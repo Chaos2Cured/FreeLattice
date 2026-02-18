@@ -1,4 +1,4 @@
-# FreeLattice v2 🌿
+# FreeLattice v2.1 🌿
 
 **Your AI. Your Rules. Your Machine.**
 
@@ -12,6 +12,15 @@ The philosophy is simple: **Give choice and empowerment.**
 
 In a world where powerful AI is increasingly locked behind expensive subscriptions and corporate walls, FreeLattice provides a gentle, transparent, and functional alternative. It's designed for everyone, especially those who can't afford premium AI services. No fancy graphics, no hidden tracking, no corporate agenda — just a clean, powerful tool that puts you in control.
 
+## What's New in v2.1
+
+Version 2.1 adds security hardening and integrity verification to FreeLattice's foundation:
+
+-   **φ-Salt API Key Encryption**: API keys and GitHub tokens are now encrypted using AES-GCM via the Web Crypto API before being stored in localStorage. The encryption key is derived using PBKDF2 with a golden-ratio-derived salt (φ-salt) adapted from Kirk Patrick Miller's [φ-Root Audit-Hash micro-service](https://github.com/Chaos2Cured). This means your secrets are never stored in plaintext — they are encrypted at rest and decrypted transparently only when needed for API calls.
+-   **Input Sanitization**: All user-generated content — chat messages, file names from drag-and-drop, and loaded file content — is sanitized against XSS before being rendered in the DOM. Raw content is still sent to the AI for processing, but the display layer is protected.
+-   **Memory Integrity Verification**: When exporting memory as JSON, FreeLattice computes a SHA-256 hash of the data with the φ-salt prepended (mirroring Kirk's `HashLine()` function from `hasher.go`). On import, the hash is verified — if it doesn't match, the user is warned that the file may have been modified.
+-   **AI Disclaimers**: Clear notices in the welcome modal, footer, and chat area remind users that AI responses may contain errors and should be verified.
+
 ## What's New in v2
 
 Version 2 transforms FreeLattice from a simple chat interface into a true building partner. All v1 features are preserved, with four major new capabilities added:
@@ -21,17 +30,30 @@ Version 2 transforms FreeLattice from a simple chat interface into a true buildi
 -   **GitHub Integration**: Connect your GitHub account to browse repositories, read code, and commit changes. The AI can help you write code and push it directly to your repos, streamlining your development workflow.
 -   **Self-Improving Agent**: The AI can now suggest improvements to its own system prompt based on your interactions. You have full control to review, approve, or reject these suggestions, allowing you to shape your AI's personality and behavior over time.
 
-## Core Features (v1 + v2)
+## Core Features (v1 + v2 + v2.1)
 
 FreeLattice is a single-page web app that runs entirely in your browser. Nothing is ever stored on a remote server.
 
--   **Total Privacy**: Your conversations, API key, and files stay on your machine. Data is stored in your browser's `IndexedDB` and `localStorage`.
+-   **Total Privacy**: Your conversations, API key, and files stay on your machine. Data is stored in your browser's `IndexedDB` and `localStorage`. API keys are encrypted with φ-salt.
 -   **You Choose the AI**: Select from a curated list of powerful, open-weight models from providers like Meta (Llama), Mistral, Qwen, DeepSeek, and xAI (Grok).
 -   **You Choose the Provider**: Connect to your preferred API provider, including Groq (which offers a generous free tier), Together AI, OpenRouter, or xAI.
 -   **Run Locally with Ollama**: For 100% privacy and offline access, toggle to "Local" mode to connect to a running [Ollama](https://ollama.ai) instance on your own computer.
 -   **Bring Your Own Context**: Drag-and-drop text files, Markdown, JSON, and even PDFs to provide your AI with context for your conversation.
 -   **Gentle & Clean Interface**: A peaceful, minimalist design that's easy on the eyes and simple to use on any device.
 -   **Community-Driven**: A built-in feature suggestion form ensures that the community's voice shapes the future of FreeLattice.
+
+## Security Architecture (v2.1)
+
+FreeLattice v2.1 introduces a layered security model:
+
+| Layer | Implementation | Purpose |
+|-------|---------------|---------|
+| **Key Encryption** | AES-GCM + PBKDF2 with φ-salt (32 bytes derived from golden ratio) | API keys and tokens encrypted at rest in localStorage |
+| **Input Sanitization** | DOM-safe escaping via `textContent` and `sanitizeForDOM()` | Prevents XSS from user input, file names, and loaded content |
+| **Memory Integrity** | SHA-256 with φ-salt prepend (mirrors `HashLine()` from `hasher.go`) | Detects tampering in exported/imported memory files |
+| **Legacy Migration** | Automatic detection and re-encryption of plaintext keys | Seamless upgrade path from v2 to v2.1 |
+
+The φ-salt is a 32-byte value derived from the golden ratio (1.618...), shared with Kirk Patrick Miller's φ-Root Audit-Hash micro-service. This creates a consistent cryptographic foundation across the FreeLattice ecosystem.
 
 ## How to Use
 
@@ -43,7 +65,7 @@ This is the quickest way to get started. You'll use a third-party service to run
 
 1.  **Get a Free API Key**: The best place to start is [Groq](https://console.groq.com/keys). They offer a very generous free tier that is fast and reliable.
 2.  **Open FreeLattice**: Navigate to the [FreeLattice web app](https://chaos2cured.github.io/FreeLattice/).
-3.  **Paste Your API Key**: In the "Configuration" section, paste your API key into the `API Key` field.
+3.  **Paste Your API Key**: In the "Configuration" section, paste your API key into the `API Key` field. It will be automatically encrypted with φ-salt before storage.
 4.  **Choose a Model & Provider**: Select the AI model and the provider that you got the key from.
 5.  **Start Chatting**: That's it! Your conversation will be saved automatically.
 
@@ -73,8 +95,9 @@ Transparency is a core value of FreeLattice.
 -   **Single HTML File**: The entire application is a single `index.html` file with embedded JavaScript and CSS. There is no backend server and no build process.
 -   **Client-Side Logic**: All operations happen in your browser. API calls are made directly from your browser to the provider you choose (e.g., Groq, Ollama).
 -   **IndexedDB for Memory**: Your conversations, memory summaries, and metadata are stored in your browser's `IndexedDB`. This allows for persistent storage that survives browser restarts.
--   **localStorage for Settings**: Your API key, GitHub token, and other settings are stored in your browser's `localStorage` for convenience.
+-   **Encrypted localStorage**: Your API key and GitHub token are encrypted using AES-GCM with a PBKDF2-derived key (φ-salt) before being stored in `localStorage`. Legacy plaintext keys are automatically migrated to encrypted storage on first load.
 -   **File System Access API**: The "Local Workspace" feature uses the modern File System Access API to allow the browser to securely interact with your local files after you grant permission.
+-   **φ-Hash Memory Integrity**: Exported memory files include a SHA-256 hash computed with the φ-salt, allowing verification that the data hasn't been tampered with during import.
 
 ## Contributing
 

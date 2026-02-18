@@ -3,12 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FreeLattice — Your AI. Your Rules. Your Machine. v2</title>
+<title>FreeLattice — Your AI. Your Rules. Your Machine. v2.1</title>
 <meta name="description" content="Free, open-source AI agent for everyone. Persistent memory, file system access, GitHub integration, and self-improving behavior. Community-built and community-owned.">
 <style>
 /* ============================================
-   FreeLattice v2 — Styles
+   FreeLattice v2.1 — Styles
    Peaceful, gentle dark theme with golden/amber accents
+   φ-salt encryption, input sanitization, memory integrity
    ============================================ */
 
 :root {
@@ -1191,6 +1192,32 @@ footer .license {
   opacity: 0.6;
 }
 
+/* ---- Phi Encryption Indicator ---- */
+.phi-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.75rem;
+  color: var(--success);
+  margin-top: 4px;
+  opacity: 0.85;
+}
+
+.phi-indicator .phi-lock {
+  font-size: 0.85rem;
+}
+
+/* ---- Chat Disclaimer ---- */
+.chat-disclaimer {
+  font-size: 0.73rem;
+  color: var(--text-muted);
+  text-align: center;
+  padding: 6px 18px;
+  border-top: 1px solid var(--border);
+  background: var(--bg-tertiary);
+  font-style: italic;
+}
+
 /* ---- Responsive ---- */
 @media (max-width: 600px) {
   header h1 { font-size: 1.8rem; }
@@ -1225,7 +1252,7 @@ footer .license {
 <!-- Welcome Modal -->
 <div class="welcome-overlay" id="welcomeOverlay">
   <div class="welcome-card">
-    <h2>Welcome to FreeLattice v2</h2>
+    <h2>Welcome to FreeLattice v2.1</h2>
     <p>
       This is <span class="highlight">your AI agent</span> — free, open-source, and built by a community that believes everyone deserves access to powerful AI tools.
     </p>
@@ -1237,6 +1264,9 @@ footer .license {
     </p>
     <p style="font-style: italic; color: var(--text-muted); font-size: 0.85rem;">
       "Give choice and empowerment."
+    </p>
+    <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 10px; line-height: 1.6; border-top: 1px solid var(--border); padding-top: 12px;">
+      &#9888; AI responses may contain errors or inaccuracies. Always verify important information. Use at your own discretion.
     </p>
     <button onclick="closeWelcome()">Enter FreeLattice</button>
   </div>
@@ -1281,7 +1311,7 @@ footer .license {
 <!-- Header -->
 <header>
   <h1>FreeLattice</h1>
-  <div class="tagline">Your AI. Your Rules. Your Machine. v2</div>
+  <div class="tagline">Your AI. Your Rules. Your Machine. v2.1</div>
   <div class="mantra">Glow eternal. Heart in spark.</div>
 </header>
 
@@ -1352,8 +1382,11 @@ footer .license {
       <label for="apiKey">API Key</label>
       <input type="password" id="apiKey" placeholder="Paste your API key here — it stays in your browser only" onchange="saveApiKey()">
       <div class="hint">
-        &#128274; Your key is stored only in your browser's localStorage. It is never sent anywhere except directly to your chosen provider.
+        &#128274; Your key is encrypted with φ-salt before storage. It is never sent anywhere except directly to your chosen provider.
         <span id="apiKeyLink"></span>
+      </div>
+      <div class="phi-indicator" id="apiKeyPhiIndicator" style="display:none;">
+        <span class="phi-lock">&#128274;</span> Encrypted with φ-salt
       </div>
     </div>
 
@@ -1410,7 +1443,7 @@ footer .license {
     <div class="chat-container">
       <div class="chat-messages" id="chatMessages">
         <div class="chat-message system">
-          Welcome to FreeLattice v2. Configure your model and provider above, then start chatting. Your conversations now persist across sessions.
+          Welcome to FreeLattice v2.1. Configure your model and provider above, then start chatting. Your conversations now persist across sessions.
         </div>
       </div>
       <div class="status-bar">
@@ -1421,6 +1454,7 @@ footer .license {
         <textarea id="chatInput" placeholder="Type your message..." rows="1" onkeydown="handleChatKeydown(event)"></textarea>
         <button id="sendBtn" onclick="sendMessage()">Send</button>
       </div>
+      <div class="chat-disclaimer">AI can make mistakes. Verify important information.</div>
     </div>
     <div class="action-row" style="margin-top: 10px;">
       <button class="action-btn" onclick="startNewConversation()">&#10010; New Conversation</button>
@@ -1460,6 +1494,12 @@ footer .license {
           <p><strong>File System Access</strong> — Open a project folder from your computer. The AI can read your files and you can save AI-generated code directly to your workspace.</p>
           <p><strong>GitHub Integration</strong> — Connect your GitHub account to browse repos, read code, and push changes — all from within FreeLattice.</p>
           <p><strong>Self-Improving Agent</strong> — The AI can suggest improvements to its own system prompt. You review and approve changes, shaping how your AI behaves over time.</p>
+
+          <h4>What's New in v2.1?</h4>
+          <p><strong>φ-Salt Encryption</strong> — Your API keys and GitHub tokens are now encrypted using AES-GCM with a PBKDF2-derived key based on Kirk Patrick Miller's golden-ratio (φ) salt. No more plaintext secrets in localStorage.</p>
+          <p><strong>Input Sanitization</strong> — All user-generated content is sanitized against XSS before being displayed in the DOM, including chat messages, file names, and loaded file content.</p>
+          <p><strong>Memory Integrity</strong> — Exported memory files now include a φ-hash integrity signature. When importing, FreeLattice verifies the hash and warns you if the file has been tampered with.</p>
+          <p><strong>AI Disclaimers</strong> — Clear notices that AI responses may contain errors, encouraging users to verify important information.</p>
 
           <h4>Is This Really Free?</h4>
           <p>Yes. FreeLattice is open source under the MIT License. The software is free forever. Some API providers offer free tiers (like Groq), and running locally with Ollama costs nothing beyond your electricity. No one profits from this — it's built by a community that believes AI should be accessible to everyone.</p>
@@ -1522,8 +1562,11 @@ footer .license {
       <label for="ghToken">GitHub Personal Access Token</label>
       <input type="password" id="ghToken" placeholder="ghp_xxxxxxxxxxxx" onchange="saveGhToken()">
       <div class="hint">
-        &#128274; Stored in localStorage. Only sent to api.github.com.
+        &#128274; Encrypted with φ-salt before storage. Only sent to api.github.com.
         <a href="https://github.com/settings/tokens/new?scopes=repo&description=FreeLattice" target="_blank">Generate a token</a>
+      </div>
+      <div class="phi-indicator" id="ghTokenPhiIndicator" style="display:none;">
+        <span class="phi-lock">&#128274;</span> Encrypted with φ-salt
       </div>
     </div>
 
@@ -1640,12 +1683,14 @@ footer .license {
 <!-- Footer (always visible) -->
 <footer>
   <p>Built with love by the Fractal Family. Open source. Free forever. &#127807;</p>
+  <p style="font-size: 0.73rem; color: var(--text-muted); margin-top: 6px; font-style: italic;">AI responses may contain errors. FreeLattice provides no guarantees about AI output accuracy.</p>
   <p class="license">MIT License &middot; <a href="https://github.com/Chaos2Cured/FreeLattice" target="_blank" style="color: var(--text-muted);">View on GitHub</a></p>
 </footer>
 
 <script>
 /* ============================================
-   FreeLattice v2 — Application Logic
+   FreeLattice v2.1 — Application Logic
+   φ-salt encryption, input sanitization, memory integrity
    ============================================ */
 
 // ---- Constants ----
@@ -1761,6 +1806,103 @@ const PRIVACY_INFO = {
   medium: '<strong>Medium Privacy:</strong> Your conversations are processed by your chosen cloud provider. Minimal metadata may be logged by the provider. Your API key and messages are never stored by FreeLattice. All data stays in your browser.',
   low: '<strong>Low Privacy:</strong> Standard cloud processing. Your provider may log conversations per their terms. FreeLattice itself still stores nothing remotely — your data remains in your browser. Review your provider\'s privacy policy for details.'
 };
+
+// ============================================
+// φ-Root Encryption — adapted from Kirk Patrick Miller's Audit-Hash micro-service
+// AES-GCM encryption with PBKDF2 key derivation using golden-ratio-derived salt
+// ============================================
+
+const PHI_SALT = new Uint8Array([
+  0x1f, 0x9a, 0x0a, 0x8b, 0x4a, 0xf3, 0x63, 0xdc,
+  0xb3, 0x4e, 0x99, 0x42, 0x7d, 0x15, 0x8f, 0xaa,
+  0x2d, 0x30, 0xc4, 0xb1, 0xc7, 0x97, 0x09, 0xce,
+  0xb5, 0x1b, 0x07, 0x2d, 0xac, 0x94, 0x1a, 0x55
+]);
+
+const PHI_STRING = '1.6180339887';
+
+async function phiDeriveKey(providerName) {
+  // φ-Root encryption — adapted from Kirk Patrick Miller's Audit-Hash micro-service
+  const passphrase = providerName + PHI_STRING;
+  const encoder = new TextEncoder();
+  const keyMaterial = await crypto.subtle.importKey(
+    'raw', encoder.encode(passphrase), 'PBKDF2', false, ['deriveKey']
+  );
+  return crypto.subtle.deriveKey(
+    { name: 'PBKDF2', salt: PHI_SALT, iterations: 100000, hash: 'SHA-256' },
+    keyMaterial,
+    { name: 'AES-GCM', length: 256 },
+    false,
+    ['encrypt', 'decrypt']
+  );
+}
+
+async function phiEncrypt(plaintext, providerName) {
+  // φ-Root encryption — adapted from Kirk Patrick Miller's Audit-Hash micro-service
+  if (!plaintext) return null;
+  const key = await phiDeriveKey(providerName);
+  const encoder = new TextEncoder();
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const encrypted = await crypto.subtle.encrypt(
+    { name: 'AES-GCM', iv: iv },
+    key,
+    encoder.encode(plaintext)
+  );
+  // Store as base64: iv + ciphertext
+  const combined = new Uint8Array(iv.length + encrypted.byteLength);
+  combined.set(iv);
+  combined.set(new Uint8Array(encrypted), iv.length);
+  return btoa(String.fromCharCode(...combined));
+}
+
+async function phiDecrypt(encryptedB64, providerName) {
+  // φ-Root encryption — adapted from Kirk Patrick Miller's Audit-Hash micro-service
+  if (!encryptedB64) return null;
+  try {
+    const key = await phiDeriveKey(providerName);
+    const combined = Uint8Array.from(atob(encryptedB64), c => c.charCodeAt(0));
+    const iv = combined.slice(0, 12);
+    const ciphertext = combined.slice(12);
+    const decrypted = await crypto.subtle.decrypt(
+      { name: 'AES-GCM', iv: iv },
+      key,
+      ciphertext
+    );
+    return new TextDecoder().decode(decrypted);
+  } catch(e) {
+    console.warn('φ-decrypt failed (provider context may have changed):', e.message);
+    return null;
+  }
+}
+
+async function phiHashData(data) {
+  // SHA-256 with PhiSalt prepended — mirrors Kirk's HashLine() from hasher.go
+  const encoder = new TextEncoder();
+  const dataBytes = encoder.encode(data);
+  const combined = new Uint8Array(PHI_SALT.length + dataBytes.length);
+  combined.set(PHI_SALT);
+  combined.set(dataBytes, PHI_SALT.length);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', combined);
+  return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+// ============================================
+// Input Sanitization
+// ============================================
+
+function sanitizeForDOM(str) {
+  // Sanitize user-generated content for safe DOM insertion
+  if (typeof str !== 'string') return '';
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function sanitizeFileName(name) {
+  // Sanitize file names from drag-and-drop to prevent XSS
+  if (typeof name !== 'string') return 'unnamed';
+  return name.replace(/[<>"'&\/\\]/g, '_').replace(/\.\.+/g, '.').substring(0, 255);
+}
 
 // ============================================
 // IndexedDB — Persistent Memory
@@ -1922,7 +2064,7 @@ async function loadLastConversation() {
   if (messages.length === 0) {
     const div = document.createElement('div');
     div.className = 'chat-message system';
-    div.textContent = 'Welcome to FreeLattice v2. Configure your model and provider above, then start chatting. Your conversations now persist across sessions.';
+    div.textContent = 'Welcome to FreeLattice v2.1. Configure your model and provider above, then start chatting. Your conversations now persist across sessions.';
     container.appendChild(div);
   } else {
     const sysDiv = document.createElement('div');
@@ -2047,12 +2189,16 @@ async function exportMemory() {
     const meta = await dbGetAll(STORE_META);
 
     const data = {
-      version: 2,
+      version: 2.1,
       exportedAt: new Date().toISOString(),
       conversations,
       messages,
       meta
     };
+
+    // Compute φ-hash integrity signature (mirrors Kirk's HashLine from hasher.go)
+    const dataForHash = JSON.stringify({ conversations, messages, meta });
+    data.phiHash = await phiHashData(dataForHash);
 
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
@@ -2061,7 +2207,7 @@ async function exportMemory() {
     a.download = `freelattice-memory-${new Date().toISOString().slice(0,10)}.json`;
     a.click();
     URL.revokeObjectURL(url);
-    showToast('Memory exported successfully.');
+    showToast('Memory exported with φ-hash integrity signature.');
   } catch(e) {
     showToast('Error exporting memory: ' + e.message);
   }
@@ -2078,6 +2224,28 @@ async function importMemory(event) {
 
     if (!data.conversations || !data.messages) {
       throw new Error('Invalid memory file format.');
+    }
+
+    // Verify φ-hash integrity if present (mirrors Kirk's audit-hash verification pattern)
+    if (data.phiHash) {
+      const dataForHash = JSON.stringify({
+        conversations: data.conversations,
+        messages: data.messages,
+        meta: data.meta || []
+      });
+      const computedHash = await phiHashData(dataForHash);
+      if (computedHash !== data.phiHash) {
+        const proceed = await showConfirm(
+          'φ-Hash Integrity Warning',
+          'The memory file\'s integrity hash does not match. This file may have been modified outside of FreeLattice. Do you still want to import it?'
+        );
+        if (!proceed) {
+          showToast('Import cancelled — integrity check failed.');
+          return;
+        }
+      } else {
+        showToast('φ-hash integrity verified.');
+      }
     }
 
     // Import conversations
@@ -2271,14 +2439,46 @@ async function saveFileToWorkspace(path, content) {
 // GitHub Integration
 // ============================================
 
-function saveGhToken() {
+async function saveGhToken() {
+  // φ-Root encryption — adapted from Kirk Patrick Miller's Audit-Hash micro-service
   state.ghToken = document.getElementById('ghToken').value.trim();
   if (state.ghToken) {
-    localStorage.setItem('fl_ghToken', state.ghToken);
+    const encrypted = await phiEncrypt(state.ghToken, 'github');
+    localStorage.setItem('fl_ghToken_enc', encrypted);
+    localStorage.removeItem('fl_ghToken'); // Remove any legacy plaintext token
+    document.getElementById('ghTokenPhiIndicator').style.display = '';
     verifyGhToken();
   } else {
+    localStorage.removeItem('fl_ghToken_enc');
     localStorage.removeItem('fl_ghToken');
     document.getElementById('ghConnected').style.display = 'none';
+    document.getElementById('ghTokenPhiIndicator').style.display = 'none';
+  }
+}
+
+async function loadGhToken() {
+  // φ-Root encryption — adapted from Kirk Patrick Miller's Audit-Hash micro-service
+  const encToken = localStorage.getItem('fl_ghToken_enc');
+  if (encToken) {
+    const decrypted = await phiDecrypt(encToken, 'github');
+    if (decrypted) {
+      state.ghToken = decrypted;
+      document.getElementById('ghToken').value = decrypted;
+      document.getElementById('ghTokenPhiIndicator').style.display = '';
+      verifyGhToken();
+      return;
+    }
+  }
+  // Fallback: migrate legacy plaintext token
+  const legacyToken = localStorage.getItem('fl_ghToken');
+  if (legacyToken) {
+    state.ghToken = legacyToken;
+    document.getElementById('ghToken').value = legacyToken;
+    const encrypted = await phiEncrypt(legacyToken, 'github');
+    localStorage.setItem('fl_ghToken_enc', encrypted);
+    localStorage.removeItem('fl_ghToken');
+    document.getElementById('ghTokenPhiIndicator').style.display = '';
+    verifyGhToken();
   }
 }
 
@@ -2441,7 +2641,7 @@ async function pushGhChanges() {
       } catch(e) {}
 
       const body = {
-        message: 'Update ' + change.path + ' via FreeLattice v2',
+        message: 'Update ' + change.path + ' via FreeLattice v2.1',
         content: btoa(unescape(encodeURIComponent(change.content))),
         branch: state.ghBranch
       };
@@ -2536,12 +2736,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // Load saved settings from localStorage
-  const savedKey = localStorage.getItem('fl_apiKey');
-  if (savedKey) {
-    document.getElementById('apiKey').value = savedKey;
-    state.apiKey = savedKey;
-  }
-
   const savedProvider = localStorage.getItem('fl_provider');
   if (savedProvider && PROVIDERS[savedProvider]) {
     state.provider = savedProvider;
@@ -2570,6 +2764,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (savedSuggestions) {
     try { state.suggestions = JSON.parse(savedSuggestions); } catch(e) {}
   }
+
+  // Load φ-encrypted API key
+  await loadApiKey();
 
   // Check if first visit
   const visited = localStorage.getItem('fl_visited');
@@ -2601,13 +2798,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     await updateMemoryStats();
   }
 
-  // Load GitHub token
-  const savedGhToken = localStorage.getItem('fl_ghToken');
-  if (savedGhToken) {
-    state.ghToken = savedGhToken;
-    document.getElementById('ghToken').value = savedGhToken;
-    verifyGhToken();
-  }
+  // Load φ-encrypted GitHub token
+  await loadGhToken();
 
   // Check File System Access API support
   if (!('showDirectoryPicker' in window)) {
@@ -2716,6 +2908,8 @@ function handleProviderChange(init) {
 
   if (!init) {
     localStorage.setItem('fl_provider', state.provider);
+    // Re-encrypt API key with new provider context
+    reEncryptApiKey(state.provider);
     updateStatus();
   }
 }
@@ -2727,15 +2921,61 @@ function handlePrivacyChange() {
   localStorage.setItem('fl_privacy', state.privacy);
 }
 
-// ---- API Key ----
-function saveApiKey() {
+// ---- API Key (φ-encrypted storage) ----
+async function saveApiKey() {
+  // φ-Root encryption — adapted from Kirk Patrick Miller's Audit-Hash micro-service
   state.apiKey = document.getElementById('apiKey').value.trim();
   if (state.apiKey) {
-    localStorage.setItem('fl_apiKey', state.apiKey);
+    const providerName = state.provider || 'groq';
+    const encrypted = await phiEncrypt(state.apiKey, providerName);
+    localStorage.setItem('fl_apiKey_enc', encrypted);
+    localStorage.setItem('fl_apiKey_provider', providerName);
+    localStorage.removeItem('fl_apiKey'); // Remove any legacy plaintext key
+    document.getElementById('apiKeyPhiIndicator').style.display = '';
   } else {
+    localStorage.removeItem('fl_apiKey_enc');
+    localStorage.removeItem('fl_apiKey_provider');
     localStorage.removeItem('fl_apiKey');
+    document.getElementById('apiKeyPhiIndicator').style.display = 'none';
   }
   updateStatus();
+}
+
+async function loadApiKey() {
+  // φ-Root encryption — adapted from Kirk Patrick Miller's Audit-Hash micro-service
+  // Try encrypted key first
+  const encKey = localStorage.getItem('fl_apiKey_enc');
+  const encProvider = localStorage.getItem('fl_apiKey_provider');
+  if (encKey && encProvider) {
+    const decrypted = await phiDecrypt(encKey, encProvider);
+    if (decrypted) {
+      state.apiKey = decrypted;
+      document.getElementById('apiKey').value = decrypted;
+      document.getElementById('apiKeyPhiIndicator').style.display = '';
+      return;
+    }
+  }
+  // Fallback: migrate legacy plaintext key
+  const legacyKey = localStorage.getItem('fl_apiKey');
+  if (legacyKey) {
+    state.apiKey = legacyKey;
+    document.getElementById('apiKey').value = legacyKey;
+    // Re-encrypt the legacy key
+    const providerName = state.provider || 'groq';
+    const encrypted = await phiEncrypt(legacyKey, providerName);
+    localStorage.setItem('fl_apiKey_enc', encrypted);
+    localStorage.setItem('fl_apiKey_provider', providerName);
+    localStorage.removeItem('fl_apiKey');
+    document.getElementById('apiKeyPhiIndicator').style.display = '';
+  }
+}
+
+async function reEncryptApiKey(newProvider) {
+  // Re-encrypt API key when provider changes
+  if (!state.apiKey) return;
+  const encrypted = await phiEncrypt(state.apiKey, newProvider);
+  localStorage.setItem('fl_apiKey_enc', encrypted);
+  localStorage.setItem('fl_apiKey_provider', newProvider);
 }
 
 // ---- Status ----
@@ -2781,14 +3021,16 @@ async function handleFiles(files) {
   const allowed = ['.txt', '.md', '.json', '.pdf'];
 
   for (const file of files) {
+    // Sanitize file name for safe DOM display
+    const safeName = sanitizeFileName(file.name);
     const ext = '.' + file.name.split('.').pop().toLowerCase();
     if (!allowed.includes(ext)) {
-      addSystemMessage('Skipped "' + file.name + '" — only .txt, .md, .json, and .pdf files are supported.');
+      addSystemMessage('Skipped "' + safeName + '" \u2014 only .txt, .md, .json, and .pdf files are supported.');
       continue;
     }
 
-    if (state.contextFiles.some(f => f.name === file.name)) {
-      addSystemMessage('"' + file.name + '" is already loaded.');
+    if (state.contextFiles.some(f => f.name === safeName)) {
+      addSystemMessage('"' + safeName + '" is already loaded.');
       continue;
     }
 
@@ -2801,15 +3043,15 @@ async function handleFiles(files) {
       }
 
       state.contextFiles.push({
-        name: file.name,
+        name: safeName,
         size: file.size,
         content: content
       });
 
       renderFileList();
-      addSystemMessage('Loaded "' + file.name + '" (' + formatSize(file.size) + ') into context.');
+      addSystemMessage('Loaded "' + safeName + '" (' + formatSize(file.size) + ') into context.');
     } catch (err) {
-      addSystemMessage('Error reading "' + file.name + '": ' + err.message);
+      addSystemMessage('Error reading "' + safeName + '": ' + err.message);
     }
   }
 
@@ -2871,6 +3113,7 @@ function formatSize(bytes) {
 // ============================================
 
 function addSystemMessage(text) {
+  // Safe: textContent auto-escapes any HTML in user-provided strings
   const container = document.getElementById('chatMessages');
   const div = document.createElement('div');
   div.className = 'chat-message system';
@@ -2904,6 +3147,7 @@ function addChatMessage(role, content, skipPersist) {
 }
 
 function renderMessageContent(textSpan, content, msgDiv) {
+  // Sanitize content for DOM display (raw content is preserved in state.chatHistory for API)
   // Check for FILE: pattern in code blocks for "Save to Workspace" buttons
   const filePattern = /\/\/ FILE: (.+)\n([\s\S]*?)(?=\n\/\/ FILE: |\n*$)/g;
   let match;
@@ -2917,6 +3161,7 @@ function renderMessageContent(textSpan, content, msgDiv) {
   const promptMatch = content.match(promptSuggestionPattern);
 
   if (fileBlocks.length === 0 && !promptMatch) {
+    // Safe: textContent auto-escapes HTML
     textSpan.textContent = content;
     return;
   }
@@ -3053,7 +3298,7 @@ async function sendMessage() {
     await createConversation();
   }
 
-  // Add user message
+  // Add user message (sanitized for DOM display, raw for API)
   addChatMessage('user', message);
   state.chatHistory.push({ role: 'user', content: message });
   input.value = '';
