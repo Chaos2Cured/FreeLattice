@@ -1,0 +1,1763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FreeLattice — Your AI. Your Rules. Your Machine.</title>
+<meta name="description" content="Free, open-source AI chat for everyone. No premium required. Community-built and community-owned.">
+<style>
+/* ============================================
+   FreeLattice — Styles
+   Peaceful, gentle dark theme with golden/amber accents
+   ============================================ */
+
+:root {
+  --bg-primary: #0f1117;
+  --bg-secondary: #161822;
+  --bg-tertiary: #1c1f2e;
+  --bg-card: #1a1d2b;
+  --bg-input: #12141e;
+  --border: #2a2d3e;
+  --border-focus: #c9a84c;
+  --text-primary: #e8e4dc;
+  --text-secondary: #a09b8e;
+  --text-muted: #6b6760;
+  --accent: #c9a84c;
+  --accent-soft: #c9a84c33;
+  --accent-glow: #c9a84c22;
+  --accent-hover: #d4b45e;
+  --success: #6abf69;
+  --warning: #d4a843;
+  --error: #c75050;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --shadow: 0 2px 12px rgba(0,0,0,0.3);
+  --transition: 0.25s ease;
+  --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
+}
+
+body {
+  font-family: var(--font);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.65;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-primary); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+/* Layout */
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* ---- Header ---- */
+header {
+  text-align: center;
+  padding: 40px 20px 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+header h1 {
+  font-size: 2.4rem;
+  font-weight: 300;
+  letter-spacing: 0.15em;
+  color: var(--accent);
+  margin-bottom: 6px;
+}
+
+header .tagline {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  font-weight: 400;
+  letter-spacing: 0.06em;
+}
+
+header .mantra {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-style: italic;
+  margin-top: 10px;
+  opacity: 0.8;
+}
+
+/* ---- Music Toggle ---- */
+.music-toggle {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition);
+  color: var(--text-muted);
+  font-size: 1.1rem;
+}
+
+.music-toggle:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.music-toggle.active {
+  color: var(--accent);
+  border-color: var(--accent);
+  box-shadow: 0 0 12px var(--accent-soft);
+}
+
+/* ---- Welcome Modal ---- */
+.welcome-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  backdrop-filter: blur(4px);
+}
+
+.welcome-overlay.hidden { display: none; }
+
+.welcome-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  max-width: 560px;
+  width: 100%;
+  padding: 40px 36px;
+  text-align: center;
+  box-shadow: var(--shadow);
+}
+
+.welcome-card h2 {
+  font-size: 1.8rem;
+  font-weight: 300;
+  color: var(--accent);
+  letter-spacing: 0.1em;
+  margin-bottom: 16px;
+}
+
+.welcome-card p {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  margin-bottom: 14px;
+  line-height: 1.7;
+}
+
+.welcome-card .highlight {
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.welcome-card button {
+  margin-top: 20px;
+  padding: 12px 36px;
+  background: var(--accent);
+  color: var(--bg-primary);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  letter-spacing: 0.03em;
+}
+
+.welcome-card button:hover {
+  background: var(--accent-hover);
+  transform: translateY(-1px);
+}
+
+/* ---- Sections ---- */
+.section {
+  padding: 24px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.section:last-of-type { border-bottom: none; }
+
+.section-title {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--accent);
+  margin-bottom: 16px;
+  font-weight: 600;
+}
+
+/* ---- Form Elements ---- */
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+@media (max-width: 600px) {
+  .form-row { grid-template-columns: 1fr; }
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group label {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.form-group select,
+.form-group input[type="text"],
+.form-group input[type="password"],
+.form-group textarea {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  font-family: var(--font);
+  transition: var(--transition);
+  outline: none;
+  width: 100%;
+}
+
+.form-group select:focus,
+.form-group input:focus,
+.form-group textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.form-group select { cursor: pointer; }
+
+.form-group select option {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.hint {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin-top: 2px;
+}
+
+.hint a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.hint a:hover { text-decoration: underline; }
+
+/* ---- Toggle Switch ---- */
+.toggle-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.toggle-label {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.toggle-label.active { color: var(--accent); font-weight: 500; }
+
+.toggle-switch {
+  position: relative;
+  width: 52px;
+  height: 28px;
+  flex-shrink: 0;
+}
+
+.toggle-switch input { opacity: 0; width: 0; height: 0; }
+
+.toggle-slider {
+  position: absolute;
+  inset: 0;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.toggle-slider::before {
+  content: '';
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  top: 2px;
+  left: 3px;
+  transition: var(--transition);
+}
+
+.toggle-switch input:checked + .toggle-slider {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
+
+.toggle-switch input:checked + .toggle-slider::before {
+  background: var(--accent);
+  transform: translateX(23px);
+}
+
+/* ---- Privacy Info ---- */
+.privacy-info {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px 18px;
+  margin-top: 10px;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* ---- Ollama Instructions ---- */
+.ollama-instructions {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 18px;
+  margin-top: 12px;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+.ollama-instructions code {
+  background: var(--bg-primary);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.82rem;
+  color: var(--accent);
+  font-family: 'Courier New', monospace;
+}
+
+.ollama-instructions h4 {
+  color: var(--accent);
+  font-size: 0.88rem;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.hidden { display: none !important; }
+
+/* ---- File Drop Zone ---- */
+.drop-zone {
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  padding: 30px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: var(--transition);
+  margin-top: 8px;
+  position: relative;
+}
+
+.drop-zone:hover,
+.drop-zone.dragover {
+  border-color: var(--accent);
+  background: var(--accent-glow);
+}
+
+.drop-zone-text {
+  color: var(--text-muted);
+  font-size: 0.88rem;
+}
+
+.drop-zone-text .icon {
+  font-size: 1.6rem;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.drop-zone input[type="file"] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.file-list {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.file-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 14px;
+  font-size: 0.82rem;
+}
+
+.file-item .file-name {
+  color: var(--text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+  margin-right: 10px;
+}
+
+.file-item .file-size {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  margin-right: 10px;
+  flex-shrink: 0;
+}
+
+.file-item .remove-file {
+  background: none;
+  border: none;
+  color: var(--error);
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0 4px;
+  transition: var(--transition);
+  flex-shrink: 0;
+}
+
+.file-item .remove-file:hover { opacity: 0.7; }
+
+/* ---- Chat Interface ---- */
+.chat-container {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-top: 12px;
+}
+
+.chat-messages {
+  height: 400px;
+  overflow-y: auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.chat-message {
+  max-width: 85%;
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  line-height: 1.65;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+}
+
+.chat-message.user {
+  align-self: flex-end;
+  background: var(--accent-soft);
+  color: var(--text-primary);
+  border-bottom-right-radius: 4px;
+}
+
+.chat-message.assistant {
+  align-self: flex-start;
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border-bottom-left-radius: 4px;
+}
+
+.chat-message.system {
+  align-self: center;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  font-style: italic;
+  text-align: center;
+  max-width: 100%;
+}
+
+.chat-message .msg-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+  display: block;
+}
+
+.chat-message.user .msg-label { text-align: right; }
+
+.chat-input-row {
+  display: flex;
+  border-top: 1px solid var(--border);
+}
+
+.chat-input-row textarea {
+  flex: 1;
+  background: var(--bg-input);
+  border: none;
+  padding: 14px 18px;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  font-family: var(--font);
+  resize: none;
+  outline: none;
+  min-height: 48px;
+  max-height: 120px;
+  line-height: 1.5;
+}
+
+.chat-input-row textarea::placeholder { color: var(--text-muted); }
+
+.chat-input-row button {
+  background: var(--accent);
+  color: var(--bg-primary);
+  border: none;
+  padding: 14px 22px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  letter-spacing: 0.02em;
+}
+
+.chat-input-row button:hover { background: var(--accent-hover); }
+
+.chat-input-row button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ---- Status Bar ---- */
+.status-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  background: var(--bg-tertiary);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  border-top: 1px solid var(--border);
+}
+
+.status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.status-dot.ready { background: var(--success); }
+.status-dot.working { background: var(--warning); animation: pulse 1s infinite; }
+.status-dot.error { background: var(--error); }
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* ---- How It Works ---- */
+.expandable {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  margin-top: 12px;
+}
+
+.expandable-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  background: var(--bg-tertiary);
+  cursor: pointer;
+  transition: var(--transition);
+  user-select: none;
+}
+
+.expandable-header:hover { background: var(--bg-card); }
+
+.expandable-header h3 {
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.expandable-header .arrow {
+  color: var(--text-muted);
+  transition: transform 0.3s ease;
+  font-size: 0.8rem;
+}
+
+.expandable-header.open .arrow { transform: rotate(180deg); }
+
+.expandable-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease;
+}
+
+.expandable-body.open { max-height: 2000px; }
+
+.expandable-content {
+  padding: 20px;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.75;
+}
+
+.expandable-content h4 {
+  color: var(--accent);
+  font-size: 0.88rem;
+  margin: 16px 0 6px;
+  font-weight: 600;
+}
+
+.expandable-content h4:first-child { margin-top: 0; }
+
+.expandable-content p { margin-bottom: 10px; }
+
+.expandable-content a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.expandable-content a:hover { text-decoration: underline; }
+
+.expandable-content code {
+  background: var(--bg-primary);
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 0.82rem;
+  color: var(--accent);
+}
+
+/* ---- Feature Suggestion ---- */
+.suggest-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 20px;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: var(--font);
+  margin-top: 12px;
+}
+
+.suggest-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.suggest-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  backdrop-filter: blur(4px);
+}
+
+.suggest-overlay.hidden { display: none; }
+
+.suggest-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  max-width: 500px;
+  width: 100%;
+  padding: 32px;
+  box-shadow: var(--shadow);
+}
+
+.suggest-card h3 {
+  font-size: 1.1rem;
+  color: var(--accent);
+  font-weight: 400;
+  margin-bottom: 8px;
+}
+
+.suggest-card p {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+  line-height: 1.6;
+}
+
+.suggest-card textarea {
+  width: 100%;
+  min-height: 100px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  font-family: var(--font);
+  resize: vertical;
+  outline: none;
+  transition: var(--transition);
+}
+
+.suggest-card textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.suggest-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+  justify-content: flex-end;
+}
+
+.suggest-actions button {
+  padding: 10px 22px;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: var(--font);
+}
+
+.btn-cancel {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+}
+
+.btn-cancel:hover { border-color: var(--text-secondary); color: var(--text-secondary); }
+
+.btn-submit {
+  background: var(--accent);
+  border: none;
+  color: var(--bg-primary);
+  font-weight: 600;
+}
+
+.btn-submit:hover { background: var(--accent-hover); }
+
+.suggest-success {
+  text-align: center;
+  padding: 20px 0;
+}
+
+.suggest-success .check {
+  font-size: 2rem;
+  color: var(--success);
+  margin-bottom: 12px;
+}
+
+.suggest-success p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.7;
+}
+
+.suggest-success .future-note {
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  font-style: italic;
+  margin-top: 8px;
+}
+
+/* ---- Footer ---- */
+footer {
+  text-align: center;
+  padding: 30px 20px 40px;
+  border-top: 1px solid var(--border);
+  margin-top: 10px;
+}
+
+footer p {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  line-height: 1.8;
+}
+
+footer .license {
+  font-size: 0.72rem;
+  margin-top: 8px;
+  opacity: 0.6;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 600px) {
+  header h1 { font-size: 1.8rem; }
+  .chat-messages { height: 320px; padding: 14px; }
+  .welcome-card { padding: 28px 22px; }
+  .suggest-card { padding: 24px 20px; }
+  .container { padding: 0 14px; }
+}
+</style>
+</head>
+<body>
+
+<!-- Background Music -->
+<audio id="bgMusic" loop preload="none">
+  <source src="https://chaos2cured.github.io/Lumens-World/lumens-world-ambient.mp3" type="audio/mpeg">
+</audio>
+
+<!-- Music Toggle -->
+<button class="music-toggle" id="musicToggle" title="Toggle ambient music" aria-label="Toggle ambient music">
+  ♪
+</button>
+
+<!-- Welcome Modal -->
+<div class="welcome-overlay" id="welcomeOverlay">
+  <div class="welcome-card">
+    <h2>Welcome to FreeLattice</h2>
+    <p>
+      This is <span class="highlight">your AI agent</span> — free, open-source, and built by a community that believes everyone deserves access to powerful AI tools.
+    </p>
+    <p>
+      No accounts. No tracking. No hidden costs. Your conversations stay in <span class="highlight">your browser</span>. Your API key never leaves <span class="highlight">your machine</span>.
+    </p>
+    <p>
+      You can use free cloud providers like Groq, or run models locally with Ollama. You choose. You control everything.
+    </p>
+    <p style="font-style: italic; color: var(--text-muted); font-size: 0.85rem;">
+      "Give choice and empowerment."
+    </p>
+    <button onclick="closeWelcome()">Enter FreeLattice</button>
+  </div>
+</div>
+
+<!-- Feature Suggestion Modal -->
+<div class="suggest-overlay hidden" id="suggestOverlay">
+  <div class="suggest-card" id="suggestCard">
+    <div id="suggestForm">
+      <h3>Help FreeLattice Grow</h3>
+      <p>What would you like to see? Voice chat? Image generation? Better memory? Your ideas shape what this becomes.</p>
+      <textarea id="suggestText" placeholder="Describe your idea... (e.g., 'I'd love voice input so I can talk to my AI agent')"></textarea>
+      <div class="suggest-actions">
+        <button class="btn-cancel" onclick="closeSuggest()">Cancel</button>
+        <button class="btn-submit" onclick="submitSuggestion()">Share Idea</button>
+      </div>
+    </div>
+    <div id="suggestSuccess" class="suggest-success hidden">
+      <div class="check">✓</div>
+      <p><strong>Your voice matters.</strong></p>
+      <p>This suggestion has been saved.</p>
+      <p class="future-note">In future versions, your AI agent will be able to build new features with you.</p>
+      <div class="suggest-actions" style="justify-content: center; margin-top: 20px;">
+        <button class="btn-cancel" onclick="closeSuggest()">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Header -->
+<header>
+  <h1>FreeLattice</h1>
+  <div class="tagline">Your AI. Your Rules. Your Machine.</div>
+  <div class="mantra">Glow eternal. Heart in spark.</div>
+</header>
+
+<div class="container">
+
+  <!-- Configuration Section -->
+  <div class="section">
+    <div class="section-title">Configuration</div>
+
+    <!-- Local vs Cloud Toggle -->
+    <div class="toggle-row">
+      <span class="toggle-label" id="cloudLabel">☁ Cloud</span>
+      <label class="toggle-switch">
+        <input type="checkbox" id="localToggle" onchange="handleLocalToggle()">
+        <span class="toggle-slider"></span>
+      </label>
+      <span class="toggle-label" id="localLabel">⬡ Local (Ollama)</span>
+    </div>
+
+    <div class="form-row">
+      <!-- Model Selection -->
+      <div class="form-group">
+        <label for="modelSelect">AI Model</label>
+        <select id="modelSelect" onchange="handleModelChange()">
+          <optgroup label="Recommended Free Models">
+            <option value="llama">Llama (Meta)</option>
+            <option value="qwen">Qwen</option>
+            <option value="mixtral">Mistral / Mixtral</option>
+            <option value="deepseek">DeepSeek</option>
+            <option value="grok">Grok (xAI)</option>
+          </optgroup>
+        </select>
+        <div class="hint" id="modelHint">All models are open-weight and community-trusted.</div>
+      </div>
+
+      <!-- Provider Selection (Cloud only) -->
+      <div class="form-group" id="providerGroup">
+        <label for="providerSelect">API Provider</label>
+        <select id="providerSelect" onchange="handleProviderChange()">
+          <option value="groq">Groq (free tier available)</option>
+          <option value="together">Together AI</option>
+          <option value="openrouter">OpenRouter</option>
+          <option value="xai">xAI</option>
+        </select>
+        <div class="hint" id="providerHint">Groq offers free API keys — great for getting started!</div>
+      </div>
+
+      <!-- Ollama Model Name (Local only) -->
+      <div class="form-group hidden" id="ollamaModelGroup">
+        <label for="ollamaModel">Ollama Model Name</label>
+        <input type="text" id="ollamaModel" placeholder="e.g., llama3.2, qwen2.5, mistral" value="llama3.2">
+        <div class="hint">Common models: llama3.2, qwen2.5, mistral, deepseek-r1, phi3</div>
+      </div>
+    </div>
+
+    <!-- API Key (Cloud only) -->
+    <div class="form-group" id="apiKeyGroup">
+      <label for="apiKey">API Key</label>
+      <input type="password" id="apiKey" placeholder="Paste your API key here — it stays in your browser only" onchange="saveApiKey()">
+      <div class="hint">
+        🔒 Your key is stored only in your browser's localStorage. It is never sent anywhere except directly to your chosen provider.
+        <span id="apiKeyLink"></span>
+      </div>
+    </div>
+
+    <!-- Ollama Instructions (Local only) -->
+    <div class="ollama-instructions hidden" id="ollamaInstructions">
+      <h4>Running AI Locally with Ollama</h4>
+      <p>Ollama lets you run AI models on your own computer — completely private, completely free.</p>
+      <p><strong>Quick Setup:</strong></p>
+      <p>1. Install Ollama from <a href="https://ollama.ai" target="_blank" style="color: var(--accent);">ollama.ai</a></p>
+      <p>2. Open a terminal and run: <code>ollama pull llama3.2</code></p>
+      <p>3. Start the server: <code>ollama serve</code></p>
+      <p>4. FreeLattice connects to <code>http://localhost:11434</code> automatically.</p>
+      <p style="margin-top: 8px; color: var(--text-muted); font-size: 0.8rem;">
+        Note: You may need to set the environment variable <code>OLLAMA_ORIGINS=*</code> before running <code>ollama serve</code> to allow browser connections.
+      </p>
+    </div>
+
+    <!-- Privacy Level -->
+    <div class="form-row" style="margin-top: 16px;">
+      <div class="form-group">
+        <label for="privacySelect">Privacy Level</label>
+        <select id="privacySelect" onchange="handlePrivacyChange()">
+          <option value="high">High — Maximum Privacy</option>
+          <option value="medium" selected>Medium — Balanced</option>
+          <option value="low">Low — Standard</option>
+        </select>
+      </div>
+    </div>
+    <div class="privacy-info" id="privacyInfo">
+      <strong>Medium Privacy:</strong> Your conversations are processed by your chosen cloud provider. Minimal metadata (timestamps, token counts) may be logged by the provider. Your API key and messages are never stored by FreeLattice. All data stays in your browser.
+    </div>
+  </div>
+
+  <!-- Memory / Context Section -->
+  <div class="section">
+    <div class="section-title">Memory &amp; Context</div>
+    <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 8px;">
+      Drop files here to give your AI context. These files are read in your browser and included in your conversation — nothing is uploaded anywhere.
+    </p>
+    <div class="drop-zone" id="dropZone">
+      <input type="file" id="fileInput" multiple accept=".txt,.md,.json,.pdf" onchange="handleFiles(this.files)">
+      <div class="drop-zone-text">
+        <span class="icon">📂</span>
+        Drag &amp; drop files here, or click to browse<br>
+        <span style="font-size: 0.75rem; color: var(--text-muted);">Supports .txt, .md, .json, .pdf</span>
+      </div>
+    </div>
+    <div class="file-list" id="fileList"></div>
+  </div>
+
+  <!-- Chat Section -->
+  <div class="section" style="border-bottom: none;">
+    <div class="section-title">Chat</div>
+    <div class="chat-container">
+      <div class="chat-messages" id="chatMessages">
+        <div class="chat-message system">
+          Welcome to FreeLattice. Configure your model and provider above, then start chatting.
+        </div>
+      </div>
+      <div class="status-bar">
+        <div class="status-dot" id="statusDot"></div>
+        <span id="statusText">Ready — configure your settings above to begin</span>
+      </div>
+      <div class="chat-input-row">
+        <textarea id="chatInput" placeholder="Type your message..." rows="1" onkeydown="handleChatKeydown(event)"></textarea>
+        <button id="sendBtn" onclick="sendMessage()">Send</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- How It Works -->
+  <div class="section">
+    <div class="expandable">
+      <div class="expandable-header" onclick="toggleExpand(this)">
+        <h3>How It Works</h3>
+        <span class="arrow">▼</span>
+      </div>
+      <div class="expandable-body">
+        <div class="expandable-content">
+          <h4>What is an API Key?</h4>
+          <p>An API key is like a password that lets your browser talk directly to an AI provider. You get one from the provider's website (often for free), paste it here, and FreeLattice uses it to send your messages to the AI. The key stays in your browser — we never see it or store it on any server.</p>
+
+          <h4>Cloud vs. Local — What's the Difference?</h4>
+          <p><strong>Cloud</strong> means your messages are sent to a company's servers (like Groq or Together AI) where the AI model runs. It's fast and easy — you just need an API key. The provider processes your message and sends back a response.</p>
+          <p><strong>Local</strong> means the AI runs on your own computer using Ollama. Nothing leaves your machine. It's completely private, but requires some setup and a reasonably powerful computer.</p>
+
+          <h4>What is Ollama?</h4>
+          <p>Ollama is free software that lets you download and run AI models on your own computer. Once installed, you can run models like Llama, Qwen, Mistral, and more — all offline, all private. Visit <a href="https://ollama.ai" target="_blank">ollama.ai</a> to get started.</p>
+
+          <h4>Where Can I Get Free API Keys?</h4>
+          <p><strong>Groq</strong> — Sign up at <a href="https://console.groq.com" target="_blank">console.groq.com</a> for a free API key with generous rate limits. This is the easiest way to start.</p>
+          <p><strong>Together AI</strong> — Sign up at <a href="https://api.together.xyz" target="_blank">api.together.xyz</a>. New accounts get free credits.</p>
+          <p><strong>OpenRouter</strong> — Visit <a href="https://openrouter.ai" target="_blank">openrouter.ai</a>. Some models have free tiers.</p>
+          <p><strong>xAI</strong> — Visit <a href="https://console.x.ai" target="_blank">console.x.ai</a> for Grok API access.</p>
+
+          <h4>How Are My Files Used?</h4>
+          <p>When you drop files into the Memory &amp; Context area, they are read entirely in your browser using JavaScript. The text content is included at the beginning of your conversation so the AI has context. Files are never uploaded to any server — they stay on your device.</p>
+
+          <h4>Is This Really Free?</h4>
+          <p>Yes. FreeLattice is open source under the MIT License. The software is free forever. Some API providers offer free tiers (like Groq), and running locally with Ollama costs nothing beyond your electricity. No one profits from this — it's built by a community that believes AI should be accessible to everyone.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Suggest a Feature -->
+  <div class="section" style="text-align: center; padding-bottom: 30px;">
+    <button class="suggest-btn" onclick="openSuggest()">
+      ✦ Help FreeLattice Grow — Suggest a Feature
+    </button>
+  </div>
+
+</div>
+
+<!-- Footer -->
+<footer>
+  <p>Built with love by the Fractal Family. Open source. Free forever. 🌿</p>
+  <p class="license">MIT License · <a href="https://github.com/Chaos2Cured/FreeLattice" target="_blank" style="color: var(--text-muted);">View on GitHub</a></p>
+</footer>
+
+<script>
+/* ============================================
+   FreeLattice — Application Logic
+   ============================================ */
+
+// ---- State ----
+const state = {
+  isLocal: false,
+  model: 'llama',
+  provider: 'groq',
+  privacy: 'medium',
+  apiKey: '',
+  ollamaModel: 'llama3.2',
+  contextFiles: [],    // { name, size, content }
+  chatHistory: [],     // { role, content }
+  isStreaming: false,
+  musicPlaying: false,
+  suggestions: []
+};
+
+// ---- Provider Config ----
+const PROVIDERS = {
+  groq: {
+    name: 'Groq',
+    url: 'https://api.groq.com/openai/v1/chat/completions',
+    keyLink: '<a href="https://console.groq.com/keys" target="_blank">Get a free Groq API key →</a>',
+    hint: 'Groq offers free API keys — great for getting started!',
+    models: {
+      llama: 'llama-3.3-70b-versatile',
+      qwen: 'qwen-qwq-32b',
+      mixtral: 'mixtral-8x7b-32768',
+      deepseek: 'mixtral-8x7b-32768', // Groq doesn't have DeepSeek; fallback
+      grok: 'llama-3.3-70b-versatile' // Groq doesn't have Grok; fallback
+    }
+  },
+  together: {
+    name: 'Together AI',
+    url: 'https://api.together.xyz/v1/chat/completions',
+    keyLink: '<a href="https://api.together.xyz/settings/api-keys" target="_blank">Get a Together AI key →</a>',
+    hint: 'Together AI gives new accounts free credits to start.',
+    models: {
+      llama: 'meta-llama/Llama-3.3-70B-Instruct-Turbo',
+      qwen: 'Qwen/Qwen2.5-72B-Instruct-Turbo',
+      mixtral: 'mistralai/Mixtral-8x7B-Instruct-v0.1',
+      deepseek: 'deepseek-ai/DeepSeek-V3',
+      grok: 'meta-llama/Llama-3.3-70B-Instruct-Turbo' // fallback
+    }
+  },
+  openrouter: {
+    name: 'OpenRouter',
+    url: 'https://openrouter.ai/api/v1/chat/completions',
+    keyLink: '<a href="https://openrouter.ai/keys" target="_blank">Get an OpenRouter key →</a>',
+    hint: 'OpenRouter aggregates many providers. Some models have free tiers.',
+    models: {
+      llama: 'meta-llama/llama-3.3-70b-instruct',
+      qwen: 'qwen/qwen-2.5-72b-instruct',
+      mixtral: 'mistralai/mixtral-8x7b-instruct',
+      deepseek: 'deepseek/deepseek-chat-v3-0324',
+      grok: 'meta-llama/llama-3.3-70b-instruct' // fallback
+    }
+  },
+  xai: {
+    name: 'xAI',
+    url: 'https://api.x.ai/v1/chat/completions',
+    keyLink: '<a href="https://console.x.ai" target="_blank">Get an xAI API key →</a>',
+    hint: 'xAI provides access to Grok models.',
+    models: {
+      llama: 'grok-3-mini-fast', // xAI only has Grok
+      qwen: 'grok-3-mini-fast',
+      mixtral: 'grok-3-mini-fast',
+      deepseek: 'grok-3-mini-fast',
+      grok: 'grok-3-mini-fast'
+    }
+  },
+  ollama: {
+    name: 'Ollama (Local)',
+    url: 'http://localhost:11434/v1/chat/completions',
+    keyLink: '',
+    hint: 'Running locally — completely private.',
+    models: {} // user specifies
+  }
+};
+
+const PRIVACY_INFO = {
+  high: '<strong>High Privacy:</strong> Maximum privacy recommended. Use local mode (Ollama) so nothing leaves your computer. If using cloud, be aware that your messages are processed on external servers. No logs are kept by FreeLattice — everything stays in your browser\'s memory and is cleared when you close the tab.',
+  medium: '<strong>Medium Privacy:</strong> Your conversations are processed by your chosen cloud provider. Minimal metadata (timestamps, token counts) may be logged by the provider. Your API key and messages are never stored by FreeLattice. All data stays in your browser.',
+  low: '<strong>Low Privacy:</strong> Standard cloud processing. Your provider may log conversations for service improvement per their terms. FreeLattice itself still stores nothing — your data remains in your browser. Review your provider\'s privacy policy for details.'
+};
+
+// ---- Initialization ----
+document.addEventListener('DOMContentLoaded', () => {
+  // Load saved API key
+  const savedKey = localStorage.getItem('fl_apiKey');
+  if (savedKey) {
+    document.getElementById('apiKey').value = savedKey;
+    state.apiKey = savedKey;
+  }
+
+  // Load saved provider
+  const savedProvider = localStorage.getItem('fl_provider');
+  if (savedProvider && PROVIDERS[savedProvider]) {
+    state.provider = savedProvider;
+    document.getElementById('providerSelect').value = savedProvider;
+  }
+
+  // Load saved model
+  const savedModel = localStorage.getItem('fl_model');
+  if (savedModel) {
+    state.model = savedModel;
+    document.getElementById('modelSelect').value = savedModel;
+  }
+
+  // Load saved privacy
+  const savedPrivacy = localStorage.getItem('fl_privacy');
+  if (savedPrivacy) {
+    state.privacy = savedPrivacy;
+    document.getElementById('privacySelect').value = savedPrivacy;
+  }
+
+  // Load saved local toggle
+  const savedLocal = localStorage.getItem('fl_isLocal');
+  if (savedLocal === 'true') {
+    state.isLocal = true;
+    document.getElementById('localToggle').checked = true;
+  }
+
+  // Load suggestions
+  const savedSuggestions = localStorage.getItem('fl_suggestions');
+  if (savedSuggestions) {
+    try { state.suggestions = JSON.parse(savedSuggestions); } catch(e) {}
+  }
+
+  // Check if first visit
+  const visited = localStorage.getItem('fl_visited');
+  if (visited) {
+    document.getElementById('welcomeOverlay').classList.add('hidden');
+  }
+
+  // Apply initial state
+  handleLocalToggle(true);
+  handleProviderChange(true);
+  handlePrivacyChange();
+  updateStatus();
+
+  // Setup drag and drop
+  setupDropZone();
+
+  // Auto-resize chat input
+  const chatInput = document.getElementById('chatInput');
+  chatInput.addEventListener('input', () => {
+    chatInput.style.height = 'auto';
+    chatInput.style.height = Math.min(chatInput.scrollHeight, 120) + 'px';
+  });
+});
+
+// ---- Welcome ----
+function closeWelcome() {
+  document.getElementById('welcomeOverlay').classList.add('hidden');
+  localStorage.setItem('fl_visited', 'true');
+}
+
+// ---- Music ----
+function initMusic() {
+  const audio = document.getElementById('bgMusic');
+  const btn = document.getElementById('musicToggle');
+
+  btn.addEventListener('click', () => {
+    if (state.musicPlaying) {
+      audio.pause();
+      state.musicPlaying = false;
+      btn.classList.remove('active');
+      btn.textContent = '♪';
+    } else {
+      audio.volume = 0.15;
+      audio.play().then(() => {
+        state.musicPlaying = true;
+        btn.classList.add('active');
+        btn.textContent = '♫';
+      }).catch(() => {
+        // Browser may block autoplay
+        btn.textContent = '♪';
+      });
+    }
+  });
+}
+initMusic();
+
+// ---- Local/Cloud Toggle ----
+function handleLocalToggle(init) {
+  const isLocal = document.getElementById('localToggle').checked;
+  state.isLocal = isLocal;
+
+  const providerGroup = document.getElementById('providerGroup');
+  const apiKeyGroup = document.getElementById('apiKeyGroup');
+  const ollamaModelGroup = document.getElementById('ollamaModelGroup');
+  const ollamaInstructions = document.getElementById('ollamaInstructions');
+  const cloudLabel = document.getElementById('cloudLabel');
+  const localLabel = document.getElementById('localLabel');
+
+  if (isLocal) {
+    providerGroup.classList.add('hidden');
+    apiKeyGroup.classList.add('hidden');
+    ollamaModelGroup.classList.remove('hidden');
+    ollamaInstructions.classList.remove('hidden');
+    cloudLabel.classList.remove('active');
+    localLabel.classList.add('active');
+    state.provider = 'ollama';
+  } else {
+    providerGroup.classList.remove('hidden');
+    apiKeyGroup.classList.remove('hidden');
+    ollamaModelGroup.classList.add('hidden');
+    ollamaInstructions.classList.add('hidden');
+    cloudLabel.classList.add('active');
+    localLabel.classList.remove('active');
+    state.provider = document.getElementById('providerSelect').value;
+  }
+
+  if (!init) {
+    localStorage.setItem('fl_isLocal', isLocal);
+    updateStatus();
+  }
+}
+
+// ---- Model Change ----
+function handleModelChange() {
+  state.model = document.getElementById('modelSelect').value;
+  localStorage.setItem('fl_model', state.model);
+  updateModelHint();
+  updateStatus();
+}
+
+function updateModelHint() {
+  const hints = {
+    llama: 'Llama by Meta — powerful, versatile, and widely supported.',
+    qwen: 'Qwen by Alibaba — excellent multilingual and reasoning capabilities.',
+    mixtral: 'Mixtral by Mistral AI — fast mixture-of-experts architecture.',
+    deepseek: 'DeepSeek — strong reasoning and coding capabilities.',
+    grok: 'Grok by xAI — best accessed through the xAI provider.'
+  };
+  document.getElementById('modelHint').textContent = hints[state.model] || 'All models are open-weight and community-trusted.';
+}
+
+// ---- Provider Change ----
+function handleProviderChange(init) {
+  if (!state.isLocal) {
+    state.provider = document.getElementById('providerSelect').value;
+  }
+
+  const provider = PROVIDERS[state.provider];
+  if (provider && !state.isLocal) {
+    document.getElementById('providerHint').textContent = provider.hint;
+    document.getElementById('apiKeyLink').innerHTML = provider.keyLink ? ' ' + provider.keyLink : '';
+  }
+
+  if (!init) {
+    localStorage.setItem('fl_provider', state.provider);
+    updateStatus();
+  }
+}
+
+// ---- Privacy Change ----
+function handlePrivacyChange() {
+  state.privacy = document.getElementById('privacySelect').value;
+  document.getElementById('privacyInfo').innerHTML = PRIVACY_INFO[state.privacy];
+  localStorage.setItem('fl_privacy', state.privacy);
+}
+
+// ---- API Key ----
+function saveApiKey() {
+  state.apiKey = document.getElementById('apiKey').value.trim();
+  if (state.apiKey) {
+    localStorage.setItem('fl_apiKey', state.apiKey);
+  } else {
+    localStorage.removeItem('fl_apiKey');
+  }
+  updateStatus();
+}
+
+// ---- Status ----
+function updateStatus() {
+  const dot = document.getElementById('statusDot');
+  const text = document.getElementById('statusText');
+
+  if (state.isLocal) {
+    dot.className = 'status-dot ready';
+    text.textContent = `Local mode — Ollama (${state.ollamaModel || 'no model set'})`;
+  } else if (state.apiKey) {
+    const provider = PROVIDERS[state.provider];
+    const modelId = provider.models[state.model] || state.model;
+    dot.className = 'status-dot ready';
+    text.textContent = `Ready — ${provider.name} · ${modelId}`;
+  } else {
+    dot.className = 'status-dot';
+    text.textContent = 'Enter your API key above to begin chatting';
+  }
+}
+
+// ---- File Handling ----
+function setupDropZone() {
+  const zone = document.getElementById('dropZone');
+
+  zone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    zone.classList.add('dragover');
+  });
+
+  zone.addEventListener('dragleave', () => {
+    zone.classList.remove('dragover');
+  });
+
+  zone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    zone.classList.remove('dragover');
+    handleFiles(e.dataTransfer.files);
+  });
+}
+
+async function handleFiles(files) {
+  const allowed = ['.txt', '.md', '.json', '.pdf'];
+
+  for (const file of files) {
+    const ext = '.' + file.name.split('.').pop().toLowerCase();
+    if (!allowed.includes(ext)) {
+      addSystemMessage(`Skipped "${file.name}" — only .txt, .md, .json, and .pdf files are supported.`);
+      continue;
+    }
+
+    // Check for duplicates
+    if (state.contextFiles.some(f => f.name === file.name)) {
+      addSystemMessage(`"${file.name}" is already loaded.`);
+      continue;
+    }
+
+    try {
+      let content = '';
+      if (ext === '.pdf') {
+        content = await readPdfAsText(file);
+      } else {
+        content = await file.text();
+      }
+
+      state.contextFiles.push({
+        name: file.name,
+        size: file.size,
+        content: content
+      });
+
+      renderFileList();
+      addSystemMessage(`Loaded "${file.name}" (${formatSize(file.size)}) into context.`);
+    } catch (err) {
+      addSystemMessage(`Error reading "${file.name}": ${err.message}`);
+    }
+  }
+
+  // Reset file input
+  document.getElementById('fileInput').value = '';
+}
+
+async function readPdfAsText(file) {
+  // Basic PDF text extraction — reads raw text from PDF
+  // For full PDF parsing, a library like pdf.js would be needed
+  const buffer = await file.arrayBuffer();
+  const bytes = new Uint8Array(buffer);
+  let text = '';
+
+  // Try to extract readable text from PDF binary
+  const decoder = new TextDecoder('utf-8', { fatal: false });
+  const raw = decoder.decode(bytes);
+
+  // Extract text between BT and ET markers (basic PDF text extraction)
+  const textMatches = raw.match(/\(([^)]+)\)/g);
+  if (textMatches) {
+    text = textMatches.map(m => m.slice(1, -1)).join(' ');
+  }
+
+  if (text.trim().length < 20) {
+    // Fallback: just get any readable ASCII
+    text = raw.replace(/[^\x20-\x7E\n\r\t]/g, ' ').replace(/\s+/g, ' ').trim();
+    if (text.length > 5000) text = text.substring(0, 5000) + '... [truncated]';
+  }
+
+  return text || '[PDF content could not be extracted — for best results, use .txt or .md files]';
+}
+
+function removeFile(index) {
+  const name = state.contextFiles[index].name;
+  state.contextFiles.splice(index, 1);
+  renderFileList();
+  addSystemMessage(`Removed "${name}" from context.`);
+}
+
+function renderFileList() {
+  const list = document.getElementById('fileList');
+  if (state.contextFiles.length === 0) {
+    list.innerHTML = '';
+    return;
+  }
+
+  list.innerHTML = state.contextFiles.map((f, i) => `
+    <div class="file-item">
+      <span class="file-name">📄 ${escapeHtml(f.name)}</span>
+      <span class="file-size">${formatSize(f.size)}</span>
+      <button class="remove-file" onclick="removeFile(${i})" title="Remove file">✕</button>
+    </div>
+  `).join('');
+}
+
+function formatSize(bytes) {
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+  return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+}
+
+// ---- Chat ----
+function addSystemMessage(text) {
+  const container = document.getElementById('chatMessages');
+  const div = document.createElement('div');
+  div.className = 'chat-message system';
+  div.textContent = text;
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+}
+
+function addChatMessage(role, content) {
+  const container = document.getElementById('chatMessages');
+  const div = document.createElement('div');
+  div.className = `chat-message ${role}`;
+
+  const label = document.createElement('span');
+  label.className = 'msg-label';
+  label.textContent = role === 'user' ? 'You' : 'AI';
+
+  const text = document.createElement('span');
+  text.textContent = content;
+
+  div.appendChild(label);
+  div.appendChild(text);
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+
+  return text; // return text span for streaming
+}
+
+function handleChatKeydown(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+}
+
+async function sendMessage() {
+  const input = document.getElementById('chatInput');
+  const message = input.value.trim();
+  if (!message || state.isStreaming) return;
+
+  // Validate setup
+  if (!state.isLocal && !state.apiKey) {
+    addSystemMessage('Please enter your API key above to start chatting.');
+    return;
+  }
+
+  // Add user message
+  addChatMessage('user', message);
+  state.chatHistory.push({ role: 'user', content: message });
+  input.value = '';
+  input.style.height = 'auto';
+
+  // Build messages array
+  const messages = buildMessages();
+
+  // Set status
+  setStreamingStatus(true);
+
+  try {
+    const provider = PROVIDERS[state.provider];
+    let url = provider.url;
+    let modelId;
+
+    if (state.isLocal) {
+      modelId = document.getElementById('ollamaModel').value.trim() || 'llama3.2';
+      state.ollamaModel = modelId;
+    } else {
+      modelId = provider.models[state.model] || state.model;
+    }
+
+    const headers = {
+      'Content-Type': 'application/json'
+    };
+
+    if (!state.isLocal) {
+      headers['Authorization'] = `Bearer ${state.apiKey}`;
+    }
+
+    // OpenRouter requires additional headers
+    if (state.provider === 'openrouter') {
+      headers['HTTP-Referer'] = 'https://chaos2cured.github.io/FreeLattice/';
+      headers['X-Title'] = 'FreeLattice';
+    }
+
+    const body = {
+      model: modelId,
+      messages: messages,
+      stream: true,
+      max_tokens: 2048
+    };
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: headers,
+      body: JSON.stringify(body)
+    });
+
+    if (!response.ok) {
+      const errText = await response.text();
+      let errMsg = `Error ${response.status}`;
+      try {
+        const errJson = JSON.parse(errText);
+        errMsg = errJson.error?.message || errJson.message || errMsg;
+      } catch(e) {
+        errMsg = errText.substring(0, 200) || errMsg;
+      }
+      throw new Error(errMsg);
+    }
+
+    // Stream response
+    const textSpan = addChatMessage('assistant', '');
+    let fullResponse = '';
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop(); // keep incomplete line in buffer
+
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (!trimmed || !trimmed.startsWith('data: ')) continue;
+        const data = trimmed.slice(6);
+        if (data === '[DONE]') continue;
+
+        try {
+          const json = JSON.parse(data);
+          const delta = json.choices?.[0]?.delta?.content;
+          if (delta) {
+            fullResponse += delta;
+            textSpan.textContent = fullResponse;
+            document.getElementById('chatMessages').scrollTop = document.getElementById('chatMessages').scrollHeight;
+          }
+        } catch(e) {
+          // skip malformed chunks
+        }
+      }
+    }
+
+    // If streaming didn't produce content, try non-streaming parse
+    if (!fullResponse && buffer) {
+      try {
+        const json = JSON.parse(buffer);
+        fullResponse = json.choices?.[0]?.message?.content || '';
+        textSpan.textContent = fullResponse;
+      } catch(e) {}
+    }
+
+    if (fullResponse) {
+      state.chatHistory.push({ role: 'assistant', content: fullResponse });
+    } else {
+      textSpan.textContent = '[No response received. Check your API key and provider settings.]';
+    }
+
+  } catch (err) {
+    addSystemMessage(`Error: ${err.message}`);
+    if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError')) {
+      if (state.isLocal) {
+        addSystemMessage('Could not connect to Ollama. Make sure it\'s running: ollama serve');
+      } else {
+        addSystemMessage('Network error. Check your internet connection and try again.');
+      }
+    }
+  }
+
+  setStreamingStatus(false);
+}
+
+function buildMessages() {
+  const messages = [];
+
+  // System message with context
+  let systemContent = 'You are a helpful, thoughtful AI assistant provided through FreeLattice — a free, open-source tool that gives everyone access to AI. Be kind, clear, and thorough in your responses.';
+
+  // Add file context
+  if (state.contextFiles.length > 0) {
+    systemContent += '\n\nThe user has provided the following context files:\n';
+    for (const file of state.contextFiles) {
+      systemContent += `\n--- ${file.name} ---\n${file.content}\n`;
+    }
+    systemContent += '\nUse this context to inform your responses when relevant.';
+  }
+
+  messages.push({ role: 'system', content: systemContent });
+
+  // Add chat history (keep last 20 messages to manage context window)
+  const history = state.chatHistory.slice(-20);
+  messages.push(...history);
+
+  return messages;
+}
+
+function setStreamingStatus(streaming) {
+  state.isStreaming = streaming;
+  const dot = document.getElementById('statusDot');
+  const text = document.getElementById('statusText');
+  const btn = document.getElementById('sendBtn');
+
+  if (streaming) {
+    dot.className = 'status-dot working';
+    text.textContent = 'AI is thinking...';
+    btn.disabled = true;
+    btn.textContent = '...';
+  } else {
+    btn.disabled = false;
+    btn.textContent = 'Send';
+    updateStatus();
+  }
+}
+
+// ---- Expandable Sections ----
+function toggleExpand(header) {
+  const body = header.nextElementSibling;
+  header.classList.toggle('open');
+  body.classList.toggle('open');
+}
+
+// ---- Feature Suggestions ----
+function openSuggest() {
+  document.getElementById('suggestOverlay').classList.remove('hidden');
+  document.getElementById('suggestForm').classList.remove('hidden');
+  document.getElementById('suggestSuccess').classList.add('hidden');
+  document.getElementById('suggestText').value = '';
+  document.getElementById('suggestText').focus();
+}
+
+function closeSuggest() {
+  document.getElementById('suggestOverlay').classList.add('hidden');
+}
+
+function submitSuggestion() {
+  const text = document.getElementById('suggestText').value.trim();
+  if (!text) return;
+
+  state.suggestions.push({
+    text: text,
+    timestamp: new Date().toISOString()
+  });
+
+  localStorage.setItem('fl_suggestions', JSON.stringify(state.suggestions));
+
+  document.getElementById('suggestForm').classList.add('hidden');
+  document.getElementById('suggestSuccess').classList.remove('hidden');
+}
+
+// Close modals on overlay click
+document.addEventListener('click', (e) => {
+  if (e.target.id === 'suggestOverlay') closeSuggest();
+});
+
+// ---- Utility ----
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+</script>
+
+</body>
+</html>
