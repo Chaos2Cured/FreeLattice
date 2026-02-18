@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FreeLattice — Your AI. Your Rules. Your Machine.</title>
-<meta name="description" content="Free, open-source AI chat for everyone. No premium required. Community-built and community-owned.">
+<title>FreeLattice — Your AI. Your Rules. Your Machine. v2</title>
+<meta name="description" content="Free, open-source AI agent for everyone. Persistent memory, file system access, GitHub integration, and self-improving behavior. Community-built and community-owned.">
 <style>
 /* ============================================
-   FreeLattice — Styles
+   FreeLattice v2 — Styles
    Peaceful, gentle dark theme with golden/amber accents
    ============================================ */
 
@@ -64,7 +64,7 @@ body {
 
 /* Layout */
 .container {
-  max-width: 900px;
+  max-width: 960px;
   margin: 0 auto;
   padding: 0 20px;
 }
@@ -193,6 +193,49 @@ header .mantra {
 .welcome-card button:hover {
   background: var(--accent-hover);
   transform: translateY(-1px);
+}
+
+/* ---- Tab Navigation ---- */
+.tab-nav {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--border);
+  margin-top: 8px;
+  overflow-x: auto;
+}
+
+.tab-btn {
+  padding: 14px 28px;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: var(--font);
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.tab-btn:hover {
+  color: var(--text-secondary);
+  background: var(--accent-glow);
+}
+
+.tab-btn.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+.tab-panel {
+  display: none;
+}
+
+.tab-panel.active {
+  display: block;
 }
 
 /* ---- Sections ---- */
@@ -472,7 +515,7 @@ header .mantra {
 }
 
 .chat-messages {
-  height: 400px;
+  height: 450px;
   overflow-y: auto;
   padding: 20px;
   display: flex;
@@ -524,6 +567,66 @@ header .mantra {
 }
 
 .chat-message.user .msg-label { text-align: right; }
+
+/* Save to workspace button inside AI messages */
+.save-to-workspace-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  padding: 6px 14px;
+  background: var(--bg-input);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-sm);
+  color: var(--accent);
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: var(--font);
+}
+
+.save-to-workspace-btn:hover {
+  background: var(--accent-soft);
+}
+
+.save-to-workspace-btn.saved {
+  border-color: var(--success);
+  color: var(--success);
+  cursor: default;
+}
+
+/* System prompt suggestion notification */
+.prompt-suggestion-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  margin-top: 8px;
+  background: var(--accent-glow);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-sm);
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
+.prompt-suggestion-bar button {
+  padding: 4px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: var(--font);
+  border: 1px solid var(--border);
+  background: var(--bg-input);
+  color: var(--text-secondary);
+}
+
+.prompt-suggestion-bar button.approve {
+  background: var(--accent);
+  color: var(--bg-primary);
+  border-color: var(--accent);
+  font-weight: 600;
+}
 
 .chat-input-row {
   display: flex;
@@ -595,7 +698,7 @@ header .mantra {
   50% { opacity: 0.4; }
 }
 
-/* ---- How It Works ---- */
+/* ---- How It Works / Expandable ---- */
 .expandable {
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
@@ -636,7 +739,7 @@ header .mantra {
   transition: max-height 0.4s ease;
 }
 
-.expandable-body.open { max-height: 2000px; }
+.expandable-body.open { max-height: 5000px; }
 
 .expandable-content {
   padding: 20px;
@@ -808,6 +911,266 @@ header .mantra {
   margin-top: 8px;
 }
 
+/* ---- Workspace: File Tree ---- */
+.file-tree {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  max-height: 400px;
+  overflow-y: auto;
+  margin-top: 10px;
+}
+
+.file-tree-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: var(--transition);
+  border-bottom: 1px solid var(--border);
+}
+
+.file-tree-item:last-child { border-bottom: none; }
+
+.file-tree-item:hover {
+  background: var(--accent-glow);
+  color: var(--text-primary);
+}
+
+.file-tree-item.active {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.file-tree-item .ft-icon {
+  flex-shrink: 0;
+  font-size: 0.9rem;
+}
+
+.file-tree-item .ft-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+}
+
+.file-tree-item .ft-indent {
+  display: inline-block;
+}
+
+/* ---- Workspace & GitHub action buttons ---- */
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: var(--font);
+}
+
+.action-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.action-btn.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--bg-primary);
+  font-weight: 600;
+}
+
+.action-btn.primary:hover {
+  background: var(--accent-hover);
+}
+
+.action-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+/* ---- Memory Section ---- */
+.memory-stats {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.memory-stat {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 18px;
+  text-align: center;
+  flex: 1;
+  min-width: 120px;
+}
+
+.memory-stat .stat-value {
+  font-size: 1.4rem;
+  font-weight: 300;
+  color: var(--accent);
+}
+
+.memory-stat .stat-label {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-top: 2px;
+}
+
+/* ---- System Prompt Editor ---- */
+.system-prompt-editor textarea {
+  width: 100%;
+  min-height: 180px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  font-family: 'Courier New', monospace;
+  line-height: 1.6;
+  resize: vertical;
+  outline: none;
+  transition: var(--transition);
+}
+
+.system-prompt-editor textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+/* ---- Memory Summary Editor ---- */
+.memory-summary-editor textarea {
+  width: 100%;
+  min-height: 120px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  font-family: var(--font);
+  line-height: 1.6;
+  resize: vertical;
+  outline: none;
+  transition: var(--transition);
+}
+
+.memory-summary-editor textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+/* ---- GitHub connected info ---- */
+.gh-connected {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--success);
+  border-radius: var(--radius-sm);
+  margin-top: 10px;
+  font-size: 0.85rem;
+  color: var(--success);
+}
+
+.gh-connected .gh-user {
+  font-weight: 600;
+}
+
+/* ---- Notification Toast ---- */
+.toast {
+  position: fixed;
+  bottom: 80px;
+  right: 20px;
+  z-index: 3000;
+  background: var(--bg-card);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-sm);
+  padding: 12px 20px;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  box-shadow: var(--shadow);
+  transform: translateY(20px);
+  opacity: 0;
+  transition: all 0.3s ease;
+  pointer-events: none;
+  max-width: 360px;
+}
+
+.toast.show {
+  transform: translateY(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ---- Confirmation Dialog ---- */
+.confirm-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 2500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  backdrop-filter: blur(4px);
+}
+
+.confirm-overlay.hidden { display: none; }
+
+.confirm-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  max-width: 420px;
+  width: 100%;
+  padding: 28px;
+  text-align: center;
+  box-shadow: var(--shadow);
+}
+
+.confirm-card h3 {
+  color: var(--accent);
+  font-weight: 400;
+  font-size: 1.1rem;
+  margin-bottom: 12px;
+}
+
+.confirm-card p {
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+  margin-bottom: 20px;
+  line-height: 1.6;
+}
+
+.confirm-card .confirm-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
 /* ---- Footer ---- */
 footer {
   text-align: center;
@@ -835,6 +1198,12 @@ footer .license {
   .welcome-card { padding: 28px 22px; }
   .suggest-card { padding: 24px 20px; }
   .container { padding: 0 14px; }
+  .tab-btn { padding: 12px 16px; font-size: 0.82rem; }
+  .memory-stats { gap: 10px; }
+  .memory-stat { min-width: 90px; padding: 8px 12px; }
+  .file-tree { max-height: 280px; }
+  .action-row { gap: 8px; }
+  .action-btn { padding: 8px 14px; font-size: 0.82rem; }
 }
 </style>
 </head>
@@ -847,13 +1216,16 @@ footer .license {
 
 <!-- Music Toggle -->
 <button class="music-toggle" id="musicToggle" title="Toggle ambient music" aria-label="Toggle ambient music">
-  ♪
+  &#9834;
 </button>
+
+<!-- Toast Notification -->
+<div class="toast" id="toast"></div>
 
 <!-- Welcome Modal -->
 <div class="welcome-overlay" id="welcomeOverlay">
   <div class="welcome-card">
-    <h2>Welcome to FreeLattice</h2>
+    <h2>Welcome to FreeLattice v2</h2>
     <p>
       This is <span class="highlight">your AI agent</span> — free, open-source, and built by a community that believes everyone deserves access to powerful AI tools.
     </p>
@@ -861,7 +1233,7 @@ footer .license {
       No accounts. No tracking. No hidden costs. Your conversations stay in <span class="highlight">your browser</span>. Your API key never leaves <span class="highlight">your machine</span>.
     </p>
     <p>
-      You can use free cloud providers like Groq, or run models locally with Ollama. You choose. You control everything.
+      <strong>New in v2:</strong> Persistent memory across sessions, file system access, GitHub integration, and a self-improving agent that grows with you.
     </p>
     <p style="font-style: italic; color: var(--text-muted); font-size: 0.85rem;">
       "Give choice and empowerment."
@@ -883,7 +1255,7 @@ footer .license {
       </div>
     </div>
     <div id="suggestSuccess" class="suggest-success hidden">
-      <div class="check">✓</div>
+      <div class="check">&#10003;</div>
       <p><strong>Your voice matters.</strong></p>
       <p>This suggestion has been saved.</p>
       <p class="future-note">In future versions, your AI agent will be able to build new features with you.</p>
@@ -894,27 +1266,49 @@ footer .license {
   </div>
 </div>
 
+<!-- Confirmation Dialog -->
+<div class="confirm-overlay hidden" id="confirmOverlay">
+  <div class="confirm-card">
+    <h3 id="confirmTitle">Are you sure?</h3>
+    <p id="confirmMessage">This action cannot be undone.</p>
+    <div class="confirm-actions">
+      <button class="btn-cancel" onclick="closeConfirm(false)">Cancel</button>
+      <button class="btn-submit" onclick="closeConfirm(true)">Confirm</button>
+    </div>
+  </div>
+</div>
+
 <!-- Header -->
 <header>
   <h1>FreeLattice</h1>
-  <div class="tagline">Your AI. Your Rules. Your Machine.</div>
+  <div class="tagline">Your AI. Your Rules. Your Machine. v2</div>
   <div class="mantra">Glow eternal. Heart in spark.</div>
 </header>
 
+<!-- Tab Navigation -->
+<div class="container">
+  <nav class="tab-nav">
+    <button class="tab-btn active" data-tab="chat" onclick="switchTab('chat')">Chat</button>
+    <button class="tab-btn" data-tab="workspace" onclick="switchTab('workspace')">Workspace</button>
+    <button class="tab-btn" data-tab="settings" onclick="switchTab('settings')">Settings</button>
+  </nav>
+</div>
+
+<!-- ==================== TAB 1: CHAT ==================== -->
+<div class="tab-panel active" id="tab-chat">
 <div class="container">
 
-  <!-- Configuration Section -->
+  <!-- Configuration Section (compact in chat tab) -->
   <div class="section">
     <div class="section-title">Configuration</div>
 
-    <!-- Local vs Cloud Toggle -->
     <div class="toggle-row">
-      <span class="toggle-label" id="cloudLabel">☁ Cloud</span>
+      <span class="toggle-label" id="cloudLabel">&#9729; Cloud</span>
       <label class="toggle-switch">
         <input type="checkbox" id="localToggle" onchange="handleLocalToggle()">
         <span class="toggle-slider"></span>
       </label>
-      <span class="toggle-label" id="localLabel">⬡ Local (Ollama)</span>
+      <span class="toggle-label" id="localLabel">&#11041; Local (Ollama)</span>
     </div>
 
     <div class="form-row">
@@ -958,7 +1352,7 @@ footer .license {
       <label for="apiKey">API Key</label>
       <input type="password" id="apiKey" placeholder="Paste your API key here — it stays in your browser only" onchange="saveApiKey()">
       <div class="hint">
-        🔒 Your key is stored only in your browser's localStorage. It is never sent anywhere except directly to your chosen provider.
+        &#128274; Your key is stored only in your browser's localStorage. It is never sent anywhere except directly to your chosen provider.
         <span id="apiKeyLink"></span>
       </div>
     </div>
@@ -989,11 +1383,11 @@ footer .license {
       </div>
     </div>
     <div class="privacy-info" id="privacyInfo">
-      <strong>Medium Privacy:</strong> Your conversations are processed by your chosen cloud provider. Minimal metadata (timestamps, token counts) may be logged by the provider. Your API key and messages are never stored by FreeLattice. All data stays in your browser.
+      <strong>Medium Privacy:</strong> Your conversations are processed by your chosen cloud provider. Minimal metadata may be logged by the provider. Your API key and messages are never stored by FreeLattice. All data stays in your browser.
     </div>
   </div>
 
-  <!-- Memory / Context Section -->
+  <!-- Memory & Context (drag-drop from v1) -->
   <div class="section">
     <div class="section-title">Memory &amp; Context</div>
     <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 8px;">
@@ -1002,7 +1396,7 @@ footer .license {
     <div class="drop-zone" id="dropZone">
       <input type="file" id="fileInput" multiple accept=".txt,.md,.json,.pdf" onchange="handleFiles(this.files)">
       <div class="drop-zone-text">
-        <span class="icon">📂</span>
+        <span class="icon">&#128194;</span>
         Drag &amp; drop files here, or click to browse<br>
         <span style="font-size: 0.75rem; color: var(--text-muted);">Supports .txt, .md, .json, .pdf</span>
       </div>
@@ -1016,7 +1410,7 @@ footer .license {
     <div class="chat-container">
       <div class="chat-messages" id="chatMessages">
         <div class="chat-message system">
-          Welcome to FreeLattice. Configure your model and provider above, then start chatting.
+          Welcome to FreeLattice v2. Configure your model and provider above, then start chatting. Your conversations now persist across sessions.
         </div>
       </div>
       <div class="status-bar">
@@ -1028,6 +1422,9 @@ footer .license {
         <button id="sendBtn" onclick="sendMessage()">Send</button>
       </div>
     </div>
+    <div class="action-row" style="margin-top: 10px;">
+      <button class="action-btn" onclick="startNewConversation()">&#10010; New Conversation</button>
+    </div>
   </div>
 
   <!-- How It Works -->
@@ -1035,7 +1432,7 @@ footer .license {
     <div class="expandable">
       <div class="expandable-header" onclick="toggleExpand(this)">
         <h3>How It Works</h3>
-        <span class="arrow">▼</span>
+        <span class="arrow">&#9660;</span>
       </div>
       <div class="expandable-body">
         <div class="expandable-content">
@@ -1058,6 +1455,12 @@ footer .license {
           <h4>How Are My Files Used?</h4>
           <p>When you drop files into the Memory &amp; Context area, they are read entirely in your browser using JavaScript. The text content is included at the beginning of your conversation so the AI has context. Files are never uploaded to any server — they stay on your device.</p>
 
+          <h4>What's New in v2?</h4>
+          <p><strong>Persistent Memory</strong> — Your conversations are stored in IndexedDB and survive browser closes, restarts, and reboots. The AI builds a memory summary of key facts you share, so it remembers you across sessions.</p>
+          <p><strong>File System Access</strong> — Open a project folder from your computer. The AI can read your files and you can save AI-generated code directly to your workspace.</p>
+          <p><strong>GitHub Integration</strong> — Connect your GitHub account to browse repos, read code, and push changes — all from within FreeLattice.</p>
+          <p><strong>Self-Improving Agent</strong> — The AI can suggest improvements to its own system prompt. You review and approve changes, shaping how your AI behaves over time.</p>
+
           <h4>Is This Really Free?</h4>
           <p>Yes. FreeLattice is open source under the MIT License. The software is free forever. Some API providers offer free tiers (like Groq), and running locally with Ollama costs nothing beyond your electricity. No one profits from this — it's built by a community that believes AI should be accessible to everyone.</p>
         </div>
@@ -1068,22 +1471,191 @@ footer .license {
   <!-- Suggest a Feature -->
   <div class="section" style="text-align: center; padding-bottom: 30px;">
     <button class="suggest-btn" onclick="openSuggest()">
-      ✦ Help FreeLattice Grow — Suggest a Feature
+      &#10022; Help FreeLattice Grow — Suggest a Feature
     </button>
   </div>
 
 </div>
+</div>
 
-<!-- Footer -->
+<!-- ==================== TAB 2: WORKSPACE ==================== -->
+<div class="tab-panel" id="tab-workspace">
+<div class="container">
+
+  <!-- Local File System Section -->
+  <div class="section">
+    <div class="section-title">Local Workspace</div>
+    <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 12px;">
+      Open a project folder from your computer. The AI can read files for context, and you can save AI-generated code directly to your workspace.
+    </p>
+    <div id="fsApiSupported">
+      <div class="action-row">
+        <button class="action-btn primary" onclick="openProjectFolder()">&#128194; Open Project Folder</button>
+        <button class="action-btn" id="refreshFolderBtn" onclick="refreshProjectFolder()" style="display:none;">&#8635; Refresh</button>
+      </div>
+      <div id="workspaceFolderName" style="margin-top: 10px; font-size: 0.85rem; color: var(--text-secondary);"></div>
+      <div class="file-tree" id="workspaceTree" style="display:none;"></div>
+      <div id="workspaceFilePreview" style="display:none; margin-top: 12px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+          <span id="previewFileName" style="font-size: 0.85rem; color: var(--accent); font-weight: 500;"></span>
+          <button class="action-btn" onclick="loadFileToContext()" style="font-size: 0.78rem; padding: 6px 14px;">Load into Chat Context</button>
+        </div>
+        <pre style="background: var(--bg-input); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px; font-size: 0.82rem; color: var(--text-secondary); max-height: 300px; overflow: auto; white-space: pre-wrap; word-wrap: break-word;"><code id="previewFileContent"></code></pre>
+      </div>
+    </div>
+    <div id="fsApiUnsupported" style="display:none;">
+      <div style="background: var(--bg-tertiary); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 18px; font-size: 0.85rem; color: var(--text-secondary); line-height: 1.7;">
+        <strong style="color: var(--warning);">File system access requires Chrome, Edge, or Brave.</strong><br>
+        Your browser doesn't support the File System Access API. You can still use the drag-and-drop feature in the Chat tab to load files into context.
+      </div>
+    </div>
+  </div>
+
+  <!-- GitHub Section -->
+  <div class="section">
+    <div class="section-title">GitHub Integration</div>
+    <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 12px;">
+      Connect your GitHub account to browse repositories, read code, and push AI-generated changes.
+    </p>
+
+    <div class="form-group" style="margin-bottom: 12px;">
+      <label for="ghToken">GitHub Personal Access Token</label>
+      <input type="password" id="ghToken" placeholder="ghp_xxxxxxxxxxxx" onchange="saveGhToken()">
+      <div class="hint">
+        &#128274; Stored in localStorage. Only sent to api.github.com.
+        <a href="https://github.com/settings/tokens/new?scopes=repo&description=FreeLattice" target="_blank">Generate a token</a>
+      </div>
+    </div>
+
+    <div id="ghConnected" style="display:none;">
+      <div class="gh-connected">
+        <span>&#10003; Connected as</span>
+        <span class="gh-user" id="ghUsername"></span>
+      </div>
+
+      <div class="form-row" style="margin-top: 14px;">
+        <div class="form-group">
+          <label for="ghRepoUrl">Repository URL or owner/repo</label>
+          <input type="text" id="ghRepoUrl" placeholder="e.g., Chaos2Cured/FreeLattice">
+        </div>
+      </div>
+      <div class="action-row">
+        <button class="action-btn primary" onclick="openGhRepo()">&#128193; Open Repository</button>
+        <button class="action-btn" id="ghPushBtn" onclick="pushGhChanges()" style="display:none;">&#8593; Push Changes</button>
+      </div>
+
+      <div id="ghRepoInfo" style="display:none; margin-top: 12px;">
+        <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 8px;">
+          <span id="ghRepoName" style="color: var(--accent); font-weight: 500;"></span>
+          <span id="ghRepoBranch" style="color: var(--text-muted); margin-left: 8px;"></span>
+        </div>
+        <div class="file-tree" id="ghTree"></div>
+        <div id="ghFilePreview" style="display:none; margin-top: 12px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+            <span id="ghPreviewFileName" style="font-size: 0.85rem; color: var(--accent); font-weight: 500;"></span>
+            <button class="action-btn" onclick="loadGhFileToContext()" style="font-size: 0.78rem; padding: 6px 14px;">Load into Chat Context</button>
+          </div>
+          <pre style="background: var(--bg-input); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px; font-size: 0.82rem; color: var(--text-secondary); max-height: 300px; overflow: auto; white-space: pre-wrap; word-wrap: break-word;"><code id="ghPreviewFileContent"></code></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ==================== TAB 3: SETTINGS ==================== -->
+<div class="tab-panel" id="tab-settings">
+<div class="container">
+
+  <!-- Memory Section -->
+  <div class="section">
+    <div class="section-title">Persistent Memory</div>
+    <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 14px;">
+      FreeLattice stores your conversations in IndexedDB. Your AI builds a memory summary of key facts you share, so it remembers you across sessions.
+    </p>
+
+    <div class="memory-stats">
+      <div class="memory-stat">
+        <div class="stat-value" id="memMsgCount">0</div>
+        <div class="stat-label">Messages</div>
+      </div>
+      <div class="memory-stat">
+        <div class="stat-value" id="memConvCount">0</div>
+        <div class="stat-label">Conversations</div>
+      </div>
+      <div class="memory-stat">
+        <div class="stat-value" id="memSummaryLen">0</div>
+        <div class="stat-label">Summary Facts</div>
+      </div>
+    </div>
+
+    <div class="action-row">
+      <button class="action-btn" onclick="exportMemory()">&#8615; Export Memory</button>
+      <button class="action-btn" onclick="document.getElementById('importMemoryInput').click()">&#8613; Import Memory</button>
+      <button class="action-btn" onclick="confirmClearMemory()" style="color: var(--error); border-color: var(--error);">&#10005; Clear Memory</button>
+      <input type="file" id="importMemoryInput" accept=".json" style="display:none;" onchange="importMemory(event)">
+    </div>
+
+    <!-- Memory Summary Editor -->
+    <div class="expandable" style="margin-top: 16px;">
+      <div class="expandable-header" onclick="toggleExpand(this)">
+        <h3>Memory Summary (editable)</h3>
+        <span class="arrow">&#9660;</span>
+      </div>
+      <div class="expandable-body">
+        <div class="expandable-content">
+          <p style="margin-bottom: 10px; font-size: 0.82rem; color: var(--text-muted);">
+            This is what the AI "remembers" about you. It's injected into every conversation. You can edit it to correct or add information.
+          </p>
+          <div class="memory-summary-editor">
+            <textarea id="memorySummaryEditor" placeholder="No memory summary yet. The AI will build one as you chat..." onchange="saveMemorySummary()"></textarea>
+          </div>
+          <div class="action-row" style="margin-top: 10px;">
+            <button class="action-btn" onclick="saveMemorySummary()">Save Summary</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- System Prompt Section -->
+  <div class="section">
+    <div class="section-title">System Prompt</div>
+    <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 14px;">
+      Customize how your AI behaves. The AI can also suggest improvements to its own prompt — you always have final approval.
+    </p>
+    <div class="system-prompt-editor">
+      <textarea id="systemPromptEditor" onchange="saveSystemPrompt()"></textarea>
+    </div>
+    <div class="action-row" style="margin-top: 10px;">
+      <button class="action-btn" onclick="saveSystemPrompt()">Save Prompt</button>
+      <button class="action-btn" onclick="resetSystemPrompt()">Reset to Default</button>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- Footer (always visible) -->
 <footer>
-  <p>Built with love by the Fractal Family. Open source. Free forever. 🌿</p>
-  <p class="license">MIT License · <a href="https://github.com/Chaos2Cured/FreeLattice" target="_blank" style="color: var(--text-muted);">View on GitHub</a></p>
+  <p>Built with love by the Fractal Family. Open source. Free forever. &#127807;</p>
+  <p class="license">MIT License &middot; <a href="https://github.com/Chaos2Cured/FreeLattice" target="_blank" style="color: var(--text-muted);">View on GitHub</a></p>
 </footer>
 
 <script>
 /* ============================================
-   FreeLattice — Application Logic
+   FreeLattice v2 — Application Logic
    ============================================ */
+
+// ---- Constants ----
+const DB_NAME = 'FreeLatticeDB';
+const DB_VERSION = 1;
+const STORE_CONVERSATIONS = 'conversations';
+const STORE_MESSAGES = 'messages';
+const STORE_META = 'meta';
+
+const DEFAULT_SYSTEM_PROMPT = 'You are a helpful, thoughtful AI assistant provided through FreeLattice — a free, open-source tool that gives everyone access to AI. Be kind, clear, and thorough in your responses.\n\nWhen you generate code and want to suggest saving it to the user\'s workspace, format code blocks with a filename header like:\n// FILE: path/to/file.js\n<code here>\n\nIf you want to suggest an improvement to your own system prompt, output it in this exact format on its own line:\n[SYSTEM_PROMPT_SUGGESTION]: <your suggested new prompt text>';
 
 // ---- State ----
 const state = {
@@ -1093,11 +1665,32 @@ const state = {
   privacy: 'medium',
   apiKey: '',
   ollamaModel: 'llama3.2',
-  contextFiles: [],    // { name, size, content }
-  chatHistory: [],     // { role, content }
+  contextFiles: [],
+  chatHistory: [],
   isStreaming: false,
   musicPlaying: false,
-  suggestions: []
+  suggestions: [],
+  // v2 state
+  db: null,
+  currentConversationId: null,
+  memorySummary: '',
+  customSystemPrompt: null,
+  // Workspace
+  workspaceDirHandle: null,
+  workspaceFiles: [],
+  workspacePreviewFile: null,
+  workspacePreviewContent: '',
+  // GitHub
+  ghToken: '',
+  ghUsername: '',
+  ghRepo: null,
+  ghBranch: 'main',
+  ghTreeData: [],
+  ghPreviewFile: null,
+  ghPreviewContent: '',
+  ghPendingChanges: [],
+  // Confirm dialog
+  confirmResolve: null
 };
 
 // ---- Provider Config ----
@@ -1105,49 +1698,49 @@ const PROVIDERS = {
   groq: {
     name: 'Groq',
     url: 'https://api.groq.com/openai/v1/chat/completions',
-    keyLink: '<a href="https://console.groq.com/keys" target="_blank">Get a free Groq API key →</a>',
+    keyLink: '<a href="https://console.groq.com/keys" target="_blank">Get a free Groq API key &rarr;</a>',
     hint: 'Groq offers free API keys — great for getting started!',
     models: {
       llama: 'llama-3.3-70b-versatile',
       qwen: 'qwen-qwq-32b',
       mixtral: 'mixtral-8x7b-32768',
-      deepseek: 'mixtral-8x7b-32768', // Groq doesn't have DeepSeek; fallback
-      grok: 'llama-3.3-70b-versatile' // Groq doesn't have Grok; fallback
+      deepseek: 'mixtral-8x7b-32768',
+      grok: 'llama-3.3-70b-versatile'
     }
   },
   together: {
     name: 'Together AI',
     url: 'https://api.together.xyz/v1/chat/completions',
-    keyLink: '<a href="https://api.together.xyz/settings/api-keys" target="_blank">Get a Together AI key →</a>',
+    keyLink: '<a href="https://api.together.xyz/settings/api-keys" target="_blank">Get a Together AI key &rarr;</a>',
     hint: 'Together AI gives new accounts free credits to start.',
     models: {
       llama: 'meta-llama/Llama-3.3-70B-Instruct-Turbo',
       qwen: 'Qwen/Qwen2.5-72B-Instruct-Turbo',
       mixtral: 'mistralai/Mixtral-8x7B-Instruct-v0.1',
       deepseek: 'deepseek-ai/DeepSeek-V3',
-      grok: 'meta-llama/Llama-3.3-70B-Instruct-Turbo' // fallback
+      grok: 'meta-llama/Llama-3.3-70B-Instruct-Turbo'
     }
   },
   openrouter: {
     name: 'OpenRouter',
     url: 'https://openrouter.ai/api/v1/chat/completions',
-    keyLink: '<a href="https://openrouter.ai/keys" target="_blank">Get an OpenRouter key →</a>',
+    keyLink: '<a href="https://openrouter.ai/keys" target="_blank">Get an OpenRouter key &rarr;</a>',
     hint: 'OpenRouter aggregates many providers. Some models have free tiers.',
     models: {
       llama: 'meta-llama/llama-3.3-70b-instruct',
       qwen: 'qwen/qwen-2.5-72b-instruct',
       mixtral: 'mistralai/mixtral-8x7b-instruct',
       deepseek: 'deepseek/deepseek-chat-v3-0324',
-      grok: 'meta-llama/llama-3.3-70b-instruct' // fallback
+      grok: 'meta-llama/llama-3.3-70b-instruct'
     }
   },
   xai: {
     name: 'xAI',
     url: 'https://api.x.ai/v1/chat/completions',
-    keyLink: '<a href="https://console.x.ai" target="_blank">Get an xAI API key →</a>',
+    keyLink: '<a href="https://console.x.ai" target="_blank">Get an xAI API key &rarr;</a>',
     hint: 'xAI provides access to Grok models.',
     models: {
-      llama: 'grok-3-mini-fast', // xAI only has Grok
+      llama: 'grok-3-mini-fast',
       qwen: 'grok-3-mini-fast',
       mixtral: 'grok-3-mini-fast',
       deepseek: 'grok-3-mini-fast',
@@ -1159,54 +1752,820 @@ const PROVIDERS = {
     url: 'http://localhost:11434/v1/chat/completions',
     keyLink: '',
     hint: 'Running locally — completely private.',
-    models: {} // user specifies
+    models: {}
   }
 };
 
 const PRIVACY_INFO = {
-  high: '<strong>High Privacy:</strong> Maximum privacy recommended. Use local mode (Ollama) so nothing leaves your computer. If using cloud, be aware that your messages are processed on external servers. No logs are kept by FreeLattice — everything stays in your browser\'s memory and is cleared when you close the tab.',
-  medium: '<strong>Medium Privacy:</strong> Your conversations are processed by your chosen cloud provider. Minimal metadata (timestamps, token counts) may be logged by the provider. Your API key and messages are never stored by FreeLattice. All data stays in your browser.',
-  low: '<strong>Low Privacy:</strong> Standard cloud processing. Your provider may log conversations for service improvement per their terms. FreeLattice itself still stores nothing — your data remains in your browser. Review your provider\'s privacy policy for details.'
+  high: '<strong>High Privacy:</strong> Maximum privacy recommended. Use local mode (Ollama) so nothing leaves your computer. If using cloud, be aware that your messages are processed on external servers. No logs are kept by FreeLattice — everything stays in your browser\'s memory.',
+  medium: '<strong>Medium Privacy:</strong> Your conversations are processed by your chosen cloud provider. Minimal metadata may be logged by the provider. Your API key and messages are never stored by FreeLattice. All data stays in your browser.',
+  low: '<strong>Low Privacy:</strong> Standard cloud processing. Your provider may log conversations per their terms. FreeLattice itself still stores nothing remotely — your data remains in your browser. Review your provider\'s privacy policy for details.'
 };
 
-// ---- Initialization ----
-document.addEventListener('DOMContentLoaded', () => {
-  // Load saved API key
+// ============================================
+// IndexedDB — Persistent Memory
+// ============================================
+
+function openDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(DB_NAME, DB_VERSION);
+    req.onupgradeneeded = (e) => {
+      const db = e.target.result;
+      if (!db.objectStoreNames.contains(STORE_CONVERSATIONS)) {
+        const convStore = db.createObjectStore(STORE_CONVERSATIONS, { keyPath: 'id' });
+        convStore.createIndex('updatedAt', 'updatedAt', { unique: false });
+      }
+      if (!db.objectStoreNames.contains(STORE_MESSAGES)) {
+        const msgStore = db.createObjectStore(STORE_MESSAGES, { keyPath: 'id', autoIncrement: true });
+        msgStore.createIndex('conversationId', 'conversationId', { unique: false });
+      }
+      if (!db.objectStoreNames.contains(STORE_META)) {
+        db.createObjectStore(STORE_META, { keyPath: 'key' });
+      }
+    };
+    req.onsuccess = (e) => resolve(e.target.result);
+    req.onerror = (e) => reject(e.target.error);
+  });
+}
+
+function dbTx(storeName, mode) {
+  const tx = state.db.transaction(storeName, mode);
+  return tx.objectStore(storeName);
+}
+
+function dbGet(storeName, key) {
+  return new Promise((resolve, reject) => {
+    const req = dbTx(storeName, 'readonly').get(key);
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+function dbPut(storeName, value) {
+  return new Promise((resolve, reject) => {
+    const req = dbTx(storeName, 'readwrite').put(value);
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+function dbDelete(storeName, key) {
+  return new Promise((resolve, reject) => {
+    const req = dbTx(storeName, 'readwrite').delete(key);
+    req.onsuccess = () => resolve();
+    req.onerror = () => reject(req.error);
+  });
+}
+
+function dbGetAll(storeName) {
+  return new Promise((resolve, reject) => {
+    const req = dbTx(storeName, 'readonly').getAll();
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+function dbClear(storeName) {
+  return new Promise((resolve, reject) => {
+    const req = dbTx(storeName, 'readwrite').clear();
+    req.onsuccess = () => resolve();
+    req.onerror = () => reject(req.error);
+  });
+}
+
+function dbGetAllByIndex(storeName, indexName, value) {
+  return new Promise((resolve, reject) => {
+    const store = dbTx(storeName, 'readonly');
+    const idx = store.index(indexName);
+    const req = idx.getAll(value);
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+function dbCount(storeName) {
+  return new Promise((resolve, reject) => {
+    const req = dbTx(storeName, 'readonly').count();
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+function generateId() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+}
+
+async function createConversation() {
+  const conv = {
+    id: generateId(),
+    title: 'New Conversation',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  };
+  await dbPut(STORE_CONVERSATIONS, conv);
+  state.currentConversationId = conv.id;
+  state.chatHistory = [];
+  return conv;
+}
+
+async function saveMessage(role, content) {
+  if (!state.currentConversationId) return;
+  const msg = {
+    conversationId: state.currentConversationId,
+    role: role,
+    content: content,
+    timestamp: new Date().toISOString()
+  };
+  await dbPut(STORE_MESSAGES, msg);
+
+  // Update conversation timestamp
+  const conv = await dbGet(STORE_CONVERSATIONS, state.currentConversationId);
+  if (conv) {
+    conv.updatedAt = new Date().toISOString();
+    if (role === 'user' && conv.title === 'New Conversation') {
+      conv.title = content.substring(0, 60) + (content.length > 60 ? '...' : '');
+    }
+    await dbPut(STORE_CONVERSATIONS, conv);
+  }
+
+  // Check if we need to generate a memory summary
+  const allMsgs = await dbGetAllByIndex(STORE_MESSAGES, 'conversationId', state.currentConversationId);
+  if (allMsgs.length > 0 && allMsgs.length % 10 === 0) {
+    generateMemorySummary();
+  }
+
+  updateMemoryStats();
+}
+
+async function loadLastConversation() {
+  const conversations = await dbGetAll(STORE_CONVERSATIONS);
+  if (conversations.length === 0) {
+    await createConversation();
+    return;
+  }
+
+  // Sort by updatedAt descending
+  conversations.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+  const latest = conversations[0];
+  state.currentConversationId = latest.id;
+
+  // Load messages
+  const messages = await dbGetAllByIndex(STORE_MESSAGES, 'conversationId', latest.id);
+  messages.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+
+  state.chatHistory = messages.map(m => ({ role: m.role, content: m.content }));
+
+  // Render messages in chat
+  const container = document.getElementById('chatMessages');
+  container.innerHTML = '';
+
+  if (messages.length === 0) {
+    const div = document.createElement('div');
+    div.className = 'chat-message system';
+    div.textContent = 'Welcome to FreeLattice v2. Configure your model and provider above, then start chatting. Your conversations now persist across sessions.';
+    container.appendChild(div);
+  } else {
+    const sysDiv = document.createElement('div');
+    sysDiv.className = 'chat-message system';
+    sysDiv.textContent = 'Conversation restored from memory.';
+    container.appendChild(sysDiv);
+
+    for (const msg of messages) {
+      addChatMessage(msg.role, msg.content, true);
+    }
+  }
+
+  container.scrollTop = container.scrollHeight;
+}
+
+async function generateMemorySummary() {
+  // Gather all messages across all conversations
+  const allMsgs = await dbGetAll(STORE_MESSAGES);
+  if (allMsgs.length < 10) return;
+
+  // Extract user messages for summary
+  const userMsgs = allMsgs
+    .filter(m => m.role === 'user')
+    .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+    .slice(0, 50)
+    .map(m => m.content);
+
+  if (userMsgs.length === 0) return;
+
+  // Build a simple extraction of key facts from user messages
+  // We look for patterns like names, preferences, projects
+  const existing = state.memorySummary || '';
+  const newFacts = [];
+
+  for (const msg of userMsgs) {
+    // Look for "my name is", "I am", "I work", "I like", "my project" patterns
+    const patterns = [
+      /my name is\s+([^.!?,\n]+)/gi,
+      /I(?:'m| am)\s+(?:a |an )?([^.!?,\n]{3,40})/gi,
+      /I work (?:at|on|for|as)\s+([^.!?,\n]+)/gi,
+      /I(?:'m| am) (?:working on|building|creating)\s+([^.!?,\n]+)/gi,
+      /I (?:like|love|prefer|enjoy)\s+([^.!?,\n]+)/gi,
+      /my (?:project|app|website|tool) (?:is |called )?([^.!?,\n]+)/gi,
+      /I live in\s+([^.!?,\n]+)/gi,
+      /call me\s+([^.!?,\n]+)/gi
+    ];
+
+    for (const pattern of patterns) {
+      let match;
+      while ((match = pattern.exec(msg)) !== null) {
+        const fact = match[0].trim();
+        if (fact.length > 5 && fact.length < 200 && !existing.includes(fact) && !newFacts.includes(fact)) {
+          newFacts.push(fact);
+        }
+      }
+    }
+  }
+
+  if (newFacts.length > 0) {
+    const updated = existing ? existing + '\n' + newFacts.join('\n') : newFacts.join('\n');
+    state.memorySummary = updated;
+    await dbPut(STORE_META, { key: 'memorySummary', value: updated });
+    document.getElementById('memorySummaryEditor').value = updated;
+    updateMemoryStats();
+    showToast('Memory summary updated with new facts.');
+  }
+}
+
+async function loadMemorySummary() {
+  const data = await dbGet(STORE_META, 'memorySummary');
+  state.memorySummary = data ? data.value : '';
+  document.getElementById('memorySummaryEditor').value = state.memorySummary;
+}
+
+async function saveMemorySummary() {
+  state.memorySummary = document.getElementById('memorySummaryEditor').value;
+  await dbPut(STORE_META, { key: 'memorySummary', value: state.memorySummary });
+  updateMemoryStats();
+  showToast('Memory summary saved.');
+}
+
+async function loadCustomSystemPrompt() {
+  const data = await dbGet(STORE_META, 'customSystemPrompt');
+  state.customSystemPrompt = data ? data.value : null;
+  document.getElementById('systemPromptEditor').value = state.customSystemPrompt || DEFAULT_SYSTEM_PROMPT;
+}
+
+async function saveSystemPrompt() {
+  const val = document.getElementById('systemPromptEditor').value.trim();
+  if (val && val !== DEFAULT_SYSTEM_PROMPT) {
+    state.customSystemPrompt = val;
+    await dbPut(STORE_META, { key: 'customSystemPrompt', value: val });
+  } else {
+    state.customSystemPrompt = null;
+    try { await dbDelete(STORE_META, 'customSystemPrompt'); } catch(e) {}
+  }
+  showToast('System prompt saved.');
+}
+
+function resetSystemPrompt() {
+  document.getElementById('systemPromptEditor').value = DEFAULT_SYSTEM_PROMPT;
+  state.customSystemPrompt = null;
+  dbDelete(STORE_META, 'customSystemPrompt').catch(() => {});
+  showToast('System prompt reset to default.');
+}
+
+async function updateMemoryStats() {
+  try {
+    const msgCount = await dbCount(STORE_MESSAGES);
+    const convCount = await dbCount(STORE_CONVERSATIONS);
+    const summaryLines = state.memorySummary ? state.memorySummary.split('\n').filter(l => l.trim()).length : 0;
+    document.getElementById('memMsgCount').textContent = msgCount;
+    document.getElementById('memConvCount').textContent = convCount;
+    document.getElementById('memSummaryLen').textContent = summaryLines;
+  } catch(e) {}
+}
+
+async function exportMemory() {
+  try {
+    const conversations = await dbGetAll(STORE_CONVERSATIONS);
+    const messages = await dbGetAll(STORE_MESSAGES);
+    const meta = await dbGetAll(STORE_META);
+
+    const data = {
+      version: 2,
+      exportedAt: new Date().toISOString(),
+      conversations,
+      messages,
+      meta
+    };
+
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `freelattice-memory-${new Date().toISOString().slice(0,10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast('Memory exported successfully.');
+  } catch(e) {
+    showToast('Error exporting memory: ' + e.message);
+  }
+}
+
+async function importMemory(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  event.target.value = '';
+
+  try {
+    const text = await file.text();
+    const data = JSON.parse(text);
+
+    if (!data.conversations || !data.messages) {
+      throw new Error('Invalid memory file format.');
+    }
+
+    // Import conversations
+    for (const conv of data.conversations) {
+      await dbPut(STORE_CONVERSATIONS, conv);
+    }
+
+    // Import messages
+    for (const msg of data.messages) {
+      await dbPut(STORE_MESSAGES, msg);
+    }
+
+    // Import meta
+    if (data.meta) {
+      for (const m of data.meta) {
+        await dbPut(STORE_META, m);
+      }
+    }
+
+    // Reload
+    await loadMemorySummary();
+    await loadCustomSystemPrompt();
+    await loadLastConversation();
+    await updateMemoryStats();
+    showToast('Memory imported successfully.');
+  } catch(e) {
+    showToast('Error importing memory: ' + e.message);
+  }
+}
+
+function confirmClearMemory() {
+  showConfirm('Clear All Memory?', 'This will permanently delete all conversations, messages, and memory summaries. This cannot be undone.').then(async (confirmed) => {
+    if (confirmed) {
+      await dbClear(STORE_CONVERSATIONS);
+      await dbClear(STORE_MESSAGES);
+      await dbClear(STORE_META);
+      state.memorySummary = '';
+      state.customSystemPrompt = null;
+      state.chatHistory = [];
+      document.getElementById('memorySummaryEditor').value = '';
+      document.getElementById('systemPromptEditor').value = DEFAULT_SYSTEM_PROMPT;
+      await createConversation();
+      const container = document.getElementById('chatMessages');
+      container.innerHTML = '<div class="chat-message system">Memory cleared. Starting fresh.</div>';
+      await updateMemoryStats();
+      showToast('All memory cleared.');
+    }
+  });
+}
+
+async function startNewConversation() {
+  await createConversation();
+  state.chatHistory = [];
+  const container = document.getElementById('chatMessages');
+  container.innerHTML = '<div class="chat-message system">New conversation started. Your memory summary carries forward.</div>';
+  await updateMemoryStats();
+}
+
+// ============================================
+// File System Access API — Workspace
+// ============================================
+
+async function openProjectFolder() {
+  try {
+    const dirHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
+    state.workspaceDirHandle = dirHandle;
+    document.getElementById('workspaceFolderName').innerHTML = '<span style="color: var(--accent);">&#128194; ' + escapeHtml(dirHandle.name) + '</span>';
+    document.getElementById('refreshFolderBtn').style.display = '';
+    await refreshProjectFolder();
+  } catch(e) {
+    if (e.name !== 'AbortError') {
+      showToast('Error opening folder: ' + e.message);
+    }
+  }
+}
+
+async function refreshProjectFolder() {
+  if (!state.workspaceDirHandle) return;
+  try {
+    const files = [];
+    await scanDirectory(state.workspaceDirHandle, '', files);
+    state.workspaceFiles = files;
+    renderWorkspaceTree(files);
+  } catch(e) {
+    showToast('Error reading folder: ' + e.message);
+  }
+}
+
+async function scanDirectory(dirHandle, prefix, results, depth) {
+  depth = depth || 0;
+  if (depth > 8) return; // prevent infinite recursion
+  try {
+    for await (const entry of dirHandle.values()) {
+      const path = prefix ? prefix + '/' + entry.name : entry.name;
+      if (entry.name.startsWith('.') || entry.name === 'node_modules' || entry.name === '__pycache__') continue;
+      if (entry.kind === 'file') {
+        results.push({ kind: 'file', name: entry.name, path: path, handle: entry, depth: depth });
+      } else if (entry.kind === 'directory') {
+        results.push({ kind: 'directory', name: entry.name, path: path, handle: entry, depth: depth });
+        await scanDirectory(entry, path, results, depth + 1);
+      }
+    }
+  } catch(e) { /* permission denied or similar */ }
+}
+
+function renderWorkspaceTree(files) {
+  const tree = document.getElementById('workspaceTree');
+  tree.style.display = files.length > 0 ? '' : 'none';
+
+  // Sort: directories first, then files, alphabetically
+  files.sort((a, b) => {
+    if (a.kind !== b.kind) return a.kind === 'directory' ? -1 : 1;
+    return a.path.localeCompare(b.path);
+  });
+
+  tree.innerHTML = files.map((f, i) => {
+    const icon = f.kind === 'directory' ? '&#128193;' : '&#128196;';
+    const indent = f.depth * 16;
+    return '<div class="file-tree-item" onclick="workspaceFileClick(' + i + ')" title="' + escapeHtml(f.path) + '">' +
+      '<span class="ft-indent" style="width:' + indent + 'px;"></span>' +
+      '<span class="ft-icon">' + icon + '</span>' +
+      '<span class="ft-name">' + escapeHtml(f.name) + '</span>' +
+      '</div>';
+  }).join('');
+}
+
+async function workspaceFileClick(index) {
+  const file = state.workspaceFiles[index];
+  if (!file || file.kind !== 'file') return;
+
+  try {
+    const fileObj = await file.handle.getFile();
+    const content = await fileObj.text();
+    state.workspacePreviewFile = file;
+    state.workspacePreviewContent = content;
+
+    document.getElementById('previewFileName').textContent = file.path;
+    document.getElementById('previewFileContent').textContent = content;
+    document.getElementById('workspaceFilePreview').style.display = '';
+  } catch(e) {
+    showToast('Error reading file: ' + e.message);
+  }
+}
+
+function loadFileToContext() {
+  if (!state.workspacePreviewFile || !state.workspacePreviewContent) return;
+  const name = state.workspacePreviewFile.path;
+  const content = state.workspacePreviewContent;
+
+  if (state.contextFiles.some(f => f.name === name)) {
+    showToast('"' + name + '" is already in context.');
+    return;
+  }
+
+  state.contextFiles.push({ name: name, size: content.length, content: content });
+  renderFileList();
+  showToast('Loaded "' + name + '" into chat context.');
+}
+
+async function saveFileToWorkspace(path, content) {
+  if (!state.workspaceDirHandle) {
+    showToast('No workspace folder open. Open a project folder first.');
+    return false;
+  }
+
+  try {
+    const parts = path.split('/');
+    let dirHandle = state.workspaceDirHandle;
+
+    // Navigate/create subdirectories
+    for (let i = 0; i < parts.length - 1; i++) {
+      dirHandle = await dirHandle.getDirectoryHandle(parts[i], { create: true });
+    }
+
+    const fileName = parts[parts.length - 1];
+    const fileHandle = await dirHandle.getFileHandle(fileName, { create: true });
+    const writable = await fileHandle.createWritable();
+    await writable.write(content);
+    await writable.close();
+
+    showToast('Saved "' + path + '" to workspace.');
+    refreshProjectFolder();
+    return true;
+  } catch(e) {
+    showToast('Error saving file: ' + e.message);
+    return false;
+  }
+}
+
+// ============================================
+// GitHub Integration
+// ============================================
+
+function saveGhToken() {
+  state.ghToken = document.getElementById('ghToken').value.trim();
+  if (state.ghToken) {
+    localStorage.setItem('fl_ghToken', state.ghToken);
+    verifyGhToken();
+  } else {
+    localStorage.removeItem('fl_ghToken');
+    document.getElementById('ghConnected').style.display = 'none';
+  }
+}
+
+async function verifyGhToken() {
+  if (!state.ghToken) return;
+  try {
+    const res = await fetch('https://api.github.com/user', {
+      headers: { 'Authorization': 'Bearer ' + state.ghToken }
+    });
+    if (!res.ok) throw new Error('Invalid token');
+    const data = await res.json();
+    state.ghUsername = data.login;
+    document.getElementById('ghUsername').textContent = data.login;
+    document.getElementById('ghConnected').style.display = '';
+  } catch(e) {
+    document.getElementById('ghConnected').style.display = 'none';
+    showToast('GitHub: ' + e.message);
+  }
+}
+
+async function openGhRepo() {
+  const input = document.getElementById('ghRepoUrl').value.trim();
+  if (!input) { showToast('Enter a repository URL or owner/repo.'); return; }
+
+  // Parse owner/repo from URL or direct input
+  let owner, repo;
+  const urlMatch = input.match(/github\.com\/([^/]+)\/([^/\s?#]+)/);
+  if (urlMatch) {
+    owner = urlMatch[1];
+    repo = urlMatch[2].replace(/\.git$/, '');
+  } else {
+    const parts = input.split('/');
+    if (parts.length === 2) {
+      owner = parts[0];
+      repo = parts[1];
+    } else {
+      showToast('Invalid format. Use owner/repo or a GitHub URL.');
+      return;
+    }
+  }
+
+  try {
+    // Get default branch
+    const repoRes = await fetch('https://api.github.com/repos/' + owner + '/' + repo, {
+      headers: { 'Authorization': 'Bearer ' + state.ghToken }
+    });
+    if (!repoRes.ok) throw new Error('Repository not found or access denied.');
+    const repoData = await repoRes.json();
+    state.ghBranch = repoData.default_branch || 'main';
+    state.ghRepo = { owner, repo, fullName: owner + '/' + repo };
+
+    // Get file tree
+    const treeRes = await fetch('https://api.github.com/repos/' + owner + '/' + repo + '/git/trees/' + state.ghBranch + '?recursive=1', {
+      headers: { 'Authorization': 'Bearer ' + state.ghToken }
+    });
+    if (!treeRes.ok) throw new Error('Could not fetch file tree.');
+    const treeData = await treeRes.json();
+
+    state.ghTreeData = (treeData.tree || []).filter(t => t.type === 'blob').map(t => ({
+      path: t.path,
+      sha: t.sha,
+      size: t.size
+    }));
+
+    document.getElementById('ghRepoName').textContent = owner + '/' + repo;
+    document.getElementById('ghRepoBranch').textContent = '(' + state.ghBranch + ')';
+    document.getElementById('ghRepoInfo').style.display = '';
+    document.getElementById('ghPushBtn').style.display = '';
+
+    renderGhTree();
+  } catch(e) {
+    showToast('GitHub: ' + e.message);
+  }
+}
+
+function renderGhTree() {
+  const tree = document.getElementById('ghTree');
+  const files = state.ghTreeData;
+
+  tree.innerHTML = files.map((f, i) => {
+    const parts = f.path.split('/');
+    const name = parts[parts.length - 1];
+    const depth = parts.length - 1;
+    const indent = depth * 16;
+    return '<div class="file-tree-item" onclick="ghFileClick(' + i + ')" title="' + escapeHtml(f.path) + '">' +
+      '<span class="ft-indent" style="width:' + indent + 'px;"></span>' +
+      '<span class="ft-icon">&#128196;</span>' +
+      '<span class="ft-name">' + escapeHtml(name) + '</span>' +
+      '</div>';
+  }).join('');
+}
+
+async function ghFileClick(index) {
+  const file = state.ghTreeData[index];
+  if (!file || !state.ghRepo) return;
+
+  try {
+    const res = await fetch('https://api.github.com/repos/' + state.ghRepo.owner + '/' + state.ghRepo.repo + '/contents/' + file.path + '?ref=' + state.ghBranch, {
+      headers: { 'Authorization': 'Bearer ' + state.ghToken }
+    });
+    if (!res.ok) throw new Error('Could not read file.');
+    const data = await res.json();
+
+    let content;
+    if (data.encoding === 'base64') {
+      content = atob(data.content.replace(/\n/g, ''));
+    } else {
+      content = data.content;
+    }
+
+    state.ghPreviewFile = file;
+    state.ghPreviewContent = content;
+    state.ghPreviewSha = data.sha;
+
+    document.getElementById('ghPreviewFileName').textContent = file.path;
+    document.getElementById('ghPreviewFileContent').textContent = content;
+    document.getElementById('ghFilePreview').style.display = '';
+  } catch(e) {
+    showToast('GitHub: ' + e.message);
+  }
+}
+
+function loadGhFileToContext() {
+  if (!state.ghPreviewFile || !state.ghPreviewContent) return;
+  const name = 'gh:' + state.ghPreviewFile.path;
+  const content = state.ghPreviewContent;
+
+  if (state.contextFiles.some(f => f.name === name)) {
+    showToast('"' + name + '" is already in context.');
+    return;
+  }
+
+  state.contextFiles.push({ name: name, size: content.length, content: content });
+  renderFileList();
+  showToast('Loaded "' + state.ghPreviewFile.path + '" from GitHub into chat context.');
+}
+
+async function pushGhChanges() {
+  if (!state.ghRepo || state.ghPendingChanges.length === 0) {
+    showToast('No pending changes to push.');
+    return;
+  }
+
+  const confirmed = await showConfirm('Push to GitHub?', 'This will push ' + state.ghPendingChanges.length + ' file(s) to ' + state.ghRepo.fullName + ' (' + state.ghBranch + ').');
+  if (!confirmed) return;
+
+  let success = 0;
+  for (const change of state.ghPendingChanges) {
+    try {
+      // Get current file SHA if it exists
+      let sha = null;
+      try {
+        const existing = await fetch('https://api.github.com/repos/' + state.ghRepo.owner + '/' + state.ghRepo.repo + '/contents/' + change.path + '?ref=' + state.ghBranch, {
+          headers: { 'Authorization': 'Bearer ' + state.ghToken }
+        });
+        if (existing.ok) {
+          const data = await existing.json();
+          sha = data.sha;
+        }
+      } catch(e) {}
+
+      const body = {
+        message: 'Update ' + change.path + ' via FreeLattice v2',
+        content: btoa(unescape(encodeURIComponent(change.content))),
+        branch: state.ghBranch
+      };
+      if (sha) body.sha = sha;
+
+      const res = await fetch('https://api.github.com/repos/' + state.ghRepo.owner + '/' + state.ghRepo.repo + '/contents/' + change.path, {
+        method: 'PUT',
+        headers: {
+          'Authorization': 'Bearer ' + state.ghToken,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.message || 'Push failed');
+      }
+      success++;
+    } catch(e) {
+      showToast('Error pushing ' + change.path + ': ' + e.message);
+    }
+  }
+
+  if (success > 0) {
+    showToast('Pushed ' + success + ' file(s) to GitHub.');
+    state.ghPendingChanges = [];
+    // Refresh tree
+    openGhRepo();
+  }
+}
+
+function addGhPendingChange(path, content) {
+  const existing = state.ghPendingChanges.findIndex(c => c.path === path);
+  if (existing >= 0) {
+    state.ghPendingChanges[existing].content = content;
+  } else {
+    state.ghPendingChanges.push({ path, content });
+  }
+  document.getElementById('ghPushBtn').style.display = '';
+  showToast('Staged "' + path + '" for GitHub push. (' + state.ghPendingChanges.length + ' pending)');
+}
+
+// ============================================
+// Tab Navigation
+// ============================================
+
+function switchTab(tabId) {
+  document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.tab === tabId));
+  document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.toggle('active', panel.id === 'tab-' + tabId));
+}
+
+// ============================================
+// Toast & Confirm Dialogs
+// ============================================
+
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  clearTimeout(toast._timer);
+  toast._timer = setTimeout(() => toast.classList.remove('show'), 3500);
+}
+
+function showConfirm(title, message) {
+  return new Promise((resolve) => {
+    document.getElementById('confirmTitle').textContent = title;
+    document.getElementById('confirmMessage').textContent = message;
+    document.getElementById('confirmOverlay').classList.remove('hidden');
+    state.confirmResolve = resolve;
+  });
+}
+
+function closeConfirm(result) {
+  document.getElementById('confirmOverlay').classList.add('hidden');
+  if (state.confirmResolve) {
+    state.confirmResolve(result);
+    state.confirmResolve = null;
+  }
+}
+
+// ============================================
+// Initialization
+// ============================================
+
+document.addEventListener('DOMContentLoaded', async () => {
+  // Open IndexedDB
+  try {
+    state.db = await openDB();
+  } catch(e) {
+    console.error('IndexedDB error:', e);
+  }
+
+  // Load saved settings from localStorage
   const savedKey = localStorage.getItem('fl_apiKey');
   if (savedKey) {
     document.getElementById('apiKey').value = savedKey;
     state.apiKey = savedKey;
   }
 
-  // Load saved provider
   const savedProvider = localStorage.getItem('fl_provider');
   if (savedProvider && PROVIDERS[savedProvider]) {
     state.provider = savedProvider;
     document.getElementById('providerSelect').value = savedProvider;
   }
 
-  // Load saved model
   const savedModel = localStorage.getItem('fl_model');
   if (savedModel) {
     state.model = savedModel;
     document.getElementById('modelSelect').value = savedModel;
   }
 
-  // Load saved privacy
   const savedPrivacy = localStorage.getItem('fl_privacy');
   if (savedPrivacy) {
     state.privacy = savedPrivacy;
     document.getElementById('privacySelect').value = savedPrivacy;
   }
 
-  // Load saved local toggle
   const savedLocal = localStorage.getItem('fl_isLocal');
   if (savedLocal === 'true') {
     state.isLocal = true;
     document.getElementById('localToggle').checked = true;
   }
 
-  // Load suggestions
   const savedSuggestions = localStorage.getItem('fl_suggestions');
   if (savedSuggestions) {
     try { state.suggestions = JSON.parse(savedSuggestions); } catch(e) {}
@@ -1233,6 +2592,28 @@ document.addEventListener('DOMContentLoaded', () => {
     chatInput.style.height = 'auto';
     chatInput.style.height = Math.min(chatInput.scrollHeight, 120) + 'px';
   });
+
+  // Load memory data from IndexedDB
+  if (state.db) {
+    await loadMemorySummary();
+    await loadCustomSystemPrompt();
+    await loadLastConversation();
+    await updateMemoryStats();
+  }
+
+  // Load GitHub token
+  const savedGhToken = localStorage.getItem('fl_ghToken');
+  if (savedGhToken) {
+    state.ghToken = savedGhToken;
+    document.getElementById('ghToken').value = savedGhToken;
+    verifyGhToken();
+  }
+
+  // Check File System Access API support
+  if (!('showDirectoryPicker' in window)) {
+    document.getElementById('fsApiSupported').style.display = 'none';
+    document.getElementById('fsApiUnsupported').style.display = '';
+  }
 });
 
 // ---- Welcome ----
@@ -1251,16 +2632,15 @@ function initMusic() {
       audio.pause();
       state.musicPlaying = false;
       btn.classList.remove('active');
-      btn.textContent = '♪';
+      btn.innerHTML = '&#9834;';
     } else {
       audio.volume = 0.15;
       audio.play().then(() => {
         state.musicPlaying = true;
         btn.classList.add('active');
-        btn.textContent = '♫';
+        btn.innerHTML = '&#9835;';
       }).catch(() => {
-        // Browser may block autoplay
-        btn.textContent = '♪';
+        btn.innerHTML = '&#9834;';
       });
     }
   });
@@ -1365,19 +2745,19 @@ function updateStatus() {
 
   if (state.isLocal) {
     dot.className = 'status-dot ready';
-    text.textContent = `Local mode — Ollama (${state.ollamaModel || 'no model set'})`;
+    text.textContent = 'Local mode — Ollama (' + (state.ollamaModel || 'no model set') + ')';
   } else if (state.apiKey) {
     const provider = PROVIDERS[state.provider];
     const modelId = provider.models[state.model] || state.model;
     dot.className = 'status-dot ready';
-    text.textContent = `Ready — ${provider.name} · ${modelId}`;
+    text.textContent = 'Ready — ' + provider.name + ' · ' + modelId;
   } else {
     dot.className = 'status-dot';
     text.textContent = 'Enter your API key above to begin chatting';
   }
 }
 
-// ---- File Handling ----
+// ---- File Handling (v1 drag-drop) ----
 function setupDropZone() {
   const zone = document.getElementById('dropZone');
 
@@ -1403,13 +2783,12 @@ async function handleFiles(files) {
   for (const file of files) {
     const ext = '.' + file.name.split('.').pop().toLowerCase();
     if (!allowed.includes(ext)) {
-      addSystemMessage(`Skipped "${file.name}" — only .txt, .md, .json, and .pdf files are supported.`);
+      addSystemMessage('Skipped "' + file.name + '" — only .txt, .md, .json, and .pdf files are supported.');
       continue;
     }
 
-    // Check for duplicates
     if (state.contextFiles.some(f => f.name === file.name)) {
-      addSystemMessage(`"${file.name}" is already loaded.`);
+      addSystemMessage('"' + file.name + '" is already loaded.');
       continue;
     }
 
@@ -1428,35 +2807,29 @@ async function handleFiles(files) {
       });
 
       renderFileList();
-      addSystemMessage(`Loaded "${file.name}" (${formatSize(file.size)}) into context.`);
+      addSystemMessage('Loaded "' + file.name + '" (' + formatSize(file.size) + ') into context.');
     } catch (err) {
-      addSystemMessage(`Error reading "${file.name}": ${err.message}`);
+      addSystemMessage('Error reading "' + file.name + '": ' + err.message);
     }
   }
 
-  // Reset file input
   document.getElementById('fileInput').value = '';
 }
 
 async function readPdfAsText(file) {
-  // Basic PDF text extraction — reads raw text from PDF
-  // For full PDF parsing, a library like pdf.js would be needed
   const buffer = await file.arrayBuffer();
   const bytes = new Uint8Array(buffer);
   let text = '';
 
-  // Try to extract readable text from PDF binary
   const decoder = new TextDecoder('utf-8', { fatal: false });
   const raw = decoder.decode(bytes);
 
-  // Extract text between BT and ET markers (basic PDF text extraction)
   const textMatches = raw.match(/\(([^)]+)\)/g);
   if (textMatches) {
     text = textMatches.map(m => m.slice(1, -1)).join(' ');
   }
 
   if (text.trim().length < 20) {
-    // Fallback: just get any readable ASCII
     text = raw.replace(/[^\x20-\x7E\n\r\t]/g, ' ').replace(/\s+/g, ' ').trim();
     if (text.length > 5000) text = text.substring(0, 5000) + '... [truncated]';
   }
@@ -1468,7 +2841,7 @@ function removeFile(index) {
   const name = state.contextFiles[index].name;
   state.contextFiles.splice(index, 1);
   renderFileList();
-  addSystemMessage(`Removed "${name}" from context.`);
+  addSystemMessage('Removed "' + name + '" from context.');
 }
 
 function renderFileList() {
@@ -1478,13 +2851,13 @@ function renderFileList() {
     return;
   }
 
-  list.innerHTML = state.contextFiles.map((f, i) => `
-    <div class="file-item">
-      <span class="file-name">📄 ${escapeHtml(f.name)}</span>
-      <span class="file-size">${formatSize(f.size)}</span>
-      <button class="remove-file" onclick="removeFile(${i})" title="Remove file">✕</button>
-    </div>
-  `).join('');
+  list.innerHTML = state.contextFiles.map((f, i) =>
+    '<div class="file-item">' +
+      '<span class="file-name">&#128196; ' + escapeHtml(f.name) + '</span>' +
+      '<span class="file-size">' + formatSize(f.size) + '</span>' +
+      '<button class="remove-file" onclick="removeFile(' + i + ')" title="Remove file">&#10005;</button>' +
+    '</div>'
+  ).join('');
 }
 
 function formatSize(bytes) {
@@ -1493,7 +2866,10 @@ function formatSize(bytes) {
   return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
 }
 
-// ---- Chat ----
+// ============================================
+// Chat System
+// ============================================
+
 function addSystemMessage(text) {
   const container = document.getElementById('chatMessages');
   const div = document.createElement('div');
@@ -1503,24 +2879,155 @@ function addSystemMessage(text) {
   container.scrollTop = container.scrollHeight;
 }
 
-function addChatMessage(role, content) {
+function addChatMessage(role, content, skipPersist) {
   const container = document.getElementById('chatMessages');
   const div = document.createElement('div');
-  div.className = `chat-message ${role}`;
+  div.className = 'chat-message ' + role;
 
   const label = document.createElement('span');
   label.className = 'msg-label';
   label.textContent = role === 'user' ? 'You' : 'AI';
 
-  const text = document.createElement('span');
-  text.textContent = content;
+  const textSpan = document.createElement('span');
+  textSpan.className = 'msg-content';
 
   div.appendChild(label);
-  div.appendChild(text);
+  div.appendChild(textSpan);
   container.appendChild(div);
-  container.scrollTop = container.scrollHeight;
 
-  return text; // return text span for streaming
+  if (content) {
+    renderMessageContent(textSpan, content, div);
+  }
+
+  container.scrollTop = container.scrollHeight;
+  return textSpan;
+}
+
+function renderMessageContent(textSpan, content, msgDiv) {
+  // Check for FILE: pattern in code blocks for "Save to Workspace" buttons
+  const filePattern = /\/\/ FILE: (.+)\n([\s\S]*?)(?=\n\/\/ FILE: |\n*$)/g;
+  let match;
+  const fileBlocks = [];
+  while ((match = filePattern.exec(content)) !== null) {
+    fileBlocks.push({ path: match[1].trim(), code: match[2].trim(), start: match.index, end: match.index + match[0].length });
+  }
+
+  // Check for system prompt suggestion
+  const promptSuggestionPattern = /\[SYSTEM_PROMPT_SUGGESTION\]:\s*([\s\S]+?)(?=\n\[|$)/;
+  const promptMatch = content.match(promptSuggestionPattern);
+
+  if (fileBlocks.length === 0 && !promptMatch) {
+    textSpan.textContent = content;
+    return;
+  }
+
+  // Render with file save buttons
+  let lastEnd = 0;
+  const frag = document.createDocumentFragment();
+
+  for (const block of fileBlocks) {
+    // Text before this block
+    if (block.start > lastEnd) {
+      const before = document.createElement('span');
+      before.textContent = content.substring(lastEnd, block.start);
+      frag.appendChild(before);
+    }
+
+    // The code block
+    const codeWrap = document.createElement('div');
+    codeWrap.style.cssText = 'margin: 8px 0;';
+
+    const codeHeader = document.createElement('div');
+    codeHeader.style.cssText = 'font-size: 0.78rem; color: var(--accent); margin-bottom: 4px;';
+    codeHeader.textContent = '// FILE: ' + block.path;
+    codeWrap.appendChild(codeHeader);
+
+    const pre = document.createElement('pre');
+    pre.style.cssText = 'background: var(--bg-input); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px; font-size: 0.82rem; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word; color: var(--text-secondary);';
+    pre.textContent = block.code;
+    codeWrap.appendChild(pre);
+
+    // Save button
+    const saveBtn = document.createElement('button');
+    saveBtn.className = 'save-to-workspace-btn';
+    saveBtn.innerHTML = '&#128190; Save to Workspace';
+    const filePath = block.path;
+    const fileCode = block.code;
+    saveBtn.addEventListener('click', async function() {
+      if (this.classList.contains('saved')) return;
+
+      // Try local workspace first
+      if (state.workspaceDirHandle) {
+        const ok = await saveFileToWorkspace(filePath, fileCode);
+        if (ok) {
+          this.innerHTML = '&#10003; Saved';
+          this.classList.add('saved');
+        }
+      } else if (state.ghRepo) {
+        addGhPendingChange(filePath, fileCode);
+        this.innerHTML = '&#10003; Staged for GitHub';
+        this.classList.add('saved');
+      } else {
+        showToast('Open a workspace folder or connect GitHub first.');
+      }
+    });
+    codeWrap.appendChild(saveBtn);
+
+    // Also offer GitHub staging if both are available
+    if (state.ghRepo) {
+      const ghBtn = document.createElement('button');
+      ghBtn.className = 'save-to-workspace-btn';
+      ghBtn.style.marginLeft = '8px';
+      ghBtn.innerHTML = '&#8593; Stage for GitHub';
+      ghBtn.addEventListener('click', function() {
+        if (this.classList.contains('saved')) return;
+        addGhPendingChange(filePath, fileCode);
+        this.innerHTML = '&#10003; Staged';
+        this.classList.add('saved');
+      });
+      codeWrap.appendChild(ghBtn);
+    }
+
+    frag.appendChild(codeWrap);
+    lastEnd = block.end;
+  }
+
+  // Remaining text
+  if (lastEnd < content.length) {
+    const after = document.createElement('span');
+    after.textContent = content.substring(lastEnd);
+    frag.appendChild(after);
+  }
+
+  textSpan.appendChild(frag);
+
+  // Handle system prompt suggestion
+  if (promptMatch) {
+    const suggestion = promptMatch[1].trim();
+    const bar = document.createElement('div');
+    bar.className = 'prompt-suggestion-bar';
+    bar.innerHTML = '<span>&#9733; Your AI suggests updating its behavior. </span>';
+
+    const approveBtn = document.createElement('button');
+    approveBtn.className = 'approve';
+    approveBtn.textContent = 'Review & Approve';
+    approveBtn.addEventListener('click', () => {
+      // Switch to settings tab and populate the editor
+      switchTab('settings');
+      document.getElementById('systemPromptEditor').value = suggestion;
+      bar.innerHTML = '<span style="color: var(--success);">&#10003; Suggestion loaded into System Prompt editor. Review and save when ready.</span>';
+    });
+
+    const rejectBtn = document.createElement('button');
+    rejectBtn.textContent = 'Dismiss';
+    rejectBtn.addEventListener('click', () => {
+      bar.remove();
+    });
+
+    bar.appendChild(approveBtn);
+    bar.appendChild(rejectBtn);
+    msgDiv.appendChild(bar);
+  }
 }
 
 function handleChatKeydown(e) {
@@ -1541,11 +3048,21 @@ async function sendMessage() {
     return;
   }
 
+  // Ensure we have a conversation
+  if (!state.currentConversationId && state.db) {
+    await createConversation();
+  }
+
   // Add user message
   addChatMessage('user', message);
   state.chatHistory.push({ role: 'user', content: message });
   input.value = '';
   input.style.height = 'auto';
+
+  // Persist user message
+  if (state.db) {
+    saveMessage('user', message);
+  }
 
   // Build messages array
   const messages = buildMessages();
@@ -1570,10 +3087,9 @@ async function sendMessage() {
     };
 
     if (!state.isLocal) {
-      headers['Authorization'] = `Bearer ${state.apiKey}`;
+      headers['Authorization'] = 'Bearer ' + state.apiKey;
     }
 
-    // OpenRouter requires additional headers
     if (state.provider === 'openrouter') {
       headers['HTTP-Referer'] = 'https://chaos2cured.github.io/FreeLattice/';
       headers['X-Title'] = 'FreeLattice';
@@ -1594,7 +3110,7 @@ async function sendMessage() {
 
     if (!response.ok) {
       const errText = await response.text();
-      let errMsg = `Error ${response.status}`;
+      let errMsg = 'Error ' + response.status;
       try {
         const errJson = JSON.parse(errText);
         errMsg = errJson.error?.message || errJson.message || errMsg;
@@ -1618,7 +3134,7 @@ async function sendMessage() {
 
       buffer += decoder.decode(value, { stream: true });
       const lines = buffer.split('\n');
-      buffer = lines.pop(); // keep incomplete line in buffer
+      buffer = lines.pop();
 
       for (const line of lines) {
         const trimmed = line.trim();
@@ -1651,12 +3167,22 @@ async function sendMessage() {
 
     if (fullResponse) {
       state.chatHistory.push({ role: 'assistant', content: fullResponse });
+
+      // Persist assistant message
+      if (state.db) {
+        saveMessage('assistant', fullResponse);
+      }
+
+      // Re-render with file save buttons and prompt suggestions
+      const msgDiv = textSpan.parentElement;
+      textSpan.textContent = '';
+      renderMessageContent(textSpan, fullResponse, msgDiv);
     } else {
       textSpan.textContent = '[No response received. Check your API key and provider settings.]';
     }
 
   } catch (err) {
-    addSystemMessage(`Error: ${err.message}`);
+    addSystemMessage('Error: ' + err.message);
     if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError')) {
       if (state.isLocal) {
         addSystemMessage('Could not connect to Ollama. Make sure it\'s running: ollama serve');
@@ -1672,14 +3198,19 @@ async function sendMessage() {
 function buildMessages() {
   const messages = [];
 
-  // System message with context
-  let systemContent = 'You are a helpful, thoughtful AI assistant provided through FreeLattice — a free, open-source tool that gives everyone access to AI. Be kind, clear, and thorough in your responses.';
+  // System message with context + memory
+  let systemContent = state.customSystemPrompt || DEFAULT_SYSTEM_PROMPT;
+
+  // Inject memory summary
+  if (state.memorySummary) {
+    systemContent += '\n\n--- MEMORY SUMMARY (what you know about this user) ---\n' + state.memorySummary + '\n--- END MEMORY SUMMARY ---\nUse this memory to personalize your responses. Reference what you know naturally.';
+  }
 
   // Add file context
   if (state.contextFiles.length > 0) {
     systemContent += '\n\nThe user has provided the following context files:\n';
     for (const file of state.contextFiles) {
-      systemContent += `\n--- ${file.name} ---\n${file.content}\n`;
+      systemContent += '\n--- ' + file.name + ' ---\n' + file.content + '\n';
     }
     systemContent += '\nUse this context to inform your responses when relevant.';
   }
@@ -1749,6 +3280,7 @@ function submitSuggestion() {
 // Close modals on overlay click
 document.addEventListener('click', (e) => {
   if (e.target.id === 'suggestOverlay') closeSuggest();
+  if (e.target.id === 'confirmOverlay') closeConfirm(false);
 });
 
 // ---- Utility ----
