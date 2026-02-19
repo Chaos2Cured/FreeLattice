@@ -1,0 +1,13 @@
+OpenRouter Model IDs - Key Findings
+====================================
+
+CONFIRMED MODEL ID FORMAT:
+meta-llama/llama-3.3-70b-instruct
+
+CURRENT FREELATTICE CONFIG FOR OPENROUTER:
+- llama: 'meta-llama/llama-3.3-70b-instruct' ✓ CORRECT
+- qwen: 'qwen/qwen-2.5-72b-instruct'
+- mixtral: 'mistralai/mixtral-8x7b-instruct'
+- deepseek: 'deepseek/deepseek-chat-v3-0324'
+
+The OpenRouter model IDs appear to be in good shape. OpenRouter aggregates many providers and maintains compatibility with older model IDs by routing to available providers. The current configuration should work fine.

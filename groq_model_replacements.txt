@@ -1,0 +1,46 @@
+Groq Model Replacements - Key Findings
+========================================
+
+DEPRECATED MODELS TO REPLACE:
+
+1. mixtral-8x7b-32768
+   - Shutdown date: 03/20/25 (already deprecated)
+   - Recommended replacements: mistral-saba-24b OR llama-3.3-70b-versatile
+   - NOTE: mistral-saba-24b was ALSO deprecated on 07/30/25 in favor of qwen/qwen3-32b
+   - FINAL RECOMMENDATION: llama-3.3-70b-versatile OR qwen/qwen3-32b
+
+2. qwen-qwq-32b
+   - Shutdown date: 07/14/25 (already deprecated)
+   - Recommended replacement: qwen/qwen3-32b
+
+OTHER MODELS TO VERIFY:
+
+3. gemma2-9b-it
+   - Deprecated on 10/08/25
+   - Recommended replacement: llama-3.1-8b-instant
+
+4. deepseek-r1-distill-llama-70b
+   - Deprecated on 10/02/25
+   - Recommended replacement: llama-3.3-70b-versatile OR openai/gpt-oss-120b
+
+5. llama-3.3-70b-versatile
+   - CURRENT/ACTIVE - Production model
+
+CURRENT GROQ PRODUCTION MODELS (as of Feb 2026):
+- llama-3.1-8b-instant
+- llama-3.3-70b-versatile
+- openai/gpt-oss-120b
+- openai/gpt-oss-20b
+- whisper-large-v3
+- whisper-large-v3-turbo
+
+CURRENT GROQ PREVIEW MODELS:
+- qwen/qwen3-32b (this is the replacement for both qwen-qwq-32b and mistral-saba-24b)
+- meta-llama/llama-4-maverick-17b-128e-instruct
+- meta-llama/llama-4-scout-17b-16e-instruct
+- moonshotai/kimi-k2-instruct-0905
+- openai/gpt-oss-safeguard-20b
+- canopylabs/orpheus-v1-english
+- canopylabs/orpheus-arabic-saudi
+- meta-llama/llama-prompt-guard-2-22m
+- meta-llama/llama-prompt-guard-2-86m

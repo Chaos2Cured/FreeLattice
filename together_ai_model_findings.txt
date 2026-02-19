@@ -1,0 +1,35 @@
+Together AI Model IDs - Key Findings
+=====================================
+
+CURRENT TOGETHER AI MODEL IDS (from docs.together.ai/docs/serverless-models):
+
+Llama models:
+- meta-llama/Llama-3.3-70B-Instruct-Turbo (recommended)
+- meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo
+
+Qwen models:
+- Qwen/Qwen3.5-397B-A17B
+- Qwen/Qwen2.5-7B-Instruct-Turbo
+- Qwen/Qwen3-235B-A22B-Instruct-2507-tput
+- NO "Qwen/Qwen2.5-72B-Instruct-Turbo" found in current docs
+
+Mixtral/Mistral models:
+- mistralai/Mistral-Small-24B-Instruct-2501
+- mistralai/Ministral-3-14B-Instruct-2512
+- mistralai/Mistral-7B-Instruct-v0.2
+- NO "mistralai/Mixtral-8x7B-Instruct-v0.1" found in current docs
+
+DeepSeek models:
+- deepseek-ai/DeepSeek-V3.1 (current)
+- deepseek-ai/DeepSeek-R1
+
+COMPARISON WITH FREELATTICE CURRENT CONFIG:
+- llama: 'meta-llama/Llama-3.3-70B-Instruct-Turbo' ✓ CORRECT
+- qwen: 'Qwen/Qwen2.5-72B-Instruct-Turbo' ✗ NOT FOUND (may be deprecated)
+- mixtral: 'mistralai/Mixtral-8x7B-Instruct-v0.1' ✗ NOT FOUND (may be deprecated)
+- deepseek: 'deepseek-ai/DeepSeek-V3' → should be 'deepseek-ai/DeepSeek-V3.1'
+
+RECOMMENDED UPDATES FOR TOGETHER AI:
+- qwen: Change to 'Qwen/Qwen2.5-7B-Instruct-Turbo' (smaller but current)
+- mixtral: Change to 'mistralai/Mistral-Small-24B-Instruct-2501' (current Mistral model)
+- deepseek: Change to 'deepseek-ai/DeepSeek-V3.1' (updated version)
