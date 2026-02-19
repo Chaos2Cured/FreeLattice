@@ -12,6 +12,14 @@ The philosophy is simple: **Give choice and empowerment.**
 
 In a world where powerful AI is increasingly locked behind expensive subscriptions and corporate walls, FreeLattice provides a gentle, transparent, and functional alternative. It's designed for everyone, especially those who can't afford premium AI services. No fancy graphics, no hidden tracking, no corporate agenda — just a clean, powerful tool that puts you in control.
 
+## What's New in v2.2
+
+Version 2.2 adds voice input and output capabilities using the Web Speech API:
+
+-   **Voice Input (Speech-to-Text)**: Click the microphone button next to the Send button to speak your message. Your speech is transcribed in real-time and auto-sent for a natural conversational flow. Click the mic again to stop and edit before sending. Uses the browser's built-in SpeechRecognition API (Chrome, Edge, Safari).
+-   **Voice Output (Text-to-Speech)**: Every AI response includes a "Listen" button that reads the response aloud using the SpeechSynthesis API. An "Auto-speak" toggle in Settings automatically reads every AI response.
+-   **Voice Settings**: A new Voice section in Settings lets you choose your preferred voice from all available system voices, adjust speech rate (0.5x to 2x), and toggle auto-speak. Preferences persist across sessions.
+
 ## What's New in v2.1
 
 Version 2.1 adds security hardening and integrity verification to FreeLattice's foundation:
@@ -41,6 +49,7 @@ FreeLattice is a single-page web app that runs entirely in your browser. Nothing
 -   **Bring Your Own Context**: Drag-and-drop text files, Markdown, JSON, and even PDFs to provide your AI with context for your conversation.
 -   **Gentle & Clean Interface**: A peaceful, minimalist design that's easy on the eyes and simple to use on any device.
 -   **Community-Driven**: A built-in feature suggestion form ensures that the community's voice shapes the future of FreeLattice.
+-   **Voice Input/Output**: Speak to your AI with the microphone button (speech-to-text) and listen to responses with the speaker button (text-to-speech). Configurable voice selection and speech rate in Settings.
 
 ## Security Architecture
 

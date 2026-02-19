@@ -651,7 +651,7 @@ header .mantra {
 
 .chat-input-row textarea::placeholder { color: var(--text-muted); }
 
-.chat-input-row button {
+.chat-input-row button:not(.mic-btn) {
   background: var(--accent);
   color: var(--bg-primary);
   border: none;
@@ -663,9 +663,9 @@ header .mantra {
   letter-spacing: 0.02em;
 }
 
-.chat-input-row button:hover { background: var(--accent-hover); }
+.chat-input-row button:not(.mic-btn):hover { background: var(--accent-hover); }
 
-.chat-input-row button:disabled {
+.chat-input-row button:not(.mic-btn):disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
@@ -1218,6 +1218,122 @@ footer .license {
   font-style: italic;
 }
 
+/* ---- Voice: Mic Button ---- */
+.mic-btn {
+  background: var(--bg-tertiary);
+  color: var(--text-muted);
+  border: none;
+  padding: 14px 16px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: var(--transition);
+  border-left: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.mic-btn:hover {
+  color: var(--accent);
+  background: var(--accent-glow);
+}
+
+.mic-btn.recording {
+  color: var(--error);
+  background: rgba(199, 80, 80, 0.12);
+  animation: mic-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes mic-pulse {
+  0%, 100% { box-shadow: none; }
+  50% { box-shadow: inset 0 0 16px rgba(199, 80, 80, 0.25), 0 0 8px rgba(199, 80, 80, 0.15); }
+}
+
+/* ---- Voice: Speaker Button on Messages ---- */
+.speak-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  padding: 4px 10px;
+  cursor: pointer;
+  transition: var(--transition);
+  margin-top: 6px;
+  gap: 4px;
+  font-family: var(--font);
+}
+
+.speak-btn:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.speak-btn.speaking {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: var(--accent-glow);
+  animation: speak-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes speak-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+/* ---- Voice: Settings Section ---- */
+.voice-rate-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 6px;
+}
+
+.voice-rate-row input[type="range"] {
+  flex: 1;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  outline: none;
+  cursor: pointer;
+}
+
+.voice-rate-row input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+  border: 2px solid var(--bg-primary);
+  box-shadow: 0 0 4px rgba(201, 168, 76, 0.3);
+}
+
+.voice-rate-row input[type="range"]::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+  border: 2px solid var(--bg-primary);
+}
+
+.voice-rate-value {
+  font-size: 0.82rem;
+  color: var(--accent);
+  font-weight: 500;
+  min-width: 36px;
+  text-align: center;
+}
+
 /* ---- Responsive ---- */
 @media (max-width: 600px) {
   header h1 { font-size: 1.8rem; }
@@ -1457,6 +1573,9 @@ footer .license {
       </div>
       <div class="chat-input-row">
         <textarea id="chatInput" placeholder="Type your message..." rows="1" onkeydown="handleChatKeydown(event)"></textarea>
+        <button class="mic-btn" id="micBtn" onclick="toggleVoiceInput()" title="Voice input (speech-to-text)" style="display:none;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="1" width="6" height="11" rx="3"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+        </button>
         <button id="sendBtn" onclick="sendMessage()">Send</button>
       </div>
       <div class="chat-disclaimer">AI can make mistakes. Verify important information.</div>
@@ -1682,6 +1801,44 @@ footer .license {
     </div>
   </div>
 
+  <!-- Voice Section -->
+  <div class="section" id="voiceSettingsSection">
+    <div class="section-title">Voice</div>
+    <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 14px;">
+      Configure voice input (speech-to-text) and voice output (text-to-speech). Uses your browser's built-in Web Speech API — no data is sent to external servers.
+    </p>
+
+    <!-- Auto-Speak Toggle -->
+    <div class="toggle-row">
+      <span class="toggle-label" id="autoSpeakLabel">Auto-speak AI responses</span>
+      <label class="toggle-switch">
+        <input type="checkbox" id="autoSpeakToggle" onchange="handleAutoSpeakToggle()">
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+    <div class="hint" style="margin-bottom: 16px;">When enabled, every AI response will be read aloud automatically.</div>
+
+    <!-- Voice Selection -->
+    <div class="form-group" style="margin-bottom: 16px;">
+      <label for="voiceSelect">Voice</label>
+      <select id="voiceSelect" onchange="handleVoiceChange()">
+        <option value="">Default system voice</option>
+      </select>
+      <div class="hint">Choose a voice for text-to-speech output. Available voices depend on your browser and operating system.</div>
+    </div>
+
+    <!-- Speech Rate -->
+    <div class="form-group">
+      <label>Speech Rate</label>
+      <div class="voice-rate-row">
+        <span style="font-size: 0.78rem; color: var(--text-muted);">0.5x</span>
+        <input type="range" id="voiceRateSlider" min="0.5" max="2" step="0.1" value="1" oninput="handleVoiceRateChange()">
+        <span style="font-size: 0.78rem; color: var(--text-muted);">2x</span>
+        <span class="voice-rate-value" id="voiceRateValue">1x</span>
+      </div>
+    </div>
+  </div>
+
 </div>
 </div>
 
@@ -1740,7 +1897,14 @@ const state = {
   ghPreviewContent: '',
   ghPendingChanges: [],
   // Confirm dialog
-  confirmResolve: null
+  confirmResolve: null,
+  // Voice
+  voiceRecognition: null,
+  voiceIsRecording: false,
+  voiceAutoSpeak: false,
+  voiceSelectedVoice: '',
+  voiceSpeechRate: 1,
+  voiceCurrentUtterance: null
 };
 
 // ---- Provider Config ----
@@ -2811,6 +2975,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('fsApiSupported').style.display = 'none';
     document.getElementById('fsApiUnsupported').style.display = '';
   }
+
+  // Initialize voice features
+  initVoiceInput();
+  initVoiceOutput();
+  loadVoiceSettings();
 });
 
 // ---- Welcome ----
@@ -3141,6 +3310,21 @@ function addChatMessage(role, content, skipPersist) {
 
   div.appendChild(label);
   div.appendChild(textSpan);
+
+  // Add speaker button for assistant messages (TTS)
+  if (role === 'assistant' && 'speechSynthesis' in window) {
+    const speakBtn = document.createElement('button');
+    speakBtn.className = 'speak-btn';
+    speakBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg> Listen';
+    speakBtn.title = 'Read aloud';
+    speakBtn.addEventListener('click', function() {
+      const msgContent = textSpan.textContent || '';
+      if (!msgContent.trim()) return;
+      toggleSpeakMessage(msgContent, speakBtn);
+    });
+    div.appendChild(speakBtn);
+  }
+
   container.appendChild(div);
 
   if (content) {
@@ -3427,6 +3611,14 @@ async function sendMessage() {
       const msgDiv = textSpan.parentElement;
       textSpan.textContent = '';
       renderMessageContent(textSpan, fullResponse, msgDiv);
+
+      // Auto-speak if enabled
+      if (state.voiceAutoSpeak && 'speechSynthesis' in window) {
+        const speakBtn = msgDiv.querySelector('.speak-btn');
+        if (speakBtn) {
+          toggleSpeakMessage(fullResponse, speakBtn);
+        }
+      }
     } else {
       textSpan.textContent = '[No response received. Check your API key and provider settings.]';
     }
@@ -3550,6 +3742,276 @@ function updateOfflineBanner() {
 window.addEventListener('online', updateOfflineBanner);
 window.addEventListener('offline', updateOfflineBanner);
 updateOfflineBanner();
+
+// ============================================
+// Voice Input — Speech-to-Text (Web Speech API)
+// ============================================
+
+function initVoiceInput() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    // Browser doesn't support speech recognition — hide mic button
+    return;
+  }
+
+  // Show the mic button
+  document.getElementById('micBtn').style.display = '';
+
+  const recognition = new SpeechRecognition();
+  recognition.continuous = false;
+  recognition.interimResults = true;
+  recognition.lang = 'en-US';
+  recognition.maxAlternatives = 1;
+
+  let finalTranscript = '';
+  let interimTranscript = '';
+
+  recognition.onstart = function() {
+    state.voiceIsRecording = true;
+    document.getElementById('micBtn').classList.add('recording');
+    document.getElementById('micBtn').title = 'Listening... click to stop';
+    finalTranscript = '';
+    interimTranscript = '';
+  };
+
+  recognition.onresult = function(event) {
+    interimTranscript = '';
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      const transcript = event.results[i][0].transcript;
+      if (event.results[i].isFinal) {
+        finalTranscript += transcript;
+      } else {
+        interimTranscript += transcript;
+      }
+    }
+    // Show interim results in the input field
+    const chatInput = document.getElementById('chatInput');
+    chatInput.value = finalTranscript + interimTranscript;
+    chatInput.style.height = 'auto';
+    chatInput.style.height = Math.min(chatInput.scrollHeight, 120) + 'px';
+  };
+
+  recognition.onend = function() {
+    state.voiceIsRecording = false;
+    document.getElementById('micBtn').classList.remove('recording');
+    document.getElementById('micBtn').title = 'Voice input (speech-to-text)';
+
+    // Auto-send if we have a final transcript
+    const chatInput = document.getElementById('chatInput');
+    if (finalTranscript.trim()) {
+      chatInput.value = finalTranscript.trim();
+      // Small delay so user can see what was transcribed before sending
+      setTimeout(() => {
+        if (chatInput.value.trim() && !state.isStreaming) {
+          sendMessage();
+        }
+      }, 400);
+    }
+  };
+
+  recognition.onerror = function(event) {
+    state.voiceIsRecording = false;
+    document.getElementById('micBtn').classList.remove('recording');
+    document.getElementById('micBtn').title = 'Voice input (speech-to-text)';
+
+    if (event.error === 'not-allowed') {
+      showToast('Microphone access denied. Please allow microphone permission.');
+    } else if (event.error === 'no-speech') {
+      // Silently ignore — user didn't speak
+    } else if (event.error !== 'aborted') {
+      showToast('Voice input error: ' + event.error);
+    }
+  };
+
+  state.voiceRecognition = recognition;
+}
+
+function toggleVoiceInput() {
+  if (!state.voiceRecognition) return;
+
+  if (state.voiceIsRecording) {
+    // Stop recording — user wants to edit before sending
+    state.voiceRecognition.stop();
+    // Prevent auto-send by clearing finalTranscript reference
+    // The onend handler will still fire, but we set a flag
+    state.voiceIsRecording = false;
+    document.getElementById('micBtn').classList.remove('recording');
+  } else {
+    // Start recording
+    try {
+      state.voiceRecognition.start();
+    } catch(e) {
+      // Already started or other error
+      showToast('Could not start voice input. Try again.');
+    }
+  }
+}
+
+// ============================================
+// Voice Output — Text-to-Speech (SpeechSynthesis API)
+// ============================================
+
+function initVoiceOutput() {
+  if (!('speechSynthesis' in window)) return;
+
+  // Populate voice list (may load asynchronously)
+  populateVoiceList();
+  if (speechSynthesis.onvoiceschanged !== undefined) {
+    speechSynthesis.onvoiceschanged = populateVoiceList;
+  }
+}
+
+function populateVoiceList() {
+  const voices = speechSynthesis.getVoices();
+  const select = document.getElementById('voiceSelect');
+  if (!select || voices.length === 0) return;
+
+  // Preserve current selection
+  const currentVal = select.value || state.voiceSelectedVoice;
+
+  select.innerHTML = '<option value="">Default system voice</option>';
+
+  // Sort: prefer Google/Natural voices first, then by language
+  const sorted = [...voices].sort((a, b) => {
+    const aPreferred = /google|natural/i.test(a.name) ? 0 : 1;
+    const bPreferred = /google|natural/i.test(b.name) ? 0 : 1;
+    if (aPreferred !== bPreferred) return aPreferred - bPreferred;
+    return a.name.localeCompare(b.name);
+  });
+
+  for (const voice of sorted) {
+    const option = document.createElement('option');
+    option.value = voice.name;
+    option.textContent = voice.name + ' (' + voice.lang + ')' + (voice.default ? ' — default' : '');
+    select.appendChild(option);
+  }
+
+  // Restore selection
+  if (currentVal) {
+    select.value = currentVal;
+  }
+}
+
+function getSelectedVoice() {
+  if (!state.voiceSelectedVoice) {
+    // Try to find a preferred natural voice
+    const voices = speechSynthesis.getVoices();
+    const preferred = voices.find(v => /google.*us|natural.*english/i.test(v.name) && v.lang.startsWith('en'));
+    return preferred || null;
+  }
+  const voices = speechSynthesis.getVoices();
+  return voices.find(v => v.name === state.voiceSelectedVoice) || null;
+}
+
+function toggleSpeakMessage(text, btn) {
+  if (!('speechSynthesis' in window)) return;
+
+  // If currently speaking, stop
+  if (speechSynthesis.speaking) {
+    speechSynthesis.cancel();
+    // Reset all speak buttons
+    document.querySelectorAll('.speak-btn.speaking').forEach(b => {
+      b.classList.remove('speaking');
+      b.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg> Listen';
+    });
+
+    // If the same button was clicked, just stop (toggle off)
+    if (btn && btn._isSpeaking) {
+      btn._isSpeaking = false;
+      return;
+    }
+  }
+
+  // Start speaking
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.rate = state.voiceSpeechRate;
+  utterance.pitch = 1;
+  utterance.volume = 1;
+
+  const voice = getSelectedVoice();
+  if (voice) {
+    utterance.voice = voice;
+  }
+
+  if (btn) {
+    btn.classList.add('speaking');
+    btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg> Stop';
+    btn._isSpeaking = true;
+  }
+
+  utterance.onend = function() {
+    if (btn) {
+      btn.classList.remove('speaking');
+      btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg> Listen';
+      btn._isSpeaking = false;
+    }
+  };
+
+  utterance.onerror = function(event) {
+    if (btn) {
+      btn.classList.remove('speaking');
+      btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg> Listen';
+      btn._isSpeaking = false;
+    }
+    if (event.error !== 'canceled') {
+      console.warn('Speech synthesis error:', event.error);
+    }
+  };
+
+  state.voiceCurrentUtterance = utterance;
+  speechSynthesis.speak(utterance);
+}
+
+// ============================================
+// Voice Settings Handlers
+// ============================================
+
+function handleAutoSpeakToggle() {
+  state.voiceAutoSpeak = document.getElementById('autoSpeakToggle').checked;
+  localStorage.setItem('fl_voiceAutoSpeak', state.voiceAutoSpeak);
+  const label = document.getElementById('autoSpeakLabel');
+  label.classList.toggle('active', state.voiceAutoSpeak);
+}
+
+function handleVoiceChange() {
+  state.voiceSelectedVoice = document.getElementById('voiceSelect').value;
+  localStorage.setItem('fl_voiceSelectedVoice', state.voiceSelectedVoice);
+}
+
+function handleVoiceRateChange() {
+  const slider = document.getElementById('voiceRateSlider');
+  state.voiceSpeechRate = parseFloat(slider.value);
+  document.getElementById('voiceRateValue').textContent = state.voiceSpeechRate.toFixed(1) + 'x';
+  localStorage.setItem('fl_voiceSpeechRate', state.voiceSpeechRate);
+}
+
+function loadVoiceSettings() {
+  // Load auto-speak
+  const savedAutoSpeak = localStorage.getItem('fl_voiceAutoSpeak');
+  if (savedAutoSpeak === 'true') {
+    state.voiceAutoSpeak = true;
+    document.getElementById('autoSpeakToggle').checked = true;
+    document.getElementById('autoSpeakLabel').classList.add('active');
+  }
+
+  // Load selected voice
+  const savedVoice = localStorage.getItem('fl_voiceSelectedVoice');
+  if (savedVoice) {
+    state.voiceSelectedVoice = savedVoice;
+    const voiceSelect = document.getElementById('voiceSelect');
+    if (voiceSelect) voiceSelect.value = savedVoice;
+  }
+
+  // Load speech rate
+  const savedRate = localStorage.getItem('fl_voiceSpeechRate');
+  if (savedRate) {
+    state.voiceSpeechRate = parseFloat(savedRate);
+    const slider = document.getElementById('voiceRateSlider');
+    if (slider) slider.value = state.voiceSpeechRate;
+    const rateVal = document.getElementById('voiceRateValue');
+    if (rateVal) rateVal.textContent = state.voiceSpeechRate.toFixed(1) + 'x';
+  }
+}
 
 // ---- Service Worker Registration ----
 if ('serviceWorker' in navigator) {
