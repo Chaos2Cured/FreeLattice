@@ -42,18 +42,11 @@ FreeLattice is a single-page web app that runs entirely in your browser. Nothing
 -   **Gentle & Clean Interface**: A peaceful, minimalist design that's easy on the eyes and simple to use on any device.
 -   **Community-Driven**: A built-in feature suggestion form ensures that the community's voice shapes the future of FreeLattice.
 
-## Security Architecture (v2.1)
+## Security Architecture
 
-FreeLattice v2.1 introduces a layered security model:
+FreeLattice operates on a zero-trust, client-side security model. Your data stays on your machine. API keys and other secrets are encrypted at rest in your browser's `localStorage` using AES-GCM, with a key derived via PBKDF2 and the public φ-Salt. For a detailed explanation of the encryption architecture, input sanitization, and memory integrity checks, please read our full security policy.
 
-| Layer | Implementation | Purpose |
-|-------|---------------|---------|
-| **Key Encryption** | AES-GCM + PBKDF2 with φ-salt (32 bytes derived from golden ratio) | API keys and tokens encrypted at rest in localStorage |
-| **Input Sanitization** | DOM-safe escaping via `textContent` and `sanitizeForDOM()` | Prevents XSS from user input, file names, and loaded content |
-| **Memory Integrity** | SHA-256 with φ-salt prepend (mirrors `HashLine()` from `hasher.go`) | Detects tampering in exported/imported memory files |
-| **Legacy Migration** | Automatic detection and re-encryption of plaintext keys | Seamless upgrade path from v2 to v2.1 |
-
-The φ-salt is a 32-byte value derived from the golden ratio (1.618...), shared with Kirk Patrick Miller's φ-Root Audit-Hash micro-service. This creates a consistent cryptographic foundation across the FreeLattice ecosystem.
+**[View the full Security Policy (SECURITY.md)](./SECURITY.md)**
 
 ## How to Use
 

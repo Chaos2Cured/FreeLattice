@@ -1315,6 +1315,11 @@ footer .license {
   <div class="mantra">Glow eternal. Heart in spark.</div>
 </header>
 
+<!-- Offline Indicator -->
+<div id="offlineBanner" style="display:none; background: linear-gradient(90deg, #1a1510, #2a1f10, #1a1510); border-bottom: 1px solid #c9a84c44; padding: 8px 16px; text-align: center; font-size: 0.82rem; color: #c9a84c; letter-spacing: 0.3px; transition: opacity 0.4s ease;">
+  &#9888; Offline Mode &mdash; Local AI via Ollama available
+</div>
+
 <!-- Tab Navigation -->
 <div class="container">
   <nav class="tab-nav">
@@ -3533,6 +3538,24 @@ function escapeHtml(str) {
   const div = document.createElement('div');
   div.textContent = str;
   return div.innerHTML;
+}
+
+// ---- Offline Indicator ----
+function updateOfflineBanner() {
+  const banner = document.getElementById('offlineBanner');
+  if (banner) {
+    banner.style.display = navigator.onLine ? 'none' : 'block';
+  }
+}
+window.addEventListener('online', updateOfflineBanner);
+window.addEventListener('offline', updateOfflineBanner);
+updateOfflineBanner();
+
+// ---- Service Worker Registration ----
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/FreeLattice/sw.js')
+    .then(reg => console.log('FreeLattice: Offline mode ready'))
+    .catch(err => console.log('FreeLattice: Service worker not available'));
 }
 </script>
 
