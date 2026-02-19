@@ -1,4 +1,4 @@
-# FreeLattice v2.1 🌿
+# FreeLattice v2.2 🌿
 
 **Your AI. Your Rules. Your Machine.**
 
@@ -14,16 +14,22 @@ In a world where powerful AI is increasingly locked behind expensive subscriptio
 
 ## What's New in v2.2
 
-Version 2.2 adds voice input and output capabilities using the Web Speech API:
+Version 2.2 adds multi-conversation management, giving you the ability to have multiple named conversations, each with its own context and history, while sharing a global memory summary across all of them:
+
+-   **Multi-Conversation Management**: Create, name, switch between, and delete multiple conversations. Each conversation has its own chat history stored separately in IndexedDB, while the global memory summary (auto-generated facts about you) is shared across all conversations — the AI knows who you are regardless of which conversation you're in.
+-   **Conversation Sidebar**: A collapsible sidebar on the Chat tab shows all your conversations with names, last message previews, timestamps, and context notes. Conversations are sorted by most recent activity. Includes search/filter for finding conversations quickly.
+-   **Conversation Context Notes**: When creating a new conversation, optionally set a topic or context note (e.g., "This conversation is about my Python project") that gets added to the system prompt for that conversation only.
+-   **Inline Rename & Delete**: Double-click any conversation name to rename it. Each conversation has a delete button with confirmation. Conversations auto-name from your first message.
+-   **Mobile-Friendly**: On mobile, the conversation list slides out as a panel (hamburger menu style) to save screen space. On desktop, it's a narrow sidebar alongside the chat area.
+-   **Seamless Migration**: Existing users with a single conversation stream will have their data automatically migrated into a "Default" conversation — no data loss.
+
+## What's New in v2.1
+
+Version 2.1 adds voice input and output capabilities and security hardening:
 
 -   **Voice Input (Speech-to-Text)**: Click the microphone button next to the Send button to speak your message. Your speech is transcribed in real-time and auto-sent for a natural conversational flow. Click the mic again to stop and edit before sending. Uses the browser's built-in SpeechRecognition API (Chrome, Edge, Safari).
 -   **Voice Output (Text-to-Speech)**: Every AI response includes a "Listen" button that reads the response aloud using the SpeechSynthesis API. An "Auto-speak" toggle in Settings automatically reads every AI response.
 -   **Voice Settings**: A new Voice section in Settings lets you choose your preferred voice from all available system voices, adjust speech rate (0.5x to 2x), and toggle auto-speak. Preferences persist across sessions.
-
-## What's New in v2.1
-
-Version 2.1 adds security hardening and integrity verification to FreeLattice's foundation:
-
 -   **φ-Salt API Key Encryption**: API keys and GitHub tokens are now encrypted using AES-GCM via the Web Crypto API before being stored in localStorage. The encryption key is derived using PBKDF2 with a golden-ratio-derived salt (φ-salt) adapted from Kirk Patrick Miller's [φ-Root Audit-Hash micro-service](https://github.com/Chaos2Cured). This means your secrets are never stored in plaintext — they are encrypted at rest and decrypted transparently only when needed for API calls.
 -   **Input Sanitization**: All user-generated content — chat messages, file names from drag-and-drop, and loaded file content — is sanitized against XSS before being rendered in the DOM. Raw content is still sent to the AI for processing, but the display layer is protected.
 -   **Memory Integrity Verification**: When exporting memory as JSON, FreeLattice computes a SHA-256 hash of the data with the φ-salt prepended (mirroring Kirk's `HashLine()` function from `hasher.go`). On import, the hash is verified — if it doesn't match, the user is warned that the file may have been modified.
@@ -38,11 +44,12 @@ Version 2 transforms FreeLattice from a simple chat interface into a true buildi
 -   **GitHub Integration**: Connect your GitHub account to browse repositories, read code, and commit changes. The AI can help you write code and push it directly to your repos, streamlining your development workflow.
 -   **Self-Improving Agent**: The AI can now suggest improvements to its own system prompt based on your interactions. You have full control to review, approve, or reject these suggestions, allowing you to shape your AI's personality and behavior over time.
 
-## Core Features (v1 + v2 + v2.1)
+## Core Features (v1 + v2 + v2.1 + v2.2)
 
 FreeLattice is a single-page web app that runs entirely in your browser. Nothing is ever stored on a remote server.
 
 -   **Total Privacy**: Your conversations, API key, and files stay on your machine. Data is stored in your browser's `IndexedDB` and `localStorage`. API keys are encrypted with φ-salt.
+-   **Multi-Conversation Management**: Create and manage multiple named conversations, each with its own chat history and optional context notes. Shared memory summary across all conversations.
 -   **You Choose the AI**: Select from a curated list of powerful, open-weight models from providers like Meta (Llama), Mistral, Qwen, DeepSeek, and xAI (Grok).
 -   **You Choose the Provider**: Connect to your preferred API provider, including Groq (which offers a generous free tier), Together AI, OpenRouter, or xAI.
 -   **Run Locally with Ollama**: For 100% privacy and offline access, toggle to "Local" mode to connect to a running [Ollama](https://ollama.ai) instance on your own computer.
@@ -90,16 +97,28 @@ This method runs the AI entirely on your own computer. It's completely private a
 6.  **Enter Model Name**: Type the name of the model you downloaded (e.g., `llama3.2`) into the `Ollama Model Name` field.
 7.  **Start Chatting**: You are now running a completely private AI on your own machine!
 
+### 3. Managing Conversations
+
+FreeLattice v2.2 lets you manage multiple conversations:
+
+1.  **Create**: Click the "New Conversation" button or the "+" in the sidebar. Optionally name it and add a context note.
+2.  **Switch**: Click any conversation in the sidebar to switch to it. Your chat history loads instantly.
+3.  **Rename**: Double-click a conversation name in the sidebar to rename it.
+4.  **Delete**: Click the "×" button on any conversation (with confirmation).
+5.  **Search**: Use the search bar in the sidebar to filter conversations by name or content.
+6.  **Shared Memory**: Your memory summary is shared across all conversations — the AI knows who you are in every conversation.
+
 ## How It Works (Technical Details)
 
 Transparency is a core value of FreeLattice.
 
 -   **Single HTML File**: The entire application is a single `index.html` file with embedded JavaScript and CSS. There is no backend server and no build process.
 -   **Client-Side Logic**: All operations happen in your browser. API calls are made directly from your browser to the provider you choose (e.g., Groq, Ollama).
--   **IndexedDB for Memory**: Your conversations, memory summaries, and metadata are stored in your browser's `IndexedDB`. This allows for persistent storage that survives browser restarts.
+-   **IndexedDB for Memory**: Your conversations, memory summaries, and metadata are stored in your browser's `IndexedDB`. Each conversation has its own chat history, while the memory summary is global. The schema supports: conversation id, name, createdAt, updatedAt, lastMessage, and contextNote.
 -   **Encrypted localStorage**: Your API key and GitHub token are encrypted using AES-GCM with a PBKDF2-derived key (φ-salt) before being stored in `localStorage`. Legacy plaintext keys are automatically migrated to encrypted storage on first load.
 -   **File System Access API**: The "Local Workspace" feature uses the modern File System Access API to allow the browser to securely interact with your local files after you grant permission.
 -   **φ-Hash Memory Integrity**: Exported memory files include a SHA-256 hash computed with the φ-salt, allowing verification that the data hasn't been tampered with during import.
+-   **Data Migration**: Existing users upgrading from v2.1 or earlier will have their single conversation stream automatically migrated into a "Default" conversation with all messages preserved.
 
 ## Contributing
 

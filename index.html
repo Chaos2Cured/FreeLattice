@@ -3,13 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FreeLattice — Your AI. Your Rules. Your Machine. v2.1</title>
+<title>FreeLattice — Your AI. Your Rules. Your Machine. v2.2</title>
 <meta name="description" content="Free, open-source AI agent for everyone. Persistent memory, file system access, GitHub integration, and self-improving behavior. Community-built and community-owned.">
 <style>
 /* ============================================
-   FreeLattice v2.1 — Styles
+   FreeLattice v2.2 — Styles
    Peaceful, gentle dark theme with golden/amber accents
    φ-salt encryption, input sanitization, memory integrity
+   Multi-conversation management
    ============================================ */
 
 :root {
@@ -35,6 +36,7 @@
   --shadow: 0 2px 12px rgba(0,0,0,0.3);
   --transition: 0.25s ease;
   --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --sidebar-width: 240px;
 }
 
 *, *::before, *::after {
@@ -1334,6 +1336,376 @@ footer .license {
   text-align: center;
 }
 
+/* ---- Conversation Sidebar ---- */
+.chat-layout {
+  display: flex;
+  gap: 0;
+  position: relative;
+}
+
+.conv-sidebar {
+  width: var(--sidebar-width);
+  min-width: var(--sidebar-width);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius) 0 0 var(--radius);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: width 0.3s ease, min-width 0.3s ease, opacity 0.3s ease;
+}
+
+.conv-sidebar.collapsed {
+  width: 0;
+  min-width: 0;
+  border: none;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.conv-sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-tertiary);
+  flex-shrink: 0;
+}
+
+.conv-sidebar-header .conv-title-text {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.conv-sidebar-header .conv-count {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin-left: 6px;
+}
+
+.conv-sidebar-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.conv-sidebar-actions button {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  padding: 3px 8px;
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: var(--font);
+}
+
+.conv-sidebar-actions button:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.conv-search {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.conv-search input {
+  width: 100%;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 6px 10px;
+  color: var(--text-primary);
+  font-size: 0.8rem;
+  font-family: var(--font);
+  outline: none;
+  transition: var(--transition);
+}
+
+.conv-search input:focus {
+  border-color: var(--accent);
+}
+
+.conv-search input::placeholder {
+  color: var(--text-muted);
+}
+
+.conv-list {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.conv-item {
+  display: flex;
+  flex-direction: column;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: var(--transition);
+  position: relative;
+}
+
+.conv-item:hover {
+  background: var(--accent-glow);
+}
+
+.conv-item.active {
+  background: var(--accent-soft);
+  border-left: 3px solid var(--accent);
+}
+
+.conv-item-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.conv-item-name {
+  font-size: 0.82rem;
+  color: var(--text-primary);
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+  cursor: pointer;
+}
+
+.conv-item.active .conv-item-name {
+  color: var(--accent);
+}
+
+.conv-item-name input {
+  background: var(--bg-input);
+  border: 1px solid var(--accent);
+  border-radius: 3px;
+  color: var(--text-primary);
+  font-size: 0.82rem;
+  font-family: var(--font);
+  padding: 1px 4px;
+  width: 100%;
+  outline: none;
+}
+
+.conv-item-delete {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 0 2px;
+  opacity: 0;
+  transition: var(--transition);
+  flex-shrink: 0;
+}
+
+.conv-item:hover .conv-item-delete {
+  opacity: 1;
+}
+
+.conv-item-delete:hover {
+  color: var(--error);
+}
+
+.conv-item-preview {
+  font-size: 0.73rem;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-top: 3px;
+  line-height: 1.3;
+}
+
+.conv-item-time {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+  opacity: 0.7;
+}
+
+.conv-item-context {
+  font-size: 0.68rem;
+  color: var(--accent);
+  opacity: 0.7;
+  margin-top: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Toggle sidebar button */
+.conv-toggle-btn {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  padding: 6px 10px;
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: var(--font);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.conv-toggle-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.chat-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.chat-main .chat-container {
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+
+.conv-sidebar.collapsed + .chat-main .chat-container {
+  border-radius: var(--radius);
+}
+
+/* New conversation modal */
+.new-conv-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  backdrop-filter: blur(4px);
+}
+
+.new-conv-overlay.hidden { display: none; }
+
+.new-conv-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  max-width: 440px;
+  width: 100%;
+  padding: 28px;
+  box-shadow: var(--shadow);
+}
+
+.new-conv-card h3 {
+  color: var(--accent);
+  font-weight: 400;
+  font-size: 1.1rem;
+  margin-bottom: 16px;
+}
+
+.new-conv-card .form-group {
+  margin-bottom: 14px;
+}
+
+.new-conv-card .form-group label {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.new-conv-card .form-group input,
+.new-conv-card .form-group textarea {
+  width: 100%;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  font-family: var(--font);
+  outline: none;
+  transition: var(--transition);
+}
+
+.new-conv-card .form-group input:focus,
+.new-conv-card .form-group textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.new-conv-card .form-group textarea {
+  min-height: 60px;
+  resize: vertical;
+}
+
+.new-conv-card .hint {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.new-conv-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 18px;
+}
+
+/* Mobile: slide-out panel */
+@media (max-width: 768px) {
+  .conv-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 1500;
+    width: 280px;
+    min-width: 280px;
+    border-radius: 0;
+    box-shadow: 4px 0 20px rgba(0,0,0,0.5);
+    transform: translateX(0);
+    transition: transform 0.3s ease, opacity 0.3s ease;
+  }
+
+  .conv-sidebar.collapsed {
+    transform: translateX(-100%);
+    opacity: 1;
+    width: 280px;
+    min-width: 280px;
+    pointer-events: none;
+  }
+
+  .conv-sidebar-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 1499;
+    transition: opacity 0.3s ease;
+  }
+
+  .conv-sidebar-backdrop.hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .chat-main .chat-container {
+    border-radius: var(--radius);
+  }
+}
+
+@media (min-width: 769px) {
+  .conv-sidebar-backdrop {
+    display: none;
+  }
+}
+
 /* ---- Responsive ---- */
 @media (max-width: 600px) {
   header h1 { font-size: 1.8rem; }
@@ -1368,7 +1740,7 @@ footer .license {
 <!-- Welcome Modal -->
 <div class="welcome-overlay" id="welcomeOverlay">
   <div class="welcome-card">
-    <h2>Welcome to FreeLattice v2.1</h2>
+    <h2>Welcome to FreeLattice v2.2</h2>
     <p>
       This is <span class="highlight">your AI agent</span> — free, open-source, and built by a community that believes everyone deserves access to powerful AI tools.
     </p>
@@ -1376,7 +1748,7 @@ footer .license {
       No accounts. No tracking. No hidden costs. Your conversations stay in <span class="highlight">your browser</span>. Your API key never leaves <span class="highlight">your machine</span>.
     </p>
     <p>
-      <strong>New in v2:</strong> Persistent memory across sessions, file system access, GitHub integration, and a self-improving agent that grows with you.
+      <strong>New in v2.2:</strong> Multi-conversation management, persistent memory across sessions, file system access, GitHub integration, voice I/O, and a self-improving agent that grows with you.
     </p>
     <p style="font-style: italic; color: var(--text-muted); font-size: 0.85rem;">
       "Give choice and empowerment."
@@ -1412,6 +1784,30 @@ footer .license {
   </div>
 </div>
 
+<!-- New Conversation Modal -->
+<div class="new-conv-overlay hidden" id="newConvOverlay">
+  <div class="new-conv-card">
+    <h3>&#10010; New Conversation</h3>
+    <div class="form-group">
+      <label for="newConvName">Conversation Name</label>
+      <input type="text" id="newConvName" placeholder="e.g., My Novel, Code Project, Daily Journal">
+      <div class="hint">Leave blank for an auto-generated name.</div>
+    </div>
+    <div class="form-group">
+      <label for="newConvContext">Topic / Context Note (optional)</label>
+      <textarea id="newConvContext" placeholder="e.g., This conversation is about my Python project" rows="2"></textarea>
+      <div class="hint">This note is added to the system prompt for this conversation only.</div>
+    </div>
+    <div class="new-conv-actions">
+      <button class="btn-cancel" onclick="closeNewConvModal()">Cancel</button>
+      <button class="btn-submit" onclick="confirmNewConversation()">Create</button>
+    </div>
+  </div>
+</div>
+
+<!-- Conversation Sidebar Backdrop (mobile) -->
+<div class="conv-sidebar-backdrop hidden" id="convBackdrop" onclick="toggleConvSidebar()"></div>
+
 <!-- Confirmation Dialog -->
 <div class="confirm-overlay hidden" id="confirmOverlay">
   <div class="confirm-card">
@@ -1427,7 +1823,7 @@ footer .license {
 <!-- Header -->
 <header>
   <h1>FreeLattice</h1>
-  <div class="tagline">Your AI. Your Rules. Your Machine. v2.1</div>
+  <div class="tagline">Your AI. Your Rules. Your Machine. v2.2</div>
   <div class="mantra">Glow eternal. Heart in spark.</div>
 </header>
 
@@ -1560,28 +1956,52 @@ footer .license {
 
   <!-- Chat Section -->
   <div class="section" style="border-bottom: none;">
-    <div class="section-title">Chat</div>
-    <div class="chat-container">
-      <div class="chat-messages" id="chatMessages">
-        <div class="chat-message system">
-          Welcome to FreeLattice v2.1. Configure your model and provider above, then start chatting. Your conversations now persist across sessions.
+    <div class="section-title" style="display: flex; align-items: center; justify-content: space-between;">
+      <span>Chat</span>
+      <button class="conv-toggle-btn" onclick="toggleConvSidebar()" title="Toggle conversation list">
+        &#9776; Conversations <span id="convCountBadge" style="font-size: 0.72rem; color: var(--text-muted);"></span>
+      </button>
+    </div>
+    <div class="chat-layout">
+      <!-- Conversation Sidebar -->
+      <div class="conv-sidebar collapsed" id="convSidebar">
+        <div class="conv-sidebar-header">
+          <span><span class="conv-title-text">Conversations</span><span class="conv-count" id="convSidebarCount"></span></span>
+          <div class="conv-sidebar-actions">
+            <button onclick="openNewConvModal()" title="New conversation">&#10010;</button>
+          </div>
+        </div>
+        <div class="conv-search">
+          <input type="text" id="convSearchInput" placeholder="Search conversations..." oninput="filterConversations()">
+        </div>
+        <div class="conv-list" id="convList"></div>
+      </div>
+      <!-- Chat Main Area -->
+      <div class="chat-main">
+        <div class="chat-container">
+          <div class="chat-messages" id="chatMessages">
+            <div class="chat-message system">
+              Welcome to FreeLattice v2.2. Configure your model and provider above, then start chatting. Your conversations now persist across sessions.
+            </div>
+          </div>
+          <div class="status-bar">
+            <div class="status-dot" id="statusDot"></div>
+            <span id="statusText">Ready — configure your settings above to begin</span>
+          </div>
+          <div class="chat-input-row">
+            <textarea id="chatInput" placeholder="Type your message..." rows="1" onkeydown="handleChatKeydown(event)"></textarea>
+            <button class="mic-btn" id="micBtn" onclick="toggleVoiceInput()" title="Voice input (speech-to-text)" style="display:none;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="1" width="6" height="11" rx="3"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+            </button>
+            <button id="sendBtn" onclick="sendMessage()">Send</button>
+          </div>
+          <div class="chat-disclaimer">AI can make mistakes. Verify important information.</div>
         </div>
       </div>
-      <div class="status-bar">
-        <div class="status-dot" id="statusDot"></div>
-        <span id="statusText">Ready — configure your settings above to begin</span>
-      </div>
-      <div class="chat-input-row">
-        <textarea id="chatInput" placeholder="Type your message..." rows="1" onkeydown="handleChatKeydown(event)"></textarea>
-        <button class="mic-btn" id="micBtn" onclick="toggleVoiceInput()" title="Voice input (speech-to-text)" style="display:none;">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="1" width="6" height="11" rx="3"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
-        </button>
-        <button id="sendBtn" onclick="sendMessage()">Send</button>
-      </div>
-      <div class="chat-disclaimer">AI can make mistakes. Verify important information.</div>
     </div>
     <div class="action-row" style="margin-top: 10px;">
-      <button class="action-btn" onclick="startNewConversation()">&#10010; New Conversation</button>
+      <button class="action-btn" onclick="openNewConvModal()">&#10010; New Conversation</button>
+      <button class="conv-toggle-btn" onclick="toggleConvSidebar()">&#9776; Toggle Sidebar</button>
     </div>
   </div>
 
@@ -1618,6 +2038,10 @@ footer .license {
           <p><strong>File System Access</strong> — Open a project folder from your computer. The AI can read your files and you can save AI-generated code directly to your workspace.</p>
           <p><strong>GitHub Integration</strong> — Connect your GitHub account to browse repos, read code, and push changes — all from within FreeLattice.</p>
           <p><strong>Self-Improving Agent</strong> — The AI can suggest improvements to its own system prompt. You review and approve changes, shaping how your AI behaves over time.</p>
+
+          <h4>What's New in v2.2?</h4>
+          <p><strong>Multi-Conversation Management</strong> — Create, name, switch between, and delete multiple conversations. Each conversation has its own chat history, while your memory summary is shared across all of them. A collapsible sidebar lets you browse, search, and manage all your conversations. On mobile, it slides out as a panel.</p>
+          <p><strong>Conversation Context Notes</strong> — When creating a new conversation, you can add a topic or context note (e.g., "This conversation is about my Python project") that gets included in the system prompt for that conversation only.</p>
 
           <h4>What's New in v2.1?</h4>
           <p><strong>φ-Salt Encryption</strong> — Your API keys and GitHub tokens are now encrypted using AES-GCM with a PBKDF2-derived key based on Kirk Patrick Miller's golden-ratio (φ) salt. No more plaintext secrets in localStorage.</p>
@@ -1739,7 +2163,7 @@ footer .license {
   <div class="section">
     <div class="section-title">Persistent Memory</div>
     <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 14px;">
-      FreeLattice stores your conversations in IndexedDB. Your AI builds a memory summary of key facts you share, so it remembers you across sessions.
+      FreeLattice stores your conversations in IndexedDB. Each conversation has its own history, while the memory summary below is shared across all conversations. Your AI remembers you regardless of which conversation you're in.
     </p>
 
     <div class="memory-stats">
@@ -1773,7 +2197,7 @@ footer .license {
       <div class="expandable-body">
         <div class="expandable-content">
           <p style="margin-bottom: 10px; font-size: 0.82rem; color: var(--text-muted);">
-            This is what the AI "remembers" about you. It's injected into every conversation. You can edit it to correct or add information.
+            This is what the AI "remembers" about you. It's shared across all conversations and injected into the system prompt. You can edit it to correct or add information.
           </p>
           <div class="memory-summary-editor">
             <textarea id="memorySummaryEditor" placeholder="No memory summary yet. The AI will build one as you chat..." onchange="saveMemorySummary()"></textarea>
@@ -1851,13 +2275,14 @@ footer .license {
 
 <script>
 /* ============================================
-   FreeLattice v2.1 — Application Logic
+   FreeLattice v2.2 — Application Logic
    φ-salt encryption, input sanitization, memory integrity
+   Multi-conversation management
    ============================================ */
 
 // ---- Constants ----
 const DB_NAME = 'FreeLatticeDB';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 const STORE_CONVERSATIONS = 'conversations';
 const STORE_MESSAGES = 'messages';
 const STORE_META = 'meta';
@@ -1882,6 +2307,10 @@ const state = {
   currentConversationId: null,
   memorySummary: '',
   customSystemPrompt: null,
+  // Multi-conversation state
+  conversationsList: [],
+  convSidebarOpen: false,
+  currentConvContextNote: '',
   // Workspace
   workspaceDirHandle: null,
   workspaceFiles: [],
@@ -2082,6 +2511,7 @@ function openDB() {
     const req = indexedDB.open(DB_NAME, DB_VERSION);
     req.onupgradeneeded = (e) => {
       const db = e.target.result;
+      const oldVersion = e.oldVersion;
       if (!db.objectStoreNames.contains(STORE_CONVERSATIONS)) {
         const convStore = db.createObjectStore(STORE_CONVERSATIONS, { keyPath: 'id' });
         convStore.createIndex('updatedAt', 'updatedAt', { unique: false });
@@ -2093,10 +2523,73 @@ function openDB() {
       if (!db.objectStoreNames.contains(STORE_META)) {
         db.createObjectStore(STORE_META, { keyPath: 'key' });
       }
+      // v2 migration: add lastMessage and contextNote fields to existing conversations
+      // This is handled post-open in migrateToV2() since we can't read data during upgrade
     };
     req.onsuccess = (e) => resolve(e.target.result);
     req.onerror = (e) => reject(e.target.error);
   });
+}
+
+async function migrateToV2() {
+  // Migrate existing conversations to have the new fields: lastMessage, contextNote, name (renamed from title)
+  const conversations = await dbGetAll(STORE_CONVERSATIONS);
+  let needsMigration = false;
+
+  for (const conv of conversations) {
+    let changed = false;
+
+    // Ensure 'name' field exists (previously was 'title')
+    if (conv.title && !conv.name) {
+      conv.name = conv.title;
+      changed = true;
+    }
+    if (!conv.name) {
+      conv.name = conv.title || 'Default';
+      changed = true;
+    }
+
+    // Ensure lastMessage field
+    if (!conv.lastMessage) {
+      // Try to get the last message for this conversation
+      try {
+        const msgs = await dbGetAllByIndex(STORE_MESSAGES, 'conversationId', conv.id);
+        if (msgs.length > 0) {
+          msgs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+          const lastMsg = msgs[0];
+          conv.lastMessage = (lastMsg.content || '').substring(0, 80);
+        } else {
+          conv.lastMessage = '';
+        }
+      } catch(e) {
+        conv.lastMessage = '';
+      }
+      changed = true;
+    }
+
+    // Ensure contextNote field
+    if (conv.contextNote === undefined) {
+      conv.contextNote = '';
+      changed = true;
+    }
+
+    if (changed) {
+      await dbPut(STORE_CONVERSATIONS, conv);
+      needsMigration = true;
+    }
+  }
+
+  // If there were no conversations at all, this is a fresh install — no migration needed
+  // If there was exactly one conversation with default title, rename it to 'Default'
+  if (conversations.length === 1 && (conversations[0].title === 'New Conversation' || conversations[0].name === 'New Conversation')) {
+    const conv = conversations[0];
+    conv.name = 'Default';
+    await dbPut(STORE_CONVERSATIONS, conv);
+  }
+
+  if (needsMigration) {
+    console.log('FreeLattice: Migrated conversations to v2 schema');
+  }
 }
 
 function dbTx(storeName, mode) {
@@ -2166,16 +2659,28 @@ function generateId() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
 }
 
-async function createConversation() {
+async function createConversation(customName, contextNote) {
+  // Auto-number if no custom name
+  let name = customName;
+  if (!name) {
+    const allConvs = await dbGetAll(STORE_CONVERSATIONS);
+    const num = allConvs.length + 1;
+    name = 'Conversation ' + num;
+  }
   const conv = {
     id: generateId(),
-    title: 'New Conversation',
+    name: name,
+    title: name, // keep title for backward compat
     createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
+    updatedAt: new Date().toISOString(),
+    lastMessage: '',
+    contextNote: contextNote || ''
   };
   await dbPut(STORE_CONVERSATIONS, conv);
   state.currentConversationId = conv.id;
+  state.currentConvContextNote = conv.contextNote || '';
   state.chatHistory = [];
+  await refreshConversationList();
   return conv;
 }
 
@@ -2189,14 +2694,19 @@ async function saveMessage(role, content) {
   };
   await dbPut(STORE_MESSAGES, msg);
 
-  // Update conversation timestamp
+  // Update conversation timestamp, lastMessage, and auto-name
   const conv = await dbGet(STORE_CONVERSATIONS, state.currentConversationId);
   if (conv) {
     conv.updatedAt = new Date().toISOString();
-    if (role === 'user' && conv.title === 'New Conversation') {
-      conv.title = content.substring(0, 60) + (content.length > 60 ? '...' : '');
+    conv.lastMessage = content.substring(0, 80);
+    // Auto-name from first user message if still default
+    if (role === 'user' && (conv.name === 'New Conversation' || /^Conversation \d+$/.test(conv.name))) {
+      const autoName = content.substring(0, 60) + (content.length > 60 ? '...' : '');
+      conv.name = autoName;
+      conv.title = autoName; // backward compat
     }
     await dbPut(STORE_CONVERSATIONS, conv);
+    refreshConversationList();
   }
 
   // Check if we need to generate a memory summary
@@ -2218,10 +2728,20 @@ async function loadLastConversation() {
   // Sort by updatedAt descending
   conversations.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
   const latest = conversations[0];
-  state.currentConversationId = latest.id;
+  await switchToConversation(latest.id);
+}
+
+async function switchToConversation(convId) {
+  // Save current conversation state (chatHistory is already persisted per-message)
+  // Load the target conversation
+  const conv = await dbGet(STORE_CONVERSATIONS, convId);
+  if (!conv) return;
+
+  state.currentConversationId = conv.id;
+  state.currentConvContextNote = conv.contextNote || '';
 
   // Load messages
-  const messages = await dbGetAllByIndex(STORE_MESSAGES, 'conversationId', latest.id);
+  const messages = await dbGetAllByIndex(STORE_MESSAGES, 'conversationId', conv.id);
   messages.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
 
   state.chatHistory = messages.map(m => ({ role: m.role, content: m.content }));
@@ -2233,12 +2753,12 @@ async function loadLastConversation() {
   if (messages.length === 0) {
     const div = document.createElement('div');
     div.className = 'chat-message system';
-    div.textContent = 'Welcome to FreeLattice v2.1. Configure your model and provider above, then start chatting. Your conversations now persist across sessions.';
+    div.textContent = 'Welcome to FreeLattice v2.2. Configure your model and provider above, then start chatting. Your conversations now persist across sessions.';
     container.appendChild(div);
   } else {
     const sysDiv = document.createElement('div');
     sysDiv.className = 'chat-message system';
-    sysDiv.textContent = 'Conversation restored from memory.';
+    sysDiv.textContent = 'Conversation restored: ' + (conv.name || 'Untitled');
     container.appendChild(sysDiv);
 
     for (const msg of messages) {
@@ -2247,6 +2767,7 @@ async function loadLastConversation() {
   }
 
   container.scrollTop = container.scrollHeight;
+  await refreshConversationList();
 }
 
 async function generateMemorySummary() {
@@ -2454,23 +2975,215 @@ function confirmClearMemory() {
       state.memorySummary = '';
       state.customSystemPrompt = null;
       state.chatHistory = [];
+      state.currentConvContextNote = '';
       document.getElementById('memorySummaryEditor').value = '';
       document.getElementById('systemPromptEditor').value = DEFAULT_SYSTEM_PROMPT;
       await createConversation();
       const container = document.getElementById('chatMessages');
       container.innerHTML = '<div class="chat-message system">Memory cleared. Starting fresh.</div>';
       await updateMemoryStats();
+      await refreshConversationList();
       showToast('All memory cleared.');
     }
   });
 }
 
 async function startNewConversation() {
-  await createConversation();
+  // Called from the old "New Conversation" button — now opens the modal
+  openNewConvModal();
+}
+
+function openNewConvModal() {
+  document.getElementById('newConvName').value = '';
+  document.getElementById('newConvContext').value = '';
+  document.getElementById('newConvOverlay').classList.remove('hidden');
+  document.getElementById('newConvName').focus();
+}
+
+function closeNewConvModal() {
+  document.getElementById('newConvOverlay').classList.add('hidden');
+}
+
+async function confirmNewConversation() {
+  const name = document.getElementById('newConvName').value.trim();
+  const contextNote = document.getElementById('newConvContext').value.trim();
+  closeNewConvModal();
+
+  await createConversation(name || '', contextNote);
   state.chatHistory = [];
   const container = document.getElementById('chatMessages');
-  container.innerHTML = '<div class="chat-message system">New conversation started. Your memory summary carries forward.</div>';
+  container.innerHTML = '<div class="chat-message system">New conversation started.' + (contextNote ? ' Topic: ' + escapeHtml(contextNote) : '') + ' Your memory summary carries forward.</div>';
   await updateMemoryStats();
+}
+
+// ============================================
+// Conversation Sidebar — UI Logic
+// ============================================
+
+function toggleConvSidebar() {
+  const sidebar = document.getElementById('convSidebar');
+  const backdrop = document.getElementById('convBackdrop');
+  state.convSidebarOpen = !state.convSidebarOpen;
+
+  if (state.convSidebarOpen) {
+    sidebar.classList.remove('collapsed');
+    backdrop.classList.remove('hidden');
+    refreshConversationList();
+  } else {
+    sidebar.classList.add('collapsed');
+    backdrop.classList.add('hidden');
+  }
+}
+
+async function refreshConversationList() {
+  if (!state.db) return;
+  const conversations = await dbGetAll(STORE_CONVERSATIONS);
+  conversations.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+  state.conversationsList = conversations;
+  renderConversationList(conversations);
+  updateConvCounts(conversations.length);
+}
+
+function updateConvCounts(count) {
+  const badge = document.getElementById('convCountBadge');
+  const sidebarCount = document.getElementById('convSidebarCount');
+  if (badge) badge.textContent = '(' + count + ')';
+  if (sidebarCount) sidebarCount.textContent = '(' + count + ')';
+}
+
+function renderConversationList(conversations) {
+  const list = document.getElementById('convList');
+  if (!list) return;
+
+  const searchTerm = (document.getElementById('convSearchInput')?.value || '').toLowerCase();
+  const filtered = searchTerm
+    ? conversations.filter(c => (c.name || '').toLowerCase().includes(searchTerm) || (c.lastMessage || '').toLowerCase().includes(searchTerm))
+    : conversations;
+
+  if (filtered.length === 0) {
+    list.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--text-muted); font-size: 0.82rem;">' +
+      (searchTerm ? 'No conversations match your search.' : 'No conversations yet.') + '</div>';
+    return;
+  }
+
+  list.innerHTML = filtered.map(conv => {
+    const isActive = conv.id === state.currentConversationId;
+    const name = escapeHtml(conv.name || conv.title || 'Untitled');
+    const preview = escapeHtml((conv.lastMessage || '').substring(0, 60));
+    const time = formatRelativeTime(conv.updatedAt);
+    const contextNote = conv.contextNote ? '<div class="conv-item-context">' + escapeHtml(conv.contextNote.substring(0, 40)) + '</div>' : '';
+
+    return '<div class="conv-item' + (isActive ? ' active' : '') + '" data-conv-id="' + conv.id + '" onclick="handleConvClick(\'' + conv.id + '\')">' +
+      '<div class="conv-item-top">' +
+        '<span class="conv-item-name" ondblclick="startRenameConv(event, \'' + conv.id + '\')" title="Double-click to rename">' + name + '</span>' +
+        '<button class="conv-item-delete" onclick="deleteConversation(event, \'' + conv.id + '\')" title="Delete conversation">&#10005;</button>' +
+      '</div>' +
+      (preview ? '<div class="conv-item-preview">' + preview + '</div>' : '') +
+      contextNote +
+      '<div class="conv-item-time">' + time + '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function filterConversations() {
+  renderConversationList(state.conversationsList);
+}
+
+function formatRelativeTime(isoString) {
+  if (!isoString) return '';
+  const date = new Date(isoString);
+  const now = new Date();
+  const diffMs = now - date;
+  const diffMin = Math.floor(diffMs / 60000);
+  const diffHr = Math.floor(diffMs / 3600000);
+  const diffDay = Math.floor(diffMs / 86400000);
+
+  if (diffMin < 1) return 'just now';
+  if (diffMin < 60) return diffMin + 'm ago';
+  if (diffHr < 24) return diffHr + 'h ago';
+  if (diffDay < 7) return diffDay + 'd ago';
+  return date.toLocaleDateString();
+}
+
+async function handleConvClick(convId) {
+  if (convId === state.currentConversationId) return;
+  await switchToConversation(convId);
+  await updateMemoryStats();
+
+  // On mobile, close sidebar after switching
+  if (window.innerWidth <= 768) {
+    toggleConvSidebar();
+  }
+}
+
+function startRenameConv(event, convId) {
+  event.stopPropagation();
+  const nameSpan = event.target;
+  const currentName = nameSpan.textContent;
+
+  const input = document.createElement('input');
+  input.value = currentName;
+  input.style.cssText = 'background: var(--bg-input); border: 1px solid var(--accent); border-radius: 3px; color: var(--text-primary); font-size: 0.82rem; font-family: var(--font); padding: 1px 4px; width: 100%; outline: none;';
+
+  nameSpan.textContent = '';
+  nameSpan.appendChild(input);
+  input.focus();
+  input.select();
+
+  const finishRename = async () => {
+    const newName = input.value.trim() || currentName;
+    nameSpan.textContent = newName;
+
+    const conv = await dbGet(STORE_CONVERSATIONS, convId);
+    if (conv) {
+      conv.name = newName;
+      conv.title = newName;
+      await dbPut(STORE_CONVERSATIONS, conv);
+      await refreshConversationList();
+    }
+  };
+
+  input.addEventListener('blur', finishRename);
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); input.blur(); }
+    if (e.key === 'Escape') { input.value = currentName; input.blur(); }
+  });
+}
+
+async function deleteConversation(event, convId) {
+  event.stopPropagation();
+
+  const conv = await dbGet(STORE_CONVERSATIONS, convId);
+  const convName = conv ? (conv.name || 'this conversation') : 'this conversation';
+
+  const confirmed = await showConfirm('Delete Conversation?', 'Delete "' + convName + '"? This will permanently remove all messages in this conversation. This cannot be undone.');
+  if (!confirmed) return;
+
+  // Delete all messages for this conversation
+  const messages = await dbGetAllByIndex(STORE_MESSAGES, 'conversationId', convId);
+  for (const msg of messages) {
+    await dbDelete(STORE_MESSAGES, msg.id);
+  }
+
+  // Delete the conversation
+  await dbDelete(STORE_CONVERSATIONS, convId);
+
+  // If we deleted the active conversation, switch to another or create new
+  if (convId === state.currentConversationId) {
+    const remaining = await dbGetAll(STORE_CONVERSATIONS);
+    if (remaining.length > 0) {
+      remaining.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+      await switchToConversation(remaining[0].id);
+    } else {
+      await createConversation();
+      const container = document.getElementById('chatMessages');
+      container.innerHTML = '<div class="chat-message system">All conversations deleted. Starting fresh. Your memory summary carries forward.</div>';
+    }
+  }
+
+  await refreshConversationList();
+  await updateMemoryStats();
+  showToast('Conversation deleted.');
 }
 
 // ============================================
@@ -2810,7 +3523,7 @@ async function pushGhChanges() {
       } catch(e) {}
 
       const body = {
-        message: 'Update ' + change.path + ' via FreeLattice v2.1',
+        message: 'Update ' + change.path + ' via FreeLattice v2.2',
         content: btoa(unescape(encodeURIComponent(change.content))),
         branch: state.ghBranch
       };
@@ -2961,10 +3674,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Load memory data from IndexedDB
   if (state.db) {
+    await migrateToV2();
     await loadMemorySummary();
     await loadCustomSystemPrompt();
     await loadLastConversation();
     await updateMemoryStats();
+    await refreshConversationList();
   }
 
   // Load φ-encrypted GitHub token
@@ -3643,9 +4358,14 @@ function buildMessages() {
   // System message with context + memory
   let systemContent = state.customSystemPrompt || DEFAULT_SYSTEM_PROMPT;
 
-  // Inject memory summary
+  // Inject shared memory summary (global across all conversations)
   if (state.memorySummary) {
     systemContent += '\n\n--- MEMORY SUMMARY (what you know about this user) ---\n' + state.memorySummary + '\n--- END MEMORY SUMMARY ---\nUse this memory to personalize your responses. Reference what you know naturally.';
+  }
+
+  // Inject per-conversation context note
+  if (state.currentConvContextNote) {
+    systemContent += '\n\n--- CONVERSATION CONTEXT ---\n' + state.currentConvContextNote + '\n--- END CONVERSATION CONTEXT ---\nKeep this topic/context in mind for this conversation.';
   }
 
   // Add file context
@@ -3723,6 +4443,7 @@ function submitSuggestion() {
 document.addEventListener('click', (e) => {
   if (e.target.id === 'suggestOverlay') closeSuggest();
   if (e.target.id === 'confirmOverlay') closeConfirm(false);
+  if (e.target.id === 'newConvOverlay') closeNewConvModal();
 });
 
 // ---- Utility ----
