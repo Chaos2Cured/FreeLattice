@@ -1,4 +1,4 @@
-# FreeLattice v2.2 🌿
+# FreeLattice v2.3 🌿
 
 **Your AI. Your Rules. Your Machine.**
 
@@ -11,6 +11,17 @@ FreeLattice is a free, open-source, community-built tool that gives everyone acc
 The philosophy is simple: **Give choice and empowerment.**
 
 In a world where powerful AI is increasingly locked behind expensive subscriptions and corporate walls, FreeLattice provides a gentle, transparent, and functional alternative. It's designed for everyone, especially those who can't afford premium AI services. No fancy graphics, no hidden tracking, no corporate agenda — just a clean, powerful tool that puts you in control.
+
+## What's New in v2.3
+
+Version 2.3 adds **Smart Context Management**, solving a critical usability issue where users on free-tier providers (especially Groq's 6,000 TPM limit) would have their requests rejected when loading multiple context files. FreeLattice now intelligently manages your token budget:
+
+-   **Token Budget Display**: A live context budget bar between the chat messages and input area shows estimated token usage with color-coded feedback (green/amber/red). Format: "Context: ~4,200 / 6,000 tokens". Updates in real-time as files are loaded, toggled, or removed.
+-   **Provider-Aware Token Limits**: Each provider has preconfigured free-tier token limits (Groq: 6,000 TPM, Together AI: 60,000 TPM, OpenRouter: 4,000 TPM, xAI: 100,000 TPM, Ollama: unlimited). Limits auto-update when you switch providers, with manual override available in Settings.
+-   **Selective File Context**: Each loaded file now has an individual toggle checkbox. Deactivate files you don't need for the current conversation without removing them. "Select All" / "Deselect All" controls for quick management. Each file shows its estimated token count.
+-   **Context Modes (Smart / Full / Minimal)**: Smart mode (default) auto-trims context to fit your provider's limit, prioritizing system prompt, memory, and recent messages. Full mode sends everything (may fail on free tiers). Minimal mode strips files and uses only the last 2 messages.
+-   **Context Summary Mode**: Files over the summary threshold (default: 2,000 tokens) show a "Summarize" button that uses the AI to create a compressed version. Toggle between Full and Summary per file. Summaries are labeled as lossy — use Full mode for poetry and pattern work.
+-   **Auto-Retry on Rate Limits**: When a request fails with a rate limit or "too large" error (429 or similar), FreeLattice automatically switches to Smart trim mode, retries with trimmed context, and shows a helpful message suggesting Local (Ollama) for unlimited context.
 
 ## What's New in v2.2
 
@@ -44,7 +55,7 @@ Version 2 transforms FreeLattice from a simple chat interface into a true buildi
 -   **GitHub Integration**: Connect your GitHub account to browse repositories, read code, and commit changes. The AI can help you write code and push it directly to your repos, streamlining your development workflow.
 -   **Self-Improving Agent**: The AI can now suggest improvements to its own system prompt based on your interactions. You have full control to review, approve, or reject these suggestions, allowing you to shape your AI's personality and behavior over time.
 
-## Core Features (v1 + v2 + v2.1 + v2.2)
+## Core Features (v1 + v2 + v2.1 + v2.2 + v2.3)
 
 FreeLattice is a single-page web app that runs entirely in your browser. Nothing is ever stored on a remote server.
 
@@ -53,7 +64,8 @@ FreeLattice is a single-page web app that runs entirely in your browser. Nothing
 -   **You Choose the AI**: Select from a curated list of powerful, open-weight models from providers like Meta (Llama), Mistral, Qwen, DeepSeek, and xAI (Grok).
 -   **You Choose the Provider**: Connect to your preferred API provider, including Groq (which offers a generous free tier), Together AI, OpenRouter, or xAI.
 -   **Run Locally with Ollama**: For 100% privacy and offline access, toggle to "Local" mode to connect to a running [Ollama](https://ollama.ai) instance on your own computer.
--   **Bring Your Own Context**: Drag-and-drop text files, Markdown, JSON, and even PDFs to provide your AI with context for your conversation.
+-   **Bring Your Own Context**: Drag-and-drop text files, Markdown, JSON, and even PDFs to provide your AI with context for your conversation. Smart Context Management ensures your files fit within your provider's token limits.
+-   **Smart Context Management**: Live token budget display, provider-aware limits, selective file toggles, auto-trimming, context summary mode, and automatic rate-limit retry. Never hit a "request too large" error again.
 -   **Gentle & Clean Interface**: A peaceful, minimalist design that's easy on the eyes and simple to use on any device.
 -   **Community-Driven**: A built-in feature suggestion form ensures that the community's voice shapes the future of FreeLattice.
 -   **Voice Input/Output**: Speak to your AI with the microphone button (speech-to-text) and listen to responses with the speaker button (text-to-speech). Configurable voice selection and speech rate in Settings.

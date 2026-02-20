@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FreeLattice — Your AI. Your Rules. Your Machine. v2.2</title>
+<title>FreeLattice — Your AI. Your Rules. Your Machine. v2.3</title>
 <meta name="description" content="Free, open-source AI agent for everyone. Persistent memory, file system access, GitHub integration, and self-improving behavior. Community-built and community-owned.">
 <style>
 /* ============================================
-   FreeLattice v2.2 — Styles
+   FreeLattice v2.3 — Styles
    Peaceful, gentle dark theme with golden/amber accents
    φ-salt encryption, input sanitization, memory integrity
-   Multi-conversation management
+   Multi-conversation management + Smart Context Management
    ============================================ */
 
 :root {
@@ -1706,6 +1706,207 @@ footer .license {
   }
 }
 
+/* ---- Context Budget Bar ---- */
+.context-budget-bar {
+  padding: 8px 18px;
+  background: var(--bg-tertiary);
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.context-budget-label {
+  white-space: nowrap;
+  flex-shrink: 0;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.context-budget-track {
+  flex: 1;
+  height: 6px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+  min-width: 60px;
+}
+
+.context-budget-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.3s ease, background 0.3s ease;
+  background: var(--success);
+}
+
+.context-budget-fill.amber { background: var(--warning); }
+.context-budget-fill.red { background: var(--error); }
+
+.context-budget-text {
+  white-space: nowrap;
+  flex-shrink: 0;
+  min-width: 120px;
+  text-align: right;
+}
+
+.context-budget-mode {
+  white-space: nowrap;
+  flex-shrink: 0;
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: 3px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.context-budget-mode:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* ---- File Item Enhanced (with toggle, tokens, summary) ---- */
+.file-item {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 14px;
+  font-size: 0.82rem;
+  gap: 8px;
+  flex-wrap: nowrap;
+}
+
+.file-item .file-toggle {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.file-item .file-name {
+  color: var(--text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+  min-width: 0;
+}
+
+.file-item .file-name.inactive {
+  color: var(--text-muted);
+  text-decoration: line-through;
+  opacity: 0.6;
+}
+
+.file-item .file-tokens {
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.file-item .file-tokens.over-budget {
+  color: var(--error);
+}
+
+.file-item .file-summary-btn {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  padding: 1px 6px;
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: var(--font);
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.file-item .file-summary-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.file-item .file-summary-btn.active {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-glow);
+}
+
+.file-item .file-summary-btn.summarizing {
+  color: var(--warning);
+  border-color: var(--warning);
+  animation: pulse 1s infinite;
+}
+
+.file-item .remove-file {
+  background: none;
+  border: none;
+  color: var(--error);
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0 4px;
+  transition: var(--transition);
+  flex-shrink: 0;
+}
+
+.file-item .remove-file:hover { opacity: 0.7; }
+
+.file-list-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  margin-bottom: 4px;
+}
+
+.file-list-controls button {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  padding: 3px 8px;
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: var(--font);
+}
+
+.file-list-controls button:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.file-summary-note {
+  font-size: 0.72rem;
+  color: var(--warning);
+  font-style: italic;
+  margin-top: 6px;
+  line-height: 1.4;
+}
+
+/* ---- Context Settings in Settings Tab ---- */
+.context-settings-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+@media (max-width: 600px) {
+  .context-settings-row { grid-template-columns: 1fr; }
+}
+
 /* ---- Responsive ---- */
 @media (max-width: 600px) {
   header h1 { font-size: 1.8rem; }
@@ -1719,6 +1920,9 @@ footer .license {
   .file-tree { max-height: 280px; }
   .action-row { gap: 8px; }
   .action-btn { padding: 8px 14px; font-size: 0.82rem; }
+  .context-budget-bar { flex-wrap: wrap; gap: 6px; }
+  .context-budget-text { min-width: auto; }
+  .context-settings-row { grid-template-columns: 1fr; }
 }
 </style>
 </head>
@@ -1740,7 +1944,7 @@ footer .license {
 <!-- Welcome Modal -->
 <div class="welcome-overlay" id="welcomeOverlay">
   <div class="welcome-card">
-    <h2>Welcome to FreeLattice v2.2</h2>
+    <h2>Welcome to FreeLattice v2.3</h2>
     <p>
       This is <span class="highlight">your AI agent</span> — free, open-source, and built by a community that believes everyone deserves access to powerful AI tools.
     </p>
@@ -1748,7 +1952,7 @@ footer .license {
       No accounts. No tracking. No hidden costs. Your conversations stay in <span class="highlight">your browser</span>. Your API key never leaves <span class="highlight">your machine</span>.
     </p>
     <p>
-      <strong>New in v2.2:</strong> Multi-conversation management, persistent memory across sessions, file system access, GitHub integration, voice I/O, and a self-improving agent that grows with you.
+      <strong>New in v2.3:</strong> Smart Context Management with token budgets, selective file context, auto-trimming, and provider-aware limits. Plus multi-conversation management, persistent memory, file system access, GitHub integration, voice I/O, and a self-improving agent.
     </p>
     <p style="font-style: italic; color: var(--text-muted); font-size: 0.85rem;">
       "Give choice and empowerment."
@@ -1823,7 +2027,7 @@ footer .license {
 <!-- Header -->
 <header>
   <h1>FreeLattice</h1>
-  <div class="tagline">Your AI. Your Rules. Your Machine. v2.2</div>
+  <div class="tagline">Your AI. Your Rules. Your Machine. v2.3</div>
   <div class="mantra">Glow eternal. Heart in spark.</div>
 </header>
 
@@ -1981,12 +2185,20 @@ footer .license {
         <div class="chat-container">
           <div class="chat-messages" id="chatMessages">
             <div class="chat-message system">
-              Welcome to FreeLattice v2.2. Configure your model and provider above, then start chatting. Your conversations now persist across sessions.
+              Welcome to FreeLattice v2.3. Configure your model and provider above, then start chatting. Smart Context Management keeps you within your provider's token limits.
             </div>
           </div>
           <div class="status-bar">
             <div class="status-dot" id="statusDot"></div>
             <span id="statusText">Ready — configure your settings above to begin</span>
+          </div>
+          <div class="context-budget-bar" id="contextBudgetBar">
+            <span class="context-budget-label">Context:</span>
+            <div class="context-budget-track">
+              <div class="context-budget-fill" id="contextBudgetFill" style="width: 0%;"></div>
+            </div>
+            <span class="context-budget-text" id="contextBudgetText">~0 / 6,000 tokens</span>
+            <button class="context-budget-mode" id="contextModeBtn" onclick="cycleContextMode()" title="Click to cycle context modes">Smart</button>
           </div>
           <div class="chat-input-row">
             <textarea id="chatInput" placeholder="Type your message..." rows="1" onkeydown="handleChatKeydown(event)"></textarea>
@@ -2225,6 +2437,44 @@ footer .license {
     </div>
   </div>
 
+  <!-- Context Management Section -->
+  <div class="section" id="contextSettingsSection">
+    <div class="section-title">Smart Context Management</div>
+    <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 14px;">
+      Control how much context is sent with each message. Free-tier providers have strict token limits &mdash; Smart mode automatically trims context to fit.
+    </p>
+
+    <div class="context-settings-row">
+      <div class="form-group">
+        <label for="contextModeSelect">Context Mode</label>
+        <select id="contextModeSelect" onchange="handleContextModeChange()">
+          <option value="smart">Smart &mdash; Auto-trim to fit budget</option>
+          <option value="full">Full &mdash; Send everything (may fail)</option>
+          <option value="minimal">Minimal &mdash; No files, minimal history</option>
+        </select>
+        <div class="hint">Smart mode (default) automatically trims context to stay within your provider's token limit.</div>
+      </div>
+
+      <div class="form-group">
+        <label for="tokenLimitInput">Token Limit (TPM)</label>
+        <input type="text" id="tokenLimitInput" placeholder="6000" onchange="handleTokenLimitChange()">
+        <div class="hint" id="tokenLimitHint">Auto-set based on provider. Override manually if needed.</div>
+      </div>
+    </div>
+
+    <div class="context-settings-row">
+      <div class="form-group">
+        <label for="summaryThresholdInput">Summary Threshold (tokens)</label>
+        <input type="text" id="summaryThresholdInput" placeholder="2000" value="2000" onchange="handleSummaryThresholdChange()">
+        <div class="hint">Files larger than this will show a "Summarize" option. Default: 2,000 tokens.</div>
+      </div>
+    </div>
+
+    <div class="privacy-info" style="margin-top: 8px;">
+      <strong>How token estimation works:</strong> FreeLattice estimates tokens using the approximation of 1 token &asymp; 4 characters. This is rough but effective for budget planning. The count includes: system prompt + memory summary + active context files + recent chat history.
+    </div>
+  </div>
+
   <!-- Voice Section -->
   <div class="section" id="voiceSettingsSection">
     <div class="section-title">Voice</div>
@@ -2275,9 +2525,9 @@ footer .license {
 
 <script>
 /* ============================================
-   FreeLattice v2.2 — Application Logic
+   FreeLattice v2.3 — Application Logic
    φ-salt encryption, input sanitization, memory integrity
-   Multi-conversation management
+   Multi-conversation management + Smart Context Management
    ============================================ */
 
 // ---- Constants ----
@@ -2333,7 +2583,13 @@ const state = {
   voiceAutoSpeak: false,
   voiceSelectedVoice: '',
   voiceSpeechRate: 1,
-  voiceCurrentUtterance: null
+  voiceCurrentUtterance: null,
+  // Smart Context Management
+  contextMode: 'smart', // 'smart', 'full', 'minimal'
+  tokenLimit: 6000,
+  tokenLimitManual: false,
+  summaryThreshold: 2000,
+  contextBudgetTotal: 0
 };
 
 // ---- Provider Config ----
@@ -2343,6 +2599,8 @@ const PROVIDERS = {
     url: 'https://api.groq.com/openai/v1/chat/completions',
     keyLink: '<a href="https://console.groq.com/keys" target="_blank">Get a free Groq API key &rarr;</a>',
     hint: 'Groq offers free API keys — great for getting started!',
+    tokenLimit: 6000,
+    tokenLimitLabel: '6,000 TPM (free tier)',
     models: {
       llama: 'llama-3.3-70b-versatile',
       qwen: 'qwen/qwen3-32b',
@@ -2356,6 +2614,8 @@ const PROVIDERS = {
     url: 'https://api.together.xyz/v1/chat/completions',
     keyLink: '<a href="https://api.together.xyz/settings/api-keys" target="_blank">Get a Together AI key &rarr;</a>',
     hint: 'Together AI gives new accounts free credits to start.',
+    tokenLimit: 60000,
+    tokenLimitLabel: '60,000 TPM (free tier)',
     models: {
       llama: 'meta-llama/Llama-3.3-70B-Instruct-Turbo',
       qwen: 'Qwen/Qwen2.5-7B-Instruct-Turbo',
@@ -2369,6 +2629,8 @@ const PROVIDERS = {
     url: 'https://openrouter.ai/api/v1/chat/completions',
     keyLink: '<a href="https://openrouter.ai/keys" target="_blank">Get an OpenRouter key &rarr;</a>',
     hint: 'OpenRouter aggregates many providers. Some models have free tiers.',
+    tokenLimit: 4000,
+    tokenLimitLabel: '4,000 TPM (varies by model)',
     models: {
       llama: 'meta-llama/llama-3.3-70b-instruct',
       qwen: 'qwen/qwen-2.5-72b-instruct',
@@ -2382,6 +2644,8 @@ const PROVIDERS = {
     url: 'https://api.x.ai/v1/chat/completions',
     keyLink: '<a href="https://console.x.ai" target="_blank">Get an xAI API key &rarr;</a>',
     hint: 'xAI provides access to Grok models.',
+    tokenLimit: 100000,
+    tokenLimitLabel: '100,000 TPM',
     models: {
       llama: 'grok-3-mini-fast',
       qwen: 'grok-3-mini-fast',
@@ -2395,6 +2659,8 @@ const PROVIDERS = {
     url: 'http://localhost:11434/v1/chat/completions',
     keyLink: '',
     hint: 'Running locally — completely private.',
+    tokenLimit: 128000,
+    tokenLimitLabel: 'No limit (local)',
     models: {}
   }
 };
@@ -2753,7 +3019,7 @@ async function switchToConversation(convId) {
   if (messages.length === 0) {
     const div = document.createElement('div');
     div.className = 'chat-message system';
-    div.textContent = 'Welcome to FreeLattice v2.2. Configure your model and provider above, then start chatting. Your conversations now persist across sessions.';
+    div.textContent = 'Welcome to FreeLattice v2.3. Configure your model and provider above, then start chatting. Smart Context Management keeps you within your provider\x27s token limits.';
     container.appendChild(div);
   } else {
     const sysDiv = document.createElement('div');
@@ -3493,8 +3759,9 @@ function loadGhFileToContext() {
     return;
   }
 
-  state.contextFiles.push({ name: name, size: content.length, content: content });
+  state.contextFiles.push({ name: name, size: content.length, content: content, active: true, summary: null, summaryContent: null, useSummary: false });
   renderFileList();
+  updateContextBudget();
   showToast('Loaded "' + state.ghPreviewFile.path + '" from GitHub into chat context.');
 }
 
@@ -3695,6 +3962,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   initVoiceInput();
   initVoiceOutput();
   loadVoiceSettings();
+
+  // Initialize Smart Context Management
+  loadContextSettings();
+  updateTokenLimitForProvider();
+  updateContextBudget();
 });
 
 // ---- Welcome ----
@@ -3760,6 +4032,7 @@ function handleLocalToggle(init) {
 
   if (!init) {
     localStorage.setItem('fl_isLocal', isLocal);
+    updateTokenLimitForProvider();
     updateStatus();
   }
 }
@@ -3799,6 +4072,7 @@ function handleProviderChange(init) {
     localStorage.setItem('fl_provider', state.provider);
     // Re-encrypt API key with new provider context
     reEncryptApiKey(state.provider);
+    updateTokenLimitForProvider();
     updateStatus();
   }
 }
@@ -3931,14 +4205,20 @@ async function handleFiles(files) {
         content = await file.text();
       }
 
+      const tokens = estimateTokens(content);
       state.contextFiles.push({
         name: safeName,
         size: file.size,
-        content: content
+        content: content,
+        active: true,
+        summary: null,
+        summaryContent: null,
+        useSummary: false
       });
 
       renderFileList();
-      addSystemMessage('Loaded "' + safeName + '" (' + formatSize(file.size) + ') into context.');
+      updateContextBudget();
+      addSystemMessage('Loaded "' + safeName + '" (~' + tokens.toLocaleString() + ' tokens) into context.');
     } catch (err) {
       addSystemMessage('Error reading "' + safeName + '": ' + err.message);
     }
@@ -3972,6 +4252,7 @@ function removeFile(index) {
   const name = state.contextFiles[index].name;
   state.contextFiles.splice(index, 1);
   renderFileList();
+  updateContextBudget();
   addSystemMessage('Removed "' + name + '" from context.');
 }
 
@@ -3982,13 +4263,50 @@ function renderFileList() {
     return;
   }
 
-  list.innerHTML = state.contextFiles.map((f, i) =>
-    '<div class="file-item">' +
-      '<span class="file-name">&#128196; ' + escapeHtml(f.name) + '</span>' +
-      '<span class="file-size">' + formatSize(f.size) + '</span>' +
-      '<button class="remove-file" onclick="removeFile(' + i + ')" title="Remove file">&#10005;</button>' +
-    '</div>'
-  ).join('');
+  // Select All / Deselect All controls
+  const allActive = state.contextFiles.every(f => f.active);
+  const noneActive = state.contextFiles.every(f => !f.active);
+  let controlsHtml = '<div class="file-list-controls">';
+  controlsHtml += '<button onclick="toggleAllFiles(true)"' + (allActive ? ' style="color: var(--accent); border-color: var(--accent);"' : '') + '>Select All</button>';
+  controlsHtml += '<button onclick="toggleAllFiles(false)"' + (noneActive ? ' style="color: var(--accent); border-color: var(--accent);"' : '') + '>Deselect All</button>';
+  controlsHtml += '</div>';
+
+  let filesHtml = state.contextFiles.map((f, i) => {
+    const tokens = estimateTokens(f.useSummary && f.summaryContent ? f.summaryContent : f.content);
+    const fullTokens = estimateTokens(f.content);
+    const nameClass = f.active ? 'file-name' : 'file-name inactive';
+    const showSummaryBtn = fullTokens >= state.summaryThreshold;
+    let tokenLabel = '~' + tokens.toLocaleString() + ' tokens';
+    if (f.useSummary && f.summaryContent) {
+      tokenLabel = 'summary ~' + tokens.toLocaleString() + ' tokens';
+    }
+
+    let html = '<div class="file-item">';
+    html += '<input type="checkbox" class="file-toggle" ' + (f.active ? 'checked' : '') + ' onchange="toggleFileActive(' + i + ', this.checked)" title="Toggle file in context">';
+    html += '<span class="' + nameClass + '">&#128196; ' + escapeHtml(f.name) + '</span>';
+    html += '<span class="file-tokens">' + tokenLabel + '</span>';
+    if (showSummaryBtn) {
+      if (f.summaryContent) {
+        const btnClass = f.useSummary ? 'file-summary-btn active' : 'file-summary-btn';
+        const btnLabel = f.useSummary ? 'Full' : 'Summary';
+        html += '<button class="' + btnClass + '" onclick="toggleFileSummary(' + i + ')" title="Toggle between full and summary">' + btnLabel + '</button>';
+      } else {
+        html += '<button class="file-summary-btn" onclick="summarizeFile(' + i + ')" title="Generate AI summary to reduce tokens">Summarize</button>';
+      }
+    }
+    html += '<button class="remove-file" onclick="removeFile(' + i + ')" title="Remove file">&#10005;</button>';
+    html += '</div>';
+    return html;
+  }).join('');
+
+  // Add lossy warning note if any files have summaries active
+  const hasSummaryActive = state.contextFiles.some(f => f.useSummary && f.summaryContent);
+  let noteHtml = '';
+  if (hasSummaryActive) {
+    noteHtml = '<div class="file-summary-note">Note: Summaries may lose subtle patterns in dense text. Use Full mode for poetry and pattern work.</div>';
+  }
+
+  list.innerHTML = controlsHtml + filesHtml + noteHtml;
 }
 
 function formatSize(bytes) {
@@ -4213,11 +4531,22 @@ async function sendMessage() {
     saveMessage('user', message);
   }
 
-  // Build messages array
-  const messages = buildMessages();
+  // Build messages array — use smart context if enabled
+  let messages;
+  const smartMessages = buildSmartMessages(message);
+  if (smartMessages) {
+    messages = smartMessages;
+  } else {
+    messages = buildMessages();
+  }
+
+  // Update context budget after building messages
+  updateContextBudget();
 
   // Set status
   setStreamingStatus(true);
+
+  let retryWithTrim = false;
 
   try {
     const provider = PROVIDERS[state.provider];
@@ -4251,12 +4580,13 @@ async function sendMessage() {
       max_tokens: 2048
     };
 
-    const response = await fetch(url, {
+    let response = await fetch(url, {
       method: 'POST',
       headers: headers,
       body: JSON.stringify(body)
     });
 
+    // Rate limit / too large error — auto-retry with trimmed context
     if (!response.ok) {
       const errText = await response.text();
       let errMsg = 'Error ' + response.status;
@@ -4266,7 +4596,77 @@ async function sendMessage() {
       } catch(e) {
         errMsg = errText.substring(0, 200) || errMsg;
       }
-      throw new Error(errMsg);
+
+      const isRateLimit = response.status === 429 || errMsg.toLowerCase().includes('too large') || errMsg.toLowerCase().includes('limit') || errMsg.toLowerCase().includes('rate');
+
+      if (isRateLimit && state.contextMode !== 'smart') {
+        // Auto-switch to smart mode and retry
+        addSystemMessage('Context was too large for your provider. Automatically switching to Smart trim mode and retrying...');
+        state.contextMode = 'smart';
+        localStorage.setItem('fl_contextMode', 'smart');
+        document.getElementById('contextModeSelect').value = 'smart';
+
+        // Rebuild with smart trimming
+        const trimmedMessages = buildSmartMessages(message);
+        if (trimmedMessages) {
+          body.messages = trimmedMessages;
+          response = await fetch(url, {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify(body)
+          });
+
+          if (!response.ok) {
+            const retryErrText = await response.text();
+            let retryErrMsg = 'Error ' + response.status;
+            try {
+              const retryErrJson = JSON.parse(retryErrText);
+              retryErrMsg = retryErrJson.error?.message || retryErrJson.message || retryErrMsg;
+            } catch(e) {
+              retryErrMsg = retryErrText.substring(0, 200) || retryErrMsg;
+            }
+            throw new Error(retryErrMsg);
+          }
+
+          addSystemMessage('Context trimmed to fit. Switch to Local (Ollama) for unlimited context.');
+          updateContextBudget();
+        } else {
+          throw new Error(errMsg);
+        }
+      } else if (isRateLimit && state.contextMode === 'smart') {
+        // Already in smart mode, try minimal
+        addSystemMessage('Still too large. Retrying with minimal context...');
+        state.contextMode = 'minimal';
+        const minimalMessages = buildSmartMessages(message);
+        state.contextMode = 'smart'; // Restore
+        if (minimalMessages) {
+          body.messages = minimalMessages;
+          response = await fetch(url, {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify(body)
+          });
+
+          if (!response.ok) {
+            const retryErrText = await response.text();
+            let retryErrMsg = 'Error ' + response.status;
+            try {
+              const retryErrJson = JSON.parse(retryErrText);
+              retryErrMsg = retryErrJson.error?.message || retryErrJson.message || retryErrMsg;
+            } catch(e) {
+              retryErrMsg = retryErrText.substring(0, 200) || retryErrMsg;
+            }
+            throw new Error(retryErrMsg);
+          }
+
+          addSystemMessage('Sent with minimal context. Consider using Local (Ollama) for unlimited context, or reduce loaded files.');
+          updateContextBudget();
+        } else {
+          throw new Error(errMsg);
+        }
+      } else {
+        throw new Error(errMsg);
+      }
     }
 
     // Stream response
@@ -4368,11 +4768,13 @@ function buildMessages() {
     systemContent += '\n\n--- CONVERSATION CONTEXT ---\n' + state.currentConvContextNote + '\n--- END CONVERSATION CONTEXT ---\nKeep this topic/context in mind for this conversation.';
   }
 
-  // Add file context
-  if (state.contextFiles.length > 0) {
+  // Add file context (only active files, use summary if enabled)
+  const activeFiles = state.contextFiles.filter(f => f.active);
+  if (activeFiles.length > 0) {
     systemContent += '\n\nThe user has provided the following context files:\n';
-    for (const file of state.contextFiles) {
-      systemContent += '\n--- ' + file.name + ' ---\n' + file.content + '\n';
+    for (const file of activeFiles) {
+      const content = (file.useSummary && file.summaryContent) ? file.summaryContent : file.content;
+      systemContent += '\n--- ' + file.name + (file.useSummary && file.summaryContent ? ' (summary)' : '') + ' ---\n' + content + '\n';
     }
     systemContent += '\nUse this context to inform your responses when relevant.';
   }
@@ -4732,6 +5134,408 @@ function loadVoiceSettings() {
     const rateVal = document.getElementById('voiceRateValue');
     if (rateVal) rateVal.textContent = state.voiceSpeechRate.toFixed(1) + 'x';
   }
+}
+
+// ============================================
+// Smart Context Management
+// ============================================
+
+function estimateTokens(text) {
+  // Rough approximation: 1 token ≈ 4 characters
+  if (!text) return 0;
+  return Math.ceil(text.length / 4);
+}
+
+function getTokenLimit() {
+  if (state.tokenLimitManual) return state.tokenLimit;
+  const provider = PROVIDERS[state.provider];
+  return provider ? provider.tokenLimit : 6000;
+}
+
+function updateContextBudget() {
+  const limit = getTokenLimit();
+  const systemPrompt = state.customSystemPrompt || DEFAULT_SYSTEM_PROMPT;
+  let total = estimateTokens(systemPrompt);
+
+  // Memory summary
+  if (state.memorySummary) {
+    total += estimateTokens(state.memorySummary) + 50; // overhead for labels
+  }
+
+  // Conversation context note
+  if (state.currentConvContextNote) {
+    total += estimateTokens(state.currentConvContextNote) + 30;
+  }
+
+  // Active context files
+  for (const file of state.contextFiles) {
+    if (file.active) {
+      const content = (file.useSummary && file.summaryContent) ? file.summaryContent : file.content;
+      total += estimateTokens(content) + estimateTokens(file.name) + 10;
+    }
+  }
+
+  // Chat history (last 20 messages)
+  const history = state.chatHistory.slice(-20);
+  for (const msg of history) {
+    total += estimateTokens(msg.content) + 5;
+  }
+
+  state.contextBudgetTotal = total;
+
+  // Update UI
+  const fill = document.getElementById('contextBudgetFill');
+  const text = document.getElementById('contextBudgetText');
+  const modeBtn = document.getElementById('contextModeBtn');
+
+  if (!fill || !text) return;
+
+  const pct = Math.min((total / limit) * 100, 100);
+  fill.style.width = pct + '%';
+
+  // Color coding
+  fill.classList.remove('amber', 'red');
+  if (pct >= 90) {
+    fill.classList.add('red');
+  } else if (pct >= 70) {
+    fill.classList.add('amber');
+  }
+
+  text.textContent = '~' + total.toLocaleString() + ' / ' + limit.toLocaleString() + ' tokens';
+  if (total > limit) {
+    text.style.color = 'var(--error)';
+  } else if (pct >= 70) {
+    text.style.color = 'var(--warning)';
+  } else {
+    text.style.color = '';
+  }
+
+  if (modeBtn) {
+    const modeLabels = { smart: 'Smart', full: 'Full', minimal: 'Minimal' };
+    modeBtn.textContent = modeLabels[state.contextMode] || 'Smart';
+  }
+}
+
+function cycleContextMode() {
+  const modes = ['smart', 'full', 'minimal'];
+  const idx = modes.indexOf(state.contextMode);
+  state.contextMode = modes[(idx + 1) % modes.length];
+  localStorage.setItem('fl_contextMode', state.contextMode);
+  document.getElementById('contextModeSelect').value = state.contextMode;
+  updateContextBudget();
+  const labels = { smart: 'Smart — auto-trim to fit', full: 'Full — send everything', minimal: 'Minimal — no files, minimal history' };
+  showToast('Context mode: ' + labels[state.contextMode]);
+}
+
+function handleContextModeChange() {
+  state.contextMode = document.getElementById('contextModeSelect').value;
+  localStorage.setItem('fl_contextMode', state.contextMode);
+  updateContextBudget();
+}
+
+function handleTokenLimitChange() {
+  const val = parseInt(document.getElementById('tokenLimitInput').value, 10);
+  if (val && val > 0) {
+    state.tokenLimit = val;
+    state.tokenLimitManual = true;
+    localStorage.setItem('fl_tokenLimit', val);
+    localStorage.setItem('fl_tokenLimitManual', 'true');
+  } else {
+    state.tokenLimitManual = false;
+    localStorage.removeItem('fl_tokenLimit');
+    localStorage.removeItem('fl_tokenLimitManual');
+    // Reset to provider default
+    const provider = PROVIDERS[state.provider];
+    state.tokenLimit = provider ? provider.tokenLimit : 6000;
+    document.getElementById('tokenLimitInput').value = state.tokenLimit;
+  }
+  updateContextBudget();
+}
+
+function handleSummaryThresholdChange() {
+  const val = parseInt(document.getElementById('summaryThresholdInput').value, 10);
+  if (val && val > 0) {
+    state.summaryThreshold = val;
+    localStorage.setItem('fl_summaryThreshold', val);
+    renderFileList();
+  }
+}
+
+function updateTokenLimitForProvider() {
+  if (state.tokenLimitManual) return;
+  const provider = PROVIDERS[state.provider];
+  if (provider) {
+    state.tokenLimit = provider.tokenLimit;
+    document.getElementById('tokenLimitInput').value = provider.tokenLimit;
+    document.getElementById('tokenLimitHint').textContent = provider.tokenLimitLabel + '. Override manually if needed.';
+  }
+  updateContextBudget();
+}
+
+// ---- File Toggle Functions ----
+
+function toggleFileActive(index, active) {
+  if (state.contextFiles[index]) {
+    state.contextFiles[index].active = active;
+    renderFileList();
+    updateContextBudget();
+  }
+}
+
+function toggleAllFiles(active) {
+  for (const f of state.contextFiles) {
+    f.active = active;
+  }
+  renderFileList();
+  updateContextBudget();
+}
+
+function toggleFileSummary(index) {
+  const file = state.contextFiles[index];
+  if (!file || !file.summaryContent) return;
+  file.useSummary = !file.useSummary;
+  renderFileList();
+  updateContextBudget();
+}
+
+// ---- Context Summary Mode ----
+
+async function summarizeFile(index) {
+  const file = state.contextFiles[index];
+  if (!file) return;
+
+  // Validate setup
+  if (!state.isLocal && !state.apiKey) {
+    showToast('Enter your API key to use the summarize feature.');
+    return;
+  }
+
+  // Mark as summarizing in UI
+  const btns = document.querySelectorAll('.file-summary-btn');
+  if (btns[index]) {
+    btns[index].classList.add('summarizing');
+    btns[index].textContent = 'Summarizing...';
+  }
+
+  try {
+    const provider = PROVIDERS[state.provider];
+    let url = provider.url;
+    let modelId;
+
+    if (state.isLocal) {
+      modelId = document.getElementById('ollamaModel').value.trim() || 'llama3.2';
+    } else {
+      modelId = provider.models[state.model] || state.model;
+    }
+
+    const headers = { 'Content-Type': 'application/json' };
+    if (!state.isLocal) {
+      headers['Authorization'] = 'Bearer ' + state.apiKey;
+    }
+    if (state.provider === 'openrouter') {
+      headers['HTTP-Referer'] = 'https://chaos2cured.github.io/FreeLattice/';
+      headers['X-Title'] = 'FreeLattice';
+    }
+
+    const summaryPrompt = 'Summarize the following document in under 500 tokens, preserving key patterns, names, concepts, and structure:\n\n' + file.content;
+
+    const body = {
+      model: modelId,
+      messages: [
+        { role: 'system', content: 'You are a precise summarizer. Create concise summaries that preserve key information, names, patterns, and structure.' },
+        { role: 'user', content: summaryPrompt }
+      ],
+      stream: false,
+      max_tokens: 600
+    };
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: headers,
+      body: JSON.stringify(body)
+    });
+
+    if (!response.ok) {
+      const errText = await response.text();
+      let errMsg = 'Error ' + response.status;
+      try {
+        const errJson = JSON.parse(errText);
+        errMsg = errJson.error?.message || errJson.message || errMsg;
+      } catch(e) {
+        errMsg = errText.substring(0, 200) || errMsg;
+      }
+      throw new Error(errMsg);
+    }
+
+    const data = await response.json();
+    const summary = data.choices?.[0]?.message?.content || '';
+
+    if (summary) {
+      file.summaryContent = summary;
+      file.useSummary = true;
+      renderFileList();
+      updateContextBudget();
+      const savedTokens = estimateTokens(file.content) - estimateTokens(summary);
+      showToast('Summary created for "' + file.name + '" — saved ~' + savedTokens.toLocaleString() + ' tokens.');
+    } else {
+      showToast('Could not generate summary for "' + file.name + '".');
+    }
+  } catch(err) {
+    showToast('Summary error: ' + err.message);
+  }
+
+  // Reset button state
+  renderFileList();
+}
+
+// ---- Smart Context Trimming ----
+
+function buildSmartMessages(userMessage) {
+  const limit = getTokenLimit();
+  const mode = state.contextMode;
+
+  // In full mode, use the original buildMessages logic
+  if (mode === 'full') {
+    return null; // Signal to use original buildMessages
+  }
+
+  const messages = [];
+  let usedTokens = 0;
+
+  // 1. System prompt (always keep)
+  let systemContent = state.customSystemPrompt || DEFAULT_SYSTEM_PROMPT;
+  usedTokens += estimateTokens(systemContent);
+
+  // 2. Memory summary (always keep, it's small)
+  if (state.memorySummary) {
+    const memBlock = '\n\n--- MEMORY SUMMARY (what you know about this user) ---\n' + state.memorySummary + '\n--- END MEMORY SUMMARY ---\nUse this memory to personalize your responses. Reference what you know naturally.';
+    systemContent += memBlock;
+    usedTokens += estimateTokens(memBlock);
+  }
+
+  // Conversation context note
+  if (state.currentConvContextNote) {
+    const ctxBlock = '\n\n--- CONVERSATION CONTEXT ---\n' + state.currentConvContextNote + '\n--- END CONVERSATION CONTEXT ---\nKeep this topic/context in mind for this conversation.';
+    systemContent += ctxBlock;
+    usedTokens += estimateTokens(ctxBlock);
+  }
+
+  // 3. Current user message (always keep)
+  const userMsgTokens = estimateTokens(userMessage) + 5;
+  usedTokens += userMsgTokens;
+
+  // In minimal mode, skip files and use minimal history
+  if (mode === 'minimal') {
+    messages.push({ role: 'system', content: systemContent });
+    // Add only last 2 messages of history for minimal context
+    const minHistory = state.chatHistory.slice(-2);
+    for (const msg of minHistory) {
+      const msgTokens = estimateTokens(msg.content) + 5;
+      if (usedTokens + msgTokens < limit) {
+        messages.push(msg);
+        usedTokens += msgTokens;
+      }
+    }
+    messages.push({ role: 'user', content: userMessage });
+    return messages;
+  }
+
+  // Smart mode: prioritized trimming
+  // 4. Active context files (user-selected)
+  let fileContextStr = '';
+  let filesIncluded = [];
+  let filesOverBudget = [];
+  const activeFiles = state.contextFiles.filter(f => f.active);
+
+  if (activeFiles.length > 0) {
+    const remainingForFiles = limit - usedTokens - 500; // Reserve 500 for some chat history
+    let fileTokensUsed = 0;
+
+    for (const file of activeFiles) {
+      const content = (file.useSummary && file.summaryContent) ? file.summaryContent : file.content;
+      const fileTokens = estimateTokens(content) + estimateTokens(file.name) + 10;
+
+      if (fileTokensUsed + fileTokens <= remainingForFiles) {
+        fileContextStr += '\n--- ' + file.name + ' ---\n' + content + '\n';
+        fileTokensUsed += fileTokens;
+        filesIncluded.push(file.name);
+      } else {
+        // Try to truncate the largest file
+        const availableTokens = remainingForFiles - fileTokensUsed;
+        if (availableTokens > 200) {
+          const truncChars = availableTokens * 4;
+          const truncContent = content.substring(0, truncChars);
+          const fullTokens = estimateTokens(content);
+          const sentTokens = estimateTokens(truncContent);
+          fileContextStr += '\n--- ' + file.name + ' ---\n' + truncContent + '\n[File truncated to fit token budget. Full file: ' + fullTokens.toLocaleString() + ' tokens, sent: ' + sentTokens.toLocaleString() + ' tokens]\n';
+          fileTokensUsed += sentTokens + 20;
+          filesIncluded.push(file.name + ' (truncated)');
+        } else {
+          filesOverBudget.push(file.name);
+        }
+      }
+    }
+
+    if (fileContextStr) {
+      systemContent += '\n\nThe user has provided the following context files:\n' + fileContextStr + '\nUse this context to inform your responses when relevant.';
+      usedTokens += fileTokensUsed + 20;
+    }
+  }
+
+  messages.push({ role: 'system', content: systemContent });
+
+  // 5. Chat history — trim from oldest first
+  const remainingForHistory = limit - usedTokens;
+  const history = state.chatHistory.slice(-20);
+  const historyToInclude = [];
+  let historyTokens = 0;
+
+  // Work backwards from most recent to ensure recent context is kept
+  for (let i = history.length - 1; i >= 0; i--) {
+    const msgTokens = estimateTokens(history[i].content) + 5;
+    if (historyTokens + msgTokens <= remainingForHistory) {
+      historyToInclude.unshift(history[i]);
+      historyTokens += msgTokens;
+    } else {
+      break; // Stop including older messages
+    }
+  }
+
+  messages.push(...historyToInclude);
+  messages.push({ role: 'user', content: userMessage });
+
+  return messages;
+}
+
+// ---- Context Settings Loaders ----
+
+function loadContextSettings() {
+  // Context mode
+  const savedMode = localStorage.getItem('fl_contextMode');
+  if (savedMode && ['smart', 'full', 'minimal'].includes(savedMode)) {
+    state.contextMode = savedMode;
+  }
+  document.getElementById('contextModeSelect').value = state.contextMode;
+
+  // Token limit
+  const savedLimit = localStorage.getItem('fl_tokenLimit');
+  const savedManual = localStorage.getItem('fl_tokenLimitManual');
+  if (savedManual === 'true' && savedLimit) {
+    state.tokenLimit = parseInt(savedLimit, 10);
+    state.tokenLimitManual = true;
+    document.getElementById('tokenLimitInput').value = state.tokenLimit;
+  } else {
+    updateTokenLimitForProvider();
+  }
+
+  // Summary threshold
+  const savedThreshold = localStorage.getItem('fl_summaryThreshold');
+  if (savedThreshold) {
+    state.summaryThreshold = parseInt(savedThreshold, 10);
+    document.getElementById('summaryThresholdInput').value = state.summaryThreshold;
+  }
+
+  updateContextBudget();
 }
 
 // ---- Service Worker Registration ----
