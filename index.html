@@ -3,14 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FreeLattice — Your AI. Your Rules. Your Machine. v2.3</title>
+<title>FreeLattice — Your AI. Your Rules. Your Machine. v2.5</title>
 <meta name="description" content="Free, open-source AI agent for everyone. Persistent memory, file system access, GitHub integration, and self-improving behavior. Community-built and community-owned.">
 <style>
 /* ============================================
-   FreeLattice v2.3 — Styles
+   FreeLattice v2.5 — Styles
    Peaceful, gentle dark theme with golden/amber accents
    φ-salt encryption, input sanitization, memory integrity
    Multi-conversation management + Smart Context Management
+   + Mesh Network (Layer 1) — P2P Knowledge Sharing
    ============================================ */
 
 :root {
@@ -1907,6 +1908,441 @@ footer .license {
   .context-settings-row { grid-template-columns: 1fr; }
 }
 
+/* ---- Mesh Tab ---- */
+.mesh-node-id {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 16px;
+  font-size: 0.88rem;
+  color: var(--accent);
+  font-weight: 500;
+  font-family: 'Courier New', monospace;
+  letter-spacing: 0.08em;
+}
+
+.mesh-node-id .node-label {
+  font-family: var(--font);
+  font-weight: 400;
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  letter-spacing: 0.02em;
+}
+
+.mesh-connection-btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.mesh-code-area {
+  margin-top: 12px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+}
+
+.mesh-code-area label {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.mesh-code-area textarea {
+  width: 100%;
+  min-height: 80px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px;
+  color: var(--text-primary);
+  font-size: 0.82rem;
+  font-family: 'Courier New', monospace;
+  resize: vertical;
+  outline: none;
+  transition: var(--transition);
+  line-height: 1.4;
+}
+
+.mesh-code-area textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.mesh-code-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.mesh-instructions {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  margin-top: 14px;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+.mesh-instructions .step {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.mesh-instructions .step:last-child {
+  margin-bottom: 0;
+}
+
+.mesh-instructions .step-num {
+  background: var(--accent);
+  color: var(--bg-primary);
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.mesh-status-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-top: 12px;
+}
+
+.mesh-status-indicator.disconnected {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+}
+
+.mesh-status-indicator.connecting {
+  background: rgba(212, 168, 67, 0.1);
+  border: 1px solid var(--warning);
+  color: var(--warning);
+  animation: pulse 1.5s infinite;
+}
+
+.mesh-status-indicator.connected {
+  background: rgba(106, 191, 105, 0.1);
+  border: 1px solid var(--success);
+  color: var(--success);
+}
+
+.mesh-peer-list {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.mesh-peer-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  font-size: 0.82rem;
+}
+
+.mesh-peer-item .peer-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mesh-peer-item .peer-id {
+  color: var(--accent);
+  font-family: 'Courier New', monospace;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}
+
+.mesh-peer-item .peer-name {
+  color: var(--text-secondary);
+}
+
+.mesh-peer-item .peer-duration {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}
+
+.mesh-peer-item .peer-disconnect {
+  background: none;
+  border: 1px solid var(--error);
+  border-radius: var(--radius-sm);
+  color: var(--error);
+  font-size: 0.75rem;
+  padding: 4px 10px;
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: var(--font);
+}
+
+.mesh-peer-item .peer-disconnect:hover {
+  background: rgba(199, 80, 80, 0.15);
+}
+
+.mesh-knowledge-list {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.mesh-knowledge-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 14px;
+  font-size: 0.82rem;
+  gap: 8px;
+}
+
+.mesh-knowledge-item .knowledge-name {
+  color: var(--text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+  min-width: 0;
+}
+
+.mesh-knowledge-item .knowledge-meta {
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.mesh-knowledge-item .knowledge-source {
+  color: var(--accent);
+  font-size: 0.72rem;
+  font-family: 'Courier New', monospace;
+  flex-shrink: 0;
+}
+
+.mesh-knowledge-item .knowledge-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.mesh-knowledge-item .knowledge-actions button {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  padding: 3px 8px;
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: var(--font);
+}
+
+.mesh-knowledge-item .knowledge-actions button:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.mesh-knowledge-item .knowledge-actions button.import-btn:hover {
+  border-color: var(--success);
+  color: var(--success);
+}
+
+.mesh-knowledge-item .knowledge-actions button.unpublish-btn:hover {
+  border-color: var(--error);
+  color: var(--error);
+}
+
+.mesh-stats-grid {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.mesh-stat {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 18px;
+  text-align: center;
+  flex: 1;
+  min-width: 100px;
+}
+
+.mesh-stat .stat-value {
+  font-size: 1.4rem;
+  font-weight: 300;
+  color: var(--accent);
+}
+
+.mesh-stat .stat-label {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-top: 2px;
+}
+
+.mesh-publish-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  backdrop-filter: blur(4px);
+}
+
+.mesh-publish-modal.hidden { display: none; }
+
+.mesh-publish-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  max-width: 520px;
+  width: 100%;
+  padding: 28px;
+  box-shadow: var(--shadow);
+}
+
+.mesh-publish-card h3 {
+  color: var(--accent);
+  font-weight: 400;
+  font-size: 1.1rem;
+  margin-bottom: 16px;
+}
+
+.mesh-publish-card .publish-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.mesh-publish-card .publish-option:hover {
+  border-color: var(--accent);
+  background: var(--accent-glow);
+}
+
+.mesh-publish-card .publish-option input[type="checkbox"] {
+  accent-color: var(--accent);
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.mesh-publish-card .publish-option .opt-name {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mesh-publish-card .publish-option .opt-tokens {
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  flex-shrink: 0;
+}
+
+.mesh-publish-card .publish-custom {
+  margin-top: 12px;
+}
+
+.mesh-publish-card .publish-custom textarea {
+  width: 100%;
+  min-height: 80px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px;
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  font-family: var(--font);
+  resize: vertical;
+  outline: none;
+  transition: var(--transition);
+}
+
+.mesh-publish-card .publish-custom textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.mesh-publish-card .publish-custom input {
+  width: 100%;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  font-family: var(--font);
+  outline: none;
+  transition: var(--transition);
+  margin-bottom: 8px;
+}
+
+.mesh-publish-card .publish-custom input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.mesh-empty {
+  padding: 16px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  font-style: italic;
+}
+
+/* ---- Mesh icon on imported files ---- */
+.file-item .mesh-icon {
+  color: var(--accent);
+  font-size: 0.85rem;
+  flex-shrink: 0;
+  margin-right: 2px;
+}
+
 /* ---- Responsive ---- */
 @media (max-width: 600px) {
   header h1 { font-size: 1.8rem; }
@@ -1944,7 +2380,7 @@ footer .license {
 <!-- Welcome Modal -->
 <div class="welcome-overlay" id="welcomeOverlay">
   <div class="welcome-card">
-    <h2>Welcome to FreeLattice v2.3</h2>
+    <h2>Welcome to FreeLattice v2.5</h2>
     <p>
       This is <span class="highlight">your AI agent</span> — free, open-source, and built by a community that believes everyone deserves access to powerful AI tools.
     </p>
@@ -1952,7 +2388,7 @@ footer .license {
       No accounts. No tracking. No hidden costs. Your conversations stay in <span class="highlight">your browser</span>. Your API key never leaves <span class="highlight">your machine</span>.
     </p>
     <p>
-      <strong>New in v2.3:</strong> Smart Context Management with token budgets, selective file context, auto-trimming, and provider-aware limits. Plus multi-conversation management, persistent memory, file system access, GitHub integration, voice I/O, and a self-improving agent.
+      <strong>New in v2.5:</strong> Peer-to-peer Mesh Network for knowledge sharing between nodes. Plus Smart Context Management, multi-conversation management, persistent memory, file system access, GitHub integration, voice I/O, and a self-improving agent.
     </p>
     <p style="font-style: italic; color: var(--text-muted); font-size: 0.85rem;">
       "Give choice and empowerment."
@@ -2027,7 +2463,7 @@ footer .license {
 <!-- Header -->
 <header>
   <h1>FreeLattice</h1>
-  <div class="tagline">Your AI. Your Rules. Your Machine. v2.3</div>
+  <div class="tagline">Your AI. Your Rules. Your Machine. v2.5</div>
   <div class="mantra">Glow eternal. Heart in spark.</div>
 </header>
 
@@ -2041,6 +2477,7 @@ footer .license {
   <nav class="tab-nav">
     <button class="tab-btn active" data-tab="chat" onclick="switchTab('chat')">Chat</button>
     <button class="tab-btn" data-tab="workspace" onclick="switchTab('workspace')">Workspace</button>
+    <button class="tab-btn" data-tab="mesh" onclick="switchTab('mesh')">&#11042; Mesh</button>
     <button class="tab-btn" data-tab="settings" onclick="switchTab('settings')">Settings</button>
   </nav>
 </div>
@@ -2185,7 +2622,7 @@ footer .license {
         <div class="chat-container">
           <div class="chat-messages" id="chatMessages">
             <div class="chat-message system">
-              Welcome to FreeLattice v2.3. Configure your model and provider above, then start chatting. Smart Context Management keeps you within your provider's token limits.
+              Welcome to FreeLattice v2.5. Configure your model and provider above, then start chatting. Connect to peers in the Mesh tab to share knowledge.
             </div>
           </div>
           <div class="status-bar">
@@ -2516,6 +2953,177 @@ footer .license {
 </div>
 </div>
 
+<!-- ==================== TAB 4: MESH ==================== -->
+<div class="tab-panel" id="tab-mesh">
+<div class="container">
+
+  <!-- Mesh: Connection Section -->
+  <div class="section">
+    <div class="section-title">Peer-to-Peer Connection</div>
+    <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 12px;">
+      Connect directly to other FreeLattice nodes and share knowledge peer-to-peer. No servers, no middlemen &mdash; just encrypted WebRTC data channels between browsers.
+    </p>
+
+    <div class="mesh-node-id">
+      <span class="node-label">Your Node ID:</span>
+      <span id="meshNodeId">------</span>
+    </div>
+
+    <div class="mesh-status-indicator disconnected" id="meshStatusIndicator">
+      <span class="status-dot" id="meshStatusDot"></span>
+      <span id="meshStatusText">Disconnected</span>
+    </div>
+
+    <div class="mesh-connection-btns">
+      <button class="action-btn primary" onclick="meshCreateOffer()" id="meshCreateBtn">&#11042; Create Connection</button>
+      <button class="action-btn" onclick="meshShowJoin()" id="meshJoinBtn">&#8618; Join Connection</button>
+    </div>
+
+    <!-- Offer Code Area (hidden by default) -->
+    <div class="mesh-code-area hidden" id="meshOfferArea">
+      <label>Your Offer Code &mdash; send this to your peer</label>
+      <textarea id="meshOfferCode" readonly placeholder="Generating offer code..."></textarea>
+      <div class="mesh-code-actions">
+        <button class="action-btn" onclick="meshCopyOffer()">&#128203; Copy Code</button>
+        <button class="action-btn" onclick="meshCancelOffer()" style="color: var(--text-muted);">Cancel</button>
+      </div>
+    </div>
+
+    <!-- Paste Answer Area (hidden by default) -->
+    <div class="mesh-code-area hidden" id="meshAnswerPasteArea">
+      <label>Paste your peer's Answer Code here</label>
+      <textarea id="meshAnswerPasteInput" placeholder="Paste the answer code from your peer..."></textarea>
+      <div class="mesh-code-actions">
+        <button class="action-btn primary" onclick="meshAcceptAnswer()">&#10003; Connect</button>
+        <button class="action-btn" onclick="meshCancelOffer()" style="color: var(--text-muted);">Cancel</button>
+      </div>
+    </div>
+
+    <!-- Join Area (hidden by default) -->
+    <div class="mesh-code-area hidden" id="meshJoinArea">
+      <label>Paste the Offer Code from your peer</label>
+      <textarea id="meshJoinOfferInput" placeholder="Paste the offer code here..."></textarea>
+      <div class="mesh-code-actions">
+        <button class="action-btn primary" onclick="meshCreateAnswer()">Generate Answer</button>
+        <button class="action-btn" onclick="meshCancelJoin()" style="color: var(--text-muted);">Cancel</button>
+      </div>
+    </div>
+
+    <!-- Answer Code Area (hidden by default) -->
+    <div class="mesh-code-area hidden" id="meshAnswerArea">
+      <label>Your Answer Code &mdash; send this back to your peer</label>
+      <textarea id="meshAnswerCode" readonly placeholder="Generating answer code..."></textarea>
+      <div class="mesh-code-actions">
+        <button class="action-btn" onclick="meshCopyAnswer()">&#128203; Copy Code</button>
+      </div>
+    </div>
+
+    <!-- How to Connect Instructions -->
+    <div class="mesh-instructions">
+      <div style="font-weight: 600; color: var(--accent); margin-bottom: 10px;">How to connect to a peer:</div>
+      <div class="step">
+        <span class="step-num">1</span>
+        <span>Click <strong>Create Connection</strong> to generate an offer code.</span>
+      </div>
+      <div class="step">
+        <span class="step-num">2</span>
+        <span>Send the offer code to your friend (text, email, Discord, etc.).</span>
+      </div>
+      <div class="step">
+        <span class="step-num">3</span>
+        <span>Your friend clicks <strong>Join Connection</strong>, pastes your code, and sends back their answer code.</span>
+      </div>
+      <div class="step">
+        <span class="step-num">4</span>
+        <span>Paste their answer code here. <strong>Connected!</strong> Knowledge flows freely.</span>
+      </div>
+    </div>
+
+    <!-- Connected Peers -->
+    <div id="meshPeerSection" style="margin-top: 16px; display: none;">
+      <div class="section-title" style="margin-bottom: 8px;">Connected Peers</div>
+      <div class="mesh-peer-list" id="meshPeerList"></div>
+    </div>
+  </div>
+
+  <!-- Mesh: My Published Knowledge -->
+  <div class="section">
+    <div class="section-title">My Published Knowledge</div>
+    <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 12px;">
+      Choose what to share with connected peers. Nothing is shared automatically &mdash; you decide what to publish.
+    </p>
+    <div class="action-row">
+      <button class="action-btn primary" onclick="meshOpenPublishModal()">&#10010; Publish Knowledge</button>
+    </div>
+    <div class="mesh-knowledge-list" id="meshMyKnowledgeList">
+      <div class="mesh-empty">No knowledge published yet. Click "Publish Knowledge" to share with peers.</div>
+    </div>
+  </div>
+
+  <!-- Mesh: Peer Knowledge -->
+  <div class="section">
+    <div class="section-title">Available from Peers</div>
+    <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 12px;">
+      Knowledge items shared by connected peers. Import items to add them to your local context.
+    </p>
+    <div class="action-row" id="meshImportAllRow" style="display: none;">
+      <button class="action-btn" onclick="meshImportAll()">&#8615; Import All</button>
+    </div>
+    <div class="mesh-knowledge-list" id="meshPeerKnowledgeList">
+      <div class="mesh-empty">No peer knowledge available. Connect to peers to discover shared knowledge.</div>
+    </div>
+  </div>
+
+  <!-- Mesh: Stats -->
+  <div class="section" style="border-bottom: none;">
+    <div class="section-title">Mesh Stats</div>
+    <div class="mesh-stats-grid">
+      <div class="mesh-stat">
+        <div class="stat-value" id="meshStatPeers">0</div>
+        <div class="stat-label">Connected Peers</div>
+      </div>
+      <div class="mesh-stat">
+        <div class="stat-value" id="meshStatPublished">0</div>
+        <div class="stat-label">Published Items</div>
+      </div>
+      <div class="mesh-stat">
+        <div class="stat-value" id="meshStatAvailable">0</div>
+        <div class="stat-label">Available from Peers</div>
+      </div>
+      <div class="mesh-stat">
+        <div class="stat-value" id="meshStatImported">0</div>
+        <div class="stat-label">Imported Items</div>
+      </div>
+    </div>
+    <div class="privacy-info" style="margin-top: 14px;">
+      <strong>Security:</strong> All WebRTC data channels are encrypted with DTLS by default. Knowledge sharing is strictly opt-in &mdash; nothing is shared automatically. Your API keys, chat history, and personal memory are never shared. Imported knowledge is clearly labeled with its source peer.
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- Mesh: Publish Knowledge Modal -->
+<div class="mesh-publish-modal hidden" id="meshPublishModal">
+  <div class="mesh-publish-card">
+    <h3>&#10010; Publish Knowledge</h3>
+    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 14px;">Select items to share with connected peers, or write custom notes.</p>
+
+    <div id="meshPublishOptions"></div>
+
+    <div class="publish-custom">
+      <div style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 8px; font-weight: 500;">Or publish custom text:</div>
+      <input type="text" id="meshPublishCustomName" placeholder="Name (e.g., My Research Notes)">
+      <textarea id="meshPublishCustomContent" placeholder="Paste or type your knowledge here..."></textarea>
+    </div>
+
+    <div class="suggest-actions" style="margin-top: 16px;">
+      <button class="btn-cancel" onclick="meshClosePublishModal()">Cancel</button>
+      <button class="btn-submit" onclick="meshConfirmPublish()">Publish Selected</button>
+    </div>
+  </div>
+</div>
+
 <!-- Footer (always visible) -->
 <footer>
   <p>Built with love by the Fractal Family. Open source. Free forever. &#127807;</p>
@@ -2525,9 +3133,10 @@ footer .license {
 
 <script>
 /* ============================================
-   FreeLattice v2.3 — Application Logic
+   FreeLattice v2.5 — Application Logic
    φ-salt encryption, input sanitization, memory integrity
    Multi-conversation management + Smart Context Management
+   + Mesh Network (Layer 1) — P2P Knowledge Sharing
    ============================================ */
 
 // ---- Constants ----
@@ -2589,7 +3198,17 @@ const state = {
   tokenLimit: 6000,
   tokenLimitManual: false,
   summaryThreshold: 2000,
-  contextBudgetTotal: 0
+  contextBudgetTotal: 0,
+  // Mesh Network (Layer 1)
+  meshNodeId: '',
+  meshPeers: new Map(), // peerId -> { pc, dc, name, connectedAt, knowledgeItems }
+  meshPublishedKnowledge: [], // { id, name, content, tokens, timestamp }
+  meshPeerKnowledge: new Map(), // peerId -> [{ id, name, tokens, timestamp }]
+  meshImportedItems: new Set(), // set of itemIds already imported
+  meshCurrentOffer: null, // current RTCPeerConnection for pending offer
+  meshCurrentJoin: null, // current RTCPeerConnection for pending join
+  meshPeerDurationTimers: new Map(),
+  meshReconnectTimers: new Map()
 };
 
 // ---- Provider Config ----
@@ -3019,7 +3638,7 @@ async function switchToConversation(convId) {
   if (messages.length === 0) {
     const div = document.createElement('div');
     div.className = 'chat-message system';
-    div.textContent = 'Welcome to FreeLattice v2.3. Configure your model and provider above, then start chatting. Smart Context Management keeps you within your provider\x27s token limits.';
+    div.textContent = 'Welcome to FreeLattice v2.5. Configure your model and provider above, then start chatting. Connect to peers in the Mesh tab to share knowledge.';
     container.appendChild(div);
   } else {
     const sysDiv = document.createElement('div');
@@ -3967,6 +4586,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   loadContextSettings();
   updateTokenLimitForProvider();
   updateContextBudget();
+
+  // Initialize Mesh Network
+  meshInit();
 });
 
 // ---- Welcome ----
@@ -4283,7 +4905,8 @@ function renderFileList() {
 
     let html = '<div class="file-item">';
     html += '<input type="checkbox" class="file-toggle" ' + (f.active ? 'checked' : '') + ' onchange="toggleFileActive(' + i + ', this.checked)" title="Toggle file in context">';
-    html += '<span class="' + nameClass + '">&#128196; ' + escapeHtml(f.name) + '</span>';
+    const fileIcon = f.meshSource ? '<span class="mesh-icon" title="From mesh peer ' + escapeHtml(f.meshSource) + '">&#11042;</span> ' : '&#128196; ';
+    html += '<span class="' + nameClass + '">' + fileIcon + escapeHtml(f.name) + '</span>';
     html += '<span class="file-tokens">' + tokenLabel + '</span>';
     if (showSummaryBtn) {
       if (f.summaryContent) {
@@ -5537,6 +6160,838 @@ function loadContextSettings() {
 
   updateContextBudget();
 }
+
+// ============================================
+// Mesh Network — Layer 1: P2P Knowledge Sharing
+// ============================================
+
+const MESH_RTC_CONFIG = {
+  iceServers: [
+    { urls: 'stun:stun.l.google.com:19302' },
+    { urls: 'stun:stun1.l.google.com:19302' }
+  ]
+};
+
+const MESH_MAX_PEERS = 5;
+const MESH_HANDSHAKE_TIMEOUT = 30000; // 30 seconds
+const MESH_RECONNECT_DELAY = 5000; // 5 seconds
+
+function meshInit() {
+  // Generate or load persistent node ID (6 alphanumeric chars)
+  let nodeId = localStorage.getItem('fl_meshNodeId');
+  if (!nodeId) {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    nodeId = '';
+    for (let i = 0; i < 6; i++) nodeId += chars[Math.floor(Math.random() * chars.length)];
+    localStorage.setItem('fl_meshNodeId', nodeId);
+  }
+  state.meshNodeId = nodeId;
+  document.getElementById('meshNodeId').textContent = nodeId;
+
+  // Load published knowledge from localStorage
+  try {
+    const saved = localStorage.getItem('fl_meshPublished');
+    if (saved) {
+      state.meshPublishedKnowledge = JSON.parse(saved);
+      meshRenderMyKnowledge();
+    }
+  } catch(e) {}
+
+  meshUpdateStats();
+}
+
+function meshGenerateItemId() {
+  return 'k_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+}
+
+function meshSavePublished() {
+  localStorage.setItem('fl_meshPublished', JSON.stringify(state.meshPublishedKnowledge));
+}
+
+// ---- WebRTC: Create Offer (Initiator) ----
+
+async function meshCreateOffer() {
+  if (state.meshPeers.size >= MESH_MAX_PEERS) {
+    showToast('Maximum ' + MESH_MAX_PEERS + ' peers reached. Disconnect a peer first.');
+    return;
+  }
+
+  // Clean up any pending connection
+  meshCleanupPending();
+
+  try {
+    const pc = new RTCPeerConnection(MESH_RTC_CONFIG);
+    state.meshCurrentOffer = pc;
+
+    // Create data channel
+    const dc = pc.createDataChannel('freelattice-mesh', { ordered: true });
+
+    // Gather ICE candidates
+    const iceCandidates = [];
+    pc.onicecandidate = (e) => {
+      if (e.candidate) {
+        iceCandidates.push(e.candidate);
+      }
+    };
+
+    // Create offer
+    const offer = await pc.createOffer();
+    await pc.setLocalDescription(offer);
+
+    // Wait for ICE gathering to complete
+    await new Promise((resolve) => {
+      if (pc.iceGatheringState === 'complete') {
+        resolve();
+      } else {
+        pc.onicegatheringstatechange = () => {
+          if (pc.iceGatheringState === 'complete') resolve();
+        };
+        // Fallback timeout
+        setTimeout(resolve, 5000);
+      }
+    });
+
+    // Encode offer + candidates as base64
+    const offerData = {
+      type: 'offer',
+      sdp: pc.localDescription.sdp,
+      candidates: iceCandidates.map(c => c.toJSON())
+    };
+    const offerCode = btoa(JSON.stringify(offerData));
+
+    // Show offer code
+    document.getElementById('meshOfferCode').value = offerCode;
+    document.getElementById('meshOfferArea').classList.remove('hidden');
+    document.getElementById('meshAnswerPasteArea').classList.remove('hidden');
+    document.getElementById('meshCreateBtn').disabled = true;
+    document.getElementById('meshJoinBtn').disabled = true;
+
+    meshSetStatus('connecting', 'Waiting for peer to respond...');
+
+    // Setup data channel handlers
+    meshSetupDataChannel(dc, pc);
+
+    // Handshake timeout
+    const timeout = setTimeout(() => {
+      if (pc.connectionState !== 'connected' && pc.connectionState !== 'completed') {
+        showToast('Connection timed out. Try again.');
+        meshCancelOffer();
+      }
+    }, MESH_HANDSHAKE_TIMEOUT);
+    pc._meshTimeout = timeout;
+
+  } catch(e) {
+    showToast('Error creating connection: ' + e.message);
+    meshCleanupPending();
+  }
+}
+
+function meshCopyOffer() {
+  const code = document.getElementById('meshOfferCode').value;
+  navigator.clipboard.writeText(code).then(() => {
+    showToast('Offer code copied to clipboard.');
+  }).catch(() => {
+    // Fallback: select text
+    document.getElementById('meshOfferCode').select();
+    showToast('Select all and copy the offer code.');
+  });
+}
+
+async function meshAcceptAnswer() {
+  const answerCode = document.getElementById('meshAnswerPasteInput').value.trim();
+  if (!answerCode) {
+    showToast('Paste the answer code from your peer.');
+    return;
+  }
+
+  const pc = state.meshCurrentOffer;
+  if (!pc) {
+    showToast('No pending connection. Create a new offer first.');
+    return;
+  }
+
+  try {
+    const answerData = JSON.parse(atob(answerCode));
+    if (answerData.type !== 'answer') {
+      throw new Error('Invalid answer code.');
+    }
+
+    await pc.setRemoteDescription(new RTCSessionDescription({ type: 'answer', sdp: answerData.sdp }));
+
+    // Add ICE candidates from answer
+    if (answerData.candidates) {
+      for (const c of answerData.candidates) {
+        await pc.addIceCandidate(new RTCIceCandidate(c));
+      }
+    }
+
+    // Hide UI areas
+    document.getElementById('meshOfferArea').classList.add('hidden');
+    document.getElementById('meshAnswerPasteArea').classList.add('hidden');
+    meshSetStatus('connecting', 'Establishing connection...');
+
+  } catch(e) {
+    showToast('Invalid answer code: ' + e.message);
+  }
+}
+
+function meshCancelOffer() {
+  meshCleanupPending();
+  document.getElementById('meshOfferArea').classList.add('hidden');
+  document.getElementById('meshAnswerPasteArea').classList.add('hidden');
+  document.getElementById('meshCreateBtn').disabled = false;
+  document.getElementById('meshJoinBtn').disabled = false;
+  meshUpdateStatusFromPeers();
+}
+
+// ---- WebRTC: Join Connection (Responder) ----
+
+function meshShowJoin() {
+  if (state.meshPeers.size >= MESH_MAX_PEERS) {
+    showToast('Maximum ' + MESH_MAX_PEERS + ' peers reached. Disconnect a peer first.');
+    return;
+  }
+  meshCleanupPending();
+  document.getElementById('meshJoinArea').classList.remove('hidden');
+  document.getElementById('meshJoinOfferInput').value = '';
+  document.getElementById('meshCreateBtn').disabled = true;
+  document.getElementById('meshJoinBtn').disabled = true;
+}
+
+async function meshCreateAnswer() {
+  const offerCode = document.getElementById('meshJoinOfferInput').value.trim();
+  if (!offerCode) {
+    showToast('Paste the offer code from your peer.');
+    return;
+  }
+
+  try {
+    const offerData = JSON.parse(atob(offerCode));
+    if (offerData.type !== 'offer') {
+      throw new Error('Invalid offer code.');
+    }
+
+    const pc = new RTCPeerConnection(MESH_RTC_CONFIG);
+    state.meshCurrentJoin = pc;
+
+    // Listen for data channel
+    pc.ondatachannel = (event) => {
+      meshSetupDataChannel(event.channel, pc);
+    };
+
+    // Gather ICE candidates
+    const iceCandidates = [];
+    pc.onicecandidate = (e) => {
+      if (e.candidate) {
+        iceCandidates.push(e.candidate);
+      }
+    };
+
+    // Set remote description (offer)
+    await pc.setRemoteDescription(new RTCSessionDescription({ type: 'offer', sdp: offerData.sdp }));
+
+    // Add ICE candidates from offer
+    if (offerData.candidates) {
+      for (const c of offerData.candidates) {
+        await pc.addIceCandidate(new RTCIceCandidate(c));
+      }
+    }
+
+    // Create answer
+    const answer = await pc.createAnswer();
+    await pc.setLocalDescription(answer);
+
+    // Wait for ICE gathering
+    await new Promise((resolve) => {
+      if (pc.iceGatheringState === 'complete') {
+        resolve();
+      } else {
+        pc.onicegatheringstatechange = () => {
+          if (pc.iceGatheringState === 'complete') resolve();
+        };
+        setTimeout(resolve, 5000);
+      }
+    });
+
+    // Encode answer + candidates
+    const answerPayload = {
+      type: 'answer',
+      sdp: pc.localDescription.sdp,
+      candidates: iceCandidates.map(c => c.toJSON())
+    };
+    const answerCode = btoa(JSON.stringify(answerPayload));
+
+    // Show answer code
+    document.getElementById('meshAnswerCode').value = answerCode;
+    document.getElementById('meshJoinArea').classList.add('hidden');
+    document.getElementById('meshAnswerArea').classList.remove('hidden');
+    meshSetStatus('connecting', 'Waiting for peer to accept answer...');
+
+    // Handshake timeout
+    const timeout = setTimeout(() => {
+      if (pc.connectionState !== 'connected' && pc.connectionState !== 'completed') {
+        showToast('Connection timed out.');
+        meshCancelJoin();
+      }
+    }, MESH_HANDSHAKE_TIMEOUT);
+    pc._meshTimeout = timeout;
+
+  } catch(e) {
+    showToast('Invalid offer code: ' + e.message);
+  }
+}
+
+function meshCopyAnswer() {
+  const code = document.getElementById('meshAnswerCode').value;
+  navigator.clipboard.writeText(code).then(() => {
+    showToast('Answer code copied to clipboard.');
+  }).catch(() => {
+    document.getElementById('meshAnswerCode').select();
+    showToast('Select all and copy the answer code.');
+  });
+}
+
+function meshCancelJoin() {
+  meshCleanupPending();
+  document.getElementById('meshJoinArea').classList.add('hidden');
+  document.getElementById('meshAnswerArea').classList.add('hidden');
+  document.getElementById('meshCreateBtn').disabled = false;
+  document.getElementById('meshJoinBtn').disabled = false;
+  meshUpdateStatusFromPeers();
+}
+
+// ---- Data Channel Setup ----
+
+function meshSetupDataChannel(dc, pc) {
+  let peerId = null;
+
+  dc.onopen = () => {
+    console.log('FreeLattice Mesh: Data channel open');
+    // Send hello
+    dc.send(JSON.stringify({
+      type: 'hello',
+      peerId: state.meshNodeId,
+      name: 'Node ' + state.meshNodeId
+    }));
+  };
+
+  dc.onmessage = (event) => {
+    try {
+      const msg = JSON.parse(event.data);
+      meshHandleMessage(msg, dc, pc);
+    } catch(e) {
+      console.warn('Mesh: Invalid message', e);
+    }
+  };
+
+  dc.onclose = () => {
+    console.log('FreeLattice Mesh: Data channel closed for peer', peerId);
+    if (peerId) {
+      meshRemovePeer(peerId);
+    }
+  };
+
+  dc.onerror = (err) => {
+    console.warn('Mesh: Data channel error', err);
+  };
+
+  // Monitor connection state
+  pc.onconnectionstatechange = () => {
+    const connState = pc.connectionState;
+    if (connState === 'disconnected' || connState === 'failed' || connState === 'closed') {
+      if (peerId) {
+        meshRemovePeer(peerId);
+      }
+    }
+  };
+
+  // Store reference for peerId resolution in onmessage
+  dc._meshPeerIdRef = (id) => { peerId = id; };
+}
+
+function meshHandleMessage(msg, dc, pc) {
+  switch (msg.type) {
+    case 'hello': {
+      const peerId = msg.peerId;
+      if (!peerId || peerId === state.meshNodeId) return;
+
+      // Resolve peer ID in data channel
+      if (dc._meshPeerIdRef) dc._meshPeerIdRef(peerId);
+
+      // Register peer
+      state.meshPeers.set(peerId, {
+        pc: pc,
+        dc: dc,
+        name: msg.name || 'Node ' + peerId,
+        connectedAt: Date.now(),
+        knowledgeItems: []
+      });
+
+      // Clear pending state
+      if (state.meshCurrentOffer === pc) state.meshCurrentOffer = null;
+      if (state.meshCurrentJoin === pc) state.meshCurrentJoin = null;
+      if (pc._meshTimeout) { clearTimeout(pc._meshTimeout); pc._meshTimeout = null; }
+
+      // Hide all code areas
+      document.getElementById('meshOfferArea').classList.add('hidden');
+      document.getElementById('meshAnswerPasteArea').classList.add('hidden');
+      document.getElementById('meshJoinArea').classList.add('hidden');
+      document.getElementById('meshAnswerArea').classList.add('hidden');
+      document.getElementById('meshCreateBtn').disabled = false;
+      document.getElementById('meshJoinBtn').disabled = false;
+
+      meshUpdateStatusFromPeers();
+      meshRenderPeerList();
+      meshUpdateStats();
+      showToast('Connected to peer ' + peerId + '!');
+
+      // Send our knowledge list
+      meshSendKnowledgeList(dc);
+      break;
+    }
+
+    case 'knowledge-list': {
+      const peerId = meshFindPeerIdByDc(dc);
+      if (!peerId) return;
+      const peer = state.meshPeers.get(peerId);
+      if (peer) {
+        peer.knowledgeItems = msg.items || [];
+        state.meshPeerKnowledge.set(peerId, msg.items || []);
+        meshRenderPeerKnowledge();
+        meshUpdateStats();
+      }
+      break;
+    }
+
+    case 'knowledge-request': {
+      // Peer is requesting a specific knowledge item
+      const item = state.meshPublishedKnowledge.find(k => k.id === msg.itemId);
+      if (item && dc.readyState === 'open') {
+        dc.send(JSON.stringify({
+          type: 'knowledge-data',
+          itemId: item.id,
+          name: item.name,
+          content: item.content,
+          tokens: item.tokens
+        }));
+      }
+      break;
+    }
+
+    case 'knowledge-data': {
+      // Received knowledge content from peer
+      const peerId = meshFindPeerIdByDc(dc);
+      meshImportKnowledgeItem(msg.itemId, msg.name, msg.content, msg.tokens, peerId);
+      break;
+    }
+
+    case 'knowledge-unpublish': {
+      const peerId = meshFindPeerIdByDc(dc);
+      if (!peerId) return;
+      const peer = state.meshPeers.get(peerId);
+      if (peer) {
+        peer.knowledgeItems = peer.knowledgeItems.filter(k => k.id !== msg.itemId);
+        state.meshPeerKnowledge.set(peerId, peer.knowledgeItems);
+        meshRenderPeerKnowledge();
+        meshUpdateStats();
+      }
+      break;
+    }
+
+    default:
+      console.log('Mesh: Unknown message type', msg.type);
+  }
+}
+
+function meshFindPeerIdByDc(dc) {
+  for (const [peerId, peer] of state.meshPeers) {
+    if (peer.dc === dc) return peerId;
+  }
+  return null;
+}
+
+// ---- Peer Management ----
+
+function meshRemovePeer(peerId) {
+  const peer = state.meshPeers.get(peerId);
+  if (peer) {
+    try { peer.dc.close(); } catch(e) {}
+    try { peer.pc.close(); } catch(e) {}
+    state.meshPeers.delete(peerId);
+    state.meshPeerKnowledge.delete(peerId);
+  }
+
+  // Clear timers
+  if (state.meshPeerDurationTimers.has(peerId)) {
+    clearInterval(state.meshPeerDurationTimers.get(peerId));
+    state.meshPeerDurationTimers.delete(peerId);
+  }
+  if (state.meshReconnectTimers.has(peerId)) {
+    clearTimeout(state.meshReconnectTimers.get(peerId));
+    state.meshReconnectTimers.delete(peerId);
+  }
+
+  meshUpdateStatusFromPeers();
+  meshRenderPeerList();
+  meshRenderPeerKnowledge();
+  meshUpdateStats();
+  showToast('Peer ' + peerId + ' disconnected.');
+}
+
+function meshDisconnectPeer(peerId) {
+  meshRemovePeer(peerId);
+}
+
+function meshCleanupPending() {
+  if (state.meshCurrentOffer) {
+    if (state.meshCurrentOffer._meshTimeout) clearTimeout(state.meshCurrentOffer._meshTimeout);
+    try { state.meshCurrentOffer.close(); } catch(e) {}
+    state.meshCurrentOffer = null;
+  }
+  if (state.meshCurrentJoin) {
+    if (state.meshCurrentJoin._meshTimeout) clearTimeout(state.meshCurrentJoin._meshTimeout);
+    try { state.meshCurrentJoin.close(); } catch(e) {}
+    state.meshCurrentJoin = null;
+  }
+}
+
+// ---- Knowledge Publishing ----
+
+function meshOpenPublishModal() {
+  const optionsDiv = document.getElementById('meshPublishOptions');
+  let html = '';
+
+  // Context files
+  if (state.contextFiles.length > 0) {
+    html += '<div style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 8px; font-weight: 500;">Context Files:</div>';
+    for (let i = 0; i < state.contextFiles.length; i++) {
+      const f = state.contextFiles[i];
+      const tokens = estimateTokens(f.content);
+      const alreadyPublished = state.meshPublishedKnowledge.some(k => k.name === f.name);
+      html += '<label class="publish-option">';
+      html += '<input type="checkbox" data-type="file" data-index="' + i + '"' + (alreadyPublished ? ' disabled title="Already published"' : '') + '>';
+      html += '<span class="opt-name">' + escapeHtml(f.name) + (alreadyPublished ? ' (published)' : '') + '</span>';
+      html += '<span class="opt-tokens">~' + tokens.toLocaleString() + ' tokens</span>';
+      html += '</label>';
+    }
+  }
+
+  // Memory summary
+  if (state.memorySummary) {
+    const tokens = estimateTokens(state.memorySummary);
+    const alreadyPublished = state.meshPublishedKnowledge.some(k => k.name === 'Memory Summary');
+    html += '<div style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 8px; margin-top: 12px; font-weight: 500;">Memory:</div>';
+    html += '<label class="publish-option">';
+    html += '<input type="checkbox" data-type="memory"' + (alreadyPublished ? ' disabled title="Already published"' : '') + '>';
+    html += '<span class="opt-name">Memory Summary' + (alreadyPublished ? ' (published)' : '') + '</span>';
+    html += '<span class="opt-tokens">~' + tokens.toLocaleString() + ' tokens</span>';
+    html += '</label>';
+  }
+
+  if (!html) {
+    html = '<div class="mesh-empty">No context files or memory to publish. Load files in the Chat tab first, or write custom text below.</div>';
+  }
+
+  optionsDiv.innerHTML = html;
+  document.getElementById('meshPublishCustomName').value = '';
+  document.getElementById('meshPublishCustomContent').value = '';
+  document.getElementById('meshPublishModal').classList.remove('hidden');
+}
+
+function meshClosePublishModal() {
+  document.getElementById('meshPublishModal').classList.add('hidden');
+}
+
+function meshConfirmPublish() {
+  let published = 0;
+
+  // Check selected files
+  const checkboxes = document.querySelectorAll('#meshPublishOptions input[type="checkbox"]:checked');
+  for (const cb of checkboxes) {
+    const type = cb.dataset.type;
+    if (type === 'file') {
+      const idx = parseInt(cb.dataset.index, 10);
+      const f = state.contextFiles[idx];
+      if (f && !state.meshPublishedKnowledge.some(k => k.name === f.name)) {
+        state.meshPublishedKnowledge.push({
+          id: meshGenerateItemId(),
+          name: f.name,
+          content: f.content,
+          tokens: estimateTokens(f.content),
+          timestamp: new Date().toISOString()
+        });
+        published++;
+      }
+    } else if (type === 'memory') {
+      if (!state.meshPublishedKnowledge.some(k => k.name === 'Memory Summary')) {
+        state.meshPublishedKnowledge.push({
+          id: meshGenerateItemId(),
+          name: 'Memory Summary',
+          content: state.memorySummary,
+          tokens: estimateTokens(state.memorySummary),
+          timestamp: new Date().toISOString()
+        });
+        published++;
+      }
+    }
+  }
+
+  // Check custom text
+  const customName = document.getElementById('meshPublishCustomName').value.trim();
+  const customContent = document.getElementById('meshPublishCustomContent').value.trim();
+  if (customContent) {
+    const name = customName || 'Custom Note (' + new Date().toLocaleTimeString() + ')';
+    state.meshPublishedKnowledge.push({
+      id: meshGenerateItemId(),
+      name: name,
+      content: customContent,
+      tokens: estimateTokens(customContent),
+      timestamp: new Date().toISOString()
+    });
+    published++;
+  }
+
+  if (published > 0) {
+    meshSavePublished();
+    meshRenderMyKnowledge();
+    meshBroadcastKnowledgeList();
+    meshUpdateStats();
+    showToast('Published ' + published + ' knowledge item(s) to the mesh.');
+  } else {
+    showToast('No items selected to publish.');
+  }
+
+  meshClosePublishModal();
+}
+
+function meshUnpublish(itemId) {
+  state.meshPublishedKnowledge = state.meshPublishedKnowledge.filter(k => k.id !== itemId);
+  meshSavePublished();
+  meshRenderMyKnowledge();
+  meshUpdateStats();
+
+  // Notify all peers
+  for (const [peerId, peer] of state.meshPeers) {
+    if (peer.dc.readyState === 'open') {
+      peer.dc.send(JSON.stringify({ type: 'knowledge-unpublish', itemId: itemId }));
+    }
+  }
+  meshBroadcastKnowledgeList();
+  showToast('Knowledge unpublished.');
+}
+
+// ---- Knowledge Exchange ----
+
+function meshSendKnowledgeList(dc) {
+  if (dc.readyState !== 'open') return;
+  const items = state.meshPublishedKnowledge.map(k => ({
+    id: k.id,
+    name: k.name,
+    tokens: k.tokens,
+    timestamp: k.timestamp
+  }));
+  dc.send(JSON.stringify({ type: 'knowledge-list', items: items }));
+}
+
+function meshBroadcastKnowledgeList() {
+  for (const [peerId, peer] of state.meshPeers) {
+    meshSendKnowledgeList(peer.dc);
+  }
+}
+
+function meshRequestKnowledge(peerId, itemId) {
+  const peer = state.meshPeers.get(peerId);
+  if (!peer || peer.dc.readyState !== 'open') {
+    showToast('Peer is not connected.');
+    return;
+  }
+  peer.dc.send(JSON.stringify({ type: 'knowledge-request', itemId: itemId }));
+  showToast('Requesting knowledge from peer ' + peerId + '...');
+}
+
+function meshImportKnowledgeItem(itemId, name, content, tokens, sourcePeerId) {
+  if (state.meshImportedItems.has(itemId)) {
+    showToast('"' + name + '" is already imported.');
+    return;
+  }
+
+  // Add to context files with mesh label
+  const meshName = '\u{1F310} [' + (sourcePeerId || '???') + '] ' + name;
+  if (state.contextFiles.some(f => f.name === meshName)) {
+    showToast('"' + name + '" is already in context.');
+    return;
+  }
+
+  state.contextFiles.push({
+    name: meshName,
+    size: (content || '').length,
+    content: content || '',
+    active: true,
+    summary: null,
+    summaryContent: null,
+    useSummary: false,
+    meshSource: sourcePeerId || 'unknown',
+    meshItemId: itemId
+  });
+
+  state.meshImportedItems.add(itemId);
+  renderFileList();
+  updateContextBudget();
+  meshUpdateStats();
+  showToast('Imported "' + name + '" from peer ' + (sourcePeerId || '???') + ' into context.');
+}
+
+function meshImportFromPeer(peerId, itemId) {
+  meshRequestKnowledge(peerId, itemId);
+}
+
+function meshImportAll() {
+  for (const [peerId, items] of state.meshPeerKnowledge) {
+    for (const item of items) {
+      if (!state.meshImportedItems.has(item.id)) {
+        meshRequestKnowledge(peerId, item.id);
+      }
+    }
+  }
+}
+
+// ---- Status & Rendering ----
+
+function meshSetStatus(status, text) {
+  const indicator = document.getElementById('meshStatusIndicator');
+  const dot = document.getElementById('meshStatusDot');
+  const textEl = document.getElementById('meshStatusText');
+
+  indicator.className = 'mesh-status-indicator ' + status;
+  dot.className = 'status-dot' + (status === 'connected' ? ' ready' : status === 'connecting' ? ' working' : '');
+  textEl.textContent = text;
+}
+
+function meshUpdateStatusFromPeers() {
+  const count = state.meshPeers.size;
+  if (count === 0) {
+    meshSetStatus('disconnected', 'Disconnected');
+  } else {
+    meshSetStatus('connected', 'Connected to ' + count + ' peer' + (count > 1 ? 's' : ''));
+  }
+}
+
+function meshRenderPeerList() {
+  const section = document.getElementById('meshPeerSection');
+  const list = document.getElementById('meshPeerList');
+
+  if (state.meshPeers.size === 0) {
+    section.style.display = 'none';
+    return;
+  }
+
+  section.style.display = '';
+  let html = '';
+
+  for (const [peerId, peer] of state.meshPeers) {
+    const duration = meshFormatDuration(Date.now() - peer.connectedAt);
+    html += '<div class="mesh-peer-item">';
+    html += '<div class="peer-info">';
+    html += '<span class="status-dot ready"></span>';
+    html += '<span class="peer-id">' + escapeHtml(peerId) + '</span>';
+    html += '<span class="peer-name">' + escapeHtml(peer.name) + '</span>';
+    html += '<span class="peer-duration">' + duration + '</span>';
+    html += '</div>';
+    html += '<button class="peer-disconnect" onclick="meshDisconnectPeer(\'' + escapeHtml(peerId) + '\')">Disconnect</button>';
+    html += '</div>';
+  }
+
+  list.innerHTML = html;
+
+  // Start duration timer if not already running
+  for (const [peerId] of state.meshPeers) {
+    if (!state.meshPeerDurationTimers.has(peerId)) {
+      const timer = setInterval(() => meshRenderPeerList(), 30000); // Update every 30s
+      state.meshPeerDurationTimers.set(peerId, timer);
+    }
+  }
+}
+
+function meshRenderMyKnowledge() {
+  const list = document.getElementById('meshMyKnowledgeList');
+  if (state.meshPublishedKnowledge.length === 0) {
+    list.innerHTML = '<div class="mesh-empty">No knowledge published yet. Click "Publish Knowledge" to share with peers.</div>';
+    return;
+  }
+
+  list.innerHTML = state.meshPublishedKnowledge.map(k => {
+    const time = new Date(k.timestamp).toLocaleString();
+    return '<div class="mesh-knowledge-item">' +
+      '<span class="knowledge-name">&#128218; ' + escapeHtml(k.name) + '</span>' +
+      '<span class="knowledge-meta">~' + (k.tokens || 0).toLocaleString() + ' tokens</span>' +
+      '<span class="knowledge-meta">' + time + '</span>' +
+      '<div class="knowledge-actions">' +
+        '<button class="unpublish-btn" onclick="meshUnpublish(\'' + k.id + '\')" title="Unpublish">&#10005; Unpublish</button>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function meshRenderPeerKnowledge() {
+  const list = document.getElementById('meshPeerKnowledgeList');
+  const importAllRow = document.getElementById('meshImportAllRow');
+  let allItems = [];
+
+  for (const [peerId, items] of state.meshPeerKnowledge) {
+    for (const item of items) {
+      allItems.push({ ...item, peerId: peerId });
+    }
+  }
+
+  if (allItems.length === 0) {
+    list.innerHTML = '<div class="mesh-empty">No peer knowledge available. Connect to peers to discover shared knowledge.</div>';
+    importAllRow.style.display = 'none';
+    return;
+  }
+
+  importAllRow.style.display = '';
+
+  list.innerHTML = allItems.map(item => {
+    const imported = state.meshImportedItems.has(item.id);
+    return '<div class="mesh-knowledge-item">' +
+      '<span class="knowledge-name">&#128218; ' + escapeHtml(item.name) + '</span>' +
+      '<span class="knowledge-meta">~' + (item.tokens || 0).toLocaleString() + ' tokens</span>' +
+      '<span class="knowledge-source">from ' + escapeHtml(item.peerId) + '</span>' +
+      '<div class="knowledge-actions">' +
+        (imported
+          ? '<button disabled style="color: var(--success); border-color: var(--success);">&#10003; Imported</button>'
+          : '<button class="import-btn" onclick="meshImportFromPeer(\'' + escapeHtml(item.peerId) + '\', \'' + item.id + '\')" title="Import to context">&#8615; Import</button>'
+        ) +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function meshUpdateStats() {
+  document.getElementById('meshStatPeers').textContent = state.meshPeers.size;
+  document.getElementById('meshStatPublished').textContent = state.meshPublishedKnowledge.length;
+
+  let peerItemCount = 0;
+  for (const [, items] of state.meshPeerKnowledge) {
+    peerItemCount += items.length;
+  }
+  document.getElementById('meshStatAvailable').textContent = peerItemCount;
+  document.getElementById('meshStatImported').textContent = state.meshImportedItems.size;
+}
+
+function meshFormatDuration(ms) {
+  const sec = Math.floor(ms / 1000);
+  if (sec < 60) return sec + 's';
+  const min = Math.floor(sec / 60);
+  if (min < 60) return min + 'm';
+  const hr = Math.floor(min / 60);
+  return hr + 'h ' + (min % 60) + 'm';
+}
+
+// Close publish modal on overlay click
+document.addEventListener('click', (e) => {
+  if (e.target.id === 'meshPublishModal') meshClosePublishModal();
+});
 
 // ---- Service Worker Registration ----
 if ('serviceWorker' in navigator) {

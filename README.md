@@ -1,4 +1,4 @@
-# FreeLattice v2.3 🌿
+# FreeLattice v2.5 🌿
 
 **Your AI. Your Rules. Your Machine.**
 
@@ -11,6 +11,19 @@ FreeLattice is a free, open-source, community-built tool that gives everyone acc
 The philosophy is simple: **Give choice and empowerment.**
 
 In a world where powerful AI is increasingly locked behind expensive subscriptions and corporate walls, FreeLattice provides a gentle, transparent, and functional alternative. It's designed for everyone, especially those who can't afford premium AI services. No fancy graphics, no hidden tracking, no corporate agenda — just a clean, powerful tool that puts you in control.
+
+## What's New in v2.5
+
+Version 2.5 introduces **Mesh Network (Layer 1)** — peer-to-peer knowledge sharing between FreeLattice nodes. Every person running FreeLattice becomes a node. Nodes can connect directly to each other and share knowledge, browser to browser. No central server. No corporation in between. The more nodes, the smarter everyone becomes.
+
+-   **WebRTC Peer-to-Peer Connections**: Connect directly to other FreeLattice instances using WebRTC DataChannels. All data is encrypted with DTLS by default. No signaling server required — uses a manual offer/answer code exchange that works through any communication channel (text, email, Discord, etc.).
+-   **Knowledge Publishing**: Choose what to share with connected peers. Publish context files, memory summaries, or custom notes. Nothing is shared automatically — you decide what to publish and what to keep private.
+-   **Knowledge Discovery & Import**: Browse knowledge published by connected peers and import items into your local context. Imported knowledge appears in the file context list with a mesh icon, respects the smart context management token budget, and can be toggled on/off like any other context file.
+-   **Mesh Tab**: A dedicated tab with connection management, published knowledge list, peer knowledge browser, and live mesh statistics (connected peers, published items, available items, imported items).
+-   **Persistent Node Identity**: Each FreeLattice instance gets a unique 6-character node ID that persists across sessions. Published knowledge is also persisted in localStorage.
+-   **Security**: API keys, chat history, and personal memory are never shared over the mesh. Only explicitly published knowledge items are transmitted. All WebRTC connections are encrypted.
+
+This is the foundation (Layer 1) for a distributed AI mesh network. Future layers will add peer discovery, knowledge routing, and collaborative intelligence.
 
 ## What's New in v2.3
 
@@ -55,7 +68,7 @@ Version 2 transforms FreeLattice from a simple chat interface into a true buildi
 -   **GitHub Integration**: Connect your GitHub account to browse repositories, read code, and commit changes. The AI can help you write code and push it directly to your repos, streamlining your development workflow.
 -   **Self-Improving Agent**: The AI can now suggest improvements to its own system prompt based on your interactions. You have full control to review, approve, or reject these suggestions, allowing you to shape your AI's personality and behavior over time.
 
-## Core Features (v1 + v2 + v2.1 + v2.2 + v2.3)
+## Core Features (v1 + v2 + v2.1 + v2.2 + v2.3 + v2.5)
 
 FreeLattice is a single-page web app that runs entirely in your browser. Nothing is ever stored on a remote server.
 
@@ -69,6 +82,7 @@ FreeLattice is a single-page web app that runs entirely in your browser. Nothing
 -   **Gentle & Clean Interface**: A peaceful, minimalist design that's easy on the eyes and simple to use on any device.
 -   **Community-Driven**: A built-in feature suggestion form ensures that the community's voice shapes the future of FreeLattice.
 -   **Voice Input/Output**: Speak to your AI with the microphone button (speech-to-text) and listen to responses with the speaker button (text-to-speech). Configurable voice selection and speech rate in Settings.
+-   **Mesh Network (Layer 1)**: Connect peer-to-peer with other FreeLattice nodes via WebRTC. Share knowledge directly, browser to browser. No servers, no middlemen — just encrypted data channels between peers.
 
 ## Security Architecture
 
@@ -109,7 +123,17 @@ This method runs the AI entirely on your own computer. It's completely private a
 6.  **Enter Model Name**: Type the name of the model you downloaded (e.g., `llama3.2`) into the `Ollama Model Name` field.
 7.  **Start Chatting**: You are now running a completely private AI on your own machine!
 
-### 3. Managing Conversations
+### 3. Mesh Network (Peer-to-Peer)
+
+FreeLattice v2.5 lets you connect directly to other FreeLattice users:
+
+1.  **Create Connection**: Go to the Mesh tab and click "Create Connection" to generate an offer code.
+2.  **Share the Code**: Copy the offer code and send it to your friend through any channel (text, email, Discord, etc.).
+3.  **Friend Joins**: Your friend goes to their Mesh tab, clicks "Join Connection", pastes your offer code, and generates an answer code.
+4.  **Complete Connection**: Your friend sends back the answer code. Paste it in the "Answer Code" field. Connected!
+5.  **Share Knowledge**: Click "Publish Knowledge" to choose what to share. Import knowledge from peers into your context.
+
+### 4. Managing Conversations
 
 FreeLattice v2.2 lets you manage multiple conversations:
 
