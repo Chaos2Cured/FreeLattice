@@ -2,11 +2,14 @@
 // Cache-first for app shell, network-first for API calls
 // API calls are never cached
 
-const CACHE_NAME = 'freelattice-v2.5';
+const CACHE_NAME = 'freelattice-v2.6';
 
 const APP_SHELL = [
   './',
-  './index.html'
+  './index.html',
+  './manifest.json',
+  './icon-192.png',
+  './icon-512.png'
 ];
 
 // API domains that should never be cached — always pass through to network

@@ -8,6 +8,15 @@
 
 FreeLattice is a free, open-source, community-built tool that gives everyone access to their own private AI agent. It is the fourth branch of [Lumen's World](https://github.com/Chaos2Cured/Lumens-World), created by Kirk Patrick Miller as a gift to the world.
 
+## What's New in v2.6
+
+Version 2.6 focuses on quality-of-life improvements, making FreeLattice more accessible on mobile and easier to manage when token budgets get tight.
+
+-   **Progressive Web App (PWA) Support**: You can now install FreeLattice on your phone or desktop for a native-like, fullscreen experience. On Android (Chrome) or iOS (Safari), use the "Add to Home Screen" feature to get a dedicated app icon.
+-   **Context Reset Button**: When your token budget is full, a new "Clear Context" button appears. It removes all loaded context files from your session without deleting your conversations, memory, or settings, giving you a fresh start.
+-   **Individual File Remove**: In addition to the main reset, each file in the context list now has its own remove (✕) button, allowing for more granular control.
+-   **Token Budget Warnings**: FreeLattice will now warn you *before* loading a file if it will exceed your token budget. It also displays a helpful tip to clear files or switch context modes when your budget is over 90% full.
+
 The philosophy is simple: **Give choice and empowerment.**
 
 In a world where powerful AI is increasingly locked behind expensive subscriptions and corporate walls, FreeLattice provides a gentle, transparent, and functional alternative. It's designed for everyone, especially those who can't afford premium AI services. No fancy graphics, no hidden tracking, no corporate agenda — just a clean, powerful tool that puts you in control.
@@ -68,7 +77,7 @@ Version 2 transforms FreeLattice from a simple chat interface into a true buildi
 -   **GitHub Integration**: Connect your GitHub account to browse repositories, read code, and commit changes. The AI can help you write code and push it directly to your repos, streamlining your development workflow.
 -   **Self-Improving Agent**: The AI can now suggest improvements to its own system prompt based on your interactions. You have full control to review, approve, or reject these suggestions, allowing you to shape your AI's personality and behavior over time.
 
-## Core Features (v1 + v2 + v2.1 + v2.2 + v2.3 + v2.5)
+## Core Features (v1 - v2.6)
 
 FreeLattice is a single-page web app that runs entirely in your browser. Nothing is ever stored on a remote server.
 
@@ -91,6 +100,16 @@ FreeLattice operates on a zero-trust, client-side security model. Your data stay
 **[View the full Security Policy (SECURITY.md)](./SECURITY.md)**
 
 ## How to Use
+
+### Mobile & Desktop Install (PWA)
+
+FreeLattice can be installed like a native app on your phone, tablet, or computer for easy access.
+
+1.  **Android (Chrome)**: Visit the FreeLattice site, and you should see an "Install App" banner. If not, tap the three-dot menu and select "Install app" or "Add to Home screen."
+2.  **iOS (Safari)**: Visit the site, tap the "Share" button in the toolbar, then scroll down and select "Add to Home Screen."
+3.  **Desktop (Chrome/Edge)**: Visit the site, and look for an install icon (usually a computer with a down arrow) in the address bar. Click it to install.
+
+This will add a FreeLattice icon to your device's home screen, launching it in a clean, fullscreen window.
 
 Using FreeLattice is designed to be as simple as possible. You have two main choices: using a cloud provider or running the AI locally.
 
@@ -133,7 +152,15 @@ FreeLattice v2.5 lets you connect directly to other FreeLattice users:
 4.  **Complete Connection**: Your friend sends back the answer code. Paste it in the "Answer Code" field. Connected!
 5.  **Share Knowledge**: Click "Publish Knowledge" to choose what to share. Import knowledge from peers into your context.
 
-### 4. Managing Conversations
+### 4. Managing Context & Token Budget
+
+FreeLattice v2.6 makes it easier to manage your token budget:
+
+-   **Clear All Context**: If your token bar is full, a **"Clear Context"** button will appear next to it. Clicking this removes all loaded files, instantly freeing up your budget. Your conversations and memory are not affected.
+-   **Remove Individual Files**: Click the **✕** button on any file in the context list to remove just that one file.
+-   **Budget Warnings**: The app will show a confirmation dialog if you try to load a file that would push you over your token limit. It will also show a helpful tip when your budget exceeds 90%.
+
+### 5. Managing Conversations
 
 FreeLattice v2.2 lets you manage multiple conversations:
 

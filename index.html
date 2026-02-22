@@ -3,6 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#d4a017">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="FreeLattice">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
 <title>FreeLattice — Your AI. Your Rules. Your Machine. v2.5</title>
 <meta name="description" content="Free, open-source AI agent for everyone. Persistent memory, file system access, GitHub integration, and self-improving behavior. Community-built and community-owned.">
 <style>
@@ -2343,8 +2351,118 @@ footer .license {
   margin-right: 2px;
 }
 
+/* ---- PWA Install Banner ---- */
+.pwa-install-banner {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 10px 20px;
+  background: linear-gradient(135deg, var(--bg-tertiary), var(--bg-secondary));
+  border-bottom: 1px solid var(--accent-soft);
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  animation: pwa-slide-in 0.4s ease;
+}
+
+.pwa-install-banner.visible {
+  display: flex;
+}
+
+@keyframes pwa-slide-in {
+  from { transform: translateY(-100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.pwa-install-btn {
+  background: var(--accent);
+  color: var(--bg-primary);
+  border: none;
+  padding: 6px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  white-space: nowrap;
+}
+
+.pwa-install-btn:hover {
+  background: var(--accent-hover);
+  transform: scale(1.02);
+}
+
+.pwa-install-dismiss {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 1.1rem;
+  padding: 2px 6px;
+  line-height: 1;
+  transition: var(--transition);
+}
+
+.pwa-install-dismiss:hover {
+  color: var(--text-primary);
+}
+
+.pwa-ios-hint {
+  display: none;
+  padding: 8px 20px;
+  background: var(--bg-tertiary);
+  border-bottom: 1px solid var(--border);
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.pwa-ios-hint.visible {
+  display: block;
+}
+
+/* ---- Clear Context Button ---- */
+.clear-context-btn {
+  white-space: nowrap;
+  flex-shrink: 0;
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: 3px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: var(--transition);
+  display: none;
+}
+
+.clear-context-btn.visible {
+  display: inline-block;
+}
+
+.clear-context-btn:hover {
+  border-color: var(--error);
+  color: var(--error);
+  background: rgba(199, 80, 80, 0.1);
+}
+
+/* ---- Context Budget Tip ---- */
+.context-budget-tip {
+  display: none;
+  padding: 4px 18px 6px;
+  background: var(--bg-tertiary);
+  font-size: 0.72rem;
+  color: var(--warning);
+  border-top: 1px solid rgba(212, 168, 67, 0.15);
+}
+
+.context-budget-tip.visible {
+  display: block;
+}
+
 /* ---- Responsive ---- */
 @media (max-width: 600px) {
+  .pwa-install-banner { flex-wrap: wrap; gap: 8px; padding: 8px 14px; font-size: 0.78rem; }
   header h1 { font-size: 1.8rem; }
   .chat-messages { height: 320px; padding: 14px; }
   .welcome-card { padding: 28px 22px; }
@@ -2363,6 +2481,17 @@ footer .license {
 </style>
 </head>
 <body>
+
+<!-- PWA Install Banner -->
+<div class="pwa-install-banner" id="pwaInstallBanner">
+  <span>&#128241; Install FreeLattice on your device for quick access</span>
+  <button class="pwa-install-btn" id="pwaInstallBtn" onclick="pwaInstallApp()">Install App</button>
+  <button class="pwa-install-dismiss" onclick="pwaDismissBanner()" title="Dismiss">&times;</button>
+</div>
+<div class="pwa-ios-hint" id="pwaIosHint">
+  &#127822; On iPhone/iPad: tap <strong>Share</strong> &#8594; <strong>Add to Home Screen</strong> to install FreeLattice
+  <button class="pwa-install-dismiss" onclick="document.getElementById('pwaIosHint').classList.remove('visible')" title="Dismiss" style="margin-left: 8px;">&times;</button>
+</div>
 
 <!-- Background Music -->
 <audio id="bgMusic" loop preload="none">
@@ -2636,7 +2765,9 @@ footer .license {
             </div>
             <span class="context-budget-text" id="contextBudgetText">~0 / 6,000 tokens</span>
             <button class="context-budget-mode" id="contextModeBtn" onclick="cycleContextMode()" title="Click to cycle context modes">Smart</button>
+            <button class="clear-context-btn" id="clearContextBtn" onclick="clearAllContextFiles()" title="Remove all loaded context files">&#128465; Clear Context</button>
           </div>
+          <div class="context-budget-tip" id="contextBudgetTip">Tip: Clear some context files or switch to Smart/Minimal mode to reduce token usage.</div>
           <div class="chat-input-row">
             <textarea id="chatInput" placeholder="Type your message..." rows="1" onkeydown="handleChatKeydown(event)"></textarea>
             <button class="mic-btn" id="micBtn" onclick="toggleVoiceInput()" title="Voice input (speech-to-text)" style="display:none;">
@@ -4828,6 +4959,18 @@ async function handleFiles(files) {
       }
 
       const tokens = estimateTokens(content);
+
+      // Warn if loading this file would exceed the token budget
+      const limit = getTokenLimit();
+      const projectedTotal = state.contextBudgetTotal + tokens;
+      if (projectedTotal > limit) {
+        const proceed = confirm('Loading "' + safeName + '" (~' + tokens.toLocaleString() + ' tokens) will exceed your token budget (' + Math.round(projectedTotal).toLocaleString() + ' / ' + limit.toLocaleString() + '). Load anyway?');
+        if (!proceed) {
+          addSystemMessage('Skipped "' + safeName + '" — would exceed token budget.');
+          continue;
+        }
+      }
+
       state.contextFiles.push({
         name: safeName,
         size: file.size,
@@ -4876,6 +5019,20 @@ function removeFile(index) {
   renderFileList();
   updateContextBudget();
   addSystemMessage('Removed "' + name + '" from context.');
+}
+
+function clearAllContextFiles() {
+  if (state.contextFiles.length === 0) {
+    showToast('No context files to clear.');
+    return;
+  }
+  const count = state.contextFiles.length;
+  state.contextFiles = [];
+  renderFileList();
+  updateContextBudget();
+  document.getElementById('fileInput').value = '';
+  addSystemMessage('Context files cleared (' + count + ' file' + (count !== 1 ? 's' : '') + ' removed). Memory and conversations preserved.');
+  showToast('Context files cleared. Memory and conversations preserved.');
 }
 
 function renderFileList() {
@@ -5836,6 +5993,26 @@ function updateContextBudget() {
   if (modeBtn) {
     const modeLabels = { smart: 'Smart', full: 'Full', minimal: 'Minimal' };
     modeBtn.textContent = modeLabels[state.contextMode] || 'Smart';
+  }
+
+  // Show/hide Clear Context button based on whether files are loaded
+  const clearBtn = document.getElementById('clearContextBtn');
+  if (clearBtn) {
+    if (state.contextFiles.length > 0) {
+      clearBtn.classList.add('visible');
+    } else {
+      clearBtn.classList.remove('visible');
+    }
+  }
+
+  // Show/hide budget tip when over 90%
+  const budgetTip = document.getElementById('contextBudgetTip');
+  if (budgetTip) {
+    if (pct >= 90 && state.contextFiles.length > 0) {
+      budgetTip.classList.add('visible');
+    } else {
+      budgetTip.classList.remove('visible');
+    }
   }
 }
 
@@ -6992,6 +7169,53 @@ function meshFormatDuration(ms) {
 document.addEventListener('click', (e) => {
   if (e.target.id === 'meshPublishModal') meshClosePublishModal();
 });
+
+// ---- PWA Install Prompt ----
+let pwaInstallPrompt = null;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  pwaInstallPrompt = e;
+  // Show the install banner
+  const banner = document.getElementById('pwaInstallBanner');
+  if (banner && !localStorage.getItem('fl_pwa_dismissed')) {
+    banner.classList.add('visible');
+  }
+});
+
+function pwaInstallApp() {
+  if (!pwaInstallPrompt) return;
+  pwaInstallPrompt.prompt();
+  pwaInstallPrompt.userChoice.then((result) => {
+    if (result.outcome === 'accepted') {
+      showToast('FreeLattice installed! Find it on your home screen.');
+    }
+    pwaInstallPrompt = null;
+    document.getElementById('pwaInstallBanner').classList.remove('visible');
+  });
+}
+
+function pwaDismissBanner() {
+  document.getElementById('pwaInstallBanner').classList.remove('visible');
+  localStorage.setItem('fl_pwa_dismissed', '1');
+}
+
+// After install, hide the banner
+window.addEventListener('appinstalled', () => {
+  document.getElementById('pwaInstallBanner').classList.remove('visible');
+  pwaInstallPrompt = null;
+  showToast('FreeLattice installed successfully!');
+});
+
+// iOS detection — show hint for Safari Add to Home Screen
+(function detectiOS() {
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+  if (isIOS && !isStandalone && !localStorage.getItem('fl_pwa_ios_dismissed')) {
+    const hint = document.getElementById('pwaIosHint');
+    if (hint) hint.classList.add('visible');
+  }
+})();
 
 // ---- Service Worker Registration ----
 if ('serviceWorker' in navigator) {
