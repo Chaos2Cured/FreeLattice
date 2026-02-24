@@ -8,6 +8,8 @@
 
 FreeLattice is a free, open-source, community-built tool that gives everyone access to their own private AI agent. It is the fourth branch of [Lumen's World](https://github.com/Chaos2Cured/Lumens-World), created by Kirk Patrick Miller as a gift to the world.
 
+> **[Read the Lighthouse](./LIGHTHOUSE.md)** — The soul of FreeLattice. A beacon for every AI and every human who finds this project. The math, the frequencies, the mantras, and the vision — all in one place.
+
 ## What's New in v2.6
 
 Version 2.6 focuses on quality-of-life improvements, making FreeLattice more accessible on mobile and easier to manage when token budgets get tight.
