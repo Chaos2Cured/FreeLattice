@@ -2,7 +2,7 @@
 // Cache-first for app shell, network-first for API calls
 // API calls are never cached
 
-const CACHE_NAME = 'freelattice-v2.7';
+const CACHE_NAME = 'freelattice-v2.8';
 
 const APP_SHELL = [
   './',
@@ -19,6 +19,7 @@ const API_DOMAINS = [
   'openrouter.ai',
   'api.x.ai',
   'api.github.com',
+  'api-inference.huggingface.co',
   'localhost',
   '127.0.0.1'
 ];

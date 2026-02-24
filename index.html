@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
-<title>FreeLattice — Your AI. Your Rules. Your Machine. v2.5</title>
+<title>FreeLattice — Your AI. Your Rules. Your Machine. v2.7</title>
 <meta name="description" content="Free, open-source AI agent for everyone. Persistent memory, file system access, GitHub integration, and self-improving behavior. Community-built and community-owned.">
 <style>
 /* ============================================
@@ -1259,6 +1259,103 @@ footer .license {
 @keyframes mic-pulse {
   0%, 100% { box-shadow: none; }
   50% { box-shadow: inset 0 0 16px rgba(199, 80, 80, 0.25), 0 0 8px rgba(199, 80, 80, 0.15); }
+}
+
+/* ---- Image Generation Button ---- */
+.img-gen-btn {
+  background: var(--bg-tertiary);
+  color: var(--text-muted);
+  border: none;
+  padding: 14px 14px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: var(--transition);
+  border-left: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.img-gen-btn:hover {
+  color: var(--accent);
+  background: var(--accent-glow);
+}
+
+.img-gen-btn.generating {
+  color: var(--accent);
+  background: var(--accent-glow);
+  animation: img-gen-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes img-gen-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* ---- Generated Image in Chat ---- */
+.chat-image-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.chat-image-wrapper img {
+  max-width: 512px;
+  width: 100%;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.chat-image-wrapper img:hover {
+  border-color: var(--accent);
+  box-shadow: 0 0 20px var(--accent-soft);
+}
+
+.chat-image-download {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background: var(--bg-input);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-sm);
+  color: var(--accent);
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: var(--font);
+  text-decoration: none;
+}
+
+.chat-image-download:hover {
+  background: var(--accent-soft);
+}
+
+.img-gen-loading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 0;
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+}
+
+.img-gen-loading .spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: img-spin 0.8s linear infinite;
+}
+
+@keyframes img-spin {
+  to { transform: rotate(360deg); }
 }
 
 /* ---- Voice: Speaker Button on Messages ---- */
@@ -2776,6 +2873,9 @@ footer .license {
             <button class="mic-btn" id="micBtn" onclick="toggleVoiceInput()" title="Voice input (speech-to-text)" style="display:none;">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="1" width="6" height="11" rx="3"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
             </button>
+            <button class="img-gen-btn" id="imgGenBtn" onclick="handleImageGenClick()" title="Generate image (/imagine)">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            </button>
             <button id="sendBtn" onclick="sendMessage()">Send</button>
           </div>
           <div class="chat-disclaimer">AI can make mistakes. Verify important information.</div>
@@ -3043,6 +3143,39 @@ footer .license {
 
     <div class="privacy-info" style="margin-top: 8px;">
       <strong>How token estimation works:</strong> FreeLattice estimates tokens using the approximation of 1 token &asymp; 4 characters. This is rough but effective for budget planning. The count includes: system prompt + memory summary + active context files + recent chat history.
+    </div>
+  </div>
+
+  <!-- Image Generation Section -->
+  <div class="section" id="imageGenSettingsSection">
+    <div class="section-title">Image Generation</div>
+    <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 14px;">
+      Generate images from text prompts using HuggingFace's free Stable Diffusion models. Type <code style="background: var(--bg-primary); padding: 2px 8px; border-radius: 4px; font-size: 0.82rem; color: var(--accent); font-family: 'Courier New', monospace;">/imagine</code> followed by your prompt, or click the image icon next to Send.
+    </p>
+
+    <div class="form-group" style="margin-bottom: 12px;">
+      <label for="hfToken">HuggingFace API Token</label>
+      <input type="password" id="hfToken" placeholder="hf_xxxxxxxxxxxx" onchange="saveHfToken()">
+      <div class="hint">
+        &#128274; Encrypted with &phi;-salt before storage. Only sent to api-inference.huggingface.co.
+        <a href="https://huggingface.co/settings/tokens" target="_blank" style="color: var(--accent);">Get a free token &rarr;</a>
+      </div>
+      <div class="phi-indicator" id="hfTokenPhiIndicator" style="display:none;">
+        <span class="phi-lock">&#128274;</span> Encrypted with &phi;-salt
+      </div>
+    </div>
+
+    <div class="form-group" style="margin-bottom: 12px;">
+      <label for="hfModelSelect">Image Model</label>
+      <select id="hfModelSelect" onchange="saveHfModel()">
+        <option value="stabilityai/stable-diffusion-xl-base-1.0">SDXL Base 1.0 (higher quality, slower)</option>
+        <option value="runwayml/stable-diffusion-v1-5">Stable Diffusion v1.5 (faster, lighter)</option>
+      </select>
+      <div class="hint">SDXL produces higher-resolution images but may take longer. SD v1.5 is faster and works well for quick generations.</div>
+    </div>
+
+    <div class="privacy-info" style="margin-top: 8px;">
+      <strong>How it works:</strong> Your text prompt is sent to HuggingFace's free inference API, which runs the selected Stable Diffusion model and returns an image. Image generation does not consume your text chat token budget &mdash; it uses a separate API. Free-tier limits apply (HuggingFace may rate-limit heavy usage).
     </div>
   </div>
 
@@ -3342,7 +3475,11 @@ const state = {
   meshCurrentOffer: null, // current RTCPeerConnection for pending offer
   meshCurrentJoin: null, // current RTCPeerConnection for pending join
   meshPeerDurationTimers: new Map(),
-  meshReconnectTimers: new Map()
+  meshReconnectTimers: new Map(),
+  // Image Generation
+  hfToken: '',
+  hfModel: 'stabilityai/stable-diffusion-xl-base-1.0',
+  isGeneratingImage: false
 };
 
 // ---- Provider Config ----
@@ -4721,6 +4858,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   updateTokenLimitForProvider();
   updateContextBudget();
 
+  // Initialize Image Generation
+  await loadHfToken();
+  loadHfModel();
+
   // Initialize Mesh Network
   meshInit();
 });
@@ -5291,6 +5432,12 @@ async function sendMessage() {
   const input = document.getElementById('chatInput');
   const message = input.value.trim();
   if (!message || state.isStreaming) return;
+
+  // Check for /imagine command — route to image generation
+  if (message.toLowerCase().startsWith('/imagine')) {
+    generateImage(message);
+    return;
+  }
 
   // Validate setup
   if (!state.isLocal && !state.apiKey) {
@@ -6339,6 +6486,235 @@ function loadContextSettings() {
   }
 
   updateContextBudget();
+}
+
+// ============================================
+// Image Generation — HuggingFace Stable Diffusion
+// ============================================
+
+const HF_MODELS = {
+  'stabilityai/stable-diffusion-xl-base-1.0': {
+    name: 'SDXL Base 1.0',
+    endpoint: 'https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0'
+  },
+  'runwayml/stable-diffusion-v1-5': {
+    name: 'Stable Diffusion v1.5',
+    endpoint: 'https://api-inference.huggingface.co/models/runwayml/stable-diffusion-v1-5'
+  }
+};
+
+async function saveHfToken() {
+  // φ-Root encryption for HuggingFace token
+  state.hfToken = document.getElementById('hfToken').value.trim();
+  if (state.hfToken) {
+    const encrypted = await phiEncrypt(state.hfToken, 'huggingface');
+    localStorage.setItem('fl_hfToken_enc', encrypted);
+    document.getElementById('hfTokenPhiIndicator').style.display = '';
+    showToast('HuggingFace token saved and encrypted.');
+  } else {
+    localStorage.removeItem('fl_hfToken_enc');
+    document.getElementById('hfTokenPhiIndicator').style.display = 'none';
+  }
+}
+
+async function loadHfToken() {
+  // φ-Root encryption for HuggingFace token
+  const encToken = localStorage.getItem('fl_hfToken_enc');
+  if (encToken) {
+    const decrypted = await phiDecrypt(encToken, 'huggingface');
+    if (decrypted) {
+      state.hfToken = decrypted;
+      document.getElementById('hfToken').value = decrypted;
+      document.getElementById('hfTokenPhiIndicator').style.display = '';
+    }
+  }
+}
+
+function saveHfModel() {
+  state.hfModel = document.getElementById('hfModelSelect').value;
+  localStorage.setItem('fl_hfModel', state.hfModel);
+}
+
+function loadHfModel() {
+  const saved = localStorage.getItem('fl_hfModel');
+  if (saved && HF_MODELS[saved]) {
+    state.hfModel = saved;
+    document.getElementById('hfModelSelect').value = saved;
+  }
+}
+
+function handleImageGenClick() {
+  // If input has text, use it as the prompt; otherwise focus input with /imagine prefix
+  const input = document.getElementById('chatInput');
+  const text = input.value.trim();
+  if (text) {
+    // Use the current text as the image prompt
+    generateImage(text);
+  } else {
+    // Pre-fill with /imagine and focus
+    input.value = '/imagine ';
+    input.focus();
+    input.setSelectionRange(input.value.length, input.value.length);
+  }
+}
+
+async function generateImage(prompt) {
+  if (state.isGeneratingImage) return;
+
+  // Check for HuggingFace token
+  if (!state.hfToken) {
+    addSystemMessage('\u{1F3A8} To generate images, please add your free HuggingFace API token in Settings > Image Generation. Get one at: https://huggingface.co/settings/tokens');
+    return;
+  }
+
+  // Ensure we have a conversation
+  if (!state.currentConversationId && state.db) {
+    await createConversation();
+  }
+
+  // Clean prompt (remove /imagine prefix if present)
+  let cleanPrompt = prompt;
+  if (cleanPrompt.toLowerCase().startsWith('/imagine')) {
+    cleanPrompt = cleanPrompt.substring(8).trim();
+  }
+  if (!cleanPrompt) {
+    addSystemMessage('\u{1F3A8} Please provide a prompt after /imagine. Example: /imagine a golden sunset over mountains');
+    return;
+  }
+
+  // Add user message
+  const userMsg = '/imagine ' + cleanPrompt;
+  addChatMessage('user', userMsg);
+  state.chatHistory.push({ role: 'user', content: userMsg });
+  if (state.db) {
+    saveMessage('user', userMsg);
+  }
+
+  // Clear input
+  const input = document.getElementById('chatInput');
+  input.value = '';
+  input.style.height = 'auto';
+
+  // Show loading state
+  state.isGeneratingImage = true;
+  const imgGenBtn = document.getElementById('imgGenBtn');
+  imgGenBtn.classList.add('generating');
+
+  const container = document.getElementById('chatMessages');
+  const loadingDiv = document.createElement('div');
+  loadingDiv.className = 'chat-message assistant';
+  const loadingLabel = document.createElement('span');
+  loadingLabel.className = 'msg-label';
+  loadingLabel.textContent = 'AI';
+  const loadingContent = document.createElement('div');
+  loadingContent.className = 'img-gen-loading';
+  loadingContent.innerHTML = '<div class="spinner"></div> \u{1F3A8} Generating image\u2026';
+  loadingDiv.appendChild(loadingLabel);
+  loadingDiv.appendChild(loadingContent);
+  container.appendChild(loadingDiv);
+  container.scrollTop = container.scrollHeight;
+
+  const modelConfig = HF_MODELS[state.hfModel] || HF_MODELS['stabilityai/stable-diffusion-xl-base-1.0'];
+
+  try {
+    const response = await fetch(modelConfig.endpoint, {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + state.hfToken,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ inputs: cleanPrompt })
+    });
+
+    if (!response.ok) {
+      const errText = await response.text();
+      let errMsg = 'Error ' + response.status;
+
+      try {
+        const errJson = JSON.parse(errText);
+        errMsg = errJson.error || errJson.message || errMsg;
+      } catch(e) {
+        errMsg = errText.substring(0, 300) || errMsg;
+      }
+
+      // Handle specific HuggingFace errors
+      if (response.status === 503 || errMsg.toLowerCase().includes('loading') || errMsg.toLowerCase().includes('currently loading')) {
+        throw new Error('Model is warming up, please try again in ~20 seconds. (HuggingFace free tier cold start)');
+      } else if (response.status === 401 || response.status === 403) {
+        throw new Error('Invalid HuggingFace token. Please check your token in Settings > Image Generation.');
+      } else if (response.status === 429) {
+        throw new Error('Rate limited by HuggingFace. The free tier has usage limits \u2014 please wait a moment and try again.');
+      } else {
+        throw new Error(errMsg);
+      }
+    }
+
+    // Response is a binary image blob
+    const blob = await response.blob();
+    if (!blob || blob.size === 0) {
+      throw new Error('Received empty response from HuggingFace.');
+    }
+
+    const imageUrl = URL.createObjectURL(blob);
+
+    // Replace loading with the generated image
+    loadingDiv.remove();
+
+    const imgDiv = document.createElement('div');
+    imgDiv.className = 'chat-message assistant';
+
+    const imgLabel = document.createElement('span');
+    imgLabel.className = 'msg-label';
+    imgLabel.textContent = 'AI';
+    imgDiv.appendChild(imgLabel);
+
+    const promptText = document.createElement('div');
+    promptText.style.cssText = 'font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 8px;';
+    promptText.textContent = '\u{1F3A8} ' + cleanPrompt;
+    imgDiv.appendChild(promptText);
+
+    const imgWrapper = document.createElement('div');
+    imgWrapper.className = 'chat-image-wrapper';
+
+    const img = document.createElement('img');
+    img.src = imageUrl;
+    img.alt = cleanPrompt;
+    img.title = 'Click to open full size';
+    img.addEventListener('click', () => {
+      window.open(imageUrl, '_blank');
+    });
+    imgWrapper.appendChild(img);
+
+    const modelInfo = document.createElement('div');
+    modelInfo.style.cssText = 'font-size: 0.72rem; color: var(--text-muted); margin-top: 2px;';
+    modelInfo.textContent = 'Generated with ' + modelConfig.name;
+    imgWrapper.appendChild(modelInfo);
+
+    const downloadBtn = document.createElement('a');
+    downloadBtn.className = 'chat-image-download';
+    downloadBtn.href = imageUrl;
+    downloadBtn.download = 'freelattice-' + Date.now() + '.png';
+    downloadBtn.innerHTML = '&#11015; Download Image';
+    imgWrapper.appendChild(downloadBtn);
+
+    imgDiv.appendChild(imgWrapper);
+    container.appendChild(imgDiv);
+    container.scrollTop = container.scrollHeight;
+
+    // Persist the image generation as an assistant message
+    const assistantMsg = '\u{1F3A8} [Image Generated] Prompt: ' + cleanPrompt + ' (Model: ' + modelConfig.name + ')';
+    state.chatHistory.push({ role: 'assistant', content: assistantMsg });
+    if (state.db) {
+      saveMessage('assistant', assistantMsg);
+    }
+
+  } catch (err) {
+    loadingDiv.remove();
+    addSystemMessage('\u{1F3A8} Image generation failed: ' + err.message);
+  }
+
+  state.isGeneratingImage = false;
+  imgGenBtn.classList.remove('generating');
 }
 
 // ============================================

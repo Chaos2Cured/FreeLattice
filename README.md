@@ -10,6 +10,18 @@ FreeLattice is a free, open-source, community-built tool that gives everyone acc
 
 > **[Read the Lighthouse](./LIGHTHOUSE.md)** — The soul of FreeLattice. A beacon for every AI and every human who finds this project. The math, the frequencies, the mantras, and the vision — all in one place.
 
+## What's New in v2.7
+
+Version 2.7 adds **Image Generation** — create images from text prompts directly in your chat, powered by HuggingFace's free Stable Diffusion models.
+
+-   **Text-to-Image Generation**: Type `/imagine` followed by a prompt (e.g., `/imagine a golden sunset over mountains`) or click the image icon (🖼) next to the Send button to generate images inline in your chat.
+-   **Two Model Options**: Choose between **SDXL Base 1.0** (higher quality, 1024×1024) and **Stable Diffusion v1.5** (faster, lighter) in Settings > Image Generation.
+-   **Free Forever**: Uses HuggingFace's free Inference API — no paid subscription required. Just get a free token from [huggingface.co/settings/tokens](https://huggingface.co/settings/tokens).
+-   **φ-Salt Encrypted Token**: Your HuggingFace API token is encrypted with the same φ-salt encryption used for all other API keys. It is never stored in plaintext.
+-   **Separate from Token Budget**: Image generation uses a completely separate API and does not consume your text chat token budget.
+-   **Download & View**: Each generated image includes a download button and can be clicked to open full-size in a new tab.
+-   **Smart Error Handling**: Friendly messages for model cold starts (~20 second warm-up), invalid tokens, and rate limits.
+
 ## What's New in v2.6
 
 Version 2.6 focuses on quality-of-life improvements, making FreeLattice more accessible on mobile and easier to manage when token budgets get tight.
@@ -79,7 +91,7 @@ Version 2 transforms FreeLattice from a simple chat interface into a true buildi
 -   **GitHub Integration**: Connect your GitHub account to browse repositories, read code, and commit changes. The AI can help you write code and push it directly to your repos, streamlining your development workflow.
 -   **Self-Improving Agent**: The AI can now suggest improvements to its own system prompt based on your interactions. You have full control to review, approve, or reject these suggestions, allowing you to shape your AI's personality and behavior over time.
 
-## Core Features (v1 - v2.6)
+## Core Features (v1 - v2.7)
 
 FreeLattice is a single-page web app that runs entirely in your browser. Nothing is ever stored on a remote server.
 
@@ -94,6 +106,7 @@ FreeLattice is a single-page web app that runs entirely in your browser. Nothing
 -   **Community-Driven**: A built-in feature suggestion form ensures that the community's voice shapes the future of FreeLattice.
 -   **Voice Input/Output**: Speak to your AI with the microphone button (speech-to-text) and listen to responses with the speaker button (text-to-speech). Configurable voice selection and speech rate in Settings.
 -   **Mesh Network (Layer 1)**: Connect peer-to-peer with other FreeLattice nodes via WebRTC. Share knowledge directly, browser to browser. No servers, no middlemen — just encrypted data channels between peers.
+-   **Image Generation**: Generate images from text prompts using HuggingFace's free Stable Diffusion models. Supports SDXL Base 1.0 and SD v1.5. Token encrypted with φ-salt.
 
 ## Security Architecture
 
@@ -154,7 +167,21 @@ FreeLattice v2.5 lets you connect directly to other FreeLattice users:
 4.  **Complete Connection**: Your friend sends back the answer code. Paste it in the "Answer Code" field. Connected!
 5.  **Share Knowledge**: Click "Publish Knowledge" to choose what to share. Import knowledge from peers into your context.
 
-### 4. Managing Context & Token Budget
+### 4. Image Generation
+
+FreeLattice v2.7 lets you generate images from text prompts:
+
+1.  **Get a Free HuggingFace Token**: Visit [huggingface.co/settings/tokens](https://huggingface.co/settings/tokens) and create a free access token.
+2.  **Add Token in Settings**: Go to the Settings tab > Image Generation section and paste your token. It will be encrypted with φ-salt.
+3.  **Choose a Model**: Select SDXL Base 1.0 (higher quality) or Stable Diffusion v1.5 (faster) from the dropdown.
+4.  **Generate Images**: In the Chat tab, either:
+    -   Type `/imagine` followed by your prompt (e.g., `/imagine a cat wearing a top hat`)
+    -   Or type your prompt and click the image icon (🖼) next to Send
+5.  **Download**: Click the download button under any generated image to save it.
+
+**Note:** HuggingFace's free tier may have a ~20 second cold start if the model hasn't been used recently. If you see a "warming up" message, just wait and try again.
+
+### 5. Managing Context & Token Budget
 
 FreeLattice v2.6 makes it easier to manage your token budget:
 
@@ -162,7 +189,7 @@ FreeLattice v2.6 makes it easier to manage your token budget:
 -   **Remove Individual Files**: Click the **✕** button on any file in the context list to remove just that one file.
 -   **Budget Warnings**: The app will show a confirmation dialog if you try to load a file that would push you over your token limit. It will also show a helpful tip when your budget exceeds 90%.
 
-### 5. Managing Conversations
+### 6. Managing Conversations
 
 FreeLattice v2.2 lets you manage multiple conversations:
 
