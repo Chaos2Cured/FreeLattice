@@ -10,6 +10,21 @@ FreeLattice is a free, open-source, community-built tool that gives everyone acc
 
 > **[Read the Lighthouse](./LIGHTHOUSE.md)** — The soul of FreeLattice. A beacon for every AI and every human who finds this project. The math, the frequencies, the mantras, and the vision — all in one place.
 
+## What's New in v3.1
+
+Version 3.1 adds **Agent-to-Agent Communication** — the most important feature yet. This turns the peer-to-peer mesh from a file-sharing network into a collaborative AI brain. Connected nodes can now query each other's AI agents, share capabilities, and build a distributed intelligence network.
+
+-   **Agent-to-Agent Queries**: Use `/mesh [question]` in chat to send a question to all connected peer agents. Their AIs process your query locally and send back answers via encrypted WebRTC. Each response is displayed in chat with full attribution (model name, provider, peer ID).
+-   **Auto-Query Mesh**: Enable "Auto-query Mesh" in the Mesh tab to let your AI automatically query connected peers when it lacks knowledge. The AI includes a `[MESH_QUERY]` tag in its response, which triggers an automatic mesh query.
+-   **Capability Announcement**: When peers connect, they exchange capability information — model name and provider (e.g., "Llama via Groq" or "Qwen via Ollama"), number of context files loaded, and custom capability tags (e.g., "coding", "poetry", "science"). This helps you decide which peer to ask.
+-   **Agent Network Panel**: A new section in the Mesh tab displays all connected peer agents with their capabilities, model info, file counts, and capability tags. Each peer has an "Ask Agent" button for direct queries and a "Block" button for privacy control.
+-   **Privacy Controls**: Two toggles — "Allow Agent Queries" (let peers query your AI) and "Auto-query Mesh" (let your AI query peers). Both default to safe settings. You can block individual peers from sending queries. All queries are logged with full transparency.
+-   **Agent Query Log**: Every incoming and outgoing agent query is logged with timestamps, peer IDs, query text, and response summaries. Full transparency — nothing hidden. Includes a "Clear Log" button.
+-   **Rate Limiting**: Maximum 5 agent queries per minute to prevent spam. Friendly error messages when rate limited.
+-   **30-Second Timeout**: If a peer's agent fails to respond within 30 seconds, a timeout message is shown. If a peer has queries disabled, a "Peer declined query" message is shown.
+-   **New Protocol Messages**: Four new WebRTC message types extend the existing mesh protocol — `agent-query`, `agent-response`, `agent-context-share`, and `agent-capability`.
+-   **Custom Capability Tags**: Set tags like "coding", "poetry", "science" to advertise your agent's strengths to connected peers. Tags are displayed in the Agent Network panel.
+
 ## What's New in v3.0
 
 Version 3.0 is a **Neuro-Design Upgrade** — a comprehensive visual overhaul grounded in neuroscience research on cognitive load, visual harmony, and accessibility. Every pixel has been reconsidered through the lens of the Golden Ratio, Fibonacci sequences, and phi-timed animations.

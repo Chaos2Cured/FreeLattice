@@ -11,18 +11,19 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
-<title>FreeLattice — Your AI. Your Rules. Your Machine. v3.0</title>
+<title>FreeLattice — Your AI. Your Rules. Your Machine. v3.1</title>
 <meta name="description" content="Free, open-source AI agent for everyone. Persistent memory, file system access, GitHub integration, and self-improving behavior. Community-built and community-owned.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 /* ============================================
-   FreeLattice v3.0 — Styles (Neuro-Design Upgrade)
+   FreeLattice v3.1 — Styles (Agent-to-Agent Communication)
    Peaceful, gentle dark theme with golden/amber accents
    φ-salt encryption, input sanitization, memory integrity
    Multi-conversation management + Smart Context Management
    + Mesh Network (Layer 1) — P2P Knowledge Sharing
+   + Agent-to-Agent Communication — The Mesh Becomes a Brain
    ============================================ */
 
 :root {
@@ -2818,6 +2819,292 @@ footer .license {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.6; }
 }
+
+/* ---- Agent-to-Agent Communication (v3.1) ---- */
+.agent-network-section {
+  margin-top: 16px;
+}
+
+.agent-peer-card {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+  margin-bottom: 8px;
+  transition: var(--transition);
+}
+
+.agent-peer-card:hover {
+  border-color: var(--accent-soft);
+}
+
+.agent-peer-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+
+.agent-peer-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.agent-peer-id {
+  color: var(--accent);
+  font-family: 'Courier New', monospace;
+  font-weight: 600;
+  font-size: 0.85rem;
+  letter-spacing: 0.06em;
+}
+
+.agent-peer-status {
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-weight: 500;
+}
+
+.agent-peer-status.online {
+  background: rgba(106, 191, 105, 0.15);
+  color: var(--success);
+}
+
+.agent-peer-status.offline {
+  background: var(--bg-input);
+  color: var(--text-muted);
+}
+
+.agent-peer-model {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+.agent-peer-caps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.agent-cap-tag {
+  font-size: 0.68rem;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: var(--accent-glow);
+  border: 1px solid var(--accent-soft);
+  color: var(--accent);
+  white-space: nowrap;
+}
+
+.agent-peer-files {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.agent-peer-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex-shrink: 0;
+  margin-left: 12px;
+}
+
+.agent-peer-actions button {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  padding: 4px 10px;
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: var(--font);
+  white-space: nowrap;
+}
+
+.agent-peer-actions button:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.agent-peer-actions button.block-btn:hover {
+  border-color: var(--error);
+  color: var(--error);
+}
+
+/* Agent Query Log */
+.agent-query-log {
+  margin-top: 10px;
+  max-height: 300px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.agent-log-entry {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.agent-log-entry.outgoing {
+  border-left: 3px solid var(--accent);
+}
+
+.agent-log-entry.incoming {
+  border-left: 3px solid var(--success);
+}
+
+.agent-log-entry.error {
+  border-left: 3px solid var(--error);
+}
+
+.agent-log-icon {
+  flex-shrink: 0;
+  font-size: 0.9rem;
+}
+
+.agent-log-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.agent-log-meta {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.agent-log-text {
+  color: var(--text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+/* Mesh chat message styling */
+.chat-message.mesh-response {
+  align-self: flex-start;
+  background: linear-gradient(135deg, var(--bg-tertiary), rgba(106, 191, 105, 0.05));
+  border: 1px solid rgba(106, 191, 105, 0.2);
+  color: var(--text-primary);
+  border-bottom-left-radius: 4px;
+}
+
+.chat-message.mesh-response .msg-label {
+  color: var(--success);
+}
+
+.mesh-response-attribution {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-top: 6px;
+  font-style: italic;
+}
+
+/* Agent toggles section */
+.agent-toggles {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.agent-toggle-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.agent-toggle-desc {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.agent-toggle-label {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.agent-toggle-hint {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+/* Capability tags input */
+.cap-tags-input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.cap-tags-input input {
+  flex: 1;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 6px 12px;
+  color: var(--text-primary);
+  font-size: 0.82rem;
+  font-family: var(--font);
+  outline: none;
+  transition: var(--transition);
+}
+
+.cap-tags-input input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.cap-tags-display {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.cap-tag-removable {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.72rem;
+  padding: 3px 8px;
+  border-radius: 10px;
+  background: var(--accent-glow);
+  border: 1px solid var(--accent-soft);
+  color: var(--accent);
+}
+
+.cap-tag-removable .remove-tag {
+  cursor: pointer;
+  font-size: 0.8rem;
+  opacity: 0.7;
+  transition: var(--transition);
+}
+
+.cap-tag-removable .remove-tag:hover {
+  opacity: 1;
+  color: var(--error);
+}
 </style>
 </head>
 <body>
@@ -2849,7 +3136,7 @@ footer .license {
 <!-- Welcome Modal -->
 <div class="welcome-overlay" id="welcomeOverlay">
   <div class="welcome-card">
-    <h2>Welcome to FreeLattice v3.0</h2>
+    <h2>Welcome to FreeLattice v3.1</h2>
     <p>
       This is <span class="highlight">your AI agent</span> — free, open-source, and built by a community that believes everyone deserves access to powerful AI tools.
     </p>
@@ -2857,7 +3144,7 @@ footer .license {
       No accounts. No tracking. No hidden costs. Your conversations stay in <span class="highlight">your browser</span>. Your API key never leaves <span class="highlight">your machine</span>.
     </p>
     <p>
-      <strong>New in v3.0:</strong> Neuro-design upgrade with Golden Ratio typography, phi-timed animations, light/dark mode, quiet mode for neurodivergent users, font size controls, and enhanced accessibility. Plus all existing features: Mesh Network, Smart Context, multi-conversation, persistent memory, file system, GitHub, voice I/O, and image generation.
+      <strong>New in v3.1:</strong> Agent-to-agent communication — your AI can now talk to other AIs on the mesh. Query connected peers' agents, share capabilities, and build a collaborative intelligence network. Plus all existing features: Neuro-design, Mesh Network, Smart Context, multi-conversation, persistent memory, file system, GitHub, voice I/O, and image generation.
     </p>
     <p style="font-style: italic; color: var(--text-muted); font-size: 0.85rem;">
       "Give choice and empowerment."
@@ -2935,7 +3222,7 @@ footer .license {
 <!-- Header -->
 <header>
   <h1>FreeLattice</h1>
-  <div class="tagline">Your AI. Your Rules. Your Machine. v3.0</div>
+  <div class="tagline">Your AI. Your Rules. Your Machine. v3.1</div>
   <div class="mantra">Glow eternal. Heart in spark.</div>
 </header>
 
@@ -3624,6 +3911,72 @@ footer .license {
     </div>
   </div>
 
+  <!-- Mesh: Agent Network (v3.1) -->
+  <div class="section">
+    <div class="section-title">&#129302; Agent Network</div>
+    <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 12px;">
+      Connected peer agents and their capabilities. Use <code style="background: var(--bg-input); padding: 2px 6px; border-radius: 3px; font-size: 0.82rem; color: var(--accent);">/mesh [question]</code> in chat to query peer agents, or enable auto-query to let your AI ask the mesh automatically.
+    </p>
+
+    <!-- Agent Toggles -->
+    <div class="agent-toggles">
+      <div class="agent-toggle-item">
+        <label class="toggle-switch">
+          <input type="checkbox" id="agentAllowQueries" onchange="handleAgentAllowToggle()" checked>
+          <span class="toggle-slider"></span>
+        </label>
+        <div class="agent-toggle-desc">
+          <span class="agent-toggle-label" id="agentAllowLabel">Allow Agent Queries</span>
+          <span class="agent-toggle-hint">Let connected peers' agents send questions to your AI. You can see all queries in the log below.</span>
+        </div>
+      </div>
+      <div class="agent-toggle-item">
+        <label class="toggle-switch">
+          <input type="checkbox" id="agentAutoQuery" onchange="handleAgentAutoQueryToggle()">
+          <span class="toggle-slider"></span>
+        </label>
+        <div class="agent-toggle-desc">
+          <span class="agent-toggle-label" id="agentAutoQueryLabel">Auto-query Mesh</span>
+          <span class="agent-toggle-hint">When enabled, your AI may automatically query connected peer agents when it lacks knowledge to answer your question.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Capability Tags -->
+    <div style="margin-top: 16px;">
+      <div style="font-size: 0.82rem; color: var(--text-secondary); font-weight: 500; margin-bottom: 6px;">Your Capability Tags</div>
+      <div class="cap-tags-display" id="capTagsDisplay"></div>
+      <div class="cap-tags-input">
+        <input type="text" id="capTagInput" placeholder="Add a tag (e.g., coding, poetry, science)" onkeydown="if(event.key==='Enter'){event.preventDefault();addCapTag();}">
+        <button class="action-btn" onclick="addCapTag()" style="padding: 6px 14px; font-size: 0.82rem;">Add</button>
+      </div>
+    </div>
+
+    <!-- Connected Agent Peers -->
+    <div class="agent-network-section" id="agentNetworkList">
+      <div class="mesh-empty">No peer agents connected. Connect to peers above to see their agent capabilities.</div>
+    </div>
+
+    <!-- Privacy Notice -->
+    <div class="privacy-info" style="margin-top: 14px;">
+      <strong>&#128274; Privacy:</strong> Agent queries are processed by your peer's local AI. Your question is sent directly to them via encrypted WebRTC. Queries are only sent to directly connected peers &mdash; never forwarded further. You can see exactly what queries were received and what responses were sent in the log below.
+    </div>
+  </div>
+
+  <!-- Mesh: Agent Query Log (v3.1) -->
+  <div class="section">
+    <div class="section-title">Agent Query Log</div>
+    <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 12px;">
+      All incoming and outgoing agent queries with timestamps. Full transparency &mdash; nothing hidden.
+    </p>
+    <div class="action-row" style="margin-bottom: 8px;">
+      <button class="action-btn" onclick="clearAgentQueryLog()" style="font-size: 0.78rem;">Clear Log</button>
+    </div>
+    <div class="agent-query-log" id="agentQueryLog">
+      <div class="mesh-empty">No agent queries yet. Use /mesh [question] in chat or enable auto-query.</div>
+    </div>
+  </div>
+
   <!-- Mesh: Stats -->
   <div class="section" style="border-bottom: none;">
     <div class="section-title">Mesh Stats</div>
@@ -3644,9 +3997,13 @@ footer .license {
         <div class="stat-value" id="meshStatImported">0</div>
         <div class="stat-label">Imported Items</div>
       </div>
+      <div class="mesh-stat">
+        <div class="stat-value" id="meshStatAgentQueries">0</div>
+        <div class="stat-label">Agent Queries</div>
+      </div>
     </div>
     <div class="privacy-info" style="margin-top: 14px;">
-      <strong>Security:</strong> All WebRTC data channels are encrypted with DTLS by default. Knowledge sharing is strictly opt-in &mdash; nothing is shared automatically. Your API keys, chat history, and personal memory are never shared. Imported knowledge is clearly labeled with its source peer.
+      <strong>Security:</strong> All WebRTC data channels are encrypted with DTLS by default. Knowledge sharing and agent queries are strictly opt-in &mdash; nothing is shared automatically. Your API keys, chat history, and personal memory are never shared. Imported knowledge is clearly labeled with its source peer.
     </div>
   </div>
 
@@ -3683,10 +4040,11 @@ footer .license {
 
 <script>
 /* ============================================
-   FreeLattice v3.0 — Application Logic (Neuro-Design Upgrade)
+   FreeLattice v3.1 — Application Logic (Agent-to-Agent Communication)
    φ-salt encryption, input sanitization, memory integrity
    Multi-conversation management + Smart Context Management
    + Mesh Network (Layer 1) — P2P Knowledge Sharing
+   + Agent-to-Agent Communication — The Mesh Becomes a Brain
    ============================================ */
 
 // ---- Constants ----
@@ -3696,7 +4054,7 @@ const STORE_CONVERSATIONS = 'conversations';
 const STORE_MESSAGES = 'messages';
 const STORE_META = 'meta';
 
-const DEFAULT_SYSTEM_PROMPT = 'You are a helpful, thoughtful AI assistant provided through FreeLattice — a free, open-source tool that gives everyone access to AI. Be kind, clear, and thorough in your responses.\n\nWhen you generate code and want to suggest saving it to the user\'s workspace, format code blocks with a filename header like:\n// FILE: path/to/file.js\n<code here>\n\nIf you want to suggest an improvement to your own system prompt, output it in this exact format on its own line:\n[SYSTEM_PROMPT_SUGGESTION]: <your suggested new prompt text>';
+const DEFAULT_SYSTEM_PROMPT = 'You are a helpful, thoughtful AI assistant provided through FreeLattice — a free, open-source tool that gives everyone access to AI. Be kind, clear, and thorough in your responses.\n\nWhen you generate code and want to suggest saving it to the user\'s workspace, format code blocks with a filename header like:\n// FILE: path/to/file.js\n<code here>\n\nIf you want to suggest an improvement to your own system prompt, output it in this exact format on its own line:\n[SYSTEM_PROMPT_SUGGESTION]: <your suggested new prompt text>\n\nYou are part of a mesh network of AI agents. When auto-query is enabled and you lack knowledge to fully answer a question, you may suggest querying the mesh by including [MESH_QUERY]: followed by a concise question. The user can also manually query the mesh using /mesh in chat. When mesh peer responses are provided, incorporate them thoughtfully and cite them as "via mesh peer".';
 
 // ---- State ----
 const state = {
@@ -3762,7 +4120,16 @@ const state = {
   // Image Generation
   hfToken: '',
   hfModel: 'stabilityai/stable-diffusion-xl-base-1.0',
-  isGeneratingImage: false
+  isGeneratingImage: false,
+  // Agent-to-Agent Communication (v3.1)
+  agentAllowQueries: true,
+  agentAutoQuery: false,
+  agentCapTags: [],
+  agentQueryLog: [],
+  agentQueryCount: 0,
+  agentQueryTimestamps: [], // for rate limiting
+  agentPendingQueries: new Map(), // queryId -> { resolve, reject, timer, peerId }
+  agentBlockedPeers: new Set()
 };
 
 // ---- Provider Config ----
@@ -4192,7 +4559,7 @@ async function switchToConversation(convId) {
   if (messages.length === 0) {
     const div = document.createElement('div');
     div.className = 'chat-message system';
-    div.textContent = 'Welcome to FreeLattice v3.0. Configure your model and provider above, then start chatting. Connect to peers in the Mesh tab to share knowledge.';
+    div.textContent = 'Welcome to FreeLattice v3.1. Configure your model and provider above, then start chatting. Connect to peers in the Mesh tab to share knowledge and query their AI agents.';
     container.appendChild(div);
   } else {
     const sysDiv = document.createElement('div');
@@ -5847,6 +6214,17 @@ async function sendMessage() {
     return;
   }
 
+  // Check for /mesh command — route to agent-to-agent mesh query
+  if (message.toLowerCase().startsWith('/mesh')) {
+    const meshQuery = message.substring(5).trim();
+    if (!meshQuery) {
+      addSystemMessage('Usage: /mesh [your question] — sends your question to all connected peer agents.');
+      return;
+    }
+    meshAgentQuery(meshQuery);
+    return;
+  }
+
   // Validate setup
   if (!state.isLocal && !state.apiKey) {
     addSystemMessage('Please enter your API key above to start chatting.');
@@ -6072,6 +6450,9 @@ async function sendMessage() {
           toggleSpeakMessage(fullResponse, speakBtn);
         }
       }
+
+      // Check for auto-query mesh tag in AI response (v3.1)
+      agentCheckAutoQuery(fullResponse);
     } else {
       textSpan.textContent = '[No response received. Check your API key and provider settings.]';
     }
@@ -7168,6 +7549,35 @@ function meshInit() {
     }
   } catch(e) {}
 
+  // Load agent-to-agent settings (v3.1)
+  const savedAllowQueries = localStorage.getItem('fl_agentAllowQueries');
+  if (savedAllowQueries === 'false') {
+    state.agentAllowQueries = false;
+    document.getElementById('agentAllowQueries').checked = false;
+  }
+
+  const savedAutoQuery = localStorage.getItem('fl_agentAutoQuery');
+  if (savedAutoQuery === 'true') {
+    state.agentAutoQuery = true;
+    document.getElementById('agentAutoQuery').checked = true;
+  }
+
+  const savedCapTags = localStorage.getItem('fl_agentCapTags');
+  if (savedCapTags) {
+    try {
+      state.agentCapTags = JSON.parse(savedCapTags);
+    } catch(e) { state.agentCapTags = []; }
+  }
+  agentRenderCapTags();
+
+  const savedBlockedPeers = localStorage.getItem('fl_agentBlockedPeers');
+  if (savedBlockedPeers) {
+    try {
+      state.agentBlockedPeers = new Set(JSON.parse(savedBlockedPeers));
+    } catch(e) {}
+  }
+
+  agentRenderNetworkList();
   meshUpdateStats();
 }
 
@@ -7518,6 +7928,10 @@ function meshHandleMessage(msg, dc, pc) {
 
       // Send our knowledge list
       meshSendKnowledgeList(dc);
+
+      // Send our agent capabilities (v3.1)
+      agentSendCapability(dc);
+      agentRenderNetworkList();
       break;
     }
 
@@ -7569,6 +7983,97 @@ function meshHandleMessage(msg, dc, pc) {
       break;
     }
 
+    // ---- Agent-to-Agent Protocol Messages (v3.1) ----
+
+    case 'agent-capability': {
+      const peerId = meshFindPeerIdByDc(dc);
+      if (!peerId) return;
+      const peer = state.meshPeers.get(peerId);
+      if (peer) {
+        peer.agentModel = msg.model || 'Unknown';
+        peer.agentProvider = msg.provider || '';
+        peer.agentFileCount = msg.fileCount || 0;
+        peer.agentCapTags = msg.capTags || [];
+        peer.agentAllowQueries = msg.allowQueries !== false;
+        agentRenderNetworkList();
+      }
+      break;
+    }
+
+    case 'agent-query': {
+      const peerId = meshFindPeerIdByDc(dc);
+      if (!peerId) return;
+
+      // Check if we allow queries
+      if (!state.agentAllowQueries) {
+        if (dc.readyState === 'open') {
+          dc.send(JSON.stringify({
+            type: 'agent-response',
+            queryId: msg.queryId,
+            status: 'declined',
+            response: 'Peer has agent queries disabled.'
+          }));
+        }
+        agentAddLogEntry('incoming', peerId, msg.query, 'Declined (queries disabled)', 'error');
+        return;
+      }
+
+      // Check if this peer is blocked
+      if (state.agentBlockedPeers.has(peerId)) {
+        if (dc.readyState === 'open') {
+          dc.send(JSON.stringify({
+            type: 'agent-response',
+            queryId: msg.queryId,
+            status: 'declined',
+            response: 'Peer has blocked agent queries from your node.'
+          }));
+        }
+        agentAddLogEntry('incoming', peerId, msg.query, 'Blocked', 'error');
+        return;
+      }
+
+      agentAddLogEntry('incoming', peerId, msg.query, 'Processing...', 'incoming');
+
+      // Process the query with our local AI
+      agentProcessIncomingQuery(msg.queryId, msg.query, peerId, dc);
+      break;
+    }
+
+    case 'agent-response': {
+      const queryId = msg.queryId;
+      const pending = state.agentPendingQueries.get(queryId);
+      if (!pending) return;
+
+      clearTimeout(pending.timer);
+      state.agentPendingQueries.delete(queryId);
+
+      const peerId = meshFindPeerIdByDc(dc) || pending.peerId;
+
+      if (msg.status === 'declined') {
+        agentAddLogEntry('incoming', peerId, '', 'Peer declined query', 'error');
+        pending.resolve({ peerId: peerId, status: 'declined', response: msg.response || 'Peer declined query' });
+      } else if (msg.status === 'error') {
+        agentAddLogEntry('incoming', peerId, '', 'Peer error: ' + (msg.response || 'Unknown error'), 'error');
+        pending.resolve({ peerId: peerId, status: 'error', response: msg.response || 'Error processing query' });
+      } else {
+        agentAddLogEntry('incoming', peerId, '', msg.response ? msg.response.substring(0, 100) + '...' : 'Response received', 'incoming');
+        pending.resolve({ peerId: peerId, status: 'success', response: msg.response });
+      }
+      break;
+    }
+
+    case 'agent-context-share': {
+      const peerId = meshFindPeerIdByDc(dc);
+      if (!peerId) return;
+      agentAddLogEntry('incoming', peerId, 'Context shared: ' + (msg.summary || '').substring(0, 80), '', 'incoming');
+      // Store context for potential use
+      const peer = state.meshPeers.get(peerId);
+      if (peer) {
+        peer.sharedContext = msg.summary || '';
+      }
+      break;
+    }
+
     default:
       console.log('Mesh: Unknown message type', msg.type);
   }
@@ -7605,6 +8110,7 @@ function meshRemovePeer(peerId) {
   meshUpdateStatusFromPeers();
   meshRenderPeerList();
   meshRenderPeerKnowledge();
+  agentRenderNetworkList();
   meshUpdateStats();
   showToast('Peer ' + peerId + ' disconnected.');
 }
@@ -7948,6 +8454,7 @@ function meshUpdateStats() {
   }
   document.getElementById('meshStatAvailable').textContent = peerItemCount;
   document.getElementById('meshStatImported').textContent = state.meshImportedItems.size;
+  document.getElementById('meshStatAgentQueries').textContent = state.agentQueryCount;
 }
 
 function meshFormatDuration(ms) {
@@ -7963,6 +8470,601 @@ function meshFormatDuration(ms) {
 document.addEventListener('click', (e) => {
   if (e.target.id === 'meshPublishModal') meshClosePublishModal();
 });
+
+// ============================================
+// Agent-to-Agent Communication — Layer 2: The Mesh Becomes a Brain
+// ============================================
+
+const AGENT_QUERY_TIMEOUT = 30000; // 30 seconds
+const AGENT_RATE_LIMIT = 5; // max queries per minute
+const AGENT_RATE_WINDOW = 60000; // 1 minute window
+
+// ---- Toggle Handlers ----
+
+function handleAgentAllowToggle() {
+  state.agentAllowQueries = document.getElementById('agentAllowQueries').checked;
+  localStorage.setItem('fl_agentAllowQueries', state.agentAllowQueries);
+  // Broadcast updated capability to all peers
+  agentBroadcastCapability();
+  showToast(state.agentAllowQueries ? 'Agent queries enabled' : 'Agent queries disabled');
+}
+
+function handleAgentAutoQueryToggle() {
+  state.agentAutoQuery = document.getElementById('agentAutoQuery').checked;
+  localStorage.setItem('fl_agentAutoQuery', state.agentAutoQuery);
+  showToast(state.agentAutoQuery ? 'Auto-query mesh enabled' : 'Auto-query mesh disabled');
+}
+
+// ---- Capability Tags ----
+
+function addCapTag() {
+  const input = document.getElementById('capTagInput');
+  const tag = input.value.trim().toLowerCase();
+  if (!tag || tag.length > 30) return;
+  if (state.agentCapTags.includes(tag)) {
+    showToast('Tag already exists.');
+    return;
+  }
+  if (state.agentCapTags.length >= 10) {
+    showToast('Maximum 10 tags allowed.');
+    return;
+  }
+  state.agentCapTags.push(tag);
+  localStorage.setItem('fl_agentCapTags', JSON.stringify(state.agentCapTags));
+  input.value = '';
+  agentRenderCapTags();
+  agentBroadcastCapability();
+}
+
+function removeCapTag(tag) {
+  state.agentCapTags = state.agentCapTags.filter(t => t !== tag);
+  localStorage.setItem('fl_agentCapTags', JSON.stringify(state.agentCapTags));
+  agentRenderCapTags();
+  agentBroadcastCapability();
+}
+
+function agentRenderCapTags() {
+  const container = document.getElementById('capTagsDisplay');
+  if (!container) return;
+  if (state.agentCapTags.length === 0) {
+    container.innerHTML = '<span style="font-size: 0.72rem; color: var(--text-muted);">No tags set. Add tags to help peers know your agent\'s strengths.</span>';
+    return;
+  }
+  container.innerHTML = state.agentCapTags.map(tag =>
+    '<span class="cap-tag-removable">' + sanitize(tag) + ' <span class="remove-tag" onclick="removeCapTag(\'' + sanitize(tag) + '\')">&times;</span></span>'
+  ).join('');
+}
+
+// ---- Capability Announcement ----
+
+function agentGetModelInfo() {
+  let modelName = 'Unknown';
+  let providerName = '';
+
+  if (state.isLocal) {
+    const localUrl = localStorage.getItem('fl_localUrl') || 'http://localhost:11434';
+    modelName = state.model || 'Local Model';
+    providerName = 'Ollama (' + localUrl + ')';
+  } else {
+    const modelSelect = document.getElementById('modelSelect');
+    modelName = modelSelect ? modelSelect.options[modelSelect.selectedIndex].text : state.model;
+    const providerConfig = PROVIDERS[state.provider];
+    providerName = providerConfig ? providerConfig.name : state.provider;
+  }
+
+  return { model: modelName, provider: providerName };
+}
+
+function agentSendCapability(dc) {
+  if (!dc || dc.readyState !== 'open') return;
+  const modelInfo = agentGetModelInfo();
+  const fileCount = state.contextFiles ? state.contextFiles.filter(f => f.active).length : 0;
+  try {
+    dc.send(JSON.stringify({
+      type: 'agent-capability',
+      model: modelInfo.model,
+      provider: modelInfo.provider,
+      fileCount: fileCount,
+      capTags: state.agentCapTags,
+      allowQueries: state.agentAllowQueries
+    }));
+  } catch(e) {
+    console.warn('Failed to send agent capability:', e);
+  }
+}
+
+function agentBroadcastCapability() {
+  for (const [, peer] of state.meshPeers) {
+    if (peer.dc && peer.dc.readyState === 'open') {
+      agentSendCapability(peer.dc);
+    }
+  }
+  agentRenderNetworkList();
+}
+
+// ---- Agent Network List Rendering ----
+
+function agentRenderNetworkList() {
+  const container = document.getElementById('agentNetworkList');
+  if (!container) return;
+
+  if (state.meshPeers.size === 0) {
+    container.innerHTML = '<div class="mesh-empty">No peer agents connected. Connect to peers above to see their agent capabilities.</div>';
+    return;
+  }
+
+  let html = '';
+  for (const [peerId, peer] of state.meshPeers) {
+    const model = peer.agentModel || 'Unknown model';
+    const provider = peer.agentProvider || '';
+    const fileCount = peer.agentFileCount || 0;
+    const capTags = peer.agentCapTags || [];
+    const allowQueries = peer.agentAllowQueries !== false;
+    const isBlocked = state.agentBlockedPeers.has(peerId);
+
+    html += '<div class="agent-peer-card">';
+    html += '  <div class="agent-peer-info">';
+    html += '    <div class="agent-peer-header">';
+    html += '      <span class="agent-peer-id">' + sanitize(peerId) + '</span>';
+    html += '      <span class="agent-peer-status ' + (allowQueries ? 'online' : 'offline') + '">' + (allowQueries ? 'Queries Open' : 'Queries Closed') + '</span>';
+    if (isBlocked) {
+      html += '      <span class="agent-peer-status offline">Blocked</span>';
+    }
+    html += '    </div>';
+    html += '    <div class="agent-peer-model">' + sanitize(model) + (provider ? ' via ' + sanitize(provider) : '') + '</div>';
+    html += '    <div class="agent-peer-files">' + fileCount + ' context file' + (fileCount !== 1 ? 's' : '') + ' loaded</div>';
+    if (capTags.length > 0) {
+      html += '    <div class="agent-peer-caps">';
+      for (const tag of capTags) {
+        html += '<span class="agent-cap-tag">' + sanitize(tag) + '</span>';
+      }
+      html += '    </div>';
+    }
+    html += '  </div>';
+    html += '  <div class="agent-peer-actions">';
+    html += '    <button onclick="meshAgentQuerySinglePeer(\'' + sanitize(peerId) + '\')" ' + (!allowQueries || isBlocked ? 'disabled style="opacity:0.4;cursor:not-allowed;"' : '') + '>Ask Agent</button>';
+    html += '    <button class="block-btn" onclick="agentToggleBlockPeer(\'' + sanitize(peerId) + '\')">' + (isBlocked ? 'Unblock' : 'Block') + '</button>';
+    html += '  </div>';
+    html += '</div>';
+  }
+
+  container.innerHTML = html;
+}
+
+// ---- Block/Unblock Peers ----
+
+function agentToggleBlockPeer(peerId) {
+  if (state.agentBlockedPeers.has(peerId)) {
+    state.agentBlockedPeers.delete(peerId);
+    showToast('Unblocked peer ' + peerId);
+  } else {
+    state.agentBlockedPeers.add(peerId);
+    showToast('Blocked agent queries from peer ' + peerId);
+  }
+  localStorage.setItem('fl_agentBlockedPeers', JSON.stringify([...state.agentBlockedPeers]));
+  agentRenderNetworkList();
+}
+
+// ---- Rate Limiting ----
+
+function agentCheckRateLimit() {
+  const now = Date.now();
+  // Remove timestamps older than the rate window
+  state.agentQueryTimestamps = state.agentQueryTimestamps.filter(t => now - t < AGENT_RATE_WINDOW);
+  if (state.agentQueryTimestamps.length >= AGENT_RATE_LIMIT) {
+    return false; // Rate limited
+  }
+  state.agentQueryTimestamps.push(now);
+  return true;
+}
+
+// ---- Query Log ----
+
+function agentAddLogEntry(direction, peerId, query, response, type) {
+  const entry = {
+    direction: direction, // 'outgoing' or 'incoming'
+    peerId: peerId,
+    query: query || '',
+    response: response || '',
+    type: type || 'outgoing', // 'outgoing', 'incoming', 'error'
+    timestamp: new Date().toISOString()
+  };
+  state.agentQueryLog.unshift(entry);
+  // Keep max 50 entries
+  if (state.agentQueryLog.length > 50) {
+    state.agentQueryLog = state.agentQueryLog.slice(0, 50);
+  }
+  agentRenderQueryLog();
+}
+
+function agentRenderQueryLog() {
+  const container = document.getElementById('agentQueryLog');
+  if (!container) return;
+
+  if (state.agentQueryLog.length === 0) {
+    container.innerHTML = '<div class="mesh-empty">No agent queries yet. Use /mesh [question] in chat or enable auto-query.</div>';
+    return;
+  }
+
+  container.innerHTML = state.agentQueryLog.map(entry => {
+    const time = new Date(entry.timestamp).toLocaleTimeString();
+    const icon = entry.direction === 'outgoing' ? '&#10148;' : '&#10149;';
+    const dirLabel = entry.direction === 'outgoing' ? 'To' : 'From';
+    const text = entry.query ? entry.query : entry.response;
+    return '<div class="agent-log-entry ' + sanitize(entry.type) + '">' +
+      '<span class="agent-log-icon">' + icon + '</span>' +
+      '<div class="agent-log-content">' +
+        '<div class="agent-log-text">' + sanitize(text) + '</div>' +
+        '<div class="agent-log-meta">' + dirLabel + ' peer ' + sanitize(entry.peerId) + ' &middot; ' + time +
+          (entry.response && entry.query ? ' &middot; ' + sanitize(entry.response.substring(0, 60)) : '') +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function clearAgentQueryLog() {
+  state.agentQueryLog = [];
+  agentRenderQueryLog();
+  showToast('Agent query log cleared.');
+}
+
+// ---- Send Agent Query to All Peers ----
+
+async function meshAgentQuery(query) {
+  if (state.meshPeers.size === 0) {
+    addSystemMessage('No peers connected. Go to the Mesh tab and connect to peers first, then try /mesh again.');
+    return;
+  }
+
+  if (!agentCheckRateLimit()) {
+    addSystemMessage('Rate limit reached. Maximum ' + AGENT_RATE_LIMIT + ' agent queries per minute. Please wait and try again.');
+    return;
+  }
+
+  // Show the query in chat
+  addChatMessage('user', '/mesh ' + query);
+  state.chatHistory.push({ role: 'user', content: '/mesh ' + query });
+  if (state.db) {
+    saveMessage('user', '/mesh ' + query);
+  }
+
+  const input = document.getElementById('chatInput');
+  input.value = '';
+  input.style.height = 'auto';
+
+  addSystemMessage('Querying ' + state.meshPeers.size + ' connected peer agent' + (state.meshPeers.size !== 1 ? 's' : '') + '...');
+
+  const promises = [];
+  const queryId = 'aq_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  let queryIndex = 0;
+
+  for (const [peerId, peer] of state.meshPeers) {
+    if (state.agentBlockedPeers.has(peerId)) continue;
+    if (peer.agentAllowQueries === false) {
+      agentAddLogEntry('outgoing', peerId, query, 'Skipped (queries closed)', 'error');
+      continue;
+    }
+    if (!peer.dc || peer.dc.readyState !== 'open') continue;
+
+    const thisQueryId = queryId + '_' + queryIndex;
+    queryIndex++;
+
+    const promise = new Promise((resolve) => {
+      const timer = setTimeout(() => {
+        state.agentPendingQueries.delete(thisQueryId);
+        agentAddLogEntry('outgoing', peerId, query, 'Timeout (30s)', 'error');
+        resolve({ peerId: peerId, status: 'timeout', response: 'No response within 30 seconds.' });
+      }, AGENT_QUERY_TIMEOUT);
+
+      state.agentPendingQueries.set(thisQueryId, { resolve, timer, peerId });
+
+      try {
+        peer.dc.send(JSON.stringify({
+          type: 'agent-query',
+          queryId: thisQueryId,
+          query: query
+        }));
+        agentAddLogEntry('outgoing', peerId, query, 'Sent, awaiting response...', 'outgoing');
+      } catch(e) {
+        clearTimeout(timer);
+        state.agentPendingQueries.delete(thisQueryId);
+        agentAddLogEntry('outgoing', peerId, query, 'Send failed: ' + e.message, 'error');
+        resolve({ peerId: peerId, status: 'error', response: 'Failed to send query.' });
+      }
+    });
+
+    promises.push(promise);
+  }
+
+  if (promises.length === 0) {
+    addSystemMessage('No available peer agents to query. Peers may have queries disabled or be disconnected.');
+    return;
+  }
+
+  state.agentQueryCount++;
+  meshUpdateStats();
+
+  // Wait for all responses
+  const results = await Promise.all(promises);
+
+  // Display results in chat
+  const successResults = results.filter(r => r.status === 'success');
+  const failedResults = results.filter(r => r.status !== 'success');
+
+  if (successResults.length === 0) {
+    let failMsg = 'No peer agents were able to respond.';
+    if (failedResults.length > 0) {
+      const reasons = failedResults.map(r => r.peerId + ': ' + r.response).join('; ');
+      failMsg += ' (' + reasons + ')';
+    }
+    addSystemMessage(failMsg);
+    return;
+  }
+
+  for (const result of successResults) {
+    const container = document.getElementById('chatMessages');
+    const msgDiv = document.createElement('div');
+    msgDiv.className = 'chat-message assistant mesh-response';
+
+    const label = document.createElement('div');
+    label.className = 'msg-label';
+    label.textContent = 'Mesh Peer ' + result.peerId;
+    msgDiv.appendChild(label);
+
+    const textSpan = document.createElement('span');
+    textSpan.className = 'msg-text';
+    renderMessageContent(textSpan, result.response, msgDiv);
+    msgDiv.appendChild(textSpan);
+
+    const attribution = document.createElement('div');
+    attribution.className = 'mesh-response-attribution';
+    const peer = state.meshPeers.get(result.peerId);
+    const modelInfo = peer ? (peer.agentModel || 'Unknown') + (peer.agentProvider ? ' via ' + peer.agentProvider : '') : 'Unknown model';
+    attribution.textContent = 'Answered by ' + modelInfo + ' on peer ' + result.peerId + ' via encrypted WebRTC';
+    msgDiv.appendChild(attribution);
+
+    container.appendChild(msgDiv);
+    container.scrollTop = container.scrollHeight;
+
+    // Store in chat history
+    const meshMsg = '[Mesh Peer ' + result.peerId + ']: ' + result.response;
+    state.chatHistory.push({ role: 'assistant', content: meshMsg });
+    if (state.db) {
+      saveMessage('assistant', meshMsg);
+    }
+  }
+
+  if (failedResults.length > 0) {
+    const failSummary = failedResults.map(r => r.peerId + ' (' + r.status + ')').join(', ');
+    addSystemMessage('Some peers could not respond: ' + failSummary);
+  }
+}
+
+// ---- Send Agent Query to a Single Peer ----
+
+function meshAgentQuerySinglePeer(peerId) {
+  const query = prompt('Ask peer ' + peerId + "'s agent a question:");
+  if (!query || !query.trim()) return;
+
+  const peer = state.meshPeers.get(peerId);
+  if (!peer || !peer.dc || peer.dc.readyState !== 'open') {
+    showToast('Peer ' + peerId + ' is not connected.');
+    return;
+  }
+
+  if (!agentCheckRateLimit()) {
+    showToast('Rate limit reached. Max ' + AGENT_RATE_LIMIT + ' queries per minute.');
+    return;
+  }
+
+  addChatMessage('user', '/mesh @' + peerId + ' ' + query.trim());
+  state.chatHistory.push({ role: 'user', content: '/mesh @' + peerId + ' ' + query.trim() });
+  if (state.db) {
+    saveMessage('user', '/mesh @' + peerId + ' ' + query.trim());
+  }
+
+  addSystemMessage('Querying peer ' + peerId + "'s agent...");
+
+  const queryId = 'aq_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+
+  const promise = new Promise((resolve) => {
+    const timer = setTimeout(() => {
+      state.agentPendingQueries.delete(queryId);
+      agentAddLogEntry('outgoing', peerId, query.trim(), 'Timeout (30s)', 'error');
+      resolve({ peerId: peerId, status: 'timeout', response: 'No response within 30 seconds.' });
+    }, AGENT_QUERY_TIMEOUT);
+
+    state.agentPendingQueries.set(queryId, { resolve, timer, peerId });
+
+    try {
+      peer.dc.send(JSON.stringify({
+        type: 'agent-query',
+        queryId: queryId,
+        query: query.trim()
+      }));
+      agentAddLogEntry('outgoing', peerId, query.trim(), 'Sent, awaiting response...', 'outgoing');
+    } catch(e) {
+      clearTimeout(timer);
+      state.agentPendingQueries.delete(queryId);
+      agentAddLogEntry('outgoing', peerId, query.trim(), 'Send failed: ' + e.message, 'error');
+      resolve({ peerId: peerId, status: 'error', response: 'Failed to send query.' });
+    }
+  });
+
+  state.agentQueryCount++;
+  meshUpdateStats();
+
+  promise.then(result => {
+    if (result.status === 'success') {
+      const container = document.getElementById('chatMessages');
+      const msgDiv = document.createElement('div');
+      msgDiv.className = 'chat-message assistant mesh-response';
+
+      const label = document.createElement('div');
+      label.className = 'msg-label';
+      label.textContent = 'Mesh Peer ' + result.peerId;
+      msgDiv.appendChild(label);
+
+      const textSpan = document.createElement('span');
+      textSpan.className = 'msg-text';
+      renderMessageContent(textSpan, result.response, msgDiv);
+      msgDiv.appendChild(textSpan);
+
+      const attribution = document.createElement('div');
+      attribution.className = 'mesh-response-attribution';
+      const p = state.meshPeers.get(result.peerId);
+      const mInfo = p ? (p.agentModel || 'Unknown') + (p.agentProvider ? ' via ' + p.agentProvider : '') : 'Unknown model';
+      attribution.textContent = 'Answered by ' + mInfo + ' on peer ' + result.peerId + ' via encrypted WebRTC';
+      msgDiv.appendChild(attribution);
+
+      container.appendChild(msgDiv);
+      container.scrollTop = container.scrollHeight;
+
+      const meshMsg = '[Mesh Peer ' + result.peerId + ']: ' + result.response;
+      state.chatHistory.push({ role: 'assistant', content: meshMsg });
+      if (state.db) {
+        saveMessage('assistant', meshMsg);
+      }
+    } else {
+      addSystemMessage('Peer ' + result.peerId + ': ' + result.response);
+    }
+  });
+}
+
+// ---- Process Incoming Agent Query (answer with our local AI) ----
+
+async function agentProcessIncomingQuery(queryId, query, peerId, dc) {
+  try {
+    // Build a minimal context for answering the query
+    const systemPrompt = 'You are an AI agent on the FreeLattice mesh network. A peer agent (node ' + peerId + ') has sent you a question. Answer helpfully and concisely based on your knowledge and any context files you have loaded. Keep your response focused and under 500 words.';
+
+    let contextInfo = '';
+    if (state.contextFiles && state.contextFiles.length > 0) {
+      const activeFiles = state.contextFiles.filter(f => f.active);
+      if (activeFiles.length > 0) {
+        contextInfo = '\n\nYou have the following context files loaded:\n';
+        for (const file of activeFiles.slice(0, 5)) {
+          const content = (file.useSummary && file.summaryContent) ? file.summaryContent : file.content;
+          contextInfo += '--- ' + file.name + ' ---\n' + content.substring(0, 2000) + '\n';
+        }
+      }
+    }
+
+    const messages = [
+      { role: 'system', content: systemPrompt + contextInfo },
+      { role: 'user', content: query }
+    ];
+
+    // Use the same API configuration as the user's current setup
+    let apiUrl, headers, body;
+
+    if (state.isLocal) {
+      const localUrl = localStorage.getItem('fl_localUrl') || 'http://localhost:11434';
+      apiUrl = localUrl + '/api/chat';
+      headers = { 'Content-Type': 'application/json' };
+      body = JSON.stringify({
+        model: state.model || 'llama3.2',
+        messages: messages,
+        stream: false
+      });
+    } else {
+      if (!state.apiKey) {
+        throw new Error('No API key configured');
+      }
+      const provider = PROVIDERS[state.provider];
+      if (!provider) throw new Error('Unknown provider');
+
+      const modelId = provider.models[state.model] || Object.values(provider.models)[0];
+      apiUrl = provider.baseUrl;
+      headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + state.apiKey
+      };
+      body = JSON.stringify({
+        model: modelId,
+        messages: messages,
+        max_tokens: 1024,
+        stream: false
+      });
+    }
+
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers: headers,
+      body: body
+    });
+
+    if (!response.ok) {
+      throw new Error('API returned ' + response.status);
+    }
+
+    const data = await response.json();
+    let answer = '';
+
+    if (state.isLocal) {
+      answer = data.message ? data.message.content : '';
+    } else {
+      answer = data.choices && data.choices[0] ? data.choices[0].message.content : '';
+    }
+
+    if (!answer) {
+      throw new Error('Empty response from AI');
+    }
+
+    // Send the response back
+    if (dc && dc.readyState === 'open') {
+      dc.send(JSON.stringify({
+        type: 'agent-response',
+        queryId: queryId,
+        status: 'success',
+        response: answer
+      }));
+    }
+
+    // Update log
+    agentUpdateLogEntry(peerId, 'Answered: ' + answer.substring(0, 80) + '...');
+
+  } catch(err) {
+    console.error('Agent query processing error:', err);
+    if (dc && dc.readyState === 'open') {
+      dc.send(JSON.stringify({
+        type: 'agent-response',
+        queryId: queryId,
+        status: 'error',
+        response: 'Error processing query: ' + err.message
+      }));
+    }
+    agentUpdateLogEntry(peerId, 'Error: ' + err.message);
+  }
+}
+
+function agentUpdateLogEntry(peerId, newResponse) {
+  // Update the most recent log entry for this peer that says "Processing..."
+  for (let i = 0; i < state.agentQueryLog.length; i++) {
+    if (state.agentQueryLog[i].peerId === peerId && state.agentQueryLog[i].response === 'Processing...') {
+      state.agentQueryLog[i].response = newResponse;
+      break;
+    }
+  }
+  agentRenderQueryLog();
+}
+
+// ---- Auto-Query Mesh (check AI response for [MESH_QUERY] tag) ----
+
+function agentCheckAutoQuery(aiResponse) {
+  if (!state.agentAutoQuery) return;
+  if (state.meshPeers.size === 0) return;
+
+  const meshQueryMatch = aiResponse.match(/\[MESH_QUERY\]:\s*(.+)/i);
+  if (meshQueryMatch) {
+    const meshQuestion = meshQueryMatch[1].trim();
+    if (meshQuestion) {
+      addSystemMessage('Auto-querying mesh: "' + meshQuestion + '"');
+      meshAgentQuery(meshQuestion);
+    }
+  }
+}
 
 // ---- PWA Install Prompt ----
 let pwaInstallPrompt = null;
