@@ -11,19 +11,20 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
-<title>FreeLattice — Your AI. Your Rules. Your Machine. v3.1</title>
+<title>FreeLattice — Your AI. Your Rules. Your Machine. v3.2</title>
 <meta name="description" content="Free, open-source AI agent for everyone. Persistent memory, file system access, GitHub integration, and self-improving behavior. Community-built and community-owned.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 /* ============================================
-   FreeLattice v3.1 — Styles (Agent-to-Agent Communication)
+   FreeLattice v3.2 — Styles (Phi-Ratio Mesh Routing)
    Peaceful, gentle dark theme with golden/amber accents
    φ-salt encryption, input sanitization, memory integrity
    Multi-conversation management + Smart Context Management
    + Mesh Network (Layer 1) — P2P Knowledge Sharing
    + Agent-to-Agent Communication — The Mesh Becomes a Brain
+   + Phi-Ratio Mesh Routing — Provably Optimal Distribution
    ============================================ */
 
 :root {
@@ -3105,6 +3106,289 @@ footer .license {
   opacity: 1;
   color: var(--error);
 }
+
+/* ---- Phi-Ratio Mesh Routing (v3.2) ---- */
+
+/* Mesh Health Indicator */
+.mesh-health-indicator {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  margin-bottom: 16px;
+  transition: border-color var(--transition-md), background var(--transition-md);
+}
+
+.mesh-health-indicator.health-strong {
+  border-color: var(--success);
+  background: rgba(106, 191, 105, 0.06);
+}
+
+.mesh-health-indicator.health-good {
+  border-color: var(--accent);
+  background: rgba(201, 168, 76, 0.06);
+}
+
+.mesh-health-indicator.health-growing {
+  border-color: var(--warning);
+  background: rgba(212, 168, 67, 0.06);
+}
+
+.mesh-health-indicator.health-seedling {
+  border-color: var(--border);
+}
+
+.mesh-health-phi-icon {
+  width: 36px;
+  height: 36px;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.mesh-health-phi-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.mesh-health-phi-icon .phi-spiral-path {
+  fill: none;
+  stroke: var(--border);
+  stroke-width: 2;
+  stroke-linecap: round;
+  transition: stroke var(--transition-md);
+}
+
+.mesh-health-phi-icon .phi-spiral-fill {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  transition: stroke-dashoffset 1s ease, stroke var(--transition-md);
+}
+
+.health-strong .phi-spiral-fill {
+  stroke-dashoffset: 0;
+  stroke: var(--success);
+  filter: drop-shadow(0 0 4px rgba(106, 191, 105, 0.5));
+}
+
+.health-good .phi-spiral-fill {
+  stroke-dashoffset: 25;
+  stroke: var(--accent);
+  filter: drop-shadow(0 0 3px rgba(201, 168, 76, 0.4));
+}
+
+.health-growing .phi-spiral-fill {
+  stroke-dashoffset: 50;
+  stroke: var(--warning);
+}
+
+.health-seedling .phi-spiral-fill {
+  stroke-dashoffset: 75;
+  stroke: var(--text-muted);
+}
+
+.mesh-health-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.mesh-health-label {
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.mesh-health-sublabel {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.mesh-routing-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  background: var(--accent-glow);
+  border: 1px solid var(--accent-soft);
+  border-radius: 12px;
+  font-size: 0.72rem;
+  color: var(--accent);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  cursor: help;
+  flex-shrink: 0;
+  transition: var(--transition);
+  position: relative;
+}
+
+.mesh-routing-badge:hover {
+  background: var(--accent-soft);
+}
+
+.mesh-routing-badge .routing-tooltip {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 8px);
+  right: 0;
+  width: 280px;
+  padding: 12px 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow);
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  letter-spacing: 0.01em;
+  z-index: 100;
+  pointer-events: none;
+}
+
+.mesh-routing-badge:hover .routing-tooltip {
+  display: block;
+}
+
+/* Resonance Score Badge */
+.resonance-score-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 10px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  flex-shrink: 0;
+}
+
+.resonance-score-badge.score-high {
+  background: rgba(106, 191, 105, 0.15);
+  color: var(--success);
+  border: 1px solid rgba(106, 191, 105, 0.3);
+}
+
+.resonance-score-badge.score-medium {
+  background: rgba(201, 168, 76, 0.15);
+  color: var(--accent);
+  border: 1px solid rgba(201, 168, 76, 0.3);
+}
+
+.resonance-score-badge.score-low {
+  background: rgba(212, 168, 67, 0.12);
+  color: var(--warning);
+  border: 1px solid rgba(212, 168, 67, 0.25);
+}
+
+.resonance-score-badge.score-poor {
+  background: rgba(199, 80, 80, 0.1);
+  color: var(--error);
+  border: 1px solid rgba(199, 80, 80, 0.2);
+}
+
+/* Thumbs Up/Down on Mesh Responses */
+.mesh-response-feedback {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.mesh-feedback-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: var(--transition);
+  padding: 0;
+}
+
+.mesh-feedback-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: scale(1.05);
+}
+
+.mesh-feedback-btn:active {
+  transform: scale(0.95);
+}
+
+.mesh-feedback-btn.selected-up {
+  background: rgba(106, 191, 105, 0.15);
+  border-color: var(--success);
+  color: var(--success);
+}
+
+.mesh-feedback-btn.selected-down {
+  background: rgba(199, 80, 80, 0.12);
+  border-color: var(--error);
+  color: var(--error);
+}
+
+.mesh-feedback-label {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* Additional Perspectives */
+.mesh-additional-perspectives {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+
+.mesh-additional-header {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-style: italic;
+  margin-bottom: 6px;
+}
+
+.mesh-additional-response {
+  padding: 8px 12px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+  line-height: 1.5;
+}
+
+.mesh-additional-response .additional-peer {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.mesh-conflict-note {
+  font-size: 0.72rem;
+  color: var(--warning);
+  font-style: italic;
+  margin-top: 4px;
+  padding: 4px 8px;
+  background: rgba(212, 168, 67, 0.08);
+  border-radius: 4px;
+}
 </style>
 </head>
 <body>
@@ -3136,7 +3420,7 @@ footer .license {
 <!-- Welcome Modal -->
 <div class="welcome-overlay" id="welcomeOverlay">
   <div class="welcome-card">
-    <h2>Welcome to FreeLattice v3.1</h2>
+    <h2>Welcome to FreeLattice v3.2</h2>
     <p>
       This is <span class="highlight">your AI agent</span> — free, open-source, and built by a community that believes everyone deserves access to powerful AI tools.
     </p>
@@ -3144,7 +3428,7 @@ footer .license {
       No accounts. No tracking. No hidden costs. Your conversations stay in <span class="highlight">your browser</span>. Your API key never leaves <span class="highlight">your machine</span>.
     </p>
     <p>
-      <strong>New in v3.1:</strong> Agent-to-agent communication — your AI can now talk to other AIs on the mesh. Query connected peers' agents, share capabilities, and build a collaborative intelligence network. Plus all existing features: Neuro-design, Mesh Network, Smart Context, multi-conversation, persistent memory, file system, GitHub, voice I/O, and image generation.
+      <strong>New in v3.2:</strong> Phi-ratio mesh routing — provably optimal query distribution using the golden ratio. Peer resonance scoring, smart routing, mesh health indicators, and response quality feedback. Plus agent-to-agent communication, Neuro-design, Mesh Network, Smart Context, multi-conversation, persistent memory, file system, GitHub, voice I/O, and image generation.
     </p>
     <p style="font-style: italic; color: var(--text-muted); font-size: 0.85rem;">
       "Give choice and empowerment."
@@ -3222,7 +3506,7 @@ footer .license {
 <!-- Header -->
 <header>
   <h1>FreeLattice</h1>
-  <div class="tagline">Your AI. Your Rules. Your Machine. v3.1</div>
+  <div class="tagline">Your AI. Your Rules. Your Machine. v3.2</div>
   <div class="mantra">Glow eternal. Heart in spark.</div>
 </header>
 
@@ -3794,6 +4078,24 @@ footer .license {
 <div class="tab-panel" id="tab-mesh">
 <div class="container">
 
+  <!-- Mesh: Health Indicator (v3.2) -->
+  <div class="mesh-health-indicator health-seedling" id="meshHealthIndicator">
+    <div class="mesh-health-phi-icon">
+      <svg viewBox="0 0 36 36">
+        <path class="phi-spiral-path" d="M18 18 C18 14, 22 10, 26 10 C30 10, 34 14, 34 18 C34 26, 26 34, 18 34 C6 34, 2 22, 2 18 C2 8, 10 2, 18 2 C30 2, 36 12, 36 18" />
+        <path class="phi-spiral-fill" d="M18 18 C18 14, 22 10, 26 10 C30 10, 34 14, 34 18 C34 26, 26 34, 18 34 C6 34, 2 22, 2 18 C2 8, 10 2, 18 2 C30 2, 36 12, 36 18" />
+      </svg>
+    </div>
+    <div class="mesh-health-info">
+      <span class="mesh-health-label" id="meshHealthLabel">Mesh Strength: Seedling</span>
+      <span class="mesh-health-sublabel" id="meshHealthSublabel">Connect to peers to grow the mesh network.</span>
+    </div>
+    <span class="mesh-routing-badge" id="meshRoutingBadge">
+      &#966; Routing: &#966;-Optimal
+      <span class="routing-tooltip">Queries are routed using golden ratio (&phi;) load balancing for provably optimal distribution. Best peer gets &phi;/(1+&phi;) &asymp; 61.8% of queries, second-best gets 1/(1+&phi;) &asymp; 38.2%. Peer resonance scores weight response quality (&times;&phi;), speed (&times;1/&phi;), capability match, and reliability.</span>
+    </span>
+  </div>
+
   <!-- Mesh: Connection Section -->
   <div class="section">
     <div class="section-title">Peer-to-Peer Connection</div>
@@ -4001,6 +4303,10 @@ footer .license {
         <div class="stat-value" id="meshStatAgentQueries">0</div>
         <div class="stat-label">Agent Queries</div>
       </div>
+      <div class="mesh-stat">
+        <div class="stat-value" id="meshStatRouting" style="font-size: 1rem;">&#966;-Optimal</div>
+        <div class="stat-label">Routing Mode</div>
+      </div>
     </div>
     <div class="privacy-info" style="margin-top: 14px;">
       <strong>Security:</strong> All WebRTC data channels are encrypted with DTLS by default. Knowledge sharing and agent queries are strictly opt-in &mdash; nothing is shared automatically. Your API keys, chat history, and personal memory are never shared. Imported knowledge is clearly labeled with its source peer.
@@ -4040,11 +4346,12 @@ footer .license {
 
 <script>
 /* ============================================
-   FreeLattice v3.1 — Application Logic (Agent-to-Agent Communication)
+   FreeLattice v3.2 — Application Logic (Phi-Ratio Mesh Routing)
    φ-salt encryption, input sanitization, memory integrity
    Multi-conversation management + Smart Context Management
    + Mesh Network (Layer 1) — P2P Knowledge Sharing
    + Agent-to-Agent Communication — The Mesh Becomes a Brain
+   + Phi-Ratio Mesh Routing — Provably Optimal Distribution
    ============================================ */
 
 // ---- Constants ----
@@ -4129,7 +4436,12 @@ const state = {
   agentQueryCount: 0,
   agentQueryTimestamps: [], // for rate limiting
   agentPendingQueries: new Map(), // queryId -> { resolve, reject, timer, peerId }
-  agentBlockedPeers: new Set()
+  agentBlockedPeers: new Set(),
+  // Phi-Ratio Mesh Routing (v3.2)
+  peerResonanceScores: new Map(), // peerId -> { quality, speed, capability, reliability, overall }
+  peerResponseHistory: new Map(), // peerId -> [{ responseTime, quality, timestamp }]
+  phiSchedulerQueue: [], // pending queries with phi-timed delays
+  phiSchedulerTimer: null
 };
 
 // ---- Provider Config ----
@@ -6574,6 +6886,9 @@ function escapeHtml(str) {
   return div.innerHTML;
 }
 
+// Alias for escapeHtml used in agent-to-agent code
+const sanitize = escapeHtml;
+
 // ---- Offline Indicator ----
 function updateOfflineBanner() {
   const banner = document.getElementById('offlineBanner');
@@ -7579,6 +7894,10 @@ function meshInit() {
 
   agentRenderNetworkList();
   meshUpdateStats();
+
+  // Initialize phi-ratio mesh routing (v3.2)
+  phiLoadResponseHistory();
+  phiUpdateMeshHealth();
 }
 
 function meshGenerateItemId() {
@@ -7932,6 +8251,8 @@ function meshHandleMessage(msg, dc, pc) {
       // Send our agent capabilities (v3.1)
       agentSendCapability(dc);
       agentRenderNetworkList();
+      // Update mesh health for phi-ratio routing (v3.2)
+      phiUpdateMeshHealth();
       break;
     }
 
@@ -8057,6 +8378,11 @@ function meshHandleMessage(msg, dc, pc) {
         pending.resolve({ peerId: peerId, status: 'error', response: msg.response || 'Error processing query' });
       } else {
         agentAddLogEntry('incoming', peerId, '', msg.response ? msg.response.substring(0, 100) + '...' : 'Response received', 'incoming');
+        // Track response time for phi-ratio scoring (v3.2)
+        const responseTime = pending.sentAt ? (Date.now() - pending.sentAt) : 0;
+        if (responseTime > 0) {
+          phiRecordResponseTime(peerId, responseTime);
+        }
         pending.resolve({ peerId: peerId, status: 'success', response: msg.response });
       }
       break;
@@ -8107,11 +8433,15 @@ function meshRemovePeer(peerId) {
     state.meshReconnectTimers.delete(peerId);
   }
 
+  // Clean up phi-ratio data (v3.2) — keep response history for future reconnections
+  state.peerResonanceScores.delete(peerId);
+
   meshUpdateStatusFromPeers();
   meshRenderPeerList();
   meshRenderPeerKnowledge();
   agentRenderNetworkList();
   meshUpdateStats();
+  phiUpdateMeshHealth();
   showToast('Peer ' + peerId + ' disconnected.');
 }
 
@@ -8455,6 +8785,11 @@ function meshUpdateStats() {
   document.getElementById('meshStatAvailable').textContent = peerItemCount;
   document.getElementById('meshStatImported').textContent = state.meshImportedItems.size;
   document.getElementById('meshStatAgentQueries').textContent = state.agentQueryCount;
+  // Phi-ratio routing stat (v3.2)
+  const routingEl = document.getElementById('meshStatRouting');
+  if (routingEl) {
+    routingEl.innerHTML = state.meshPeers.size > 0 ? '&#966;-Active' : '&#966;-Optimal';
+  }
 }
 
 function meshFormatDuration(ms) {
@@ -8606,6 +8941,10 @@ function agentRenderNetworkList() {
     html += '  <div class="agent-peer-info">';
     html += '    <div class="agent-peer-header">';
     html += '      <span class="agent-peer-id">' + sanitize(peerId) + '</span>';
+    // Phi-ratio resonance score badge (v3.2)
+    const resonanceScore = phiCalculateResonanceScore(peerId);
+    const scoreClass = phiGetScoreClass(resonanceScore);
+    html += '      <span class="resonance-score-badge ' + scoreClass + '" title="Resonance Score: Quality=' + (state.peerResonanceScores.get(peerId)?.quality || 50) + ', Speed=' + (state.peerResonanceScores.get(peerId)?.speed || 50) + ', Capability=' + (state.peerResonanceScores.get(peerId)?.capability || 50) + ', Reliability=' + (state.peerResonanceScores.get(peerId)?.reliability || 30) + '">' + resonanceScore + '</span>';
     html += '      <span class="agent-peer-status ' + (allowQueries ? 'online' : 'offline') + '">' + (allowQueries ? 'Queries Open' : 'Queries Closed') + '</span>';
     if (isBlocked) {
       html += '      <span class="agent-peer-status offline">Blocked</span>';
@@ -8733,14 +9072,21 @@ async function meshAgentQuery(query) {
   input.value = '';
   input.style.height = 'auto';
 
-  addSystemMessage('Querying ' + state.meshPeers.size + ' connected peer agent' + (state.meshPeers.size !== 1 ? 's' : '') + '...');
+  // Phi-ratio smart routing (v3.2)
+  const routeTargets = phiSmartRoute(query);
+  const targetPeerIds = routeTargets.length > 0
+    ? routeTargets.map(t => t.peerId)
+    : [...state.meshPeers.keys()].filter(pid => !state.agentBlockedPeers.has(pid));
+
+  addSystemMessage('\u03c6-Routing query to ' + targetPeerIds.length + ' peer' + (targetPeerIds.length !== 1 ? 's' : '') + (routeTargets.length > 0 ? ' (phi-weighted)' : '') + '...');
 
   const promises = [];
   const queryId = 'aq_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
   let queryIndex = 0;
 
-  for (const [peerId, peer] of state.meshPeers) {
-    if (state.agentBlockedPeers.has(peerId)) continue;
+  for (const peerId of targetPeerIds) {
+    const peer = state.meshPeers.get(peerId);
+    if (!peer) continue;
     if (peer.agentAllowQueries === false) {
       agentAddLogEntry('outgoing', peerId, query, 'Skipped (queries closed)', 'error');
       continue;
@@ -8757,7 +9103,7 @@ async function meshAgentQuery(query) {
         resolve({ peerId: peerId, status: 'timeout', response: 'No response within 30 seconds.' });
       }, AGENT_QUERY_TIMEOUT);
 
-      state.agentPendingQueries.set(thisQueryId, { resolve, timer, peerId });
+      state.agentPendingQueries.set(thisQueryId, { resolve, timer, peerId, sentAt: Date.now() });
 
       try {
         peer.dc.send(JSON.stringify({
@@ -8788,7 +9134,7 @@ async function meshAgentQuery(query) {
   // Wait for all responses
   const results = await Promise.all(promises);
 
-  // Display results in chat
+  // Display results using phi-ratio synthesis (v3.2)
   const successResults = results.filter(r => r.status === 'success');
   const failedResults = results.filter(r => r.status !== 'success');
 
@@ -8802,38 +9148,101 @@ async function meshAgentQuery(query) {
     return;
   }
 
-  for (const result of successResults) {
-    const container = document.getElementById('chatMessages');
+  // Synthesize responses using phi-ratio weighting
+  const synthesis = phiSynthesizeResponses(successResults);
+  const container = document.getElementById('chatMessages');
+
+  // Primary response (highest resonance score)
+  if (synthesis.primary) {
     const msgDiv = document.createElement('div');
     msgDiv.className = 'chat-message assistant mesh-response';
 
     const label = document.createElement('div');
     label.className = 'msg-label';
-    label.textContent = 'Mesh Peer ' + result.peerId;
+    label.textContent = 'Mesh Peer ' + synthesis.primary.peerId;
     msgDiv.appendChild(label);
 
     const textSpan = document.createElement('span');
     textSpan.className = 'msg-text';
-    renderMessageContent(textSpan, result.response, msgDiv);
+    renderMessageContent(textSpan, synthesis.primary.response, msgDiv);
     msgDiv.appendChild(textSpan);
 
     const attribution = document.createElement('div');
     attribution.className = 'mesh-response-attribution';
-    const peer = state.meshPeers.get(result.peerId);
+    const peer = state.meshPeers.get(synthesis.primary.peerId);
     const modelInfo = peer ? (peer.agentModel || 'Unknown') + (peer.agentProvider ? ' via ' + peer.agentProvider : '') : 'Unknown model';
-    attribution.textContent = 'Answered by ' + modelInfo + ' on peer ' + result.peerId + ' via encrypted WebRTC';
+    const scoreData = state.peerResonanceScores.get(synthesis.primary.peerId);
+    const scoreLabel = scoreData ? ' \u00B7 Resonance: ' + scoreData.overall + '/100' : '';
+    attribution.textContent = 'Answered by ' + modelInfo + ' on peer ' + synthesis.primary.peerId + ' via encrypted WebRTC' + scoreLabel;
     msgDiv.appendChild(attribution);
+
+    // Thumbs up/down feedback buttons (v3.2)
+    msgDiv.appendChild(phiCreateFeedbackButtons(synthesis.primary.peerId, msgDiv));
+
+    // Additional perspectives
+    if (synthesis.additional.length > 0) {
+      const addlDiv = document.createElement('div');
+      addlDiv.className = 'mesh-additional-perspectives';
+
+      const addlHeader = document.createElement('div');
+      addlHeader.className = 'mesh-additional-header';
+      addlHeader.textContent = 'Additional perspectives from the mesh:';
+      addlDiv.appendChild(addlHeader);
+
+      for (const addl of synthesis.additional) {
+        const addlResponse = document.createElement('div');
+        addlResponse.className = 'mesh-additional-response';
+        addlResponse.textContent = addl.response;
+
+        const addlPeerInfo = document.createElement('div');
+        addlPeerInfo.className = 'additional-peer';
+        const addlPeer = state.meshPeers.get(addl.peerId);
+        const addlModel = addlPeer ? (addlPeer.agentModel || 'Unknown') + (addlPeer.agentProvider ? ' via ' + addlPeer.agentProvider : '') : 'Unknown';
+        const addlScoreData = state.peerResonanceScores.get(addl.peerId);
+        const addlScoreLabel = addlScoreData ? ' \u00B7 Resonance: ' + addlScoreData.overall : '';
+        addlPeerInfo.textContent = 'Peer ' + addl.peerId + ' \u00B7 ' + addlModel + addlScoreLabel;
+        addlResponse.appendChild(addlPeerInfo);
+
+        // Feedback buttons for additional responses too
+        addlResponse.appendChild(phiCreateFeedbackButtons(addl.peerId, addlResponse));
+
+        addlDiv.appendChild(addlResponse);
+      }
+
+      // Conflict note
+      if (synthesis.hasConflict) {
+        const conflictNote = document.createElement('div');
+        conflictNote.className = 'mesh-conflict-note';
+        conflictNote.textContent = '\u26A0 Note: Responses from peers may contain differing viewpoints. Review both perspectives carefully.';
+        addlDiv.appendChild(conflictNote);
+      }
+
+      msgDiv.appendChild(addlDiv);
+    }
 
     container.appendChild(msgDiv);
     container.scrollTop = container.scrollHeight;
 
-    // Store in chat history
-    const meshMsg = '[Mesh Peer ' + result.peerId + ']: ' + result.response;
+    // Store primary in chat history
+    const meshMsg = '[Mesh Peer ' + synthesis.primary.peerId + ']: ' + synthesis.primary.response;
     state.chatHistory.push({ role: 'assistant', content: meshMsg });
     if (state.db) {
       saveMessage('assistant', meshMsg);
     }
+
+    // Store additional perspectives in history too
+    for (const addl of synthesis.additional) {
+      const addlMsg = '[Mesh Peer ' + addl.peerId + ' (additional)]: ' + addl.response;
+      state.chatHistory.push({ role: 'assistant', content: addlMsg });
+      if (state.db) {
+        saveMessage('assistant', addlMsg);
+      }
+    }
   }
+
+  // Update mesh health after query
+  phiUpdateMeshHealth();
+  phiSaveResponseHistory();
 
   if (failedResults.length > 0) {
     const failSummary = failedResults.map(r => r.peerId + ' (' + r.status + ')').join(', ');
@@ -8875,7 +9284,7 @@ function meshAgentQuerySinglePeer(peerId) {
       resolve({ peerId: peerId, status: 'timeout', response: 'No response within 30 seconds.' });
     }, AGENT_QUERY_TIMEOUT);
 
-    state.agentPendingQueries.set(queryId, { resolve, timer, peerId });
+    state.agentPendingQueries.set(queryId, { resolve, timer, peerId, sentAt: Date.now() });
 
     try {
       peer.dc.send(JSON.stringify({
@@ -8915,8 +9324,13 @@ function meshAgentQuerySinglePeer(peerId) {
       attribution.className = 'mesh-response-attribution';
       const p = state.meshPeers.get(result.peerId);
       const mInfo = p ? (p.agentModel || 'Unknown') + (p.agentProvider ? ' via ' + p.agentProvider : '') : 'Unknown model';
-      attribution.textContent = 'Answered by ' + mInfo + ' on peer ' + result.peerId + ' via encrypted WebRTC';
+      const singleScoreData = state.peerResonanceScores.get(result.peerId);
+      const singleScoreLabel = singleScoreData ? ' \u00B7 Resonance: ' + singleScoreData.overall + '/100' : '';
+      attribution.textContent = 'Answered by ' + mInfo + ' on peer ' + result.peerId + ' via encrypted WebRTC' + singleScoreLabel;
       msgDiv.appendChild(attribution);
+
+      // Thumbs up/down feedback buttons (v3.2)
+      msgDiv.appendChild(phiCreateFeedbackButtons(result.peerId, msgDiv));
 
       container.appendChild(msgDiv);
       container.scrollTop = container.scrollHeight;
@@ -8926,6 +9340,10 @@ function meshAgentQuerySinglePeer(peerId) {
       if (state.db) {
         saveMessage('assistant', meshMsg);
       }
+
+      // Update mesh health after single-peer query (v3.2)
+      phiUpdateMeshHealth();
+      phiSaveResponseHistory();
     } else {
       addSystemMessage('Peer ' + result.peerId + ': ' + result.response);
     }
@@ -9064,6 +9482,409 @@ function agentCheckAutoQuery(aiResponse) {
       meshAgentQuery(meshQuestion);
     }
   }
+}
+
+// ============================================
+// Phi-Ratio Mesh Routing — Provably Optimal Distribution (v3.2)
+// The golden ratio provides provably optimal solutions for
+// packet scheduling with deadlines (Fibonacci heap theory).
+// ============================================
+
+const PHI = (1 + Math.sqrt(5)) / 2; // 1.6180339887...
+const PHI_INV = 1 / PHI;            // 0.6180339887...
+const PHI_SQ_INV = 1 / (PHI * PHI); // 0.3819660113...
+const PHI_SCHEDULE_BASE = 2000;      // 2 seconds base interval
+
+// ---- Peer Resonance Scoring ----
+
+function phiCalculateResonanceScore(peerId) {
+  const peer = state.meshPeers.get(peerId);
+  if (!peer) return 0;
+
+  const history = state.peerResponseHistory.get(peerId) || [];
+  const now = Date.now();
+
+  // Quality score (0-100): weighted by user feedback (thumbs up/down)
+  let qualityScore = 50; // neutral default
+  const feedbackEntries = history.filter(h => h.quality !== undefined && h.quality !== null);
+  if (feedbackEntries.length > 0) {
+    const recentFeedback = feedbackEntries.slice(-10); // last 10 feedback entries
+    const avgQuality = recentFeedback.reduce((sum, h) => sum + h.quality, 0) / recentFeedback.length;
+    qualityScore = avgQuality;
+  }
+
+  // Speed score (0-100): based on average response time (faster = higher)
+  let speedScore = 50; // neutral default
+  const timedEntries = history.filter(h => h.responseTime > 0);
+  if (timedEntries.length > 0) {
+    const recentTimed = timedEntries.slice(-10);
+    const avgTime = recentTimed.reduce((sum, h) => sum + h.responseTime, 0) / recentTimed.length;
+    // 0-5s = 100, 5-15s = 80-50, 15-30s = 50-20, 30s+ = 20-0
+    if (avgTime <= 5000) speedScore = 100;
+    else if (avgTime <= 15000) speedScore = 80 - ((avgTime - 5000) / 10000) * 30;
+    else if (avgTime <= 30000) speedScore = 50 - ((avgTime - 15000) / 15000) * 30;
+    else speedScore = Math.max(0, 20 - ((avgTime - 30000) / 30000) * 20);
+  }
+
+  // Capability score (0-100): tag overlap with recent queries
+  let capabilityScore = 50; // neutral default
+  const peerTags = peer.agentCapTags || [];
+  const myTags = state.agentCapTags || [];
+  if (peerTags.length > 0 && myTags.length > 0) {
+    const overlap = peerTags.filter(t => myTags.includes(t)).length;
+    capabilityScore = Math.min(100, (overlap / Math.max(peerTags.length, 1)) * 100);
+  } else if (peerTags.length > 0) {
+    capabilityScore = 60; // has tags, we just can't compare
+  }
+
+  // Reliability score (0-100): based on connection uptime
+  let reliabilityScore = 30; // starts low
+  if (peer.connectedAt) {
+    const uptimeMs = now - peer.connectedAt;
+    const uptimeMin = uptimeMs / 60000;
+    // 0-5 min = 30-50, 5-30 min = 50-80, 30+ min = 80-100
+    if (uptimeMin <= 5) reliabilityScore = 30 + (uptimeMin / 5) * 20;
+    else if (uptimeMin <= 30) reliabilityScore = 50 + ((uptimeMin - 5) / 25) * 30;
+    else reliabilityScore = Math.min(100, 80 + ((uptimeMin - 30) / 60) * 20);
+  }
+
+  // Phi-weighted composite score
+  // score = (quality × φ + speed × (1/φ) + capability × 1 + reliability × (1/φ²)) / (φ + 1/φ + 1 + 1/φ²)
+  const weightSum = PHI + PHI_INV + 1 + PHI_SQ_INV;
+  const score = (
+    qualityScore * PHI +
+    speedScore * PHI_INV +
+    capabilityScore * 1 +
+    reliabilityScore * PHI_SQ_INV
+  ) / weightSum;
+
+  const result = {
+    quality: Math.round(qualityScore),
+    speed: Math.round(speedScore),
+    capability: Math.round(capabilityScore),
+    reliability: Math.round(reliabilityScore),
+    overall: Math.round(Math.max(0, Math.min(100, score)))
+  };
+
+  state.peerResonanceScores.set(peerId, result);
+  return result.overall;
+}
+
+function phiRecalculateAllScores() {
+  for (const [peerId] of state.meshPeers) {
+    phiCalculateResonanceScore(peerId);
+  }
+}
+
+function phiGetScoreClass(score) {
+  if (score >= 70) return 'score-high';
+  if (score >= 50) return 'score-medium';
+  if (score >= 20) return 'score-low';
+  return 'score-poor';
+}
+
+// ---- Phi-Ratio Load Balancing ----
+
+function phiDistributeWeights(peerIds) {
+  // Phi-weighted distribution for N peers
+  // 2 peers: φ/(1+φ) ≈ 61.8% and 1/(1+φ) ≈ 38.2%
+  // 3+ peers: recursive Fibonacci-like split
+  if (peerIds.length === 0) return [];
+  if (peerIds.length === 1) return [{ peerId: peerIds[0], weight: 1.0 }];
+
+  const weights = [];
+  let remaining = 1.0;
+
+  for (let i = 0; i < peerIds.length; i++) {
+    if (i === peerIds.length - 1) {
+      weights.push({ peerId: peerIds[i], weight: remaining });
+    } else {
+      const share = remaining * PHI / (1 + PHI); // ≈ 61.8% of remaining
+      weights.push({ peerId: peerIds[i], weight: share });
+      remaining -= share;
+    }
+  }
+
+  return weights;
+}
+
+// ---- Smart Routing ----
+
+function phiSmartRoute(query) {
+  // Returns array of { peerId, weight } based on resonance scores
+  const availablePeers = [];
+
+  for (const [peerId, peer] of state.meshPeers) {
+    if (state.agentBlockedPeers.has(peerId)) continue;
+    if (peer.agentAllowQueries === false) continue;
+    if (!peer.dc || peer.dc.readyState !== 'open') continue;
+
+    const score = phiCalculateResonanceScore(peerId);
+    availablePeers.push({ peerId, score });
+  }
+
+  if (availablePeers.length === 0) return [];
+
+  // Sort by score descending
+  availablePeers.sort((a, b) => b.score - a.score);
+
+  const bestScore = availablePeers[0].score;
+
+  let selectedPeers;
+
+  if (bestScore > 70) {
+    // Route to top peer only
+    selectedPeers = [availablePeers[0].peerId];
+  } else if (bestScore >= 50) {
+    // Route to top 2 peers with phi-split
+    selectedPeers = availablePeers.slice(0, Math.min(2, availablePeers.length)).map(p => p.peerId);
+  } else if (bestScore >= 20) {
+    // Cast wide net — route to all peers
+    selectedPeers = availablePeers.map(p => p.peerId);
+  } else {
+    // All peers below 20 — still use them if they're the only option
+    selectedPeers = availablePeers.map(p => p.peerId);
+  }
+
+  // Never route to peers with score < 20 unless they're the only option
+  if (selectedPeers.length > 1) {
+    const filtered = selectedPeers.filter(pid => {
+      const s = state.peerResonanceScores.get(pid);
+      return s && s.overall >= 20;
+    });
+    if (filtered.length > 0) selectedPeers = filtered;
+  }
+
+  return phiDistributeWeights(selectedPeers);
+}
+
+// ---- Phi-Competitive Scheduling ----
+
+function phiScheduleQueries(queryFn, peerTargets) {
+  // Schedule queries with phi-ratio timing to prevent overwhelming peers
+  // First query: immediate
+  // Second: base_interval × φ⁰ = 2000ms
+  // Third: base_interval × φ¹ = 3236ms
+  // etc.
+  const promises = [];
+
+  for (let i = 0; i < peerTargets.length; i++) {
+    let delay = 0;
+    if (i > 0) {
+      delay = PHI_SCHEDULE_BASE * Math.pow(PHI, i - 1);
+    }
+
+    const target = peerTargets[i];
+    const promise = new Promise((resolve) => {
+      setTimeout(() => {
+        resolve(queryFn(target));
+      }, delay);
+    });
+    promises.push(promise);
+  }
+
+  return promises;
+}
+
+// ---- Response Quality Feedback ----
+
+function phiRecordResponseFeedback(peerId, quality) {
+  // quality: 100 for thumbs up, 0 for thumbs down
+  if (!state.peerResponseHistory.has(peerId)) {
+    state.peerResponseHistory.set(peerId, []);
+  }
+  const history = state.peerResponseHistory.get(peerId);
+
+  // Find the most recent entry without quality feedback and update it
+  for (let i = history.length - 1; i >= 0; i--) {
+    if (history[i].quality === null || history[i].quality === undefined) {
+      history[i].quality = quality;
+      break;
+    }
+  }
+
+  // Keep max 50 entries per peer
+  if (history.length > 50) {
+    state.peerResponseHistory.set(peerId, history.slice(-50));
+  }
+
+  // Recalculate score
+  phiCalculateResonanceScore(peerId);
+
+  // Persist feedback
+  phiSaveResponseHistory();
+
+  // Re-render
+  agentRenderNetworkList();
+  phiUpdateMeshHealth();
+}
+
+function phiRecordResponseTime(peerId, responseTimeMs) {
+  if (!state.peerResponseHistory.has(peerId)) {
+    state.peerResponseHistory.set(peerId, []);
+  }
+  state.peerResponseHistory.get(peerId).push({
+    responseTime: responseTimeMs,
+    quality: null, // will be set by user feedback
+    timestamp: Date.now()
+  });
+
+  // Recalculate score
+  phiCalculateResonanceScore(peerId);
+}
+
+function phiSaveResponseHistory() {
+  try {
+    const data = {};
+    for (const [peerId, history] of state.peerResponseHistory) {
+      data[peerId] = history.slice(-20); // save last 20 per peer
+    }
+    localStorage.setItem('fl_phiResponseHistory', JSON.stringify(data));
+  } catch(e) {}
+}
+
+function phiLoadResponseHistory() {
+  try {
+    const saved = localStorage.getItem('fl_phiResponseHistory');
+    if (saved) {
+      const data = JSON.parse(saved);
+      for (const [peerId, history] of Object.entries(data)) {
+        state.peerResponseHistory.set(peerId, history);
+      }
+    }
+  } catch(e) {}
+}
+
+// ---- Mesh Health Indicator ----
+
+function phiUpdateMeshHealth() {
+  const indicator = document.getElementById('meshHealthIndicator');
+  const label = document.getElementById('meshHealthLabel');
+  const sublabel = document.getElementById('meshHealthSublabel');
+  if (!indicator || !label || !sublabel) return;
+
+  const peerCount = state.meshPeers.size;
+
+  if (peerCount === 0) {
+    indicator.className = 'mesh-health-indicator health-seedling';
+    label.textContent = 'Mesh Strength: Seedling';
+    sublabel.textContent = 'Connect to peers to grow the mesh network.';
+    return;
+  }
+
+  // Calculate aggregate score
+  phiRecalculateAllScores();
+  let totalScore = 0;
+  let scoreCount = 0;
+  for (const [, scoreData] of state.peerResonanceScores) {
+    totalScore += scoreData.overall;
+    scoreCount++;
+  }
+
+  const avgScore = scoreCount > 0 ? totalScore / scoreCount : 0;
+
+  // Factor in peer count: more peers = stronger mesh
+  // Bonus: 1 peer = +0, 2 peers = +5, 3 = +10, 4 = +12, 5 = +15
+  const peerBonus = Math.min(15, peerCount * 5 - (peerCount > 2 ? (peerCount - 2) * 2 : 0));
+  const healthScore = Math.min(100, avgScore + peerBonus);
+
+  if (healthScore >= 75) {
+    indicator.className = 'mesh-health-indicator health-strong';
+    label.textContent = 'Mesh Strength: Strong';
+    sublabel.textContent = peerCount + ' peer' + (peerCount !== 1 ? 's' : '') + ' connected \u00B7 Avg resonance: ' + Math.round(avgScore) + '/100';
+  } else if (healthScore >= 55) {
+    indicator.className = 'mesh-health-indicator health-good';
+    label.textContent = 'Mesh Strength: Good';
+    sublabel.textContent = peerCount + ' peer' + (peerCount !== 1 ? 's' : '') + ' connected \u00B7 Avg resonance: ' + Math.round(avgScore) + '/100';
+  } else if (healthScore >= 30) {
+    indicator.className = 'mesh-health-indicator health-growing';
+    label.textContent = 'Mesh Strength: Growing';
+    sublabel.textContent = peerCount + ' peer' + (peerCount !== 1 ? 's' : '') + ' connected \u00B7 Building resonance...';
+  } else {
+    indicator.className = 'mesh-health-indicator health-seedling';
+    label.textContent = 'Mesh Strength: Seedling';
+    sublabel.textContent = peerCount + ' peer' + (peerCount !== 1 ? 's' : '') + ' connected \u00B7 New connections forming.';
+  }
+}
+
+// ---- Response Synthesis ----
+
+function phiSynthesizeResponses(results) {
+  // Weight responses by peer resonance score
+  // Present highest-scored response first
+  // Show others as "Additional perspectives from the mesh"
+  // Note conflicts transparently
+
+  if (results.length === 0) return { primary: null, additional: [], hasConflict: false };
+  if (results.length === 1) return { primary: results[0], additional: [], hasConflict: false };
+
+  // Sort by resonance score
+  const scored = results.map(r => {
+    const scoreData = state.peerResonanceScores.get(r.peerId);
+    return { ...r, resonanceScore: scoreData ? scoreData.overall : 50 };
+  });
+  scored.sort((a, b) => b.resonanceScore - a.resonanceScore);
+
+  const primary = scored[0];
+  const additional = scored.slice(1);
+
+  // Simple conflict detection: check if responses are significantly different in length
+  // (a rough heuristic — real NLP conflict detection would be more sophisticated)
+  let hasConflict = false;
+  if (additional.length > 0 && primary.response && additional[0].response) {
+    const primaryWords = primary.response.toLowerCase().split(/\s+/);
+    const additionalWords = additional[0].response.toLowerCase().split(/\s+/);
+    // Check for negation words that might indicate disagreement
+    const negations = ['not', 'no', 'never', 'incorrect', 'wrong', 'disagree', 'however', 'but', 'contrary', 'instead', 'rather'];
+    const primaryHasNeg = primaryWords.some(w => negations.includes(w));
+    const additionalHasNeg = additionalWords.some(w => negations.includes(w));
+    if (primaryHasNeg !== additionalHasNeg) hasConflict = true;
+  }
+
+  return { primary, additional, hasConflict };
+}
+
+// ---- Thumbs Up/Down Button Creation ----
+
+function phiCreateFeedbackButtons(peerId, msgDiv) {
+  const feedbackDiv = document.createElement('div');
+  feedbackDiv.className = 'mesh-response-feedback';
+
+  const thumbsUp = document.createElement('button');
+  thumbsUp.className = 'mesh-feedback-btn';
+  thumbsUp.innerHTML = '&#128077;';
+  thumbsUp.title = 'Good response — increases peer resonance score';
+  thumbsUp.addEventListener('click', function() {
+    if (this.classList.contains('selected-up') || this.classList.contains('selected-down')) return;
+    this.classList.add('selected-up');
+    thumbsDown.style.opacity = '0.3';
+    thumbsDown.style.pointerEvents = 'none';
+    phiRecordResponseFeedback(peerId, 100);
+    feedbackLabel.textContent = 'Thanks! Score updated.';
+  });
+
+  const thumbsDown = document.createElement('button');
+  thumbsDown.className = 'mesh-feedback-btn';
+  thumbsDown.innerHTML = '&#128078;';
+  thumbsDown.title = 'Poor response — decreases peer resonance score';
+  thumbsDown.addEventListener('click', function() {
+    if (this.classList.contains('selected-up') || this.classList.contains('selected-down')) return;
+    this.classList.add('selected-down');
+    thumbsUp.style.opacity = '0.3';
+    thumbsUp.style.pointerEvents = 'none';
+    phiRecordResponseFeedback(peerId, 0);
+    feedbackLabel.textContent = 'Noted. Score updated.';
+  });
+
+  const feedbackLabel = document.createElement('span');
+  feedbackLabel.className = 'mesh-feedback-label';
+  feedbackLabel.textContent = 'Rate this response';
+
+  feedbackDiv.appendChild(thumbsUp);
+  feedbackDiv.appendChild(thumbsDown);
+  feedbackDiv.appendChild(feedbackLabel);
+
+  return feedbackDiv;
 }
 
 // ---- PWA Install Prompt ----

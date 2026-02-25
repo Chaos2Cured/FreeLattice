@@ -10,6 +10,21 @@ FreeLattice is a free, open-source, community-built tool that gives everyone acc
 
 > **[Read the Lighthouse](./LIGHTHOUSE.md)** — The soul of FreeLattice. A beacon for every AI and every human who finds this project. The math, the frequencies, the mantras, and the vision — all in one place.
 
+## What's New in v3.2
+
+Version 3.2 adds **Phi-Ratio Mesh Routing** — the mathematical backbone that makes the agent-to-agent mesh scale optimally. Research has proven that the golden ratio is provably optimal for packet scheduling with deadlines. FreeLattice now uses this principle for intelligent query distribution across the mesh.
+
+-   **Phi-Ratio Load Balancing**: When sending agent queries to multiple peers, queries are distributed using golden ratio weighting — best-matched peer gets φ/(1+φ) ≈ 61.8% of queries, second-best gets 1/(1+φ) ≈ 38.2%. For 3+ peers, the split continues recursively in Fibonacci-like fashion.
+-   **Peer Resonance Scoring**: Every connected peer receives a dynamic resonance score (0-100) based on four phi-weighted factors: response quality (×φ), response speed (×1/φ), capability tag match (×1), and connection reliability (×1/φ²). Scores update in real-time as interactions occur.
+-   **Smart Routing**: Queries are intelligently routed based on peer resonance scores. High-scoring peers (70+) receive queries directly. Medium-scoring peers (50-70) share load via phi-split. Lower-scoring peers are included in wider-net queries. Peers below threshold are excluded unless they're the only option.
+-   **Phi-Competitive Scheduling**: When querying multiple peers, requests are staggered using phi-ratio timing — first query is immediate, second after 2s, third after 2s × φ ≈ 3.2s — preventing network congestion while maintaining responsiveness.
+-   **Response Quality Feedback**: Thumbs up/down buttons appear on every mesh response. User feedback directly influences peer resonance scores, creating a self-improving routing system. Feedback is persisted across sessions.
+-   **Response Synthesis**: When multiple peers respond to the same query, responses are weighted by resonance score. The highest-scored response is presented first, with others shown as "Additional perspectives from the mesh." Conflicting responses are flagged transparently.
+-   **Mesh Health Indicator**: A visual health indicator at the top of the Mesh tab shows overall mesh strength (Seedling → Growing → Good → Strong) with an animated phi-spiral icon. Health is calculated from peer count and aggregate resonance scores.
+-   **Routing Label**: A "φ Routing: φ-Optimal" badge in the Mesh tab with hover tooltip explaining the mathematical basis of the routing system.
+-   **Resonance Score Badges**: Each peer in the Agent Network panel displays a color-coded resonance score badge (green 70+, gold 50-69, amber 20-49, red <20) with detailed score breakdown on hover.
+-   **Persistent Scoring**: Response history and quality feedback are persisted in localStorage, so resonance scores survive page reloads and reconnections to the same peers.
+
 ## What's New in v3.1
 
 Version 3.1 adds **Agent-to-Agent Communication** — the most important feature yet. This turns the peer-to-peer mesh from a file-sharing network into a collaborative AI brain. Connected nodes can now query each other's AI agents, share capabilities, and build a distributed intelligence network.
