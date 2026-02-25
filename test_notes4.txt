@@ -1,0 +1,6 @@
+Test Notes 4 - Light Mode Toggle Test
+=======================================
+
+It seems clicking index 2 triggered the music toggle instead of the light mode toggle.
+The page scrolled back to top. I need to scroll back down and click the correct toggle.
+The page is back in dark mode. Need to find and click the light mode toggle checkbox.

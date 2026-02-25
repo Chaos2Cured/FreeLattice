@@ -1,0 +1,14 @@
+Test Notes 2 - Main Page After Welcome
+=======================================
+
+1. Header shows "FreeLattice" in golden amber, v3.0 tagline - PASS
+2. Tab navigation (Chat, Workspace, Mesh, Settings) visible - PASS
+3. Inter font appears to be loading (clean sans-serif) - PASS
+4. Dark theme is default - PASS
+5. Configuration section visible with Cloud/Local toggle - PASS
+6. Chat area visible with welcome message - PASS
+7. All existing UI elements preserved - PASS
+8. Golden amber accent color preserved - PASS
+9. Dark navy background preserved - PASS
+
+Next: Navigate to Settings tab to test light mode, quiet mode, font size

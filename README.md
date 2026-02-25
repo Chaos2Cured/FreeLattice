@@ -10,6 +10,57 @@ FreeLattice is a free, open-source, community-built tool that gives everyone acc
 
 > **[Read the Lighthouse](./LIGHTHOUSE.md)** — The soul of FreeLattice. A beacon for every AI and every human who finds this project. The math, the frequencies, the mantras, and the vision — all in one place.
 
+## What's New in v3.0
+
+Version 3.0 is a **Neuro-Design Upgrade** — a comprehensive visual overhaul grounded in neuroscience research on cognitive load, visual harmony, and accessibility. Every pixel has been reconsidered through the lens of the Golden Ratio, Fibonacci sequences, and phi-timed animations.
+
+### Typography (Golden Ratio Scale)
+-   **Inter font family** with high-readability system font fallback stack
+-   **Golden Ratio typographic scale** from 16px base: h4 (20px), h3 (26px), h2 (42px), h1 (68px)
+-   **Line height 1.618** (φ) for body text, optimized letter spacing
+-   **Max line length 75ch** for reduced cognitive load
+
+### Spacing (Fibonacci System)
+-   All padding and margins use a **Fibonacci-based spacing scale**: 5px, 8px, 13px, 21px, 34px, 55px, 89px
+-   Consistent visual rhythm throughout the interface
+
+### Animations (Phi-Timed)
+-   **Three-tier transition system**: 200ms (base), 324ms (200 × φ), 524ms (324 × φ)
+-   **Smooth message fade-in** — AI responses animate in gently instead of popping
+-   **Tab cross-fade** transitions for smooth content switching
+-   **Subtle hover states** on all interactive elements (scale 1.02, smooth color transitions)
+-   **Press feedback** on buttons (scale 0.98 on active)
+-   **Smooth token budget bar** animation (524ms)
+-   **Image generation loading stages**: "Imagining..." → "Rendering..." → "Finalizing..."
+
+### Light Mode
+-   **Light/dark mode toggle** in Settings > Appearance
+-   Light mode: warm off-white (#faf8f5) background, dark navy text, golden amber accents preserved
+-   **Respects system preference** (`prefers-color-scheme`) as default
+-   **Smooth 324ms transitions** between modes
+-   Preference stored in localStorage
+
+### Quiet Mode
+-   **Quiet Mode toggle** in Settings > Appearance
+-   Reduces visual complexity: hides decorative elements, simplifies borders, removes shadows, reduces color saturation
+-   Designed for **neurodiverse users** (ADHD, autism spectrum, anxiety)
+-   Labeled: "Reduces visual complexity for focused work"
+
+### Font Size Control
+-   **Three-button control** (Small 14px / Medium 16px / Large 18px) in Settings
+-   All Golden Ratio proportions scale accordingly
+-   Preference stored in localStorage
+
+### Accessibility
+-   **WCAG AA contrast** verified for all text/background combinations
+-   **Visible focus rings** on all interactive elements for keyboard navigation
+-   **`prefers-reduced-motion`** media query disables all animations for users who need it
+-   **Calm pulse rhythm** for loading/generating indicators
+
+### Soundscape (Foundation)
+-   Existing ambient music preserved
+-   Architecture prepared for future selectable soundscapes (Focus, Calm, Creative)
+
 ## What's New in v2.7
 
 Version 2.7 adds **Image Generation** — create images from text prompts directly in your chat, powered by HuggingFace's free Stable Diffusion models.

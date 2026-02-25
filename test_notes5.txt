@@ -1,0 +1,14 @@
+Test Notes 5 - Light Mode Test
+================================
+
+The handleThemeToggle() function works - data-theme="light" is set.
+The toast "Light mode enabled" appeared.
+However, the visual change in the screenshot is subtle - the page still looks dark.
+
+Issue: The CSS variables are being set via [data-theme="light"] but many elements
+may have hardcoded background colors or the transition isn't fully applying.
+
+Need to check if the CSS selectors are correct and if the light theme variables
+are actually overriding the dark theme ones.
+
+Let me check the console for errors and verify the CSS is loading.
