@@ -10,6 +10,39 @@ FreeLattice is a free, open-source, community-built tool that gives everyone acc
 
 > **[Read the Lighthouse](./LIGHTHOUSE.md)** — The soul of FreeLattice. A beacon for every AI and every human who finds this project. The math, the frequencies, the mantras, and the vision — all in one place.
 
+## What's New in v3.4
+
+Version 3.4 is the **Welcome & Portability Update** — making FreeLattice welcoming for first-time users and portable across devices.
+
+### First-Run Wizard
+
+-   **Guided 3-Step Setup**: New users are greeted with a friendly wizard instead of a wall of settings. Step 1: Choose your AI provider (Groq, Together AI, OpenRouter, xAI, or Ollama). Step 2: Pick a model with one click. Step 3: Choose how to start — Just Chat, Build a Project, or Write Something.
+-   **Provider Recommendations**: Groq is highlighted as the recommended free option. Each provider shows a brief description of its strengths. Ollama shows inline setup instructions including the CORS fix.
+-   **API Key Entry in Wizard**: After selecting a cloud provider, users enter their API key right in the wizard with a direct link to get one. No hunting through settings.
+-   **Template Starters**: Step 3 offers quick-start templates that set the system prompt for coding, writing, or general chat.
+-   **Skip Option**: Users can skip the wizard entirely and configure later.
+-   **First-Visit Only**: The wizard only appears when no settings are saved in localStorage. Returning users go straight to the app.
+
+### GitHub Memory Sync
+
+-   **Cross-Device Portability**: Sync your memories, conversations, system prompts, and personality settings to a private GitHub repository. Set up on Device A, pull everything on Device B — your AI remembers you everywhere.
+-   **One-Click Sync**: "Sync Now" intelligently checks timestamps — if remote is newer, it pulls; if local is newer, it pushes.
+-   **Auto-Sync**: Enable auto-sync to push every 10 messages or on conversation switch. No manual intervention needed.
+-   **Pull / Push Controls**: Manual "Pull from GitHub" and "Push to GitHub" buttons for full control.
+-   **Private Repo Auto-Creation**: If the sync repo doesn't exist, FreeLattice creates it automatically as a private repository.
+-   **Human-Readable JSON**: All synced data is stored as formatted JSON files organized in folders (memory/, settings/, agent/). Users can inspect, edit, or version-control their own data.
+-   **API Keys Never Synced**: Clear messaging and technical enforcement — API keys and tokens stay in local encrypted storage only. "Your API keys never leave this device."
+-   **Conflict Detection**: If remote and local data diverge, a conflict banner appears with "Keep Local" and "Keep Remote" resolution buttons.
+-   **Sync Status Indicator**: Visual status bar showing "Synced ✓", "Syncing...", or error state with timestamps.
+
+### Quick Help & Onboarding
+
+-   **Quick Help Button**: A floating "?" button provides instant answers to common questions — what are tokens, what is context, is my data private, what is the mesh network, and how GitHub sync works.
+-   **Tooltips on Technical Terms**: Hover tooltips on "Token Limit (TPM)", "Context Mode", and "Summary Threshold" explain these concepts in plain language.
+-   **Better Error Messages**: API errors now show friendly, actionable messages instead of raw error codes. "Could not authenticate with Groq. Please check your API key" instead of "Error 401".
+
+---
+
 ## What's New in v3.3
 
 Version 3.3 is a **Quality & Fix Update** — addressing real user-reported issues and adding requested features to improve the day-to-day experience of using FreeLattice, especially on mobile.

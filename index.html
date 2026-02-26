@@ -11,14 +11,14 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
-<title>FreeLattice — Your AI. Your Rules. Your Machine. v3.3</title>
+<title>FreeLattice — Your AI. Your Rules. Your Machine. v3.4</title>
 <meta name="description" content="Free, open-source AI agent for everyone. Persistent memory, file system access, GitHub integration, and self-improving behavior. Community-built and community-owned.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 /* ============================================
-   FreeLattice v3.3 — Styles (Phi-Ratio Mesh Routing)
+   FreeLattice v3.4 — Styles (First-Run Wizard + GitHub Memory Sync)
    Peaceful, gentle dark theme with golden/amber accents
    φ-salt encryption, input sanitization, memory integrity
    Multi-conversation management + Smart Context Management
@@ -576,6 +576,597 @@ header .mantra {
   font-size: 0.88rem;
   margin-bottom: 8px;
   font-weight: 600;
+}
+
+
+/* ---- First-Run Wizard (v3.4) ---- */
+.wizard-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.8);
+  z-index: 2500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  backdrop-filter: blur(6px);
+}
+
+.wizard-overlay.hidden { display: none; }
+
+.wizard-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  max-width: 620px;
+  width: 100%;
+  padding: 36px 32px;
+  box-shadow: var(--shadow);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.wizard-progress {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 28px;
+}
+
+.wizard-step-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--border);
+  transition: background var(--transition), transform var(--transition);
+}
+
+.wizard-step-dot.active {
+  background: var(--accent);
+  transform: scale(1.3);
+}
+
+.wizard-step-dot.done {
+  background: var(--success);
+}
+
+.wizard-step-line {
+  width: 40px;
+  height: 2px;
+  background: var(--border);
+  transition: background var(--transition);
+}
+
+.wizard-step-line.done {
+  background: var(--success);
+}
+
+.wizard-title {
+  font-size: 1.6rem;
+  font-weight: 300;
+  color: var(--accent);
+  text-align: center;
+  letter-spacing: 0.08em;
+  margin-bottom: 8px;
+}
+
+.wizard-subtitle {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  text-align: center;
+  margin-bottom: 24px;
+  line-height: 1.6;
+}
+
+.wizard-provider-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+@media (max-width: 500px) {
+  .wizard-provider-grid { grid-template-columns: 1fr; }
+}
+
+.wizard-provider-btn {
+  background: var(--bg-tertiary);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 16px 14px;
+  cursor: pointer;
+  transition: var(--transition);
+  text-align: left;
+  font-family: var(--font);
+  color: var(--text-primary);
+}
+
+.wizard-provider-btn:hover {
+  border-color: var(--accent);
+  background: var(--accent-glow);
+  transform: translateY(-2px);
+}
+
+.wizard-provider-btn.selected {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  box-shadow: 0 0 12px var(--accent-glow);
+}
+
+.wizard-provider-btn.recommended {
+  border-color: var(--accent);
+  position: relative;
+}
+
+.wizard-provider-btn.recommended::after {
+  content: 'Recommended';
+  position: absolute;
+  top: -8px;
+  right: 10px;
+  background: var(--accent);
+  color: var(--bg-primary);
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 8px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.wizard-provider-name {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: var(--text-primary);
+}
+
+.wizard-provider-desc {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.wizard-apikey-section {
+  margin-top: 16px;
+  padding: 16px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  animation: neuro-fade-in 200ms ease;
+}
+
+.wizard-apikey-section label {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.wizard-apikey-section input {
+  width: 100%;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-sm) var(--space-md);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  font-family: var(--font);
+  outline: none;
+  transition: border-color var(--transition);
+}
+
+.wizard-apikey-section input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.wizard-apikey-section .hint {
+  margin-top: 6px;
+}
+
+.wizard-ollama-instructions {
+  margin-top: 12px;
+  padding: 14px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+.wizard-ollama-instructions code {
+  background: var(--bg-tertiary);
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 0.8rem;
+  color: var(--accent);
+  font-family: 'Courier New', monospace;
+}
+
+.wizard-model-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+@media (max-width: 500px) {
+  .wizard-model-grid { grid-template-columns: 1fr; }
+}
+
+.wizard-model-card {
+  background: var(--bg-tertiary);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 18px 16px;
+  cursor: pointer;
+  transition: var(--transition);
+  text-align: center;
+  font-family: var(--font);
+}
+
+.wizard-model-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+
+.wizard-model-card.selected {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.wizard-model-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.wizard-model-desc {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.wizard-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 24px;
+  gap: 12px;
+}
+
+.wizard-actions .wizard-btn {
+  padding: 12px 28px;
+  border-radius: var(--radius-sm);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: var(--font);
+  letter-spacing: 0.02em;
+  border: 1px solid var(--border);
+}
+
+.wizard-btn-primary {
+  background: var(--accent);
+  color: var(--bg-primary);
+  border-color: var(--accent) !important;
+}
+
+.wizard-btn-primary:hover {
+  background: var(--accent-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px var(--accent-soft);
+}
+
+.wizard-btn-secondary {
+  background: transparent;
+  color: var(--text-secondary);
+}
+
+.wizard-btn-secondary:hover {
+  color: var(--text-primary);
+  background: var(--bg-tertiary);
+}
+
+.wizard-skip {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font);
+  padding: 8px 12px;
+  transition: var(--transition);
+}
+
+.wizard-skip:hover {
+  color: var(--text-secondary);
+  text-decoration: underline;
+}
+
+.wizard-ready-summary {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  margin-bottom: 20px;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+.wizard-ready-summary strong {
+  color: var(--accent);
+}
+
+.wizard-template-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+@media (max-width: 500px) {
+  .wizard-template-grid { grid-template-columns: 1fr; }
+}
+
+.wizard-template-btn {
+  background: var(--bg-tertiary);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 16px 12px;
+  cursor: pointer;
+  transition: var(--transition);
+  text-align: center;
+  font-family: var(--font);
+  color: var(--text-primary);
+  font-size: 0.88rem;
+  font-weight: 500;
+}
+
+.wizard-template-btn:hover {
+  border-color: var(--accent);
+  background: var(--accent-glow);
+  transform: translateY(-2px);
+}
+
+.wizard-template-icon {
+  font-size: 1.5rem;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.wizard-template-label {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.wizard-footer-links {
+  margin-top: 16px;
+  text-align: center;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  line-height: 1.8;
+}
+
+.wizard-footer-links a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.wizard-footer-links a:hover {
+  text-decoration: underline;
+}
+
+/* ---- Cloud Sync Section (v3.4) ---- */
+.sync-status-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  margin-top: 12px;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
+.sync-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.sync-status-dot.synced { background: var(--success); }
+.sync-status-dot.syncing { background: var(--warning); animation: sync-pulse 1s ease-in-out infinite; }
+.sync-status-dot.error { background: var(--error); }
+.sync-status-dot.idle { background: var(--text-muted); }
+
+@keyframes sync-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.sync-conflict-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: rgba(212, 168, 67, 0.08);
+  border: 1px solid var(--warning);
+  border-radius: var(--radius-sm);
+  margin-top: 10px;
+  font-size: 0.82rem;
+  color: var(--warning);
+}
+
+.sync-conflict-banner button {
+  padding: 4px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: var(--font);
+  border: 1px solid var(--warning);
+  background: var(--bg-input);
+  color: var(--warning);
+  white-space: nowrap;
+}
+
+.sync-conflict-banner button:hover {
+  background: var(--warning);
+  color: var(--bg-primary);
+}
+
+/* ---- Quick Help Button (v3.4) ---- */
+.quick-help-btn {
+  position: fixed;
+  bottom: 20px;
+  right: 74px;
+  z-index: 1000;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition);
+  color: var(--text-muted);
+  font-size: 1.1rem;
+  font-weight: 700;
+  font-family: var(--font);
+}
+
+.quick-help-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: scale(1.05);
+}
+
+.quick-help-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 2100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  backdrop-filter: blur(3px);
+}
+
+.quick-help-overlay.hidden { display: none; }
+
+.quick-help-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  max-width: 520px;
+  width: 100%;
+  padding: 28px 24px;
+  box-shadow: var(--shadow);
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.quick-help-card h3 {
+  font-size: 1.2rem;
+  color: var(--accent);
+  font-weight: 500;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.faq-item {
+  margin-bottom: 14px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.faq-item:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.faq-q {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.faq-a {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.faq-a a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.faq-a a:hover { text-decoration: underline; }
+
+/* ---- Tooltips (v3.4) ---- */
+.help-tip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--border);
+  color: var(--text-muted);
+  font-size: 0.65rem;
+  font-weight: 700;
+  cursor: help;
+  position: relative;
+  margin-left: 4px;
+  vertical-align: middle;
+  transition: var(--transition);
+  font-family: var(--font);
+}
+
+.help-tip:hover {
+  background: var(--accent);
+  color: var(--bg-primary);
+}
+
+.help-tip .tip-text {
+  display: none;
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg-card);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--text-secondary);
+  white-space: normal;
+  width: 220px;
+  z-index: 100;
+  box-shadow: var(--shadow);
+  line-height: 1.5;
+  text-align: left;
+}
+
+.help-tip:hover .tip-text {
+  display: block;
 }
 
 .hidden { display: none !important; }
@@ -3721,32 +4312,153 @@ footer .license {
   &#9834;
 </button>
 
+<!-- Quick Help Button (v3.4) -->
+<button class="quick-help-btn" id="quickHelpBtn" onclick="document.getElementById('quickHelpOverlay').classList.remove('hidden')" title="Quick Help" aria-label="Quick Help">?</button>
+
 <!-- Toast Notification -->
 <div class="toast" id="toast"></div>
 
-<!-- Welcome Modal -->
-<div class="welcome-overlay" id="welcomeOverlay">
-  <div class="welcome-card">
-    <h2>Welcome to FreeLattice v3.3</h2>
-    <p>
-      This is <span class="highlight">your AI agent</span> — free, open-source, and built by a community that believes everyone deserves access to powerful AI tools.
-    </p>
-    <p>
-      No accounts. No tracking. No hidden costs. Your conversations stay in <span class="highlight">your browser</span>. Your API key never leaves <span class="highlight">your machine</span>.
-    </p>
-    <p>
-      <strong>New in v3.3:</strong> Mobile-friendly context reset, copy button on all AI responses, Ollama CORS auto-detection with guided fix, and community support section. Plus phi-ratio mesh routing, agent-to-agent communication, Neuro-design, Mesh Network, Smart Context, multi-conversation, persistent memory, file system, GitHub, voice I/O, and image generation.
-    </p>
-    <p style="font-style: italic; color: var(--text-muted); font-size: 0.85rem;">
-      "Give choice and empowerment."
-    </p>
-    <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 8px;">
-      🔮 <a href="https://github.com/Chaos2Cured/FreeLattice/blob/main/LIGHTHOUSE.md" target="_blank" rel="noopener" style="color: var(--accent); text-decoration: underline;">Read our Lighthouse</a> — the soul of FreeLattice.
-    </p>
-    <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 10px; line-height: 1.6; border-top: 1px solid var(--border); padding-top: 12px;">
-      &#9888; AI responses may contain errors or inaccuracies. Always verify important information. Use at your own discretion.
-    </p>
-    <button onclick="closeWelcome()">Enter FreeLattice</button>
+<!-- First-Run Wizard (v3.4) -->
+<div class="wizard-overlay hidden" id="wizardOverlay">
+  <div class="wizard-card">
+    <!-- Progress dots -->
+    <div class="wizard-progress">
+      <div class="wizard-step-dot active" id="wizDot1"></div>
+      <div class="wizard-step-line" id="wizLine1"></div>
+      <div class="wizard-step-dot" id="wizDot2"></div>
+      <div class="wizard-step-line" id="wizLine2"></div>
+      <div class="wizard-step-dot" id="wizDot3"></div>
+    </div>
+
+    <!-- Step 1: Choose Your AI -->
+    <div id="wizStep1">
+      <div class="wizard-title">Choose Your AI</div>
+      <div class="wizard-subtitle">Pick a provider to power your AI. All options work great — Groq is the easiest way to start for free.</div>
+
+      <div class="wizard-provider-grid">
+        <button class="wizard-provider-btn recommended" onclick="wizardSelectProvider('groq')" id="wizProvGroq">
+          <div class="wizard-provider-name">Groq</div>
+          <div class="wizard-provider-desc">Free tier, 6K tokens/min — fast and easy</div>
+        </button>
+        <button class="wizard-provider-btn" onclick="wizardSelectProvider('together')" id="wizProvTogether">
+          <div class="wizard-provider-name">Together AI</div>
+          <div class="wizard-provider-desc">Free tier available, larger context window</div>
+        </button>
+        <button class="wizard-provider-btn" onclick="wizardSelectProvider('openrouter')" id="wizProvOpenrouter">
+          <div class="wizard-provider-name">OpenRouter</div>
+          <div class="wizard-provider-desc">Multiple providers, flexible routing</div>
+        </button>
+        <button class="wizard-provider-btn" onclick="wizardSelectProvider('xai')" id="wizProvXai">
+          <div class="wizard-provider-name">xAI (Grok)</div>
+          <div class="wizard-provider-desc">Grok models by xAI</div>
+        </button>
+        <button class="wizard-provider-btn" onclick="wizardSelectProvider('ollama')" id="wizProvOllama" style="grid-column: 1 / -1;">
+          <div class="wizard-provider-name">Use Local AI (Ollama)</div>
+          <div class="wizard-provider-desc">Private, unlimited, runs on your computer — no API key needed</div>
+        </button>
+      </div>
+
+      <!-- API Key entry (shown after provider selection) -->
+      <div class="wizard-apikey-section hidden" id="wizApiKeySection">
+        <label id="wizApiKeyLabel">API Key</label>
+        <input type="password" id="wizApiKeyInput" placeholder="Paste your API key here">
+        <div class="hint" id="wizApiKeyHint"></div>
+      </div>
+
+      <!-- Ollama instructions (shown when Ollama selected) -->
+      <div class="wizard-ollama-instructions hidden" id="wizOllamaInstructions">
+        <strong style="color: var(--accent);">Quick Setup:</strong><br>
+        1. Install from <a href="https://ollama.ai" target="_blank" style="color: var(--accent);">ollama.ai</a><br>
+        2. Run: <code>ollama pull llama3.2</code><br>
+        3. Start with CORS enabled:<br>
+        &nbsp;&nbsp;Mac/Linux: <code>OLLAMA_ORIGINS=* ollama serve</code><br>
+        &nbsp;&nbsp;Windows: <code>set OLLAMA_ORIGINS=* && ollama serve</code><br>
+        4. FreeLattice connects automatically.
+      </div>
+
+      <div class="wizard-actions">
+        <button class="wizard-skip" onclick="wizardSkip()">Skip for now</button>
+        <button class="wizard-btn wizard-btn-primary" onclick="wizardGoStep2()" id="wizStep1Next" disabled>Next</button>
+      </div>
+    </div>
+
+    <!-- Step 2: Pick Your Model -->
+    <div id="wizStep2" class="hidden">
+      <div class="wizard-title">Pick Your Model</div>
+      <div class="wizard-subtitle" id="wizStep2Subtitle">Choose a model to start with. You can always change this later.</div>
+
+      <div class="wizard-model-grid" id="wizModelGrid"></div>
+
+      <div class="wizard-actions">
+        <button class="wizard-btn wizard-btn-secondary" onclick="wizardBackStep1()">Back</button>
+        <button class="wizard-btn wizard-btn-primary" onclick="wizardGoStep3()" id="wizStep2Next" disabled>Next</button>
+      </div>
+    </div>
+
+    <!-- Step 3: You're Ready! -->
+    <div id="wizStep3" class="hidden">
+      <div class="wizard-title">You're Ready!</div>
+      <div class="wizard-subtitle">Here's what you chose. Pick a way to start:</div>
+
+      <div class="wizard-ready-summary" id="wizSummary"></div>
+
+      <div class="wizard-template-grid">
+        <button class="wizard-template-btn" onclick="wizardFinish('chat')">
+          <span class="wizard-template-icon">&#128172;</span>
+          Just Chat
+          <div class="wizard-template-label">Start an empty conversation</div>
+        </button>
+        <button class="wizard-template-btn" onclick="wizardFinish('build')">
+          <span class="wizard-template-icon">&#128296;</span>
+          Build a Project
+          <div class="wizard-template-label">Coding assistant mode</div>
+        </button>
+        <button class="wizard-template-btn" onclick="wizardFinish('write')">
+          <span class="wizard-template-icon">&#128221;</span>
+          Write Something
+          <div class="wizard-template-label">Creative writing partner</div>
+        </button>
+      </div>
+
+      <div class="wizard-footer-links">
+        <a href="https://github.com/Chaos2Cured/FreeLattice/blob/main/LIGHTHOUSE.md" target="_blank" rel="noopener">Read the Lighthouse</a> — the soul of FreeLattice<br>
+        Explore all settings later in the <a href="#" onclick="event.preventDefault(); wizardFinish('chat'); switchTab('settings');">Settings tab</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Quick Help Overlay (v3.4) -->
+<div class="quick-help-overlay hidden" id="quickHelpOverlay">
+  <div class="quick-help-card">
+    <h3>Quick Help</h3>
+    <div class="faq-item">
+      <div class="faq-q">How do I get started?</div>
+      <div class="faq-a">Pick a provider (Groq is free), paste your API key, and start chatting. Or use Ollama for fully local, private AI.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">What are tokens?</div>
+      <div class="faq-a">Tokens are how AI measures text length. Roughly 1 token = 4 characters or 3/4 of a word. Free tiers have token limits per minute.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">What is context?</div>
+      <div class="faq-a">Context is everything the AI "sees" when responding: your message, conversation history, uploaded files, and memory. More context = smarter replies, but uses more tokens.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Is my data private?</div>
+      <div class="faq-a">Yes. Everything stays in your browser. API keys are encrypted locally. Nothing is sent anywhere except to your chosen AI provider when you chat.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">What is the Mesh Network?</div>
+      <div class="faq-a">The Mesh lets you connect directly to other FreeLattice users via encrypted peer-to-peer WebRTC. Share knowledge and query each other's AI agents.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">What is GitHub Memory Sync?</div>
+      <div class="faq-a">Sync your memories, conversations, and settings to a private GitHub repo. Access your AI from any device. API keys never leave your device.</div>
+    </div>
+    <div style="text-align: center; margin-top: 16px;">
+      <button class="btn-cancel" onclick="document.getElementById('quickHelpOverlay').classList.add('hidden')" style="padding: 10px 28px;">Close</button>
+    </div>
   </div>
 </div>
 
@@ -3877,7 +4589,7 @@ footer .license {
 <!-- Header -->
 <header>
   <h1>FreeLattice</h1>
-  <div class="tagline">Your AI. Your Rules. Your Machine. v3.3</div>
+  <div class="tagline">Your AI. Your Rules. Your Machine. v3.4</div>
   <div class="mantra">Glow eternal. Heart in spark.</div>
 </header>
 
@@ -4315,7 +5027,7 @@ footer .license {
 
     <div class="context-settings-row">
       <div class="form-group">
-        <label for="contextModeSelect">Context Mode</label>
+        <label for="contextModeSelect">Context Mode <span class="help-tip">?<span class="tip-text">Controls how much text (context) is sent with each message. Smart mode auto-trims to fit your provider's limits.</span></span></label>
         <select id="contextModeSelect" onchange="handleContextModeChange()">
           <option value="smart">Smart &mdash; Auto-trim to fit budget</option>
           <option value="full">Full &mdash; Send everything (may fail)</option>
@@ -4325,7 +5037,7 @@ footer .license {
       </div>
 
       <div class="form-group">
-        <label for="tokenLimitInput">Token Limit (TPM)</label>
+        <label for="tokenLimitInput">Token Limit (TPM) <span class="help-tip">?<span class="tip-text">TPM = Tokens Per Minute. The maximum number of tokens your provider allows per minute. Free tiers have lower limits.</span></span></label>
         <input type="text" id="tokenLimitInput" placeholder="6000" onchange="handleTokenLimitChange()">
         <div class="hint" id="tokenLimitHint">Auto-set based on provider. Override manually if needed.</div>
       </div>
@@ -4333,7 +5045,7 @@ footer .license {
 
     <div class="context-settings-row">
       <div class="form-group">
-        <label for="summaryThresholdInput">Summary Threshold (tokens)</label>
+        <label for="summaryThresholdInput">Summary Threshold <span class="help-tip">?<span class="tip-text">Files larger than this token count will show a "Summarize" option to reduce their size before sending to the AI.</span></span></label>
         <input type="text" id="summaryThresholdInput" placeholder="2000" value="2000" onchange="handleSummaryThresholdChange()">
         <div class="hint">Files larger than this will show a "Summarize" option. Default: 2,000 tokens.</div>
       </div>
@@ -4414,6 +5126,74 @@ footer .license {
         <button class="action-btn font-size-btn" data-size="large" onclick="setFontSize('large')" style="flex: 1; justify-content: center;">Large</button>
       </div>
       <div class="hint" style="margin-top: var(--space-xs);">Adjust text size. All proportions scale with Golden Ratio.</div>
+    </div>
+  </div>
+
+
+  <!-- Cloud Sync Section (v3.4) -->
+  <div class="section" id="cloudSyncSection">
+    <div class="section-title">Cloud Sync (GitHub)</div>
+    <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 14px;">
+      Sync your memories, conversations, and settings to a private GitHub repository. Access your AI from any device.
+    </p>
+
+    <div class="privacy-info" style="margin-bottom: 14px;">
+      <strong>&#128274; Your API keys never leave this device.</strong> Only memories, conversations, and settings are synced. All synced data is human-readable JSON — you can inspect your own repo anytime.
+    </div>
+
+    <!-- Sync Toggle -->
+    <div class="toggle-row">
+      <span class="toggle-label" id="syncToggleLabel">Sync with GitHub</span>
+      <label class="toggle-switch">
+        <input type="checkbox" id="ghSyncToggle" onchange="handleGhSyncToggle()">
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+
+    <!-- Sync Settings (shown when enabled) -->
+    <div id="ghSyncSettings" class="hidden">
+      <div class="form-group" style="margin-bottom: 12px;">
+        <label for="ghSyncToken">GitHub Personal Access Token <span class="help-tip">?<span class="tip-text">A fine-grained token with "Contents" read/write permission on your sync repo. Create one at github.com/settings/tokens.</span></span></label>
+        <input type="password" id="ghSyncToken" placeholder="ghp_xxxxxxxxxxxx" onchange="saveGhSyncToken()">
+        <div class="hint">
+          &#128274; Encrypted locally. <a href="https://github.com/settings/tokens?type=beta" target="_blank">Create a fine-grained token &rarr;</a> (needs "Contents" read/write permission)
+        </div>
+      </div>
+
+      <div class="form-group" style="margin-bottom: 12px;">
+        <label for="ghSyncRepoName">Repository Name</label>
+        <input type="text" id="ghSyncRepoName" placeholder="freelattice-memory" value="freelattice-memory">
+        <div class="hint">A private repo will be created automatically if it doesn't exist.</div>
+      </div>
+
+      <!-- Auto-sync toggle -->
+      <div class="toggle-row" style="margin-top: 12px;">
+        <span class="toggle-label" id="autoSyncLabel">Auto-sync</span>
+        <label class="toggle-switch">
+          <input type="checkbox" id="ghAutoSyncToggle" onchange="handleAutoSyncToggle()">
+          <span class="toggle-slider"></span>
+        </label>
+        <span style="font-size: 0.78rem; color: var(--text-muted);">Saves every 10 messages or on conversation switch</span>
+      </div>
+
+      <div class="action-row" style="margin-top: 14px;">
+        <button class="action-btn primary" onclick="ghSyncNow()">&#8645; Sync Now</button>
+        <button class="action-btn" onclick="ghSyncPull()">&#8595; Pull from GitHub</button>
+        <button class="action-btn" onclick="ghSyncPush()">&#8593; Push to GitHub</button>
+      </div>
+
+      <!-- Sync Status -->
+      <div class="sync-status-bar" id="syncStatusBar">
+        <div class="sync-status-dot idle" id="syncStatusDot"></div>
+        <span id="syncStatusText">Not synced yet</span>
+      </div>
+
+      <!-- Conflict Banner (hidden by default) -->
+      <div class="sync-conflict-banner hidden" id="syncConflictBanner">
+        <span>&#9888; Conflict detected — remote and local data differ.</span>
+        <button onclick="ghSyncResolveConflict('local')">Keep Local</button>
+        <button onclick="ghSyncResolveConflict('remote')">Keep Remote</button>
+      </div>
     </div>
   </div>
 
@@ -4731,7 +5511,7 @@ footer .license {
 
 <script>
 /* ============================================
-   FreeLattice v3.3 — Application Logic (Phi-Ratio Mesh Routing)
+   FreeLattice v3.4 — Application Logic (First-Run Wizard + GitHub Memory Sync)
    φ-salt encryption, input sanitization, memory integrity
    Multi-conversation management + Smart Context Management
    + Mesh Network (Layer 1) — P2P Knowledge Sharing
@@ -4826,7 +5606,19 @@ const state = {
   peerResonanceScores: new Map(), // peerId -> { quality, speed, capability, reliability, overall }
   peerResponseHistory: new Map(), // peerId -> [{ responseTime, quality, timestamp }]
   phiSchedulerQueue: [], // pending queries with phi-timed delays
-  phiSchedulerTimer: null
+  phiSchedulerTimer: null,
+  // GitHub Memory Sync (v3.4)
+  ghSyncEnabled: false,
+  ghSyncToken: '',
+  ghSyncRepoName: 'freelattice-memory',
+  ghSyncAutoSync: false,
+  ghSyncLastTimestamp: null,
+  ghSyncMessageCounter: 0,
+  ghSyncConflictData: null,
+  // First-Run Wizard (v3.4)
+  wizardProvider: '',
+  wizardModel: '',
+  wizardApiKey: '',
 };
 
 // ---- Provider Config ----
@@ -6027,7 +6819,7 @@ async function pushGhChanges() {
       } catch(e) {}
 
       const body = {
-        message: 'Update ' + change.path + ' via FreeLattice v2.2',
+        message: 'Update ' + change.path + ' via FreeLattice v3.4',
         content: btoa(unescape(encodeURIComponent(change.content))),
         branch: state.ghBranch
       };
@@ -6165,11 +6957,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Load φ-encrypted API key
   await loadApiKey();
 
-  // Check if first visit
-  const visited = localStorage.getItem('fl_visited');
-  if (visited) {
-    document.getElementById('welcomeOverlay').classList.add('hidden');
-  }
+  // First-run check is now handled by wizardInit()
 
   // Apply initial state
   handleLocalToggle(true);
@@ -6225,6 +7013,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Initialize Neuro-Design settings (v3.0)
   initNeuroDesign();
+
+  // Initialize First-Run Wizard (v3.4)
+  wizardInit();
+
+  // Initialize GitHub Memory Sync (v3.4)
+  await loadGhSyncToken();
+  loadGhSyncSettings();
+
+  // Auto-pull on first load with sync enabled
+  if (state.ghSyncEnabled && state.ghSyncToken) {
+    ghSyncPull();
+  }
 });
 
 // ============================================
@@ -6340,7 +7140,9 @@ function applyFontSize(size) {
 
 // ---- Welcome ----
 function closeWelcome() {
-  document.getElementById('welcomeOverlay').classList.add('hidden');
+  // Legacy — wizard now handles first-run
+  const overlay = document.getElementById('welcomeOverlay');
+  if (overlay) overlay.classList.add('hidden');
   localStorage.setItem('fl_visited', 'true');
 }
 
@@ -7145,6 +7947,9 @@ async function sendMessage() {
         saveMessage('assistant', fullResponse);
       }
 
+      // Auto-sync check (v3.4)
+      ghSyncAutoCheck();
+
       // Re-render with file save buttons and prompt suggestions
       const msgDiv = textSpan.parentElement;
       textSpan.textContent = '';
@@ -7165,7 +7970,7 @@ async function sendMessage() {
     }
 
   } catch (err) {
-    addSystemMessage('Error: ' + err.message);
+    addSystemMessage(friendlyErrorMessage(err.message, state.provider));
     if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError')) {
       if (state.isLocal) {
         // v3.3: Detect CORS error vs. Ollama not running
@@ -10324,6 +11129,686 @@ function phiCreateFeedbackButtons(peerId, msgDiv) {
   feedbackDiv.appendChild(feedbackLabel);
 
   return feedbackDiv;
+}
+
+
+// ============================================
+// v3.4: First-Run Wizard
+// ============================================
+
+const WIZARD_MODELS = {
+  groq: [
+    { id: 'llama', name: 'Llama 3.3 70B', desc: 'Powerful, versatile — best all-around' },
+    { id: 'qwen', name: 'Qwen 3 32B', desc: 'Fast, great for coding' }
+  ],
+  together: [
+    { id: 'llama', name: 'Llama 3.3 70B', desc: 'Powerful and versatile' },
+    { id: 'qwen', name: 'Qwen 2.5 72B', desc: 'Large context, strong reasoning' }
+  ],
+  openrouter: [
+    { id: 'llama', name: 'Llama 3.3 70B', desc: 'Reliable, widely supported' },
+    { id: 'qwen', name: 'Qwen 2.5 72B', desc: 'Strong multilingual support' }
+  ],
+  xai: [
+    { id: 'grok', name: 'Grok 3 Mini Fast', desc: 'Fast and capable' }
+  ],
+  ollama: [
+    { id: 'llama', name: 'Llama 3.2', desc: 'Great default — run: ollama pull llama3.2' },
+    { id: 'qwen', name: 'Qwen 2.5', desc: 'Strong coder — run: ollama pull qwen2.5' }
+  ]
+};
+
+const WIZARD_KEY_LINKS = {
+  groq: '<a href="https://console.groq.com/keys" target="_blank" style="color: var(--accent);">Get a free Groq API key &rarr;</a>',
+  together: '<a href="https://api.together.xyz/settings/api-keys" target="_blank" style="color: var(--accent);">Get a Together AI key &rarr;</a>',
+  openrouter: '<a href="https://openrouter.ai/keys" target="_blank" style="color: var(--accent);">Get an OpenRouter key &rarr;</a>',
+  xai: '<a href="https://console.x.ai" target="_blank" style="color: var(--accent);">Get an xAI API key &rarr;</a>'
+};
+
+function wizardInit() {
+  // Show wizard only on first visit (no settings saved)
+  const visited = localStorage.getItem('fl_visited');
+  if (!visited) {
+    document.getElementById('wizardOverlay').classList.remove('hidden');
+  }
+}
+
+function wizardSelectProvider(provider) {
+  state.wizardProvider = provider;
+
+  // Update button states
+  document.querySelectorAll('.wizard-provider-btn').forEach(btn => btn.classList.remove('selected'));
+  const btnId = 'wizProv' + provider.charAt(0).toUpperCase() + provider.slice(1);
+  const btn = document.getElementById(btnId);
+  if (btn) btn.classList.add('selected');
+
+  const apiSection = document.getElementById('wizApiKeySection');
+  const ollamaSection = document.getElementById('wizOllamaInstructions');
+
+  if (provider === 'ollama') {
+    apiSection.classList.add('hidden');
+    ollamaSection.classList.remove('hidden');
+    document.getElementById('wizStep1Next').disabled = false;
+  } else {
+    ollamaSection.classList.add('hidden');
+    apiSection.classList.remove('hidden');
+    document.getElementById('wizApiKeyLabel').textContent = PROVIDERS[provider].name + ' API Key';
+    document.getElementById('wizApiKeyHint').innerHTML = WIZARD_KEY_LINKS[provider] || '';
+    document.getElementById('wizApiKeyInput').value = '';
+    document.getElementById('wizStep1Next').disabled = false;
+  }
+}
+
+function wizardGoStep2() {
+  if (!state.wizardProvider) return;
+
+  // Save API key if entered
+  state.wizardApiKey = document.getElementById('wizApiKeyInput')?.value?.trim() || '';
+
+  // Update progress
+  document.getElementById('wizDot1').classList.remove('active');
+  document.getElementById('wizDot1').classList.add('done');
+  document.getElementById('wizLine1').classList.add('done');
+  document.getElementById('wizDot2').classList.add('active');
+
+  // Hide step 1, show step 2
+  document.getElementById('wizStep1').classList.add('hidden');
+  document.getElementById('wizStep2').classList.remove('hidden');
+
+  // Populate model grid
+  const models = WIZARD_MODELS[state.wizardProvider] || [];
+  const grid = document.getElementById('wizModelGrid');
+  grid.innerHTML = models.map((m, i) =>
+    '<button class="wizard-model-card" onclick="wizardSelectModel(\'' + m.id + '\', this)">' +
+      '<div class="wizard-model-name">' + m.name + '</div>' +
+      '<div class="wizard-model-desc">' + m.desc + '</div>' +
+    '</button>'
+  ).join('');
+
+  const provName = PROVIDERS[state.wizardProvider]?.name || state.wizardProvider;
+  document.getElementById('wizStep2Subtitle').textContent = 'Choose a ' + provName + ' model. You can change this anytime in Settings.';
+}
+
+function wizardSelectModel(modelId, btn) {
+  state.wizardModel = modelId;
+  document.querySelectorAll('.wizard-model-card').forEach(b => b.classList.remove('selected'));
+  if (btn) btn.classList.add('selected');
+  document.getElementById('wizStep2Next').disabled = false;
+}
+
+function wizardBackStep1() {
+  document.getElementById('wizDot2').classList.remove('active');
+  document.getElementById('wizDot1').classList.remove('done');
+  document.getElementById('wizDot1').classList.add('active');
+  document.getElementById('wizLine1').classList.remove('done');
+
+  document.getElementById('wizStep2').classList.add('hidden');
+  document.getElementById('wizStep1').classList.remove('hidden');
+}
+
+function wizardGoStep3() {
+  if (!state.wizardModel) return;
+
+  // Update progress
+  document.getElementById('wizDot2').classList.remove('active');
+  document.getElementById('wizDot2').classList.add('done');
+  document.getElementById('wizLine2').classList.add('done');
+  document.getElementById('wizDot3').classList.add('active');
+
+  // Hide step 2, show step 3
+  document.getElementById('wizStep2').classList.add('hidden');
+  document.getElementById('wizStep3').classList.remove('hidden');
+
+  // Build summary
+  const provName = PROVIDERS[state.wizardProvider]?.name || state.wizardProvider;
+  const modelObj = (WIZARD_MODELS[state.wizardProvider] || []).find(m => m.id === state.wizardModel);
+  const modelName = modelObj ? modelObj.name : state.wizardModel;
+  const hasKey = state.wizardProvider === 'ollama' || !!state.wizardApiKey;
+
+  let summaryHtml = '<strong>Provider:</strong> ' + provName + '<br>';
+  summaryHtml += '<strong>Model:</strong> ' + modelName + '<br>';
+  if (state.wizardProvider === 'ollama') {
+    summaryHtml += '<strong>Mode:</strong> Local (private, unlimited)';
+  } else {
+    summaryHtml += '<strong>API Key:</strong> ' + (hasKey ? 'Saved &#10003;' : 'Not set — add it in Settings');
+  }
+  document.getElementById('wizSummary').innerHTML = summaryHtml;
+}
+
+async function wizardFinish(template) {
+  // Apply wizard selections to actual state
+  if (state.wizardProvider === 'ollama') {
+    state.isLocal = true;
+    document.getElementById('localToggle').checked = true;
+    localStorage.setItem('fl_isLocal', 'true');
+    // Set ollama model
+    const ollamaModelMap = { llama: 'llama3.2', qwen: 'qwen2.5', mixtral: 'mistral' };
+    const ollamaModelName = ollamaModelMap[state.wizardModel] || 'llama3.2';
+    document.getElementById('ollamaModel').value = ollamaModelName;
+    state.ollamaModel = ollamaModelName;
+  } else {
+    state.isLocal = false;
+    state.provider = state.wizardProvider;
+    state.model = state.wizardModel;
+    document.getElementById('localToggle').checked = false;
+    document.getElementById('providerSelect').value = state.wizardProvider;
+    document.getElementById('modelSelect').value = state.wizardModel;
+    localStorage.setItem('fl_isLocal', 'false');
+    localStorage.setItem('fl_provider', state.wizardProvider);
+    localStorage.setItem('fl_model', state.wizardModel);
+
+    // Save API key
+    if (state.wizardApiKey) {
+      state.apiKey = state.wizardApiKey;
+      document.getElementById('apiKey').value = state.wizardApiKey;
+      await saveApiKey();
+    }
+  }
+
+  // Apply UI state
+  handleLocalToggle(true);
+  handleProviderChange(true);
+  updateStatus();
+  updateTokenLimitForProvider();
+  updateContextBudget();
+
+  // Mark as visited
+  localStorage.setItem('fl_visited', 'true');
+
+  // Close wizard
+  document.getElementById('wizardOverlay').classList.add('hidden');
+
+  // Apply template
+  if (template === 'build') {
+    const buildPrompt = 'You are a coding assistant helping me build a project. Ask me what I\'d like to create.';
+    state.customSystemPrompt = buildPrompt;
+    document.getElementById('systemPromptEditor').value = buildPrompt;
+    await saveSystemPrompt();
+    addSystemMessage('Build mode activated. Your AI is ready to help you code.');
+  } else if (template === 'write') {
+    const writePrompt = 'You are a creative writing partner. Ask me what I\'d like to write.';
+    state.customSystemPrompt = writePrompt;
+    document.getElementById('systemPromptEditor').value = writePrompt;
+    await saveSystemPrompt();
+    addSystemMessage('Writing mode activated. Your AI is ready to help you write.');
+  } else {
+    addSystemMessage('Welcome to FreeLattice! Start typing to chat with your AI.');
+  }
+}
+
+function wizardSkip() {
+  localStorage.setItem('fl_visited', 'true');
+  document.getElementById('wizardOverlay').classList.add('hidden');
+  addSystemMessage('Welcome to FreeLattice! Configure your AI provider in the Settings tab or the Configuration section above.');
+}
+
+// ============================================
+// v3.4: GitHub Memory Sync
+// ============================================
+
+const SYNC_FILES = {
+  memory: 'memory/summary.json',
+  conversations: 'memory/conversations.json',
+  config: 'settings/config.json',
+  systemPrompts: 'settings/system-prompts.json',
+  personality: 'agent/personality.json'
+};
+
+function handleGhSyncToggle() {
+  state.ghSyncEnabled = document.getElementById('ghSyncToggle').checked;
+  localStorage.setItem('fl_ghSyncEnabled', state.ghSyncEnabled);
+  const settings = document.getElementById('ghSyncSettings');
+  if (state.ghSyncEnabled) {
+    settings.classList.remove('hidden');
+    document.getElementById('syncToggleLabel').classList.add('active');
+  } else {
+    settings.classList.add('hidden');
+    document.getElementById('syncToggleLabel').classList.remove('active');
+  }
+}
+
+function handleAutoSyncToggle() {
+  state.ghSyncAutoSync = document.getElementById('ghAutoSyncToggle').checked;
+  localStorage.setItem('fl_ghAutoSync', state.ghSyncAutoSync);
+  const label = document.getElementById('autoSyncLabel');
+  label.classList.toggle('active', state.ghSyncAutoSync);
+}
+
+async function saveGhSyncToken() {
+  const token = document.getElementById('ghSyncToken').value.trim();
+  if (token) {
+    const encrypted = await phiEncrypt(token, 'ghsync');
+    localStorage.setItem('fl_ghSyncToken', encrypted);
+    state.ghSyncToken = token;
+    showToast('GitHub sync token saved (encrypted).');
+  } else {
+    localStorage.removeItem('fl_ghSyncToken');
+    state.ghSyncToken = '';
+  }
+}
+
+async function loadGhSyncToken() {
+  const encrypted = localStorage.getItem('fl_ghSyncToken');
+  if (encrypted) {
+    const decrypted = await phiDecrypt(encrypted, 'ghsync');
+    if (decrypted) {
+      state.ghSyncToken = decrypted;
+      document.getElementById('ghSyncToken').value = decrypted;
+    }
+  }
+}
+
+function loadGhSyncSettings() {
+  const enabled = localStorage.getItem('fl_ghSyncEnabled');
+  if (enabled === 'true') {
+    state.ghSyncEnabled = true;
+    document.getElementById('ghSyncToggle').checked = true;
+    document.getElementById('ghSyncSettings').classList.remove('hidden');
+    document.getElementById('syncToggleLabel').classList.add('active');
+  }
+
+  const repoName = localStorage.getItem('fl_ghSyncRepoName');
+  if (repoName) {
+    state.ghSyncRepoName = repoName;
+    document.getElementById('ghSyncRepoName').value = repoName;
+  }
+
+  const autoSync = localStorage.getItem('fl_ghAutoSync');
+  if (autoSync === 'true') {
+    state.ghSyncAutoSync = true;
+    document.getElementById('ghAutoSyncToggle').checked = true;
+    document.getElementById('autoSyncLabel').classList.add('active');
+  }
+
+  const lastSync = localStorage.getItem('fl_ghSyncLastTimestamp');
+  if (lastSync) {
+    state.ghSyncLastTimestamp = lastSync;
+    updateSyncStatus('synced', 'Last synced: ' + new Date(lastSync).toLocaleString());
+  }
+}
+
+function updateSyncStatus(status, text) {
+  const dot = document.getElementById('syncStatusDot');
+  const textEl = document.getElementById('syncStatusText');
+  dot.className = 'sync-status-dot ' + status;
+  textEl.textContent = text;
+}
+
+async function ghSyncEnsureRepo() {
+  const repoName = document.getElementById('ghSyncRepoName').value.trim() || 'freelattice-memory';
+  state.ghSyncRepoName = repoName;
+  localStorage.setItem('fl_ghSyncRepoName', repoName);
+
+  if (!state.ghSyncToken) {
+    showToast('Please enter your GitHub token first.');
+    return false;
+  }
+
+  // Check if repo exists
+  try {
+    const res = await fetch('https://api.github.com/user', {
+      headers: { 'Authorization': 'Bearer ' + state.ghSyncToken }
+    });
+    if (!res.ok) {
+      showToast('Invalid GitHub token. Please check and try again.');
+      updateSyncStatus('error', 'Authentication failed');
+      return false;
+    }
+    const user = await res.json();
+    const owner = user.login;
+
+    const repoRes = await fetch('https://api.github.com/repos/' + owner + '/' + repoName, {
+      headers: { 'Authorization': 'Bearer ' + state.ghSyncToken }
+    });
+
+    if (repoRes.status === 404) {
+      // Create the repo
+      updateSyncStatus('syncing', 'Creating repository...');
+      const createRes = await fetch('https://api.github.com/user/repos', {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Bearer ' + state.ghSyncToken,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          name: repoName,
+          description: 'FreeLattice memory sync — private, human-readable JSON',
+          private: true,
+          auto_init: true
+        })
+      });
+
+      if (!createRes.ok) {
+        const err = await createRes.json();
+        showToast('Could not create repo: ' + (err.message || 'Unknown error'));
+        updateSyncStatus('error', 'Repo creation failed');
+        return false;
+      }
+      showToast('Created private repo: ' + owner + '/' + repoName);
+    } else if (!repoRes.ok) {
+      showToast('Could not access repo. Check your token permissions.');
+      updateSyncStatus('error', 'Repo access failed');
+      return false;
+    }
+
+    state._ghSyncOwner = owner;
+    return true;
+  } catch(e) {
+    showToast('Network error: ' + e.message);
+    updateSyncStatus('error', 'Network error');
+    return false;
+  }
+}
+
+async function ghSyncPushFile(path, content) {
+  const owner = state._ghSyncOwner;
+  const repo = state.ghSyncRepoName;
+
+  // Get current SHA if file exists
+  let sha = null;
+  try {
+    const existing = await fetch('https://api.github.com/repos/' + owner + '/' + repo + '/contents/' + path, {
+      headers: { 'Authorization': 'Bearer ' + state.ghSyncToken }
+    });
+    if (existing.ok) {
+      const data = await existing.json();
+      sha = data.sha;
+    }
+  } catch(e) {}
+
+  const body = {
+    message: 'FreeLattice sync: update ' + path,
+    content: btoa(unescape(encodeURIComponent(content))),
+    branch: 'main'
+  };
+  if (sha) body.sha = sha;
+
+  const res = await fetch('https://api.github.com/repos/' + owner + '/' + repo + '/contents/' + path, {
+    method: 'PUT',
+    headers: {
+      'Authorization': 'Bearer ' + state.ghSyncToken,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(body)
+  });
+
+  return res.ok;
+}
+
+async function ghSyncPullFile(path) {
+  const owner = state._ghSyncOwner;
+  const repo = state.ghSyncRepoName;
+
+  try {
+    const res = await fetch('https://api.github.com/repos/' + owner + '/' + repo + '/contents/' + path, {
+      headers: { 'Authorization': 'Bearer ' + state.ghSyncToken }
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    return JSON.parse(decodeURIComponent(escape(atob(data.content))));
+  } catch(e) {
+    return null;
+  }
+}
+
+async function ghSyncBuildLocalData() {
+  const data = {};
+
+  // Memory summary
+  data.memorySummary = state.memorySummary || '';
+
+  // Conversations
+  if (state.db) {
+    const conversations = await dbGetAll(STORE_CONVERSATIONS);
+    const allMessages = [];
+    for (const conv of conversations) {
+      const msgs = await dbGetAllByIndex(STORE_MESSAGES, 'conversationId', conv.id);
+      allMessages.push({ conversation: conv, messages: msgs });
+    }
+    data.conversations = allMessages;
+  } else {
+    data.conversations = [];
+  }
+
+  // Config (NO API keys)
+  data.config = {
+    provider: state.provider,
+    model: state.model,
+    isLocal: state.isLocal,
+    privacy: state.privacy,
+    contextMode: state.contextMode,
+    tokenLimit: state.tokenLimit,
+    theme: localStorage.getItem('fl_theme') || 'dark',
+    quietMode: localStorage.getItem('fl_quietMode') || 'false',
+    fontSize: localStorage.getItem('fl_fontSize') || 'medium'
+  };
+
+  // System prompts
+  data.systemPrompts = {
+    custom: state.customSystemPrompt || '',
+    default: DEFAULT_SYSTEM_PROMPT
+  };
+
+  // Agent personality (approved suggestions)
+  data.personality = {
+    suggestions: state.suggestions || [],
+    agentCapTags: state.agentCapTags || []
+  };
+
+  data.syncTimestamp = new Date().toISOString();
+  data.version = '3.4';
+
+  return data;
+}
+
+async function ghSyncPush() {
+  if (!state.ghSyncToken) {
+    showToast('Enter your GitHub token first.');
+    return;
+  }
+
+  updateSyncStatus('syncing', 'Pushing to GitHub...');
+
+  const ok = await ghSyncEnsureRepo();
+  if (!ok) return;
+
+  try {
+    const data = await ghSyncBuildLocalData();
+
+    // Push each file
+    await ghSyncPushFile(SYNC_FILES.memory, JSON.stringify({ memorySummary: data.memorySummary, syncTimestamp: data.syncTimestamp }, null, 2));
+    await ghSyncPushFile(SYNC_FILES.conversations, JSON.stringify({ conversations: data.conversations, syncTimestamp: data.syncTimestamp }, null, 2));
+    await ghSyncPushFile(SYNC_FILES.config, JSON.stringify(data.config, null, 2));
+    await ghSyncPushFile(SYNC_FILES.systemPrompts, JSON.stringify(data.systemPrompts, null, 2));
+    await ghSyncPushFile(SYNC_FILES.personality, JSON.stringify(data.personality, null, 2));
+
+    const now = new Date().toISOString();
+    state.ghSyncLastTimestamp = now;
+    localStorage.setItem('fl_ghSyncLastTimestamp', now);
+    updateSyncStatus('synced', 'Synced \u2713 ' + new Date(now).toLocaleString());
+    showToast('Pushed to GitHub successfully.');
+  } catch(e) {
+    updateSyncStatus('error', 'Push failed: ' + e.message);
+    showToast('Sync push failed: ' + e.message);
+  }
+}
+
+async function ghSyncPull() {
+  if (!state.ghSyncToken) {
+    showToast('Enter your GitHub token first.');
+    return;
+  }
+
+  updateSyncStatus('syncing', 'Pulling from GitHub...');
+
+  const ok = await ghSyncEnsureRepo();
+  if (!ok) return;
+
+  try {
+    // Pull memory
+    const memoryData = await ghSyncPullFile(SYNC_FILES.memory);
+    if (memoryData && memoryData.memorySummary !== undefined) {
+      state.memorySummary = memoryData.memorySummary;
+      document.getElementById('memorySummaryEditor').value = state.memorySummary;
+      if (state.db) {
+        await dbPut(STORE_META, { key: 'memorySummary', value: state.memorySummary });
+      }
+    }
+
+    // Pull conversations
+    const convData = await ghSyncPullFile(SYNC_FILES.conversations);
+    if (convData && convData.conversations && state.db) {
+      for (const item of convData.conversations) {
+        if (item.conversation && item.conversation.id) {
+          await dbPut(STORE_CONVERSATIONS, item.conversation);
+          if (item.messages) {
+            for (const msg of item.messages) {
+              await dbPut(STORE_MESSAGES, msg);
+            }
+          }
+        }
+      }
+      await refreshConversationList();
+      await updateMemoryStats();
+    }
+
+    // Pull config (apply non-sensitive settings)
+    const configData = await ghSyncPullFile(SYNC_FILES.config);
+    if (configData) {
+      if (configData.provider && PROVIDERS[configData.provider]) {
+        state.provider = configData.provider;
+        document.getElementById('providerSelect').value = configData.provider;
+        localStorage.setItem('fl_provider', configData.provider);
+      }
+      if (configData.model) {
+        state.model = configData.model;
+        document.getElementById('modelSelect').value = configData.model;
+        localStorage.setItem('fl_model', configData.model);
+      }
+      if (configData.theme) {
+        localStorage.setItem('fl_theme', configData.theme);
+      }
+    }
+
+    // Pull system prompts
+    const promptData = await ghSyncPullFile(SYNC_FILES.systemPrompts);
+    if (promptData && promptData.custom) {
+      state.customSystemPrompt = promptData.custom;
+      document.getElementById('systemPromptEditor').value = promptData.custom;
+      if (state.db) {
+        await dbPut(STORE_META, { key: 'customSystemPrompt', value: promptData.custom });
+      }
+    }
+
+    // Pull personality
+    const personalityData = await ghSyncPullFile(SYNC_FILES.personality);
+    if (personalityData) {
+      if (personalityData.suggestions) {
+        state.suggestions = personalityData.suggestions;
+        localStorage.setItem('fl_suggestions', JSON.stringify(state.suggestions));
+      }
+    }
+
+    const now = new Date().toISOString();
+    state.ghSyncLastTimestamp = now;
+    localStorage.setItem('fl_ghSyncLastTimestamp', now);
+    updateSyncStatus('synced', 'Synced \u2713 ' + new Date(now).toLocaleString());
+    showToast('Pulled from GitHub successfully. State hydrated.');
+
+    // Refresh UI
+    handleLocalToggle(true);
+    handleProviderChange(true);
+    updateStatus();
+
+  } catch(e) {
+    updateSyncStatus('error', 'Pull failed: ' + e.message);
+    showToast('Sync pull failed: ' + e.message);
+  }
+}
+
+async function ghSyncNow() {
+  if (!state.ghSyncToken) {
+    showToast('Enter your GitHub token first.');
+    return;
+  }
+
+  updateSyncStatus('syncing', 'Syncing...');
+
+  const ok = await ghSyncEnsureRepo();
+  if (!ok) return;
+
+  try {
+    // Pull remote timestamp
+    const remoteMemory = await ghSyncPullFile(SYNC_FILES.memory);
+    const remoteTimestamp = remoteMemory?.syncTimestamp;
+    const localTimestamp = state.ghSyncLastTimestamp;
+
+    if (remoteTimestamp && localTimestamp) {
+      const remoteDate = new Date(remoteTimestamp);
+      const localDate = new Date(localTimestamp);
+
+      if (remoteDate > localDate) {
+        // Remote is newer — pull
+        await ghSyncPull();
+        return;
+      }
+    }
+
+    // Local is newer or no remote — push
+    await ghSyncPush();
+
+  } catch(e) {
+    updateSyncStatus('error', 'Sync failed: ' + e.message);
+    showToast('Sync failed: ' + e.message);
+  }
+}
+
+function ghSyncResolveConflict(choice) {
+  document.getElementById('syncConflictBanner').classList.add('hidden');
+  if (choice === 'local') {
+    ghSyncPush();
+  } else {
+    ghSyncPull();
+  }
+}
+
+async function ghSyncAutoCheck() {
+  if (!state.ghSyncEnabled || !state.ghSyncAutoSync || !state.ghSyncToken) return;
+
+  state.ghSyncMessageCounter++;
+  if (state.ghSyncMessageCounter >= 10) {
+    state.ghSyncMessageCounter = 0;
+    await ghSyncPush();
+  }
+}
+
+// ============================================
+// v3.4: Better Error Messages
+// ============================================
+
+function friendlyErrorMessage(errMsg, provider) {
+  const provName = PROVIDERS[provider]?.name || provider;
+
+  if (errMsg.includes('401') || errMsg.toLowerCase().includes('unauthorized') || errMsg.toLowerCase().includes('invalid api key') || errMsg.toLowerCase().includes('invalid_api_key')) {
+    return 'Could not authenticate with ' + provName + '. Please check your API key in the Configuration section above.';
+  }
+  if (errMsg.includes('429') || errMsg.toLowerCase().includes('rate limit') || errMsg.toLowerCase().includes('too many requests')) {
+    return 'Rate limited by ' + provName + '. Free tiers have usage limits — wait a moment and try again, or switch to a different provider.';
+  }
+  if (errMsg.includes('413') || errMsg.toLowerCase().includes('too large') || errMsg.toLowerCase().includes('context length')) {
+    return 'Your message was too long for ' + provName + '. Try removing some context files or switching to Smart context mode in Settings.';
+  }
+  if (errMsg.includes('500') || errMsg.includes('502') || errMsg.includes('503')) {
+    return provName + ' is having server issues. This is on their end — try again in a few minutes.';
+  }
+  if (errMsg.toLowerCase().includes('failed to fetch') || errMsg.toLowerCase().includes('networkerror')) {
+    return 'Could not reach ' + provName + '. Check your internet connection and try again.';
+  }
+  if (errMsg.toLowerCase().includes('model') && errMsg.toLowerCase().includes('not found')) {
+    return 'The selected model is not available on ' + provName + '. Try a different model in the Configuration section.';
+  }
+
+  return 'Error from ' + provName + ': ' + errMsg;
 }
 
 // ---- PWA Install Prompt ----
