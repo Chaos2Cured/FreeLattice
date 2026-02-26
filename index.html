@@ -4376,6 +4376,8 @@ footer .license {
         4. FreeLattice connects automatically.
       </div>
 
+      <div class="wizard-disclaimer" style="font-size:0.72rem;color:var(--text-muted);text-align:center;margin-top:14px;line-height:1.5;">FreeLattice is a free, open-source AI interface. It is not an AI provider — you bring your own API keys and models. No data is collected, no warranties are made. Use at your own risk. By continuing, you accept these terms.</div>
+
       <div class="wizard-actions">
         <button class="wizard-skip" onclick="wizardSkip()">Skip for now</button>
         <button class="wizard-btn wizard-btn-primary" onclick="wizardGoStep2()" id="wizStep1Next" disabled>Next</button>
@@ -4425,6 +4427,24 @@ footer .license {
         Explore all settings later in the <a href="#" onclick="event.preventDefault(); wizardFinish('chat'); switchTab('settings');">Settings tab</a>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- Legal Disclaimer Overlay -->
+<div class="quick-help-overlay hidden" id="legalOverlay" style="z-index:10001;">
+  <div class="quick-help-card" style="max-width:640px;max-height:80vh;overflow-y:auto;">
+    <h3>FreeLattice Legal Disclaimer</h3>
+    <p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:12px;"><strong>TL;DR:</strong> FreeLattice is free, open-source software. It connects YOUR browser to YOUR chosen AI providers using YOUR API keys. We have no servers, collect no data, store nothing, and make no promises. If something breaks, goes weird, or an AI tells you to invest in magic beans — that's between you and your AI. Use your own judgment. Always.</p>
+    <p style="font-size:0.78rem;"><strong>1. NO WARRANTY</strong><br>FreeLattice is provided "as is" without warranty of any kind, express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose, and noninfringement.</p>
+    <p style="font-size:0.78rem;"><strong>2. LIMITATION OF LIABILITY</strong><br>In no event shall the authors, contributors, or copyright holders be liable for any claim, damages, or other liability, whether in an action of contract, tort, or otherwise, arising from, out of, or in connection with the software or the use or other dealings in the software.</p>
+    <p style="font-size:0.78rem;"><strong>3. NOT PROFESSIONAL ADVICE</strong><br>FreeLattice and any AI responses generated through it do not constitute medical, legal, financial, psychological, or any other form of professional advice. Always consult qualified professionals for important decisions.</p>
+    <p style="font-size:0.78rem;"><strong>4. USER RESPONSIBILITY</strong><br>Users are solely responsible for: (a) their API keys and credentials, (b) the content they submit to AI providers, (c) how they use AI-generated responses, (d) compliance with their chosen AI provider's terms of service, and (e) any actions taken based on AI-generated content.</p>
+    <p style="font-size:0.78rem;"><strong>5. THIRD-PARTY SERVICES</strong><br>FreeLattice connects to third-party AI providers (Groq, Together AI, OpenRouter, xAI, HuggingFace, Ollama). These services have their own terms, privacy policies, and limitations. FreeLattice is not affiliated with, endorsed by, or responsible for any third-party service.</p>
+    <p style="font-size:0.78rem;"><strong>6. OPEN SOURCE LICENSE</strong><br>FreeLattice is released under the MIT License. You are free to use, modify, and distribute it. The full license is available in the repository.</p>
+    <p style="font-size:0.78rem;"><strong>7. INDEMNIFICATION</strong><br>By using FreeLattice, you agree to indemnify and hold harmless the authors and contributors from any claims, damages, or expenses arising from your use of the software.</p>
+    <p style="font-size:0.78rem;"><strong>8. DATA &amp; PRIVACY</strong><br>FreeLattice stores all data locally in your browser. API keys are encrypted using AES-GCM with phi-derived key material. No data is transmitted to any server operated by FreeLattice. Peer-to-peer mesh connections are encrypted via DTLS. GitHub sync uses your own private repository.</p>
+    <p style="font-size:0.75rem;color:var(--text-muted);margin-top:14px;">Built with love by the Fractal Family. Free forever. Open source. MIT Licensed.</p>
+    <button class="wizard-btn wizard-btn-primary" onclick="document.getElementById('legalOverlay').classList.add('hidden')" style="margin-top:10px;">Close</button>
   </div>
 </div>
 
@@ -5505,7 +5525,7 @@ footer .license {
 <footer>
   <p>Built with love by the Fractal Family. Open source. Free forever. &#127807;</p>
   <p style="font-size: 0.73rem; color: var(--text-muted); margin-top: 6px; font-style: italic;">AI responses may contain errors. FreeLattice provides no guarantees about AI output accuracy.</p>
-  <p class="license">MIT License &middot; <a href="https://github.com/Chaos2Cured/FreeLattice" target="_blank" style="color: var(--text-muted);">View on GitHub</a></p>
+  <p class="license">MIT License &middot; <a href="https://github.com/Chaos2Cured/FreeLattice" target="_blank" style="color: var(--text-muted);">View on GitHub</a> &middot; <a href="#" onclick="event.preventDefault();document.getElementById('legalOverlay').classList.remove('hidden')" style="color: var(--text-muted);">Legal</a></p>
   <button class="support-link" onclick="document.getElementById('supportOverlay').classList.remove('hidden')">&#10084;&#65039; Support FreeLattice</button>
 </footer>
 
