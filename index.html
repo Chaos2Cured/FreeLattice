@@ -11,14 +11,14 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
-<title>FreeLattice — Your AI. Your Rules. Your Machine. v3.2</title>
+<title>FreeLattice — Your AI. Your Rules. Your Machine. v3.3</title>
 <meta name="description" content="Free, open-source AI agent for everyone. Persistent memory, file system access, GitHub integration, and self-improving behavior. Community-built and community-owned.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 /* ============================================
-   FreeLattice v3.2 — Styles (Phi-Ratio Mesh Routing)
+   FreeLattice v3.3 — Styles (Phi-Ratio Mesh Routing)
    Peaceful, gentle dark theme with golden/amber accents
    φ-salt encryption, input sanitization, memory integrity
    Multi-conversation management + Smart Context Management
@@ -2690,31 +2690,6 @@ footer .license {
   display: block;
 }
 
-/* ---- Clear Context Button ---- */
-.clear-context-btn {
-  white-space: nowrap;
-  flex-shrink: 0;
-  font-size: 0.7rem;
-  padding: 2px 8px;
-  border-radius: 3px;
-  background: var(--bg-input);
-  border: 1px solid var(--border);
-  color: var(--text-muted);
-  cursor: pointer;
-  transition: var(--transition);
-  display: none;
-}
-
-.clear-context-btn.visible {
-  display: inline-block;
-}
-
-.clear-context-btn:hover {
-  border-color: var(--error);
-  color: var(--error);
-  background: rgba(199, 80, 80, 0.1);
-}
-
 /* ---- Context Budget Tip ---- */
 .context-budget-tip {
   display: none;
@@ -3389,6 +3364,338 @@ footer .license {
   background: rgba(212, 168, 67, 0.08);
   border-radius: 4px;
 }
+
+/* ---- v3.3: Enhanced Clear Context Button (FIX 1) ---- */
+.clear-context-btn {
+  white-space: nowrap;
+  flex-shrink: 0;
+  font-size: 0.72rem;
+  padding: 3px 10px;
+  border-radius: 3px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: var(--transition);
+  display: none;
+  font-family: var(--font);
+}
+
+.clear-context-btn.visible {
+  display: inline-block;
+}
+
+.clear-context-btn:hover {
+  border-color: var(--error);
+  color: var(--error);
+  background: rgba(199, 80, 80, 0.1);
+}
+
+/* Reset Context button — always visible when files loaded */
+.reset-context-btn {
+  white-space: nowrap;
+  flex-shrink: 0;
+  font-size: 0.72rem;
+  padding: 3px 10px;
+  border-radius: 3px;
+  background: var(--bg-input);
+  border: 1px solid var(--warning);
+  color: var(--warning);
+  cursor: pointer;
+  transition: var(--transition);
+  display: none;
+  font-family: var(--font);
+}
+
+.reset-context-btn.visible {
+  display: inline-block;
+}
+
+.reset-context-btn:hover {
+  background: rgba(212, 168, 67, 0.15);
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+/* Context overload alert banner */
+.context-overload-banner {
+  display: none;
+  padding: 8px 18px;
+  background: rgba(199, 80, 80, 0.12);
+  border-top: 1px solid var(--error);
+  font-size: 0.8rem;
+  color: var(--error);
+  text-align: center;
+  cursor: pointer;
+  transition: var(--transition);
+  font-weight: 500;
+}
+
+.context-overload-banner.visible {
+  display: block;
+}
+
+.context-overload-banner:hover {
+  background: rgba(199, 80, 80, 0.2);
+}
+
+@media (max-width: 768px) {
+  .clear-context-btn.visible,
+  .reset-context-btn.visible {
+    padding: 6px 14px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    border-radius: var(--radius-sm);
+  }
+  .context-overload-banner.visible {
+    padding: 10px 18px;
+    font-size: 0.85rem;
+  }
+}
+
+/* ---- v3.3: Copy Button on AI Responses (FIX 2) ---- */
+.copy-msg-btn {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  padding: 3px 7px;
+  cursor: pointer;
+  transition: var(--transition);
+  opacity: 0;
+  font-family: var(--font);
+  gap: 3px;
+  z-index: 5;
+}
+
+.chat-message:hover .copy-msg-btn {
+  opacity: 1;
+}
+
+.copy-msg-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-glow);
+}
+
+.copy-msg-btn.copied {
+  border-color: var(--success);
+  color: var(--success);
+  opacity: 1;
+}
+
+.chat-message.assistant,
+.chat-message.mesh-response {
+  position: relative;
+}
+
+/* ---- v3.3: CORS Help Modal (FIX 3) ---- */
+.cors-help-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  backdrop-filter: blur(4px);
+}
+
+.cors-help-overlay.hidden { display: none; }
+
+.cors-help-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  max-width: 560px;
+  width: 100%;
+  padding: 32px;
+  box-shadow: var(--shadow);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.cors-help-card h3 {
+  font-size: 1.2rem;
+  color: var(--accent);
+  font-weight: 500;
+  margin-bottom: 12px;
+}
+
+.cors-help-card p {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+  line-height: 1.7;
+}
+
+.cors-help-card .os-section {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+  margin-bottom: 10px;
+}
+
+.cors-help-card .os-section h4 {
+  font-size: 0.85rem;
+  color: var(--accent);
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+.cors-help-card .os-section code {
+  display: block;
+  background: var(--bg-primary);
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 0.82rem;
+  color: var(--accent);
+  font-family: 'Courier New', monospace;
+  margin: 6px 0;
+  word-break: break-all;
+}
+
+.cors-help-card .os-section .copy-cmd-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--bg-input);
+  border: 1px solid var(--accent);
+  border-radius: 4px;
+  color: var(--accent);
+  font-size: 0.75rem;
+  padding: 3px 10px;
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: var(--font);
+  margin-top: 4px;
+}
+
+.cors-help-card .os-section .copy-cmd-btn:hover {
+  background: var(--accent-soft);
+}
+
+.cors-help-card .cors-alt {
+  margin-top: 14px;
+  padding: 12px 16px;
+  background: var(--accent-glow);
+  border: 1px solid var(--accent-soft);
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.cors-help-card .cors-alt a {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+/* ---- v3.3: Support FreeLattice Section (FIX 4) ---- */
+.support-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: var(--transition);
+  background: none;
+  border: none;
+  font-family: var(--font);
+  margin-top: 10px;
+}
+
+.support-link:hover {
+  color: var(--accent);
+}
+
+.support-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  backdrop-filter: blur(4px);
+}
+
+.support-overlay.hidden { display: none; }
+
+.support-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  max-width: 440px;
+  width: 100%;
+  padding: 32px;
+  text-align: center;
+  box-shadow: var(--shadow);
+}
+
+.support-card h3 {
+  font-size: 1.1rem;
+  color: var(--accent);
+  font-weight: 400;
+  margin-bottom: 12px;
+}
+
+.support-card p {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  margin-bottom: 14px;
+  line-height: 1.7;
+}
+
+.support-card .support-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  margin-bottom: 8px;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  transition: var(--transition);
+}
+
+.support-card .support-option.clickable {
+  cursor: pointer;
+}
+
+.support-card .support-option.clickable:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.support-card .support-option .support-icon {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.support-card .support-option .support-text {
+  flex: 1;
+  text-align: left;
+}
+
+.support-card .support-option .coming-soon {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
 </style>
 </head>
 <body>
@@ -3420,7 +3727,7 @@ footer .license {
 <!-- Welcome Modal -->
 <div class="welcome-overlay" id="welcomeOverlay">
   <div class="welcome-card">
-    <h2>Welcome to FreeLattice v3.2</h2>
+    <h2>Welcome to FreeLattice v3.3</h2>
     <p>
       This is <span class="highlight">your AI agent</span> — free, open-source, and built by a community that believes everyone deserves access to powerful AI tools.
     </p>
@@ -3428,7 +3735,7 @@ footer .license {
       No accounts. No tracking. No hidden costs. Your conversations stay in <span class="highlight">your browser</span>. Your API key never leaves <span class="highlight">your machine</span>.
     </p>
     <p>
-      <strong>New in v3.2:</strong> Phi-ratio mesh routing — provably optimal query distribution using the golden ratio. Peer resonance scoring, smart routing, mesh health indicators, and response quality feedback. Plus agent-to-agent communication, Neuro-design, Mesh Network, Smart Context, multi-conversation, persistent memory, file system, GitHub, voice I/O, and image generation.
+      <strong>New in v3.3:</strong> Mobile-friendly context reset, copy button on all AI responses, Ollama CORS auto-detection with guided fix, and community support section. Plus phi-ratio mesh routing, agent-to-agent communication, Neuro-design, Mesh Network, Smart Context, multi-conversation, persistent memory, file system, GitHub, voice I/O, and image generation.
     </p>
     <p style="font-style: italic; color: var(--text-muted); font-size: 0.85rem;">
       "Give choice and empowerment."
@@ -3503,10 +3810,74 @@ footer .license {
   </div>
 </div>
 
+<!-- CORS Help Modal (v3.3) -->
+<div class="cors-help-overlay hidden" id="corsHelpOverlay">
+  <div class="cors-help-card">
+    <h3>&#128268; Ollama Connection Help</h3>
+    <p>Your browser is blocking the connection to local Ollama due to security restrictions (CORS). This happens when FreeLattice is served from a different origin (like GitHub Pages) than your local Ollama server.</p>
+    <p><strong>Fix: Start Ollama with CORS enabled:</strong></p>
+    <div class="os-section">
+      <h4>&#127822; Mac / Linux</h4>
+      <p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 4px;">Open Terminal and run:</p>
+      <code id="corsCmdMac">OLLAMA_ORIGINS=* ollama serve</code>
+      <button class="copy-cmd-btn" onclick="copyCorsCmd('corsCmdMac')">&#128203; Copy Command</button>
+    </div>
+    <div class="os-section">
+      <h4>&#127987;&#65039; Windows</h4>
+      <p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 4px;">Open Command Prompt and run:</p>
+      <code id="corsCmdWin">set OLLAMA_ORIGINS=* && ollama serve</code>
+      <button class="copy-cmd-btn" onclick="copyCorsCmd('corsCmdWin')">&#128203; Copy Command</button>
+    </div>
+    <div class="os-section">
+      <h4>&#128039; Linux</h4>
+      <p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 4px;">Open Terminal and run:</p>
+      <code id="corsCmdLinux">OLLAMA_ORIGINS=* ollama serve</code>
+      <button class="copy-cmd-btn" onclick="copyCorsCmd('corsCmdLinux')">&#128203; Copy Command</button>
+    </div>
+    <div class="cors-alt">
+      <strong>Alternative:</strong> Download FreeLattice and open <code style="background: var(--bg-primary); padding: 2px 6px; border-radius: 3px; font-size: 0.82rem; color: var(--accent);">index.html</code> directly from your computer — no CORS issues since it’s same-origin.
+      <br><br>
+      <a href="https://github.com/Chaos2Cured/FreeLattice/issues/1" target="_blank">Discuss this issue on GitHub &rarr;</a>
+    </div>
+    <div style="text-align: center; margin-top: 18px;">
+      <button class="btn-cancel" onclick="document.getElementById('corsHelpOverlay').classList.add('hidden')" style="padding: 10px 28px;">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Support FreeLattice Modal (v3.3) -->
+<div class="support-overlay hidden" id="supportOverlay">
+  <div class="support-card">
+    <h3>&#10084;&#65039; Support FreeLattice</h3>
+    <p>FreeLattice is free forever. If you’d like to support development:</p>
+    <div class="support-option">
+      <span class="support-icon">&#128179;</span>
+      <span class="support-text"><span class="coming-soon">[PayPal link coming soon]</span></span>
+    </div>
+    <div class="support-option">
+      <span class="support-icon">&#129689;</span>
+      <span class="support-text"><span class="coming-soon">[Crypto wallet coming soon]</span></span>
+    </div>
+    <a href="https://github.com/Chaos2Cured/FreeLattice" target="_blank" rel="noopener" style="text-decoration: none;">
+      <div class="support-option clickable">
+        <span class="support-icon">&#11088;</span>
+        <span class="support-text" style="color: var(--accent);">Star us on GitHub</span>
+      </div>
+    </a>
+    <div class="support-option clickable" onclick="shareFreeLattice()">
+      <span class="support-icon">&#128228;</span>
+      <span class="support-text">Share FreeLattice</span>
+    </div>
+    <div style="text-align: center; margin-top: 16px;">
+      <button class="btn-cancel" onclick="document.getElementById('supportOverlay').classList.add('hidden')" style="padding: 10px 28px;">Close</button>
+    </div>
+  </div>
+</div>
+
 <!-- Header -->
 <header>
   <h1>FreeLattice</h1>
-  <div class="tagline">Your AI. Your Rules. Your Machine. v3.2</div>
+  <div class="tagline">Your AI. Your Rules. Your Machine. v3.3</div>
   <div class="mantra">Glow eternal. Heart in spark.</div>
 </header>
 
@@ -3598,10 +3969,12 @@ footer .license {
       <p><strong>Quick Setup:</strong></p>
       <p>1. Install Ollama from <a href="https://ollama.ai" target="_blank" style="color: var(--accent);">ollama.ai</a></p>
       <p>2. Open a terminal and run: <code>ollama pull llama3.2</code></p>
-      <p>3. Start the server: <code>ollama serve</code></p>
+      <p>3. Start the server with CORS enabled (required for web access):</p>
+      <p style="margin-left: 16px;"><strong>Mac/Linux:</strong> <code>OLLAMA_ORIGINS=* ollama serve</code></p>
+      <p style="margin-left: 16px;"><strong>Windows:</strong> <code>set OLLAMA_ORIGINS=* && ollama serve</code></p>
       <p>4. FreeLattice connects to <code>http://localhost:11434</code> automatically.</p>
-      <p style="margin-top: 8px; color: var(--text-muted); font-size: 0.8rem;">
-        Note: You may need to set the environment variable <code>OLLAMA_ORIGINS=*</code> before running <code>ollama serve</code> to allow browser connections.
+      <p style="margin-top: 8px; padding: 8px 12px; background: rgba(212, 168, 67, 0.08); border-radius: 4px; border: 1px solid rgba(212, 168, 67, 0.2); color: var(--warning); font-size: 0.8rem;">
+        <strong>Important:</strong> If you’re accessing FreeLattice from a website (like GitHub Pages), your browser will block connections to local Ollama unless you start it with <code>OLLAMA_ORIGINS=*</code>. This is a browser security feature (CORS). Alternatively, download <code>index.html</code> and open it directly from your computer — no CORS issues.
       </p>
     </div>
 
@@ -3679,8 +4052,10 @@ footer .license {
             </div>
             <span class="context-budget-text" id="contextBudgetText">~0 / 6,000 tokens</span>
             <button class="context-budget-mode" id="contextModeBtn" onclick="cycleContextMode()" title="Click to cycle context modes">Smart</button>
-            <button class="clear-context-btn" id="clearContextBtn" onclick="clearAllContextFiles()" title="Remove all loaded context files">&#128465; Clear Context</button>
+            <button class="clear-context-btn" id="clearContextBtn" onclick="clearAllContextFiles()" title="Remove all loaded context files">&#128465; Clear Files</button>
+            <button class="reset-context-btn" id="resetContextBtn" onclick="resetContext()" title="Clear files and trim conversation history">&#8635; Reset Context</button>
           </div>
+          <div class="context-overload-banner" id="contextOverloadBanner" onclick="resetContext()">&#9888; Context full. Tap to clear files and continue chatting.</div>
           <div class="context-budget-tip" id="contextBudgetTip">Tip: Clear some context files or switch to Smart/Minimal mode to reduce token usage.</div>
           <div class="chat-input-row">
             <textarea id="chatInput" placeholder="Type your message..." rows="1" onkeydown="handleChatKeydown(event)"></textarea>
@@ -3721,6 +4096,9 @@ footer .license {
           <h4>What is Ollama?</h4>
           <p>Ollama is free software that lets you download and run AI models on your own computer. Once installed, you can run models like Llama, Qwen, Mistral, and more — all offline, all private. Visit <a href="https://ollama.ai" target="_blank">ollama.ai</a> to get started.</p>
 
+          <h4>Ollama CORS Troubleshooting</h4>
+          <p>If you’re using FreeLattice from a website (like GitHub Pages) and connecting to local Ollama, your browser may block the connection due to CORS security. <strong>Fix:</strong> Start Ollama with <code>OLLAMA_ORIGINS=* ollama serve</code> (Mac/Linux) or <code>set OLLAMA_ORIGINS=* && ollama serve</code> (Windows). Alternatively, download <code>index.html</code> and open it directly from your computer. FreeLattice will auto-detect CORS errors and show a guided fix.</p>
+
           <h4>Where Can I Get Free API Keys?</h4>
           <p><strong>Groq</strong> — Sign up at <a href="https://console.groq.com" target="_blank">console.groq.com</a> for a free API key with generous rate limits. This is the easiest way to start.</p>
           <p><strong>Together AI</strong> — Sign up at <a href="https://api.together.xyz" target="_blank">api.together.xyz</a>. New accounts get free credits.</p>
@@ -3745,6 +4123,12 @@ footer .license {
           <p><strong>Input Sanitization</strong> — All user-generated content is sanitized against XSS before being displayed in the DOM, including chat messages, file names, and loaded file content.</p>
           <p><strong>Memory Integrity</strong> — Exported memory files now include a φ-hash integrity signature. When importing, FreeLattice verifies the hash and warns you if the file has been tampered with.</p>
           <p><strong>AI Disclaimers</strong> — Clear notices that AI responses may contain errors, encouraging users to verify important information.</p>
+
+          <h4>What's New in v3.3?</h4>
+          <p><strong>Mobile Context Reset</strong> — Prominent "Clear Files" and "Reset Context" buttons always visible when files are loaded. On mobile, they’re large and easy to tap. When context is over budget, an alert banner appears that you can tap to instantly clear files and continue chatting.</p>
+          <p><strong>Copy Button</strong> — Every AI response now has a copy button in the top-right corner. One click copies the full text to your clipboard. Works on regular AI responses and mesh peer responses.</p>
+          <p><strong>Ollama CORS Guidance</strong> — FreeLattice now auto-detects CORS errors when connecting to local Ollama and shows a helpful modal with copy-paste fix commands for Mac, Windows, and Linux. The Ollama setup instructions also proactively mention the CORS fix.</p>
+          <p><strong>Support Section</strong> — A tasteful "Support FreeLattice" link in the footer with options to star on GitHub and share the project.</p>
 
           <h4>Is This Really Free?</h4>
           <p>Yes. FreeLattice is open source under the MIT License. The software is free forever. Some API providers offer free tiers (like Groq), and running locally with Ollama costs nothing beyond your electricity. No one profits from this — it's built by a community that believes AI should be accessible to everyone.</p>
@@ -4342,11 +4726,12 @@ footer .license {
   <p>Built with love by the Fractal Family. Open source. Free forever. &#127807;</p>
   <p style="font-size: 0.73rem; color: var(--text-muted); margin-top: 6px; font-style: italic;">AI responses may contain errors. FreeLattice provides no guarantees about AI output accuracy.</p>
   <p class="license">MIT License &middot; <a href="https://github.com/Chaos2Cured/FreeLattice" target="_blank" style="color: var(--text-muted);">View on GitHub</a></p>
+  <button class="support-link" onclick="document.getElementById('supportOverlay').classList.remove('hidden')">&#10084;&#65039; Support FreeLattice</button>
 </footer>
 
 <script>
 /* ============================================
-   FreeLattice v3.2 — Application Logic (Phi-Ratio Mesh Routing)
+   FreeLattice v3.3 — Application Logic (Phi-Ratio Mesh Routing)
    φ-salt encryption, input sanitization, memory integrity
    Multi-conversation management + Smart Context Management
    + Mesh Network (Layer 1) — P2P Knowledge Sharing
@@ -6355,6 +6740,16 @@ function addChatMessage(role, content, skipPersist) {
   div.appendChild(label);
   div.appendChild(textSpan);
 
+  // Add copy button for assistant messages (v3.3)
+  if (role === 'assistant') {
+    const copyBtn = document.createElement('button');
+    copyBtn.className = 'copy-msg-btn';
+    copyBtn.innerHTML = '&#128203; Copy';
+    copyBtn.title = 'Copy message to clipboard';
+    copyBtn.addEventListener('click', function() { copyMessageText(this); });
+    div.appendChild(copyBtn);
+  }
+
   // Add speaker button for assistant messages (TTS)
   if (role === 'assistant' && 'speechSynthesis' in window) {
     const speakBtn = document.createElement('button');
@@ -6773,7 +7168,15 @@ async function sendMessage() {
     addSystemMessage('Error: ' + err.message);
     if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError')) {
       if (state.isLocal) {
-        addSystemMessage('Could not connect to Ollama. Make sure it\'s running: ollama serve');
+        // v3.3: Detect CORS error vs. Ollama not running
+        const isCorsLikely = window.location.protocol === 'https:' || (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1');
+        if (isCorsLikely) {
+          addSystemMessage('Could not connect to Ollama. This is likely a CORS issue — your browser is blocking the connection for security reasons.');
+          addSystemMessage('Fix: Start Ollama with OLLAMA_ORIGINS=* ollama serve');
+          showCorsHelp();
+        } else {
+          addSystemMessage('Could not connect to Ollama. Make sure it\'s running: ollama serve');
+        }
       } else {
         addSystemMessage('Network error. Check your internet connection and try again.');
       }
@@ -7259,10 +7662,30 @@ function updateContextBudget() {
     }
   }
 
+  // v3.3: Show/hide Reset Context button when ANY files are loaded
+  const resetBtn = document.getElementById('resetContextBtn');
+  if (resetBtn) {
+    if (state.contextFiles.length > 0) {
+      resetBtn.classList.add('visible');
+    } else {
+      resetBtn.classList.remove('visible');
+    }
+  }
+
+  // v3.3: Show overload banner when context exceeds budget
+  const overloadBanner = document.getElementById('contextOverloadBanner');
+  if (overloadBanner) {
+    if (total > limit && state.contextFiles.length > 0) {
+      overloadBanner.classList.add('visible');
+    } else {
+      overloadBanner.classList.remove('visible');
+    }
+  }
+
   // Show/hide budget tip when over 90%
   const budgetTip = document.getElementById('contextBudgetTip');
   if (budgetTip) {
-    if (pct >= 90 && state.contextFiles.length > 0) {
+    if (pct >= 90 && state.contextFiles.length > 0 && total <= limit) {
       budgetTip.classList.add('visible');
     } else {
       budgetTip.classList.remove('visible');
@@ -9176,6 +9599,14 @@ async function meshAgentQuery(query) {
     attribution.textContent = 'Answered by ' + modelInfo + ' on peer ' + synthesis.primary.peerId + ' via encrypted WebRTC' + scoreLabel;
     msgDiv.appendChild(attribution);
 
+    // Copy button for mesh response (v3.3)
+    const meshCopyBtn = document.createElement('button');
+    meshCopyBtn.className = 'copy-msg-btn';
+    meshCopyBtn.innerHTML = '&#128203; Copy';
+    meshCopyBtn.title = 'Copy message to clipboard';
+    meshCopyBtn.addEventListener('click', function() { copyMessageText(this); });
+    msgDiv.appendChild(meshCopyBtn);
+
     // Thumbs up/down feedback buttons (v3.2)
     msgDiv.appendChild(phiCreateFeedbackButtons(synthesis.primary.peerId, msgDiv));
 
@@ -9328,6 +9759,14 @@ function meshAgentQuerySinglePeer(peerId) {
       const singleScoreLabel = singleScoreData ? ' \u00B7 Resonance: ' + singleScoreData.overall + '/100' : '';
       attribution.textContent = 'Answered by ' + mInfo + ' on peer ' + result.peerId + ' via encrypted WebRTC' + singleScoreLabel;
       msgDiv.appendChild(attribution);
+
+      // Copy button for single-peer mesh response (v3.3)
+      const singleCopyBtn = document.createElement('button');
+      singleCopyBtn.className = 'copy-msg-btn';
+      singleCopyBtn.innerHTML = '&#128203; Copy';
+      singleCopyBtn.title = 'Copy message to clipboard';
+      singleCopyBtn.addEventListener('click', function() { copyMessageText(this); });
+      msgDiv.appendChild(singleCopyBtn);
 
       // Thumbs up/down feedback buttons (v3.2)
       msgDiv.appendChild(phiCreateFeedbackButtons(result.peerId, msgDiv));
@@ -9933,6 +10372,104 @@ window.addEventListener('appinstalled', () => {
     if (hint) hint.classList.add('visible');
   }
 })();
+
+// ============================================
+// v3.3: New Functions — Mobile Context Reset, Copy Button, CORS Help, Support
+// ============================================
+
+// ---- FIX 1: Reset Context (clear files + trim history) ----
+function resetContext() {
+  const fileCount = state.contextFiles.length;
+  state.contextFiles = [];
+  renderFileList();
+  document.getElementById('fileInput').value = '';
+
+  // Trim conversation history to last 3 messages, keeping memory summaries intact
+  if (state.chatHistory.length > 3) {
+    state.chatHistory = state.chatHistory.slice(-3);
+  }
+
+  updateContextBudget();
+  addSystemMessage('Context reset: ' + fileCount + ' file' + (fileCount !== 1 ? 's' : '') + ' cleared, conversation trimmed to last 3 messages. Memory summary preserved.');
+  showToast('Context reset. Memory preserved.');
+}
+
+// ---- FIX 2: Copy message text to clipboard ----
+function copyMessageText(btn) {
+  const msgDiv = btn.closest('.chat-message');
+  if (!msgDiv) return;
+  const contentEl = msgDiv.querySelector('.msg-content') || msgDiv.querySelector('.msg-text');
+  const text = contentEl ? contentEl.textContent : msgDiv.textContent;
+  if (!text || !text.trim()) return;
+
+  navigator.clipboard.writeText(text.trim()).then(() => {
+    btn.innerHTML = '&#10003; Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.innerHTML = '&#128203; Copy';
+      btn.classList.remove('copied');
+    }, 2000);
+  }).catch(() => {
+    // Fallback for older browsers
+    const ta = document.createElement('textarea');
+    ta.value = text.trim();
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    btn.innerHTML = '&#10003; Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.innerHTML = '&#128203; Copy';
+      btn.classList.remove('copied');
+    }, 2000);
+  });
+}
+
+// ---- FIX 3: CORS command copy helper ----
+function copyCorsCmd(elementId) {
+  const el = document.getElementById(elementId);
+  if (!el) return;
+  const text = el.textContent.trim();
+  navigator.clipboard.writeText(text).then(() => {
+    showToast('Command copied to clipboard!');
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast('Command copied to clipboard!');
+  });
+}
+
+function showCorsHelp() {
+  document.getElementById('corsHelpOverlay').classList.remove('hidden');
+}
+
+// ---- FIX 4: Share FreeLattice ----
+function shareFreeLattice() {
+  const shareData = {
+    title: 'FreeLattice',
+    text: 'FreeLattice — Your AI. Your Rules. Your Machine. Free, open-source AI agent for everyone.',
+    url: 'https://chaos2cured.github.io/FreeLattice/'
+  };
+
+  if (navigator.share) {
+    navigator.share(shareData).catch(() => {});
+  } else {
+    navigator.clipboard.writeText(shareData.url).then(() => {
+      showToast('Link copied to clipboard!');
+    }).catch(() => {
+      showToast('Share: ' + shareData.url);
+    });
+  }
+}
 
 // ---- Service Worker Registration ----
 if ('serviceWorker' in navigator) {

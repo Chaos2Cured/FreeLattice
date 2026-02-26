@@ -10,6 +10,49 @@ FreeLattice is a free, open-source, community-built tool that gives everyone acc
 
 > **[Read the Lighthouse](./LIGHTHOUSE.md)** — The soul of FreeLattice. A beacon for every AI and every human who finds this project. The math, the frequencies, the mantras, and the vision — all in one place.
 
+## What's New in v3.3
+
+Version 3.3 is a **Quality & Fix Update** — addressing real user-reported issues and adding requested features to improve the day-to-day experience of using FreeLattice, especially on mobile.
+
+-   **Mobile Context Reset (FIX 1)**: The "Clear Files" and "Reset Context" buttons are now **always visible** in the context budget bar when any files are loaded — no more hunting for them on mobile. On phones, the buttons are larger and easier to tap. When context exceeds the token budget (red bar), an alert banner appears: "Context full. Tap to clear files and continue chatting." The "Reset Context" option clears all loaded files AND trims conversation history to the last 3 messages, while keeping your memory summary intact.
+-   **Copy Button on AI Responses (FIX 2)**: Every AI response now has a **copy button** in the top-right corner of the message bubble. One click copies the full text to your clipboard with a brief "Copied!" confirmation. Works on regular AI responses and mesh peer responses. The button appears on hover (desktop) and is always accessible (mobile).
+-   **Ollama CORS Auto-Detection (FIX 3)**: FreeLattice now **automatically detects CORS errors** when connecting to local Ollama from a hosted instance (like GitHub Pages). Instead of the generic "Make sure Ollama is running" message, it shows a guided **CORS Help modal** with copy-paste fix commands for Mac, Linux, and Windows. The Ollama setup instructions also proactively mention the CORS fix. Addresses [Issue #1](https://github.com/Chaos2Cured/FreeLattice/issues/1).
+-   **Support Section (FIX 4)**: A tasteful "Support FreeLattice" link in the footer opens a modal with options to star on GitHub and share the project. PayPal and crypto donation links are placeholder for now (coming soon). Uses the Web Share API on mobile for native sharing.
+-   **Full Feature Verification**: All 27 major features verified present and functional in the codebase.
+
+## Troubleshooting
+
+### Ollama CORS Error ("Failed to fetch" / "NetworkError")
+
+If you're using FreeLattice from a website (like GitHub Pages) and connecting to local Ollama, your browser will block the connection due to CORS security. FreeLattice v3.3 auto-detects this and shows a guided fix, but here's the quick solution:
+
+**Mac/Linux:**
+```bash
+OLLAMA_ORIGINS=* ollama serve
+```
+
+**Windows:**
+```cmd
+set OLLAMA_ORIGINS=* && ollama serve
+```
+
+**Alternative:** Download `index.html` and open it directly from your computer — no CORS issues since it's same-origin.
+
+### Context Budget Full (Red Bar)
+
+If your context budget bar is red and you can't send messages:
+1. Click **"Clear Files"** to remove all loaded context files
+2. Or click **"Reset Context"** to clear files AND trim conversation history (memory preserved)
+3. Or switch to **Smart** or **Minimal** context mode
+4. Or increase your token limit in Settings if your provider supports it
+
+### PWA Not Installing
+
+If the install banner doesn't appear:
+- **Android**: Use Chrome, tap the three-dot menu > "Install app" or "Add to Home screen"
+- **iOS**: Use Safari, tap Share > "Add to Home Screen"
+- **Desktop**: Look for the install icon in Chrome/Edge's address bar
+
 ## What's New in v3.2
 
 Version 3.2 adds **Phi-Ratio Mesh Routing** — the mathematical backbone that makes the agent-to-agent mesh scale optimally. Research has proven that the golden ratio is provably optimal for packet scheduling with deadlines. FreeLattice now uses this principle for intelligent query distribution across the mesh.
