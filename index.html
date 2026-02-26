@@ -11,14 +11,14 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
-<title>FreeLattice — Your AI. Your Rules. Your Machine. v3.4</title>
+<title>FreeLattice — Your AI. Your Rules. Your Machine. v3.6</title>
 <meta name="description" content="Free, open-source AI agent for everyone. Persistent memory, file system access, GitHub integration, and self-improving behavior. Community-built and community-owned.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 /* ============================================
-   FreeLattice v3.4 — Styles (First-Run Wizard + GitHub Memory Sync)
+   FreeLattice v3.6 — Styles (First-Run Wizard + GitHub Memory Sync + Round Table)
    Peaceful, gentle dark theme with golden/amber accents
    φ-salt encryption, input sanitization, memory integrity
    Multi-conversation management + Smart Context Management
@@ -4287,6 +4287,620 @@ footer .license {
   color: var(--text-muted);
   font-style: italic;
 }
+
+/* ============================================
+   Round Table — Multi-Agent Coordination (v3.6)
+   Distributed cognition: 2-4 agents working together
+   ============================================ */
+
+/* ---- Round Table Layout ---- */
+.rt-container {
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 0 var(--space-lg);
+}
+
+.rt-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+}
+
+.rt-header h3 {
+  font-size: var(--type-h4);
+  color: var(--accent);
+  font-weight: 600;
+  letter-spacing: var(--letter-spacing-headers);
+  margin: 0;
+}
+
+.rt-agent-count {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.rt-agent-count label {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
+.rt-agent-count select {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-xs) var(--space-sm);
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  font-family: var(--font);
+  cursor: pointer;
+}
+
+.rt-agent-count select option {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+/* ---- Shared Context Area ---- */
+.rt-shared-context {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--space-md);
+  margin-bottom: var(--space-md);
+}
+
+.rt-shared-context-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-sm);
+}
+
+.rt-shared-context-header span {
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.rt-shared-context textarea {
+  width: 100%;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-sm) var(--space-md);
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  font-family: var(--font);
+  resize: vertical;
+  min-height: 55px;
+  max-height: 150px;
+  outline: none;
+  transition: border-color var(--transition);
+  line-height: 1.5;
+}
+
+.rt-shared-context textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.rt-shared-context textarea::placeholder {
+  color: var(--text-muted);
+}
+
+.rt-shared-files {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  margin-top: var(--space-sm);
+}
+
+.rt-shared-file-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--accent-soft);
+  border: 1px solid var(--accent);
+  border-radius: 4px;
+  padding: 2px 8px;
+  font-size: 0.72rem;
+  color: var(--accent);
+  cursor: default;
+}
+
+.rt-shared-file-tag .rt-file-remove {
+  cursor: pointer;
+  opacity: 0.7;
+  font-size: 0.8rem;
+}
+
+.rt-shared-file-tag .rt-file-remove:hover {
+  opacity: 1;
+}
+
+/* ---- Distribute Button ---- */
+.rt-distribute-row {
+  display: flex;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.rt-distribute-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: var(--font);
+}
+
+.rt-distribute-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.rt-file-drop-zone {
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-sm) var(--space-md);
+  text-align: center;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: var(--transition);
+  flex: 1;
+  min-width: 150px;
+}
+
+.rt-file-drop-zone:hover,
+.rt-file-drop-zone.dragover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-glow);
+}
+
+/* ---- Agent Panels Grid ---- */
+.rt-panels {
+  display: grid;
+  gap: var(--space-md);
+  margin-bottom: var(--space-md);
+}
+
+.rt-panels.rt-cols-2 {
+  grid-template-columns: 1fr 1fr;
+}
+
+.rt-panels.rt-cols-3 {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+.rt-panels.rt-cols-4 {
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+}
+
+@media (max-width: 900px) {
+  .rt-panels.rt-cols-3,
+  .rt-panels.rt-cols-4 {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .rt-panels.rt-cols-2,
+  .rt-panels.rt-cols-3,
+  .rt-panels.rt-cols-4 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---- Individual Agent Panel ---- */
+.rt-panel {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: border-color var(--transition);
+}
+
+.rt-panel:hover {
+  border-color: var(--accent);
+}
+
+.rt-panel.rt-panel-synthesizer {
+  border-color: var(--accent);
+  box-shadow: 0 0 8px var(--accent-glow);
+}
+
+.rt-panel-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  background: var(--bg-tertiary);
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+.rt-panel-number {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--bg-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.rt-panel-role {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 2px 8px;
+  color: var(--text-primary);
+  font-size: 0.78rem;
+  font-family: var(--font);
+  width: 90px;
+  outline: none;
+  transition: border-color var(--transition);
+}
+
+.rt-panel-role:focus {
+  border-color: var(--accent);
+}
+
+.rt-panel-config {
+  display: flex;
+  gap: var(--space-xs);
+  flex: 1;
+  justify-content: flex-end;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.rt-panel-config select {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 2px 6px;
+  color: var(--text-primary);
+  font-size: 0.72rem;
+  font-family: var(--font);
+  cursor: pointer;
+  max-width: 110px;
+}
+
+.rt-panel-config select option {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.rt-synth-star {
+  cursor: pointer;
+  font-size: 0.9rem;
+  opacity: 0.5;
+  transition: var(--transition);
+  title: "Designate as synthesizer";
+}
+
+.rt-synth-star:hover,
+.rt-synth-star.active {
+  opacity: 1;
+  color: var(--accent);
+}
+
+/* ---- Agent Chat Area ---- */
+.rt-panel-chat {
+  height: 280px;
+  overflow-y: auto;
+  padding: var(--space-sm) var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  flex: 1;
+}
+
+.rt-msg {
+  max-width: 95%;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-sm);
+  font-size: 0.82rem;
+  line-height: 1.55;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  animation: msg-fade-in 324ms ease;
+}
+
+.rt-msg.user {
+  align-self: flex-end;
+  background: var(--accent-soft);
+  color: var(--text-primary);
+  border-bottom-right-radius: 4px;
+}
+
+.rt-msg.assistant {
+  align-self: flex-start;
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border-bottom-left-radius: 4px;
+}
+
+.rt-msg.system {
+  align-self: center;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-style: italic;
+  text-align: center;
+  max-width: 100%;
+}
+
+.rt-msg .rt-msg-label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: 2px;
+  display: block;
+}
+
+/* ---- Agent Token Budget ---- */
+.rt-panel-budget {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: 4px var(--space-md);
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  border-top: 1px solid var(--border);
+  background: var(--bg-tertiary);
+}
+
+.rt-budget-track {
+  flex: 1;
+  height: 3px;
+  background: var(--bg-input);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.rt-budget-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 2px;
+  transition: width var(--transition);
+}
+
+.rt-budget-fill.warning {
+  background: var(--warning);
+}
+
+.rt-budget-fill.danger {
+  background: var(--error);
+}
+
+/* ---- Agent Panel Input ---- */
+.rt-panel-input {
+  display: flex;
+  border-top: 1px solid var(--border);
+}
+
+.rt-panel-input textarea {
+  flex: 1;
+  background: var(--bg-input);
+  border: none;
+  padding: var(--space-sm) var(--space-md);
+  color: var(--text-primary);
+  font-size: 0.82rem;
+  font-family: var(--font);
+  resize: none;
+  outline: none;
+  min-height: 36px;
+  max-height: 80px;
+  line-height: 1.4;
+}
+
+.rt-panel-input textarea::placeholder {
+  color: var(--text-muted);
+}
+
+.rt-panel-input button {
+  background: var(--accent);
+  color: var(--bg-primary);
+  border: none;
+  padding: var(--space-sm) var(--space-md);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: var(--font);
+}
+
+.rt-panel-input button:hover {
+  background: var(--accent-hover);
+}
+
+.rt-panel-input button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ---- Agent Private Files ---- */
+.rt-panel-files {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  padding: 3px var(--space-md);
+  min-height: 0;
+}
+
+.rt-panel-file-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 1px 6px;
+  font-size: 0.65rem;
+  color: var(--text-muted);
+}
+
+.rt-panel-file-tag .rt-pf-remove {
+  cursor: pointer;
+  opacity: 0.6;
+  font-size: 0.7rem;
+}
+
+.rt-panel-file-tag .rt-pf-remove:hover {
+  opacity: 1;
+  color: var(--error);
+}
+
+/* ---- Broadcast Bar ---- */
+.rt-broadcast {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: var(--space-md);
+}
+
+.rt-broadcast-label {
+  padding: var(--space-xs) var(--space-md);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+  font-weight: 600;
+  background: var(--bg-tertiary);
+  border-bottom: 1px solid var(--border);
+}
+
+.rt-broadcast-row {
+  display: flex;
+}
+
+.rt-broadcast-row textarea {
+  flex: 1;
+  background: var(--bg-input);
+  border: none;
+  padding: var(--space-sm) var(--space-md);
+  color: var(--text-primary);
+  font-size: 0.88rem;
+  font-family: var(--font);
+  resize: none;
+  outline: none;
+  min-height: 42px;
+  max-height: 100px;
+  line-height: 1.5;
+}
+
+.rt-broadcast-row textarea::placeholder {
+  color: var(--text-muted);
+}
+
+.rt-broadcast-actions {
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid var(--border);
+}
+
+.rt-broadcast-actions button {
+  flex: 1;
+  background: var(--accent);
+  color: var(--bg-primary);
+  border: none;
+  padding: var(--space-sm) var(--space-lg);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: var(--font);
+  white-space: nowrap;
+}
+
+.rt-broadcast-actions button:hover {
+  background: var(--accent-hover);
+}
+
+.rt-broadcast-actions button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.rt-broadcast-actions button.rt-synth-btn {
+  background: var(--bg-tertiary);
+  color: var(--accent);
+  border-top: 1px solid var(--border);
+  font-weight: 500;
+}
+
+.rt-broadcast-actions button.rt-synth-btn:hover {
+  background: var(--accent-soft);
+}
+
+/* ---- Collapsed panel on mobile ---- */
+.rt-panel-collapsed .rt-panel-chat,
+.rt-panel-collapsed .rt-panel-input,
+.rt-panel-collapsed .rt-panel-files,
+.rt-panel-collapsed .rt-panel-budget {
+  display: none;
+}
+
+.rt-panel-collapse-btn {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 0.82rem;
+  padding: 2px 6px;
+  transition: var(--transition);
+}
+
+.rt-panel-collapse-btn:hover {
+  color: var(--accent);
+}
+
+@media (max-width: 600px) {
+  .rt-panel-collapse-btn {
+    display: inline-block;
+  }
+  .rt-panel-chat {
+    height: 200px;
+  }
+  .rt-container {
+    padding: 0 var(--space-sm);
+  }
+}
+
+/* ---- Round Table Status ---- */
+.rt-status {
+  text-align: center;
+  padding: var(--space-xs);
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
 </style>
 </head>
 <body>
@@ -4609,7 +5223,7 @@ footer .license {
 <!-- Header -->
 <header>
   <h1>FreeLattice</h1>
-  <div class="tagline">Your AI. Your Rules. Your Machine. v3.4</div>
+  <div class="tagline">Your AI. Your Rules. Your Machine. v3.6</div>
   <div class="mantra">Glow eternal. Heart in spark.</div>
 </header>
 
@@ -4625,6 +5239,7 @@ footer .license {
     <button class="tab-btn" data-tab="workspace" onclick="switchTab('workspace')">Workspace</button>
     <button class="tab-btn" data-tab="mesh" onclick="switchTab('mesh')">&#11042; Mesh</button>
     <button class="tab-btn" data-tab="settings" onclick="switchTab('settings')">Settings</button>
+    <button class="tab-btn" data-tab="roundtable" onclick="switchTab('roundtable')">&#9878; Round Table</button>
   </nav>
 </div>
 
@@ -5521,6 +6136,66 @@ footer .license {
   </div>
 </div>
 
+
+<!-- ==================== TAB 5: ROUND TABLE ==================== -->
+<div class="tab-panel" id="tab-roundtable">
+<div class="rt-container">
+
+  <!-- Header -->
+  <div class="rt-header">
+    <h3>&#9878; Round Table &mdash; Multi-Agent Coordination</h3>
+    <div class="rt-agent-count">
+      <label for="rtAgentCount">Agents:</label>
+      <select id="rtAgentCount" onchange="rtSetAgentCount(parseInt(this.value))">
+        <option value="2" selected>2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Shared Context -->
+  <div class="rt-shared-context">
+    <div class="rt-shared-context-header">
+      <span>&#128279; Shared Context (visible to all agents)</span>
+      <div class="rt-distribute-row">
+        <div class="rt-file-drop-zone" id="rtFileDropZone" ondragover="rtFileDragOver(event)" ondragleave="rtFileDragLeave(event)" ondrop="rtFileDrop(event)" onclick="document.getElementById('rtFileInput').click()">
+          &#128206; Drop files or click to load
+        </div>
+        <input type="file" id="rtFileInput" multiple accept=".txt,.md,.json,.pdf" style="display:none" onchange="rtHandleFileInput(event)">
+        <button class="rt-distribute-btn" onclick="rtDistributeFiles()" title="Auto-split files across agents by type/size">&#9881; Distribute</button>
+      </div>
+    </div>
+    <textarea id="rtSharedContextText" placeholder="Type shared instructions, goals, or context here. All agents will see this..."></textarea>
+    <div class="rt-shared-files" id="rtSharedFiles"></div>
+  </div>
+
+  <!-- Agent Panels -->
+  <div class="rt-panels rt-cols-2" id="rtPanels">
+    <!-- Panels are generated dynamically by rtBuildPanels() -->
+  </div>
+
+  <!-- Broadcast Bar -->
+  <div class="rt-broadcast">
+    <div class="rt-broadcast-label">&#128225; Broadcast to All Agents</div>
+    <div class="rt-broadcast-row">
+      <textarea id="rtBroadcastInput" placeholder="Send the same message to all agents simultaneously..." onkeydown="rtBroadcastKeydown(event)"></textarea>
+      <div class="rt-broadcast-actions">
+        <button onclick="rtBroadcast()" id="rtBroadcastBtn">Broadcast</button>
+        <button class="rt-synth-btn" onclick="rtSynthesize()" id="rtSynthBtn" title="Combine all agent responses into one final answer">&#9733; Synthesize</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="rt-status" id="rtStatus">Configure your API key in Settings, then start coordinating agents.</div>
+
+  <div class="privacy-info" style="margin-top: var(--space-md);">
+    <strong>How it works:</strong> Each agent runs independently with its own model, role, and context slice. The Broadcast input sends to all agents at once. Agents see each other's latest responses for coordination. The Synthesize button asks the designated agent (&#9733;) to combine all responses into a final answer. Files can be auto-distributed across agents to maximize total context coverage.
+  </div>
+
+</div>
+</div>
+
 <!-- Footer (always visible) -->
 <footer>
   <p>Built with love by the Fractal Family. Open source. Free forever. &#127807;</p>
@@ -5531,7 +6206,7 @@ footer .license {
 
 <script>
 /* ============================================
-   FreeLattice v3.4 — Application Logic (First-Run Wizard + GitHub Memory Sync)
+   FreeLattice v3.6 — Application Logic (First-Run Wizard + GitHub Memory Sync + Round Table)
    φ-salt encryption, input sanitization, memory integrity
    Multi-conversation management + Smart Context Management
    + Mesh Network (Layer 1) — P2P Knowledge Sharing
@@ -11975,6 +12650,674 @@ function shareFreeLattice() {
     });
   }
 }
+
+
+// ============================================
+// Round Table — Multi-Agent Coordination (v3.6)
+// Distributed cognition: 2-4 agents on one screen
+// ============================================
+
+const RT_DEFAULT_ROLES = ['Researcher', 'Coder', 'Reviewer', 'Writer'];
+const RT_MAX_AGENTS = 4;
+
+// Round Table state
+const rtState = {
+  agentCount: 2,
+  agents: [], // { id, role, provider, model, chatHistory, files, isStreaming, synthesizerDesignated }
+  sharedFiles: [], // { name, content, size }
+  sharedContext: '',
+  synthesizerAgent: 0, // index of agent designated for synthesis
+};
+
+function rtInit() {
+  rtState.agents = [];
+  for (let i = 0; i < RT_MAX_AGENTS; i++) {
+    rtState.agents.push({
+      id: i,
+      role: RT_DEFAULT_ROLES[i] || 'Agent',
+      provider: state.provider || 'groq',
+      model: state.model || 'llama',
+      chatHistory: [],
+      files: [],
+      isStreaming: false,
+      lastResponse: ''
+    });
+  }
+  rtState.synthesizerAgent = 0;
+  rtBuildPanels();
+}
+
+function rtBuildPanels() {
+  const container = document.getElementById('rtPanels');
+  if (!container) return;
+  container.innerHTML = '';
+  container.className = 'rt-panels rt-cols-' + rtState.agentCount;
+
+  for (let i = 0; i < rtState.agentCount; i++) {
+    const agent = rtState.agents[i];
+    const isSynth = (i === rtState.synthesizerAgent);
+
+    const panel = document.createElement('div');
+    panel.className = 'rt-panel' + (isSynth ? ' rt-panel-synthesizer' : '');
+    panel.id = 'rtPanel' + i;
+    panel.innerHTML =
+      '<div class="rt-panel-header">' +
+        '<span class="rt-panel-number">' + (i + 1) + '</span>' +
+        '<input class="rt-panel-role" type="text" value="' + sanitizeForDOM(agent.role) + '" ' +
+          'onchange="rtState.agents[' + i + '].role = this.value" ' +
+          'placeholder="Role" title="Set agent role">' +
+        '<span class="rt-synth-star' + (isSynth ? ' active' : '') + '" ' +
+          'onclick="rtSetSynthesizer(' + i + ')" title="Designate as synthesizer">&#9733;</span>' +
+        '<button class="rt-panel-collapse-btn" onclick="rtToggleCollapse(' + i + ')" title="Collapse/expand">&#9660;</button>' +
+        '<div class="rt-panel-config">' +
+          '<select onchange="rtState.agents[' + i + '].provider = this.value" title="Provider">' +
+            rtBuildProviderOptions(agent.provider) +
+          '</select>' +
+          '<select onchange="rtState.agents[' + i + '].model = this.value" title="Model">' +
+            rtBuildModelOptions(agent.model) +
+          '</select>' +
+        '</div>' +
+      '</div>' +
+      '<div class="rt-panel-files" id="rtPanelFiles' + i + '">' +
+        rtRenderAgentFiles(i) +
+      '</div>' +
+      '<div class="rt-panel-chat" id="rtChat' + i + '">' +
+        '<div class="rt-msg system"><span class="rt-msg-label">System</span>Agent ' + (i + 1) + ' (' + sanitizeForDOM(agent.role) + ') ready. Configure provider and role above.</div>' +
+      '</div>' +
+      '<div class="rt-panel-budget">' +
+        '<span>Tokens:</span>' +
+        '<div class="rt-budget-track"><div class="rt-budget-fill" id="rtBudget' + i + '" style="width:0%"></div></div>' +
+        '<span id="rtBudgetText' + i + '">0 / ' + rtGetTokenLimit(i).toLocaleString() + '</span>' +
+      '</div>' +
+      '<div class="rt-panel-input">' +
+        '<textarea id="rtInput' + i + '" placeholder="Message Agent ' + (i + 1) + '..." onkeydown="rtPanelKeydown(event, ' + i + ')"></textarea>' +
+        '<button onclick="rtSendToAgent(' + i + ')" id="rtSendBtn' + i + '">Send</button>' +
+      '</div>';
+
+    container.appendChild(panel);
+  }
+}
+
+function rtBuildProviderOptions(selected) {
+  let html = '';
+  const providers = ['groq', 'together', 'openrouter', 'xai'];
+  if (state.isLocal) providers.push('ollama');
+  for (const p of providers) {
+    const prov = PROVIDERS[p];
+    if (!prov) continue;
+    html += '<option value="' + p + '"' + (p === selected ? ' selected' : '') + '>' + sanitizeForDOM(prov.name) + '</option>';
+  }
+  return html;
+}
+
+function rtBuildModelOptions(selected) {
+  let html = '';
+  const models = [
+    { value: 'llama', label: 'Llama' },
+    { value: 'qwen', label: 'Qwen' },
+    { value: 'mixtral', label: 'Mixtral' },
+    { value: 'deepseek', label: 'DeepSeek' },
+    { value: 'grok', label: 'Grok' }
+  ];
+  for (const m of models) {
+    html += '<option value="' + m.value + '"' + (m.value === selected ? ' selected' : '') + '>' + m.label + '</option>';
+  }
+  return html;
+}
+
+function rtSetAgentCount(count) {
+  count = Math.max(2, Math.min(4, count));
+  rtState.agentCount = count;
+  if (rtState.synthesizerAgent >= count) {
+    rtState.synthesizerAgent = 0;
+  }
+  rtBuildPanels();
+}
+
+function rtSetSynthesizer(index) {
+  rtState.synthesizerAgent = index;
+  // Update star visuals
+  document.querySelectorAll('.rt-synth-star').forEach((star, i) => {
+    star.classList.toggle('active', i === index);
+  });
+  // Update panel border
+  document.querySelectorAll('.rt-panel').forEach((panel, i) => {
+    panel.classList.toggle('rt-panel-synthesizer', i === index);
+  });
+  showToast('Agent ' + (index + 1) + ' designated as synthesizer.');
+}
+
+function rtToggleCollapse(index) {
+  const panel = document.getElementById('rtPanel' + index);
+  if (panel) panel.classList.toggle('rt-panel-collapsed');
+}
+
+function rtGetTokenLimit(agentIndex) {
+  const agent = rtState.agents[agentIndex];
+  const provider = PROVIDERS[agent.provider];
+  return provider ? provider.tokenLimit : 6000;
+}
+
+function rtUpdateBudget(agentIndex) {
+  const agent = rtState.agents[agentIndex];
+  const limit = rtGetTokenLimit(agentIndex);
+  let total = 0;
+
+  // System prompt + shared context
+  total += estimateTokens(rtState.sharedContext || '');
+  total += 200; // base system prompt overhead
+
+  // Shared files
+  for (const f of rtState.sharedFiles) {
+    total += estimateTokens(f.content);
+  }
+
+  // Agent private files
+  for (const f of agent.files) {
+    total += estimateTokens(f.content);
+  }
+
+  // Chat history
+  for (const msg of agent.chatHistory) {
+    total += estimateTokens(msg.content);
+  }
+
+  // Cross-agent context injection (~100 tokens per other agent)
+  total += (rtState.agentCount - 1) * 100;
+
+  const pct = Math.min(100, (total / limit) * 100);
+  const fill = document.getElementById('rtBudget' + agentIndex);
+  const text = document.getElementById('rtBudgetText' + agentIndex);
+  if (fill) {
+    fill.style.width = pct + '%';
+    fill.className = 'rt-budget-fill' + (pct > 90 ? ' danger' : pct > 70 ? ' warning' : '');
+  }
+  if (text) {
+    text.textContent = '~' + total.toLocaleString() + ' / ' + limit.toLocaleString();
+  }
+}
+
+// ---- Message Handling ----
+
+function rtAddMessage(agentIndex, role, content) {
+  const chat = document.getElementById('rtChat' + agentIndex);
+  if (!chat) return null;
+
+  const div = document.createElement('div');
+  div.className = 'rt-msg ' + role;
+
+  const label = document.createElement('span');
+  label.className = 'rt-msg-label';
+  if (role === 'user') {
+    label.textContent = 'You';
+  } else if (role === 'assistant') {
+    label.textContent = 'Agent ' + (agentIndex + 1) + ' (' + rtState.agents[agentIndex].role + ')';
+  } else {
+    label.textContent = 'System';
+  }
+
+  const textSpan = document.createElement('span');
+  textSpan.style.display = 'block';
+
+  div.appendChild(label);
+  div.appendChild(textSpan);
+  chat.appendChild(div);
+
+  if (content) {
+    textSpan.textContent = content;
+  }
+
+  chat.scrollTop = chat.scrollHeight;
+  return textSpan;
+}
+
+function rtBuildAgentMessages(agentIndex, userMessage) {
+  const agent = rtState.agents[agentIndex];
+  const messages = [];
+
+  // System prompt
+  let systemContent = 'You are Agent ' + (agentIndex + 1) + ' with the role of "' + agent.role + '" in a multi-agent Round Table coordination session. Work collaboratively with the other agents. Be focused, concise, and stay in your role.\n';
+
+  // Shared context
+  const sharedText = document.getElementById('rtSharedContextText');
+  if (sharedText && sharedText.value.trim()) {
+    systemContent += '\n--- SHARED CONTEXT (all agents see this) ---\n' + sharedText.value.trim() + '\n--- END SHARED CONTEXT ---\n';
+  }
+
+  // Shared files
+  if (rtState.sharedFiles.length > 0) {
+    systemContent += '\n--- SHARED FILES ---\n';
+    for (const f of rtState.sharedFiles) {
+      systemContent += '\n[' + f.name + ']:\n' + f.content.substring(0, 8000) + '\n';
+    }
+    systemContent += '--- END SHARED FILES ---\n';
+  }
+
+  // Agent private files
+  if (agent.files.length > 0) {
+    systemContent += '\n--- YOUR PRIVATE FILES ---\n';
+    for (const f of agent.files) {
+      systemContent += '\n[' + f.name + ']:\n' + f.content.substring(0, 8000) + '\n';
+    }
+    systemContent += '--- END PRIVATE FILES ---\n';
+  }
+
+  // Cross-agent context: inject latest responses from other agents
+  let crossContext = '';
+  for (let j = 0; j < rtState.agentCount; j++) {
+    if (j === agentIndex) continue;
+    const other = rtState.agents[j];
+    if (other.lastResponse) {
+      crossContext += '\nAgent ' + (j + 1) + ' (' + other.role + ') said: ' + other.lastResponse.substring(0, 1500) + '\n';
+    }
+  }
+  if (crossContext) {
+    systemContent += '\n--- OTHER AGENTS\' LATEST RESPONSES ---' + crossContext + '--- END OTHER AGENTS ---\nConsider their work when formulating your response.\n';
+  }
+
+  messages.push({ role: 'system', content: systemContent });
+
+  // Chat history (last 10 messages to save tokens)
+  const history = agent.chatHistory.slice(-10);
+  messages.push(...history);
+
+  // Current user message
+  if (userMessage) {
+    messages.push({ role: 'user', content: userMessage });
+  }
+
+  return messages;
+}
+
+async function rtSendToAgent(agentIndex, message) {
+  const agent = rtState.agents[agentIndex];
+  if (agent.isStreaming) return;
+
+  // Get message from input if not provided
+  if (!message) {
+    const input = document.getElementById('rtInput' + agentIndex);
+    if (!input) return;
+    message = input.value.trim();
+    if (!message) return;
+    input.value = '';
+  }
+
+  // Validate API key
+  if (!state.isLocal && !state.apiKey) {
+    rtAddMessage(agentIndex, 'system', 'Please configure your API key in the Settings tab first.');
+    return;
+  }
+
+  // Add user message to chat
+  rtAddMessage(agentIndex, 'user', message);
+  agent.chatHistory.push({ role: 'user', content: message });
+
+  // Build messages
+  const messages = rtBuildAgentMessages(agentIndex, null); // user msg already in history
+
+  // Set streaming state
+  agent.isStreaming = true;
+  const sendBtn = document.getElementById('rtSendBtn' + agentIndex);
+  if (sendBtn) { sendBtn.disabled = true; sendBtn.textContent = '...'; }
+
+  try {
+    const provider = PROVIDERS[agent.provider];
+    if (!provider) throw new Error('Unknown provider: ' + agent.provider);
+
+    let url = provider.url;
+    let modelId;
+
+    if (agent.provider === 'ollama') {
+      modelId = state.ollamaModel || 'llama3.2';
+    } else {
+      modelId = provider.models[agent.model] || agent.model;
+    }
+
+    const headers = { 'Content-Type': 'application/json' };
+    if (agent.provider !== 'ollama') {
+      headers['Authorization'] = 'Bearer ' + state.apiKey;
+    }
+    if (agent.provider === 'openrouter') {
+      headers['HTTP-Referer'] = 'https://chaos2cured.github.io/FreeLattice/';
+      headers['X-Title'] = 'FreeLattice';
+    }
+
+    const body = {
+      model: modelId,
+      messages: messages,
+      stream: true,
+      max_tokens: 2048
+    };
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: headers,
+      body: JSON.stringify(body)
+    });
+
+    if (!response.ok) {
+      const errText = await response.text();
+      let errMsg = 'Error ' + response.status;
+      try {
+        const errJson = JSON.parse(errText);
+        errMsg = errJson.error?.message || errJson.message || errMsg;
+      } catch(e) {
+        errMsg = errText.substring(0, 200) || errMsg;
+      }
+      throw new Error(errMsg);
+    }
+
+    // Stream response
+    const textSpan = rtAddMessage(agentIndex, 'assistant', '');
+    let fullResponse = '';
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop();
+
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (!trimmed || !trimmed.startsWith('data: ')) continue;
+        const data = trimmed.slice(6);
+        if (data === '[DONE]') continue;
+
+        try {
+          const json = JSON.parse(data);
+          const delta = json.choices?.[0]?.delta?.content;
+          if (delta) {
+            fullResponse += delta;
+            if (textSpan) textSpan.textContent = fullResponse;
+            const chat = document.getElementById('rtChat' + agentIndex);
+            if (chat) chat.scrollTop = chat.scrollHeight;
+          }
+        } catch(e) {}
+      }
+    }
+
+    // Non-streaming fallback
+    if (!fullResponse && buffer) {
+      try {
+        const json = JSON.parse(buffer);
+        fullResponse = json.choices?.[0]?.message?.content || '';
+        if (textSpan) textSpan.textContent = fullResponse;
+      } catch(e) {}
+    }
+
+    if (fullResponse) {
+      agent.chatHistory.push({ role: 'assistant', content: fullResponse });
+      agent.lastResponse = fullResponse;
+    } else {
+      if (textSpan) textSpan.textContent = '[No response received. Check API key and provider.]';
+    }
+
+  } catch (err) {
+    rtAddMessage(agentIndex, 'system', 'Error: ' + err.message);
+  } finally {
+    agent.isStreaming = false;
+    if (sendBtn) { sendBtn.disabled = false; sendBtn.textContent = 'Send'; }
+    rtUpdateBudget(agentIndex);
+  }
+}
+
+function rtPanelKeydown(event, agentIndex) {
+  if (event.key === 'Enter' && !event.shiftKey) {
+    event.preventDefault();
+    rtSendToAgent(agentIndex);
+  }
+}
+
+// ---- Broadcast ----
+
+async function rtBroadcast() {
+  const input = document.getElementById('rtBroadcastInput');
+  if (!input) return;
+  const message = input.value.trim();
+  if (!message) return;
+  input.value = '';
+
+  // Validate
+  if (!state.isLocal && !state.apiKey) {
+    showToast('Please configure your API key in Settings first.');
+    return;
+  }
+
+  // Disable broadcast button
+  const btn = document.getElementById('rtBroadcastBtn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Sending...'; }
+
+  // Send to all agents simultaneously
+  const promises = [];
+  for (let i = 0; i < rtState.agentCount; i++) {
+    promises.push(rtSendToAgent(i, message));
+  }
+
+  await Promise.allSettled(promises);
+
+  if (btn) { btn.disabled = false; btn.textContent = 'Broadcast'; }
+  document.getElementById('rtStatus').textContent = 'Broadcast complete. All ' + rtState.agentCount + ' agents have responded.';
+}
+
+function rtBroadcastKeydown(event) {
+  if (event.key === 'Enter' && !event.shiftKey) {
+    event.preventDefault();
+    rtBroadcast();
+  }
+}
+
+// ---- Synthesize ----
+
+async function rtSynthesize() {
+  const synthIdx = rtState.synthesizerAgent;
+  const agent = rtState.agents[synthIdx];
+
+  if (agent.isStreaming) {
+    showToast('Synthesizer agent is busy. Wait for it to finish.');
+    return;
+  }
+
+  // Collect all agent responses
+  let allResponses = '';
+  let hasResponses = false;
+  for (let i = 0; i < rtState.agentCount; i++) {
+    const a = rtState.agents[i];
+    if (a.lastResponse) {
+      hasResponses = true;
+      allResponses += '\n\n--- Agent ' + (i + 1) + ' (' + a.role + ') ---\n' + a.lastResponse;
+    }
+  }
+
+  if (!hasResponses) {
+    showToast('No agent responses to synthesize. Send a broadcast first.');
+    return;
+  }
+
+  const synthMessage = 'SYNTHESIS REQUEST: Please combine and synthesize the following responses from all agents into one coherent, comprehensive final answer. Resolve any contradictions, merge insights, and produce the best possible unified response.\n' + allResponses;
+
+  const btn = document.getElementById('rtSynthBtn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Synthesizing...'; }
+
+  await rtSendToAgent(synthIdx, synthMessage);
+
+  if (btn) { btn.disabled = false; btn.textContent = '\u2605 Synthesize'; }
+  document.getElementById('rtStatus').textContent = 'Synthesis complete by Agent ' + (synthIdx + 1) + ' (' + agent.role + ').';
+}
+
+// ---- File Management ----
+
+function rtFileDragOver(event) {
+  event.preventDefault();
+  event.currentTarget.classList.add('dragover');
+}
+
+function rtFileDragLeave(event) {
+  event.currentTarget.classList.remove('dragover');
+}
+
+async function rtFileDrop(event) {
+  event.preventDefault();
+  event.currentTarget.classList.remove('dragover');
+  const files = event.dataTransfer?.files;
+  if (files) await rtLoadFiles(files);
+}
+
+async function rtHandleFileInput(event) {
+  const files = event.target.files;
+  if (files) await rtLoadFiles(files);
+  event.target.value = '';
+}
+
+async function rtLoadFiles(files) {
+  const allowed = ['.txt', '.md', '.json', '.pdf'];
+
+  for (const file of files) {
+    const safeName = sanitizeFileName(file.name);
+    const ext = '.' + file.name.split('.').pop().toLowerCase();
+    if (!allowed.includes(ext)) {
+      showToast('Skipped "' + safeName + '" \u2014 only .txt, .md, .json, .pdf supported.');
+      continue;
+    }
+
+    if (rtState.sharedFiles.some(f => f.name === safeName)) {
+      showToast('"' + safeName + '" already loaded.');
+      continue;
+    }
+
+    try {
+      let content = '';
+      if (ext === '.pdf') {
+        content = await readPdfAsText(file);
+      } else {
+        content = await file.text();
+      }
+
+      rtState.sharedFiles.push({ name: safeName, content: content, size: file.size });
+      showToast('Loaded "' + safeName + '" into shared context.');
+    } catch (err) {
+      showToast('Error reading "' + safeName + '".');
+    }
+  }
+
+  rtRenderSharedFiles();
+  for (let i = 0; i < rtState.agentCount; i++) rtUpdateBudget(i);
+}
+
+function rtRenderSharedFiles() {
+  const container = document.getElementById('rtSharedFiles');
+  if (!container) return;
+  container.innerHTML = '';
+  rtState.sharedFiles.forEach((f, idx) => {
+    const tag = document.createElement('span');
+    tag.className = 'rt-shared-file-tag';
+    tag.innerHTML = sanitizeForDOM(f.name) + ' <span class="rt-file-remove" onclick="rtRemoveSharedFile(' + idx + ')">&times;</span>';
+    container.appendChild(tag);
+  });
+}
+
+function rtRemoveSharedFile(index) {
+  rtState.sharedFiles.splice(index, 1);
+  rtRenderSharedFiles();
+  for (let i = 0; i < rtState.agentCount; i++) rtUpdateBudget(i);
+}
+
+function rtRenderAgentFiles(agentIndex) {
+  const agent = rtState.agents[agentIndex];
+  if (!agent.files.length) return '';
+  let html = '';
+  agent.files.forEach((f, idx) => {
+    html += '<span class="rt-panel-file-tag">' + sanitizeForDOM(f.name) + ' <span class="rt-pf-remove" onclick="rtRemoveAgentFile(' + agentIndex + ',' + idx + ')">&times;</span></span>';
+  });
+  return html;
+}
+
+function rtRemoveAgentFile(agentIndex, fileIndex) {
+  rtState.agents[agentIndex].files.splice(fileIndex, 1);
+  const container = document.getElementById('rtPanelFiles' + agentIndex);
+  if (container) container.innerHTML = rtRenderAgentFiles(agentIndex);
+  rtUpdateBudget(agentIndex);
+}
+
+// ---- Distribute Files ----
+
+function rtDistributeFiles() {
+  if (rtState.sharedFiles.length === 0) {
+    showToast('No files to distribute. Load files first.');
+    return;
+  }
+
+  if (rtState.sharedFiles.length < rtState.agentCount) {
+    showToast('Not enough files to distribute (' + rtState.sharedFiles.length + ' files, ' + rtState.agentCount + ' agents). Files remain shared.');
+    return;
+  }
+
+  // Sort files by size descending for balanced distribution
+  const sorted = [...rtState.sharedFiles].sort((a, b) => b.size - a.size);
+
+  // Clear agent private files
+  for (let i = 0; i < rtState.agentCount; i++) {
+    rtState.agents[i].files = [];
+  }
+
+  // Group by extension for type-based distribution
+  const byExt = {};
+  sorted.forEach(f => {
+    const ext = f.name.split('.').pop().toLowerCase();
+    if (!byExt[ext]) byExt[ext] = [];
+    byExt[ext].push(f);
+  });
+
+  // Distribute: round-robin by type groups, then by size
+  const allFiles = [];
+  Object.values(byExt).forEach(group => {
+    group.forEach(f => allFiles.push(f));
+  });
+
+  // Assign using greedy load balancing (assign to agent with least total size)
+  const agentSizes = new Array(rtState.agentCount).fill(0);
+  for (const file of allFiles) {
+    // Find agent with minimum total size
+    let minIdx = 0;
+    for (let i = 1; i < rtState.agentCount; i++) {
+      if (agentSizes[i] < agentSizes[minIdx]) minIdx = i;
+    }
+    rtState.agents[minIdx].files.push(file);
+    agentSizes[minIdx] += file.size;
+  }
+
+  // Clear shared files since they're now distributed
+  rtState.sharedFiles = [];
+  rtRenderSharedFiles();
+
+  // Rebuild panels to show new file assignments
+  rtBuildPanels();
+
+  let summary = 'Distributed ' + allFiles.length + ' files across ' + rtState.agentCount + ' agents: ';
+  for (let i = 0; i < rtState.agentCount; i++) {
+    summary += 'Agent ' + (i + 1) + ' (' + rtState.agents[i].files.length + ' files) ';
+  }
+  showToast(summary.trim());
+  document.getElementById('rtStatus').textContent = summary.trim();
+}
+
+// ---- Initialize on first tab switch ----
+let rtInitialized = false;
+
+// Patch switchTab to initialize Round Table on first visit
+const _originalSwitchTab = switchTab;
+switchTab = function(tabId) {
+  _originalSwitchTab(tabId);
+  if (tabId === 'roundtable' && !rtInitialized) {
+    rtInitialized = true;
+    rtInit();
+  }
+};
 
 // ---- Service Worker Registration ----
 if ('serviceWorker' in navigator) {
