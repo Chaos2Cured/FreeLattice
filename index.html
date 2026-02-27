@@ -5163,6 +5163,163 @@ footer .license {
     max-height: 200px;
   }
 }
+/* ---- Lattice Points (v3.9) ---- */
+.lp-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  padding: 5px 14px;
+  border-radius: 21px;
+  background: linear-gradient(135deg, #1a1510 0%, #2a1f10 100%);
+  border: 1px solid #d4a01744;
+  font-size: 0.78rem;
+  color: #d4a017;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: background 0.3s ease, border-color 0.3s ease, transform 0.2s ease;
+  user-select: none;
+}
+.lp-badge:hover {
+  background: linear-gradient(135deg, #2a1f10 0%, #3a2f18 100%);
+  border-color: #d4a01788;
+  transform: scale(1.04);
+}
+.lp-badge .lp-badge-icon { font-size: 0.9rem; }
+.lp-badge .lp-badge-level { font-weight: 600; }
+.lp-badge .lp-badge-sep { opacity: 0.4; }
+.lp-badge .lp-badge-pts { opacity: 0.85; font-weight: 400; }
+
+.lp-section { position: relative; }
+.lp-section .section-title {
+  color: #d4a017;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.lp-section .section-title .lp-title-icon { font-size: 1.3rem; }
+.lp-header-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 34px;
+  margin-bottom: 21px;
+  flex-wrap: wrap;
+}
+.lp-counter-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 140px;
+}
+.lp-total {
+  font-size: 3rem;
+  font-weight: 200;
+  color: #d4a017;
+  line-height: 1.1;
+  letter-spacing: 0.02em;
+}
+.lp-total-label {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+.lp-level-block {
+  flex: 1;
+  min-width: 200px;
+}
+.lp-level-name {
+  font-size: 1.4rem;
+  font-weight: 500;
+  margin-bottom: 8px;
+  letter-spacing: 0.03em;
+}
+.lp-progress-wrap {
+  background: #1e293b;
+  border-radius: 8px;
+  height: 10px;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+.lp-progress-bar {
+  height: 100%;
+  border-radius: 8px;
+  transition: width 0.6s ease;
+  background: linear-gradient(90deg, #d4a017, #f59e0b);
+}
+.lp-progress-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+.lp-philosophy {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.618;
+  margin-bottom: 21px;
+  padding: 13px 16px;
+  background: #111827;
+  border-radius: 12px;
+  border-left: 3px solid #d4a01744;
+}
+.lp-log-title {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+.lp-log {
+  max-height: 260px;
+  overflow-y: auto;
+  border-radius: 12px;
+  background: #111827;
+  border: 1px solid #1e293b;
+}
+.lp-log::-webkit-scrollbar { width: 5px; }
+.lp-log::-webkit-scrollbar-track { background: transparent; }
+.lp-log::-webkit-scrollbar-thumb { background: #2a2d3e; border-radius: 3px; }
+.lp-log-entry {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 14px;
+  border-bottom: 1px solid #1e293b;
+  font-size: 0.8rem;
+  transition: background 0.2s ease;
+}
+.lp-log-entry:last-child { border-bottom: none; }
+.lp-log-entry:hover { background: #1a1d2b; }
+.lp-log-desc { color: var(--text-secondary); flex: 1; }
+.lp-log-pts {
+  color: #10b981;
+  font-weight: 600;
+  margin-left: 12px;
+  white-space: nowrap;
+}
+.lp-log-time {
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  margin-left: 12px;
+  white-space: nowrap;
+}
+.lp-log-empty {
+  padding: 21px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+}
+/* Level colors */
+.lp-level-spark { color: #6b7280; }
+.lp-level-ember { color: #f59e0b; }
+.lp-level-flame { color: #ef4444; }
+.lp-level-beacon { color: #3b82f6; }
+.lp-level-lighthouse { color: #d4a017; }
+
+@media (max-width: 768px) {
+  .lp-header-row { gap: 16px; }
+  .lp-total { font-size: 2.2rem; }
+  .lp-counter-block { min-width: 100px; }
+}
 
 </style>
 </head>
@@ -5488,6 +5645,7 @@ footer .license {
   <h1>FreeLattice</h1>
   <div class="tagline">Your AI. Your Rules. Your Machine. v3.6</div>
   <div class="mantra">Glow eternal. Heart in spark.</div>
+  <div id="latticePointsBadge" class="lp-badge" style="display:none;" onclick="switchTab('settings')" title="View your Lattice Points"></div>
 </header>
 
 <!-- Offline Indicator -->
@@ -5849,6 +6007,9 @@ footer .license {
 <!-- ==================== TAB 3: SETTINGS ==================== -->
 <div class="tab-panel" id="tab-settings">
 <div class="container">
+
+  <!-- Lattice Points Section (v3.9) -->
+  <div class="section lp-section" id="latticePointsSection"></div>
 
   <!-- Memory Section -->
   <div class="section">
@@ -7556,6 +7717,7 @@ async function openProjectFolder() {
     state.workspaceDirHandle = dirHandle;
     document.getElementById('workspaceFolderName').innerHTML = '<span style="color: var(--accent);">&#128194; ' + escapeHtml(dirHandle.name) + '</span>';
     document.getElementById('refreshFolderBtn').style.display = '';
+    if (typeof LatticePoints !== 'undefined') LatticePoints.award('workspace_open', 5, 'Project folder connected');
     await refreshProjectFolder();
   } catch(e) {
     if (e.name !== 'AbortError') {
@@ -7670,6 +7832,7 @@ async function saveFileToWorkspace(path, content) {
 
     showToast('Saved "' + path + '" to workspace.');
     refreshProjectFolder();
+    if (typeof LatticePoints !== 'undefined') LatticePoints.award('file_saved', 10, 'File written to workspace');
     return true;
   } catch(e) {
     showToast('Error saving file: ' + e.message);
@@ -8090,6 +8253,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (state.ghSyncEnabled && state.ghSyncToken) {
     ghSyncPull();
   }
+  // Initialize Lattice Points (v3.9)
+  LatticePoints.init();
 });
 
 // ============================================
@@ -8819,6 +8984,7 @@ async function sendMessage() {
 
   // Add user message (sanitized for DOM display, raw for API)
   addChatMessage('user', message);
+  if (typeof LatticePoints !== 'undefined') LatticePoints.awardChat();
   state.chatHistory.push({ role: 'user', content: message });
   input.value = '';
   input.style.height = 'auto';
@@ -10544,6 +10710,7 @@ function meshHandleMessage(msg, dc, pc) {
       meshRenderPeerList();
       meshUpdateStats();
       showToast('Connected to peer ' + peerId + '!');
+      if (typeof LatticePoints !== 'undefined') LatticePoints.award('mesh_peer', 15, 'Peer connected to mesh');
 
       // Send our knowledge list
       meshSendKnowledgeList(dc);
@@ -12918,6 +13085,7 @@ window.addEventListener('appinstalled', () => {
   document.getElementById('pwaInstallBanner').classList.remove('visible');
   pwaInstallPrompt = null;
   showToast('FreeLattice installed successfully!');
+  if (typeof LatticePoints !== 'undefined') LatticePoints.award('pwa_installed', 100, 'FreeLattice installed as PWA');
 });
 
 // iOS detection — show hint for Safari Add to Home Screen
@@ -13493,6 +13661,7 @@ async function rtBroadcast() {
 
   if (btn) { btn.disabled = false; btn.textContent = 'Broadcast'; }
   document.getElementById('rtStatus').textContent = 'Broadcast complete. All ' + rtState.agentCount + ' agents have responded.';
+  if (typeof LatticePoints !== 'undefined') LatticePoints.award('rt_session', 10, 'Round Table session initiated');
 }
 
 function rtBroadcastKeydown(event) {
@@ -13538,6 +13707,7 @@ async function rtSynthesize() {
 
   if (btn) { btn.disabled = false; btn.textContent = '\u2605 Synthesize'; }
   document.getElementById('rtStatus').textContent = 'Synthesis complete by Agent ' + (synthIdx + 1) + ' (' + agent.role + ').';
+  if (typeof LatticePoints !== 'undefined') LatticePoints.award('rt_synthesis', 25, 'Synthesis completed \u2014 perspectives unified');
 }
 
 // ---- File Management ----
@@ -13739,6 +13909,7 @@ async function rtWsOpenFolder() {
     rtWsUpdateStatus();
     rtWsRefreshSidebar();
     showToast('Project folder "' + dirHandle.name + '" connected to Round Table.');
+    if (typeof LatticePoints !== 'undefined') LatticePoints.award('workspace_open', 5, 'Project folder connected');
   } catch(e) {
     if (e.name !== 'AbortError') {
       showToast('Error opening folder: ' + e.message);
@@ -13943,6 +14114,7 @@ function rtWsRenderSaveButtons(agentIndex) {
               btn.classList.add('saved');
               rtWsRefreshSidebar();
               showToast('Saved ' + filePath + ' to workspace.');
+              if (typeof LatticePoints !== 'undefined') LatticePoints.award('file_saved', 10, 'File written to workspace');
             }
           } catch(e) {
             showToast('Error saving: ' + e.message);
@@ -14043,6 +14215,7 @@ function copyWalletAddress(elementId) {
             friendlyName: data.friendlyName,
             lastSeen: Date.now()
           };
+          if (typeof LatticePoints !== 'undefined') LatticePoints.award('lan_peer', 10, 'LAN peer discovered');
           renderLanPeers();
         }
       };
@@ -14173,6 +14346,193 @@ function copyWalletAddress(elementId) {
       if (lanDiscoveryEnabled) startLanDiscovery();
     }, 1000);
   }
+})();
+
+// ============================================
+// Lattice Points v3.9 — Reputation & Accomplishment System
+// ============================================
+const LatticePoints = (function() {
+  const STORAGE_KEY = 'latticePoints';
+  const LEVELS = [
+    { name: 'Spark',      min: 0,    icon: '\u2728', css: 'lp-level-spark' },
+    { name: 'Ember',      min: 100,  icon: '\uD83D\uDD25', css: 'lp-level-ember' },
+    { name: 'Flame',      min: 500,  icon: '\uD83D\uDD25', css: 'lp-level-flame' },
+    { name: 'Beacon',     min: 1500, icon: '\uD83D\uDCA1', css: 'lp-level-beacon' },
+    { name: 'Lighthouse', min: 5000, icon: '\uD83C\uDFE0', css: 'lp-level-lighthouse' }
+  ];
+  const MAX_HISTORY = 20;
+  const DAILY_CHAT_CAP = 50;
+
+  let data = null;
+
+  function load() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        data = JSON.parse(raw);
+        // Ensure all fields exist
+        if (typeof data.total !== 'number') data.total = 0;
+        if (!Array.isArray(data.history)) data.history = [];
+        if (typeof data.dailyChatCount !== 'number') data.dailyChatCount = 0;
+        if (typeof data.dailyChatDate !== 'string') data.dailyChatDate = '';
+        if (typeof data.achievements !== 'object' || data.achievements === null) data.achievements = {};
+      } else {
+        data = { total: 0, level: 'Spark', history: [], dailyChatCount: 0, dailyChatDate: '', achievements: {} };
+      }
+    } catch(e) {
+      data = { total: 0, level: 'Spark', history: [], dailyChatCount: 0, dailyChatDate: '', achievements: {} };
+    }
+    data.level = computeLevel(data.total);
+  }
+
+  function save() {
+    try {
+      data.level = computeLevel(data.total);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    } catch(e) { /* localStorage full or unavailable */ }
+  }
+
+  function computeLevel(total) {
+    let lvl = LEVELS[0].name;
+    for (let i = LEVELS.length - 1; i >= 0; i--) {
+      if (total >= LEVELS[i].min) { lvl = LEVELS[i].name; break; }
+    }
+    return lvl;
+  }
+
+  function getLevelInfo(name) {
+    return LEVELS.find(l => l.name === name) || LEVELS[0];
+  }
+
+  function getNextLevel(name) {
+    const idx = LEVELS.findIndex(l => l.name === name);
+    if (idx < 0 || idx >= LEVELS.length - 1) return null;
+    return LEVELS[idx + 1];
+  }
+
+  function getProgress() {
+    const current = getLevelInfo(data.level);
+    const next = getNextLevel(data.level);
+    if (!next) return { percent: 100, label: 'Max level reached' };
+    const range = next.min - current.min;
+    const progress = data.total - current.min;
+    const percent = Math.min(100, Math.round((progress / range) * 100));
+    return { percent: percent, label: (next.min - data.total) + ' points to ' + next.name };
+  }
+
+  function formatTime(ts) {
+    const diff = Date.now() - ts;
+    if (diff < 60000) return 'just now';
+    if (diff < 3600000) return Math.floor(diff / 60000) + 'm ago';
+    if (diff < 86400000) return Math.floor(diff / 3600000) + 'h ago';
+    if (diff < 604800000) return Math.floor(diff / 86400000) + 'd ago';
+    return new Date(ts).toLocaleDateString();
+  }
+
+  function award(event, points, description) {
+    if (!data) load();
+    // One-time achievements
+    if (event === 'pwa_installed') {
+      if (data.achievements.pwaInstalled) return;
+      data.achievements.pwaInstalled = true;
+    }
+    if (event === 'first_visit') {
+      if (data.achievements.firstVisit) return;
+      data.achievements.firstVisit = true;
+    }
+    data.total += points;
+    data.history.unshift({ event: description, points: points, timestamp: Date.now() });
+    if (data.history.length > MAX_HISTORY) data.history = data.history.slice(0, MAX_HISTORY);
+    save();
+    renderBadge();
+    renderPointsUI();
+  }
+
+  function awardChat() {
+    if (!data) load();
+    const today = new Date().toISOString().slice(0, 10);
+    if (data.dailyChatDate !== today) {
+      data.dailyChatDate = today;
+      data.dailyChatCount = 0;
+    }
+    if (data.dailyChatCount >= DAILY_CHAT_CAP) return;
+    data.dailyChatCount++;
+    award('chat_message', 1, 'Message sent');
+  }
+
+  function getTotal() { if (!data) load(); return data.total; }
+  function getLevel() { if (!data) load(); return data.level; }
+  function getHistory() { if (!data) load(); return data.history; }
+
+  function renderBadge() {
+    if (!data) load();
+    const badge = document.getElementById('latticePointsBadge');
+    if (!badge) return;
+    const info = getLevelInfo(data.level);
+    badge.innerHTML = '<span class="lp-badge-icon">' + info.icon + '</span>' +
+      '<span class="lp-badge-level ' + info.css + '">' + data.level + '</span>' +
+      '<span class="lp-badge-sep">&middot;</span>' +
+      '<span class="lp-badge-pts">' + data.total.toLocaleString() + '</span>';
+    badge.style.display = 'inline-flex';
+  }
+
+  function renderPointsUI() {
+    if (!data) load();
+    const section = document.getElementById('latticePointsSection');
+    if (!section) return;
+    const info = getLevelInfo(data.level);
+    const progress = getProgress();
+    let logHTML = '';
+    if (data.history.length === 0) {
+      logHTML = '<div class="lp-log-empty">No activity yet. Start chatting to earn points!</div>';
+    } else {
+      for (let i = 0; i < data.history.length; i++) {
+        const h = data.history[i];
+        logHTML += '<div class="lp-log-entry">' +
+          '<span class="lp-log-desc">' + h.event + '</span>' +
+          '<span class="lp-log-pts">+' + h.points + '</span>' +
+          '<span class="lp-log-time">' + formatTime(h.timestamp) + '</span>' +
+          '</div>';
+      }
+    }
+    section.innerHTML =
+      '<div class="section-title"><span class="lp-title-icon">\u2728</span> Lattice Points</div>' +
+      '<div class="lp-header-row">' +
+        '<div class="lp-counter-block">' +
+          '<div class="lp-total">' + data.total.toLocaleString() + '</div>' +
+          '<div class="lp-total-label">Lattice Points</div>' +
+        '</div>' +
+        '<div class="lp-level-block">' +
+          '<div class="lp-level-name ' + info.css + '">' + info.icon + ' ' + data.level + '</div>' +
+          '<div class="lp-progress-wrap"><div class="lp-progress-bar" style="width:' + progress.percent + '%"></div></div>' +
+          '<div class="lp-progress-label">' + progress.label + '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="lp-philosophy">Lattice Points reflect your contribution to the FreeLattice community. Every interaction strengthens the network. These points are yours \u2014 stored locally, earned through participation.</div>' +
+      '<div class="lp-log-title">Recent Activity</div>' +
+      '<div class="lp-log">' + logHTML + '</div>';
+  }
+
+  function init() {
+    load();
+    // First visit bonus
+    if (!data.achievements.firstVisit) {
+      award('first_visit', 50, 'Welcome to the lattice!');
+    }
+    renderBadge();
+    renderPointsUI();
+  }
+
+  return {
+    init: init,
+    award: award,
+    awardChat: awardChat,
+    getTotal: getTotal,
+    getLevel: getLevel,
+    getHistory: getHistory,
+    renderPointsUI: renderPointsUI,
+    renderBadge: renderBadge
+  };
 })();
 
 // ---- Service Worker Registration ----
