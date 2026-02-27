@@ -4901,6 +4901,264 @@ footer .license {
   color: var(--text-muted);
 }
 
+/* ---- Round Table: Workspace Integration ---- */
+.rt-open-folder-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: var(--font);
+}
+.rt-open-folder-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.rt-open-folder-btn.connected {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.rt-workspace-body {
+  display: flex;
+  gap: var(--space-md);
+  margin-bottom: var(--space-md);
+}
+.rt-workspace-sidebar {
+  width: 220px;
+  min-width: 180px;
+  max-width: 260px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+.rt-workspace-sidebar.hidden {
+  display: none;
+}
+.rt-sidebar-header {
+  padding: var(--space-sm) var(--space-md);
+  background: var(--bg-tertiary);
+  border-bottom: 1px solid var(--border);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.rt-sidebar-header button {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 0.8rem;
+  padding: 2px 4px;
+  transition: var(--transition);
+}
+.rt-sidebar-header button:hover {
+  color: var(--accent);
+}
+.rt-sidebar-tree {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-xs) 0;
+  max-height: 500px;
+}
+.rt-sidebar-tree .rt-tree-item {
+  display: flex;
+  align-items: center;
+  padding: 3px var(--space-sm);
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background var(--transition);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.rt-sidebar-tree .rt-tree-item:hover {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.rt-tree-icon {
+  margin-right: 4px;
+  flex-shrink: 0;
+}
+.rt-sidebar-empty {
+  padding: var(--space-md);
+  text-align: center;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+.rt-main-content {
+  flex: 1;
+  min-width: 0;
+}
+.rt-save-ws-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 4px;
+  padding: 3px 10px;
+  background: var(--accent-soft);
+  border: 1px solid var(--accent);
+  border-radius: 4px;
+  color: var(--accent);
+  font-size: 0.7rem;
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: var(--font);
+}
+.rt-save-ws-btn:hover {
+  background: var(--accent);
+  color: var(--bg-primary);
+}
+.rt-save-ws-btn.saved {
+  background: var(--success, #4caf50);
+  border-color: var(--success, #4caf50);
+  color: #fff;
+  cursor: default;
+  opacity: 0.85;
+}
+.rt-code-block {
+  margin: 6px 0;
+}
+.rt-code-header {
+  font-size: 0.68rem;
+  color: var(--accent);
+  margin-bottom: 2px;
+  font-family: monospace;
+}
+.rt-code-pre {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px;
+  font-size: 0.72rem;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  color: var(--text-secondary);
+  max-height: 200px;
+  overflow-y: auto;
+  font-family: 'Courier New', monospace;
+}
+/* File preview overlay */
+.rt-file-preview-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.rt-file-preview-overlay.hidden {
+  display: none;
+}
+.rt-file-preview-box {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  max-width: 700px;
+  width: 100%;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.rt-file-preview-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-sm) var(--space-md);
+  background: var(--bg-tertiary);
+  border-bottom: 1px solid var(--border);
+}
+.rt-file-preview-header span {
+  font-size: 0.82rem;
+  color: var(--accent);
+  font-weight: 600;
+}
+.rt-file-preview-header button {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 1.1rem;
+  padding: 2px 6px;
+}
+.rt-file-preview-header button:hover {
+  color: var(--accent);
+}
+.rt-file-preview-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-md);
+}
+.rt-file-preview-body pre {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  font-size: 0.78rem;
+  color: var(--text-primary);
+  font-family: 'Courier New', monospace;
+  line-height: 1.5;
+}
+.rt-file-preview-actions {
+  display: flex;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  border-top: 1px solid var(--border);
+  background: var(--bg-tertiary);
+  justify-content: flex-end;
+}
+.rt-file-preview-actions button {
+  padding: 5px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 0.78rem;
+  cursor: pointer;
+  font-family: var(--font);
+  transition: var(--transition);
+  border: 1px solid var(--border);
+  background: var(--bg-input);
+  color: var(--text-secondary);
+}
+.rt-file-preview-actions button:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.rt-file-preview-actions button.primary {
+  background: var(--accent);
+  color: var(--bg-primary);
+  border-color: var(--accent);
+}
+.rt-file-preview-actions button.primary:hover {
+  background: var(--accent-hover);
+}
+@media (max-width: 768px) {
+  .rt-workspace-body {
+    flex-direction: column;
+  }
+  .rt-workspace-sidebar {
+    width: 100%;
+    max-width: 100%;
+    max-height: 200px;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -6144,13 +6402,19 @@ footer .license {
   <!-- Header -->
   <div class="rt-header">
     <h3>&#9878; Round Table &mdash; Multi-Agent Coordination</h3>
-    <div class="rt-agent-count">
-      <label for="rtAgentCount">Agents:</label>
-      <select id="rtAgentCount" onchange="rtSetAgentCount(parseInt(this.value))">
-        <option value="2" selected>2</option>
-        <option value="3">3</option>
-        <option value="4">4</option>
-      </select>
+    <div style="display:flex; align-items:center; gap:var(--space-sm); flex-wrap:wrap;">
+      <button class="rt-open-folder-btn" id="rtOpenFolderBtn" onclick="rtWsOpenFolder()" title="Open a project folder for all agents to access">
+        &#128194; Open Project Folder
+      </button>
+      <span id="rtWsStatus" style="font-size:0.72rem; color:var(--text-muted);">&#128193; No workspace</span>
+      <div class="rt-agent-count">
+        <label for="rtAgentCount">Agents:</label>
+        <select id="rtAgentCount" onchange="rtSetAgentCount(parseInt(this.value))">
+          <option value="2" selected>2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+        </select>
+      </div>
     </div>
   </div>
 
@@ -6170,9 +6434,24 @@ footer .license {
     <div class="rt-shared-files" id="rtSharedFiles"></div>
   </div>
 
-  <!-- Agent Panels -->
-  <div class="rt-panels rt-cols-2" id="rtPanels">
-    <!-- Panels are generated dynamically by rtBuildPanels() -->
+  <!-- Workspace Body: Sidebar + Agent Panels -->
+  <div class="rt-workspace-body">
+    <!-- Workspace Sidebar -->
+    <div class="rt-workspace-sidebar hidden" id="rtWsSidebar">
+      <div class="rt-sidebar-header">
+        <span>&#128194; Workspace</span>
+        <button onclick="rtWsRefreshSidebar()" title="Refresh file tree">&#8635;</button>
+      </div>
+      <div class="rt-sidebar-tree" id="rtWsSidebarTree">
+        <div class="rt-sidebar-empty">Open a project folder to see files here.</div>
+      </div>
+    </div>
+    <!-- Agent Panels -->
+    <div class="rt-main-content">
+      <div class="rt-panels rt-cols-2" id="rtPanels">
+        <!-- Panels are generated dynamically by rtBuildPanels() -->
+      </div>
+    </div>
   </div>
 
   <!-- Broadcast Bar -->
@@ -6194,6 +6473,23 @@ footer .license {
   </div>
 
 </div>
+</div>
+
+<!-- Round Table: File Preview Overlay -->
+<div class="rt-file-preview-overlay hidden" id="rtFilePreviewOverlay">
+  <div class="rt-file-preview-box">
+    <div class="rt-file-preview-header">
+      <span id="rtFilePreviewName">file.txt</span>
+      <button onclick="rtWsClosePreview()">&times;</button>
+    </div>
+    <div class="rt-file-preview-body">
+      <pre id="rtFilePreviewContent"></pre>
+    </div>
+    <div class="rt-file-preview-actions">
+      <button onclick="rtWsClosePreview()">Close</button>
+      <button class="primary" onclick="rtWsLoadPreviewToAgent()">&#128229; Load into Agent Context</button>
+    </div>
+  </div>
 </div>
 
 <!-- Footer (always visible) -->
@@ -12902,6 +13198,17 @@ function rtBuildAgentMessages(agentIndex, userMessage) {
     systemContent += '--- END PRIVATE FILES ---\n';
   }
 
+  // Workspace file tree (if connected)
+  if (state.workspaceDirHandle && state.workspaceFiles && state.workspaceFiles.length > 0) {
+    systemContent += '\n--- WORKSPACE PROJECT FILES ---\n';
+    systemContent += 'The user has a project folder open: ' + state.workspaceDirHandle.name + '\n';
+    for (const f of state.workspaceFiles) {
+      systemContent += (f.kind === 'directory' ? '[DIR] ' : '      ') + f.path + '\n';
+    }
+    systemContent += '--- END WORKSPACE FILES ---\n';
+    systemContent += 'When you generate code that should be saved to the workspace, format it with a filename header like:\n// FILE: path/to/file.js\n<code here>\n\nThis allows the user to save your code directly to their project folder.\n';
+  }
+
   // Cross-agent context: inject latest responses from other agents
   let crossContext = '';
   for (let j = 0; j < rtState.agentCount; j++) {
@@ -13054,6 +13361,8 @@ async function rtSendToAgent(agentIndex, message) {
     if (fullResponse) {
       agent.chatHistory.push({ role: 'assistant', content: fullResponse });
       agent.lastResponse = fullResponse;
+      // Render Save to Workspace buttons for code blocks
+      rtWsRenderSaveButtons(agentIndex);
     } else {
       if (textSpan) textSpan.textContent = '[No response received. Check API key and provider.]';
     }
@@ -13317,6 +13626,270 @@ switchTab = function(tabId) {
     rtInitialized = true;
     rtInit();
   }
+  // Update workspace sidebar when switching to Round Table
+  if (tabId === 'roundtable') {
+    rtWsUpdateStatus();
+    rtWsRefreshSidebar();
+  }
+};
+
+// ============================================
+// Round Table — Workspace Integration
+// Connects File System Access to multi-agent panels
+// ============================================
+
+let _rtWsPreviewFile = null; // { path, content }
+
+// Open project folder from Round Table header
+async function rtWsOpenFolder() {
+  if (!('showDirectoryPicker' in window)) {
+    showToast('File System Access API not supported. Use Chrome, Edge, or Brave.');
+    return;
+  }
+  try {
+    const dirHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
+    state.workspaceDirHandle = dirHandle;
+    // Also update the Workspace tab UI if it exists
+    const folderNameEl = document.getElementById('workspaceFolderName');
+    if (folderNameEl) folderNameEl.innerHTML = '<span style="color: var(--accent);">&#128194; ' + sanitizeForDOM(dirHandle.name) + '</span>';
+    const refreshBtn = document.getElementById('refreshFolderBtn');
+    if (refreshBtn) refreshBtn.style.display = '';
+    await refreshProjectFolder();
+    rtWsUpdateStatus();
+    rtWsRefreshSidebar();
+    showToast('Project folder "' + dirHandle.name + '" connected to Round Table.');
+  } catch(e) {
+    if (e.name !== 'AbortError') {
+      showToast('Error opening folder: ' + e.message);
+    }
+  }
+}
+
+// Update the workspace status indicator in the RT header
+function rtWsUpdateStatus() {
+  const statusEl = document.getElementById('rtWsStatus');
+  const btn = document.getElementById('rtOpenFolderBtn');
+  if (!statusEl) return;
+  if (state.workspaceDirHandle) {
+    statusEl.innerHTML = '&#128194; ' + sanitizeForDOM(state.workspaceDirHandle.name);
+    statusEl.style.color = 'var(--accent)';
+    if (btn) btn.classList.add('connected');
+    // Show sidebar
+    const sidebar = document.getElementById('rtWsSidebar');
+    if (sidebar) sidebar.classList.remove('hidden');
+  } else {
+    statusEl.innerHTML = '&#128193; No workspace';
+    statusEl.style.color = 'var(--text-muted)';
+    if (btn) btn.classList.remove('connected');
+  }
+}
+
+// Refresh the workspace file tree sidebar
+function rtWsRefreshSidebar() {
+  const treeContainer = document.getElementById('rtWsSidebarTree');
+  if (!treeContainer) return;
+  if (!state.workspaceDirHandle || !state.workspaceFiles || state.workspaceFiles.length === 0) {
+    treeContainer.innerHTML = '<div class="rt-sidebar-empty">No workspace folder open.<br>Click <strong>Open Project Folder</strong> above.</div>';
+    return;
+  }
+  const sidebar = document.getElementById('rtWsSidebar');
+  if (sidebar) sidebar.classList.remove('hidden');
+  const files = state.workspaceFiles.slice();
+  files.sort(function(a, b) {
+    if (a.kind !== b.kind) return a.kind === 'directory' ? -1 : 1;
+    return a.path.localeCompare(b.path);
+  });
+  let html = '';
+  files.forEach(function(f, i) {
+    const icon = f.kind === 'directory' ? '&#128193;' : '&#128196;';
+    const indent = (f.depth || 0) * 14;
+    html += '<div class="rt-tree-item" onclick="rtWsFileClick(' + i + ')" title="' + sanitizeForDOM(f.path) + '">' +
+      '<span style="width:' + indent + 'px; display:inline-block; flex-shrink:0;"></span>' +
+      '<span class="rt-tree-icon">' + icon + '</span>' +
+      '<span>' + sanitizeForDOM(f.name) + '</span>' +
+      '</div>';
+  });
+  treeContainer.innerHTML = html;
+}
+
+// Click a file in the sidebar to preview it
+async function rtWsFileClick(index) {
+  const files = state.workspaceFiles;
+  if (!files || !files[index] || files[index].kind !== 'file') return;
+  const file = files[index];
+  try {
+    const fileObj = await file.handle.getFile();
+    const content = await fileObj.text();
+    _rtWsPreviewFile = { path: file.path, content: content };
+    document.getElementById('rtFilePreviewName').textContent = file.path;
+    document.getElementById('rtFilePreviewContent').textContent = content;
+    document.getElementById('rtFilePreviewOverlay').classList.remove('hidden');
+  } catch(e) {
+    showToast('Error reading file: ' + e.message);
+  }
+}
+
+// Close the file preview overlay
+function rtWsClosePreview() {
+  document.getElementById('rtFilePreviewOverlay').classList.add('hidden');
+  _rtWsPreviewFile = null;
+}
+
+// Load previewed file into an agent's context
+function rtWsLoadPreviewToAgent() {
+  if (!_rtWsPreviewFile) return;
+  const activeCount = rtState.agentCount;
+  if (activeCount === 0) {
+    showToast('No agents available.');
+    return;
+  }
+  // If only one agent, load directly
+  if (activeCount === 1) {
+    _rtWsInjectFile(0, _rtWsPreviewFile.path, _rtWsPreviewFile.content);
+    rtWsClosePreview();
+    return;
+  }
+  // Ask which agent
+  let agentNames = '';
+  for (let i = 0; i < activeCount; i++) {
+    agentNames += (i + 1) + ' (' + rtState.agents[i].role + '), ';
+  }
+  agentNames = agentNames.slice(0, -2);
+  const choice = prompt('Load "' + _rtWsPreviewFile.path + '" into which agent?\nAvailable: ' + agentNames + '\n\nType the agent number (1-' + activeCount + ') or "all":');
+  if (!choice) return;
+  if (choice.toLowerCase() === 'all') {
+    for (let i = 0; i < activeCount; i++) {
+      _rtWsInjectFile(i, _rtWsPreviewFile.path, _rtWsPreviewFile.content);
+    }
+  } else {
+    const idx = parseInt(choice) - 1;
+    if (idx >= 0 && idx < activeCount) {
+      _rtWsInjectFile(idx, _rtWsPreviewFile.path, _rtWsPreviewFile.content);
+    } else {
+      showToast('Invalid agent number.');
+      return;
+    }
+  }
+  rtWsClosePreview();
+}
+
+// Inject a file into an agent's private files and notify in chat
+function _rtWsInjectFile(agentIndex, path, content) {
+  const agent = rtState.agents[agentIndex];
+  if (!agent) return;
+  // Check if already loaded
+  if (agent.files.some(function(f) { return f.name === path; })) {
+    showToast('"' + path + '" already loaded in Agent ' + (agentIndex + 1) + '.');
+    return;
+  }
+  agent.files.push({ name: path, content: content, size: content.length });
+  // Update the files display
+  const container = document.getElementById('rtPanelFiles' + agentIndex);
+  if (container) container.innerHTML = rtRenderAgentFiles(agentIndex);
+  rtUpdateBudget(agentIndex);
+  rtAddMessage(agentIndex, 'system', '\uD83D\uDCC4 Workspace file loaded: ' + path + ' (' + content.length + ' chars)');
+  showToast('Loaded "' + path + '" into Agent ' + (agentIndex + 1) + '.');
+}
+
+// Parse assistant response for code blocks with // FILE: headers and add Save buttons
+function rtWsRenderSaveButtons(agentIndex) {
+  const chat = document.getElementById('rtChat' + agentIndex);
+  if (!chat) return;
+  // Find all assistant messages that haven't been processed yet
+  const msgs = chat.querySelectorAll('.rt-msg.assistant:not([data-ws-processed])');
+  msgs.forEach(function(msgDiv) {
+    msgDiv.setAttribute('data-ws-processed', 'true');
+    const textSpan = msgDiv.querySelector('span[style*="display"]');
+    if (!textSpan) return;
+    const content = textSpan.textContent || '';
+    // Match // FILE: path patterns
+    const filePattern = /\/\/ FILE: (.+)/g;
+    let match;
+    const fileBlocks = [];
+    while ((match = filePattern.exec(content)) !== null) {
+      const filePath = match[1].trim();
+      const startOfCode = match.index + match[0].length + 1; // after newline
+      // Find end: next // FILE: or end of content
+      const nextMatch = content.indexOf('\n// FILE: ', startOfCode);
+      const endOfCode = nextMatch !== -1 ? nextMatch : content.length;
+      const code = content.substring(startOfCode, endOfCode).trim();
+      if (code) {
+        fileBlocks.push({ path: filePath, code: code });
+      }
+    }
+    if (fileBlocks.length === 0) return;
+    // Replace text content with structured code blocks
+    const fragment = document.createDocumentFragment();
+    // Keep the label
+    const label = msgDiv.querySelector('.rt-msg-label');
+    // Clear and rebuild
+    msgDiv.innerHTML = '';
+    if (label) msgDiv.appendChild(label);
+    // Add any text before first file block
+    const firstFileIdx = content.indexOf('// FILE:');
+    if (firstFileIdx > 0) {
+      const beforeText = document.createElement('span');
+      beforeText.style.display = 'block';
+      beforeText.style.whiteSpace = 'pre-wrap';
+      beforeText.textContent = content.substring(0, firstFileIdx).trim();
+      if (beforeText.textContent) msgDiv.appendChild(beforeText);
+    }
+    fileBlocks.forEach(function(block) {
+      const codeWrap = document.createElement('div');
+      codeWrap.className = 'rt-code-block';
+      const header = document.createElement('div');
+      header.className = 'rt-code-header';
+      header.textContent = '// FILE: ' + block.path;
+      codeWrap.appendChild(header);
+      const pre = document.createElement('pre');
+      pre.className = 'rt-code-pre';
+      pre.textContent = block.code;
+      codeWrap.appendChild(pre);
+      const saveBtn = document.createElement('button');
+      saveBtn.className = 'rt-save-ws-btn';
+      saveBtn.innerHTML = '&#128190; Save to Workspace';
+      (function(filePath, fileCode, btn) {
+        btn.addEventListener('click', async function() {
+          if (btn.classList.contains('saved')) return;
+          if (!state.workspaceDirHandle) {
+            showToast('Open a project folder first (use the button in the Round Table header).');
+            return;
+          }
+          try {
+            const ok = await saveFileToWorkspace(filePath, fileCode);
+            if (ok !== false) {
+              btn.innerHTML = '&#10003; Saved to ' + filePath;
+              btn.classList.add('saved');
+              rtWsRefreshSidebar();
+              showToast('Saved ' + filePath + ' to workspace.');
+            }
+          } catch(e) {
+            showToast('Error saving: ' + e.message);
+          }
+        });
+      })(block.path, block.code, saveBtn);
+      codeWrap.appendChild(saveBtn);
+      msgDiv.appendChild(codeWrap);
+    });
+    // Add any text after last file block
+    const lastBlock = fileBlocks[fileBlocks.length - 1];
+    const lastFileEnd = content.lastIndexOf(lastBlock.code) + lastBlock.code.length;
+    if (lastFileEnd < content.length) {
+      const afterText = document.createElement('span');
+      afterText.style.display = 'block';
+      afterText.style.whiteSpace = 'pre-wrap';
+      afterText.textContent = content.substring(lastFileEnd).trim();
+      if (afterText.textContent) msgDiv.appendChild(afterText);
+    }
+  });
+}
+
+// Patch refreshProjectFolder to also update Round Table sidebar
+const _rtOrigRefreshProjectFolder = refreshProjectFolder;
+refreshProjectFolder = async function() {
+  await _rtOrigRefreshProjectFolder();
+  rtWsRefreshSidebar();
+  rtWsUpdateStatus();
 };
 
 // ---- Service Worker Registration ----
