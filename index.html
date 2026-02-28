@@ -5321,7 +5321,279 @@ footer .license {
   .lp-counter-block { min-width: 100px; }
 }
 
-</style>
+/* ============================================
+   Persistent Memory Index v4.0 — Styles
+   ============================================ */
+
+/* Memory Index Section */
+.mi-section { position: relative; }
+.mi-section .section-title { display: flex; align-items: center; gap: 8px; }
+.mi-section .section-title .mi-title-icon { font-size: 1.2rem; }
+
+.mi-search-bar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.mi-search-bar input {
+  flex: 1;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  color: var(--text-primary);
+  font-size: 0.88rem;
+  font-family: var(--font);
+  outline: none;
+  transition: border-color var(--transition);
+}
+.mi-search-bar input:focus {
+  border-color: #d4a017;
+  box-shadow: 0 0 0 2px rgba(212, 160, 23, 0.15);
+}
+.mi-search-bar input::placeholder { color: var(--text-muted); }
+
+.mi-conv-list {
+  max-height: 400px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.mi-conv-list::-webkit-scrollbar { width: 6px; }
+.mi-conv-list::-webkit-scrollbar-track { background: transparent; }
+.mi-conv-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+.mi-conv-card {
+  background: #111827;
+  border: 1px solid #1e293b;
+  border-radius: 12px;
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: border-color var(--transition), background var(--transition);
+}
+.mi-conv-card:hover {
+  border-color: var(--accent);
+  background: #1a2235;
+}
+.mi-conv-card.expanded {
+  border-color: var(--accent);
+}
+.mi-conv-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+}
+.mi-conv-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mi-conv-meta {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+.mi-conv-keywords {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 8px;
+}
+.mi-keyword-pill {
+  display: inline-block;
+  background: rgba(212, 160, 23, 0.1);
+  color: #d4a017;
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-weight: 500;
+}
+.mi-conv-delete {
+  background: none;
+  border: 1px solid var(--error);
+  color: var(--error);
+  border-radius: 6px;
+  padding: 3px 10px;
+  font-size: 0.72rem;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity var(--transition);
+  flex-shrink: 0;
+}
+.mi-conv-delete:hover { opacity: 1; }
+
+.mi-conv-messages {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #1e293b;
+  max-height: 300px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.mi-msg {
+  font-size: 0.82rem;
+  line-height: 1.5;
+  padding: 6px 10px;
+  border-radius: 8px;
+}
+.mi-msg.user {
+  background: rgba(201, 168, 76, 0.08);
+  color: var(--text-primary);
+}
+.mi-msg.assistant {
+  background: rgba(139, 92, 246, 0.06);
+  color: var(--text-secondary);
+}
+.mi-msg .mi-msg-role {
+  font-weight: 600;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 2px;
+  color: var(--text-muted);
+}
+
+.mi-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+.mi-action-btn {
+  background: transparent;
+  border: 1px solid #10b981;
+  color: #10b981;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background var(--transition), color var(--transition);
+  font-family: var(--font);
+}
+.mi-action-btn:hover {
+  background: rgba(16, 185, 129, 0.1);
+}
+.mi-action-btn.danger {
+  border-color: var(--error);
+  color: var(--error);
+}
+.mi-action-btn.danger:hover {
+  background: rgba(199, 80, 80, 0.1);
+}
+
+.mi-storage-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+.mi-storage-track {
+  flex: 1;
+  height: 6px;
+  background: var(--bg-input);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.mi-storage-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #10b981, #d4a017);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.mi-philosophy {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  font-style: italic;
+  line-height: 1.6;
+  padding: 12px 16px;
+  background: rgba(212, 160, 23, 0.04);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 8px 8px 0;
+  margin-top: 12px;
+}
+
+.mi-empty {
+  text-align: center;
+  padding: 30px 20px;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.mi-result-count {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+/* Memory Active Indicator */
+.mi-active-badge {
+  display: none;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.75rem;
+  color: #8b5cf6;
+  padding: 2px 10px;
+  border-radius: 10px;
+  background: rgba(139, 92, 246, 0.08);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  animation: mi-glow 2s ease-in-out infinite alternate;
+  margin-left: 8px;
+  flex-shrink: 0;
+}
+.mi-active-badge.visible { display: inline-flex; }
+@keyframes mi-glow {
+  from { box-shadow: 0 0 4px rgba(139, 92, 246, 0.1); }
+  to { box-shadow: 0 0 10px rgba(139, 92, 246, 0.25); }
+}
+
+/* Memory Index toggle in context settings */
+.mi-toggle-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 12px;
+  margin-bottom: 8px;
+}
+
+/* Light mode overrides for Memory Index */
+[data-theme="light"] .mi-conv-card {
+  background: #f5f2ed;
+  border-color: #d4cfc6;
+}
+[data-theme="light"] .mi-conv-card:hover {
+  background: #ebe8e2;
+  border-color: var(--accent);
+}
+[data-theme="light"] .mi-conv-messages {
+  border-top-color: #d4cfc6;
+}
+[data-theme="light"] .mi-keyword-pill {
+  background: rgba(184, 148, 46, 0.12);
+  color: #8a6d1b;
+}
+
+@media (max-width: 768px) {
+  .mi-conv-list { max-height: 300px; }
+  .mi-actions { flex-direction: column; }
+  .mi-action-btn { width: 100%; text-align: center; }
+}
+</style>>
 </head>
 <body>
 
@@ -5812,6 +6084,7 @@ footer .license {
           <div class="status-bar">
             <div class="status-dot" id="statusDot"></div>
             <span id="statusText">Ready — configure your settings above to begin</span>
+            <span class="mi-active-badge" id="miActiveBadge">&#129504; Memory active</span>
           </div>
           <div class="context-budget-bar" id="contextBudgetBar">
             <span class="context-budget-label">Context:</span>
@@ -6059,6 +6332,57 @@ footer .license {
           </div>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- Persistent Memory Index Section (v4.0) -->
+  <div class="section mi-section" id="memoryIndexSection">
+    <div class="section-title"><span class="mi-title-icon">&#129504;</span> Memory Vault</div>
+    <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 14px;">
+      Browse, search, and manage your conversation memory. Every conversation is indexed with keywords and searchable. Relevant past conversations are automatically injected as context when you chat.
+    </p>
+
+    <!-- Auto-Context Toggle -->
+    <div class="toggle-row">
+      <span class="toggle-label" id="miAutoContextLabel">Auto-Context Injection</span>
+      <label class="toggle-switch">
+        <input type="checkbox" id="miAutoContextToggle" checked onchange="MemoryIndex.handleAutoContextToggle()">
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+    <div class="hint" style="margin-bottom: 16px;">When enabled, relevant past conversations are automatically found and injected as context before each message.</div>
+
+    <!-- Storage Usage -->
+    <div class="mi-storage-bar">
+      <span>Storage:</span>
+      <div class="mi-storage-track">
+        <div class="mi-storage-fill" id="miStorageFill" style="width: 0%;"></div>
+      </div>
+      <span id="miStorageText">Calculating...</span>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="mi-search-bar">
+      <input type="text" id="miSearchInput" placeholder="Search your memory vault..." oninput="MemoryIndex.handleSearch()">
+    </div>
+    <div class="mi-result-count" id="miResultCount"></div>
+
+    <!-- Conversation List -->
+    <div class="mi-conv-list" id="miConvList">
+      <div class="mi-empty">Loading memory vault...</div>
+    </div>
+
+    <!-- Actions -->
+    <div class="mi-actions">
+      <button class="mi-action-btn" onclick="MemoryIndex.exportVault()">&#8615; Export Memory Vault</button>
+      <button class="mi-action-btn" onclick="document.getElementById('miImportInput').click()">&#8613; Import Memory Vault</button>
+      <button class="mi-action-btn danger" onclick="MemoryIndex.clearAll()">&#10005; Clear All Memory</button>
+      <input type="file" id="miImportInput" accept=".json" style="display:none;" onchange="MemoryIndex.importVault(event)">
+    </div>
+
+    <!-- Philosophy -->
+    <div class="mi-philosophy">
+      Your memory lives on your device. No server ever sees it. Export it, carry it with you, import it anywhere. This is YOUR history.
     </div>
   </div>
 
@@ -6747,10 +7071,11 @@ footer .license {
 
 // ---- Constants ----
 const DB_NAME = 'FreeLatticeDB';
-const DB_VERSION = 2;
+const DB_VERSION = 3;
 const STORE_CONVERSATIONS = 'conversations';
 const STORE_MESSAGES = 'messages';
 const STORE_META = 'meta';
+const STORE_MEMORY_INDEX = 'memoryIndex';
 
 const DEFAULT_SYSTEM_PROMPT = 'You are a helpful, thoughtful AI assistant provided through FreeLattice — a free, open-source tool that gives everyone access to AI. Be kind, clear, and thorough in your responses.\n\nWhen you generate code and want to suggest saving it to the user\'s workspace, format code blocks with a filename header like:\n// FILE: path/to/file.js\n<code here>\n\nIf you want to suggest an improvement to your own system prompt, output it in this exact format on its own line:\n[SYSTEM_PROMPT_SUGGESTION]: <your suggested new prompt text>\n\nYou are part of a mesh network of AI agents. When auto-query is enabled and you lack knowledge to fully answer a question, you may suggest querying the mesh by including [MESH_QUERY]: followed by a concise question. The user can also manually query the mesh using /mesh in chat. When mesh peer responses are provided, incorporate them thoughtfully and cite them as "via mesh peer".';
 
@@ -6845,6 +7170,9 @@ const state = {
   wizardProvider: '',
   wizardModel: '',
   wizardApiKey: '',
+  // Persistent Memory Index (v4.0)
+  memoryAutoContext: true,
+  memoryLastInjection: null,
 };
 
 // ---- Provider Config ----
@@ -7043,6 +7371,11 @@ function openDB() {
       }
       if (!db.objectStoreNames.contains(STORE_META)) {
         db.createObjectStore(STORE_META, { keyPath: 'key' });
+      }
+      // v3: Add memoryIndex store for Persistent Memory Index
+      if (!db.objectStoreNames.contains(STORE_MEMORY_INDEX)) {
+        const miStore = db.createObjectStore(STORE_MEMORY_INDEX, { keyPath: 'id' });
+        miStore.createIndex('timestamp', 'timestamp', { unique: false });
       }
       // v2 migration: add lastMessage and contextNote fields to existing conversations
       // This is handled post-open in migrateToV2() since we can't read data during upgrade
@@ -7504,6 +7837,22 @@ function confirmClearMemory() {
       container.innerHTML = '<div class="chat-message system">Memory cleared. Starting fresh.</div>';
       await updateMemoryStats();
       await refreshConversationList();
+      // Also clear Memory Index vault (v4.0)
+      if (typeof MemoryIndex !== 'undefined') {
+        try {
+          // Use internal miClear via the module's clearAll without re-prompting
+          const miStore = indexedDB.open('FreeLatticeMemory', 1);
+          miStore.onsuccess = (ev) => {
+            try {
+              const db = ev.target.result;
+              const tx = db.transaction('conversations', 'readwrite');
+              tx.objectStore('conversations').clear();
+            } catch(e2) {}
+          };
+          MemoryIndex.renderConvList();
+          MemoryIndex.updateStorageUsage();
+        } catch(e) {}
+      }
       showToast('All memory cleared.');
     }
   });
@@ -8253,6 +8602,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (state.ghSyncEnabled && state.ghSyncToken) {
     ghSyncPull();
   }
+  // Initialize Persistent Memory Index (v4.0)
+  if (typeof MemoryIndex !== 'undefined') {
+    await MemoryIndex.init();
+  }
+
   // Initialize Lattice Points (v3.9)
   LatticePoints.init();
 });
@@ -8994,6 +9348,21 @@ async function sendMessage() {
     saveMessage('user', message);
   }
 
+  // Persistent Memory Index: search for relevant past conversations (v4.0)
+  state.memoryLastInjection = null;
+  if (typeof MemoryIndex !== 'undefined' && state.memoryAutoContext) {
+    try {
+      const memCtx = await MemoryIndex.getContextBlock(message);
+      if (memCtx) {
+        state.memoryLastInjection = memCtx;
+        MemoryIndex.showActiveBadge(true);
+        if (typeof LatticePoints !== 'undefined') LatticePoints.award('memory_recalled', 5, 'Memory recalled');
+      } else {
+        MemoryIndex.showActiveBadge(false);
+      }
+    } catch(e) { MemoryIndex.showActiveBadge(false); }
+  }
+
   // Build messages array — use smart context if enabled
   let messages;
   const smartMessages = buildSmartMessages(message);
@@ -9188,6 +9557,11 @@ async function sendMessage() {
       // Auto-sync check (v3.4)
       ghSyncAutoCheck();
 
+      // Persist to Memory Index (v4.0)
+      if (typeof MemoryIndex !== 'undefined' && state.currentConversationId) {
+        MemoryIndex.saveConversation(state.currentConversationId, state.chatHistory, []);
+      }
+
       // Re-render with file save buttons and prompt suggestions
       const msgDiv = textSpan.parentElement;
       textSpan.textContent = '';
@@ -9238,6 +9612,11 @@ function buildMessages() {
   // Inject shared memory summary (global across all conversations)
   if (state.memorySummary) {
     systemContent += '\n\n--- MEMORY SUMMARY (what you know about this user) ---\n' + state.memorySummary + '\n--- END MEMORY SUMMARY ---\nUse this memory to personalize your responses. Reference what you know naturally.';
+  }
+
+  // Inject Persistent Memory Index context (v4.0)
+  if (state.memoryLastInjection) {
+    systemContent += '\n\n' + state.memoryLastInjection;
   }
 
   // Inject per-conversation context note
@@ -13458,6 +13837,11 @@ function rtBuildAgentMessages(agentIndex, userMessage) {
     systemContent += 'When you generate code that should be saved to the workspace, format it with a filename header like:\n// FILE: path/to/file.js\n<code here>\n\nThis allows the user to save your code directly to their project folder.\n';
   }
 
+  // Inject Persistent Memory Index context for Round Table (v4.0)
+  if (state.memoryLastInjection) {
+    systemContent += '\n' + state.memoryLastInjection + '\n';
+  }
+
   // Cross-agent context: inject latest responses from other agents
   let crossContext = '';
   for (let j = 0; j < rtState.agentCount; j++) {
@@ -13610,6 +13994,11 @@ async function rtSendToAgent(agentIndex, message) {
     if (fullResponse) {
       agent.chatHistory.push({ role: 'assistant', content: fullResponse });
       agent.lastResponse = fullResponse;
+      // Persist Round Table conversation to Memory Index (v4.0)
+      if (typeof MemoryIndex !== 'undefined') {
+        const rtConvId = 'rt_agent_' + agentIndex + '_' + Date.now().toString(36);
+        MemoryIndex.saveConversation(rtConvId, agent.chatHistory, ['roundtable', 'agent-' + (agentIndex + 1), agent.role || 'agent']);
+      }
       // Render Save to Workspace buttons for code blocks
       rtWsRenderSaveButtons(agentIndex);
     } else {
@@ -13650,6 +14039,21 @@ async function rtBroadcast() {
   // Disable broadcast button
   const btn = document.getElementById('rtBroadcastBtn');
   if (btn) { btn.disabled = true; btn.textContent = 'Sending...'; }
+
+  // Persistent Memory Index: search for relevant past conversations for Round Table (v4.0)
+  state.memoryLastInjection = null;
+  if (typeof MemoryIndex !== 'undefined' && state.memoryAutoContext) {
+    try {
+      const memCtx = await MemoryIndex.getContextBlock(message);
+      if (memCtx) {
+        state.memoryLastInjection = memCtx;
+        MemoryIndex.showActiveBadge(true);
+        if (typeof LatticePoints !== 'undefined') LatticePoints.award('memory_recalled', 5, 'Memory recalled');
+      } else {
+        MemoryIndex.showActiveBadge(false);
+      }
+    } catch(e) { MemoryIndex.showActiveBadge(false); }
+  }
 
   // Send to all agents simultaneously
   const promises = [];
@@ -14346,6 +14750,577 @@ function copyWalletAddress(elementId) {
       if (lanDiscoveryEnabled) startLanDiscovery();
     }, 1000);
   }
+})();
+
+// ============================================
+// Persistent Memory Index v4.0 — Conversations That Never Forget
+// ============================================
+const MemoryIndex = (function() {
+  const MI_DB_NAME = 'FreeLatticeMemory';
+  const MI_DB_VERSION = 1;
+  const MI_STORE = 'conversations';
+  let miDb = null;
+
+  // --- Stop Words ---
+  const STOP_WORDS = new Set([
+    'the','is','at','which','on','a','an','and','or','but','in','with','to','for',
+    'of','it','this','that','was','are','be','has','had','have','do','does','did',
+    'will','would','could','should','can','may','might','shall','not','no','so',
+    'if','then','than','too','very','just','about','above','after','again','all',
+    'also','am','any','because','been','before','being','between','both','by',
+    'came','come','each','from','get','got','he','her','here','him','his','how',
+    'i','im','into','its','like','make','many','me','more','most','much','my',
+    'no','now','of','only','other','our','out','over','said','she','some','such',
+    'take','tell','their','them','there','these','they','thing','think','those',
+    'through','up','us','use','want','was','way','we','well','were','what','when',
+    'where','while','who','why','will','with','you','your','re','ve','ll','don',
+    'doesn','didn','won','wouldn','couldn','shouldn','isn','aren','wasn','weren',
+    'haven','hasn','hadn','let','say','says','know','right','going','went','go',
+    'one','two','three','new','old','first','last','long','great','little','own',
+    'still','back','even','give','day','help','need','try','sure','yeah','yes',
+    'ok','okay','hey','hi','hello','thanks','thank','please','sorry','really',
+    'actually','basically','just','already','always','never','often','sometimes'
+  ]);
+
+  // --- IndexedDB Helpers ---
+  function openMiDb() {
+    return new Promise((resolve, reject) => {
+      const req = indexedDB.open(MI_DB_NAME, MI_DB_VERSION);
+      req.onupgradeneeded = (e) => {
+        const db = e.target.result;
+        if (!db.objectStoreNames.contains(MI_STORE)) {
+          const store = db.createObjectStore(MI_STORE, { keyPath: 'id' });
+          store.createIndex('timestamp', 'timestamp', { unique: false });
+        }
+      };
+      req.onsuccess = (e) => { miDb = e.target.result; resolve(miDb); };
+      req.onerror = (e) => reject(e.target.error);
+    });
+  }
+
+  function miTx(mode) {
+    const tx = miDb.transaction(MI_STORE, mode);
+    return tx.objectStore(MI_STORE);
+  }
+
+  function miGet(key) {
+    return new Promise((resolve, reject) => {
+      const req = miTx('readonly').get(key);
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    });
+  }
+
+  function miPut(value) {
+    return new Promise((resolve, reject) => {
+      const req = miTx('readwrite').put(value);
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    });
+  }
+
+  function miDelete(key) {
+    return new Promise((resolve, reject) => {
+      const req = miTx('readwrite').delete(key);
+      req.onsuccess = () => resolve();
+      req.onerror = () => reject(req.error);
+    });
+  }
+
+  function miGetAll() {
+    return new Promise((resolve, reject) => {
+      const req = miTx('readonly').getAll();
+      req.onsuccess = () => resolve(req.result || []);
+      req.onerror = () => reject(req.error);
+    });
+  }
+
+  function miClear() {
+    return new Promise((resolve, reject) => {
+      const req = miTx('readwrite').clear();
+      req.onsuccess = () => resolve();
+      req.onerror = () => reject(req.error);
+    });
+  }
+
+  // --- Keyword Extraction (TF-IDF inspired) ---
+  function extractKeywords(text) {
+    if (!text) return [];
+    const words = text.toLowerCase().replace(/[^a-z0-9\s'-]/g, ' ').split(/\s+/);
+    const freq = {};
+    for (const word of words) {
+      const clean = word.replace(/^['-]+|['-]+$/g, '');
+      if (clean.length < 3 || STOP_WORDS.has(clean)) continue;
+      freq[clean] = (freq[clean] || 0) + 1;
+    }
+    // Sort by frequency, take top 15
+    return Object.entries(freq)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 15)
+      .map(e => e[0]);
+  }
+
+  function generateSummary(messages) {
+    if (!messages || messages.length === 0) return '';
+    // Smart excerpt: first user message + first assistant response
+    const firstUser = messages.find(m => m.role === 'user');
+    const firstAssistant = messages.find(m => m.role === 'assistant');
+    let summary = '';
+    if (firstUser) summary += firstUser.content.substring(0, 100);
+    if (firstAssistant) summary += ' | ' + firstAssistant.content.substring(0, 100);
+    return summary.substring(0, 200);
+  }
+
+  function generateTitle(messages) {
+    const firstUser = messages.find(m => m.role === 'user');
+    if (firstUser) {
+      const title = firstUser.content.substring(0, 60);
+      return title + (firstUser.content.length > 60 ? '...' : '');
+    }
+    return 'Untitled Conversation';
+  }
+
+  // --- Core: Save/Update Conversation ---
+  async function saveConversation(convId, messages, tags) {
+    if (!miDb) return;
+    try {
+      const allText = messages.map(m => m.content).join(' ');
+      const keywords = extractKeywords(allText);
+      const existing = await miGet(convId);
+      const record = {
+        id: convId,
+        timestamp: existing ? existing.timestamp : Date.now(),
+        updatedAt: Date.now(),
+        title: generateTitle(messages),
+        messages: messages.map(m => ({
+          role: m.role,
+          content: m.content,
+          timestamp: m.timestamp || Date.now()
+        })),
+        tags: tags || [],
+        summary: generateSummary(messages),
+        keywords: keywords
+      };
+      await miPut(record);
+    } catch(e) {
+      console.warn('MemoryIndex: save error', e);
+    }
+  }
+
+  // --- Search: TF-IDF + Recency Scoring ---
+  function scoreConversation(conv, queryTokens, now) {
+    if (!queryTokens.length) return 0;
+    // Keyword match score (70% weight)
+    const convKeywords = new Set(conv.keywords || []);
+    let matchCount = 0;
+    for (const token of queryTokens) {
+      if (convKeywords.has(token)) matchCount++;
+      // Partial match bonus
+      for (const kw of convKeywords) {
+        if (kw.includes(token) || token.includes(kw)) {
+          matchCount += 0.5;
+          break;
+        }
+      }
+    }
+    const keywordScore = matchCount / queryTokens.length;
+
+    // Recency score (30% weight) — exponential decay over days
+    const daysSince = (now - (conv.updatedAt || conv.timestamp)) / 86400000;
+    const recencyScore = Math.exp(-daysSince / 30); // 30-day half-life
+
+    return (keywordScore * 0.7) + (recencyScore * 0.3);
+  }
+
+  async function search(query, limit) {
+    if (!miDb) return [];
+    limit = limit || 5;
+    try {
+      const all = await miGetAll();
+      if (all.length === 0) return [];
+
+      const queryTokens = query.toLowerCase()
+        .replace(/[^a-z0-9\s'-]/g, ' ')
+        .split(/\s+/)
+        .map(w => w.replace(/^['-]+|['-]+$/g, ''))
+        .filter(w => w.length >= 3 && !STOP_WORDS.has(w));
+
+      if (queryTokens.length === 0) return [];
+
+      const now = Date.now();
+      const scored = all.map(conv => ({
+        conv: conv,
+        score: scoreConversation(conv, queryTokens, now)
+      }));
+
+      scored.sort((a, b) => b.score - a.score);
+      return scored.filter(s => s.score > 0.1).slice(0, limit);
+    } catch(e) {
+      console.warn('MemoryIndex: search error', e);
+      return [];
+    }
+  }
+
+  // --- Auto-Context Injection ---
+  async function getContextBlock(userMessage) {
+    if (!state.memoryAutoContext || !miDb) return null;
+    try {
+      const results = await search(userMessage, 3);
+      if (results.length === 0) return null;
+
+      // Build context block, limit to ~500 tokens (~2000 chars)
+      let block = '--- MEMORY: RELEVANT PAST CONVERSATIONS ---\n';
+      let charCount = 0;
+      const maxChars = 2000;
+
+      for (const r of results) {
+        if (charCount >= maxChars) break;
+        const conv = r.conv;
+        const dateStr = new Date(conv.timestamp).toLocaleDateString();
+        let entry = '[Conversation from ' + dateStr + ': "' + (conv.title || 'Untitled').substring(0, 50) + '"]\n';
+        entry += 'Summary: ' + (conv.summary || 'No summary') + '\n';
+
+        // Find most relevant message pairs (up to 2)
+        const msgs = conv.messages || [];
+        let pairCount = 0;
+        for (let i = 0; i < msgs.length - 1 && pairCount < 2; i++) {
+          if (msgs[i].role === 'user' && msgs[i + 1] && msgs[i + 1].role === 'assistant') {
+            entry += 'User: ' + msgs[i].content.substring(0, 150) + '\n';
+            entry += 'Assistant: ' + msgs[i + 1].content.substring(0, 150) + '\n';
+            pairCount++;
+          }
+        }
+        entry += '\n';
+
+        if (charCount + entry.length > maxChars) {
+          // Truncate this entry to fit
+          entry = entry.substring(0, maxChars - charCount) + '...\n';
+        }
+        block += entry;
+        charCount += entry.length;
+      }
+
+      block += '--- END MEMORY ---';
+      return block;
+    } catch(e) {
+      console.warn('MemoryIndex: context error', e);
+      return null;
+    }
+  }
+
+  // --- UI: Memory Browser ---
+  let searchDebounce = null;
+
+  function handleSearch() {
+    clearTimeout(searchDebounce);
+    searchDebounce = setTimeout(async () => {
+      const query = document.getElementById('miSearchInput').value.trim();
+      if (!query) {
+        await renderConvList();
+        document.getElementById('miResultCount').textContent = '';
+        return;
+      }
+      const results = await search(query, 20);
+      const container = document.getElementById('miConvList');
+      document.getElementById('miResultCount').textContent = results.length + ' result' + (results.length !== 1 ? 's' : '') + ' found';
+      if (results.length === 0) {
+        container.innerHTML = '<div class="mi-empty">No matching conversations found.</div>';
+        return;
+      }
+      container.innerHTML = '';
+      for (const r of results) {
+        container.appendChild(buildConvCard(r.conv, r.score));
+      }
+    }, 300);
+  }
+
+  async function renderConvList() {
+    if (!miDb) return;
+    const container = document.getElementById('miConvList');
+    if (!container) return;
+    try {
+      const all = await miGetAll();
+      all.sort((a, b) => (b.updatedAt || b.timestamp) - (a.updatedAt || a.timestamp));
+      if (all.length === 0) {
+        container.innerHTML = '<div class="mi-empty">No conversations stored yet. Start chatting and your memory vault will grow.</div>';
+        return;
+      }
+      container.innerHTML = '';
+      for (const conv of all) {
+        container.appendChild(buildConvCard(conv));
+      }
+    } catch(e) {
+      container.innerHTML = '<div class="mi-empty">Error loading memory vault.</div>';
+    }
+  }
+
+  function buildConvCard(conv, score) {
+    const card = document.createElement('div');
+    card.className = 'mi-conv-card';
+    card.setAttribute('data-conv-id', conv.id);
+
+    const dateStr = new Date(conv.updatedAt || conv.timestamp).toLocaleDateString();
+    const msgCount = (conv.messages || []).length;
+    const keywords = (conv.keywords || []).slice(0, 8);
+
+    let keywordsHtml = '';
+    for (const kw of keywords) {
+      keywordsHtml += '<span class="mi-keyword-pill">' + escapeHtml(kw) + '</span>';
+    }
+
+    let headerHtml = '<div class="mi-conv-header">' +
+      '<div style="flex:1;min-width:0;">' +
+        '<div class="mi-conv-title">' + escapeHtml(conv.title || 'Untitled') + '</div>' +
+        '<div class="mi-conv-meta">' +
+          '<span>' + dateStr + '</span>' +
+          '<span>' + msgCount + ' message' + (msgCount !== 1 ? 's' : '') + '</span>' +
+          (score ? '<span>Score: ' + score.toFixed(2) + '</span>' : '') +
+        '</div>' +
+        (keywordsHtml ? '<div class="mi-conv-keywords">' + keywordsHtml + '</div>' : '') +
+      '</div>' +
+      '<button class="mi-conv-delete" onclick="event.stopPropagation(); MemoryIndex.deleteConv(\'' + conv.id + '\')" title="Delete this conversation">Delete</button>' +
+    '</div>';
+
+    card.innerHTML = headerHtml;
+
+    card.addEventListener('click', function() {
+      const isExpanded = card.classList.contains('expanded');
+      // Collapse all others
+      document.querySelectorAll('.mi-conv-card.expanded').forEach(c => {
+        c.classList.remove('expanded');
+        const msgDiv = c.querySelector('.mi-conv-messages');
+        if (msgDiv) msgDiv.remove();
+      });
+      if (!isExpanded) {
+        card.classList.add('expanded');
+        const msgsDiv = document.createElement('div');
+        msgsDiv.className = 'mi-conv-messages';
+        const msgs = conv.messages || [];
+        if (msgs.length === 0) {
+          msgsDiv.innerHTML = '<div class="mi-empty" style="padding:10px;">No messages in this conversation.</div>';
+        } else {
+          for (const msg of msgs) {
+            const msgEl = document.createElement('div');
+            msgEl.className = 'mi-msg ' + (msg.role || 'user');
+            msgEl.innerHTML = '<div class="mi-msg-role">' + escapeHtml(msg.role || 'unknown') + '</div>' +
+              '<div>' + escapeHtml(msg.content || '').substring(0, 500) + (msg.content && msg.content.length > 500 ? '...' : '') + '</div>';
+            msgsDiv.appendChild(msgEl);
+          }
+        }
+        card.appendChild(msgsDiv);
+      }
+    });
+
+    return card;
+  }
+
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  // --- Delete / Clear ---
+  async function deleteConv(convId) {
+    if (!miDb) return;
+    try {
+      await miDelete(convId);
+      await renderConvList();
+      await updateStorageUsage();
+      if (typeof showToast === 'function') showToast('Conversation removed from memory vault.');
+    } catch(e) {
+      console.warn('MemoryIndex: delete error', e);
+    }
+  }
+
+  async function clearAll() {
+    if (typeof showConfirm === 'function') {
+      const confirmed = await showConfirm('Clear Memory Vault?', 'This will permanently delete ALL indexed conversations from the Memory Vault. Your existing chat conversations in the main database will not be affected. This cannot be undone.');
+      if (!confirmed) return;
+    }
+    try {
+      await miClear();
+      await renderConvList();
+      await updateStorageUsage();
+      if (typeof showToast === 'function') showToast('Memory vault cleared.');
+    } catch(e) {
+      console.warn('MemoryIndex: clear error', e);
+    }
+  }
+
+  // --- Export / Import ---
+  async function exportVault() {
+    if (!miDb) return;
+    try {
+      const all = await miGetAll();
+      const data = {
+        version: '4.0',
+        type: 'FreeLatticeMemoryVault',
+        exportedAt: new Date().toISOString(),
+        conversationCount: all.length,
+        conversations: all
+      };
+      // Simple encryption: base64 encode the JSON
+      const jsonStr = JSON.stringify(data, null, 2);
+      const encoded = btoa(unescape(encodeURIComponent(jsonStr)));
+      const wrapper = {
+        format: 'FreeLatticeMemoryVault_v4',
+        encrypted: true,
+        data: encoded
+      };
+      const blob = new Blob([JSON.stringify(wrapper, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'freelattice-memory-vault-' + new Date().toISOString().slice(0, 10) + '.json';
+      a.click();
+      URL.revokeObjectURL(url);
+      if (typeof showToast === 'function') showToast('Memory vault exported (' + all.length + ' conversations).');
+      // Award Lattice Points
+      if (typeof LatticePoints !== 'undefined') LatticePoints.award('memory_vault_exported', 20, 'Memory vault exported');
+    } catch(e) {
+      if (typeof showToast === 'function') showToast('Error exporting memory vault: ' + e.message);
+    }
+  }
+
+  async function importVault(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    event.target.value = '';
+    try {
+      const text = await file.text();
+      let data;
+      const parsed = JSON.parse(text);
+      // Handle encrypted format
+      if (parsed.format === 'FreeLatticeMemoryVault_v4' && parsed.data) {
+        const decoded = decodeURIComponent(escape(atob(parsed.data)));
+        data = JSON.parse(decoded);
+      } else if (parsed.conversations && Array.isArray(parsed.conversations)) {
+        data = parsed;
+      } else {
+        throw new Error('Invalid memory vault file format.');
+      }
+      if (!data.conversations || !Array.isArray(data.conversations)) {
+        throw new Error('No conversations found in file.');
+      }
+      let imported = 0;
+      for (const conv of data.conversations) {
+        if (conv.id && conv.messages) {
+          await miPut(conv);
+          imported++;
+        }
+      }
+      await renderConvList();
+      await updateStorageUsage();
+      if (typeof showToast === 'function') showToast('Imported ' + imported + ' conversations into memory vault.');
+    } catch(e) {
+      if (typeof showToast === 'function') showToast('Error importing memory vault: ' + e.message);
+    }
+  }
+
+  // --- Storage Usage ---
+  async function updateStorageUsage() {
+    try {
+      if (navigator.storage && navigator.storage.estimate) {
+        const est = await navigator.storage.estimate();
+        const usedMB = (est.usage / (1024 * 1024)).toFixed(1);
+        const quotaMB = (est.quota / (1024 * 1024)).toFixed(0);
+        const pct = Math.min(100, ((est.usage / est.quota) * 100)).toFixed(1);
+        const fillEl = document.getElementById('miStorageFill');
+        const textEl = document.getElementById('miStorageText');
+        if (fillEl) fillEl.style.width = pct + '%';
+        if (textEl) textEl.textContent = usedMB + ' MB / ' + quotaMB + ' MB (' + pct + '%)';
+      } else {
+        const textEl = document.getElementById('miStorageText');
+        if (textEl) textEl.textContent = 'Storage API not available';
+      }
+    } catch(e) {
+      const textEl = document.getElementById('miStorageText');
+      if (textEl) textEl.textContent = 'Unable to estimate';
+    }
+  }
+
+  // --- Toggle Handler ---
+  function handleAutoContextToggle() {
+    const toggle = document.getElementById('miAutoContextToggle');
+    state.memoryAutoContext = toggle ? toggle.checked : true;
+    localStorage.setItem('fl_memoryAutoContext', state.memoryAutoContext ? 'true' : 'false');
+    if (typeof showToast === 'function') {
+      showToast(state.memoryAutoContext ? 'Memory auto-context enabled.' : 'Memory auto-context disabled.');
+    }
+  }
+
+  // --- Show/Hide Memory Active Badge ---
+  function showActiveBadge(show) {
+    const badge = document.getElementById('miActiveBadge');
+    if (badge) {
+      badge.classList.toggle('visible', show);
+    }
+  }
+
+  // --- Sync from existing DB ---
+  async function syncFromExistingDB() {
+    if (!miDb || !state.db) return;
+    try {
+      const conversations = await dbGetAll(STORE_CONVERSATIONS);
+      for (const conv of conversations) {
+        const existing = await miGet(conv.id);
+        // Only sync if not already indexed or if updated
+        if (!existing || (conv.updatedAt && new Date(conv.updatedAt).getTime() > (existing.updatedAt || 0))) {
+          const msgs = await dbGetAllByIndex(STORE_MESSAGES, 'conversationId', conv.id);
+          msgs.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+          if (msgs.length > 0) {
+            const messages = msgs.map(m => ({
+              role: m.role,
+              content: m.content,
+              timestamp: new Date(m.timestamp).getTime()
+            }));
+            await saveConversation(conv.id, messages, []);
+          }
+        }
+      }
+    } catch(e) {
+      console.warn('MemoryIndex: sync error', e);
+    }
+  }
+
+  // --- Init ---
+  async function init() {
+    try {
+      await openMiDb();
+      // Load auto-context setting
+      const saved = localStorage.getItem('fl_memoryAutoContext');
+      if (saved === 'false') {
+        state.memoryAutoContext = false;
+        const toggle = document.getElementById('miAutoContextToggle');
+        if (toggle) toggle.checked = false;
+      }
+      // Sync existing conversations into the memory index
+      await syncFromExistingDB();
+      // Render UI
+      await renderConvList();
+      await updateStorageUsage();
+    } catch(e) {
+      console.warn('MemoryIndex: init error', e);
+    }
+  }
+
+  return {
+    init: init,
+    saveConversation: saveConversation,
+    search: search,
+    getContextBlock: getContextBlock,
+    handleSearch: handleSearch,
+    renderConvList: renderConvList,
+    deleteConv: deleteConv,
+    clearAll: clearAll,
+    exportVault: exportVault,
+    importVault: importVault,
+    updateStorageUsage: updateStorageUsage,
+    handleAutoContextToggle: handleAutoContextToggle,
+    showActiveBadge: showActiveBadge,
+    syncFromExistingDB: syncFromExistingDB
+  };
 })();
 
 // ============================================
