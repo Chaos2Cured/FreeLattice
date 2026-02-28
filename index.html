@@ -5593,6 +5593,250 @@ footer .license {
   .mi-actions { flex-direction: column; }
   .mi-action-btn { width: 100%; text-align: center; }
 }
+
+/* Skill Forge — Plugin/Skill System Styles */
+.sf-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: var(--space-lg);
+  margin-top: var(--space-lg);
+}
+@media (max-width: 600px) {
+  .sf-grid { grid-template-columns: 1fr; }
+}
+.sf-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  transition: var(--transition);
+  position: relative;
+}
+.sf-card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+.sf-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+.sf-card-icon {
+  font-size: 1.5rem;
+  background: var(--bg-secondary);
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+}
+.sf-card-title {
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: var(--text-primary);
+  margin-top: 4px;
+}
+.sf-card-desc {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 4px 0;
+}
+.sf-tag {
+  font-size: 0.72rem;
+  padding: 2px 8px;
+  border-radius: 100px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+.sf-tag-dev { background: #3b82f633; color: #3b82f6; }
+.sf-tag-writing { background: #8b5cf633; color: #8b5cf6; }
+.sf-tag-language { background: #10b98133; color: #10b981; }
+.sf-tag-creativity { background: #f59e0b33; color: #f59e0b; }
+.sf-tag-research { background: #ef444433; color: #ef4444; }
+.sf-tag-productivity { background: #06b6d433; color: #06b6d4; }
+.sf-tag-other { background: #6b728033; color: #6b7280; }
+
+.sf-card-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+  padding-top: var(--space-sm);
+  border-top: 1px solid var(--border);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+.sf-card-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: var(--space-sm);
+}
+.sf-btn {
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: var(--transition);
+  border: 1px solid var(--border);
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.sf-btn:hover {
+  background: var(--bg-tertiary);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.sf-btn-primary {
+  background: var(--accent);
+  color: var(--bg-primary);
+  border: none;
+  font-weight: 600;
+}
+.sf-btn-primary:hover {
+  background: var(--accent-hover);
+  color: var(--bg-primary);
+}
+.sf-form-container {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  margin-bottom: var(--space-xl);
+  overflow: hidden;
+}
+.sf-form-header {
+  padding: var(--space-md) var(--space-lg);
+  background: var(--bg-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.sf-form-body {
+  padding: var(--space-lg);
+  display: none;
+}
+.sf-form-body.active {
+  display: block;
+}
+.sf-import-export {
+  display: flex;
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+}
+.sf-skill-select-container {
+  position: relative;
+  display: inline-block;
+}
+.sf-skill-dropdown {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.3);
+  width: 240px;
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 1000;
+  display: none;
+  margin-bottom: 8px;
+}
+.sf-skill-dropdown.active {
+  display: block;
+}
+.sf-skill-item {
+  padding: 10px 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid var(--border);
+  transition: var(--transition);
+}
+.sf-skill-item:last-child { border-bottom: none; }
+.sf-skill-item:hover {
+  background: var(--accent-glow);
+}
+.sf-skill-item-info {
+  display: flex;
+  flex-direction: column;
+}
+.sf-skill-item-name {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.sf-skill-item-desc {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sf-trigger-suggestion {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  right: 0;
+  background: var(--bg-card);
+  border: 1px solid var(--accent);
+  border-radius: 10px;
+  padding: 8px 14px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 -4px 15px var(--accent-glow);
+  animation: sf-slide-up 300ms ease;
+  z-index: 900;
+}
+@keyframes sf-slide-up {
+  from { transform: translateY(10px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.sf-trigger-text { font-size: 0.85rem; color: var(--text-primary); }
+.sf-trigger-actions { display: flex; gap: 8px; }
+.sf-usage-badge {
+  background: var(--bg-tertiary);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: monospace;
+}
+.sf-switch {
+  position: relative;
+  display: inline-block;
+  width: 36px;
+  height: 20px;
+}
+.sf-switch input { opacity: 0; width: 0; height: 0; }
+.sf-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: var(--border);
+  transition: .4s;
+  border-radius: 20px;
+}
+.sf-slider:before {
+  position: absolute;
+  content: "";
+  height: 14px; width: 14px;
+  left: 3px; bottom: 3px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+}
+input:checked + .sf-slider { background-color: var(--accent); }
+input:checked + .sf-slider:before { transform: translateX(16px); }
 </style>>
 </head>
 <body>
@@ -5932,6 +6176,7 @@ footer .license {
     <button class="tab-btn" data-tab="workspace" onclick="switchTab('workspace')">Workspace</button>
     <button class="tab-btn" data-tab="mesh" onclick="switchTab('mesh')">&#11042; Mesh</button>
     <button class="tab-btn" data-tab="settings" onclick="switchTab('settings')">Settings</button>
+    <button class="tab-btn" data-tab="skills" onclick="switchTab('skills')">⚡ Skills</button>
     <button class="tab-btn" data-tab="roundtable" onclick="switchTab('roundtable')">&#9878; Round Table</button>
   </nav>
 </div>
@@ -6954,6 +7199,96 @@ footer .license {
 </div>
 
 
+<!-- ==================== TAB: SKILLS (Skill Forge) ==================== -->
+<div class="tab-panel" id="tab-skills">
+<div class="container">
+
+  <div class="section">
+    <div class="section-title">Skill Forge — Create & Manage Skills</div>
+    <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: var(--space-lg);">
+      Forge custom skills to extend your AI's capabilities. Skills combine specialized system prompts with auto-triggering phrases to make your agents more effective.
+    </p>
+
+    <!-- Create New Skill Form -->
+    <div class="sf-form-container">
+      <div class="sf-form-header" onclick="document.getElementById('sfFormBody').classList.toggle('active')">
+        <span style="font-weight: 600; color: var(--accent);">+ Forge New Skill</span>
+        <span style="font-size: 0.8rem; color: var(--text-muted);">Click to expand</span>
+      </div>
+      <div class="sf-form-body" id="sfFormBody">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Skill Name</label>
+            <input type="text" id="sfName" placeholder="e.g., Code Reviewer">
+          </div>
+          <div class="form-group">
+            <label>Icon (Emoji)</label>
+            <input type="text" id="sfIcon" placeholder="e.g., 🔍">
+          </div>
+        </div>
+        <div class="form-group" style="margin-bottom: 16px;">
+          <label>Description</label>
+          <textarea id="sfDesc" rows="2" placeholder="What does this skill do?"></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Category</label>
+            <select id="sfCategory">
+              <option value="development">Development</option>
+              <option value="writing">Writing</option>
+              <option value="language">Language</option>
+              <option value="creativity">Creativity</option>
+              <option value="research">Research</option>
+              <option value="productivity">Productivity</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Triggers (comma-separated)</label>
+            <input type="text" id="sfTriggers" placeholder="e.g., review this code, check my code">
+          </div>
+        </div>
+        <div class="form-group" style="margin-bottom: 16px;">
+          <label>System Prompt (The Core Logic)</label>
+          <textarea id="sfPrompt" rows="4" placeholder="You are an expert... When given..."></textarea>
+        </div>
+        <div class="form-group" style="margin-bottom: 16px;">
+          <label>Input Template (Optional)</label>
+          <textarea id="sfTemplate" rows="3" placeholder="Please review this code:\n\n```{{code}}```"></textarea>
+          <div class="hint">Use {{variable}} placeholders to structure inputs.</div>
+        </div>
+        <div class="sf-card-actions">
+          <button class="sf-btn sf-btn-primary" onclick="SkillForge.saveFromForm()">Save Skill</button>
+          <button class="sf-btn" onclick="SkillForge.testSkill()">Test Skill</button>
+          <button class="sf-btn" onclick="document.getElementById('sfFormBody').classList.remove('active')">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Import/Export -->
+    <div class="sf-import-export">
+      <button class="sf-btn" onclick="SkillForge.exportAll()">&#128229; Export All Skills</button>
+      <button class="sf-btn" onclick="document.getElementById('sfImportInput').click()">&#128224; Import Skill</button>
+      <input type="file" id="sfImportInput" accept=".json" style="display:none" onchange="SkillForge.importFile(event)">
+    </div>
+
+    <!-- Installed Skills Grid -->
+    <div class="sf-grid" id="sfSkillGrid">
+      <!-- Skills populated by JS -->
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Community Skills</div>
+    <div style="padding: var(--space-lg); border: 1px dashed var(--border); border-radius: 12px; text-align: center; color: var(--text-muted); font-size: 0.9rem;">
+      <p>Community skill sharing via mesh coming soon.</p>
+      <p style="font-size: 0.8rem; margin-top: 4px;">For now, share skills by exporting and sending the JSON file.</p>
+    </div>
+  </div>
+
+</div>
+</div>
+
 <!-- ==================== TAB 5: ROUND TABLE ==================== -->
 <div class="tab-panel" id="tab-roundtable">
 <div class="rt-container">
@@ -7068,6 +7403,497 @@ footer .license {
    + Agent-to-Agent Communication — The Mesh Becomes a Brain
    + Phi-Ratio Mesh Routing — Provably Optimal Distribution
    ============================================ */
+
+// ============================================
+// Skill Forge — Plugin/Skill System
+// ============================================
+const SkillForge = (function() {
+  const DB_NAME = 'FreeLatticeSkills';
+  const DB_VERSION = 1;
+  const STORE_NAME = 'skills';
+  let db = null;
+  let skills = [];
+
+  const BUILT_IN_SKILLS = [
+    {
+      id: 'skill-code-reviewer',
+      name: 'Code Reviewer',
+      description: 'Reviews code for bugs, style issues, and security vulnerabilities',
+      author: 'FreeLattice',
+      version: '1.0.0',
+      icon: '🔍',
+      category: 'development',
+      systemPrompt: 'You are an expert code reviewer. When given code, analyze it for bugs, performance issues, and security vulnerabilities. Provide specific suggestions for improvement and explain the reasoning behind your recommendations.',
+      triggers: ['review this code', 'check my code', 'code review'],
+      inputTemplate: 'Please review the following code:\n\n```{{language}}\n{{code}}\n```',
+      outputFormat: 'structured',
+      tags: ['code', 'review', 'development'],
+      installed: true,
+      builtIn: true,
+      createdAt: Date.now(),
+      usageCount: 0
+    },
+    {
+      id: 'skill-summarizer',
+      name: 'Summarizer',
+      description: 'Condenses long text into clear, concise summaries',
+      author: 'FreeLattice',
+      version: '1.0.0',
+      icon: '📝',
+      category: 'writing',
+      systemPrompt: 'You are a professional editor specializing in summarization. Your goal is to condense long texts into clear, concise summaries that capture all key points without losing essential meaning. Use bullet points for readability.',
+      triggers: ['summarize this', 'give me a summary', 'tl;dr'],
+      inputTemplate: 'Please summarize the following text:\n\n{{text}}',
+      outputFormat: 'structured',
+      tags: ['summary', 'writing', 'editing'],
+      installed: true,
+      builtIn: true,
+      createdAt: Date.now(),
+      usageCount: 0
+    },
+    {
+      id: 'skill-translator',
+      name: 'Translator',
+      description: 'Translates text between languages with cultural context',
+      author: 'FreeLattice',
+      version: '1.0.0',
+      icon: '🌐',
+      category: 'language',
+      systemPrompt: 'You are an expert polyglot translator. Translate the provided text accurately while preserving cultural nuances, idioms, and the original tone. If multiple interpretations exist, provide the most likely one and note the alternatives.',
+      triggers: ['translate this', 'how do you say', 'in spanish', 'in french', 'in chinese'],
+      inputTemplate: 'Please translate the following text to {{target_language}}:\n\n{{text}}',
+      outputFormat: 'structured',
+      tags: ['translation', 'language', 'culture'],
+      installed: true,
+      builtIn: true,
+      createdAt: Date.now(),
+      usageCount: 0
+    },
+    {
+      id: 'skill-brainstormer',
+      name: 'Brainstormer',
+      description: 'Generates creative ideas and explores possibilities from multiple angles',
+      author: 'FreeLattice',
+      version: '1.0.0',
+      icon: '💡',
+      category: 'creativity',
+      systemPrompt: 'You are a creative strategist. When given a topic or problem, generate a wide range of creative ideas, explore unexpected possibilities, and provide multiple angles of approach. Encourage "outside the box" thinking.',
+      triggers: ['brainstorm', 'give me ideas', 'help me think of'],
+      inputTemplate: 'Let\'s brainstorm ideas for: {{topic}}',
+      outputFormat: 'structured',
+      tags: ['creativity', 'ideas', 'brainstorming'],
+      installed: true,
+      builtIn: true,
+      createdAt: Date.now(),
+      usageCount: 0
+    },
+    {
+      id: 'skill-debug-assistant',
+      name: 'Debug Assistant',
+      description: 'Helps diagnose and fix code errors with step-by-step analysis',
+      author: 'FreeLattice',
+      version: '1.0.0',
+      icon: '🐛',
+      category: 'development',
+      systemPrompt: 'You are a master debugger. When presented with an error or buggy code, provide a step-by-step analysis of the likely cause. Suggest specific fixes and explain how to prevent similar issues in the future.',
+      triggers: ['debug this', 'why is this failing', 'fix this error'],
+      inputTemplate: 'I\'m having an issue with this code:\n\n```\n{{code}}\n```\n\nError/Issue: {{error}}',
+      outputFormat: 'structured',
+      tags: ['debug', 'code', 'fix'],
+      installed: true,
+      builtIn: true,
+      createdAt: Date.now(),
+      usageCount: 0
+    }
+  ];
+
+  async function init() {
+    return new Promise((resolve, reject) => {
+      const request = indexedDB.open(DB_NAME, DB_VERSION);
+      request.onupgradeneeded = (e) => {
+        const db = e.target.result;
+        if (!db.objectStoreNames.contains(STORE_NAME)) {
+          db.createObjectStore(STORE_NAME, { keyPath: 'id' });
+        }
+      };
+      request.onsuccess = async (e) => {
+        db = e.target.result;
+        await loadSkills();
+        if (!localStorage.getItem('skillsInitialized')) {
+          for (const skill of BUILT_IN_SKILLS) {
+            await saveSkill(skill);
+          }
+          localStorage.setItem('skillsInitialized', 'true');
+          await loadSkills();
+        }
+        renderGrid();
+        renderDropdowns();
+        resolve();
+      };
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  async function loadSkills() {
+    return new Promise((resolve) => {
+      const transaction = db.transaction(STORE_NAME, 'readonly');
+      const store = transaction.objectStore(STORE_NAME);
+      const request = store.getAll();
+      request.onsuccess = () => {
+        skills = request.result;
+        resolve(skills);
+      };
+    });
+  }
+
+  async function saveSkill(skill) {
+    return new Promise((resolve) => {
+      const transaction = db.transaction(STORE_NAME, 'readwrite');
+      const store = transaction.objectStore(STORE_NAME);
+      const request = store.put(skill);
+      request.onsuccess = () => {
+        loadSkills().then(() => {
+          renderGrid();
+          renderDropdowns();
+          resolve();
+        });
+      };
+    });
+  }
+
+  async function deleteSkill(id) {
+    const skill = skills.find(s => s.id === id);
+    if (skill && skill.builtIn) return;
+    if (!confirm('Are you sure you want to delete this skill?')) return;
+    
+    return new Promise((resolve) => {
+      const transaction = db.transaction(STORE_NAME, 'readwrite');
+      const store = transaction.objectStore(STORE_NAME);
+      const request = store.delete(id);
+      request.onsuccess = () => {
+        loadSkills().then(() => {
+          renderGrid();
+          renderDropdowns();
+          resolve();
+        });
+      };
+    });
+  }
+
+  function renderGrid() {
+    const grid = document.getElementById('sfSkillGrid');
+    if (!grid) return;
+    grid.innerHTML = '';
+    
+    skills.sort((a, b) => b.createdAt - a.createdAt).forEach(skill => {
+      const card = document.createElement('div');
+      card.className = 'sf-card';
+      const categoryClass = 'sf-tag-' + (skill.category || 'other');
+      
+      card.innerHTML = `
+        <div class="sf-card-header">
+          <div class="sf-card-icon">${skill.icon || '⚡'}</div>
+          <div class="sf-switch">
+            <input type="checkbox" ${skill.installed ? 'checked' : ''} onchange="SkillForge.toggleSkill('${skill.id}')">
+            <span class="sf-slider"></span>
+          </div>
+        </div>
+        <div class="sf-card-title">${sanitizeForDOM(skill.name)}</div>
+        <div class="sf-card-desc">${sanitizeForDOM(skill.description)}</div>
+        <div><span class="sf-tag ${categoryClass}">${skill.category}</span></div>
+        <div class="sf-card-meta">
+          <span>By ${sanitizeForDOM(skill.author)}</span>
+          <span>Used <span class="sf-usage-badge">${skill.usageCount || 0}</span> times</span>
+        </div>
+        <div class="sf-card-actions">
+          <button class="sf-btn" onclick="SkillForge.editSkill('${skill.id}')">Edit</button>
+          ${!skill.builtIn ? `<button class="sf-btn" onclick="SkillForge.deleteSkill('${skill.id}')">Delete</button>` : ''}
+          <button class="sf-btn" onclick="SkillForge.shareSkill('${skill.id}')">Share</button>
+        </div>
+      `;
+      grid.appendChild(card);
+    });
+  }
+
+  async function toggleSkill(id) {
+    const skill = skills.find(s => s.id === id);
+    if (skill) {
+      skill.installed = !skill.installed;
+      await saveSkill(skill);
+    }
+  }
+
+  function saveFromForm() {
+    const name = document.getElementById('sfName').value;
+    const icon = document.getElementById('sfIcon').value || '⚡';
+    const desc = document.getElementById('sfDesc').value;
+    const cat = document.getElementById('sfCategory').value;
+    const triggers = document.getElementById('sfTriggers').value.split(',').map(t => t.trim()).filter(t => t);
+    const prompt = document.getElementById('sfPrompt').value;
+    const template = document.getElementById('sfTemplate').value;
+    
+    if (!name || !prompt) {
+      alert('Skill Name and System Prompt are required.');
+      return;
+    }
+
+    const id = document.getElementById('sfFormBody').dataset.editId || 'skill-' + crypto.randomUUID();
+    const existing = skills.find(s => s.id === id);
+    
+    const skill = {
+      id,
+      name,
+      icon,
+      description: desc,
+      category: cat,
+      author: existing ? existing.author : 'You',
+      version: existing ? existing.version : '1.0.0',
+      systemPrompt: prompt,
+      triggers,
+      inputTemplate: template,
+      installed: true,
+      builtIn: existing ? existing.builtIn : false,
+      createdAt: existing ? existing.createdAt : Date.now(),
+      usageCount: existing ? existing.usageCount : 0,
+      tags: [cat]
+    };
+
+    saveSkill(skill).then(() => {
+      document.getElementById('sfFormBody').classList.remove('active');
+      delete document.getElementById('sfFormBody').dataset.editId;
+      resetForm();
+      if (typeof LatticePoints !== 'undefined') {
+        LatticePoints.award('skill_forged', 25, 'Skill forged');
+      }
+    });
+  }
+
+  function resetForm() {
+    document.getElementById('sfName').value = '';
+    document.getElementById('sfIcon').value = '';
+    document.getElementById('sfDesc').value = '';
+    document.getElementById('sfCategory').value = 'development';
+    document.getElementById('sfTriggers').value = '';
+    document.getElementById('sfPrompt').value = '';
+    document.getElementById('sfTemplate').value = '';
+  }
+
+  function editSkill(id) {
+    const skill = skills.find(s => s.id === id);
+    if (!skill) return;
+    
+    document.getElementById('sfName').value = skill.name;
+    document.getElementById('sfIcon').value = skill.icon;
+    document.getElementById('sfDesc').value = skill.description;
+    document.getElementById('sfCategory').value = skill.category;
+    document.getElementById('sfTriggers').value = skill.triggers.join(', ');
+    document.getElementById('sfPrompt').value = skill.systemPrompt;
+    document.getElementById('sfTemplate').value = skill.inputTemplate || '';
+    
+    document.getElementById('sfFormBody').dataset.editId = id;
+    document.getElementById('sfFormBody').classList.add('active');
+    document.getElementById('tab-skills').scrollTop = 0;
+  }
+
+  function shareSkill(id) {
+    const skill = skills.find(s => s.id === id);
+    if (!skill) return;
+    const json = JSON.stringify(skill, null, 2);
+    navigator.clipboard.writeText(json).then(() => {
+      alert('Skill JSON copied to clipboard! Share it with others.');
+      if (typeof LatticePoints !== 'undefined') {
+        LatticePoints.award('skill_shared', 15, 'Skill shared to mesh');
+      }
+    });
+  }
+
+  function exportAll() {
+    const data = JSON.stringify(skills, null, 2);
+    const blob = new Blob([data], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'freelattice-skills.json';
+    a.click();
+  }
+
+  function importFile(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const imported = JSON.parse(event.target.result);
+        const skillsToImport = Array.isArray(imported) ? imported : [imported];
+        for (const s of skillsToImport) {
+          if (s.name && s.systemPrompt) {
+            if (!s.id) s.id = 'skill-' + crypto.randomUUID();
+            s.builtIn = false;
+            saveSkill(s);
+          }
+        }
+        if (typeof LatticePoints !== 'undefined') {
+          LatticePoints.award('skill_imported', 10, 'Skill imported');
+        }
+      } catch (err) {
+        alert('Invalid skill JSON file.');
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  function renderDropdowns() {
+    const chatContainer = document.querySelector('.chat-input-area');
+    if (!chatContainer) return;
+    
+    let dropdown = document.getElementById('sfChatDropdown');
+    if (!dropdown) {
+      const container = document.createElement('div');
+      container.className = 'sf-skill-select-container';
+      container.innerHTML = `
+        <button class="sf-btn" id="sfChatBtn" title="Skills" style="height: 38px; margin-right: 8px;">
+          ⚡
+        </button>
+        <div class="sf-skill-dropdown" id="sfChatDropdown"></div>
+      `;
+      chatContainer.insertBefore(container, chatContainer.firstChild);
+      
+      document.getElementById('sfChatBtn').onclick = (e) => {
+        e.stopPropagation();
+        document.getElementById('sfChatDropdown').classList.toggle('active');
+      };
+      
+      document.addEventListener('click', () => {
+        document.getElementById('sfChatDropdown')?.classList.remove('active');
+      });
+      
+      dropdown = document.getElementById('sfChatDropdown');
+    }
+    
+    const enabledSkills = skills.filter(s => s.installed);
+    dropdown.innerHTML = enabledSkills.length ? '' : '<div class="sf-skill-item">No skills enabled</div>';
+    
+    enabledSkills.forEach(skill => {
+      const item = document.createElement('div');
+      item.className = 'sf-skill-item';
+      item.innerHTML = `
+        <span>${skill.icon}</span>
+        <div class="sf-skill-item-info">
+          <div class="sf-skill-item-name">${sanitizeForDOM(skill.name)}</div>
+          <div class="sf-skill-item-desc">${sanitizeForDOM(skill.description)}</div>
+        </div>
+      `;
+      item.onclick = () => activateSkill(skill);
+      dropdown.appendChild(item);
+    });
+  }
+
+  function activateSkill(skill, isAuto = false) {
+    const input = document.getElementById('chatInput');
+    if (!input) return;
+    
+    let content = input.value;
+    if (skill.inputTemplate && !isAuto) {
+      content = skill.inputTemplate.replace('{{text}}', content).replace('{{code}}', content).replace('{{topic}}', content);
+    }
+    
+    // Set a flag to use this skill's prompt in the next message
+    window.activeSkill = skill;
+    input.value = content;
+    input.focus();
+    
+    const statusText = document.getElementById('statusText');
+    if (statusText) {
+      statusText.innerHTML = `⚡ Skill Active: ${skill.name}`;
+      setTimeout(() => {
+        if (statusText.innerHTML.includes(skill.name)) {
+          statusText.innerHTML = 'Ready';
+        }
+      }, 3000);
+    }
+  }
+
+  function checkTriggers(text) {
+    if (!text || text.length < 3) return;
+    const enabledSkills = skills.filter(s => s.installed);
+    const match = enabledSkills.find(s => 
+      s.triggers.some(t => text.toLowerCase().includes(t.toLowerCase()))
+    );
+    
+    if (match) {
+      showTriggerSuggestion(match);
+    }
+  }
+
+  function showTriggerSuggestion(skill) {
+    const existing = document.getElementById('sfSuggestion');
+    if (existing) return;
+    
+    const chatMain = document.querySelector('.chat-main');
+    if (!chatMain) return;
+    
+    const suggestion = document.createElement('div');
+    suggestion.id = 'sfSuggestion';
+    suggestion.className = 'sf-trigger-suggestion';
+    suggestion.innerHTML = `
+      <div class="sf-trigger-text">💡 Skill match: <b>${skill.name}</b> — Use this skill?</div>
+      <div class="sf-trigger-actions">
+        <button class="sf-btn sf-btn-primary" id="sfAcceptTrigger">Accept</button>
+        <button class="sf-btn" id="sfDismissTrigger">Dismiss</button>
+      </div>
+    `;
+    
+    const inputArea = document.querySelector('.chat-input-area');
+    inputArea.appendChild(suggestion);
+    
+    document.getElementById('sfAcceptTrigger').onclick = () => {
+      activateSkill(skill, true);
+      suggestion.remove();
+    };
+    
+    document.getElementById('sfDismissTrigger').onclick = () => suggestion.remove();
+    
+    setTimeout(() => suggestion?.remove(), 5000);
+  }
+
+  // Hook into sendMessage to use active skill and increment count
+  function getSkillPrompt() {
+    if (window.activeSkill) {
+      const prompt = window.activeSkill.systemPrompt;
+      incrementUsage(window.activeSkill.id);
+      window.activeSkill = null;
+      if (typeof LatticePoints !== 'undefined') {
+        LatticePoints.award('skill_activated', 3, 'Skill activated');
+      }
+      return prompt;
+    }
+    return null;
+  }
+
+  async function incrementUsage(id) {
+    const skill = skills.find(s => s.id === id);
+    if (skill) {
+      skill.usageCount = (skill.usageCount || 0) + 1;
+      await saveSkill(skill);
+    }
+  }
+
+  return {
+    init,
+    saveFromForm,
+    editSkill,
+    deleteSkill,
+    toggleSkill,
+    shareSkill,
+    exportAll,
+    importFile,
+    checkTriggers,
+    getSkillPrompt,
+    activateSkill,
+    renderDropdowns,
+    testSkill: () => alert('Test skill feature: In a real session, this would open a mini chat. For now, save the skill and try it in the main chat!')
+  };
+})();
 
 // ---- Constants ----
 const DB_NAME = 'FreeLatticeDB';
@@ -8609,6 +9435,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Initialize Lattice Points (v3.9)
   LatticePoints.init();
+  
+  // Initialize Skill Forge
+  await SkillForge.init();
+  // Ensure skills are available for other components
+  SkillForge.renderDropdowns();
 });
 
 // ============================================
@@ -9341,6 +10172,9 @@ async function sendMessage() {
   if (typeof LatticePoints !== 'undefined') LatticePoints.awardChat();
   state.chatHistory.push({ role: 'user', content: message });
   input.value = '';
+  
+  // Skill Forge: Auto-trigger check
+  if (typeof SkillForge !== 'undefined') SkillForge.checkTriggers(message);
   input.style.height = 'auto';
 
   // Persist user message
@@ -9607,7 +10441,7 @@ function buildMessages() {
   const messages = [];
 
   // System message with context + memory
-  let systemContent = state.customSystemPrompt || DEFAULT_SYSTEM_PROMPT;
+  let systemContent = (typeof SkillForge !== 'undefined' ? SkillForge.getSkillPrompt() : null) || state.customSystemPrompt || DEFAULT_SYSTEM_PROMPT;
 
   // Inject shared memory summary (global across all conversations)
   if (state.memorySummary) {
@@ -10302,7 +11136,7 @@ function buildSmartMessages(userMessage) {
   let usedTokens = 0;
 
   // 1. System prompt (always keep)
-  let systemContent = state.customSystemPrompt || DEFAULT_SYSTEM_PROMPT;
+  let systemContent = (typeof SkillForge !== 'undefined' ? SkillForge.getSkillPrompt() : null) || state.customSystemPrompt || DEFAULT_SYSTEM_PROMPT;
   usedTokens += estimateTokens(systemContent);
 
   // 2. Memory summary (always keep, it's small)
@@ -13640,6 +14474,10 @@ function rtBuildPanels() {
           '<select onchange="rtState.agents[' + i + '].model = this.value" title="Model">' +
             rtBuildModelOptions(agent.model) +
           '</select>' +
+          '<select onchange="rtState.agents[' + i + '].skillId = this.value" title="Skill">' +
+            '<option value="">No Skill</option>' +
+            (typeof SkillForge !== 'undefined' ? SkillForge.skills.filter(s => s.installed).map(s => '<option value="' + s.id + '"' + (agent.skillId === s.id ? ' selected' : '') + '>' + s.icon + ' ' + sanitizeForDOM(s.name) + '</option>').join('') : '') +
+          '</select>' +
         '</div>' +
       '</div>' +
       '<div class="rt-panel-files" id="rtPanelFiles' + i + '">' +
@@ -13799,8 +14637,18 @@ function rtBuildAgentMessages(agentIndex, userMessage) {
   const agent = rtState.agents[agentIndex];
   const messages = [];
 
+  // Skill Forge: Inject skill prompt if selected
+  let skillPrompt = '';
+  if (typeof SkillForge !== 'undefined' && agent.skillId) {
+    const skill = SkillForge.skills.find(s => s.id === agent.skillId);
+    if (skill) {
+      skillPrompt = skill.systemPrompt + '\n\n';
+      SkillForge.incrementUsage(skill.id);
+    }
+  }
+
   // System prompt
-  let systemContent = 'You are Agent ' + (agentIndex + 1) + ' with the role of "' + agent.role + '" in a multi-agent Round Table coordination session. Work collaboratively with the other agents. Be focused, concise, and stay in your role.\n';
+  let systemContent = skillPrompt + 'You are Agent ' + (agentIndex + 1) + ' with the role of "' + agent.role + '" in a multi-agent Round Table coordination session. Work collaboratively with the other agents. Be focused, concise, and stay in your role.\n';
 
   // Shared context
   const sharedText = document.getElementById('rtSharedContextText');
