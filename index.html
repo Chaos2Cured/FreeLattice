@@ -5837,6 +5837,536 @@ footer .license {
 }
 input:checked + .sf-slider { background-color: var(--accent); }
 input:checked + .sf-slider:before { transform: translateX(16px); }
+/* ============================================
+   Marketplace — Bounty Economy (v4.2)
+   ============================================ */
+.mkt-dashboard {
+  background: linear-gradient(135deg, #111827 0%, #0f1629 100%);
+  border: 1px solid #d4a01733;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+.mkt-dashboard-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #d4a017;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.mkt-reserve-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.mkt-stat-card {
+  background: #0a0e1a;
+  border: 1px solid #1e293b;
+  border-radius: 10px;
+  padding: 12px 16px;
+  flex: 1 1 180px;
+  min-width: 160px;
+}
+.mkt-stat-label {
+  font-size: 0.72rem;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+.mkt-stat-value {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #e2e8f0;
+  word-break: break-all;
+}
+.mkt-stat-value.gold { color: #d4a017; }
+.mkt-stat-value.green { color: #10b981; }
+.mkt-stat-value small {
+  font-size: 0.72rem;
+  color: #94a3b8;
+  font-weight: 400;
+}
+.mkt-wallet-addr {
+  font-family: monospace;
+  font-size: 0.68rem;
+  color: #94a3b8;
+  word-break: break-all;
+}
+.mkt-philosophy {
+  font-size: 0.78rem;
+  color: #94a3b8;
+  font-style: italic;
+  line-height: 1.5;
+  margin-top: 10px;
+  padding: 10px 14px;
+  background: #d4a01708;
+  border-left: 3px solid #d4a01744;
+  border-radius: 0 8px 8px 0;
+}
+.mkt-btn {
+  padding: 8px 18px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+.mkt-btn-gold {
+  background: linear-gradient(135deg, #d4a017, #b8860b);
+  color: #0a0e1a;
+}
+.mkt-btn-gold:hover { background: linear-gradient(135deg, #e6b422, #d4a017); transform: translateY(-1px); }
+.mkt-btn-blue {
+  background: #3b82f6;
+  color: #fff;
+}
+.mkt-btn-blue:hover { background: #2563eb; }
+.mkt-btn-green {
+  background: #10b981;
+  color: #fff;
+}
+.mkt-btn-green:hover { background: #059669; }
+.mkt-btn-red {
+  background: #ef4444;
+  color: #fff;
+}
+.mkt-btn-red:hover { background: #dc2626; }
+.mkt-btn-outline {
+  background: transparent;
+  border: 1px solid #1e293b;
+  color: #e2e8f0;
+}
+.mkt-btn-outline:hover { border-color: #d4a017; color: #d4a017; }
+.mkt-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.mkt-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.mkt-filter-btn {
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid #1e293b;
+  background: transparent;
+  color: #94a3b8;
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.mkt-filter-btn:hover { border-color: #d4a017; color: #d4a017; }
+.mkt-filter-btn.active { background: #d4a017; color: #0a0e1a; border-color: #d4a017; font-weight: 600; }
+.mkt-sort-select {
+  margin-left: auto;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid #1e293b;
+  background: #0a0e1a;
+  color: #e2e8f0;
+  font-size: 0.78rem;
+}
+.mkt-bounty-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 14px;
+  margin-bottom: 20px;
+}
+.mkt-bounty-card {
+  background: #111827;
+  border: 1px solid #1e293b;
+  border-radius: 12px;
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+.mkt-bounty-card:hover { border-color: #d4a01788; transform: translateY(-2px); box-shadow: 0 4px 20px #d4a01715; }
+.mkt-bounty-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 8px;
+}
+.mkt-bounty-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #e2e8f0;
+  flex: 1;
+  margin-right: 10px;
+}
+.mkt-bounty-reward {
+  background: #d4a01720;
+  color: #d4a017;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.mkt-bounty-desc {
+  font-size: 0.8rem;
+  color: #94a3b8;
+  line-height: 1.45;
+  margin-bottom: 10px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.mkt-bounty-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  font-size: 0.72rem;
+}
+.mkt-cat-badge {
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+.mkt-cat-development { background: #3b82f620; color: #3b82f6; }
+.mkt-cat-design { background: #8b5cf620; color: #8b5cf6; }
+.mkt-cat-content { background: #10b98120; color: #10b981; }
+.mkt-cat-testing { background: #f59e0b20; color: #f59e0b; }
+.mkt-cat-translation { background: #06b6d420; color: #06b6d4; }
+.mkt-cat-community { background: #ec489920; color: #ec4899; }
+.mkt-cat-other { background: #6b728020; color: #6b7280; }
+.mkt-status-badge {
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+.mkt-status-open { background: #10b98120; color: #10b981; }
+.mkt-status-claimed { background: #f59e0b20; color: #f59e0b; }
+.mkt-status-completed { background: #3b82f620; color: #3b82f6; }
+.mkt-status-verified { background: #d4a01720; color: #d4a017; }
+.mkt-bounty-poster {
+  color: #64748b;
+  font-size: 0.72rem;
+}
+.mkt-post-form {
+  background: #111827;
+  border: 1px solid #1e293b;
+  border-radius: 12px;
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+.mkt-post-toggle {
+  padding: 14px 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  color: #d4a017;
+  font-size: 0.88rem;
+  transition: background 0.2s;
+}
+.mkt-post-toggle:hover { background: #1e293b44; }
+.mkt-post-toggle .mkt-toggle-arrow {
+  transition: transform 0.2s;
+  font-size: 0.7rem;
+}
+.mkt-post-toggle.open .mkt-toggle-arrow { transform: rotate(90deg); }
+.mkt-post-body {
+  padding: 0 18px 18px;
+  display: none;
+}
+.mkt-post-body.open { display: block; }
+.mkt-form-row {
+  margin-bottom: 12px;
+}
+.mkt-form-row label {
+  display: block;
+  font-size: 0.78rem;
+  color: #94a3b8;
+  margin-bottom: 4px;
+  font-weight: 500;
+}
+.mkt-form-row input,
+.mkt-form-row textarea,
+.mkt-form-row select {
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #1e293b;
+  background: #0a0e1a;
+  color: #e2e8f0;
+  font-size: 0.82rem;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+.mkt-form-row textarea { min-height: 80px; resize: vertical; }
+.mkt-form-row input:focus,
+.mkt-form-row textarea:focus,
+.mkt-form-row select:focus { border-color: #d4a017; outline: none; }
+.mkt-form-note {
+  font-size: 0.72rem;
+  color: #64748b;
+  font-style: italic;
+  margin-top: 8px;
+}
+.mkt-form-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+}
+.mkt-detail-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: #0a0e1acc;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.mkt-detail-panel {
+  background: #111827;
+  border: 1px solid #1e293b;
+  border-radius: 14px;
+  max-width: 680px;
+  width: 100%;
+  max-height: 85vh;
+  overflow-y: auto;
+  padding: 24px;
+  position: relative;
+}
+.mkt-detail-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: none;
+  border: none;
+  color: #94a3b8;
+  font-size: 1.3rem;
+  cursor: pointer;
+}
+.mkt-detail-close:hover { color: #e2e8f0; }
+.mkt-detail-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #e2e8f0;
+  margin-bottom: 6px;
+  padding-right: 30px;
+}
+.mkt-detail-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 14px;
+  align-items: center;
+}
+.mkt-detail-section {
+  margin-bottom: 16px;
+}
+.mkt-detail-section-title {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #d4a017;
+  margin-bottom: 6px;
+}
+.mkt-detail-desc {
+  font-size: 0.85rem;
+  color: #cbd5e1;
+  line-height: 1.55;
+  white-space: pre-wrap;
+}
+.mkt-detail-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid #1e293b;
+}
+.mkt-timeline {
+  display: flex;
+  gap: 0;
+  margin: 14px 0;
+  align-items: center;
+}
+.mkt-timeline-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  position: relative;
+}
+.mkt-timeline-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #1e293b;
+  border: 2px solid #334155;
+  z-index: 1;
+}
+.mkt-timeline-dot.active { background: #d4a017; border-color: #d4a017; }
+.mkt-timeline-dot.done { background: #10b981; border-color: #10b981; }
+.mkt-timeline-label {
+  font-size: 0.65rem;
+  color: #64748b;
+  margin-top: 4px;
+  text-align: center;
+}
+.mkt-timeline-step:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  top: 6px;
+  left: 50%;
+  width: 100%;
+  height: 2px;
+  background: #1e293b;
+  z-index: 0;
+}
+.mkt-timeline-step.done:not(:last-child)::after { background: #10b981; }
+.mkt-messages {
+  max-height: 200px;
+  overflow-y: auto;
+  margin-bottom: 10px;
+  padding: 8px;
+  background: #0a0e1a;
+  border-radius: 8px;
+  border: 1px solid #1e293b;
+}
+.mkt-msg {
+  margin-bottom: 8px;
+  font-size: 0.78rem;
+}
+.mkt-msg-from {
+  font-weight: 600;
+  color: #d4a017;
+}
+.mkt-msg-text {
+  color: #cbd5e1;
+  margin-left: 4px;
+}
+.mkt-msg-time {
+  color: #475569;
+  font-size: 0.68rem;
+  margin-left: 6px;
+}
+.mkt-msg-input-row {
+  display: flex;
+  gap: 8px;
+}
+.mkt-msg-input-row input {
+  flex: 1;
+  padding: 7px 12px;
+  border-radius: 8px;
+  border: 1px solid #1e293b;
+  background: #0a0e1a;
+  color: #e2e8f0;
+  font-size: 0.8rem;
+}
+.mkt-msg-input-row input:focus { border-color: #d4a017; outline: none; }
+.mkt-redeem-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: #0a0e1acc;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.mkt-redeem-panel {
+  background: #111827;
+  border: 1px solid #d4a01744;
+  border-radius: 14px;
+  max-width: 500px;
+  width: 100%;
+  padding: 24px;
+}
+.mkt-redeem-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #d4a017;
+  margin-bottom: 16px;
+}
+.mkt-redeem-info {
+  font-size: 0.82rem;
+  color: #94a3b8;
+  margin-bottom: 14px;
+  line-height: 1.5;
+}
+.mkt-redeem-disclaimer {
+  font-size: 0.72rem;
+  color: #64748b;
+  font-style: italic;
+  margin-top: 12px;
+  padding: 10px;
+  background: #0a0e1a;
+  border-radius: 8px;
+  border: 1px solid #1e293b;
+}
+.mkt-redeem-history {
+  margin-top: 14px;
+}
+.mkt-redeem-history-title {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #d4a017;
+  margin-bottom: 8px;
+}
+.mkt-redeem-entry {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 10px;
+  background: #0a0e1a;
+  border-radius: 8px;
+  margin-bottom: 6px;
+  font-size: 0.75rem;
+  border: 1px solid #1e293b;
+}
+.mkt-redeem-entry-status {
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 0.68rem;
+  font-weight: 600;
+}
+.mkt-redeem-status-pending { background: #f59e0b20; color: #f59e0b; }
+.mkt-redeem-status-processed { background: #3b82f620; color: #3b82f6; }
+.mkt-redeem-status-completed { background: #10b98120; color: #10b981; }
+.mkt-empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: #64748b;
+  font-size: 0.88rem;
+}
+.mkt-empty-icon {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+  opacity: 0.5;
+}
+.mkt-mesh-btn {
+  font-size: 0.72rem;
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid #1e293b;
+  background: transparent;
+  color: #94a3b8;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.mkt-mesh-btn:hover { border-color: #06b6d4; color: #06b6d4; }
+@media (max-width: 600px) {
+  .mkt-bounty-grid { grid-template-columns: 1fr; }
+  .mkt-reserve-row { flex-direction: column; }
+  .mkt-detail-panel { padding: 16px; }
+}
 </style>>
 </head>
 <body>
@@ -6178,6 +6708,7 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
     <button class="tab-btn" data-tab="settings" onclick="switchTab('settings')">Settings</button>
     <button class="tab-btn" data-tab="skills" onclick="switchTab('skills')">⚡ Skills</button>
     <button class="tab-btn" data-tab="roundtable" onclick="switchTab('roundtable')">&#9878; Round Table</button>
+    <button class="tab-btn" data-tab="market" onclick="switchTab('market')">&#127978; Market</button>
   </nav>
 </div>
 
@@ -7383,6 +7914,122 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
       <button onclick="rtWsClosePreview()">Close</button>
       <button class="primary" onclick="rtWsLoadPreviewToAgent()">&#128229; Load into Agent Context</button>
     </div>
+  </div>
+</div>
+
+<!-- ==================== TAB: MARKETPLACE (v4.2) ==================== -->
+<div class="tab-panel" id="tab-market">
+  <!-- Economy Dashboard -->
+  <div class="mkt-dashboard" id="mktDashboard">
+    <div class="mkt-dashboard-title">&#128142; Economy Dashboard &mdash; Season 1: Genesis</div>
+    <div class="mkt-reserve-row">
+      <div class="mkt-stat-card">
+        <div class="mkt-stat-label">Reserve Status</div>
+        <div class="mkt-stat-value green">Economy backed by $FL reserve</div>
+        <div class="mkt-wallet-addr" style="margin-top:6px;">Reserve: FHo1XEHgnDfnNs6YauDkojYGkwQ9gAvmHyv8cFXrX6Ao</div>
+      </div>
+      <div class="mkt-stat-card">
+        <div class="mkt-stat-label">Exchange Rate</div>
+        <div class="mkt-stat-value gold">1,000 LP = 1 $FL</div>
+        <div style="font-size:0.7rem;color:#64748b;margin-top:4px;">Exchange rate reviewed each season (3 months)</div>
+      </div>
+      <div class="mkt-stat-card">
+        <div class="mkt-stat-label">Monthly Redemption Cap</div>
+        <div class="mkt-stat-value">50,000 $FL <small>max per month (all users)</small></div>
+      </div>
+    </div>
+    <div class="mkt-reserve-row">
+      <div class="mkt-stat-card">
+        <div class="mkt-stat-label">Your Redeemable Balance</div>
+        <div class="mkt-stat-value gold" id="mktUserBalance">0 LP</div>
+        <div style="font-size:0.75rem;color:#94a3b8;margin-top:2px;" id="mktUserFlValue">= 0 $FL</div>
+      </div>
+      <div class="mkt-stat-card">
+        <div class="mkt-stat-label">FreeLattice Coin (Solana)</div>
+        <div class="mkt-wallet-addr">738e9U81pp3MwHaLSyn5fw9VVostYgKpNVVDYBbPpump</div>
+        <div style="font-size:0.68rem;color:#475569;margin-top:4px;">Reserve is publicly verifiable on-chain</div>
+      </div>
+      <div class="mkt-stat-card" style="display:flex;align-items:center;justify-content:center;">
+        <button class="mkt-btn mkt-btn-gold" onclick="Marketplace.openRedeemModal()">&#128176; Request Redemption</button>
+      </div>
+    </div>
+    <div class="mkt-philosophy">The Lattice economy is backed by real value. Every point earned represents real contribution. Every redemption is honored from the reserve. We rise together.</div>
+  </div>
+
+  <!-- Post Bounty Form -->
+  <div class="mkt-post-form" id="mktPostForm">
+    <div class="mkt-post-toggle" onclick="Marketplace.togglePostForm()">
+      <span class="mkt-toggle-arrow">&#9654;</span>
+      <span>+ Post a New Bounty</span>
+    </div>
+    <div class="mkt-post-body" id="mktPostBody">
+      <div class="mkt-form-row">
+        <label>Title</label>
+        <input type="text" id="mktPostTitle" placeholder="e.g. Build a weather skill plugin" maxlength="120">
+      </div>
+      <div class="mkt-form-row">
+        <label>Description</label>
+        <textarea id="mktPostDesc" placeholder="Describe the task in detail..."></textarea>
+      </div>
+      <div class="mkt-form-row" style="display:flex;gap:12px;flex-wrap:wrap;">
+        <div style="flex:1;min-width:140px;">
+          <label>Reward (Lattice Points)</label>
+          <input type="number" id="mktPostReward" min="10" max="10000" placeholder="100" value="100">
+        </div>
+        <div style="flex:1;min-width:140px;">
+          <label>Category</label>
+          <select id="mktPostCategory">
+            <option value="development">Development</option>
+            <option value="design">Design</option>
+            <option value="content">Content</option>
+            <option value="testing">Testing</option>
+            <option value="translation">Translation</option>
+            <option value="community">Community</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div style="flex:1;min-width:140px;">
+          <label>Deadline (optional)</label>
+          <input type="date" id="mktPostDeadline">
+        </div>
+      </div>
+      <div class="mkt-form-row">
+        <label>Requirements</label>
+        <textarea id="mktPostReqs" placeholder="Specific requirements, acceptance criteria..." style="min-height:50px;"></textarea>
+      </div>
+      <div class="mkt-form-note">Posting a bounty reserves the reward points from your balance. Points are returned if the bounty expires unclaimed.</div>
+      <div class="mkt-form-actions">
+        <button class="mkt-btn mkt-btn-gold" onclick="Marketplace.postBounty()">&#128640; Post Bounty</button>
+        <button class="mkt-btn mkt-btn-outline" onclick="Marketplace.togglePostForm()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter & Sort Toolbar -->
+  <div class="mkt-toolbar">
+    <button class="mkt-filter-btn active" data-filter="all" onclick="Marketplace.setFilter('all')">All</button>
+    <button class="mkt-filter-btn" data-filter="open" onclick="Marketplace.setFilter('open')">Open</button>
+    <button class="mkt-filter-btn" data-filter="mine" onclick="Marketplace.setFilter('mine')">My Bounties</button>
+    <button class="mkt-filter-btn" data-filter="claims" onclick="Marketplace.setFilter('claims')">My Claims</button>
+    <select class="mkt-sort-select" id="mktSortSelect" onchange="Marketplace.setSort(this.value)">
+      <option value="newest">Newest</option>
+      <option value="reward">Highest Reward</option>
+      <option value="deadline">Ending Soon</option>
+    </select>
+  </div>
+
+  <!-- Bounty Grid -->
+  <div class="mkt-bounty-grid" id="mktBountyGrid">
+    <!-- Populated by JS -->
+  </div>
+  <div class="mkt-empty hidden" id="mktEmptyState">
+    <div class="mkt-empty-icon">&#128270;</div>
+    <div>No bounties match your filter. Try a different view or post a new bounty!</div>
+  </div>
+
+  <!-- Mesh Note -->
+  <div class="privacy-info" style="margin-top:10px;">
+    <strong>&#11042; Mesh-synced bounties coming soon</strong> &mdash; bounties will be visible to all connected peers. For now, bounties are stored locally on your device.
   </div>
 </div>
 
@@ -16355,6 +17002,692 @@ const LatticePoints = (function() {
     getHistory: getHistory,
     renderPointsUI: renderPointsUI,
     renderBadge: renderBadge
+  };
+})();
+
+// ============================================
+// Marketplace — Bounty Economy backed by $FL (v4.2)
+// ============================================
+const Marketplace = (function() {
+  const DB_NAME = 'FreeLatticeMarket';
+  const DB_VERSION = 1;
+  const STORE_BOUNTIES = 'bounties';
+  const STORE_REDEMPTIONS = 'redemptions';
+  const EXCHANGE_RATE = 1000;
+  const MIN_REDEEM = 1000;
+  const MONTHLY_CAP = 50000;
+  const STORAGE_KEY_USER = 'mktUsername';
+  const STORAGE_KEY_INIT = 'mktSampleSeeded';
+
+  let db = null;
+  let currentFilter = 'all';
+  let currentSort = 'newest';
+  let mktInitialized = false;
+
+  function openDB() {
+    return new Promise(function(resolve, reject) {
+      if (db) { resolve(db); return; }
+      var req = indexedDB.open(DB_NAME, DB_VERSION);
+      req.onupgradeneeded = function(e) {
+        var d = e.target.result;
+        if (!d.objectStoreNames.contains(STORE_BOUNTIES)) {
+          var bs = d.createObjectStore(STORE_BOUNTIES, { keyPath: 'id' });
+          bs.createIndex('status', 'status', { unique: false });
+          bs.createIndex('postedBy', 'postedBy', { unique: false });
+          bs.createIndex('claimedBy', 'claimedBy', { unique: false });
+          bs.createIndex('postedAt', 'postedAt', { unique: false });
+        }
+        if (!d.objectStoreNames.contains(STORE_REDEMPTIONS)) {
+          var rs = d.createObjectStore(STORE_REDEMPTIONS, { keyPath: 'id' });
+          rs.createIndex('createdAt', 'createdAt', { unique: false });
+        }
+      };
+      req.onsuccess = function(e) { db = e.target.result; resolve(db); };
+      req.onerror = function(e) { reject(e.target.error); };
+    });
+  }
+
+  function dbPut(store, obj) {
+    return openDB().then(function(d) {
+      return new Promise(function(resolve, reject) {
+        var tx = d.transaction(store, 'readwrite');
+        tx.objectStore(store).put(obj);
+        tx.oncomplete = function() { resolve(); };
+        tx.onerror = function(e) { reject(e.target.error); };
+      });
+    });
+  }
+
+  function dbGetAll(store) {
+    return openDB().then(function(d) {
+      return new Promise(function(resolve, reject) {
+        var tx = d.transaction(store, 'readonly');
+        var req = tx.objectStore(store).getAll();
+        req.onsuccess = function() { resolve(req.result || []); };
+        req.onerror = function(e) { reject(e.target.error); };
+      });
+    });
+  }
+
+  function dbGet(store, id) {
+    return openDB().then(function(d) {
+      return new Promise(function(resolve, reject) {
+        var tx = d.transaction(store, 'readonly');
+        var req = tx.objectStore(store).get(id);
+        req.onsuccess = function() { resolve(req.result); };
+        req.onerror = function(e) { reject(e.target.error); };
+      });
+    });
+  }
+
+  function uuid() {
+    return 'bounty-' + Date.now().toString(36) + '-' + Math.random().toString(36).substr(2, 9);
+  }
+  function redeemUuid() {
+    return 'redeem-' + Date.now().toString(36) + '-' + Math.random().toString(36).substr(2, 9);
+  }
+  function getUsername() {
+    var u = localStorage.getItem(STORAGE_KEY_USER);
+    if (!u) {
+      u = 'User-' + Math.random().toString(36).substr(2, 6);
+      localStorage.setItem(STORAGE_KEY_USER, u);
+    }
+    return u;
+  }
+  function escapeHtml(str) {
+    var div = document.createElement('div');
+    div.textContent = str || '';
+    return div.innerHTML;
+  }
+  function formatDate(ts) {
+    if (!ts) return '';
+    var d = new Date(ts);
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  }
+  function timeAgo(ts) {
+    var diff = Date.now() - ts;
+    var mins = Math.floor(diff / 60000);
+    if (mins < 1) return 'just now';
+    if (mins < 60) return mins + 'm ago';
+    var hrs = Math.floor(mins / 60);
+    if (hrs < 24) return hrs + 'h ago';
+    var days = Math.floor(hrs / 24);
+    if (days < 30) return days + 'd ago';
+    return formatDate(ts);
+  }
+
+  function seedSamples() {
+    if (localStorage.getItem(STORAGE_KEY_INIT)) return Promise.resolve();
+    var samples = [
+      {
+        id: 'bounty-sample-001',
+        title: 'Create a Pomodoro Timer Skill',
+        description: 'Build a Skill Forge plugin that implements a Pomodoro timer with voice announcements. The skill should allow users to start, pause, and reset timer sessions. Include configurable work/break intervals and audio notifications.',
+        reward: 200,
+        category: 'development',
+        status: 'open',
+        postedBy: 'FreeLattice',
+        postedAt: Date.now() - 86400000 * 2,
+        deadline: null,
+        requirements: 'Must work with the Skill Forge plugin system. Should include auto-trigger phrases like "start pomodoro" and "timer status". Voice announcements via TTS when available.',
+        claimedBy: null,
+        claimedAt: null,
+        submission: null,
+        submittedAt: null,
+        completedAt: null,
+        messages: []
+      },
+      {
+        id: 'bounty-sample-002',
+        title: 'Write FreeLattice Documentation',
+        description: 'Write a comprehensive getting-started guide for new FreeLattice users. Cover initial setup, provider configuration, chat features, Mesh networking, Skill Forge, Round Table, and Lattice Points.',
+        reward: 300,
+        category: 'content',
+        status: 'open',
+        postedBy: 'FreeLattice',
+        postedAt: Date.now() - 86400000,
+        deadline: null,
+        requirements: 'Markdown format preferred. Should be beginner-friendly with screenshots or descriptions of key UI elements. Minimum 2000 words covering all major features.',
+        claimedBy: null,
+        claimedAt: null,
+        submission: null,
+        submittedAt: null,
+        completedAt: null,
+        messages: []
+      },
+      {
+        id: 'bounty-sample-003',
+        title: 'Design a FreeLattice Logo',
+        description: 'Design an original logo that captures the golden ratio aesthetic and lattice concept. The logo should work at small sizes (favicon) and large sizes (splash screen). Should evoke themes of interconnection, growth, and decentralized intelligence.',
+        reward: 500,
+        category: 'design',
+        status: 'open',
+        postedBy: 'FreeLattice',
+        postedAt: Date.now() - 3600000 * 12,
+        deadline: null,
+        requirements: 'Deliver in SVG and PNG formats. Must look good on dark backgrounds (#0a0e1a). Color palette should include golden amber (#d4a017). Provide at least 2 variations.',
+        claimedBy: null,
+        claimedAt: null,
+        submission: null,
+        submittedAt: null,
+        completedAt: null,
+        messages: []
+      }
+    ];
+    localStorage.setItem(STORAGE_KEY_INIT, '1');
+    return Promise.all(samples.map(function(s) { return dbPut(STORE_BOUNTIES, s); }));
+  }
+
+  function renderDashboard() {
+    var total = (typeof LatticePoints !== 'undefined') ? LatticePoints.getTotal() : 0;
+    var flVal = (total / EXCHANGE_RATE).toFixed(3);
+    var balEl = document.getElementById('mktUserBalance');
+    var flEl = document.getElementById('mktUserFlValue');
+    if (balEl) balEl.textContent = total.toLocaleString() + ' LP';
+    if (flEl) flEl.textContent = '= ' + flVal + ' $FL';
+  }
+
+  function renderBountyCard(b) {
+    var descTrunc = (b.description || '').length > 120 ? b.description.substring(0, 120) + '...' : (b.description || '');
+    return '<div class="mkt-bounty-card" onclick="Marketplace.openDetail(\'' + b.id + '\')">'+
+      '<div class="mkt-bounty-card-header">'+
+        '<div class="mkt-bounty-title">' + escapeHtml(b.title) + '</div>'+
+        '<div class="mkt-bounty-reward">' + b.reward.toLocaleString() + ' LP</div>'+
+      '</div>'+
+      '<div class="mkt-bounty-desc">' + escapeHtml(descTrunc) + '</div>'+
+      '<div class="mkt-bounty-meta">'+
+        '<span class="mkt-cat-badge mkt-cat-' + b.category + '">' + b.category + '</span>'+
+        '<span class="mkt-status-badge mkt-status-' + b.status + '">' + b.status + '</span>'+
+        '<span class="mkt-bounty-poster">by ' + escapeHtml(b.postedBy) + '</span>'+
+        '<span class="mkt-bounty-poster">' + timeAgo(b.postedAt) + '</span>'+
+        (b.deadline ? '<span class="mkt-bounty-poster">&#9200; ' + formatDate(b.deadline) + '</span>' : '') +
+      '</div>'+
+    '</div>';
+  }
+
+  function renderGrid() {
+    var username = getUsername();
+    dbGetAll(STORE_BOUNTIES).then(function(bounties) {
+      var filtered = bounties;
+      if (currentFilter === 'open') {
+        filtered = bounties.filter(function(b) { return b.status === 'open'; });
+      } else if (currentFilter === 'mine') {
+        filtered = bounties.filter(function(b) { return b.postedBy === username; });
+      } else if (currentFilter === 'claims') {
+        filtered = bounties.filter(function(b) { return b.claimedBy === username; });
+      }
+      if (currentSort === 'newest') {
+        filtered.sort(function(a, b) { return b.postedAt - a.postedAt; });
+      } else if (currentSort === 'reward') {
+        filtered.sort(function(a, b) { return b.reward - a.reward; });
+      } else if (currentSort === 'deadline') {
+        filtered.sort(function(a, b) {
+          if (!a.deadline) return 1;
+          if (!b.deadline) return -1;
+          return a.deadline - b.deadline;
+        });
+      }
+      var grid = document.getElementById('mktBountyGrid');
+      var empty = document.getElementById('mktEmptyState');
+      if (!grid) return;
+      if (filtered.length === 0) {
+        grid.innerHTML = '';
+        if (empty) empty.classList.remove('hidden');
+      } else {
+        if (empty) empty.classList.add('hidden');
+        grid.innerHTML = filtered.map(renderBountyCard).join('');
+      }
+    });
+  }
+
+  function togglePostForm() {
+    var toggle = document.querySelector('.mkt-post-toggle');
+    var body = document.getElementById('mktPostBody');
+    if (!toggle || !body) return;
+    body.classList.toggle('open');
+    toggle.classList.toggle('open');
+  }
+
+  function postBounty() {
+    var title = (document.getElementById('mktPostTitle').value || '').trim();
+    var desc = (document.getElementById('mktPostDesc').value || '').trim();
+    var reward = parseInt(document.getElementById('mktPostReward').value, 10);
+    var category = document.getElementById('mktPostCategory').value;
+    var deadline = document.getElementById('mktPostDeadline').value;
+    var reqs = (document.getElementById('mktPostReqs').value || '').trim();
+
+    if (!title) { showToast('Please enter a bounty title.', 'error'); return; }
+    if (!desc) { showToast('Please enter a description.', 'error'); return; }
+    if (isNaN(reward) || reward < 10) { showToast('Minimum reward is 10 Lattice Points.', 'error'); return; }
+    if (reward > 10000) { showToast('Maximum reward is 10,000 Lattice Points.', 'error'); return; }
+
+    var userPts = (typeof LatticePoints !== 'undefined') ? LatticePoints.getTotal() : 0;
+    if (userPts < reward) {
+      showToast('Insufficient Lattice Points. You have ' + userPts.toLocaleString() + ' LP but need ' + reward.toLocaleString() + ' LP.', 'error');
+      return;
+    }
+
+    var username = getUsername();
+    var bounty = {
+      id: uuid(),
+      title: title,
+      description: desc,
+      reward: reward,
+      category: category,
+      status: 'open',
+      postedBy: username,
+      postedAt: Date.now(),
+      deadline: deadline ? new Date(deadline).getTime() : null,
+      requirements: reqs,
+      claimedBy: null,
+      claimedAt: null,
+      submission: null,
+      submittedAt: null,
+      completedAt: null,
+      messages: []
+    };
+
+    // Deduct points from poster
+    if (typeof LatticePoints !== 'undefined') {
+      var lpData = JSON.parse(localStorage.getItem('latticePoints') || '{}');
+      lpData.total = (lpData.total || 0) - reward;
+      if (lpData.total < 0) lpData.total = 0;
+      if (!Array.isArray(lpData.history)) lpData.history = [];
+      lpData.history.unshift({ event: 'Bounty posted: ' + title, points: -reward, timestamp: Date.now() });
+      localStorage.setItem('latticePoints', JSON.stringify(lpData));
+      LatticePoints.init();
+    }
+
+    dbGetAll(STORE_BOUNTIES).then(function(all) {
+      var myBounties = all.filter(function(b) { return b.postedBy === username; });
+      if (myBounties.length === 0 && typeof LatticePoints !== 'undefined') {
+        LatticePoints.award('first_bounty_posted', 20, 'First bounty posted!');
+      }
+      return dbPut(STORE_BOUNTIES, bounty);
+    }).then(function() {
+      showToast('Bounty posted! ' + reward + ' LP reserved.', 'success');
+      document.getElementById('mktPostTitle').value = '';
+      document.getElementById('mktPostDesc').value = '';
+      document.getElementById('mktPostReward').value = '100';
+      document.getElementById('mktPostReqs').value = '';
+      document.getElementById('mktPostDeadline').value = '';
+      togglePostForm();
+      renderGrid();
+      renderDashboard();
+    });
+  }
+
+  function openDetail(bountyId) {
+    dbGet(STORE_BOUNTIES, bountyId).then(function(b) {
+      if (!b) return;
+      var username = getUsername();
+      var isOwner = b.postedBy === username;
+      var isClaimer = b.claimedBy === username;
+
+      var steps = [
+        { label: 'Posted', done: true, active: b.status === 'open' },
+        { label: 'Claimed', done: !!b.claimedBy, active: b.status === 'claimed' && !b.submission },
+        { label: 'Submitted', done: !!b.submission, active: !!b.submission && b.status !== 'verified' },
+        { label: 'Verified', done: b.status === 'verified', active: b.status === 'verified' }
+      ];
+      var timelineHtml = '<div class="mkt-timeline">';
+      for (var i = 0; i < steps.length; i++) {
+        var cls = steps[i].done ? 'done' : (steps[i].active ? 'active' : '');
+        timelineHtml += '<div class="mkt-timeline-step ' + cls + '">' +
+          '<div class="mkt-timeline-dot ' + cls + '"></div>' +
+          '<div class="mkt-timeline-label">' + steps[i].label + '</div>' +
+        '</div>';
+      }
+      timelineHtml += '</div>';
+
+      var msgsHtml = '';
+      if (b.messages && b.messages.length > 0) {
+        for (var m = 0; m < b.messages.length; m++) {
+          var msg = b.messages[m];
+          msgsHtml += '<div class="mkt-msg">' +
+            '<span class="mkt-msg-from">' + escapeHtml(msg.from) + ':</span>' +
+            '<span class="mkt-msg-text">' + escapeHtml(msg.text) + '</span>' +
+            '<span class="mkt-msg-time">' + timeAgo(msg.timestamp) + '</span>' +
+          '</div>';
+        }
+      } else {
+        msgsHtml = '<div style="font-size:0.75rem;color:#475569;padding:8px;">No messages yet.</div>';
+      }
+
+      var actionsHtml = '';
+      if (b.status === 'open' && !isOwner) {
+        actionsHtml += '<button class="mkt-btn mkt-btn-green" onclick="Marketplace.claimBounty(\'' + b.id + '\')">&#9989; Claim This Bounty</button>';
+      }
+      if (isClaimer && b.status === 'claimed' && !b.submission) {
+        actionsHtml += '<div style="width:100%;margin-bottom:8px;">' +
+          '<textarea id="mktSubmitNotes" placeholder="Describe your completed work, link to files or repos..." style="width:100%;padding:8px 12px;border-radius:8px;border:1px solid #1e293b;background:#0a0e1a;color:#e2e8f0;font-size:0.82rem;min-height:60px;box-sizing:border-box;font-family:inherit;resize:vertical;"></textarea>' +
+          '</div>' +
+          '<button class="mkt-btn mkt-btn-blue" onclick="Marketplace.submitWork(\'' + b.id + '\')">&#128640; Submit Work</button>';
+      }
+      if (isOwner && b.submission && b.status !== 'verified') {
+        actionsHtml += '<button class="mkt-btn mkt-btn-gold" onclick="Marketplace.approveBounty(\'' + b.id + '\')">&#9989; Approve &amp; Pay</button>';
+        actionsHtml += '<button class="mkt-btn mkt-btn-outline" onclick="Marketplace.requestRevision(\'' + b.id + '\')">&#128260; Request Revision</button>';
+      }
+      actionsHtml += '<button class="mkt-mesh-btn" onclick="Marketplace.shareToMesh(\'' + b.id + '\')" title="Copy bounty JSON to clipboard">&#11042; Share to Mesh</button>';
+
+      var submissionHtml = '';
+      if (b.submission) {
+        submissionHtml = '<div class="mkt-detail-section">' +
+          '<div class="mkt-detail-section-title">Submission</div>' +
+          '<div class="mkt-detail-desc">' + escapeHtml(b.submission) + '</div>' +
+          '<div style="font-size:0.7rem;color:#475569;margin-top:4px;">Submitted ' + timeAgo(b.submittedAt) + ' by ' + escapeHtml(b.claimedBy || '') + '</div>' +
+        '</div>';
+      }
+
+      var html = '<div class="mkt-detail-overlay" id="mktDetailOverlay" onclick="if(event.target===this)Marketplace.closeDetail()">' +
+        '<div class="mkt-detail-panel">' +
+          '<button class="mkt-detail-close" onclick="Marketplace.closeDetail()">&times;</button>' +
+          '<div class="mkt-detail-title">' + escapeHtml(b.title) + '</div>' +
+          '<div class="mkt-detail-meta">' +
+            '<span class="mkt-cat-badge mkt-cat-' + b.category + '">' + b.category + '</span>' +
+            '<span class="mkt-status-badge mkt-status-' + b.status + '">' + b.status + '</span>' +
+            '<span class="mkt-bounty-reward">' + b.reward.toLocaleString() + ' LP</span>' +
+            '<span style="font-size:0.72rem;color:#64748b;">by ' + escapeHtml(b.postedBy) + ' &middot; ' + formatDate(b.postedAt) + '</span>' +
+            (b.deadline ? '<span style="font-size:0.72rem;color:#f59e0b;">&#9200; Deadline: ' + formatDate(b.deadline) + '</span>' : '') +
+          '</div>' +
+          timelineHtml +
+          '<div class="mkt-detail-section">' +
+            '<div class="mkt-detail-section-title">Description</div>' +
+            '<div class="mkt-detail-desc">' + escapeHtml(b.description) + '</div>' +
+          '</div>' +
+          (b.requirements ? '<div class="mkt-detail-section"><div class="mkt-detail-section-title">Requirements</div><div class="mkt-detail-desc">' + escapeHtml(b.requirements) + '</div></div>' : '') +
+          submissionHtml +
+          (b.claimedBy ? '<div style="font-size:0.78rem;color:#94a3b8;margin-bottom:10px;">Claimed by: <strong style="color:#e2e8f0;">' + escapeHtml(b.claimedBy) + '</strong> ' + (b.claimedAt ? timeAgo(b.claimedAt) : '') + '</div>' : '') +
+          '<div class="mkt-detail-section">' +
+            '<div class="mkt-detail-section-title">Conversation</div>' +
+            '<div class="mkt-messages" id="mktDetailMessages">' + msgsHtml + '</div>' +
+            '<div class="mkt-msg-input-row">' +
+              '<input type="text" id="mktMsgInput" placeholder="Send a message..." onkeydown="if(event.key===\'Enter\')Marketplace.sendMessage(\'' + b.id + '\')">' +
+              '<button class="mkt-btn mkt-btn-outline" onclick="Marketplace.sendMessage(\'' + b.id + '\')">Send</button>' +
+            '</div>' +
+          '</div>' +
+          '<div class="mkt-detail-actions">' + actionsHtml + '</div>' +
+        '</div>' +
+      '</div>';
+
+      var existing = document.getElementById('mktDetailOverlay');
+      if (existing) existing.remove();
+      document.body.insertAdjacentHTML('beforeend', html);
+    });
+  }
+
+  function closeDetail() {
+    var el = document.getElementById('mktDetailOverlay');
+    if (el) el.remove();
+  }
+
+  function claimBounty(bountyId) {
+    var username = getUsername();
+    dbGet(STORE_BOUNTIES, bountyId).then(function(b) {
+      if (!b || b.status !== 'open') { showToast('This bounty is no longer available.', 'error'); return; }
+      b.status = 'claimed';
+      b.claimedBy = username;
+      b.claimedAt = Date.now();
+      b.messages.push({ from: 'System', text: username + ' claimed this bounty.', timestamp: Date.now() });
+      return dbPut(STORE_BOUNTIES, b).then(function() {
+        if (typeof LatticePoints !== 'undefined') {
+          LatticePoints.award('bounty_claimed', 5, 'Bounty claimed');
+        }
+        showToast('Bounty claimed! Start working and submit when ready.', 'success');
+        closeDetail();
+        renderGrid();
+      });
+    });
+  }
+
+  function submitWork(bountyId) {
+    var notes = (document.getElementById('mktSubmitNotes') || {}).value || '';
+    if (!notes.trim()) { showToast('Please describe your completed work.', 'error'); return; }
+    var username = getUsername();
+    dbGet(STORE_BOUNTIES, bountyId).then(function(b) {
+      if (!b || b.claimedBy !== username) return;
+      b.submission = notes.trim();
+      b.submittedAt = Date.now();
+      b.status = 'completed';
+      b.messages.push({ from: 'System', text: username + ' submitted work for review.', timestamp: Date.now() });
+      return dbPut(STORE_BOUNTIES, b).then(function() {
+        showToast('Work submitted! Waiting for approval.', 'success');
+        closeDetail();
+        renderGrid();
+      });
+    });
+  }
+
+  function approveBounty(bountyId) {
+    dbGet(STORE_BOUNTIES, bountyId).then(function(b) {
+      if (!b || !b.claimedBy) return;
+      b.status = 'verified';
+      b.completedAt = Date.now();
+      b.messages.push({ from: 'System', text: 'Bounty approved and payment of ' + b.reward + ' LP sent to ' + b.claimedBy + '.', timestamp: Date.now() });
+      return dbPut(STORE_BOUNTIES, b).then(function() {
+        if (typeof LatticePoints !== 'undefined') {
+          LatticePoints.award('bounty_completed', b.reward, 'Bounty completed: ' + b.title);
+        }
+        dbGetAll(STORE_BOUNTIES).then(function(all) {
+          var completed = all.filter(function(x) { return x.status === 'verified' && x.claimedBy === b.claimedBy; });
+          if (completed.length <= 1 && typeof LatticePoints !== 'undefined') {
+            LatticePoints.award('first_bounty_completed', 30, 'First bounty completed!');
+          }
+        });
+        showToast('Bounty approved! ' + b.reward + ' LP awarded to ' + b.claimedBy + '.', 'success');
+        closeDetail();
+        renderGrid();
+        renderDashboard();
+      });
+    });
+  }
+
+  function requestRevision(bountyId) {
+    dbGet(STORE_BOUNTIES, bountyId).then(function(b) {
+      if (!b) return;
+      b.submission = null;
+      b.submittedAt = null;
+      b.status = 'claimed';
+      b.messages.push({ from: b.postedBy, text: 'Revision requested. Please update your submission.', timestamp: Date.now() });
+      return dbPut(STORE_BOUNTIES, b).then(function() {
+        showToast('Revision requested.', 'info');
+        closeDetail();
+        renderGrid();
+      });
+    });
+  }
+
+  function sendMessage(bountyId) {
+    var input = document.getElementById('mktMsgInput');
+    if (!input || !input.value.trim()) return;
+    var username = getUsername();
+    var text = input.value.trim();
+    dbGet(STORE_BOUNTIES, bountyId).then(function(b) {
+      if (!b) return;
+      b.messages.push({ from: username, text: text, timestamp: Date.now() });
+      return dbPut(STORE_BOUNTIES, b).then(function() {
+        openDetail(bountyId);
+      });
+    });
+  }
+
+  function shareToMesh(bountyId) {
+    dbGet(STORE_BOUNTIES, bountyId).then(function(b) {
+      if (!b) return;
+      var json = JSON.stringify({
+        id: b.id,
+        title: b.title,
+        description: b.description,
+        reward: b.reward,
+        category: b.category,
+        status: b.status,
+        postedBy: b.postedBy,
+        postedAt: b.postedAt,
+        deadline: b.deadline,
+        requirements: b.requirements
+      }, null, 2);
+      navigator.clipboard.writeText(json).then(function() {
+        showToast('Bounty JSON copied to clipboard! Mesh sync coming soon.', 'success');
+      }).catch(function() {
+        showToast('Could not copy to clipboard.', 'error');
+      });
+    });
+  }
+
+  function setFilter(f) {
+    currentFilter = f;
+    document.querySelectorAll('.mkt-filter-btn').forEach(function(btn) {
+      btn.classList.toggle('active', btn.dataset.filter === f);
+    });
+    renderGrid();
+  }
+
+  function setSort(s) {
+    currentSort = s;
+    renderGrid();
+  }
+
+  function openRedeemModal() {
+    var total = (typeof LatticePoints !== 'undefined') ? LatticePoints.getTotal() : 0;
+    var flVal = (total / EXCHANGE_RATE).toFixed(3);
+
+    dbGetAll(STORE_REDEMPTIONS).then(function(redemptions) {
+      redemptions.sort(function(a, b) { return b.createdAt - a.createdAt; });
+      var historyHtml = '';
+      if (redemptions.length > 0) {
+        historyHtml = '<div class="mkt-redeem-history"><div class="mkt-redeem-history-title">Redemption History</div>';
+        for (var i = 0; i < redemptions.length; i++) {
+          var r = redemptions[i];
+          historyHtml += '<div class="mkt-redeem-entry">' +
+            '<span>' + formatDate(r.createdAt) + '</span>' +
+            '<span>' + r.points.toLocaleString() + ' LP &rarr; ' + (r.points / EXCHANGE_RATE).toFixed(3) + ' $FL</span>' +
+            '<span class="mkt-redeem-entry-status mkt-redeem-status-' + r.status + '">' + r.status + '</span>' +
+            (r.txHash ? '<span style="font-size:0.65rem;color:#64748b;">TX: ' + r.txHash.substring(0, 12) + '...</span>' : '') +
+          '</div>';
+        }
+        historyHtml += '</div>';
+      }
+
+      var html = '<div class="mkt-redeem-overlay" id="mktRedeemOverlay" onclick="if(event.target===this)Marketplace.closeRedeemModal()">' +
+        '<div class="mkt-redeem-panel">' +
+          '<div class="mkt-redeem-title">&#128176; Request $FL Redemption</div>' +
+          '<div class="mkt-redeem-info">Your balance: <strong style="color:#d4a017;">' + total.toLocaleString() + ' LP</strong> = <strong style="color:#d4a017;">' + flVal + ' $FL</strong></div>' +
+          '<div class="mkt-form-row">' +
+            '<label>Points to Redeem (minimum ' + MIN_REDEEM.toLocaleString() + ' = 1 $FL)</label>' +
+            '<input type="number" id="mktRedeemAmount" min="' + MIN_REDEEM + '" max="' + total + '" placeholder="' + MIN_REDEEM + '" value="' + Math.max(MIN_REDEEM, Math.min(total, MIN_REDEEM)) + '">' +
+          '</div>' +
+          '<div class="mkt-form-row">' +
+            '<label>Solana Wallet Address (for receiving $FL)</label>' +
+            '<input type="text" id="mktRedeemWallet" placeholder="Enter your Solana wallet address...">' +
+          '</div>' +
+          '<div class="mkt-redeem-info" style="font-size:0.78rem;">Redemption requests are processed weekly. Your $FL will be sent to the wallet address provided.</div>' +
+          '<div class="mkt-form-actions">' +
+            '<button class="mkt-btn mkt-btn-gold" onclick="Marketplace.submitRedemption()">Submit Request</button>' +
+            '<button class="mkt-btn mkt-btn-outline" onclick="Marketplace.closeRedeemModal()">Cancel</button>' +
+          '</div>' +
+          '<div class="mkt-redeem-disclaimer">Redemption is subject to reserve availability and monthly caps. This is a community reward program, not a financial service.</div>' +
+          historyHtml +
+        '</div>' +
+      '</div>';
+
+      var existing = document.getElementById('mktRedeemOverlay');
+      if (existing) existing.remove();
+      document.body.insertAdjacentHTML('beforeend', html);
+    });
+  }
+
+  function closeRedeemModal() {
+    var el = document.getElementById('mktRedeemOverlay');
+    if (el) el.remove();
+  }
+
+  function submitRedemption() {
+    var amount = parseInt((document.getElementById('mktRedeemAmount') || {}).value, 10);
+    var wallet = ((document.getElementById('mktRedeemWallet') || {}).value || '').trim();
+
+    if (isNaN(amount) || amount < MIN_REDEEM) {
+      showToast('Minimum redemption is ' + MIN_REDEEM.toLocaleString() + ' Lattice Points.', 'error');
+      return;
+    }
+    var total = (typeof LatticePoints !== 'undefined') ? LatticePoints.getTotal() : 0;
+    if (amount > total) {
+      showToast('Insufficient Lattice Points.', 'error');
+      return;
+    }
+    if (!wallet || wallet.length < 20) {
+      showToast('Please enter a valid Solana wallet address.', 'error');
+      return;
+    }
+
+    var redemption = {
+      id: redeemUuid(),
+      points: amount,
+      flAmount: amount / EXCHANGE_RATE,
+      wallet: wallet,
+      status: 'pending',
+      createdAt: Date.now(),
+      processedAt: null,
+      txHash: null
+    };
+
+    dbPut(STORE_REDEMPTIONS, redemption).then(function() {
+      showToast('Redemption request submitted for ' + amount.toLocaleString() + ' LP (' + (amount / EXCHANGE_RATE).toFixed(3) + ' $FL). Processed weekly.', 'success');
+      closeRedeemModal();
+      renderDashboard();
+    });
+  }
+
+  function mktShowToast(msg, type) {
+    if (typeof window.showToast === 'function') {
+      window.showToast(msg, type);
+    } else {
+      alert(msg);
+    }
+  }
+
+  function init() {
+    if (mktInitialized) return;
+    mktInitialized = true;
+    openDB().then(function() {
+      return seedSamples();
+    }).then(function() {
+      renderDashboard();
+      renderGrid();
+    }).catch(function(err) {
+      console.error('Marketplace init error:', err);
+    });
+  }
+
+  return {
+    init: init,
+    togglePostForm: togglePostForm,
+    postBounty: postBounty,
+    openDetail: openDetail,
+    closeDetail: closeDetail,
+    claimBounty: claimBounty,
+    submitWork: submitWork,
+    approveBounty: approveBounty,
+    requestRevision: requestRevision,
+    sendMessage: sendMessage,
+    shareToMesh: shareToMesh,
+    setFilter: setFilter,
+    setSort: setSort,
+    openRedeemModal: openRedeemModal,
+    closeRedeemModal: closeRedeemModal,
+    submitRedemption: submitRedemption,
+    renderDashboard: renderDashboard,
+    renderGrid: renderGrid
+  };
+})();
+
+// ---- Patch switchTab for Marketplace initialization ----
+(function() {
+  var _prevSwitchTab = switchTab;
+  switchTab = function(tabId) {
+    _prevSwitchTab(tabId);
+    if (tabId === 'market') {
+      Marketplace.init();
+    }
   };
 })();
 
