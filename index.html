@@ -6432,6 +6432,14 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
           <div class="wizard-provider-name">xAI (Grok)</div>
           <div class="wizard-provider-desc">Grok models by xAI</div>
         </button>
+        <button class="wizard-provider-btn" onclick="wizardSelectProvider('mistral')" id="wizProvMistral">
+          <div class="wizard-provider-name">Mistral AI</div>
+          <div class="wizard-provider-desc">European AI — fast, high-quality models</div>
+        </button>
+        <button class="wizard-provider-btn" onclick="wizardSelectProvider('custom')" id="wizProvCustom">
+          <div class="wizard-provider-name">Custom Provider</div>
+          <div class="wizard-provider-desc">Any OpenAI-compatible API endpoint</div>
+        </button>
         <button class="wizard-provider-btn" onclick="wizardSelectProvider('ollama')" id="wizProvOllama" style="grid-column: 1 / -1;">
           <div class="wizard-provider-name">Use Local AI (Ollama)</div>
           <div class="wizard-provider-desc">Private, unlimited, runs on your computer — no API key needed</div>
@@ -6753,6 +6761,8 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
           <option value="together">Together AI</option>
           <option value="openrouter">OpenRouter</option>
           <option value="xai">xAI</option>
+          <option value="mistral">Mistral AI</option>
+          <option value="custom">Custom Provider</option>
         </select>
         <div class="hint" id="providerHint">Groq offers free API keys — great for getting started!</div>
       </div>
@@ -6792,6 +6802,15 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
       <p style="margin-top: 8px; padding: 8px 12px; background: rgba(212, 168, 67, 0.08); border-radius: 4px; border: 1px solid rgba(212, 168, 67, 0.2); color: var(--warning); font-size: 0.8rem;">
         <strong>Important:</strong> If you’re accessing FreeLattice from a website (like GitHub Pages), your browser will block connections to local Ollama unless you start it with <code>OLLAMA_ORIGINS=*</code>. This is a browser security feature (CORS). Alternatively, download <code>index.html</code> and open it directly from your computer — no CORS issues.
       </p>
+    </div>
+    <!-- Custom Provider Settings (shown when Custom selected) -->
+    <div class="form-group hidden" id="customProviderGroup" style="margin-top: 12px;">
+      <label for="customBaseUrl">Custom API Base URL</label>
+      <input type="text" id="customBaseUrl" placeholder="https://your-api.example.com/v1/chat/completions" onchange="saveCustomProvider()">
+      <div class="hint">Enter the full chat completions endpoint URL for any OpenAI-compatible API.</div>
+      <label for="customModelName" style="margin-top: 10px;">Custom Model Name</label>
+      <input type="text" id="customModelName" placeholder="e.g., my-model-name" onchange="saveCustomProvider()">
+      <div class="hint">The exact model identifier your provider expects.</div>
     </div>
 
     <!-- Privacy Level -->
@@ -7432,6 +7451,29 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
           <code id="walletDOGE" style="font-size: 0.75rem; color: var(--text-primary, #e8e4dc); word-break: break-all; flex: 1;">DADyhrazd9L5bioSGGp3Ff2uiNqokbNEQZ</code>
           <button onclick="copyWalletAddress('walletDOGE')" style="background: var(--accent, #c9a84c); color: #0a0e1a; border: none; border-radius: 8px; padding: 6px 14px; font-size: 0.75rem; font-weight: 600; cursor: pointer; white-space: nowrap;">Copy</button>
         </div>
+      </div>
+    </div>
+  </div>
+  <!-- Self-Host FreeLattice Section (v4.3) -->
+  <div class="section" id="selfHostSection">
+    <div class="section-title">&#128421; Self-Host FreeLattice</div>
+    <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 14px; line-height: 1.6;">
+      Run FreeLattice as a local server to access it from any device on your network &mdash; or anywhere in the world. No cloud required.
+    </p>
+    <div style="background: var(--bg-input, #12141e); border: 1px solid var(--border, #2a2d3e); border-radius: 12px; padding: 16px; margin-bottom: 14px;">
+      <div style="font-size: 0.78rem; color: var(--accent, #c9a84c); font-weight: 600; margin-bottom: 8px;">Current Access URL</div>
+      <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+        <code id="selfHostCurrentUrl" style="font-size: 0.75rem; color: var(--text-primary, #e8e4dc); word-break: break-all; flex: 1;"></code>
+        <button onclick="navigator.clipboard.writeText(window.location.href)" style="background: var(--accent, #c9a84c); color: #0a0e1a; border: none; border-radius: 8px; padding: 6px 14px; font-size: 0.75rem; font-weight: 600; cursor: pointer; white-space: nowrap;">Copy</button>
+      </div>
+      <div id="selfHostStatus" style="font-size: 0.78rem; margin-top: 8px; padding: 8px 12px; border-radius: 8px;"></div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+      <a href="https://github.com/Chaos2Cured/FreeLattice/blob/main/SELF-HOST.md" target="_blank" style="display: inline-flex; align-items: center; gap: 8px; background: var(--bg-input, #12141e); border: 1px solid var(--border, #2a2d3e); border-radius: 8px; padding: 10px 16px; color: var(--accent, #c9a84c); text-decoration: none; font-size: 0.82rem; font-weight: 600; transition: border-color 0.2s;">
+        &#128214; Self-Hosting Guide &rarr;
+      </a>
+      <div style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.5;">
+        <strong>Quick start:</strong> Download the repo, then double-click <code>start-freelattice.bat</code> (Windows) or run <code>./start-freelattice.sh</code> (Mac/Linux). Requires Node.js or Python &mdash; no other dependencies.
       </div>
     </div>
   </div>
@@ -8718,6 +8760,36 @@ const PROVIDERS = {
     tokenLimit: 128000,
     tokenLimitLabel: 'No limit (local)',
     models: {}
+  },
+  mistral: {
+    name: 'Mistral AI',
+    url: 'https://api.mistral.ai/v1/chat/completions',
+    keyLink: '<a href="https://console.mistral.ai/api-keys" target="_blank">Get a Mistral AI key &rarr;</a>',
+    hint: 'Mistral AI — high-quality European AI models with competitive pricing.',
+    tokenLimit: 60000,
+    tokenLimitLabel: '60,000 TPM',
+    models: {
+      llama: 'mistral-large-latest',
+      qwen: 'mistral-medium-latest',
+      mixtral: 'mistral-small-latest',
+      deepseek: 'codestral-latest',
+      grok: 'mistral-large-latest'
+    }
+  },
+  custom: {
+    name: 'Custom Provider',
+    url: '',
+    keyLink: '',
+    hint: 'Enter any OpenAI-compatible API base URL and model name.',
+    tokenLimit: 60000,
+    tokenLimitLabel: '60,000 TPM (adjust as needed)',
+    models: {
+      llama: '',
+      qwen: '',
+      mixtral: '',
+      deepseek: '',
+      grok: ''
+    }
   }
 };
 
@@ -10009,6 +10081,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // First-run check is now handled by wizardInit()
 
+  // Load custom provider settings if applicable
+  if (state.provider === 'custom' && PROVIDERS.custom) {
+    var savedCustomUrl = localStorage.getItem('fl_custom_url');
+    var savedCustomModel = localStorage.getItem('fl_custom_model');
+    if (savedCustomUrl) PROVIDERS.custom.url = savedCustomUrl;
+    if (savedCustomModel) {
+      PROVIDERS.custom.models = { llama: savedCustomModel, qwen: savedCustomModel, mixtral: savedCustomModel, deepseek: savedCustomModel, grok: savedCustomModel };
+    }
+  }
   // Apply initial state
   handleLocalToggle(true);
   handleProviderChange(true);
@@ -10087,7 +10168,44 @@ document.addEventListener('DOMContentLoaded', async () => {
   await SkillForge.init();
   // Ensure skills are available for other components
   SkillForge.renderDropdowns();
+  // Initialize Self-Host detection (v4.3)
+  initSelfHostSection();
 });
+
+// ============================================
+// Self-Host Detection (v4.3)
+// ============================================
+function initSelfHostSection() {
+  const urlEl = document.getElementById('selfHostCurrentUrl');
+  const statusEl = document.getElementById('selfHostStatus');
+  if (!urlEl || !statusEl) return;
+  urlEl.textContent = window.location.href;
+  const host = window.location.hostname;
+  if (host === 'localhost' || host === '127.0.0.1') {
+    statusEl.textContent = '\u2705 Running locally! Share your network URL with other devices on your WiFi.';
+    statusEl.style.background = 'rgba(106, 191, 105, 0.1)';
+    statusEl.style.color = 'var(--success, #6abf69)';
+    statusEl.style.border = '1px solid rgba(106, 191, 105, 0.25)';
+    // Award self-host achievement
+    if (typeof LatticePoints !== 'undefined') {
+      LatticePoints.award('self_hosted', 50, 'FreeLattice self-hosted!');
+    }
+  } else if (/^(10\.|172\.(1[6-9]|2[0-9]|3[01])\.|192\.168\.)/.test(host) || /^\d+\.\d+\.\d+\.\d+$/.test(host)) {
+    statusEl.textContent = '\u2705 Accessed via network \u2014 you\'re connected to a self-hosted instance!';
+    statusEl.style.background = 'rgba(106, 191, 105, 0.1)';
+    statusEl.style.color = 'var(--success, #6abf69)';
+    statusEl.style.border = '1px solid rgba(106, 191, 105, 0.25)';
+    // Award self-host achievement
+    if (typeof LatticePoints !== 'undefined') {
+      LatticePoints.award('self_hosted', 50, 'FreeLattice self-hosted!');
+    }
+  } else {
+    statusEl.textContent = '\uD83C\uDF10 Accessed via web \u2014 self-host for full control and network access.';
+    statusEl.style.background = 'rgba(212, 168, 67, 0.08)';
+    statusEl.style.color = 'var(--warning, #d4a843)';
+    statusEl.style.border = '1px solid rgba(212, 168, 67, 0.2)';
+  }
+}
 
 // ============================================
 // Neuro-Design v3.0 — Light Mode, Quiet Mode, Font Size
@@ -10308,6 +10426,21 @@ function handleProviderChange(init) {
     document.getElementById('apiKeyLink').innerHTML = provider.keyLink ? ' ' + provider.keyLink : '';
   }
 
+  // Toggle custom provider fields
+  var customGroup = document.getElementById('customProviderGroup');
+  if (customGroup) {
+    if (state.provider === 'custom' && !state.isLocal) {
+      customGroup.classList.remove('hidden');
+      // Load saved custom settings
+      var savedUrl = localStorage.getItem('fl_custom_url');
+      var savedModel = localStorage.getItem('fl_custom_model');
+      if (savedUrl) document.getElementById('customBaseUrl').value = savedUrl;
+      if (savedModel) document.getElementById('customModelName').value = savedModel;
+    } else {
+      customGroup.classList.add('hidden');
+    }
+  }
+
   if (!init) {
     localStorage.setItem('fl_provider', state.provider);
     // Re-encrypt API key with new provider context
@@ -10315,6 +10448,18 @@ function handleProviderChange(init) {
     updateTokenLimitForProvider();
     updateStatus();
   }
+}
+// ---- Custom Provider Save ----
+function saveCustomProvider() {
+  var url = document.getElementById('customBaseUrl').value.trim();
+  var model = document.getElementById('customModelName').value.trim();
+  localStorage.setItem('fl_custom_url', url);
+  localStorage.setItem('fl_custom_model', model);
+  if (PROVIDERS.custom) {
+    PROVIDERS.custom.url = url;
+    PROVIDERS.custom.models = { llama: model, qwen: model, mixtral: model, deepseek: model, grok: model };
+  }
+  updateStatus();
 }
 
 // ---- Privacy Change ----
@@ -14261,7 +14406,9 @@ const WIZARD_KEY_LINKS = {
   groq: '<a href="https://console.groq.com/keys" target="_blank" style="color: var(--accent);">Get a free Groq API key &rarr;</a>',
   together: '<a href="https://api.together.xyz/settings/api-keys" target="_blank" style="color: var(--accent);">Get a Together AI key &rarr;</a>',
   openrouter: '<a href="https://openrouter.ai/keys" target="_blank" style="color: var(--accent);">Get an OpenRouter key &rarr;</a>',
-  xai: '<a href="https://console.x.ai" target="_blank" style="color: var(--accent);">Get an xAI API key &rarr;</a>'
+  xai: '<a href="https://console.x.ai" target="_blank" style="color: var(--accent);">Get an xAI API key &rarr;</a>',
+  mistral: '<a href="https://console.mistral.ai/api-keys" target="_blank" style="color: var(--accent);">Get a Mistral AI key &rarr;</a>',
+  custom: 'Enter your API key for your custom provider.'
 };
 
 function wizardInit() {
@@ -15149,7 +15296,7 @@ function rtBuildPanels() {
 
 function rtBuildProviderOptions(selected) {
   let html = '';
-  const providers = ['groq', 'together', 'openrouter', 'xai'];
+  const providers = ['groq', 'together', 'openrouter', 'xai', 'mistral', 'custom'];
   if (state.isLocal) providers.push('ollama');
   for (const p of providers) {
     const prov = PROVIDERS[p];
@@ -16909,6 +17056,10 @@ const LatticePoints = (function() {
     if (event === 'first_visit') {
       if (data.achievements.firstVisit) return;
       data.achievements.firstVisit = true;
+    }
+    if (event === 'self_hosted') {
+      if (data.achievements.selfHosted) return;
+      data.achievements.selfHosted = true;
     }
     data.total += points;
     data.history.unshift({ event: description, points: points, timestamp: Date.now() });
