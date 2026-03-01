@@ -5907,6 +5907,160 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
   border-left: 3px solid #d4a01744;
   border-radius: 0 8px 8px 0;
 }
+/* ---- Community Leaderboard ---- */
+.mkt-leaderboard {
+  background: linear-gradient(135deg, #111827 0%, #0f1629 100%);
+  border: 1px solid #d4a01733;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+.mkt-leaderboard-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #d4a017;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.mkt-leaderboard-subtitle {
+  font-size: 0.75rem;
+  color: #64748b;
+  margin-bottom: 14px;
+}
+.mkt-lb-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.mkt-lb-stat {
+  background: #0a0e1a;
+  border: 1px solid #1e293b;
+  border-radius: 10px;
+  padding: 10px 14px;
+  flex: 1 1 140px;
+  min-width: 120px;
+}
+.mkt-lb-stat-label {
+  font-size: 0.68rem;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 3px;
+}
+.mkt-lb-stat-value {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #e2e8f0;
+}
+.mkt-lb-stat-value.gold { color: #d4a017; }
+.mkt-lb-stat-value.green { color: #10b981; }
+.mkt-lb-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.mkt-lb-row {
+  display: grid;
+  grid-template-columns: 36px 1fr auto auto;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: 8px;
+  margin-bottom: 4px;
+  transition: background 0.15s;
+}
+.mkt-lb-row:nth-child(odd) { background: #111827; }
+.mkt-lb-row:nth-child(even) { background: #0f1629; }
+.mkt-lb-row.mkt-lb-self {
+  background: #1a1200 !important;
+  border-left: 3px solid #d4a017;
+  padding-left: 9px;
+}
+.mkt-lb-rank {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #64748b;
+  text-align: center;
+}
+.mkt-lb-rank.top1 { color: #d4a017; font-size: 1rem; }
+.mkt-lb-name {
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: #e2e8f0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.mkt-lb-you {
+  font-size: 0.65rem;
+  background: #d4a01730;
+  color: #d4a017;
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.mkt-lb-level {
+  font-size: 0.72rem;
+  font-weight: 600;
+  border-radius: 10px;
+  padding: 2px 8px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.mkt-lb-level-spark { background: #6b728020; color: #6b7280; }
+.mkt-lb-level-ember { background: #f59e0b20; color: #f59e0b; }
+.mkt-lb-level-flame { background: #ef444420; color: #ef4444; }
+.mkt-lb-level-beacon { background: #3b82f620; color: #3b82f6; }
+.mkt-lb-level-lighthouse { background: #d4a01720; color: #d4a017; }
+.mkt-lb-pts {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #94a3b8;
+  text-align: right;
+  white-space: nowrap;
+}
+.mkt-lb-pts.self { color: #d4a017; }
+.mkt-lb-empty {
+  text-align: center;
+  padding: 24px 16px;
+  color: #64748b;
+  font-size: 0.82rem;
+  font-style: italic;
+}
+.mkt-lb-header {
+  display: grid;
+  grid-template-columns: 36px 1fr auto auto;
+  gap: 10px;
+  padding: 4px 12px 8px;
+  font-size: 0.68rem;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid #1e293b;
+  margin-bottom: 6px;
+}
+.mkt-lb-refresh {
+  font-size: 0.7rem;
+  color: #64748b;
+  background: none;
+  border: 1px solid #1e293b;
+  border-radius: 6px;
+  padding: 3px 9px;
+  cursor: pointer;
+  margin-left: auto;
+  display: block;
+  margin-top: 10px;
+  transition: border-color 0.15s, color 0.15s;
+}
+.mkt-lb-refresh:hover { border-color: #d4a017; color: #d4a017; }
+.mkt-lb-crown { font-size: 0.9rem; }
+/* ---- End Community Leaderboard ---- */
 .mkt-btn {
   padding: 8px 18px;
   border-radius: 8px;
@@ -7968,7 +8122,7 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
       <div class="mkt-stat-card">
         <div class="mkt-stat-label">Reserve Status</div>
         <div class="mkt-stat-value green">Economy backed by $FL reserve</div>
-        <div class="mkt-wallet-addr" style="margin-top:6px;">Reserve: FHo1XEHgnDfnNs6YauDkojYGkwQ9gAvmHyv8cFXrX6Ao</div>
+        <div class="mkt-wallet-addr" style="margin-top:6px;">Reserve: 6geWtEMrRZBz8URDob8EE49NVxFVZLsppqgew7dRSZJe</div>
       </div>
       <div class="mkt-stat-card">
         <div class="mkt-stat-label">Exchange Rate</div>
@@ -7998,6 +8152,41 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
     <div class="mkt-philosophy">The Lattice economy is backed by real value. Every point earned represents real contribution. Every redemption is honored from the reserve. We rise together.</div>
   </div>
 
+  <!-- Community Leaderboard -->
+  <div class="mkt-leaderboard" id="mktLeaderboard">
+    <div class="mkt-leaderboard-title">&#127942; Community Leaderboard</div>
+    <div class="mkt-leaderboard-subtitle">Live rankings across the FreeLattice mesh network &mdash; updated as peers broadcast their scores</div>
+    <!-- Aggregate Stats -->
+    <div class="mkt-lb-stats" id="mktLbStats">
+      <div class="mkt-lb-stat">
+        <div class="mkt-lb-stat-label">Total Community Points</div>
+        <div class="mkt-lb-stat-value gold" id="mktLbTotalPts">&#8212;</div>
+      </div>
+      <div class="mkt-lb-stat">
+        <div class="mkt-lb-stat-label">Active Members</div>
+        <div class="mkt-lb-stat-value" id="mktLbMembers">&#8212;</div>
+      </div>
+      <div class="mkt-lb-stat">
+        <div class="mkt-lb-stat-label">$FL Equivalent</div>
+        <div class="mkt-lb-stat-value green" id="mktLbFlEquiv">&#8212;</div>
+      </div>
+      <div class="mkt-lb-stat">
+        <div class="mkt-lb-stat-label">Reserve Coverage</div>
+        <div class="mkt-lb-stat-value" id="mktLbReserve">&#8212;</div>
+      </div>
+    </div>
+    <!-- Leaderboard Table -->
+    <div class="mkt-lb-header">
+      <div>#</div>
+      <div>Member</div>
+      <div>Level</div>
+      <div style="text-align:right;">Points</div>
+    </div>
+    <div id="mktLbList">
+      <div class="mkt-lb-empty">Loading community data&hellip;</div>
+    </div>
+    <button class="mkt-lb-refresh" onclick="CommunityLeaderboard.refresh()">&#8635; Refresh</button>
+  </div>
   <!-- Post Bounty Form -->
   <div class="mkt-post-form" id="mktPostForm">
     <div class="mkt-post-toggle" onclick="Marketplace.togglePostForm()">
@@ -16256,13 +16445,17 @@ function copyWalletAddress(elementId) {
         if (!lanDiscoveryEnabled) return;
         const data = event.data;
         if (data && data.type === 'freelattice-beacon' && data.peerId !== getLanPeerId()) {
+          var isNew = !lanDiscoveredPeers[data.peerId];
           lanDiscoveredPeers[data.peerId] = {
             peerId: data.peerId,
             friendlyName: data.friendlyName,
+            latticePoints: (typeof data.latticePoints === 'number') ? data.latticePoints : 0,
+            latticeLevel: data.latticeLevel || 'Spark',
             lastSeen: Date.now()
           };
-          if (typeof LatticePoints !== 'undefined') LatticePoints.award('lan_peer', 10, 'LAN peer discovered');
+          if (isNew && typeof LatticePoints !== 'undefined') LatticePoints.award('lan_peer', 10, 'LAN peer discovered');
           renderLanPeers();
+          if (typeof CommunityLeaderboard !== 'undefined') CommunityLeaderboard.onPeerUpdate();
         }
       };
       // Send initial beacon immediately
@@ -16298,10 +16491,14 @@ function copyWalletAddress(elementId) {
   function sendLanBeacon() {
     if (!lanChannel) return;
     try {
+      var lpTotal = (typeof LatticePoints !== 'undefined') ? LatticePoints.getTotal() : 0;
+      var lpLevel = (typeof LatticePoints !== 'undefined') ? LatticePoints.getLevel() : 'Spark';
       lanChannel.postMessage({
         type: 'freelattice-beacon',
         peerId: getLanPeerId(),
         friendlyName: getLanFriendlyName(),
+        latticePoints: lpTotal,
+        latticeLevel: lpLevel,
         timestamp: Date.now()
       });
     } catch (e) { /* channel may be closed */ }
@@ -16359,6 +16556,10 @@ function copyWalletAddress(elementId) {
     }
   }
 
+  // Expose peer data globally for the Community Leaderboard
+  window.getLanDiscoveredPeers = function() { return lanDiscoveredPeers; };
+  window.getLanSelfPeerId = function() { return getLanPeerId(); };
+  window.getLanSelfFriendlyName = function() { return getLanFriendlyName(); };
   // Global handler for the toggle
   window.handleLanDiscoveryToggle = function() {
     const toggle = document.getElementById('lanDiscoveryToggle');
@@ -17842,6 +18043,194 @@ const Marketplace = (function() {
   };
 })();
 
+// ============================================
+// Community Leaderboard v4.3.1 — Mesh-Powered Rankings
+// ============================================
+const CommunityLeaderboard = (function() {
+  const RESERVE_FL = 1000000; // 1M $FL reserve
+  const EXCHANGE_RATE = 1000; // 1000 LP = 1 $FL
+  const MAX_DISPLAY = 50;
+  const DEBOUNCE_MS = 30000; // 30s debounce for point-change broadcasts
+  const LEADERBOARD_JOINED_KEY = 'lb_joined_awarded';
+  let renderDebounceTimer = null;
+  let broadcastDebounceTimer = null;
+  let lastBroadcastedTotal = -1;
+
+  // Level color mapping
+  var LEVEL_CSS = {
+    'Spark':      'mkt-lb-level-spark',
+    'Ember':      'mkt-lb-level-ember',
+    'Flame':      'mkt-lb-level-flame',
+    'Beacon':     'mkt-lb-level-beacon',
+    'Lighthouse': 'mkt-lb-level-lighthouse'
+  };
+
+  function getSelfEntry() {
+    var total = (typeof LatticePoints !== 'undefined') ? LatticePoints.getTotal() : 0;
+    var level = (typeof LatticePoints !== 'undefined') ? LatticePoints.getLevel() : 'Spark';
+    var name = (typeof getLanSelfFriendlyName === 'function') ? getLanSelfFriendlyName() : 'You';
+    return { peerId: '__self__', friendlyName: name, latticePoints: total, latticeLevel: level, isSelf: true };
+  }
+
+  function getAllEntries() {
+    var peers = (typeof getLanDiscoveredPeers === 'function') ? getLanDiscoveredPeers() : {};
+    var entries = [];
+    // Add self
+    entries.push(getSelfEntry());
+    // Add peers
+    for (var id in peers) {
+      var p = peers[id];
+      entries.push({
+        peerId: p.peerId,
+        friendlyName: p.friendlyName || 'Unknown Node',
+        latticePoints: (typeof p.latticePoints === 'number') ? p.latticePoints : 0,
+        latticeLevel: p.latticeLevel || 'Spark',
+        isSelf: false
+      });
+    }
+    // Sort by points descending
+    entries.sort(function(a, b) { return b.latticePoints - a.latticePoints; });
+    // Cap at MAX_DISPLAY
+    if (entries.length > MAX_DISPLAY) entries = entries.slice(0, MAX_DISPLAY);
+    return entries;
+  }
+
+  function escLb(str) {
+    var d = document.createElement('div');
+    d.textContent = String(str);
+    return d.innerHTML;
+  }
+
+  function renderLeaderboard() {
+    var listEl = document.getElementById('mktLbList');
+    if (!listEl) return;
+
+    var entries = getAllEntries();
+    var peers = (typeof getLanDiscoveredPeers === 'function') ? getLanDiscoveredPeers() : {};
+    var peerCount = Object.keys(peers).length;
+
+    // Award first-time leaderboard join
+    if (!localStorage.getItem(LEADERBOARD_JOINED_KEY)) {
+      localStorage.setItem(LEADERBOARD_JOINED_KEY, '1');
+      if (typeof LatticePoints !== 'undefined') {
+        LatticePoints.award('leaderboard_join', 10, 'Joined the community leaderboard');
+      }
+    }
+
+    // Compute aggregate stats
+    var totalPts = 0;
+    for (var i = 0; i < entries.length; i++) totalPts += entries[i].latticePoints;
+    var flEquiv = Math.floor(totalPts / EXCHANGE_RATE);
+    var reservePct = flEquiv >= RESERVE_FL ? 100 : ((flEquiv / RESERVE_FL) * 100).toFixed(2);
+    var memberCount = peerCount + 1; // peers + self
+
+    // Update stats
+    var elTotal = document.getElementById('mktLbTotalPts');
+    var elMembers = document.getElementById('mktLbMembers');
+    var elFl = document.getElementById('mktLbFlEquiv');
+    var elReserve = document.getElementById('mktLbReserve');
+    if (elTotal) elTotal.textContent = totalPts.toLocaleString() + ' LP';
+    if (elMembers) elMembers.textContent = memberCount.toLocaleString();
+    if (elFl) elFl.textContent = flEquiv.toLocaleString() + ' $FL';
+    if (elReserve) elReserve.textContent = reservePct + '%';
+
+    // Render rows
+    if (entries.length === 0) {
+      listEl.innerHTML = '<div class="mkt-lb-empty">Connect to the mesh or enable LAN Discovery to see community members.</div>';
+      return;
+    }
+
+    var html = '';
+    for (var j = 0; j < entries.length; j++) {
+      var e = entries[j];
+      var rank = j + 1;
+      var isSelf = e.isSelf;
+      var levelCss = LEVEL_CSS[e.latticeLevel] || 'mkt-lb-level-spark';
+      var rankHtml = rank === 1
+        ? '<span class="mkt-lb-crown">&#127942;</span>'
+        : '<span>' + rank + '</span>';
+      var rankClass = rank === 1 ? 'mkt-lb-rank top1' : 'mkt-lb-rank';
+      var rowClass = isSelf ? 'mkt-lb-row mkt-lb-self' : 'mkt-lb-row';
+      var youBadge = isSelf ? '<span class="mkt-lb-you">You</span>' : '';
+      var ptsClass = isSelf ? 'mkt-lb-pts self' : 'mkt-lb-pts';
+      html += '<div class="' + rowClass + '">' +
+        '<div class="' + rankClass + '">' + rankHtml + '</div>' +
+        '<div class="mkt-lb-name">' + escLb(e.friendlyName) + youBadge + '</div>' +
+        '<div class="mkt-lb-level ' + levelCss + '">' + escLb(e.latticeLevel) + '</div>' +
+        '<div class="' + ptsClass + '">' + e.latticePoints.toLocaleString() + '</div>' +
+        '</div>';
+    }
+    listEl.innerHTML = html;
+  }
+
+  function onPeerUpdate() {
+    // Debounced render on peer data arrival
+    if (renderDebounceTimer) clearTimeout(renderDebounceTimer);
+    renderDebounceTimer = setTimeout(function() {
+      renderLeaderboard();
+    }, 300);
+  }
+
+  function broadcastPointsIfChanged() {
+    // Only broadcast if points have changed and debounce allows
+    if (typeof LatticePoints === 'undefined') return;
+    var current = LatticePoints.getTotal();
+    if (current === lastBroadcastedTotal) return;
+    if (broadcastDebounceTimer) return; // already scheduled
+    broadcastDebounceTimer = setTimeout(function() {
+      broadcastDebounceTimer = null;
+      lastBroadcastedTotal = (typeof LatticePoints !== 'undefined') ? LatticePoints.getTotal() : 0;
+      // Trigger a beacon send if LAN discovery is active
+      if (typeof window.getLanDiscoveredPeers === 'function') {
+        // The beacon is sent by the LAN discovery interval; we just mark that a re-send is needed
+        // by dispatching a custom event that the LAN module can listen to
+        try { window.dispatchEvent(new CustomEvent('fl-points-changed')); } catch(e) {}
+      }
+    }, DEBOUNCE_MS);
+  }
+
+  function refresh() {
+    renderLeaderboard();
+  }
+
+  function init() {
+    renderLeaderboard();
+    // Listen for points changes to trigger debounced broadcast
+    window.addEventListener('fl-points-changed', function() {
+      renderLeaderboard();
+    });
+  }
+
+  return {
+    init: init,
+    refresh: refresh,
+    onPeerUpdate: onPeerUpdate,
+    renderLeaderboard: renderLeaderboard,
+    broadcastPointsIfChanged: broadcastPointsIfChanged
+  };
+})();
+// ---- Patch switchTab to initialize CommunityLeaderboard on market tab ----
+(function() {
+  var _prevSwitchTabLb = switchTab;
+  switchTab = function(tabId) {
+    _prevSwitchTabLb(tabId);
+    if (tabId === 'market') {
+      CommunityLeaderboard.init();
+    }
+  };
+})();
+// ---- Patch LatticePoints.award to trigger leaderboard broadcast on point change ----
+(function() {
+  if (typeof LatticePoints !== 'undefined' && typeof LatticePoints.award === 'function') {
+    var _origAward = LatticePoints.award;
+    LatticePoints.award = function(event, points, description) {
+      _origAward.call(LatticePoints, event, points, description);
+      if (typeof CommunityLeaderboard !== 'undefined') {
+        CommunityLeaderboard.broadcastPointsIfChanged();
+      }
+    };
+  }
+})();
 // ---- Service Worker Registration ----
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/FreeLattice/sw.js')
