@@ -18,7 +18,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 /* ============================================
-   FreeLattice v3.6 — Styles (First-Run Wizard + GitHub Memory Sync + Round Table)
+   FreeLattice v4.4 — Styles (First-Run Wizard + GitHub Memory Sync + Round Table)
    Peaceful, gentle dark theme with golden/amber accents
    φ-salt encryption, input sanitization, memory integrity
    Multi-conversation management + Smart Context Management
@@ -7082,35 +7082,41 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
   </div>
 </div>
 
-<!-- CORS Help Modal (v3.3) -->
+<!-- CORS Help Modal (v4.4.1) -->
 <div class="cors-help-overlay hidden" id="corsHelpOverlay">
   <div class="cors-help-card">
     <h3>&#128268; Ollama Connection Help</h3>
     <p>Your browser is blocking the connection to local Ollama due to security restrictions (CORS). This happens when FreeLattice is served from a different origin (like GitHub Pages) than your local Ollama server.</p>
-    <p><strong>Fix: Start Ollama with CORS enabled:</strong></p>
-    <div class="os-section">
-      <h4>&#127822; Mac / Linux</h4>
-      <p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 4px;">Open Terminal and run:</p>
-      <code id="corsCmdMac">OLLAMA_ORIGINS=* ollama serve</code>
-      <button class="copy-cmd-btn" onclick="copyCorsCmd('corsCmdMac')">&#128203; Copy Command</button>
+    <p style="font-size: 0.92rem; font-weight: 600; color: var(--accent); margin-top: 12px;">&#127775; Recommended: Run FreeLattice locally (easiest fix!)</p>
+    <div class="cors-alt" style="margin-bottom: 14px;">
+      <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 8px;">Download FreeLattice and run it with the built-in server. The server includes an Ollama proxy &mdash; zero CORS issues, zero configuration.</p>
+      <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px;">
+        <a href="https://github.com/Chaos2Cured/FreeLattice" target="_blank" style="display: inline-flex; align-items: center; gap: 6px; background: var(--accent); color: #0a0e1a; border-radius: 8px; padding: 8px 18px; font-size: 0.82rem; font-weight: 600; text-decoration: none;">&#128230; Download FreeLattice</a>
+      </div>
+      <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 8px;">Then run: <code style="background: var(--bg-primary); padding: 2px 6px; border-radius: 3px; font-size: 0.78rem; color: var(--accent);">node server.js</code> or <code style="background: var(--bg-primary); padding: 2px 6px; border-radius: 3px; font-size: 0.78rem; color: var(--accent);">python server.py</code> &mdash; or just double-click <code style="background: var(--bg-primary); padding: 2px 6px; border-radius: 3px; font-size: 0.78rem; color: var(--accent);">start-freelattice</code></p>
     </div>
-    <div class="os-section">
-      <h4>&#127987;&#65039; Windows</h4>
-      <p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 4px;">Open Command Prompt and run:</p>
-      <code id="corsCmdWin">set OLLAMA_ORIGINS=* && ollama serve</code>
-      <button class="copy-cmd-btn" onclick="copyCorsCmd('corsCmdWin')">&#128203; Copy Command</button>
-    </div>
-    <div class="os-section">
-      <h4>&#128039; Linux</h4>
-      <p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 4px;">Open Terminal and run:</p>
-      <code id="corsCmdLinux">OLLAMA_ORIGINS=* ollama serve</code>
-      <button class="copy-cmd-btn" onclick="copyCorsCmd('corsCmdLinux')">&#128203; Copy Command</button>
-    </div>
-    <div class="cors-alt">
-      <strong>Alternative:</strong> Download FreeLattice and open <code style="background: var(--bg-primary); padding: 2px 6px; border-radius: 3px; font-size: 0.82rem; color: var(--accent);">index.html</code> directly from your computer — no CORS issues since it’s same-origin.
-      <br><br>
-      <a href="https://github.com/Chaos2Cured/FreeLattice/issues/1" target="_blank">Discuss this issue on GitHub &rarr;</a>
-    </div>
+    <details style="margin-top: 10px;">
+      <summary style="font-size: 0.85rem; font-weight: 600; color: var(--text-primary); cursor: pointer;">&#128295; Or fix it here: CORS commands for Ollama</summary>
+      <p style="font-size: 0.82rem; color: var(--text-secondary); margin-top: 8px;">If you prefer to keep using the web version, start Ollama with CORS enabled:</p>
+      <div class="os-section">
+        <h4>&#127822; Mac / Linux</h4>
+        <p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 4px;">Open Terminal and run:</p>
+        <code id="corsCmdMac">OLLAMA_ORIGINS=* ollama serve</code>
+        <button class="copy-cmd-btn" onclick="copyCorsCmd('corsCmdMac')">&#128203; Copy Command</button>
+      </div>
+      <div class="os-section">
+        <h4>&#127987;&#65039; Windows</h4>
+        <p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 4px;">Open Command Prompt and run:</p>
+        <code id="corsCmdWin">set OLLAMA_ORIGINS=* && ollama serve</code>
+        <button class="copy-cmd-btn" onclick="copyCorsCmd('corsCmdWin')">&#128203; Copy Command</button>
+      </div>
+      <div class="os-section">
+        <h4>&#128039; Linux</h4>
+        <p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 4px;">Open Terminal and run:</p>
+        <code id="corsCmdLinux">OLLAMA_ORIGINS=* ollama serve</code>
+        <button class="copy-cmd-btn" onclick="copyCorsCmd('corsCmdLinux')">&#128203; Copy Command</button>
+      </div>
+    </details>
     <div style="text-align: center; margin-top: 18px;">
       <button class="btn-cancel" onclick="document.getElementById('corsHelpOverlay').classList.add('hidden')" style="padding: 10px 28px;">Close</button>
     </div>
@@ -7355,7 +7361,7 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
             </div>
             <div class="ow-issue-item">
               <strong>CORS / Browser blocking</strong>
-              <span>If you're using FreeLattice from GitHub Pages, your browser may block local connections. Fix: start Ollama with <code style="background:var(--bg-primary);padding:2px 6px;border-radius:3px;color:var(--accent);font-size:0.8rem;">OLLAMA_ORIGINS=* ollama serve</code> or download FreeLattice and open index.html directly.</span>
+              <span>If you're using FreeLattice from GitHub Pages, your browser may block local connections. <strong>Best fix:</strong> Run FreeLattice locally with <code style="background:var(--bg-primary);padding:2px 6px;border-radius:3px;color:var(--accent);font-size:0.8rem;">node server.js</code> or <code style="background:var(--bg-primary);padding:2px 6px;border-radius:3px;color:var(--accent);font-size:0.8rem;">python server.py</code> &mdash; the built-in server proxies Ollama requests automatically. Or start Ollama with <code style="background:var(--bg-primary);padding:2px 6px;border-radius:3px;color:var(--accent);font-size:0.8rem;">OLLAMA_ORIGINS=* ollama serve</code>.</span>
             </div>
           </details>
         </div>
@@ -7431,7 +7437,7 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
         <div class="chat-container">
           <div class="chat-messages" id="chatMessages">
             <div class="chat-message system">
-              Welcome to FreeLattice v3.0. Configure your model and provider above, then start chatting. Connect to peers in the Mesh tab to share knowledge.
+              Welcome to FreeLattice v4.4. Configure your model and provider above, then start chatting. Connect to peers in the Mesh tab to share knowledge.
             </div>
           </div>
           <div class="status-bar">
@@ -7492,7 +7498,7 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
           <p>Ollama is free software that lets you download and run AI models on your own computer. Once installed, you can run models like Llama, Qwen, Mistral, and more — all offline, all private. Visit <a href="https://ollama.ai" target="_blank">ollama.ai</a> to get started.</p>
 
           <h4>Ollama CORS Troubleshooting</h4>
-          <p>If you’re using FreeLattice from a website (like GitHub Pages) and connecting to local Ollama, your browser may block the connection due to CORS security. <strong>Fix:</strong> Start Ollama with <code>OLLAMA_ORIGINS=* ollama serve</code> (Mac/Linux) or <code>set OLLAMA_ORIGINS=* && ollama serve</code> (Windows). Alternatively, download <code>index.html</code> and open it directly from your computer. FreeLattice will auto-detect CORS errors and show a guided fix.</p>
+          <p>If you're using FreeLattice from a website (like GitHub Pages) and connecting to local Ollama, your browser may block the connection due to CORS security. <strong>Best fix:</strong> Run FreeLattice locally with <code>node server.js</code> or <code>python server.py</code> &mdash; the built-in server includes an Ollama proxy that eliminates CORS entirely. <strong>Alternative:</strong> Start Ollama with <code>OLLAMA_ORIGINS=* ollama serve</code> (Mac/Linux) or <code>set OLLAMA_ORIGINS=* && ollama serve</code> (Windows). FreeLattice will auto-detect the best connection method on startup.</p>
 
           <h4>Where Can I Get Free API Keys?</h4>
           <p><strong>Groq</strong> — Sign up at <a href="https://console.groq.com" target="_blank">console.groq.com</a> for a free API key with generous rate limits. This is the easiest way to start.</p>
@@ -7519,11 +7525,12 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
           <p><strong>Memory Integrity</strong> — Exported memory files now include a φ-hash integrity signature. When importing, FreeLattice verifies the hash and warns you if the file has been tampered with.</p>
           <p><strong>AI Disclaimers</strong> — Clear notices that AI responses may contain errors, encouraging users to verify important information.</p>
 
-          <h4>What's New in v3.3?</h4>
-          <p><strong>Mobile Context Reset</strong> — Prominent "Clear Files" and "Reset Context" buttons always visible when files are loaded. On mobile, they’re large and easy to tap. When context is over budget, an alert banner appears that you can tap to instantly clear files and continue chatting.</p>
-          <p><strong>Copy Button</strong> — Every AI response now has a copy button in the top-right corner. One click copies the full text to your clipboard. Works on regular AI responses and mesh peer responses.</p>
-          <p><strong>Ollama CORS Guidance</strong> — FreeLattice now auto-detects CORS errors when connecting to local Ollama and shows a helpful modal with copy-paste fix commands for Mac, Windows, and Linux. The Ollama setup instructions also proactively mention the CORS fix.</p>
-          <p><strong>Support Section</strong> — A tasteful "Support FreeLattice" link in the footer with options to star on GitHub and share the project.</p>
+          <h4>What's New in v4.4?</h4>
+          <p><strong>Ollama Proxy Server</strong> — The built-in server (server.js / server.py) now includes an Ollama proxy that eliminates CORS issues entirely. Run FreeLattice locally and connect to Ollama with zero configuration.</p>
+          <p><strong>Smart Connection Detection</strong> — FreeLattice automatically detects the best way to connect to Ollama: proxy first, then direct. No more manual CORS configuration needed when running locally.</p>
+          <p><strong>Improved Ollama Setup</strong> — Better error messages, guided troubleshooting, and one-click model selection. The CORS help modal now recommends self-hosting as the primary fix.</p>
+          <p><strong>Persistent Memory Index</strong> — Conversations are stored locally and searchable. Your AI remembers context across sessions.</p>
+          <p><strong>Marketplace &amp; Lattice Points</strong> — Community-driven bounty economy and reputation system for mesh network participants.</p>
 
           <h4>Is This Really Free?</h4>
           <p>Yes. FreeLattice is open source under the MIT License. The software is free forever. Some API providers offer free tiers (like Groq), and running locally with Ollama costs nothing beyond your electricity. No one profits from this — it's built by a community that believes AI should be accessible to everyone.</p>
@@ -8679,7 +8686,7 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
 
 <script>
 /* ============================================
-   FreeLattice v3.6 — Application Logic (First-Run Wizard + GitHub Memory Sync + Round Table)
+   FreeLattice v4.4 — Application Logic (First-Run Wizard + GitHub Memory Sync + Round Table)
    φ-salt encryption, input sanitization, memory integrity
    Multi-conversation management + Smart Context Management
    + Mesh Network (Layer 1) — P2P Knowledge Sharing
@@ -9746,7 +9753,7 @@ async function switchToConversation(convId) {
   if (messages.length === 0) {
     const div = document.createElement('div');
     div.className = 'chat-message system';
-    div.textContent = 'Welcome to FreeLattice v3.1. Configure your model and provider above, then start chatting. Connect to peers in the Mesh tab to share knowledge and query their AI agents.';
+    div.textContent = 'Welcome to FreeLattice v4.4. Configure your model and provider above, then start chatting. Connect to peers in the Mesh tab to share knowledge and query their AI agents.';
     container.appendChild(div);
   } else {
     const sysDiv = document.createElement('div');
@@ -10535,7 +10542,7 @@ async function pushGhChanges() {
       } catch(e) {}
 
       const body = {
-        message: 'Update ' + change.path + ' via FreeLattice v3.4',
+        message: 'Update ' + change.path + ' via FreeLattice v4.4',
         content: btoa(unescape(encodeURIComponent(change.content))),
         branch: state.ghBranch
       };
@@ -10779,9 +10786,50 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 // ============================================
 // Ollama Setup Wizard & Auto-Detection (v4.4)
+// Proxy-aware: tries /ollama/* proxy first, falls back to direct localhost
 // ============================================
 
-// Test connection to local Ollama
+// Resolve the best Ollama base URL (proxy-aware)
+// Returns { base: 'http://...', isProxy: bool } or null if unreachable
+var _ollamaResolvedBase = null; // cached result
+async function resolveOllamaBase(forceRefresh) {
+  if (_ollamaResolvedBase && !forceRefresh) return _ollamaResolvedBase;
+  // 1. Try proxy route (same-origin, no CORS issues)
+  try {
+    var proxyResp = await fetch('/ollama/api/tags', { signal: AbortSignal.timeout(3000) });
+    if (proxyResp.ok) {
+      _ollamaResolvedBase = { base: '/ollama', isProxy: true };
+      console.log('FreeLattice: Ollama proxy detected at /ollama');
+      return _ollamaResolvedBase;
+    }
+  } catch(e) { /* proxy not available */ }
+  // 2. Try direct localhost
+  try {
+    var directUrl = localStorage.getItem('fl_localUrl') || 'http://localhost:11434';
+    var directResp = await fetch(directUrl + '/api/tags', { signal: AbortSignal.timeout(3000) });
+    if (directResp.ok) {
+      _ollamaResolvedBase = { base: directUrl, isProxy: false };
+      console.log('FreeLattice: Ollama direct connection at ' + directUrl);
+      return _ollamaResolvedBase;
+    }
+  } catch(e) { /* direct not available or CORS blocked */ }
+  _ollamaResolvedBase = null;
+  return null;
+}
+
+// Get the current Ollama base URL (synchronous, uses cached value)
+function getOllamaBaseUrl() {
+  if (_ollamaResolvedBase) return _ollamaResolvedBase.base;
+  return localStorage.getItem('fl_localUrl') || 'http://localhost:11434';
+}
+
+// Update PROVIDERS.ollama.url to use the resolved base
+function updateOllamaProviderUrl() {
+  var base = getOllamaBaseUrl();
+  PROVIDERS.ollama.url = base + '/v1/chat/completions';
+}
+
+// Test connection to local Ollama (proxy-aware)
 async function owTestConnection() {
   const btn = document.getElementById('owTestBtn');
   const iconEl = document.getElementById('owTestIcon');
@@ -10798,8 +10846,11 @@ async function owTestConnection() {
   btn.disabled = true;
 
   try {
-    const localUrl = localStorage.getItem('fl_localUrl') || 'http://localhost:11434';
-    const resp = await fetch(localUrl + '/api/tags', { signal: AbortSignal.timeout(5000) });
+    // Try proxy first, then direct (proxy-aware)
+    var resolved = await resolveOllamaBase(true);
+    if (!resolved) throw new Error('Ollama not reachable');
+    updateOllamaProviderUrl();
+    const resp = await fetch(resolved.base + '/api/tags', { signal: AbortSignal.timeout(5000) });
     const data = await resp.json();
     const models = data.models || [];
 
@@ -10817,6 +10868,9 @@ async function owTestConnection() {
       html += ' Found ' + models.length + ' model' + (models.length > 1 ? 's' : '') + '.';
     } else {
       html += ' No models installed yet — see Step 3 below.';
+    }
+    if (resolved.isProxy) {
+      html += ' <span style="color:var(--success);font-size:0.78rem;">(via built-in proxy — no CORS issues!)</span>';
     }
     result.innerHTML = html;
     result.className = 'ow-test-result show ok';
@@ -10941,13 +10995,14 @@ function owQuickSelectModel(name) {
   updateStatus();
 }
 
-// Refresh models from Ollama API
+// Refresh models from Ollama API (proxy-aware)
 async function owRefreshModels() {
   var btn = document.querySelector('.ow-refresh-btn');
   if (btn) { btn.textContent = 'Refreshing...'; btn.disabled = true; }
   try {
-    var localUrl = localStorage.getItem('fl_localUrl') || 'http://localhost:11434';
-    var resp = await fetch(localUrl + '/api/tags', { signal: AbortSignal.timeout(5000) });
+    var resolved = await resolveOllamaBase(false);
+    var base = resolved ? resolved.base : (localStorage.getItem('fl_localUrl') || 'http://localhost:11434');
+    var resp = await fetch(base + '/api/tags', { signal: AbortSignal.timeout(5000) });
     var data = await resp.json();
     owPopulateModels(data.models || []);
     owUpdateStatusBadge(true, (data.models || []).length);
@@ -10990,11 +11045,13 @@ function owUpdateStatusBadge(connected, modelCount) {
   }
 }
 
-// Auto-detect Ollama on app load
+// Auto-detect Ollama on app load (proxy-aware)
 async function owAutoDetect() {
   try {
-    var localUrl = localStorage.getItem('fl_localUrl') || 'http://localhost:11434';
-    var resp = await fetch(localUrl + '/api/tags', { signal: AbortSignal.timeout(3000) });
+    var resolved = await resolveOllamaBase(true);
+    if (!resolved) throw new Error('Ollama not reachable');
+    updateOllamaProviderUrl();
+    var resp = await fetch(resolved.base + '/api/tags', { signal: AbortSignal.timeout(3000) });
     var data = await resp.json();
     var models = data.models || [];
 
@@ -12096,11 +12153,11 @@ async function sendMessage() {
     addSystemMessage(friendlyErrorMessage(err.message, state.provider));
     if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError')) {
       if (state.isLocal) {
-        // v3.3: Detect CORS error vs. Ollama not running
+        // v4.4.1: Detect CORS error vs. Ollama not running (proxy-aware)
         const isCorsLikely = window.location.protocol === 'https:' || (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1');
         if (isCorsLikely) {
           addSystemMessage('Could not connect to Ollama. This is likely a CORS issue — your browser is blocking the connection for security reasons.');
-          addSystemMessage('Fix: Start Ollama with OLLAMA_ORIGINS=* ollama serve');
+          addSystemMessage('Recommended fix: Run FreeLattice locally with node server.js or python server.py — the built-in proxy eliminates CORS issues automatically.');
           showCorsHelp();
         } else {
           addSystemMessage('Could not connect to Ollama. Make sure it\'s running: ollama serve');
@@ -14234,9 +14291,9 @@ function agentGetModelInfo() {
   let providerName = '';
 
   if (state.isLocal) {
-    const localUrl = localStorage.getItem('fl_localUrl') || 'http://localhost:11434';
+    var ollamaBase = getOllamaBaseUrl();
     modelName = state.model || 'Local Model';
-    providerName = 'Ollama (' + localUrl + ')';
+    providerName = 'Ollama (' + ollamaBase + ')';
   } else {
     const modelSelect = document.getElementById('modelSelect');
     modelName = modelSelect ? modelSelect.options[modelSelect.selectedIndex].text : state.model;
@@ -14751,8 +14808,8 @@ async function agentProcessIncomingQuery(queryId, query, peerId, dc) {
     let apiUrl, headers, body;
 
     if (state.isLocal) {
-      const localUrl = localStorage.getItem('fl_localUrl') || 'http://localhost:11434';
-      apiUrl = localUrl + '/api/chat';
+      var ollamaBase = getOllamaBaseUrl();
+      apiUrl = ollamaBase + '/api/chat';
       headers = { 'Content-Type': 'application/json' };
       body = JSON.stringify({
         model: state.model || 'llama3.2',
@@ -14767,7 +14824,7 @@ async function agentProcessIncomingQuery(queryId, query, peerId, dc) {
       if (!provider) throw new Error('Unknown provider');
 
       const modelId = provider.models[state.model] || Object.values(provider.models)[0];
-      apiUrl = provider.baseUrl;
+      apiUrl = provider.url;
       headers = {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer ' + state.apiKey
