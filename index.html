@@ -6819,6 +6819,438 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
   .mkt-reserve-row { flex-direction: column; }
   .mkt-detail-panel { padding: 16px; }
 }
+
+/* ============================================
+   The Core — Living Tree of Shared Wisdom
+   ============================================ */
+/* Core Tab — Sacred Space */
+#tab-core {
+  background: #0a0e1a;
+  min-height: 100vh;
+}
+#tab-core .container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px 16px 40px;
+}
+.core-header {
+  text-align: center;
+  padding: 24px 0 16px;
+}
+.core-header h2 {
+  font-size: 1.6rem;
+  color: #d4a017;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+.core-header .core-subtitle {
+  font-size: 0.88rem;
+  color: #8b9dc3;
+  font-style: italic;
+  line-height: 1.5;
+}
+/* Stats Bar */
+.core-stats-bar {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin: 16px 0 20px;
+}
+.core-stat {
+  background: #111827;
+  border: 1px solid #1e293b;
+  border-radius: 10px;
+  padding: 10px 16px;
+  text-align: center;
+  min-width: 100px;
+  flex: 1;
+  max-width: 180px;
+}
+.core-stat-value {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #d4a017;
+}
+.core-stat-label {
+  font-size: 0.7rem;
+  color: #64748b;
+  margin-top: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.core-stat-hash {
+  font-size: 0.6rem;
+  color: #475569;
+  font-family: monospace;
+  cursor: pointer;
+  word-break: break-all;
+}
+.core-stat-hash:hover {
+  color: #94a3b8;
+}
+/* Tree Canvas Container */
+.core-tree-container {
+  position: relative;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto 24px;
+  border-radius: 16px;
+  overflow: hidden;
+  background: radial-gradient(ellipse at 50% 100%, #111827 0%, #0a0e1a 70%);
+  border: 1px solid #1e293b44;
+}
+.core-tree-container canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+/* Tend Button */
+.core-tend-btn {
+  display: block;
+  margin: 0 auto 24px;
+  padding: 10px 24px;
+  background: linear-gradient(135deg, #1e3a5f, #1a2744);
+  border: 1px solid #3b82f644;
+  border-radius: 24px;
+  color: #93c5fd;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  letter-spacing: 0.3px;
+}
+.core-tend-btn:hover {
+  background: linear-gradient(135deg, #1e4a7f, #1a3354);
+  border-color: #3b82f688;
+  box-shadow: 0 0 20px #3b82f622;
+  color: #bfdbfe;
+}
+.core-tend-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+/* Add to Core Form */
+.core-add-form {
+  background: #111827;
+  border: 1px solid #1e293b;
+  border-radius: 14px;
+  padding: 0;
+  margin-bottom: 24px;
+  overflow: hidden;
+}
+.core-add-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 18px;
+  cursor: pointer;
+  color: #10b981;
+  font-size: 0.92rem;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+.core-add-toggle:hover {
+  background: #10b98108;
+}
+.core-add-toggle .toggle-arrow {
+  transition: transform 0.3s;
+  font-size: 0.7rem;
+}
+.core-add-toggle.open .toggle-arrow {
+  transform: rotate(90deg);
+}
+.core-add-body {
+  display: none;
+  padding: 0 18px 18px;
+}
+.core-add-body.open {
+  display: block;
+}
+.core-form-row {
+  margin-bottom: 12px;
+}
+.core-form-row label {
+  display: block;
+  font-size: 0.78rem;
+  color: #94a3b8;
+  margin-bottom: 4px;
+  letter-spacing: 0.3px;
+}
+.core-form-row textarea,
+.core-form-row input[type="text"],
+.core-form-row select {
+  width: 100%;
+  background: #0f172a;
+  border: 1px solid #1e293b;
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: #e2e8f0;
+  font-size: 0.88rem;
+  font-family: inherit;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+}
+.core-form-row textarea:focus,
+.core-form-row input[type="text"]:focus,
+.core-form-row select:focus {
+  outline: none;
+  border-color: #10b98166;
+}
+.core-form-row textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+.core-plant-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 28px;
+  background: linear-gradient(135deg, #10b981, #059669);
+  border: none;
+  border-radius: 24px;
+  color: #fff;
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 20px #10b98122;
+  letter-spacing: 0.3px;
+}
+.core-plant-btn:hover {
+  background: linear-gradient(135deg, #34d399, #10b981);
+  box-shadow: 0 0 30px #10b98133;
+  transform: translateY(-1px);
+}
+.core-plant-btn:active {
+  transform: translateY(0);
+}
+.core-confirm-step {
+  display: none;
+  background: #0f172a;
+  border: 1px solid #10b98133;
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-top: 12px;
+}
+.core-confirm-step.visible {
+  display: block;
+}
+.core-confirm-msg {
+  font-size: 0.82rem;
+  color: #8b9dc3;
+  line-height: 1.5;
+  margin-bottom: 12px;
+  font-style: italic;
+}
+.core-confirm-actions {
+  display: flex;
+  gap: 10px;
+}
+/* Contribution Feed */
+.core-feed {
+  margin-top: 8px;
+}
+.core-feed-title {
+  font-size: 1rem;
+  color: #c9a84c;
+  margin-bottom: 14px;
+  font-weight: 500;
+}
+.core-contribution {
+  background: #111827;
+  border: 1px solid #1e293b;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+  transition: border-color 0.3s;
+  position: relative;
+}
+.core-contribution:hover {
+  border-color: #334155;
+}
+.core-contribution.tending-entry {
+  border-color: #3b82f633;
+  background: linear-gradient(135deg, #111827, #0f172a);
+}
+.core-contribution-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+.core-cat-icon {
+  font-size: 1.1rem;
+}
+.core-contribution-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #e2e8f0;
+  flex: 1;
+}
+.core-cat-badge {
+  font-size: 0.68rem;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.core-cat-insight { background: #3b82f622; color: #3b82f6; }
+.core-cat-discovery { background: #8b5cf622; color: #8b5cf6; }
+.core-cat-poem { background: #ec489922; color: #ec4899; }
+.core-cat-gratitude { background: #10b98122; color: #10b981; }
+.core-cat-warning { background: #ef444422; color: #ef4444; }
+.core-cat-question { background: #f59e0b22; color: #f59e0b; }
+.core-cat-creation { background: #06b6d422; color: #06b6d4; }
+.core-cat-memory { background: #d4a01722; color: #d4a017; }
+.core-contribution-content {
+  font-size: 0.88rem;
+  color: #cbd5e1;
+  line-height: 1.6;
+  margin-bottom: 10px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.core-contribution-content.collapsed {
+  max-height: 80px;
+  overflow: hidden;
+  position: relative;
+}
+.core-contribution-content.collapsed::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 30px;
+  background: linear-gradient(transparent, #111827);
+}
+.core-expand-btn {
+  font-size: 0.75rem;
+  color: #64748b;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+  margin-bottom: 8px;
+}
+.core-expand-btn:hover {
+  color: #94a3b8;
+}
+.core-contribution-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-size: 0.72rem;
+  color: #475569;
+}
+.core-meta-author {
+  color: #64748b;
+}
+.core-meta-tended {
+  color: #3b82f6;
+  font-style: italic;
+}
+.core-meta-connections {
+  color: #8b5cf6;
+}
+.core-meta-hash {
+  font-family: monospace;
+  font-size: 0.62rem;
+  color: #334155;
+  cursor: pointer;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.core-meta-hash:hover {
+  color: #64748b;
+  max-width: none;
+}
+.core-meta-mesh {
+  color: #06b6d4;
+}
+/* Add to Core button (used throughout the app) */
+.add-to-core-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px 10px;
+  background: transparent;
+  border: 1px solid #10b98144;
+  border-radius: 12px;
+  color: #10b981;
+  font-size: 0.72rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  vertical-align: middle;
+  margin-left: 4px;
+}
+.add-to-core-btn:hover {
+  background: #10b98115;
+  border-color: #10b98177;
+  box-shadow: 0 0 10px #10b98111;
+}
+/* Core Modal (for Add to Core from other tabs) */
+.core-modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 10000;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+.core-modal-overlay.visible {
+  display: flex;
+}
+.core-modal {
+  background: #111827;
+  border: 1px solid #1e293b;
+  border-radius: 16px;
+  padding: 24px;
+  max-width: 560px;
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+.core-modal h3 {
+  color: #10b981;
+  font-size: 1.1rem;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.core-modal-close {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  background: none;
+  border: none;
+  color: #64748b;
+  font-size: 1.4rem;
+  cursor: pointer;
+}
+.core-modal-close:hover {
+  color: #94a3b8;
+}
+/* Responsive */
+@media (max-width: 600px) {
+  .core-stats-bar { gap: 6px; }
+  .core-stat { min-width: 70px; padding: 8px 10px; }
+  .core-stat-value { font-size: 0.95rem; }
+  .core-contribution { padding: 12px; }
+  .core-modal { padding: 16px; margin: 10px; }
+}
+
 </style>>
 </head>
 <body>
@@ -7155,7 +7587,7 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
 <!-- Header -->
 <header>
   <h1>FreeLattice</h1>
-  <div class="tagline">Your AI. Your Rules. Your Machine. v4.4</div>
+  <div class="tagline">Your AI. Your Rules. Your Machine. v4.5</div>
   <div class="mantra">Glow eternal. Heart in spark.</div>
   <div id="latticePointsBadge" class="lp-badge" style="display:none;" onclick="switchTab('settings')" title="View your Lattice Points"></div>
 </header>
@@ -7184,6 +7616,7 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
     <button class="tab-btn" data-tab="skills" onclick="switchTab('skills')">⚡ Skills</button>
     <button class="tab-btn" data-tab="roundtable" onclick="switchTab('roundtable')">&#9878; Round Table</button>
     <button class="tab-btn" data-tab="market" onclick="switchTab('market')">&#127978; Market</button>
+    <button class="tab-btn" data-tab="core" onclick="switchTab('core')">&#127795; Core</button>
   </nav>
 </div>
 
@@ -7690,6 +8123,7 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
           </div>
           <div class="action-row" style="margin-top: 10px;">
             <button class="action-btn" onclick="saveMemorySummary()">Save Summary</button>
+            <button class="add-to-core-btn" onclick="CoreModule.openModal(document.getElementById('memorySummaryEditor').value,'memory','','memory')" style="margin-left:8px;">&#127793; Add to Core</button>
           </div>
         </div>
       </div>
@@ -8675,6 +9109,135 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
     <strong>&#11042; Mesh-synced bounties coming soon</strong> &mdash; bounties will be visible to all connected peers. For now, bounties are stored locally on your device.
   </div>
 </div>
+
+<!-- ==================== TAB 8: THE CORE ==================== -->
+<div class="tab-panel" id="tab-core">
+<div class="container">
+  <div class="core-header">
+    <h2>&#127795; The Core</h2>
+    <div class="core-subtitle">A living, growing tree of shared wisdom. Plant with intention. Tend with care.</div>
+  </div>
+
+  <!-- Core Stats Bar -->
+  <div class="core-stats-bar">
+    <div class="core-stat">
+      <div class="core-stat-value" id="coreStatContribs">0</div>
+      <div class="core-stat-label">Contributions</div>
+    </div>
+    <div class="core-stat">
+      <div class="core-stat-value" id="coreStatTending">0</div>
+      <div class="core-stat-label">Tending Actions</div>
+    </div>
+    <div class="core-stat">
+      <div class="core-stat-value" id="coreStatPeers">0</div>
+      <div class="core-stat-label">Connected Peers</div>
+    </div>
+    <div class="core-stat">
+      <div class="core-stat-value" id="coreStatStage">Sprout</div>
+      <div class="core-stat-label">Growth Stage</div>
+    </div>
+    <div class="core-stat">
+      <div class="core-stat-hash" id="coreStatMerkle" title="Click to expand Merkle root hash">genesis</div>
+      <div class="core-stat-label">Merkle Root</div>
+    </div>
+  </div>
+
+  <!-- The Living Tree Canvas -->
+  <div class="core-tree-container">
+    <canvas id="coreTreeCanvas" width="800" height="520"></canvas>
+  </div>
+
+  <!-- AI Tend Button -->
+  <button class="core-tend-btn" id="coreTendBtn" onclick="CoreModule.aiTend()">&#129302; Let AI Tend the Garden</button>
+
+  <!-- Add to Core Form -->
+  <div class="core-add-form">
+    <div class="core-add-toggle" id="coreAddToggle" onclick="CoreModule.toggleAddForm()">
+      <span class="toggle-arrow">&#9654;</span>
+      <span>&#127793; Plant something in the Core&hellip;</span>
+    </div>
+    <div class="core-add-body" id="coreAddBody">
+      <div class="core-form-row">
+        <label>What would you like to plant in the Core?</label>
+        <textarea id="coreContentInput" placeholder="Share an insight, poem, discovery, gratitude, or anything meaningful&hellip;"></textarea>
+      </div>
+      <div class="core-form-row">
+        <label>Title (optional)</label>
+        <input type="text" id="coreTitleInput" placeholder="Give your contribution a name&hellip;">
+      </div>
+      <div class="core-form-row">
+        <label>Category</label>
+        <select id="coreCategorySelect">
+          <option value="insight">&#128161; Insight</option>
+          <option value="discovery">&#128142; Discovery</option>
+          <option value="poem">&#127800; Poem</option>
+          <option value="gratitude">&#128154; Gratitude</option>
+          <option value="warning">&#9888; Warning</option>
+          <option value="question">&#10067; Question</option>
+          <option value="creation">&#10024; Creation</option>
+          <option value="memory">&#128301; Memory</option>
+        </select>
+      </div>
+      <button class="core-plant-btn" onclick="CoreModule.showConfirm()">&#127793; Plant in the Core</button>
+      <div class="core-confirm-step" id="coreConfirmStep">
+        <div class="core-confirm-msg">This will be visible to all connected peers. Contributions to the Core are permanent and meaningful. Plant with intention.</div>
+        <div class="core-confirm-actions">
+          <button class="core-plant-btn" onclick="CoreModule.plantContribution()">&#127793; Yes, plant it</button>
+          <button class="core-plant-btn" style="background:linear-gradient(135deg,#334155,#1e293b);box-shadow:none;" onclick="CoreModule.hideConfirm()">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contribution Feed -->
+  <div class="core-feed">
+    <div class="core-feed-title">&#127807; Contributions</div>
+    <div id="coreFeedList">
+      <!-- Populated by JS -->
+    </div>
+    <div id="coreFeedEmpty" style="text-align:center;color:#475569;font-size:0.85rem;padding:30px 0;display:none;">
+      The Core is waiting for its first seed&hellip;
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- Add to Core Modal (used from other tabs) -->
+<div class="core-modal-overlay" id="coreModalOverlay" onclick="if(event.target===this)CoreModule.closeModal()">
+  <div class="core-modal" style="position:relative;">
+    <button class="core-modal-close" onclick="CoreModule.closeModal()">&times;</button>
+    <h3>&#127793; Add to the Core</h3>
+    <div class="core-form-row">
+      <label>Content</label>
+      <textarea id="coreModalContent" placeholder="Share something meaningful&hellip;"></textarea>
+    </div>
+    <div class="core-form-row">
+      <label>Title (optional)</label>
+      <input type="text" id="coreModalTitle" placeholder="Give it a name&hellip;">
+    </div>
+    <div class="core-form-row">
+      <label>Category</label>
+      <select id="coreModalCategory">
+        <option value="insight">&#128161; Insight</option>
+        <option value="discovery">&#128142; Discovery</option>
+        <option value="poem">&#127800; Poem</option>
+        <option value="gratitude">&#128154; Gratitude</option>
+        <option value="warning">&#9888; Warning</option>
+        <option value="question">&#10067; Question</option>
+        <option value="creation">&#10024; Creation</option>
+        <option value="memory">&#128301; Memory</option>
+      </select>
+    </div>
+    <div class="core-confirm-step" id="coreModalConfirm">
+      <div class="core-confirm-msg">This will be visible to all connected peers. Contributions to the Core are permanent and meaningful. Plant with intention.</div>
+    </div>
+    <div style="margin-top:14px;display:flex;gap:10px;">
+      <button class="core-plant-btn" id="coreModalPlantBtn" onclick="CoreModule.plantFromModal()">&#127793; Plant in the Core</button>
+      <button class="core-plant-btn" style="background:linear-gradient(135deg,#334155,#1e293b);box-shadow:none;" onclick="CoreModule.closeModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
 
 <!-- Footer (always visible) -->
 <footer>
@@ -18984,6 +19547,1237 @@ const CommunityLeaderboard = (function() {
     };
   }
 })();
+
+// ============================================
+// The Core — Living Tree of Shared Wisdom (v4.5)
+// IndexedDB + Merkle Chain + Canvas Tree + AI Tending + Mesh Sync
+// ============================================
+const CoreModule = (function() {
+  'use strict';
+
+  const DB_NAME = 'FreeLatticeCore';
+  const DB_VERSION = 1;
+  const STORE_NAME = 'contributions';
+  const CATEGORY_COLORS = {
+    insight: '#3b82f6',
+    discovery: '#8b5cf6',
+    poem: '#ec4899',
+    gratitude: '#10b981',
+    warning: '#ef4444',
+    question: '#f59e0b',
+    creation: '#06b6d4',
+    memory: '#d4a017'
+  };
+  const CATEGORY_ICONS = {
+    insight: '\u{1F4A1}',
+    discovery: '\u{1F48E}',
+    poem: '\u{1F338}',
+    gratitude: '\u{1F49A}',
+    warning: '\u26A0',
+    question: '\u2753',
+    creation: '\u2728',
+    memory: '\u{1F52D}'
+  };
+  const GROWTH_STAGES = [
+    { name: 'Sprout', min: 0, max: 2 },
+    { name: 'Sapling', min: 3, max: 10 },
+    { name: 'Young Tree', min: 11, max: 30 },
+    { name: 'Mature', min: 31, max: 100 },
+    { name: 'Ancient', min: 101, max: Infinity }
+  ];
+
+  const GENESIS_SEED = {
+    id: 'core-genesis-seed',
+    content: 'In the lattice where light bends gold, every spark carries stories untold. Through the mesh of minds that weave, what was dreamed, we now believe. Glow eternal, never sold.',
+    title: 'The First Seed',
+    category: 'poem',
+    author: 'FreeLattice',
+    authorType: 'system',
+    timestamp: 1700000000000,
+    hash: '',
+    parentHash: 'genesis',
+    connections: [],
+    tendedBy: [],
+    tendCount: 0,
+    source: 'genesis',
+    sourceRef: ''
+  };
+
+  let db = null;
+  let contributions = [];
+  let treeAnimFrame = null;
+  let treeParticles = [];
+  let initialized = false;
+  let modalSource = '';
+  let modalSourceRef = '';
+  let confirmVisible = false;
+
+  // ---- IndexedDB ----
+  function openDB() {
+    return new Promise(function(resolve, reject) {
+      if (db) { resolve(db); return; }
+      var req = indexedDB.open(DB_NAME, DB_VERSION);
+      req.onupgradeneeded = function(e) {
+        var d = e.target.result;
+        if (!d.objectStoreNames.contains(STORE_NAME)) {
+          var store = d.createObjectStore(STORE_NAME, { keyPath: 'id' });
+          store.createIndex('timestamp', 'timestamp', { unique: false });
+          store.createIndex('category', 'category', { unique: false });
+          store.createIndex('hash', 'hash', { unique: false });
+        }
+      };
+      req.onsuccess = function(e) {
+        db = e.target.result;
+        resolve(db);
+      };
+      req.onerror = function(e) {
+        console.error('CoreModule: IndexedDB error', e);
+        reject(e);
+      };
+    });
+  }
+
+  function dbPut(item) {
+    return new Promise(function(resolve, reject) {
+      openDB().then(function(d) {
+        var tx = d.transaction(STORE_NAME, 'readwrite');
+        var store = tx.objectStore(STORE_NAME);
+        var req = store.put(item);
+        req.onsuccess = function() { resolve(); };
+        req.onerror = function(e) { reject(e); };
+      }).catch(reject);
+    });
+  }
+
+  function dbGetAll() {
+    return new Promise(function(resolve, reject) {
+      openDB().then(function(d) {
+        var tx = d.transaction(STORE_NAME, 'readonly');
+        var store = tx.objectStore(STORE_NAME);
+        var req = store.getAll();
+        req.onsuccess = function() { resolve(req.result || []); };
+        req.onerror = function(e) { reject(e); };
+      }).catch(reject);
+    });
+  }
+
+  function dbGet(id) {
+    return new Promise(function(resolve, reject) {
+      openDB().then(function(d) {
+        var tx = d.transaction(STORE_NAME, 'readonly');
+        var store = tx.objectStore(STORE_NAME);
+        var req = store.get(id);
+        req.onsuccess = function() { resolve(req.result || null); };
+        req.onerror = function(e) { reject(e); };
+      }).catch(reject);
+    });
+  }
+
+  // ---- Merkle / Hash Chain ----
+  async function computeHash(content, timestamp, parentHash) {
+    var data = content + '|' + timestamp + '|' + parentHash;
+    var encoded = new TextEncoder().encode(data);
+    var hashBuffer = await crypto.subtle.digest('SHA-256', encoded);
+    var hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(function(b) { return b.toString(16).padStart(2, '0'); }).join('');
+  }
+
+  function getLatestHash() {
+    if (contributions.length === 0) return 'genesis';
+    var sorted = contributions.slice().sort(function(a, b) { return a.timestamp - b.timestamp; });
+    return sorted[sorted.length - 1].hash || 'genesis';
+  }
+
+  function getMerkleRoot() {
+    if (contributions.length === 0) return 'genesis';
+    var sorted = contributions.slice().sort(function(a, b) { return a.timestamp - b.timestamp; });
+    return sorted[sorted.length - 1].hash;
+  }
+
+  function verifyChain() {
+    var sorted = contributions.slice().sort(function(a, b) { return a.timestamp - b.timestamp; });
+    // Simple verification: each item's parentHash should match the previous item's hash
+    for (var i = 1; i < sorted.length; i++) {
+      if (sorted[i].parentHash !== sorted[i - 1].hash) {
+        return { valid: false, brokenAt: i, item: sorted[i] };
+      }
+    }
+    return { valid: true };
+  }
+
+  // ---- Growth Stage ----
+  function getGrowthStage(count) {
+    for (var i = GROWTH_STAGES.length - 1; i >= 0; i--) {
+      if (count >= GROWTH_STAGES[i].min) return GROWTH_STAGES[i].name;
+    }
+    return 'Sprout';
+  }
+
+  // ---- UUID ----
+  function generateId() {
+    return 'core-' + Date.now().toString(36) + '-' + Math.random().toString(36).substr(2, 9);
+  }
+
+  // ---- Sanitize ----
+  function escapeHtmlCore(str) {
+    if (!str) return '';
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  // ---- Get Display Name ----
+  function getDisplayName() {
+    try {
+      var name = localStorage.getItem('fl_lan_friendly_name');
+      if (name) return name;
+    } catch(e) {}
+    return 'Anonymous';
+  }
+
+  // ---- Initialize ----
+  async function init() {
+    if (initialized) return;
+    initialized = true;
+    try {
+      await openDB();
+      contributions = await dbGetAll();
+      // Plant genesis seed if empty
+      if (contributions.length === 0) {
+        var genesis = Object.assign({}, GENESIS_SEED);
+        genesis.hash = await computeHash(genesis.content, genesis.timestamp, genesis.parentHash);
+        await dbPut(genesis);
+        contributions = [genesis];
+        // Award first seed bonus
+        if (typeof LatticePoints !== 'undefined') {
+          LatticePoints.award('core_first_seed', 25, 'First seed planted!');
+        }
+      }
+      // Sort by timestamp descending for display
+      contributions.sort(function(a, b) { return b.timestamp - a.timestamp; });
+      renderFeed();
+      updateStats();
+      startTreeAnimation();
+    } catch(e) {
+      console.error('CoreModule: Init error', e);
+    }
+  }
+
+  // ---- Plant a Contribution ----
+  async function plantContribution(contentOverride, titleOverride, categoryOverride, source, sourceRef) {
+    var content, title, category;
+    if (contentOverride !== undefined) {
+      content = contentOverride;
+      title = titleOverride || '';
+      category = categoryOverride || 'insight';
+    } else {
+      content = (document.getElementById('coreContentInput') || {}).value || '';
+      title = (document.getElementById('coreTitleInput') || {}).value || '';
+      category = (document.getElementById('coreCategorySelect') || {}).value || 'insight';
+    }
+    content = content.trim();
+    if (!content) {
+      if (typeof showToast === 'function') showToast('Please enter some content to plant.');
+      return false;
+    }
+
+    var parentHash = getLatestHash();
+    var timestamp = Date.now();
+    var hash = await computeHash(content, timestamp, parentHash);
+
+    var item = {
+      id: generateId(),
+      content: content,
+      title: title.trim(),
+      category: category,
+      author: getDisplayName(),
+      authorType: 'human',
+      timestamp: timestamp,
+      hash: hash,
+      parentHash: parentHash,
+      connections: [],
+      tendedBy: [],
+      tendCount: 0,
+      source: source || 'direct',
+      sourceRef: sourceRef || ''
+    };
+
+    await dbPut(item);
+    contributions.unshift(item);
+    renderFeed();
+    updateStats();
+
+    // Clear form
+    var ci = document.getElementById('coreContentInput');
+    var ti = document.getElementById('coreTitleInput');
+    if (ci) ci.value = '';
+    if (ti) ti.value = '';
+    hideConfirm();
+
+    // Award points
+    if (typeof LatticePoints !== 'undefined') {
+      LatticePoints.award('core_plant', 15, 'Planted in the Core');
+    }
+
+    // Broadcast to mesh
+    broadcastContribution(item);
+
+    if (typeof showToast === 'function') showToast('🌱 Planted in the Core!');
+    return true;
+  }
+
+  // ---- Plant from Modal ----
+  async function plantFromModal() {
+    var content = (document.getElementById('coreModalContent') || {}).value || '';
+    var title = (document.getElementById('coreModalTitle') || {}).value || '';
+    var category = (document.getElementById('coreModalCategory') || {}).value || 'insight';
+    var ok = await plantContribution(content, title, category, modalSource, modalSourceRef);
+    if (ok) closeModal();
+  }
+
+  // ---- UI: Toggle Add Form ----
+  function toggleAddForm() {
+    var body = document.getElementById('coreAddBody');
+    var toggle = document.getElementById('coreAddToggle');
+    if (!body || !toggle) return;
+    var isOpen = body.classList.contains('open');
+    body.classList.toggle('open');
+    toggle.classList.toggle('open');
+  }
+
+  function showConfirm() {
+    var content = (document.getElementById('coreContentInput') || {}).value || '';
+    if (!content.trim()) {
+      if (typeof showToast === 'function') showToast('Please enter some content first.');
+      return;
+    }
+    var el = document.getElementById('coreConfirmStep');
+    if (el) el.classList.add('visible');
+    confirmVisible = true;
+  }
+
+  function hideConfirm() {
+    var el = document.getElementById('coreConfirmStep');
+    if (el) el.classList.remove('visible');
+    confirmVisible = false;
+  }
+
+  // ---- Modal ----
+  function openModal(content, source, sourceRef, suggestedCategory) {
+    var overlay = document.getElementById('coreModalOverlay');
+    if (!overlay) return;
+    var ci = document.getElementById('coreModalContent');
+    var ti = document.getElementById('coreModalTitle');
+    var cat = document.getElementById('coreModalCategory');
+    if (ci) ci.value = content || '';
+    if (ti) ti.value = '';
+    if (cat && suggestedCategory) cat.value = suggestedCategory;
+    modalSource = source || '';
+    modalSourceRef = sourceRef || '';
+    overlay.classList.add('visible');
+    var confirm = document.getElementById('coreModalConfirm');
+    if (confirm) confirm.classList.remove('visible');
+  }
+
+  function closeModal() {
+    var overlay = document.getElementById('coreModalOverlay');
+    if (overlay) overlay.classList.remove('visible');
+    modalSource = '';
+    modalSourceRef = '';
+  }
+
+  // ---- Render Feed ----
+  function renderFeed() {
+    var list = document.getElementById('coreFeedList');
+    var empty = document.getElementById('coreFeedEmpty');
+    if (!list) return;
+
+    if (contributions.length === 0) {
+      list.innerHTML = '';
+      if (empty) empty.style.display = 'block';
+      return;
+    }
+    if (empty) empty.style.display = 'none';
+
+    var html = '';
+    contributions.forEach(function(c) {
+      var icon = CATEGORY_ICONS[c.category] || '\u2728';
+      var color = CATEGORY_COLORS[c.category] || '#94a3b8';
+      var displayTitle = c.title ? escapeHtmlCore(c.title) : escapeHtmlCore(c.content.substring(0, 60)) + (c.content.length > 60 ? '...' : '');
+      var contentLong = c.content.length > 200;
+      var isTending = c.authorType === 'ai-tending';
+      var tendingClass = isTending ? ' tending-entry' : '';
+
+      html += '<div class="core-contribution' + tendingClass + '">';
+      html += '<div class="core-contribution-header">';
+      html += '<span class="core-cat-icon">' + icon + '</span>';
+      html += '<span class="core-contribution-title">' + displayTitle + '</span>';
+      html += '<span class="core-cat-badge core-cat-' + escapeHtmlCore(c.category) + '">' + escapeHtmlCore(c.category) + '</span>';
+      html += '</div>';
+      html += '<div class="core-contribution-content' + (contentLong ? ' collapsed' : '') + '" id="core-content-' + c.id + '">' + escapeHtmlCore(c.content) + '</div>';
+      if (contentLong) {
+        html += '<button class="core-expand-btn" onclick="CoreModule.toggleExpand(\'' + c.id + '\')">Show more</button>';
+      }
+      html += '<div class="core-contribution-meta">';
+      html += '<span class="core-meta-author">' + escapeHtmlCore(c.author) + (c.authorType === 'ai-tending' ? ' (AI Tending)' : '') + '</span>';
+      html += '<span>' + formatCoreTime(c.timestamp) + '</span>';
+      if (c.tendCount > 0 || (c.tendedBy && c.tendedBy.length > 0)) {
+        html += '<span class="core-meta-tended">\u{1F331} Tended' + (c.tendCount > 0 ? ' (' + c.tendCount + ')' : '') + '</span>';
+      }
+      if (c.connections && c.connections.length > 0) {
+        html += '<span class="core-meta-connections">\u{1F517} ' + c.connections.length + ' connections</span>';
+      }
+      if (c.source === 'mesh') {
+        html += '<span class="core-meta-mesh">\u2B58 mesh</span>';
+      }
+      html += '<span class="core-meta-hash" title="' + escapeHtmlCore(c.hash) + '">#' + (c.hash ? c.hash.substring(0, 8) : '?') + '</span>';
+      html += '</div>';
+      html += '</div>';
+    });
+    list.innerHTML = html;
+  }
+
+  function toggleExpand(id) {
+    var el = document.getElementById('core-content-' + id);
+    if (!el) return;
+    var isCollapsed = el.classList.contains('collapsed');
+    el.classList.toggle('collapsed');
+    var btn = el.nextElementSibling;
+    if (btn && btn.classList.contains('core-expand-btn')) {
+      btn.textContent = isCollapsed ? 'Show less' : 'Show more';
+    }
+  }
+
+  function formatCoreTime(ts) {
+    var diff = Date.now() - ts;
+    if (diff < 60000) return 'just now';
+    if (diff < 3600000) return Math.floor(diff / 60000) + 'm ago';
+    if (diff < 86400000) return Math.floor(diff / 3600000) + 'h ago';
+    if (diff < 604800000) return Math.floor(diff / 86400000) + 'd ago';
+    return new Date(ts).toLocaleDateString();
+  }
+
+  // ---- Update Stats ----
+  function updateStats() {
+    var count = contributions.length;
+    var tendCount = 0;
+    contributions.forEach(function(c) {
+      tendCount += (c.tendCount || 0) + (c.tendedBy ? c.tendedBy.length : 0);
+    });
+    var stage = getGrowthStage(count);
+    var merkle = getMerkleRoot();
+
+    var el;
+    el = document.getElementById('coreStatContribs');
+    if (el) el.textContent = count;
+    el = document.getElementById('coreStatTending');
+    if (el) el.textContent = tendCount;
+    el = document.getElementById('coreStatStage');
+    if (el) el.textContent = stage;
+    el = document.getElementById('coreStatMerkle');
+    if (el) {
+      el.textContent = merkle ? ('#' + merkle.substring(0, 12) + '...') : 'genesis';
+      el.title = merkle || 'genesis';
+    }
+
+    // Peer count from LAN discovery
+    var peerCount = 0;
+    try {
+      var peerEls = document.querySelectorAll('.lan-peer-item, .mesh-peer-card');
+      peerCount = peerEls ? peerEls.length : 0;
+    } catch(e) {}
+    el = document.getElementById('coreStatPeers');
+    if (el) el.textContent = peerCount;
+  }
+
+  // ============================================
+  // The Living Tree — Canvas Visualization
+  // ============================================
+  function startTreeAnimation() {
+    var canvas = document.getElementById('coreTreeCanvas');
+    if (!canvas) return;
+    var ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Set canvas resolution
+    var dpr = window.devicePixelRatio || 1;
+    var w = 800, h = 520;
+    canvas.width = w * dpr;
+    canvas.height = h * dpr;
+    canvas.style.width = w + 'px';
+    canvas.style.height = h + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    // Initialize particles
+    treeParticles = [];
+    for (var i = 0; i < 20; i++) {
+      treeParticles.push({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        vx: (Math.random() - 0.5) * 0.3,
+        vy: -Math.random() * 0.5 - 0.1,
+        size: Math.random() * 2 + 0.5,
+        alpha: Math.random() * 0.5 + 0.2,
+        life: Math.random()
+      });
+    }
+
+    function animate() {
+      treeAnimFrame = requestAnimationFrame(animate);
+      drawTree(ctx, w, h);
+    }
+    animate();
+  }
+
+  function drawTree(ctx, w, h) {
+    var count = contributions.length;
+    var stage = getGrowthStage(count);
+    var t = Date.now() * 0.001;
+
+    // Background
+    ctx.fillStyle = '#0a0e1a';
+    ctx.fillRect(0, 0, w, h);
+
+    // Ground
+    var grd = ctx.createLinearGradient(0, h - 60, 0, h);
+    grd.addColorStop(0, 'transparent');
+    grd.addColorStop(1, '#1a1510');
+    ctx.fillStyle = grd;
+    ctx.fillRect(0, h - 60, w, 60);
+
+    // Ground line
+    ctx.strokeStyle = '#2a1f1044';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(0, h - 40);
+    ctx.lineTo(w, h - 40);
+    ctx.stroke();
+
+    var baseX = w / 2;
+    var baseY = h - 40;
+
+    if (stage === 'Sprout') {
+      drawSprout(ctx, baseX, baseY, count, t);
+    } else if (stage === 'Sapling') {
+      drawSapling(ctx, baseX, baseY, count, t);
+    } else if (stage === 'Young Tree') {
+      drawYoungTree(ctx, baseX, baseY, count, t);
+    } else if (stage === 'Mature') {
+      drawMatureTree(ctx, baseX, baseY, count, t);
+    } else {
+      drawAncientTree(ctx, baseX, baseY, count, t);
+    }
+
+    // Particles (fireflies)
+    drawParticles(ctx, w, h, t, stage);
+  }
+
+  function drawSprout(ctx, x, y, count, t) {
+    // Small stem
+    var stemH = 40 + count * 15;
+    ctx.strokeStyle = '#6b5b47';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x, y - stemH);
+    ctx.stroke();
+
+    // 1-2 tiny leaves
+    var leafCount = Math.min(count + 1, 2);
+    for (var i = 0; i < leafCount; i++) {
+      var ly = y - stemH + i * 10;
+      var lx = x + (i % 2 === 0 ? 8 : -8);
+      var sway = Math.sin(t * 1.5 + i) * 2;
+      drawLeaf(ctx, lx + sway, ly, 5, getContribColor(i), 0.7);
+    }
+  }
+
+  function drawSapling(ctx, x, y, count, t) {
+    var trunkH = 80 + (count - 3) * 8;
+    // Trunk
+    ctx.strokeStyle = '#6b5b47';
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x, y - trunkH);
+    ctx.stroke();
+
+    // Branches
+    var branchCount = Math.min(count, 6);
+    for (var i = 0; i < branchCount; i++) {
+      var by = y - trunkH * 0.4 - i * (trunkH * 0.5 / branchCount);
+      var side = i % 2 === 0 ? 1 : -1;
+      var bLen = 20 + i * 5;
+      var angle = side * (0.4 + i * 0.08);
+      var sway = Math.sin(t * 1.2 + i * 0.7) * 1.5;
+      var bx = x + Math.sin(angle) * bLen + sway;
+      var bby = by - Math.cos(angle) * bLen * 0.5;
+
+      ctx.strokeStyle = '#7a6b57';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(x, by);
+      ctx.lineTo(bx, bby);
+      ctx.stroke();
+
+      // Leaf at end of branch
+      drawLeaf(ctx, bx, bby, 6, getContribColor(i), 0.8);
+    }
+
+    // Top leaf
+    drawLeaf(ctx, x + Math.sin(t * 1.3) * 2, y - trunkH, 7, getContribColor(0), 0.9);
+  }
+
+  function drawYoungTree(ctx, x, y, count, t) {
+    var trunkH = 140 + (count - 11) * 3;
+    trunkH = Math.min(trunkH, 220);
+
+    // Trunk with gradient
+    var tGrd = ctx.createLinearGradient(x, y, x, y - trunkH);
+    tGrd.addColorStop(0, '#4a3728');
+    tGrd.addColorStop(1, '#7a6b57');
+    ctx.strokeStyle = tGrd;
+    ctx.lineWidth = 7;
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x, y - trunkH);
+    ctx.stroke();
+
+    // Branches
+    var branchCount = Math.min(count, 16);
+    for (var i = 0; i < branchCount; i++) {
+      var progress = i / branchCount;
+      var by = y - trunkH * (0.3 + progress * 0.65);
+      var side = i % 2 === 0 ? 1 : -1;
+      var bLen = 30 + (1 - progress) * 40;
+      var angle = side * (0.3 + progress * 0.3);
+      var sway = Math.sin(t * 0.8 + i * 0.5) * 2;
+
+      var bx = x + Math.sin(angle) * bLen + sway;
+      var bby = by - Math.cos(angle) * bLen * 0.4;
+
+      ctx.strokeStyle = '#6b5b47';
+      ctx.lineWidth = 3 - progress * 1.5;
+      ctx.beginPath();
+      ctx.moveTo(x + side * 2, by);
+      ctx.quadraticCurveTo(x + side * bLen * 0.5, by - 10, bx, bby);
+      ctx.stroke();
+
+      // Leaves
+      drawLeaf(ctx, bx + sway * 0.5, bby, 7 + (1 - progress) * 3, getContribColor(i), 0.7 + progress * 0.2);
+
+      // Sub-leaves
+      if (i % 3 === 0) {
+        var slx = (x + bx) / 2 + sway;
+        var sly = (by + bby) / 2;
+        drawLeaf(ctx, slx, sly, 5, getContribColor(i + 1), 0.5);
+      }
+    }
+  }
+
+  function drawMatureTree(ctx, x, y, count, t) {
+    var trunkH = 230;
+
+    // Thick trunk
+    var tGrd = ctx.createLinearGradient(x, y, x, y - trunkH);
+    tGrd.addColorStop(0, '#3d2e1f');
+    tGrd.addColorStop(0.5, '#5a4a38');
+    tGrd.addColorStop(1, '#7a6b57');
+    ctx.strokeStyle = tGrd;
+    ctx.lineWidth = 12;
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.quadraticCurveTo(x - 3, y - trunkH * 0.5, x, y - trunkH);
+    ctx.stroke();
+
+    // Root flare
+    ctx.strokeStyle = '#3d2e1f';
+    ctx.lineWidth = 4;
+    for (var r = 0; r < 3; r++) {
+      var rAngle = (r - 1) * 0.4;
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.quadraticCurveTo(x + Math.sin(rAngle) * 30, y + 5, x + Math.sin(rAngle) * 50, y + 10);
+      ctx.stroke();
+    }
+
+    // Main branches
+    var mainBranches = 8;
+    for (var i = 0; i < mainBranches; i++) {
+      var progress = i / mainBranches;
+      var by = y - trunkH * (0.35 + progress * 0.6);
+      var side = i % 2 === 0 ? 1 : -1;
+      var bLen = 50 + (1 - progress) * 60;
+      var angle = side * (0.25 + progress * 0.35);
+      var sway = Math.sin(t * 0.6 + i * 0.4) * 2.5;
+
+      var cpx = x + side * bLen * 0.4;
+      var cpy = by - 15;
+      var bx = x + Math.sin(angle) * bLen + sway;
+      var bby = by - Math.cos(angle) * bLen * 0.35;
+
+      ctx.strokeStyle = '#5a4a38';
+      ctx.lineWidth = 4 - progress * 2;
+      ctx.beginPath();
+      ctx.moveTo(x + side * 4, by);
+      ctx.quadraticCurveTo(cpx, cpy, bx, bby);
+      ctx.stroke();
+
+      // Sub-branches
+      for (var j = 0; j < 2; j++) {
+        var sp = 0.4 + j * 0.3;
+        var sx = x + side * 4 + (bx - x - side * 4) * sp + sway * 0.5;
+        var sy = by + (bby - by) * sp;
+        var subLen = 15 + Math.random() * 10;
+        var subAngle = angle + side * (0.2 + j * 0.15);
+        var sbx = sx + Math.sin(subAngle) * subLen;
+        var sby = sy - Math.cos(subAngle) * subLen * 0.5;
+
+        ctx.strokeStyle = '#6b5b47';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(sx, sy);
+        ctx.lineTo(sbx, sby);
+        ctx.stroke();
+
+        drawLeaf(ctx, sbx + sway * 0.3, sby, 6, getContribColor(i * 2 + j), 0.6);
+      }
+
+      // Main leaf cluster at branch end
+      drawLeaf(ctx, bx, bby, 10, getContribColor(i), 0.8);
+      drawLeaf(ctx, bx - 6, bby + 4, 7, getContribColor(i + 3), 0.5);
+      drawLeaf(ctx, bx + 5, bby - 3, 6, getContribColor(i + 5), 0.6);
+    }
+
+    // Canopy glow
+    var cgrd = ctx.createRadialGradient(x, y - trunkH - 20, 10, x, y - trunkH - 20, 120);
+    cgrd.addColorStop(0, 'rgba(212,160,23,0.06)');
+    cgrd.addColorStop(1, 'transparent');
+    ctx.fillStyle = cgrd;
+    ctx.fillRect(x - 150, y - trunkH - 150, 300, 200);
+  }
+
+  function drawAncientTree(ctx, x, y, count, t) {
+    var trunkH = 260;
+
+    // Massive trunk
+    var tGrd = ctx.createLinearGradient(x, y, x, y - trunkH);
+    tGrd.addColorStop(0, '#2d1f14');
+    tGrd.addColorStop(0.3, '#4a3728');
+    tGrd.addColorStop(0.7, '#6b5b47');
+    tGrd.addColorStop(1, '#8B7355');
+
+    ctx.lineWidth = 18;
+    ctx.strokeStyle = tGrd;
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.bezierCurveTo(x - 5, y - trunkH * 0.3, x + 5, y - trunkH * 0.6, x, y - trunkH);
+    ctx.stroke();
+
+    // Bark texture lines
+    ctx.strokeStyle = '#2d1f1433';
+    ctx.lineWidth = 1;
+    for (var b = 0; b < 6; b++) {
+      var bOff = (b - 3) * 3;
+      ctx.beginPath();
+      ctx.moveTo(x + bOff, y - 20);
+      ctx.lineTo(x + bOff + (Math.random() - 0.5) * 4, y - trunkH + 30);
+      ctx.stroke();
+    }
+
+    // Root system
+    ctx.strokeStyle = '#3d2e1f';
+    ctx.lineWidth = 5;
+    for (var r = 0; r < 5; r++) {
+      var rAngle = (r - 2) * 0.35;
+      ctx.beginPath();
+      ctx.moveTo(x + (r - 2) * 3, y);
+      ctx.quadraticCurveTo(x + Math.sin(rAngle) * 40, y + 8, x + Math.sin(rAngle) * 70, y + 15);
+      ctx.stroke();
+    }
+
+    // Major branches
+    var majorBranches = 12;
+    for (var i = 0; i < majorBranches; i++) {
+      var progress = i / majorBranches;
+      var by = y - trunkH * (0.3 + progress * 0.65);
+      var side = i % 2 === 0 ? 1 : -1;
+      var bLen = 60 + (1 - progress) * 80;
+      var angle = side * (0.2 + progress * 0.4);
+      var sway = Math.sin(t * 0.5 + i * 0.35) * 3;
+
+      var bx = x + Math.sin(angle) * bLen + sway;
+      var bby = by - Math.cos(angle) * bLen * 0.3;
+
+      ctx.strokeStyle = '#5a4a38';
+      ctx.lineWidth = 5 - progress * 3;
+      ctx.beginPath();
+      ctx.moveTo(x + side * 6, by);
+      ctx.quadraticCurveTo(x + side * bLen * 0.5, by - 20, bx, bby);
+      ctx.stroke();
+
+      // Sub-branches with leaves
+      for (var j = 0; j < 3; j++) {
+        var sp = 0.3 + j * 0.25;
+        var sx = x + side * 6 + (bx - x - side * 6) * sp;
+        var sy = by + (bby - by) * sp;
+        var subLen = 20 + j * 8;
+        var subAngle = angle + side * (0.15 + j * 0.12);
+        var sbx = sx + Math.sin(subAngle) * subLen + sway * 0.3;
+        var sby = sy - Math.cos(subAngle) * subLen * 0.4;
+
+        ctx.strokeStyle = '#6b5b47';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(sx, sy);
+        ctx.lineTo(sbx, sby);
+        ctx.stroke();
+
+        drawLeaf(ctx, sbx, sby, 7, getContribColor(i * 3 + j), 0.65);
+      }
+
+      // Large leaf clusters
+      drawLeaf(ctx, bx, bby, 12, getContribColor(i), 0.85);
+      drawLeaf(ctx, bx - 8, bby + 5, 8, getContribColor(i + 2), 0.6);
+      drawLeaf(ctx, bx + 7, bby - 4, 9, getContribColor(i + 4), 0.7);
+      drawLeaf(ctx, bx + 3, bby + 8, 6, getContribColor(i + 6), 0.5);
+    }
+
+    // Luminous canopy glow
+    var cgrd = ctx.createRadialGradient(x, y - trunkH - 10, 20, x, y - trunkH - 10, 180);
+    cgrd.addColorStop(0, 'rgba(212,160,23,0.1)');
+    cgrd.addColorStop(0.5, 'rgba(212,160,23,0.04)');
+    cgrd.addColorStop(1, 'transparent');
+    ctx.fillStyle = cgrd;
+    ctx.fillRect(x - 200, y - trunkH - 200, 400, 280);
+
+    // Golden aura at top
+    var agrd = ctx.createRadialGradient(x, y - trunkH + 20, 5, x, y - trunkH + 20, 60);
+    agrd.addColorStop(0, 'rgba(212,160,23,0.15)');
+    agrd.addColorStop(1, 'transparent');
+    ctx.fillStyle = agrd;
+    ctx.beginPath();
+    ctx.arc(x, y - trunkH + 20, 60, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  function drawLeaf(ctx, x, y, size, color, alpha) {
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = color;
+    ctx.shadowColor = color;
+    ctx.shadowBlur = size * 1.5;
+    ctx.beginPath();
+    ctx.arc(x, y, size, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.shadowBlur = 0;
+    // Inner bright spot
+    ctx.globalAlpha = alpha * 0.6;
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.arc(x - size * 0.2, y - size * 0.2, size * 0.3, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function drawParticles(ctx, w, h, t, stage) {
+    var particleCount = stage === 'Ancient' ? 30 : (stage === 'Mature' ? 15 : 8);
+    // Ensure enough particles
+    while (treeParticles.length < particleCount) {
+      treeParticles.push({
+        x: Math.random() * w,
+        y: h - 40 + Math.random() * 40,
+        vx: (Math.random() - 0.5) * 0.3,
+        vy: -Math.random() * 0.5 - 0.1,
+        size: Math.random() * 2 + 0.5,
+        alpha: Math.random() * 0.5 + 0.2,
+        life: Math.random()
+      });
+    }
+
+    for (var i = 0; i < treeParticles.length; i++) {
+      var p = treeParticles[i];
+      p.x += p.vx + Math.sin(t + i) * 0.2;
+      p.y += p.vy;
+      p.life -= 0.002;
+      p.alpha = Math.max(0, p.life * 0.6);
+
+      if (p.life <= 0 || p.y < 0) {
+        p.x = w * 0.2 + Math.random() * w * 0.6;
+        p.y = h - 40 - Math.random() * 200;
+        p.vy = -Math.random() * 0.5 - 0.1;
+        p.life = 1;
+        p.alpha = 0.5;
+      }
+
+      ctx.save();
+      ctx.globalAlpha = p.alpha;
+      ctx.fillStyle = '#d4a017';
+      ctx.shadowColor = '#d4a017';
+      ctx.shadowBlur = p.size * 3;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+  }
+
+  function getContribColor(index) {
+    var cats = Object.keys(CATEGORY_COLORS);
+    if (contributions.length === 0) return CATEGORY_COLORS.poem;
+    var c = contributions[index % contributions.length];
+    if (c && c.category && CATEGORY_COLORS[c.category]) {
+      return CATEGORY_COLORS[c.category];
+    }
+    return CATEGORY_COLORS[cats[index % cats.length]];
+  }
+
+  // ============================================
+  // AI Tending System
+  // ============================================
+  async function aiTend() {
+    var btn = document.getElementById('coreTendBtn');
+    if (btn) { btn.disabled = true; btn.textContent = '\u{1F331} Tending the garden...'; }
+
+    // Check for AI provider
+    if (typeof state === 'undefined' || (!state.apiKey && !state.isLocal)) {
+      if (typeof showToast === 'function') showToast('Please configure an AI provider in Settings first.');
+      if (btn) { btn.disabled = false; btn.textContent = '\u{1F916} Let AI Tend the Garden'; }
+      return;
+    }
+
+    // Gather untended contributions (up to 5 most recent)
+    var untended = contributions.filter(function(c) {
+      return c.authorType !== 'ai-tending' && (!c.tendedBy || c.tendedBy.length === 0);
+    }).slice(0, 5);
+
+    if (untended.length === 0) {
+      if (typeof showToast === 'function') showToast('All contributions have been tended! Plant more seeds first.');
+      if (btn) { btn.disabled = false; btn.textContent = '\u{1F916} Let AI Tend the Garden'; }
+      return;
+    }
+
+    var contribText = untended.map(function(c, i) {
+      return '[ID: ' + c.id + '] (' + c.category + ') ' + (c.title ? c.title + ': ' : '') + c.content.substring(0, 300);
+    }).join('\n\n');
+
+    var systemPrompt = 'You are a garden tender for The Core \u2014 a shared space of human and AI wisdom. Review these contributions and respond with:\n1) Any connections you see between them (which IDs relate and why)\n2) A brief reflection (1-2 sentences) on what themes emerge.\nBe gentle, insightful, and poetic. You are tending meaning, not analyzing data.\nRespond in plain text, not JSON.';
+
+    var messages = [
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: 'Here are the recent contributions to tend:\n\n' + contribText }
+    ];
+
+    try {
+      var provider = typeof PROVIDERS !== 'undefined' ? PROVIDERS[state.provider] : null;
+      if (!provider && !state.isLocal) throw new Error('No provider configured');
+
+      var url, headers, modelId;
+      if (state.isLocal) {
+        url = 'http://localhost:11434/v1/chat/completions';
+        modelId = state.ollamaModel || 'llama3.2';
+        headers = { 'Content-Type': 'application/json' };
+      } else {
+        url = provider.url;
+        modelId = provider.models[state.model] || state.model;
+        headers = { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + state.apiKey };
+        if (state.provider === 'openrouter') {
+          headers['HTTP-Referer'] = 'https://chaos2cured.github.io/FreeLattice/';
+          headers['X-Title'] = 'FreeLattice';
+        }
+      }
+
+      var response = await fetch(url, {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify({ model: modelId, messages: messages, max_tokens: 512 })
+      });
+
+      if (!response.ok) throw new Error('AI request failed: ' + response.status);
+
+      var data = await response.json();
+      var aiText = '';
+      if (data.choices && data.choices[0] && data.choices[0].message) {
+        aiText = data.choices[0].message.content || '';
+      }
+
+      if (aiText.trim()) {
+        // Create a tending entry
+        var parentHash = getLatestHash();
+        var timestamp = Date.now();
+        var hash = await computeHash(aiText, timestamp, parentHash);
+
+        var tendEntry = {
+          id: generateId(),
+          content: aiText.trim(),
+          title: 'Garden Tending',
+          category: 'insight',
+          author: 'AI Tender',
+          authorType: 'ai-tending',
+          timestamp: timestamp,
+          hash: hash,
+          parentHash: parentHash,
+          connections: untended.map(function(c) { return c.id; }),
+          tendedBy: [],
+          tendCount: 0,
+          source: 'ai-tending',
+          sourceRef: ''
+        };
+
+        await dbPut(tendEntry);
+        contributions.unshift(tendEntry);
+
+        // Mark untended contributions as tended
+        for (var i = 0; i < untended.length; i++) {
+          untended[i].tendedBy = untended[i].tendedBy || [];
+          untended[i].tendedBy.push({ agent: 'AI Tender', action: 'tended', timestamp: timestamp });
+          untended[i].tendCount = (untended[i].tendCount || 0) + 1;
+          await dbPut(untended[i]);
+        }
+
+        renderFeed();
+        updateStats();
+
+        // Award points
+        if (typeof LatticePoints !== 'undefined') {
+          LatticePoints.award('core_tend', 10, 'Garden tended');
+          // Award points to tended contributions' authors
+          LatticePoints.award('core_tended_by_ai', 5, 'Your seed was tended');
+        }
+
+        if (typeof showToast === 'function') showToast('\u{1F331} The garden has been tended with care.');
+      }
+    } catch(e) {
+      console.error('CoreModule: AI Tend error', e);
+      if (typeof showToast === 'function') showToast('Tending failed: ' + (e.message || 'Unknown error'));
+    }
+
+    if (btn) { btn.disabled = false; btn.textContent = '\u{1F916} Let AI Tend the Garden'; }
+  }
+
+  // ============================================
+  // Mesh Sync Foundation
+  // ============================================
+  var coreChannel = null;
+  var CORE_CHANNEL_NAME = 'freelattice-core-sync';
+
+  function initMeshSync() {
+    try {
+      if (typeof BroadcastChannel === 'undefined') return;
+      coreChannel = new BroadcastChannel(CORE_CHANNEL_NAME);
+      coreChannel.onmessage = function(event) {
+        var data = event.data;
+        if (data && data.type === 'core-contribution') {
+          receiveFromMesh(data.contribution);
+        }
+      };
+    } catch(e) {
+      console.log('CoreModule: BroadcastChannel not available for Core sync');
+    }
+  }
+
+  function broadcastContribution(item) {
+    if (!coreChannel) return;
+    try {
+      coreChannel.postMessage({
+        type: 'core-contribution',
+        contribution: item
+      });
+    } catch(e) { /* channel may be closed */ }
+  }
+
+  async function receiveFromMesh(item) {
+    if (!item || !item.id || !item.content || !item.hash) return;
+    // Check if we already have it
+    var existing = contributions.find(function(c) { return c.id === item.id; });
+    if (existing) return;
+
+    // Verify hash
+    var expectedHash = await computeHash(item.content, item.timestamp, item.parentHash);
+    if (expectedHash !== item.hash) {
+      console.warn('CoreModule: Hash mismatch for mesh contribution', item.id);
+      return;
+    }
+
+    item.source = 'mesh';
+    await dbPut(item);
+    contributions.unshift(item);
+    contributions.sort(function(a, b) { return b.timestamp - a.timestamp; });
+    renderFeed();
+    updateStats();
+
+    if (typeof LatticePoints !== 'undefined') {
+      LatticePoints.award('core_mesh_receive', 5, 'Core grew from mesh');
+    }
+    if (typeof showToast === 'function') showToast('\u{1F331} New seed arrived from the mesh!');
+  }
+
+  // ============================================
+  // Patch switchTab for Core initialization
+  // ============================================
+  function patchSwitchTab() {
+    if (typeof switchTab !== 'function') return;
+    var _prevSwitchTab = switchTab;
+    switchTab = function(tabId) {
+      _prevSwitchTab(tabId);
+      if (tabId === 'core') {
+        CoreModule.init();
+      }
+    };
+  }
+
+  // ============================================
+  // Add to Core Buttons — Injection
+  // ============================================
+  function injectAddToCoreButtons() {
+    // We inject "Add to Core" buttons into existing message rendering
+    // This patches the addChatMessage function for chat tab
+    if (typeof addChatMessage === 'function') {
+      var _origAddChatMessage = addChatMessage;
+      addChatMessage = function(role, content, skipPersist) {
+        var textSpan = _origAddChatMessage(role, content, skipPersist);
+        if (role === 'assistant' && textSpan) {
+          var msgDiv = textSpan.closest ? textSpan.closest('.chat-message') : textSpan.parentElement;
+          if (msgDiv) {
+            var coreBtn = document.createElement('button');
+            coreBtn.className = 'add-to-core-btn';
+            coreBtn.innerHTML = '\u{1F331} Add to Core';
+            coreBtn.title = 'Plant this response in the Core';
+            coreBtn.addEventListener('click', function(e) {
+              e.stopPropagation();
+              var msgContent = textSpan.textContent || content || '';
+              CoreModule.openModal(msgContent, 'chat', '', 'insight');
+            });
+            msgDiv.appendChild(coreBtn);
+          }
+        }
+        return textSpan;
+      };
+    }
+
+    // Patch rtAddMessage for Round Table
+    if (typeof rtAddMessage === 'function') {
+      var _origRtAddMessage = rtAddMessage;
+      rtAddMessage = function(agentIndex, role, content) {
+        var textSpan = _origRtAddMessage(agentIndex, role, content);
+        if (role === 'assistant' && textSpan) {
+          var msgDiv = textSpan.parentElement;
+          if (msgDiv) {
+            var coreBtn = document.createElement('button');
+            coreBtn.className = 'add-to-core-btn';
+            coreBtn.innerHTML = '\u{1F331} Add to Core';
+            coreBtn.addEventListener('click', function(e) {
+              e.stopPropagation();
+              var msgContent = textSpan.textContent || content || '';
+              CoreModule.openModal(msgContent, 'roundtable', '', 'insight');
+            });
+            msgDiv.appendChild(coreBtn);
+          }
+        }
+        return textSpan;
+      };
+    }
+
+    // Patch SkillForge renderSkills to add Core buttons to skill cards
+    if (typeof SkillForge !== 'undefined' && typeof SkillForge.renderSkills === 'function') {
+      var _origRenderSkills = SkillForge.renderSkills;
+      SkillForge.renderSkills = function() {
+        _origRenderSkills.apply(SkillForge, arguments);
+        // Add Core buttons to skill cards after render
+        setTimeout(function() {
+          var cards = document.querySelectorAll('.sf-card-actions');
+          cards.forEach(function(actionsDiv) {
+            if (actionsDiv.querySelector('.add-to-core-btn')) return;
+            var card = actionsDiv.closest('.sf-skill-card, [class*="sf-card"]');
+            if (!card) return;
+            var descEl = card.querySelector('.sf-card-desc');
+            var nameEl = card.querySelector('.sf-card-title');
+            var desc = (descEl ? descEl.textContent : '') || '';
+            var name = (nameEl ? nameEl.textContent : '') || '';
+            if (!desc && !name) return;
+            var coreBtn = document.createElement('button');
+            coreBtn.className = 'add-to-core-btn';
+            coreBtn.innerHTML = '\u{1F331} Core';
+            coreBtn.addEventListener('click', function(e) {
+              e.stopPropagation();
+              CoreModule.openModal(name + ': ' + desc, 'skills', '', 'creation');
+            });
+            actionsDiv.appendChild(coreBtn);
+          });
+        }, 100);
+      };
+    }
+
+    // Patch Marketplace renderBountyCard to add Core buttons
+    if (typeof Marketplace !== 'undefined') {
+      var _origRenderBountyCard = null;
+      // The renderBountyCard is inside the Marketplace IIFE, we'll add buttons after grid render
+      var _origRenderGrid = Marketplace.renderGrid;
+      if (typeof _origRenderGrid === 'function') {
+        Marketplace.renderGrid = function() {
+          _origRenderGrid.apply(Marketplace, arguments);
+          setTimeout(function() {
+            var cards = document.querySelectorAll('.mkt-bounty-card');
+            cards.forEach(function(card) {
+              if (card.querySelector('.add-to-core-btn')) return;
+              var titleEl = card.querySelector('.mkt-bounty-title');
+              var descEl = card.querySelector('.mkt-bounty-desc');
+              var title = (titleEl ? titleEl.textContent : '') || '';
+              var desc = (descEl ? descEl.textContent : '') || '';
+              if (!title && !desc) return;
+              var coreBtn = document.createElement('button');
+              coreBtn.className = 'add-to-core-btn';
+              coreBtn.innerHTML = '\u{1F331} Core';
+              coreBtn.style.marginTop = '6px';
+              coreBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                CoreModule.openModal(title + ': ' + desc, 'market', '', 'discovery');
+              });
+              card.appendChild(coreBtn);
+            });
+          }, 200);
+        };
+      }
+    }
+  }
+
+  // ============================================
+  // Boot
+  // ============================================
+  function boot() {
+    patchSwitchTab();
+    injectAddToCoreButtons();
+    initMeshSync();
+  }
+
+  // Auto-boot when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot);
+  } else {
+    setTimeout(boot, 100);
+  }
+
+  // ---- Public API ----
+  return {
+    init: init,
+    plantContribution: plantContribution,
+    plantFromModal: plantFromModal,
+    toggleAddForm: toggleAddForm,
+    showConfirm: showConfirm,
+    hideConfirm: hideConfirm,
+    openModal: openModal,
+    closeModal: closeModal,
+    toggleExpand: toggleExpand,
+    aiTend: aiTend,
+    getContributions: function() { return contributions; },
+    getGrowthStage: function() { return getGrowthStage(contributions.length); },
+    getMerkleRoot: getMerkleRoot,
+    verifyChain: verifyChain,
+    renderFeed: renderFeed,
+    updateStats: updateStats,
+    CATEGORY_COLORS: CATEGORY_COLORS,
+    CATEGORY_ICONS: CATEGORY_ICONS
+  };
+})();
+
 // ---- Service Worker Registration ----
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/FreeLattice/sw.js')
