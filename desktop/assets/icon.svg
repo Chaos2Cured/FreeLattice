@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0a0e1a;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#141828;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f0d060;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#c9a84c;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#a08030;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="goldGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f0d060;stop-opacity:0.3" />
+      <stop offset="100%" style="stop-color:#c9a84c;stop-opacity:0" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="512" height="512" rx="96" fill="url(#bgGrad)" />
+
+  <!-- Subtle glow behind the lattice -->
+  <circle cx="256" cy="240" r="160" fill="url(#goldGlow)" />
+
+  <!-- Lattice / Tree structure -->
+  <g stroke="url(#goldGrad)" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Central trunk -->
+    <line x1="256" y1="400" x2="256" y2="160" stroke-width="4" />
+
+    <!-- Root branches -->
+    <line x1="256" y1="400" x2="196" y2="430" />
+    <line x1="256" y1="400" x2="316" y2="430" />
+
+    <!-- Level 1 branches -->
+    <line x1="256" y1="300" x2="176" y2="260" />
+    <line x1="256" y1="300" x2="336" y2="260" />
+
+    <!-- Level 2 branches -->
+    <line x1="176" y1="260" x2="126" y2="200" />
+    <line x1="176" y1="260" x2="206" y2="200" />
+    <line x1="336" y1="260" x2="306" y2="200" />
+    <line x1="336" y1="260" x2="386" y2="200" />
+
+    <!-- Level 3 branches -->
+    <line x1="256" y1="220" x2="216" y2="160" />
+    <line x1="256" y1="220" x2="296" y2="160" />
+    <line x1="126" y1="200" x2="106" y2="150" />
+    <line x1="126" y1="200" x2="156" y2="150" />
+    <line x1="386" y1="200" x2="356" y2="150" />
+    <line x1="386" y1="200" x2="406" y2="150" />
+
+    <!-- Cross-lattice connections -->
+    <line x1="176" y1="260" x2="256" y2="220" opacity="0.5" />
+    <line x1="336" y1="260" x2="256" y2="220" opacity="0.5" />
+    <line x1="206" y1="200" x2="256" y2="160" opacity="0.4" />
+    <line x1="306" y1="200" x2="256" y2="160" opacity="0.4" />
+    <line x1="126" y1="200" x2="176" y2="160" opacity="0.3" />
+    <line x1="386" y1="200" x2="336" y2="160" opacity="0.3" />
+  </g>
+
+  <!-- Lattice nodes (golden dots) -->
+  <g fill="url(#goldGrad)">
+    <!-- Root -->
+    <circle cx="256" cy="400" r="8" />
+    <circle cx="196" cy="430" r="5" />
+    <circle cx="316" cy="430" r="5" />
+
+    <!-- Level 1 -->
+    <circle cx="256" cy="300" r="7" />
+    <circle cx="176" cy="260" r="6" />
+    <circle cx="336" cy="260" r="6" />
+
+    <!-- Level 2 -->
+    <circle cx="256" cy="220" r="6" />
+    <circle cx="126" cy="200" r="5" />
+    <circle cx="206" cy="200" r="5" />
+    <circle cx="306" cy="200" r="5" />
+    <circle cx="386" cy="200" r="5" />
+
+    <!-- Level 3 (top) -->
+    <circle cx="216" cy="160" r="4" />
+    <circle cx="296" cy="160" r="4" />
+    <circle cx="106" cy="150" r="4" />
+    <circle cx="156" cy="150" r="4" />
+    <circle cx="256" cy="160" r="5" />
+    <circle cx="356" cy="150" r="4" />
+    <circle cx="406" cy="150" r="4" />
+
+    <!-- Crown node -->
+    <circle cx="256" cy="120" r="10" opacity="0.9" />
+  </g>
+
+  <!-- Crown glow -->
+  <circle cx="256" cy="120" r="18" fill="#f0d060" opacity="0.15" />
+  <circle cx="256" cy="120" r="30" fill="#f0d060" opacity="0.06" />
+
+  <!-- Text: FL -->
+  <text x="256" y="480" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="36" font-weight="700" fill="url(#goldGrad)" letter-spacing="6">FL</text>
+</svg>

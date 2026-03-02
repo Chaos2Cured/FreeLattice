@@ -8457,6 +8457,27 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
   <!-- Self-Host FreeLattice Section (v4.3) -->
   <div class="section" id="selfHostSection">
     <div class="section-title">&#128421; Self-Host FreeLattice</div>
+    <!-- Desktop App Detection Banner (v4.6) -->
+    <div id="desktopAppBanner" style="display: none; margin-bottom: 14px; padding: 12px 16px; border-radius: 10px; font-size: 0.82rem; line-height: 1.6;"></div>
+    <script>
+    (function() {
+      var banner = document.getElementById('desktopAppBanner');
+      if (!banner) return;
+      if (window.electronAPI || window.isElectronApp) {
+        banner.style.display = 'block';
+        banner.style.background = 'rgba(106, 191, 105, 0.1)';
+        banner.style.border = '1px solid rgba(106, 191, 105, 0.25)';
+        banner.style.color = 'var(--success, #6abf69)';
+        banner.innerHTML = '\u2705 Running as desktop app &mdash; all features enabled, no configuration needed!';
+      } else {
+        banner.style.display = 'block';
+        banner.style.background = 'rgba(201, 168, 76, 0.08)';
+        banner.style.border = '1px solid rgba(201, 168, 76, 0.2)';
+        banner.style.color = 'var(--text-secondary, #a8a4a0)';
+        banner.innerHTML = '\uD83D\uDCA1 Want the easiest experience? <a href="https://github.com/Chaos2Cured/FreeLattice/releases" target="_blank" style="color: var(--accent, #c9a84c); font-weight: 600; text-decoration: underline;">Download the FreeLattice desktop app</a> &mdash; one click, everything works.';
+      }
+    })();
+    </script>
     <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 14px; line-height: 1.6;">
       Run FreeLattice as a local server to access it from any device on your network &mdash; or anywhere in the world. No cloud required.
     </p>

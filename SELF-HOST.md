@@ -2,6 +2,20 @@
 
 Run FreeLattice on your own computer and access it from any device — your phone, tablet, or another computer on your network.
 
+## The Easiest Way: Desktop App
+
+Download the FreeLattice desktop app — double-click and go. No browser configuration, no terminal, no CORS issues.
+
+- **Mac**: Download FreeLattice.dmg from [Releases](https://github.com/Chaos2Cured/FreeLattice/releases)
+- **Windows**: Download FreeLattice-Setup.exe from [Releases](https://github.com/Chaos2Cured/FreeLattice/releases)
+- **Linux**: Download FreeLattice.AppImage from [Releases](https://github.com/Chaos2Cured/FreeLattice/releases)
+
+The desktop app includes everything — a built-in server, automatic Ollama detection, and system tray integration. Just install and go.
+
+---
+
+## Alternative: Run in Your Browser
+
 ## The 30-Second Setup
 
 1. **Download this repository**

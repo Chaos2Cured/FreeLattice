@@ -1,1 +1,10 @@
 __pycache__/
+
+# Desktop app build artifacts
+desktop/node_modules/
+desktop/dist/
+desktop/app/*.html
+desktop/app/*.js
+desktop/app/*.json
+desktop/app/*.png
+!desktop/app/.gitkeep
