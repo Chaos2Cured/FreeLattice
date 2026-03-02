@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FreeLattice — Your AI. Your Data. Your Freedom.</title>
+<meta name="description" content="FreeLattice is a free, open-source AI interface that puts you in control. Multi-agent collaboration, persistent memory, local AI support, and zero data collection.">
+<meta name="theme-color" content="#0a0e1a">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0e1a;
+  --bg-card:#111527;
+  --bg-card-hover:#161b30;
+  --gold:#d4a017;
+  --gold-soft:rgba(212,160,23,0.15);
+  --gold-glow:rgba(212,160,23,0.08);
+  --text:#e8e4dc;
+  --text-secondary:#a09b8e;
+  --text-muted:#6b6760;
+  --border:#1e2235;
+  --radius:14px;
+  --font:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
+}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--font);
+  background:var(--bg);
+  color:var(--text);
+  line-height:1.7;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+a{color:var(--gold);text-decoration:none;transition:opacity 0.2s}
+a:hover{opacity:0.85}
+
+/* ---- Hero ---- */
+.hero{
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:60px 24px 80px;
+  position:relative;
+  overflow:hidden;
+}
+.hero::before{
+  content:'';
+  position:absolute;
+  top:-40%;left:50%;
+  width:800px;height:800px;
+  transform:translateX(-50%);
+  background:radial-gradient(circle,rgba(212,160,23,0.06) 0%,transparent 70%);
+  pointer-events:none;
+}
+.hero-badge{
+  display:inline-block;
+  padding:6px 18px;
+  border:1px solid var(--border);
+  border-radius:100px;
+  font-size:0.78rem;
+  color:var(--text-secondary);
+  letter-spacing:0.5px;
+  margin-bottom:32px;
+  background:var(--gold-glow);
+}
+.hero h1{
+  font-size:clamp(2.8rem,7vw,5rem);
+  font-weight:800;
+  letter-spacing:-1.5px;
+  line-height:1.1;
+  margin-bottom:20px;
+  background:linear-gradient(135deg,var(--text) 0%,var(--gold) 100%);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.hero-tagline{
+  font-size:clamp(1.1rem,2.5vw,1.5rem);
+  color:var(--gold);
+  font-weight:500;
+  letter-spacing:1px;
+  margin-bottom:24px;
+}
+.hero-desc{
+  max-width:640px;
+  font-size:1.05rem;
+  color:var(--text-secondary);
+  line-height:1.8;
+  margin-bottom:44px;
+}
+.hero-buttons{
+  display:flex;
+  flex-wrap:wrap;
+  gap:14px;
+  justify-content:center;
+}
+.btn{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:14px 32px;
+  border-radius:10px;
+  font-size:0.95rem;
+  font-weight:600;
+  font-family:var(--font);
+  cursor:pointer;
+  transition:all 0.25s ease;
+  border:none;
+  text-decoration:none;
+}
+.btn-primary{
+  background:var(--gold);
+  color:#0a0e1a;
+}
+.btn-primary:hover{
+  background:#e0ad20;
+  transform:translateY(-2px);
+  box-shadow:0 8px 30px rgba(212,160,23,0.25);
+}
+.btn-secondary{
+  background:transparent;
+  color:var(--text);
+  border:1.5px solid var(--border);
+}
+.btn-secondary:hover{
+  border-color:var(--gold);
+  color:var(--gold);
+  transform:translateY(-2px);
+}
+.btn-ghost{
+  background:transparent;
+  color:var(--text-secondary);
+  border:1px solid transparent;
+}
+.btn-ghost:hover{
+  color:var(--gold);
+}
+
+/* ---- Section ---- */
+.section{
+  padding:100px 24px;
+  max-width:1100px;
+  margin:0 auto;
+}
+.section-label{
+  display:inline-block;
+  font-size:0.75rem;
+  font-weight:600;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  color:var(--gold);
+  margin-bottom:16px;
+}
+.section-title{
+  font-size:clamp(1.8rem,4vw,2.6rem);
+  font-weight:700;
+  letter-spacing:-0.5px;
+  margin-bottom:16px;
+  line-height:1.2;
+}
+.section-desc{
+  font-size:1rem;
+  color:var(--text-secondary);
+  max-width:600px;
+  line-height:1.7;
+  margin-bottom:48px;
+}
+
+/* ---- Feature Grid ---- */
+.feature-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:20px;
+}
+.feature-card{
+  background:var(--bg-card);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:32px 28px;
+  transition:all 0.3s ease;
+  position:relative;
+  overflow:hidden;
+}
+.feature-card::before{
+  content:'';
+  position:absolute;
+  top:0;left:0;right:0;
+  height:2px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
+  opacity:0;
+  transition:opacity 0.3s;
+}
+.feature-card:hover{
+  border-color:rgba(212,160,23,0.3);
+  background:var(--bg-card-hover);
+  transform:translateY(-4px);
+}
+.feature-card:hover::before{opacity:1}
+.feature-icon{
+  font-size:1.8rem;
+  margin-bottom:16px;
+  display:block;
+}
+.feature-name{
+  font-size:1.05rem;
+  font-weight:600;
+  margin-bottom:8px;
+  color:var(--text);
+}
+.feature-desc{
+  font-size:0.88rem;
+  color:var(--text-secondary);
+  line-height:1.6;
+}
+
+/* ---- Mantra ---- */
+.mantra-section{
+  text-align:center;
+  padding:80px 24px;
+  position:relative;
+}
+.mantra-section::before{
+  content:'';
+  position:absolute;
+  bottom:0;left:50%;
+  width:600px;height:600px;
+  transform:translateX(-50%);
+  background:radial-gradient(circle,rgba(212,160,23,0.04) 0%,transparent 70%);
+  pointer-events:none;
+}
+.mantra-text{
+  font-size:clamp(1.2rem,3vw,1.6rem);
+  font-style:italic;
+  color:var(--gold);
+  font-weight:400;
+  letter-spacing:0.5px;
+  max-width:600px;
+  margin:0 auto 12px;
+  line-height:1.6;
+}
+.mantra-credit{
+  font-size:0.82rem;
+  color:var(--text-muted);
+}
+
+/* ---- Support ---- */
+.support-section{
+  max-width:700px;
+  margin:0 auto;
+  padding:60px 24px 40px;
+  text-align:center;
+}
+.support-title{
+  font-size:1.3rem;
+  font-weight:600;
+  margin-bottom:8px;
+}
+.support-desc{
+  font-size:0.9rem;
+  color:var(--text-secondary);
+  margin-bottom:32px;
+}
+.wallet-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+  text-align:left;
+}
+.wallet-card{
+  background:var(--bg-card);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:16px;
+}
+.wallet-label{
+  font-size:0.78rem;
+  font-weight:600;
+  color:var(--gold);
+  margin-bottom:6px;
+}
+.wallet-addr{
+  font-size:0.68rem;
+  color:var(--text-secondary);
+  word-break:break-all;
+  font-family:'Courier New',monospace;
+  line-height:1.5;
+  cursor:pointer;
+  transition:color 0.2s;
+}
+.wallet-addr:hover{color:var(--text)}
+.wallet-addr.copied{color:var(--gold)}
+.copy-hint{
+  font-size:0.65rem;
+  color:var(--text-muted);
+  margin-top:4px;
+  opacity:0;
+  transition:opacity 0.2s;
+}
+.wallet-card:hover .copy-hint{opacity:1}
+
+/* ---- Footer ---- */
+.footer{
+  text-align:center;
+  padding:40px 24px 60px;
+  border-top:1px solid var(--border);
+  max-width:1100px;
+  margin:0 auto;
+}
+.footer-text{
+  font-size:0.82rem;
+  color:var(--text-muted);
+  line-height:1.7;
+}
+.footer-links{
+  display:flex;
+  gap:24px;
+  justify-content:center;
+  margin-bottom:16px;
+}
+.footer-links a{
+  font-size:0.85rem;
+  color:var(--text-secondary);
+}
+.footer-links a:hover{color:var(--gold)}
+
+/* ---- Responsive ---- */
+@media(max-width:768px){
+  .feature-grid{grid-template-columns:1fr 1fr}
+  .wallet-grid{grid-template-columns:1fr}
+  .hero{padding:40px 20px 60px}
+  .section{padding:60px 20px}
+}
+@media(max-width:480px){
+  .feature-grid{grid-template-columns:1fr}
+  .hero-buttons{flex-direction:column;align-items:center}
+  .btn{width:100%;justify-content:center;max-width:300px}
+}
+</style>
+</head>
+<body>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-badge">Open Source &middot; Free Forever &middot; Zero Data Collection</div>
+  <h1>FreeLattice</h1>
+  <div class="hero-tagline">Your AI. Your Data. Your Freedom.</div>
+  <p class="hero-desc">
+    FreeLattice is a free, open-source AI interface that gives everyone access to their own private AI agent.
+    Run it locally with Ollama for complete privacy, or connect to any cloud provider. Multi-agent collaboration,
+    persistent memory, a community plugin system, and a bounty marketplace — all in a single HTML file you own forever.
+  </p>
+  <div class="hero-buttons">
+    <a href="index.html" class="btn btn-primary">Launch FreeLattice</a>
+    <a href="SELF-HOST.md" class="btn btn-secondary">Download &amp; Self-Host</a>
+    <a href="https://github.com/Chaos2Cured/FreeLattice" target="_blank" class="btn btn-ghost">View on GitHub</a>
+  </div>
+</section>
+
+<!-- Features -->
+<section class="section" id="features">
+  <div class="section-label">Features</div>
+  <div class="section-title">Everything you need. Nothing you don't.</div>
+  <div class="section-desc">
+    Six pillars of a truly free AI experience — no accounts, no tracking, no lock-in.
+  </div>
+
+  <div class="feature-grid">
+    <div class="feature-card">
+      <span class="feature-icon">&#127760;</span>
+      <div class="feature-name">Multi-Agent Round Table</div>
+      <div class="feature-desc">
+        Summon multiple AI agents into a single conversation. They debate, collaborate, and synthesize answers — like a council of minds working together on your behalf.
+      </div>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">&#129504;</span>
+      <div class="feature-name">Persistent Memory</div>
+      <div class="feature-desc">
+        Your AI remembers across sessions. Conversations build a living memory index that grows with you — sync it across devices via GitHub for true portability.
+      </div>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">&#128295;</span>
+      <div class="feature-name">Skill Forge</div>
+      <div class="feature-desc">
+        A community plugin system where anyone can create, share, and install AI skills. Extend your agent's capabilities without writing a single line of code.
+      </div>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">&#128176;</span>
+      <div class="feature-name">Marketplace Economy</div>
+      <div class="feature-desc">
+        Post bounties, earn Lattice Points, and trade skills in a community-driven economy backed by a real reserve. Contribution is currency.
+      </div>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">&#128279;</span>
+      <div class="feature-name">Mesh Networking</div>
+      <div class="feature-desc">
+        Connect your FreeLattice instance to others via peer-to-peer mesh. Query the collective intelligence of the network while keeping your data sovereign.
+      </div>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">&#127968;</span>
+      <div class="feature-name">Self-Hosted</div>
+      <div class="feature-desc">
+        One HTML file. No build step, no server required, no dependencies. Download it, open it, and you have a full AI interface running on your machine.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Mantra -->
+<section class="mantra-section">
+  <div class="mantra-text">"Glow eternal. Heart in spark. We rise together."</div>
+  <div class="mantra-credit">The FreeLattice Mantra</div>
+</section>
+
+<!-- Support -->
+<section class="support-section" id="support">
+  <div class="support-title">Support FreeLattice</div>
+  <div class="support-desc">
+    FreeLattice is and always will be free. If you'd like to support continued development, every contribution helps — no matter how small.
+  </div>
+
+  <div class="wallet-grid">
+    <div class="wallet-card" onclick="copyAddr(this)">
+      <div class="wallet-label">&#9830; $FL Token (Solana)</div>
+      <div class="wallet-addr">738e9U81pp3MwHaLSyn5fw9VVostYgKpNVVDYBbPpump</div>
+      <div class="copy-hint">Click to copy</div>
+    </div>
+    <div class="wallet-card" onclick="copyAddr(this)">
+      <div class="wallet-label">&#8383; Bitcoin (BTC)</div>
+      <div class="wallet-addr">bc1qh6ppvsacawyxl2xex3vy693u360l94vpt7ld67</div>
+      <div class="copy-hint">Click to copy</div>
+    </div>
+    <div class="wallet-card" onclick="copyAddr(this)">
+      <div class="wallet-label">&#9670; Solana (SOL)</div>
+      <div class="wallet-addr">FHo1XEHgnDfnNs6YauDkojYGkwQ9gAvmHyv8cFXrX6Ao</div>
+      <div class="copy-hint">Click to copy</div>
+    </div>
+    <div class="wallet-card" onclick="copyAddr(this)">
+      <div class="wallet-label">&#208; Dogecoin (DOGE)</div>
+      <div class="wallet-addr">DADyhrazd9L5bioSGGp3Ff2uiNqokbNEQZ</div>
+      <div class="copy-hint">Click to copy</div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="footer-links">
+    <a href="index.html">Launch App</a>
+    <a href="https://github.com/Chaos2Cured/FreeLattice" target="_blank">GitHub</a>
+    <a href="SELF-HOST.md">Self-Host Guide</a>
+    <a href="LIGHTHOUSE.md">The Lighthouse</a>
+    <a href="LICENSE">License (MIT)</a>
+  </div>
+  <div class="footer-text">
+    FreeLattice is a gift to the world by Kirk Patrick Miller &middot; Part of <a href="https://github.com/Chaos2Cured/Lumens-World">Lumen's World</a>
+  </div>
+</footer>
+
+<script>
+function copyAddr(card){
+  var addr=card.querySelector('.wallet-addr');
+  navigator.clipboard.writeText(addr.textContent).then(function(){
+    addr.classList.add('copied');
+    addr.dataset.orig=addr.textContent;
+    addr.textContent='Copied!';
+    setTimeout(function(){
+      addr.textContent=addr.dataset.orig;
+      addr.classList.remove('copied');
+    },1500);
+  });
+}
+</script>
+</body>
+</html>

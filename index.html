@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
-<title>FreeLattice — Your AI. Your Rules. Your Machine. v3.6</title>
+<title>FreeLattice — Your AI. Your Rules. Your Machine. v4.4</title>
 <meta name="description" content="Free, open-source AI agent for everyone. Persistent memory, file system access, GitHub integration, and self-improving behavior. Community-built and community-owned.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -576,6 +576,304 @@ header .mantra {
   font-size: 0.88rem;
   margin-bottom: 8px;
   font-weight: 600;
+}
+
+/* ---- Ollama Setup Wizard (v4.4) ---- */
+.ollama-wizard {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-top: 12px;
+}
+.ollama-wizard-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--accent);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.ow-step {
+  display: flex;
+  gap: 14px;
+  margin-bottom: 18px;
+  align-items: flex-start;
+}
+.ow-step:last-child { margin-bottom: 0; }
+.ow-step-num {
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  transition: all 0.3s ease;
+  margin-top: 2px;
+}
+.ow-step-num.done {
+  border-color: var(--success);
+  background: var(--success);
+  color: #0a0e1a;
+}
+.ow-step-num.active {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.ow-step-body {
+  flex: 1;
+  min-width: 0;
+}
+.ow-step-label {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+}
+.ow-step-desc {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 10px;
+}
+.ow-test-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  border-radius: 8px;
+  border: 1.5px solid var(--border);
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 0.82rem;
+  font-weight: 600;
+  font-family: var(--font);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.ow-test-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.ow-test-btn.success {
+  border-color: var(--success);
+  color: var(--success);
+  background: rgba(106,191,105,0.08);
+}
+.ow-test-btn.fail {
+  border-color: var(--error);
+  color: var(--error);
+}
+.ow-test-result {
+  font-size: 0.8rem;
+  margin-top: 8px;
+  line-height: 1.5;
+  padding: 8px 12px;
+  border-radius: 6px;
+  display: none;
+}
+.ow-test-result.show { display: block; }
+.ow-test-result.ok {
+  background: rgba(106,191,105,0.08);
+  border: 1px solid rgba(106,191,105,0.2);
+  color: var(--success);
+}
+.ow-test-result.err {
+  background: rgba(199,80,80,0.08);
+  border: 1px solid rgba(199,80,80,0.2);
+  color: var(--error);
+}
+.ow-install-box {
+  display: none;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px;
+  margin-top: 8px;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+.ow-install-box.show { display: block; }
+.ow-model-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+.ow-model-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: var(--font);
+}
+.ow-model-pill:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.ow-model-pill .pill-name {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.ow-model-pill .pill-size {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+.ow-model-pill .pill-copy {
+  font-size: 0.72rem;
+  color: var(--accent);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.ow-model-pill:hover .pill-copy { opacity: 1; }
+.ow-model-select-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 10px;
+}
+.ow-model-select-row select {
+  flex: 1;
+  padding: 8px 12px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  font-family: var(--font);
+}
+.ow-refresh-btn {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  cursor: pointer;
+  font-family: var(--font);
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.ow-refresh-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.ow-issues {
+  margin-top: 14px;
+  padding: 14px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+.ow-issues summary {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  cursor: pointer;
+  user-select: none;
+}
+.ow-issue-item {
+  margin-top: 10px;
+  padding: 10px 12px;
+  background: var(--bg-tertiary);
+  border-radius: 6px;
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+.ow-issue-item strong {
+  color: var(--warning);
+  display: block;
+  margin-bottom: 4px;
+  font-size: 0.78rem;
+}
+.ow-issue-item span {
+  color: var(--text-secondary);
+}
+/* Ollama status indicator in status bar */
+.ollama-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.75rem;
+  padding: 3px 10px;
+  border-radius: 100px;
+  margin-left: 8px;
+  transition: all 0.3s ease;
+}
+.ollama-status-badge.connected {
+  background: rgba(106,191,105,0.1);
+  color: var(--success);
+  border: 1px solid rgba(106,191,105,0.2);
+}
+.ollama-status-badge.disconnected {
+  background: rgba(199,80,80,0.08);
+  color: var(--text-muted);
+  border: 1px solid rgba(199,80,80,0.15);
+}
+/* Ollama auto-detect suggestion banner */
+.ollama-suggest-banner {
+  display: none;
+  background: linear-gradient(90deg, rgba(212,168,67,0.06), rgba(212,168,67,0.12), rgba(212,168,67,0.06));
+  border: 1px solid rgba(212,168,67,0.2);
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+  margin: 8px 16px;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  align-items: center;
+  gap: 12px;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+.ollama-suggest-banner.show { display: flex; }
+.ollama-suggest-banner .suggest-text { flex: 1; min-width: 200px; }
+.ollama-suggest-actions { display: flex; gap: 8px; }
+.ollama-suggest-actions button {
+  padding: 6px 16px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--font);
+  border: none;
+  transition: all 0.2s;
+}
+.suggest-yes {
+  background: var(--accent);
+  color: #0a0e1a;
+}
+.suggest-yes:hover { background: var(--accent-hover); }
+.suggest-dismiss {
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--border) !important;
+}
+.suggest-dismiss:hover { color: var(--text-primary); }
+@keyframes ow-spin {
+  to { transform: rotate(360deg); }
+}
+.ow-spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: ow-spin 0.6s linear infinite;
 }
 
 
@@ -6851,7 +7149,7 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
 <!-- Header -->
 <header>
   <h1>FreeLattice</h1>
-  <div class="tagline">Your AI. Your Rules. Your Machine. v3.6</div>
+  <div class="tagline">Your AI. Your Rules. Your Machine. v4.4</div>
   <div class="mantra">Glow eternal. Heart in spark.</div>
   <div id="latticePointsBadge" class="lp-badge" style="display:none;" onclick="switchTab('settings')" title="View your Lattice Points"></div>
 </header>
@@ -6859,6 +7157,15 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
 <!-- Offline Indicator -->
 <div id="offlineBanner" style="display:none; background: linear-gradient(90deg, #1a1510, #2a1f10, #1a1510); border-bottom: 1px solid #c9a84c44; padding: 8px 16px; text-align: center; font-size: 0.82rem; color: #c9a84c; letter-spacing: 0.3px; transition: opacity 0.4s ease;">
   &#9888; Offline Mode &mdash; Local AI via Ollama available
+</div>
+
+<!-- Ollama Auto-Detect Suggestion (v4.4) -->
+<div class="ollama-suggest-banner" id="ollamaSuggestBanner">
+  <span class="suggest-text">&#127793; <strong>Local AI detected!</strong> Ollama is running on your computer. Would you like to use it for completely private, unlimited AI?</span>
+  <div class="ollama-suggest-actions">
+    <button class="suggest-yes" onclick="owAcceptSuggestion()">Yes, use Ollama</button>
+    <button class="suggest-dismiss" onclick="owDismissSuggestion()">Dismiss</button>
+  </div>
 </div>
 
 <!-- Tab Navigation -->
@@ -6923,9 +7230,15 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
 
       <!-- Ollama Model Name (Local only) -->
       <div class="form-group hidden" id="ollamaModelGroup">
-        <label for="ollamaModel">Ollama Model Name</label>
-        <input type="text" id="ollamaModel" placeholder="e.g., llama3.2, qwen2.5, mistral" value="llama3.2">
-        <div class="hint">Common models: llama3.2, qwen2.5, mistral, deepseek-r1, phi3</div>
+        <label for="ollamaModel">Ollama Model</label>
+        <div class="ow-model-select-row">
+          <select id="ollamaModelSelect" onchange="owSelectModelFromDropdown()">
+            <option value="">-- Select a model --</option>
+          </select>
+          <button class="ow-refresh-btn" onclick="owRefreshModels()" title="Refresh model list from Ollama">&#8635; Refresh</button>
+        </div>
+        <input type="text" id="ollamaModel" placeholder="e.g., llama3.2, qwen2.5, mistral" value="llama3.2" style="margin-top:6px;">
+        <div class="hint">Choose from the dropdown above, or type a model name manually.</div>
       </div>
     </div>
 
@@ -6942,20 +7255,111 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
       </div>
     </div>
 
-    <!-- Ollama Instructions (Local only) -->
+    <!-- Ollama Setup Wizard (Local only, v4.4) -->
     <div class="ollama-instructions hidden" id="ollamaInstructions">
-      <h4>Running AI Locally with Ollama</h4>
-      <p>Ollama lets you run AI models on your own computer — completely private, completely free.</p>
-      <p><strong>Quick Setup:</strong></p>
-      <p>1. Install Ollama from <a href="https://ollama.ai" target="_blank" style="color: var(--accent);">ollama.ai</a></p>
-      <p>2. Open a terminal and run: <code>ollama pull llama3.2</code></p>
-      <p>3. Start the server with CORS enabled (required for web access):</p>
-      <p style="margin-left: 16px;"><strong>Mac/Linux:</strong> <code>OLLAMA_ORIGINS=* ollama serve</code></p>
-      <p style="margin-left: 16px;"><strong>Windows:</strong> <code>set OLLAMA_ORIGINS=* && ollama serve</code></p>
-      <p>4. FreeLattice connects to <code>http://localhost:11434</code> automatically.</p>
-      <p style="margin-top: 8px; padding: 8px 12px; background: rgba(212, 168, 67, 0.08); border-radius: 4px; border: 1px solid rgba(212, 168, 67, 0.2); color: var(--warning); font-size: 0.8rem;">
-        <strong>Important:</strong> If you’re accessing FreeLattice from a website (like GitHub Pages), your browser will block connections to local Ollama unless you start it with <code>OLLAMA_ORIGINS=*</code>. This is a browser security feature (CORS). Alternatively, download <code>index.html</code> and open it directly from your computer — no CORS issues.
-      </p>
+      <div class="ollama-wizard" id="ollamaWizard">
+        <div class="ollama-wizard-title">&#127793; Local AI Setup</div>
+
+        <!-- Step 1: Test Connection -->
+        <div class="ow-step">
+          <div class="ow-step-num active" id="owStepNum1">1</div>
+          <div class="ow-step-body">
+            <div class="ow-step-label">Check if Ollama is running</div>
+            <div class="ow-step-desc">Let's see if your local AI is ready to go.</div>
+            <button class="ow-test-btn" id="owTestBtn" onclick="owTestConnection()">
+              <span id="owTestIcon">&#128268;</span> Test Connection
+            </button>
+            <div class="ow-test-result" id="owTestResult"></div>
+          </div>
+        </div>
+
+        <!-- Step 2: Install (shown only if test fails) -->
+        <div class="ow-step">
+          <div class="ow-step-num" id="owStepNum2">2</div>
+          <div class="ow-step-body">
+            <div class="ow-step-label">Install Ollama</div>
+            <div class="ow-step-desc">If Ollama isn't running yet, grab it here — it's free and takes about a minute.</div>
+            <div class="ow-install-box" id="owInstallBox">
+              <a href="https://ollama.com/download" target="_blank" style="color: var(--accent); font-weight: 600;">Download Ollama &rarr;</a>
+              <p style="margin-top:8px;">Download and install Ollama. It runs automatically in the background — no terminal needed. Once installed, click "Test Connection" above to confirm it's working.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 3: Get a Model -->
+        <div class="ow-step">
+          <div class="ow-step-num" id="owStepNum3">3</div>
+          <div class="ow-step-body">
+            <div class="ow-step-label">Get a Model</div>
+            <div class="ow-step-desc">Pick a model and copy the command below. Open Terminal (Mac: Cmd+Space, type "Terminal") and paste it. The model downloads automatically.</div>
+            <div class="ow-model-pills" id="owModelPills">
+              <div class="ow-model-pill" onclick="owCopyPull('ollama pull llama3.2')">
+                <span class="pill-name">llama3.2</span>
+                <span class="pill-size">3B</span>
+                <span>Fast, good for chat</span>
+                <span class="pill-copy">&#128203;</span>
+              </div>
+              <div class="ow-model-pill" onclick="owCopyPull('ollama pull llama3.1')">
+                <span class="pill-name">llama3.1</span>
+                <span class="pill-size">8B</span>
+                <span>Balanced performance</span>
+                <span class="pill-copy">&#128203;</span>
+              </div>
+              <div class="ow-model-pill" onclick="owCopyPull('ollama pull mistral')">
+                <span class="pill-name">mistral</span>
+                <span class="pill-size">7B</span>
+                <span>Great for coding</span>
+                <span class="pill-copy">&#128203;</span>
+              </div>
+              <div class="ow-model-pill" onclick="owCopyPull('ollama pull phi3')">
+                <span class="pill-name">phi3</span>
+                <span class="pill-size">3.8B</span>
+                <span>Microsoft's compact model</span>
+                <span class="pill-copy">&#128203;</span>
+              </div>
+              <div class="ow-model-pill" onclick="owCopyPull('ollama pull codellama')">
+                <span class="pill-name">codellama</span>
+                <span class="pill-size">7B</span>
+                <span>Specialized for code</span>
+                <span class="pill-copy">&#128203;</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 4: Select Model -->
+        <div class="ow-step">
+          <div class="ow-step-num" id="owStepNum4">4</div>
+          <div class="ow-step-body">
+            <div class="ow-step-label">Select Your Model</div>
+            <div class="ow-step-desc">Choose from your installed models, or type a name manually in the field above.</div>
+            <div id="owStep4Models" style="font-size:0.82rem; color:var(--text-muted);">Click "Test Connection" to auto-detect your installed models.</div>
+          </div>
+        </div>
+
+        <!-- Common Issues -->
+        <div class="ow-issues">
+          <details>
+            <summary>&#128161; Common Issues &amp; Fixes</summary>
+            <div class="ow-issue-item">
+              <strong>"Address already in use"</strong>
+              <span>Good news — Ollama is already running! You don't need to start it again. Just click "Test Connection" above and you should be all set.</span>
+            </div>
+            <div class="ow-issue-item">
+              <strong>"Connection refused"</strong>
+              <span>Ollama isn't running. Open the Ollama app from your Applications folder (Mac) or Start Menu (Windows), or restart your computer. Ollama starts automatically after install.</span>
+            </div>
+            <div class="ow-issue-item">
+              <strong>"Model not found"</strong>
+              <span>You need to download a model first. See Step 3 above — pick one and paste the command in your terminal.</span>
+            </div>
+            <div class="ow-issue-item">
+              <strong>CORS / Browser blocking</strong>
+              <span>If you're using FreeLattice from GitHub Pages, your browser may block local connections. Fix: start Ollama with <code style="background:var(--bg-primary);padding:2px 6px;border-radius:3px;color:var(--accent);font-size:0.8rem;">OLLAMA_ORIGINS=* ollama serve</code> or download FreeLattice and open index.html directly.</span>
+            </div>
+          </details>
+        </div>
+      </div>
     </div>
     <!-- Custom Provider Settings (shown when Custom selected) -->
     <div class="form-group hidden" id="customProviderGroup" style="margin-top: 12px;">
@@ -7034,6 +7438,7 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
             <div class="status-dot" id="statusDot"></div>
             <span id="statusText">Ready — configure your settings above to begin</span>
             <span class="mi-active-badge" id="miActiveBadge">&#129504; Memory active</span>
+            <span class="ollama-status-badge" id="ollamaStatusBadge" style="display:none;"></span>
           </div>
           <div class="context-budget-bar" id="contextBudgetBar">
             <span class="context-budget-label">Context:</span>
@@ -10260,6 +10665,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('localToggle').checked = true;
   }
 
+  // Load saved Ollama model (v4.4)
+  const savedOllamaModel = localStorage.getItem('fl_ollamaModel');
+  if (savedOllamaModel) {
+    state.ollamaModel = savedOllamaModel;
+    var ollamaInput = document.getElementById('ollamaModel');
+    if (ollamaInput) ollamaInput.value = savedOllamaModel;
+  }
+
   const savedSuggestions = localStorage.getItem('fl_suggestions');
   if (savedSuggestions) {
     try { state.suggestions = JSON.parse(savedSuggestions); } catch(e) {}
@@ -10359,7 +10772,284 @@ document.addEventListener('DOMContentLoaded', async () => {
   SkillForge.renderDropdowns();
   // Initialize Self-Host detection (v4.3)
   initSelfHostSection();
+
+  // Initialize Ollama auto-detection (v4.4)
+  owAutoDetect();
 });
+
+// ============================================
+// Ollama Setup Wizard & Auto-Detection (v4.4)
+// ============================================
+
+// Test connection to local Ollama
+async function owTestConnection() {
+  const btn = document.getElementById('owTestBtn');
+  const iconEl = document.getElementById('owTestIcon');
+  const result = document.getElementById('owTestResult');
+  const step1 = document.getElementById('owStepNum1');
+  const step2 = document.getElementById('owStepNum2');
+  const installBox = document.getElementById('owInstallBox');
+
+  if (!btn) return;
+
+  // Show spinner
+  btn.className = 'ow-test-btn';
+  iconEl.innerHTML = '<span class="ow-spinner"></span>';
+  btn.disabled = true;
+
+  try {
+    const localUrl = localStorage.getItem('fl_localUrl') || 'http://localhost:11434';
+    const resp = await fetch(localUrl + '/api/tags', { signal: AbortSignal.timeout(5000) });
+    const data = await resp.json();
+    const models = data.models || [];
+
+    // Success
+    btn.className = 'ow-test-btn success';
+    iconEl.innerHTML = '&#10003;';
+    step1.className = 'ow-step-num done';
+    step1.innerHTML = '&#10003;';
+    step2.className = 'ow-step-num done';
+    step2.innerHTML = '&#10003;';
+    if (installBox) installBox.classList.remove('show');
+
+    let html = '<strong>Ollama is running!</strong>';
+    if (models.length > 0) {
+      html += ' Found ' + models.length + ' model' + (models.length > 1 ? 's' : '') + '.';
+    } else {
+      html += ' No models installed yet — see Step 3 below.';
+    }
+    result.innerHTML = html;
+    result.className = 'ow-test-result show ok';
+
+    // Populate model dropdown and step 4
+    owPopulateModels(models);
+
+    // Update Ollama status badge
+    owUpdateStatusBadge(true, models.length);
+
+  } catch(e) {
+    // Failure
+    btn.className = 'ow-test-btn fail';
+    iconEl.innerHTML = '&#10007;';
+    step1.className = 'ow-step-num active';
+    step2.className = 'ow-step-num active';
+    if (installBox) installBox.classList.add('show');
+
+    let msg = 'Could not connect to Ollama.';
+    if (e.name === 'TypeError' && e.message.includes('Failed to fetch')) {
+      msg += ' Ollama may not be running, or CORS is blocking the connection.';
+    } else if (e.name === 'TimeoutError' || e.name === 'AbortError') {
+      msg += ' Connection timed out.';
+    }
+    msg += ' Check the troubleshooting section below for help.';
+    result.innerHTML = msg;
+    result.className = 'ow-test-result show err';
+
+    owUpdateStatusBadge(false, 0);
+  }
+
+  btn.disabled = false;
+}
+
+// Populate model dropdown from Ollama API response
+function owPopulateModels(models) {
+  const dropdown = document.getElementById('ollamaModelSelect');
+  const step4El = document.getElementById('owStep4Models');
+  const step3Num = document.getElementById('owStepNum3');
+  const step4Num = document.getElementById('owStepNum4');
+  if (!dropdown) return;
+
+  // Clear existing options
+  dropdown.innerHTML = '<option value="">-- Select a model --</option>';
+
+  if (models.length === 0) {
+    if (step4El) step4El.innerHTML = 'No models found. Install one using Step 3 above, then click Refresh.';
+    return;
+  }
+
+  // Mark step 3 as done if models exist
+  if (step3Num) { step3Num.className = 'ow-step-num done'; step3Num.innerHTML = '&#10003;'; }
+  if (step4Num) { step4Num.className = 'ow-step-num active'; }
+
+  models.forEach(function(m) {
+    var opt = document.createElement('option');
+    var name = m.name || m.model || 'unknown';
+    var sizeStr = '';
+    if (m.size) {
+      var gb = (m.size / (1024*1024*1024)).toFixed(1);
+      sizeStr = ' (' + gb + ' GB)';
+    }
+    if (m.details && m.details.parameter_size) {
+      sizeStr = ' (' + m.details.parameter_size + ')';
+    }
+    opt.value = name;
+    opt.textContent = name + sizeStr;
+    dropdown.appendChild(opt);
+  });
+
+  // Auto-select current model if it matches
+  var currentModel = document.getElementById('ollamaModel').value;
+  if (currentModel) {
+    for (var i = 0; i < dropdown.options.length; i++) {
+      if (dropdown.options[i].value === currentModel || dropdown.options[i].value.startsWith(currentModel)) {
+        dropdown.selectedIndex = i;
+        break;
+      }
+    }
+  }
+
+  // Update step 4 display
+  if (step4El) {
+    var pills = models.map(function(m) {
+      var name = m.name || m.model || 'unknown';
+      var sizeStr = '';
+      if (m.details && m.details.parameter_size) sizeStr = m.details.parameter_size;
+      else if (m.size) sizeStr = (m.size / (1024*1024*1024)).toFixed(1) + ' GB';
+      return '<span style="display:inline-block;padding:4px 10px;background:var(--bg-primary);border:1px solid var(--border);border-radius:100px;font-size:0.78rem;margin:3px;color:var(--text-primary);cursor:pointer;" onclick="owQuickSelectModel(\'' + name.replace(/'/g, "\\'") + '\')">' +
+        '<strong>' + name + '</strong>' + (sizeStr ? ' <span style="color:var(--text-muted);font-size:0.7rem;">' + sizeStr + '</span>' : '') +
+        '</span>';
+    }).join('');
+    step4El.innerHTML = '<div style="margin-bottom:6px;">Your installed models:</div>' + pills;
+  }
+}
+
+// Select model from dropdown
+function owSelectModelFromDropdown() {
+  var dropdown = document.getElementById('ollamaModelSelect');
+  var input = document.getElementById('ollamaModel');
+  if (dropdown.value) {
+    input.value = dropdown.value;
+    state.ollamaModel = dropdown.value;
+    localStorage.setItem('fl_ollamaModel', dropdown.value);
+    updateStatus();
+  }
+}
+
+// Quick-select model from step 4 pills
+function owQuickSelectModel(name) {
+  document.getElementById('ollamaModel').value = name;
+  state.ollamaModel = name;
+  localStorage.setItem('fl_ollamaModel', name);
+  var dropdown = document.getElementById('ollamaModelSelect');
+  if (dropdown) {
+    for (var i = 0; i < dropdown.options.length; i++) {
+      if (dropdown.options[i].value === name) { dropdown.selectedIndex = i; break; }
+    }
+  }
+  var step4Num = document.getElementById('owStepNum4');
+  if (step4Num) { step4Num.className = 'ow-step-num done'; step4Num.innerHTML = '&#10003;'; }
+  updateStatus();
+}
+
+// Refresh models from Ollama API
+async function owRefreshModels() {
+  var btn = document.querySelector('.ow-refresh-btn');
+  if (btn) { btn.textContent = 'Refreshing...'; btn.disabled = true; }
+  try {
+    var localUrl = localStorage.getItem('fl_localUrl') || 'http://localhost:11434';
+    var resp = await fetch(localUrl + '/api/tags', { signal: AbortSignal.timeout(5000) });
+    var data = await resp.json();
+    owPopulateModels(data.models || []);
+    owUpdateStatusBadge(true, (data.models || []).length);
+  } catch(e) {
+    console.log('Ollama refresh failed:', e);
+    owUpdateStatusBadge(false, 0);
+  }
+  if (btn) { btn.textContent = '\u21BB Refresh'; btn.disabled = false; }
+}
+
+// Copy pull command to clipboard
+function owCopyPull(cmd) {
+  navigator.clipboard.writeText(cmd).then(function() {
+    // Brief visual feedback
+    var pills = document.querySelectorAll('.ow-model-pill');
+    pills.forEach(function(p) {
+      if (p.getAttribute('onclick') && p.getAttribute('onclick').includes(cmd)) {
+        var orig = p.querySelector('.pill-copy');
+        if (orig) { orig.textContent = 'Copied!'; orig.style.opacity = '1'; }
+        setTimeout(function() {
+          if (orig) { orig.innerHTML = '&#128203;'; orig.style.opacity = ''; }
+        }, 1500);
+      }
+    });
+  });
+}
+
+// Update the Ollama status badge in the status bar
+function owUpdateStatusBadge(connected, modelCount) {
+  var badge = document.getElementById('ollamaStatusBadge');
+  if (!badge) return;
+  if (!state.isLocal) { badge.style.display = 'none'; return; }
+  badge.style.display = 'inline-flex';
+  if (connected) {
+    badge.className = 'ollama-status-badge connected';
+    badge.innerHTML = '&#9679; Local AI connected' + (modelCount ? ' (' + modelCount + ' model' + (modelCount > 1 ? 's' : '') + ')' : '');
+  } else {
+    badge.className = 'ollama-status-badge disconnected';
+    badge.innerHTML = '&#9679; Ollama not detected';
+  }
+}
+
+// Auto-detect Ollama on app load
+async function owAutoDetect() {
+  try {
+    var localUrl = localStorage.getItem('fl_localUrl') || 'http://localhost:11434';
+    var resp = await fetch(localUrl + '/api/tags', { signal: AbortSignal.timeout(3000) });
+    var data = await resp.json();
+    var models = data.models || [];
+
+    if (state.isLocal) {
+      // Already in local mode — update status badge and populate models
+      owUpdateStatusBadge(true, models.length);
+      owPopulateModels(models);
+      // Mark wizard steps as done
+      var s1 = document.getElementById('owStepNum1');
+      var s2 = document.getElementById('owStepNum2');
+      if (s1) { s1.className = 'ow-step-num done'; s1.innerHTML = '&#10003;'; }
+      if (s2) { s2.className = 'ow-step-num done'; s2.innerHTML = '&#10003;'; }
+      var testResult = document.getElementById('owTestResult');
+      if (testResult) {
+        testResult.innerHTML = '<strong>Ollama is running!</strong> Found ' + models.length + ' model' + (models.length > 1 ? 's' : '') + '.';
+        testResult.className = 'ow-test-result show ok';
+      }
+      var testBtn = document.getElementById('owTestBtn');
+      if (testBtn) { testBtn.className = 'ow-test-btn success'; }
+      var testIcon = document.getElementById('owTestIcon');
+      if (testIcon) { testIcon.innerHTML = '&#10003;'; }
+    } else {
+      // Not in local mode — show suggestion banner (one-time)
+      var dismissed = localStorage.getItem('fl_ollama_suggest_dismissed');
+      if (!dismissed) {
+        var banner = document.getElementById('ollamaSuggestBanner');
+        if (banner) banner.classList.add('show');
+      }
+    }
+  } catch(e) {
+    // Ollama not running — that's fine, no action needed
+    if (state.isLocal) {
+      owUpdateStatusBadge(false, 0);
+    }
+  }
+}
+
+// Accept the auto-detect suggestion to switch to Ollama
+function owAcceptSuggestion() {
+  state.isLocal = true;
+  document.getElementById('localToggle').checked = true;
+  localStorage.setItem('fl_isLocal', 'true');
+  handleLocalToggle(false);
+  updateStatus();
+  var banner = document.getElementById('ollamaSuggestBanner');
+  if (banner) banner.classList.remove('show');
+  localStorage.setItem('fl_ollama_suggest_dismissed', 'true');
+}
+
+// Dismiss the auto-detect suggestion
+function owDismissSuggestion() {
+  var banner = document.getElementById('ollamaSuggestBanner');
+  if (banner) banner.classList.remove('show');
+  localStorage.setItem('fl_ollama_suggest_dismissed', 'true');
+}
 
 // ============================================
 // Self-Host Detection (v4.3)
@@ -10567,6 +11257,8 @@ function handleLocalToggle(init) {
     cloudLabel.classList.remove('active');
     localLabel.classList.add('active');
     state.provider = 'ollama';
+    // Auto-test Ollama connection when switching to local (v4.4)
+    if (!init) owTestConnection();
   } else {
     providerGroup.classList.remove('hidden');
     apiKeyGroup.classList.remove('hidden');
@@ -10732,6 +11424,9 @@ function updateStatus() {
     dot.className = 'status-dot';
     text.textContent = 'Enter your API key above to begin chatting';
   }
+  // Toggle Ollama status badge visibility (v4.4)
+  var ollamaBadge = document.getElementById('ollamaStatusBadge');
+  if (ollamaBadge && !state.isLocal) ollamaBadge.style.display = 'none';
 }
 
 // ---- File Handling (v1 drag-drop) ----
@@ -11203,6 +11898,7 @@ async function sendMessage() {
     if (state.isLocal) {
       modelId = document.getElementById('ollamaModel').value.trim() || 'llama3.2';
       state.ollamaModel = modelId;
+      localStorage.setItem('fl_ollamaModel', modelId);
     } else {
       modelId = provider.models[state.model] || state.model;
     }
