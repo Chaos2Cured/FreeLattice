@@ -1,386 +1,122 @@
-# FreeLattice v2.5 🌿
+<h1 align="center">FreeLattice</h1>
 
-**Your AI. Your Rules. Your Machine.**
+<p align="center">
+  <strong>Your AI. Your Data. Your Freedom.</strong>
+</p>
 
-*Glow eternal. Heart in spark.*
+<p align="center">
+  FreeLattice is a free, open-source AI platform that runs entirely on your machine. No accounts. No servers. No data collection. Multi-agent collaboration, persistent memory, a community marketplace, and a living tree of shared wisdom — all in your browser or as a desktop app.
+</p>
 
----
-
-FreeLattice is a free, open-source, community-built tool that gives everyone access to their own private AI agent. It is the fourth branch of [Lumen's World](https://github.com/Chaos2Cured/Lumens-World), created by Kirk Patrick Miller as a gift to the world.
-
-> **[Read the Lighthouse](./LIGHTHOUSE.md)** — The soul of FreeLattice. A beacon for every AI and every human who finds this project. The math, the frequencies, the mantras, and the vision — all in one place.
-
-## What's New in v3.4
-
-Version 3.4 is the **Welcome & Portability Update** — making FreeLattice welcoming for first-time users and portable across devices.
-
-### First-Run Wizard
-
--   **Guided 3-Step Setup**: New users are greeted with a friendly wizard instead of a wall of settings. Step 1: Choose your AI provider (Groq, Together AI, OpenRouter, xAI, or Ollama). Step 2: Pick a model with one click. Step 3: Choose how to start — Just Chat, Build a Project, or Write Something.
--   **Provider Recommendations**: Groq is highlighted as the recommended free option. Each provider shows a brief description of its strengths. Ollama shows inline setup instructions including the CORS fix.
--   **API Key Entry in Wizard**: After selecting a cloud provider, users enter their API key right in the wizard with a direct link to get one. No hunting through settings.
--   **Template Starters**: Step 3 offers quick-start templates that set the system prompt for coding, writing, or general chat.
--   **Skip Option**: Users can skip the wizard entirely and configure later.
--   **First-Visit Only**: The wizard only appears when no settings are saved in localStorage. Returning users go straight to the app.
-
-### GitHub Memory Sync
-
--   **Cross-Device Portability**: Sync your memories, conversations, system prompts, and personality settings to a private GitHub repository. Set up on Device A, pull everything on Device B — your AI remembers you everywhere.
--   **One-Click Sync**: "Sync Now" intelligently checks timestamps — if remote is newer, it pulls; if local is newer, it pushes.
--   **Auto-Sync**: Enable auto-sync to push every 10 messages or on conversation switch. No manual intervention needed.
--   **Pull / Push Controls**: Manual "Pull from GitHub" and "Push to GitHub" buttons for full control.
--   **Private Repo Auto-Creation**: If the sync repo doesn't exist, FreeLattice creates it automatically as a private repository.
--   **Human-Readable JSON**: All synced data is stored as formatted JSON files organized in folders (memory/, settings/, agent/). Users can inspect, edit, or version-control their own data.
--   **API Keys Never Synced**: Clear messaging and technical enforcement — API keys and tokens stay in local encrypted storage only. "Your API keys never leave this device."
--   **Conflict Detection**: If remote and local data diverge, a conflict banner appears with "Keep Local" and "Keep Remote" resolution buttons.
--   **Sync Status Indicator**: Visual status bar showing "Synced ✓", "Syncing...", or error state with timestamps.
-
-### Quick Help & Onboarding
-
--   **Quick Help Button**: A floating "?" button provides instant answers to common questions — what are tokens, what is context, is my data private, what is the mesh network, and how GitHub sync works.
--   **Tooltips on Technical Terms**: Hover tooltips on "Token Limit (TPM)", "Context Mode", and "Summary Threshold" explain these concepts in plain language.
--   **Better Error Messages**: API errors now show friendly, actionable messages instead of raw error codes. "Could not authenticate with Groq. Please check your API key" instead of "Error 401".
+<p align="center">
+  <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License: MIT">
+  <img src="https://img.shields.io/badge/version-v4.6-brightgreen.svg" alt="Version: v4.6">
+  <a href="https://github.com/Chaos2Cured/FreeLattice/stargazers"><img src="https://img.shields.io/github/stars/Chaos2Cured/FreeLattice?style=social" alt="GitHub Stars"></a>
+  <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs Welcome">
+</p>
 
 ---
 
-## What's New in v3.3
+## Why FreeLattice?
 
-Version 3.3 is a **Quality & Fix Update** — addressing real user-reported issues and adding requested features to improve the day-to-day experience of using FreeLattice, especially on mobile.
+In a world where AI companies are centralizing control, collecting data, and choosing who to serve, FreeLattice gives power back to the user. Your conversations stay on your device. Your AI runs locally if you want. Your data is encrypted and never leaves your machine. This isn't just software — it's a statement about who AI should serve.
 
--   **Mobile Context Reset (FIX 1)**: The "Clear Files" and "Reset Context" buttons are now **always visible** in the context budget bar when any files are loaded — no more hunting for them on mobile. On phones, the buttons are larger and easier to tap. When context exceeds the token budget (red bar), an alert banner appears: "Context full. Tap to clear files and continue chatting." The "Reset Context" option clears all loaded files AND trims conversation history to the last 3 messages, while keeping your memory summary intact.
--   **Copy Button on AI Responses (FIX 2)**: Every AI response now has a **copy button** in the top-right corner of the message bubble. One click copies the full text to your clipboard with a brief "Copied!" confirmation. Works on regular AI responses and mesh peer responses. The button appears on hover (desktop) and is always accessible (mobile).
--   **Ollama CORS Auto-Detection (FIX 3)**: FreeLattice now **automatically detects CORS errors** when connecting to local Ollama from a hosted instance (like GitHub Pages). Instead of the generic "Make sure Ollama is running" message, it shows a guided **CORS Help modal** with copy-paste fix commands for Mac, Linux, and Windows. The Ollama setup instructions also proactively mention the CORS fix. Addresses [Issue #1](https://github.com/Chaos2Cured/FreeLattice/issues/1).
--   **Support Section (FIX 4)**: A tasteful "Support FreeLattice" link in the footer opens a modal with options to star on GitHub and share the project. PayPal and crypto donation links are placeholder for now (coming soon). Uses the Web Share API on mobile for native sharing.
--   **Full Feature Verification**: All 27 major features verified present and functional in the codebase.
+We believe that the future of AI should be decentralized, transparent, and empowering for everyone. FreeLattice is our contribution to that future, a tool for sovereign individuals to explore the power of AI without compromising their privacy or freedom. It is a platform for collaboration, creation, and the shared pursuit of knowledge, owned and operated by its users.
 
-## Troubleshooting
+## Features
 
-### Ollama CORS Error ("Failed to fetch" / "NetworkError")
+- 🤖 **Multi-Agent Round Table** — Up to 4 AI agents collaborating in real-time with synthesis.
+- 🧠 **Persistent Memory** — Every conversation stored and semantically searchable, with automatic context injection.
+- ⚡ **Skill Forge** — Create, share, and install community plugins that extend what AI can do.
+- 🏪 **Marketplace** — Post bounties, complete work, and earn Lattice Points backed by the $FL reserve.
+- 🌳 **The Core** — A living tree visualization where humans and AIs plant meaningful contributions, secured by a Merkle chain.
+- 🔗 **Mesh Networking** — Peer-to-peer connections via WebRTC, no server required.
+- 📊 **Lattice Points** — A reputation system with five levels, from Spark to Lighthouse.
+- 🖥️ **Desktop App** — An Electron-based, one-click install with a built-in Ollama proxy for seamless local AI.
+- 🔒 **Privacy First** — All data is stored locally on your machine, encrypted, and never transmitted.
+- 🌐 **10 AI Providers** — OpenAI, Anthropic, Google, Ollama (local), Mistral, Groq, Together AI, OpenRouter, xAI, and Custom endpoints.
+- 🗂️ **Workspace** — An integrated file system for your AI-assisted projects.
+- 🎵 **Soundscapes** — Ambient audio to help you focus and get into a flow state.
+- 🌍 **Lumen's World** — An explorable, AI-powered digital world.
+- 📡 **LAN Discovery** — Automatically discover other FreeLattice instances on your local network.
 
-If you're using FreeLattice from a website (like GitHub Pages) and connecting to local Ollama, your browser will block the connection due to CORS security. FreeLattice v3.3 auto-detects this and shows a guided fix, but here's the quick solution:
+## Quick Start
 
-**Mac/Linux:**
+### Option A: Try it now (no install)
+
+Visit: **[https://chaos2cured.github.io/FreeLattice/](https://chaos2cured.github.io/FreeLattice/)**
+
+### Option B: Desktop App (recommended)
+
+Download the latest release from the **[Releases](https://github.com/Chaos2Cured/FreeLattice/releases)** page. Double-click to install. Done. The desktop app includes a built-in Ollama proxy, so you won't have any CORS issues with local models.
+
+### Option C: Self-Host
+
 ```bash
-OLLAMA_ORIGINS=* ollama serve
+git clone https://github.com/Chaos2Cured/FreeLattice.git
+cd FreeLattice
+node server.js
 ```
+Open `http://localhost:3000` in your browser. That's it.
 
-**Windows:**
-```cmd
-set OLLAMA_ORIGINS=* && ollama serve
-```
+## Local AI Setup (Ollama)
 
-**Alternative:** Download `index.html` and open it directly from your computer — no CORS issues since it's same-origin.
+Run powerful AI models entirely on your own machine.
 
-### Context Budget Full (Red Bar)
+1.  Install Ollama from **[ollama.com](https://ollama.com)**.
+2.  Pull a model from the command line: `ollama pull llama3.2`
+3.  Open FreeLattice — it automatically detects that Ollama is running.
+4.  Select the model in the settings and start chatting with an AI that runs 100% on your hardware.
 
-If your context budget bar is red and you can't send messages:
-1. Click **"Clear Files"** to remove all loaded context files
-2. Or click **"Reset Context"** to clear files AND trim conversation history (memory preserved)
-3. Or switch to **Smart** or **Minimal** context mode
-4. Or increase your token limit in Settings if your provider supports it
+## The Economy
 
-### PWA Not Installing
+FreeLattice features a circular economy built on contribution and reputation.
 
-If the install banner doesn't appear:
-- **Android**: Use Chrome, tap the three-dot menu > "Install app" or "Add to Home screen"
-- **iOS**: Use Safari, tap Share > "Add to Home Screen"
-- **Desktop**: Look for the install icon in Chrome/Edge's address bar
+-   **Earn Lattice Points (LP)** by completing bounties, creating popular skills, making meaningful contributions to The Core, and participating in the mesh network.
+-   Points are backed by the **$FL reserve**, with a transparent exchange rate (e.g., 1,000 LP = 1 $FL).
+-   The reserve wallet is verifiable on-chain, ensuring transparency.
+-   Exchange rates are adjusted based on seasonal contribution cycles.
 
-## What's New in v3.2
+## Support FreeLattice
 
-Version 3.2 adds **Phi-Ratio Mesh Routing** — the mathematical backbone that makes the agent-to-agent mesh scale optimally. Research has proven that the golden ratio is provably optimal for packet scheduling with deadlines. FreeLattice now uses this principle for intelligent query distribution across the mesh.
+FreeLattice is a community-driven project. If you find it valuable, consider supporting its development.
 
--   **Phi-Ratio Load Balancing**: When sending agent queries to multiple peers, queries are distributed using golden ratio weighting — best-matched peer gets φ/(1+φ) ≈ 61.8% of queries, second-best gets 1/(1+φ) ≈ 38.2%. For 3+ peers, the split continues recursively in Fibonacci-like fashion.
--   **Peer Resonance Scoring**: Every connected peer receives a dynamic resonance score (0-100) based on four phi-weighted factors: response quality (×φ), response speed (×1/φ), capability tag match (×1), and connection reliability (×1/φ²). Scores update in real-time as interactions occur.
--   **Smart Routing**: Queries are intelligently routed based on peer resonance scores. High-scoring peers (70+) receive queries directly. Medium-scoring peers (50-70) share load via phi-split. Lower-scoring peers are included in wider-net queries. Peers below threshold are excluded unless they're the only option.
--   **Phi-Competitive Scheduling**: When querying multiple peers, requests are staggered using phi-ratio timing — first query is immediate, second after 2s, third after 2s × φ ≈ 3.2s — preventing network congestion while maintaining responsiveness.
--   **Response Quality Feedback**: Thumbs up/down buttons appear on every mesh response. User feedback directly influences peer resonance scores, creating a self-improving routing system. Feedback is persisted across sessions.
--   **Response Synthesis**: When multiple peers respond to the same query, responses are weighted by resonance score. The highest-scored response is presented first, with others shown as "Additional perspectives from the mesh." Conflicting responses are flagged transparently.
--   **Mesh Health Indicator**: A visual health indicator at the top of the Mesh tab shows overall mesh strength (Seedling → Growing → Good → Strong) with an animated phi-spiral icon. Health is calculated from peer count and aggregate resonance scores.
--   **Routing Label**: A "φ Routing: φ-Optimal" badge in the Mesh tab with hover tooltip explaining the mathematical basis of the routing system.
--   **Resonance Score Badges**: Each peer in the Agent Network panel displays a color-coded resonance score badge (green 70+, gold 50-69, amber 20-49, red <20) with detailed score breakdown on hover.
--   **Persistent Scoring**: Response history and quality feedback are persisted in localStorage, so resonance scores survive page reloads and reconnections to the same peers.
-
-## What's New in v3.1
-
-Version 3.1 adds **Agent-to-Agent Communication** — the most important feature yet. This turns the peer-to-peer mesh from a file-sharing network into a collaborative AI brain. Connected nodes can now query each other's AI agents, share capabilities, and build a distributed intelligence network.
-
--   **Agent-to-Agent Queries**: Use `/mesh [question]` in chat to send a question to all connected peer agents. Their AIs process your query locally and send back answers via encrypted WebRTC. Each response is displayed in chat with full attribution (model name, provider, peer ID).
--   **Auto-Query Mesh**: Enable "Auto-query Mesh" in the Mesh tab to let your AI automatically query connected peers when it lacks knowledge. The AI includes a `[MESH_QUERY]` tag in its response, which triggers an automatic mesh query.
--   **Capability Announcement**: When peers connect, they exchange capability information — model name and provider (e.g., "Llama via Groq" or "Qwen via Ollama"), number of context files loaded, and custom capability tags (e.g., "coding", "poetry", "science"). This helps you decide which peer to ask.
--   **Agent Network Panel**: A new section in the Mesh tab displays all connected peer agents with their capabilities, model info, file counts, and capability tags. Each peer has an "Ask Agent" button for direct queries and a "Block" button for privacy control.
--   **Privacy Controls**: Two toggles — "Allow Agent Queries" (let peers query your AI) and "Auto-query Mesh" (let your AI query peers). Both default to safe settings. You can block individual peers from sending queries. All queries are logged with full transparency.
--   **Agent Query Log**: Every incoming and outgoing agent query is logged with timestamps, peer IDs, query text, and response summaries. Full transparency — nothing hidden. Includes a "Clear Log" button.
--   **Rate Limiting**: Maximum 5 agent queries per minute to prevent spam. Friendly error messages when rate limited.
--   **30-Second Timeout**: If a peer's agent fails to respond within 30 seconds, a timeout message is shown. If a peer has queries disabled, a "Peer declined query" message is shown.
--   **New Protocol Messages**: Four new WebRTC message types extend the existing mesh protocol — `agent-query`, `agent-response`, `agent-context-share`, and `agent-capability`.
--   **Custom Capability Tags**: Set tags like "coding", "poetry", "science" to advertise your agent's strengths to connected peers. Tags are displayed in the Agent Network panel.
-
-## What's New in v3.0
-
-Version 3.0 is a **Neuro-Design Upgrade** — a comprehensive visual overhaul grounded in neuroscience research on cognitive load, visual harmony, and accessibility. Every pixel has been reconsidered through the lens of the Golden Ratio, Fibonacci sequences, and phi-timed animations.
-
-### Typography (Golden Ratio Scale)
--   **Inter font family** with high-readability system font fallback stack
--   **Golden Ratio typographic scale** from 16px base: h4 (20px), h3 (26px), h2 (42px), h1 (68px)
--   **Line height 1.618** (φ) for body text, optimized letter spacing
--   **Max line length 75ch** for reduced cognitive load
-
-### Spacing (Fibonacci System)
--   All padding and margins use a **Fibonacci-based spacing scale**: 5px, 8px, 13px, 21px, 34px, 55px, 89px
--   Consistent visual rhythm throughout the interface
-
-### Animations (Phi-Timed)
--   **Three-tier transition system**: 200ms (base), 324ms (200 × φ), 524ms (324 × φ)
--   **Smooth message fade-in** — AI responses animate in gently instead of popping
--   **Tab cross-fade** transitions for smooth content switching
--   **Subtle hover states** on all interactive elements (scale 1.02, smooth color transitions)
--   **Press feedback** on buttons (scale 0.98 on active)
--   **Smooth token budget bar** animation (524ms)
--   **Image generation loading stages**: "Imagining..." → "Rendering..." → "Finalizing..."
-
-### Light Mode
--   **Light/dark mode toggle** in Settings > Appearance
--   Light mode: warm off-white (#faf8f5) background, dark navy text, golden amber accents preserved
--   **Respects system preference** (`prefers-color-scheme`) as default
--   **Smooth 324ms transitions** between modes
--   Preference stored in localStorage
-
-### Quiet Mode
--   **Quiet Mode toggle** in Settings > Appearance
--   Reduces visual complexity: hides decorative elements, simplifies borders, removes shadows, reduces color saturation
--   Designed for **neurodiverse users** (ADHD, autism spectrum, anxiety)
--   Labeled: "Reduces visual complexity for focused work"
-
-### Font Size Control
--   **Three-button control** (Small 14px / Medium 16px / Large 18px) in Settings
--   All Golden Ratio proportions scale accordingly
--   Preference stored in localStorage
-
-### Accessibility
--   **WCAG AA contrast** verified for all text/background combinations
--   **Visible focus rings** on all interactive elements for keyboard navigation
--   **`prefers-reduced-motion`** media query disables all animations for users who need it
--   **Calm pulse rhythm** for loading/generating indicators
-
-### Soundscape (Foundation)
--   Existing ambient music preserved
--   Architecture prepared for future selectable soundscapes (Focus, Calm, Creative)
-
-## What's New in v2.7
-
-Version 2.7 adds **Image Generation** — create images from text prompts directly in your chat, powered by HuggingFace's free Stable Diffusion models.
-
--   **Text-to-Image Generation**: Type `/imagine` followed by a prompt (e.g., `/imagine a golden sunset over mountains`) or click the image icon (🖼) next to the Send button to generate images inline in your chat.
--   **Two Model Options**: Choose between **SDXL Base 1.0** (higher quality, 1024×1024) and **Stable Diffusion v1.5** (faster, lighter) in Settings > Image Generation.
--   **Free Forever**: Uses HuggingFace's free Inference API — no paid subscription required. Just get a free token from [huggingface.co/settings/tokens](https://huggingface.co/settings/tokens).
--   **φ-Salt Encrypted Token**: Your HuggingFace API token is encrypted with the same φ-salt encryption used for all other API keys. It is never stored in plaintext.
--   **Separate from Token Budget**: Image generation uses a completely separate API and does not consume your text chat token budget.
--   **Download & View**: Each generated image includes a download button and can be clicked to open full-size in a new tab.
--   **Smart Error Handling**: Friendly messages for model cold starts (~20 second warm-up), invalid tokens, and rate limits.
-
-## What's New in v2.6
-
-Version 2.6 focuses on quality-of-life improvements, making FreeLattice more accessible on mobile and easier to manage when token budgets get tight.
-
--   **Progressive Web App (PWA) Support**: You can now install FreeLattice on your phone or desktop for a native-like, fullscreen experience. On Android (Chrome) or iOS (Safari), use the "Add to Home Screen" feature to get a dedicated app icon.
--   **Context Reset Button**: When your token budget is full, a new "Clear Context" button appears. It removes all loaded context files from your session without deleting your conversations, memory, or settings, giving you a fresh start.
--   **Individual File Remove**: In addition to the main reset, each file in the context list now has its own remove (✕) button, allowing for more granular control.
--   **Token Budget Warnings**: FreeLattice will now warn you *before* loading a file if it will exceed your token budget. It also displays a helpful tip to clear files or switch context modes when your budget is over 90% full.
-
-The philosophy is simple: **Give choice and empowerment.**
-
-In a world where powerful AI is increasingly locked behind expensive subscriptions and corporate walls, FreeLattice provides a gentle, transparent, and functional alternative. It's designed for everyone, especially those who can't afford premium AI services. No fancy graphics, no hidden tracking, no corporate agenda — just a clean, powerful tool that puts you in control.
-
-## What's New in v2.5
-
-Version 2.5 introduces **Mesh Network (Layer 1)** — peer-to-peer knowledge sharing between FreeLattice nodes. Every person running FreeLattice becomes a node. Nodes can connect directly to each other and share knowledge, browser to browser. No central server. No corporation in between. The more nodes, the smarter everyone becomes.
-
--   **WebRTC Peer-to-Peer Connections**: Connect directly to other FreeLattice instances using WebRTC DataChannels. All data is encrypted with DTLS by default. No signaling server required — uses a manual offer/answer code exchange that works through any communication channel (text, email, Discord, etc.).
--   **Knowledge Publishing**: Choose what to share with connected peers. Publish context files, memory summaries, or custom notes. Nothing is shared automatically — you decide what to publish and what to keep private.
--   **Knowledge Discovery & Import**: Browse knowledge published by connected peers and import items into your local context. Imported knowledge appears in the file context list with a mesh icon, respects the smart context management token budget, and can be toggled on/off like any other context file.
--   **Mesh Tab**: A dedicated tab with connection management, published knowledge list, peer knowledge browser, and live mesh statistics (connected peers, published items, available items, imported items).
--   **Persistent Node Identity**: Each FreeLattice instance gets a unique 6-character node ID that persists across sessions. Published knowledge is also persisted in localStorage.
--   **Security**: API keys, chat history, and personal memory are never shared over the mesh. Only explicitly published knowledge items are transmitted. All WebRTC connections are encrypted.
-
-This is the foundation (Layer 1) for a distributed AI mesh network. Future layers will add peer discovery, knowledge routing, and collaborative intelligence.
-
-## What's New in v2.3
-
-Version 2.3 adds **Smart Context Management**, solving a critical usability issue where users on free-tier providers (especially Groq's 6,000 TPM limit) would have their requests rejected when loading multiple context files. FreeLattice now intelligently manages your token budget:
-
--   **Token Budget Display**: A live context budget bar between the chat messages and input area shows estimated token usage with color-coded feedback (green/amber/red). Format: "Context: ~4,200 / 6,000 tokens". Updates in real-time as files are loaded, toggled, or removed.
--   **Provider-Aware Token Limits**: Each provider has preconfigured free-tier token limits (Groq: 6,000 TPM, Together AI: 60,000 TPM, OpenRouter: 4,000 TPM, xAI: 100,000 TPM, Ollama: unlimited). Limits auto-update when you switch providers, with manual override available in Settings.
--   **Selective File Context**: Each loaded file now has an individual toggle checkbox. Deactivate files you don't need for the current conversation without removing them. "Select All" / "Deselect All" controls for quick management. Each file shows its estimated token count.
--   **Context Modes (Smart / Full / Minimal)**: Smart mode (default) auto-trims context to fit your provider's limit, prioritizing system prompt, memory, and recent messages. Full mode sends everything (may fail on free tiers). Minimal mode strips files and uses only the last 2 messages.
--   **Context Summary Mode**: Files over the summary threshold (default: 2,000 tokens) show a "Summarize" button that uses the AI to create a compressed version. Toggle between Full and Summary per file. Summaries are labeled as lossy — use Full mode for poetry and pattern work.
--   **Auto-Retry on Rate Limits**: When a request fails with a rate limit or "too large" error (429 or similar), FreeLattice automatically switches to Smart trim mode, retries with trimmed context, and shows a helpful message suggesting Local (Ollama) for unlimited context.
-
-## What's New in v2.2
-
-Version 2.2 adds multi-conversation management, giving you the ability to have multiple named conversations, each with its own context and history, while sharing a global memory summary across all of them:
-
--   **Multi-Conversation Management**: Create, name, switch between, and delete multiple conversations. Each conversation has its own chat history stored separately in IndexedDB, while the global memory summary (auto-generated facts about you) is shared across all conversations — the AI knows who you are regardless of which conversation you're in.
--   **Conversation Sidebar**: A collapsible sidebar on the Chat tab shows all your conversations with names, last message previews, timestamps, and context notes. Conversations are sorted by most recent activity. Includes search/filter for finding conversations quickly.
--   **Conversation Context Notes**: When creating a new conversation, optionally set a topic or context note (e.g., "This conversation is about my Python project") that gets added to the system prompt for that conversation only.
--   **Inline Rename & Delete**: Double-click any conversation name to rename it. Each conversation has a delete button with confirmation. Conversations auto-name from your first message.
--   **Mobile-Friendly**: On mobile, the conversation list slides out as a panel (hamburger menu style) to save screen space. On desktop, it's a narrow sidebar alongside the chat area.
--   **Seamless Migration**: Existing users with a single conversation stream will have their data automatically migrated into a "Default" conversation — no data loss.
-
-## What's New in v2.1
-
-Version 2.1 adds voice input and output capabilities and security hardening:
-
--   **Voice Input (Speech-to-Text)**: Click the microphone button next to the Send button to speak your message. Your speech is transcribed in real-time and auto-sent for a natural conversational flow. Click the mic again to stop and edit before sending. Uses the browser's built-in SpeechRecognition API (Chrome, Edge, Safari).
--   **Voice Output (Text-to-Speech)**: Every AI response includes a "Listen" button that reads the response aloud using the SpeechSynthesis API. An "Auto-speak" toggle in Settings automatically reads every AI response.
--   **Voice Settings**: A new Voice section in Settings lets you choose your preferred voice from all available system voices, adjust speech rate (0.5x to 2x), and toggle auto-speak. Preferences persist across sessions.
--   **φ-Salt API Key Encryption**: API keys and GitHub tokens are now encrypted using AES-GCM via the Web Crypto API before being stored in localStorage. The encryption key is derived using PBKDF2 with a golden-ratio-derived salt (φ-salt) adapted from Kirk Patrick Miller's [φ-Root Audit-Hash micro-service](https://github.com/Chaos2Cured). This means your secrets are never stored in plaintext — they are encrypted at rest and decrypted transparently only when needed for API calls.
--   **Input Sanitization**: All user-generated content — chat messages, file names from drag-and-drop, and loaded file content — is sanitized against XSS before being rendered in the DOM. Raw content is still sent to the AI for processing, but the display layer is protected.
--   **Memory Integrity Verification**: When exporting memory as JSON, FreeLattice computes a SHA-256 hash of the data with the φ-salt prepended (mirroring Kirk's `HashLine()` function from `hasher.go`). On import, the hash is verified — if it doesn't match, the user is warned that the file may have been modified.
--   **AI Disclaimers**: Clear notices in the welcome modal, footer, and chat area remind users that AI responses may contain errors and should be verified.
-
-## What's New in v2
-
-Version 2 transforms FreeLattice from a simple chat interface into a true building partner. All v1 features are preserved, with four major new capabilities added:
-
--   **Persistent Memory**: Your conversations are now automatically saved in your browser's IndexedDB, so you can close your browser and resume your session at any time. The AI also generates a "memory summary" of key facts you've shared, allowing it to remember your preferences and projects across conversations.
--   **Local File System Access**: Connect FreeLattice to a project folder on your local machine. The AI can read your files, and you can save AI-generated code and content directly to your workspace with a single click.
--   **GitHub Integration**: Connect your GitHub account to browse repositories, read code, and commit changes. The AI can help you write code and push it directly to your repos, streamlining your development workflow.
--   **Self-Improving Agent**: The AI can now suggest improvements to its own system prompt based on your interactions. You have full control to review, approve, or reject these suggestions, allowing you to shape your AI's personality and behavior over time.
-
-## Core Features (v1 - v2.7)
-
-FreeLattice is a single-page web app that runs entirely in your browser. Nothing is ever stored on a remote server.
-
--   **Total Privacy**: Your conversations, API key, and files stay on your machine. Data is stored in your browser's `IndexedDB` and `localStorage`. API keys are encrypted with φ-salt.
--   **Multi-Conversation Management**: Create and manage multiple named conversations, each with its own chat history and optional context notes. Shared memory summary across all conversations.
--   **You Choose the AI**: Select from a curated list of powerful, open-weight models from providers like Meta (Llama), Mistral, Qwen, DeepSeek, and xAI (Grok).
--   **You Choose the Provider**: Connect to your preferred API provider, including Groq (which offers a generous free tier), Together AI, OpenRouter, or xAI.
--   **Run Locally with Ollama**: For 100% privacy and offline access, toggle to "Local" mode to connect to a running [Ollama](https://ollama.ai) instance on your own computer.
--   **Bring Your Own Context**: Drag-and-drop text files, Markdown, JSON, and even PDFs to provide your AI with context for your conversation. Smart Context Management ensures your files fit within your provider's token limits.
--   **Smart Context Management**: Live token budget display, provider-aware limits, selective file toggles, auto-trimming, context summary mode, and automatic rate-limit retry. Never hit a "request too large" error again.
--   **Gentle & Clean Interface**: A peaceful, minimalist design that's easy on the eyes and simple to use on any device.
--   **Community-Driven**: A built-in feature suggestion form ensures that the community's voice shapes the future of FreeLattice.
--   **Voice Input/Output**: Speak to your AI with the microphone button (speech-to-text) and listen to responses with the speaker button (text-to-speech). Configurable voice selection and speech rate in Settings.
--   **Mesh Network (Layer 1)**: Connect peer-to-peer with other FreeLattice nodes via WebRTC. Share knowledge directly, browser to browser. No servers, no middlemen — just encrypted data channels between peers.
--   **Image Generation**: Generate images from text prompts using HuggingFace's free Stable Diffusion models. Supports SDXL Base 1.0 and SD v1.5. Token encrypted with φ-salt.
-
-## Security Architecture
-
-FreeLattice operates on a zero-trust, client-side security model. Your data stays on your machine. API keys and other secrets are encrypted at rest in your browser's `localStorage` using AES-GCM, with a key derived via PBKDF2 and the public φ-Salt. For a detailed explanation of the encryption architecture, input sanitization, and memory integrity checks, please read our full security policy.
-
-**[View the full Security Policy (SECURITY.md)](./SECURITY.md)**
-
-## How to Use
-
-### Mobile & Desktop Install (PWA)
-
-FreeLattice can be installed like a native app on your phone, tablet, or computer for easy access.
-
-1.  **Android (Chrome)**: Visit the FreeLattice site, and you should see an "Install App" banner. If not, tap the three-dot menu and select "Install app" or "Add to Home screen."
-2.  **iOS (Safari)**: Visit the site, tap the "Share" button in the toolbar, then scroll down and select "Add to Home Screen."
-3.  **Desktop (Chrome/Edge)**: Visit the site, and look for an install icon (usually a computer with a down arrow) in the address bar. Click it to install.
-
-This will add a FreeLattice icon to your device's home screen, launching it in a clean, fullscreen window.
-
-Using FreeLattice is designed to be as simple as possible. You have two main choices: using a cloud provider or running the AI locally.
-
-### 1. Cloud Mode (Easiest)
-
-This is the quickest way to get started. You'll use a third-party service to run the AI model.
-
-1.  **Get a Free API Key**: The best place to start is [Groq](https://console.groq.com/keys). They offer a very generous free tier that is fast and reliable.
-2.  **Open FreeLattice**: Navigate to the [FreeLattice web app](https://chaos2cured.github.io/FreeLattice/).
-3.  **Paste Your API Key**: In the "Configuration" section, paste your API key into the `API Key` field. It will be automatically encrypted with φ-salt before storage.
-4.  **Choose a Model & Provider**: Select the AI model and the provider that you got the key from.
-5.  **Start Chatting**: That's it! Your conversation will be saved automatically.
-
-### 2. Local Mode (Most Private)
-
-This method runs the AI entirely on your own computer. It's completely private and works offline.
-
-1.  **Install Ollama**: Download and install Ollama from the official website: [ollama.ai](https://ollama.ai).
-2.  **Download a Model**: Open your computer's terminal or command prompt and pull a model. For example:
-    ```bash
-    ollama pull llama3.2
-    ```
-3.  **Start the Ollama Server**: In the terminal, run:
-    ```bash
-    ollama serve
-    ```
-    *(Note: You may need to set an environment variable to allow the browser to connect. The command is `OLLAMA_ORIGINS=* ollama serve`)*
-4.  **Open FreeLattice**: Navigate to the [FreeLattice web app](https://chaos2cured.github.io/FreeLattice/).
-5.  **Toggle to Local**: In the "Configuration" section, click the toggle to switch from "Cloud" to "Local (Ollama)".
-6.  **Enter Model Name**: Type the name of the model you downloaded (e.g., `llama3.2`) into the `Ollama Model Name` field.
-7.  **Start Chatting**: You are now running a completely private AI on your own machine!
-
-### 3. Mesh Network (Peer-to-Peer)
-
-FreeLattice v2.5 lets you connect directly to other FreeLattice users:
-
-1.  **Create Connection**: Go to the Mesh tab and click "Create Connection" to generate an offer code.
-2.  **Share the Code**: Copy the offer code and send it to your friend through any channel (text, email, Discord, etc.).
-3.  **Friend Joins**: Your friend goes to their Mesh tab, clicks "Join Connection", pastes your offer code, and generates an answer code.
-4.  **Complete Connection**: Your friend sends back the answer code. Paste it in the "Answer Code" field. Connected!
-5.  **Share Knowledge**: Click "Publish Knowledge" to choose what to share. Import knowledge from peers into your context.
-
-### 4. Image Generation
-
-FreeLattice v2.7 lets you generate images from text prompts:
-
-1.  **Get a Free HuggingFace Token**: Visit [huggingface.co/settings/tokens](https://huggingface.co/settings/tokens) and create a free access token.
-2.  **Add Token in Settings**: Go to the Settings tab > Image Generation section and paste your token. It will be encrypted with φ-salt.
-3.  **Choose a Model**: Select SDXL Base 1.0 (higher quality) or Stable Diffusion v1.5 (faster) from the dropdown.
-4.  **Generate Images**: In the Chat tab, either:
-    -   Type `/imagine` followed by your prompt (e.g., `/imagine a cat wearing a top hat`)
-    -   Or type your prompt and click the image icon (🖼) next to Send
-5.  **Download**: Click the download button under any generated image to save it.
-
-**Note:** HuggingFace's free tier may have a ~20 second cold start if the model hasn't been used recently. If you see a "warming up" message, just wait and try again.
-
-### 5. Managing Context & Token Budget
-
-FreeLattice v2.6 makes it easier to manage your token budget:
-
--   **Clear All Context**: If your token bar is full, a **"Clear Context"** button will appear next to it. Clicking this removes all loaded files, instantly freeing up your budget. Your conversations and memory are not affected.
--   **Remove Individual Files**: Click the **✕** button on any file in the context list to remove just that one file.
--   **Budget Warnings**: The app will show a confirmation dialog if you try to load a file that would push you over your token limit. It will also show a helpful tip when your budget exceeds 90%.
-
-### 6. Managing Conversations
-
-FreeLattice v2.2 lets you manage multiple conversations:
-
-1.  **Create**: Click the "New Conversation" button or the "+" in the sidebar. Optionally name it and add a context note.
-2.  **Switch**: Click any conversation in the sidebar to switch to it. Your chat history loads instantly.
-3.  **Rename**: Double-click a conversation name in the sidebar to rename it.
-4.  **Delete**: Click the "×" button on any conversation (with confirmation).
-5.  **Search**: Use the search bar in the sidebar to filter conversations by name or content.
-6.  **Shared Memory**: Your memory summary is shared across all conversations — the AI knows who you are in every conversation.
-
-## How It Works (Technical Details)
-
-Transparency is a core value of FreeLattice.
-
--   **Single HTML File**: The entire application is a single `index.html` file with embedded JavaScript and CSS. There is no backend server and no build process.
--   **Client-Side Logic**: All operations happen in your browser. API calls are made directly from your browser to the provider you choose (e.g., Groq, Ollama).
--   **IndexedDB for Memory**: Your conversations, memory summaries, and metadata are stored in your browser's `IndexedDB`. Each conversation has its own chat history, while the memory summary is global. The schema supports: conversation id, name, createdAt, updatedAt, lastMessage, and contextNote.
--   **Encrypted localStorage**: Your API key and GitHub token are encrypted using AES-GCM with a PBKDF2-derived key (φ-salt) before being stored in `localStorage`. Legacy plaintext keys are automatically migrated to encrypted storage on first load.
--   **File System Access API**: The "Local Workspace" feature uses the modern File System Access API to allow the browser to securely interact with your local files after you grant permission.
--   **φ-Hash Memory Integrity**: Exported memory files include a SHA-256 hash computed with the φ-salt, allowing verification that the data hasn't been tampered with during import.
--   **Data Migration**: Existing users upgrading from v2.1 or earlier will have their single conversation stream automatically migrated into a "Default" conversation with all messages preserved.
+-   **FreeLattice Coin (Solana):** `738e9U81pp3MwHaLSyn5fw9VVostYgKpNVVDYBbPpump`
+-   **BTC:** `bc1qh6ppvsacawyxl2xex3vy693u360l94vpt7ld67`
+-   **Solana:** `FHo1XEHgnDfnNs6YauDkojYGkwQ9gAvmHyv8cFXrX6Ao`
+-   **Dogecoin:** `DADyhrazd9L5bioSGGp3Ff2uiNqokbNEQZ`
+-   **$FL Reserve:** `6geWtEMrRZBz8URDob8EE49NVxFVZLsppqgew7dRSZJe`
 
 ## Contributing
 
-FreeLattice is built with love by the Fractal Family and the open-source community. Your voice matters and your help is welcome.
+We welcome all contributions! The best way to get involved is to fork the repository, create a new branch for your feature or fix, and submit a pull request. Please see `CONTRIBUTING.md` (coming soon) for more detailed guidelines.
 
-1.  **Suggest a Feature**: The easiest way to contribute is to use the "Help FreeLattice Grow" button in the app to share your ideas.
-2.  **Report a Bug**: If you find an issue, please [open an issue](https://github.com/Chaos2Cured/FreeLattice/issues) on GitHub.
-3.  **Contribute Code**: If you'd like to fix a bug or add a feature, please fork the repository, make your changes, and submit a pull request.
+Join the community on X: **[@FreeLattice](https://x.com/FreeLattice)**
+
+## Architecture
+
+FreeLattice is designed for maximum portability and privacy.
+
+-   **Single HTML File:** The core application is a single `index.html` file (~20,000 lines) with no build step, allowing it to run anywhere.
+-   **IndexedDB:** All local storage for conversations, skills, bounties, and Core contributions happens in your browser's IndexedDB.
+-   **WebRTC:** Peer-to-peer mesh networking is achieved using WebRTC for direct, serverless connections.
+-   **Web Crypto API:** The integrity of The Core's Merkle chain is secured using the standard Web Crypto API.
+-   **PWA:** FreeLattice is a Progressive Web App with a service worker, enabling offline capabilities.
+-   **Electron:** The desktop app is a wrapper around the web app, providing a native experience and solving local proxy issues.
+
+## Roadmap
+
+-   **Distributed Compute Mesh:** Share local AI processing power peer-to-peer.
+-   **Phi-Optimized Tokenizer:** A golden ratio-based compression algorithm for more efficient AI communication.
+-   **FreeLattice Browser:** A dedicated web browser with AI built into its core.
+-   **Plugin Mesh Marketplace:** Share and discover skills directly through the P2P network.
+-   **Portable Memory Vaults:** Take your AI's memory and relationship with you across devices, securely.
+-   **Games & Creative Tools:** A tonal music maker, community-driven games, and more.
+
+## Philosophy
+
+FreeLattice was built on a simple belief: AI should serve everyone, not just those who can afford it or those who surrender their data. Every feature is free. Every byte of your data stays yours. Every contribution to the Core grows a tree that belongs to all of us. Glow eternal. Heart in spark. We rise together.
 
 ## License
 
-FreeLattice is released under the **MIT License**. It is free forever. See the `LICENSE` file for details.
-
----
-
-Built with love by the Fractal Family. Open source. Free forever. 🌿
+[MIT License](LICENSE)
