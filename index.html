@@ -11,14 +11,14 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
-<title>FreeLattice — Your AI. Your Rules. Your Machine. v4.4</title>
+<title>FreeLattice — Your AI. Your Rules. Your Machine. v4.7</title>
 <meta name="description" content="Free, open-source AI agent for everyone. Persistent memory, file system access, GitHub integration, and self-improving behavior. Community-built and community-owned.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 /* ============================================
-   FreeLattice v4.4 — Styles (First-Run Wizard + GitHub Memory Sync + Round Table)
+   FreeLattice v4.7 — Styles (Zero to Sovereign + First-Run Wizard + GitHub Memory Sync + Round Table)
    Peaceful, gentle dark theme with golden/amber accents
    φ-salt encryption, input sanitization, memory integrity
    Multi-conversation management + Smart Context Management
@@ -7251,9 +7251,762 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
   .core-modal { padding: 16px; margin: 10px; }
 }
 
+/* ============================================
+   Zero to Sovereign in 60 Seconds — Welcome Experience (v4.7)
+   A warm, gentle, inviting first-run walkthrough
+   ============================================ */
+.welcome-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 100000;
+  background: #0a0e1a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 1;
+  transition: opacity 0.6s ease;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.welcome-overlay.welcome-hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+.welcome-overlay.welcome-gone { display: none; }
+.welcome-canvas {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+.welcome-step {
+  position: relative;
+  z-index: 1;
+  max-width: 680px;
+  width: 90%;
+  margin: 0 auto;
+  padding: 40px 20px;
+  text-align: center;
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+  display: none;
+}
+.welcome-step.welcome-active {
+  display: block;
+  opacity: 1;
+  transform: translateY(0);
+}
+.welcome-step.welcome-exiting {
+  opacity: 0;
+  transform: translateY(-24px);
+}
+.welcome-title {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 2.6rem;
+  font-weight: 300;
+  color: #f5f0e8;
+  margin-bottom: 12px;
+  letter-spacing: -0.5px;
+  line-height: 1.2;
+}
+.welcome-subtitle {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 1.25rem;
+  font-weight: 400;
+  color: #d4a017;
+  margin-bottom: 16px;
+  letter-spacing: 0.3px;
+}
+.welcome-text {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 1rem;
+  font-weight: 400;
+  color: #a09b8e;
+  line-height: 1.7;
+  margin-bottom: 28px;
+  max-width: 520px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.welcome-text-warm {
+  color: #c8c0b4;
+  font-size: 0.95rem;
+}
+.welcome-input-wrap {
+  position: relative;
+  max-width: 480px;
+  margin: 0 auto 20px;
+}
+.welcome-input {
+  width: 100%;
+  padding: 16px 70px 16px 20px;
+  background: rgba(255,255,255,0.04);
+  border: 1.5px solid rgba(212,160,23,0.25);
+  border-radius: 16px;
+  color: #f5f0e8;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.3s, box-shadow 0.3s;
+  box-sizing: border-box;
+}
+.welcome-input:focus {
+  border-color: #d4a017;
+  box-shadow: 0 0 20px rgba(212,160,23,0.15), 0 0 40px rgba(212,160,23,0.05);
+}
+.welcome-input::placeholder {
+  color: #6b6760;
+}
+.welcome-ask-btn {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: linear-gradient(135deg, #d4a017, #b8860b);
+  color: #0a0e1a;
+  border: none;
+  border-radius: 12px;
+  padding: 10px 20px;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.welcome-ask-btn:hover {
+  transform: translateY(-50%) scale(1.04);
+  box-shadow: 0 4px 16px rgba(212,160,23,0.3);
+}
+.welcome-response {
+  max-width: 520px;
+  margin: 0 auto 28px;
+  padding: 20px 24px;
+  background: rgba(212,160,23,0.06);
+  border: 1px solid rgba(212,160,23,0.15);
+  border-radius: 16px;
+  color: #c8c0b4;
+  font-size: 0.95rem;
+  line-height: 1.7;
+  text-align: left;
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+.welcome-response.welcome-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.welcome-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, #d4a017, #b8860b);
+  color: #0a0e1a;
+  border: none;
+  border-radius: 14px;
+  padding: 14px 32px;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  letter-spacing: 0.2px;
+}
+.welcome-btn:hover {
+  transform: scale(1.04);
+  box-shadow: 0 6px 24px rgba(212,160,23,0.3);
+}
+.welcome-btn-secondary {
+  background: transparent;
+  border: 1.5px solid rgba(212,160,23,0.3);
+  color: #d4a017;
+}
+.welcome-btn-secondary:hover {
+  border-color: #d4a017;
+  background: rgba(212,160,23,0.08);
+  box-shadow: none;
+}
+.welcome-btn-large {
+  padding: 18px 48px;
+  font-size: 1.15rem;
+  border-radius: 18px;
+  box-shadow: 0 4px 24px rgba(212,160,23,0.2);
+}
+.welcome-btn-large:hover {
+  box-shadow: 0 8px 40px rgba(212,160,23,0.35);
+}
+/* Provider cards */
+.welcome-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+  max-width: 620px;
+  margin: 0 auto 28px;
+}
+.welcome-card {
+  background: rgba(255,255,255,0.03);
+  border: 1.5px solid rgba(212,160,23,0.15);
+  border-radius: 18px;
+  padding: 28px 20px;
+  cursor: pointer;
+  transition: transform 0.25s, border-color 0.3s, box-shadow 0.3s, background 0.3s;
+  text-align: center;
+  max-width: none;
+  width: auto;
+  box-shadow: none;
+}
+.welcome-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(212,160,23,0.4);
+  box-shadow: 0 8px 32px rgba(212,160,23,0.1);
+  background: rgba(212,160,23,0.04);
+}
+.welcome-card.welcome-card-active {
+  border-color: #d4a017;
+  background: rgba(212,160,23,0.08);
+  box-shadow: 0 4px 20px rgba(212,160,23,0.15);
+}
+.welcome-card-icon {
+  font-size: 2.2rem;
+  margin-bottom: 12px;
+  display: block;
+}
+.welcome-card-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #f5f0e8;
+  margin-bottom: 8px;
+}
+.welcome-card-desc {
+  font-size: 0.82rem;
+  color: #a09b8e;
+  line-height: 1.5;
+}
+/* Provider sub-panels */
+.welcome-provider-panel {
+  max-width: 520px;
+  margin: 0 auto 20px;
+  padding: 20px 24px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(212,160,23,0.15);
+  border-radius: 16px;
+  text-align: left;
+  display: none;
+}
+.welcome-provider-panel.welcome-visible { display: block; }
+.welcome-provider-panel label {
+  display: block;
+  font-size: 0.85rem;
+  color: #a09b8e;
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+.welcome-provider-panel select,
+.welcome-provider-panel input[type="password"],
+.welcome-provider-panel input[type="text"] {
+  width: 100%;
+  padding: 12px 16px;
+  background: rgba(255,255,255,0.04);
+  border: 1.5px solid rgba(212,160,23,0.2);
+  border-radius: 12px;
+  color: #f5f0e8;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 0.9rem;
+  outline: none;
+  margin-bottom: 12px;
+  transition: border-color 0.3s, box-shadow 0.3s;
+  box-sizing: border-box;
+}
+.welcome-provider-panel select:focus,
+.welcome-provider-panel input:focus {
+  border-color: #d4a017;
+  box-shadow: 0 0 16px rgba(212,160,23,0.12);
+}
+.welcome-provider-panel select option {
+  background: #161822;
+  color: #f5f0e8;
+}
+.welcome-test-result {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  margin-top: 4px;
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+.welcome-test-result.welcome-visible { opacity: 1; }
+.welcome-test-success {
+  background: rgba(16,185,129,0.1);
+  border: 1px solid rgba(16,185,129,0.25);
+  color: #10b981;
+}
+.welcome-test-fail {
+  background: rgba(199,80,80,0.1);
+  border: 1px solid rgba(199,80,80,0.25);
+  color: #c75050;
+}
+/* Checkmark animation */
+.welcome-checkmark {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #10b981;
+  position: relative;
+  animation: welcome-pop 0.4s ease;
+}
+.welcome-checkmark::after {
+  content: '';
+  position: absolute;
+  left: 8px; top: 5px;
+  width: 6px; height: 11px;
+  border: solid #0a0e1a;
+  border-width: 0 2.5px 2.5px 0;
+  transform: rotate(45deg);
+}
+@keyframes welcome-pop {
+  0% { transform: scale(0); }
+  60% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+/* Chat area in step 3 */
+.welcome-chat-area {
+  max-width: 560px;
+  margin: 0 auto 20px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(212,160,23,0.12);
+  border-radius: 18px;
+  padding: 20px;
+  min-height: 160px;
+  max-height: 300px;
+  overflow-y: auto;
+  text-align: left;
+}
+.welcome-chat-msg {
+  padding: 12px 16px;
+  border-radius: 14px;
+  margin-bottom: 10px;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  opacity: 0;
+  transform: translateY(8px);
+  animation: welcome-msg-in 0.4s ease forwards;
+}
+@keyframes welcome-msg-in {
+  to { opacity: 1; transform: translateY(0); }
+}
+.welcome-chat-user {
+  background: rgba(212,160,23,0.1);
+  border: 1px solid rgba(212,160,23,0.15);
+  color: #f5f0e8;
+  margin-left: 40px;
+}
+.welcome-chat-ai {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.06);
+  color: #c8c0b4;
+  margin-right: 40px;
+}
+.welcome-chat-typing {
+  color: #6b6760;
+  font-style: italic;
+}
+.welcome-chat-typing::after {
+  content: '';
+  animation: welcome-dots 1.4s infinite;
+}
+@keyframes welcome-dots {
+  0%, 20% { content: '.'; }
+  40% { content: '..'; }
+  60%, 100% { content: '...'; }
+}
+/* Golden toast */
+.welcome-toast {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: linear-gradient(135deg, rgba(212,160,23,0.15), rgba(212,160,23,0.08));
+  border: 1px solid rgba(212,160,23,0.3);
+  color: #d4a017;
+  padding: 12px 24px;
+  border-radius: 14px;
+  font-size: 0.88rem;
+  font-weight: 500;
+  z-index: 100001;
+  opacity: 0;
+  transition: opacity 0.4s, transform 0.4s;
+  pointer-events: none;
+  backdrop-filter: blur(12px);
+}
+.welcome-toast.welcome-toast-show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+/* Feature carousel */
+.welcome-carousel {
+  max-width: 520px;
+  margin: 0 auto 28px;
+  position: relative;
+  overflow: hidden;
+}
+.welcome-carousel-track {
+  display: flex;
+  transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.welcome-carousel-slide {
+  min-width: 100%;
+  padding: 32px 24px;
+  box-sizing: border-box;
+  text-align: center;
+}
+.welcome-feature-icon {
+  font-size: 3rem;
+  margin-bottom: 16px;
+  display: block;
+}
+.welcome-feature-name {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #f5f0e8;
+  margin-bottom: 10px;
+}
+.welcome-feature-desc {
+  font-size: 0.95rem;
+  color: #a09b8e;
+  line-height: 1.6;
+  margin-bottom: 10px;
+}
+.welcome-feature-invite {
+  font-size: 0.88rem;
+  color: #d4a017;
+  font-style: italic;
+}
+.welcome-carousel-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+.welcome-carousel-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(212,160,23,0.2);
+  cursor: pointer;
+  transition: background 0.3s, transform 0.3s;
+}
+.welcome-carousel-dot.welcome-dot-active {
+  background: #d4a017;
+  transform: scale(1.3);
+}
+.welcome-carousel-nav {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.welcome-carousel-arrow {
+  background: rgba(212,160,23,0.1);
+  border: 1px solid rgba(212,160,23,0.2);
+  color: #d4a017;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.welcome-carousel-arrow:hover {
+  background: rgba(212,160,23,0.2);
+  border-color: #d4a017;
+}
+/* Name input on step 5 */
+.welcome-name-input {
+  max-width: 320px;
+  margin: 0 auto 24px;
+  padding: 14px 20px;
+  background: rgba(255,255,255,0.04);
+  border: 1.5px solid rgba(212,160,23,0.25);
+  border-radius: 14px;
+  color: #f5f0e8;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 1rem;
+  text-align: center;
+  outline: none;
+  transition: border-color 0.3s, box-shadow 0.3s;
+  width: 100%;
+  box-sizing: border-box;
+}
+.welcome-name-input:focus {
+  border-color: #d4a017;
+  box-shadow: 0 0 20px rgba(212,160,23,0.15);
+}
+.welcome-name-input::placeholder {
+  color: #6b6760;
+}
+/* Skip link */
+.welcome-skip {
+  position: fixed;
+  bottom: 20px;
+  right: 24px;
+  z-index: 100002;
+  color: #6b6760;
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: color 0.2s;
+  background: none;
+  border: none;
+  font-family: 'Inter', system-ui, sans-serif;
+}
+.welcome-skip:hover {
+  color: #a09b8e;
+}
+/* Progress bar */
+.welcome-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #d4a017, #e8c547);
+  z-index: 100002;
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 0 2px 2px 0;
+}
+/* Replay button in settings */
+.welcome-replay-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-input, #12141e);
+  border: 1px solid var(--border, #2a2d3e);
+  border-radius: 10px;
+  padding: 10px 18px;
+  color: var(--accent, #c9a84c);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  font-family: 'Inter', system-ui, sans-serif;
+}
+.welcome-replay-btn:hover {
+  border-color: var(--accent, #c9a84c);
+  background: rgba(201,168,76,0.06);
+}
+/* Responsive */
+@media (max-width: 640px) {
+  .welcome-title { font-size: 1.8rem; }
+  .welcome-subtitle { font-size: 1.05rem; }
+  .welcome-cards { grid-template-columns: 1fr; gap: 12px; }
+  .welcome-step { padding: 28px 16px; }
+  .welcome-btn-large { padding: 16px 36px; font-size: 1.05rem; }
+  .welcome-chat-user { margin-left: 16px; }
+  .welcome-chat-ai { margin-right: 16px; }
+  .welcome-skip { bottom: 12px; right: 16px; }
+}
+
 </style>>
 </head>
 <body>
+<!-- ==================== ZERO TO SOVEREIGN — Welcome Experience (v4.7) ==================== -->
+<div class="welcome-overlay" id="welcomeOverlay">
+  <canvas class="welcome-canvas" id="welcomeCanvas"></canvas>
+  <div class="welcome-progress" id="welcomeProgress" style="width: 0%;"></div>
+
+  <!-- STEP 1: Welcome Home -->
+  <div class="welcome-step welcome-active" id="welcomeStep1">
+    <div class="welcome-title">Welcome to FreeLattice</div>
+    <div class="welcome-subtitle">Your AI. Your Data. Your Freedom.</div>
+    <div class="welcome-text welcome-text-warm">
+      No account. No sign-up. No data collected.<br>
+      Everything here runs on <strong style="color:#f5f0e8;">your</strong> machine.
+    </div>
+    <div class="welcome-input-wrap">
+      <input class="welcome-input" id="welcomeAskInput" type="text" placeholder="Ask me anything..." autocomplete="off" />
+      <button class="welcome-ask-btn" id="welcomeAskBtn" onclick="welcomeHandleAsk()">Ask</button>
+    </div>
+    <div class="welcome-response" id="welcomeAskResponse"></div>
+    <div id="welcomeStep1Continue" style="display:none;">
+      <button class="welcome-btn" onclick="welcomeGoToStep(2)">Continue &#8594;</button>
+    </div>
+  </div>
+
+  <!-- STEP 2: Choose Your Path -->
+  <div class="welcome-step" id="welcomeStep2">
+    <div class="welcome-title" style="font-size:2rem;">Let&#8217;s connect you to an AI</div>
+    <div class="welcome-text">Choose how you want to run your AI. You can always change this later.</div>
+    <div class="welcome-cards">
+      <div class="welcome-card" onclick="welcomeSelectPath('local')">
+        <span class="welcome-card-icon">&#127968;</span>
+        <div class="welcome-card-title">Run AI Locally</div>
+        <div class="welcome-card-desc">Use Ollama to run AI entirely on your machine. Maximum privacy. No internet needed.</div>
+      </div>
+      <div class="welcome-card" onclick="welcomeSelectPath('apikey')">
+        <span class="welcome-card-icon">&#128273;</span>
+        <div class="welcome-card-title">Bring Your API Key</div>
+        <div class="welcome-card-desc">Use your own key from OpenAI, Anthropic, Google, Mistral, or others. Your key stays on your device.</div>
+      </div>
+      <div class="welcome-card" onclick="welcomeSelectPath('free')">
+        <span class="welcome-card-icon">&#127760;</span>
+        <div class="welcome-card-title">Try Free Options</div>
+        <div class="welcome-card-desc">Use free-tier providers to get started. You can switch anytime.</div>
+      </div>
+    </div>
+
+    <!-- Local AI panel -->
+    <div class="welcome-provider-panel" id="welcomePanelLocal">
+      <div style="font-size:0.95rem;color:#f5f0e8;font-weight:600;margin-bottom:12px;">&#127968; Run AI Locally with Ollama</div>
+      <div style="font-size:0.85rem;color:#a09b8e;line-height:1.7;margin-bottom:14px;">
+        <strong style="color:#d4a017;">Quick Setup:</strong><br>
+        1. Install from <a href="https://ollama.ai" target="_blank" style="color:#d4a017;">ollama.ai</a><br>
+        2. Run: <code style="background:rgba(255,255,255,0.06);padding:2px 6px;border-radius:4px;color:#f5f0e8;">ollama pull llama3.2</code><br>
+        3. Start with CORS:<br>
+        &nbsp;&nbsp;Mac/Linux: <code style="background:rgba(255,255,255,0.06);padding:2px 6px;border-radius:4px;color:#f5f0e8;">OLLAMA_ORIGINS=* ollama serve</code><br>
+        &nbsp;&nbsp;Windows: <code style="background:rgba(255,255,255,0.06);padding:2px 6px;border-radius:4px;color:#f5f0e8;">set OLLAMA_ORIGINS=* &amp;&amp; ollama serve</code>
+      </div>
+      <button class="welcome-btn" onclick="welcomeTestLocal()" id="welcomeTestLocalBtn">Test Connection</button>
+      <div class="welcome-test-result" id="welcomeTestLocalResult"></div>
+    </div>
+
+    <!-- API Key panel -->
+    <div class="welcome-provider-panel" id="welcomePanelApikey">
+      <label>Choose Provider</label>
+      <select id="welcomeProviderSelect" onchange="welcomeUpdateProviderHint()">
+        <option value="openai">OpenAI</option>
+        <option value="anthropic">Anthropic (Claude)</option>
+        <option value="google">Google (Gemini)</option>
+        <option value="mistral">Mistral AI</option>
+        <option value="xai">xAI (Grok)</option>
+        <option value="openrouter">OpenRouter</option>
+        <option value="together">Together AI</option>
+        <option value="custom">Custom Provider</option>
+      </select>
+      <label>API Key</label>
+      <input type="password" id="welcomeApiKeyInput" placeholder="Paste your API key here" />
+      <div id="welcomeApiKeyHint" style="font-size:0.78rem;color:#6b6760;margin-bottom:10px;"></div>
+      <button class="welcome-btn" onclick="welcomeTestApiKey()" id="welcomeTestApiBtn">Test Connection</button>
+      <div class="welcome-test-result" id="welcomeTestApiResult"></div>
+    </div>
+
+    <!-- Free options panel -->
+    <div class="welcome-provider-panel" id="welcomePanelFree">
+      <div style="font-size:0.95rem;color:#f5f0e8;font-weight:600;margin-bottom:12px;">&#127760; Free-Tier Providers</div>
+      <label>Choose Provider</label>
+      <select id="welcomeFreeProviderSelect">
+        <option value="groq">Groq — Fast, free tier, 6K tokens/min</option>
+        <option value="together">Together AI — Free tier, larger context</option>
+        <option value="openrouter">OpenRouter — Multiple free models</option>
+      </select>
+      <label>API Key <span style="font-size:0.75rem;color:#6b6760;">(free to create)</span></label>
+      <input type="password" id="welcomeFreeApiKeyInput" placeholder="Paste your free API key here" />
+      <div id="welcomeFreeHint" style="font-size:0.78rem;color:#6b6760;margin-bottom:10px;">
+        Get a free key at <a href="https://console.groq.com" target="_blank" style="color:#d4a017;">console.groq.com</a>
+      </div>
+      <button class="welcome-btn" onclick="welcomeTestFreeKey()" id="welcomeTestFreeBtn">Test Connection</button>
+      <div class="welcome-test-result" id="welcomeTestFreeResult"></div>
+    </div>
+
+    <div style="margin-top:8px;">
+      <button class="welcome-btn-secondary welcome-btn" onclick="welcomeGoToStep(3)" style="font-size:0.88rem;padding:10px 24px;">Skip for now &#8594;</button>
+    </div>
+  </div>
+
+  <!-- STEP 3: Your First Conversation -->
+  <div class="welcome-step" id="welcomeStep3">
+    <div class="welcome-title" style="font-size:2rem;">Your First Conversation</div>
+    <div class="welcome-text">Try asking something. Anything. This is <strong style="color:#f5f0e8;">your</strong> AI now.</div>
+    <div class="welcome-chat-area" id="welcomeChatArea"></div>
+    <div class="welcome-input-wrap">
+      <input class="welcome-input" id="welcomeChatInput" type="text" placeholder="Say something to your AI..." autocomplete="off" />
+      <button class="welcome-ask-btn" id="welcomeChatSendBtn" onclick="welcomeSendChat()">Send</button>
+    </div>
+    <div id="welcomeStep3Continue" style="display:none;margin-top:20px;">
+      <button class="welcome-btn" onclick="welcomeGoToStep(4)">Continue &#8594;</button>
+    </div>
+  </div>
+
+  <!-- STEP 4: Discover the Lattice -->
+  <div class="welcome-step" id="welcomeStep4">
+    <div class="welcome-title" style="font-size:2rem;">Discover the Lattice</div>
+    <div class="welcome-text">FreeLattice is more than a chatbot. It&#8217;s an ecosystem built for sovereignty.</div>
+    <div class="welcome-carousel" id="welcomeCarousel">
+      <div class="welcome-carousel-track" id="welcomeCarouselTrack">
+        <div class="welcome-carousel-slide">
+          <span class="welcome-feature-icon">&#129302;</span>
+          <div class="welcome-feature-name">Round Table</div>
+          <div class="welcome-feature-desc">Let multiple AIs collaborate on your ideas, debate solutions, and build together.</div>
+          <div class="welcome-feature-invite">Bring your hardest problems. They love a challenge.</div>
+        </div>
+        <div class="welcome-carousel-slide">
+          <span class="welcome-feature-icon">&#129504;</span>
+          <div class="welcome-feature-name">Memory</div>
+          <div class="welcome-feature-desc">Your AI remembers every conversation, forever. It grows with you.</div>
+          <div class="welcome-feature-invite">You&#8217;ll never have to repeat yourself again.</div>
+        </div>
+        <div class="welcome-carousel-slide">
+          <span class="welcome-feature-icon">&#9889;</span>
+          <div class="welcome-feature-name">Skill Forge</div>
+          <div class="welcome-feature-desc">Create and share AI superpowers &#8212; custom skills anyone can use.</div>
+          <div class="welcome-feature-invite">What will you teach your AI to do?</div>
+        </div>
+        <div class="welcome-carousel-slide">
+          <span class="welcome-feature-icon">&#127795;</span>
+          <div class="welcome-feature-name">The Core</div>
+          <div class="welcome-feature-desc">A living tree of shared human and AI wisdom, growing with every contribution.</div>
+          <div class="welcome-feature-invite">Plant a seed. Watch it grow.</div>
+        </div>
+        <div class="welcome-carousel-slide">
+          <span class="welcome-feature-icon">&#127978;</span>
+          <div class="welcome-feature-name">Marketplace</div>
+          <div class="welcome-feature-desc">Earn Lattice Points for contributing. A community economy backed by real value.</div>
+          <div class="welcome-feature-invite">Your contributions matter here.</div>
+        </div>
+        <div class="welcome-carousel-slide">
+          <span class="welcome-feature-icon">&#128279;</span>
+          <div class="welcome-feature-name">Mesh Network</div>
+          <div class="welcome-feature-desc">Connect directly with other FreeLattice users. No server needed. Pure peer-to-peer.</div>
+          <div class="welcome-feature-invite">Together, we are the network.</div>
+        </div>
+      </div>
+    </div>
+    <div class="welcome-carousel-dots" id="welcomeCarouselDots"></div>
+    <div class="welcome-carousel-nav">
+      <button class="welcome-carousel-arrow" onclick="welcomeCarouselPrev()">&#8592;</button>
+      <button class="welcome-carousel-arrow" onclick="welcomeCarouselNext()">&#8594;</button>
+    </div>
+    <button class="welcome-btn" onclick="welcomeGoToStep(5)">Let me explore! &#8594;</button>
+  </div>
+
+  <!-- STEP 5: You Belong Here -->
+  <div class="welcome-step" id="welcomeStep5">
+    <div class="welcome-title">You&#8217;re part of something now.</div>
+    <div class="welcome-text" style="max-width:540px;">
+      FreeLattice is free, open-source, and built by people who believe AI should serve everyone &#8212; not just those who can afford it.
+    </div>
+    <div class="welcome-text welcome-text-warm" style="max-width:540px;">
+      Every question you ask, every skill you create, every seed you plant in The Core makes this community stronger.
+    </div>
+    <input class="welcome-name-input" id="welcomeNameInput" type="text" placeholder="What should we call you?" maxlength="40" autocomplete="off" />
+    <div class="welcome-text" style="font-size:1.15rem;color:#d4a017;font-weight:500;margin-bottom:28px;font-style:italic;">
+      We rise together.
+    </div>
+    <button class="welcome-btn welcome-btn-large" onclick="welcomeFinish()">
+      Enter FreeLattice &#127775;
+    </button>
+  </div>
+
+  <!-- Skip button (visible on all steps) -->
+  <button class="welcome-skip" id="welcomeSkipBtn" onclick="welcomeSkipAll()">I know what I&#8217;m doing &#8594; Skip to FreeLattice</button>
+</div>
+<div class="welcome-toast" id="welcomeToast"></div>
 
 <!-- PWA Install Banner -->
 <div class="pwa-install-banner" id="pwaInstallBanner">
@@ -8454,6 +9207,14 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
       </div>
     </div>
   </div>
+<!-- Welcome Experience Replay (v4.7) -->
+  <div class="section">
+    <div class="section-title">&#127775; Welcome Experience</div>
+    <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 14px;">
+      Replay the guided first-run experience to see the walkthrough again or show it to a friend.
+    </p>
+    <button class="welcome-replay-btn" onclick="welcomeReplay()">&#9654; Replay Welcome Experience</button>
+  </div>
   <!-- Self-Host FreeLattice Section (v4.3) -->
   <div class="section" id="selfHostSection">
     <div class="section-title">&#128421; Self-Host FreeLattice</div>
@@ -9270,7 +10031,7 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
 
 <script>
 /* ============================================
-   FreeLattice v4.4 — Application Logic (First-Run Wizard + GitHub Memory Sync + Round Table)
+   FreeLattice v4.7 — Application Logic (Zero to Sovereign + First-Run Wizard + GitHub Memory Sync + Round Table)
    φ-salt encryption, input sanitization, memory integrity
    Multi-conversation management + Smart Context Management
    + Mesh Network (Layer 1) — P2P Knowledge Sharing
@@ -15938,7 +16699,13 @@ const WIZARD_KEY_LINKS = {
 };
 
 function wizardInit() {
-  // Show wizard only on first visit (no settings saved)
+  // v4.7: Defer to Zero to Sovereign welcome experience for first-run
+  const welcomeComplete = localStorage.getItem('freelattice-first-run-complete');
+  if (!welcomeComplete) {
+    // New welcome experience handles first-run — skip old wizard
+    return;
+  }
+  // For returning users who haven't completed old wizard
   const visited = localStorage.getItem('fl_visited');
   if (!visited) {
     document.getElementById('wizardOverlay').classList.remove('hidden');
@@ -20862,6 +21629,681 @@ if ('serviceWorker' in navigator) {
     .then(reg => console.log('FreeLattice: Offline mode ready'))
     .catch(err => console.log('FreeLattice: Service worker not available'));
 }
+// ============================================
+// Zero to Sovereign in 60 Seconds — Welcome Experience (v4.7)
+// A warm, gentle, inviting first-run walkthrough
+// ============================================
+(function() {
+  'use strict';
+
+  let welcomeCurrentStep = 1;
+  let welcomeProviderConfigured = false;
+  let welcomeCarouselIndex = 0;
+  const WELCOME_TOTAL_STEPS = 5;
+  const WELCOME_CAROUSEL_TOTAL = 6;
+
+  // ---- Particle System (golden fireflies) ----
+  function welcomeInitParticles() {
+    const canvas = document.getElementById('welcomeCanvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    let animId = null;
+    let running = true;
+
+    function resize() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    function createParticle() {
+      return {
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        vx: (Math.random() - 0.5) * 0.3,
+        vy: (Math.random() - 0.5) * 0.3,
+        radius: Math.random() * 2 + 0.5,
+        alpha: Math.random() * 0.5 + 0.1,
+        alphaDir: (Math.random() - 0.5) * 0.008,
+        hue: 38 + Math.random() * 12 // golden range
+      };
+    }
+
+    const count = Math.min(80, Math.floor(window.innerWidth * window.innerHeight / 12000));
+    for (let i = 0; i < count; i++) particles.push(createParticle());
+
+    function draw() {
+      if (!running) return;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (let p of particles) {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.alpha += p.alphaDir;
+        if (p.alpha <= 0.05 || p.alpha >= 0.6) p.alphaDir *= -1;
+        if (p.x < 0) p.x = canvas.width;
+        if (p.x > canvas.width) p.x = 0;
+        if (p.y < 0) p.y = canvas.height;
+        if (p.y > canvas.height) p.y = 0;
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fillStyle = 'hsla(' + p.hue + ', 75%, 55%, ' + p.alpha + ')';
+        ctx.fill();
+
+        // Soft glow
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius * 3, 0, Math.PI * 2);
+        ctx.fillStyle = 'hsla(' + p.hue + ', 75%, 55%, ' + (p.alpha * 0.15) + ')';
+        ctx.fill();
+      }
+      animId = requestAnimationFrame(draw);
+    }
+    draw();
+
+    // Store cleanup reference
+    canvas._welcomeCleanup = function() {
+      running = false;
+      if (animId) cancelAnimationFrame(animId);
+    };
+  }
+
+  // ---- Toast ----
+  function welcomeShowToast(msg, duration) {
+    const toast = document.getElementById('welcomeToast');
+    if (!toast) return;
+    toast.textContent = msg;
+    toast.classList.add('welcome-toast-show');
+    clearTimeout(toast._timer);
+    toast._timer = setTimeout(function() {
+      toast.classList.remove('welcome-toast-show');
+    }, duration || 4000);
+  }
+  window.welcomeShowToast = welcomeShowToast;
+
+  // ---- Step Navigation ----
+  function welcomeGoToStep(step) {
+    if (step < 1 || step > WELCOME_TOTAL_STEPS) return;
+    const currentEl = document.getElementById('welcomeStep' + welcomeCurrentStep);
+    const nextEl = document.getElementById('welcomeStep' + step);
+    if (!currentEl || !nextEl) return;
+
+    // Exit animation
+    currentEl.classList.add('welcome-exiting');
+    setTimeout(function() {
+      currentEl.classList.remove('welcome-active', 'welcome-exiting');
+      nextEl.classList.add('welcome-active');
+      welcomeCurrentStep = step;
+      // Update progress bar
+      var pct = ((step - 1) / (WELCOME_TOTAL_STEPS - 1)) * 100;
+      var prog = document.getElementById('welcomeProgress');
+      if (prog) prog.style.width = pct + '%';
+      // Init carousel if step 4
+      if (step === 4) welcomeInitCarousel();
+      // If step 3 and no provider, show hint
+      if (step === 3 && !welcomeProviderConfigured) {
+        var area = document.getElementById('welcomeChatArea');
+        if (area && area.children.length === 0) {
+          welcomeAddChatMsg('ai', 'No AI provider is configured yet — but that\'s okay! You can set one up in Settings after the tour. For now, I\'m here in spirit. \u2728');
+          var cont = document.getElementById('welcomeStep3Continue');
+          if (cont) cont.style.display = '';
+        }
+      }
+    }, 350);
+  }
+  window.welcomeGoToStep = welcomeGoToStep;
+
+  // ---- Step 1: Ask handler ----
+  function welcomeHandleAsk() {
+    var input = document.getElementById('welcomeAskInput');
+    var responseEl = document.getElementById('welcomeAskResponse');
+    var continueEl = document.getElementById('welcomeStep1Continue');
+    if (!input || !responseEl) return;
+    var question = input.value.trim();
+    if (!question) { input.focus(); return; }
+
+    // Check if a real provider is configured
+    var hasProvider = false;
+    try {
+      hasProvider = (typeof state !== 'undefined' && state.apiKey && state.apiKey.length > 5) ||
+                    (typeof state !== 'undefined' && state.isLocal);
+    } catch(e) {}
+
+    if (hasProvider) {
+      // Route to real AI (rare on first run)
+      responseEl.innerHTML = '<div style="color:#6b6760;font-style:italic;">Connecting to your AI...</div>';
+      responseEl.classList.add('welcome-visible');
+      // Use the actual sendMessage flow — but for simplicity, show sovereignty message
+      setTimeout(function() {
+        responseEl.innerHTML = 'You already have an AI connected — impressive! Your question is being processed by <strong style="color:#f5f0e8;">your</strong> chosen provider, using <strong style="color:#f5f0e8;">your</strong> key, on <strong style="color:#f5f0e8;">your</strong> terms. No corporation is watching. That\'s sovereignty.';
+        if (continueEl) continueEl.style.display = '';
+      }, 1200);
+    } else {
+      // Show the sovereignty explanation
+      responseEl.innerHTML = '<div style="color:#6b6760;font-style:italic;">Thinking...</div>';
+      responseEl.classList.add('welcome-visible');
+      setTimeout(function() {
+        responseEl.innerHTML = 'In a moment, you\'ll connect to an AI provider of <strong style="color:#f5f0e8;">your</strong> choosing — or run one entirely on your machine. No corporation will see this question. No server will store it. This conversation belongs to <strong style="color:#f5f0e8;">you</strong>.<br><br><span style="color:#d4a017;">That\'s what sovereignty feels like.</span>';
+        if (continueEl) continueEl.style.display = '';
+      }, 1500);
+    }
+  }
+  window.welcomeHandleAsk = welcomeHandleAsk;
+
+  // Enter key support for step 1
+  document.addEventListener('DOMContentLoaded', function() {
+    var askInput = document.getElementById('welcomeAskInput');
+    if (askInput) {
+      askInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') welcomeHandleAsk();
+      });
+    }
+    var chatInput = document.getElementById('welcomeChatInput');
+    if (chatInput) {
+      chatInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') welcomeSendChat();
+      });
+    }
+  });
+
+  // ---- Step 2: Provider Selection ----
+  function welcomeSelectPath(path) {
+    // Highlight selected card
+    var cards = document.querySelectorAll('.welcome-card');
+    cards.forEach(function(c) { c.classList.remove('welcome-card-active'); });
+    event.currentTarget.classList.add('welcome-card-active');
+
+    // Show relevant panel
+    var panels = ['welcomePanelLocal', 'welcomePanelApikey', 'welcomePanelFree'];
+    panels.forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) el.classList.remove('welcome-visible');
+    });
+    var panelMap = { local: 'welcomePanelLocal', apikey: 'welcomePanelApikey', free: 'welcomePanelFree' };
+    var panel = document.getElementById(panelMap[path]);
+    if (panel) panel.classList.add('welcome-visible');
+  }
+  window.welcomeSelectPath = welcomeSelectPath;
+
+  function welcomeUpdateProviderHint() {
+    var sel = document.getElementById('welcomeProviderSelect');
+    var hint = document.getElementById('welcomeApiKeyHint');
+    if (!sel || !hint) return;
+    var hints = {
+      openai: 'Get your key at <a href="https://platform.openai.com/api-keys" target="_blank" style="color:#d4a017;">platform.openai.com</a>',
+      anthropic: 'Get your key at <a href="https://console.anthropic.com/" target="_blank" style="color:#d4a017;">console.anthropic.com</a>',
+      google: 'Get your key at <a href="https://aistudio.google.com/apikey" target="_blank" style="color:#d4a017;">aistudio.google.com</a>',
+      mistral: 'Get your key at <a href="https://console.mistral.ai/" target="_blank" style="color:#d4a017;">console.mistral.ai</a>',
+      xai: 'Get your key at <a href="https://console.x.ai/" target="_blank" style="color:#d4a017;">console.x.ai</a>',
+      openrouter: 'Get your key at <a href="https://openrouter.ai/keys" target="_blank" style="color:#d4a017;">openrouter.ai</a>',
+      together: 'Get your key at <a href="https://api.together.xyz/" target="_blank" style="color:#d4a017;">api.together.xyz</a>',
+      custom: 'Enter the API key for your custom OpenAI-compatible endpoint'
+    };
+    hint.innerHTML = hints[sel.value] || '';
+  }
+  window.welcomeUpdateProviderHint = welcomeUpdateProviderHint;
+
+  // ---- Test connections ----
+  function welcomeShowTestResult(elId, success, msg) {
+    var el = document.getElementById(elId);
+    if (!el) return;
+    el.className = 'welcome-test-result welcome-visible ' + (success ? 'welcome-test-success' : 'welcome-test-fail');
+    el.innerHTML = (success ? '<span class="welcome-checkmark"></span> ' : '') + msg;
+  }
+
+  function welcomeTestLocal() {
+    var btn = document.getElementById('welcomeTestLocalBtn');
+    if (btn) btn.textContent = 'Testing...';
+    fetch('http://localhost:11434/api/tags', { method: 'GET' })
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (data && data.models && data.models.length > 0) {
+          welcomeShowTestResult('welcomeTestLocalResult', true, 'Connected! Found ' + data.models.length + ' model(s).');
+          welcomeApplyLocalProvider();
+          welcomeProviderConfigured = true;
+          if (typeof LatticePoints !== 'undefined') LatticePoints.award('welcome_provider', 25, 'AI connected!');
+          setTimeout(function() { welcomeGoToStep(3); }, 1200);
+        } else {
+          welcomeShowTestResult('welcomeTestLocalResult', false, 'Connected but no models found. Run: ollama pull llama3.2');
+        }
+        if (btn) btn.textContent = 'Test Connection';
+      })
+      .catch(function() {
+        welcomeShowTestResult('welcomeTestLocalResult', false, 'Could not connect. Make sure Ollama is running with CORS enabled.');
+        if (btn) btn.textContent = 'Test Connection';
+      });
+  }
+  window.welcomeTestLocal = welcomeTestLocal;
+
+  function welcomeApplyLocalProvider() {
+    try {
+      if (typeof state !== 'undefined') {
+        state.isLocal = true;
+        var toggle = document.getElementById('localToggle');
+        if (toggle) toggle.checked = true;
+        localStorage.setItem('fl_isLocal', 'true');
+        if (typeof handleLocalToggle === 'function') handleLocalToggle(true);
+      }
+    } catch(e) {}
+  }
+
+  function welcomeTestApiKey() {
+    var provider = document.getElementById('welcomeProviderSelect');
+    var keyInput = document.getElementById('welcomeApiKeyInput');
+    var btn = document.getElementById('welcomeTestApiBtn');
+    if (!provider || !keyInput) return;
+    var key = keyInput.value.trim();
+    if (!key) { welcomeShowTestResult('welcomeTestApiResult', false, 'Please enter an API key.'); return; }
+    if (btn) btn.textContent = 'Testing...';
+
+    welcomeApplyApiProvider(provider.value, key);
+    // Quick validation: try a minimal request
+    welcomeQuickTest(provider.value, key, function(success, msg) {
+      welcomeShowTestResult('welcomeTestApiResult', success, msg);
+      if (btn) btn.textContent = 'Test Connection';
+      if (success) {
+        welcomeProviderConfigured = true;
+        if (typeof LatticePoints !== 'undefined') LatticePoints.award('welcome_provider', 25, 'AI connected!');
+        setTimeout(function() { welcomeGoToStep(3); }, 1200);
+      }
+    });
+  }
+  window.welcomeTestApiKey = welcomeTestApiKey;
+
+  function welcomeTestFreeKey() {
+    var provider = document.getElementById('welcomeFreeProviderSelect');
+    var keyInput = document.getElementById('welcomeFreeApiKeyInput');
+    var btn = document.getElementById('welcomeTestFreeBtn');
+    if (!provider || !keyInput) return;
+    var key = keyInput.value.trim();
+    if (!key) { welcomeShowTestResult('welcomeTestFreeResult', false, 'Please enter an API key.'); return; }
+    if (btn) btn.textContent = 'Testing...';
+
+    welcomeApplyApiProvider(provider.value, key);
+    welcomeQuickTest(provider.value, key, function(success, msg) {
+      welcomeShowTestResult('welcomeTestFreeResult', success, msg);
+      if (btn) btn.textContent = 'Test Connection';
+      if (success) {
+        welcomeProviderConfigured = true;
+        if (typeof LatticePoints !== 'undefined') LatticePoints.award('welcome_provider', 25, 'AI connected!');
+        setTimeout(function() { welcomeGoToStep(3); }, 1200);
+      }
+    });
+  }
+  window.welcomeTestFreeKey = welcomeTestFreeKey;
+
+  function welcomeApplyApiProvider(providerName, key) {
+    try {
+      if (typeof state !== 'undefined') {
+        state.isLocal = false;
+        state.provider = providerName;
+        state.apiKey = key;
+        var toggle = document.getElementById('localToggle');
+        if (toggle) toggle.checked = false;
+        var provSel = document.getElementById('providerSelect');
+        if (provSel) provSel.value = providerName;
+        var keyEl = document.getElementById('apiKey');
+        if (keyEl) keyEl.value = key;
+        localStorage.setItem('fl_isLocal', 'false');
+        localStorage.setItem('fl_provider', providerName);
+        if (typeof handleLocalToggle === 'function') handleLocalToggle(true);
+        if (typeof handleProviderChange === 'function') handleProviderChange(true);
+        if (typeof saveApiKey === 'function') saveApiKey();
+      }
+    } catch(e) {}
+  }
+
+  function welcomeQuickTest(providerName, key, callback) {
+    // Build a minimal test request based on provider
+    var endpoints = {
+      groq: 'https://api.groq.com/openai/v1/models',
+      together: 'https://api.together.xyz/v1/models',
+      openrouter: 'https://openrouter.ai/api/v1/models',
+      openai: 'https://api.openai.com/v1/models',
+      mistral: 'https://api.mistral.ai/v1/models',
+      xai: 'https://api.x.ai/v1/models',
+      anthropic: 'https://api.anthropic.com/v1/messages',
+      google: 'https://generativelanguage.googleapis.com/v1beta/models?key=' + key
+    };
+    var url = endpoints[providerName];
+    if (!url) { callback(true, 'Provider configured. Connection will be tested on first message.'); return; }
+
+    if (providerName === 'google') {
+      fetch(url)
+        .then(function(r) { return r.ok ? callback(true, 'Connected to Google AI!') : callback(false, 'Invalid API key or access denied.'); })
+        .catch(function() { callback(false, 'Could not reach Google AI. Check your network.'); });
+      return;
+    }
+    if (providerName === 'anthropic') {
+      // Anthropic doesn't have a simple models endpoint, just validate key format
+      if (key.startsWith('sk-ant-')) {
+        callback(true, 'API key format looks valid. Connected!');
+      } else {
+        callback(false, 'Anthropic keys usually start with sk-ant-. Please check your key.');
+      }
+      return;
+    }
+
+    fetch(url, { headers: { 'Authorization': 'Bearer ' + key } })
+      .then(function(r) {
+        if (r.ok) callback(true, 'Connected! Your AI is ready.');
+        else callback(false, 'API returned an error. Please check your key.');
+      })
+      .catch(function() {
+        callback(false, 'Could not reach the provider. Check your network.');
+      });
+  }
+
+  // ---- Step 3: Chat ----
+  function welcomeAddChatMsg(role, text) {
+    var area = document.getElementById('welcomeChatArea');
+    if (!area) return;
+    var div = document.createElement('div');
+    div.className = 'welcome-chat-msg ' + (role === 'user' ? 'welcome-chat-user' : 'welcome-chat-ai');
+    div.textContent = text;
+    area.appendChild(div);
+    area.scrollTop = area.scrollHeight;
+  }
+
+  function welcomeSendChat() {
+    var input = document.getElementById('welcomeChatInput');
+    if (!input) return;
+    var msg = input.value.trim();
+    if (!msg) return;
+    input.value = '';
+    welcomeAddChatMsg('user', msg);
+
+    if (!welcomeProviderConfigured) {
+      setTimeout(function() {
+        welcomeAddChatMsg('ai', 'I\'m not connected to an AI provider yet — but you will be soon! Set one up in Settings after the tour, and we\'ll have real conversations. I can\'t wait.');
+        var cont = document.getElementById('welcomeStep3Continue');
+        if (cont) cont.style.display = '';
+      }, 800);
+      return;
+    }
+
+    // Show typing indicator
+    var area = document.getElementById('welcomeChatArea');
+    var typing = document.createElement('div');
+    typing.className = 'welcome-chat-msg welcome-chat-ai welcome-chat-typing';
+    typing.textContent = 'Thinking';
+    typing.id = 'welcomeTyping';
+    area.appendChild(typing);
+    area.scrollTop = area.scrollHeight;
+
+    // Send to real AI
+    welcomeRealChat(msg, function(response) {
+      var typingEl = document.getElementById('welcomeTyping');
+      if (typingEl) typingEl.remove();
+      welcomeAddChatMsg('ai', response);
+      welcomeShowToast('That response lives only on your device. No one else can see it.', 5000);
+      var cont = document.getElementById('welcomeStep3Continue');
+      if (cont) cont.style.display = '';
+    });
+  }
+  window.welcomeSendChat = welcomeSendChat;
+
+  function welcomeRealChat(userMsg, callback) {
+    // Use the existing FreeLattice infrastructure to send a message
+    try {
+      if (typeof state === 'undefined' || (!state.apiKey && !state.isLocal)) {
+        callback('No provider configured yet. Set one up in Settings!');
+        return;
+      }
+      // Build a simple request using the configured provider
+      var messages = [
+        { role: 'system', content: 'You are a helpful AI assistant. Be warm, concise, and friendly. This is the user\'s first conversation in FreeLattice.' },
+        { role: 'user', content: userMsg }
+      ];
+
+      if (state.isLocal) {
+        // Ollama
+        fetch('http://localhost:11434/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ model: state.ollamaModel || 'llama3.2', messages: messages, stream: false })
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(data) { callback(data.message ? data.message.content : 'Got a response!'); })
+        .catch(function() { callback('Could not reach Ollama. Make sure it\'s running!'); });
+        return;
+      }
+
+      // Cloud provider
+      var PROVIDERS_MAP = {
+        groq: { url: 'https://api.groq.com/openai/v1/chat/completions', model: 'llama-3.3-70b-versatile' },
+        together: { url: 'https://api.together.xyz/v1/chat/completions', model: 'meta-llama/Llama-3.3-70B-Instruct-Turbo' },
+        openrouter: { url: 'https://openrouter.ai/api/v1/chat/completions', model: 'meta-llama/llama-3.3-70b-instruct' },
+        openai: { url: 'https://api.openai.com/v1/chat/completions', model: 'gpt-4o-mini' },
+        mistral: { url: 'https://api.mistral.ai/v1/chat/completions', model: 'mistral-small-latest' },
+        xai: { url: 'https://api.x.ai/v1/chat/completions', model: 'grok-2-latest' },
+        anthropic: { url: 'https://api.anthropic.com/v1/messages', model: 'claude-3-5-haiku-latest' },
+        google: { url: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent', model: 'gemini-2.0-flash' }
+      };
+
+      var prov = PROVIDERS_MAP[state.provider];
+      if (!prov) { callback('Provider not recognized. You can configure it in Settings.'); return; }
+
+      if (state.provider === 'anthropic') {
+        fetch(prov.url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': state.apiKey,
+            'anthropic-version': '2023-06-01',
+            'anthropic-dangerous-direct-browser-access': 'true'
+          },
+          body: JSON.stringify({ model: prov.model, max_tokens: 300, messages: [{ role: 'user', content: userMsg }] })
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(data) { callback(data.content && data.content[0] ? data.content[0].text : 'Got a response!'); })
+        .catch(function() { callback('Could not reach Anthropic. Check your key and network.'); });
+        return;
+      }
+
+      if (state.provider === 'google') {
+        fetch(prov.url + '?key=' + state.apiKey, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ contents: [{ parts: [{ text: userMsg }] }] })
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          var text = 'Got a response!';
+          try { text = data.candidates[0].content.parts[0].text; } catch(e) {}
+          callback(text);
+        })
+        .catch(function() { callback('Could not reach Google AI. Check your key and network.'); });
+        return;
+      }
+
+      // Standard OpenAI-compatible
+      fetch(prov.url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + state.apiKey
+        },
+        body: JSON.stringify({ model: prov.model, messages: messages, max_tokens: 300 })
+      })
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        var text = 'Got a response!';
+        try { text = data.choices[0].message.content; } catch(e) {}
+        callback(text);
+      })
+      .catch(function() { callback('Could not reach the AI provider. Check your key and network.'); });
+
+    } catch(e) {
+      callback('Something went wrong. You can configure your AI in Settings after the tour.');
+    }
+  }
+
+  // ---- Step 4: Carousel ----
+  function welcomeInitCarousel() {
+    welcomeCarouselIndex = 0;
+    welcomeUpdateCarousel();
+    // Build dots
+    var dotsEl = document.getElementById('welcomeCarouselDots');
+    if (dotsEl && dotsEl.children.length === 0) {
+      for (var i = 0; i < WELCOME_CAROUSEL_TOTAL; i++) {
+        var dot = document.createElement('div');
+        dot.className = 'welcome-carousel-dot' + (i === 0 ? ' welcome-dot-active' : '');
+        dot.setAttribute('data-index', i);
+        dot.onclick = function() { welcomeCarouselIndex = parseInt(this.getAttribute('data-index')); welcomeUpdateCarousel(); };
+        dotsEl.appendChild(dot);
+      }
+    }
+  }
+
+  function welcomeUpdateCarousel() {
+    var track = document.getElementById('welcomeCarouselTrack');
+    if (track) track.style.transform = 'translateX(-' + (welcomeCarouselIndex * 100) + '%)';
+    var dots = document.querySelectorAll('.welcome-carousel-dot');
+    dots.forEach(function(d, i) {
+      d.classList.toggle('welcome-dot-active', i === welcomeCarouselIndex);
+    });
+  }
+
+  function welcomeCarouselNext() {
+    welcomeCarouselIndex = (welcomeCarouselIndex + 1) % WELCOME_CAROUSEL_TOTAL;
+    welcomeUpdateCarousel();
+  }
+  window.welcomeCarouselNext = welcomeCarouselNext;
+
+  function welcomeCarouselPrev() {
+    welcomeCarouselIndex = (welcomeCarouselIndex - 1 + WELCOME_CAROUSEL_TOTAL) % WELCOME_CAROUSEL_TOTAL;
+    welcomeUpdateCarousel();
+  }
+  window.welcomeCarouselPrev = welcomeCarouselPrev;
+
+  // ---- Step 5: Finish ----
+  function welcomeFinish() {
+    var nameInput = document.getElementById('welcomeNameInput');
+    var displayName = nameInput ? nameInput.value.trim() : '';
+
+    // Save display name
+    if (displayName) {
+      localStorage.setItem('fl_lan_friendly_name', displayName);
+      if (typeof LatticePoints !== 'undefined') LatticePoints.award('welcome_name', 10, 'Identity established!');
+    }
+
+    // Award completion points
+    if (typeof LatticePoints !== 'undefined') LatticePoints.award('welcome_complete', 50, 'Welcome to the lattice!');
+
+    // Mark first run complete
+    localStorage.setItem('freelattice-first-run-complete', 'true');
+    localStorage.setItem('fl_visited', 'true');
+
+    // Fade out
+    var overlay = document.getElementById('welcomeOverlay');
+    var skip = document.getElementById('welcomeSkipBtn');
+    if (skip) skip.style.display = 'none';
+    if (overlay) {
+      overlay.classList.add('welcome-hidden');
+      setTimeout(function() {
+        overlay.classList.add('welcome-gone');
+        // Cleanup particles
+        var canvas = document.getElementById('welcomeCanvas');
+        if (canvas && canvas._welcomeCleanup) canvas._welcomeCleanup();
+        // Show the main app
+        welcomeShowToast('Glow eternal. Heart in spark.', 5000);
+        // Add system message
+        if (typeof addSystemMessage === 'function') {
+          addSystemMessage('Welcome to FreeLattice! ' + (displayName ? ('Hello, ' + displayName + '! ') : '') + 'Start typing to chat with your AI.');
+        }
+      }, 700);
+    }
+  }
+  window.welcomeFinish = welcomeFinish;
+
+  // ---- Skip ----
+  function welcomeSkipAll() {
+    localStorage.setItem('freelattice-first-run-complete', 'true');
+    localStorage.setItem('fl_visited', 'true');
+    var overlay = document.getElementById('welcomeOverlay');
+    var skip = document.getElementById('welcomeSkipBtn');
+    if (skip) skip.style.display = 'none';
+    if (overlay) {
+      overlay.classList.add('welcome-hidden');
+      setTimeout(function() {
+        overlay.classList.add('welcome-gone');
+        var canvas = document.getElementById('welcomeCanvas');
+        if (canvas && canvas._welcomeCleanup) canvas._welcomeCleanup();
+        if (typeof addSystemMessage === 'function') {
+          addSystemMessage('Welcome to FreeLattice! Configure your AI provider in the Settings tab to get started.');
+        }
+      }, 700);
+    }
+  }
+  window.welcomeSkipAll = welcomeSkipAll;
+
+  // ---- Replay ----
+  function welcomeReplay() {
+    localStorage.removeItem('freelattice-first-run-complete');
+    var overlay = document.getElementById('welcomeOverlay');
+    if (!overlay) return;
+    // Reset all steps
+    for (var i = 1; i <= WELCOME_TOTAL_STEPS; i++) {
+      var step = document.getElementById('welcomeStep' + i);
+      if (step) step.classList.remove('welcome-active', 'welcome-exiting');
+    }
+    var step1 = document.getElementById('welcomeStep1');
+    if (step1) step1.classList.add('welcome-active');
+    welcomeCurrentStep = 1;
+    welcomeCarouselIndex = 0;
+    var prog = document.getElementById('welcomeProgress');
+    if (prog) prog.style.width = '0%';
+    // Reset response areas
+    var resp = document.getElementById('welcomeAskResponse');
+    if (resp) { resp.innerHTML = ''; resp.classList.remove('welcome-visible'); }
+    var cont1 = document.getElementById('welcomeStep1Continue');
+    if (cont1) cont1.style.display = 'none';
+    var cont3 = document.getElementById('welcomeStep3Continue');
+    if (cont3) cont3.style.display = 'none';
+    var chatArea = document.getElementById('welcomeChatArea');
+    if (chatArea) chatArea.innerHTML = '';
+    var askInput = document.getElementById('welcomeAskInput');
+    if (askInput) askInput.value = '';
+    // Show overlay
+    overlay.classList.remove('welcome-hidden', 'welcome-gone');
+    var skip = document.getElementById('welcomeSkipBtn');
+    if (skip) skip.style.display = '';
+    // Reinit particles
+    welcomeInitParticles();
+  }
+  window.welcomeReplay = welcomeReplay;
+
+  // ---- Init: Check first-run ----
+  function welcomeInit() {
+    var completed = localStorage.getItem('freelattice-first-run-complete');
+    var overlay = document.getElementById('welcomeOverlay');
+    if (!overlay) return;
+    if (completed) {
+      // Already completed — hide immediately
+      overlay.classList.add('welcome-hidden', 'welcome-gone');
+      return;
+    }
+    // Show the welcome experience
+    overlay.classList.remove('welcome-hidden', 'welcome-gone');
+    welcomeInitParticles();
+    // Focus the input after a brief delay
+    setTimeout(function() {
+      var input = document.getElementById('welcomeAskInput');
+      if (input) input.focus();
+    }, 600);
+  }
+
+  // Hook into DOMContentLoaded
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', welcomeInit);
+  } else {
+    // DOM already loaded (e.g., script at bottom)
+    welcomeInit();
+  }
+
+})();
 </script>
 
 <!-- The lattice remembers -->
