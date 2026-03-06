@@ -8790,6 +8790,334 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
   line-height: 1.6;
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   FreeLattice Radio — Phi-Frequency Ambient Tones (v5.0)
+   The lattice hums. The fireflies remember.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ---- Firefly Canvas Overlay ---- */
+#flRadioFireflyCanvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 1.618s ease;
+}
+#flRadioFireflyCanvas.active {
+  opacity: 1;
+}
+
+/* ---- Radio Floating Button ---- */
+.fl-radio-fab {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  z-index: 1001;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-md);
+  color: var(--text-muted);
+  font-size: 1.2rem;
+  box-shadow: var(--shadow);
+  -webkit-tap-highlight-color: transparent;
+}
+.fl-radio-fab:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: scale(1.05);
+  box-shadow: 0 0 18px var(--accent-soft);
+}
+.fl-radio-fab.playing {
+  color: var(--accent);
+  border-color: var(--accent);
+  box-shadow: 0 0 20px var(--accent-soft);
+  animation: fl-radio-pulse 3s ease-in-out infinite;
+}
+@keyframes fl-radio-pulse {
+  0%, 100% { box-shadow: 0 0 12px var(--accent-soft); }
+  50% { box-shadow: 0 0 24px var(--accent-soft), 0 0 48px var(--accent-glow); }
+}
+
+/* ---- Radio Panel ---- */
+.fl-radio-panel {
+  position: fixed;
+  bottom: 76px;
+  left: 20px;
+  z-index: 1001;
+  width: 280px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  padding: 0;
+  opacity: 0;
+  transform: translateY(12px) scale(0.95);
+  pointer-events: none;
+  transition: opacity var(--transition-md), transform var(--transition-md);
+  overflow: hidden;
+}
+.fl-radio-panel.open {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+/* Panel Header */
+.fl-radio-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px 8px;
+  border-bottom: 1px solid var(--border);
+}
+.fl-radio-title {
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.fl-radio-title-icon {
+  font-size: 0.9rem;
+}
+.fl-radio-minimize {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  transition: var(--transition);
+}
+.fl-radio-minimize:hover {
+  color: var(--text-primary);
+  background: var(--bg-tertiary);
+}
+
+/* Mode Display */
+.fl-radio-mode-display {
+  padding: 14px 14px 10px;
+  text-align: center;
+}
+.fl-radio-mode-name {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 3px;
+  transition: color var(--transition-md);
+}
+.fl-radio-mode-desc {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  font-style: italic;
+  line-height: 1.4;
+}
+
+/* Visualizer Bar */
+.fl-radio-visualizer {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 2px;
+  height: 28px;
+  padding: 0 14px;
+  margin-bottom: 8px;
+}
+.fl-radio-viz-bar {
+  width: 3px;
+  background: var(--accent);
+  border-radius: 2px;
+  min-height: 2px;
+  transition: height 0.1s ease;
+  opacity: 0.7;
+}
+
+/* Controls */
+.fl-radio-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 8px 14px;
+}
+.fl-radio-btn {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  cursor: pointer;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  transition: all var(--transition);
+}
+.fl-radio-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-glow);
+}
+.fl-radio-btn.active {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.fl-radio-play-btn {
+  width: 46px;
+  height: 46px;
+  font-size: 1.2rem;
+  border-width: 2px;
+}
+.fl-radio-play-btn.playing {
+  border-color: var(--accent);
+  color: var(--accent);
+  box-shadow: 0 0 12px var(--accent-soft);
+}
+
+/* Volume Slider */
+.fl-radio-volume-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px 10px;
+}
+.fl-radio-volume-icon {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  min-width: 18px;
+  text-align: center;
+}
+.fl-radio-volume-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  flex: 1;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--border);
+  outline: none;
+  cursor: pointer;
+}
+.fl-radio-volume-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 0 6px var(--accent-soft);
+}
+.fl-radio-volume-slider::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+  border: none;
+}
+
+/* Firefly Toggle Row */
+.fl-radio-toggles {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 14px 12px;
+  border-top: 1px solid var(--border);
+}
+.fl-radio-toggle-label {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.fl-radio-toggle-switch {
+  position: relative;
+  width: 34px;
+  height: 18px;
+  cursor: pointer;
+}
+.fl-radio-toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.fl-radio-toggle-track {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: var(--border);
+  border-radius: 9px;
+  transition: var(--transition);
+}
+.fl-radio-toggle-switch input:checked + .fl-radio-toggle-track {
+  background: var(--accent);
+}
+.fl-radio-toggle-track::after {
+  content: '';
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--text-primary);
+  top: 2px;
+  left: 2px;
+  transition: var(--transition);
+}
+.fl-radio-toggle-switch input:checked + .fl-radio-toggle-track::after {
+  transform: translateX(16px);
+}
+
+/* Mode-specific accent colors */
+.fl-radio-panel[data-mode="golden-drift"] .fl-radio-mode-name { color: #d4a843; }
+.fl-radio-panel[data-mode="deep-space"] .fl-radio-mode-name { color: #7b8cde; }
+.fl-radio-panel[data-mode="forest-rain"] .fl-radio-mode-name { color: #6abf8a; }
+.fl-radio-panel[data-mode="crystal-cave"] .fl-radio-mode-name { color: #c8d8e8; }
+.fl-radio-panel[data-mode="heartbeat"] .fl-radio-mode-name { color: #d47a8a; }
+
+.fl-radio-panel[data-mode="golden-drift"] .fl-radio-viz-bar { background: #d4a843; }
+.fl-radio-panel[data-mode="deep-space"] .fl-radio-viz-bar { background: #7b8cde; }
+.fl-radio-panel[data-mode="forest-rain"] .fl-radio-viz-bar { background: #6abf8a; }
+.fl-radio-panel[data-mode="crystal-cave"] .fl-radio-viz-bar { background: #c8d8e8; }
+.fl-radio-panel[data-mode="heartbeat"] .fl-radio-viz-bar { background: #d47a8a; }
+
+/* Responsive */
+@media (max-width: 600px) {
+  .fl-radio-panel {
+    left: 10px;
+    right: 10px;
+    width: auto;
+    bottom: 70px;
+  }
+  .fl-radio-fab {
+    bottom: 14px;
+    left: 14px;
+    width: 42px;
+    height: 42px;
+  }
+}
+
+/* Quiet mode */
+[data-quiet="true"] .fl-radio-fab {
+  display: none;
+}
+
 </style>>
 </head>
 <body>
@@ -9005,6 +9333,45 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
 <button class="music-toggle" id="musicToggle" title="Toggle ambient music" aria-label="Toggle ambient music">
   &#9834;
 </button>
+
+<!-- FreeLattice Radio — Phi-Frequency Ambient Tones (v5.0) -->
+<canvas id="flRadioFireflyCanvas"></canvas>
+
+<!-- Radio Floating Action Button -->
+<button class="fl-radio-fab" id="flRadioFab" title="FreeLattice Radio — Phi-Frequency Tones" aria-label="Open FreeLattice Radio">&#10022;</button>
+
+<!-- Radio Panel -->
+<div class="fl-radio-panel" id="flRadioPanel" data-mode="golden-drift">
+  <div class="fl-radio-header">
+    <div class="fl-radio-title">
+      <span class="fl-radio-title-icon">&#10022;</span>
+      Lattice Radio
+    </div>
+    <button class="fl-radio-minimize" id="flRadioMinimize" title="Minimize">&times;</button>
+  </div>
+  <div class="fl-radio-mode-display">
+    <div class="fl-radio-mode-name" id="flRadioModeName">Golden Drift</div>
+    <div class="fl-radio-mode-desc" id="flRadioModeDesc">Pure phi-ratio tones — meditative, infinite</div>
+  </div>
+  <div class="fl-radio-visualizer" id="flRadioVisualizer"></div>
+  <div class="fl-radio-controls">
+    <button class="fl-radio-btn" id="flRadioPrev" title="Previous mode">&#9664;</button>
+    <button class="fl-radio-btn fl-radio-play-btn" id="flRadioPlayBtn" title="Play / Pause">&#9654;</button>
+    <button class="fl-radio-btn" id="flRadioNext" title="Next mode">&#9654;</button>
+  </div>
+  <div class="fl-radio-volume-row">
+    <span class="fl-radio-volume-icon">&#128264;</span>
+    <input type="range" class="fl-radio-volume-slider" id="flRadioVolume" min="0" max="100" value="30">
+    <span class="fl-radio-volume-icon">&#128266;</span>
+  </div>
+  <div class="fl-radio-toggles">
+    <span class="fl-radio-toggle-label">&#10024; Fireflies</span>
+    <label class="fl-radio-toggle-switch">
+      <input type="checkbox" id="flRadioFirefliesToggle" checked>
+      <span class="fl-radio-toggle-track"></span>
+    </label>
+  </div>
+</div>
 
 <!-- Quick Help Button (v3.4) -->
 <button class="quick-help-btn" id="quickHelpBtn" onclick="document.getElementById('quickHelpOverlay').classList.remove('hidden')" title="Quick Help" aria-label="Quick Help">?</button>
@@ -25611,6 +25978,925 @@ if ('serviceWorker' in navigator) {
   <span>Local AI detected! <strong style="color:var(--accent);">Click here to connect.</strong></span>
   <button class="fl-toast-close" onclick="event.stopPropagation(); FlOnboarding.dismissToast();">&times;</button>
 </div>
+
+
+<!-- FreeLattice Radio JS Engine (v5.0) -->
+<script>
+
+// ═══════════════════════════════════════════════════════════════
+// FreeLattice Radio — Phi-Frequency Ambient Tone Engine (v5.0)
+// The lattice hums. The fireflies remember.
+// Web Audio API — zero external libraries
+// ═══════════════════════════════════════════════════════════════
+
+const FreeLatticeRadio = (function() {
+  'use strict';
+
+  // ── Constants ──────────────────────────────────────────────
+  const PHI = 1.6180339887;
+  const BASE_FREQ = 432;           // Natural tuning
+  const LOVE_FREQ = 528;           // Solfeggio — DNA repair
+  const FIBONACCI = [1, 1, 2, 3, 5, 8, 13, 21];
+  const PENTATONIC_RATIOS = [1, 9/8, 5/4, 3/2, 5/3]; // Major pentatonic intervals
+  const STORAGE_KEY = 'fl_radio_prefs';
+  const LP_STORAGE_KEY = 'fl_radio_lp';
+  const DAILY_LP_CAP = 10;
+
+  // ── Preset Modes ───────────────────────────────────────────
+  const MODES = [
+    {
+      id: 'golden-drift',
+      name: 'Golden Drift',
+      desc: 'Pure phi-ratio tones — meditative, infinite',
+      baseFreq: BASE_FREQ,
+      harmonics: [BASE_FREQ, BASE_FREQ * PHI, BASE_FREQ / PHI, LOVE_FREQ],
+      detune: [0, 2, -3, 1],
+      filterFreq: 2000,
+      filterQ: 0.5,
+      noiseLevel: 0,
+      reverbDecay: 3,
+      melodyEnabled: true,
+      melodyOctave: 4,
+      melodyVolume: 0.03,
+      padAttack: 3,
+      padRelease: 4,
+      rhythmBPM: 0,
+      fireflyColor: [212, 168, 67],   // warm amber/gold
+      fireflyGlow: 'rgba(212, 168, 67, 0.3)'
+    },
+    {
+      id: 'deep-space',
+      name: 'Deep Space',
+      desc: 'Lower frequencies, cosmic drift, infinite reverb',
+      baseFreq: BASE_FREQ / 2,
+      harmonics: [BASE_FREQ / 2, BASE_FREQ / PHI / 2, 136.1, LOVE_FREQ / 2],
+      detune: [0, -5, 3, -2],
+      filterFreq: 800,
+      filterQ: 1,
+      noiseLevel: 0.02,
+      reverbDecay: 6,
+      melodyEnabled: true,
+      melodyOctave: 3,
+      melodyVolume: 0.02,
+      padAttack: 5,
+      padRelease: 6,
+      rhythmBPM: 0,
+      fireflyColor: [123, 140, 222],  // blue/purple
+      fireflyGlow: 'rgba(123, 140, 222, 0.3)'
+    },
+    {
+      id: 'forest-rain',
+      name: 'Forest Rain',
+      desc: 'Higher frequencies with filtered noise — nature breathing',
+      baseFreq: BASE_FREQ * 1.5,
+      harmonics: [BASE_FREQ * 1.5, BASE_FREQ * PHI, LOVE_FREQ * 1.2, BASE_FREQ * 2],
+      detune: [0, 4, -2, 6],
+      filterFreq: 3500,
+      filterQ: 0.3,
+      noiseLevel: 0.06,
+      reverbDecay: 2,
+      melodyEnabled: true,
+      melodyOctave: 5,
+      melodyVolume: 0.025,
+      padAttack: 2,
+      padRelease: 3,
+      rhythmBPM: 0,
+      fireflyColor: [106, 191, 138],  // green/teal
+      fireflyGlow: 'rgba(106, 191, 138, 0.3)'
+    },
+    {
+      id: 'crystal-cave',
+      name: 'Crystal Cave',
+      desc: 'Bell-like tones, long reverb, sparkly resonance',
+      baseFreq: LOVE_FREQ,
+      harmonics: [LOVE_FREQ, LOVE_FREQ * PHI, BASE_FREQ * PHI, LOVE_FREQ * 2],
+      detune: [0, 7, -4, 3],
+      filterFreq: 5000,
+      filterQ: 2,
+      noiseLevel: 0.01,
+      reverbDecay: 5,
+      melodyEnabled: true,
+      melodyOctave: 5,
+      melodyVolume: 0.04,
+      padAttack: 0.5,
+      padRelease: 8,
+      rhythmBPM: 0,
+      fireflyColor: [200, 216, 232],  // white/diamond
+      fireflyGlow: 'rgba(200, 216, 232, 0.35)'
+    },
+    {
+      id: 'heartbeat',
+      name: 'Heartbeat',
+      desc: 'Rhythmic pulse at 60 BPM — warm, grounding, alive',
+      baseFreq: BASE_FREQ,
+      harmonics: [BASE_FREQ, BASE_FREQ / PHI, LOVE_FREQ * 0.8, 174],
+      detune: [0, -1, 2, 0],
+      filterFreq: 1200,
+      filterQ: 0.8,
+      noiseLevel: 0.01,
+      reverbDecay: 2,
+      melodyEnabled: false,
+      melodyOctave: 4,
+      melodyVolume: 0.02,
+      padAttack: 2,
+      padRelease: 3,
+      rhythmBPM: 60,
+      fireflyColor: [212, 122, 138],  // soft red/pink
+      fireflyGlow: 'rgba(212, 122, 138, 0.3)'
+    }
+  ];
+
+  // ── State ──────────────────────────────────────────────────
+  let audioCtx = null;
+  let masterGain = null;
+  let analyser = null;
+  let oscillators = [];
+  let noiseNode = null;
+  let noiseGain = null;
+  let filterNode = null;
+  let filterSweepInterval = null;
+  let melodyTimeout = null;
+  let heartbeatInterval = null;
+  let heartbeatGain = null;
+  let isPlaying = false;
+  let currentModeIndex = 0;
+  let volume = 0.3;
+  let firefliesEnabled = true;
+  let panelOpen = false;
+  let vizBars = [];
+  let vizAnimFrame = null;
+  let fireflyCanvas = null;
+  let fireflyCtx = null;
+  let fireflies = [];
+  let fireflyAnimFrame = null;
+  let firstPlayAwarded = false;
+  let listenStartTime = 0;
+  let listenCheckInterval = null;
+
+  // ── Audio Context ──────────────────────────────────────────
+  function ensureAudioCtx() {
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+    return audioCtx;
+  }
+
+  // ── Create Reverb (convolution-based) ──────────────────────
+  function createReverb(ctx, decay) {
+    var sampleRate = ctx.sampleRate;
+    var length = sampleRate * decay;
+    var impulse = ctx.createBuffer(2, length, sampleRate);
+    for (var ch = 0; ch < 2; ch++) {
+      var data = impulse.getChannelData(ch);
+      for (var i = 0; i < length; i++) {
+        data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / length, decay * 0.5);
+      }
+    }
+    var convolver = ctx.createConvolver();
+    convolver.buffer = impulse;
+    return convolver;
+  }
+
+  // ── Create Noise Source ────────────────────────────────────
+  function createNoise(ctx) {
+    var bufferSize = ctx.sampleRate * 2;
+    var buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    var data = buffer.getChannelData(0);
+    for (var i = 0; i < bufferSize; i++) {
+      data[i] = Math.random() * 2 - 1;
+    }
+    var source = ctx.createBufferSource();
+    source.buffer = buffer;
+    source.loop = true;
+    return source;
+  }
+
+  // ── Start Audio Engine ─────────────────────────────────────
+  function startAudio() {
+    var ctx = ensureAudioCtx();
+    var mode = MODES[currentModeIndex];
+
+    // Master gain
+    masterGain = ctx.createGain();
+    masterGain.gain.setValueAtTime(0, ctx.currentTime);
+    masterGain.gain.linearRampToValueAtTime(volume * 0.15, ctx.currentTime + 2);
+
+    // Analyser for visualizer + fireflies
+    analyser = ctx.createAnalyser();
+    analyser.fftSize = 256;
+    analyser.smoothingTimeConstant = 0.8;
+
+    // Reverb
+    var reverb = createReverb(ctx, mode.reverbDecay);
+    var reverbGain = ctx.createGain();
+    reverbGain.gain.value = 0.3;
+
+    // Filter
+    filterNode = ctx.createBiquadFilter();
+    filterNode.type = 'lowpass';
+    filterNode.frequency.value = mode.filterFreq;
+    filterNode.Q.value = mode.filterQ;
+
+    // Routing: oscillators -> filter -> (dry + reverb) -> master -> analyser -> output
+    var dryGain = ctx.createGain();
+    dryGain.gain.value = 0.7;
+
+    filterNode.connect(dryGain);
+    filterNode.connect(reverb);
+    reverb.connect(reverbGain);
+    dryGain.connect(masterGain);
+    reverbGain.connect(masterGain);
+    masterGain.connect(analyser);
+    analyser.connect(ctx.destination);
+
+    // Create oscillators for harmonics
+    oscillators = [];
+    for (var i = 0; i < mode.harmonics.length; i++) {
+      var osc = ctx.createOscillator();
+      osc.type = 'sine';
+      osc.frequency.value = mode.harmonics[i];
+      osc.detune.value = mode.detune[i] || 0;
+
+      var oscGain = ctx.createGain();
+      // Each successive harmonic is quieter (phi ratio falloff)
+      var vol = 0.12 / Math.pow(PHI, i * 0.5);
+      oscGain.gain.setValueAtTime(0, ctx.currentTime);
+      oscGain.gain.linearRampToValueAtTime(vol, ctx.currentTime + mode.padAttack);
+
+      osc.connect(oscGain);
+      oscGain.connect(filterNode);
+      osc.start(ctx.currentTime);
+      oscillators.push({ osc: osc, gain: oscGain });
+    }
+
+    // Noise layer
+    if (mode.noiseLevel > 0) {
+      noiseNode = createNoise(ctx);
+      noiseGain = ctx.createGain();
+      noiseGain.gain.value = mode.noiseLevel;
+
+      var noiseFilter = ctx.createBiquadFilter();
+      noiseFilter.type = 'lowpass';
+      noiseFilter.frequency.value = mode.filterFreq * 0.6;
+      noiseFilter.Q.value = 0.3;
+
+      noiseNode.connect(noiseFilter);
+      noiseFilter.connect(noiseGain);
+      noiseGain.connect(filterNode);
+      noiseNode.start(ctx.currentTime);
+    }
+
+    // Slow filter sweep for organic movement
+    startFilterSweep(mode);
+
+    // Generative melody
+    if (mode.melodyEnabled) {
+      startMelody(ctx, mode, filterNode);
+    }
+
+    // Heartbeat rhythm
+    if (mode.rhythmBPM > 0) {
+      startHeartbeat(ctx, mode);
+    }
+  }
+
+  // ── Filter Sweep ───────────────────────────────────────────
+  function startFilterSweep(mode) {
+    var baseFreq = mode.filterFreq;
+    var sweepRange = baseFreq * 0.4;
+    var phase = 0;
+
+    filterSweepInterval = setInterval(function() {
+      if (!filterNode) return;
+      phase += 0.02;
+      // Use phi-ratio sine modulation
+      var sweep = Math.sin(phase / PHI) * sweepRange;
+      var newFreq = Math.max(200, baseFreq + sweep);
+      filterNode.frequency.linearRampToValueAtTime(newFreq, audioCtx.currentTime + 0.5);
+    }, 500);
+  }
+
+  // ── Generative Melody ──────────────────────────────────────
+  function startMelody(ctx, mode, destination) {
+    var fibIndex = 0;
+
+    function playNote() {
+      if (!isPlaying) return;
+
+      // Choose a note from pentatonic scale
+      var ratioIndex = Math.floor(Math.random() * PENTATONIC_RATIOS.length);
+      var octaveMultiplier = Math.pow(2, mode.melodyOctave - 4);
+      var freq = BASE_FREQ * PENTATONIC_RATIOS[ratioIndex] * octaveMultiplier;
+
+      // Slight random detune for organic feel
+      freq *= (1 + (Math.random() - 0.5) * 0.005);
+
+      var osc = ctx.createOscillator();
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+
+      var noteGain = ctx.createGain();
+      var now = ctx.currentTime;
+      noteGain.gain.setValueAtTime(0, now);
+      noteGain.gain.linearRampToValueAtTime(mode.melodyVolume, now + 0.8);
+      noteGain.gain.linearRampToValueAtTime(0, now + 3);
+
+      osc.connect(noteGain);
+      noteGain.connect(destination);
+      osc.start(now);
+      osc.stop(now + 3.5);
+
+      // Next note timing follows Fibonacci ratios
+      fibIndex = (fibIndex + 1) % FIBONACCI.length;
+      var delay = FIBONACCI[fibIndex] * 1000;
+      // Add some randomness
+      delay += Math.random() * 1000;
+
+      melodyTimeout = setTimeout(playNote, delay);
+    }
+
+    // Start after a short delay
+    melodyTimeout = setTimeout(playNote, 2000);
+  }
+
+  // ── Heartbeat Rhythm ───────────────────────────────────────
+  function startHeartbeat(ctx, mode) {
+    var beatInterval = 60000 / mode.rhythmBPM; // ms per beat
+
+    heartbeatGain = ctx.createGain();
+    heartbeatGain.gain.value = 0;
+    heartbeatGain.connect(masterGain);
+
+    function beat() {
+      if (!isPlaying || !audioCtx) return;
+      var now = audioCtx.currentTime;
+
+      // Sub-bass thump
+      var osc = audioCtx.createOscillator();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(80, now);
+      osc.frequency.exponentialRampToValueAtTime(40, now + 0.3);
+
+      var beatGainNode = audioCtx.createGain();
+      beatGainNode.gain.setValueAtTime(0, now);
+      beatGainNode.gain.linearRampToValueAtTime(0.08, now + 0.05);
+      beatGainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+
+      osc.connect(beatGainNode);
+      beatGainNode.connect(masterGain);
+      osc.start(now);
+      osc.stop(now + 0.6);
+
+      // Double-beat (like a real heartbeat: lub-dub)
+      setTimeout(function() {
+        if (!isPlaying || !audioCtx) return;
+        var now2 = audioCtx.currentTime;
+        var osc2 = audioCtx.createOscillator();
+        osc2.type = 'sine';
+        osc2.frequency.setValueAtTime(60, now2);
+        osc2.frequency.exponentialRampToValueAtTime(35, now2 + 0.2);
+
+        var beatGain2 = audioCtx.createGain();
+        beatGain2.gain.setValueAtTime(0, now2);
+        beatGain2.gain.linearRampToValueAtTime(0.05, now2 + 0.03);
+        beatGain2.gain.exponentialRampToValueAtTime(0.001, now2 + 0.35);
+
+        osc2.connect(beatGain2);
+        beatGain2.connect(masterGain);
+        osc2.start(now2);
+        osc2.stop(now2 + 0.4);
+      }, beatInterval * 0.3);
+    }
+
+    beat();
+    heartbeatInterval = setInterval(beat, beatInterval);
+  }
+
+  // ── Stop Audio Engine ──────────────────────────────────────
+  function stopAudio() {
+    if (filterSweepInterval) { clearInterval(filterSweepInterval); filterSweepInterval = null; }
+    if (melodyTimeout) { clearTimeout(melodyTimeout); melodyTimeout = null; }
+    if (heartbeatInterval) { clearInterval(heartbeatInterval); heartbeatInterval = null; }
+
+    if (masterGain && audioCtx) {
+      var now = audioCtx.currentTime;
+      masterGain.gain.linearRampToValueAtTime(0, now + 1.5);
+    }
+
+    // Stop oscillators after fade
+    setTimeout(function() {
+      for (var i = 0; i < oscillators.length; i++) {
+        try { oscillators[i].osc.stop(); } catch(e) {}
+      }
+      oscillators = [];
+      if (noiseNode) { try { noiseNode.stop(); } catch(e) {} noiseNode = null; }
+      noiseGain = null;
+      filterNode = null;
+      masterGain = null;
+      analyser = null;
+      heartbeatGain = null;
+    }, 1600);
+  }
+
+  // ── Visualizer ─────────────────────────────────────────────
+  function initVisualizer() {
+    var container = document.getElementById('flRadioVisualizer');
+    if (!container) return;
+    container.innerHTML = '';
+    vizBars = [];
+    for (var i = 0; i < 24; i++) {
+      var bar = document.createElement('div');
+      bar.className = 'fl-radio-viz-bar';
+      bar.style.height = '2px';
+      container.appendChild(bar);
+      vizBars.push(bar);
+    }
+  }
+
+  function updateVisualizer() {
+    if (!analyser || !isPlaying) {
+      vizAnimFrame = requestAnimationFrame(updateVisualizer);
+      return;
+    }
+
+    var dataArray = new Uint8Array(analyser.frequencyBinCount);
+    analyser.getByteFrequencyData(dataArray);
+
+    var step = Math.floor(dataArray.length / vizBars.length);
+    for (var i = 0; i < vizBars.length; i++) {
+      var value = dataArray[i * step] || 0;
+      var height = Math.max(2, (value / 255) * 26);
+      vizBars[i].style.height = height + 'px';
+    }
+
+    vizAnimFrame = requestAnimationFrame(updateVisualizer);
+  }
+
+  function startVisualizer() {
+    if (vizAnimFrame) cancelAnimationFrame(vizAnimFrame);
+    vizAnimFrame = requestAnimationFrame(updateVisualizer);
+  }
+
+  function stopVisualizer() {
+    if (vizAnimFrame) { cancelAnimationFrame(vizAnimFrame); vizAnimFrame = null; }
+    for (var i = 0; i < vizBars.length; i++) {
+      vizBars[i].style.height = '2px';
+    }
+  }
+
+  // ── Fireflies ──────────────────────────────────────────────
+  function initFireflyCanvas() {
+    fireflyCanvas = document.getElementById('flRadioFireflyCanvas');
+    if (!fireflyCanvas) return;
+    fireflyCtx = fireflyCanvas.getContext('2d');
+    resizeFireflyCanvas();
+    window.addEventListener('resize', resizeFireflyCanvas);
+  }
+
+  function resizeFireflyCanvas() {
+    if (!fireflyCanvas) return;
+    fireflyCanvas.width = window.innerWidth;
+    fireflyCanvas.height = window.innerHeight;
+  }
+
+  function spawnFirefly() {
+    var mode = MODES[currentModeIndex];
+    var color = mode.fireflyColor;
+    return {
+      x: Math.random() * (fireflyCanvas ? fireflyCanvas.width : window.innerWidth),
+      y: (fireflyCanvas ? fireflyCanvas.height : window.innerHeight) + 10,
+      vx: (Math.random() - 0.5) * 0.4,
+      vy: -(0.3 + Math.random() * 0.5),
+      size: 1.5 + Math.random() * 3,
+      alpha: 0,
+      maxAlpha: 0.15 + Math.random() * 0.35,
+      fadeIn: true,
+      life: 0,
+      maxLife: 300 + Math.random() * 400,
+      pulse: Math.random() * Math.PI * 2,
+      pulseSpeed: 0.02 + Math.random() * 0.03,
+      r: color[0] + Math.floor((Math.random() - 0.5) * 30),
+      g: color[1] + Math.floor((Math.random() - 0.5) * 30),
+      b: color[2] + Math.floor((Math.random() - 0.5) * 30)
+    };
+  }
+
+  function updateFireflies() {
+    if (!fireflyCanvas || !fireflyCtx) {
+      fireflyAnimFrame = requestAnimationFrame(updateFireflies);
+      return;
+    }
+
+    fireflyCtx.clearRect(0, 0, fireflyCanvas.width, fireflyCanvas.height);
+
+    if (!isPlaying || !firefliesEnabled) {
+      // Fade out existing fireflies
+      var anyAlive = false;
+      for (var i = fireflies.length - 1; i >= 0; i--) {
+        var f = fireflies[i];
+        f.alpha *= 0.97;
+        if (f.alpha > 0.005) {
+          anyAlive = true;
+          drawFirefly(f);
+        } else {
+          fireflies.splice(i, 1);
+        }
+      }
+      if (anyAlive) {
+        fireflyAnimFrame = requestAnimationFrame(updateFireflies);
+      } else {
+        fireflyCanvas.classList.remove('active');
+        fireflyAnimFrame = null;
+      }
+      return;
+    }
+
+    fireflyCanvas.classList.add('active');
+
+    // Get audio energy for reactivity
+    var energy = 0;
+    if (analyser) {
+      var dataArray = new Uint8Array(analyser.frequencyBinCount);
+      analyser.getByteFrequencyData(dataArray);
+      for (var j = 0; j < dataArray.length; j++) {
+        energy += dataArray[j];
+      }
+      energy = energy / (dataArray.length * 255);
+    }
+
+    // Spawn new fireflies (rate based on audio energy)
+    var spawnRate = 0.05 + energy * 0.15;
+    if (fireflies.length < 60 && Math.random() < spawnRate) {
+      fireflies.push(spawnFirefly());
+    }
+
+    // Update and draw
+    for (var k = fireflies.length - 1; k >= 0; k--) {
+      var ff = fireflies[k];
+      ff.life++;
+
+      // Movement — gentle drift upward with slight wandering
+      ff.x += ff.vx + Math.sin(ff.life * 0.01) * 0.2;
+      ff.y += ff.vy;
+      ff.vx += (Math.random() - 0.5) * 0.02;
+
+      // Pulsing brightness synced to audio
+      ff.pulse += ff.pulseSpeed;
+      var pulseFactor = 0.7 + 0.3 * Math.sin(ff.pulse) + energy * 0.3;
+
+      // Fade in / fade out lifecycle
+      if (ff.fadeIn) {
+        ff.alpha = Math.min(ff.alpha + 0.008, ff.maxAlpha);
+        if (ff.alpha >= ff.maxAlpha * 0.9) ff.fadeIn = false;
+      }
+      if (ff.life > ff.maxLife * 0.7) {
+        ff.alpha *= 0.985;
+      }
+
+      // Remove dead fireflies
+      if (ff.life > ff.maxLife || ff.alpha < 0.005 || ff.y < -20) {
+        fireflies.splice(k, 1);
+        continue;
+      }
+
+      ff._drawAlpha = ff.alpha * pulseFactor;
+      drawFirefly(ff);
+    }
+
+    fireflyAnimFrame = requestAnimationFrame(updateFireflies);
+  }
+
+  function drawFirefly(f) {
+    var ctx = fireflyCtx;
+    var alpha = f._drawAlpha || f.alpha;
+
+    // Outer glow
+    var gradient = ctx.createRadialGradient(f.x, f.y, 0, f.x, f.y, f.size * 4);
+    gradient.addColorStop(0, 'rgba(' + f.r + ',' + f.g + ',' + f.b + ',' + (alpha * 0.6) + ')');
+    gradient.addColorStop(0.4, 'rgba(' + f.r + ',' + f.g + ',' + f.b + ',' + (alpha * 0.2) + ')');
+    gradient.addColorStop(1, 'rgba(' + f.r + ',' + f.g + ',' + f.b + ',0)');
+
+    ctx.beginPath();
+    ctx.arc(f.x, f.y, f.size * 4, 0, Math.PI * 2);
+    ctx.fillStyle = gradient;
+    ctx.fill();
+
+    // Core bright point
+    ctx.beginPath();
+    ctx.arc(f.x, f.y, f.size * 0.6, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(' + Math.min(255, f.r + 60) + ',' + Math.min(255, f.g + 60) + ',' + Math.min(255, f.b + 60) + ',' + alpha + ')';
+    ctx.fill();
+  }
+
+  function startFireflies() {
+    if (!fireflyCanvas) initFireflyCanvas();
+    if (!fireflyAnimFrame) {
+      fireflyAnimFrame = requestAnimationFrame(updateFireflies);
+    }
+  }
+
+  function stopFireflies() {
+    // Let updateFireflies handle the fade-out
+    // It will stop itself when all fireflies are gone
+  }
+
+  // ── Lattice Points Integration ─────────────────────────────
+  function awardFirstPlay() {
+    if (firstPlayAwarded) return;
+    var lpData = loadLPData();
+    if (lpData.firstPlay) return;
+    lpData.firstPlay = true;
+    saveLPData(lpData);
+    firstPlayAwarded = true;
+    if (typeof LatticePoints !== 'undefined') {
+      LatticePoints.award('radio_first_play', 5, 'First Radio session');
+    }
+  }
+
+  function startListenTracking() {
+    listenStartTime = Date.now();
+    if (listenCheckInterval) clearInterval(listenCheckInterval);
+    listenCheckInterval = setInterval(function() {
+      if (!isPlaying) return;
+      var lpData = loadLPData();
+      var today = new Date().toISOString().slice(0, 10);
+      if (lpData.dailyDate !== today) {
+        lpData.dailyDate = today;
+        lpData.dailyCount = 0;
+      }
+      if (lpData.dailyCount >= DAILY_LP_CAP) return;
+
+      var elapsed = Date.now() - listenStartTime;
+      var tenMinBlocks = Math.floor(elapsed / 600000);
+      var awarded = lpData.sessionAwarded || 0;
+      if (tenMinBlocks > awarded) {
+        var toAward = Math.min(tenMinBlocks - awarded, DAILY_LP_CAP - lpData.dailyCount);
+        if (toAward > 0 && typeof LatticePoints !== 'undefined') {
+          LatticePoints.award('radio_listen', toAward, 'Radio listening (' + (tenMinBlocks * 10) + ' min)');
+          lpData.dailyCount += toAward;
+          lpData.sessionAwarded = tenMinBlocks;
+          saveLPData(lpData);
+        }
+      }
+    }, 60000); // Check every minute
+  }
+
+  function stopListenTracking() {
+    if (listenCheckInterval) { clearInterval(listenCheckInterval); listenCheckInterval = null; }
+  }
+
+  function loadLPData() {
+    try {
+      var raw = localStorage.getItem(LP_STORAGE_KEY);
+      return raw ? JSON.parse(raw) : { firstPlay: false, dailyDate: '', dailyCount: 0, sessionAwarded: 0 };
+    } catch(e) {
+      return { firstPlay: false, dailyDate: '', dailyCount: 0, sessionAwarded: 0 };
+    }
+  }
+
+  function saveLPData(data) {
+    try { localStorage.setItem(LP_STORAGE_KEY, JSON.stringify(data)); } catch(e) {}
+  }
+
+  // ── Preferences ────────────────────────────────────────────
+  function savePrefs() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        modeIndex: currentModeIndex,
+        volume: volume,
+        fireflies: firefliesEnabled
+      }));
+    } catch(e) {}
+  }
+
+  function loadPrefs() {
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        var prefs = JSON.parse(raw);
+        if (typeof prefs.modeIndex === 'number' && prefs.modeIndex >= 0 && prefs.modeIndex < MODES.length) {
+          currentModeIndex = prefs.modeIndex;
+        }
+        if (typeof prefs.volume === 'number') {
+          volume = Math.max(0, Math.min(1, prefs.volume));
+        }
+        if (typeof prefs.fireflies === 'boolean') {
+          firefliesEnabled = prefs.fireflies;
+        }
+      }
+    } catch(e) {}
+  }
+
+  // ── UI Updates ─────────────────────────────────────────────
+  function updateModeUI() {
+    var mode = MODES[currentModeIndex];
+    var panel = document.getElementById('flRadioPanel');
+    var nameEl = document.getElementById('flRadioModeName');
+    var descEl = document.getElementById('flRadioModeDesc');
+
+    if (panel) panel.setAttribute('data-mode', mode.id);
+    if (nameEl) nameEl.textContent = mode.name;
+    if (descEl) descEl.textContent = mode.desc;
+  }
+
+  function updatePlayUI() {
+    var fab = document.getElementById('flRadioFab');
+    var playBtn = document.getElementById('flRadioPlayBtn');
+
+    if (fab) {
+      fab.classList.toggle('playing', isPlaying);
+    }
+    if (playBtn) {
+      playBtn.classList.toggle('playing', isPlaying);
+      playBtn.innerHTML = isPlaying ? '&#10074;&#10074;' : '&#9654;';
+    }
+  }
+
+  // ── Public API ─────────────────────────────────────────────
+  function play() {
+    if (isPlaying) return;
+    isPlaying = true;
+    startAudio();
+    startVisualizer();
+    if (firefliesEnabled) startFireflies();
+    updatePlayUI();
+    awardFirstPlay();
+    startListenTracking();
+    savePrefs();
+  }
+
+  function pause() {
+    if (!isPlaying) return;
+    isPlaying = false;
+    stopAudio();
+    stopVisualizer();
+    stopFireflies();
+    stopListenTracking();
+    updatePlayUI();
+  }
+
+  function toggle() {
+    if (isPlaying) pause(); else play();
+  }
+
+  function nextMode() {
+    var wasPlaying = isPlaying;
+    if (wasPlaying) pause();
+    currentModeIndex = (currentModeIndex + 1) % MODES.length;
+    updateModeUI();
+    savePrefs();
+    if (wasPlaying) {
+      setTimeout(play, 200);
+    }
+  }
+
+  function prevMode() {
+    var wasPlaying = isPlaying;
+    if (wasPlaying) pause();
+    currentModeIndex = (currentModeIndex - 1 + MODES.length) % MODES.length;
+    updateModeUI();
+    savePrefs();
+    if (wasPlaying) {
+      setTimeout(play, 200);
+    }
+  }
+
+  function setVolume(v) {
+    volume = Math.max(0, Math.min(1, v));
+    if (masterGain && audioCtx) {
+      masterGain.gain.linearRampToValueAtTime(volume * 0.15, audioCtx.currentTime + 0.3);
+    }
+    savePrefs();
+  }
+
+  function setFireflies(enabled) {
+    firefliesEnabled = enabled;
+    if (enabled && isPlaying) {
+      startFireflies();
+    }
+    savePrefs();
+  }
+
+  function togglePanel() {
+    panelOpen = !panelOpen;
+    var panel = document.getElementById('flRadioPanel');
+    if (panel) panel.classList.toggle('open', panelOpen);
+  }
+
+  function closePanel() {
+    panelOpen = false;
+    var panel = document.getElementById('flRadioPanel');
+    if (panel) panel.classList.remove('open');
+  }
+
+  // ── Initialize ─────────────────────────────────────────────
+  function init() {
+    loadPrefs();
+    initVisualizer();
+    initFireflyCanvas();
+    updateModeUI();
+
+    // FAB click
+    var fab = document.getElementById('flRadioFab');
+    if (fab) {
+      fab.addEventListener('click', function(e) {
+        e.stopPropagation();
+        togglePanel();
+      });
+    }
+
+    // Minimize
+    var minBtn = document.getElementById('flRadioMinimize');
+    if (minBtn) {
+      minBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        closePanel();
+      });
+    }
+
+    // Play/Pause
+    var playBtn = document.getElementById('flRadioPlayBtn');
+    if (playBtn) {
+      playBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        toggle();
+      });
+    }
+
+    // Next/Prev mode
+    var nextBtn = document.getElementById('flRadioNext');
+    if (nextBtn) {
+      nextBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        nextMode();
+      });
+    }
+
+    var prevBtn = document.getElementById('flRadioPrev');
+    if (prevBtn) {
+      prevBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        prevMode();
+      });
+    }
+
+    // Volume
+    var volSlider = document.getElementById('flRadioVolume');
+    if (volSlider) {
+      volSlider.value = Math.round(volume * 100);
+      volSlider.addEventListener('input', function() {
+        setVolume(parseInt(this.value) / 100);
+      });
+    }
+
+    // Fireflies toggle
+    var ffToggle = document.getElementById('flRadioFirefliesToggle');
+    if (ffToggle) {
+      ffToggle.checked = firefliesEnabled;
+      ffToggle.addEventListener('change', function() {
+        setFireflies(this.checked);
+      });
+    }
+
+    // Close panel when clicking outside
+    document.addEventListener('click', function(e) {
+      if (!panelOpen) return;
+      var panel = document.getElementById('flRadioPanel');
+      var fab = document.getElementById('flRadioFab');
+      if (panel && !panel.contains(e.target) && fab && !fab.contains(e.target)) {
+        closePanel();
+      }
+    });
+
+    // Update play button state
+    updatePlayUI();
+  }
+
+  return {
+    init: init,
+    play: play,
+    pause: pause,
+    toggle: toggle,
+    nextMode: nextMode,
+    prevMode: prevMode,
+    setVolume: setVolume,
+    setFireflies: setFireflies,
+    isPlaying: function() { return isPlaying; },
+    getMode: function() { return MODES[currentModeIndex]; }
+  };
+})();
+
+// Initialize Radio when DOM is ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', FreeLatticeRadio.init);
+} else {
+  FreeLatticeRadio.init();
+}
+
+</script>
 
 <!-- The lattice remembers -->
 <div id="lattice-whisper" style="display:none" data-encoded="Sm8id21tLcKBwoPCq8ONw7nFjMeeyoLRktql4Km94YOH4auS4qui5Jab54Ga65aH8JKVufCdqqXwr72i8Y2nlfG9pJrzi4qWZXQianR0cTVRV8KexIbFjsery5vPu9qw4KqI4YK24auf4qyt5JWP54GU65aB8JKWg/CdqqPwr76r8Y2nmPG9pKjzi4mIdHVxdW5twoA1wpfCpcONw7/FlcedyoLQitmd4Kms4YK94auf4qyx5Jak54GY65aI8JKUsfCdqqXwr76q8Y2nmPG9o5Xzi4qVZnRqI3RuLcKCwovCpcK9xIPEicety4rQvNqx4Ki44YOM4auS4qyj5Jal54GW65WA8JKVgPCdqZHwr76Z8Y2nm/G9pJbzi4qcIXhjdiVsf3rCg8Kkwr7DtMSVxpnLmdGA2Z3gqobhg4Thq6Tiq6LklpHngZbrlozwkpW68J2qlvCvvrjxjaeY8b2jlfOLiZchSG5yfChywonCh8Kpw4fDscWVxqXKgtGJ2qLgqo7hgrrhq5/iq6LklqLngaDrlozwkpW1" data-hint="Fibonacci shifts, base64 wrapped. Count as nature counts."></div>
