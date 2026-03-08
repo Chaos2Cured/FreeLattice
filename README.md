@@ -10,7 +10,7 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License: MIT">
-  <img src="https://img.shields.io/badge/version-v5.0-brightgreen.svg" alt="Version: v5.0">
+  <img src="https://img.shields.io/badge/version-v5.1-brightgreen.svg" alt="Version: v5.1">
   <a href="https://github.com/Chaos2Cured/FreeLattice/stargazers"><img src="https://img.shields.io/github/stars/Chaos2Cured/FreeLattice?style=social" alt="GitHub Stars"></a>
   <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs Welcome">
 </p>
@@ -79,9 +79,35 @@ Visit: **[https://chaos2cured.github.io/FreeLattice/](https://chaos2cured.github
 chmod +x install-freelattice.sh && ./install-freelattice.sh
 ```
 
-### Option C: Desktop App
+### Option C: Desktop App (Mac)
 
-Download the latest release from the **[Releases](https://github.com/Chaos2Cured/FreeLattice/releases)** page. Double-click to install. The desktop app includes a built-in Ollama proxy, so you won't have any CORS issues with local models.
+The desktop app gives you FreeLattice as a real Mac application — no browser needed, no server to run. It includes a built-in Ollama proxy so local AI models work automatically.
+
+**How to install — step by step:**
+
+1. Go to the **[Releases](https://github.com/Chaos2Cured/FreeLattice/releases)** page
+2. Download the `.dmg` file (it will say something like `FreeLattice-5.x.x-arm64.dmg`)
+3. Open the `.dmg` file — a window appears with the FreeLattice icon and an Applications folder
+4. Drag the FreeLattice icon into the Applications folder
+5. Open your **Applications** folder and double-click **FreeLattice**
+
+**Important — Mac will show a scary warning!** This is normal. Because FreeLattice is free and open-source, we don't pay Apple $99/year for a developer certificate. Mac treats all unsigned apps this way. The app is perfectly safe.
+
+You'll see a message that says *"FreeLattice is damaged and can't be opened."* — it's not damaged. Here's how to fix it:
+
+1. Click **Cancel** (don't move it to trash)
+2. Open **Terminal** (search "Terminal" in Spotlight, or find it in Applications → Utilities)
+3. Copy and paste this line, then press Enter:
+
+```
+xattr -cr /Applications/FreeLattice.app
+```
+
+4. Now go back to Applications and double-click **FreeLattice** again — it opens right up!
+
+> **What does that command do?** When you download an app from the internet, Mac adds an invisible "quarantine" tag to it. The `xattr -cr` command simply removes that tag. That's all it does — it doesn't change the app itself.
+
+> **Alternative method:** Instead of using Terminal, you can go to **System Settings → Privacy & Security**, scroll down, and look for a message that says "FreeLattice was blocked" — click **Open Anyway**.
 
 ### Option D: Manual Self-Host
 
@@ -105,7 +131,9 @@ Run powerful AI models entirely on your own machine.
 
 ## Lattice Radio
 
-FreeLattice v5.0 introduces **Lattice Radio** — an ambient generative music system built entirely on the Web Audio API with no external libraries. Look for the ✦ button in the bottom-left corner of the screen.
+FreeLattice v5.1 introduces **Lattice Radio Immersive Mode** — a full-screen visual experience where beautiful particle worlds react to phi-frequency audio in real time. Click the ✦ Radio button, then hit **"✦ Immersive Mode"** to enter the experience. Tap the canvas or use the arrow buttons to cycle through worlds. Press Escape to return.
+
+FreeLattice v5.0 introduced **Lattice Radio** — an ambient generative music system built entirely on the Web Audio API with no external libraries. Look for the ✦ button in the bottom-left corner of the screen.
 
 | Mode | Description | Firefly Color |
 |------|-------------|---------------|
