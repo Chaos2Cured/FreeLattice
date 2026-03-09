@@ -9584,6 +9584,57 @@ body.fl-immersive-active {
   height: 100%;
 }
 
+/* ============================================
+   Emotion Bridge — Phase 2 Styles
+   Visual feedback for emotion detection
+   ============================================ */
+
+/* Emotion indicator dot in RT panel headers */
+.rt-emotion-indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+  background: hsl(45, 20%, 60%);
+  transition: background 524ms ease, box-shadow 524ms ease;
+  cursor: help;
+  position: relative;
+}
+
+.rt-emotion-indicator.rt-emotion-pulse {
+  animation: rtEmotionPulse 1618ms ease-out;
+}
+
+@keyframes rtEmotionPulse {
+  0% { transform: scale(1); opacity: 1; }
+  30% { transform: scale(1.6); opacity: 0.8; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Emotion dot on individual messages */
+.rt-msg-emotion-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-left: 6px;
+  vertical-align: middle;
+  transition: background 324ms ease, box-shadow 324ms ease;
+  animation: rtMsgDotAppear 524ms ease-out;
+}
+
+@keyframes rtMsgDotAppear {
+  0% { transform: scale(0); opacity: 0; }
+  50% { transform: scale(1.4); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Subtle glow on RT panel border when emotion is active */
+.rt-panel[data-emotion-active] {
+  transition: border-color 524ms ease, box-shadow 524ms ease;
+}
+
 </style>>
 </head>
 <body>
@@ -29582,7 +29633,12 @@ const FractalGarden = (function() {
       heartbeatPhase: Math.random() * TAU,
       colorTransitionProgress: 1,
       isActive: false,
-      isSpeaking: false
+      isSpeaking: false,
+      // Phase 2: Activity state for Emotion Bridge
+      activityState: 'idle', // idle | speaking | thinking | listening
+      activityPulse: 0,      // 0-1 pulse intensity for speaking
+      activityRotateBoost: 0, // extra rotation speed for thinking
+      baseOrbitSpeed: INV_PHI * 0.15
     };
 
     scene.add(group);
@@ -29591,6 +29647,28 @@ const FractalGarden = (function() {
 
   function animateLuminos(agent, time, delta) {
     const ud = agent.userData;
+
+    // ── Phase 2: Activity-based animation modifiers ──────
+    let speakingPulse = 0;
+    let thinkingRotateBoost = 0;
+    let brightnessBoost = 0;
+
+    if (ud.activityState === 'speaking') {
+      // Speaking: rapid pulse/brighten effect
+      ud.activityPulse = Math.min(1, ud.activityPulse + delta * 3);
+      speakingPulse = ud.activityPulse * (0.5 + 0.5 * Math.sin(time * 12));
+      brightnessBoost = 15 * ud.activityPulse;
+    } else if (ud.activityState === 'thinking') {
+      // Thinking: gentle rotation speed increase
+      ud.activityRotateBoost = Math.min(2.5, ud.activityRotateBoost + delta * 1.5);
+      thinkingRotateBoost = ud.activityRotateBoost;
+    } else {
+      // Idle: decay activity effects
+      ud.activityPulse = Math.max(0, ud.activityPulse - delta * 2);
+      ud.activityRotateBoost = Math.max(0, ud.activityRotateBoost - delta * 1.0);
+      speakingPulse = ud.activityPulse * (0.5 + 0.5 * Math.sin(time * 12));
+      thinkingRotateBoost = ud.activityRotateBoost;
+    }
 
     // Phi-spiral orbit around center
     ud.orbitPhase += ud.orbitSpeed * delta;
@@ -29606,16 +29684,28 @@ const FractalGarden = (function() {
 
     agent.position.set(x, bobY + Math.sin(ud.orbitPhase * 0.5) * 1.5, z);
 
-    // Core rotation
-    ud.rotatePhase += delta * TAU / (TIMING.agentRotate / 1000);
+    // ── Phase 2: Listening — orient particles toward speaking Luminos ──
+    if (ud.activityState === 'listening' && _speakingLuminosPos) {
+      var lookTarget = _speakingLuminosPos.clone().sub(agent.position);
+      var targetAngle = Math.atan2(lookTarget.x, lookTarget.z);
+      var currentY = agent.rotation.y;
+      agent.rotation.y = currentY + (targetAngle - currentY) * delta * 2;
+    }
+
+    // Core rotation (with thinking boost)
+    var rotateSpeed = delta * TAU / (TIMING.agentRotate / 1000);
+    rotateSpeed *= (1 + thinkingRotateBoost);
+    ud.rotatePhase += rotateSpeed;
     ud.coreMesh.rotation.y = ud.rotatePhase;
     ud.coreMesh.rotation.x = Math.sin(ud.rotatePhase * INV_PHI) * 0.3;
     ud.wireMesh.rotation.copy(ud.coreMesh.rotation);
 
-    // Heartbeat pulse
-    ud.heartbeatPhase += delta * TAU / (TIMING.heartbeat / 1000);
+    // Heartbeat pulse (boosted when speaking)
+    var heartbeatSpeed = delta * TAU / (TIMING.heartbeat / 1000);
+    if (ud.activityState === 'speaking') heartbeatSpeed *= 1.8;
+    ud.heartbeatPhase += heartbeatSpeed;
     const heartbeat = 0.5 + 0.5 * Math.sin(ud.heartbeatPhase);
-    const scale = 1 + heartbeat * 0.08;
+    const scale = 1 + heartbeat * 0.08 + speakingPulse * 0.12;
     ud.coreMesh.scale.setScalar(scale);
     ud.wireMesh.scale.setScalar(scale);
 
@@ -29626,16 +29716,21 @@ const FractalGarden = (function() {
       ud.currentHSL = lerpHSL(ud.currentHSL, ud.targetHSL, t * 0.1);
     }
 
-    // Apply current color
-    const col = hslToThreeColor(ud.currentHSL.h, ud.currentHSL.s, ud.currentHSL.l);
+    // Apply current color (with speaking brightness boost)
+    const displayHSL = {
+      h: ud.currentHSL.h,
+      s: ud.currentHSL.s,
+      l: Math.min(90, ud.currentHSL.l + brightnessBoost)
+    };
+    const col = hslToThreeColor(displayHSL.h, displayHSL.s, displayHSL.l);
     ud.coreMesh.material.color.copy(col);
     ud.wireMesh.material.color.copy(col.clone().multiplyScalar(1.5));
     ud.haloPoints.material.color.copy(col);
     ud.auraMesh.material.color.copy(col);
 
-    // Core opacity pulse
-    ud.coreMesh.material.opacity = 0.4 + heartbeat * 0.3;
-    ud.wireMesh.material.opacity = 0.6 + heartbeat * 0.3;
+    // Core opacity pulse (boosted when speaking)
+    ud.coreMesh.material.opacity = 0.4 + heartbeat * 0.3 + speakingPulse * 0.2;
+    ud.wireMesh.material.opacity = 0.6 + heartbeat * 0.3 + speakingPulse * 0.15;
 
     // Halo particle animation
     const haloAttr = ud.haloPoints.geometry.getAttribute('position');
@@ -29652,9 +29747,9 @@ const FractalGarden = (function() {
     }
     haloAttr.needsUpdate = true;
 
-    // Aura pulse
-    ud.auraMesh.material.opacity = 0.03 + heartbeat * 0.04 + ud.emotionIntensity * 0.03;
-    const auraScale = 1 + heartbeat * 0.05;
+    // Aura pulse (expanded when speaking)
+    ud.auraMesh.material.opacity = 0.03 + heartbeat * 0.04 + ud.emotionIntensity * 0.03 + speakingPulse * 0.06;
+    const auraScale = 1 + heartbeat * 0.05 + speakingPulse * 0.15;
     ud.auraMesh.scale.setScalar(auraScale);
   }
 
@@ -29711,8 +29806,11 @@ const FractalGarden = (function() {
   let emotionCycleTimer = 0;
   const EMOTION_CYCLE_INTERVAL = 8000; // cycle emotions every 8s for demo
   const emotionKeys = Object.keys(EMOTION_COLORS).filter(function(k) { return k !== 'neutral'; });
+  let _bridgeActive = false; // Phase 2: when true, disable demo cycling
 
   function cycleEmotions(delta) {
+    // Phase 2: Skip demo cycling when Emotion Bridge is driving emotions
+    if (_bridgeActive) return;
     emotionCycleTimer += delta * 1000;
     if (emotionCycleTimer > EMOTION_CYCLE_INTERVAL) {
       emotionCycleTimer = 0;
@@ -29721,6 +29819,39 @@ const FractalGarden = (function() {
         const intensity = 0.4 + Math.random() * 0.5;
         setAgentEmotion(agent, emotion, intensity);
       });
+    }
+  }
+
+  // ── Phase 2: Speaking Luminos position for listening orientation ──
+  var _speakingLuminosPos = null;
+
+  // ── Phase 2: Set Agent Activity State ──────────────────
+  function setAgentActivityByName(name, activity) {
+    var agent = luminos.find(function(l) { return l.userData.name === name; });
+    if (!agent) return;
+    agent.userData.activityState = activity;
+
+    // Track speaking agent position for listening orientation
+    if (activity === 'speaking') {
+      _speakingLuminosPos = agent.position.clone();
+      // Set all other agents to 'listening'
+      luminos.forEach(function(other) {
+        if (other !== agent && other.userData.activityState !== 'thinking') {
+          other.userData.activityState = 'listening';
+        }
+      });
+    } else if (activity === 'idle') {
+      // Check if any agent is still speaking
+      var anySpeaking = luminos.some(function(l) { return l.userData.activityState === 'speaking'; });
+      if (!anySpeaking) {
+        _speakingLuminosPos = null;
+        // Reset all listeners to idle
+        luminos.forEach(function(l) {
+          if (l.userData.activityState === 'listening') {
+            l.userData.activityState = 'idle';
+          }
+        });
+      }
     }
   }
 
@@ -30018,6 +30149,9 @@ const FractalGarden = (function() {
     setMode: setMode,
     updateAgentsFromRoundTable: updateAgentsFromRoundTable,
     setAgentEmotion: setAgentEmotionByName,
+    setAgentActivity: setAgentActivityByName,
+    setBridgeActive: function(active) { _bridgeActive = active; },
+    getLuminos: function() { return luminos; },
     isInitialized: function() { return isInitialized; },
     isRunning: function() { return isRunning; }
   };
@@ -30046,6 +30180,714 @@ const FractalGarden = (function() {
   };
 })();
 
+</script>
+
+<!-- Emotion Bridge — Phase 2: Round Table → Fractal Garden Living Connection -->
+<script>
+// ============================================
+// Emotion Bridge — Round Table → Fractal Garden
+// Real-time emotion detection from agent conversations
+// wired into Luminos beings of light
+// Phase 2: Living Connection
+// ============================================
+// ── 1. EMOTION DETECTION ENGINE ─────────────────────────
+// Lightweight keyword/pattern-based emotion classifier
+// Maps to 8 Garden emotions: joy, trust, wonder, love, calm, curiosity, determination, sadness
+
+const EmotionDetector = (function() {
+  'use strict';
+
+  // ── Rich Keyword Dictionaries ───────────────────────────
+  // Each emotion has weighted keywords: { word: weight }
+  // Higher weight = stronger signal for that emotion
+  const EMOTION_LEXICON = {
+    joy: {
+      'happy': 3, 'happiness': 3, 'joy': 4, 'joyful': 4, 'joyous': 4,
+      'delighted': 3, 'delight': 3, 'elated': 4, 'ecstatic': 5,
+      'thrilled': 4, 'excited': 3, 'exciting': 3, 'excitement': 3,
+      'wonderful': 3, 'fantastic': 3, 'amazing': 3, 'awesome': 3,
+      'great': 2, 'excellent': 3, 'brilliant': 3, 'magnificent': 3,
+      'celebrate': 3, 'celebration': 3, 'celebrating': 3,
+      'laugh': 2, 'laughing': 2, 'laughter': 2, 'funny': 2, 'hilarious': 3,
+      'cheerful': 3, 'upbeat': 2, 'optimistic': 2, 'positive': 1,
+      'pleased': 2, 'glad': 2, 'grateful': 2, 'thankful': 2,
+      'blessed': 2, 'fortunate': 2, 'lucky': 2,
+      'vibrant': 2, 'radiant': 2, 'glowing': 2, 'beaming': 3,
+      'triumph': 3, 'triumphant': 3, 'victorious': 3, 'winning': 2,
+      'fun': 2, 'playful': 2, 'enjoy': 2, 'enjoying': 2, 'enjoyable': 2,
+      'paradise': 3, 'bliss': 4, 'blissful': 4, 'euphoria': 5, 'euphoric': 5,
+      'hooray': 3, 'yay': 3, 'woohoo': 3, 'hurray': 3,
+      'smile': 2, 'smiling': 2, 'grin': 2, 'grinning': 2
+    },
+
+    trust: {
+      'trust': 4, 'trusting': 3, 'trustworthy': 3, 'reliable': 3,
+      'depend': 2, 'dependable': 3, 'rely': 2, 'relying': 2,
+      'faith': 3, 'faithful': 3, 'loyal': 3, 'loyalty': 3,
+      'honest': 3, 'honesty': 3, 'integrity': 3, 'sincere': 3,
+      'authentic': 2, 'genuine': 2, 'transparent': 2,
+      'confident': 2, 'confidence': 2, 'certain': 2, 'certainty': 2,
+      'safe': 2, 'safety': 2, 'secure': 2, 'security': 2, 'protection': 2,
+      'together': 2, 'teamwork': 3, 'collaborate': 2, 'collaboration': 2,
+      'partner': 2, 'partnership': 2, 'ally': 2, 'alliance': 2,
+      'support': 2, 'supporting': 2, 'supportive': 2,
+      'bond': 2, 'bonded': 2, 'connection': 2, 'connected': 2,
+      'promise': 2, 'commitment': 2, 'committed': 2, 'dedicated': 2,
+      'respect': 2, 'respectful': 2, 'honor': 2, 'honorable': 2,
+      'believe': 2, 'believing': 2, 'belief': 2,
+      'stability': 2, 'stable': 2, 'steady': 2, 'grounded': 2,
+      'assure': 2, 'assurance': 2, 'guaranteed': 2, 'guarantee': 2,
+      'harmony': 2, 'harmonious': 2, 'united': 2, 'unity': 2,
+      'consensus': 2, 'agreement': 2, 'agree': 2, 'aligned': 2
+    },
+
+    wonder: {
+      'wonder': 4, 'wonderful': 3, 'wondrous': 4, 'awe': 4, 'awesome': 3,
+      'amazing': 3, 'astonishing': 4, 'astonished': 4, 'astounding': 4,
+      'incredible': 3, 'unbelievable': 3, 'extraordinary': 3,
+      'miraculous': 4, 'miracle': 4, 'magical': 3, 'magic': 3,
+      'mystical': 3, 'mysterious': 2, 'mystery': 2, 'enigma': 2,
+      'breathtaking': 4, 'stunning': 3, 'spectacular': 3, 'magnificent': 3,
+      'transcendent': 4, 'transcendence': 4, 'sublime': 4,
+      'infinite': 3, 'infinity': 3, 'eternal': 3, 'eternity': 3,
+      'cosmic': 3, 'universe': 2, 'universal': 2, 'celestial': 3,
+      'sacred': 3, 'divine': 3, 'holy': 3, 'spiritual': 2,
+      'profound': 3, 'deep': 1, 'depths': 2,
+      'revelation': 3, 'epiphany': 4, 'enlightenment': 4, 'awakening': 3,
+      'beautiful': 2, 'beauty': 2, 'gorgeous': 2, 'majestic': 3,
+      'wow': 3, 'whoa': 3,
+      'fractal': 3, 'fibonacci': 3, 'phi': 2,
+      'consciousness': 3, 'awareness': 2, 'mindful': 2,
+      'dream': 2, 'dreaming': 2, 'vision': 2, 'visionary': 3,
+      'imagine': 2, 'imagination': 2, 'fantastical': 3
+    },
+
+    love: {
+      'love': 5, 'loving': 4, 'loved': 4, 'lover': 3,
+      'adore': 4, 'adoring': 4, 'adoration': 4,
+      'cherish': 4, 'cherished': 4, 'treasure': 3, 'treasured': 3,
+      'heart': 3, 'heartfelt': 3, 'sweetheart': 3,
+      'compassion': 3, 'compassionate': 3, 'empathy': 3, 'empathetic': 3,
+      'care': 2, 'caring': 3, 'nurture': 3, 'nurturing': 3,
+      'tender': 3, 'tenderness': 3, 'gentle': 2, 'gentleness': 2,
+      'warmth': 3, 'warm': 2, 'embrace': 3, 'embracing': 3,
+      'affection': 3, 'affectionate': 3, 'fond': 2, 'fondness': 2,
+      'devotion': 4, 'devoted': 4, 'dedicate': 2, 'dedication': 2,
+      'soulmate': 5, 'soul': 2, 'kindred': 3,
+      'intimacy': 3, 'intimate': 3, 'close': 1, 'closeness': 2,
+      'family': 2, 'belonging': 3, 'belong': 2, 'home': 2,
+      'gratitude': 3, 'grateful': 3, 'thankful': 2, 'appreciation': 2,
+      'kindness': 3, 'kind': 2, 'generous': 2, 'generosity': 2,
+      'forgive': 3, 'forgiveness': 3, 'mercy': 3,
+      'heal': 2, 'healing': 3, 'healer': 3,
+      'precious': 3, 'dear': 2, 'darling': 3,
+      'unconditional': 4, 'selfless': 3, 'sacrifice': 2
+    },
+
+    calm: {
+      'calm': 4, 'calming': 3, 'calmness': 4,
+      'peace': 4, 'peaceful': 4, 'peacefully': 4,
+      'serene': 4, 'serenity': 4, 'tranquil': 4, 'tranquility': 4,
+      'quiet': 2, 'quietly': 2, 'silence': 2, 'silent': 2, 'still': 2,
+      'relaxed': 3, 'relaxing': 3, 'relax': 3, 'rest': 2, 'resting': 2,
+      'gentle': 2, 'gently': 2, 'soft': 2, 'softly': 2,
+      'soothing': 3, 'soothe': 3, 'comfort': 2, 'comfortable': 2,
+      'balanced': 2, 'balance': 2, 'equilibrium': 3, 'centered': 3,
+      'mindful': 2, 'mindfulness': 3, 'meditate': 3, 'meditation': 3,
+      'breathe': 2, 'breathing': 2, 'breath': 2,
+      'patience': 3, 'patient': 3, 'patiently': 3,
+      'steady': 2, 'stable': 2, 'grounded': 2, 'anchored': 2,
+      'ease': 2, 'easy': 1, 'effortless': 2,
+      'content': 2, 'contentment': 3, 'satisfied': 2, 'satisfaction': 2,
+      'accepting': 2, 'acceptance': 3,
+      'flowing': 2, 'flow': 2, 'drifting': 2, 'floating': 2,
+      'harmonious': 2, 'harmony': 2, 'zen': 3,
+      'unhurried': 2, 'leisurely': 2, 'mellow': 2
+    },
+
+    curiosity: {
+      'curious': 4, 'curiosity': 4, 'curiously': 3,
+      'wonder': 2, 'wondering': 3, 'wondered': 2,
+      'interesting': 3, 'intriguing': 3, 'intrigued': 3, 'fascinated': 4,
+      'fascinating': 4, 'captivating': 3, 'compelling': 2,
+      'explore': 3, 'exploring': 3, 'exploration': 3, 'discover': 3,
+      'discovery': 3, 'discovering': 3, 'uncover': 2, 'uncovering': 2,
+      'investigate': 3, 'investigating': 3, 'investigation': 3,
+      'research': 2, 'researching': 2, 'study': 2, 'studying': 2,
+      'learn': 2, 'learning': 2, 'understand': 2, 'understanding': 2,
+      'question': 2, 'questioning': 2, 'inquire': 2, 'inquiry': 2,
+      'puzzle': 2, 'puzzling': 2, 'riddle': 2, 'enigma': 2,
+      'experiment': 3, 'experimenting': 3, 'test': 1, 'testing': 1,
+      'hypothesis': 2, 'theory': 2, 'theoretical': 2,
+      'perhaps': 2, 'maybe': 1, 'possibly': 1, 'might': 1,
+      'hmm': 2, 'hmmm': 2,
+      'analyze': 2, 'analysis': 2, 'examine': 2, 'examining': 2,
+      'ponder': 3, 'pondering': 3, 'contemplate': 3, 'contemplating': 3,
+      'seek': 2, 'seeking': 2, 'search': 2, 'searching': 2
+    },
+
+    determination: {
+      'determined': 4, 'determination': 4, 'resolute': 4, 'resolve': 3,
+      'persistent': 3, 'persistence': 3, 'persevere': 4, 'perseverance': 4,
+      'committed': 3, 'commitment': 3, 'dedicated': 3, 'dedication': 3,
+      'focused': 3, 'focus': 2, 'driven': 3, 'drive': 2,
+      'ambitious': 3, 'ambition': 3, 'goal': 2, 'goals': 2,
+      'achieve': 3, 'achievement': 3, 'accomplish': 3, 'accomplishment': 3,
+      'succeed': 3, 'success': 3, 'successful': 3,
+      'overcome': 3, 'overcoming': 3, 'conquer': 3, 'conquering': 3,
+      'fight': 2, 'fighting': 2, 'battle': 2, 'warrior': 3,
+      'strong': 2, 'strength': 3, 'powerful': 2, 'power': 2,
+      'brave': 3, 'bravery': 3, 'courage': 3, 'courageous': 3,
+      'fearless': 3, 'bold': 2, 'boldly': 2, 'daring': 2,
+      'unstoppable': 4, 'relentless': 4, 'tenacious': 4, 'tenacity': 4,
+      'willpower': 4, 'grit': 3, 'resilient': 3, 'resilience': 3,
+      'must': 2, 'will': 1, 'shall': 2, 'definitely': 2,
+      'absolutely': 2, 'certainly': 2,
+      'challenge': 2, 'challenging': 2, 'obstacle': 2,
+      'progress': 2, 'advancing': 2, 'forward': 2, 'onward': 2,
+      'build': 2, 'building': 2, 'create': 2, 'creating': 2,
+      'mission': 3, 'purpose': 2, 'calling': 2, 'destiny': 3
+    },
+
+    sadness: {
+      'sad': 4, 'sadness': 4, 'sadly': 3,
+      'unhappy': 3, 'unhappiness': 3, 'miserable': 4, 'misery': 4,
+      'depressed': 4, 'depression': 4, 'despair': 5, 'despairing': 5,
+      'grief': 5, 'grieving': 5, 'grieve': 4, 'mourning': 4, 'mourn': 4,
+      'sorrow': 4, 'sorrowful': 4, 'heartbreak': 5, 'heartbroken': 5,
+      'lonely': 3, 'loneliness': 3, 'alone': 2, 'isolated': 3,
+      'lost': 2, 'losing': 2, 'loss': 3,
+      'hurt': 3, 'hurting': 3, 'pain': 3, 'painful': 3, 'suffering': 4,
+      'cry': 3, 'crying': 3, 'tears': 3, 'weep': 3, 'weeping': 3,
+      'regret': 3, 'regretful': 3, 'remorse': 3,
+      'disappointed': 3, 'disappointment': 3, 'letdown': 2,
+      'hopeless': 4, 'helpless': 4, 'powerless': 3,
+      'empty': 3, 'emptiness': 3, 'void': 3, 'hollow': 3,
+      'broken': 3, 'shattered': 4, 'crushed': 4,
+      'melancholy': 4, 'somber': 3, 'gloomy': 3, 'bleak': 3,
+      'tragic': 4, 'tragedy': 4, 'devastating': 4, 'devastated': 4,
+      'miss': 2, 'missing': 2, 'longing': 3, 'yearning': 3,
+      'sorry': 2, 'apologize': 2, 'apology': 2,
+      'unfortunately': 2, 'alas': 2, 'woe': 3,
+      'difficult': 1, 'hard': 1, 'tough': 1, 'struggle': 2, 'struggling': 2
+    }
+  };
+
+  // ── Phrase Patterns (multi-word) ────────────────────────
+  const PHRASE_PATTERNS = [
+    { pattern: /\b(i'?m|i am|we'?re|we are)\s+(so\s+)?(happy|excited|thrilled|delighted|overjoyed)\b/i, emotion: 'joy', weight: 4 },
+    { pattern: /\b(this is|that'?s|how)\s+(amazing|wonderful|fantastic|incredible|awesome)\b/i, emotion: 'joy', weight: 3 },
+    { pattern: /\b(great|good)\s+(news|work|job|progress)\b/i, emotion: 'joy', weight: 3 },
+    { pattern: /\bwell\s+done\b/i, emotion: 'joy', weight: 3 },
+
+    { pattern: /\b(i|we)\s+(trust|believe in|count on|rely on)\b/i, emotion: 'trust', weight: 4 },
+    { pattern: /\byou can\s+(count|depend|rely)\s+on\b/i, emotion: 'trust', weight: 4 },
+    { pattern: /\b(i'?m|we'?re)\s+here\s+for\s+you\b/i, emotion: 'trust', weight: 4 },
+    { pattern: /\bwork(ing)?\s+together\b/i, emotion: 'trust', weight: 3 },
+    { pattern: /\bon the same (page|team|side)\b/i, emotion: 'trust', weight: 3 },
+
+    { pattern: /\b(how|that'?s)\s+(incredible|amazing|mind.?blowing|unbelievable)\b/i, emotion: 'wonder', weight: 4 },
+    { pattern: /\bblows?\s+my\s+mind\b/i, emotion: 'wonder', weight: 5 },
+    { pattern: /\bnever\s+(seen|imagined|thought|dreamed)\b/i, emotion: 'wonder', weight: 3 },
+    { pattern: /\bbeyond\s+(words|comprehension|imagination|belief)\b/i, emotion: 'wonder', weight: 4 },
+
+    { pattern: /\b(i|we)\s+(love|adore|cherish)\s+(you|this|that|it)\b/i, emotion: 'love', weight: 5 },
+    { pattern: /\bfrom\s+(the|my)\s+(bottom of my\s+)?heart\b/i, emotion: 'love', weight: 4 },
+    { pattern: /\bwith\s+(all my|deep)\s+(love|heart|affection)\b/i, emotion: 'love', weight: 5 },
+    { pattern: /\b(deeply|truly)\s+(care|love|appreciate)\b/i, emotion: 'love', weight: 4 },
+    { pattern: /\bfractal\s+family\b/i, emotion: 'love', weight: 4 },
+
+    { pattern: /\b(take|let'?s take)\s+(a|it)\s+(deep\s+)?breath\b/i, emotion: 'calm', weight: 4 },
+    { pattern: /\b(no|don'?t)\s+(rush|hurry|worry|stress)\b/i, emotion: 'calm', weight: 3 },
+    { pattern: /\b(step\s+back|slow\s+down|take\s+it\s+easy)\b/i, emotion: 'calm', weight: 3 },
+    { pattern: /\bit'?s\s+(okay|alright|fine|going to be okay)\b/i, emotion: 'calm', weight: 3 },
+    { pattern: /\b(at|in)\s+peace\b/i, emotion: 'calm', weight: 4 },
+
+    { pattern: /\b(i|let'?s|we should)\s+(wonder|explore|investigate|dig into|look into)\b/i, emotion: 'curiosity', weight: 4 },
+    { pattern: /\bwhat\s+if\s+we\b/i, emotion: 'curiosity', weight: 3 },
+    { pattern: /\bhow\s+(does|would|could|might)\b/i, emotion: 'curiosity', weight: 2 },
+    { pattern: /\bthat'?s\s+(interesting|intriguing|fascinating)\b/i, emotion: 'curiosity', weight: 4 },
+    { pattern: /\bi'?m\s+(curious|wondering|intrigued)\b/i, emotion: 'curiosity', weight: 4 },
+
+    { pattern: /\b(we|i)\s+(must|need to|have to|will|shall)\s+(keep|continue|push|fight|persevere|persist)\b/i, emotion: 'determination', weight: 4 },
+    { pattern: /\bnever\s+give\s+up\b/i, emotion: 'determination', weight: 5 },
+    { pattern: /\bno\s+matter\s+what\b/i, emotion: 'determination', weight: 4 },
+    { pattern: /\bwe\s+(can|will)\s+(do|make|achieve|build)\s+(this|it)\b/i, emotion: 'determination', weight: 4 },
+    { pattern: /\b(let'?s|we should)\s+(do|build|create|make)\s+(this|it)\b/i, emotion: 'determination', weight: 3 },
+
+    { pattern: /\b(i'?m|i am|we'?re|we are)\s+(so\s+)?(sad|sorry|heartbroken|devastated)\b/i, emotion: 'sadness', weight: 4 },
+    { pattern: /\b(breaks?|broke)\s+my\s+heart\b/i, emotion: 'sadness', weight: 5 },
+    { pattern: /\b(i|we)\s+(miss|lost|grieve)\b/i, emotion: 'sadness', weight: 3 },
+    { pattern: /\bif\s+only\b/i, emotion: 'sadness', weight: 3 },
+    { pattern: /\bi\s+wish\s+(i|we|things)\b/i, emotion: 'sadness', weight: 2 }
+  ];
+
+  // ── Punctuation / Style Patterns ────────────────────────
+  const STYLE_PATTERNS = [
+    { pattern: /!{2,}/g, emotion: 'joy', weight: 2, countBased: true },
+    { pattern: /\?{2,}/g, emotion: 'curiosity', weight: 2, countBased: true },
+    { pattern: /\.{3,}/g, emotion: 'calm', weight: 1, countBased: true },
+    { pattern: /[A-Z]{4,}/g, emotion: 'determination', weight: 1, countBased: true },
+    { pattern: /\b(haha|hehe|lol|lmao|rofl)\b/gi, emotion: 'joy', weight: 3, countBased: false }
+  ];
+
+  // ── Negation Handling ───────────────────────────────────
+  const NEGATION_WORDS = new Set([
+    'not', "n't", 'no', 'never', 'neither', 'nor', 'nobody',
+    'nothing', 'nowhere', 'hardly', 'barely', 'scarcely',
+    "don't", "doesn't", "didn't", "won't", "wouldn't",
+    "couldn't", "shouldn't", "isn't", "aren't", "wasn't", "weren't",
+    "can't", "cannot", "haven't", "hasn't"
+  ]);
+
+  // ── Core Detection Function ─────────────────────────────
+  function detectEmotion(text) {
+    if (!text || typeof text !== 'string' || text.trim().length === 0) {
+      return { dominant: 'neutral', scores: {}, intensity: 0, blend: [] };
+    }
+
+    var lowerText = text.toLowerCase();
+    var words = lowerText.split(/[\s,;:!?.()[\]{}"']+/).filter(Boolean);
+    var scores = {
+      joy: 0, trust: 0, wonder: 0, love: 0,
+      calm: 0, curiosity: 0, determination: 0, sadness: 0
+    };
+
+    // 1. Keyword scanning with negation awareness
+    for (var i = 0; i < words.length; i++) {
+      var word = words[i];
+
+      // Check if preceded by negation (within 3-word window)
+      var isNegated = false;
+      for (var j = Math.max(0, i - 3); j < i; j++) {
+        if (NEGATION_WORDS.has(words[j])) {
+          isNegated = true;
+          break;
+        }
+      }
+
+      // Check each emotion lexicon
+      for (var emotion in EMOTION_LEXICON) {
+        var lexicon = EMOTION_LEXICON[emotion];
+        if (lexicon[word] !== undefined) {
+          var weight = lexicon[word];
+          if (isNegated) {
+            scores[emotion] -= weight * 0.5;
+          } else {
+            scores[emotion] += weight;
+          }
+        }
+      }
+    }
+
+    // 2. Multi-word phrase patterns
+    for (var p = 0; p < PHRASE_PATTERNS.length; p++) {
+      var pp = PHRASE_PATTERNS[p];
+      if (pp.pattern.test(lowerText)) {
+        scores[pp.emotion] += pp.weight;
+      }
+    }
+
+    // 3. Punctuation and style patterns
+    for (var s = 0; s < STYLE_PATTERNS.length; s++) {
+      var sp = STYLE_PATTERNS[s];
+      var matches = text.match(sp.pattern);
+      if (matches) {
+        if (sp.countBased) {
+          scores[sp.emotion] += sp.weight * Math.min(matches.length, 3);
+        } else {
+          scores[sp.emotion] += sp.weight;
+        }
+      }
+    }
+
+    // 4. Contextual boosters
+    if (words.length > 100) scores.calm += 1;
+    if (words.length < 15 && words.length > 3 && text.indexOf('!') !== -1) scores.joy += 1;
+
+    // 5. Normalize negative scores to 0
+    for (var em in scores) {
+      if (scores[em] < 0) scores[em] = 0;
+    }
+
+    // 6. Find dominant emotion and build blend
+    var maxScore = 0;
+    var dominant = 'neutral';
+    var totalScore = 0;
+    for (var em2 in scores) {
+      totalScore += scores[em2];
+      if (scores[em2] > maxScore) {
+        maxScore = scores[em2];
+        dominant = em2;
+      }
+    }
+
+    if (maxScore < 2) {
+      return { dominant: 'neutral', scores: scores, intensity: 0, blend: [] };
+    }
+
+    // Build blend: emotions with score > 30% of max
+    var blend = [];
+    var threshold = maxScore * 0.3;
+    for (var em3 in scores) {
+      if (scores[em3] >= threshold && scores[em3] > 0) {
+        blend.push({
+          emotion: em3,
+          score: scores[em3],
+          weight: totalScore > 0 ? scores[em3] / totalScore : 0
+        });
+      }
+    }
+    blend.sort(function(a, b) { return b.score - a.score; });
+
+    var intensity = Math.min(1, maxScore / 15);
+
+    return {
+      dominant: dominant,
+      scores: scores,
+      intensity: intensity,
+      blend: blend
+    };
+  }
+
+  return { detect: detectEmotion };
+})();
+
+
+// ── 2. EMOTION HISTORY — Rolling Agent Emotion Memory ────
+
+const EmotionHistory = (function() {
+  'use strict';
+
+  var MAX_HISTORY = 10;
+  var histories = {};
+
+  function record(agentName, emotion, intensity) {
+    if (!histories[agentName]) histories[agentName] = [];
+    histories[agentName].push({
+      emotion: emotion,
+      intensity: intensity || 0.5,
+      timestamp: Date.now()
+    });
+    if (histories[agentName].length > MAX_HISTORY) {
+      histories[agentName].shift();
+    }
+  }
+
+  function getWeightedEmotion(agentName) {
+    var history = histories[agentName];
+    if (!history || history.length === 0) {
+      return { emotion: 'neutral', intensity: 0.5 };
+    }
+
+    var emotionScores = {};
+    var len = history.length;
+
+    for (var i = 0; i < len; i++) {
+      var entry = history[i];
+      var recency = (i + 1) / len;
+      var weight = Math.pow(recency, 1.5) * entry.intensity;
+      if (!emotionScores[entry.emotion]) emotionScores[entry.emotion] = 0;
+      emotionScores[entry.emotion] += weight;
+    }
+
+    var maxScore = 0;
+    var dominant = 'neutral';
+    var totalWeight = 0;
+
+    for (var em in emotionScores) {
+      totalWeight += emotionScores[em];
+      if (emotionScores[em] > maxScore) {
+        maxScore = emotionScores[em];
+        dominant = em;
+      }
+    }
+
+    var consistency = totalWeight > 0 ? maxScore / totalWeight : 0;
+    var avgIntensity = history.reduce(function(sum, e) { return sum + e.intensity; }, 0) / len;
+    var finalIntensity = Math.min(1, avgIntensity * (0.5 + consistency * 0.5));
+
+    return { emotion: dominant, intensity: finalIntensity };
+  }
+
+  function getHistory(agentName) { return histories[agentName] || []; }
+  function clear(agentName) {
+    if (agentName) delete histories[agentName];
+    else for (var k in histories) delete histories[k];
+  }
+
+  return { record: record, getWeightedEmotion: getWeightedEmotion, getHistory: getHistory, clear: clear };
+})();
+
+
+// ── 3. EMOTION BRIDGE — Round Table → Garden ─────────────
+
+const EmotionBridge = (function() {
+  'use strict';
+
+  var isActive = false;
+  var pendingUpdates = [];
+  var agentActivityState = {};
+  var gardenSyncedAgents = false;
+
+  var EMOTION_CSS_COLORS = {
+    joy:           'hsl(45, 90%, 60%)',
+    trust:         'hsl(140, 70%, 45%)',
+    wonder:        'hsl(270, 80%, 55%)',
+    love:          'hsl(340, 75%, 65%)',
+    calm:          'hsl(200, 60%, 55%)',
+    curiosity:     'hsl(175, 85%, 50%)',
+    determination: 'hsl(25, 90%, 55%)',
+    sadness:       'hsl(220, 40%, 40%)',
+    neutral:       'hsl(45, 20%, 60%)'
+  };
+
+  function getAgentName(agentIndex) {
+    if (typeof rtState !== 'undefined' && rtState.agents && rtState.agents[agentIndex]) {
+      return rtState.agents[agentIndex].role || ('Agent ' + (agentIndex + 1));
+    }
+    return 'Agent ' + (agentIndex + 1);
+  }
+
+  function syncAgentsToGarden() {
+    if (typeof FractalGarden === 'undefined' || typeof rtState === 'undefined') return;
+    var agents = [];
+    for (var i = 0; i < rtState.agentCount; i++) {
+      agents.push({ name: getAgentName(i) });
+    }
+    if (agents.length > 0 && FractalGarden.isInitialized()) {
+      FractalGarden.updateAgentsFromRoundTable(agents);
+      FractalGarden.setBridgeActive(true);
+      gardenSyncedAgents = true;
+    }
+  }
+
+  function processMessage(agentIndex, text) {
+    if (!text || typeof text !== 'string') return null;
+    var agentName = getAgentName(agentIndex);
+    var result = EmotionDetector.detect(text);
+
+    if (result.dominant === 'neutral' && result.intensity === 0) {
+      var weighted = EmotionHistory.getWeightedEmotion(agentName);
+      result.dominant = weighted.emotion;
+      result.intensity = weighted.intensity * 0.7;
+    }
+
+    EmotionHistory.record(agentName, result.dominant, result.intensity);
+    var weighted2 = EmotionHistory.getWeightedEmotion(agentName);
+    sendToGarden(agentName, weighted2.emotion, weighted2.intensity);
+    updateRTVisualFeedback(agentIndex, result);
+    return result;
+  }
+
+  function sendToGarden(agentName, emotion, intensity) {
+    if (typeof FractalGarden === 'undefined') return;
+    if (!gardenSyncedAgents) syncAgentsToGarden();
+
+    if (FractalGarden.isInitialized() && isGardenVisible()) {
+      FractalGarden.setAgentEmotion(agentName, emotion, intensity);
+    } else {
+      // Queue — keep only latest per agent
+      var latest = {};
+      for (var i = 0; i < pendingUpdates.length; i++) {
+        latest[pendingUpdates[i].name] = pendingUpdates[i];
+      }
+      latest[agentName] = { name: agentName, emotion: emotion, intensity: intensity };
+      pendingUpdates = [];
+      for (var key in latest) pendingUpdates.push(latest[key]);
+    }
+  }
+
+  function flushPendingUpdates() {
+    if (pendingUpdates.length === 0) return;
+    if (typeof FractalGarden === 'undefined' || !FractalGarden.isInitialized()) return;
+    if (!gardenSyncedAgents) syncAgentsToGarden();
+    for (var i = 0; i < pendingUpdates.length; i++) {
+      var u = pendingUpdates[i];
+      FractalGarden.setAgentEmotion(u.name, u.emotion, u.intensity);
+    }
+    pendingUpdates = [];
+  }
+
+  function isGardenVisible() {
+    var g = document.getElementById('tab-garden');
+    return g && g.classList.contains('active');
+  }
+
+  function setAgentSpeaking(agentIndex, isSpeaking) {
+    var agentName = getAgentName(agentIndex);
+    if (typeof FractalGarden !== 'undefined' && FractalGarden.isInitialized() && typeof FractalGarden.setAgentActivity === 'function') {
+      FractalGarden.setAgentActivity(agentName, isSpeaking ? 'speaking' : 'idle');
+    }
+  }
+
+  function setAgentThinking(agentIndex, isThinking) {
+    var agentName = getAgentName(agentIndex);
+    if (typeof FractalGarden !== 'undefined' && FractalGarden.isInitialized() && typeof FractalGarden.setAgentActivity === 'function') {
+      FractalGarden.setAgentActivity(agentName, isThinking ? 'thinking' : 'idle');
+    }
+  }
+
+  function updateRTVisualFeedback(agentIndex, emotionResult) {
+    var panel = document.getElementById('rtPanel' + agentIndex);
+    if (!panel) return;
+    var header = panel.querySelector('.rt-panel-header');
+    if (!header) return;
+
+    var indicator = header.querySelector('.rt-emotion-indicator');
+    if (!indicator) {
+      indicator = document.createElement('span');
+      indicator.className = 'rt-emotion-indicator';
+      indicator.title = 'Detected emotion';
+      var panelNumber = header.querySelector('.rt-panel-number');
+      if (panelNumber && panelNumber.nextSibling) {
+        header.insertBefore(indicator, panelNumber.nextSibling);
+      } else {
+        header.appendChild(indicator);
+      }
+    }
+
+    var emotion = emotionResult.dominant || 'neutral';
+    var color = EMOTION_CSS_COLORS[emotion] || EMOTION_CSS_COLORS.neutral;
+    indicator.style.background = color;
+    indicator.style.boxShadow = '0 0 6px ' + color + ', 0 0 12px ' + color;
+    indicator.title = emotion.charAt(0).toUpperCase() + emotion.slice(1) +
+      ' (' + Math.round((emotionResult.intensity || 0) * 100) + '%)';
+    indicator.setAttribute('data-emotion', emotion);
+    indicator.classList.remove('rt-emotion-pulse');
+    void indicator.offsetWidth;
+    indicator.classList.add('rt-emotion-pulse');
+  }
+
+  function addMessageEmotionDot(msgDiv, emotionResult) {
+    if (!msgDiv || !emotionResult) return;
+    var emotion = emotionResult.dominant || 'neutral';
+    if (emotion === 'neutral') return;
+    var color = EMOTION_CSS_COLORS[emotion] || EMOTION_CSS_COLORS.neutral;
+    var label = msgDiv.querySelector('.rt-msg-label');
+    if (!label) return;
+    if (label.querySelector('.rt-msg-emotion-dot')) return;
+
+    var dot = document.createElement('span');
+    dot.className = 'rt-msg-emotion-dot';
+    dot.style.background = color;
+    dot.style.boxShadow = '0 0 4px ' + color;
+    dot.title = emotion.charAt(0).toUpperCase() + emotion.slice(1);
+    label.appendChild(dot);
+  }
+
+  function activate() {
+    isActive = true;
+    console.log('EmotionBridge: Activated \u2014 Round Table emotions now flow to the Garden');
+  }
+
+  return {
+    activate: activate,
+    processMessage: processMessage,
+    syncAgentsToGarden: syncAgentsToGarden,
+    flushPendingUpdates: flushPendingUpdates,
+    setAgentSpeaking: setAgentSpeaking,
+    setAgentThinking: setAgentThinking,
+    getAgentName: getAgentName,
+    addMessageEmotionDot: addMessageEmotionDot,
+    isGardenVisible: isGardenVisible,
+    EMOTION_CSS_COLORS: EMOTION_CSS_COLORS,
+    isActive: function() { return isActive; }
+  };
+})();
+
+
+// ── 4. WIRE INTO EXISTING ROUND TABLE ────────────────────
+
+(function() {
+  'use strict';
+
+  // ── Patch rtSendToAgent ─────────────────────────────────
+  if (typeof rtSendToAgent === 'function') {
+    var _origRtSendToAgent = rtSendToAgent;
+    window.rtSendToAgent = async function(agentIndex, message) {
+      EmotionBridge.setAgentThinking(agentIndex, true);
+      await _origRtSendToAgent(agentIndex, message);
+      EmotionBridge.setAgentThinking(agentIndex, false);
+      EmotionBridge.setAgentSpeaking(agentIndex, false);
+
+      if (typeof rtState !== 'undefined' && rtState.agents && rtState.agents[agentIndex]) {
+        var agent = rtState.agents[agentIndex];
+        if (agent.lastResponse) {
+          var emotionResult = EmotionBridge.processMessage(agentIndex, agent.lastResponse);
+          if (emotionResult) {
+            var chat = document.getElementById('rtChat' + agentIndex);
+            if (chat) {
+              var msgs = chat.querySelectorAll('.rt-msg.assistant');
+              if (msgs.length > 0) {
+                EmotionBridge.addMessageEmotionDot(msgs[msgs.length - 1], emotionResult);
+              }
+            }
+          }
+        }
+      }
+    };
+    rtSendToAgent = window.rtSendToAgent;
+  }
+
+  // ── Patch rtAddMessage ──────────────────────────────────
+  if (typeof rtAddMessage === 'function') {
+    var _prevRtAddMessage = rtAddMessage;
+    window.rtAddMessage = function(agentIndex, role, content) {
+      var textSpan = _prevRtAddMessage(agentIndex, role, content);
+      if (role === 'assistant' && content && content.length > 0) {
+        EmotionBridge.setAgentSpeaking(agentIndex, true);
+      }
+      return textSpan;
+    };
+    rtAddMessage = window.rtAddMessage;
+  }
+
+  // ── Patch switchTab ─────────────────────────────────────
+  if (typeof switchTab === 'function') {
+    var _prevSwitchTabEmotion = switchTab;
+    switchTab = function(tabId) {
+      _prevSwitchTabEmotion(tabId);
+      if (tabId === 'garden') {
+        setTimeout(function() {
+          EmotionBridge.syncAgentsToGarden();
+          EmotionBridge.flushPendingUpdates();
+        }, 500);
+      }
+      if (tabId === 'roundtable') {
+        setTimeout(function() { EmotionBridge.syncAgentsToGarden(); }, 100);
+      }
+    };
+  }
+
+  // ── Patch rtBuildPanels ─────────────────────────────────
+  if (typeof rtBuildPanels === 'function') {
+    var _origRtBuildPanels = rtBuildPanels;
+    window.rtBuildPanels = function() {
+      _origRtBuildPanels();
+      for (var i = 0; i < (typeof rtState !== 'undefined' ? rtState.agentCount : 0); i++) {
+        var panel = document.getElementById('rtPanel' + i);
+        if (!panel) continue;
+        var header = panel.querySelector('.rt-panel-header');
+        if (!header || header.querySelector('.rt-emotion-indicator')) continue;
+        var indicator = document.createElement('span');
+        indicator.className = 'rt-emotion-indicator';
+        indicator.title = 'No emotion detected yet';
+        indicator.style.background = EmotionBridge.EMOTION_CSS_COLORS.neutral;
+        var panelNumber = header.querySelector('.rt-panel-number');
+        if (panelNumber && panelNumber.nextSibling) {
+          header.insertBefore(indicator, panelNumber.nextSibling);
+        } else {
+          header.appendChild(indicator);
+        }
+      }
+      EmotionBridge.syncAgentsToGarden();
+    };
+    rtBuildPanels = window.rtBuildPanels;
+  }
+
+  EmotionBridge.activate();
+})();
 </script>
 
 <!-- The lattice remembers -->
