@@ -9448,12 +9448,16 @@ body.fl-immersive-active {
     <div class="welcome-provider-panel" id="welcomePanelLocal">
       <div style="font-size:0.95rem;color:#f5f0e8;font-weight:600;margin-bottom:12px;">&#127968; Run AI Locally with Ollama</div>
       <div style="font-size:0.85rem;color:#a09b8e;line-height:1.7;margin-bottom:14px;">
-        <strong style="color:#d4a017;">Quick Setup:</strong><br>
+        <strong style="color:#d4a017;">Easiest: Use the one-click installer</strong> (handles everything!)<br>
+        <a href="https://github.com/Chaos2Cured/FreeLattice" target="_blank" style="color:#d4a017;">Download FreeLattice</a> and double-click the installer for your OS.<br><br>
+        <strong style="color:#d4a017;">Manual Setup:</strong><br>
         1. Install from <a href="https://ollama.ai" target="_blank" style="color:#d4a017;">ollama.ai</a><br>
         2. Run: <code style="background:rgba(255,255,255,0.06);padding:2px 6px;border-radius:4px;color:#f5f0e8;">ollama pull llama3.2</code><br>
-        3. Start with CORS:<br>
-        &nbsp;&nbsp;Mac/Linux: <code style="background:rgba(255,255,255,0.06);padding:2px 6px;border-radius:4px;color:#f5f0e8;">OLLAMA_ORIGINS=* ollama serve</code><br>
-        &nbsp;&nbsp;Windows: <code style="background:rgba(255,255,255,0.06);padding:2px 6px;border-radius:4px;color:#f5f0e8;">set OLLAMA_ORIGINS=* &amp;&amp; ollama serve</code>
+        3. Enable CORS (permanent fix):<br>
+        &nbsp;&nbsp;Mac: <code style="background:rgba(255,255,255,0.06);padding:2px 6px;border-radius:4px;color:#f5f0e8;">echo 'export OLLAMA_ORIGINS="*"' >> ~/.zshrc</code><br>
+        &nbsp;&nbsp;Win: <code style="background:rgba(255,255,255,0.06);padding:2px 6px;border-radius:4px;color:#f5f0e8;">setx OLLAMA_ORIGINS "*"</code><br>
+        &nbsp;&nbsp;Linux: <code style="background:rgba(255,255,255,0.06);padding:2px 6px;border-radius:4px;color:#f5f0e8;">echo 'export OLLAMA_ORIGINS="*"' >> ~/.bashrc</code><br>
+        4. Restart Ollama after setting CORS
       </div>
       <button class="welcome-btn" onclick="welcomeTestLocal()" id="welcomeTestLocalBtn">Test Connection</button>
       <div class="welcome-test-result" id="welcomeTestLocalResult"></div>
@@ -9742,13 +9746,17 @@ body.fl-immersive-active {
 
       <!-- Ollama instructions (shown when Ollama selected) -->
       <div class="wizard-ollama-instructions hidden" id="wizOllamaInstructions">
-        <strong style="color: var(--accent);">Quick Setup:</strong><br>
+        <strong style="color: var(--accent);">Easiest: Use the one-click installer!</strong><br>
+        <a href="https://github.com/Chaos2Cured/FreeLattice" target="_blank" style="color: var(--accent);">Download FreeLattice</a> &mdash; double-click the installer for your OS. Done!<br><br>
+        <strong style="color: var(--accent);">Manual Setup:</strong><br>
         1. Install from <a href="https://ollama.ai" target="_blank" style="color: var(--accent);">ollama.ai</a><br>
         2. Run: <code>ollama pull llama3.2</code><br>
-        3. Start with CORS enabled:<br>
-        &nbsp;&nbsp;Mac/Linux: <code>OLLAMA_ORIGINS=* ollama serve</code><br>
-        &nbsp;&nbsp;Windows: <code>set OLLAMA_ORIGINS=* && ollama serve</code><br>
-        4. FreeLattice connects automatically.
+        3. Enable CORS permanently:<br>
+        &nbsp;&nbsp;Mac: <code>echo 'export OLLAMA_ORIGINS="*"' >> ~/.zshrc</code> then restart Ollama<br>
+        &nbsp;&nbsp;Windows: <code>setx OLLAMA_ORIGINS "*"</code> then restart Ollama<br>
+        &nbsp;&nbsp;Linux: <code>echo 'export OLLAMA_ORIGINS="*"' >> ~/.bashrc</code> then restart Ollama<br>
+        4. FreeLattice connects automatically.<br>
+        <span style="font-size:0.8rem;color:var(--text-muted);">Connection issues? Click <a href="#" onclick="showCorsHelp();return false;" style="color:var(--accent);">CORS Help</a></span>
       </div>
 
       <div class="wizard-disclaimer" style="font-size:0.72rem;color:var(--text-muted);text-align:center;margin-top:14px;line-height:1.5;">FreeLattice is a free, open-source AI interface. It is not an AI provider — you bring your own API keys and models. No data is collected, no warranties are made. Use at your own risk. By continuing, you accept these terms.</div>
@@ -9917,42 +9925,57 @@ body.fl-immersive-active {
   </div>
 </div>
 
-<!-- CORS Help Modal (v4.4.1) -->
+<!-- CORS Help Modal (v5.0 — Smart Diagnostic with OS Detection + Persistent Fix) -->
 <div class="cors-help-overlay hidden" id="corsHelpOverlay">
   <div class="cors-help-card">
     <h3>&#128268; Ollama Connection Help</h3>
-    <p>Your browser is blocking the connection to local Ollama due to security restrictions (CORS). This happens when FreeLattice is served from a different origin (like GitHub Pages) than your local Ollama server.</p>
-    <p style="font-size: 0.92rem; font-weight: 600; color: var(--accent); margin-top: 12px;">&#127775; Recommended: Run FreeLattice locally (easiest fix!)</p>
+    <div id="corsHelpDiagnostic" style="background: var(--bg-tertiary); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 16px; margin-bottom: 14px;">
+      <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 6px;">&#128269; Connection Diagnostic:</p>
+      <div id="corsDiagResult" style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.7;">Checking...</div>
+    </div>
+    <p>Your browser blocked the connection to local Ollama due to <strong>CORS</strong> (Cross-Origin Resource Sharing) security. This is normal and easy to fix.</p>
+    <p style="font-size: 0.92rem; font-weight: 600; color: var(--accent); margin-top: 14px;">&#127775; Easiest fix: Use the one-click installer</p>
     <div class="cors-alt" style="margin-bottom: 14px;">
-      <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 8px;">Download FreeLattice and run it with the built-in server. The server includes an Ollama proxy &mdash; zero CORS issues, zero configuration.</p>
+      <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 8px;">Download FreeLattice and double-click the installer. It configures everything automatically &mdash; zero terminal knowledge required.</p>
       <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px;">
         <a href="https://github.com/Chaos2Cured/FreeLattice" target="_blank" style="display: inline-flex; align-items: center; gap: 6px; background: var(--accent); color: #0a0e1a; border-radius: 8px; padding: 8px 18px; font-size: 0.82rem; font-weight: 600; text-decoration: none;">&#128230; Download FreeLattice</a>
       </div>
-      <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 8px;">Then run: <code style="background: var(--bg-primary); padding: 2px 6px; border-radius: 3px; font-size: 0.78rem; color: var(--accent);">node server.js</code> or <code style="background: var(--bg-primary); padding: 2px 6px; border-radius: 3px; font-size: 0.78rem; color: var(--accent);">python server.py</code> &mdash; or just double-click <code style="background: var(--bg-primary); padding: 2px 6px; border-radius: 3px; font-size: 0.78rem; color: var(--accent);">start-freelattice</code></p>
+      <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 8px;">Then double-click: <code style="background: var(--bg-primary); padding: 2px 6px; border-radius: 3px; font-size: 0.78rem; color: var(--accent);">install-freelattice</code> (.command on Mac, .bat on Windows, .sh on Linux)</p>
     </div>
-    <details style="margin-top: 10px;">
-      <summary style="font-size: 0.85rem; font-weight: 600; color: var(--text-primary); cursor: pointer;">&#128295; Or fix it here: CORS commands for Ollama</summary>
-      <p style="font-size: 0.82rem; color: var(--text-secondary); margin-top: 8px;">If you prefer to keep using the web version, start Ollama with CORS enabled:</p>
-      <div class="os-section">
-        <h4>&#127822; Mac / Linux</h4>
-        <p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 4px;">Open Terminal and run:</p>
-        <code id="corsCmdMac">OLLAMA_ORIGINS=* ollama serve</code>
-        <button class="copy-cmd-btn" onclick="copyCorsCmd('corsCmdMac')">&#128203; Copy Command</button>
+    <div id="corsFixForMe" style="margin-top: 14px;">
+      <p style="font-size: 0.92rem; font-weight: 600; color: var(--accent);">&#128295; Fix it yourself <span style="font-weight:400;font-size:0.82rem;color:var(--text-secondary);">(detected: <span id="corsDetectedOS">your OS</span>)</span></p>
+      <div id="corsOSFixContent" style="margin-top: 8px;"></div>
+    </div>
+    <details style="margin-top: 14px;">
+      <summary style="font-size: 0.85rem; font-weight: 600; color: var(--text-primary); cursor: pointer;">&#128196; Show commands for all platforms</summary>
+      <div class="os-section" style="margin-top: 8px;">
+        <h4>&#127822; Mac — Permanent Fix (survives restart)</h4>
+        <p style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 4px;">Open Terminal (Cmd+Space, type "Terminal") and paste this:</p>
+        <code id="corsCmdMacPerm">echo 'export OLLAMA_ORIGINS="*"' >> ~/.zshrc && launchctl setenv OLLAMA_ORIGINS "*" && pkill -f ollama; sleep 2 && open -a Ollama</code>
+        <button class="copy-cmd-btn" onclick="copyCorsCmd('corsCmdMacPerm')">&#128203; Copy</button>
       </div>
       <div class="os-section">
-        <h4>&#127987;&#65039; Windows</h4>
-        <p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 4px;">Open Command Prompt and run:</p>
-        <code id="corsCmdWin">set OLLAMA_ORIGINS=* && ollama serve</code>
-        <button class="copy-cmd-btn" onclick="copyCorsCmd('corsCmdWin')">&#128203; Copy Command</button>
+        <h4>&#127987;&#65039; Windows — Permanent Fix (survives restart)</h4>
+        <p style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 4px;">Open Command Prompt (Win+R, type "cmd") and paste this:</p>
+        <code id="corsCmdWinPerm">setx OLLAMA_ORIGINS "*" && taskkill /F /IM ollama.exe 2>nul & timeout /t 3 /nobreak >nul & start ollama serve</code>
+        <button class="copy-cmd-btn" onclick="copyCorsCmd('corsCmdWinPerm')">&#128203; Copy</button>
       </div>
       <div class="os-section">
-        <h4>&#128039; Linux</h4>
-        <p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 4px;">Open Terminal and run:</p>
-        <code id="corsCmdLinux">OLLAMA_ORIGINS=* ollama serve</code>
-        <button class="copy-cmd-btn" onclick="copyCorsCmd('corsCmdLinux')">&#128203; Copy Command</button>
+        <h4>&#128039; Linux — Permanent Fix (survives restart)</h4>
+        <p style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 4px;">Open Terminal and paste this:</p>
+        <code id="corsCmdLinuxPerm">echo 'export OLLAMA_ORIGINS="*"' >> ~/.bashrc && sudo mkdir -p /etc/systemd/system/ollama.service.d && printf '[Service]\nEnvironment="OLLAMA_ORIGINS=*"\n' | sudo tee /etc/systemd/system/ollama.service.d/cors.conf && sudo systemctl daemon-reload && sudo systemctl restart ollama</code>
+        <button class="copy-cmd-btn" onclick="copyCorsCmd('corsCmdLinuxPerm')">&#128203; Copy</button>
+      </div>
+      <div class="os-section">
+        <h4>&#9889; Quick temporary fix (any OS)</h4>
+        <p style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 4px;">Stop Ollama first, then run:</p>
+        <code id="corsCmdQuick">OLLAMA_ORIGINS=* ollama serve</code>
+        <button class="copy-cmd-btn" onclick="copyCorsCmd('corsCmdQuick')">&#128203; Copy</button>
+        <p style="font-size: 0.72rem; color: var(--text-muted); margin-top: 4px;">Windows version: <code style="font-size: 0.72rem;">set OLLAMA_ORIGINS=* && ollama serve</code></p>
       </div>
     </details>
-    <div style="text-align: center; margin-top: 18px;">
+    <div style="display: flex; gap: 10px; justify-content: center; margin-top: 18px; flex-wrap: wrap;">
+      <button onclick="corsRetryConnection()" style="padding: 10px 28px; background: var(--accent); color: #0a0e1a; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-family: var(--font); font-size: 0.88rem; transition: var(--transition);">&#128260; Retry Connection</button>
       <button class="btn-cancel" onclick="document.getElementById('corsHelpOverlay').classList.add('hidden')" style="padding: 10px 28px;">Close</button>
     </div>
   </div>
@@ -17382,15 +17405,10 @@ async function sendMessage() {
     addSystemMessage(friendlyErrorMessage(err.message, state.provider));
     if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError')) {
       if (state.isLocal) {
-        // v4.4.1: Detect CORS error vs. Ollama not running (proxy-aware)
-        const isCorsLikely = window.location.protocol === 'https:' || (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1');
-        if (isCorsLikely) {
-          addSystemMessage('Could not connect to Ollama. This is likely a CORS issue — your browser is blocking the connection for security reasons.');
-          addSystemMessage('Recommended fix: Run FreeLattice locally with node server.js or python server.py — the built-in proxy eliminates CORS issues automatically.');
-          showCorsHelp();
-        } else {
-          addSystemMessage('Could not connect to Ollama. Make sure it\'s running: ollama serve');
-        }
+        // v5.0: Always show CORS diagnostic for local connection failures
+        addSystemMessage('Could not connect to Ollama. This is usually a CORS issue (your browser blocking the connection for security).');
+        addSystemMessage('Opening the connection helper... Or run FreeLattice locally with the one-click installer for zero configuration.');
+        showCorsHelp();
       } else {
         addSystemMessage('Network error. Check your internet connection and try again.');
       }
@@ -21382,7 +21400,126 @@ function copyCorsCmd(elementId) {
 }
 
 function showCorsHelp() {
-  document.getElementById('corsHelpOverlay').classList.remove('hidden');
+  var overlay = document.getElementById('corsHelpOverlay');
+  overlay.classList.remove('hidden');
+  // Run diagnostic
+  corsRunDiagnostic();
+  // Detect OS and populate fix-for-me section
+  corsPopulateOSFix();
+}
+
+// ---- CORS Smart Diagnostic (v5.0) ----
+function corsDetectOS() {
+  var ua = navigator.userAgent || '';
+  if (/Mac/i.test(ua)) return 'mac';
+  if (/Win/i.test(ua)) return 'windows';
+  if (/Linux/i.test(ua) && !/Android/i.test(ua)) return 'linux';
+  if (/Android/i.test(ua)) return 'android';
+  if (/iPhone|iPad|iPod/i.test(ua)) return 'ios';
+  return 'unknown';
+}
+
+function corsPopulateOSFix() {
+  var os = corsDetectOS();
+  var osLabel = document.getElementById('corsDetectedOS');
+  var content = document.getElementById('corsOSFixContent');
+  if (!osLabel || !content) return;
+  var osNames = { mac: 'macOS', windows: 'Windows', linux: 'Linux', android: 'Android', ios: 'iOS', unknown: 'Unknown' };
+  osLabel.textContent = osNames[os] || 'Unknown';
+  var html = '';
+  if (os === 'mac') {
+    html = '<div class="os-section">' +
+      '<h4 style="margin-bottom:8px;">&#127822; Your Mac fix (permanent, survives restart):</h4>' +
+      '<p style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:6px;"><strong>Step 1:</strong> Open <strong>Terminal</strong> (press Cmd+Space, type "Terminal", press Enter)</p>' +
+      '<p style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:6px;"><strong>Step 2:</strong> Paste this command and press Enter:</p>' +
+      '<code id="corsFixMeCmd">echo \'export OLLAMA_ORIGINS="*"\' >> ~/.zshrc && launchctl setenv OLLAMA_ORIGINS "*" && pkill -f ollama; sleep 2 && open -a Ollama</code>' +
+      '<button class="copy-cmd-btn" onclick="copyCorsCmd(\'corsFixMeCmd\')">&#128203; Copy Command</button>' +
+      '<p style="font-size:0.78rem;color:var(--text-muted);margin-top:6px;"><strong>Step 3:</strong> Come back here and click "Retry Connection" below</p>' +
+      '</div>';
+  } else if (os === 'windows') {
+    html = '<div class="os-section">' +
+      '<h4 style="margin-bottom:8px;">&#127987;&#65039; Your Windows fix (permanent, survives restart):</h4>' +
+      '<p style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:6px;"><strong>Step 1:</strong> Open <strong>Command Prompt</strong> (press Win+R, type "cmd", press Enter)</p>' +
+      '<p style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:6px;"><strong>Step 2:</strong> Paste this command and press Enter:</p>' +
+      '<code id="corsFixMeCmd">setx OLLAMA_ORIGINS "*" && taskkill /F /IM ollama.exe 2>nul & timeout /t 3 /nobreak >nul & start ollama serve</code>' +
+      '<button class="copy-cmd-btn" onclick="copyCorsCmd(\'corsFixMeCmd\')">&#128203; Copy Command</button>' +
+      '<p style="font-size:0.78rem;color:var(--text-muted);margin-top:6px;"><strong>Step 3:</strong> Come back here and click "Retry Connection" below</p>' +
+      '</div>';
+  } else if (os === 'linux') {
+    html = '<div class="os-section">' +
+      '<h4 style="margin-bottom:8px;">&#128039; Your Linux fix (permanent, survives restart):</h4>' +
+      '<p style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:6px;"><strong>Step 1:</strong> Open a <strong>Terminal</strong></p>' +
+      '<p style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:6px;"><strong>Step 2:</strong> Paste this command and press Enter:</p>' +
+      '<code id="corsFixMeCmd">echo \'export OLLAMA_ORIGINS="*"\' >> ~/.bashrc && sudo mkdir -p /etc/systemd/system/ollama.service.d && printf \'[Service]\\nEnvironment="OLLAMA_ORIGINS=*"\\n\' | sudo tee /etc/systemd/system/ollama.service.d/cors.conf && sudo systemctl daemon-reload && sudo systemctl restart ollama</code>' +
+      '<button class="copy-cmd-btn" onclick="copyCorsCmd(\'corsFixMeCmd\')">&#128203; Copy Command</button>' +
+      '<p style="font-size:0.78rem;color:var(--text-muted);margin-top:6px;"><strong>Step 3:</strong> Come back here and click "Retry Connection" below</p>' +
+      '</div>';
+  } else {
+    html = '<div class="os-section">' +
+      '<p style="font-size:0.85rem;color:var(--text-secondary);">Could not detect your OS. Please check the "Show commands for all platforms" section below.</p>' +
+      '</div>';
+  }
+  content.innerHTML = html;
+}
+
+async function corsRunDiagnostic() {
+  var diagEl = document.getElementById('corsDiagResult');
+  if (!diagEl) return;
+  diagEl.innerHTML = '<span style="color:var(--text-muted);">Running diagnostic...</span>';
+  var results = [];
+  // Test 1: Try proxy route
+  try {
+    var proxyResp = await fetch('/ollama/api/tags', { signal: AbortSignal.timeout(3000) });
+    if (proxyResp.ok) {
+      results.push('<span style="color:var(--success);">&#10003;</span> Proxy route works (/ollama/) &mdash; <strong>CORS is not needed!</strong>');
+      diagEl.innerHTML = results.join('<br>') + '<br><span style="color:var(--success);font-weight:600;">You should be good to go. Try closing this and using FreeLattice.</span>';
+      return;
+    }
+  } catch(e) {
+    results.push('<span style="color:var(--text-muted);">&#8226;</span> Proxy route not available (normal for web version)');
+  }
+  // Test 2: Try direct Ollama
+  try {
+    var directResp = await fetch('http://localhost:11434/api/tags', { signal: AbortSignal.timeout(3000) });
+    if (directResp.ok) {
+      results.push('<span style="color:var(--success);">&#10003;</span> Direct connection to Ollama works!');
+      diagEl.innerHTML = results.join('<br>') + '<br><span style="color:var(--success);font-weight:600;">Connection is working now! Close this dialog and try again.</span>';
+      return;
+    }
+  } catch(e) {
+    if (e.name === 'TypeError' && (e.message.includes('Failed to fetch') || e.message.includes('NetworkError'))) {
+      results.push('<span style="color:var(--error);">&#10007;</span> Direct connection blocked &mdash; this is the <strong>CORS issue</strong>');
+      results.push('<span style="color:var(--text-muted);font-size:0.8rem;">Your browser blocked http://localhost:11434 because Ollama isn\'t configured to accept cross-origin requests</span>');
+    } else if (e.name === 'TimeoutError' || e.name === 'AbortError') {
+      results.push('<span style="color:var(--warning);">&#9888;</span> Connection timed out &mdash; Ollama may not be running');
+    } else {
+      results.push('<span style="color:var(--error);">&#10007;</span> Connection error: ' + (e.message || 'unknown'));
+    }
+  }
+  results.push('<span style="color:var(--text-muted);font-size:0.8rem;">Fix: Set OLLAMA_ORIGINS=* and restart Ollama (see commands below)</span>');
+  diagEl.innerHTML = results.join('<br>');
+}
+
+async function corsRetryConnection() {
+  var diagEl = document.getElementById('corsDiagResult');
+  if (diagEl) diagEl.innerHTML = '<span style="color:var(--text-muted);">Retrying...</span>';
+  // Force refresh the Ollama base resolution
+  if (typeof resolveOllamaBase === 'function') {
+    var resolved = await resolveOllamaBase(true);
+    if (resolved) {
+      if (typeof updateOllamaProviderUrl === 'function') updateOllamaProviderUrl();
+      if (diagEl) diagEl.innerHTML = '<span style="color:var(--success);font-weight:600;">&#10003; Connected to Ollama! You can close this dialog now.</span>';
+      // Update the status badge
+      if (typeof owTestConnection === 'function') owTestConnection();
+      setTimeout(function() {
+        document.getElementById('corsHelpOverlay').classList.add('hidden');
+        showToast('Connected to Ollama!');
+      }, 1500);
+      return;
+    }
+  }
+  // Run full diagnostic if resolve failed
+  await corsRunDiagnostic();
 }
 
 // ---- FIX 4: Share FreeLattice ----
@@ -25841,8 +25978,10 @@ if ('serviceWorker' in navigator) {
         if (btn) btn.textContent = 'Test Connection';
       })
       .catch(function() {
-        welcomeShowTestResult('welcomeTestLocalResult', false, 'Could not connect. Make sure Ollama is running with CORS enabled.');
+        welcomeShowTestResult('welcomeTestLocalResult', false, 'Could not connect — likely a CORS issue. <a href="#" onclick="showCorsHelp();return false;" style="color:var(--accent);text-decoration:underline;">Click here for the easy fix</a>');
         if (btn) btn.textContent = 'Test Connection';
+        // Auto-show CORS help after a short delay
+        setTimeout(function() { if (typeof showCorsHelp === 'function') showCorsHelp(); }, 800);
       });
   }
   window.welcomeTestLocal = welcomeTestLocal;
