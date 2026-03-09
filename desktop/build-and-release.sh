@@ -27,6 +27,14 @@ cp ../icon-512.png app/ 2>/dev/null && echo "     ✓ icon-512.png" || echo "   
 cp ../sw.js app/ 2>/dev/null && echo "     ✓ sw.js" || echo "     ⚠ sw.js not found (optional)"
 cp ../landing.html app/ 2>/dev/null && echo "     ✓ landing.html" || echo "     ⚠ landing.html not found (optional)"
 
+# Module files (lazy-loaded features)
+if [ -d "../modules" ]; then
+  mkdir -p app/modules
+  cp ../modules/*.js app/modules/ 2>/dev/null && echo "     ✓ modules/ (lazy-loaded features)" || echo "     ⚠ No module files found"
+else
+  echo "     ⚠ modules/ directory not found (optional)"
+fi
+
 # Verify index.html exists
 if [ ! -f "app/index.html" ]; then
   echo ""
