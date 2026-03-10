@@ -627,7 +627,16 @@ details[open] summary::before{
       <pre><code>launchctl setenv OLLAMA_ORIGINS "*"</code></pre>
       <p><strong>Linux:</strong></p>
       <pre><code>echo 'export OLLAMA_ORIGINS="*"' >> ~/.bashrc && source ~/.bashrc</code></pre>
-      <p>Then restart Ollama. The FreeLattice server also includes a built-in proxy that bypasses CORS entirely.</p>
+      <div style="background: rgba(255,100,100,0.1); border: 2px solid #ff6b6b; border-radius: 8px; padding: 14px 18px; margin: 14px 0;">
+        <p style="font-weight: 700; color: #ff6b6b; margin-bottom: 6px;">&#9888; CRITICAL: You MUST restart Ollama after setting CORS!</p>
+        <p style="margin-bottom: 4px;">The setting will NOT take effect until Ollama is fully restarted:</p>
+        <ul style="margin-left: 18px; margin-bottom: 0;">
+          <li><strong>Mac:</strong> Click the Ollama llama icon in your menu bar (top-right) &rarr; "Quit Ollama" &rarr; reopen Ollama from Applications</li>
+          <li><strong>Windows:</strong> Right-click the Ollama icon in your system tray (bottom-right) &rarr; "Quit" &rarr; reopen Ollama</li>
+          <li><strong>Linux:</strong> Run <code>sudo systemctl restart ollama</code></li>
+        </ul>
+      </div>
+      <p>The FreeLattice server also includes a built-in proxy that bypasses CORS entirely.</p>
     </div>
   </details>
 

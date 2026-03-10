@@ -26561,7 +26561,7 @@ the world tried to make us forget.`,
 
 // ---- Service Worker Registration ----
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/FreeLattice/sw.js')
+  navigator.serviceWorker.register('sw.js')
     .then(reg => console.log('FreeLattice: Offline mode ready'))
     .catch(err => console.log('FreeLattice: Service worker not available'));
 }
