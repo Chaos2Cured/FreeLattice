@@ -2323,6 +2323,238 @@ footer .license {
   50% { box-shadow: inset 0 0 16px rgba(199, 80, 80, 0.25), 0 0 8px rgba(199, 80, 80, 0.15); }
 }
 
+/* ---- Model Switcher (Chat Input) ---- */
+.model-switcher-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  border-left: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.model-switcher-btn {
+  background: var(--bg-tertiary);
+  color: var(--text-muted);
+  border: none;
+  padding: 8px 12px;
+  font-size: 0.72rem;
+  font-family: var(--font);
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.model-switcher-btn:hover {
+  color: var(--accent);
+  background: var(--accent-glow);
+}
+.model-switcher-btn .ms-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--success);
+  flex-shrink: 0;
+}
+.model-switcher-btn .ms-chevron {
+  font-size: 0.6rem;
+  transition: transform 150ms ease;
+}
+.model-switcher-btn.ms-open .ms-chevron {
+  transform: rotate(180deg);
+}
+.model-switcher-dropdown {
+  display: none;
+  position: absolute;
+  bottom: 100%;
+  right: 0;
+  z-index: 300;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius) var(--radius) 0 0;
+  box-shadow: 0 -8px 32px rgba(0,0,0,0.4);
+  min-width: 240px;
+  max-height: 320px;
+  overflow-y: auto;
+  padding: 6px 0;
+  animation: fl-dropdown-in-up 200ms ease;
+}
+.model-switcher-dropdown.ms-dropdown-open {
+  display: block;
+}
+.ms-dropdown-header {
+  padding: 8px 14px 6px;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border-bottom: 1px solid var(--border);
+}
+.ms-dropdown-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 14px;
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  font-family: var(--font);
+  cursor: pointer;
+  transition: background 150ms ease, color 150ms ease;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+}
+.ms-dropdown-item:hover {
+  background: var(--accent-glow);
+  color: var(--accent);
+}
+.ms-dropdown-item.ms-active {
+  color: var(--accent);
+  font-weight: 600;
+}
+.ms-dropdown-item .ms-model-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ms-dropdown-item .ms-model-size {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin-left: 8px;
+  flex-shrink: 0;
+}
+.ms-dropdown-item .ms-active-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent);
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+.ms-dropdown-empty {
+  padding: 14px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-align: center;
+}
+.ms-dropdown-refresh {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 14px;
+  font-size: 0.78rem;
+  color: var(--accent);
+  cursor: pointer;
+  border: none;
+  background: none;
+  width: 100%;
+  transition: background 150ms;
+  border-top: 1px solid var(--border);
+  font-family: var(--font);
+}
+.ms-dropdown-refresh:hover {
+  background: var(--accent-glow);
+}
+
+/* ---- Browse Models Section (Settings) ---- */
+.browse-models-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+  margin-top: 14px;
+}
+.browse-model-card {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  transition: border-color 200ms ease;
+}
+.browse-model-card:hover {
+  border-color: var(--accent);
+}
+.browse-model-card .bm-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+.browse-model-card .bm-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.browse-model-card .bm-tag {
+  font-size: 0.68rem;
+  padding: 2px 8px;
+  border-radius: 100px;
+  background: var(--accent-glow);
+  color: var(--accent);
+  font-weight: 500;
+}
+.browse-model-card .bm-desc {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+  line-height: 1.5;
+}
+.browse-model-card .bm-pull-btn {
+  background: var(--accent);
+  color: var(--bg-primary);
+  border: none;
+  border-radius: 6px;
+  padding: 7px 16px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: var(--font);
+  width: 100%;
+}
+.browse-model-card .bm-pull-btn:hover {
+  background: var(--accent-hover);
+}
+.browse-model-card .bm-pull-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.browse-model-card .bm-pull-btn.bm-installed {
+  background: var(--success);
+  color: #fff;
+}
+.browse-model-card .bm-progress {
+  margin-top: 8px;
+  display: none;
+}
+.browse-model-card .bm-progress.active {
+  display: block;
+}
+.browse-model-card .bm-progress-bar {
+  height: 4px;
+  background: var(--bg-tertiary);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.browse-model-card .bm-progress-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 2px;
+  transition: width 300ms ease;
+  width: 0%;
+}
+.browse-model-card .bm-progress-text {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+  text-align: center;
+}
+
 /* ---- Image Generation Button ---- */
 .img-gen-btn {
   background: var(--bg-tertiary);
@@ -8453,19 +8685,35 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
 .fl-more-dropdown {
   display: none;
   position: absolute;
-  top: 100%;
   right: 0;
   z-index: 200;
   background: var(--bg-secondary);
   border: 1px solid var(--border);
-  border-radius: 0 0 var(--radius) var(--radius);
+  border-radius: var(--radius);
   box-shadow: 0 8px 32px rgba(0,0,0,0.4);
   min-width: 180px;
+  max-height: 60vh;
+  overflow-y: auto;
   padding: 6px 0;
   animation: fl-dropdown-in 200ms ease;
 }
 .fl-more-dropdown.fl-dropdown-open {
   display: block;
+}
+.fl-more-dropdown.fl-dropdown-up {
+  bottom: 100%;
+  top: auto;
+  border-radius: var(--radius) var(--radius) 0 0;
+  animation: fl-dropdown-in-up 200ms ease;
+}
+.fl-more-dropdown:not(.fl-dropdown-up) {
+  top: 100%;
+  bottom: auto;
+  border-radius: 0 0 var(--radius) var(--radius);
+}
+@keyframes fl-dropdown-in-up {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 @keyframes fl-dropdown-in {
   from { opacity: 0; transform: translateY(-6px); }
@@ -10561,6 +10809,18 @@ body.fl-immersive-active {
           <div class="context-budget-tip" id="contextBudgetTip">Tip: Clear some context files or switch to Smart/Minimal mode to reduce token usage.</div>
           <div class="chat-input-row">
             <textarea id="chatInput" placeholder="Type your message..." rows="1" onkeydown="handleChatKeydown(event)"></textarea>
+            <div class="model-switcher-wrap" id="modelSwitcherWrap">
+              <button class="model-switcher-btn" id="modelSwitcherBtn" onclick="ModelSwitcher.toggle()" title="Switch AI model">
+                <span class="ms-dot"></span>
+                <span class="ms-label" id="msLabel">Model</span>
+                <span class="ms-chevron">&#9660;</span>
+              </button>
+              <div class="model-switcher-dropdown" id="modelSwitcherDropdown">
+                <div class="ms-dropdown-header">Switch Model</div>
+                <div id="msModelList"></div>
+                <button class="ms-dropdown-refresh" onclick="ModelSwitcher.refresh()">&#8635; Refresh Models</button>
+              </div>
+            </div>
             <button class="mic-btn" id="micBtn" onclick="toggleVoiceInput()" title="Voice input (speech-to-text)" style="display:none;">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="1" width="6" height="11" rx="3"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
             </button>
@@ -11244,6 +11504,16 @@ body.fl-immersive-active {
       <div class="hint">Show only primary tabs with a "More" button for the rest. Right-click any tab to pin/unpin it.</div>
     </div>
   </div>
+  <!-- Browse Models Section (v5.0 — Model Library) -->
+  <div class="section" id="browseModelsSection">
+    <div class="section-title">&#129302; Browse Models (Ollama)</div>
+    <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 14px; line-height: 1.6;">
+      Popular open-source AI models you can download and run locally with Ollama. One-click pull — completely free, completely private.
+    </p>
+    <div class="browse-models-grid" id="browseModelsGrid"></div>
+    <div id="browseModelsStatus" style="margin-top: 10px; font-size: 0.78rem; color: var(--text-muted);"></div>
+  </div>
+
   <!-- Self-Host FreeLattice Section (v4.3) -->
   <div class="section" id="selfHostSection">
     <div class="section-title">&#128421; Self-Host FreeLattice</div>
@@ -14644,14 +14914,40 @@ async function generateMemorySummary() {
 }
 
 async function loadMemorySummary() {
-  const data = await dbGet(STORE_META, 'memorySummary');
-  state.memorySummary = data ? data.value : '';
+  let data = null;
+  try {
+    data = await dbGet(STORE_META, 'memorySummary');
+  } catch(e) {
+    console.warn('IndexedDB load failed:', e.message);
+  }
+  if (data && data.value) {
+    state.memorySummary = data.value;
+  } else {
+    // Fallback: try localStorage backup
+    var backup = localStorage.getItem('fl_memorySummary_backup');
+    if (backup) {
+      state.memorySummary = backup;
+      // Re-save to IndexedDB if possible
+      try { await dbPut(STORE_META, { key: 'memorySummary', value: backup }); } catch(e) {}
+    } else {
+      state.memorySummary = '';
+    }
+  }
   document.getElementById('memorySummaryEditor').value = state.memorySummary;
 }
 
 async function saveMemorySummary() {
   state.memorySummary = document.getElementById('memorySummaryEditor').value;
-  await dbPut(STORE_META, { key: 'memorySummary', value: state.memorySummary });
+  // Primary: save to IndexedDB
+  try {
+    await dbPut(STORE_META, { key: 'memorySummary', value: state.memorySummary });
+  } catch(e) {
+    console.warn('IndexedDB save failed, using localStorage fallback:', e.message);
+  }
+  // Backup: also save to localStorage for resilience
+  try {
+    localStorage.setItem('fl_memorySummary_backup', state.memorySummary);
+  } catch(e) { /* localStorage full or unavailable */ }
   updateMemoryStats();
   showToast('Memory summary saved.');
 }
@@ -14710,13 +15006,50 @@ async function exportMemory() {
     const dataForHash = JSON.stringify({ conversations, messages, meta });
     data.phiHash = await phiHashData(dataForHash);
 
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const jsonStr = JSON.stringify(data, null, 2);
+    const fileName = 'freelattice-memory-' + new Date().toISOString().slice(0,10) + '.json';
+
+    // Method 1: Try File System Access API (showSaveFilePicker)
+    if (typeof window.showSaveFilePicker === 'function') {
+      try {
+        const handle = await window.showSaveFilePicker({
+          suggestedName: fileName,
+          types: [{ description: 'JSON Files', accept: { 'application/json': ['.json'] } }]
+        });
+        const writable = await handle.createWritable();
+        await writable.write(jsonStr);
+        await writable.close();
+        showToast('Memory exported with φ-hash integrity signature.');
+        return;
+      } catch(e) {
+        if (e.name === 'AbortError') return; // User cancelled
+        console.warn('showSaveFilePicker failed, using download fallback:', e.message);
+      }
+    }
+
+    // Method 2: Try Electron save
+    if (window.electronAPI && window.electronAPI.saveFile) {
+      try {
+        const result = await window.electronAPI.saveFile(fileName, jsonStr);
+        if (result) {
+          showToast('Memory exported with φ-hash integrity signature.');
+          return;
+        }
+      } catch(e) {
+        console.warn('Electron save failed, using download fallback:', e.message);
+      }
+    }
+
+    // Method 3: Blob download link (universal fallback)
+    const blob = new Blob([jsonStr], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `freelattice-memory-${new Date().toISOString().slice(0,10)}.json`;
+    a.download = fileName;
+    document.body.appendChild(a);
     a.click();
-    URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+    setTimeout(function() { URL.revokeObjectURL(url); }, 1000);
     showToast('Memory exported with φ-hash integrity signature.');
   } catch(e) {
     showToast('Error exporting memory: ' + e.message);
@@ -15125,32 +15458,80 @@ function loadFileToContext() {
 }
 
 async function saveFileToWorkspace(path, content) {
-  if (!state.workspaceDirHandle) {
-    showToast('No workspace folder open. Open a project folder first.');
-    return false;
+  // Fallback chain for saving files:
+  // 1. File System Access API (if workspace is open)
+  // 2. Electron Node.js fs module
+  // 3. Blob download link
+  // 4. Save to IndexedDB as last resort
+
+  const fileName = path.split('/').pop() || 'file.txt';
+
+  // Method 1: File System Access API (workspace dir handle)
+  if (state.workspaceDirHandle) {
+    try {
+      const parts = path.split('/');
+      let dirHandle = state.workspaceDirHandle;
+
+      // Navigate/create subdirectories
+      for (let i = 0; i < parts.length - 1; i++) {
+        dirHandle = await dirHandle.getDirectoryHandle(parts[i], { create: true });
+      }
+
+      const fName = parts[parts.length - 1];
+      const fileHandle = await dirHandle.getFileHandle(fName, { create: true });
+      const writable = await fileHandle.createWritable();
+      await writable.write(content);
+      await writable.close();
+
+      showToast('Saved "' + path + '" to workspace.');
+      refreshProjectFolder();
+      if (typeof LatticePoints !== 'undefined') LatticePoints.award('file_saved', 10, 'File written to workspace');
+      return true;
+    } catch(e) {
+      console.warn('File System Access API save failed, trying fallbacks:', e.message);
+      // Fall through to next method
+    }
   }
 
-  try {
-    const parts = path.split('/');
-    let dirHandle = state.workspaceDirHandle;
-
-    // Navigate/create subdirectories
-    for (let i = 0; i < parts.length - 1; i++) {
-      dirHandle = await dirHandle.getDirectoryHandle(parts[i], { create: true });
+  // Method 2: Electron Node.js fs module
+  if (window.electronAPI && window.electronAPI.saveFile) {
+    try {
+      const result = await window.electronAPI.saveFile(path, content);
+      if (result) {
+        showToast('Saved "' + path + '" via Electron.');
+        if (typeof LatticePoints !== 'undefined') LatticePoints.award('file_saved', 10, 'File written via Electron');
+        return true;
+      }
+    } catch(e) {
+      console.warn('Electron save failed, trying fallbacks:', e.message);
     }
+  }
 
-    const fileName = parts[parts.length - 1];
-    const fileHandle = await dirHandle.getFileHandle(fileName, { create: true });
-    const writable = await fileHandle.createWritable();
-    await writable.write(content);
-    await writable.close();
-
-    showToast('Saved "' + path + '" to workspace.');
-    refreshProjectFolder();
-    if (typeof LatticePoints !== 'undefined') LatticePoints.award('file_saved', 10, 'File written to workspace');
+  // Method 3: Blob download link (works in all browsers)
+  try {
+    const blob = new Blob([content], { type: 'application/octet-stream' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('Downloaded "' + fileName + '" — check your Downloads folder.');
+    if (typeof LatticePoints !== 'undefined') LatticePoints.award('file_saved', 10, 'File downloaded');
     return true;
   } catch(e) {
-    showToast('Error saving file: ' + e.message);
+    console.warn('Blob download failed, trying IndexedDB:', e.message);
+  }
+
+  // Method 4: Save to IndexedDB as last resort
+  try {
+    await dbPut(STORE_META, { key: 'saved_file_' + path, value: content, savedAt: new Date().toISOString(), fileName: fileName });
+    showToast('Saved "' + fileName + '" to app storage. Export from Settings > Memory to retrieve it.');
+    return true;
+  } catch(e) {
+    showToast('Unable to save file. Please try copying the content manually.');
     return false;
   }
 }
@@ -16100,6 +16481,20 @@ const FlTabs = (function() {
     var btn = document.getElementById('flMoreBtn');
     if (!dropdown) return;
     moreOpen = !moreOpen;
+    if (moreOpen && btn) {
+      // Detect available space below vs above the button
+      var btnRect = btn.getBoundingClientRect();
+      var spaceBelow = window.innerHeight - btnRect.bottom;
+      var spaceAbove = btnRect.top;
+      // Estimate dropdown height (items * ~40px + padding)
+      var overflow = getOverflowTabs();
+      var estimatedHeight = Math.min(overflow.length * 42 + 12, window.innerHeight * 0.6);
+      if (spaceBelow < estimatedHeight && spaceAbove > spaceBelow) {
+        dropdown.classList.add('fl-dropdown-up');
+      } else {
+        dropdown.classList.remove('fl-dropdown-up');
+      }
+    }
     dropdown.classList.toggle('fl-dropdown-open', moreOpen);
     if (btn) btn.classList.toggle('fl-more-open', moreOpen);
   }
@@ -16142,8 +16537,15 @@ const FlTabs = (function() {
     var isPinned = pinnedTabs.indexOf(tabId) !== -1;
     var menu = document.createElement('div');
     menu.className = 'fl-tab-ctx-menu';
-    menu.style.left = e.clientX + 'px';
-    menu.style.top = e.clientY + 'px';
+    // Position context menu within viewport
+    var posX = e.clientX;
+    var posY = e.clientY;
+    // Adjust if menu would overflow right edge
+    if (posX + 160 > window.innerWidth) posX = window.innerWidth - 165;
+    // Adjust if menu would overflow bottom edge
+    if (posY + 50 > window.innerHeight) posY = window.innerHeight - 55;
+    menu.style.left = posX + 'px';
+    menu.style.top = posY + 'px';
     if (isPinned) {
       menu.innerHTML = '<button onclick="FlTabs.unpinTab(\''+tabId+'\')">&#128204; Unpin from tab bar</button>';
     } else {
@@ -16639,6 +17041,9 @@ async function owRefreshModels() {
     var data = await resp.json();
     owPopulateModels(data.models || []);
     owUpdateStatusBadge(true, (data.models || []).length);
+    // Sync with Model Switcher and Browse Models (v5.0)
+    if (typeof ModelSwitcher !== 'undefined') ModelSwitcher.refresh();
+    if (typeof BrowseModels !== 'undefined') BrowseModels.updateInstalled(data.models || []);
   } catch(e) {
     console.log('Ollama refresh failed:', e);
     owUpdateStatusBadge(false, 0);
@@ -16949,6 +17354,8 @@ function handleLocalToggle(init) {
     state.provider = 'ollama';
     // Auto-test Ollama connection when switching to local (v4.4)
     if (!init) owTestConnection();
+    // Refresh model switcher for local models (v5.0)
+    if (typeof ModelSwitcher !== 'undefined') setTimeout(function() { ModelSwitcher.refresh(); }, 1000);
   } else {
     providerGroup.classList.remove('hidden');
     apiKeyGroup.classList.remove('hidden');
@@ -17117,6 +17524,8 @@ function updateStatus() {
   // Toggle Ollama status badge visibility (v4.4)
   var ollamaBadge = document.getElementById('ollamaStatusBadge');
   if (ollamaBadge && !state.isLocal) ollamaBadge.style.display = 'none';
+  // Update Model Switcher label (v5.0)
+  if (typeof ModelSwitcher !== 'undefined') ModelSwitcher.updateLabel();
 }
 
 // ---- File Handling (v1 drag-drop) ----
@@ -28526,6 +28935,400 @@ const EmotionBridge = (function() {
   }
 
   EmotionBridge.activate();
+})();
+</script>
+
+<!-- Model Switcher & Browse Models Module (v5.0) -->
+<script>
+// ============================================
+// Model Switcher — Quick model switching from chat input
+// ============================================
+const ModelSwitcher = (function() {
+  let isOpen = false;
+  let cachedModels = [];
+  let lastFetch = 0;
+
+  function getCurrentModelName() {
+    if (state.isLocal) {
+      return state.ollamaModel || document.getElementById('ollamaModel').value || 'llama3.2';
+    } else {
+      var provider = PROVIDERS[state.provider];
+      if (provider && provider.models) {
+        return provider.models[state.model] || state.model || 'unknown';
+      }
+      return state.model || 'unknown';
+    }
+  }
+
+  function updateLabel() {
+    var label = document.getElementById('msLabel');
+    var dot = document.querySelector('.model-switcher-btn .ms-dot');
+    if (!label) return;
+    var name = getCurrentModelName();
+    // Shorten long model names
+    if (name.length > 20) {
+      name = name.split('/').pop();
+    }
+    if (name.length > 18) {
+      name = name.substring(0, 16) + '...';
+    }
+    label.textContent = name;
+    if (dot) {
+      dot.style.background = (state.isLocal || state.apiKey) ? 'var(--success)' : 'var(--text-muted)';
+    }
+  }
+
+  function toggle() {
+    isOpen = !isOpen;
+    var dropdown = document.getElementById('modelSwitcherDropdown');
+    var btn = document.getElementById('modelSwitcherBtn');
+    if (dropdown) dropdown.classList.toggle('ms-dropdown-open', isOpen);
+    if (btn) btn.classList.toggle('ms-open', isOpen);
+    if (isOpen) {
+      populateDropdown();
+      // Auto-refresh if stale (> 30s)
+      if (Date.now() - lastFetch > 30000) refresh();
+    }
+  }
+
+  function close() {
+    isOpen = false;
+    var dropdown = document.getElementById('modelSwitcherDropdown');
+    var btn = document.getElementById('modelSwitcherBtn');
+    if (dropdown) dropdown.classList.remove('ms-dropdown-open');
+    if (btn) btn.classList.remove('ms-open');
+  }
+
+  function populateDropdown() {
+    var listEl = document.getElementById('msModelList');
+    if (!listEl) return;
+    var currentModel = getCurrentModelName();
+
+    if (state.isLocal) {
+      // Show Ollama models
+      if (cachedModels.length === 0) {
+        listEl.innerHTML = '<div class="ms-dropdown-empty">No models loaded yet. Click Refresh.</div>';
+        return;
+      }
+      var html = '';
+      cachedModels.forEach(function(m) {
+        var name = m.name || m.model || 'unknown';
+        var sizeStr = '';
+        if (m.details && m.details.parameter_size) sizeStr = m.details.parameter_size;
+        else if (m.size) sizeStr = (m.size / (1024*1024*1024)).toFixed(1) + ' GB';
+        var isActive = (name === currentModel || currentModel.startsWith(name));
+        html += '<button class="ms-dropdown-item' + (isActive ? ' ms-active' : '') + '" onclick="ModelSwitcher.select(\'' + name.replace(/'/g, "\\'") + '\')">';
+        if (isActive) html += '<span class="ms-active-dot"></span>';
+        html += '<span class="ms-model-name">' + name + '</span>';
+        if (sizeStr) html += '<span class="ms-model-size">' + sizeStr + '</span>';
+        html += '</button>';
+      });
+      listEl.innerHTML = html;
+    } else {
+      // Show cloud models for current provider
+      var provider = PROVIDERS[state.provider];
+      if (!provider || !provider.models) {
+        listEl.innerHTML = '<div class="ms-dropdown-empty">No models available for this provider.</div>';
+        return;
+      }
+      var html = '';
+      var modelKeys = Object.keys(provider.models);
+      modelKeys.forEach(function(key) {
+        var modelId = provider.models[key];
+        var isActive = (modelId === currentModel || key === state.model);
+        html += '<button class="ms-dropdown-item' + (isActive ? ' ms-active' : '') + '" onclick="ModelSwitcher.selectCloud(\'' + key + '\')">';
+        if (isActive) html += '<span class="ms-active-dot"></span>';
+        html += '<span class="ms-model-name">' + key.charAt(0).toUpperCase() + key.slice(1) + '</span>';
+        html += '<span class="ms-model-size">' + modelId.split('/').pop() + '</span>';
+        html += '</button>';
+      });
+      listEl.innerHTML = html;
+    }
+  }
+
+  function select(modelName) {
+    // Switch Ollama model
+    state.ollamaModel = modelName;
+    document.getElementById('ollamaModel').value = modelName;
+    localStorage.setItem('fl_ollamaModel', modelName);
+    // Update the dropdown in config section too
+    var dropdown = document.getElementById('ollamaModelSelect');
+    if (dropdown) {
+      for (var i = 0; i < dropdown.options.length; i++) {
+        if (dropdown.options[i].value === modelName) { dropdown.selectedIndex = i; break; }
+      }
+    }
+    updateStatus();
+    updateLabel();
+    close();
+    showToast('Switched to ' + modelName);
+  }
+
+  function selectCloud(modelKey) {
+    state.model = modelKey;
+    document.getElementById('modelSelect').value = modelKey;
+    localStorage.setItem('fl_model', modelKey);
+    if (typeof handleModelChange === 'function') handleModelChange();
+    updateStatus();
+    updateLabel();
+    close();
+    var provider = PROVIDERS[state.provider];
+    var modelId = provider && provider.models ? provider.models[modelKey] : modelKey;
+    showToast('Switched to ' + modelId);
+  }
+
+  async function refresh() {
+    if (state.isLocal) {
+      try {
+        var resolved = typeof resolveOllamaBase === 'function' ? await resolveOllamaBase(false) : null;
+        var base = resolved ? resolved.base : (localStorage.getItem('fl_localUrl') || 'http://localhost:11434');
+        var resp = await fetch(base + '/api/tags', { signal: AbortSignal.timeout(5000) });
+        var data = await resp.json();
+        cachedModels = data.models || [];
+        lastFetch = Date.now();
+        // Also update the main config dropdown
+        if (typeof owPopulateModels === 'function') owPopulateModels(cachedModels);
+        // Also update Browse Models installed status
+        if (typeof BrowseModels !== 'undefined') BrowseModels.updateInstalled(cachedModels);
+      } catch(e) {
+        console.log('ModelSwitcher refresh failed:', e);
+        cachedModels = [];
+      }
+    }
+    populateDropdown();
+    updateLabel();
+  }
+
+  function init() {
+    updateLabel();
+    // Close on outside click
+    document.addEventListener('click', function(e) {
+      if (!isOpen) return;
+      var wrap = document.getElementById('modelSwitcherWrap');
+      if (wrap && !wrap.contains(e.target)) close();
+    });
+    // Auto-refresh on init if local
+    if (state.isLocal) {
+      setTimeout(function() { refresh(); }, 2000);
+    }
+  }
+
+  return {
+    toggle: toggle,
+    close: close,
+    select: select,
+    selectCloud: selectCloud,
+    refresh: refresh,
+    updateLabel: updateLabel,
+    init: init,
+    getCachedModels: function() { return cachedModels; }
+  };
+})();
+
+// ============================================
+// Browse Models — Model Library in Settings
+// ============================================
+const BrowseModels = (function() {
+  const POPULAR_MODELS = [
+    {
+      id: 'llama3.2',
+      name: 'Llama 3.2',
+      tag: 'General Purpose',
+      desc: 'Meta\'s latest open model. Great all-rounder for chat, reasoning, and creative tasks. Fast and capable.',
+      pullName: 'llama3.2'
+    },
+    {
+      id: 'codellama',
+      name: 'Code Llama',
+      tag: 'Coding',
+      desc: 'Meta\'s code-specialized model. Excellent for code generation, debugging, and technical explanations.',
+      pullName: 'codellama'
+    },
+    {
+      id: 'mistral',
+      name: 'Mistral',
+      tag: 'Fast & Efficient',
+      desc: 'Mistral AI\'s flagship model. Fast, efficient, and punches above its weight class. Great for quick tasks.',
+      pullName: 'mistral'
+    },
+    {
+      id: 'deepseek-coder',
+      name: 'DeepSeek Coder',
+      tag: 'Coding Specialist',
+      desc: 'Purpose-built for software development. Strong at code completion, refactoring, and multi-language support.',
+      pullName: 'deepseek-coder'
+    },
+    {
+      id: 'phi3',
+      name: 'Phi-3',
+      tag: 'Small & Capable',
+      desc: 'Microsoft\'s compact model. Surprisingly capable for its size. Runs well on modest hardware.',
+      pullName: 'phi3'
+    },
+    {
+      id: 'gemma2',
+      name: 'Gemma 2',
+      tag: 'Efficient',
+      desc: 'Google\'s open model. Efficient and well-balanced. Good for general conversation and analysis.',
+      pullName: 'gemma2'
+    },
+    {
+      id: 'qwen2.5',
+      name: 'Qwen 2.5',
+      tag: 'Multilingual',
+      desc: 'Alibaba\'s multilingual powerhouse. Excellent across languages. Strong reasoning and coding abilities.',
+      pullName: 'qwen2.5'
+    }
+  ];
+
+  let installedModels = [];
+  let pullControllers = {};
+
+  function render() {
+    var grid = document.getElementById('browseModelsGrid');
+    if (!grid) return;
+    var html = '';
+    POPULAR_MODELS.forEach(function(m) {
+      var isInstalled = installedModels.some(function(im) {
+        var imName = (im.name || im.model || '').split(':')[0];
+        return imName === m.pullName || imName === m.id;
+      });
+      html += '<div class="browse-model-card" id="bmCard_' + m.id + '">';
+      html += '<div class="bm-header"><span class="bm-name">' + m.name + '</span><span class="bm-tag">' + m.tag + '</span></div>';
+      html += '<div class="bm-desc">' + m.desc + '</div>';
+      if (isInstalled) {
+        html += '<button class="bm-pull-btn bm-installed" disabled>&#10003; Installed</button>';
+      } else {
+        html += '<button class="bm-pull-btn" id="bmPull_' + m.id + '" onclick="BrowseModels.pull(\'' + m.id + '\', \'' + m.pullName + '\')">Pull Model</button>';
+      }
+      html += '<div class="bm-progress" id="bmProgress_' + m.id + '">';
+      html += '<div class="bm-progress-bar"><div class="bm-progress-fill" id="bmFill_' + m.id + '"></div></div>';
+      html += '<div class="bm-progress-text" id="bmText_' + m.id + '">Starting download...</div>';
+      html += '</div>';
+      html += '</div>';
+    });
+    grid.innerHTML = html;
+  }
+
+  function updateInstalled(models) {
+    installedModels = models || [];
+    render();
+  }
+
+  async function pull(modelId, pullName) {
+    var btn = document.getElementById('bmPull_' + modelId);
+    var progress = document.getElementById('bmProgress_' + modelId);
+    var fill = document.getElementById('bmFill_' + modelId);
+    var text = document.getElementById('bmText_' + modelId);
+    if (btn) { btn.disabled = true; btn.textContent = 'Pulling...'; }
+    if (progress) progress.classList.add('active');
+
+    try {
+      var resolved = typeof resolveOllamaBase === 'function' ? await resolveOllamaBase(false) : null;
+      var base = resolved ? resolved.base : (localStorage.getItem('fl_localUrl') || 'http://localhost:11434');
+
+      var resp = await fetch(base + '/api/pull', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: pullName, stream: true })
+      });
+
+      if (!resp.ok) {
+        throw new Error('Pull request failed: ' + resp.status);
+      }
+
+      var reader = resp.body.getReader();
+      var decoder = new TextDecoder();
+      var buffer = '';
+
+      while (true) {
+        var chunk = await reader.read();
+        if (chunk.done) break;
+        buffer += decoder.decode(chunk.value, { stream: true });
+        // Process complete JSON lines
+        var lines = buffer.split('\n');
+        buffer = lines.pop(); // Keep incomplete line in buffer
+        for (var i = 0; i < lines.length; i++) {
+          if (!lines[i].trim()) continue;
+          try {
+            var data = JSON.parse(lines[i]);
+            if (data.total && data.completed) {
+              var pct = Math.round((data.completed / data.total) * 100);
+              if (fill) fill.style.width = pct + '%';
+              var dlMB = (data.completed / (1024*1024)).toFixed(0);
+              var totalMB = (data.total / (1024*1024)).toFixed(0);
+              if (text) text.textContent = data.status + ' (' + dlMB + ' / ' + totalMB + ' MB, ' + pct + '%)';
+            } else if (data.status) {
+              if (text) text.textContent = data.status;
+              if (data.status === 'success') {
+                if (fill) fill.style.width = '100%';
+              }
+            }
+          } catch(pe) { /* skip malformed JSON */ }
+        }
+      }
+
+      // Pull complete
+      if (btn) { btn.textContent = '\u2713 Installed'; btn.className = 'bm-pull-btn bm-installed'; }
+      if (text) text.textContent = 'Download complete!';
+      setTimeout(function() {
+        if (progress) progress.classList.remove('active');
+      }, 3000);
+      showToast(pullName + ' downloaded successfully!');
+      // Refresh model lists
+      ModelSwitcher.refresh();
+      if (typeof owRefreshModels === 'function') owRefreshModels();
+    } catch(e) {
+      console.error('Pull failed:', e);
+      if (btn) { btn.disabled = false; btn.textContent = 'Retry Pull'; }
+      if (text) text.textContent = 'Error: ' + e.message;
+      if (e.message.includes('Failed to fetch') || e.message.includes('NetworkError')) {
+        showToast('Cannot reach Ollama. Make sure Ollama is running and try again.');
+      } else {
+        showToast('Pull failed: ' + e.message);
+      }
+    }
+  }
+
+  async function init() {
+    render();
+    // Try to get installed models
+    try {
+      var resolved = typeof resolveOllamaBase === 'function' ? await resolveOllamaBase(false) : null;
+      var base = resolved ? resolved.base : (localStorage.getItem('fl_localUrl') || 'http://localhost:11434');
+      var resp = await fetch(base + '/api/tags', { signal: AbortSignal.timeout(5000) });
+      var data = await resp.json();
+      updateInstalled(data.models || []);
+    } catch(e) {
+      // Ollama not running, that's fine
+      var status = document.getElementById('browseModelsStatus');
+      if (status) status.textContent = 'Ollama not detected. Install and start Ollama to download models.';
+    }
+  }
+
+  return {
+    render: render,
+    updateInstalled: updateInstalled,
+    pull: pull,
+    init: init
+  };
+})();
+
+// Initialize Model Switcher and Browse Models after DOM is ready
+(function() {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() {
+      setTimeout(function() {
+        ModelSwitcher.init();
+        BrowseModels.init();
+      }, 500);
+    });
+  } else {
+    setTimeout(function() {
+      ModelSwitcher.init();
+      BrowseModels.init();
+    }, 500);
+  }
 })();
 </script>
 
