@@ -248,6 +248,7 @@ a:hover{opacity:0.85}
   letter-spacing:-2px;
   line-height:1.05;
   margin-bottom:20px;
+  color:var(--gold);
   background:linear-gradient(135deg,var(--text) 0%,var(--gold) 60%,var(--gold-light) 100%);
   -webkit-background-clip:text;
   -webkit-text-fill-color:transparent;
@@ -301,6 +302,23 @@ a:hover{opacity:0.85}
   from{opacity:0;transform:translateY(24px)}
   to{opacity:1;transform:translateY(0)}
 }
+
+/* Ensure hero content is always visible (fallback if animation fails) */
+@media (prefers-reduced-motion: reduce){
+  .hero-badge,.hero h1,.hero-tagline,.hero-desc,.hero-buttons,.hero-stats{
+    animation:none;
+    opacity:1;
+    transform:none;
+  }
+}
+
+/* Safety fallback: hero content must always be visible */
+.hero-badge{animation-duration:0.8s}
+.hero h1{animation-duration:0.8s}
+.hero-tagline{animation-duration:0.8s}
+.hero-desc{animation-duration:0.8s}
+.hero-buttons{animation-duration:0.8s}
+.hero-stats{animation-duration:0.8s}
 
 /* ---- Buttons ---- */
 .btn{
@@ -1102,17 +1120,17 @@ a:hover{opacity:0.85}
     </div>
 
     <div class="os-cards reveal">
-      <a href="https://raw.githubusercontent.com/Chaos2Cured/FreeLattice/main/install-freelattice.command" class="os-card" id="os-mac" download>
+      <a href="https://github.com/Chaos2Cured/FreeLattice/releases/download/v5.2/install-freelattice.command" class="os-card" id="os-mac" download="install-freelattice.command">
         <span class="os-card-icon">&#63743;</span>
         <div class="os-card-title">macOS</div>
         <div class="os-card-file">install-freelattice.command</div>
       </a>
-      <a href="https://raw.githubusercontent.com/Chaos2Cured/FreeLattice/main/install-freelattice.bat" class="os-card" id="os-win" download>
+      <a href="https://github.com/Chaos2Cured/FreeLattice/releases/download/v5.2/install-freelattice.bat" class="os-card" id="os-win" download="install-freelattice.bat">
         <span class="os-card-icon">&#128187;</span>
         <div class="os-card-title">Windows</div>
         <div class="os-card-file">install-freelattice.bat</div>
       </a>
-      <a href="https://raw.githubusercontent.com/Chaos2Cured/FreeLattice/main/install-freelattice.sh" class="os-card" id="os-linux" download>
+      <a href="https://github.com/Chaos2Cured/FreeLattice/releases/download/v5.2/install-freelattice.sh" class="os-card" id="os-linux" download="install-freelattice.sh">
         <span class="os-card-icon">&#128039;</span>
         <div class="os-card-title">Linux</div>
         <div class="os-card-file">install-freelattice.sh</div>
@@ -1479,9 +1497,9 @@ a:hover{opacity:0.85}
 
   var osNames = {mac:'macOS', windows:'Windows', linux:'Linux'};
   var osFiles = {
-    mac: {name:'install-freelattice.command', url:'https://raw.githubusercontent.com/Chaos2Cured/FreeLattice/main/install-freelattice.command'},
-    windows: {name:'install-freelattice.bat', url:'https://raw.githubusercontent.com/Chaos2Cured/FreeLattice/main/install-freelattice.bat'},
-    linux: {name:'install-freelattice.sh', url:'https://raw.githubusercontent.com/Chaos2Cured/FreeLattice/main/install-freelattice.sh'}
+    mac: {name:'install-freelattice.command', url:'https://github.com/Chaos2Cured/FreeLattice/releases/download/v5.2/install-freelattice.command'},
+    windows: {name:'install-freelattice.bat', url:'https://github.com/Chaos2Cured/FreeLattice/releases/download/v5.2/install-freelattice.bat'},
+    linux: {name:'install-freelattice.sh', url:'https://github.com/Chaos2Cured/FreeLattice/releases/download/v5.2/install-freelattice.sh'}
   };
 
   var detectedEl = document.getElementById('detected-os');
