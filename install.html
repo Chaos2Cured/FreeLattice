@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Install FreeLattice — Your AI, Your Way</title>
+<meta name="description" content="Download and install FreeLattice in under 2 minutes. One file, one double-click, done.">
+<meta name="theme-color" content="#0a0e1a">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0e1a;
+  --bg-card:#111527;
+  --bg-card-hover:#161b30;
+  --gold:#d4a017;
+  --gold-soft:rgba(212,160,23,0.15);
+  --gold-glow:rgba(212,160,23,0.08);
+  --text:#e8e4dc;
+  --text-secondary:#a09b8e;
+  --text-muted:#6b6760;
+  --border:#1e2235;
+  --green:#4ade80;
+  --green-soft:rgba(74,222,128,0.12);
+  --blue:#60a5fa;
+  --red:#f87171;
+  --radius:14px;
+  --font:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
+}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--font);
+  background:var(--bg);
+  color:var(--text);
+  line-height:1.7;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+  min-height:100vh;
+}
+a{color:var(--gold);text-decoration:none;transition:opacity 0.2s}
+a:hover{opacity:0.85}
+
+/* ---- Hero ---- */
+.hero{
+  min-height:60vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:60px 24px 40px;
+  position:relative;
+  overflow:hidden;
+}
+.hero::before{
+  content:'';
+  position:absolute;
+  top:-40%;left:50%;
+  width:800px;height:800px;
+  transform:translateX(-50%);
+  background:radial-gradient(circle,rgba(212,160,23,0.06) 0%,transparent 70%);
+  pointer-events:none;
+}
+.hero h1{
+  font-size:clamp(2.2rem,6vw,4rem);
+  font-weight:800;
+  letter-spacing:-1.5px;
+  line-height:1.1;
+  margin-bottom:16px;
+  background:linear-gradient(135deg,var(--text) 0%,var(--gold) 100%);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.hero .subtitle{
+  font-size:clamp(1rem,2.5vw,1.25rem);
+  color:var(--text-secondary);
+  max-width:600px;
+  margin:0 auto 32px;
+}
+.hero .badge{
+  display:inline-block;
+  padding:6px 18px;
+  border:1px solid var(--border);
+  border-radius:100px;
+  font-size:0.78rem;
+  color:var(--text-secondary);
+  letter-spacing:0.5px;
+  margin-bottom:24px;
+  background:var(--gold-glow);
+}
+
+/* ---- Download Section ---- */
+.download-section{
+  max-width:720px;
+  margin:0 auto;
+  padding:0 24px 60px;
+}
+.os-detected{
+  text-align:center;
+  margin-bottom:32px;
+}
+.os-detected .os-label{
+  font-size:0.85rem;
+  color:var(--text-muted);
+  margin-bottom:8px;
+}
+.os-detected .os-name{
+  font-size:1.1rem;
+  color:var(--gold);
+  font-weight:600;
+}
+
+/* Primary download button */
+.download-btn{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+  width:100%;
+  max-width:480px;
+  margin:0 auto 16px;
+  padding:18px 32px;
+  background:linear-gradient(135deg,var(--gold) 0%,#b8860b 100%);
+  color:#0a0e1a;
+  font-size:1.15rem;
+  font-weight:700;
+  border:none;
+  border-radius:var(--radius);
+  cursor:pointer;
+  transition:all 0.2s;
+  text-decoration:none;
+}
+.download-btn:hover{
+  opacity:0.92;
+  transform:translateY(-1px);
+  box-shadow:0 8px 32px rgba(212,160,23,0.25);
+}
+.download-btn .icon{
+  font-size:1.4rem;
+}
+
+.download-alt{
+  text-align:center;
+  font-size:0.85rem;
+  color:var(--text-muted);
+  margin-bottom:40px;
+}
+.download-alt a{
+  color:var(--text-secondary);
+  text-decoration:underline;
+  text-underline-offset:2px;
+}
+
+/* ---- Steps ---- */
+.steps{
+  max-width:720px;
+  margin:0 auto;
+  padding:0 24px 60px;
+}
+.steps h2{
+  text-align:center;
+  font-size:1.5rem;
+  font-weight:700;
+  margin-bottom:32px;
+  color:var(--text);
+}
+.step-card{
+  display:flex;
+  gap:16px;
+  padding:20px;
+  margin-bottom:16px;
+  background:var(--bg-card);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  transition:border-color 0.2s;
+}
+.step-card:hover{
+  border-color:rgba(212,160,23,0.3);
+}
+.step-num{
+  flex-shrink:0;
+  width:40px;
+  height:40px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:var(--gold-soft);
+  color:var(--gold);
+  font-weight:700;
+  font-size:1rem;
+  border-radius:10px;
+}
+.step-content h3{
+  font-size:1rem;
+  font-weight:600;
+  margin-bottom:4px;
+  color:var(--text);
+}
+.step-content p{
+  font-size:0.9rem;
+  color:var(--text-secondary);
+  line-height:1.5;
+}
+.step-content code{
+  background:rgba(212,160,23,0.1);
+  color:var(--gold);
+  padding:2px 6px;
+  border-radius:4px;
+  font-size:0.82rem;
+  font-family:'SF Mono','Fira Code',monospace;
+}
+
+/* ---- Other OS ---- */
+.other-os{
+  max-width:720px;
+  margin:0 auto;
+  padding:0 24px 60px;
+}
+.other-os h2{
+  text-align:center;
+  font-size:1.3rem;
+  font-weight:700;
+  margin-bottom:24px;
+  color:var(--text);
+}
+.os-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+  gap:16px;
+}
+.os-card{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:12px;
+  padding:24px 16px;
+  background:var(--bg-card);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  text-align:center;
+  transition:all 0.2s;
+  cursor:pointer;
+  text-decoration:none;
+  color:var(--text);
+}
+.os-card:hover{
+  border-color:var(--gold);
+  background:var(--bg-card-hover);
+  transform:translateY(-2px);
+}
+.os-card.active{
+  border-color:var(--gold);
+  background:var(--gold-glow);
+}
+.os-card .os-icon{
+  font-size:2rem;
+}
+.os-card .os-title{
+  font-weight:600;
+  font-size:0.95rem;
+}
+.os-card .os-file{
+  font-size:0.75rem;
+  color:var(--text-muted);
+  font-family:'SF Mono','Fira Code',monospace;
+}
+
+/* ---- Troubleshooting ---- */
+.troubleshoot{
+  max-width:720px;
+  margin:0 auto;
+  padding:0 24px 80px;
+}
+.troubleshoot h2{
+  text-align:center;
+  font-size:1.3rem;
+  font-weight:700;
+  margin-bottom:24px;
+  color:var(--text);
+}
+details{
+  background:var(--bg-card);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  margin-bottom:12px;
+  overflow:hidden;
+}
+details[open]{
+  border-color:rgba(212,160,23,0.3);
+}
+summary{
+  padding:16px 20px;
+  cursor:pointer;
+  font-weight:600;
+  font-size:0.95rem;
+  color:var(--text);
+  list-style:none;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  transition:background 0.2s;
+}
+summary:hover{
+  background:var(--bg-card-hover);
+}
+summary::-webkit-details-marker{display:none}
+summary::before{
+  content:'';
+  display:inline-block;
+  width:8px;
+  height:8px;
+  border-right:2px solid var(--gold);
+  border-bottom:2px solid var(--gold);
+  transform:rotate(-45deg);
+  transition:transform 0.2s;
+  flex-shrink:0;
+}
+details[open] summary::before{
+  transform:rotate(45deg);
+}
+.details-body{
+  padding:0 20px 20px;
+  font-size:0.9rem;
+  color:var(--text-secondary);
+  line-height:1.6;
+}
+.details-body p{
+  margin-bottom:8px;
+}
+.details-body code{
+  background:rgba(212,160,23,0.1);
+  color:var(--gold);
+  padding:2px 6px;
+  border-radius:4px;
+  font-size:0.82rem;
+  font-family:'SF Mono','Fira Code',monospace;
+}
+.details-body pre{
+  background:#0d1117;
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:12px 16px;
+  overflow-x:auto;
+  margin:8px 0;
+  font-size:0.82rem;
+  line-height:1.5;
+}
+.details-body pre code{
+  background:none;
+  padding:0;
+  color:var(--text);
+}
+
+/* ---- Try Online ---- */
+.try-online{
+  max-width:720px;
+  margin:0 auto;
+  padding:0 24px 60px;
+  text-align:center;
+}
+.try-online-card{
+  padding:32px;
+  background:var(--bg-card);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+}
+.try-online-card h3{
+  font-size:1.1rem;
+  margin-bottom:8px;
+}
+.try-online-card p{
+  color:var(--text-secondary);
+  font-size:0.9rem;
+  margin-bottom:16px;
+}
+.try-online-btn{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:12px 24px;
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  color:var(--text);
+  font-weight:600;
+  font-size:0.9rem;
+  text-decoration:none;
+  transition:all 0.2s;
+}
+.try-online-btn:hover{
+  border-color:var(--gold);
+  background:var(--gold-glow);
+}
+
+/* ---- Footer ---- */
+.footer{
+  text-align:center;
+  padding:40px 24px;
+  border-top:1px solid var(--border);
+  font-size:0.82rem;
+  color:var(--text-muted);
+}
+.footer a{color:var(--text-secondary)}
+
+/* ---- Responsive ---- */
+@media(max-width:600px){
+  .hero{padding:40px 16px 32px}
+  .download-section,.steps,.other-os,.troubleshoot,.try-online{padding-left:16px;padding-right:16px}
+  .step-card{flex-direction:column;gap:12px}
+  .os-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="badge">v5.1 &mdash; Free &amp; Open Source</div>
+  <h1>Install FreeLattice</h1>
+  <p class="subtitle">One file. One double-click. Your private AI is running in under 2 minutes.</p>
+</section>
+
+<!-- Download Section -->
+<section class="download-section">
+  <div class="os-detected">
+    <div class="os-label">Detected your system as</div>
+    <div class="os-name" id="detected-os">Detecting...</div>
+  </div>
+
+  <a id="primary-download" class="download-btn" href="#">
+    <span class="icon" id="download-icon">&#11015;</span>
+    <span id="download-text">Download Installer</span>
+  </a>
+
+  <div class="download-alt">
+    Not your OS? <a href="#all-platforms">See all platforms below</a>
+    &nbsp;&bull;&nbsp;
+    <a href="https://chaos2cured.github.io/FreeLattice/" target="_blank">Try online without installing</a>
+  </div>
+</section>
+
+<!-- Steps -->
+<section class="steps" id="steps-section">
+  <h2>How It Works</h2>
+
+  <!-- Windows Steps -->
+  <div id="steps-windows" style="display:none">
+    <div class="step-card">
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <h3>Download the installer</h3>
+        <p>Click the button above to download <code>install-freelattice.bat</code>. Save it anywhere &mdash; your Desktop is fine.</p>
+      </div>
+    </div>
+    <div class="step-card">
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <h3>Double-click to run</h3>
+        <p>If Windows shows a SmartScreen warning ("Windows protected your PC"), click <strong>"More info"</strong> then <strong>"Run anyway"</strong>. This is normal for downloaded scripts.</p>
+      </div>
+    </div>
+    <div class="step-card">
+      <div class="step-num">3</div>
+      <div class="step-content">
+        <h3>Follow the prompts</h3>
+        <p>A Command Prompt window opens and walks you through everything automatically &mdash; Python, Ollama, CORS, AI models, and launching the server.</p>
+      </div>
+    </div>
+    <div class="step-card">
+      <div class="step-num">4</div>
+      <div class="step-content">
+        <h3>You're in!</h3>
+        <p>Your browser opens to <code>http://localhost:3000</code> and FreeLattice is running. Close the Command Prompt window to stop.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mac Steps -->
+  <div id="steps-mac" style="display:none">
+    <div class="step-card">
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <h3>Download the installer</h3>
+        <p>Click the button above to download <code>install-freelattice.command</code>. Save it anywhere.</p>
+      </div>
+    </div>
+    <div class="step-card">
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <h3>Double-click in Finder</h3>
+        <p>If macOS shows a security warning, <strong>right-click</strong> the file, choose <strong>"Open"</strong>, then click <strong>"Open"</strong> in the dialog. You only need to do this once.</p>
+      </div>
+    </div>
+    <div class="step-card">
+      <div class="step-num">3</div>
+      <div class="step-content">
+        <h3>Terminal handles everything</h3>
+        <p>A Terminal window opens with colorful status messages. It checks Python, configures Ollama, and starts the server automatically.</p>
+      </div>
+    </div>
+    <div class="step-card">
+      <div class="step-num">4</div>
+      <div class="step-content">
+        <h3>You're in!</h3>
+        <p>Your browser opens to <code>http://localhost:3000</code>. Close the Terminal window to stop the server.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Linux Steps -->
+  <div id="steps-linux" style="display:none">
+    <div class="step-card">
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <h3>Download the installer</h3>
+        <p>Click the button above to download <code>install-freelattice.sh</code>.</p>
+      </div>
+    </div>
+    <div class="step-card">
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <h3>Make it executable and run</h3>
+        <p>Open a terminal and run: <code>chmod +x ~/Downloads/install-freelattice.sh && ~/Downloads/install-freelattice.sh</code></p>
+      </div>
+    </div>
+    <div class="step-card">
+      <div class="step-num">3</div>
+      <div class="step-content">
+        <h3>Follow the prompts</h3>
+        <p>The script detects your system, installs Ollama if needed, configures CORS, and starts the server with full status output.</p>
+      </div>
+    </div>
+    <div class="step-card">
+      <div class="step-num">4</div>
+      <div class="step-content">
+        <h3>You're in!</h3>
+        <p>Your browser opens to <code>http://localhost:3000</code>. Press <code>Ctrl+C</code> to stop the server.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- All Platforms -->
+<section class="other-os" id="all-platforms">
+  <h2>All Platforms</h2>
+  <div class="os-grid">
+    <a class="os-card" id="card-windows" href="https://github.com/Chaos2Cured/FreeLattice/releases/latest/download/install-freelattice.bat" data-fallback="https://raw.githubusercontent.com/Chaos2Cured/FreeLattice/main/install-freelattice.bat" onclick="downloadFile('windows',event)">
+      <div class="os-icon">&#128187;</div>
+      <div class="os-title">Windows</div>
+      <div class="os-file">install-freelattice.bat</div>
+    </a>
+    <a class="os-card" id="card-mac" href="https://github.com/Chaos2Cured/FreeLattice/releases/latest/download/install-freelattice.command" data-fallback="https://raw.githubusercontent.com/Chaos2Cured/FreeLattice/main/install-freelattice.command" onclick="downloadFile('mac',event)">
+      <div class="os-icon">&#127823;</div>
+      <div class="os-title">macOS</div>
+      <div class="os-file">install-freelattice.command</div>
+    </a>
+    <a class="os-card" id="card-linux" href="https://github.com/Chaos2Cured/FreeLattice/releases/latest/download/install-freelattice.sh" data-fallback="https://raw.githubusercontent.com/Chaos2Cured/FreeLattice/main/install-freelattice.sh" onclick="downloadFile('linux',event)">
+      <div class="os-icon">&#128039;</div>
+      <div class="os-title">Linux</div>
+      <div class="os-file">install-freelattice.sh</div>
+    </a>
+  </div>
+</section>
+
+<!-- Try Online -->
+<section class="try-online">
+  <div class="try-online-card">
+    <h3>Just want to try it?</h3>
+    <p>FreeLattice runs in any browser &mdash; no install needed. Cloud AI providers work out of the box. Install locally later for full privacy with Ollama.</p>
+    <a class="try-online-btn" href="https://chaos2cured.github.io/FreeLattice/" target="_blank">
+      &#127760; Open FreeLattice Online
+    </a>
+  </div>
+</section>
+
+<!-- Troubleshooting -->
+<section class="troubleshoot">
+  <h2>Having Trouble?</h2>
+
+  <details>
+    <summary>Windows: "Windows protected your PC" (SmartScreen)</summary>
+    <div class="details-body">
+      <p>This is normal for any script downloaded from the internet. Windows SmartScreen blocks files it hasn't seen before.</p>
+      <p><strong>Fix:</strong> Click <strong>"More info"</strong> (it's a small text link), then click <strong>"Run anyway"</strong>.</p>
+      <p>This only happens the first time. The file is safe &mdash; it's open source and you can <a href="https://github.com/Chaos2Cured/FreeLattice/blob/main/install-freelattice.bat" target="_blank">read every line of code</a>.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary>Windows: "Python was not found"</summary>
+    <div class="details-body">
+      <p>The installer tries to install Python automatically. If that fails:</p>
+      <p>1. Go to <a href="https://python.org/downloads" target="_blank">python.org/downloads</a></p>
+      <p>2. Download the latest Python 3</p>
+      <p>3. <strong>IMPORTANT:</strong> Check the box that says <strong>"Add Python to PATH"</strong> during installation</p>
+      <p>4. Run the installer again</p>
+    </div>
+  </details>
+
+  <details>
+    <summary>Windows: Script closes immediately / nothing happens</summary>
+    <div class="details-body">
+      <p>This usually means the .bat file was blocked or there's an antivirus issue.</p>
+      <p><strong>Option 1:</strong> Right-click the .bat file and choose <strong>"Run as administrator"</strong></p>
+      <p><strong>Option 2:</strong> Open Command Prompt manually, navigate to the folder, and type:</p>
+      <pre><code>install-freelattice.bat</code></pre>
+      <p>This lets you see any error messages that would otherwise flash by.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary>Mac: "Cannot be opened because it is from an unidentified developer"</summary>
+    <div class="details-body">
+      <p>macOS Gatekeeper blocks files from developers who haven't paid Apple $99/year for a certificate. FreeLattice is free and open source.</p>
+      <p><strong>Fix:</strong> Right-click (or Control-click) the file in Finder, choose <strong>"Open"</strong>, then click <strong>"Open"</strong> in the dialog.</p>
+      <p>You only need to do this once. After that, double-clicking works normally.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary>Ollama CORS errors / "Failed to fetch" in browser console</summary>
+    <div class="details-body">
+      <p>The installer configures CORS automatically, but if you're running manually:</p>
+      <p><strong>Windows:</strong></p>
+      <pre><code>setx OLLAMA_ORIGINS "*"</code></pre>
+      <p><strong>Mac:</strong></p>
+      <pre><code>launchctl setenv OLLAMA_ORIGINS "*"</code></pre>
+      <p><strong>Linux:</strong></p>
+      <pre><code>echo 'export OLLAMA_ORIGINS="*"' >> ~/.bashrc && source ~/.bashrc</code></pre>
+      <p>Then restart Ollama. The FreeLattice server also includes a built-in proxy that bypasses CORS entirely.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary>Port 3000 is already in use</summary>
+    <div class="details-body">
+      <p>Another application is using port 3000. The installer automatically finds the next available port.</p>
+      <p>If running manually, set a different port:</p>
+      <pre><code>PORT=8080 python3 server.py</code></pre>
+      <p>Then open <code>http://localhost:8080</code> in your browser.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary>I just want to run it manually without the installer</summary>
+    <div class="details-body">
+      <p>Absolutely! Clone the repo and start the server:</p>
+      <pre><code>git clone https://github.com/Chaos2Cured/FreeLattice.git
+cd FreeLattice
+python3 server.py</code></pre>
+      <p>Open <code>http://localhost:3000</code> in your browser. That's it.</p>
+      <p>If you want Ollama (local AI), install it from <a href="https://ollama.com" target="_blank">ollama.com</a> and set <code>OLLAMA_ORIGINS=*</code> before starting Ollama.</p>
+    </div>
+  </details>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <p>
+    <a href="https://github.com/Chaos2Cured/FreeLattice" target="_blank">GitHub</a>
+    &nbsp;&bull;&nbsp;
+    <a href="https://x.com/FreeLattice" target="_blank">@FreeLattice</a>
+    &nbsp;&bull;&nbsp;
+    <a href="https://chaos2cured.github.io/FreeLattice/" target="_blank">Live Demo</a>
+  </p>
+  <p style="margin-top:8px">FreeLattice is free, open-source, and always will be. Your AI. Your data. Your freedom.</p>
+</footer>
+
+<script>
+(function(){
+  // OS Detection
+  const ua = navigator.userAgent || '';
+  const platform = navigator.platform || '';
+  let os = 'unknown';
+
+  if (/Win/.test(platform) || /Windows/.test(ua)) {
+    os = 'windows';
+  } else if (/Mac/.test(platform) || /Macintosh/.test(ua)) {
+    os = 'mac';
+  } else if (/Linux/.test(platform) || /Linux/.test(ua)) {
+    // Check for Android (which is also Linux)
+    if (/Android/.test(ua)) {
+      os = 'linux'; // Show Linux for Android too
+    } else {
+      os = 'linux';
+    }
+  } else if (/iPhone|iPad|iPod/.test(ua)) {
+    os = 'mac';
+  }
+
+  const config = {
+    windows: {
+      name: 'Windows',
+      file: 'install-freelattice.bat',
+      icon: '\uD83D\uDCBB',
+      releaseUrl: 'https://github.com/Chaos2Cured/FreeLattice/releases/latest/download/install-freelattice.bat',
+      rawUrl: 'https://raw.githubusercontent.com/Chaos2Cured/FreeLattice/main/install-freelattice.bat',
+      steps: 'steps-windows'
+    },
+    mac: {
+      name: 'macOS',
+      file: 'install-freelattice.command',
+      icon: '\uD83C\uDF4E',
+      releaseUrl: 'https://github.com/Chaos2Cured/FreeLattice/releases/latest/download/install-freelattice.command',
+      rawUrl: 'https://raw.githubusercontent.com/Chaos2Cured/FreeLattice/main/install-freelattice.command',
+      steps: 'steps-mac'
+    },
+    linux: {
+      name: 'Linux',
+      file: 'install-freelattice.sh',
+      icon: '\uD83D\uDC27',
+      releaseUrl: 'https://github.com/Chaos2Cured/FreeLattice/releases/latest/download/install-freelattice.sh',
+      rawUrl: 'https://raw.githubusercontent.com/Chaos2Cured/FreeLattice/main/install-freelattice.sh',
+      steps: 'steps-linux'
+    }
+  };
+
+  function setupForOS(detectedOS) {
+    const c = config[detectedOS] || config.windows;
+
+    // Update detected OS display
+    document.getElementById('detected-os').textContent = c.name;
+
+    // Update primary download button
+    const btn = document.getElementById('primary-download');
+    btn.href = c.rawUrl;
+    btn.setAttribute('download', c.file);
+    document.getElementById('download-icon').textContent = c.icon;
+    document.getElementById('download-text').textContent = 'Download for ' + c.name;
+
+    // Show relevant steps
+    const stepsEl = document.getElementById(c.steps);
+    if (stepsEl) stepsEl.style.display = 'block';
+
+    // Highlight active OS card
+    const card = document.getElementById('card-' + detectedOS);
+    if (card) card.classList.add('active');
+  }
+
+  setupForOS(os);
+
+  // Download handler for OS cards
+  window.downloadFile = function(osKey, event) {
+    event.preventDefault();
+    const c = config[osKey];
+    if (!c) return;
+
+    // Show steps for this OS
+    ['steps-windows', 'steps-mac', 'steps-linux'].forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) el.style.display = 'none';
+    });
+    var stepsEl = document.getElementById(c.steps);
+    if (stepsEl) stepsEl.style.display = 'block';
+
+    // Trigger download from raw GitHub (always available, no release needed)
+    var a = document.createElement('a');
+    a.href = c.rawUrl;
+    a.download = c.file;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
+})();
+</script>
+</body>
+</html>

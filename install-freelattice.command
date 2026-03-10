@@ -1,10 +1,17 @@
 #!/usr/bin/env bash
 # ╔══════════════════════════════════════════════════════════════╗
-# ║  FreeLattice — Mac One-Click Installer                      ║
+# ║  FreeLattice — Mac One-Click Installer  v2.0                ║
 # ║  Double-click this file in Finder — everything is automatic ║
 # ╚══════════════════════════════════════════════════════════════╝
 # This is the ONLY file a Mac user needs. Double-click it.
 # It handles EVERYTHING: Python, Ollama, CORS, models, server, browser.
+#
+# GATEKEEPER NOTE:
+#   If macOS says "cannot be opened because it is from an unidentified developer":
+#     1. Right-click (or Control-click) this file in Finder
+#     2. Choose "Open" from the menu
+#     3. Click "Open" in the dialog
+#   You only need to do this once.
 
 # Don't exit on error — we handle errors ourselves
 set +e
@@ -22,25 +29,24 @@ BOLD='\033[1m'
 NC='\033[0m'
 
 step()    { echo -e "\n${CYAN}${BOLD}  ▸ $1${NC}"; }
-success() { echo -e "  ${GREEN}✅ $1${NC}"; }
-warn()    { echo -e "  ${YELLOW}⚠️  $1${NC}"; }
-fail()    { echo -e "  ${RED}❌ $1${NC}"; }
+success() { echo -e "  ${GREEN}  $1${NC}"; }
+warn()    { echo -e "  ${YELLOW}  $1${NC}"; }
+fail()    { echo -e "  ${RED}  $1${NC}"; }
 info()    { echo -e "  ${DIM}$1${NC}"; }
 
-# Make ourselves executable
+# Make ourselves executable (in case Finder didn't set +x)
 chmod +x "$0" 2>/dev/null
 
 # ── Banner ───────────────────────────────────────────────────
 echo ""
 echo -e "${MAGENTA}${BOLD}"
-echo "  ╔══════════════════════════════════════════════════╗"
-echo "  ║                                                  ║"
-echo "  ║        🌐  F R E E L A T T I C E  🌐            ║"
-echo "  ║                                                  ║"
-echo "  ║     Mac One-Click Installer                      ║"
-echo "  ║     Your AI, Your Way — No Cloud Required        ║"
-echo "  ║                                                  ║"
-echo "  ╚══════════════════════════════════════════════════╝"
+echo "  ========================================================"
+echo "  =                                                      ="
+echo "  =        FreeLattice  -  Mac One-Click Installer       ="
+echo "  =                                                      ="
+echo "  =     Your AI, Your Way  -  No Cloud Required          ="
+echo "  =                                                      ="
+echo "  ========================================================"
 echo -e "${NC}"
 echo -e "  ${DIM}Detected: macOS $(sw_vers -productVersion 2>/dev/null || echo 'unknown') | $(uname -m)${NC}"
 
@@ -86,10 +92,18 @@ step "Step 2/7: Checking for Ollama (local AI engine)..."
 OLLAMA_INSTALLED=false
 OLLAMA_RUNNING=false
 
+# Check multiple locations
 if command -v ollama &>/dev/null; then
   OLLAMA_INSTALLED=true
   OLLAMA_VERSION=$(ollama --version 2>&1 || echo "installed")
   success "Ollama is installed ($OLLAMA_VERSION)"
+elif [ -f "/usr/local/bin/ollama" ]; then
+  OLLAMA_INSTALLED=true
+  export PATH="/usr/local/bin:$PATH"
+  success "Found Ollama in /usr/local/bin"
+elif [ -d "/Applications/Ollama.app" ]; then
+  OLLAMA_INSTALLED=true
+  success "Found Ollama.app in Applications"
 else
   warn "Ollama is not installed yet"
   echo ""
@@ -103,24 +117,37 @@ else
   INSTALL_CHOICE="${INSTALL_CHOICE:-Y}"
 
   if [[ "$INSTALL_CHOICE" =~ ^[Yy] ]]; then
-    info "Opening Ollama download page..."
-    open "https://ollama.com/download/mac" 2>/dev/null || open "https://ollama.ai" 2>/dev/null || true
-    echo ""
-    echo -e "  ${WHITE}Please download and install Ollama from the page that just opened.${NC}"
-    echo -e "  ${WHITE}After installation, press Enter to continue...${NC}"
-    echo ""
-    read -p "  Press Enter when Ollama is installed (or to skip)..." _
+    # Try the official install script first (works on Mac too)
+    info "Attempting automatic Ollama install..."
+    if curl -fsSL https://ollama.com/install.sh 2>/dev/null | sh 2>&1; then
+      if command -v ollama &>/dev/null || [ -f "/usr/local/bin/ollama" ]; then
+        OLLAMA_INSTALLED=true
+        export PATH="/usr/local/bin:$PATH"
+        success "Ollama installed successfully!"
+      fi
+    fi
 
-    # Re-check
-    if command -v ollama &>/dev/null; then
-      OLLAMA_INSTALLED=true
-      success "Ollama is now installed!"
-    else
-      # Check if it's in /usr/local/bin (sometimes PATH isn't updated in this shell)
-      if [ -f "/usr/local/bin/ollama" ]; then
+    # If auto-install didn't work, open download page
+    if [ "$OLLAMA_INSTALLED" = false ]; then
+      info "Opening Ollama download page..."
+      open "https://ollama.com/download/mac" 2>/dev/null || true
+      echo ""
+      echo -e "  ${WHITE}Please download and install Ollama from the page that just opened.${NC}"
+      echo -e "  ${WHITE}After installation, press Enter to continue...${NC}"
+      echo ""
+      read -p "  Press Enter when Ollama is installed (or to skip)..." _
+
+      # Re-check
+      if command -v ollama &>/dev/null; then
+        OLLAMA_INSTALLED=true
+        success "Ollama is now installed!"
+      elif [ -f "/usr/local/bin/ollama" ]; then
         OLLAMA_INSTALLED=true
         export PATH="/usr/local/bin:$PATH"
         success "Ollama is now installed!"
+      elif [ -d "/Applications/Ollama.app" ]; then
+        OLLAMA_INSTALLED=true
+        success "Found Ollama.app!"
       else
         warn "Ollama not detected yet — continuing without it"
         info "You can install Ollama later from https://ollama.com"
@@ -138,12 +165,10 @@ if [ "$OLLAMA_INSTALLED" = true ]; then
   step "Step 3/7: Configuring Ollama CORS (so your browser can talk to it)..."
 
   # ── 3a: Set OLLAMA_ORIGINS persistently via launchctl ──
-  # This affects all future GUI app launches (including Ollama.app)
   launchctl setenv OLLAMA_ORIGINS "*" 2>/dev/null && \
     info "Set OLLAMA_ORIGINS=* via launchctl (affects GUI apps)" || true
 
   # ── 3b: Add to shell profile for persistence across reboots ──
-  # Try all common shell profiles
   PROFILES_UPDATED=0
   for PROFILE in "$HOME/.zshrc" "$HOME/.zprofile" "$HOME/.bash_profile" "$HOME/.bashrc"; do
     if [ -f "$PROFILE" ] || [ "$PROFILE" = "$HOME/.zshrc" ]; then
@@ -201,7 +226,7 @@ PLIST_EOF
   # ── 3d: Set for current process ──
   export OLLAMA_ORIGINS="*"
 
-  # ── 3e: CRITICAL — Kill and restart Ollama so it picks up the new setting ──
+  # ── 3e: Kill and restart Ollama so it picks up the new setting ──
   info "Restarting Ollama to apply CORS settings..."
 
   # Kill ALL Ollama processes (the app and the server)
@@ -218,27 +243,26 @@ PLIST_EOF
 
   # Start Ollama fresh — try the app first, then CLI
   if [ -d "/Applications/Ollama.app" ]; then
-    # Set the env var so the app inherits it
     OLLAMA_ORIGINS="*" open -a Ollama 2>/dev/null
     info "Started Ollama.app with CORS enabled"
   elif [ -f "/usr/local/bin/ollama" ]; then
     OLLAMA_ORIGINS="*" /usr/local/bin/ollama serve &>/dev/null &
     info "Started ollama serve with CORS enabled"
-  else
+  elif command -v ollama &>/dev/null; then
     OLLAMA_ORIGINS="*" ollama serve &>/dev/null &
     info "Started ollama serve with CORS enabled"
   fi
 
-  # ── 3f: Wait for Ollama to be ready (with patience) ──
+  # ── 3f: Wait for Ollama to be ready ──
   info "Waiting for Ollama to start up..."
   OLLAMA_READY=false
-  for i in $(seq 1 15); do
+  for i in $(seq 1 20); do
     if curl -s --connect-timeout 2 http://localhost:11434/api/tags &>/dev/null; then
       OLLAMA_READY=true
       break
     fi
     sleep 1
-    printf "  ${DIM}.${NC}"
+    printf "."
   done
   echo ""
 
@@ -281,7 +305,7 @@ fi
 
 # Check common locations
 if [ -z "$FL_DIR" ]; then
-  for DIR in "$HOME/FreeLattice" "$HOME/Desktop/FreeLattice" "$HOME/Downloads/FreeLattice" "$HOME/Documents/FreeLattice"; do
+  for DIR in "$HOME/FreeLattice" "$HOME/Desktop/FreeLattice" "$HOME/Downloads/FreeLattice" "$HOME/Downloads/FreeLattice-main" "$HOME/Documents/FreeLattice"; do
     if [ -f "$DIR/index.html" ]; then
       FL_DIR="$DIR"
       success "Found FreeLattice at: $FL_DIR"
@@ -372,7 +396,7 @@ import sys, json
 try:
     data = json.load(sys.stdin)
     for m in data.get('models', []):
-        print('    • ' + m.get('name', 'unknown'))
+        print('    - ' + m.get('name', 'unknown'))
 except:
     pass
 " 2>/dev/null
@@ -433,30 +457,30 @@ fi
 # Print the success message
 echo ""
 echo -e "${GREEN}${BOLD}"
-echo "  ╔══════════════════════════════════════════════════╗"
-echo "  ║                                                  ║"
-echo "  ║   🌐 FreeLattice is running!                     ║"
-echo "  ║                                                  ║"
-echo -e "  ║   ${WHITE}Open: ${CYAN}http://localhost:$PORT${GREEN}${BOLD}                    ║"
-echo "  ║                                                  ║"
-echo "  ║   Close this window to stop the server.          ║"
-echo "  ║                                                  ║"
-echo "  ╚══════════════════════════════════════════════════╝"
+echo "  ========================================================"
+echo "  =                                                      ="
+echo "  =   FreeLattice is running!                            ="
+echo "  =                                                      ="
+echo -e "  =   ${WHITE}Open: ${CYAN}http://localhost:$PORT${GREEN}${BOLD}"
+echo "  =                                                      ="
+echo "  =   Close this window to stop the server.              ="
+echo "  =                                                      ="
+echo "  ========================================================"
 echo -e "${NC}"
 
 if [ "$OLLAMA_RUNNING" = true ]; then
-  echo -e "  ${GREEN}🤖 Ollama is connected — local AI is ready!${NC}"
-  echo -e "  ${GREEN}   CORS is configured — browser ↔ Ollama will work!${NC}"
+  echo -e "  ${GREEN}Ollama is connected — local AI is ready!${NC}"
+  echo -e "  ${GREEN}CORS is configured — browser connections will work!${NC}"
 else
   if [ "$OLLAMA_INSTALLED" = true ]; then
-    echo -e "  ${YELLOW}🤖 Ollama is installed but may still be starting up${NC}"
+    echo -e "  ${YELLOW}Ollama is installed but may still be starting up${NC}"
     echo -e "  ${DIM}   The built-in proxy server handles CORS automatically${NC}"
   else
-    echo -e "  ${DIM}💡 Tip: Install Ollama from ollama.com for local AI models${NC}"
+    echo -e "  ${DIM}Tip: Install Ollama from ollama.com for local AI models${NC}"
   fi
 fi
-echo -e "  ${DIM}📡 Other devices on your network can also connect${NC}"
-echo -e "  ${DIM}🔧 Server type: $SERVER_TYPE${NC}"
+echo -e "  ${DIM}Other devices on your network can also connect${NC}"
+echo -e "  ${DIM}Server type: $SERVER_TYPE${NC}"
 echo ""
 
 # Start the server (this blocks until Ctrl+C or window close)

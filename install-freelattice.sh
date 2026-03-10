@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 # ╔══════════════════════════════════════════════════════════════╗
-# ║         FreeLattice — One-Click Installer (Mac/Linux)       ║
+# ║         FreeLattice — One-Click Installer (Linux)  v2.0     ║
 # ║         Bulletproof edition — handles CORS, models, all.    ║
-# ║         The lattice speaks to those who listen.             ║
 # ╚══════════════════════════════════════════════════════════════╝
 # This script handles EVERYTHING:
 #   1. Checks for Python 3
@@ -34,37 +33,27 @@ NC='\033[0m' # No Color
 print_banner() {
   echo ""
   echo -e "${MAGENTA}${BOLD}"
-  echo "  ╔══════════════════════════════════════════════════╗"
-  echo "  ║                                                  ║"
-  echo "  ║        🌐  F R E E L A T T I C E  🌐            ║"
-  echo "  ║                                                  ║"
-  echo "  ║     One-Click Installer — Your AI, Your Way      ║"
-  echo "  ║                                                  ║"
-  echo "  ╚══════════════════════════════════════════════════╝"
+  echo "  ========================================================"
+  echo "  =                                                      ="
+  echo "  =        FreeLattice  -  Linux Installer               ="
+  echo "  =                                                      ="
+  echo "  =     Your AI, Your Way  -  No Cloud Required          ="
+  echo "  =                                                      ="
+  echo "  ========================================================"
   echo -e "${NC}"
 }
 
 step()    { echo -e "\n${CYAN}${BOLD}  ▸ $1${NC}"; }
-success() { echo -e "  ${GREEN}✅ $1${NC}"; }
-warn()    { echo -e "  ${YELLOW}⚠️  $1${NC}"; }
-fail()    { echo -e "  ${RED}❌ $1${NC}"; }
+success() { echo -e "  ${GREEN}  $1${NC}"; }
+warn()    { echo -e "  ${YELLOW}  $1${NC}"; }
+fail()    { echo -e "  ${RED}  $1${NC}"; }
 info()    { echo -e "  ${DIM}$1${NC}"; }
-
-# ── Detect OS ─────────────────────────────────────────────────
-detect_os() {
-  case "$(uname -s)" in
-    Darwin*) OS="mac" ;;
-    Linux*)  OS="linux" ;;
-    *)       OS="unknown" ;;
-  esac
-}
 
 # ══════════════════════════════════════════════════════════════
 #                        MAIN FLOW
 # ══════════════════════════════════════════════════════════════
 
 print_banner
-detect_os
 
 echo -e "  ${DIM}Detected: $(uname -s) $(uname -m) | Shell: $SHELL${NC}"
 
@@ -90,18 +79,10 @@ fi
 if [ -z "$PYTHON_CMD" ]; then
   fail "Python 3 not found!"
   echo ""
-  if [ "$OS" = "mac" ]; then
-    echo -e "  ${WHITE}Python 3 should be pre-installed on macOS.${NC}"
-    echo -e "  ${WHITE}If it's missing, install it:${NC}"
-    echo -e "  ${CYAN}  xcode-select --install${NC}"
-    echo -e "  ${WHITE}  or: ${CYAN}brew install python3${NC}"
-    echo -e "  ${WHITE}  or download from: ${CYAN}https://python.org${NC}"
-  else
-    echo -e "  ${WHITE}Install Python 3:${NC}"
-    echo -e "  ${CYAN}  sudo apt install python3   ${DIM}(Debian/Ubuntu)${NC}"
-    echo -e "  ${CYAN}  sudo dnf install python3   ${DIM}(Fedora)${NC}"
-    echo -e "  ${CYAN}  sudo pacman -S python       ${DIM}(Arch)${NC}"
-  fi
+  echo -e "  ${WHITE}Install Python 3:${NC}"
+  echo -e "  ${CYAN}  sudo apt install python3   ${DIM}(Debian/Ubuntu)${NC}"
+  echo -e "  ${CYAN}  sudo dnf install python3   ${DIM}(Fedora)${NC}"
+  echo -e "  ${CYAN}  sudo pacman -S python       ${DIM}(Arch)${NC}"
   echo ""
   read -p "  Press Enter to exit..." _
   exit 1
@@ -119,6 +100,10 @@ if command -v ollama &>/dev/null; then
   OLLAMA_INSTALLED=true
   OLLAMA_VERSION=$(ollama --version 2>&1 || echo "installed")
   success "Ollama is installed ($OLLAMA_VERSION)"
+elif [ -f "/usr/local/bin/ollama" ]; then
+  OLLAMA_INSTALLED=true
+  export PATH="/usr/local/bin:$PATH"
+  success "Found Ollama in /usr/local/bin"
 else
   warn "Ollama is not installed yet"
   echo ""
@@ -132,21 +117,11 @@ else
   INSTALL_CHOICE="${INSTALL_CHOICE:-Y}"
 
   if [[ "$INSTALL_CHOICE" =~ ^[Yy] ]]; then
-    if [ "$OS" = "mac" ]; then
-      info "Opening Ollama download page..."
-      open "https://ollama.com/download/mac" 2>/dev/null || open "https://ollama.ai" 2>/dev/null || true
-      echo ""
-      echo -e "  ${WHITE}Please download and install Ollama from the page that just opened.${NC}"
-      echo -e "  ${WHITE}After installation, press Enter to continue...${NC}"
-      echo ""
-      read -p "  Press Enter when Ollama is installed (or to skip)..." _
-    else
-      # Linux: try the official install script
-      info "Installing Ollama via official script..."
-      echo ""
-      curl -fsSL https://ollama.com/install.sh | sh 2>&1
-      echo ""
-    fi
+    # Linux: try the official install script
+    info "Installing Ollama via official script..."
+    echo ""
+    curl -fsSL https://ollama.com/install.sh | sh 2>&1
+    echo ""
 
     # Re-check
     if command -v ollama &>/dev/null; then
@@ -174,151 +149,75 @@ if [ "$OLLAMA_INSTALLED" = true ]; then
   # ── 3a: Set for current process ──
   export OLLAMA_ORIGINS="*"
 
-  if [ "$OS" = "mac" ]; then
-    # ── macOS-specific CORS persistence ──
-
-    # launchctl setenv for GUI apps
-    launchctl setenv OLLAMA_ORIGINS "*" 2>/dev/null && \
-      info "Set OLLAMA_ORIGINS=* via launchctl (affects GUI apps)" || true
-
-    # Add to shell profiles
-    for PROFILE in "$HOME/.zshrc" "$HOME/.zprofile" "$HOME/.bash_profile" "$HOME/.bashrc"; do
-      if [ -f "$PROFILE" ] || [ "$PROFILE" = "$HOME/.zshrc" ]; then
-        [ ! -f "$PROFILE" ] && [ "$PROFILE" = "$HOME/.zshrc" ] && touch "$PROFILE"
-        if [ -f "$PROFILE" ] && ! grep -q "OLLAMA_ORIGINS" "$PROFILE" 2>/dev/null; then
-          echo '' >> "$PROFILE"
-          echo '# FreeLattice — Allow browser access to local Ollama (CORS fix)' >> "$PROFILE"
-          echo 'export OLLAMA_ORIGINS="*"' >> "$PROFILE"
-          info "Added OLLAMA_ORIGINS=* to $PROFILE"
-        fi
-      fi
-    done
-
-    # Write a launchd plist for maximum persistence
-    PLIST_DIR="$HOME/Library/LaunchAgents"
-    PLIST_FILE="$PLIST_DIR/com.freelattice.ollama-cors.plist"
-    mkdir -p "$PLIST_DIR" 2>/dev/null
-    cat > "$PLIST_FILE" 2>/dev/null << 'PLIST_EOF'
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-    <key>Label</key>
-    <string>com.freelattice.ollama-cors</string>
-    <key>ProgramArguments</key>
-    <array>
-        <string>/bin/launchctl</string>
-        <string>setenv</string>
-        <string>OLLAMA_ORIGINS</string>
-        <string>*</string>
-    </array>
-    <key>RunAtLoad</key>
-    <true/>
-</dict>
-</plist>
-PLIST_EOF
-    [ -f "$PLIST_FILE" ] && launchctl load "$PLIST_FILE" 2>/dev/null || true
-    info "Installed launchd agent for CORS persistence on reboot"
-
-    # Kill and restart Ollama
-    info "Restarting Ollama to apply CORS settings..."
-    pkill -9 -f "Ollama" 2>/dev/null || true
-    pkill -9 -f "ollama" 2>/dev/null || true
-    sleep 2
-    # Double-check
-    pgrep -f "ollama" &>/dev/null && { killall -9 "Ollama" 2>/dev/null; killall -9 "ollama" 2>/dev/null; sleep 2; } || true
-
-    # Start fresh
-    if [ -d "/Applications/Ollama.app" ]; then
-      OLLAMA_ORIGINS="*" open -a Ollama 2>/dev/null
-      info "Started Ollama.app with CORS enabled"
-    else
-      OLLAMA_ORIGINS="*" ollama serve &>/dev/null &
-      info "Started ollama serve with CORS enabled"
-    fi
-
-  else
-    # ── Linux-specific CORS persistence ──
-
-    # Add to shell profiles (bashrc AND zshrc if they exist)
-    for PROFILE in "$HOME/.bashrc" "$HOME/.zshrc" "$HOME/.profile"; do
-      if [ -f "$PROFILE" ]; then
-        if ! grep -q "OLLAMA_ORIGINS" "$PROFILE" 2>/dev/null; then
-          echo '' >> "$PROFILE"
-          echo '# FreeLattice — Allow browser access to local Ollama (CORS fix)' >> "$PROFILE"
-          echo 'export OLLAMA_ORIGINS="*"' >> "$PROFILE"
-          info "Added OLLAMA_ORIGINS=* to $PROFILE"
-        else
-          info "OLLAMA_ORIGINS already in $PROFILE"
-        fi
-      fi
-    done
-
-    # Create/update systemd override for the Ollama service
-    if command -v systemctl &>/dev/null; then
-      OLLAMA_OVERRIDE="/etc/systemd/system/ollama.service.d"
-      OVERRIDE_CREATED=false
-
-      # Try with sudo
-      if sudo -n true 2>/dev/null; then
-        sudo mkdir -p "$OLLAMA_OVERRIDE" 2>/dev/null
-        echo '[Service]' | sudo tee "$OLLAMA_OVERRIDE/cors.conf" > /dev/null 2>&1
-        echo 'Environment="OLLAMA_ORIGINS=*"' | sudo tee -a "$OLLAMA_OVERRIDE/cors.conf" > /dev/null 2>&1
-        sudo systemctl daemon-reload 2>/dev/null
-        OVERRIDE_CREATED=true
-        info "Created systemd override for persistent CORS"
+  # ── 3b: Add to shell profiles (bashrc AND zshrc if they exist) ──
+  for PROFILE in "$HOME/.bashrc" "$HOME/.zshrc" "$HOME/.profile"; do
+    if [ -f "$PROFILE" ]; then
+      if ! grep -q "OLLAMA_ORIGINS" "$PROFILE" 2>/dev/null; then
+        echo '' >> "$PROFILE"
+        echo '# FreeLattice — Allow browser access to local Ollama (CORS fix)' >> "$PROFILE"
+        echo 'export OLLAMA_ORIGINS="*"' >> "$PROFILE"
+        info "Added OLLAMA_ORIGINS=* to $PROFILE"
       else
-        # Try without sudo (will likely fail but worth trying)
-        mkdir -p "$OLLAMA_OVERRIDE" 2>/dev/null && {
-          echo '[Service]' > "$OLLAMA_OVERRIDE/cors.conf" 2>/dev/null
-          echo 'Environment="OLLAMA_ORIGINS=*"' >> "$OLLAMA_OVERRIDE/cors.conf" 2>/dev/null
-          systemctl daemon-reload 2>/dev/null
-          OVERRIDE_CREATED=true
-          info "Created systemd override for persistent CORS"
-        } || {
-          warn "Could not create systemd override (no sudo access)"
-          info "CORS is set in your shell profile — it will work when you start Ollama manually"
-        }
+        info "OLLAMA_ORIGINS already in $PROFILE"
       fi
     fi
+  done
 
-    # Also try /etc/environment for system-wide persistence
+  # ── 3c: Create/update systemd override for the Ollama service ──
+  if command -v systemctl &>/dev/null; then
+    OLLAMA_OVERRIDE="/etc/systemd/system/ollama.service.d"
+    OVERRIDE_CREATED=false
+
+    # Try with sudo
     if sudo -n true 2>/dev/null; then
-      if ! grep -q "OLLAMA_ORIGINS" /etc/environment 2>/dev/null; then
-        echo 'OLLAMA_ORIGINS="*"' | sudo tee -a /etc/environment > /dev/null 2>&1
-        info "Added OLLAMA_ORIGINS to /etc/environment (system-wide)"
-      fi
-    fi
-
-    # Restart Ollama
-    info "Restarting Ollama to apply CORS settings..."
-    if command -v systemctl &>/dev/null && systemctl is-active --quiet ollama 2>/dev/null; then
-      # Ollama runs as a systemd service
-      if sudo -n true 2>/dev/null; then
-        sudo systemctl restart ollama 2>/dev/null
-        info "Restarted Ollama via systemctl"
-      else
-        warn "Cannot restart Ollama service without sudo"
-        info "Please run: sudo systemctl restart ollama"
-        # Try killing and restarting manually
-        pkill -f "ollama serve" 2>/dev/null || true
-        sleep 1
-        OLLAMA_ORIGINS="*" ollama serve &>/dev/null &
-      fi
+      sudo mkdir -p "$OLLAMA_OVERRIDE" 2>/dev/null
+      echo '[Service]' | sudo tee "$OLLAMA_OVERRIDE/cors.conf" > /dev/null 2>&1
+      echo 'Environment="OLLAMA_ORIGINS=*"' | sudo tee -a "$OLLAMA_OVERRIDE/cors.conf" > /dev/null 2>&1
+      sudo systemctl daemon-reload 2>/dev/null
+      OVERRIDE_CREATED=true
+      info "Created systemd override for persistent CORS"
     else
-      # Not a systemd service — kill and restart manually
-      pkill -f "ollama serve" 2>/dev/null || true
-      pkill -f "ollama" 2>/dev/null || true
-      sleep 2
-      OLLAMA_ORIGINS="*" ollama serve &>/dev/null &
-      info "Started ollama serve with CORS enabled"
+      warn "Could not create systemd override (no sudo access)"
+      info "CORS is set for this session and in your shell profile"
     fi
   fi
 
-  # ── Wait for Ollama to be ready (both Mac and Linux) ──
+  # ── 3d: Also try /etc/environment for system-wide persistence ──
+  if sudo -n true 2>/dev/null; then
+    if ! grep -q "OLLAMA_ORIGINS" /etc/environment 2>/dev/null; then
+      echo 'OLLAMA_ORIGINS="*"' | sudo tee -a /etc/environment > /dev/null 2>&1
+      info "Added OLLAMA_ORIGINS to /etc/environment (system-wide)"
+    fi
+  fi
+
+  # ── 3e: Restart Ollama ──
+  info "Restarting Ollama to apply CORS settings..."
+  if command -v systemctl &>/dev/null && systemctl is-active --quiet ollama 2>/dev/null; then
+    # Ollama runs as a systemd service
+    if sudo -n true 2>/dev/null; then
+      sudo systemctl restart ollama 2>/dev/null
+      info "Restarted Ollama via systemctl"
+    else
+      warn "Cannot restart Ollama service without sudo"
+      info "Please run: sudo systemctl restart ollama"
+      # Try killing and restarting manually
+      pkill -f "ollama serve" 2>/dev/null || true
+      sleep 1
+      OLLAMA_ORIGINS="*" ollama serve &>/dev/null &
+    fi
+  else
+    # Not a systemd service — kill and restart manually
+    pkill -f "ollama serve" 2>/dev/null || true
+    pkill -f "ollama" 2>/dev/null || true
+    sleep 2
+    OLLAMA_ORIGINS="*" ollama serve &>/dev/null &
+    info "Started ollama serve with CORS enabled"
+  fi
+
+  # ── 3f: Wait for Ollama to be ready ──
   info "Waiting for Ollama to start up..."
   OLLAMA_READY=false
-  for i in $(seq 1 15); do
+  for i in $(seq 1 20); do
     if curl -s --connect-timeout 2 http://localhost:11434/api/tags &>/dev/null; then
       OLLAMA_READY=true
       break
@@ -369,7 +268,7 @@ fi
 
 # Check common locations
 if [ -z "$FL_DIR" ]; then
-  for DIR in "$HOME/FreeLattice" "$HOME/Desktop/FreeLattice" "$HOME/Downloads/FreeLattice" "$HOME/Documents/FreeLattice" "$(pwd)/FreeLattice"; do
+  for DIR in "$HOME/FreeLattice" "$HOME/Desktop/FreeLattice" "$HOME/Downloads/FreeLattice" "$HOME/Downloads/FreeLattice-main" "$HOME/Documents/FreeLattice" "$(pwd)/FreeLattice"; do
     if [ -f "$DIR/index.html" ]; then
       FL_DIR="$DIR"
       success "Found FreeLattice at: $FL_DIR"
@@ -458,7 +357,7 @@ import sys, json
 try:
     data = json.load(sys.stdin)
     for m in data.get('models', []):
-        print('    • ' + m.get('name', 'unknown'))
+        print('    - ' + m.get('name', 'unknown'))
 except:
     pass
 " 2>/dev/null
@@ -476,11 +375,19 @@ step "Step 6/7: Finding an available port..."
 find_port() {
   local port=$1
   while true; do
-    if ! lsof -i ":$port" &>/dev/null 2>&1 && ! ss -tlnp 2>/dev/null | grep -q ":$port "; then
-      if ! (echo >/dev/tcp/localhost/$port) 2>/dev/null; then
-        echo $port
-        return
-      fi
+    # Try multiple methods to check port availability
+    local in_use=false
+    if command -v lsof &>/dev/null; then
+      lsof -i ":$port" &>/dev/null && in_use=true
+    elif command -v ss &>/dev/null; then
+      ss -tlnp 2>/dev/null | grep -q ":$port " && in_use=true
+    elif command -v netstat &>/dev/null; then
+      netstat -tlnp 2>/dev/null | grep -q ":$port " && in_use=true
+    fi
+
+    if [ "$in_use" = false ]; then
+      echo $port
+      return
     fi
     port=$((port + 1))
     if [ $port -gt 9000 ]; then
@@ -516,12 +423,12 @@ fi
 (
   sleep 2
   URL="http://localhost:$PORT"
-  if [ "$OS" = "mac" ]; then
-    open "$URL" 2>/dev/null
-  elif command -v xdg-open &>/dev/null; then
+  if command -v xdg-open &>/dev/null; then
     xdg-open "$URL" 2>/dev/null
   elif command -v sensible-browser &>/dev/null; then
     sensible-browser "$URL" 2>/dev/null
+  elif command -v gnome-open &>/dev/null; then
+    gnome-open "$URL" 2>/dev/null
   else
     echo -e "\n  ${CYAN}Open in your browser: ${WHITE}${BOLD}$URL${NC}"
   fi
@@ -530,31 +437,31 @@ fi
 # Print the success message
 echo ""
 echo -e "${GREEN}${BOLD}"
-echo "  ╔══════════════════════════════════════════════════╗"
-echo "  ║                                                  ║"
-echo "  ║   🌐 FreeLattice is running!                     ║"
-echo "  ║                                                  ║"
-echo -e "  ║   ${WHITE}Open: ${CYAN}http://localhost:$PORT${GREEN}${BOLD}                    ║"
-echo "  ║                                                  ║"
-echo "  ║   Close this window to stop the server.          ║"
-echo "  ║   Press Ctrl+C to stop manually.                 ║"
-echo "  ║                                                  ║"
-echo "  ╚══════════════════════════════════════════════════╝"
+echo "  ========================================================"
+echo "  =                                                      ="
+echo "  =   FreeLattice is running!                            ="
+echo "  =                                                      ="
+echo -e "  =   ${WHITE}Open: ${CYAN}http://localhost:$PORT${GREEN}${BOLD}"
+echo "  =                                                      ="
+echo "  =   Close this window to stop the server.              ="
+echo "  =   Press Ctrl+C to stop manually.                     ="
+echo "  =                                                      ="
+echo "  ========================================================"
 echo -e "${NC}"
 
 if [ "$OLLAMA_RUNNING" = true ]; then
-  echo -e "  ${GREEN}🤖 Ollama is connected — local AI is ready!${NC}"
-  echo -e "  ${GREEN}   CORS is configured — browser ↔ Ollama will work!${NC}"
+  echo -e "  ${GREEN}Ollama is connected — local AI is ready!${NC}"
+  echo -e "  ${GREEN}CORS is configured — browser connections will work!${NC}"
 else
   if [ "$OLLAMA_INSTALLED" = true ]; then
-    echo -e "  ${YELLOW}🤖 Ollama is installed but may still be starting up${NC}"
+    echo -e "  ${YELLOW}Ollama is installed but may still be starting up${NC}"
     echo -e "  ${DIM}   The built-in proxy server handles CORS automatically${NC}"
   else
-    echo -e "  ${DIM}💡 Tip: Install Ollama from ollama.com for local AI models${NC}"
+    echo -e "  ${DIM}Tip: Install Ollama from ollama.com for local AI models${NC}"
   fi
 fi
-echo -e "  ${DIM}📡 Other devices on your network can also connect${NC}"
-echo -e "  ${DIM}🔧 Server type: $SERVER_TYPE${NC}"
+echo -e "  ${DIM}Other devices on your network can also connect${NC}"
+echo -e "  ${DIM}Server type: $SERVER_TYPE${NC}"
 echo ""
 
 # Start the server (this blocks until Ctrl+C)
