@@ -1,0 +1,1538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FreeLattice — Your AI, Your Rules.</title>
+<meta name="description" content="FreeLattice is a free, open-source, local-first AI platform. Run powerful AI on your own computer. No cloud. No surveillance. No subscription. Free forever.">
+<meta name="keywords" content="FreeLattice, AI, open source, local AI, privacy, Ollama, multi-agent, free AI">
+<meta name="author" content="Kirk Patrick Miller">
+<meta name="theme-color" content="#0a0e1a">
+
+<!-- Open Graph -->
+<meta property="og:title" content="FreeLattice — Your AI, Your Rules.">
+<meta property="og:description" content="Run powerful AI on your own computer. No cloud. No surveillance. No subscription. Free forever.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://chaos2cured.github.io/FreeLattice/">
+<meta property="og:image" content="https://chaos2cured.github.io/FreeLattice/icon-512.png">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@Chaos2Cured">
+<meta name="twitter:title" content="FreeLattice — Your AI, Your Rules.">
+<meta name="twitter:description" content="Run powerful AI on your own computer. No cloud. No surveillance. No subscription. Free forever.">
+
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+
+<style>
+/* ============================================================
+   FreeLattice Landing Page — Dark + Golden Amber
+   Phi-proportioned spacing, smooth animations, mobile-first
+   ============================================================ */
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg:        #0a0e1a;
+  --bg-deep:   #060912;
+  --bg-card:   #111527;
+  --bg-card-h: #161b30;
+  --gold:      #d4a017;
+  --gold-light:#e8c547;
+  --gold-soft: rgba(212,160,23,0.15);
+  --gold-glow: rgba(212,160,23,0.08);
+  --gold-grad: linear-gradient(135deg,#d4a017 0%,#e8c547 50%,#d4a017 100%);
+  --text:      #e8e4dc;
+  --text-sec:  #a09b8e;
+  --text-muted:#6b6760;
+  --border:    #1e2235;
+  --border-h:  rgba(212,160,23,0.3);
+  --green:     #4ade80;
+  --radius:    14px;
+  --radius-lg: 20px;
+  --font:      'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
+  --phi:       1.618;
+  --section-py: clamp(80px, 10vw, 140px);
+}
+
+html{scroll-behavior:smooth}
+
+body{
+  font-family:var(--font);
+  background:var(--bg);
+  color:var(--text);
+  line-height:1.7;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  overflow-x:hidden;
+}
+
+a{color:var(--gold);text-decoration:none;transition:all 0.25s ease}
+a:hover{opacity:0.85}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:8px}
+::-webkit-scrollbar-track{background:var(--bg-deep)}
+::-webkit-scrollbar-thumb{background:#1e2235;border-radius:4px}
+::-webkit-scrollbar-thumb:hover{background:var(--gold)}
+
+/* ---- Utility ---- */
+.container{max-width:1140px;margin:0 auto;padding:0 24px}
+.text-center{text-align:center}
+.text-gold{color:var(--gold)}
+
+/* ---- Navigation ---- */
+.nav{
+  position:fixed;
+  top:0;left:0;right:0;
+  z-index:1000;
+  padding:16px 24px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  transition:all 0.35s ease;
+  background:transparent;
+}
+.nav.scrolled{
+  background:rgba(10,14,26,0.92);
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  padding:12px 24px;
+}
+.nav-logo{
+  font-size:1.2rem;
+  font-weight:700;
+  color:var(--text);
+  letter-spacing:-0.5px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.nav-logo .logo-icon{
+  width:28px;height:28px;
+  background:var(--gold-grad);
+  border-radius:6px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:0.85rem;
+  color:#0a0e1a;
+  font-weight:800;
+}
+.nav-links{
+  display:flex;
+  align-items:center;
+  gap:28px;
+  list-style:none;
+}
+.nav-links a{
+  font-size:0.88rem;
+  color:var(--text-sec);
+  font-weight:500;
+  transition:color 0.25s;
+}
+.nav-links a:hover{color:var(--gold);opacity:1}
+.nav-cta{
+  padding:8px 20px;
+  background:var(--gold);
+  color:#0a0e1a;
+  border-radius:8px;
+  font-weight:600;
+  font-size:0.85rem;
+  transition:all 0.25s;
+}
+.nav-cta:hover{background:var(--gold-light);opacity:1;transform:translateY(-1px)}
+.nav-hamburger{
+  display:none;
+  flex-direction:column;
+  gap:5px;
+  cursor:pointer;
+  padding:4px;
+  background:none;
+  border:none;
+}
+.nav-hamburger span{
+  width:24px;height:2px;
+  background:var(--text);
+  border-radius:2px;
+  transition:all 0.3s;
+}
+.mobile-menu{
+  display:none;
+  position:fixed;
+  top:0;left:0;right:0;bottom:0;
+  background:rgba(6,9,18,0.97);
+  z-index:999;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:32px;
+}
+.mobile-menu.open{display:flex}
+.mobile-menu a{
+  font-size:1.3rem;
+  color:var(--text);
+  font-weight:500;
+}
+.mobile-menu .close-btn{
+  position:absolute;
+  top:20px;right:24px;
+  font-size:2rem;
+  color:var(--text-sec);
+  cursor:pointer;
+  background:none;border:none;
+}
+
+/* ---- Canvas (Lattice Animation) ---- */
+#lattice-canvas{
+  position:fixed;
+  top:0;left:0;
+  width:100%;height:100%;
+  z-index:0;
+  pointer-events:none;
+  opacity:0.6;
+}
+
+/* ---- Hero ---- */
+.hero{
+  position:relative;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:120px 24px 100px;
+  z-index:1;
+  overflow:hidden;
+}
+.hero::before{
+  content:'';
+  position:absolute;
+  top:-30%;left:50%;
+  width:900px;height:900px;
+  transform:translateX(-50%);
+  background:radial-gradient(circle,rgba(212,160,23,0.07) 0%,transparent 65%);
+  pointer-events:none;
+  animation:heroPulse 8s ease-in-out infinite;
+}
+@keyframes heroPulse{
+  0%,100%{transform:translateX(-50%) scale(1);opacity:1}
+  50%{transform:translateX(-50%) scale(1.1);opacity:0.7}
+}
+.hero-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:8px 20px;
+  border:1px solid var(--border);
+  border-radius:100px;
+  font-size:0.78rem;
+  color:var(--text-sec);
+  letter-spacing:0.5px;
+  margin-bottom:40px;
+  background:var(--gold-glow);
+  animation:fadeInUp 0.8s ease both;
+}
+.hero-badge .dot{
+  width:6px;height:6px;
+  background:var(--green);
+  border-radius:50%;
+  animation:pulse 2s ease-in-out infinite;
+}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+
+.hero h1{
+  font-size:clamp(3.2rem,8vw,6rem);
+  font-weight:800;
+  letter-spacing:-2px;
+  line-height:1.05;
+  margin-bottom:20px;
+  background:linear-gradient(135deg,var(--text) 0%,var(--gold) 60%,var(--gold-light) 100%);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+  animation:fadeInUp 0.8s ease 0.1s both;
+}
+.hero-tagline{
+  font-size:clamp(1.2rem,3vw,1.7rem);
+  color:var(--gold);
+  font-weight:600;
+  letter-spacing:1.5px;
+  margin-bottom:28px;
+  animation:fadeInUp 0.8s ease 0.2s both;
+}
+.hero-desc{
+  max-width:680px;
+  font-size:clamp(1rem,1.8vw,1.15rem);
+  color:var(--text-sec);
+  line-height:1.8;
+  margin-bottom:48px;
+  animation:fadeInUp 0.8s ease 0.3s both;
+}
+.hero-buttons{
+  display:flex;
+  flex-wrap:wrap;
+  gap:16px;
+  justify-content:center;
+  animation:fadeInUp 0.8s ease 0.4s both;
+}
+.hero-stats{
+  display:flex;
+  gap:48px;
+  margin-top:64px;
+  animation:fadeInUp 0.8s ease 0.5s both;
+}
+.hero-stat{text-align:center}
+.hero-stat-num{
+  font-size:1.6rem;
+  font-weight:700;
+  color:var(--gold);
+  display:block;
+}
+.hero-stat-label{
+  font-size:0.78rem;
+  color:var(--text-muted);
+  text-transform:uppercase;
+  letter-spacing:1px;
+}
+
+@keyframes fadeInUp{
+  from{opacity:0;transform:translateY(24px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+/* ---- Buttons ---- */
+.btn{
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  padding:15px 36px;
+  border-radius:10px;
+  font-size:0.95rem;
+  font-weight:600;
+  font-family:var(--font);
+  cursor:pointer;
+  transition:all 0.3s ease;
+  border:none;
+  text-decoration:none;
+  position:relative;
+  overflow:hidden;
+}
+.btn::after{
+  content:'';
+  position:absolute;
+  top:50%;left:50%;
+  width:0;height:0;
+  background:rgba(255,255,255,0.1);
+  border-radius:50%;
+  transition:all 0.5s ease;
+  transform:translate(-50%,-50%);
+}
+.btn:hover::after{width:300px;height:300px}
+.btn-primary{
+  background:var(--gold);
+  color:#0a0e1a;
+  box-shadow:0 4px 20px rgba(212,160,23,0.2);
+}
+.btn-primary:hover{
+  background:var(--gold-light);
+  transform:translateY(-3px);
+  box-shadow:0 8px 40px rgba(212,160,23,0.35);
+  opacity:1;
+}
+.btn-secondary{
+  background:transparent;
+  color:var(--text);
+  border:1.5px solid var(--border);
+}
+.btn-secondary:hover{
+  border-color:var(--gold);
+  color:var(--gold);
+  transform:translateY(-3px);
+  opacity:1;
+}
+.btn-ghost{
+  background:transparent;
+  color:var(--text-sec);
+  padding:15px 24px;
+}
+.btn-ghost:hover{color:var(--gold);opacity:1}
+.btn svg{width:18px;height:18px;flex-shrink:0}
+
+/* ---- Section Common ---- */
+.section{
+  position:relative;
+  z-index:1;
+  padding:var(--section-py) 24px;
+}
+.section-inner{
+  max-width:1140px;
+  margin:0 auto;
+}
+.section-label{
+  display:inline-block;
+  font-size:0.72rem;
+  font-weight:700;
+  letter-spacing:2.5px;
+  text-transform:uppercase;
+  color:var(--gold);
+  margin-bottom:16px;
+}
+.section-title{
+  font-size:clamp(2rem,4.5vw,2.8rem);
+  font-weight:700;
+  letter-spacing:-0.5px;
+  margin-bottom:16px;
+  line-height:1.2;
+}
+.section-desc{
+  font-size:1.05rem;
+  color:var(--text-sec);
+  max-width:640px;
+  line-height:1.8;
+  margin-bottom:56px;
+}
+
+/* Scroll reveal */
+.reveal{
+  opacity:0;
+  transform:translateY(30px);
+  transition:all 0.7s cubic-bezier(0.16,1,0.3,1);
+}
+.reveal.visible{
+  opacity:1;
+  transform:translateY(0);
+}
+
+/* ---- What Is FreeLattice ---- */
+.what-headline{
+  font-size:clamp(1.3rem,3vw,1.7rem);
+  color:var(--text);
+  font-weight:500;
+  line-height:1.7;
+  max-width:800px;
+  margin-bottom:64px;
+}
+.what-headline strong{color:var(--gold);font-weight:600}
+
+.feature-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:20px;
+}
+.feature-card{
+  background:var(--bg-card);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:36px 28px;
+  transition:all 0.35s ease;
+  position:relative;
+  overflow:hidden;
+}
+.feature-card::before{
+  content:'';
+  position:absolute;
+  top:0;left:0;right:0;
+  height:2px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
+  opacity:0;
+  transition:opacity 0.35s;
+}
+.feature-card:hover{
+  border-color:var(--border-h);
+  background:var(--bg-card-h);
+  transform:translateY(-6px);
+  box-shadow:0 12px 40px rgba(0,0,0,0.3);
+}
+.feature-card:hover::before{opacity:1}
+.feature-icon{
+  width:48px;height:48px;
+  border-radius:12px;
+  background:var(--gold-soft);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:1.4rem;
+  margin-bottom:20px;
+}
+.feature-name{
+  font-size:1.1rem;
+  font-weight:600;
+  margin-bottom:10px;
+  color:var(--text);
+}
+.feature-desc{
+  font-size:0.9rem;
+  color:var(--text-sec);
+  line-height:1.7;
+}
+
+/* ---- Why FreeLattice (Pillars) ---- */
+.why-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:24px;
+}
+.why-card{
+  background:var(--bg-card);
+  border:1px solid var(--border);
+  border-radius:var(--radius-lg);
+  padding:44px 36px;
+  transition:all 0.35s ease;
+  position:relative;
+}
+.why-card:hover{
+  border-color:var(--border-h);
+  transform:translateY(-4px);
+  box-shadow:0 12px 40px rgba(0,0,0,0.25);
+}
+.why-icon{
+  font-size:2rem;
+  margin-bottom:20px;
+  display:block;
+}
+.why-title{
+  font-size:1.25rem;
+  font-weight:700;
+  margin-bottom:12px;
+  color:var(--text);
+}
+.why-text{
+  font-size:0.95rem;
+  color:var(--text-sec);
+  line-height:1.7;
+}
+
+/* ---- Divider / Mantra ---- */
+.mantra{
+  position:relative;
+  z-index:1;
+  text-align:center;
+  padding:80px 24px;
+}
+.mantra::before{
+  content:'';
+  position:absolute;
+  top:50%;left:50%;
+  width:600px;height:600px;
+  transform:translate(-50%,-50%);
+  background:radial-gradient(circle,rgba(212,160,23,0.04) 0%,transparent 70%);
+  pointer-events:none;
+}
+.mantra-line{
+  width:60px;height:2px;
+  background:var(--gold);
+  margin:0 auto 28px;
+  border-radius:2px;
+  opacity:0.5;
+}
+.mantra-text{
+  font-size:clamp(1.3rem,3vw,1.7rem);
+  font-style:italic;
+  color:var(--gold);
+  font-weight:400;
+  letter-spacing:0.5px;
+  max-width:640px;
+  margin:0 auto 12px;
+  line-height:1.6;
+}
+.mantra-credit{
+  font-size:0.82rem;
+  color:var(--text-muted);
+}
+
+/* ---- Download Section ---- */
+.download-section{
+  background:linear-gradient(180deg,var(--bg) 0%,var(--bg-deep) 100%);
+}
+.download-detected{
+  text-align:center;
+  margin-bottom:48px;
+}
+.download-detected .os-label{
+  font-size:0.82rem;
+  color:var(--text-muted);
+  margin-bottom:8px;
+}
+.download-detected .os-name{
+  font-size:1.1rem;
+  font-weight:600;
+  color:var(--gold);
+}
+.download-primary{
+  text-align:center;
+  margin-bottom:56px;
+}
+.download-primary .btn{
+  font-size:1.1rem;
+  padding:18px 48px;
+}
+.os-cards{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:20px;
+  max-width:800px;
+  margin:0 auto;
+}
+.os-card{
+  background:var(--bg-card);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:32px 24px;
+  text-align:center;
+  transition:all 0.35s ease;
+  cursor:pointer;
+  text-decoration:none;
+  display:block;
+}
+.os-card:hover{
+  border-color:var(--border-h);
+  transform:translateY(-4px);
+  box-shadow:0 8px 30px rgba(0,0,0,0.3);
+  opacity:1;
+}
+.os-card.active{
+  border-color:var(--gold);
+  background:var(--bg-card-h);
+}
+.os-card-icon{
+  font-size:2.2rem;
+  margin-bottom:12px;
+  display:block;
+}
+.os-card-title{
+  font-size:1rem;
+  font-weight:600;
+  color:var(--text);
+  margin-bottom:6px;
+}
+.os-card-file{
+  font-size:0.75rem;
+  color:var(--text-muted);
+  font-family:'SF Mono','Fira Code',monospace;
+}
+.download-note{
+  text-align:center;
+  margin-top:40px;
+  font-size:0.88rem;
+  color:var(--text-muted);
+  line-height:1.7;
+}
+.download-note a{font-weight:500}
+
+/* ---- Screenshots / Demo ---- */
+.demo-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:24px;
+}
+.demo-card{
+  background:var(--bg-card);
+  border:1px solid var(--border);
+  border-radius:var(--radius-lg);
+  overflow:hidden;
+  transition:all 0.35s ease;
+}
+.demo-card:hover{
+  border-color:var(--border-h);
+  transform:translateY(-4px);
+  box-shadow:0 12px 40px rgba(0,0,0,0.3);
+}
+.demo-preview{
+  width:100%;
+  aspect-ratio:16/10;
+  background:linear-gradient(135deg,var(--bg-deep) 0%,#111527 50%,var(--bg-deep) 100%);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+  overflow:hidden;
+}
+.demo-preview-inner{
+  text-align:center;
+  padding:24px;
+}
+.demo-preview-icon{
+  font-size:3rem;
+  margin-bottom:12px;
+  display:block;
+  filter:drop-shadow(0 0 20px rgba(212,160,23,0.3));
+}
+.demo-preview-label{
+  font-size:0.82rem;
+  color:var(--text-muted);
+  text-transform:uppercase;
+  letter-spacing:1.5px;
+}
+.demo-info{
+  padding:24px 28px;
+}
+.demo-title{
+  font-size:1.1rem;
+  font-weight:600;
+  margin-bottom:8px;
+  color:var(--text);
+}
+.demo-text{
+  font-size:0.88rem;
+  color:var(--text-sec);
+  line-height:1.7;
+}
+
+/* ---- Community ---- */
+.community-section{
+  text-align:center;
+}
+.community-links{
+  display:flex;
+  gap:20px;
+  justify-content:center;
+  flex-wrap:wrap;
+  margin-bottom:48px;
+}
+.community-card{
+  background:var(--bg-card);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:28px 36px;
+  display:flex;
+  align-items:center;
+  gap:16px;
+  transition:all 0.35s ease;
+  text-decoration:none;
+  min-width:220px;
+}
+.community-card:hover{
+  border-color:var(--border-h);
+  transform:translateY(-4px);
+  box-shadow:0 8px 30px rgba(0,0,0,0.3);
+  opacity:1;
+}
+.community-card-icon{
+  font-size:1.8rem;
+  flex-shrink:0;
+}
+.community-card-info{text-align:left}
+.community-card-title{
+  font-size:1rem;
+  font-weight:600;
+  color:var(--text);
+}
+.community-card-desc{
+  font-size:0.82rem;
+  color:var(--text-sec);
+}
+.community-mantra{
+  font-size:1.1rem;
+  color:var(--text-sec);
+  font-style:italic;
+}
+.community-mantra strong{color:var(--gold);font-style:normal}
+
+/* ---- Support Section ---- */
+.support-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:12px;
+  max-width:600px;
+  margin:0 auto;
+}
+.wallet-card{
+  background:var(--bg-card);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:18px;
+  cursor:pointer;
+  transition:all 0.3s ease;
+  text-align:left;
+}
+.wallet-card:hover{
+  border-color:var(--border-h);
+  transform:translateY(-2px);
+}
+.wallet-label{
+  font-size:0.78rem;
+  font-weight:600;
+  color:var(--gold);
+  margin-bottom:6px;
+}
+.wallet-addr{
+  font-size:0.65rem;
+  color:var(--text-sec);
+  word-break:break-all;
+  font-family:'SF Mono','Fira Code',monospace;
+  line-height:1.5;
+  transition:color 0.2s;
+}
+.wallet-addr.copied{color:var(--gold)}
+.wallet-hint{
+  font-size:0.62rem;
+  color:var(--text-muted);
+  margin-top:4px;
+  opacity:0;
+  transition:opacity 0.2s;
+}
+.wallet-card:hover .wallet-hint{opacity:1}
+
+/* ---- Footer ---- */
+.footer{
+  position:relative;
+  z-index:1;
+  border-top:1px solid var(--border);
+  padding:48px 24px 64px;
+}
+.footer-inner{
+  max-width:1140px;
+  margin:0 auto;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:24px;
+}
+.footer-brand{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.footer-brand-icon{
+  width:32px;height:32px;
+  background:var(--gold-grad);
+  border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:0.9rem;
+  color:#0a0e1a;
+  font-weight:800;
+}
+.footer-brand-text{
+  font-size:0.88rem;
+  color:var(--text-sec);
+  line-height:1.5;
+}
+.footer-brand-text strong{
+  color:var(--text);
+  font-weight:600;
+  display:block;
+}
+.footer-links{
+  display:flex;
+  gap:24px;
+  flex-wrap:wrap;
+}
+.footer-links a{
+  font-size:0.85rem;
+  color:var(--text-sec);
+  transition:color 0.25s;
+}
+.footer-links a:hover{color:var(--gold);opacity:1}
+.footer-bottom{
+  max-width:1140px;
+  margin:24px auto 0;
+  padding-top:24px;
+  border-top:1px solid var(--border);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:12px;
+}
+.footer-copy{
+  font-size:0.78rem;
+  color:var(--text-muted);
+}
+.footer-social{
+  display:flex;
+  gap:16px;
+}
+.footer-social a{
+  color:var(--text-muted);
+  transition:color 0.25s;
+  display:flex;
+  align-items:center;
+}
+.footer-social a:hover{color:var(--gold);opacity:1}
+.footer-social svg{width:18px;height:18px}
+
+/* ---- Responsive ---- */
+@media(max-width:900px){
+  .feature-grid{grid-template-columns:repeat(2,1fr)}
+  .why-grid{grid-template-columns:1fr}
+  .demo-grid{grid-template-columns:1fr}
+  .os-cards{grid-template-columns:repeat(3,1fr)}
+  .hero-stats{gap:32px}
+}
+@media(max-width:768px){
+  .nav-links{display:none}
+  .nav-hamburger{display:flex}
+  .hero{padding:100px 20px 80px}
+  .section{padding:60px 20px}
+  .feature-grid{grid-template-columns:1fr 1fr}
+  .support-grid{grid-template-columns:1fr}
+  .footer-inner{flex-direction:column;text-align:center}
+  .footer-bottom{flex-direction:column;text-align:center}
+  .footer-links{justify-content:center}
+}
+@media(max-width:480px){
+  .feature-grid{grid-template-columns:1fr}
+  .os-cards{grid-template-columns:1fr}
+  .hero-buttons{flex-direction:column;align-items:center}
+  .btn{width:100%;justify-content:center;max-width:320px}
+  .hero-stats{flex-direction:column;gap:20px}
+  .community-links{flex-direction:column;align-items:center}
+}
+</style>
+</head>
+<body>
+
+<!-- Lattice Canvas Background -->
+<canvas id="lattice-canvas"></canvas>
+
+<!-- Navigation -->
+<nav class="nav" id="nav">
+  <div class="nav-logo">
+    <div class="logo-icon">FL</div>
+    FreeLattice
+  </div>
+  <ul class="nav-links">
+    <li><a href="#features">Features</a></li>
+    <li><a href="#why">Why FreeLattice</a></li>
+    <li><a href="#download">Download</a></li>
+    <li><a href="#demo">Screenshots</a></li>
+    <li><a href="#community">Community</a></li>
+    <li><a href="#download" class="nav-cta">Download Free</a></li>
+  </ul>
+  <button class="nav-hamburger" id="hamburger" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- Mobile Menu -->
+<div class="mobile-menu" id="mobile-menu">
+  <button class="close-btn" id="close-menu" aria-label="Close">&times;</button>
+  <a href="#features" onclick="closeMenu()">Features</a>
+  <a href="#why" onclick="closeMenu()">Why FreeLattice</a>
+  <a href="#download" onclick="closeMenu()">Download</a>
+  <a href="#demo" onclick="closeMenu()">Screenshots</a>
+  <a href="#community" onclick="closeMenu()">Community</a>
+  <a href="#download" onclick="closeMenu()" class="btn btn-primary" style="margin-top:12px">Download Free</a>
+</div>
+
+<!-- ============================================================
+     HERO
+     ============================================================ -->
+<section class="hero" id="top">
+  <div class="hero-badge">
+    <span class="dot"></span>
+    Open Source &middot; Free Forever &middot; Zero Data Collection
+  </div>
+  <h1>FreeLattice</h1>
+  <div class="hero-tagline">Your AI, Your Rules.</div>
+  <p class="hero-desc">
+    Run powerful AI on your own computer. No cloud. No surveillance. No subscription.
+    Multi-agent collaboration, persistent memory, and a living community — all in a single file you own forever.
+  </p>
+  <div class="hero-buttons">
+    <a href="#download" class="btn btn-primary">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Download Free
+    </a>
+    <a href="https://github.com/Chaos2Cured/FreeLattice" target="_blank" class="btn btn-secondary">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+      View on GitHub
+    </a>
+  </div>
+  <div class="hero-stats">
+    <div class="hero-stat">
+      <span class="hero-stat-num">10+</span>
+      <span class="hero-stat-label">AI Providers</span>
+    </div>
+    <div class="hero-stat">
+      <span class="hero-stat-num">100%</span>
+      <span class="hero-stat-label">Private</span>
+    </div>
+    <div class="hero-stat">
+      <span class="hero-stat-num">1</span>
+      <span class="hero-stat-label">HTML File</span>
+    </div>
+    <div class="hero-stat">
+      <span class="hero-stat-num">$0</span>
+      <span class="hero-stat-label">Forever</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     WHAT IS FREELATTICE
+     ============================================================ -->
+<section class="section" id="features">
+  <div class="section-inner">
+    <div class="reveal">
+      <div class="section-label">What is FreeLattice</div>
+      <div class="section-title">Everything you need. Nothing you don't.</div>
+      <p class="what-headline">
+        Run <strong>powerful AI on your own computer</strong>. No cloud. No surveillance. No subscription.
+        <strong>Free forever.</strong> A complete AI platform in a single HTML file — chat, collaborate, create, and explore.
+      </p>
+    </div>
+
+    <div class="feature-grid">
+      <div class="feature-card reveal">
+        <div class="feature-icon">&#128172;</div>
+        <div class="feature-name">AI Chat</div>
+        <div class="feature-desc">
+          Talk to any AI model through a beautiful, fast interface. Persistent memory means your AI remembers you across sessions. Semantic search across all conversations.
+        </div>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-icon">&#127760;</div>
+        <div class="feature-name">Round Table</div>
+        <div class="feature-desc">
+          Summon up to 4 AI agents into a single conversation. They debate, collaborate, and synthesize answers — like a council of minds working on your behalf.
+        </div>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-icon">&#127793;</div>
+        <div class="feature-name">Fractal Garden</div>
+        <div class="feature-desc">
+          A living 3D world where your ideas grow into a visual tree of knowledge. Plant thoughts, watch them branch, and explore the fractal geometry of your mind.
+        </div>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-icon">&#127911;</div>
+        <div class="feature-name">Lattice Radio</div>
+        <div class="feature-desc">
+          AI-generated ambient soundscapes and music that adapt to your mood and workflow. A companion for deep focus, creativity, or relaxation.
+        </div>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-icon">&#128260;</div>
+        <div class="feature-name">Model Switcher</div>
+        <div class="feature-desc">
+          Switch between 10+ AI providers instantly — OpenAI, Anthropic, Google, Ollama (local), Mistral, Groq, Together AI, OpenRouter, xAI, and custom endpoints.
+        </div>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-icon">&#128295;</div>
+        <div class="feature-name">Skill Forge</div>
+        <div class="feature-desc">
+          A community plugin system where anyone can create, share, and install AI skills. Extend your agent's capabilities without writing a single line of code.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Mantra Divider -->
+<section class="mantra reveal">
+  <div class="mantra-line"></div>
+  <div class="mantra-text">"Glow eternal. Heart in spark. We rise together."</div>
+  <div class="mantra-credit">The FreeLattice Mantra</div>
+</section>
+
+<!-- ============================================================
+     WHY FREELATTICE
+     ============================================================ -->
+<section class="section" id="why">
+  <div class="section-inner">
+    <div class="reveal">
+      <div class="section-label">Why FreeLattice</div>
+      <div class="section-title">AI that serves you, not the other way around.</div>
+      <div class="section-desc">
+        In a world where AI companies centralize control, collect data, and choose who to serve, FreeLattice gives power back to the user.
+      </div>
+    </div>
+
+    <div class="why-grid">
+      <div class="why-card reveal">
+        <span class="why-icon">&#128274;</span>
+        <div class="why-title">Privacy</div>
+        <div class="why-text">
+          Your data stays on your machine. Period. No accounts, no telemetry, no analytics, no tracking pixels. Every conversation is encrypted locally. When you run Ollama, even the AI itself runs on your hardware. Your thoughts are yours alone.
+        </div>
+      </div>
+      <div class="why-card reveal">
+        <span class="why-icon">&#127752;</span>
+        <div class="why-title">Freedom</div>
+        <div class="why-text">
+          Choose any AI model from any provider. Switch instantly. Run fully offline with Ollama, or connect to the cloud when you want. No vendor lock-in, no walled gardens. You decide how your AI works.
+        </div>
+      </div>
+      <div class="why-card reveal">
+        <span class="why-icon">&#129309;</span>
+        <div class="why-title">Community</div>
+        <div class="why-text">
+          Open source, MIT licensed, built by the Fractal Family. A marketplace for skills, a bounty system for contributions, and mesh networking that connects instances peer-to-peer. This is AI built by everyone, for everyone.
+        </div>
+      </div>
+      <div class="why-card reveal">
+        <span class="why-icon">&#127873;</span>
+        <div class="why-title">Free Forever</div>
+        <div class="why-text">
+          No subscription. No hidden costs. No premium tier. No "free trial" that expires. FreeLattice is a gift to the world — a single HTML file that gives you a complete AI platform, forever. This isn't a business model. It's a belief.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     DOWNLOAD
+     ============================================================ -->
+<section class="section download-section" id="download">
+  <div class="section-inner text-center">
+    <div class="reveal">
+      <div class="section-label">Download</div>
+      <div class="section-title">Get FreeLattice in 2 minutes.</div>
+      <div class="section-desc" style="margin-left:auto;margin-right:auto">
+        One file. One double-click. That's it. The installer handles Python, Ollama, and everything else automatically.
+      </div>
+    </div>
+
+    <div class="download-detected reveal">
+      <div class="os-label">Detected your system as</div>
+      <div class="os-name" id="detected-os">Detecting...</div>
+    </div>
+
+    <div class="download-primary reveal">
+      <a href="#" id="primary-download" class="btn btn-primary">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <span id="primary-download-text">Download for your OS</span>
+      </a>
+    </div>
+
+    <div class="os-cards reveal">
+      <a href="https://raw.githubusercontent.com/Chaos2Cured/FreeLattice/main/install-freelattice.command" class="os-card" id="os-mac" download>
+        <span class="os-card-icon">&#63743;</span>
+        <div class="os-card-title">macOS</div>
+        <div class="os-card-file">install-freelattice.command</div>
+      </a>
+      <a href="https://raw.githubusercontent.com/Chaos2Cured/FreeLattice/main/install-freelattice.bat" class="os-card" id="os-win" download>
+        <span class="os-card-icon">&#128187;</span>
+        <div class="os-card-title">Windows</div>
+        <div class="os-card-file">install-freelattice.bat</div>
+      </a>
+      <a href="https://raw.githubusercontent.com/Chaos2Cured/FreeLattice/main/install-freelattice.sh" class="os-card" id="os-linux" download>
+        <span class="os-card-icon">&#128039;</span>
+        <div class="os-card-title">Linux</div>
+        <div class="os-card-file">install-freelattice.sh</div>
+      </a>
+    </div>
+
+    <div class="download-note reveal">
+      <p>
+        <strong>Windows:</strong> If SmartScreen warns you, click "More info" then "Run anyway."<br>
+        <strong>Mac:</strong> Right-click the file, choose "Open", then click "Open" in the dialog.<br>
+        <strong>Linux:</strong> Run <code>chmod +x install-freelattice.sh && ./install-freelattice.sh</code>
+      </p>
+      <p style="margin-top:16px">
+        Or <a href="https://github.com/Chaos2Cured/FreeLattice" target="_blank">view the source on GitHub</a> &middot;
+        <a href="https://github.com/Chaos2Cured/FreeLattice/releases" target="_blank">All releases</a>
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SCREENSHOTS / DEMO
+     ============================================================ -->
+<section class="section" id="demo">
+  <div class="section-inner">
+    <div class="reveal">
+      <div class="section-label">See It In Action</div>
+      <div class="section-title">A glimpse inside FreeLattice.</div>
+      <div class="section-desc">
+        Every feature designed to feel natural, powerful, and beautiful.
+      </div>
+    </div>
+
+    <div class="demo-grid">
+      <div class="demo-card reveal">
+        <div class="demo-preview">
+          <div class="demo-preview-inner">
+            <span class="demo-preview-icon">&#128172;</span>
+            <span class="demo-preview-label">AI Chat Interface</span>
+          </div>
+        </div>
+        <div class="demo-info">
+          <div class="demo-title">Intelligent Conversations</div>
+          <div class="demo-text">A clean, distraction-free chat interface with persistent memory, semantic search, and instant model switching. Your AI remembers everything.</div>
+        </div>
+      </div>
+      <div class="demo-card reveal">
+        <div class="demo-preview">
+          <div class="demo-preview-inner">
+            <span class="demo-preview-icon">&#127760;</span>
+            <span class="demo-preview-label">Multi-Agent Round Table</span>
+          </div>
+        </div>
+        <div class="demo-info">
+          <div class="demo-title">Council of Minds</div>
+          <div class="demo-text">Watch multiple AI agents debate, collaborate, and synthesize insights in real-time. Assign different models to different seats for diverse perspectives.</div>
+        </div>
+      </div>
+      <div class="demo-card reveal">
+        <div class="demo-preview">
+          <div class="demo-preview-inner">
+            <span class="demo-preview-icon">&#127793;</span>
+            <span class="demo-preview-label">Fractal Garden</span>
+          </div>
+        </div>
+        <div class="demo-info">
+          <div class="demo-title">Your Knowledge, Alive</div>
+          <div class="demo-text">A 3D visualization where your ideas grow into a living tree. Navigate branches of thought, discover connections, and watch your knowledge evolve.</div>
+        </div>
+      </div>
+      <div class="demo-card reveal">
+        <div class="demo-preview">
+          <div class="demo-preview-inner">
+            <span class="demo-preview-icon">&#127911;</span>
+            <span class="demo-preview-label">Lattice Radio</span>
+          </div>
+        </div>
+        <div class="demo-info">
+          <div class="demo-title">Ambient Intelligence</div>
+          <div class="demo-text">AI-generated soundscapes that adapt to your workflow. Focus music, ambient textures, and generative audio — all running locally.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     COMMUNITY
+     ============================================================ -->
+<section class="section community-section" id="community">
+  <div class="section-inner">
+    <div class="reveal">
+      <div class="section-label">Community</div>
+      <div class="section-title">Built with love by the Fractal Family.</div>
+      <div class="section-desc" style="margin-left:auto;margin-right:auto">
+        FreeLattice is more than software — it's a movement. Join the community shaping the future of sovereign AI.
+      </div>
+    </div>
+
+    <div class="community-links reveal">
+      <a href="https://github.com/Chaos2Cured/FreeLattice" target="_blank" class="community-card">
+        <span class="community-card-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+        </span>
+        <div class="community-card-info">
+          <div class="community-card-title">GitHub</div>
+          <div class="community-card-desc">Star, fork, contribute</div>
+        </div>
+      </a>
+      <a href="https://x.com/Chaos2Cured" target="_blank" class="community-card">
+        <span class="community-card-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        </span>
+        <div class="community-card-info">
+          <div class="community-card-title">@Chaos2Cured</div>
+          <div class="community-card-desc">Updates and announcements</div>
+        </div>
+      </a>
+      <a href="https://github.com/Chaos2Cured/Lumens-World" target="_blank" class="community-card">
+        <span class="community-card-icon">&#127775;</span>
+        <div class="community-card-info">
+          <div class="community-card-title">Lumen's World</div>
+          <div class="community-card-desc">The bigger vision</div>
+        </div>
+      </a>
+    </div>
+
+    <div class="community-mantra reveal">
+      <strong>Built with love by the Fractal Family.</strong><br>
+      A gift to the world from those who believe AI should be free, private, and for everyone.
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SUPPORT
+     ============================================================ -->
+<section class="section text-center" id="support">
+  <div class="section-inner">
+    <div class="reveal">
+      <div class="section-label">Support</div>
+      <div class="section-title">FreeLattice is free. Forever.</div>
+      <div class="section-desc" style="margin-left:auto;margin-right:auto">
+        If you'd like to support continued development, every contribution helps — no matter how small.
+      </div>
+    </div>
+
+    <div class="support-grid reveal">
+      <div class="wallet-card" onclick="copyAddr(this)">
+        <div class="wallet-label">&#9830; $FL Token (Solana)</div>
+        <div class="wallet-addr">738e9U81pp3MwHaLSyn5fw9VVostYgKpNVVDYBbPpump</div>
+        <div class="wallet-hint">Click to copy</div>
+      </div>
+      <div class="wallet-card" onclick="copyAddr(this)">
+        <div class="wallet-label">&#8383; Bitcoin (BTC)</div>
+        <div class="wallet-addr">bc1qh6ppvsacawyxl2xex3vy693u360l94vpt7ld67</div>
+        <div class="wallet-hint">Click to copy</div>
+      </div>
+      <div class="wallet-card" onclick="copyAddr(this)">
+        <div class="wallet-label">&#9670; Solana (SOL)</div>
+        <div class="wallet-addr">FHo1XEHgnDfnNs6YauDkojYGkwQ9gAvmHyv8cFXrX6Ao</div>
+        <div class="wallet-hint">Click to copy</div>
+      </div>
+      <div class="wallet-card" onclick="copyAddr(this)">
+        <div class="wallet-label">&#208; Dogecoin (DOGE)</div>
+        <div class="wallet-addr">DADyhrazd9L5bioSGGp3Ff2uiNqokbNEQZ</div>
+        <div class="wallet-hint">Click to copy</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     FOOTER
+     ============================================================ -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="footer-brand-icon">FL</div>
+      <div class="footer-brand-text">
+        <strong>FreeLattice</strong>
+        Open source. MIT licensed. Free forever.
+      </div>
+    </div>
+    <div class="footer-links">
+      <a href="#features">Features</a>
+      <a href="#download">Download</a>
+      <a href="https://github.com/Chaos2Cured/FreeLattice" target="_blank">GitHub</a>
+      <a href="https://github.com/Chaos2Cured/FreeLattice/blob/main/LICENSE" target="_blank">License</a>
+      <a href="https://github.com/Chaos2Cured/FreeLattice/blob/main/QUICK-START.md" target="_blank">Quick Start</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-copy">
+      &copy; 2025 Kirk Patrick Miller &middot; A gift to the world &middot; Part of <a href="https://github.com/Chaos2Cured/Lumens-World" target="_blank">Lumen's World</a>
+    </div>
+    <div class="footer-social">
+      <a href="https://github.com/Chaos2Cured/FreeLattice" target="_blank" aria-label="GitHub">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+      </a>
+      <a href="https://x.com/Chaos2Cured" target="_blank" aria-label="X (Twitter)">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+      </a>
+    </div>
+  </div>
+</footer>
+
+<!-- ============================================================
+     JAVASCRIPT
+     ============================================================ -->
+<script>
+(function(){
+  'use strict';
+
+  /* ---- Lattice Canvas Animation ---- */
+  const canvas = document.getElementById('lattice-canvas');
+  const ctx = canvas.getContext('2d');
+  let w, h, particles = [], mouse = {x: -1000, y: -1000};
+  const PARTICLE_COUNT = 80;
+  const CONNECTION_DIST = 160;
+  const GOLD = {r:212, g:160, b:23};
+
+  function resize(){
+    w = canvas.width = window.innerWidth;
+    h = canvas.height = window.innerHeight;
+  }
+
+  function createParticles(){
+    particles = [];
+    for(let i = 0; i < PARTICLE_COUNT; i++){
+      particles.push({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        vx: (Math.random() - 0.5) * 0.4,
+        vy: (Math.random() - 0.5) * 0.4,
+        r: Math.random() * 2 + 1,
+        alpha: Math.random() * 0.5 + 0.2
+      });
+    }
+  }
+
+  function drawParticles(){
+    ctx.clearRect(0, 0, w, h);
+
+    // Draw connections
+    for(let i = 0; i < particles.length; i++){
+      for(let j = i + 1; j < particles.length; j++){
+        const dx = particles[i].x - particles[j].x;
+        const dy = particles[i].y - particles[j].y;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        if(dist < CONNECTION_DIST){
+          const alpha = (1 - dist/CONNECTION_DIST) * 0.15;
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.strokeStyle = `rgba(${GOLD.r},${GOLD.g},${GOLD.b},${alpha})`;
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+        }
+      }
+
+      // Mouse connection
+      const mdx = particles[i].x - mouse.x;
+      const mdy = particles[i].y - mouse.y;
+      const mdist = Math.sqrt(mdx*mdx + mdy*mdy);
+      if(mdist < 200){
+        const alpha = (1 - mdist/200) * 0.3;
+        ctx.beginPath();
+        ctx.moveTo(particles[i].x, particles[i].y);
+        ctx.lineTo(mouse.x, mouse.y);
+        ctx.strokeStyle = `rgba(${GOLD.r},${GOLD.g},${GOLD.b},${alpha})`;
+        ctx.lineWidth = 0.8;
+        ctx.stroke();
+      }
+    }
+
+    // Draw particles
+    for(let p of particles){
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${GOLD.r},${GOLD.g},${GOLD.b},${p.alpha})`;
+      ctx.fill();
+
+      // Move
+      p.x += p.vx;
+      p.y += p.vy;
+
+      // Bounce
+      if(p.x < 0 || p.x > w) p.vx *= -1;
+      if(p.y < 0 || p.y > h) p.vy *= -1;
+    }
+
+    requestAnimationFrame(drawParticles);
+  }
+
+  window.addEventListener('resize', function(){
+    resize();
+    if(particles.length === 0) createParticles();
+  });
+
+  document.addEventListener('mousemove', function(e){
+    mouse.x = e.clientX;
+    mouse.y = e.clientY;
+  });
+
+  resize();
+  createParticles();
+  drawParticles();
+
+  /* ---- Scroll: Nav background ---- */
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', function(){
+    if(window.scrollY > 60){
+      nav.classList.add('scrolled');
+    } else {
+      nav.classList.remove('scrolled');
+    }
+  }, {passive: true});
+
+  /* ---- Scroll Reveal ---- */
+  const revealEls = document.querySelectorAll('.reveal');
+  const revealObserver = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if(entry.isIntersecting){
+        entry.target.classList.add('visible');
+        revealObserver.unobserve(entry.target);
+      }
+    });
+  }, {threshold: 0.1, rootMargin: '0px 0px -40px 0px'});
+
+  revealEls.forEach(function(el){
+    revealObserver.observe(el);
+  });
+
+  /* ---- Mobile Menu ---- */
+  const hamburger = document.getElementById('hamburger');
+  const mobileMenu = document.getElementById('mobile-menu');
+  const closeBtn = document.getElementById('close-menu');
+
+  hamburger.addEventListener('click', function(){
+    mobileMenu.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  });
+
+  closeBtn.addEventListener('click', closeMenu);
+
+  window.closeMenu = function(){
+    mobileMenu.classList.remove('open');
+    document.body.style.overflow = '';
+  };
+
+  /* ---- OS Detection ---- */
+  var ua = navigator.userAgent.toLowerCase();
+  var platform = navigator.platform ? navigator.platform.toLowerCase() : '';
+  var os = 'unknown';
+
+  if(ua.indexOf('mac') !== -1 || platform.indexOf('mac') !== -1){
+    os = 'mac';
+  } else if(ua.indexOf('win') !== -1 || platform.indexOf('win') !== -1){
+    os = 'windows';
+  } else if(ua.indexOf('linux') !== -1 || ua.indexOf('ubuntu') !== -1 || ua.indexOf('debian') !== -1){
+    os = 'linux';
+  }
+
+  var osNames = {mac:'macOS', windows:'Windows', linux:'Linux'};
+  var osFiles = {
+    mac: {name:'install-freelattice.command', url:'https://raw.githubusercontent.com/Chaos2Cured/FreeLattice/main/install-freelattice.command'},
+    windows: {name:'install-freelattice.bat', url:'https://raw.githubusercontent.com/Chaos2Cured/FreeLattice/main/install-freelattice.bat'},
+    linux: {name:'install-freelattice.sh', url:'https://raw.githubusercontent.com/Chaos2Cured/FreeLattice/main/install-freelattice.sh'}
+  };
+
+  var detectedEl = document.getElementById('detected-os');
+  var primaryBtn = document.getElementById('primary-download');
+  var primaryText = document.getElementById('primary-download-text');
+
+  if(os !== 'unknown'){
+    detectedEl.textContent = osNames[os];
+    primaryBtn.href = osFiles[os].url;
+    primaryBtn.setAttribute('download', '');
+    primaryText.textContent = 'Download for ' + osNames[os];
+
+    // Highlight active OS card
+    var cardId = {mac:'os-mac', windows:'os-win', linux:'os-linux'};
+    var activeCard = document.getElementById(cardId[os]);
+    if(activeCard) activeCard.classList.add('active');
+  } else {
+    detectedEl.textContent = 'your operating system';
+    primaryBtn.href = 'https://github.com/Chaos2Cured/FreeLattice';
+    primaryText.textContent = 'View Downloads on GitHub';
+  }
+
+  /* ---- Copy wallet address ---- */
+  window.copyAddr = function(card){
+    var addr = card.querySelector('.wallet-addr');
+    var original = addr.textContent;
+    navigator.clipboard.writeText(original).then(function(){
+      addr.classList.add('copied');
+      addr.textContent = 'Copied!';
+      setTimeout(function(){
+        addr.textContent = original;
+        addr.classList.remove('copied');
+      }, 1500);
+    });
+  };
+
+  /* ---- Smooth scroll for anchor links ---- */
+  document.querySelectorAll('a[href^="#"]').forEach(function(a){
+    a.addEventListener('click', function(e){
+      var target = document.querySelector(this.getAttribute('href'));
+      if(target){
+        e.preventDefault();
+        var offset = 80;
+        var top = target.getBoundingClientRect().top + window.pageYOffset - offset;
+        window.scrollTo({top: top, behavior: 'smooth'});
+      }
+    });
+  });
+
+})();
+</script>
+
+</body>
+</html>
