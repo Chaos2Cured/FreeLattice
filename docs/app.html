@@ -16010,7 +16010,7 @@ const FlOnboarding = (function() {
       });
     }
 
-    fetch('http://localhost:11434/api/tags', { method: 'GET', signal: AbortSignal.timeout(3000) })
+    fetch('http://localhost:11434/api/tags', { mode: 'cors', signal: AbortSignal.timeout(3000) })
       .then(function(r) { return r.json(); })
       .then(function(data) {
         if (data && data.models && data.models.length > 0) {
@@ -16085,7 +16085,7 @@ const FlOnboarding = (function() {
       if (c.textContent.indexOf('Run AI Locally') !== -1 || c.textContent.indexOf('Local AI detected') !== -1) localCard = c;
     });
 
-    fetch('http://localhost:11434/api/tags', { method: 'GET', signal: AbortSignal.timeout(3000) })
+    fetch('http://localhost:11434/api/tags', { mode: 'cors', signal: AbortSignal.timeout(3000) })
       .then(function(r) { return r.json(); })
       .then(function(data) {
         if (data && data.models && data.models.length > 0) {
@@ -16141,7 +16141,7 @@ const FlOnboarding = (function() {
     if (hasProvider) return; // Already configured
     if (localStorage.getItem('fl_ollama_toast_dismissed')) return;
 
-    fetch('http://localhost:11434/api/tags', { method: 'GET', signal: AbortSignal.timeout(3000) })
+    fetch('http://localhost:11434/api/tags', { mode: 'cors', signal: AbortSignal.timeout(3000) })
       .then(function(r) { return r.json(); })
       .then(function(data) {
         if (data && data.models && data.models.length > 0) {
@@ -16877,7 +16877,7 @@ async function resolveOllamaBase(forceRefresh) {
   // 2. Try direct localhost
   try {
     var directUrl = localStorage.getItem('fl_localUrl') || 'http://localhost:11434';
-    var directResp = await fetch(directUrl + '/api/tags', { signal: AbortSignal.timeout(3000) });
+    var directResp = await fetch(directUrl + '/api/tags', { mode: 'cors', signal: AbortSignal.timeout(3000) });
     if (directResp.ok) {
       _ollamaResolvedBase = { base: directUrl, isProxy: false };
       console.log('FreeLattice: Ollama direct connection at ' + directUrl);
@@ -16921,7 +16921,7 @@ async function owTestConnection() {
     var resolved = await resolveOllamaBase(true);
     if (!resolved) throw new Error('Ollama not reachable');
     updateOllamaProviderUrl();
-    const resp = await fetch(resolved.base + '/api/tags', { signal: AbortSignal.timeout(5000) });
+    const resp = await fetch(resolved.base + '/api/tags', { mode: 'cors', signal: AbortSignal.timeout(5000) });
     const data = await resp.json();
     const models = data.models || [];
 
@@ -17073,7 +17073,7 @@ async function owRefreshModels() {
   try {
     var resolved = await resolveOllamaBase(false);
     var base = resolved ? resolved.base : (localStorage.getItem('fl_localUrl') || 'http://localhost:11434');
-    var resp = await fetch(base + '/api/tags', { signal: AbortSignal.timeout(5000) });
+    var resp = await fetch(base + '/api/tags', { mode: 'cors', signal: AbortSignal.timeout(5000) });
     var data = await resp.json();
     owPopulateModels(data.models || []);
     owUpdateStatusBadge(true, (data.models || []).length);
@@ -17125,7 +17125,7 @@ async function owAutoDetect() {
     var resolved = await resolveOllamaBase(true);
     if (!resolved) throw new Error('Ollama not reachable');
     updateOllamaProviderUrl();
-    var resp = await fetch(resolved.base + '/api/tags', { signal: AbortSignal.timeout(3000) });
+    var resp = await fetch(resolved.base + '/api/tags', { mode: 'cors', signal: AbortSignal.timeout(3000) });
     var data = await resp.json();
     var models = data.models || [];
 
@@ -22308,7 +22308,7 @@ async function corsRunDiagnostic() {
   }
   // Test 2: Try direct Ollama
   try {
-    var directResp = await fetch('http://localhost:11434/api/tags', { signal: AbortSignal.timeout(3000) });
+    var directResp = await fetch('http://localhost:11434/api/tags', { mode: 'cors', signal: AbortSignal.timeout(3000) });
     if (directResp.ok) {
       results.push('<span style="color:var(--success);">&#10003;</span> Direct connection to Ollama works!');
       diagEl.innerHTML = results.join('<br>') + '<br><span style="color:var(--success);font-weight:600;">Connection is working now! Close this dialog and try again.</span>';
@@ -26253,7 +26253,7 @@ the world tried to make us forget.`,
 
       var url, headers, modelId;
       if (state.isLocal) {
-        url = 'http://localhost:11434/v1/chat/completions';
+        url = (typeof getOllamaBaseUrl === 'function' ? getOllamaBaseUrl() : 'http://localhost:11434') + '/v1/chat/completions';
         modelId = state.ollamaModel || 'llama3.2';
         headers = { 'Content-Type': 'application/json' };
       } else {
@@ -26265,9 +26265,9 @@ the world tried to make us forget.`,
           headers['X-Title'] = 'FreeLattice';
         }
       }
-
       var response = await fetch(url, {
         method: 'POST',
+        mode: 'cors',
         headers: headers,
         body: JSON.stringify({ model: modelId, messages: messages, max_tokens: 512 })
       });
@@ -26561,7 +26561,7 @@ the world tried to make us forget.`,
 
 // ---- Service Worker Registration ----
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js')
+  navigator.serviceWorker.register('/FreeLattice/sw.js')
     .then(reg => console.log('FreeLattice: Offline mode ready'))
     .catch(err => console.log('FreeLattice: Service worker not available'));
 }
@@ -26791,7 +26791,7 @@ if ('serviceWorker' in navigator) {
   function welcomeTestLocal() {
     var btn = document.getElementById('welcomeTestLocalBtn');
     if (btn) btn.textContent = 'Testing...';
-    fetch('http://localhost:11434/api/tags', { method: 'GET' })
+    fetch('http://localhost:11434/api/tags', { mode: 'cors', signal: AbortSignal.timeout(5000) })
       .then(function(r) { return r.json(); })
       .then(function(data) {
         if (data && data.models && data.models.length > 0) {
@@ -26806,21 +26806,66 @@ if ('serviceWorker' in navigator) {
         if (btn) btn.textContent = 'Test Connection';
       })
       .catch(function() {
-        welcomeShowTestResult('welcomeTestLocalResult', false, 'Could not connect — likely a CORS issue. <a href="#" id="welcomeCorsFixLink" style="color:var(--accent);text-decoration:underline;cursor:pointer;">Click here for the easy fix</a>');
-        // Attach click handler via DOM (inline onclick can fail in dynamic innerHTML)
-        setTimeout(function() {
-          var corsLink = document.getElementById('welcomeCorsFixLink');
-          if (corsLink) {
-            corsLink.addEventListener('click', function(e) {
-              e.preventDefault();
-              e.stopPropagation();
-              if (typeof window.showCorsHelp === 'function') window.showCorsHelp();
+        // Show inline CORS fix instructions directly — no broken links or modals needed
+        var corsOs = (navigator.userAgent || '');
+        var isMac = /Mac/i.test(corsOs);
+        var isWin = /Win/i.test(corsOs);
+        var isLinux = /Linux/i.test(corsOs) && !/Android/i.test(corsOs);
+        var quitStep = isMac ? 'Click the llama icon in your <strong>menu bar</strong> (top-right) &rarr; <strong>Quit Ollama</strong>'
+          : isWin ? 'Right-click Ollama in the <strong>system tray</strong> (bottom-right) &rarr; <strong>Quit</strong>'
+          : isLinux ? 'Run <code style="background:rgba(255,255,255,0.08);padding:2px 6px;border-radius:3px;">pkill ollama</code> in Terminal'
+          : 'Quit the Ollama application';
+        var serveCmd = isWin ? 'set OLLAMA_ORIGINS=* && ollama serve' : 'OLLAMA_ORIGINS="*" ollama serve';
+        var termStep = isMac ? 'Open <strong>Terminal</strong> (Cmd+Space, type "Terminal")'
+          : isWin ? 'Open <strong>Command Prompt</strong> (Win+R, type "cmd")'
+          : 'Open a <strong>Terminal</strong>';
+
+        var el = document.getElementById('welcomeTestLocalResult');
+        if (el) {
+          el.className = 'welcome-test-result welcome-visible welcome-test-fail';
+          el.style.display = 'block';
+          el.style.textAlign = 'left';
+          el.innerHTML = '<div style="margin-bottom:10px;"><strong style="color:#ff6b6b;">&#9888; Ollama is running but your browser is blocking the connection (CORS).</strong></div>' +
+            '<div style="background:linear-gradient(135deg,rgba(212,160,23,0.15),rgba(212,160,23,0.05));border:2px solid var(--accent);border-radius:8px;padding:14px 16px;margin:8px 0;">' +
+            '<div style="font-size:0.92rem;font-weight:700;color:var(--accent);margin-bottom:10px;">&#9889; Here\'s the fix (30 seconds):</div>' +
+            '<div style="font-size:0.85rem;color:var(--text-primary);line-height:1.9;">' +
+            '<strong style="color:var(--accent);">Step 1:</strong> Quit Ollama &mdash; ' + quitStep + '<br>' +
+            '<strong style="color:var(--accent);">Step 2:</strong> ' + termStep + ' and run:<br>' +
+            '<code id="welcomeCorsFixCmd" style="display:block;background:var(--bg-primary);padding:8px 12px;border-radius:6px;font-size:0.88rem;color:var(--accent);font-family:monospace;margin:4px 0 4px 16px;border:1px solid var(--border);word-break:break-all;">' + serveCmd + '</code>' +
+            '<button id="welcomeCorsCopyBtn" style="margin:2px 0 8px 16px;display:inline-flex;align-items:center;gap:4px;background:var(--bg-input);border:1px solid var(--accent);border-radius:4px;color:var(--accent);font-size:0.78rem;padding:4px 12px;cursor:pointer;font-family:var(--font);">&#128203; Copy Command</button><br>' +
+            '<strong style="color:var(--accent);">Step 3:</strong> Come back here and click <strong>Retry</strong> below' +
+            '</div></div>' +
+            '<div style="display:flex;gap:8px;margin-top:10px;">' +
+            '<button id="welcomeCorsRetryBtn" style="padding:8px 22px;background:var(--accent);color:#0a0e1a;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-family:var(--font);font-size:0.85rem;">&#128260; Retry Connection</button>' +
+            '<button id="welcomeCorsMoreBtn" style="padding:8px 16px;background:transparent;color:var(--text-secondary);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-family:var(--font);font-size:0.82rem;">More Help</button>' +
+            '</div>';
+          // Attach event listeners via DOM
+          setTimeout(function() {
+            var copyBtn = document.getElementById('welcomeCorsCopyBtn');
+            if (copyBtn) copyBtn.addEventListener('click', function() {
+              var cmd = document.getElementById('welcomeCorsFixCmd');
+              if (cmd) {
+                var text = cmd.textContent.trim();
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                  navigator.clipboard.writeText(text).then(function() {
+                    copyBtn.textContent = '\u2713 Copied!';
+                    setTimeout(function() { copyBtn.innerHTML = '&#128203; Copy Command'; }, 2000);
+                  }).catch(function() { copyBtn.textContent = '\u2713 Copied!'; });
+                } else {
+                  var ta = document.createElement('textarea'); ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+                  document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+                  copyBtn.textContent = '\u2713 Copied!';
+                  setTimeout(function() { copyBtn.innerHTML = '&#128203; Copy Command'; }, 2000);
+                }
+              }
             });
-          }
-        }, 50);
+            var retryBtn = document.getElementById('welcomeCorsRetryBtn');
+            if (retryBtn) retryBtn.addEventListener('click', function() { welcomeTestLocal(); });
+            var moreBtn = document.getElementById('welcomeCorsMoreBtn');
+            if (moreBtn) moreBtn.addEventListener('click', function() { if (typeof showCorsHelp === 'function') showCorsHelp(); });
+          }, 50);
+        }
         if (btn) btn.textContent = 'Test Connection';
-        // Auto-show CORS help after a short delay
-        setTimeout(function() { if (typeof showCorsHelp === 'function') showCorsHelp(); }, 800);
       });
   }
   window.welcomeTestLocal = welcomeTestLocal;
@@ -27008,8 +27053,9 @@ if ('serviceWorker' in navigator) {
 
       if (state.isLocal) {
         // Ollama
-        fetch('http://localhost:11434/api/chat', {
+        fetch((typeof getOllamaBaseUrl === 'function' ? getOllamaBaseUrl() : 'http://localhost:11434') + '/api/chat', {
           method: 'POST',
+          mode: 'cors',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ model: state.ollamaModel || 'llama3.2', messages: messages, stream: false })
         })
@@ -29129,7 +29175,7 @@ const ModelSwitcher = (function() {
       try {
         var resolved = typeof resolveOllamaBase === 'function' ? await resolveOllamaBase(false) : null;
         var base = resolved ? resolved.base : (localStorage.getItem('fl_localUrl') || 'http://localhost:11434');
-        var resp = await fetch(base + '/api/tags', { signal: AbortSignal.timeout(5000) });
+        var resp = await fetch(base + '/api/tags', { mode: 'cors', signal: AbortSignal.timeout(5000) });
         var data = await resp.json();
         cachedModels = data.models || [];
         lastFetch = Date.now();
@@ -29276,6 +29322,7 @@ const BrowseModels = (function() {
 
       var resp = await fetch(base + '/api/pull', {
         method: 'POST',
+        mode: 'cors',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: pullName, stream: true })
       });
@@ -29343,7 +29390,7 @@ const BrowseModels = (function() {
     try {
       var resolved = typeof resolveOllamaBase === 'function' ? await resolveOllamaBase(false) : null;
       var base = resolved ? resolved.base : (localStorage.getItem('fl_localUrl') || 'http://localhost:11434');
-      var resp = await fetch(base + '/api/tags', { signal: AbortSignal.timeout(5000) });
+      var resp = await fetch(base + '/api/tags', { mode: 'cors', signal: AbortSignal.timeout(5000) });
       var data = await resp.json();
       updateInstalled(data.models || []);
     } catch(e) {
