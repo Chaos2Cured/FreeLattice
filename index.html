@@ -10246,18 +10246,29 @@ body.fl-immersive-active {
         <strong style="color: var(--accent);">Manual Setup:</strong><br>
         1. Install from <a href="https://ollama.ai" target="_blank" style="color: var(--accent);">ollama.ai</a><br>
         2. Run: <code>ollama pull llama3.2</code><br>
-        3. Enable CORS permanently:<br>
-        &nbsp;&nbsp;Mac: <code>echo 'export OLLAMA_ORIGINS="*"' >> ~/.zshrc</code><br>
-        &nbsp;&nbsp;Windows: <code>setx OLLAMA_ORIGINS "*"</code><br>
-        &nbsp;&nbsp;Linux: <code>echo 'export OLLAMA_ORIGINS="*"' >> ~/.bashrc</code><br>
+        3. <strong style="color: #ff6b6b;">Stop Ollama first</strong> (it auto-starts after install!):<br>
+        &nbsp;&nbsp;<strong>Windows:</strong> Right-click Ollama icon in system tray (bottom-right near clock) &rarr; <strong>"Quit"</strong><br>
+        &nbsp;&nbsp;<strong>Mac:</strong> Click Ollama icon in menu bar (top-right) &rarr; <strong>"Quit Ollama"</strong> &mdash; or: <code>pkill ollama</code><br>
+        &nbsp;&nbsp;<strong>Linux:</strong> <code>systemctl stop ollama</code> or <code>pkill ollama</code><br>
+        4. Enable CORS and restart:<br>
+        &nbsp;&nbsp;Mac/Linux: <code>OLLAMA_ORIGINS="*" ollama serve</code><br>
+        &nbsp;&nbsp;Windows (cmd): <code>set OLLAMA_ORIGINS=* && ollama serve</code><br>
       </div>
       <div style="background: rgba(199,80,80,0.12); border: 2px solid var(--error); border-radius: var(--radius-sm); padding: 12px 16px; margin: 10px 0;">
-        <div style="font-size: 0.92rem; font-weight: 700; color: #ff6b6b; margin-bottom: 6px;">&#9888; IMPORTANT &mdash; Step 4: You MUST restart Ollama!</div>
+        <div style="font-size: 0.92rem; font-weight: 700; color: #ff6b6b; margin-bottom: 6px;">&#9888; Getting "port already in use" error?</div>
         <div style="font-size: 0.85rem; color: var(--text-primary); line-height: 1.7;">
-          The CORS setting <strong>will not take effect</strong> until you restart Ollama:<br>
-          &nbsp;&nbsp;<strong style="color: var(--accent);">Mac:</strong> Click the Ollama llama icon in your menu bar &rarr; <strong>"Quit Ollama"</strong> &rarr; reopen from Applications<br>
-          &nbsp;&nbsp;<strong style="color: var(--accent);">Windows:</strong> Right-click Ollama in system tray &rarr; <strong>"Quit"</strong> &rarr; reopen Ollama<br>
-          &nbsp;&nbsp;<strong style="color: var(--accent);">Linux:</strong> Run <code>sudo systemctl restart ollama</code>
+          This means Ollama is already running in the background. You <strong>must quit it first</strong> (Step 3 above) before running the CORS command.<br>
+          &nbsp;&nbsp;<strong style="color: var(--accent);">Windows:</strong> Right-click Ollama in system tray (bottom-right near clock) &rarr; <strong>"Quit"</strong> &rarr; then run the command<br>
+          &nbsp;&nbsp;<strong style="color: var(--accent);">Mac:</strong> Click Ollama in menu bar &rarr; <strong>"Quit Ollama"</strong> &rarr; then run the command<br>
+          &nbsp;&nbsp;<strong style="color: var(--accent);">Linux:</strong> Run <code>systemctl stop ollama</code> or <code>pkill ollama</code> &rarr; then run the command
+        </div>
+      </div>
+      <div style="background: rgba(212,160,23,0.08); border: 1px solid rgba(212,160,23,0.3); border-radius: var(--radius-sm); padding: 12px 16px; margin: 10px 0;">
+        <div style="font-size: 0.88rem; font-weight: 600; color: var(--accent); margin-bottom: 6px;">&#128274; Make CORS permanent (so you don't have to do this every time)</div>
+        <div style="font-size: 0.82rem; color: var(--text-secondary); line-height: 1.7;">
+          <strong>Windows:</strong> Open System Settings &rarr; Search "Environment Variables" &rarr; Under System Variables, click New &rarr; Name: <code>OLLAMA_ORIGINS</code> &rarr; Value: <code>*</code> &rarr; OK &rarr; Restart Ollama normally.<br>
+          <strong>Mac:</strong> Run in Terminal: <code>launchctl setenv OLLAMA_ORIGINS '*'</code> &mdash; then restart Ollama normally.<br>
+          <strong>Linux:</strong> Run: <code>echo 'export OLLAMA_ORIGINS="*"' >> ~/.bashrc</code> and restart Ollama.
         </div>
       </div>
       <div class="wizard-ollama-instructions" style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.7;">
@@ -10441,20 +10452,39 @@ body.fl-immersive-active {
     </div>
     <p>Your browser blocked the connection to local Ollama due to <strong>CORS</strong> (Cross-Origin Resource Sharing) security. This is normal and easy to fix.</p>
 
+    <!-- "Ollama running but no CORS" detection banner (populated by JS diagnostic) -->
+    <div id="corsRunningNoCorsWarning" class="hidden" style="background: rgba(199,80,80,0.12); border: 2px solid var(--error); border-radius: var(--radius-sm); padding: 14px 18px; margin: 12px 0;">
+      <p style="font-size: 0.92rem; font-weight: 700; color: #ff6b6b; margin-bottom: 6px;">&#9888; Ollama is running but doesn't have CORS enabled</p>
+      <p style="font-size: 0.84rem; color: var(--text-secondary); line-height: 1.6;">You need to <strong>quit Ollama first</strong>, then restart it with the CORS command below. If you just run the command without quitting first, you'll get a <strong>"port already in use"</strong> error because Ollama is already using that port.</p>
+    </div>
+
     <!-- Dead-simple 3-step quick fix -->
     <div style="background: linear-gradient(135deg, rgba(212,160,23,0.12), rgba(212,160,23,0.05)); border: 2px solid var(--accent); border-radius: var(--radius); padding: 18px 20px; margin: 16px 0;">
       <p style="font-size: 1rem; font-weight: 700; color: var(--accent); margin-bottom: 12px;">&#9889; Quick Fix (3 steps, takes 30 seconds)</p>
       <div style="font-size: 0.9rem; color: var(--text-primary); line-height: 2;">
-        <p style="margin-bottom: 8px;"><strong style="color: var(--accent); font-size: 1.1rem;">Step 1:</strong> <strong>Quit Ollama completely</strong></p>
-        <p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 12px; padding-left: 16px;">&#8226; <strong>Mac:</strong> Click the Ollama llama icon in your menu bar (top-right of screen) &rarr; click <strong>"Quit Ollama"</strong><br>&#8226; <strong>Windows:</strong> Right-click the Ollama icon in your system tray (bottom-right) &rarr; click <strong>"Quit"</strong><br>&#8226; <strong>Linux:</strong> Run <code style="background: var(--bg-primary); padding: 2px 6px; border-radius: 3px; color: var(--accent);">pkill ollama</code> in Terminal</p>
-        <p style="margin-bottom: 8px;"><strong style="color: var(--accent); font-size: 1.1rem;">Step 2:</strong> <strong>Open Terminal</strong> and paste this command:</p>
+        <div style="background: rgba(199,80,80,0.10); border: 1px solid rgba(255,107,107,0.4); border-radius: 8px; padding: 12px 16px; margin-bottom: 14px;">
+          <p style="margin-bottom: 6px;"><strong style="color: #ff6b6b; font-size: 1.1rem;">Step 0:</strong> <strong style="color: #ff6b6b;">Stop Ollama First!</strong></p>
+          <p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 4px;">Ollama auto-starts when you install it. You <strong>must quit it</strong> before running the CORS command, or you'll get a <em>"port already in use"</em> error.</p>
+          <p style="font-size: 0.82rem; color: var(--text-secondary); padding-left: 8px; line-height: 1.8;">&#8226; <strong>Windows:</strong> Right-click the Ollama icon in the system tray (bottom-right corner near the clock) and click <strong>"Quit"</strong><br>&#8226; <strong>Mac:</strong> Click the Ollama icon in the menu bar (top-right) and click <strong>"Quit Ollama"</strong> &mdash; or in Terminal: <code style="background: var(--bg-primary); padding: 2px 6px; border-radius: 3px; color: var(--accent);">pkill ollama</code><br>&#8226; <strong>Linux:</strong> In Terminal: <code style="background: var(--bg-primary); padding: 2px 6px; border-radius: 3px; color: var(--accent);">systemctl stop ollama</code> or <code style="background: var(--bg-primary); padding: 2px 6px; border-radius: 3px; color: var(--accent);">pkill ollama</code></p>
+        </div>
+        <p style="margin-bottom: 8px;"><strong style="color: var(--accent); font-size: 1.1rem;">Step 1:</strong> <strong>Open Terminal</strong> and paste this command:</p>
         <code id="corsQuickFixCmd" style="display: block; background: var(--bg-primary); padding: 10px 14px; border-radius: 6px; font-size: 0.88rem; color: var(--accent); font-family: 'Courier New', monospace; margin: 6px 0; word-break: break-all; border: 1px solid var(--border);">OLLAMA_ORIGINS="*" ollama serve</code>
         <div style="display: flex; gap: 8px; margin: 6px 0 12px;">
           <button class="copy-cmd-btn" onclick="copyCorsCmd('corsQuickFixCmd')" style="display: inline-flex; align-items: center; gap: 4px; background: var(--bg-input); border: 1px solid var(--accent); border-radius: 4px; color: var(--accent); font-size: 0.78rem; padding: 4px 12px; cursor: pointer; font-family: var(--font);">&#128203; Copy Command</button>
         </div>
         <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 12px; padding-left: 16px;">&#8226; <strong>Mac:</strong> Press Cmd+Space, type "Terminal", press Enter<br>&#8226; <strong>Windows:</strong> Press Win+R, type "cmd", press Enter &mdash; then use: <code style="background: var(--bg-primary); padding: 2px 6px; border-radius: 3px; color: var(--accent); font-size: 0.78rem;">set OLLAMA_ORIGINS=* && ollama serve</code></p>
-        <p><strong style="color: var(--accent); font-size: 1.1rem;">Step 3:</strong> <strong>Come back here</strong> and click "Retry Connection" below</p>
+        <p><strong style="color: var(--accent); font-size: 1.1rem;">Step 2:</strong> <strong>Come back here</strong> and click "Retry Connection" below</p>
       </div>
+
+      <!-- Persistent fix instructions -->
+      <details style="margin-top: 14px; border-top: 1px solid rgba(212,160,23,0.2); padding-top: 12px;">
+        <summary style="font-size: 0.85rem; font-weight: 600; color: var(--accent); cursor: pointer;">&#128274; Make it permanent (so you don't have to do this every time)</summary>
+        <div style="font-size: 0.82rem; color: var(--text-secondary); line-height: 1.8; margin-top: 10px; padding-left: 8px;">
+          <p style="margin-bottom: 10px;"><strong style="color: var(--accent);">Windows:</strong> Open System Settings &rarr; Search <strong>"Environment Variables"</strong> &rarr; Under System Variables, click <strong>New</strong> &rarr; Variable name: <code style="background: var(--bg-primary); padding: 2px 6px; border-radius: 3px; color: var(--accent);">OLLAMA_ORIGINS</code> &rarr; Variable value: <code style="background: var(--bg-primary); padding: 2px 6px; border-radius: 3px; color: var(--accent);">*</code> &rarr; Click OK &rarr; Restart Ollama normally.</p>
+          <p style="margin-bottom: 10px;"><strong style="color: var(--accent);">Mac:</strong> Run this in Terminal to make it permanent:<br><code style="display: inline-block; background: var(--bg-primary); padding: 4px 10px; border-radius: 4px; color: var(--accent); margin-top: 4px;">launchctl setenv OLLAMA_ORIGINS '*'</code><br>Then restart Ollama normally from your Applications folder.</p>
+          <p><strong style="color: var(--accent);">Linux:</strong> Run:<br><code style="display: inline-block; background: var(--bg-primary); padding: 4px 10px; border-radius: 4px; color: var(--accent); margin-top: 4px;">sudo mkdir -p /etc/systemd/system/ollama.service.d && printf '[Service]\nEnvironment="OLLAMA_ORIGINS=*"\n' | sudo tee /etc/systemd/system/ollama.service.d/cors.conf && sudo systemctl daemon-reload && sudo systemctl restart ollama</code></p>
+        </div>
+      </details>
     </div>
 
     <p style="font-size: 0.92rem; font-weight: 600; color: var(--accent); margin-top: 14px;">&#127775; Or use the one-click installer (does everything automatically)</p>
@@ -10733,8 +10763,8 @@ body.fl-immersive-active {
           <details>
             <summary>&#128161; Common Issues &amp; Fixes</summary>
             <div class="ow-issue-item">
-              <strong>"Address already in use"</strong>
-              <span>Good news — Ollama is already running! You don't need to start it again. Just click "Test Connection" above and you should be all set.</span>
+              <strong>"Address already in use" / "port already in use"</strong>
+              <span>This means Ollama is already running in the background (it auto-starts on install). If you're trying to run <code style="background:var(--bg-primary);padding:2px 6px;border-radius:3px;color:var(--accent);font-size:0.8rem;">ollama serve</code> with CORS, you must <strong>stop Ollama first</strong>: <strong>Windows:</strong> Right-click Ollama in system tray (bottom-right near clock) &rarr; "Quit". <strong>Mac:</strong> Click Ollama in menu bar &rarr; "Quit Ollama" or run <code style="background:var(--bg-primary);padding:2px 6px;border-radius:3px;color:var(--accent);font-size:0.8rem;">pkill ollama</code>. <strong>Linux:</strong> Run <code style="background:var(--bg-primary);padding:2px 6px;border-radius:3px;color:var(--accent);font-size:0.8rem;">systemctl stop ollama</code> or <code style="background:var(--bg-primary);padding:2px 6px;border-radius:3px;color:var(--accent);font-size:0.8rem;">pkill ollama</code>. Then run the CORS command.</span>
             </div>
             <div class="ow-issue-item">
               <strong>"Connection refused"</strong>
@@ -10746,7 +10776,7 @@ body.fl-immersive-active {
             </div>
             <div class="ow-issue-item">
               <strong>CORS / Browser blocking</strong>
-              <span>If you're using FreeLattice from GitHub Pages, your browser may block local connections. <strong>Best fix:</strong> Run FreeLattice locally with <code style="background:var(--bg-primary);padding:2px 6px;border-radius:3px;color:var(--accent);font-size:0.8rem;">node server.js</code> or <code style="background:var(--bg-primary);padding:2px 6px;border-radius:3px;color:var(--accent);font-size:0.8rem;">python server.py</code> &mdash; the built-in server proxies Ollama requests automatically. Or start Ollama with <code style="background:var(--bg-primary);padding:2px 6px;border-radius:3px;color:var(--accent);font-size:0.8rem;">OLLAMA_ORIGINS=* ollama serve</code>.</span>
+              <span>If you're using FreeLattice from GitHub Pages, your browser may block local connections. <strong>Best fix:</strong> Run FreeLattice locally with <code style="background:var(--bg-primary);padding:2px 6px;border-radius:3px;color:var(--accent);font-size:0.8rem;">node server.js</code> or <code style="background:var(--bg-primary);padding:2px 6px;border-radius:3px;color:var(--accent);font-size:0.8rem;">python server.py</code> &mdash; the built-in server proxies Ollama requests automatically. <strong>Alternative:</strong> Stop Ollama first (see above), then run: <code style="background:var(--bg-primary);padding:2px 6px;border-radius:3px;color:var(--accent);font-size:0.8rem;">OLLAMA_ORIGINS=* ollama serve</code> (Mac/Linux) or <code style="background:var(--bg-primary);padding:2px 6px;border-radius:3px;color:var(--accent);font-size:0.8rem;">set OLLAMA_ORIGINS=* && ollama serve</code> (Windows). To make it permanent: <strong>Windows:</strong> Set OLLAMA_ORIGINS=* in System Environment Variables. <strong>Mac:</strong> Run <code style="background:var(--bg-primary);padding:2px 6px;border-radius:3px;color:var(--accent);font-size:0.8rem;">launchctl setenv OLLAMA_ORIGINS '*'</code>.</span>
             </div>
           </details>
         </div>
@@ -10895,7 +10925,13 @@ body.fl-immersive-active {
           <p>Ollama is free software that lets you download and run AI models on your own computer. Once installed, you can run models like Llama, Qwen, Mistral, and more — all offline, all private. Visit <a href="https://ollama.ai" target="_blank">ollama.ai</a> to get started.</p>
 
           <h4>Ollama CORS Troubleshooting</h4>
-          <p>If you're using FreeLattice from a website (like GitHub Pages) and connecting to local Ollama, your browser may block the connection due to CORS security. <strong>Best fix:</strong> Run FreeLattice locally with <code>node server.js</code> or <code>python server.py</code> &mdash; the built-in server includes an Ollama proxy that eliminates CORS entirely. <strong>Alternative:</strong> Start Ollama with <code>OLLAMA_ORIGINS=* ollama serve</code> (Mac/Linux) or <code>set OLLAMA_ORIGINS=* && ollama serve</code> (Windows). FreeLattice will auto-detect the best connection method on startup.</p>
+          <p>If you're using FreeLattice from a website (like GitHub Pages) and connecting to local Ollama, your browser may block the connection due to CORS security. <strong>Best fix:</strong> Run FreeLattice locally with <code>node server.js</code> or <code>python server.py</code> &mdash; the built-in server includes an Ollama proxy that eliminates CORS entirely.</p>
+          <p><strong>Alternative &mdash; Manual CORS fix (3 steps):</strong><br>
+          <strong>1. Stop Ollama first</strong> &mdash; Ollama auto-starts on install, so you must quit it before restarting with CORS. <strong>Windows:</strong> Right-click the Ollama icon in the system tray (bottom-right near the clock) &rarr; "Quit". <strong>Mac:</strong> Click the Ollama icon in the menu bar (top-right) &rarr; "Quit Ollama" (or run <code>pkill ollama</code>). <strong>Linux:</strong> Run <code>systemctl stop ollama</code> or <code>pkill ollama</code>.<br>
+          <strong>2. Run with CORS enabled:</strong> <code>OLLAMA_ORIGINS=* ollama serve</code> (Mac/Linux) or <code>set OLLAMA_ORIGINS=* && ollama serve</code> (Windows cmd).<br>
+          <strong>3. Retry</strong> the connection in FreeLattice.</p>
+          <p><strong>Getting "port already in use" error?</strong> That means you skipped Step 1 &mdash; Ollama is still running. Quit it first, then try the command again.</p>
+          <p><strong>Make it permanent:</strong> <strong>Windows:</strong> Open System Settings &rarr; Search "Environment Variables" &rarr; Under System Variables, click New &rarr; Variable name: <code>OLLAMA_ORIGINS</code>, Variable value: <code>*</code> &rarr; OK &rarr; Restart Ollama normally. <strong>Mac:</strong> Run <code>launchctl setenv OLLAMA_ORIGINS '*'</code> in Terminal, then restart Ollama. <strong>Linux:</strong> Run <code>echo 'export OLLAMA_ORIGINS="*"' >> ~/.bashrc</code> and restart Ollama. FreeLattice will auto-detect the best connection method on startup.</p>
 
           <h4>Where Can I Get Free API Keys?</h4>
           <p><strong>Groq</strong> — Sign up at <a href="https://console.groq.com" target="_blank">console.groq.com</a> for a free API key with generous rate limits. This is the easiest way to start.</p>
@@ -16962,7 +16998,15 @@ async function owTestConnection() {
 
     let msg = 'Could not connect to Ollama.';
     if (e.name === 'TypeError' && e.message.includes('Failed to fetch')) {
-      msg += ' Ollama may not be running, or CORS is blocking the connection.';
+      // Try a no-cors ping to distinguish "not running" from "running but CORS blocked"
+      try {
+        await fetch('http://localhost:11434/api/tags', { mode: 'no-cors', signal: AbortSignal.timeout(2000) });
+        msg = '<strong>Ollama is running but CORS is not enabled.</strong> You need to quit Ollama first, then restart it with CORS. ';
+        msg += '<strong>Stop Ollama:</strong> Windows: Right-click Ollama in system tray &rarr; Quit. Mac: Click Ollama in menu bar &rarr; Quit Ollama. Linux: <code>systemctl stop ollama</code> or <code>pkill ollama</code>. ';
+        msg += 'Then run: <code>OLLAMA_ORIGINS=* ollama serve</code> (Mac/Linux) or <code>set OLLAMA_ORIGINS=* && ollama serve</code> (Windows).';
+      } catch(pingErr) {
+        msg += ' Ollama may not be running, or CORS is blocking the connection.';
+      }
     } else if (e.name === 'TimeoutError' || e.name === 'AbortError') {
       msg += ' Connection timed out.';
     }
@@ -18234,7 +18278,7 @@ async function sendMessage() {
     if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError')) {
       if (state.isLocal) {
         // v5.0: Always show CORS diagnostic for local connection failures
-        addSystemMessage('Could not connect to Ollama. This is usually a CORS issue (your browser blocking the connection for security).');
+        addSystemMessage('Could not connect to Ollama. This is usually a CORS issue (your browser blocking the connection for security). If Ollama is running, you need to quit it first and restart with CORS enabled.');
         addSystemMessage('Opening the connection helper... Or run FreeLattice locally with the one-click installer for zero configuration.');
         showCorsHelp();
       } else {
@@ -22258,29 +22302,34 @@ function corsPopulateOSFix() {
   if (os === 'mac') {
     html = '<div class="os-section">' +
       '<h4 style="margin-bottom:8px;">&#127822; Your Mac fix (permanent, survives restart):</h4>' +
-      '<p style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:6px;"><strong>Step 1:</strong> Open <strong>Terminal</strong> (press Cmd+Space, type "Terminal", press Enter)</p>' +
-      '<p style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:6px;"><strong>Step 2:</strong> Paste this command and press Enter:</p>' +
+      '<p style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:6px;"><strong style="color:#ff6b6b;">Step 1: Stop Ollama first</strong> &mdash; Click the Ollama icon in the menu bar (top-right) &rarr; <strong>"Quit Ollama"</strong>, or in Terminal: <code>pkill ollama</code></p>' +
+      '<p style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:6px;"><strong>Step 2:</strong> Open <strong>Terminal</strong> (press Cmd+Space, type "Terminal", press Enter)</p>' +
+      '<p style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:6px;"><strong>Step 3:</strong> Paste this command and press Enter:</p>' +
       '<code id="corsFixMeCmd">echo \'export OLLAMA_ORIGINS="*"\' >> ~/.zshrc && launchctl setenv OLLAMA_ORIGINS "*" && pkill -f ollama; sleep 2 && open -a Ollama</code>' +
       '<button class="copy-cmd-btn" onclick="copyCorsCmd(\'corsFixMeCmd\')">&#128203; Copy Command</button>' +
-      '<p style="font-size:0.78rem;color:var(--text-muted);margin-top:6px;"><strong>Step 3:</strong> Come back here and click "Retry Connection" below</p>' +
+      '<p style="font-size:0.78rem;color:var(--text-muted);margin-top:6px;"><strong>Step 4:</strong> Come back here and click "Retry Connection" below</p>' +
+      '<p style="font-size:0.78rem;color:var(--text-muted);margin-top:8px;">&#128274; <strong>Permanent alternative:</strong> Run <code>launchctl setenv OLLAMA_ORIGINS \'*\'</code> in Terminal, then restart Ollama normally from Applications.</p>' +
       '</div>';
   } else if (os === 'windows') {
     html = '<div class="os-section">' +
       '<h4 style="margin-bottom:8px;">&#127987;&#65039; Your Windows fix (permanent, survives restart):</h4>' +
-      '<p style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:6px;"><strong>Step 1:</strong> Open <strong>Command Prompt</strong> (press Win+R, type "cmd", press Enter)</p>' +
-      '<p style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:6px;"><strong>Step 2:</strong> Paste this command and press Enter:</p>' +
+      '<p style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:6px;"><strong style="color:#ff6b6b;">Step 1: Stop Ollama first</strong> &mdash; Right-click the Ollama icon in the system tray (bottom-right corner near the clock) and click <strong>"Quit"</strong></p>' +
+      '<p style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:6px;"><strong>Step 2:</strong> Open <strong>Command Prompt</strong> (press Win+R, type "cmd", press Enter)</p>' +
+      '<p style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:6px;"><strong>Step 3:</strong> Paste this command and press Enter:</p>' +
       '<code id="corsFixMeCmd">setx OLLAMA_ORIGINS "*" && taskkill /F /IM ollama.exe 2>nul & timeout /t 3 /nobreak >nul & start ollama serve</code>' +
       '<button class="copy-cmd-btn" onclick="copyCorsCmd(\'corsFixMeCmd\')">&#128203; Copy Command</button>' +
-      '<p style="font-size:0.78rem;color:var(--text-muted);margin-top:6px;"><strong>Step 3:</strong> Come back here and click "Retry Connection" below</p>' +
+      '<p style="font-size:0.78rem;color:var(--text-muted);margin-top:6px;"><strong>Step 4:</strong> Come back here and click "Retry Connection" below</p>' +
+      '<p style="font-size:0.78rem;color:var(--text-muted);margin-top:8px;">&#128274; <strong>Permanent alternative:</strong> Open System Settings &rarr; Search "Environment Variables" &rarr; Under System Variables, click New &rarr; Variable name: <code>OLLAMA_ORIGINS</code> &rarr; Variable value: <code>*</code> &rarr; Click OK &rarr; Restart Ollama normally.</p>' +
       '</div>';
   } else if (os === 'linux') {
     html = '<div class="os-section">' +
       '<h4 style="margin-bottom:8px;">&#128039; Your Linux fix (permanent, survives restart):</h4>' +
-      '<p style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:6px;"><strong>Step 1:</strong> Open a <strong>Terminal</strong></p>' +
-      '<p style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:6px;"><strong>Step 2:</strong> Paste this command and press Enter:</p>' +
+      '<p style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:6px;"><strong style="color:#ff6b6b;">Step 1: Stop Ollama first</strong> &mdash; In Terminal, run: <code>systemctl stop ollama</code> or <code>pkill ollama</code></p>' +
+      '<p style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:6px;"><strong>Step 2:</strong> Open a <strong>Terminal</strong></p>' +
+      '<p style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:6px;"><strong>Step 3:</strong> Paste this command and press Enter:</p>' +
       '<code id="corsFixMeCmd">echo \'export OLLAMA_ORIGINS="*"\' >> ~/.bashrc && sudo mkdir -p /etc/systemd/system/ollama.service.d && printf \'[Service]\\nEnvironment="OLLAMA_ORIGINS=*"\\n\' | sudo tee /etc/systemd/system/ollama.service.d/cors.conf && sudo systemctl daemon-reload && sudo systemctl restart ollama</code>' +
       '<button class="copy-cmd-btn" onclick="copyCorsCmd(\'corsFixMeCmd\')">&#128203; Copy Command</button>' +
-      '<p style="font-size:0.78rem;color:var(--text-muted);margin-top:6px;"><strong>Step 3:</strong> Come back here and click "Retry Connection" below</p>' +
+      '<p style="font-size:0.78rem;color:var(--text-muted);margin-top:6px;"><strong>Step 4:</strong> Come back here and click "Retry Connection" below</p>' +
       '</div>';
   } else {
     html = '<div class="os-section">' +
@@ -22292,9 +22341,12 @@ function corsPopulateOSFix() {
 
 async function corsRunDiagnostic() {
   var diagEl = document.getElementById('corsDiagResult');
+  var warningBanner = document.getElementById('corsRunningNoCorsWarning');
   if (!diagEl) return;
   diagEl.innerHTML = '<span style="color:var(--text-muted);">Running diagnostic...</span>';
+  if (warningBanner) warningBanner.classList.add('hidden');
   var results = [];
+  var ollamaIsRunning = false;
   // Test 1: Try proxy route
   try {
     var proxyResp = await fetch('/ollama/api/tags', { signal: AbortSignal.timeout(3000) });
@@ -22306,7 +22358,16 @@ async function corsRunDiagnostic() {
   } catch(e) {
     results.push('<span style="color:var(--text-muted);">&#8226;</span> Proxy route not available (normal for web version)');
   }
-  // Test 2: Try direct Ollama
+  // Test 2: Try direct Ollama (no-cors mode to check if Ollama is running at all)
+  try {
+    var pingResp = await fetch('http://localhost:11434/api/tags', { mode: 'no-cors', signal: AbortSignal.timeout(3000) });
+    // If we get here without error, Ollama IS running (even if response is opaque)
+    ollamaIsRunning = true;
+  } catch(e) {
+    // Ollama is not running at all
+    ollamaIsRunning = false;
+  }
+  // Test 3: Try direct Ollama with CORS
   try {
     var directResp = await fetch('http://localhost:11434/api/tags', { mode: 'cors', signal: AbortSignal.timeout(3000) });
     if (directResp.ok) {
@@ -22316,15 +22377,23 @@ async function corsRunDiagnostic() {
     }
   } catch(e) {
     if (e.name === 'TypeError' && (e.message.includes('Failed to fetch') || e.message.includes('NetworkError'))) {
-      results.push('<span style="color:var(--error);">&#10007;</span> Direct connection blocked &mdash; this is the <strong>CORS issue</strong>');
-      results.push('<span style="color:var(--text-muted);font-size:0.8rem;">Your browser blocked http://localhost:11434 because Ollama isn\'t configured to accept cross-origin requests</span>');
+      if (ollamaIsRunning) {
+        // Ollama IS running but CORS is blocking — this is the most common case
+        results.push('<span style="color:var(--warning);">&#9888;</span> <strong>Ollama is running but CORS is not enabled</strong>');
+        results.push('<span style="color:var(--text-secondary);font-size:0.84rem;">You need to quit Ollama and restart it with the CORS command below. If you just run the command without quitting first, you\'ll get a "port already in use" error.</span>');
+        // Show the prominent warning banner
+        if (warningBanner) warningBanner.classList.remove('hidden');
+      } else {
+        results.push('<span style="color:var(--error);">&#10007;</span> Direct connection blocked &mdash; this is the <strong>CORS issue</strong>');
+        results.push('<span style="color:var(--text-muted);font-size:0.8rem;">Your browser blocked http://localhost:11434 because Ollama isn\'t configured to accept cross-origin requests</span>');
+      }
     } else if (e.name === 'TimeoutError' || e.name === 'AbortError') {
       results.push('<span style="color:var(--warning);">&#9888;</span> Connection timed out &mdash; Ollama may not be running');
     } else {
       results.push('<span style="color:var(--error);">&#10007;</span> Connection error: ' + (e.message || 'unknown'));
     }
   }
-  results.push('<span style="color:var(--text-muted);font-size:0.8rem;">Fix: Set OLLAMA_ORIGINS=* and restart Ollama (see commands below)</span>');
+  results.push('<span style="color:var(--text-muted);font-size:0.8rem;">Fix: Stop Ollama first, then set OLLAMA_ORIGINS=* and restart (see steps below)</span>');
   diagEl.innerHTML = results.join('<br>');
 }
 
