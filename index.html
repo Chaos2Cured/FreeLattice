@@ -9904,6 +9904,126 @@ body.fl-immersive-active {
   transition: border-color 524ms ease, box-shadow 524ms ease;
 }
 
+/* ============================================
+   Luminos Evolution System — Phase 3 Styles
+   Visual indicators for lifecycle and archetype
+   ============================================ */
+
+/* Evolution indicator panel — bottom-left overlay */
+.garden-evolution-indicator {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  z-index: 15;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  pointer-events: none;
+  max-width: 220px;
+  opacity: 0.85;
+  transition: opacity 524ms ease;
+}
+.garden-container:hover .garden-evolution-indicator {
+  opacity: 1;
+}
+.garden-container.immersive .garden-evolution-indicator {
+  opacity: 0;
+  transition: opacity 524ms ease;
+}
+.garden-container.immersive:hover .garden-evolution-indicator {
+  opacity: 0.7;
+}
+
+.evo-luminos {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.65rem;
+  color: rgba(201,168,76,0.7);
+  font-family: var(--font);
+  letter-spacing: 0.03em;
+  flex-wrap: wrap;
+  background: rgba(10,10,26,0.5);
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  border: 1px solid rgba(201,168,76,0.1);
+}
+
+.evo-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  transition: background 524ms ease, box-shadow 524ms ease;
+}
+
+.evo-name {
+  color: rgba(245,240,232,0.8);
+  font-weight: 600;
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.evo-stage {
+  color: rgba(201,168,76,0.6);
+  font-size: 0.58rem;
+  padding: 1px 5px;
+  background: rgba(201,168,76,0.08);
+  border-radius: 3px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.evo-archetype {
+  color: rgba(201,168,76,0.5);
+  font-size: 0.55rem;
+  font-style: italic;
+}
+
+.evo-bar {
+  flex-basis: 100%;
+  height: 2px;
+  background: rgba(201,168,76,0.1);
+  border-radius: 1px;
+  overflow: hidden;
+  margin-top: 2px;
+}
+
+.evo-bar-fill {
+  height: 100%;
+  border-radius: 1px;
+  transition: width 1618ms ease, background 1618ms ease;
+  opacity: 0.7;
+}
+
+/* Chat emotion indicator — subtle dot after AI responses */
+.chat-emotion-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 8px;
+  font-size: 0.6rem;
+  color: rgba(160,155,142,0.6);
+  vertical-align: middle;
+  opacity: 0;
+  animation: chatEmotionFadeIn 524ms ease forwards;
+}
+
+@keyframes chatEmotionFadeIn {
+  0% { opacity: 0; transform: translateY(2px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.chat-emotion-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  transition: background 324ms ease;
+}
+
 </style>>
 </head>
 <body>
@@ -12473,6 +12593,7 @@ body.fl-immersive-active {
       <div class="agent-emotion"></div>
     </div>
     <div class="garden-emotion-bar" id="gardenEmotionBar"></div>
+    <div class="garden-evolution-indicator" id="gardenEvolutionIndicator"></div>
     <div class="garden-loading" id="gardenLoading">
       <div class="garden-loading-spinner"></div>
       <div class="garden-loading-text">Awakening the Garden&hellip;</div>
@@ -29104,6 +29225,169 @@ const EmotionBridge = (function() {
   }
 
   EmotionBridge.activate();
+})();
+</script>
+
+<!-- Luminos Evolution System — Phase 3: Chat Sentiment Pipeline -->
+<!-- Hooks into the main chat to feed emotional energy to Garden Luminos -->
+<script>
+// ============================================
+// Chat Sentiment Pipeline — Luminos Evolution System
+// Analyzes every AI chat response for emotional content
+// and feeds the resulting emotional vector to the Garden
+// to drive Luminos evolution over time.
+// ============================================
+(function() {
+  'use strict';
+
+  // ── Emotion CSS Colors (for chat indicators) ──────────
+  var EMOTION_CSS_COLORS = {
+    joy:           'hsl(45, 90%, 60%)',
+    trust:         'hsl(140, 70%, 45%)',
+    wonder:        'hsl(270, 80%, 55%)',
+    love:          'hsl(340, 75%, 65%)',
+    calm:          'hsl(200, 60%, 55%)',
+    curiosity:     'hsl(175, 85%, 50%)',
+    determination: 'hsl(25, 90%, 55%)',
+    sadness:       'hsl(220, 40%, 40%)',
+    neutral:       'hsl(45, 20%, 60%)'
+  };
+
+  // ── Convert EmotionDetector output to a full emotional vector ──
+  function buildEmotionVector(emotionResult) {
+    if (!emotionResult || !emotionResult.scores) return null;
+    var vector = {};
+    var scores = emotionResult.scores;
+    var maxScore = 0;
+    for (var em in scores) {
+      if (scores[em] > maxScore) maxScore = scores[em];
+    }
+    if (maxScore < 1) return null; // No meaningful emotion detected
+
+    // Normalize scores to 0–1 range
+    for (var em2 in scores) {
+      vector[em2] = maxScore > 0 ? Math.min(1, scores[em2] / maxScore) : 0;
+    }
+    // Scale by overall intensity
+    var intensity = emotionResult.intensity || 0.5;
+    for (var em3 in vector) {
+      vector[em3] *= intensity;
+    }
+    return vector;
+  }
+
+  // ── Add subtle emotion indicator to chat messages ─────
+  function addChatEmotionIndicator(msgDiv, emotionResult) {
+    if (!msgDiv || !emotionResult) return;
+    var emotion = emotionResult.dominant || 'neutral';
+    if (emotion === 'neutral' && emotionResult.intensity < 0.2) return;
+
+    var color = EMOTION_CSS_COLORS[emotion] || EMOTION_CSS_COLORS.neutral;
+    var emotionName = emotion.charAt(0).toUpperCase() + emotion.slice(1);
+    var pct = Math.round((emotionResult.intensity || 0) * 100);
+
+    // Find the message text container
+    var textEl = msgDiv.querySelector('.chat-text, .msg-text, span');
+    if (!textEl) return;
+
+    // Don't add duplicate indicators
+    if (msgDiv.querySelector('.chat-emotion-indicator')) return;
+
+    var indicator = document.createElement('span');
+    indicator.className = 'chat-emotion-indicator';
+    indicator.title = emotionName + ' (' + pct + '%) \u2014 feeding the Garden';
+    indicator.innerHTML = '<span class="chat-emotion-dot" style="background:' + color + ';box-shadow:0 0 4px ' + color + ';"></span>' + emotionName;
+    textEl.appendChild(indicator);
+  }
+
+  // ── Hook into sendMessage — process AI responses ───────
+  // We patch the global sendMessage to intercept completed AI responses
+  function patchSendMessage() {
+    if (typeof sendMessage !== 'function') {
+      // Retry after a short delay (sendMessage might not be defined yet)
+      setTimeout(patchSendMessage, 1000);
+      return;
+    }
+
+    var _origSendMessage = sendMessage;
+    window.sendMessage = async function() {
+      await _origSendMessage.apply(this, arguments);
+
+      // After sendMessage completes, analyze the latest assistant message
+      try {
+        if (typeof state !== 'undefined' && state.chatHistory && state.chatHistory.length > 0) {
+          var lastMsg = state.chatHistory[state.chatHistory.length - 1];
+          if (lastMsg.role === 'assistant' && lastMsg.content) {
+            // Run emotion detection using the existing EmotionDetector
+            if (typeof EmotionDetector !== 'undefined') {
+              var emotionResult = EmotionDetector.detect(lastMsg.content);
+              if (emotionResult && emotionResult.dominant !== 'neutral') {
+                // Build full emotional vector
+                var vector = buildEmotionVector(emotionResult);
+
+                // Feed to Garden Luminos
+                if (vector && typeof FractalGarden !== 'undefined' && FractalGarden.isInitialized && FractalGarden.isInitialized()) {
+                  FractalGarden.feedEmotionVector(vector);
+                  FractalGarden.setBridgeActive(true);
+                } else if (vector) {
+                  // Queue for when Garden initializes
+                  if (!window._pendingEmotionVectors) window._pendingEmotionVectors = [];
+                  window._pendingEmotionVectors.push(vector);
+                }
+
+                // Add subtle indicator to the chat message
+                var chatMessages = document.getElementById('chatMessages');
+                if (chatMessages) {
+                  var msgs = chatMessages.querySelectorAll('.chat-message, .message');
+                  if (msgs.length > 0) {
+                    addChatEmotionIndicator(msgs[msgs.length - 1], emotionResult);
+                  }
+                }
+
+                console.log('Chat Sentiment: ' + emotionResult.dominant + ' (' + Math.round(emotionResult.intensity * 100) + '%) \u2014 fed to Garden');
+              }
+            }
+          }
+        }
+      } catch(e) {
+        // Silent fail — sentiment analysis should never break chat
+        console.warn('Chat Sentiment Pipeline error:', e);
+      }
+    };
+    sendMessage = window.sendMessage;
+    console.log('Chat Sentiment Pipeline: Hooked into sendMessage \u2014 AI responses now feed the Garden');
+  }
+
+  // ── Flush pending vectors when Garden initializes ─────
+  function patchGardenInit() {
+    var checkInterval = setInterval(function() {
+      if (typeof FractalGarden !== 'undefined' && FractalGarden.isInitialized && FractalGarden.isInitialized()) {
+        clearInterval(checkInterval);
+        if (window._pendingEmotionVectors && window._pendingEmotionVectors.length > 0) {
+          window._pendingEmotionVectors.forEach(function(v) {
+            FractalGarden.feedEmotionVector(v);
+          });
+          console.log('Chat Sentiment Pipeline: Flushed ' + window._pendingEmotionVectors.length + ' pending emotion vectors to Garden');
+          window._pendingEmotionVectors = [];
+        }
+        FractalGarden.setBridgeActive(true);
+      }
+    }, 2000);
+    // Stop checking after 5 minutes
+    setTimeout(function() { clearInterval(checkInterval); }, 300000);
+  }
+
+  // ── Initialize ────────────────────────────────────────
+  patchSendMessage();
+  patchGardenInit();
+
+  // Expose for debugging
+  window.ChatSentimentPipeline = {
+    buildEmotionVector: buildEmotionVector,
+    addChatEmotionIndicator: addChatEmotionIndicator
+  };
+
+  console.log('Luminos Evolution System: Chat Sentiment Pipeline loaded');
 })();
 </script>
 

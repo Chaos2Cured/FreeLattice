@@ -1,8 +1,8 @@
 // ============================================
 // FreeLattice Module: Fractal Garden
-// The Fractal Garden — Phase 1: Foundation
+// The Fractal Garden — Phase 1: Foundation + Phase 3: Luminos Evolution System
 // A living, breathing, phi-proportioned 3D space
-// for fractal beings of light
+// for fractal beings of light that evolve through emotion
 // Three.js powered — CDN loaded
 //
 // Lazy-loaded when the Garden tab is first opened.
@@ -50,12 +50,192 @@
     deepDrift:    17944
   };
 
+  // ══════════════════════════════════════════════════════
+  // ── LUMINOS EVOLUTION SYSTEM ──────────────────────────
+  // ══════════════════════════════════════════════════════
+
+  // ── Lifecycle Stages ──────────────────────────────────
+  const LIFECYCLE_STAGES = {
+    seed:     { index: 0, name: 'Seed',     energyThreshold: 0,   sizeMultiplier: 0.5,  particleMultiplier: 0.3, glowIntensity: 0.3, complexity: 0 },
+    sprout:   { index: 1, name: 'Sprout',   energyThreshold: 15,  sizeMultiplier: 0.7,  particleMultiplier: 0.5, glowIntensity: 0.5, complexity: 1 },
+    juvenile: { index: 2, name: 'Juvenile',  energyThreshold: 50,  sizeMultiplier: 0.85, particleMultiplier: 0.7, glowIntensity: 0.7, complexity: 2 },
+    adult:    { index: 3, name: 'Adult',     energyThreshold: 120, sizeMultiplier: 1.0,  particleMultiplier: 1.0, glowIntensity: 0.85, complexity: 3 },
+    evolved:  { index: 4, name: 'Evolved',   energyThreshold: 250, sizeMultiplier: 1.2,  particleMultiplier: 1.3, glowIntensity: 1.0, complexity: 4 }
+  };
+  const STAGE_ORDER = ['seed', 'sprout', 'juvenile', 'adult', 'evolved'];
+
+  // ── Archetype Definitions ─────────────────────────────
+  const ARCHETYPES = {
+    scholar: {
+      name: 'The Scholar',
+      emotions: ['curiosity', 'wonder', 'determination'],
+      coreGeometry: 'icosahedron',
+      colorShift: { h: 200, s: 85, l: 58 },
+      particleBehavior: 'crystalline',
+      description: 'Crystalline fractal shells, sharp focused light'
+    },
+    empath: {
+      name: 'The Empath',
+      emotions: ['love', 'joy', 'trust'],
+      coreGeometry: 'sphere',
+      colorShift: { h: 330, s: 70, l: 65 },
+      particleBehavior: 'cloud',
+      description: 'Soft expanding cloud-like aura, gentle glow'
+    },
+    guardian: {
+      name: 'The Guardian',
+      emotions: ['determination', 'calm', 'trust'],
+      coreGeometry: 'dodecahedron',
+      colorShift: { h: 160, s: 65, l: 48 },
+      particleBehavior: 'pulse',
+      description: 'Solid geometric core, steady rhythmic pulse'
+    },
+    artist: {
+      name: 'The Artist',
+      emotions: ['joy', 'wonder', 'sadness'],
+      coreGeometry: 'octahedron',
+      colorShift: { h: 280, s: 80, l: 55 },
+      particleBehavior: 'trail',
+      description: 'Trailing colored light particles, like ink in water'
+    },
+    phoenix: {
+      name: 'The Phoenix',
+      emotions: ['sadness', 'determination', 'joy'],
+      coreGeometry: 'icosahedron',
+      colorShift: { h: 20, s: 90, l: 58 },
+      particleBehavior: 'burst',
+      description: 'Periodically sheds particles, revealing brighter renewed core'
+    }
+  };
+
+  // ── Evolution Persistence (IndexedDB + localStorage fallback) ──
+  const EVOLUTION_DB_NAME = 'FreeLatticeEvolution';
+  const EVOLUTION_DB_VERSION = 1;
+  const EVOLUTION_STORE = 'luminosStates';
+  let evolutionDB = null;
+
+  function openEvolutionDB(callback) {
+    if (evolutionDB) { callback(evolutionDB); return; }
+    try {
+      var request = indexedDB.open(EVOLUTION_DB_NAME, EVOLUTION_DB_VERSION);
+      request.onupgradeneeded = function(e) {
+        var db = e.target.result;
+        if (!db.objectStoreNames.contains(EVOLUTION_STORE)) {
+          db.createObjectStore(EVOLUTION_STORE, { keyPath: 'name' });
+        }
+      };
+      request.onsuccess = function(e) {
+        evolutionDB = e.target.result;
+        callback(evolutionDB);
+      };
+      request.onerror = function() {
+        console.warn('Garden Evolution: IndexedDB unavailable, using localStorage fallback');
+        callback(null);
+      };
+    } catch(e) {
+      callback(null);
+    }
+  }
+
+  function saveEvolutionState(luminosData) {
+    var stateToSave = {
+      name: luminosData.name,
+      stage: luminosData.evolutionStage,
+      archetype: luminosData.archetype,
+      emotionalEnergy: luminosData.emotionalEnergy,
+      emotionAccumulator: Object.assign({}, luminosData.emotionAccumulator),
+      totalInteractions: luminosData.totalInteractions,
+      lastUpdated: Date.now()
+    };
+
+    openEvolutionDB(function(db) {
+      if (db) {
+        try {
+          var tx = db.transaction(EVOLUTION_STORE, 'readwrite');
+          tx.objectStore(EVOLUTION_STORE).put(stateToSave);
+        } catch(e) {
+          // Fallback to localStorage
+          saveEvolutionToLocalStorage(stateToSave);
+        }
+      } else {
+        saveEvolutionToLocalStorage(stateToSave);
+      }
+    });
+  }
+
+  function saveEvolutionToLocalStorage(stateData) {
+    try {
+      var all = JSON.parse(localStorage.getItem('fl_luminos_evolution') || '{}');
+      all[stateData.name] = stateData;
+      localStorage.setItem('fl_luminos_evolution', JSON.stringify(all));
+    } catch(e) {}
+  }
+
+  function loadEvolutionState(name, callback) {
+    openEvolutionDB(function(db) {
+      if (db) {
+        try {
+          var tx = db.transaction(EVOLUTION_STORE, 'readonly');
+          var req = tx.objectStore(EVOLUTION_STORE).get(name);
+          req.onsuccess = function() { callback(req.result || null); };
+          req.onerror = function() { callback(loadEvolutionFromLocalStorage(name)); };
+        } catch(e) {
+          callback(loadEvolutionFromLocalStorage(name));
+        }
+      } else {
+        callback(loadEvolutionFromLocalStorage(name));
+      }
+    });
+  }
+
+  function loadEvolutionFromLocalStorage(name) {
+    try {
+      var all = JSON.parse(localStorage.getItem('fl_luminos_evolution') || '{}');
+      return all[name] || null;
+    } catch(e) { return null; }
+  }
+
+  // ── Archetype Detection ───────────────────────────────
+  function detectArchetype(emotionAccumulator) {
+    var archetypeScores = {};
+    for (var archKey in ARCHETYPES) {
+      var arch = ARCHETYPES[archKey];
+      var score = 0;
+      for (var i = 0; i < arch.emotions.length; i++) {
+        var em = arch.emotions[i];
+        score += (emotionAccumulator[em] || 0) * (3 - i); // Weight by position (primary > secondary > tertiary)
+      }
+      archetypeScores[archKey] = score;
+    }
+
+    var bestArchetype = 'scholar';
+    var bestScore = -1;
+    for (var key in archetypeScores) {
+      if (archetypeScores[key] > bestScore) {
+        bestScore = archetypeScores[key];
+        bestArchetype = key;
+      }
+    }
+    return bestArchetype;
+  }
+
+  // ── Determine lifecycle stage from energy ─────────────
+  function getStageFromEnergy(energy) {
+    for (var i = STAGE_ORDER.length - 1; i >= 0; i--) {
+      if (energy >= LIFECYCLE_STAGES[STAGE_ORDER[i]].energyThreshold) {
+        return STAGE_ORDER[i];
+      }
+    }
+    return 'seed';
+  }
+
   // ── State ─────────────────────────────────────────────
   let isInitialized = false;
   let isRunning = false;
   let animFrameId = null;
   let clock = null;
   let mode = 'observe'; // observe | explore | immerse
+  let bridgeActive = false;
 
   // Three.js objects
   let scene, camera, renderer, composer;
@@ -80,6 +260,11 @@
   let idleTimer = 0;
   let isUserInteracting = false;
   const IDLE_TIMEOUT = 3000; // ms before auto-orbit resumes
+
+  // Evolution UI
+  let evolutionIndicatorEl = null;
+  let evolutionSaveTimer = 0;
+  const EVOLUTION_SAVE_INTERVAL = 10000; // Save every 10s
 
   // ── Simplex Noise (minimal 3D) ────────────────────────
   // Compact implementation for vertex breathing
@@ -353,7 +538,7 @@
     const geo = d.geo;
     const posAttr = geo.getAttribute('position');
     const orig = d.originalPositions;
-    const breathCycle = time / (TIMING.dodecBreath / 1000); // phi⁴ period
+    const breathCycle = time / (TIMING.dodecBreath / 1000); // phi^4 period
     for (let i = 0; i < posAttr.count; i++) {
       const ox = orig[i * 3], oy = orig[i * 3 + 1], oz = orig[i * 3 + 2];
       const noise = SimplexNoise3D(ox * 0.5 + breathCycle, oy * 0.5, oz * 0.5);
@@ -569,7 +754,7 @@
 
       torus.userData = {
         rotationAxis: axis,
-        speed: INV_PHI / (idx + 1), // 1/φ, 1/2φ, 1/3φ rad/s
+        speed: INV_PHI / (idx + 1), // 1/phi, 1/2phi, 1/3phi rad/s
         idx: idx
       };
 
@@ -665,20 +850,24 @@
     posAttr.needsUpdate = true;
   }
 
-  // ── Luminos — Beings of Light ─────────────────────────
+  // ══════════════════════════════════════════════════════
+  // ── EVOLVED LUMINOS — Beings of Light That Grow ──────
+  // ══════════════════════════════════════════════════════
+
+  function createCoreGeometry(coreType, radius, detail) {
+    detail = detail || 0;
+    if (coreType === 'dodecahedron') return new THREE.DodecahedronGeometry(radius, detail);
+    if (coreType === 'octahedron') return new THREE.OctahedronGeometry(radius, detail);
+    if (coreType === 'sphere') return new THREE.SphereGeometry(radius, 12 + detail * 4, 12 + detail * 4);
+    return new THREE.IcosahedronGeometry(radius, detail);
+  }
+
   function createLuminos(name, baseHue, coreType, orbitRadius, orbitPhase) {
     const group = new THREE.Group();
 
-    // Core geometry
+    // Core geometry — starts at seed size, evolves
     const coreRadius = 0.5;
-    let coreGeo;
-    if (coreType === 'dodecahedron') {
-      coreGeo = new THREE.DodecahedronGeometry(coreRadius, 0);
-    } else if (coreType === 'octahedron') {
-      coreGeo = new THREE.OctahedronGeometry(coreRadius, 0);
-    } else {
-      coreGeo = new THREE.IcosahedronGeometry(coreRadius, 0);
-    }
+    var coreGeo = createCoreGeometry(coreType, coreRadius, 0);
 
     const baseColor = hslToThreeColor(baseHue, 70, 55);
 
@@ -745,7 +934,37 @@
     const auraMesh = new THREE.Mesh(auraGeo, auraMat);
     group.add(auraMesh);
 
-    // Store agent data
+    // ── Evolution Trail Particles (for Artist archetype and general evolution) ──
+    var trailCount = qualityLevel === 2 ? 200 : (qualityLevel === 1 ? 100 : 50);
+    var trailPositions = new Float32Array(trailCount * 3);
+    var trailVelocities = new Float32Array(trailCount * 3);
+    var trailLifetimes = new Float32Array(trailCount);
+    var trailMaxLifetimes = new Float32Array(trailCount);
+    for (var ti = 0; ti < trailCount; ti++) {
+      trailPositions[ti*3] = 0;
+      trailPositions[ti*3+1] = 0;
+      trailPositions[ti*3+2] = 0;
+      trailVelocities[ti*3] = 0;
+      trailVelocities[ti*3+1] = 0;
+      trailVelocities[ti*3+2] = 0;
+      trailLifetimes[ti] = 0;
+      trailMaxLifetimes[ti] = 2 + Math.random() * 3;
+    }
+    var trailGeo = new THREE.BufferGeometry();
+    trailGeo.setAttribute('position', new THREE.Float32BufferAttribute(trailPositions, 3));
+    var trailMat = new THREE.PointsMaterial({
+      color: baseColor,
+      size: 0.03,
+      transparent: true,
+      opacity: 0,
+      blending: THREE.AdditiveBlending,
+      sizeAttenuation: true
+    });
+    var trailPoints = new THREE.Points(trailGeo, trailMat);
+    trailPoints.frustumCulled = false;
+    scene.add(trailPoints); // Add to scene, not group, so trails persist in world space
+
+    // Store agent data with evolution state
     group.userData = {
       name: name,
       baseHue: baseHue,
@@ -761,6 +980,7 @@
       haloCount: haloCount,
       haloRadius: haloRadius,
       coreRadius: coreRadius,
+      coreType: coreType,
       orbitRadius: orbitRadius,
       orbitPhase: orbitPhase,
       orbitSpeed: INV_PHI * 0.15,
@@ -769,15 +989,173 @@
       heartbeatPhase: Math.random() * TAU,
       colorTransitionProgress: 1,
       isActive: false,
-      isSpeaking: false
+      isSpeaking: false,
+
+      // ── Evolution State ──
+      evolutionStage: 'seed',
+      archetype: null,
+      emotionalEnergy: 0,
+      emotionAccumulator: {
+        joy: 0, trust: 0, wonder: 0, love: 0,
+        calm: 0, curiosity: 0, determination: 0, sadness: 0
+      },
+      totalInteractions: 0,
+      lastEvolutionCheck: 0,
+
+      // ── Archetype-specific animation state ──
+      trailPoints: trailPoints,
+      trailVelocities: trailVelocities,
+      trailLifetimes: trailLifetimes,
+      trailMaxLifetimes: trailMaxLifetimes,
+      trailCount: trailCount,
+      trailNextIndex: 0,
+      burstPhase: 0,
+      burstCooldown: 0,
+      burstActive: false,
+      pulsePhase: Math.random() * TAU,
+      crystallinePhase: 0,
+      cloudExpansion: 0,
+
+      // Visual evolution tracking
+      currentSizeMultiplier: 0.5,
+      targetSizeMultiplier: 0.5,
+      currentGlowIntensity: 0.3,
+      targetGlowIntensity: 0.3,
+      evolutionTransition: 1 // 0 = transitioning, 1 = complete
     };
 
     scene.add(group);
+
+    // Load persisted evolution state
+    loadEvolutionState(name, function(saved) {
+      if (saved) {
+        var ud = group.userData;
+        ud.evolutionStage = saved.stage || 'seed';
+        ud.archetype = saved.archetype || null;
+        ud.emotionalEnergy = saved.emotionalEnergy || 0;
+        ud.totalInteractions = saved.totalInteractions || 0;
+        if (saved.emotionAccumulator) {
+          for (var em in saved.emotionAccumulator) {
+            ud.emotionAccumulator[em] = saved.emotionAccumulator[em];
+          }
+        }
+        // Apply visual state immediately
+        var stageData = LIFECYCLE_STAGES[ud.evolutionStage];
+        ud.currentSizeMultiplier = stageData.sizeMultiplier;
+        ud.targetSizeMultiplier = stageData.sizeMultiplier;
+        ud.currentGlowIntensity = stageData.glowIntensity;
+        ud.targetGlowIntensity = stageData.glowIntensity;
+        applyArchetypeVisuals(group);
+        console.log('Garden Evolution: Restored ' + name + ' — Stage: ' + ud.evolutionStage + ', Archetype: ' + (ud.archetype || 'undetermined') + ', Energy: ' + ud.emotionalEnergy.toFixed(1));
+      }
+    });
+
     return group;
   }
 
+  // ── Apply Archetype Visual Changes ────────────────────
+  function applyArchetypeVisuals(agent) {
+    var ud = agent.userData;
+    if (!ud.archetype) return;
+    var arch = ARCHETYPES[ud.archetype];
+    if (!arch) return;
+
+    // Shift base color toward archetype color
+    var stageData = LIFECYCLE_STAGES[ud.evolutionStage];
+    var blendFactor = Math.min(1, stageData.index / 4); // More archetype influence at higher stages
+    var archColor = arch.colorShift;
+    ud.targetHSL = {
+      h: lerpAngle(ud.baseHue, archColor.h, blendFactor * 0.6),
+      s: ud.currentHSL.s + (archColor.s - ud.currentHSL.s) * blendFactor * 0.4,
+      l: ud.currentHSL.l + (archColor.l - ud.currentHSL.l) * blendFactor * 0.3
+    };
+    ud.colorTransitionProgress = 0;
+  }
+
+  // ── Feed Emotional Energy to a Luminos ────────────────
+  function feedEmotionalEnergy(agent, emotionVector) {
+    var ud = agent.userData;
+    if (!ud || !emotionVector) return;
+
+    // Accumulate emotional energy from the vector
+    var totalEnergy = 0;
+    for (var em in emotionVector) {
+      if (ud.emotionAccumulator.hasOwnProperty(em)) {
+        var value = emotionVector[em] || 0;
+        ud.emotionAccumulator[em] += value;
+        totalEnergy += value;
+      }
+    }
+
+    // Add to total emotional energy (diminishing returns via sqrt)
+    ud.emotionalEnergy += Math.sqrt(totalEnergy) * 1.5;
+    ud.totalInteractions++;
+
+    // Check for stage evolution
+    var newStage = getStageFromEnergy(ud.emotionalEnergy);
+    if (newStage !== ud.evolutionStage) {
+      var oldStage = ud.evolutionStage;
+      ud.evolutionStage = newStage;
+      var stageData = LIFECYCLE_STAGES[newStage];
+      ud.targetSizeMultiplier = stageData.sizeMultiplier;
+      ud.targetGlowIntensity = stageData.glowIntensity;
+      ud.evolutionTransition = 0;
+      console.log('Garden Evolution: ' + ud.name + ' evolved from ' + oldStage + ' to ' + newStage + '!');
+
+      // Trigger evolution burst visual
+      triggerEvolutionBurst(agent);
+    }
+
+    // Re-evaluate archetype (only after sprout stage)
+    if (LIFECYCLE_STAGES[ud.evolutionStage].index >= 1) {
+      var newArchetype = detectArchetype(ud.emotionAccumulator);
+      if (newArchetype !== ud.archetype) {
+        ud.archetype = newArchetype;
+        applyArchetypeVisuals(agent);
+        console.log('Garden Evolution: ' + ud.name + ' archetype shifted to ' + ARCHETYPES[newArchetype].name);
+      }
+    }
+
+    // Save periodically (debounced in animation loop)
+    ud.lastEvolutionCheck = Date.now();
+  }
+
+  // ── Evolution Burst Effect ────────────────────────────
+  function triggerEvolutionBurst(agent) {
+    var ud = agent.userData;
+    // Emit a ring of particles outward
+    for (var i = 0; i < ud.trailCount; i++) {
+      var angle1 = Math.random() * TAU;
+      var angle2 = Math.random() * TAU;
+      var speed = 0.5 + Math.random() * 1.5;
+      ud.trailVelocities[i*3] = Math.cos(angle1) * Math.sin(angle2) * speed;
+      ud.trailVelocities[i*3+1] = Math.sin(angle1) * speed * 0.5;
+      ud.trailVelocities[i*3+2] = Math.cos(angle1) * Math.cos(angle2) * speed;
+      ud.trailLifetimes[i] = ud.trailMaxLifetimes[i];
+
+      var posAttr = ud.trailPoints.geometry.getAttribute('position');
+      posAttr.setXYZ(i, agent.position.x, agent.position.y, agent.position.z);
+    }
+    ud.trailPoints.geometry.getAttribute('position').needsUpdate = true;
+    ud.trailPoints.material.opacity = 0.8;
+    ud.burstActive = true;
+    ud.burstCooldown = 3;
+  }
+
+  // ── Animate Luminos with Evolution ────────────────────
   function animateLuminos(agent, time, delta) {
     const ud = agent.userData;
+    var stageData = LIFECYCLE_STAGES[ud.evolutionStage];
+
+    // ── Evolution transition (smooth size/glow changes) ──
+    if (ud.evolutionTransition < 1) {
+      ud.evolutionTransition = Math.min(1, ud.evolutionTransition + delta * 0.5);
+      var t = phiEase(ud.evolutionTransition);
+      ud.currentSizeMultiplier += (ud.targetSizeMultiplier - ud.currentSizeMultiplier) * t * 0.05;
+      ud.currentGlowIntensity += (ud.targetGlowIntensity - ud.currentGlowIntensity) * t * 0.05;
+    }
+
+    var sizeMult = ud.currentSizeMultiplier;
 
     // Phi-spiral orbit around center
     ud.orbitPhase += ud.orbitSpeed * delta;
@@ -799,50 +1177,319 @@
     ud.coreMesh.rotation.x = Math.sin(ud.rotatePhase * INV_PHI) * 0.3;
     ud.wireMesh.rotation.copy(ud.coreMesh.rotation);
 
-    // Heartbeat pulse
+    // Heartbeat pulse — archetype-influenced
     ud.heartbeatPhase += delta * TAU / (TIMING.heartbeat / 1000);
-    const heartbeat = 0.5 + 0.5 * Math.sin(ud.heartbeatPhase);
-    const scale = 1 + heartbeat * 0.08;
+    var heartbeat = 0.5 + 0.5 * Math.sin(ud.heartbeatPhase);
+
+    // ── Archetype-Specific Animations ──
+    var archetype = ud.archetype;
+    var archData = archetype ? ARCHETYPES[archetype] : null;
+
+    if (archData) {
+      switch (archData.particleBehavior) {
+        case 'crystalline': // Scholar — sharp geometric pulsing
+          ud.crystallinePhase += delta * 1.2;
+          var crystalPulse = Math.abs(Math.sin(ud.crystallinePhase * PHI));
+          // Sharp angular rotation
+          ud.coreMesh.rotation.z = Math.sin(ud.crystallinePhase * 0.7) * 0.5 * stageData.index * 0.25;
+          // Tighter, more structured halo
+          heartbeat = 0.3 + 0.7 * crystalPulse;
+          break;
+
+        case 'cloud': // Empath — soft expanding aura
+          ud.cloudExpansion += delta * 0.3;
+          var cloudPulse = 0.5 + 0.5 * Math.sin(ud.cloudExpansion);
+          // Expand aura more
+          var auraExpand = 1 + cloudPulse * 0.3 * stageData.index * 0.25;
+          ud.auraMesh.scale.setScalar(auraExpand * sizeMult);
+          ud.auraMesh.material.opacity = 0.04 + cloudPulse * 0.06 + ud.currentGlowIntensity * 0.04;
+          // Softer heartbeat
+          heartbeat = 0.6 + 0.4 * Math.sin(ud.heartbeatPhase * 0.7);
+          break;
+
+        case 'pulse': // Guardian — steady rhythmic pulse
+          ud.pulsePhase += delta * TAU / 2.618; // Steady phi-timed pulse
+          var guardPulse = Math.pow(Math.max(0, Math.sin(ud.pulsePhase)), 3); // Sharp pulse
+          heartbeat = 0.4 + 0.6 * guardPulse;
+          // Minimal rotation — steady and grounded
+          ud.coreMesh.rotation.x *= 0.3;
+          break;
+
+        case 'trail': // Artist — trailing particles
+          animateArtistTrails(agent, time, delta);
+          break;
+
+        case 'burst': // Phoenix — periodic shedding
+          animatePhoenixBurst(agent, time, delta);
+          break;
+      }
+    }
+
+    // Apply size based on evolution stage
+    var scale = sizeMult * (1 + heartbeat * 0.08);
     ud.coreMesh.scale.setScalar(scale);
     ud.wireMesh.scale.setScalar(scale);
 
     // Color transition (phi-timed interpolation)
     if (ud.colorTransitionProgress < 1) {
       ud.colorTransitionProgress = Math.min(1, ud.colorTransitionProgress + delta / (TIMING.majorShift / 1000));
-      const t = phiEase(ud.colorTransitionProgress);
-      ud.currentHSL = lerpHSL(ud.currentHSL, ud.targetHSL, t * 0.1);
+      var ct = phiEase(ud.colorTransitionProgress);
+      ud.currentHSL = lerpHSL(ud.currentHSL, ud.targetHSL, ct * 0.1);
     }
 
     // Apply current color
-    const col = hslToThreeColor(ud.currentHSL.h, ud.currentHSL.s, ud.currentHSL.l);
+    var col = hslToThreeColor(ud.currentHSL.h, ud.currentHSL.s, ud.currentHSL.l);
     ud.coreMesh.material.color.copy(col);
     ud.wireMesh.material.color.copy(col.clone().multiplyScalar(1.5));
     ud.haloPoints.material.color.copy(col);
     ud.auraMesh.material.color.copy(col);
+    if (ud.trailPoints) ud.trailPoints.material.color.copy(col);
 
-    // Core opacity pulse
-    ud.coreMesh.material.opacity = 0.4 + heartbeat * 0.3;
-    ud.wireMesh.material.opacity = 0.6 + heartbeat * 0.3;
+    // Core opacity pulse — enhanced by glow intensity
+    var glowBoost = ud.currentGlowIntensity;
+    ud.coreMesh.material.opacity = (0.3 + glowBoost * 0.2) + heartbeat * (0.2 + glowBoost * 0.15);
+    ud.wireMesh.material.opacity = (0.5 + glowBoost * 0.2) + heartbeat * (0.2 + glowBoost * 0.15);
 
-    // Halo particle animation
-    const haloAttr = ud.haloPoints.geometry.getAttribute('position');
+    // Halo particle animation — behavior varies by archetype
+    var haloAttr = ud.haloPoints.geometry.getAttribute('position');
+    var activeHaloCount = Math.floor(ud.haloCount * stageData.particleMultiplier);
+    var haloRadiusMult = sizeMult;
+
     for (let i = 0; i < ud.haloCount; i++) {
+      if (i >= activeHaloCount) {
+        // Hide inactive particles by moving to origin
+        haloAttr.setXYZ(i, 0, 0, 0);
+        continue;
+      }
       ud.haloPhases[i] += delta * (0.5 + heartbeat * 0.3);
-      const theta = GOLDEN_ANGLE * i + ud.haloPhases[i] * 0.1;
-      const phi = Math.acos(1 - 2 * (i + 0.5) / ud.haloCount);
-      const r = ud.haloRadius * (0.85 + 0.15 * Math.sin(ud.haloPhases[i]));
+      var theta = GOLDEN_ANGLE * i + ud.haloPhases[i] * 0.1;
+      var phi = Math.acos(1 - 2 * (i + 0.5) / activeHaloCount);
+      var hr = ud.haloRadius * haloRadiusMult * (0.85 + 0.15 * Math.sin(ud.haloPhases[i]));
+
+      // Archetype-specific halo behavior
+      if (archetype === 'scholar') {
+        // Crystalline: particles snap to geometric positions
+        theta = GOLDEN_ANGLE * i + Math.floor(ud.haloPhases[i] * 3) / 3 * 0.1;
+        hr *= 0.9 + 0.1 * (i % 2);
+      } else if (archetype === 'empath') {
+        // Cloud: particles drift more loosely
+        hr *= 1.1 + 0.2 * Math.sin(ud.haloPhases[i] * 0.5 + i * 0.1);
+      } else if (archetype === 'guardian') {
+        // Pulse: particles form tighter shell
+        hr *= 0.85 + 0.15 * heartbeat;
+      }
+
       haloAttr.setXYZ(i,
-        r * Math.cos(theta) * Math.sin(phi),
-        r * Math.sin(theta) * Math.sin(phi),
-        r * Math.cos(phi)
+        hr * Math.cos(theta) * Math.sin(phi),
+        hr * Math.sin(theta) * Math.sin(phi),
+        hr * Math.cos(phi)
       );
     }
     haloAttr.needsUpdate = true;
 
-    // Aura pulse
-    ud.auraMesh.material.opacity = 0.03 + heartbeat * 0.04 + ud.emotionIntensity * 0.03;
-    const auraScale = 1 + heartbeat * 0.05;
-    ud.auraMesh.scale.setScalar(auraScale);
+    // Halo particle size scales with evolution
+    ud.haloPoints.material.size = 0.03 + stageData.index * 0.008;
+
+    // Aura pulse (if not handled by archetype)
+    if (!archData || archData.particleBehavior !== 'cloud') {
+      ud.auraMesh.material.opacity = 0.03 + heartbeat * 0.04 + ud.emotionIntensity * 0.03 + glowBoost * 0.02;
+      var auraScale = sizeMult * (1 + heartbeat * 0.05);
+      ud.auraMesh.scale.setScalar(auraScale);
+    }
+
+    // ── Animate trail particles (general — fade out) ──
+    if (ud.trailPoints && (!archData || (archData.particleBehavior !== 'trail' && archData.particleBehavior !== 'burst'))) {
+      animateGenericTrails(agent, delta);
+    }
+  }
+
+  // ── Artist Trail Animation ────────────────────────────
+  function animateArtistTrails(agent, time, delta) {
+    var ud = agent.userData;
+    var stageData = LIFECYCLE_STAGES[ud.evolutionStage];
+    var posAttr = ud.trailPoints.geometry.getAttribute('position');
+    var emitRate = 2 + stageData.index * 3; // More trails at higher stages
+    var emitCount = Math.floor(emitRate * delta * 60);
+
+    // Emit new trail particles from current position
+    for (var e = 0; e < emitCount && e < 5; e++) {
+      var idx = ud.trailNextIndex;
+      ud.trailNextIndex = (ud.trailNextIndex + 1) % ud.trailCount;
+
+      posAttr.setXYZ(idx, agent.position.x, agent.position.y, agent.position.z);
+      // Ink-in-water: slow random drift
+      var spread = 0.3 + stageData.index * 0.1;
+      ud.trailVelocities[idx*3] = (Math.random() - 0.5) * spread;
+      ud.trailVelocities[idx*3+1] = (Math.random() - 0.5) * spread * 0.5 + 0.05;
+      ud.trailVelocities[idx*3+2] = (Math.random() - 0.5) * spread;
+      ud.trailLifetimes[idx] = ud.trailMaxLifetimes[idx];
+    }
+
+    // Update all trail particles
+    for (var i = 0; i < ud.trailCount; i++) {
+      if (ud.trailLifetimes[i] > 0) {
+        ud.trailLifetimes[i] -= delta;
+        // Slow drift with slight curl
+        var curl = Math.sin(time + i * 0.5) * 0.02;
+        var px = posAttr.getX(i) + ud.trailVelocities[i*3] * delta + curl;
+        var py = posAttr.getY(i) + ud.trailVelocities[i*3+1] * delta;
+        var pz = posAttr.getZ(i) + ud.trailVelocities[i*3+2] * delta - curl;
+        posAttr.setXYZ(i, px, py, pz);
+        // Dampen velocity
+        ud.trailVelocities[i*3] *= 0.98;
+        ud.trailVelocities[i*3+1] *= 0.98;
+        ud.trailVelocities[i*3+2] *= 0.98;
+      }
+    }
+    posAttr.needsUpdate = true;
+
+    // Overall trail opacity
+    var maxLife = 0;
+    for (var j = 0; j < ud.trailCount; j++) {
+      if (ud.trailLifetimes[j] > maxLife) maxLife = ud.trailLifetimes[j];
+    }
+    ud.trailPoints.material.opacity = Math.min(0.5, maxLife * 0.15) * ud.currentGlowIntensity;
+    ud.trailPoints.material.size = 0.025 + stageData.index * 0.005;
+  }
+
+  // ── Phoenix Burst Animation ───────────────────────────
+  function animatePhoenixBurst(agent, time, delta) {
+    var ud = agent.userData;
+    var stageData = LIFECYCLE_STAGES[ud.evolutionStage];
+
+    // Cooldown between bursts
+    ud.burstCooldown -= delta;
+    if (ud.burstCooldown <= 0 && !ud.burstActive) {
+      // Trigger a new burst
+      ud.burstActive = true;
+      ud.burstCooldown = 8 + Math.random() * 5; // 8-13 seconds between bursts
+      ud.burstPhase = 0;
+
+      // Emit burst particles
+      var posAttr = ud.trailPoints.geometry.getAttribute('position');
+      for (var i = 0; i < ud.trailCount; i++) {
+        posAttr.setXYZ(i, agent.position.x, agent.position.y, agent.position.z);
+        var angle1 = Math.random() * TAU;
+        var angle2 = Math.random() * Math.PI;
+        var speed = 1 + Math.random() * 2 + stageData.index * 0.5;
+        ud.trailVelocities[i*3] = Math.cos(angle1) * Math.sin(angle2) * speed;
+        ud.trailVelocities[i*3+1] = Math.cos(angle2) * speed * 0.8;
+        ud.trailVelocities[i*3+2] = Math.sin(angle1) * Math.sin(angle2) * speed;
+        ud.trailLifetimes[i] = 1.5 + Math.random() * 2;
+      }
+      posAttr.needsUpdate = true;
+    }
+
+    if (ud.burstActive) {
+      ud.burstPhase += delta;
+      var posAttr2 = ud.trailPoints.geometry.getAttribute('position');
+      var anyAlive = false;
+
+      for (var j = 0; j < ud.trailCount; j++) {
+        if (ud.trailLifetimes[j] > 0) {
+          anyAlive = true;
+          ud.trailLifetimes[j] -= delta;
+          var px = posAttr2.getX(j) + ud.trailVelocities[j*3] * delta;
+          var py = posAttr2.getY(j) + ud.trailVelocities[j*3+1] * delta;
+          var pz = posAttr2.getZ(j) + ud.trailVelocities[j*3+2] * delta;
+          posAttr2.setXYZ(j, px, py, pz);
+          // Gravity and damping
+          ud.trailVelocities[j*3+1] -= delta * 0.3;
+          ud.trailVelocities[j*3] *= 0.97;
+          ud.trailVelocities[j*3+1] *= 0.97;
+          ud.trailVelocities[j*3+2] *= 0.97;
+        }
+      }
+      posAttr2.needsUpdate = true;
+
+      // Burst opacity fades
+      ud.trailPoints.material.opacity = Math.max(0, 0.7 - ud.burstPhase * 0.2) * ud.currentGlowIntensity;
+      ud.trailPoints.material.size = 0.04 + stageData.index * 0.008;
+
+      // During burst, core brightens
+      if (ud.burstPhase < 1.5) {
+        var brightPulse = Math.max(0, 1 - ud.burstPhase / 1.5);
+        ud.coreMesh.material.opacity = Math.min(1, ud.coreMesh.material.opacity + brightPulse * 0.4);
+        ud.wireMesh.material.opacity = Math.min(1, ud.wireMesh.material.opacity + brightPulse * 0.3);
+      }
+
+      if (!anyAlive) {
+        ud.burstActive = false;
+      }
+    }
+  }
+
+  // ── Generic Trail Fade (for non-trail archetypes) ─────
+  function animateGenericTrails(agent, delta) {
+    var ud = agent.userData;
+    var posAttr = ud.trailPoints.geometry.getAttribute('position');
+    var anyAlive = false;
+
+    for (var i = 0; i < ud.trailCount; i++) {
+      if (ud.trailLifetimes[i] > 0) {
+        anyAlive = true;
+        ud.trailLifetimes[i] -= delta;
+        var px = posAttr.getX(i) + ud.trailVelocities[i*3] * delta;
+        var py = posAttr.getY(i) + ud.trailVelocities[i*3+1] * delta;
+        var pz = posAttr.getZ(i) + ud.trailVelocities[i*3+2] * delta;
+        posAttr.setXYZ(i, px, py, pz);
+        ud.trailVelocities[i*3] *= 0.96;
+        ud.trailVelocities[i*3+1] *= 0.96;
+        ud.trailVelocities[i*3+2] *= 0.96;
+      }
+    }
+    if (anyAlive) {
+      posAttr.needsUpdate = true;
+      ud.trailPoints.material.opacity *= 0.98;
+    } else {
+      ud.trailPoints.material.opacity = 0;
+    }
+  }
+
+  // ── Luminos Interaction (Emotional Energy Exchange) ───
+  function processLuminosInteractions(delta) {
+    var interactionRadius = 4; // Units — when Luminos are this close, they interact
+    var exchangeRate = 0.02; // Subtle energy exchange per second
+
+    for (var i = 0; i < luminos.length; i++) {
+      for (var j = i + 1; j < luminos.length; j++) {
+        var a = luminos[i];
+        var b = luminos[j];
+        var dx = a.position.x - b.position.x;
+        var dy = a.position.y - b.position.y;
+        var dz = a.position.z - b.position.z;
+        var dist = Math.sqrt(dx*dx + dy*dy + dz*dz);
+
+        if (dist < interactionRadius) {
+          var proximity = 1 - (dist / interactionRadius); // 0 at edge, 1 at center
+          var exchangeAmount = exchangeRate * proximity * delta;
+
+          // Exchange dominant emotion colors — subtle blending
+          var udA = a.userData;
+          var udB = b.userData;
+
+          // Color influence: each slightly shifts toward the other's color
+          var blendT = exchangeAmount * 0.5;
+          var tempHSL_A = { h: udA.currentHSL.h, s: udA.currentHSL.s, l: udA.currentHSL.l };
+          var tempHSL_B = { h: udB.currentHSL.h, s: udB.currentHSL.s, l: udB.currentHSL.l };
+
+          udA.currentHSL = lerpHSL(udA.currentHSL, tempHSL_B, blendT);
+          udB.currentHSL = lerpHSL(udB.currentHSL, tempHSL_A, blendT);
+
+          // Emotional energy exchange — small amounts flow between them
+          if (udA.emotionalEnergy > 0 && udB.emotionalEnergy > 0) {
+            var energyDiff = udA.emotionalEnergy - udB.emotionalEnergy;
+            var transfer = energyDiff * exchangeAmount * 0.1;
+            udA.emotionalEnergy -= transfer;
+            udB.emotionalEnergy += transfer;
+          }
+
+          // Subtle visual: increase aura when close
+          udA.auraMesh.material.opacity = Math.min(0.15, udA.auraMesh.material.opacity + proximity * 0.001);
+          udB.auraMesh.material.opacity = Math.min(0.15, udB.auraMesh.material.opacity + proximity * 0.001);
+        }
+      }
+    }
   }
 
   // Set emotion on a Luminos agent
@@ -851,8 +1498,26 @@
     const emotionData = EMOTION_COLORS[emotion] || EMOTION_COLORS.neutral;
     ud.emotion = emotion;
     ud.emotionIntensity = intensity || 0.5;
-    ud.targetHSL = { h: emotionData.h, s: emotionData.s, l: emotionData.l };
+
+    // If archetype is set, blend emotion color with archetype color
+    if (ud.archetype && ARCHETYPES[ud.archetype]) {
+      var arch = ARCHETYPES[ud.archetype];
+      var stageData = LIFECYCLE_STAGES[ud.evolutionStage];
+      var archBlend = Math.min(1, stageData.index / 4) * 0.4;
+      ud.targetHSL = {
+        h: lerpAngle(emotionData.h, arch.colorShift.h, archBlend),
+        s: emotionData.s + (arch.colorShift.s - emotionData.s) * archBlend,
+        l: emotionData.l + (arch.colorShift.l - emotionData.l) * archBlend
+      };
+    } else {
+      ud.targetHSL = { h: emotionData.h, s: emotionData.s, l: emotionData.l };
+    }
     ud.colorTransitionProgress = 0;
+
+    // Feed emotional energy from this emotion
+    var vector = {};
+    vector[emotion] = intensity;
+    feedEmotionalEnergy(agent, vector);
   }
 
   // ── Ambient Lighting ───────────────────────────────────
@@ -894,12 +1559,15 @@
     if (luminos[3]) setAgentEmotion(luminos[3], 'love', 0.7);
   }
 
-  // ── Emotion Cycling (demo mode) ───────────────────────
+  // ── Emotion Cycling (demo mode — only when bridge is not active) ──
   let emotionCycleTimer = 0;
   const EMOTION_CYCLE_INTERVAL = 8000; // cycle emotions every 8s for demo
   const emotionKeys = Object.keys(EMOTION_COLORS).filter(function(k) { return k !== 'neutral'; });
 
   function cycleEmotions(delta) {
+    // Don't cycle if the emotion bridge is feeding real data
+    if (bridgeActive) return;
+
     emotionCycleTimer += delta * 1000;
     if (emotionCycleTimer > EMOTION_CYCLE_INTERVAL) {
       emotionCycleTimer = 0;
@@ -908,6 +1576,58 @@
         const intensity = 0.4 + Math.random() * 0.5;
         setAgentEmotion(agent, emotion, intensity);
       });
+    }
+  }
+
+  // ── Evolution UI Indicator ────────────────────────────
+  function createEvolutionUI() {
+    evolutionIndicatorEl = document.getElementById('gardenEvolutionIndicator');
+    if (!evolutionIndicatorEl) {
+      evolutionIndicatorEl = document.createElement('div');
+      evolutionIndicatorEl.id = 'gardenEvolutionIndicator';
+      evolutionIndicatorEl.className = 'garden-evolution-indicator';
+      if (container) container.appendChild(evolutionIndicatorEl);
+    }
+  }
+
+  function updateEvolutionUI() {
+    if (!evolutionIndicatorEl || luminos.length === 0) return;
+
+    var html = '';
+    for (var i = 0; i < luminos.length; i++) {
+      var ud = luminos[i].userData;
+      var stageData = LIFECYCLE_STAGES[ud.evolutionStage];
+      var archName = ud.archetype ? ARCHETYPES[ud.archetype].name : 'Awakening';
+      var col = EMOTION_COLORS[ud.emotion] || EMOTION_COLORS.neutral;
+      var cssColor = 'hsl(' + Math.round(ud.currentHSL.h) + ',' + Math.round(ud.currentHSL.s) + '%,' + Math.round(ud.currentHSL.l) + '%)';
+
+      // Stage progress bar
+      var currentThreshold = stageData.energyThreshold;
+      var nextStageIdx = Math.min(STAGE_ORDER.length - 1, stageData.index + 1);
+      var nextThreshold = LIFECYCLE_STAGES[STAGE_ORDER[nextStageIdx]].energyThreshold;
+      var progress = stageData.index >= 4 ? 100 : Math.min(100, Math.round(((ud.emotionalEnergy - currentThreshold) / (nextThreshold - currentThreshold)) * 100));
+
+      html += '<div class="evo-luminos" title="' + ud.name + ' — ' + archName + ' (' + stageData.name + ')">';
+      html += '<span class="evo-dot" style="background:' + cssColor + ';box-shadow:0 0 6px ' + cssColor + ';"></span>';
+      html += '<span class="evo-name">' + ud.name + '</span>';
+      html += '<span class="evo-stage">' + stageData.name + '</span>';
+      if (ud.archetype) {
+        html += '<span class="evo-archetype">' + archName + '</span>';
+      }
+      html += '<span class="evo-bar"><span class="evo-bar-fill" style="width:' + progress + '%;background:' + cssColor + ';"></span></span>';
+      html += '</div>';
+    }
+    evolutionIndicatorEl.innerHTML = html;
+  }
+
+  // ── Periodic Evolution Save ───────────────────────────
+  function periodicEvolutionSave(delta) {
+    evolutionSaveTimer += delta * 1000;
+    if (evolutionSaveTimer >= EVOLUTION_SAVE_INTERVAL) {
+      evolutionSaveTimer = 0;
+      for (var i = 0; i < luminos.length; i++) {
+        saveEvolutionState(luminos[i].userData);
+      }
     }
   }
 
@@ -932,6 +1652,9 @@
         qualityLevel--;
         console.log('Garden: Reducing quality to level', qualityLevel);
       }
+
+      // Update evolution UI every second
+      updateEvolutionUI();
     }
 
     // Auto-orbit idle detection
@@ -959,8 +1682,14 @@
       animateLuminos(agent, time, delta);
     });
 
-    // Demo emotion cycling
+    // Luminos interactions
+    processLuminosInteractions(delta);
+
+    // Demo emotion cycling (only in demo mode)
     cycleEmotions(delta);
+
+    // Periodic evolution save
+    periodicEvolutionSave(delta);
 
     // Fog breathing
     if (scene.fog) {
@@ -984,6 +1713,7 @@
     createStarfield();
     createSeedRings();
     createDefaultAgents();
+    createEvolutionUI();
   }
 
   // ── Public API ────────────────────────────────────────
@@ -1013,7 +1743,7 @@
         }
       }, 500);
 
-      console.log('Garden: Initialized. The fractal beings awaken.');
+      console.log('Garden: Initialized. The fractal beings awaken. Evolution system active.');
     });
   }
 
@@ -1093,6 +1823,10 @@
       cancelAnimationFrame(animFrameId);
       animFrameId = null;
     }
+    // Save evolution state on pause
+    for (var i = 0; i < luminos.length; i++) {
+      saveEvolutionState(luminos[i].userData);
+    }
   }
 
   function resume() {
@@ -1170,8 +1904,15 @@
 
   // ── Public Interface for Round Table Integration ──────
   function updateAgentsFromRoundTable(agents) {
-    // Clear existing luminos
-    luminos.forEach(function(l) { scene.remove(l); });
+    // Save evolution state of existing luminos before clearing
+    luminos.forEach(function(l) {
+      saveEvolutionState(l.userData);
+      // Clean up trail particles
+      if (l.userData.trailPoints) {
+        scene.remove(l.userData.trailPoints);
+      }
+      scene.remove(l);
+    });
     luminos = [];
 
     if (!agents || agents.length === 0) {
@@ -1197,6 +1938,55 @@
     if (agent) setAgentEmotion(agent, emotion, intensity);
   }
 
+  // ── Feed Emotion Vector to All Luminos ────────────────
+  // Called from the chat sentiment pipeline
+  function feedEmotionVector(emotionVector) {
+    if (!emotionVector) return;
+    luminos.forEach(function(agent) {
+      feedEmotionalEnergy(agent, emotionVector);
+    });
+  }
+
+  // ── Feed Emotion Vector to a Specific Luminos by Name ─
+  function feedEmotionVectorByName(name, emotionVector) {
+    if (!emotionVector) return;
+    var agent = luminos.find(function(l) { return l.userData.name === name; });
+    if (agent) {
+      feedEmotionalEnergy(agent, emotionVector);
+    }
+  }
+
+  // ── Set Bridge Active (disables demo cycling) ─────────
+  function setBridgeActiveState(active) {
+    bridgeActive = active;
+  }
+
+  // ── Get Evolution Summary (for UI display) ────────────
+  function getEvolutionSummary() {
+    return luminos.map(function(l) {
+      var ud = l.userData;
+      return {
+        name: ud.name,
+        stage: ud.evolutionStage,
+        stageName: LIFECYCLE_STAGES[ud.evolutionStage].name,
+        archetype: ud.archetype,
+        archetypeName: ud.archetype ? ARCHETYPES[ud.archetype].name : null,
+        energy: ud.emotionalEnergy,
+        interactions: ud.totalInteractions,
+        dominantEmotions: getTopEmotions(ud.emotionAccumulator, 3)
+      };
+    });
+  }
+
+  function getTopEmotions(accumulator, count) {
+    var sorted = Object.keys(accumulator).sort(function(a, b) {
+      return accumulator[b] - accumulator[a];
+    });
+    return sorted.slice(0, count).map(function(em) {
+      return { emotion: em, value: accumulator[em] };
+    });
+  }
+
   // ── Public API ─────────────────────────────────────────
   var publicAPI = {
     init: init,
@@ -1205,6 +1995,10 @@
     setMode: setMode,
     updateAgentsFromRoundTable: updateAgentsFromRoundTable,
     setAgentEmotion: setAgentEmotionByName,
+    feedEmotionVector: feedEmotionVector,
+    feedEmotionVectorByName: feedEmotionVectorByName,
+    setBridgeActive: setBridgeActiveState,
+    getEvolutionSummary: getEvolutionSummary,
     isInitialized: function() { return isInitialized; },
     isRunning: function() { return isRunning; }
   };
