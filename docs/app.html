@@ -343,11 +343,14 @@ header .mantra {
 /* ---- Tab Navigation ---- */
 .tab-nav {
   display: flex;
+  flex-wrap: wrap;
   gap: 0;
   border-bottom: 1px solid var(--border);
   margin-top: var(--space-sm);
   overflow-x: auto;
+  overflow-y: visible;
   transition: border-color var(--transition-md);
+  position: relative;
 }
 
 .tab-btn {
@@ -8644,6 +8647,7 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
 .tab-nav {
   position: relative;
   flex-wrap: nowrap;
+  overflow-y: visible;
 }
 .tab-nav .tab-btn[data-tab] {
   transition: color var(--transition), background var(--transition), border-color var(--transition), transform var(--transition), opacity 250ms ease, max-width 250ms ease;
@@ -8664,8 +8668,8 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
   border: none;
   border-bottom: 2px solid transparent;
   color: var(--text-muted);
-  font-size: 0.88rem;
-  font-weight: 500;
+  font-size: 0.92rem;
+  font-weight: 600;
   cursor: pointer;
   transition: color var(--transition), background var(--transition);
   font-family: var(--font);
@@ -8673,6 +8677,9 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
   white-space: nowrap;
   flex-shrink: 0;
   position: relative;
+  min-height: 44px;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 .fl-more-btn:hover {
   color: var(--text-secondary);
@@ -8681,38 +8688,31 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
 .fl-more-btn.fl-more-open {
   color: var(--accent);
   border-bottom-color: var(--accent);
+  background: var(--accent-glow);
 }
 .fl-more-dropdown {
   display: none;
-  position: absolute;
-  right: 0;
+  position: relative;
   z-index: 200;
   background: var(--bg-secondary);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-  min-width: 180px;
+  border-top: none;
+  border-radius: 0 0 var(--radius) var(--radius);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.35);
+  width: 100%;
   max-height: 60vh;
   overflow-y: auto;
-  padding: 6px 0;
-  animation: fl-dropdown-in 200ms ease;
+  overflow-x: hidden;
+  padding: 8px 0;
+  animation: fl-panel-slide-down 250ms ease;
 }
 .fl-more-dropdown.fl-dropdown-open {
-  display: block;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 2px;
 }
-.fl-more-dropdown.fl-dropdown-up {
-  bottom: 100%;
-  top: auto;
-  border-radius: var(--radius) var(--radius) 0 0;
-  animation: fl-dropdown-in-up 200ms ease;
-}
-.fl-more-dropdown:not(.fl-dropdown-up) {
-  top: 100%;
-  bottom: auto;
-  border-radius: 0 0 var(--radius) var(--radius);
-}
-@keyframes fl-dropdown-in-up {
-  from { opacity: 0; transform: translateY(6px); }
+@keyframes fl-panel-slide-down {
+  from { opacity: 0; transform: translateY(-8px); }
   to { opacity: 1; transform: translateY(0); }
 }
 @keyframes fl-dropdown-in {
@@ -8723,9 +8723,10 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 18px;
+  padding: 14px 20px;
+  min-height: 48px;
   color: var(--text-secondary);
-  font-size: 0.86rem;
+  font-size: 1rem;
   font-family: var(--font);
   cursor: pointer;
   transition: background 150ms ease, color 150ms ease;
@@ -8733,14 +8734,22 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
   background: none;
   width: 100%;
   text-align: left;
+  border-radius: var(--radius-sm);
+  margin: 0 4px;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
-.fl-more-dropdown .fl-dropdown-item:hover {
+.fl-more-dropdown .fl-dropdown-item:hover,
+.fl-more-dropdown .fl-dropdown-item:active {
   background: var(--accent-glow);
   color: var(--accent);
 }
+.fl-more-dropdown .fl-dropdown-item:active {
+  background: var(--accent-soft);
+}
 .fl-more-dropdown .fl-dropdown-item .fl-pin-icon {
-  font-size: 0.72rem;
-  opacity: 0;
+  font-size: 0.85rem;
+  opacity: 0.3;
   transition: opacity 150ms;
   color: var(--text-muted);
   margin-left: 12px;
@@ -8777,8 +8786,20 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
   color: var(--accent);
 }
 @media (max-width: 600px) {
-  .fl-more-btn { padding: 12px 14px; font-size: 0.82rem; }
-  .fl-more-dropdown { min-width: 160px; }
+  .fl-more-btn { padding: 12px 14px; font-size: 0.88rem; }
+  .fl-more-dropdown.fl-dropdown-open {
+    grid-template-columns: 1fr;
+  }
+  .fl-more-dropdown .fl-dropdown-item {
+    padding: 16px 20px;
+    min-height: 52px;
+    font-size: 1.05rem;
+  }
+  .fl-more-dropdown .fl-dropdown-item .fl-pin-icon {
+    opacity: 0.5;
+    font-size: 1rem;
+    padding: 8px;
+  }
 }
 
 /* ---- Accordion Settings (v4.9) ---- */
@@ -10598,8 +10619,8 @@ body.fl-immersive-active {
     <button class="tab-btn" data-tab="core" onclick="switchTab('core')">&#127795; Core</button>
     <button class="tab-btn" data-tab="garden" onclick="switchTab('garden')">&#10022; Garden</button>
     <button class="fl-more-btn" id="flMoreBtn" onclick="FlTabs.toggleMore()" title="More tabs">More &#9776;</button>
-    <div class="fl-more-dropdown" id="flMoreDropdown"></div>
   </nav>
+  <div class="fl-more-dropdown" id="flMoreDropdown"></div>
 </div>
 
 <!-- ==================== TAB 1: CHAT ==================== -->
@@ -16553,20 +16574,6 @@ const FlTabs = (function() {
     var btn = document.getElementById('flMoreBtn');
     if (!dropdown) return;
     moreOpen = !moreOpen;
-    if (moreOpen && btn) {
-      // Detect available space below vs above the button
-      var btnRect = btn.getBoundingClientRect();
-      var spaceBelow = window.innerHeight - btnRect.bottom;
-      var spaceAbove = btnRect.top;
-      // Estimate dropdown height (items * ~40px + padding)
-      var overflow = getOverflowTabs();
-      var estimatedHeight = Math.min(overflow.length * 42 + 12, window.innerHeight * 0.6);
-      if (spaceBelow < estimatedHeight && spaceAbove > spaceBelow) {
-        dropdown.classList.add('fl-dropdown-up');
-      } else {
-        dropdown.classList.remove('fl-dropdown-up');
-      }
-    }
     dropdown.classList.toggle('fl-dropdown-open', moreOpen);
     if (btn) btn.classList.toggle('fl-more-open', moreOpen);
   }
@@ -16574,7 +16581,7 @@ const FlTabs = (function() {
   function closeMore() {
     var dropdown = document.getElementById('flMoreDropdown');
     var btn = document.getElementById('flMoreBtn');
-    if (dropdown) dropdown.classList.remove('fl-dropdown-open');
+    if (dropdown) { dropdown.classList.remove('fl-dropdown-open'); dropdown.classList.remove('fl-dropdown-up'); }
     if (btn) btn.classList.remove('fl-more-open');
     moreOpen = false;
   }
