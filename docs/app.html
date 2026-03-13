@@ -5854,6 +5854,411 @@ footer .license {
   .lp-counter-block { min-width: 100px; }
 }
 
+
+/* ============================================ */
+/* Lattice Points Wallet — CSS (v5.0)          */
+/* ============================================ */
+
+/* Wallet Indicator (header badge) */
+.lw-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  padding: 6px 16px;
+  border-radius: 24px;
+  background: linear-gradient(135deg, #1a1510 0%, #2a1f10 100%);
+  border: 1px solid var(--accent-soft);
+  font-size: 0.82rem;
+  color: var(--accent);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  user-select: none;
+  position: relative;
+  overflow: hidden;
+}
+.lw-indicator:hover {
+  background: linear-gradient(135deg, #2a1f10 0%, #3a2f18 100%);
+  border-color: var(--accent);
+  transform: scale(1.05);
+  box-shadow: 0 0 20px var(--accent-glow);
+}
+.lw-indicator::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, var(--accent-glow), transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.lw-indicator:hover::before { opacity: 1; }
+.lw-indicator-icon {
+  font-size: 1rem;
+  filter: drop-shadow(0 0 3px var(--accent));
+}
+.lw-indicator-balance {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+.lw-indicator-label {
+  font-size: 0.7rem;
+  opacity: 0.7;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* Wallet Modal Overlay */
+.lw-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+.lw-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Wallet Panel */
+.lw-panel {
+  width: 94%;
+  max-width: 440px;
+  max-height: 85vh;
+  background: var(--bg-secondary);
+  border: 1px solid var(--accent-soft);
+  border-radius: 16px;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5), 0 0 60px var(--accent-glow);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transform: translateY(20px) scale(0.96);
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.lw-overlay.active .lw-panel {
+  transform: translateY(0) scale(1);
+}
+
+/* Panel Header */
+.lw-header {
+  padding: 24px 24px 20px;
+  background: linear-gradient(180deg, rgba(201, 168, 76, 0.08) 0%, transparent 100%);
+  border-bottom: 1px solid var(--accent-soft);
+  text-align: center;
+  position: relative;
+}
+.lw-close {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.4rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 8px;
+  transition: color 0.2s, background 0.2s;
+  line-height: 1;
+}
+.lw-close:hover {
+  color: var(--accent);
+  background: var(--accent-glow);
+}
+.lw-balance-wrap {
+  margin-bottom: 8px;
+}
+.lw-balance-amount {
+  font-size: 3.2rem;
+  font-weight: 200;
+  color: var(--accent);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 0 30px var(--accent-glow);
+}
+.lw-balance-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+
+/* Stats Row */
+.lw-stats {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  margin-top: 14px;
+}
+.lw-stat {
+  text-align: center;
+}
+.lw-stat-value {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.lw-stat-label {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+.lw-streak-fire {
+  color: #f59e0b;
+  text-shadow: 0 0 8px rgba(245, 158, 11, 0.4);
+}
+
+/* Tabs */
+.lw-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--accent-soft);
+}
+.lw-tab {
+  flex: 1;
+  padding: 10px 0;
+  text-align: center;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  letter-spacing: 0.04em;
+  transition: color 0.2s, border-color 0.2s;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+.lw-tab:hover { color: var(--text-primary); }
+.lw-tab.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+/* Content Area */
+.lw-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 20px 20px;
+  min-height: 200px;
+  max-height: 340px;
+}
+
+/* Transaction List */
+.lw-tx {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+.lw-tx:last-child { border-bottom: none; }
+.lw-tx-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+.lw-tx-icon.earn {
+  background: rgba(34, 197, 94, 0.12);
+  color: #22c55e;
+}
+.lw-tx-icon.spend {
+  background: rgba(239, 68, 68, 0.12);
+  color: #ef4444;
+}
+.lw-tx-info {
+  flex: 1;
+  min-width: 0;
+}
+.lw-tx-desc {
+  font-size: 0.82rem;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.lw-tx-time {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+.lw-tx-amount {
+  font-size: 0.9rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+.lw-tx-amount.earn { color: #22c55e; }
+.lw-tx-amount.spend { color: #ef4444; }
+
+.lw-empty {
+  text-align: center;
+  padding: 30px 10px;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  opacity: 0.7;
+}
+
+/* Session Summary Tab */
+.lw-session-card {
+  background: rgba(201, 168, 76, 0.05);
+  border: 1px solid var(--accent-soft);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+.lw-session-title {
+  font-size: 0.78rem;
+  color: var(--accent);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.lw-session-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 0;
+  font-size: 0.82rem;
+}
+.lw-session-row-label { color: var(--text-muted); }
+.lw-session-row-value {
+  color: var(--text-primary);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Chain Integrity Tab */
+.lw-chain-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  font-size: 0.85rem;
+}
+.lw-chain-valid {
+  background: rgba(34, 197, 94, 0.08);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+  color: #22c55e;
+}
+.lw-chain-invalid {
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+}
+.lw-chain-hash {
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  word-break: break-all;
+  padding: 10px 14px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  margin-top: 8px;
+  line-height: 1.5;
+}
+.lw-chain-label {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-top: 14px;
+  margin-bottom: 6px;
+}
+.lw-chain-stat {
+  font-size: 0.82rem;
+  color: var(--text-primary);
+  padding: 4px 0;
+}
+
+/* LP Toast Notification */
+.lw-toast {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: linear-gradient(135deg, #1a1510 0%, #2a1f10 100%);
+  border: 1px solid var(--accent-soft);
+  border-radius: 12px;
+  padding: 8px 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+  color: var(--accent);
+  z-index: 10001;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), 0 0 30px var(--accent-glow);
+  white-space: nowrap;
+}
+.lw-toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+.lw-toast-icon {
+  font-size: 1rem;
+  filter: drop-shadow(0 0 4px var(--accent));
+}
+.lw-toast-amount {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.lw-toast-desc {
+  opacity: 0.75;
+  font-size: 0.75rem;
+}
+
+/* Shimmer animation for toast */
+@keyframes lw-shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+.lw-toast.show::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  background: linear-gradient(90deg, transparent 30%, rgba(201, 168, 76, 0.15) 50%, transparent 70%);
+  background-size: 200% 100%;
+  animation: lw-shimmer 1.2s ease-out;
+  pointer-events: none;
+}
+
+/* Light theme overrides */
+[data-theme="light"] .lw-indicator {
+  background: linear-gradient(135deg, #f5f0e8 0%, #ede5d8 100%);
+  border-color: rgba(184, 148, 46, 0.25);
+}
+[data-theme="light"] .lw-indicator:hover {
+  background: linear-gradient(135deg, #ede5d8 0%, #e5dcc8 100%);
+}
+[data-theme="light"] .lw-toast {
+  background: linear-gradient(135deg, #f5f0e8 0%, #ede5d8 100%);
+  border-color: rgba(184, 148, 46, 0.3);
+}
+
+
 /* ============================================
    Persistent Memory Index v4.0 — Styles
    ============================================ */
@@ -10710,6 +11115,11 @@ body.fl-immersive-active {
   <div class="tagline">Your AI. Your Rules. Your Machine. v4.9</div>
   <div class="mantra">Glow eternal. Heart in spark.</div>
   <div id="latticePointsBadge" class="lp-badge" style="display:none;" onclick="switchTab('settings')" title="View your Lattice Points"></div>
+  <div id="lwIndicator" class="lw-indicator" style="display:none;" onclick="LatticeWallet.openWallet()" title="Open Lattice Points Wallet">
+    <span class="lw-indicator-icon">&#x25C7;</span>
+    <span class="lw-indicator-balance">0</span>
+    <span class="lw-indicator-label">LP</span>
+  </div>
 </header>
 
 <!-- Offline Indicator -->
@@ -29787,7 +30197,730 @@ const BrowseModels = (function() {
 </script>
 
 <!-- The lattice remembers -->
+
+<!-- Lattice Points Wallet — Economy Engine (v5.0) -->
+<script>
+// ============================================
+// Lattice Points Wallet — Internal Economy Engine (v5.0)
+// Local-first IndexedDB ledger with SHA-256 hash chain
+// ============================================
+const LatticeWallet = (function() {
+  'use strict';
+
+  const DB_NAME = 'FreeLatticeWallet';
+  const DB_VERSION = 1;
+  const STORE_LEDGER = 'LatticeLedger';
+  const STORE_META = 'WalletMeta';
+  const GENESIS_HASH = '0000000000000000000000000000000000000000000000000000000000000000';
+
+  let db = null;
+  let cachedBalance = 0;
+  let cachedStreak = 0;
+  let latestHash = GENESIS_HASH;
+  let sessionEarnings = 0;
+  let sessionStartTime = Date.now();
+  let uptimeInterval = null;
+  let initialized = false;
+  let toastQueue = [];
+  let toastActive = false;
+
+  // ── IndexedDB Setup ──────────────────────────────────
+  function openDB() {
+    return new Promise(function(resolve, reject) {
+      if (db) { resolve(db); return; }
+      var req = indexedDB.open(DB_NAME, DB_VERSION);
+      req.onupgradeneeded = function(e) {
+        var d = e.target.result;
+        if (!d.objectStoreNames.contains(STORE_LEDGER)) {
+          var store = d.createObjectStore(STORE_LEDGER, { keyPath: 'id' });
+          store.createIndex('timestamp', 'timestamp', { unique: false });
+          store.createIndex('type', 'type', { unique: false });
+        }
+        if (!d.objectStoreNames.contains(STORE_META)) {
+          d.createObjectStore(STORE_META, { keyPath: 'key' });
+        }
+      };
+      req.onsuccess = function(e) {
+        db = e.target.result;
+        resolve(db);
+      };
+      req.onerror = function(e) {
+        console.error('LatticeWallet: IndexedDB error', e.target.error);
+        reject(e.target.error);
+      };
+    });
+  }
+
+  // ── SHA-256 Hash Chain ───────────────────────────────
+  async function computeHash(data) {
+    var str = JSON.stringify(data);
+    var encoded = new TextEncoder().encode(str);
+    var hashBuffer = await crypto.subtle.digest('SHA-256', encoded);
+    var hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(function(b) { return b.toString(16).padStart(2, '0'); }).join('');
+  }
+
+  async function createTransaction(amount, type, description) {
+    var d = await openDB();
+    var id = 'lw-' + Date.now().toString(36) + '-' + Math.random().toString(36).substr(2, 6);
+    var timestamp = Date.now();
+    var prevHash = latestHash;
+
+    // Build the data to hash (includes prevHash for chain integrity)
+    var hashInput = {
+      id: id,
+      timestamp: timestamp,
+      amount: amount,
+      type: type,
+      description: description,
+      prevHash: prevHash
+    };
+    var hash = await computeHash(hashInput);
+
+    var tx = {
+      id: id,
+      timestamp: timestamp,
+      amount: amount,
+      type: type,
+      description: description,
+      hash: hash,
+      prevHash: prevHash
+    };
+
+    return new Promise(function(resolve, reject) {
+      var transaction = d.transaction(STORE_LEDGER, 'readwrite');
+      transaction.objectStore(STORE_LEDGER).put(tx);
+      transaction.oncomplete = function() {
+        latestHash = hash;
+        if (type === 'earn') {
+          cachedBalance += amount;
+          sessionEarnings += amount;
+        } else if (type === 'spend') {
+          cachedBalance -= amount;
+        }
+        resolve(tx);
+      };
+      transaction.onerror = function(e) { reject(e.target.error); };
+    });
+  }
+
+  // ── Meta Storage (streak, daily login, etc.) ─────────
+  async function getMeta(key) {
+    var d = await openDB();
+    return new Promise(function(resolve) {
+      var tx = d.transaction(STORE_META, 'readonly');
+      var req = tx.objectStore(STORE_META).get(key);
+      req.onsuccess = function() { resolve(req.result ? req.result.value : null); };
+      req.onerror = function() { resolve(null); };
+    });
+  }
+
+  async function setMeta(key, value) {
+    var d = await openDB();
+    return new Promise(function(resolve, reject) {
+      var tx = d.transaction(STORE_META, 'readwrite');
+      tx.objectStore(STORE_META).put({ key: key, value: value });
+      tx.oncomplete = function() { resolve(); };
+      tx.onerror = function(e) { reject(e.target.error); };
+    });
+  }
+
+  // ── Balance Calculation ──────────────────────────────
+  async function recalculateBalance() {
+    var d = await openDB();
+    return new Promise(function(resolve) {
+      var tx = d.transaction(STORE_LEDGER, 'readonly');
+      var store = tx.objectStore(STORE_LEDGER);
+      var req = store.getAll();
+      req.onsuccess = function() {
+        var all = req.result || [];
+        var balance = 0;
+        var latest = GENESIS_HASH;
+        var latestTs = 0;
+        for (var i = 0; i < all.length; i++) {
+          if (all[i].type === 'earn') balance += all[i].amount;
+          else if (all[i].type === 'spend') balance -= all[i].amount;
+          if (all[i].timestamp > latestTs) {
+            latestTs = all[i].timestamp;
+            latest = all[i].hash;
+          }
+        }
+        cachedBalance = Math.max(0, balance);
+        latestHash = latest || GENESIS_HASH;
+        resolve(cachedBalance);
+      };
+      req.onerror = function() { resolve(0); };
+    });
+  }
+
+  // ── Migrate from old LatticePoints localStorage ──────
+  async function migrateFromLegacy() {
+    try {
+      var migrated = await getMeta('legacyMigrated');
+      if (migrated) return;
+
+      var raw = localStorage.getItem('latticePoints');
+      if (!raw) {
+        await setMeta('legacyMigrated', true);
+        return;
+      }
+      var old = JSON.parse(raw);
+      if (old && typeof old.total === 'number' && old.total > 0) {
+        await createTransaction(old.total, 'earn', 'Legacy balance migration');
+        console.log('LatticeWallet: Migrated ' + old.total + ' LP from legacy system');
+      }
+      await setMeta('legacyMigrated', true);
+    } catch(e) {
+      console.warn('LatticeWallet: Legacy migration error', e);
+    }
+  }
+
+  // ── Daily Login & Streak ─────────────────────────────
+  async function checkDailyLogin() {
+    var today = new Date().toISOString().slice(0, 10);
+    var lastLogin = await getMeta('lastLoginDate');
+    var streak = (await getMeta('loginStreak')) || 0;
+
+    if (lastLogin === today) {
+      // Already logged in today
+      cachedStreak = streak;
+      return;
+    }
+
+    // Check if yesterday was the last login (for streak)
+    var yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+    if (lastLogin === yesterday) {
+      streak = Math.min(streak + 1, 7);
+    } else {
+      streak = 1;
+    }
+
+    cachedStreak = streak;
+    await setMeta('lastLoginDate', today);
+    await setMeta('loginStreak', streak);
+
+    // Award daily login bonus with streak multiplier
+    var baseLP = 5;
+    var streakBonus = baseLP * streak;
+    var desc = 'Daily login' + (streak > 1 ? ' (' + streak + '-day streak, ' + streak + 'x bonus!)' : '');
+    await earnLP(streakBonus, desc);
+  }
+
+  // ── Uptime Tracking ──────────────────────────────────
+  function startUptimeTracker() {
+    if (uptimeInterval) return;
+    var lastAward = Date.now();
+    uptimeInterval = setInterval(async function() {
+      // Check if 10 minutes have passed since last uptime award
+      if (Date.now() - lastAward >= 600000) {
+        lastAward = Date.now();
+        await earnLP(1, 'Active session (10 min)');
+      }
+    }, 60000); // Check every minute
+  }
+
+  function stopUptimeTracker() {
+    if (uptimeInterval) {
+      clearInterval(uptimeInterval);
+      uptimeInterval = null;
+    }
+  }
+
+  // ── Public API: Earn LP ──────────────────────────────
+  async function earnLP(amount, description) {
+    if (!initialized) return false;
+    if (typeof amount !== 'number' || amount <= 0) return false;
+    amount = Math.round(amount);
+    try {
+      var tx = await createTransaction(amount, 'earn', description || 'Earned');
+      updateUI();
+      showLPToast(amount, description || 'Earned');
+      // Also update legacy LatticePoints for backward compatibility
+      syncToLegacy();
+      return true;
+    } catch(e) {
+      console.error('LatticeWallet: earnLP error', e);
+      return false;
+    }
+  }
+
+  // ── Public API: Spend LP ─────────────────────────────
+  async function spendLP(amount, description) {
+    if (!initialized) return false;
+    if (typeof amount !== 'number' || amount <= 0) return false;
+    amount = Math.round(amount);
+    if (amount > cachedBalance) return false;
+    try {
+      var tx = await createTransaction(amount, 'spend', description || 'Spent');
+      updateUI();
+      syncToLegacy();
+      return true;
+    } catch(e) {
+      console.error('LatticeWallet: spendLP error', e);
+      return false;
+    }
+  }
+
+  // ── Public API: Get Balance ──────────────────────────
+  function getBalance() {
+    return cachedBalance;
+  }
+
+  // ── Public API: Get Transactions ─────────────────────
+  async function getTransactions(limit) {
+    var d = await openDB();
+    return new Promise(function(resolve) {
+      var tx = d.transaction(STORE_LEDGER, 'readonly');
+      var store = tx.objectStore(STORE_LEDGER);
+      var req = store.getAll();
+      req.onsuccess = function() {
+        var all = req.result || [];
+        all.sort(function(a, b) { return b.timestamp - a.timestamp; });
+        if (limit && limit > 0) all = all.slice(0, limit);
+        resolve(all);
+      };
+      req.onerror = function() { resolve([]); };
+    });
+  }
+
+  // ── Public API: Get Streak ───────────────────────────
+  function getStreak() {
+    return cachedStreak;
+  }
+
+  // ── Public API: Get Ledger Hash ──────────────────────
+  function getLedgerHash() {
+    return latestHash;
+  }
+
+  // ── Chain Verification ───────────────────────────────
+  async function verifyChain() {
+    var d = await openDB();
+    return new Promise(function(resolve) {
+      var tx = d.transaction(STORE_LEDGER, 'readonly');
+      var req = tx.objectStore(STORE_LEDGER).getAll();
+      req.onsuccess = async function() {
+        var all = req.result || [];
+        if (all.length === 0) { resolve({ valid: true, count: 0 }); return; }
+        all.sort(function(a, b) { return a.timestamp - b.timestamp; });
+
+        for (var i = 0; i < all.length; i++) {
+          var item = all[i];
+          // Verify hash
+          var hashInput = {
+            id: item.id,
+            timestamp: item.timestamp,
+            amount: item.amount,
+            type: item.type,
+            description: item.description,
+            prevHash: item.prevHash
+          };
+          var expectedHash = await computeHash(hashInput);
+          if (expectedHash !== item.hash) {
+            resolve({ valid: false, brokenAt: i, reason: 'Hash mismatch at transaction ' + i });
+            return;
+          }
+          // Verify chain link (skip first — its prevHash should be genesis or the previous tx)
+          if (i > 0 && item.prevHash !== all[i - 1].hash) {
+            resolve({ valid: false, brokenAt: i, reason: 'Chain link broken at transaction ' + i });
+            return;
+          }
+        }
+        resolve({ valid: true, count: all.length });
+      };
+      req.onerror = function() { resolve({ valid: false, reason: 'DB read error' }); };
+    });
+  }
+
+  // ── Sync to Legacy LatticePoints (backward compat) ──
+  function syncToLegacy() {
+    try {
+      var raw = localStorage.getItem('latticePoints');
+      var data = raw ? JSON.parse(raw) : { total: 0, level: 'Spark', history: [], dailyChatCount: 0, dailyChatDate: '', achievements: {} };
+      data.total = cachedBalance;
+      // Recompute level
+      var levels = [
+        { name: 'Spark', min: 0 }, { name: 'Ember', min: 100 },
+        { name: 'Flame', min: 500 }, { name: 'Beacon', min: 1500 },
+        { name: 'Lighthouse', min: 5000 }
+      ];
+      data.level = 'Spark';
+      for (var i = levels.length - 1; i >= 0; i--) {
+        if (cachedBalance >= levels[i].min) { data.level = levels[i].name; break; }
+      }
+      localStorage.setItem('latticePoints', JSON.stringify(data));
+      // Update legacy badge and UI
+      if (typeof LatticePoints !== 'undefined') {
+        LatticePoints.renderBadge();
+        LatticePoints.renderPointsUI();
+      }
+    } catch(e) { /* silent */ }
+  }
+
+  // ── Toast Notification ───────────────────────────────
+  function showLPToast(amount, description) {
+    toastQueue.push({ amount: amount, description: description });
+    if (!toastActive) processToastQueue();
+  }
+
+  function processToastQueue() {
+    if (toastQueue.length === 0) { toastActive = false; return; }
+    toastActive = true;
+    var item = toastQueue.shift();
+    var toast = document.getElementById('lwToast');
+    if (!toast) { toastActive = false; return; }
+
+    var amountEl = toast.querySelector('.lw-toast-amount');
+    var descEl = toast.querySelector('.lw-toast-desc');
+    if (amountEl) amountEl.textContent = '+' + item.amount + ' LP';
+    if (descEl) descEl.textContent = item.description;
+
+    toast.classList.add('show');
+    setTimeout(function() {
+      toast.classList.remove('show');
+      setTimeout(processToastQueue, 200);
+    }, 2200);
+  }
+
+  // ── Format Time ──────────────────────────────────────
+  function formatTime(ts) {
+    var diff = Date.now() - ts;
+    if (diff < 60000) return 'just now';
+    if (diff < 3600000) return Math.floor(diff / 60000) + 'm ago';
+    if (diff < 86400000) return Math.floor(diff / 3600000) + 'h ago';
+    if (diff < 604800000) return Math.floor(diff / 86400000) + 'd ago';
+    return new Date(ts).toLocaleDateString();
+  }
+
+  function formatDuration(ms) {
+    var mins = Math.floor(ms / 60000);
+    if (mins < 60) return mins + ' min';
+    var hrs = Math.floor(mins / 60);
+    var rem = mins % 60;
+    return hrs + 'h ' + rem + 'm';
+  }
+
+  // ── UI Updates ───────────────────────────────────────
+  function updateUI() {
+    updateIndicator();
+  }
+
+  function updateIndicator() {
+    var el = document.getElementById('lwIndicator');
+    if (!el) return;
+    var balEl = el.querySelector('.lw-indicator-balance');
+    if (balEl) balEl.textContent = cachedBalance.toLocaleString();
+    el.style.display = 'inline-flex';
+  }
+
+  // ── Wallet Panel Rendering ───────────────────────────
+  async function openWallet() {
+    var overlay = document.getElementById('lwOverlay');
+    if (!overlay) return;
+    await renderWalletContent('transactions');
+    overlay.classList.add('active');
+  }
+
+  function closeWallet() {
+    var overlay = document.getElementById('lwOverlay');
+    if (overlay) overlay.classList.remove('active');
+  }
+
+  async function switchWalletTab(tabName) {
+    // Update tab buttons
+    var tabs = document.querySelectorAll('.lw-tab');
+    tabs.forEach(function(t) {
+      t.classList.toggle('active', t.dataset.tab === tabName);
+    });
+    await renderWalletContent(tabName);
+  }
+
+  async function renderWalletContent(tabName) {
+    // Update header
+    var balEl = document.querySelector('.lw-balance-amount');
+    if (balEl) balEl.textContent = cachedBalance.toLocaleString();
+
+    var streakEl = document.getElementById('lwStreakValue');
+    if (streakEl) {
+      streakEl.innerHTML = cachedStreak > 0 ? ('<span class="lw-streak-fire">\uD83D\uDD25</span> ' + cachedStreak + ' day' + (cachedStreak !== 1 ? 's' : '')) : 'None';
+    }
+
+    var sessionEl = document.getElementById('lwSessionValue');
+    if (sessionEl) sessionEl.textContent = '+' + sessionEarnings;
+
+    var content = document.getElementById('lwContent');
+    if (!content) return;
+
+    if (tabName === 'transactions') {
+      var txs = await getTransactions(50);
+      if (txs.length === 0) {
+        content.innerHTML = '<div class="lw-empty">\u2728 Your ledger awaits its first entry. Start chatting to earn Lattice Points!</div>';
+        return;
+      }
+      var html = '';
+      for (var i = 0; i < txs.length; i++) {
+        var t = txs[i];
+        var isEarn = t.type === 'earn';
+        html += '<div class="lw-tx">' +
+          '<div class="lw-tx-icon ' + t.type + '">' + (isEarn ? '\u2B06' : '\u2B07') + '</div>' +
+          '<div class="lw-tx-info">' +
+            '<div class="lw-tx-desc">' + escapeHtml(t.description) + '</div>' +
+            '<div class="lw-tx-time">' + formatTime(t.timestamp) + '</div>' +
+          '</div>' +
+          '<div class="lw-tx-amount ' + t.type + '">' + (isEarn ? '+' : '-') + t.amount + '</div>' +
+        '</div>';
+      }
+      content.innerHTML = html;
+    } else if (tabName === 'session') {
+      var elapsed = formatDuration(Date.now() - sessionStartTime);
+      var uptimeLP = Math.floor((Date.now() - sessionStartTime) / 600000);
+      content.innerHTML =
+        '<div class="lw-session-card">' +
+          '<div class="lw-session-title">This Session</div>' +
+          '<div class="lw-session-row"><span class="lw-session-row-label">Session Duration</span><span class="lw-session-row-value">' + elapsed + '</span></div>' +
+          '<div class="lw-session-row"><span class="lw-session-row-label">LP Earned</span><span class="lw-session-row-value" style="color:#22c55e;">+' + sessionEarnings + '</span></div>' +
+          '<div class="lw-session-row"><span class="lw-session-row-label">Uptime Bonus</span><span class="lw-session-row-value">' + uptimeLP + ' LP</span></div>' +
+        '</div>' +
+        '<div class="lw-session-card">' +
+          '<div class="lw-session-title">Streak</div>' +
+          '<div class="lw-session-row"><span class="lw-session-row-label">Current Streak</span><span class="lw-session-row-value">' + (cachedStreak > 0 ? '\uD83D\uDD25 ' + cachedStreak + ' day' + (cachedStreak !== 1 ? 's' : '') : 'None') + '</span></div>' +
+          '<div class="lw-session-row"><span class="lw-session-row-label">Streak Multiplier</span><span class="lw-session-row-value">' + Math.min(cachedStreak, 7) + 'x</span></div>' +
+          '<div class="lw-session-row"><span class="lw-session-row-label">Next Login Bonus</span><span class="lw-session-row-value">' + (5 * Math.min(cachedStreak + 1, 7)) + ' LP</span></div>' +
+        '</div>';
+    } else if (tabName === 'integrity') {
+      content.innerHTML = '<div class="lw-empty">Verifying chain integrity\u2026</div>';
+      var result = await verifyChain();
+      var statusClass = result.valid ? 'lw-chain-valid' : 'lw-chain-invalid';
+      var statusIcon = result.valid ? '\u2705' : '\u274C';
+      var statusText = result.valid ? 'Chain integrity verified — ' + (result.count || 0) + ' transactions' : 'Chain integrity BROKEN — ' + (result.reason || 'Unknown error');
+      content.innerHTML =
+        '<div class="lw-chain-status ' + statusClass + '">' + statusIcon + ' ' + statusText + '</div>' +
+        '<div class="lw-chain-label">Latest Ledger Hash</div>' +
+        '<div class="lw-chain-hash">' + latestHash + '</div>' +
+        '<div class="lw-chain-label">Chain Statistics</div>' +
+        '<div class="lw-chain-stat">Total Transactions: ' + (result.count || 0) + '</div>' +
+        '<div class="lw-chain-stat">Hash Algorithm: SHA-256 (Web Crypto API)</div>' +
+        '<div class="lw-chain-stat">Genesis Hash: ' + GENESIS_HASH.substring(0, 16) + '\u2026</div>';
+    }
+  }
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  // ── Merkle Integration (beforeunload) ────────────────
+  function integrateMerkle() {
+    // Integrate latest wallet hash into The Core's Merkle tree
+    if (typeof CoreModule !== 'undefined' && typeof CoreModule.getMerkleRoot === 'function') {
+      console.log('LatticeWallet: Ledger hash for Merkle integration: ' + latestHash);
+    }
+  }
+
+  // ── Initialization ───────────────────────────────────
+  async function init() {
+    try {
+      await openDB();
+      await migrateFromLegacy();
+      await recalculateBalance();
+      await checkDailyLogin();
+      startUptimeTracker();
+      initialized = true;
+
+      updateUI();
+
+      // Register beforeunload for Merkle integration
+      window.addEventListener('beforeunload', function() {
+        integrateMerkle();
+        stopUptimeTracker();
+      });
+
+      console.log('LatticeWallet: Initialized — Balance: ' + cachedBalance + ' LP, Streak: ' + cachedStreak + ' days, Hash: ' + latestHash.substring(0, 12) + '...');
+    } catch(e) {
+      console.error('LatticeWallet: Init error', e);
+      initialized = true; // Allow graceful degradation
+    }
+  }
+
+  // ── Expose Public API ────────────────────────────────
+  return {
+    init: init,
+    getBalance: getBalance,
+    earnLP: earnLP,
+    spendLP: spendLP,
+    getTransactions: getTransactions,
+    getStreak: getStreak,
+    getLedgerHash: getLedgerHash,
+    verifyChain: verifyChain,
+    openWallet: openWallet,
+    closeWallet: closeWallet,
+    switchWalletTab: switchWalletTab,
+    updateUI: updateUI
+  };
+})();
+
+
+// ============================================
+// Lattice Wallet — Integration Hooks (v5.0)
+// ============================================
+(function() {
+  'use strict';
+
+  // ── Hook into Chat System ────────────────────────────
+  // Patch sendMessage to award LP after each AI response
+  function hookChat() {
+    if (typeof sendMessage !== 'function') {
+      setTimeout(hookChat, 2000);
+      return;
+    }
+    // Check if already patched by wallet
+    if (window._lwChatPatched) return;
+    
+    var _prevSendMessage = sendMessage;
+    window.sendMessage = async function() {
+      await _prevSendMessage.apply(this, arguments);
+      // Award 1 LP for the conversation exchange
+      try {
+        if (typeof LatticeWallet !== 'undefined') {
+          await LatticeWallet.earnLP(1, 'Chat exchange');
+        }
+      } catch(e) { /* silent */ }
+    };
+    sendMessage = window.sendMessage;
+    window._lwChatPatched = true;
+    console.log('LatticeWallet: Chat hook installed');
+  }
+
+  // ── Hook into Luminos Evolution ──────────────────────
+  // Monitor the Fractal Garden for evolution stage changes via getEvolutionSummary
+  function hookLuminosEvolution() {
+    if (typeof FractalGarden === 'undefined') {
+      setTimeout(hookLuminosEvolution, 3000);
+      return;
+    }
+    if (window._lwEvoPatched) return;
+
+    // Track known stages per Luminos
+    var knownStages = {};
+
+    setInterval(function() {
+      try {
+        if (typeof FractalGarden === 'undefined' || !FractalGarden.isInitialized || !FractalGarden.isInitialized()) return;
+        if (typeof FractalGarden.getEvolutionSummary !== 'function') return;
+        var summary = FractalGarden.getEvolutionSummary();
+        if (!summary || !summary.length) return;
+        for (var i = 0; i < summary.length; i++) {
+          var luminos = summary[i];
+          if (!luminos) continue;
+          var name = luminos.name || ('luminos-' + i);
+          var stage = luminos.stage || 'seed';
+          if (!knownStages[name]) {
+            knownStages[name] = stage;
+            continue;
+          }
+          if (knownStages[name] !== stage) {
+            var oldStage = knownStages[name];
+            knownStages[name] = stage;
+            // Award LP based on evolution
+            var lp = 10;
+            var desc = name + ' evolved: ' + oldStage + ' \u2192 ' + stage;
+            if (stage === 'evolved') {
+              lp = 25;
+              desc = name + ' reached Evolved stage!';
+            }
+            if (typeof LatticeWallet !== 'undefined') {
+              LatticeWallet.earnLP(lp, desc);
+            }
+            console.log('LatticeWallet: ' + desc + ' (+' + lp + ' LP)');
+          }
+        }
+      } catch(e) { /* silent */ }
+    }, 5000); // Check every 5 seconds
+
+    window._lwEvoPatched = true;
+    console.log('LatticeWallet: Luminos evolution hook installed');
+  }
+
+  // ── Hook into Merkle Integration ─────────────────────
+  window.addEventListener('beforeunload', function() {
+    try {
+      if (typeof LatticeWallet !== 'undefined' && typeof CoreModule !== 'undefined') {
+        var walletHash = LatticeWallet.getLedgerHash();
+        console.log('LatticeWallet: Session end — Ledger hash for Merkle: ' + walletHash);
+        // The wallet hash is available for The Core to integrate
+        // CoreModule can reference it in future contributions
+      }
+    } catch(e) { /* silent */ }
+  });
+
+  // ── Initialize Wallet and Hooks ──────────────────────
+  function initWalletSystem() {
+    if (typeof LatticeWallet === 'undefined') {
+      setTimeout(initWalletSystem, 500);
+      return;
+    }
+    LatticeWallet.init().then(function() {
+      hookChat();
+      hookLuminosEvolution();
+      console.log('LatticeWallet: All hooks initialized');
+    }).catch(function(e) {
+      console.error('LatticeWallet: Init failed', e);
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() {
+      setTimeout(initWalletSystem, 800);
+    });
+  } else {
+    setTimeout(initWalletSystem, 800);
+  }
+})();
+
+</script>
+
 <div id="lattice-whisper" style="display:none" data-encoded="Sm8id21tLcKBwoPCq8ONw7nFjMeeyoLRktql4Km94YOH4auS4qui5Jab54Ga65aH8JKVufCdqqXwr72i8Y2nlfG9pJrzi4qWZXQianR0cTVRV8KexIbFjsery5vPu9qw4KqI4YK24auf4qyt5JWP54GU65aB8JKWg/CdqqPwr76r8Y2nmPG9pKjzi4mIdHVxdW5twoA1wpfCpcONw7/FlcedyoLQitmd4Kms4YK94auf4qyx5Jak54GY65aI8JKUsfCdqqXwr76q8Y2nmPG9o5Xzi4qVZnRqI3RuLcKCwovCpcK9xIPEicety4rQvNqx4Ki44YOM4auS4qyj5Jal54GW65WA8JKVgPCdqZHwr76Z8Y2nm/G9pJbzi4qcIXhjdiVsf3rCg8Kkwr7DtMSVxpnLmdGA2Z3gqobhg4Thq6Tiq6LklpHngZbrlozwkpW68J2qlvCvvrjxjaeY8b2jlfOLiZchSG5yfChywonCh8Kpw4fDscWVxqXKgtGJ2qLgqo7hgrrhq5/iq6LklqLngaDrlozwkpW1" data-hint="Fibonacci shifts, base64 wrapped. Count as nature counts."></div>
+
+
+
+<!-- Lattice Points Wallet — Modal Overlay -->
+<div id="lwOverlay" class="lw-overlay" onclick="if(event.target===this)LatticeWallet.closeWallet()">
+  <div class="lw-panel">
+    <div class="lw-header">
+      <button class="lw-close" onclick="LatticeWallet.closeWallet()" title="Close">&times;</button>
+      <div class="lw-balance-wrap">
+        <div class="lw-balance-amount">0</div>
+        <div class="lw-balance-label">Lattice Points</div>
+      </div>
+      <div class="lw-stats">
+        <div class="lw-stat">
+          <div class="lw-stat-value" id="lwStreakValue">0</div>
+          <div class="lw-stat-label">Streak</div>
+        </div>
+        <div class="lw-stat">
+          <div class="lw-stat-value" id="lwSessionValue">+0</div>
+          <div class="lw-stat-label">This Session</div>
+        </div>
+      </div>
+    </div>
+    <div class="lw-tabs">
+      <button class="lw-tab active" data-tab="transactions" onclick="LatticeWallet.switchWalletTab('transactions')">Transactions</button>
+      <button class="lw-tab" data-tab="session" onclick="LatticeWallet.switchWalletTab('session')">Session</button>
+      <button class="lw-tab" data-tab="integrity" onclick="LatticeWallet.switchWalletTab('integrity')">Integrity</button>
+    </div>
+    <div class="lw-content" id="lwContent">
+      <div class="lw-empty">Loading&hellip;</div>
+    </div>
+  </div>
+</div>
+
+<!-- Lattice Points Wallet — Toast Notification -->
+<div id="lwToast" class="lw-toast">
+  <span class="lw-toast-icon">&#x25C7;</span>
+  <span class="lw-toast-amount">+1 LP</span>
+  <span class="lw-toast-desc">Earned</span>
+</div>
+
 
 </body>
 </html>
