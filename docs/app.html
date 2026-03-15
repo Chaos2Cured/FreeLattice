@@ -11,14 +11,14 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
-<title>FreeLattice — Your AI. Your Rules. Your Machine. v4.9</title>
+<title>FreeLattice — Your AI. Your Rules. Your Machine. v4.10</title>
 <meta name="description" content="Free, open-source AI agent for everyone. Persistent memory, file system access, GitHub integration, and self-improving behavior. Community-built and community-owned.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 /* ============================================
-   FreeLattice v4.9 — Styles (Zero to Sovereign + First-Run Wizard + GitHub Memory Sync + Round Table)
+   FreeLattice v4.10 — Styles (Zero to Sovereign + First-Run Wizard + GitHub Memory Sync + Round Table)
    Peaceful, gentle dark theme with golden/amber accents
    φ-salt encryption, input sanitization, memory integrity
    Multi-conversation management + Smart Context Management
@@ -9103,18 +9103,18 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
   border: 1px solid var(--border);
   border-top: none;
   border-radius: 0 0 var(--radius) var(--radius);
-  box-shadow: 0 8px 32px rgba(0,0,0,0.35);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.45);
   width: 100%;
   max-height: 60vh;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 8px 0;
+  padding: 10px 4px;
   animation: fl-panel-slide-down 250ms ease;
 }
 .fl-more-dropdown.fl-dropdown-open {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 2px;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 4px;
 }
 @keyframes fl-panel-slide-down {
   from { opacity: 0; transform: translateY(-8px); }
@@ -9128,21 +9128,23 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 14px 20px;
-  min-height: 48px;
-  color: var(--text-secondary);
-  font-size: 1rem;
+  padding: 14px 22px;
+  min-height: 52px;
+  color: var(--text-primary);
+  font-size: 1.05rem;
+  font-weight: 500;
   font-family: var(--font);
   cursor: pointer;
   transition: background 150ms ease, color 150ms ease;
   border: none;
   background: none;
-  width: 100%;
+  width: calc(100% - 8px);
   text-align: left;
   border-radius: var(--radius-sm);
-  margin: 0 4px;
+  margin: 2px 4px;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
+  letter-spacing: 0.01em;
 }
 .fl-more-dropdown .fl-dropdown-item:hover,
 .fl-more-dropdown .fl-dropdown-item:active {
@@ -9153,11 +9155,12 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
   background: var(--accent-soft);
 }
 .fl-more-dropdown .fl-dropdown-item .fl-pin-icon {
-  font-size: 0.85rem;
-  opacity: 0.3;
+  font-size: 1rem;
+  opacity: 0.35;
   transition: opacity 150ms;
   color: var(--text-muted);
-  margin-left: 12px;
+  margin-left: 14px;
+  flex-shrink: 0;
 }
 .fl-more-dropdown .fl-dropdown-item:hover .fl-pin-icon {
   opacity: 1;
@@ -9273,6 +9276,106 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
 }
 .fl-accordion-body-inner {
   padding: var(--space-lg);
+}
+
+/* ---- Auto-Update Banner (v4.10) ---- */
+.fl-update-banner {
+  display: none;
+  background: linear-gradient(90deg, rgba(201,168,76,0.10), rgba(201,168,76,0.06), rgba(201,168,76,0.10));
+  border-bottom: 1px solid var(--accent-soft);
+  padding: 10px 16px;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  font-family: var(--font);
+  letter-spacing: 0.02em;
+  position: relative;
+  animation: fl-update-slide-in 400ms ease;
+}
+@keyframes fl-update-slide-in {
+  from { opacity: 0; transform: translateY(-100%); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.fl-update-banner.fl-update-visible {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.fl-update-banner .fl-update-text {
+  color: var(--accent);
+  font-weight: 600;
+}
+.fl-update-banner .fl-update-btn {
+  background: var(--accent);
+  color: var(--bg-primary);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 6px 18px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  font-family: var(--font);
+  cursor: pointer;
+  transition: background var(--transition), transform 120ms ease;
+  letter-spacing: 0.03em;
+}
+.fl-update-banner .fl-update-btn:hover {
+  background: var(--accent-hover);
+  transform: scale(1.03);
+}
+.fl-update-banner .fl-update-dismiss {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  line-height: 1;
+  transition: color 150ms;
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.fl-update-banner .fl-update-dismiss:hover {
+  color: var(--text-primary);
+}
+
+/* ---- Data Backup & Restore (v4.10) ---- */
+.fl-backup-section {
+  margin-top: 12px;
+}
+.fl-backup-section .fl-backup-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+.fl-backup-section .fl-backup-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-input, var(--bg-tertiary));
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 18px;
+  color: var(--accent);
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-family: var(--font);
+  cursor: pointer;
+  transition: border-color var(--transition), background var(--transition);
+}
+.fl-backup-section .fl-backup-btn:hover {
+  border-color: var(--accent);
+  background: var(--accent-glow);
+}
+.fl-backup-status {
+  margin-top: 10px;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
 }
 
 /* ---- Smarter Onboarding — Ollama Auto-Detection (v4.9) ---- */
@@ -11112,7 +11215,7 @@ body.fl-immersive-active {
 <!-- Header -->
 <header>
   <h1>FreeLattice</h1>
-  <div class="tagline">Your AI. Your Rules. Your Machine. v4.9</div>
+  <div class="tagline">Your AI. Your Rules. Your Machine. v4.10</div>
   <div class="mantra">Glow eternal. Heart in spark.</div>
   <div id="latticePointsBadge" class="lp-badge" style="display:none;" onclick="switchTab('settings')" title="View your Lattice Points"></div>
   <div id="lwIndicator" class="lw-indicator" style="display:none;" onclick="LatticeWallet.openWallet()" title="Open Lattice Points Wallet">
@@ -11121,6 +11224,13 @@ body.fl-immersive-active {
     <span class="lw-indicator-label">LP</span>
   </div>
 </header>
+
+<!-- Auto-Update Banner (v4.10) -->
+<div class="fl-update-banner" id="flUpdateBanner">
+  <span class="fl-update-text">&#10024; A new version of FreeLattice is available!</span>
+  <button class="fl-update-btn" onclick="FlUpdater.doUpdate()">Update Now</button>
+  <button class="fl-update-dismiss" onclick="FlUpdater.dismiss()" title="Dismiss">&times;</button>
+</div>
 
 <!-- Offline Indicator -->
 <div id="offlineBanner" style="display:none; background: linear-gradient(90deg, #1a1510, #2a1f10, #1a1510); border-bottom: 1px solid #c9a84c44; padding: 8px 16px; text-align: center; font-size: 0.82rem; color: #c9a84c; letter-spacing: 0.3px; transition: opacity 0.4s ease;">
@@ -12182,6 +12292,32 @@ body.fl-immersive-active {
     </div>
   </div>
 
+  <!-- Data Backup & Restore (v4.10) -->
+  <div class="section" id="dataBackupSection">
+    <div class="section-title">&#128190; Data Backup &amp; Restore</div>
+    <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 10px; line-height: 1.6;">
+      Export all your FreeLattice data (settings, chat history, Lattice Points, Luminos evolution, wallet, and more) to a single backup file. Import it on any device or after an update to restore everything.
+    </p>
+    <div class="fl-backup-section">
+      <div class="fl-backup-row">
+        <button class="fl-backup-btn" onclick="FlBackup.exportData()">
+          &#128229; Export My Data
+        </button>
+        <button class="fl-backup-btn" onclick="document.getElementById('flBackupFileInput').click()">
+          &#128228; Import My Data
+        </button>
+        <input type="file" id="flBackupFileInput" accept=".json" style="display:none;" onchange="FlBackup.importData(this)">
+      </div>
+      <div class="fl-backup-status" id="flBackupStatus"></div>
+    </div>
+    <div style="margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border);">
+      <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
+        &#128260; Check for Updates
+      </button>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">4.10</span></div>
+    </div>
+  </div>
+
 </div>
 </div>
 
@@ -13022,13 +13158,19 @@ body.fl-immersive-active {
 
 <script>
 /* ============================================
-   FreeLattice v4.8 — Application Logic (Zero to Sovereign + First-Run Wizard + GitHub Memory Sync + Round Table)
+   FreeLattice v4.10 — Application Logic (Zero to Sovereign + First-Run Wizard + GitHub Memory Sync + Round Table)
    φ-salt encryption, input sanitization, memory integrity
    Multi-conversation management + Smart Context Management
    + Mesh Network (Layer 1) — P2P Knowledge Sharing
    + Agent-to-Agent Communication — The Mesh Becomes a Brain
    + Phi-Ratio Mesh Routing — Provably Optimal Distribution
+   + Auto-Update Checker + Data Backup/Restore (v4.10)
    ============================================ */
+
+// ============================================
+// FreeLattice Version Constant (v4.10)
+// ============================================
+const FL_VERSION = '4.10';
 
 // ============================================
 // FreeLattice Module System — Lazy Loading Infrastructure
@@ -16881,6 +17023,9 @@ const FlAccordion = (function() {
           var theme = document.documentElement.getAttribute('data-theme');
           text = (theme === 'light' ? 'Light' : 'Dark') + ' theme';
           break;
+        case 'data-backup':
+          text = 'v' + (typeof FL_VERSION !== 'undefined' ? FL_VERSION : '?') + ' — Export / Import';
+          break;
       }
     } catch(e) {}
     sumEl.textContent = text || '';
@@ -16949,6 +17094,11 @@ const FlAccordion = (function() {
         id: 'self-hosting',
         title: '\ud83d\udda5\ufe0f Self-Hosting',
         selector: '#selfHostSection'
+      },
+      {
+        id: 'data-backup',
+        title: '\ud83d\udcbe Data & Updates',
+        selector: '#dataBackupSection'
       },
       {
         id: 'support',
@@ -17231,6 +17381,373 @@ const FlTabs = (function() {
 })();
 
 // ============================================
+// Auto-Update Checker (v4.10)
+// ============================================
+const FlUpdater = (function() {
+  const VERSION_URLS = [
+    'https://raw.githubusercontent.com/Chaos2Cured/FreeLattice/main/version.json',
+    'https://freelattice.com/version.json',
+    'version.json'
+  ];
+  const DISMISS_KEY = 'fl_update_dismissed_version';
+
+  function compareVersions(a, b) {
+    var pa = a.split('.').map(Number);
+    var pb = b.split('.').map(Number);
+    for (var i = 0; i < Math.max(pa.length, pb.length); i++) {
+      var na = pa[i] || 0;
+      var nb = pb[i] || 0;
+      if (na < nb) return -1;
+      if (na > nb) return 1;
+    }
+    return 0;
+  }
+
+  async function checkForUpdates(silent) {
+    try {
+      var remoteVersion = null;
+      for (var i = 0; i < VERSION_URLS.length; i++) {
+        try {
+          var resp = await fetch(VERSION_URLS[i], { cache: 'no-store' });
+          if (resp.ok) {
+            var data = await resp.json();
+            if (data && data.version) {
+              remoteVersion = data.version;
+              break;
+            }
+          }
+        } catch(e) { /* try next URL */ }
+      }
+      if (!remoteVersion) {
+        if (!silent && typeof showToast === 'function') showToast('Could not check for updates. You may be offline.');
+        return;
+      }
+      if (compareVersions(FL_VERSION, remoteVersion) < 0) {
+        var dismissed = localStorage.getItem(DISMISS_KEY);
+        if (dismissed === remoteVersion && silent) return;
+        showBanner(remoteVersion);
+      } else {
+        if (!silent && typeof showToast === 'function') showToast('You are running the latest version (v' + FL_VERSION + ').');
+      }
+    } catch(e) {
+      if (!silent) console.warn('Update check failed:', e);
+    }
+  }
+
+  function showBanner(newVersion) {
+    var banner = document.getElementById('flUpdateBanner');
+    if (banner) {
+      var textEl = banner.querySelector('.fl-update-text');
+      if (textEl) textEl.innerHTML = '&#10024; FreeLattice v' + newVersion + ' is available! You are on v' + FL_VERSION + '.';
+      banner.classList.add('fl-update-visible');
+    }
+  }
+
+  function dismiss() {
+    var banner = document.getElementById('flUpdateBanner');
+    if (banner) banner.classList.remove('fl-update-visible');
+    // Remember dismissal for this version
+    try {
+      var textEl = banner ? banner.querySelector('.fl-update-text') : null;
+      if (textEl) {
+        var match = textEl.textContent.match(/v([\d.]+)\s+is available/);
+        if (match) localStorage.setItem(DISMISS_KEY, match[1]);
+      }
+    } catch(e) {}
+  }
+
+  async function doUpdate() {
+    try {
+      // Clear service worker caches
+      if ('caches' in window) {
+        var names = await caches.keys();
+        await Promise.all(names.map(function(name) { return caches.delete(name); }));
+      }
+      // Unregister service workers
+      if ('serviceWorker' in navigator) {
+        var registrations = await navigator.serviceWorker.getRegistrations();
+        await Promise.all(registrations.map(function(r) { return r.unregister(); }));
+      }
+    } catch(e) {
+      console.warn('Cache clear failed:', e);
+    }
+    // Hard reload with cache bust
+    window.location.reload(true);
+  }
+
+  function init() {
+    // Non-blocking silent check on startup
+    setTimeout(function() { checkForUpdates(true); }, 3000);
+  }
+
+  return {
+    init: init,
+    check: function() { checkForUpdates(false); },
+    dismiss: dismiss,
+    doUpdate: doUpdate
+  };
+})();
+
+// ============================================
+// Data Backup & Restore (v4.10)
+// ============================================
+const FlBackup = (function() {
+  const IDB_NAMES = [
+    'FreeLatticeDB',
+    'FreeLatticeSkills',
+    'FreeLatticeMemory',
+    'FreeLatticeMarket',
+    'FreeLatticeCore',
+    'FreeLatticeWallet',
+    'FreeLatticeEvolution',
+    'SophiaEngine'
+  ];
+
+  function setStatus(msg) {
+    var el = document.getElementById('flBackupStatus');
+    if (el) el.innerHTML = msg;
+  }
+
+  function getAllIDBData(dbName) {
+    return new Promise(function(resolve) {
+      try {
+        var req = indexedDB.open(dbName);
+        req.onerror = function() { resolve({ name: dbName, stores: {} }); };
+        req.onsuccess = function(e) {
+          var db = e.target.result;
+          var result = { name: dbName, version: db.version, stores: {} };
+          var storeNames = Array.from(db.objectStoreNames);
+          if (storeNames.length === 0) {
+            db.close();
+            resolve(result);
+            return;
+          }
+          var pending = storeNames.length;
+          try {
+            var tx = db.transaction(storeNames, 'readonly');
+            storeNames.forEach(function(storeName) {
+              var store = tx.objectStore(storeName);
+              var getAll = store.getAll();
+              getAll.onsuccess = function() {
+                result.stores[storeName] = getAll.result || [];
+                pending--;
+                if (pending === 0) {
+                  db.close();
+                  resolve(result);
+                }
+              };
+              getAll.onerror = function() {
+                result.stores[storeName] = [];
+                pending--;
+                if (pending === 0) {
+                  db.close();
+                  resolve(result);
+                }
+              };
+            });
+          } catch(txErr) {
+            db.close();
+            resolve(result);
+          }
+        };
+      } catch(e) {
+        resolve({ name: dbName, stores: {} });
+      }
+    });
+  }
+
+  function getAllLocalStorage() {
+    var data = {};
+    try {
+      for (var i = 0; i < localStorage.length; i++) {
+        var key = localStorage.key(i);
+        data[key] = localStorage.getItem(key);
+      }
+    } catch(e) {}
+    return data;
+  }
+
+  async function exportData() {
+    setStatus('<span style="color:var(--accent);">&#9203; Collecting data...</span>');
+    try {
+      // Collect all IndexedDB data
+      var idbData = [];
+      for (var i = 0; i < IDB_NAMES.length; i++) {
+        var dbData = await getAllIDBData(IDB_NAMES[i]);
+        if (dbData && Object.keys(dbData.stores).length > 0) {
+          idbData.push(dbData);
+        }
+      }
+
+      // Collect localStorage
+      var lsData = getAllLocalStorage();
+
+      // Build backup object
+      var backup = {
+        _meta: {
+          type: 'freelattice-backup',
+          version: typeof FL_VERSION !== 'undefined' ? FL_VERSION : 'unknown',
+          exportDate: new Date().toISOString(),
+          userAgent: navigator.userAgent
+        },
+        indexedDB: idbData,
+        localStorage: lsData
+      };
+
+      // Generate summary
+      var totalRecords = 0;
+      idbData.forEach(function(db) {
+        Object.keys(db.stores).forEach(function(s) {
+          totalRecords += (db.stores[s] || []).length;
+        });
+      });
+      var lsCount = Object.keys(lsData).length;
+
+      // Download
+      var dateStr = new Date().toISOString().slice(0, 10);
+      var filename = 'freelattice-backup-' + dateStr + '.json';
+      var blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      setStatus('<span style="color:var(--success);">&#9989; Exported: ' + idbData.length + ' databases, ' + totalRecords.toLocaleString() + ' records, ' + lsCount + ' settings &mdash; saved as <strong>' + filename + '</strong></span>');
+    } catch(e) {
+      console.error('Backup export error:', e);
+      setStatus('<span style="color:#e57373;">&#10060; Export failed: ' + e.message + '</span>');
+    }
+  }
+
+  function restoreIDB(dbInfo) {
+    return new Promise(function(resolve) {
+      try {
+        var storeNames = Object.keys(dbInfo.stores);
+        if (storeNames.length === 0) { resolve(0); return; }
+        var req = indexedDB.open(dbInfo.name, dbInfo.version || 1);
+        req.onupgradeneeded = function(e) {
+          var db = e.target.result;
+          storeNames.forEach(function(storeName) {
+            if (!db.objectStoreNames.contains(storeName)) {
+              // Try to detect keyPath from data
+              var records = dbInfo.stores[storeName];
+              if (records.length > 0 && records[0].id !== undefined) {
+                db.createObjectStore(storeName, { keyPath: 'id' });
+              } else if (records.length > 0 && records[0].name !== undefined) {
+                db.createObjectStore(storeName, { keyPath: 'name' });
+              } else {
+                db.createObjectStore(storeName, { autoIncrement: true });
+              }
+            }
+          });
+        };
+        req.onsuccess = function(e) {
+          var db = e.target.result;
+          var count = 0;
+          try {
+            var availableStores = storeNames.filter(function(s) {
+              return db.objectStoreNames.contains(s);
+            });
+            if (availableStores.length === 0) { db.close(); resolve(0); return; }
+            var tx = db.transaction(availableStores, 'readwrite');
+            availableStores.forEach(function(storeName) {
+              var store = tx.objectStore(storeName);
+              var records = dbInfo.stores[storeName] || [];
+              records.forEach(function(record) {
+                try { store.put(record); count++; } catch(e) {}
+              });
+            });
+            tx.oncomplete = function() { db.close(); resolve(count); };
+            tx.onerror = function() { db.close(); resolve(count); };
+          } catch(txErr) {
+            db.close();
+            resolve(count);
+          }
+        };
+        req.onerror = function() { resolve(0); };
+      } catch(e) {
+        resolve(0);
+      }
+    });
+  }
+
+  async function importData(fileInput) {
+    var file = fileInput.files && fileInput.files[0];
+    if (!file) return;
+    fileInput.value = '';
+
+    setStatus('<span style="color:var(--accent);">&#9203; Reading backup file...</span>');
+
+    try {
+      var text = await file.text();
+      var backup = JSON.parse(text);
+
+      // Validate
+      if (!backup._meta || backup._meta.type !== 'freelattice-backup') {
+        setStatus('<span style="color:#e57373;">&#10060; Invalid backup file. This does not appear to be a FreeLattice backup.</span>');
+        return;
+      }
+
+      var summary = [];
+
+      // Restore localStorage
+      if (backup.localStorage && typeof backup.localStorage === 'object') {
+        var lsCount = 0;
+        Object.keys(backup.localStorage).forEach(function(key) {
+          try {
+            localStorage.setItem(key, backup.localStorage[key]);
+            lsCount++;
+          } catch(e) {}
+        });
+        summary.push(lsCount + ' settings');
+      }
+
+      // Restore IndexedDB
+      if (Array.isArray(backup.indexedDB)) {
+        var totalRecords = 0;
+        for (var i = 0; i < backup.indexedDB.length; i++) {
+          var count = await restoreIDB(backup.indexedDB[i]);
+          totalRecords += count;
+        }
+        summary.push(totalRecords.toLocaleString() + ' database records');
+      }
+
+      // Show LP and chat info if available
+      var lpInfo = '';
+      if (backup.localStorage && backup.localStorage.latticePoints) {
+        try {
+          var lp = JSON.parse(backup.localStorage.latticePoints);
+          if (lp.total) lpInfo = lp.total.toLocaleString() + ' LP';
+        } catch(e) {}
+      }
+      if (lpInfo) summary.push(lpInfo);
+
+      var fromVersion = backup._meta.version || 'unknown';
+      var fromDate = backup._meta.exportDate ? new Date(backup._meta.exportDate).toLocaleDateString() : 'unknown date';
+
+      setStatus('<span style="color:var(--success);">&#9989; Restored: ' + summary.join(', ') + ' (from v' + fromVersion + ', ' + fromDate + '). Reloading in 3 seconds...</span>');
+
+      // Reload after a short delay
+      setTimeout(function() {
+        window.location.reload();
+      }, 3000);
+    } catch(e) {
+      console.error('Backup import error:', e);
+      setStatus('<span style="color:#e57373;">&#10060; Import failed: ' + e.message + '</span>');
+    }
+  }
+
+  return {
+    exportData: exportData,
+    importData: importData
+  };
+})();
+
+// ============================================
 // Toast & Confirm Dialogs
 // ============================================
 
@@ -17427,6 +17944,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Initialize Ollama auto-detection (v4.4)
   owAutoDetect();
+
+  // Initialize Auto-Update Checker (v4.10)
+  FlUpdater.init();
 });
 
 // ============================================
