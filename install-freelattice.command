@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ╔══════════════════════════════════════════════════════════════╗
-# ║  FreeLattice — Mac One-Click Installer  v2.0                ║
+# ║  FreeLattice — Mac One-Click Installer  v3.0                ║
 # ║  Double-click this file in Finder — everything is automatic ║
 # ╚══════════════════════════════════════════════════════════════╝
 # This is the ONLY file a Mac user needs. Double-click it.
@@ -165,37 +165,49 @@ if [ "$OLLAMA_INSTALLED" = true ]; then
   step "Step 3/7: Configuring Ollama CORS (so your browser can talk to it)..."
 
   # ── 3a: Set OLLAMA_ORIGINS persistently via launchctl ──
+  # This is the most reliable method for GUI apps on macOS
   launchctl setenv OLLAMA_ORIGINS "*" 2>/dev/null && \
     info "Set OLLAMA_ORIGINS=* via launchctl (affects GUI apps)" || true
 
-  # ── 3b: Add to shell profile for persistence across reboots ──
-  PROFILES_UPDATED=0
+  # ── 3b: Clean up and deduplicate OLLAMA_ORIGINS in shell profiles ──
   for PROFILE in "$HOME/.zshrc" "$HOME/.zprofile" "$HOME/.bash_profile" "$HOME/.bashrc"; do
-    if [ -f "$PROFILE" ] || [ "$PROFILE" = "$HOME/.zshrc" ]; then
-      # Create .zshrc if it doesn't exist (default macOS shell is zsh)
-      if [ ! -f "$PROFILE" ] && [ "$PROFILE" = "$HOME/.zshrc" ]; then
-        touch "$PROFILE"
-      fi
-      if [ -f "$PROFILE" ]; then
-        if ! grep -q "OLLAMA_ORIGINS" "$PROFILE" 2>/dev/null; then
-          echo '' >> "$PROFILE"
-          echo '# FreeLattice — Allow browser access to local Ollama (CORS fix)' >> "$PROFILE"
-          echo 'export OLLAMA_ORIGINS="*"' >> "$PROFILE"
-          PROFILES_UPDATED=$((PROFILES_UPDATED + 1))
-          info "Added OLLAMA_ORIGINS=* to $PROFILE"
-        else
-          info "OLLAMA_ORIGINS already in $PROFILE"
-          PROFILES_UPDATED=$((PROFILES_UPDATED + 1))
-        fi
-      fi
+    if [ -f "$PROFILE" ]; then
+      # Remove ALL existing OLLAMA_ORIGINS lines (and their comment headers)
+      # to prevent duplicates from previous installs
+      sed -i '' '/# FreeLattice.*CORS/d' "$PROFILE" 2>/dev/null || true
+      sed -i '' '/# Allow browser access to local Ollama/d' "$PROFILE" 2>/dev/null || true
+      sed -i '' '/export OLLAMA_ORIGINS/d' "$PROFILE" 2>/dev/null || true
+      # Remove any blank lines that were left behind (collapse multiple blanks to one)
+      sed -i '' '/^$/N;/^\n$/d' "$PROFILE" 2>/dev/null || true
     fi
   done
 
-  if [ $PROFILES_UPDATED -gt 0 ]; then
-    success "CORS setting will persist across reboots"
+  # ── 3c: Add a single clean OLLAMA_ORIGINS entry to .zshrc ──
+  # (zsh is the default shell on modern macOS)
+  ZSHRC="$HOME/.zshrc"
+  if [ ! -f "$ZSHRC" ]; then
+    touch "$ZSHRC"
+  fi
+  echo '' >> "$ZSHRC"
+  echo '# FreeLattice — Allow browser access to local Ollama (CORS fix)' >> "$ZSHRC"
+  echo 'export OLLAMA_ORIGINS="*"' >> "$ZSHRC"
+  info "Added OLLAMA_ORIGINS=* to $ZSHRC (deduplicated)"
+
+  # Also add to .zprofile for login shells
+  ZPROFILE="$HOME/.zprofile"
+  if [ -f "$ZPROFILE" ] || [ ! -f "$HOME/.bash_profile" ]; then
+    if [ ! -f "$ZPROFILE" ]; then
+      touch "$ZPROFILE"
+    fi
+    echo '' >> "$ZPROFILE"
+    echo '# FreeLattice — Allow browser access to local Ollama (CORS fix)' >> "$ZPROFILE"
+    echo 'export OLLAMA_ORIGINS="*"' >> "$ZPROFILE"
+    info "Added OLLAMA_ORIGINS=* to $ZPROFILE (deduplicated)"
   fi
 
-  # ── 3c: Also write a launchd plist for maximum persistence ──
+  success "CORS setting will persist across reboots"
+
+  # ── 3d: Also write a launchd plist for maximum persistence ──
   PLIST_DIR="$HOME/Library/LaunchAgents"
   PLIST_FILE="$PLIST_DIR/com.freelattice.ollama-cors.plist"
   mkdir -p "$PLIST_DIR" 2>/dev/null
@@ -223,10 +235,10 @@ PLIST_EOF
     info "Installed launchd agent for CORS persistence on reboot"
   fi
 
-  # ── 3d: Set for current process ──
+  # ── 3e: Set for current process ──
   export OLLAMA_ORIGINS="*"
 
-  # ── 3e: Kill and restart Ollama so it picks up the new setting ──
+  # ── 3f: Kill and restart Ollama so it picks up the new setting ──
   info "Restarting Ollama to apply CORS settings..."
 
   # Kill ALL Ollama processes (the app and the server)
@@ -253,7 +265,7 @@ PLIST_EOF
     info "Started ollama serve with CORS enabled"
   fi
 
-  # ── 3f: Wait for Ollama to be ready ──
+  # ── 3g: Wait for Ollama to be ready ──
   info "Waiting for Ollama to start up..."
   OLLAMA_READY=false
   for i in $(seq 1 20); do
@@ -270,7 +282,7 @@ PLIST_EOF
     OLLAMA_RUNNING=true
     success "Ollama is running with CORS enabled!"
 
-    # ── 3g: Verify CORS is actually working ──
+    # ── 3h: Verify CORS is actually working ──
     CORS_CHECK=$(curl -s -o /dev/null -w "%{http_code}" \
       -H "Origin: http://localhost:8080" \
       http://localhost:11434/api/tags 2>/dev/null)
@@ -281,7 +293,7 @@ PLIST_EOF
       info "The proxy server will handle this as a fallback"
     fi
   else
-    warn "Ollama is taking longer than expected to start"
+    warn "Ollama didn't respond within 20 seconds"
     info "It may still be loading — the proxy server will work as a fallback"
   fi
 else

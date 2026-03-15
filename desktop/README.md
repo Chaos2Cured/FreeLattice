@@ -1,17 +1,17 @@
 # FreeLattice Desktop App
 
-A native desktop application for FreeLattice — double-click and go. No browser, no terminal, no CORS issues.
+A native desktop application for FreeLattice — double-click and go. Always up-to-date, no CORS issues, no browser required.
 
 ## Quick Start (Development)
 
 ```bash
 cd desktop
 npm install
-./build-and-release.sh   # copies app files into desktop/app/
+./build-and-release.sh   # copies fallback app files into desktop/app/
 npm start
 ```
 
-**Note:** Before running `npm start`, the FreeLattice app files (index.html, etc.) must be present in the `desktop/app/` directory. The `build-and-release.sh` script handles this automatically.
+**Note:** The Electron app loads the live site (`https://freelattice.com/app.html`) by default. The local `desktop/app/` files are only used as an offline fallback. The `build-and-release.sh` script copies them automatically.
 
 ## Build Installers
 
@@ -27,10 +27,14 @@ npm run build:linux    # creates .AppImage + .deb
 
 ## How It Works
 
-The desktop app bundles FreeLattice with a built-in local server that:
+The desktop app loads FreeLattice directly from `freelattice.com`, so you always get the latest version automatically. If you're offline, it falls back to a bundled local copy.
 
-- **Serves the app locally** — no browser needed, no CORS issues, ever
-- **Proxies Ollama requests** — `/ollama/*` routes to `localhost:11434` automatically
+### Key Features
+
+- **Always up-to-date** — loads from `freelattice.com` so you never get stuck on old versions
+- **Offline fallback** — if you're offline, the bundled local copy kicks in automatically
+- **CORS bypass** — Electron's session intercepts requests to Ollama (`localhost:11434`) and injects permissive CORS headers, so local AI always works regardless of origin
+- **Ollama proxy** — the built-in local server also proxies `/ollama/*` to `localhost:11434` as a secondary fallback
 - **Auto-detects local AI models** — checks every 30 seconds, notifies you when Ollama connects
 - **Runs in the system tray** — close the window, the app stays accessible from the tray
 - **Remembers your window** — position, size, and maximized state persist between sessions
@@ -44,20 +48,28 @@ The desktop app bundles FreeLattice with a built-in local server that:
 │  ┌────────────────────────────────────┐  │
 │  │       Electron BrowserWindow       │  │
 │  │                                    │  │
-│  │   Loads http://127.0.0.1:{port}    │  │
+│  │   Online:  freelattice.com         │  │
+│  │   Offline: 127.0.0.1:{port}       │  │
 │  └──────────────┬─────────────────────┘  │
 │                 │                         │
 │  ┌──────────────▼─────────────────────┐  │
-│  │       Built-in HTTP Server         │  │
+│  │     CORS Bypass (session-level)    │  │
 │  │                                    │  │
-│  │   /            → index.html        │  │
+│  │   Strips Origin header on Ollama   │  │
+│  │   Injects Access-Control-Allow-*   │  │
+│  └────────────────────────────────────┘  │
+│                                          │
+│  ┌────────────────────────────────────┐  │
+│  │   Local Fallback HTTP Server       │  │
+│  │                                    │  │
+│  │   /            → app.html          │  │
 │  │   /ollama/*    → localhost:11434   │  │
 │  │   /desktop/*   → status API        │  │
 │  └────────────────────────────────────┘  │
 │                                          │
 │  ┌────────────────────────────────────┐  │
 │  │         System Tray Icon           │  │
-│  │   • Open / Ollama Status / Quit    │  │
+│  │   • Open / Source / Ollama / Quit  │  │
 │  └────────────────────────────────────┘  │
 └──────────────────────────────────────────┘
 ```
@@ -66,14 +78,15 @@ The desktop app bundles FreeLattice with a built-in local server that:
 
 | Feature | Description |
 |---|---|
-| **One-click launch** | Double-click the app — FreeLattice opens instantly |
-| **Built-in Ollama proxy** | No CORS configuration needed, ever |
+| **Live loading** | Loads from `freelattice.com` — always the latest version |
+| **Offline fallback** | Seamlessly falls back to bundled local copy when offline |
+| **CORS bypass** | Session-level interception ensures Ollama always works |
+| **Built-in Ollama proxy** | Secondary CORS fallback via local server proxy |
 | **Auto-detection** | Automatically finds Ollama if it's running locally |
 | **System tray** | Minimize to tray, quick access from the menu bar |
 | **Window memory** | Remembers size, position, and maximized state |
 | **Deep links** | Foundation for `freelattice://` protocol handling |
 | **Cross-platform** | Builds for macOS (.dmg), Windows (.exe), and Linux (.AppImage) |
-| **Secure** | Context isolation, sandboxed renderer, no node integration |
 
 ## Requirements for Building
 
@@ -100,14 +113,15 @@ Pre-built installers will be available on the [GitHub Releases](https://github.c
 
 ## Security Model
 
-The desktop app follows Electron security best practices:
+The desktop app balances security with functionality:
 
 - **Context isolation** is enabled — the renderer cannot access Node.js APIs directly
 - **Node integration** is disabled — no `require()` in the renderer
-- **Sandbox mode** is enabled — the renderer runs in a restricted environment
 - **Preload script** exposes only specific, safe APIs via `contextBridge`
 - **External URLs** open in the default browser, not inside the app
 - **Directory traversal** is prevented in the static file server
+- **Web security** is relaxed (`webSecurity: false`) to allow cross-origin requests to local Ollama — this is safe because the app only loads trusted content from `freelattice.com` or the local bundled copy
+- **Session-level CORS bypass** specifically targets Ollama endpoints (`localhost:11434` / `127.0.0.1:11434`) rather than blanket-disabling all security
 
 ## License
 

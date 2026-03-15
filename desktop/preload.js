@@ -39,6 +39,12 @@ contextBridge.exposeInMainWorld('electronAPI', {
   getServerPort: () => ipcRenderer.invoke('get-server-port'),
 
   /**
+   * Get whether the app loaded from the live site or local fallback.
+   * @returns {Promise<string>} 'live' or 'local'
+   */
+  getSource: () => ipcRenderer.invoke('get-source'),
+
+  /**
    * Listen for Ollama status changes from the main process.
    * @param {function} callback - Called with (boolean) when status changes
    * @returns {function} unsubscribe function

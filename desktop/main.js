@@ -2,9 +2,14 @@
 // FreeLattice Desktop — Electron Main Process
 // Your AI. Your Data. Your Freedom.
 // ============================================
+// Now loads the live site (freelattice.com) by default,
+// falls back to a bundled local copy when offline,
+// and bypasses CORS so Ollama always works.
+// ============================================
 
-const { app, BrowserWindow, Menu, Tray, shell, dialog, Notification, ipcMain, nativeImage } = require('electron');
+const { app, BrowserWindow, Menu, Tray, shell, dialog, Notification, ipcMain, nativeImage, session } = require('electron');
 const http = require('http');
+const https = require('https');
 const fs = require('fs');
 const path = require('path');
 const net = require('net');
@@ -23,11 +28,18 @@ try {
 // ============================================
 
 const APP_NAME = 'FreeLattice';
+const LIVE_URL = 'https://freelattice.com/app.html';
 const OLLAMA_HOST = 'http://localhost:11434';
 const OLLAMA_HOSTNAME = 'localhost';
 const OLLAMA_PORT = 11434;
 const OLLAMA_CHECK_INTERVAL = 30000; // 30 seconds
 const APP_DIR = path.join(__dirname, 'app');
+
+// Ollama endpoints that should bypass CORS
+const OLLAMA_ORIGINS = [
+  'http://localhost:11434',
+  'http://127.0.0.1:11434'
+];
 
 // ============================================
 // State
@@ -40,6 +52,7 @@ let serverPort = 0;
 let ollamaConnected = false;
 let ollamaCheckTimer = null;
 let store = null;
+let loadedFromLive = false;
 
 // ============================================
 // Persistent Store (window position, size, etc.)
@@ -122,6 +135,21 @@ function findAvailablePort(startPort) {
       // Port in use, try next
       resolve(findAvailablePort(startPort + 1));
     });
+  });
+}
+
+// ============================================
+// Connectivity Check
+// ============================================
+
+function checkOnline() {
+  return new Promise((resolve) => {
+    const req = https.request(LIVE_URL, { method: 'HEAD', timeout: 5000 }, (res) => {
+      resolve(res.statusCode >= 200 && res.statusCode < 400);
+    });
+    req.on('error', () => resolve(false));
+    req.on('timeout', () => { req.destroy(); resolve(false); });
+    req.end();
   });
 }
 
@@ -245,6 +273,7 @@ function proxyToOllama(req, res, ollamaPath) {
 
 // ============================================
 // Local HTTP Server (serves app + Ollama proxy)
+// (kept as fallback for offline mode)
 // ============================================
 
 function startLocalServer(port) {
@@ -285,7 +314,8 @@ function startLocalServer(port) {
       }
 
       // --- Static file serving ---
-      if (urlPath === '/') urlPath = '/index.html';
+      if (urlPath === '/') urlPath = '/app.html';
+      if (urlPath === '/index.html') urlPath = '/app.html';
 
       const safePath = path.normalize(urlPath).replace(/^(\.\.[\/\\])+/, '');
       const filePath = path.join(APP_DIR, safePath);
@@ -328,10 +358,49 @@ function startLocalServer(port) {
 }
 
 // ============================================
+// CORS Bypass — Allow Electron to reach Ollama
+// ============================================
+
+function setupCORSBypass() {
+  const ses = session.defaultSession;
+
+  // Remove CORS restrictions for Ollama endpoints.
+  // This is safe because this is a trusted desktop app.
+  ses.webRequest.onBeforeSendHeaders((details, callback) => {
+    // For requests to Ollama, strip the Origin header so Ollama
+    // doesn't reject the request based on CORS policy.
+    const url = details.url;
+    const isOllama = OLLAMA_ORIGINS.some((origin) => url.startsWith(origin));
+    if (isOllama) {
+      delete details.requestHeaders['Origin'];
+    }
+    callback({ requestHeaders: details.requestHeaders });
+  });
+
+  ses.webRequest.onHeadersReceived((details, callback) => {
+    const url = details.url;
+    const isOllama = OLLAMA_ORIGINS.some((origin) => url.startsWith(origin));
+
+    if (isOllama) {
+      // Inject permissive CORS headers into every Ollama response
+      const headers = details.responseHeaders || {};
+      headers['Access-Control-Allow-Origin'] = ['*'];
+      headers['Access-Control-Allow-Methods'] = ['GET, POST, PUT, DELETE, OPTIONS'];
+      headers['Access-Control-Allow-Headers'] = ['Content-Type, Authorization'];
+      callback({ responseHeaders: headers });
+    } else {
+      callback({ responseHeaders: details.responseHeaders });
+    }
+  });
+
+  console.log('[FreeLattice] CORS bypass configured for Ollama endpoints');
+}
+
+// ============================================
 // Window Management
 // ============================================
 
-function createMainWindow() {
+async function createMainWindow() {
   const bounds = getStoredValue('windowBounds', { width: 1400, height: 900 });
   const position = getStoredValue('windowPosition', null);
   const maximized = getStoredValue('windowMaximized', false);
@@ -349,7 +418,10 @@ function createMainWindow() {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
       nodeIntegration: false,
-      sandbox: true,
+      // Disable web security to allow cross-origin requests to Ollama
+      // from the freelattice.com origin. This is safe in a trusted
+      // desktop environment where the user controls what is loaded.
+      webSecurity: false,
       spellcheck: true
     }
   };
@@ -366,8 +438,25 @@ function createMainWindow() {
     mainWindow.maximize();
   }
 
-  // Load the app from the local server
-  mainWindow.loadURL('http://127.0.0.1:' + serverPort);
+  // Set a custom user agent that identifies the desktop app
+  const electronVersion = process.versions.electron || 'unknown';
+  const appVersion = app.getVersion();
+  mainWindow.webContents.setUserAgent(
+    `Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) FreeLattice/${appVersion} Electron/${electronVersion} Chrome/${process.versions.chrome} Safari/537.36`
+  );
+
+  // ── Load Strategy: live site first, local fallback ──
+  const isOnline = await checkOnline();
+
+  if (isOnline) {
+    console.log('[FreeLattice] Online — loading live site: ' + LIVE_URL);
+    mainWindow.loadURL(LIVE_URL);
+    loadedFromLive = true;
+  } else {
+    console.log('[FreeLattice] Offline — falling back to local server');
+    mainWindow.loadURL('http://127.0.0.1:' + serverPort);
+    loadedFromLive = false;
+  }
 
   // Save window state on changes
   mainWindow.on('resize', saveWindowState);
@@ -393,7 +482,9 @@ function createMainWindow() {
 
   // Open external links in the default browser
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
-    if (url.startsWith('http://127.0.0.1:' + serverPort)) {
+    // Allow the live site and local server
+    if (url.startsWith(LIVE_URL.replace('/app.html', '')) ||
+        url.startsWith('http://127.0.0.1:' + serverPort)) {
       return { action: 'allow' };
     }
     shell.openExternal(url);
@@ -402,9 +493,22 @@ function createMainWindow() {
 
   // Intercept navigation to external URLs
   mainWindow.webContents.on('will-navigate', (event, url) => {
-    if (!url.startsWith('http://127.0.0.1:' + serverPort)) {
+    const isFreeLattice = url.startsWith('https://freelattice.com');
+    const isLocal = url.startsWith('http://127.0.0.1:' + serverPort);
+    const isOllama = OLLAMA_ORIGINS.some((origin) => url.startsWith(origin));
+    if (!isFreeLattice && !isLocal && !isOllama) {
       event.preventDefault();
       shell.openExternal(url);
+    }
+  });
+
+  // Handle load failures — fall back to local server
+  mainWindow.webContents.on('did-fail-load', (event, errorCode, errorDescription) => {
+    console.warn('[FreeLattice] Page load failed:', errorDescription, '(code:', errorCode + ')');
+    if (loadedFromLive) {
+      console.log('[FreeLattice] Falling back to local server...');
+      loadedFromLive = false;
+      mainWindow.loadURL('http://127.0.0.1:' + serverPort);
     }
   });
 }
@@ -477,12 +581,20 @@ function updateTrayMenu() {
     ? 'Ollama Status: ✓ Connected'
     : 'Ollama Status: ✗ Not Found';
 
+  const sourceLabel = loadedFromLive
+    ? 'Source: freelattice.com (live)'
+    : 'Source: Local (offline)';
+
   const contextMenu = Menu.buildFromTemplate([
     {
       label: 'Open FreeLattice',
       click: () => showMainWindow()
     },
     { type: 'separator' },
+    {
+      label: sourceLabel,
+      enabled: false
+    },
     {
       label: statusLabel,
       enabled: false
@@ -643,6 +755,8 @@ function showAboutDialog() {
       'An open-source AI interface that puts you in control.',
       'No tracking. No data collection. No corporate oversight.',
       '',
+      loadedFromLive ? 'Running from: freelattice.com (live)' : 'Running from: local (offline)',
+      '',
       '© 2024-2025 FreeLattice Contributors',
       'Released under the MIT License'
     ].join('\n'),
@@ -711,10 +825,11 @@ function handleDeepLink(url) {
 // ============================================
 
 function checkForUpdates() {
-  // TODO: Integrate electron-updater for automatic updates
-  // For now, just check GitHub releases and log
-  console.log('[FreeLattice] Auto-updater: checking for updates...');
-  console.log('[FreeLattice] Auto-updater: To enable, install electron-updater and configure GitHub releases.');
+  // With the live-URL loading strategy, the app always gets the
+  // latest FreeLattice UI from freelattice.com automatically.
+  // This updater is reserved for Electron shell updates only.
+  console.log('[FreeLattice] UI auto-updates via freelattice.com — always current.');
+  console.log('[FreeLattice] Electron shell updater: To enable, install electron-updater and configure GitHub releases.');
 
   // Future implementation:
   // const { autoUpdater } = require('electron-updater');
@@ -755,6 +870,10 @@ function setupIPC() {
   ipcMain.handle('get-server-port', () => {
     return serverPort;
   });
+
+  ipcMain.handle('get-source', () => {
+    return loadedFromLive ? 'live' : 'local';
+  });
 }
 
 // ============================================
@@ -771,35 +890,28 @@ app.whenReady().then(async () => {
   const canContinue = setupDeepLinks();
   if (canContinue === false) return; // Another instance is already running
 
-  // Find an available port
+  // ── CORS Bypass: configure session-level CORS override ──
+  setupCORSBypass();
+
+  // Find an available port for the local fallback server
   serverPort = await findAvailablePort(45678);
-  console.log('[FreeLattice] Using port ' + serverPort);
+  console.log('[FreeLattice] Fallback server port: ' + serverPort);
 
-  // Check if app files exist
-  const indexPath = path.join(APP_DIR, 'index.html');
-  if (!fs.existsSync(indexPath)) {
-    dialog.showErrorBox(
-      'FreeLattice — App Files Missing',
-      'Could not find app files in the "app" directory.\n\n' +
-      'Please run the build-and-release script first:\n' +
-      '  ./build-and-release.sh\n\n' +
-      'Or manually copy index.html and other files into:\n' +
-      '  ' + APP_DIR
-    );
-    app.quit();
-    return;
-  }
+  // Start the local fallback server (always available for offline use)
+  const indexPath = path.join(APP_DIR, 'app.html');
+  const legacyIndexPath = path.join(APP_DIR, 'index.html');
+  const hasLocalFiles = fs.existsSync(indexPath) || fs.existsSync(legacyIndexPath);
 
-  // Start the local server
-  try {
-    await startLocalServer(serverPort);
-  } catch (err) {
-    dialog.showErrorBox(
-      'FreeLattice — Server Error',
-      'Could not start the local server: ' + err.message
-    );
-    app.quit();
-    return;
+  if (hasLocalFiles) {
+    try {
+      await startLocalServer(serverPort);
+      console.log('[FreeLattice] Local fallback server ready');
+    } catch (err) {
+      console.warn('[FreeLattice] Could not start local fallback server:', err.message);
+      // Non-fatal: we can still load from the live site
+    }
+  } else {
+    console.log('[FreeLattice] No local app files found — live-only mode');
   }
 
   // Set up IPC handlers
@@ -808,8 +920,8 @@ app.whenReady().then(async () => {
   // Create the application menu
   createAppMenu();
 
-  // Create the main window
-  createMainWindow();
+  // Create the main window (handles live vs. local decision)
+  await createMainWindow();
 
   // Create system tray
   createTray();
