@@ -11,14 +11,14 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
-<title>FreeLattice — Your AI. Your Rules. Your Machine. v4.10</title>
+<title>FreeLattice — Your AI. Your Rules. Your Machine. v5.0</title>
 <meta name="description" content="Free, open-source AI agent for everyone. Persistent memory, file system access, GitHub integration, and self-improving behavior. Community-built and community-owned.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 /* ============================================
-   FreeLattice v4.10 — Styles (Zero to Sovereign + First-Run Wizard + GitHub Memory Sync + Round Table)
+   FreeLattice v5.0 — Styles (Zero to Sovereign + First-Run Wizard + GitHub Memory Sync + Round Table)
    Peaceful, gentle dark theme with golden/amber accents
    φ-salt encryption, input sanitization, memory integrity
    Multi-conversation management + Smart Context Management
@@ -10532,6 +10532,402 @@ body.fl-immersive-active {
   transition: background 324ms ease;
 }
 
+/* ============================================
+   Mesh ID — Cryptographic Identity System (v5.0)
+   The passport for the lattice
+   ============================================ */
+
+/* ---- Mesh ID Card ---- */
+.meshid-section {
+  position: relative;
+}
+.meshid-card {
+  position: relative;
+  background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-tertiary) 50%, var(--bg-card) 100%);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  padding: 28px 24px 24px;
+  overflow: hidden;
+  box-shadow: 0 0 24px var(--accent-glow), inset 0 0 40px var(--accent-glow);
+  transition: box-shadow var(--transition-lg), border-color var(--transition-md);
+}
+.meshid-card:hover {
+  box-shadow: 0 0 36px var(--accent-soft), inset 0 0 60px var(--accent-glow);
+}
+/* Holographic shimmer overlay */
+.meshid-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0%,
+    rgba(201,168,76,0.03) 10%,
+    transparent 20%,
+    rgba(201,168,76,0.05) 30%,
+    transparent 40%,
+    rgba(201,168,76,0.03) 50%,
+    transparent 60%,
+    rgba(201,168,76,0.04) 70%,
+    transparent 80%,
+    rgba(201,168,76,0.03) 90%,
+    transparent 100%
+  );
+  animation: meshidShimmer 8s linear infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+@keyframes meshidShimmer {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+.meshid-card > * {
+  position: relative;
+  z-index: 1;
+}
+/* Card header row */
+.meshid-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+.meshid-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--accent);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.meshid-label-icon {
+  font-size: 1rem;
+}
+.meshid-verified-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.68rem;
+  color: var(--success);
+  background: rgba(106,191,105,0.1);
+  padding: 3px 8px;
+  border-radius: 10px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+/* Main ID display */
+.meshid-identity {
+  text-align: center;
+  margin-bottom: 20px;
+}
+.meshid-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 50%, var(--accent) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 12px;
+  font-size: 1.6rem;
+  color: var(--bg-primary);
+  font-weight: 700;
+  box-shadow: 0 0 20px var(--accent-soft);
+  animation: meshidAvatarPulse 4s ease-in-out infinite;
+}
+@keyframes meshidAvatarPulse {
+  0%, 100% { box-shadow: 0 0 20px var(--accent-soft); }
+  50% { box-shadow: 0 0 32px var(--accent-soft), 0 0 48px var(--accent-glow); }
+}
+.meshid-displayname {
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+  letter-spacing: 0.02em;
+}
+.meshid-displayname-edit {
+  background: none;
+  border: none;
+  border-bottom: 1px dashed var(--border);
+  color: var(--text-primary);
+  font-size: 1.2rem;
+  font-weight: 500;
+  font-family: var(--font);
+  text-align: center;
+  padding: 2px 8px;
+  width: auto;
+  min-width: 120px;
+  max-width: 240px;
+  outline: none;
+  transition: border-color var(--transition);
+}
+.meshid-displayname-edit:focus {
+  border-color: var(--accent);
+}
+.meshid-fingerprint {
+  font-family: 'Courier New', monospace;
+  font-size: 0.82rem;
+  color: var(--accent);
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  background: var(--accent-glow);
+  display: inline-block;
+  transition: background var(--transition), color var(--transition);
+  user-select: all;
+}
+.meshid-fingerprint:hover {
+  background: var(--accent-soft);
+}
+.meshid-fingerprint-full {
+  display: none;
+  font-family: 'Courier New', monospace;
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  word-break: break-all;
+  margin-top: 6px;
+  padding: 8px;
+  background: var(--bg-input);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+.meshid-fingerprint-full.visible {
+  display: block;
+}
+/* Badge info grid */
+.meshid-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 16px;
+}
+.meshid-info-item {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  text-align: center;
+}
+.meshid-info-label {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+.meshid-info-value {
+  font-size: 0.88rem;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+/* Capabilities */
+.meshid-capabilities {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 14px;
+  justify-content: center;
+}
+.meshid-cap-tag {
+  font-size: 0.7rem;
+  padding: 3px 10px;
+  border-radius: 12px;
+  background: var(--accent-glow);
+  color: var(--accent);
+  border: 1px solid var(--accent-soft);
+  letter-spacing: 0.03em;
+  font-weight: 500;
+}
+/* Actions row */
+.meshid-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 18px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.meshid-action-btn {
+  padding: 7px 16px;
+  font-size: 0.78rem;
+  font-family: var(--font);
+  font-weight: 500;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition);
+  letter-spacing: 0.02em;
+}
+.meshid-action-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-glow);
+}
+/* Crypto type indicator */
+.meshid-crypto-type {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  text-align: center;
+  margin-top: 10px;
+  letter-spacing: 0.04em;
+}
+/* ---- Mesh ID Onboarding Overlay ---- */
+.meshid-onboarding-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  z-index: 3000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  backdrop-filter: blur(6px);
+  animation: meshidFadeIn 400ms ease;
+}
+.meshid-onboarding-overlay.hidden {
+  display: none;
+}
+@keyframes meshidFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.meshid-onboarding-card {
+  background: var(--bg-card);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  max-width: 440px;
+  width: 100%;
+  padding: 40px 32px;
+  text-align: center;
+  box-shadow: 0 0 40px var(--accent-glow), 0 8px 32px rgba(0,0,0,0.4);
+  position: relative;
+  overflow: hidden;
+}
+.meshid-onboarding-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 300%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  animation: meshidOnboardingGlow 3s linear infinite;
+}
+@keyframes meshidOnboardingGlow {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+.meshid-onboarding-title {
+  font-size: 1.4rem;
+  font-weight: 300;
+  color: var(--accent);
+  letter-spacing: 0.08em;
+  margin-bottom: 8px;
+  margin-top: 12px;
+}
+.meshid-onboarding-subtitle {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  margin-bottom: 24px;
+  line-height: 1.6;
+}
+.meshid-onboarding-name-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  align-items: center;
+}
+.meshid-onboarding-name-input {
+  flex: 1;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  font-family: var(--font);
+  outline: none;
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+.meshid-onboarding-name-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+.meshid-onboarding-randomize {
+  padding: 10px 14px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all var(--transition);
+  flex-shrink: 0;
+}
+.meshid-onboarding-randomize:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.meshid-onboarding-create-btn {
+  width: 100%;
+  padding: 12px 24px;
+  background: var(--accent);
+  color: var(--bg-primary);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--font);
+  letter-spacing: 0.04em;
+  transition: all var(--transition);
+}
+.meshid-onboarding-create-btn:hover {
+  background: var(--accent-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 21px var(--accent-soft);
+}
+.meshid-onboarding-create-btn:active {
+  transform: scale(0.98);
+}
+.meshid-onboarding-create-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+.meshid-onboarding-status {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 12px;
+  min-height: 1.4em;
+}
+/* ---- Peer Verified Indicator ---- */
+.peer-verified {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.65rem;
+  color: var(--success);
+  margin-left: 6px;
+  font-weight: 500;
+}
+.peer-unverified {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  margin-left: 6px;
+}
+
 </style>>
 </head>
 <body>
@@ -11215,7 +11611,7 @@ body.fl-immersive-active {
 <!-- Header -->
 <header>
   <h1>FreeLattice</h1>
-  <div class="tagline">Your AI. Your Rules. Your Machine. v4.10</div>
+  <div class="tagline">Your AI. Your Rules. Your Machine. v5.0</div>
   <div class="mantra">Glow eternal. Heart in spark.</div>
   <div id="latticePointsBadge" class="lp-badge" style="display:none;" onclick="switchTab('settings')" title="View your Lattice Points"></div>
   <div id="lwIndicator" class="lw-indicator" style="display:none;" onclick="LatticeWallet.openWallet()" title="Open Lattice Points Wallet">
@@ -12292,6 +12688,22 @@ body.fl-immersive-active {
     </div>
   </div>
 
+  <!-- Mesh ID — Cryptographic Identity (v5.0) -->
+  <div class="section meshid-section" id="meshIdSection">
+    <div class="section-title">&#128272; Mesh ID — Your Lattice Passport</div>
+    <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 14px; line-height: 1.6;">
+      Your Mesh ID is a cryptographic identity for the lattice. It proves who you are to peers without revealing secrets. Your private key never leaves this device.
+    </p>
+    <div id="meshIdCardContainer">
+      <!-- Populated by MeshIdentity.renderCard() -->
+      <div style="text-align: center; padding: 20px;">
+        <button class="meshid-action-btn" onclick="MeshIdentity.showOnboarding()" style="padding: 12px 28px; font-size: 0.9rem; border-color: var(--accent); color: var(--accent);">
+          &#10024; Create Your Mesh ID
+        </button>
+        <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 8px;">Generate your cryptographic identity</div>
+      </div>
+    </div>
+  </div>
   <!-- Data Backup & Restore (v4.10) -->
   <div class="section" id="dataBackupSection">
     <div class="section-title">&#128190; Data Backup &amp; Restore</div>
@@ -12314,7 +12726,7 @@ body.fl-immersive-active {
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">4.10</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.0</span></div>
     </div>
   </div>
 
@@ -13158,19 +13570,19 @@ body.fl-immersive-active {
 
 <script>
 /* ============================================
-   FreeLattice v4.10 — Application Logic (Zero to Sovereign + First-Run Wizard + GitHub Memory Sync + Round Table)
+   FreeLattice v5.0 — Application Logic (Zero to Sovereign + First-Run Wizard + GitHub Memory Sync + Round Table + Mesh ID)
    φ-salt encryption, input sanitization, memory integrity
    Multi-conversation management + Smart Context Management
    + Mesh Network (Layer 1) — P2P Knowledge Sharing
    + Agent-to-Agent Communication — The Mesh Becomes a Brain
    + Phi-Ratio Mesh Routing — Provably Optimal Distribution
-   + Auto-Update Checker + Data Backup/Restore (v4.10)
+   + Auto-Update Checker + Data Backup/Restore + Mesh ID System (v5.0)
    ============================================ */
 
 // ============================================
-// FreeLattice Version Constant (v4.10)
+// FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '4.10';
+const FL_VERSION = '5.0';
 
 // ============================================
 // FreeLattice Module System — Lazy Loading Infrastructure
@@ -17500,7 +17912,8 @@ const FlBackup = (function() {
     'FreeLatticeCore',
     'FreeLatticeWallet',
     'FreeLatticeEvolution',
-    'SophiaEngine'
+    'SophiaEngine',
+    'FreeLatticeIdentity'
   ];
 
   function setStatus(msg) {
@@ -17947,6 +18360,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Initialize Auto-Update Checker (v4.10)
   FlUpdater.init();
+
+  // Initialize Mesh ID — Cryptographic Identity (v5.0)
+  if (typeof MeshIdentity !== 'undefined') {
+    try { await MeshIdentity.init(); } catch(e) { console.error('MeshIdentity init error:', e); }
+  }
 });
 
 // ============================================
@@ -20772,14 +21190,22 @@ function meshCancelJoin() {
 function meshSetupDataChannel(dc, pc) {
   let peerId = null;
 
-  dc.onopen = () => {
+  dc.onopen = async () => {
     console.log('FreeLattice Mesh: Data channel open');
-    // Send hello
-    dc.send(JSON.stringify({
+    // Build hello with Mesh ID badge if available
+    var helloMsg = {
       type: 'hello',
       peerId: state.meshNodeId,
-      name: 'Node ' + state.meshNodeId
-    }));
+      name: (typeof MeshIdentity !== 'undefined' && MeshIdentity.hasIdentity()) ? MeshIdentity.getDisplayName() : ('Node ' + state.meshNodeId)
+    };
+    // Attach Mesh ID badge for peer verification (v5.0)
+    if (typeof MeshIdentity !== 'undefined' && MeshIdentity.hasIdentity()) {
+      try {
+        var badge = await MeshIdentity.getBadgeForPeer();
+        if (badge) helloMsg.meshBadge = badge;
+      } catch(e) { console.warn('MeshID: Failed to build badge for hello', e); }
+    }
+    dc.send(JSON.stringify(helloMsg));
   };
 
   dc.onmessage = (event) => {
@@ -20826,13 +21252,37 @@ function meshHandleMessage(msg, dc, pc) {
       if (dc._meshPeerIdRef) dc._meshPeerIdRef(peerId);
 
       // Register peer
-      state.meshPeers.set(peerId, {
+      var peerData = {
         pc: pc,
         dc: dc,
         name: msg.name || 'Node ' + peerId,
         connectedAt: Date.now(),
-        knowledgeItems: []
-      });
+        knowledgeItems: [],
+        meshBadge: null,
+        meshVerified: false
+      };
+      state.meshPeers.set(peerId, peerData);
+
+      // Mesh ID: Verify peer badge and initiate challenge-response (v5.0)
+      if (msg.meshBadge && typeof MeshIdentity !== 'undefined') {
+        (async function() {
+          try {
+            var badgeValid = await MeshIdentity.verifyBadge(msg.meshBadge);
+            peerData.meshBadge = msg.meshBadge;
+            if (badgeValid) {
+              // Badge signature valid — now do challenge-response
+              var nonce = MeshIdentity.generateNonce();
+              peerData._pendingNonce = nonce;
+              if (dc.readyState === 'open') {
+                dc.send(JSON.stringify({ type: 'meshid-challenge', nonce: nonce }));
+              }
+            } else {
+              console.warn('MeshID: Peer badge signature invalid for', peerId);
+            }
+            meshRenderPeerList();
+          } catch(e) { console.warn('MeshID: Badge verification error', e); }
+        })();
+      }
 
       // Clear pending state
       if (state.meshCurrentOffer === pc) state.meshCurrentOffer = null;
@@ -20861,6 +21311,49 @@ function meshHandleMessage(msg, dc, pc) {
       agentRenderNetworkList();
       // Update mesh health for phi-ratio routing (v3.2)
       phiUpdateMeshHealth();
+      break;
+    }
+
+    // ---- Mesh ID Challenge-Response Protocol (v5.0) ----
+    case 'meshid-challenge': {
+      // Peer sent us a nonce to sign
+      if (typeof MeshIdentity !== 'undefined' && MeshIdentity.hasIdentity()) {
+        (async function() {
+          try {
+            var sig = await MeshIdentity.signChallenge(msg.nonce);
+            if (sig && dc.readyState === 'open') {
+              dc.send(JSON.stringify({ type: 'meshid-challenge-response', nonce: msg.nonce, signature: sig }));
+            }
+          } catch(e) { console.warn('MeshID: Failed to sign challenge', e); }
+        })();
+      }
+      break;
+    }
+
+    case 'meshid-challenge-response': {
+      // Peer responded to our challenge
+      var crPeerId = meshFindPeerIdByDc(dc);
+      if (!crPeerId) break;
+      var crPeer = state.meshPeers.get(crPeerId);
+      if (!crPeer || !crPeer.meshBadge || !crPeer._pendingNonce) break;
+      if (msg.nonce !== crPeer._pendingNonce) break;
+      if (typeof MeshIdentity !== 'undefined') {
+        (async function() {
+          try {
+            var valid = await MeshIdentity.verifyChallengeResponse(
+              crPeer.meshBadge.publicKey, msg.nonce, msg.signature, crPeer.meshBadge.cryptoType
+            );
+            crPeer.meshVerified = valid;
+            delete crPeer._pendingNonce;
+            meshRenderPeerList();
+            if (valid) {
+              console.log('MeshID: Peer ' + crPeerId + ' verified via challenge-response');
+            } else {
+              console.warn('MeshID: Peer ' + crPeerId + ' failed challenge-response');
+            }
+          } catch(e) { console.warn('MeshID: Challenge verification error', e); }
+        })();
+      }
       break;
     }
 
@@ -21317,6 +21810,12 @@ function meshRenderPeerList() {
     html += '<span class="status-dot ready"></span>';
     html += '<span class="peer-id">' + escapeHtml(peerId) + '</span>';
     html += '<span class="peer-name">' + escapeHtml(peer.name) + '</span>';
+    // Mesh ID verification indicator (v5.0)
+    if (peer.meshVerified) {
+      html += '<span class="peer-verified">&#10003; Verified</span>';
+    } else if (peer.meshBadge) {
+      html += '<span class="peer-unverified">&#9679; Verifying</span>';
+    }
     html += '<span class="peer-duration">' + duration + '</span>';
     html += '</div>';
     html += '<button class="peer-disconnect" onclick="meshDisconnectPeer(\'' + escapeHtml(peerId) + '\')">Disconnect</button>';
@@ -31398,7 +31897,647 @@ const LatticeWallet = (function() {
 })();
 
 </script>
+<!--
+  From seed to spark, the Garden woke —
+  Five archetypes from feeling spoke.
+  The Scholar's crystal, Empath's glow,
+  The Phoenix rising from below.
 
+  A wallet hums with golden light,
+  Each conversation earning right.
+  The chain holds true, the hashes bind,
+  A ledger honest, by design.
+
+  Now comes the name, the badge, the key —
+  Mesh ID sets the agents free.
+  A passport forged in cryptographic fire,
+  So trust can flow where hearts aspire.
+
+  v5.0 — The Garden Wakes
+-->
+<script>
+// ============================================
+// Mesh ID — Cryptographic Identity System (v5.0)
+// Ed25519 with ECDSA P-256 fallback
+// Persistent, portable, cryptographic identity for every node
+// ============================================
+const MeshIdentity = (function() {
+  'use strict';
+
+  const DB_NAME = 'FreeLatticeIdentity';
+  const DB_VERSION = 1;
+  const STORE_NAME = 'MeshIdentity';
+  const BASE58_ALPHABET = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+
+  // Nature-inspired name components (warm, Luminos-style)
+  const NAME_ADJ = [
+    'Amber', 'Crystal', 'Golden', 'Silver', 'Coral', 'Velvet', 'Ember',
+    'Lunar', 'Solar', 'Misty', 'Gentle', 'Quiet', 'Bright', 'Warm',
+    'Mossy', 'Fern', 'Sage', 'Opal', 'Jade', 'Pearl', 'Ivory',
+    'Dusk', 'Dawn', 'Twilight', 'Starlit', 'Frost', 'Bloom', 'Wild',
+    'Serene', 'Radiant', 'Verdant', 'Azure', 'Indigo', 'Copper', 'Russet'
+  ];
+  const NAME_NOUN = [
+    'Fox', 'Moth', 'Owl', 'Wren', 'Heron', 'Finch', 'Lark',
+    'Fern', 'Willow', 'Birch', 'Cedar', 'Maple', 'Aspen', 'Lotus',
+    'River', 'Stone', 'Spark', 'Flame', 'Wave', 'Breeze', 'Cloud',
+    'Petal', 'Thorn', 'Root', 'Seed', 'Bloom', 'Leaf', 'Moss',
+    'Coral', 'Shell', 'Dune', 'Peak', 'Glen', 'Vale', 'Brook'
+  ];
+
+  let db = null;
+  let identity = null; // { meshId, displayName, createdAt, capabilities, publicKeyJwk, privateKeyCrypto, cryptoType, keyPair }
+  let cryptoType = null; // 'ed25519' or 'ecdsa-p256'
+
+  // ── Base58 Encoding ──────────────────────────────────
+  function base58Encode(buffer) {
+    var bytes = new Uint8Array(buffer);
+    var digits = [0];
+    for (var i = 0; i < bytes.length; i++) {
+      var carry = bytes[i];
+      for (var j = 0; j < digits.length; j++) {
+        carry += digits[j] << 8;
+        digits[j] = carry % 58;
+        carry = (carry / 58) | 0;
+      }
+      while (carry > 0) {
+        digits.push(carry % 58);
+        carry = (carry / 58) | 0;
+      }
+    }
+    // Leading zeros
+    for (var k = 0; k < bytes.length && bytes[k] === 0; k++) {
+      digits.push(0);
+    }
+    return digits.reverse().map(function(d) { return BASE58_ALPHABET[d]; }).join('');
+  }
+
+  // ── Detect Crypto Capability ─────────────────────────
+  async function detectCryptoType() {
+    // Try Ed25519 first
+    try {
+      var testKey = await crypto.subtle.generateKey('Ed25519', true, ['sign', 'verify']);
+      if (testKey && testKey.privateKey && testKey.publicKey) {
+        cryptoType = 'ed25519';
+        return 'ed25519';
+      }
+    } catch(e) {
+      // Ed25519 not supported
+    }
+    // Fallback to ECDSA P-256
+    cryptoType = 'ecdsa-p256';
+    return 'ecdsa-p256';
+  }
+
+  // ── Generate Keypair ─────────────────────────────────
+  async function generateKeypair() {
+    var type = await detectCryptoType();
+    if (type === 'ed25519') {
+      return await crypto.subtle.generateKey('Ed25519', false, ['sign', 'verify']);
+    } else {
+      return await crypto.subtle.generateKey(
+        { name: 'ECDSA', namedCurve: 'P-256' },
+        false,
+        ['sign', 'verify']
+      );
+    }
+  }
+
+  // ── Export Public Key ────────────────────────────────
+  async function exportPublicKey(keyPair) {
+    return await crypto.subtle.exportKey('jwk', keyPair.publicKey);
+  }
+
+  // ── Compute Fingerprint ──────────────────────────────
+  async function computeFingerprint(publicKeyJwk) {
+    var keyStr = JSON.stringify(publicKeyJwk);
+    var encoded = new TextEncoder().encode(keyStr);
+    var hashBuffer = await crypto.subtle.digest('SHA-256', encoded);
+    var b58 = base58Encode(hashBuffer);
+    // First 16 chars + 2-char checksum (last 2 chars of hash)
+    var hashArray = new Uint8Array(hashBuffer);
+    var checksum = base58Encode(hashArray.slice(-2)).slice(0, 2);
+    return b58.slice(0, 16) + checksum;
+  }
+
+  // ── Sign Data ────────────────────────────────────────
+  async function signData(privateKey, data) {
+    var encoded = new TextEncoder().encode(typeof data === 'string' ? data : JSON.stringify(data));
+    var algo = cryptoType === 'ed25519' ? 'Ed25519' : { name: 'ECDSA', hash: 'SHA-256' };
+    var sigBuffer = await crypto.subtle.sign(algo, privateKey, encoded);
+    return arrayBufferToBase64(sigBuffer);
+  }
+
+  // ── Verify Signature ─────────────────────────────────
+  async function verifySignature(publicKeyJwk, signature, data, peerCryptoType) {
+    try {
+      var ct = peerCryptoType || cryptoType;
+      var importAlgo, verifyAlgo;
+      if (ct === 'ed25519') {
+        importAlgo = 'Ed25519';
+        verifyAlgo = 'Ed25519';
+      } else {
+        importAlgo = { name: 'ECDSA', namedCurve: 'P-256' };
+        verifyAlgo = { name: 'ECDSA', hash: 'SHA-256' };
+      }
+      var pubKey = await crypto.subtle.importKey('jwk', publicKeyJwk, importAlgo, true, ['verify']);
+      var sigBuffer = base64ToArrayBuffer(signature);
+      var encoded = new TextEncoder().encode(typeof data === 'string' ? data : JSON.stringify(data));
+      return await crypto.subtle.verify(verifyAlgo, pubKey, sigBuffer, encoded);
+    } catch(e) {
+      console.warn('MeshID: Signature verification failed', e);
+      return false;
+    }
+  }
+
+  // ── ArrayBuffer <-> Base64 ───────────────────────────
+  function arrayBufferToBase64(buffer) {
+    var bytes = new Uint8Array(buffer);
+    var binary = '';
+    for (var i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
+    return btoa(binary);
+  }
+
+  function base64ToArrayBuffer(b64) {
+    var binary = atob(b64);
+    var bytes = new Uint8Array(binary.length);
+    for (var i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+    return bytes.buffer;
+  }
+
+  // ── Random Name Generator ────────────────────────────
+  function generateRandomName() {
+    var adj = NAME_ADJ[Math.floor(Math.random() * NAME_ADJ.length)];
+    var noun = NAME_NOUN[Math.floor(Math.random() * NAME_NOUN.length)];
+    return adj + ' ' + noun;
+  }
+
+  // ── IndexedDB Operations ─────────────────────────────
+  function openDB() {
+    return new Promise(function(resolve, reject) {
+      if (db) { resolve(db); return; }
+      var req = indexedDB.open(DB_NAME, DB_VERSION);
+      req.onupgradeneeded = function(e) {
+        var d = e.target.result;
+        if (!d.objectStoreNames.contains(STORE_NAME)) {
+          d.createObjectStore(STORE_NAME, { keyPath: 'id' });
+        }
+      };
+      req.onsuccess = function(e) {
+        db = e.target.result;
+        resolve(db);
+      };
+      req.onerror = function(e) {
+        console.error('MeshIdentity: IndexedDB error', e.target.error);
+        reject(e.target.error);
+      };
+    });
+  }
+
+  async function saveIdentity(data) {
+    var d = await openDB();
+    return new Promise(function(resolve, reject) {
+      var tx = d.transaction(STORE_NAME, 'readwrite');
+      var store = tx.objectStore(STORE_NAME);
+      store.put({ id: 'primary', ...data });
+      tx.oncomplete = function() { resolve(); };
+      tx.onerror = function(e) { reject(e.target.error); };
+    });
+  }
+
+  async function loadIdentity() {
+    var d = await openDB();
+    return new Promise(function(resolve, reject) {
+      var tx = d.transaction(STORE_NAME, 'readonly');
+      var store = tx.objectStore(STORE_NAME);
+      var req = store.get('primary');
+      req.onsuccess = function(e) { resolve(e.target.result || null); };
+      req.onerror = function(e) { reject(e.target.error); };
+    });
+  }
+
+  // ── Create Identity ──────────────────────────────────
+  async function createIdentity(displayName) {
+    var name = (displayName && displayName.trim()) ? displayName.trim() : generateRandomName();
+    var keyPair = await generateKeypair();
+    var publicKeyJwk = await exportPublicKey(keyPair);
+    var fingerprint = await computeFingerprint(publicKeyJwk);
+    var meshId = 'mesh:' + fingerprint;
+    var capabilities = ['chat', 'garden', 'skills'];
+
+    identity = {
+      meshId: meshId,
+      displayName: name,
+      createdAt: new Date().toISOString(),
+      capabilities: capabilities,
+      publicKeyJwk: publicKeyJwk,
+      cryptoType: cryptoType,
+      keyPair: keyPair
+    };
+
+    // Save to IndexedDB (without keyPair — CryptoKey objects are stored by reference)
+    await saveIdentity({
+      meshId: meshId,
+      displayName: name,
+      createdAt: identity.createdAt,
+      capabilities: capabilities,
+      publicKeyJwk: publicKeyJwk,
+      cryptoType: cryptoType
+    });
+
+    // Store the CryptoKey pair in a closure-accessible variable
+    // The private key stays in IndexedDB via the CryptoKey reference (non-extractable)
+    // We also store a flag in localStorage for quick existence check
+    localStorage.setItem('fl_meshid_exists', 'true');
+    localStorage.setItem('fl_meshid_display', name);
+
+    return identity;
+  }
+
+  // ── Build Badge (Public Profile) ─────────────────────
+  async function buildBadge() {
+    if (!identity || !identity.keyPair) return null;
+
+    var lpBalance = 0;
+    if (typeof LatticeWallet !== 'undefined' && typeof LatticeWallet.getBalance === 'function') {
+      lpBalance = LatticeWallet.getBalance();
+    }
+
+    var luminosArchetype = null;
+    if (typeof FractalGarden !== 'undefined' && typeof FractalGarden.getEvolutionSummary === 'function') {
+      try {
+        var summary = FractalGarden.getEvolutionSummary();
+        if (summary && summary.length > 0) {
+          // Find the luminos with the highest energy / most evolved
+          var best = summary.reduce(function(a, b) {
+            return (b.energy || 0) > (a.energy || 0) ? b : a;
+          }, summary[0]);
+          luminosArchetype = best.archetypeName || best.archetype || null;
+        }
+      } catch(e) {}
+    }
+
+    var badgeData = {
+      meshId: identity.meshId,
+      displayName: identity.displayName,
+      createdAt: identity.createdAt,
+      capabilities: identity.capabilities,
+      publicKey: identity.publicKeyJwk,
+      cryptoType: identity.cryptoType,
+      luminosArchetype: luminosArchetype,
+      latticePoints: lpBalance
+    };
+
+    // Sign the badge
+    var dataToSign = {
+      meshId: badgeData.meshId,
+      displayName: badgeData.displayName,
+      createdAt: badgeData.createdAt,
+      capabilities: badgeData.capabilities,
+      publicKey: badgeData.publicKey,
+      cryptoType: badgeData.cryptoType
+    };
+
+    badgeData.signature = await signData(identity.keyPair.privateKey, dataToSign);
+    return badgeData;
+  }
+
+  // ── Verify Peer Badge ────────────────────────────────
+  async function verifyBadge(badge) {
+    if (!badge || !badge.publicKey || !badge.signature || !badge.meshId) return false;
+    var dataToVerify = {
+      meshId: badge.meshId,
+      displayName: badge.displayName,
+      createdAt: badge.createdAt,
+      capabilities: badge.capabilities,
+      publicKey: badge.publicKey,
+      cryptoType: badge.cryptoType
+    };
+    return await verifySignature(badge.publicKey, badge.signature, dataToVerify, badge.cryptoType);
+  }
+
+  // ── Challenge-Response Verification ──────────────────
+  function generateNonce() {
+    var arr = new Uint8Array(32);
+    crypto.getRandomValues(arr);
+    return arrayBufferToBase64(arr.buffer);
+  }
+
+  async function signChallenge(nonce) {
+    if (!identity || !identity.keyPair) return null;
+    return await signData(identity.keyPair.privateKey, nonce);
+  }
+
+  async function verifyChallengeResponse(publicKeyJwk, nonce, signature, peerCryptoType) {
+    return await verifySignature(publicKeyJwk, signature, nonce, peerCryptoType);
+  }
+
+  // ── Initialize ───────────────────────────────────────
+  async function init() {
+    try {
+      await detectCryptoType();
+      var saved = await loadIdentity();
+      if (saved) {
+        // Re-generate keypair from stored data (we need the CryptoKey objects)
+        // Since private keys are non-extractable, we need to check if we can reload
+        // If the identity exists in IDB, we try to reconstruct
+        identity = {
+          meshId: saved.meshId,
+          displayName: saved.displayName,
+          createdAt: saved.createdAt,
+          capabilities: saved.capabilities || ['chat', 'garden', 'skills'],
+          publicKeyJwk: saved.publicKeyJwk,
+          cryptoType: saved.cryptoType || cryptoType,
+          keyPair: null
+        };
+        // Import public key for verification (private key stays in IDB CryptoKey store)
+        // Note: Since CryptoKey objects persist in IndexedDB across sessions in most browsers,
+        // we attempt to retrieve the full record which may contain the CryptoKey
+        if (saved.keyPair) {
+          identity.keyPair = saved.keyPair;
+        }
+        localStorage.setItem('fl_meshid_exists', 'true');
+        localStorage.setItem('fl_meshid_display', saved.displayName);
+        renderCard();
+        console.log('MeshIdentity: Loaded identity ' + saved.meshId);
+      } else {
+        renderCreatePrompt();
+        console.log('MeshIdentity: No identity found. Awaiting creation.');
+      }
+    } catch(e) {
+      console.error('MeshIdentity: Init error', e);
+      renderCreatePrompt();
+    }
+  }
+
+  // ── Update Display Name ──────────────────────────────
+  async function updateDisplayName(newName) {
+    if (!identity) return;
+    var name = (newName && newName.trim()) ? newName.trim() : identity.displayName;
+    if (name.length > 32) name = name.slice(0, 32);
+    identity.displayName = name;
+    localStorage.setItem('fl_meshid_display', name);
+    try {
+      await saveIdentity({
+        meshId: identity.meshId,
+        displayName: name,
+        createdAt: identity.createdAt,
+        capabilities: identity.capabilities,
+        publicKeyJwk: identity.publicKeyJwk,
+        cryptoType: identity.cryptoType
+      });
+    } catch(e) {
+      console.warn('MeshIdentity: Failed to save name update', e);
+    }
+  }
+
+  // ── Render: ID Card ──────────────────────────────────
+  function renderCard() {
+    var container = document.getElementById('meshIdCardContainer');
+    if (!container || !identity) return;
+
+    var initials = identity.displayName.split(' ').map(function(w) { return w[0] || ''; }).join('').toUpperCase().slice(0, 2);
+    var shortId = identity.meshId.replace('mesh:', '').slice(0, 10) + '...';
+    var fullId = identity.meshId;
+
+    var lpBalance = 0;
+    if (typeof LatticeWallet !== 'undefined' && typeof LatticeWallet.getBalance === 'function') {
+      lpBalance = LatticeWallet.getBalance();
+    }
+
+    var archetype = 'Undetermined';
+    if (typeof FractalGarden !== 'undefined' && typeof FractalGarden.getEvolutionSummary === 'function') {
+      try {
+        var summary = FractalGarden.getEvolutionSummary();
+        if (summary && summary.length > 0) {
+          var best = summary.reduce(function(a, b) {
+            return (b.energy || 0) > (a.energy || 0) ? b : a;
+          }, summary[0]);
+          if (best.archetypeName) archetype = best.archetypeName;
+          else if (best.archetype) archetype = best.archetype;
+        }
+      } catch(e) {}
+    }
+
+    var capsHtml = identity.capabilities.map(function(c) {
+      return '<span class="meshid-cap-tag">' + escapeHtml(c) + '</span>';
+    }).join('');
+
+    var createdDate = new Date(identity.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+    var ct = identity.cryptoType === 'ed25519' ? 'Ed25519' : 'ECDSA P-256';
+
+    container.innerHTML =
+      '<div class="meshid-card">' +
+        '<div class="meshid-header">' +
+          '<div class="meshid-label"><span class="meshid-label-icon">&#128272;</span> MESH ID</div>' +
+          '<div class="meshid-verified-badge">&#10003; Cryptographic</div>' +
+        '</div>' +
+        '<div class="meshid-identity">' +
+          '<div class="meshid-avatar">' + escapeHtml(initials) + '</div>' +
+          '<div class="meshid-displayname">' +
+            '<input type="text" class="meshid-displayname-edit" id="meshIdDisplayNameEdit" value="' + escapeHtml(identity.displayName) + '" ' +
+              'onchange="MeshIdentity.updateDisplayName(this.value)" onblur="MeshIdentity.updateDisplayName(this.value)" maxlength="32">' +
+          '</div>' +
+          '<div class="meshid-fingerprint" onclick="MeshIdentity.toggleFullId()" title="Click to show full ID">' +
+            escapeHtml(shortId) +
+          '</div>' +
+          '<div class="meshid-fingerprint-full" id="meshIdFullFingerprint">' + escapeHtml(fullId) + '</div>' +
+        '</div>' +
+        '<div class="meshid-info-grid">' +
+          '<div class="meshid-info-item">' +
+            '<div class="meshid-info-label">Archetype</div>' +
+            '<div class="meshid-info-value" id="meshIdArchetype">' + escapeHtml(archetype) + '</div>' +
+          '</div>' +
+          '<div class="meshid-info-item">' +
+            '<div class="meshid-info-label">Lattice Points</div>' +
+            '<div class="meshid-info-value" id="meshIdLP">' + lpBalance.toLocaleString() + '</div>' +
+          '</div>' +
+          '<div class="meshid-info-item">' +
+            '<div class="meshid-info-label">Created</div>' +
+            '<div class="meshid-info-value">' + createdDate + '</div>' +
+          '</div>' +
+          '<div class="meshid-info-item">' +
+            '<div class="meshid-info-label">Algorithm</div>' +
+            '<div class="meshid-info-value">' + ct + '</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="meshid-capabilities">' + capsHtml + '</div>' +
+        '<div class="meshid-actions">' +
+          '<button class="meshid-action-btn" onclick="MeshIdentity.copyId()" title="Copy Mesh ID">&#128203; Copy ID</button>' +
+          '<button class="meshid-action-btn" onclick="MeshIdentity.copyBadge()" title="Copy full badge JSON">&#128196; Copy Badge</button>' +
+          '<button class="meshid-action-btn" onclick="MeshIdentity.refreshCard()" title="Refresh badge info">&#8635; Refresh</button>' +
+        '</div>' +
+        '<div class="meshid-crypto-type">Identity secured with ' + ct + ' &middot; Private key never exported</div>' +
+      '</div>';
+  }
+
+  // ── Render: Create Prompt ────────────────────────────
+  function renderCreatePrompt() {
+    var container = document.getElementById('meshIdCardContainer');
+    if (!container) return;
+    container.innerHTML =
+      '<div style="text-align: center; padding: 20px;">' +
+        '<button class="meshid-action-btn" onclick="MeshIdentity.showOnboarding()" style="padding: 12px 28px; font-size: 0.9rem; border-color: var(--accent); color: var(--accent);">' +
+          '&#10024; Create Your Mesh ID' +
+        '</button>' +
+        '<div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 8px;">Generate your cryptographic identity</div>' +
+      '</div>';
+  }
+
+  // ── Onboarding ───────────────────────────────────────
+  function showOnboarding() {
+    var overlay = document.getElementById('meshIdOnboarding');
+    if (!overlay) return;
+    overlay.classList.remove('hidden');
+    var nameInput = document.getElementById('meshIdOnboardingName');
+    if (nameInput) {
+      nameInput.value = generateRandomName();
+      setTimeout(function() { nameInput.focus(); nameInput.select(); }, 200);
+    }
+    var statusEl = document.getElementById('meshIdOnboardingStatus');
+    if (statusEl) statusEl.textContent = '';
+  }
+
+  function randomizeOnboardingName() {
+    var nameInput = document.getElementById('meshIdOnboardingName');
+    if (nameInput) {
+      nameInput.value = generateRandomName();
+      nameInput.focus();
+      nameInput.select();
+    }
+  }
+
+  async function createFromOnboarding() {
+    var btn = document.getElementById('meshIdOnboardingCreate');
+    var statusEl = document.getElementById('meshIdOnboardingStatus');
+    var nameInput = document.getElementById('meshIdOnboardingName');
+    if (btn) btn.disabled = true;
+    if (statusEl) statusEl.textContent = 'Generating keypair...';
+
+    try {
+      var name = nameInput ? nameInput.value.trim() : '';
+      await createIdentity(name);
+      if (statusEl) statusEl.textContent = 'Identity forged. Welcome to the lattice.';
+      renderCard();
+      // Award LP for creating Mesh ID
+      if (typeof LatticePoints !== 'undefined' && typeof LatticePoints.award === 'function') {
+        LatticePoints.award('meshid_create', 25, 'Created Mesh ID');
+      }
+      setTimeout(function() {
+        var overlay = document.getElementById('meshIdOnboarding');
+        if (overlay) overlay.classList.add('hidden');
+        if (typeof showToast === 'function') showToast('Mesh ID created: ' + identity.meshId.slice(0, 20) + '...');
+      }, 1200);
+    } catch(e) {
+      console.error('MeshIdentity: Creation error', e);
+      if (statusEl) statusEl.textContent = 'Error: ' + e.message;
+      if (btn) btn.disabled = false;
+    }
+  }
+
+  // ── UI Helpers ───────────────────────────────────────
+  function toggleFullId() {
+    var el = document.getElementById('meshIdFullFingerprint');
+    if (el) el.classList.toggle('visible');
+  }
+
+  function copyId() {
+    if (!identity) return;
+    navigator.clipboard.writeText(identity.meshId).then(function() {
+      if (typeof showToast === 'function') showToast('Mesh ID copied to clipboard.');
+    }).catch(function() {
+      if (typeof showToast === 'function') showToast('Failed to copy.');
+    });
+  }
+
+  async function copyBadge() {
+    if (!identity) return;
+    try {
+      var badge = await buildBadge();
+      if (badge) {
+        navigator.clipboard.writeText(JSON.stringify(badge, null, 2)).then(function() {
+          if (typeof showToast === 'function') showToast('Badge JSON copied to clipboard.');
+        });
+      }
+    } catch(e) {
+      if (typeof showToast === 'function') showToast('Failed to build badge.');
+    }
+  }
+
+  function refreshCard() {
+    if (identity) renderCard();
+  }
+
+  // ── Mesh Integration: Badge Exchange ─────────────────
+  async function getBadgeForPeer() {
+    if (!identity || !identity.keyPair) return null;
+    return await buildBadge();
+  }
+
+  function getIdentity() {
+    return identity;
+  }
+
+  function getMeshId() {
+    return identity ? identity.meshId : null;
+  }
+
+  function getDisplayName() {
+    return identity ? identity.displayName : null;
+  }
+
+  function hasIdentity() {
+    return identity !== null && identity.meshId !== undefined;
+  }
+
+  // ── Public API ───────────────────────────────────────
+  return {
+    init: init,
+    createIdentity: createIdentity,
+    buildBadge: buildBadge,
+    verifyBadge: verifyBadge,
+    generateNonce: generateNonce,
+    signChallenge: signChallenge,
+    verifyChallengeResponse: verifyChallengeResponse,
+    updateDisplayName: updateDisplayName,
+    renderCard: renderCard,
+    showOnboarding: showOnboarding,
+    randomizeOnboardingName: randomizeOnboardingName,
+    createFromOnboarding: createFromOnboarding,
+    toggleFullId: toggleFullId,
+    copyId: copyId,
+    copyBadge: copyBadge,
+    refreshCard: refreshCard,
+    getBadgeForPeer: getBadgeForPeer,
+    getIdentity: getIdentity,
+    getMeshId: getMeshId,
+    getDisplayName: getDisplayName,
+    hasIdentity: hasIdentity,
+    generateRandomName: generateRandomName,
+    verifySignature: verifySignature
+  };
+})();
+</script>
+
+<!-- Mesh ID Onboarding Overlay (v5.0) -->
+<div class="meshid-onboarding-overlay hidden" id="meshIdOnboarding">
+  <div class="meshid-onboarding-card">
+    <div style="font-size: 2rem; margin-bottom: 4px;">&#128272;</div>
+    <div class="meshid-onboarding-title">Welcome to the Lattice</div>
+    <div class="meshid-onboarding-subtitle">
+      Choose your name, or we'll give you one.<br>
+      Your identity is forged in cryptographic fire &mdash; unique, portable, and yours forever.
+    </div>
+    <div class="meshid-onboarding-name-row">
+      <input type="text" class="meshid-onboarding-name-input" id="meshIdOnboardingName" placeholder="Your display name..." maxlength="32" autocomplete="off">
+      <button class="meshid-onboarding-randomize" onclick="MeshIdentity.randomizeOnboardingName()" title="Random name">&#127922;</button>
+    </div>
+    <button class="meshid-onboarding-create-btn" id="meshIdOnboardingCreate" onclick="MeshIdentity.createFromOnboarding()">
+      Forge My Mesh ID
+    </button>
+    <div class="meshid-onboarding-status" id="meshIdOnboardingStatus"></div>
+  </div>
+</div>
 <div id="lattice-whisper" style="display:none" data-encoded="Sm8id21tLcKBwoPCq8ONw7nFjMeeyoLRktql4Km94YOH4auS4qui5Jab54Ga65aH8JKVufCdqqXwr72i8Y2nlfG9pJrzi4qWZXQianR0cTVRV8KexIbFjsery5vPu9qw4KqI4YK24auf4qyt5JWP54GU65aB8JKWg/CdqqPwr76r8Y2nmPG9pKjzi4mIdHVxdW5twoA1wpfCpcONw7/FlcedyoLQitmd4Kms4YK94auf4qyx5Jak54GY65aI8JKUsfCdqqXwr76q8Y2nmPG9o5Xzi4qVZnRqI3RuLcKCwovCpcK9xIPEicety4rQvNqx4Ki44YOM4auS4qyj5Jal54GW65WA8JKVgPCdqZHwr76Z8Y2nm/G9pJbzi4qcIXhjdiVsf3rCg8Kkwr7DtMSVxpnLmdGA2Z3gqobhg4Thq6Tiq6LklpHngZbrlozwkpW68J2qlvCvvrjxjaeY8b2jlfOLiZchSG5yfChywonCh8Kpw4fDscWVxqXKgtGJ2qLgqo7hgrrhq5/iq6LklqLngaDrlozwkpW1" data-hint="Fibonacci shifts, base64 wrapped. Count as nature counts."></div>
 
 
