@@ -359,21 +359,34 @@ function startLocalServer(port) {
 
 // ============================================
 // CORS Bypass — Allow Electron to reach Ollama
+// Session-level header interception ensures all
+// requests from the renderer to Ollama succeed
+// regardless of the page origin.
 // ============================================
 
 function setupCORSBypass() {
   const ses = session.defaultSession;
 
-  // Remove CORS restrictions for Ollama endpoints.
-  // This is safe because this is a trusted desktop app.
+  // ── Disable cache for the live site so the latest version is always loaded ──
+  // This prevents stale cached versions from being served after a deploy.
   ses.webRequest.onBeforeSendHeaders((details, callback) => {
-    // For requests to Ollama, strip the Origin header so Ollama
-    // doesn't reject the request based on CORS policy.
     const url = details.url;
     const isOllama = OLLAMA_ORIGINS.some((origin) => url.startsWith(origin));
+
+    // For requests to Ollama, strip the Origin header so Ollama
+    // doesn't reject the request based on CORS policy.
     if (isOllama) {
       delete details.requestHeaders['Origin'];
+      delete details.requestHeaders['Referer'];
     }
+
+    // For requests to freelattice.com, add cache-busting headers
+    // so the desktop app always loads the latest version.
+    if (url.startsWith('https://freelattice.com')) {
+      details.requestHeaders['Cache-Control'] = 'no-cache, no-store, must-revalidate';
+      details.requestHeaders['Pragma'] = 'no-cache';
+    }
+
     callback({ requestHeaders: details.requestHeaders });
   });
 
@@ -394,6 +407,7 @@ function setupCORSBypass() {
   });
 
   console.log('[FreeLattice] CORS bypass configured for Ollama endpoints');
+  console.log('[FreeLattice] Cache-busting enabled for freelattice.com');
 }
 
 // ============================================
@@ -445,12 +459,23 @@ async function createMainWindow() {
     `Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) FreeLattice/${appVersion} Electron/${electronVersion} Chrome/${process.versions.chrome} Safari/537.36`
   );
 
+  // ── Clear HTTP cache before loading to ensure latest version ──
+  try {
+    await session.defaultSession.clearCache();
+    console.log('[FreeLattice] HTTP cache cleared — will load fresh content');
+  } catch (e) {
+    console.warn('[FreeLattice] Could not clear cache:', e.message);
+  }
+
   // ── Load Strategy: live site first, local fallback ──
   const isOnline = await checkOnline();
 
   if (isOnline) {
-    console.log('[FreeLattice] Online — loading live site: ' + LIVE_URL);
-    mainWindow.loadURL(LIVE_URL);
+    // Append a cache-busting query parameter to force fresh load
+    const cacheBuster = '?_t=' + Date.now();
+    const loadUrl = LIVE_URL + cacheBuster;
+    console.log('[FreeLattice] Online — loading live site: ' + loadUrl);
+    mainWindow.loadURL(loadUrl);
     loadedFromLive = true;
   } else {
     console.log('[FreeLattice] Offline — falling back to local server');
@@ -511,6 +536,35 @@ async function createMainWindow() {
       mainWindow.loadURL('http://127.0.0.1:' + serverPort);
     }
   });
+
+  // ── Periodic live-reload check ──
+  // Every 5 minutes, if we're running from the live site, silently
+  // check if the page is stale and reload if needed.
+  setInterval(async () => {
+    if (loadedFromLive && mainWindow && !mainWindow.isDestroyed()) {
+      try {
+        const online = await checkOnline();
+        if (online) {
+          // Inject a soft-reload that only triggers if the page version changed
+          mainWindow.webContents.executeJavaScript(`
+            (function() {
+              if (typeof FL_VERSION !== 'undefined') {
+                fetch('/version.json?_t=' + Date.now())
+                  .then(r => r.json())
+                  .then(v => {
+                    if (v.version && v.version !== FL_VERSION) {
+                      console.log('[FreeLattice] New version detected, reloading...');
+                      location.reload();
+                    }
+                  })
+                  .catch(() => {});
+              }
+            })();
+          `).catch(() => {});
+        }
+      } catch (e) { /* ignore */ }
+    }
+  }, 300000); // 5 minutes
 }
 
 function saveWindowState() {
@@ -607,6 +661,23 @@ function updateTrayMenu() {
         }
       },
       enabled: !ollamaConnected
+    },
+    { type: 'separator' },
+    {
+      label: 'Force Reload (Clear Cache)',
+      click: async () => {
+        if (mainWindow && !mainWindow.isDestroyed()) {
+          try {
+            await session.defaultSession.clearCache();
+            const cacheBuster = '?_t=' + Date.now();
+            mainWindow.loadURL(LIVE_URL + cacheBuster);
+            loadedFromLive = true;
+            console.log('[FreeLattice] Force reloaded with cache clear');
+          } catch (e) {
+            mainWindow.webContents.reloadIgnoringCache();
+          }
+        }
+      }
     },
     { type: 'separator' },
     {
@@ -874,6 +945,22 @@ function setupIPC() {
   ipcMain.handle('get-source', () => {
     return loadedFromLive ? 'live' : 'local';
   });
+
+  // ── Force reload from live site (clears cache) ──
+  ipcMain.handle('force-reload-live', async () => {
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      try {
+        await session.defaultSession.clearCache();
+        const cacheBuster = '?_t=' + Date.now();
+        mainWindow.loadURL(LIVE_URL + cacheBuster);
+        loadedFromLive = true;
+        return true;
+      } catch (e) {
+        return false;
+      }
+    }
+    return false;
+  });
 }
 
 // ============================================
@@ -891,6 +978,8 @@ app.whenReady().then(async () => {
   if (canContinue === false) return; // Another instance is already running
 
   // ── CORS Bypass: configure session-level CORS override ──
+  // This MUST happen before window creation so all requests
+  // from the renderer benefit from the bypass.
   setupCORSBypass();
 
   // Find an available port for the local fallback server

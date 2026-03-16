@@ -45,6 +45,13 @@ contextBridge.exposeInMainWorld('electronAPI', {
   getSource: () => ipcRenderer.invoke('get-source'),
 
   /**
+   * Force reload from the live site, clearing all caches.
+   * Useful when the user suspects they're seeing a stale version.
+   * @returns {Promise<boolean>} true if reload was triggered
+   */
+  forceReloadLive: () => ipcRenderer.invoke('force-reload-live'),
+
+  /**
    * Listen for Ollama status changes from the main process.
    * @param {function} callback - Called with (boolean) when status changes
    * @returns {function} unsubscribe function

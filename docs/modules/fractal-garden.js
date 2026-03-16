@@ -81,6 +81,26 @@
   let isUserInteracting = false;
   const IDLE_TIMEOUT = 3000; // ms before auto-orbit resumes
 
+  // ── Interactive Light Particles ────────────────────────
+  // Mouse/touch trail and click ripple system
+  const TRAIL_MAX = 120;          // max trail particles alive at once
+  const TRAIL_SPAWN_RATE = 3;     // particles per mousemove event
+  const TRAIL_LIFETIME = 2.0;     // seconds
+  const RIPPLE_PARTICLES = 36;    // particles per click burst
+  const RIPPLE_LIFETIME = 1.8;    // seconds
+  const RIPPLE_SPEED = 8.0;       // expansion speed
+  const GOLDEN_COLOR_H = 45;      // golden/phi hue
+  const GOLDEN_COLOR_S = 85;
+  const GOLDEN_COLOR_L = 58;
+
+  let lightParticles = [];         // {pos, vel, life, maxLife, size, type}
+  let lightParticleSystem = null;  // THREE.Points
+  let lightParticleGeo = null;
+  let lightParticleMat = null;
+  let mouseNDC = { x: 0, y: 0 };  // normalized device coords
+  let raycaster = null;
+  let interactionPlane = null;     // invisible plane for raycasting
+
   // ── Simplex Noise (minimal 3D) ────────────────────────
   // Compact implementation for vertex breathing
   const SimplexNoise3D = (function() {
@@ -911,6 +931,249 @@
     }
   }
 
+  // ── Interactive Light Particle System ──────────────────
+  // Creates warm golden light trails on mouse movement
+  // and ripple bursts on click/tap.
+
+  function initLightParticles() {
+    // Pre-allocate geometry for max possible particles
+    var maxCount = TRAIL_MAX + RIPPLE_PARTICLES * 5; // room for multiple ripples
+    var positions = new Float32Array(maxCount * 3);
+    var sizes = new Float32Array(maxCount);
+    var alphas = new Float32Array(maxCount);
+
+    lightParticleGeo = new THREE.BufferGeometry();
+    lightParticleGeo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+    lightParticleGeo.setAttribute('size', new THREE.Float32BufferAttribute(sizes, 1));
+    lightParticleGeo.setAttribute('alpha', new THREE.Float32BufferAttribute(alphas, 1));
+
+    // Custom shader material for soft glowing particles
+    lightParticleMat = new THREE.ShaderMaterial({
+      uniforms: {
+        uColor: { value: hslToThreeColor(GOLDEN_COLOR_H, GOLDEN_COLOR_S, GOLDEN_COLOR_L) },
+        uColorWarm: { value: hslToThreeColor(30, 90, 55) } // warmer amber
+      },
+      vertexShader: [
+        'attribute float size;',
+        'attribute float alpha;',
+        'varying float vAlpha;',
+        'void main() {',
+        '  vAlpha = alpha;',
+        '  vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);',
+        '  gl_PointSize = size * (200.0 / -mvPosition.z);',
+        '  gl_PointSize = clamp(gl_PointSize, 1.0, 64.0);',
+        '  gl_Position = projectionMatrix * mvPosition;',
+        '}'
+      ].join('\n'),
+      fragmentShader: [
+        'uniform vec3 uColor;',
+        'uniform vec3 uColorWarm;',
+        'varying float vAlpha;',
+        'void main() {',
+        '  float d = length(gl_PointCoord - vec2(0.5));',
+        '  if (d > 0.5) discard;',
+        '  float glow = 1.0 - smoothstep(0.0, 0.5, d);',
+        '  glow = pow(glow, 1.5);',
+        '  vec3 col = mix(uColorWarm, uColor, glow);',
+        '  gl_FragColor = vec4(col, glow * vAlpha);',
+        '}'
+      ].join('\n'),
+      transparent: true,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
+    });
+
+    lightParticleSystem = new THREE.Points(lightParticleGeo, lightParticleMat);
+    lightParticleSystem.frustumCulled = false;
+    scene.add(lightParticleSystem);
+
+    // Raycaster for projecting mouse into 3D space
+    raycaster = new THREE.Raycaster();
+
+    // Invisible interaction plane at y=0
+    interactionPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+
+    // Set up event listeners
+    setupLightInteraction();
+  }
+
+  function getWorldPosFromMouse(clientX, clientY) {
+    if (!container || !camera || !raycaster) return null;
+    var rect = container.getBoundingClientRect();
+    var ndcX = ((clientX - rect.left) / rect.width) * 2 - 1;
+    var ndcY = -((clientY - rect.top) / rect.height) * 2 + 1;
+
+    raycaster.setFromCamera(new THREE.Vector2(ndcX, ndcY), camera);
+    var target = new THREE.Vector3();
+    var hit = raycaster.ray.intersectPlane(interactionPlane, target);
+    if (!hit) {
+      // Fallback: project at a fixed distance
+      target = raycaster.ray.at(20, new THREE.Vector3());
+    }
+    return target;
+  }
+
+  function spawnTrailParticles(worldPos) {
+    if (!worldPos) return;
+    for (var i = 0; i < TRAIL_SPAWN_RATE; i++) {
+      if (lightParticles.length >= TRAIL_MAX + RIPPLE_PARTICLES * 5) {
+        // Remove oldest trail particle
+        var oldest = -1;
+        for (var j = 0; j < lightParticles.length; j++) {
+          if (lightParticles[j].type === 'trail') { oldest = j; break; }
+        }
+        if (oldest >= 0) lightParticles.splice(oldest, 1);
+      }
+
+      // Slight random offset for organic feel
+      var spread = 0.5;
+      lightParticles.push({
+        pos: new THREE.Vector3(
+          worldPos.x + (Math.random() - 0.5) * spread,
+          worldPos.y + (Math.random() - 0.5) * spread * 0.5 + 0.2,
+          worldPos.z + (Math.random() - 0.5) * spread
+        ),
+        vel: new THREE.Vector3(
+          (Math.random() - 0.5) * 0.3,
+          0.3 + Math.random() * 0.5,
+          (Math.random() - 0.5) * 0.3
+        ),
+        life: TRAIL_LIFETIME,
+        maxLife: TRAIL_LIFETIME,
+        size: 0.15 + Math.random() * 0.2,
+        type: 'trail'
+      });
+    }
+  }
+
+  function spawnRippleParticles(worldPos) {
+    if (!worldPos) return;
+    for (var i = 0; i < RIPPLE_PARTICLES; i++) {
+      var angle = (i / RIPPLE_PARTICLES) * TAU;
+      // Add golden-angle offset for phi-distributed burst
+      var phiAngle = angle + GOLDEN_ANGLE * i * 0.1;
+      var speed = RIPPLE_SPEED * (0.6 + Math.random() * 0.8);
+      var elevation = (Math.random() - 0.3) * 3;
+
+      lightParticles.push({
+        pos: new THREE.Vector3(
+          worldPos.x,
+          worldPos.y + 0.1,
+          worldPos.z
+        ),
+        vel: new THREE.Vector3(
+          Math.cos(phiAngle) * speed,
+          elevation,
+          Math.sin(phiAngle) * speed
+        ),
+        life: RIPPLE_LIFETIME * (0.7 + Math.random() * 0.3),
+        maxLife: RIPPLE_LIFETIME,
+        size: 0.2 + Math.random() * 0.35,
+        type: 'ripple'
+      });
+    }
+  }
+
+  function updateLightParticles(delta) {
+    if (!lightParticleSystem) return;
+
+    // Update particle physics
+    var i = lightParticles.length;
+    while (i--) {
+      var p = lightParticles[i];
+      p.life -= delta;
+      if (p.life <= 0) {
+        lightParticles.splice(i, 1);
+        continue;
+      }
+
+      // Apply velocity with drag
+      var drag = p.type === 'trail' ? 0.96 : 0.94;
+      p.vel.multiplyScalar(drag);
+      p.pos.addScaledVector(p.vel, delta);
+
+      // Trail particles drift upward gently
+      if (p.type === 'trail') {
+        p.vel.y += delta * 0.2;
+      }
+    }
+
+    // Write to GPU buffers
+    var posAttr = lightParticleGeo.getAttribute('position');
+    var sizeAttr = lightParticleGeo.getAttribute('size');
+    var alphaAttr = lightParticleGeo.getAttribute('alpha');
+    var count = lightParticles.length;
+
+    for (var j = 0; j < count; j++) {
+      var pp = lightParticles[j];
+      posAttr.setXYZ(j, pp.pos.x, pp.pos.y, pp.pos.z);
+
+      var lifeRatio = pp.life / pp.maxLife;
+      // Fade in quickly, fade out slowly (phi curve)
+      var alpha = lifeRatio < 0.1 ? lifeRatio * 10 : Math.pow(lifeRatio, 0.618);
+      sizeAttr.setX(j, pp.size * (0.5 + lifeRatio * 0.5));
+      alphaAttr.setX(j, alpha * 0.85);
+    }
+
+    // Zero out remaining slots
+    var maxCount = posAttr.count;
+    for (var k = count; k < maxCount; k++) {
+      posAttr.setXYZ(k, 0, -1000, 0);
+      sizeAttr.setX(k, 0);
+      alphaAttr.setX(k, 0);
+    }
+
+    posAttr.needsUpdate = true;
+    sizeAttr.needsUpdate = true;
+    alphaAttr.needsUpdate = true;
+    lightParticleGeo.setDrawRange(0, count);
+  }
+
+  function setupLightInteraction() {
+    if (!container) return;
+    var lastMoveTime = 0;
+    var moveThrottle = 16; // ~60fps throttle
+
+    // Mouse move — trail particles
+    container.addEventListener('mousemove', function(e) {
+      var now = performance.now();
+      if (now - lastMoveTime < moveThrottle) return;
+      lastMoveTime = now;
+      var worldPos = getWorldPosFromMouse(e.clientX, e.clientY);
+      spawnTrailParticles(worldPos);
+    }, { passive: true });
+
+    // Mouse click — ripple burst
+    container.addEventListener('click', function(e) {
+      // Don't trigger on button clicks
+      if (e.target.tagName === 'BUTTON' || e.target.closest('button')) return;
+      var worldPos = getWorldPosFromMouse(e.clientX, e.clientY);
+      spawnRippleParticles(worldPos);
+    });
+
+    // Touch move — trail particles
+    container.addEventListener('touchmove', function(e) {
+      var now = performance.now();
+      if (now - lastMoveTime < moveThrottle) return;
+      lastMoveTime = now;
+      if (e.touches.length > 0) {
+        var touch = e.touches[0];
+        var worldPos = getWorldPosFromMouse(touch.clientX, touch.clientY);
+        spawnTrailParticles(worldPos);
+      }
+    }, { passive: true });
+
+    // Touch start — ripple burst (tap)
+    container.addEventListener('touchstart', function(e) {
+      if (e.target.tagName === 'BUTTON' || e.target.closest('button')) return;
+      if (e.touches.length > 0) {
+        var touch = e.touches[0];
+        var worldPos = getWorldPosFromMouse(touch.clientX, touch.clientY);
+        spawnRippleParticles(worldPos);
+      }
+    }, { passive: true });
+  }
+
   // ── Animation Loop ────────────────────────────────────
   function animate() {
     if (!isRunning) return;
@@ -962,6 +1225,9 @@
     // Demo emotion cycling
     cycleEmotions(delta);
 
+    // Interactive light particles (mouse trail + click ripples)
+    updateLightParticles(delta);
+
     // Fog breathing
     if (scene.fog) {
       const fogBreath = Math.sin(time * TAU / (TIMING.dodecBreath / 1000));
@@ -984,6 +1250,7 @@
     createStarfield();
     createSeedRings();
     createDefaultAgents();
+    initLightParticles();
   }
 
   // ── Public API ────────────────────────────────────────
@@ -1205,6 +1472,7 @@
     setMode: setMode,
     updateAgentsFromRoundTable: updateAgentsFromRoundTable,
     setAgentEmotion: setAgentEmotionByName,
+    setBridgeActive: function() { /* placeholder for Round Table bridge */ },
     isInitialized: function() { return isInitialized; },
     isRunning: function() { return isRunning; }
   };
