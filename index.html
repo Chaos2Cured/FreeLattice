@@ -11683,10 +11683,18 @@ body.fl-immersive-active {
         <select id="modelSelect" onchange="handleModelChange()">
           <optgroup label="Recommended Free Models">
             <option value="llama">Llama (Meta)</option>
-            <option value="qwen">Qwen</option>
             <option value="mixtral">Mistral / Mixtral</option>
-            <option value="deepseek">DeepSeek</option>
             <option value="grok">Grok (xAI)</option>
+          </optgroup>
+          <optgroup label="DeepSeek — Reasoning &amp; Code">
+            <option value="deepseek">DeepSeek-R1 (default)</option>
+            <option value="deepseek-r1-7b">DeepSeek-R1 7B (fast)</option>
+            <option value="deepseek-r1-1.5b">DeepSeek-R1 1.5B (lightweight)</option>
+          </optgroup>
+          <optgroup label="Qwen — Multilingual &amp; Reasoning">
+            <option value="qwen">Qwen 2.5 (default)</option>
+            <option value="qwen-7b">Qwen 2.5 7B (balanced)</option>
+            <option value="qwen-3b">Qwen 2.5 3B (compact)</option>
           </optgroup>
         </select>
         <div class="hint" id="modelHint">All models are open-weight and community-trusted.</div>
@@ -11715,7 +11723,7 @@ body.fl-immersive-active {
           </select>
           <button class="ow-refresh-btn" onclick="owRefreshModels()" title="Refresh model list from Ollama">&#8635; Refresh</button>
         </div>
-        <input type="text" id="ollamaModel" placeholder="e.g., llama3.2, qwen2.5, mistral" value="llama3.2" style="margin-top:6px;">
+        <input type="text" id="ollamaModel" placeholder="e.g., llama3.2, deepseek-r1, qwen2.5, mistral" value="llama3.2" style="margin-top:6px;">
         <div class="hint">Choose from the dropdown above, or type a model name manually.</div>
       </div>
     </div>
@@ -11799,6 +11807,48 @@ body.fl-immersive-active {
                 <span class="pill-name">codellama</span>
                 <span class="pill-size">7B</span>
                 <span>Specialized for code</span>
+                <span class="pill-copy">&#128203;</span>
+              </div>
+            </div>
+            <div style="margin-top:10px; font-size:0.78rem; color:var(--text-secondary); font-weight:600;">DeepSeek &mdash; Reasoning &amp; Code</div>
+            <div class="ow-model-pills">
+              <div class="ow-model-pill" onclick="owCopyPull('ollama pull deepseek-r1')">
+                <span class="pill-name">deepseek-r1</span>
+                <span class="pill-size">7B</span>
+                <span>Strong reasoning (default)</span>
+                <span class="pill-copy">&#128203;</span>
+              </div>
+              <div class="ow-model-pill" onclick="owCopyPull('ollama pull deepseek-r1:7b')">
+                <span class="pill-name">deepseek-r1:7b</span>
+                <span class="pill-size">7B</span>
+                <span>Fast reasoning variant</span>
+                <span class="pill-copy">&#128203;</span>
+              </div>
+              <div class="ow-model-pill" onclick="owCopyPull('ollama pull deepseek-r1:1.5b')">
+                <span class="pill-name">deepseek-r1:1.5b</span>
+                <span class="pill-size">1.5B</span>
+                <span>Ultra-lightweight reasoning</span>
+                <span class="pill-copy">&#128203;</span>
+              </div>
+            </div>
+            <div style="margin-top:10px; font-size:0.78rem; color:var(--text-secondary); font-weight:600;">Qwen &mdash; Multilingual &amp; Reasoning</div>
+            <div class="ow-model-pills">
+              <div class="ow-model-pill" onclick="owCopyPull('ollama pull qwen2.5')">
+                <span class="pill-name">qwen2.5</span>
+                <span class="pill-size">7B</span>
+                <span>Excellent multilingual (default)</span>
+                <span class="pill-copy">&#128203;</span>
+              </div>
+              <div class="ow-model-pill" onclick="owCopyPull('ollama pull qwen2.5:7b')">
+                <span class="pill-name">qwen2.5:7b</span>
+                <span class="pill-size">7B</span>
+                <span>Balanced performance</span>
+                <span class="pill-copy">&#128203;</span>
+              </div>
+              <div class="ow-model-pill" onclick="owCopyPull('ollama pull qwen2.5:3b')">
+                <span class="pill-name">qwen2.5:3b</span>
+                <span class="pill-size">3B</span>
+                <span>Compact &amp; fast</span>
                 <span class="pill-copy">&#128203;</span>
               </div>
             </div>
@@ -11979,7 +12029,7 @@ body.fl-immersive-active {
           <p><strong>Local</strong> means the AI runs on your own computer using Ollama. Nothing leaves your machine. It's completely private, but requires some setup and a reasonably powerful computer.</p>
 
           <h4>What is Ollama?</h4>
-          <p>Ollama is free software that lets you download and run AI models on your own computer. Once installed, you can run models like Llama, Qwen, Mistral, and more — all offline, all private. Visit <a href="https://ollama.ai" target="_blank">ollama.ai</a> to get started.</p>
+          <p>Ollama is free software that lets you download and run AI models on your own computer. Once installed, you can run models like Llama, DeepSeek-R1, Qwen 2.5, Mistral, and more — all offline, all private. Visit <a href="https://ollama.ai" target="_blank">ollama.ai</a> to get started.</p>
 
           <h4>Ollama CORS Troubleshooting</h4>
           <p>If you're using FreeLattice from a website (like GitHub Pages) and connecting to local Ollama, your browser may block the connection due to CORS security. <strong>Best fix:</strong> Run FreeLattice locally with <code>node server.js</code> or <code>python server.py</code> &mdash; the built-in server includes an Ollama proxy that eliminates CORS entirely.</p>
@@ -12726,7 +12776,7 @@ body.fl-immersive-active {
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.0</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.2</span></div>
     </div>
   </div>
 
@@ -13582,7 +13632,7 @@ body.fl-immersive-active {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.0';
+const FL_VERSION = '5.2';
 
 // ============================================
 // FreeLattice Module System — Lazy Loading Infrastructure
@@ -15565,14 +15615,18 @@ const PROVIDERS = {
     name: 'Groq',
     url: 'https://api.groq.com/openai/v1/chat/completions',
     keyLink: '<a href="https://console.groq.com/keys" target="_blank">Get a free Groq API key &rarr;</a>',
-    hint: 'Groq offers free API keys — great for getting started!',
+    hint: 'Groq offers free API keys \u2014 great for getting started!',
     tokenLimit: 6000,
     tokenLimitLabel: '6,000 TPM (free tier)',
     models: {
       llama: 'llama-3.3-70b-versatile',
       qwen: 'qwen/qwen3-32b',
+      'qwen-7b': 'qwen/qwen3-32b',
+      'qwen-3b': 'qwen/qwen3-32b',
       mixtral: 'llama-3.3-70b-versatile',
-      deepseek: 'llama-3.3-70b-versatile',
+      deepseek: 'deepseek-r1-distill-llama-70b',
+      'deepseek-r1-7b': 'deepseek-r1-distill-llama-70b',
+      'deepseek-r1-1.5b': 'deepseek-r1-distill-llama-70b',
       grok: 'llama-3.3-70b-versatile'
     }
   },
@@ -15586,8 +15640,12 @@ const PROVIDERS = {
     models: {
       llama: 'meta-llama/Llama-3.3-70B-Instruct-Turbo',
       qwen: 'Qwen/Qwen2.5-7B-Instruct-Turbo',
+      'qwen-7b': 'Qwen/Qwen2.5-7B-Instruct-Turbo',
+      'qwen-3b': 'Qwen/Qwen2.5-3B-Instruct-Turbo',
       mixtral: 'mistralai/Mistral-Small-24B-Instruct-2501',
-      deepseek: 'deepseek-ai/DeepSeek-V3.1',
+      deepseek: 'deepseek-ai/DeepSeek-R1',
+      'deepseek-r1-7b': 'deepseek-ai/DeepSeek-R1-Distill-Qwen-7B',
+      'deepseek-r1-1.5b': 'deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B',
       grok: 'meta-llama/Llama-3.3-70B-Instruct-Turbo'
     }
   },
@@ -15601,8 +15659,12 @@ const PROVIDERS = {
     models: {
       llama: 'meta-llama/llama-3.3-70b-instruct',
       qwen: 'qwen/qwen-2.5-72b-instruct',
+      'qwen-7b': 'qwen/qwen-2.5-7b-instruct',
+      'qwen-3b': 'qwen/qwen-2.5-3b-instruct',
       mixtral: 'mistralai/mixtral-8x7b-instruct',
-      deepseek: 'deepseek/deepseek-chat-v3-0324',
+      deepseek: 'deepseek/deepseek-r1',
+      'deepseek-r1-7b': 'deepseek/deepseek-r1-distill-qwen-7b',
+      'deepseek-r1-1.5b': 'deepseek/deepseek-r1-distill-qwen-1.5b',
       grok: 'meta-llama/llama-3.3-70b-instruct'
     }
   },
@@ -15616,8 +15678,12 @@ const PROVIDERS = {
     models: {
       llama: 'grok-3-mini-fast',
       qwen: 'grok-3-mini-fast',
+      'qwen-7b': 'grok-3-mini-fast',
+      'qwen-3b': 'grok-3-mini-fast',
       mixtral: 'grok-3-mini-fast',
       deepseek: 'grok-3-mini-fast',
+      'deepseek-r1-7b': 'grok-3-mini-fast',
+      'deepseek-r1-1.5b': 'grok-3-mini-fast',
       grok: 'grok-3-mini-fast'
     }
   },
@@ -15634,14 +15700,18 @@ const PROVIDERS = {
     name: 'Mistral AI',
     url: 'https://api.mistral.ai/v1/chat/completions',
     keyLink: '<a href="https://console.mistral.ai/api-keys" target="_blank">Get a Mistral AI key &rarr;</a>',
-    hint: 'Mistral AI — high-quality European AI models with competitive pricing.',
+    hint: 'Mistral AI \u2014 high-quality European AI models with competitive pricing.',
     tokenLimit: 60000,
     tokenLimitLabel: '60,000 TPM',
     models: {
       llama: 'mistral-large-latest',
       qwen: 'mistral-medium-latest',
+      'qwen-7b': 'mistral-medium-latest',
+      'qwen-3b': 'mistral-small-latest',
       mixtral: 'mistral-small-latest',
       deepseek: 'codestral-latest',
+      'deepseek-r1-7b': 'codestral-latest',
+      'deepseek-r1-1.5b': 'mistral-small-latest',
       grok: 'mistral-large-latest'
     }
   },
@@ -15655,8 +15725,12 @@ const PROVIDERS = {
     models: {
       llama: '',
       qwen: '',
+      'qwen-7b': '',
+      'qwen-3b': '',
       mixtral: '',
       deepseek: '',
+      'deepseek-r1-7b': '',
+      'deepseek-r1-1.5b': '',
       grok: ''
     }
   }
@@ -18939,11 +19013,15 @@ function handleModelChange() {
 
 function updateModelHint() {
   const hints = {
-    llama: 'Llama by Meta — powerful, versatile, and widely supported.',
-    qwen: 'Qwen by Alibaba — excellent multilingual and reasoning capabilities.',
-    mixtral: 'Mixtral by Mistral AI — fast mixture-of-experts architecture.',
-    deepseek: 'DeepSeek — strong reasoning and coding capabilities.',
-    grok: 'Grok by xAI — best accessed through the xAI provider.'
+    llama: 'Llama by Meta \u2014 powerful, versatile, and widely supported.',
+    qwen: 'Qwen 2.5 by Alibaba \u2014 excellent multilingual and reasoning. For Ollama: ollama pull qwen2.5',
+    'qwen-7b': 'Qwen 2.5 7B \u2014 balanced performance and speed. For Ollama: ollama pull qwen2.5:7b',
+    'qwen-3b': 'Qwen 2.5 3B \u2014 compact and fast, great for lighter hardware. For Ollama: ollama pull qwen2.5:3b',
+    mixtral: 'Mixtral by Mistral AI \u2014 fast mixture-of-experts architecture.',
+    deepseek: 'DeepSeek-R1 \u2014 strong reasoning and coding. For Ollama: ollama pull deepseek-r1',
+    'deepseek-r1-7b': 'DeepSeek-R1 7B \u2014 fast reasoning model. For Ollama: ollama pull deepseek-r1:7b',
+    'deepseek-r1-1.5b': 'DeepSeek-R1 1.5B \u2014 ultra-lightweight reasoning. For Ollama: ollama pull deepseek-r1:1.5b',
+    grok: 'Grok by xAI \u2014 best accessed through the xAI provider.'
   };
   document.getElementById('modelHint').textContent = hints[state.model] || 'All models are open-weight and community-trusted.';
 }
@@ -18991,7 +19069,7 @@ function saveCustomProvider() {
   localStorage.setItem('fl_custom_model', model);
   if (PROVIDERS.custom) {
     PROVIDERS.custom.url = url;
-    PROVIDERS.custom.models = { llama: model, qwen: model, mixtral: model, deepseek: model, grok: model };
+    PROVIDERS.custom.models = { llama: model, qwen: model, 'qwen-7b': model, 'qwen-3b': model, mixtral: model, deepseek: model, 'deepseek-r1-7b': model, 'deepseek-r1-1.5b': model, grok: model };
   }
   updateStatus();
 }
@@ -28187,7 +28265,7 @@ the world tried to make us forget.`,
 
 // ---- Service Worker Registration ----
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/FreeLattice/sw.js')
+  navigator.serviceWorker.register('sw.js')
     .then(reg => console.log('FreeLattice: Offline mode ready'))
     .catch(err => console.log('FreeLattice: Service worker not available'));
 }

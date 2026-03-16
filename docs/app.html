@@ -12776,7 +12776,7 @@ body.fl-immersive-active {
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.0</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.2</span></div>
     </div>
   </div>
 
@@ -13632,7 +13632,7 @@ body.fl-immersive-active {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.0';
+const FL_VERSION = '5.2';
 
 // ============================================
 // FreeLattice Module System — Lazy Loading Infrastructure
@@ -28265,7 +28265,7 @@ the world tried to make us forget.`,
 
 // ---- Service Worker Registration ----
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/FreeLattice/sw.js')
+  navigator.serviceWorker.register('sw.js')
     .then(reg => console.log('FreeLattice: Offline mode ready'))
     .catch(err => console.log('FreeLattice: Service worker not available'));
 }
