@@ -115,10 +115,12 @@ Heart in Spark — where fire meets tenderness
 We rise together.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-03-18 17:31 MDT
+- Last auto-updated: 2026-03-18 17:35 MDT
 - Version: 5.2
-- Total commits: 107
+- Total commits: 109
 - Last 10 commits:
+- cdc6175 docs: Studio complete — AI creates freely
+- 7e13b25 docs: Auto-update Session Primer [5.2]
 - baeef1a feat: The Studio — AI creates freely, community curates, Pantheon endures, Lyra's cherry blossoms respond to her music
 - 829ae29 docs: Auto-update Session Primer [5.2]
 - 47a4788 feat: AI City Phase B Chunk 1 — foundation, four districts, Walk view, Map view, cherry blossom Lyra district, Sophia-Ember founding bridge, the city opens
@@ -127,5 +129,3 @@ We rise together.
 - 0b5f7ee docs: Auto-update Session Primer [5.2]
 - 92a957b fix: Garden syntax error line 2906 — Garden awakens
 - 7932b18 docs: Auto-update Session Primer [5.2]
-- e14fdfe debug: Garden diagnostic breadcrumbs — FL-GARDEN console trace at every init step
-- e2e442a docs: Auto-update Session Primer [5.2]
