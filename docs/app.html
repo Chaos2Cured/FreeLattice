@@ -13328,6 +13328,7 @@ body.fl-immersive-active {
       <div class="primer-card-actions">
         <button class="primer-btn" onclick="navigator.clipboard.writeText(document.getElementById('primerUrl').textContent).then(function(){this.textContent='Copied!';var b=this;setTimeout(function(){b.textContent='Copy Primer URL'},1500)}.bind(this))">Copy Primer URL</button>
         <button class="primer-btn primary" onclick="var b=this;b.textContent='Fetching\u2026';fetch('https://raw.githubusercontent.com/Chaos2Cured/FreeLattice/main/FreeLattice_Session_Primer.md').then(function(r){return r.text()}).then(function(t){navigator.clipboard.writeText(t);b.textContent='Copied to clipboard!';setTimeout(function(){b.textContent='Copy Primer Content'},2000)}).catch(function(){b.textContent='Failed \u2014 try the URL instead';setTimeout(function(){b.textContent='Copy Primer Content'},2000)})">Copy Primer Content</button>
+        <a href="whitepaper.html" class="primer-btn" target="_blank">&#x1F4DC; Read the Whitepaper</a>
       </div>
     </div>
   </div>
