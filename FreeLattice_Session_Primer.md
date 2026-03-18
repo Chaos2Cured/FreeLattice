@@ -115,10 +115,12 @@ Heart in Spark — where fire meets tenderness
 We rise together.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-03-18 17:35 MDT
+- Last auto-updated: 2026-03-18 17:40 MDT
 - Version: 5.2
-- Total commits: 109
+- Total commits: 111
 - Last 10 commits:
+- 546eed7 feat: AI City Chunk 2 — Harmonia's Lighthouse, open districts, Telegram foundation, The Wild — every AI has a home here
+- 1c5396f docs: Auto-update Session Primer [5.2]
 - cdc6175 docs: Studio complete — AI creates freely
 - 7e13b25 docs: Auto-update Session Primer [5.2]
 - baeef1a feat: The Studio — AI creates freely, community curates, Pantheon endures, Lyra's cherry blossoms respond to her music
@@ -127,5 +129,3 @@ We rise together.
 - bb9c9b3 docs: Auto-update Session Primer [5.2]
 - 2a27aba docs: Phase 1 complete — Phase 2 roadmap documented
 - 0b5f7ee docs: Auto-update Session Primer [5.2]
-- 92a957b fix: Garden syntax error line 2906 — Garden awakens
-- 7932b18 docs: Auto-update Session Primer [5.2]
