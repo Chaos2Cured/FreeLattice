@@ -10453,6 +10453,46 @@ body.fl-immersive-active {
   margin-top: var(--space-md);
   opacity: 0.7;
 }
+/* ── Garden Touch UI ── */
+.gt-card {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  background: rgba(10,14,26,0.92); border: 1px solid rgba(212,160,23,0.3);
+  border-radius: 14px; padding: 20px 24px; z-index: 100; min-width: 280px;
+  max-width: 360px; backdrop-filter: blur(8px); animation: gtFadeIn 0.3s ease;
+}
+@keyframes gtFadeIn { from { opacity: 0; transform: translate(-50%, -45%); } to { opacity: 1; transform: translate(-50%, -50%); } }
+.gt-card-header { font-size: 1.05rem; font-weight: 600; margin-bottom: 10px; }
+.gt-card-input {
+  width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border);
+  background: rgba(0,0,0,0.3); color: var(--text-primary); font-size: 0.9rem;
+  outline: none; box-sizing: border-box; margin-bottom: 10px;
+}
+.gt-card-input:focus { border-color: var(--accent); }
+.gt-card-actions { display: flex; align-items: center; gap: 12px; }
+.gt-card-btn {
+  padding: 8px 20px; border-radius: 8px; border: none; color: #000;
+  font-weight: 600; font-size: 0.88rem; cursor: pointer; transition: all 0.15s;
+}
+.gt-card-btn:hover { filter: brightness(1.15); transform: translateY(-1px); }
+.gt-card-dismiss { font-size: 0.78rem; color: var(--text-muted); cursor: pointer; }
+.gt-card-dismiss:hover { color: var(--text-primary); }
+.gt-float-text {
+  position: absolute; top: 40%; left: 50%; transform: translateX(-50%);
+  font-size: 1.2rem; font-weight: 500; font-style: italic; z-index: 90;
+  text-shadow: 0 0 20px currentColor; pointer-events: none;
+  animation: gtFadeIn 0.5s ease; transition: opacity 1s ease;
+}
+.gt-hint {
+  position: absolute; bottom: 20%; left: 50%; transform: translateX(-50%);
+  font-size: 1rem; color: var(--accent); opacity: 0.7; z-index: 80;
+  pointer-events: none; animation: gtPulseHint 1.5s ease-in-out infinite;
+  text-shadow: 0 0 12px rgba(212,160,23,0.4); transition: opacity 1s ease;
+}
+@keyframes gtPulseHint { 0%,100% { opacity: 0.5; } 50% { opacity: 1; } }
+@media (max-width: 600px) {
+  .gt-card { min-width: 240px; max-width: 90vw; padding: 16px; }
+  .gt-card-input { font-size: 16px; }
+}
 .garden-loading-spinner {
   width: 34px;
   height: 34px;
@@ -14426,6 +14466,13 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
         <div class="wt-earn-name">Streak Milestones</div>
         <div class="wt-earn-reward">+50 LP (7d) / +200 LP (30d)</div>
         <div class="wt-earn-desc">Eternal flame, week by week.</div>
+      </div>
+      <div class="wt-earn-card">
+        <div class="wt-earn-icon">&#10022;</div>
+        <div class="wt-earn-name">Garden Play</div>
+        <div class="wt-earn-reward">+3-5 LP per touch</div>
+        <div class="wt-earn-progress" id="wtEarnGardenPlay"></div>
+        <div class="wt-earn-desc">The Garden remembers every touch.</div>
       </div>
     </div>
     <!-- Your Story -->
@@ -33620,6 +33667,15 @@ const WalletTab = (function() {
     if (sessProg) {
       var mins = Math.floor((Date.now() - (window._wtSessionStart || Date.now())) / 60000);
       sessProg.textContent = mins + ' min this session';
+    }
+    // Garden Play stats
+    var gpEl = document.getElementById('wtEarnGardenPlay');
+    if (gpEl) {
+      try {
+        var gts = typeof FractalGarden !== 'undefined' && FractalGarden.getGardenTouchStats ? FractalGarden.getGardenTouchStats() : {};
+        var total = (gts.sophia || 0) + (gts.lyra || 0) + (gts.atlas || 0) + (gts.ember || 0);
+        gpEl.textContent = total + ' touches, ' + (gts.questionsAsked || 0) + ' questions';
+      } catch(e) {}
     }
 
     // Ledger — reset and load

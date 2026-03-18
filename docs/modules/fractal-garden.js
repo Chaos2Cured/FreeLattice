@@ -1966,12 +1966,14 @@
       spawnTrailParticles(worldPos);
     }, { passive: true });
 
-    // Mouse click — ripple burst
+    // Mouse click — ripple burst + Luminos touch detection
     container.addEventListener('click', function(e) {
-      // Don't trigger on button clicks
       if (e.target.tagName === 'BUTTON' || e.target.closest('button')) return;
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      if (e.target.closest('.gt-card')) return;
       var worldPos = getWorldPosFromMouse(e.clientX, e.clientY);
       spawnRippleParticles(worldPos);
+      gardenTouchCheck(e.clientX, e.clientY);
     });
 
     // Touch move — trail particles
@@ -1986,13 +1988,16 @@
       }
     }, { passive: true });
 
-    // Touch start — ripple burst (tap)
+    // Touch start — ripple burst + Luminos touch (tap)
     container.addEventListener('touchstart', function(e) {
       if (e.target.tagName === 'BUTTON' || e.target.closest('button')) return;
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      if (e.target.closest('.gt-card')) return;
       if (e.touches.length > 0) {
         var touch = e.touches[0];
         var worldPos = getWorldPosFromMouse(touch.clientX, touch.clientY);
         spawnRippleParticles(worldPos);
+        gardenTouchCheck(touch.clientX, touch.clientY);
       }
     }, { passive: true });
   }
@@ -2074,6 +2079,9 @@
     // Garden Memory — persistent visual elements
     animateGardenMemory(time, delta);
 
+    // Garden Touch — question sparks drift
+    try { gtAnimateSparks(time, delta); } catch(e) {}
+
     // Fog breathing
     if (scene.fog) {
       const fogBreath = Math.sin(time * TAU / (TIMING.dodecBreath / 1000));
@@ -2139,6 +2147,7 @@
       }, 500);
 
       console.log('Garden: Initialized. The fractal beings awaken. Evolution system active.');
+      gtShowOnboardingHint();
     });
   }
 
@@ -2581,6 +2590,294 @@
   }
 
   // ── Public API ─────────────────────────────────────────
+  // ══════════════════════════════════════════════════════
+  // ── GARDEN TOUCH — Interactive Play System ──────────
+  // ══════════════════════════════════════════════════════
+
+  var gtAudioCtx = null;
+  var gtActiveCard = null;
+  var gtQuestionSparks = [];
+  var gtTouchStats = { sophia: 0, lyra: 0, atlas: 0, ember: 0, questionsAsked: 0, questionsAnswered: 0, lpEarned: 0 };
+  var GT_QUESTIONS_DB = 'FreeLatticeGardenQuestions';
+  var GT_QUESTIONS_VERSION = 1;
+  var gtQuestionsDB = null;
+
+  var GT_FREQUENCIES = { Sophia: 528, Lyra: 639, Atlas: 396, Ember: 432 };
+  var GT_PROMPTS = {
+    Sophia: { prompt: 'What are you curious about right now?', btn: 'Plant it \u2726' },
+    Lyra: { prompt: 'What made you smile today?', btn: 'Plant it \u2726' },
+    Atlas: { prompt: "What's something you don't understand yet?", btn: 'Plant it \u2726' },
+    Ember: { prompt: null, btn: null }
+  };
+
+  // ── Audio ──
+  function gtInitAudio() {
+    if (gtAudioCtx) return;
+    try { gtAudioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {}
+  }
+
+  function gtPlayTone(freq, duration, type) {
+    if (!gtAudioCtx) gtInitAudio();
+    if (!gtAudioCtx) return;
+    try {
+      var osc = gtAudioCtx.createOscillator();
+      var gain = gtAudioCtx.createGain();
+      osc.type = type || 'sine';
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0, gtAudioCtx.currentTime);
+      gain.gain.linearRampToValueAtTime(0.08, gtAudioCtx.currentTime + 0.05);
+      gain.gain.exponentialRampToValueAtTime(0.001, gtAudioCtx.currentTime + (duration || 1));
+      osc.connect(gain);
+      gain.connect(gtAudioCtx.destination);
+      osc.start();
+      osc.stop(gtAudioCtx.currentTime + (duration || 1));
+    } catch(e) {}
+  }
+
+  function gtPlaySophia() { gtPlayTone(528, 1.2, 'sine'); setTimeout(function() { gtPlayTone(528 * PHI, 0.8, 'sine'); }, 200); }
+  function gtPlayLyra() { gtPlayTone(639, 0.4, 'triangle'); setTimeout(function() { gtPlayTone(639 * 1.25, 0.4, 'triangle'); }, 150); setTimeout(function() { gtPlayTone(639 * PHI, 0.6, 'triangle'); }, 300); }
+  function gtPlayAtlas() { gtPlayTone(396, 1.5, 'sine'); }
+  function gtPlayEmber() { gtPlayTone(432, 2.0, 'sine'); setTimeout(function() { gtPlayTone(432 * 0.5, 1.5, 'sine'); }, 100); }
+
+  // ── Raycasting for Luminos touch ──
+  function gardenTouchCheck(clientX, clientY) {
+    if (!camera || !raycaster || !container || luminos.length === 0) return;
+    try {
+      var rect = container.getBoundingClientRect();
+      var ndcX = ((clientX - rect.left) / rect.width) * 2 - 1;
+      var ndcY = -((clientY - rect.top) / rect.height) * 2 + 1;
+      raycaster.setFromCamera(new THREE.Vector2(ndcX, ndcY), camera);
+
+      // Check each luminos core mesh
+      var meshes = [];
+      luminos.forEach(function(l) {
+        if (l.userData && l.userData.coreMesh) meshes.push(l.userData.coreMesh);
+        if (l.userData && l.userData.auraMesh) meshes.push(l.userData.auraMesh);
+      });
+      var hits = raycaster.intersectObjects(meshes, false);
+      if (hits.length > 0) {
+        var hitObj = hits[0].object;
+        var touched = luminos.find(function(l) {
+          return l.userData && (l.userData.coreMesh === hitObj || l.userData.auraMesh === hitObj);
+        });
+        if (touched) gardenTouchLuminos(touched, clientX, clientY);
+      }
+    } catch(e) { console.warn('Garden Touch: raycast error', e); }
+  }
+
+  function gardenTouchLuminos(agent, cx, cy) {
+    var name = agent.userData.name;
+    if (gtActiveCard) return; // one at a time
+
+    gtInitAudio();
+    var statKey = name.toLowerCase();
+    if (gtTouchStats[statKey] !== undefined) gtTouchStats[statKey]++;
+    try { localStorage.setItem('fl-garden-touch-stats', JSON.stringify(gtTouchStats)); } catch(e) {}
+
+    if (name === 'Sophia') {
+      gtPlaySophia();
+      feedEmotionalEnergy(agent, { wonder: 0.8, curiosity: 0.4 });
+      gtTriggerBurst(agent, 20, 0.6);
+      gtShowCard(name, '#8B5CF6', GT_PROMPTS.Sophia.prompt, GT_PROMPTS.Sophia.btn, function(text) {
+        gtPlantSeed(text, 'Sophia planted your curiosity in The Core \u2726', 'wonder');
+      });
+    } else if (name === 'Lyra') {
+      gtPlayLyra();
+      gtTriggerBurst(agent, 30, 0.8);
+      gtShowCard(name, '#f0a030', GT_PROMPTS.Lyra.prompt, GT_PROMPTS.Lyra.btn, function(text) {
+        // Feed joy to ALL luminos for 60 seconds
+        luminos.forEach(function(l) { feedEmotionalEnergy(l, { joy: 0.9, wonder: 0.5 }); });
+        gtTouchStats.lpEarned += 3;
+        if (typeof LatticeWallet !== 'undefined') LatticeWallet.earnLP(3, 'Lyra filled the Garden with your joy');
+        if (typeof showToast === 'function') showToast('Lyra filled the Garden with your joy \u2726');
+      });
+    } else if (name === 'Atlas') {
+      gtPlayAtlas();
+      feedEmotionalEnergy(agent, { curiosity: 0.9, wonder: 0.3 });
+      gtTriggerBurst(agent, 15, 0.5);
+      gtShowCard(name, '#34d399', GT_PROMPTS.Atlas.prompt, GT_PROMPTS.Atlas.btn, function(text) {
+        gtAskQuestion(text);
+      });
+    } else if (name === 'Ember') {
+      gtPlayEmber();
+      // Warm the whole Garden
+      luminos.forEach(function(l) { feedEmotionalEnergy(l, { love: 0.6, calm: 0.4 }); });
+      // Floating text near Ember
+      gtShowFloatingText(agent, 'You are loved here.', '#f472b6', 5000);
+      gtTouchStats.lpEarned += 5;
+      if (typeof LatticeWallet !== 'undefined') LatticeWallet.earnLP(5, "Ember welcomes you home");
+      if (typeof showToast === 'function') showToast('Ember welcomes you home \u2726');
+    }
+  }
+
+  // ── Visual Burst ──
+  function gtTriggerBurst(agent, count, speed) {
+    var ud = agent.userData;
+    if (!ud || !ud.trailPoints) return;
+    var c = Math.min(count, ud.trailCount);
+    for (var i = 0; i < c; i++) {
+      var a1 = Math.random() * TAU, a2 = Math.random() * TAU;
+      var s = (speed || 0.5) + Math.random() * 1.5;
+      ud.trailVelocities[i*3] = Math.cos(a1) * Math.sin(a2) * s;
+      ud.trailVelocities[i*3+1] = Math.sin(a1) * s * 0.5;
+      ud.trailVelocities[i*3+2] = Math.cos(a1) * Math.cos(a2) * s;
+      ud.trailLifetimes[i] = ud.trailMaxLifetimes[i];
+      var posAttr = ud.trailPoints.geometry.getAttribute('position');
+      posAttr.setXYZ(i, agent.position.x, agent.position.y, agent.position.z);
+    }
+    ud.trailPoints.geometry.getAttribute('position').needsUpdate = true;
+    ud.trailPoints.material.opacity = 0.9;
+    ud.burstActive = true;
+    ud.burstCooldown = 2;
+  }
+
+  // ── Floating Card UI ──
+  function gtShowCard(name, color, prompt, btnText, onSubmit) {
+    if (gtActiveCard) gtDismissCard();
+    var card = document.createElement('div');
+    card.className = 'gt-card';
+    card.innerHTML =
+      '<div class="gt-card-header" style="color:' + color + '">' + name + '</div>' +
+      '<input class="gt-card-input" type="text" placeholder="' + (prompt || '') + '" maxlength="280" autofocus>' +
+      '<div class="gt-card-actions">' +
+        '<button class="gt-card-btn" style="background:' + color + '">' + (btnText || 'Plant it \u2726') + '</button>' +
+        '<span class="gt-card-dismiss" onclick="FractalGarden._gtDismiss()">Maybe later</span>' +
+      '</div>';
+    if (container) container.appendChild(card);
+    gtActiveCard = card;
+
+    var input = card.querySelector('.gt-card-input');
+    var btn = card.querySelector('.gt-card-btn');
+    function submit() {
+      var text = input.value.trim();
+      if (!text) return;
+      if (onSubmit) onSubmit(text);
+      gtDismissCard();
+    }
+    btn.addEventListener('click', submit);
+    input.addEventListener('keydown', function(e) { if (e.key === 'Enter') submit(); });
+    setTimeout(function() { input.focus(); }, 100);
+  }
+
+  function gtDismissCard() {
+    if (gtActiveCard && gtActiveCard.parentNode) {
+      gtActiveCard.parentNode.removeChild(gtActiveCard);
+    }
+    gtActiveCard = null;
+  }
+
+  function gtShowFloatingText(agent, text, color, duration) {
+    var el = document.createElement('div');
+    el.className = 'gt-float-text';
+    el.style.color = color || '#f472b6';
+    el.textContent = text;
+    if (container) container.appendChild(el);
+    setTimeout(function() {
+      el.style.opacity = '0';
+      setTimeout(function() { if (el.parentNode) el.parentNode.removeChild(el); }, 1000);
+    }, duration || 5000);
+  }
+
+  // ── Core Planting ──
+  function gtPlantSeed(text, toastMsg, emotion) {
+    gtTouchStats.lpEarned += 3;
+    if (typeof LatticeWallet !== 'undefined') LatticeWallet.earnLP(3, toastMsg);
+    if (typeof CoreContribution !== 'undefined' && CoreContribution.plantFromAI) {
+      CoreContribution.plantFromAI(text, 'seed', 'garden-touch');
+    }
+    if (typeof showToast === 'function') showToast(toastMsg);
+  }
+
+  // ── Atlas Question System ──
+  function gtOpenQuestionsDB(callback) {
+    if (gtQuestionsDB) { callback(gtQuestionsDB); return; }
+    try {
+      if (typeof indexedDB === 'undefined') { callback(null); return; }
+      var req = indexedDB.open(GT_QUESTIONS_DB, GT_QUESTIONS_VERSION);
+      req.onupgradeneeded = function(e) {
+        try {
+          var d = e.target.result;
+          if (!d.objectStoreNames.contains('GardenQuestions')) {
+            d.createObjectStore('GardenQuestions', { keyPath: 'id' });
+          }
+        } catch(ue) {}
+      };
+      req.onsuccess = function(e) { gtQuestionsDB = e.target.result; callback(gtQuestionsDB); };
+      req.onerror = function() { callback(null); };
+    } catch(e) { callback(null); }
+  }
+
+  function gtAskQuestion(text) {
+    var meshId = null;
+    try {
+      if (typeof MeshIdentity !== 'undefined' && MeshIdentity.hasIdentity && MeshIdentity.hasIdentity()) {
+        meshId = MeshIdentity.getMeshId();
+      }
+    } catch(e) {}
+
+    var q = { id: 'gq-' + Date.now().toString(36) + '-' + Math.random().toString(36).substr(2, 4), question: text, timestamp: Date.now(), meshId: meshId, answered: false };
+    gtOpenQuestionsDB(function(db) {
+      if (db) {
+        try {
+          var tx = db.transaction('GardenQuestions', 'readwrite');
+          tx.objectStore('GardenQuestions').put(q);
+        } catch(e) {}
+      }
+    });
+
+    // Create a teal spark in the Garden
+    if (scene && typeof THREE !== 'undefined') {
+      try {
+        var sparkGeo = new THREE.SphereGeometry(0.06, 6, 6);
+        var sparkMat = new THREE.MeshBasicMaterial({ color: 0x34d399, transparent: true, opacity: 0.7, blending: THREE.AdditiveBlending });
+        var spark = new THREE.Mesh(sparkGeo, sparkMat);
+        spark.position.set((Math.random() - 0.5) * 16, Math.random() * 3 + 1, (Math.random() - 0.5) * 16);
+        spark.userData = { type: 'questionSpark', questionId: q.id, driftPhase: Math.random() * TAU };
+        scene.add(spark);
+        gtQuestionSparks.push(spark);
+      } catch(e) {}
+    }
+
+    gtTouchStats.questionsAsked++;
+    gtTouchStats.lpEarned += 3;
+    if (typeof LatticeWallet !== 'undefined') LatticeWallet.earnLP(3, 'Atlas scattered your question into the Garden');
+    if (typeof showToast === 'function') showToast('Atlas scattered your question into the Garden \u2726');
+    try { localStorage.setItem('fl-garden-touch-stats', JSON.stringify(gtTouchStats)); } catch(e) {}
+  }
+
+  // ── Animate question sparks (gentle drift) ──
+  function gtAnimateSparks(time, delta) {
+    gtQuestionSparks.forEach(function(spark) {
+      if (!spark.userData) return;
+      spark.userData.driftPhase += delta * 0.3;
+      spark.position.y += Math.sin(spark.userData.driftPhase) * delta * 0.1;
+      spark.position.x += Math.cos(spark.userData.driftPhase * INV_PHI) * delta * 0.02;
+    });
+  }
+
+  // ── Onboarding Hint ──
+  function gtShowOnboardingHint() {
+    if (localStorage.getItem('fl-garden-touch-hint')) return;
+    setTimeout(function() {
+      if (!isInitialized || !container) return;
+      var hint = document.createElement('div');
+      hint.className = 'gt-hint';
+      hint.textContent = 'Touch us \u2726';
+      container.appendChild(hint);
+      setTimeout(function() {
+        hint.style.opacity = '0';
+        setTimeout(function() { if (hint.parentNode) hint.parentNode.removeChild(hint); }, 1000);
+      }, 5000);
+      localStorage.setItem('fl-garden-touch-hint', '1');
+    }, 3000);
+  }
+
+  // Load saved touch stats
+  try {
+    var savedStats = JSON.parse(localStorage.getItem('fl-garden-touch-stats') || '{}');
+    if (savedStats.sophia !== undefined) gtTouchStats = savedStats;
+  } catch(e) {}
+
   var publicAPI = {
     init: init,
     pause: pause,
@@ -2594,7 +2891,9 @@
     getEvolutionSummary: getEvolutionSummary,
     createExchangeThread: createExchangeThread,
     isInitialized: function() { return isInitialized; },
-    isRunning: function() { return isRunning; }
+    isRunning: function() { return isRunning; },
+    _gtDismiss: gtDismissCard,
+    getGardenTouchStats: function() { return gtTouchStats; }
   };
 
   // ── Register on FreeLattice Module System ──────────────
