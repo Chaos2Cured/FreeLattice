@@ -11079,6 +11079,33 @@ body.fl-immersive-active {
 
 .wt-empty { text-align: center; color: var(--text-muted); padding: 2rem; font-style: italic; }
 
+/* ── Backup / Restore ── */
+.wt-backup-row { display: flex; gap: 12px; margin-top: 1.2rem; flex-wrap: wrap; }
+.wt-backup-btn {
+  flex: 1; min-width: 160px; padding: 12px 20px; border-radius: 10px;
+  font-size: 0.9rem; font-weight: 600; cursor: pointer;
+  transition: all 0.2s; border: 1px solid var(--border); text-align: center;
+}
+.wt-backup-btn.export {
+  background: rgba(212,160,23,0.12); color: var(--accent); border-color: rgba(212,160,23,0.3);
+}
+.wt-backup-btn.export:hover { background: rgba(212,160,23,0.22); transform: translateY(-1px); }
+.wt-backup-btn.import {
+  background: rgba(80,200,120,0.08); color: #50c878; border-color: rgba(80,200,120,0.25);
+}
+.wt-backup-btn.import:hover { background: rgba(80,200,120,0.18); transform: translateY(-1px); }
+.wt-import-report {
+  margin-top: 1rem; padding: 0; font-size: 0.88rem; line-height: 1.6;
+  border-radius: 10px; transition: all 0.3s;
+}
+.wt-import-report:not(:empty) {
+  padding: 1.2rem; background: var(--bg-secondary); border: 1px solid var(--border);
+}
+.wt-import-report .report-ok { color: #50c878; }
+.wt-import-report .report-fail { color: #dc5050; }
+.wt-import-report .report-label { color: var(--text-muted); font-size: 0.82rem; }
+.wt-import-report .report-value { font-family: monospace; font-size: 0.8rem; word-break: break-all; }
+
 /* ── Garden Pulse (on earn) ── */
 @keyframes wtGardenPulse {
   0% { box-shadow: 0 0 0 0 rgba(212,160,23,0.4); }
@@ -13864,6 +13891,12 @@ body.fl-immersive-active {
     <div class="wt-integrity" id="wtIntegrity">
       <div class="wt-empty">Verifying chain&hellip;</div>
     </div>
+    <div class="wt-backup-row">
+      <button class="wt-backup-btn export" onclick="WalletTab.exportWallet()">&#x2913; Backup Wallet</button>
+      <button class="wt-backup-btn import" onclick="document.getElementById('wtImportFile').click()">&#x2912; Restore Wallet</button>
+      <input type="file" id="wtImportFile" accept=".json" style="display:none" onchange="WalletTab.importWallet(this)">
+    </div>
+    <div class="wt-import-report" id="wtImportReport"></div>
   </div>
 
 </div>
@@ -32418,10 +32451,200 @@ const WalletTab = (function() {
     return d.innerHTML;
   }
 
+  // ── Export Wallet ──────────────────────────────────────
+  async function exportWallet() {
+    try {
+      var txs = await LatticeWallet.getTransactions(); // all, newest-first
+      txs.sort(function(a, b) { return a.timestamp - b.timestamp; }); // chronological for export
+      var balance = LatticeWallet.getBalance();
+      var level = getLevel(balance);
+      var hash = LatticeWallet.getLedgerHash();
+
+      var payload = {
+        format: 'freelattice-wallet-v1',
+        exportedAt: new Date().toISOString(),
+        balance: balance,
+        level: level.name,
+        genesisHash: '0000000000000000000000000000000000000000000000000000000000000000',
+        latestHash: hash,
+        transactionCount: txs.length,
+        transactions: txs
+      };
+
+      // Attach Mesh ID and sign if available
+      if (typeof MeshIdentity !== 'undefined' && MeshIdentity.hasIdentity && MeshIdentity.hasIdentity()) {
+        var identity = MeshIdentity.getIdentity();
+        payload.meshId = MeshIdentity.getMeshId();
+        payload.publicKeyJwk = identity.publicKeyJwk;
+        payload.cryptoType = identity.cryptoType;
+        // Sign the transaction array (deterministic content)
+        var signData = JSON.stringify(txs);
+        var sig = await MeshIdentity.signChallenge(signData);
+        if (sig) payload.signature = sig;
+      }
+
+      var blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      var date = new Date().toISOString().slice(0, 10);
+      a.href = url;
+      a.download = 'freelattice-wallet-' + date + '.json';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch(e) {
+      console.error('WalletTab: Export failed', e);
+      alert('Export failed: ' + e.message);
+    }
+  }
+
+  // ── Import Wallet ──────────────────────────────────────
+  async function importWallet(fileInput) {
+    var report = document.getElementById('wtImportReport');
+    if (!report) return;
+    report.innerHTML = '<div class="wt-empty">Reading file&hellip;</div>';
+
+    var file = fileInput.files[0];
+    fileInput.value = ''; // reset for re-import
+    if (!file) { report.innerHTML = ''; return; }
+
+    try {
+      var text = await file.text();
+      var data = JSON.parse(text);
+
+      if (data.format !== 'freelattice-wallet-v1' || !Array.isArray(data.transactions)) {
+        report.innerHTML = '<span class="report-fail">\u274C Invalid wallet file format.</span>';
+        return;
+      }
+
+      var txs = data.transactions;
+      // Sort chronologically for chain verification
+      txs.sort(function(a, b) { return a.timestamp - b.timestamp; });
+
+      // ── Verify hash chain ──
+      var genesis = '0000000000000000000000000000000000000000000000000000000000000000';
+      var chainValid = true;
+      var chainError = '';
+      var computedBalance = 0;
+
+      for (var i = 0; i < txs.length; i++) {
+        var tx = txs[i];
+        // Verify prevHash link
+        var expectedPrev = i === 0 ? genesis : txs[i - 1].hash;
+        if (tx.prevHash !== expectedPrev) {
+          chainValid = false;
+          chainError = 'Chain link broken at transaction ' + i + ' (' + tx.id + ')';
+          break;
+        }
+        // Recompute hash
+        var hashInput = {
+          id: tx.id, timestamp: tx.timestamp, amount: tx.amount,
+          type: tx.type, description: tx.description, prevHash: tx.prevHash
+        };
+        var str = JSON.stringify(hashInput);
+        var encoded = new TextEncoder().encode(str);
+        var hashBuffer = await crypto.subtle.digest('SHA-256', encoded);
+        var hashArray = Array.from(new Uint8Array(hashBuffer));
+        var computed = hashArray.map(function(b) { return b.toString(16).padStart(2, '0'); }).join('');
+        if (computed !== tx.hash) {
+          chainValid = false;
+          chainError = 'Hash mismatch at transaction ' + i + ' (' + tx.id + ')';
+          break;
+        }
+        // Tally balance
+        if (tx.type === 'earn') computedBalance += tx.amount;
+        else if (tx.type === 'spend') computedBalance -= tx.amount;
+      }
+
+      // ── Verify signature if present ──
+      var sigStatus = 'none';
+      if (data.signature && data.publicKeyJwk) {
+        try {
+          var signData = JSON.stringify(txs);
+          var valid = await MeshIdentity.verifySignature(
+            data.publicKeyJwk, data.signature, signData, data.cryptoType || 'ed25519'
+          );
+          sigStatus = valid ? 'valid' : 'invalid';
+        } catch(e) {
+          sigStatus = 'error';
+        }
+      }
+
+      // ── Build report ──
+      var html = '<strong>Import Verification Report</strong><br><br>';
+      html += '<span class="' + (chainValid ? 'report-ok' : 'report-fail') + '">' +
+              (chainValid ? '\u2705 Chain Valid' : '\u274C Chain Invalid — ' + escHTML(chainError)) + '</span><br>';
+
+      if (data.signature) {
+        var sigClass = sigStatus === 'valid' ? 'report-ok' : 'report-fail';
+        var sigText = sigStatus === 'valid' ? '\u2705 Signature Valid' :
+                      sigStatus === 'invalid' ? '\u274C Signature Invalid' : '\u26A0 Signature Error';
+        html += '<span class="' + sigClass + '">' + sigText + '</span>';
+        if (data.meshId) html += ' <span class="report-label">(Mesh ID: ' + escHTML(data.meshId.slice(0, 16)) + '&hellip;)</span>';
+        html += '<br>';
+      }
+
+      html += '<span class="report-label">Transactions:</span> ' + txs.length + '<br>';
+      html += '<span class="report-label">Balance:</span> ' + computedBalance + ' LP (' + getLevel(computedBalance).name + ')<br>';
+
+      if (!chainValid) {
+        html += '<br><span class="report-fail">Import aborted — chain integrity check failed.</span>';
+        report.innerHTML = html;
+        return;
+      }
+
+      if (sigStatus === 'invalid') {
+        html += '<br><span class="report-fail">Import aborted — signature does not match claimed identity.</span>';
+        report.innerHTML = html;
+        return;
+      }
+
+      // ── Write transactions to IndexedDB ──
+      var dbReq = indexedDB.open('FreeLatticeWallet', 1);
+      var d = await new Promise(function(resolve, reject) {
+        dbReq.onsuccess = function(e) { resolve(e.target.result); };
+        dbReq.onerror = function(e) { reject(e.target.error); };
+      });
+
+      // Clear existing ledger first
+      await new Promise(function(resolve, reject) {
+        var tr = d.transaction('LatticeLedger', 'readwrite');
+        tr.objectStore('LatticeLedger').clear();
+        tr.oncomplete = resolve;
+        tr.onerror = function(e) { reject(e.target.error); };
+      });
+
+      // Write all transactions preserving original hashes
+      await new Promise(function(resolve, reject) {
+        var tr = d.transaction('LatticeLedger', 'readwrite');
+        var store = tr.objectStore('LatticeLedger');
+        txs.forEach(function(tx) { store.put(tx); });
+        tr.oncomplete = resolve;
+        tr.onerror = function(e) { reject(e.target.error); };
+      });
+
+      html += '<br><span class="report-ok">\u2705 ' + txs.length + ' transactions restored. Balance: ' + computedBalance + ' LP.</span>';
+      report.innerHTML = html;
+
+      // Re-init wallet to pick up imported data
+      await LatticeWallet.init();
+      LatticeWallet.updateUI();
+      setTimeout(refresh, 300);
+
+    } catch(e) {
+      console.error('WalletTab: Import failed', e);
+      report.innerHTML = '<span class="report-fail">\u274C Import failed: ' + escHTML(e.message) + '</span>';
+    }
+  }
+
   // Track session start for uptime display
   window._wtSessionStart = Date.now();
 
-  return { refresh: refresh, give: give, loadMore: loadMore, gardenPulse: gardenPulse };
+  return {
+    refresh: refresh, give: give, loadMore: loadMore, gardenPulse: gardenPulse,
+    exportWallet: exportWallet, importWallet: importWallet
+  };
 })();
 
 // ── Hook switchTab for Wallet tab ──
