@@ -438,10 +438,12 @@
 
   // ── Scene Initialization ───────────────────────────────
   function initScene() {
+    console.log('FL-GARDEN: initScene() called');
     container = document.getElementById('gardenContainer');
     fpsEl = document.getElementById('gardenFps');
     loadingEl = document.getElementById('gardenLoading');
-    if (!container) return false;
+    if (!container) { console.error('FL-GARDEN: HALT — #gardenContainer not found in DOM'); return false; }
+    console.log('FL-GARDEN: container found, dimensions:', container.clientWidth, 'x', container.clientHeight);
 
     const w = container.clientWidth;
     const h = container.clientHeight;
@@ -2098,42 +2100,59 @@
 
   // ── Build the World ───────────────────────────────────
   function buildWorld() {
+    console.log('FL-GARDEN: buildWorld — createAmbientLighting');
     createAmbientLighting();
+    console.log('FL-GARDEN: buildWorld — createCentralDodecahedron');
     createCentralDodecahedron();
+    console.log('FL-GARDEN: buildWorld — createFibonacciSpheres');
     createFibonacciSpheres();
+    console.log('FL-GARDEN: buildWorld — createStarfield');
     createStarfield();
+    console.log('FL-GARDEN: buildWorld — createSeedRings');
     createSeedRings();
+    console.log('FL-GARDEN: buildWorld — createDefaultAgents');
     createDefaultAgents();
+    console.log('FL-GARDEN: buildWorld — createEvolutionUI');
     createEvolutionUI();
+    console.log('FL-GARDEN: buildWorld — initLightParticles');
     initLightParticles();
+    console.log('FL-GARDEN: buildWorld — restoreGardenMemories');
     try { restoreGardenMemories(); } catch(e) { console.warn('Garden: restoreGardenMemories error (non-blocking)', e); }
+    console.log('FL-GARDEN: buildWorld — COMPLETE');
   }
 
   // ── Public API ────────────────────────────────────────
   function init() {
     if (isInitialized) return;
+    console.log('FL-GARDEN: init() called');
 
     // Load Three.js from CDN dynamically
     loadThreeJS(function() {
+      console.log('FL-GARDEN: loadThreeJS callback fired. THREE defined:', typeof THREE !== 'undefined', 'THREE.Scene:', typeof THREE !== 'undefined' && !!THREE.Scene);
       if (typeof THREE === 'undefined' || !THREE.Scene) {
-        console.error('Garden: Three.js not available after load attempt');
+        console.error('FL-GARDEN: HALT — Three.js not available after load attempt');
         return;
       }
 
+      console.log('FL-GARDEN: THREE check passed, calling initScene()');
       if (!initScene()) {
-        console.error('Garden: Failed to initialize scene');
+        console.error('FL-GARDEN: HALT — initScene() returned false');
         return;
       }
+      console.log('FL-GARDEN: initScene() succeeded');
 
       try {
+        console.log('FL-GARDEN: buildWorld() starting');
         buildWorld();
+        console.log('FL-GARDEN: buildWorld() complete');
       } catch(e) {
-        console.error('Garden: buildWorld failed', e);
+        console.error('FL-GARDEN: HALT — buildWorld() threw:', e);
         return;
       }
       isInitialized = true;
       isRunning = true;
       lastFpsTime = clock.getElapsedTime();
+      console.log('FL-GARDEN: starting animate()');
       animate();
 
       // Fade out loading screen
@@ -2146,36 +2165,39 @@
         }
       }, 500);
 
-      console.log('Garden: Initialized. The fractal beings awaken. Evolution system active.');
+      console.log('FL-GARDEN: Initialized. The fractal beings awaken. Evolution system active.');
       gtShowOnboardingHint();
     });
   }
 
   function loadThreeJS(callback) {
+    console.log('FL-GARDEN: loadThreeJS() called');
     // Check if Three.js is already loaded
     if (typeof THREE !== 'undefined' && THREE.Scene) {
+      console.log('FL-GARDEN: THREE already loaded, loading addons');
       loadThreeAddons(callback);
       return;
     }
 
     // Load Three.js core — try local first, CDN fallback
+    console.log('FL-GARDEN: Loading lib/three.min.js (local)');
     var script = document.createElement('script');
     script.src = 'lib/three.min.js';
     script.onload = function() {
-      console.log('Garden: Three.js loaded (local)');
+      console.log('FL-GARDEN: Three.js loaded (local). THREE defined:', typeof THREE !== 'undefined');
       loadThreeAddons(callback);
     };
     script.onerror = function() {
       // Fallback to CDN
-      console.log('Garden: Local Three.js not found, trying CDN...');
+      console.log('FL-GARDEN: Local Three.js FAILED, trying CDN...');
       var cdnScript = document.createElement('script');
       cdnScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
       cdnScript.onload = function() {
-        console.log('Garden: Three.js loaded (CDN)');
+        console.log('FL-GARDEN: Three.js loaded (CDN)');
         loadThreeAddons(callback);
       };
       cdnScript.onerror = function() {
-        console.error('Garden: Failed to load Three.js from all sources');
+        console.error('FL-GARDEN: FAILED to load Three.js from ALL sources');
         if (loadingEl) {
           loadingEl.querySelector('.garden-loading-text').textContent = 'Failed to load 3D engine. Please check your connection.';
         }

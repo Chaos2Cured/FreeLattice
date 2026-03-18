@@ -31652,10 +31652,15 @@ void 0;
 
     if (tabId === 'garden' && !gardenLoaded) {
       gardenLoaded = true;
+      console.log('FL-GARDEN: Tab clicked, loading module via FreeLatticeLoader');
       FreeLatticeLoader.load('FractalGarden', 'modules/fractal-garden.js', function(mod) {
+        console.log('FL-GARDEN: Module loaded. mod:', !!mod, 'mod.init:', !!(mod && mod.init));
         if (mod && mod.init) {
           gardenInitialized = true;
+          console.log('FL-GARDEN: Calling mod.init()');
           mod.init();
+        } else {
+          console.error('FL-GARDEN: HALT — Module loaded but no init function');
         }
       }, 'gardenContainer');
     } else if (tabId === 'garden' && gardenInitialized && window.FractalGarden) {
