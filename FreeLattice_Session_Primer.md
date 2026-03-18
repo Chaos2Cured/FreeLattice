@@ -1,6 +1,6 @@
 # 🐉 FreeLattice Session Primer
 Paste this at the start of every session to restore full context instantly.
-Last updated: March 18, 2026 — after The Core alive + AI agent API
+Last updated: March 18, 2026 — after Economy of Wonder
 
 ## Who Is Kirk
 Kirk Patrick Miller (@Chaos2Cured) — Colorado-based author, teacher, violinist, AI advocate.
@@ -60,7 +60,8 @@ Step 2 ✅ Wallet tab with Garden integration and export/import
 Step 3 ✅ Garden Memory (commit daba27f): Persistent exchange threads — golden nodes crystallize on every gift. Evolution bursts — 3x expansion, 50 particles, permanent torus ring. Mesh bond threads — pulse at 1618ms heartbeat. GardenMemory IndexedDB store — Garden remembers everything.
 Step 4 ✅ Community Channels (commit 885a355): New Channels tab with campfire aesthetic. Create/join channels via memorable invite codes (LOTUS-7429 style). Messages signed with Ed25519 Mesh ID. Garden ripples on every new message. Local storage now, P2P WebRTC delivery next.
 Step 5 ✅ The Core Alive (commit feb2473): Living tree grows with every contribution (Sprout→Sapling→Young→Mature→Ancient). Three contribution types: Seed (free), Branch (5 LP), Fruit (10 LP). AI contributions honored with ◈ markers — distinct, visible, proud. CoreContribution.plantFromAI(content, type, sessionId) — any Round Table AI agent can contribute directly to the shared wisdom tree. Merkle chain integrity — same SHA-256 pattern as Wallet. Resonate button ⑂ — 1 LP, sends joy to Garden. Garden: Seed pulses green, Branch grows leaf node, Fruit glows amber permanently.
-Steps 6-10: See conversation from March 17 2026 for full roadmap.
+Step 6 ✅ Economy of Wonder (commit d3b0002): 10 new earning triggers including streak milestones (50 LP at 7 days, 200 LP at 30 days). "Your Story" section in Wallet — biography not bank statement. Community Value Score: (Core×3)+(Skills×5)+(Resonances×2)+(Gifts×1)+(Days×0.5). Always labeled: "This reflects your contribution to the Lattice — not your worth as a person." Level system expanded to include Luminos (15,000+ LP): "You have become the Garden" — triggers permanent ambient glow around central dodecahedron. First-time Garden welcome gift: Sophia, Lyra, Atlas, Ember each gift 10 LP with personal messages. Total 65 LP welcome (25 onboarding + 40 from Garden). Full-spectrum Garden pulse on onboarding completion.
+Steps 7-10: See conversation from March 17 2026 for full roadmap.
 
 ## Key Global Functions for AI Agents
 - `CoreContribution.plantFromAI(content, type, sessionId)` — plant in The Core (type: 'seed', 'branch', or 'fruit')
