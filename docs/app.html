@@ -5859,52 +5859,38 @@ footer .license {
 /* Lattice Points Wallet — CSS (v5.0)          */
 /* ============================================ */
 
-/* Wallet Indicator (header badge) */
+/* Wallet Indicator (header ambient display) */
 .lw-indicator {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   margin-top: 8px;
-  padding: 6px 16px;
-  border-radius: 24px;
-  background: linear-gradient(135deg, #1a1510 0%, #2a1f10 100%);
-  border: 1px solid var(--accent-soft);
-  font-size: 0.82rem;
-  color: var(--accent);
+  padding: 4px 12px;
+  border-radius: 20px;
+  background: transparent;
+  border: none;
+  font-size: 0.8rem;
+  color: var(--text-muted);
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: color 0.2s ease;
   user-select: none;
-  position: relative;
-  overflow: hidden;
 }
 .lw-indicator:hover {
-  background: linear-gradient(135deg, #2a1f10 0%, #3a2f18 100%);
-  border-color: var(--accent);
-  transform: scale(1.05);
-  box-shadow: 0 0 20px var(--accent-glow);
+  color: var(--accent);
 }
-.lw-indicator::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(90deg, transparent, var(--accent-glow), transparent);
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-.lw-indicator:hover::before { opacity: 1; }
 .lw-indicator-icon {
-  font-size: 1rem;
-  filter: drop-shadow(0 0 3px var(--accent));
+  font-size: 0.85rem;
+  opacity: 0.7;
 }
 .lw-indicator-balance {
-  font-weight: 600;
+  font-weight: 500;
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.02em;
 }
 .lw-indicator-label {
-  font-size: 0.7rem;
-  opacity: 0.7;
-  letter-spacing: 0.06em;
+  font-size: 0.68rem;
+  opacity: 0.6;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 
@@ -6246,13 +6232,8 @@ footer .license {
 }
 
 /* Light theme overrides */
-[data-theme="light"] .lw-indicator {
-  background: linear-gradient(135deg, #f5f0e8 0%, #ede5d8 100%);
-  border-color: rgba(184, 148, 46, 0.25);
-}
-[data-theme="light"] .lw-indicator:hover {
-  background: linear-gradient(135deg, #ede5d8 0%, #e5dcc8 100%);
-}
+[data-theme="light"] .lw-indicator { color: #8a7a5a; }
+[data-theme="light"] .lw-indicator:hover { color: #6a5a30; }
 [data-theme="light"] .lw-toast {
   background: linear-gradient(135deg, #f5f0e8 0%, #ede5d8 100%);
   border-color: rgba(184, 148, 46, 0.3);
@@ -11810,7 +11791,7 @@ body.fl-immersive-active {
   <div class="tagline">Your AI. Your Rules. Your Machine. v5.0</div>
   <div class="mantra">Glow eternal. Heart in spark.</div>
   <div id="latticePointsBadge" class="lp-badge" style="display:none;" onclick="switchTab('settings')" title="View your Lattice Points"></div>
-  <div id="lwIndicator" class="lw-indicator" style="display:none;" onclick="switchTab('wallet')" title="Open Lattice Points Wallet">
+  <div id="lwIndicator" class="lw-indicator" style="display:none;" onclick="switchTab('wallet')" title="Wallet">
     <span class="lw-indicator-icon">&#x25C7;</span>
     <span class="lw-indicator-balance">0</span>
     <span class="lw-indicator-label">LP</span>
