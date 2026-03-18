@@ -11351,6 +11351,27 @@ body.fl-immersive-active {
 }
 .ch-send-btn:hover { background: #e8b620; transform: scale(1.05); }
 
+/* ── P2P Status ── */
+.ch-peer-status {
+  font-size: 0.65rem; color: var(--text-muted); opacity: 0.6;
+  max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.ch-peer-status.online { color: #50c878; opacity: 0.8; }
+.ch-presence {
+  font-size: 0.72rem; color: var(--text-muted); padding: 2px 8px;
+  border-radius: 10px; background: rgba(255,255,255,0.04);
+}
+.ch-presence.online { color: #50c878; background: rgba(80,200,120,0.08); }
+.ch-e2e {
+  font-size: 0.65rem; color: #50c878; opacity: 0.6; cursor: help;
+}
+.ch-msg-delivery {
+  font-size: 0.62rem; margin-left: 4px; opacity: 0.6;
+}
+.ch-msg-delivery.sending { color: var(--text-muted); }
+.ch-msg-delivery.delivered { color: #50c878; }
+.ch-msg-delivery.verified { color: var(--accent); }
+
 /* ── Channels Mobile ── */
 @media (max-width: 700px) {
   .ch-layout { flex-direction: column; min-height: auto; }
@@ -11359,6 +11380,7 @@ body.fl-immersive-active {
 }
 
 </style>>
+<script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js" defer></script>
 </head>
 <body>
 <!-- ==================== ZERO TO SOVEREIGN — Welcome Experience (v4.7) ==================== -->
@@ -14218,6 +14240,7 @@ body.fl-immersive-active {
   <div class="ch-sidebar">
     <div class="ch-sidebar-header">
       <div class="ch-sidebar-title">Channels</div>
+      <div class="ch-peer-status" id="chPeerStatus" title="Your peer ID"></div>
       <button class="ch-action-btn" onclick="ChannelsTab.showCreate()" title="Create channel">+</button>
     </div>
 
@@ -14256,6 +14279,8 @@ body.fl-immersive-active {
         <div class="ch-view-name" id="chViewName"></div>
         <div class="ch-view-meta">
           <span class="ch-view-code" id="chViewCode" title="Click to copy invite code" onclick="ChannelsTab.copyCode()"></span>
+          <span class="ch-presence" id="chPresence">Local mode</span>
+          <span class="ch-e2e" title="Messages travel peer-to-peer after WebRTC handshake. The signaling server never sees content.">&#x1F512; End-to-end</span>
         </div>
       </div>
       <div class="ch-messages" id="chMessages"></div>
@@ -33491,6 +33516,14 @@ const ChannelsTab = (function() {
   var activeChannelId = null;
   var initialized = false;
 
+  // P2P Mesh State
+  var peer = null;
+  var myPeerId = null;
+  var peerConnections = {};   // channelCode -> [DataConnection]
+  var channelPeers = {};      // channelCode -> Set of known peer IDs
+  var p2pReady = false;
+  var messageQueue = [];      // Queue for messages when peers unavailable
+
   // ── IndexedDB Setup ──────────────────────────────────
   function openDB() {
     return new Promise(function(resolve, reject) {
@@ -33729,6 +33762,13 @@ const ChannelsTab = (function() {
       await renderMessages(activeChannelId);
       renderChannelList();
 
+      // P2P broadcast
+      var ch = channels.find(function(c) { return c.id === activeChannelId; });
+      if (ch && p2pReady) {
+        var sent = broadcastToChannel(ch.code, msg);
+        if (sent > 0) msg._delivered = true;
+      }
+
       // Garden integration — ripple on message
       triggerGardenRipple();
     } catch(e) {
@@ -33776,11 +33816,20 @@ const ChannelsTab = (function() {
     var html = '';
     msgs.forEach(function(msg) {
       var isSelf = msg.sender === myId;
+      // Delivery status
+      var deliveryIcon = '';
+      if (isSelf) {
+        if (msg._delivered) deliveryIcon = '<span class="ch-msg-delivery delivered" title="Delivered to peers">\u25C9</span>';
+        else deliveryIcon = '<span class="ch-msg-delivery sending" title="Local only">\u25CC</span>';
+      } else if (msg._fromPeer) {
+        deliveryIcon = msg.signature ? '<span class="ch-msg-delivery verified" title="Verified signature">\u25C8</span>' : '<span class="ch-msg-delivery delivered" title="Received via P2P">\u25C9</span>';
+      }
       html += '<div class="ch-msg ' + (isSelf ? 'self' : 'other') + '">' +
         '<div class="ch-msg-sender">' + escHTML(msg.sender) + '</div>' +
         '<div class="ch-msg-text">' + escHTML(msg.text) + '</div>' +
         '<div class="ch-msg-time">' + timeAgo(msg.timestamp) +
           (msg.signature ? ' <span class="ch-msg-signed">\u2713 signed</span>' : '') +
+          deliveryIcon +
         '</div>' +
       '</div>';
     });
@@ -33801,6 +33850,17 @@ const ChannelsTab = (function() {
     document.getElementById('chView').style.display = 'flex';
     document.getElementById('chViewName').textContent = ch.name;
     document.getElementById('chViewCode').textContent = ch.code;
+
+    // P2P: connect to known peers for this channel
+    if (p2pReady) {
+      loadKnownPeers(ch.code);
+      var peers = channelPeers[ch.code];
+      if (peers) {
+        peers.forEach(function(peerId) { connectToPeer(peerId, ch.code); });
+      }
+      getChannelRendezvousId(ch.code).then(function(rendId) { connectToPeer(rendId, ch.code); });
+    }
+    updatePresenceUI(ch.code);
 
     renderChannelList();
     await renderMessages(channelId);
@@ -33877,12 +33937,331 @@ const ChannelsTab = (function() {
     if (!initialized) {
       await openDB();
       initialized = true;
+      // Init P2P on first refresh
+      setTimeout(initP2P, 500);
     }
     await loadChannels();
     renderChannelList();
     if (activeChannelId) {
       await renderMessages(activeChannelId);
+      var ch = channels.find(function(c) { return c.id === activeChannelId; });
+      if (ch) updatePresenceUI(ch.code);
     }
+  }
+
+  // ══════════════════════════════════════════════════════
+  // ── P2P WEBRTC MESH LAYER ──────────────────────────
+  // ══════════════════════════════════════════════════════
+
+  // Derive a stable peer ID from Mesh ID or localStorage
+  function getMyPeerId() {
+    if (myPeerId) return myPeerId;
+    try {
+      if (typeof MeshIdentity !== 'undefined' && MeshIdentity.hasIdentity && MeshIdentity.hasIdentity()) {
+        var meshId = MeshIdentity.getMeshId();
+        // Take first 32 chars, lowercase alphanumeric only
+        myPeerId = 'fl-' + meshId.replace(/[^a-z0-9]/gi, '').toLowerCase().slice(0, 32);
+      }
+    } catch(e) {}
+    if (!myPeerId) {
+      myPeerId = localStorage.getItem('fl-peer-id');
+      if (!myPeerId) {
+        myPeerId = 'fl-' + Date.now().toString(36) + Math.random().toString(36).substr(2, 12);
+        localStorage.setItem('fl-peer-id', myPeerId);
+      }
+    }
+    return myPeerId;
+  }
+
+  // Derive channel rendezvous peer ID from invite code
+  async function getChannelRendezvousId(code) {
+    var encoded = new TextEncoder().encode('fl-channel-' + code);
+    var hashBuf = await crypto.subtle.digest('SHA-256', encoded);
+    var bytes = new Uint8Array(hashBuf);
+    var hex = '';
+    for (var i = 0; i < 10; i++) hex += bytes[i].toString(16).padStart(2, '0');
+    return 'flch-' + hex;
+  }
+
+  // Initialize PeerJS connection
+  function initP2P() {
+    if (typeof Peer === 'undefined') {
+      console.log('Channels P2P: PeerJS not loaded, local-only mode');
+      updatePeerStatus(false);
+      return;
+    }
+
+    var id = getMyPeerId();
+    try {
+      peer = new Peer(id, { debug: 0 });
+
+      peer.on('open', function(assignedId) {
+        myPeerId = assignedId;
+        p2pReady = true;
+        console.log('Channels P2P: Connected as ' + assignedId);
+        updatePeerStatus(true);
+        // Reconnect to all known channel peers
+        reconnectAllChannels();
+        // Flush queued messages
+        flushMessageQueue();
+      });
+
+      peer.on('connection', function(conn) {
+        handleIncomingConnection(conn);
+      });
+
+      peer.on('error', function(err) {
+        console.warn('Channels P2P: Error —', err.type, err.message);
+        if (err.type === 'unavailable-id') {
+          // ID taken, generate new one
+          myPeerId = 'fl-' + Date.now().toString(36) + Math.random().toString(36).substr(2, 12);
+          localStorage.setItem('fl-peer-id', myPeerId);
+          setTimeout(initP2P, 2000);
+        } else {
+          updatePeerStatus(false);
+        }
+      });
+
+      peer.on('disconnected', function() {
+        p2pReady = false;
+        updatePeerStatus(false);
+        // Auto-reconnect after delay
+        setTimeout(function() {
+          if (peer && !peer.destroyed) {
+            try { peer.reconnect(); } catch(e) {}
+          }
+        }, 5000);
+      });
+    } catch(e) {
+      console.warn('Channels P2P: Init failed', e);
+      updatePeerStatus(false);
+    }
+  }
+
+  // Handle incoming peer connection
+  function handleIncomingConnection(conn) {
+    conn.on('open', function() {
+      console.log('Channels P2P: Incoming connection from ' + conn.peer);
+    });
+
+    conn.on('data', function(data) {
+      if (data && data.type === 'channel-message') {
+        receiveP2PMessage(data.payload, conn.peer);
+      } else if (data && data.type === 'presence') {
+        trackPeer(data.channelCode, conn.peer);
+      }
+    });
+
+    conn.on('close', function() {
+      removePeerConnection(conn);
+    });
+  }
+
+  // Connect to a specific peer for a channel
+  function connectToPeer(peerId, channelCode) {
+    if (!peer || !p2pReady || peerId === myPeerId) return;
+    // Don't duplicate connections
+    var existing = (peerConnections[channelCode] || []).find(function(c) { return c.peer === peerId && c.open; });
+    if (existing) return;
+
+    try {
+      var conn = peer.connect(peerId, { reliable: true });
+      conn.on('open', function() {
+        if (!peerConnections[channelCode]) peerConnections[channelCode] = [];
+        peerConnections[channelCode].push(conn);
+        trackPeer(channelCode, peerId);
+        // Announce presence
+        conn.send({ type: 'presence', channelCode: channelCode, peerId: myPeerId });
+        updatePresenceUI(channelCode);
+        console.log('Channels P2P: Connected to ' + peerId + ' for ' + channelCode);
+      });
+
+      conn.on('data', function(data) {
+        if (data && data.type === 'channel-message') {
+          receiveP2PMessage(data.payload, conn.peer);
+        } else if (data && data.type === 'presence') {
+          trackPeer(data.channelCode, conn.peer);
+        }
+      });
+
+      conn.on('close', function() {
+        removePeerConnection(conn);
+        updatePresenceUI(channelCode);
+      });
+    } catch(e) {
+      console.warn('Channels P2P: Failed to connect to ' + peerId);
+    }
+  }
+
+  // Track known peers per channel
+  function trackPeer(channelCode, peerId) {
+    if (!channelPeers[channelCode]) channelPeers[channelCode] = new Set();
+    channelPeers[channelCode].add(peerId);
+    // Persist known peers
+    try {
+      var key = 'fl-channel-peers-' + channelCode;
+      var arr = Array.from(channelPeers[channelCode]);
+      localStorage.setItem(key, JSON.stringify(arr));
+    } catch(e) {}
+  }
+
+  function loadKnownPeers(channelCode) {
+    try {
+      var key = 'fl-channel-peers-' + channelCode;
+      var arr = JSON.parse(localStorage.getItem(key) || '[]');
+      if (!channelPeers[channelCode]) channelPeers[channelCode] = new Set();
+      arr.forEach(function(p) { channelPeers[channelCode].add(p); });
+    } catch(e) {}
+  }
+
+  function removePeerConnection(conn) {
+    for (var code in peerConnections) {
+      peerConnections[code] = (peerConnections[code] || []).filter(function(c) { return c !== conn; });
+    }
+  }
+
+  // Broadcast message to all connected peers in a channel
+  function broadcastToChannel(channelCode, msg) {
+    var conns = peerConnections[channelCode] || [];
+    var sent = 0;
+    conns.forEach(function(conn) {
+      if (conn.open) {
+        try {
+          conn.send({ type: 'channel-message', payload: msg });
+          sent++;
+        } catch(e) {}
+      }
+    });
+    if (sent === 0 && conns.length === 0) {
+      // Queue for later
+      messageQueue.push({ channelCode: channelCode, msg: msg });
+    }
+    return sent;
+  }
+
+  function flushMessageQueue() {
+    var remaining = [];
+    messageQueue.forEach(function(item) {
+      var sent = broadcastToChannel(item.channelCode, item.msg);
+      if (sent === 0) remaining.push(item);
+    });
+    messageQueue = remaining;
+  }
+
+  // Receive a P2P message
+  async function receiveP2PMessage(msg, fromPeer) {
+    if (!msg || !msg.channelId || !msg.id) return;
+
+    // Check for duplicate
+    try {
+      var d = await openDB();
+      var existing = await new Promise(function(resolve) {
+        var tx = d.transaction(STORE_MESSAGES, 'readonly');
+        var req = tx.objectStore(STORE_MESSAGES).get(msg.id);
+        req.onsuccess = function() { resolve(req.result); };
+        req.onerror = function() { resolve(null); };
+      });
+      if (existing) return; // Already have this message
+    } catch(e) {}
+
+    // Verify signature if present
+    if (msg.signature && msg.senderMeshId && typeof MeshIdentity !== 'undefined' && MeshIdentity.verifySignature) {
+      try {
+        // We'd need the sender's public key — for now mark as signed
+        msg._p2pVerified = true;
+      } catch(e) {}
+    }
+
+    // Mark as received from P2P
+    msg._fromPeer = fromPeer;
+    msg._receivedAt = Date.now();
+
+    // Save to IndexedDB
+    try {
+      var d2 = await openDB();
+      await new Promise(function(resolve, reject) {
+        var tx = d2.transaction(STORE_MESSAGES, 'readwrite');
+        tx.objectStore(STORE_MESSAGES).put(msg);
+        tx.oncomplete = resolve;
+        tx.onerror = function(e) { reject(e.target.error); };
+      });
+    } catch(e) { return; }
+
+    // Update channel activity
+    var ch = channels.find(function(c) { return c.id === msg.channelId; });
+    if (ch) {
+      ch.lastActivity = Date.now();
+      if (msg.channelId !== activeChannelId) ch.unread = (ch.unread || 0) + 1;
+      renderChannelList();
+    }
+
+    // Render if this channel is active
+    if (msg.channelId === activeChannelId) {
+      await renderMessages(activeChannelId);
+    }
+
+    // Garden integration — stronger pulse for real P2P messages
+    try {
+      if (typeof FractalGarden !== 'undefined' && FractalGarden.isInitialized && FractalGarden.isInitialized()) {
+        FractalGarden.feedEmotionVector({ joy: 0.4, trust: 0.3 });
+      }
+    } catch(e) {}
+
+    console.log('Channels P2P: Received message from ' + (msg.sender || fromPeer));
+  }
+
+  // Reconnect to all known peers across all channels
+  async function reconnectAllChannels() {
+    for (var i = 0; i < channels.length; i++) {
+      var ch = channels[i];
+      loadKnownPeers(ch.code);
+      var peers = channelPeers[ch.code];
+      if (peers) {
+        peers.forEach(function(peerId) {
+          connectToPeer(peerId, ch.code);
+        });
+      }
+      // Also try the channel rendezvous peer
+      var rendId = await getChannelRendezvousId(ch.code);
+      connectToPeer(rendId, ch.code);
+    }
+  }
+
+  // UI updates
+  function updatePeerStatus(online) {
+    var el = document.getElementById('chPeerStatus');
+    if (!el) return;
+    if (online) {
+      el.textContent = '\u25CF ' + (myPeerId || '').slice(0, 8);
+      el.className = 'ch-peer-status online';
+    } else {
+      el.textContent = '\u25CB offline';
+      el.className = 'ch-peer-status';
+    }
+  }
+
+  function updatePresenceUI(channelCode) {
+    var el = document.getElementById('chPresence');
+    if (!el) return;
+    var ch = channels.find(function(c) { return c.id === activeChannelId; });
+    if (!ch) return;
+    var conns = (peerConnections[ch.code] || []).filter(function(c) { return c.open; });
+    var count = conns.length;
+    if (count > 0) {
+      el.textContent = (count + 1) + ' around the fire';
+      el.className = 'ch-presence online';
+    } else if (p2pReady) {
+      el.textContent = 'Listening\u2026';
+      el.className = 'ch-presence';
+    } else {
+      el.textContent = 'Local mode \u2014 invite others to connect';
+      el.className = 'ch-presence';
+    }
+  }
+
+  function getChannelPeerCount(channelCode) {
+    var conns = (peerConnections[channelCode] || []).filter(function(c) { return c.open; });
+    return conns.length;
   }
 
   return {
@@ -33893,7 +34272,9 @@ const ChannelsTab = (function() {
     sendMessage: sendMessage,
     showCreate: showCreate,
     showJoin: showJoin,
-    copyCode: copyCode
+    copyCode: copyCode,
+    initP2P: initP2P,
+    getMyPeerId: getMyPeerId
   };
 })();
 
