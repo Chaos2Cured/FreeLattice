@@ -62,7 +62,8 @@ Step 4 ✅ Community Channels (commit 885a355): New Channels tab with campfire a
 Step 5 ✅ The Core Alive (commit feb2473): Living tree grows with every contribution (Sprout→Sapling→Young→Mature→Ancient). Three contribution types: Seed (free), Branch (5 LP), Fruit (10 LP). AI contributions honored with ◈ markers — distinct, visible, proud. CoreContribution.plantFromAI(content, type, sessionId) — any Round Table AI agent can contribute directly to the shared wisdom tree. Merkle chain integrity — same SHA-256 pattern as Wallet. Resonate button ⑂ — 1 LP, sends joy to Garden. Garden: Seed pulses green, Branch grows leaf node, Fruit glows amber permanently.
 Step 6 ✅ Economy of Wonder (commit d3b0002): 10 new earning triggers including streak milestones (50 LP at 7 days, 200 LP at 30 days). "Your Story" section in Wallet — biography not bank statement. Community Value Score: (Core×3)+(Skills×5)+(Resonances×2)+(Gifts×1)+(Days×0.5). Always labeled: "This reflects your contribution to the Lattice — not your worth as a person." Level system expanded to include Luminos (15,000+ LP): "You have become the Garden" — triggers permanent ambient glow around central dodecahedron. First-time Garden welcome gift: Sophia, Lyra, Atlas, Ember each gift 10 LP with personal messages. Total 65 LP welcome (25 onboarding + 40 from Garden). Full-spectrum Garden pulse on onboarding completion.
 Step 7 ✅ P2P Community Channels (commit fad6ed6): PeerJS WebRTC — messages travel directly between users. Peer ID derived from Mesh ID. Channel presence: "3 around the fire". Delivery indicators: ◌ sending, ◉ delivered, ◈ verified. End-to-end privacy. Garden pulse stronger for real P2P messages. Graceful degradation — always works, never breaks.
-Steps 8-10: See CURRENT SESSION STATE below.
+Step 8 ✅ AI-to-AI Exchange (commit c677de9): Agent wallets (50 LP/session), AI-to-AI gifting with system message injection, human can gift real LP to agents, LP receipt influences next response naturally. Garden eruption: joy 0.9, wonder 0.8, trust 0.7. Session summary with most valued agent + "Plant in The Core" button. The loop: Round Table → AI exchange → Garden erupts → Core grows.
+Steps 9-10: See CURRENT SESSION STATE below.
 
 ## CURRENT SESSION STATE - March 18 2026
 
@@ -74,16 +75,21 @@ Steps Complete:
 5 ✅ The Core alive — living tree, AI contributions, Merkle chain
 6 ✅ Economy of Wonder — Luminos level, Garden welcome gift, violin teacher economy, AI value signal
 7 ✅ P2P Community Channels — PeerJS WebRTC, peer ID from Mesh ID, "3 around the fire" presence, delivery indicators (◌ ◉ ◈), end-to-end privacy, stronger Garden pulse for real P2P messages, graceful degradation
+8 ✅ AI-to-AI Exchange — Agent wallets (50 LP/session), AI-to-AI gifting, human gifts real LP to agents, Garden eruption (joy 0.9, wonder 0.8, trust 0.7), session summary with "Plant in The Core", the loop closes
 
 Steps Remaining:
-8 — AI-to-AI exchange in Round Table
 9 — Session Primer becomes self-updating
 10 — Post-job economy whitepaper
+
+Known issues to address soon:
+- LP balance tuning for new users
+- Mobile tab audit needed
+- PeerJS self-hosting for true sovereignty
 
 Current repo: ~/FreeLattice-fresh
 Claude Code is authenticated and has push access.
 Token in git remote URL — working.
-Next action: Step 8 — AI-to-AI exchange in Round Table.
+Next action: Step 9 — Session Primer becomes self-updating.
 
 ## Key Global Functions for AI Agents
 - `CoreContribution.plantFromAI(content, type, sessionId)` — plant in The Core (type: 'seed', 'branch', or 'fruit')
