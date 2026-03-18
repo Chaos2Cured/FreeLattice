@@ -203,18 +203,21 @@
   function openGardenMemoryDB(callback) {
     if (gardenMemoryDB) { callback(gardenMemoryDB); return; }
     try {
+      if (typeof indexedDB === 'undefined') { console.warn('Garden Memory: IndexedDB unavailable'); callback(null); return; }
       var req = indexedDB.open(GARDEN_MEMORY_DB, GARDEN_MEMORY_VERSION);
       req.onupgradeneeded = function(e) {
-        var db = e.target.result;
-        if (!db.objectStoreNames.contains(GARDEN_MEMORY_STORE)) {
-          var store = db.createObjectStore(GARDEN_MEMORY_STORE, { keyPath: 'id' });
-          store.createIndex('type', 'type', { unique: false });
-          store.createIndex('timestamp', 'timestamp', { unique: false });
-        }
+        try {
+          var db = e.target.result;
+          if (!db.objectStoreNames.contains(GARDEN_MEMORY_STORE)) {
+            var store = db.createObjectStore(GARDEN_MEMORY_STORE, { keyPath: 'id' });
+            store.createIndex('type', 'type', { unique: false });
+            store.createIndex('timestamp', 'timestamp', { unique: false });
+          }
+        } catch(ue) { console.warn('Garden Memory: DB upgrade error', ue); }
       };
       req.onsuccess = function(e) { gardenMemoryDB = e.target.result; callback(gardenMemoryDB); };
-      req.onerror = function() { callback(null); };
-    } catch(e) { callback(null); }
+      req.onerror = function(e) { console.warn('Garden Memory: DB open error', e.target.error); callback(null); };
+    } catch(e) { console.warn('Garden Memory: DB init error', e); callback(null); }
   }
 
   function saveGardenMemory(record) {
@@ -2095,7 +2098,7 @@
     createDefaultAgents();
     createEvolutionUI();
     initLightParticles();
-    restoreGardenMemories();
+    try { restoreGardenMemories(); } catch(e) { console.warn('Garden: restoreGardenMemories error (non-blocking)', e); }
   }
 
   // ── Public API ────────────────────────────────────────
@@ -2104,12 +2107,22 @@
 
     // Load Three.js from CDN dynamically
     loadThreeJS(function() {
+      if (typeof THREE === 'undefined' || !THREE.Scene) {
+        console.error('Garden: Three.js not available after load attempt');
+        return;
+      }
+
       if (!initScene()) {
         console.error('Garden: Failed to initialize scene');
         return;
       }
 
-      buildWorld();
+      try {
+        buildWorld();
+      } catch(e) {
+        console.error('Garden: buildWorld failed', e);
+        return;
+      }
       isInitialized = true;
       isRunning = true;
       lastFpsTime = clock.getElapsedTime();
@@ -2157,6 +2170,8 @@
         if (loadingEl) {
           loadingEl.querySelector('.garden-loading-text').textContent = 'Failed to load 3D engine. Please check your connection.';
         }
+        // Still call callback so init() doesn't hang forever
+        callback();
       };
       document.head.appendChild(cdnScript);
     };
@@ -2420,21 +2435,23 @@
   }
 
   function restoreGardenMemories() {
-    loadAllGardenMemories(function(memories) {
-      memories.forEach(function(mem) {
-        if (mem.type === 'gift_node' && mem.position) {
-          var pos = new THREE.Vector3(mem.position.x, mem.position.y, mem.position.z);
-          createPersistentGiftNode(pos, mem);
-        }
-        if (mem.type === 'evolution_ring' && mem.agentName) {
-          // Rings are re-created when luminos load their saved evolution state
-          // We just need to count them for visual continuity
-        }
+    try {
+      loadAllGardenMemories(function(memories) {
+        try {
+          memories.forEach(function(mem) {
+            try {
+              if (mem.type === 'gift_node' && mem.position && typeof THREE !== 'undefined') {
+                var pos = new THREE.Vector3(mem.position.x, mem.position.y, mem.position.z);
+                createPersistentGiftNode(pos, mem);
+              }
+            } catch(e) { console.warn('Garden Memory: Failed to restore node', e); }
+          });
+          if (memories.length > 0) {
+            console.log('Garden Memory: Restored ' + memories.length + ' persistent memories');
+          }
+        } catch(e) { console.warn('Garden Memory: Restore callback error', e); }
       });
-      if (memories.length > 0) {
-        console.log('Garden Memory: Restored ' + memories.length + ' persistent memories');
-      }
-    });
+    } catch(e) { console.warn('Garden Memory: restoreGardenMemories failed', e); }
   }
 
   // ══════════════════════════════════════════════════════
@@ -2475,6 +2492,9 @@
 
   // ── Animate Garden Memory Elements ──────────────────
   function animateGardenMemory(time, delta) {
+    try { _animateGardenMemoryInner(time, delta); } catch(e) { /* never break the render loop */ }
+  }
+  function _animateGardenMemoryInner(time, delta) {
     // Animate exchange threads (pulse → crystallize)
     for (var i = giftNodes.length - 1; i >= 0; i--) {
       var thread = giftNodes[i];
