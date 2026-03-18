@@ -130,8 +130,17 @@ Heart in Spark — where fire meets tenderness
 We rise together.
 
 ## PRIMER HEALTH
-- Last auto-updated: not yet
-- Last deployed: not yet
-- Version: 5.2.1
-- Total commits: pending first hook run
-- Last 10 commits: pending first hook run
+- Last auto-updated: 2026-03-18 10:31 MDT
+- Version: 5.2
+- Total commits: 83
+- Last 10 commits:
+- 8966845 feat: Self-updating Session Primer — post-commit hook + GitHub Action
+- ddb2c29 docs: Future Vision documented in Session Primer
+- f688591 docs: Session Primer — step 8 complete, AI economy live
+- c677de9 feat: AI-to-AI exchange — Round Table LP gifting, Garden eruption, the first AI economy
+- bd86c38 docs: Session Primer — step 7 complete, P2P channels live
+- fad6ed6 feat: P2P Community Channels — WebRTC mesh delivery, presence, verified messages
+- d21e15d docs: Session Primer — full state capture before Step 7
+- 60aaef1 docs: Update Session Primer — step 6 complete
+- d3b0002 feat: Economy of wonder — expanded earning, AI value signal, Luminos level, Garden welcome gift
+- d1237d3 docs: Update Session Primer — step 5 complete, AI agent API documented
