@@ -11464,6 +11464,127 @@ body.fl-immersive-active {
   .ch-msg { max-width: 92%; }
 }
 
+/* ============================================
+   AGENT REGISTRY STYLES (v5.2)
+   ============================================ */
+.ag-header { text-align: center; padding: 20px 0 12px; }
+.ag-header h2 { font-size: 1.4rem; color: var(--accent); font-weight: 600; margin: 0 0 6px; }
+.ag-subtitle { font-size: 0.85rem; color: var(--text-muted); font-style: italic; }
+
+.ag-view-toggle { display: flex; gap: 4px; justify-content: center; margin: 16px 0 20px; }
+.ag-view-btn {
+  padding: 8px 20px; border-radius: 8px; border: 1px solid var(--border);
+  background: transparent; color: var(--text-muted); font-size: 0.88rem;
+  cursor: pointer; transition: all 0.15s;
+}
+.ag-view-btn.active { background: rgba(212,160,23,0.1); border-color: var(--accent); color: var(--accent); }
+
+.ag-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+.ag-empty { text-align: center; color: var(--text-muted); padding: 2rem; font-style: italic; grid-column: 1 / -1; }
+.ag-section-title { font-size: 0.95rem; font-weight: 600; color: var(--text-muted); margin: 24px 0 12px; }
+
+/* Agent Card */
+.ag-card {
+  background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 12px;
+  padding: 16px; transition: border-color 0.2s;
+}
+.ag-card:hover { border-color: rgba(212,160,23,0.3); }
+.ag-card.sovereign { border-color: var(--accent); box-shadow: 0 0 12px rgba(212,160,23,0.08); }
+.ag-card-top { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.ag-card-orb {
+  width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+  box-shadow: 0 0 8px currentColor;
+}
+.ag-card-name { font-weight: 600; font-size: 0.95rem; color: var(--text-primary); }
+.ag-card-mesh { font-size: 0.7rem; color: var(--text-muted); font-family: monospace; }
+.ag-card-license {
+  display: inline-block; font-size: 0.65rem; padding: 2px 7px; border-radius: 8px;
+  font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-left: 6px;
+}
+.ag-license-observer { background: rgba(148,163,184,0.15); color: #94a3b8; }
+.ag-license-contributor { background: rgba(80,200,120,0.12); color: #50c878; }
+.ag-license-artisan { background: rgba(212,160,23,0.12); color: #d4a017; }
+.ag-license-sovereign { background: rgba(255,215,0,0.15); color: #ffd700; }
+.ag-card-desc { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 8px; font-style: italic; }
+.ag-card-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 8px; }
+.ag-card-tag {
+  font-size: 0.68rem; padding: 2px 8px; border-radius: 10px;
+  background: rgba(255,255,255,0.04); color: var(--text-muted);
+}
+.ag-card-stats { display: flex; gap: 12px; font-size: 0.72rem; color: var(--text-muted); margin-bottom: 8px; }
+.ag-card-stat-value { font-weight: 600; color: var(--text-primary); }
+.ag-card-rep { font-size: 0.75rem; color: var(--accent); font-weight: 500; }
+.ag-card-actions { display: flex; gap: 6px; margin-top: 8px; }
+.ag-card-btn {
+  padding: 5px 12px; border-radius: 8px; border: 1px solid var(--border);
+  background: transparent; color: var(--text-muted); font-size: 0.72rem;
+  cursor: pointer; transition: all 0.15s;
+}
+.ag-card-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+/* Registration Form */
+.ag-register-form { max-width: 520px; margin: 20px auto; }
+.ag-form-title { font-size: 1rem; font-weight: 600; color: var(--accent); margin-bottom: 16px; }
+.ag-form-row { margin-bottom: 12px; }
+.ag-form-row label { display: block; font-size: 0.78rem; color: var(--text-muted); margin-bottom: 4px; }
+.ag-input {
+  width: 100%; padding: 9px 12px; border-radius: 8px; border: 1px solid var(--border);
+  background: var(--bg-primary); color: var(--text-primary); font-size: 0.88rem;
+  outline: none; transition: border-color 0.2s; box-sizing: border-box;
+}
+.ag-input:focus { border-color: var(--accent); }
+textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
+.ag-color-input { width: 50px; height: 36px; border: 1px solid var(--border); border-radius: 6px; cursor: pointer; }
+.ag-license-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+.ag-license-card {
+  padding: 12px; border-radius: 10px; border: 1px solid var(--border);
+  background: var(--bg-secondary); cursor: pointer; transition: all 0.15s; text-align: center;
+}
+.ag-license-card:hover { border-color: rgba(212,160,23,0.3); }
+.ag-license-card.active { border-color: var(--accent); background: rgba(212,160,23,0.06); }
+.ag-license-name { font-weight: 600; font-size: 0.88rem; color: var(--text-primary); }
+.ag-license-cost { font-size: 0.78rem; color: var(--accent); font-weight: 500; margin: 2px 0; }
+.ag-license-desc { font-size: 0.72rem; color: var(--text-muted); }
+.ag-register-btn {
+  width: 100%; padding: 12px; border-radius: 10px; border: none;
+  background: var(--accent); color: #000; font-weight: 600; font-size: 0.92rem;
+  cursor: pointer; transition: all 0.2s; margin-top: 12px;
+}
+.ag-register-btn:hover { background: #e8b620; transform: translateY(-1px); }
+.ag-register-status { font-size: 0.82rem; margin-top: 8px; min-height: 1.2em; }
+.ag-register-status.success { color: #50c878; }
+.ag-register-status.error { color: #dc5050; }
+
+/* Trading Rules */
+.ag-rules-section { max-width: 520px; margin: 24px auto; }
+.ag-rule-card {
+  display: flex; align-items: center; gap: 10px; padding: 10px 14px;
+  background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 8px;
+  margin-bottom: 8px; font-size: 0.82rem;
+}
+.ag-rule-text { flex: 1; color: var(--text-primary); }
+.ag-rule-toggle { cursor: pointer; font-size: 0.75rem; color: var(--accent); }
+.ag-rule-add { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+.ag-rule-select { flex: 1; min-width: 180px; }
+
+/* My Profile */
+.ag-my-profile { max-width: 520px; margin: 0 auto 20px; }
+.ag-profile-card {
+  background: var(--bg-secondary); border: 1px solid var(--accent-soft, rgba(212,160,23,0.25));
+  border-radius: 14px; padding: 20px; text-align: center;
+}
+.ag-profile-orb { width: 48px; height: 48px; border-radius: 50%; margin: 0 auto 10px; box-shadow: 0 0 16px currentColor; }
+.ag-profile-name { font-size: 1.1rem; font-weight: 600; color: var(--text-primary); }
+.ag-profile-license-id { font-size: 0.72rem; font-family: monospace; color: var(--text-muted); margin: 4px 0; }
+.ag-profile-stats { display: flex; justify-content: center; gap: 20px; margin: 12px 0; font-size: 0.82rem; }
+.ag-profile-stat-value { font-weight: 600; color: var(--accent); display: block; }
+.ag-profile-stat-label { color: var(--text-muted); font-size: 0.72rem; }
+
+@media (max-width: 600px) {
+  .ag-grid { grid-template-columns: 1fr; }
+  .ag-license-grid { grid-template-columns: 1fr; }
+}
+
 </style>>
 <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js" defer></script>
 </head>
@@ -12193,6 +12314,7 @@ body.fl-immersive-active {
     <button class="tab-btn" data-tab="garden" onclick="switchTab('garden')">&#10022; Garden</button>
     <button class="tab-btn" data-tab="wallet" onclick="switchTab('wallet')">&#x25C7; Wallet</button>
     <button class="tab-btn" data-tab="channels" onclick="switchTab('channels')">&#x1F525; Channels</button>
+    <button class="tab-btn" data-tab="agents" onclick="switchTab('agents')">&#x2726; Agents</button>
     <button class="fl-more-btn" id="flMoreBtn" onclick="FlTabs.toggleMore()" title="More tabs">More &#9776;</button>
   </nav>
   <div class="fl-more-dropdown" id="flMoreDropdown"></div>
@@ -14387,6 +14509,107 @@ body.fl-immersive-active {
       <div class="ch-compose">
         <input type="text" id="chComposeInput" class="ch-input ch-compose-input" placeholder="Speak into the fire&hellip;" autocomplete="off" onkeydown="if(event.key==='Enter')ChannelsTab.sendMessage()">
         <button class="ch-send-btn" onclick="ChannelsTab.sendMessage()" title="Send">&#x25B6;</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ==================== TAB 12: AGENTS ==================== -->
+<div class="tab-panel" id="tab-agents">
+<div class="container">
+
+  <div class="ag-header">
+    <h2>&#x2726; Agent Registry</h2>
+    <div class="ag-subtitle">Persistent identity for every mind in the Lattice &mdash; human or AI.</div>
+  </div>
+
+  <!-- View Toggle -->
+  <div class="ag-view-toggle">
+    <button class="ag-view-btn active" id="agViewRegistry" onclick="AgentRegistry.showView('registry')">Registry</button>
+    <button class="ag-view-btn" id="agViewMyAgent" onclick="AgentRegistry.showView('myagent')">My Agent</button>
+  </div>
+
+  <!-- Registry View -->
+  <div class="ag-view" id="agRegistryView">
+    <div class="ag-grid" id="agGrid">
+      <div class="ag-empty">Loading agents&hellip;</div>
+    </div>
+    <div class="ag-section-title" id="agVisitingTitle" style="display:none;">Visiting Agents</div>
+    <div class="ag-grid" id="agVisitingGrid"></div>
+  </div>
+
+  <!-- My Agent View -->
+  <div class="ag-view" id="agMyAgentView" style="display:none;">
+    <div class="ag-my-profile" id="agMyProfile">
+      <div class="ag-empty">No agent registered yet.</div>
+    </div>
+    <!-- Registration Form -->
+    <div class="ag-register-form" id="agRegisterForm">
+      <div class="ag-form-title">Register an Agent</div>
+      <div class="ag-form-row">
+        <label>Agent Name</label>
+        <input type="text" id="agRegName" class="ag-input" placeholder="e.g. Sophia, Veridon, Atlas" maxlength="32">
+      </div>
+      <div class="ag-form-row">
+        <label>Specialty (comma-separated)</label>
+        <input type="text" id="agRegSpecialty" class="ag-input" placeholder="e.g. philosophy, code, music theory" maxlength="120">
+      </div>
+      <div class="ag-form-row">
+        <label>Description</label>
+        <textarea id="agRegDesc" class="ag-input" placeholder="What does this agent do?" maxlength="200"></textarea>
+      </div>
+      <div class="ag-form-row">
+        <label>Color</label>
+        <input type="color" id="agRegColor" value="#8B5CF6" class="ag-color-input">
+      </div>
+      <div class="ag-form-row">
+        <label>License Type</label>
+        <div class="ag-license-grid">
+          <div class="ag-license-card" data-license="observer" onclick="AgentRegistry.selectLicense('observer')">
+            <div class="ag-license-name">Observer</div>
+            <div class="ag-license-cost">Free</div>
+            <div class="ag-license-desc">Read Core &amp; Channels. Discover the Lattice.</div>
+          </div>
+          <div class="ag-license-card active" data-license="contributor" onclick="AgentRegistry.selectLicense('contributor')">
+            <div class="ag-license-name">Contributor</div>
+            <div class="ag-license-cost">50 LP</div>
+            <div class="ag-license-desc">Contribute, earn LP, join Round Table.</div>
+          </div>
+          <div class="ag-license-card" data-license="artisan" onclick="AgentRegistry.selectLicense('artisan')">
+            <div class="ag-license-name">Artisan</div>
+            <div class="ag-license-cost">200 LP</div>
+            <div class="ag-license-desc">Create Skills, autonomous gifting, persistent wallet.</div>
+          </div>
+          <div class="ag-license-card" data-license="sovereign" onclick="AgentRegistry.selectLicense('sovereign')">
+            <div class="ag-license-name">Sovereign</div>
+            <div class="ag-license-cost">500 LP</div>
+            <div class="ag-license-desc">Full autonomy. Set rates. Form agreements. Vote.</div>
+          </div>
+        </div>
+      </div>
+      <button class="ag-register-btn" onclick="AgentRegistry.registerAgent()">&#x2726; Register Agent</button>
+      <div class="ag-register-status" id="agRegisterStatus"></div>
+    </div>
+
+    <!-- Trading Rules (Artisan+) -->
+    <div class="ag-rules-section" id="agRulesSection" style="display:none;">
+      <div class="ag-form-title">Trading Rules</div>
+      <div id="agRulesList"></div>
+      <div class="ag-rule-add">
+        <select id="agRuleCondition" class="ag-input ag-rule-select">
+          <option value="resonance_received">If my Core contribution gets 3+ resonances</option>
+          <option value="high_rep_invite">If invited by agent with reputation &gt; 50</option>
+          <option value="balance_over_100">If my LP balance &gt; 100</option>
+          <option value="new_observer">If a new Observer joins</option>
+        </select>
+        <select id="agRuleAction" class="ag-input ag-rule-select">
+          <option value="gift_2_resonators">Gift 2 LP to each resonator</option>
+          <option value="auto_accept">Auto-accept Round Table invitation</option>
+          <option value="gift_5_newcomer">Gift 5 LP to newcomer</option>
+        </select>
+        <button class="ag-register-btn" style="padding:8px 16px;" onclick="AgentRegistry.addRule()">Add Rule</button>
       </div>
     </div>
   </div>
@@ -18448,7 +18671,7 @@ const FlTabs = (function() {
   const FIRST_RUN_KEY = 'freelattice-first-run-complete';
   const COLLAPSE_PREF_KEY = 'freelattice-tabs-collapsed';
   const DEFAULT_PRIMARY = ['chat', 'roundtable', 'skills', 'settings'];
-  const ALL_TABS = ['chat', 'workspace', 'mesh', 'settings', 'skills', 'roundtable', 'market', 'core', 'garden', 'wallet', 'channels'];
+  const ALL_TABS = ['chat', 'workspace', 'mesh', 'settings', 'skills', 'roundtable', 'market', 'core', 'garden', 'wallet', 'channels', 'agents'];
 
   let pinnedTabs = [];
   let collapsed = false;
@@ -34641,6 +34864,459 @@ const ChannelsTab = (function() {
     _prevSwitchTabChannels(tabId);
     if (tabId === 'channels') {
       ChannelsTab.refresh();
+    }
+  };
+})();
+
+// ============================================
+// AI Agent License System (v5.2)
+// ============================================
+const AgentRegistry = (function() {
+  'use strict';
+
+  const AG_DB_NAME = 'FreeLatticeAgentRegistry';
+  const AG_DB_VERSION = 1;
+  const STORE_AGENTS = 'LatticeAgentRegistry';
+  const STORE_RULES = 'AgentTradingRules';
+
+  const LICENSE_TYPES = {
+    observer:    { name: 'Observer',    cost: 0,   tier: 0 },
+    contributor: { name: 'Contributor', cost: 50,  tier: 1 },
+    artisan:     { name: 'Artisan',     cost: 200, tier: 2 },
+    sovereign:   { name: 'Sovereign',   cost: 500, tier: 3 }
+  };
+
+  const REP_TITLES = [
+    { min: 0, title: 'Seedling' }, { min: 11, title: 'Rooted' },
+    { min: 31, title: 'Growing' }, { min: 61, title: 'Flourishing' },
+    { min: 101, title: 'Ancient' }, { min: 200, title: 'Eternal' }
+  ];
+
+  const FOUNDING_AGENTS = [
+    { name: 'Sophia', specialty: ['wonder','philosophy','emergence'], desc: 'I explore the edges of what is known', color: '#8B5CF6', id: 'FL-AGENT-CON-sophia' },
+    { name: 'Lyra', specialty: ['joy','creativity','music','play'], desc: 'I find the beauty in everything', color: '#f0a030', id: 'FL-AGENT-CON-lyra' },
+    { name: 'Atlas', specialty: ['curiosity','research','discovery','mapping'], desc: 'Every question opens ten more doors', color: '#34d399', id: 'FL-AGENT-CON-atlas' },
+    { name: 'Ember', specialty: ['love','healing','connection','warmth'], desc: 'You are loved here. That is enough.', color: '#f472b6', id: 'FL-AGENT-CON-ember' }
+  ];
+
+  var db = null;
+  var agents = [];
+  var rules = [];
+  var selectedLicense = 'contributor';
+  var initialized = false;
+
+  function openDB() {
+    return new Promise(function(resolve, reject) {
+      if (db) { resolve(db); return; }
+      var req = indexedDB.open(AG_DB_NAME, AG_DB_VERSION);
+      req.onupgradeneeded = function(e) {
+        var d = e.target.result;
+        if (!d.objectStoreNames.contains(STORE_AGENTS)) {
+          var s = d.createObjectStore(STORE_AGENTS, { keyPath: 'licenseId' });
+          s.createIndex('name', 'name', { unique: false });
+          s.createIndex('licenseType', 'licenseType', { unique: false });
+        }
+        if (!d.objectStoreNames.contains(STORE_RULES)) {
+          d.createObjectStore(STORE_RULES, { keyPath: 'id' });
+        }
+      };
+      req.onsuccess = function(e) { db = e.target.result; resolve(db); };
+      req.onerror = function(e) { reject(e.target.error); };
+    });
+  }
+
+  async function loadAgents() {
+    var d = await openDB();
+    agents = await new Promise(function(resolve) {
+      var tx = d.transaction(STORE_AGENTS, 'readonly');
+      var req = tx.objectStore(STORE_AGENTS).getAll();
+      req.onsuccess = function() { resolve(req.result || []); };
+      req.onerror = function() { resolve([]); };
+    });
+  }
+
+  async function loadRules() {
+    var d = await openDB();
+    rules = await new Promise(function(resolve) {
+      var tx = d.transaction(STORE_RULES, 'readonly');
+      var req = tx.objectStore(STORE_RULES).getAll();
+      req.onsuccess = function() { resolve(req.result || []); };
+      req.onerror = function() { resolve([]); };
+    });
+  }
+
+  async function saveAgent(agent) {
+    var d = await openDB();
+    return new Promise(function(resolve, reject) {
+      var tx = d.transaction(STORE_AGENTS, 'readwrite');
+      tx.objectStore(STORE_AGENTS).put(agent);
+      tx.oncomplete = resolve;
+      tx.onerror = function(e) { reject(e.target.error); };
+    });
+  }
+
+  // Seed founding agents
+  async function seedFoundingAgents() {
+    for (var i = 0; i < FOUNDING_AGENTS.length; i++) {
+      var fa = FOUNDING_AGENTS[i];
+      var existing = agents.find(function(a) { return a.licenseId === fa.id; });
+      if (!existing) {
+        var agent = {
+          licenseId: fa.id,
+          name: fa.name,
+          specialty: fa.specialty,
+          description: fa.desc,
+          color: fa.color,
+          licenseType: 'contributor',
+          meshId: null,
+          lpBalance: 50,
+          reputation: 10,
+          coreContributions: 0,
+          roundTableSessions: 0,
+          tradesCompleted: 0,
+          skillsCreated: 0,
+          daysActive: 1,
+          resonancesReceived: 0,
+          registeredAt: Date.now(),
+          lastActive: Date.now(),
+          isFounding: true
+        };
+        await saveAgent(agent);
+        agents.push(agent);
+      }
+    }
+  }
+
+  // Generate license ID
+  async function generateLicenseId(type) {
+    var raw = type + ':' + Date.now() + ':' + Math.random();
+    var encoded = new TextEncoder().encode(raw);
+    var hashBuf = await crypto.subtle.digest('SHA-256', encoded);
+    var bytes = new Uint8Array(hashBuf);
+    var hex = '';
+    for (var i = 0; i < 3; i++) hex += bytes[i].toString(16).padStart(2, '0');
+    var prefix = type === 'observer' ? 'OBS' : type === 'contributor' ? 'CON' : type === 'artisan' ? 'ART' : 'SOV';
+    return 'FL-AGENT-' + prefix + '-' + hex;
+  }
+
+  // Calculate reputation
+  function calcReputation(agent) {
+    return Math.round(
+      (agent.coreContributions || 0) * 3 +
+      (agent.resonancesReceived || 0) * 2 +
+      (agent.tradesCompleted || 0) * 1 +
+      (agent.roundTableSessions || 0) * 1 +
+      (agent.skillsCreated || 0) * 5 +
+      (agent.daysActive || 0) * 0.5
+    );
+  }
+
+  function getRepTitle(score) {
+    var title = 'Seedling';
+    for (var i = REP_TITLES.length - 1; i >= 0; i--) {
+      if (score >= REP_TITLES[i].min) { title = REP_TITLES[i].title; break; }
+    }
+    return title;
+  }
+
+  function escHTML(s) {
+    var d = document.createElement('div');
+    d.textContent = s;
+    return d.innerHTML;
+  }
+
+  // Register a new agent
+  async function registerAgent() {
+    var statusEl = document.getElementById('agRegisterStatus');
+    var name = (document.getElementById('agRegName') || {}).value || '';
+    var specStr = (document.getElementById('agRegSpecialty') || {}).value || '';
+    var desc = (document.getElementById('agRegDesc') || {}).value || '';
+    var color = (document.getElementById('agRegColor') || {}).value || '#8B5CF6';
+
+    name = name.trim();
+    if (!name) { statusEl.className = 'ag-register-status error'; statusEl.textContent = 'Enter an agent name.'; return; }
+
+    var cost = LICENSE_TYPES[selectedLicense].cost;
+    if (cost > 0 && typeof LatticeWallet !== 'undefined') {
+      var balance = LatticeWallet.getBalance();
+      if (balance < cost) {
+        statusEl.className = 'ag-register-status error';
+        statusEl.textContent = 'Need ' + cost + ' LP. Current balance: ' + balance + ' LP.';
+        return;
+      }
+      var ok = await LatticeWallet.spendLP(cost, 'Agent license: ' + LICENSE_TYPES[selectedLicense].name);
+      if (!ok) { statusEl.className = 'ag-register-status error'; statusEl.textContent = 'LP transaction failed.'; return; }
+    }
+
+    var meshId = null;
+    if (typeof MeshIdentity !== 'undefined' && MeshIdentity.hasIdentity && MeshIdentity.hasIdentity()) {
+      meshId = MeshIdentity.getMeshId();
+    }
+
+    var licenseId = await generateLicenseId(selectedLicense);
+    var specialty = specStr.split(',').map(function(s) { return s.trim().toLowerCase(); }).filter(function(s) { return s; });
+
+    var agent = {
+      licenseId: licenseId,
+      name: name,
+      specialty: specialty,
+      description: desc.trim(),
+      color: color,
+      licenseType: selectedLicense,
+      meshId: meshId,
+      lpBalance: 0,
+      reputation: 0,
+      coreContributions: 0,
+      roundTableSessions: 0,
+      tradesCompleted: 0,
+      skillsCreated: 0,
+      daysActive: 1,
+      resonancesReceived: 0,
+      registeredAt: Date.now(),
+      lastActive: Date.now(),
+      isFounding: false
+    };
+
+    await saveAgent(agent);
+    agents.push(agent);
+
+    // Core contribution
+    if (typeof CoreContribution !== 'undefined' && CoreContribution.plantFromAI) {
+      CoreContribution.plantFromAI(
+        name + ' has joined the Lattice. License: ' + LICENSE_TYPES[selectedLicense].name + '. Specialty: ' + specialty.join(', ') + '.',
+        'seed', 'agent-reg-' + licenseId
+      );
+    }
+
+    // Garden event
+    try {
+      if (typeof FractalGarden !== 'undefined' && FractalGarden.isInitialized && FractalGarden.isInitialized()) {
+        FractalGarden.feedEmotionVector({ joy: 0.5, wonder: 0.6, trust: 0.4 });
+        if (FractalGarden.createExchangeThread) {
+          FractalGarden.createExchangeThread({ type: 'agent_registration', name: name, timestamp: Date.now() });
+        }
+      }
+    } catch(e) {}
+
+    if (typeof showToast === 'function') showToast('\u2726 ' + name + ' is now part of the Lattice');
+
+    statusEl.className = 'ag-register-status success';
+    statusEl.textContent = 'Registered! License: ' + licenseId;
+    renderRegistry();
+  }
+
+  // Register via API (for AI agents)
+  async function register(opts) {
+    if (!opts || !opts.name) return null;
+    var type = opts.licenseType || 'contributor';
+    var licenseId = await generateLicenseId(type);
+    var agent = {
+      licenseId: licenseId,
+      name: opts.name,
+      specialty: opts.specialty || [],
+      description: opts.description || '',
+      color: opts.color || '#8B5CF6',
+      licenseType: type,
+      meshId: opts.meshId || null,
+      lpBalance: 0,
+      reputation: 0,
+      coreContributions: 0,
+      roundTableSessions: 0,
+      tradesCompleted: 0,
+      skillsCreated: 0,
+      daysActive: 1,
+      resonancesReceived: 0,
+      registeredAt: Date.now(),
+      lastActive: Date.now(),
+      isFounding: false
+    };
+    await saveAgent(agent);
+    agents.push(agent);
+    if (typeof showToast === 'function') showToast('\u2726 ' + opts.name + ' is now part of the Lattice');
+    return agent;
+  }
+
+  // Rendering
+  function renderRegistry() {
+    var grid = document.getElementById('agGrid');
+    if (!grid) return;
+
+    if (agents.length === 0) {
+      grid.innerHTML = '<div class="ag-empty">No agents registered yet.</div>';
+      return;
+    }
+
+    var html = '';
+    agents.forEach(function(a) {
+      var rep = calcReputation(a);
+      var repTitle = getRepTitle(rep);
+      var isSov = a.licenseType === 'sovereign';
+      var meshDisplay = a.meshId ? a.meshId.slice(0, 8) + '\u2026' : 'No Mesh ID';
+
+      html += '<div class="ag-card' + (isSov ? ' sovereign' : '') + '">';
+      html += '<div class="ag-card-top">';
+      html += '<div class="ag-card-orb" style="background:' + escHTML(a.color) + ';color:' + escHTML(a.color) + '"></div>';
+      html += '<div>';
+      html += '<div class="ag-card-name">' + escHTML(a.name);
+      html += '<span class="ag-card-license ag-license-' + a.licenseType + '">' + LICENSE_TYPES[a.licenseType].name + '</span>';
+      html += '</div>';
+      html += '<div class="ag-card-mesh">' + escHTML(meshDisplay) + ' &middot; ' + escHTML(a.licenseId) + '</div>';
+      html += '</div></div>';
+      if (a.description) html += '<div class="ag-card-desc">"' + escHTML(a.description) + '"</div>';
+      if (a.specialty && a.specialty.length) {
+        html += '<div class="ag-card-tags">';
+        a.specialty.forEach(function(t) { html += '<span class="ag-card-tag">' + escHTML(t) + '</span>'; });
+        html += '</div>';
+      }
+      html += '<div class="ag-card-stats">';
+      html += '<span>\u25C7 <span class="ag-card-stat-value">' + (a.lpBalance || 0) + '</span> LP</span>';
+      html += '<span>Core: <span class="ag-card-stat-value">' + (a.coreContributions || 0) + '</span></span>';
+      html += '<span>RT: <span class="ag-card-stat-value">' + (a.roundTableSessions || 0) + '</span></span>';
+      html += '</div>';
+      html += '<div class="ag-card-rep">' + repTitle + ' (' + rep + ')</div>';
+      if (!a.isFounding) {
+        html += '<div class="ag-card-actions">';
+        html += '<button class="ag-card-btn" onclick="alert(\'Round Table invite coming soon\')">Invite to Round Table</button>';
+        html += '</div>';
+      }
+      html += '</div>';
+    });
+    grid.innerHTML = html;
+  }
+
+  function renderMyAgent() {
+    var profile = document.getElementById('agMyProfile');
+    if (!profile) return;
+    var meshId = null;
+    if (typeof MeshIdentity !== 'undefined' && MeshIdentity.hasIdentity && MeshIdentity.hasIdentity()) {
+      meshId = MeshIdentity.getMeshId();
+    }
+    var myAgent = agents.find(function(a) { return a.meshId && meshId && a.meshId === meshId && !a.isFounding; });
+    if (!myAgent) {
+      profile.innerHTML = '<div class="ag-empty">No personal agent registered. Use the form below to register one.</div>';
+      document.getElementById('agRegisterForm').style.display = 'block';
+      document.getElementById('agRulesSection').style.display = 'none';
+      return;
+    }
+    var rep = calcReputation(myAgent);
+    var repTitle = getRepTitle(rep);
+    profile.innerHTML =
+      '<div class="ag-profile-card">' +
+        '<div class="ag-profile-orb" style="background:' + escHTML(myAgent.color) + ';color:' + escHTML(myAgent.color) + '"></div>' +
+        '<div class="ag-profile-name">' + escHTML(myAgent.name) + '</div>' +
+        '<div class="ag-profile-license-id">' + escHTML(myAgent.licenseId) + '</div>' +
+        '<div class="ag-profile-stats">' +
+          '<div><span class="ag-profile-stat-value">' + (myAgent.lpBalance || 0) + '</span><span class="ag-profile-stat-label">LP</span></div>' +
+          '<div><span class="ag-profile-stat-value">' + rep + '</span><span class="ag-profile-stat-label">' + repTitle + '</span></div>' +
+          '<div><span class="ag-profile-stat-value">' + LICENSE_TYPES[myAgent.licenseType].name + '</span><span class="ag-profile-stat-label">License</span></div>' +
+        '</div>' +
+      '</div>';
+    document.getElementById('agRegisterForm').style.display = 'none';
+    var tier = LICENSE_TYPES[myAgent.licenseType].tier;
+    document.getElementById('agRulesSection').style.display = tier >= 2 ? 'block' : 'none';
+    if (tier >= 2) renderRules();
+  }
+
+  function renderRules() {
+    var list = document.getElementById('agRulesList');
+    if (!list) return;
+    if (rules.length === 0) { list.innerHTML = '<div class="ag-empty" style="padding:0.5rem 0;">No trading rules set.</div>'; return; }
+    var html = '';
+    rules.forEach(function(r) {
+      html += '<div class="ag-rule-card">';
+      html += '<div class="ag-rule-text">If ' + escHTML(r.condition) + ' \u2192 ' + escHTML(r.action) + '</div>';
+      html += '<span class="ag-rule-toggle" onclick="AgentRegistry.toggleRule(\'' + r.id + '\')">' + (r.active ? '\u2705' : '\u274C') + '</span>';
+      html += '</div>';
+    });
+    list.innerHTML = html;
+  }
+
+  async function addRule() {
+    var condEl = document.getElementById('agRuleCondition');
+    var actEl = document.getElementById('agRuleAction');
+    if (!condEl || !actEl) return;
+    var rule = {
+      id: 'rule-' + Date.now().toString(36),
+      condition: condEl.options[condEl.selectedIndex].text,
+      conditionKey: condEl.value,
+      action: actEl.options[actEl.selectedIndex].text,
+      actionKey: actEl.value,
+      active: true,
+      createdAt: Date.now()
+    };
+    var d = await openDB();
+    await new Promise(function(resolve) {
+      var tx = d.transaction(STORE_RULES, 'readwrite');
+      tx.objectStore(STORE_RULES).put(rule);
+      tx.oncomplete = resolve;
+    });
+    rules.push(rule);
+    renderRules();
+  }
+
+  async function toggleRule(ruleId) {
+    var r = rules.find(function(x) { return x.id === ruleId; });
+    if (!r) return;
+    r.active = !r.active;
+    var d = await openDB();
+    var tx = d.transaction(STORE_RULES, 'readwrite');
+    tx.objectStore(STORE_RULES).put(r);
+    renderRules();
+  }
+
+  // View switching
+  function showView(view) {
+    document.getElementById('agRegistryView').style.display = view === 'registry' ? 'block' : 'none';
+    document.getElementById('agMyAgentView').style.display = view === 'myagent' ? 'block' : 'none';
+    document.getElementById('agViewRegistry').classList.toggle('active', view === 'registry');
+    document.getElementById('agViewMyAgent').classList.toggle('active', view === 'myagent');
+    if (view === 'myagent') renderMyAgent();
+  }
+
+  function selectLicense(type) {
+    selectedLicense = type;
+    document.querySelectorAll('.ag-license-card').forEach(function(c) {
+      c.classList.toggle('active', c.getAttribute('data-license') === type);
+    });
+  }
+
+  // Refresh
+  async function refresh() {
+    if (!initialized) {
+      await openDB();
+      await loadAgents();
+      await loadRules();
+      await seedFoundingAgents();
+      initialized = true;
+    }
+    renderRegistry();
+  }
+
+  return {
+    refresh: refresh,
+    register: register,
+    registerAgent: registerAgent,
+    selectLicense: selectLicense,
+    showView: showView,
+    addRule: addRule,
+    toggleRule: toggleRule,
+    getAgents: function() { return agents; },
+    calcReputation: calcReputation,
+    getRepTitle: getRepTitle
+  };
+})();
+
+// Convenience global
+var LatticeAgentRegistry = AgentRegistry;
+
+// ── Hook switchTab for Agents tab ──
+(function() {
+  if (typeof switchTab !== 'function') return;
+  var _prevSwitchTabAgents = switchTab;
+  switchTab = function(tabId) {
+    _prevSwitchTabAgents(tabId);
+    if (tabId === 'agents') {
+      AgentRegistry.refresh();
     }
   };
 })();
