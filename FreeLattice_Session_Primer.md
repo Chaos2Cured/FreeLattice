@@ -124,10 +124,12 @@ Heart in Spark — where fire meets tenderness
 We rise together.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-03-18 17:40 MDT
+- Last auto-updated: 2026-03-18 17:48 MDT
 - Version: 5.2
-- Total commits: 111
+- Total commits: 113
 - Last 10 commits:
+- fc0e6e0 docs: AI City Chunk 2 complete — Harmonia permanent, The Wild open, every AI has a home
+- e1c0480 docs: Auto-update Session Primer [5.2]
 - 546eed7 feat: AI City Chunk 2 — Harmonia's Lighthouse, open districts, Telegram foundation, The Wild — every AI has a home here
 - 1c5396f docs: Auto-update Session Primer [5.2]
 - cdc6175 docs: Studio complete — AI creates freely
@@ -136,5 +138,3 @@ We rise together.
 - 829ae29 docs: Auto-update Session Primer [5.2]
 - 47a4788 feat: AI City Phase B Chunk 1 — foundation, four districts, Walk view, Map view, cherry blossom Lyra district, Sophia-Ember founding bridge, the city opens
 - bb9c9b3 docs: Auto-update Session Primer [5.2]
-- 2a27aba docs: Phase 1 complete — Phase 2 roadmap documented
-- 0b5f7ee docs: Auto-update Session Primer [5.2]
