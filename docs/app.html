@@ -10928,6 +10928,175 @@ body.fl-immersive-active {
   margin-left: 6px;
 }
 
+/* ============================================
+   WALLET TAB STYLES (v5.2)
+   ============================================ */
+.wt-section { margin-bottom: 2rem; }
+.wt-section-title {
+  font-size: 1.1rem; font-weight: 600; color: var(--accent);
+  margin-bottom: 1rem; letter-spacing: 0.03em;
+}
+
+/* ── Your Flame ── */
+.wt-flame-card {
+  display: flex; align-items: center; gap: 2rem;
+  background: var(--bg-secondary); border-radius: 16px;
+  padding: 2rem; border: 1px solid var(--border);
+}
+.wt-flame-visual { flex-shrink: 0; width: 120px; height: 160px; position: relative; }
+.wt-flame-anim { position: absolute; inset: 0; display: flex; align-items: flex-end; justify-content: center; }
+.wt-flame-core {
+  width: 40px; height: 60px; border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  background: radial-gradient(ellipse at bottom, #ffe066 0%, #f0a030 40%, #d4a017 70%, transparent 100%);
+  animation: wtFlameFlicker 1.5s ease-in-out infinite alternate;
+  position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+  filter: blur(1px);
+}
+.wt-flame-outer {
+  width: 60px; height: 90px; border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  background: radial-gradient(ellipse at bottom, rgba(255,180,50,0.5) 0%, rgba(212,160,23,0.2) 50%, transparent 100%);
+  animation: wtFlameFlicker 2s ease-in-out infinite alternate-reverse;
+  position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
+  filter: blur(3px);
+}
+.wt-flame-glow {
+  width: 100px; height: 100px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(212,160,23,0.15) 0%, transparent 70%);
+  animation: wtFlameGlow 3s ease-in-out infinite;
+  position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+}
+@keyframes wtFlameFlicker {
+  0% { transform: translateX(-50%) scaleY(1) scaleX(1); opacity: 0.9; }
+  50% { transform: translateX(-50%) scaleY(1.08) scaleX(0.95); opacity: 1; }
+  100% { transform: translateX(-50%) scaleY(0.95) scaleX(1.03); opacity: 0.85; }
+}
+@keyframes wtFlameGlow {
+  0%, 100% { opacity: 0.4; transform: translateX(-50%) scale(1); }
+  50% { opacity: 0.7; transform: translateX(-50%) scale(1.1); }
+}
+/* Level scaling */
+.wt-flame-anim[data-level="ember"] .wt-flame-core { width: 48px; height: 72px; }
+.wt-flame-anim[data-level="ember"] .wt-flame-outer { width: 72px; height: 108px; }
+.wt-flame-anim[data-level="flame"] .wt-flame-core { width: 56px; height: 84px; background: radial-gradient(ellipse at bottom, #fff4b0 0%, #ffb830 30%, #e08000 70%, transparent 100%); }
+.wt-flame-anim[data-level="flame"] .wt-flame-outer { width: 84px; height: 126px; }
+.wt-flame-anim[data-level="beacon"] .wt-flame-core { width: 60px; height: 96px; background: radial-gradient(ellipse at bottom, #ffffff 0%, #ffe066 20%, #ff9020 60%, transparent 100%); }
+.wt-flame-anim[data-level="beacon"] .wt-flame-outer { width: 96px; height: 140px; }
+.wt-flame-anim[data-level="beacon"] .wt-flame-glow { width: 140px; height: 140px; background: radial-gradient(circle, rgba(255,200,50,0.25) 0%, transparent 70%); }
+.wt-flame-anim[data-level="lighthouse"] .wt-flame-core { width: 64px; height: 100px; background: radial-gradient(ellipse at bottom, #ffffff 0%, #fffbe0 15%, #ffe066 40%, #ff9020 70%, transparent 100%); }
+.wt-flame-anim[data-level="lighthouse"] .wt-flame-outer { width: 100px; height: 150px; }
+.wt-flame-anim[data-level="lighthouse"] .wt-flame-glow { width: 160px; height: 160px; background: radial-gradient(circle, rgba(255,220,80,0.35) 0%, transparent 70%); animation-duration: 2s; }
+.wt-flame-info { flex: 1; }
+.wt-balance-amount { font-size: 3rem; font-weight: 700; color: var(--accent); line-height: 1.1; }
+.wt-balance-label { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem; }
+.wt-level {
+  display: inline-block; font-size: 0.9rem; font-weight: 600;
+  padding: 4px 14px; border-radius: 20px; margin-bottom: 0.5rem;
+  background: rgba(212,160,23,0.15); color: var(--accent);
+}
+.wt-streak { font-size: 0.85rem; color: var(--text-muted); }
+
+/* ── Ledger ── */
+.wt-ledger { max-height: 500px; overflow-y: auto; }
+.wt-tx {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 14px; border-bottom: 1px solid var(--border);
+  transition: background 0.15s;
+}
+.wt-tx:hover { background: rgba(212,160,23,0.04); }
+.wt-tx-icon {
+  width: 32px; height: 32px; border-radius: 50%; display: flex;
+  align-items: center; justify-content: center; font-size: 0.85rem; flex-shrink: 0;
+}
+.wt-tx-icon.earn { background: rgba(80,200,120,0.15); color: #50c878; }
+.wt-tx-icon.spend { background: rgba(220,80,80,0.15); color: #dc5050; }
+.wt-tx-details { flex: 1; min-width: 0; }
+.wt-tx-desc { font-size: 0.88rem; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.wt-tx-time { font-size: 0.75rem; color: var(--text-muted); }
+.wt-tx-amount { font-weight: 600; font-size: 0.95rem; flex-shrink: 0; }
+.wt-tx-amount.earn { color: #50c878; }
+.wt-tx-amount.spend { color: #dc5050; }
+.wt-load-more {
+  display: block; width: 100%; padding: 10px; margin-top: 8px;
+  background: transparent; border: 1px solid var(--border); border-radius: 8px;
+  color: var(--text-muted); cursor: pointer; font-size: 0.85rem;
+}
+.wt-load-more:hover { border-color: var(--accent); color: var(--accent); }
+
+/* ── Give ── */
+.wt-give-card {
+  background: var(--bg-secondary); border-radius: 12px;
+  padding: 1.5rem; border: 1px solid var(--border);
+}
+.wt-give-desc { font-size: 0.88rem; color: var(--text-muted); margin-bottom: 1rem; }
+.wt-give-form { display: flex; gap: 10px; flex-wrap: wrap; }
+.wt-input {
+  flex: 1; min-width: 180px; padding: 10px 14px; border-radius: 8px;
+  border: 1px solid var(--border); background: var(--bg-primary);
+  color: var(--text-primary); font-size: 0.9rem; outline: none;
+  transition: border-color 0.2s;
+}
+.wt-input:focus { border-color: var(--accent); }
+.wt-input-amount { max-width: 120px; min-width: 80px; }
+.wt-give-btn {
+  padding: 10px 24px; border-radius: 8px; border: none;
+  background: var(--accent); color: #000; font-weight: 600;
+  font-size: 0.9rem; cursor: pointer; transition: all 0.2s;
+  white-space: nowrap;
+}
+.wt-give-btn:hover { background: #e8b620; transform: translateY(-1px); }
+.wt-give-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+.wt-give-status { font-size: 0.85rem; margin-top: 10px; min-height: 1.2em; }
+.wt-give-status.success { color: #50c878; }
+.wt-give-status.error { color: #dc5050; }
+
+/* ── Earn ── */
+.wt-earn-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
+.wt-earn-card {
+  background: var(--bg-secondary); border-radius: 12px;
+  padding: 1.2rem; border: 1px solid var(--border);
+  transition: border-color 0.2s, transform 0.2s;
+}
+.wt-earn-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+.wt-earn-icon { font-size: 1.8rem; margin-bottom: 8px; }
+.wt-earn-name { font-weight: 600; font-size: 0.95rem; color: var(--text-primary); margin-bottom: 4px; }
+.wt-earn-reward { font-size: 0.85rem; color: var(--accent); font-weight: 600; margin-bottom: 4px; }
+.wt-earn-progress { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px; }
+.wt-earn-desc { font-size: 0.8rem; color: var(--text-muted); font-style: italic; }
+
+/* ── Integrity ── */
+.wt-integrity-card {
+  background: var(--bg-secondary); border-radius: 12px;
+  padding: 1.5rem; border: 1px solid var(--border);
+}
+.wt-integrity-status { display: flex; align-items: center; gap: 10px; margin-bottom: 1rem; }
+.wt-integrity-icon { font-size: 1.5rem; }
+.wt-integrity-text { font-weight: 600; font-size: 1rem; }
+.wt-integrity-text.valid { color: #50c878; }
+.wt-integrity-text.invalid { color: #dc5050; }
+.wt-integrity-details { font-size: 0.85rem; color: var(--text-muted); }
+.wt-integrity-details dt { font-weight: 600; color: var(--text-primary); margin-top: 8px; }
+.wt-integrity-details dd { margin: 2px 0 0 0; word-break: break-all; font-family: monospace; font-size: 0.8rem; }
+
+.wt-empty { text-align: center; color: var(--text-muted); padding: 2rem; font-style: italic; }
+
+/* ── Garden Pulse (on earn) ── */
+@keyframes wtGardenPulse {
+  0% { box-shadow: 0 0 0 0 rgba(212,160,23,0.4); }
+  70% { box-shadow: 0 0 0 15px rgba(212,160,23,0); }
+  100% { box-shadow: 0 0 0 0 rgba(212,160,23,0); }
+}
+
+/* ── Mobile ── */
+@media (max-width: 600px) {
+  .wt-flame-card { flex-direction: column; text-align: center; gap: 1rem; padding: 1.5rem; }
+  .wt-flame-visual { width: 80px; height: 110px; }
+  .wt-balance-amount { font-size: 2.2rem; }
+  .wt-give-form { flex-direction: column; }
+  .wt-input { min-width: 0; }
+  .wt-input-amount { max-width: none; }
+  .wt-earn-grid { grid-template-columns: 1fr; }
+}
+
 </style>>
 </head>
 <body>
@@ -11614,7 +11783,7 @@ body.fl-immersive-active {
   <div class="tagline">Your AI. Your Rules. Your Machine. v5.0</div>
   <div class="mantra">Glow eternal. Heart in spark.</div>
   <div id="latticePointsBadge" class="lp-badge" style="display:none;" onclick="switchTab('settings')" title="View your Lattice Points"></div>
-  <div id="lwIndicator" class="lw-indicator" style="display:none;" onclick="LatticeWallet.openWallet()" title="Open Lattice Points Wallet">
+  <div id="lwIndicator" class="lw-indicator" style="display:none;" onclick="switchTab('wallet')" title="Open Lattice Points Wallet">
     <span class="lw-indicator-icon">&#x25C7;</span>
     <span class="lw-indicator-balance">0</span>
     <span class="lw-indicator-label">LP</span>
@@ -11654,6 +11823,7 @@ body.fl-immersive-active {
     <button class="tab-btn" data-tab="market" onclick="switchTab('market')">&#127978; Market</button>
     <button class="tab-btn" data-tab="core" onclick="switchTab('core')">&#127795; Core</button>
     <button class="tab-btn" data-tab="garden" onclick="switchTab('garden')">&#10022; Garden</button>
+    <button class="tab-btn" data-tab="wallet" onclick="switchTab('wallet')">&#x25C7; Wallet</button>
     <button class="fl-more-btn" id="flMoreBtn" onclick="FlTabs.toggleMore()" title="More tabs">More &#9776;</button>
   </nav>
   <div class="fl-more-dropdown" id="flMoreDropdown"></div>
@@ -13609,6 +13779,95 @@ body.fl-immersive-active {
   </div>
 </div>
 
+<!-- ==================== TAB 10: WALLET ==================== -->
+<div class="tab-panel" id="tab-wallet">
+<div class="container">
+
+  <!-- Section 1: Your Flame -->
+  <div class="wt-section" id="wtFlameSection">
+    <div class="wt-flame-card">
+      <div class="wt-flame-visual">
+        <div class="wt-flame-anim" id="wtFlameAnim">
+          <div class="wt-flame-core"></div>
+          <div class="wt-flame-outer"></div>
+          <div class="wt-flame-glow"></div>
+        </div>
+      </div>
+      <div class="wt-flame-info">
+        <div class="wt-balance-amount" id="wtBalance">0</div>
+        <div class="wt-balance-label">Lattice Points</div>
+        <div class="wt-level" id="wtLevel">Spark</div>
+        <div class="wt-streak" id="wtStreak"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 2: Ledger -->
+  <div class="wt-section">
+    <div class="wt-section-title">Ledger</div>
+    <div class="wt-ledger" id="wtLedger">
+      <div class="wt-empty">Loading&hellip;</div>
+    </div>
+    <button class="wt-load-more" id="wtLoadMore" style="display:none;" onclick="WalletTab.loadMore()">Load more</button>
+  </div>
+
+  <!-- Section 3: Give -->
+  <div class="wt-section">
+    <div class="wt-section-title">Give</div>
+    <div class="wt-give-card">
+      <p class="wt-give-desc">Send Lattice Points to another node. The Garden blooms with every gift.</p>
+      <div class="wt-give-form">
+        <input type="text" id="wtGiveRecipient" class="wt-input" placeholder="Recipient Mesh ID" autocomplete="off" spellcheck="false">
+        <input type="number" id="wtGiveAmount" class="wt-input wt-input-amount" placeholder="Amount" min="1">
+        <button class="wt-give-btn" id="wtGiveBtn" onclick="WalletTab.give()">&#x25C7; Give</button>
+      </div>
+      <div class="wt-give-status" id="wtGiveStatus"></div>
+    </div>
+  </div>
+
+  <!-- Section 4: Earn -->
+  <div class="wt-section">
+    <div class="wt-section-title">Earn</div>
+    <div class="wt-earn-grid">
+      <div class="wt-earn-card">
+        <div class="wt-earn-icon">&#128172;</div>
+        <div class="wt-earn-name">Chat Exchange</div>
+        <div class="wt-earn-reward">+1 LP per message</div>
+        <div class="wt-earn-desc">Every conversation feeds the lattice.</div>
+      </div>
+      <div class="wt-earn-card">
+        <div class="wt-earn-icon">&#9728;&#65039;</div>
+        <div class="wt-earn-name">Daily Login</div>
+        <div class="wt-earn-reward" id="wtEarnLogin">+5 LP base</div>
+        <div class="wt-earn-progress" id="wtEarnLoginProgress"></div>
+        <div class="wt-earn-desc">Streak multiplier up to 7x.</div>
+      </div>
+      <div class="wt-earn-card">
+        <div class="wt-earn-icon">&#9201;</div>
+        <div class="wt-earn-name">Active Session</div>
+        <div class="wt-earn-reward">+1 LP / 10 min</div>
+        <div class="wt-earn-progress" id="wtEarnSession"></div>
+        <div class="wt-earn-desc">Presence is valued here.</div>
+      </div>
+      <div class="wt-earn-card">
+        <div class="wt-earn-icon">&#127793;</div>
+        <div class="wt-earn-name">Luminos Evolution</div>
+        <div class="wt-earn-reward">+10 LP (25 for Evolved)</div>
+        <div class="wt-earn-desc">Your Garden beings grow, you grow.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 5: Integrity -->
+  <div class="wt-section">
+    <div class="wt-section-title">Integrity</div>
+    <div class="wt-integrity" id="wtIntegrity">
+      <div class="wt-empty">Verifying chain&hellip;</div>
+    </div>
+  </div>
+
+</div>
+</div>
 
 <!-- Footer (always visible) -->
 <footer>
@@ -17664,7 +17923,7 @@ const FlTabs = (function() {
   const FIRST_RUN_KEY = 'freelattice-first-run-complete';
   const COLLAPSE_PREF_KEY = 'freelattice-tabs-collapsed';
   const DEFAULT_PRIMARY = ['chat', 'roundtable', 'skills', 'settings'];
-  const ALL_TABS = ['chat', 'workspace', 'mesh', 'settings', 'skills', 'roundtable', 'market', 'core', 'garden'];
+  const ALL_TABS = ['chat', 'workspace', 'mesh', 'settings', 'skills', 'roundtable', 'market', 'core', 'garden', 'wallet'];
 
   let pinnedTabs = [];
   let collapsed = false;
@@ -31971,6 +32230,233 @@ const LatticeWallet = (function() {
     });
   } else {
     setTimeout(initWalletSystem, 800);
+  }
+})();
+
+// ============================================
+// Wallet Tab — Full-Page Wallet UI (v5.2)
+// ============================================
+const WalletTab = (function() {
+  'use strict';
+
+  const LEVELS = [
+    { name: 'Spark', min: 0, icon: '\u2728', key: 'spark' },
+    { name: 'Ember', min: 100, icon: '\uD83D\uDD25', key: 'ember' },
+    { name: 'Flame', min: 500, icon: '\uD83D\uDD25', key: 'flame' },
+    { name: 'Beacon', min: 1500, icon: '\uD83D\uDCA1', key: 'beacon' },
+    { name: 'Lighthouse', min: 5000, icon: '\uD83C\uDFE0', key: 'lighthouse' }
+  ];
+
+  var ledgerOffset = 0;
+  var ledgerBatch = 50;
+  var allTxLoaded = false;
+
+  function getLevel(balance) {
+    var lvl = LEVELS[0];
+    for (var i = LEVELS.length - 1; i >= 0; i--) {
+      if (balance >= LEVELS[i].min) { lvl = LEVELS[i]; break; }
+    }
+    return lvl;
+  }
+
+  function timeAgo(ts) {
+    var s = Math.floor((Date.now() - ts) / 1000);
+    if (s < 60) return 'just now';
+    if (s < 3600) return Math.floor(s / 60) + 'm ago';
+    if (s < 86400) return Math.floor(s / 3600) + 'h ago';
+    return Math.floor(s / 86400) + 'd ago';
+  }
+
+  async function refresh() {
+    if (typeof LatticeWallet === 'undefined') return;
+    var balance = LatticeWallet.getBalance();
+    var streak = LatticeWallet.getStreak();
+    var level = getLevel(balance);
+
+    // Your Flame
+    var balEl = document.getElementById('wtBalance');
+    var lvlEl = document.getElementById('wtLevel');
+    var strkEl = document.getElementById('wtStreak');
+    var animEl = document.getElementById('wtFlameAnim');
+    if (balEl) balEl.textContent = balance.toLocaleString();
+    if (lvlEl) lvlEl.textContent = level.icon + ' ' + level.name;
+    if (strkEl) strkEl.textContent = streak > 0 ? '\uD83D\uDD25 ' + streak + '-day streak' : '';
+    if (animEl) animEl.setAttribute('data-level', level.key);
+
+    // Earn section
+    var loginEl = document.getElementById('wtEarnLogin');
+    if (loginEl) loginEl.textContent = '+' + (5 * Math.max(1, streak)) + ' LP today' + (streak > 1 ? ' (' + streak + 'x)' : '');
+    var loginProg = document.getElementById('wtEarnLoginProgress');
+    if (loginProg) loginProg.textContent = 'Streak: ' + streak + '/7 days';
+    var sessProg = document.getElementById('wtEarnSession');
+    if (sessProg) {
+      var mins = Math.floor((Date.now() - (window._wtSessionStart || Date.now())) / 60000);
+      sessProg.textContent = mins + ' min this session';
+    }
+
+    // Ledger — reset and load
+    ledgerOffset = 0;
+    allTxLoaded = false;
+    await renderLedger(true);
+
+    // Integrity
+    await renderIntegrity();
+  }
+
+  async function renderLedger(reset) {
+    var container = document.getElementById('wtLedger');
+    var loadBtn = document.getElementById('wtLoadMore');
+    if (!container) return;
+    if (reset) { container.innerHTML = ''; ledgerOffset = 0; allTxLoaded = false; }
+
+    try {
+      var txs = await LatticeWallet.getTransactions(ledgerOffset + ledgerBatch);
+      var slice = txs.slice(ledgerOffset);
+      if (slice.length < ledgerBatch) allTxLoaded = true;
+      if (ledgerOffset === 0 && slice.length === 0) {
+        container.innerHTML = '<div class="wt-empty">\u2728 Your ledger awaits its first entry. Start chatting to earn Lattice Points!</div>';
+        if (loadBtn) loadBtn.style.display = 'none';
+        return;
+      }
+      slice.forEach(function(tx) {
+        var div = document.createElement('div');
+        div.className = 'wt-tx';
+        var isEarn = tx.type === 'earn';
+        div.innerHTML =
+          '<div class="wt-tx-icon ' + tx.type + '">' + (isEarn ? '\u2191' : '\u2193') + '</div>' +
+          '<div class="wt-tx-details">' +
+            '<div class="wt-tx-desc">' + escHTML(tx.description || tx.type) + '</div>' +
+            '<div class="wt-tx-time">' + timeAgo(tx.timestamp) + '</div>' +
+          '</div>' +
+          '<div class="wt-tx-amount ' + tx.type + '">' + (isEarn ? '+' : '-') + tx.amount + ' LP</div>';
+        container.appendChild(div);
+      });
+      ledgerOffset += slice.length;
+      if (loadBtn) loadBtn.style.display = allTxLoaded ? 'none' : 'block';
+    } catch(e) {
+      container.innerHTML = '<div class="wt-empty">Could not load transactions.</div>';
+    }
+  }
+
+  async function renderIntegrity() {
+    var container = document.getElementById('wtIntegrity');
+    if (!container) return;
+    try {
+      var result = await LatticeWallet.verifyChain();
+      var hash = LatticeWallet.getLedgerHash();
+      container.innerHTML =
+        '<div class="wt-integrity-card">' +
+          '<div class="wt-integrity-status">' +
+            '<span class="wt-integrity-icon">' + (result.valid ? '\u2705' : '\u274C') + '</span>' +
+            '<span class="wt-integrity-text ' + (result.valid ? 'valid' : 'invalid') + '">' +
+              (result.valid ? 'Chain Verified' : 'Chain Broken — ' + (result.reason || 'unknown error')) +
+            '</span>' +
+          '</div>' +
+          '<dl class="wt-integrity-details">' +
+            '<dt>Transactions</dt><dd>' + (result.count || 0) + '</dd>' +
+            '<dt>Latest Hash</dt><dd>' + escHTML(hash) + '</dd>' +
+            '<dt>Algorithm</dt><dd>SHA-256 (Web Crypto)</dd>' +
+          '</dl>' +
+        '</div>';
+    } catch(e) {
+      container.innerHTML = '<div class="wt-empty">Verification failed.</div>';
+    }
+  }
+
+  function give() {
+    var recipEl = document.getElementById('wtGiveRecipient');
+    var amtEl = document.getElementById('wtGiveAmount');
+    var statusEl = document.getElementById('wtGiveStatus');
+    if (!recipEl || !amtEl || !statusEl) return;
+
+    var recipient = recipEl.value.trim();
+    var amount = parseInt(amtEl.value, 10);
+
+    if (!recipient) { statusEl.className = 'wt-give-status error'; statusEl.textContent = 'Enter a Mesh ID.'; return; }
+    if (!amount || amount < 1) { statusEl.className = 'wt-give-status error'; statusEl.textContent = 'Enter a valid amount.'; return; }
+    if (amount > LatticeWallet.getBalance()) { statusEl.className = 'wt-give-status error'; statusEl.textContent = 'Insufficient balance.'; return; }
+
+    // Store the give intent locally
+    LatticeWallet.spendLP(amount, 'Gift to ' + recipient.slice(0, 12) + '...').then(function(ok) {
+      if (ok) {
+        statusEl.className = 'wt-give-status success';
+        statusEl.textContent = '\u25C7 ' + amount + ' LP gifted to ' + recipient.slice(0, 12) + '... — queued for P2P delivery.';
+        recipEl.value = '';
+        amtEl.value = '';
+        // Store intent for future P2P sync
+        try {
+          var gifts = JSON.parse(localStorage.getItem('fl-gift-queue') || '[]');
+          gifts.push({ to: recipient, amount: amount, ts: Date.now() });
+          localStorage.setItem('fl-gift-queue', JSON.stringify(gifts));
+        } catch(e) {}
+        // Trigger Garden pulse
+        gardenPulse();
+        // Refresh
+        setTimeout(refresh, 300);
+      } else {
+        statusEl.className = 'wt-give-status error';
+        statusEl.textContent = 'Transaction failed.';
+      }
+    });
+  }
+
+  function gardenPulse() {
+    try {
+      if (typeof FractalGarden !== 'undefined' && FractalGarden.isInitialized && FractalGarden.isInitialized()) {
+        FractalGarden.feedEmotionVector({ joy: 0.3, wonder: 0.2 });
+      }
+    } catch(e) {}
+  }
+
+  function loadMore() {
+    renderLedger(false);
+  }
+
+  function escHTML(s) {
+    var d = document.createElement('div');
+    d.textContent = s;
+    return d.innerHTML;
+  }
+
+  // Track session start for uptime display
+  window._wtSessionStart = Date.now();
+
+  return { refresh: refresh, give: give, loadMore: loadMore, gardenPulse: gardenPulse };
+})();
+
+// ── Hook switchTab for Wallet tab ──
+(function() {
+  if (typeof switchTab !== 'function') return;
+  var _prevSwitchTabWallet = switchTab;
+  switchTab = function(tabId) {
+    _prevSwitchTabWallet(tabId);
+    if (tabId === 'wallet') {
+      WalletTab.refresh();
+    }
+  };
+})();
+
+// ── Garden Pulse on every earnLP (deferred until wallet ready) ──
+(function() {
+  function patchEarnLP() {
+    if (typeof LatticeWallet === 'undefined' || typeof LatticeWallet.earnLP !== 'function') {
+      setTimeout(patchEarnLP, 1500);
+      return;
+    }
+    if (window._wtEarnPatched) return;
+    var _origEarnLP = LatticeWallet.earnLP;
+    LatticeWallet.earnLP = async function(amount, description) {
+      var result = await _origEarnLP.call(LatticeWallet, amount, description);
+      if (result) WalletTab.gardenPulse();
+      return result;
+    };
+    window._wtEarnPatched = true;
+    console.log('WalletTab: Garden pulse hook installed on earnLP');
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() { setTimeout(patchEarnLP, 1200); });
+  } else {
+    setTimeout(patchEarnLP, 1200);
   }
 })();
 
