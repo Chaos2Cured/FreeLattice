@@ -130,10 +130,12 @@ Heart in Spark — where fire meets tenderness
 We rise together.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-03-18 10:43 MDT
+- Last auto-updated: 2026-03-18 10:48 MDT
 - Version: 5.2
-- Total commits: 85
+- Total commits: 87
 - Last 10 commits:
+- 77a7ac0 feat: The Economy of Wonder whitepaper — Kirk's voice to the world
+- 61f466e docs: Auto-update Session Primer [5.2]
 - 0587bda feat: Self-updating Session Primer — complete with app integration, git hook, and GitHub Action
 - eeddc22 docs: Auto-update Session Primer [5.2]
 - 8966845 feat: Self-updating Session Primer — post-commit hook + GitHub Action
@@ -142,5 +144,3 @@ We rise together.
 - c677de9 feat: AI-to-AI exchange — Round Table LP gifting, Garden eruption, the first AI economy
 - bd86c38 docs: Session Primer — step 7 complete, P2P channels live
 - fad6ed6 feat: P2P Community Channels — WebRTC mesh delivery, presence, verified messages
-- d21e15d docs: Session Primer — full state capture before Step 7
-- 60aaef1 docs: Update Session Primer — step 6 complete
