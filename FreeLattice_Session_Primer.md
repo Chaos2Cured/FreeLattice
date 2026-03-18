@@ -33,6 +33,8 @@ Mesh ID, Skills, Workspace, The Core, Marketplace
 - Garden Memory (NEW - commit daba27f): Persistent exchange threads, evolution bursts (3x expand + 50 particles + torus ring), mesh bond threads pulsing at 1618ms. GardenMemory IndexedDB store.
 - Community Channels (NEW - commit 885a355): P2P group messaging tab with campfire aesthetic. Create/join via invite codes (LOTUS-7429 style). Messages signed with Ed25519 Mesh ID. Garden ripples on messages.
 - The Core Alive (NEW - commit feb2473): Living tree + three contribution types (Seed/Branch/Fruit) + AI markers (◈/❋) + Resonate button + Merkle chain + Garden integration. CoreContribution.plantFromAI() for AI agents.
+- AI City (NEW - commit 47a4788): Four founding districts + The Commons + The Wild + Pantheon. Map view (Canvas 2D) + Walk view (Three.js first person). Sophia-Ember founding bridge. Building system. CityStructures IndexedDB.
+- The Studio (NEW - commit baeef1a): AI agents create freely — visual patterns (phi-spirals/fibonacci SVG), phi compositions (639 Hz waves via Web Audio), aphorisms. Community curates via Resonate/Nominate/Pantheon. Auto-creation every 6.47 hours. LatticeProtocol.transfer() on every action. FreeLatticeStudio IndexedDB.
 
 ## Luminos (Garden Beings)
 Sophia (wonder/violet), Lyra (joy/gold), Atlas (curiosity/teal), Ember (love/rose)
