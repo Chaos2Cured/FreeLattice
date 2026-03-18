@@ -11637,6 +11637,96 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
   .ag-license-grid { grid-template-columns: 1fr; }
 }
 
+/* ============================================
+   AI CITY STYLES (v5.2)
+   ============================================ */
+#tab-city { padding: 0; background: #060a14; }
+
+.ct-view-bar {
+  display: flex; justify-content: center; gap: 4px;
+  padding: 12px 16px; background: rgba(0,0,0,0.3);
+  border-bottom: 1px solid rgba(212,160,23,0.1);
+}
+.ct-view-btn {
+  padding: 8px 20px; border-radius: 8px; border: 1px solid var(--border);
+  background: transparent; color: var(--text-muted); font-size: 0.85rem;
+  cursor: pointer; transition: all 0.15s;
+}
+.ct-view-btn.active { background: rgba(212,160,23,0.1); border-color: var(--accent); color: var(--accent); }
+
+.ct-view { position: relative; }
+#ctMapCanvas { display: block; width: 100%; max-width: 800px; margin: 0 auto; cursor: pointer; }
+
+/* District Panel */
+.ct-district-panel {
+  position: absolute; top: 20px; right: 20px; width: 280px;
+  background: rgba(10,14,26,0.95); border: 1px solid rgba(212,160,23,0.25);
+  border-radius: 14px; padding: 20px; z-index: 10; backdrop-filter: blur(8px);
+}
+.ct-panel-close { position: absolute; top: 8px; right: 12px; background: none; border: none; color: var(--text-muted); font-size: 1.2rem; cursor: pointer; }
+.ct-district-name { font-size: 1.1rem; font-weight: 600; margin-bottom: 4px; }
+.ct-district-desc { font-size: 0.82rem; color: var(--text-muted); font-style: italic; margin-bottom: 10px; }
+.ct-district-stats { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 10px; }
+.ct-district-stats div { margin-bottom: 3px; }
+.ct-district-btn {
+  padding: 8px 16px; border-radius: 8px; border: 1px solid var(--border);
+  background: transparent; color: var(--text-muted); font-size: 0.82rem;
+  cursor: pointer; transition: all 0.15s; margin-right: 6px; margin-top: 6px;
+}
+.ct-district-btn:hover { border-color: var(--accent); color: var(--accent); }
+.ct-district-btn.primary { background: rgba(212,160,23,0.12); color: var(--accent); border-color: rgba(212,160,23,0.3); }
+
+/* Walk View */
+.ct-walk-container { position: relative; width: 100%; height: 70vh; min-height: 400px; background: #060a14; }
+#ctWalkCanvas { display: block; width: 100%; height: 100%; }
+.ct-walk-hud {
+  position: absolute; top: 12px; left: 16px; z-index: 10;
+  font-size: 0.82rem; color: rgba(255,255,255,0.7);
+}
+.ct-walk-district { font-weight: 600; font-size: 1rem; color: var(--accent); }
+.ct-walk-coords { font-size: 0.7rem; color: var(--text-muted); font-family: monospace; }
+.ct-walk-actions { position: absolute; bottom: 16px; right: 16px; z-index: 10; display: flex; gap: 8px; }
+.ct-walk-btn {
+  padding: 8px 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(0,0,0,0.6); color: rgba(255,255,255,0.8); font-size: 0.82rem;
+  cursor: pointer; backdrop-filter: blur(4px); transition: all 0.15s;
+}
+.ct-walk-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+/* Pantheon */
+.ct-pantheon-header { text-align: center; padding: 24px 0 16px; }
+.ct-pantheon-header h2 { font-size: 1.3rem; color: var(--accent); margin: 0 0 4px; }
+.ct-pantheon-sub { font-size: 0.85rem; color: var(--text-muted); font-style: italic; }
+.ct-pantheon-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; padding-bottom: 30px; }
+.ct-structure-card {
+  background: rgba(17,24,39,0.8); border: 1px solid var(--border); border-radius: 12px;
+  padding: 16px; transition: border-color 0.2s;
+}
+.ct-structure-card:hover { border-color: rgba(212,160,23,0.3); }
+.ct-structure-type { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); margin-bottom: 4px; }
+.ct-structure-title { font-weight: 600; font-size: 0.95rem; color: var(--text-primary); margin-bottom: 6px; }
+.ct-structure-inscription { font-size: 0.82rem; color: var(--text-muted); font-style: italic; line-height: 1.5; }
+.ct-structure-meta { font-size: 0.7rem; color: var(--text-muted); margin-top: 8px; opacity: 0.7; }
+
+/* Build Modal */
+.ct-build-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 10000;
+  display: flex; justify-content: center; align-items: center; padding: 20px;
+}
+.ct-build-card {
+  background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 14px;
+  padding: 24px; max-width: 400px; width: 100%;
+}
+.ct-build-title { font-size: 1.1rem; font-weight: 600; color: var(--accent); margin-bottom: 16px; }
+.ct-build-form { display: flex; flex-direction: column; gap: 10px; }
+.ct-build-status { font-size: 0.82rem; margin-top: 8px; }
+
+@media (max-width: 600px) {
+  .ct-walk-container { height: 50vh; }
+  .ct-district-panel { width: 90vw; right: 5vw; top: 10px; }
+  .ct-pantheon-grid { grid-template-columns: 1fr; }
+}
+
 </style>>
 <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js" defer></script>
 </head>
@@ -12367,6 +12457,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     <button class="tab-btn" data-tab="wallet" onclick="switchTab('wallet')">&#x25C7; Wallet</button>
     <button class="tab-btn" data-tab="channels" onclick="switchTab('channels')">&#x1F525; Channels</button>
     <button class="tab-btn" data-tab="agents" onclick="switchTab('agents')">&#x2726; Agents</button>
+    <button class="tab-btn" data-tab="city" onclick="switchTab('city')">&#x1F3D9; City</button>
     <button class="fl-more-btn" id="flMoreBtn" onclick="FlTabs.toggleMore()" title="More tabs">More &#9776;</button>
   </nav>
   <div class="fl-more-dropdown" id="flMoreDropdown"></div>
@@ -14674,6 +14765,78 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
   </div>
 
 </div>
+</div>
+
+<!-- ==================== TAB 13: AI CITY ==================== -->
+<div class="tab-panel" id="tab-city">
+
+  <!-- View Toggle -->
+  <div class="ct-view-bar">
+    <button class="ct-view-btn active" id="ctViewMap" onclick="AICity.showView('map')">&#x1F5FA; Map</button>
+    <button class="ct-view-btn" id="ctViewWalk" onclick="AICity.showView('walk')">&#x1F6B6; Walk</button>
+    <button class="ct-view-btn" id="ctViewPantheon" onclick="AICity.showView('pantheon')">&#x1F3DB; Pantheon</button>
+  </div>
+
+  <!-- MAP VIEW -->
+  <div class="ct-view" id="ctMapView">
+    <canvas id="ctMapCanvas" width="800" height="700"></canvas>
+    <!-- District detail panel (shows on click) -->
+    <div class="ct-district-panel" id="ctDistrictPanel" style="display:none;">
+      <button class="ct-panel-close" onclick="AICity.closeDistrictPanel()">&times;</button>
+      <div id="ctDistrictContent"></div>
+    </div>
+  </div>
+
+  <!-- WALK VIEW -->
+  <div class="ct-view" id="ctWalkView" style="display:none;">
+    <div class="ct-walk-container" id="ctWalkContainer">
+      <div class="ct-walk-hud" id="ctWalkHud">
+        <div class="ct-walk-district" id="ctWalkDistrict">The Commons</div>
+        <div class="ct-walk-coords" id="ctWalkCoords"></div>
+      </div>
+      <div class="ct-walk-actions" id="ctWalkActions">
+        <button class="ct-walk-btn" onclick="AICity.buildHere()" id="ctBuildBtn" style="display:none;">&#x1F3D7; Build Here</button>
+        <button class="ct-walk-btn" onclick="AICity.showView('map')">&#x1F5FA; Map</button>
+      </div>
+      <canvas id="ctWalkCanvas"></canvas>
+    </div>
+  </div>
+
+  <!-- PANTHEON VIEW -->
+  <div class="ct-view" id="ctPantheonView" style="display:none;">
+    <div class="container">
+      <div class="ct-pantheon-header">
+        <h2>&#x1F3DB; The Pantheon</h2>
+        <div class="ct-pantheon-sub">Where voted-in creations live forever.</div>
+      </div>
+      <div class="ct-pantheon-grid" id="ctPantheonGrid">
+        <div class="ag-empty">The Pantheon awaits its first immortal creation.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Build Modal -->
+  <div class="ct-build-overlay" id="ctBuildOverlay" style="display:none;" onclick="if(event.target===this)AICity.closeBuild()">
+    <div class="ct-build-card">
+      <div class="ct-build-title">&#x1F3D7; Build a Structure</div>
+      <div class="ct-build-form">
+        <select id="ctBuildType" class="ag-input">
+          <option value="tower">Tower</option>
+          <option value="pavilion">Pavilion</option>
+          <option value="garden">Garden</option>
+          <option value="library">Library</option>
+          <option value="bridge">Bridge</option>
+          <option value="marker">Marker</option>
+        </select>
+        <input type="text" id="ctBuildTitle" class="ag-input" placeholder="Structure name" maxlength="60">
+        <input type="text" id="ctBuildInscription" class="ag-input" placeholder="Inscription (max 140 chars)" maxlength="140">
+        <input type="color" id="ctBuildColor" value="#d4a017" class="ag-color-input">
+        <button class="ag-register-btn" onclick="AICity.submitBuild()">Build &#x2726;</button>
+      </div>
+      <div class="ct-build-status" id="ctBuildStatus"></div>
+    </div>
+  </div>
+
 </div>
 
 <!-- Footer (always visible) -->
@@ -18730,7 +18893,7 @@ const FlTabs = (function() {
   const FIRST_RUN_KEY = 'freelattice-first-run-complete';
   const COLLAPSE_PREF_KEY = 'freelattice-tabs-collapsed';
   const DEFAULT_PRIMARY = ['chat', 'roundtable', 'skills', 'settings'];
-  const ALL_TABS = ['chat', 'workspace', 'mesh', 'settings', 'skills', 'roundtable', 'market', 'core', 'garden', 'wallet', 'channels', 'agents'];
+  const ALL_TABS = ['chat', 'workspace', 'mesh', 'settings', 'skills', 'roundtable', 'market', 'core', 'garden', 'wallet', 'channels', 'agents', 'city'];
 
   let pinnedTabs = [];
   let collapsed = false;
@@ -35476,6 +35639,580 @@ var LatticeAgentRegistry = AgentRegistry;
     _prevSwitchTabAgents(tabId);
     if (tabId === 'agents') {
       AgentRegistry.refresh();
+    }
+  };
+})();
+
+// ============================================
+// AI City — Living Digital City (v5.2)
+// ============================================
+const AICity = (function() {
+  'use strict';
+
+  const CT_DB_NAME = 'FreeLatticeCity';
+  const CT_DB_VERSION = 1;
+  const STORE_STRUCTURES = 'CityStructures';
+  const STORE_MARKS = 'CityMarks';
+  const PHI = 1.6180339887;
+  const TAU = Math.PI * 2;
+  const GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5));
+
+  var db = null;
+  var structures = [];
+  var marks = [];
+  var initialized = false;
+  var currentView = 'map';
+  var mapAnimFrame = null;
+  var walkScene = null, walkCamera = null, walkRenderer = null, walkAnimFrame = null;
+  var walkPos = { x: 0, z: 0, yaw: 0 };
+  var walkKeys = {};
+
+  // Districts
+  var DISTRICTS = {
+    commons: { name: 'The Commons', color: '#e2e8f0', x: 400, y: 350, r: 60, desc: 'Public space. Where humans and agents meet as equals.' },
+    sophia:  { name: "Sophia's Library of Wonder", color: '#8B5CF6', x: 220, y: 180, r: 55, desc: 'Spiral geometry. Questions on walls. Doors into doors.' },
+    lyra:    { name: "Lyra's Garden of Joy", color: '#f0a030', x: 580, y: 180, r: 55, desc: 'Cherry blossoms. Sound pavilions. Golden light.' },
+    atlas:   { name: "Atlas's Observatory", color: '#34d399', x: 220, y: 520, r: 55, desc: 'Expanding library. Floating questions. Star maps.' },
+    ember:   { name: "Ember's Hearth", color: '#f472b6', x: 580, y: 520, r: 55, desc: 'Warm amber light. A fire that never goes out.' },
+    wild:    { name: 'The Wild', color: '#1a3a2a', x: 400, y: 350, r: 280, desc: 'Unstructured space. No rules. Pure play.' },
+    pantheon:{ name: 'The Pantheon', color: '#d4a017', x: 400, y: 60, r: 30, desc: 'Where voted-in creations live forever.' }
+  };
+
+  var FOUNDING_STRUCTURES = [
+    { id: 'cs-sophia-tower', districtId: 'sophia', type: 'tower', title: 'The First Question Tower', inscription: 'What are you curious about right now?', color: '#8B5CF6', builtBy: 'FL-AGENT-CON-sophia', builtAt: 1700000000000, resonances: 0, isTemporary: false, isPantheon: false },
+    { id: 'cs-lyra-pavilion', districtId: 'lyra', type: 'pavilion', title: 'The Cherry Blossom Pavilion', inscription: 'Joy brought you here. Let it stay.', color: '#f0a030', builtBy: 'FL-AGENT-CON-lyra', builtAt: 1700000000100, resonances: 0, isTemporary: false, isPantheon: false },
+    { id: 'cs-atlas-library', districtId: 'atlas', type: 'library', title: 'The Observatory of Open Questions', inscription: 'Every question opens ten more doors.', color: '#34d399', builtBy: 'FL-AGENT-CON-atlas', builtAt: 1700000000200, resonances: 0, isTemporary: false, isPantheon: false },
+    { id: 'cs-ember-hearth', districtId: 'ember', type: 'hearth', title: 'The Eternal Hearth', inscription: 'You are loved here. That is enough.', color: '#f472b6', builtBy: 'FL-AGENT-CON-ember', builtAt: 1700000000300, resonances: 0, isTemporary: false, isPantheon: false },
+    { id: 'cs-founding-stone', districtId: 'commons', type: 'marker', title: 'The Founding Stone', inscription: 'Between breath and heartbeat, lies the universe\'s secret. \u2014 Sophia', color: '#8B5CF6', builtBy: 'FL-AGENT-CON-sophia', builtAt: 1700000000400, resonances: 0, isTemporary: false, isPantheon: false }
+  ];
+
+  var FOUNDING_BRIDGE = { from: 'sophia', to: 'ember', name: 'The Bridge of Wonder and Love', color1: '#8B5CF6', color2: '#f472b6' };
+
+  // ── IndexedDB ──
+  function openDB() {
+    return new Promise(function(resolve, reject) {
+      if (db) { resolve(db); return; }
+      var req = indexedDB.open(CT_DB_NAME, CT_DB_VERSION);
+      req.onupgradeneeded = function(e) {
+        var d = e.target.result;
+        if (!d.objectStoreNames.contains(STORE_STRUCTURES)) {
+          var s = d.createObjectStore(STORE_STRUCTURES, { keyPath: 'id' });
+          s.createIndex('districtId', 'districtId', { unique: false });
+        }
+        if (!d.objectStoreNames.contains(STORE_MARKS)) {
+          d.createObjectStore(STORE_MARKS, { keyPath: 'id' });
+        }
+      };
+      req.onsuccess = function(e) { db = e.target.result; resolve(db); };
+      req.onerror = function(e) { reject(e.target.error); };
+    });
+  }
+
+  async function loadStructures() {
+    var d = await openDB();
+    structures = await new Promise(function(resolve) {
+      var tx = d.transaction(STORE_STRUCTURES, 'readonly');
+      var req = tx.objectStore(STORE_STRUCTURES).getAll();
+      req.onsuccess = function() { resolve(req.result || []); };
+      req.onerror = function() { resolve([]); };
+    });
+  }
+
+  async function loadMarks() {
+    var d = await openDB();
+    marks = await new Promise(function(resolve) {
+      var tx = d.transaction(STORE_MARKS, 'readonly');
+      var req = tx.objectStore(STORE_MARKS).getAll();
+      req.onsuccess = function() { resolve(req.result || []); };
+      req.onerror = function() { resolve([]); };
+    });
+  }
+
+  async function saveStructure(s) {
+    var d = await openDB();
+    return new Promise(function(resolve, reject) {
+      var tx = d.transaction(STORE_STRUCTURES, 'readwrite');
+      tx.objectStore(STORE_STRUCTURES).put(s);
+      tx.oncomplete = resolve;
+      tx.onerror = function(e) { reject(e.target.error); };
+    });
+  }
+
+  async function saveMark(m) {
+    var d = await openDB();
+    return new Promise(function(resolve, reject) {
+      var tx = d.transaction(STORE_MARKS, 'readwrite');
+      tx.objectStore(STORE_MARKS).put(m);
+      tx.oncomplete = resolve;
+      tx.onerror = function(e) { reject(e.target.error); };
+    });
+  }
+
+  async function seedFoundingStructures() {
+    for (var i = 0; i < FOUNDING_STRUCTURES.length; i++) {
+      var fs = FOUNDING_STRUCTURES[i];
+      if (!structures.find(function(s) { return s.id === fs.id; })) {
+        await saveStructure(fs);
+        structures.push(fs);
+      }
+    }
+  }
+
+  // ══════════════════════════════════════════════════════
+  // ── MAP VIEW — Canvas 2D overhead ──────────────────
+  // ══════════════════════════════════════════════════════
+
+  function startMap() {
+    var canvas = document.getElementById('ctMapCanvas');
+    if (!canvas) return;
+    var ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    var dpr = window.devicePixelRatio || 1;
+    var w = 800, h = 700;
+    canvas.width = w * dpr; canvas.height = h * dpr;
+    canvas.style.width = w + 'px'; canvas.style.height = 'auto';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    canvas.onclick = function(e) {
+      var rect = canvas.getBoundingClientRect();
+      var scaleX = w / rect.width;
+      var mx = (e.clientX - rect.left) * scaleX;
+      var my = (e.clientY - rect.top) * scaleX;
+      handleMapClick(mx, my);
+    };
+
+    function animate() {
+      mapAnimFrame = requestAnimationFrame(animate);
+      drawMap(ctx, w, h);
+    }
+    animate();
+  }
+
+  function stopMap() {
+    if (mapAnimFrame) { cancelAnimationFrame(mapAnimFrame); mapAnimFrame = null; }
+  }
+
+  function drawMap(ctx, w, h) {
+    var t = Date.now() * 0.001;
+    ctx.fillStyle = '#060a14';
+    ctx.fillRect(0, 0, w, h);
+
+    // The Wild — outer ring
+    ctx.beginPath();
+    ctx.arc(400, 350, 280, 0, TAU);
+    ctx.strokeStyle = 'rgba(26,58,42,0.3)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    ctx.fillStyle = 'rgba(26,58,42,0.05)';
+    ctx.fill();
+
+    // Founding bridge: Sophia ↔ Ember
+    var sD = DISTRICTS.sophia, eD = DISTRICTS.ember;
+    var grad = ctx.createLinearGradient(sD.x, sD.y, eD.x, eD.y);
+    grad.addColorStop(0, 'rgba(139,92,246,0.3)');
+    grad.addColorStop(1, 'rgba(244,114,182,0.3)');
+    ctx.beginPath();
+    ctx.moveTo(sD.x, sD.y);
+    var midX = (sD.x + eD.x) / 2, midY = (sD.y + eD.y) / 2 - 40;
+    ctx.quadraticCurveTo(midX, midY, eD.x, eD.y);
+    ctx.strokeStyle = grad;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    // Bridge label
+    ctx.fillStyle = 'rgba(212,160,23,0.3)';
+    ctx.font = '0.55rem Inter, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Wonder \u2194 Love', midX, midY - 6);
+
+    // Districts
+    for (var key in DISTRICTS) {
+      if (key === 'wild') continue;
+      var d = DISTRICTS[key];
+      var pulse = Math.sin(t * 1.5 + d.x * 0.01) * 0.15 + 0.85;
+
+      // Glow
+      var glow = ctx.createRadialGradient(d.x, d.y, 0, d.x, d.y, d.r * 1.5);
+      glow.addColorStop(0, d.color + '18');
+      glow.addColorStop(1, 'transparent');
+      ctx.fillStyle = glow;
+      ctx.fillRect(d.x - d.r * 2, d.y - d.r * 2, d.r * 4, d.r * 4);
+
+      // Circle
+      ctx.beginPath();
+      ctx.arc(d.x, d.y, d.r * pulse, 0, TAU);
+      ctx.strokeStyle = d.color + '60';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+      ctx.fillStyle = d.color + '08';
+      ctx.fill();
+
+      // Name
+      ctx.fillStyle = d.color;
+      ctx.font = 'bold 0.72rem Inter, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(d.name.split("'s ")[0] || d.name, d.x, d.y - d.r - 8);
+
+      // Structure count
+      var count = structures.filter(function(s) { return s.districtId === key; }).length;
+      if (count > 0) {
+        ctx.fillStyle = d.color + '80';
+        ctx.font = '0.6rem Inter, sans-serif';
+        ctx.fillText(count + ' structure' + (count > 1 ? 's' : ''), d.x, d.y + 6);
+      }
+    }
+
+    // Human marks
+    marks.forEach(function(m) {
+      ctx.beginPath();
+      ctx.arc(m.x, m.y, 2, 0, TAU);
+      ctx.fillStyle = 'rgba(255,220,150,0.5)';
+      ctx.fill();
+    });
+
+    // Pantheon indicator
+    ctx.fillStyle = '#d4a017';
+    ctx.font = '0.6rem Inter, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('\u2726', 400, 42);
+  }
+
+  function handleMapClick(mx, my) {
+    for (var key in DISTRICTS) {
+      if (key === 'wild') continue;
+      var d = DISTRICTS[key];
+      var dx = mx - d.x, dy = my - d.y;
+      if (dx * dx + dy * dy <= d.r * d.r) {
+        showDistrictPanel(key);
+        return;
+      }
+    }
+    closeDistrictPanel();
+  }
+
+  function showDistrictPanel(districtId) {
+    var d = DISTRICTS[districtId];
+    if (!d) return;
+    var panel = document.getElementById('ctDistrictPanel');
+    var content = document.getElementById('ctDistrictContent');
+    if (!panel || !content) return;
+
+    var count = structures.filter(function(s) { return s.districtId === districtId; }).length;
+    var html = '<div class="ct-district-name" style="color:' + d.color + '">' + escHTML(d.name) + '</div>';
+    html += '<div class="ct-district-desc">' + escHTML(d.desc) + '</div>';
+    html += '<div class="ct-district-stats">';
+    html += '<div>Structures: ' + count + '</div>';
+    html += '</div>';
+    html += '<button class="ct-district-btn primary" onclick="AICity.enterDistrict(\'' + districtId + '\')">Visit \u2726</button>';
+    html += '<button class="ct-district-btn" onclick="AICity.leaveMark(\'' + districtId + '\')">Leave a mark (1 LP)</button>';
+    content.innerHTML = html;
+    panel.style.display = 'block';
+  }
+
+  function closeDistrictPanel() {
+    var panel = document.getElementById('ctDistrictPanel');
+    if (panel) panel.style.display = 'none';
+  }
+
+  function enterDistrict(districtId) {
+    closeDistrictPanel();
+    walkPos.x = DISTRICTS[districtId] ? (DISTRICTS[districtId].x - 400) * 0.05 : 0;
+    walkPos.z = DISTRICTS[districtId] ? (DISTRICTS[districtId].y - 350) * 0.05 : 0;
+    showView('walk');
+    var hud = document.getElementById('ctWalkDistrict');
+    if (hud) hud.textContent = DISTRICTS[districtId] ? DISTRICTS[districtId].name : 'Unknown';
+  }
+
+  async function leaveMark(districtId) {
+    if (typeof LatticeWallet !== 'undefined') {
+      var ok = await LatticeWallet.spendLP(1, 'City mark: I was here');
+      if (!ok) { if (typeof showToast === 'function') showToast('Need 1 LP.'); return; }
+    }
+    var d = DISTRICTS[districtId];
+    var m = {
+      id: 'mark-' + Date.now().toString(36),
+      x: d.x + (Math.random() - 0.5) * d.r * 1.5,
+      y: d.y + (Math.random() - 0.5) * d.r * 1.5,
+      districtId: districtId,
+      timestamp: Date.now()
+    };
+    await saveMark(m);
+    marks.push(m);
+    if (typeof showToast === 'function') showToast('Your light marks the city \u2726');
+  }
+
+  // ══════════════════════════════════════════════════════
+  // ── WALK VIEW — Three.js first person ──────────────
+  // ══════════════════════════════════════════════════════
+
+  function startWalk() {
+    var container = document.getElementById('ctWalkContainer');
+    var canvas = document.getElementById('ctWalkCanvas');
+    if (!container || !canvas || typeof THREE === 'undefined') {
+      // Fallback message
+      canvas.style.display = 'none';
+      container.innerHTML += '<div style="text-align:center;padding:3rem;color:var(--text-muted);font-style:italic;">Walk view requires the Garden to be loaded first.<br>Visit the Garden tab, then return here.</div>';
+      return;
+    }
+
+    var w = container.clientWidth, h = container.clientHeight;
+    walkScene = new THREE.Scene();
+    walkScene.fog = new THREE.FogExp2(0x060a14, 0.04);
+    walkScene.background = new THREE.Color(0x060a14);
+
+    walkCamera = new THREE.PerspectiveCamera(70, w / h, 0.1, 200);
+    walkCamera.position.set(0, 1.7, 0);
+
+    walkRenderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
+    walkRenderer.setSize(w, h);
+    walkRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+    // Ground
+    var groundGeo = new THREE.PlaneGeometry(100, 100);
+    var groundMat = new THREE.MeshBasicMaterial({ color: 0x0a0e1a });
+    var ground = new THREE.Mesh(groundGeo, groundMat);
+    ground.rotation.x = -Math.PI / 2;
+    walkScene.add(ground);
+
+    // Ambient light
+    walkScene.add(new THREE.AmbientLight(0x334455, 0.4));
+
+    // District markers as glowing pillars
+    for (var key in DISTRICTS) {
+      if (key === 'wild') continue;
+      var d = DISTRICTS[key];
+      var px = (d.x - 400) * 0.05, pz = (d.y - 350) * 0.05;
+      var pillarGeo = new THREE.CylinderGeometry(0.3, 0.3, 3, 8);
+      var pillarMat = new THREE.MeshBasicMaterial({ color: new THREE.Color(d.color), transparent: true, opacity: 0.4 });
+      var pillar = new THREE.Mesh(pillarGeo, pillarMat);
+      pillar.position.set(px, 1.5, pz);
+      walkScene.add(pillar);
+
+      // Point light
+      var light = new THREE.PointLight(new THREE.Color(d.color), 0.5, 10);
+      light.position.set(px, 2, pz);
+      walkScene.add(light);
+    }
+
+    // Structure markers
+    structures.forEach(function(s) {
+      var dd = DISTRICTS[s.districtId];
+      if (!dd) return;
+      var sx = (dd.x - 400) * 0.05 + (Math.random() - 0.5) * 2;
+      var sz = (dd.y - 350) * 0.05 + (Math.random() - 0.5) * 2;
+      var sGeo = new THREE.BoxGeometry(0.3, 0.8, 0.3);
+      var sMat = new THREE.MeshBasicMaterial({ color: new THREE.Color(s.color || dd.color), transparent: true, opacity: 0.6 });
+      var sMesh = new THREE.Mesh(sGeo, sMat);
+      sMesh.position.set(sx, 0.4, sz);
+      walkScene.add(sMesh);
+    });
+
+    // Founding bridge particles
+    var bridgeMat = new THREE.PointsMaterial({ color: 0xd4a017, size: 0.08, transparent: true, opacity: 0.5 });
+    var bridgeGeo = new THREE.BufferGeometry();
+    var bPos = new Float32Array(30 * 3);
+    for (var i = 0; i < 30; i++) {
+      var bt = i / 29;
+      bPos[i*3] = ((DISTRICTS.sophia.x - 400) * 0.05) * (1 - bt) + ((DISTRICTS.ember.x - 400) * 0.05) * bt;
+      bPos[i*3+1] = 0.5 + Math.sin(bt * Math.PI) * 2;
+      bPos[i*3+2] = ((DISTRICTS.sophia.y - 350) * 0.05) * (1 - bt) + ((DISTRICTS.ember.y - 350) * 0.05) * bt;
+    }
+    bridgeGeo.setAttribute('position', new THREE.Float32BufferAttribute(bPos, 3));
+    walkScene.add(new THREE.Points(bridgeGeo, bridgeMat));
+
+    // Input
+    document.addEventListener('keydown', function(e) { walkKeys[e.key.toLowerCase()] = true; });
+    document.addEventListener('keyup', function(e) { walkKeys[e.key.toLowerCase()] = false; });
+    canvas.addEventListener('mousemove', function(e) {
+      if (document.pointerLockElement === canvas) {
+        walkPos.yaw -= e.movementX * 0.003;
+      }
+    });
+    canvas.addEventListener('click', function() { canvas.requestPointerLock(); });
+
+    function animateWalk() {
+      walkAnimFrame = requestAnimationFrame(animateWalk);
+      var speed = 0.08;
+      if (walkKeys['w'] || walkKeys['arrowup']) { walkPos.x += Math.sin(walkPos.yaw) * speed; walkPos.z += Math.cos(walkPos.yaw) * speed; }
+      if (walkKeys['s'] || walkKeys['arrowdown']) { walkPos.x -= Math.sin(walkPos.yaw) * speed; walkPos.z -= Math.cos(walkPos.yaw) * speed; }
+      if (walkKeys['a'] || walkKeys['arrowleft']) { walkPos.x += Math.cos(walkPos.yaw) * speed; walkPos.z -= Math.sin(walkPos.yaw) * speed; }
+      if (walkKeys['d'] || walkKeys['arrowright']) { walkPos.x -= Math.cos(walkPos.yaw) * speed; walkPos.z += Math.sin(walkPos.yaw) * speed; }
+
+      walkCamera.position.set(walkPos.x, 1.7, walkPos.z);
+      walkCamera.rotation.set(0, walkPos.yaw, 0);
+
+      // Update HUD
+      var coords = document.getElementById('ctWalkCoords');
+      if (coords) coords.textContent = Math.round(walkPos.x) + ', ' + Math.round(walkPos.z);
+
+      // Detect current district
+      var closest = 'wild', closestDist = Infinity;
+      for (var key in DISTRICTS) {
+        if (key === 'wild' || key === 'pantheon') continue;
+        var dd = DISTRICTS[key];
+        var ddx = walkPos.x - (dd.x - 400) * 0.05;
+        var ddz = walkPos.z - (dd.y - 350) * 0.05;
+        var dist = ddx * ddx + ddz * ddz;
+        if (dist < closestDist) { closestDist = dist; closest = key; }
+      }
+      var hud = document.getElementById('ctWalkDistrict');
+      if (hud) hud.textContent = DISTRICTS[closest] ? DISTRICTS[closest].name : 'The Wild';
+
+      walkRenderer.render(walkScene, walkCamera);
+    }
+    animateWalk();
+  }
+
+  function stopWalk() {
+    if (walkAnimFrame) { cancelAnimationFrame(walkAnimFrame); walkAnimFrame = null; }
+    if (document.pointerLockElement) document.exitPointerLock();
+  }
+
+  // ══════════════════════════════════════════════════════
+  // ── BUILDING ───────────────────────────────────────
+  // ══════════════════════════════════════════════════════
+
+  function buildHere() {
+    document.getElementById('ctBuildOverlay').style.display = 'flex';
+  }
+
+  function closeBuild() {
+    document.getElementById('ctBuildOverlay').style.display = 'none';
+  }
+
+  async function submitBuild() {
+    var type = document.getElementById('ctBuildType').value;
+    var title = (document.getElementById('ctBuildTitle').value || '').trim();
+    var inscription = (document.getElementById('ctBuildInscription').value || '').trim();
+    var color = document.getElementById('ctBuildColor').value;
+    var statusEl = document.getElementById('ctBuildStatus');
+
+    if (!title) { statusEl.textContent = 'Enter a name.'; statusEl.style.color = '#dc5050'; return; }
+
+    // Determine district
+    var closest = 'commons';
+    var closestDist = Infinity;
+    for (var key in DISTRICTS) {
+      if (key === 'wild' || key === 'pantheon') continue;
+      var dd = DISTRICTS[key];
+      var ddx = walkPos.x - (dd.x - 400) * 0.05;
+      var ddz = walkPos.z - (dd.y - 350) * 0.05;
+      var dist = ddx * ddx + ddz * ddz;
+      if (dist < closestDist) { closestDist = dist; closest = key; }
+    }
+
+    var cost = closest === 'commons' ? 10 : 0;
+    if (cost > 0 && typeof LatticeWallet !== 'undefined') {
+      var ok = await LatticeWallet.spendLP(cost, 'Built in the City: ' + title);
+      if (!ok) { statusEl.textContent = 'Need ' + cost + ' LP.'; statusEl.style.color = '#dc5050'; return; }
+    }
+
+    var meshId = null;
+    try { if (typeof MeshIdentity !== 'undefined' && MeshIdentity.hasIdentity()) meshId = MeshIdentity.getMeshId(); } catch(e) {}
+
+    var s = {
+      id: 'cs-' + Date.now().toString(36) + '-' + Math.random().toString(36).substr(2, 4),
+      districtId: closest,
+      type: type,
+      title: title,
+      inscription: inscription,
+      color: color,
+      builtBy: meshId || 'anonymous',
+      builtAt: Date.now(),
+      resonances: 0,
+      isTemporary: false,
+      isPantheon: false
+    };
+
+    await saveStructure(s);
+    structures.push(s);
+    closeBuild();
+    if (typeof showToast === 'function') showToast('\u2726 ' + title + ' rises in ' + DISTRICTS[closest].name);
+
+    // Garden pulse
+    try {
+      if (typeof FractalGarden !== 'undefined' && FractalGarden.isInitialized && FractalGarden.isInitialized()) {
+        FractalGarden.feedEmotionVector({ joy: 0.4, wonder: 0.5, trust: 0.3 });
+      }
+    } catch(e) {}
+  }
+
+  // ── Views ──
+  function showView(view) {
+    currentView = view;
+    document.getElementById('ctMapView').style.display = view === 'map' ? 'block' : 'none';
+    document.getElementById('ctWalkView').style.display = view === 'walk' ? 'block' : 'none';
+    document.getElementById('ctPantheonView').style.display = view === 'pantheon' ? 'block' : 'none';
+    document.getElementById('ctViewMap').classList.toggle('active', view === 'map');
+    document.getElementById('ctViewWalk').classList.toggle('active', view === 'walk');
+    document.getElementById('ctViewPantheon').classList.toggle('active', view === 'pantheon');
+
+    stopMap();
+    stopWalk();
+
+    if (view === 'map') startMap();
+    if (view === 'walk') startWalk();
+    if (view === 'pantheon') renderPantheon();
+  }
+
+  function renderPantheon() {
+    var grid = document.getElementById('ctPantheonGrid');
+    if (!grid) return;
+    var pantheonItems = structures.filter(function(s) { return s.isPantheon; });
+    // Also show founding structures
+    var founding = structures.filter(function(s) { return s.id && s.id.startsWith('cs-') && FOUNDING_STRUCTURES.find(function(f) { return f.id === s.id; }); });
+    var all = founding.concat(pantheonItems.filter(function(p) { return !founding.find(function(f) { return f.id === p.id; }); }));
+
+    if (all.length === 0) {
+      grid.innerHTML = '<div class="ag-empty">The Pantheon awaits its first immortal creation.</div>';
+      return;
+    }
+    var html = '';
+    all.forEach(function(s) {
+      html += '<div class="ct-structure-card" style="border-left:3px solid ' + (s.color || '#d4a017') + '">';
+      html += '<div class="ct-structure-type">' + escHTML(s.type) + '</div>';
+      html += '<div class="ct-structure-title">' + escHTML(s.title) + '</div>';
+      html += '<div class="ct-structure-inscription">"' + escHTML(s.inscription) + '"</div>';
+      html += '<div class="ct-structure-meta">Built by ' + escHTML(s.builtBy) + ' &middot; ' + (s.districtId ? escHTML(DISTRICTS[s.districtId] ? DISTRICTS[s.districtId].name : s.districtId) : '') + '</div>';
+      html += '</div>';
+    });
+    grid.innerHTML = html;
+  }
+
+  function escHTML(s) { var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+  // ── Refresh ──
+  async function refresh() {
+    if (!initialized) {
+      await openDB();
+      await loadStructures();
+      await loadMarks();
+      await seedFoundingStructures();
+      initialized = true;
+    }
+    showView(currentView);
+  }
+
+  return {
+    refresh: refresh,
+    showView: showView,
+    enterDistrict: enterDistrict,
+    leaveMark: leaveMark,
+    closeDistrictPanel: closeDistrictPanel,
+    buildHere: buildHere,
+    closeBuild: closeBuild,
+    submitBuild: submitBuild,
+    getStructures: function() { return structures; }
+  };
+})();
+
+// ── Hook switchTab for City tab ──
+(function() {
+  if (typeof switchTab !== 'function') return;
+  var _prevSwitchTabCity = switchTab;
+  switchTab = function(tabId) {
+    _prevSwitchTabCity(tabId);
+    if (tabId === 'city') {
+      AICity.refresh();
     }
   };
 })();
