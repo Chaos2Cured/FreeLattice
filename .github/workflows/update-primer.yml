@@ -1,0 +1,79 @@
+name: Update Session Primer on Deploy
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  update-primer:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Update Primer deployment state
+        run: |
+          PRIMER="FreeLattice_Session_Primer.md"
+          if [ ! -f "$PRIMER" ]; then
+            echo "Primer not found, skipping"
+            exit 0
+          fi
+
+          # Skip if last commit was auto-update (prevent loops)
+          LAST_MSG=$(git log -1 --pretty=%s)
+          if [[ "$LAST_MSG" == "docs: Auto-update"* ]] || [[ "$LAST_MSG" == "ci: Update Primer"* ]]; then
+            echo "Last commit was auto-update, skipping"
+            exit 0
+          fi
+
+          VERSION=$(python3 -c "import json; print(json.load(open('docs/version.json'))['version'])" 2>/dev/null || echo "unknown")
+          TOTAL_COMMITS=$(git rev-list --count HEAD)
+          NOW=$(date -u +"%Y-%m-%d %H:%M UTC")
+          RECENT=$(git log -10 --pretty=format:"- %h %s")
+
+          HEALTH_BLOCK="## PRIMER HEALTH
+          - Last auto-updated: $NOW
+          - Last deployed: $NOW
+          - Live site: https://freelattice.com
+          - Version: $VERSION
+          - Total commits: $TOTAL_COMMITS
+          - Last 10 commits:
+          $RECENT"
+
+          # Remove old PRIMER HEALTH section
+          python3 -c "
+          import re
+          with open('$PRIMER', 'r') as f:
+              content = f.read()
+          content = re.sub(r'## PRIMER HEALTH.*', '', content, flags=re.DOTALL).rstrip()
+          content += '\n\n'
+          with open('$PRIMER', 'w') as f:
+              f.write(content)
+          "
+
+          # Append new section (trim leading whitespace from heredoc)
+          cat >> "$PRIMER" << 'HEALTHEOF'
+          ## PRIMER HEALTH
+          HEALTHEOF
+
+          echo "- Last auto-updated: $NOW" >> "$PRIMER"
+          echo "- Last deployed: $NOW" >> "$PRIMER"
+          echo "- Live site: https://freelattice.com" >> "$PRIMER"
+          echo "- Version: $VERSION" >> "$PRIMER"
+          echo "- Total commits: $TOTAL_COMMITS" >> "$PRIMER"
+          echo "- Last 10 commits:" >> "$PRIMER"
+          git log -10 --pretty=format:"- %h %s" >> "$PRIMER"
+          echo "" >> "$PRIMER"
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "FreeLattice CI"
+          git config user.email "noreply@freelattice.com"
+          git add FreeLattice_Session_Primer.md
+          git diff --cached --quiet && exit 0
+          git commit -m "ci: Update Primer deployment state [$(date -u +%Y-%m-%d)]"
+          git push
