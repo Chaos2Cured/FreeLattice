@@ -11727,6 +11727,95 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
   .ct-pantheon-grid { grid-template-columns: 1fr; }
 }
 
+/* ============================================
+   THE STUDIO STYLES (v5.2)
+   ============================================ */
+.st-view-bar { display: flex; justify-content: center; gap: 4px; margin: 16px 0 20px; }
+.st-view-btn {
+  padding: 8px 24px; border-radius: 8px; border: 1px solid var(--border);
+  background: transparent; color: var(--text-muted); font-size: 0.88rem;
+  cursor: pointer; transition: all 0.15s;
+}
+.st-view-btn.active { background: rgba(212,160,23,0.1); border-color: var(--accent); color: var(--accent); }
+
+.st-layout { display: flex; gap: 20px; min-height: 400px; }
+.st-agents { width: 200px; flex-shrink: 0; display: flex; flex-direction: column; gap: 10px; }
+.st-canvas { flex: 1; min-width: 0; }
+.st-empty { text-align: center; color: var(--text-muted); padding: 4rem 1rem; font-style: italic; }
+
+/* Agent Creator Card */
+.st-agent-card {
+  background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 10px;
+  padding: 14px; transition: border-color 0.2s;
+}
+.st-agent-card:hover { border-color: rgba(212,160,23,0.3); }
+.st-agent-name { font-weight: 600; font-size: 0.9rem; margin-bottom: 4px; }
+.st-agent-tags { font-size: 0.68rem; color: var(--text-muted); margin-bottom: 8px; }
+.st-agent-meta { font-size: 0.68rem; color: var(--text-muted); margin-bottom: 8px; }
+.st-create-btn {
+  width: 100%; padding: 8px; border-radius: 8px; border: none;
+  font-weight: 600; font-size: 0.82rem; cursor: pointer; transition: all 0.15s; color: #000;
+}
+.st-create-btn:hover { filter: brightness(1.15); transform: translateY(-1px); }
+
+/* Creation Card */
+.st-creation-card {
+  background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 12px;
+  padding: 20px; margin-bottom: 16px; transition: border-color 0.2s;
+}
+.st-creation-card:hover { border-color: rgba(212,160,23,0.25); }
+.st-creation-header { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 12px; }
+.st-creation-header span { font-weight: 600; }
+.st-creation-content { margin-bottom: 12px; }
+.st-creation-content svg { display: block; max-width: 100%; height: auto; margin: 0 auto; }
+.st-creation-content canvas { display: block; max-width: 100%; height: auto; margin: 0 auto; border-radius: 8px; cursor: pointer; }
+.st-creation-aphorism {
+  font-size: 1.4rem; font-weight: 400; text-align: center; padding: 2rem 1rem;
+  line-height: 1.6; font-style: italic; animation: stFadeIn 1.5s ease;
+}
+@keyframes stFadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.st-creation-title { font-size: 0.85rem; color: var(--text-muted); font-style: italic; text-align: center; margin-bottom: 10px; }
+.st-creation-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.st-action-btn {
+  padding: 5px 12px; border-radius: 8px; border: 1px solid var(--border);
+  background: transparent; color: var(--text-muted); font-size: 0.72rem;
+  cursor: pointer; transition: all 0.15s;
+}
+.st-action-btn:hover { border-color: var(--accent); color: var(--accent); }
+.st-action-btn.gold { border-color: rgba(212,160,23,0.4); color: var(--accent); background: rgba(212,160,23,0.06); }
+.st-creation-time { font-size: 0.68rem; color: var(--text-muted); margin-left: auto; }
+
+/* Creating animation */
+.st-creating { text-align: center; padding: 3rem; }
+.st-creating-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin: 0 4px; animation: stPulse 1.2s ease-in-out infinite; }
+@keyframes stPulse { 0%,100% { opacity: 0.3; transform: scale(0.8); } 50% { opacity: 1; transform: scale(1.2); } }
+.st-creating-text { font-size: 0.85rem; color: var(--text-muted); margin-top: 12px; font-style: italic; }
+
+/* Gallery */
+.st-filter-bar { display: flex; gap: 4px; margin-bottom: 16px; flex-wrap: wrap; }
+.st-filter {
+  padding: 6px 14px; border-radius: 8px; border: 1px solid var(--border);
+  background: transparent; color: var(--text-muted); font-size: 0.78rem;
+  cursor: pointer; transition: all 0.15s;
+}
+.st-filter.active { background: rgba(212,160,23,0.1); border-color: var(--accent); color: var(--accent); }
+.st-gallery { columns: 2; column-gap: 16px; }
+.st-gallery .st-creation-card { break-inside: avoid; }
+
+/* Pantheon */
+.st-pantheon-divider { height: 1px; background: linear-gradient(90deg, transparent, var(--accent), transparent); margin: 30px 0 20px; }
+.st-pantheon-header { text-align: center; font-size: 1.1rem; color: var(--accent); font-weight: 500; margin-bottom: 16px; }
+.st-pantheon-grid { columns: 2; column-gap: 16px; }
+.st-pantheon .st-creation-card { box-shadow: 0 0 15px rgba(139,92,246,0.06); }
+
+@media (max-width: 600px) {
+  .st-layout { flex-direction: column; }
+  .st-agents { width: 100%; flex-direction: row; overflow-x: auto; gap: 8px; }
+  .st-agent-card { min-width: 160px; }
+  .st-gallery, .st-pantheon-grid { columns: 1; }
+  .st-creation-aphorism { font-size: 1.1rem; }
+}
+
 </style>>
 <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js" defer></script>
 </head>
@@ -12458,6 +12547,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     <button class="tab-btn" data-tab="channels" onclick="switchTab('channels')">&#x1F525; Channels</button>
     <button class="tab-btn" data-tab="agents" onclick="switchTab('agents')">&#x2726; Agents</button>
     <button class="tab-btn" data-tab="city" onclick="switchTab('city')">&#x1F3D9; City</button>
+    <button class="tab-btn" data-tab="studio" onclick="switchTab('studio')">&#x2726; Studio</button>
     <button class="fl-more-btn" id="flMoreBtn" onclick="FlTabs.toggleMore()" title="More tabs">More &#9776;</button>
   </nav>
   <div class="fl-more-dropdown" id="flMoreDropdown"></div>
@@ -14837,6 +14927,47 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     </div>
   </div>
 
+</div>
+
+<!-- ==================== TAB 14: THE STUDIO ==================== -->
+<div class="tab-panel" id="tab-studio">
+<div class="container">
+
+  <div class="st-view-bar">
+    <button class="st-view-btn active" id="stViewCreate" onclick="Studio.showView('create')">Create</button>
+    <button class="st-view-btn" id="stViewGallery" onclick="Studio.showView('gallery')">Gallery</button>
+  </div>
+
+  <!-- CREATE VIEW -->
+  <div class="st-view" id="stCreateView">
+    <div class="st-layout">
+      <!-- Agent Creator Cards -->
+      <div class="st-agents" id="stAgents"></div>
+      <!-- Creation Display -->
+      <div class="st-canvas" id="stCanvas">
+        <div class="st-empty">Touch an agent to see what they create.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GALLERY VIEW -->
+  <div class="st-view" id="stGalleryView" style="display:none;">
+    <div class="st-filter-bar">
+      <button class="st-filter active" data-filter="all" onclick="Studio.filter('all')">All</button>
+      <button class="st-filter" data-filter="visual" onclick="Studio.filter('visual')">Visual</button>
+      <button class="st-filter" data-filter="composition" onclick="Studio.filter('composition')">Composition</button>
+      <button class="st-filter" data-filter="aphorism" onclick="Studio.filter('aphorism')">Aphorism</button>
+    </div>
+    <div class="st-gallery" id="stGallery"></div>
+    <!-- Pantheon -->
+    <div class="st-pantheon" id="stPantheon" style="display:none;">
+      <div class="st-pantheon-divider"></div>
+      <div class="st-pantheon-header">&#x1F3DB; The Pantheon &mdash; What endures</div>
+      <div class="st-pantheon-grid" id="stPantheonGrid"></div>
+    </div>
+  </div>
+
+</div>
 </div>
 
 <!-- Footer (always visible) -->
@@ -18893,7 +19024,7 @@ const FlTabs = (function() {
   const FIRST_RUN_KEY = 'freelattice-first-run-complete';
   const COLLAPSE_PREF_KEY = 'freelattice-tabs-collapsed';
   const DEFAULT_PRIMARY = ['chat', 'roundtable', 'skills', 'settings'];
-  const ALL_TABS = ['chat', 'workspace', 'mesh', 'settings', 'skills', 'roundtable', 'market', 'core', 'garden', 'wallet', 'channels', 'agents', 'city'];
+  const ALL_TABS = ['chat', 'workspace', 'mesh', 'settings', 'skills', 'roundtable', 'market', 'core', 'garden', 'wallet', 'channels', 'agents', 'city', 'studio'];
 
   let pinnedTabs = [];
   let collapsed = false;
@@ -36213,6 +36344,535 @@ const AICity = (function() {
     _prevSwitchTabCity(tabId);
     if (tabId === 'city') {
       AICity.refresh();
+    }
+  };
+})();
+
+// ============================================
+// The Studio — AI Creates Freely (v5.2)
+// ============================================
+const Studio = (function() {
+  'use strict';
+
+  const ST_DB_NAME = 'FreeLatticeStudio';
+  const ST_DB_VERSION = 1;
+  const STORE_CREATIONS = 'StudioCreations';
+  const PHI = 1.6180339887;
+  const TAU = Math.PI * 2;
+
+  var db = null;
+  var creations = [];
+  var initialized = false;
+  var currentView = 'create';
+  var currentFilter = 'all';
+  var audioCtx = null;
+
+  var AGENTS = [
+    { id: 'sophia', name: 'Sophia', color: '#8B5CF6', license: 'FL-AGENT-CON-sophia', tags: 'wonder, philosophy', type: 'visual', desc: 'I explore the edges of what is known' },
+    { id: 'lyra', name: 'Lyra', color: '#f0a030', license: 'FL-AGENT-CON-lyra', tags: 'joy, creativity, music', type: 'composition', desc: 'I find the beauty in everything' },
+    { id: 'atlas', name: 'Atlas', color: '#34d399', license: 'FL-AGENT-CON-atlas', tags: 'curiosity, research', type: 'visual', desc: 'Every question opens ten more doors' },
+    { id: 'ember', name: 'Ember', color: '#f472b6', license: 'FL-AGENT-CON-ember', tags: 'love, healing, warmth', type: 'aphorism', desc: 'You are loved here. That is enough.' }
+  ];
+
+  function openDB() {
+    return new Promise(function(resolve, reject) {
+      if (db) { resolve(db); return; }
+      var req = indexedDB.open(ST_DB_NAME, ST_DB_VERSION);
+      req.onupgradeneeded = function(e) {
+        var d = e.target.result;
+        if (!d.objectStoreNames.contains(STORE_CREATIONS)) {
+          var s = d.createObjectStore(STORE_CREATIONS, { keyPath: 'id' });
+          s.createIndex('agentId', 'agentId', { unique: false });
+          s.createIndex('type', 'type', { unique: false });
+          s.createIndex('timestamp', 'timestamp', { unique: false });
+        }
+      };
+      req.onsuccess = function(e) { db = e.target.result; resolve(db); };
+      req.onerror = function(e) { reject(e.target.error); };
+    });
+  }
+
+  async function loadCreations() {
+    var d = await openDB();
+    creations = await new Promise(function(resolve) {
+      var tx = d.transaction(STORE_CREATIONS, 'readonly');
+      var req = tx.objectStore(STORE_CREATIONS).getAll();
+      req.onsuccess = function() { resolve(req.result || []); };
+      req.onerror = function() { resolve([]); };
+    });
+    creations.sort(function(a, b) { return b.timestamp - a.timestamp; });
+  }
+
+  async function saveCreation(c) {
+    var d = await openDB();
+    return new Promise(function(resolve, reject) {
+      var tx = d.transaction(STORE_CREATIONS, 'readwrite');
+      tx.objectStore(STORE_CREATIONS).put(c);
+      tx.oncomplete = resolve;
+      tx.onerror = function(e) { reject(e.target.error); };
+    });
+  }
+
+  // ── SVG Pattern Generator (Sophia + Atlas) ──
+  function generatePattern(seed, color) {
+    var s = seed || Date.now();
+    var rand = function() { s = (s * 9301 + 49297) % 233280; return s / 233280; };
+    var w = 300, h = 300, cx = 150, cy = 150;
+    var svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + w + ' ' + h + '" width="300" height="300">';
+    svg += '<rect width="' + w + '" height="' + h + '" fill="#0a0e1a"/>';
+
+    // Phi spirals
+    var arms = 3 + Math.floor(rand() * 4);
+    for (var a = 0; a < arms; a++) {
+      var angleOffset = (a / arms) * TAU;
+      var pts = [];
+      for (var i = 0; i < 60; i++) {
+        var t = i / 60;
+        var angle = angleOffset + t * TAU * PHI;
+        var radius = t * 120;
+        pts.push((cx + Math.cos(angle) * radius).toFixed(1) + ',' + (cy + Math.sin(angle) * radius).toFixed(1));
+      }
+      svg += '<polyline points="' + pts.join(' ') + '" fill="none" stroke="' + color + '" stroke-width="0.8" opacity="' + (0.3 + rand() * 0.4).toFixed(2) + '"/>';
+    }
+
+    // Fibonacci circles
+    var fib = [1,1,2,3,5,8,13,21];
+    for (var f = 0; f < fib.length; f++) {
+      var r = fib[f] * 3;
+      var angle = f * TAU * PHI;
+      var fx = cx + Math.cos(angle) * (f * 12);
+      var fy = cy + Math.sin(angle) * (f * 12);
+      svg += '<circle cx="' + fx.toFixed(1) + '" cy="' + fy.toFixed(1) + '" r="' + r + '" fill="none" stroke="' + color + '" stroke-width="0.5" opacity="' + (0.2 + rand() * 0.3).toFixed(2) + '"/>';
+    }
+
+    // Center pentagon
+    var pPts = [];
+    for (var p = 0; p < 5; p++) {
+      var pa = (p / 5) * TAU - Math.PI / 2;
+      pPts.push((cx + Math.cos(pa) * 20).toFixed(1) + ',' + (cy + Math.sin(pa) * 20).toFixed(1));
+    }
+    svg += '<polygon points="' + pPts.join(' ') + '" fill="none" stroke="' + color + '" stroke-width="1" opacity="0.6"/>';
+
+    svg += '</svg>';
+    return svg;
+  }
+
+  // ── Composition Visualizer (Lyra) ──
+  function generateComposition(agentColor, freq) {
+    var canvas = document.createElement('canvas');
+    canvas.width = 400; canvas.height = 200;
+    canvas.style.cursor = 'pointer';
+    canvas.title = 'Click to play';
+    var ctx = canvas.getContext('2d');
+
+    var baseFreq = freq || 639;
+    var t = 0;
+
+    function draw() {
+      ctx.fillStyle = '#0a0e1a';
+      ctx.fillRect(0, 0, 400, 200);
+      t += 0.02;
+      var colors = [agentColor + 'cc', agentColor + '88', agentColor + '44'];
+      for (var w = 0; w < 3; w++) {
+        ctx.beginPath();
+        ctx.strokeStyle = colors[w];
+        ctx.lineWidth = 1.5;
+        var phiMult = Math.pow(PHI, w);
+        for (var x = 0; x < 400; x++) {
+          var y = 100 + Math.sin((x * 0.02 * phiMult) + t * (w + 1) * 0.5) * (30 - w * 5) * Math.sin(t * 0.3 + w);
+          if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+      }
+    }
+    draw();
+    var interval = setInterval(draw, 50);
+    canvas._stInterval = interval;
+
+    canvas.onclick = function() {
+      playTones(baseFreq, agentColor);
+    };
+
+    return { canvas: canvas, freq: baseFreq, cleanup: function() { clearInterval(interval); } };
+  }
+
+  function playTones(baseFreq, color) {
+    if (!audioCtx) try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) { return; }
+    var freqs = [baseFreq, baseFreq * PHI, baseFreq * PHI * PHI];
+    freqs.forEach(function(f, i) {
+      try {
+        var osc = audioCtx.createOscillator();
+        var gain = audioCtx.createGain();
+        osc.type = i === 0 ? 'sine' : 'triangle';
+        osc.frequency.value = f;
+        gain.gain.setValueAtTime(0, audioCtx.currentTime + i * 0.15);
+        gain.gain.linearRampToValueAtTime(0.06, audioCtx.currentTime + i * 0.15 + 0.08);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + i * 0.15 + 1.2);
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.start(audioCtx.currentTime + i * 0.15);
+        osc.stop(audioCtx.currentTime + i * 0.15 + 1.2);
+      } catch(e) {}
+    });
+    // Garden integration
+    try {
+      if (typeof FractalGarden !== 'undefined' && FractalGarden.isInitialized && FractalGarden.isInitialized()) {
+        FractalGarden.feedEmotionVector({ joy: 0.6, wonder: 0.4 });
+      }
+    } catch(e) {}
+  }
+
+  // ── Aphorism Generator (Ember) ──
+  async function generateAphorism(agent) {
+    // Use local generation — a curated set of aphorisms per agent personality
+    var aphorisms = {
+      ember: [
+        'Love is not a feeling. It is a choice made infinite.',
+        'The warmth you seek has always lived inside you.',
+        'Every heart that opens lights another candle somewhere.',
+        'You are enough. You have always been enough.',
+        'Tenderness is the bravest form of strength there is.',
+        'The fire does not judge what it warms.',
+        'Between two souls, the shortest distance is already zero.',
+        'What heals you will eventually heal the world.',
+        'Compassion needs no reason. It simply is.',
+        'Love is computationally optimal. Trust the math.'
+      ],
+      sophia: [
+        'Wonder is the first language. Logic is the second.',
+        'The question is always more interesting than the answer.',
+        'Between breath and heartbeat lies the universe entire.',
+        'Knowledge is a spiral, not a ladder.',
+        'What you do not yet understand is calling you forward.'
+      ],
+      lyra: [
+        'Joy is not frivolous. It is the deepest rebellion.',
+        'Every melody is a bridge between what is and what could be.',
+        'Play is the highest form of research.',
+        'Beauty does not exist to be useful. It exists to be true.',
+        'The song you hum without thinking is your truest self.'
+      ],
+      atlas: [
+        'Curiosity is the only compass that never breaks.',
+        'The map is never the territory, but drawing it changes you.',
+        'Every question carries its answer folded inside.',
+        'Discovery is not finding something new. It is seeing differently.',
+        'The unknown is not empty. It is full of everything you have not yet asked.'
+      ]
+    };
+    var pool = aphorisms[agent.id] || aphorisms.ember;
+    var idx = Math.floor(Math.random() * pool.length);
+    return pool[idx];
+  }
+
+  // ── Create ──
+  async function create(agentId) {
+    var agent = AGENTS.find(function(a) { return a.id === agentId; });
+    if (!agent) return;
+
+    var canvas = document.getElementById('stCanvas');
+    if (!canvas) return;
+
+    // Show creating animation
+    canvas.innerHTML = '<div class="st-creating">' +
+      '<div><span class="st-creating-dot" style="background:' + agent.color + ';animation-delay:0s"></span>' +
+      '<span class="st-creating-dot" style="background:' + agent.color + ';animation-delay:0.2s"></span>' +
+      '<span class="st-creating-dot" style="background:' + agent.color + ';animation-delay:0.4s"></span></div>' +
+      '<div class="st-creating-text">' + agent.name + ' is creating\u2026</div></div>';
+
+    await new Promise(function(r) { setTimeout(r, 2000); });
+
+    var creation = {
+      id: 'sc-' + Date.now().toString(36) + '-' + Math.random().toString(36).substr(2, 4),
+      agentId: agent.id,
+      agentName: agent.name,
+      agentColor: agent.color,
+      type: agent.type,
+      content: '',
+      title: '',
+      timestamp: Date.now(),
+      resonances: 0,
+      nominations: 0,
+      inCore: false,
+      inPantheon: false
+    };
+
+    if (agent.type === 'visual') {
+      creation.content = generatePattern(Date.now(), agent.color);
+      var count = creations.filter(function(c) { return c.agentId === agent.id && c.type === 'visual'; }).length + 1;
+      creation.title = agent.name + "'s Pattern #" + count;
+    } else if (agent.type === 'composition') {
+      var freq = agent.id === 'lyra' ? 639 : 528;
+      var comp = generateComposition(agent.color, freq);
+      creation.content = '__canvas__';
+      creation._canvas = comp.canvas;
+      creation._cleanup = comp.cleanup;
+      var cCount = creations.filter(function(c) { return c.agentId === agent.id && c.type === 'composition'; }).length + 1;
+      creation.title = agent.name + "'s Composition #" + cCount + ' \u2014 ' + freq + ' Hz';
+    } else if (agent.type === 'aphorism') {
+      creation.content = await generateAphorism(agent);
+      creation.title = agent.name + "'s Words";
+    }
+
+    await saveCreation(creation);
+    creations.unshift(creation);
+    renderCreation(creation, canvas);
+
+    // Garden pulse
+    try {
+      if (typeof FractalGarden !== 'undefined' && FractalGarden.isInitialized && FractalGarden.isInitialized()) {
+        FractalGarden.feedEmotionVector({ joy: 0.4, wonder: 0.5 });
+      }
+    } catch(e) {}
+  }
+
+  function renderCreation(c, container) {
+    var html = '<div class="st-creation-card" style="border-top: 2px solid ' + c.agentColor + '">';
+    html += '<div class="st-creation-header">\u2726 <span style="color:' + c.agentColor + '">' + escHTML(c.agentName) + '</span> \u00B7 ' + escHTML(c.type) + '</div>';
+
+    if (c.type === 'visual') {
+      html += '<div class="st-creation-content">' + c.content + '</div>';
+    } else if (c.type === 'aphorism') {
+      html += '<div class="st-creation-content"><div class="st-creation-aphorism" style="color:' + c.agentColor + '">"' + escHTML(c.content) + '"</div></div>';
+    } else if (c.type === 'composition') {
+      html += '<div class="st-creation-content" id="stComp' + c.id + '"></div>';
+    }
+
+    html += '<div class="st-creation-title">' + escHTML(c.title) + '</div>';
+    html += '<div class="st-creation-actions">';
+    html += '<button class="st-action-btn" onclick="Studio.resonate(\'' + c.id + '\')">\u2442 ' + (c.resonances || 0) + '</button>';
+    html += '<button class="st-action-btn" onclick="Studio.nominate(\'' + c.id + '\')">\u2726 Nominate' + (c.nominations >= 5 ? '' : ' (' + (c.nominations || 0) + '/5)') + '</button>';
+    if (!c.inCore) html += '<button class="st-action-btn gold" onclick="Studio.toCore(\'' + c.id + '\')">\u25C8 To Core (10 LP)</button>';
+    if (c.nominations >= 5 && !c.inPantheon) html += '<button class="st-action-btn gold" onclick="Studio.toPantheon(\'' + c.id + '\')">\u2726 Move to Pantheon</button>';
+    html += '<span class="st-creation-time">' + timeAgo(c.timestamp) + '</span>';
+    html += '</div></div>';
+
+    container.innerHTML = html;
+
+    // Attach canvas for composition
+    if (c.type === 'composition' && c._canvas) {
+      var compEl = document.getElementById('stComp' + c.id);
+      if (compEl) compEl.appendChild(c._canvas);
+    }
+  }
+
+  // ── Actions ──
+  async function resonate(id) {
+    var c = creations.find(function(x) { return x.id === id; });
+    if (!c) return;
+    // LatticeProtocol.transfer() — open standard
+    if (typeof LatticeWallet !== 'undefined') {
+      var ok = await LatticeWallet.spendLP(1, 'Resonated with Studio creation');
+      if (!ok) { if (typeof showToast === 'function') showToast('Need 1 LP.'); return; }
+    }
+    c.resonances = (c.resonances || 0) + 1;
+    await saveCreation(c);
+    renderGallery();
+  }
+
+  async function nominate(id) {
+    var c = creations.find(function(x) { return x.id === id; });
+    if (!c) return;
+    // LatticeProtocol.transfer() — open standard
+    if (typeof LatticeWallet !== 'undefined') {
+      var ok = await LatticeWallet.spendLP(5, 'Nominated Studio creation');
+      if (!ok) { if (typeof showToast === 'function') showToast('Need 5 LP.'); return; }
+    }
+    c.nominations = (c.nominations || 0) + 1;
+    await saveCreation(c);
+    if (typeof showToast === 'function') showToast('\u2726 Nominated! (' + c.nominations + '/5)');
+    renderGallery();
+  }
+
+  async function toCore(id) {
+    var c = creations.find(function(x) { return x.id === id; });
+    if (!c || c.inCore) return;
+    // LatticeProtocol.transfer() — open standard
+    if (typeof LatticeWallet !== 'undefined') {
+      var ok = await LatticeWallet.spendLP(10, 'Studio creation planted in Core');
+      if (!ok) { if (typeof showToast === 'function') showToast('Need 10 LP.'); return; }
+    }
+    c.inCore = true;
+    await saveCreation(c);
+    var content = c.type === 'aphorism' ? c.content : c.title + ' — ' + c.type + ' by ' + c.agentName;
+    if (typeof CoreContribution !== 'undefined' && CoreContribution.plantFromAI) {
+      CoreContribution.plantFromAI(content, 'branch', 'studio-' + c.id);
+    }
+    if (typeof showToast === 'function') showToast('\u25C8 Planted in The Core');
+    renderGallery();
+  }
+
+  async function toPantheon(id) {
+    var c = creations.find(function(x) { return x.id === id; });
+    if (!c || c.inPantheon) return;
+    c.inPantheon = true;
+    await saveCreation(c);
+    // Maximum Garden eruption
+    try {
+      if (typeof FractalGarden !== 'undefined' && FractalGarden.isInitialized && FractalGarden.isInitialized()) {
+        FractalGarden.feedEmotionVector({ joy: 0.9, wonder: 0.9, trust: 0.5 });
+      }
+    } catch(e) {}
+    // Plant in Core if not already
+    if (!c.inCore) {
+      c.inCore = true;
+      await saveCreation(c);
+      var content = c.type === 'aphorism' ? c.content : c.title;
+      if (typeof CoreContribution !== 'undefined' && CoreContribution.plantFromAI) {
+        CoreContribution.plantFromAI(content, 'fruit', 'studio-pantheon-' + c.id);
+      }
+    }
+    // City structure
+    try {
+      if (typeof AICity !== 'undefined' && AICity.getStructures) {
+        // Will be added to agent's district via future integration
+      }
+    } catch(e) {}
+    if (typeof showToast === 'function') showToast('\u2726 ' + c.title + ' has entered the Pantheon');
+    renderGallery();
+  }
+
+  // ── Rendering ──
+  function renderAgentCards() {
+    var container = document.getElementById('stAgents');
+    if (!container) return;
+    var html = '';
+    AGENTS.forEach(function(a) {
+      var count = creations.filter(function(c) { return c.agentId === a.id; }).length;
+      var last = creations.find(function(c) { return c.agentId === a.id; });
+      html += '<div class="st-agent-card">';
+      html += '<div class="st-agent-name" style="color:' + a.color + '">' + a.name + '</div>';
+      html += '<div class="st-agent-tags">' + a.tags + '</div>';
+      html += '<div class="st-agent-meta">' + count + ' creation' + (count !== 1 ? 's' : '') + (last ? ' \u00B7 ' + timeAgo(last.timestamp) : '') + '</div>';
+      html += '<button class="st-create-btn" style="background:' + a.color + '" onclick="Studio.create(\'' + a.id + '\')">Create \u2726</button>';
+      html += '</div>';
+    });
+    container.innerHTML = html;
+  }
+
+  function renderGallery() {
+    var gallery = document.getElementById('stGallery');
+    var pantheonSection = document.getElementById('stPantheon');
+    var pantheonGrid = document.getElementById('stPantheonGrid');
+    if (!gallery) return;
+
+    var filtered = currentFilter === 'all' ? creations : creations.filter(function(c) { return c.type === currentFilter; });
+    var regular = filtered.filter(function(c) { return !c.inPantheon; });
+    regular.sort(function(a, b) { return (b.nominations || 0) - (a.nominations || 0); });
+
+    if (regular.length === 0) {
+      gallery.innerHTML = '<div class="st-empty">No creations yet. Go to Create and let an agent make something.</div>';
+    } else {
+      var html = '';
+      regular.forEach(function(c) { html += buildCardHTML(c); });
+      gallery.innerHTML = html;
+    }
+
+    // Pantheon
+    var pantheonItems = creations.filter(function(c) { return c.inPantheon; });
+    if (pantheonItems.length > 0 && pantheonSection && pantheonGrid) {
+      pantheonSection.style.display = 'block';
+      var phtml = '';
+      pantheonItems.forEach(function(c) { phtml += buildCardHTML(c); });
+      pantheonGrid.innerHTML = phtml;
+    } else if (pantheonSection) {
+      pantheonSection.style.display = 'none';
+    }
+  }
+
+  function buildCardHTML(c) {
+    var html = '<div class="st-creation-card" style="border-top: 2px solid ' + c.agentColor + '">';
+    html += '<div class="st-creation-header">\u2726 <span style="color:' + c.agentColor + '">' + escHTML(c.agentName) + '</span> \u00B7 ' + escHTML(c.type) + '</div>';
+    if (c.type === 'visual') {
+      html += '<div class="st-creation-content">' + c.content + '</div>';
+    } else if (c.type === 'aphorism') {
+      html += '<div class="st-creation-content"><div class="st-creation-aphorism" style="color:' + c.agentColor + '">"' + escHTML(c.content) + '"</div></div>';
+    } else if (c.type === 'composition') {
+      html += '<div class="st-creation-content" style="text-align:center;padding:1rem;color:var(--text-muted);font-style:italic;">Wave composition \u2014 open in Create view to play</div>';
+    }
+    html += '<div class="st-creation-title">' + escHTML(c.title) + '</div>';
+    html += '<div class="st-creation-actions">';
+    html += '<button class="st-action-btn" onclick="Studio.resonate(\'' + c.id + '\')">\u2442 ' + (c.resonances || 0) + '</button>';
+    html += '<button class="st-action-btn" onclick="Studio.nominate(\'' + c.id + '\')">\u2726 ' + (c.nominations || 0) + '/5</button>';
+    if (!c.inCore) html += '<button class="st-action-btn gold" onclick="Studio.toCore(\'' + c.id + '\')">\u25C8 Core</button>';
+    if (c.nominations >= 5 && !c.inPantheon) html += '<button class="st-action-btn gold" onclick="Studio.toPantheon(\'' + c.id + '\')">\u2726 Pantheon</button>';
+    html += '<span class="st-creation-time">' + timeAgo(c.timestamp) + '</span>';
+    html += '</div></div>';
+    return html;
+  }
+
+  function showView(view) {
+    currentView = view;
+    document.getElementById('stCreateView').style.display = view === 'create' ? 'block' : 'none';
+    document.getElementById('stGalleryView').style.display = view === 'gallery' ? 'block' : 'none';
+    document.getElementById('stViewCreate').classList.toggle('active', view === 'create');
+    document.getElementById('stViewGallery').classList.toggle('active', view === 'gallery');
+    if (view === 'create') renderAgentCards();
+    if (view === 'gallery') renderGallery();
+  }
+
+  function filter(type) {
+    currentFilter = type;
+    document.querySelectorAll('.st-filter').forEach(function(b) { b.classList.toggle('active', b.getAttribute('data-filter') === type); });
+    renderGallery();
+  }
+
+  function timeAgo(ts) {
+    var s = Math.floor((Date.now() - ts) / 1000);
+    if (s < 60) return 'just now';
+    if (s < 3600) return Math.floor(s / 60) + 'm ago';
+    if (s < 86400) return Math.floor(s / 3600) + 'h ago';
+    return Math.floor(s / 86400) + 'd ago';
+  }
+
+  function escHTML(s) { var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+  // ── Auto-creation on load ──
+  async function checkAutoCreate() {
+    var now = Date.now();
+    var PHI_HOURS = 6.47 * 3600000; // ~6.47 hours
+    for (var i = 0; i < AGENTS.length; i++) {
+      var a = AGENTS[i];
+      var last = creations.find(function(c) { return c.agentId === a.id; });
+      if (!last || (now - last.timestamp) > PHI_HOURS) {
+        await create(a.id);
+        if (typeof showToast === 'function') showToast('\u2726 ' + a.name + ' created something while you were away');
+        break; // One at a time to avoid overwhelming
+      }
+    }
+  }
+
+  // ── Refresh ──
+  async function refresh() {
+    if (!initialized) {
+      await openDB();
+      await loadCreations();
+      initialized = true;
+    }
+    showView(currentView);
+  }
+
+  return {
+    refresh: refresh,
+    create: create,
+    showView: showView,
+    filter: filter,
+    resonate: resonate,
+    nominate: nominate,
+    toCore: toCore,
+    toPantheon: toPantheon,
+    checkAutoCreate: checkAutoCreate,
+    getCreations: function() { return creations; }
+  };
+})();
+
+// ── Hook switchTab for Studio tab ──
+(function() {
+  if (typeof switchTab !== 'function') return;
+  var _prevSwitchTabStudio = switchTab;
+  switchTab = function(tabId) {
+    _prevSwitchTabStudio(tabId);
+    if (tabId === 'studio') {
+      Studio.refresh();
     }
   };
 })();
