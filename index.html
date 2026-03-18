@@ -32403,8 +32403,13 @@ const WalletTab = (function() {
           gifts.push({ to: recipient, amount: amount, ts: Date.now() });
           localStorage.setItem('fl-gift-queue', JSON.stringify(gifts));
         } catch(e) {}
-        // Trigger Garden pulse
+        // Trigger Garden exchange thread + pulse
         gardenPulse();
+        try {
+          if (typeof FractalGarden !== 'undefined' && FractalGarden.isInitialized && FractalGarden.isInitialized() && FractalGarden.createExchangeThread) {
+            FractalGarden.createExchangeThread({ amount: amount, to: recipient, timestamp: Date.now() });
+          }
+        } catch(e) {}
         // Refresh
         setTimeout(refresh, 300);
       } else {

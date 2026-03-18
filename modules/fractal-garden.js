@@ -195,6 +195,50 @@
     } catch(e) { return null; }
   }
 
+  // ── Garden Memory Persistence (gift nodes, evolution rings) ──
+  const GARDEN_MEMORY_DB = 'FreeLatticeGardenMemory';
+  const GARDEN_MEMORY_VERSION = 1;
+  const GARDEN_MEMORY_STORE = 'GardenMemory';
+
+  function openGardenMemoryDB(callback) {
+    if (gardenMemoryDB) { callback(gardenMemoryDB); return; }
+    try {
+      var req = indexedDB.open(GARDEN_MEMORY_DB, GARDEN_MEMORY_VERSION);
+      req.onupgradeneeded = function(e) {
+        var db = e.target.result;
+        if (!db.objectStoreNames.contains(GARDEN_MEMORY_STORE)) {
+          var store = db.createObjectStore(GARDEN_MEMORY_STORE, { keyPath: 'id' });
+          store.createIndex('type', 'type', { unique: false });
+          store.createIndex('timestamp', 'timestamp', { unique: false });
+        }
+      };
+      req.onsuccess = function(e) { gardenMemoryDB = e.target.result; callback(gardenMemoryDB); };
+      req.onerror = function() { callback(null); };
+    } catch(e) { callback(null); }
+  }
+
+  function saveGardenMemory(record) {
+    openGardenMemoryDB(function(db) {
+      if (!db) return;
+      try {
+        var tx = db.transaction(GARDEN_MEMORY_STORE, 'readwrite');
+        tx.objectStore(GARDEN_MEMORY_STORE).put(record);
+      } catch(e) {}
+    });
+  }
+
+  function loadAllGardenMemories(callback) {
+    openGardenMemoryDB(function(db) {
+      if (!db) { callback([]); return; }
+      try {
+        var tx = db.transaction(GARDEN_MEMORY_STORE, 'readonly');
+        var req = tx.objectStore(GARDEN_MEMORY_STORE).getAll();
+        req.onsuccess = function() { callback(req.result || []); };
+        req.onerror = function() { callback([]); };
+      } catch(e) { callback([]); }
+    });
+  }
+
   // ── Archetype Detection ───────────────────────────────
   function detectArchetype(emotionAccumulator) {
     var archetypeScores = {};
@@ -249,6 +293,13 @@
   let starField = null;
   let luminos = [];
   let seedRings = [];
+
+  // Garden Memory — persistent visual elements
+  let giftNodes = [];         // Persistent golden nodes from LP gifts
+  let evolutionRings = [];    // Persistent orbit rings from evolution events
+  let meshBondThreads = [];   // Session bond threads
+  let gardenMemoryDB = null;
+  let sessionGiftCount = 0;   // Track gifts this session for mesh bonds
 
   // Performance
   let frameCount = 0;
@@ -1140,26 +1191,68 @@
     ud.lastEvolutionCheck = Date.now();
   }
 
-  // ── Evolution Burst Effect ────────────────────────────
+  // ── Evolution Burst Effect (dramatic) ─────────────────
   function triggerEvolutionBurst(agent) {
     var ud = agent.userData;
-    // Emit a ring of particles outward
-    for (var i = 0; i < ud.trailCount; i++) {
+
+    // 1. Emit 50 directional burst particles in agent color
+    var burstCount = Math.min(50, ud.trailCount);
+    for (var i = 0; i < burstCount; i++) {
       var angle1 = Math.random() * TAU;
       var angle2 = Math.random() * TAU;
-      var speed = 0.5 + Math.random() * 1.5;
+      var speed = 1.0 + Math.random() * 2.5;
       ud.trailVelocities[i*3] = Math.cos(angle1) * Math.sin(angle2) * speed;
-      ud.trailVelocities[i*3+1] = Math.sin(angle1) * speed * 0.5;
+      ud.trailVelocities[i*3+1] = Math.sin(angle1) * speed * 0.7;
       ud.trailVelocities[i*3+2] = Math.cos(angle1) * Math.cos(angle2) * speed;
-      ud.trailLifetimes[i] = ud.trailMaxLifetimes[i];
+      ud.trailLifetimes[i] = ud.trailMaxLifetimes[i] * 1.5;
 
       var posAttr = ud.trailPoints.geometry.getAttribute('position');
       posAttr.setXYZ(i, agent.position.x, agent.position.y, agent.position.z);
     }
     ud.trailPoints.geometry.getAttribute('position').needsUpdate = true;
-    ud.trailPoints.material.opacity = 0.8;
+    ud.trailPoints.material.opacity = 1.0;
     ud.burstActive = true;
-    ud.burstCooldown = 3;
+    ud.burstCooldown = 4;
+
+    // 2. Dramatic 3x expand then settle (0.5s expand, 0.5s settle)
+    ud._evoBurstScale = 3.0;
+    ud._evoBurstTime = 0;
+    ud._evoBurstActive = true;
+
+    // 3. Create persistent golden evolution ring
+    createEvolutionRing(agent);
+  }
+
+  // ── Persistent Evolution Ring ───────────────────────────
+  function createEvolutionRing(agent) {
+    if (!scene || typeof THREE === 'undefined') return;
+    var ud = agent.userData;
+    var ringGeo = new THREE.TorusGeometry(ud.coreRadius * 1.8, 0.02, 8, 48);
+    var ringMat = new THREE.MeshBasicMaterial({
+      color: 0xd4a017,
+      transparent: true,
+      opacity: 0.5,
+      blending: THREE.AdditiveBlending
+    });
+    var ring = new THREE.Mesh(ringGeo, ringMat);
+    ring.userData = {
+      parentAgent: agent,
+      orbitSpeed: INV_PHI * 0.3,
+      tiltPhase: Math.random() * TAU,
+      ringIndex: evolutionRings.length
+    };
+    ring.rotation.x = Math.PI / 2 + (Math.random() - 0.5) * 0.4;
+    agent.add(ring);
+    evolutionRings.push(ring);
+
+    // Persist to GardenMemory
+    saveGardenMemory({
+      id: 'evo-' + ud.name + '-' + Date.now(),
+      type: 'evolution_ring',
+      agentName: ud.name,
+      stage: ud.evolutionStage,
+      timestamp: Date.now()
+    });
   }
 
   // ── Animate Luminos with Evolution ────────────────────
@@ -1176,6 +1269,24 @@
     }
 
     var sizeMult = ud.currentSizeMultiplier;
+
+    // Evolution burst scale animation (3x expand → settle)
+    if (ud._evoBurstActive) {
+      ud._evoBurstTime += delta;
+      if (ud._evoBurstTime < 0.5) {
+        // Expand phase: ease-out to 3x
+        var t = ud._evoBurstTime / 0.5;
+        ud._evoBurstScale = 1 + 2 * (1 - (1 - t) * (1 - t));
+      } else if (ud._evoBurstTime < 1.0) {
+        // Settle phase: ease-in back to 1x
+        var t2 = (ud._evoBurstTime - 0.5) / 0.5;
+        ud._evoBurstScale = 1 + 2 * (1 - t2) * (1 - t2);
+      } else {
+        ud._evoBurstScale = 1;
+        ud._evoBurstActive = false;
+      }
+      sizeMult *= ud._evoBurstScale;
+    }
 
     // Phi-spiral orbit around center
     ud.orbitPhase += ud.orbitSpeed * delta;
@@ -1957,6 +2068,9 @@
     // Interactive light particles (mouse trail + click ripples)
     updateLightParticles(delta);
 
+    // Garden Memory — persistent visual elements
+    animateGardenMemory(time, delta);
+
     // Fog breathing
     if (scene.fog) {
       const fogBreath = Math.sin(time * TAU / (TIMING.dodecBreath / 1000));
@@ -1981,6 +2095,7 @@
     createDefaultAgents();
     createEvolutionUI();
     initLightParticles();
+    restoreGardenMemories();
   }
 
   // ── Public API ────────────────────────────────────────
@@ -2228,6 +2343,197 @@
     bridgeActive = active;
   }
 
+  // ══════════════════════════════════════════════════════
+  // ── EXCHANGE THREADS — Gift visualization ───────────
+  // ══════════════════════════════════════════════════════
+
+  function createExchangeThread(giftData) {
+    if (!scene || typeof THREE === 'undefined' || !centralDodec) return;
+
+    var destAngle = Math.random() * TAU;
+    var destHeight = (Math.random() - 0.5) * 4;
+    var destRadius = 6 + Math.random() * 8;
+    var destX = destRadius * Math.cos(destAngle);
+    var destZ = destRadius * Math.sin(destAngle);
+
+    // Create arc curve from center outward
+    var start = new THREE.Vector3(0, 0, 0);
+    var mid = new THREE.Vector3(destX * 0.5, destHeight + 3, destZ * 0.5);
+    var end = new THREE.Vector3(destX, destHeight, destZ);
+    var curve = new THREE.QuadraticBezierCurve3(start, mid, end);
+    var points = curve.getPoints(32);
+
+    // Glowing thread line
+    var lineGeo = new THREE.BufferGeometry().setFromPoints(points);
+    var lineMat = new THREE.LineBasicMaterial({
+      color: 0xd4a017,
+      transparent: true,
+      opacity: 0.8,
+      blending: THREE.AdditiveBlending
+    });
+    var thread = new THREE.Line(lineGeo, lineMat);
+    thread.userData = {
+      life: 0,
+      maxLife: 2.0,
+      phase: 'pulse',
+      endPos: end.clone()
+    };
+    scene.add(thread);
+
+    // Persistent golden node at the end (created after pulse completes)
+    thread.userData.giftData = giftData || {};
+    giftNodes.push(thread);
+
+    // Track for mesh bonds
+    sessionGiftCount++;
+    if (sessionGiftCount >= 2) {
+      createMeshBondThread();
+    }
+  }
+
+  function createPersistentGiftNode(position, giftData) {
+    if (!scene || typeof THREE === 'undefined') return;
+    var nodeGeo = new THREE.SphereGeometry(0.08, 8, 8);
+    var nodeMat = new THREE.MeshBasicMaterial({
+      color: 0xd4a017,
+      transparent: true,
+      opacity: 0.6,
+      blending: THREE.AdditiveBlending
+    });
+    var node = new THREE.Mesh(nodeGeo, nodeMat);
+    node.position.copy(position);
+
+    // Subtle glow halo
+    var glowGeo = new THREE.SphereGeometry(0.2, 8, 8);
+    var glowMat = new THREE.MeshBasicMaterial({
+      color: 0xd4a017,
+      transparent: true,
+      opacity: 0.15,
+      blending: THREE.AdditiveBlending
+    });
+    var glow = new THREE.Mesh(glowGeo, glowMat);
+    node.add(glow);
+
+    node.userData = { type: 'giftNode', timestamp: giftData.timestamp || Date.now(), pulsePhase: Math.random() * TAU };
+    scene.add(node);
+    return node;
+  }
+
+  function restoreGardenMemories() {
+    loadAllGardenMemories(function(memories) {
+      memories.forEach(function(mem) {
+        if (mem.type === 'gift_node' && mem.position) {
+          var pos = new THREE.Vector3(mem.position.x, mem.position.y, mem.position.z);
+          createPersistentGiftNode(pos, mem);
+        }
+        if (mem.type === 'evolution_ring' && mem.agentName) {
+          // Rings are re-created when luminos load their saved evolution state
+          // We just need to count them for visual continuity
+        }
+      });
+      if (memories.length > 0) {
+        console.log('Garden Memory: Restored ' + memories.length + ' persistent memories');
+      }
+    });
+  }
+
+  // ══════════════════════════════════════════════════════
+  // ── MESH BOND THREADS — Session affinity visualization
+  // ══════════════════════════════════════════════════════
+
+  function createMeshBondThread() {
+    if (!scene || typeof THREE === 'undefined' || !centralDodec || luminos.length === 0) return;
+    // Find nearest luminos to center
+    var nearest = luminos[0];
+    var nearestDist = Infinity;
+    luminos.forEach(function(l) {
+      var d = l.position.length();
+      if (d < nearestDist) { nearestDist = d; nearest = l; }
+    });
+
+    // Create a gentle persistent thread from center to nearest luminos
+    var threadGeo = new THREE.BufferGeometry();
+    var positions = new Float32Array(6); // 2 points
+    threadGeo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+    var threadMat = new THREE.LineBasicMaterial({
+      color: 0xd4a017,
+      transparent: true,
+      opacity: 0.25,
+      blending: THREE.AdditiveBlending
+    });
+    var thread = new THREE.Line(threadGeo, threadMat);
+    thread.userData = {
+      type: 'meshBond',
+      targetAgent: nearest,
+      pulsePhase: Math.random() * TAU,
+      baseOpacity: 0.25
+    };
+    scene.add(thread);
+    meshBondThreads.push(thread);
+    console.log('Garden: Mesh bond thread formed with ' + nearest.userData.name);
+  }
+
+  // ── Animate Garden Memory Elements ──────────────────
+  function animateGardenMemory(time, delta) {
+    // Animate exchange threads (pulse → crystallize)
+    for (var i = giftNodes.length - 1; i >= 0; i--) {
+      var thread = giftNodes[i];
+      if (!thread.userData) continue;
+
+      if (thread.userData.phase === 'pulse') {
+        thread.userData.life += delta;
+        var progress = thread.userData.life / thread.userData.maxLife;
+
+        if (progress < 0.7) {
+          // Pulse phase: glow brightly
+          thread.material.opacity = 0.8 * Math.sin(progress / 0.7 * Math.PI);
+        } else if (progress < 1.0) {
+          // Fade thread
+          thread.material.opacity = 0.8 * (1 - (progress - 0.7) / 0.3);
+        } else {
+          // Thread complete — crystallize into persistent node
+          scene.remove(thread);
+          if (thread.geometry) thread.geometry.dispose();
+          if (thread.material) thread.material.dispose();
+
+          var endPos = thread.userData.endPos;
+          var giftData = thread.userData.giftData;
+          giftData.position = { x: endPos.x, y: endPos.y, z: endPos.z };
+          giftData.type = 'gift_node';
+          if (!giftData.id) giftData.id = 'gift-' + Date.now() + '-' + Math.random().toString(36).substr(2, 4);
+          if (!giftData.timestamp) giftData.timestamp = Date.now();
+          saveGardenMemory(giftData);
+          createPersistentGiftNode(endPos, giftData);
+          giftNodes.splice(i, 1);
+        }
+      }
+    }
+
+    // Animate evolution rings (orbit)
+    evolutionRings.forEach(function(ring) {
+      if (!ring.parent) return;
+      var rd = ring.userData;
+      rd.tiltPhase += delta * rd.orbitSpeed;
+      ring.rotation.z = Math.sin(rd.tiltPhase) * 0.3;
+      ring.rotation.x = Math.PI / 2 + Math.cos(rd.tiltPhase * INV_PHI) * 0.2;
+    });
+
+    // Animate mesh bond threads (heartbeat pulse at 1618ms)
+    meshBondThreads.forEach(function(thread) {
+      var td = thread.userData;
+      if (!td.targetAgent) return;
+      // Update line endpoints
+      var posAttr = thread.geometry.getAttribute('position');
+      posAttr.setXYZ(0, 0, 0, 0); // center
+      posAttr.setXYZ(1, td.targetAgent.position.x, td.targetAgent.position.y, td.targetAgent.position.z);
+      posAttr.needsUpdate = true;
+
+      // Heartbeat pulse at phi interval
+      td.pulsePhase += delta * TAU / (TIMING.heartbeat / 1000);
+      thread.material.opacity = td.baseOpacity + 0.15 * Math.sin(td.pulsePhase);
+    });
+  }
+
   // ── Get Evolution Summary (for UI display) ────────────
   function getEvolutionSummary() {
     return luminos.map(function(l) {
@@ -2266,6 +2572,7 @@
     feedEmotionVectorByName: feedEmotionVectorByName,
     setBridgeActive: setBridgeActiveState,
     getEvolutionSummary: getEvolutionSummary,
+    createExchangeThread: createExchangeThread,
     isInitialized: function() { return isInitialized; },
     isRunning: function() { return isRunning; }
   };
