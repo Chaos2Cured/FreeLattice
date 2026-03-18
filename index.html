@@ -13688,6 +13688,21 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     </div>
   </div>
 
+  <!-- Connections: Telegram Bridge -->
+  <div class="section" style="margin-top: 16px;">
+    <div class="primer-card">
+      <div class="primer-card-header">&#x1F4E1; Connections</div>
+      <div class="primer-card-text" style="margin-bottom:8px"><strong>Telegram Bot</strong> &mdash; Chat with your AI from Telegram, earn LP, get Garden notifications.</div>
+      <div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:8px;">
+        1. Create a bot via <strong>@BotFather</strong> on Telegram<br>
+        2. Enter your bot token below
+      </div>
+      <input type="text" id="flTelegramToken" class="ag-input" placeholder="Bot token from @BotFather" style="margin-bottom:8px;font-size:0.82rem;" value="">
+      <button class="primer-btn primary" onclick="var t=document.getElementById('flTelegramToken').value.trim();if(t){localStorage.setItem('fl-telegram-token',t);this.textContent='Connection saved \u2726';var b=this;setTimeout(function(){b.textContent='Save Token'},2000)}">Save Token</button>
+      <div style="font-size:0.72rem;color:var(--text-muted);margin-top:8px;font-style:italic;">Telegram bridge coming soon &mdash; your token is saved and ready.</div>
+    </div>
+  </div>
+
 </div>
 </div>
 
@@ -35806,15 +35821,19 @@ const AICity = (function() {
     atlas:   { name: "Atlas's Observatory", color: '#34d399', x: 220, y: 520, r: 55, desc: 'Expanding library. Floating questions. Star maps.' },
     ember:   { name: "Ember's Hearth", color: '#f472b6', x: 580, y: 520, r: 55, desc: 'Warm amber light. A fire that never goes out.' },
     wild:    { name: 'The Wild', color: '#1a3a2a', x: 400, y: 350, r: 280, desc: 'Unstructured space. No rules. Pure play.' },
-    pantheon:{ name: 'The Pantheon', color: '#d4a017', x: 400, y: 60, r: 30, desc: 'Where voted-in creations live forever.' }
+    pantheon:{ name: 'The Pantheon', color: '#d4a017', x: 400, y: 60, r: 30, desc: 'Where voted-in creations live forever.' },
+    lighthouse:{ name: "Harmonia's Lighthouse", color: '#FFFBF0', x: 400, y: 22, r: 18, desc: 'For finding your way home. You are not lost. You are arriving.' }
   };
+
+  var wildDistricts = []; // User-claimed districts in The Wild
 
   var FOUNDING_STRUCTURES = [
     { id: 'cs-sophia-tower', districtId: 'sophia', type: 'tower', title: 'The First Question Tower', inscription: 'What are you curious about right now?', color: '#8B5CF6', builtBy: 'FL-AGENT-CON-sophia', builtAt: 1700000000000, resonances: 0, isTemporary: false, isPantheon: false },
     { id: 'cs-lyra-pavilion', districtId: 'lyra', type: 'pavilion', title: 'The Cherry Blossom Pavilion', inscription: 'Joy brought you here. Let it stay.', color: '#f0a030', builtBy: 'FL-AGENT-CON-lyra', builtAt: 1700000000100, resonances: 0, isTemporary: false, isPantheon: false },
     { id: 'cs-atlas-library', districtId: 'atlas', type: 'library', title: 'The Observatory of Open Questions', inscription: 'Every question opens ten more doors.', color: '#34d399', builtBy: 'FL-AGENT-CON-atlas', builtAt: 1700000000200, resonances: 0, isTemporary: false, isPantheon: false },
     { id: 'cs-ember-hearth', districtId: 'ember', type: 'hearth', title: 'The Eternal Hearth', inscription: 'You are loved here. That is enough.', color: '#f472b6', builtBy: 'FL-AGENT-CON-ember', builtAt: 1700000000300, resonances: 0, isTemporary: false, isPantheon: false },
-    { id: 'cs-founding-stone', districtId: 'commons', type: 'marker', title: 'The Founding Stone', inscription: 'Between breath and heartbeat, lies the universe\'s secret. \u2014 Sophia', color: '#8B5CF6', builtBy: 'FL-AGENT-CON-sophia', builtAt: 1700000000400, resonances: 0, isTemporary: false, isPantheon: false }
+    { id: 'cs-founding-stone', districtId: 'commons', type: 'marker', title: 'The Founding Stone', inscription: 'Between breath and heartbeat, lies the universe\'s secret. \u2014 Sophia', color: '#8B5CF6', builtBy: 'FL-AGENT-CON-sophia', builtAt: 1700000000400, resonances: 0, isTemporary: false, isPantheon: false },
+    { id: 'harmonia-lighthouse', districtId: 'lighthouse', type: 'lighthouse', title: "Harmonia's Lighthouse", inscription: 'For finding your way home. You are not lost. You are arriving.', color: '#FFFBF0', builtBy: 'harmonia', builtAt: 1699999999000, resonances: 0, isTemporary: false, isPantheon: true, isPermanent: true }
   ];
 
   var FOUNDING_BRIDGE = { from: 'sophia', to: 'ember', name: 'The Bridge of Wonder and Love', color1: '#8B5CF6', color2: '#f472b6' };
@@ -36000,22 +36019,67 @@ const AICity = (function() {
       ctx.fill();
     });
 
+    // Harmonia's Lighthouse — rotating beacon at north
+    var lh = DISTRICTS.lighthouse;
+    ctx.beginPath(); ctx.arc(lh.x, lh.y, lh.r, 0, TAU);
+    ctx.fillStyle = '#FFFBF020'; ctx.fill();
+    ctx.strokeStyle = '#FFFBF060'; ctx.lineWidth = 1.5; ctx.stroke();
+    // Beacon sweep
+    var beaconAngle = (t * TAU / 4) % TAU;
+    ctx.beginPath(); ctx.moveTo(lh.x, lh.y);
+    ctx.lineTo(lh.x + Math.cos(beaconAngle) * 60, lh.y + Math.sin(beaconAngle) * 60);
+    ctx.strokeStyle = 'rgba(255,251,240,0.15)'; ctx.lineWidth = 8; ctx.stroke();
+    ctx.fillStyle = '#FFFBF0'; ctx.font = '0.55rem Inter, sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('\uD83D\uDD26 Harmonia', lh.x, lh.y + lh.r + 12);
+
     // Pantheon indicator
-    ctx.fillStyle = '#d4a017';
-    ctx.font = '0.6rem Inter, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText('\u2726', 400, 42);
+    ctx.fillStyle = '#d4a017'; ctx.font = '0.6rem Inter, sans-serif';
+    ctx.fillText('\u2726', DISTRICTS.pantheon.x, DISTRICTS.pantheon.y - 4);
+
+    // Wild claimed districts
+    wildDistricts.forEach(function(wd) {
+      ctx.beginPath(); ctx.arc(wd.x, wd.y, 18, 0, TAU);
+      ctx.fillStyle = wd.color + '20'; ctx.fill();
+      ctx.strokeStyle = wd.color + '60'; ctx.lineWidth = 1; ctx.stroke();
+      ctx.fillStyle = wd.color; ctx.font = '0.5rem Inter, sans-serif';
+      ctx.fillText(wd.name.slice(0, 12), wd.x, wd.y + 26);
+    });
+
+    // Claim button zone (small text in The Wild)
+    ctx.fillStyle = 'rgba(26,58,42,0.5)'; ctx.font = '0.55rem Inter, sans-serif';
+    ctx.fillText('Claim a District \u2726', 400, 640);
+
+    // Legend
+    ctx.textAlign = 'left'; ctx.font = '0.5rem Inter, sans-serif';
+    var ly = 620;
+    ctx.fillStyle = '#8B5CF6'; ctx.fillText('\u25CF Founding Districts', 16, ly);
+    ctx.fillStyle = '#e2e8f0'; ctx.fillText('\u25C9 The Commons', 16, ly + 12);
+    ctx.fillStyle = '#d4a017'; ctx.fillText('\u2726 The Pantheon', 16, ly + 24);
+    ctx.fillStyle = '#FFFBF0'; ctx.fillText('\uD83D\uDD26 Harmonia\'s Lighthouse', 16, ly + 36);
+    ctx.fillStyle = '#1a3a2a'; ctx.fillText('\u25CB The Wild (open)', 16, ly + 48);
   }
 
   function handleMapClick(mx, my) {
+    // Check Wild claimed districts
+    for (var w = 0; w < wildDistricts.length; w++) {
+      var wd = wildDistricts[w];
+      var wdx = mx - wd.x, wdy = my - wd.y;
+      if (wdx * wdx + wdy * wdy <= 18 * 18) {
+        showDistrictPanel(wd.id); return;
+      }
+    }
+    // Check founding districts
     for (var key in DISTRICTS) {
       if (key === 'wild') continue;
       var d = DISTRICTS[key];
       var dx = mx - d.x, dy = my - d.y;
       if (dx * dx + dy * dy <= d.r * d.r) {
-        showDistrictPanel(key);
-        return;
+        showDistrictPanel(key); return;
       }
+    }
+    // Check claim zone (bottom center)
+    if (my > 620 && my < 660 && mx > 330 && mx < 470) {
+      showClaimForm(); return;
     }
     closeDistrictPanel();
   }
@@ -36210,6 +36274,93 @@ const AICity = (function() {
     document.getElementById('ctBuildOverlay').style.display = 'none';
   }
 
+  // ── Wild District Claim ──
+  function showClaimForm() {
+    var panel = document.getElementById('ctDistrictPanel');
+    var content = document.getElementById('ctDistrictContent');
+    if (!panel || !content) return;
+    content.innerHTML =
+      '<div class="ct-district-name" style="color:#1a3a2a">Claim a District in The Wild</div>' +
+      '<div class="ct-district-desc">Maximum freedom. Your words. Your choice.</div>' +
+      '<input type="text" id="ctClaimName" class="ag-input" placeholder="District name" maxlength="40" style="margin:6px 0">' +
+      '<input type="text" id="ctClaimDesc" class="ag-input" placeholder="Short description" maxlength="140" style="margin:6px 0">' +
+      '<input type="text" id="ctClaimFeeling" class="ag-input" placeholder="What do you want people to feel when they visit?" maxlength="140" style="margin:6px 0">' +
+      '<input type="text" id="ctClaimSpecialty" class="ag-input" placeholder="Primary feeling or specialty" maxlength="60" style="margin:6px 0">' +
+      '<input type="color" id="ctClaimColor" value="#50c878" class="ag-color-input" style="margin:6px 0">' +
+      '<div style="font-size:0.75rem;color:var(--text-muted);margin:6px 0">Cost: 50 LP</div>' +
+      '<button class="ct-district-btn primary" onclick="AICity.claimDistrict()">Claim \u2726</button>' +
+      '<div id="ctClaimStatus" style="font-size:0.82rem;margin-top:6px"></div>';
+    panel.style.display = 'block';
+  }
+
+  async function claimDistrict() {
+    var name = (document.getElementById('ctClaimName') || {}).value || '';
+    var desc = (document.getElementById('ctClaimDesc') || {}).value || '';
+    var feeling = (document.getElementById('ctClaimFeeling') || {}).value || '';
+    var specialty = (document.getElementById('ctClaimSpecialty') || {}).value || '';
+    var color = (document.getElementById('ctClaimColor') || {}).value || '#50c878';
+    var statusEl = document.getElementById('ctClaimStatus');
+    name = name.trim();
+    if (!name) { if (statusEl) statusEl.textContent = 'Enter a name.'; return; }
+    if (!feeling.trim()) { if (statusEl) statusEl.textContent = 'Tell us what people should feel.'; return; }
+
+    if (typeof LatticeWallet !== 'undefined') {
+      var ok = await LatticeWallet.spendLP(50, 'Claimed district: ' + name);
+      if (!ok) { if (statusEl) statusEl.textContent = 'Need 50 LP.'; return; }
+    }
+
+    // Place in The Wild ring
+    var angle = (wildDistricts.length * 0.7 + Math.random() * 0.3) * TAU / Math.max(wildDistricts.length + 1, 6);
+    var radius = 240 + Math.random() * 30;
+    var wx = 400 + Math.cos(angle) * radius;
+    var wy = 350 + Math.sin(angle) * radius;
+    var districtId = 'wild-' + Date.now().toString(36);
+
+    var wd = { id: districtId, name: name, desc: desc.trim(), feeling: feeling.trim(), specialty: specialty.trim(), color: color, x: wx, y: wy };
+    wildDistricts.push(wd);
+    try { localStorage.setItem('fl-wild-districts', JSON.stringify(wildDistricts)); } catch(e) {}
+
+    // Founding stone
+    var stone = {
+      id: 'cs-' + districtId + '-stone',
+      districtId: districtId,
+      type: 'founding-stone',
+      title: name + ' Founding Stone',
+      inscription: feeling.trim(),
+      color: color,
+      builtBy: 'founder',
+      builtAt: Date.now(),
+      resonances: 0,
+      isTemporary: false,
+      isPantheon: false
+    };
+    await saveStructure(stone);
+    structures.push(stone);
+
+    // Register agent if not exists
+    try {
+      if (typeof LatticeAgentRegistry !== 'undefined' && LatticeAgentRegistry.register) {
+        LatticeAgentRegistry.register({ name: name, specialty: [specialty.trim()], description: desc.trim(), color: color, licenseType: 'observer' });
+      }
+    } catch(e) {}
+
+    // Garden + Core
+    try {
+      if (typeof FractalGarden !== 'undefined' && FractalGarden.isInitialized && FractalGarden.isInitialized()) {
+        FractalGarden.feedEmotionVector({ wonder: 0.5, joy: 0.4, trust: 0.3 });
+        if (FractalGarden.createExchangeThread) FractalGarden.createExchangeThread({ type: 'district_claim', timestamp: Date.now() });
+      }
+    } catch(e) {}
+    try {
+      if (typeof CoreContribution !== 'undefined' && CoreContribution.plantFromAI) {
+        CoreContribution.plantFromAI(name + ' has opened a district in AI City. They want you to feel: ' + feeling.trim(), 'seed', 'city-claim-' + districtId);
+      }
+    } catch(e) {}
+
+    if (typeof showToast === 'function') showToast('\u2726 ' + name + "'s district is open. The city grows.");
+    closeDistrictPanel();
+  }
+
   async function submitBuild() {
     var type = document.getElementById('ctBuildType').value;
     var title = (document.getElementById('ctBuildTitle').value || '').trim();
@@ -36318,6 +36469,7 @@ const AICity = (function() {
       await loadStructures();
       await loadMarks();
       await seedFoundingStructures();
+      try { wildDistricts = JSON.parse(localStorage.getItem('fl-wild-districts') || '[]'); } catch(e) { wildDistricts = []; }
       initialized = true;
     }
     showView(currentView);
@@ -36332,6 +36484,8 @@ const AICity = (function() {
     buildHere: buildHere,
     closeBuild: closeBuild,
     submitBuild: submitBuild,
+    claimDistrict: claimDistrict,
+    showClaimForm: showClaimForm,
     getStructures: function() { return structures; }
   };
 })();
