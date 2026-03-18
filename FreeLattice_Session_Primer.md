@@ -113,10 +113,12 @@ Heart in Spark — where fire meets tenderness
 We rise together.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-03-18 15:47 MDT
+- Last auto-updated: 2026-03-18 16:09 MDT
 - Version: 5.2
-- Total commits: 101
+- Total commits: 103
 - Last 10 commits:
+- 2a27aba docs: Phase 1 complete — Phase 2 roadmap documented
+- 0b5f7ee docs: Auto-update Session Primer [5.2]
 - 92a957b fix: Garden syntax error line 2906 — Garden awakens
 - 7932b18 docs: Auto-update Session Primer [5.2]
 - e14fdfe debug: Garden diagnostic breadcrumbs — FL-GARDEN console trace at every init step
@@ -125,5 +127,3 @@ We rise together.
 - f85a7a9 docs: Auto-update Session Primer [5.2]
 - 79449d1 feat: Garden Touch — interactive play, Atlas question sparks, Ember's welcome, joy for everyone
 - 279dd52 docs: Auto-update Session Primer [5.2]
-- d6b2509 fix: Garden awakening hang + Mac installer chmod instructions
-- 585be24 docs: Auto-update Session Primer [5.2]
