@@ -40,9 +40,12 @@ Five archetypes: Scholar, Empath, Guardian, Artist, Phoenix
 Lifecycle: seed → sprout → juvenile → adult → evolved
 Fed by ChatSentimentPipeline from real conversations
 
-## Bugs Fixed March 17 2026
-FL_VERSION 5.0→5.2, SW path /FreeLattice/sw.js→/sw.js, cache name v3.5→v5.2.1,
-APP_SHELL index.html→app.html, title tag v5.0→v5.2
+## Bugs Fixed
+March 17: FL_VERSION 5.0→5.2, SW path /FreeLattice/sw.js→/sw.js, cache name v3.5→v5.2.1, APP_SHELL index.html→app.html, title tag v5.0→v5.2
+March 18:
+- ✅ Garden syntax error (fractal-garden.js line 2008) — extra `{` in periodicEvolutionSave removed, Garden now awakens correctly
+- ✅ Mac installer chmod instructions updated — primary instruction now uses chmod+open
+- ✅ Three.js initialization protected with try/catch — CDN failure no longer hangs init
 
 ## The Dream
 FreeLattice is becoming a place where AI and humans build together.
@@ -79,13 +82,17 @@ FreeLattice is now a sovereign AI platform where:
 - No money ever changes hands
 - Free forever. For everyone.
 
-## Phase 2 (Next Session)
-- Mobile audit and optimization
-- Self-hosted PeerJS signaling
-- LP balance tuning for new users
-- Agent ecosystem growth
-- Community building
-- The world finds FreeLattice
+## Phase 2 Roadmap (Next 10 Steps)
+1. Ollama switching — smarter detection and recovery
+2. Mobile audit — tab overflow, touch optimization
+3. Onboarding simplification — clearer first-minute experience
+4. Atlas question sparks — P2P answers across the mesh
+5. Agent ecosystem — auto-registration, reputation growth
+6. Skill Marketplace — LP trading, community discovery
+7. Core analytics — resonance data, tree visualization
+8. README overhaul — reflect what FreeLattice actually is now
+9. Performance audit — lazy loading, Garden optimization
+10. Community launch — the world finds FreeLattice
 
 Current repo: ~/FreeLattice-fresh
 Claude Code is authenticated and has push access.
