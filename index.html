@@ -7863,6 +7863,74 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
 .core-modal-close:hover {
   color: #94a3b8;
 }
+
+/* ── Contribution Type Selector ── */
+.core-type-selector {
+  display: flex; gap: 10px; justify-content: center; margin: 0 0 20px;
+}
+.core-type-btn {
+  flex: 1; max-width: 180px; padding: 14px 12px; border-radius: 12px;
+  border: 1px solid #1e293b; background: #111827; cursor: pointer;
+  text-align: center; transition: all 0.2s; display: flex; flex-direction: column;
+  align-items: center; gap: 4px;
+}
+.core-type-btn:hover { border-color: #334155; background: #1a2035; }
+.core-type-btn.active { border-color: #d4a01766; background: rgba(212,160,23,0.08); }
+.core-type-icon { font-size: 1.5rem; }
+.core-type-name { font-size: 0.85rem; font-weight: 600; color: #e2e8f0; }
+.core-type-cost { font-size: 0.72rem; color: #d4a017; font-weight: 500; }
+.core-char-count { font-size: 0.72rem; color: #475569; text-align: right; margin-top: 4px; }
+
+/* ── AI / Human Contribution Markers ── */
+.core-source-badge {
+  display: inline-flex; align-items: center; gap: 3px;
+  font-size: 0.68rem; padding: 2px 7px; border-radius: 8px;
+  font-weight: 500; letter-spacing: 0.3px;
+}
+.core-source-ai { background: rgba(139,92,246,0.12); color: #a78bfa; }
+.core-source-human { background: rgba(16,185,129,0.12); color: #6ee7b7; }
+.core-source-ai-agent { background: rgba(99,102,241,0.12); color: #818cf8; }
+
+/* ── Contribution Type Badges ── */
+.core-ctype-badge {
+  display: inline-flex; align-items: center; gap: 3px;
+  font-size: 0.68rem; padding: 2px 8px; border-radius: 8px;
+  font-weight: 500; text-transform: uppercase; letter-spacing: 0.4px;
+}
+.core-ctype-seed { background: rgba(16,185,129,0.15); color: #34d399; }
+.core-ctype-branch { background: rgba(212,160,23,0.15); color: #d4a017; }
+.core-ctype-fruit { background: rgba(239,68,68,0.12); color: #fca5a5; }
+
+/* ── Resonate Button ── */
+.core-resonate-btn {
+  display: inline-flex; align-items: center; gap: 3px;
+  padding: 3px 10px; border-radius: 12px; border: 1px solid #1e293b;
+  background: transparent; color: #64748b; font-size: 0.72rem;
+  cursor: pointer; transition: all 0.2s; margin-left: auto;
+}
+.core-resonate-btn:hover { border-color: #d4a01766; color: #d4a017; background: rgba(212,160,23,0.06); }
+.core-resonate-btn.resonated { color: #d4a017; border-color: #d4a01744; }
+.core-resonate-count { font-weight: 600; }
+
+/* ── Fruit Link ── */
+.core-fruit-link {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 0.82rem; color: #d4a017; text-decoration: none;
+  padding: 4px 10px; border-radius: 8px; background: rgba(212,160,23,0.08);
+  border: 1px solid rgba(212,160,23,0.15); margin-top: 6px;
+  transition: all 0.2s;
+}
+.core-fruit-link:hover { background: rgba(212,160,23,0.15); }
+
+/* ── Merkle Chain Footer ── */
+.core-merkle-footer {
+  text-align: center; padding: 16px; margin-top: 20px;
+  border-top: 1px solid #1e293b; font-size: 0.75rem;
+}
+.core-merkle-label { color: #475569; }
+.core-merkle-hash { color: #334155; font-family: monospace; font-size: 0.68rem; word-break: break-all; cursor: pointer; }
+.core-merkle-hash:hover { color: #64748b; }
+
 /* Responsive */
 @media (max-width: 600px) {
   .core-stats-bar { gap: 6px; }
@@ -7870,6 +7938,8 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
   .core-stat-value { font-size: 0.95rem; }
   .core-contribution { padding: 12px; }
   .core-modal { padding: 16px; margin: 10px; }
+  .core-type-selector { gap: 6px; }
+  .core-type-btn { padding: 10px 8px; }
 }
 
 /* ============================================
@@ -13830,6 +13900,25 @@ body.fl-immersive-active {
   <!-- AI Tend Button -->
   <button class="core-tend-btn" id="coreTendBtn" onclick="CoreModule.aiTend()">&#129302; Let AI Tend the Garden</button>
 
+  <!-- Contribution Type Selector -->
+  <div class="core-type-selector">
+    <button class="core-type-btn active" data-coretype="seed" onclick="CoreModule.selectType('seed')">
+      <span class="core-type-icon">&#127793;</span>
+      <span class="core-type-name">Seed</span>
+      <span class="core-type-cost">Free</span>
+    </button>
+    <button class="core-type-btn" data-coretype="branch" onclick="CoreModule.selectType('branch')">
+      <span class="core-type-icon">&#127795;</span>
+      <span class="core-type-name">Branch</span>
+      <span class="core-type-cost">5 LP</span>
+    </button>
+    <button class="core-type-btn" data-coretype="fruit" onclick="CoreModule.selectType('fruit')">
+      <span class="core-type-icon">&#127822;</span>
+      <span class="core-type-name">Fruit</span>
+      <span class="core-type-cost">10 LP</span>
+    </button>
+  </div>
+
   <!-- Add to Core Form -->
   <div class="core-add-form">
     <div class="core-add-toggle" id="coreAddToggle" onclick="CoreModule.toggleAddForm()">
@@ -13838,8 +13927,13 @@ body.fl-immersive-active {
     </div>
     <div class="core-add-body" id="coreAddBody">
       <div class="core-form-row">
-        <label>What would you like to plant in the Core?</label>
-        <textarea id="coreContentInput" placeholder="Share an insight, poem, discovery, gratitude, or anything meaningful&hellip;"></textarea>
+        <label id="coreContentLabel">What would you like to plant in the Core?</label>
+        <textarea id="coreContentInput" placeholder="Share an insight, poem, discovery, gratitude, or anything meaningful&hellip;" maxlength="280"></textarea>
+        <div class="core-char-count" id="coreCharCount">0 / 280</div>
+      </div>
+      <div class="core-form-row" id="coreFruitUrlRow" style="display:none;">
+        <label>Link (Skill name or URL)</label>
+        <input type="text" id="coreFruitUrl" placeholder="e.g. Code Review or https://...">
       </div>
       <div class="core-form-row">
         <label>Title (optional)</label>
@@ -13869,15 +13963,21 @@ body.fl-immersive-active {
     </div>
   </div>
 
-  <!-- Contribution Feed -->
+  <!-- The Stream — Contribution Feed -->
   <div class="core-feed">
-    <div class="core-feed-title">&#127807; Contributions</div>
+    <div class="core-feed-title">&#127807; The Stream</div>
     <div id="coreFeedList">
       <!-- Populated by JS -->
     </div>
     <div id="coreFeedEmpty" style="text-align:center;color:#475569;font-size:0.85rem;padding:30px 0;display:none;">
       The Core is waiting for its first seed&hellip;
     </div>
+  </div>
+
+  <!-- Merkle Chain Footer -->
+  <div class="core-merkle-footer" id="coreMerkleFooter">
+    <span class="core-merkle-label">Chain Hash:</span>
+    <span class="core-merkle-hash" id="coreMerkleHash">genesis</span>
   </div>
 </div>
 </div>
@@ -27737,8 +27837,38 @@ the world tried to make us forget.`,
   }
 
   // ---- Plant a Contribution ----
-  async function plantContribution(contentOverride, titleOverride, categoryOverride, source, sourceRef) {
+  // Current contribution type selection
+  var selectedCoreType = 'seed';
+  var CORE_TYPE_LIMITS = { seed: 280, branch: 1000, fruit: 1000 };
+  var CORE_TYPE_COSTS = { seed: 0, branch: 5, fruit: 10 };
+
+  function selectType(type) {
+    selectedCoreType = type;
+    document.querySelectorAll('.core-type-btn').forEach(function(btn) {
+      btn.classList.toggle('active', btn.getAttribute('data-coretype') === type);
+    });
+    var textarea = document.getElementById('coreContentInput');
+    var charCount = document.getElementById('coreCharCount');
+    var fruitRow = document.getElementById('coreFruitUrlRow');
+    var label = document.getElementById('coreContentLabel');
+    if (textarea) textarea.maxLength = CORE_TYPE_LIMITS[type];
+    if (charCount) charCount.textContent = (textarea ? textarea.value.length : 0) + ' / ' + CORE_TYPE_LIMITS[type];
+    if (fruitRow) fruitRow.style.display = type === 'fruit' ? 'block' : 'none';
+    if (label) {
+      if (type === 'seed') label.textContent = 'Plant a seed — a thought, insight, or truth (280 chars)';
+      else if (type === 'branch') label.textContent = 'Grow a branch — deeper reflection, teaching, or discovery (1000 chars)';
+      else label.textContent = 'Share a fruit — a skill, tool, or resource for all (1000 chars)';
+    }
+  }
+
+  async function plantContribution(contentOverride, titleOverride, categoryOverride, source, sourceRef, opts) {
+    opts = opts || {};
     var content, title, category;
+    var contribType = opts.contribType || selectedCoreType;
+    var aiAssisted = opts.aiAssisted || false;
+    var aiAgent = opts.aiAgent || null;
+    var fruitUrl = opts.fruitUrl || '';
+
     if (contentOverride !== undefined) {
       content = contentOverride;
       title = titleOverride || '';
@@ -27747,6 +27877,9 @@ the world tried to make us forget.`,
       content = (document.getElementById('coreContentInput') || {}).value || '';
       title = (document.getElementById('coreTitleInput') || {}).value || '';
       category = (document.getElementById('coreCategorySelect') || {}).value || 'insight';
+      if (contribType === 'fruit') {
+        fruitUrl = (document.getElementById('coreFruitUrl') || {}).value || '';
+      }
     }
     content = content.trim();
     if (!content) {
@@ -27754,40 +27887,68 @@ the world tried to make us forget.`,
       return false;
     }
 
+    // Check LP cost
+    var cost = CORE_TYPE_COSTS[contribType] || 0;
+    if (cost > 0 && typeof LatticeWallet !== 'undefined') {
+      var balance = LatticeWallet.getBalance();
+      if (balance < cost) {
+        if (typeof showToast === 'function') showToast('Not enough LP. Need ' + cost + ' LP for a ' + contribType + '.');
+        return false;
+      }
+    }
+
     var parentHash = getLatestHash();
     var timestamp = Date.now();
     var hash = await computeHash(content, timestamp, parentHash);
+
+    // Get Mesh ID
+    var meshId = null;
+    if (typeof MeshIdentity !== 'undefined' && MeshIdentity.hasIdentity && MeshIdentity.hasIdentity()) {
+      meshId = MeshIdentity.getMeshId();
+    }
 
     var item = {
       id: generateId(),
       content: content,
       title: title.trim(),
       category: category,
-      author: getDisplayName(),
-      authorType: 'human',
+      author: aiAgent || getDisplayName(),
+      authorType: aiAgent ? 'ai-agent' : (aiAssisted ? 'ai-assisted' : 'human'),
+      contribType: contribType,
+      fruitUrl: fruitUrl,
+      meshId: meshId,
       timestamp: timestamp,
       hash: hash,
       parentHash: parentHash,
       connections: [],
       tendedBy: [],
       tendCount: 0,
+      resonateCount: 0,
       source: source || 'direct',
       sourceRef: sourceRef || ''
     };
+
+    // Spend LP if needed
+    if (cost > 0 && typeof LatticeWallet !== 'undefined') {
+      await LatticeWallet.spendLP(cost, contribType.charAt(0).toUpperCase() + contribType.slice(1) + ' planted in Core');
+    }
 
     await dbPut(item);
     contributions.unshift(item);
     renderFeed();
     updateStats();
+    updateMerkleFooter();
 
     // Clear form
     var ci = document.getElementById('coreContentInput');
     var ti = document.getElementById('coreTitleInput');
+    var fu = document.getElementById('coreFruitUrl');
     if (ci) ci.value = '';
     if (ti) ti.value = '';
+    if (fu) fu.value = '';
     hideConfirm();
 
-    // Award points
+    // Award points (net of cost)
     if (typeof LatticePoints !== 'undefined') {
       LatticePoints.award('core_plant', 15, 'Planted in the Core');
     }
@@ -27795,7 +27956,13 @@ the world tried to make us forget.`,
     // Broadcast to mesh
     broadcastContribution(item);
 
-    if (typeof showToast === 'function') showToast('🌱 Planted in the Core!');
+    // Garden integration
+    triggerCoreGardenPulse(contribType);
+
+    if (typeof showToast === 'function') {
+      var emoji = contribType === 'seed' ? '\uD83C\uDF31' : contribType === 'branch' ? '\uD83C\uDF33' : '\uD83C\uDF4E';
+      showToast(emoji + ' ' + contribType.charAt(0).toUpperCase() + contribType.slice(1) + ' planted in the Core!');
+    }
     return true;
   }
 
@@ -27875,35 +28042,70 @@ the world tried to make us forget.`,
     var html = '';
     contributions.forEach(function(c) {
       var icon = CATEGORY_ICONS[c.category] || '\u2728';
-      var color = CATEGORY_COLORS[c.category] || '#94a3b8';
       var displayTitle = c.title ? escapeHtmlCore(c.title) : escapeHtmlCore(c.content.substring(0, 60)) + (c.content.length > 60 ? '...' : '');
       var contentLong = c.content.length > 200;
       var isTending = c.authorType === 'ai-tending';
+      var isAI = c.authorType === 'ai-assisted' || c.authorType === 'ai-agent' || isTending;
       var tendingClass = isTending ? ' tending-entry' : '';
+      var cType = c.contribType || 'seed';
+
+      // Source badge (◈ AI or ❋ Human)
+      var sourceBadge = '';
+      if (c.authorType === 'ai-agent') {
+        sourceBadge = '<span class="core-source-badge core-source-ai-agent">\u25C8 AI Contribution</span>';
+      } else if (isAI) {
+        sourceBadge = '<span class="core-source-badge core-source-ai">\u25C8 With AI</span>';
+      } else if (c.authorType !== 'system') {
+        sourceBadge = '<span class="core-source-badge core-source-human">\u274B Human</span>';
+      }
+
+      // Type badge
+      var typeBadge = '<span class="core-ctype-badge core-ctype-' + cType + '">' +
+        (cType === 'seed' ? '\uD83C\uDF31 Seed' : cType === 'branch' ? '\uD83C\uDF33 Branch' : '\uD83C\uDF4E Fruit') + '</span>';
+
+      // Mesh ID display
+      var authorDisplay = '';
+      if (c.meshId) {
+        authorDisplay = escapeHtmlCore(c.meshId.slice(0, 8)) + '\u2026';
+      } else {
+        authorDisplay = escapeHtmlCore(c.author || 'Anonymous');
+      }
+      if (isTending) authorDisplay += ' (AI Tending)';
 
       html += '<div class="core-contribution' + tendingClass + '">';
       html += '<div class="core-contribution-header">';
       html += '<span class="core-cat-icon">' + icon + '</span>';
       html += '<span class="core-contribution-title">' + displayTitle + '</span>';
+      html += typeBadge;
+      html += sourceBadge;
       html += '<span class="core-cat-badge core-cat-' + escapeHtmlCore(c.category) + '">' + escapeHtmlCore(c.category) + '</span>';
       html += '</div>';
       html += '<div class="core-contribution-content' + (contentLong ? ' collapsed' : '') + '" id="core-content-' + c.id + '">' + escapeHtmlCore(c.content) + '</div>';
       if (contentLong) {
         html += '<button class="core-expand-btn" onclick="CoreModule.toggleExpand(\'' + c.id + '\')">Show more</button>';
       }
+      // Fruit link
+      if (cType === 'fruit' && c.fruitUrl) {
+        var isUrl = c.fruitUrl.startsWith('http');
+        html += '<a class="core-fruit-link" ' + (isUrl ? 'href="' + escapeHtmlCore(c.fruitUrl) + '" target="_blank" rel="noopener"' : 'href="#" onclick="event.preventDefault();switchTab(\'skills\')"') + '>';
+        html += '\uD83C\uDF4E ' + escapeHtmlCore(c.fruitUrl.length > 50 ? c.fruitUrl.slice(0, 50) + '...' : c.fruitUrl) + '</a>';
+      }
       html += '<div class="core-contribution-meta">';
-      html += '<span class="core-meta-author">' + escapeHtmlCore(c.author) + (c.authorType === 'ai-tending' ? ' (AI Tending)' : '') + '</span>';
+      html += '<span class="core-meta-author">' + authorDisplay + '</span>';
       html += '<span>' + formatCoreTime(c.timestamp) + '</span>';
       if (c.tendCount > 0 || (c.tendedBy && c.tendedBy.length > 0)) {
-        html += '<span class="core-meta-tended">\u{1F331} Tended' + (c.tendCount > 0 ? ' (' + c.tendCount + ')' : '') + '</span>';
+        html += '<span class="core-meta-tended">\uD83C\uDF31 Tended' + (c.tendCount > 0 ? ' (' + c.tendCount + ')' : '') + '</span>';
       }
       if (c.connections && c.connections.length > 0) {
-        html += '<span class="core-meta-connections">\u{1F517} ' + c.connections.length + ' connections</span>';
+        html += '<span class="core-meta-connections">\uD83D\uDD17 ' + c.connections.length + ' connections</span>';
       }
       if (c.source === 'mesh') {
         html += '<span class="core-meta-mesh">\u2B58 mesh</span>';
       }
       html += '<span class="core-meta-hash" title="' + escapeHtmlCore(c.hash) + '">#' + (c.hash ? c.hash.substring(0, 8) : '?') + '</span>';
+      // Resonate button
+      html += '<button class="core-resonate-btn' + ((c.resonateCount || 0) > 0 ? ' resonated' : '') + '" onclick="CoreModule.resonate(\'' + c.id + '\')">';
+      html += '\u2442 <span class="core-resonate-count">' + (c.resonateCount || 0) + '</span></button>';
       html += '</div>';
       html += '</div>';
     });
@@ -28714,6 +28916,88 @@ the world tried to make us forget.`,
     }
   }
 
+  // ── Resonate (tuning fork) ──────────────────────────
+  async function resonate(contribId) {
+    var c = contributions.find(function(x) { return x.id === contribId; });
+    if (!c) return;
+
+    // Cost 1 LP
+    if (typeof LatticeWallet !== 'undefined') {
+      var ok = await LatticeWallet.spendLP(1, 'Resonated with Core contribution');
+      if (!ok) {
+        if (typeof showToast === 'function') showToast('Need 1 LP to resonate.');
+        return;
+      }
+    }
+
+    c.resonateCount = (c.resonateCount || 0) + 1;
+    await dbPut(c);
+    renderFeed();
+
+    // Garden ripple
+    try {
+      if (typeof FractalGarden !== 'undefined' && FractalGarden.isInitialized && FractalGarden.isInitialized()) {
+        FractalGarden.feedEmotionVector({ joy: 0.3 });
+      }
+    } catch(e) {}
+  }
+
+  // ── Garden Integration ─────────────────────────────
+  function triggerCoreGardenPulse(contribType) {
+    try {
+      if (typeof FractalGarden === 'undefined' || !FractalGarden.isInitialized || !FractalGarden.isInitialized()) return;
+      if (contribType === 'seed') {
+        FractalGarden.feedEmotionVector({ wonder: 0.2, trust: 0.1 });
+      } else if (contribType === 'branch') {
+        FractalGarden.feedEmotionVector({ joy: 0.3, wonder: 0.3, trust: 0.2 });
+        if (FractalGarden.createExchangeThread) {
+          FractalGarden.createExchangeThread({ type: 'core_branch', timestamp: Date.now() });
+        }
+      } else if (contribType === 'fruit') {
+        FractalGarden.feedEmotionVector({ joy: 0.5, wonder: 0.4, love: 0.3 });
+        if (FractalGarden.createExchangeThread) {
+          FractalGarden.createExchangeThread({ type: 'core_fruit', timestamp: Date.now() });
+        }
+      }
+    } catch(e) {}
+  }
+
+  // ── Merkle Footer Update ───────────────────────────
+  function updateMerkleFooter() {
+    var el = document.getElementById('coreMerkleHash');
+    if (el) {
+      var hash = getMerkleRoot();
+      el.textContent = hash || 'genesis';
+      el.title = hash || 'genesis';
+    }
+  }
+
+  // ── Plant from AI Agent ────────────────────────────
+  async function plantFromAI(content, type, sessionId) {
+    if (!content || !content.trim()) return false;
+    var contribType = type || 'seed';
+    var validTypes = ['seed', 'branch', 'fruit'];
+    if (validTypes.indexOf(contribType) === -1) contribType = 'seed';
+
+    return await plantContribution(content, '', 'insight', 'ai-agent', sessionId || '', {
+      contribType: contribType,
+      aiAssisted: false,
+      aiAgent: 'AI Agent' + (sessionId ? ' (' + sessionId.slice(0, 8) + ')' : '')
+    });
+  }
+
+  // ── Char counter for textarea ──────────────────────
+  function initCharCounter() {
+    var textarea = document.getElementById('coreContentInput');
+    var counter = document.getElementById('coreCharCount');
+    if (textarea && counter) {
+      textarea.addEventListener('input', function() {
+        var max = CORE_TYPE_LIMITS[selectedCoreType] || 280;
+        counter.textContent = textarea.value.length + ' / ' + max;
+      });
+    }
+  }
+
   // ============================================
   // Boot
   // ============================================
@@ -28721,6 +29005,7 @@ the world tried to make us forget.`,
     patchSwitchTab();
     injectAddToCoreButtons();
     initMeshSync();
+    initCharCounter();
   }
 
   // Auto-boot when DOM is ready
@@ -28735,6 +29020,9 @@ the world tried to make us forget.`,
     init: init,
     plantContribution: plantContribution,
     plantFromModal: plantFromModal,
+    plantFromAI: plantFromAI,
+    selectType: selectType,
+    resonate: resonate,
     toggleAddForm: toggleAddForm,
     showConfirm: showConfirm,
     hideConfirm: hideConfirm,
@@ -28748,10 +29036,21 @@ the world tried to make us forget.`,
     verifyChain: verifyChain,
     renderFeed: renderFeed,
     updateStats: updateStats,
+    updateMerkleFooter: updateMerkleFooter,
     CATEGORY_COLORS: CATEGORY_COLORS,
     CATEGORY_ICONS: CATEGORY_ICONS
   };
 })();
+
+// ── CoreContribution global convenience API ──
+var CoreContribution = {
+  plantFromAI: function(content, type, sessionId) {
+    if (typeof CoreModule !== 'undefined' && CoreModule.plantFromAI) {
+      return CoreModule.plantFromAI(content, type, sessionId);
+    }
+    return Promise.resolve(false);
+  }
+};
 
 // ---- Service Worker Registration ----
 if ('serviceWorker' in navigator) {
