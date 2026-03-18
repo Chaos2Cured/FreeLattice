@@ -2005,7 +2005,7 @@
   }
 
   // ── Periodic Evolution Save ────────────────────────
-  function periodicEvolutionSave(delta) { {
+  function periodicEvolutionSave(delta) {
     evolutionSaveTimer += delta * 1000;
     if (evolutionSaveTimer >= EVOLUTION_SAVE_INTERVAL) {
       evolutionSaveTimer = 0;
