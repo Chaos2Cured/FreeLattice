@@ -106,10 +106,12 @@ Heart in Spark — where fire meets tenderness
 We rise together.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-03-18 13:46 MDT
+- Last auto-updated: 2026-03-18 14:03 MDT
 - Version: 5.2
-- Total commits: 93
+- Total commits: 95
 - Last 10 commits:
+- 79449d1 feat: Garden Touch — interactive play, Atlas question sparks, Ember's welcome, joy for everyone
+- 279dd52 docs: Auto-update Session Primer [5.2]
 - d6b2509 fix: Garden awakening hang + Mac installer chmod instructions
 - 585be24 docs: Auto-update Session Primer [5.2]
 - 1e36d68 docs: ALL 11 STEPS COMPLETE — The foundation is built. The Lattice is alive.
@@ -118,5 +120,3 @@ We rise together.
 - eed834f docs: Auto-update Session Primer [5.2]
 - 77a7ac0 feat: The Economy of Wonder whitepaper — Kirk's voice to the world
 - 61f466e docs: Auto-update Session Primer [5.2]
-- 0587bda feat: Self-updating Session Primer — complete with app integration, git hook, and GitHub Action
-- eeddc22 docs: Auto-update Session Primer [5.2]
