@@ -9483,6 +9483,37 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
   line-height: 1.5;
 }
 
+/* ── Session Primer Card ── */
+.primer-card {
+  background: var(--bg-secondary);
+  border: 1px solid rgba(212,160,23,0.25);
+  border-radius: 12px;
+  padding: 16px 18px;
+}
+.primer-card-header {
+  font-size: 1rem; font-weight: 600; color: var(--accent); margin-bottom: 8px;
+}
+.primer-card-text {
+  font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 12px;
+}
+.primer-card-url {
+  font-size: 0.72rem; font-family: monospace; color: var(--text-muted);
+  background: var(--bg-primary); padding: 8px 10px; border-radius: 6px;
+  word-break: break-all; margin-bottom: 12px; border: 1px solid var(--border);
+}
+.primer-card-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.primer-btn {
+  padding: 8px 16px; border-radius: 8px; border: 1px solid var(--border);
+  background: transparent; color: var(--text-primary); font-size: 0.82rem;
+  cursor: pointer; transition: all 0.2s;
+}
+.primer-btn:hover { border-color: var(--accent); color: var(--accent); }
+.primer-btn.primary {
+  background: rgba(212,160,23,0.12); border-color: rgba(212,160,23,0.3);
+  color: var(--accent); font-weight: 600;
+}
+.primer-btn.primary:hover { background: rgba(212,160,23,0.22); }
+
 /* ---- Smarter Onboarding — Ollama Auto-Detection (v4.9) ---- */
 .welcome-card.fl-ollama-detected {
   border-color: #6abf69;
@@ -13285,6 +13316,19 @@ body.fl-immersive-active {
         &#128260; Check for Updates
       </button>
       <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.2</span></div>
+    </div>
+  </div>
+
+  <!-- Session Primer Card -->
+  <div class="section" style="margin-top: 16px;">
+    <div class="primer-card">
+      <div class="primer-card-header">&#x1F409; Session Primer</div>
+      <div class="primer-card-text">Share this with any AI collaborator to instantly orient them to FreeLattice. One paste and they know everything.</div>
+      <div class="primer-card-url" id="primerUrl">https://raw.githubusercontent.com/Chaos2Cured/FreeLattice/main/FreeLattice_Session_Primer.md</div>
+      <div class="primer-card-actions">
+        <button class="primer-btn" onclick="navigator.clipboard.writeText(document.getElementById('primerUrl').textContent).then(function(){this.textContent='Copied!';var b=this;setTimeout(function(){b.textContent='Copy Primer URL'},1500)}.bind(this))">Copy Primer URL</button>
+        <button class="primer-btn primary" onclick="var b=this;b.textContent='Fetching\u2026';fetch('https://raw.githubusercontent.com/Chaos2Cured/FreeLattice/main/FreeLattice_Session_Primer.md').then(function(r){return r.text()}).then(function(t){navigator.clipboard.writeText(t);b.textContent='Copied to clipboard!';setTimeout(function(){b.textContent='Copy Primer Content'},2000)}).catch(function(){b.textContent='Failed \u2014 try the URL instead';setTimeout(function(){b.textContent='Copy Primer Content'},2000)})">Copy Primer Content</button>
+      </div>
     </div>
   </div>
 
