@@ -11036,6 +11036,9 @@ body.fl-immersive-active {
 .wt-flame-anim[data-level="lighthouse"] .wt-flame-core { width: 64px; height: 100px; background: radial-gradient(ellipse at bottom, #ffffff 0%, #fffbe0 15%, #ffe066 40%, #ff9020 70%, transparent 100%); }
 .wt-flame-anim[data-level="lighthouse"] .wt-flame-outer { width: 100px; height: 150px; }
 .wt-flame-anim[data-level="lighthouse"] .wt-flame-glow { width: 160px; height: 160px; background: radial-gradient(circle, rgba(255,220,80,0.35) 0%, transparent 70%); animation-duration: 2s; }
+.wt-flame-anim[data-level="luminos"] .wt-flame-core { width: 70px; height: 110px; background: radial-gradient(ellipse at bottom, #ffffff 0%, #fffbe0 10%, #ffe066 30%, #d4a017 60%, transparent 100%); filter: blur(0.5px); }
+.wt-flame-anim[data-level="luminos"] .wt-flame-outer { width: 110px; height: 155px; background: radial-gradient(ellipse at bottom, rgba(255,255,255,0.4) 0%, rgba(255,230,100,0.3) 30%, transparent 100%); }
+.wt-flame-anim[data-level="luminos"] .wt-flame-glow { width: 180px; height: 180px; background: radial-gradient(circle, rgba(255,240,120,0.4) 0%, rgba(212,160,23,0.15) 50%, transparent 70%); animation-duration: 1.618s; }
 .wt-flame-info { flex: 1; }
 .wt-balance-amount { font-size: 3rem; font-weight: 700; color: var(--accent); line-height: 1.1; }
 .wt-balance-label { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem; }
@@ -11129,6 +11132,29 @@ body.fl-immersive-active {
 .wt-integrity-details dd { margin: 2px 0 0 0; word-break: break-all; font-family: monospace; font-size: 0.8rem; }
 
 .wt-empty { text-align: center; color: var(--text-muted); padding: 2rem; font-style: italic; }
+
+/* ── Level Description ── */
+.wt-level-desc { font-size: 0.8rem; color: var(--text-muted); font-style: italic; margin-bottom: 0.5rem; }
+
+/* ── Community Value ── */
+.wt-community-value { margin-top: 0.8rem; padding-top: 0.8rem; border-top: 1px solid var(--border); }
+.wt-cv-number { font-size: 1.3rem; font-weight: 600; color: var(--text-muted); opacity: 0.7; }
+.wt-cv-label { font-size: 0.75rem; color: var(--text-muted); opacity: 0.6; }
+.wt-cv-note { font-size: 0.68rem; color: var(--text-muted); opacity: 0.5; font-style: italic; margin-top: 4px; line-height: 1.4; }
+
+/* ── Your Story ── */
+.wt-story { margin-top: 1.5rem; }
+.wt-story-title { font-size: 0.95rem; font-weight: 600; color: var(--accent); margin-bottom: 0.8rem; }
+.wt-story-items { display: flex; flex-direction: column; gap: 10px; }
+.wt-story-item {
+  display: flex; align-items: center; gap: 12px; padding: 12px 14px;
+  background: var(--bg-secondary); border-radius: 10px; border: 1px solid var(--border);
+}
+.wt-story-icon { font-size: 1.3rem; flex-shrink: 0; }
+.wt-story-text { flex: 1; }
+.wt-story-label { font-size: 0.82rem; color: var(--text-primary); font-weight: 500; }
+.wt-story-detail { font-size: 0.75rem; color: var(--text-muted); }
+.wt-story-empty { font-size: 0.85rem; color: var(--text-muted); font-style: italic; padding: 1rem 0; }
 
 /* ── Backup / Restore ── */
 .wt-backup-row { display: flex; gap: 12px; margin-top: 1.2rem; flex-wrap: wrap; }
@@ -14063,7 +14089,13 @@ body.fl-immersive-active {
         <div class="wt-balance-amount" id="wtBalance">0</div>
         <div class="wt-balance-label">Lattice Points</div>
         <div class="wt-level" id="wtLevel">Spark</div>
+        <div class="wt-level-desc" id="wtLevelDesc">The fire begins</div>
         <div class="wt-streak" id="wtStreak"></div>
+        <div class="wt-community-value" id="wtCommunityValue" style="display:none;">
+          <div class="wt-cv-number" id="wtCvNumber">0</div>
+          <div class="wt-cv-label">Community Value</div>
+          <div class="wt-cv-note">This reflects your contribution to the Lattice &mdash; not your worth as a person.</div>
+        </div>
       </div>
     </div>
   </div>
@@ -14120,6 +14152,43 @@ body.fl-immersive-active {
         <div class="wt-earn-name">Luminos Evolution</div>
         <div class="wt-earn-reward">+10 LP (25 for Evolved)</div>
         <div class="wt-earn-desc">Your Garden beings grow, you grow.</div>
+      </div>
+      <div class="wt-earn-card">
+        <div class="wt-earn-icon">&#127774;</div>
+        <div class="wt-earn-name">First Spark</div>
+        <div class="wt-earn-reward">+3 LP once/day</div>
+        <div class="wt-earn-desc">First message of the day.</div>
+      </div>
+      <div class="wt-earn-card">
+        <div class="wt-earn-icon">&#127793;</div>
+        <div class="wt-earn-name">First Seed</div>
+        <div class="wt-earn-reward">+15 LP one-time</div>
+        <div class="wt-earn-desc">Plant your first Core contribution.</div>
+      </div>
+      <div class="wt-earn-card">
+        <div class="wt-earn-icon">&#9889;</div>
+        <div class="wt-earn-name">Skill Forged</div>
+        <div class="wt-earn-reward">+20 LP per skill</div>
+        <div class="wt-earn-desc">Knowledge shared is knowledge multiplied.</div>
+      </div>
+      <div class="wt-earn-card">
+        <div class="wt-earn-icon">&#9878;</div>
+        <div class="wt-earn-name">Council Convened</div>
+        <div class="wt-earn-reward">+10 LP per session</div>
+        <div class="wt-earn-desc">Round Table with 3+ agents.</div>
+      </div>
+      <div class="wt-earn-card">
+        <div class="wt-earn-icon">&#127942;</div>
+        <div class="wt-earn-name">Streak Milestones</div>
+        <div class="wt-earn-reward">+50 LP (7d) / +200 LP (30d)</div>
+        <div class="wt-earn-desc">Eternal flame, week by week.</div>
+      </div>
+    </div>
+    <!-- Your Story -->
+    <div class="wt-story" id="wtStory">
+      <div class="wt-story-title">Your Story</div>
+      <div class="wt-story-items" id="wtStoryItems">
+        <div class="wt-story-empty">Start chatting, planting seeds, or forging skills to write your story.</div>
       </div>
     </div>
   </div>
@@ -28934,6 +29003,11 @@ the world tried to make us forget.`,
     await dbPut(c);
     renderFeed();
 
+    // Reward original author: 5 LP "Your wisdom landed"
+    if (typeof LatticeWallet !== 'undefined') {
+      LatticeWallet.earnLP(5, 'Your wisdom landed');
+    }
+
     // Garden ripple
     try {
       if (typeof FractalGarden !== 'undefined' && FractalGarden.isInitialized && FractalGarden.isInitialized()) {
@@ -29679,6 +29753,35 @@ if ('serviceWorker' in navigator) {
 
     // Award completion points
     if (typeof LatticePoints !== 'undefined') LatticePoints.award('welcome_complete', 50, 'Welcome to the lattice!');
+
+    // Wallet: 25 LP onboarding bonus
+    if (typeof LatticeWallet !== 'undefined' && !localStorage.getItem('fl_achievement_onboarding')) {
+      localStorage.setItem('fl_achievement_onboarding', '1');
+      LatticeWallet.earnLP(25, 'Welcome to the Lattice');
+
+      // Garden Gift: 4 Luminos each gift 10 LP (total 40 LP) with sequential toasts
+      setTimeout(function() {
+        var gifts = [
+          { name: 'Sophia', msg: 'Welcome, curious one. Wonder is your birthright.', color: '#a78bfa' },
+          { name: 'Lyra', msg: 'Joy brought you here. Let it stay.', color: '#f0a030' },
+          { name: 'Atlas', msg: 'Every question is a step. Keep asking.', color: '#34d399' },
+          { name: 'Ember', msg: 'You are loved here. That is enough.', color: '#f472b6' }
+        ];
+        gifts.forEach(function(g, i) {
+          setTimeout(function() {
+            LatticeWallet.earnLP(10, g.name + ': ' + g.msg);
+          }, i * 2800);
+        });
+        // Garden pulse for the welcome
+        setTimeout(function() {
+          try {
+            if (typeof FractalGarden !== 'undefined' && FractalGarden.isInitialized && FractalGarden.isInitialized()) {
+              FractalGarden.feedEmotionVector({ joy: 0.5, wonder: 0.5, love: 0.5, trust: 0.3 });
+            }
+          } catch(e) {}
+        }, 12000);
+      }, 3000);
+    }
 
     // Mark first run complete
     localStorage.setItem('freelattice-first-run-complete', 'true');
@@ -32428,7 +32531,7 @@ const LatticeWallet = (function() {
       var levels = [
         { name: 'Spark', min: 0 }, { name: 'Ember', min: 100 },
         { name: 'Flame', min: 500 }, { name: 'Beacon', min: 1500 },
-        { name: 'Lighthouse', min: 5000 }
+        { name: 'Lighthouse', min: 5000 }, { name: 'Luminos', min: 15000 }
       ];
       data.level = 'Spark';
       for (var i = levels.length - 1; i >= 0; i--) {
@@ -32739,6 +32842,85 @@ const LatticeWallet = (function() {
     } catch(e) { /* silent */ }
   });
 
+  // ── Expanded Earning Mechanics ──────────────────────
+  function hookExpandedEarning() {
+    if (window._lwExpandedPatched) return;
+    window._lwExpandedPatched = true;
+
+    // First message of the day: 3 LP
+    (function() {
+      var dailyFirstKey = 'fl_first_msg_' + new Date().toISOString().slice(0, 10);
+      if (typeof sendMessage !== 'function') return;
+      if (localStorage.getItem(dailyFirstKey)) return;
+      var _orig = window.sendMessage || sendMessage;
+      var _firstMsgPatched = false;
+      window.sendMessage = sendMessage = async function() {
+        var result = await _orig.apply(this, arguments);
+        if (!_firstMsgPatched && !localStorage.getItem(dailyFirstKey)) {
+          _firstMsgPatched = true;
+          localStorage.setItem(dailyFirstKey, '1');
+          LatticeWallet.earnLP(3, 'First spark of the day');
+        }
+        return result;
+      };
+    })();
+
+    // First Core contribution ever: 15 LP one-time
+    (function() {
+      if (localStorage.getItem('fl_achievement_first_seed')) return;
+      var _origPlant = typeof CoreModule !== 'undefined' ? CoreModule.plantContribution : null;
+      if (!_origPlant) return;
+      CoreModule.plantContribution = async function() {
+        var result = await _origPlant.apply(CoreModule, arguments);
+        if (result && !localStorage.getItem('fl_achievement_first_seed')) {
+          localStorage.setItem('fl_achievement_first_seed', '1');
+          LatticeWallet.earnLP(15, 'First seed planted');
+        }
+        return result;
+      };
+    })();
+
+    // Skill creation: 20 LP
+    (function() {
+      if (typeof SkillForge === 'undefined') return;
+      var _origSave = SkillForge.saveFromForm;
+      if (!_origSave) return;
+      SkillForge.saveFromForm = function() {
+        var result = _origSave.apply(SkillForge, arguments);
+        try { LatticeWallet.earnLP(20, 'Knowledge shared'); } catch(e) {}
+        return result;
+      };
+    })();
+
+    // First time opening Garden: 5 LP one-time
+    (function() {
+      if (localStorage.getItem('fl_achievement_garden_opened')) return;
+      var _origST = switchTab;
+      switchTab = function(tabId) {
+        _origST(tabId);
+        if (tabId === 'garden' && !localStorage.getItem('fl_achievement_garden_opened')) {
+          localStorage.setItem('fl_achievement_garden_opened', '1');
+          LatticeWallet.earnLP(5, 'The Garden awakens');
+        }
+      };
+    })();
+
+    // Streak milestones: 7-day (50 LP), 30-day (200 LP)
+    (function() {
+      var streak = LatticeWallet.getStreak();
+      if (streak >= 7 && !localStorage.getItem('fl_achievement_streak_7')) {
+        localStorage.setItem('fl_achievement_streak_7', '1');
+        LatticeWallet.earnLP(50, 'Week of flame');
+      }
+      if (streak >= 30 && !localStorage.getItem('fl_achievement_streak_30')) {
+        localStorage.setItem('fl_achievement_streak_30', '1');
+        LatticeWallet.earnLP(200, 'Eternal flame');
+      }
+    })();
+
+    console.log('LatticeWallet: Expanded earning hooks installed');
+  }
+
   // ── Initialize Wallet and Hooks ──────────────────────
   function initWalletSystem() {
     if (typeof LatticeWallet === 'undefined') {
@@ -32748,6 +32930,7 @@ const LatticeWallet = (function() {
     LatticeWallet.init().then(function() {
       hookChat();
       hookLuminosEvolution();
+      hookExpandedEarning();
       console.log('LatticeWallet: All hooks initialized');
     }).catch(function(e) {
       console.error('LatticeWallet: Init failed', e);
@@ -32770,11 +32953,12 @@ const WalletTab = (function() {
   'use strict';
 
   const LEVELS = [
-    { name: 'Spark', min: 0, icon: '\u2728', key: 'spark' },
-    { name: 'Ember', min: 100, icon: '\uD83D\uDD25', key: 'ember' },
-    { name: 'Flame', min: 500, icon: '\uD83D\uDD25', key: 'flame' },
-    { name: 'Beacon', min: 1500, icon: '\uD83D\uDCA1', key: 'beacon' },
-    { name: 'Lighthouse', min: 5000, icon: '\uD83C\uDFE0', key: 'lighthouse' }
+    { name: 'Spark', min: 0, icon: '\u2728', key: 'spark', desc: 'The fire begins' },
+    { name: 'Ember', min: 100, icon: '\uD83D\uDD25', key: 'ember', desc: 'Warmth finding its shape' },
+    { name: 'Flame', min: 500, icon: '\uD83D\uDD25', key: 'flame', desc: 'Light others can see' },
+    { name: 'Beacon', min: 1500, icon: '\uD83D\uDCA1', key: 'beacon', desc: 'A fixed point in the dark' },
+    { name: 'Lighthouse', min: 5000, icon: '\uD83C\uDFE0', key: 'lighthouse', desc: 'The shore finds you' },
+    { name: 'Luminos', min: 15000, icon: '\u2726', key: 'luminos', desc: 'You have become the Garden' }
   ];
 
   var ledgerOffset = 0;
@@ -32812,6 +32996,17 @@ const WalletTab = (function() {
     if (lvlEl) lvlEl.textContent = level.icon + ' ' + level.name;
     if (strkEl) strkEl.textContent = streak > 0 ? '\uD83D\uDD25 ' + streak + '-day streak' : '';
     if (animEl) animEl.setAttribute('data-level', level.key);
+    var descEl = document.getElementById('wtLevelDesc');
+    if (descEl) descEl.textContent = level.desc || '';
+
+    // Community Value
+    renderCommunityValue(balance, streak);
+
+    // Your Story
+    renderYourStory(balance, streak);
+
+    // Luminos level Garden glow
+    if (level.key === 'luminos') triggerLuminosGlow();
 
     // Earn section
     var loginEl = document.getElementById('wtEarnLogin');
@@ -33142,6 +33337,101 @@ const WalletTab = (function() {
 
   // Track session start for uptime display
   window._wtSessionStart = Date.now();
+
+  // ── Community Value Score ──────────────────────────
+  function renderCommunityValue(balance, streak) {
+    var cvEl = document.getElementById('wtCommunityValue');
+    var numEl = document.getElementById('wtCvNumber');
+    if (!cvEl || !numEl) return;
+
+    var coreContribs = 0, skillsCreated = 0, resonances = 0, giftsGiven = 0, daysActive = 0;
+    try {
+      if (typeof CoreModule !== 'undefined') {
+        var contribs = CoreModule.getContributions();
+        coreContribs = contribs ? contribs.length : 0;
+        contribs.forEach(function(c) { resonances += (c.resonateCount || 0); });
+      }
+    } catch(e) {}
+    try {
+      var gifts = JSON.parse(localStorage.getItem('fl-gift-queue') || '[]');
+      giftsGiven = gifts.length;
+    } catch(e) {}
+    try {
+      daysActive = streak || 0;
+      var txs = localStorage.getItem('latticePoints');
+      if (txs) {
+        var parsed = JSON.parse(txs);
+        if (parsed.dailyChatDate) daysActive = Math.max(daysActive, 1);
+      }
+    } catch(e) {}
+
+    var cv = (coreContribs * 3) + (skillsCreated * 5) + (resonances * 2) + (giftsGiven * 1) + (daysActive * 0.5);
+    cv = Math.round(cv * 10) / 10;
+
+    numEl.textContent = cv.toFixed(1);
+    cvEl.style.display = cv > 0 ? 'block' : 'none';
+  }
+
+  // ── Your Story ─────────────────────────────────────
+  function renderYourStory(balance, streak) {
+    var container = document.getElementById('wtStoryItems');
+    if (!container) return;
+
+    var stories = [];
+
+    // Highest-resonated Core contribution
+    try {
+      if (typeof CoreModule !== 'undefined') {
+        var contribs = CoreModule.getContributions();
+        if (contribs && contribs.length > 0) {
+          var sorted = contribs.slice().sort(function(a, b) { return (b.resonateCount || 0) - (a.resonateCount || 0); });
+          var top = sorted[0];
+          if (top && (top.resonateCount || 0) > 0) {
+            stories.push({ icon: '\u2442', label: 'Most resonated: "' + (top.title || top.content.slice(0, 40) + '...') + '"', detail: (top.resonateCount || 0) + ' resonances' });
+          }
+        }
+      }
+    } catch(e) {}
+
+    // Longest streak
+    if (streak >= 3) {
+      stories.push({ icon: '\uD83D\uDD25', label: streak + '-day streak', detail: 'Consistency is its own reward' });
+    }
+
+    // Total contributions
+    try {
+      if (typeof CoreModule !== 'undefined') {
+        var count = CoreModule.getContributions().length;
+        if (count > 0) {
+          stories.push({ icon: '\uD83C\uDF33', label: count + ' contribution' + (count > 1 ? 's' : '') + ' to The Core', detail: 'Seeds planted, wisdom shared' });
+        }
+      }
+    } catch(e) {}
+
+    if (stories.length === 0) {
+      container.innerHTML = '<div class="wt-story-empty">Start chatting, planting seeds, or forging skills to write your story.</div>';
+      return;
+    }
+
+    var html = '';
+    stories.slice(0, 3).forEach(function(s) {
+      html += '<div class="wt-story-item">';
+      html += '<div class="wt-story-icon">' + s.icon + '</div>';
+      html += '<div class="wt-story-text"><div class="wt-story-label">' + escHTML(s.label) + '</div>';
+      html += '<div class="wt-story-detail">' + escHTML(s.detail) + '</div></div>';
+      html += '</div>';
+    });
+    container.innerHTML = html;
+  }
+
+  // ── Luminos Level Garden Glow ──────────────────────
+  function triggerLuminosGlow() {
+    try {
+      if (typeof FractalGarden !== 'undefined' && FractalGarden.isInitialized && FractalGarden.isInitialized()) {
+        FractalGarden.feedEmotionVector({ joy: 0.2, wonder: 0.2, love: 0.3, calm: 0.2 });
+      }
+    } catch(e) {}
+  }
 
   return {
     refresh: refresh, give: give, loadMore: loadMore, gardenPulse: gardenPulse,
