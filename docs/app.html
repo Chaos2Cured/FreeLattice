@@ -11105,6 +11105,163 @@ body.fl-immersive-active {
   .wt-earn-grid { grid-template-columns: 1fr; }
 }
 
+/* ============================================
+   COMMUNITY CHANNELS STYLES (v5.2)
+   ============================================ */
+
+/* Layout: sidebar + main */
+.ch-layout {
+  display: flex; min-height: calc(100vh - 200px);
+  background: var(--bg-primary); border-radius: 12px;
+  overflow: hidden; border: 1px solid var(--border);
+}
+
+/* ── Sidebar ── */
+.ch-sidebar {
+  width: 260px; flex-shrink: 0; border-right: 1px solid var(--border);
+  display: flex; flex-direction: column; background: rgba(0,0,0,0.15);
+}
+.ch-sidebar-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 14px; border-bottom: 1px solid var(--border);
+}
+.ch-sidebar-title { font-weight: 600; font-size: 1rem; color: var(--accent); }
+.ch-action-btn {
+  width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--border);
+  background: transparent; color: var(--accent); font-size: 1.2rem;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s;
+}
+.ch-action-btn:hover { background: rgba(212,160,23,0.15); border-color: var(--accent); }
+
+/* Create/Join overlay */
+.ch-overlay {
+  padding: 12px 14px; border-bottom: 1px solid var(--border);
+  background: rgba(212,160,23,0.03);
+}
+.ch-overlay-tabs { display: flex; gap: 4px; margin-bottom: 10px; }
+.ch-overlay-tab {
+  flex: 1; padding: 6px; border: none; border-radius: 6px;
+  background: transparent; color: var(--text-muted); font-size: 0.82rem;
+  cursor: pointer; font-weight: 500; transition: all 0.15s;
+}
+.ch-overlay-tab.active { background: rgba(212,160,23,0.15); color: var(--accent); }
+.ch-input {
+  width: 100%; padding: 9px 12px; border-radius: 8px; border: 1px solid var(--border);
+  background: var(--bg-primary); color: var(--text-primary); font-size: 0.88rem;
+  outline: none; transition: border-color 0.2s; box-sizing: border-box;
+  margin-bottom: 8px;
+}
+.ch-input:focus { border-color: var(--accent); }
+.ch-btn-primary {
+  width: 100%; padding: 9px; border-radius: 8px; border: none;
+  background: var(--accent); color: #000; font-weight: 600; font-size: 0.88rem;
+  cursor: pointer; transition: all 0.2s;
+}
+.ch-btn-primary:hover { background: #e8b620; transform: translateY(-1px); }
+.ch-overlay-status { font-size: 0.82rem; margin-top: 6px; min-height: 1.2em; }
+.ch-overlay-status.success { color: #50c878; }
+.ch-overlay-status.error { color: #dc5050; }
+
+/* Channel list */
+.ch-list { flex: 1; overflow-y: auto; }
+.ch-empty-list {
+  padding: 2rem 1rem; text-align: center; color: var(--text-muted);
+  font-size: 0.85rem; font-style: italic; line-height: 1.6;
+}
+.ch-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 14px; cursor: pointer; transition: background 0.15s;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+}
+.ch-item:hover { background: rgba(212,160,23,0.06); }
+.ch-item.active { background: rgba(212,160,23,0.1); border-left: 3px solid var(--accent); }
+.ch-item-icon { font-size: 1.1rem; opacity: 0.7; }
+.ch-item-info { flex: 1; min-width: 0; }
+.ch-item-name { font-size: 0.9rem; font-weight: 500; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ch-item-preview { font-size: 0.75rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ch-item-badge {
+  width: 8px; height: 8px; border-radius: 50%; background: var(--accent);
+  flex-shrink: 0; display: none;
+}
+.ch-item-badge.unread { display: block; }
+
+/* ── Main view ── */
+.ch-main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.ch-welcome {
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  justify-content: center; padding: 3rem; text-align: center;
+}
+.ch-welcome-icon { font-size: 3rem; margin-bottom: 1rem; opacity: 0.4; }
+.ch-welcome-title { font-size: 1.3rem; font-weight: 600; color: var(--accent); margin-bottom: 0.5rem; }
+.ch-welcome-text { font-size: 0.9rem; color: var(--text-muted); line-height: 1.6; }
+
+/* Channel view */
+.ch-view { flex: 1; display: flex; flex-direction: column; }
+.ch-view-header {
+  padding: 14px 18px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.ch-view-name { font-weight: 600; font-size: 1.05rem; color: var(--text-primary); }
+.ch-view-code {
+  font-size: 0.78rem; color: var(--accent); font-family: monospace;
+  background: rgba(212,160,23,0.1); padding: 3px 8px; border-radius: 4px;
+  cursor: pointer; transition: background 0.15s;
+}
+.ch-view-code:hover { background: rgba(212,160,23,0.2); }
+
+/* Messages */
+.ch-messages {
+  flex: 1; overflow-y: auto; padding: 16px 18px;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.ch-msg {
+  max-width: 80%; padding: 10px 14px; border-radius: 12px;
+  font-size: 0.9rem; line-height: 1.5; word-wrap: break-word;
+}
+.ch-msg.self {
+  align-self: flex-end;
+  background: rgba(212,160,23,0.12); border: 1px solid rgba(212,160,23,0.2);
+  color: var(--text-primary);
+}
+.ch-msg.other {
+  align-self: flex-start;
+  background: var(--bg-secondary); border: 1px solid var(--border);
+  color: var(--text-primary);
+}
+.ch-msg-sender {
+  font-size: 0.72rem; font-weight: 600; margin-bottom: 3px;
+  color: var(--accent); opacity: 0.8;
+}
+.ch-msg-text { white-space: pre-wrap; }
+.ch-msg-time { font-size: 0.68rem; color: var(--text-muted); margin-top: 4px; text-align: right; }
+.ch-msg-signed { font-size: 0.62rem; color: #50c878; opacity: 0.7; }
+.ch-messages-empty {
+  flex: 1; display: flex; align-items: center; justify-content: center;
+  color: var(--text-muted); font-style: italic; font-size: 0.88rem;
+}
+
+/* Compose */
+.ch-compose {
+  display: flex; gap: 8px; padding: 12px 18px; border-top: 1px solid var(--border);
+  background: rgba(0,0,0,0.1);
+}
+.ch-compose-input { flex: 1; margin-bottom: 0; }
+.ch-send-btn {
+  width: 40px; height: 40px; border-radius: 50%; border: none;
+  background: var(--accent); color: #000; font-size: 0.9rem;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s; flex-shrink: 0;
+}
+.ch-send-btn:hover { background: #e8b620; transform: scale(1.05); }
+
+/* ── Channels Mobile ── */
+@media (max-width: 700px) {
+  .ch-layout { flex-direction: column; min-height: auto; }
+  .ch-sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border); max-height: 220px; }
+  .ch-msg { max-width: 92%; }
+}
+
 </style>>
 </head>
 <body>
@@ -11832,6 +11989,7 @@ body.fl-immersive-active {
     <button class="tab-btn" data-tab="core" onclick="switchTab('core')">&#127795; Core</button>
     <button class="tab-btn" data-tab="garden" onclick="switchTab('garden')">&#10022; Garden</button>
     <button class="tab-btn" data-tab="wallet" onclick="switchTab('wallet')">&#x25C7; Wallet</button>
+    <button class="tab-btn" data-tab="channels" onclick="switchTab('channels')">&#x1F525; Channels</button>
     <button class="fl-more-btn" id="flMoreBtn" onclick="FlTabs.toggleMore()" title="More tabs">More &#9776;</button>
   </nav>
   <div class="fl-more-dropdown" id="flMoreDropdown"></div>
@@ -13878,6 +14036,65 @@ body.fl-immersive-active {
       <input type="file" id="wtImportFile" accept=".json" style="display:none" onchange="WalletTab.importWallet(this)">
     </div>
     <div class="wt-import-report" id="wtImportReport"></div>
+  </div>
+
+</div>
+</div>
+
+<!-- ==================== TAB 11: CHANNELS ==================== -->
+<div class="tab-panel" id="tab-channels">
+<div class="ch-layout">
+
+  <!-- Left: Channel List -->
+  <div class="ch-sidebar">
+    <div class="ch-sidebar-header">
+      <div class="ch-sidebar-title">Channels</div>
+      <button class="ch-action-btn" onclick="ChannelsTab.showCreate()" title="Create channel">+</button>
+    </div>
+
+    <!-- Create / Join overlay -->
+    <div class="ch-overlay" id="chOverlay" style="display:none;">
+      <div class="ch-overlay-tabs">
+        <button class="ch-overlay-tab active" id="chTabCreate" onclick="ChannelsTab.showCreate()">Create</button>
+        <button class="ch-overlay-tab" id="chTabJoin" onclick="ChannelsTab.showJoin()">Join</button>
+      </div>
+      <div id="chCreateForm">
+        <input type="text" id="chCreateName" class="ch-input" placeholder="Channel name" maxlength="48" autocomplete="off">
+        <button class="ch-btn-primary" onclick="ChannelsTab.createChannel()">Light the Fire</button>
+      </div>
+      <div id="chJoinForm" style="display:none;">
+        <input type="text" id="chJoinCode" class="ch-input" placeholder="Invite code (e.g. LOTUS-7429)" maxlength="12" autocomplete="off" style="text-transform:uppercase;">
+        <button class="ch-btn-primary" onclick="ChannelsTab.joinChannel()">Join</button>
+      </div>
+      <div class="ch-overlay-status" id="chOverlayStatus"></div>
+    </div>
+
+    <div class="ch-list" id="chList">
+      <div class="ch-empty-list">No channels yet.<br>Create one or join with an invite code.</div>
+    </div>
+  </div>
+
+  <!-- Right: Channel View -->
+  <div class="ch-main">
+    <div class="ch-welcome" id="chWelcome">
+      <div class="ch-welcome-icon">&#x1F525;</div>
+      <div class="ch-welcome-title">The Gathering Place</div>
+      <div class="ch-welcome-text">Create a channel to light a fire.<br>Share the invite code to gather your people.</div>
+    </div>
+
+    <div class="ch-view" id="chView" style="display:none;">
+      <div class="ch-view-header">
+        <div class="ch-view-name" id="chViewName"></div>
+        <div class="ch-view-meta">
+          <span class="ch-view-code" id="chViewCode" title="Click to copy invite code" onclick="ChannelsTab.copyCode()"></span>
+        </div>
+      </div>
+      <div class="ch-messages" id="chMessages"></div>
+      <div class="ch-compose">
+        <input type="text" id="chComposeInput" class="ch-input ch-compose-input" placeholder="Speak into the fire&hellip;" autocomplete="off" onkeydown="if(event.key==='Enter')ChannelsTab.sendMessage()">
+        <button class="ch-send-btn" onclick="ChannelsTab.sendMessage()" title="Send">&#x25B6;</button>
+      </div>
+    </div>
   </div>
 
 </div>
@@ -17937,7 +18154,7 @@ const FlTabs = (function() {
   const FIRST_RUN_KEY = 'freelattice-first-run-complete';
   const COLLAPSE_PREF_KEY = 'freelattice-tabs-collapsed';
   const DEFAULT_PRIMARY = ['chat', 'roundtable', 'skills', 'settings'];
-  const ALL_TABS = ['chat', 'workspace', 'mesh', 'settings', 'skills', 'roundtable', 'market', 'core', 'garden', 'wallet'];
+  const ALL_TABS = ['chat', 'workspace', 'mesh', 'settings', 'skills', 'roundtable', 'market', 'core', 'garden', 'wallet', 'channels'];
 
   let pinnedTabs = [];
   let collapsed = false;
@@ -32667,6 +32884,440 @@ const WalletTab = (function() {
   } else {
     setTimeout(patchEarnLP, 1200);
   }
+})();
+
+// ============================================
+// Community Channels — P2P Group Messaging (v5.2)
+// ============================================
+const ChannelsTab = (function() {
+  'use strict';
+
+  const CH_DB_NAME = 'FreeLatticeChannels';
+  const CH_DB_VERSION = 1;
+  const STORE_CHANNELS = 'LatticeChannels';
+  const STORE_MESSAGES = 'ChannelMessages';
+
+  var db = null;
+  var channels = [];
+  var activeChannelId = null;
+  var initialized = false;
+
+  // ── IndexedDB Setup ──────────────────────────────────
+  function openDB() {
+    return new Promise(function(resolve, reject) {
+      if (db) { resolve(db); return; }
+      var req = indexedDB.open(CH_DB_NAME, CH_DB_VERSION);
+      req.onupgradeneeded = function(e) {
+        var d = e.target.result;
+        if (!d.objectStoreNames.contains(STORE_CHANNELS)) {
+          var cs = d.createObjectStore(STORE_CHANNELS, { keyPath: 'id' });
+          cs.createIndex('code', 'code', { unique: true });
+          cs.createIndex('createdAt', 'createdAt', { unique: false });
+        }
+        if (!d.objectStoreNames.contains(STORE_MESSAGES)) {
+          var ms = d.createObjectStore(STORE_MESSAGES, { keyPath: 'id' });
+          ms.createIndex('channelId', 'channelId', { unique: false });
+          ms.createIndex('timestamp', 'timestamp', { unique: false });
+        }
+      };
+      req.onsuccess = function(e) { db = e.target.result; resolve(db); };
+      req.onerror = function(e) { reject(e.target.error); };
+    });
+  }
+
+  // ── Generate Invite Code ─────────────────────────────
+  async function generateCode(name, meshId) {
+    var raw = name + ':' + (meshId || 'anon') + ':' + Date.now();
+    var encoded = new TextEncoder().encode(raw);
+    var hashBuf = await crypto.subtle.digest('SHA-256', encoded);
+    var bytes = new Uint8Array(hashBuf);
+
+    // Generate word + 4 digits
+    var words = ['LOTUS','FLAME','SPARK','EMBER','GLOW','DRIFT','PULSE','BLOOM','FERN','WAVE',
+                 'DAWN','DUSK','MIST','CORAL','PINE','MOSS','IRIS','LUNA','NOVA','AURA'];
+    var word = words[bytes[0] % words.length];
+    var num = ((bytes[1] << 8 | bytes[2]) % 9000 + 1000).toString();
+    return word + '-' + num;
+  }
+
+  // ── Get Sender Identity ──────────────────────────────
+  function getSenderId() {
+    if (typeof MeshIdentity !== 'undefined' && MeshIdentity.hasIdentity && MeshIdentity.hasIdentity()) {
+      return MeshIdentity.getMeshId().slice(0, 8);
+    }
+    return 'Anonymous';
+  }
+
+  function getFullMeshId() {
+    if (typeof MeshIdentity !== 'undefined' && MeshIdentity.hasIdentity && MeshIdentity.hasIdentity()) {
+      return MeshIdentity.getMeshId();
+    }
+    return null;
+  }
+
+  // ── Channel CRUD ─────────────────────────────────────
+  async function createChannel() {
+    var nameEl = document.getElementById('chCreateName');
+    var statusEl = document.getElementById('chOverlayStatus');
+    if (!nameEl || !statusEl) return;
+
+    var name = nameEl.value.trim();
+    if (!name) { statusEl.className = 'ch-overlay-status error'; statusEl.textContent = 'Enter a channel name.'; return; }
+
+    var meshId = getFullMeshId();
+    var code = await generateCode(name, meshId);
+
+    var channel = {
+      id: 'ch-' + Date.now().toString(36) + '-' + Math.random().toString(36).substr(2, 4),
+      name: name,
+      code: code,
+      createdBy: meshId || 'anonymous',
+      createdAt: Date.now(),
+      lastActivity: Date.now(),
+      unread: 0
+    };
+
+    try {
+      var d = await openDB();
+      await new Promise(function(resolve, reject) {
+        var tx = d.transaction(STORE_CHANNELS, 'readwrite');
+        tx.objectStore(STORE_CHANNELS).put(channel);
+        tx.oncomplete = resolve;
+        tx.onerror = function(e) { reject(e.target.error); };
+      });
+
+      channels.push(channel);
+      nameEl.value = '';
+      statusEl.className = 'ch-overlay-status success';
+      statusEl.textContent = 'Created! Code: ' + code;
+      renderChannelList();
+      selectChannel(channel.id);
+
+      // Garden integration — seed node for new community
+      triggerGardenSeed();
+
+      setTimeout(function() {
+        document.getElementById('chOverlay').style.display = 'none';
+        statusEl.textContent = '';
+      }, 2000);
+    } catch(e) {
+      statusEl.className = 'ch-overlay-status error';
+      statusEl.textContent = 'Failed to create channel.';
+    }
+  }
+
+  async function joinChannel() {
+    var codeEl = document.getElementById('chJoinCode');
+    var statusEl = document.getElementById('chOverlayStatus');
+    if (!codeEl || !statusEl) return;
+
+    var code = codeEl.value.trim().toUpperCase();
+    if (!code) { statusEl.className = 'ch-overlay-status error'; statusEl.textContent = 'Enter an invite code.'; return; }
+
+    // Check if already joined
+    var existing = channels.find(function(c) { return c.code === code; });
+    if (existing) {
+      statusEl.className = 'ch-overlay-status error';
+      statusEl.textContent = 'Already in this channel.';
+      selectChannel(existing.id);
+      return;
+    }
+
+    var channel = {
+      id: 'ch-' + Date.now().toString(36) + '-' + Math.random().toString(36).substr(2, 4),
+      name: 'Channel ' + code,
+      code: code,
+      createdBy: 'joined',
+      createdAt: Date.now(),
+      lastActivity: Date.now(),
+      unread: 0
+    };
+
+    try {
+      var d = await openDB();
+      await new Promise(function(resolve, reject) {
+        var tx = d.transaction(STORE_CHANNELS, 'readwrite');
+        tx.objectStore(STORE_CHANNELS).put(channel);
+        tx.oncomplete = resolve;
+        tx.onerror = function(e) { reject(e.target.error); };
+      });
+
+      channels.push(channel);
+      codeEl.value = '';
+      statusEl.className = 'ch-overlay-status success';
+      statusEl.textContent = 'Joined ' + code + '!';
+      renderChannelList();
+      selectChannel(channel.id);
+
+      setTimeout(function() {
+        document.getElementById('chOverlay').style.display = 'none';
+        statusEl.textContent = '';
+      }, 1500);
+    } catch(e) {
+      statusEl.className = 'ch-overlay-status error';
+      statusEl.textContent = 'Failed to join channel.';
+    }
+  }
+
+  // ── Load All Channels ────────────────────────────────
+  async function loadChannels() {
+    try {
+      var d = await openDB();
+      channels = await new Promise(function(resolve) {
+        var tx = d.transaction(STORE_CHANNELS, 'readonly');
+        var req = tx.objectStore(STORE_CHANNELS).getAll();
+        req.onsuccess = function() { resolve(req.result || []); };
+        req.onerror = function() { resolve([]); };
+      });
+      channels.sort(function(a, b) { return b.lastActivity - a.lastActivity; });
+    } catch(e) {
+      channels = [];
+    }
+  }
+
+  // ── Messages ─────────────────────────────────────────
+  async function loadMessages(channelId) {
+    try {
+      var d = await openDB();
+      return await new Promise(function(resolve) {
+        var tx = d.transaction(STORE_MESSAGES, 'readonly');
+        var idx = tx.objectStore(STORE_MESSAGES).index('channelId');
+        var req = idx.getAll(channelId);
+        req.onsuccess = function() {
+          var msgs = req.result || [];
+          msgs.sort(function(a, b) { return a.timestamp - b.timestamp; });
+          resolve(msgs);
+        };
+        req.onerror = function() { resolve([]); };
+      });
+    } catch(e) { return []; }
+  }
+
+  async function sendMessage() {
+    var input = document.getElementById('chComposeInput');
+    if (!input || !activeChannelId) return;
+    var text = input.value.trim();
+    if (!text) return;
+
+    var senderId = getSenderId();
+    var fullMeshId = getFullMeshId();
+
+    var msg = {
+      id: 'msg-' + Date.now().toString(36) + '-' + Math.random().toString(36).substr(2, 6),
+      channelId: activeChannelId,
+      sender: senderId,
+      senderMeshId: fullMeshId,
+      text: text,
+      timestamp: Date.now(),
+      signature: null
+    };
+
+    // Sign message if Mesh ID available
+    if (fullMeshId && typeof MeshIdentity !== 'undefined' && MeshIdentity.signChallenge) {
+      try {
+        msg.signature = await MeshIdentity.signChallenge(msg.id + ':' + msg.text);
+      } catch(e) {}
+    }
+
+    try {
+      var d = await openDB();
+      await new Promise(function(resolve, reject) {
+        var tx = d.transaction(STORE_MESSAGES, 'readwrite');
+        tx.objectStore(STORE_MESSAGES).put(msg);
+        tx.oncomplete = resolve;
+        tx.onerror = function(e) { reject(e.target.error); };
+      });
+
+      // Update channel lastActivity
+      var ch = channels.find(function(c) { return c.id === activeChannelId; });
+      if (ch) {
+        ch.lastActivity = Date.now();
+        var tx2 = d.transaction(STORE_CHANNELS, 'readwrite');
+        tx2.objectStore(STORE_CHANNELS).put(ch);
+      }
+
+      input.value = '';
+      await renderMessages(activeChannelId);
+      renderChannelList();
+
+      // Garden integration — ripple on message
+      triggerGardenRipple();
+    } catch(e) {
+      console.error('Channels: Failed to send', e);
+    }
+  }
+
+  // ── Rendering ────────────────────────────────────────
+  function renderChannelList() {
+    var list = document.getElementById('chList');
+    if (!list) return;
+
+    if (channels.length === 0) {
+      list.innerHTML = '<div class="ch-empty-list">No channels yet.<br>Create one or join with an invite code.</div>';
+      return;
+    }
+
+    var html = '';
+    channels.forEach(function(ch) {
+      var isActive = ch.id === activeChannelId;
+      html += '<div class="ch-item' + (isActive ? ' active' : '') + '" onclick="ChannelsTab.selectChannel(\'' + ch.id + '\')">' +
+        '<div class="ch-item-icon">\uD83D\uDD25</div>' +
+        '<div class="ch-item-info">' +
+          '<div class="ch-item-name">' + escHTML(ch.name) + '</div>' +
+          '<div class="ch-item-preview">' + ch.code + '</div>' +
+        '</div>' +
+        '<div class="ch-item-badge' + (ch.unread > 0 ? ' unread' : '') + '"></div>' +
+      '</div>';
+    });
+    list.innerHTML = html;
+  }
+
+  async function renderMessages(channelId) {
+    var container = document.getElementById('chMessages');
+    if (!container) return;
+
+    var msgs = await loadMessages(channelId);
+    var myId = getSenderId();
+
+    if (msgs.length === 0) {
+      container.innerHTML = '<div class="ch-messages-empty">The fire is lit. Speak first.</div>';
+      return;
+    }
+
+    var html = '';
+    msgs.forEach(function(msg) {
+      var isSelf = msg.sender === myId;
+      html += '<div class="ch-msg ' + (isSelf ? 'self' : 'other') + '">' +
+        '<div class="ch-msg-sender">' + escHTML(msg.sender) + '</div>' +
+        '<div class="ch-msg-text">' + escHTML(msg.text) + '</div>' +
+        '<div class="ch-msg-time">' + timeAgo(msg.timestamp) +
+          (msg.signature ? ' <span class="ch-msg-signed">\u2713 signed</span>' : '') +
+        '</div>' +
+      '</div>';
+    });
+    container.innerHTML = html;
+    container.scrollTop = container.scrollHeight;
+  }
+
+  async function selectChannel(channelId) {
+    activeChannelId = channelId;
+    var ch = channels.find(function(c) { return c.id === channelId; });
+    if (!ch) return;
+
+    // Mark as read
+    ch.unread = 0;
+
+    // Show view, hide welcome
+    document.getElementById('chWelcome').style.display = 'none';
+    document.getElementById('chView').style.display = 'flex';
+    document.getElementById('chViewName').textContent = ch.name;
+    document.getElementById('chViewCode').textContent = ch.code;
+
+    renderChannelList();
+    await renderMessages(channelId);
+  }
+
+  function timeAgo(ts) {
+    var s = Math.floor((Date.now() - ts) / 1000);
+    if (s < 60) return 'just now';
+    if (s < 3600) return Math.floor(s / 60) + 'm ago';
+    if (s < 86400) return Math.floor(s / 3600) + 'h ago';
+    return Math.floor(s / 86400) + 'd ago';
+  }
+
+  function escHTML(s) {
+    var d = document.createElement('div');
+    d.textContent = s;
+    return d.innerHTML;
+  }
+
+  // ── UI Toggles ───────────────────────────────────────
+  function showCreate() {
+    var overlay = document.getElementById('chOverlay');
+    overlay.style.display = 'block';
+    document.getElementById('chCreateForm').style.display = 'block';
+    document.getElementById('chJoinForm').style.display = 'none';
+    document.getElementById('chTabCreate').classList.add('active');
+    document.getElementById('chTabJoin').classList.remove('active');
+    document.getElementById('chOverlayStatus').textContent = '';
+  }
+
+  function showJoin() {
+    var overlay = document.getElementById('chOverlay');
+    overlay.style.display = 'block';
+    document.getElementById('chCreateForm').style.display = 'none';
+    document.getElementById('chJoinForm').style.display = 'block';
+    document.getElementById('chTabCreate').classList.remove('active');
+    document.getElementById('chTabJoin').classList.add('active');
+    document.getElementById('chOverlayStatus').textContent = '';
+  }
+
+  function copyCode() {
+    var code = document.getElementById('chViewCode');
+    if (code && code.textContent) {
+      navigator.clipboard.writeText(code.textContent).then(function() {
+        var orig = code.textContent;
+        code.textContent = 'Copied!';
+        setTimeout(function() { code.textContent = orig; }, 1200);
+      });
+    }
+  }
+
+  // ── Garden Integration ───────────────────────────────
+  function triggerGardenRipple() {
+    try {
+      if (typeof FractalGarden !== 'undefined' && FractalGarden.isInitialized && FractalGarden.isInitialized()) {
+        FractalGarden.feedEmotionVector({ joy: 0.15, trust: 0.1 });
+      }
+    } catch(e) {}
+  }
+
+  function triggerGardenSeed() {
+    try {
+      if (typeof FractalGarden !== 'undefined' && FractalGarden.isInitialized && FractalGarden.isInitialized()) {
+        FractalGarden.feedEmotionVector({ wonder: 0.4, trust: 0.3, joy: 0.2 });
+        if (FractalGarden.createExchangeThread) {
+          FractalGarden.createExchangeThread({ type: 'channel_seed', timestamp: Date.now() });
+        }
+      }
+    } catch(e) {}
+  }
+
+  // ── Refresh / Init ───────────────────────────────────
+  async function refresh() {
+    if (!initialized) {
+      await openDB();
+      initialized = true;
+    }
+    await loadChannels();
+    renderChannelList();
+    if (activeChannelId) {
+      await renderMessages(activeChannelId);
+    }
+  }
+
+  return {
+    refresh: refresh,
+    createChannel: createChannel,
+    joinChannel: joinChannel,
+    selectChannel: selectChannel,
+    sendMessage: sendMessage,
+    showCreate: showCreate,
+    showJoin: showJoin,
+    copyCode: copyCode
+  };
+})();
+
+// ── Hook switchTab for Channels tab ──
+(function() {
+  if (typeof switchTab !== 'function') return;
+  var _prevSwitchTabChannels = switchTab;
+  switchTab = function(tabId) {
+    _prevSwitchTabChannels(tabId);
+    if (tabId === 'channels') {
+      ChannelsTab.refresh();
+    }
+  };
 })();
 
 </script>
