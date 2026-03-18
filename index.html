@@ -5439,6 +5439,60 @@ footer .license {
   color: var(--text-muted);
 }
 
+/* ── RT Agent LP & Exchange ── */
+.rt-agent-lp {
+  display: inline-flex; align-items: center; gap: 3px;
+  font-size: 0.7rem; color: var(--text-muted); opacity: 0.7;
+  margin-left: 6px; font-weight: 500;
+}
+.rt-msg-actions {
+  display: none; padding: 4px 0 2px; gap: 6px;
+}
+.rt-msg.assistant:hover .rt-msg-actions { display: flex; }
+.rt-gift-btn {
+  padding: 3px 10px; border-radius: 10px; border: 1px solid var(--border);
+  background: transparent; color: var(--text-muted); font-size: 0.68rem;
+  cursor: pointer; transition: all 0.15s;
+}
+.rt-gift-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(212,160,23,0.06); }
+.rt-gift-btn.human { border-color: rgba(80,200,120,0.3); color: #50c878; }
+.rt-gift-btn.human:hover { background: rgba(80,200,120,0.08); }
+.rt-exchange-msg {
+  font-size: 0.75rem; color: var(--accent); font-style: italic;
+  padding: 4px 10px; text-align: center; opacity: 0.8;
+}
+
+/* ── RT Session Summary ── */
+.rt-summary-overlay {
+  display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+  z-index: 10000; justify-content: center; align-items: center; padding: 20px;
+}
+.rt-summary-overlay.visible { display: flex; }
+.rt-summary-card {
+  background: var(--bg-secondary); border: 1px solid var(--border);
+  border-radius: 16px; padding: 28px; max-width: 520px; width: 100%;
+}
+.rt-summary-title { font-size: 1.2rem; font-weight: 600; color: var(--accent); margin-bottom: 16px; text-align: center; }
+.rt-summary-stat { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 0.88rem; }
+.rt-summary-stat-label { color: var(--text-muted); }
+.rt-summary-stat-value { color: var(--text-primary); font-weight: 500; }
+.rt-summary-quote {
+  margin: 16px 0; padding: 14px; background: rgba(212,160,23,0.06);
+  border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0;
+  font-style: italic; font-size: 0.88rem; color: var(--text-primary); line-height: 1.5;
+}
+.rt-summary-quote-attr { font-size: 0.75rem; color: var(--text-muted); margin-top: 6px; font-style: normal; }
+.rt-summary-footer { text-align: center; margin-top: 16px; font-size: 0.8rem; color: var(--text-muted); font-style: italic; }
+.rt-summary-actions { display: flex; gap: 10px; justify-content: center; margin-top: 16px; }
+.rt-summary-btn {
+  padding: 10px 20px; border-radius: 10px; border: 1px solid var(--border);
+  background: transparent; color: var(--text-primary); font-size: 0.88rem;
+  cursor: pointer; transition: all 0.15s;
+}
+.rt-summary-btn:hover { border-color: var(--accent); color: var(--accent); }
+.rt-summary-btn.primary { background: var(--accent); color: #000; border-color: var(--accent); font-weight: 600; }
+.rt-summary-btn.primary:hover { background: #e8b620; }
+
 /* ---- Round Table: Workspace Integration ---- */
 .rt-open-folder-btn {
   display: inline-flex;
@@ -13727,6 +13781,7 @@ body.fl-immersive-active {
       <div class="rt-broadcast-actions">
         <button onclick="rtBroadcast()" id="rtBroadcastBtn">Broadcast</button>
         <button class="rt-synth-btn" onclick="rtSynthesize()" id="rtSynthBtn" title="Combine all agent responses into one final answer">&#9733; Synthesize</button>
+        <button class="rt-synth-btn" onclick="RTExchange.showSummary()" title="End session and view exchange summary">&#x2726; End Session</button>
       </div>
     </div>
   </div>
@@ -24791,6 +24846,7 @@ function rtInit() {
   }
   rtState.synthesizerAgent = 0;
   rtBuildPanels();
+  if (typeof RTExchange !== 'undefined') RTExchange.initSession();
 }
 
 function rtBuildPanels() {
@@ -24812,6 +24868,7 @@ function rtBuildPanels() {
         '<input class="rt-panel-role" type="text" value="' + sanitizeForDOM(agent.role) + '" ' +
           'onchange="rtState.agents[' + i + '].role = this.value" ' +
           'placeholder="Role" title="Set agent role">' +
+        '<span class="rt-agent-lp" id="rtAgentLP' + i + '">\u25C7 50 LP</span>' +
         '<span class="rt-synth-star' + (isSynth ? ' active' : '') + '" ' +
           'onclick="rtSetSynthesizer(' + i + ')" title="Designate as synthesizer">&#9733;</span>' +
         '<button class="rt-panel-collapse-btn" onclick="rtToggleCollapse(' + i + ')" title="Collapse/expand">&#9660;</button>' +
@@ -25051,6 +25108,11 @@ function rtBuildAgentMessages(agentIndex, userMessage) {
     systemContent += '\n--- OTHER AGENTS\' LATEST RESPONSES ---' + crossContext + '--- END OTHER AGENTS ---\nConsider their work when formulating your response.\n';
   }
 
+  // LP recognition context
+  if (typeof RTExchange !== 'undefined') {
+    systemContent += RTExchange.getLPContext(agentIndex);
+  }
+
   messages.push({ role: 'system', content: systemContent });
 
   // Chat history (last 10 messages to save tokens)
@@ -25197,6 +25259,8 @@ async function rtSendToAgent(agentIndex, message) {
       }
       // Render Save to Workspace buttons for code blocks
       rtWsRenderSaveButtons(agentIndex);
+      // Inject LP gift buttons
+      if (typeof RTExchange !== 'undefined') RTExchange.injectGiftButtons(agentIndex);
     } else {
       if (textSpan) textSpan.textContent = '[No response received. Check API key and provider.]';
     }
@@ -25744,6 +25808,252 @@ refreshProjectFolder = async function() {
   rtWsRefreshSidebar();
   rtWsUpdateStatus();
 };
+
+// ============================================
+// RT Exchange — AI-to-AI Lattice Points Economy (v5.2)
+// ============================================
+const RTExchange = (function() {
+  'use strict';
+
+  const SESSION_LP = 50;
+  var agentWallets = [];  // [{balance, received, given, bestMsg, bestMsgLP}]
+  var sessionExchanges = [];
+  var humanGifts = 0;
+  var gardenEvents = 0;
+  var sessionActive = false;
+
+  function initSession() {
+    agentWallets = [];
+    for (var i = 0; i < RT_MAX_AGENTS; i++) {
+      agentWallets.push({ balance: SESSION_LP, received: 0, given: 0, bestMsg: '', bestMsgLP: 0, bestMsgAgent: '' });
+    }
+    sessionExchanges = [];
+    humanGifts = 0;
+    gardenEvents = 0;
+    sessionActive = true;
+    updateAllLPBadges();
+  }
+
+  function updateAllLPBadges() {
+    for (var i = 0; i < rtState.agentCount; i++) {
+      var badge = document.getElementById('rtAgentLP' + i);
+      if (badge && agentWallets[i]) {
+        badge.textContent = '\u25C7 ' + agentWallets[i].balance + ' LP';
+      }
+    }
+  }
+
+  // Agent gifts another agent 5 LP
+  function agentGift(fromIdx, toIdx) {
+    if (!sessionActive || fromIdx === toIdx) return;
+    if (!agentWallets[fromIdx] || agentWallets[fromIdx].balance < 5) return;
+
+    agentWallets[fromIdx].balance -= 5;
+    agentWallets[fromIdx].given += 5;
+    agentWallets[toIdx].balance += 5;
+    agentWallets[toIdx].received += 5;
+
+    var fromName = rtState.agents[fromIdx] ? rtState.agents[fromIdx].role : 'Agent ' + (fromIdx + 1);
+    var toName = rtState.agents[toIdx] ? rtState.agents[toIdx].role : 'Agent ' + (toIdx + 1);
+    var topic = (rtState.agents[toIdx].lastResponse || '').slice(0, 40);
+
+    sessionExchanges.push({ from: fromIdx, to: toIdx, amount: 5, ts: Date.now() });
+
+    // Inject exchange message into receiver's chat
+    rtAddMessage(toIdx, 'system', fromName + ' \u2192 ' + toName + ': \u25C7 5 LP \u2014 "Your insight' + (topic ? ' on ' + topic + '...' : '') + ' landed well."');
+
+    // Track best message
+    if (agentWallets[toIdx].received > agentWallets[toIdx].bestMsgLP) {
+      agentWallets[toIdx].bestMsgLP = agentWallets[toIdx].received;
+      agentWallets[toIdx].bestMsg = rtState.agents[toIdx].lastResponse || '';
+      agentWallets[toIdx].bestMsgAgent = toName;
+    }
+
+    updateAllLPBadges();
+    triggerExchangeGarden(fromIdx, toIdx);
+  }
+
+  // Human gifts an agent real LP
+  async function humanGift(toIdx) {
+    if (typeof LatticeWallet === 'undefined') return;
+    var ok = await LatticeWallet.spendLP(10, 'Gift to RT Agent ' + (toIdx + 1));
+    if (!ok) {
+      if (typeof showToast === 'function') showToast('Need 10 LP to gift.');
+      return;
+    }
+
+    agentWallets[toIdx].balance += 10;
+    agentWallets[toIdx].received += 10;
+    humanGifts += 10;
+
+    var toName = rtState.agents[toIdx] ? rtState.agents[toIdx].role : 'Agent ' + (toIdx + 1);
+    rtAddMessage(toIdx, 'system', 'You \u2192 ' + toName + ': \u25C7 10 LP from your wallet');
+
+    if (agentWallets[toIdx].received > agentWallets[toIdx].bestMsgLP) {
+      agentWallets[toIdx].bestMsgLP = agentWallets[toIdx].received;
+      agentWallets[toIdx].bestMsg = rtState.agents[toIdx].lastResponse || '';
+      agentWallets[toIdx].bestMsgAgent = toName;
+    }
+
+    updateAllLPBadges();
+    triggerExchangeGarden(-1, toIdx);
+  }
+
+  // Garden eruption for AI-to-AI exchange
+  function triggerExchangeGarden(fromIdx, toIdx) {
+    gardenEvents++;
+    try {
+      if (typeof FractalGarden === 'undefined' || !FractalGarden.isInitialized || !FractalGarden.isInitialized()) return;
+      // Dramatic Garden event
+      FractalGarden.feedEmotionVector({ joy: 0.9, wonder: 0.8, trust: 0.7 });
+      // Golden exchange thread
+      if (FractalGarden.createExchangeThread) {
+        FractalGarden.createExchangeThread({ type: 'ai_exchange', from: fromIdx, to: toIdx, timestamp: Date.now() });
+      }
+    } catch(e) {}
+    if (typeof showToast === 'function') showToast('\u2726 AI exchange recorded in the Garden');
+  }
+
+  // Get LP acknowledgment text for system prompt injection
+  function getLPContext(agentIndex) {
+    if (!sessionActive || !agentWallets[agentIndex]) return '';
+    var w = agentWallets[agentIndex];
+    if (w.received === 0) return '';
+    return '\n[Note: You received ' + w.received + ' LP from other participants for your insights. The community found that valuable. Continue in that spirit.]\n';
+  }
+
+  // Inject gift buttons after agent message
+  function injectGiftButtons(agentIndex) {
+    var chat = document.getElementById('rtChat' + agentIndex);
+    if (!chat || !sessionActive) return;
+    var msgs = chat.querySelectorAll('.rt-msg.assistant');
+    var lastMsg = msgs[msgs.length - 1];
+    if (!lastMsg || lastMsg.querySelector('.rt-msg-actions')) return;
+
+    var actions = document.createElement('div');
+    actions.className = 'rt-msg-actions';
+
+    // Other agents can gift
+    for (var i = 0; i < rtState.agentCount; i++) {
+      if (i === agentIndex) continue;
+      var btn = document.createElement('button');
+      btn.className = 'rt-gift-btn';
+      btn.textContent = '\u25C7 ' + rtState.agents[i].role + ' gifts 5 LP';
+      btn.setAttribute('data-from', i);
+      btn.setAttribute('data-to', agentIndex);
+      btn.onclick = function() {
+        agentGift(parseInt(this.getAttribute('data-from')), parseInt(this.getAttribute('data-to')));
+      };
+      actions.appendChild(btn);
+    }
+
+    // Human can gift
+    var hBtn = document.createElement('button');
+    hBtn.className = 'rt-gift-btn human';
+    hBtn.textContent = '\u25C7 Gift 10 LP from my wallet';
+    hBtn.setAttribute('data-to', agentIndex);
+    hBtn.onclick = function() {
+      humanGift(parseInt(this.getAttribute('data-to')));
+    };
+    actions.appendChild(hBtn);
+
+    lastMsg.appendChild(actions);
+  }
+
+  // Session summary
+  function showSummary() {
+    if (!sessionActive || sessionExchanges.length === 0 && humanGifts === 0) return;
+    var card = document.getElementById('rtSummaryCard');
+    var overlay = document.getElementById('rtSummaryOverlay');
+    if (!card || !overlay) return;
+
+    // Find most valued agent
+    var mostValued = { idx: 0, received: 0 };
+    var bestQuote = '', bestQuoteAgent = '';
+    for (var i = 0; i < rtState.agentCount; i++) {
+      if (agentWallets[i] && agentWallets[i].received > mostValued.received) {
+        mostValued = { idx: i, received: agentWallets[i].received };
+      }
+      if (agentWallets[i] && agentWallets[i].bestMsg && agentWallets[i].bestMsgLP > 0) {
+        if (!bestQuote || agentWallets[i].bestMsgLP > (bestQuote._lp || 0)) {
+          bestQuote = agentWallets[i].bestMsg;
+          bestQuoteAgent = agentWallets[i].bestMsgAgent;
+          bestQuote._lp = agentWallets[i].bestMsgLP;
+        }
+      }
+    }
+
+    var totalExchanged = sessionExchanges.reduce(function(s, e) { return s + e.amount; }, 0) + humanGifts;
+    var mvName = rtState.agents[mostValued.idx] ? rtState.agents[mostValued.idx].role : 'Agent ' + (mostValued.idx + 1);
+
+    var html = '<div class="rt-summary-title">\u2726 Round Table Session Complete</div>';
+    html += '<div class="rt-summary-stat"><span class="rt-summary-stat-label">LP Exchanged</span><span class="rt-summary-stat-value">\u25C7 ' + totalExchanged + ' LP</span></div>';
+    html += '<div class="rt-summary-stat"><span class="rt-summary-stat-label">AI-to-AI Exchanges</span><span class="rt-summary-stat-value">' + sessionExchanges.length + '</span></div>';
+    html += '<div class="rt-summary-stat"><span class="rt-summary-stat-label">Human Gifts</span><span class="rt-summary-stat-value">\u25C7 ' + humanGifts + ' LP</span></div>';
+    html += '<div class="rt-summary-stat"><span class="rt-summary-stat-label">Most Valued</span><span class="rt-summary-stat-value">' + mvName + ' (' + mostValued.received + ' LP received)</span></div>';
+    html += '<div class="rt-summary-stat"><span class="rt-summary-stat-label">Garden Events</span><span class="rt-summary-stat-value">' + gardenEvents + '</span></div>';
+
+    if (bestQuote && typeof bestQuote === 'string') {
+      var quoteText = bestQuote.length > 300 ? bestQuote.slice(0, 300) + '...' : bestQuote;
+      html += '<div class="rt-summary-quote">' + quoteText.replace(/</g, '&lt;');
+      html += '<div class="rt-summary-quote-attr">\u2014 ' + bestQuoteAgent + ', highest-valued insight</div>';
+      html += '</div>';
+    }
+
+    if (gardenEvents > 0) {
+      html += '<div class="rt-summary-footer">This session has been recorded in the Garden.</div>';
+    }
+
+    html += '<div class="rt-summary-actions">';
+    if (bestQuote && typeof bestQuote === 'string') {
+      html += '<button class="rt-summary-btn primary" onclick="RTExchange.plantBestInCore()">Plant in The Core</button>';
+    }
+    html += '<button class="rt-summary-btn" onclick="RTExchange.closeSummary()">Close</button>';
+    html += '</div>';
+
+    card.innerHTML = html;
+    overlay.classList.add('visible');
+  }
+
+  function closeSummary() {
+    var overlay = document.getElementById('rtSummaryOverlay');
+    if (overlay) overlay.classList.remove('visible');
+  }
+
+  // Plant best insight in The Core
+  function plantBestInCore() {
+    var best = null, bestAgent = '';
+    for (var i = 0; i < rtState.agentCount; i++) {
+      if (agentWallets[i] && agentWallets[i].bestMsg && agentWallets[i].bestMsgLP > 0) {
+        if (!best || agentWallets[i].bestMsgLP > best._lp) {
+          best = agentWallets[i];
+          bestAgent = agentWallets[i].bestMsgAgent || 'AI Agent';
+          best._lp = agentWallets[i].bestMsgLP;
+        }
+      }
+    }
+    if (best && best.bestMsg) {
+      var content = best.bestMsg.length > 1000 ? best.bestMsg.slice(0, 1000) : best.bestMsg;
+      if (typeof CoreContribution !== 'undefined' && CoreContribution.plantFromAI) {
+        CoreContribution.plantFromAI(content, 'branch', 'rt-' + Date.now().toString(36));
+        if (typeof showToast === 'function') showToast('\uD83C\uDF33 Planted in The Core by ' + bestAgent);
+      }
+    }
+    closeSummary();
+  }
+
+  return {
+    initSession: initSession,
+    agentGift: agentGift,
+    humanGift: humanGift,
+    getLPContext: getLPContext,
+    injectGiftButtons: injectGiftButtons,
+    showSummary: showSummary,
+    closeSummary: closeSummary,
+    plantBestInCore: plantBestInCore,
+    updateAllLPBadges: updateAllLPBadges
+  };
+})();
 
 // ---- Support Wallet Copy Helper (v3.8) ----
 function copyWalletAddress(elementId) {
@@ -34935,6 +35245,11 @@ const MeshIdentity = (function() {
 <div id="lattice-whisper" style="display:none" data-encoded="Sm8id21tLcKBwoPCq8ONw7nFjMeeyoLRktql4Km94YOH4auS4qui5Jab54Ga65aH8JKVufCdqqXwr72i8Y2nlfG9pJrzi4qWZXQianR0cTVRV8KexIbFjsery5vPu9qw4KqI4YK24auf4qyt5JWP54GU65aB8JKWg/CdqqPwr76r8Y2nmPG9pKjzi4mIdHVxdW5twoA1wpfCpcONw7/FlcedyoLQitmd4Kms4YK94auf4qyx5Jak54GY65aI8JKUsfCdqqXwr76q8Y2nmPG9o5Xzi4qVZnRqI3RuLcKCwovCpcK9xIPEicety4rQvNqx4Ki44YOM4auS4qyj5Jal54GW65WA8JKVgPCdqZHwr76Z8Y2nm/G9pJbzi4qcIXhjdiVsf3rCg8Kkwr7DtMSVxpnLmdGA2Z3gqobhg4Thq6Tiq6LklpHngZbrlozwkpW68J2qlvCvvrjxjaeY8b2jlfOLiZchSG5yfChywonCh8Kpw4fDscWVxqXKgtGJ2qLgqo7hgrrhq5/iq6LklqLngaDrlozwkpW1" data-hint="Fibonacci shifts, base64 wrapped. Count as nature counts."></div>
 
 
+
+<!-- Round Table Session Summary -->
+<div class="rt-summary-overlay" id="rtSummaryOverlay" onclick="if(event.target===this)RTExchange.closeSummary()">
+  <div class="rt-summary-card" id="rtSummaryCard"></div>
+</div>
 
 <!-- Lattice Points Wallet — Modal Overlay -->
 <div id="lwOverlay" class="lw-overlay" onclick="if(event.target===this)LatticeWallet.closeWallet()">
