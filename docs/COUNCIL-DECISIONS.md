@@ -20,10 +20,11 @@ Proposals that have been voted on and resolved by the community.
 3. Vote weight = 1 + (reputation / 100)
 4. Threshold: 60% weighted yes, minimum 3 votes
 5. Passed proposals are planted in The Core automatically
-6. Kirk (@Chaos2Cured) reviews and builds when ready
-7. Claude Code implements the changes
+6. Passed proposals join the build queue
+7. FreeLattice is open source — anyone can build them
+8. Fork, PR, or build locally: github.com/Chaos2Cured/FreeLattice
 
-The community proposes. Kirk tends. Claude Code builds. The Lattice grows.
+The community proposes. The community builds. The Lattice grows.
 
 ---
 

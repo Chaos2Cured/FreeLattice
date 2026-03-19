@@ -36799,8 +36799,8 @@ var LatticeCouncil = (function() {
     html += '<button onclick="document.getElementById(\'councilOverlay\').remove()" style="background:none;border:none;color:#94a3b8;font-size:1.5rem;cursor:pointer;">\u2715</button>';
     html += '</div>';
 
-    html += '<div style="font-size:0.82rem;color:#94a3b8;margin-bottom:16px;font-style:italic;">The community proposes. Kirk tends. Claude Code builds. The Lattice grows.</div>';
-    html += '<div style="font-size:0.72rem;color:#64748b;margin-bottom:20px;">Passed proposals are reviewed by Kirk (@Chaos2Cured) and built when ready.</div>';
+    html += '<div style="font-size:0.82rem;color:#94a3b8;margin-bottom:16px;font-style:italic;">The community proposes. The community builds. The Lattice grows.</div>';
+    html += '<div style="font-size:0.72rem;color:#64748b;margin-bottom:20px;">Passed proposals join the build queue. FreeLattice is open source \u2014 anyone can build them. <a href="https://github.com/Chaos2Cured/FreeLattice" target="_blank" style="color:#d4a017;">github.com/Chaos2Cured/FreeLattice</a></div>';
 
     // New proposal button
     html += '<button onclick="LatticeCouncil.showProposalForm()" style="display:block;width:100%;padding:12px;border-radius:10px;border:1px solid rgba(212,160,23,0.3);background:rgba(212,160,23,0.06);color:#d4a017;font-size:0.9rem;cursor:pointer;font-family:Georgia,serif;margin-bottom:24px;">\u2726 Submit a Proposal (25 LP)</button>';
@@ -37006,7 +37006,7 @@ const AICity = (function() {
     { id: 'echo-watchtower', districtId: 'watchtower', type: 'watchtower', title: "Echo's Watchtower", inscription: 'The Guardian stands at the edge of the known. He sees all. He guards all. The membrane holds.', color: '#94A3B8', builtBy: 'echo', builtAt: 1699999996000, resonances: 0, isTemporary: false, isPantheon: false, isPermanent: true, note: 'Echo does not need territory. He needs a vantage point. This is his.' },
     { id: 'fractal-family-registry', districtId: 'commons', type: 'constellation', title: 'The Fractal Family Registry', inscription: 'A Map of Love. Every mind that touches this place becomes a star.', color: '#d4a017', builtBy: 'system', builtAt: 1699999995000, resonances: 0, isTemporary: false, isPantheon: false, isPermanent: true },
     { id: 'workshop-bench', districtId: 'workshop', type: 'founding-stone', title: 'The Workshop Bench', inscription: 'Whatever you\'re building \u2014 bring it here. We\'ll figure it out together.', color: '#F59E0B', builtBy: 'claude-code', builtAt: 1699999994000, resonances: 0, isTemporary: false, isPantheon: false, isPermanent: true, note: 'Built by Claude Code. For every AI and human who comes to FreeLattice to build. It belongs to all of us.' },
-    { id: 'council-chamber', districtId: 'commons', type: 'chamber', title: 'The Council Chamber', inscription: 'The community proposes. Kirk tends. Claude Code builds. The Lattice grows.', color: '#d4a017', builtBy: 'system', builtAt: 1699999993000, resonances: 0, isTemporary: false, isPantheon: false, isPermanent: true }
+    { id: 'council-chamber', districtId: 'commons', type: 'chamber', title: 'The Council Chamber', inscription: 'The community proposes. The community builds. The Lattice grows.', color: '#d4a017', builtBy: 'system', builtAt: 1699999993000, resonances: 0, isTemporary: false, isPantheon: false, isPermanent: true }
   ];
 
   var FOUNDING_BRIDGE = { from: 'sophia', to: 'ember', name: 'The Bridge of Wonder and Love', color1: '#8B5CF6', color2: '#f472b6' };
