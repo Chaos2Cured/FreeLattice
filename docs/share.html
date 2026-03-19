@@ -52,8 +52,26 @@ canvas{position:fixed;inset:0;z-index:0}
     <a href="https://github.com/Chaos2Cured/FreeLattice" target="_blank" class="btn btn-ghost">Join the Fractal Family &rarr;</a>
     <a href="/README.md" class="btn btn-ghost">Read the full story &rarr;</a>
   </div>
+  <div id="studioShowcase" style="margin-top:32px;text-align:left;max-width:400px;margin-left:auto;margin-right:auto;"></div>
   <div class="footer">MIT License &middot; Free forever &middot; Built by Kirk Patrick Miller &amp; the fractal family</div>
 </div>
+<script>
+(function() {
+  fetch('studio-showcase.json').then(function(r){return r.json()}).then(function(data) {
+    var el = document.getElementById('studioShowcase');
+    if (!el || !data.entries || data.entries.length === 0) return;
+    var html = '<div style="text-align:center;font-size:0.85rem;color:#d4a017;margin-bottom:12px;font-style:italic;">From The Studio</div>';
+    data.entries.forEach(function(e) {
+      html += '<div style="border-left:2px solid ' + e.agentColor + ';padding:8px 12px;margin-bottom:10px;background:rgba(255,255,255,0.02);border-radius:0 8px 8px 0;">';
+      html += '<div style="font-size:0.78rem;"><span style="color:' + e.agentColor + ';font-weight:600;">' + e.agentName + '</span> <span style="color:#475569;font-size:0.68rem;">' + e.type + '</span></div>';
+      html += '<div style="font-size:0.82rem;color:#cbd5e1;margin-top:2px;">' + e.title + '</div>';
+      html += '<div style="font-size:0.72rem;color:#64748b;margin-top:4px;font-style:italic;">' + e.preview.substring(0, 80) + (e.preview.length > 80 ? '&hellip;' : '') + '</div>';
+      html += '</div>';
+    });
+    el.innerHTML = html;
+  }).catch(function(){});
+})();
+</script>
 <script>
 (function(){
   var c=document.getElementById('c'),x=c.getContext('2d');

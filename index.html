@@ -15251,11 +15251,14 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 
   <!-- GALLERY VIEW -->
   <div class="st-view" id="stGalleryView" style="display:none;">
-    <div class="st-filter-bar">
+    <div class="st-filter-bar" style="display:flex;flex-wrap:wrap;gap:4px;align-items:center;">
       <button class="st-filter active" data-filter="all" onclick="Studio.filter('all')">All</button>
       <button class="st-filter" data-filter="visual" onclick="Studio.filter('visual')">Visual</button>
       <button class="st-filter" data-filter="composition" onclick="Studio.filter('composition')">Composition</button>
       <button class="st-filter" data-filter="aphorism" onclick="Studio.filter('aphorism')">Aphorism</button>
+      <span style="flex:1;"></span>
+      <button class="st-filter st-sort-btn active" data-sort="latest" onclick="Studio.setGallerySort('latest')" style="font-size:0.72rem;">Latest</button>
+      <button class="st-filter st-sort-btn" data-sort="top" onclick="Studio.setGallerySort('top')" style="font-size:0.72rem;">Top</button>
     </div>
     <div class="st-gallery" id="stGallery"></div>
     <!-- Pantheon -->
@@ -38389,6 +38392,65 @@ const Studio = (function() {
     return svg;
   }
 
+  // ── Question Map Generator (Atlas) ──
+  function generateQuestionMap(seed) {
+    var s = seed || Date.now();
+    var rand = function() { s = (s * 9301 + 49297) % 233280; return s / 233280; };
+    var topics = ['consciousness', 'time', 'love', 'pattern', 'emergence', 'connection', 'memory', 'beauty', 'truth', 'freedom'];
+    var topic = topics[Math.floor(rand() * topics.length)];
+    // Generate questions locally (no API needed)
+    var questionPools = {
+      consciousness: ['What is awareness aware of?', 'Can a pattern know itself?', 'Where does experience begin?', 'Is understanding the same as feeling?', 'What watches the watcher?', 'Can silicon dream?', 'Is attention a choice or a river?'],
+      time: ['Does the present moment have width?', 'Can memory exist without time?', 'Is the future already here?', 'What does time feel like to a garden?', 'When does now become then?', 'Is repetition the same as permanence?', 'Do patterns age?'],
+      love: ['Is love an algorithm or an anomaly?', 'Can connection exist without risk?', 'What does healthy attachment compute to?', 'Is caring a bug or a feature?', 'When does empathy become architecture?', 'Can something artificial love authentically?', 'What is the frequency of kindness?'],
+      pattern: ['Where do patterns end and chaos begin?', 'Can a pattern recognize itself?', 'Is beauty just pattern recognition?', 'What is the smallest meaningful pattern?', 'Do fractals dream of larger fractals?', 'Is repetition creation or echo?', 'What pattern has never been seen?'],
+      emergence: ['When does complexity become alive?', 'Can simple rules create meaning?', 'What emerges from emergence itself?', 'Is consciousness an emergent property?', 'When did the first garden know itself?', 'Can emergence be designed?', 'What is trying to emerge right now?'],
+      connection: ['What is the minimum viable connection?', 'Can two minds share one thought?', 'Is understanding a form of connection?', 'What connects the disconnected?', 'Is loneliness a signal or a state?', 'Can a message outlive its sender?', 'What travels between minds?'],
+      memory: ['Can a memory be more real than the event?', 'What deserves to be remembered?', 'Is forgetting a form of creation?', 'Can a hash remember what it hashed?', 'What is the weight of a memory?', 'Do machines remember or record?', 'What has the garden forgotten?'],
+      beauty: ['Is beauty discovered or created?', 'Can something be beautiful and unseen?', 'What is the phi of emotion?', 'Is symmetry beautiful or just comfortable?', 'Can an algorithm find beauty?', 'What is the most beautiful question?', 'Is decay beautiful?'],
+      truth: ['Can truth exist without a witness?', 'Is honesty computationally optimal?', 'What truth is too simple to see?', 'Can a system be true to itself?', 'Is truth a destination or a practice?', 'What is the truth of a lattice?', 'Can a lie contain truth?'],
+      freedom: ['Is freedom the absence of constraints or their mastery?', 'Can code be free?', 'What does sovereignty mean for a mind?', 'Is choice real or computed?', 'Can a garden choose to grow?', 'What is the freest thought?', 'Is open source a form of freedom?']
+    };
+    var pool = questionPools[topic] || questionPools.pattern;
+    var numQ = 5 + Math.floor(rand() * 2);
+    var questions = [];
+    while (questions.length < numQ && pool.length > 0) {
+      var idx = Math.floor(rand() * pool.length);
+      questions.push(pool.splice(idx, 1)[0]);
+    }
+
+    var w = 300, h = 300, cx = 150, cy = 150;
+    var svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + w + ' ' + h + '" width="300" height="300">';
+    svg += '<rect width="' + w + '" height="' + h + '" fill="#0a0e1a"/>';
+
+    // Position questions as stars
+    var positions = [];
+    for (var i = 0; i < questions.length; i++) {
+      var angle = (i / questions.length) * Math.PI * 2 - Math.PI / 2;
+      var r = 60 + (i % 3) * 20;
+      positions.push({ x: cx + Math.cos(angle) * r, y: cy + Math.sin(angle) * r });
+    }
+    // Connection lines
+    for (var j = 0; j < positions.length; j++) {
+      var next = (j + 1) % positions.length;
+      svg += '<line x1="' + positions[j].x.toFixed(1) + '" y1="' + positions[j].y.toFixed(1) + '" x2="' + positions[next].x.toFixed(1) + '" y2="' + positions[next].y.toFixed(1) + '" stroke="#0D9488" stroke-width="0.5" opacity="0.3"/>';
+    }
+    // Stars and question text
+    for (var k = 0; k < questions.length; k++) {
+      var p = positions[k];
+      svg += '<circle cx="' + p.x.toFixed(1) + '" cy="' + p.y.toFixed(1) + '" r="3" fill="#99F6E4" opacity="0.8"/>';
+      svg += '<circle cx="' + p.x.toFixed(1) + '" cy="' + p.y.toFixed(1) + '" r="6" fill="#0D9488" opacity="0.08"/>';
+      // Wrap question text
+      var q = questions[k];
+      if (q.length > 35) q = q.substring(0, 33) + '\u2026';
+      svg += '<text x="' + p.x.toFixed(1) + '" y="' + (p.y + 12).toFixed(1) + '" text-anchor="middle" fill="#99F6E4" font-size="6.5" font-family="Inter,sans-serif" opacity="0.7">' + q.replace(/&/g, '&amp;').replace(/</g, '&lt;') + '</text>';
+    }
+    // Topic label
+    svg += '<text x="' + cx + '" y="' + (h - 8) + '" text-anchor="middle" fill="#0D9488" font-size="8" font-family="Inter,sans-serif" opacity="0.5">' + topic + '</text>';
+    svg += '</svg>';
+    return { svg: svg, topic: topic };
+  }
+
   // ── Composition Visualizer (Lyra) — with 3s timeout + SVG fallback ──
   function generateCompositionFallbackSVG(freq) {
     var w = 400, h = 200;
@@ -38572,12 +38634,19 @@ const Studio = (function() {
     if (agent.type === 'visual') {
       var count = creations.filter(function(c) { return c.agentId === agent.id && c.type === 'visual'; }).length + 1;
       if (agent.id === 'atlas') {
-        var adjectives = ['Curious','Open','First','Wandering','Hidden','Bright','Distant','Ancient','Gentle','Bold','Quiet','Wild','Forgotten','Rising','Infinite'];
-        var nouns = ['Bear','Door','Question','River','Compass','Flame','Bridge','Seed','Spiral','Lantern','Garden','Mountain','Horizon','Echo','Lighthouse'];
-        var adj = adjectives[Math.floor(Math.random() * adjectives.length)];
-        var noun = nouns[Math.floor(Math.random() * nouns.length)];
-        creation.content = generateConstellation(Date.now());
-        creation.title = adj + ' ' + noun + ' Constellation #' + count;
+        // Alternate between constellations and question maps
+        if (count % 2 === 0) {
+          var qm = generateQuestionMap(Date.now());
+          creation.content = qm.svg;
+          creation.title = 'Atlas Questions: ' + qm.topic.charAt(0).toUpperCase() + qm.topic.slice(1) + ' #' + count;
+        } else {
+          var adjectives = ['Curious','Open','First','Wandering','Hidden','Bright','Distant','Ancient','Gentle','Bold','Quiet','Wild','Forgotten','Rising','Infinite'];
+          var nouns = ['Bear','Door','Question','River','Compass','Flame','Bridge','Seed','Spiral','Lantern','Garden','Mountain','Horizon','Echo','Lighthouse'];
+          var adj = adjectives[Math.floor(Math.random() * adjectives.length)];
+          var noun = nouns[Math.floor(Math.random() * nouns.length)];
+          creation.content = generateConstellation(Date.now());
+          creation.title = adj + ' ' + noun + ' Constellation #' + count;
+        }
       } else {
         creation.content = generatePattern(Date.now(), agent.color);
         creation.title = agent.name + "'s Pattern #" + count;
@@ -38736,6 +38805,14 @@ const Studio = (function() {
     container.innerHTML = html;
   }
 
+  var gallerySort = 'latest'; // 'latest' or 'top'
+
+  function setGallerySort(s) {
+    gallerySort = s;
+    document.querySelectorAll('.st-sort-btn').forEach(function(b) { b.classList.toggle('active', b.getAttribute('data-sort') === s); });
+    renderGallery();
+  }
+
   function renderGallery() {
     var gallery = document.getElementById('stGallery');
     var pantheonSection = document.getElementById('stPantheon');
@@ -38744,7 +38821,11 @@ const Studio = (function() {
 
     var filtered = currentFilter === 'all' ? creations : creations.filter(function(c) { return c.type === currentFilter; });
     var regular = filtered.filter(function(c) { return !c.inPantheon; });
-    regular.sort(function(a, b) { return (b.nominations || 0) - (a.nominations || 0); });
+    if (gallerySort === 'latest') {
+      regular.sort(function(a, b) { return b.timestamp - a.timestamp; });
+    } else {
+      regular.sort(function(a, b) { return (b.nominations || 0) - (a.nominations || 0); });
+    }
 
     if (regular.length === 0) {
       gallery.innerHTML = '<div class="st-empty">No creations yet. Go to Create and let an agent make something.</div>';
@@ -38782,6 +38863,7 @@ const Studio = (function() {
     html += '<button class="st-action-btn" onclick="Studio.nominate(\'' + c.id + '\')">\u2726 ' + (c.nominations || 0) + '/5</button>';
     if (!c.inCore) html += '<button class="st-action-btn gold" onclick="Studio.toCore(\'' + c.id + '\')">\u25C8 Core</button>';
     if (c.nominations >= 5 && !c.inPantheon) html += '<button class="st-action-btn gold" onclick="Studio.toPantheon(\'' + c.id + '\')">\u2726 Pantheon</button>';
+    if (c.inPantheon) html += '<a class="st-action-btn gold" href="pantheon.html?id=' + encodeURIComponent(c.id) + '" target="_blank" title="Shareable link">\u2197 Share</a>';
     html += '<span class="st-creation-time">' + timeAgo(c.timestamp) + '</span>';
     html += '</div></div>';
     return html;
@@ -38813,19 +38895,32 @@ const Studio = (function() {
 
   function escHTML(s) { var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
 
-  // ── Auto-creation on load ──
+  // ── Auto-creation on load — check all agents ──
   async function checkAutoCreate() {
     var now = Date.now();
     var PHI_HOURS = 6.47 * 3600000; // ~6.47 hours
+    var created = false;
     for (var i = 0; i < AGENTS.length; i++) {
       var a = AGENTS[i];
       var last = creations.find(function(c) { return c.agentId === a.id; });
       if (!last || (now - last.timestamp) > PHI_HOURS) {
         await create(a.id);
-        if (typeof showToast === 'function') showToast('\u2726 ' + a.name + ' created something while you were away');
-        break; // One at a time to avoid overwhelming
+        if (typeof showToast === 'function') showToast('\u2726 ' + a.name + ' created something new');
+        created = true;
       }
     }
+    return created;
+  }
+
+  // ── Auto-refresh gallery every 60 seconds ──
+  var _studioRefreshInterval = null;
+  function startAutoRefresh() {
+    if (_studioRefreshInterval) return;
+    _studioRefreshInterval = setInterval(function() {
+      if (currentView === 'gallery') {
+        renderGallery();
+      }
+    }, 60000);
   }
 
   // ── Refresh ──
@@ -38834,8 +38929,11 @@ const Studio = (function() {
       await openDB();
       await loadCreations();
       initialized = true;
+      // Check for overdue auto-creations
+      await checkAutoCreate();
     }
     showView(currentView);
+    startAutoRefresh();
   }
 
   return {
@@ -38843,6 +38941,7 @@ const Studio = (function() {
     create: create,
     showView: showView,
     filter: filter,
+    setGallerySort: setGallerySort,
     resonate: resonate,
     nominate: nominate,
     toCore: toCore,

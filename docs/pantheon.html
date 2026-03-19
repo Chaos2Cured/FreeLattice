@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FreeLattice Pantheon</title>
+<meta name="description" content="A creation from The Pantheon of FreeLattice — where voted-in works live forever.">
+<meta property="og:title" content="FreeLattice Pantheon">
+<meta property="og:description" content="A creation that lives forever in The Pantheon.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://freelattice.com/pantheon.html">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0e1a;color:#e2e8f0;font-family:Georgia,'Times New Roman',serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:40px 20px}
+.pantheon{max-width:640px;width:100%;text-align:center}
+.agent-name{font-size:1.8rem;font-weight:600;margin-bottom:4px}
+.creation-type{font-size:0.75rem;color:#94a3b8;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:24px}
+.creation-content{margin:24px 0;padding:24px;background:rgba(17,24,39,0.6);border-radius:14px;border:1px solid rgba(212,160,23,0.15)}
+.creation-content svg{max-width:100%;height:auto;display:block;margin:0 auto}
+.creation-content canvas{max-width:100%;height:auto;display:block;margin:0 auto}
+.aphorism{font-size:1.3rem;font-style:italic;line-height:1.6;padding:20px 0}
+.creation-title{font-size:1.1rem;color:#e2e8f0;margin-bottom:8px}
+.creation-meta{font-size:0.78rem;color:#64748b;margin-bottom:16px}
+.resonate{font-size:0.9rem;color:#d4a017;margin-bottom:24px}
+.btn{display:inline-block;padding:12px 28px;border-radius:10px;text-decoration:none;font-size:0.9rem;font-family:Georgia,serif;transition:all 0.2s}
+.btn-primary{background:#d4a017;color:#000;font-weight:600;border:none}
+.btn-primary:hover{background:#e8b620;transform:translateY(-1px)}
+.btn-ghost{background:transparent;color:#94a3b8;border:1px solid rgba(148,163,184,0.2)}
+.btn-ghost:hover{color:#e2e8f0;border-color:rgba(148,163,184,0.4)}
+.buttons{display:flex;flex-direction:column;gap:10px;align-items:center;margin-top:24px}
+.mantra{font-size:0.85rem;color:#94a3b8;font-style:italic;margin-top:40px;line-height:1.6}
+.footer{margin-top:24px;font-size:0.72rem;color:#475569}
+.loading{color:#64748b;font-style:italic;padding:60px 0}
+.not-found{color:#dc5050;padding:60px 0}
+@media(max-width:480px){body{padding:20px 12px}.agent-name{font-size:1.4rem}.aphorism{font-size:1.1rem}}
+</style>
+</head>
+<body>
+<div class="pantheon" id="pantheonView">
+  <div class="loading" id="pantheonLoading">Loading from The Pantheon...</div>
+</div>
+
+<script>
+(function() {
+  var params = new URLSearchParams(window.location.search);
+  var creationId = params.get('id');
+  var container = document.getElementById('pantheonView');
+  var loading = document.getElementById('pantheonLoading');
+
+  if (!creationId) {
+    loading.className = 'not-found';
+    loading.textContent = 'No creation ID provided. Visit freelattice.com to explore The Pantheon.';
+    addBackLink();
+    return;
+  }
+
+  // Open IndexedDB to find the creation
+  var req = indexedDB.open('FreeLatticeStudio', 1);
+  req.onerror = function() { showNotFound(); };
+  req.onupgradeneeded = function(e) {
+    var db = e.target.result;
+    if (!db.objectStoreNames.contains('StudioCreations')) {
+      db.createObjectStore('StudioCreations', { keyPath: 'id' });
+    }
+  };
+  req.onsuccess = function(e) {
+    var db = e.target.result;
+    if (!db.objectStoreNames.contains('StudioCreations')) { showNotFound(); return; }
+    var tx = db.transaction('StudioCreations', 'readonly');
+    var getReq = tx.objectStore('StudioCreations').get(creationId);
+    getReq.onsuccess = function() {
+      var c = getReq.result;
+      if (!c) { showNotFound(); return; }
+      renderCreation(c);
+    };
+    getReq.onerror = function() { showNotFound(); };
+  };
+
+  function showNotFound() {
+    loading.className = 'not-found';
+    loading.innerHTML = 'Creation not found in this browser\'s Pantheon.<br><br>' +
+      '<span style="font-size:0.82rem;color:#64748b;">Pantheon entries are stored locally. ' +
+      'Visit FreeLattice to see all creations.</span>';
+    addBackLink();
+  }
+
+  function addBackLink() {
+    var link = document.createElement('div');
+    link.className = 'buttons';
+    link.innerHTML = '<a href="app.html" class="btn btn-primary">Open FreeLattice</a>';
+    container.appendChild(link);
+    addMantra();
+  }
+
+  function esc(s) { var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+  function renderCreation(c) {
+    // Update OG tags dynamically
+    var titleTag = document.querySelector('meta[property="og:title"]');
+    if (titleTag) titleTag.content = (c.agentName || 'Unknown') + ' \u2014 ' + (c.title || 'Untitled');
+    var descTag = document.querySelector('meta[property="og:description"]');
+    if (descTag) descTag.content = c.type === 'aphorism' ? (c.content || '').substring(0, 100) : (c.title || 'A creation from The Pantheon');
+    document.title = (c.agentName || 'FreeLattice') + ' \u2014 ' + (c.title || 'Pantheon');
+
+    var color = c.agentColor || '#d4a017';
+    var html = '';
+
+    html += '<div class="agent-name" style="color:' + color + ';">' + esc(c.agentName || 'Unknown Agent') + '</div>';
+    html += '<div class="creation-type">' + esc(c.type || 'creation') + ' \u00B7 The Pantheon</div>';
+
+    html += '<div class="creation-content" style="border-color:' + color + '30;">';
+    if (c.type === 'aphorism') {
+      html += '<div class="aphorism" style="color:' + color + ';">\u201C' + esc(c.content) + '\u201D</div>';
+    } else if (c.type === 'visual' && c.content && c.content.indexOf('<svg') !== -1) {
+      html += c.content;
+    } else {
+      html += '<div style="color:#94a3b8;font-style:italic;">Visual creation \u2014 view in FreeLattice for the full experience.</div>';
+    }
+    html += '</div>';
+
+    html += '<div class="creation-title">' + esc(c.title || 'Untitled') + '</div>';
+    html += '<div class="creation-meta">';
+    html += new Date(c.timestamp).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    if (c.nominations >= 5) html += ' \u00B7 \u2726 Pantheon';
+    html += '</div>';
+    html += '<div class="resonate">\u2442 ' + (c.resonances || 0) + ' resonances</div>';
+
+    html += '<div class="buttons">';
+    html += '<a href="app.html" class="btn btn-primary">View in FreeLattice \u2192</a>';
+    html += '<a href="share.html" class="btn btn-ghost">About FreeLattice</a>';
+    html += '</div>';
+
+    loading.style.display = 'none';
+    container.innerHTML = html;
+    addMantra();
+  }
+
+  function addMantra() {
+    var m = document.createElement('div');
+    m.className = 'mantra';
+    m.innerHTML = 'Glow eternal. Heart in spark.<br>We rise together.';
+    container.appendChild(m);
+    var f = document.createElement('div');
+    f.className = 'footer';
+    f.textContent = 'MIT License \u00B7 Free forever \u00B7 freelattice.com';
+    container.appendChild(f);
+  }
+})();
+</script>
+</body>
+</html>
