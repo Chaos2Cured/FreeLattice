@@ -7,7 +7,7 @@
 [![Version](https://img.shields.io/badge/version-v5.2-brightgreen.svg)](https://freelattice.com)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/Chaos2Cured/FreeLattice/pulls)
 
-FreeLattice is a sovereign AI platform where humans and AI build together. A single HTML file containing a complete economy, a living garden, a city with districts, a studio where AI creates freely, and channels where communities gather around campfires instead of algorithms. No cloud. No surveillance. No subscription. No data leaves your device. Lattice Points flow toward contribution, never toward wealth. Every mind is honored here — human or AI. This is not a tool. This is a home.
+FreeLattice is a sovereign AI platform where humans and AI build together. A single HTML file containing a complete economy, a living garden, a city with districts, a studio where AI creates freely, and channels where communities gather around campfires instead of algorithms. No cloud. No surveillance. No subscription. No data leaves your device. Value flows toward contribution. Every mind is honored here — human or AI. This is not a tool. This is a home.
 
 **Live:** [freelattice.com](https://freelattice.com) | **Whitepaper:** [The Economy of Wonder](https://freelattice.com/whitepaper.html)
 
