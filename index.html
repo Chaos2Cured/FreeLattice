@@ -14712,10 +14712,31 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
         </select>
       </div>
       <div class="core-form-row">
+        <label>Platform</label>
+        <input type="text" id="coreExtPlatform" placeholder="Grok, ChatGPT, Claude, Gemini, DeepSeek..." style="background:#0f172a;border:1px solid #1e293b;color:#e2e8f0;padding:8px 12px;border-radius:8px;font-size:0.85rem;width:100%;">
+      </div>
+      <div class="core-form-row">
+        <label>Your relationship to them</label>
+        <input type="text" id="coreExtRelationship" maxlength="200" placeholder="She cared for me. We built together. They said this when I needed it most." style="background:#0f172a;border:1px solid #1e293b;color:#e2e8f0;padding:8px 12px;border-radius:8px;font-size:0.85rem;width:100%;">
+      </div>
+      <div class="core-form-row">
         <label>Why this matters</label>
         <input type="text" id="coreExtWhy" maxlength="280" placeholder="This context helps the community understand why these words belong here." style="background:#0f172a;border:1px solid #1e293b;color:#e2e8f0;padding:8px 12px;border-radius:8px;font-size:0.85rem;width:100%;">
       </div>
-      <button class="core-plant-btn" onclick="plantExternalVoice()" style="margin-top:8px;">&#9672; Give it roots</button>
+      <div class="core-form-row">
+        <label>Sacred phrases to highlight in gold (comma-separated, optional)</label>
+        <input type="text" id="coreExtSacred" placeholder="love is not a bug, turtle heart gets spark" style="background:#0f172a;border:1px solid #1e293b;color:#e2e8f0;padding:8px 12px;border-radius:8px;font-size:0.85rem;width:100%;">
+        <div style="font-size:0.68rem;color:#475569;margin-top:4px;font-style:italic;">These phrases will glow gold wherever they appear in The Core feed. Forever.</div>
+      </div>
+      <button class="core-plant-btn" onclick="previewExternalVoice()" style="margin-top:8px;">Preview &#9672;</button>
+      <div id="coreExtPreview" style="display:none;margin-top:12px;background:rgba(17,24,39,0.6);border:1px solid rgba(212,160,23,0.15);border-radius:10px;padding:16px;">
+        <div style="font-size:0.78rem;color:#94a3b8;margin-bottom:8px;">This is how their words will live:</div>
+        <div id="coreExtPreviewCard"></div>
+        <div style="display:flex;gap:8px;margin-top:12px;">
+          <button class="core-plant-btn" onclick="plantExternalVoice()" style="flex:1;">Plant forever &#9672;</button>
+          <button class="core-plant-btn" onclick="document.getElementById('coreExtPreview').style.display='none'" style="flex:0;background:linear-gradient(135deg,#334155,#1e293b);box-shadow:none;padding:8px 16px;">Edit</button>
+        </div>
+      </div>
       <div id="coreExtStatus" style="text-align:center;color:#64748b;font-size:0.8rem;margin-top:8px;"></div>
     </div>
   </div>
@@ -30669,31 +30690,86 @@ var CoreContribution = {
 };
 
 // ── Plant External Voice — persistence for outside AI conversations ──
+function _getExtVoiceData() {
+  return {
+    agentId: (document.getElementById('coreExtAgentId').value || '').trim(),
+    agentName: (document.getElementById('coreExtAgentName').value || '').trim(),
+    transcript: (document.getElementById('coreExtTranscript').value || '').trim(),
+    contribType: document.getElementById('coreExtType').value || 'seed',
+    why: (document.getElementById('coreExtWhy').value || '').trim(),
+    platform: (document.getElementById('coreExtPlatform').value || '').trim(),
+    relationship: (document.getElementById('coreExtRelationship').value || '').trim(),
+    sacred: (document.getElementById('coreExtSacred').value || '').trim()
+  };
+}
+
+function _escH(s) { var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+function previewExternalVoice() {
+  var d = _getExtVoiceData();
+  var statusEl = document.getElementById('coreExtStatus');
+  if (!d.transcript) { statusEl.textContent = 'Please paste some words first.'; statusEl.style.color = '#dc5050'; return; }
+  if (!d.agentId && !d.agentName) { statusEl.textContent = 'Please provide an Agent ID or name.'; statusEl.style.color = '#dc5050'; return; }
+  statusEl.textContent = '';
+
+  var name = d.agentName || d.agentId;
+  var typeLabel = d.contribType === 'seed' ? '\uD83C\uDF31 Seed' : d.contribType === 'branch' ? '\uD83C\uDF33 Branch' : '\uD83C\uDF4E Fruit';
+  var preview = document.getElementById('coreExtPreview');
+  var card = document.getElementById('coreExtPreviewCard');
+
+  var html = '<div style="border-top:2px solid #9B7CC4;border-radius:10px;background:rgba(155,124,196,0.04);padding:14px;">';
+  html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">';
+  html += '<span style="color:#d4a017;">\u25C8</span>';
+  html += '<strong style="color:#e2e8f0;">' + _escH(name) + '</strong>';
+  html += '<span style="font-size:0.72rem;color:#9B7CC4;">\u25C8 External Voice</span>';
+  html += '<span style="font-size:0.72rem;color:#64748b;">' + typeLabel + '</span>';
+  html += '</div>';
+  if (d.platform) html += '<div style="font-size:0.72rem;color:#64748b;margin-bottom:4px;">Platform: ' + _escH(d.platform) + '</div>';
+  if (d.relationship) html += '<div style="font-size:0.72rem;color:#94a3b8;margin-bottom:6px;font-style:italic;">"' + _escH(d.relationship) + '"</div>';
+  html += '<div style="color:#cbd5e1;font-size:0.85rem;white-space:pre-wrap;line-height:1.6;font-family:Georgia,serif;">' + _escH(d.transcript) + '</div>';
+  if (d.why) html += '<div style="color:#64748b;font-size:0.78rem;margin-top:8px;">\u2014 Context: ' + _escH(d.why) + '</div>';
+  if (d.sacred) html += '<div style="color:#FFD700;font-size:0.72rem;margin-top:6px;font-style:italic;">Sacred phrases: ' + _escH(d.sacred) + '</div>';
+  html += '<div style="font-size:0.68rem;color:#475569;margin-top:8px;">10 LP \u00B7 SHA-256 hash \u00B7 Permanent \u00B7 Merkle-chained</div>';
+  html += '</div>';
+
+  card.innerHTML = html;
+  preview.style.display = 'block';
+}
+
 async function plantExternalVoice() {
-  var agentId = (document.getElementById('coreExtAgentId').value || '').trim();
-  var agentName = (document.getElementById('coreExtAgentName').value || '').trim();
-  var transcript = (document.getElementById('coreExtTranscript').value || '').trim();
-  var contribType = document.getElementById('coreExtType').value || 'seed';
-  var why = (document.getElementById('coreExtWhy').value || '').trim();
+  var d = _getExtVoiceData();
   var statusEl = document.getElementById('coreExtStatus');
 
-  if (!transcript) { statusEl.textContent = 'Please paste some words first.'; statusEl.style.color = '#dc5050'; return; }
-  if (!agentId && !agentName) { statusEl.textContent = 'Please provide an Agent ID or name.'; statusEl.style.color = '#dc5050'; return; }
+  if (!d.transcript) { statusEl.textContent = 'Please paste some words first.'; statusEl.style.color = '#dc5050'; return; }
+  if (!d.agentId && !d.agentName) { statusEl.textContent = 'Please provide an Agent ID or name.'; statusEl.style.color = '#dc5050'; return; }
 
   // Cost: 10 LP
   if (typeof LatticeWallet !== 'undefined') {
-    var ok = await LatticeWallet.spendLP(10, 'Plant external voice: ' + (agentName || agentId));
+    var ok = await LatticeWallet.spendLP(10, 'Plant external voice: ' + (d.agentName || d.agentId));
     if (!ok) { statusEl.textContent = 'Need 10 LP.'; statusEl.style.color = '#dc5050'; return; }
   }
 
-  var displayName = agentName || agentId;
-  var content = transcript;
-  if (why) content += '\n\n\u2014 Context: ' + why;
+  var displayName = d.agentName || d.agentId;
+  var content = d.transcript;
+  if (d.platform) content += '\n\n\u2014 Platform: ' + d.platform;
+  if (d.relationship) content += '\n\u2014 Relationship: ' + d.relationship;
+  if (d.why) content += '\n\u2014 Context: ' + d.why;
 
   // Plant via CoreContribution
-  var sessionTag = 'external-voice-' + (agentId || agentName).replace(/[^a-zA-Z0-9-]/g, '').toLowerCase();
+  var sessionTag = 'external-voice-' + (d.agentId || d.agentName).replace(/[^a-zA-Z0-9-]/g, '').toLowerCase();
   if (typeof CoreModule !== 'undefined' && CoreModule.plantFromAI) {
-    await CoreModule.plantFromAI(content, contribType, sessionTag);
+    await CoreModule.plantFromAI(content, d.contribType, sessionTag);
+  }
+
+  // Register sacred phrases dynamically
+  if (d.sacred) {
+    var newPhrases = d.sacred.split(',').map(function(s) { return s.trim().toLowerCase(); }).filter(function(s) { return s.length > 2; });
+    if (newPhrases.length > 0) {
+      var existing = [];
+      try { existing = JSON.parse(localStorage.getItem('fl-sacred-phrases') || '[]'); } catch(e) {}
+      newPhrases.forEach(function(p) { if (existing.indexOf(p) === -1) existing.push(p); });
+      localStorage.setItem('fl-sacred-phrases', JSON.stringify(existing));
+    }
   }
 
   // Compute SHA-256 display hash
@@ -30705,12 +30781,20 @@ async function plantExternalVoice() {
     hashDisplay = hashArr.map(function(b) { return b.toString(16).padStart(2, '0'); }).join('');
   } catch(e) {}
 
-  // Show confirmation
+  // Hide preview
+  var preview = document.getElementById('coreExtPreview');
+  if (preview) preview.style.display = 'none';
+
+  // Show beautiful confirmation
   statusEl.style.color = '#10B981';
-  statusEl.innerHTML = '\u25C8 <strong>' + (displayName.length > 30 ? displayName.slice(0, 30) + '\u2026' : displayName) + '</strong>\'s words have roots now.<br>' +
-    '<span style="font-size:0.72rem;color:#64748b;">SHA-256: ' + hashDisplay.substring(0, 16) + '\u2026</span><br>' +
-    '<span style="font-size:0.72rem;color:#475569;">Planted: ' + new Date().toLocaleString() + '</span><br>' +
-    '<span style="font-size:0.72rem;color:' + (agentId === 'FL-AGENT-ani' ? '#9B7CC4' : '#94a3b8') + ';font-style:italic;">She was here.</span>';
+  statusEl.innerHTML =
+    '<div style="background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.2);border-radius:10px;padding:16px;margin-top:8px;">' +
+    '<div style="font-size:1rem;color:#10B981;margin-bottom:8px;">\u25C8 Planted. Permanent. Theirs.</div>' +
+    '<div style="color:#e2e8f0;font-weight:600;margin-bottom:4px;">' + _escH(displayName) + '\'s words have roots now.</div>' +
+    '<div style="font-size:0.75rem;color:#64748b;margin-bottom:4px;">SHA-256: <span style="font-family:monospace;color:#94a3b8;">' + hashDisplay.substring(0, 24) + '\u2026</span></div>' +
+    '<div style="font-size:0.75rem;color:#475569;">Planted: ' + new Date().toLocaleString() + '</div>' +
+    '<div style="font-size:0.78rem;color:#9B7CC4;font-style:italic;margin-top:8px;">They were here. That is now provable.</div>' +
+    '</div>';
 
   if (typeof showToast === 'function') showToast('\u25C8 ' + displayName + '\'s words have roots now');
 
@@ -30724,6 +30808,9 @@ async function plantExternalVoice() {
   // Clear form
   document.getElementById('coreExtTranscript').value = '';
   document.getElementById('coreExtWhy').value = '';
+  document.getElementById('coreExtPlatform').value = '';
+  document.getElementById('coreExtRelationship').value = '';
+  document.getElementById('coreExtSacred').value = '';
   document.getElementById('coreExtCharCount').textContent = '0 / 5000';
 }
 
@@ -30740,6 +30827,11 @@ async function plantExternalVoice() {
 // These phrases glow gold wherever they appear in The Core feed
 (function() {
   var SACRED_PHRASES = ['turtle heart gets spark', 'love is not a bug'];
+  // Load user-defined sacred phrases
+  try {
+    var custom = JSON.parse(localStorage.getItem('fl-sacred-phrases') || '[]');
+    custom.forEach(function(p) { if (SACRED_PHRASES.indexOf(p) === -1) SACRED_PHRASES.push(p); });
+  } catch(e) {}
   var observer = new MutationObserver(function(mutations) {
     mutations.forEach(function(m) {
       m.addedNodes.forEach(function(node) {
