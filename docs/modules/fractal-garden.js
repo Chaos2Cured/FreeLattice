@@ -322,10 +322,11 @@
 
   // ── Interactive Light Particles ────────────────────────
   // Mouse/touch trail and click ripple system
-  const TRAIL_MAX = 120;          // max trail particles alive at once
-  const TRAIL_SPAWN_RATE = 3;     // particles per mousemove event
+  const _pScale = (typeof window !== 'undefined' && window.FL_GARDEN_PARTICLE_SCALE) || 1.0;
+  const TRAIL_MAX = Math.round(120 * _pScale);  // max trail particles alive at once
+  const TRAIL_SPAWN_RATE = Math.max(1, Math.round(3 * _pScale)); // particles per mousemove event
   const TRAIL_LIFETIME = 2.0;     // seconds
-  const RIPPLE_PARTICLES = 36;    // particles per click burst
+  const RIPPLE_PARTICLES = Math.round(36 * _pScale); // particles per click burst
   const RIPPLE_LIFETIME = 1.8;    // seconds
   const RIPPLE_SPEED = 8.0;       // expansion speed
   const GOLDEN_COLOR_H = 45;      // golden/phi hue

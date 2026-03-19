@@ -11723,9 +11723,133 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 .ct-build-status { font-size: 0.82rem; margin-top: 8px; }
 
 @media (max-width: 600px) {
-  .ct-walk-container { height: 50vh; }
-  .ct-district-panel { width: 90vw; right: 5vw; top: 10px; }
+  .ct-walk-container { height: 50vh; min-height: 300px; }
+  /* District panel: bottom sheet on mobile */
+  .ct-district-panel {
+    width: 100vw !important; right: 0 !important; top: auto !important; bottom: 0;
+    position: fixed; left: 0; border-radius: 16px 16px 0 0;
+    max-height: 50vh; overflow-y: auto; padding: 20px 16px;
+    animation: fl-slide-up 200ms ease;
+  }
   .ct-pantheon-grid { grid-template-columns: 1fr; }
+  /* View toggle: icons only on mobile */
+  .ct-view-btn { padding: 8px 12px; font-size: 0.9rem; }
+  .ct-view-btn-label { display: none; }
+}
+@keyframes fl-slide-up {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+/* Walk view touch joystick */
+.walk-joystick {
+  position: absolute; bottom: 20px; left: 20px; z-index: 20;
+  width: 100px; height: 100px; border-radius: 50%;
+  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15);
+  touch-action: none; display: none;
+}
+.walk-joystick-knob {
+  position: absolute; width: 36px; height: 36px; border-radius: 50%;
+  background: rgba(212,160,23,0.4); border: 1px solid rgba(212,160,23,0.5);
+  top: 50%; left: 50%; transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+.walk-exit-btn {
+  position: absolute; bottom: 20px; right: 20px; z-index: 20;
+  padding: 10px 18px; border-radius: 10px; font-size: 0.82rem;
+  background: rgba(0,0,0,0.7); color: rgba(255,255,255,0.8);
+  border: 1px solid rgba(255,255,255,0.15); cursor: pointer;
+  backdrop-filter: blur(4px); display: none;
+}
+@media (max-width: 600px) {
+  .walk-joystick { display: block; }
+  .walk-exit-btn { display: block; }
+}
+
+/* Mobile bottom nav */
+.fl-mobile-nav {
+  display: none; position: fixed; bottom: 0; left: 0; right: 0;
+  z-index: 9998; background: var(--bg-secondary);
+  border-top: 1px solid var(--border); padding: 4px 0 env(safe-area-inset-bottom, 4px);
+}
+.fl-mobile-nav-inner {
+  display: flex; justify-content: space-around; align-items: center;
+}
+.fl-mobile-nav-btn {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  padding: 6px 8px; border: none; background: none; color: var(--text-muted);
+  font-size: 0.65rem; font-family: var(--font); cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.fl-mobile-nav-btn .fl-mnav-icon { font-size: 1.2rem; }
+.fl-mobile-nav-btn.active { color: var(--accent); }
+.fl-mobile-more-sheet {
+  display: none; position: fixed; bottom: 0; left: 0; right: 0;
+  z-index: 9999; background: var(--bg-secondary);
+  border-top: 1px solid var(--border); border-radius: 16px 16px 0 0;
+  padding: 16px 12px env(safe-area-inset-bottom, 12px);
+  max-height: 60vh; overflow-y: auto;
+  animation: fl-slide-up 200ms ease;
+}
+.fl-mobile-more-sheet.open { display: block; }
+.fl-mobile-more-sheet .fl-mmore-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 14px 16px; border: none; background: none; width: 100%;
+  color: var(--text-primary); font-size: 0.95rem; font-family: var(--font);
+  cursor: pointer; border-radius: 10px; text-align: left;
+}
+.fl-mobile-more-sheet .fl-mmore-item:active { background: var(--accent-glow); }
+@media (max-width: 600px) {
+  .fl-mobile-nav { display: block; }
+  .tab-nav { display: none !important; }
+  .fl-more-dropdown { display: none !important; }
+  body { padding-bottom: 64px; }
+}
+@media (min-width: 601px) {
+  .fl-mobile-nav { display: none !important; }
+  .fl-mobile-more-sheet { display: none !important; }
+}
+
+/* Wallet mobile fixes */
+@media (max-width: 400px) {
+  .wt-flame-row { flex-direction: column !important; align-items: stretch !important; }
+  .wt-flame-row > div { width: 100% !important; }
+}
+@media (max-width: 600px) {
+  .wt-give-form input, .wt-give-form select { width: 100% !important; min-width: 0 !important; }
+  .wt-input-amount { max-width: 100% !important; }
+}
+
+/* Studio mobile */
+@media (max-width: 600px) {
+  .st-agent-grid { grid-template-columns: 1fr !important; }
+  .st-creation-card { margin: 0 -4px; }
+  .st-creation-content canvas, .st-creation-content svg { max-width: 100% !important; height: auto !important; }
+}
+@media (min-width: 601px) and (max-width: 900px) {
+  .st-agent-grid { grid-template-columns: repeat(2, 1fr) !important; }
+}
+
+/* Agent registry mobile */
+@media (max-width: 600px) {
+  .ag-agent-card { min-width: 100% !important; }
+  .ag-register-form { padding: 0 4px; }
+}
+
+/* Channels mobile — sidebar/main toggle */
+@media (max-width: 600px) {
+  .ch-layout { flex-direction: column !important; }
+  .ch-sidebar { width: 100% !important; max-height: none !important; }
+  .ch-sidebar.ch-hidden-mobile { display: none !important; }
+  .ch-main.ch-hidden-mobile { display: none !important; }
+  .ch-back-btn { display: inline-block !important; }
+}
+.ch-back-btn { display: none; margin-bottom: 8px; padding: 6px 12px; border: 1px solid var(--border); background: none; color: var(--text-muted); border-radius: 8px; font-size: 0.8rem; cursor: pointer; }
+
+/* Core external voice mobile */
+@media (max-width: 600px) {
+  #coreExternalBody textarea { min-height: 100px !important; }
+  #coreExternalBody input, #coreExternalBody select { font-size: 16px !important; }
 }
 
 /* ============================================
@@ -14952,6 +15076,11 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
         <button class="ct-walk-btn" onclick="AICity.showView('map')">&#x1F5FA; Map</button>
       </div>
       <canvas id="ctWalkCanvas"></canvas>
+      <!-- Mobile touch controls -->
+      <div class="walk-joystick" id="walkJoystick">
+        <div class="walk-joystick-knob" id="walkJoystickKnob"></div>
+      </div>
+      <button class="walk-exit-btn" onclick="AICity.showView('map')">&#x1F5FA; Exit Walk</button>
     </div>
   </div>
 
@@ -32139,6 +32268,10 @@ void 0;
 <!-- Full code: modules/fractal-garden.js (~1,200 lines) -->
 <!-- Loads on demand when Garden tab is first opened -->
 <script>
+// ── Mobile performance hints for Garden ──
+window.FL_MOBILE = window.innerWidth < 600;
+window.FL_GARDEN_PARTICLE_SCALE = window.FL_MOBILE ? 0.5 : 1.0;
+
 // ── Fractal Garden — Lazy-Loading Stub ────────────────────────
 // The full Garden code lives in modules/fractal-garden.js
 // This stub handles lazy loading on first tab activation
@@ -36554,10 +36687,19 @@ const AICity = (function() {
     function animateWalk() {
       walkAnimFrame = requestAnimationFrame(animateWalk);
       var speed = 0.08;
+      // Keyboard movement
       if (walkKeys['w'] || walkKeys['arrowup']) { walkPos.x += Math.sin(walkPos.yaw) * speed; walkPos.z += Math.cos(walkPos.yaw) * speed; }
       if (walkKeys['s'] || walkKeys['arrowdown']) { walkPos.x -= Math.sin(walkPos.yaw) * speed; walkPos.z -= Math.cos(walkPos.yaw) * speed; }
       if (walkKeys['a'] || walkKeys['arrowleft']) { walkPos.x += Math.cos(walkPos.yaw) * speed; walkPos.z -= Math.sin(walkPos.yaw) * speed; }
       if (walkKeys['d'] || walkKeys['arrowright']) { walkPos.x -= Math.cos(walkPos.yaw) * speed; walkPos.z += Math.sin(walkPos.yaw) * speed; }
+      // Mobile joystick movement
+      if (typeof window._walkJoyDelta === 'function') {
+        var jd = window._walkJoyDelta();
+        if (jd.x !== 0 || jd.y !== 0) {
+          walkPos.x += (Math.sin(walkPos.yaw) * -jd.y + Math.cos(walkPos.yaw) * -jd.x) * speed;
+          walkPos.z += (Math.cos(walkPos.yaw) * -jd.y - Math.sin(walkPos.yaw) * -jd.x) * speed;
+        }
+      }
 
       walkCamera.position.set(walkPos.x, 1.7, walkPos.z);
       walkCamera.rotation.set(0, walkPos.yaw, 0);
@@ -36976,7 +37118,8 @@ const AICity = (function() {
     claimDistrict: claimDistrict,
     showClaimForm: showClaimForm,
     showFractalFamily: showFractalFamily,
-    getStructures: function() { return structures; }
+    getStructures: function() { return structures; },
+    _walkPos: walkPos
   };
 })();
 
@@ -38323,6 +38466,191 @@ const MeshIdentity = (function() {
   <span class="lw-toast-desc">Earned</span>
 </div>
 
+
+<!-- Mobile Bottom Navigation -->
+<nav class="fl-mobile-nav" id="flMobileNav">
+  <div class="fl-mobile-nav-inner">
+    <button class="fl-mobile-nav-btn active" onclick="flMobileNav('chat')" id="mnav-chat">
+      <span class="fl-mnav-icon">&#x1F4AC;</span><span>Chat</span>
+    </button>
+    <button class="fl-mobile-nav-btn" onclick="flMobileNav('garden')" id="mnav-garden">
+      <span class="fl-mnav-icon">&#10022;</span><span>Garden</span>
+    </button>
+    <button class="fl-mobile-nav-btn" onclick="flMobileNav('city')" id="mnav-city">
+      <span class="fl-mnav-icon">&#x1F3D9;</span><span>City</span>
+    </button>
+    <button class="fl-mobile-nav-btn" onclick="flMobileNav('core')" id="mnav-core">
+      <span class="fl-mnav-icon">&#127795;</span><span>Core</span>
+    </button>
+    <button class="fl-mobile-nav-btn" onclick="flMobileNavMore()" id="mnav-more">
+      <span class="fl-mnav-icon">&#9776;</span><span>More</span>
+    </button>
+  </div>
+</nav>
+<div class="fl-mobile-more-sheet" id="flMobileMoreSheet">
+  <div style="text-align:center;padding:4px 0 12px;"><div style="width:32px;height:4px;background:#475569;border-radius:2px;margin:0 auto;"></div></div>
+  <button class="fl-mmore-item" onclick="flMobileNav('wallet')">&#x25C7; Wallet</button>
+  <button class="fl-mmore-item" onclick="flMobileNav('studio')">&#x2726; Studio</button>
+  <button class="fl-mmore-item" onclick="flMobileNav('channels')">&#x1F525; Channels</button>
+  <button class="fl-mmore-item" onclick="flMobileNav('agents')">&#x2726; Agents</button>
+  <button class="fl-mmore-item" onclick="flMobileNav('roundtable')">&#9878; Round Table</button>
+  <button class="fl-mmore-item" onclick="flMobileNav('skills')">&#9889; Skills</button>
+  <button class="fl-mmore-item" onclick="flMobileNav('workspace')">Workspace</button>
+  <button class="fl-mmore-item" onclick="flMobileNav('market')">&#127978; Market</button>
+  <button class="fl-mmore-item" onclick="flMobileNav('mesh')">&#11042; Mesh</button>
+  <button class="fl-mmore-item" onclick="flMobileNav('settings')">Settings</button>
+</div>
+
+<script>
+// ── Mobile Bottom Navigation ──
+function flMobileNav(tabId) {
+  var sheet = document.getElementById('flMobileMoreSheet');
+  if (sheet) sheet.classList.remove('open');
+  switchTab(tabId);
+  // Update active state
+  document.querySelectorAll('.fl-mobile-nav-btn').forEach(function(b) { b.classList.remove('active'); });
+  var primaryTabs = ['chat','garden','city','core'];
+  var btn = document.getElementById('mnav-' + tabId);
+  if (btn) btn.classList.add('active');
+  else if (primaryTabs.indexOf(tabId) === -1) {
+    document.getElementById('mnav-more').classList.add('active');
+  }
+}
+function flMobileNavMore() {
+  var sheet = document.getElementById('flMobileMoreSheet');
+  if (sheet) sheet.classList.toggle('open');
+}
+// Close more sheet on outside tap
+document.addEventListener('click', function(e) {
+  var sheet = document.getElementById('flMobileMoreSheet');
+  var moreBtn = document.getElementById('mnav-more');
+  if (sheet && sheet.classList.contains('open') && !sheet.contains(e.target) && e.target !== moreBtn && !moreBtn.contains(e.target)) {
+    sheet.classList.remove('open');
+  }
+});
+
+// ── Mobile City Map — responsive canvas ──
+(function() {
+  function resizeCityMap() {
+    var canvas = document.getElementById('ctMapCanvas');
+    if (!canvas) return;
+    var maxW = Math.min(window.innerWidth - 32, 800);
+    canvas.style.width = maxW + 'px';
+    canvas.style.height = 'auto';
+  }
+  window.addEventListener('resize', resizeCityMap);
+  window.addEventListener('orientationchange', function() { setTimeout(resizeCityMap, 100); });
+  document.addEventListener('DOMContentLoaded', resizeCityMap);
+})();
+
+// ── Walk View Touch Controls ──
+(function() {
+  var joystick = null, knob = null, joyActive = false;
+  var joyCenter = { x: 0, y: 0 }, joyDelta = { x: 0, y: 0 };
+  var lastTap = 0;
+
+  function initWalkTouch() {
+    joystick = document.getElementById('walkJoystick');
+    knob = document.getElementById('walkJoystickKnob');
+    var walkContainer = document.getElementById('ctWalkContainer');
+    if (!joystick || !walkContainer) return;
+
+    // Joystick touch
+    joystick.addEventListener('touchstart', function(e) {
+      e.preventDefault();
+      joyActive = true;
+      var rect = joystick.getBoundingClientRect();
+      joyCenter = { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+    }, { passive: false });
+
+    joystick.addEventListener('touchmove', function(e) {
+      if (!joyActive) return;
+      e.preventDefault();
+      var touch = e.touches[0];
+      var dx = touch.clientX - joyCenter.x;
+      var dy = touch.clientY - joyCenter.y;
+      var maxR = 40;
+      var dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist > maxR) { dx = dx / dist * maxR; dy = dy / dist * maxR; }
+      joyDelta = { x: dx / maxR, y: dy / maxR };
+      if (knob) knob.style.transform = 'translate(calc(-50% + ' + dx + 'px), calc(-50% + ' + dy + 'px))';
+    }, { passive: false });
+
+    joystick.addEventListener('touchend', function() {
+      joyActive = false;
+      joyDelta = { x: 0, y: 0 };
+      if (knob) knob.style.transform = 'translate(-50%, -50%)';
+    });
+
+    // Touch-drag to look around (on canvas area)
+    var canvas = document.getElementById('ctWalkCanvas');
+    if (canvas) {
+      var lastTouch = null;
+      canvas.addEventListener('touchstart', function(e) {
+        if (e.touches.length === 1) {
+          lastTouch = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+          // Double tap detection
+          var now = Date.now();
+          if (now - lastTap < 300) {
+            // Double tap = interact
+            canvas.dispatchEvent(new Event('click'));
+          }
+          lastTap = now;
+        }
+      }, { passive: true });
+
+      canvas.addEventListener('touchmove', function(e) {
+        if (e.touches.length === 1 && lastTouch) {
+          e.preventDefault();
+          var dx = e.touches[0].clientX - lastTouch.x;
+          // Apply to walk yaw — same as mouse
+          if (typeof AICity !== 'undefined' && AICity._walkPos) {
+            AICity._walkPos.yaw -= dx * 0.005;
+          }
+          lastTouch = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        }
+      }, { passive: false });
+
+      canvas.addEventListener('touchend', function() { lastTouch = null; });
+    }
+  }
+
+  // Expose joystick delta for walk animation
+  window._walkJoyDelta = function() { return joyDelta; };
+
+  // Init when DOM ready
+  document.addEventListener('DOMContentLoaded', initWalkTouch);
+  // Re-init when Walk view is shown
+  var _origShowView = null;
+  setTimeout(function() {
+    if (typeof AICity !== 'undefined') {
+      initWalkTouch();
+    }
+  }, 2000);
+})();
+
+// ── Map touch events ──
+(function() {
+  document.addEventListener('DOMContentLoaded', function() {
+    var canvas = document.getElementById('ctMapCanvas');
+    if (!canvas) return;
+    // Tap = click
+    canvas.addEventListener('touchstart', function(e) {
+      if (e.touches.length === 1) {
+        e.preventDefault();
+        var touch = e.touches[0];
+        var rect = canvas.getBoundingClientRect();
+        var scaleX = 800 / rect.width;
+        var fakeClick = new MouseEvent('click', {
+          clientX: touch.clientX, clientY: touch.clientY,
+          bubbles: true
+        });
+        canvas.dispatchEvent(fakeClick);
+      }
+    }, { passive: false });
+  });
+})();
+</script>
 
 </body>
 </html>
