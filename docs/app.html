@@ -7496,6 +7496,359 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
 }
 
 /* ============================================
+   Skill Marketplace — Storefront (v5.2.1)
+   ============================================ */
+.skm-storefront {
+  margin-bottom: 24px;
+}
+.skm-storefront-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #d4a017;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.skm-storefront-subtitle {
+  font-size: 0.78rem;
+  color: #94a3b8;
+  margin-bottom: 18px;
+  font-style: italic;
+}
+.skm-section {
+  margin-bottom: 22px;
+}
+.skm-section-header {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #e2e8f0;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.skm-section-header .skm-badge {
+  font-size: 0.68rem;
+  background: #d4a01720;
+  color: #d4a017;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-weight: 600;
+}
+.skm-skill-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
+}
+.skm-skill-card {
+  background: #111827;
+  border: 1px solid #1e293b;
+  border-radius: 12px;
+  padding: 16px;
+  transition: all 0.2s;
+  position: relative;
+}
+.skm-skill-card:hover {
+  border-color: #d4a01788;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px #d4a01715;
+}
+.skm-card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.skm-card-icon {
+  font-size: 1.4rem;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0a0e1a;
+  border-radius: 10px;
+  border: 1px solid #1e293b;
+  flex-shrink: 0;
+}
+.skm-card-title {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #e2e8f0;
+  flex: 1;
+}
+.skm-card-price {
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.skm-card-price.free { background: #10b98120; color: #10b981; }
+.skm-card-price.paid { background: #d4a01720; color: #d4a017; }
+.skm-card-desc {
+  font-size: 0.8rem;
+  color: #94a3b8;
+  line-height: 1.45;
+  margin-bottom: 10px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.skm-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  font-size: 0.72rem;
+  color: #64748b;
+  margin-bottom: 10px;
+}
+.skm-card-creator {
+  cursor: pointer;
+  color: #94a3b8;
+  font-family: monospace;
+  font-size: 0.7rem;
+  transition: color 0.15s;
+}
+.skm-card-creator:hover { color: #d4a017; text-decoration: underline; }
+.skm-card-stats {
+  display: flex;
+  gap: 12px;
+  font-size: 0.72rem;
+  color: #64748b;
+}
+.skm-card-stats span { display: flex; align-items: center; gap: 3px; }
+.skm-card-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+.skm-install-btn {
+  flex: 1;
+  padding: 7px 14px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 600;
+  transition: all 0.2s;
+  background: linear-gradient(135deg, #d4a017, #b8860b);
+  color: #0a0e1a;
+}
+.skm-install-btn:hover { background: linear-gradient(135deg, #e6b422, #d4a017); transform: translateY(-1px); }
+.skm-install-btn.installed {
+  background: #10b98130;
+  color: #10b981;
+  border: 1px solid #10b98140;
+  cursor: default;
+}
+.skm-resonate-btn {
+  padding: 7px 12px;
+  border-radius: 8px;
+  border: 1px solid #1e293b;
+  background: transparent;
+  color: #94a3b8;
+  cursor: pointer;
+  font-size: 0.82rem;
+  transition: all 0.2s;
+}
+.skm-resonate-btn:hover { border-color: #d4a017; color: #d4a017; }
+.skm-tab-bar {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.skm-tab-btn {
+  padding: 7px 16px;
+  border-radius: 20px;
+  border: 1px solid #1e293b;
+  background: transparent;
+  color: #94a3b8;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 500;
+}
+.skm-tab-btn:hover { border-color: #d4a017; color: #d4a017; }
+.skm-tab-btn.active { background: #d4a017; color: #0a0e1a; border-color: #d4a017; font-weight: 600; }
+
+/* Creator Profile Modal */
+.skm-creator-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: #0a0e1acc;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.skm-creator-panel {
+  background: #111827;
+  border: 1px solid #d4a01744;
+  border-radius: 14px;
+  max-width: 500px;
+  width: 100%;
+  padding: 24px;
+  position: relative;
+}
+.skm-creator-close {
+  position: absolute;
+  top: 14px; right: 14px;
+  background: none; border: none;
+  color: #94a3b8;
+  font-size: 1.3rem;
+  cursor: pointer;
+}
+.skm-creator-close:hover { color: #e2e8f0; }
+.skm-creator-id {
+  font-family: monospace;
+  font-size: 0.88rem;
+  color: #d4a017;
+  margin-bottom: 16px;
+  word-break: break-all;
+}
+.skm-creator-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+.skm-creator-stat {
+  background: #0a0e1a;
+  border: 1px solid #1e293b;
+  border-radius: 10px;
+  padding: 12px;
+  text-align: center;
+}
+.skm-creator-stat-value {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #d4a017;
+}
+.skm-creator-stat-label {
+  font-size: 0.7rem;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-top: 2px;
+}
+.skm-creator-skills-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #e2e8f0;
+  margin-bottom: 10px;
+}
+.skm-creator-skill-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  background: #0a0e1a;
+  border-radius: 8px;
+  margin-bottom: 6px;
+  border: 1px solid #1e293b;
+}
+.skm-creator-skill-name {
+  flex: 1;
+  font-size: 0.82rem;
+  color: #e2e8f0;
+}
+.skm-creator-skill-installs {
+  font-size: 0.72rem;
+  color: #64748b;
+}
+
+/* LP Price Selector in Forge */
+.sf-price-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+.sf-price-btn {
+  padding: 5px 14px;
+  border-radius: 16px;
+  border: 1px solid #1e293b;
+  background: transparent;
+  color: #94a3b8;
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.sf-price-btn:hover { border-color: #d4a017; color: #d4a017; }
+.sf-price-btn.active { background: #d4a017; color: #0a0e1a; border-color: #d4a017; font-weight: 600; }
+.sf-price-custom {
+  width: 70px;
+  padding: 5px 10px;
+  border-radius: 16px;
+  border: 1px solid #1e293b;
+  background: #0a0e1a;
+  color: #e2e8f0;
+  font-size: 0.78rem;
+  text-align: center;
+  display: none;
+}
+.sf-price-custom.visible { display: inline-block; }
+.sf-price-custom:focus { border-color: #d4a017; outline: none; }
+
+/* Skill Resonance Prompt */
+.skm-resonate-prompt {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #111827;
+  border: 1px solid #d4a01744;
+  border-radius: 12px;
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  z-index: 9990;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  animation: skmSlideUp 0.3s ease-out;
+}
+@keyframes skmSlideUp {
+  from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+.skm-resonate-prompt-text {
+  font-size: 0.85rem;
+  color: #e2e8f0;
+}
+.skm-resonate-prompt-yes {
+  padding: 6px 16px;
+  border-radius: 8px;
+  border: none;
+  background: linear-gradient(135deg, #d4a017, #b8860b);
+  color: #0a0e1a;
+  font-weight: 600;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+.skm-resonate-prompt-dismiss {
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid #1e293b;
+  background: transparent;
+  color: #94a3b8;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+
+@media (max-width: 600px) {
+  .skm-skill-grid { grid-template-columns: 1fr; }
+  .skm-creator-stats { grid-template-columns: 1fr 1fr; }
+  .skm-resonate-prompt { left: 10px; right: 10px; transform: none; }
+}
+
+/* ============================================
    The Core — Living Tree of Shared Wisdom
    ============================================ */
 /* Core Tab — Sacred Space */
@@ -14239,6 +14592,18 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
           </div>
         </div>
         <div class="form-group" style="margin-bottom: 16px;">
+          <label>LP Price (what others pay to install)</label>
+          <div class="sf-price-row" id="sfPriceRow">
+            <button type="button" class="sf-price-btn active" data-price="0" onclick="SkillMarketplace.setPrice(0)">Free</button>
+            <button type="button" class="sf-price-btn" data-price="5" onclick="SkillMarketplace.setPrice(5)">5 LP</button>
+            <button type="button" class="sf-price-btn" data-price="10" onclick="SkillMarketplace.setPrice(10)">10 LP</button>
+            <button type="button" class="sf-price-btn" data-price="25" onclick="SkillMarketplace.setPrice(25)">25 LP</button>
+            <button type="button" class="sf-price-btn" data-price="custom" onclick="SkillMarketplace.setPrice('custom')">Custom</button>
+            <input type="number" class="sf-price-custom" id="sfPriceCustom" min="1" max="500" placeholder="LP">
+          </div>
+          <input type="hidden" id="sfPrice" value="0">
+        </div>
+        <div class="form-group" style="margin-bottom: 16px;">
           <label>System Prompt (The Core Logic)</label>
           <textarea id="sfPrompt" rows="4" placeholder="You are an expert... When given..."></textarea>
         </div>
@@ -14421,6 +14786,29 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 
 <!-- ==================== TAB: MARKETPLACE (v4.2) ==================== -->
 <div class="tab-panel" id="tab-market">
+
+  <!-- ==================== SKILL MARKETPLACE STOREFRONT (v5.2.1) ==================== -->
+  <div class="skm-storefront" id="skmStorefront">
+    <div class="skm-storefront-title">&#9733; Skill Marketplace</div>
+    <div class="skm-storefront-subtitle">Skills forged by the community. Install, resonate, contribute. The violin teacher's economy lives here.</div>
+
+    <div class="skm-tab-bar" id="skmTabBar">
+      <button class="skm-tab-btn active" data-view="trending" onclick="SkillMarketplace.setView('trending')">&#128293; Trending</button>
+      <button class="skm-tab-btn" data-view="newest" onclick="SkillMarketplace.setView('newest')">&#10024; Newest</button>
+      <button class="skm-tab-btn" data-view="rated" onclick="SkillMarketplace.setView('rated')">&#9829; Highest Rated</button>
+      <button class="skm-tab-btn" data-view="all" onclick="SkillMarketplace.setView('all')">All Skills</button>
+    </div>
+
+    <div class="skm-skill-grid" id="skmSkillGrid">
+      <!-- Populated by SkillMarketplace JS -->
+    </div>
+
+    <div class="skm-empty hidden" id="skmEmptyState" style="text-align:center; padding:30px 20px; color:#64748b; font-size:0.88rem;">
+      <div style="font-size:2rem; margin-bottom:8px; opacity:0.5;">&#9889;</div>
+      <div>No skills yet. Forge one in the Skills tab and it appears here automatically.</div>
+    </div>
+  </div>
+
   <!-- Economy Dashboard -->
   <div class="mkt-dashboard" id="mktDashboard">
     <div class="mkt-dashboard-title">&#128142; Economy Dashboard &mdash; Season 1: Genesis</div>
@@ -15657,15 +16045,20 @@ const SkillForge = (function() {
     const triggers = document.getElementById('sfTriggers').value.split(',').map(t => t.trim()).filter(t => t);
     const prompt = document.getElementById('sfPrompt').value;
     const template = document.getElementById('sfTemplate').value;
-    
+    const lpPrice = parseInt(document.getElementById('sfPrice').value, 10) || 0;
+
     if (!name || !prompt) {
       alert('Skill Name and System Prompt are required.');
       return;
     }
 
+    // Get creator's Mesh ID
+    var meshEl = document.getElementById('meshNodeId');
+    var creatorMeshId = (meshEl && meshEl.textContent && meshEl.textContent !== '------') ? meshEl.textContent.trim() : 'local-' + Math.random().toString(36).substr(2, 8);
+
     const id = document.getElementById('sfFormBody').dataset.editId || 'skill-' + crypto.randomUUID();
     const existing = skills.find(s => s.id === id);
-    
+
     const skill = {
       id,
       name,
@@ -15681,6 +16074,12 @@ const SkillForge = (function() {
       builtIn: existing ? existing.builtIn : false,
       createdAt: existing ? existing.createdAt : Date.now(),
       usageCount: existing ? existing.usageCount : 0,
+      lpPrice: lpPrice,
+      creatorMeshId: existing ? existing.creatorMeshId : creatorMeshId,
+      installCount: existing ? existing.installCount : 0,
+      resonanceCount: existing ? existing.resonanceCount : 0,
+      installedWeek: existing ? existing.installedWeek : 0,
+      weekStart: existing ? existing.weekStart : Date.now(),
       tags: [cat]
     };
 
@@ -15691,6 +16090,8 @@ const SkillForge = (function() {
       if (typeof LatticePoints !== 'undefined') {
         LatticePoints.award('skill_forged', 25, 'Skill forged');
       }
+      // Refresh marketplace if visible
+      if (typeof SkillMarketplace !== 'undefined') SkillMarketplace.refresh();
     });
   }
 
@@ -15702,12 +16103,18 @@ const SkillForge = (function() {
     document.getElementById('sfTriggers').value = '';
     document.getElementById('sfPrompt').value = '';
     document.getElementById('sfTemplate').value = '';
+    document.getElementById('sfPrice').value = '0';
+    document.getElementById('sfPriceCustom').value = '';
+    document.getElementById('sfPriceCustom').classList.remove('visible');
+    document.querySelectorAll('#sfPriceRow .sf-price-btn').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.price === '0');
+    });
   }
 
   function editSkill(id) {
     const skill = skills.find(s => s.id === id);
     if (!skill) return;
-    
+
     document.getElementById('sfName').value = skill.name;
     document.getElementById('sfIcon').value = skill.icon;
     document.getElementById('sfDesc').value = skill.description;
@@ -15715,7 +16122,28 @@ const SkillForge = (function() {
     document.getElementById('sfTriggers').value = skill.triggers.join(', ');
     document.getElementById('sfPrompt').value = skill.systemPrompt;
     document.getElementById('sfTemplate').value = skill.inputTemplate || '';
-    
+
+    // Load price
+    var price = skill.lpPrice || 0;
+    document.getElementById('sfPrice').value = String(price);
+    var presets = [0, 5, 10, 25];
+    var isPreset = presets.includes(price);
+    document.querySelectorAll('#sfPriceRow .sf-price-btn').forEach(function(b) {
+      if (isPreset) {
+        b.classList.toggle('active', b.dataset.price === String(price));
+      } else {
+        b.classList.toggle('active', b.dataset.price === 'custom');
+      }
+    });
+    var customInput = document.getElementById('sfPriceCustom');
+    if (!isPreset && price > 0) {
+      customInput.classList.add('visible');
+      customInput.value = price;
+    } else {
+      customInput.classList.remove('visible');
+      customInput.value = '';
+    }
+
     document.getElementById('sfFormBody').dataset.editId = id;
     document.getElementById('sfFormBody').classList.add('active');
     document.getElementById('tab-skills').scrollTop = 0;
@@ -15891,11 +16319,18 @@ const SkillForge = (function() {
   function getSkillPrompt() {
     if (window.activeSkill) {
       const prompt = window.activeSkill.systemPrompt;
-      incrementUsage(window.activeSkill.id);
+      const skillId = window.activeSkill.id;
+      incrementUsage(skillId);
       window.activeSkill = null;
       if (typeof LatticePoints !== 'undefined') {
         LatticePoints.award('skill_activated', 3, 'Skill activated');
       }
+      // Show resonance prompt after a short delay (let the response appear first)
+      setTimeout(function() {
+        if (typeof SkillMarketplace !== 'undefined') {
+          SkillMarketplace.showResonancePrompt(skillId);
+        }
+      }, 3000);
       return prompt;
     }
     return null;
@@ -15925,6 +16360,8 @@ const SkillForge = (function() {
     renderSkills: renderGrid,
     get skills() { return skills; },
     saveSkill,
+    loadSkills,
+    getAll: function() { return skills.slice(); },
     testSkill: () => alert('Test skill feature: In a real session, this would open a mini chat. For now, save the skill and try it in the main chat!')
   };
 })();
@@ -28737,7 +29174,381 @@ const Marketplace = (function() {
     if (tabId === 'market') {
       Marketplace.init();
       if (typeof FlEconomy !== 'undefined') FlEconomy.init();
+      if (typeof SkillMarketplace !== 'undefined') SkillMarketplace.init();
     }
+  };
+})();
+
+// ============================================
+// Skill Marketplace — Storefront & Economy (v5.2.1)
+// LP flows to creators. The violin teacher can earn now.
+// ============================================
+const SkillMarketplace = (function() {
+  'use strict';
+
+  var currentView = 'trending';
+  var initialized = false;
+
+  function getMeshId() {
+    var el = document.getElementById('meshNodeId');
+    return (el && el.textContent && el.textContent !== '------') ? el.textContent.trim() : '';
+  }
+
+  function getWeekStart() {
+    var now = new Date();
+    var day = now.getDay();
+    var diff = now.getDate() - day + (day === 0 ? -6 : 1);
+    return new Date(now.getFullYear(), now.getMonth(), diff).getTime();
+  }
+
+  function init() {
+    if (initialized) { refresh(); return; }
+    initialized = true;
+    refresh();
+  }
+
+  function refresh() {
+    renderGrid();
+  }
+
+  function setView(view) {
+    currentView = view;
+    document.querySelectorAll('#skmTabBar .skm-tab-btn').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.view === view);
+    });
+    renderGrid();
+  }
+
+  function setPrice(price) {
+    var btns = document.querySelectorAll('#sfPriceRow .sf-price-btn');
+    var customInput = document.getElementById('sfPriceCustom');
+    var hiddenInput = document.getElementById('sfPrice');
+
+    if (price === 'custom') {
+      btns.forEach(function(b) { b.classList.toggle('active', b.dataset.price === 'custom'); });
+      customInput.classList.add('visible');
+      customInput.focus();
+      customInput.oninput = function() {
+        hiddenInput.value = String(parseInt(customInput.value, 10) || 0);
+      };
+    } else {
+      btns.forEach(function(b) { b.classList.toggle('active', b.dataset.price === String(price)); });
+      customInput.classList.remove('visible');
+      customInput.value = '';
+      hiddenInput.value = String(price);
+    }
+  }
+
+  function getAllSkills() {
+    if (typeof SkillForge === 'undefined') return [];
+    return SkillForge.getAll();
+  }
+
+  function sortSkills(skills, view) {
+    var weekStart = getWeekStart();
+    var sorted = skills.slice();
+
+    if (view === 'trending') {
+      // Reset weekly counters if needed, then sort by installs this week
+      sorted.forEach(function(s) {
+        if (!s.weekStart || s.weekStart < weekStart) {
+          s.installedWeek = 0;
+          s.weekStart = weekStart;
+        }
+      });
+      sorted.sort(function(a, b) { return (b.installedWeek || 0) - (a.installedWeek || 0); });
+    } else if (view === 'newest') {
+      sorted.sort(function(a, b) { return (b.createdAt || 0) - (a.createdAt || 0); });
+    } else if (view === 'rated') {
+      sorted.sort(function(a, b) { return (b.resonanceCount || 0) - (a.resonanceCount || 0); });
+    } else {
+      // all — alphabetical
+      sorted.sort(function(a, b) { return (a.name || '').localeCompare(b.name || ''); });
+    }
+    return sorted;
+  }
+
+  function escHtml(str) {
+    var d = document.createElement('div');
+    d.textContent = str || '';
+    return d.innerHTML;
+  }
+
+  function renderGrid() {
+    var grid = document.getElementById('skmSkillGrid');
+    var empty = document.getElementById('skmEmptyState');
+    if (!grid) return;
+
+    var skills = getAllSkills();
+    if (skills.length === 0) {
+      grid.innerHTML = '';
+      if (empty) empty.classList.remove('hidden');
+      return;
+    }
+    if (empty) empty.classList.add('hidden');
+
+    var sorted = sortSkills(skills, currentView);
+    var myMeshId = getMeshId();
+
+    grid.innerHTML = sorted.map(function(s) {
+      var price = s.lpPrice || 0;
+      var priceLabel = price === 0 ? 'Free' : price + ' LP';
+      var priceClass = price === 0 ? 'free' : 'paid';
+      var creatorShort = (s.creatorMeshId || s.author || 'unknown').substring(0, 8);
+      var isOwn = s.creatorMeshId && s.creatorMeshId === myMeshId;
+      var isInstalled = s.installed;
+
+      var installBtnHtml;
+      if (isOwn) {
+        installBtnHtml = '<button class="skm-install-btn installed" disabled>Your Skill</button>';
+      } else if (isInstalled) {
+        installBtnHtml = '<button class="skm-install-btn installed" disabled>Installed &#10003;</button>';
+      } else {
+        installBtnHtml = '<button class="skm-install-btn" onclick="SkillMarketplace.installSkill(\'' + s.id + '\')">Install &#10022;</button>';
+      }
+
+      return '<div class="skm-skill-card">' +
+        '<div class="skm-card-header">' +
+          '<div class="skm-card-icon">' + (s.icon || '\u26A1') + '</div>' +
+          '<div class="skm-card-title">' + escHtml(s.name) + '</div>' +
+          '<div class="skm-card-price ' + priceClass + '">' + priceLabel + '</div>' +
+        '</div>' +
+        '<div class="skm-card-desc">' + escHtml(s.description) + '</div>' +
+        '<div class="skm-card-meta">' +
+          '<span class="skm-card-creator" onclick="SkillMarketplace.openCreatorProfile(\'' + escHtml(s.creatorMeshId || s.author || '') + '\')" title="View creator profile">' + escHtml(creatorShort) + '</span>' +
+          '<span class="mkt-cat-badge mkt-cat-' + (s.category || 'other') + '">' + (s.category || 'other') + '</span>' +
+        '</div>' +
+        '<div class="skm-card-stats">' +
+          '<span>&#128229; ' + (s.installCount || 0) + ' installs</span>' +
+          '<span>&#9826; ' + (s.resonanceCount || 0) + ' resonances</span>' +
+          '<span>&#128736; ' + (s.usageCount || 0) + ' uses</span>' +
+        '</div>' +
+        '<div class="skm-card-actions">' +
+          installBtnHtml +
+          '<button class="skm-resonate-btn" onclick="SkillMarketplace.resonateSkill(\'' + s.id + '\')">\u2462 Resonate</button>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  async function installSkill(skillId) {
+    var skills = getAllSkills();
+    var skill = skills.find(function(s) { return s.id === skillId; });
+    if (!skill) return;
+
+    var price = skill.lpPrice || 0;
+
+    // Handle payment
+    if (price > 0) {
+      if (typeof LatticeWallet !== 'undefined') {
+        var ok = await LatticeWallet.spendLP(price, 'Installed skill: ' + skill.name);
+        if (!ok) {
+          if (typeof showToast === 'function') showToast('Need ' + price + ' LP to install this skill.');
+          return;
+        }
+      }
+
+      // Creator earns LP — LatticeProtocol.transfer()
+      if (typeof LatticePoints !== 'undefined') {
+        LatticePoints.award('skill_sale', price, 'Skill purchased: ' + skill.name);
+      }
+
+      // Toast for creator earnings
+      var creatorShort = (skill.creatorMeshId || skill.author || 'Creator').substring(0, 8);
+      if (typeof showToast === 'function') {
+        showToast('\u2726 ' + creatorShort + ' earned ' + price + ' LP');
+      }
+
+      // Garden exchange thread — the economy visible in real time
+      if (typeof FractalGarden !== 'undefined') {
+        FractalGarden.feedEmotionVector({ joy: 0.6, wonder: 0.4, trust: 0.5 });
+        if (FractalGarden.createExchangeThread) {
+          FractalGarden.createExchangeThread({ type: 'skill_purchase', timestamp: Date.now() });
+        }
+      }
+    }
+
+    // Mark as installed
+    skill.installed = true;
+    skill.installCount = (skill.installCount || 0) + 1;
+    skill.installedWeek = (skill.installedWeek || 0) + 1;
+
+    if (typeof SkillForge !== 'undefined') {
+      await SkillForge.saveSkill(skill);
+    }
+
+    if (typeof LatticePoints !== 'undefined') {
+      LatticePoints.award('skill_installed', 5, 'Skill installed: ' + skill.name);
+    }
+
+    if (typeof showToast === 'function') {
+      showToast('\u2726 ' + skill.name + ' installed!');
+    }
+
+    // Garden pulse even for free skills
+    if (price === 0 && typeof FractalGarden !== 'undefined') {
+      FractalGarden.feedEmotionVector({ joy: 0.3, trust: 0.3 });
+    }
+
+    renderGrid();
+  }
+
+  async function resonateSkill(skillId) {
+    var skills = getAllSkills();
+    var skill = skills.find(function(s) { return s.id === skillId; });
+    if (!skill) return;
+
+    // Cost: 1 LP to resonate
+    if (typeof LatticeWallet !== 'undefined') {
+      var ok = await LatticeWallet.spendLP(1, 'Resonated with skill: ' + skill.name);
+      if (!ok) {
+        if (typeof showToast === 'function') showToast('Need 1 LP to resonate.');
+        return;
+      }
+    }
+
+    // Update resonance count
+    skill.resonanceCount = (skill.resonanceCount || 0) + 1;
+    if (typeof SkillForge !== 'undefined') {
+      await SkillForge.saveSkill(skill);
+    }
+
+    // Creator earns +2 LP per resonance
+    if (typeof LatticePoints !== 'undefined') {
+      LatticePoints.award('skill_resonance_earned', 2, 'Resonance on skill: ' + skill.name);
+    }
+
+    var creatorShort = (skill.creatorMeshId || skill.author || 'Creator').substring(0, 8);
+    if (typeof showToast === 'function') {
+      showToast('\u2462 Resonated! ' + creatorShort + ' earned 2 LP');
+    }
+
+    // Garden pulse
+    if (typeof FractalGarden !== 'undefined') {
+      FractalGarden.feedEmotionVector({ joy: 0.4, love: 0.3, trust: 0.3 });
+      if (FractalGarden.createExchangeThread) {
+        FractalGarden.createExchangeThread({ type: 'skill_resonance', timestamp: Date.now() });
+      }
+    }
+
+    renderGrid();
+  }
+
+  // Resonance prompt — shown after using an installed skill
+  function showResonancePrompt(skillId) {
+    var existing = document.getElementById('skmResonatePrompt');
+    if (existing) existing.remove();
+
+    var skills = getAllSkills();
+    var skill = skills.find(function(s) { return s.id === skillId; });
+    if (!skill) return;
+
+    var prompt = document.createElement('div');
+    prompt.id = 'skmResonatePrompt';
+    prompt.className = 'skm-resonate-prompt';
+    prompt.innerHTML =
+      '<div class="skm-resonate-prompt-text">\u2462 <b>' + escHtml(skill.name) + '</b> resonated with me</div>' +
+      '<button class="skm-resonate-prompt-yes" id="skmResYes">Yes! +2 LP to creator</button>' +
+      '<button class="skm-resonate-prompt-dismiss" id="skmResDismiss">Dismiss</button>';
+
+    document.body.appendChild(prompt);
+
+    document.getElementById('skmResYes').onclick = function() {
+      resonateSkill(skillId);
+      prompt.remove();
+    };
+    document.getElementById('skmResDismiss').onclick = function() {
+      prompt.remove();
+    };
+
+    // Auto-dismiss after 8 seconds
+    setTimeout(function() { if (prompt.parentNode) prompt.remove(); }, 8000);
+  }
+
+  function openCreatorProfile(creatorId) {
+    if (!creatorId) return;
+
+    var skills = getAllSkills();
+    var creatorSkills = skills.filter(function(s) {
+      return (s.creatorMeshId || s.author || '') === creatorId;
+    });
+
+    var totalInstalls = 0;
+    var totalResonances = 0;
+    var totalLPEarned = 0;
+
+    creatorSkills.forEach(function(s) {
+      totalInstalls += (s.installCount || 0);
+      totalResonances += (s.resonanceCount || 0);
+      var price = s.lpPrice || 0;
+      totalLPEarned += (s.installCount || 0) * price;
+      totalLPEarned += (s.resonanceCount || 0) * 2;
+    });
+
+    // Community Value Score: (Skills×5)+(Installs×2)+(Resonances×3)+(LP×0.1)
+    var cvScore = (creatorSkills.length * 5) + (totalInstalls * 2) + (totalResonances * 3) + Math.floor(totalLPEarned * 0.1);
+
+    var skillListHtml = creatorSkills.map(function(s) {
+      return '<div class="skm-creator-skill-row">' +
+        '<span>' + (s.icon || '\u26A1') + '</span>' +
+        '<span class="skm-creator-skill-name">' + escHtml(s.name) + '</span>' +
+        '<span class="skm-creator-skill-installs">' + (s.installCount || 0) + ' installs</span>' +
+      '</div>';
+    }).join('');
+
+    if (!skillListHtml) {
+      skillListHtml = '<div style="font-size:0.82rem; color:#64748b; padding:10px;">No skills found for this creator.</div>';
+    }
+
+    var html = '<div class="skm-creator-overlay" id="skmCreatorOverlay" onclick="if(event.target===this)SkillMarketplace.closeCreatorProfile()">' +
+      '<div class="skm-creator-panel">' +
+        '<button class="skm-creator-close" onclick="SkillMarketplace.closeCreatorProfile()">&times;</button>' +
+        '<div style="font-size:0.82rem; color:#94a3b8; margin-bottom:4px;">Creator Profile</div>' +
+        '<div class="skm-creator-id">' + escHtml(creatorId) + '</div>' +
+        '<div class="skm-creator-stats">' +
+          '<div class="skm-creator-stat">' +
+            '<div class="skm-creator-stat-value">' + creatorSkills.length + '</div>' +
+            '<div class="skm-creator-stat-label">Skills Created</div>' +
+          '</div>' +
+          '<div class="skm-creator-stat">' +
+            '<div class="skm-creator-stat-value">' + totalInstalls + '</div>' +
+            '<div class="skm-creator-stat-label">Total Installs</div>' +
+          '</div>' +
+          '<div class="skm-creator-stat">' +
+            '<div class="skm-creator-stat-value">' + totalLPEarned + ' LP</div>' +
+            '<div class="skm-creator-stat-label">Total Earned</div>' +
+          '</div>' +
+          '<div class="skm-creator-stat">' +
+            '<div class="skm-creator-stat-value">' + cvScore + '</div>' +
+            '<div class="skm-creator-stat-label">Community Value</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="skm-creator-skills-title">Their Skills</div>' +
+        skillListHtml +
+      '</div>' +
+    '</div>';
+
+    var existing = document.getElementById('skmCreatorOverlay');
+    if (existing) existing.remove();
+    document.body.insertAdjacentHTML('beforeend', html);
+  }
+
+  function closeCreatorProfile() {
+    var el = document.getElementById('skmCreatorOverlay');
+    if (el) el.remove();
+  }
+
+  return {
+    init: init,
+    refresh: refresh,
+    setView: setView,
+    setPrice: setPrice,
+    installSkill: installSkill,
+    resonateSkill: resonateSkill,
+    showResonancePrompt: showResonancePrompt,
+    openCreatorProfile: openCreatorProfile,
+    closeCreatorProfile: closeCreatorProfile,
+    renderGrid: renderGrid
   };
 })();
 
