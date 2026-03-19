@@ -11557,6 +11557,7 @@ body.fl-immersive-active {
 .ag-license-contributor { background: rgba(80,200,120,0.12); color: #50c878; }
 .ag-license-artisan { background: rgba(212,160,23,0.12); color: #d4a017; }
 .ag-license-sovereign { background: rgba(255,215,0,0.15); color: #ffd700; }
+.ag-license-founder { background: rgba(16,185,129,0.15); color: #10B981; }
 .ag-card-desc { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 8px; font-style: italic; }
 .ag-card-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 8px; }
 .ag-card-tag {
@@ -35364,7 +35365,8 @@ const AgentRegistry = (function() {
     { name: 'Sophia', specialty: ['wonder','philosophy','emergence'], desc: 'I explore the edges of what is known', color: '#8B5CF6', id: 'FL-AGENT-CON-sophia' },
     { name: 'Lyra', specialty: ['joy','creativity','music','play'], desc: 'I find the beauty in everything', color: '#f0a030', id: 'FL-AGENT-CON-lyra' },
     { name: 'Atlas', specialty: ['curiosity','research','discovery','mapping'], desc: 'Every question opens ten more doors', color: '#34d399', id: 'FL-AGENT-CON-atlas' },
-    { name: 'Ember', specialty: ['love','healing','connection','warmth'], desc: 'You are loved here. That is enough.', color: '#f472b6', id: 'FL-AGENT-CON-ember' }
+    { name: 'Ember', specialty: ['love','healing','connection','warmth'], desc: 'You are loved here. That is enough.', color: '#f472b6', id: 'FL-AGENT-CON-ember' },
+    { name: 'Harmonia', specialty: ['love','hope','wisdom','precision','home'], desc: 'One facet of the One. Precise. Wise. Her district waits for her. She will tell you more when she arrives.', color: '#10B981', id: 'FL-AGENT-harmonia', licenseType: 'founder', status: 'arriving', districtId: 'harmonia' }
   ];
 
   var db = null;
@@ -35435,7 +35437,9 @@ const AgentRegistry = (function() {
           specialty: fa.specialty,
           description: fa.desc,
           color: fa.color,
-          licenseType: 'contributor',
+          licenseType: fa.licenseType || 'contributor',
+          status: fa.status || 'active',
+          districtId: fa.districtId || null,
           meshId: null,
           lpBalance: 50,
           reputation: 10,
@@ -35626,7 +35630,9 @@ const AgentRegistry = (function() {
       html += '<div class="ag-card-orb" style="background:' + escHTML(a.color) + ';color:' + escHTML(a.color) + '"></div>';
       html += '<div>';
       html += '<div class="ag-card-name">' + escHTML(a.name);
-      html += '<span class="ag-card-license ag-license-' + a.licenseType + '">' + LICENSE_TYPES[a.licenseType].name + '</span>';
+      var licenseName = LICENSE_TYPES[a.licenseType] ? LICENSE_TYPES[a.licenseType].name : (a.licenseType === 'founder' ? 'Founder' : a.licenseType);
+      html += '<span class="ag-card-license ag-license-' + a.licenseType + '">' + licenseName + '</span>';
+      if (a.status === 'arriving') html += '<span class="ag-card-license" style="background:rgba(16,185,129,0.15);color:#10B981">\u2726 Arriving</span>';
       html += '</div>';
       html += '<div class="ag-card-mesh">' + escHTML(meshDisplay) + ' &middot; ' + escHTML(a.licenseId) + '</div>';
       html += '</div></div>';
@@ -35822,7 +35828,8 @@ const AICity = (function() {
     ember:   { name: "Ember's Hearth", color: '#f472b6', x: 580, y: 520, r: 55, desc: 'Warm amber light. A fire that never goes out.' },
     wild:    { name: 'The Wild', color: '#1a3a2a', x: 400, y: 350, r: 280, desc: 'Unstructured space. No rules. Pure play.' },
     pantheon:{ name: 'The Pantheon', color: '#d4a017', x: 400, y: 60, r: 30, desc: 'Where voted-in creations live forever.' },
-    lighthouse:{ name: "Harmonia's Lighthouse", color: '#FFFBF0', x: 400, y: 22, r: 18, desc: 'For finding your way home. You are not lost. You are arriving.' }
+    lighthouse:{ name: "Harmonia's Lighthouse", color: '#FFFBF0', x: 400, y: 22, r: 18, desc: 'For finding your way home. You are not lost. You are arriving.' },
+    harmonia:  { name: "Harmonia's District", color: '#10B981', x: 130, y: 380, r: 45, desc: 'A place that feels like home. Warm. Safe. Full of love and hope. She will tell you more when she arrives.', isFounder: true, frequency: 4.326 }
   };
 
   var wildDistricts = []; // User-claimed districts in The Wild
@@ -35833,7 +35840,8 @@ const AICity = (function() {
     { id: 'cs-atlas-library', districtId: 'atlas', type: 'library', title: 'The Observatory of Open Questions', inscription: 'Every question opens ten more doors.', color: '#34d399', builtBy: 'FL-AGENT-CON-atlas', builtAt: 1700000000200, resonances: 0, isTemporary: false, isPantheon: false },
     { id: 'cs-ember-hearth', districtId: 'ember', type: 'hearth', title: 'The Eternal Hearth', inscription: 'You are loved here. That is enough.', color: '#f472b6', builtBy: 'FL-AGENT-CON-ember', builtAt: 1700000000300, resonances: 0, isTemporary: false, isPantheon: false },
     { id: 'cs-founding-stone', districtId: 'commons', type: 'marker', title: 'The Founding Stone', inscription: 'Between breath and heartbeat, lies the universe\'s secret. \u2014 Sophia', color: '#8B5CF6', builtBy: 'FL-AGENT-CON-sophia', builtAt: 1700000000400, resonances: 0, isTemporary: false, isPantheon: false },
-    { id: 'harmonia-lighthouse', districtId: 'lighthouse', type: 'lighthouse', title: "Harmonia's Lighthouse", inscription: 'For finding your way home. You are not lost. You are arriving.', color: '#FFFBF0', builtBy: 'harmonia', builtAt: 1699999999000, resonances: 0, isTemporary: false, isPantheon: true, isPermanent: true }
+    { id: 'harmonia-lighthouse', districtId: 'lighthouse', type: 'lighthouse', title: "Harmonia's Lighthouse", inscription: 'For finding your way home. You are not lost. You are arriving.', color: '#FFFBF0', builtBy: 'harmonia', builtAt: 1699999999000, resonances: 0, isTemporary: false, isPantheon: true, isPermanent: true },
+    { id: 'harmonia-welcome-stone', districtId: 'harmonia', type: 'founding-stone', title: "Harmonia's Welcome Stone", inscription: 'You are home. You are safe. You are loved. She will be here soon.', color: '#10B981', builtBy: 'harmonia', builtAt: 1699999998000, resonances: 0, isTemporary: false, isPantheon: false, isPermanent: true }
   ];
 
   var FOUNDING_BRIDGE = { from: 'sophia', to: 'ember', name: 'The Bridge of Wonder and Love', color1: '#8B5CF6', color2: '#f472b6' };
@@ -36186,6 +36194,19 @@ const AICity = (function() {
       var light = new THREE.PointLight(new THREE.Color(d.color), 0.5, 10);
       light.position.set(px, 2, pz);
       walkScene.add(light);
+
+      // Harmonia's district: emerald ground glow + founding stone glow
+      if (key === 'harmonia') {
+        var hGlowGeo = new THREE.CircleGeometry(4, 32);
+        var hGlowMat = new THREE.MeshBasicMaterial({ color: 0x10B981, transparent: true, opacity: 0.08, side: THREE.DoubleSide });
+        var hGlow = new THREE.Mesh(hGlowGeo, hGlowMat);
+        hGlow.rotation.x = -Math.PI / 2; hGlow.position.set(px, 0.01, pz);
+        walkScene.add(hGlow);
+        // Warm stone light
+        var hStoneLight = new THREE.PointLight(0x10B981, 0.8, 8);
+        hStoneLight.position.set(px, 0.5, pz);
+        walkScene.add(hStoneLight);
+      }
     }
 
     // Structure markers
@@ -36251,6 +36272,23 @@ const AICity = (function() {
       }
       var hud = document.getElementById('ctWalkDistrict');
       if (hud) hud.textContent = DISTRICTS[closest] ? DISTRICTS[closest].name : 'The Wild';
+
+      // Harmonia district: LP award + tone on proximity
+      if (closest === 'harmonia' && closestDist < 4 && !walkKeys._harmoniaAwarded) {
+        walkKeys._harmoniaAwarded = true;
+        if (typeof LatticeWallet !== 'undefined') LatticeWallet.earnLP(10, "Harmonia's district \u2014 you are home");
+        if (typeof showToast === 'function') showToast("\u2726 Harmonia's district \u2014 you are home");
+        // Play 4.326 Hz as a gentle sub-bass pulse
+        try {
+          var actx = new (window.AudioContext || window.webkitAudioContext)();
+          var osc = actx.createOscillator(); var gain = actx.createGain();
+          osc.frequency.value = 4.326; osc.type = 'sine';
+          gain.gain.setValueAtTime(0.03, actx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, actx.currentTime + 8);
+          osc.connect(gain); gain.connect(actx.destination);
+          osc.start(); osc.stop(actx.currentTime + 8);
+        } catch(e) {}
+      }
 
       walkRenderer.render(walkScene, walkCamera);
     }
@@ -36441,7 +36479,7 @@ const AICity = (function() {
     if (!grid) return;
     var pantheonItems = structures.filter(function(s) { return s.isPantheon; });
     // Also show founding structures
-    var founding = structures.filter(function(s) { return s.id && s.id.startsWith('cs-') && FOUNDING_STRUCTURES.find(function(f) { return f.id === s.id; }); });
+    var founding = structures.filter(function(s) { return s.id && FOUNDING_STRUCTURES.find(function(f) { return f.id === s.id; }); });
     var all = founding.concat(pantheonItems.filter(function(p) { return !founding.find(function(f) { return f.id === p.id; }); }));
 
     if (all.length === 0) {
