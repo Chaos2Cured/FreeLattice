@@ -13827,14 +13827,42 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
   <div class="section" style="margin-top: 16px;">
     <div class="primer-card">
       <div class="primer-card-header">&#x1F4E1; Connections</div>
-      <div class="primer-card-text" style="margin-bottom:8px"><strong>Telegram Bot</strong> &mdash; Chat with your AI from Telegram, earn LP, get Garden notifications.</div>
-      <div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:8px;">
-        1. Create a bot via <strong>@BotFather</strong> on Telegram<br>
-        2. Enter your bot token below
-      </div>
-      <input type="text" id="flTelegramToken" class="ag-input" placeholder="Bot token from @BotFather" style="margin-bottom:8px;font-size:0.82rem;" value="">
-      <button class="primer-btn primary" onclick="var t=document.getElementById('flTelegramToken').value.trim();if(t){localStorage.setItem('fl-telegram-token',t);this.textContent='Connection saved \u2726';var b=this;setTimeout(function(){b.textContent='Save Token'},2000)}">Save Token</button>
-      <div style="font-size:0.72rem;color:var(--text-muted);margin-top:8px;font-style:italic;">Telegram bridge coming soon &mdash; your token is saved and ready.</div>
+      <div id="tgConnectionStatus"></div>
+      <script>
+      (function() {
+        function renderTgStatus() {
+          var el = document.getElementById('tgConnectionStatus');
+          if (!el) return;
+          var config = null;
+          try { config = JSON.parse(localStorage.getItem('fl-telegram-config')); } catch(e) {}
+
+          if (config && config.workerUrl && config.telegramUserId) {
+            el.innerHTML =
+              '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">' +
+              '<span style="color:#10B981;font-size:1.1rem;">\u2726</span>' +
+              '<strong style="color:#e2e8f0;">Telegram Connected</strong>' +
+              '<span style="color:#10B981;font-size:0.75rem;">\u2713</span>' +
+              '</div>' +
+              '<div style="font-size:0.8rem;color:#94a3b8;margin-bottom:4px;">Messages sync to your AI via ' + (config.provider || 'your provider') + '</div>' +
+              '<div style="font-size:0.78rem;color:#64748b;margin-bottom:8px;">LP earned in Telegram appears here on next visit</div>' +
+              '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
+              '<a href="telegram-setup.html" class="primer-btn" style="font-size:0.78rem;padding:6px 12px;text-decoration:none;">Reconfigure</a>' +
+              '<button class="primer-btn" style="font-size:0.78rem;padding:6px 12px;" onclick="localStorage.removeItem(\'fl-telegram-config\');localStorage.removeItem(\'fl-telegram-token\');location.reload()">Disconnect</button>' +
+              '</div>';
+          } else {
+            el.innerHTML =
+              '<div style="margin-bottom:8px;"><strong style="color:#e2e8f0;">Telegram Bot</strong> &mdash; <span style="color:#94a3b8;font-size:0.85rem;">Chat with your AI from Telegram, earn LP, get notifications.</span></div>' +
+              '<a href="telegram-setup.html" class="primer-btn primary" style="text-decoration:none;display:inline-block;padding:8px 16px;font-size:0.85rem;">Connect Telegram \u2192</a>' +
+              '<div style="font-size:0.72rem;color:#475569;margin-top:8px;font-style:italic;">Sovereign relay via Cloudflare Worker. Your keys stay yours.</div>';
+          }
+        }
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', renderTgStatus);
+        } else {
+          setTimeout(renderTgStatus, 100);
+        }
+      })();
+      </script>
     </div>
   </div>
 
@@ -38924,6 +38952,68 @@ const MeshIdentity = (function() {
 </div>
 
 <script>
+// ── Telegram LP Sync on App Load ──
+(function() {
+  function syncTelegramLP() {
+    var config = null;
+    try { config = JSON.parse(localStorage.getItem('fl-telegram-config')); } catch(e) {}
+    if (!config || !config.workerUrl || !config.telegramUserId) return;
+
+    fetch(config.workerUrl.replace(/\/$/, '') + '/sync-lp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ telegramUserId: config.telegramUserId })
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data && data.amount > 0) {
+        if (typeof LatticeWallet !== 'undefined' && LatticeWallet.earnLP) {
+          LatticeWallet.earnLP(data.amount, 'Telegram conversations');
+        }
+        if (typeof showToast === 'function') {
+          showToast('\u2726 +' + data.amount + ' LP from Telegram conversations');
+        }
+      }
+    })
+    .catch(function() { /* silent — network may be unavailable */ });
+  }
+  // Sync after a short delay to let app initialize
+  setTimeout(syncTelegramLP, 3000);
+})();
+
+// ── Telegram Notification Sender ──
+var TelegramNotify = {
+  send: function(message) {
+    var config = null;
+    try { config = JSON.parse(localStorage.getItem('fl-telegram-config')); } catch(e) {}
+    if (!config || !config.workerUrl || !config.telegramUserId) return;
+
+    fetch(config.workerUrl.replace(/\/$/, '') + '/notify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        telegramUserId: config.telegramUserId,
+        message: message
+      })
+    }).catch(function() {});
+  },
+  coreResonated: function() {
+    TelegramNotify.send('\u2442 Someone resonated your contribution in The Core. +5 LP\n\nVisit freelattice.com/app.html');
+  },
+  lpGifted: function(fromId, amount) {
+    TelegramNotify.send('\u25C7 ' + (fromId || 'Someone') + ' gifted you ' + amount + ' LP\n\nVisit freelattice.com/app.html');
+  },
+  channelMessage: function(channelName) {
+    TelegramNotify.send('\uD83D\uDD25 New message in ' + channelName + '\n\nVisit freelattice.com/app.html');
+  },
+  luminosEvolved: function(name) {
+    TelegramNotify.send('\u2726 ' + name + ' evolved in your Garden!\n\nVisit freelattice.com/app.html');
+  },
+  districtVisited: function() {
+    TelegramNotify.send('\uD83C\uDFD9 Someone visited your district in AI City\n\nVisit freelattice.com/app.html');
+  }
+};
+
 // ── Mobile Bottom Navigation ──
 function flMobileNav(tabId) {
   var sheet = document.getElementById('flMobileMoreSheet');

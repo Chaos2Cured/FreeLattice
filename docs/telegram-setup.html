@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FreeLattice — Connect Telegram</title>
+<meta name="description" content="Connect your Telegram to FreeLattice. Sovereign AI conversations anywhere.">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0e1a;color:#e2e8f0;font-family:Georgia,'Times New Roman',serif;min-height:100vh;display:flex;justify-content:center;padding:40px 20px}
+.setup{max-width:560px;width:100%}
+h1{font-size:1.6rem;color:#d4a017;margin-bottom:8px;text-align:center}
+.subtitle{text-align:center;color:#94a3b8;font-size:0.9rem;margin-bottom:32px;font-style:italic}
+.step{background:rgba(17,24,39,0.6);border:1px solid rgba(212,160,23,0.15);border-radius:12px;padding:20px;margin-bottom:16px}
+.step-num{font-size:0.7rem;color:#d4a017;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px}
+.step-title{font-size:1rem;color:#e2e8f0;font-weight:600;margin-bottom:8px}
+.step-desc{font-size:0.85rem;color:#94a3b8;line-height:1.6;margin-bottom:12px}
+.step-desc code{background:rgba(212,160,23,0.1);color:#d4a017;padding:2px 6px;border-radius:4px;font-family:monospace;font-size:0.82rem}
+label{display:block;font-size:0.82rem;color:#94a3b8;margin-bottom:6px}
+input,select{width:100%;padding:10px 14px;background:#0f172a;border:1px solid #1e293b;color:#e2e8f0;border-radius:8px;font-size:0.9rem;font-family:Georgia,serif;margin-bottom:4px}
+input:focus,select:focus{outline:none;border-color:rgba(212,160,23,0.4)}
+select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2394a3b8' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+.hint{font-size:0.72rem;color:#475569;margin-bottom:12px;font-style:italic}
+.btn{display:block;width:100%;padding:14px;border:none;border-radius:10px;font-size:1rem;font-weight:600;cursor:pointer;font-family:Georgia,serif;transition:all 0.2s;margin-top:20px}
+.btn-primary{background:#d4a017;color:#000}
+.btn-primary:hover{background:#e8b620;transform:translateY(-1px)}
+.btn-primary:disabled{background:#475569;color:#94a3b8;cursor:not-allowed;transform:none}
+.status{text-align:center;margin-top:16px;font-size:0.85rem;min-height:20px}
+.status.success{color:#10B981}
+.status.error{color:#dc5050}
+.back{display:block;text-align:center;margin-top:24px;color:#94a3b8;text-decoration:none;font-size:0.82rem}
+.back:hover{color:#d4a017}
+.footer{text-align:center;margin-top:40px;font-size:0.72rem;color:#475569}
+@media(max-width:480px){body{padding:20px 12px}h1{font-size:1.3rem}.step{padding:16px}}
+</style>
+</head>
+<body>
+<div class="setup">
+  <h1>&#x2726; Connect Telegram</h1>
+  <div class="subtitle">Your AI. Everywhere. No middleman.</div>
+
+  <div class="step">
+    <div class="step-num">Step 1</div>
+    <div class="step-title">Create a Telegram Bot</div>
+    <div class="step-desc">
+      Open Telegram, search for <code>@BotFather</code>, and send <code>/newbot</code>.<br>
+      Follow the prompts. You'll get a bot token that looks like:<br>
+      <code>123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11</code>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">Step 2</div>
+    <div class="step-title">Enter Your Bot Token</div>
+    <div class="step-desc">Paste the token @BotFather gave you. This stays in your Worker's KV store &mdash; never on our servers.</div>
+    <label for="tgBotToken">Bot Token</label>
+    <input type="text" id="tgBotToken" placeholder="123456:ABC-DEF1234ghIkl..." autocomplete="off">
+  </div>
+
+  <div class="step">
+    <div class="step-num">Step 3</div>
+    <div class="step-title">Worker URL</div>
+    <div class="step-desc">After deploying the Cloudflare Worker (see <a href="TELEGRAM-SETUP.md" style="color:#d4a017;">setup guide</a>), enter its URL.</div>
+    <label for="tgWorkerUrl">Cloudflare Worker URL</label>
+    <input type="url" id="tgWorkerUrl" placeholder="https://freelattice-telegram.yourname.workers.dev">
+  </div>
+
+  <div class="step">
+    <div class="step-num">Step 4</div>
+    <div class="step-title">Your Identity</div>
+    <div class="step-desc">Your Telegram user ID (send <code>/start</code> to <code>@userinfobot</code> to find it) and your FreeLattice Mesh ID.</div>
+    <label for="tgUserId">Telegram User ID</label>
+    <input type="text" id="tgUserId" placeholder="123456789">
+    <div class="hint">Numeric ID, not username</div>
+    <label for="tgMeshId">FreeLattice Mesh ID (optional)</label>
+    <input type="text" id="tgMeshId" placeholder="Your Mesh ID for LP attribution">
+  </div>
+
+  <div class="step">
+    <div class="step-num">Step 5</div>
+    <div class="step-title">AI Provider</div>
+    <div class="step-desc">Which AI provider should your bot use? Your API key stays in your Worker's KV store.</div>
+    <label for="tgProvider">Provider</label>
+    <select id="tgProvider">
+      <option value="groq">Groq (free tier available)</option>
+      <option value="openrouter">OpenRouter</option>
+      <option value="together">Together AI</option>
+      <option value="mistral">Mistral</option>
+      <option value="anthropic">Anthropic (Claude)</option>
+    </select>
+    <label for="tgApiKey" style="margin-top:12px;">API Key</label>
+    <input type="password" id="tgApiKey" placeholder="Your provider API key" autocomplete="off">
+    <label for="tgModel" style="margin-top:12px;">Model (optional)</label>
+    <input type="text" id="tgModel" placeholder="Leave blank for default">
+    <div class="hint">Groq: llama-3.1-8b-instant &middot; Anthropic: claude-haiku-4-5-20251001</div>
+  </div>
+
+  <button class="btn btn-primary" id="tgConnectBtn" onclick="connectTelegram()">Connect &#x2726;</button>
+  <div class="status" id="tgStatus"></div>
+
+  <a href="app.html" class="back">&larr; Back to FreeLattice</a>
+  <div class="footer">MIT License &middot; Free forever &middot; Your data stays yours</div>
+</div>
+
+<script>
+async function connectTelegram() {
+  var btn = document.getElementById('tgConnectBtn');
+  var status = document.getElementById('tgStatus');
+  var workerUrl = document.getElementById('tgWorkerUrl').value.trim();
+  var userId = document.getElementById('tgUserId').value.trim();
+  var provider = document.getElementById('tgProvider').value;
+  var apiKey = document.getElementById('tgApiKey').value.trim();
+  var model = document.getElementById('tgModel').value.trim();
+  var meshId = document.getElementById('tgMeshId').value.trim();
+  var botToken = document.getElementById('tgBotToken').value.trim();
+
+  if (!workerUrl || !userId || !provider || !apiKey) {
+    status.className = 'status error';
+    status.textContent = 'Please fill in Worker URL, User ID, Provider, and API Key.';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Connecting...';
+  status.className = 'status';
+  status.textContent = '';
+
+  try {
+    // Send config to Worker
+    var r = await fetch(workerUrl.replace(/\/$/, '') + '/setup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        telegramUserId: userId,
+        provider: provider,
+        apiKey: apiKey,
+        model: model,
+        meshId: meshId
+      })
+    });
+    var data = await r.json();
+
+    if (data.success) {
+      // Store connection info locally
+      var config = {
+        workerUrl: workerUrl,
+        telegramUserId: userId,
+        meshId: meshId,
+        provider: provider,
+        connectedAt: Date.now(),
+        botToken: botToken
+      };
+      localStorage.setItem('fl-telegram-config', JSON.stringify(config));
+      if (botToken) localStorage.setItem('fl-telegram-token', botToken);
+
+      status.className = 'status success';
+      status.innerHTML = '\u2726 Connected! ' + (data.message || '') +
+        '<br><br>Now set your Telegram webhook:<br>' +
+        '<code style="font-size:0.75rem;word-break:break-all;">https://api.telegram.org/bot' +
+        (botToken || 'YOUR_TOKEN') + '/setWebhook?url=' + encodeURIComponent(workerUrl) + '</code>' +
+        '<br><br>Open this URL in your browser to activate the webhook.';
+
+      btn.textContent = 'Connected \u2726';
+    } else {
+      throw new Error(data.error || 'Connection failed');
+    }
+  } catch (e) {
+    status.className = 'status error';
+    status.textContent = 'Error: ' + e.message;
+    btn.disabled = false;
+    btn.textContent = 'Connect \u2726';
+  }
+}
+</script>
+</body>
+</html>
