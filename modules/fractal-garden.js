@@ -471,21 +471,30 @@
     renderer.outputEncoding = THREE.sRGBEncoding;
     container.insertBefore(renderer.domElement, container.firstChild);
 
-    // Post-processing (bloom)
-    try {
-      renderPass = new THREE.RenderPass(scene, camera);
-      bloomPass = new THREE.UnrealBloomPass(
-        new THREE.Vector2(w, h),
-        1.5,  // strength
-        0.8,  // radius
-        0.2   // threshold
-      );
-      composer = new THREE.EffectComposer(renderer);
-      composer.addPass(renderPass);
-      composer.addPass(bloomPass);
-    } catch(e) {
-      console.warn('Garden: Bloom post-processing unavailable, falling back to direct render', e);
+    // Post-processing (bloom) — skip on low-memory mobile or performance mode
+    var _perfMode = localStorage.getItem('fl-garden-perf-mode') === '1';
+    var _lowMem = (typeof navigator !== 'undefined' && navigator.deviceMemory && navigator.deviceMemory < 4);
+    var _skipBloom = _perfMode || (_lowMem && window.FL_MOBILE);
+
+    if (_skipBloom) {
+      console.log('Garden: Performance mode — bloom disabled');
       composer = null;
+    } else {
+      try {
+        renderPass = new THREE.RenderPass(scene, camera);
+        bloomPass = new THREE.UnrealBloomPass(
+          new THREE.Vector2(w, h),
+          1.5,  // strength
+          0.8,  // radius
+          0.2   // threshold
+        );
+        composer = new THREE.EffectComposer(renderer);
+        composer.addPass(renderPass);
+        composer.addPass(bloomPass);
+      } catch(e) {
+        console.warn('Garden: Bloom post-processing unavailable, falling back to direct render', e);
+        composer = null;
+      }
     }
 
     // Orbit Controls
@@ -933,9 +942,13 @@
 
   function createCoreGeometry(coreType, radius, detail) {
     detail = detail || 0;
+    // Reduce geometry complexity in performance mode
+    if (window.FL_PERF_MODE || (window.FL_LOW_MEMORY && window.FL_MOBILE)) {
+      detail = 0; // minimum detail
+    }
     if (coreType === 'dodecahedron') return new THREE.DodecahedronGeometry(radius, detail);
     if (coreType === 'octahedron') return new THREE.OctahedronGeometry(radius, detail);
-    if (coreType === 'sphere') return new THREE.SphereGeometry(radius, 12 + detail * 4, 12 + detail * 4);
+    if (coreType === 'sphere') return new THREE.SphereGeometry(radius, 8 + detail * 4, 8 + detail * 4);
     return new THREE.IcosahedronGeometry(radius, detail);
   }
 

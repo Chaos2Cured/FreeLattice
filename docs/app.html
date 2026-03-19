@@ -13866,6 +13866,35 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     </div>
   </div>
 
+  <!-- Performance Settings -->
+  <div class="section" style="margin-top: 16px;">
+    <div class="primer-card">
+      <div class="primer-card-header">&#x26A1; Performance</div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <input type="checkbox" id="flGardenPerfMode" onchange="localStorage.setItem('fl-garden-perf-mode',this.checked?'1':'0');if(typeof showToast==='function')showToast('Restart the Garden tab to apply changes')">
+        <label for="flGardenPerfMode" style="font-size:0.85rem;color:#e2e8f0;cursor:pointer;">Reduce Garden effects for better performance</label>
+      </div>
+      <div style="font-size:0.72rem;color:#475569;margin-bottom:8px;font-style:italic;">Disables bloom post-processing and reduces particles. Recommended for older phones and low-memory devices.</div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <input type="checkbox" id="flDeferTabs" onchange="localStorage.setItem('fl-defer-tabs',this.checked?'1':'0')" checked>
+        <label for="flDeferTabs" style="font-size:0.85rem;color:#e2e8f0;cursor:pointer;">Defer heavy tab loading until opened</label>
+      </div>
+      <div style="font-size:0.72rem;color:#475569;margin-top:4px;font-style:italic;">City, Studio, Agents, and Channels initialize only when first visited. Faster startup.</div>
+    </div>
+  </div>
+  <script>
+  (function() {
+    function initPerfToggles() {
+      var gp = document.getElementById('flGardenPerfMode');
+      var dt = document.getElementById('flDeferTabs');
+      if (gp) gp.checked = localStorage.getItem('fl-garden-perf-mode') === '1';
+      if (dt) dt.checked = localStorage.getItem('fl-defer-tabs') !== '0';
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initPerfToggles);
+    else setTimeout(initPerfToggles, 100);
+  })();
+  </script>
+
 </div>
 </div>
 
@@ -18652,7 +18681,27 @@ function addGhPendingChange(path, content) {
 // Tab Navigation
 // ============================================
 
+// ── Tab loading indicator ──
+var _tabLoadingTimer = null;
+var _tabLoadingEl = null;
+function showTabLoading(tabId) {
+  _tabLoadingTimer = setTimeout(function() {
+    var panel = document.getElementById('tab-' + tabId);
+    if (panel && !_tabLoadingEl) {
+      _tabLoadingEl = document.createElement('div');
+      _tabLoadingEl.className = 'fl-tab-loading';
+      _tabLoadingEl.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted);font-size:0.85rem;"><span style="color:var(--accent);">\u2726</span> Loading\u2026</div>';
+      panel.insertBefore(_tabLoadingEl, panel.firstChild);
+    }
+  }, 500);
+}
+function hideTabLoading() {
+  if (_tabLoadingTimer) { clearTimeout(_tabLoadingTimer); _tabLoadingTimer = null; }
+  if (_tabLoadingEl) { _tabLoadingEl.remove(); _tabLoadingEl = null; }
+}
+
 function switchTab(tabId) {
+  hideTabLoading();
   document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.tab === tabId));
   document.querySelectorAll('.tab-panel').forEach(panel => {
     const isTarget = panel.id === 'tab-' + tabId;
@@ -20013,17 +20062,17 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Initialize Skill Forge
   await SkillForge.init();
 
-  // Sophia Engine initialization (v4.8)
-  if (typeof SophiaEngine !== 'undefined') {
-    try { await SophiaEngine.init(); } catch(e) { console.error('SophiaEngine init error:', e); }
-  }
-
-  // Skill Sharing initialization (v4.8)
-  if (typeof SkillSharing !== 'undefined') {
-    try { SkillSharing.init(); } catch(e) { console.error('SkillSharing init error:', e); }
-  }
-  // Ensure skills are available for other components
-  SkillForge.renderDropdowns();
+  // Defer non-critical module init for faster startup
+  // SophiaEngine and SkillSharing load after a short delay
+  setTimeout(async function() {
+    if (typeof SophiaEngine !== 'undefined') {
+      try { await SophiaEngine.init(); } catch(e) { console.error('SophiaEngine init error:', e); }
+    }
+    if (typeof SkillSharing !== 'undefined') {
+      try { SkillSharing.init(); } catch(e) { console.error('SkillSharing init error:', e); }
+    }
+    SkillForge.renderDropdowns();
+  }, 1000);
   // Initialize Self-Host detection (v4.3)
   initSelfHostSection();
 
@@ -32332,9 +32381,20 @@ void 0;
 <!-- Full code: modules/fractal-garden.js (~1,200 lines) -->
 <!-- Loads on demand when Garden tab is first opened -->
 <script>
-// ── Mobile performance hints for Garden ──
+// ── Mobile + Performance detection ──
 window.FL_MOBILE = window.innerWidth < 600;
-window.FL_GARDEN_PARTICLE_SCALE = window.FL_MOBILE ? 0.5 : 1.0;
+window.FL_LOW_MEMORY = (typeof navigator !== 'undefined' && navigator.deviceMemory && navigator.deviceMemory < 4);
+window.FL_PERF_MODE = localStorage.getItem('fl-garden-perf-mode') === '1';
+window.FL_GARDEN_PARTICLE_SCALE = (window.FL_MOBILE || window.FL_PERF_MODE) ? 0.5 : 1.0;
+if (window.FL_LOW_MEMORY && window.FL_MOBILE) window.FL_GARDEN_PARTICLE_SCALE = 0.3;
+
+// IndexedDB Audit (v5.2 — 12 databases):
+// FreeLatticeDB (chat history), FreeLatticeSkills, SophiaEngine,
+// FreeLatticeMemory, FreeLatticeMarket, FreeLatticeCore,
+// FreeLatticeWallet, FreeLatticeChannels, FreeLatticeAgentRegistry,
+// FreeLatticeCity (CityStructures, CityMarks), FreeLatticeStudio,
+// FreeLatticeIdentity (MeshIdentity)
+// Future v6.0: consolidate into 2-3 databases with multiple stores
 
 // ── Fractal Garden — Lazy-Loading Stub ────────────────────────
 // The full Garden code lives in modules/fractal-garden.js
@@ -37578,9 +37638,10 @@ const AICity = (function() {
   if (typeof switchTab !== 'function') return;
   var _prevSwitchTabCity = switchTab;
   switchTab = function(tabId) {
+    if (tabId === 'city') showTabLoading('city');
     _prevSwitchTabCity(tabId);
     if (tabId === 'city') {
-      AICity.refresh();
+      AICity.refresh().then(function() { hideTabLoading(); }).catch(function() { hideTabLoading(); });
     }
   };
 })();
