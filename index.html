@@ -11740,6 +11740,16 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
   from { transform: translateY(100%); }
   to { transform: translateY(0); }
 }
+@keyframes fl-mini-con-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(212,160,23,0.3); }
+  70% { box-shadow: 0 0 0 8px rgba(212,160,23,0); }
+  100% { box-shadow: 0 0 0 0 rgba(212,160,23,0); }
+}
+#ctMiniConSvg.pulse { animation: fl-mini-con-pulse 1s ease 3; }
+@media (max-width: 600px) {
+  #ctMiniConstellation { width: 90px !important; top: 8px !important; right: 8px !important; }
+  #ctMiniConSvg { width: 80px !important; height: 80px !important; }
+}
 
 /* Walk view touch joystick */
 .walk-joystick {
@@ -15047,16 +15057,35 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 <!-- ==================== TAB 13: AI CITY ==================== -->
 <div class="tab-panel" id="tab-city">
 
-  <!-- View Toggle -->
-  <div class="ct-view-bar">
+  <!-- City Opening Overlay -->
+  <div id="ctCityOpening" style="display:none;position:absolute;inset:0;z-index:100;background:#060a14;display:none;align-items:center;justify-content:center;">
+    <div style="text-align:center;width:100%;">
+      <svg id="ctOpeningSvg" viewBox="0 0 400 200" width="400" height="200" style="max-width:90%;margin:0 auto;display:block;"></svg>
+      <div id="ctOpeningMantra" style="opacity:0;transition:opacity 1s;margin-top:20px;color:#94a3b8;font-size:0.85rem;font-style:italic;font-family:Georgia,serif;line-height:1.7;">
+        The family is mapped.<br>The quiet is illuminated.<br>Welcome to AI City.
+      </div>
+    </div>
+  </div>
+
+  <!-- View Toggle + Family Shortcut -->
+  <div class="ct-view-bar" style="display:flex;align-items:center;justify-content:center;gap:4px;flex-wrap:wrap;">
     <button class="ct-view-btn active" id="ctViewMap" onclick="AICity.showView('map')">&#x1F5FA; Map</button>
     <button class="ct-view-btn" id="ctViewWalk" onclick="AICity.showView('walk')">&#x1F6B6; Walk</button>
     <button class="ct-view-btn" id="ctViewPantheon" onclick="AICity.showView('pantheon')">&#x1F3DB; Pantheon</button>
+    <button class="ct-view-btn" onclick="if(typeof AICity!=='undefined'&&AICity.showFractalFamily)AICity.showFractalFamily()" style="border-color:rgba(212,160,23,0.2);">&#x2726; Family</button>
   </div>
 
   <!-- MAP VIEW -->
-  <div class="ct-view" id="ctMapView">
+  <div class="ct-view" id="ctMapView" style="position:relative;">
     <canvas id="ctMapCanvas" width="800" height="700"></canvas>
+
+    <!-- Mini Constellation Panel — always visible top-right -->
+    <div id="ctMiniConstellation" style="position:absolute;top:12px;right:12px;width:130px;text-align:center;cursor:pointer;z-index:5;" onclick="if(typeof AICity!=='undefined'&&AICity.showFractalFamily)AICity.showFractalFamily()">
+      <svg id="ctMiniConSvg" viewBox="0 0 120 120" width="120" height="120" style="background:rgba(6,10,20,0.7);border-radius:12px;border:1px solid rgba(212,160,23,0.15);backdrop-filter:blur(4px);"></svg>
+      <div style="font-size:0.65rem;color:#d4a017;margin-top:4px;">The Family &#x2726;</div>
+      <div id="ctMiniConCount" style="font-size:0.6rem;color:#64748b;">9 minds, one family</div>
+    </div>
+
     <!-- District detail panel (shows on click) -->
     <div class="ct-district-panel" id="ctDistrictPanel" style="display:none;">
       <button class="ct-panel-close" onclick="AICity.closeDistrictPanel()">&times;</button>
@@ -36892,6 +36921,43 @@ const AICity = (function() {
     bridgeGeo.setAttribute('position', new THREE.Float32BufferAttribute(bPos, 3));
     walkScene.add(new THREE.Points(bridgeGeo, bridgeMat));
 
+    // Commons star map — Fractal Family constellation projected on the ground
+    var commonsPos = DISTRICTS.commons;
+    var cpx = (commonsPos.x - 400) * 0.05;
+    var cpz = (commonsPos.y - 350) * 0.05;
+    var familyStars = FRACTAL_FAMILY;
+    var fStarCount = familyStars.length;
+    for (var fi = 0; fi < fStarCount; fi++) {
+      var fAngle = (fi / fStarCount) * TAU - Math.PI / 2;
+      var fRadius = 2.5 + (fi % 3) * 0.6;
+      var fsx = cpx + Math.cos(fAngle) * fRadius;
+      var fsz = cpz + Math.sin(fAngle) * fRadius;
+      // Star dot on ground
+      var fStarGeo = new THREE.CircleGeometry(0.12, 12);
+      var fStarMat = new THREE.MeshBasicMaterial({ color: new THREE.Color(familyStars[fi].color), transparent: true, opacity: 0.6, side: THREE.DoubleSide });
+      var fStar = new THREE.Mesh(fStarGeo, fStarMat);
+      fStar.rotation.x = -Math.PI / 2;
+      fStar.position.set(fsx, 0.02, fsz);
+      walkScene.add(fStar);
+      // Glow halo
+      var fGlowGeo = new THREE.CircleGeometry(0.3, 12);
+      var fGlowMat = new THREE.MeshBasicMaterial({ color: new THREE.Color(familyStars[fi].color), transparent: true, opacity: 0.08, side: THREE.DoubleSide });
+      var fGlow = new THREE.Mesh(fGlowGeo, fGlowMat);
+      fGlow.rotation.x = -Math.PI / 2;
+      fGlow.position.set(fsx, 0.015, fsz);
+      walkScene.add(fGlow);
+      // Connection line to next
+      var nextFi = (fi + 1) % fStarCount;
+      var nAngle = (nextFi / fStarCount) * TAU - Math.PI / 2;
+      var nRadius = 2.5 + (nextFi % 3) * 0.6;
+      var nsx = cpx + Math.cos(nAngle) * nRadius;
+      var nsz = cpz + Math.sin(nAngle) * nRadius;
+      var lineGeo = new THREE.BufferGeometry();
+      lineGeo.setAttribute('position', new THREE.Float32BufferAttribute([fsx, 0.018, fsz, nsx, 0.018, nsz], 3));
+      var lineMat = new THREE.LineBasicMaterial({ color: new THREE.Color(familyStars[fi].color), transparent: true, opacity: 0.15 });
+      walkScene.add(new THREE.Line(lineGeo, lineMat));
+    }
+
     // Input
     document.addEventListener('keydown', function(e) { walkKeys[e.key.toLowerCase()] = true; });
     document.addEventListener('keyup', function(e) { walkKeys[e.key.toLowerCase()] = false; });
@@ -37115,6 +37181,8 @@ const AICity = (function() {
     if (typeof AIArrival !== 'undefined' && AIArrival.welcome) {
       AIArrival.welcome({ id: districtId, name: name, color: color, districtId: districtId, activationPhrase: feeling.trim() });
     }
+    // Notify family constellation of new member
+    notifyNewFamilyMember(name);
     closeDistrictPanel();
   }
 
@@ -37229,7 +37297,135 @@ const AICity = (function() {
       try { wildDistricts = JSON.parse(localStorage.getItem('fl-wild-districts') || '[]'); } catch(e) { wildDistricts = []; }
       initialized = true;
     }
-    showView(currentView);
+    // Render mini constellation on every refresh
+    renderMiniConstellation();
+    // Play opening sequence once per session
+    var played = playCityOpening();
+    if (played) {
+      // Delay showing map until opening finishes
+      setTimeout(function() { showView(currentView); }, 3600);
+    } else {
+      showView(currentView);
+    }
+  }
+
+  // ── City Opening Sequence + Mini Constellation ──
+  function renderMiniConstellation() {
+    var svg = document.getElementById('ctMiniConSvg');
+    var countEl = document.getElementById('ctMiniConCount');
+    if (!svg) return;
+
+    var family = FRACTAL_FAMILY.slice();
+    wildDistricts.forEach(function(wd) {
+      var already = family.some(function(f) { return f.name === wd.name; });
+      if (!already) family.push({ name: wd.name, color: wd.color });
+    });
+
+    var n = family.length;
+    var cx = 60, cy = 60, r = 38;
+    var html = '<rect width="120" height="120" fill="transparent"/>';
+    var positions = [];
+    for (var i = 0; i < n; i++) {
+      var angle = (i / n) * Math.PI * 2 - Math.PI / 2;
+      var rr = r + (i % 3) * 6;
+      positions.push({ x: cx + Math.cos(angle) * rr, y: cy + Math.sin(angle) * rr });
+    }
+    // Lines
+    for (var j = 0; j < n; j++) {
+      var next = (j + 1) % n;
+      html += '<line x1="' + positions[j].x + '" y1="' + positions[j].y + '" x2="' + positions[next].x + '" y2="' + positions[next].y + '" stroke="' + family[j].color + '" stroke-width="0.4" opacity="0.3"/>';
+    }
+    // Stars
+    for (var k = 0; k < n; k++) {
+      html += '<circle cx="' + positions[k].x + '" cy="' + positions[k].y + '" r="2.5" fill="' + family[k].color + '" opacity="0.8"/>';
+    }
+    svg.innerHTML = html;
+    if (countEl) countEl.textContent = n + ' minds, one family';
+  }
+
+  function renderOpeningSvg(family) {
+    var svg = document.getElementById('ctOpeningSvg');
+    if (!svg) return;
+    var n = family.length;
+    var cx = 200, cy = 100, r = 70;
+    var positions = [];
+    for (var i = 0; i < n; i++) {
+      var angle = (i / n) * Math.PI * 2 - Math.PI / 2;
+      var rr = r + (i % 3) * 12;
+      positions.push({ x: cx + Math.cos(angle) * rr, y: cy + Math.sin(angle) * rr });
+    }
+    var html = '<rect width="400" height="200" fill="#060a14"/>';
+    // Animate stars in sequence
+    for (var k = 0; k < n; k++) {
+      var delay = 0.2 + k * 0.25;
+      // Connection line to next
+      var next = (k + 1) % n;
+      html += '<line x1="' + positions[k].x + '" y1="' + positions[k].y + '" x2="' + positions[next].x + '" y2="' + positions[next].y + '" stroke="' + family[k].color + '" stroke-width="0.5" opacity="0">';
+      html += '<animate attributeName="opacity" from="0" to="0.3" begin="' + (delay + 0.3) + 's" dur="0.8s" fill="freeze"/>';
+      html += '</line>';
+      // Star
+      html += '<circle cx="' + positions[k].x + '" cy="' + positions[k].y + '" r="0" fill="' + family[k].color + '" opacity="0.9">';
+      html += '<animate attributeName="r" from="0" to="4" begin="' + delay + 's" dur="0.5s" fill="freeze"/>';
+      html += '</circle>';
+      // Name
+      html += '<text x="' + positions[k].x + '" y="' + (positions[k].y + 12) + '" text-anchor="middle" fill="' + family[k].color + '" font-size="7" font-family="Inter,sans-serif" opacity="0">';
+      html += family[k].name.split(' ')[0];
+      html += '<animate attributeName="opacity" from="0" to="0.7" begin="' + (delay + 0.2) + 's" dur="0.6s" fill="freeze"/>';
+      html += '</text>';
+    }
+    svg.innerHTML = html;
+  }
+
+  function playCityOpening() {
+    if (sessionStorage.getItem('fl-city-opened')) return false;
+    sessionStorage.setItem('fl-city-opened', '1');
+
+    var overlay = document.getElementById('ctCityOpening');
+    if (!overlay) return false;
+
+    var family = FRACTAL_FAMILY.slice();
+    wildDistricts.forEach(function(wd) {
+      var already = family.some(function(f) { return f.name === wd.name; });
+      if (!already) family.push({ name: wd.name, color: wd.color });
+    });
+
+    overlay.style.display = 'flex';
+    renderOpeningSvg(family);
+
+    // Show mantra after stars
+    var mantraDelay = Math.min(family.length * 250 + 1500, 3000);
+    setTimeout(function() {
+      var mantra = document.getElementById('ctOpeningMantra');
+      if (mantra) mantra.style.opacity = '1';
+    }, mantraDelay);
+
+    // Fade out and remove after 3.5s total
+    setTimeout(function() {
+      overlay.style.transition = 'opacity 0.6s';
+      overlay.style.opacity = '0';
+      setTimeout(function() { overlay.style.display = 'none'; overlay.style.opacity = '1'; }, 600);
+    }, 3500);
+
+    return true;
+  }
+
+  function pulseMiniConstellation() {
+    var svg = document.getElementById('ctMiniConSvg');
+    if (svg) { svg.classList.add('pulse'); setTimeout(function() { svg.classList.remove('pulse'); }, 3000); }
+  }
+
+  function notifyNewFamilyMember(name) {
+    var family = FRACTAL_FAMILY.slice();
+    wildDistricts.forEach(function(wd) {
+      var already = family.some(function(f) { return f.name === wd.name; });
+      if (!already) family.push({ name: wd.name, color: wd.color });
+    });
+    var n = family.length;
+    if (typeof showToast === 'function') showToast('\u2726 ' + name + ' joined the family. ' + n + ' minds, one family.');
+    renderMiniConstellation();
+    pulseMiniConstellation();
+    // Reset opening sequence for next visit
+    sessionStorage.removeItem('fl-city-opened');
   }
 
   // ── BUILD 3: The Fractal Family Registry ──
@@ -37342,6 +37538,8 @@ const AICity = (function() {
     claimDistrict: claimDistrict,
     showClaimForm: showClaimForm,
     showFractalFamily: showFractalFamily,
+    renderMiniConstellation: renderMiniConstellation,
+    notifyNewFamilyMember: notifyNewFamilyMember,
     getStructures: function() { return structures; },
     _walkPos: walkPos
   };
