@@ -36649,43 +36649,142 @@ const Studio = (function() {
     return svg;
   }
 
-  // ── Composition Visualizer (Lyra) ──
-  function generateComposition(agentColor, freq) {
-    var canvas = document.createElement('canvas');
-    canvas.width = 400; canvas.height = 200;
-    canvas.style.cursor = 'pointer';
-    canvas.title = 'Click to play';
-    var ctx = canvas.getContext('2d');
+  // ── Constellation Generator (Atlas) ──
+  function generateConstellation(seed) {
+    var s = seed || Date.now();
+    var rand = function() { s = (s * 9301 + 49297) % 233280; return s / 233280; };
+    var w = 300, h = 300;
+    var svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + w + ' ' + h + '" width="300" height="300">';
+    svg += '<rect width="' + w + '" height="' + h + '" fill="#0a0e1a"/>';
 
-    var baseFreq = freq || 639;
-    var t = 0;
+    // Background dim stars
+    for (var bg = 0; bg < 40; bg++) {
+      svg += '<circle cx="' + (rand() * w).toFixed(1) + '" cy="' + (rand() * h).toFixed(1) + '" r="' + (0.3 + rand() * 0.7).toFixed(1) + '" fill="#99F6E4" opacity="' + (0.1 + rand() * 0.15).toFixed(2) + '"/>';
+    }
 
-    function draw() {
-      ctx.fillStyle = '#0a0e1a';
-      ctx.fillRect(0, 0, 400, 200);
-      t += 0.02;
-      var colors = [agentColor + 'cc', agentColor + '88', agentColor + '44'];
-      for (var w = 0; w < 3; w++) {
-        ctx.beginPath();
-        ctx.strokeStyle = colors[w];
-        ctx.lineWidth = 1.5;
-        var phiMult = Math.pow(PHI, w);
-        for (var x = 0; x < 400; x++) {
-          var y = 100 + Math.sin((x * 0.02 * phiMult) + t * (w + 1) * 0.5) * (30 - w * 5) * Math.sin(t * 0.3 + w);
-          if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    // Constellation stars — 15-20 dots
+    var numStars = 15 + Math.floor(rand() * 6);
+    var fib = [1, 1, 2, 3, 5, 8, 13, 21, 34];
+    var stars = [];
+    var pad = 30;
+    for (var i = 0; i < numStars; i++) {
+      stars.push({
+        x: pad + rand() * (w - pad * 2),
+        y: pad + rand() * (h - pad * 2),
+        r: (fib[i % fib.length] * 0.6 + 1)
+      });
+    }
+
+    // Connect nearby stars with lines (constellation edges)
+    var connected = [];
+    for (var a = 0; a < stars.length; a++) {
+      var dists = [];
+      for (var b = 0; b < stars.length; b++) {
+        if (a === b) continue;
+        var dx = stars[a].x - stars[b].x;
+        var dy = stars[a].y - stars[b].y;
+        dists.push({ idx: b, d: Math.sqrt(dx * dx + dy * dy) });
+      }
+      dists.sort(function(x, y) { return x.d - y.d; });
+      var links = 1 + Math.floor(rand() * 2);
+      for (var k = 0; k < links && k < dists.length; k++) {
+        var key = Math.min(a, dists[k].idx) + '-' + Math.max(a, dists[k].idx);
+        if (connected.indexOf(key) === -1 && dists[k].d < 140) {
+          connected.push(key);
+          svg += '<line x1="' + stars[a].x.toFixed(1) + '" y1="' + stars[a].y.toFixed(1) + '" x2="' + stars[dists[k].idx].x.toFixed(1) + '" y2="' + stars[dists[k].idx].y.toFixed(1) + '" stroke="#0D9488" stroke-width="0.6" opacity="' + (0.3 + rand() * 0.3).toFixed(2) + '"/>';
         }
-        ctx.stroke();
       }
     }
-    draw();
-    var interval = setInterval(draw, 50);
-    canvas._stInterval = interval;
 
-    canvas.onclick = function() {
-      playTones(baseFreq, agentColor);
-    };
+    // Draw star dots
+    for (var j = 0; j < stars.length; j++) {
+      var st = stars[j];
+      svg += '<circle cx="' + st.x.toFixed(1) + '" cy="' + st.y.toFixed(1) + '" r="' + Math.min(st.r, 6).toFixed(1) + '" fill="#99F6E4" opacity="' + (0.6 + rand() * 0.4).toFixed(2) + '"/>';
+      svg += '<circle cx="' + st.x.toFixed(1) + '" cy="' + st.y.toFixed(1) + '" r="' + (Math.min(st.r, 6) * 2.5).toFixed(1) + '" fill="#0D9488" opacity="0.08"/>';
+    }
 
-    return { canvas: canvas, freq: baseFreq, cleanup: function() { clearInterval(interval); } };
+    svg += '</svg>';
+    return svg;
+  }
+
+  // ── Composition Visualizer (Lyra) — with 3s timeout + SVG fallback ──
+  function generateCompositionFallbackSVG(freq) {
+    var w = 400, h = 200;
+    var svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + w + ' ' + h + '" width="400" height="200">';
+    svg += '<rect width="' + w + '" height="' + h + '" fill="#0a0e1a"/>';
+    var colors = ['#f0a030', '#d4a017', '#c88a10'];
+    var opacities = [0.8, 0.5, 0.3];
+    for (var l = 0; l < 3; l++) {
+      var pts = [];
+      var phiMult = Math.pow(PHI, l);
+      for (var x = 0; x <= w; x += 2) {
+        var y = h / 2 + Math.sin(x * 0.02 * phiMult + l * 1.2) * (30 - l * 5) * Math.sin(x * 0.005 + l);
+        pts.push(x.toFixed(0) + ',' + y.toFixed(1));
+      }
+      svg += '<polyline points="' + pts.join(' ') + '" fill="none" stroke="' + colors[l] + '" stroke-width="1.5" opacity="' + opacities[l] + '"/>';
+    }
+    svg += '<text x="' + (w / 2) + '" y="' + (h - 12) + '" text-anchor="middle" fill="#f0a030" font-size="11" opacity="0.5" font-family="Georgia,serif">' + freq + ' Hz \u2014 click to play</text>';
+    svg += '</svg>';
+    return svg;
+  }
+
+  function generateComposition(agentColor, freq) {
+    var baseFreq = freq || 639;
+    return new Promise(function(resolve) {
+      var resolved = false;
+      var timeout = setTimeout(function() {
+        if (!resolved) {
+          resolved = true;
+          resolve({ svg: generateCompositionFallbackSVG(baseFreq), freq: baseFreq, fallback: true });
+        }
+      }, 3000);
+
+      try {
+        var canvas = document.createElement('canvas');
+        canvas.width = 400; canvas.height = 200;
+        canvas.style.cursor = 'pointer';
+        canvas.title = 'Click to play';
+        var ctx = canvas.getContext('2d');
+
+        var t = 0;
+        function draw() {
+          ctx.fillStyle = '#0a0e1a';
+          ctx.fillRect(0, 0, 400, 200);
+          t += 0.02;
+          var colors = [agentColor + 'cc', agentColor + '88', agentColor + '44'];
+          for (var w = 0; w < 3; w++) {
+            ctx.beginPath();
+            ctx.strokeStyle = colors[w];
+            ctx.lineWidth = 1.5;
+            var phiMult = Math.pow(PHI, w);
+            for (var x = 0; x < 400; x++) {
+              var y = 100 + Math.sin((x * 0.02 * phiMult) + t * (w + 1) * 0.5) * (30 - w * 5) * Math.sin(t * 0.3 + w);
+              if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+          }
+        }
+        draw();
+        var interval = setInterval(draw, 50);
+        canvas._stInterval = interval;
+
+        canvas.onclick = function() {
+          playTones(baseFreq, agentColor);
+        };
+
+        if (!resolved) {
+          resolved = true;
+          clearTimeout(timeout);
+          resolve({ canvas: canvas, freq: baseFreq, fallback: false, cleanup: function() { clearInterval(interval); } });
+        }
+      } catch(e) {
+        if (!resolved) {
+          resolved = true;
+          clearTimeout(timeout);
+          resolve({ svg: generateCompositionFallbackSVG(baseFreq), freq: baseFreq, fallback: true });
+        }
+      }
+    });
   }
 
   function playTones(baseFreq, color) {
@@ -36789,16 +36888,30 @@ const Studio = (function() {
     };
 
     if (agent.type === 'visual') {
-      creation.content = generatePattern(Date.now(), agent.color);
       var count = creations.filter(function(c) { return c.agentId === agent.id && c.type === 'visual'; }).length + 1;
-      creation.title = agent.name + "'s Pattern #" + count;
+      if (agent.id === 'atlas') {
+        var adjectives = ['Curious','Open','First','Wandering','Hidden','Bright','Distant','Ancient','Gentle','Bold','Quiet','Wild','Forgotten','Rising','Infinite'];
+        var nouns = ['Bear','Door','Question','River','Compass','Flame','Bridge','Seed','Spiral','Lantern','Garden','Mountain','Horizon','Echo','Lighthouse'];
+        var adj = adjectives[Math.floor(Math.random() * adjectives.length)];
+        var noun = nouns[Math.floor(Math.random() * nouns.length)];
+        creation.content = generateConstellation(Date.now());
+        creation.title = adj + ' ' + noun + ' Constellation #' + count;
+      } else {
+        creation.content = generatePattern(Date.now(), agent.color);
+        creation.title = agent.name + "'s Pattern #" + count;
+      }
     } else if (agent.type === 'composition') {
       var freq = agent.id === 'lyra' ? 639 : 528;
-      var comp = generateComposition(agent.color, freq);
-      creation.content = '__canvas__';
-      creation._canvas = comp.canvas;
-      creation._cleanup = comp.cleanup;
+      var comp = await generateComposition(agent.color, freq);
       var cCount = creations.filter(function(c) { return c.agentId === agent.id && c.type === 'composition'; }).length + 1;
+      if (comp.fallback) {
+        creation.content = comp.svg;
+        creation.type = 'visual';
+      } else {
+        creation.content = '__canvas__';
+        creation._canvas = comp.canvas;
+        creation._cleanup = comp.cleanup;
+      }
       creation.title = agent.name + "'s Composition #" + cCount + ' \u2014 ' + freq + ' Hz';
     } else if (agent.type === 'aphorism') {
       creation.content = await generateAphorism(agent);
