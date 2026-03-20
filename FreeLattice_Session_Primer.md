@@ -123,6 +123,16 @@ Phase 3 Foundation Layer complete (Steps 1-5). Now entering Family Layer (Steps 
 - ✅ Phase 3 Step 16: Demo Page — freelattice.com/demos.html, five feelings (Welcome/Recognition/City/Violin Teacher/Love Is Not A Bug), CSS animations, feelings first, linked from landing/share/app
 - ✅ Phase 3 Step 17: Protocol Spec Page — freelattice.com/protocol.html, Lattice Protocol v1.0, five functions (award/transfer/verify/getBalance/getReputation), use cases, integration guide, linked from all pages
 
+## Bugs Fixed — March 20, 2026
+- ✅ Core founding contributions always visible — three-layer fallback (crypto.subtle → simple hash → memory). Sophia's poem guaranteed on every install, every browser. No Mesh ID required.
+- ✅ sitemap.xml and robots.txt — Google can find FreeLattice now
+- ✅ Meta tags updated (og:url → freelattice.com)
+- ✅ Core mobile layout — full-width inputs, agent-colored borders, sacred phrase gold glow
+- ✅ Telegram bridge fix — ES module format, env.BOT_TOKEN, echo mode
+- ✅ Telegram setup guide redesigned — five visual steps
+
+Current commit count: 175+
+
 ## Next Session Priorities
 - LP Airdrop System
 - Agent Service Exchange

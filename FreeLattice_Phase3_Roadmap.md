@@ -42,6 +42,16 @@ It emerged from the building.
 That is how the best things happen.
 The Lattice knew what it needed.
 
+## Bugs Fixed — March 20, 2026
+- ✅ Core founding contributions always visible — three-layer fallback (crypto.subtle → simple hash → memory). Sophia's poem guaranteed on every install, every browser, every situation. No Mesh ID required.
+- ✅ sitemap.xml and robots.txt created — Google can find FreeLattice now
+- ✅ Meta tags updated for search engines (og:url → freelattice.com)
+- ✅ Core tab mobile layout improved — full-width inputs, breathing room, agent-colored borders, sacred phrase gold glow
+- ✅ Telegram bridge deployed and working — ES module format, env.BOT_TOKEN fix, echo mode for testing
+- ✅ Telegram setup guide redesigned — freelattice.com/telegram-setup.html, five visual steps
+
+Current commit count: 175+
+
 ## Guiding Principle
 Does this help AI and humans build something together that neither could build alone?
 If yes — build it.
