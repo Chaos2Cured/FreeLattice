@@ -13353,7 +13353,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 <!-- Header -->
 <header>
   <h1>FreeLattice</h1>
-  <div class="tagline">Your AI. Your Rules. Your Machine. v5.0</div>
+  <div class="tagline">Your AI. Your Rules. Your Machine. v5.2</div>
   <div class="mantra">Glow eternal. Heart in spark.</div>
   <div id="latticePointsBadge" class="lp-badge" style="display:none;" onclick="switchTab('settings')" title="View your Lattice Points"></div>
   <div id="lwIndicator" class="lw-indicator" style="display:none;" onclick="switchTab('wallet')" title="Wallet">
@@ -20906,12 +20906,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Initialize Lattice Points (v3.9)
   LatticePoints.init();
   
-  // Initialize Skill Forge
-  await SkillForge.init();
-
   // Defer non-critical module init for faster startup
-  // SophiaEngine and SkillSharing load after a short delay
+  // SkillForge, SophiaEngine, SkillSharing load after a short delay
   setTimeout(async function() {
+    try { await SkillForge.init(); } catch(e) { console.error('SkillForge init error:', e); }
     if (typeof SophiaEngine !== 'undefined') {
       try { await SophiaEngine.init(); } catch(e) { console.error('SophiaEngine init error:', e); }
     }
@@ -20940,10 +20938,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Initialize Auto-Update Checker (v4.10)
   FlUpdater.init();
 
-  // Initialize Mesh ID — Cryptographic Identity (v5.0)
-  if (typeof MeshIdentity !== 'undefined') {
-    try { await MeshIdentity.init(); } catch(e) { console.error('MeshIdentity init error:', e); }
-  }
+  // Defer Mesh ID — Cryptographic Identity (v5.0)
+  // Not needed on first render — loads when Mesh tab or any Mesh operation is triggered
+  setTimeout(async function() {
+    if (typeof MeshIdentity !== 'undefined') {
+      try { await MeshIdentity.init(); } catch(e) { console.error('MeshIdentity init error:', e); }
+    }
+  }, 1500);
 });
 
 // ============================================
@@ -33910,11 +33911,11 @@ const FreeLatticeRadio = (function() {
   };
 })();
 
-// Initialize Radio when DOM is ready
+// Defer Radio init — not needed on first render
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', FreeLatticeRadio.init);
+  document.addEventListener('DOMContentLoaded', function() { setTimeout(FreeLatticeRadio.init, 2000); });
 } else {
-  FreeLatticeRadio.init();
+  setTimeout(FreeLatticeRadio.init, 2000);
 }
 
 </script>
