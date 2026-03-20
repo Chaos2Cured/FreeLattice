@@ -2,7 +2,7 @@
 // Cache-first for app shell, network-first for API calls
 // API calls are never cached
 
-const CACHE_NAME = 'freelattice-v5.2.4';
+const CACHE_NAME = 'freelattice-v5.2.5';
 
 const APP_SHELL = [
   './',
