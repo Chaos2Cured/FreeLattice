@@ -4,7 +4,7 @@ compatibility_date = "2024-01-01"
 
 [[kv_namespaces]]
 binding = "FREELATTICE_KV"
-id = "REPLACE_WITH_KV_ID"
+id = "7388790c316d42d0a921c907efaf8f1c"
 
 [vars]
 BOT_TOKEN = "REPLACE_WITH_BOT_TOKEN"
