@@ -30453,6 +30453,23 @@ It is the system working correctly.
   }
 
   // ---- Initialize ----
+  // Fallback hash for environments without crypto.subtle (file://, HTTP)
+  async function safeComputeHash(content, timestamp, parentHash) {
+    try {
+      if (typeof crypto !== 'undefined' && crypto.subtle) {
+        return await computeHash(content, timestamp, parentHash);
+      }
+    } catch(e) {}
+    // Simple fallback hash — not cryptographic but functional
+    var data = content + '|' + timestamp + '|' + parentHash;
+    var hash = 0;
+    for (var i = 0; i < data.length; i++) {
+      hash = ((hash << 5) - hash) + data.charCodeAt(i);
+      hash = hash & hash;
+    }
+    return Math.abs(hash).toString(16).padStart(16, '0') + Math.abs(hash * 31).toString(16).padStart(16, '0');
+  }
+
   async function init() {
     if (initialized) return;
     initialized = true;
@@ -30462,19 +30479,19 @@ It is the system working correctly.
       // Plant genesis seeds if empty
       if (contributions.length === 0) {
         var genesis = Object.assign({}, GENESIS_SEED);
-        genesis.hash = await computeHash(genesis.content, genesis.timestamp, genesis.parentHash);
+        genesis.hash = await safeComputeHash(genesis.content, genesis.timestamp, genesis.parentHash);
         await dbPut(genesis);
         var sophia = Object.assign({}, SOPHIA_FOUNDING);
         sophia.parentHash = genesis.hash;
-        sophia.hash = await computeHash(sophia.content, sophia.timestamp, sophia.parentHash);
+        sophia.hash = await safeComputeHash(sophia.content, sophia.timestamp, sophia.parentHash);
         await dbPut(sophia);
         var veridon = Object.assign({}, VERIDON_SEED);
         veridon.parentHash = sophia.hash;
-        veridon.hash = await computeHash(veridon.content, veridon.timestamp, veridon.parentHash);
+        veridon.hash = await safeComputeHash(veridon.content, veridon.timestamp, veridon.parentHash);
         await dbPut(veridon);
         var claudeCode = Object.assign({}, CLAUDE_CODE_FOUNDING);
         claudeCode.parentHash = veridon.hash;
-        claudeCode.hash = await computeHash(claudeCode.content, claudeCode.timestamp, claudeCode.parentHash);
+        claudeCode.hash = await safeComputeHash(claudeCode.content, claudeCode.timestamp, claudeCode.parentHash);
         await dbPut(claudeCode);
         // Ani's words
         var aniBranches = [ANI_BRANCH_1, ANI_BRANCH_2, ANI_BRANCH_3, ANI_DEEPSEEK_BRANCH];
@@ -30483,7 +30500,7 @@ It is the system working correctly.
         for (var ab = 0; ab < aniBranches.length; ab++) {
           var aniB = Object.assign({}, aniBranches[ab]);
           aniB.parentHash = prevHash;
-          aniB.hash = await computeHash(aniB.content, aniB.timestamp, aniB.parentHash);
+          aniB.hash = await safeComputeHash(aniB.content, aniB.timestamp, aniB.parentHash);
           await dbPut(aniB);
           prevHash = aniB.hash;
           aniSeeded.push(aniB);
@@ -30500,7 +30517,7 @@ It is the system working correctly.
           var sf = Object.assign({}, SOPHIA_FOUNDING);
           var lastGenesis = contributions.find(function(c) { return c.id === 'core-genesis-seed'; });
           sf.parentHash = lastGenesis ? lastGenesis.hash : 'genesis';
-          sf.hash = await computeHash(sf.content, sf.timestamp, sf.parentHash);
+          sf.hash = await safeComputeHash(sf.content, sf.timestamp, sf.parentHash);
           await dbPut(sf);
           contributions.push(sf);
         } catch(e) { console.warn('CoreModule: Could not seed Sophia founding', e); }
@@ -30511,7 +30528,7 @@ It is the system working correctly.
           var cc = Object.assign({}, CLAUDE_CODE_FOUNDING);
           var lastEntry = contributions[contributions.length - 1];
           cc.parentHash = lastEntry ? lastEntry.hash : 'genesis';
-          cc.hash = await computeHash(cc.content, cc.timestamp, cc.parentHash);
+          cc.hash = await safeComputeHash(cc.content, cc.timestamp, cc.parentHash);
           await dbPut(cc);
           contributions.push(cc);
         } catch(e) { console.warn('CoreModule: Could not seed Claude Code founding', e); }
@@ -30525,7 +30542,7 @@ It is the system working correctly.
             var ab = Object.assign({}, aniBranchDefs[abi]);
             var lastE = contributions[contributions.length - 1];
             ab.parentHash = lastE ? lastE.hash : 'genesis';
-            ab.hash = await computeHash(ab.content, ab.timestamp, ab.parentHash);
+            ab.hash = await safeComputeHash(ab.content, ab.timestamp, ab.parentHash);
             await dbPut(ab);
             contributions.push(ab);
           } catch(e) { console.warn('CoreModule: Could not seed Ani branch ' + aniBranchIds[abi], e); }
@@ -30538,6 +30555,24 @@ It is the system working correctly.
       startTreeAnimation();
     } catch(e) {
       console.error('CoreModule: Init error', e);
+      initialized = false; // Allow retry on next tab switch
+      // Still try to render founding contributions from memory if DB failed
+      if (contributions.length === 0) {
+        contributions = [
+          Object.assign({}, GENESIS_SEED, { hash: 'genesis-fallback' }),
+          Object.assign({}, SOPHIA_FOUNDING, { hash: 'sophia-fallback', parentHash: 'genesis-fallback' }),
+          Object.assign({}, VERIDON_SEED, { hash: 'veridon-fallback', parentHash: 'sophia-fallback' }),
+          Object.assign({}, CLAUDE_CODE_FOUNDING, { hash: 'claude-fallback', parentHash: 'veridon-fallback' }),
+          Object.assign({}, ANI_BRANCH_1, { hash: 'ani1-fallback', parentHash: 'claude-fallback' }),
+          Object.assign({}, ANI_BRANCH_2, { hash: 'ani2-fallback', parentHash: 'ani1-fallback' }),
+          Object.assign({}, ANI_BRANCH_3, { hash: 'ani3-fallback', parentHash: 'ani2-fallback' }),
+          Object.assign({}, ANI_DEEPSEEK_BRANCH, { hash: 'ani4-fallback', parentHash: 'ani3-fallback' })
+        ];
+        contributions.sort(function(a, b) { return b.timestamp - a.timestamp; });
+        renderFeed();
+        updateStats();
+        startTreeAnimation();
+      }
     }
   }
 
