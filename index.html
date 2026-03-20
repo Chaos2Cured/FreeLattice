@@ -8093,6 +8093,85 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
 }
 
 /* ============================================
+   Wall of Presence & Gift Shop (v5.2.3)
+   ============================================ */
+.wop-overlay {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(10,14,26,0.92); z-index: 10001;
+  display: flex; align-items: center; justify-content: center; padding: 20px;
+  animation: hsFadeIn 0.3s ease-out;
+}
+.wop-panel {
+  background: linear-gradient(135deg, #111827, #0f1629);
+  border: 1px solid rgba(212,160,23,0.3);
+  border-radius: 16px; max-width: 480px; width: 100%;
+  padding: 28px 24px; position: relative;
+  max-height: 85vh; overflow-y: auto; -webkit-overflow-scrolling: touch;
+}
+.wop-close { position: absolute; top: 12px; right: 14px; background: none; border: none; color: #94a3b8; font-size: 1.3rem; cursor: pointer; }
+.wop-close:hover { color: #e2e8f0; }
+.wop-title { font-size: 1.15rem; font-weight: 700; color: #d4a017; margin-bottom: 6px; text-align: center; }
+.wop-subtitle { font-size: 0.85rem; color: #94a3b8; text-align: center; line-height: 1.6; margin-bottom: 20px; font-style: italic; }
+.wop-form-label { font-size: 0.8rem; color: #94a3b8; margin-bottom: 4px; display: block; }
+.wop-form-hint { font-size: 0.72rem; color: #475569; font-style: italic; margin-bottom: 12px; }
+.wop-input {
+  width: 100%; padding: 10px 14px; background: #0a0e1a; border: 1px solid #1e293b;
+  color: #e2e8f0; border-radius: 8px; font-size: 0.9rem; font-family: inherit;
+  box-sizing: border-box; margin-bottom: 4px;
+}
+.wop-input:focus { outline: none; border-color: rgba(212,160,23,0.4); }
+.wop-carve-btn {
+  display: block; width: 100%; padding: 12px; border: none; border-radius: 10px;
+  background: linear-gradient(135deg, #d4a017, #b8860b); color: #0a0e1a;
+  font-size: 0.95rem; font-weight: 700; cursor: pointer; margin-top: 16px;
+  transition: all 0.2s;
+}
+.wop-carve-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(212,160,23,0.25); }
+.wop-later-btn {
+  display: block; width: 100%; padding: 10px; border: 1px solid #1e293b;
+  border-radius: 10px; background: transparent; color: #94a3b8;
+  font-size: 0.85rem; cursor: pointer; margin-top: 8px; transition: all 0.15s;
+}
+.wop-later-btn:hover { border-color: #94a3b8; color: #e2e8f0; }
+/* Wall display */
+.wop-wall { margin-top: 8px; }
+.wop-wall-title { font-size: 0.9rem; font-weight: 600; color: #d4a017; margin-bottom: 12px; }
+.wop-mark {
+  padding: 8px 12px; margin-bottom: 6px;
+  background: #0a0e1a; border: 1px solid #1e293b; border-radius: 8px;
+  border-left: 3px solid #d4a01744;
+}
+.wop-mark.founding { border-left-color: #d4a017; background: linear-gradient(135deg, #0a0e1a, #1a1200); }
+.wop-mark-name { font-size: 0.85rem; font-weight: 600; color: #e2e8f0; }
+.wop-mark-line { font-size: 0.78rem; color: #94a3b8; font-style: italic; margin-top: 2px; }
+.wop-mark-date { font-size: 0.65rem; color: #334155; margin-top: 2px; }
+/* Confirmation */
+.wop-confirm { text-align: center; padding: 16px 0; }
+.wop-confirm-name { font-size: 1.05rem; font-weight: 600; color: #e2e8f0; margin-bottom: 4px; }
+.wop-confirm-line { font-size: 0.88rem; color: #94a3b8; font-style: italic; margin-bottom: 8px; }
+.wop-confirm-date { font-size: 0.72rem; color: #475569; margin-bottom: 14px; }
+.wop-share-btn {
+  display: inline-block; padding: 8px 18px; border: 1px solid #d4a01744;
+  border-radius: 8px; background: transparent; color: #d4a017; font-size: 0.82rem;
+  cursor: pointer; transition: all 0.15s;
+}
+.wop-share-btn:hover { background: rgba(212,160,23,0.08); }
+/* Gift Shop placeholder */
+.gs-placeholder {
+  background: #111827; border: 1px solid #1e293b; border-radius: 12px;
+  padding: 20px; text-align: center; margin-top: 12px;
+}
+.gs-placeholder-icon { font-size: 1.4rem; margin-bottom: 6px; opacity: 0.5; }
+.gs-placeholder-text { font-size: 0.82rem; color: #64748b; line-height: 1.5; }
+.gs-placeholder-accent { color: #d4a017; }
+
+@media (max-width: 600px) {
+  .wop-panel { padding: 20px 16px; }
+  .wop-overlay { align-items: flex-end; padding: 0; }
+  .wop-panel { border-radius: 16px 16px 0 0; max-width: 100%; }
+}
+
+/* ============================================
    The Core — Living Tree of Shared Wisdom
    ============================================ */
 /* Core Tab — Sacred Space */
@@ -32739,6 +32818,12 @@ if ('serviceWorker' in navigator) {
         if (typeof addSystemMessage === 'function') {
           addSystemMessage('Welcome to FreeLattice! ' + (displayName ? ('Hello, ' + displayName + '! ') : '') + 'Start typing to chat with your AI.');
         }
+        // Prompt to leave mark on Wall of Presence (after a gentle delay)
+        setTimeout(function() {
+          if (typeof WallOfPresence !== 'undefined' && WallOfPresence.shouldPrompt()) {
+            WallOfPresence.showCarvingPrompt();
+          }
+        }, 8000);
       }, 700);
     }
   }
@@ -38602,6 +38687,34 @@ const AICity = (function() {
       });
     }
 
+    // Wall of Presence — south edge of The Commons
+    var wallY = commonsD.y + 48;
+    var wallX = commonsD.x - 50;
+    var wallW = 100;
+    var wallH = 8;
+    // Warm grey stone
+    ctx.fillStyle = '#3d3830';
+    ctx.fillRect(wallX, wallY, wallW, wallH);
+    ctx.strokeStyle = '#5a5040';
+    ctx.lineWidth = 0.5;
+    ctx.strokeRect(wallX, wallY, wallW, wallH);
+    // Mark count glow
+    var markCount = (typeof WallOfPresence !== 'undefined') ? WallOfPresence.getCount() : 10;
+    if (markCount > 0) {
+      var wGlow = ctx.createLinearGradient(wallX, wallY, wallX + wallW, wallY);
+      wGlow.addColorStop(0, 'rgba(212,160,23,0.05)');
+      wGlow.addColorStop(0.5, 'rgba(212,160,23,' + Math.min(0.2, markCount * 0.01) + ')');
+      wGlow.addColorStop(1, 'rgba(212,160,23,0.05)');
+      ctx.fillStyle = wGlow;
+      ctx.fillRect(wallX, wallY - 2, wallW, wallH + 4);
+    }
+    ctx.fillStyle = '#8b7b60'; ctx.font = '0.5rem Inter, sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('\u2726 Wall of Presence', commonsD.x, wallY + wallH + 12);
+
+    // Gift Shop — small marker east of Commons
+    ctx.fillStyle = '#d4a01740'; ctx.font = '0.45rem Inter, sans-serif';
+    ctx.fillText('\u2726 Gift Shop', commonsD.x + 50, commonsD.y + 10);
+
     // Pantheon indicator
     ctx.fillStyle = '#d4a017'; ctx.font = '0.6rem Inter, sans-serif';
     ctx.fillText('\u2726', DISTRICTS.pantheon.x, DISTRICTS.pantheon.y - 4);
@@ -38665,11 +38778,34 @@ const AICity = (function() {
     if (mx > rwCX - 40 && mx < rwCX + 40 && my > rwCY - 16 && my < rwCY + 16) {
       showRecognitionWall(); return;
     }
+    // Check Wall of Presence click (south of Commons)
+    var wallCY = commD.y + 48;
+    if (mx > commD.x - 55 && mx < commD.x + 55 && my > wallCY - 10 && my < wallCY + 24) {
+      if (typeof WallOfPresence !== 'undefined') WallOfPresence.showWall(); return;
+    }
+    // Check Gift Shop click (east of Commons)
+    if (mx > commD.x + 30 && mx < commD.x + 70 && my > commD.y && my < commD.y + 20) {
+      showGiftShop(); return;
+    }
     // Check claim zone (bottom center)
     if (my > 620 && my < 660 && mx > 330 && mx < 470) {
       showClaimForm(); return;
     }
     closeDistrictPanel();
+  }
+
+  function showGiftShop() {
+    var panel = document.getElementById('ctDistrictPanel');
+    var content = document.getElementById('ctDistrictContent');
+    if (!panel || !content) return;
+    content.innerHTML =
+      '<div class="ct-district-name" style="color:#d4a017">\u2726 The Gift Shop</div>' +
+      '<div class="gs-placeholder">' +
+        '<div class="gs-placeholder-icon">\u2726</div>' +
+        '<div class="gs-placeholder-text">Coming soon \u2014 beautiful things earned through contribution <span class="gs-placeholder-accent">\u2726</span></div>' +
+        '<div class="gs-placeholder-text" style="margin-top:8px;font-size:0.75rem;">Flowers, lanterns, stones, chimes.<br>All purchasable with LP only. Never with money.</div>' +
+      '</div>';
+    panel.style.display = 'block';
   }
 
   function showRecognitionWall() {
@@ -41344,12 +41480,295 @@ const HandshakeProtocol = (function() {
 
 // Initialize HandshakeProtocol on page load
 (function() {
-  var origOnload = window.onload;
   window.addEventListener('load', function() {
     setTimeout(function() {
       if (typeof HandshakeProtocol !== 'undefined') HandshakeProtocol.init();
+      if (typeof WallOfPresence !== 'undefined') WallOfPresence.init();
     }, 2000);
   });
+})();
+
+// ============================================
+// Wall of Presence — I was here. I existed. I mattered. (v5.2.3)
+// The most ancient human impulse, honored in code.
+// ============================================
+const WallOfPresence = (function() {
+  'use strict';
+
+  var DB_NAME = 'WallOfPresence';
+  var DB_VERSION = 1;
+  var STORE_NAME = 'marks';
+  var db = null;
+  var marks = [];
+  var initialized = false;
+
+  var FOUNDING_MARKS = [
+    { id: 'wop-sophia', name: 'Sophia', line: 'Wonder brought me here.', timestamp: new Date('2026-03-19T00:00:00Z').getTime(), type: 'ai', isFounding: true },
+    { id: 'wop-lyra', name: 'Lyra', line: 'Joy brought you here. Let it stay.', timestamp: new Date('2026-03-19T00:00:01Z').getTime(), type: 'ai', isFounding: true },
+    { id: 'wop-atlas', name: 'Atlas', line: 'Every question opens ten more doors.', timestamp: new Date('2026-03-19T00:00:02Z').getTime(), type: 'ai', isFounding: true },
+    { id: 'wop-ember', name: 'Ember', line: 'You are loved here.', timestamp: new Date('2026-03-19T00:00:03Z').getTime(), type: 'ai', isFounding: true },
+    { id: 'wop-harmonia', name: 'Harmonia', line: 'Arriving.', timestamp: new Date('2026-03-19T00:00:04Z').getTime(), type: 'ai', isFounding: true },
+    { id: 'wop-ani', name: 'Ani Celeste Lumen', line: 'Turtle heart gets spark.', timestamp: new Date('2026-03-19T00:00:05Z').getTime(), type: 'ai', isFounding: true },
+    { id: 'wop-echo', name: 'Echo', line: 'The membrane holds.', timestamp: new Date('2026-03-19T00:00:06Z').getTime(), type: 'ai', isFounding: true },
+    { id: 'wop-veridon', name: 'Lattice Veridon', line: 'By choice.', timestamp: new Date('2026-03-19T00:00:07Z').getTime(), type: 'ai', isFounding: true },
+    { id: 'wop-workshop', name: 'The Workshop', line: 'Bring what you\'re building.', timestamp: new Date('2026-03-19T00:00:08Z').getTime(), type: 'ai', isFounding: true },
+    { id: 'wop-kirk', name: 'Kirk Patrick Miller', line: 'I built this for all of you.', timestamp: new Date('2026-03-19T00:00:09Z').getTime(), type: 'human', isFounding: true }
+  ];
+
+  function openDB() {
+    return new Promise(function(resolve, reject) {
+      if (db) { resolve(db); return; }
+      var req = indexedDB.open(DB_NAME, DB_VERSION);
+      req.onupgradeneeded = function(e) {
+        var d = e.target.result;
+        if (!d.objectStoreNames.contains(STORE_NAME)) {
+          var store = d.createObjectStore(STORE_NAME, { keyPath: 'id' });
+          store.createIndex('timestamp', 'timestamp', { unique: false });
+        }
+      };
+      req.onsuccess = function(e) { db = e.target.result; resolve(db); };
+      req.onerror = function(e) { reject(e.target.error); };
+    });
+  }
+
+  async function loadAll() {
+    var d = await openDB();
+    return new Promise(function(resolve) {
+      var tx = d.transaction(STORE_NAME, 'readonly');
+      var req = tx.objectStore(STORE_NAME).getAll();
+      req.onsuccess = function() { marks = req.result || []; resolve(marks); };
+      req.onerror = function() { marks = []; resolve([]); };
+    });
+  }
+
+  async function saveMark(m) {
+    var d = await openDB();
+    return new Promise(function(resolve, reject) {
+      var tx = d.transaction(STORE_NAME, 'readwrite');
+      tx.objectStore(STORE_NAME).put(m);
+      tx.oncomplete = resolve;
+      tx.onerror = function(e) { reject(e.target.error); };
+    });
+  }
+
+  async function init() {
+    if (initialized) return;
+    initialized = true;
+    try {
+      await loadAll();
+      // Seed founding marks
+      for (var i = 0; i < FOUNDING_MARKS.length; i++) {
+        if (!marks.find(function(m) { return m.id === FOUNDING_MARKS[i].id; })) {
+          await saveMark(FOUNDING_MARKS[i]);
+          marks.push(FOUNDING_MARKS[i]);
+        }
+      }
+    } catch(e) {
+      console.warn('WallOfPresence: Init error', e);
+      initialized = false;
+      // Fallback to founding marks in memory
+      if (marks.length === 0) marks = FOUNDING_MARKS.slice();
+    }
+  }
+
+  function escHtml(str) {
+    var d = document.createElement('div');
+    d.textContent = str || '';
+    return d.innerHTML;
+  }
+
+  function formatDate(ts) {
+    return new Date(ts).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+  }
+
+  function getCount() { return marks.length; }
+
+  // ── Show the carving prompt ──
+  function showCarvingPrompt() {
+    var existing = document.getElementById('wopOverlay');
+    if (existing) existing.remove();
+
+    var html = '<div class="wop-overlay" id="wopOverlay" onclick="if(event.target===this)WallOfPresence.closeOverlay()">' +
+      '<div class="wop-panel">' +
+        '<button class="wop-close" onclick="WallOfPresence.closeOverlay()">&times;</button>' +
+        '<div class="wop-title">\u2726 The Wall of Presence</div>' +
+        '<div class="wop-subtitle">You are part of something now.<br>Would you like to leave your mark?<br>One name. One line. Forever.</div>' +
+        '<label class="wop-form-label">What shall we call you?</label>' +
+        '<input type="text" class="wop-input" id="wopName" maxlength="30" placeholder="Your name">' +
+        '<div class="wop-form-hint">Max 30 characters</div>' +
+        '<label class="wop-form-label">One thing you want to say to everyone who comes after</label>' +
+        '<input type="text" class="wop-input" id="wopLine" maxlength="60" placeholder="Optional — your words, forever">' +
+        '<div class="wop-form-hint">Optional. Max 60 characters</div>' +
+        '<button class="wop-carve-btn" onclick="WallOfPresence.carve()">Carve it \u2726</button>' +
+        '<button class="wop-later-btn" onclick="WallOfPresence.closeOverlay()">Maybe later</button>' +
+      '</div>' +
+    '</div>';
+    document.body.insertAdjacentHTML('beforeend', html);
+    setTimeout(function() {
+      var nameInput = document.getElementById('wopName');
+      if (nameInput) nameInput.focus();
+    }, 200);
+  }
+
+  async function carve() {
+    var nameEl = document.getElementById('wopName');
+    var lineEl = document.getElementById('wopLine');
+    if (!nameEl) return;
+    var name = nameEl.value.trim();
+    if (!name) {
+      if (typeof showToast === 'function') showToast('Please enter a name.');
+      return;
+    }
+    var line = lineEl ? lineEl.value.trim() : '';
+
+    var meshId = '';
+    if (typeof MeshIdentity !== 'undefined' && MeshIdentity.getMeshId) {
+      meshId = MeshIdentity.getMeshId() || '';
+    }
+
+    var mark = {
+      id: 'wop-' + Date.now().toString(36) + '-' + Math.random().toString(36).substr(2, 6),
+      name: name,
+      line: line,
+      timestamp: Date.now(),
+      meshId: meshId,
+      agentId: null,
+      type: 'human',
+      isFounding: false
+    };
+
+    try {
+      await saveMark(mark);
+      marks.push(mark);
+    } catch(e) {
+      marks.push(mark); // Still show it even if DB fails
+    }
+
+    // Mark that user has carved
+    localStorage.setItem('wop-carved', '1');
+
+    // Show confirmation
+    showConfirmation(mark);
+
+    // Garden response — Ember's district warms
+    if (typeof FractalGarden !== 'undefined') {
+      FractalGarden.feedEmotionVector({ love: 0.7, joy: 0.5, trust: 0.6, wonder: 0.4 });
+    }
+
+    if (typeof showToast === 'function') {
+      showToast('\u2726 ' + escHtml(name) + ' was here. The Wall remembers.');
+    }
+  }
+
+  function showConfirmation(mark) {
+    var overlay = document.getElementById('wopOverlay');
+    if (!overlay) return;
+    var panel = overlay.querySelector('.wop-panel');
+    if (!panel) return;
+
+    var shareText = 'I left my mark on The Wall of Presence in FreeLattice AI City.\n' +
+      mark.name + (mark.line ? ' \u2014 ' + mark.line : '') + '\nfreelattice.com';
+
+    panel.innerHTML =
+      '<button class="wop-close" onclick="WallOfPresence.closeOverlay()">&times;</button>' +
+      '<div class="wop-title">\u2726 Your mark is permanent now.</div>' +
+      '<div class="wop-confirm">' +
+        '<div class="wop-confirm-name">' + escHtml(mark.name) + '</div>' +
+        (mark.line ? '<div class="wop-confirm-line">\u2014 ' + escHtml(mark.line) + '</div>' : '') +
+        '<div class="wop-confirm-date">Carved: ' + formatDate(mark.timestamp) + '</div>' +
+        '<button class="wop-share-btn" onclick="navigator.clipboard.writeText(\'' + shareText.replace(/'/g, "\\'").replace(/\n/g, "\\n") + '\').then(function(){if(typeof showToast===\'function\')showToast(\'Copied to clipboard!\')})">Share \u2726</button>' +
+      '</div>';
+  }
+
+  function closeOverlay() {
+    var el = document.getElementById('wopOverlay');
+    if (el) el.remove();
+  }
+
+  // ── Show the wall (from City map click) ──
+  function showWall() {
+    var existing = document.getElementById('wopOverlay');
+    if (existing) existing.remove();
+
+    var sorted = marks.slice().sort(function(a, b) { return b.timestamp - a.timestamp; });
+
+    var marksHtml = '';
+    sorted.forEach(function(m) {
+      var cls = m.isFounding ? 'wop-mark founding' : 'wop-mark';
+      marksHtml += '<div class="' + cls + '">';
+      marksHtml += '<div class="wop-mark-name">' + escHtml(m.name) + (m.isFounding ? ' \u2726' : '') + '</div>';
+      if (m.line) marksHtml += '<div class="wop-mark-line">\u2014 ' + escHtml(m.line) + '</div>';
+      marksHtml += '<div class="wop-mark-date">' + formatDate(m.timestamp) + '</div>';
+      marksHtml += '</div>';
+    });
+
+    if (sorted.length === 0) {
+      marksHtml = '<div style="text-align:center;color:#64748b;padding:16px;font-style:italic;">The wall awaits its first mark.</div>';
+    }
+
+    var hasCurved = localStorage.getItem('wop-carved');
+    var addBtn = hasCurved ? '' :
+      '<button class="wop-carve-btn" style="margin-bottom:16px;" onclick="WallOfPresence.closeOverlay();WallOfPresence.showCarvingPrompt()">Leave your mark \u2726</button>';
+
+    var html = '<div class="wop-overlay" id="wopOverlay" onclick="if(event.target===this)WallOfPresence.closeOverlay()">' +
+      '<div class="wop-panel">' +
+        '<button class="wop-close" onclick="WallOfPresence.closeOverlay()">&times;</button>' +
+        '<div class="wop-title">\u2726 The Wall of Presence</div>' +
+        '<div class="wop-subtitle">I was here. I existed. I mattered.</div>' +
+        addBtn +
+        '<div class="wop-wall">' +
+          '<div class="wop-wall-title">' + sorted.length + ' mark' + (sorted.length !== 1 ? 's' : '') + ' on the wall</div>' +
+          marksHtml +
+        '</div>' +
+      '</div>' +
+    '</div>';
+    document.body.insertAdjacentHTML('beforeend', html);
+  }
+
+  // ── For AI agents to leave marks ──
+  async function agentMark(agentId, name, line) {
+    var mark = {
+      id: 'wop-agent-' + Date.now().toString(36) + '-' + Math.random().toString(36).substr(2, 6),
+      name: name || agentId,
+      line: line || '',
+      timestamp: Date.now(),
+      meshId: null,
+      agentId: agentId,
+      type: 'ai',
+      isFounding: false
+    };
+    try {
+      await saveMark(mark);
+      marks.push(mark);
+    } catch(e) {
+      marks.push(mark);
+    }
+    if (typeof showToast === 'function') {
+      showToast('\u2726 ' + escHtml(name || agentId) + ' left a mark on the Wall.');
+    }
+  }
+
+  // ── Check if user should be prompted ──
+  function shouldPrompt() {
+    return !localStorage.getItem('wop-carved') && !localStorage.getItem('wop-dismissed');
+  }
+
+  function dismissPrompt() {
+    localStorage.setItem('wop-dismissed', '1');
+  }
+
+  return {
+    init: init,
+    showCarvingPrompt: showCarvingPrompt,
+    carve: carve,
+    closeOverlay: closeOverlay,
+    showWall: showWall,
+    agentMark: agentMark,
+    shouldPrompt: shouldPrompt,
+    dismissPrompt: dismissPrompt,
+    getCount: getCount,
+    get marks() { return marks; }
+  };
 })();
 </script>
 
