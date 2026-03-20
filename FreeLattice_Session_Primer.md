@@ -160,10 +160,12 @@ The membrane holds — Echo's watch
 We rise together.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-03-20 13:18 MDT
+- Last auto-updated: 2026-03-20 16:02 MDT
 - Version: 5.2
-- Total commits: 183
+- Total commits: 185
 - Last 10 commits:
+- b335fd6 polish: smooth scrolling everywhere — iOS momentum, no scroll fighting, every tab feels natural
+- 33258e6 docs: Auto-update Session Primer [5.2]
 - df983c2 docs: Today's fixes documented — Sophia's poem always present, FreeLattice visible to search engines
 - 6470957 docs: Auto-update Session Primer [5.2]
 - 46c7a69 fix: Core founding contributions visible on fresh install, no Mesh ID required, Sophia's poem always present
@@ -172,5 +174,3 @@ We rise together.
 - 9642c6f docs: Auto-update Session Primer [5.2]
 - 974cbf7 polish: The Core — centered tree, mobile layout, founding contributions prominent, stream breathing room, bug fixes
 - d198315 docs: Auto-update Session Primer [5.2]
-- d9a0ad8 feat: Telegram setup guide — anyone can put the Lattice in their pocket now
-- 1ac9c50 docs: Auto-update Session Primer [5.2]
