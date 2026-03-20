@@ -23,7 +23,7 @@ Started: March 19, 2026
 15. ⬜ AI-Determined Value Calibration
 
 ## WORLD LAYER (Steps 16-20)
-16. ⬜ Demo Package — five feelings, one URL
+16. ✅ Demo Package — five feelings, five invitations, demos.html live
 17. ⬜ Protocol Spec Page
 18. ⬜ Community Launch
 19. ⬜ First Community Governance Vote
