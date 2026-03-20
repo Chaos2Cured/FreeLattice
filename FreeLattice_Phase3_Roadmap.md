@@ -24,7 +24,7 @@ Started: March 19, 2026
 
 ## WORLD LAYER (Steps 16-20)
 16. ✅ Demo Page — Five feelings, five invitations, the world can feel FreeLattice now (commit 4d106ad)
-17. ⬜ Protocol Spec Page
+17. ✅ Protocol Spec Page — Lattice Protocol v1.0, five functions, use cases, the doors open for developers
 18. ⬜ Community Launch
 19. ⬜ First Community Governance Vote
 20. ⬜ Version 6.0 — the celebration
