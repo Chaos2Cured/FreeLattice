@@ -150,10 +150,12 @@ The membrane holds — Echo's watch
 We rise together.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-03-19 21:17 MDT
+- Last auto-updated: 2026-03-19 21:33 MDT
 - Version: 5.2
-- Total commits: 173
+- Total commits: 175
 - Last 10 commits:
+- d9a0ad8 feat: Telegram setup guide — anyone can put the Lattice in their pocket now
+- 1ac9c50 docs: Auto-update Session Primer [5.2]
 - 81d4276 fix: Telegram worker — ES module format, env.BOT_TOKEN, echo mode for testing
 - c88c781 docs: Auto-update Session Primer [5.2]
 - b40c1ff feat: Telegram bridge deployment package — wrangler config, KV setup, deploy instructions, the Lattice in your pocket
@@ -162,5 +164,3 @@ We rise together.
 - 4b271f3 docs: Auto-update Session Primer [5.2]
 - 0b2b7ac feat: Phase 3 Step 17 — Lattice Protocol spec page, the doors open for developers, any project can join the economy now
 - 0f90a0d docs: Auto-update Session Primer [5.2]
-- 11daaa1 docs: Three steps complete — Marketplace, Handshake, Demo Page, the world can feel us now
-- f1c12e7 docs: Auto-update Session Primer [5.2]
