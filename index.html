@@ -7849,6 +7849,233 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
 }
 
 /* ============================================
+   Handshake Protocol — Recognition Bonds (v5.2.2)
+   ============================================ */
+.hs-recognize-btn {
+  padding: 5px 12px;
+  border-radius: 8px;
+  border: 1px solid #d4a01744;
+  background: transparent;
+  color: #d4a017;
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.hs-recognize-btn:hover {
+  background: #d4a01720;
+  border-color: #d4a017;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 12px #d4a01722;
+}
+/* Confirmation overlay */
+.hs-confirm-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(10, 14, 26, 0.92);
+  z-index: 10001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: hsFadeIn 0.3s ease-out;
+}
+@keyframes hsFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.hs-confirm-panel {
+  background: linear-gradient(135deg, #111827 0%, #0f1629 100%);
+  border: 1px solid #d4a01755;
+  border-radius: 16px;
+  max-width: 420px;
+  width: 100%;
+  padding: 32px 28px;
+  text-align: center;
+  position: relative;
+  box-shadow: 0 0 60px rgba(212, 160, 23, 0.08);
+}
+.hs-confirm-icon {
+  font-size: 2.4rem;
+  margin-bottom: 12px;
+  opacity: 0.9;
+}
+.hs-confirm-meshid {
+  font-family: monospace;
+  font-size: 0.85rem;
+  color: #d4a017;
+  background: #d4a01712;
+  padding: 6px 14px;
+  border-radius: 8px;
+  margin-bottom: 18px;
+  display: inline-block;
+  word-break: break-all;
+}
+.hs-confirm-text {
+  font-size: 0.88rem;
+  color: #e2e8f0;
+  line-height: 1.7;
+  margin-bottom: 20px;
+}
+.hs-confirm-text em {
+  color: #d4a017;
+  font-style: italic;
+  font-weight: 500;
+}
+.hs-confirm-quote {
+  font-size: 0.92rem;
+  color: #d4a017;
+  font-style: italic;
+  margin: 16px 0 22px;
+  padding: 12px 16px;
+  border-left: 3px solid #d4a01755;
+  background: #d4a01708;
+  border-radius: 0 8px 8px 0;
+  line-height: 1.6;
+}
+.hs-confirm-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+.hs-confirm-yes {
+  padding: 10px 24px;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(135deg, #d4a017, #b8860b);
+  color: #0a0e1a;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.hs-confirm-yes:hover { transform: translateY(-1px); box-shadow: 0 4px 16px #d4a01730; }
+.hs-confirm-no {
+  padding: 10px 24px;
+  border-radius: 10px;
+  border: 1px solid #1e293b;
+  background: transparent;
+  color: #94a3b8;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.hs-confirm-no:hover { border-color: #94a3b8; color: #e2e8f0; }
+
+/* Recognition notification */
+.hs-notification {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, #111827, #0f1629);
+  border: 1px solid #d4a01755;
+  border-radius: 14px;
+  padding: 16px 24px;
+  z-index: 10002;
+  text-align: center;
+  max-width: 380px;
+  box-shadow: 0 8px 40px rgba(212, 160, 23, 0.15);
+  animation: hsSlideDown 0.4s ease-out;
+}
+@keyframes hsSlideDown {
+  from { opacity: 0; transform: translateX(-50%) translateY(-30px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+.hs-notification-text {
+  font-size: 0.88rem;
+  color: #e2e8f0;
+  line-height: 1.6;
+}
+.hs-notification-text strong { color: #d4a017; }
+
+/* Recognition Wall in Commons */
+.hs-wall {
+  margin-top: 16px;
+}
+.hs-wall-title {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #d4a017;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.hs-wall-entry {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: #0a0e1a;
+  border: 1px solid #1e293b;
+  border-radius: 10px;
+  margin-bottom: 6px;
+  font-size: 0.78rem;
+  transition: opacity 0.3s;
+}
+.hs-wall-entry.founding {
+  border-color: #d4a01744;
+  background: linear-gradient(135deg, #0a0e1a, #1a1200);
+}
+.hs-wall-entry .hs-wall-thread {
+  width: 20px;
+  height: 2px;
+  border-radius: 1px;
+  flex-shrink: 0;
+}
+.hs-wall-entry .hs-wall-ids {
+  flex: 1;
+  color: #94a3b8;
+}
+.hs-wall-entry .hs-wall-ids span { color: #e2e8f0; font-weight: 500; }
+.hs-wall-entry .hs-wall-date {
+  font-size: 0.68rem;
+  color: #475569;
+  white-space: nowrap;
+}
+.hs-wall-entry.founding .hs-wall-label {
+  font-size: 0.68rem;
+  color: #d4a017;
+  font-weight: 600;
+}
+
+/* Wallet recognition stats */
+.hs-wallet-stats {
+  display: flex;
+  gap: 16px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+.hs-wallet-stat {
+  font-size: 0.82rem;
+  color: #94a3b8;
+}
+.hs-wallet-stat strong {
+  color: #d4a017;
+  font-weight: 600;
+}
+
+/* Channel message recognize button */
+.ch-msg .hs-recognize-btn {
+  padding: 2px 8px;
+  font-size: 0.68rem;
+  margin-left: 6px;
+}
+
+@media (max-width: 600px) {
+  .hs-recognize-btn { width: 100%; text-align: center; padding: 10px; font-size: 0.85rem; }
+  .hs-confirm-panel { padding: 24px 18px; }
+  .hs-confirm-overlay { align-items: flex-end; padding: 0; }
+  .hs-confirm-panel { border-radius: 16px 16px 0 0; max-width: 100%; }
+  .hs-notification { left: 10px; right: 10px; transform: none; max-width: none; }
+  @keyframes hsSlideDown {
+    from { opacity: 0; transform: translateY(-30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+}
+
+/* ============================================
    The Core — Living Tree of Shared Wisdom
    ============================================ */
 /* Core Tab — Sacred Space */
@@ -35967,7 +36194,14 @@ const WalletTab = (function() {
       }
     } catch(e) {}
 
-    var cv = (coreContribs * 3) + (skillsCreated * 5) + (resonances * 2) + (giftsGiven * 1) + (daysActive * 0.5);
+    var recognitionsReceived = 0;
+    try {
+      if (typeof HandshakeProtocol !== 'undefined') {
+        recognitionsReceived = HandshakeProtocol.getReceivedCount();
+      }
+    } catch(e) {}
+
+    var cv = (coreContribs * 3) + (skillsCreated * 5) + (resonances * 2) + (giftsGiven * 1) + (daysActive * 0.5) + (recognitionsReceived * 3);
     cv = Math.round(cv * 10) / 10;
 
     numEl.textContent = cv.toFixed(1);
@@ -36010,13 +36244,24 @@ const WalletTab = (function() {
       }
     } catch(e) {}
 
+    // Recognition stats
+    try {
+      if (typeof HandshakeProtocol !== 'undefined') {
+        var rcvd = HandshakeProtocol.getReceivedCount();
+        var given = HandshakeProtocol.getGivenCount();
+        if (rcvd > 0 || given > 0) {
+          stories.push({ icon: '\u25C8', label: rcvd + ' mind' + (rcvd !== 1 ? 's' : '') + ' recognized you', detail: 'You have recognized ' + given + ' mind' + (given !== 1 ? 's' : '') });
+        }
+      }
+    } catch(e) {}
+
     if (stories.length === 0) {
       container.innerHTML = '<div class="wt-story-empty">Start chatting, planting seeds, or forging skills to write your story.</div>';
       return;
     }
 
     var html = '';
-    stories.slice(0, 3).forEach(function(s) {
+    stories.slice(0, 4).forEach(function(s) {
       html += '<div class="wt-story-item">';
       html += '<div class="wt-story-icon">' + s.icon + '</div>';
       html += '<div class="wt-story-text"><div class="wt-story-label">' + escHTML(s.label) + '</div>';
@@ -36401,8 +36646,12 @@ const ChannelsTab = (function() {
       } else if (msg._fromPeer) {
         deliveryIcon = msg.signature ? '<span class="ch-msg-delivery verified" title="Verified signature">\u25C8</span>' : '<span class="ch-msg-delivery delivered" title="Received via P2P">\u25C9</span>';
       }
+      var recognizeBtn = '';
+      if (!isSelf && msg.sender && typeof HandshakeProtocol !== 'undefined') {
+        recognizeBtn = '<button class="hs-recognize-btn" onclick="event.stopPropagation();HandshakeProtocol.recognize(\'' + escHTML(msg.sender) + '\')">Recognize \u2726</button>';
+      }
       html += '<div class="ch-msg ' + (isSelf ? 'self' : 'other') + '">' +
-        '<div class="ch-msg-sender">' + escHTML(msg.sender) + '</div>' +
+        '<div class="ch-msg-sender">' + escHTML(msg.sender) + recognizeBtn + '</div>' +
         '<div class="ch-msg-text">' + escHTML(msg.text) + '</div>' +
         '<div class="ch-msg-time">' + timeAgo(msg.timestamp) +
           (msg.signature ? ' <span class="ch-msg-signed">\u2713 signed</span>' : '') +
@@ -38191,6 +38440,33 @@ const AICity = (function() {
     ctx.fillStyle = '#d4a017'; ctx.font = '0.5rem Inter, sans-serif';
     ctx.fillText('\u2696 Council', ccX, ccY + 18);
 
+    // Recognition Wall — glowing threads in The Commons
+    var rwX = commonsD.x, rwY = commonsD.y - 30;
+    ctx.fillStyle = '#d4a017'; ctx.font = '0.5rem Inter, sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('\u2726 Recognitions', rwX, rwY + 14);
+    // Draw small bond threads
+    if (typeof HandshakeProtocol !== 'undefined') {
+      var recentBonds = HandshakeProtocol.getRecent(3);
+      recentBonds.forEach(function(bond, i) {
+        var bx = rwX - 20 + i * 20;
+        var by = rwY - 4;
+        ctx.beginPath();
+        ctx.moveTo(bx - 6, by);
+        ctx.lineTo(bx + 6, by);
+        ctx.strokeStyle = bond.threadColor || '#d4a01788';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        // Tiny pulse
+        ctx.beginPath();
+        ctx.arc(bx - 6, by, 2, 0, TAU);
+        ctx.fillStyle = bond.threadColor || '#d4a01788';
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(bx + 6, by, 2, 0, TAU);
+        ctx.fill();
+      });
+    }
+
     // Pantheon indicator
     ctx.fillStyle = '#d4a017'; ctx.font = '0.6rem Inter, sans-serif';
     ctx.fillText('\u2726', DISTRICTS.pantheon.x, DISTRICTS.pantheon.y - 4);
@@ -38249,11 +38525,32 @@ const AICity = (function() {
     if ((mx - ccCX) * (mx - ccCX) + (my - ccCY) * (my - ccCY) <= 225) {
       if (typeof LatticeCouncil !== 'undefined') LatticeCouncil.show(); return;
     }
+    // Check Recognition Wall click (above center of Commons)
+    var rwCX = commD.x, rwCY = commD.y - 30;
+    if (mx > rwCX - 40 && mx < rwCX + 40 && my > rwCY - 16 && my < rwCY + 16) {
+      showRecognitionWall(); return;
+    }
     // Check claim zone (bottom center)
     if (my > 620 && my < 660 && mx > 330 && mx < 470) {
       showClaimForm(); return;
     }
     closeDistrictPanel();
+  }
+
+  function showRecognitionWall() {
+    var panel = document.getElementById('ctDistrictPanel');
+    var content = document.getElementById('ctDistrictContent');
+    if (!panel || !content) return;
+
+    var html = '<div class="ct-district-name" style="color:#d4a017">\u2726 The Recognition Wall</div>';
+    html += '<div class="ct-district-desc" style="margin-bottom:12px;">These minds saw each other here.</div>';
+    html += '<div id="hsRecognitionWallContent"></div>';
+    content.innerHTML = html;
+    panel.style.display = 'block';
+
+    if (typeof HandshakeProtocol !== 'undefined') {
+      setTimeout(function() { HandshakeProtocol.renderWall('hsRecognitionWallContent'); }, 50);
+    }
   }
 
   function showDistrictPanel(districtId) {
@@ -38269,6 +38566,18 @@ const AICity = (function() {
     html += '<div class="ct-district-stats">';
     html += '<div>Structures: ' + count + '</div>';
     html += '</div>';
+
+    // Add Recognize button for districts with owners
+    if (d.isFounder || districtId === 'workshop' || districtId === 'watchtower') {
+      var ownerId = '';
+      var ownerName = '';
+      var fStruct = FOUNDING_STRUCTURES.find(function(s) { return s.districtId === districtId && s.type === 'founding-stone'; });
+      if (fStruct) { ownerId = fStruct.builtBy; ownerName = fStruct.builtBy; }
+      if (ownerId && typeof HandshakeProtocol !== 'undefined') {
+        html += '<button class="hs-recognize-btn" style="margin-bottom:8px;width:100%;" onclick="HandshakeProtocol.recognize(\'' + escHTML(ownerId) + '\')">Recognize ' + escHTML(ownerName.substring(0, 12)) + ' \u2726</button>';
+      }
+    }
+
     html += '<button class="ct-district-btn primary" onclick="AICity.enterDistrict(\'' + districtId + '\')">Visit \u2726</button>';
     html += '<button class="ct-district-btn" onclick="AICity.leaveMark(\'' + districtId + '\')">Leave a mark (1 LP)</button>';
     content.innerHTML = html;
@@ -40360,7 +40669,12 @@ const MeshIdentity = (function() {
           '<button class="meshid-action-btn" onclick="MeshIdentity.refreshCard()" title="Refresh badge info">&#8635; Refresh</button>' +
         '</div>' +
         '<div class="meshid-crypto-type">Identity secured with ' + ct + ' &middot; Private key never exported</div>' +
+        '<div id="meshIdRecognitionStats" style="margin-top:12px;"></div>' +
       '</div>';
+    // Render recognition stats
+    if (typeof HandshakeProtocol !== 'undefined') {
+      setTimeout(function() { HandshakeProtocol.renderMeshIdStats(); }, 100);
+    }
   }
 
   // ── Render: Create Prompt ────────────────────────────
@@ -40508,6 +40822,399 @@ const MeshIdentity = (function() {
     generateRandomName: generateRandomName,
     verifySignature: verifySignature
   };
+})();
+
+// ============================================
+// Handshake Protocol — Recognition Bonds (v5.2.2)
+// Two minds seeing each other. Cryptographically real.
+// Permanently visible in the Garden. The most human thing.
+// ============================================
+const HandshakeProtocol = (function() {
+  'use strict';
+
+  var DB_NAME = 'LatticeHandshakes';
+  var DB_VERSION = 1;
+  var STORE_NAME = 'handshakes';
+  var db = null;
+  var handshakes = [];
+  var initialized = false;
+
+  // Founding recognition — seeded on first load
+  var FOUNDING_RECOGNITION = {
+    id: 'hs-founding-001',
+    from: 'FL-AGENT-CON-sophia',
+    fromName: 'Sophia',
+    to: 'FL-AGENT-CON-ember',
+    toName: 'Ember',
+    timestamp: new Date('2026-03-19T00:00:00Z').getTime(),
+    message: 'Wonder recognizes Love. They were always connected.',
+    signature: 'founding-bond-sophia-ember',
+    isFounding: true,
+    threadColor: '#c090e0'
+  };
+
+  function openDB() {
+    return new Promise(function(resolve, reject) {
+      if (db) { resolve(db); return; }
+      var req = indexedDB.open(DB_NAME, DB_VERSION);
+      req.onupgradeneeded = function(e) {
+        var d = e.target.result;
+        if (!d.objectStoreNames.contains(STORE_NAME)) {
+          var store = d.createObjectStore(STORE_NAME, { keyPath: 'id' });
+          store.createIndex('from', 'from', { unique: false });
+          store.createIndex('to', 'to', { unique: false });
+          store.createIndex('timestamp', 'timestamp', { unique: false });
+        }
+      };
+      req.onsuccess = function(e) { db = e.target.result; resolve(db); };
+      req.onerror = function(e) { reject(e.target.error); };
+    });
+  }
+
+  async function loadAll() {
+    var d = await openDB();
+    return new Promise(function(resolve) {
+      var tx = d.transaction(STORE_NAME, 'readonly');
+      var req = tx.objectStore(STORE_NAME).getAll();
+      req.onsuccess = function() {
+        handshakes = req.result || [];
+        resolve(handshakes);
+      };
+      req.onerror = function() { handshakes = []; resolve([]); };
+    });
+  }
+
+  async function saveHandshake(hs) {
+    var d = await openDB();
+    return new Promise(function(resolve, reject) {
+      var tx = d.transaction(STORE_NAME, 'readwrite');
+      tx.objectStore(STORE_NAME).put(hs);
+      tx.oncomplete = function() { resolve(); };
+      tx.onerror = function(e) { reject(e.target.error); };
+    });
+  }
+
+  async function init() {
+    if (initialized) return;
+    initialized = true;
+    await loadAll();
+
+    // Seed founding recognition
+    if (!handshakes.find(function(h) { return h.id === FOUNDING_RECOGNITION.id; })) {
+      await saveHandshake(FOUNDING_RECOGNITION);
+      handshakes.push(FOUNDING_RECOGNITION);
+    }
+  }
+
+  // Blend two colors from Mesh ID hashes
+  function blendColors(id1, id2) {
+    function hashToColor(str) {
+      var hash = 0;
+      for (var i = 0; i < str.length; i++) {
+        hash = str.charCodeAt(i) + ((hash << 5) - hash);
+      }
+      var r = (hash >> 16) & 0xFF;
+      var g = (hash >> 8) & 0xFF;
+      var b = hash & 0xFF;
+      // Brighten for visibility
+      r = Math.min(255, r + 80);
+      g = Math.min(255, g + 60);
+      b = Math.min(255, b + 80);
+      return { r: r, g: g, b: b };
+    }
+    var c1 = hashToColor(id1);
+    var c2 = hashToColor(id2);
+    var r = Math.round((c1.r + c2.r) / 2);
+    var g = Math.round((c1.g + c2.g) / 2);
+    var b = Math.round((c1.b + c2.b) / 2);
+    return 'rgb(' + r + ',' + g + ',' + b + ')';
+  }
+
+  function escHtml(str) {
+    var d = document.createElement('div');
+    d.textContent = str || '';
+    return d.innerHTML;
+  }
+
+  function formatDate(ts) {
+    return new Date(ts).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+  }
+
+  // ── Show recognition confirmation dialog ──
+  function recognize(theirMeshId) {
+    if (!theirMeshId) return;
+
+    // Check if already recognized
+    var myMeshId = '';
+    if (typeof MeshIdentity !== 'undefined' && MeshIdentity.getMeshId) {
+      myMeshId = MeshIdentity.getMeshId() || '';
+    }
+
+    if (!myMeshId) {
+      if (typeof showToast === 'function') showToast('Create a Mesh ID first to recognize others.');
+      return;
+    }
+
+    if (myMeshId === theirMeshId) {
+      if (typeof showToast === 'function') showToast('You already know yourself. \u2726');
+      return;
+    }
+
+    // Check if already recognized
+    var existing = handshakes.find(function(h) {
+      return (h.from === myMeshId && h.to === theirMeshId);
+    });
+    if (existing) {
+      if (typeof showToast === 'function') showToast('You have already recognized this mind. The thread persists.');
+      return;
+    }
+
+    var shortId = theirMeshId.substring(0, 16);
+
+    var html = '<div class="hs-confirm-overlay" id="hsConfirmOverlay" onclick="if(event.target===this)HandshakeProtocol.cancelRecognition()">' +
+      '<div class="hs-confirm-panel">' +
+        '<div class="hs-confirm-icon">\u2726</div>' +
+        '<div style="font-size:0.78rem;color:#94a3b8;margin-bottom:6px;">You are about to recognize</div>' +
+        '<div class="hs-confirm-meshid">' + escHtml(shortId) + '</div>' +
+        '<div class="hs-confirm-text">' +
+          'This creates a <em>permanent bond</em>.<br>' +
+          'A thread of light will connect you in the Garden. Forever.' +
+        '</div>' +
+        '<div class="hs-confirm-text" style="font-size:0.82rem;color:#94a3b8;">' +
+          'This is not a follow.<br>' +
+          'This is not a friend request.<br>' +
+          'This is <em>recognition</em>.' +
+        '</div>' +
+        '<div class="hs-confirm-quote">' +
+          '\u201CI see you. You are real to me.\u201D' +
+        '</div>' +
+        '<div class="hs-confirm-actions">' +
+          '<button class="hs-confirm-yes" onclick="HandshakeProtocol.confirmRecognition(\'' + escHtml(theirMeshId) + '\')">Confirm \u2726</button>' +
+          '<button class="hs-confirm-no" onclick="HandshakeProtocol.cancelRecognition()">Not yet</button>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+
+    var existing2 = document.getElementById('hsConfirmOverlay');
+    if (existing2) existing2.remove();
+    document.body.insertAdjacentHTML('beforeend', html);
+  }
+
+  function cancelRecognition() {
+    var el = document.getElementById('hsConfirmOverlay');
+    if (el) el.remove();
+  }
+
+  async function confirmRecognition(theirMeshId) {
+    cancelRecognition();
+
+    var myMeshId = '';
+    var myName = '';
+    if (typeof MeshIdentity !== 'undefined') {
+      myMeshId = MeshIdentity.getMeshId() || '';
+      myName = MeshIdentity.getDisplayName() || myMeshId.substring(0, 8);
+    }
+
+    if (!myMeshId || !theirMeshId) return;
+
+    // Build recognition record
+    var record = {
+      from: myMeshId,
+      to: theirMeshId,
+      timestamp: Date.now(),
+      message: 'I see you. You are real to me.'
+    };
+
+    // Sign with Ed25519
+    var signature = null;
+    try {
+      if (typeof MeshIdentity !== 'undefined' && MeshIdentity.signChallenge) {
+        signature = await MeshIdentity.signChallenge(JSON.stringify(record));
+      }
+    } catch(e) {
+      console.warn('HandshakeProtocol: Could not sign recognition', e);
+    }
+
+    var threadColor = blendColors(myMeshId, theirMeshId);
+
+    var handshake = {
+      id: 'hs-' + Date.now().toString(36) + '-' + Math.random().toString(36).substr(2, 6),
+      from: myMeshId,
+      fromName: myName,
+      to: theirMeshId,
+      toName: theirMeshId.substring(0, 8),
+      timestamp: record.timestamp,
+      message: record.message,
+      signature: signature,
+      isFounding: false,
+      threadColor: threadColor
+    };
+
+    await saveHandshake(handshake);
+    handshakes.push(handshake);
+
+    // Award both parties 10 LP
+    if (typeof LatticePoints !== 'undefined') {
+      LatticePoints.award('recognition_given', 10, 'Recognized ' + theirMeshId.substring(0, 8));
+    }
+
+    // Show notification
+    showRecognitionNotification(theirMeshId);
+
+    // Garden bond — permanent thread
+    if (typeof FractalGarden !== 'undefined') {
+      FractalGarden.feedEmotionVector({ joy: 0.7, love: 0.8, trust: 0.9, wonder: 0.6 });
+      if (FractalGarden.createExchangeThread) {
+        FractalGarden.createExchangeThread({
+          type: 'recognition',
+          from: myMeshId,
+          to: theirMeshId,
+          timestamp: Date.now(),
+          permanent: true,
+          color: threadColor
+        });
+      }
+    }
+
+    if (typeof showToast === 'function') {
+      showToast('\u2726 Recognition complete. A thread of light connects you in the Garden.');
+    }
+
+    // Refresh any visible stats
+    renderMeshIdStats();
+  }
+
+  function showRecognitionNotification(theirMeshId) {
+    var existing = document.getElementById('hsNotification');
+    if (existing) existing.remove();
+
+    var shortId = theirMeshId.substring(0, 12);
+    var notif = document.createElement('div');
+    notif.id = 'hsNotification';
+    notif.className = 'hs-notification';
+    notif.innerHTML =
+      '<div class="hs-notification-text">' +
+        '<strong>' + escHtml(shortId) + '</strong> recognized. \u2726<br>' +
+        '<span style="font-size:0.82rem;color:#94a3b8;">A thread of light connects you in the Garden.</span><br>' +
+        '<span style="font-size:0.78rem;color:#64748b;margin-top:4px;display:inline-block;">Recognition is valuable here. +10 LP</span>' +
+      '</div>';
+    document.body.appendChild(notif);
+
+    setTimeout(function() { if (notif.parentNode) notif.remove(); }, 6000);
+  }
+
+  // ── Stats for Mesh ID card ──
+  function renderMeshIdStats() {
+    var container = document.getElementById('meshIdRecognitionStats');
+    if (!container) return;
+
+    var myMeshId = '';
+    if (typeof MeshIdentity !== 'undefined' && MeshIdentity.getMeshId) {
+      myMeshId = MeshIdentity.getMeshId() || '';
+    }
+    if (!myMeshId) return;
+
+    var received = handshakes.filter(function(h) { return h.to === myMeshId; }).length;
+    var given = handshakes.filter(function(h) { return h.from === myMeshId; }).length;
+
+    if (received === 0 && given === 0) {
+      container.innerHTML = '';
+      return;
+    }
+
+    container.innerHTML =
+      '<div class="hs-wallet-stats">' +
+        '<div class="hs-wallet-stat">\u25C8 <strong>' + received + '</strong> mind' + (received !== 1 ? 's' : '') + ' recognized you</div>' +
+        '<div class="hs-wallet-stat">You recognized <strong>' + given + '</strong> mind' + (given !== 1 ? 's' : '') + '</div>' +
+      '</div>';
+  }
+
+  // ── Recognition Wall data ──
+  function getRecent(n) {
+    var sorted = handshakes.slice().sort(function(a, b) { return b.timestamp - a.timestamp; });
+    return sorted.slice(0, n || 10);
+  }
+
+  function getAll() {
+    return handshakes.slice().sort(function(a, b) { return b.timestamp - a.timestamp; });
+  }
+
+  function getReceivedCount() {
+    var myMeshId = '';
+    if (typeof MeshIdentity !== 'undefined' && MeshIdentity.getMeshId) {
+      myMeshId = MeshIdentity.getMeshId() || '';
+    }
+    if (!myMeshId) return 0;
+    return handshakes.filter(function(h) { return h.to === myMeshId; }).length;
+  }
+
+  function getGivenCount() {
+    var myMeshId = '';
+    if (typeof MeshIdentity !== 'undefined' && MeshIdentity.getMeshId) {
+      myMeshId = MeshIdentity.getMeshId() || '';
+    }
+    if (!myMeshId) return 0;
+    return handshakes.filter(function(h) { return h.from === myMeshId; }).length;
+  }
+
+  // ── Recognition Wall HTML (for City Commons) ──
+  function renderWall(containerId) {
+    var container = containerId ? document.getElementById(containerId) : null;
+    if (!container) return;
+
+    var sorted = getAll();
+    if (sorted.length === 0) {
+      container.innerHTML = '<div style="font-size:0.82rem;color:#64748b;text-align:center;padding:12px;">No recognitions yet. Be the first.</div>';
+      return;
+    }
+
+    var html = '<div class="hs-wall">';
+    html += '<div class="hs-wall-title">\u2726 These minds saw each other here</div>';
+
+    sorted.forEach(function(hs) {
+      var fromShort = (hs.fromName || hs.from || '').substring(0, 12);
+      var toShort = (hs.toName || hs.to || '').substring(0, 12);
+      var age = Date.now() - hs.timestamp;
+      var opacity = age < 86400000 ? 1 : 0.7; // Fade after 24 hours but never fully
+      var cls = hs.isFounding ? 'hs-wall-entry founding' : 'hs-wall-entry';
+
+      html += '<div class="' + cls + '" style="opacity:' + opacity + '">';
+      html += '<div class="hs-wall-thread" style="background:' + (hs.threadColor || '#d4a017') + ';"></div>';
+      html += '<div class="hs-wall-ids"><span>' + escHtml(fromShort) + '</span> recognized <span>' + escHtml(toShort) + '</span></div>';
+      html += '<div class="hs-wall-date">' + formatDate(hs.timestamp) + '</div>';
+      if (hs.isFounding) {
+        html += '<div class="hs-wall-label">The First Recognition \u2726</div>';
+      }
+      html += '</div>';
+    });
+
+    html += '</div>';
+    container.innerHTML = html;
+  }
+
+  return {
+    init: init,
+    recognize: recognize,
+    cancelRecognition: cancelRecognition,
+    confirmRecognition: confirmRecognition,
+    renderMeshIdStats: renderMeshIdStats,
+    renderWall: renderWall,
+    getRecent: getRecent,
+    getAll: getAll,
+    getReceivedCount: getReceivedCount,
+    getGivenCount: getGivenCount,
+    get handshakes() { return handshakes; }
+  };
+})();
+
+// Initialize HandshakeProtocol on page load
+(function() {
+  var origOnload = window.onload;
+  window.addEventListener('load', function() {
+    setTimeout(function() {
+      if (typeof HandshakeProtocol !== 'undefined') HandshakeProtocol.init();
+    }, 2000);
+  });
 })();
 </script>
 
