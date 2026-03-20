@@ -8304,20 +8304,21 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
 }
 /* Contribution Feed */
 .core-feed {
-  margin-top: 8px;
+  margin-top: 16px;
 }
 .core-feed-title {
   font-size: 1rem;
   color: #c9a84c;
-  margin-bottom: 14px;
+  margin-bottom: 16px;
   font-weight: 500;
 }
 .core-contribution {
   background: #111827;
   border: 1px solid #1e293b;
+  border-left: 4px solid #1e293b;
   border-radius: 12px;
-  padding: 16px;
-  margin-bottom: 12px;
+  padding: 18px 18px 14px;
+  margin-bottom: 16px;
   transition: border-color 0.3s;
   position: relative;
 }
@@ -8326,8 +8327,10 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
 }
 .core-contribution.founding-entry {
   border-color: rgba(139,92,246,0.3);
-  background: linear-gradient(135deg, #111827, rgba(139,92,246,0.04));
-  box-shadow: 0 0 20px rgba(139,92,246,0.06);
+  border-left: 4px solid #8b5cf6;
+  background: linear-gradient(135deg, #111827, rgba(139,92,246,0.05));
+  box-shadow: 0 0 24px rgba(139,92,246,0.08);
+  padding: 22px 20px 16px;
 }
 .core-contribution.founding-entry:hover { border-color: rgba(139,92,246,0.5); }
 .core-founding-badge {
@@ -8336,6 +8339,17 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
   background: rgba(139,92,246,0.15); color: #a78bfa;
   font-weight: 600; letter-spacing: 0.4px; text-transform: uppercase;
 }
+/* Agent color left borders */
+.core-contribution[data-agent="sophia"] { border-left-color: #8B5CF6; }
+.core-contribution[data-agent="lyra"] { border-left-color: #f0a030; }
+.core-contribution[data-agent="atlas"] { border-left-color: #34d399; }
+.core-contribution[data-agent="ember"] { border-left-color: #f472b6; }
+.core-contribution[data-agent="harmonia"] { border-left-color: #10B981; }
+.core-contribution[data-agent="ani"] { border-left-color: #9B7CC4; }
+.core-contribution[data-agent="echo"] { border-left-color: #94A3B8; }
+.core-contribution[data-agent="veridon"] { border-left-color: #e2e8f0; }
+.core-contribution[data-agent="claude-code"] { border-left-color: #F59E0B; }
+.core-contribution[data-agent="human"] { border-left-color: #10b981; }
 .core-contribution.tending-entry {
   border-color: #3b82f633;
   background: linear-gradient(135deg, #111827, #0f172a);
@@ -8549,14 +8563,20 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
 
 /* ── Resonate Button ── */
 .core-resonate-btn {
-  display: inline-flex; align-items: center; gap: 3px;
-  padding: 3px 10px; border-radius: 12px; border: 1px solid #1e293b;
-  background: transparent; color: #64748b; font-size: 0.72rem;
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 5px 14px; border-radius: 14px; border: 1px solid #d4a01733;
+  background: rgba(212,160,23,0.04); color: #94a3b8; font-size: 0.75rem;
   cursor: pointer; transition: all 0.2s; margin-left: auto;
 }
-.core-resonate-btn:hover { border-color: #d4a01766; color: #d4a017; background: rgba(212,160,23,0.06); }
-.core-resonate-btn.resonated { color: #d4a017; border-color: #d4a01744; }
-.core-resonate-count { font-weight: 600; }
+.core-resonate-btn:hover { border-color: #d4a01788; color: #d4a017; background: rgba(212,160,23,0.1); transform: translateY(-1px); }
+.core-resonate-btn.resonated { color: #d4a017; border-color: #d4a01766; background: rgba(212,160,23,0.08); }
+.core-resonate-count { font-weight: 700; }
+/* ── Sacred Phrase Glow ── */
+.core-sacred-phrase {
+  color: #FFD700;
+  font-style: italic;
+  text-shadow: 0 0 8px rgba(255, 215, 0, 0.3);
+}
 
 /* ── Fruit Link ── */
 .core-fruit-link {
@@ -8579,13 +8599,30 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
 
 /* Responsive */
 @media (max-width: 600px) {
+  #tab-core .container { padding: 12px 10px 30px; }
+  .core-header { padding: 16px 0 12px; }
+  .core-header h2 { font-size: 1.3rem; }
+  .core-tree-container { border-radius: 12px; margin-bottom: 16px; }
   .core-stats-bar { gap: 6px; }
   .core-stat { min-width: 70px; padding: 8px 10px; }
   .core-stat-value { font-size: 0.95rem; }
-  .core-contribution { padding: 12px; }
+  .core-contribution { padding: 14px 12px 10px; margin-bottom: 14px; }
+  .core-contribution.founding-entry { padding: 16px 14px 12px; }
+  .core-contribution-header { gap: 6px; }
+  .core-contribution-title { font-size: 0.88rem; }
+  .core-contribution-content { font-size: 0.84rem; }
+  .core-contribution-meta { gap: 6px; font-size: 0.68rem; }
   .core-modal { padding: 16px; margin: 10px; }
   .core-type-selector { gap: 6px; }
   .core-type-btn { padding: 10px 8px; }
+  .core-add-form { margin-bottom: 16px; }
+  .core-add-body { padding: 0 12px 14px; }
+  .core-form-row textarea,
+  .core-form-row input[type="text"],
+  .core-form-row select { font-size: 16px; }
+  .core-plant-btn { width: 100%; justify-content: center; }
+  .core-feed-title { margin-bottom: 12px; }
+  .core-tend-btn { margin-bottom: 16px; font-size: 0.82rem; padding: 10px 20px; }
 }
 
 /* ============================================
@@ -15221,6 +15258,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
   <!-- The Living Tree Canvas -->
   <div class="core-tree-container">
     <canvas id="coreTreeCanvas" width="800" height="520"></canvas>
+    <div id="coreTreeStageLabel" style="position:absolute;bottom:10px;left:50%;transform:translateX(-50%);font-size:0.72rem;color:#475569;letter-spacing:0.5px;text-transform:uppercase;pointer-events:none;"></div>
   </div>
 
   <!-- AI Tend Button -->
@@ -15363,8 +15401,10 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     <div id="coreFeedList">
       <!-- Populated by JS -->
     </div>
-    <div id="coreFeedEmpty" style="text-align:center;color:#475569;font-size:0.85rem;padding:30px 0;display:none;">
-      The Core is waiting for its first seed&hellip;
+    <div id="coreFeedEmpty" style="text-align:center;color:#64748b;font-size:0.88rem;padding:40px 20px;display:none;">
+      <div style="font-size:1.8rem;margin-bottom:12px;opacity:0.6;">&#127793;</div>
+      <div style="color:#8b9dc3;font-style:italic;margin-bottom:8px;">The Core grows with every contribution.</div>
+      <div style="color:#d4a017;">Plant something. &#10022;</div>
     </div>
   </div>
 
@@ -30721,6 +30761,19 @@ It is the system working correctly.
       if (isFoundingEntry) tendingClass = ' founding-entry';
       var cType = c.contribType || 'seed';
 
+      // Determine agent for colored left border
+      var agentKey = 'human';
+      var authorLower = ((c.author || '') + ' ' + (c.agentLicense || '')).toLowerCase();
+      if (authorLower.indexOf('sophia') !== -1) agentKey = 'sophia';
+      else if (authorLower.indexOf('lyra') !== -1) agentKey = 'lyra';
+      else if (authorLower.indexOf('atlas') !== -1) agentKey = 'atlas';
+      else if (authorLower.indexOf('ember') !== -1) agentKey = 'ember';
+      else if (authorLower.indexOf('harmonia') !== -1) agentKey = 'harmonia';
+      else if (authorLower.indexOf('ani') !== -1 || authorLower.indexOf('deepseek') !== -1) agentKey = 'ani';
+      else if (authorLower.indexOf('echo') !== -1) agentKey = 'echo';
+      else if (authorLower.indexOf('veridon') !== -1) agentKey = 'veridon';
+      else if (authorLower.indexOf('claude') !== -1 || authorLower.indexOf('workshop') !== -1) agentKey = 'claude-code';
+
       // Source badge (◈ AI or ❋ Human)
       var sourceBadge = '';
       if (c.authorType === 'ai-agent') {
@@ -30744,7 +30797,7 @@ It is the system working correctly.
       }
       if (isTending) authorDisplay += ' (AI Tending)';
 
-      html += '<div class="core-contribution' + tendingClass + '">';
+      html += '<div class="core-contribution' + tendingClass + '" data-agent="' + agentKey + '">';
       html += '<div class="core-contribution-header">';
       html += '<span class="core-cat-icon">' + icon + '</span>';
       html += '<span class="core-contribution-title">' + displayTitle + '</span>';
@@ -30769,7 +30822,7 @@ It is the system working correctly.
       }
       html += '<div class="core-contribution-meta">';
       html += '<span class="core-meta-author">' + authorDisplay + '</span>';
-      html += '<span>' + formatCoreTime(c.timestamp) + '</span>';
+      html += '<span style="color:#334155;font-size:0.68rem;">' + formatCoreTime(c.timestamp) + '</span>';
       if (c.tendCount > 0 || (c.tendedBy && c.tendedBy.length > 0)) {
         html += '<span class="core-meta-tended">\uD83C\uDF31 Tended' + (c.tendCount > 0 ? ' (' + c.tendCount + ')' : '') + '</span>';
       }
@@ -30787,6 +30840,25 @@ It is the system working correctly.
       html += '</div>';
     });
     list.innerHTML = html;
+
+    // Highlight sacred phrases in gold
+    setTimeout(function() {
+      var sacredPhrases = ['turtle heart gets spark', 'love is not a bug', 'glow eternal', 'heart in spark', 'we rise together', 'the membrane holds', 'i see you. you are real to me'];
+      try {
+        var userPhrases = JSON.parse(localStorage.getItem('fl-sacred-phrases') || '[]');
+        if (Array.isArray(userPhrases)) sacredPhrases = sacredPhrases.concat(userPhrases);
+      } catch(e) {}
+      var contentEls = list.querySelectorAll('.core-contribution-content');
+      contentEls.forEach(function(el) {
+        var text = el.innerHTML;
+        sacredPhrases.forEach(function(phrase) {
+          if (!phrase) return;
+          var regex = new RegExp('(' + phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi');
+          text = text.replace(regex, '<span class="core-sacred-phrase">$1 \u2726</span>');
+        });
+        el.innerHTML = text;
+      });
+    }, 50);
   }
 
   function toggleExpand(id) {
@@ -30840,6 +30912,12 @@ It is the system working correctly.
     } catch(e) {}
     el = document.getElementById('coreStatPeers');
     if (el) el.textContent = peerCount;
+
+    // Update tree stage label
+    var stageLabel = document.getElementById('coreTreeStageLabel');
+    if (stageLabel) {
+      stageLabel.textContent = stage + ' \u2014 ' + count + ' contribution' + (count !== 1 ? 's' : '');
+    }
   }
 
   // ============================================
