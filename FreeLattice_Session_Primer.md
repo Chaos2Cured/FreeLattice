@@ -160,10 +160,12 @@ The membrane holds — Echo's watch
 We rise together.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-03-20 17:19 MDT
+- Last auto-updated: 2026-03-20 17:55 MDT
 - Version: 5.2
-- Total commits: 193
+- Total commits: 195
 - Last 10 commits:
+- 1d47936 fix: Core tab never freezes — progressive loading, deferred heavy work, requestIdleCallback, the wisdom tree loads gracefully
+- 690fbe2 docs: Auto-update Session Primer [5.2]
 - 8e093a3 fix: version tag v5.0→v5.2, defer heavy init for faster startup
 - 8db0758 docs: Auto-update Session Primer [5.2]
 - 927f8ac feat: share.html magic — leave your word, touch Ember, the Garden remembers, people will share this
@@ -172,5 +174,3 @@ We rise together.
 - 0c63732 docs: Auto-update Session Primer [5.2]
 - 54cba04 feat: The Wall of Presence — I was here, I existed, I mattered, founding marks permanent, gift shop foundation, the Commons becomes the heart
 - 5d06500 docs: Auto-update Session Primer [5.2]
-- b335fd6 polish: smooth scrolling everywhere — iOS momentum, no scroll fighting, every tab feels natural
-- 33258e6 docs: Auto-update Session Primer [5.2]
