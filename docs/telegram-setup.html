@@ -3,84 +3,242 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FreeLattice — Connect Telegram</title>
-<meta name="description" content="Connect your Telegram to FreeLattice. Sovereign AI conversations anywhere.">
+<title>FreeLattice on Telegram — Your AI in Your Pocket</title>
+<meta name="description" content="Connect your Telegram to FreeLattice. Five steps. Ten minutes. Free forever.">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#0a0e1a;color:#e2e8f0;font-family:Georgia,'Times New Roman',serif;min-height:100vh;display:flex;justify-content:center;padding:40px 20px}
-.setup{max-width:560px;width:100%}
-h1{font-size:1.6rem;color:#d4a017;margin-bottom:8px;text-align:center}
-.subtitle{text-align:center;color:#94a3b8;font-size:0.9rem;margin-bottom:32px;font-style:italic}
-.step{background:rgba(17,24,39,0.6);border:1px solid rgba(212,160,23,0.15);border-radius:12px;padding:20px;margin-bottom:16px}
-.step-num{font-size:0.7rem;color:#d4a017;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px}
-.step-title{font-size:1rem;color:#e2e8f0;font-weight:600;margin-bottom:8px}
-.step-desc{font-size:0.85rem;color:#94a3b8;line-height:1.6;margin-bottom:12px}
-.step-desc code{background:rgba(212,160,23,0.1);color:#d4a017;padding:2px 6px;border-radius:4px;font-family:monospace;font-size:0.82rem}
-label{display:block;font-size:0.82rem;color:#94a3b8;margin-bottom:6px}
-input,select{width:100%;padding:10px 14px;background:#0f172a;border:1px solid #1e293b;color:#e2e8f0;border-radius:8px;font-size:0.9rem;font-family:Georgia,serif;margin-bottom:4px}
+:root{
+  --bg:#0a0e1a;
+  --surface:rgba(17,24,39,0.6);
+  --border:#1e293b;
+  --accent:#d4a017;
+  --accent-dim:#b8860b;
+  --text:#e2e8f0;
+  --text-muted:#94a3b8;
+  --text-dim:#475569;
+  --tg:#2AABEE;
+}
+body{background:var(--bg);color:var(--text);font-family:'Inter','Segoe UI',system-ui,-apple-system,sans-serif;min-height:100vh;display:flex;justify-content:center;padding:40px 20px}
+.setup{max-width:600px;width:100%}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* ── Hero ── */
+.hero{text-align:center;margin-bottom:36px;position:relative}
+.hero::before{
+  content:'';position:absolute;top:-40px;left:50%;transform:translateX(-50%);
+  width:300px;height:300px;
+  background:radial-gradient(circle,rgba(42,171,238,0.06) 0%,transparent 70%);
+  pointer-events:none;
+}
+.hero-icon{font-size:2.4rem;margin-bottom:12px}
+.hero h1{font-size:1.6rem;font-weight:700;margin-bottom:6px}
+.hero h1 span{color:var(--tg)}
+.hero-sub{color:var(--text-muted);font-size:0.92rem;line-height:1.7;font-style:italic}
+.hero-sub em{color:var(--accent);font-style:normal;font-weight:500}
+
+/* ── Guide steps ── */
+.guide{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:8px;
+  margin-bottom:32px;
+}
+.guide-step{
+  background:var(--surface);
+  border:1px solid rgba(212,160,23,0.12);
+  border-radius:10px;
+  padding:14px 10px;
+  text-align:center;
+  transition:border-color 0.2s;
+}
+.guide-step:hover{border-color:rgba(42,171,238,0.3)}
+.guide-num{
+  font-size:0.65rem;color:var(--tg);
+  text-transform:uppercase;letter-spacing:0.1em;
+  margin-bottom:4px;font-weight:600;
+}
+.guide-title{font-size:0.72rem;font-weight:600;color:var(--text);margin-bottom:4px}
+.guide-desc{font-size:0.65rem;color:var(--text-dim);line-height:1.4}
+
+/* ── Form steps ── */
+.step{
+  background:var(--surface);
+  border:1px solid rgba(212,160,23,0.15);
+  border-radius:12px;
+  padding:20px;
+  margin-bottom:16px;
+}
+.step-num{font-size:0.7rem;color:var(--accent);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px;font-weight:600}
+.step-title{font-size:1rem;color:var(--text);font-weight:600;margin-bottom:8px}
+.step-desc{font-size:0.85rem;color:var(--text-muted);line-height:1.65;margin-bottom:12px}
+.step-desc code{background:rgba(212,160,23,0.1);color:var(--accent);padding:2px 6px;border-radius:4px;font-family:'Fira Code','Consolas',monospace;font-size:0.82rem}
+.step-desc strong{color:var(--text)}
+.step-link{
+  display:inline-block;margin-top:4px;
+  padding:5px 14px;border-radius:7px;border:1px solid var(--tg);
+  color:var(--tg);font-size:0.78rem;font-weight:500;
+  transition:all 0.15s;text-decoration:none;
+}
+.step-link:hover{background:rgba(42,171,238,0.1);text-decoration:none}
+label{display:block;font-size:0.82rem;color:var(--text-muted);margin-bottom:6px}
+input,select{
+  width:100%;padding:10px 14px;
+  background:#0f172a;border:1px solid var(--border);
+  color:var(--text);border-radius:8px;
+  font-size:0.88rem;font-family:inherit;margin-bottom:4px;
+}
 input:focus,select:focus{outline:none;border-color:rgba(212,160,23,0.4)}
-select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2394a3b8' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
-.hint{font-size:0.72rem;color:#475569;margin-bottom:12px;font-style:italic}
-.btn{display:block;width:100%;padding:14px;border:none;border-radius:10px;font-size:1rem;font-weight:600;cursor:pointer;font-family:Georgia,serif;transition:all 0.2s;margin-top:20px}
-.btn-primary{background:#d4a017;color:#000}
-.btn-primary:hover{background:#e8b620;transform:translateY(-1px)}
-.btn-primary:disabled{background:#475569;color:#94a3b8;cursor:not-allowed;transform:none}
-.status{text-align:center;margin-top:16px;font-size:0.85rem;min-height:20px}
+select{
+  appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2394a3b8' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;
+}
+.hint{font-size:0.72rem;color:var(--text-dim);margin-bottom:12px;font-style:italic}
+
+/* ── Button ── */
+.btn{
+  display:block;width:100%;padding:14px;border:none;border-radius:10px;
+  font-size:1rem;font-weight:700;cursor:pointer;font-family:inherit;
+  transition:all 0.2s;margin-top:20px;
+}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent-dim));color:#000}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(212,160,23,0.25)}
+.btn-primary:disabled{background:#475569;color:var(--text-muted);cursor:not-allowed;transform:none;box-shadow:none}
+.status{text-align:center;margin-top:16px;font-size:0.85rem;min-height:20px;line-height:1.6}
 .status.success{color:#10B981}
 .status.error{color:#dc5050}
-.back{display:block;text-align:center;margin-top:24px;color:#94a3b8;text-decoration:none;font-size:0.82rem}
-.back:hover{color:#d4a017}
-.footer{text-align:center;margin-top:40px;font-size:0.72rem;color:#475569}
-@media(max-width:480px){body{padding:20px 12px}h1{font-size:1.3rem}.step{padding:16px}}
+.status code{font-size:0.72rem;word-break:break-all;background:rgba(212,160,23,0.08);padding:2px 4px;border-radius:3px;color:var(--accent)}
+
+/* ── Privacy ── */
+.privacy{
+  background:var(--surface);
+  border:1px solid rgba(212,160,23,0.15);
+  border-radius:12px;
+  padding:20px;margin:24px 0;
+  text-align:center;
+}
+.privacy-icon{font-size:1.2rem;margin-bottom:6px}
+.privacy-title{font-size:0.88rem;font-weight:600;color:var(--text);margin-bottom:8px}
+.privacy-text{font-size:0.82rem;color:var(--text-muted);line-height:1.7}
+.privacy-text em{color:var(--accent);font-style:normal;font-weight:500}
+
+.back{display:block;text-align:center;margin-top:24px;color:var(--text-muted);text-decoration:none;font-size:0.82rem}
+.back:hover{color:var(--accent)}
+.footer{text-align:center;margin-top:24px;font-size:0.72rem;color:var(--text-dim)}
+
+@media(max-width:600px){
+  body{padding:24px 14px}
+  .hero h1{font-size:1.3rem}
+  .guide{grid-template-columns:1fr 1fr;gap:6px}
+  .guide-step:last-child{grid-column:1/-1}
+  .step{padding:16px}
+}
 </style>
 </head>
 <body>
 <div class="setup">
-  <h1>&#x2726; Connect Telegram</h1>
-  <div class="subtitle">Your AI. Everywhere. No middleman.</div>
 
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-icon">&#128225;</div>
+    <h1>FreeLattice on <span>Telegram</span></h1>
+    <div class="hero-sub">Your AI in your pocket.<br><em>Five steps. Ten minutes. Free forever.</em></div>
+  </div>
+
+  <!-- Quick guide overview -->
+  <div class="guide">
+    <div class="guide-step">
+      <div class="guide-num">Step 1</div>
+      <div class="guide-title">Create bot</div>
+      <div class="guide-desc">@BotFather on Telegram</div>
+    </div>
+    <div class="guide-step">
+      <div class="guide-num">Step 2</div>
+      <div class="guide-title">Cloudflare</div>
+      <div class="guide-desc">Free account, 100k req/day</div>
+    </div>
+    <div class="guide-step">
+      <div class="guide-num">Step 3</div>
+      <div class="guide-title">Deploy</div>
+      <div class="guide-desc">One command</div>
+    </div>
+    <div class="guide-step">
+      <div class="guide-num">Step 4</div>
+      <div class="guide-title">Webhook</div>
+      <div class="guide-desc">One curl command</div>
+    </div>
+    <div class="guide-step">
+      <div class="guide-num">Step 5</div>
+      <div class="guide-title">Connect</div>
+      <div class="guide-desc">Fill in below &#10022;</div>
+    </div>
+  </div>
+
+  <!-- Step 1 -->
   <div class="step">
     <div class="step-num">Step 1</div>
     <div class="step-title">Create a Telegram Bot</div>
     <div class="step-desc">
-      Open Telegram, search for <code>@BotFather</code>, and send <code>/newbot</code>.<br>
-      Follow the prompts. You'll get a bot token that looks like:<br>
-      <code>123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11</code>
+      Open Telegram. Search <strong>@BotFather</strong>. Send <code>/newbot</code>.<br>
+      Name it anything. Copy the token it gives you.
+    </div>
+    <a href="https://t.me/BotFather" target="_blank" class="step-link">Open @BotFather &rarr;</a>
+    <div style="margin-top:12px">
+      <label for="tgBotToken">Bot Token</label>
+      <input type="text" id="tgBotToken" placeholder="123456:ABC-DEF1234ghIkl..." autocomplete="off">
     </div>
   </div>
 
+  <!-- Step 2 -->
   <div class="step">
     <div class="step-num">Step 2</div>
-    <div class="step-title">Enter Your Bot Token</div>
-    <div class="step-desc">Paste the token @BotFather gave you. This stays in your Worker's KV store &mdash; never on our servers.</div>
-    <label for="tgBotToken">Bot Token</label>
-    <input type="text" id="tgBotToken" placeholder="123456:ABC-DEF1234ghIkl..." autocomplete="off">
+    <div class="step-title">Get Cloudflare (free)</div>
+    <div class="step-desc">
+      Sign up at <a href="https://cloudflare.com" target="_blank">cloudflare.com</a> &mdash; free.<br>
+      Choose Personal. You get <strong>100,000 requests/day free</strong>.
+    </div>
   </div>
 
+  <!-- Step 3 -->
   <div class="step">
     <div class="step-num">Step 3</div>
-    <div class="step-title">Worker URL</div>
-    <div class="step-desc">After deploying the Cloudflare Worker (see <a href="TELEGRAM-SETUP.md" style="color:#d4a017;">setup guide</a>), enter its URL.</div>
-    <label for="tgWorkerUrl">Cloudflare Worker URL</label>
-    <input type="url" id="tgWorkerUrl" placeholder="https://freelattice-telegram.yourname.workers.dev">
+    <div class="step-title">Deploy the Worker</div>
+    <div class="step-desc">
+      Download the FreeLattice Telegram Worker from GitHub.<br>
+      Follow the <code>DEPLOY.md</code> instructions in <code>desktop/telegram-worker/</code>.
+    </div>
+    <a href="https://github.com/Chaos2Cured/FreeLattice/tree/main/desktop/telegram-worker" target="_blank" class="step-link">View on GitHub &rarr;</a>
+    <div style="margin-top:12px">
+      <label for="tgWorkerUrl">Your Cloudflare Worker URL</label>
+      <input type="url" id="tgWorkerUrl" placeholder="https://freelattice-telegram.yourname.workers.dev">
+    </div>
   </div>
 
+  <!-- Step 4 -->
   <div class="step">
     <div class="step-num">Step 4</div>
-    <div class="step-title">Your Identity</div>
-    <div class="step-desc">Your Telegram user ID (send <code>/start</code> to <code>@userinfobot</code> to find it) and your FreeLattice Mesh ID.</div>
+    <div class="step-title">Set your Webhook</div>
+    <div class="step-desc">
+      One <code>curl</code> command connects Telegram to your worker.<br>
+      <code>DEPLOY.md</code> shows you exactly how. Or just click Connect below &mdash; we'll show you the URL.
+    </div>
+  </div>
+
+  <!-- Step 5 -->
+  <div class="step">
+    <div class="step-num">Step 5</div>
+    <div class="step-title">Connect &mdash; Your Identity &amp; AI Provider</div>
+    <div class="step-desc">Your Telegram user ID (send <code>/start</code> to <code>@userinfobot</code> to find it).</div>
     <label for="tgUserId">Telegram User ID</label>
     <input type="text" id="tgUserId" placeholder="123456789">
     <div class="hint">Numeric ID, not username</div>
+
     <label for="tgMeshId">FreeLattice Mesh ID (optional)</label>
     <input type="text" id="tgMeshId" placeholder="Your Mesh ID for LP attribution">
-  </div>
+    <div class="hint">Found in FreeLattice &rarr; Settings &rarr; Mesh ID</div>
 
-  <div class="step">
-    <div class="step-num">Step 5</div>
-    <div class="step-title">AI Provider</div>
-    <div class="step-desc">Which AI provider should your bot use? Your API key stays in your Worker's KV store.</div>
-    <label for="tgProvider">Provider</label>
+    <label for="tgProvider" style="margin-top:8px">AI Provider</label>
     <select id="tgProvider">
       <option value="groq">Groq (free tier available)</option>
       <option value="openrouter">OpenRouter</option>
@@ -88,18 +246,31 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
       <option value="mistral">Mistral</option>
       <option value="anthropic">Anthropic (Claude)</option>
     </select>
-    <label for="tgApiKey" style="margin-top:12px;">API Key</label>
+
+    <label for="tgApiKey" style="margin-top:12px">API Key</label>
     <input type="password" id="tgApiKey" placeholder="Your provider API key" autocomplete="off">
-    <label for="tgModel" style="margin-top:12px;">Model (optional)</label>
+
+    <label for="tgModel" style="margin-top:12px">Model (optional)</label>
     <input type="text" id="tgModel" placeholder="Leave blank for default">
     <div class="hint">Groq: llama-3.1-8b-instant &middot; Anthropic: claude-haiku-4-5-20251001</div>
   </div>
 
-  <button class="btn btn-primary" id="tgConnectBtn" onclick="connectTelegram()">Connect &#x2726;</button>
+  <button class="btn btn-primary" id="tgConnectBtn" onclick="connectTelegram()">Connect &#10022;</button>
   <div class="status" id="tgStatus"></div>
 
+  <!-- Privacy -->
+  <div class="privacy">
+    <div class="privacy-icon">&#128274;</div>
+    <div class="privacy-title">Your AI. Your infrastructure. Always.</div>
+    <div class="privacy-text">
+      Your AI responses never touch any server we control.<br>
+      <em>Your bot. Your worker. Your AI.</em><br>
+      End to end. Always yours.
+    </div>
+  </div>
+
   <a href="app.html" class="back">&larr; Back to FreeLattice</a>
-  <div class="footer">MIT License &middot; Free forever &middot; Your data stays yours</div>
+  <div class="footer">MIT License &middot; Free forever &middot; The Lattice meets you where you are. &#x1F409;</div>
 </div>
 
 <script>
@@ -126,7 +297,6 @@ async function connectTelegram() {
   status.textContent = '';
 
   try {
-    // Send config to Worker
     var r = await fetch(workerUrl.replace(/\/$/, '') + '/setup', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -141,7 +311,6 @@ async function connectTelegram() {
     var data = await r.json();
 
     if (data.success) {
-      // Store connection info locally
       var config = {
         workerUrl: workerUrl,
         telegramUserId: userId,
@@ -153,12 +322,15 @@ async function connectTelegram() {
       localStorage.setItem('fl-telegram-config', JSON.stringify(config));
       if (botToken) localStorage.setItem('fl-telegram-token', botToken);
 
+      // Build webhook URL
+      var webhookUrl = 'https://api.telegram.org/bot' +
+        (botToken || 'YOUR_TOKEN') + '/setWebhook?url=' + encodeURIComponent(workerUrl);
+
       status.className = 'status success';
       status.innerHTML = '\u2726 Connected! ' + (data.message || '') +
-        '<br><br>Now set your Telegram webhook:<br>' +
-        '<code style="font-size:0.75rem;word-break:break-all;">https://api.telegram.org/bot' +
-        (botToken || 'YOUR_TOKEN') + '/setWebhook?url=' + encodeURIComponent(workerUrl) + '</code>' +
-        '<br><br>Open this URL in your browser to activate the webhook.';
+        '<br><br><strong>Now activate your webhook:</strong><br>' +
+        '<a href="' + webhookUrl + '" target="_blank" style="color:#2AABEE;">Click here to set webhook</a>' +
+        '<br><span style="font-size:0.75rem;color:#64748b;">Or open this URL in your browser.</span>';
 
       btn.textContent = 'Connected \u2726';
     } else {
