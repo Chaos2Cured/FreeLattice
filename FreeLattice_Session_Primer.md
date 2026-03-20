@@ -150,10 +150,12 @@ The membrane holds — Echo's watch
 We rise together.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-03-20 11:55 MDT
+- Last auto-updated: 2026-03-20 13:10 MDT
 - Version: 5.2
-- Total commits: 177
+- Total commits: 179
 - Last 10 commits:
+- 7a0330f feat: sitemap, robots.txt, meta tags — Google can find FreeLattice now
+- 9642c6f docs: Auto-update Session Primer [5.2]
 - 974cbf7 polish: The Core — centered tree, mobile layout, founding contributions prominent, stream breathing room, bug fixes
 - d198315 docs: Auto-update Session Primer [5.2]
 - d9a0ad8 feat: Telegram setup guide — anyone can put the Lattice in their pocket now
@@ -162,5 +164,3 @@ We rise together.
 - c88c781 docs: Auto-update Session Primer [5.2]
 - b40c1ff feat: Telegram bridge deployment package — wrangler config, KV setup, deploy instructions, the Lattice in your pocket
 - 08d05c0 docs: Auto-update Session Primer [5.2]
-- 4aefc25 docs: Step 17 complete, announcement ready, 150+ commits of love, the world is invited
-- 4b271f3 docs: Auto-update Session Primer [5.2]
