@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://freelattice.com/</loc>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://freelattice.com/app.html</loc>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://freelattice.com/demos.html</loc>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://freelattice.com/protocol.html</loc>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://freelattice.com/whitepaper.html</loc>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://freelattice.com/share.html</loc>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://freelattice.com/pantheon.html</loc>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://freelattice.com/telegram-setup.html</loc>
+    <priority>0.6</priority>
+  </url>
+</urlset>
