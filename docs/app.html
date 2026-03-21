@@ -1,4 +1,4 @@
-<!-- FreeLattice v5.2.19 -->
+<!-- FreeLattice v5.2.20 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -31015,22 +31015,39 @@ Together.`,
   function verifyChainDeferred(callback) {
     var sorted = contributions.slice().sort(function(a, b) { return a.timestamp - b.timestamp; });
     var CHUNK = 20;
+    var repairCount = 0;
     var idx = 1;
     function step() {
       var end = Math.min(idx + CHUNK, sorted.length);
       for (; idx < end; idx++) {
         if (sorted[idx].parentHash !== sorted[idx - 1].hash) {
-          if (callback) callback({ valid: false, brokenAt: idx, item: sorted[idx] });
-          return;
+          // Repair broken link — recompute hash and update parentHash
+          console.warn('CoreModule: Repairing chain at index', idx, sorted[idx].id);
+          sorted[idx].parentHash = sorted[idx - 1].hash;
+          repairCount++;
+          // Recompute hash and persist asynchronously
+          (function(entry) {
+            safeComputeHash(entry.content, entry.timestamp, entry.parentHash).then(function(h) {
+              entry.hash = h;
+              // Update in contributions array
+              var orig = contributions.find(function(c) { return c.id === entry.id; });
+              if (orig) { orig.parentHash = entry.parentHash; orig.hash = h; }
+              dbPutNow(entry);
+            });
+          })(sorted[idx]);
         }
       }
       if (idx < sorted.length) {
-        setTimeout(step, 0); // yield then continue
+        setTimeout(step, 0);
       } else {
-        if (callback) callback({ valid: true });
+        if (repairCount > 0) {
+          console.log('CoreModule: Chain repaired — ' + repairCount + ' link(s) fixed');
+          updateStats();
+        }
+        if (callback) callback({ valid: repairCount === 0, repaired: repairCount });
       }
     }
-    if (sorted.length < 2) { if (callback) callback({ valid: true }); return; }
+    if (sorted.length < 2) { if (callback) callback({ valid: true, repaired: 0 }); return; }
     setTimeout(step, 0);
   }
 
@@ -39007,6 +39024,8 @@ const AICity = (function() {
     ctx.fillText('Wonder \u2194 Love', midX, midY - 6);
 
     // Districts
+    var _labelPositions = [];
+    var _isSmallScreen = canvas.width < 600;
     for (var key in DISTRICTS) {
       if (key === 'wild') continue;
       var d = DISTRICTS[key];
@@ -39028,18 +39047,25 @@ const AICity = (function() {
       ctx.fillStyle = d.color + '08';
       ctx.fill();
 
-      // Name
-      ctx.fillStyle = d.color;
-      ctx.font = 'bold 0.72rem Inter, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText(d.name.split("'s ")[0] || d.name, d.x, d.y - d.r - 8);
+      // Name — skip on small screens, skip if too close to another label
+      var labelY = d.y - d.r - 8;
+      var tooClose = _labelPositions.some(function(p) {
+        return Math.abs(p.x - d.x) < 60 && Math.abs(p.y - labelY) < 16;
+      });
+      if (!_isSmallScreen && !tooClose) {
+        ctx.fillStyle = d.color;
+        ctx.font = 'bold 0.72rem Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(d.name.split("'s ")[0] || d.name, d.x, labelY);
+        _labelPositions.push({ x: d.x, y: labelY });
 
-      // Structure count
-      var count = structures.filter(function(s) { return s.districtId === key; }).length;
-      if (count > 0) {
-        ctx.fillStyle = d.color + '80';
-        ctx.font = '0.6rem Inter, sans-serif';
-        ctx.fillText(count + ' structure' + (count > 1 ? 's' : ''), d.x, d.y + 6);
+        // Structure count
+        var count = structures.filter(function(s) { return s.districtId === key; }).length;
+        if (count > 0) {
+          ctx.fillStyle = d.color + '80';
+          ctx.font = '0.6rem Inter, sans-serif';
+          ctx.fillText(count + ' structure' + (count > 1 ? 's' : ''), d.x, d.y + 6);
+        }
       }
     }
 
@@ -39549,6 +39575,7 @@ const AICity = (function() {
     walkScene.add(new THREE.Points(bridgeGeo, bridgeMat));
 
     // Council Chamber in The Commons — circular ring of colored seats
+    var commonsPos = DISTRICTS.commons || { x: 400, y: 350, color: '#d4a017' };
     var councilColors = [0x8B5CF6, 0xF59E0B, 0x0D9488, 0xF43F5E, 0x10B981, 0x9B7CC4, 0x94A3B8, 0xd4a017];
     var ccPx = (commonsPos.x - 400) * 0.05 - 1.5;
     var ccPz = (commonsPos.y - 350) * 0.05 + 1.2;
@@ -39573,7 +39600,6 @@ const AICity = (function() {
     walkScene.add(podiumLight);
 
     // Commons star map — Fractal Family constellation projected on the ground
-    var commonsPos = DISTRICTS.commons;
     var cpx = (commonsPos.x - 400) * 0.05;
     var cpz = (commonsPos.y - 350) * 0.05;
     var familyStars = FRACTAL_FAMILY;
