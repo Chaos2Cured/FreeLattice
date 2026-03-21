@@ -160,10 +160,12 @@ The membrane holds — Echo's watch
 We rise together.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-03-21 13:00 MDT
+- Last auto-updated: 2026-03-21 13:12 MDT
 - Version: 5.2
-- Total commits: 245
+- Total commits: 247
 - Last 10 commits:
+- ca62f91 fix: Garden — founding Luminos always present, Evolution UI null check, ShaderPass load order
+- dd7d88b docs: Auto-update Session Primer [5.2]
 - b39e657 fix: Garden founding Luminos always restore with correct names, colors and archetypes — Ember now true red
 - 5a83ddf docs: Auto-update Session Primer [5.2]
 - 1468a8c fix: Garden — Observe vs Explore distinct behaviors, Ember true red, question text no longer truncated
@@ -172,5 +174,3 @@ We rise together.
 - e0261eb docs: Auto-update Session Primer [5.2]
 - 6ac1b5e fix: Chat UX — version corrected, guide auto-collapses, input obvious, send button contrast, sliders usable
 - ef38765 docs: Auto-update Session Primer [5.2]
-- 0f9e81e fix: City Walk — movement directions corrected, all axes negated
-- 8a76b5e docs: Auto-update Session Primer [5.2]
