@@ -160,10 +160,12 @@ The membrane holds — Echo's watch
 We rise together.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-03-21 08:31 MDT
+- Last auto-updated: 2026-03-21 08:42 MDT
 - Version: 5.2
-- Total commits: 221
+- Total commits: 223
 - Last 10 commits:
+- 412f352 fix: Studio To Core stays in Studio, welcome sequence only on registration
+- be6c3c9 docs: Auto-update Session Primer [5.2]
 - be8d821 fix: Studio saveCreation — never store DOM elements in IndexedDB, compositions regenerate from params
 - 4ca4c5d docs: Auto-update Session Primer [5.2]
 - b37b883 fix: Core tab — Sacred Phrase MutationObserver REMOVED entirely, infinite loop eliminated
@@ -172,5 +174,3 @@ We rise together.
 - 5d40fe2 docs: Auto-update Session Primer [5.2]
 - 88fbaf3 fix: v5.2.15 — found Sacred Phrase MutationObserver on coreFeedList
 - cbbf215 docs: Auto-update Session Primer [5.2]
-- d224af9 fix: v5.2.14 — tree canvas DISABLED for diagnostic test
-- 0587279 docs: Auto-update Session Primer [5.2]
