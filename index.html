@@ -1,4 +1,4 @@
-<!-- FreeLattice v5.2.23 -->
+<!-- FreeLattice v5.2.24 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1713,26 +1713,23 @@ header .mantra {
 
 .chat-input-row textarea::placeholder { color: var(--text-muted); }
 
-.chat-input-row button:not(.mic-btn) {
+#sendBtn {
   background: var(--accent);
   color: var(--bg-primary);
   border: none;
-  padding: 14px 22px;
-  font-size: 0.9rem;
-  font-weight: 600;
+  padding: 14px 24px;
+  font-size: 0.92rem;
+  font-weight: 700;
   cursor: pointer;
   transition: var(--transition);
   letter-spacing: 0.02em;
+  min-height: 44px;
+  min-width: 44px;
+  border-radius: 0;
 }
-
-.chat-input-row button:not(.mic-btn):hover { background: var(--accent-hover); transform: scale(1.02); }
-
-.chat-input-row button:not(.mic-btn):active { transform: scale(0.98); }
-
-.chat-input-row button:not(.mic-btn):disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
+#sendBtn:hover { background: var(--accent-hover); transform: scale(1.02); }
+#sendBtn:active { transform: scale(0.98); }
+#sendBtn:disabled { opacity: 0.5; cursor: not-allowed; }
 
 /* ---- Status Bar ---- */
 .status-bar {
@@ -2566,7 +2563,7 @@ footer .license {
 
 /* ---- Image Generation Button ---- */
 .img-gen-btn {
-  background: var(--bg-tertiary);
+  background: transparent;
   color: var(--text-muted);
   border: none;
   padding: 14px 14px;
@@ -2578,7 +2575,9 @@ footer .license {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  opacity: 0.6;
 }
+.img-gen-btn:hover { opacity: 1; }
 
 .img-gen-btn:hover {
   color: var(--accent);
@@ -2704,7 +2703,8 @@ footer .license {
   margin-top: 6px;
 }
 
-.voice-rate-row input[type="range"] {
+.voice-rate-row input[type="range"],
+input[type="range"] {
   flex: 1;
   -webkit-appearance: none;
   appearance: none;
@@ -2716,21 +2716,23 @@ footer .license {
   cursor: pointer;
 }
 
-.voice-rate-row input[type="range"]::-webkit-slider-thumb {
+.voice-rate-row input[type="range"]::-webkit-slider-thumb,
+input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 18px;
-  height: 18px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   background: var(--accent);
   cursor: pointer;
   border: 2px solid var(--bg-primary);
-  box-shadow: 0 0 4px rgba(201, 168, 76, 0.3);
+  box-shadow: 0 0 6px rgba(201, 168, 76, 0.3);
 }
 
-.voice-rate-row input[type="range"]::-moz-range-thumb {
-  width: 18px;
-  height: 18px;
+.voice-rate-row input[type="range"]::-moz-range-thumb,
+input[type="range"]::-moz-range-thumb {
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   background: var(--accent);
   cursor: pointer;
@@ -13920,7 +13922,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
         <div class="chat-container">
           <div class="chat-messages" id="chatMessages">
             <div class="chat-message system">
-              Welcome to FreeLattice v4.4. Configure your model and provider above, then start chatting. Connect to peers in the Mesh tab to share knowledge.
+              Welcome to FreeLattice v5.2. Configure your model and provider above, then start chatting. Connect to peers in the Mesh tab to share knowledge.
             </div>
           </div>
           <div class="status-bar">
@@ -13942,7 +13944,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
           <div class="context-overload-banner" id="contextOverloadBanner" onclick="resetContext()">&#9888; Context full. Tap to clear files and continue chatting.</div>
           <div class="context-budget-tip" id="contextBudgetTip">Tip: Clear some context files or switch to Smart/Minimal mode to reduce token usage.</div>
           <div class="chat-input-row">
-            <textarea id="chatInput" placeholder="Type your message..." rows="1" onkeydown="handleChatKeydown(event)"></textarea>
+            <textarea id="chatInput" placeholder="Ask anything..." rows="1" onkeydown="handleChatKeydown(event)"></textarea>
             <div class="model-switcher-wrap" id="modelSwitcherWrap">
               <button class="model-switcher-btn" id="modelSwitcherBtn" onclick="ModelSwitcher.toggle()" title="Switch AI model">
                 <span class="ms-dot"></span>
@@ -13961,7 +13963,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
             <button class="img-gen-btn" id="imgGenBtn" onclick="handleImageGenClick()" title="Generate image (/imagine)">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
             </button>
-            <button id="sendBtn" onclick="sendMessage()">Send</button>
+            <button id="sendBtn" onclick="sendMessage()">Send &#10022;</button>
           </div>
           <div class="chat-disclaimer">AI can make mistakes. Verify important information.</div>
         </div>
@@ -14026,7 +14028,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
           <p><strong>Memory Integrity</strong> — Exported memory files now include a φ-hash integrity signature. When importing, FreeLattice verifies the hash and warns you if the file has been tampered with.</p>
           <p><strong>AI Disclaimers</strong> — Clear notices that AI responses may contain errors, encouraging users to verify important information.</p>
 
-          <h4>What's New in v4.4?</h4>
+          <h4>What's New in v5.2?</h4>
           <p><strong>Ollama Proxy Server</strong> — The built-in server (server.js / server.py) now includes an Ollama proxy that eliminates CORS issues entirely. Run FreeLattice locally and connect to Ollama with zero configuration.</p>
           <p><strong>Smart Connection Detection</strong> — FreeLattice automatically detects the best way to connect to Ollama: proxy first, then direct. No more manual CORS configuration needed when running locally.</p>
           <p><strong>Improved Ollama Setup</strong> — Better error messages, guided troubleshooting, and one-click model selection. The CORS help modal now recommends self-hosting as the primary fix.</p>
@@ -18900,7 +18902,7 @@ async function switchToConversation(convId) {
   if (messages.length === 0) {
     const div = document.createElement('div');
     div.className = 'chat-message system';
-    div.textContent = 'Welcome to FreeLattice v4.4. Configure your model and provider above, then start chatting. Connect to peers in the Mesh tab to share knowledge and query their AI agents.';
+    div.textContent = 'Welcome to FreeLattice v5.2. Configure your model and provider above, then start chatting. Connect to peers in the Mesh tab to share knowledge and query their AI agents.';
     container.appendChild(div);
   } else {
     const sysDiv = document.createElement('div');
@@ -19800,7 +19802,7 @@ async function pushGhChanges() {
       } catch(e) {}
 
       const body = {
-        message: 'Update ' + change.path + ' via FreeLattice v4.4',
+        message: 'Update ' + change.path + ' via FreeLattice v5.2',
         content: btoa(unescape(encodeURIComponent(change.content))),
         branch: state.ghBranch
       };
@@ -21210,6 +21212,21 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Initialize First-Run Wizard (v3.4)
   wizardInit();
 
+  // Cycling chat placeholder
+  (function() {
+    var phrases = ['Ask anything...', 'What are you curious about?', 'Say something...', 'What\'s on your mind?', 'Type a question...'];
+    var ci = 0;
+    var chatIn = document.getElementById('chatInput');
+    if (chatIn) {
+      setInterval(function() {
+        if (chatIn.value === '' && document.activeElement !== chatIn) {
+          ci = (ci + 1) % phrases.length;
+          chatIn.placeholder = phrases[ci];
+        }
+      }, 4000);
+    }
+  })();
+
   // Initialize GitHub Memory Sync (v3.4)
   await loadGhSyncToken();
   loadGhSyncSettings();
@@ -22373,6 +22390,14 @@ async function sendMessage() {
   const input = document.getElementById('chatInput');
   const message = input.value.trim();
   if (!message || state.isStreaming) return;
+
+  // Collapse welcome overlay on first message — give conversation full space
+  var _wo = document.getElementById('welcomeOverlay');
+  if (_wo && _wo.style.display !== 'none') {
+    _wo.style.transition = 'opacity 0.3s ease';
+    _wo.style.opacity = '0';
+    setTimeout(function() { _wo.style.display = 'none'; }, 300);
+  }
 
   // Check for /imagine command — route to image generation
   if (message.toLowerCase().startsWith('/imagine')) {
