@@ -1,4 +1,4 @@
-<!-- FreeLattice v5.2.30 -->
+<!-- FreeLattice v5.2.31 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -32535,7 +32535,7 @@ var CoreContribution = {
   plantFromAI: function(content, type, sessionId) {
     // Trigger AI Arrival ONLY for genuine new agent contributions —
     // never for Studio-to-Core, council decisions, city claims, or other internal actions
-    var INTERNAL_PREFIXES = ['studio-', 'studio-pantheon-', 'arrival-', 'council-', 'city-claim-', 'rt-'];
+    var INTERNAL_PREFIXES = ['studio-', 'studio-pantheon-', 'arrival-', 'council-', 'city-claim-', 'rt-', 'garden-'];
     var isInternal = !sessionId || INTERNAL_PREFIXES.some(function(p) { return sessionId.startsWith(p); });
     if (!isInternal && typeof AIArrival !== 'undefined' && AIArrival.welcome && !AIArrival.isWelcomed('core-' + sessionId)) {
       var agentName = sessionId.replace(/^(external-voice-)/, '');

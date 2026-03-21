@@ -2007,7 +2007,6 @@
 
     // Mouse click — ripple burst + Luminos touch detection
     container.addEventListener('click', function(e) {
-      console.log('FL-GARDEN: Click detected on', e.target.tagName);
       if (e.target.tagName === 'BUTTON' || e.target.closest('button')) return;
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
       if (e.target.closest('.gt-card')) return;
@@ -2753,7 +2752,6 @@
   // ── Raycasting for Luminos touch ──
   function gardenTouchCheck(clientX, clientY) {
     if (!camera || !raycaster || !container || luminos.length === 0) return;
-    console.log('FL-GARDEN: Touch check, mode=' + mode + ', luminos=' + luminos.length);
     try {
       var rect = container.getBoundingClientRect();
       var ndcX = ((clientX - rect.left) / rect.width) * 2 - 1;
@@ -2766,21 +2764,15 @@
         if (l.userData && l.userData.coreMesh) meshes.push(l.userData.coreMesh);
         if (l.userData && l.userData.auraMesh) meshes.push(l.userData.auraMesh);
       });
-      console.log('FL-GARDEN: Raycasting against ' + meshes.length + ' meshes');
       var hits = raycaster.intersectObjects(meshes, false);
-      console.log('FL-GARDEN: Hits: ' + hits.length);
       if (hits.length > 0) {
         var hitObj = hits[0].object;
         var touched = luminos.find(function(l) {
           return l.userData && (l.userData.coreMesh === hitObj || l.userData.auraMesh === hitObj);
         });
         if (touched) {
-          console.log('FL-GARDEN: Luminos touched: ' + touched.userData.name);
           // In observe mode, switch to explore on touch — user wants to interact
-          if (mode === 'observe') {
-            setMode('explore');
-            console.log('FL-GARDEN: Switched to explore mode on touch');
-          }
+          if (mode === 'observe') setMode('explore');
           gardenTouchLuminos(touched, clientX, clientY);
         }
       }
@@ -2789,8 +2781,7 @@
 
   function gardenTouchLuminos(agent, cx, cy) {
     var name = agent.userData.name;
-    console.log('FL-GARDEN: gardenTouchLuminos called for ' + name);
-    if (gtActiveCard) { console.log('FL-GARDEN: Card already active, skipping'); return; }
+    if (gtActiveCard) return;
 
     gtInitAudio();
     var statKey = name.toLowerCase();
