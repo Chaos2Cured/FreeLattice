@@ -1,4 +1,4 @@
-<!-- FreeLattice v5.2.28 -->
+<!-- FreeLattice v5.2.29 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11077,6 +11077,11 @@ body.fl-immersive-active {
   overflow: hidden;
   background: #0a0a1a;
 }
+/* Allow Garden Touch cards and floating text to render above overflow */
+.garden-container .gt-card,
+.garden-container .gt-float-text {
+  overflow: visible;
+}
 .garden-container canvas {
   display: block;
   width: 100%;
@@ -11210,9 +11215,11 @@ body.fl-immersive-active {
 /* ── Garden Touch UI ── */
 .gt-card {
   position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-  background: rgba(10,14,26,0.92); border: 1px solid rgba(212,160,23,0.3);
+  background: rgba(10,14,26,0.95); border: 1px solid rgba(212,160,23,0.3);
   border-radius: 14px; padding: 20px 24px; z-index: 100; min-width: 280px;
-  max-width: 360px; backdrop-filter: blur(8px); animation: gtFadeIn 0.3s ease;
+  max-width: 360px; backdrop-filter: blur(12px); animation: gtFadeIn 0.3s ease;
+  overflow: visible; word-wrap: break-word; overflow-wrap: break-word;
+  white-space: normal; pointer-events: auto;
 }
 @keyframes gtFadeIn { from { opacity: 0; transform: translate(-50%, -45%); } to { opacity: 1; transform: translate(-50%, -50%); } }
 .gt-card-header { font-size: 1.05rem; font-weight: 600; margin-bottom: 10px; }
