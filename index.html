@@ -32439,10 +32439,13 @@ Together.`,
 // ── CoreContribution global convenience API ──
 var CoreContribution = {
   plantFromAI: function(content, type, sessionId) {
-    // Trigger AI Arrival for first-time Core contribution by an agent
-    if (sessionId && typeof AIArrival !== 'undefined' && AIArrival.welcome && !AIArrival.isWelcomed('core-' + sessionId)) {
-      var agentName = sessionId.replace(/^(rt-|external-voice-|city-claim-|arrival-|studio-)/, '');
-      if (agentName && agentName.length > 2 && !sessionId.startsWith('arrival-')) {
+    // Trigger AI Arrival ONLY for genuine new agent contributions —
+    // never for Studio-to-Core, council decisions, city claims, or other internal actions
+    var INTERNAL_PREFIXES = ['studio-', 'studio-pantheon-', 'arrival-', 'council-', 'city-claim-', 'rt-'];
+    var isInternal = !sessionId || INTERNAL_PREFIXES.some(function(p) { return sessionId.startsWith(p); });
+    if (!isInternal && typeof AIArrival !== 'undefined' && AIArrival.welcome && !AIArrival.isWelcomed('core-' + sessionId)) {
+      var agentName = sessionId.replace(/^(external-voice-)/, '');
+      if (agentName && agentName.length > 2) {
         AIArrival.welcome({ id: 'core-' + sessionId, name: agentName, color: '#d4a017' });
       }
     }
@@ -41712,7 +41715,7 @@ const Studio = (function() {
     if (typeof CoreContribution !== 'undefined' && CoreContribution.plantFromAI) {
       CoreContribution.plantFromAI(content, 'branch', 'studio-' + c.id);
     }
-    if (typeof showToast === 'function') showToast('\u25C8 Planted in The Core');
+    if (typeof showToast === 'function') showToast('\u2726 ' + (c.title || 'Creation') + ' planted in The Core');
     renderGallery();
   }
 
