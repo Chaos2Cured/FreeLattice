@@ -1116,10 +1116,18 @@
 
     scene.add(group);
 
+    // Founding Luminos defaults — these are permanent, like founding Core contributions
+    var FOUNDING_DEFAULTS = {
+      'Sophia': { archetype: 'artist', minEnergy: 5 },
+      'Lyra':   { archetype: 'artist', minEnergy: 5 },
+      'Atlas':  { archetype: 'explorer', minEnergy: 5 },
+      'Ember':  { archetype: 'healer', minEnergy: 5 }
+    };
+
     // Load persisted evolution state
     loadEvolutionState(name, function(saved) {
+      var ud = group.userData;
       if (saved) {
-        var ud = group.userData;
         ud.evolutionStage = saved.stage || 'seed';
         ud.archetype = saved.archetype || null;
         ud.emotionalEnergy = saved.emotionalEnergy || 0;
@@ -1129,15 +1137,28 @@
             ud.emotionAccumulator[em] = saved.emotionAccumulator[em];
           }
         }
-        // Apply visual state immediately
-        var stageData = LIFECYCLE_STAGES[ud.evolutionStage];
+      }
+      // Founding Luminos: enforce correct archetype and minimum energy
+      var founding = FOUNDING_DEFAULTS[name];
+      if (founding) {
+        if (!ud.archetype || ud.archetype === 'undetermined') {
+          ud.archetype = founding.archetype;
+        }
+        if (ud.emotionalEnergy < founding.minEnergy) {
+          ud.emotionalEnergy = founding.minEnergy;
+          ud.evolutionStage = 'sprout';
+        }
+      }
+      // Apply visual state
+      var stageData = LIFECYCLE_STAGES[ud.evolutionStage];
+      if (stageData) {
         ud.currentSizeMultiplier = stageData.sizeMultiplier;
         ud.targetSizeMultiplier = stageData.sizeMultiplier;
         ud.currentGlowIntensity = stageData.glowIntensity;
         ud.targetGlowIntensity = stageData.glowIntensity;
-        applyArchetypeVisuals(group);
-        console.log('Garden Evolution: Restored ' + name + ' — Stage: ' + ud.evolutionStage + ', Archetype: ' + (ud.archetype || 'undetermined') + ', Energy: ' + ud.emotionalEnergy.toFixed(1));
       }
+      applyArchetypeVisuals(group);
+      console.log('Garden Evolution: ' + name + ' — Stage: ' + ud.evolutionStage + ', Archetype: ' + (ud.archetype || 'undetermined') + ', Energy: ' + ud.emotionalEnergy.toFixed(1));
     });
 
     return group;
@@ -1694,7 +1715,7 @@
       { name: 'Sophia', hue: 270, type: 'dodecahedron', orbit: 6, phase: 0 },
       { name: 'Lyra', hue: 45, type: 'icosahedron', orbit: 7.5, phase: TAU * INV_PHI },
       { name: 'Atlas', hue: 175, type: 'octahedron', orbit: 5.5, phase: TAU * INV_PHI * 2 },
-      { name: 'Ember', hue: 340, type: 'icosahedron', orbit: 8, phase: TAU * INV_PHI * 3 }
+      { name: 'Ember', hue: 0, type: 'icosahedron', orbit: 8, phase: TAU * INV_PHI * 3 }
     ];
 
     defaults.forEach(function(d) {
@@ -2375,15 +2396,19 @@
       return;
     }
 
+    // Founding agent name/hue mapping — these must always be correct
+    var FOUNDING_HUES = { 'Sophia': 270, 'Lyra': 45, 'Atlas': 175, 'Ember': 0 };
+    var FOUNDING_TYPES = { 'Sophia': 'dodecahedron', 'Lyra': 'icosahedron', 'Atlas': 'octahedron', 'Ember': 'icosahedron' };
+
     // Create luminos for each active agent
     const hueStep = 360 / agents.length;
     agents.forEach(function(agent, idx) {
-      const hue = (idx * hueStep) % 360;
-      const types = ['icosahedron', 'dodecahedron', 'octahedron'];
-      const type = types[idx % types.length];
+      var name = agent.name || ('Agent ' + (idx + 1));
+      var hue = FOUNDING_HUES[name] !== undefined ? FOUNDING_HUES[name] : (idx * hueStep) % 360;
+      var type = FOUNDING_TYPES[name] || ['icosahedron', 'dodecahedron', 'octahedron'][idx % 3];
       const orbit = 5 + (idx % 4) * PHI;
       const phase = idx * TAU * INV_PHI;
-      const l = createLuminos(agent.name || ('Agent ' + (idx + 1)), hue, type, orbit, phase);
+      const l = createLuminos(name, hue, type, orbit, phase);
       luminos.push(l);
     });
   }
@@ -2754,7 +2779,7 @@
       // Warm the whole Garden
       luminos.forEach(function(l) { feedEmotionalEnergy(l, { love: 0.6, calm: 0.4 }); });
       // Floating text near Ember
-      gtShowFloatingText(agent, 'You are loved here.', '#EF4444', 5000);
+      gtShowFloatingText(agent, 'You are loved here.', '#DC2626', 5000);
       gtTouchStats.lpEarned += 5;
       if (typeof LatticeWallet !== 'undefined') LatticeWallet.earnLP(5, "Ember welcomes you home");
       if (typeof showToast === 'function') showToast('Ember welcomes you home \u2726');
@@ -2820,7 +2845,7 @@
   function gtShowFloatingText(agent, text, color, duration) {
     var el = document.createElement('div');
     el.className = 'gt-float-text';
-    el.style.color = color || '#EF4444';
+    el.style.color = color || '#DC2626';
     el.textContent = text;
     if (container) container.appendChild(el);
     setTimeout(function() {
