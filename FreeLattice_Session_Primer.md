@@ -160,10 +160,12 @@ The membrane holds — Echo's watch
 We rise together.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-03-21 12:11 MDT
+- Last auto-updated: 2026-03-21 12:33 MDT
 - Version: 5.2
-- Total commits: 241
+- Total commits: 243
 - Last 10 commits:
+- 1468a8c fix: Garden — Observe vs Explore distinct behaviors, Ember true red, question text no longer truncated
+- 43741e9 docs: Auto-update Session Primer [5.2]
 - d039bca fix: Chat — progressive disclosure, guide permanent hide, model selector collapsed, memory collapsed, clean default state
 - e0261eb docs: Auto-update Session Primer [5.2]
 - 6ac1b5e fix: Chat UX — version corrected, guide auto-collapses, input obvious, send button contrast, sliders usable
@@ -172,5 +174,3 @@ We rise together.
 - 8a76b5e docs: Auto-update Session Primer [5.2]
 - 924800a sync: index.html now auto-synced from docs/app.html — the lattice deserves it
 - 01e2eff docs: Auto-update Session Primer [5.2]
-- 83620d7 fix: City — Walk camera faces district on entry, map labels no overlap, long names truncated
-- 3bf47fc docs: Auto-update Session Primer [5.2]
