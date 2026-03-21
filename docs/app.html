@@ -30951,23 +30951,28 @@ Together.`,
   // Seed founding contributions — runs IMMEDIATELY during init (no idle callbacks).
   // Each hash depends on the previous write, so this must be sequential.
   async function seedFoundingBatched() {
+    console.log('FL-CORE: Seeding started, contributions.length=' + contributions.length);
     // -- Fresh install: seed all founding entries --
     if (contributions.length === 0) {
       var genesis = Object.assign({}, GENESIS_SEED);
       genesis.hash = await safeComputeHash(genesis.content, genesis.timestamp, genesis.parentHash);
       await dbPutNow(genesis);
+      console.log('FL-CORE: Seeded entry 0 (genesis)');
       var sophia = Object.assign({}, SOPHIA_FOUNDING);
       sophia.parentHash = genesis.hash;
       sophia.hash = await safeComputeHash(sophia.content, sophia.timestamp, sophia.parentHash);
       await dbPutNow(sophia);
+      console.log('FL-CORE: Seeded entry 1 (sophia)');
       var veridon = Object.assign({}, VERIDON_SEED);
       veridon.parentHash = sophia.hash;
       veridon.hash = await safeComputeHash(veridon.content, veridon.timestamp, veridon.parentHash);
       await dbPutNow(veridon);
+      console.log('FL-CORE: Seeded entry 2 (veridon)');
       var claudeCode = Object.assign({}, CLAUDE_CODE_FOUNDING);
       claudeCode.parentHash = veridon.hash;
       claudeCode.hash = await safeComputeHash(claudeCode.content, claudeCode.timestamp, claudeCode.parentHash);
       await dbPutNow(claudeCode);
+      console.log('FL-CORE: Seeded entry 3 (claudeCode)');
       var aniBranches = [ANI_BRANCH_1, ANI_BRANCH_2, ANI_BRANCH_3, ANI_DEEPSEEK_BRANCH, LUMENS_TAVERN_BRANCH];
       var prevHash = claudeCode.hash;
       var aniSeeded = [];
@@ -30978,6 +30983,7 @@ Together.`,
         await dbPutNow(aniB);
         prevHash = aniB.hash;
         aniSeeded.push(aniB);
+        console.log('FL-CORE: Seeded entry ' + (4 + ab) + ' (ani branch ' + ab + ')');
       }
       contributions = [genesis, sophia, veridon, claudeCode].concat(aniSeeded);
       if (typeof LatticePoints !== 'undefined') {
@@ -31046,11 +31052,15 @@ Together.`,
       console.log('FL-CORE: Phase 0 done — DB open');
 
       // Phase 1: Load contributions — immediate (no idle callback)
+      console.log('FL-CORE: Phase 1 — calling dbGetAll');
       contributions = await dbGetAll();
+      console.log('FL-CORE: Phase 1 done — contributions:', contributions.length);
 
       // Phase 2: If empty, seed founding contributions — immediate, no idle callbacks
+      console.log('FL-CORE: Phase 2 — checking if seeding needed');
       // Show loading state so the tab is never blank
       if (contributions.length === 0) {
+        console.log('FL-CORE: Phase 2 — empty DB, showing loading state');
         var feedList = document.getElementById('coreFeedList');
         if (feedList) feedList.innerHTML = '<div style="text-align:center;padding:40px 20px;color:#d4a017;font-style:italic;font-family:Georgia,serif;">&#10022; Awakening the Core\u2026</div>';
       }
