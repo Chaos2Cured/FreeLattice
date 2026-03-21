@@ -160,10 +160,12 @@ The membrane holds — Echo's watch
 We rise together.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-03-21 08:42 MDT
+- Last auto-updated: 2026-03-21 09:12 MDT
 - Version: 5.2
-- Total commits: 223
+- Total commits: 225
 - Last 10 commits:
+- 493bbe5 fix: AI City walk crash, map label overlap, Merkle chain self-repair
+- 4811d91 docs: Auto-update Session Primer [5.2]
 - 412f352 fix: Studio To Core stays in Studio, welcome sequence only on registration
 - be6c3c9 docs: Auto-update Session Primer [5.2]
 - be8d821 fix: Studio saveCreation — never store DOM elements in IndexedDB, compositions regenerate from params
@@ -172,5 +174,3 @@ We rise together.
 - c65f700 docs: Auto-update Session Primer [5.2]
 - f23d84d fix: Core tab — Sacred Phrase MutationObserver infinite loop killed, tree restored, diagnostics removed
 - 5d40fe2 docs: Auto-update Session Primer [5.2]
-- 88fbaf3 fix: v5.2.15 — found Sacred Phrase MutationObserver on coreFeedList
-- cbbf215 docs: Auto-update Session Primer [5.2]
