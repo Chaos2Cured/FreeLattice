@@ -1,4 +1,4 @@
-<!-- FreeLattice v5.2.11 -->
+<!-- FreeLattice v5.2.12 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -31080,18 +31080,27 @@ Together.`,
       console.log('FL-CORE: updateStats done');
 
       // Phase 4: Tree animation — defer 100ms (visual, fine to defer)
-      setTimeout(startTreeAnimation, 100);
+      console.log('FL-CORE: Scheduling deferred phases (tree 100ms, wall 500ms, merkle 1000ms)');
+      setTimeout(function() {
+        console.log('FL-CORE: Phase 4 — starting tree animation');
+        startTreeAnimation();
+        console.log('FL-CORE: Phase 4 — tree animation started');
+      }, 100);
 
       // Phase 5: Wall of Presence — defer 500ms
       setTimeout(function() {
+        console.log('FL-CORE: Phase 5 — Wall of Presence init starting');
         if (typeof WallOfPresence !== 'undefined' && WallOfPresence.init) {
           try { WallOfPresence.init(); } catch(e) { console.warn('CoreModule: WallOfPresence init deferred error', e); }
         }
+        console.log('FL-CORE: Phase 5 — Wall of Presence init done');
       }, 500);
 
       // Phase 6: Merkle chain verification — defer 1000ms, chunked
       setTimeout(function() {
+        console.log('FL-CORE: Phase 6 — starting chain verification');
         verifyChainDeferred(function(result) {
+          console.log('FL-CORE: Phase 6 — chain verification complete, valid=' + result.valid);
           if (!result.valid) {
             console.warn('CoreModule: Merkle chain broken at index', result.brokenAt, result.item);
           }
@@ -31465,13 +31474,16 @@ Together.`,
     if (_feedObserver) { _feedObserver.disconnect(); _feedObserver = null; }
 
     // Use IntersectionObserver to render deferred items as user scrolls
+    console.log('FL-CORE: renderFeed — setting up IntersectionObserver for ' + deferredItems.length + ' deferred items');
     if (deferredItems.length > 0 && typeof IntersectionObserver === 'function') {
       _feedObserver = new IntersectionObserver(function(entries) {
+        console.log('FL-CORE: IntersectionObserver fired for ' + entries.length + ' entries');
         entries.forEach(function(entry) {
           if (!entry.isIntersecting) return;
           var el = entry.target;
           var idx = parseInt(el.getAttribute('data-lazy-index'), 10);
           if (isNaN(idx) || !deferredItems[idx]) return;
+          console.log('FL-CORE: Lazy-rendering deferred item ' + idx);
           // Replace placeholder with real content
           var temp = document.createElement('div');
           temp.innerHTML = renderContributionHTML(deferredItems[idx]);
