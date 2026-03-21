@@ -1,5 +1,5 @@
 // FreeLattice Service Worker — Offline Mode
-// Cache-first for app shell, network-first for API calls
+// Cache-first for app shell, network-first for app.html and API calls
 // API calls are never cached
 
 const CACHE_NAME = 'freelattice-v5.2.23';
@@ -54,7 +54,7 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
-// Fetch: cache-first for app shell, network-only for API calls
+// Fetch: network-first for app.html, cache-first for other app shell, network-only for API calls
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
@@ -70,7 +70,26 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Cache-first strategy for app shell and same-origin resources
+  // Network-first for app.html — always get the latest version
+  if (url.pathname.endsWith('/app.html') || url.pathname.endsWith('/') || url.pathname === '') {
+    event.respondWith(
+      fetch(event.request).then((networkResponse) => {
+        if (networkResponse && networkResponse.status === 200) {
+          const responseClone = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, responseClone);
+          });
+        }
+        return networkResponse;
+      }).catch(() => {
+        // Offline fallback: serve from cache
+        return caches.match(event.request);
+      })
+    );
+    return;
+  }
+
+  // Cache-first strategy for other app shell and same-origin resources
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       if (cachedResponse) {

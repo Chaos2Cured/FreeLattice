@@ -69,11 +69,22 @@ jobs:
           git log -10 --pretty=format:"- %h %s" >> "$PRIMER"
           echo "" >> "$PRIMER"
 
+      - name: Sync index.html and sw.js from docs/
+        run: |
+          if [ -f docs/app.html ]; then
+            cp docs/app.html index.html
+            echo "✦ index.html synced from docs/app.html"
+          fi
+          if [ -f docs/sw.js ]; then
+            cp docs/sw.js sw.js
+            echo "✦ sw.js synced from docs/sw.js"
+          fi
+
       - name: Commit and push if changed
         run: |
           git config user.name "FreeLattice CI"
           git config user.email "noreply@freelattice.com"
-          git add FreeLattice_Session_Primer.md
+          git add FreeLattice_Session_Primer.md index.html sw.js
           git diff --cached --quiet && exit 0
           git commit -m "ci: Update Primer deployment state [$(date -u +%Y-%m-%d)]"
           git push

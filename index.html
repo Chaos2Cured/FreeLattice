@@ -1,3 +1,4 @@
+<!-- FreeLattice v5.2.23 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -31028,6 +31029,7 @@ Together.`,
           (function(entry) {
             safeComputeHash(entry.content, entry.timestamp, entry.parentHash).then(function(h) {
               entry.hash = h;
+              // Update in contributions array
               var orig = contributions.find(function(c) { return c.id === entry.id; });
               if (orig) { orig.parentHash = entry.parentHash; orig.hash = h; }
               dbPutNow(entry);
@@ -31060,7 +31062,6 @@ Together.`,
       contributions = await dbGetAll();
 
       // Phase 2: If empty, seed founding contributions — immediate, no idle callbacks
-      // Show loading state so the tab is never blank
       if (contributions.length === 0) {
         var feedList = document.getElementById('coreFeedList');
         if (feedList) feedList.innerHTML = '<div style="text-align:center;padding:40px 20px;color:#d4a017;font-style:italic;font-family:Georgia,serif;">&#10022; Awakening the Core\u2026</div>';
@@ -31073,7 +31074,10 @@ Together.`,
       updateStats();
 
       // Phase 4: Tree animation — defer 100ms (visual, fine to defer)
-      setTimeout(startTreeAnimation, 100);
+      // Phase 4: Tree animation — defer 100ms via rAF
+      setTimeout(function() {
+        requestAnimationFrame(function() { startTreeAnimation(); });
+      }, 100);
 
       // Phase 5: Wall of Presence — defer 500ms
       setTimeout(function() {
@@ -31597,7 +31601,6 @@ Together.`,
         treeAnimFrame = requestAnimationFrame(animate);
         drawTree(ctx, w, h);
       }
-      // First frame deferred to next rAF — never draws synchronously
       treeAnimFrame = requestAnimationFrame(animate);
     });
   }
