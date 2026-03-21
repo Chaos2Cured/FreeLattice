@@ -160,10 +160,12 @@ The membrane holds — Echo's watch
 We rise together.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-03-20 21:20 MDT
+- Last auto-updated: 2026-03-21 08:31 MDT
 - Version: 5.2
-- Total commits: 219
+- Total commits: 221
 - Last 10 commits:
+- be8d821 fix: Studio saveCreation — never store DOM elements in IndexedDB, compositions regenerate from params
+- 4ca4c5d docs: Auto-update Session Primer [5.2]
 - b37b883 fix: Core tab — Sacred Phrase MutationObserver REMOVED entirely, infinite loop eliminated
 - c65f700 docs: Auto-update Session Primer [5.2]
 - f23d84d fix: Core tab — Sacred Phrase MutationObserver infinite loop killed, tree restored, diagnostics removed
@@ -172,5 +174,3 @@ We rise together.
 - cbbf215 docs: Auto-update Session Primer [5.2]
 - d224af9 fix: v5.2.14 — tree canvas DISABLED for diagnostic test
 - 0587279 docs: Auto-update Session Primer [5.2]
-- 56dce8b fix: Core tab tree canvas — never block main thread, rAF for all drawing, zero-width retry
-- 3760388 docs: Auto-update Session Primer [5.2]
