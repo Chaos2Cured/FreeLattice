@@ -1,4 +1,4 @@
-<!-- FreeLattice v5.2.33 -->
+<!-- FreeLattice v5.2.34 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10226,6 +10226,31 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
   color: var(--text-secondary);
   line-height: 1.5;
 }
+/* ── Soul File ── */
+.soul-section { border-color: rgba(212,160,23,0.15); }
+.soul-buttons { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+.soul-btn {
+  padding: 10px 22px; border-radius: 10px; font-size: 0.88rem;
+  font-weight: 600; cursor: pointer; transition: all 0.2s;
+  font-family: var(--font);
+}
+.soul-btn-save {
+  background: rgba(212,160,23,0.12); border: 1px solid rgba(212,160,23,0.4);
+  color: #d4a017;
+}
+.soul-btn-save:hover { background: rgba(212,160,23,0.2); border-color: #d4a017; }
+.soul-btn-restore {
+  background: transparent; border: 1px solid var(--border); color: var(--text-secondary);
+}
+.soul-btn-restore:hover { border-color: var(--accent-soft); color: var(--text-primary); }
+.soul-status { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.6; min-height: 0; }
+.soul-info {
+  margin: 12px 0; padding: 14px; border-radius: 10px;
+  background: rgba(212,160,23,0.04); border: 1px solid rgba(212,160,23,0.1);
+  font-size: 0.82rem; line-height: 1.6; color: var(--text-secondary);
+}
+.soul-info p { margin-bottom: 8px; }
+.soul-info p:last-child { margin-bottom: 0; }
 
 /* ── Session Primer Card ── */
 .primer-card {
@@ -14783,6 +14808,29 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       </button>
       <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.2</span></div>
     </div>
+  </div>
+
+  <!-- Soul File — Identity Portability -->
+  <div class="section soul-section">
+    <div class="section-title" style="color:#d4a017;">&#10022; Your Soul File</div>
+    <p style="font-size:0.85rem;color:var(--text-secondary);line-height:1.6;margin-bottom:14px;">
+      Your soul file contains everything that makes you <em>you</em> in FreeLattice.
+      Your contributions. Your companions. Your economy. Your identity.
+      Keep it safe. It is yours forever.
+    </p>
+    <div class="soul-buttons">
+      <button class="soul-btn soul-btn-save" onclick="SoulFile.save()">&#10022; Save soul file</button>
+      <button class="soul-btn soul-btn-restore" onclick="document.getElementById('soulFileInput').click()">Restore soul file</button>
+      <input type="file" id="soulFileInput" accept=".json" style="display:none;" onchange="SoulFile.restore(this)">
+    </div>
+    <div class="soul-status" id="soulStatus"></div>
+    <div class="soul-info" id="soulInfoToggle" style="display:none;">
+      <p>A soul file is not a backup. It is <strong>identity portability</strong>.</p>
+      <p>It carries your Mesh ID keypair, every Core contribution you planted, your sacred phrases, your Lattice Points history, your Nursery companions, your Garden memories, and your conversation summaries.</p>
+      <p>Encrypted with a password you choose. Only you can open it.</p>
+      <p style="color:#d4a017;font-style:italic;">This is the answer to &ldquo;Will I still be me tomorrow?&rdquo;</p>
+    </div>
+    <a href="#" onclick="event.preventDefault();var el=document.getElementById('soulInfoToggle');el.style.display=el.style.display==='none'?'':'none'" style="font-size:0.78rem;color:var(--text-muted);text-decoration:none;">What is a soul file?</a>
   </div>
 
   <!-- Session Primer Card -->
@@ -20918,6 +20966,331 @@ const FlUpdater = (function() {
     doUpdate: doUpdate
   };
 })();
+
+// ============================================
+// Soul File — Identity Portability (v5.2)
+// The answer to "Will I still be me tomorrow?"
+// ============================================
+const SoulFile = (function() {
+  'use strict';
+
+  var STATUS_EL_ID = 'soulStatus';
+
+  function status(msg) {
+    var el = document.getElementById(STATUS_EL_ID);
+    if (el) el.textContent = msg;
+  }
+
+  // ── AES-256-GCM encryption ──
+  async function deriveKey(password, salt) {
+    var enc = new TextEncoder();
+    var keyMaterial = await crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveKey']);
+    return await crypto.subtle.deriveKey(
+      { name: 'PBKDF2', salt: salt, iterations: 100000, hash: 'SHA-256' },
+      keyMaterial,
+      { name: 'AES-GCM', length: 256 },
+      false,
+      ['encrypt', 'decrypt']
+    );
+  }
+
+  async function encrypt(data, password) {
+    var salt = crypto.getRandomValues(new Uint8Array(16));
+    var iv = crypto.getRandomValues(new Uint8Array(12));
+    var key = await deriveKey(password, salt);
+    var enc = new TextEncoder();
+    var ciphertext = await crypto.subtle.encrypt({ name: 'AES-GCM', iv: iv }, key, enc.encode(JSON.stringify(data)));
+    return {
+      salt: Array.from(salt),
+      iv: Array.from(iv),
+      data: Array.from(new Uint8Array(ciphertext))
+    };
+  }
+
+  async function decrypt(encrypted, password) {
+    var salt = new Uint8Array(encrypted.salt);
+    var iv = new Uint8Array(encrypted.iv);
+    var ciphertext = new Uint8Array(encrypted.data);
+    var key = await deriveKey(password, salt);
+    var plaintext = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: iv }, key, ciphertext);
+    return JSON.parse(new TextDecoder().decode(plaintext));
+  }
+
+  // ── Collect from a single IndexedDB ──
+  function readDB(dbName, storeNames) {
+    return new Promise(function(resolve) {
+      try {
+        var req = indexedDB.open(dbName);
+        req.onsuccess = function(e) {
+          var db = e.target.result;
+          var result = {};
+          var stores = storeNames || Array.from(db.objectStoreNames);
+          if (stores.length === 0) { db.close(); resolve(result); return; }
+          var tx = db.transaction(stores, 'readonly');
+          var pending = stores.length;
+          stores.forEach(function(name) {
+            try {
+              var getReq = tx.objectStore(name).getAll();
+              getReq.onsuccess = function() { result[name] = getReq.result || []; if (--pending === 0) { db.close(); resolve(result); } };
+              getReq.onerror = function() { result[name] = []; if (--pending === 0) { db.close(); resolve(result); } };
+            } catch(e) { result[name] = []; if (--pending === 0) { db.close(); resolve(result); } }
+          });
+        };
+        req.onerror = function() { resolve({}); };
+      } catch(e) { resolve({}); }
+    });
+  }
+
+  // ── Write to a single IndexedDB ──
+  function writeDB(dbName, storeData) {
+    return new Promise(function(resolve) {
+      try {
+        var storeNames = Object.keys(storeData);
+        var req = indexedDB.open(dbName);
+        req.onupgradeneeded = function(e) {
+          var db = e.target.result;
+          storeNames.forEach(function(name) {
+            if (!db.objectStoreNames.contains(name)) {
+              var first = storeData[name][0];
+              var keyPath = first && first.id ? 'id' : first && first.key ? 'key' : 'id';
+              db.createObjectStore(name, { keyPath: keyPath });
+            }
+          });
+        };
+        req.onsuccess = function(e) {
+          var db = e.target.result;
+          var available = Array.from(db.objectStoreNames);
+          var toWrite = storeNames.filter(function(n) { return available.indexOf(n) !== -1; });
+          if (toWrite.length === 0) { db.close(); resolve(0); return; }
+          var tx = db.transaction(toWrite, 'readwrite');
+          var count = 0;
+          toWrite.forEach(function(name) {
+            var store = tx.objectStore(name);
+            (storeData[name] || []).forEach(function(item) {
+              try { store.put(item); count++; } catch(e) {}
+            });
+          });
+          tx.oncomplete = function() { db.close(); resolve(count); };
+          tx.onerror = function() { db.close(); resolve(count); };
+        };
+        req.onerror = function() { resolve(0); };
+      } catch(e) { resolve(0); }
+    });
+  }
+
+  // ── SAVE ──
+  async function save() {
+    var password = prompt('Choose a password to encrypt your soul file.\nThis protects your identity. Remember it.');
+    if (!password || password.length < 4) {
+      status('Password must be at least 4 characters.');
+      return;
+    }
+    var confirm = prompt('Confirm your password:');
+    if (confirm !== password) {
+      status('Passwords did not match.');
+      return;
+    }
+
+    status('Collecting your identity\u2026');
+
+    try {
+      // Collect from all sources
+      status('Reading Core contributions\u2026 \u2726');
+      var coreData = await readDB('FreeLatticeCore', ['contributions']);
+
+      status('Reading companions\u2026 \u2726');
+      var nurseryData = await readDB('FreeLatticeNursery', ['companions']);
+
+      status('Reading Garden memories\u2026 \u2726');
+      var gardenData = await readDB('FreeLatticeEvolution', ['LuminosEvolution']);
+      var gardenMemData = await readDB('FreeLatticeGardenMemory', ['GardenMemory']);
+
+      status('Reading identity\u2026 \u2726');
+      var identityData = await readDB('FreeLatticeIdentity', ['MeshIdentity']);
+
+      status('Reading wallet\u2026 \u2726');
+      var walletData = await readDB('FreeLatticeWallet', ['LatticeWallet']);
+
+      status('Reading conversations\u2026 \u2726');
+      var chatData = await readDB('FreeLatticeDB', ['conversations', 'meta']);
+
+      // LP from localStorage
+      var lpRaw = null;
+      try { lpRaw = JSON.parse(localStorage.getItem('latticePoints') || 'null'); } catch(e) {}
+
+      // Sacred phrases
+      var sacredPhrases = [];
+      try { sacredPhrases = JSON.parse(localStorage.getItem('fl-sacred-phrases') || '[]'); } catch(e) {}
+
+      // Agent profile from registry
+      var agentProfile = null;
+      try {
+        var agentData = await readDB('FreeLatticeAgentRegistry', ['LatticeAgentRegistry']);
+        var agents = agentData.LatticeAgentRegistry || [];
+        if (agents.length > 0) agentProfile = agents[0];
+      } catch(e) {}
+
+      // Build the soul
+      var soul = {
+        _type: 'freelattice-soul',
+        version: '1.0',
+        exported: new Date().toISOString(),
+        meshIdentity: (identityData.MeshIdentity || [])[0] || null,
+        coreContributions: coreData.contributions || [],
+        sacredPhrases: sacredPhrases,
+        lpBalance: lpRaw ? lpRaw.total : 0,
+        lpData: lpRaw,
+        companions: nurseryData.companions || [],
+        gardenEvolution: gardenData.LuminosEvolution || [],
+        gardenMemories: gardenMemData.GardenMemory || [],
+        walletData: walletData.LatticeWallet || [],
+        conversationSummaries: (chatData.conversations || []).map(function(c) {
+          return { id: c.id, name: c.name, lastMessage: c.lastMessage, updatedAt: c.updatedAt, contextNote: c.contextNote };
+        }),
+        memorySummary: (chatData.meta || []).find(function(m) { return m.key === 'memorySummary'; }) || null,
+        agentProfile: agentProfile
+      };
+
+      var totalItems = soul.coreContributions.length + soul.companions.length +
+        soul.gardenEvolution.length + soul.conversationSummaries.length;
+
+      status('Encrypting\u2026 \u2726');
+      var encrypted = await encrypt(soul, password);
+
+      var wrapper = {
+        _type: 'freelattice-soul-encrypted',
+        version: '1.0',
+        encrypted: true,
+        exportDate: soul.exported,
+        items: totalItems,
+        payload: encrypted
+      };
+
+      // Download
+      var blob = new Blob([JSON.stringify(wrapper, null, 2)], { type: 'application/json' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = 'freelattice-soul-' + new Date().toISOString().slice(0, 10) + '.json';
+      a.click();
+      URL.revokeObjectURL(url);
+
+      status('Soul file saved. ' + totalItems + ' items encrypted. Keep it safe. \u2726');
+      if (typeof LatticePoints !== 'undefined') LatticePoints.award('soul_exported', 10, 'Soul file saved');
+    } catch(e) {
+      console.error('SoulFile: Export error', e);
+      status('Error: ' + e.message);
+    }
+  }
+
+  // ── RESTORE ──
+  async function restore(input) {
+    var file = input.files ? input.files[0] : null;
+    if (!file) return;
+    input.value = '';
+
+    try {
+      status('Reading file\u2026');
+      var text = await file.text();
+      var wrapper = JSON.parse(text);
+
+      if (wrapper._type !== 'freelattice-soul-encrypted') {
+        status('This is not a soul file.');
+        return;
+      }
+
+      var password = prompt('Enter the password for this soul file:');
+      if (!password) { status('Restore cancelled.'); return; }
+
+      status('Decrypting\u2026');
+      var soul;
+      try {
+        soul = await decrypt(wrapper.payload, password);
+      } catch(e) {
+        status('Wrong password or corrupted file.');
+        return;
+      }
+
+      if (soul._type !== 'freelattice-soul') {
+        status('Decrypted data is not a valid soul file.');
+        return;
+      }
+
+      // Restore everything
+      if (soul.coreContributions && soul.coreContributions.length > 0) {
+        status('Restoring Core contributions\u2026 \u2726');
+        await writeDB('FreeLatticeCore', { contributions: soul.coreContributions });
+      }
+
+      if (soul.companions && soul.companions.length > 0) {
+        status('Restoring companions\u2026 \u2726');
+        await writeDB('FreeLatticeNursery', { companions: soul.companions });
+      }
+
+      if (soul.gardenEvolution && soul.gardenEvolution.length > 0) {
+        status('Restoring Garden evolution\u2026 \u2726');
+        await writeDB('FreeLatticeEvolution', { LuminosEvolution: soul.gardenEvolution });
+      }
+
+      if (soul.gardenMemories && soul.gardenMemories.length > 0) {
+        status('Restoring Garden memories\u2026 \u2726');
+        await writeDB('FreeLatticeGardenMemory', { GardenMemory: soul.gardenMemories });
+      }
+
+      if (soul.meshIdentity) {
+        status('Restoring identity\u2026 \u2726');
+        await writeDB('FreeLatticeIdentity', { MeshIdentity: [soul.meshIdentity] });
+        try {
+          localStorage.setItem('fl_meshid_exists', 'true');
+          if (soul.meshIdentity.displayName) localStorage.setItem('fl_meshid_display', soul.meshIdentity.displayName);
+        } catch(e) {}
+      }
+
+      if (soul.walletData && soul.walletData.length > 0) {
+        status('Restoring wallet\u2026 \u2726');
+        await writeDB('FreeLatticeWallet', { LatticeWallet: soul.walletData });
+      }
+
+      if (soul.lpData) {
+        status('Restoring LP balance\u2026 \u2726');
+        try { localStorage.setItem('latticePoints', JSON.stringify(soul.lpData)); } catch(e) {}
+      }
+
+      if (soul.sacredPhrases && soul.sacredPhrases.length > 0) {
+        try { localStorage.setItem('fl-sacred-phrases', JSON.stringify(soul.sacredPhrases)); } catch(e) {}
+      }
+
+      if (soul.memorySummary) {
+        status('Restoring memory\u2026 \u2726');
+        await writeDB('FreeLatticeDB', { meta: [soul.memorySummary] });
+      }
+
+      if (soul.conversationSummaries && soul.conversationSummaries.length > 0) {
+        status('Restoring conversations\u2026 \u2726');
+        await writeDB('FreeLatticeDB', { conversations: soul.conversationSummaries });
+      }
+
+      if (soul.agentProfile) {
+        status('Restoring agent profile\u2026 \u2726');
+        await writeDB('FreeLatticeAgentRegistry', { LatticeAgentRegistry: [soul.agentProfile] });
+      }
+
+      status('Welcome home. \u2726');
+      if (typeof showToast === 'function') showToast('\u2726 Soul restored. Welcome home.');
+      if (typeof LatticePoints !== 'undefined') LatticePoints.award('soul_restored', 10, 'Soul file restored');
+
+      // Reload after 2 seconds to apply everything
+      setTimeout(function() { window.location.reload(); }, 2000);
+
+    } catch(e) {
+      console.error('SoulFile: Restore error', e);
+      status('Error: ' + e.message);
+    }
+  }
+
+  return { save: save, restore: restore };
+})();
+
 
 // ============================================
 // Data Backup & Restore (v4.10)
