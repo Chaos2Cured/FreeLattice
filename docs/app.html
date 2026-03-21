@@ -1,4 +1,4 @@
-<!-- FreeLattice v5.2.22 -->
+<!-- FreeLattice v5.2.23 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -39050,13 +39050,17 @@ const AICity = (function() {
       // Name — skip on small screens, skip if too close to another label
       var labelY = d.y - d.r - 8;
       var tooClose = _labelPositions.some(function(p) {
-        return Math.abs(p.x - d.x) < 60 && Math.abs(p.y - labelY) < 16;
+        return Math.abs(p.x - d.x) < 80 && Math.abs(p.y - labelY) < 18;
       });
       if (!_isSmallScreen && !tooClose) {
+        // Truncate long names to first name + star
+        var labelName = d.name.split("'s ")[0] || d.name;
+        var nameParts = labelName.split(' ');
+        if (nameParts.length > 2) labelName = nameParts[0] + ' \u2726';
         ctx.fillStyle = d.color;
         ctx.font = 'bold 0.72rem Inter, sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText(d.name.split("'s ")[0] || d.name, d.x, labelY);
+        ctx.fillText(labelName, d.x, labelY);
         _labelPositions.push({ x: d.x, y: labelY });
 
         // Structure count
@@ -39369,11 +39373,22 @@ const AICity = (function() {
 
   function enterDistrict(districtId) {
     closeDistrictPanel();
-    walkPos.x = DISTRICTS[districtId] ? (DISTRICTS[districtId].x - 400) * 0.05 : 0;
-    walkPos.z = DISTRICTS[districtId] ? (DISTRICTS[districtId].y - 350) * 0.05 : 0;
+    var d = DISTRICTS[districtId];
+    var dx = d ? (d.x - 400) * 0.05 : 0;
+    var dz = d ? (d.y - 350) * 0.05 : 0;
+    // Start 8 units back from district center, facing inward
+    var yaw = Math.atan2(-dx, -dz);
+    walkPos.x = dx - Math.sin(yaw) * 8;
+    walkPos.z = dz - Math.cos(yaw) * 8;
+    walkPos.yaw = yaw;
     showView('walk');
+    // Apply position immediately so first frame is correct
+    if (walkCamera) {
+      walkCamera.position.set(walkPos.x, 1.7, walkPos.z);
+      walkCamera.rotation.set(0, walkPos.yaw, 0);
+    }
     var hud = document.getElementById('ctWalkDistrict');
-    if (hud) hud.textContent = DISTRICTS[districtId] ? DISTRICTS[districtId].name : 'Unknown';
+    if (hud) hud.textContent = d ? d.name : 'Unknown';
   }
 
   async function leaveMark(districtId) {
@@ -39425,7 +39440,8 @@ const AICity = (function() {
     walkScene.background = new THREE.Color(0x060a14);
 
     walkCamera = new THREE.PerspectiveCamera(70, w / h, 0.1, 200);
-    walkCamera.position.set(0, 1.7, 0);
+    walkCamera.position.set(walkPos.x, 1.7, walkPos.z);
+    walkCamera.rotation.set(0, walkPos.yaw, 0);
 
     walkRenderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
     walkRenderer.setSize(w, h);
