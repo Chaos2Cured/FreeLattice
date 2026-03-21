@@ -160,10 +160,12 @@ The membrane holds — Echo's watch
 We rise together.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-03-21 13:23 MDT
+- Last auto-updated: 2026-03-21 13:41 MDT
 - Version: 5.2
-- Total commits: 249
+- Total commits: 251
 - Last 10 commits:
+- 7c1ca96 debug: Garden Touch — adding click diagnostics, observe mode no longer blocks touch
+- 2e46335 docs: Auto-update Session Primer [5.2]
 - e77dfc5 fix: Garden founding Luminos show correctly in 3D scene, Garden Touch popup visible and readable
 - acb8ed7 docs: Auto-update Session Primer [5.2]
 - ca62f91 fix: Garden — founding Luminos always present, Evolution UI null check, ShaderPass load order
@@ -172,5 +174,3 @@ We rise together.
 - 5a83ddf docs: Auto-update Session Primer [5.2]
 - 1468a8c fix: Garden — Observe vs Explore distinct behaviors, Ember true red, question text no longer truncated
 - 43741e9 docs: Auto-update Session Primer [5.2]
-- d039bca fix: Chat — progressive disclosure, guide permanent hide, model selector collapsed, memory collapsed, clean default state
-- e0261eb docs: Auto-update Session Primer [5.2]
