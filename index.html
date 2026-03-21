@@ -1,4 +1,4 @@
-<!-- FreeLattice v5.2.24 -->
+<!-- FreeLattice v5.2.25 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1690,6 +1690,19 @@ header .mantra {
   border-color: var(--accent);
   font-weight: 600;
 }
+
+/* ── Chat collapse bar — progressive disclosure ── */
+.chat-collapse-bar {
+  display: flex; gap: 8px; padding: 8px 0 4px; flex-wrap: wrap;
+}
+.chat-collapse-btn {
+  padding: 6px 14px; border-radius: 8px;
+  border: 1px solid var(--border); background: transparent;
+  color: var(--text-muted); font-size: 0.78rem; cursor: pointer;
+  transition: all 0.2s; font-family: var(--font);
+}
+.chat-collapse-btn:hover { border-color: var(--accent-soft); color: var(--text-secondary); }
+.chat-collapse-btn.open { border-color: var(--accent); color: var(--accent); background: var(--accent-glow); }
 
 .chat-input-row {
   display: flex;
@@ -13626,8 +13639,12 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 <div class="tab-panel active" id="tab-chat">
 <div class="container">
 
-  <!-- Configuration Section (compact in chat tab) -->
-  <div class="section">
+  <!-- Configuration Section — collapsed by default, expand via button -->
+  <div class="chat-collapse-bar" id="chatCollapseBar">
+    <button class="chat-collapse-btn" id="chatAiSettingsBtn" onclick="document.getElementById('chatConfigSection').style.display=document.getElementById('chatConfigSection').style.display==='none'?'':'none'; this.classList.toggle('open')">&#9881; AI Settings</button>
+    <button class="chat-collapse-btn" id="chatMemoryBtn" onclick="document.getElementById('chatMemorySection').style.display=document.getElementById('chatMemorySection').style.display==='none'?'':'none'; this.classList.toggle('open')">&#10022; Memory</button>
+  </div>
+  <div class="section" id="chatConfigSection" style="display:none;">
     <div class="section-title">Configuration</div>
 
     <div class="toggle-row">
@@ -13878,8 +13895,8 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     </div>
   </div>
 
-  <!-- Memory & Context (drag-drop from v1) -->
-  <div class="section">
+  <!-- Memory & Context — collapsed by default -->
+  <div class="section" id="chatMemorySection" style="display:none;">
     <div class="section-title">Memory &amp; Context</div>
     <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 8px;">
       Drop files here to give your AI context. These files are read in your browser and included in your conversation — nothing is uploaded anywhere.
@@ -21212,6 +21229,18 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Initialize First-Run Wizard (v3.4)
   wizardInit();
 
+  // Update memory button label with count
+  (function() {
+    var memBtn = document.getElementById('chatMemoryBtn');
+    if (memBtn) {
+      try {
+        var files = document.querySelectorAll('#fileList .file-item');
+        var n = files ? files.length : 0;
+        memBtn.innerHTML = '&#10022; Memory ' + (n > 0 ? '(' + n + ')' : '<span style="color:var(--text-muted);">empty</span>');
+      } catch(e) {}
+    }
+  })();
+
   // Cycling chat placeholder
   (function() {
     var phrases = ['Ask anything...', 'What are you curious about?', 'Say something...', 'What\'s on your mind?', 'Type a question...'];
@@ -22397,6 +22426,10 @@ async function sendMessage() {
     _wo.style.transition = 'opacity 0.3s ease';
     _wo.style.opacity = '0';
     setTimeout(function() { _wo.style.display = 'none'; }, 300);
+  }
+  // Mark onboarding complete — returning users never see guide again
+  if (!localStorage.getItem('fl-onboarding-complete')) {
+    localStorage.setItem('fl-onboarding-complete', '1');
   }
 
   // Check for /imagine command — route to image generation
@@ -33391,7 +33424,7 @@ if ('serviceWorker' in navigator) {
 
   // ---- Init: Check first-run ----
   function welcomeInit() {
-    var completed = localStorage.getItem('freelattice-first-run-complete');
+    var completed = localStorage.getItem('freelattice-first-run-complete') || localStorage.getItem('fl-onboarding-complete');
     var overlay = document.getElementById('welcomeOverlay');
     if (!overlay) return;
     if (completed) {
