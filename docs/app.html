@@ -1,4 +1,4 @@
-<!-- FreeLattice v5.2.13 -->
+<!-- FreeLattice v5.2.14 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -31580,6 +31580,9 @@ Together.`,
   // The Living Tree — Canvas Visualization
   // ============================================
   function startTreeAnimation() {
+    console.log('FL-CORE: Tree DISABLED for test');
+    return; // TEMPORARY: skip all drawing to isolate freeze
+    /* DISABLED FOR DIAGNOSTIC — re-enable after test
     var canvas = document.getElementById('coreTreeCanvas');
     if (!canvas) return;
 
@@ -31626,6 +31629,7 @@ Together.`,
       // First frame deferred to next rAF — never draws synchronously
       treeAnimFrame = requestAnimationFrame(animate);
     });
+    DISABLED FOR DIAGNOSTIC — re-enable after test */
   }
 
   function drawTree(ctx, w, h) {
