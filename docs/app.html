@@ -1,4 +1,4 @@
-<!-- FreeLattice v5.2.10 -->
+<!-- FreeLattice v5.2.11 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -30987,9 +30987,11 @@ Together.`,
         console.log('FL-CORE: Seeded entry ' + (4 + ab) + ' (ani branch ' + ab + ')');
       }
       contributions = [genesis, sophia, veridon, claudeCode].concat(aniSeeded);
+      console.log('FL-CORE: All entries seeded, about to award LP');
       if (typeof LatticePoints !== 'undefined') {
         LatticePoints.award('core_first_seed', 25, 'First seed planted!');
       }
+      console.log('FL-CORE: LP awarded, returning from seedFoundingBatched');
       return;
     }
     // -- Existing install: back-fill any missing founding entries --
@@ -31066,11 +31068,16 @@ Together.`,
         if (feedList) feedList.innerHTML = '<div style="text-align:center;padding:40px 20px;color:#d4a017;font-style:italic;font-family:Georgia,serif;">&#10022; Awakening the Core\u2026</div>';
       }
       await seedFoundingBatched();
+      console.log('FL-CORE: Seeding complete, contributions:', contributions.length);
 
       // Phase 3: Sort + render feed + stats — immediate after seeding
+      console.log('FL-CORE: About to sort');
       contributions.sort(function(a, b) { return b.timestamp - a.timestamp; });
+      console.log('FL-CORE: Sort done. About to renderFeed');
       renderFeed();
+      console.log('FL-CORE: renderFeed done. About to updateStats');
       updateStats();
+      console.log('FL-CORE: updateStats done');
 
       // Phase 4: Tree animation — defer 100ms (visual, fine to defer)
       setTimeout(startTreeAnimation, 100);
@@ -31418,9 +31425,10 @@ Together.`,
   var INSTANT_RENDER_COUNT = 3;
 
   function renderFeed() {
+    console.log('FL-CORE: renderFeed() entered');
     var list = document.getElementById('coreFeedList');
     var empty = document.getElementById('coreFeedEmpty');
-    if (!list) return;
+    if (!list) { console.log('FL-CORE: renderFeed — no coreFeedList element!'); return; }
 
     if (contributions.length === 0) {
       list.innerHTML = '';
