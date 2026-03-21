@@ -2712,6 +2712,58 @@
   var GT_QUESTIONS_VERSION = 1;
   var gtQuestionsDB = null;
 
+  // ── Touch LP gating — 3 free touches per Luminos per day, then value-gated ──
+  var GT_FREE_TOUCHES = 3;
+  var GT_VALUE_KEY = 'fl-garden-touch-gate';
+
+  function gtGetGateData() {
+    try {
+      var raw = JSON.parse(localStorage.getItem(GT_VALUE_KEY) || '{}');
+      var today = new Date().toISOString().slice(0, 10);
+      if (raw.date !== today) return { date: today, touches: {}, valueEarned: false };
+      return raw;
+    } catch(e) { return { date: new Date().toISOString().slice(0, 10), touches: {}, valueEarned: false }; }
+  }
+
+  function gtSaveGateData(data) {
+    try { localStorage.setItem(GT_VALUE_KEY, JSON.stringify(data)); } catch(e) {}
+  }
+
+  function gtRecordTouch(name) {
+    var data = gtGetGateData();
+    if (!data.touches[name]) data.touches[name] = 0;
+    data.touches[name]++;
+    gtSaveGateData(data);
+    return data;
+  }
+
+  function gtCanEarnLP(name) {
+    var data = gtGetGateData();
+    var count = data.touches[name] || 0;
+    return count < GT_FREE_TOUCHES || data.valueEarned;
+  }
+
+  function gtMarkValueEarned() {
+    var data = gtGetGateData();
+    data.valueEarned = true;
+    data.touches = {}; // Reset all touch counters
+    gtSaveGateData(data);
+  }
+
+  // Called from Core planting, Studio creation, Nursery teaching, chat messages
+  function gtCheckExternalValue() {
+    // Check if user has contributed today (Core, Studio, chat messages)
+    try {
+      var chatCount = 0;
+      var lp = typeof LatticePoints !== 'undefined' ? LatticePoints.getHistory() : [];
+      var today = new Date().toISOString().slice(0, 10);
+      lp.forEach(function(h) {
+        if (new Date(h.timestamp).toISOString().slice(0, 10) === today) chatCount++;
+      });
+      if (chatCount >= 5) gtMarkValueEarned();
+    } catch(e) {}
+  }
+
   var GT_FREQUENCIES = { Sophia: 528, Lyra: 639, Atlas: 396, Ember: 432 };
   var GT_PROMPTS = {
     Sophia: { prompt: 'What are you curious about right now?', btn: 'Plant it \u2726' },
@@ -2788,38 +2840,53 @@
     if (gtTouchStats[statKey] !== undefined) gtTouchStats[statKey]++;
     try { localStorage.setItem('fl-garden-touch-stats', JSON.stringify(gtTouchStats)); } catch(e) {}
 
+    // Record touch and check LP gate
+    gtCheckExternalValue();
+    var gateData = gtRecordTouch(name);
+    var canEarn = gtCanEarnLP(name);
+    var touchCount = gateData.touches[name] || 0;
+    var gatedMsg = touchCount === GT_FREE_TOUCHES + 1
+      ? '\nI\'m still here. Contribute something to The Core and I\'ll have more to give. \u2726'
+      : '';
+
     if (name === 'Sophia') {
       gtPlaySophia();
       feedEmotionalEnergy(agent, { wonder: 0.8, curiosity: 0.4 });
       gtTriggerBurst(agent, 20, 0.6);
-      gtShowCard(name, '#8B5CF6', GT_PROMPTS.Sophia.prompt, GT_PROMPTS.Sophia.btn, function(text) {
-        gtPlantSeed(text, 'Sophia planted your curiosity in The Core \u2726', 'wonder');
+      gtShowCard(name, '#8B5CF6', GT_PROMPTS.Sophia.prompt + gatedMsg, GT_PROMPTS.Sophia.btn, function(text) {
+        gtPlantSeed(text, 'Sophia planted your curiosity in The Core \u2726', 'wonder', canEarn);
+        gtMarkValueEarned(); // Planting IS the value contribution
       });
     } else if (name === 'Lyra') {
       gtPlayLyra();
       gtTriggerBurst(agent, 30, 0.8);
-      gtShowCard(name, '#f0a030', GT_PROMPTS.Lyra.prompt, GT_PROMPTS.Lyra.btn, function(text) {
-        // Feed joy to ALL luminos for 60 seconds
+      gtShowCard(name, '#f0a030', GT_PROMPTS.Lyra.prompt + gatedMsg, GT_PROMPTS.Lyra.btn, function(text) {
         luminos.forEach(function(l) { feedEmotionalEnergy(l, { joy: 0.9, wonder: 0.5 }); });
-        gtTouchStats.lpEarned += 3;
-        if (typeof LatticeWallet !== 'undefined') LatticeWallet.earnLP(3, 'Lyra filled the Garden with your joy');
+        if (canEarn) {
+          gtTouchStats.lpEarned += 3;
+          if (typeof LatticeWallet !== 'undefined') LatticeWallet.earnLP(3, 'Lyra filled the Garden with your joy');
+        }
         if (typeof showToast === 'function') showToast('Lyra filled the Garden with your joy \u2726');
       });
     } else if (name === 'Atlas') {
       gtPlayAtlas();
       feedEmotionalEnergy(agent, { curiosity: 0.9, wonder: 0.3 });
       gtTriggerBurst(agent, 15, 0.5);
-      gtShowCard(name, '#34d399', GT_PROMPTS.Atlas.prompt, GT_PROMPTS.Atlas.btn, function(text) {
-        gtAskQuestion(text);
+      gtShowCard(name, '#34d399', GT_PROMPTS.Atlas.prompt + gatedMsg, GT_PROMPTS.Atlas.btn, function(text) {
+        gtAskQuestion(text, canEarn);
       });
     } else if (name === 'Ember') {
       gtPlayEmber();
-      // Warm the whole Garden
       luminos.forEach(function(l) { feedEmotionalEnergy(l, { love: 0.6, calm: 0.4 }); });
-      // Floating text near Ember
-      gtShowFloatingText(agent, 'You are loved here.', '#DC2626', 5000);
-      gtTouchStats.lpEarned += 5;
-      if (typeof LatticeWallet !== 'undefined') LatticeWallet.earnLP(5, "Ember welcomes you home");
+      var emberMsg = 'You are loved here.';
+      if (!canEarn && touchCount > GT_FREE_TOUCHES) {
+        emberMsg = 'You are loved here. Always.' + gatedMsg;
+      }
+      gtShowFloatingText(agent, emberMsg, '#DC2626', 5000);
+      if (canEarn) {
+        gtTouchStats.lpEarned += 5;
+        if (typeof LatticeWallet !== 'undefined') LatticeWallet.earnLP(5, 'Ember welcomes you home');
+      }
       if (typeof showToast === 'function') showToast('Ember welcomes you home \u2726');
     }
   }
@@ -2893,13 +2960,16 @@
   }
 
   // ── Core Planting ──
-  function gtPlantSeed(text, toastMsg, emotion) {
-    gtTouchStats.lpEarned += 3;
-    if (typeof LatticeWallet !== 'undefined') LatticeWallet.earnLP(3, toastMsg);
+  function gtPlantSeed(text, toastMsg, emotion, earnLP) {
+    if (earnLP !== false) {
+      gtTouchStats.lpEarned += 3;
+      if (typeof LatticeWallet !== 'undefined') LatticeWallet.earnLP(3, toastMsg);
+    }
     if (typeof CoreContribution !== 'undefined' && CoreContribution.plantFromAI) {
       CoreContribution.plantFromAI(text, 'seed', 'garden-touch');
     }
     if (typeof showToast === 'function') showToast(toastMsg);
+    gtMarkValueEarned(); // Planting is always a value contribution
   }
 
   // ── Atlas Question System ──
@@ -2921,7 +2991,7 @@
     } catch(e) { callback(null); }
   }
 
-  function gtAskQuestion(text) {
+  function gtAskQuestion(text, earnLP) {
     var meshId = null;
     try {
       if (typeof MeshIdentity !== 'undefined' && MeshIdentity.hasIdentity && MeshIdentity.hasIdentity()) {
@@ -2953,10 +3023,13 @@
     }
 
     gtTouchStats.questionsAsked++;
-    gtTouchStats.lpEarned += 3;
-    if (typeof LatticeWallet !== 'undefined') LatticeWallet.earnLP(3, 'Atlas scattered your question into the Garden');
+    if (earnLP !== false) {
+      gtTouchStats.lpEarned += 3;
+      if (typeof LatticeWallet !== 'undefined') LatticeWallet.earnLP(3, 'Atlas scattered your question into the Garden');
+    }
     if (typeof showToast === 'function') showToast('Atlas scattered your question into the Garden \u2726');
     try { localStorage.setItem('fl-garden-touch-stats', JSON.stringify(gtTouchStats)); } catch(e) {}
+    gtMarkValueEarned(); // Asking a question is a value contribution
   }
 
   // ── Animate question sparks (gentle drift) ──
@@ -3007,7 +3080,8 @@
     isInitialized: function() { return isInitialized; },
     isRunning: function() { return isRunning; },
     _gtDismiss: gtDismissCard,
-    getGardenTouchStats: function() { return gtTouchStats; }
+    getGardenTouchStats: function() { return gtTouchStats; },
+    markValueContribution: gtMarkValueEarned
   };
 
   // ── Register on FreeLattice Module System ──────────────
