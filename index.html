@@ -19867,6 +19867,7 @@ function hideTabLoading() {
 }
 
 function switchTab(tabId) {
+  if (tabId === 'core') console.log('FL-CORE: Tab clicked — entering base switchTab');
   hideTabLoading();
   document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.tab === tabId));
   document.querySelectorAll('.tab-panel').forEach(panel => {
@@ -19881,6 +19882,7 @@ function switchTab(tabId) {
       panel.classList.remove('active');
     }
   });
+  if (tabId === 'core') console.log('FL-CORE: Base switchTab done — panel now active');
 }
 
 
@@ -31034,11 +31036,14 @@ Together.`,
   }
 
   async function init() {
+    console.log('FL-CORE: init() entered, initialized=' + initialized);
     if (initialized) return;
     initialized = true;
+    console.log('FL-CORE: Starting init — Phase 0: openDB');
     try {
       // Phase 0: Open DB — immediate
       await openDB();
+      console.log('FL-CORE: Phase 0 done — DB open');
 
       // Phase 1: Load contributions — immediate (no idle callback)
       contributions = await dbGetAll();
@@ -32166,8 +32171,10 @@ Together.`,
     if (typeof switchTab !== 'function') return;
     var _prevSwitchTab = switchTab;
     switchTab = function(tabId) {
+      if (tabId === 'core') console.log('FL-CORE: Entering CoreModule switchTab patch (about to call chain)');
       _prevSwitchTab(tabId);
       if (tabId === 'core') {
+        console.log('FL-CORE: Chain complete — calling CoreModule.init()');
         CoreModule.init();
       }
     };
