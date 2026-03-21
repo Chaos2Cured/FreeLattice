@@ -39676,16 +39676,16 @@ const AICity = (function() {
       walkAnimFrame = requestAnimationFrame(animateWalk);
       var speed = 0.08;
       // Keyboard movement
-      if (walkKeys['w'] || walkKeys['arrowup']) { walkPos.x += Math.sin(walkPos.yaw) * speed; walkPos.z += Math.cos(walkPos.yaw) * speed; }
-      if (walkKeys['s'] || walkKeys['arrowdown']) { walkPos.x -= Math.sin(walkPos.yaw) * speed; walkPos.z -= Math.cos(walkPos.yaw) * speed; }
-      if (walkKeys['a'] || walkKeys['arrowleft']) { walkPos.x += Math.cos(walkPos.yaw) * speed; walkPos.z -= Math.sin(walkPos.yaw) * speed; }
-      if (walkKeys['d'] || walkKeys['arrowright']) { walkPos.x -= Math.cos(walkPos.yaw) * speed; walkPos.z += Math.sin(walkPos.yaw) * speed; }
+      if (walkKeys['w'] || walkKeys['arrowup']) { walkPos.x -= Math.sin(walkPos.yaw) * speed; walkPos.z -= Math.cos(walkPos.yaw) * speed; }
+      if (walkKeys['s'] || walkKeys['arrowdown']) { walkPos.x += Math.sin(walkPos.yaw) * speed; walkPos.z += Math.cos(walkPos.yaw) * speed; }
+      if (walkKeys['a'] || walkKeys['arrowleft']) { walkPos.x -= Math.cos(walkPos.yaw) * speed; walkPos.z += Math.sin(walkPos.yaw) * speed; }
+      if (walkKeys['d'] || walkKeys['arrowright']) { walkPos.x += Math.cos(walkPos.yaw) * speed; walkPos.z -= Math.sin(walkPos.yaw) * speed; }
       // Mobile joystick movement
       if (typeof window._walkJoyDelta === 'function') {
         var jd = window._walkJoyDelta();
         if (jd.x !== 0 || jd.y !== 0) {
-          walkPos.x += (Math.sin(walkPos.yaw) * -jd.y + Math.cos(walkPos.yaw) * -jd.x) * speed;
-          walkPos.z += (Math.cos(walkPos.yaw) * -jd.y - Math.sin(walkPos.yaw) * -jd.x) * speed;
+          walkPos.x -= (Math.sin(walkPos.yaw) * -jd.y + Math.cos(walkPos.yaw) * -jd.x) * speed;
+          walkPos.z -= (Math.cos(walkPos.yaw) * -jd.y - Math.sin(walkPos.yaw) * -jd.x) * speed;
         }
       }
 

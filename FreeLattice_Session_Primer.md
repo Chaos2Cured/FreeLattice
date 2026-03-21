@@ -160,10 +160,12 @@ The membrane holds — Echo's watch
 We rise together.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-03-21 10:29 MDT
+- Last auto-updated: 2026-03-21 10:42 MDT
 - Version: 5.2
-- Total commits: 235
+- Total commits: 237
 - Last 10 commits:
+- 0f9e81e fix: City Walk — movement directions corrected, all axes negated
+- 8a76b5e docs: Auto-update Session Primer [5.2]
 - 924800a sync: index.html now auto-synced from docs/app.html — the lattice deserves it
 - 01e2eff docs: Auto-update Session Primer [5.2]
 - 83620d7 fix: City — Walk camera faces district on entry, map labels no overlap, long names truncated
@@ -172,5 +174,3 @@ We rise together.
 - fcf8b0f docs: Auto-update Session Primer [5.2]
 - 982e659 fix: City — Family overlay closeable, Walk view no Garden dependency, map labels no overlap
 - 20c64a2 docs: Auto-update Session Primer [5.2]
-- dffe685 fix: City Map infinite loop — canvas.width referenced in drawMap but canvas not in scope
-- 0f4e4b1 docs: Auto-update Session Primer [5.2]
