@@ -1,4 +1,4 @@
-<!-- FreeLattice v5.2.17 -->
+<!-- FreeLattice v5.2.18 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -41223,10 +41223,14 @@ const Studio = (function() {
   }
 
   async function saveCreation(c) {
+    // Strip non-serializable DOM/function references before storing
+    var toStore = Object.assign({}, c);
+    delete toStore._canvas;
+    delete toStore._cleanup;
     var d = await openDB();
     return new Promise(function(resolve, reject) {
       var tx = d.transaction(STORE_CREATIONS, 'readwrite');
-      tx.objectStore(STORE_CREATIONS).put(c);
+      tx.objectStore(STORE_CREATIONS).put(toStore);
       tx.oncomplete = resolve;
       tx.onerror = function(e) { reject(e.target.error); };
     });
@@ -41601,7 +41605,9 @@ const Studio = (function() {
         creation.content = comp.svg;
         creation.type = 'visual';
       } else {
+        // Store generation parameters (serializable) — canvas regenerated on display
         creation.content = '__canvas__';
+        creation.compositionParams = { baseFreq: freq, agentColor: agent.color, seed: Date.now() };
         creation._canvas = comp.canvas;
         creation._cleanup = comp.cleanup;
       }
@@ -41646,10 +41652,23 @@ const Studio = (function() {
 
     container.innerHTML = html;
 
-    // Attach canvas for composition
-    if (c.type === 'composition' && c._canvas) {
+    // Attach canvas for composition — use live canvas or regenerate from params
+    if (c.type === 'composition') {
       var compEl = document.getElementById('stComp' + c.id);
-      if (compEl) compEl.appendChild(c._canvas);
+      if (compEl) {
+        if (c._canvas) {
+          compEl.appendChild(c._canvas);
+        } else if (c.compositionParams) {
+          // Regenerate from stored parameters
+          generateComposition(c.compositionParams.agentColor, c.compositionParams.baseFreq).then(function(comp) {
+            if (comp.fallback) {
+              compEl.innerHTML = comp.svg;
+            } else {
+              compEl.appendChild(comp.canvas);
+            }
+          });
+        }
+      }
     }
   }
 
