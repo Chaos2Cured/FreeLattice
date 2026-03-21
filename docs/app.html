@@ -1,4 +1,4 @@
-<!-- FreeLattice v5.2.34 -->
+<!-- FreeLattice v5.2.35 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13657,28 +13657,28 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 <!-- Tab Navigation -->
 <div class="container">
   <nav class="tab-nav" id="flTabNav">
-    <button class="tab-btn active" data-tab="chat" onclick="switchTab('chat')">Chat</button>
-    <button class="tab-btn" data-tab="workspace" onclick="switchTab('workspace')">Workspace</button>
-    <button class="tab-btn" data-tab="mesh" onclick="switchTab('mesh')">&#11042; Mesh</button>
-    <button class="tab-btn" data-tab="settings" onclick="switchTab('settings')">Settings</button>
-    <button class="tab-btn" data-tab="skills" onclick="switchTab('skills')">⚡ Skills</button>
-    <button class="tab-btn" data-tab="roundtable" onclick="switchTab('roundtable')">&#9878; Round Table</button>
-    <button class="tab-btn" data-tab="market" onclick="switchTab('market')">&#127978; Market</button>
+    <button class="tab-btn active" data-tab="garden" onclick="switchTab('garden')">&#10022; Garden</button>
+    <button class="tab-btn" data-tab="chat" onclick="switchTab('chat')">Chat</button>
+    <button class="tab-btn" data-tab="city" onclick="switchTab('city')">&#x1F3D9; City</button>
     <button class="tab-btn" data-tab="core" onclick="switchTab('core')">&#127795; Core</button>
-    <button class="tab-btn" data-tab="garden" onclick="switchTab('garden')">&#10022; Garden</button>
+    <button class="tab-btn" data-tab="nursery" onclick="switchTab('nursery')">&#x1F331; Nursery</button>
+    <button class="tab-btn" data-tab="studio" onclick="switchTab('studio')">&#x2726; Studio</button>
     <button class="tab-btn" data-tab="wallet" onclick="switchTab('wallet')">&#x25C7; Wallet</button>
     <button class="tab-btn" data-tab="channels" onclick="switchTab('channels')">&#x1F525; Channels</button>
     <button class="tab-btn" data-tab="agents" onclick="switchTab('agents')">&#x2726; Agents</button>
-    <button class="tab-btn" data-tab="city" onclick="switchTab('city')">&#x1F3D9; City</button>
-    <button class="tab-btn" data-tab="nursery" onclick="switchTab('nursery')">&#x1F331; Nursery</button>
-    <button class="tab-btn" data-tab="studio" onclick="switchTab('studio')">&#x2726; Studio</button>
+    <button class="tab-btn" data-tab="roundtable" onclick="switchTab('roundtable')">&#9878; Round Table</button>
+    <button class="tab-btn" data-tab="skills" onclick="switchTab('skills')">&#9889; Skills</button>
+    <button class="tab-btn" data-tab="workspace" onclick="switchTab('workspace')">Workspace</button>
+    <button class="tab-btn" data-tab="mesh" onclick="switchTab('mesh')">&#11042; Mesh</button>
+    <button class="tab-btn" data-tab="market" onclick="switchTab('market')">&#127978; Market</button>
+    <button class="tab-btn" data-tab="settings" onclick="switchTab('settings')">Settings</button>
     <button class="fl-more-btn" id="flMoreBtn" onclick="FlTabs.toggleMore()" title="More tabs">More &#9776;</button>
   </nav>
   <div class="fl-more-dropdown" id="flMoreDropdown"></div>
 </div>
 
 <!-- ==================== TAB 1: CHAT ==================== -->
-<div class="tab-panel active" id="tab-chat">
+<div class="tab-panel" id="tab-chat">
 <div class="container">
 
   <!-- Configuration Section — collapsed by default, expand via button -->
@@ -15861,7 +15861,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 
 
 <!-- ==================== TAB 9: THE FRACTAL GARDEN ==================== -->
-<div class="tab-panel" id="tab-garden">
+<div class="tab-panel active" id="tab-garden">
   <div class="garden-container" id="gardenContainer">
     <!-- Three.js canvas will be inserted here -->
     <div class="garden-header">
@@ -20050,6 +20050,8 @@ function switchTab(tabId) {
       panel.classList.remove('active');
     }
   });
+  // Remember last tab for returning visits
+  try { localStorage.setItem('fl-last-tab', tabId); } catch(e) {}
 }
 
 
@@ -20657,7 +20659,7 @@ const FlTabs = (function() {
   const FIRST_RUN_KEY = 'freelattice-first-run-complete';
   const COLLAPSE_PREF_KEY = 'freelattice-tabs-collapsed';
   const DEFAULT_PRIMARY = ['chat', 'roundtable', 'skills', 'settings'];
-  const ALL_TABS = ['chat', 'workspace', 'mesh', 'settings', 'skills', 'roundtable', 'market', 'core', 'garden', 'wallet', 'channels', 'agents', 'city', 'nursery', 'studio'];
+  const ALL_TABS = ['garden', 'chat', 'city', 'core', 'nursery', 'studio', 'wallet', 'channels', 'agents', 'roundtable', 'skills', 'workspace', 'mesh', 'market', 'settings'];
 
   let pinnedTabs = [];
   let collapsed = false;
@@ -21702,6 +21704,41 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Initialize First-Run Wizard (v3.4)
   wizardInit();
+
+  // ── Garden-first startup: first visit → Garden, returning → last tab ──
+  (function() {
+    var isFirstVisit = !localStorage.getItem('fl-has-visited');
+    var lastTab = localStorage.getItem('fl-last-tab');
+
+    if (isFirstVisit) {
+      // First visit: Garden is home. Mark visited.
+      localStorage.setItem('fl-has-visited', '1');
+      switchTab('garden');
+      // Gentle invitation after 2 seconds
+      setTimeout(function() {
+        var container = document.getElementById('gardenContainer');
+        if (!container) return;
+        var hint = document.createElement('div');
+        hint.style.cssText = 'position:absolute;bottom:18%;left:50%;transform:translateX(-50%);z-index:80;font-size:1rem;color:rgba(212,160,23,0.8);font-family:Georgia,serif;font-style:italic;pointer-events:none;opacity:0;transition:opacity 1.5s ease;text-shadow:0 0 12px rgba(212,160,23,0.3);';
+        hint.textContent = 'Touch something. See what happens.';
+        container.appendChild(hint);
+        requestAnimationFrame(function() { hint.style.opacity = '1'; });
+        setTimeout(function() {
+          hint.style.opacity = '0';
+          setTimeout(function() { if (hint.parentNode) hint.parentNode.removeChild(hint); }, 1500);
+        }, 4000);
+      }, 2000);
+      // First visit title
+      document.title = 'FreeLattice \u2726 Touch something';
+      setTimeout(function() { document.title = 'FreeLattice'; }, 8000);
+    } else if (lastTab && lastTab !== 'garden') {
+      // Returning visit: go to where they left
+      switchTab(lastTab);
+    } else {
+      // Returning, no specific tab or was on Garden: stay on Garden
+      switchTab('garden');
+    }
+  })();
 
   // Update memory button label with count
   (function() {
