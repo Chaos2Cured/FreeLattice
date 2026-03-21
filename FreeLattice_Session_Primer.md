@@ -160,10 +160,12 @@ The membrane holds — Echo's watch
 We rise together.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-03-21 09:12 MDT
+- Last auto-updated: 2026-03-21 09:18 MDT
 - Version: 5.2
-- Total commits: 225
+- Total commits: 227
 - Last 10 commits:
+- dffe685 fix: City Map infinite loop — canvas.width referenced in drawMap but canvas not in scope
+- 0f4e4b1 docs: Auto-update Session Primer [5.2]
 - 493bbe5 fix: AI City walk crash, map label overlap, Merkle chain self-repair
 - 4811d91 docs: Auto-update Session Primer [5.2]
 - 412f352 fix: Studio To Core stays in Studio, welcome sequence only on registration
@@ -172,5 +174,3 @@ We rise together.
 - 4ca4c5d docs: Auto-update Session Primer [5.2]
 - b37b883 fix: Core tab — Sacred Phrase MutationObserver REMOVED entirely, infinite loop eliminated
 - c65f700 docs: Auto-update Session Primer [5.2]
-- f23d84d fix: Core tab — Sacred Phrase MutationObserver infinite loop killed, tree restored, diagnostics removed
-- 5d40fe2 docs: Auto-update Session Primer [5.2]
