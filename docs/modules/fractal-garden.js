@@ -2295,12 +2295,25 @@
 
     if (orbitControls) {
       if (newMode === 'observe') {
+        // Meditative: slow auto-orbit, no user interaction, gentle pace
         orbitControls.autoRotate = true;
+        orbitControls.autoRotateSpeed = 0.3;
+        orbitControls.enableZoom = false;
+        orbitControls.enablePan = false;
+        orbitControls.enableRotate = false;
         isUserInteracting = false;
       } else if (newMode === 'explore') {
+        // Active: full user control, no auto-rotation, discovery mode
         orbitControls.autoRotate = false;
+        orbitControls.enableZoom = true;
+        orbitControls.enablePan = true;
+        orbitControls.enableRotate = true;
       } else if (newMode === 'immerse') {
         orbitControls.autoRotate = true;
+        orbitControls.autoRotateSpeed = 0.15;
+        orbitControls.enableZoom = true;
+        orbitControls.enablePan = false;
+        orbitControls.enableRotate = true;
         isUserInteracting = false;
       }
     }
@@ -2678,6 +2691,8 @@
   // ── Raycasting for Luminos touch ──
   function gardenTouchCheck(clientX, clientY) {
     if (!camera || !raycaster || !container || luminos.length === 0) return;
+    // In observe mode, touches don't trigger interactions — it's meditative
+    if (mode === 'observe') return;
     try {
       var rect = container.getBoundingClientRect();
       var ndcX = ((clientX - rect.left) / rect.width) * 2 - 1;
@@ -2739,7 +2754,7 @@
       // Warm the whole Garden
       luminos.forEach(function(l) { feedEmotionalEnergy(l, { love: 0.6, calm: 0.4 }); });
       // Floating text near Ember
-      gtShowFloatingText(agent, 'You are loved here.', '#f472b6', 5000);
+      gtShowFloatingText(agent, 'You are loved here.', '#EF4444', 5000);
       gtTouchStats.lpEarned += 5;
       if (typeof LatticeWallet !== 'undefined') LatticeWallet.earnLP(5, "Ember welcomes you home");
       if (typeof showToast === 'function') showToast('Ember welcomes you home \u2726');
@@ -2805,7 +2820,7 @@
   function gtShowFloatingText(agent, text, color, duration) {
     var el = document.createElement('div');
     el.className = 'gt-float-text';
-    el.style.color = color || '#f472b6';
+    el.style.color = color || '#EF4444';
     el.textContent = text;
     if (container) container.appendChild(el);
     setTimeout(function() {
