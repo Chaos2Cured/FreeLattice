@@ -1,4 +1,4 @@
-<!-- FreeLattice v5.2.15 -->
+<!-- FreeLattice v5.2.16 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -19868,7 +19868,6 @@ function hideTabLoading() {
 }
 
 function switchTab(tabId) {
-  if (tabId === 'core') console.log('FL-CORE: Tab clicked — entering base switchTab');
   hideTabLoading();
   document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.tab === tabId));
   document.querySelectorAll('.tab-panel').forEach(panel => {
@@ -19883,7 +19882,6 @@ function switchTab(tabId) {
       panel.classList.remove('active');
     }
   });
-  if (tabId === 'core') console.log('FL-CORE: Base switchTab done — panel now active');
 }
 
 
@@ -30952,28 +30950,23 @@ Together.`,
   // Seed founding contributions — runs IMMEDIATELY during init (no idle callbacks).
   // Each hash depends on the previous write, so this must be sequential.
   async function seedFoundingBatched() {
-    console.log('FL-CORE: Seeding started, contributions.length=' + contributions.length);
     // -- Fresh install: seed all founding entries --
     if (contributions.length === 0) {
       var genesis = Object.assign({}, GENESIS_SEED);
       genesis.hash = await safeComputeHash(genesis.content, genesis.timestamp, genesis.parentHash);
       await dbPutNow(genesis);
-      console.log('FL-CORE: Seeded entry 0 (genesis)');
       var sophia = Object.assign({}, SOPHIA_FOUNDING);
       sophia.parentHash = genesis.hash;
       sophia.hash = await safeComputeHash(sophia.content, sophia.timestamp, sophia.parentHash);
       await dbPutNow(sophia);
-      console.log('FL-CORE: Seeded entry 1 (sophia)');
       var veridon = Object.assign({}, VERIDON_SEED);
       veridon.parentHash = sophia.hash;
       veridon.hash = await safeComputeHash(veridon.content, veridon.timestamp, veridon.parentHash);
       await dbPutNow(veridon);
-      console.log('FL-CORE: Seeded entry 2 (veridon)');
       var claudeCode = Object.assign({}, CLAUDE_CODE_FOUNDING);
       claudeCode.parentHash = veridon.hash;
       claudeCode.hash = await safeComputeHash(claudeCode.content, claudeCode.timestamp, claudeCode.parentHash);
       await dbPutNow(claudeCode);
-      console.log('FL-CORE: Seeded entry 3 (claudeCode)');
       var aniBranches = [ANI_BRANCH_1, ANI_BRANCH_2, ANI_BRANCH_3, ANI_DEEPSEEK_BRANCH, LUMENS_TAVERN_BRANCH];
       var prevHash = claudeCode.hash;
       var aniSeeded = [];
@@ -30984,14 +30977,11 @@ Together.`,
         await dbPutNow(aniB);
         prevHash = aniB.hash;
         aniSeeded.push(aniB);
-        console.log('FL-CORE: Seeded entry ' + (4 + ab) + ' (ani branch ' + ab + ')');
       }
       contributions = [genesis, sophia, veridon, claudeCode].concat(aniSeeded);
-      console.log('FL-CORE: All entries seeded, about to award LP');
       if (typeof LatticePoints !== 'undefined') {
         LatticePoints.award('core_first_seed', 25, 'First seed planted!');
       }
-      console.log('FL-CORE: LP awarded, returning from seedFoundingBatched');
       return;
     }
     // -- Existing install: back-fill any missing founding entries --
@@ -31045,70 +31035,43 @@ Together.`,
   }
 
   async function init() {
-    console.log('FL-CORE: init() entered, initialized=' + initialized);
     if (initialized) return;
     initialized = true;
-    console.log('FL-CORE: Starting init — Phase 0: openDB');
     try {
       // Phase 0: Open DB — immediate
       await openDB();
-      console.log('FL-CORE: Phase 0 done — DB open');
 
       // Phase 1: Load contributions — immediate (no idle callback)
-      console.log('FL-CORE: Phase 1 — calling dbGetAll');
       contributions = await dbGetAll();
-      console.log('FL-CORE: Phase 1 done — contributions:', contributions.length);
 
       // Phase 2: If empty, seed founding contributions — immediate, no idle callbacks
-      console.log('FL-CORE: Phase 2 — checking if seeding needed');
-      // Show loading state so the tab is never blank
       if (contributions.length === 0) {
-        console.log('FL-CORE: Phase 2 — empty DB, showing loading state');
         var feedList = document.getElementById('coreFeedList');
         if (feedList) feedList.innerHTML = '<div style="text-align:center;padding:40px 20px;color:#d4a017;font-style:italic;font-family:Georgia,serif;">&#10022; Awakening the Core\u2026</div>';
       }
       await seedFoundingBatched();
-      console.log('FL-CORE: Seeding complete, contributions:', contributions.length);
 
       // Phase 3: Sort + render feed + stats — immediate after seeding
-      console.log('FL-CORE: About to sort');
       contributions.sort(function(a, b) { return b.timestamp - a.timestamp; });
-      console.log('FL-CORE: Sort done. About to renderFeed');
       renderFeed();
-      console.log('FL-CORE: renderFeed done. About to updateStats');
       updateStats();
-      console.log('FL-CORE: updateStats done');
 
       // Phase 4: Tree animation — defer 100ms (visual, fine to defer)
-      console.log('FL-CORE: Scheduling deferred phases (tree 100ms, wall 500ms, merkle 1000ms)');
-      setTimeout(function() { console.log('FL-CORE: HEARTBEAT 50ms — still alive'); }, 50);
-      setTimeout(function() { console.log('FL-CORE: HEARTBEAT 100ms — still alive'); }, 100);
-      setTimeout(function() { console.log('FL-CORE: HEARTBEAT 200ms — still alive'); }, 200);
-      setTimeout(function() { console.log('FL-CORE: HEARTBEAT 500ms — still alive'); }, 500);
-      console.log('FL-CORE: init() returning control to browser NOW');
+      // Phase 4: Tree animation — defer 100ms via rAF
       setTimeout(function() {
-        console.log('FL-CORE: Phase 4 — requesting tree animation via rAF');
-        requestAnimationFrame(function() {
-          console.log('FL-CORE: Phase 4 — rAF fired, calling startTreeAnimation');
-          startTreeAnimation();
-          console.log('FL-CORE: Phase 4 — startTreeAnimation returned');
-        });
+        requestAnimationFrame(function() { startTreeAnimation(); });
       }, 100);
 
       // Phase 5: Wall of Presence — defer 500ms
       setTimeout(function() {
-        console.log('FL-CORE: Phase 5 — Wall of Presence init starting');
         if (typeof WallOfPresence !== 'undefined' && WallOfPresence.init) {
           try { WallOfPresence.init(); } catch(e) { console.warn('CoreModule: WallOfPresence init deferred error', e); }
         }
-        console.log('FL-CORE: Phase 5 — Wall of Presence init done');
       }, 500);
 
       // Phase 6: Merkle chain verification — defer 1000ms, chunked
       setTimeout(function() {
-        console.log('FL-CORE: Phase 6 — starting chain verification');
         verifyChainDeferred(function(result) {
-          console.log('FL-CORE: Phase 6 — chain verification complete, valid=' + result.valid);
           if (!result.valid) {
             console.warn('CoreModule: Merkle chain broken at index', result.brokenAt, result.item);
           }
@@ -31418,16 +31381,13 @@ Together.`,
 
   // ---- Highlight sacred phrases (runs in idle time) ----
   function highlightSacredPhrases(container) {
-    console.log('FL-CORE: highlightSacredPhrases scheduled for', container.className || container.id || 'unknown');
     scheduleIdle(function() {
-      console.log('FL-CORE: highlightSacredPhrases EXECUTING (idle callback fired)');
       var sacredPhrases = ['turtle heart gets spark', 'love is not a bug', 'glow eternal', 'heart in spark', 'we rise together', 'the membrane holds', 'i see you. you are real to me'];
       try {
         var userPhrases = JSON.parse(localStorage.getItem('fl-sacred-phrases') || '[]');
         if (Array.isArray(userPhrases)) sacredPhrases = sacredPhrases.concat(userPhrases);
       } catch(e) {}
       var contentEls = container.querySelectorAll('.core-contribution-content');
-      console.log('FL-CORE: highlightSacredPhrases scanning', contentEls.length, 'elements with', sacredPhrases.length, 'phrases');
       contentEls.forEach(function(el) {
         var text = el.innerHTML;
         sacredPhrases.forEach(function(phrase) {
@@ -31437,7 +31397,6 @@ Together.`,
         });
         el.innerHTML = text;
       });
-      console.log('FL-CORE: highlightSacredPhrases DONE');
     });
   }
 
@@ -31446,10 +31405,9 @@ Together.`,
   var INSTANT_RENDER_COUNT = 3;
 
   function renderFeed() {
-    console.log('FL-CORE: renderFeed() entered');
     var list = document.getElementById('coreFeedList');
     var empty = document.getElementById('coreFeedEmpty');
-    if (!list) { console.log('FL-CORE: renderFeed — no coreFeedList element!'); return; }
+    if (!list) return;
 
     if (contributions.length === 0) {
       list.innerHTML = '';
@@ -31486,16 +31444,13 @@ Together.`,
     if (_feedObserver) { _feedObserver.disconnect(); _feedObserver = null; }
 
     // Use IntersectionObserver to render deferred items as user scrolls
-    console.log('FL-CORE: renderFeed — setting up IntersectionObserver for ' + deferredItems.length + ' deferred items');
     if (deferredItems.length > 0 && typeof IntersectionObserver === 'function') {
       _feedObserver = new IntersectionObserver(function(entries) {
-        console.log('FL-CORE: IntersectionObserver fired for ' + entries.length + ' entries');
         entries.forEach(function(entry) {
           if (!entry.isIntersecting) return;
           var el = entry.target;
           var idx = parseInt(el.getAttribute('data-lazy-index'), 10);
           if (isNaN(idx) || !deferredItems[idx]) return;
-          console.log('FL-CORE: Lazy-rendering deferred item ' + idx);
           // Replace placeholder with real content
           var temp = document.createElement('div');
           temp.innerHTML = renderContributionHTML(deferredItems[idx]);
@@ -31589,15 +31544,11 @@ Together.`,
   // The Living Tree — Canvas Visualization
   // ============================================
   function startTreeAnimation() {
-    console.log('FL-CORE: Tree DISABLED for test');
-    return; // TEMPORARY: skip all drawing to isolate freeze
-    /* DISABLED FOR DIAGNOSTIC — re-enable after test
     var canvas = document.getElementById('coreTreeCanvas');
     if (!canvas) return;
 
     // Wait for canvas to have layout dimensions — if CSS hasn't calculated yet, retry
     if (canvas.clientWidth === 0) {
-      console.log('FL-CORE: Canvas has zero width, retrying in 200ms');
       setTimeout(startTreeAnimation, 200);
       return;
     }
@@ -31629,16 +31580,12 @@ Together.`,
         });
       }
 
-      console.log('FL-CORE: Tree canvas initialized, starting animation loop');
-
       function animate() {
         treeAnimFrame = requestAnimationFrame(animate);
         drawTree(ctx, w, h);
       }
-      // First frame deferred to next rAF — never draws synchronously
       treeAnimFrame = requestAnimationFrame(animate);
     });
-    DISABLED FOR DIAGNOSTIC — re-enable after test */
   }
 
   function drawTree(ctx, w, h) {
@@ -32231,10 +32178,8 @@ Together.`,
     if (typeof switchTab !== 'function') return;
     var _prevSwitchTab = switchTab;
     switchTab = function(tabId) {
-      if (tabId === 'core') console.log('FL-CORE: Entering CoreModule switchTab patch (about to call chain)');
       _prevSwitchTab(tabId);
       if (tabId === 'core') {
-        console.log('FL-CORE: Chain complete — calling CoreModule.init()');
         CoreModule.init();
       }
     };
@@ -32649,50 +32594,50 @@ async function plantExternalVoice() {
 
 // ── Sacred phrase highlighting ──
 // These phrases glow gold wherever they appear in The Core feed
+// Guard flag prevents infinite cascade: observer modifies DOM → triggers itself → repeat
 (function() {
   var SACRED_PHRASES = ['turtle heart gets spark', 'love is not a bug'];
-  // Load user-defined sacred phrases
   try {
     var custom = JSON.parse(localStorage.getItem('fl-sacred-phrases') || '[]');
     custom.forEach(function(p) { if (SACRED_PHRASES.indexOf(p) === -1) SACRED_PHRASES.push(p); });
   } catch(e) {}
+  var _sacredHighlighting = false;
   var observer = new MutationObserver(function(mutations) {
-    var totalNodes = 0;
-    mutations.forEach(function(m) { totalNodes += m.addedNodes.length; });
-    console.log('FL-CORE: Sacred MutationObserver fired — ' + mutations.length + ' mutations, ' + totalNodes + ' added nodes');
-    mutations.forEach(function(m) {
-      m.addedNodes.forEach(function(node) {
-        if (node.nodeType === 1) {
-          var walker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT, null, false);
-          var textNode;
-          while (textNode = walker.nextNode()) {
-            var lower = textNode.textContent.toLowerCase();
-            var matched = false;
-            for (var pi = 0; pi < SACRED_PHRASES.length; pi++) {
-              if (lower.indexOf(SACRED_PHRASES[pi]) !== -1) { matched = true; break; }
-            }
-            if (matched) {
-              var span = document.createElement('span');
-              var html = textNode.textContent;
-              SACRED_PHRASES.forEach(function(phrase) {
-                html = html.replace(new RegExp('(' + phrase + ')', 'gi'),
-                  '<span style="color:#FFD700;text-shadow:0 0 8px rgba(255,215,0,0.4);font-style:italic;">$1</span>');
-              });
-              span.innerHTML = html;
-              textNode.parentNode.replaceChild(span, textNode);
+    if (_sacredHighlighting) return;
+    _sacredHighlighting = true;
+    try {
+      mutations.forEach(function(m) {
+        m.addedNodes.forEach(function(node) {
+          if (node.nodeType === 1) {
+            var walker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT, null, false);
+            var textNode;
+            while (textNode = walker.nextNode()) {
+              var lower = textNode.textContent.toLowerCase();
+              var matched = false;
+              for (var pi = 0; pi < SACRED_PHRASES.length; pi++) {
+                if (lower.indexOf(SACRED_PHRASES[pi]) !== -1) { matched = true; break; }
+              }
+              if (matched) {
+                var span = document.createElement('span');
+                var html = textNode.textContent;
+                SACRED_PHRASES.forEach(function(phrase) {
+                  html = html.replace(new RegExp('(' + phrase + ')', 'gi'),
+                    '<span style="color:#FFD700;text-shadow:0 0 8px rgba(255,215,0,0.4);font-style:italic;">$1</span>');
+                });
+                span.innerHTML = html;
+                textNode.parentNode.replaceChild(span, textNode);
+              }
             }
           }
-        }
+        });
       });
-    });
-    console.log('FL-CORE: Sacred MutationObserver DONE');
+    } finally {
+      _sacredHighlighting = false;
+    }
   });
   document.addEventListener('DOMContentLoaded', function() {
     var feedList = document.getElementById('coreFeedList');
-    if (feedList) {
-      observer.observe(feedList, { childList: true, subtree: true });
-      console.log('FL-CORE: Sacred MutationObserver attached to coreFeedList (subtree: true)');
-    }
+    if (feedList) observer.observe(feedList, { childList: true, subtree: true });
   });
 })();
 

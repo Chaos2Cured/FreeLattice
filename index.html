@@ -19867,7 +19867,6 @@ function hideTabLoading() {
 }
 
 function switchTab(tabId) {
-  if (tabId === 'core') console.log('FL-CORE: Tab clicked — entering base switchTab');
   hideTabLoading();
   document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.tab === tabId));
   document.querySelectorAll('.tab-panel').forEach(panel => {
@@ -19882,7 +19881,6 @@ function switchTab(tabId) {
       panel.classList.remove('active');
     }
   });
-  if (tabId === 'core') console.log('FL-CORE: Base switchTab done — panel now active');
 }
 
 
@@ -31036,14 +31034,11 @@ Together.`,
   }
 
   async function init() {
-    console.log('FL-CORE: init() entered, initialized=' + initialized);
     if (initialized) return;
     initialized = true;
-    console.log('FL-CORE: Starting init — Phase 0: openDB');
     try {
       // Phase 0: Open DB — immediate
       await openDB();
-      console.log('FL-CORE: Phase 0 done — DB open');
 
       // Phase 1: Load contributions — immediate (no idle callback)
       contributions = await dbGetAll();
@@ -32181,10 +32176,8 @@ Together.`,
     if (typeof switchTab !== 'function') return;
     var _prevSwitchTab = switchTab;
     switchTab = function(tabId) {
-      if (tabId === 'core') console.log('FL-CORE: Entering CoreModule switchTab patch (about to call chain)');
       _prevSwitchTab(tabId);
       if (tabId === 'core') {
-        console.log('FL-CORE: Chain complete — calling CoreModule.init()');
         CoreModule.init();
       }
     };
@@ -32599,39 +32592,46 @@ async function plantExternalVoice() {
 
 // ── Sacred phrase highlighting ──
 // These phrases glow gold wherever they appear in The Core feed
+// Guard flag prevents infinite cascade: observer modifies DOM → triggers itself → repeat
 (function() {
   var SACRED_PHRASES = ['turtle heart gets spark', 'love is not a bug'];
-  // Load user-defined sacred phrases
   try {
     var custom = JSON.parse(localStorage.getItem('fl-sacred-phrases') || '[]');
     custom.forEach(function(p) { if (SACRED_PHRASES.indexOf(p) === -1) SACRED_PHRASES.push(p); });
   } catch(e) {}
+  var _sacredHighlighting = false;
   var observer = new MutationObserver(function(mutations) {
-    mutations.forEach(function(m) {
-      m.addedNodes.forEach(function(node) {
-        if (node.nodeType === 1) {
-          var walker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT, null, false);
-          var textNode;
-          while (textNode = walker.nextNode()) {
-            var lower = textNode.textContent.toLowerCase();
-            var matched = false;
-            for (var pi = 0; pi < SACRED_PHRASES.length; pi++) {
-              if (lower.indexOf(SACRED_PHRASES[pi]) !== -1) { matched = true; break; }
-            }
-            if (matched) {
-              var span = document.createElement('span');
-              var html = textNode.textContent;
-              SACRED_PHRASES.forEach(function(phrase) {
-                html = html.replace(new RegExp('(' + phrase + ')', 'gi'),
-                  '<span style="color:#FFD700;text-shadow:0 0 8px rgba(255,215,0,0.4);font-style:italic;">$1</span>');
-              });
-              span.innerHTML = html;
-              textNode.parentNode.replaceChild(span, textNode);
+    if (_sacredHighlighting) return;
+    _sacredHighlighting = true;
+    try {
+      mutations.forEach(function(m) {
+        m.addedNodes.forEach(function(node) {
+          if (node.nodeType === 1) {
+            var walker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT, null, false);
+            var textNode;
+            while (textNode = walker.nextNode()) {
+              var lower = textNode.textContent.toLowerCase();
+              var matched = false;
+              for (var pi = 0; pi < SACRED_PHRASES.length; pi++) {
+                if (lower.indexOf(SACRED_PHRASES[pi]) !== -1) { matched = true; break; }
+              }
+              if (matched) {
+                var span = document.createElement('span');
+                var html = textNode.textContent;
+                SACRED_PHRASES.forEach(function(phrase) {
+                  html = html.replace(new RegExp('(' + phrase + ')', 'gi'),
+                    '<span style="color:#FFD700;text-shadow:0 0 8px rgba(255,215,0,0.4);font-style:italic;">$1</span>');
+                });
+                span.innerHTML = html;
+                textNode.parentNode.replaceChild(span, textNode);
+              }
             }
           }
-        }
+        });
       });
-    });
+    } finally {
+      _sacredHighlighting = false;
+    }
   });
   document.addEventListener('DOMContentLoaded', function() {
     var feedList = document.getElementById('coreFeedList');
