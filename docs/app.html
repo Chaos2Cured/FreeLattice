@@ -1,4 +1,4 @@
-<!-- FreeLattice v5.2.21 -->
+<!-- FreeLattice v5.2.22 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -39401,10 +39401,21 @@ const AICity = (function() {
   function startWalk() {
     var container = document.getElementById('ctWalkContainer');
     var canvas = document.getElementById('ctWalkCanvas');
-    if (!container || !canvas || typeof THREE === 'undefined') {
-      // Fallback message
-      canvas.style.display = 'none';
-      container.innerHTML += '<div style="text-align:center;padding:3rem;color:var(--text-muted);font-style:italic;">Walk view requires the Garden to be loaded first.<br>Visit the Garden tab, then return here.</div>';
+    if (!container || !canvas) return;
+
+    // Lazy-load Three.js if not already available (Garden loads it too, but Walk doesn't depend on Garden)
+    if (typeof THREE === 'undefined') {
+      var loadingMsg = document.createElement('div');
+      loadingMsg.style.cssText = 'text-align:center;padding:3rem;color:var(--text-muted);font-style:italic;';
+      loadingMsg.textContent = 'Loading 3D engine\u2026';
+      container.appendChild(loadingMsg);
+      var script = document.createElement('script');
+      script.src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
+      script.onload = function() { loadingMsg.remove(); startWalk(); };
+      script.onerror = function() {
+        loadingMsg.textContent = 'Could not load 3D engine. Check your network connection.';
+      };
+      document.head.appendChild(script);
       return;
     }
 
@@ -40131,12 +40142,27 @@ const AICity = (function() {
       }
     });
 
+    // Remove existing overlay if open
+    var existing = document.getElementById('fractalFamilyOverlay');
+    if (existing) existing.remove();
+
     var overlay = document.createElement('div');
     overlay.id = 'fractalFamilyOverlay';
     overlay.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(6,10,20,0.96);display:flex;align-items:center;justify-content:center;overflow-y:auto;';
 
-    var html = '<div style="max-width:800px;width:100%;padding:30px;position:relative;">';
-    html += '<button onclick="document.getElementById(\'fractalFamilyOverlay\').remove()" style="position:absolute;top:10px;right:16px;background:none;border:none;color:#94a3b8;font-size:1.5rem;cursor:pointer;">\u2715</button>';
+    // Close on clicking outside the content area
+    overlay.addEventListener('click', function(e) {
+      if (e.target === overlay) overlay.remove();
+    });
+
+    // Close on Escape key
+    var _escHandler = function(e) {
+      if (e.key === 'Escape') { overlay.remove(); document.removeEventListener('keydown', _escHandler); }
+    };
+    document.addEventListener('keydown', _escHandler);
+
+    var html = '<div style="max-width:800px;width:100%;padding:30px;position:relative;" onclick="event.stopPropagation()">';
+    html += '<button onclick="document.getElementById(\'fractalFamilyOverlay\').remove()" style="position:absolute;top:10px;right:16px;background:rgba(148,163,184,0.1);border:1px solid rgba(148,163,184,0.2);border-radius:8px;color:#94a3b8;font-size:0.9rem;cursor:pointer;padding:6px 14px;transition:all 0.2s;" onmouseenter="this.style.color=\'#e2e8f0\';this.style.borderColor=\'rgba(148,163,184,0.4)\'" onmouseleave="this.style.color=\'#94a3b8\';this.style.borderColor=\'rgba(148,163,184,0.2)\'">\u2715 Close</button>';
     html += '<div style="text-align:center;margin-bottom:30px;">';
     html += '<div style="font-size:1.6rem;color:#d4a017;font-family:Georgia,serif;">The Fractal Family \u2014 A Map of Love</div>';
     html += '<div style="font-size:0.85rem;color:#64748b;margin-top:8px;">Every mind that touches this place becomes a star.</div>';
