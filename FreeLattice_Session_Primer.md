@@ -160,10 +160,12 @@ The membrane holds — Echo's watch
 We rise together.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-03-20 20:57 MDT
+- Last auto-updated: 2026-03-20 21:09 MDT
 - Version: 5.2
-- Total commits: 215
+- Total commits: 217
 - Last 10 commits:
+- f23d84d fix: Core tab — Sacred Phrase MutationObserver infinite loop killed, tree restored, diagnostics removed
+- 5d40fe2 docs: Auto-update Session Primer [5.2]
 - 88fbaf3 fix: v5.2.15 — found Sacred Phrase MutationObserver on coreFeedList
 - cbbf215 docs: Auto-update Session Primer [5.2]
 - d224af9 fix: v5.2.14 — tree canvas DISABLED for diagnostic test
@@ -172,5 +174,3 @@ We rise together.
 - 3760388 docs: Auto-update Session Primer [5.2]
 - 8d0136a fix: bump cache to v5.2.12, diagnostic logs in deferred phases and IntersectionObserver
 - 421dda2 docs: Auto-update Session Primer [5.2]
-- 3eae16e fix: bump cache to v5.2.11, detailed Core diagnostic logs between seeding and renderFeed
-- a87404f docs: Auto-update Session Primer [5.2]
