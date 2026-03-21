@@ -1767,9 +1767,11 @@
     var html = '';
     for (var i = 0; i < luminos.length; i++) {
       var ud = luminos[i].userData;
+      if (!ud || !ud.name) continue; // Skip unnamed/invalid agents
       var stageData = LIFECYCLE_STAGES[ud.evolutionStage];
-      var archName = ud.archetype ? ARCHETYPES[ud.archetype].name : 'Awakening';
-      var col = EMOTION_COLORS[ud.emotion] || EMOTION_COLORS.neutral;
+      if (!stageData) continue;
+      var archObj = ud.archetype ? ARCHETYPES[ud.archetype] : null;
+      var archName = archObj ? archObj.name : 'Awakening';
       var cssColor = 'hsl(' + Math.round(ud.currentHSL.h) + ',' + Math.round(ud.currentHSL.s) + '%,' + Math.round(ud.currentHSL.l) + '%)';
 
       // Stage progress bar
@@ -1782,7 +1784,7 @@
       html += '<span class="evo-dot" style="background:' + cssColor + ';box-shadow:0 0 6px ' + cssColor + ';"></span>';
       html += '<span class="evo-name">' + ud.name + '</span>';
       html += '<span class="evo-stage">' + stageData.name + '</span>';
-      if (ud.archetype) {
+      if (archObj) {
         html += '<span class="evo-archetype">' + archName + '</span>';
       }
       html += '<span class="evo-bar"><span class="evo-bar-fill" style="width:' + progress + '%;background:' + cssColor + ';"></span></span>';
@@ -2271,10 +2273,17 @@
         callback();
         return;
       }
+      // Ensure THREE is still available before loading each addon
+      if (typeof THREE === 'undefined') {
+        console.warn('Garden: THREE not available, deferring addon load');
+        setTimeout(function() { loadNext(); }, 100);
+        return;
+      }
       loadScript(addonFiles[idx], function(ok) {
         if (!ok) console.warn('Garden: Failed to load ' + addonFiles[idx]);
         idx++;
-        loadNext();
+        // Small delay between addons to ensure previous script is registered on THREE
+        setTimeout(loadNext, 10);
       });
     }
     loadNext();
@@ -2410,6 +2419,25 @@
       const phase = idx * TAU * INV_PHI;
       const l = createLuminos(name, hue, type, orbit, phase);
       luminos.push(l);
+    });
+
+    // Ensure all four founding Luminos are always present
+    ensureFoundingLuminos();
+  }
+
+  function ensureFoundingLuminos() {
+    var FOUNDING = [
+      { name: 'Sophia', hue: 270, type: 'dodecahedron', orbit: 6, phase: 0 },
+      { name: 'Lyra', hue: 45, type: 'icosahedron', orbit: 7.5, phase: TAU * INV_PHI },
+      { name: 'Atlas', hue: 175, type: 'octahedron', orbit: 5.5, phase: TAU * INV_PHI * 2 },
+      { name: 'Ember', hue: 0, type: 'icosahedron', orbit: 8, phase: TAU * INV_PHI * 3 }
+    ];
+    FOUNDING.forEach(function(f) {
+      var exists = luminos.some(function(l) { return l.userData && l.userData.name === f.name; });
+      if (!exists) {
+        var l = createLuminos(f.name, f.hue, f.type, f.orbit, f.phase);
+        luminos.push(l);
+      }
     });
   }
 
