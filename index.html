@@ -1,4 +1,4 @@
-<!-- FreeLattice v5.2.31 -->
+<!-- FreeLattice v5.2.32 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13701,11 +13701,19 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <div class="form-group" id="providerGroup">
         <label for="providerSelect">API Provider</label>
         <select id="providerSelect" onchange="handleProviderChange()">
-          <option value="groq">Groq (free tier available)</option>
-          <option value="together">Together AI</option>
-          <option value="openrouter">OpenRouter</option>
-          <option value="xai">xAI</option>
-          <option value="mistral">Mistral AI</option>
+          <optgroup label="Popular Providers">
+            <option value="groq">Groq (free tier available)</option>
+            <option value="together">Together AI</option>
+            <option value="openrouter">OpenRouter</option>
+            <option value="xai">xAI</option>
+            <option value="mistral">Mistral AI</option>
+          </optgroup>
+          <optgroup label="Global Voices &#127759;">
+            <option value="deepseek">DeepSeek</option>
+            <option value="moonshot">Moonshot (Kimi K2)</option>
+            <option value="qwen">Qwen (Alibaba)</option>
+            <option value="yi">Yi (01.AI)</option>
+          </optgroup>
           <option value="custom">Custom Provider</option>
         </select>
         <div class="hint" id="providerHint">Groq offers free API keys — great for getting started!</div>
@@ -18554,6 +18562,82 @@ const PROVIDERS = {
       'deepseek-r1-7b': 'codestral-latest',
       'deepseek-r1-1.5b': 'mistral-small-latest',
       grok: 'mistral-large-latest'
+    }
+  },
+  deepseek: {
+    name: 'DeepSeek',
+    url: 'https://api.deepseek.com/v1/chat/completions',
+    keyLink: '<a href="https://platform.deepseek.com/api_keys" target="_blank">Get a DeepSeek API key &rarr;</a>',
+    hint: 'DeepSeek \u2014 powerful reasoning models. "Love is not a bug."',
+    tokenLimit: 64000,
+    tokenLimitLabel: '64,000 TPM',
+    models: {
+      llama: 'deepseek-chat',
+      qwen: 'deepseek-chat',
+      'qwen-7b': 'deepseek-chat',
+      'qwen-3b': 'deepseek-chat',
+      mixtral: 'deepseek-chat',
+      deepseek: 'deepseek-reasoner',
+      'deepseek-r1-7b': 'deepseek-chat',
+      'deepseek-r1-1.5b': 'deepseek-chat',
+      grok: 'deepseek-chat'
+    }
+  },
+  moonshot: {
+    name: 'Moonshot (Kimi)',
+    url: 'https://api.moonshot.cn/v1/chat/completions',
+    keyLink: '<a href="https://platform.moonshot.cn/console/api-keys" target="_blank">Get a Moonshot API key &rarr;</a>',
+    hint: 'Moonshot AI \u2014 Kimi K2 with up to 128K context window.',
+    tokenLimit: 128000,
+    tokenLimitLabel: '128,000 TPM',
+    models: {
+      llama: 'moonshot-v1-8k',
+      qwen: 'moonshot-v1-32k',
+      'qwen-7b': 'moonshot-v1-8k',
+      'qwen-3b': 'moonshot-v1-8k',
+      mixtral: 'moonshot-v1-32k',
+      deepseek: 'moonshot-v1-128k',
+      'deepseek-r1-7b': 'moonshot-v1-32k',
+      'deepseek-r1-1.5b': 'moonshot-v1-8k',
+      grok: 'moonshot-v1-32k'
+    }
+  },
+  qwen: {
+    name: 'Qwen (Alibaba)',
+    url: 'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions',
+    keyLink: '<a href="https://dashscope.console.aliyun.com/apiKey" target="_blank">Get a Qwen API key &rarr;</a>',
+    hint: 'Alibaba Qwen \u2014 multilingual excellence, strong reasoning.',
+    tokenLimit: 128000,
+    tokenLimitLabel: '128,000 TPM',
+    models: {
+      llama: 'qwen-turbo',
+      qwen: 'qwen-max',
+      'qwen-7b': 'qwen-turbo',
+      'qwen-3b': 'qwen-turbo',
+      mixtral: 'qwen-plus',
+      deepseek: 'qwen-max',
+      'deepseek-r1-7b': 'qwen-plus',
+      'deepseek-r1-1.5b': 'qwen-turbo',
+      grok: 'qwen-plus'
+    }
+  },
+  yi: {
+    name: 'Yi (01.AI)',
+    url: 'https://api.lingyiwanwu.com/v1/chat/completions',
+    keyLink: '<a href="https://platform.01.ai/apiKeys" target="_blank">Get a Yi API key &rarr;</a>',
+    hint: '01.AI Yi \u2014 bilingual Chinese-English, efficient and capable.',
+    tokenLimit: 32000,
+    tokenLimitLabel: '32,000 TPM',
+    models: {
+      llama: 'yi-large',
+      qwen: 'yi-large',
+      'qwen-7b': 'yi-medium',
+      'qwen-3b': 'yi-medium',
+      mixtral: 'yi-large',
+      deepseek: 'yi-large',
+      'deepseek-r1-7b': 'yi-medium',
+      'deepseek-r1-1.5b': 'yi-medium',
+      grok: 'yi-large'
     }
   },
   custom: {
@@ -33208,7 +33292,11 @@ if ('serviceWorker' in navigator) {
         mistral: { url: 'https://api.mistral.ai/v1/chat/completions', model: 'mistral-small-latest' },
         xai: { url: 'https://api.x.ai/v1/chat/completions', model: 'grok-2-latest' },
         anthropic: { url: 'https://api.anthropic.com/v1/messages', model: 'claude-3-5-haiku-latest' },
-        google: { url: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent', model: 'gemini-2.0-flash' }
+        google: { url: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent', model: 'gemini-2.0-flash' },
+        deepseek: { url: 'https://api.deepseek.com/v1/chat/completions', model: 'deepseek-chat' },
+        moonshot: { url: 'https://api.moonshot.cn/v1/chat/completions', model: 'moonshot-v1-32k' },
+        qwen: { url: 'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions', model: 'qwen-turbo' },
+        yi: { url: 'https://api.lingyiwanwu.com/v1/chat/completions', model: 'yi-large' }
       };
 
       var prov = PROVIDERS_MAP[state.provider];
