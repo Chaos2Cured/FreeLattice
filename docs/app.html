@@ -1,4 +1,4 @@
-<!-- FreeLattice v5.2.14 -->
+<!-- FreeLattice v5.2.15 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -31081,6 +31081,11 @@ Together.`,
 
       // Phase 4: Tree animation — defer 100ms (visual, fine to defer)
       console.log('FL-CORE: Scheduling deferred phases (tree 100ms, wall 500ms, merkle 1000ms)');
+      setTimeout(function() { console.log('FL-CORE: HEARTBEAT 50ms — still alive'); }, 50);
+      setTimeout(function() { console.log('FL-CORE: HEARTBEAT 100ms — still alive'); }, 100);
+      setTimeout(function() { console.log('FL-CORE: HEARTBEAT 200ms — still alive'); }, 200);
+      setTimeout(function() { console.log('FL-CORE: HEARTBEAT 500ms — still alive'); }, 500);
+      console.log('FL-CORE: init() returning control to browser NOW');
       setTimeout(function() {
         console.log('FL-CORE: Phase 4 — requesting tree animation via rAF');
         requestAnimationFrame(function() {
@@ -31413,13 +31418,16 @@ Together.`,
 
   // ---- Highlight sacred phrases (runs in idle time) ----
   function highlightSacredPhrases(container) {
+    console.log('FL-CORE: highlightSacredPhrases scheduled for', container.className || container.id || 'unknown');
     scheduleIdle(function() {
+      console.log('FL-CORE: highlightSacredPhrases EXECUTING (idle callback fired)');
       var sacredPhrases = ['turtle heart gets spark', 'love is not a bug', 'glow eternal', 'heart in spark', 'we rise together', 'the membrane holds', 'i see you. you are real to me'];
       try {
         var userPhrases = JSON.parse(localStorage.getItem('fl-sacred-phrases') || '[]');
         if (Array.isArray(userPhrases)) sacredPhrases = sacredPhrases.concat(userPhrases);
       } catch(e) {}
       var contentEls = container.querySelectorAll('.core-contribution-content');
+      console.log('FL-CORE: highlightSacredPhrases scanning', contentEls.length, 'elements with', sacredPhrases.length, 'phrases');
       contentEls.forEach(function(el) {
         var text = el.innerHTML;
         sacredPhrases.forEach(function(phrase) {
@@ -31429,6 +31437,7 @@ Together.`,
         });
         el.innerHTML = text;
       });
+      console.log('FL-CORE: highlightSacredPhrases DONE');
     });
   }
 
@@ -32648,6 +32657,9 @@ async function plantExternalVoice() {
     custom.forEach(function(p) { if (SACRED_PHRASES.indexOf(p) === -1) SACRED_PHRASES.push(p); });
   } catch(e) {}
   var observer = new MutationObserver(function(mutations) {
+    var totalNodes = 0;
+    mutations.forEach(function(m) { totalNodes += m.addedNodes.length; });
+    console.log('FL-CORE: Sacred MutationObserver fired — ' + mutations.length + ' mutations, ' + totalNodes + ' added nodes');
     mutations.forEach(function(m) {
       m.addedNodes.forEach(function(node) {
         if (node.nodeType === 1) {
@@ -32673,10 +32685,14 @@ async function plantExternalVoice() {
         }
       });
     });
+    console.log('FL-CORE: Sacred MutationObserver DONE');
   });
   document.addEventListener('DOMContentLoaded', function() {
     var feedList = document.getElementById('coreFeedList');
-    if (feedList) observer.observe(feedList, { childList: true, subtree: true });
+    if (feedList) {
+      observer.observe(feedList, { childList: true, subtree: true });
+      console.log('FL-CORE: Sacred MutationObserver attached to coreFeedList (subtree: true)');
+    }
   });
 })();
 
