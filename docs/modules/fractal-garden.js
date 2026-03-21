@@ -2405,14 +2405,22 @@
       return;
     }
 
+    // If all incoming agents are unnamed ("Agent N"), ignore them — keep founding defaults
+    var allUnnamed = agents.every(function(a) { return !a.name || a.name.indexOf('Agent ') === 0; });
+    if (allUnnamed) {
+      createDefaultAgents();
+      return;
+    }
+
     // Founding agent name/hue mapping — these must always be correct
     var FOUNDING_HUES = { 'Sophia': 270, 'Lyra': 45, 'Atlas': 175, 'Ember': 0 };
     var FOUNDING_TYPES = { 'Sophia': 'dodecahedron', 'Lyra': 'icosahedron', 'Atlas': 'octahedron', 'Ember': 'icosahedron' };
 
-    // Create luminos for each active agent
+    // Create luminos for each named agent
     const hueStep = 360 / agents.length;
     agents.forEach(function(agent, idx) {
-      var name = agent.name || ('Agent ' + (idx + 1));
+      var name = agent.name;
+      if (!name || name.indexOf('Agent ') === 0) return; // Skip unnamed agents
       var hue = FOUNDING_HUES[name] !== undefined ? FOUNDING_HUES[name] : (idx * hueStep) % 360;
       var type = FOUNDING_TYPES[name] || ['icosahedron', 'dodecahedron', 'octahedron'][idx % 3];
       const orbit = 5 + (idx % 4) * PHI;
