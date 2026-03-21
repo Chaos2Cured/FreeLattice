@@ -1,4 +1,4 @@
-<!-- FreeLattice v5.2.12 -->
+<!-- FreeLattice v5.2.13 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -31082,9 +31082,12 @@ Together.`,
       // Phase 4: Tree animation — defer 100ms (visual, fine to defer)
       console.log('FL-CORE: Scheduling deferred phases (tree 100ms, wall 500ms, merkle 1000ms)');
       setTimeout(function() {
-        console.log('FL-CORE: Phase 4 — starting tree animation');
-        startTreeAnimation();
-        console.log('FL-CORE: Phase 4 — tree animation started');
+        console.log('FL-CORE: Phase 4 — requesting tree animation via rAF');
+        requestAnimationFrame(function() {
+          console.log('FL-CORE: Phase 4 — rAF fired, calling startTreeAnimation');
+          startTreeAnimation();
+          console.log('FL-CORE: Phase 4 — startTreeAnimation returned');
+        });
       }, 100);
 
       // Phase 5: Wall of Presence — defer 500ms
@@ -31579,37 +31582,50 @@ Together.`,
   function startTreeAnimation() {
     var canvas = document.getElementById('coreTreeCanvas');
     if (!canvas) return;
+
+    // Wait for canvas to have layout dimensions — if CSS hasn't calculated yet, retry
+    if (canvas.clientWidth === 0) {
+      console.log('FL-CORE: Canvas has zero width, retrying in 200ms');
+      setTimeout(startTreeAnimation, 200);
+      return;
+    }
+
     var ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Set canvas resolution
-    var dpr = window.devicePixelRatio || 1;
-    var w = 800, h = 520;
-    canvas.width = w * dpr;
-    canvas.height = h * dpr;
-    canvas.style.width = w + 'px';
-    canvas.style.height = h + 'px';
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    // Set canvas resolution inside rAF so it never blocks the main thread
+    requestAnimationFrame(function() {
+      var dpr = window.devicePixelRatio || 1;
+      var w = 800, h = 520;
+      canvas.width = w * dpr;
+      canvas.height = h * dpr;
+      canvas.style.width = w + 'px';
+      canvas.style.height = h + 'px';
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-    // Initialize particles
-    treeParticles = [];
-    for (var i = 0; i < 20; i++) {
-      treeParticles.push({
-        x: Math.random() * w,
-        y: Math.random() * h,
-        vx: (Math.random() - 0.5) * 0.3,
-        vy: -Math.random() * 0.5 - 0.1,
-        size: Math.random() * 2 + 0.5,
-        alpha: Math.random() * 0.5 + 0.2,
-        life: Math.random()
-      });
-    }
+      // Initialize particles
+      treeParticles = [];
+      for (var i = 0; i < 20; i++) {
+        treeParticles.push({
+          x: Math.random() * w,
+          y: Math.random() * h,
+          vx: (Math.random() - 0.5) * 0.3,
+          vy: -Math.random() * 0.5 - 0.1,
+          size: Math.random() * 2 + 0.5,
+          alpha: Math.random() * 0.5 + 0.2,
+          life: Math.random()
+        });
+      }
 
-    function animate() {
+      console.log('FL-CORE: Tree canvas initialized, starting animation loop');
+
+      function animate() {
+        treeAnimFrame = requestAnimationFrame(animate);
+        drawTree(ctx, w, h);
+      }
+      // First frame deferred to next rAF — never draws synchronously
       treeAnimFrame = requestAnimationFrame(animate);
-      drawTree(ctx, w, h);
-    }
-    animate();
+    });
   }
 
   function drawTree(ctx, w, h) {

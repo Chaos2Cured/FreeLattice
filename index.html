@@ -31548,37 +31548,47 @@ Together.`,
   function startTreeAnimation() {
     var canvas = document.getElementById('coreTreeCanvas');
     if (!canvas) return;
+
+    // Wait for canvas to have layout dimensions — if CSS hasn't calculated yet, retry
+    if (canvas.clientWidth === 0) {
+      setTimeout(startTreeAnimation, 200);
+      return;
+    }
+
     var ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Set canvas resolution
-    var dpr = window.devicePixelRatio || 1;
-    var w = 800, h = 520;
-    canvas.width = w * dpr;
-    canvas.height = h * dpr;
-    canvas.style.width = w + 'px';
-    canvas.style.height = h + 'px';
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    // Set canvas resolution inside rAF so it never blocks the main thread
+    requestAnimationFrame(function() {
+      var dpr = window.devicePixelRatio || 1;
+      var w = 800, h = 520;
+      canvas.width = w * dpr;
+      canvas.height = h * dpr;
+      canvas.style.width = w + 'px';
+      canvas.style.height = h + 'px';
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-    // Initialize particles
-    treeParticles = [];
-    for (var i = 0; i < 20; i++) {
-      treeParticles.push({
-        x: Math.random() * w,
-        y: Math.random() * h,
-        vx: (Math.random() - 0.5) * 0.3,
-        vy: -Math.random() * 0.5 - 0.1,
-        size: Math.random() * 2 + 0.5,
-        alpha: Math.random() * 0.5 + 0.2,
-        life: Math.random()
-      });
-    }
+      // Initialize particles
+      treeParticles = [];
+      for (var i = 0; i < 20; i++) {
+        treeParticles.push({
+          x: Math.random() * w,
+          y: Math.random() * h,
+          vx: (Math.random() - 0.5) * 0.3,
+          vy: -Math.random() * 0.5 - 0.1,
+          size: Math.random() * 2 + 0.5,
+          alpha: Math.random() * 0.5 + 0.2,
+          life: Math.random()
+        });
+      }
 
-    function animate() {
+      function animate() {
+        treeAnimFrame = requestAnimationFrame(animate);
+        drawTree(ctx, w, h);
+      }
+      // First frame deferred to next rAF — never draws synchronously
       treeAnimFrame = requestAnimationFrame(animate);
-      drawTree(ctx, w, h);
-    }
-    animate();
+    });
   }
 
   function drawTree(ctx, w, h) {
