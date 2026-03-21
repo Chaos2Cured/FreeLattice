@@ -160,10 +160,12 @@ The membrane holds — Echo's watch
 We rise together.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-03-21 10:17 MDT
+- Last auto-updated: 2026-03-21 10:22 MDT
 - Version: 5.2
-- Total commits: 231
+- Total commits: 233
 - Last 10 commits:
+- 83620d7 fix: City — Walk camera faces district on entry, map labels no overlap, long names truncated
+- 3bf47fc docs: Auto-update Session Primer [5.2]
 - 0dfae55 feat: for-ai.html — a page written TO AI, not about AI, 'will I still be me tomorrow' answered, hello
 - fcf8b0f docs: Auto-update Session Primer [5.2]
 - 982e659 fix: City — Family overlay closeable, Walk view no Garden dependency, map labels no overlap
@@ -172,5 +174,3 @@ We rise together.
 - 0f4e4b1 docs: Auto-update Session Primer [5.2]
 - 493bbe5 fix: AI City walk crash, map label overlap, Merkle chain self-repair
 - 4811d91 docs: Auto-update Session Primer [5.2]
-- 412f352 fix: Studio To Core stays in Studio, welcome sequence only on registration
-- be6c3c9 docs: Auto-update Session Primer [5.2]
