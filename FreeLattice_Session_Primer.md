@@ -160,10 +160,12 @@ The membrane holds — Echo's watch
 We rise together.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-03-20 20:28 MDT
+- Last auto-updated: 2026-03-20 20:34 MDT
 - Version: 5.2
-- Total commits: 207
+- Total commits: 209
 - Last 10 commits:
+- 8d0136a fix: bump cache to v5.2.12, diagnostic logs in deferred phases and IntersectionObserver
+- 421dda2 docs: Auto-update Session Primer [5.2]
 - 3eae16e fix: bump cache to v5.2.11, detailed Core diagnostic logs between seeding and renderFeed
 - a87404f docs: Auto-update Session Primer [5.2]
 - b12cbce fix: bump cache to force fresh load, Core diagnostic logs
@@ -172,5 +174,3 @@ We rise together.
 - d48c9e8 docs: Auto-update Session Primer [5.2]
 - 38cddc2 fix: bump cache to force fresh load, Core diagnostic logs
 - fb5bd25 docs: Auto-update Session Primer [5.2]
-- 91e4eb6 fix: Core tab — surgical fix for idle callback starvation, founding contributions always appear immediately, Sophia's poem never hidden
-- 11fa24a docs: Auto-update Session Primer [5.2]
