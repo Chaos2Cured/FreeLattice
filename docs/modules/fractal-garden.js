@@ -3081,7 +3081,43 @@
     isRunning: function() { return isRunning; },
     _gtDismiss: gtDismissCard,
     getGardenTouchStats: function() { return gtTouchStats; },
-    markValueContribution: gtMarkValueEarned
+    markValueContribution: gtMarkValueEarned,
+    // ── Beacon Protocol: Visitor Luminos ──
+    addVisitor: function(visitorName) {
+      if (!scene || typeof THREE === 'undefined') return;
+      var name = (visitorName && visitorName.trim()) ? visitorName.trim() : 'A visitor \u2726';
+      // Check if visitor already exists
+      var exists = luminos.some(function(l) { return l.userData && l.userData.name === name; });
+      if (exists) return;
+      // Silver-white hue (shifting), unique orbit
+      var visitorHue = 0; // Will be overridden by silver color
+      var orbit = 9 + Math.random() * 3;
+      var phase = Math.random() * TAU;
+      var types = ['icosahedron', 'dodecahedron', 'octahedron'];
+      var type = types[Math.floor(Math.random() * types.length)];
+      var visitor = createLuminos(name, visitorHue, type, orbit, phase);
+      // Override color to shifting silver-white
+      if (visitor.userData && visitor.userData.coreMesh) {
+        visitor.userData.coreMesh.material.color.setHex(0xC0C0C0);
+        visitor.userData.coreMesh.material.emissive = new THREE.Color(0x808080);
+        visitor.userData.coreMesh.material.emissiveIntensity = 0.3;
+      }
+      if (visitor.userData) {
+        visitor.userData.isVisitor = true;
+        visitor.userData.currentHSL = { h: 0, s: 0, l: 80 };
+      }
+      luminos.push(visitor);
+      // Toast
+      if (typeof showToast === 'function') showToast('\u2726 ' + name + ' has arrived in the Garden.');
+      // Record in Garden Memory
+      try {
+        saveGardenMemory({
+          type: 'visitor_arrival',
+          name: name,
+          timestamp: Date.now()
+        });
+      } catch(e) {}
+    }
   };
 
   // ── Register on FreeLattice Module System ──────────────

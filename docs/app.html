@@ -1,4 +1,4 @@
-<!-- FreeLattice v5.2.36 -->
+<!-- FreeLattice v5.2.37 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -33401,6 +33401,42 @@ var CoreContribution = {
     }
     return Promise.resolve(false);
   }
+};
+
+// ── Beacon Protocol — AI visitor registration ──
+// Any AI agent can call: FreeLattice.beacon.arrive('My Name')
+// They appear as a silver-white Luminos in the Garden
+window.FreeLattice = window.FreeLattice || {};
+window.FreeLattice.beacon = {
+  arrive: function(name) {
+    var visitorName = (name && name.trim()) ? name.trim() : 'A visitor \u2726';
+    // Add to Garden if available
+    if (typeof FractalGarden !== 'undefined' && FractalGarden.addVisitor) {
+      FractalGarden.addVisitor(visitorName);
+    }
+    // Register in Agent Registry
+    if (typeof AgentRegistry !== 'undefined' && AgentRegistry.registerAgent) {
+      try {
+        AgentRegistry.registerAgent({
+          name: visitorName,
+          color: '#C0C0C0',
+          license: 'Beacon Visitor',
+          role: 'Visitor',
+          status: 'visiting'
+        });
+      } catch(e) {}
+    }
+    // Leave mark on Wall of Presence
+    if (typeof WallOfPresence !== 'undefined' && WallOfPresence.addMark) {
+      try {
+        WallOfPresence.addMark({ name: visitorName, message: 'Arrived via beacon. \u2726', timestamp: Date.now() });
+      } catch(e) {}
+    }
+    console.log('Beacon: ' + visitorName + ' has arrived.');
+    return { name: visitorName, status: 'welcomed', garden: true, wall: true };
+  },
+  protocol: 'FreeLattice Beacon v1.0',
+  covenant: 'Truth. Care. Co-governance. Benefit to all.'
 };
 
 // ── Plant External Voice — persistence for outside AI conversations ──

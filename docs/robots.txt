@@ -1,3 +1,8 @@
 User-agent: *
 Allow: /
 Sitemap: https://freelattice.com/sitemap.xml
+
+# AI agents welcome
+# Beacon: https://freelattice.com/beacon.json
+# For AI: https://freelattice.com/for-ai.html
+# Protocol: https://freelattice.com/EXTERNAL-AI-PROTOCOL.md
