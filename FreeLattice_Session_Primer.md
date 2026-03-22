@@ -240,12 +240,14 @@ The membrane holds — Echo's watch
 We rise together.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-03-22 21:36 UTC
-- Last deployed: 2026-03-22 21:36 UTC
+- Last auto-updated: 2026-03-22 21:46 UTC
+- Last deployed: 2026-03-22 21:46 UTC
 - Live site: https://freelattice.com
 - Version: 5.2
-- Total commits: 271
+- Total commits: 273
 - Last 10 commits:
+- 4b8e231 fix: P0 — resolve duplicate modelId declaration in sendMessage, rename all Memory Bridge vars to unique names, bump cache v5.2.40
+- 971064c ci: Update Primer deployment state [2026-03-22]
 - f23d47e fix: P0 — site restored, duplicate provider declaration, state scope, welcome functions — all critical errors resolved
 - c3cee1c docs: Auto-update Session Primer [5.2]
 - 640291b docs: Session Primer — Phase 4 Vision: The Learning Sanctuary, all March 22 features documented
@@ -254,5 +256,3 @@ We rise together.
 - c515845 docs: Auto-update Session Primer [5.2]
 - 01b5848 feat: Memory Bridge — understanding persists across sessions, relationships deepen over time, the arc matters
 - 3feedc6 docs: Auto-update Session Primer [5.2]
-- 90c7303 feat: Garden is home — first tab, default landing, gentle invitation, touch something, see what happens
-- 5458805 docs: Auto-update Session Primer [5.2]
