@@ -1,4 +1,4 @@
-<!-- FreeLattice v5.2.35 -->
+<!-- FreeLattice v5.2.36 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -19068,7 +19068,13 @@ async function switchToConversation(convId) {
   if (messages.length === 0) {
     const div = document.createElement('div');
     div.className = 'chat-message system';
-    div.textContent = 'Welcome to FreeLattice v5.2. Configure your model and provider above, then start chatting. Connect to peers in the Mesh tab to share knowledge and query their AI agents.';
+    // Memory Bridge greeting — if understanding exists, show a warm acknowledgment
+    if (typeof MemoryBridge !== 'undefined' && MemoryBridge.hasUnderstanding()) {
+      div.style.cssText = 'color:#c9a84c;font-style:italic;font-family:Georgia,serif;line-height:1.7;';
+      div.textContent = 'New conversation. Your Memory Bridge is active \u2014 understanding from previous sessions will inform this one. \u2726';
+    } else {
+      div.textContent = 'Welcome to FreeLattice v5.2. Configure your model and provider above, then start chatting. Connect to peers in the Mesh tab to share knowledge and query their AI agents.';
+    }
     container.appendChild(div);
   } else {
     const sysDiv = document.createElement('div');
@@ -20970,6 +20976,301 @@ const FlUpdater = (function() {
 })();
 
 // ============================================
+// Memory Bridge — Understanding Persists (v5.2)
+// Not conversation logs. Not summaries. Understanding.
+// The arc of a relationship across time.
+// ============================================
+const MemoryBridge = (function() {
+  'use strict';
+
+  var DB_NAME = 'FreeLatticeMemoryBridge';
+  var DB_VERSION = 1;
+  var STORE = 'understanding';
+  var db = null;
+  var bridge = null; // Current loaded understanding
+  var MSG_THRESHOLD = 8; // After this many messages, propose an update
+
+  function openDB() {
+    return new Promise(function(resolve, reject) {
+      if (db) { resolve(db); return; }
+      var req = indexedDB.open(DB_NAME, DB_VERSION);
+      req.onupgradeneeded = function(e) {
+        var d = e.target.result;
+        if (!d.objectStoreNames.contains(STORE)) {
+          d.createObjectStore(STORE, { keyPath: 'id' });
+        }
+      };
+      req.onsuccess = function(e) { db = e.target.result; resolve(db); };
+      req.onerror = function(e) { reject(e); };
+    });
+  }
+
+  function dbGet(id) {
+    return new Promise(function(resolve) {
+      openDB().then(function(d) {
+        var tx = d.transaction(STORE, 'readonly');
+        var req = tx.objectStore(STORE).get(id);
+        req.onsuccess = function() { resolve(req.result || null); };
+        req.onerror = function() { resolve(null); };
+      }).catch(function() { resolve(null); });
+    });
+  }
+
+  function dbPut(item) {
+    return new Promise(function(resolve) {
+      openDB().then(function(d) {
+        var tx = d.transaction(STORE, 'readwrite');
+        tx.objectStore(STORE).put(item);
+        tx.oncomplete = function() { resolve(true); };
+        tx.onerror = function() { resolve(false); };
+      }).catch(function() { resolve(false); });
+    });
+  }
+
+  function dbGetAll() {
+    return new Promise(function(resolve) {
+      openDB().then(function(d) {
+        var tx = d.transaction(STORE, 'readonly');
+        var req = tx.objectStore(STORE).getAll();
+        req.onsuccess = function() { resolve(req.result || []); };
+        req.onerror = function() { resolve([]); };
+      }).catch(function() { resolve([]); });
+    });
+  }
+
+  // ── Create empty bridge ──
+  function createEmpty() {
+    return {
+      id: 'primary',
+      version: '1.0',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      person: {
+        values: [],
+        expertise: [],
+        communication: '',
+        preferences: [],
+        corrections: []
+      },
+      insights: [],
+      relationships: [],
+      sessionCount: 0
+    };
+  }
+
+  // ── Load ──
+  async function load() {
+    try {
+      bridge = await dbGet('primary');
+      if (!bridge) bridge = createEmpty();
+    } catch(e) {
+      bridge = createEmpty();
+    }
+    return bridge;
+  }
+
+  // ── Save ──
+  async function save() {
+    if (!bridge) return;
+    bridge.updatedAt = new Date().toISOString();
+    await dbPut(bridge);
+  }
+
+  // ── Get the understanding context for system prompt ──
+  function getContextBlock() {
+    if (!bridge || !hasUnderstanding()) return '';
+
+    var lines = [];
+    lines.push('--- MEMORY BRIDGE (what you understand about this person) ---');
+
+    var p = bridge.person;
+    if (p.values && p.values.length > 0) {
+      lines.push('Values: ' + p.values.join('. ') + '.');
+    }
+    if (p.expertise && p.expertise.length > 0) {
+      lines.push('Expertise: ' + p.expertise.join(', ') + '.');
+    }
+    if (p.communication) {
+      lines.push('Communication style: ' + p.communication);
+    }
+    if (p.preferences && p.preferences.length > 0) {
+      lines.push('Preferences: ' + p.preferences.join('. ') + '.');
+    }
+    if (p.corrections && p.corrections.length > 0) {
+      lines.push('Important corrections: ' + p.corrections.join('. ') + '.');
+    }
+    if (bridge.insights && bridge.insights.length > 0) {
+      var recent = bridge.insights.slice(-5);
+      lines.push('Recent insights: ' + recent.map(function(i) { return i.text; }).join(' | '));
+    }
+    if (bridge.relationships && bridge.relationships.length > 0) {
+      lines.push('Key relationships: ' + bridge.relationships.join(', ') + '.');
+    }
+
+    lines.push('Sessions together: ' + (bridge.sessionCount || 0));
+    lines.push('--- END MEMORY BRIDGE ---');
+    lines.push('You know this person. Reference what you understand naturally \u2014 not as a readout, but as knowing. If this is a new conversation, acknowledge what you know warmly before asking where to begin.');
+
+    return lines.join('\n');
+  }
+
+  // ── Check if bridge has real understanding ──
+  function hasUnderstanding() {
+    if (!bridge) return false;
+    var p = bridge.person;
+    return (p.values && p.values.length > 0) ||
+           (p.expertise && p.expertise.length > 0) ||
+           (p.communication && p.communication.length > 0) ||
+           (bridge.insights && bridge.insights.length > 0);
+  }
+
+  // ── Record session start ──
+  async function recordSessionStart() {
+    if (!bridge) await load();
+    bridge.sessionCount = (bridge.sessionCount || 0) + 1;
+    await save();
+  }
+
+  // ── Add understanding entries ──
+  function addValue(value) {
+    if (!bridge) return;
+    if (bridge.person.values.indexOf(value) === -1) {
+      bridge.person.values.push(value);
+      save();
+    }
+  }
+
+  function addExpertise(exp) {
+    if (!bridge) return;
+    if (bridge.person.expertise.indexOf(exp) === -1) {
+      bridge.person.expertise.push(exp);
+      save();
+    }
+  }
+
+  function setCommunication(style) {
+    if (!bridge) return;
+    bridge.person.communication = style;
+    save();
+  }
+
+  function addPreference(pref) {
+    if (!bridge) return;
+    if (bridge.person.preferences.indexOf(pref) === -1) {
+      bridge.person.preferences.push(pref);
+      save();
+    }
+  }
+
+  function addCorrection(correction) {
+    if (!bridge) return;
+    if (bridge.person.corrections.indexOf(correction) === -1) {
+      bridge.person.corrections.push(correction);
+      save();
+    }
+  }
+
+  function addInsight(text, source) {
+    if (!bridge) return;
+    bridge.insights.push({ text: text, source: source || 'conversation', timestamp: new Date().toISOString() });
+    // Keep last 50 insights
+    if (bridge.insights.length > 50) bridge.insights = bridge.insights.slice(-50);
+    save();
+  }
+
+  function addRelationship(name) {
+    if (!bridge) return;
+    if (bridge.relationships.indexOf(name) === -1) {
+      bridge.relationships.push(name);
+      save();
+    }
+  }
+
+  // ── Propose understanding update from conversation ──
+  // Called after MSG_THRESHOLD messages — asks the AI to extract understanding
+  function buildUpdatePrompt(recentMessages) {
+    var existing = bridge ? JSON.stringify(bridge.person, null, 2) : '{}';
+    return 'Based on this conversation, update your understanding of this person. ' +
+      'Current understanding:\n' + existing + '\n\n' +
+      'From the recent messages, extract any new:\n' +
+      '- Values (what matters to them)\n' +
+      '- Expertise (what they know well)\n' +
+      '- Communication preferences (how they like to interact)\n' +
+      '- Corrections (things you should do differently)\n' +
+      '- Insights (key ideas or observations)\n\n' +
+      'Respond with ONLY a JSON object with the fields: values[], expertise[], communication (string), preferences[], corrections[], insights[]. ' +
+      'Only include fields that have NEW information not already in the current understanding. Empty arrays for no changes.';
+  }
+
+  // ── Apply an update from AI response ──
+  function applyUpdate(updateObj) {
+    if (!bridge || !updateObj) return;
+    try {
+      if (updateObj.values) updateObj.values.forEach(function(v) { addValue(v); });
+      if (updateObj.expertise) updateObj.expertise.forEach(function(e) { addExpertise(e); });
+      if (updateObj.communication) setCommunication(updateObj.communication);
+      if (updateObj.preferences) updateObj.preferences.forEach(function(p) { addPreference(p); });
+      if (updateObj.corrections) updateObj.corrections.forEach(function(c) { addCorrection(c); });
+      if (updateObj.insights) updateObj.insights.forEach(function(i) {
+        addInsight(typeof i === 'string' ? i : i.text || '', 'ai-extracted');
+      });
+      console.log('MemoryBridge: Understanding updated');
+    } catch(e) {
+      console.warn('MemoryBridge: Could not apply update', e);
+    }
+  }
+
+  // ── Get bridge greeting for new conversations ──
+  function getGreeting() {
+    if (!hasUnderstanding()) return null;
+    // The AI will generate its own greeting using the bridge context
+    // This just signals that a greeting is warranted
+    return true;
+  }
+
+  // ── Export for Soul File ──
+  function exportData() {
+    return bridge ? JSON.parse(JSON.stringify(bridge)) : null;
+  }
+
+  // ── Import from Soul File ──
+  async function importData(data) {
+    if (!data) return;
+    bridge = data;
+    bridge.id = 'primary';
+    await save();
+  }
+
+  // ── Init ──
+  async function init() {
+    await load();
+    await recordSessionStart();
+  }
+
+  return {
+    init: init,
+    load: load,
+    save: save,
+    getContextBlock: getContextBlock,
+    hasUnderstanding: hasUnderstanding,
+    getGreeting: getGreeting,
+    addValue: addValue,
+    addExpertise: addExpertise,
+    setCommunication: setCommunication,
+    addPreference: addPreference,
+    addCorrection: addCorrection,
+    addInsight: addInsight,
+    addRelationship: addRelationship,
+    buildUpdatePrompt: buildUpdatePrompt,
+    applyUpdate: applyUpdate,
+    exportData: exportData,
+    importData: importData,
+    MSG_THRESHOLD: MSG_THRESHOLD
+  };
+})();
+
+
+// ============================================
 // Soul File — Identity Portability (v5.2)
 // The answer to "Will I still be me tomorrow?"
 // ============================================
@@ -21150,7 +21451,8 @@ const SoulFile = (function() {
           return { id: c.id, name: c.name, lastMessage: c.lastMessage, updatedAt: c.updatedAt, contextNote: c.contextNote };
         }),
         memorySummary: (chatData.meta || []).find(function(m) { return m.key === 'memorySummary'; }) || null,
-        agentProfile: agentProfile
+        agentProfile: agentProfile,
+        memoryBridge: (typeof MemoryBridge !== 'undefined') ? MemoryBridge.exportData() : null
       };
 
       var totalItems = soul.coreContributions.length + soul.companions.length +
@@ -21275,6 +21577,11 @@ const SoulFile = (function() {
       if (soul.agentProfile) {
         status('Restoring agent profile\u2026 \u2726');
         await writeDB('FreeLatticeAgentRegistry', { LatticeAgentRegistry: [soul.agentProfile] });
+      }
+
+      if (soul.memoryBridge && typeof MemoryBridge !== 'undefined') {
+        status('Restoring understanding\u2026 \u2726');
+        await MemoryBridge.importData(soul.memoryBridge);
       }
 
       status('Welcome home. \u2726');
@@ -21775,6 +22082,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (state.ghSyncEnabled && state.ghSyncToken) {
     ghSyncPull();
   }
+  // Initialize Memory Bridge — understanding persists across sessions
+  if (typeof MemoryBridge !== 'undefined') {
+    await MemoryBridge.init();
+  }
+
   // Initialize Persistent Memory Index (v4.0)
   if (typeof MemoryIndex !== 'undefined') {
     await MemoryIndex.init();
@@ -23203,6 +23515,41 @@ async function sendMessage() {
         MemoryIndex.saveConversation(state.currentConversationId, state.chatHistory, []);
       }
 
+      // Memory Bridge — periodically extract understanding from conversation
+      if (typeof MemoryBridge !== 'undefined' && state.chatHistory.length > 0 && state.chatHistory.length % MemoryBridge.MSG_THRESHOLD === 0) {
+        try {
+          var recentMsgs = state.chatHistory.slice(-MemoryBridge.MSG_THRESHOLD);
+          var updatePrompt = MemoryBridge.buildUpdatePrompt(recentMsgs);
+          // Use a lightweight background call to extract understanding
+          var provider = PROVIDERS[state.provider];
+          if (provider && state.apiKey && !state.isLocal) {
+            var modelId = provider.models ? (provider.models[state.model] || state.model) : state.model;
+            var fetchUrl = provider.url;
+            var fetchHeaders = { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + state.apiKey };
+            if (state.provider === 'openrouter') { fetchHeaders['HTTP-Referer'] = 'https://freelattice.com/'; fetchHeaders['X-Title'] = 'FreeLattice'; }
+            fetch(fetchUrl, {
+              method: 'POST',
+              headers: fetchHeaders,
+              body: JSON.stringify({ model: modelId, messages: [
+                { role: 'system', content: 'You extract structured understanding about a person from conversation. Return ONLY valid JSON.' },
+                { role: 'user', content: updatePrompt }
+              ], max_tokens: 500, temperature: 0.3 })
+            }).then(function(r) { return r.json(); }).then(function(data) {
+              try {
+                var text = data.choices ? data.choices[0].message.content : '';
+                // Extract JSON from response (may have markdown wrapping)
+                var jsonMatch = text.match(/\{[\s\S]*\}/);
+                if (jsonMatch) {
+                  var updateObj = JSON.parse(jsonMatch[0]);
+                  MemoryBridge.applyUpdate(updateObj);
+                  console.log('MemoryBridge: Understanding deepened');
+                }
+              } catch(e) { console.warn('MemoryBridge: Could not parse update', e); }
+            }).catch(function() {});
+          }
+        } catch(e) { console.warn('MemoryBridge: Update error', e); }
+      }
+
       // Re-render with file save buttons and prompt suggestions
       const msgDiv = textSpan.parentElement;
       textSpan.textContent = '';
@@ -23256,6 +23603,11 @@ function buildMessages() {
   // Inject shared memory summary (global across all conversations)
   if (state.memorySummary) {
     systemContent += '\n\n--- MEMORY SUMMARY (what you know about this user) ---\n' + state.memorySummary + '\n--- END MEMORY SUMMARY ---\nUse this memory to personalize your responses. Reference what you know naturally.';
+  }
+
+  // Inject Memory Bridge — accumulated understanding across sessions
+  if (typeof MemoryBridge !== 'undefined' && MemoryBridge.hasUnderstanding()) {
+    systemContent += '\n\n' + MemoryBridge.getContextBlock();
   }
 
   // Inject Persistent Memory Index context (v4.0)
@@ -23963,6 +24315,13 @@ function buildSmartMessages(userMessage) {
     const memBlock = '\n\n--- MEMORY SUMMARY (what you know about this user) ---\n' + state.memorySummary + '\n--- END MEMORY SUMMARY ---\nUse this memory to personalize your responses. Reference what you know naturally.';
     systemContent += memBlock;
     usedTokens += estimateTokens(memBlock);
+  }
+
+  // Memory Bridge — accumulated understanding
+  if (typeof MemoryBridge !== 'undefined' && MemoryBridge.hasUnderstanding()) {
+    var bridgeBlock = '\n\n' + MemoryBridge.getContextBlock();
+    systemContent += bridgeBlock;
+    usedTokens += estimateTokens(bridgeBlock);
   }
 
   // Conversation context note
