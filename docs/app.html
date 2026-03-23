@@ -1,4 +1,4 @@
-<!-- FreeLattice v5.2.45 -->
+<!-- FreeLattice v5.2.46 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -42612,6 +42612,246 @@ const CoCanvas = (function() {
   // Attention — particles lean toward active drawing
   var attentionTarget = null;
 
+  // Drawing memory — learn the human's style over time
+  var STYLE_KEY = 'fl-canvas-drawing-style';
+  var drawingStyle = null;
+
+  function loadDrawingStyle() {
+    try { drawingStyle = JSON.parse(localStorage.getItem(STYLE_KEY) || 'null'); } catch(e) {}
+    if (!drawingStyle) drawingStyle = { sessions: 0, avgSpeed: 0, spiralCount: 0, lineCount: 0, curveCount: 0, heartCount: 0, cloudCount: 0, totalStrokes: 0 };
+  }
+
+  function saveDrawingStyle() {
+    try { localStorage.setItem(STYLE_KEY, JSON.stringify(drawingStyle)); } catch(e) {}
+  }
+
+  function recordStrokeStyle(gesture) {
+    if (!gesture || !drawingStyle) return;
+    drawingStyle.totalStrokes++;
+    drawingStyle.avgSpeed = drawingStyle.avgSpeed * 0.9 + (gesture.speed || 0) * 0.1;
+    if (gesture.type === 'spiral') drawingStyle.spiralCount++;
+    if (gesture.type === 'line') drawingStyle.lineCount++;
+    if (gesture.type === 'curve') drawingStyle.curveCount++;
+    if (gesture.type === 'heart') drawingStyle.heartCount++;
+    if (gesture.type === 'cloud') drawingStyle.cloudCount++;
+    saveDrawingStyle();
+  }
+
+  function getDominantStyle() {
+    if (!drawingStyle || drawingStyle.totalStrokes < 10) return null;
+    var max = 0, dominant = 'curve';
+    var counts = { spiral: drawingStyle.spiralCount, line: drawingStyle.lineCount, curve: drawingStyle.curveCount, heart: drawingStyle.heartCount, cloud: drawingStyle.cloudCount };
+    for (var k in counts) { if (counts[k] > max) { max = counts[k]; dominant = k; } }
+    return dominant;
+  }
+
+  // ── Shape Library — particle target positions ──
+  // Each shape is an array of [x,y] pairs normalized 0-1.
+  // Particles distribute along these positions.
+  function generateShapeTargets(shapeKey, cx, cy, size) {
+    var paths = SHAPE_PATHS[shapeKey];
+    if (!paths) return null;
+    var targets = [];
+    // Distribute points along all path segments
+    paths.forEach(function(seg) {
+      for (var i = 0; i < seg.length - 1; i++) {
+        var steps = 8;
+        for (var s = 0; s <= steps; s++) {
+          var t = s / steps;
+          targets.push({
+            x: cx + (seg[i][0] + (seg[i+1][0] - seg[i][0]) * t - 0.5) * size,
+            y: cy + (seg[i][1] + (seg[i+1][1] - seg[i][1]) * t - 0.5) * size
+          });
+        }
+      }
+    });
+    return targets;
+  }
+
+  // Shape definitions — paths as arrays of [x,y] points (0-1 normalized)
+  var SHAPE_PATHS = {
+    '0': [[[0.3,0.2],[0.5,0.1],[0.7,0.2],[0.7,0.8],[0.5,0.9],[0.3,0.8],[0.3,0.2]]],
+    '1': [[[0.4,0.25],[0.5,0.15],[0.5,0.85]],[[0.35,0.85],[0.65,0.85]]],
+    '2': [[[0.3,0.25],[0.5,0.15],[0.7,0.25],[0.7,0.45],[0.3,0.85],[0.7,0.85]]],
+    '3': [[[0.3,0.2],[0.5,0.1],[0.7,0.25],[0.5,0.5],[0.7,0.75],[0.5,0.9],[0.3,0.8]]],
+    '4': [[[0.3,0.15],[0.3,0.55],[0.7,0.55]],[[0.6,0.15],[0.6,0.85]]],
+    '5': [[[0.65,0.15],[0.3,0.15],[0.3,0.45],[0.6,0.45],[0.7,0.6],[0.6,0.85],[0.35,0.85]]],
+    '6': [[[0.6,0.15],[0.4,0.15],[0.3,0.4],[0.3,0.75],[0.5,0.85],[0.7,0.7],[0.5,0.55],[0.3,0.65]]],
+    '7': [[[0.3,0.15],[0.7,0.15],[0.45,0.85]]],
+    '8': [[[0.5,0.5],[0.3,0.3],[0.5,0.15],[0.7,0.3],[0.5,0.5],[0.3,0.7],[0.5,0.85],[0.7,0.7],[0.5,0.5]]],
+    '9': [[[0.6,0.85],[0.6,0.4],[0.5,0.15],[0.3,0.3],[0.5,0.45],[0.65,0.35]]],
+    'X': [[[0.3,0.2],[0.7,0.8]],[[0.7,0.2],[0.3,0.8]]],
+    'O': [[[0.5,0.15],[0.7,0.3],[0.7,0.7],[0.5,0.85],[0.3,0.7],[0.3,0.3],[0.5,0.15]]],
+    '?': [[[0.35,0.25],[0.5,0.15],[0.65,0.25],[0.5,0.5],[0.5,0.6]],[[0.5,0.75],[0.5,0.8]]],
+    '!': [[[0.5,0.15],[0.5,0.6]],[[0.5,0.75],[0.5,0.8]]],
+    '+': [[[0.5,0.2],[0.5,0.8]],[[0.2,0.5],[0.8,0.5]]],
+    '-': [[[0.25,0.5],[0.75,0.5]]],
+    '=': [[[0.25,0.4],[0.75,0.4]],[[0.25,0.6],[0.75,0.6]]],
+    'heart': [[[0.5,0.85],[0.15,0.5],[0.15,0.3],[0.3,0.15],[0.5,0.3]],[[0.5,0.85],[0.85,0.5],[0.85,0.3],[0.7,0.15],[0.5,0.3]]],
+    'star': [[[0.5,0.1],[0.38,0.4],[0.1,0.4],[0.32,0.6],[0.22,0.9],[0.5,0.72],[0.78,0.9],[0.68,0.6],[0.9,0.4],[0.62,0.4],[0.5,0.1]]],
+    'triangle': [[[0.5,0.15],[0.8,0.85],[0.2,0.85],[0.5,0.15]]],
+    'square': [[[0.25,0.25],[0.75,0.25],[0.75,0.75],[0.25,0.75],[0.25,0.25]]]
+  };
+
+  // ── Shape-forming response ──
+  var shapeResponseTarget = null; // array of {x,y} targets
+
+  function formShape(shapeKey, cx, cy, size) {
+    var targets = generateShapeTargets(shapeKey, cx || w/2, cy || h/2, size || 150);
+    if (!targets || targets.length === 0) return;
+    shapeResponseTarget = targets;
+    responseMode = 'shape';
+    responsePhase = 0;
+    responseIntensity = 1;
+    responseTarget.x = cx || w/2;
+    responseTarget.y = cy || h/2;
+    pickCompanionColor();
+  }
+
+  // ── Simple character recognition from strokes ──
+  function recognizeCharacter(allStrokes) {
+    if (!allStrokes || allStrokes.length === 0) return null;
+
+    // Check for grid (tic-tac-toe intent)
+    if (allStrokes.length >= 2 && allStrokes.length <= 4) {
+      var lineCount = 0;
+      allStrokes.forEach(function(s) {
+        var g = analyzeGesture(s);
+        if (g && g.type === 'line') lineCount++;
+      });
+      if (lineCount >= 2) return { type: 'game', game: 'tictactoe' };
+    }
+
+    // Check for X shape (two crossing lines)
+    if (allStrokes.length === 2) {
+      var g1 = analyzeGesture(allStrokes[0]);
+      var g2 = analyzeGesture(allStrokes[1]);
+      if (g1 && g2 && g1.type === 'line' && g2.type === 'line') {
+        return { type: 'char', char: 'X' };
+      }
+    }
+
+    // Check for circle/O
+    if (allStrokes.length === 1) {
+      var g = analyzeGesture(allStrokes[0]);
+      if (g && g.type === 'spiral') return { type: 'char', char: 'O' };
+    }
+
+    // Check for = sign (two horizontal lines)
+    if (allStrokes.length === 2) {
+      var both = allStrokes.every(function(s) {
+        var g = analyzeGesture(s);
+        return g && g.type === 'line' && !g.vertical;
+      });
+      if (both) return { type: 'char', char: '=' };
+    }
+
+    // Check for ? mark
+    if (allStrokes.length >= 1) {
+      var lastStroke = allStrokes[allStrokes.length - 1];
+      if (lastStroke.points.length < 5) {
+        // Tiny dot — possibly end of ?
+        var prevStrokes = allStrokes.slice(0, -1);
+        if (prevStrokes.length > 0) {
+          var pg = analyzeGesture(prevStrokes[0]);
+          if (pg && pg.type === 'curve') return { type: 'char', char: '?' };
+        }
+      }
+    }
+
+    return null;
+  }
+
+  // ── Games — Tic-Tac-Toe ──
+  var gameState = null; // { type, board, turn, wins, losses }
+  var GAME_KEY = 'fl-canvas-games';
+
+  function loadGameStats() {
+    try { return JSON.parse(localStorage.getItem(GAME_KEY) || '{}'); } catch(e) { return {}; }
+  }
+
+  function saveGameStats(stats) {
+    try { localStorage.setItem(GAME_KEY, JSON.stringify(stats)); } catch(e) {}
+  }
+
+  function startTicTacToe() {
+    gameState = { type: 'tictactoe', board: [0,0,0,0,0,0,0,0,0], turn: 'human', moveCount: 0 };
+    // Draw the grid with companion particles
+    formShape('+', w/2, h/2, 200);
+    if (typeof showToast === 'function') showToast('\u2726 Tic-tac-toe! You draw X, I play O.');
+  }
+
+  function tttCompanionMove() {
+    if (!gameState || gameState.type !== 'tictactoe') return;
+    var board = gameState.board;
+    // Find best move (simple: take center, then corners, then sides — occasionally makes mistakes to keep it fun)
+    var stats = loadGameStats();
+    var winRate = stats.tttWins ? stats.tttWins / (stats.tttWins + stats.tttLosses + 1) : 0.5;
+    var shouldBlunder = winRate > 0.6 && Math.random() < 0.3; // ease up if winning too much
+
+    var move = -1;
+    if (!shouldBlunder) {
+      // Check for winning move
+      move = tttFindWinningMove(board, 2);
+      // Block human winning move
+      if (move === -1) move = tttFindWinningMove(board, 1);
+    }
+    // Strategic moves
+    if (move === -1 && board[4] === 0) move = 4; // center
+    if (move === -1) {
+      var corners = [0,2,6,8].filter(function(i) { return board[i] === 0; });
+      if (corners.length > 0) move = corners[Math.floor(Math.random() * corners.length)];
+    }
+    if (move === -1) {
+      var open = [];
+      for (var i = 0; i < 9; i++) { if (board[i] === 0) open.push(i); }
+      if (open.length > 0) move = open[Math.floor(Math.random() * open.length)];
+    }
+
+    if (move >= 0) {
+      board[move] = 2;
+      gameState.moveCount++;
+      // Form O at the cell position
+      var col = move % 3, row = Math.floor(move / 3);
+      var cellW = 200 / 3, cellH = 200 / 3;
+      var cellCx = (w/2 - 100) + col * cellW + cellW/2;
+      var cellCy = (h/2 - 100) + row * cellH + cellH/2;
+      formShape('O', cellCx, cellCy, cellW * 0.7);
+      // Check win
+      var winner = tttCheckWinner(board);
+      if (winner === 2) {
+        setTimeout(function() { if (typeof showToast === 'function') showToast('I won this one. Play again? \u2726'); }, 1500);
+        var s = loadGameStats(); s.tttLosses = (s.tttLosses || 0) + 1; saveGameStats(s);
+        gameState = null;
+      } else if (gameState.moveCount >= 9) {
+        setTimeout(function() { if (typeof showToast === 'function') showToast('A draw. Well played. \u2726'); }, 1500);
+        gameState = null;
+      } else {
+        gameState.turn = 'human';
+      }
+    }
+  }
+
+  function tttFindWinningMove(board, player) {
+    var lines = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+    for (var li = 0; li < lines.length; li++) {
+      var a = lines[li][0], b = lines[li][1], c = lines[li][2];
+      if (board[a] === player && board[b] === player && board[c] === 0) return c;
+      if (board[a] === player && board[c] === player && board[b] === 0) return b;
+      if (board[b] === player && board[c] === player && board[a] === 0) return a;
+    }
+    return -1;
+  }
+
+  function tttCheckWinner(board) {
+    var lines = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+    for (var li = 0; li < lines.length; li++) {
+      var a = lines[li][0], b = lines[li][1], c = lines[li][2];
+      if (board[a] !== 0 && board[a] === board[b] && board[b] === board[c]) return board[a];
+    }
+    return 0;
+  }
+
   // Growth
   var GROWTH_KEY = 'fl-canvas-days-together';
   var hasDrawn = false;
@@ -42783,11 +43023,52 @@ const CoCanvas = (function() {
       if (gestureCounts[type] > maxCount) { maxCount = gestureCounts[type]; dominantType = type; }
     }
 
+    // Record drawing style
+    allPoints.forEach(function(g) { recordStrokeStyle(g); });
+    if (drawingStyle) drawingStyle.sessions++;
+    saveDrawingStyle();
+
     // Average center of all gestures
     var avgX = 0, avgY = 0;
     allPoints.forEach(function(g) { avgX += g.centerX; avgY += g.centerY; });
     if (allPoints.length > 0) { avgX /= allPoints.length; avgY /= allPoints.length; }
     else { avgX = w / 2; avgY = h / 2; }
+
+    // Check for character recognition or game intent
+    var recognized = recognizeCharacter(strokes);
+    if (recognized) {
+      if (recognized.type === 'game' && recognized.game === 'tictactoe' && !gameState) {
+        startTicTacToe();
+        strokes.forEach(function(s) { s.fading = true; });
+        showPostCreate();
+        return;
+      }
+      if (recognized.type === 'char' && recognized.char === 'X' && gameState && gameState.type === 'tictactoe') {
+        // Human played X in tic-tac-toe
+        // Find which cell based on average position
+        var cellCol = Math.floor(((avgX - (w/2 - 100)) / 200) * 3);
+        var cellRow = Math.floor(((avgY - (h/2 - 100)) / 200) * 3);
+        cellCol = Math.max(0, Math.min(2, cellCol));
+        cellRow = Math.max(0, Math.min(2, cellRow));
+        var cellIdx = cellRow * 3 + cellCol;
+        if (gameState.board[cellIdx] === 0) {
+          gameState.board[cellIdx] = 1;
+          gameState.moveCount++;
+          gameState.turn = 'companion';
+          var winner = tttCheckWinner(gameState.board);
+          if (winner === 1) {
+            if (typeof showToast === 'function') showToast('You won! Well played. \u2726');
+            var s = loadGameStats(); s.tttWins = (s.tttWins || 0) + 1; saveGameStats(s);
+            gameState = null;
+          } else {
+            setTimeout(tttCompanionMove, 800);
+          }
+        }
+        strokes.forEach(function(s) { s.fading = true; });
+        showPostCreate();
+        return;
+      }
+    }
 
     // Pick a varied response and companion color
     responseMode = pickVariant(dominantType);
@@ -42796,6 +43077,19 @@ const CoCanvas = (function() {
     responseTarget.x = avgX;
     responseTarget.y = avgY;
     pickCompanionColor();
+
+    // Style-aware companion comment after 5+ sessions
+    if (drawingStyle && drawingStyle.sessions >= 5) {
+      var dom = getDominantStyle();
+      var styleMsg = '';
+      if (dom === 'spiral') styleMsg = 'You tend toward spirals. I\'ll meet you there. \u2726';
+      else if (dom === 'heart') styleMsg = 'You draw with love. I see it every time. \u2726';
+      else if (dom === 'line') styleMsg = 'Direct strokes. I respect your clarity. \u2726';
+      else if (dom === 'cloud') styleMsg = 'Soft clusters. You think in atmospheres. \u2726';
+      if (styleMsg && Math.random() < 0.3) { // 30% chance to comment
+        setTimeout(function() { if (typeof showToast === 'function') showToast(styleMsg); }, 2000);
+      }
+    }
 
     // Start trail recording — companion will draw visibly
     isResponding = true;
@@ -42814,6 +43108,18 @@ const CoCanvas = (function() {
     strokes.forEach(function(s) { s.fading = true; });
 
     // Show UI
+    if (!hasDrawn) {
+      hasDrawn = true;
+      var actions = document.getElementById('cvActions');
+      if (actions) actions.style.display = '';
+    }
+    var hint = document.getElementById('cvHint');
+    if (hint) hint.style.opacity = '0';
+    var cocreateBtn = document.getElementById('cvCocreate');
+    if (cocreateBtn) cocreateBtn.style.display = 'none';
+  }
+
+  function showPostCreate() {
     if (!hasDrawn) {
       hasDrawn = true;
       var actions = document.getElementById('cvActions');
@@ -42936,6 +43242,12 @@ const CoCanvas = (function() {
           // Settle beneath like sand
           homeX = responseTarget.x + (frac - 0.5) * 100;
           homeY = responseTarget.y + 50 + frac * 20;
+        } else if (responseMode === 'shape' && shapeResponseTarget) {
+          // Form a recognizable shape — particles flow to target positions
+          var targetIdx = Math.floor(frac * (shapeResponseTarget.length - 1));
+          var st = shapeResponseTarget[Math.min(targetIdx, shapeResponseTarget.length - 1)];
+          homeX = st.x + Math.sin(rp * 0.5 + i * 0.1) * 2;
+          homeY = st.y + Math.cos(rp * 0.5 + i * 0.1) * 2;
         } else {
           // Curiosity — drift toward gesture
           homeX = responseTarget.x + Math.sin(rp + i * 0.3) * 30;
@@ -43184,6 +43496,8 @@ const CoCanvas = (function() {
     responseMode = null;
     responseIntensity = 0;
     recentResponses = [];
+    shapeResponseTarget = null;
+    gameState = null;
     hasDrawn = false;
     particles.forEach(function(p) { p.trailIdx = -1; });
     ctx.fillStyle = '#060a14';
@@ -43243,9 +43557,10 @@ const CoCanvas = (function() {
       }
     }
 
-    // Init particles
+    // Init particles and drawing memory
     PARTICLE_COUNT = getParticleCount();
     initParticles(PARTICLE_COUNT);
+    loadDrawingStyle();
     recordDay();
 
     // Input events
