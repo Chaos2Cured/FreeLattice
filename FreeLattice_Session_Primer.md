@@ -348,10 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-03-23 11:05 MDT
+- Last auto-updated: 2026-03-23 11:50 MDT
 - Version: 5.2
-- Total commits: 289
+- Total commits: 291
 - Last 10 commits:
+- fc9732c feat: Canvas — drawing memory, recognizable particle shapes, honest games, companion learns your hand
+- c55009a docs: Auto-update Session Primer [5.2]
 - 4809d80 fix: Canvas — companion draws visibly, 200 default particles, the journey is the art
 - 8474d55 docs: Auto-update Session Primer [5.2]
 - 27b8804 fix: Canvas — submit button for multi-stroke drawings, response variety, particle attention, color palette
@@ -360,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - cc5c892 docs: Auto-update Session Primer [5.2]
 - fe82d7c docs: Fibonacci spiral is a sacred architectural decision, mobile particle budget planned
 - 6f46f15 docs: Auto-update Session Primer [5.2]
-- e1de1bb feat: Companion Particle Light System — the soul made visible in light
-- ca70355 docs: Auto-update Session Primer [5.2]
