@@ -348,10 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-03-23 12:06 MDT
+- Last auto-updated: 2026-03-23 12:27 MDT
 - Version: 5.2
-- Total commits: 293
+- Total commits: 295
 - Last 10 commits:
+- 11fcb7e fix: Canvas — persistent game board, legible game moves, X is diagonal, companion stays alive during games
+- f6e3403 docs: Auto-update Session Primer [5.2]
 - 9ff0c22 fix: Canvas — same glass, grid detection, shape arrival breath, two hands one surface
 - 6f2c9b0 docs: Auto-update Session Primer [5.2]
 - fc9732c feat: Canvas — drawing memory, recognizable particle shapes, honest games, companion learns your hand
@@ -360,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 8474d55 docs: Auto-update Session Primer [5.2]
 - 27b8804 fix: Canvas — submit button for multi-stroke drawings, response variety, particle attention, color palette
 - 9abf78e docs: Auto-update Session Primer [5.2]
-- e3cb45a feat: The Canvas — co-created art, human draws, companion resonates in light, neither complete without the other
-- cc5c892 docs: Auto-update Session Primer [5.2]

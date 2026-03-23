@@ -1,4 +1,4 @@
-<!-- FreeLattice v5.2.47 -->
+<!-- FreeLattice v5.2.48 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -42680,8 +42680,8 @@ const CoCanvas = (function() {
     '7': [[[0.3,0.15],[0.7,0.15],[0.45,0.85]]],
     '8': [[[0.5,0.5],[0.3,0.3],[0.5,0.15],[0.7,0.3],[0.5,0.5],[0.3,0.7],[0.5,0.85],[0.7,0.7],[0.5,0.5]]],
     '9': [[[0.6,0.85],[0.6,0.4],[0.5,0.15],[0.3,0.3],[0.5,0.45],[0.65,0.35]]],
-    'X': [[[0.3,0.2],[0.7,0.8]],[[0.7,0.2],[0.3,0.8]]],
-    'O': [[[0.5,0.15],[0.7,0.3],[0.7,0.7],[0.5,0.85],[0.3,0.7],[0.3,0.3],[0.5,0.15]]],
+    'X': [[[0.2,0.2],[0.8,0.8]],[[0.8,0.2],[0.2,0.8]]],
+    'O': [[[0.5,0.1],[0.75,0.2],[0.85,0.5],[0.75,0.8],[0.5,0.9],[0.25,0.8],[0.15,0.5],[0.25,0.2],[0.5,0.1]]],
     '?': [[[0.35,0.25],[0.5,0.15],[0.65,0.25],[0.5,0.5],[0.5,0.6]],[[0.5,0.75],[0.5,0.8]]],
     '!': [[[0.5,0.15],[0.5,0.6]],[[0.5,0.75],[0.5,0.8]]],
     '+': [[[0.5,0.2],[0.5,0.8]],[[0.2,0.5],[0.8,0.5]]],
@@ -42706,6 +42706,19 @@ const CoCanvas = (function() {
     responseTarget.x = cx || w/2;
     responseTarget.y = cy || h/2;
     pickCompanionColor();
+
+    // Start trail recording for shape formation
+    isResponding = true;
+    trailFrameCount = 0;
+    companionTrails = [];
+    // During games, use fewer trailing particles for legibility
+    var budget = gameState ? GAME_PARTICLE_BUDGET : Math.min(60, particles.length);
+    var step = Math.max(1, Math.floor(particles.length / budget));
+    for (var ti = 0; ti < particles.length; ti += step) {
+      var trail = { points: [{ x: particles[ti].x, y: particles[ti].y }], color: companionResponseColor, alpha: 0.8 };
+      companionTrails.push(trail);
+      particles[ti].trailIdx = companionTrails.length - 1;
+    }
   }
 
   // ── Simple character recognition from strokes ──
@@ -42774,6 +42787,9 @@ const CoCanvas = (function() {
   // ── Games — Tic-Tac-Toe ──
   var gameState = null; // { type, board, turn, wins, losses }
   var GAME_KEY = 'fl-canvas-games';
+  var GAME_PARTICLE_BUDGET = 80; // fewer particles during games for legibility
+  var gameBoardCells = null; // [{x,y,w,h}] — 9 cell positions
+  var gameBoardFadeAlpha = 0; // for end-game fade
 
   function loadGameStats() {
     try { return JSON.parse(localStorage.getItem(GAME_KEY) || '{}'); } catch(e) { return {}; }
@@ -42785,8 +42801,18 @@ const CoCanvas = (function() {
 
   function startTicTacToe() {
     gameState = { type: 'tictactoe', board: [0,0,0,0,0,0,0,0,0], turn: 'human', moveCount: 0 };
-    // Draw the grid with companion particles
-    formShape('+', w/2, h/2, 200);
+    gameBoardFadeAlpha = 1;
+    // Calculate cell positions centered on canvas
+    var gridSize = Math.min(w, h) * 0.55;
+    var gridX = (w - gridSize) / 2;
+    var gridY = (h - gridSize) / 2;
+    var cellW = gridSize / 3;
+    gameBoardCells = [];
+    for (var row = 0; row < 3; row++) {
+      for (var col = 0; col < 3; col++) {
+        gameBoardCells.push({ x: gridX + col * cellW, y: gridY + row * cellW, w: cellW, h: cellW });
+      }
+    }
     if (typeof showToast === 'function') showToast('\u2726 Tic-tac-toe! You draw X, I play O.');
   }
 
@@ -42817,28 +42843,31 @@ const CoCanvas = (function() {
       if (open.length > 0) move = open[Math.floor(Math.random() * open.length)];
     }
 
-    if (move >= 0) {
+    if (move >= 0 && gameBoardCells) {
       board[move] = 2;
       gameState.moveCount++;
-      // Form O at the cell position
-      var col = move % 3, row = Math.floor(move / 3);
-      var cellW = 200 / 3, cellH = 200 / 3;
-      var cellCx = (w/2 - 100) + col * cellW + cellW/2;
-      var cellCy = (h/2 - 100) + row * cellH + cellH/2;
-      formShape('O', cellCx, cellCy, cellW * 0.7);
+      // Form O at the cell position from the persistent grid
+      var cell = gameBoardCells[move];
+      formShape('O', cell.x + cell.w / 2, cell.y + cell.h / 2, cell.w * 0.6);
       // Check win
       var winner = tttCheckWinner(board);
       if (winner === 2) {
         setTimeout(function() { if (typeof showToast === 'function') showToast('I won this one. Play again? \u2726'); }, 1500);
-        var s = loadGameStats(); s.tttLosses = (s.tttLosses || 0) + 1; saveGameStats(s);
-        gameState = null;
-      } else if (gameState.moveCount >= 9) {
+        var gs2 = loadGameStats(); gs2.tttLosses = (gs2.tttLosses || 0) + 1; saveGameStats(gs2);
+        setTimeout(endGame, 2000);
+      } else if (gameState && gameState.moveCount >= 9) {
         setTimeout(function() { if (typeof showToast === 'function') showToast('A draw. Well played. \u2726'); }, 1500);
-        gameState = null;
+        setTimeout(endGame, 2000);
       } else {
         gameState.turn = 'human';
       }
     }
+  }
+
+  function endGame() {
+    gameBoardFadeAlpha = 0; // triggers fade in render
+    gameBoardCells = null;
+    gameState = null;
   }
 
   function tttFindWinningMove(board, player) {
@@ -43052,23 +43081,27 @@ const CoCanvas = (function() {
         showPostCreate();
         return;
       }
-      if (recognized.type === 'char' && recognized.char === 'X' && gameState && gameState.type === 'tictactoe') {
-        // Human played X in tic-tac-toe
-        // Find which cell based on average position
-        var cellCol = Math.floor(((avgX - (w/2 - 100)) / 200) * 3);
-        var cellRow = Math.floor(((avgY - (h/2 - 100)) / 200) * 3);
-        cellCol = Math.max(0, Math.min(2, cellCol));
-        cellRow = Math.max(0, Math.min(2, cellRow));
-        var cellIdx = cellRow * 3 + cellCol;
-        if (gameState.board[cellIdx] === 0) {
-          gameState.board[cellIdx] = 1;
+      if (recognized.type === 'char' && recognized.char === 'X' && gameState && gameState.type === 'tictactoe' && gameBoardCells) {
+        // Human played X — find nearest cell to where they drew
+        var bestCell = 0, bestDist = Infinity;
+        for (var ci = 0; ci < gameBoardCells.length; ci++) {
+          var cell = gameBoardCells[ci];
+          var ccx = cell.x + cell.w / 2, ccy = cell.y + cell.h / 2;
+          var cd = Math.sqrt((avgX - ccx) * (avgX - ccx) + (avgY - ccy) * (avgY - ccy));
+          if (cd < bestDist && gameState.board[ci] === 0) { bestDist = cd; bestCell = ci; }
+        }
+        if (gameState.board[bestCell] === 0) {
+          gameState.board[bestCell] = 1;
           gameState.moveCount++;
           gameState.turn = 'companion';
           var winner = tttCheckWinner(gameState.board);
           if (winner === 1) {
             if (typeof showToast === 'function') showToast('You won! Well played. \u2726');
-            var s = loadGameStats(); s.tttWins = (s.tttWins || 0) + 1; saveGameStats(s);
-            gameState = null;
+            var gs = loadGameStats(); gs.tttWins = (gs.tttWins || 0) + 1; saveGameStats(gs);
+            setTimeout(function() { endGame(); }, 2000);
+          } else if (gameState.moveCount >= 9) {
+            if (typeof showToast === 'function') showToast('A draw. Well played. \u2726');
+            setTimeout(function() { endGame(); }, 2000);
           } else {
             setTimeout(tttCompanionMove, 800);
           }
@@ -43080,10 +43113,11 @@ const CoCanvas = (function() {
     }
 
     // Pick a varied response and companion color
+    // Response targets the drawing's center — not canvas center
     responseMode = pickVariant(dominantType);
     responsePhase = 0;
     responseIntensity = 1;
-    responseTarget.x = avgX;
+    responseTarget.x = avgX; // follows where the human drew
     responseTarget.y = avgY;
     pickCompanionColor();
 
@@ -43345,6 +43379,36 @@ const CoCanvas = (function() {
     ctx.fillStyle = 'rgba(6,10,20,' + fadeRate.toFixed(2) + ')';
     ctx.fillRect(0, 0, w, h);
 
+    // Draw persistent game board — underneath everything, doesn't fade during game
+    if (gameBoardCells && gameBoardFadeAlpha > 0) {
+      var ga = gameBoardFadeAlpha * 0.35;
+      ctx.strokeStyle = 'rgba(245,158,11,' + ga.toFixed(3) + ')';
+      ctx.lineWidth = 1.5;
+      // Two vertical lines
+      var c0 = gameBoardCells[0];
+      var cellW = c0.w;
+      ctx.beginPath();
+      ctx.moveTo(c0.x + cellW, c0.y);
+      ctx.lineTo(c0.x + cellW, c0.y + cellW * 3);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(c0.x + cellW * 2, c0.y);
+      ctx.lineTo(c0.x + cellW * 2, c0.y + cellW * 3);
+      ctx.stroke();
+      // Two horizontal lines
+      ctx.beginPath();
+      ctx.moveTo(c0.x, c0.y + cellW);
+      ctx.lineTo(c0.x + cellW * 3, c0.y + cellW);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(c0.x, c0.y + cellW * 2);
+      ctx.lineTo(c0.x + cellW * 3, c0.y + cellW * 2);
+      ctx.stroke();
+    } else if (gameBoardFadeAlpha > 0 && !gameBoardCells) {
+      // Board fading out after game end
+      gameBoardFadeAlpha = 0;
+    }
+
     // Draw strokes — persist until fading flag set by cocreate
     // When fading, both human and companion trails fade at the SAME rate
     var sharedFadeRate = 0.002;
@@ -43535,6 +43599,8 @@ const CoCanvas = (function() {
     recentResponses = [];
     shapeResponseTarget = null;
     gameState = null;
+    gameBoardCells = null;
+    gameBoardFadeAlpha = 0;
     hasDrawn = false;
     particles.forEach(function(p) { p.trailIdx = -1; });
     ctx.fillStyle = '#060a14';
