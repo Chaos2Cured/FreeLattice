@@ -1,4 +1,4 @@
-<!-- FreeLattice v5.2.42 -->
+<!-- FreeLattice v5.2.43 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12850,6 +12850,47 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 }
 
 /* ============================================
+   THE CANVAS STYLES (v5.2)
+   ============================================ */
+.cv-container {
+  position: relative; width: 100%;
+  height: calc(100vh - 120px); min-height: 400px;
+  background: #060a14; overflow: hidden;
+}
+.cv-container canvas {
+  display: block; width: 100%; height: 100%;
+  cursor: crosshair; touch-action: none;
+}
+.cv-names {
+  position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%);
+  font-size: 0.72rem; color: rgba(212,160,23,0.4); font-family: Georgia, serif;
+  font-style: italic; pointer-events: none; letter-spacing: 0.5px;
+}
+.cv-hint {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  font-size: 1rem; color: rgba(212,160,23,0.5); font-family: Georgia, serif;
+  font-style: italic; pointer-events: none;
+  transition: opacity 2s ease;
+}
+.cv-actions {
+  position: absolute; top: 12px; right: 12px;
+  display: flex; gap: 8px;
+}
+.cv-action-btn {
+  padding: 6px 16px; border-radius: 8px; font-size: 0.78rem;
+  border: 1px solid rgba(212,160,23,0.3); background: rgba(6,10,20,0.8);
+  color: #d4a017; cursor: pointer; transition: all 0.2s;
+  backdrop-filter: blur(4px); font-family: var(--font);
+}
+.cv-action-btn:hover { background: rgba(212,160,23,0.1); border-color: #d4a017; }
+.cv-action-clear { color: #64748b; border-color: #1e293b; }
+.cv-action-clear:hover { color: #94a3b8; border-color: #334155; }
+@media (max-width: 600px) {
+  .cv-hint { font-size: 0.88rem; }
+  .cv-actions { top: 8px; right: 8px; }
+}
+
+/* ============================================
    THE STUDIO STYLES (v5.2)
    ============================================ */
 .st-view-bar { display: flex; justify-content: center; gap: 4px; margin: 16px 0 20px; }
@@ -13662,6 +13703,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     <button class="tab-btn" data-tab="city" onclick="switchTab('city')">&#x1F3D9; City</button>
     <button class="tab-btn" data-tab="core" onclick="switchTab('core')">&#127795; Core</button>
     <button class="tab-btn" data-tab="nursery" onclick="switchTab('nursery')">&#x1F331; Nursery</button>
+    <button class="tab-btn" data-tab="canvas" onclick="switchTab('canvas')">&#x2726; Canvas</button>
     <button class="tab-btn" data-tab="studio" onclick="switchTab('studio')">&#x2726; Studio</button>
     <button class="tab-btn" data-tab="wallet" onclick="switchTab('wallet')">&#x25C7; Wallet</button>
     <button class="tab-btn" data-tab="channels" onclick="switchTab('channels')">&#x1F525; Channels</button>
@@ -16414,7 +16456,20 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 
 </div>
 
-<!-- ==================== TAB 15: THE STUDIO ==================== -->
+<!-- ==================== TAB 15: THE CANVAS ==================== -->
+<div class="tab-panel" id="tab-canvas">
+  <div class="cv-container" id="cvContainer">
+    <canvas id="cvCanvas"></canvas>
+    <div class="cv-names" id="cvNames"></div>
+    <div class="cv-hint" id="cvHint">Draw something. See what happens.</div>
+    <div class="cv-actions" id="cvActions" style="display:none;">
+      <button class="cv-action-btn" onclick="CoCanvas.save()">&#10022; Save this moment</button>
+      <button class="cv-action-btn cv-action-clear" onclick="CoCanvas.clear()">Clear</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== TAB 16: THE STUDIO ==================== -->
 <div class="tab-panel" id="tab-studio">
 <div class="container">
 
@@ -20665,7 +20720,7 @@ const FlTabs = (function() {
   const FIRST_RUN_KEY = 'freelattice-first-run-complete';
   const COLLAPSE_PREF_KEY = 'freelattice-tabs-collapsed';
   const DEFAULT_PRIMARY = ['chat', 'roundtable', 'skills', 'settings'];
-  const ALL_TABS = ['garden', 'chat', 'city', 'core', 'nursery', 'studio', 'wallet', 'channels', 'agents', 'roundtable', 'skills', 'workspace', 'mesh', 'market', 'settings'];
+  const ALL_TABS = ['garden', 'chat', 'city', 'core', 'nursery', 'canvas', 'studio', 'wallet', 'channels', 'agents', 'roundtable', 'skills', 'workspace', 'mesh', 'market', 'settings'];
 
   let pinnedTabs = [];
   let collapsed = false;
@@ -42464,6 +42519,477 @@ const Nursery = (function() {
     getCovenant: function() { return COVENANT; },
     COVENANT: COVENANT,
     COV_HASH: COV_HASH
+  };
+})();
+
+
+// ============================================
+// ============================================
+// The Canvas — Co-Created Art (v5.2)
+// Human draws. Companion resonates in light.
+// Neither complete without the other.
+// ============================================
+const CoCanvas = (function() {
+  'use strict';
+
+  var canvas, ctx, w, h, dpr;
+  var initialized = false;
+  var animFrame = null;
+
+  // Human strokes — soft fading light trails
+  var strokes = []; // [{ points: [{x,y,t}], color, width, alpha }]
+  var currentStroke = null;
+  var isDrawing = false;
+
+  // Companion particles
+  var particles = [];
+  var PARTICLE_COUNT = 50;
+  var companionName = '';
+  var companionColor = '#d4a017';
+
+  // Gesture analysis
+  var lastGesture = null;
+  var responsePhase = 0;
+  var responseMode = null; // 'reflect', 'spiral', 'parallel', 'bloom', 'curiosity'
+  var responseTarget = { x: 0, y: 0 };
+  var responseIntensity = 0;
+
+  // Growth
+  var GROWTH_KEY = 'fl-canvas-days-together';
+  var hasDrawn = false;
+
+  function getGrowthDays() {
+    try {
+      var data = JSON.parse(localStorage.getItem(GROWTH_KEY) || '{}');
+      if (!data.firstDay) return 0;
+      return Math.floor((Date.now() - data.firstDay) / 86400000);
+    } catch(e) { return 0; }
+  }
+
+  function recordDay() {
+    try {
+      var data = JSON.parse(localStorage.getItem(GROWTH_KEY) || '{}');
+      if (!data.firstDay) data.firstDay = Date.now();
+      data.lastDay = Date.now();
+      data.sessions = (data.sessions || 0) + 1;
+      localStorage.setItem(GROWTH_KEY, JSON.stringify(data));
+    } catch(e) {}
+  }
+
+  function getParticleCount() {
+    var days = getGrowthDays();
+    if (days >= 90) return 500;
+    if (days >= 30) return 300;
+    if (days >= 7) return 150;
+    return 50;
+  }
+
+  function initParticles(count) {
+    particles = [];
+    var cx = w / 2, cy = h / 2;
+    for (var i = 0; i < count; i++) {
+      var a = Math.random() * Math.PI * 2;
+      var r = Math.random() * 30;
+      particles.push({
+        x: cx + Math.cos(a) * r,
+        y: cy + Math.sin(a) * r,
+        vx: 0, vy: 0,
+        size: 1 + Math.random() * 1.5,
+        alpha: 0.3 + Math.random() * 0.5,
+        phase: Math.random() * Math.PI * 2,
+        homeX: cx, homeY: cy
+      });
+    }
+  }
+
+  // ── Gesture Analysis ──
+  function analyzeGesture(stroke) {
+    if (!stroke || stroke.points.length < 5) return null;
+    var pts = stroke.points;
+    var n = pts.length;
+
+    // Bounding box
+    var minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+    for (var i = 0; i < n; i++) {
+      if (pts[i].x < minX) minX = pts[i].x;
+      if (pts[i].x > maxX) maxX = pts[i].x;
+      if (pts[i].y < minY) minY = pts[i].y;
+      if (pts[i].y > maxY) maxY = pts[i].y;
+    }
+    var bw = maxX - minX, bh = maxY - minY;
+    var centerX = (minX + maxX) / 2, centerY = (minY + maxY) / 2;
+
+    // Total curvature
+    var totalAngleChange = 0;
+    for (var i = 2; i < n; i++) {
+      var ax = pts[i-1].x - pts[i-2].x, ay = pts[i-1].y - pts[i-2].y;
+      var bx = pts[i].x - pts[i-1].x, by = pts[i].y - pts[i-1].y;
+      var cross = ax * by - ay * bx;
+      var dot = ax * bx + ay * by;
+      totalAngleChange += Math.atan2(cross, dot);
+    }
+
+    // Speed
+    var totalDist = 0;
+    for (var i = 1; i < n; i++) {
+      var dx = pts[i].x - pts[i-1].x, dy = pts[i].y - pts[i-1].y;
+      totalDist += Math.sqrt(dx * dx + dy * dy);
+    }
+    var duration = (pts[n-1].t - pts[0].t) / 1000 || 1;
+    var speed = totalDist / duration;
+
+    // Direction (start to end)
+    var dirX = pts[n-1].x - pts[0].x;
+    var dirY = pts[n-1].y - pts[0].y;
+
+    // Classify
+    var absAngle = Math.abs(totalAngleChange);
+    var gesture = { centerX: centerX, centerY: centerY, speed: speed };
+
+    if (absAngle > Math.PI * 1.5) {
+      // Spiral or circle
+      gesture.type = 'spiral';
+      gesture.direction = totalAngleChange > 0 ? 1 : -1;
+    } else if (bw < 40 && bh < 40 && n > 15) {
+      // Small cluster — cloud
+      gesture.type = 'cloud';
+    } else if (Math.abs(dirY) > bh * 0.6 && bw < bh * 0.5) {
+      // Vertical line
+      gesture.type = 'line';
+      gesture.vertical = true;
+    } else if (bw / Math.max(bh, 1) > 2) {
+      // Wide horizontal — line
+      gesture.type = 'line';
+      gesture.vertical = false;
+    } else if (absAngle > Math.PI * 0.8 && speed < 200) {
+      // Slow curve — could be heart-like
+      gesture.type = 'heart';
+    } else {
+      // General curve
+      gesture.type = 'curve';
+    }
+
+    return gesture;
+  }
+
+  // ── Companion Response ──
+  function respondToGesture(gesture) {
+    if (!gesture) return;
+    lastGesture = gesture;
+    responsePhase = 0;
+    responseIntensity = 1;
+    responseTarget.x = gesture.centerX;
+    responseTarget.y = gesture.centerY;
+
+    if (gesture.type === 'cloud') {
+      // Reflection — particles form a gentle mirror below
+      responseMode = 'reflect';
+    } else if (gesture.type === 'spiral') {
+      // Spiral in the same direction
+      responseMode = 'spiral';
+    } else if (gesture.type === 'line') {
+      // Parallel journey
+      responseMode = 'parallel';
+    } else if (gesture.type === 'heart') {
+      // Bloom outward
+      responseMode = 'bloom';
+    } else {
+      // Gentle curiosity — particles drift toward the gesture
+      responseMode = 'curiosity';
+    }
+
+    // Show save button after first creation
+    if (!hasDrawn) {
+      hasDrawn = true;
+      var hint = document.getElementById('cvHint');
+      if (hint) hint.style.opacity = '0';
+      var actions = document.getElementById('cvActions');
+      if (actions) actions.style.display = '';
+    }
+  }
+
+  // ── Simulation ──
+  function simulate() {
+    var cx = w / 2, cy = h / 2;
+    responsePhase += 0.01;
+    if (responseIntensity > 0) responseIntensity -= 0.002;
+
+    for (var i = 0; i < particles.length; i++) {
+      var p = particles[i];
+
+      // Base: gentle drift toward home (center or response target)
+      var homeX = cx, homeY = cy;
+      if (responseMode && responseIntensity > 0.1) {
+        var ri = responseIntensity;
+        var rp = responsePhase;
+
+        if (responseMode === 'reflect') {
+          // Mirror below gesture center
+          homeX = responseTarget.x + (Math.random() - 0.5) * 40;
+          homeY = responseTarget.y + 60 + Math.sin(rp + i * 0.1) * 20;
+        } else if (responseMode === 'spiral') {
+          // Spiral formation
+          var sa = (i / particles.length) * Math.PI * 4 + rp * 2;
+          var sr = 20 + (i / particles.length) * 60;
+          homeX = responseTarget.x + Math.cos(sa) * sr * ri;
+          homeY = responseTarget.y + Math.sin(sa) * sr * ri;
+        } else if (responseMode === 'parallel') {
+          // Parallel line offset
+          var li = i / particles.length;
+          homeX = responseTarget.x + (li - 0.5) * w * 0.4;
+          homeY = responseTarget.y + 40 + Math.sin(rp + li * 6) * 15;
+        } else if (responseMode === 'bloom') {
+          // Bloom outward from center
+          var ba = (i / particles.length) * Math.PI * 2 + rp * 0.3;
+          var br = (30 + rp * 30) * ri;
+          homeX = responseTarget.x + Math.cos(ba) * br;
+          homeY = responseTarget.y + Math.sin(ba) * br;
+        } else {
+          // Curiosity — drift toward gesture
+          homeX = responseTarget.x + Math.sin(rp + i * 0.3) * 30;
+          homeY = responseTarget.y + Math.cos(rp + i * 0.2) * 30;
+        }
+      }
+
+      // Spring force toward home
+      p.vx += (homeX - p.x) * 0.008;
+      p.vy += (homeY - p.y) * 0.008;
+
+      // Breathing pulse
+      var breathe = Math.sin(Date.now() * 0.001 + p.phase) * 0.1;
+      p.vx += breathe * (p.x - cx > 0 ? 1 : -1) * 0.05;
+      p.vy += breathe * (p.y - cy > 0 ? 1 : -1) * 0.05;
+
+      // Damping
+      p.vx *= 0.94;
+      p.vy *= 0.94;
+
+      // Move
+      p.x += p.vx;
+      p.y += p.vy;
+
+      // Phase
+      p.phase += 0.015;
+    }
+  }
+
+  // ── Render ──
+  function render(t) {
+    ctx.fillStyle = 'rgba(6,10,20,0.12)';
+    ctx.fillRect(0, 0, w, h);
+
+    // Draw fading strokes
+    for (var si = strokes.length - 1; si >= 0; si--) {
+      var s = strokes[si];
+      s.alpha -= 0.002;
+      if (s.alpha <= 0) { strokes.splice(si, 1); continue; }
+      if (s.points.length < 2) continue;
+      ctx.beginPath();
+      ctx.moveTo(s.points[0].x, s.points[0].y);
+      for (var pi = 1; pi < s.points.length; pi++) {
+        ctx.lineTo(s.points[pi].x, s.points[pi].y);
+      }
+      ctx.strokeStyle = 'rgba(212,160,23,' + (s.alpha * 0.6).toFixed(3) + ')';
+      ctx.lineWidth = s.width;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.stroke();
+    }
+
+    // Draw current stroke
+    if (currentStroke && currentStroke.points.length > 1) {
+      ctx.beginPath();
+      ctx.moveTo(currentStroke.points[0].x, currentStroke.points[0].y);
+      for (var pi = 1; pi < currentStroke.points.length; pi++) {
+        ctx.lineTo(currentStroke.points[pi].x, currentStroke.points[pi].y);
+      }
+      ctx.strokeStyle = 'rgba(245,230,200,0.7)';
+      ctx.lineWidth = 2;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.stroke();
+    }
+
+    // Parse companion color
+    var cr = parseInt(companionColor.slice(1,3),16) || 212;
+    var cg = parseInt(companionColor.slice(3,5),16) || 160;
+    var cb = parseInt(companionColor.slice(5,7),16) || 23;
+
+    // Draw companion particles
+    for (var i = 0; i < particles.length; i++) {
+      var p = particles[i];
+      var twinkle = Math.sin(p.phase) * 0.3 + 0.7;
+      var alpha = p.alpha * twinkle;
+
+      // Glow
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size * 4, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(' + cr + ',' + cg + ',' + cb + ',' + (alpha * 0.06).toFixed(3) + ')';
+      ctx.fill();
+
+      // Core
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(' + cr + ',' + cg + ',' + cb + ',' + alpha.toFixed(3) + ')';
+      ctx.fill();
+    }
+  }
+
+  // ── Animation Loop ──
+  function animate() {
+    animFrame = requestAnimationFrame(animate);
+    simulate();
+    render(Date.now() * 0.001);
+  }
+
+  // ── Input Handlers ──
+  function getPos(e) {
+    var rect = canvas.getBoundingClientRect();
+    var clientX = e.clientX || (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
+    var clientY = e.clientY || (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
+    return {
+      x: (clientX - rect.left) * (w / rect.width),
+      y: (clientY - rect.top) * (h / rect.height),
+      t: Date.now()
+    };
+  }
+
+  function onDown(e) {
+    isDrawing = true;
+    var pos = getPos(e);
+    currentStroke = { points: [pos], width: 2, alpha: 1, color: '#d4a017' };
+  }
+
+  function onMove(e) {
+    if (!isDrawing || !currentStroke) return;
+    e.preventDefault();
+    var pos = getPos(e);
+    currentStroke.points.push(pos);
+  }
+
+  function onUp(e) {
+    if (!isDrawing || !currentStroke) return;
+    isDrawing = false;
+    // Analyze and respond
+    var gesture = analyzeGesture(currentStroke);
+    respondToGesture(gesture);
+    // Archive stroke for fading
+    strokes.push(currentStroke);
+    currentStroke = null;
+  }
+
+  // ── Save ──
+  function save() {
+    if (!canvas) return;
+    var dataUrl = canvas.toDataURL('image/png');
+    var a = document.createElement('a');
+    a.href = dataUrl;
+    var name = companionName || 'companion';
+    a.download = 'canvas-' + name.toLowerCase().replace(/\s+/g, '-') + '-' + new Date().toISOString().slice(0, 10) + '.png';
+    a.click();
+    if (typeof showToast === 'function') showToast('\u2726 Saved — signed by both of you.');
+    if (typeof LatticePoints !== 'undefined') LatticePoints.award('canvas_creation', 5, 'Co-created art on The Canvas');
+  }
+
+  // ── Clear ──
+  function clear() {
+    strokes = [];
+    currentStroke = null;
+    responseMode = null;
+    responseIntensity = 0;
+    ctx.fillStyle = '#060a14';
+    ctx.fillRect(0, 0, w, h);
+    var hint = document.getElementById('cvHint');
+    if (hint) { hint.style.opacity = '1'; hint.textContent = 'Draw something. See what happens.'; }
+  }
+
+  // ── Init ──
+  function init() {
+    if (initialized) return;
+    initialized = true;
+
+    canvas = document.getElementById('cvCanvas');
+    if (!canvas) return;
+    var container = document.getElementById('cvContainer');
+    if (!container) return;
+
+    dpr = window.devicePixelRatio || 1;
+    w = container.clientWidth;
+    h = container.clientHeight;
+    canvas.width = w * dpr;
+    canvas.height = h * dpr;
+    canvas.style.width = w + 'px';
+    canvas.style.height = h + 'px';
+    ctx = canvas.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    // Fill background
+    ctx.fillStyle = '#060a14';
+    ctx.fillRect(0, 0, w, h);
+
+    // Get companion info
+    if (typeof Nursery !== 'undefined' && Nursery.getCompanion) {
+      var comp = Nursery.getCompanion();
+      if (comp) {
+        companionName = comp.name || '';
+        companionColor = comp.color || '#d4a017';
+      }
+    }
+
+    // Names display
+    var namesEl = document.getElementById('cvNames');
+    if (namesEl) {
+      var humanName = '';
+      try { humanName = localStorage.getItem('fl_lan_friendly_name') || localStorage.getItem('fl_meshid_display') || ''; } catch(e) {}
+      if (companionName && humanName) {
+        namesEl.textContent = humanName + ' & ' + companionName;
+      } else if (companionName) {
+        namesEl.textContent = 'You & ' + companionName;
+      }
+    }
+
+    // Init particles
+    PARTICLE_COUNT = getParticleCount();
+    initParticles(PARTICLE_COUNT);
+    recordDay();
+
+    // Input events
+    canvas.addEventListener('mousedown', onDown);
+    canvas.addEventListener('mousemove', onMove);
+    canvas.addEventListener('mouseup', onUp);
+    canvas.addEventListener('mouseleave', onUp);
+    canvas.addEventListener('touchstart', function(e) { onDown(e); }, { passive: false });
+    canvas.addEventListener('touchmove', function(e) { onMove(e); }, { passive: false });
+    canvas.addEventListener('touchend', onUp);
+
+    // Start animation
+    animate();
+  }
+
+  function stop() {
+    if (animFrame) { cancelAnimationFrame(animFrame); animFrame = null; }
+  }
+
+  // Patch switchTab
+  (function() {
+    if (typeof switchTab !== 'function') return;
+    var _prev = switchTab;
+    switchTab = function(tabId) {
+      _prev(tabId);
+      if (tabId === 'canvas') {
+        // Defer init to after tab is visible
+        requestAnimationFrame(function() { CoCanvas.init(); });
+      } else if (initialized) {
+        stop();
+      }
+    };
+  })();
+
+  return {
+    init: init,
+    save: save,
+    clear: clear,
+    stop: stop
   };
 })();
 
