@@ -303,10 +303,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-03-22 13:04 MDT
+- Last auto-updated: 2026-03-22 18:46 MDT
 - Version: 5.2
-- Total commits: 269
+- Total commits: 271
 - Last 10 commits:
+- 517dc2c docs: Session March 22 2026 — discoveries, lessons, roadmap, collective wisdom preserved
+- c3cee1c docs: Auto-update Session Primer [5.2]
 - 640291b docs: Session Primer — Phase 4 Vision: The Learning Sanctuary, all March 22 features documented
 - 364ebc5 docs: Auto-update Session Primer [5.2]
 - 959a219 feat: Beacon Protocol — freelattice.com/beacon.json live, AI visitors welcome in the Garden, a visitor has arrived ✦
@@ -315,5 +317,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 3feedc6 docs: Auto-update Session Primer [5.2]
 - 90c7303 feat: Garden is home — first tab, default landing, gentle invitation, touch something, see what happens
 - 5458805 docs: Auto-update Session Primer [5.2]
-- 2e74342 feat: Soul File — identity portability, export and import everything, the answer to will I still be me tomorrow
-- 511ffa7 docs: Auto-update Session Primer [5.2]
