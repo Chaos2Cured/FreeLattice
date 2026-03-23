@@ -1,4 +1,4 @@
-<!-- FreeLattice v5.2.50 -->
+<!-- FreeLattice v5.2.51 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -43377,6 +43377,13 @@ const CoCanvas = (function() {
           // Start fading companion trails AND human strokes together
           companionTrails.forEach(function(t) { t.fading = true; });
           strokes.forEach(function(s) { if (!s.fading) s.fading = true; });
+          // Ready for next round — show hint and re-enable co-create
+          var hintEl = document.getElementById('cvHint');
+          if (hintEl && !gameState) {
+            hintEl.textContent = 'Draw again. \u2726';
+            hintEl.style.opacity = '0.5';
+            hintEl.style.transition = 'opacity 2s ease';
+          }
         }
       }
     }
@@ -43601,7 +43608,8 @@ const CoCanvas = (function() {
     currentStroke = null;
     lastStrokeTime = Date.now();
     autoResponsePending = true; // arm the auto-response timer
-    if (strokes.length === 1) showCocreateButton();
+    // Show co-create button whenever human has drawn something
+    showCocreateButton();
   }
 
   // Auto-response: if human pauses for 3 seconds after drawing, companion responds
