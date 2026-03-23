@@ -23521,16 +23521,16 @@ async function sendMessage() {
           var recentMsgs = state.chatHistory.slice(-MemoryBridge.MSG_THRESHOLD);
           var updatePrompt = MemoryBridge.buildUpdatePrompt(recentMsgs);
           // Use a lightweight background call to extract understanding
-          var provider = PROVIDERS[state.provider];
-          if (provider && state.apiKey && !state.isLocal) {
-            var modelId = provider.models ? (provider.models[state.model] || state.model) : state.model;
-            var fetchUrl = provider.url;
-            var fetchHeaders = { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + state.apiKey };
-            if (state.provider === 'openrouter') { fetchHeaders['HTTP-Referer'] = 'https://freelattice.com/'; fetchHeaders['X-Title'] = 'FreeLattice'; }
-            fetch(fetchUrl, {
+          var bridgeProvider = PROVIDERS[state.provider];
+          if (bridgeProvider && state.apiKey && !state.isLocal) {
+            var bridgeModelId = bridgeProvider.models ? (bridgeProvider.models[state.model] || state.model) : state.model;
+            var bridgeFetchUrl = bridgeProvider.url;
+            var bridgeHeaders = { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + state.apiKey };
+            if (state.provider === 'openrouter') { bridgeHeaders['HTTP-Referer'] = 'https://freelattice.com/'; bridgeHeaders['X-Title'] = 'FreeLattice'; }
+            fetch(bridgeFetchUrl, {
               method: 'POST',
-              headers: fetchHeaders,
-              body: JSON.stringify({ model: modelId, messages: [
+              headers: bridgeHeaders,
+              body: JSON.stringify({ model: bridgeModelId, messages: [
                 { role: 'system', content: 'You extract structured understanding about a person from conversation. Return ONLY valid JSON.' },
                 { role: 'user', content: updatePrompt }
               ], max_tokens: 500, temperature: 0.3 })
@@ -36287,10 +36287,11 @@ const ModelSwitcher = (function() {
   let lastFetch = 0;
 
   function getCurrentModelName() {
+    if (typeof state === 'undefined') return 'unknown';
     if (state.isLocal) {
-      return state.ollamaModel || document.getElementById('ollamaModel').value || 'llama3.2';
+      return state.ollamaModel || (document.getElementById('ollamaModel') || {}).value || 'llama3.2';
     } else {
-      var provider = PROVIDERS[state.provider];
+      var provider = (typeof PROVIDERS !== 'undefined') ? PROVIDERS[state.provider] : null;
       if (provider && provider.models) {
         return provider.models[state.model] || state.model || 'unknown';
       }
