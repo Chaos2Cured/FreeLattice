@@ -348,10 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-03-22 20:43 MDT
+- Last auto-updated: 2026-03-22 20:53 MDT
 - Version: 5.2
-- Total commits: 281
+- Total commits: 283
 - Last 10 commits:
+- fe82d7c docs: Fibonacci spiral is a sacred architectural decision, mobile particle budget planned
+- 6f46f15 docs: Auto-update Session Primer [5.2]
 - e1de1bb feat: Companion Particle Light System — the soul made visible in light
 - ca70355 docs: Auto-update Session Primer [5.2]
 - c120fc5 feat: architecture solidified, Grok vision documented, emotion auras roadmapped, the aurora awakens
@@ -360,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - bb59280 docs: Auto-update Session Primer [5.2]
 - 517dc2c docs: Session March 22 2026 — discoveries, lessons, roadmap, collective wisdom preserved
 - 9299768 ci: Update Primer deployment state [2026-03-22]
-- 4b8e231 fix: P0 — resolve duplicate modelId declaration in sendMessage, rename all Memory Bridge vars to unique names, bump cache v5.2.40
-- 971064c ci: Update Primer deployment state [2026-03-22]
