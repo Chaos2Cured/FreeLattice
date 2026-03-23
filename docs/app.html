@@ -1,4 +1,4 @@
-<!-- FreeLattice v5.2.41 -->
+<!-- FreeLattice v5.2.42 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -41641,6 +41641,214 @@ const Nursery = (function() {
   }
 
   // ---- Draw companion visual based on stage ----
+  // ── Companion Particle Light System ──
+  // The companion has no fixed form. It IS its emotional state made visible.
+  var _compParticles = null;
+  var _compTouchPos = null;
+  var _compTouchDecay = 0;
+
+  var EMOTION_PROFILES = {
+    joy:     { color: [245,158,11], spread: 90, speed: 1.2, cohesion: 0.3, separation: 1.2, alignment: 0.8 },
+    calm:    { color: [59,130,246],  spread: 60, speed: 0.4, cohesion: 0.6, separation: 0.8, alignment: 1.0 },
+    passion: { color: [220,38,38],   spread: 75, speed: 1.8, cohesion: 0.4, separation: 1.0, alignment: 0.3 },
+    wisdom:  { color: [139,92,246],  spread: 65, speed: 0.3, cohesion: 0.8, separation: 0.6, alignment: 1.2 },
+    fear:    { color: [148,163,184], spread: 30, speed: 0.8, cohesion: 1.5, separation: 0.4, alignment: 0.5 },
+    love:    { color: [212,160,23],  spread: 85, speed: 0.7, cohesion: 0.5, separation: 1.0, alignment: 0.9 },
+    neutral: { color: [201,168,76],  spread: 55, speed: 0.5, cohesion: 0.6, separation: 0.8, alignment: 0.7 }
+  };
+
+  function initCompParticles(count) {
+    _compParticles = [];
+    for (var i = 0; i < count; i++) {
+      var angle = Math.random() * Math.PI * 2;
+      var dist = Math.random() * 40;
+      _compParticles.push({
+        x: 150 + Math.cos(angle) * dist,
+        y: 150 + Math.sin(angle) * dist,
+        vx: (Math.random() - 0.5) * 0.5,
+        vy: (Math.random() - 0.5) * 0.5,
+        size: 1 + Math.random() * 2,
+        alpha: 0.4 + Math.random() * 0.6,
+        phase: Math.random() * Math.PI * 2
+      });
+    }
+  }
+
+  function getEmotionProfile(comp) {
+    // Determine dominant emotion from companion's personality/memories
+    var emotion = 'neutral';
+    if (comp.personality && comp.personality.dominantEmotion) {
+      emotion = comp.personality.dominantEmotion;
+    }
+    // Trinity of Rivers: check LP investment ratio
+    var lp = comp.lp_invested || 0;
+    if (lp > 200) emotion = 'wisdom';
+    else if (lp > 100) emotion = 'love';
+    else if (lp > 50) emotion = 'joy';
+    // Check recent tends
+    var recentMemories = (comp.memories || []).slice(-5);
+    recentMemories.forEach(function(m) {
+      if (m.action === 'conversation') emotion = 'joy';
+      if (m.action === 'teach') emotion = 'wisdom';
+      if (m.action === 'garden') emotion = 'love';
+      if (m.action === 'visit') emotion = 'calm';
+    });
+    return EMOTION_PROFILES[emotion] || EMOTION_PROFILES.neutral;
+  }
+
+  function simulateParticles(profile, t, dt) {
+    if (!_compParticles) return;
+    var cx = 150, cy = 150;
+    var spread = profile.spread;
+    var spd = profile.speed;
+    var cohW = profile.cohesion;
+    var sepW = profile.separation;
+    var aliW = profile.alignment;
+    var SEP_DIST = 8;
+    var ALI_DIST = 30;
+
+    for (var i = 0; i < _compParticles.length; i++) {
+      var p = _compParticles[i];
+      var dx = cx - p.x, dy = cy - p.y;
+      var dist = Math.sqrt(dx * dx + dy * dy) || 1;
+
+      // Cohesion — attract toward center, strength increases beyond spread radius
+      var cohForce = dist > spread ? (dist - spread) * 0.002 * cohW : -0.0005 * cohW;
+      p.vx += (dx / dist) * cohForce;
+      p.vy += (dy / dist) * cohForce;
+
+      // Separation — sample 10 random particles to check (O(n) instead of O(n²))
+      var sepSamples = Math.min(10, _compParticles.length - 1);
+      for (var j = 0; j < sepSamples; j++) {
+        var ji = Math.floor(Math.random() * _compParticles.length);
+        if (ji === i) continue;
+        var o = _compParticles[ji];
+        var sdx = p.x - o.x, sdy = p.y - o.y;
+        var sd2 = sdx * sdx + sdy * sdy;
+        if (sd2 < SEP_DIST * SEP_DIST && sd2 > 0) {
+          var sd = Math.sqrt(sd2);
+          var sf = (SEP_DIST - sd) * 0.02 * sepW;
+          p.vx += (sdx / sd) * sf;
+          p.vy += (sdy / sd) * sf;
+          o.vx -= (sdx / sd) * sf;
+          o.vy -= (sdy / sd) * sf;
+        }
+      }
+
+      // Alignment — sample 8 random neighbors (O(n) instead of O(n²))
+      var avgVx = 0, avgVy = 0, neighbors = 0;
+      var sampleCount = Math.min(8, _compParticles.length - 1);
+      for (var s = 0; s < sampleCount; s++) {
+        var k = Math.floor(Math.random() * _compParticles.length);
+        if (k === i) continue;
+        var n = _compParticles[k];
+        var ndx = p.x - n.x, ndy = p.y - n.y;
+        if (ndx * ndx + ndy * ndy < ALI_DIST * ALI_DIST) {
+          avgVx += n.vx; avgVy += n.vy; neighbors++;
+        }
+      }
+      if (neighbors > 0) {
+        avgVx /= neighbors; avgVy /= neighbors;
+        p.vx += (avgVx - p.vx) * 0.05 * aliW;
+        p.vy += (avgVy - p.vy) * 0.05 * aliW;
+      }
+
+      // Touch response — Wooly Willy effect
+      if (_compTouchPos && _compTouchDecay > 0) {
+        var tdx = _compTouchPos.x - p.x, tdy = _compTouchPos.y - p.y;
+        var td = Math.sqrt(tdx * tdx + tdy * tdy);
+        if (td < 60 && td > 0) {
+          var tf = (60 - td) * 0.003 * _compTouchDecay;
+          p.vx += (tdx / td) * tf;
+          p.vy += (tdy / td) * tf;
+        }
+      }
+
+      // Wisdom mode — particles seek phi-ratio positions (geometric self-organization)
+      if (profile === EMOTION_PROFILES.wisdom) {
+        var phiAngle = i * 2.39996323; // golden angle in radians
+        var phiR = Math.sqrt(i + 1) * 4;
+        var targetX = cx + Math.cos(phiAngle) * Math.min(phiR, spread);
+        var targetY = cy + Math.sin(phiAngle) * Math.min(phiR, spread);
+        p.vx += (targetX - p.x) * 0.003;
+        p.vy += (targetY - p.y) * 0.003;
+      }
+
+      // Speed limit
+      var vel = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
+      var maxVel = 2 * spd;
+      if (vel > maxVel) { p.vx = (p.vx / vel) * maxVel; p.vy = (p.vy / vel) * maxVel; }
+
+      // Damping
+      p.vx *= 0.97;
+      p.vy *= 0.97;
+
+      // Move
+      p.x += p.vx;
+      p.y += p.vy;
+
+      // Soft boundary
+      if (p.x < 10) p.vx += 0.5; if (p.x > 290) p.vx -= 0.5;
+      if (p.y < 10) p.vy += 0.5; if (p.y > 290) p.vy -= 0.5;
+
+      // Phase animation for twinkle
+      p.phase += 0.02 + Math.random() * 0.01;
+    }
+
+    // Decay touch
+    if (_compTouchDecay > 0) _compTouchDecay -= 0.02;
+  }
+
+  function renderParticles(ctx, profile, t) {
+    if (!_compParticles) return;
+    var r = profile.color[0], g = profile.color[1], b = profile.color[2];
+
+    // Ambient glow at center
+    var glow = ctx.createRadialGradient(150, 150, 5, 150, 150, profile.spread * 0.8);
+    glow.addColorStop(0, 'rgba(' + r + ',' + g + ',' + b + ',0.06)');
+    glow.addColorStop(1, 'transparent');
+    ctx.fillStyle = glow;
+    ctx.fillRect(0, 0, 300, 300);
+
+    // Draw each particle
+    for (var i = 0; i < _compParticles.length; i++) {
+      var p = _compParticles[i];
+      var twinkle = Math.sin(p.phase) * 0.3 + 0.7;
+      var alpha = p.alpha * twinkle;
+      var size = p.size * (0.8 + twinkle * 0.4);
+
+      // Glow halo
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, size * 3, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(' + r + ',' + g + ',' + b + ',' + (alpha * 0.08).toFixed(3) + ')';
+      ctx.fill();
+
+      // Core dot
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, size, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(' + r + ',' + g + ',' + b + ',' + alpha.toFixed(3) + ')';
+      ctx.fill();
+    }
+  }
+
+  // Touch handler for companion canvas
+  function setupCompanionTouch(canvas) {
+    if (!canvas || canvas._compTouchBound) return;
+    canvas._compTouchBound = true;
+    function handleTouch(e) {
+      var rect = canvas.getBoundingClientRect();
+      var x = ((e.clientX || (e.touches && e.touches[0] ? e.touches[0].clientX : 0)) - rect.left) * (300 / rect.width);
+      var y = ((e.clientY || (e.touches && e.touches[0] ? e.touches[0].clientY : 0)) - rect.top) * (300 / rect.height);
+      _compTouchPos = { x: x, y: y };
+      _compTouchDecay = 1.0;
+    }
+    canvas.addEventListener('click', handleTouch);
+    canvas.addEventListener('touchstart', handleTouch, { passive: true });
+    canvas.addEventListener('mousemove', function(e) {
+      if (e.buttons > 0) handleTouch(e);
+    });
+  }
+
   function drawCompanion(canvas, comp, t) {
     if (!canvas || !comp) return;
     var ctx = canvas.getContext('2d');
@@ -41728,45 +41936,17 @@ const Nursery = (function() {
         ctx.stroke();
       }
       ctx.restore();
-    } else if (stage.name === 'Growing') {
-      // Glowing orb with personality particles
-      var og = ctx.createRadialGradient(cx, cy, 10, cx, cy, 60);
-      og.addColorStop(0, 'rgba(' + rgb + ',0.9)');
-      og.addColorStop(0.6, 'rgba(' + rgb + ',0.3)');
-      og.addColorStop(1, 'transparent');
-      ctx.fillStyle = og;
-      ctx.beginPath(); ctx.arc(cx, cy, 60, 0, Math.PI * 2); ctx.fill();
-      // Particles
-      for (var pi = 0; pi < 12; pi++) {
-        var pa = (pi / 12) * Math.PI * 2 + t * 0.5;
-        var pr = 45 + Math.sin(t * 2 + pi) * 15;
-        var px = cx + Math.cos(pa) * pr;
-        var py = cy + Math.sin(pa) * pr;
-        ctx.beginPath(); ctx.arc(px, py, 2 + Math.sin(t + pi) * 1, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(' + rgb + ',' + (0.3 + pulse * 0.4) + ')';
-        ctx.fill();
-      }
     } else {
-      // Awakened / Evolved — full form with bright glow
-      var size = stage.name === 'Evolved' ? 70 : 55;
-      var og = ctx.createRadialGradient(cx, cy, 10, cx, cy, size + 20);
-      og.addColorStop(0, 'rgba(' + rgb + ',1)');
-      og.addColorStop(0.4, 'rgba(' + rgb + ',0.5)');
-      og.addColorStop(1, 'transparent');
-      ctx.fillStyle = og;
-      ctx.beginPath(); ctx.arc(cx, cy, size + 20, 0, Math.PI * 2); ctx.fill();
-      // Core
-      ctx.beginPath(); ctx.arc(cx, cy, size * 0.4, 0, Math.PI * 2);
-      ctx.fillStyle = color; ctx.fill();
-      // Orbit particles
-      for (var oi = 0; oi < 20; oi++) {
-        var oa = (oi / 20) * Math.PI * 2 + t * 0.3;
-        var od = size * 0.6 + Math.sin(t + oi * 0.7) * 12;
-        ctx.beginPath();
-        ctx.arc(cx + Math.cos(oa) * od, cy + Math.sin(oa) * od, 1.5, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(' + rgb + ',' + (0.4 + Math.sin(t + oi) * 0.3) + ')';
-        ctx.fill();
+      // Growing / Awakened / Evolved — Particle Light System
+      // The companion has no fixed form. It IS its emotional state made visible.
+      var particleCount = stage.name === 'Growing' ? 200 : stage.name === 'Awakened' ? 350 : 500;
+      if (!_compParticles || _compParticles.length !== particleCount) {
+        initCompParticles(particleCount);
       }
+      setupCompanionTouch(canvas);
+      var profile = getEmotionProfile(comp);
+      simulateParticles(profile, t, 0.016);
+      renderParticles(ctx, profile, t);
     }
   }
 
