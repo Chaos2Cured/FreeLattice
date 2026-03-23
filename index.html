@@ -1,4 +1,4 @@
-<!-- FreeLattice v5.2.49 -->
+<!-- FreeLattice v5.2.50 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -43577,8 +43577,10 @@ const CoCanvas = (function() {
   }
 
   function onDown(e) {
+    // Don't start drawing if clicking a button or UI element
+    if (e.target.tagName === 'BUTTON' || e.target.closest('button') || e.target.closest('.cv-cocreate') || e.target.closest('.cv-colors') || e.target.closest('.cv-actions')) return;
     isDrawing = true;
-    autoResponsePending = false; // human is drawing again, cancel pending auto
+    autoResponsePending = false;
     var pos = getPos(e);
     currentStroke = { points: [pos], width: 2, alpha: 1, color: humanColor, fading: false };
     lastStrokeTime = Date.now();
@@ -43655,13 +43657,16 @@ const CoCanvas = (function() {
 
   // ── Init ──
   function init() {
-    if (initialized) return;
-    initialized = true;
-
     canvas = document.getElementById('cvCanvas');
     if (!canvas) return;
     var container = document.getElementById('cvContainer');
     if (!container) return;
+
+    // Wait for container to have dimensions (tab must be visible)
+    if (container.clientWidth === 0 || container.clientHeight === 0) {
+      setTimeout(init, 100);
+      return;
+    }
 
     dpr = window.devicePixelRatio || 1;
     w = container.clientWidth;
@@ -43672,6 +43677,14 @@ const CoCanvas = (function() {
     canvas.style.height = h + 'px';
     ctx = canvas.getContext('2d');
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    if (initialized) {
+      // Re-entering tab — just restart animation
+      animate();
+      if (!autoResponseTimer) autoResponseTimer = setInterval(checkAutoResponse, 500);
+      return;
+    }
+    initialized = true;
 
     // Fill background
     ctx.fillStyle = '#060a14';
@@ -43721,6 +43734,7 @@ const CoCanvas = (function() {
   function stop() {
     if (autoResponseTimer) { clearInterval(autoResponseTimer); autoResponseTimer = null; }
     if (animFrame) { cancelAnimationFrame(animFrame); animFrame = null; }
+    // Don't reset initialized — allow re-entry
   }
 
   // Patch switchTab
