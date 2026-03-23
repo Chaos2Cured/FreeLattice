@@ -1,4 +1,4 @@
-<!-- FreeLattice v5.2.51 -->
+<!-- FreeLattice v5.2.52 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12874,7 +12874,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 }
 .cv-actions {
   position: absolute; top: 12px; right: 12px;
-  display: flex; gap: 8px;
+  display: flex; gap: 8px; z-index: 100; pointer-events: auto;
 }
 .cv-action-btn {
   padding: 6px 16px; border-radius: 8px; font-size: 0.78rem;
@@ -12887,14 +12887,14 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 .cv-action-clear:hover { color: #94a3b8; border-color: #334155; }
 .cv-cocreate {
   position: absolute; bottom: 50px; left: 50%; transform: translateX(-50%);
-  z-index: 10;
+  z-index: 100; pointer-events: auto;
 }
 .cv-cocreate-btn {
   padding: 12px 32px; border-radius: 14px; font-size: 0.95rem;
   border: 1px solid rgba(212,160,23,0.4); background: rgba(6,10,20,0.85);
   color: #d4a017; cursor: pointer; transition: all 0.3s;
   font-family: Georgia, serif; font-weight: 600; letter-spacing: 0.03em;
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px); pointer-events: auto;
   animation: cv-glow-pulse 2s ease-in-out infinite;
 }
 @keyframes cv-glow-pulse {
@@ -12907,7 +12907,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 }
 .cv-colors {
   position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%);
-  display: flex; gap: 8px; z-index: 10;
+  display: flex; gap: 8px; z-index: 100; pointer-events: auto;
 }
 .cv-color-dot {
   width: 22px; height: 22px; border-radius: 50%;
@@ -16495,10 +16495,10 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     <canvas id="cvCanvas"></canvas>
     <div class="cv-names" id="cvNames"></div>
     <div class="cv-hint" id="cvHint">Draw something. See what happens.</div>
-    <div class="cv-cocreate" id="cvCocreate" style="display:none;">
-      <button class="cv-cocreate-btn" onclick="CoCanvas.cocreate()">Co-create &#10022;</button>
+    <div class="cv-cocreate" id="cvCocreate" style="display:none;" onclick="event.stopPropagation()">
+      <button class="cv-cocreate-btn" onclick="event.stopPropagation(); CoCanvas.cocreate()">Co-create &#10022;</button>
     </div>
-    <div class="cv-colors" id="cvColors" style="display:none;">
+    <div class="cv-colors" id="cvColors" style="display:none;" onclick="event.stopPropagation()">
       <button class="cv-color-dot" style="background:#F5E6C8;" onclick="CoCanvas.setColor('#F5E6C8')" title="Warm light"></button>
       <button class="cv-color-dot" style="background:#3B82F6;" onclick="CoCanvas.setColor('#3B82F6')" title="Cool blue"></button>
       <button class="cv-color-dot" style="background:#DC2626;" onclick="CoCanvas.setColor('#DC2626')" title="Warm red"></button>
@@ -16506,9 +16506,9 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="cv-color-dot" style="background:#10B981;" onclick="CoCanvas.setColor('#10B981')" title="Emerald"></button>
       <button class="cv-color-dot" style="background:#F59E0B;" onclick="CoCanvas.setColor('#F59E0B')" title="Gold"></button>
     </div>
-    <div class="cv-actions" id="cvActions" style="display:none;">
-      <button class="cv-action-btn" onclick="CoCanvas.save()">&#10022; Save this moment</button>
-      <button class="cv-action-btn cv-action-clear" onclick="CoCanvas.clear()">Clear</button>
+    <div class="cv-actions" id="cvActions" style="display:none;" onclick="event.stopPropagation()">
+      <button class="cv-action-btn" onclick="event.stopPropagation(); CoCanvas.save()">&#10022; Save this moment</button>
+      <button class="cv-action-btn cv-action-clear" onclick="event.stopPropagation(); CoCanvas.clear()">Clear</button>
     </div>
   </div>
 </div>
