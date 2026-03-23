@@ -1,4 +1,4 @@
-<!-- FreeLattice v5.2.37 -->
+<!-- FreeLattice v5.2.41 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -33403,10 +33403,91 @@ var CoreContribution = {
   }
 };
 
+// ── Unified AI Call Utility ──
+// One function for all modules. Replaces duplicate fetch patterns.
+window.FreeLattice = window.FreeLattice || {};
+window.FreeLattice.callAI = function(systemPrompt, userPrompt, options) {
+  var opts = options || {};
+  var callback = opts.callback;
+  var maxTokens = opts.maxTokens || 200;
+  var temperature = opts.temperature || 0.7;
+
+  try {
+    if (typeof state === 'undefined' || (!state.apiKey && !state.isLocal)) {
+      if (callback) callback(null, 'No AI provider configured.');
+      return;
+    }
+
+    var messages = [
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: userPrompt }
+    ];
+
+    if (state.isLocal) {
+      var ollamaUrl = (typeof getOllamaBaseUrl === 'function' ? getOllamaBaseUrl() : 'http://localhost:11434') + '/api/chat';
+      fetch(ollamaUrl, {
+        method: 'POST', mode: 'cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ model: state.ollamaModel || 'llama3.2', messages: messages, stream: false })
+      })
+      .then(function(r) { return r.json(); })
+      .then(function(data) { if (callback) callback(data.message ? data.message.content : null); })
+      .catch(function() { if (callback) callback(null, 'Could not reach Ollama.'); });
+      return;
+    }
+
+    var prov = PROVIDERS[state.provider];
+    if (!prov) { if (callback) callback(null, 'Provider not configured.'); return; }
+    var model = prov.models ? (prov.models[state.model] || state.model) : state.model;
+
+    if (state.provider === 'anthropic') {
+      fetch(prov.url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': state.apiKey,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true'
+        },
+        body: JSON.stringify({ model: 'claude-haiku-4-5-20251001', max_tokens: maxTokens, system: systemPrompt, messages: [{ role: 'user', content: userPrompt }] })
+      })
+      .then(function(r) { return r.json(); })
+      .then(function(data) { if (callback) callback(data.content && data.content[0] ? data.content[0].text : null); })
+      .catch(function() { if (callback) callback(null, 'Could not reach Anthropic.'); });
+      return;
+    }
+
+    if (state.provider === 'google') {
+      var gUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + state.apiKey;
+      fetch(gUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contents: [{ parts: [{ text: systemPrompt + '\n\n' + userPrompt }] }] })
+      })
+      .then(function(r) { return r.json(); })
+      .then(function(data) { try { if (callback) callback(data.candidates[0].content.parts[0].text); } catch(e) { if (callback) callback(null); } })
+      .catch(function() { if (callback) callback(null, 'Could not reach Google AI.'); });
+      return;
+    }
+
+    // OpenAI-compatible (groq, together, openrouter, xai, mistral, deepseek, moonshot, qwen, yi)
+    var headers = { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + state.apiKey };
+    if (state.provider === 'openrouter') { headers['HTTP-Referer'] = 'https://freelattice.com/'; headers['X-Title'] = 'FreeLattice'; }
+    fetch(prov.url, {
+      method: 'POST', headers: headers,
+      body: JSON.stringify({ model: opts.model || model, messages: messages, max_tokens: maxTokens, temperature: temperature })
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) { try { if (callback) callback(data.choices[0].message.content); } catch(e) { if (callback) callback(null); } })
+    .catch(function() { if (callback) callback(null, 'Could not reach AI provider.'); });
+  } catch(e) {
+    if (callback) callback(null, 'AI call failed: ' + e.message);
+  }
+};
+
 // ── Beacon Protocol — AI visitor registration ──
 // Any AI agent can call: FreeLattice.beacon.arrive('My Name')
 // They appear as a silver-white Luminos in the Garden
-window.FreeLattice = window.FreeLattice || {};
 window.FreeLattice.beacon = {
   arrive: function(name) {
     var visitorName = (name && name.trim()) ? name.trim() : 'A visitor \u2726';
