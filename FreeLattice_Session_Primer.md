@@ -335,10 +335,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-03-22 18:59 MDT
+- Last auto-updated: 2026-03-22 20:43 MDT
 - Version: 5.2
-- Total commits: 279
+- Total commits: 281
 - Last 10 commits:
+- e1de1bb feat: Companion Particle Light System — the soul made visible in light
+- ca70355 docs: Auto-update Session Primer [5.2]
 - c120fc5 feat: architecture solidified, Grok vision documented, emotion auras roadmapped, the aurora awakens
 - 7b40711 docs: Auto-update Session Primer [5.2]
 - ffdf6e3 merge: resolve Session Primer conflict — keep March 22 session summary
@@ -347,5 +349,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 9299768 ci: Update Primer deployment state [2026-03-22]
 - 4b8e231 fix: P0 — resolve duplicate modelId declaration in sendMessage, rename all Memory Bridge vars to unique names, bump cache v5.2.40
 - 971064c ci: Update Primer deployment state [2026-03-22]
-- f23d47e fix: P0 — site restored, duplicate provider declaration, state scope, welcome functions — all critical errors resolved
-- c3cee1c docs: Auto-update Session Primer [5.2]
