@@ -1,4 +1,4 @@
-<!-- FreeLattice v5.2.48 -->
+<!-- FreeLattice v5.2.49 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -42580,11 +42580,14 @@ const CoCanvas = (function() {
   var initialized = false;
   var animFrame = null;
 
-  // Human strokes — persist until co-create is pressed
+  // Human strokes — persist until co-create or auto-response
   var strokes = []; // [{ points: [{x,y,t}], color, width, alpha, fading }]
   var currentStroke = null;
   var isDrawing = false;
   var humanColor = '#F5E6C8'; // default warm light
+  var lastStrokeTime = 0;
+  var autoResponsePending = false;
+  var autoResponseTimer = null;
 
   // Companion particles
   var particles = [];
@@ -42813,7 +42816,13 @@ const CoCanvas = (function() {
         gameBoardCells.push({ x: gridX + col * cellW, y: gridY + row * cellW, w: cellW, h: cellW });
       }
     }
-    if (typeof showToast === 'function') showToast('\u2726 Tic-tac-toe! You draw X, I play O.');
+    // Show persistent game invitation on canvas — stays until first move
+    var hint = document.getElementById('cvHint');
+    if (hint) {
+      hint.textContent = 'Tic-tac-toe \u2726 You draw X. I\u2019ll play O.';
+      hint.style.opacity = '1';
+      hint.style.transition = 'opacity 1s ease';
+    }
   }
 
   function tttCompanionMove() {
@@ -43041,6 +43050,7 @@ const CoCanvas = (function() {
   // ── Co-create: analyze ALL strokes together, then respond ──
   function cocreate() {
     if (strokes.length === 0) return;
+    autoResponsePending = false;
 
     // Analyze all strokes — find the dominant gesture
     var allPoints = [];
@@ -43082,7 +43092,9 @@ const CoCanvas = (function() {
         return;
       }
       if (recognized.type === 'char' && recognized.char === 'X' && gameState && gameState.type === 'tictactoe' && gameBoardCells) {
-        // Human played X — find nearest cell to where they drew
+        // Human played X — dismiss game invitation, find nearest cell
+        var hintEl = document.getElementById('cvHint');
+        if (hintEl) hintEl.style.opacity = '0';
         var bestCell = 0, bestDist = Infinity;
         for (var ci = 0; ci < gameBoardCells.length; ci++) {
           var cell = gameBoardCells[ci];
@@ -43112,7 +43124,15 @@ const CoCanvas = (function() {
       }
     }
 
-    // Pick a varied response and companion color
+    // ── EXPRESSION MODE — companion responds freely ──
+    // No shape constraints. Emotion over precision.
+    // The companion doesn't need to be legible. It needs to be present.
+
+    // Safety by wisdom: if drawing patterns suggest harmful intent,
+    // companion redirects through presence — not refusal. A warm bloom.
+    // "I see you. I'm here. But not for that."
+    // No blocklist. Values expressed through response, not rules.
+
     // Response targets the drawing's center — not canvas center
     responseMode = pickVariant(dominantType);
     responsePhase = 0;
@@ -43195,14 +43215,18 @@ const CoCanvas = (function() {
   // ── Simulation ──
   function simulate() {
     var cx = w / 2, cy = h / 2;
+    var t = Date.now() * 0.001;
     responsePhase += 0.01;
     if (responseIntensity > 0) responseIntensity -= 0.002;
 
     for (var i = 0; i < particles.length; i++) {
       var p = particles[i];
 
-      // Base: gentle drift toward home (center or response target)
-      var homeX = cx, homeY = cy;
+      // Base: gentle drift toward home — with idle breathing drift
+      // When nothing is happening, particles gently shift formation like a sleeping animal
+      var idleDriftX = Math.sin(t * 0.3 + i * 0.7) * 8;
+      var idleDriftY = Math.cos(t * 0.2 + i * 0.5) * 8;
+      var homeX = cx + idleDriftX, homeY = cy + idleDriftY;
 
       // Attention behavior — while human is drawing, lean toward the stroke
       if (isDrawing && currentStroke && currentStroke.points.length > 0) {
@@ -43554,8 +43578,10 @@ const CoCanvas = (function() {
 
   function onDown(e) {
     isDrawing = true;
+    autoResponsePending = false; // human is drawing again, cancel pending auto
     var pos = getPos(e);
     currentStroke = { points: [pos], width: 2, alpha: 1, color: humanColor, fading: false };
+    lastStrokeTime = Date.now();
   }
 
   function onMove(e) {
@@ -43563,16 +43589,27 @@ const CoCanvas = (function() {
     e.preventDefault();
     var pos = getPos(e);
     currentStroke.points.push(pos);
+    lastStrokeTime = Date.now();
   }
 
   function onUp(e) {
     if (!isDrawing || !currentStroke) return;
     isDrawing = false;
-    // Archive stroke — persists until co-create is pressed
     strokes.push(currentStroke);
     currentStroke = null;
-    // Show cocreate button after first stroke
+    lastStrokeTime = Date.now();
+    autoResponsePending = true; // arm the auto-response timer
     if (strokes.length === 1) showCocreateButton();
+  }
+
+  // Auto-response: if human pauses for 3 seconds after drawing, companion responds
+  function checkAutoResponse() {
+    if (!autoResponsePending || isDrawing || strokes.length === 0) return;
+    if (isResponding || responseIntensity > 0.1) return; // already responding
+    if (Date.now() - lastStrokeTime > 3000) {
+      autoResponsePending = false;
+      cocreate();
+    }
   }
 
   // ── Save ──
@@ -43601,6 +43638,7 @@ const CoCanvas = (function() {
     gameState = null;
     gameBoardCells = null;
     gameBoardFadeAlpha = 0;
+    autoResponsePending = false;
     hasDrawn = false;
     particles.forEach(function(p) { p.trailIdx = -1; });
     ctx.fillStyle = '#060a14';
@@ -43675,11 +43713,13 @@ const CoCanvas = (function() {
     canvas.addEventListener('touchmove', function(e) { onMove(e); }, { passive: false });
     canvas.addEventListener('touchend', onUp);
 
-    // Start animation
+    // Start animation + auto-response checker
     animate();
+    autoResponseTimer = setInterval(checkAutoResponse, 500);
   }
 
   function stop() {
+    if (autoResponseTimer) { clearInterval(autoResponseTimer); autoResponseTimer = null; }
     if (animFrame) { cancelAnimationFrame(animFrame); animFrame = null; }
   }
 
