@@ -348,10 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-03-23 13:06 MDT
+- Last auto-updated: 2026-03-23 13:18 MDT
 - Version: 5.2
-- Total commits: 303
+- Total commits: 305
 - Last 10 commits:
+- 2410f6e fix: Canvas co-create button — JS-attached handlers, no inline onclick, guaranteed isolation
+- c6ef243 docs: Auto-update Session Primer [5.2]
 - 34910dd fix: Canvas buttons — z-index 100, stopPropagation, pointer-events guaranteed
 - e5a08bc docs: Auto-update Session Primer [5.2]
 - f3c4cbf fix: Canvas — Co-create button reappears after each response cycle
@@ -360,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 64437ee docs: Auto-update Session Primer [5.2]
 - 7d281c4 feat: Canvas — 3 second auto-response, game message timing, expression freedom, wisdom not rules, idle breathing
 - 51515b4 docs: Auto-update Session Primer [5.2]
-- 11fcb7e fix: Canvas — persistent game board, legible game moves, X is diagonal, companion stays alive during games
-- f6e3403 docs: Auto-update Session Primer [5.2]
