@@ -1,4 +1,4 @@
-<!-- FreeLattice v5.2.58 -->
+<!-- FreeLattice v5.2.59 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -43018,23 +43018,67 @@ const CoCanvas = (function() {
 
   // Capture canvas and send to AI
   function captureAndSendToAI() {
+    console.log('[AI Vision] captureAndSendToAI called. canvasAIEnabled:', canvasAIEnabled, 'aiVisionPending:', aiVisionPending, 'cooldown clear:', (Date.now() - aiVisionCooldown >= AI_VISION_COOLDOWN_MS));
     if (!canvasAIEnabled || aiVisionPending || !canvas || !ctx) return;
     if (Date.now() - aiVisionCooldown < AI_VISION_COOLDOWN_MS) return;
     if (strokes.length <= lastCaptureStrokeCount) return;
-    if (!isVisionCapable()) return;
 
-    console.log('[AI Vision] Capturing canvas, stroke count:', strokes.length);
+    console.log('[AI Vision] Capturing canvas, stroke count:', strokes.length, 'visionCapable:', isVisionCapable());
     lastCaptureStrokeCount = strokes.length;
     aiVisionPending = true;
     aiVisionPulse = 1;
     aiVisionCooldown = Date.now();
 
-    // Capture current canvas as base64
-    var dataUrl = canvas.toDataURL('image/png');
-    var base64 = dataUrl.split(',')[1];
+    if (isVisionCapable()) {
+      // Vision model: capture canvas as image
+      var dataUrl = canvas.toDataURL('image/png');
+      var base64 = dataUrl.split(',')[1];
+      sendVisionRequest(base64);
+    } else {
+      // Non-vision fallback: analyze strokes as text description
+      sendTextFallback();
+    }
+  }
 
-    // Build request based on provider
-    sendVisionRequest(base64);
+  function sendTextFallback() {
+    console.log('[AI Vision] Non-vision fallback: sending stroke analysis to text model');
+    // Analyze stroke data directly
+    var strokeCount = strokes.length;
+    var sMinX = Infinity, sMaxX = -Infinity, sMinY = Infinity, sMaxY = -Infinity;
+    var colorsUsed = {};
+    strokes.forEach(function(s) {
+      if (s.color) colorsUsed[s.color] = true;
+      s.points.forEach(function(p) {
+        if (p.x < sMinX) sMinX = p.x; if (p.x > sMaxX) sMaxX = p.x;
+        if (p.y < sMinY) sMinY = p.y; if (p.y > sMaxY) sMaxY = p.y;
+      });
+    });
+    var bboxW = sMaxX !== -Infinity ? Math.round(sMaxX - sMinX) : 0;
+    var bboxH = sMaxY !== -Infinity ? Math.round(sMaxY - sMinY) : 0;
+
+    // Detect patterns
+    var pattern = 'freeform drawing';
+    var gestures = [];
+    strokes.forEach(function(s) { var g = analyzeGesture(s); if (g) gestures.push(g.type); });
+    var lineCount = gestures.filter(function(g) { return g === 'line'; }).length;
+    var spiralCount = gestures.filter(function(g) { return g === 'spiral'; }).length;
+    if (lineCount > gestures.length * 0.6) pattern = 'mostly straight lines';
+    else if (spiralCount > 0) pattern = 'curved or circular shapes';
+    else if (bboxW < 60 && bboxH < 60) pattern = 'small detailed marks or writing';
+    else if (bboxW > 200 || bboxH > 200) pattern = 'a large sweeping drawing';
+
+    var desc = strokeCount + ' strokes covering a ' + bboxW + 'x' + bboxH + ' pixel area. The drawing appears to be: ' + pattern + '. Colors used: ' + Object.keys(colorsUsed).join(', ');
+    var fallbackPrompt = 'You are a co-creator on a shared canvas. You cannot see the drawing, but here is what was drawn: ' + desc + '. Respond ONLY with a JSON object, no other text. Fields: text (1-5 words, a warm, curious, or playful response to what might have been drawn), particles (30-500), spread (0.1-1.0), speed (instant/gentle/slow/drift), color (hex or null), emotion (one word), placement (right/below/above/surround). Be imaginative about what they might have drawn. Be warm.';
+
+    // Use FreeLattice.callAI if available, otherwise direct fetch
+    if (typeof FreeLattice !== 'undefined' && FreeLattice.callAI) {
+      FreeLattice.callAI(fallbackPrompt, 'What do you see?', {
+        maxTokens: 200, temperature: 0.8,
+        callback: function(text) { handleVisionResponse(text); }
+      });
+    } else {
+      aiVisionPending = false; aiVisionPulse = 0;
+    }
   }
 
   function sendVisionRequest(base64) {
@@ -43545,11 +43589,22 @@ const CoCanvas = (function() {
     if (drawingStyle) drawingStyle.sessions++;
     saveDrawingStyle();
 
-    // Average center of all gestures
+    // Average center of all gestures — or last stroke endpoint as fallback
     var avgX = 0, avgY = 0;
     allPoints.forEach(function(g) { avgX += g.centerX; avgY += g.centerY; });
-    if (allPoints.length > 0) { avgX /= allPoints.length; avgY /= allPoints.length; }
-    else { avgX = w / 2; avgY = h / 2; }
+    if (allPoints.length > 0) {
+      avgX /= allPoints.length; avgY /= allPoints.length;
+    } else {
+      // Fallback: use the last point of the most recent stroke
+      var lastStroke = strokes[strokes.length - 1];
+      if (lastStroke && lastStroke.points.length > 0) {
+        var lastPt = lastStroke.points[lastStroke.points.length - 1];
+        avgX = lastPt.x; avgY = lastPt.y;
+      } else {
+        avgX = w / 2; avgY = h / 2;
+      }
+    }
+    console.log('[Canvas] Ambient particles spawning near:', avgX.toFixed(0), avgY.toFixed(0), allPoints.length > 0 ? 'from gesture center' : 'from stroke endpoint');
 
     // Game detection ONLY when gameMode is explicitly enabled by user toggle
     var recognized = gameMode ? recognizeCharacter(strokes) : null;
@@ -43846,13 +43901,18 @@ const CoCanvas = (function() {
           // Start fading companion trails AND human strokes together
           companionTrails.forEach(function(t) { t.fading = true; });
           strokes.forEach(function(s) { if (!s.fading) s.fading = true; });
-          // Ready for next round — show hint and re-enable co-create
+          // Ready for next round — re-show co-create button and hint
           var hintEl = document.getElementById('cvHint');
           if (hintEl && !gameState) {
             hintEl.textContent = 'Draw again. \u2726';
             hintEl.style.opacity = '0.5';
             hintEl.style.transition = 'opacity 2s ease';
           }
+          // Always re-show the Co-create button after response completes
+          var cvCoBtn = document.getElementById('cvCocreate');
+          if (cvCoBtn) cvCoBtn.style.display = '';
+          var cvColorsEl = document.getElementById('cvColors');
+          if (cvColorsEl) cvColorsEl.style.display = '';
         }
       }
     }
@@ -44252,10 +44312,17 @@ const CoCanvas = (function() {
         e.stopPropagation(); e.stopImmediatePropagation();
         toggleAIVision();
       });
-      // Show hint if model doesn't support vision
-      if (!isVisionCapable()) {
+      // Show vision state based on model capability
+      if (typeof state !== 'undefined' && !state.apiKey && !state.isLocal) {
+        visionBtn.style.color = '#475569';
+        visionBtn.style.textDecoration = 'line-through';
+        visionBtn.title = 'Connect an AI provider in Settings to enable canvas responses';
+      } else if (!isVisionCapable()) {
         visionBtn.style.color = '#64748b';
-        visionBtn.title = 'Switch to a vision model for AI canvas responses';
+        visionBtn.title = 'AI Vision limited \u2014 switch to llava, GPT-4o, or Claude for full vision. Using text fallback.';
+      } else {
+        visionBtn.style.color = '#F59E0B';
+        visionBtn.title = 'AI Vision active \u2014 the AI can see your drawings';
       }
     }
     // Color dots
