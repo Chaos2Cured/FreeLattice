@@ -1,4 +1,4 @@
-<!-- FreeLattice v5.2.60 -->
+<!-- FreeLattice v5.2.61 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -43293,77 +43293,73 @@ const CoCanvas = (function() {
     var targetCount = Math.min(resp.particles || 100, Math.max(textPixels.length, 30));
     var sampleStep = Math.max(1, Math.floor(textPixels.length / targetCount));
 
-    // Determine color
-    var pColor = resp.color || companionResponseColor;
+    // Determine color — triple fallback to ensure never null
+    var pColor = resp.color || companionResponseColor || companionColor || '#d4a017';
 
-    // Spawn delay per particle based on speed
-    function getSpawnDelay(speed) {
-      if (speed === 'instant') return 2;
-      if (speed === 'gentle') return 8;
-      if (speed === 'slow') return 15;
-      if (speed === 'drift') return 25;
-      return 8;
-    }
-    var spawnDelay = getSpawnDelay(resp.speed);
+    // Spawn delay per particle based on speed (reduced for faster visibility)
+    var spawnDelay;
+    if (resp.speed === 'instant') spawnDelay = 2;
+    else if (resp.speed === 'gentle') spawnDelay = 5;
+    else if (resp.speed === 'slow') spawnDelay = 10;
+    else if (resp.speed === 'drift') spawnDelay = 18;
+    else spawnDelay = 5;
     var now = performance.now();
 
-    // Create AI vision particles
+    // Create AI vision particles — with separate startX/startY that never change
     aiVisionParticles = [];
-    var pIdx = 0;
     for (var si = 0; si < textPixels.length; si += sampleStep) {
       var px = textPixels[si];
       var spread = resp.spread || 0.5;
+      var spreadOff = (Math.random() - 0.5) * spread * 60;
 
-      // START position: random point on canvas (they'll animate TO the text)
-      var startX = Math.random() * w;
-      var startY = Math.random() * h;
+      // Random start position — ANYWHERE on canvas
+      var sX = Math.random() * w;
+      var sY = Math.random() * h;
+      // Target position — text pixel + spread offset
+      var tX = px.x + spreadOff;
+      var tY = px.y + (Math.random() - 0.5) * spread * 60;
 
-      // TARGET position: the actual text pixel position + spread offset
-      var spreadOffset = (Math.random() - 0.5) * spread * 60;
-      var targetPx = px.x + spreadOffset;
-      var targetPy = px.y + spreadOffset;
-
-      // Ensure color is never null — use companionColor as final fallback
-      var safeColor = pColor || companionColor || '#d4a017';
-      var particle = {
-        x: startX, y: startY,
-        targetX: targetPx, targetY: targetPy,
-        color: safeColor,
-        size: 1 + Math.random() * 1.5,
-        alpha: 0,
-        targetAlpha: 0.3 + Math.random() * 0.6,
+      aiVisionParticles.push({
+        startX: sX, startY: sY,    // original position, never modified
+        x: sX, y: sY,              // current position, updated each frame
+        targetX: tX, targetY: tY,  // destination, never modified
+        opacity: 0,
+        targetOpacity: 0.4 + Math.random() * 0.5,
+        color: pColor,
         speed: resp.speed || 'gentle',
         phase: Math.random() * Math.PI * 2,
         arrived: false,
-        birthTime: now + pIdx * spawnDelay,
-        alive: true
-      };
-      if (pIdx === 0) {
-        console.log('[AI Vision] First particle — start:', startX.toFixed(0), startY.toFixed(0),
-                    'target:', targetPx.toFixed(0), targetPy.toFixed(0),
-                    'canvas w/h:', w, h, 'color:', safeColor);
-      }
-      aiVisionParticles.push(particle);
-      pIdx++;
+        arrivedTime: 0,
+        birthTime: now + (aiVisionParticles.length) * spawnDelay,
+        _logged: false
+      });
+
+      if (aiVisionParticles.length >= (resp.particles || 100)) break;
     }
 
     // Add ambient particles if text had fewer pixels than requested
-    if (aiVisionParticles.length < (resp.particles || 100)) {
-      var extra = (resp.particles || 100) - aiVisionParticles.length;
-      for (var ei = 0; ei < extra; ei++) {
-        aiVisionParticles.push({
-          x: Math.random() * w, y: Math.random() * h,
-          targetX: textX + (Math.random() - 0.5) * 80,
-          targetY: textY + (Math.random() - 0.5) * 40,
-          color: pColor || companionColor || '#d4a017', size: 0.8 + Math.random(), alpha: 0,
-          targetAlpha: 0.15 + Math.random() * 0.3,
-          speed: resp.speed || 'gentle', phase: Math.random() * Math.PI * 2,
-          arrived: false, birthTime: now + pIdx * spawnDelay, alive: true
-        });
-        pIdx++;
-      }
+    while (aiVisionParticles.length < (resp.particles || 100)) {
+      var aX = Math.random() * w, aY = Math.random() * h;
+      aiVisionParticles.push({
+        startX: aX, startY: aY, x: aX, y: aY,
+        targetX: textX + (Math.random() - 0.5) * 80,
+        targetY: textY + (Math.random() - 0.5) * 40,
+        opacity: 0, targetOpacity: 0.2 + Math.random() * 0.3,
+        color: pColor, speed: resp.speed || 'gentle',
+        phase: Math.random() * Math.PI * 2,
+        arrived: false, arrivedTime: 0,
+        birthTime: now + aiVisionParticles.length * spawnDelay,
+        _logged: false
+      });
     }
-    console.log('[AI Vision] Particles created with targets:', aiVisionParticles.length);
+
+    if (aiVisionParticles.length > 0) {
+      var fp = aiVisionParticles[0];
+      console.log('[AI Vision] First particle — startXY:', fp.startX.toFixed(0), fp.startY.toFixed(0),
+                  'targetXY:', fp.targetX.toFixed(0), fp.targetY.toFixed(0),
+                  'canvas:', w, 'x', h, 'color:', fp.color, 'targetOpacity:', fp.targetOpacity.toFixed(2));
+    }
+    console.log('[AI Vision] Particles created:', aiVisionParticles.length, 'spawnDelay:', spawnDelay, 'ms/particle');
 
     // Issue 6: Show AI whisper text
     showAIWhisper(resp.text, resp.emotion, pColor);
@@ -43387,15 +43383,14 @@ const CoCanvas = (function() {
     var now = performance.now();
     for (var i = aiVisionParticles.length - 1; i >= 0; i--) {
       var p = aiVisionParticles[i];
-      if (!p.alive) continue;
 
-      // Don't start until birth time (stagger effect)
+      // Don't render until born
       if (now < p.birthTime) continue;
 
       var age = now - p.birthTime;
 
-      // Animate toward target
       if (!p.arrived) {
+        // Flight duration based on speed
         var duration;
         if (p.speed === 'instant') duration = 300;
         else if (p.speed === 'gentle') duration = 800;
@@ -43403,62 +43398,69 @@ const CoCanvas = (function() {
         else if (p.speed === 'drift') duration = 3500;
         else duration = 800;
 
-        var progress = Math.min(1, age / duration);
-        var eased = 1 - Math.pow(1 - progress, 3); // ease-out cubic
+        // Progress 0→1 with ease-out cubic
+        var progress = Math.min(1.0, age / duration);
+        var eased = 1.0 - Math.pow(1.0 - progress, 3);
 
-        p.x = p.x + (p.targetX - p.x) * eased * 0.12;
-        p.y = p.y + (p.targetY - p.y) * eased * 0.12;
-        p.alpha = Math.min(p.targetAlpha, p.targetAlpha * eased);
+        // Lerp from START to TARGET (startX/startY never change)
+        p.x = p.startX + (p.targetX - p.startX) * eased;
+        p.y = p.startY + (p.targetY - p.startY) * eased;
 
-        // Check if close enough to target
-        var dist = Math.abs(p.x - p.targetX) + Math.abs(p.y - p.targetY);
-        if (dist < 2) {
+        // Opacity ramps up with progress
+        p.opacity = p.targetOpacity * eased;
+
+        // Arrive when progress is complete
+        if (progress >= 1.0) {
           p.x = p.targetX;
           p.y = p.targetY;
+          p.opacity = p.targetOpacity;
           p.arrived = true;
-          p.alpha = p.targetAlpha;
+          p.arrivedTime = now;
         }
       } else {
-        // Breathing oscillation once arrived
-        p.phase += 0.015;
-        p.x = p.targetX + Math.sin(p.phase) * 1.5;
-        p.y = p.targetY + Math.cos(p.phase * 0.7) * 1.5;
-      }
+        // Breathing oscillation after arrival — full opacity
+        var breathX = Math.sin(now * 0.001 + p.phase) * 1.5;
+        var breathY = Math.cos(now * 0.0013 + p.phase) * 1.5;
+        p.x = p.targetX + breathX;
+        p.y = p.targetY + breathY;
 
-      // Fade out after 8 seconds
-      if (age > 8000) {
-        p.alpha -= 0.01;
-        if (p.alpha <= 0) {
-          aiVisionParticles.splice(i, 1);
-          continue;
+        // Hold full opacity for 8 seconds after ARRIVAL, then fade
+        var timeSinceArrival = now - p.arrivedTime;
+        if (timeSinceArrival > 8000) {
+          p.opacity -= 0.015;
+          if (p.opacity <= 0) {
+            aiVisionParticles.splice(i, 1);
+            continue;
+          }
+        } else {
+          p.opacity = p.targetOpacity;
         }
       }
 
-      // Log first particle on first render for diagnostics
-      if (i === aiVisionParticles.length - 1 && !p._logged) {
+      // Diagnostic: log first particle on first render
+      if (!p._logged) {
         console.log('[AI Vision] Rendering particle at:', p.x.toFixed(0), p.y.toFixed(0),
                     'target:', p.targetX.toFixed(0), p.targetY.toFixed(0),
-                    'arrived:', p.arrived, 'opacity:', p.alpha.toFixed(2));
+                    'arrived:', p.arrived, 'opacity:', p.opacity.toFixed(2));
         p._logged = true;
       }
 
-      // Render the particle — safely parse color
-      var a = Math.max(0, p.alpha);
-      var colorStr = p.color || '#d4a017';
-      var cr = parseInt(colorStr.slice(1,3),16) || 212;
-      var cg = parseInt(colorStr.slice(3,5),16) || 160;
-      var cb = parseInt(colorStr.slice(5,7),16) || 23;
+      // Draw particle with proper rgba
+      var hex = p.color || '#d4a017';
+      var cr = parseInt(hex.slice(1,3),16) || 212;
+      var cg = parseInt(hex.slice(3,5),16) || 160;
+      var cb = parseInt(hex.slice(5,7),16) || 23;
 
-      // Glow
+      // Glow halo
       ctx.beginPath();
-      ctx.arc(p.x, p.y, p.size * 3, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(' + cr + ',' + cg + ',' + cb + ',' + (a * 0.08).toFixed(3) + ')';
+      ctx.arc(p.x, p.y, 4.5, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(' + cr + ',' + cg + ',' + cb + ',' + (p.opacity * 0.1).toFixed(3) + ')';
       ctx.fill();
 
-      // Core
+      // Core dot — 1.8px radius
       ctx.beginPath();
-      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(' + cr + ',' + cg + ',' + cb + ',' + a.toFixed(3) + ')';
+      ctx.arc(p.x, p.y, 1.8, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(' + cr + ',' + cg + ',' + cb + ',' + p.opacity.toFixed(3) + ')';
       ctx.fill();
     }
 
