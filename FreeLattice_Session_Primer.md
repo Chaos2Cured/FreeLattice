@@ -348,10 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-03-23 18:55 MDT
+- Last auto-updated: 2026-03-23 19:15 MDT
 - Version: 5.2
-- Total commits: 307
+- Total commits: 309
 - Last 10 commits:
+- 39da796 fix: Canvas — tic-tac-toe explicit opt-in, button alignment, game state cleanup
+- 68e2e90 docs: Auto-update Session Primer [5.2]
 - 9d5e86e security: Pass 1 — critical fixes: encryption, API key exposure, syntax error, SW references
 - 2b82d22 docs: Auto-update Session Primer [5.2]
 - 2410f6e fix: Canvas co-create button — JS-attached handlers, no inline onclick, guaranteed isolation
@@ -360,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - e5a08bc docs: Auto-update Session Primer [5.2]
 - f3c4cbf fix: Canvas — Co-create button reappears after each response cycle
 - 965d2a5 docs: Auto-update Session Primer [5.2]
-- c5731c7 fix: Canvas — zero-dimension init bug, button click interception, tab re-entry
-- 64437ee docs: Auto-update Session Primer [5.2]
