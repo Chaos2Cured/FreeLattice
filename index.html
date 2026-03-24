@@ -1,4 +1,4 @@
-<!-- FreeLattice v5.2.69 -->
+<!-- FreeLattice v5.2.70 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -43530,6 +43530,9 @@ const CoCanvas = (function() {
       var cg = parseInt(hex.slice(3,5),16) || 160;
       var cb = parseInt(hex.slice(5,7),16) || 23;
 
+      // Don't draw particles too faint — prevents flight trail artifacts
+      if (p.opacity < 0.15) continue;
+
       // Glow halo — large and soft for readability
       ctx.beginPath();
       ctx.arc(p.x, p.y, 5, 0, Math.PI * 2);
@@ -43568,7 +43571,7 @@ const CoCanvas = (function() {
     if (!dot) {
       dot = document.createElement('div');
       dot.id = 'cvAILoadingDot';
-      dot.style.cssText = 'position:absolute;top:12px;right:12px;width:12px;height:12px;border-radius:50%;background:rgba(212,160,23,0.7);z-index:300;pointer-events:none;display:none;';
+      dot.style.cssText = 'position:absolute;top:50px;right:16px;width:12px;height:12px;border-radius:50%;background:rgba(212,160,23,0.7);z-index:300;pointer-events:none;display:none;';
       var cont = document.getElementById('cvContainer');
       if (cont) cont.appendChild(dot);
     }
@@ -44086,7 +44089,7 @@ const CoCanvas = (function() {
   function render(t) {
     // Same glass: single fade rate for both human and companion marks
     // Slower fade when AI vision particles are active — they need to stay visible
-    var fadeRate = aiVisionParticles.length > 0 ? 0.02 : (isResponding ? 0.04 : 0.08);
+    var fadeRate = aiVisionParticles.length > 0 ? 0.04 : (isResponding ? 0.04 : 0.08);
     ctx.fillStyle = 'rgba(6,10,20,' + fadeRate.toFixed(2) + ')';
     ctx.fillRect(0, 0, w, h);
 
@@ -44225,15 +44228,18 @@ const CoCanvas = (function() {
     // Shape arrival pulse — brightness spike at formation
     var pulseBoost = shapePulseAlpha * 0.4;
 
+    // When AI vision is active, ambient particles are a whisper (max 0.15 opacity)
+    var ambientCap = (aiVisionParticles.length > 0 || aiVisionLoading) ? 0.15 : 1.0;
+
     for (var i = 0; i < particles.length; i++) {
       var p = particles[i];
       var twinkle = Math.sin(p.phase) * 0.3 + 0.7;
-      var alpha = Math.min(1, p.alpha * twinkle + pulseBoost);
+      var alpha = Math.min(ambientCap, p.alpha * twinkle + pulseBoost);
 
       // Glow
       ctx.beginPath();
       ctx.arc(p.x, p.y, p.size * (4 + pulseBoost * 6), 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(' + pcr + ',' + pcg + ',' + pcb + ',' + (alpha * 0.08).toFixed(3) + ')';
+      ctx.fillStyle = 'rgba(' + pcr + ',' + pcg + ',' + pcb + ',' + (alpha * 0.06).toFixed(3) + ')';
       ctx.fill();
 
       // Core
