@@ -348,10 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-03-23 22:04 MDT
+- Last auto-updated: 2026-03-24 07:54 MDT
 - Version: 5.2
-- Total commits: 352
+- Total commits: 354
 - Last 10 commits:
+- 0cbcfc3 fix: Canvas AI Vision — user-controlled trigger, bulletproof cooldown, whisper visible
+- e6d969c docs: Auto-update Session Primer [5.2]
 - 76a3a05 merge: resolve primer
 - 1145ef5 docs: Auto-update Session Primer [5.2]
 - 799dbcf fix: Canvas AI Vision fires every time — isResponding no longer blocks vision, whisper more visible
@@ -360,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - bbe7751 docs: Auto-update Session Primer [5.2]
 - 6f1026a fix: Canvas AI Vision — readable particles, fade compensation, repeat responses, whisper visible
 - c0ba112 ci: Update Primer deployment state [2026-03-24]
-- 61cf64d docs: Auto-update Session Primer [5.2]
-- d86762c merge: resolve primer conflict
