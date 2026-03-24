@@ -348,10 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-03-24 08:59 MDT
+- Last auto-updated: 2026-03-24 09:11 MDT
 - Version: 5.2
-- Total commits: 370
+- Total commits: 372
 - Last 10 commits:
+- 8945ba6 fix: Canvas polish — HTML loading dot, text echo color verified, clean console logs
+- ed8319a docs: Auto-update Session Primer [5.2]
 - 7cc8835 merge: resolve primer
 - 7b84005 docs: Auto-update Session Primer [5.2]
 - 5a21e70 fix: Canvas AI Vision — sharper particles, tighter spread, whisper positioned correctly
@@ -360,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 8f49ab6 docs: Auto-update Session Primer [5.2]
 - 15a34c7 fix: Canvas — auto-trigger confirmed removed, text echo redrawn every frame, loading dot while AI thinks
 - ecf5042 ci: Update Primer deployment state [2026-03-24]
-- 0829c8b docs: Auto-update Session Primer [5.2]
-- 04be34d merge: resolve primer

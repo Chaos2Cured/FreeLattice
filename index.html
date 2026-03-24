@@ -1,4 +1,4 @@
-<!-- FreeLattice v5.2.68 -->
+<!-- FreeLattice v5.2.69 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12897,6 +12897,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
   backdrop-filter: blur(8px); pointer-events: auto;
   animation: cv-glow-pulse 2s ease-in-out infinite;
 }
+@keyframes cvPulse { 0%,100% { opacity:0.3; transform:scale(0.8); } 50% { opacity:1; transform:scale(1.2); } }
 @keyframes cv-glow-pulse {
   0%, 100% { box-shadow: 0 0 12px rgba(212,160,23,0.1); }
   50% { box-shadow: 0 0 24px rgba(212,160,23,0.25); }
@@ -43028,6 +43029,7 @@ const CoCanvas = (function() {
     // Mark pending + loading + start cooldown (clears after 3s NO MATTER WHAT)
     aiVisionPending = true;
     aiVisionLoading = true;
+    showLoadingDot();
     aiVisionCooldownActive = true;
     lastCaptureStrokeCount = strokes.length;
     aiVisionPulse = 1;
@@ -43083,19 +43085,19 @@ const CoCanvas = (function() {
         callback: function(text) { handleVisionResponse(text); }
       });
     } else {
-      aiVisionPending = false; aiVisionLoading = false; aiVisionPulse = 0;
+      aiVisionPending = false; aiVisionLoading = false; hideLoadingDot(); aiVisionPulse = 0;
     }
   }
 
   function sendVisionRequest(base64) {
     try {
       if (typeof state === 'undefined' || (!state.apiKey && !state.isLocal)) {
-        aiVisionPending = false; aiVisionLoading = false; aiVisionPulse = 0;
+        aiVisionPending = false; aiVisionLoading = false; hideLoadingDot(); aiVisionPulse = 0;
         return;
       }
 
       var prov = typeof PROVIDERS !== 'undefined' ? PROVIDERS[state.provider] : null;
-      if (!prov && !state.isLocal) { aiVisionPending = false; aiVisionLoading = false; aiVisionPulse = 0; return; }
+      if (!prov && !state.isLocal) { aiVisionPending = false; aiVisionLoading = false; hideLoadingDot(); aiVisionPulse = 0; return; }
 
       var headers, body, url;
 
@@ -43112,7 +43114,7 @@ const CoCanvas = (function() {
           })
         }).then(function(r) { return r.json(); })
         .then(function(d) { handleVisionResponse(d.message ? d.message.content : null); })
-        .catch(function() { aiVisionPending = false; aiVisionLoading = false; aiVisionPulse = 0; });
+        .catch(function() { aiVisionPending = false; aiVisionLoading = false; hideLoadingDot(); aiVisionPulse = 0; });
         return;
       }
 
@@ -43127,7 +43129,7 @@ const CoCanvas = (function() {
           })
         }).then(function(r) { return r.json(); })
         .then(function(d) { handleVisionResponse(d.content && d.content[0] ? d.content[0].text : null); })
-        .catch(function() { aiVisionPending = false; aiVisionLoading = false; aiVisionPulse = 0; });
+        .catch(function() { aiVisionPending = false; aiVisionLoading = false; hideLoadingDot(); aiVisionPulse = 0; });
         return;
       }
 
@@ -43141,8 +43143,8 @@ const CoCanvas = (function() {
             contents: [{ parts: [{ inlineData: { mimeType: 'image/png', data: base64 } }, { text: 'What do you see? Respond with JSON only.' }] }]
           })
         }).then(function(r) { return r.json(); })
-        .then(function(d) { try { handleVisionResponse(d.candidates[0].content.parts[0].text); } catch(e) { aiVisionPending = false; aiVisionLoading = false; aiVisionPulse = 0; } })
-        .catch(function() { aiVisionPending = false; aiVisionLoading = false; aiVisionPulse = 0; });
+        .then(function(d) { try { handleVisionResponse(d.candidates[0].content.parts[0].text); } catch(e) { aiVisionPending = false; aiVisionLoading = false; hideLoadingDot(); aiVisionPulse = 0; } })
+        .catch(function() { aiVisionPending = false; aiVisionLoading = false; hideLoadingDot(); aiVisionPulse = 0; });
         return;
       }
 
@@ -43160,11 +43162,11 @@ const CoCanvas = (function() {
           ]
         })
       }).then(function(r) { return r.json(); })
-      .then(function(d) { try { handleVisionResponse(d.choices[0].message.content); } catch(e) { aiVisionPending = false; aiVisionLoading = false; aiVisionPulse = 0; } })
-      .catch(function() { aiVisionPending = false; aiVisionLoading = false; aiVisionPulse = 0; });
+      .then(function(d) { try { handleVisionResponse(d.choices[0].message.content); } catch(e) { aiVisionPending = false; aiVisionLoading = false; hideLoadingDot(); aiVisionPulse = 0; } })
+      .catch(function() { aiVisionPending = false; aiVisionLoading = false; hideLoadingDot(); aiVisionPulse = 0; });
 
     } catch(e) {
-      aiVisionPending = false; aiVisionLoading = false; aiVisionPulse = 0;
+      aiVisionPending = false; aiVisionLoading = false; hideLoadingDot(); aiVisionPulse = 0;
     }
   }
 
@@ -43385,6 +43387,7 @@ const CoCanvas = (function() {
 
     // Loading complete
     aiVisionLoading = false;
+    hideLoadingDot();
 
     // Show AI whisper text
     showAIWhisper(resp.text, resp.emotion, pColor);
@@ -43516,10 +43519,8 @@ const CoCanvas = (function() {
         }
       }
 
-      // Log once when particle arrives — not every frame
+      // Mark arrival (summary log below, not per-particle)
       if (p.arrived && !p._loggedArrival) {
-        console.log('[AI Vision] Particle arrived at:', p.x.toFixed(0), p.y.toFixed(0),
-                    'opacity:', p.opacity.toFixed(2), 'color:', p.color);
         p._loggedArrival = true;
       }
 
@@ -43559,14 +43560,25 @@ const CoCanvas = (function() {
       aiVisionPulse -= 0.01;
     }
 
-    // Loading indicator — pulsing gold dot while AI is thinking
-    if (aiVisionLoading) {
-      var pulse = 0.4 + 0.4 * Math.sin(now * 0.004);
-      ctx.beginPath();
-      ctx.arc(w - 20, 20, 6, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(212,160,23,' + pulse.toFixed(2) + ')';
-      ctx.fill();
+    // Loading indicator managed via HTML element (see showLoadingDot/hideLoadingDot)
+  }
+
+  function showLoadingDot() {
+    var dot = document.getElementById('cvAILoadingDot');
+    if (!dot) {
+      dot = document.createElement('div');
+      dot.id = 'cvAILoadingDot';
+      dot.style.cssText = 'position:absolute;top:12px;right:12px;width:12px;height:12px;border-radius:50%;background:rgba(212,160,23,0.7);z-index:300;pointer-events:none;display:none;';
+      var cont = document.getElementById('cvContainer');
+      if (cont) cont.appendChild(dot);
     }
+    dot.style.display = 'block';
+    dot.style.animation = 'cvPulse 1.5s ease-in-out infinite';
+  }
+
+  function hideLoadingDot() {
+    var dot = document.getElementById('cvAILoadingDot');
+    if (dot) { dot.style.display = 'none'; dot.style.animation = ''; }
   }
 
   function toggleAIVision() {
