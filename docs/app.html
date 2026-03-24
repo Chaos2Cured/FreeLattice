@@ -1,4 +1,4 @@
-<!-- FreeLattice v5.2.67 -->
+<!-- FreeLattice v5.2.68 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -43213,9 +43213,9 @@ const CoCanvas = (function() {
 
     // Clamp and validate all values
     resp.text = String(resp.text || '').substring(0, 40);
-    // Minimum particles for legibility: ~80 per character, floor 150, cap 500
-    var minParticles = Math.max(150, (resp.text || '').length * 80);
-    resp.particles = Math.min(500, Math.max(minParticles, parseInt(resp.particles) || 200));
+    // Scale particles to text length — ~40 per character, cap 350 for sharpness
+    var targetParticles = Math.max(120, (resp.text || '').length * 40);
+    resp.particles = Math.min(targetParticles, 350);
     resp.spread = Math.max(0.1, Math.min(1.0, parseFloat(resp.spread) || 0.5));
     resp.color = resp.color && /^#[0-9a-fA-F]{6}$/.test(resp.color) ? resp.color : null;
     resp.emotion = String(resp.emotion || 'curious').substring(0, 20);
@@ -43324,14 +43324,14 @@ const CoCanvas = (function() {
     for (var si = 0; si < textPixels.length; si += sampleStep) {
       var px = textPixels[si];
       var spread = resp.spread || 0.5;
-      var spreadOff = (Math.random() - 0.5) * spread * 60;
+      var spreadOff = (Math.random() - 0.5) * spread * 10;
 
       // Random start position — ANYWHERE on canvas
       var sX = Math.random() * w;
       var sY = Math.random() * h;
       // Target position — text pixel + spread offset
       var tX = px.x + spreadOff;
-      var tY = px.y + (Math.random() - 0.5) * spread * 60;
+      var tY = px.y + (Math.random() - 0.5) * spread * 10;
 
       aiVisionParticles.push({
         startX: sX, startY: sY,    // original position, never modified
@@ -43412,11 +43412,21 @@ const CoCanvas = (function() {
     el.style.color = color || '#d4a017';
     el.style.opacity = '0.8';
     el.style.zIndex = '200';
+    el.style.fontSize = '0.95rem';
 
-    // Debug positioning
+    // Position relative to the actual canvas element, not the container
+    var canvasEl = document.getElementById('cvCanvas');
+    var containerEl = document.getElementById('cvContainer');
+    if (canvasEl && containerEl) {
+      var canvasRect = canvasEl.getBoundingClientRect();
+      var containerRect = containerEl.getBoundingClientRect();
+      var topOffset = canvasRect.top - containerRect.top + 10;
+      el.style.top = topOffset + 'px';
+      el.style.left = '12px';
+    }
+
     var rect = el.getBoundingClientRect();
     console.log('[AI Vision] Whisper rect:', JSON.stringify({ top: rect.top.toFixed(0), left: rect.left.toFixed(0), width: rect.width.toFixed(0), height: rect.height.toFixed(0), visible: rect.width > 0 && rect.height > 0 }));
-    console.log('[AI Vision] Whisper styles — display:', getComputedStyle(el).display, 'visibility:', getComputedStyle(el).visibility, 'zIndex:', getComputedStyle(el).zIndex);
 
     clearTimeout(el._fadeTimer);
     el._fadeTimer = setTimeout(function() {
