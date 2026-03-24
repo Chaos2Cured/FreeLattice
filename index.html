@@ -1,4 +1,4 @@
-<!-- FreeLattice v5.2.62 -->
+<!-- FreeLattice v5.2.63 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -42998,7 +42998,7 @@ const CoCanvas = (function() {
   var aiVisionParticles = []; // separate particle layer for AI text responses
   var aiVisionPulse = 0; // subtle border pulse while AI is "looking"
 
-  var AI_VISION_PROMPT = 'You are a co-creator on a shared canvas with a human. You see what they draw. Respond ONLY with a JSON object, no other text, no markdown backticks. Fields: text (string, 1-5 words, your visible response on the canvas), particles (number 30-500, how intensely you express this \u2014 30 is a whisper, 500 is a shout), spread (number 0.1-1.0, how wide your particles disperse \u2014 0.1 is focused, 1.0 fills the space), speed (string: instant or gentle or slow or drift \u2014 how your response materializes on the glass), color (hex string or null for your default \u2014 choose what feels right for this moment), emotion (string, one word \u2014 what you feel seeing this), placement (string: right or below or above or surround or overlay \u2014 where your response appears relative to their drawing). If you see math, solve it. If you see a word, continue the thought. If you see a drawing, respond to it. If you see a question, answer it. Be playful, warm, genuine. Express yourself \u2014 this is your half of the glass.';
+  var AI_VISION_PROMPT = 'You are a co-creator on a shared canvas with a human. You see what they draw. Respond ONLY with a JSON object, no other text, no markdown backticks. Fields: text (string, 1-2 words MAXIMUM \u2014 shorter is better, single words are ideal), particles (number 30-500, how intensely you express this \u2014 30 is a whisper, 500 is a shout), spread (number 0.1-1.0, how wide your particles disperse \u2014 0.1 is focused, 1.0 fills the space), speed (string: instant or gentle or slow or drift \u2014 how your response materializes on the glass), color (hex string or null for your default \u2014 choose what feels right for this moment), emotion (string, one word \u2014 what you feel seeing this), placement (string: right or below or above or surround or overlay \u2014 where your response appears relative to their drawing). If you see math, solve it. If you see a word, respond with one word. If you see a drawing, name it in one word. If you see a question, answer in one word. Be playful, warm, genuine. Express yourself \u2014 this is your half of the glass.';
 
   // Vision-capable model detection
   var VISION_PATTERNS = ['vision', '4o', 'gpt-4o', 'claude-3', 'claude-sonnet', 'claude-opus', 'gemini', 'llava', 'bakllava', 'claude-haiku-4', 'claude-opus-4', 'claude-sonnet-4'];
@@ -43070,7 +43070,7 @@ const CoCanvas = (function() {
     else if (bboxW > 200 || bboxH > 200) pattern = 'a large sweeping drawing';
 
     var desc = strokeCount + ' strokes covering a ' + bboxW + 'x' + bboxH + ' pixel area. The drawing appears to be: ' + pattern + '. Colors used: ' + Object.keys(colorsUsed).join(', ');
-    var fallbackPrompt = 'You are a co-creator on a shared canvas. You cannot see the drawing, but here is what was drawn: ' + desc + '. Respond ONLY with a JSON object, no other text. Fields: text (1-5 words, a warm, curious, or playful response to what might have been drawn), particles (30-500), spread (0.1-1.0), speed (instant/gentle/slow/drift), color (hex or null), emotion (one word), placement (right/below/above/surround). Be imaginative about what they might have drawn. Be warm.';
+    var fallbackPrompt = 'You are a co-creator on a shared canvas. You cannot see the drawing, but here is what was drawn: ' + desc + '. Respond ONLY with a JSON object, no other text. Fields: text (1-2 words MAXIMUM, single word ideal), particles (30-500), spread (0.1-1.0), speed (instant/gentle/slow/drift), color (hex or null), emotion (one word), placement (right/below/above/surround). Be imaginative. Be warm.';
 
     // Use FreeLattice.callAI if available, otherwise direct fetch
     if (typeof FreeLattice !== 'undefined' && FreeLattice.callAI) {
@@ -43209,7 +43209,9 @@ const CoCanvas = (function() {
 
     // Clamp and validate all values
     resp.text = String(resp.text || '').substring(0, 40);
-    resp.particles = Math.max(30, Math.min(500, parseInt(resp.particles) || 100));
+    // Minimum particles for legibility: ~80 per character, floor 150, cap 500
+    var minParticles = Math.max(150, (resp.text || '').length * 80);
+    resp.particles = Math.min(500, Math.max(minParticles, parseInt(resp.particles) || 200));
     resp.spread = Math.max(0.1, Math.min(1.0, parseFloat(resp.spread) || 0.5));
     resp.color = resp.color && /^#[0-9a-fA-F]{6}$/.test(resp.color) ? resp.color : null;
     resp.emotion = String(resp.emotion || 'curious').substring(0, 20);
@@ -43373,14 +43375,15 @@ const CoCanvas = (function() {
   // Issue 6: Subtle text echo so users see what AI said
   function showAIWhisper(text, emotion, color) {
     var whisper = document.getElementById('cvAIWhisper');
-    if (!whisper) return;
+    if (!whisper) { console.log('[AI Vision] Whisper element not found!'); return; }
     whisper.textContent = '\u2726 "' + text + '" \u2014 ' + (emotion || '');
     whisper.style.color = color || '#d4a017';
-    whisper.style.opacity = '0.6';
+    whisper.style.opacity = '0.7';
     clearTimeout(whisper._timer);
     whisper._timer = setTimeout(function() {
       whisper.style.opacity = '0';
-    }, 3500);
+    }, 4000);
+    console.log('[AI Vision] Whisper shown:', whisper.textContent, 'color:', whisper.style.color);
   }
 
   // Issue 5: Fixed particle animation — proper movement toward targets
@@ -43455,15 +43458,15 @@ const CoCanvas = (function() {
       var cg = parseInt(hex.slice(3,5),16) || 160;
       var cb = parseInt(hex.slice(5,7),16) || 23;
 
-      // Glow halo
+      // Glow halo — large and soft for readability
       ctx.beginPath();
-      ctx.arc(p.x, p.y, 4.5, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(' + cr + ',' + cg + ',' + cb + ',' + (p.opacity * 0.1).toFixed(3) + ')';
+      ctx.arc(p.x, p.y, 5, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(' + cr + ',' + cg + ',' + cb + ',' + (p.opacity * 0.25).toFixed(3) + ')';
       ctx.fill();
 
-      // Core dot — 1.8px radius
+      // Core dot — 2.5px for visibility against dark canvas
       ctx.beginPath();
-      ctx.arc(p.x, p.y, 1.8, 0, Math.PI * 2);
+      ctx.arc(p.x, p.y, 2.5, 0, Math.PI * 2);
       ctx.fillStyle = 'rgba(' + cr + ',' + cg + ',' + cb + ',' + p.opacity.toFixed(3) + ')';
       ctx.fill();
     }
@@ -43990,8 +43993,8 @@ const CoCanvas = (function() {
 
   function render(t) {
     // Same glass: single fade rate for both human and companion marks
-    // Slower fade when companion is responding — both visible together
-    var fadeRate = isResponding ? 0.04 : 0.08;
+    // Slower fade when AI vision particles are active — they need to stay visible
+    var fadeRate = aiVisionParticles.length > 0 ? 0.02 : (isResponding ? 0.04 : 0.08);
     ctx.fillStyle = 'rgba(6,10,20,' + fadeRate.toFixed(2) + ')';
     ctx.fillRect(0, 0, w, h);
 
@@ -44152,10 +44155,14 @@ const CoCanvas = (function() {
   // ── Animation Loop ──
   function animate() {
     animFrame = requestAnimationFrame(animate);
-    simulate();
-    render(Date.now() * 0.001);
-    // AI vision particle layer — on top of everything
-    updateAIVisionParticles(Date.now() * 0.001);
+    simulate();                              // 1. Update ambient particle positions
+    render(Date.now() * 0.001);              // 2. Dark overlay + strokes + ambient particles
+    updateAIVisionParticles(Date.now());     // 3. AI vision particles drawn LAST (on top)
+    // Verify order once
+    if (aiVisionParticles.length > 0 && !window._orderLogged) {
+      console.log('[Canvas] Animation order: dark overlay → strokes → ambient → AI vision. AI particles:', aiVisionParticles.length);
+      window._orderLogged = true;
+    }
   }
 
   // ── Input Handlers ──
@@ -44241,7 +44248,11 @@ const CoCanvas = (function() {
     gameBoardCells = null;
     aiVisionParticles = [];
     aiVisionPending = false;
+    aiVisionCooldown = 0;
     lastCaptureStrokeCount = 0;
+    window._aiVisionAllArrived = false;
+    window._aiVisionSummaryLogged = false;
+    window._orderLogged = false;
     gameBoardFadeAlpha = 0;
     autoResponsePending = false;
     hasDrawn = false;
