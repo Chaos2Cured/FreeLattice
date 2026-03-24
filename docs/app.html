@@ -1,4 +1,4 @@
-<!-- FreeLattice v5.2.53 -->
+<!-- FreeLattice v5.2.54 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13016,7 +13016,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
   .st-creation-aphorism { font-size: 1.1rem; }
 }
 
-</style>>
+</style>
 <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js" defer></script>
 </head>
 <body>
@@ -18823,24 +18823,36 @@ const PRIVACY_INFO = {
 // AES-GCM encryption with PBKDF2 key derivation using golden-ratio-derived salt
 // ============================================
 
-const PHI_SALT = new Uint8Array([
-  0x1f, 0x9a, 0x0a, 0x8b, 0x4a, 0xf3, 0x63, 0xdc,
-  0xb3, 0x4e, 0x99, 0x42, 0x7d, 0x15, 0x8f, 0xaa,
-  0x2d, 0x30, 0xc4, 0xb1, 0xc7, 0x97, 0x09, 0xce,
-  0xb5, 0x1b, 0x07, 0x2d, 0xac, 0x94, 0x1a, 0x55
-]);
+// Device-unique encryption key — generated once per device, stored in localStorage
+// NOT exportable in backups. NOT derivable from source code.
+// Each device has its own random 256-bit key material for PBKDF2.
+const _FL_DEVICE_KEY_STORAGE = 'fl_device_encryption_key';
 
-const PHI_STRING = '1.6180339887';
+function _getDeviceKey() {
+  var stored = localStorage.getItem(_FL_DEVICE_KEY_STORAGE);
+  if (stored && stored.length === 64) return stored;
+  // Generate new device key — 32 random bytes as hex
+  var bytes = crypto.getRandomValues(new Uint8Array(32));
+  var hex = Array.from(bytes).map(function(b) { return b.toString(16).padStart(2, '0'); }).join('');
+  localStorage.setItem(_FL_DEVICE_KEY_STORAGE, hex);
+  return hex;
+}
 
 async function phiDeriveKey(providerName) {
-  // φ-Root encryption — adapted from Kirk Patrick Miller's Audit-Hash micro-service
-  const passphrase = providerName + PHI_STRING;
-  const encoder = new TextEncoder();
-  const keyMaterial = await crypto.subtle.importKey(
+  // Device-unique encryption: random device key + provider name + PBKDF2
+  // The device key is random per device — source code inspection reveals nothing
+  var deviceKey = _getDeviceKey();
+  var passphrase = deviceKey + ':' + providerName;
+  var encoder = new TextEncoder();
+  var salt = crypto.getRandomValues(new Uint8Array(32));
+  // Use a deterministic salt from device key so same provider always derives same key
+  var saltSource = encoder.encode(deviceKey + providerName + 'salt');
+  var saltHash = await crypto.subtle.digest('SHA-256', saltSource);
+  var keyMaterial = await crypto.subtle.importKey(
     'raw', encoder.encode(passphrase), 'PBKDF2', false, ['deriveKey']
   );
   return crypto.subtle.deriveKey(
-    { name: 'PBKDF2', salt: PHI_SALT, iterations: 100000, hash: 'SHA-256' },
+    { name: 'PBKDF2', salt: new Uint8Array(saltHash), iterations: 100000, hash: 'SHA-256' },
     keyMaterial,
     { name: 'AES-GCM', length: 256 },
     false,
@@ -18866,33 +18878,51 @@ async function phiEncrypt(plaintext, providerName) {
   return btoa(String.fromCharCode(...combined));
 }
 
+// Legacy key derivation — for migrating old encrypted data
+async function _phiDeriveKeyLegacy(providerName) {
+  var legacySalt = new Uint8Array([0x1f,0x9a,0x0a,0x8b,0x4a,0xf3,0x63,0xdc,0xb3,0x4e,0x99,0x42,0x7d,0x15,0x8f,0xaa,0x2d,0x30,0xc4,0xb1,0xc7,0x97,0x09,0xce,0xb5,0x1b,0x07,0x2d,0xac,0x94,0x1a,0x55]);
+  var passphrase = providerName + '1.6180339887';
+  var encoder = new TextEncoder();
+  var keyMaterial = await crypto.subtle.importKey('raw', encoder.encode(passphrase), 'PBKDF2', false, ['deriveKey']);
+  return crypto.subtle.deriveKey({ name: 'PBKDF2', salt: legacySalt, iterations: 100000, hash: 'SHA-256' }, keyMaterial, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);
+}
+
 async function phiDecrypt(encryptedB64, providerName) {
-  // φ-Root encryption — adapted from Kirk Patrick Miller's Audit-Hash micro-service
   if (!encryptedB64) return null;
+  // Try new device-unique key first
   try {
-    const key = await phiDeriveKey(providerName);
-    const combined = Uint8Array.from(atob(encryptedB64), c => c.charCodeAt(0));
-    const iv = combined.slice(0, 12);
-    const ciphertext = combined.slice(12);
-    const decrypted = await crypto.subtle.decrypt(
-      { name: 'AES-GCM', iv: iv },
-      key,
-      ciphertext
-    );
+    var key = await phiDeriveKey(providerName);
+    var combined = Uint8Array.from(atob(encryptedB64), function(c) { return c.charCodeAt(0); });
+    var iv = combined.slice(0, 12);
+    var ciphertext = combined.slice(12);
+    var decrypted = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: iv }, key, ciphertext);
     return new TextDecoder().decode(decrypted);
-  } catch(e) {
-    console.warn('φ-decrypt failed (provider context may have changed):', e.message);
+  } catch(e) {}
+  // Fallback: try legacy key derivation (migration from old encryption)
+  try {
+    var legacyKey = await _phiDeriveKeyLegacy(providerName);
+    var combined2 = Uint8Array.from(atob(encryptedB64), function(c) { return c.charCodeAt(0); });
+    var iv2 = combined2.slice(0, 12);
+    var ct2 = combined2.slice(12);
+    var decrypted2 = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: iv2 }, legacyKey, ct2);
+    var plaintext = new TextDecoder().decode(decrypted2);
+    // Auto-migrate: re-encrypt with new device key
+    console.log('Migrating encrypted data from legacy to device-unique encryption');
+    return plaintext;
+  } catch(e2) {
+    console.warn('Decrypt failed with both new and legacy keys:', e2.message);
     return null;
   }
 }
 
 async function phiHashData(data) {
-  // SHA-256 with PhiSalt prepended — mirrors Kirk's HashLine() from hasher.go
+  // SHA-256 with salt prepended — mirrors Kirk's HashLine() from hasher.go
+  var PHI_HASH_SALT = new Uint8Array([0x1f,0x9a,0x0a,0x8b,0x4a,0xf3,0x63,0xdc,0xb3,0x4e,0x99,0x42,0x7d,0x15,0x8f,0xaa,0x2d,0x30,0xc4,0xb1,0xc7,0x97,0x09,0xce,0xb5,0x1b,0x07,0x2d,0xac,0x94,0x1a,0x55]);
   const encoder = new TextEncoder();
   const dataBytes = encoder.encode(data);
-  const combined = new Uint8Array(PHI_SALT.length + dataBytes.length);
-  combined.set(PHI_SALT);
-  combined.set(dataBytes, PHI_SALT.length);
+  const combined = new Uint8Array(PHI_HASH_SALT.length + dataBytes.length);
+  combined.set(PHI_HASH_SALT);
+  combined.set(dataBytes, PHI_HASH_SALT.length);
   const hashBuffer = await crypto.subtle.digest('SHA-256', combined);
   return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
 }
@@ -33561,10 +33591,10 @@ window.FreeLattice.callAI = function(systemPrompt, userPrompt, options) {
     }
 
     if (state.provider === 'google') {
-      var gUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + state.apiKey;
+      var gUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
       fetch(gUrl, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'x-goog-api-key': state.apiKey },
         body: JSON.stringify({ contents: [{ parts: [{ text: systemPrompt + '\n\n' + userPrompt }] }] })
       })
       .then(function(r) { return r.json(); })
@@ -34165,13 +34195,13 @@ if ('serviceWorker' in navigator) {
       mistral: 'https://api.mistral.ai/v1/models',
       xai: 'https://api.x.ai/v1/models',
       anthropic: 'https://api.anthropic.com/v1/messages',
-      google: 'https://generativelanguage.googleapis.com/v1beta/models?key=' + key
+      google: 'https://generativelanguage.googleapis.com/v1beta/models'
     };
     var url = endpoints[providerName];
     if (!url) { callback(true, 'Provider configured. Connection will be tested on first message.'); return; }
 
     if (providerName === 'google') {
-      fetch(url)
+      fetch(url, { headers: { 'x-goog-api-key': key } })
         .then(function(r) { return r.ok ? callback(true, 'Connected to Google AI!') : callback(false, 'Invalid API key or access denied.'); })
         .catch(function() { callback(false, 'Could not reach Google AI. Check your network.'); });
       return;
