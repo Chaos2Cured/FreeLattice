@@ -348,17 +348,19 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-03-24 15:41 MDT
+- Last auto-updated: 2026-03-24 21:41 UTC
+- Last deployed: 2026-03-24 21:41 UTC
+- Live site: https://freelattice.com
 - Version: 5.2
-- Total commits: 399
+- Total commits: 402
 - Last 10 commits:
+- 55328ec Merge branch 'main' of https://github.com/Chaos2Cured/FreeLattice
+- 63578ca docs: Auto-update Session Primer [5.2]
 - b5a0ac4 fix: Canvas — Co-create is only trigger, no auto-response. Redemption modal fully removed.
+- 7b113e2 ci: Update Primer deployment state [2026-03-24]
 - 3e4f959 docs: Auto-update Session Primer [5.2]
 - 5cdc3fa merge: resolve primer
 - af47044 docs: Auto-update Session Primer [5.2]
 - c9d7ef2 feat: Canvas eraser tool + verified existing refinements
 - 316b79e ci: Update Primer deployment state [2026-03-24]
 - 4da4359 Merge branch 'main' of https://github.com/Chaos2Cured/FreeLattice
-- d7c0853 docs: Auto-update Session Primer [5.2]
-- 8320f7a feat: $FL Economy Restructure — LP and $FL fully separated, burn mechanism, no redemption
-- 9a0960c ci: Update Primer deployment state [2026-03-24]
