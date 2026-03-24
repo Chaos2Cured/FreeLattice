@@ -348,19 +348,17 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-03-24 15:12 UTC
-- Last deployed: 2026-03-24 15:12 UTC
-- Live site: https://freelattice.com
+- Last auto-updated: 2026-03-24 12:19 MDT
 - Version: 5.2
-- Total commits: 375
+- Total commits: 379
 - Last 10 commits:
+- 236945a merge: resolve primer
+- 53c5707 docs: Auto-update Session Primer [5.2]
+- 2034c08 fix: Canvas — ambient particles whisper, no flight trails, loading dot below toolbar
+- bec9921 ci: Update Primer deployment state [2026-03-24]
 - 110592a Merge branch 'main' of https://github.com/Chaos2Cured/FreeLattice
 - b15f6d9 docs: Auto-update Session Primer [5.2]
 - 8945ba6 fix: Canvas polish — HTML loading dot, text echo color verified, clean console logs
 - 0258e94 ci: Update Primer deployment state [2026-03-24]
 - ed8319a docs: Auto-update Session Primer [5.2]
 - 7cc8835 merge: resolve primer
-- 7b84005 docs: Auto-update Session Primer [5.2]
-- 5a21e70 fix: Canvas AI Vision — sharper particles, tighter spread, whisper positioned correctly
-- 4429541 ci: Update Primer deployment state [2026-03-24]
-- 8aed9f7 Merge branch 'main' of https://github.com/Chaos2Cured/FreeLattice
