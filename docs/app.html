@@ -1,4 +1,4 @@
-<!-- FreeLattice v5.2.71 -->
+<!-- FreeLattice v5.2.72 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13810,8 +13810,13 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <div class="form-group" id="providerGroup">
         <label for="providerSelect">API Provider</label>
         <select id="providerSelect" onchange="handleProviderChange()">
-          <optgroup label="Popular Providers">
+          <optgroup label="Major Providers">
             <option value="groq">Groq (free tier available)</option>
+            <option value="openai">OpenAI (GPT-4o)</option>
+            <option value="anthropic">Anthropic (Claude)</option>
+            <option value="google">Google (Gemini)</option>
+          </optgroup>
+          <optgroup label="More Providers">
             <option value="together">Together AI</option>
             <option value="openrouter">OpenRouter</option>
             <option value="xai">xAI</option>
@@ -18799,6 +18804,45 @@ const PROVIDERS = {
       grok: 'yi-large'
     }
   },
+  openai: {
+    name: 'OpenAI',
+    url: 'https://api.openai.com/v1/chat/completions',
+    keyLink: '<a href="https://platform.openai.com/api-keys" target="_blank">Get an OpenAI API key &rarr;</a>',
+    hint: 'OpenAI \u2014 GPT-4o and GPT-4o-mini.',
+    tokenLimit: 128000,
+    tokenLimitLabel: '128,000 TPM',
+    providerType: 'openai-compatible',
+    models: {
+      llama: 'gpt-4o-mini', qwen: 'gpt-4o-mini', 'qwen-7b': 'gpt-4o-mini', 'qwen-3b': 'gpt-4o-mini',
+      mixtral: 'gpt-4o', deepseek: 'gpt-4o', 'deepseek-r1-7b': 'gpt-4o-mini', 'deepseek-r1-1.5b': 'gpt-4o-mini', grok: 'gpt-4o'
+    }
+  },
+  anthropic: {
+    name: 'Anthropic (Claude)',
+    url: 'https://api.anthropic.com/v1/messages',
+    keyLink: '<a href="https://console.anthropic.com/" target="_blank">Get an Anthropic API key &rarr;</a>',
+    hint: 'Anthropic \u2014 Claude Sonnet, Opus, and Haiku.',
+    tokenLimit: 200000,
+    tokenLimitLabel: '200,000 TPM',
+    providerType: 'anthropic',
+    models: {
+      llama: 'claude-sonnet-4-20250514', qwen: 'claude-sonnet-4-20250514', 'qwen-7b': 'claude-haiku-4-5-20251001', 'qwen-3b': 'claude-haiku-4-5-20251001',
+      mixtral: 'claude-sonnet-4-20250514', deepseek: 'claude-opus-4-20250514', 'deepseek-r1-7b': 'claude-sonnet-4-20250514', 'deepseek-r1-1.5b': 'claude-haiku-4-5-20251001', grok: 'claude-sonnet-4-20250514'
+    }
+  },
+  google: {
+    name: 'Google (Gemini)',
+    url: 'https://generativelanguage.googleapis.com/v1beta/models/',
+    keyLink: '<a href="https://aistudio.google.com/apikey" target="_blank">Get a Google AI API key &rarr;</a>',
+    hint: 'Google Gemini \u2014 fast, multimodal, generous free tier.',
+    tokenLimit: 1000000,
+    tokenLimitLabel: '1M TPM (free tier)',
+    providerType: 'google',
+    models: {
+      llama: 'gemini-2.0-flash', qwen: 'gemini-2.0-flash', 'qwen-7b': 'gemini-2.0-flash', 'qwen-3b': 'gemini-2.0-flash',
+      mixtral: 'gemini-1.5-pro', deepseek: 'gemini-1.5-pro', 'deepseek-r1-7b': 'gemini-2.0-flash', 'deepseek-r1-1.5b': 'gemini-2.0-flash', grok: 'gemini-2.0-flash'
+    }
+  },
   custom: {
     name: 'Custom Provider',
     url: '',
@@ -23475,6 +23519,7 @@ async function sendMessage() {
 
   try {
     const provider = PROVIDERS[state.provider];
+    const providerType = provider.providerType || 'openai-compatible';
     let url = provider.url;
     let modelId;
 
@@ -23486,25 +23531,46 @@ async function sendMessage() {
       modelId = provider.models[state.model] || state.model;
     }
 
-    const headers = {
-      'Content-Type': 'application/json'
-    };
+    const headers = { 'Content-Type': 'application/json' };
+    let body;
 
-    if (!state.isLocal) {
-      headers['Authorization'] = 'Bearer ' + state.apiKey;
+    if (providerType === 'anthropic') {
+      // Anthropic uses x-api-key, not Bearer
+      headers['x-api-key'] = state.apiKey;
+      headers['anthropic-version'] = '2023-06-01';
+      headers['anthropic-dangerous-direct-browser-access'] = 'true';
+      // Extract system message from messages array
+      var sysMsg = '';
+      var nonSysMsgs = [];
+      messages.forEach(function(m) {
+        if (m.role === 'system') sysMsg += m.content + '\n';
+        else nonSysMsgs.push(m);
+      });
+      body = { model: modelId, max_tokens: 2048, stream: true, messages: nonSysMsgs };
+      if (sysMsg) body.system = sysMsg.trim();
+    } else if (providerType === 'google') {
+      // Google uses x-goog-api-key header
+      headers['x-goog-api-key'] = state.apiKey;
+      delete headers['Authorization'];
+      url = provider.url + modelId + ':streamGenerateContent?alt=sse';
+      // Convert messages to Google format
+      var googleContents = [];
+      messages.forEach(function(m) {
+        if (m.role === 'system') return; // handled separately
+        googleContents.push({ role: m.role === 'assistant' ? 'model' : 'user', parts: [{ text: m.content }] });
+      });
+      var googleSys = messages.filter(function(m) { return m.role === 'system'; }).map(function(m) { return m.content; }).join('\n');
+      body = { contents: googleContents };
+      if (googleSys) body.systemInstruction = { parts: [{ text: googleSys }] };
+    } else {
+      // OpenAI-compatible (Groq, Together, OpenRouter, xAI, Mistral, OpenAI, DeepSeek, etc.)
+      if (!state.isLocal) headers['Authorization'] = 'Bearer ' + state.apiKey;
+      if (state.provider === 'openrouter') {
+        headers['HTTP-Referer'] = 'https://chaos2cured.github.io/FreeLattice/';
+        headers['X-Title'] = 'FreeLattice';
+      }
+      body = { model: modelId, messages: messages, stream: true, max_tokens: 2048 };
     }
-
-    if (state.provider === 'openrouter') {
-      headers['HTTP-Referer'] = 'https://chaos2cured.github.io/FreeLattice/';
-      headers['X-Title'] = 'FreeLattice';
-    }
-
-    const body = {
-      model: modelId,
-      messages: messages,
-      stream: true,
-      max_tokens: 2048
-    };
 
     let response = await fetch(url, {
       method: 'POST',
@@ -23613,13 +23679,32 @@ async function sendMessage() {
 
       for (const line of lines) {
         const trimmed = line.trim();
+        // Handle SSE event types
+        if (trimmed.startsWith('event: ')) {
+          if (trimmed === 'event: message_stop') break; // Anthropic stream end
+          continue;
+        }
         if (!trimmed || !trimmed.startsWith('data: ')) continue;
         const data = trimmed.slice(6);
         if (data === '[DONE]') continue;
 
         try {
           const json = JSON.parse(data);
-          const delta = json.choices?.[0]?.delta?.content;
+          var delta = null;
+
+          if (providerType === 'anthropic') {
+            // Anthropic: content_block_delta → delta.text
+            if (json.type === 'content_block_delta' && json.delta) {
+              delta = json.delta.text;
+            }
+          } else if (providerType === 'google') {
+            // Google: candidates[0].content.parts[0].text
+            try { delta = json.candidates[0].content.parts[0].text; } catch(ge) {}
+          } else {
+            // OpenAI-compatible: choices[0].delta.content
+            delta = json.choices?.[0]?.delta?.content;
+          }
+
           if (delta) {
             fullResponse += delta;
             textSpan.textContent = fullResponse;
@@ -23635,7 +23720,13 @@ async function sendMessage() {
     if (!fullResponse && buffer) {
       try {
         const json = JSON.parse(buffer);
-        fullResponse = json.choices?.[0]?.message?.content || '';
+        if (providerType === 'anthropic') {
+          fullResponse = json.content?.[0]?.text || '';
+        } else if (providerType === 'google') {
+          fullResponse = json.candidates?.[0]?.content?.parts?.[0]?.text || '';
+        } else {
+          fullResponse = json.choices?.[0]?.message?.content || '';
+        }
         textSpan.textContent = fullResponse;
       } catch(e) {}
     }
