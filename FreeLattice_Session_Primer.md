@@ -348,19 +348,17 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-03-24 01:58 UTC
-- Last deployed: 2026-03-24 01:58 UTC
-- Live site: https://freelattice.com
+- Last auto-updated: 2026-03-23 20:07 MDT
 - Version: 5.2
-- Total commits: 321
+- Total commits: 325
 - Last 10 commits:
+- 612ba7b merge: resolve primer conflict
+- c289c9f docs: Auto-update Session Primer [5.2]
+- be6a9cb fix: Canvas AI Vision particles — 6 rendering issues fixed, diagnostic logs added
+- 4a9784e ci: Update Primer deployment state [2026-03-24]
 - bfa846a Merge branch 'main' of https://github.com/Chaos2Cured/FreeLattice
 - edbffb4 docs: Auto-update Session Primer [5.2]
 - 0c323e9 fix: Ollama suggest banner moved inside Chat tab — no longer overlaps Canvas colors
 - f940963 ci: Update Primer deployment state [2026-03-24]
 - 7f91a35 docs: Auto-update Session Primer [5.2]
 - 7ce7694 merge: resolve primer conflict, keep remote updates
-- 1e5fd4a docs: Auto-update Session Primer [5.2]
-- a51af55 feat: Canvas AI Vision — the AI sees, interprets, and chooses how to respond in light
-- b635ac5 ci: Update Primer deployment state [2026-03-24]
-- 3e919fa Merge branch 'main' of https://github.com/Chaos2Cured/FreeLattice
