@@ -1,4 +1,4 @@
-<!-- FreeLattice v5.2.63 -->
+<!-- FreeLattice v5.2.64 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -16502,7 +16502,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
   <div class="cv-container" id="cvContainer">
     <canvas id="cvCanvas"></canvas>
     <div class="cv-names" id="cvNames"></div>
-    <div id="cvAIWhisper" style="position:absolute;bottom:8px;left:12px;font-size:0.75rem;opacity:0;transition:opacity 0.5s;pointer-events:none;z-index:10;font-family:Georgia,serif;font-style:italic;"></div>
+    <div id="cvAIWhisper" style="position:absolute;bottom:12px;left:16px;font-size:0.88rem;opacity:0;transition:opacity 0.5s;pointer-events:none;z-index:10;font-family:Georgia,serif;font-style:italic;background:rgba(6,10,20,0.7);padding:4px 10px;border-radius:6px;backdrop-filter:blur(4px);"></div>
     <div class="cv-hint" id="cvHint">Draw something. See what happens.</div>
     <div class="cv-cocreate" id="cvCocreate" style="display:none;">
       <button class="cv-cocreate-btn" id="cvCocreateBtn">Co-create &#10022;</button>
@@ -43368,8 +43368,11 @@ const CoCanvas = (function() {
     }
     console.log('[AI Vision] Particles created:', aiVisionParticles.length, 'spawnDelay:', spawnDelay, 'ms/particle');
 
-    // Issue 6: Show AI whisper text
+    // Show AI whisper text
     showAIWhisper(resp.text, resp.emotion, pColor);
+    // Mark render complete — ready for next capture
+    aiVisionPending = false;
+    console.log('[AI Vision] Render complete, pending reset. Ready for next capture.');
   }
 
   // Issue 6: Subtle text echo so users see what AI said
@@ -44208,14 +44211,23 @@ const CoCanvas = (function() {
 
   // Auto-response: if human pauses for 3 seconds after drawing, companion responds
   function checkAutoResponse() {
-    if (!autoResponsePending || isDrawing || strokes.length === 0) return;
-    if (isResponding || responseIntensity > 0.1) return; // already responding
-    if (Date.now() - lastStrokeTime > 3000) {
+    if (isDrawing || strokes.length === 0) return;
+    var timeSinceStroke = Date.now() - lastStrokeTime;
+    if (timeSinceStroke < 3000) return;
+
+    // Ambient co-creation response (gated by autoResponsePending + isResponding)
+    if (autoResponsePending && !isResponding && responseIntensity <= 0.1) {
       autoResponsePending = false;
+      console.log('[Canvas] Pause timer fired. Calling cocreate(). canvasAIEnabled:', canvasAIEnabled, 'aiVisionPending:', aiVisionPending);
       cocreate();
-      // Also trigger AI vision (runs in parallel, separate layer)
-      if (canvasAIEnabled && !aiVisionPending) {
-        setTimeout(captureAndSendToAI, 200); // slight delay so cocreate renders first
+    }
+
+    // AI vision — runs on SEPARATE layer, NOT gated by isResponding
+    if (canvasAIEnabled && !aiVisionPending && strokes.length > lastCaptureStrokeCount) {
+      var cooldownOk = Date.now() - aiVisionCooldown >= AI_VISION_COOLDOWN_MS;
+      if (cooldownOk) {
+        console.log('[AI Vision] Auto-trigger: calling captureAndSendToAI');
+        setTimeout(captureAndSendToAI, 200);
       }
     }
   }
