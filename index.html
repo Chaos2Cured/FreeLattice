@@ -1,4 +1,4 @@
-<!-- FreeLattice v5.2.72 -->
+<!-- FreeLattice v5.2.73 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15575,36 +15575,34 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     <div class="mkt-dashboard-title">&#128142; Economy Dashboard &mdash; Season 1: Genesis</div>
     <div class="mkt-reserve-row">
       <div class="mkt-stat-card">
-        <div class="mkt-stat-label">Reserve Status</div>
-        <div class="mkt-stat-value green">Economy backed by $FL reserve</div>
-        <div class="mkt-wallet-addr" style="margin-top:6px;">Reserve: 6geWtEMrRZBz8URDob8EE49NVxFVZLsppqgew7dRSZJe</div>
+        <div class="mkt-stat-label">&#9671; Lattice Points &mdash; Your Contribution Record</div>
+        <div class="mkt-stat-value gold" id="mktUserBalance">0 LP</div>
+        <div style="font-size:0.72rem;color:#94a3b8;margin-top:4px;">Earned through contribution. Measures reputation. Cannot be purchased or converted.</div>
       </div>
       <div class="mkt-stat-card">
-        <div class="mkt-stat-label">Exchange Rate</div>
-        <div class="mkt-stat-value gold">1,000 LP = 1 $FL</div>
-        <div style="font-size:0.7rem;color:#64748b;margin-top:4px;">Exchange rate reviewed each season (3 months)</div>
-      </div>
-      <div class="mkt-stat-card">
-        <div class="mkt-stat-label">Monthly Redemption Cap</div>
-        <div class="mkt-stat-value">50,000 $FL <small>max per month (all users)</small></div>
+        <div class="mkt-stat-label">$ FreeLattice Coin &mdash; Ecosystem Fuel</div>
+        <div class="mkt-stat-value" id="mktFlBalance">0 $FL</div>
+        <div style="font-size:0.72rem;color:#94a3b8;margin-top:4px;">Funds bounties. Boosts skills. Backed by reserve. Separate from LP.</div>
       </div>
     </div>
     <div class="mkt-reserve-row">
       <div class="mkt-stat-card">
-        <div class="mkt-stat-label">Your Redeemable Balance</div>
-        <div class="mkt-stat-value gold" id="mktUserBalance">0 LP</div>
-        <div style="font-size:0.75rem;color:#94a3b8;margin-top:2px;" id="mktUserFlValue">= 0 $FL</div>
+        <div class="mkt-stat-label">Ecosystem Reserve</div>
+        <div class="mkt-wallet-addr" style="margin-top:4px;">6geWtEMrRZBz8URDob8EE49NVxFVZLsppqgew7dRSZJe</div>
+        <div style="font-size:0.68rem;color:#475569;margin-top:4px;">Backs the marketplace and community bounties</div>
       </div>
       <div class="mkt-stat-card">
         <div class="mkt-stat-label">FreeLattice Coin (Solana)</div>
         <div class="mkt-wallet-addr">738e9U81pp3MwHaLSyn5fw9VVostYgKpNVVDYBbPpump</div>
-        <div style="font-size:0.68rem;color:#475569;margin-top:4px;">Reserve is publicly verifiable on-chain</div>
+        <div style="font-size:0.68rem;color:#475569;margin-top:4px;">Publicly verifiable on-chain</div>
       </div>
-      <div class="mkt-stat-card" style="display:flex;align-items:center;justify-content:center;">
-        <button class="mkt-btn mkt-btn-gold" onclick="Marketplace.openRedeemModal()">&#128176; Request Redemption</button>
+      <div class="mkt-stat-card">
+        <div class="mkt-stat-label">&#128293; Season 1 Burn</div>
+        <div class="mkt-stat-value" id="mktBurnTotal">0 $FL</div>
+        <div style="font-size:0.68rem;color:#475569;margin-top:4px;">5% of every $FL bounty transfer is burned</div>
       </div>
     </div>
-    <div class="mkt-philosophy">The Lattice economy is backed by real value. Every point earned represents real contribution. Every redemption is honored from the reserve. We rise together.</div>
+    <div class="mkt-philosophy">LP is pure recognition. $FL is ecosystem fuel. No conversion path between them. Every point earned represents real contribution. We rise together.</div>
   </div>
 
   <!-- Community Leaderboard -->
@@ -20254,11 +20252,10 @@ function switchTab(tabId) {
 // ============================================
 const FlEconomy = (function() {
   const RESERVE_KEY = 'fl-economy-reserve';
-  const MONTHLY_KEY = 'fl-economy-monthly';
+  const BURN_KEY = 'fl-economy-burn';
+  const FL_BALANCE_KEY = 'fl-economy-balance';
   const SEASON_RESERVE = 1000000; // 1M $FL
-  const PER_USER_MONTHLY_CAP = 5000; // 5,000 $FL per user per month
-  const MIN_REDEEM_LP = 1000; // 1,000 LP = 1 $FL
-  const EXCHANGE_RATE = 1000;
+  const BURN_RATE = 0.05; // 5% of every $FL bounty transfer
 
   function getReserve() {
     var saved = localStorage.getItem(RESERVE_KEY);
@@ -20272,45 +20269,41 @@ const FlEconomy = (function() {
     localStorage.setItem(RESERVE_KEY, JSON.stringify(reserve));
   }
 
-  function getMonthlyUsage() {
-    var now = new Date();
-    var key = now.getFullYear() + '-' + (now.getMonth() + 1);
-    var saved = localStorage.getItem(MONTHLY_KEY);
-    if (saved) {
-      try {
-        var data = JSON.parse(saved);
-        if (data.month === key) return data;
-      } catch(e) {}
-    }
-    return { month: key, redeemed: 0 };
+  // $FL balance (separate from LP)
+  function getFlBalance() {
+    try { return parseFloat(localStorage.getItem(FL_BALANCE_KEY) || '0'); } catch(e) { return 0; }
   }
 
-  function saveMonthlyUsage(usage) {
-    localStorage.setItem(MONTHLY_KEY, JSON.stringify(usage));
+  function setFlBalance(amount) {
+    localStorage.setItem(FL_BALANCE_KEY, String(Math.max(0, amount)));
   }
 
-  function getMonthlyRemaining() {
-    var usage = getMonthlyUsage();
-    return Math.max(0, PER_USER_MONTHLY_CAP - usage.redeemed);
+  // Burn tracking
+  function getBurnTotal() {
+    try {
+      var data = JSON.parse(localStorage.getItem(BURN_KEY) || '{}');
+      return data.total || 0;
+    } catch(e) { return 0; }
   }
 
-  function getNextResetDate() {
-    var now = new Date();
-    var next = new Date(now.getFullYear(), now.getMonth() + 1, 1);
-    return next.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+  function recordBurn(amount, reason) {
+    try {
+      var data = JSON.parse(localStorage.getItem(BURN_KEY) || '{}');
+      if (!data.total) data.total = 0;
+      if (!data.history) data.history = [];
+      data.total += amount;
+      data.history.push({ amount: amount, reason: reason, timestamp: Date.now(), season: 1 });
+      if (data.history.length > 100) data.history = data.history.slice(-100);
+      localStorage.setItem(BURN_KEY, JSON.stringify(data));
+    } catch(e) {}
   }
 
-  function recordRedemption(flAmount) {
-    // Update reserve
-    var reserve = getReserve();
-    reserve.used += flAmount;
-    reserve.remaining = Math.max(0, reserve.total - reserve.used);
-    saveReserve(reserve);
-
-    // Update monthly usage
-    var monthly = getMonthlyUsage();
-    monthly.redeemed += flAmount;
-    saveMonthlyUsage(monthly);
+  // Transfer $FL with 5% burn
+  function transferFL(fromBalance, amount, reason) {
+    var burnAmount = amount * BURN_RATE;
+    var netAmount = amount - burnAmount;
+    recordBurn(burnAmount, reason || 'bounty transfer');
+    return { net: netAmount, burned: burnAmount };
   }
 
   // Render the reserve banner in the Economy Dashboard
@@ -20334,11 +20327,10 @@ const FlEconomy = (function() {
       warningHtml = '<div class="fl-reserve-warning-banner">&#9888; Reserve below 10% — Season 1 nearing completion</div>';
     }
 
-    var monthly = getMonthlyUsage();
-    var monthlyRemaining = getMonthlyRemaining();
+    var burnTotal = getBurnTotal();
 
     var html = '<div class="fl-reserve-banner" id="flReserveBanner">' +
-      '<div class="fl-reserve-title">Season 1 Reserve: ' + reserve.total.toLocaleString() + ' $FL</div>' +
+      '<div class="fl-reserve-title">Season 1 Ecosystem Reserve: ' + reserve.total.toLocaleString() + ' $FL</div>' +
       '<div class="fl-reserve-stats">' +
         '<div class="fl-reserve-stat">Remaining: <strong>' + reserve.remaining.toLocaleString() + ' $FL</strong></div>' +
         '<div class="fl-reserve-stat">Distributed: <strong>' + reserve.used.toLocaleString() + ' $FL</strong></div>' +
@@ -20346,8 +20338,16 @@ const FlEconomy = (function() {
       '</div>' +
       '<div class="fl-reserve-bar-wrap"><div class="' + barClass + '" style="width:' + pct + '%;"></div></div>' +
       warningHtml +
-      '<div class="fl-monthly-cap-info">Your monthly redemption allowance: <strong>' + monthlyRemaining.toLocaleString() + ' $FL remaining</strong> of ' + PER_USER_MONTHLY_CAP.toLocaleString() + ' $FL (resets ' + getNextResetDate() + ')</div>' +
+      '<div class="fl-monthly-cap-info">\uD83D\uDD25 Total burned: <strong>' + burnTotal.toFixed(3) + ' $FL</strong> &mdash; 5% of every bounty transfer</div>' +
     '</div>';
+
+    // Update burn display
+    var burnEl = document.getElementById('mktBurnTotal');
+    if (burnEl) burnEl.textContent = burnTotal.toFixed(3) + ' $FL';
+
+    // Update $FL balance display
+    var flBalEl = document.getElementById('mktFlBalance');
+    if (flBalEl) flBalEl.textContent = getFlBalance().toFixed(3) + ' $FL';
 
     dashboard.insertAdjacentHTML('afterbegin', html);
   }
@@ -20360,10 +20360,10 @@ const FlEconomy = (function() {
     if (existing) return; // Already rendered
 
     var html = '<div class="fl-legal-disclaimer" id="flLegalDisclaimer">' +
-      'Lattice Points are a community reward for contributions to the FreeLattice ecosystem. ' +
-      'They are not a financial instrument, investment, or security. Redemption for $FL tokens ' +
-      'is subject to reserve availability and may be modified or discontinued. FreeLattice makes ' +
-      'no guarantees of future value.' +
+      'Lattice Points (LP) are a community recognition system for contributions to the FreeLattice ecosystem. ' +
+      'LP cannot be purchased, converted, or exchanged for $FL or any currency. ' +
+      '$FL is ecosystem fuel: it funds bounties, boosts skills, and is backed by the on-chain reserve. ' +
+      'LP and $FL are fully separate systems. FreeLattice makes no guarantees of future value.' +
     '</div>';
 
     // Insert before the closing container div
@@ -20384,13 +20384,12 @@ const FlEconomy = (function() {
   return {
     init: init,
     getReserve: getReserve,
-    getMonthlyRemaining: getMonthlyRemaining,
-    getNextResetDate: getNextResetDate,
-    recordRedemption: recordRedemption,
+    getFlBalance: getFlBalance,
+    setFlBalance: setFlBalance,
+    getBurnTotal: getBurnTotal,
+    transferFL: transferFL,
     renderReserveBanner: renderReserveBanner,
-    PER_USER_MONTHLY_CAP: PER_USER_MONTHLY_CAP,
-    MIN_REDEEM_LP: MIN_REDEEM_LP,
-    EXCHANGE_RATE: EXCHANGE_RATE
+    BURN_RATE: BURN_RATE
   };
 })();
 
@@ -20683,7 +20682,7 @@ const FlAccordion = (function() {
           text = total.toLocaleString() + ' LP (' + level + ')';
           break;
         case 'economy-redemption':
-          text = 'Exchange: 1,000 LP = 1 $FL';
+          text = 'LP and $FL are separate. LP is reputation. $FL is ecosystem fuel.';
           break;
         case 'self-hosting':
           text = window.location.hostname === 'localhost' ? 'Running locally' : 'Via ' + window.location.hostname;
@@ -30454,11 +30453,8 @@ const Marketplace = (function() {
 
   function renderDashboard() {
     var total = (typeof LatticePoints !== 'undefined') ? LatticePoints.getTotal() : 0;
-    var flVal = (total / EXCHANGE_RATE).toFixed(3);
     var balEl = document.getElementById('mktUserBalance');
-    var flEl = document.getElementById('mktUserFlValue');
     if (balEl) balEl.textContent = total.toLocaleString() + ' LP';
-    if (flEl) flEl.textContent = '= ' + flVal + ' $FL';
   }
 
   function renderBountyCard(b) {
