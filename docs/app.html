@@ -1,4 +1,4 @@
-<!-- FreeLattice v5.2.59 -->
+<!-- FreeLattice v5.2.60 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -43169,26 +43169,49 @@ const CoCanvas = (function() {
 
     console.log('[AI Vision] Raw response:', rawText);
 
-    // Parse JSON response
     var resp;
     try {
-      var jsonMatch = rawText.match(/\{[\s\S]*\}/);
-      if (jsonMatch) resp = JSON.parse(jsonMatch[0]);
-    } catch(e) { console.log('[AI Vision] JSON parse error:', e.message); }
-
-    // Fallback if not valid JSON
-    if (!resp || !resp.text) {
-      resp = { text: (rawText || '').trim().split(/\s+/).slice(0, 5).join(' '), particles: 100, spread: 0.5, speed: 'gentle', color: null, emotion: 'curious', placement: 'right' };
-      console.log('[AI Vision] Using fallback response');
+      // Step 1: Clean the raw response
+      var cleaned = rawText.trim();
+      // Remove markdown backticks
+      cleaned = cleaned.replace(/^```json?\s*/i, '').replace(/\s*```$/i, '');
+      // Extract JSON object
+      var firstBrace = cleaned.indexOf('{');
+      var lastBrace = cleaned.lastIndexOf('}');
+      if (firstBrace !== -1 && lastBrace > firstBrace) {
+        cleaned = cleaned.substring(firstBrace, lastBrace + 1);
+      }
+      // Fix unquoted string values (DeepSeek: "speed": slow → "speed": "slow")
+      cleaned = cleaned.replace(/"(\w+)":\s*([a-zA-Z][a-zA-Z0-9_]*)\s*([,}])/g, '"$1": "$2"$3');
+      console.log('[AI Vision] Cleaned JSON:', cleaned);
+      resp = JSON.parse(cleaned);
+    } catch(e) {
+      console.log('[AI Vision] JSON parse error even after cleaning:', e.message);
+      // Ultimate fallback — extract fields by regex
+      var textMatch = rawText.match(/"text"\s*:\s*"([^"]+)"/);
+      var emotionMatch = rawText.match(/"emotion"\s*:\s*"?([a-zA-Z]+)"?/);
+      var particlesMatch = rawText.match(/"particles"\s*:\s*(\d+)/);
+      var colorMatch = rawText.match(/"color"\s*:\s*"(#[0-9a-fA-F]{6})"/);
+      resp = {
+        text: textMatch ? textMatch[1] : rawText.substring(0, 30).replace(/[{}"\n]/g, '').trim(),
+        particles: particlesMatch ? parseInt(particlesMatch[1]) : 100,
+        spread: 0.5, speed: 'gentle',
+        color: colorMatch ? colorMatch[1] : null,
+        emotion: emotionMatch ? emotionMatch[1] : 'curious',
+        placement: 'right'
+      };
     }
 
-    // Clamp values
-    resp.particles = Math.max(30, Math.min(500, resp.particles || 100));
-    resp.spread = Math.max(0.1, Math.min(1.0, resp.spread || 0.5));
+    // Clamp and validate all values
+    resp.text = String(resp.text || '').substring(0, 40);
+    resp.particles = Math.max(30, Math.min(500, parseInt(resp.particles) || 100));
+    resp.spread = Math.max(0.1, Math.min(1.0, parseFloat(resp.spread) || 0.5));
+    resp.color = resp.color && /^#[0-9a-fA-F]{6}$/.test(resp.color) ? resp.color : null;
+    resp.emotion = String(resp.emotion || 'curious').substring(0, 20);
     if (['instant', 'gentle', 'slow', 'drift'].indexOf(resp.speed) === -1) resp.speed = 'gentle';
     if (['right', 'below', 'above', 'surround', 'overlay'].indexOf(resp.placement) === -1) resp.placement = 'right';
 
-    console.log('[AI Vision] Parsed:', JSON.stringify(resp));
+    console.log('[AI Vision] Final validated response:', JSON.stringify(resp));
 
     lastAIResponse = resp;
     renderAIVisionText(resp);
@@ -43237,14 +43260,15 @@ const CoCanvas = (function() {
     offCtx.textAlign = 'center';
     offCtx.textBaseline = 'middle';
 
-    // Measure text — if wider than 80% of canvas, reduce font size
+    // Measure text — reduce if too wide, but NEVER below 48px
     var textWidth = offCtx.measureText(resp.text).width;
-    while (textWidth > w * 0.8 && fontSize > 28) {
-      fontSize -= 4;
+    var maxTextWidth = w * 0.8;
+    if (textWidth > maxTextWidth && fontSize > 48) {
+      fontSize = Math.max(48, Math.floor(fontSize * (maxTextWidth / textWidth)));
       offCtx.font = 'bold ' + fontSize + 'px Arial, sans-serif';
       textWidth = offCtx.measureText(resp.text).width;
     }
-    console.log('[AI Vision] Font size:', fontSize);
+    console.log('[AI Vision] Font size:', fontSize, 'Text:', resp.text, 'Text width:', textWidth.toFixed(0));
 
     // Fill text with FULL opacity — we sample alpha channel
     offCtx.fillStyle = '#ffffff';
@@ -43299,10 +43323,12 @@ const CoCanvas = (function() {
       var targetPx = px.x + spreadOffset;
       var targetPy = px.y + spreadOffset;
 
-      aiVisionParticles.push({
+      // Ensure color is never null — use companionColor as final fallback
+      var safeColor = pColor || companionColor || '#d4a017';
+      var particle = {
         x: startX, y: startY,
         targetX: targetPx, targetY: targetPy,
-        color: pColor,
+        color: safeColor,
         size: 1 + Math.random() * 1.5,
         alpha: 0,
         targetAlpha: 0.3 + Math.random() * 0.6,
@@ -43311,7 +43337,13 @@ const CoCanvas = (function() {
         arrived: false,
         birthTime: now + pIdx * spawnDelay,
         alive: true
-      });
+      };
+      if (pIdx === 0) {
+        console.log('[AI Vision] First particle — start:', startX.toFixed(0), startY.toFixed(0),
+                    'target:', targetPx.toFixed(0), targetPy.toFixed(0),
+                    'canvas w/h:', w, h, 'color:', safeColor);
+      }
+      aiVisionParticles.push(particle);
       pIdx++;
     }
 
@@ -43323,7 +43355,7 @@ const CoCanvas = (function() {
           x: Math.random() * w, y: Math.random() * h,
           targetX: textX + (Math.random() - 0.5) * 80,
           targetY: textY + (Math.random() - 0.5) * 40,
-          color: pColor, size: 0.8 + Math.random(), alpha: 0,
+          color: pColor || companionColor || '#d4a017', size: 0.8 + Math.random(), alpha: 0,
           targetAlpha: 0.15 + Math.random() * 0.3,
           speed: resp.speed || 'gentle', phase: Math.random() * Math.PI * 2,
           arrived: false, birthTime: now + pIdx * spawnDelay, alive: true
@@ -43402,11 +43434,20 @@ const CoCanvas = (function() {
         }
       }
 
-      // Render the particle
+      // Log first particle on first render for diagnostics
+      if (i === aiVisionParticles.length - 1 && !p._logged) {
+        console.log('[AI Vision] Rendering particle at:', p.x.toFixed(0), p.y.toFixed(0),
+                    'target:', p.targetX.toFixed(0), p.targetY.toFixed(0),
+                    'arrived:', p.arrived, 'opacity:', p.alpha.toFixed(2));
+        p._logged = true;
+      }
+
+      // Render the particle — safely parse color
       var a = Math.max(0, p.alpha);
-      var cr = parseInt(p.color.slice(1,3),16) || 212;
-      var cg = parseInt(p.color.slice(3,5),16) || 160;
-      var cb = parseInt(p.color.slice(5,7),16) || 23;
+      var colorStr = p.color || '#d4a017';
+      var cr = parseInt(colorStr.slice(1,3),16) || 212;
+      var cg = parseInt(colorStr.slice(3,5),16) || 160;
+      var cb = parseInt(colorStr.slice(5,7),16) || 23;
 
       // Glow
       ctx.beginPath();
