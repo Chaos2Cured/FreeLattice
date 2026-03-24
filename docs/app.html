@@ -1,4 +1,4 @@
-<!-- FreeLattice v5.2.73 -->
+<!-- FreeLattice v5.2.74 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -16518,6 +16518,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="cv-color-dot" style="background:#8B5CF6;" title="Violet"></button>
       <button class="cv-color-dot" style="background:#10B981;" title="Emerald"></button>
       <button class="cv-color-dot" style="background:#F59E0B;" title="Gold"></button>
+      <button class="cv-color-dot" id="cvEraserBtn" style="background:#060a14;border-color:rgba(148,163,184,0.4);" title="Eraser">&#x2715;</button>
     </div>
     <div class="cv-actions" id="cvActions" style="display:none;">
       <button class="cv-action-btn" id="cvVisionBtn" title="AI Vision — let the AI see and respond to your drawings" style="color:#F59E0B;">&#128065;</button>
@@ -42714,6 +42715,7 @@ const CoCanvas = (function() {
   var currentStroke = null;
   var isDrawing = false;
   var humanColor = '#F5E6C8'; // default warm light
+  var eraserActive = false;
   var lastStrokeTime = 0;
   var autoResponsePending = false;
   var autoResponseTimer = null;
@@ -43983,9 +43985,28 @@ const CoCanvas = (function() {
   // ── Set human stroke color ──
   function setColor(hex) {
     humanColor = hex;
+    eraserActive = false;
+    if (canvas) canvas.style.cursor = 'crosshair';
+    var eraserBtn = document.getElementById('cvEraserBtn');
+    if (eraserBtn) eraserBtn.style.borderColor = 'rgba(148,163,184,0.4)';
     document.querySelectorAll('.cv-color-dot').forEach(function(d) {
       d.classList.toggle('active', d.style.backgroundColor === hex || d.getAttribute('style').indexOf(hex) !== -1);
     });
+  }
+
+  function toggleEraser() {
+    eraserActive = !eraserActive;
+    var eraserBtn = document.getElementById('cvEraserBtn');
+    if (eraserActive) {
+      if (canvas) canvas.style.cursor = 'cell';
+      if (eraserBtn) eraserBtn.style.borderColor = '#F59E0B';
+      // Deactivate all color dots
+      document.querySelectorAll('.cv-color-dot').forEach(function(d) { d.classList.remove('active'); });
+      if (eraserBtn) eraserBtn.classList.add('active');
+    } else {
+      if (canvas) canvas.style.cursor = 'crosshair';
+      if (eraserBtn) { eraserBtn.style.borderColor = 'rgba(148,163,184,0.4)'; eraserBtn.classList.remove('active'); }
+    }
   }
 
   // ── Simulation ──
@@ -44379,7 +44400,9 @@ const CoCanvas = (function() {
     isDrawing = true;
     autoResponsePending = false;
     var pos = getPos(e);
-    currentStroke = { points: [pos], width: 2, alpha: 1, color: humanColor, fading: false };
+    var strokeColor = eraserActive ? '#060a14' : humanColor;
+    var strokeWidth = eraserActive ? 6 : 2;
+    currentStroke = { points: [pos], width: strokeWidth, alpha: 1, color: strokeColor, fading: false };
     lastStrokeTime = Date.now();
   }
 
@@ -44435,6 +44458,8 @@ const CoCanvas = (function() {
     currentStroke = null;
     companionTrails = [];
     isResponding = false;
+    eraserActive = false;
+    if (canvas) canvas.style.cursor = 'crosshair';
     responseMode = null;
     responseIntensity = 0;
     recentResponses = [];
@@ -44595,12 +44620,14 @@ const CoCanvas = (function() {
         visionBtn.title = 'AI Vision active \u2014 the AI can see your drawings';
       }
     }
-    // Color dots
+    // Color dots + eraser
     document.querySelectorAll('.cv-color-dot').forEach(function(dot) {
       dot.addEventListener('click', function(e) {
         e.stopPropagation(); e.stopImmediatePropagation();
-        var bg = dot.style.backgroundColor;
-        // Convert rgb() to hex if needed
+        if (dot.id === 'cvEraserBtn') {
+          toggleEraser();
+          return;
+        }
         var hex = dot.getAttribute('title') === 'Warm light' ? '#F5E6C8' :
                   dot.getAttribute('title') === 'Cool blue' ? '#3B82F6' :
                   dot.getAttribute('title') === 'Warm red' ? '#DC2626' :
@@ -44644,7 +44671,8 @@ const CoCanvas = (function() {
     cocreate: cocreate,
     setColor: setColor,
     toggleGameMode: toggleGameMode,
-    toggleAIVision: toggleAIVision
+    toggleAIVision: toggleAIVision,
+    toggleEraser: toggleEraser
   };
 })();
 
