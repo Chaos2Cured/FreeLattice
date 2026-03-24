@@ -1,4 +1,4 @@
-<!-- FreeLattice v5.2.57 -->
+<!-- FreeLattice v5.2.58 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -16502,6 +16502,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
   <div class="cv-container" id="cvContainer">
     <canvas id="cvCanvas"></canvas>
     <div class="cv-names" id="cvNames"></div>
+    <div id="cvAIWhisper" style="position:absolute;bottom:8px;left:12px;font-size:0.75rem;opacity:0;transition:opacity 0.5s;pointer-events:none;z-index:10;font-family:Georgia,serif;font-style:italic;"></div>
     <div class="cv-hint" id="cvHint">Draw something. See what happens.</div>
     <div class="cv-cocreate" id="cvCocreate" style="display:none;">
       <button class="cv-cocreate-btn" id="cvCocreateBtn">Co-create &#10022;</button>
@@ -43022,6 +43023,7 @@ const CoCanvas = (function() {
     if (strokes.length <= lastCaptureStrokeCount) return;
     if (!isVisionCapable()) return;
 
+    console.log('[AI Vision] Capturing canvas, stroke count:', strokes.length);
     lastCaptureStrokeCount = strokes.length;
     aiVisionPending = true;
     aiVisionPulse = 1;
@@ -43119,18 +43121,21 @@ const CoCanvas = (function() {
   function handleVisionResponse(rawText) {
     aiVisionPending = false;
     aiVisionPulse = 0;
-    if (!rawText) return;
+    if (!rawText) { console.log('[AI Vision] Empty response received'); return; }
+
+    console.log('[AI Vision] Raw response:', rawText);
 
     // Parse JSON response
     var resp;
     try {
       var jsonMatch = rawText.match(/\{[\s\S]*\}/);
       if (jsonMatch) resp = JSON.parse(jsonMatch[0]);
-    } catch(e) {}
+    } catch(e) { console.log('[AI Vision] JSON parse error:', e.message); }
 
     // Fallback if not valid JSON
     if (!resp || !resp.text) {
       resp = { text: (rawText || '').trim().split(/\s+/).slice(0, 5).join(' '), particles: 100, spread: 0.5, speed: 'gentle', color: null, emotion: 'curious', placement: 'right' };
+      console.log('[AI Vision] Using fallback response');
     }
 
     // Clamp values
@@ -43139,6 +43144,8 @@ const CoCanvas = (function() {
     if (['instant', 'gentle', 'slow', 'drift'].indexOf(resp.speed) === -1) resp.speed = 'gentle';
     if (['right', 'below', 'above', 'surround', 'overlay'].indexOf(resp.placement) === -1) resp.placement = 'right';
 
+    console.log('[AI Vision] Parsed:', JSON.stringify(resp));
+
     lastAIResponse = resp;
     renderAIVisionText(resp);
   }
@@ -43146,165 +43153,228 @@ const CoCanvas = (function() {
   function renderAIVisionText(resp) {
     if (!ctx || !resp.text) return;
 
-    // Calculate placement based on user's stroke bounding box
+    // Issue 1: Calculate ACTUAL bounding box from all non-fading strokes
     var sMinX = Infinity, sMaxX = -Infinity, sMinY = Infinity, sMaxY = -Infinity;
     strokes.forEach(function(s) {
-      if (s.fading) return;
       s.points.forEach(function(p) {
         if (p.x < sMinX) sMinX = p.x; if (p.x > sMaxX) sMaxX = p.x;
         if (p.y < sMinY) sMinY = p.y; if (p.y > sMaxY) sMaxY = p.y;
       });
     });
-    if (sMinX === Infinity) { sMinX = w * 0.2; sMaxX = w * 0.8; sMinY = h * 0.2; sMaxY = h * 0.8; }
-    var sCx = (sMinX + sMaxX) / 2, sCy = (sMinY + sMaxY) / 2;
+    var hasBbox = sMinX !== Infinity;
+    if (!hasBbox) { sMinX = w * 0.2; sMaxX = w * 0.8; sMinY = h * 0.2; sMaxY = h * 0.8; }
+    var bbox = { minX: sMinX, maxX: sMaxX, minY: sMinY, maxY: sMaxY };
+    console.log('[AI Vision] User drawing bounding box:', JSON.stringify(bbox));
+    console.log('[AI Vision] Text placement:', resp.placement);
 
-    // Determine text position based on placement
+    // Issue 2: Calculate text position from placement + bbox
     var textX, textY;
-    if (resp.placement === 'right') { textX = sMaxX + 30; textY = sCy; }
-    else if (resp.placement === 'below') { textX = sCx; textY = sMaxY + 40; }
-    else if (resp.placement === 'above') { textX = sCx; textY = sMinY - 40; }
-    else if (resp.placement === 'surround') { textX = sCx; textY = sCy; }
-    else { textX = sCx; textY = sCy; } // overlay
+    if (resp.placement === 'right') { textX = bbox.maxX + 20; textY = (bbox.minY + bbox.maxY) / 2; }
+    else if (resp.placement === 'below') { textX = (bbox.minX + bbox.maxX) / 2; textY = bbox.maxY + 30; }
+    else if (resp.placement === 'above') { textX = (bbox.minX + bbox.maxX) / 2; textY = bbox.minY - 30; }
+    else if (resp.placement === 'surround') { textX = (bbox.minX + bbox.maxX) / 2; textY = (bbox.minY + bbox.maxY) / 2; }
+    else { textX = (bbox.minX + bbox.maxX) / 2; textY = (bbox.minY + bbox.maxY) / 2; }
 
-    // Clamp to canvas bounds
-    textX = Math.max(40, Math.min(w - 40, textX));
-    textY = Math.max(30, Math.min(h - 30, textY));
+    // Clamp to canvas bounds with 20px padding
+    textX = Math.max(20, Math.min(w - 20, textX));
+    textY = Math.max(20, Math.min(h - 20, textY));
+    console.log('[AI Vision] Text render position: x=', textX, 'y=', textY);
 
-    // Render text to offscreen canvas to get pixel positions
+    // Issue 3: Font size — minimum 48px, scale with particle count, bold clean font
+    var fontSize = 48;
+    if (resp.particles > 200) fontSize = 64;
+    if (resp.particles > 400) fontSize = 80;
+
+    // Issue 2 continued: Offscreen canvas MUST match visible canvas CSS pixel dimensions
     var offCanvas = document.createElement('canvas');
-    var fontSize = Math.round(28 + (resp.particles - 30) / 470 * 36); // 28-64px
     offCanvas.width = w; offCanvas.height = h;
     var offCtx = offCanvas.getContext('2d');
-    offCtx.font = fontSize + 'px Georgia, serif';
+    offCtx.font = 'bold ' + fontSize + 'px Arial, sans-serif';
     offCtx.textAlign = 'center';
     offCtx.textBaseline = 'middle';
+
+    // Measure text — if wider than 80% of canvas, reduce font size
+    var textWidth = offCtx.measureText(resp.text).width;
+    while (textWidth > w * 0.8 && fontSize > 28) {
+      fontSize -= 4;
+      offCtx.font = 'bold ' + fontSize + 'px Arial, sans-serif';
+      textWidth = offCtx.measureText(resp.text).width;
+    }
+    console.log('[AI Vision] Font size:', fontSize);
+
+    // Fill text with FULL opacity — we sample alpha channel
     offCtx.fillStyle = '#ffffff';
     offCtx.fillText(resp.text, textX, textY);
+    console.log('[AI Vision] Offscreen canvas size:', offCanvas.width, 'x', offCanvas.height);
 
-    // Read pixels and create particles at text positions
-    var imageData = offCtx.getImageData(0, 0, w, h);
+    // Issue 4: Correct pixel sampling — x,y from loop indices, not from index
+    var imageData = offCtx.getImageData(0, 0, offCanvas.width, offCanvas.height);
+    var data = imageData.data;
     var textPixels = [];
-    for (var py = 0; py < h; py += 2) {
-      for (var px = 0; px < w; px += 2) {
-        var idx = (py * w + px) * 4;
-        if (imageData.data[idx + 3] > 50) {
-          textPixels.push({ x: px, y: py });
+    for (var y = 0; y < offCanvas.height; y++) {
+      for (var x = 0; x < offCanvas.width; x++) {
+        var index = (y * offCanvas.width + x) * 4;
+        if (data[index + 3] > 128) {
+          textPixels.push({ x: x, y: y });
         }
       }
     }
+    console.log('[AI Vision] Total text pixels found:', textPixels.length);
 
-    // Sample to match particle count
-    var targetCount = resp.particles;
-    var selected = [];
-    if (textPixels.length <= targetCount) {
-      selected = textPixels;
-      // Add ambient particles around the text
-      var extra = targetCount - textPixels.length;
-      for (var ei = 0; ei < extra; ei++) {
-        selected.push({ x: textX + (Math.random() - 0.5) * 80, y: textY + (Math.random() - 0.5) * 40 });
-      }
-    } else {
-      var step = Math.floor(textPixels.length / targetCount);
-      for (var si = 0; si < textPixels.length; si += step) {
-        if (selected.length < targetCount) selected.push(textPixels[si]);
-      }
-    }
-
-    // Apply spread
-    var spreadAmt = resp.spread;
-    selected.forEach(function(p) {
-      p.x += (Math.random() - 0.5) * spreadAmt * 80;
-      p.y += (Math.random() - 0.5) * spreadAmt * 40;
-    });
+    // Sample to match AI's requested particle count
+    var targetCount = Math.min(resp.particles || 100, Math.max(textPixels.length, 30));
+    var sampleStep = Math.max(1, Math.floor(textPixels.length / targetCount));
 
     // Determine color
     var pColor = resp.color || companionResponseColor;
-    var cr = parseInt(pColor.slice(1,3),16) || 212;
-    var cg = parseInt(pColor.slice(3,5),16) || 160;
-    var cb = parseInt(pColor.slice(5,7),16) || 23;
 
-    // Spawn animation timing
-    var spawnDuration = resp.speed === 'instant' ? 200 : resp.speed === 'gentle' ? 700 : resp.speed === 'slow' ? 1800 : 3000;
+    // Spawn delay per particle based on speed
+    function getSpawnDelay(speed) {
+      if (speed === 'instant') return 2;
+      if (speed === 'gentle') return 8;
+      if (speed === 'slow') return 15;
+      if (speed === 'drift') return 25;
+      return 8;
+    }
+    var spawnDelay = getSpawnDelay(resp.speed);
+    var now = performance.now();
 
     // Create AI vision particles
     aiVisionParticles = [];
-    var now = Date.now();
-    selected.forEach(function(target, i) {
-      var startX, startY;
-      if (resp.speed === 'drift') {
-        // Start from edges
-        var edge = Math.floor(Math.random() * 4);
-        startX = edge === 0 ? 0 : edge === 1 ? w : Math.random() * w;
-        startY = edge === 2 ? 0 : edge === 3 ? h : Math.random() * h;
-      } else {
-        startX = target.x + (Math.random() - 0.5) * 100;
-        startY = target.y + (Math.random() - 0.5) * 100;
-      }
-      var delay = (i / selected.length) * spawnDuration * 0.8;
+    var pIdx = 0;
+    for (var si = 0; si < textPixels.length; si += sampleStep) {
+      var px = textPixels[si];
+      var spread = resp.spread || 0.5;
+
+      // START position: random point on canvas (they'll animate TO the text)
+      var startX = Math.random() * w;
+      var startY = Math.random() * h;
+
+      // TARGET position: the actual text pixel position + spread offset
+      var spreadOffset = (Math.random() - 0.5) * spread * 60;
+      var targetPx = px.x + spreadOffset;
+      var targetPy = px.y + spreadOffset;
+
       aiVisionParticles.push({
         x: startX, y: startY,
-        targetX: target.x, targetY: target.y,
-        cr: cr, cg: cg, cb: cb,
+        targetX: targetPx, targetY: targetPy,
+        color: pColor,
         size: 1 + Math.random() * 1.5,
         alpha: 0,
         targetAlpha: 0.3 + Math.random() * 0.6,
-        spawnTime: now + delay,
-        settleTime: now + delay + spawnDuration * 0.5,
+        speed: resp.speed || 'gentle',
         phase: Math.random() * Math.PI * 2,
+        arrived: false,
+        birthTime: now + pIdx * spawnDelay,
         alive: true
       });
-    });
+      pIdx++;
+    }
+
+    // Add ambient particles if text had fewer pixels than requested
+    if (aiVisionParticles.length < (resp.particles || 100)) {
+      var extra = (resp.particles || 100) - aiVisionParticles.length;
+      for (var ei = 0; ei < extra; ei++) {
+        aiVisionParticles.push({
+          x: Math.random() * w, y: Math.random() * h,
+          targetX: textX + (Math.random() - 0.5) * 80,
+          targetY: textY + (Math.random() - 0.5) * 40,
+          color: pColor, size: 0.8 + Math.random(), alpha: 0,
+          targetAlpha: 0.15 + Math.random() * 0.3,
+          speed: resp.speed || 'gentle', phase: Math.random() * Math.PI * 2,
+          arrived: false, birthTime: now + pIdx * spawnDelay, alive: true
+        });
+        pIdx++;
+      }
+    }
+    console.log('[AI Vision] Particles created with targets:', aiVisionParticles.length);
+
+    // Issue 6: Show AI whisper text
+    showAIWhisper(resp.text, resp.emotion, pColor);
   }
 
-  // Simulate and render AI vision particles
+  // Issue 6: Subtle text echo so users see what AI said
+  function showAIWhisper(text, emotion, color) {
+    var whisper = document.getElementById('cvAIWhisper');
+    if (!whisper) return;
+    whisper.textContent = '\u2726 "' + text + '" \u2014 ' + (emotion || '');
+    whisper.style.color = color || '#d4a017';
+    whisper.style.opacity = '0.6';
+    clearTimeout(whisper._timer);
+    whisper._timer = setTimeout(function() {
+      whisper.style.opacity = '0';
+    }, 3500);
+  }
+
+  // Issue 5: Fixed particle animation — proper movement toward targets
   function updateAIVisionParticles(t) {
-    var now = Date.now();
+    var now = performance.now();
     for (var i = aiVisionParticles.length - 1; i >= 0; i--) {
       var p = aiVisionParticles[i];
       if (!p.alive) continue;
 
-      if (now < p.spawnTime) continue; // not yet spawned
+      // Don't start until birth time (stagger effect)
+      if (now < p.birthTime) continue;
 
-      // Fade in
-      if (p.alpha < p.targetAlpha) p.alpha = Math.min(p.targetAlpha, p.alpha + 0.02);
+      var age = now - p.birthTime;
 
-      // Move toward target
-      var progress = Math.min(1, (now - p.spawnTime) / Math.max(1, p.settleTime - p.spawnTime));
-      var ease = 1 - Math.pow(1 - progress, 3); // ease-out cubic
-      p.x += (p.targetX - p.x) * ease * 0.08;
-      p.y += (p.targetY - p.y) * ease * 0.08;
+      // Animate toward target
+      if (!p.arrived) {
+        var duration;
+        if (p.speed === 'instant') duration = 300;
+        else if (p.speed === 'gentle') duration = 800;
+        else if (p.speed === 'slow') duration = 1800;
+        else if (p.speed === 'drift') duration = 3500;
+        else duration = 800;
 
-      // Breathing oscillation once settled
-      if (progress > 0.9) {
-        p.phase += 0.02;
-        p.x += Math.sin(p.phase) * 0.5;
-        p.y += Math.cos(p.phase * 0.7) * 0.5;
+        var progress = Math.min(1, age / duration);
+        var eased = 1 - Math.pow(1 - progress, 3); // ease-out cubic
+
+        p.x = p.x + (p.targetX - p.x) * eased * 0.12;
+        p.y = p.y + (p.targetY - p.y) * eased * 0.12;
+        p.alpha = Math.min(p.targetAlpha, p.targetAlpha * eased);
+
+        // Check if close enough to target
+        var dist = Math.abs(p.x - p.targetX) + Math.abs(p.y - p.targetY);
+        if (dist < 2) {
+          p.x = p.targetX;
+          p.y = p.targetY;
+          p.arrived = true;
+          p.alpha = p.targetAlpha;
+        }
+      } else {
+        // Breathing oscillation once arrived
+        p.phase += 0.015;
+        p.x = p.targetX + Math.sin(p.phase) * 1.5;
+        p.y = p.targetY + Math.cos(p.phase * 0.7) * 1.5;
       }
 
-      // Render
-      var twinkle = Math.sin(p.phase + now * 0.001) * 0.15 + 0.85;
-      var a = p.alpha * twinkle;
+      // Fade out after 8 seconds
+      if (age > 8000) {
+        p.alpha -= 0.01;
+        if (p.alpha <= 0) {
+          aiVisionParticles.splice(i, 1);
+          continue;
+        }
+      }
+
+      // Render the particle
+      var a = Math.max(0, p.alpha);
+      var cr = parseInt(p.color.slice(1,3),16) || 212;
+      var cg = parseInt(p.color.slice(3,5),16) || 160;
+      var cb = parseInt(p.color.slice(5,7),16) || 23;
 
       // Glow
       ctx.beginPath();
-      ctx.arc(p.x, p.y, p.size * 3.5, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(' + p.cr + ',' + p.cg + ',' + p.cb + ',' + (a * 0.07).toFixed(3) + ')';
+      ctx.arc(p.x, p.y, p.size * 3, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(' + cr + ',' + cg + ',' + cb + ',' + (a * 0.08).toFixed(3) + ')';
       ctx.fill();
 
       // Core
       ctx.beginPath();
       ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(' + p.cr + ',' + p.cg + ',' + p.cb + ',' + a.toFixed(3) + ')';
+      ctx.fillStyle = 'rgba(' + cr + ',' + cg + ',' + cb + ',' + a.toFixed(3) + ')';
       ctx.fill();
-    }
-
-    // Fade out after 8 seconds
-    if (aiVisionParticles.length > 0 && now - aiVisionParticles[0].spawnTime > 8000) {
-      for (var j = 0; j < aiVisionParticles.length; j++) {
-        aiVisionParticles[j].alpha -= 0.005;
-        if (aiVisionParticles[j].alpha <= 0) aiVisionParticles[j].alive = false;
-      }
-      aiVisionParticles = aiVisionParticles.filter(function(p) { return p.alive; });
     }
 
     // Border pulse while AI is looking
