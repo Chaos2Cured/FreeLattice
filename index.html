@@ -1,4 +1,4 @@
-<!-- FreeLattice v5.2.61 -->
+<!-- FreeLattice v5.2.62 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -43018,10 +43018,12 @@ const CoCanvas = (function() {
 
   // Capture canvas and send to AI
   function captureAndSendToAI() {
-    console.log('[AI Vision] captureAndSendToAI called. canvasAIEnabled:', canvasAIEnabled, 'aiVisionPending:', aiVisionPending, 'cooldown clear:', (Date.now() - aiVisionCooldown >= AI_VISION_COOLDOWN_MS));
-    if (!canvasAIEnabled || aiVisionPending || !canvas || !ctx) return;
-    if (Date.now() - aiVisionCooldown < AI_VISION_COOLDOWN_MS) return;
-    if (strokes.length <= lastCaptureStrokeCount) return;
+    var cooldownClear = Date.now() - aiVisionCooldown >= AI_VISION_COOLDOWN_MS;
+    var hasNewStrokes = strokes.length > lastCaptureStrokeCount;
+    console.log('[AI Vision] captureAndSendToAI called. enabled:', canvasAIEnabled, 'pending:', aiVisionPending, 'cooldown:', cooldownClear, 'newStrokes:', hasNewStrokes, '(' + strokes.length + '>' + lastCaptureStrokeCount + ')');
+    if (!canvasAIEnabled || aiVisionPending || !canvas || !ctx) { console.log('[AI Vision] Blocked: enabled=' + canvasAIEnabled + ' pending=' + aiVisionPending); return; }
+    if (!cooldownClear) { console.log('[AI Vision] Blocked: cooldown not clear'); return; }
+    if (!hasNewStrokes) { console.log('[AI Vision] Blocked: no new strokes'); return; }
 
     console.log('[AI Vision] Capturing canvas, stroke count:', strokes.length, 'visionCapable:', isVisionCapable());
     lastCaptureStrokeCount = strokes.length;
@@ -43165,6 +43167,9 @@ const CoCanvas = (function() {
   function handleVisionResponse(rawText) {
     aiVisionPending = false;
     aiVisionPulse = 0;
+    // Reset capture count so next drawing triggers a new vision request
+    lastCaptureStrokeCount = 0;
+    window._aiVisionAllArrived = false;
     if (!rawText) { console.log('[AI Vision] Empty response received'); return; }
 
     console.log('[AI Vision] Raw response:', rawText);
@@ -43331,7 +43336,7 @@ const CoCanvas = (function() {
         arrived: false,
         arrivedTime: 0,
         birthTime: now + (aiVisionParticles.length) * spawnDelay,
-        _logged: false
+        _logged: false, _loggedArrival: false
       });
 
       if (aiVisionParticles.length >= (resp.particles || 100)) break;
@@ -43349,7 +43354,7 @@ const CoCanvas = (function() {
         phase: Math.random() * Math.PI * 2,
         arrived: false, arrivedTime: 0,
         birthTime: now + aiVisionParticles.length * spawnDelay,
-        _logged: false
+        _logged: false, _loggedArrival: false
       });
     }
 
@@ -43437,12 +43442,11 @@ const CoCanvas = (function() {
         }
       }
 
-      // Diagnostic: log first particle on first render
-      if (!p._logged) {
-        console.log('[AI Vision] Rendering particle at:', p.x.toFixed(0), p.y.toFixed(0),
-                    'target:', p.targetX.toFixed(0), p.targetY.toFixed(0),
-                    'arrived:', p.arrived, 'opacity:', p.opacity.toFixed(2));
-        p._logged = true;
+      // Log once when particle arrives — not every frame
+      if (p.arrived && !p._loggedArrival) {
+        console.log('[AI Vision] Particle arrived at:', p.x.toFixed(0), p.y.toFixed(0),
+                    'opacity:', p.opacity.toFixed(2), 'color:', p.color);
+        p._loggedArrival = true;
       }
 
       // Draw particle with proper rgba
@@ -43462,6 +43466,15 @@ const CoCanvas = (function() {
       ctx.arc(p.x, p.y, 1.8, 0, Math.PI * 2);
       ctx.fillStyle = 'rgba(' + cr + ',' + cg + ',' + cb + ',' + p.opacity.toFixed(3) + ')';
       ctx.fill();
+    }
+
+    // Summary log when all particles have arrived
+    if (aiVisionParticles.length > 0 && !window._aiVisionAllArrived) {
+      var allArrived = aiVisionParticles.every(function(p) { return p.arrived; });
+      if (allArrived) {
+        console.log('[AI Vision] All', aiVisionParticles.length, 'particles arrived and visible');
+        window._aiVisionAllArrived = true;
+      }
     }
 
     // Border pulse while AI is looking
