@@ -348,19 +348,17 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-03-24 01:16 UTC
-- Last deployed: 2026-03-24 01:16 UTC
-- Live site: https://freelattice.com
+- Last auto-updated: 2026-03-23 19:50 MDT
 - Version: 5.2
-- Total commits: 312
+- Total commits: 316
 - Last 10 commits:
+- 7ce7694 merge: resolve primer conflict, keep remote updates
+- 1e5fd4a docs: Auto-update Session Primer [5.2]
+- a51af55 feat: Canvas AI Vision — the AI sees, interprets, and chooses how to respond in light
+- b635ac5 ci: Update Primer deployment state [2026-03-24]
 - 3e919fa Merge branch 'main' of https://github.com/Chaos2Cured/FreeLattice
 - 744ad66 docs: Auto-update Session Primer [5.2]
 - 39da796 fix: Canvas — tic-tac-toe explicit opt-in, button alignment, game state cleanup
 - 606f511 ci: Update Primer deployment state [2026-03-24]
 - 68e2e90 docs: Auto-update Session Primer [5.2]
 - 9d5e86e security: Pass 1 — critical fixes: encryption, API key exposure, syntax error, SW references
-- 2b82d22 docs: Auto-update Session Primer [5.2]
-- 2410f6e fix: Canvas co-create button — JS-attached handlers, no inline onclick, guaranteed isolation
-- c6ef243 docs: Auto-update Session Primer [5.2]
-- 34910dd fix: Canvas buttons — z-index 100, stopPropagation, pointer-events guaranteed
