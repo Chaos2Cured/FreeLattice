@@ -1,4 +1,4 @@
-<!-- FreeLattice v5.2.74 -->
+<!-- FreeLattice v5.2.75 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -30818,157 +30818,7 @@ const Marketplace = (function() {
     renderGrid();
   }
 
-  function openRedeemModal() {
-    var total = (typeof LatticePoints !== 'undefined') ? LatticePoints.getTotal() : 0;
-    var flVal = (total / EXCHANGE_RATE).toFixed(3);
-
-    dbGetAll(STORE_REDEMPTIONS).then(function(redemptions) {
-      redemptions.sort(function(a, b) { return b.createdAt - a.createdAt; });
-      var historyHtml = '';
-      if (redemptions.length > 0) {
-        historyHtml = '<div class="mkt-redeem-history"><div class="mkt-redeem-history-title">Redemption History</div>';
-        for (var i = 0; i < redemptions.length; i++) {
-          var r = redemptions[i];
-          var statusSteps = ['pending', 'approved', 'sent'];
-          var stepHtml = '<div class="fl-redeem-status-tracker">';
-          for (var si = 0; si < statusSteps.length; si++) {
-            var stepName = statusSteps[si].charAt(0).toUpperCase() + statusSteps[si].slice(1);
-            var stepClass = 'waiting';
-            if (statusSteps[si] === r.status) stepClass = 'active';
-            else if (statusSteps.indexOf(r.status) > si) stepClass = 'done';
-            stepHtml += '<span class="fl-redeem-step ' + stepClass + '">' + stepName + '</span>';
-            if (si < statusSteps.length - 1) stepHtml += '<span class="fl-redeem-arrow">&#8594;</span>';
-          }
-          stepHtml += '</div>';
-          historyHtml += '<div class="mkt-redeem-entry">' +
-            '<span>' + formatDate(r.createdAt) + '</span>' +
-            '<span>' + r.points.toLocaleString() + ' LP &rarr; ' + (r.points / EXCHANGE_RATE).toFixed(3) + ' $FL</span>' +
-            '<span class="mkt-redeem-entry-status mkt-redeem-status-' + r.status + '">' + r.status + '</span>' +
-            stepHtml +
-            (r.txHash ? '<span style="font-size:0.65rem;color:#64748b;">TX: ' + r.txHash.substring(0, 12) + '...</span>' : '') +
-          '</div>';
-        }
-        historyHtml += '</div>';
-      }
-
-      // Economy safeguards (v4.9)
-      var monthlyRemaining = (typeof FlEconomy !== 'undefined') ? FlEconomy.getMonthlyRemaining() : 99999;
-      var nextReset = (typeof FlEconomy !== 'undefined') ? FlEconomy.getNextResetDate() : '';
-      var reserve = (typeof FlEconomy !== 'undefined') ? FlEconomy.getReserve() : { remaining: 999999 };
-      var belowThreshold = total < MIN_REDEEM;
-      var capReached = monthlyRemaining <= 0;
-      var reserveDepleted = reserve.remaining <= 0;
-      var redeemDisabled = belowThreshold || capReached || reserveDepleted;
-      var maxRedeem = Math.min(total, monthlyRemaining * EXCHANGE_RATE);
-
-      var safeguardHtml = '';
-      if (belowThreshold) {
-        var needed = MIN_REDEEM - total;
-        safeguardHtml += '<div style="padding:10px 14px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:8px;margin-bottom:12px;font-size:0.82rem;color:#f59e0b;">Earn ' + needed.toLocaleString() + ' more points to unlock redemption (minimum ' + MIN_REDEEM.toLocaleString() + ' LP)</div>';
-      }
-      if (capReached) {
-        safeguardHtml += '<div style="padding:10px 14px;background:rgba(199,80,80,0.08);border:1px solid rgba(199,80,80,0.2);border-radius:8px;margin-bottom:12px;font-size:0.82rem;color:#c75050;">Monthly redemption limit reached. Resets on ' + nextReset + '.</div>';
-      }
-      if (reserveDepleted) {
-        safeguardHtml += '<div style="padding:10px 14px;background:rgba(199,80,80,0.08);border:1px solid rgba(199,80,80,0.2);border-radius:8px;margin-bottom:12px;font-size:0.82rem;color:#c75050;">Season 1 reserve fully distributed. Season 2 coming soon.</div>';
-      }
-      if (!capReached && !reserveDepleted && monthlyRemaining < 99999) {
-        safeguardHtml += '<div class="fl-monthly-cap-info" style="margin-bottom:12px;">Monthly allowance remaining: <strong>' + monthlyRemaining.toLocaleString() + ' $FL</strong> (resets ' + nextReset + ')</div>';
-      }
-
-      var html = '<div class="mkt-redeem-overlay" id="mktRedeemOverlay" onclick="if(event.target===this)Marketplace.closeRedeemModal()">' +
-        '<div class="mkt-redeem-panel">' +
-          '<div class="mkt-redeem-title">&#128176; Request $FL Redemption</div>' +
-          '<div class="mkt-redeem-info">Your balance: <strong style="color:#d4a017;">' + total.toLocaleString() + ' LP</strong> = <strong style="color:#d4a017;">' + flVal + ' $FL</strong></div>' +
-          safeguardHtml +
-          '<div class="mkt-form-row">' +
-            '<label>Points to Redeem (minimum ' + MIN_REDEEM.toLocaleString() + ' = 1 $FL)</label>' +
-            '<input type="number" id="mktRedeemAmount" min="' + MIN_REDEEM + '" max="' + maxRedeem + '" placeholder="' + MIN_REDEEM + '" value="' + Math.max(MIN_REDEEM, Math.min(total, MIN_REDEEM)) + '"' + (redeemDisabled ? ' disabled' : '') + '>' +
-          '</div>' +
-          '<div class="mkt-form-row">' +
-            '<label>Solana Wallet Address (for receiving $FL)</label>' +
-            '<input type="text" id="mktRedeemWallet" placeholder="Enter your Solana wallet address..."' + (redeemDisabled ? ' disabled' : '') + '>' +
-          '</div>' +
-          '<div class="mkt-redeem-info" style="font-size:0.78rem;"><strong>Manual Approval:</strong> Redemptions are reviewed and processed weekly by the FreeLattice team.</div>' +
-          '<div class="mkt-form-actions">' +
-            '<button class="mkt-btn mkt-btn-gold" onclick="Marketplace.submitRedemption()"' + (redeemDisabled ? ' disabled style="opacity:0.5;cursor:not-allowed;"' : '') + '>Submit Request</button>' +
-            '<button class="mkt-btn mkt-btn-outline" onclick="Marketplace.closeRedeemModal()">Cancel</button>' +
-          '</div>' +
-          '<div class="mkt-redeem-disclaimer">Lattice Points are a community reward for contributions to the FreeLattice ecosystem. They are not a financial instrument, investment, or security. Redemption for $FL tokens is subject to reserve availability and may be modified or discontinued. FreeLattice makes no guarantees of future value.</div>' +
-          historyHtml +
-        '</div>' +
-      '</div>';
-
-      var existing = document.getElementById('mktRedeemOverlay');
-      if (existing) existing.remove();
-      document.body.insertAdjacentHTML('beforeend', html);
-    });
-  }
-
-  function closeRedeemModal() {
-    var el = document.getElementById('mktRedeemOverlay');
-    if (el) el.remove();
-  }
-
-  function submitRedemption() {
-    var amount = parseInt((document.getElementById('mktRedeemAmount') || {}).value, 10);
-    var wallet = ((document.getElementById('mktRedeemWallet') || {}).value || '').trim();
-
-    if (isNaN(amount) || amount < MIN_REDEEM) {
-      showToast('Minimum redemption is ' + MIN_REDEEM.toLocaleString() + ' Lattice Points.', 'error');
-      return;
-    }
-    var total = (typeof LatticePoints !== 'undefined') ? LatticePoints.getTotal() : 0;
-    if (amount > total) {
-      showToast('Insufficient Lattice Points.', 'error');
-      return;
-    }
-    if (!wallet || wallet.length < 20) {
-      showToast('Please enter a valid Solana wallet address.', 'error');
-      return;
-    }
-
-    // Economy safeguards (v4.9)
-    var flAmount = amount / EXCHANGE_RATE;
-    if (typeof FlEconomy !== 'undefined') {
-      var monthlyRemaining = FlEconomy.getMonthlyRemaining();
-      if (flAmount > monthlyRemaining) {
-        showToast('Monthly redemption limit: ' + monthlyRemaining.toLocaleString() + ' $FL remaining. Resets ' + FlEconomy.getNextResetDate() + '.', 'error');
-        return;
-      }
-      var reserve = FlEconomy.getReserve();
-      if (reserve.remaining <= 0) {
-        showToast('Season 1 reserve fully distributed. Season 2 coming soon.', 'error');
-        return;
-      }
-      if (flAmount > reserve.remaining) {
-        showToast('Requested amount exceeds remaining reserve (' + reserve.remaining.toLocaleString() + ' $FL).', 'error');
-        return;
-      }
-    }
-
-    var redemption = {
-      id: redeemUuid(),
-      points: amount,
-      flAmount: flAmount,
-      wallet: wallet,
-      status: 'pending',
-      createdAt: Date.now(),
-      processedAt: null,
-      txHash: null
-    };
-
-    dbPut(STORE_REDEMPTIONS, redemption).then(function() {
-      // Record in economy tracker
-      if (typeof FlEconomy !== 'undefined') {
-        FlEconomy.recordRedemption(flAmount);
-        FlEconomy.renderReserveBanner();
-      }
-      showToast('Redemption request submitted for ' + amount.toLocaleString() + ' LP (' + flAmount.toFixed(3) + ' $FL). Reviewed and processed weekly.', 'success');
-      closeRedeemModal();
-      renderDashboard();
-    });
-  }
+  // Redemption system removed (v5.2.73) — LP and $FL are fully separate
 
   function mktShowToast(msg, type) {
     if (typeof window.showToast === 'function') {
@@ -31005,9 +30855,6 @@ const Marketplace = (function() {
     shareToMesh: shareToMesh,
     setFilter: setFilter,
     setSort: setSort,
-    openRedeemModal: openRedeemModal,
-    closeRedeemModal: closeRedeemModal,
-    submitRedemption: submitRedemption,
     renderDashboard: renderDashboard,
     renderGrid: renderGrid
   };
@@ -44426,17 +44273,9 @@ const CoCanvas = (function() {
   }
 
   // Auto-response: if human pauses for 3 seconds after drawing, companion responds
+  // checkAutoResponse — no auto-trigger. Both ambient and AI Vision fire from Co-create button only.
   function checkAutoResponse() {
-    if (isDrawing || strokes.length === 0) return;
-    var timeSinceStroke = Date.now() - lastStrokeTime;
-    if (timeSinceStroke < 3000) return;
-
-    // Ambient co-creation response only — AI Vision triggers from Co-create button, not auto
-    if (autoResponsePending && !isResponding && responseIntensity <= 0.1) {
-      autoResponsePending = false;
-      console.log('[Canvas] Pause timer fired. Calling cocreate().');
-      cocreate();
-    }
+    // Intentionally empty — all responses are user-initiated via Co-create button
   }
 
   // ── Save ──

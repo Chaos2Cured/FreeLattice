@@ -348,10 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-03-24 14:33 MDT
+- Last auto-updated: 2026-03-24 15:41 MDT
 - Version: 5.2
-- Total commits: 397
+- Total commits: 399
 - Last 10 commits:
+- b5a0ac4 fix: Canvas — Co-create is only trigger, no auto-response. Redemption modal fully removed.
+- 3e4f959 docs: Auto-update Session Primer [5.2]
 - 5cdc3fa merge: resolve primer
 - af47044 docs: Auto-update Session Primer [5.2]
 - c9d7ef2 feat: Canvas eraser tool + verified existing refinements
@@ -360,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - d7c0853 docs: Auto-update Session Primer [5.2]
 - 8320f7a feat: $FL Economy Restructure — LP and $FL fully separated, burn mechanism, no redemption
 - 9a0960c ci: Update Primer deployment state [2026-03-24]
-- bb5a7d8 docs: Auto-update Session Primer [5.2]
-- 0d3e08c merge: resolve primer
