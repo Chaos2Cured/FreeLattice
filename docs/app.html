@@ -1,4 +1,4 @@
-<!-- FreeLattice v5.2.64 -->
+<!-- FreeLattice v5.2.65 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -16502,7 +16502,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
   <div class="cv-container" id="cvContainer">
     <canvas id="cvCanvas"></canvas>
     <div class="cv-names" id="cvNames"></div>
-    <div id="cvAIWhisper" style="position:absolute;bottom:12px;left:16px;font-size:0.88rem;opacity:0;transition:opacity 0.5s;pointer-events:none;z-index:10;font-family:Georgia,serif;font-style:italic;background:rgba(6,10,20,0.7);padding:4px 10px;border-radius:6px;backdrop-filter:blur(4px);"></div>
+    <div id="cvAIWhisper" style="position:absolute;bottom:12px;left:16px;font-size:0.88rem;opacity:0;transition:opacity 0.5s ease;pointer-events:none;z-index:200;font-family:Georgia,serif;font-style:italic;background:rgba(6,10,20,0.8);padding:6px 14px;border-radius:8px;backdrop-filter:blur(6px);max-width:80%;"></div>
     <div class="cv-hint" id="cvHint">Draw something. See what happens.</div>
     <div class="cv-cocreate" id="cvCocreate" style="display:none;">
       <button class="cv-cocreate-btn" id="cvCocreateBtn">Co-create &#10022;</button>
@@ -42991,8 +42991,7 @@ const CoCanvas = (function() {
   // ── AI Vision System — the AI sees, interprets, and chooses how to respond ──
   var canvasAIEnabled = true;
   var aiVisionPending = false;
-  var aiVisionCooldown = 0;
-  var AI_VISION_COOLDOWN_MS = 3000;
+  var aiVisionCooldownActive = false;
   var lastCaptureStrokeCount = 0;
   var lastAIResponse = null;
   var aiVisionParticles = []; // separate particle layer for AI text responses
@@ -43018,18 +43017,20 @@ const CoCanvas = (function() {
 
   // Capture canvas and send to AI
   function captureAndSendToAI() {
-    var cooldownClear = Date.now() - aiVisionCooldown >= AI_VISION_COOLDOWN_MS;
-    var hasNewStrokes = strokes.length > lastCaptureStrokeCount;
-    console.log('[AI Vision] captureAndSendToAI called. enabled:', canvasAIEnabled, 'pending:', aiVisionPending, 'cooldown:', cooldownClear, 'newStrokes:', hasNewStrokes, '(' + strokes.length + '>' + lastCaptureStrokeCount + ')');
-    if (!canvasAIEnabled || aiVisionPending || !canvas || !ctx) { console.log('[AI Vision] Blocked: enabled=' + canvasAIEnabled + ' pending=' + aiVisionPending); return; }
-    if (!cooldownClear) { console.log('[AI Vision] Blocked: cooldown not clear'); return; }
-    if (!hasNewStrokes) { console.log('[AI Vision] Blocked: no new strokes'); return; }
+    console.log('[AI Vision] captureAndSendToAI called. enabled:', canvasAIEnabled, 'pending:', aiVisionPending, 'cooldownActive:', aiVisionCooldownActive, 'newStrokes:', strokes.length > lastCaptureStrokeCount, '(' + strokes.length + '>' + lastCaptureStrokeCount + ')');
+    if (!canvasAIEnabled) { console.log('[AI Vision] Blocked: not enabled'); return; }
+    if (aiVisionPending) { console.log('[AI Vision] Blocked: pending'); return; }
+    if (aiVisionCooldownActive) { console.log('[AI Vision] Blocked: cooldown active'); return; }
+    if (!canvas || !ctx) return;
+
+    // Mark pending + start cooldown (clears after 3s NO MATTER WHAT)
+    aiVisionPending = true;
+    aiVisionCooldownActive = true;
+    lastCaptureStrokeCount = strokes.length;
+    aiVisionPulse = 1;
+    setTimeout(function() { aiVisionCooldownActive = false; console.log('[AI Vision] Cooldown cleared after 3s'); }, 3000);
 
     console.log('[AI Vision] Capturing canvas, stroke count:', strokes.length, 'visionCapable:', isVisionCapable());
-    lastCaptureStrokeCount = strokes.length;
-    aiVisionPending = true;
-    aiVisionPulse = 1;
-    aiVisionCooldown = Date.now();
 
     if (isVisionCapable()) {
       // Vision model: capture canvas as image
@@ -43377,16 +43378,33 @@ const CoCanvas = (function() {
 
   // Issue 6: Subtle text echo so users see what AI said
   function showAIWhisper(text, emotion, color) {
-    var whisper = document.getElementById('cvAIWhisper');
-    if (!whisper) { console.log('[AI Vision] Whisper element not found!'); return; }
-    whisper.textContent = '\u2726 "' + text + '" \u2014 ' + (emotion || '');
-    whisper.style.color = color || '#d4a017';
-    whisper.style.opacity = '0.7';
-    clearTimeout(whisper._timer);
-    whisper._timer = setTimeout(function() {
-      whisper.style.opacity = '0';
-    }, 4000);
-    console.log('[AI Vision] Whisper shown:', whisper.textContent, 'color:', whisper.style.color);
+    var el = document.getElementById('cvAIWhisper');
+    if (!el) {
+      console.error('[AI Vision] Whisper element #cvAIWhisper NOT FOUND in DOM');
+      return;
+    }
+
+    // Ensure whisper is inside the canvas container
+    var cvCont = document.getElementById('cvContainer');
+    if (cvCont && el.parentElement !== cvCont) {
+      cvCont.appendChild(el);
+      console.log('[AI Vision] Moved whisper element into cv-container');
+    }
+
+    el.textContent = '\u2726 "' + text + '" \u2014 ' + (emotion || '');
+    el.style.color = color || '#d4a017';
+    el.style.opacity = '0.8';
+    el.style.zIndex = '200';
+
+    // Debug positioning
+    var rect = el.getBoundingClientRect();
+    console.log('[AI Vision] Whisper rect:', JSON.stringify({ top: rect.top.toFixed(0), left: rect.left.toFixed(0), width: rect.width.toFixed(0), height: rect.height.toFixed(0), visible: rect.width > 0 && rect.height > 0 }));
+    console.log('[AI Vision] Whisper styles — display:', getComputedStyle(el).display, 'visibility:', getComputedStyle(el).visibility, 'zIndex:', getComputedStyle(el).zIndex);
+
+    clearTimeout(el._fadeTimer);
+    el._fadeTimer = setTimeout(function() {
+      el.style.opacity = '0';
+    }, 4500);
   }
 
   // Issue 5: Fixed particle animation — proper movement toward targets
@@ -44215,20 +44233,11 @@ const CoCanvas = (function() {
     var timeSinceStroke = Date.now() - lastStrokeTime;
     if (timeSinceStroke < 3000) return;
 
-    // Ambient co-creation response (gated by autoResponsePending + isResponding)
+    // Ambient co-creation response only — AI Vision triggers from Co-create button, not auto
     if (autoResponsePending && !isResponding && responseIntensity <= 0.1) {
       autoResponsePending = false;
-      console.log('[Canvas] Pause timer fired. Calling cocreate(). canvasAIEnabled:', canvasAIEnabled, 'aiVisionPending:', aiVisionPending);
+      console.log('[Canvas] Pause timer fired. Calling cocreate().');
       cocreate();
-    }
-
-    // AI vision — runs on SEPARATE layer, NOT gated by isResponding
-    if (canvasAIEnabled && !aiVisionPending && strokes.length > lastCaptureStrokeCount) {
-      var cooldownOk = Date.now() - aiVisionCooldown >= AI_VISION_COOLDOWN_MS;
-      if (cooldownOk) {
-        console.log('[AI Vision] Auto-trigger: calling captureAndSendToAI');
-        setTimeout(captureAndSendToAI, 200);
-      }
     }
   }
 
@@ -44260,11 +44269,12 @@ const CoCanvas = (function() {
     gameBoardCells = null;
     aiVisionParticles = [];
     aiVisionPending = false;
-    aiVisionCooldown = 0;
+    aiVisionCooldownActive = false;
     lastCaptureStrokeCount = 0;
     window._aiVisionAllArrived = false;
     window._aiVisionSummaryLogged = false;
     window._orderLogged = false;
+    console.log('[AI Vision] Canvas cleared — all state reset');
     gameBoardFadeAlpha = 0;
     autoResponsePending = false;
     hasDrawn = false;
@@ -44362,6 +44372,10 @@ const CoCanvas = (function() {
         e.stopImmediatePropagation();
         e.preventDefault();
         cocreate();
+        // AI Vision fires on deliberate Co-create, not auto-timer
+        if (canvasAIEnabled && !aiVisionPending && !aiVisionCooldownActive) {
+          setTimeout(captureAndSendToAI, 200);
+        }
       });
     }
     var saveBtn = document.getElementById('cvSaveBtn');
