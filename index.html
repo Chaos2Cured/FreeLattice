@@ -1,4 +1,4 @@
-<!-- FreeLattice v5.2.56 -->
+<!-- FreeLattice v5.2.57 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13727,15 +13727,6 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
   &#9888; Offline Mode &mdash; Local AI via Ollama available
 </div>
 
-<!-- Ollama Auto-Detect Suggestion (v4.4) -->
-<div class="ollama-suggest-banner" id="ollamaSuggestBanner">
-  <span class="suggest-text">&#127793; <strong>Local AI detected!</strong> Ollama is running on your computer. Would you like to use it for completely private, unlimited AI?</span>
-  <div class="ollama-suggest-actions">
-    <button class="suggest-yes" onclick="owAcceptSuggestion()">Yes, use Ollama</button>
-    <button class="suggest-dismiss" onclick="owDismissSuggestion()">Dismiss</button>
-  </div>
-</div>
-
 <!-- Tab Navigation -->
 <div class="container">
   <nav class="tab-nav" id="flTabNav">
@@ -13763,6 +13754,15 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 <!-- ==================== TAB 1: CHAT ==================== -->
 <div class="tab-panel" id="tab-chat">
 <div class="container">
+
+  <!-- Ollama Auto-Detect Suggestion (v4.4) — inside Chat tab only -->
+  <div class="ollama-suggest-banner" id="ollamaSuggestBanner">
+    <span class="suggest-text">&#127793; <strong>Local AI detected!</strong> Ollama is running on your computer. Would you like to use it for completely private, unlimited AI?</span>
+    <div class="ollama-suggest-actions">
+      <button class="suggest-yes" onclick="owAcceptSuggestion()">Yes, use Ollama</button>
+      <button class="suggest-dismiss" onclick="owDismissSuggestion()">Dismiss</button>
+    </div>
+  </div>
 
   <!-- Configuration Section — collapsed by default, expand via button -->
   <div class="chat-collapse-bar" id="chatCollapseBar">

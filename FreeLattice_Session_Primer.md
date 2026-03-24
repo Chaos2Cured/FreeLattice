@@ -348,10 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-03-23 19:50 MDT
+- Last auto-updated: 2026-03-23 19:57 MDT
 - Version: 5.2
-- Total commits: 316
+- Total commits: 318
 - Last 10 commits:
+- 0c323e9 fix: Ollama suggest banner moved inside Chat tab — no longer overlaps Canvas colors
+- 7f91a35 docs: Auto-update Session Primer [5.2]
 - 7ce7694 merge: resolve primer conflict, keep remote updates
 - 1e5fd4a docs: Auto-update Session Primer [5.2]
 - a51af55 feat: Canvas AI Vision — the AI sees, interprets, and chooses how to respond in light
@@ -360,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 744ad66 docs: Auto-update Session Primer [5.2]
 - 39da796 fix: Canvas — tic-tac-toe explicit opt-in, button alignment, game state cleanup
 - 606f511 ci: Update Primer deployment state [2026-03-24]
-- 68e2e90 docs: Auto-update Session Primer [5.2]
-- 9d5e86e security: Pass 1 — critical fixes: encryption, API key exposure, syntax error, SW references
