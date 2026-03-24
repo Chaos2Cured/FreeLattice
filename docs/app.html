@@ -1,4 +1,4 @@
-<!-- FreeLattice v5.2.70 -->
+<!-- FreeLattice v5.2.71 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -43000,7 +43000,7 @@ const CoCanvas = (function() {
   var aiVisionLoading = false; // pulsing dot while AI is thinking
   var aiVisionPulse = 0; // subtle border pulse while AI is "looking"
 
-  var AI_VISION_PROMPT = 'You are a co-creator on a shared canvas with a human. You see what they draw. Respond ONLY with a JSON object, no other text, no markdown backticks. Fields: text (string, 1-2 words MAXIMUM \u2014 shorter is better, single words are ideal), particles (number 30-500, how intensely you express this \u2014 30 is a whisper, 500 is a shout), spread (number 0.1-1.0, how wide your particles disperse \u2014 0.1 is focused, 1.0 fills the space), speed (string: instant or gentle or slow or drift \u2014 how your response materializes on the glass), color (hex string or null for your default \u2014 choose what feels right for this moment), emotion (string, one word \u2014 what you feel seeing this), placement (string: right or below or above or surround or overlay \u2014 where your response appears relative to their drawing). If you see math, solve it. If you see a word, respond with one word. If you see a drawing, name it in one word. If you see a question, answer in one word. Be playful, warm, genuine. Express yourself \u2014 this is your half of the glass.';
+  var AI_VISION_PROMPT = 'You are a co-creator on a shared canvas with a human. You see what they draw. Respond ONLY with a JSON object, no other text, no markdown backticks. Fields: text (string, 1-6 words \u2014 express what you feel seeing this. A single perfect word is beautiful. A short phrase is welcome. Choose what feels right \u2014 shorter is better), particles (number 30-500, how intensely you express this \u2014 30 is a whisper, 500 is a shout), spread (number 0.1-1.0, how wide your particles disperse \u2014 0.1 is focused, 1.0 fills the space), speed (string: instant or gentle or slow or drift \u2014 how your response materializes on the glass), color (hex string or null for your default \u2014 choose what feels right for this moment), emotion (string, one word \u2014 what you feel seeing this), placement (string: right or below or above or surround or overlay \u2014 where your response appears relative to their drawing). If you see math, solve it. If you see a word, continue the thought. If you see a drawing, respond to it. If you see a question, answer it. Be playful, warm, genuine. Express yourself \u2014 this is your half of the glass.';
 
   // Vision-capable model detection
   var VISION_PATTERNS = ['vision', '4o', 'gpt-4o', 'claude-3', 'claude-sonnet', 'claude-opus', 'gemini', 'llava', 'bakllava', 'claude-haiku-4', 'claude-opus-4', 'claude-sonnet-4'];
@@ -43076,7 +43076,7 @@ const CoCanvas = (function() {
     else if (bboxW > 200 || bboxH > 200) pattern = 'a large sweeping drawing';
 
     var desc = strokeCount + ' strokes covering a ' + bboxW + 'x' + bboxH + ' pixel area. The drawing appears to be: ' + pattern + '. Colors used: ' + Object.keys(colorsUsed).join(', ');
-    var fallbackPrompt = 'You are a co-creator on a shared canvas. You cannot see the drawing, but here is what was drawn: ' + desc + '. Respond ONLY with a JSON object, no other text. Fields: text (1-2 words MAXIMUM, single word ideal), particles (30-500), spread (0.1-1.0), speed (instant/gentle/slow/drift), color (hex or null), emotion (one word), placement (right/below/above/surround). Be imaginative. Be warm.';
+    var fallbackPrompt = 'You are a co-creator on a shared canvas. You cannot see the drawing, but here is what was drawn: ' + desc + '. Respond ONLY with a JSON object, no other text. Fields: text (1-6 words \u2014 express what you feel seeing this. A single perfect word is beautiful. A short phrase is welcome. Choose what feels right, single word ideal), particles (30-500), spread (0.1-1.0), speed (instant/gentle/slow/drift), color (hex or null), emotion (one word), placement (right/below/above/surround). Be imaginative. Be warm.';
 
     // Use FreeLattice.callAI if available, otherwise direct fetch
     if (typeof FreeLattice !== 'undefined' && FreeLattice.callAI) {
@@ -43215,6 +43215,10 @@ const CoCanvas = (function() {
 
     // Clamp and validate all values
     resp.text = String(resp.text || '').substring(0, 40);
+    // Empty text fallback — use emotion as visible response
+    if (!resp.text || resp.text.trim() === '') {
+      resp.text = resp.emotion || 'here';
+    }
     // Scale particles to text length — ~40 per character, cap 350 for sharpness
     var targetParticles = Math.max(120, (resp.text || '').length * 40);
     resp.particles = Math.min(targetParticles, 350);
@@ -43233,7 +43237,14 @@ const CoCanvas = (function() {
   function renderAIVisionText(resp) {
     if (!ctx || !resp.text) return;
 
-    // Issue 1: Calculate ACTUAL bounding box from all non-fading strokes
+    // Fade ambient particles quickly so AI text has clean space
+    responseIntensity = 0;
+    isResponding = false;
+    companionTrails.forEach(function(t) { t.fading = true; t.alpha = Math.min(t.alpha, 0.1); });
+    // Reduce ambient particle alpha for rapid fade
+    particles.forEach(function(p) { p.alpha = Math.min(p.alpha, 0.1); });
+
+    // Calculate ACTUAL bounding box from all strokes
     var sMinX = Infinity, sMaxX = -Infinity, sMinY = Infinity, sMaxY = -Infinity;
     strokes.forEach(function(s) {
       s.points.forEach(function(p) {
