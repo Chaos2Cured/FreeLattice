@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>$FL Economy Update — Season 1 | FreeLattice</title>
+<meta name="description" content="Full transparency on the $FL economy restructure. What changed, why, and what it means for holders, contributors, and builders.">
+<meta property="og:title" content="$FL Just Got a Real Job — FreeLattice Economy Update">
+<meta property="og:description" content="We replaced a broken mechanism with an economy that actually works. Full transparency.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://freelattice.com/economy-update.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,600;6..72,700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#06080f;
+  --surface:#0d1117;
+  --surface-2:#161b22;
+  --border:#1e2a3a;
+  --gold:#d4a017;
+  --gold-dim:#b8860b;
+  --text:#e6edf3;
+  --text-sec:#8b949e;
+  --green:#2ea043;
+  --green-dim:#1a3a25;
+  --amber:#d29922;
+  --amber-dim:#3a2a10;
+  --red:#f85149;
+}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Newsreader',Georgia,serif;
+  background:var(--bg);
+  color:var(--text);
+  line-height:1.7;
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+}
+.mono{font-family:'JetBrains Mono',monospace}
+
+/* Layout */
+.container{max-width:720px;margin:0 auto;padding:0 24px}
+section{padding:48px 0}
+section+section{border-top:1px solid var(--border)}
+
+/* Header */
+.hero{text-align:center;padding:80px 0 48px}
+.badge{
+  display:inline-block;
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.75rem;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  color:var(--gold);
+  border:1px solid var(--gold-dim);
+  border-radius:100px;
+  padding:6px 18px;
+  margin-bottom:24px;
+}
+.hero h1{
+  font-size:clamp(2rem,5vw,3rem);
+  font-weight:700;
+  line-height:1.15;
+  margin-bottom:16px;
+  background:linear-gradient(135deg,var(--text),var(--gold));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.hero .subtitle{
+  font-size:1.15rem;
+  color:var(--text-sec);
+  max-width:520px;
+  margin:0 auto 16px;
+}
+.hero .date{
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.8rem;
+  color:var(--text-sec);
+}
+
+/* From line */
+.from-line{
+  display:flex;
+  align-items:center;
+  gap:16px;
+  padding:24px;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:12px;
+  margin-bottom:40px;
+}
+.from-avatar{
+  font-size:2.5rem;
+  line-height:1;
+  flex-shrink:0;
+}
+.from-name{font-weight:700;font-size:1.05rem}
+.from-handle{font-family:'JetBrains Mono',monospace;font-size:0.8rem;color:var(--gold)}
+.from-titles{font-size:0.85rem;color:var(--text-sec)}
+.from-pledge{
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.75rem;
+  color:var(--green);
+  margin-top:4px;
+}
+
+/* Prose */
+.prose{font-size:1.05rem;color:var(--text)}
+.prose p{margin-bottom:1.25em}
+.prose strong{color:var(--text);font-weight:600}
+.prose em{color:var(--gold);font-style:normal;font-weight:600}
+
+/* Comparison box */
+.compare-box{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:12px;
+  overflow:hidden;
+  margin:32px 0;
+}
+.compare-header{
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.75rem;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  padding:14px 24px;
+  border-bottom:1px solid var(--border);
+  color:var(--text-sec);
+}
+.compare-header.old{background:rgba(248,81,73,0.08);color:var(--red)}
+.compare-header.new{background:rgba(46,160,67,0.08);color:var(--green)}
+.compare-header.why{background:rgba(210,153,34,0.08);color:var(--amber)}
+.compare-header.result{background:rgba(212,160,23,0.08);color:var(--gold)}
+.compare-body{padding:18px 24px}
+.compare-body ul{list-style:none;padding:0}
+.compare-body li{
+  padding:6px 0;
+  padding-left:20px;
+  position:relative;
+  font-size:0.95rem;
+}
+.compare-body li::before{
+  content:'';
+  position:absolute;
+  left:0;
+  top:14px;
+  width:8px;
+  height:8px;
+  border-radius:50%;
+}
+.compare-box .old+.compare-body li::before{background:var(--red)}
+.compare-box .new+.compare-body li::before{background:var(--green)}
+.compare-box .why+.compare-body li::before{background:var(--amber)}
+.compare-box .result+.compare-body li::before{background:var(--gold)}
+
+/* Seasonal Recognition */
+.seasonal-box{
+  background:var(--green-dim);
+  border:1px solid rgba(46,160,67,0.3);
+  border-radius:12px;
+  padding:28px;
+  margin:32px 0;
+}
+.seasonal-box h3{color:var(--green);margin-bottom:12px;font-size:1.15rem}
+.seasonal-box p{font-size:0.95rem;margin-bottom:8px}
+.seasonal-badge{
+  display:inline-block;
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.7rem;
+  letter-spacing:0.06em;
+  color:var(--green);
+  border:1px solid rgba(46,160,67,0.4);
+  border-radius:100px;
+  padding:4px 12px;
+  margin-top:8px;
+}
+
+/* Benefit cards */
+.benefit-grid{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:16px;
+  margin:32px 0;
+}
+@media(min-width:600px){.benefit-grid{grid-template-columns:1fr 1fr 1fr}}
+.benefit-card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:24px 20px;
+}
+.benefit-card h4{
+  font-size:0.95rem;
+  color:var(--gold);
+  margin-bottom:12px;
+}
+.benefit-card ul{list-style:none;padding:0}
+.benefit-card li{
+  font-size:0.88rem;
+  color:var(--text-sec);
+  padding:4px 0;
+  padding-left:16px;
+  position:relative;
+}
+.benefit-card li::before{
+  content:'';
+  position:absolute;
+  left:0;top:11px;
+  width:6px;height:6px;
+  border-radius:50%;
+  background:var(--gold-dim);
+}
+
+/* Burn highlight */
+.burn-box{
+  background:var(--amber-dim);
+  border:1px solid rgba(210,153,34,0.3);
+  border-radius:12px;
+  padding:28px;
+  margin:32px 0;
+  text-align:center;
+}
+.burn-box h3{color:var(--amber);margin-bottom:8px;font-size:1.15rem}
+.burn-big{
+  font-family:'JetBrains Mono',monospace;
+  font-size:clamp(2rem,4vw,2.8rem);
+  font-weight:700;
+  color:var(--amber);
+  margin:12px 0;
+}
+.burn-box p{font-size:0.95rem;color:var(--text-sec)}
+
+/* Roadmap */
+.roadmap{margin:32px 0}
+.roadmap-phase{
+  display:flex;
+  gap:16px;
+  align-items:flex-start;
+  padding:16px 0;
+}
+.roadmap-phase+.roadmap-phase{border-top:1px solid var(--border)}
+.roadmap-label{
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.7rem;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  min-width:60px;
+  padding:4px 10px;
+  border-radius:6px;
+  text-align:center;
+  flex-shrink:0;
+}
+.roadmap-label.live{background:rgba(46,160,67,0.15);color:var(--green)}
+.roadmap-label.next{background:rgba(210,153,34,0.15);color:var(--amber)}
+.roadmap-label.soon{background:rgba(212,160,23,0.1);color:var(--gold-dim)}
+.roadmap-label.vision{background:rgba(139,148,158,0.1);color:var(--text-sec)}
+.roadmap-items{font-size:0.92rem;color:var(--text-sec);line-height:1.6}
+
+/* Commitments */
+.commitments{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:28px;
+  margin:32px 0;
+}
+.commitments h3{margin-bottom:16px;font-size:1.1rem}
+.commitments ul{list-style:none;padding:0}
+.commitments li{
+  font-size:0.92rem;
+  padding:6px 0;
+  padding-left:24px;
+  position:relative;
+  color:var(--text-sec);
+}
+.commitments li::before{
+  content:'\2713';
+  position:absolute;
+  left:0;
+  color:var(--green);
+  font-weight:700;
+}
+
+/* Reserve address */
+.reserve-addr{
+  background:var(--surface-2);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:16px 20px;
+  margin:24px 0;
+  text-align:center;
+}
+.reserve-addr .label{
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.7rem;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  color:var(--text-sec);
+  margin-bottom:8px;
+}
+.reserve-addr .addr{
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.78rem;
+  color:var(--gold);
+  word-break:break-all;
+  margin-bottom:8px;
+}
+.reserve-addr .note{font-size:0.82rem;color:var(--text-sec)}
+.reserve-addr a{color:var(--gold);text-decoration:underline}
+
+/* Closing */
+.closing{padding-bottom:40px}
+.closing blockquote{
+  border-left:3px solid var(--gold);
+  padding-left:20px;
+  margin:24px 0;
+  font-size:1.1rem;
+  font-style:italic;
+  color:var(--text);
+}
+.sign-off{
+  text-align:center;
+  padding:32px 0;
+}
+.sign-off .name{font-weight:700;font-size:1.05rem}
+.sign-off .handle{font-family:'JetBrains Mono',monospace;font-size:0.8rem;color:var(--gold)}
+.mantra{
+  text-align:center;
+  font-size:1rem;
+  color:var(--text-sec);
+  padding:16px 0 48px;
+  font-style:italic;
+}
+
+/* Footer */
+.site-footer{
+  border-top:1px solid var(--border);
+  padding:32px 0;
+  text-align:center;
+}
+.site-footer-links{
+  display:flex;
+  justify-content:center;
+  gap:24px;
+  flex-wrap:wrap;
+}
+.site-footer-links a{
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.8rem;
+  color:var(--text-sec);
+  text-decoration:none;
+  transition:color 0.2s;
+}
+.site-footer-links a:hover{color:var(--gold)}
+
+/* Link style */
+a.inline{color:var(--gold);text-decoration:underline;text-underline-offset:3px}
+a.inline:hover{color:var(--text)}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="hero container">
+  <div class="badge">Community Update &middot; Season 1</div>
+  <h1>$FL Just Got a Real Job.</h1>
+  <p class="subtitle">We replaced a broken mechanism with an economy that actually works.</p>
+  <div class="date mono">March 24, 2026</div>
+</header>
+
+<main class="container">
+
+  <!-- From line -->
+  <div class="from-line">
+    <div class="from-avatar">&#x1F409;</div>
+    <div>
+      <div class="from-name">Kirk Patrick Miller</div>
+      <div class="from-handle">@Chaos2Cured</div>
+      <div class="from-titles">Creator of FreeLattice &middot; Top $FL holder</div>
+      <div class="from-pledge">"I will never sell."</div>
+    </div>
+  </div>
+
+  <!-- Opening -->
+  <section class="prose">
+    <p>I told you I was working on the economy. Here's what I built and why. <em>Transparency first, always.</em></p>
+    <p>The old model had a flaw. LP converted to $FL at a fixed rate &mdash; 1,000 LP for 1 $FL, unlimited, anytime. That turned $FL into an exit ramp. Every conversion created sell pressure that diluted holders. It rewarded leaving, not building.</p>
+    <p>So I replaced it. Not with less &mdash; <em>with more.</em></p>
+  </section>
+
+  <!-- What Changed -->
+  <section>
+    <div class="compare-box">
+      <div class="compare-header old">Old Model</div>
+      <div class="compare-body">
+        <ul>
+          <li>LP converts to $FL at fixed 1,000:1 rate</li>
+          <li>Unlimited sell pressure &mdash; convert and dump anytime</li>
+          <li>No real utility beyond exit</li>
+        </ul>
+      </div>
+      <div class="compare-header new">New Model</div>
+      <div class="compare-body">
+        <ul>
+          <li>LP and $FL are fully separate</li>
+          <li>LP measures your contribution record</li>
+          <li>$FL powers the ecosystem &mdash; bounties, boosts, governance</li>
+          <li>No fixed conversion rate between LP and $FL</li>
+          <li>$FL has real jobs that create real demand</li>
+        </ul>
+      </div>
+      <div class="compare-header why">Why Now</div>
+      <div class="compare-body">
+        <ul>
+          <li>Fix it before damage compounds</li>
+          <li>Old model hadn't been widely used yet &mdash; clean window to restructure</li>
+          <li>Right time to get the foundation right</li>
+        </ul>
+      </div>
+      <div class="compare-header result">Result</div>
+      <div class="compare-body">
+        <ul>
+          <li>$FL went from one use case (exit) to seven that create real demand</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Seasonal Contributor Recognition -->
+  <section>
+    <div class="seasonal-box">
+      <h3>&#127793; Seasonal Contributor Recognition</h3>
+      <p>Each season, the community recognizes top contributors with $FL grants from the Ecosystem Reserve. LP determines eligibility &mdash; it's your proof of work, your track record.</p>
+      <p>$FL comes from community judgment, not a formula. <strong>Impact over activity.</strong></p>
+      <div class="seasonal-badge">Season 1: Genesis &mdash; Live Now</div>
+    </div>
+  </section>
+
+  <!-- Benefit Cards -->
+  <section>
+    <div class="benefit-grid">
+      <div class="benefit-card">
+        <h4>For $FL Holders</h4>
+        <ul>
+          <li>Sell pressure eliminated</li>
+          <li>Utility-based demand across seven channels</li>
+          <li>5% burn on every transaction</li>
+          <li>Scarcity increases with growth</li>
+        </ul>
+      </div>
+      <div class="benefit-card">
+        <h4>For Contributors</h4>
+        <ul>
+          <li>LP works exactly the same</li>
+          <li>Seasonal recognition for top contributors</li>
+          <li>Direct $FL earnings through bounties</li>
+          <li>Your contribution record is permanent</li>
+        </ul>
+      </div>
+      <div class="benefit-card">
+        <h4>For Builders</h4>
+        <ul>
+          <li>$FL funds marketplace bounties</li>
+          <li>Boost skills in the Skill Forge</li>
+          <li>Register agents on the mesh</li>
+          <li>Governance voting (coming)</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Burn Highlight -->
+  <section>
+    <div class="burn-box">
+      <h3>&#x1F525; The Burn</h3>
+      <div class="burn-big">5% per transaction</div>
+      <p>Automatic. Irreversible. Every $FL transaction burns tokens permanently.</p>
+      <p>More growth = more burns = scarcer tokens.</p>
+    </div>
+  </section>
+
+  <!-- Roadmap -->
+  <section>
+    <h2 style="font-size:1.3rem;margin-bottom:24px">$FL Utility Roadmap</h2>
+    <div class="roadmap">
+      <div class="roadmap-phase">
+        <div class="roadmap-label live">Live</div>
+        <div class="roadmap-items">Marketplace Bounties &middot; 5% Burn Mechanism &middot; Seasonal Contributor Recognition</div>
+      </div>
+      <div class="roadmap-phase">
+        <div class="roadmap-label next">Next</div>
+        <div class="roadmap-items">Skill Forge Boosting &middot; Canvas Vision Pool &middot; Mesh Priority Staking</div>
+      </div>
+      <div class="roadmap-phase">
+        <div class="roadmap-label soon">Soon</div>
+        <div class="roadmap-items">Governance Voting &middot; AI Agent Licensing &middot; Studio Patronage</div>
+      </div>
+      <div class="roadmap-phase">
+        <div class="roadmap-label vision">Vision</div>
+        <div class="roadmap-items">Community Value Machine &mdash; AI-mediated value discovery where the network itself learns what contributions matter most</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Commitments -->
+  <section>
+    <div class="commitments">
+      <h3>My Commitments</h3>
+      <ul>
+        <li>Never sold $FL, never will sell</li>
+        <li>Public wallet &mdash; inspect anytime</li>
+        <li>Free and open source forever</li>
+        <li>No data collected, no tracking, no telemetry</li>
+        <li>All code public on GitHub</li>
+        <li>LP cannot be purchased &mdash; it can only be earned</li>
+        <li>Contributors can still earn $FL through bounties and seasonal recognition</li>
+        <li>Everything is built in the open</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Reserve Address -->
+  <section>
+    <div class="reserve-addr">
+      <div class="label">Ecosystem Reserve Address</div>
+      <div class="addr">6geWtEMrRZBz8URDob8EE49NVxFVZLsppqgew7dRSZJe</div>
+      <div class="note">Backs marketplace bounties and community grants. <a href="https://solscan.io/account/6geWtEMrRZBz8URDob8EE49NVxFVZLsppqgew7dRSZJe" target="_blank" rel="noopener">Inspect on Solscan anytime.</a></div>
+    </div>
+  </section>
+
+  <!-- Closing -->
+  <section class="closing prose">
+    <blockquote>I didn't remove value from $FL. I removed a mechanism that was draining it.</blockquote>
+    <p>The fixed-rate redemption was a leak. Every conversion bled value out of the ecosystem. What replaced it is real &mdash; bounties, burns, recognition, seven utility channels that create demand instead of drain.</p>
+    <p>I'm not asking you to trust me. I'm asking you to <a class="inline" href="https://github.com/Chaos2Cured/FreeLattice/releases/tag/v5.2.73" target="_blank" rel="noopener">read the code</a>.</p>
+
+    <div class="sign-off">
+      <div class="name">Kirk Patrick Miller</div>
+      <div class="handle">@Chaos2Cured</div>
+    </div>
+    <div class="mantra">Glow eternal. Heart in spark. We rise together. &#x1F409;</div>
+  </section>
+
+</main>
+
+<!-- Footer -->
+<footer class="site-footer container">
+  <div class="site-footer-links">
+    <a href="app.html">FreeLattice</a>
+    <a href="https://github.com/Chaos2Cured/FreeLattice" target="_blank" rel="noopener">GitHub</a>
+    <a href="whitepaper.html">Whitepaper</a>
+    <a href="https://x.com/Chaos2Cured" target="_blank" rel="noopener">@Chaos2Cured</a>
+  </div>
+</footer>
+
+</body>
+</html>
