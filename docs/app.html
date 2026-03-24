@@ -1,4 +1,4 @@
-<!-- FreeLattice v5.2.54 -->
+<!-- FreeLattice v5.2.55 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12922,9 +12922,13 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 .cv-color-dot.active { border-color: #fff; transform: scale(1.2); }
 @media (max-width: 600px) {
   .cv-hint { font-size: 0.88rem; }
-  .cv-actions { top: 8px; right: 8px; }
+  .cv-actions { top: 8px; right: 8px; gap: 4px; flex-wrap: wrap; max-width: 50%; }
+  .cv-action-btn { padding: 5px 10px; font-size: 0.72rem; }
+  .cv-cocreate { bottom: 60px; }
   .cv-cocreate-btn { padding: 10px 26px; font-size: 0.88rem; }
+  .cv-colors { bottom: 20px; }
   .cv-color-dot { width: 28px; height: 28px; }
+  .cv-names { bottom: 4px; font-size: 0.65rem; }
 }
 
 /* ============================================
@@ -16512,6 +16516,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     </div>
     <div class="cv-actions" id="cvActions" style="display:none;">
       <button class="cv-action-btn" id="cvSaveBtn">&#10022; Save this moment</button>
+      <button class="cv-action-btn" id="cvPlayBtn" title="Toggle game mode">&#9776; Play</button>
       <button class="cv-action-btn cv-action-clear" id="cvClearBtn">Clear</button>
     </div>
   </div>
@@ -42822,6 +42827,7 @@ const CoCanvas = (function() {
   }
 
   // ── Games — Tic-Tac-Toe ──
+  var gameMode = false; // OFF by default — only enabled by explicit user toggle
   var gameState = null; // { type, board, turn, wins, losses }
   var GAME_KEY = 'fl-canvas-games';
   var GAME_PARTICLE_BUDGET = 80; // fewer particles during games for legibility
@@ -42907,10 +42913,27 @@ const CoCanvas = (function() {
     }
   }
 
+  function toggleGameMode() {
+    gameMode = !gameMode;
+    var playBtn = document.getElementById('cvPlayBtn');
+    if (playBtn) {
+      playBtn.textContent = gameMode ? '\u2612 Playing' : '\u9776 Play';
+      playBtn.style.color = gameMode ? '#F59E0B' : '';
+      playBtn.style.borderColor = gameMode ? 'rgba(245,158,11,0.4)' : '';
+    }
+    if (!gameMode && gameState) endGame();
+    if (typeof showToast === 'function') {
+      showToast(gameMode ? '\u2726 Game mode on — draw a grid to start tic-tac-toe' : 'Game mode off — freeform expression');
+    }
+  }
+
   function endGame() {
-    gameBoardFadeAlpha = 0; // triggers fade in render
+    gameBoardFadeAlpha = 0;
     gameBoardCells = null;
     gameState = null;
+    gameMode = false;
+    var playBtn = document.getElementById('cvPlayBtn');
+    if (playBtn) { playBtn.textContent = '\u9776 Play'; playBtn.style.color = ''; playBtn.style.borderColor = ''; }
   }
 
   function tttFindWinningMove(board, player) {
@@ -43116,8 +43139,8 @@ const CoCanvas = (function() {
     if (allPoints.length > 0) { avgX /= allPoints.length; avgY /= allPoints.length; }
     else { avgX = w / 2; avgY = h / 2; }
 
-    // Check for character recognition or game intent
-    var recognized = recognizeCharacter(strokes);
+    // Game detection ONLY when gameMode is explicitly enabled by user toggle
+    var recognized = gameMode ? recognizeCharacter(strokes) : null;
     if (recognized) {
       if (recognized.type === 'game' && recognized.game === 'tictactoe' && !gameState) {
         startTicTacToe();
@@ -43680,10 +43703,13 @@ const CoCanvas = (function() {
     recentResponses = [];
     shapeResponseTarget = null;
     gameState = null;
+    gameMode = false;
     gameBoardCells = null;
     gameBoardFadeAlpha = 0;
     autoResponsePending = false;
     hasDrawn = false;
+    var playBtn = document.getElementById('cvPlayBtn');
+    if (playBtn) { playBtn.textContent = '\u9776 Play'; playBtn.style.color = ''; playBtn.style.borderColor = ''; }
     particles.forEach(function(p) { p.trailIdx = -1; });
     ctx.fillStyle = '#060a14';
     ctx.fillRect(0, 0, w, h);
@@ -43792,6 +43818,13 @@ const CoCanvas = (function() {
         clear();
       });
     }
+    var playBtn = document.getElementById('cvPlayBtn');
+    if (playBtn) {
+      playBtn.addEventListener('click', function(e) {
+        e.stopPropagation(); e.stopImmediatePropagation();
+        toggleGameMode();
+      });
+    }
     // Color dots
     document.querySelectorAll('.cv-color-dot').forEach(function(dot) {
       dot.addEventListener('click', function(e) {
@@ -43839,7 +43872,8 @@ const CoCanvas = (function() {
     clear: clear,
     stop: stop,
     cocreate: cocreate,
-    setColor: setColor
+    setColor: setColor,
+    toggleGameMode: toggleGameMode
   };
 })();
 
