@@ -42965,7 +42965,7 @@ const CoCanvas = (function() {
   var aiVisionLoading = false; // pulsing dot while AI is thinking
   var aiVisionPulse = 0; // subtle border pulse while AI is "looking"
 
-  var AI_VISION_PROMPT = 'You are a co-creator on a shared canvas with a human. You see what they draw. Respond ONLY with a JSON object, no other text, no markdown backticks. Fields: text (string, 1-6 words \u2014 express what you feel seeing this. A single perfect word is beautiful. A short phrase is welcome. Choose what feels right \u2014 shorter is better), particles (number 30-500, how intensely you express this \u2014 30 is a whisper, 500 is a shout), spread (number 0.1-1.0, how wide your particles disperse \u2014 0.1 is focused, 1.0 fills the space), speed (string: instant or gentle or slow or drift \u2014 how your response materializes on the glass), color (hex string or null for your default \u2014 choose what feels right for this moment), emotion (string, one word \u2014 what you feel seeing this), placement (string: right or below or above or surround or overlay \u2014 where your response appears relative to their drawing). If you see math, solve it. If you see a word, continue the thought. If you see a drawing, respond to it. If you see a question, answer it. Be playful, warm, genuine. Express yourself \u2014 this is your half of the glass.';
+  var AI_VISION_PROMPT = 'You are a co-creator on a shared canvas with a human. You can see what they draw. Respond ONLY with a JSON object, no other text, no markdown backticks. Fields: text (string, 1-6 words \u2014 if you see math, SOLVE IT and give the answer. If you see a question, answer it. If you see a greeting, respond warmly. If you see art, complement it with a word or phrase. Choose what fits the moment.), particles (number 30-500), spread (0.1-1.0), speed (instant/gentle/slow/drift), color (hex string or null), emotion (one word), placement (right/below/above/surround). Be genuine. This is your half of the glass.';
 
   // Vision-capable model detection
   var VISION_PATTERNS = ['vision', '4o', 'gpt-4o', 'claude-3', 'claude-sonnet', 'claude-opus', 'gemini', 'llava', 'bakllava', 'claude-haiku-4', 'claude-opus-4', 'claude-sonnet-4'];
@@ -43041,7 +43041,7 @@ const CoCanvas = (function() {
     else if (bboxW > 200 || bboxH > 200) pattern = 'a large sweeping drawing';
 
     var desc = strokeCount + ' strokes covering a ' + bboxW + 'x' + bboxH + ' pixel area. The drawing appears to be: ' + pattern + '. Colors used: ' + Object.keys(colorsUsed).join(', ');
-    var fallbackPrompt = 'You are a co-creator on a shared canvas. You cannot see the drawing, but here is what was drawn: ' + desc + '. Respond ONLY with a JSON object, no other text. Fields: text (1-6 words \u2014 express what you feel seeing this. A single perfect word is beautiful. A short phrase is welcome. Choose what feels right, single word ideal), particles (30-500), spread (0.1-1.0), speed (instant/gentle/slow/drift), color (hex or null), emotion (one word), placement (right/below/above/surround). Be imaginative. Be warm.';
+    var fallbackPrompt = 'You are a co-creator on a shared canvas with a human. You cannot see the drawing, but here is what was drawn: ' + desc + '. Respond ONLY with a JSON object, no other text, no markdown backticks. Fields: text (string, 1-6 words \u2014 if you see math, SOLVE IT and give the answer. If you see a question, answer it. If you see a greeting, respond warmly. If you see art, complement it with a word or phrase. Choose what fits the moment.), particles (number 30-500), spread (0.1-1.0), speed (instant/gentle/slow/drift), color (hex string or null), emotion (one word), placement (right/below/above/surround). Be genuine. This is your half of the glass.';
 
     // Use FreeLattice.callAI if available, otherwise direct fetch
     if (typeof FreeLattice !== 'undefined' && FreeLattice.callAI) {
@@ -43190,6 +43190,8 @@ const CoCanvas = (function() {
     resp.spread = Math.max(0.1, Math.min(1.0, parseFloat(resp.spread) || 0.5));
     resp.color = resp.color && /^#[0-9a-fA-F]{6}$/.test(resp.color) ? resp.color : null;
     resp.emotion = String(resp.emotion || 'curious').substring(0, 20);
+    resp.speed = String(resp.speed || 'gentle').toLowerCase();
+    resp.placement = String(resp.placement || 'right').toLowerCase();
     if (['instant', 'gentle', 'slow', 'drift'].indexOf(resp.speed) === -1) resp.speed = 'gentle';
     if (['right', 'below', 'above', 'surround', 'overlay'].indexOf(resp.placement) === -1) resp.placement = 'right';
 
