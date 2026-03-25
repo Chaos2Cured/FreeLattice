@@ -348,10 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-03-24 16:26 MDT
+- Last auto-updated: 2026-03-24 20:31 MDT
 - Version: 5.2
-- Total commits: 406
+- Total commits: 408
 - Last 10 commits:
+- 7ad87f1 feat: vision models in Ollama recs, Mistral models, Canvas vision mode indicator + dev logs
+- 5901cd0 docs: Auto-update Session Primer [5.2]
 - 8fd674a Merge branch 'main' of https://github.com/Chaos2Cured/FreeLattice
 - 543e7a6 docs: Auto-update Session Primer [5.2]
 - 5898833 docs: $FL Economy Update — full transparency for the community. Season 1.
@@ -360,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 63578ca docs: Auto-update Session Primer [5.2]
 - b5a0ac4 fix: Canvas — Co-create is only trigger, no auto-response. Redemption modal fully removed.
 - 7b113e2 ci: Update Primer deployment state [2026-03-24]
-- 3e4f959 docs: Auto-update Session Primer [5.2]
-- 5cdc3fa merge: resolve primer
