@@ -348,10 +348,15 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-03-25 12:59 MDT
+- Last auto-updated: 2026-03-25 22:13 UTC
+- Last deployed: 2026-03-25 22:13 UTC
+- Live site: https://freelattice.com
 - Version: 5.2
-- Total commits: 415
+- Total commits: 418
 - Last 10 commits:
+- b6fa290 fix: Canvas AI Vision — dynamic Gemini model, key-in-URL auth, gpt-4-turbo support
+- ea86f3a ci: Update Primer deployment state [2026-03-25]
+- eebb482 docs: Auto-update Session Primer [5.2]
 - bf9e3d3 Merge branch 'main' of https://github.com/Chaos2Cured/FreeLattice
 - a78699f docs: Auto-update Session Primer [5.2]
 - f47dc4c feat: Canvas AI Vision — cleaner prompt, case-insensitive validation
@@ -359,6 +364,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 220da60 Merge branch 'main' of https://github.com/Chaos2Cured/FreeLattice
 - a47a640 docs: Auto-update Session Primer [5.2]
 - 7ad87f1 feat: vision models in Ollama recs, Mistral models, Canvas vision mode indicator + dev logs
-- 915608a ci: Update Primer deployment state [2026-03-24]
-- 5901cd0 docs: Auto-update Session Primer [5.2]
-- 8fd674a Merge branch 'main' of https://github.com/Chaos2Cured/FreeLattice

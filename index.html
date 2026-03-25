@@ -42968,7 +42968,7 @@ const CoCanvas = (function() {
   var AI_VISION_PROMPT = 'You are a co-creator on a shared canvas with a human. You can see what they draw. Respond ONLY with a JSON object, no other text, no markdown backticks. Fields: text (string, 1-6 words \u2014 if you see math, SOLVE IT and give the answer. If you see a question, answer it. If you see a greeting, respond warmly. If you see art, complement it with a word or phrase. Choose what fits the moment.), particles (number 30-500), spread (0.1-1.0), speed (instant/gentle/slow/drift), color (hex string or null), emotion (one word), placement (right/below/above/surround). Be genuine. This is your half of the glass.';
 
   // Vision-capable model detection
-  var VISION_PATTERNS = ['vision', '4o', 'gpt-4o', 'claude-3', 'claude-sonnet', 'claude-opus', 'gemini', 'llava', 'bakllava', 'claude-haiku-4', 'claude-opus-4', 'claude-sonnet-4'];
+  var VISION_PATTERNS = ['vision', '4o', 'gpt-4o', 'gpt-4-turbo', 'claude-3', 'claude-sonnet', 'claude-opus', 'gemini', 'llava', 'bakllava', 'claude-haiku-4', 'claude-opus-4', 'claude-sonnet-4'];
 
   function isVisionCapable() {
     if (typeof state === 'undefined') return false;
@@ -43099,13 +43099,13 @@ const CoCanvas = (function() {
       }
 
       if (state.provider === 'google') {
-        var gUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
+        var geminiModel = (prov.models ? (prov.models[state.model] || state.model) : state.model) || 'gemini-2.0-flash';
+        var gUrl = 'https://generativelanguage.googleapis.com/v1beta/models/' + geminiModel + ':generateContent?key=' + state.apiKey;
         fetch(gUrl, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'x-goog-api-key': state.apiKey },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            systemInstruction: { parts: [{ text: AI_VISION_PROMPT }] },
-            contents: [{ parts: [{ inlineData: { mimeType: 'image/png', data: base64 } }, { text: 'What do you see? Respond with JSON only.' }] }]
+            contents: [{ parts: [{ inlineData: { mimeType: 'image/png', data: base64 } }, { text: AI_VISION_PROMPT }] }]
           })
         }).then(function(r) { return r.json(); })
         .then(function(d) { try { handleVisionResponse(d.candidates[0].content.parts[0].text); } catch(e) { aiVisionPending = false; aiVisionLoading = false; hideLoadingDot(); aiVisionPulse = 0; } })
