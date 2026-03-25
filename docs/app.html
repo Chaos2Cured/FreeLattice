@@ -13897,6 +13897,28 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
           <div class="ow-step-body">
             <div class="ow-step-label">Get a Model</div>
             <div class="ow-step-desc">Pick a model and copy the command below. Open Terminal (Mac: Cmd+Space, type "Terminal") and paste it. The model downloads automatically.</div>
+            <div style="margin-bottom:6px; font-size:0.78rem; color:#d4a017; font-weight:600;">&#128302; Vision Models &mdash; these can SEE your Canvas drawings</div>
+            <div class="ow-model-pills">
+              <div class="ow-model-pill" onclick="owCopyPull('ollama pull llava')">
+                <span class="pill-name">llava</span>
+                <span class="pill-size">7B</span>
+                <span>Vision &mdash; sees images and drawings</span>
+                <span class="pill-copy">&#128203;</span>
+              </div>
+              <div class="ow-model-pill" onclick="owCopyPull('ollama pull llava-llama3')">
+                <span class="pill-name">llava-llama3</span>
+                <span class="pill-size">8B</span>
+                <span>Better vision + reasoning</span>
+                <span class="pill-copy">&#128203;</span>
+              </div>
+              <div class="ow-model-pill" onclick="owCopyPull('ollama pull moondream')">
+                <span class="pill-name">moondream</span>
+                <span class="pill-size">1.8B</span>
+                <span>Tiny &amp; fast vision</span>
+                <span class="pill-copy">&#128203;</span>
+              </div>
+            </div>
+            <div style="margin-top:10px; margin-bottom:6px; font-size:0.78rem; color:var(--text-secondary); font-weight:600;">&mdash;&mdash; Text Models &mdash;&mdash;</div>
             <div class="ow-model-pills" id="owModelPills">
               <div class="ow-model-pill" onclick="owCopyPull('ollama pull llama3.2')">
                 <span class="pill-name">llama3.2</span>
@@ -13913,7 +13935,13 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
               <div class="ow-model-pill" onclick="owCopyPull('ollama pull mistral')">
                 <span class="pill-name">mistral</span>
                 <span class="pill-size">7B</span>
-                <span>Great for coding</span>
+                <span>Fast, great for coding</span>
+                <span class="pill-copy">&#128203;</span>
+              </div>
+              <div class="ow-model-pill" onclick="owCopyPull('ollama pull mistral-nemo')">
+                <span class="pill-name">mistral-nemo</span>
+                <span class="pill-size">12B</span>
+                <span>Stronger reasoning</span>
                 <span class="pill-copy">&#128203;</span>
               </div>
               <div class="ow-model-pill" onclick="owCopyPull('ollama pull phi3')">
@@ -16522,7 +16550,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="cv-color-dot" id="cvEraserBtn" style="background:#060a14;border-color:rgba(148,163,184,0.4);" title="Eraser">&#x2715;</button>
     </div>
     <div class="cv-actions" id="cvActions" style="display:none;">
-      <button class="cv-action-btn" id="cvVisionBtn" title="AI Vision — let the AI see and respond to your drawings" style="color:#F59E0B;">&#128065;</button>
+      <button class="cv-action-btn" id="cvVisionBtn" title="AI Vision — let the AI see and respond to your drawings" style="color:#F59E0B;">&#128065;</button><span id="cvVisionModeLabel" style="font-size:0.65rem;font-family:var(--font-mono);margin-left:2px;vertical-align:middle;color:#F59E0B;">Vision</span>
       <button class="cv-action-btn" id="cvSaveBtn">&#10022; Save this moment</button>
       <button class="cv-action-btn" id="cvPlayBtn" title="Toggle game mode">&#9776; Play</button>
       <button class="cv-action-btn cv-action-clear" id="cvClearBtn">Clear</button>
@@ -43166,6 +43194,12 @@ const CoCanvas = (function() {
     if (['right', 'below', 'above', 'surround', 'overlay'].indexOf(resp.placement) === -1) resp.placement = 'right';
 
     console.log('[AI Vision] Final validated response:', JSON.stringify(resp));
+    console.log('[AI Vision] === RESPONSE SUMMARY ===');
+    console.log('[AI Vision] Mode:', isVisionCapable() ? 'FULL VISION (AI sees the canvas)' : 'TEXT FALLBACK (AI guessing from strokes)');
+    console.log('[AI Vision] AI responded:', resp.text);
+    console.log('[AI Vision] Emotion:', resp.emotion);
+    console.log('[AI Vision] Visual choices — particles:', resp.particles, 'spread:', resp.spread, 'speed:', resp.speed, 'color:', resp.color, 'placement:', resp.placement);
+    console.log('[AI Vision] ======================');
 
     lastAIResponse = resp;
     renderAIVisionText(resp);
@@ -43535,9 +43569,15 @@ const CoCanvas = (function() {
   function toggleAIVision() {
     canvasAIEnabled = !canvasAIEnabled;
     var btn = document.getElementById('cvVisionBtn');
+    var modeLabel = document.getElementById('cvVisionModeLabel');
     if (btn) {
-      btn.style.color = canvasAIEnabled ? '#F59E0B' : '#64748b';
-      btn.title = canvasAIEnabled ? 'AI Vision on — the AI sees your drawings' : 'AI Vision off';
+      var vision = canvasAIEnabled && isVisionCapable();
+      btn.style.color = canvasAIEnabled ? (vision ? '#F59E0B' : '#64748b') : '#475569';
+      btn.title = canvasAIEnabled ? (vision ? 'AI Vision active — the AI can see your drawings' : 'AI Vision limited — using text fallback') : 'AI Vision off';
+      if (modeLabel) {
+        modeLabel.textContent = canvasAIEnabled ? (vision ? 'Vision' : 'Text') : 'Off';
+        modeLabel.style.color = canvasAIEnabled ? (vision ? '#d4a017' : '#64748b') : '#475569';
+      }
     }
     if (typeof showToast === 'function') {
       showToast(canvasAIEnabled ? '\uD83D\uDC41 AI Vision on' : 'AI Vision off');
@@ -44448,16 +44488,20 @@ const CoCanvas = (function() {
         toggleAIVision();
       });
       // Show vision state based on model capability
+      var modeLabel = document.getElementById('cvVisionModeLabel');
       if (typeof state !== 'undefined' && !state.apiKey && !state.isLocal) {
         visionBtn.style.color = '#475569';
         visionBtn.style.textDecoration = 'line-through';
         visionBtn.title = 'Connect an AI provider in Settings to enable canvas responses';
+        if (modeLabel) { modeLabel.textContent = 'Off'; modeLabel.style.color = '#475569'; }
       } else if (!isVisionCapable()) {
         visionBtn.style.color = '#64748b';
         visionBtn.title = 'AI Vision limited \u2014 switch to llava, GPT-4o, or Claude for full vision. Using text fallback.';
+        if (modeLabel) { modeLabel.textContent = 'Text'; modeLabel.style.color = '#64748b'; }
       } else {
         visionBtn.style.color = '#F59E0B';
         visionBtn.title = 'AI Vision active \u2014 the AI can see your drawings';
+        if (modeLabel) { modeLabel.textContent = 'Vision'; modeLabel.style.color = '#d4a017'; }
       }
     }
     // Color dots + eraser
