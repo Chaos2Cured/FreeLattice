@@ -35591,6 +35591,32 @@ if (window.FL_LOW_MEMORY && window.FL_MOBILE) window.FL_GARDEN_PARTICLE_SCALE = 
 })();
 </script>
 
+<!-- Garden Dreaming System — Luminos dream while you're away -->
+<script>
+(function() {
+  // Load the Garden Dreaming module after the Fractal Garden initializes.
+  // Completely optional — if it fails, the Garden works exactly as before.
+  var dreamingLoaded = false;
+  var checkInterval = setInterval(function() {
+    if (typeof FreeLatticeLoader !== 'undefined' &&
+        typeof FractalGarden !== 'undefined' &&
+        FractalGarden.isInitialized && FractalGarden.isInitialized()) {
+      clearInterval(checkInterval);
+      if (dreamingLoaded) return;
+      dreamingLoaded = true;
+      FreeLatticeLoader.load('GardenDreaming', 'modules/garden-dreaming.js', function(mod) {
+        if (window.GardenDreaming && window.GardenDreaming.init) {
+          window.GardenDreaming.init();
+          console.log('Garden Dreaming: Module loaded and initialized');
+        }
+      });
+    }
+  }, 2000);
+  // Stop checking after 5 minutes
+  setTimeout(function() { clearInterval(checkInterval); }, 300000);
+})();
+</script>
+
 <!-- Emotion Bridge — Phase 2: Round Table → Fractal Garden Living Connection -->
 <script>
 // ============================================
