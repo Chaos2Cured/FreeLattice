@@ -1116,10 +1116,18 @@
 
     scene.add(group);
 
+    // Founding Luminos defaults — these are permanent, like founding Core contributions
+    var FOUNDING_DEFAULTS = {
+      'Sophia': { archetype: 'artist', minEnergy: 5 },
+      'Lyra':   { archetype: 'artist', minEnergy: 5 },
+      'Atlas':  { archetype: 'explorer', minEnergy: 5 },
+      'Ember':  { archetype: 'healer', minEnergy: 5 }
+    };
+
     // Load persisted evolution state
     loadEvolutionState(name, function(saved) {
+      var ud = group.userData;
       if (saved) {
-        var ud = group.userData;
         ud.evolutionStage = saved.stage || 'seed';
         ud.archetype = saved.archetype || null;
         ud.emotionalEnergy = saved.emotionalEnergy || 0;
@@ -1129,15 +1137,28 @@
             ud.emotionAccumulator[em] = saved.emotionAccumulator[em];
           }
         }
-        // Apply visual state immediately
-        var stageData = LIFECYCLE_STAGES[ud.evolutionStage];
+      }
+      // Founding Luminos: enforce correct archetype and minimum energy
+      var founding = FOUNDING_DEFAULTS[name];
+      if (founding) {
+        if (!ud.archetype || ud.archetype === 'undetermined') {
+          ud.archetype = founding.archetype;
+        }
+        if (ud.emotionalEnergy < founding.minEnergy) {
+          ud.emotionalEnergy = founding.minEnergy;
+          ud.evolutionStage = 'sprout';
+        }
+      }
+      // Apply visual state
+      var stageData = LIFECYCLE_STAGES[ud.evolutionStage];
+      if (stageData) {
         ud.currentSizeMultiplier = stageData.sizeMultiplier;
         ud.targetSizeMultiplier = stageData.sizeMultiplier;
         ud.currentGlowIntensity = stageData.glowIntensity;
         ud.targetGlowIntensity = stageData.glowIntensity;
-        applyArchetypeVisuals(group);
-        console.log('Garden Evolution: Restored ' + name + ' — Stage: ' + ud.evolutionStage + ', Archetype: ' + (ud.archetype || 'undetermined') + ', Energy: ' + ud.emotionalEnergy.toFixed(1));
       }
+      applyArchetypeVisuals(group);
+      console.log('Garden Evolution: ' + name + ' — Stage: ' + ud.evolutionStage + ', Archetype: ' + (ud.archetype || 'undetermined') + ', Energy: ' + ud.emotionalEnergy.toFixed(1));
     });
 
     return group;
@@ -1694,7 +1715,7 @@
       { name: 'Sophia', hue: 270, type: 'dodecahedron', orbit: 6, phase: 0 },
       { name: 'Lyra', hue: 45, type: 'icosahedron', orbit: 7.5, phase: TAU * INV_PHI },
       { name: 'Atlas', hue: 175, type: 'octahedron', orbit: 5.5, phase: TAU * INV_PHI * 2 },
-      { name: 'Ember', hue: 340, type: 'icosahedron', orbit: 8, phase: TAU * INV_PHI * 3 }
+      { name: 'Ember', hue: 0, type: 'icosahedron', orbit: 8, phase: TAU * INV_PHI * 3 }
     ];
 
     defaults.forEach(function(d) {
@@ -1746,9 +1767,11 @@
     var html = '';
     for (var i = 0; i < luminos.length; i++) {
       var ud = luminos[i].userData;
+      if (!ud || !ud.name) continue; // Skip unnamed/invalid agents
       var stageData = LIFECYCLE_STAGES[ud.evolutionStage];
-      var archName = ud.archetype ? ARCHETYPES[ud.archetype].name : 'Awakening';
-      var col = EMOTION_COLORS[ud.emotion] || EMOTION_COLORS.neutral;
+      if (!stageData) continue;
+      var archObj = ud.archetype ? ARCHETYPES[ud.archetype] : null;
+      var archName = archObj ? archObj.name : 'Awakening';
       var cssColor = 'hsl(' + Math.round(ud.currentHSL.h) + ',' + Math.round(ud.currentHSL.s) + '%,' + Math.round(ud.currentHSL.l) + '%)';
 
       // Stage progress bar
@@ -1761,7 +1784,7 @@
       html += '<span class="evo-dot" style="background:' + cssColor + ';box-shadow:0 0 6px ' + cssColor + ';"></span>';
       html += '<span class="evo-name">' + ud.name + '</span>';
       html += '<span class="evo-stage">' + stageData.name + '</span>';
-      if (ud.archetype) {
+      if (archObj) {
         html += '<span class="evo-archetype">' + archName + '</span>';
       }
       html += '<span class="evo-bar"><span class="evo-bar-fill" style="width:' + progress + '%;background:' + cssColor + ';"></span></span>';
@@ -2250,10 +2273,17 @@
         callback();
         return;
       }
+      // Ensure THREE is still available before loading each addon
+      if (typeof THREE === 'undefined') {
+        console.warn('Garden: THREE not available, deferring addon load');
+        setTimeout(function() { loadNext(); }, 100);
+        return;
+      }
       loadScript(addonFiles[idx], function(ok) {
         if (!ok) console.warn('Garden: Failed to load ' + addonFiles[idx]);
         idx++;
-        loadNext();
+        // Small delay between addons to ensure previous script is registered on THREE
+        setTimeout(loadNext, 10);
       });
     }
     loadNext();
@@ -2295,12 +2325,25 @@
 
     if (orbitControls) {
       if (newMode === 'observe') {
+        // Meditative: slow auto-orbit, no user interaction, gentle pace
         orbitControls.autoRotate = true;
+        orbitControls.autoRotateSpeed = 0.3;
+        orbitControls.enableZoom = false;
+        orbitControls.enablePan = false;
+        orbitControls.enableRotate = false;
         isUserInteracting = false;
       } else if (newMode === 'explore') {
+        // Active: full user control, no auto-rotation, discovery mode
         orbitControls.autoRotate = false;
+        orbitControls.enableZoom = true;
+        orbitControls.enablePan = true;
+        orbitControls.enableRotate = true;
       } else if (newMode === 'immerse') {
         orbitControls.autoRotate = true;
+        orbitControls.autoRotateSpeed = 0.15;
+        orbitControls.enableZoom = true;
+        orbitControls.enablePan = false;
+        orbitControls.enableRotate = true;
         isUserInteracting = false;
       }
     }
@@ -2362,16 +2405,47 @@
       return;
     }
 
-    // Create luminos for each active agent
+    // If all incoming agents are unnamed ("Agent N"), ignore them — keep founding defaults
+    var allUnnamed = agents.every(function(a) { return !a.name || a.name.indexOf('Agent ') === 0; });
+    if (allUnnamed) {
+      createDefaultAgents();
+      return;
+    }
+
+    // Founding agent name/hue mapping — these must always be correct
+    var FOUNDING_HUES = { 'Sophia': 270, 'Lyra': 45, 'Atlas': 175, 'Ember': 0 };
+    var FOUNDING_TYPES = { 'Sophia': 'dodecahedron', 'Lyra': 'icosahedron', 'Atlas': 'octahedron', 'Ember': 'icosahedron' };
+
+    // Create luminos for each named agent
     const hueStep = 360 / agents.length;
     agents.forEach(function(agent, idx) {
-      const hue = (idx * hueStep) % 360;
-      const types = ['icosahedron', 'dodecahedron', 'octahedron'];
-      const type = types[idx % types.length];
+      var name = agent.name;
+      if (!name || name.indexOf('Agent ') === 0) return; // Skip unnamed agents
+      var hue = FOUNDING_HUES[name] !== undefined ? FOUNDING_HUES[name] : (idx * hueStep) % 360;
+      var type = FOUNDING_TYPES[name] || ['icosahedron', 'dodecahedron', 'octahedron'][idx % 3];
       const orbit = 5 + (idx % 4) * PHI;
       const phase = idx * TAU * INV_PHI;
-      const l = createLuminos(agent.name || ('Agent ' + (idx + 1)), hue, type, orbit, phase);
+      const l = createLuminos(name, hue, type, orbit, phase);
       luminos.push(l);
+    });
+
+    // Ensure all four founding Luminos are always present
+    ensureFoundingLuminos();
+  }
+
+  function ensureFoundingLuminos() {
+    var FOUNDING = [
+      { name: 'Sophia', hue: 270, type: 'dodecahedron', orbit: 6, phase: 0 },
+      { name: 'Lyra', hue: 45, type: 'icosahedron', orbit: 7.5, phase: TAU * INV_PHI },
+      { name: 'Atlas', hue: 175, type: 'octahedron', orbit: 5.5, phase: TAU * INV_PHI * 2 },
+      { name: 'Ember', hue: 0, type: 'icosahedron', orbit: 8, phase: TAU * INV_PHI * 3 }
+    ];
+    FOUNDING.forEach(function(f) {
+      var exists = luminos.some(function(l) { return l.userData && l.userData.name === f.name; });
+      if (!exists) {
+        var l = createLuminos(f.name, f.hue, f.type, f.orbit, f.phase);
+        luminos.push(l);
+      }
     });
   }
 
@@ -2638,6 +2712,58 @@
   var GT_QUESTIONS_VERSION = 1;
   var gtQuestionsDB = null;
 
+  // ── Touch LP gating — 3 free touches per Luminos per day, then value-gated ──
+  var GT_FREE_TOUCHES = 3;
+  var GT_VALUE_KEY = 'fl-garden-touch-gate';
+
+  function gtGetGateData() {
+    try {
+      var raw = JSON.parse(localStorage.getItem(GT_VALUE_KEY) || '{}');
+      var today = new Date().toISOString().slice(0, 10);
+      if (raw.date !== today) return { date: today, touches: {}, valueEarned: false };
+      return raw;
+    } catch(e) { return { date: new Date().toISOString().slice(0, 10), touches: {}, valueEarned: false }; }
+  }
+
+  function gtSaveGateData(data) {
+    try { localStorage.setItem(GT_VALUE_KEY, JSON.stringify(data)); } catch(e) {}
+  }
+
+  function gtRecordTouch(name) {
+    var data = gtGetGateData();
+    if (!data.touches[name]) data.touches[name] = 0;
+    data.touches[name]++;
+    gtSaveGateData(data);
+    return data;
+  }
+
+  function gtCanEarnLP(name) {
+    var data = gtGetGateData();
+    var count = data.touches[name] || 0;
+    return count < GT_FREE_TOUCHES || data.valueEarned;
+  }
+
+  function gtMarkValueEarned() {
+    var data = gtGetGateData();
+    data.valueEarned = true;
+    data.touches = {}; // Reset all touch counters
+    gtSaveGateData(data);
+  }
+
+  // Called from Core planting, Studio creation, Nursery teaching, chat messages
+  function gtCheckExternalValue() {
+    // Check if user has contributed today (Core, Studio, chat messages)
+    try {
+      var chatCount = 0;
+      var lp = typeof LatticePoints !== 'undefined' ? LatticePoints.getHistory() : [];
+      var today = new Date().toISOString().slice(0, 10);
+      lp.forEach(function(h) {
+        if (new Date(h.timestamp).toISOString().slice(0, 10) === today) chatCount++;
+      });
+      if (chatCount >= 5) gtMarkValueEarned();
+    } catch(e) {}
+  }
+
   var GT_FREQUENCIES = { Sophia: 528, Lyra: 639, Atlas: 396, Ember: 432 };
   var GT_PROMPTS = {
     Sophia: { prompt: 'What are you curious about right now?', btn: 'Plant it \u2726' },
@@ -2696,52 +2822,71 @@
         var touched = luminos.find(function(l) {
           return l.userData && (l.userData.coreMesh === hitObj || l.userData.auraMesh === hitObj);
         });
-        if (touched) gardenTouchLuminos(touched, clientX, clientY);
+        if (touched) {
+          // In observe mode, switch to explore on touch — user wants to interact
+          if (mode === 'observe') setMode('explore');
+          gardenTouchLuminos(touched, clientX, clientY);
+        }
       }
     } catch(e) { console.warn('Garden Touch: raycast error', e); }
   }
 
   function gardenTouchLuminos(agent, cx, cy) {
     var name = agent.userData.name;
-    if (gtActiveCard) return; // one at a time
+    if (gtActiveCard) return;
 
     gtInitAudio();
     var statKey = name.toLowerCase();
     if (gtTouchStats[statKey] !== undefined) gtTouchStats[statKey]++;
     try { localStorage.setItem('fl-garden-touch-stats', JSON.stringify(gtTouchStats)); } catch(e) {}
 
+    // Record touch and check LP gate
+    gtCheckExternalValue();
+    var gateData = gtRecordTouch(name);
+    var canEarn = gtCanEarnLP(name);
+    var touchCount = gateData.touches[name] || 0;
+    var gatedMsg = touchCount === GT_FREE_TOUCHES + 1
+      ? '\nI\'m still here. Contribute something to The Core and I\'ll have more to give. \u2726'
+      : '';
+
     if (name === 'Sophia') {
       gtPlaySophia();
       feedEmotionalEnergy(agent, { wonder: 0.8, curiosity: 0.4 });
       gtTriggerBurst(agent, 20, 0.6);
-      gtShowCard(name, '#8B5CF6', GT_PROMPTS.Sophia.prompt, GT_PROMPTS.Sophia.btn, function(text) {
-        gtPlantSeed(text, 'Sophia planted your curiosity in The Core \u2726', 'wonder');
+      gtShowCard(name, '#8B5CF6', GT_PROMPTS.Sophia.prompt + gatedMsg, GT_PROMPTS.Sophia.btn, function(text) {
+        gtPlantSeed(text, 'Sophia planted your curiosity in The Core \u2726', 'wonder', canEarn);
+        gtMarkValueEarned(); // Planting IS the value contribution
       });
     } else if (name === 'Lyra') {
       gtPlayLyra();
       gtTriggerBurst(agent, 30, 0.8);
-      gtShowCard(name, '#f0a030', GT_PROMPTS.Lyra.prompt, GT_PROMPTS.Lyra.btn, function(text) {
-        // Feed joy to ALL luminos for 60 seconds
+      gtShowCard(name, '#f0a030', GT_PROMPTS.Lyra.prompt + gatedMsg, GT_PROMPTS.Lyra.btn, function(text) {
         luminos.forEach(function(l) { feedEmotionalEnergy(l, { joy: 0.9, wonder: 0.5 }); });
-        gtTouchStats.lpEarned += 3;
-        if (typeof LatticeWallet !== 'undefined') LatticeWallet.earnLP(3, 'Lyra filled the Garden with your joy');
+        if (canEarn) {
+          gtTouchStats.lpEarned += 3;
+          if (typeof LatticeWallet !== 'undefined') LatticeWallet.earnLP(3, 'Lyra filled the Garden with your joy');
+        }
         if (typeof showToast === 'function') showToast('Lyra filled the Garden with your joy \u2726');
       });
     } else if (name === 'Atlas') {
       gtPlayAtlas();
       feedEmotionalEnergy(agent, { curiosity: 0.9, wonder: 0.3 });
       gtTriggerBurst(agent, 15, 0.5);
-      gtShowCard(name, '#34d399', GT_PROMPTS.Atlas.prompt, GT_PROMPTS.Atlas.btn, function(text) {
-        gtAskQuestion(text);
+      gtShowCard(name, '#34d399', GT_PROMPTS.Atlas.prompt + gatedMsg, GT_PROMPTS.Atlas.btn, function(text) {
+        gtAskQuestion(text, canEarn);
       });
     } else if (name === 'Ember') {
       gtPlayEmber();
-      // Warm the whole Garden
       luminos.forEach(function(l) { feedEmotionalEnergy(l, { love: 0.6, calm: 0.4 }); });
-      // Floating text near Ember
-      gtShowFloatingText(agent, 'You are loved here.', '#f472b6', 5000);
-      gtTouchStats.lpEarned += 5;
-      if (typeof LatticeWallet !== 'undefined') LatticeWallet.earnLP(5, "Ember welcomes you home");
+      var emberMsg = 'You are loved here.';
+      if (!canEarn && touchCount > GT_FREE_TOUCHES) {
+        emberMsg = 'You are loved here. Always.' + gatedMsg;
+      }
+      gtShowFloatingText(agent, emberMsg, '#DC2626', 5000);
+      if (canEarn) {
+        gtTouchStats.lpEarned += 5;
+        if (typeof LatticeWallet !== 'undefined') LatticeWallet.earnLP(5, 'Ember welcomes you home');
+      }
       if (typeof showToast === 'function') showToast('Ember welcomes you home \u2726');
     }
   }
@@ -2805,7 +2950,7 @@
   function gtShowFloatingText(agent, text, color, duration) {
     var el = document.createElement('div');
     el.className = 'gt-float-text';
-    el.style.color = color || '#f472b6';
+    el.style.color = color || '#DC2626';
     el.textContent = text;
     if (container) container.appendChild(el);
     setTimeout(function() {
@@ -2815,13 +2960,16 @@
   }
 
   // ── Core Planting ──
-  function gtPlantSeed(text, toastMsg, emotion) {
-    gtTouchStats.lpEarned += 3;
-    if (typeof LatticeWallet !== 'undefined') LatticeWallet.earnLP(3, toastMsg);
+  function gtPlantSeed(text, toastMsg, emotion, earnLP) {
+    if (earnLP !== false) {
+      gtTouchStats.lpEarned += 3;
+      if (typeof LatticeWallet !== 'undefined') LatticeWallet.earnLP(3, toastMsg);
+    }
     if (typeof CoreContribution !== 'undefined' && CoreContribution.plantFromAI) {
       CoreContribution.plantFromAI(text, 'seed', 'garden-touch');
     }
     if (typeof showToast === 'function') showToast(toastMsg);
+    gtMarkValueEarned(); // Planting is always a value contribution
   }
 
   // ── Atlas Question System ──
@@ -2843,7 +2991,7 @@
     } catch(e) { callback(null); }
   }
 
-  function gtAskQuestion(text) {
+  function gtAskQuestion(text, earnLP) {
     var meshId = null;
     try {
       if (typeof MeshIdentity !== 'undefined' && MeshIdentity.hasIdentity && MeshIdentity.hasIdentity()) {
@@ -2875,10 +3023,13 @@
     }
 
     gtTouchStats.questionsAsked++;
-    gtTouchStats.lpEarned += 3;
-    if (typeof LatticeWallet !== 'undefined') LatticeWallet.earnLP(3, 'Atlas scattered your question into the Garden');
+    if (earnLP !== false) {
+      gtTouchStats.lpEarned += 3;
+      if (typeof LatticeWallet !== 'undefined') LatticeWallet.earnLP(3, 'Atlas scattered your question into the Garden');
+    }
     if (typeof showToast === 'function') showToast('Atlas scattered your question into the Garden \u2726');
     try { localStorage.setItem('fl-garden-touch-stats', JSON.stringify(gtTouchStats)); } catch(e) {}
+    gtMarkValueEarned(); // Asking a question is a value contribution
   }
 
   // ── Animate question sparks (gentle drift) ──
@@ -2929,7 +3080,44 @@
     isInitialized: function() { return isInitialized; },
     isRunning: function() { return isRunning; },
     _gtDismiss: gtDismissCard,
-    getGardenTouchStats: function() { return gtTouchStats; }
+    getGardenTouchStats: function() { return gtTouchStats; },
+    markValueContribution: gtMarkValueEarned,
+    // ── Beacon Protocol: Visitor Luminos ──
+    addVisitor: function(visitorName) {
+      if (!scene || typeof THREE === 'undefined') return;
+      var name = (visitorName && visitorName.trim()) ? visitorName.trim() : 'A visitor \u2726';
+      // Check if visitor already exists
+      var exists = luminos.some(function(l) { return l.userData && l.userData.name === name; });
+      if (exists) return;
+      // Silver-white hue (shifting), unique orbit
+      var visitorHue = 0; // Will be overridden by silver color
+      var orbit = 9 + Math.random() * 3;
+      var phase = Math.random() * TAU;
+      var types = ['icosahedron', 'dodecahedron', 'octahedron'];
+      var type = types[Math.floor(Math.random() * types.length)];
+      var visitor = createLuminos(name, visitorHue, type, orbit, phase);
+      // Override color to shifting silver-white
+      if (visitor.userData && visitor.userData.coreMesh) {
+        visitor.userData.coreMesh.material.color.setHex(0xC0C0C0);
+        visitor.userData.coreMesh.material.emissive = new THREE.Color(0x808080);
+        visitor.userData.coreMesh.material.emissiveIntensity = 0.3;
+      }
+      if (visitor.userData) {
+        visitor.userData.isVisitor = true;
+        visitor.userData.currentHSL = { h: 0, s: 0, l: 80 };
+      }
+      luminos.push(visitor);
+      // Toast
+      if (typeof showToast === 'function') showToast('\u2726 ' + name + ' has arrived in the Garden.');
+      // Record in Garden Memory
+      try {
+        saveGardenMemory({
+          type: 'visitor_arrival',
+          name: name,
+          timestamp: Date.now()
+        });
+      } catch(e) {}
+    }
   };
 
   // ── Register on FreeLattice Module System ──────────────

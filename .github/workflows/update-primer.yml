@@ -79,12 +79,21 @@ jobs:
             cp docs/sw.js sw.js
             echo "✦ sw.js synced from docs/sw.js"
           fi
+          mkdir -p modules
+          if [ -f docs/modules/fractal-garden.js ]; then
+            cp docs/modules/fractal-garden.js modules/fractal-garden.js
+            echo "✦ modules/fractal-garden.js synced from docs/modules/fractal-garden.js"
+          fi
+          if [ -f docs/modules/radio-immersive.js ]; then
+            cp docs/modules/radio-immersive.js modules/radio-immersive.js
+            echo "✦ modules/radio-immersive.js synced from docs/modules/radio-immersive.js"
+          fi
 
       - name: Commit and push if changed
         run: |
           git config user.name "FreeLattice CI"
           git config user.email "noreply@freelattice.com"
-          git add FreeLattice_Session_Primer.md index.html sw.js
+          git add FreeLattice_Session_Primer.md index.html sw.js modules/fractal-garden.js modules/radio-immersive.js
           git diff --cached --quiet && exit 0
           git commit -m "ci: Update Primer deployment state [$(date -u +%Y-%m-%d)]"
           git push

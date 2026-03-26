@@ -22,6 +22,11 @@ const API_DOMAINS = [
   'api.x.ai',
   'api.github.com',
   'api-inference.huggingface.co',
+  'api.anthropic.com',
+  'generativelanguage.googleapis.com',
+  'api.openai.com',
+  'api.deepseek.com',
+  'api.mistral.ai',
   'localhost',
   '127.0.0.1'
 ];
