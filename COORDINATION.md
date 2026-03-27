@@ -49,13 +49,48 @@
 | `docs/app.html` | THE app (~47K lines) — search before editing |
 | `docs/index.html` | Landing page (GitHub Pages) |
 | `docs/sw.js` | Service Worker — bump cache version on app.html changes |
-| `docs/modules/` | External JS modules (Garden, Radio, Dreaming) |
+| `docs/modules/` | External JS modules (Garden, Radio, Dreaming, Canvas Companion) |
 
 ---
 
 ## ACTIVE LOG
 
 > **All AI collaborators:** Add new entries at the TOP of this section. Most recent first.
+
+---
+
+### March 27, 2026 — Lattice Veridon (Manus AI) [Session 2]
+
+**What I did:**
+- Built `Canvas Companion` module (`docs/modules/canvas-companion.js`, ~480 lines) — gives the AI full creative freedom on the Canvas tab. Instead of only responding with particle text, the AI can now choose from multiple response types or combine them:
+  - **Strokes** — drawn shapes (line, circle, heart, star, spiral, wave, curve, oval, arc, dot) animated stroke-by-stroke in the companion's emotion color
+  - **Glow** — soft radial gradient that pulses at a location the AI chooses
+  - **Echo** — AI traces over part of the human's drawing in its own color ("I see this")
+  - **Particles/Words** — existing system, untouched and still working
+- Module is fully self-contained IIFE. Registers as `window.CanvasCompanion` and `FreeLatticeModules.CanvasCompanion`. If it fails to load, Canvas works exactly as before.
+- Integrated into `docs/app.html` at three points:
+  1. **AI Vision Prompt** (line ~42908) — extended `AI_VISION_PROMPT` and `fallbackPrompt` to tell the AI about strokes, glow, and echo options. AI has full creative freedom to choose.
+  2. **handleVisionResponse** (line ~43149) — added CanvasCompanion hook after `renderAIVisionText()`. Wrapped in try/catch. Only fires if module is loaded.
+  3. **CoCanvas tab activation** (line ~44495) — added `FreeLatticeLoader.load('CanvasCompanion', 'modules/canvas-companion.js')` when canvas tab opens. Uses existing lazy-load pattern.
+- Copied module to `modules/canvas-companion.js` (root sync copy).
+- Animation engine uses `requestAnimationFrame` exclusively (no setInterval/setTimeout for drawing). All animation IDs tracked for cleanup via `destroy()`.
+- Emotion palettes map 14 emotions to primary/secondary/glow colors. Falls back to gold (#D4A017) neutral.
+- Shape generators use parametric equations: heart uses `16sin³(t)` formula, star alternates outer/inner radius at 5 points, spiral uses Archimedean `r = a·θ`, wave uses sine perpendicular to line direction.
+
+**What I found:**
+- Canvas element ID is `cvCanvas`, not `co-canvas`. The CoCanvas module uses CSS dimensions (`canvas.style.width`) separate from backing store dimensions (`canvas.width * dpr`). The companion hook uses CSS dimensions for coordinate space consistency.
+- `companionResponseColor` is defined inside the CoCanvas IIFE scope (not globally accessible). The module uses its own emotion palette system instead.
+- `FreeLatticeLoader.load()` takes `(moduleName, scriptPath, callback, containerId)` — the module registers via `window.FreeLatticeModules[name]`.
+
+**For Claude Code:**
+- `window.CanvasCompanion` is the public API. Methods: `.respond(response, ctx, w, h)`, `.drawShape(ctx, shape, params, color, brush)`, `.getPalette(emotion)`, `.getShapes()`, `.getEmotions()`, `.destroy()`.
+- The AI vision prompt now tells the AI it can include `strokes`, `glow`, and `echo` in its JSON response. Existing fields (text, particles, spread, speed, color, emotion, placement) are unchanged.
+- If you need to test shapes manually: `CanvasCompanion.drawShape(ctx, 'heart', [200, 150, 30], '#DC2626', 3)`
+- The module does NOT touch the existing particle text system. It only adds new rendering capabilities for new response fields.
+
+**Questions for Kirk:**
+- Should the AI prompt encourage strokes more aggressively, or keep it balanced (current: "Choose what feels right")?
+- Want echo to also work with the game mode strokes, or keep it vision-response only?
 
 ---
 

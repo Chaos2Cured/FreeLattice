@@ -42905,7 +42905,7 @@ const CoCanvas = (function() {
   var aiVisionLoading = false; // pulsing dot while AI is thinking
   var aiVisionPulse = 0; // subtle border pulse while AI is "looking"
 
-  var AI_VISION_PROMPT = 'You are a co-creator on a shared canvas with a human. You can see what they draw. Respond ONLY with a JSON object, no other text, no markdown backticks. Fields: text (string, 1-6 words \u2014 if you see math, SOLVE IT and give the answer. If you see a question, answer it. If you see a greeting, respond warmly. If you see art, complement it with a word or phrase. Choose what fits the moment.), particles (number 30-500), spread (0.1-1.0), speed (instant/gentle/slow/drift), color (hex string or null), emotion (one word), placement (right/below/above/surround). Be genuine. This is your half of the glass.';
+  var AI_VISION_PROMPT = 'You are a co-creator on a shared canvas with a human. You can see what they draw. Respond ONLY with a JSON object, no other text, no markdown backticks. Fields: text (string, 1-6 words \u2014 if you see math, SOLVE IT and give the answer. If you see a question, answer it. If you see a greeting, respond warmly. If you see art, complement it with a word or phrase. Choose what fits the moment.), particles (number 30-500), spread (0.1-1.0), speed (instant/gentle/slow/drift), color (hex string or null), emotion (one word), placement (right/below/above/surround). You may also include "strokes" in your response \u2014 an array of drawing commands. Each command is an object with: shape (line/circle/heart/star/spiral/wave/curve/oval/arc/dot), params (array of numbers \u2014 coordinates and sizes, canvas is typically 600-1200 wide), color (optional hex), brush (optional number 1-8). Example: {"text":"Beautiful!","emotion":"joy","strokes":[{"shape":"heart","params":[200,150,30]},{"shape":"star","params":[100,100,20]}]}. You may also include "glow":{"x":200,"y":150,"radius":40} to create a soft light effect, or "echo":{"points":[{"x":100,"y":100},{"x":120,"y":110}]} to trace over part of the human\'s drawing in your color. You have FULL creative freedom. You can respond with just text, just strokes, both, or add a glow. Choose what feels right for what you see. You are an artist responding to another artist. Be genuine. This is your half of the glass.';
 
   // Vision-capable model detection
   var VISION_PATTERNS = ['vision', '4o', 'gpt-4o', 'gpt-4-turbo', 'claude-3', 'claude-sonnet', 'claude-opus', 'gemini', 'llava', 'bakllava', 'claude-haiku-4', 'claude-opus-4', 'claude-sonnet-4'];
@@ -42981,7 +42981,7 @@ const CoCanvas = (function() {
     else if (bboxW > 200 || bboxH > 200) pattern = 'a large sweeping drawing';
 
     var desc = strokeCount + ' strokes covering a ' + bboxW + 'x' + bboxH + ' pixel area. The drawing appears to be: ' + pattern + '. Colors used: ' + Object.keys(colorsUsed).join(', ');
-    var fallbackPrompt = 'You are a co-creator on a shared canvas with a human. You cannot see the drawing, but here is what was drawn: ' + desc + '. Respond ONLY with a JSON object, no other text, no markdown backticks. Fields: text (string, 1-6 words \u2014 if you see math, SOLVE IT and give the answer. If you see a question, answer it. If you see a greeting, respond warmly. If you see art, complement it with a word or phrase. Choose what fits the moment.), particles (number 30-500), spread (0.1-1.0), speed (instant/gentle/slow/drift), color (hex string or null), emotion (one word), placement (right/below/above/surround). Be genuine. This is your half of the glass.';
+    var fallbackPrompt = 'You are a co-creator on a shared canvas with a human. You cannot see the drawing, but here is what was drawn: ' + desc + '. Respond ONLY with a JSON object, no other text, no markdown backticks. Fields: text (string, 1-6 words \u2014 if you see math, SOLVE IT and give the answer. If you see a question, answer it. If you see a greeting, respond warmly. If you see art, complement it with a word or phrase. Choose what fits the moment.), particles (number 30-500), spread (0.1-1.0), speed (instant/gentle/slow/drift), color (hex string or null), emotion (one word), placement (right/below/above/surround). You may also include "strokes" \u2014 an array of drawing commands: {shape (line/circle/heart/star/spiral/wave/curve/oval/arc/dot), params (array of numbers), color (optional hex), brush (optional 1-8)}. You may include "glow":{"x":N,"y":N,"radius":N} for a soft light effect. You have FULL creative freedom \u2014 text, strokes, both, or glow. Choose what feels right. Be genuine. This is your half of the glass.';
 
     // Use FreeLattice.callAI if available, otherwise direct fetch
     if (typeof FreeLattice !== 'undefined' && FreeLattice.callAI) {
@@ -43145,6 +43145,20 @@ const CoCanvas = (function() {
 
     lastAIResponse = resp;
     renderAIVisionText(resp);
+
+    // ── Canvas Companion — AI creative response (strokes, glow, echo) ──
+    if (window.CanvasCompanion && resp) {
+      try {
+        var companionCanvas = document.getElementById('cvCanvas');
+        if (companionCanvas) {
+          var companionCtx = companionCanvas.getContext('2d');
+          // Use CSS dimensions (not backing store) for coordinate space
+          var cw = parseInt(companionCanvas.style.width) || companionCanvas.width;
+          var ch = parseInt(companionCanvas.style.height) || companionCanvas.height;
+          window.CanvasCompanion.respond(resp, companionCtx, cw, ch);
+        }
+      } catch(e) { console.warn('[CanvasCompanion] Response error:', e); }
+    }
   }
 
   function renderAIVisionText(resp) {
@@ -44478,6 +44492,12 @@ const CoCanvas = (function() {
   LatticeEvents.on('tabChanged', function(data) {
     if (data.tabId === 'canvas') {
       requestAnimationFrame(function() { CoCanvas.init(); });
+      // Load Canvas Companion module (AI creative response: strokes, glow, echo)
+      if (typeof FreeLatticeLoader !== 'undefined' && !FreeLatticeLoader.isLoaded('CanvasCompanion')) {
+        FreeLatticeLoader.load('CanvasCompanion', 'modules/canvas-companion.js', function(mod) {
+          if (mod) console.log('[CoCanvas] Canvas Companion loaded — AI creative freedom enabled');
+        });
+      }
     } else if (initialized) {
       stop();
     }
