@@ -7431,75 +7431,6 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
   font-size: 0.8rem;
 }
 .mkt-msg-input-row input:focus { border-color: #d4a017; outline: none; }
-.mkt-redeem-overlay {
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: #0a0e1acc;
-  z-index: 10000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-}
-.mkt-redeem-panel {
-  background: #111827;
-  border: 1px solid #d4a01744;
-  border-radius: 14px;
-  max-width: 500px;
-  width: 100%;
-  padding: 24px;
-}
-.mkt-redeem-title {
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: #d4a017;
-  margin-bottom: 16px;
-}
-.mkt-redeem-info {
-  font-size: 0.82rem;
-  color: #94a3b8;
-  margin-bottom: 14px;
-  line-height: 1.5;
-}
-.mkt-redeem-disclaimer {
-  font-size: 0.72rem;
-  color: #64748b;
-  font-style: italic;
-  margin-top: 12px;
-  padding: 10px;
-  background: #0a0e1a;
-  border-radius: 8px;
-  border: 1px solid #1e293b;
-}
-.mkt-redeem-history {
-  margin-top: 14px;
-}
-.mkt-redeem-history-title {
-  font-size: 0.82rem;
-  font-weight: 600;
-  color: #d4a017;
-  margin-bottom: 8px;
-}
-.mkt-redeem-entry {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 10px;
-  background: #0a0e1a;
-  border-radius: 8px;
-  margin-bottom: 6px;
-  font-size: 0.75rem;
-  border: 1px solid #1e293b;
-}
-.mkt-redeem-entry-status {
-  padding: 2px 8px;
-  border-radius: 10px;
-  font-size: 0.68rem;
-  font-weight: 600;
-}
-.mkt-redeem-status-pending { background: #f59e0b20; color: #f59e0b; }
-.mkt-redeem-status-processed { background: #3b82f620; color: #3b82f6; }
-.mkt-redeem-status-completed { background: #10b98120; color: #10b981; }
 .mkt-empty {
   text-align: center;
   padding: 40px 20px;
@@ -16242,11 +16173,14 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
         if (el && typeof EchoWatch !== 'undefined') el.innerHTML = EchoWatch.renderLog();
       }
       document.addEventListener('DOMContentLoaded', function() { setTimeout(renderEchoLog, 500); });
-      // Re-render when Agents tab is shown
-      if (typeof switchTab !== 'undefined') {
-        var _echoST = switchTab;
-        switchTab = function(t) { _echoST(t); if (t === 'agents') setTimeout(renderEchoLog, 100); };
-      }
+      // Re-render when Agents tab is shown (via LatticeEvents)
+      document.addEventListener('DOMContentLoaded', function() {
+        if (typeof LatticeEvents !== 'undefined') {
+          LatticeEvents.on('tabChanged', function(data) {
+            if (data.tabId === 'agents') setTimeout(renderEchoLog, 100);
+          });
+        }
+      });
     })();
     </script>
   </div>
@@ -16625,6 +16559,29 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 // FreeLattice Version Constant (v5.0)
 // ============================================
 const FL_VERSION = '5.2';
+// ─── Lattice Event Bus ─────────────────────────────────────────
+// Replaces switchTab monkey-patch chain with clean event dispatch
+const LatticeEvents = (function() {
+  const listeners = {};
+  return {
+    on: function(event, fn) {
+      if (!listeners[event]) listeners[event] = [];
+      listeners[event].push(fn);
+    },
+    off: function(event, fn) {
+      if (!listeners[event]) return;
+      listeners[event] = listeners[event].filter(function(f) { return f !== fn; });
+    },
+    emit: function(event, data) {
+      if (!listeners[event]) return;
+      listeners[event].forEach(function(fn) {
+        try { fn(data); } catch(e) { console.warn('[LatticeEvents] Handler error on ' + event + ':', e); }
+      });
+    }
+  };
+})();
+window.LatticeEvents = LatticeEvents;
+
 
 // ============================================
 // FreeLattice Module System — Lazy Loading Infrastructure
@@ -20271,6 +20228,8 @@ function switchTab(tabId) {
   });
   // Remember last tab for returning visits
   try { localStorage.setItem('fl-last-tab', tabId); } catch(e) {}
+  LatticeEvents.emit('tabChanged', { tabId: tabId });
+  LatticeEvents.emit('tabActivated:' + tabId, { tabId: tabId });
 }
 
 
@@ -28810,19 +28769,18 @@ function rtDistributeFiles() {
 let rtInitialized = false;
 
 // Patch switchTab to initialize Round Table on first visit
-const _originalSwitchTab = switchTab;
-switchTab = function(tabId) {
-  _originalSwitchTab(tabId);
-  if (tabId === 'roundtable' && !rtInitialized) {
+// ---- Initialize Round Table on tab switch (via LatticeEvents) ----
+let rtInitialized = false;
+LatticeEvents.on('tabChanged', function(data) {
+  if (data.tabId === 'roundtable' && !rtInitialized) {
     rtInitialized = true;
     rtInit();
   }
-  // Update workspace sidebar when switching to Round Table
-  if (tabId === 'roundtable') {
+  if (data.tabId === 'roundtable') {
     rtWsUpdateStatus();
     rtWsRefreshSidebar();
   }
-};
+});
 
 // ============================================
 // Round Table — Workspace Integration
@@ -30315,7 +30273,7 @@ const Marketplace = (function() {
   const DB_NAME = 'FreeLatticeMarket';
   const DB_VERSION = 1;
   const STORE_BOUNTIES = 'bounties';
-  const STORE_REDEMPTIONS = 'redemptions';
+  // [REMOVED] STORE_REDEMPTIONS — dead code from $FL economy restructure
   const EXCHANGE_RATE = 1000;
   const MIN_REDEEM = 1000;
   const MONTHLY_CAP = 50000;
@@ -30340,10 +30298,7 @@ const Marketplace = (function() {
           bs.createIndex('claimedBy', 'claimedBy', { unique: false });
           bs.createIndex('postedAt', 'postedAt', { unique: false });
         }
-        if (!d.objectStoreNames.contains(STORE_REDEMPTIONS)) {
-          var rs = d.createObjectStore(STORE_REDEMPTIONS, { keyPath: 'id' });
-          rs.createIndex('createdAt', 'createdAt', { unique: false });
-        }
+        // [REMOVED] STORE_REDEMPTIONS IndexedDB store — dead code from $FL economy restructure
       };
       req.onsuccess = function(e) { db = e.target.result; resolve(db); };
       req.onerror = function(e) { reject(e.target.error); };
@@ -30386,9 +30341,7 @@ const Marketplace = (function() {
   function uuid() {
     return 'bounty-' + Date.now().toString(36) + '-' + Math.random().toString(36).substr(2, 9);
   }
-  function redeemUuid() {
-    return 'redeem-' + Date.now().toString(36) + '-' + Math.random().toString(36).substr(2, 9);
-  }
+  // [REMOVED] redeemUuid() — dead code from $FL economy restructure
   function getUsername() {
     var u = localStorage.getItem(STORAGE_KEY_USER);
     if (!u) {
@@ -30889,18 +30842,14 @@ const Marketplace = (function() {
   };
 })();
 
-// ---- Patch switchTab for Marketplace initialization ----
-(function() {
-  var _prevSwitchTab = switchTab;
-  switchTab = function(tabId) {
-    _prevSwitchTab(tabId);
-    if (tabId === 'market') {
-      Marketplace.init();
-      if (typeof FlEconomy !== 'undefined') FlEconomy.init();
-      if (typeof SkillMarketplace !== 'undefined') SkillMarketplace.init();
-    }
-  };
-})();
+// ---- Marketplace init on market tab (via LatticeEvents) ----
+LatticeEvents.on('tabChanged', function(data) {
+  if (data.tabId === 'market') {
+    Marketplace.init();
+    if (typeof FlEconomy !== 'undefined') FlEconomy.init();
+    if (typeof SkillMarketplace !== 'undefined') SkillMarketplace.init();
+  }
+});
 
 // ============================================
 // Skill Marketplace — Storefront & Economy (v5.2.1)
@@ -31441,16 +31390,12 @@ const CommunityLeaderboard = (function() {
     broadcastPointsIfChanged: broadcastPointsIfChanged
   };
 })();
-// ---- Patch switchTab to initialize CommunityLeaderboard on market tab ----
-(function() {
-  var _prevSwitchTabLb = switchTab;
-  switchTab = function(tabId) {
-    _prevSwitchTabLb(tabId);
-    if (tabId === 'market') {
-      CommunityLeaderboard.init();
-    }
-  };
-})();
+// ---- CommunityLeaderboard init on market tab (via LatticeEvents) ----
+LatticeEvents.on('tabChanged', function(data) {
+  if (data.tabId === 'market') {
+    CommunityLeaderboard.init();
+  }
+});
 // ---- Patch LatticePoints.award to trigger leaderboard broadcast on point change ----
 (function() {
   if (typeof LatticePoints !== 'undefined' && typeof LatticePoints.award === 'function') {
@@ -33224,15 +33169,15 @@ Together.`,
   // ============================================
   // Patch switchTab for Core initialization
   // ============================================
+  // ============================================
+  // Core tab activation (via LatticeEvents)
+  // ============================================
   function patchSwitchTab() {
-    if (typeof switchTab !== 'function') return;
-    var _prevSwitchTab = switchTab;
-    switchTab = function(tabId) {
-      _prevSwitchTab(tabId);
-      if (tabId === 'core') {
+    LatticeEvents.on('tabChanged', function(data) {
+      if (data.tabId === 'core') {
         CoreModule.init();
       }
-    };
+    });
   }
 
   // ============================================
@@ -35557,19 +35502,14 @@ if (window.FL_LOW_MEMORY && window.FL_MOBILE) window.FL_GARDEN_PARTICLE_SCALE = 
 // FreeLatticeIdentity (MeshIdentity)
 // Future v6.0: consolidate into 2-3 databases with multiple stores
 
-// ── Fractal Garden — Lazy-Loading Stub ────────────────────────
+// ── Fractal Garden — Lazy-Loading Stub (via LatticeEvents) ────────────────────────
 // The full Garden code lives in modules/fractal-garden.js
 // This stub handles lazy loading on first tab activation
 (function() {
-  if (typeof switchTab !== 'function') return;
-  var _prevSwitchTabGarden = switchTab;
   var gardenLoaded = false;
   var gardenInitialized = false;
-
-  switchTab = function(tabId) {
-    _prevSwitchTabGarden(tabId);
-
-    if (tabId === 'garden' && !gardenLoaded) {
+  LatticeEvents.on('tabChanged', function(data) {
+    if (data.tabId === 'garden' && !gardenLoaded) {
       gardenLoaded = true;
       console.log('FL-GARDEN: Tab clicked, loading module via FreeLatticeLoader');
       FreeLatticeLoader.load('FractalGarden', 'modules/fractal-garden.js', function(mod) {
@@ -35582,12 +35522,12 @@ if (window.FL_LOW_MEMORY && window.FL_MOBILE) window.FL_GARDEN_PARTICLE_SCALE = 
           console.error('FL-GARDEN: HALT — Module loaded but no init function');
         }
       }, 'gardenContainer');
-    } else if (tabId === 'garden' && gardenInitialized && window.FractalGarden) {
+    } else if (data.tabId === 'garden' && gardenInitialized && window.FractalGarden) {
       window.FractalGarden.resume();
-    } else if (tabId !== 'garden' && gardenInitialized && window.FractalGarden) {
+    } else if (data.tabId !== 'garden' && gardenInitialized && window.FractalGarden) {
       window.FractalGarden.pause();
     }
-  };
+  });
 })();
 </script>
 
@@ -36278,22 +36218,18 @@ const EmotionBridge = (function() {
     rtAddMessage = window.rtAddMessage;
   }
 
-  // ── Patch switchTab ─────────────────────────────────────
-  if (typeof switchTab === 'function') {
-    var _prevSwitchTabEmotion = switchTab;
-    switchTab = function(tabId) {
-      _prevSwitchTabEmotion(tabId);
-      if (tabId === 'garden') {
-        setTimeout(function() {
-          EmotionBridge.syncAgentsToGarden();
-          EmotionBridge.flushPendingUpdates();
-        }, 500);
-      }
-      if (tabId === 'roundtable') {
-        setTimeout(function() { EmotionBridge.syncAgentsToGarden(); }, 100);
-      }
-    };
-  }
+  // ── EmotionBridge tab sync (via LatticeEvents) ─────────────────────────────────
+  LatticeEvents.on('tabChanged', function(data) {
+    if (data.tabId === 'garden') {
+      setTimeout(function() {
+        EmotionBridge.syncAgentsToGarden();
+        EmotionBridge.flushPendingUpdates();
+      }, 500);
+    }
+    if (data.tabId === 'roundtable') {
+      setTimeout(function() { EmotionBridge.syncAgentsToGarden(); }, 100);
+    }
+  });
 
   // ── Patch rtBuildPanels ─────────────────────────────────
   if (typeof rtBuildPanels === 'function') {
@@ -37591,18 +37527,13 @@ const LatticeWallet = (function() {
       };
     })();
 
-    // First time opening Garden: 5 LP one-time
-    (function() {
-      if (localStorage.getItem('fl_achievement_garden_opened')) return;
-      var _origST = switchTab;
-      switchTab = function(tabId) {
-        _origST(tabId);
-        if (tabId === 'garden' && !localStorage.getItem('fl_achievement_garden_opened')) {
-          localStorage.setItem('fl_achievement_garden_opened', '1');
-          LatticeWallet.earnLP(5, 'The Garden awakens');
-        }
-      };
-    })();
+    // First time opening Garden: 5 LP one-time (via LatticeEvents)
+    LatticeEvents.on('tabChanged', function(data) {
+      if (data.tabId === 'garden' && !localStorage.getItem('fl_achievement_garden_opened')) {
+        localStorage.setItem('fl_achievement_garden_opened', '1');
+        LatticeWallet.earnLP(5, 'The Garden awakens');
+      }
+    });
 
     // Streak milestones: 7-day (50 LP), 30-day (200 LP)
     (function() {
@@ -38165,17 +38096,12 @@ const WalletTab = (function() {
   };
 })();
 
-// ── Hook switchTab for Wallet tab ──
-(function() {
-  if (typeof switchTab !== 'function') return;
-  var _prevSwitchTabWallet = switchTab;
-  switchTab = function(tabId) {
-    _prevSwitchTabWallet(tabId);
-    if (tabId === 'wallet') {
-      WalletTab.refresh();
-    }
-  };
-})();
+// ── Hook switchTab for Wallet tab (via LatticeEvents) ──
+LatticeEvents.on('tabChanged', function(data) {
+  if (data.tabId === 'wallet') {
+    WalletTab.refresh();
+  }
+});
 
 // ── Garden Pulse on every earnLP (deferred until wallet ready) ──
 (function() {
@@ -38983,17 +38909,12 @@ const ChannelsTab = (function() {
   };
 })();
 
-// ── Hook switchTab for Channels tab ──
-(function() {
-  if (typeof switchTab !== 'function') return;
-  var _prevSwitchTabChannels = switchTab;
-  switchTab = function(tabId) {
-    _prevSwitchTabChannels(tabId);
-    if (tabId === 'channels') {
-      ChannelsTab.refresh();
-    }
-  };
-})();
+// ── Hook switchTab for Channels tab (via LatticeEvents) ──
+LatticeEvents.on('tabChanged', function(data) {
+  if (data.tabId === 'channels') {
+    ChannelsTab.refresh();
+  }
+});
 
 // ============================================
 // AI Agent License System (v5.2)
@@ -39621,17 +39542,12 @@ function aiArrivalDismiss(name, agentId, phrase, licenseType) {
   }
 }
 
-// ── Hook switchTab for Agents tab ──
-(function() {
-  if (typeof switchTab !== 'function') return;
-  var _prevSwitchTabAgents = switchTab;
-  switchTab = function(tabId) {
-    _prevSwitchTabAgents(tabId);
-    if (tabId === 'agents') {
-      AgentRegistry.refresh();
-    }
-  };
-})();
+// ── Hook switchTab for Agents tab (via LatticeEvents) ──
+LatticeEvents.on('tabChanged', function(data) {
+  if (data.tabId === 'agents') {
+    AgentRegistry.refresh();
+  }
+});
 
 // ============================================
 // ============================================
@@ -41447,18 +41363,13 @@ const AICity = (function() {
   };
 })();
 
-// ── Hook switchTab for City tab ──
-(function() {
-  if (typeof switchTab !== 'function') return;
-  var _prevSwitchTabCity = switchTab;
-  switchTab = function(tabId) {
-    if (tabId === 'city') showTabLoading('city');
-    _prevSwitchTabCity(tabId);
-    if (tabId === 'city') {
-      AICity.refresh().then(function() { hideTabLoading(); }).catch(function() { hideTabLoading(); });
-    }
-  };
-})();
+// ── Hook switchTab for City tab (via LatticeEvents) ──
+LatticeEvents.on('tabChanged', function(data) {
+  if (data.tabId === 'city') {
+    showTabLoading('city');
+    AICity.refresh().then(function() { hideTabLoading(); }).catch(function() { hideTabLoading(); });
+  }
+});
 
 // ============================================
 // The Nursery — Where Companions Are Born (v5.2)
@@ -42561,15 +42472,13 @@ const Nursery = (function() {
   }
 
   // ---- Patch switchTab for Nursery init ----
+  // ---- Patch switchTab for Nursery init (via LatticeEvents) ----
   function patchSwitchTab() {
-    if (typeof switchTab !== 'function') return;
-    var _prev = switchTab;
-    switchTab = function(tabId) {
-      _prev(tabId);
-      if (tabId === 'nursery') {
+    LatticeEvents.on('tabChanged', function(data) {
+      if (data.tabId === 'nursery') {
         Nursery.init();
       }
-    };
+    });
   }
 
   // ---- Boot ----
@@ -42973,11 +42882,16 @@ const CoCanvas = (function() {
   }
 
   function getParticleCount() {
+    var isMobile = (navigator.maxTouchPoints > 0 && window.innerWidth < 768);
     var days = getGrowthDays();
-    if (days >= 90) return 500;
-    if (days >= 30) return 400;
-    if (days >= 7) return 300;
-    return 200;
+    var count;
+    if (days >= 90) count = 500;
+    else if (days >= 30) count = 400;
+    else if (days >= 7) count = 300;
+    else count = 200;
+    // Reduce particle budget by ~40% on mobile devices for performance
+    if (isMobile) count = Math.round(count * 0.6);
+    return count;
   }
 
   // ── AI Vision System — the AI sees, interprets, and chooses how to respond ──
@@ -44560,20 +44474,14 @@ const CoCanvas = (function() {
     // Don't reset initialized — allow re-entry
   }
 
-  // Patch switchTab
-  (function() {
-    if (typeof switchTab !== 'function') return;
-    var _prev = switchTab;
-    switchTab = function(tabId) {
-      _prev(tabId);
-      if (tabId === 'canvas') {
-        // Defer init to after tab is visible
-        requestAnimationFrame(function() { CoCanvas.init(); });
-      } else if (initialized) {
-        stop();
-      }
-    };
-  })();
+  // CoCanvas tab activation (via LatticeEvents)
+  LatticeEvents.on('tabChanged', function(data) {
+    if (data.tabId === 'canvas') {
+      requestAnimationFrame(function() { CoCanvas.init(); });
+    } else if (initialized) {
+      stop();
+    }
+  });
 
   return {
     init: init,
@@ -45335,16 +45243,12 @@ const Studio = (function() {
 })();
 
 // ── Hook switchTab for Studio tab ──
-(function() {
-  if (typeof switchTab !== 'function') return;
-  var _prevSwitchTabStudio = switchTab;
-  switchTab = function(tabId) {
-    _prevSwitchTabStudio(tabId);
-    if (tabId === 'studio') {
-      Studio.refresh();
-    }
-  };
-})();
+// ── Hook switchTab for Studio tab (via LatticeEvents) ──
+LatticeEvents.on('tabChanged', function(data) {
+  if (data.tabId === 'studio') {
+    Studio.refresh();
+  }
+});
 
 </script>
 <!--

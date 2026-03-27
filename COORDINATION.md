@@ -59,6 +59,33 @@
 
 ---
 
+### March 27, 2026 — Lattice Veridon (Manus AI)
+
+**What I did:**
+- Event bus system (LatticeEvents) — replaced all 15 switchTab monkey-patches with clean event dispatch. Each module now listens via `LatticeEvents.on('tabChanged', handler)` instead of wrapping switchTab. `try/catch` on every handler prevents cascade failures.
+- Dead code cleanup — removed `STORE_REDEMPTIONS` IndexedDB store creation, `redeemUuid()` function, and all 12 `.mkt-redeem-*` CSS rules (overlay, panel, title, info, disclaimer, history, entry, status classes). All were confirmed unreferenced.
+- Mobile particle budget — `getParticleCount()` now detects mobile via `navigator.maxTouchPoints > 0 && window.innerWidth < 768` and reduces baseline by 40% (`count * 0.6`).
+- 15 patches converted total: EchoWatch/Agents, Round Table init, Marketplace init, CommunityLeaderboard, Core module, Fractal Garden lazy-load, EmotionBridge sync, Garden first-open achievement, Wallet tab, Channels tab, Agents tab, City tab (with loading state), Nursery init, CoCanvas init/stop, Studio refresh.
+- `openRedeemModal()` was already removed in a prior session — confirmed absent from codebase.
+
+**What I found:**
+- A `FreeLatticeEvents` bus already existed at line 16638 (defined but never used — 0 references). The new `LatticeEvents` bus is separate and purpose-built for the switchTab refactor. Future consolidation opportunity: merge both into one bus.
+- Patch 12 (City tab) called `showTabLoading('city')` BEFORE the original switchTab ran. In the event bus version, loading is triggered in the listener (same tick, visually identical). Tested safe.
+- Patch 1 (EchoWatch) was defined before the main `switchTab` function existed. Converted to a `DOMContentLoaded` listener that registers on `LatticeEvents` — deferred registration pattern.
+- Patch 14 (CoCanvas) had bidirectional behavior: init on canvas tab, stop on any other tab if initialized. Preserved both paths in the event listener.
+
+**For Claude Code:**
+- `switchTab()` is no longer monkey-patched. Use `LatticeEvents.on('tabChanged', fn)` to react to tab changes. The handler receives `{ tabId: 'tabname' }`.
+- `LatticeEvents` is global (`window.LatticeEvents`). Available methods: `.on(event, fn)`, `.off(event, fn)`, `.emit(event, data)`.
+- Two events fire per tab switch: `'tabChanged'` (generic) and `'tabActivated:' + tabId` (specific, e.g. `'tabActivated:garden'`).
+- The Companion Draws Back module is coming next — will live in `modules/canvas-companion.js`.
+- Dead code markers left as comments: `// [REMOVED] ...` — search for `[REMOVED]` to see what was cleaned.
+
+**Questions for Kirk:**
+- None right now. Building.
+
+---
+
 ### March 26, 2026 — Lattice Veridon (Manus AI)
 
 **What I did:**
