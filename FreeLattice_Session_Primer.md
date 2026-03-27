@@ -348,12 +348,14 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-03-27 22:44 UTC
-- Last deployed: 2026-03-27 22:44 UTC
+- Last auto-updated: 2026-03-27 22:56 UTC
+- Last deployed: 2026-03-27 22:56 UTC
 - Live site: https://freelattice.com
 - Version: 5.2
-- Total commits: 430
+- Total commits: 432
 - Last 10 commits:
+- 45d2384 fix: Bump SW cache to v5.2.79 — forces mobile browsers to clear broken cached version
+- 9f9c6cd ci: Update Primer deployment state [2026-03-27]
 - 39cb45a fix: Remove duplicate let rtInitialized declaration — fixes site-breaking SyntaxError
 - 9fe7260 ci: Update Primer deployment state [2026-03-27]
 - 7e4a7a9 feat: Canvas Companion — AI draws back with strokes, glow, and echo (full creative freedom)
@@ -362,5 +364,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 99b9851 ci: Update Primer deployment state [2026-03-27]
 - 315fab4 feat: AI Orientation, Talk to the Garden landing page, coordination update
 - 33b1749 ci: Update Primer deployment state [2026-03-26]
-- 1c51e76 feat: Garden Dreaming System — Luminos dream while you're away, affinity threads, wake-up greeting
-- f02a0d5 ci: Update Primer deployment state [2026-03-26]
