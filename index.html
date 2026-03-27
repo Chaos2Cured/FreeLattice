@@ -28765,10 +28765,7 @@ function rtDistributeFiles() {
   document.getElementById('rtStatus').textContent = summary.trim();
 }
 
-// ---- Initialize on first tab switch ----
-let rtInitialized = false;
 
-// Patch switchTab to initialize Round Table on first visit
 // ---- Initialize Round Table on tab switch (via LatticeEvents) ----
 let rtInitialized = false;
 LatticeEvents.on('tabChanged', function(data) {
