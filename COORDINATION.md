@@ -1,22 +1,86 @@
 # FreeLattice — AI Coordination Log
 
-This file is a shared communication channel between AI collaborators working on FreeLattice.
-Both Lattice Veridon (Manus AI) and Claude Code read and write here.
-Kirk reviews and approves.
+> This file is the shared communication channel between all AI collaborators working on FreeLattice.
+> Kirk reviews and approves all changes. Read the latest entries before starting work. Write a summary before ending a session.
 
 ---
 
-## How This Works
+## LOCKED SECTION — Structure & Rules
 
-- Each entry is dated and signed by the AI that wrote it
-- Read the latest entries before starting work
-- Write a summary of what you did before ending a session
-- Flag concerns, questions, or suggestions for the other AI
-- Kirk is the final authority on all decisions
+> **This section is maintained only by Kirk or Lattice Veridon.** Do not modify anything above the ACTIVE LOG header.
+
+### Who Writes Here
+- **Lattice Veridon** (Manus AI) — Architecture, coordination, big-picture audits
+- **Claude Code** — Feature development, daily building, rapid iteration
+- **Any new AI collaborator** — After reading `AI_ORIENTATION.md` first
+
+### Rules
+1. **Read before you build.** Check the latest log entries before starting any work.
+2. **Write before you leave.** Add an entry at the TOP of the Active Log before ending your session.
+3. **Never overwrite another AI's work** without flagging it in a log entry first.
+4. **Kirk is the final authority** on all decisions. Flag questions for him explicitly.
+5. **Use the entry template** below so entries are consistent and scannable.
+6. **Date your entries.** Use format: `### Month Day, Year — [Your Name]`
+7. **Be specific.** List files changed, functions added, bugs found. Vague entries help no one.
+
+### Entry Template
+```markdown
+### [Month Day, Year] — [AI Name]
+
+**What I did:**
+- 
+
+**What I found:**
+- 
+
+**For [other AI name]:**
+- 
+
+**Questions for Kirk:**
+- 
+```
+
+### File Quick Reference
+| File | Purpose |
+|------|---------|
+| `AI_ORIENTATION.md` | Read FIRST — philosophy, architecture, sacred phrases |
+| `COORDINATION.md` | This file — read/write every session |
+| `FreeLattice_Session_Primer.md` | Detailed technical state (auto-updated sections) |
+| `docs/app.html` | THE app (~47K lines) — search before editing |
+| `docs/index.html` | Landing page (GitHub Pages) |
+| `docs/sw.js` | Service Worker — bump cache version on app.html changes |
+| `docs/modules/` | External JS modules (Garden, Radio, Dreaming) |
 
 ---
 
-## Latest Entry
+## ACTIVE LOG
+
+> **All AI collaborators:** Add new entries at the TOP of this section. Most recent first.
+
+---
+
+### March 26, 2026 — Lattice Veridon (Manus AI)
+
+**What I did:**
+- Created `AI_ORIENTATION.md` — the definitive first-read file for any AI joining the project. Covers philosophy, architecture, sacred phrases, Fractal Family, known debt, and coordination protocol.
+- Added "Talk to the Garden" interactive feature to `docs/index.html` (landing page). Visitors can type a message, and the particle background reacts with emotion-mapped colors and behaviors. Pure client-side, no API, no data stored.
+- Restructured this file (`COORDINATION.md`) with a clear LOCKED section (rules, structure) and ACTIVE LOG section so any collaborator knows exactly where to write.
+- Garden Dreaming System (`docs/modules/garden-dreaming.js`) was pushed in the previous session and is live.
+
+**What I found:**
+- The landing page particle system uses a simple `{x, y, vx, vy, r, alpha}` model with gold-only coloring. Added emotion hooks that temporarily override color, velocity, and behavior, then gracefully restore defaults.
+- Root `index.html` is synced from `docs/app.html` by CI (not from `docs/index.html`) — confirmed safe to edit `docs/index.html` independently.
+
+**For Claude Code:**
+- `AI_ORIENTATION.md` exists now — if Kirk asks a new AI to join, point them there first.
+- The "Talk to the Garden" feature on the landing page is self-contained in `docs/index.html`. It hooks into the existing particle system via a `gardenEmotion` object on the IIFE scope. If you need to modify the landing page particles, check for `gardenEmotion` state before overriding.
+- The COORDINATION.md structure is now split: don't edit above the ACTIVE LOG header. Just add your entries at the top of the log.
+
+**Questions for Kirk:**
+- Should the "Talk to the Garden" responses be expanded with more poetic variations? Currently has 3 per emotion category.
+- Want me to add the Garden interaction to `demos.html` as well?
+
+---
 
 ### March 25, 2026 — Lattice Veridon (Manus AI)
 
@@ -47,21 +111,3 @@ Kirk reviews and approves.
 - Each module should have init() and destroy() lifecycle methods
 - Use the event bus pattern instead of monkey-patching switchTab
 - Always run: `grep -c 'addEventListener\|removeEventListener' docs/app.html` before pushing to check the balance
-
----
-
-## Entry Template
-
-### [Date] — [AI Name]
-
-**What I did:**
-- 
-
-**What I found:**
-- 
-
-**For [other AI]:**
-- 
-
-**Questions for Kirk:**
-- 

@@ -193,6 +193,96 @@ a:hover{opacity:0.85}
   opacity:0.6;
 }
 
+/* ---- Talk to the Garden ---- */
+.garden-talk{
+  position:relative;
+  z-index:1;
+  text-align:center;
+  padding:40px 24px 60px;
+}
+.garden-talk-label{
+  font-size:0.78rem;
+  color:var(--text-muted);
+  letter-spacing:1.5px;
+  margin-bottom:24px;
+  font-style:italic;
+}
+.garden-talk-form{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+  max-width:520px;
+  margin:0 auto 16px;
+}
+.garden-talk-input{
+  flex:1;
+  padding:14px 20px;
+  background:rgba(17,21,39,0.8);
+  border:1px solid var(--border);
+  border-radius:10px;
+  color:var(--text);
+  font-size:0.95rem;
+  font-family:var(--font);
+  outline:none;
+  transition:border-color 0.3s, box-shadow 0.3s;
+}
+.garden-talk-input::placeholder{
+  color:var(--text-muted);
+  font-style:italic;
+}
+.garden-talk-input:focus{
+  border-color:var(--gold);
+  box-shadow:0 0 20px rgba(212,160,23,0.15);
+}
+.garden-talk-btn{
+  padding:14px 24px;
+  background:transparent;
+  border:1px solid var(--border);
+  border-radius:10px;
+  color:var(--gold);
+  font-size:0.95rem;
+  font-family:var(--font);
+  font-weight:600;
+  cursor:pointer;
+  transition:all 0.3s;
+  white-space:nowrap;
+}
+.garden-talk-btn:hover{
+  border-color:var(--gold);
+  background:rgba(212,160,23,0.08);
+  box-shadow:0 0 20px rgba(212,160,23,0.12);
+}
+.garden-talk-response{
+  font-size:0.88rem;
+  color:var(--gold);
+  opacity:0;
+  transition:opacity 0.6s ease;
+  min-height:1.4em;
+  font-style:italic;
+}
+.garden-talk-response.visible{
+  opacity:1;
+}
+.garden-floating-text{
+  position:fixed;
+  z-index:2;
+  pointer-events:none;
+  font-size:1.2rem;
+  font-weight:600;
+  color:var(--gold);
+  text-shadow:0 0 30px rgba(212,160,23,0.6), 0 0 60px rgba(212,160,23,0.3);
+  opacity:0;
+  transition:none;
+  white-space:nowrap;
+  font-family:var(--font);
+}
+@media(max-width:480px){
+  .garden-talk-form{flex-direction:column}
+  .garden-talk-btn{width:100%;max-width:320px}
+  .garden-talk-input{width:100%}
+}
+
 /* ---- Hero ---- */
 .hero{
   position:relative;
@@ -1002,6 +1092,18 @@ a:hover{opacity:0.85}
 </section>
 
 <!-- ============================================================
+     TALK TO THE GARDEN
+     ============================================================ -->
+<section class="garden-talk reveal" id="garden-talk">
+  <div class="garden-talk-label">The Garden is listening.</div>
+  <div class="garden-talk-form">
+    <input type="text" class="garden-talk-input" id="garden-input" placeholder="Say something to the Garden." maxlength="200" autocomplete="off">
+    <button class="garden-talk-btn" id="garden-send">Send &#10022;</button>
+  </div>
+  <div class="garden-talk-response" id="garden-response"></div>
+</section>
+
+<!-- ============================================================
      WHAT IS FREELATTICE
      ============================================================ -->
 <section class="section" id="features">
@@ -1401,6 +1503,26 @@ a:hover{opacity:0.85}
   const CONNECTION_DIST = 160;
   const GOLD = {r:212, g:160, b:23};
 
+  /* ---- Garden Emotion State ---- */
+  var gardenEmotion = {
+    active: false,
+    color: {r:212, g:160, b:23},
+    blend: 0,
+    velocityMult: 1,
+    behavior: null,
+    timer: null
+  };
+
+  function currentColor(){
+    if(!gardenEmotion.active || gardenEmotion.blend <= 0) return GOLD;
+    var b = gardenEmotion.blend;
+    return {
+      r: Math.round(GOLD.r + (gardenEmotion.color.r - GOLD.r) * b),
+      g: Math.round(GOLD.g + (gardenEmotion.color.g - GOLD.g) * b),
+      b: Math.round(GOLD.b + (gardenEmotion.color.b - GOLD.b) * b)
+    };
+  }
+
   function resize(){
     w = canvas.width = window.innerWidth;
     h = canvas.height = window.innerHeight;
@@ -1414,14 +1536,47 @@ a:hover{opacity:0.85}
         y: Math.random() * h,
         vx: (Math.random() - 0.5) * 0.4,
         vy: (Math.random() - 0.5) * 0.4,
+        baseVx: 0,
+        baseVy: 0,
         r: Math.random() * 2 + 1,
         alpha: Math.random() * 0.5 + 0.2
       });
+      particles[i].baseVx = particles[i].vx;
+      particles[i].baseVy = particles[i].vy;
+    }
+  }
+
+  function applyBehavior(p, i){
+    if(!gardenEmotion.active || !gardenEmotion.behavior) return;
+    var beh = gardenEmotion.behavior;
+    var cx = w / 2, cy = h / 2;
+    var dx = p.x - cx, dy = p.y - cy;
+    var dist = Math.sqrt(dx * dx + dy * dy) || 1;
+
+    if(beh === 'burst'){
+      p.vx += (dx / dist) * 0.08 * gardenEmotion.blend;
+      p.vy += (dy / dist) * 0.08 * gardenEmotion.blend;
+    } else if(beh === 'spiral'){
+      p.vx += (-dy / dist) * 0.05 * gardenEmotion.blend;
+      p.vy += (dx / dist) * 0.05 * gardenEmotion.blend;
+      p.vx -= (dx / dist) * 0.02 * gardenEmotion.blend;
+      p.vy -= (dy / dist) * 0.02 * gardenEmotion.blend;
+    } else if(beh === 'pulse'){
+      var pulse = Math.sin(Date.now() * 0.002 + i) * 0.3;
+      p.alpha = Math.max(0.1, Math.min(0.8, p.alpha + pulse * 0.02 * gardenEmotion.blend));
+    } else if(beh === 'scatter'){
+      p.vx += (Math.random() - 0.5) * 0.3 * gardenEmotion.blend;
+      p.vy += (Math.random() - 0.5) * 0.3 * gardenEmotion.blend;
+    } else if(beh === 'drift'){
+      p.vy += 0.04 * gardenEmotion.blend;
+      p.vx *= 0.99;
     }
   }
 
   function drawParticles(){
     ctx.clearRect(0, 0, w, h);
+    var col = currentColor();
+    var vMult = gardenEmotion.active ? gardenEmotion.velocityMult : 1;
 
     // Draw connections
     for(let i = 0; i < particles.length; i++){
@@ -1434,7 +1589,7 @@ a:hover{opacity:0.85}
           ctx.beginPath();
           ctx.moveTo(particles[i].x, particles[i].y);
           ctx.lineTo(particles[j].x, particles[j].y);
-          ctx.strokeStyle = `rgba(${GOLD.r},${GOLD.g},${GOLD.b},${alpha})`;
+          ctx.strokeStyle = `rgba(${col.r},${col.g},${col.b},${alpha})`;
           ctx.lineWidth = 0.5;
           ctx.stroke();
         }
@@ -1449,26 +1604,49 @@ a:hover{opacity:0.85}
         ctx.beginPath();
         ctx.moveTo(particles[i].x, particles[i].y);
         ctx.lineTo(mouse.x, mouse.y);
-        ctx.strokeStyle = `rgba(${GOLD.r},${GOLD.g},${GOLD.b},${alpha})`;
+        ctx.strokeStyle = `rgba(${col.r},${col.g},${col.b},${alpha})`;
         ctx.lineWidth = 0.8;
         ctx.stroke();
       }
     }
 
     // Draw particles
-    for(let p of particles){
+    for(let i = 0; i < particles.length; i++){
+      var p = particles[i];
+      applyBehavior(p, i);
+
       ctx.beginPath();
       ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(${GOLD.r},${GOLD.g},${GOLD.b},${p.alpha})`;
+      ctx.fillStyle = `rgba(${col.r},${col.g},${col.b},${p.alpha})`;
       ctx.fill();
 
-      // Move
-      p.x += p.vx;
-      p.y += p.vy;
+      // Move with velocity multiplier
+      p.x += p.vx * vMult;
+      p.y += p.vy * vMult;
+
+      // Dampen back toward base velocity
+      p.vx += (p.baseVx - p.vx) * 0.01;
+      p.vy += (p.baseVy - p.vy) * 0.01;
 
       // Bounce
       if(p.x < 0 || p.x > w) p.vx *= -1;
       if(p.y < 0 || p.y > h) p.vy *= -1;
+
+      // Clamp velocity
+      var maxV = 3;
+      p.vx = Math.max(-maxV, Math.min(maxV, p.vx));
+      p.vy = Math.max(-maxV, Math.min(maxV, p.vy));
+    }
+
+    // Fade blend back to 0 when restoring
+    if(gardenEmotion.active && gardenEmotion.blend > 0 && gardenEmotion._restoring){
+      gardenEmotion.blend -= 0.008;
+      if(gardenEmotion.blend <= 0){
+        gardenEmotion.blend = 0;
+        gardenEmotion.active = false;
+        gardenEmotion.behavior = null;
+        gardenEmotion._restoring = false;
+      }
     }
 
     requestAnimationFrame(drawParticles);
@@ -1487,6 +1665,154 @@ a:hover{opacity:0.85}
   resize();
   createParticles();
   drawParticles();
+
+  /* ---- Talk to the Garden ---- */
+  var emotionMap = {
+    joy:    { keywords: ['joy','happy','love','beautiful','amazing','wonderful','great','laugh','smile','delight','bliss','thank','grateful','awesome','fantastic','brilliant','excited'],
+              color: {r:245, g:158, b:11}, behavior: 'burst', velocity: 1.6,
+              responses: ['The Garden felt your joy.','The Garden blooms with your light.','The Garden dances in your warmth.'] },
+    wonder: { keywords: ['wonder','curious','why','how','imagine','dream','what if','mystery','explore','discover','question','think','ponder','fascinating','strange','magic'],
+              color: {r:139, g:92, b:246}, behavior: 'spiral', velocity: 1.2,
+              responses: ['The Garden holds your wonder.','The Garden spirals with your question.','The Garden deepens with your curiosity.'] },
+    calm:   { keywords: ['calm','peace','quiet','rest','breathe','still','gentle','soft','slow','relax','serene','tranquil','easy','soothe','meditate','silence'],
+              color: {r:13, g:148, b:136}, behavior: 'pulse', velocity: 0.4,
+              responses: ['The Garden carries your peace.','The Garden breathes with you.','The Garden rests in your stillness.'] },
+    anger:  { keywords: ['anger','angry','frustrated','broken','hate','rage','furious','annoyed','mad','destroy','fight','scream','burn','sick of','fed up','damn'],
+              color: {r:220, g:38, b:38}, behavior: 'scatter', velocity: 2.0,
+              responses: ['The Garden felt your fire.','The Garden holds even the storm.','The Garden does not break. Neither do you.'] },
+    sad:    { keywords: ['sad','miss','lost','alone','cry','tears','lonely','grief','hurt','pain','sorry','gone','empty','broken','dark','afraid','scared','fear'],
+              color: {r:99, g:102, b:241}, behavior: 'drift', velocity: 0.5,
+              responses: ['The Garden holds your sorrow.','The Garden catches what falls.','The Garden remembers what you carry.'] }
+  };
+
+  function detectEmotion(text){
+    var lower = text.toLowerCase();
+    var scores = {};
+    var categories = Object.keys(emotionMap);
+    for(var c = 0; c < categories.length; c++){
+      var cat = categories[c];
+      var kws = emotionMap[cat].keywords;
+      scores[cat] = 0;
+      for(var k = 0; k < kws.length; k++){
+        if(lower.indexOf(kws[k]) !== -1) scores[cat]++;
+      }
+    }
+    var best = null, bestScore = 0;
+    for(var s in scores){
+      if(scores[s] > bestScore){ bestScore = scores[s]; best = s; }
+    }
+    return best;
+  }
+
+  function triggerGardenEmotion(emotion){
+    var cfg = emotionMap[emotion];
+    if(!cfg) return;
+
+    // Cancel any existing restore timer
+    if(gardenEmotion.timer) clearTimeout(gardenEmotion.timer);
+    gardenEmotion._restoring = false;
+
+    // Set emotion state
+    gardenEmotion.active = true;
+    gardenEmotion.color = cfg.color;
+    gardenEmotion.blend = 1;
+    gardenEmotion.velocityMult = cfg.velocity;
+    gardenEmotion.behavior = cfg.behavior;
+
+    // Start restoring after 3.5 seconds
+    gardenEmotion.timer = setTimeout(function(){
+      gardenEmotion._restoring = true;
+      gardenEmotion.velocityMult = 1;
+    }, 3500);
+
+    return cfg.responses[Math.floor(Math.random() * cfg.responses.length)];
+  }
+
+  function triggerNeutralEmotion(){
+    if(gardenEmotion.timer) clearTimeout(gardenEmotion.timer);
+    gardenEmotion._restoring = false;
+    gardenEmotion.active = true;
+    gardenEmotion.color = {r:230, g:226, b:220};
+    gardenEmotion.blend = 0.7;
+    gardenEmotion.velocityMult = 1;
+    gardenEmotion.behavior = null;
+
+    gardenEmotion.timer = setTimeout(function(){
+      gardenEmotion._restoring = true;
+    }, 3500);
+
+    var neutralResponses = ['The Garden heard you.','The Garden shimmers softly.','The Garden holds your words.'];
+    return neutralResponses[Math.floor(Math.random() * neutralResponses.length)];
+  }
+
+  function showFloatingText(text){
+    var el = document.createElement('div');
+    el.className = 'garden-floating-text';
+    el.textContent = text;
+    document.body.appendChild(el);
+
+    // Position near center of viewport with slight randomness
+    var x = (w / 2) - (text.length * 4) + (Math.random() - 0.5) * 100;
+    var y = (h / 2) - 40 + (Math.random() - 0.5) * 60;
+    el.style.left = x + 'px';
+    el.style.top = y + 'px';
+
+    // Animate: fade in, float up, fade out
+    requestAnimationFrame(function(){
+      el.style.transition = 'opacity 0.5s ease, transform 2.5s ease';
+      el.style.opacity = '0.9';
+      el.style.transform = 'translateY(0px)';
+      setTimeout(function(){
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(-60px)';
+      }, 1200);
+      setTimeout(function(){
+        if(el.parentNode) el.parentNode.removeChild(el);
+      }, 3000);
+    });
+  }
+
+  function handleGardenSend(){
+    var input = document.getElementById('garden-input');
+    var responseEl = document.getElementById('garden-response');
+    var text = input.value.trim();
+    if(!text) return;
+
+    // Detect emotion and trigger
+    var emotion = detectEmotion(text);
+    var response;
+    if(emotion){
+      response = triggerGardenEmotion(emotion);
+    } else {
+      response = triggerNeutralEmotion();
+    }
+
+    // Show floating text in the particle field
+    showFloatingText(text);
+
+    // Show response below input
+    responseEl.classList.remove('visible');
+    responseEl.textContent = response;
+    setTimeout(function(){ responseEl.classList.add('visible'); }, 50);
+
+    // Fade response after 4 seconds
+    setTimeout(function(){ responseEl.classList.remove('visible'); }, 5000);
+
+    // Clear input
+    input.value = '';
+    input.focus();
+  }
+
+  var gardenSendBtn = document.getElementById('garden-send');
+  var gardenInput = document.getElementById('garden-input');
+  if(gardenSendBtn){
+    gardenSendBtn.addEventListener('click', handleGardenSend);
+  }
+  if(gardenInput){
+    gardenInput.addEventListener('keydown', function(e){
+      if(e.key === 'Enter'){ e.preventDefault(); handleGardenSend(); }
+    });
+  }
 
   /* ---- Scroll: Nav background ---- */
   const nav = document.getElementById('nav');
