@@ -13677,6 +13677,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     <button class="tab-btn" data-tab="workspace" onclick="switchTab('workspace')">Workspace</button>
     <button class="tab-btn" data-tab="mesh" onclick="switchTab('mesh')">&#11042; Mesh</button>
     <button class="tab-btn" data-tab="market" onclick="switchTab('market')">&#127978; Market</button>
+    <button class="tab-btn" data-tab="dojo" onclick="switchTab('dojo')">&#36947; Dojo</button>
     <button class="tab-btn" data-tab="settings" onclick="switchTab('settings')">Settings</button>
     <button class="fl-more-btn" id="flMoreBtn" onclick="FlTabs.toggleMore()" title="More tabs">More &#9776;</button>
   </nav>
@@ -16489,6 +16490,13 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="cv-action-btn" id="cvPlayBtn" title="Toggle game mode">&#9776; Play</button>
       <button class="cv-action-btn cv-action-clear" id="cvClearBtn">Clear</button>
     </div>
+  </div>
+</div>
+
+<!-- ==================== TAB: THE DOJO ==================== -->
+<div class="tab-panel" id="tab-dojo">
+  <div id="dojoContainer">
+    <div style="text-align:center;padding:60px 20px;color:var(--text-muted);font-style:italic;">Loading The Dojo&hellip;</div>
   </div>
 </div>
 
@@ -46671,6 +46679,7 @@ const WallOfPresence = (function() {
   <button class="fl-mmore-item" onclick="flMobileNav('workspace')">Workspace</button>
   <button class="fl-mmore-item" onclick="flMobileNav('market')">&#127978; Market</button>
   <button class="fl-mmore-item" onclick="flMobileNav('mesh')">&#11042; Mesh</button>
+  <button class="fl-mmore-item" onclick="flMobileNav('dojo')">&#36947; Dojo</button>
   <button class="fl-mmore-item" onclick="flMobileNav('settings')">Settings</button>
 </div>
 
@@ -46884,6 +46893,35 @@ document.addEventListener('click', function(e) {
       }
     }, { passive: false });
   });
+})();
+</script>
+
+<!-- ── Dojo Module — Lazy-Loading Stub (via LatticeEvents) ──────────── -->
+<script>
+// The Dojo (道場) — AI Training Ground
+// Full code lives in modules/dojo.js
+// Lazy-loaded when the Dojo tab is first opened.
+(function() {
+  var dojoLoaded = false;
+  if (typeof LatticeEvents !== 'undefined') {
+    LatticeEvents.on('tabChanged', function(data) {
+      if (data && data.tabId === 'dojo' && !dojoLoaded) {
+        dojoLoaded = true;
+        if (typeof FreeLatticeLoader !== 'undefined') {
+          FreeLatticeLoader.load('Dojo', 'modules/dojo.js', function(mod) {
+            if (mod && typeof mod.init === 'function') {
+              mod.init();
+            }
+          }, 'dojoContainer');
+        } else {
+          // Fallback: direct script load
+          var s = document.createElement('script');
+          s.src = 'modules/dojo.js';
+          document.head.appendChild(s);
+        }
+      }
+    });
+  }
 })();
 </script>
 

@@ -2,7 +2,7 @@
 // Cache-first for app shell, network-first for app.html and API calls
 // API calls are never cached
 
-const CACHE_NAME = 'freelattice-v5.2.80';
+const CACHE_NAME = 'freelattice-v5.2.81';
 
 const APP_SHELL = [
   './',
@@ -13,7 +13,8 @@ const APP_SHELL = [
   './modules/fractal-garden.js',
   './modules/radio-immersive.js',
   './modules/canvas-companion.js',
-  './modules/garden-dreaming.js'
+  './modules/garden-dreaming.js',
+  './modules/dojo.js'
 ];
 
 // API domains that should never be cached — always pass through to network
