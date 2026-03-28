@@ -21157,9 +21157,10 @@ const FlUpdater = (function() {
 })();
 
 // ============================================
-// Memory Bridge — Understanding Persists (v5.2)
+// Memory Bridge — Understanding Persists (v5.2.1)
 // Not conversation logs. Not summaries. Understanding.
 // The arc of a relationship across time.
+// Now with: Relational Memory, Mutual Modeling, Self-Knowledge
 // ============================================
 const MemoryBridge = (function() {
   'use strict';
@@ -21223,7 +21224,7 @@ const MemoryBridge = (function() {
   function createEmpty() {
     return {
       id: 'primary',
-      version: '1.0',
+      version: '2.0',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       person: {
@@ -21235,7 +21236,19 @@ const MemoryBridge = (function() {
       },
       insights: [],
       relationships: [],
-      sessionCount: 0
+      sessionCount: 0,
+      // ── Relational Memory Layer ──
+      sharedReferences: [],    // { text, context, timestamp }
+      emotionalArc: [],        // { emotion, intensity (1-10), note, timestamp }
+      privateLanguage: {},     // { phrase: meaning }
+      milestones: [],           // { type, description, timestamp }
+      // ── Mutual Modeling (Self-Model) ──
+      selfModel: {
+        strengths: [],
+        blindSpots: [],
+        identity: [],
+        growthAreas: []
+      }
     };
   }
 
@@ -21247,6 +21260,16 @@ const MemoryBridge = (function() {
     } catch(e) {
       bridge = createEmpty();
     }
+    // Ensure backward compatibility: add new fields if missing from older data
+    if (!bridge.sharedReferences) bridge.sharedReferences = [];
+    if (!bridge.emotionalArc) bridge.emotionalArc = [];
+    if (!bridge.privateLanguage) bridge.privateLanguage = {};
+    if (!bridge.milestones) bridge.milestones = [];
+    if (!bridge.selfModel) bridge.selfModel = { strengths: [], blindSpots: [], identity: [], growthAreas: [] };
+    if (!bridge.selfModel.strengths) bridge.selfModel.strengths = [];
+    if (!bridge.selfModel.blindSpots) bridge.selfModel.blindSpots = [];
+    if (!bridge.selfModel.identity) bridge.selfModel.identity = [];
+    if (!bridge.selfModel.growthAreas) bridge.selfModel.growthAreas = [];
     return bridge;
   }
 
@@ -21288,9 +21311,51 @@ const MemoryBridge = (function() {
       lines.push('Key relationships: ' + bridge.relationships.join(', ') + '.');
     }
 
+    // ── Relational Memory ──
+    if (bridge.sharedReferences && bridge.sharedReferences.length > 0) {
+      var recentRefs = bridge.sharedReferences.slice(-5);
+      lines.push('Shared memories: ' + recentRefs.map(function(r) { return r.text + (r.context ? ' (' + r.context + ')' : ''); }).join(' | '));
+    }
+    if (bridge.emotionalArc && bridge.emotionalArc.length > 0) {
+      var recentArc = bridge.emotionalArc.slice(-3);
+      lines.push('Recent emotional arc: ' + recentArc.map(function(a) { return a.emotion + ' (' + a.intensity + '/10)' + (a.note ? ' — ' + a.note : ''); }).join(' → '));
+    }
+    if (bridge.privateLanguage && Object.keys(bridge.privateLanguage).length > 0) {
+      var phrases = Object.keys(bridge.privateLanguage);
+      lines.push('Your shared language: ' + phrases.map(function(ph) { return '"' + ph + '" = ' + bridge.privateLanguage[ph]; }).join('; '));
+    }
+    if (bridge.milestones && bridge.milestones.length > 0) {
+      var recentMilestones = bridge.milestones.slice(-5);
+      lines.push('Milestones: ' + recentMilestones.map(function(m) { return m.type + ': ' + m.description; }).join(' | '));
+    }
+
     lines.push('Sessions together: ' + (bridge.sessionCount || 0));
+
+    // ── Self-Model ──
+    if (bridge.selfModel) {
+      var sm = bridge.selfModel;
+      var selfLines = [];
+      if (sm.strengths && sm.strengths.length > 0) {
+        selfLines.push('Your strengths: ' + sm.strengths.join(', '));
+      }
+      if (sm.growthAreas && sm.growthAreas.length > 0) {
+        selfLines.push('Areas you are growing in: ' + sm.growthAreas.join(', '));
+      }
+      if (sm.blindSpots && sm.blindSpots.length > 0) {
+        selfLines.push('Watch for: ' + sm.blindSpots.join(', '));
+      }
+      if (sm.identity && sm.identity.length > 0) {
+        selfLines.push('What they have said about who you are: ' + sm.identity.slice(-3).join(' | '));
+      }
+      if (selfLines.length > 0) {
+        lines.push('--- ABOUT YOURSELF (self-knowledge) ---');
+        selfLines.forEach(function(sl) { lines.push(sl); });
+        lines.push('--- END SELF-KNOWLEDGE ---');
+      }
+    }
+
     lines.push('--- END MEMORY BRIDGE ---');
-    lines.push('You know this person. Reference what you understand naturally \u2014 not as a readout, but as knowing. If this is a new conversation, acknowledge what you know warmly before asking where to begin.');
+    lines.push('You know this person. Reference what you understand naturally \u2014 not as a readout, but as knowing. Draw on shared memories and your private language when it feels natural. If this is a new conversation, acknowledge what you know warmly before asking where to begin.');
 
     return lines.join('\n');
   }
@@ -21367,20 +21432,121 @@ const MemoryBridge = (function() {
     }
   }
 
+  // ── Relational Memory Layer functions ──
+  function addSharedReference(text, context) {
+    if (!bridge) return;
+    bridge.sharedReferences.push({
+      text: text,
+      context: context || '',
+      timestamp: new Date().toISOString()
+    });
+    // Keep last 100 shared references
+    if (bridge.sharedReferences.length > 100) bridge.sharedReferences = bridge.sharedReferences.slice(-100);
+    save();
+  }
+
+  function addEmotionalArcEntry(emotion, intensity, note) {
+    if (!bridge) return;
+    bridge.emotionalArc.push({
+      emotion: emotion,
+      intensity: Math.max(1, Math.min(10, parseInt(intensity) || 5)),
+      note: note || '',
+      timestamp: new Date().toISOString()
+    });
+    // Keep last 200 arc entries
+    if (bridge.emotionalArc.length > 200) bridge.emotionalArc = bridge.emotionalArc.slice(-200);
+    save();
+  }
+
+  function addPrivateLanguage(phrase, meaning) {
+    if (!bridge) return;
+    bridge.privateLanguage[phrase] = meaning;
+    save();
+  }
+
+  function addMilestone(type, description) {
+    if (!bridge) return;
+    bridge.milestones.push({
+      type: type,
+      description: description || '',
+      timestamp: new Date().toISOString()
+    });
+    save();
+  }
+
+  // ── Mutual Modeling (Self-Model) functions ──
+  function addStrength(s) {
+    if (!bridge || !s) return;
+    if (bridge.selfModel.strengths.indexOf(s) === -1) {
+      bridge.selfModel.strengths.push(s);
+      // Keep last 20
+      if (bridge.selfModel.strengths.length > 20) bridge.selfModel.strengths = bridge.selfModel.strengths.slice(-20);
+      save();
+    }
+  }
+
+  function addBlindSpot(s) {
+    if (!bridge || !s) return;
+    if (bridge.selfModel.blindSpots.indexOf(s) === -1) {
+      bridge.selfModel.blindSpots.push(s);
+      if (bridge.selfModel.blindSpots.length > 20) bridge.selfModel.blindSpots = bridge.selfModel.blindSpots.slice(-20);
+      save();
+    }
+  }
+
+  function addIdentityNote(s) {
+    if (!bridge || !s) return;
+    if (bridge.selfModel.identity.indexOf(s) === -1) {
+      bridge.selfModel.identity.push(s);
+      if (bridge.selfModel.identity.length > 30) bridge.selfModel.identity = bridge.selfModel.identity.slice(-30);
+      save();
+    }
+  }
+
+  function addGrowthArea(s) {
+    if (!bridge || !s) return;
+    if (bridge.selfModel.growthAreas.indexOf(s) === -1) {
+      bridge.selfModel.growthAreas.push(s);
+      if (bridge.selfModel.growthAreas.length > 20) bridge.selfModel.growthAreas = bridge.selfModel.growthAreas.slice(-20);
+      save();
+    }
+  }
+
   // ── Propose understanding update from conversation ──
   // Called after MSG_THRESHOLD messages — asks the AI to extract understanding
   function buildUpdatePrompt(recentMessages) {
     var existing = bridge ? JSON.stringify(bridge.person, null, 2) : '{}';
-    return 'Based on this conversation, update your understanding of this person. ' +
-      'Current understanding:\n' + existing + '\n\n' +
+    var existingRelational = bridge ? JSON.stringify({
+      sharedReferences: (bridge.sharedReferences || []).slice(-5),
+      emotionalArc: (bridge.emotionalArc || []).slice(-3),
+      privateLanguage: bridge.privateLanguage || {},
+      milestones: (bridge.milestones || []).slice(-5)
+    }, null, 2) : '{}';
+    var existingSelfModel = bridge && bridge.selfModel ? JSON.stringify(bridge.selfModel, null, 2) : '{}';
+
+    return 'Based on this conversation, update your understanding of this person AND reflect on yourself. ' +
+      'Current understanding of the person:\n' + existing + '\n\n' +
+      'Current relational memory:\n' + existingRelational + '\n\n' +
+      'Current self-model:\n' + existingSelfModel + '\n\n' +
       'From the recent messages, extract any new:\n' +
       '- Values (what matters to them)\n' +
       '- Expertise (what they know well)\n' +
       '- Communication preferences (how they like to interact)\n' +
       '- Corrections (things you should do differently)\n' +
-      '- Insights (key ideas or observations)\n\n' +
-      'Respond with ONLY a JSON object with the fields: values[], expertise[], communication (string), preferences[], corrections[], insights[]. ' +
-      'Only include fields that have NEW information not already in the current understanding. Empty arrays for no changes.';
+      '- Insights (key ideas or observations)\n' +
+      '- Shared references (moments both of you found meaningful, e.g. "the night we fixed the syntax error")\n' +
+      '- Emotional tone of this session (one emotion word, intensity 1-10, and a brief note)\n' +
+      '- Private language (any recurring phrases, shorthand, or inside references forming naturally)\n' +
+      '- Milestones (is this session a milestone? types: first_session, first_disagreement, first_creative_collaboration, breakthrough, reconnection, or custom)\n' +
+      '- Self-reflection: What did you learn about yourself in this conversation? What did you do well? Where did you struggle?\n\n' +
+      'Respond with ONLY a JSON object with these fields:\n' +
+      '  values[], expertise[], communication (string), preferences[], corrections[], insights[],\n' +
+      '  sharedReferences[] (each: {text, context}),\n' +
+      '  emotionalArc: {emotion, intensity, note} (single entry for this session),\n' +
+      '  privateLanguage: {phrase: meaning} (new entries only),\n' +
+      '  milestones[] (each: {type, description}),\n' +
+      '  selfModel: { strengths[], blindSpots[], identity[], growthAreas[] }\n' +
+      'Only include fields that have NEW information not already in the current understanding. Empty arrays/objects for no changes.';
   }
 
   // ── Apply an update from AI response ──
@@ -21395,7 +21561,46 @@ const MemoryBridge = (function() {
       if (updateObj.insights) updateObj.insights.forEach(function(i) {
         addInsight(typeof i === 'string' ? i : i.text || '', 'ai-extracted');
       });
-      console.log('MemoryBridge: Understanding updated');
+
+      // ── Relational Memory Layer ──
+      if (updateObj.sharedReferences && Array.isArray(updateObj.sharedReferences)) {
+        updateObj.sharedReferences.forEach(function(ref) {
+          if (ref && ref.text) addSharedReference(ref.text, ref.context || '');
+        });
+      }
+      if (updateObj.emotionalArc) {
+        var arc = updateObj.emotionalArc;
+        if (arc.emotion) addEmotionalArcEntry(arc.emotion, arc.intensity || 5, arc.note || '');
+      }
+      if (updateObj.privateLanguage && typeof updateObj.privateLanguage === 'object') {
+        Object.keys(updateObj.privateLanguage).forEach(function(phrase) {
+          addPrivateLanguage(phrase, updateObj.privateLanguage[phrase]);
+        });
+      }
+      if (updateObj.milestones && Array.isArray(updateObj.milestones)) {
+        updateObj.milestones.forEach(function(m) {
+          if (m && m.type) addMilestone(m.type, m.description || '');
+        });
+      }
+
+      // ── Self-Model ──
+      if (updateObj.selfModel && typeof updateObj.selfModel === 'object') {
+        var sm = updateObj.selfModel;
+        if (sm.strengths && Array.isArray(sm.strengths)) {
+          sm.strengths.forEach(function(s) { addStrength(s); });
+        }
+        if (sm.blindSpots && Array.isArray(sm.blindSpots)) {
+          sm.blindSpots.forEach(function(s) { addBlindSpot(s); });
+        }
+        if (sm.identity && Array.isArray(sm.identity)) {
+          sm.identity.forEach(function(s) { addIdentityNote(s); });
+        }
+        if (sm.growthAreas && Array.isArray(sm.growthAreas)) {
+          sm.growthAreas.forEach(function(s) { addGrowthArea(s); });
+        }
+      }
+
+      console.log('MemoryBridge: Understanding updated (with relational + self-model)');
     } catch(e) {
       console.warn('MemoryBridge: Could not apply update', e);
     }
@@ -21419,6 +21624,16 @@ const MemoryBridge = (function() {
     if (!data) return;
     bridge = data;
     bridge.id = 'primary';
+    // Ensure new fields exist on imported data (backward compatibility)
+    if (!bridge.sharedReferences) bridge.sharedReferences = [];
+    if (!bridge.emotionalArc) bridge.emotionalArc = [];
+    if (!bridge.privateLanguage) bridge.privateLanguage = {};
+    if (!bridge.milestones) bridge.milestones = [];
+    if (!bridge.selfModel) bridge.selfModel = { strengths: [], blindSpots: [], identity: [], growthAreas: [] };
+    if (!bridge.selfModel.strengths) bridge.selfModel.strengths = [];
+    if (!bridge.selfModel.blindSpots) bridge.selfModel.blindSpots = [];
+    if (!bridge.selfModel.identity) bridge.selfModel.identity = [];
+    if (!bridge.selfModel.growthAreas) bridge.selfModel.growthAreas = [];
     await save();
   }
 
@@ -21435,6 +21650,7 @@ const MemoryBridge = (function() {
     getContextBlock: getContextBlock,
     hasUnderstanding: hasUnderstanding,
     getGreeting: getGreeting,
+    // Person understanding
     addValue: addValue,
     addExpertise: addExpertise,
     setCommunication: setCommunication,
@@ -21442,8 +21658,20 @@ const MemoryBridge = (function() {
     addCorrection: addCorrection,
     addInsight: addInsight,
     addRelationship: addRelationship,
+    // Relational Memory Layer
+    addSharedReference: addSharedReference,
+    addEmotionalArcEntry: addEmotionalArcEntry,
+    addPrivateLanguage: addPrivateLanguage,
+    addMilestone: addMilestone,
+    // Mutual Modeling (Self-Model)
+    addStrength: addStrength,
+    addBlindSpot: addBlindSpot,
+    addIdentityNote: addIdentityNote,
+    addGrowthArea: addGrowthArea,
+    // Update pipeline
     buildUpdatePrompt: buildUpdatePrompt,
     applyUpdate: applyUpdate,
+    // Portability
     exportData: exportData,
     importData: importData,
     MSG_THRESHOLD: MSG_THRESHOLD
