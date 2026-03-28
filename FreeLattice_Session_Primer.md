@@ -348,12 +348,14 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-03-27 23:10 UTC
-- Last deployed: 2026-03-27 23:10 UTC
+- Last auto-updated: 2026-03-28 03:04 UTC
+- Last deployed: 2026-03-28 03:04 UTC
 - Live site: https://freelattice.com
 - Version: 5.2
-- Total commits: 434
+- Total commits: 436
 - Last 10 commits:
+- 10512ee feat: Add The Dojo (道場) — AI Training Ground module
+- 02b1ced ci: Update Primer deployment state [2026-03-27]
 - 2802a34 fix: Add Canvas and Nursery to mobile More menu, bump SW cache to v5.2.80
 - 6d58b69 ci: Update Primer deployment state [2026-03-27]
 - 45d2384 fix: Bump SW cache to v5.2.79 — forces mobile browsers to clear broken cached version
@@ -362,5 +364,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 9fe7260 ci: Update Primer deployment state [2026-03-27]
 - 7e4a7a9 feat: Canvas Companion — AI draws back with strokes, glow, and echo (full creative freedom)
 - d967447 ci: Update Primer deployment state [2026-03-27]
-- a755e4b refactor: Event bus system, dead code cleanup, mobile particle budget — foundation stabilization
-- 99b9851 ci: Update Primer deployment state [2026-03-27]
