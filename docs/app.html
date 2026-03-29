@@ -34176,7 +34176,7 @@ async function plantExternalVoice() {
 
 // ---- Service Worker Registration ----
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js')
+  navigator.serviceWorker.register('sw.js', {updateViaCache: 'none'})
     .then(reg => console.log('FreeLattice: Offline mode ready'))
     .catch(err => console.log('FreeLattice: Service worker not available'));
 }
