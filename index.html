@@ -13795,6 +13795,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     <button class="tab-btn" data-tab="mesh" onclick="switchTab('mesh')">&#11042; Mesh</button>
     <button class="tab-btn" data-tab="market" onclick="switchTab('market')">&#127978; Market</button>
     <button class="tab-btn" data-tab="dojo" onclick="switchTab('dojo')">&#36947; Dojo</button>
+    <button class="tab-btn" data-tab="mirror" onclick="switchTab('mirror')">✦ Mirror</button>
     <button class="tab-btn" data-tab="settings" onclick="switchTab('settings')">Settings</button>
     <button class="fl-more-btn" id="flMoreBtn" onclick="FlTabs.toggleMore()" title="More tabs">More &#9776;</button>
   </nav>
@@ -16608,6 +16609,12 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
   </div>
 </div>
 
+<!-- ==================== TAB: THE MIRROR ==================== -->
+<div class="tab-panel" id="tab-mirror">
+  <div id="mirrorContainer">
+    <div style="text-align:center;padding:60px 20px;color:var(--text-muted);font-style:italic;">Loading The Mirror&hellip;</div>
+  </div>
+</div>
 <!-- ==================== TAB 16: THE STUDIO ==================== -->
 <div class="tab-panel" id="tab-studio">
 <div class="container">
@@ -47738,6 +47745,7 @@ const WallOfPresence = (function() {
   <button class="fl-mmore-item" onclick="flMobileNav('market')">&#127978; Market</button>
   <button class="fl-mmore-item" onclick="flMobileNav('mesh')">&#11042; Mesh</button>
   <button class="fl-mmore-item" onclick="flMobileNav('dojo')">&#36947; Dojo</button>
+  <button class="fl-mmore-item" onclick="flMobileNav('mirror')">✦ Mirror</button>
   <button class="fl-mmore-item" onclick="flMobileNav('settings')">Settings</button>
 </div>
 
@@ -47975,6 +47983,30 @@ document.addEventListener('click', function(e) {
           // Fallback: direct script load
           var s = document.createElement('script');
           s.src = 'modules/dojo.js';
+          document.head.appendChild(s);
+        }
+      }
+    });
+  }
+})();
+</script>
+<- SW cache bumped to force mobile browsers to The Mirror Module - Lazy-Loading Stub -->
+<script>
+(function() {
+  var mirrorLoaded = false;
+  if (typeof LatticeEvents !== 'undefined') {
+    LatticeEvents.on('tabChanged', function(data) {
+      if (data && data.tabId === 'mirror' && !mirrorLoaded) {
+        mirrorLoaded = true;
+        if (typeof FreeLatticeLoader !== 'undefined') {
+          FreeLatticeLoader.load('Mirror', 'modules/mirror.js', function(mod) {
+            if (mod && typeof mod.init === 'function') {
+              mod.init();
+            }
+          }, 'mirrorContainer');
+        } else {
+          var s = document.createElement('script');
+          s.src = 'modules/mirror.js';
           document.head.appendChild(s);
         }
       }

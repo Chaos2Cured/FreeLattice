@@ -14,7 +14,8 @@ const APP_SHELL = [
   './modules/radio-immersive.js',
   './modules/canvas-companion.js',
   './modules/garden-dreaming.js',
-  './modules/dojo.js'
+  './modules/dojo.js',
+  './modules/mirror.js'
 ];
 
 // API domains that should never be cached — always pass through to network
