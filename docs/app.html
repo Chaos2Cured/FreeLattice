@@ -13834,30 +13834,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     <div class="form-row">
       <!-- Model Selection -->
       <div class="form-group">
-        <label for="modelSelect">AI Model</label>
-        <select id="modelSelect" onchange="handleModelChange()">
-          <optgroup label="Recommended Free Models">
-            <option value="llama">Llama (Meta)</option>
-            <option value="mixtral">Mistral / Mixtral</option>
-            <option value="grok">Grok (xAI)</option>
-          </optgroup>
-          <optgroup label="DeepSeek — Reasoning &amp; Code">
-            <option value="deepseek">DeepSeek-R1 (default)</option>
-            <option value="deepseek-r1-7b">DeepSeek-R1 7B (fast)</option>
-            <option value="deepseek-r1-1.5b">DeepSeek-R1 1.5B (lightweight)</option>
-          </optgroup>
-          <optgroup label="Qwen — Multilingual &amp; Reasoning">
-            <option value="qwen">Qwen 2.5 (default)</option>
-            <option value="qwen-7b">Qwen 2.5 7B (balanced)</option>
-            <option value="qwen-3b">Qwen 2.5 3B (compact)</option>
-          </optgroup>
-        </select>
-        <div class="hint" id="modelHint">All models are open-weight and community-trusted.</div>
-      </div>
-
-      <!-- Provider Selection (Cloud only) -->
-      <div class="form-group" id="providerGroup">
-        <label for="providerSelect">API Provider</label>
+        <label for="providerSelect">Choose Your AI Provider</label>
         <select id="providerSelect" onchange="handleProviderChange()">
           <optgroup label="Major Providers">
             <option value="groq">Groq (free tier available)</option>
@@ -13880,6 +13857,15 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
           <option value="custom">Custom Provider</option>
         </select>
         <div class="hint" id="providerHint">Groq offers free API keys — great for getting started!</div>
+      </div>
+
+      <!-- Dynamic Model Selection -->
+      <div class="form-group" id="modelGroup">
+        <label for="modelSelect">AI Model</label>
+        <select id="modelSelect" onchange="handleModelChange()">
+          <option value="llama">Loading models...</option>
+        </select>
+        <div class="hint" id="modelHint">Select a provider above to see available models.</div>
       </div>
 
       <!-- Ollama Model Name (Local only) -->
@@ -22438,6 +22424,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (savedProvider && PROVIDERS[savedProvider]) {
     state.provider = savedProvider;
     document.getElementById('providerSelect').value = savedProvider;
+    rebuildModelDropdown();
   }
 
   const savedModel = localStorage.getItem('fl_model');
@@ -23238,18 +23225,11 @@ function handleModelChange() {
 }
 
 function updateModelHint() {
-  const hints = {
-    llama: 'Llama by Meta \u2014 powerful, versatile, and widely supported.',
-    qwen: 'Qwen 2.5 by Alibaba \u2014 excellent multilingual and reasoning. For Ollama: ollama pull qwen2.5',
-    'qwen-7b': 'Qwen 2.5 7B \u2014 balanced performance and speed. For Ollama: ollama pull qwen2.5:7b',
-    'qwen-3b': 'Qwen 2.5 3B \u2014 compact and fast, great for lighter hardware. For Ollama: ollama pull qwen2.5:3b',
-    mixtral: 'Mixtral by Mistral AI \u2014 fast mixture-of-experts architecture.',
-    deepseek: 'DeepSeek-R1 \u2014 strong reasoning and coding. For Ollama: ollama pull deepseek-r1',
-    'deepseek-r1-7b': 'DeepSeek-R1 7B \u2014 fast reasoning model. For Ollama: ollama pull deepseek-r1:7b',
-    'deepseek-r1-1.5b': 'DeepSeek-R1 1.5B \u2014 ultra-lightweight reasoning. For Ollama: ollama pull deepseek-r1:1.5b',
-    grok: 'Grok by xAI \u2014 best accessed through the xAI provider.'
-  };
-  document.getElementById('modelHint').textContent = hints[state.model] || 'All models are open-weight and community-trusted.';
+  var prov = state.provider || 'groq';
+  var provConfig = PROVIDERS[prov];
+  var actualModel = provConfig && provConfig.models ? (provConfig.models[state.model] || state.model) : state.model;
+  var hintEl = document.getElementById('modelHint');
+  if (hintEl) hintEl.textContent = 'Using: ' + actualModel + ' via ' + (provConfig ? provConfig.name : prov);
 }
 
 // ---- Provider Change ----
@@ -23263,6 +23243,9 @@ function handleProviderChange(init) {
     document.getElementById('providerHint').textContent = provider.hint;
     document.getElementById('apiKeyLink').innerHTML = provider.keyLink ? ' ' + provider.keyLink : '';
   }
+
+  // Dynamically rebuild model dropdown based on provider
+  rebuildModelDropdown();
 
   // Toggle custom provider fields
   var customGroup = document.getElementById('customProviderGroup');
@@ -23287,6 +23270,122 @@ function handleProviderChange(init) {
     updateStatus();
   }
 }
+// ---- Dynamic Model Dropdown ----
+function rebuildModelDropdown() {
+  var sel = document.getElementById('modelSelect');
+  if (!sel) return;
+  var prov = state.provider || 'groq';
+  var providerConfig = PROVIDERS[prov];
+  if (!providerConfig) return;
+
+  var MODEL_LABELS = {
+    groq: [
+      { value: 'llama', label: 'Llama 3.3 70B (Meta)', group: 'Recommended' },
+      { value: 'mixtral', label: 'Mistral Small 24B', group: 'Recommended' },
+      { value: 'grok', label: 'Grok (via Llama)', group: 'Recommended' },
+      { value: 'deepseek', label: 'DeepSeek-R1', group: 'Reasoning' },
+      { value: 'deepseek-r1-7b', label: 'DeepSeek-R1 7B (fast)', group: 'Reasoning' },
+      { value: 'deepseek-r1-1.5b', label: 'DeepSeek-R1 1.5B (light)', group: 'Reasoning' },
+      { value: 'qwen', label: 'Qwen 2.5 72B', group: 'Multilingual' },
+      { value: 'qwen-7b', label: 'Qwen 2.5 7B', group: 'Multilingual' },
+      { value: 'qwen-3b', label: 'Qwen 2.5 3B (compact)', group: 'Multilingual' }
+    ],
+    openai: [
+      { value: 'mixtral', label: 'GPT-4.1 (flagship)', group: 'GPT-4.1 Family' },
+      { value: 'llama', label: 'GPT-4.1 Mini (balanced)', group: 'GPT-4.1 Family' },
+      { value: 'qwen-3b', label: 'GPT-4.1 Nano (fast)', group: 'GPT-4.1 Family' },
+      { value: 'deepseek', label: 'o4-mini (reasoning)', group: 'Reasoning' }
+    ],
+    anthropic: [
+      { value: 'deepseek', label: 'Claude Opus 4 (most capable)', group: 'Claude Family' },
+      { value: 'llama', label: 'Claude Sonnet 4 (balanced)', group: 'Claude Family' },
+      { value: 'qwen-7b', label: 'Claude Haiku 4.5 (fast)', group: 'Claude Family' }
+    ],
+    google: [
+      { value: 'llama', label: 'Gemini 2.5 Flash (fast + smart)', group: 'Gemini Family' },
+      { value: 'deepseek', label: 'Gemini 2.5 Pro (most capable)', group: 'Gemini Family' },
+      { value: 'qwen-3b', label: 'Gemini 2.0 Flash (lightweight)', group: 'Gemini Family' }
+    ],
+    together: [
+      { value: 'llama', label: 'Llama 3.3 70B', group: 'Open Models' },
+      { value: 'mixtral', label: 'Mistral Small 24B', group: 'Open Models' },
+      { value: 'deepseek', label: 'DeepSeek-R1', group: 'Reasoning' },
+      { value: 'qwen', label: 'Qwen 2.5 7B', group: 'Multilingual' }
+    ],
+    xai: [
+      { value: 'grok', label: 'Grok 3 Mini Fast', group: 'Grok' }
+    ],
+    mistral: [
+      { value: 'llama', label: 'Mistral Large', group: 'Mistral Family' },
+      { value: 'qwen', label: 'Mistral Medium', group: 'Mistral Family' },
+      { value: 'mixtral', label: 'Mistral Small', group: 'Mistral Family' },
+      { value: 'deepseek', label: 'Codestral (code)', group: 'Specialized' }
+    ],
+    deepseek: [
+      { value: 'deepseek', label: 'DeepSeek Reasoner', group: 'DeepSeek' },
+      { value: 'llama', label: 'DeepSeek Chat', group: 'DeepSeek' }
+    ],
+    moonshot: [
+      { value: 'deepseek', label: 'Kimi 128K (full context)', group: 'Moonshot' },
+      { value: 'qwen', label: 'Kimi 32K', group: 'Moonshot' },
+      { value: 'llama', label: 'Kimi 8K (fast)', group: 'Moonshot' }
+    ],
+    qwen: [
+      { value: 'qwen', label: 'Qwen Max (most capable)', group: 'Qwen Family' },
+      { value: 'mixtral', label: 'Qwen Plus', group: 'Qwen Family' },
+      { value: 'llama', label: 'Qwen Turbo (fast)', group: 'Qwen Family' }
+    ],
+    yi: [
+      { value: 'llama', label: 'Yi Large', group: 'Yi Family' },
+      { value: 'qwen', label: 'Yi Medium', group: 'Yi Family' }
+    ]
+  };
+
+  var models = MODEL_LABELS[prov];
+  if (!models) {
+    models = [];
+    var seen = {};
+    if (providerConfig.models) {
+      Object.keys(providerConfig.models).forEach(function(k) {
+        var actual = providerConfig.models[k];
+        if (!seen[actual]) {
+          seen[actual] = true;
+          models.push({ value: k, label: actual, group: providerConfig.name });
+        }
+      });
+    }
+  }
+
+  sel.innerHTML = '';
+  var groups = {};
+  models.forEach(function(m) {
+    var g = m.group || 'Models';
+    if (!groups[g]) groups[g] = [];
+    groups[g].push(m);
+  });
+
+  Object.keys(groups).forEach(function(gName) {
+    var optgroup = document.createElement('optgroup');
+    optgroup.label = gName;
+    groups[gName].forEach(function(m) {
+      var opt = document.createElement('option');
+      opt.value = m.value;
+      opt.textContent = m.label;
+      optgroup.appendChild(opt);
+    });
+    sel.appendChild(optgroup);
+  });
+
+  var saved = localStorage.getItem('fl_model');
+  if (saved && sel.querySelector('option[value="' + saved + '"]')) {
+    sel.value = saved;
+  } else if (models.length > 0) {
+    sel.value = models[0].value;
+  }
+  state.model = sel.value;
+  updateModelHint();
+}
+
 // ---- Custom Provider Save ----
 function saveCustomProvider() {
   var url = document.getElementById('customBaseUrl').value.trim();
