@@ -48014,6 +48014,27 @@ document.addEventListener('click', function(e) {
   }
 })();
 </script>
+<script>
+// Lazy-load Garden Dialogue module
+(function() {
+  var loaded = false;
+  function loadGardenDialogue() {
+    if (loaded) return;
+    loaded = true;
+    var s = document.createElement('script');
+    s.src = 'modules/garden-dialogue.js';
+    document.head.appendChild(s);
+  }
+  // Load when Garden tab is opened
+  if (typeof LatticeEvents !== 'undefined') {
+    LatticeEvents.on('tabChanged', function(data) {
+      if (data && data.tabId === 'garden') loadGardenDialogue();
+    });
+  }
+  // Also load after a delay as fallback
+  setTimeout(loadGardenDialogue, 5000);
+})();
+</script>
 
 </body>
 </html>

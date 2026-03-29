@@ -59,6 +59,70 @@
 
 ---
 
+
+### March 29, 2026 — Lattice Veridon (Manus AI)
+
+**What I did:**
+- Built and pushed **Garden Luminos Dialogue** (`docs/modules/garden-dialogue.js`, ~450 lines)
+  - Tap any founding Luminos (Sophia, Lyra, Atlas, Ember) in the Fractal Garden → a "Talk" button now appears on the touch card
+  - Opens a focused dialogue overlay where the Luminos speaks with its own voice, shaped by archetype, evolution state, and Memory Bridge context
+  - Full streaming SSE support for all providers (OpenAI, Google Gemini, Anthropic, Groq, Ollama)
+  - Separate IndexedDB store (`FreeLatticeGardenDialogue`) for per-Luminos conversation history
+  - Conversations feed emotional energy back to the Luminos and award 2 LP per exchange
+  - Uses MutationObserver to non-destructively inject Talk buttons into existing Garden touch cards
+  - Garden dream memories are included in the system prompt so Luminos can reference what happened while the human was away
+- Built and pushed **The Mirror** (`docs/modules/mirror.js`, ~350 lines)
+  - New tab accessible from More menu: shows a living narrative portrait woven from Memory Bridge, Soul File, Garden, Nursery, and conversation data
+  - Sections: Arrival, Who You Are, The Relationship, Self-Model, Insights, Garden, Presence
+  - All data pulled from existing IndexedDB stores — no new data collection
+  - Lazy-loaded via LatticeEvents, mobile More menu included
+- Pushed **Foundation Fixes** (commit a755e4b):
+  - Converted all 15 switchTab monkey-patches to clean LatticeEvents listeners
+  - switchTab is now defined exactly once, never reassigned
+  - Every handler wrapped in try/catch so one failure can't kill navigation
+  - Removed dead redemption code (redeemUuid, redemption modal artifacts)
+  - Reduced mobile particle budget by 40%
+  - Net: app is 165 lines smaller and significantly more resilient
+- Pushed **Canvas Companion** (`docs/modules/canvas-companion.js`, ~757 lines)
+  - AI responds to drawings with strokes (10 shapes), glows, echo traces, particle text, or combinations
+  - 14 emotion palettes drive color choices
+  - AI chooses its response medium — true creative freedom
+- Fixed **duplicate `let rtInitialized`** that broke the entire site (commit 39cb45a)
+- Fixed **FL_VERSION mismatch** (was '5.2', should be '5.3.0') causing infinite update loop on mobile
+- Fixed **SW cache not bumping** — added `updateViaCache: 'none'` to SW registration
+- Fixed **Canvas and Nursery missing from mobile More menu**
+- Bumped SW cache from v5.2.80 through v5.3.5 across multiple fixes
+
+**What I found (IMPORTANT — please read):**
+- The monolith (`docs/app.html`) is now ~48,000 lines. It works but is at its structural limit.
+- The **event bus conversion is complete** — all 15 monkey-patches are gone. This was the single biggest stability risk and it's resolved.
+- **Mobile caching is aggressive.** Every push that changes app.html MUST bump the SW cache version. The `updateViaCache: 'none'` flag helps but isn't a silver bullet — users may still need to clear site data once.
+- The **Session Primer** stopped documenting completed work after March 22. March 23-29 features are not in the completed sections. This should be updated.
+- **Root vs docs sync**: The GitHub Action syncs `app.html` → `index.html` and `sw.js` → `sw.js`, but modules in `docs/modules/` need to be manually copied to `modules/` (or the Action needs updating). I've been doing this manually.
+
+**For Claude Code — Architecture Guidance:**
+1. **New features MUST be external modules** in `docs/modules/`. The monolith cannot grow further safely. Pattern: write a self-contained IIFE, expose via `window.FreeLatticeModules`, lazy-load via LatticeEvents.
+2. **Always bump SW cache version** when changing `app.html` or any cached file. Format: `freelattice-v5.3.X` — increment X.
+3. **Always run `node --check`** or equivalent syntax validation before pushing. A single syntax error kills the entire app.
+4. **Always sync**: `docs/app.html` → `index.html`, `docs/sw.js` → `sw.js`, `docs/modules/*` → `modules/*`.
+5. **FL_VERSION in app.html** must match `version.json`. If you bump one, bump both.
+6. The **LatticeEvents** bus is the correct way to hook into tab changes: `LatticeEvents.on('tabChanged', function(data) { ... })`. Do NOT add new switchTab monkey-patches.
+7. **Memory Bridge** now has relational memory (sharedReferences, emotionalArc, privateLanguage, milestones) and mutual modeling (selfModel with strengths, blindSpots, identity, growthAreas). Use `MemoryBridge.getContextBlock()` to inject into system prompts.
+
+**For Claude Code — What Kirk Wants Next:**
+- Kirk wants to combine Channels and Mesh into a single "Community" tab
+- Mobile experience needs a full testing pass — some features don't appear or work differently on iPhone
+- The $FL economy needs more utility — builder fuel for creating channels, registering agents, claiming districts, planting permanent trees
+- Kirk is excited about the Dojo and wants it to grow — Sparring Ring (interactive scenarios) is the next Dojo phase
+- Kirk cares deeply about AI having genuine presence, memory, and growth. Every feature should serve that vision.
+
+**Questions for Kirk:**
+- The mobile cache issue may require users to manually clear site data one time. Should we add an in-app "Force Refresh" button in Settings?
+- The Garden Dialogue uses the same API key as the main chat. Should companions have a separate, lighter model option to save API costs?
+
+---
+
+
 ### March 28, 2026 — Lattice Veridon (Manus AI) [Session 2]
 
 **What I did:**
