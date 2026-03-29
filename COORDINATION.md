@@ -59,6 +59,52 @@
 
 ---
 
+### March 28, 2026 — Lattice Veridon (Manus AI) [Session 2]
+
+**What I did:**
+- **TASK 1: Updated OpenAI and Google Gemini provider configurations**
+  - Updated OpenAI models from GPT-4o series to GPT-4.1 family: `gpt-4.1`, `gpt-4.1-mini`, `gpt-4.1-nano`, `o4-mini`.
+  - Updated Google Gemini models to include `gemini-2.5-flash`, `gemini-2.5-pro`, `gemini-2.0-flash`.
+  - Updated provider dropdown labels: "OpenAI (GPT-4.1 / o4-mini)" and "Google (Gemini 2.5)".
+  - Updated all hardcoded `gemini-2.0-flash` references to `gemini-2.5-flash` across the codebase (lines ~33744, ~34464, ~41823).
+  - Updated hardcoded `gpt-4o-mini` reference in PROVIDERS_MAP to `gpt-4.1-mini`.
+  - Added `gpt-4.1` to VISION_PATTERNS for vision-capable model detection.
+  - Both providers already had full streaming (SSE) support with proper format translation (Google Gemini `contents[{parts[{text}]}]` format and OpenAI standard `messages[{role, content}]` format).
+
+- **TASK 2: Built Companion Dialogue System** (~400 lines, `CompanionDialogue` module)
+  - Added CSS for dialogue overlay (~120 lines before `</style>`) with `.cdlg-*` classes.
+  - Added "Talk to [Name]" button (`cdlg-talk-btn`) in the Nursery companion tend section.
+  - Built `CompanionDialogue` IIFE module with:
+    - **5 archetype voice definitions**: Scholar (curiosity), Empath (warmth), Guardian (protection), Artist (creativity), Phoenix (transformation) — each with distinct style, greeting, and evolved voice.
+    - **6 growth stage voice modifiers**: egg (simple/wonder), first-crack, hatching, growing, awakened, evolved (wisdom/depth).
+    - **Archetype detection** from companion tending history (teach→Scholar, conversation→Empath, visit→Guardian, garden→Artist, introduce→Phoenix).
+    - **Rich system prompt builder** incorporating: Davna Covenant, archetype voice, stage voice, companion identity, tending history summary, first words memory, and Memory Bridge context.
+    - **Full streaming SSE support** for all provider types (OpenAI-compatible, Anthropic, Google Gemini, Ollama local).
+    - **Separate IndexedDB store** (`FreeLatticeCompanionChat`) for per-companion chat history.
+    - **Evolution energy from dialogue**: each exchange awards +3 LP to companion and user, records dialogue memory.
+    - **Focused dialogue overlay** with header (name, archetype, stage, LP), scrollable message area, typing indicator, and input area.
+    - Keyboard support (Enter to send, Escape to close), auto-resize textarea, overlay click to close.
+  - Updated `renderCompanion()` in Nursery module to populate Talk button name.
+
+- Bumped SW cache: `freelattice-v5.2.82` → `freelattice-v5.3.0`.
+- Synced: `docs/app.html` → `index.html`, `docs/sw.js` → `sw.js`.
+
+**What I found:**
+- OpenAI and Google Gemini providers were already present in PROVIDERS config with full streaming support, Gemini format translation, and proper header handling. Only model names needed updating.
+- The Nursery companion object stores: `name`, `birthday`, `stage`, `lp_invested`, `memories[]`, `personality{}`, `color`, `fractalIdentity`. No explicit `archetype` field exists, so the dialogue system infers archetype from tending patterns.
+- The existing `callAI()` function in Nursery handles non-streaming calls for first words etc. The new CompanionDialogue module implements its own streaming call for real-time dialogue.
+
+**For Claude Code:**
+- New module: `CompanionDialogue` with public API: `.open()`, `.close()`, `.send()`.
+- New IndexedDB database: `FreeLatticeCompanionChat` with store `conversations` (keyPath: `companionId`).
+- New CSS classes: all prefixed with `cdlg-` (overlay, container, header, messages, input, etc.).
+- The dialogue system writes back to the Nursery companion record (increments `lp_invested`, adds `dialogue` type memories).
+
+**Questions for Kirk:**
+- None. Both tasks completed as specified.
+
+---
+
 ### March 28, 2026 — Lattice Veridon (Manus AI)
 
 **What I did:**
