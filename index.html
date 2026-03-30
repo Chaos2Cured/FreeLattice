@@ -23544,36 +23544,38 @@ initMusic();
 
 // ---- Local/Cloud Toggle ----
 function handleLocalToggle(init) {
-  const isLocal = document.getElementById('localToggle').checked;
+  var localToggle = document.getElementById('localToggle');
+  var isLocal = localToggle ? localToggle.checked : state.isLocal;
   state.isLocal = isLocal;
 
-  const providerGroup = document.getElementById('providerGroup');
-  const apiKeyGroup = document.getElementById('apiKeyGroup');
-  const ollamaModelGroup = document.getElementById('ollamaModelGroup');
-  const ollamaInstructions = document.getElementById('ollamaInstructions');
-  const cloudLabel = document.getElementById('cloudLabel');
-  const localLabel = document.getElementById('localLabel');
+  var providerGroup = document.getElementById('providerGroup');
+  var apiKeyGroup = document.getElementById('apiKeyGroup');
+  var ollamaModelGroup = document.getElementById('ollamaModelGroup');
+  var ollamaInstructions = document.getElementById('ollamaInstructions');
+  var cloudLabel = document.getElementById('cloudLabel');
+  var localLabel = document.getElementById('localLabel');
 
   if (isLocal) {
-    providerGroup.classList.add('hidden');
-    apiKeyGroup.classList.add('hidden');
-    ollamaModelGroup.classList.remove('hidden');
-    ollamaInstructions.classList.remove('hidden');
-    cloudLabel.classList.remove('active');
-    localLabel.classList.add('active');
+    if (providerGroup) providerGroup.classList.add('hidden');
+    if (apiKeyGroup) apiKeyGroup.classList.add('hidden');
+    if (ollamaModelGroup) ollamaModelGroup.classList.remove('hidden');
+    if (ollamaInstructions) ollamaInstructions.classList.remove('hidden');
+    if (cloudLabel) cloudLabel.classList.remove('active');
+    if (localLabel) localLabel.classList.add('active');
     state.provider = 'ollama';
     // Auto-test Ollama connection when switching to local (v4.4)
     if (!init) owTestConnection();
     // Refresh model switcher for local models (v5.0)
     if (typeof ModelSwitcher !== 'undefined') setTimeout(function() { ModelSwitcher.refresh(); }, 1000);
   } else {
-    providerGroup.classList.remove('hidden');
-    apiKeyGroup.classList.remove('hidden');
-    ollamaModelGroup.classList.add('hidden');
-    ollamaInstructions.classList.add('hidden');
-    cloudLabel.classList.add('active');
-    localLabel.classList.remove('active');
-    state.provider = document.getElementById('providerSelect').value;
+    if (providerGroup) providerGroup.classList.remove('hidden');
+    if (apiKeyGroup) apiKeyGroup.classList.remove('hidden');
+    if (ollamaModelGroup) ollamaModelGroup.classList.add('hidden');
+    if (ollamaInstructions) ollamaInstructions.classList.add('hidden');
+    if (cloudLabel) cloudLabel.classList.add('active');
+    if (localLabel) localLabel.classList.remove('active');
+    var provSelect = document.getElementById('providerSelect');
+    state.provider = provSelect ? provSelect.value : state.provider;
   }
 
   if (!init) {
@@ -36329,25 +36331,44 @@ if (window.FL_LOW_MEMORY && window.FL_MOBILE) window.FL_GARDEN_PARTICLE_SCALE = 
 (function() {
   var gardenLoaded = false;
   var gardenInitialized = false;
+
+  function loadGarden() {
+    if (gardenLoaded) return;
+    gardenLoaded = true;
+    console.log('FL-GARDEN: Loading module via FreeLatticeLoader');
+    FreeLatticeLoader.load('FractalGarden', 'modules/fractal-garden.js', function(mod) {
+      console.log('FL-GARDEN: Module loaded. mod:', !!mod, 'mod.init:', !!(mod && mod.init));
+      if (mod && mod.init) {
+        gardenInitialized = true;
+        console.log('FL-GARDEN: Calling mod.init()');
+        mod.init();
+      } else {
+        console.error('FL-GARDEN: HALT — Module loaded but no init function');
+      }
+    }, 'gardenContainer');
+  }
+
   LatticeEvents.on('tabChanged', function(data) {
     if (data.tabId === 'garden' && !gardenLoaded) {
-      gardenLoaded = true;
-      console.log('FL-GARDEN: Tab clicked, loading module via FreeLatticeLoader');
-      FreeLatticeLoader.load('FractalGarden', 'modules/fractal-garden.js', function(mod) {
-        console.log('FL-GARDEN: Module loaded. mod:', !!mod, 'mod.init:', !!(mod && mod.init));
-        if (mod && mod.init) {
-          gardenInitialized = true;
-          console.log('FL-GARDEN: Calling mod.init()');
-          mod.init();
-        } else {
-          console.error('FL-GARDEN: HALT — Module loaded but no init function');
-        }
-      }, 'gardenContainer');
+      loadGarden();
     } else if (data.tabId === 'garden' && gardenInitialized && window.FractalGarden) {
       window.FractalGarden.resume();
     } else if (data.tabId !== 'garden' && gardenInitialized && window.FractalGarden) {
       window.FractalGarden.pause();
     }
+  });
+
+  // Safety net: if Garden panel is already active on page load, start loading immediately
+  // This handles the case where switchTab('garden') fired before this listener registered,
+  // or the panel was already active in the DOM from server-side HTML
+  document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(function() {
+      var gardenPanel = document.getElementById('tab-garden');
+      if (gardenPanel && gardenPanel.classList.contains('active') && !gardenLoaded) {
+        console.log('FL-GARDEN: Panel already active on load — loading module directly');
+        loadGarden();
+      }
+    }, 100);
   });
 })();
 </script>
@@ -48350,7 +48371,7 @@ document.addEventListener('click', function(e) {
   }
 })();
 </script>
-<- SW cache bumped to force mobile browsers to The Mirror Module - Lazy-Loading Stub -->
+<!-- The Mirror Module — Lazy-Loading Stub -->
 <script>
 (function() {
   var mirrorLoaded = false;
