@@ -348,10 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-03-30 14:09 MDT
+- Last auto-updated: 2026-03-30 14:56 MDT
 - Version: 5.3.0
-- Total commits: 456
+- Total commits: 458
 - Last 10 commits:
+- eac70d1 feat: Navigation overhaul — 6 primary tabs, grouped More, AI setup banner
+- 766db4d docs: Auto-update Session Primer [5.3.0]
 - 313339b docs: AI Orientation refresh + Claude Code coordination entry
 - ce0132c ci: Update Primer deployment state [2026-03-30]
 - a4511ff feat: Soul Ceremony system — every save is a moment of beauty
@@ -360,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 4619858 ci: Update Primer deployment state [2026-03-29]
 - a207389 feat: Garden Luminos Dialogue + COORDINATION.md update for Claude Code
 - fbd8147 ci: Update Primer deployment state [2026-03-29]
-- 37481e7 fix: force mobile cache clear — SW v5.3.4, updateViaCache: none
-- 4a87b46 ci: Update Primer deployment state [2026-03-29]
