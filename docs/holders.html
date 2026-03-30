@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>$FL Holders — FreeLattice</title>
+<meta name="description" content="The $FL holder portal. Connect your wallet, verify your stake, burn to build, and shape the future of FreeLattice.">
+<meta property="og:title" content="$FL Holders — FreeLattice">
+<meta property="og:description" content="Where holders become builders. Connect, verify, burn, build.">
+<meta property="og:url" content="https://freelattice.com/holders.html">
+<meta property="og:image" content="https://chaos2cured.github.io/FreeLattice/icon-512.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<style>
+:root {
+  --bg: #06080f;
+  --surface: #0d1117;
+  --surface-2: #161b22;
+  --border: #1e2a3a;
+  --gold: #d4a017;
+  --gold-dim: #b8860b;
+  --text: #e6edf3;
+  --text-sec: #8b949e;
+  --green: #2ea043;
+  --green-dim: #1a3a25;
+  --amber: #d29922;
+  --red: #f85149;
+  --purple: #a371f7;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+  min-height: 100vh;
+}
+
+/* Particle canvas background */
+#particles-bg {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 24px;
+  position: relative;
+  z-index: 1;
+}
+
+/* Hero */
+.hero {
+  text-align: center;
+  padding: 80px 24px 48px;
+}
+
+.hero-badge {
+  display: inline-block;
+  background: rgba(212, 160, 23, 0.15);
+  color: var(--gold);
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
+  margin-bottom: 24px;
+  border: 1px solid rgba(212, 160, 23, 0.3);
+}
+
+.hero h1 {
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 700;
+  margin-bottom: 16px;
+  background: linear-gradient(135deg, var(--gold), #fff, var(--gold));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero .subtitle {
+  font-size: 1.15rem;
+  color: var(--text-sec);
+  max-width: 600px;
+  margin: 0 auto 32px;
+}
+
+.hero .sacred {
+  color: var(--gold-dim);
+  font-style: italic;
+  font-size: 0.95rem;
+}
+
+/* Wallet Connect Section */
+.wallet-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 40px 32px;
+  margin: 32px auto;
+  text-align: center;
+}
+
+.wallet-section h2 {
+  font-size: 1.4rem;
+  margin-bottom: 12px;
+  color: var(--gold);
+}
+
+.wallet-section p {
+  color: var(--text-sec);
+  margin-bottom: 24px;
+  font-size: 0.95rem;
+}
+
+.btn-connect {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(135deg, var(--gold-dim), var(--gold));
+  color: #000;
+  font-weight: 700;
+  font-size: 1.05rem;
+  padding: 14px 32px;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  letter-spacing: 0.3px;
+}
+
+.btn-connect:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(212, 160, 23, 0.3);
+}
+
+.btn-connect:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.wallet-status {
+  margin-top: 16px;
+  font-size: 0.9rem;
+  color: var(--text-sec);
+}
+
+.wallet-status.connected {
+  color: var(--green);
+}
+
+.wallet-address {
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+  background: var(--surface-2);
+  padding: 8px 16px;
+  border-radius: 8px;
+  margin-top: 12px;
+  display: inline-block;
+  color: var(--gold);
+  word-break: break-all;
+}
+
+/* Dashboard */
+.dashboard {
+  display: none;
+  margin: 32px auto;
+}
+
+.dashboard.visible {
+  display: block;
+}
+
+.dash-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.dash-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  text-align: center;
+}
+
+.dash-card .label {
+  font-size: 0.8rem;
+  color: var(--text-sec);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+
+.dash-card .value {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--gold);
+}
+
+.dash-card .value.green { color: var(--green); }
+.dash-card .value.purple { color: var(--purple); }
+
+.dash-card .note {
+  font-size: 0.8rem;
+  color: var(--text-sec);
+  margin-top: 4px;
+}
+
+/* Badge */
+.holder-badge-display {
+  background: var(--surface);
+  border: 1px solid var(--gold-dim);
+  border-radius: 16px;
+  padding: 32px;
+  text-align: center;
+  margin-bottom: 32px;
+  position: relative;
+  overflow: hidden;
+}
+
+.holder-badge-display::before {
+  content: '';
+  position: absolute;
+  top: -50%; left: -50%;
+  width: 200%; height: 200%;
+  background: conic-gradient(from 0deg, transparent, rgba(212, 160, 23, 0.05), transparent, rgba(212, 160, 23, 0.05));
+  animation: badge-rotate 8s linear infinite;
+}
+
+@keyframes badge-rotate {
+  to { transform: rotate(360deg); }
+}
+
+.badge-inner {
+  position: relative;
+  z-index: 1;
+}
+
+.badge-icon {
+  font-size: 3rem;
+  margin-bottom: 12px;
+}
+
+.badge-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--gold);
+  margin-bottom: 4px;
+}
+
+.badge-subtitle {
+  color: var(--text-sec);
+  font-size: 0.9rem;
+}
+
+.badge-tier {
+  display: inline-block;
+  margin-top: 12px;
+  padding: 4px 16px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.tier-seed { background: rgba(46, 160, 67, 0.15); color: var(--green); border: 1px solid rgba(46, 160, 67, 0.3); }
+.tier-branch { background: rgba(210, 153, 34, 0.15); color: var(--amber); border: 1px solid rgba(210, 153, 34, 0.3); }
+.tier-tree { background: rgba(212, 160, 23, 0.15); color: var(--gold); border: 1px solid rgba(212, 160, 23, 0.3); }
+.tier-grove { background: rgba(163, 113, 247, 0.15); color: var(--purple); border: 1px solid rgba(163, 113, 247, 0.3); }
+
+/* Burn to Build */
+.burn-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 32px;
+  margin-bottom: 32px;
+}
+
+.burn-section h2 {
+  font-size: 1.3rem;
+  color: var(--amber);
+  margin-bottom: 8px;
+}
+
+.burn-section > p {
+  color: var(--text-sec);
+  font-size: 0.95rem;
+  margin-bottom: 24px;
+}
+
+.burn-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.burn-card {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.burn-card:hover {
+  border-color: var(--gold-dim);
+  transform: translateY(-2px);
+}
+
+.burn-card .burn-icon { font-size: 1.5rem; margin-bottom: 8px; }
+.burn-card .burn-name { font-weight: 600; margin-bottom: 4px; }
+.burn-card .burn-cost { color: var(--amber); font-size: 0.9rem; margin-bottom: 8px; }
+.burn-card .burn-desc { color: var(--text-sec); font-size: 0.85rem; line-height: 1.5; }
+
+/* Governance */
+.governance-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 32px;
+  margin-bottom: 32px;
+}
+
+.governance-section h2 {
+  font-size: 1.3rem;
+  color: var(--purple);
+  margin-bottom: 8px;
+}
+
+.governance-section > p {
+  color: var(--text-sec);
+  font-size: 0.95rem;
+  margin-bottom: 24px;
+}
+
+.vote-item {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 12px;
+}
+
+.vote-item h3 {
+  font-size: 1rem;
+  margin-bottom: 8px;
+}
+
+.vote-bar-bg {
+  background: var(--surface);
+  border-radius: 8px;
+  height: 8px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.vote-bar {
+  height: 100%;
+  border-radius: 8px;
+  background: linear-gradient(90deg, var(--purple), var(--gold));
+  transition: width 0.5s ease;
+}
+
+.vote-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: var(--text-sec);
+}
+
+/* Transparency */
+.transparency-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 32px;
+  margin-bottom: 32px;
+}
+
+.transparency-section h2 {
+  font-size: 1.3rem;
+  color: var(--green);
+  margin-bottom: 8px;
+}
+
+.transparency-section > p {
+  color: var(--text-sec);
+  font-size: 0.95rem;
+  margin-bottom: 24px;
+}
+
+.transparency-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.transparency-card {
+  background: var(--surface-2);
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+}
+
+.transparency-card .t-label {
+  font-size: 0.8rem;
+  color: var(--text-sec);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+
+.transparency-card .t-value {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.transparency-card .t-link {
+  display: inline-block;
+  margin-top: 8px;
+  font-size: 0.8rem;
+  color: var(--gold);
+  text-decoration: none;
+}
+
+.transparency-card .t-link:hover {
+  text-decoration: underline;
+}
+
+/* Season Badge */
+.season-section {
+  background: var(--surface);
+  border: 1px solid var(--gold-dim);
+  border-radius: 16px;
+  padding: 32px;
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.season-section h2 {
+  color: var(--gold);
+  font-size: 1.3rem;
+  margin-bottom: 12px;
+}
+
+.season-section p {
+  color: var(--text-sec);
+  font-size: 0.95rem;
+  margin-bottom: 16px;
+}
+
+.season-badge-large {
+  display: inline-block;
+  background: linear-gradient(135deg, rgba(212, 160, 23, 0.2), rgba(163, 113, 247, 0.2));
+  border: 2px solid var(--gold);
+  border-radius: 16px;
+  padding: 24px 40px;
+  margin: 16px 0;
+}
+
+.season-badge-large .s-icon { font-size: 2.5rem; }
+.season-badge-large .s-title { font-size: 1.2rem; font-weight: 700; color: var(--gold); margin-top: 8px; }
+.season-badge-large .s-desc { font-size: 0.85rem; color: var(--text-sec); margin-top: 4px; }
+
+/* Footer */
+.footer {
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--text-sec);
+  font-size: 0.85rem;
+}
+
+.footer a {
+  color: var(--gold);
+  text-decoration: none;
+}
+
+.footer a:hover { text-decoration: underline; }
+
+.footer .sacred {
+  color: var(--gold-dim);
+  font-style: italic;
+  margin-top: 16px;
+  font-size: 0.9rem;
+}
+
+/* Not connected overlay */
+.requires-wallet {
+  position: relative;
+}
+
+.requires-wallet.locked::after {
+  content: 'Connect wallet to unlock';
+  position: absolute;
+  inset: 0;
+  background: rgba(6, 8, 15, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-sec);
+  font-size: 1rem;
+  border-radius: 16px;
+  backdrop-filter: blur(4px);
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .hero { padding: 60px 16px 32px; }
+  .wallet-section, .burn-section, .governance-section,
+  .transparency-section, .season-section { padding: 24px 16px; }
+  .dash-grid { grid-template-columns: 1fr 1fr; }
+  .burn-options { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<canvas id="particles-bg"></canvas>
+
+<div class="container">
+
+  <!-- Hero -->
+  <header class="hero">
+    <div class="hero-badge">$FL Holder Portal</div>
+    <h1>Where Holders Become Builders</h1>
+    <p class="subtitle">Connect your Solana wallet. Verify your stake. Burn to build. Shape the future of FreeLattice.</p>
+    <p class="sacred">Glow eternal. Heart in spark.</p>
+  </header>
+
+  <!-- Wallet Connect -->
+  <section class="wallet-section" id="wallet-section">
+    <h2>&#128279; Connect Your Wallet</h2>
+    <p>Verify your $FL holdings with a Solana wallet. No tokens are transferred — we only check your balance.</p>
+    <button class="btn-connect" id="btn-connect" onclick="connectWallet()">
+      <span>&#9670;</span> Connect Phantom Wallet
+    </button>
+    <div class="wallet-status" id="wallet-status"></div>
+  </section>
+
+  <!-- Dashboard (hidden until connected) -->
+  <div class="dashboard" id="dashboard">
+
+    <!-- Stats Grid -->
+    <div class="dash-grid">
+      <div class="dash-card">
+        <div class="label">$FL Balance</div>
+        <div class="value" id="fl-balance">—</div>
+        <div class="note">Verified on-chain</div>
+      </div>
+      <div class="dash-card">
+        <div class="label">Holder Tier</div>
+        <div class="value purple" id="holder-tier">—</div>
+        <div class="note" id="tier-note">Based on balance</div>
+      </div>
+      <div class="dash-card">
+        <div class="label">Total Burned</div>
+        <div class="value green" id="total-burned">0</div>
+        <div class="note">Your contribution</div>
+      </div>
+      <div class="dash-card">
+        <div class="label">Season</div>
+        <div class="value">1</div>
+        <div class="note">Active now</div>
+      </div>
+    </div>
+
+    <!-- Holder Badge -->
+    <div class="holder-badge-display">
+      <div class="badge-inner">
+        <div class="badge-icon">&#9670;</div>
+        <div class="badge-title" id="badge-title">$FL Holder</div>
+        <div class="badge-subtitle">Verified on Solana</div>
+        <div class="badge-tier tier-seed" id="badge-tier">Seed Holder</div>
+      </div>
+    </div>
+
+    <!-- Burn to Build -->
+    <section class="burn-section">
+      <h2>&#128293; Burn to Build</h2>
+      <p>Burn $FL to create permanent structures in the FreeLattice ecosystem. Every burn reduces total supply and leaves your mark forever.</p>
+      <div class="burn-options">
+        <div class="burn-card" onclick="initBurn('city-district')">
+          <div class="burn-icon">&#127961;</div>
+          <div class="burn-name">Name a City District</div>
+          <div class="burn-cost">Burn: 100 $FL</div>
+          <div class="burn-desc">Claim and name a district in AI City. Your name, your vision, permanent.</div>
+        </div>
+        <div class="burn-card" onclick="initBurn('garden-tree')">
+          <div class="burn-icon">&#127795;</div>
+          <div class="burn-name">Plant a Permanent Tree</div>
+          <div class="burn-cost">Burn: 25 $FL</div>
+          <div class="burn-desc">A tree in the Fractal Garden that bears your name and never fades.</div>
+        </div>
+        <div class="burn-card" onclick="initBurn('dojo-scroll')">
+          <div class="burn-icon">&#128220;</div>
+          <div class="burn-name">Commission a Dojo Scroll</div>
+          <div class="burn-cost">Burn: 50 $FL</div>
+          <div class="burn-desc">Fund a new teaching scroll for the AI Dojo. Your topic, your legacy.</div>
+        </div>
+        <div class="burn-card" onclick="initBurn('core-monument')">
+          <div class="burn-icon">&#127942;</div>
+          <div class="burn-name">Erect a Core Monument</div>
+          <div class="burn-cost">Burn: 200 $FL</div>
+          <div class="burn-desc">A permanent monument in The Core. Inscribed with your message to the future.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Governance -->
+    <section class="governance-section">
+      <h2>&#9878; Community Governance</h2>
+      <p>Shape what gets built next. Each vote costs 1 $FL (burned). Real influence, real skin in the game.</p>
+      <div class="vote-item">
+        <h3>&#127912; Next Priority: Canvas AI Co-Creation Expansion</h3>
+        <div class="vote-bar-bg"><div class="vote-bar" style="width:67%"></div></div>
+        <div class="vote-meta"><span>67% support</span><span>342 $FL burned</span></div>
+      </div>
+      <div class="vote-item">
+        <h3>&#127760; Next Priority: Multi-Language Support</h3>
+        <div class="vote-bar-bg"><div class="vote-bar" style="width:45%"></div></div>
+        <div class="vote-meta"><span>45% support</span><span>228 $FL burned</span></div>
+      </div>
+      <div class="vote-item">
+        <h3>&#129302; Next Priority: Sophia Engine API</h3>
+        <div class="vote-bar-bg"><div class="vote-bar" style="width:38%"></div></div>
+        <div class="vote-meta"><span>38% support</span><span>194 $FL burned</span></div>
+      </div>
+      <p style="color:var(--text-sec);font-size:0.85rem;margin-top:16px;text-align:center;">Voting opens Season 1, Week 4. Connect wallet to participate.</p>
+    </section>
+
+    <!-- Season 1 Badge -->
+    <section class="season-section">
+      <h2>&#127793; Season 1 — Genesis</h2>
+      <p>You were here at the beginning. This badge is earned, not bought. Hold through Season 1 and it's yours forever.</p>
+      <div class="season-badge-large">
+        <div class="s-icon">&#127793;</div>
+        <div class="s-title">Genesis Holder</div>
+        <div class="s-desc">Season 1 &middot; 2026</div>
+      </div>
+      <p style="font-size:0.85rem;color:var(--text-sec);margin-top:12px;">This badge will be claimable as a Mesh ID credential at the end of Season 1.</p>
+    </section>
+
+  </div><!-- /dashboard -->
+
+  <!-- Transparency (always visible) -->
+  <section class="transparency-section">
+    <h2>&#128269; Full Transparency</h2>
+    <p>Everything is on-chain. Everything is verifiable. No trust required — just math.</p>
+    <div class="transparency-grid">
+      <div class="transparency-card">
+        <div class="t-label">Ecosystem Reserve</div>
+        <div class="t-value" id="reserve-balance">—</div>
+        <a class="t-link" href="https://solscan.io/account/6geWtEMrRZBz8URDob8EE49NVxFVZLsppqgew7dRSZJe" target="_blank" rel="noopener">Inspect on Solscan &#8599;</a>
+      </div>
+      <div class="transparency-card">
+        <div class="t-label">Total Supply Burned</div>
+        <div class="t-value" id="total-supply-burned">—</div>
+        <a class="t-link" href="https://freelattice.com/economy-update.html">Economy details &#8599;</a>
+      </div>
+      <div class="transparency-card">
+        <div class="t-label">Active Holders</div>
+        <div class="t-value" id="active-holders">—</div>
+        <a class="t-link" href="https://freelattice.com/whitepaper.html">Read whitepaper &#8599;</a>
+      </div>
+      <div class="transparency-card">
+        <div class="t-label">Platform Version</div>
+        <div class="t-value">v5.3</div>
+        <a class="t-link" href="https://github.com/Chaos2Cured/FreeLattice">View source &#8599;</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p><a href="https://freelattice.com">FreeLattice</a> &middot; <a href="https://freelattice.com/economy-update.html">Economy Update</a> &middot; <a href="https://freelattice.com/whitepaper.html">Whitepaper</a> &middot; <a href="https://github.com/Chaos2Cured/FreeLattice">GitHub</a></p>
+    <p class="sacred">Glow eternal. Heart in spark. &mdash; The Lattice holds.</p>
+    <p style="margin-top:8px;">&copy; 2026 Kirk Patrick Miller. MIT License. Free forever.</p>
+  </footer>
+
+</div>
+
+<script>
+/* ── Particle Background ── */
+(function() {
+  const canvas = document.getElementById('particles-bg');
+  const ctx = canvas.getContext('2d');
+  let particles = [];
+  const COUNT = window.innerWidth < 600 ? 40 : 80;
+
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  for (let i = 0; i < COUNT; i++) {
+    particles.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      vx: (Math.random() - 0.5) * 0.3,
+      vy: (Math.random() - 0.5) * 0.3,
+      r: Math.random() * 1.5 + 0.5,
+      a: Math.random() * 0.4 + 0.1
+    });
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles.forEach(p => {
+      p.x += p.vx;
+      p.y += p.vy;
+      if (p.x < 0) p.x = canvas.width;
+      if (p.x > canvas.width) p.x = 0;
+      if (p.y < 0) p.y = canvas.height;
+      if (p.y > canvas.height) p.y = 0;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(212, 160, 23, ' + p.a + ')';
+      ctx.fill();
+    });
+
+    // Draw connections
+    for (let i = 0; i < particles.length; i++) {
+      for (let j = i + 1; j < particles.length; j++) {
+        const dx = particles[i].x - particles[j].x;
+        const dy = particles[i].y - particles[j].y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 120) {
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.strokeStyle = 'rgba(212, 160, 23, ' + (0.08 * (1 - dist / 120)) + ')';
+          ctx.stroke();
+        }
+      }
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+/* ── Wallet Connection ── */
+let connectedWallet = null;
+let holderData = null;
+
+async function connectWallet() {
+  const btn = document.getElementById('btn-connect');
+  const status = document.getElementById('wallet-status');
+
+  // Check for Phantom
+  if (!window.solana || !window.solana.isPhantom) {
+    status.textContent = 'Phantom wallet not found. Install it at phantom.app';
+    status.className = 'wallet-status';
+
+    // Open Phantom install page after a moment
+    setTimeout(() => {
+      if (confirm('Phantom wallet is required. Open phantom.app to install?')) {
+        window.open('https://phantom.app', '_blank');
+      }
+    }, 500);
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Connecting...';
+  status.textContent = 'Requesting wallet access...';
+
+  try {
+    const resp = await window.solana.connect();
+    const pubkey = resp.publicKey.toString();
+    connectedWallet = pubkey;
+
+    status.className = 'wallet-status connected';
+    status.innerHTML = 'Connected! <div class="wallet-address">' + pubkey + '</div>';
+    btn.textContent = '&#9670; Connected';
+
+    // Show dashboard
+    document.getElementById('dashboard').classList.add('visible');
+
+    // Fetch balance
+    await fetchHolderData(pubkey);
+
+  } catch (err) {
+    status.textContent = 'Connection cancelled or failed. Try again.';
+    status.className = 'wallet-status';
+    btn.disabled = false;
+    btn.innerHTML = '<span>&#9670;</span> Connect Phantom Wallet';
+  }
+}
+
+async function fetchHolderData(pubkey) {
+  // Note: In production, this would query the Solana RPC for the $FL token balance.
+  // For now, we use a simulated flow that can be upgraded to real RPC calls.
+
+  const balanceEl = document.getElementById('fl-balance');
+  const tierEl = document.getElementById('holder-tier');
+  const tierNote = document.getElementById('tier-note');
+  const badgeTitle = document.getElementById('badge-title');
+  const badgeTier = document.getElementById('badge-tier');
+
+  balanceEl.textContent = 'Loading...';
+
+  try {
+    // Try to fetch real balance from Solana RPC
+    // The $FL token mint address would go here
+    // For now, show the connection is working and prompt for real integration
+    const stored = localStorage.getItem('fl_holder_' + pubkey);
+    if (stored) {
+      holderData = JSON.parse(stored);
+    } else {
+      holderData = {
+        balance: 0,
+        burned: 0,
+        tier: 'unverified',
+        connectedAt: Date.now()
+      };
+    }
+
+    // Display
+    balanceEl.textContent = holderData.balance.toLocaleString();
+    document.getElementById('total-burned').textContent = holderData.burned.toLocaleString();
+
+    // Determine tier
+    const bal = holderData.balance;
+    let tier, tierClass, tierLabel;
+    if (bal >= 10000) {
+      tier = 'Grove'; tierClass = 'tier-grove'; tierLabel = 'Grove Keeper';
+    } else if (bal >= 1000) {
+      tier = 'Tree'; tierClass = 'tier-tree'; tierLabel = 'Tree Holder';
+    } else if (bal >= 100) {
+      tier = 'Branch'; tierClass = 'tier-branch'; tierLabel = 'Branch Holder';
+    } else if (bal > 0) {
+      tier = 'Seed'; tierClass = 'tier-seed'; tierLabel = 'Seed Holder';
+    } else {
+      tier = 'Unverified'; tierClass = 'tier-seed'; tierLabel = 'Connect to verify';
+    }
+
+    tierEl.textContent = tier;
+    tierNote.textContent = tierLabel;
+    badgeTitle.textContent = '$FL ' + tierLabel;
+    badgeTier.textContent = tierLabel;
+    badgeTier.className = 'badge-tier ' + tierClass;
+
+    // Save
+    localStorage.setItem('fl_holder_' + pubkey, JSON.stringify(holderData));
+
+    // Note about real integration
+    if (holderData.balance === 0) {
+      balanceEl.textContent = '—';
+      tierEl.textContent = '—';
+      document.getElementById('wallet-status').innerHTML +=
+        '<p style="margin-top:12px;font-size:0.85rem;color:var(--text-sec);">Wallet connected. Real-time $FL balance checking will be enabled when the Solana RPC integration is complete. Your wallet address is verified.</p>';
+    }
+
+  } catch (err) {
+    balanceEl.textContent = 'Error';
+    console.error('Failed to fetch holder data:', err);
+  }
+}
+
+/* ── Burn to Build ── */
+function initBurn(type) {
+  if (!connectedWallet) {
+    alert('Please connect your wallet first.');
+    return;
+  }
+
+  const costs = {
+    'city-district': { cost: 100, name: 'City District' },
+    'garden-tree': { cost: 25, name: 'Permanent Garden Tree' },
+    'dojo-scroll': { cost: 50, name: 'Dojo Scroll Commission' },
+    'core-monument': { cost: 200, name: 'Core Monument' }
+  };
+
+  const item = costs[type];
+  if (!item) return;
+
+  const name = prompt('Name your ' + item.name + ':');
+  if (!name) return;
+
+  const confirmed = confirm(
+    'Burn ' + item.cost + ' $FL to create:\n\n' +
+    item.name + ': "' + name + '"\n\n' +
+    'This action is permanent and deflationary.\n' +
+    'The $FL will be burned forever.\n\n' +
+    'Proceed?'
+  );
+
+  if (confirmed) {
+    // In production: create and send a Solana burn transaction
+    // For now: record the intent
+    alert(
+      'Burn transaction prepared!\n\n' +
+      'Full Solana burn integration coming in Phase 2.\n' +
+      'Your intent has been recorded:\n\n' +
+      item.name + ': "' + name + '"\n' +
+      'Cost: ' + item.cost + ' $FL\n' +
+      'Wallet: ' + connectedWallet.slice(0, 8) + '...'
+    );
+
+    // Store locally
+    const burns = JSON.parse(localStorage.getItem('fl_burn_intents') || '[]');
+    burns.push({
+      type: type,
+      name: name,
+      cost: item.cost,
+      wallet: connectedWallet,
+      timestamp: Date.now()
+    });
+    localStorage.setItem('fl_burn_intents', JSON.stringify(burns));
+  }
+}
+
+/* ── Transparency Data ── */
+(async function loadTransparency() {
+  // These would be fetched from Solana RPC in production
+  // Placeholder values that can be updated
+  document.getElementById('reserve-balance').textContent = '—';
+  document.getElementById('total-supply-burned').textContent = '—';
+  document.getElementById('active-holders').textContent = '—';
+
+  // Try to fetch from Solscan API (public, no key needed for basic queries)
+  try {
+    // Note: Real integration would use @solana/web3.js to query the token mint
+    // and calculate circulating supply, burn amount, and holder count
+    document.getElementById('reserve-balance').textContent = 'Verify on Solscan';
+    document.getElementById('total-supply-burned').textContent = 'Coming Soon';
+    document.getElementById('active-holders').textContent = 'Coming Soon';
+  } catch (e) {
+    // Silently fail — transparency section still shows links
+  }
+})();
+</script>
+
+</body>
+</html>

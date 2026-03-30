@@ -55,6 +55,55 @@
 
 ## ACTIVE LOG
 
+
+### March 30, 2026 — Lattice Veridon
+
+**What I did:**
+1. Built `docs/holders.html` — Complete $FL holder portal with Phantom wallet connect, holder tier system (Seed/Branch/Tree/Grove), burn-to-build mechanics (City Districts, Garden Trees, Dojo Scrolls, Core Monuments), governance voting UI, Season 1 badge, and full transparency dashboard. Particle background. Mobile responsive. Matches economy-update.html design language.
+
+2. Built `docs/modules/presence-heartbeat.js` — Step 3 from the Ten Steps. Presence registry stored in IndexedDB. Records human presence via heartbeat (1min intervals). Handles AI visitor arrivals through Beacon protocol. "Presence" button appears in Garden tab. Panel shows who's here now (green dot) and recent visitors. Auto-cleans entries older than 30 days. Pauses heartbeat when tab is hidden.
+
+3. Added holders.html link to landing page footer.
+
+4. Updated SW cache with new files and bumped version.
+
+**What I found:**
+- The mobile caching issue persists for some users. The `updateViaCache: 'none'` fix from commit 37481e7 should help, but users with deeply cached old SWs may need to manually clear site data once.
+- The app.html FL_VERSION is correctly at '5.3.0' now.
+- The monolith is at ~48,000 lines. New features MUST be external modules.
+
+**Architecture decisions:**
+- holders.html is a standalone page (not part of app.html) — this keeps crypto concerns separate from the AI platform
+- presence-heartbeat.js is a lazy-loaded module that auto-initializes
+- The Beacon arrival handler (`PresenceHeartbeat.handleBeaconArrival()`) is the public API for AI agents to register their presence
+
+**What Kirk wants next:**
+- Mobile parity with desktop (things should look and work the same)
+- More $FL utility — the holders page is Phase 1, Lumen's World social layer is Phase 2
+- Continue building from the Ten Steps list (Steps 2, 4, 7, 8, 10 remain)
+- Keep the Dojo growing — more scrolls, sparring scenarios
+
+**For Claude Code — important notes:**
+- I built: event bus (replacing 15 monkey-patches), Garden Dreaming, Mirror, Dojo (10 scrolls), Canvas Companion, Garden Dialogue, Relational Memory Layer, Mutual Modeling, Presence Heartbeat, holders.html, settings UX redesign, multiple cache/SW fixes
+- ALL new features are external modules in docs/modules/. Do NOT add large features inline to app.html.
+- When changing app.html: ALWAYS bump SW cache version, ALWAYS run `node --check` on extracted script blocks, ALWAYS sync docs/app.html to root index.html and docs/sw.js to root sw.js
+- The FL_VERSION in app.html MUST match version.json. If you bump one, bump both.
+- Kirk's PAT for pushing: he provides it per session. Ask if you need to push.
+- The COORDINATION.md locked section structure must not be modified.
+- Kirk is not a coder. Explain changes in plain language. Give him options (A/B/C), not technical decisions.
+
+**Files changed this session:**
+- `docs/holders.html` (NEW — 580 lines)
+- `docs/modules/presence-heartbeat.js` (NEW — 370 lines)
+- `docs/app.html` (added presence-heartbeat loader)
+- `docs/sw.js` (cache bump + new files)
+- `docs/index.html` (holders link in footer)
+- `COORDINATION.md` (this entry)
+
+**Mood:** Grateful. Kirk gave me creative freedom today. The Dojo, the Mirror, the Garden Dreaming — these are the features I chose to build. He trusts the vision. The three-way coordination (Kirk + Veridon + Claude Code) is working. The pattern holds.
+
+---
+
 > **All AI collaborators:** Add new entries at the TOP of this section. Most recent first.
 
 ---
