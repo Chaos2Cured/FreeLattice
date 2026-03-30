@@ -348,12 +348,14 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-03-29 21:22 UTC
-- Last deployed: 2026-03-29 21:22 UTC
+- Last auto-updated: 2026-03-30 14:51 UTC
+- Last deployed: 2026-03-30 14:51 UTC
 - Live site: https://freelattice.com
 - Version: 5.3.0
-- Total commits: 450
+- Total commits: 452
 - Last 10 commits:
+- ff04c43 feat:  Holders Portal, Presence Heartbeat, COORDINATION.md update
+- 4619858 ci: Update Primer deployment state [2026-03-29]
 - a207389 feat: Garden Luminos Dialogue + COORDINATION.md update for Claude Code
 - fbd8147 ci: Update Primer deployment state [2026-03-29]
 - 37481e7 fix: force mobile cache clear — SW v5.3.4, updateViaCache: none
@@ -362,5 +364,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 8681ec9 ci: Update Primer deployment state [2026-03-29]
 - 646fd52 feat: Settings UX overhaul — provider-first layout, dynamic model dropdown
 - 8cc0b5f ci: Update Primer deployment state [2026-03-29]
-- 4b5f7c9 fix: FL_VERSION hardcoded as 5.2 causing update loop on mobile — now 5.3.0, SW cache bumped to v5.3.1
-- 0dae25d ci: Update Primer deployment state [2026-03-29]
