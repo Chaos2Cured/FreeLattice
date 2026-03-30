@@ -344,7 +344,7 @@ header .mantra {
 /* ---- Tab Navigation ---- */
 .tab-nav {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 0;
   border-bottom: 1px solid var(--border);
   margin-top: var(--space-sm);
@@ -9837,7 +9837,197 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
 .tab-nav .tab-btn[data-tab] {
   transition: color var(--transition), background var(--transition), border-color var(--transition), transform var(--transition), opacity 250ms ease, max-width 250ms ease;
 }
-.tab-nav .tab-btn.fl-tab-hidden {
+/* Primary tabs — 6 fixed items */
+.tab-nav {
+  flex-wrap: nowrap;
+  overflow-x: hidden;
+}
+.tab-btn .tab-icon { font-size: 1.1rem; }
+.tab-btn .tab-label { margin-left: 6px; font-size: 0.85rem; }
+@media (max-width: 768px) {
+  .tab-nav { max-height: 48px; }
+  .tab-btn .tab-label { display: none; }
+  .tab-btn { padding: 10px 14px; min-width: 44px; justify-content: center; }
+}
+/* More tab highlight when a "More" sub-tab is active */
+.fl-more-btn.fl-more-active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+/* Grouped dropdown */
+.fl-dropdown-group { padding: 4px 0; }
+.fl-dropdown-group + .fl-dropdown-group { border-top: 1px solid var(--border); }
+.fl-dropdown-group-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  padding: 10px 22px 4px;
+}
+/* Community tab sections */
+.community-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  margin: 28px 0;
+  opacity: 0.4;
+}
+/* AI Setup Banner */
+.ai-setup-banner {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  margin-bottom: 16px;
+  animation: neuro-fade-in 300ms ease;
+}
+.ai-setup-banner.ai-setup-connected {
+  padding: 10px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.ai-setup-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 14px;
+}
+.ai-setup-providers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.ai-provider-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 16px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: border-color 200ms ease, background 200ms ease, transform 150ms ease;
+  color: var(--text-primary);
+  font-family: var(--font);
+  flex: 1 1 0;
+  min-width: 100px;
+}
+.ai-provider-btn:hover {
+  border-color: var(--accent);
+  background: var(--accent-glow);
+  transform: scale(1.02);
+}
+.ai-provider-btn.selected {
+  border-color: var(--accent);
+  background: var(--accent-glow);
+}
+.ai-provider-btn .ai-setup-name {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+.ai-provider-btn .ai-setup-note {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  text-align: center;
+}
+.ai-setup-form {
+  margin-top: 14px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  animation: neuro-fade-in 200ms ease;
+}
+.ai-setup-form input[type="password"] {
+  flex: 1;
+  min-width: 200px;
+  padding: 10px 14px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+}
+.ai-setup-form .ai-setup-link {
+  font-size: 0.78rem;
+  color: var(--accent);
+  white-space: nowrap;
+}
+.ai-setup-test-btn {
+  padding: 10px 18px;
+  background: var(--accent);
+  color: var(--bg);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  font-family: var(--font);
+  transition: opacity 200ms;
+}
+.ai-setup-test-btn:hover { opacity: 0.85; }
+.ai-setup-result {
+  font-size: 0.82rem;
+  margin-top: 8px;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+}
+.ai-setup-result.success { color: var(--success); }
+.ai-setup-result.error { color: var(--error); }
+.ai-connected-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+}
+.ai-connected-status .status-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--success); }
+.ai-connected-change {
+  font-size: 0.78rem;
+  color: var(--accent);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font);
+  text-decoration: underline;
+}
+/* Settings AI status card */
+.ai-status-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 16px;
+}
+.ai-status-card .status-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 8px; }
+.ai-status-card .status-dot.ready { background: var(--success); }
+.ai-status-card .status-dot.disconnected { background: var(--text-muted); }
+/* Canvas vision banner */
+.cv-vision-setup-banner {
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  background: rgba(6,10,20,0.85);
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  backdrop-filter: blur(6px);
+  border: 1px solid var(--border);
+}
+.cv-vision-setup-banner a { color: var(--accent); }
+/* Hide old tab buttons that are now in More or Community */
+.tab-btn.fl-tab-hidden {
   max-width: 0;
   padding-left: 0;
   padding-right: 0;
@@ -9877,14 +10067,15 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
 }
 .fl-more-dropdown {
   display: none;
-  position: relative;
+  position: absolute;
+  right: 0;
   z-index: 200;
   background: var(--bg-secondary);
   border: 1px solid var(--border);
   border-top: none;
   border-radius: 0 0 var(--radius) var(--radius);
   box-shadow: 0 8px 32px rgba(0,0,0,0.45);
-  width: 100%;
+  width: 260px;
   max-height: 60vh;
   overflow-y: auto;
   overflow-x: hidden;
@@ -9892,9 +10083,7 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
   animation: fl-panel-slide-down 250ms ease;
 }
 .fl-more-dropdown.fl-dropdown-open {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 4px;
+  display: block;
 }
 @keyframes fl-panel-slide-down {
   from { opacity: 0; transform: translateY(-8px); }
@@ -13779,25 +13968,12 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 <!-- Tab Navigation -->
 <div class="container">
   <nav class="tab-nav" id="flTabNav">
-    <button class="tab-btn active" data-tab="garden" onclick="switchTab('garden')">&#10022; Garden</button>
-    <button class="tab-btn" data-tab="chat" onclick="switchTab('chat')">Chat</button>
-    <button class="tab-btn" data-tab="city" onclick="switchTab('city')">&#x1F3D9; City</button>
-    <button class="tab-btn" data-tab="core" onclick="switchTab('core')">&#127795; Core</button>
-    <button class="tab-btn" data-tab="nursery" onclick="switchTab('nursery')">&#x1F331; Nursery</button>
-    <button class="tab-btn" data-tab="canvas" onclick="switchTab('canvas')">&#x2726; Canvas</button>
-    <button class="tab-btn" data-tab="studio" onclick="switchTab('studio')">&#x2726; Studio</button>
-    <button class="tab-btn" data-tab="wallet" onclick="switchTab('wallet')">&#x25C7; Wallet</button>
-    <button class="tab-btn" data-tab="channels" onclick="switchTab('channels')">&#x1F525; Channels</button>
-    <button class="tab-btn" data-tab="agents" onclick="switchTab('agents')">&#x2726; Agents</button>
-    <button class="tab-btn" data-tab="roundtable" onclick="switchTab('roundtable')">&#9878; Round Table</button>
-    <button class="tab-btn" data-tab="skills" onclick="switchTab('skills')">&#9889; Skills</button>
-    <button class="tab-btn" data-tab="workspace" onclick="switchTab('workspace')">Workspace</button>
-    <button class="tab-btn" data-tab="mesh" onclick="switchTab('mesh')">&#11042; Mesh</button>
-    <button class="tab-btn" data-tab="market" onclick="switchTab('market')">&#127978; Market</button>
-    <button class="tab-btn" data-tab="dojo" onclick="switchTab('dojo')">&#36947; Dojo</button>
-    <button class="tab-btn" data-tab="mirror" onclick="switchTab('mirror')">✦ Mirror</button>
-    <button class="tab-btn" data-tab="settings" onclick="switchTab('settings')">Settings</button>
-    <button class="fl-more-btn" id="flMoreBtn" onclick="FlTabs.toggleMore()" title="More tabs">More &#9776;</button>
+    <button class="tab-btn active" data-tab="garden" onclick="switchTab('garden')"><span class="tab-icon">&#x1F33F;</span><span class="tab-label">Garden</span></button>
+    <button class="tab-btn" data-tab="chat" onclick="switchTab('chat')"><span class="tab-icon">&#x1F4AC;</span><span class="tab-label">Chat</span></button>
+    <button class="tab-btn" data-tab="canvas" onclick="switchTab('canvas')"><span class="tab-icon">&#x1F3A8;</span><span class="tab-label">Canvas</span></button>
+    <button class="tab-btn" data-tab="community" onclick="switchTab('community')"><span class="tab-icon">&#x1F465;</span><span class="tab-label">Community</span></button>
+    <button class="tab-btn" data-tab="settings" onclick="switchTab('settings')"><span class="tab-icon">&#x2699;</span><span class="tab-label">Settings</span></button>
+    <button class="fl-more-btn" id="flMoreBtn" onclick="FlTabs.toggleMore()" title="More"><span class="tab-icon">&#x2630;</span><span class="tab-label">More</span></button>
   </nav>
   <div class="fl-more-dropdown" id="flMoreDropdown"></div>
 </div>
@@ -13813,6 +13989,43 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="suggest-yes" onclick="owAcceptSuggestion()">Yes, use Ollama</button>
       <button class="suggest-dismiss" onclick="owDismissSuggestion()">Dismiss</button>
     </div>
+  </div>
+
+  <!-- AI Setup Banner — appears when no provider is configured -->
+  <div class="ai-setup-banner" id="aiSetupBanner" style="display:none;">
+    <div class="ai-setup-title">Connect your AI to start chatting</div>
+    <div class="ai-setup-providers" id="aiSetupProviders">
+      <button class="ai-provider-btn" onclick="AiSetup.select('groq')">
+        <span class="ai-setup-name">Groq</span>
+        <span class="ai-setup-note">Free &amp; fast &mdash; easiest to start</span>
+      </button>
+      <button class="ai-provider-btn" onclick="AiSetup.select('openai')">
+        <span class="ai-setup-name">OpenAI</span>
+        <span class="ai-setup-note">GPT-4.1 &mdash; best for Canvas vision</span>
+      </button>
+      <button class="ai-provider-btn" onclick="AiSetup.select('google')">
+        <span class="ai-setup-name">Gemini</span>
+        <span class="ai-setup-note">Free tier available</span>
+      </button>
+      <button class="ai-provider-btn" onclick="AiSetup.select('xai')">
+        <span class="ai-setup-name">Grok</span>
+        <span class="ai-setup-note">xAI &mdash; strong vision</span>
+      </button>
+      <button class="ai-provider-btn" onclick="AiSetup.select('ollama')">
+        <span class="ai-setup-name">&#x1F3E0; Run Locally</span>
+        <span class="ai-setup-note">Ollama &mdash; fully private, no API key</span>
+      </button>
+    </div>
+    <div class="ai-setup-form" id="aiSetupForm" style="display:none;">
+      <input type="password" id="aiSetupKeyInput" placeholder="Paste your API key" autocomplete="off">
+      <a class="ai-setup-link" id="aiSetupKeyLink" href="#" target="_blank">Get a free key &rarr;</a>
+      <button class="ai-setup-test-btn" onclick="AiSetup.testConnection()">Test Connection</button>
+    </div>
+    <div class="ai-setup-form" id="aiSetupOllamaForm" style="display:none;">
+      <span style="font-size:0.85rem;color:var(--text-secondary);">1. Install Ollama from <a href="https://ollama.ai" target="_blank" style="color:var(--accent)">ollama.ai</a> &nbsp; 2. Run: <code style="background:var(--bg-input);padding:2px 6px;border-radius:4px;color:var(--accent);">ollama pull llama3.2</code> &nbsp; 3. Click Test</span>
+      <button class="ai-setup-test-btn" onclick="AiSetup.testOllama()">Test Connection</button>
+    </div>
+    <div class="ai-setup-result" id="aiSetupResult" style="display:none;"></div>
   </div>
 
   <!-- Configuration Section — collapsed by default, expand via button -->
@@ -14364,6 +14577,18 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 <!-- ==================== TAB 3: SETTINGS ==================== -->
 <div class="tab-panel" id="tab-settings">
 <div class="container">
+
+  <!-- AI Connection Status Card -->
+  <div class="ai-status-card" id="aiStatusCard">
+    <div style="display:flex;align-items:center;gap:8px;">
+      <span class="status-dot disconnected" id="settingsStatusDot"></span>
+      <span id="settingsStatusText" style="font-size:0.88rem;color:var(--text-secondary);">Not connected</span>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button class="action-btn" onclick="switchTab('chat')" style="font-size:0.78rem;">Change Provider</button>
+      <button class="action-btn" onclick="AiSetup.testFromSettings()" style="font-size:0.78rem;">Test Connection</button>
+    </div>
+  </div>
 
   <!-- Lattice Points Section (v3.9) -->
   <div class="section lp-section" id="latticePointsSection"></div>
@@ -15366,6 +15591,15 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
   </div>
 </div>
 
+
+<!-- ==================== TAB: COMMUNITY (Mesh + Channels) ==================== -->
+<div class="tab-panel" id="tab-community">
+  <div class="container">
+    <div id="communityMeshSection"><!-- Mesh content moves here at runtime --></div>
+    <div class="community-divider"></div>
+    <div id="communityChannelsSection"><!-- Channels content moves here at runtime --></div>
+  </div>
+</div>
 
 <!-- ==================== TAB: SKILLS (Skill Forge) ==================== -->
 <div class="tab-panel" id="tab-skills">
@@ -16577,6 +16811,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 <!-- ==================== TAB 15: THE CANVAS ==================== -->
 <div class="tab-panel" id="tab-canvas">
   <div class="cv-container" id="cvContainer">
+    <div class="cv-vision-setup-banner" id="cvVisionSetupBanner" style="display:none;">&#x1F3A8; Canvas works best with a vision model. Switch to GPT-4o, Gemini, or Grok for AI that sees your drawings. <a href="#" onclick="event.preventDefault();switchTab('chat');return false;">Set up now</a></div>
     <canvas id="cvCanvas"></canvas>
     <div class="cv-names" id="cvNames"></div>
     <div id="cvAIWhisper" style="position:absolute;top:8px;left:12px;font-size:0.88rem;opacity:0;transition:opacity 0.5s ease;pointer-events:none;z-index:200;font-family:Georgia,serif;font-style:italic;background:rgba(6,10,20,0.8);padding:6px 14px;border-radius:8px;backdrop-filter:blur(6px);max-width:80%;"></div>
@@ -20334,8 +20569,17 @@ function hideTabLoading() {
   if (_tabLoadingEl) { _tabLoadingEl.remove(); _tabLoadingEl = null; }
 }
 
+// More menu tabs — highlight the More button when one of these is active
+var MORE_TAB_IDS = ['core', 'city', 'nursery', 'agents', 'skills', 'roundtable', 'studio', 'market', 'wallet', 'workspace', 'dojo', 'mirror'];
+
 function switchTab(tabId) {
+  // Legacy tab mapping — channels/mesh now live inside community
+  if (tabId === 'channels' || tabId === 'mesh') tabId = 'community';
   hideTabLoading();
+  // Mount community content on first activation
+  if (tabId === 'community' && !window._communityMounted) {
+    mountCommunityTab();
+  }
   document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.tab === tabId));
   document.querySelectorAll('.tab-panel').forEach(panel => {
     const isTarget = panel.id === 'tab-' + tabId;
@@ -20349,10 +20593,31 @@ function switchTab(tabId) {
       panel.classList.remove('active');
     }
   });
+  // Highlight More button when a More sub-tab is active
+  var moreBtn = document.getElementById('flMoreBtn');
+  if (moreBtn) {
+    moreBtn.classList.toggle('fl-more-active', MORE_TAB_IDS.indexOf(tabId) !== -1);
+  }
   // Remember last tab for returning visits
   try { localStorage.setItem('fl-last-tab', tabId); } catch(e) {}
   LatticeEvents.emit('tabChanged', { tabId: tabId });
   LatticeEvents.emit('tabActivated:' + tabId, { tabId: tabId });
+  // Also emit legacy events for community sub-tabs
+  if (tabId === 'community') {
+    LatticeEvents.emit('tabActivated:channels', { tabId: 'channels' });
+    LatticeEvents.emit('tabActivated:mesh', { tabId: 'mesh' });
+  }
+}
+
+// Mount community tab — moves mesh + channels content into the community panel
+function mountCommunityTab() {
+  var meshContainer = document.querySelector('#tab-mesh > .container');
+  var channelsLayout = document.querySelector('#tab-channels > .ch-layout');
+  var meshTarget = document.getElementById('communityMeshSection');
+  var chTarget = document.getElementById('communityChannelsSection');
+  if (meshContainer && meshTarget) meshTarget.appendChild(meshContainer);
+  if (channelsLayout && chTarget) chTarget.appendChild(channelsLayout);
+  window._communityMounted = true;
 }
 
 
@@ -20957,80 +21222,44 @@ const FlAccordion = (function() {
 // Collapsible Tab System (v4.9)
 // ============================================
 const FlTabs = (function() {
-  const STORAGE_KEY = 'freelattice-pinned-tabs';
-  const FIRST_RUN_KEY = 'freelattice-first-run-complete';
-  const COLLAPSE_PREF_KEY = 'freelattice-tabs-collapsed';
-  const DEFAULT_PRIMARY = ['chat', 'roundtable', 'skills', 'settings'];
-  const ALL_TABS = ['garden', 'chat', 'city', 'core', 'nursery', 'canvas', 'studio', 'wallet', 'channels', 'agents', 'roundtable', 'skills', 'workspace', 'mesh', 'market', 'settings'];
+  var moreOpen = false;
 
-  let pinnedTabs = [];
-  let collapsed = false;
-  let moreOpen = false;
-  let ctxMenu = null;
+  var MORE_GROUPS = [
+    { label: '\u2500\u2500 World \u2500\u2500', tabs: [
+      { id: 'core', icon: '&#x1F333;', label: 'Core' },
+      { id: 'city', icon: '&#x1F3D9;', label: 'City' },
+      { id: 'nursery', icon: '&#x1F331;', label: 'Nursery' },
+      { id: 'agents', icon: '&#10022;', label: 'Pantheon' }
+    ]},
+    { label: '\u2500\u2500 Create \u2500\u2500', tabs: [
+      { id: 'skills', icon: '&#9889;', label: 'Skills' },
+      { id: 'roundtable', icon: '&#9878;', label: 'Round Table' },
+      { id: 'studio', icon: '&#x1F3AD;', label: 'Studio' }
+    ]},
+    { label: '\u2500\u2500 Economy \u2500\u2500', tabs: [
+      { id: 'market', icon: '&#x1F3EA;', label: 'Market' },
+      { id: 'wallet', icon: '&#x1F48E;', label: 'Wallet' }
+    ]},
+    { label: '\u2500\u2500 Tools \u2500\u2500', tabs: [
+      { id: 'workspace', icon: '&#x1F4C2;', label: 'Workspace' },
+      { id: 'dojo', icon: '&#36947;', label: 'Dojo' },
+      { id: 'mirror', icon: '&#10022;', label: 'Mirror' }
+    ]}
+  ];
 
-  function isFirstRunUser() {
-    return !!localStorage.getItem(FIRST_RUN_KEY);
-  }
-
-  function load() {
-    var saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      try { pinnedTabs = JSON.parse(saved); } catch(e) { pinnedTabs = DEFAULT_PRIMARY.slice(); }
-    } else {
-      pinnedTabs = DEFAULT_PRIMARY.slice();
-    }
-    var collPref = localStorage.getItem(COLLAPSE_PREF_KEY);
-    if (collPref === 'true') {
-      collapsed = true;
-    } else if (collPref === 'false') {
-      collapsed = false;
-    } else {
-      // Default: existing users see all tabs, new users see collapsed
-      collapsed = !isFirstRunUser();
-    }
-  }
-
-  function save() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(pinnedTabs));
-    localStorage.setItem(COLLAPSE_PREF_KEY, collapsed ? 'true' : 'false');
-  }
-
-  function getOverflowTabs() {
-    return ALL_TABS.filter(function(t) { return pinnedTabs.indexOf(t) === -1; });
-  }
-
-  function render() {
-    var nav = document.getElementById('flTabNav');
-    var moreBtn = document.getElementById('flMoreBtn');
+  function buildDropdown() {
     var dropdown = document.getElementById('flMoreDropdown');
-    if (!nav || !moreBtn) return;
-
-    var overflow = getOverflowTabs();
-
-    ALL_TABS.forEach(function(tabId) {
-      var btn = nav.querySelector('.tab-btn[data-tab="' + tabId + '"]');
-      if (!btn) return;
-      if (collapsed && overflow.indexOf(tabId) !== -1) {
-        btn.classList.add('fl-tab-hidden');
-      } else {
-        btn.classList.remove('fl-tab-hidden');
-      }
-    });
-
-    if (collapsed && overflow.length > 0) {
-      moreBtn.style.display = '';
-      // Build dropdown
-      var html = '';
-      overflow.forEach(function(tabId) {
-        var btn = nav.querySelector('.tab-btn[data-tab="' + tabId + '"]');
-        var label = btn ? btn.textContent.trim() : tabId;
-        html += '<button class="fl-dropdown-item" onclick="FlTabs.selectFromMore(\''+tabId+'\')"><span>'+label+'</span><span class="fl-pin-icon" title="Pin to tab bar">&#128204;</span></button>';
+    if (!dropdown) return;
+    var html = '';
+    MORE_GROUPS.forEach(function(group) {
+      html += '<div class="fl-dropdown-group">';
+      html += '<div class="fl-dropdown-group-label">' + group.label + '</div>';
+      group.tabs.forEach(function(tab) {
+        html += '<button class="fl-dropdown-item" onclick="FlTabs.selectFromMore(\'' + tab.id + '\')">' + tab.icon + ' ' + tab.label + '</button>';
       });
-      if (dropdown) dropdown.innerHTML = html;
-    } else {
-      moreBtn.style.display = 'none';
-      if (dropdown) { dropdown.classList.remove('fl-dropdown-open'); moreOpen = false; }
-    }
+      html += '</div>';
+    });
+    dropdown.innerHTML = html;
   }
 
   function toggleMore() {
@@ -21045,7 +21274,7 @@ const FlTabs = (function() {
   function closeMore() {
     var dropdown = document.getElementById('flMoreDropdown');
     var btn = document.getElementById('flMoreBtn');
-    if (dropdown) { dropdown.classList.remove('fl-dropdown-open'); dropdown.classList.remove('fl-dropdown-up'); }
+    if (dropdown) { dropdown.classList.remove('fl-dropdown-open'); }
     if (btn) btn.classList.remove('fl-more-open');
     moreOpen = false;
   }
@@ -21055,89 +21284,8 @@ const FlTabs = (function() {
     switchTab(tabId);
   }
 
-  function pinTab(tabId) {
-    if (pinnedTabs.indexOf(tabId) === -1) {
-      pinnedTabs.push(tabId);
-      save();
-      render();
-    }
-    closeCtxMenu();
-  }
-
-  function unpinTab(tabId) {
-    var idx = pinnedTabs.indexOf(tabId);
-    if (idx !== -1 && pinnedTabs.length > 1) {
-      pinnedTabs.splice(idx, 1);
-      save();
-      render();
-    }
-    closeCtxMenu();
-  }
-
-  function showCtxMenu(e, tabId) {
-    e.preventDefault();
-    closeCtxMenu();
-    var isPinned = pinnedTabs.indexOf(tabId) !== -1;
-    var menu = document.createElement('div');
-    menu.className = 'fl-tab-ctx-menu';
-    // Position context menu within viewport
-    var posX = e.clientX;
-    var posY = e.clientY;
-    // Adjust if menu would overflow right edge
-    if (posX + 160 > window.innerWidth) posX = window.innerWidth - 165;
-    // Adjust if menu would overflow bottom edge
-    if (posY + 50 > window.innerHeight) posY = window.innerHeight - 55;
-    menu.style.left = posX + 'px';
-    menu.style.top = posY + 'px';
-    if (isPinned) {
-      menu.innerHTML = '<button onclick="FlTabs.unpinTab(\''+tabId+'\')">&#128204; Unpin from tab bar</button>';
-    } else {
-      menu.innerHTML = '<button onclick="FlTabs.pinTab(\''+tabId+'\')">&#128204; Pin to tab bar</button>';
-    }
-    document.body.appendChild(menu);
-    ctxMenu = menu;
-    setTimeout(function() {
-      document.addEventListener('click', closeCtxMenu, { once: true });
-    }, 10);
-  }
-
-  function closeCtxMenu() {
-    if (ctxMenu && ctxMenu.parentNode) {
-      ctxMenu.parentNode.removeChild(ctxMenu);
-    }
-    ctxMenu = null;
-  }
-
-  function setCollapsed(val) {
-    collapsed = !!val;
-    save();
-    render();
-  }
-
-  function isCollapsed() {
-    return collapsed;
-  }
-
   function init() {
-    load();
-    render();
-    // Attach right-click handlers to all tab buttons
-    var nav = document.getElementById('flTabNav');
-    if (nav) {
-      ALL_TABS.forEach(function(tabId) {
-        var btn = nav.querySelector('.tab-btn[data-tab="' + tabId + '"]');
-        if (btn) {
-          btn.addEventListener('contextmenu', function(e) { showCtxMenu(e, tabId); });
-          // Long-press for mobile
-          var pressTimer = null;
-          btn.addEventListener('touchstart', function(e) {
-            pressTimer = setTimeout(function() { showCtxMenu(e.touches[0], tabId); }, 600);
-          });
-          btn.addEventListener('touchend', function() { clearTimeout(pressTimer); });
-          btn.addEventListener('touchmove', function() { clearTimeout(pressTimer); });
-        }
-      });
-    }
+    buildDropdown();
     // Close dropdown on outside click
     document.addEventListener('click', function(e) {
       if (moreOpen) {
@@ -21152,14 +21300,225 @@ const FlTabs = (function() {
 
   return {
     init: init,
-    render: render,
     toggleMore: toggleMore,
     closeMore: closeMore,
-    selectFromMore: selectFromMore,
-    pinTab: pinTab,
-    unpinTab: unpinTab,
-    setCollapsed: setCollapsed,
-    isCollapsed: isCollapsed
+    selectFromMore: selectFromMore
+  };
+})();
+
+// ============================================
+// AI Setup — Inline provider picker for Chat tab
+// ============================================
+const AiSetup = (function() {
+  var PROVIDER_KEYS = {
+    groq: { url: 'https://console.groq.com/keys', defaultModel: 'llama' },
+    openai: { url: 'https://platform.openai.com/api-keys', defaultModel: 'llama' },
+    google: { url: 'https://aistudio.google.com/apikey', defaultModel: 'llama' },
+    xai: { url: 'https://console.x.ai', defaultModel: 'llama' }
+  };
+
+  var selectedProvider = null;
+
+  function init() {
+    // Show/hide banner based on connection state
+    refreshBanner();
+    refreshSettingsCard();
+    // Refresh when returning to chat tab
+    if (typeof LatticeEvents !== 'undefined') {
+      LatticeEvents.on('tabChanged', function(data) {
+        if (data.tabId === 'chat') refreshBanner();
+        if (data.tabId === 'settings') refreshSettingsCard();
+        if (data.tabId === 'canvas') refreshCanvasBanner();
+      });
+    }
+  }
+
+  function isConnected() {
+    return state.isLocal || (state.apiKey && state.apiKey.length > 0);
+  }
+
+  function getStatusText() {
+    if (state.isLocal) return 'Connected to Ollama (' + (state.ollamaModel || 'llama3.2') + ')';
+    if (state.apiKey) {
+      var prov = PROVIDERS[state.provider];
+      var modelId = prov ? (prov.models[state.model] || state.model) : state.provider;
+      return 'Connected to ' + (prov ? prov.name : state.provider) + ' \u2014 ' + modelId;
+    }
+    return 'Not connected';
+  }
+
+  function refreshBanner() {
+    var banner = document.getElementById('aiSetupBanner');
+    if (!banner) return;
+    if (isConnected()) {
+      banner.className = 'ai-setup-banner ai-setup-connected';
+      banner.innerHTML = '<div class="ai-connected-status"><span class="status-dot"></span><span>\u2713 ' + getStatusText() + '</span></div><button class="ai-connected-change" onclick="AiSetup.showFull()">Change</button>';
+    } else {
+      banner.style.display = '';
+      banner.className = 'ai-setup-banner';
+      // Reset to provider buttons
+      var providers = document.getElementById('aiSetupProviders');
+      var form = document.getElementById('aiSetupForm');
+      var ollamaForm = document.getElementById('aiSetupOllamaForm');
+      var result = document.getElementById('aiSetupResult');
+      if (providers) providers.style.display = '';
+      if (form) form.style.display = 'none';
+      if (ollamaForm) ollamaForm.style.display = 'none';
+      if (result) result.style.display = 'none';
+      // Deselect buttons
+      document.querySelectorAll('.ai-provider-btn').forEach(function(b) { b.classList.remove('selected'); });
+    }
+  }
+
+  function showFull() {
+    var banner = document.getElementById('aiSetupBanner');
+    if (!banner) return;
+    banner.className = 'ai-setup-banner';
+    banner.style.display = '';
+    // Rebuild the full banner content
+    banner.innerHTML = '<div class="ai-setup-title">Connect your AI to start chatting</div>' +
+      '<div class="ai-setup-providers" id="aiSetupProviders">' +
+      '<button class="ai-provider-btn" onclick="AiSetup.select(\'groq\')"><span class="ai-setup-name">Groq</span><span class="ai-setup-note">Free &amp; fast</span></button>' +
+      '<button class="ai-provider-btn" onclick="AiSetup.select(\'openai\')"><span class="ai-setup-name">OpenAI</span><span class="ai-setup-note">GPT-4.1</span></button>' +
+      '<button class="ai-provider-btn" onclick="AiSetup.select(\'google\')"><span class="ai-setup-name">Gemini</span><span class="ai-setup-note">Free tier</span></button>' +
+      '<button class="ai-provider-btn" onclick="AiSetup.select(\'xai\')"><span class="ai-setup-name">Grok</span><span class="ai-setup-note">xAI vision</span></button>' +
+      '<button class="ai-provider-btn" onclick="AiSetup.select(\'ollama\')"><span class="ai-setup-name">\uD83C\uDFE0 Local</span><span class="ai-setup-note">Ollama</span></button>' +
+      '</div>' +
+      '<div class="ai-setup-form" id="aiSetupForm" style="display:none;">' +
+      '<input type="password" id="aiSetupKeyInput" placeholder="Paste your API key" autocomplete="off">' +
+      '<a class="ai-setup-link" id="aiSetupKeyLink" href="#" target="_blank">Get a free key \u2192</a>' +
+      '<button class="ai-setup-test-btn" onclick="AiSetup.testConnection()">Test Connection</button>' +
+      '</div>' +
+      '<div class="ai-setup-form" id="aiSetupOllamaForm" style="display:none;">' +
+      '<span style="font-size:0.85rem;color:var(--text-secondary);">Install from <a href="https://ollama.ai" target="_blank" style="color:var(--accent)">ollama.ai</a>, then run: <code style="background:var(--bg-input);padding:2px 6px;border-radius:4px;color:var(--accent);">ollama pull llama3.2</code></span>' +
+      '<button class="ai-setup-test-btn" onclick="AiSetup.testOllama()">Test Connection</button>' +
+      '</div>' +
+      '<div class="ai-setup-result" id="aiSetupResult" style="display:none;"></div>';
+  }
+
+  function select(provider) {
+    selectedProvider = provider;
+    // Highlight selected button
+    document.querySelectorAll('.ai-provider-btn').forEach(function(b) { b.classList.remove('selected'); });
+    event.currentTarget.classList.add('selected');
+    var form = document.getElementById('aiSetupForm');
+    var ollamaForm = document.getElementById('aiSetupOllamaForm');
+    var result = document.getElementById('aiSetupResult');
+    if (result) result.style.display = 'none';
+    if (provider === 'ollama') {
+      if (form) form.style.display = 'none';
+      if (ollamaForm) ollamaForm.style.display = '';
+    } else {
+      if (ollamaForm) ollamaForm.style.display = 'none';
+      if (form) form.style.display = '';
+      var link = document.getElementById('aiSetupKeyLink');
+      if (link && PROVIDER_KEYS[provider]) {
+        link.href = PROVIDER_KEYS[provider].url;
+        link.textContent = 'Get a free key \u2192';
+      }
+      // Focus the key input
+      var input = document.getElementById('aiSetupKeyInput');
+      if (input) { input.value = ''; input.focus(); }
+    }
+  }
+
+  function testConnection() {
+    if (!selectedProvider) return;
+    var input = document.getElementById('aiSetupKeyInput');
+    var key = input ? input.value.trim() : '';
+    if (!key) { showResult('Please enter an API key', false); return; }
+    // Set the provider in the existing system
+    var providerSelect = document.getElementById('providerSelect');
+    if (providerSelect) { providerSelect.value = selectedProvider; }
+    state.provider = selectedProvider;
+    state.isLocal = false;
+    var localToggle = document.getElementById('localToggle');
+    if (localToggle) localToggle.checked = false;
+    handleProviderChange(false);
+    // Set and save the API key
+    document.getElementById('apiKey').value = key;
+    state.apiKey = key;
+    saveApiKey().then(function() {
+      updateStatus();
+      showResult('\u2713 Connected to ' + (PROVIDERS[selectedProvider] ? PROVIDERS[selectedProvider].name : selectedProvider) + '!', true);
+      // Collapse to connected state after a moment
+      setTimeout(function() { refreshBanner(); refreshSettingsCard(); }, 1500);
+    });
+  }
+
+  function testOllama() {
+    showResult('Testing Ollama connection...', true);
+    fetch('http://localhost:11434/api/tags', { method: 'GET' })
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (data.models && data.models.length > 0) {
+          // Switch to local mode
+          state.isLocal = true;
+          state.ollamaModel = data.models[0].name || 'llama3.2';
+          var localToggle = document.getElementById('localToggle');
+          if (localToggle) localToggle.checked = true;
+          handleLocalToggle();
+          showResult('\u2713 Ollama connected! Found ' + data.models.length + ' model(s). Using: ' + state.ollamaModel, true);
+          setTimeout(function() { refreshBanner(); refreshSettingsCard(); }, 1500);
+        } else {
+          showResult('Ollama is running but no models found. Run: ollama pull llama3.2', false);
+        }
+      })
+      .catch(function() {
+        showResult('Could not connect to Ollama. Is it running? Install from ollama.ai', false);
+      });
+  }
+
+  function testFromSettings() {
+    if (state.isLocal) {
+      testOllama();
+    } else if (state.apiKey) {
+      showResult('\u2713 ' + getStatusText(), true);
+      var dot = document.getElementById('settingsStatusDot');
+      if (dot) { dot.className = 'status-dot ready'; }
+    } else {
+      switchTab('chat');
+    }
+  }
+
+  function showResult(msg, success) {
+    var result = document.getElementById('aiSetupResult');
+    if (result) {
+      result.style.display = '';
+      result.className = 'ai-setup-result ' + (success ? 'success' : 'error');
+      result.textContent = msg;
+    }
+  }
+
+  function refreshSettingsCard() {
+    var dot = document.getElementById('settingsStatusDot');
+    var text = document.getElementById('settingsStatusText');
+    if (dot) dot.className = 'status-dot ' + (isConnected() ? 'ready' : 'disconnected');
+    if (text) text.textContent = isConnected() ? '\u2713 ' + getStatusText() : 'Not connected \u2014 set up in Chat tab';
+  }
+
+  function refreshCanvasBanner() {
+    var banner = document.getElementById('cvVisionSetupBanner');
+    if (!banner) return;
+    if (!isConnected()) {
+      banner.style.display = '';
+    } else if (typeof isVisionCapable === 'function' && !isVisionCapable()) {
+      banner.style.display = '';
+      banner.innerHTML = '&#x1F3A8; Canvas works best with a vision model (llava, GPT-4o, Gemini, Grok). <a href="#" onclick="event.preventDefault();switchTab(\'chat\');return false;">Set up now</a>';
+    } else {
+      banner.style.display = 'none';
+    }
+  }
+
+  return {
+    init: init,
+    select: select,
+    testConnection: testConnection,
+    testOllama: testOllama,
+    testFromSettings: testFromSettings,
+    showFull: showFull,
+    refreshBanner: refreshBanner,
+    refreshSettingsCard: refreshSettingsCard
   };
 })();
 
@@ -22541,6 +22900,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   (function() {
     var isFirstVisit = !localStorage.getItem('fl-has-visited');
     var lastTab = localStorage.getItem('fl-last-tab');
+    // Legacy tab mapping
+    if (lastTab === 'channels' || lastTab === 'mesh') lastTab = 'community';
 
     if (isFirstVisit) {
       // First visit: Garden is home. Mark visited.
@@ -22641,10 +23002,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Initialize Accordion Settings (v4.9)
   FlAccordion.init();
 
-  // Initialize Collapsible Tab System (v4.9)
+  // Initialize Tab System (v5.3 — fixed primary + grouped More)
   FlTabs.init();
-  var flTabToggle = document.getElementById('flTabCollapseToggle');
-  if (flTabToggle) flTabToggle.checked = FlTabs.isCollapsed();
+  AiSetup.init();
 
   // Initialize Ollama auto-detection (v4.4)
   owAutoDetect();
