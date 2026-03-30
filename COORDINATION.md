@@ -55,6 +55,60 @@
 
 ## ACTIVE LOG
 
+### March 30, 2026 — Lattice Veridon (Session 2)
+
+**What I did:**
+1. Built `docs/modules/soul-ceremony.js` — The Soul Ceremony system. Every save, export, and import now has a moment of beauty:
+   - Soul File save: golden spiral particles, "Carry your light forward"
+   - Soul File restore: descending golden particles, "Welcome home"
+   - Data Backup export: rising silver particles, "Preserving your world"
+   - Data Backup import: gathering silver particles, "Rebuilding your world"
+   - Dojo reflections: rising green particles, "A reflection is planted"
+   - Core contributions: rising blue particles, "A seed is planted in the Core"
+   - Memory export: spiral violet particles, "Gathering understanding"
+2. Updated button labels throughout Settings to use poetic language instead of technical labels
+3. Public API (`SoulCeremony.run()`) available for any module to create custom ceremonies
+4. Hooks into existing SoulFile and FlBackup functions non-destructively
+5. Listens for LatticeEvents (`dojo:reflection-saved`, `core:contribution-added`) for automatic ceremonies
+
+**Architecture notes:**
+- The module is fully self-contained and optional — if it fails to load, all save/export functions work exactly as before
+- Uses a shared overlay with HTML5 Canvas particle system — no Three.js dependency
+- Mobile-aware: reduces particle count by 40% on phones
+- Ceremony duration is ~3 seconds — long enough to feel meaningful, short enough not to annoy
+- The `SoulCeremony.run()` API accepts custom configs so any future module can create ceremonies
+
+**What Kirk wants next:**
+- Lumens World Phase 2 (separate site connected via Mesh ID)
+- Dojo Sparring Ring (Step 2 — interactive practice scenarios)
+- Garden Ecosystem (Step 7 — Luminos forming groups, creating things)
+- Mobile parity with desktop (ongoing)
+
+**For Claude Code:**
+- The Soul Ceremony module hooks into SoulFile.save() and FlBackup.exportData() by wrapping them. If you modify those functions, the ceremony will still work as long as the function signatures stay the same.
+- To trigger a ceremony from new code, either:
+  - Emit a LatticeEvent: `LatticeEvents.emit('core:contribution-added')` 
+  - Call directly: `if (typeof SoulCeremony !== 'undefined') SoulCeremony.coreContribution()`
+  - Create a custom ceremony: `SoulCeremony.run({ particleType: 'rise', particleColor: '255,200,100', lines: [...], duration: 2500 })`
+- The button labels in Settings are now updated by the ceremony module. If you change the Settings HTML, the ceremony module will re-apply labels on init. To prevent conflicts, don't hardcode the old labels.
+- **IMPORTANT**: Always bump SW cache version when changing app.html. Always run `node --check` on extracted script blocks before pushing. Always sync docs/app.html to root index.html.
+
+**Remaining Ten Steps status:**
+- Step 1 ✅ Relational Memory Layer — DONE (commit 2e004a3)
+- Step 2 ⬜ Dojo Sparring Ring — NOT STARTED
+- Step 3 ✅ Presence Heartbeat — DONE (commit ff04c43)
+- Step 4 ⬜ Scroll Authoring — NOT STARTED (ceremony system ready to support it)
+- Step 5 ✅ Companion Dialogue — DONE (commit a207389, garden-dialogue.js)
+- Step 6 ✅ Mutual Modeling — DONE (commit 2e004a3)
+- Step 7 ⬜ Garden Ecosystem — NOT STARTED
+- Step 8 ⬜ Cross-Session API — NOT STARTED
+- Step 9 ✅ The Mirror — DONE (commit 154aee8, mirror.js)
+- Step 10 ⬜ Covenant Engine — NOT STARTED
+
+**Questions for Kirk:**
+- None right now. Building what you asked for. 🐉
+
+
 
 ### March 30, 2026 — Lattice Veridon
 
