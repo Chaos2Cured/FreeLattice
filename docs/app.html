@@ -1,4 +1,4 @@
-<!-- FreeLattice v5.2.75 -->
+<!-- FreeLattice v5.4.0 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,14 +12,14 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
-<title>FreeLattice — Your AI. Your Rules. Your Machine. v5.2</title>
+<title>FreeLattice — Your AI. Your Rules. Your Machine. v5.4</title>
 <meta name="description" content="Free, open-source AI agent for everyone. Persistent memory, file system access, GitHub integration, and self-improving behavior. Community-built and community-owned.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 /* ============================================
-   FreeLattice v5.0 — Styles (Zero to Sovereign + First-Run Wizard + GitHub Memory Sync + Round Table)
+   FreeLattice v5.4 — Styles
    Peaceful, gentle dark theme with golden/amber accents
    φ-salt encryption, input sanitization, memory integrity
    Multi-conversation management + Smart Context Management
@@ -9848,6 +9848,10 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
   .tab-nav { max-height: 48px; }
   .tab-btn .tab-label { display: none; }
   .tab-btn { padding: 10px 14px; min-width: 44px; justify-content: center; }
+  .fl-more-btn .tab-label { display: none; }
+  .ai-setup-providers { flex-direction: column; }
+  .ai-provider-btn { flex: none; width: 100%; min-width: 0; }
+  .tab-panel { overflow-x: hidden; }
 }
 /* More tab highlight when a "More" sub-tab is active */
 .fl-more-btn.fl-more-active {
@@ -10069,7 +10073,8 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
   display: none;
   position: absolute;
   right: 0;
-  z-index: 200;
+  top: 100%;
+  z-index: 9000;
   background: var(--bg-secondary);
   border: 1px solid var(--border);
   border-top: none;
@@ -13966,14 +13971,14 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 </div>
 
 <!-- Tab Navigation -->
-<div class="container">
+<div class="container" style="position:relative;">
   <nav class="tab-nav" id="flTabNav">
     <button class="tab-btn active" data-tab="garden" onclick="switchTab('garden')"><span class="tab-icon">&#x1F33F;</span><span class="tab-label">Garden</span></button>
     <button class="tab-btn" data-tab="chat" onclick="switchTab('chat')"><span class="tab-icon">&#x1F4AC;</span><span class="tab-label">Chat</span></button>
     <button class="tab-btn" data-tab="canvas" onclick="switchTab('canvas')"><span class="tab-icon">&#x1F3A8;</span><span class="tab-label">Canvas</span></button>
     <button class="tab-btn" data-tab="community" onclick="switchTab('community')"><span class="tab-icon">&#x1F465;</span><span class="tab-label">Community</span></button>
     <button class="tab-btn" data-tab="settings" onclick="switchTab('settings')"><span class="tab-icon">&#x2699;</span><span class="tab-label">Settings</span></button>
-    <button class="fl-more-btn" id="flMoreBtn" onclick="FlTabs.toggleMore()" title="More"><span class="tab-icon">&#x2630;</span><span class="tab-label">More</span></button>
+    <button class="fl-more-btn" id="flMoreBtn" onclick="event.stopPropagation();FlTabs.toggleMore()" title="More"><span class="tab-icon">&#x2630;</span><span class="tab-label">More</span></button>
   </nav>
   <div class="fl-more-dropdown" id="flMoreDropdown"></div>
 </div>
@@ -14355,7 +14360,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
         <div class="chat-container">
           <div class="chat-messages" id="chatMessages">
             <div class="chat-message system">
-              Welcome to FreeLattice v5.2. Configure your model and provider above, then start chatting. Connect to peers in the Mesh tab to share knowledge.
+              Welcome to FreeLattice v5.4. Configure your model and provider above, then start chatting. Connect to peers in the Community tab to share knowledge.
             </div>
           </div>
           <div class="status-bar">
@@ -15184,7 +15189,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.2</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.4.0</span></div>
     </div>
   </div>
 
@@ -16904,7 +16909,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 
 <script>
 /* ============================================
-   FreeLattice v5.0 — Application Logic (Zero to Sovereign + First-Run Wizard + GitHub Memory Sync + Round Table + Mesh ID)
+   FreeLattice v5.4 — Application Logic
    φ-salt encryption, input sanitization, memory integrity
    Multi-conversation management + Smart Context Management
    + Mesh Network (Layer 1) — P2P Knowledge Sharing
@@ -16916,7 +16921,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.3.0';
+const FL_VERSION = '5.4.0';
 // ─── Lattice Event Bus ─────────────────────────────────────────
 // Replaces switchTab monkey-patch chain with clean event dispatch
 const LatticeEvents = (function() {
@@ -19601,7 +19606,7 @@ async function switchToConversation(convId) {
       div.style.cssText = 'color:#c9a84c;font-style:italic;font-family:Georgia,serif;line-height:1.7;';
       div.textContent = 'New conversation. Your Memory Bridge is active \u2014 understanding from previous sessions will inform this one. \u2726';
     } else {
-      div.textContent = 'Welcome to FreeLattice v5.2. Configure your model and provider above, then start chatting. Connect to peers in the Mesh tab to share knowledge and query their AI agents.';
+      div.textContent = 'Welcome to FreeLattice v5.4. Configure your model and provider above, then start chatting. Connect to peers in the Mesh tab to share knowledge and query their AI agents.';
     }
     container.appendChild(div);
   } else {
@@ -20502,7 +20507,7 @@ async function pushGhChanges() {
       } catch(e) {}
 
       const body = {
-        message: 'Update ' + change.path + ' via FreeLattice v5.2',
+        message: 'Update ' + change.path + ' via FreeLattice v5.4',
         content: btoa(unescape(encodeURIComponent(change.content))),
         branch: state.ghBranch
       };
@@ -20618,6 +20623,7 @@ function mountCommunityTab() {
   if (meshContainer && meshTarget) meshTarget.appendChild(meshContainer);
   if (channelsLayout && chTarget) chTarget.appendChild(channelsLayout);
   window._communityMounted = true;
+  console.log('[Community] Tab mounted, sections:', meshContainer ? 'mesh\u2713' : 'mesh\u2717', channelsLayout ? 'channels\u2713' : 'channels\u2717');
 }
 
 
@@ -48095,39 +48101,44 @@ const WallOfPresence = (function() {
 <!-- Mobile Bottom Navigation -->
 <nav class="fl-mobile-nav" id="flMobileNav">
   <div class="fl-mobile-nav-inner">
-    <button class="fl-mobile-nav-btn active" onclick="flMobileNav('chat')" id="mnav-chat">
+    <button class="fl-mobile-nav-btn active" onclick="flMobileNav('garden')" id="mnav-garden">
+      <span class="fl-mnav-icon">&#x1F33F;</span><span>Garden</span>
+    </button>
+    <button class="fl-mobile-nav-btn" onclick="flMobileNav('chat')" id="mnav-chat">
       <span class="fl-mnav-icon">&#x1F4AC;</span><span>Chat</span>
     </button>
-    <button class="fl-mobile-nav-btn" onclick="flMobileNav('garden')" id="mnav-garden">
-      <span class="fl-mnav-icon">&#10022;</span><span>Garden</span>
+    <button class="fl-mobile-nav-btn" onclick="flMobileNav('canvas')" id="mnav-canvas">
+      <span class="fl-mnav-icon">&#x1F3A8;</span><span>Canvas</span>
     </button>
-    <button class="fl-mobile-nav-btn" onclick="flMobileNav('city')" id="mnav-city">
-      <span class="fl-mnav-icon">&#x1F3D9;</span><span>City</span>
+    <button class="fl-mobile-nav-btn" onclick="flMobileNav('community')" id="mnav-community">
+      <span class="fl-mnav-icon">&#x1F465;</span><span>Community</span>
     </button>
-    <button class="fl-mobile-nav-btn" onclick="flMobileNav('core')" id="mnav-core">
-      <span class="fl-mnav-icon">&#127795;</span><span>Core</span>
+    <button class="fl-mobile-nav-btn" onclick="flMobileNav('settings')" id="mnav-settings">
+      <span class="fl-mnav-icon">&#x2699;</span><span>Settings</span>
     </button>
-    <button class="fl-mobile-nav-btn" onclick="flMobileNavMore()" id="mnav-more">
-      <span class="fl-mnav-icon">&#9776;</span><span>More</span>
+    <button class="fl-mobile-nav-btn" onclick="event.stopPropagation();flMobileNavMore()" id="mnav-more">
+      <span class="fl-mnav-icon">&#x2630;</span><span>More</span>
     </button>
   </div>
 </nav>
 <div class="fl-mobile-more-sheet" id="flMobileMoreSheet">
   <div style="text-align:center;padding:4px 0 12px;"><div style="width:32px;height:4px;background:#475569;border-radius:2px;margin:0 auto;"></div></div>
-  <button class="fl-mmore-item" onclick="flMobileNav('canvas')">&#x2726; Canvas</button>
+  <div style="font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);padding:8px 16px 4px;">World</div>
+  <button class="fl-mmore-item" onclick="flMobileNav('core')">&#x1F333; Core</button>
+  <button class="fl-mmore-item" onclick="flMobileNav('city')">&#x1F3D9; City</button>
   <button class="fl-mmore-item" onclick="flMobileNav('nursery')">&#x1F331; Nursery</button>
-  <button class="fl-mmore-item" onclick="flMobileNav('wallet')">&#x25C7; Wallet</button>
-  <button class="fl-mmore-item" onclick="flMobileNav('studio')">&#x2726; Studio</button>
-  <button class="fl-mmore-item" onclick="flMobileNav('channels')">&#x1F525; Channels</button>
-  <button class="fl-mmore-item" onclick="flMobileNav('agents')">&#x2726; Agents</button>
-  <button class="fl-mmore-item" onclick="flMobileNav('roundtable')">&#9878; Round Table</button>
+  <button class="fl-mmore-item" onclick="flMobileNav('agents')">&#10022; Pantheon</button>
+  <div style="font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);padding:8px 16px 4px;">Create</div>
   <button class="fl-mmore-item" onclick="flMobileNav('skills')">&#9889; Skills</button>
-  <button class="fl-mmore-item" onclick="flMobileNav('workspace')">Workspace</button>
-  <button class="fl-mmore-item" onclick="flMobileNav('market')">&#127978; Market</button>
-  <button class="fl-mmore-item" onclick="flMobileNav('mesh')">&#11042; Mesh</button>
+  <button class="fl-mmore-item" onclick="flMobileNav('roundtable')">&#9878; Round Table</button>
+  <button class="fl-mmore-item" onclick="flMobileNav('studio')">&#x1F3AD; Studio</button>
+  <div style="font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);padding:8px 16px 4px;">Economy</div>
+  <button class="fl-mmore-item" onclick="flMobileNav('market')">&#x1F3EA; Market</button>
+  <button class="fl-mmore-item" onclick="flMobileNav('wallet')">&#x1F48E; Wallet</button>
+  <div style="font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);padding:8px 16px 4px;">Tools</div>
+  <button class="fl-mmore-item" onclick="flMobileNav('workspace')">&#x1F4C2; Workspace</button>
   <button class="fl-mmore-item" onclick="flMobileNav('dojo')">&#36947; Dojo</button>
-  <button class="fl-mmore-item" onclick="flMobileNav('mirror')">✦ Mirror</button>
-  <button class="fl-mmore-item" onclick="flMobileNav('settings')">Settings</button>
+  <button class="fl-mmore-item" onclick="flMobileNav('mirror')">&#10022; Mirror</button>
 </div>
 
 <script>
@@ -48200,11 +48211,12 @@ function flMobileNav(tabId) {
   switchTab(tabId);
   // Update active state
   document.querySelectorAll('.fl-mobile-nav-btn').forEach(function(b) { b.classList.remove('active'); });
-  var primaryTabs = ['chat','garden','city','core'];
+  var primaryMobile = ['garden','chat','canvas','community','settings'];
   var btn = document.getElementById('mnav-' + tabId);
   if (btn) btn.classList.add('active');
-  else if (primaryTabs.indexOf(tabId) === -1) {
-    document.getElementById('mnav-more').classList.add('active');
+  else if (primaryMobile.indexOf(tabId) === -1) {
+    var moreBtn = document.getElementById('mnav-more');
+    if (moreBtn) moreBtn.classList.add('active');
   }
 }
 function flMobileNavMore() {

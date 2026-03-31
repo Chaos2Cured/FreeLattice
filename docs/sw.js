@@ -1,8 +1,9 @@
 // FreeLattice Service Worker — Offline Mode
 // Cache-first for app shell, network-first for app.html and API calls
 // API calls are never cached
+// VERSION: Must match version.json — update both together
 
-const CACHE_NAME = 'freelattice-v5.3.8';
+const CACHE_NAME = 'freelattice-v5.4.0';
 
 const APP_SHELL = [
   './',
