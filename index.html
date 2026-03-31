@@ -348,14 +348,16 @@ header .mantra {
   gap: 0;
   border-bottom: 1px solid var(--border);
   margin-top: var(--space-sm);
-  overflow-x: auto;
-  overflow-y: visible;
+  overflow: hidden;
+  max-width: 100%;
   transition: border-color var(--transition-md);
   position: relative;
 }
 
 .tab-btn {
-  padding: var(--space-md) var(--space-xl);
+  flex: 1 1 0;
+  min-width: 0;
+  padding: var(--space-md) var(--space-lg);
   background: transparent;
   border: none;
   border-bottom: 2px solid transparent;
@@ -367,7 +369,8 @@ header .mantra {
   font-family: var(--font);
   letter-spacing: 0.03em;
   white-space: nowrap;
-  flex-shrink: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .tab-btn:hover {
@@ -9838,12 +9841,11 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
   transition: color var(--transition), background var(--transition), border-color var(--transition), transform var(--transition), opacity 250ms ease, max-width 250ms ease;
 }
 /* Primary tabs — 6 fixed items */
-.tab-nav {
-  flex-wrap: nowrap;
-  overflow-x: hidden;
-}
 .tab-btn .tab-icon { font-size: 1.1rem; }
 .tab-btn .tab-label { margin-left: 6px; font-size: 0.85rem; }
+@media (min-width: 1200px) {
+  .tab-nav { max-width: 800px; margin-left: auto; margin-right: auto; }
+}
 @media (max-width: 768px) {
   .tab-nav { max-height: 48px; }
   .tab-btn .tab-label { display: none; }
@@ -10042,6 +10044,8 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
   margin: 0;
 }
 .fl-more-btn {
+  flex: 1 1 0;
+  min-width: 0;
   padding: var(--space-md) var(--space-lg);
   background: transparent;
   border: none;
@@ -10054,7 +10058,7 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
   font-family: var(--font);
   letter-spacing: 0.03em;
   white-space: nowrap;
-  flex-shrink: 0;
+  overflow: hidden;
   position: relative;
   min-height: 44px;
   -webkit-tap-highlight-color: transparent;
