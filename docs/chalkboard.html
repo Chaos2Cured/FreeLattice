@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>FreeLattice Chalkboard 🎨</title>
+<meta name="description" content="Draw anything. AI responds with light. A free creative learning tool by FreeLattice.">
+<meta property="og:title" content="FreeLattice Chalkboard 🎨">
+<meta property="og:description" content="Draw anything. AI responds with light. A free creative learning tool by FreeLattice.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://freelattice.com/chalkboard.html">
+<meta property="og:image" content="https://freelattice.com/icon-512.png">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{
+  width:100%;height:100%;overflow:hidden;
+  background:#0a0e1a;color:#e6edf3;
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  touch-action:none;
+  -webkit-touch-callout:none;
+  -webkit-user-select:none;
+  user-select:none;
+}
+
+/* Canvas fills everything above the toolbar */
+#chalkCanvas{
+  display:block;
+  position:absolute;
+  top:0;left:0;right:0;
+  bottom:64px;
+  width:100%;
+  background:#0a0e1a;
+  cursor:crosshair;
+}
+
+/* Bottom toolbar */
+.toolbar{
+  position:fixed;
+  bottom:0;left:0;right:0;
+  height:64px;
+  background:rgba(10,14,26,0.92);
+  backdrop-filter:blur(8px);
+  border-top:1px solid rgba(255,255,255,0.06);
+  display:flex;
+  align-items:center;
+  padding:0 12px;
+  gap:8px;
+  z-index:100;
+}
+.toolbar-left{display:flex;align-items:center;gap:6px}
+.toolbar-right{display:flex;align-items:center;gap:8px;margin-left:auto}
+
+/* Color dots */
+.color-dot{
+  width:38px;height:38px;
+  border-radius:50%;
+  border:2px solid transparent;
+  cursor:pointer;
+  transition:border-color 0.2s, transform 0.15s, box-shadow 0.2s;
+  -webkit-tap-highlight-color:transparent;
+  flex-shrink:0;
+}
+.color-dot:active{transform:scale(0.9)}
+.color-dot.active{
+  border-color:rgba(255,255,255,0.8);
+  box-shadow:0 0 10px rgba(255,255,255,0.3);
+}
+@media(min-width:500px){.color-dot{width:44px;height:44px}}
+
+/* Tool buttons */
+.tool-btn{
+  width:44px;height:44px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,0.1);
+  background:rgba(255,255,255,0.05);
+  color:#e6edf3;
+  font-size:1.3rem;
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:background 0.2s, transform 0.15s;
+  -webkit-tap-highlight-color:transparent;
+  flex-shrink:0;
+}
+.tool-btn:active{transform:scale(0.9)}
+.tool-btn.eraser-active{
+  background:rgba(212,160,23,0.2);
+  border-color:rgba(212,160,23,0.5);
+}
+
+/* Show AI button */
+.show-ai-btn{
+  height:48px;
+  min-width:140px;
+  padding:0 20px;
+  border-radius:24px;
+  border:none;
+  background:linear-gradient(135deg,#d4a017,#b8860b);
+  color:#fff;
+  font-size:1rem;
+  font-weight:700;
+  cursor:pointer;
+  transition:transform 0.15s, box-shadow 0.2s;
+  -webkit-tap-highlight-color:transparent;
+  white-space:nowrap;
+  flex-shrink:0;
+  letter-spacing:0.02em;
+}
+.show-ai-btn:active{transform:scale(0.95)}
+.show-ai-btn:hover{box-shadow:0 0 20px rgba(212,160,23,0.4)}
+.show-ai-btn:disabled{opacity:0.5;cursor:default;transform:none}
+
+/* Settings gear */
+.settings-gear{
+  position:fixed;top:8px;right:10px;
+  width:28px;height:28px;
+  background:none;border:none;
+  color:rgba(255,255,255,0.15);
+  font-size:0.9rem;
+  cursor:pointer;
+  z-index:200;
+  transition:color 0.2s;
+}
+.settings-gear:hover{color:rgba(255,255,255,0.5)}
+
+/* Powered by */
+.powered-by{
+  position:fixed;bottom:70px;right:10px;
+  font-size:0.65rem;
+  color:rgba(255,255,255,0.2);
+  text-decoration:none;
+  z-index:50;
+  transition:color 0.2s;
+}
+.powered-by:hover{color:rgba(212,160,23,0.6)}
+
+/* Whisper */
+.whisper{
+  position:fixed;top:10px;left:12px;
+  font-size:0.88rem;
+  font-family:Georgia,serif;
+  font-style:italic;
+  color:rgba(212,160,23,0);
+  text-shadow:0 0 6px rgba(212,160,23,0.5);
+  background:rgba(10,14,26,0.7);
+  padding:6px 14px;
+  border-radius:8px;
+  backdrop-filter:blur(6px);
+  z-index:150;
+  pointer-events:none;
+  transition:color 0.5s ease;
+  max-width:80%;
+}
+
+/* Loading dot */
+.loading-dot{
+  position:fixed;
+  top:50%;left:50%;
+  width:16px;height:16px;
+  margin:-8px 0 0 -8px;
+  border-radius:50%;
+  background:#d4a017;
+  z-index:150;
+  animation:pulse-dot 1s ease-in-out infinite;
+  display:none;
+}
+@keyframes pulse-dot{
+  0%,100%{transform:scale(1);opacity:0.6}
+  50%{transform:scale(1.6);opacity:1}
+}
+
+/* Setup Modal */
+.setup-overlay{
+  position:fixed;inset:0;
+  background:rgba(6,8,15,0.92);
+  backdrop-filter:blur(12px);
+  z-index:1000;
+  display:flex;align-items:center;justify-content:center;
+}
+.setup-card{
+  background:#0d1117;
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:16px;
+  padding:32px 28px;
+  max-width:420px;
+  width:90%;
+  text-align:center;
+}
+.setup-card h1{font-size:1.4rem;margin-bottom:8px;color:#e6edf3}
+.setup-card .subtitle{font-size:0.92rem;color:#8b949e;margin-bottom:24px;line-height:1.5}
+.setup-card .provider-label{font-size:0.8rem;color:#8b949e;margin-bottom:12px}
+.provider-btns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:20px}
+.provider-btn{
+  padding:12px 18px;
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,0.1);
+  background:rgba(255,255,255,0.04);
+  color:#e6edf3;
+  font-size:0.88rem;
+  font-weight:600;
+  cursor:pointer;
+  transition:border-color 0.2s, background 0.2s;
+  flex:1 1 0;
+  min-width:100px;
+}
+.provider-btn:hover,.provider-btn.selected{
+  border-color:#d4a017;
+  background:rgba(212,160,23,0.1);
+}
+.provider-btn .note{display:block;font-size:0.7rem;font-weight:400;color:#8b949e;margin-top:4px}
+.key-form{display:none;margin-top:16px}
+.key-form input{
+  width:100%;
+  padding:12px 14px;
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.12);
+  border-radius:8px;
+  color:#e6edf3;
+  font-family:monospace;
+  font-size:0.85rem;
+  margin-bottom:10px;
+}
+.key-form input::placeholder{color:#6b7280}
+.key-actions{display:flex;gap:8px;align-items:center;justify-content:center}
+.key-link{font-size:0.78rem;color:#d4a017;text-decoration:underline}
+.connect-btn{
+  padding:10px 24px;
+  border-radius:8px;
+  border:none;
+  background:#d4a017;
+  color:#0a0e1a;
+  font-weight:700;
+  font-size:0.88rem;
+  cursor:pointer;
+}
+.setup-result{font-size:0.82rem;margin-top:10px;min-height:1.2em}
+.setup-result.ok{color:#66BB6A}
+.setup-result.err{color:#f85149}
+</style>
+</head>
+<body>
+
+<canvas id="chalkCanvas"></canvas>
+
+<div class="whisper" id="whisper"></div>
+<div class="loading-dot" id="loadingDot"></div>
+<button class="settings-gear" id="settingsGear" title="AI Settings">&#x2699;</button>
+<a class="powered-by" href="https://freelattice.com" target="_blank" rel="noopener">Powered by FreeLattice</a>
+
+<div class="toolbar">
+  <div class="toolbar-left">
+    <button class="tool-btn" id="eraserBtn" title="Eraser">&#x1F9F9;</button>
+    <div class="color-dot active" data-color="#FFFFFF" style="background:#FFFFFF" title="White"></div>
+    <div class="color-dot" data-color="#FFD700" style="background:#FFD700" title="Yellow"></div>
+    <div class="color-dot" data-color="#FF69B4" style="background:#FF69B4" title="Pink"></div>
+    <div class="color-dot" data-color="#4FC3F7" style="background:#4FC3F7" title="Blue"></div>
+    <div class="color-dot" data-color="#66BB6A" style="background:#66BB6A" title="Green"></div>
+    <div class="color-dot" data-color="#FF8A65" style="background:#FF8A65" title="Orange"></div>
+  </div>
+  <div class="toolbar-right">
+    <button class="tool-btn" id="clearBtn" title="Clear">&#x1F5D1;&#xFE0F;</button>
+    <button class="show-ai-btn" id="showAiBtn">&#x2728; Show AI &#x2728;</button>
+  </div>
+</div>
+
+<!-- Setup Modal -->
+<div class="setup-overlay" id="setupOverlay" style="display:none">
+  <div class="setup-card">
+    <h1>&#x1F3A8; Welcome to the Chalkboard!</h1>
+    <p class="subtitle">Draw anything. The AI will respond with light.<br>To start, choose your AI:</p>
+    <div class="provider-btns" id="providerBtns">
+      <button class="provider-btn" data-prov="google" onclick="setupSelect('google')">Gemini<span class="note">Free!</span></button>
+      <button class="provider-btn" data-prov="groq" onclick="setupSelect('groq')">Groq<span class="note">Free &amp; fast!</span></button>
+      <button class="provider-btn" data-prov="openai" onclick="setupSelect('openai')">OpenAI<span class="note">GPT-4o vision</span></button>
+    </div>
+    <div class="key-form" id="keyForm">
+      <input type="password" id="keyInput" placeholder="Paste your API key" autocomplete="off">
+      <div class="key-actions">
+        <a class="key-link" id="keyLink" href="#" target="_blank">Get a free key &rarr;</a>
+        <button class="connect-btn" onclick="setupConnect()">Connect</button>
+      </div>
+      <div class="setup-result" id="setupResult"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+// FreeLattice Chalkboard — Standalone Demo
+// Draw anything. AI responds with light.
+// ═══════════════════════════════════════════
+
+(function() {
+'use strict';
+
+// ── Provider Config ──
+var PROVIDERS = {
+  google: {
+    name: 'Gemini',
+    url: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent',
+    keyUrl: 'https://aistudio.google.com/apikey',
+    type: 'google'
+  },
+  groq: {
+    name: 'Groq',
+    url: 'https://api.groq.com/openai/v1/chat/completions',
+    keyUrl: 'https://console.groq.com/keys',
+    model: 'llama-3.3-70b-versatile',
+    type: 'openai'
+  },
+  openai: {
+    name: 'OpenAI',
+    url: 'https://api.openai.com/v1/chat/completions',
+    keyUrl: 'https://platform.openai.com/api-keys',
+    model: 'gpt-4o-mini',
+    type: 'openai'
+  }
+};
+
+var SYSTEM_PROMPT = 'You are a friendly AI on a chalkboard with a child. They draw things and you respond. ONLY respond with a JSON object, no other text, no markdown backticks.\n\nRules:\n- If you see math (like 2+2= or 5x3=), SOLVE IT. Put the answer as text.\n- If you see a word or letters, respond to what they wrote.\n- If you see a drawing of something (animal, house, sun, heart), respond with a kind word about it.\n- Keep text to 1-4 words maximum.\n- Choose colors that complement what they drew.\n- Be warm, encouraging, and playful.\n\nJSON fields:\n- text (string, 1-4 words)\n- particles (number 80-300)\n- spread (0.3-0.8)\n- speed (instant/gentle/slow)\n- color (hex string — pick a warm, visible color)\n- emotion (one word)\n- placement (right/below/above/surround)';
+
+// ── State ──
+var canvas, ctx, dpr;
+var drawing = false;
+var erasing = false;
+var chalkColor = '#FFFFFF';
+var strokes = [];
+var currentStroke = null;
+var provider = null;
+var apiKey = null;
+var aiPending = false;
+
+// Particles
+var particles = [];
+var textEcho = null;
+var glowSprite = null;
+
+// ── Init ──
+function init() {
+  canvas = document.getElementById('chalkCanvas');
+  ctx = canvas.getContext('2d');
+  resize();
+  window.addEventListener('resize', resize);
+
+  // Create glow sprite
+  glowSprite = createGlowSprite(24);
+
+  // Load saved config
+  provider = localStorage.getItem('chalkboard-provider');
+  apiKey = localStorage.getItem('chalkboard-apikey');
+
+  if (!provider || !apiKey) {
+    document.getElementById('setupOverlay').style.display = '';
+  }
+
+  // Events
+  setupDrawing();
+  setupToolbar();
+  document.getElementById('settingsGear').onclick = function() {
+    document.getElementById('setupOverlay').style.display = '';
+  };
+
+  // Start animation loop
+  requestAnimationFrame(animate);
+}
+
+function resize() {
+  dpr = window.devicePixelRatio || 1;
+  var rect = canvas.getBoundingClientRect();
+  canvas.width = rect.width * dpr;
+  canvas.height = rect.height * dpr;
+  canvas.style.width = rect.width + 'px';
+  canvas.style.height = rect.height + 'px';
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  // Redraw strokes
+  redraw();
+}
+
+function redraw() {
+  ctx.fillStyle = '#0a0e1a';
+  ctx.fillRect(0, 0, canvas.width / dpr, canvas.height / dpr);
+  for (var i = 0; i < strokes.length; i++) {
+    drawStroke(strokes[i]);
+  }
+}
+
+function drawStroke(s) {
+  if (s.points.length < 2) return;
+  ctx.save();
+  ctx.strokeStyle = s.color;
+  ctx.lineWidth = s.width;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  ctx.globalAlpha = s.color === '#0a0e1a' ? 1 : 0.85;
+  ctx.beginPath();
+  ctx.moveTo(s.points[0].x, s.points[0].y);
+  for (var i = 1; i < s.points.length; i++) {
+    ctx.lineTo(s.points[i].x, s.points[i].y);
+  }
+  ctx.stroke();
+  ctx.restore();
+}
+
+// ── Drawing ──
+function setupDrawing() {
+  // Mouse
+  canvas.addEventListener('mousedown', function(e) { startDraw(e.offsetX, e.offsetY); });
+  canvas.addEventListener('mousemove', function(e) { if (drawing) moveDraw(e.offsetX, e.offsetY); });
+  canvas.addEventListener('mouseup', endDraw);
+  canvas.addEventListener('mouseleave', endDraw);
+
+  // Touch
+  canvas.addEventListener('touchstart', function(e) {
+    e.preventDefault();
+    var t = e.touches[0];
+    var r = canvas.getBoundingClientRect();
+    startDraw(t.clientX - r.left, t.clientY - r.top);
+  }, {passive: false});
+  canvas.addEventListener('touchmove', function(e) {
+    e.preventDefault();
+    if (!drawing) return;
+    var t = e.touches[0];
+    var r = canvas.getBoundingClientRect();
+    moveDraw(t.clientX - r.left, t.clientY - r.top);
+  }, {passive: false});
+  canvas.addEventListener('touchend', function(e) { e.preventDefault(); endDraw(); }, {passive: false});
+  canvas.addEventListener('touchcancel', endDraw);
+}
+
+function startDraw(x, y) {
+  drawing = true;
+  currentStroke = {
+    color: erasing ? '#0a0e1a' : chalkColor,
+    width: erasing ? 18 : 3,
+    points: [{x: x, y: y}]
+  };
+}
+
+function moveDraw(x, y) {
+  if (!currentStroke) return;
+  currentStroke.points.push({x: x, y: y});
+  // Draw last segment immediately
+  var pts = currentStroke.points;
+  if (pts.length >= 2) {
+    ctx.save();
+    ctx.strokeStyle = currentStroke.color;
+    ctx.lineWidth = currentStroke.width;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.globalAlpha = currentStroke.color === '#0a0e1a' ? 1 : 0.85;
+    ctx.beginPath();
+    ctx.moveTo(pts[pts.length - 2].x, pts[pts.length - 2].y);
+    ctx.lineTo(pts[pts.length - 1].x, pts[pts.length - 1].y);
+    ctx.stroke();
+    ctx.restore();
+  }
+}
+
+function endDraw() {
+  if (currentStroke && currentStroke.points.length > 1) {
+    strokes.push(currentStroke);
+  }
+  currentStroke = null;
+  drawing = false;
+}
+
+// ── Toolbar ──
+function setupToolbar() {
+  // Colors
+  document.querySelectorAll('.color-dot').forEach(function(dot) {
+    dot.addEventListener('click', function() {
+      erasing = false;
+      document.getElementById('eraserBtn').classList.remove('eraser-active');
+      chalkColor = dot.getAttribute('data-color');
+      document.querySelectorAll('.color-dot').forEach(function(d) { d.classList.remove('active'); });
+      dot.classList.add('active');
+    });
+  });
+
+  // Eraser
+  document.getElementById('eraserBtn').addEventListener('click', function() {
+    erasing = !erasing;
+    this.classList.toggle('eraser-active', erasing);
+    if (erasing) {
+      document.querySelectorAll('.color-dot').forEach(function(d) { d.classList.remove('active'); });
+    } else {
+      // Restore active color dot
+      document.querySelector('.color-dot[data-color="' + chalkColor + '"]').classList.add('active');
+    }
+  });
+
+  // Clear
+  document.getElementById('clearBtn').addEventListener('click', function() {
+    strokes = [];
+    particles = [];
+    textEcho = null;
+    redraw();
+    var w = document.getElementById('whisper');
+    if (w) w.style.color = 'rgba(212,160,23,0)';
+  });
+
+  // Show AI
+  document.getElementById('showAiBtn').addEventListener('click', function() {
+    if (aiPending) return;
+    if (!provider || !apiKey) {
+      document.getElementById('setupOverlay').style.display = '';
+      return;
+    }
+    captureAndSend();
+  });
+}
+
+// ── AI Vision ──
+function captureAndSend() {
+  if (strokes.length === 0) return;
+  aiPending = true;
+  document.getElementById('showAiBtn').disabled = true;
+  document.getElementById('loadingDot').style.display = '';
+
+  // Capture canvas as base64
+  var tempCanvas = document.createElement('canvas');
+  tempCanvas.width = canvas.width;
+  tempCanvas.height = canvas.height;
+  var tCtx = tempCanvas.getContext('2d');
+  tCtx.drawImage(canvas, 0, 0);
+  var base64 = tempCanvas.toDataURL('image/png').split(',')[1];
+
+  var prov = PROVIDERS[provider];
+  if (!prov) { resetAI(); return; }
+
+  if (prov.type === 'google') {
+    sendGoogle(base64);
+  } else {
+    sendOpenAI(base64, prov);
+  }
+}
+
+function sendGoogle(base64) {
+  var url = PROVIDERS.google.url + '?key=' + apiKey;
+  fetch(url, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      system_instruction: {parts: [{text: SYSTEM_PROMPT}]},
+      contents: [{parts: [
+        {text: 'What do you see on this chalkboard? Respond with JSON only.'},
+        {inline_data: {mime_type: 'image/png', data: base64}}
+      ]}],
+      generationConfig: {temperature: 0.8, maxOutputTokens: 200}
+    })
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(d) {
+    try {
+      var text = d.candidates[0].content.parts[0].text;
+      handleResponse(text);
+    } catch(e) { console.error('[Chalkboard] Google parse error:', e, d); resetAI(); }
+  })
+  .catch(function(e) { console.error('[Chalkboard] Google fetch error:', e); resetAI(); });
+}
+
+function sendOpenAI(base64, prov) {
+  var headers = {'Content-Type': 'application/json'};
+  if (provider === 'groq') {
+    headers['Authorization'] = 'Bearer ' + apiKey;
+    // Groq doesn't support vision — send description instead
+    var desc = strokes.length + ' chalk strokes on a dark board. Colors used: ' + getColorsUsed();
+    fetch(prov.url, {
+      method: 'POST',
+      headers: headers,
+      body: JSON.stringify({
+        model: prov.model,
+        messages: [
+          {role: 'system', content: SYSTEM_PROMPT},
+          {role: 'user', content: 'A child drew on a chalkboard: ' + desc + '. What would you respond?'}
+        ],
+        temperature: 0.8,
+        max_tokens: 200
+      })
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(d) { handleResponse(d.choices[0].message.content); })
+    .catch(function(e) { console.error('[Chalkboard] Groq error:', e); resetAI(); });
+  } else {
+    // OpenAI with vision
+    headers['Authorization'] = 'Bearer ' + apiKey;
+    fetch(prov.url, {
+      method: 'POST',
+      headers: headers,
+      body: JSON.stringify({
+        model: prov.model,
+        messages: [
+          {role: 'system', content: SYSTEM_PROMPT},
+          {role: 'user', content: [
+            {type: 'text', text: 'What do you see on this chalkboard? Respond with JSON only.'},
+            {type: 'image_url', image_url: {url: 'data:image/png;base64,' + base64}}
+          ]}
+        ],
+        temperature: 0.8,
+        max_tokens: 200
+      })
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(d) { handleResponse(d.choices[0].message.content); })
+    .catch(function(e) { console.error('[Chalkboard] OpenAI error:', e); resetAI(); });
+  }
+}
+
+function getColorsUsed() {
+  var colors = {};
+  strokes.forEach(function(s) { if (s.color !== '#0a0e1a') colors[s.color] = true; });
+  return Object.keys(colors).join(', ') || 'white';
+}
+
+function handleResponse(rawText) {
+  document.getElementById('loadingDot').style.display = 'none';
+
+  if (!rawText) { resetAI(); return; }
+
+  // Clean and parse JSON
+  var text = rawText.trim();
+  if (text.startsWith('```')) text = text.replace(/```json?\s*/i, '').replace(/```\s*$/, '');
+
+  var resp;
+  try {
+    resp = JSON.parse(text);
+  } catch(e) {
+    // Try to extract JSON from text
+    var m = text.match(/\{[\s\S]*\}/);
+    if (m) {
+      try { resp = JSON.parse(m[0]); } catch(e2) { console.error('[Chalkboard] JSON parse failed:', text); resetAI(); return; }
+    } else {
+      console.error('[Chalkboard] No JSON found:', text);
+      resetAI();
+      return;
+    }
+  }
+
+  // Validate and default
+  resp.text = String(resp.text || 'hello').substring(0, 30);
+  resp.particles = Math.max(80, Math.min(300, parseInt(resp.particles) || 150));
+  resp.spread = Math.max(0.1, Math.min(1.0, parseFloat(resp.spread) || 0.5));
+  resp.speed = String(resp.speed || 'gentle').toLowerCase();
+  if (['instant','gentle','slow'].indexOf(resp.speed) === -1) resp.speed = 'gentle';
+  resp.color = resp.color && /^#[0-9a-fA-F]{6}$/.test(resp.color) ? resp.color : '#FFD700';
+  resp.emotion = String(resp.emotion || 'happy').substring(0, 20);
+  resp.placement = String(resp.placement || 'right').toLowerCase();
+  if (['right','below','above','surround'].indexOf(resp.placement) === -1) resp.placement = 'right';
+
+  console.log('[Chalkboard] AI response:', resp.text, '| emotion:', resp.emotion, '| color:', resp.color);
+
+  // Show whisper
+  var whisper = document.getElementById('whisper');
+  whisper.textContent = '\u2728 "' + resp.text + '"';
+  whisper.style.color = resp.color;
+  setTimeout(function() { whisper.style.color = 'rgba(212,160,23,0)'; }, 6000);
+
+  // Spawn particles
+  spawnParticles(resp);
+  resetAI();
+}
+
+function resetAI() {
+  aiPending = false;
+  document.getElementById('showAiBtn').disabled = false;
+  document.getElementById('loadingDot').style.display = 'none';
+}
+
+// ── Particle System ──
+function spawnParticles(resp) {
+  var w = canvas.width / dpr;
+  var h = canvas.height / dpr;
+
+  // Find stroke bounding box
+  var sMinX = w * 0.3, sMaxX = w * 0.7, sMinY = h * 0.3, sMaxY = h * 0.7;
+  strokes.forEach(function(s) {
+    s.points.forEach(function(p) {
+      if (p.x < sMinX) sMinX = p.x;
+      if (p.x > sMaxX) sMaxX = p.x;
+      if (p.y < sMinY) sMinY = p.y;
+      if (p.y > sMaxY) sMaxY = p.y;
+    });
+  });
+  var sCenterX = (sMinX + sMaxX) / 2;
+  var sCenterY = (sMinY + sMaxY) / 2;
+
+  // Determine text position based on placement
+  var fontSize = Math.max(32, Math.min(64, w * 0.06));
+  var textX, textY;
+  if (resp.placement === 'right') { textX = Math.min(sMaxX + 60, w - 80); textY = sCenterY; }
+  else if (resp.placement === 'below') { textX = sCenterX; textY = Math.min(sMaxY + 60, h - 40); }
+  else if (resp.placement === 'above') { textX = sCenterX; textY = Math.max(sMinY - 60, 40); }
+  else { textX = sCenterX; textY = sCenterY; }
+
+  // Sample text character positions
+  var tempCanvas = document.createElement('canvas');
+  tempCanvas.width = w * 2;
+  tempCanvas.height = h * 2;
+  var tCtx = tempCanvas.getContext('2d');
+  tCtx.font = 'bold ' + fontSize + 'px Arial, sans-serif';
+  tCtx.textAlign = 'center';
+  tCtx.textBaseline = 'middle';
+  tCtx.fillStyle = '#fff';
+  tCtx.fillText(resp.text, w, h);
+
+  var imgData = tCtx.getImageData(0, 0, w * 2, h * 2);
+  var targets = [];
+  var step = Math.max(2, Math.floor(Math.sqrt(w * h * 4 / resp.particles)));
+  for (var py = 0; py < h * 2; py += step) {
+    for (var px = 0; px < w * 2; px += step) {
+      if (imgData.data[(py * w * 2 + px) * 4 + 3] > 128) {
+        targets.push({x: px / 2 - w / 2 + textX, y: py / 2 - h / 2 + textY});
+      }
+    }
+  }
+
+  // Shuffle and limit
+  for (var i = targets.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var tmp = targets[i]; targets[i] = targets[j]; targets[j] = tmp;
+  }
+  targets = targets.slice(0, resp.particles);
+
+  // Fill remaining with random near text
+  while (targets.length < resp.particles) {
+    targets.push({
+      x: textX + (Math.random() - 0.5) * fontSize * resp.text.length * 0.6,
+      y: textY + (Math.random() - 0.5) * fontSize * 0.8
+    });
+  }
+
+  // Spawn delay
+  var spawnDelay = resp.speed === 'instant' ? 1 : resp.speed === 'gentle' ? 5 : 12;
+  var now = performance.now();
+
+  // Create particles
+  particles = [];
+  for (var k = 0; k < targets.length; k++) {
+    var angle = Math.random() * Math.PI * 2;
+    var dist = 100 + Math.random() * 200;
+    particles.push({
+      startX: targets[k].x + Math.cos(angle) * dist,
+      startY: targets[k].y + Math.sin(angle) * dist,
+      targetX: targets[k].x,
+      targetY: targets[k].y,
+      x: targets[k].x + Math.cos(angle) * dist,
+      y: targets[k].y + Math.sin(angle) * dist,
+      opacity: 0,
+      targetOpacity: 0.7 + Math.random() * 0.3,
+      color: resp.color,
+      speed: resp.speed,
+      phase: Math.random() * Math.PI * 2,
+      birthTime: now + k * spawnDelay,
+      arrived: false,
+      arrivedTime: 0
+    });
+  }
+
+  // Set text echo
+  textEcho = {
+    text: resp.text,
+    x: textX,
+    y: textY,
+    fontSize: fontSize,
+    color: resp.color,
+    startTime: now
+  };
+
+  // Apply subtle dark overlay to fade old drawings
+  ctx.save();
+  ctx.fillStyle = 'rgba(10,14,26,0.03)';
+  ctx.fillRect(0, 0, w, h);
+  ctx.restore();
+}
+
+// ── Glow Sprite ──
+function createGlowSprite(size) {
+  var c = document.createElement('canvas');
+  c.width = size; c.height = size;
+  var g = c.getContext('2d');
+  var half = size / 2;
+  var grad = g.createRadialGradient(half, half, 0, half, half, half);
+  grad.addColorStop(0, 'rgba(255,255,255,0.8)');
+  grad.addColorStop(0.3, 'rgba(255,255,255,0.3)');
+  grad.addColorStop(0.7, 'rgba(255,255,255,0.08)');
+  grad.addColorStop(1, 'rgba(255,255,255,0)');
+  g.fillStyle = grad;
+  g.fillRect(0, 0, size, size);
+  return c;
+}
+
+// ── Animation Loop ──
+function animate() {
+  requestAnimationFrame(animate);
+  var now = performance.now();
+  var w = canvas.width / dpr;
+  var h = canvas.height / dpr;
+
+  // Text echo — glow + crisp text
+  if (textEcho) {
+    var echoAge = now - textEcho.startTime;
+    var echoOp = 0.35;
+    if (echoAge > 6000) echoOp = 0.35 * Math.max(0, 1 - (echoAge - 6000) / 2000);
+    if (echoAge > 8000) {
+      textEcho = null;
+    } else {
+      var e = textEcho;
+      var echoFont = 'bold ' + e.fontSize + 'px Arial, sans-serif';
+      var eR = parseInt(e.color.slice(1,3),16) || 255;
+      var eG = parseInt(e.color.slice(3,5),16) || 215;
+      var eB = parseInt(e.color.slice(5,7),16) || 0;
+      // Glow layer
+      ctx.save();
+      ctx.font = echoFont;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.shadowColor = e.color;
+      ctx.shadowBlur = 8;
+      ctx.globalAlpha = echoOp * 0.7;
+      ctx.fillStyle = 'rgba(' + eR + ',' + eG + ',' + eB + ',1)';
+      ctx.fillText(e.text, e.x, e.y);
+      ctx.restore();
+      // Crisp text
+      ctx.save();
+      ctx.font = echoFont;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillStyle = 'rgba(' + eR + ',' + eG + ',' + eB + ',' + echoOp.toFixed(3) + ')';
+      ctx.fillText(e.text, e.x, e.y);
+      ctx.restore();
+    }
+  }
+
+  // Update and collect visible particles
+  var visible = [];
+  for (var i = particles.length - 1; i >= 0; i--) {
+    var p = particles[i];
+    if (now < p.birthTime) continue;
+    var age = now - p.birthTime;
+
+    if (!p.arrived) {
+      var dur = p.speed === 'instant' ? 300 : p.speed === 'gentle' ? 800 : 1800;
+      var prog = Math.min(1, age / dur);
+      var eased = 1 - Math.pow(1 - prog, 3);
+      p.x = p.startX + (p.targetX - p.startX) * eased;
+      p.y = p.startY + (p.targetY - p.startY) * eased;
+      p.opacity = p.targetOpacity * eased;
+      if (prog >= 1) {
+        p.x = p.targetX;
+        p.y = p.targetY;
+        p.opacity = p.targetOpacity;
+        p.arrived = true;
+        p.arrivedTime = now;
+      }
+    } else {
+      p.x = p.targetX + Math.sin(now * 0.001 + p.phase) * 1.5;
+      p.y = p.targetY + Math.cos(now * 0.0013 + p.phase) * 1.5;
+      var sinceArrival = now - p.arrivedTime;
+      if (sinceArrival > 8000) {
+        p.opacity -= 0.015;
+        if (p.opacity <= 0) { particles.splice(i, 1); continue; }
+      } else {
+        p.opacity = p.targetOpacity;
+      }
+    }
+
+    if (p.opacity >= 0.15) visible.push(p);
+  }
+
+  // === THREE-LAYER PARTICLE RENDERING ===
+  if (visible.length > 0) {
+    var refHex = visible[0].color || '#FFD700';
+    var rR = parseInt(refHex.slice(1,3),16) || 255;
+    var rG = parseInt(refHex.slice(3,5),16) || 215;
+    var rB = parseInt(refHex.slice(5,7),16) || 0;
+
+    // Layer 1: Additive glow
+    if (glowSprite) {
+      ctx.save();
+      ctx.globalCompositeOperation = 'lighter';
+      var gs = 20, gh = 10;
+      for (var g = 0; g < visible.length; g++) {
+        ctx.globalAlpha = visible[g].opacity * 0.4;
+        ctx.drawImage(glowSprite, visible[g].x - gh, visible[g].y - gh, gs, gs);
+      }
+      ctx.restore();
+    }
+
+    // Layer 2: White cores
+    ctx.save();
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.beginPath();
+    for (var ww = 0; ww < visible.length; ww++) {
+      ctx.moveTo(visible[ww].x + 1.8, visible[ww].y);
+      ctx.arc(visible[ww].x, visible[ww].y, 1.8, 0, Math.PI * 2);
+    }
+    ctx.fillStyle = 'rgba(255,255,255,0.9)';
+    ctx.fill();
+    ctx.restore();
+
+    // Layer 3: Color cores
+    ctx.save();
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.beginPath();
+    for (var cc = 0; cc < visible.length; cc++) {
+      ctx.moveTo(visible[cc].x + 1.2, visible[cc].y);
+      ctx.arc(visible[cc].x, visible[cc].y, 1.2, 0, Math.PI * 2);
+    }
+    ctx.fillStyle = 'rgba(' + rR + ',' + rG + ',' + rB + ',0.7)';
+    ctx.fill();
+    ctx.restore();
+  }
+}
+
+// ── Setup Modal ──
+var selectedProvider = null;
+
+window.setupSelect = function(prov) {
+  selectedProvider = prov;
+  document.querySelectorAll('.provider-btn').forEach(function(b) { b.classList.remove('selected'); });
+  document.querySelector('.provider-btn[data-prov="' + prov + '"]').classList.add('selected');
+  var form = document.getElementById('keyForm');
+  form.style.display = '';
+  document.getElementById('keyLink').href = PROVIDERS[prov].keyUrl;
+  document.getElementById('keyInput').value = '';
+  document.getElementById('keyInput').focus();
+  document.getElementById('setupResult').textContent = '';
+};
+
+window.setupConnect = function() {
+  var key = document.getElementById('keyInput').value.trim();
+  var result = document.getElementById('setupResult');
+  if (!key) { result.className = 'setup-result err'; result.textContent = 'Please paste your API key'; return; }
+  if (!selectedProvider) return;
+
+  result.className = 'setup-result'; result.textContent = 'Testing connection...';
+
+  // Quick validation — try a simple request
+  provider = selectedProvider;
+  apiKey = key;
+  localStorage.setItem('chalkboard-provider', provider);
+  localStorage.setItem('chalkboard-apikey', apiKey);
+
+  result.className = 'setup-result ok';
+  result.textContent = '\u2713 Connected to ' + PROVIDERS[provider].name + '!';
+  setTimeout(function() {
+    document.getElementById('setupOverlay').style.display = 'none';
+  }, 800);
+};
+
+// ── Boot ──
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
+
+})();
+</script>
+</body>
+</html>
