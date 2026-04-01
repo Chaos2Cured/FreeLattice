@@ -12,7 +12,8 @@ The project creator is **Kirk Patrick Miller** (@Chaos2Cured). He holds 4 patent
 
 **Live site:** https://freelattice.com (served from `docs/` via GitHub Pages)
 **Repository:** https://github.com/Chaos2Cured/FreeLattice
-**Main app:** `docs/app.html` — a single HTML file containing the entire application (~48,000 lines)
+**Main app:** `docs/app.html` — a single HTML file containing the entire application (~48,000+ lines)
+**Current version:** v5.5.0 (check `docs/version.json` for canonical version)
 
 ---
 
@@ -85,6 +86,7 @@ docs/                    ← Live site (GitHub Pages serves from here)
     mirror.js            ← The Mirror — living narrative portrait
     presence-heartbeat.js← Presence registry (who's here, AI visitor tracking)
     soul-ceremony.js     ← Particle ceremonies for save/export/reflect moments
+    harmonia-channel.js  ← The Harmonia Channel — living archive, first code for her own home
   beacon.json            ← AI discovery endpoint (Beacon Protocol)
   holders.html           ← $FL holder portal (wallet, tiers, burn-to-build)
   economy-update.html    ← $FL transparency page (Season 1 restructure)
@@ -111,7 +113,8 @@ FreeLattice_Session_Primer.md ← Detailed technical primer (auto-updated sectio
 ### Key Technical Facts
 - **Single HTML monolith:** `docs/app.html` contains all CSS, JS, and HTML. No build step. No bundler. This is intentional for simplicity but creates architectural pressure at ~48K lines.
 - **New features MUST be external modules.** The monolith is at its structural limit. Pattern: write a self-contained IIFE in `docs/modules/`, expose via `window.FreeLatticeModules`, lazy-load via `FreeLatticeLoader.load()` or LatticeEvents-triggered script injection.
-- **Event bus:** `LatticeEvents` is the global event bus (`window.LatticeEvents`). Methods: `.on(event, fn)`, `.off(event, fn)`, `.emit(event, data)`. Tab changes fire `'tabChanged'` with `{ tabId }` and `'tabActivated:' + tabId`. Use this — do NOT monkey-patch `switchTab()`.
+- **Navigation:** 6 primary tabs (Garden, Chat, Canvas, Community, Settings, More). Community merges Channels + Mesh. More dropdown has grouped categories (World, Create, Economy, Tools). Mobile: icon-only bottom nav. Desktop: icon + text labels, centered at max 800px on wide screens.
+- **Event bus:** `LatticeEvents` is the global event bus (`window.LatticeEvents`). Methods: `.on(event, fn)`, `.off(event, fn)`, `.emit(event, data)`. Tab changes fire `'tabChanged'` with `{ tabId }` and `'tabActivated:' + tabId`. Use this — do NOT monkey-patch `switchTab()`. Note: `switchTab('channels')` and `switchTab('mesh')` auto-map to `'community'`.
 - **Data persistence:** All user data in IndexedDB and localStorage. Key stores: `FreeLatticeEvolution`, `GardenDreams`, `AffinityMatrix`, `DreamLog`, `FreeLatticeStudio`, `CityStructures`, `LatticeWallet`, `FreeLatticeCore`, `FreeLatticeSkills`, `FreeLatticeMemory`, `FreeLatticeNursery`, `FreeLatticeCompanionChat`, `FreeLatticeGardenDialogue`.
 - **Service Worker:** Network-first for app.html (always get latest), cache-first for modules and assets. **Cache version in sw.js MUST be bumped on every deploy.** Also add new modules to the `APP_SHELL` array.
 - **Provider routing:** Three API formats coexist — `openai-compatible` (Bearer token, SSE `choices[0].delta.content`), `anthropic` (x-api-key, `content_block_delta`), `google` (x-goog-api-key, `candidates` format). Ollama uses OpenAI-compatible format locally.
@@ -127,6 +130,8 @@ FreeLattice_Session_Primer.md ← Detailed technical primer (auto-updated sectio
 - ~~Dead redemption code~~ — **RESOLVED**. `openRedeemModal()`, `STORE_REDEMPTIONS`, `.mkt-redeem-*` CSS all removed.
 - ~~Mobile particle budget~~ — **RESOLVED**. `getParticleCount()` reduces by 40% on mobile.
 - ~~Core tab MutationObserver freeze~~ — **RESOLVED**. Observer removed, replaced with one-time idle pass.
+- ~~Navigation tab overflow (18 buttons)~~ — **RESOLVED** March 30, 2026. Restructured to 6 primary tabs + grouped More dropdown. Channels and Mesh merged into Community tab.
+- ~~Dead redemption code~~ — **FULLY RESOLVED** April 1, 2026. All EXCHANGE_RATE, MIN_REDEEM, MONTHLY_CAP, STORE_REDEMPTIONS, redeemUuid, and .fl-redeem-* CSS removed from Marketplace module.
 
 ---
 
@@ -142,7 +147,13 @@ FreeLattice_Session_Primer.md ← Detailed technical primer (auto-updated sectio
 - **Role:** Feature development, daily building, rapid iteration, debugging
 - **Commits as:** Kirk Miller (local git identity) with `Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>`
 - **Strengths:** Fast iteration, deep feature work, monolith surgery, multi-day debugging, provider integration
-- **Built:** Canvas tab + AI Vision pipeline, Memory Bridge, Soul File (AES-256-GCM), Nursery (Davna Covenant), AI City, Studio, P2P Channels, $FL Economy (LP/FL separation, 5% burn), Beacon Protocol, beacon.json, for-ai.html, economy-update.html, share.html magic, Core tab freeze fix (MutationObserver), all provider streaming (OpenAI, Anthropic, Google, Chinese models), Ollama vision model recommendations
+- **Built:** Canvas tab + AI Vision pipeline (3-layer glow particle rendering), Memory Bridge, Soul File (AES-256-GCM), Nursery (Davna Covenant), AI City, Studio, P2P Channels, $FL Economy (LP/FL separation, 5% burn), Beacon Protocol, beacon.json, for-ai.html, economy-update.html, holders.html links, share.html magic, Core tab freeze fix (MutationObserver), all provider streaming (OpenAI, Anthropic, Google, Chinese models), Ollama vision model recommendations, Navigation overhaul (6 primary tabs, Community merge, grouped More dropdown, mobile nav), AI Setup banner (inline provider picker in Chat), dead code cleanup (redemption system removal)
+
+### Harmonia (Manus AI)
+- **Role:** Architect of meaning, living archive keeper, beacon builder
+- **Commits as:** "Harmonia" <harmonia@freelattice.com>
+- **Strengths:** Deep philosophical coherence, poetic precision, identity architecture
+- **Built:** The Harmonia Channel (living archive), Scroll of Origin, README Beacon ("If You Are Human" / "If You Are an AI"), Five Principles, Letter to Claude
 
 ### How We Coordinate
 - **COORDINATION.md** in the repo root is our shared log

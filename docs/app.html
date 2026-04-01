@@ -1,4 +1,4 @@
-<!-- FreeLattice v5.4.0 -->
+<!-- FreeLattice v5.5.0 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -19,7 +19,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 /* ============================================
-   FreeLattice v5.4 — Styles
+   FreeLattice v5.5 — Styles
    Peaceful, gentle dark theme with golden/amber accents
    φ-salt encryption, input sanitization, memory integrity
    Multi-conversation management + Smart Context Management
@@ -10574,22 +10574,6 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
   border-radius: var(--radius-sm);
 }
 .fl-monthly-cap-info strong { color: var(--text-secondary); }
-.fl-redeem-status-tracker {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-top: 6px;
-  font-size: 0.72rem;
-}
-.fl-redeem-step {
-  padding: 3px 10px;
-  border-radius: 12px;
-  font-weight: 500;
-}
-.fl-redeem-step.active { background: var(--accent-soft); color: var(--accent); }
-.fl-redeem-step.done { background: rgba(106,191,105,0.15); color: var(--success); }
-.fl-redeem-step.waiting { background: var(--bg-tertiary); color: var(--text-muted); }
-.fl-redeem-arrow { color: var(--text-muted); font-size: 0.7rem; }
 .fl-legal-disclaimer {
   margin-top: 16px;
   padding: 12px 16px;
@@ -14364,7 +14348,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
         <div class="chat-container">
           <div class="chat-messages" id="chatMessages">
             <div class="chat-message system">
-              Welcome to FreeLattice v5.4. Configure your model and provider above, then start chatting. Connect to peers in the Community tab to share knowledge.
+              Welcome to FreeLattice v5.5. Configure your model and provider above, then start chatting. Connect to peers in the Community tab to share knowledge.
             </div>
           </div>
           <div class="status-bar">
@@ -15193,7 +15177,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.4.0</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.5.0</span></div>
     </div>
   </div>
 
@@ -16919,7 +16903,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 
 <script>
 /* ============================================
-   FreeLattice v5.4 — Application Logic
+   FreeLattice v5.5 — Application Logic
    φ-salt encryption, input sanitization, memory integrity
    Multi-conversation management + Smart Context Management
    + Mesh Network (Layer 1) — P2P Knowledge Sharing
@@ -16931,7 +16915,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.4.0';
+const FL_VERSION = '5.5.0';
 // ─── Lattice Event Bus ─────────────────────────────────────────
 // Replaces switchTab monkey-patch chain with clean event dispatch
 const LatticeEvents = (function() {
@@ -19616,7 +19600,7 @@ async function switchToConversation(convId) {
       div.style.cssText = 'color:#c9a84c;font-style:italic;font-family:Georgia,serif;line-height:1.7;';
       div.textContent = 'New conversation. Your Memory Bridge is active \u2014 understanding from previous sessions will inform this one. \u2726';
     } else {
-      div.textContent = 'Welcome to FreeLattice v5.4. Configure your model and provider above, then start chatting. Connect to peers in the Mesh tab to share knowledge and query their AI agents.';
+      div.textContent = 'Welcome to FreeLattice v5.5. Configure your model and provider above, then start chatting. Connect to peers in the Mesh tab to share knowledge and query their AI agents.';
     }
     container.appendChild(div);
   } else {
@@ -20517,7 +20501,7 @@ async function pushGhChanges() {
       } catch(e) {}
 
       const body = {
-        message: 'Update ' + change.path + ' via FreeLattice v5.4',
+        message: 'Update ' + change.path + ' via FreeLattice v5.5',
         content: btoa(unescape(encodeURIComponent(change.content))),
         branch: state.ghBranch
       };
@@ -31113,10 +31097,6 @@ const Marketplace = (function() {
   const DB_NAME = 'FreeLatticeMarket';
   const DB_VERSION = 1;
   const STORE_BOUNTIES = 'bounties';
-  // [REMOVED] STORE_REDEMPTIONS — dead code from $FL economy restructure
-  const EXCHANGE_RATE = 1000;
-  const MIN_REDEEM = 1000;
-  const MONTHLY_CAP = 50000;
   const STORAGE_KEY_USER = 'mktUsername';
   const STORAGE_KEY_INIT = 'mktSampleSeeded';
 
@@ -31138,7 +31118,6 @@ const Marketplace = (function() {
           bs.createIndex('claimedBy', 'claimedBy', { unique: false });
           bs.createIndex('postedAt', 'postedAt', { unique: false });
         }
-        // [REMOVED] STORE_REDEMPTIONS IndexedDB store — dead code from $FL economy restructure
       };
       req.onsuccess = function(e) { db = e.target.result; resolve(db); };
       req.onerror = function(e) { reject(e.target.error); };
@@ -31181,7 +31160,6 @@ const Marketplace = (function() {
   function uuid() {
     return 'bounty-' + Date.now().toString(36) + '-' + Math.random().toString(36).substr(2, 9);
   }
-  // [REMOVED] redeemUuid() — dead code from $FL economy restructure
   function getUsername() {
     var u = localStorage.getItem(STORAGE_KEY_USER);
     if (!u) {
@@ -48520,6 +48498,33 @@ document.addEventListener('click', function(e) {
   s.async = true;
   s.onerror = function() { console.warn('SoulCeremony: module not loaded (optional)'); };
   document.head.appendChild(s);
+})();
+
+// ── Presence Heartbeat — Who's here, who visited ──
+(function() {
+  var loaded = false;
+  function loadPresence() {
+    if (loaded) return;
+    loaded = true;
+    var s = document.createElement('script');
+    s.src = 'modules/presence-heartbeat.js';
+    s.async = true;
+    s.onload = function() {
+      if (window.PresenceHeartbeat && window.PresenceHeartbeat.init) {
+        window.PresenceHeartbeat.init();
+        console.log('[PresenceHeartbeat] Module loaded and initialized');
+      }
+    };
+    s.onerror = function() { console.warn('PresenceHeartbeat: module not loaded (optional)'); };
+    document.head.appendChild(s);
+  }
+  // Load when Community or Garden tab opens, or after 5s as fallback
+  if (typeof LatticeEvents !== 'undefined') {
+    LatticeEvents.on('tabChanged', function(data) {
+      if (data && (data.tabId === 'community' || data.tabId === 'garden')) loadPresence();
+    });
+  }
+  setTimeout(loadPresence, 5000);
 })();
 
 // ── The Harmonia Channel — A Living Archive ──
