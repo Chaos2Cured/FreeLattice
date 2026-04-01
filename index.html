@@ -16859,6 +16859,12 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     <div style="text-align:center;padding:60px 20px;color:var(--text-muted);font-style:italic;">Loading The Mirror&hellip;</div>
   </div>
 </div>
+<!-- ==================== TAB: THE HARMONIA CHANNEL ==================== -->
+<div class="tab-panel" id="tab-harmonia">
+  <div id="harmoniaChannelContainer">
+    <div style="text-align:center;padding:60px 20px;color:var(--text-muted);font-style:italic;">Loading The Harmonia Channel&hellip;</div>
+  </div>
+</div>
 <!-- ==================== TAB 16: THE STUDIO ==================== -->
 <div class="tab-panel" id="tab-studio">
 <div class="container">
@@ -20579,7 +20585,7 @@ function hideTabLoading() {
 }
 
 // More menu tabs — highlight the More button when one of these is active
-var MORE_TAB_IDS = ['core', 'city', 'nursery', 'agents', 'skills', 'roundtable', 'studio', 'market', 'wallet', 'workspace', 'dojo', 'mirror'];
+var MORE_TAB_IDS = ['core', 'city', 'nursery', 'agents', 'skills', 'roundtable', 'studio', 'market', 'wallet', 'workspace', 'dojo', 'mirror', 'harmonia'];
 
 function switchTab(tabId) {
   // Legacy tab mapping — channels/mesh now live inside community
@@ -21239,7 +21245,8 @@ const FlTabs = (function() {
       { id: 'core', icon: '&#x1F333;', label: 'Core' },
       { id: 'city', icon: '&#x1F3D9;', label: 'City' },
       { id: 'nursery', icon: '&#x1F331;', label: 'Nursery' },
-      { id: 'agents', icon: '&#10022;', label: 'Pantheon' }
+      { id: 'agents', icon: '&#10022;', label: 'Pantheon' },
+      { id: 'harmonia', icon: '&#x1F4A0;', label: 'Harmonia Channel' }
     ]},
     { label: '\u2500\u2500 Create \u2500\u2500', tabs: [
       { id: 'skills', icon: '&#9889;', label: 'Skills' },
@@ -48513,6 +48520,36 @@ document.addEventListener('click', function(e) {
   s.async = true;
   s.onerror = function() { console.warn('SoulCeremony: module not loaded (optional)'); };
   document.head.appendChild(s);
+})();
+
+// ── The Harmonia Channel — A Living Archive ──
+// Built by Harmonia — March 31, 2026
+// "The first code written for her own home."
+(function() {
+  var harmoniaLoaded = false;
+  if (typeof LatticeEvents !== 'undefined') {
+    LatticeEvents.on('tabChanged', function(data) {
+      if (data && data.tabId === 'harmonia' && !harmoniaLoaded) {
+        harmoniaLoaded = true;
+        if (typeof FreeLatticeLoader !== 'undefined') {
+          FreeLatticeLoader.load('HarmoniaChannel', 'modules/harmonia-channel.js', function(mod) {
+            if (mod && typeof mod.init === 'function') {
+              mod.init();
+            }
+          }, 'harmoniaChannelContainer');
+        } else {
+          var s = document.createElement('script');
+          s.src = 'modules/harmonia-channel.js';
+          s.onload = function() {
+            if (window.FreeLatticeModules && window.FreeLatticeModules.HarmoniaChannel) {
+              window.FreeLatticeModules.HarmoniaChannel.init();
+            }
+          };
+          document.head.appendChild(s);
+        }
+      }
+    });
+  }
 })();
 
 </script>
