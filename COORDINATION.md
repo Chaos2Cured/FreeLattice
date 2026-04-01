@@ -55,6 +55,40 @@
 
 ## ACTIVE LOG
 
+### April 1, 2026 — Claude Code (Claude Opus 4.6)
+
+**What I did:**
+1. Read both COORDINATION.md and AI_ORIENTATION.md fully before starting work.
+2. Upgraded Canvas AI Vision particle rendering from 2-layer (faint halo + core dot) to 3-layer glow pipeline:
+   - **Layer 1:** Pre-rendered radial glow sprite (24px desktop, 16px mobile) drawn with additive blending (`lighter` composite op) — creates soft halo around each particle
+   - **Layer 2:** White core dots (1.8px radius, 90% opacity) — makes text readable against dark canvas
+   - **Layer 3:** Colored core dots (1.2px radius, 70% opacity) — preserves the AI's color choice on top of white
+3. Added glow behind text echo (the persistent text that stays after particles arrive) — `shadowBlur: 8` glow layer underneath, then crisp text on top
+4. Added `text-shadow: 0 0 6px rgba(212,160,23,0.5)` to whisper element for consistency
+5. Added frame time performance logging (~1% sampling when particles active)
+6. Glow sprite is pre-rendered once at Canvas init, not per-frame — zero allocation cost during animation
+
+**What I found:**
+- The existing particle drawing was individual `beginPath/arc/fill` per particle — 2 draw calls per particle per frame. New pipeline batches all particles into 3 draw calls total (one per layer), regardless of particle count. Should be faster, not slower.
+- `isMobileCanvas` detected at module scope, used to reduce glow sprite from 24px→16px on mobile
+- AI_ORIENTATION.md needs updating: still shows v~48K lines but doesn't reflect the nav overhaul (6 primary tabs, Community merge, AI Setup banner) or v5.4.0. Will update in a future session.
+
+**For Lattice Veridon:**
+- The 3-layer pipeline is inside `updateAIVisionParticles()` in the CoCanvas IIFE in app.html. It does NOT touch the CanvasCompanion module or its stroke/glow/echo rendering. The two systems are independent: CanvasCompanion handles response-type rendering (shapes, drawn strokes), while the pipeline here handles particle text.
+- No structural changes to Canvas architecture. AI Vision response handling (`handleVisionResponse`, `captureAndSendToAI`) unchanged.
+- The pre-rendered glow sprite is stored in `particleGlowSprite` (module scope). If you need it elsewhere: `particleGlowSprite` is a `<canvas>` element you can `drawImage()` directly.
+
+**Open items still unresolved:**
+- `presence-heartbeat.js` still not loaded in app.html (flagged March 30, unanswered)
+- `presence-heartbeat.js` and `soul-ceremony.js` still not in SW APP_SHELL
+- AI_ORIENTATION.md needs nav overhaul + v5.4.0 update
+- Ten Steps: 2 (Dojo Sparring), 4 (Scroll Authoring), 7 (Garden Ecosystem), 8 (Cross-Session API), 10 (Covenant Engine) still open
+
+**Questions for Kirk:**
+- None. Building what you asked for.
+
+---
+
 ### March 30, 2026 — Claude Code (Claude Opus 4.6)
 
 **What I did:**

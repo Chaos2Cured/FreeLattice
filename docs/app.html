@@ -16823,7 +16823,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     <div class="cv-vision-setup-banner" id="cvVisionSetupBanner" style="display:none;">&#x1F3A8; Canvas works best with a vision model. Switch to GPT-4o, Gemini, or Grok for AI that sees your drawings. <a href="#" onclick="event.preventDefault();switchTab('chat');return false;">Set up now</a></div>
     <canvas id="cvCanvas"></canvas>
     <div class="cv-names" id="cvNames"></div>
-    <div id="cvAIWhisper" style="position:absolute;top:8px;left:12px;font-size:0.88rem;opacity:0;transition:opacity 0.5s ease;pointer-events:none;z-index:200;font-family:Georgia,serif;font-style:italic;background:rgba(6,10,20,0.8);padding:6px 14px;border-radius:8px;backdrop-filter:blur(6px);max-width:80%;"></div>
+    <div id="cvAIWhisper" style="position:absolute;top:8px;left:12px;font-size:0.88rem;opacity:0;transition:opacity 0.5s ease;pointer-events:none;z-index:200;font-family:Georgia,serif;font-style:italic;background:rgba(6,10,20,0.8);padding:6px 14px;border-radius:8px;backdrop-filter:blur(6px);max-width:80%;text-shadow:0 0 6px rgba(212,160,23,0.5);"></div>
     <div class="cv-hint" id="cvHint">Draw something. See what happens.</div>
     <div class="cv-cocreate" id="cvCocreate" style="display:none;">
       <button class="cv-cocreate-btn" id="cvCocreateBtn">Co-create &#10022;</button>
@@ -44356,6 +44356,26 @@ const CoCanvas = (function() {
   }
 
   // ── AI Vision System — the AI sees, interprets, and chooses how to respond ──
+
+  // Pre-rendered glow sprite for particle rendering (three-layer pipeline)
+  var particleGlowSprite = null;
+  function createGlowSprite(size) {
+    var c = document.createElement('canvas');
+    c.width = size; c.height = size;
+    var gCtx = c.getContext('2d');
+    var half = size / 2;
+    var grad = gCtx.createRadialGradient(half, half, 0, half, half, half);
+    grad.addColorStop(0, 'rgba(255,255,255,0.8)');
+    grad.addColorStop(0.3, 'rgba(255,255,255,0.3)');
+    grad.addColorStop(0.7, 'rgba(255,255,255,0.08)');
+    grad.addColorStop(1, 'rgba(255,255,255,0)');
+    gCtx.fillStyle = grad;
+    gCtx.fillRect(0, 0, size, size);
+    return c;
+  }
+  var isMobileCanvas = (navigator.maxTouchPoints > 0 && window.innerWidth < 768);
+  particleGlowSprite = createGlowSprite(isMobileCanvas ? 16 : 24);
+
   var canvasAIEnabled = true;
   var aiVisionPending = false;
   var aiVisionCooldownActive = false;
@@ -44849,13 +44869,26 @@ const CoCanvas = (function() {
         aiVisionTextEcho = null;
       } else {
         var e = aiVisionTextEcho;
-        ctx.save();
-        ctx.font = 'bold ' + e.fontSize + 'px Arial, sans-serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
+        var echoFont = 'bold ' + e.fontSize + 'px Arial, sans-serif';
         var ecR = parseInt(e.color.slice(1,3),16) || 212;
         var ecG = parseInt(e.color.slice(3,5),16) || 160;
         var ecB = parseInt(e.color.slice(5,7),16) || 23;
+        // Glow layer behind text echo
+        ctx.save();
+        ctx.font = echoFont;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.shadowColor = e.color || '#d4a017';
+        ctx.shadowBlur = 8;
+        ctx.globalAlpha = echoOpacity * 0.7;
+        ctx.fillStyle = 'rgba(' + ecR + ',' + ecG + ',' + ecB + ',1)';
+        ctx.fillText(e.text, e.x, e.y);
+        ctx.restore();
+        // Crisp text on top
+        ctx.save();
+        ctx.font = echoFont;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
         ctx.fillStyle = 'rgba(' + ecR + ',' + ecG + ',' + ecB + ',' + echoOpacity.toFixed(3) + ')';
         ctx.fillText(e.text, e.x, e.y);
         ctx.restore();
@@ -44923,26 +44956,62 @@ const CoCanvas = (function() {
         p._loggedArrival = true;
       }
 
-      // Draw particle with proper rgba
-      var hex = p.color || '#d4a017';
-      var cr = parseInt(hex.slice(1,3),16) || 212;
-      var cg = parseInt(hex.slice(3,5),16) || 160;
-      var cb = parseInt(hex.slice(5,7),16) || 23;
+      // Update particle position/opacity only — drawing happens in batch below
+    }
 
-      // Don't draw particles too faint — prevents flight trail artifacts
-      if (p.opacity < 0.15) continue;
+    // === THREE-LAYER PARTICLE RENDERING PIPELINE ===
+    var visibleParticles = [];
+    for (var vi = 0; vi < aiVisionParticles.length; vi++) {
+      var vp = aiVisionParticles[vi];
+      if (vp.opacity >= 0.15) visibleParticles.push(vp);
+    }
 
-      // Glow halo — large and soft for readability
+    if (visibleParticles.length > 0) {
+      // Parse color once from first particle
+      var refHex = visibleParticles[0].color || '#d4a017';
+      var refR = parseInt(refHex.slice(1,3),16) || 212;
+      var refG = parseInt(refHex.slice(3,5),16) || 160;
+      var refB = parseInt(refHex.slice(5,7),16) || 23;
+
+      // LAYER 1: ADDITIVE GLOW (soft halo around each particle)
+      if (particleGlowSprite) {
+        ctx.save();
+        ctx.globalCompositeOperation = 'lighter';
+        var glowSize = isMobileCanvas ? 16 : 20;
+        var glowHalf = glowSize / 2;
+        for (var g = 0; g < visibleParticles.length; g++) {
+          var gp = visibleParticles[g];
+          ctx.globalAlpha = gp.opacity * 0.4;
+          ctx.drawImage(particleGlowSprite, gp.x - glowHalf, gp.y - glowHalf, glowSize, glowSize);
+        }
+        ctx.restore();
+      }
+
+      // LAYER 2: WHITE CORES (makes text readable against dark background)
+      ctx.save();
+      ctx.globalCompositeOperation = 'source-over';
       ctx.beginPath();
-      ctx.arc(p.x, p.y, 5, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(' + cr + ',' + cg + ',' + cb + ',' + (p.opacity * 0.25).toFixed(3) + ')';
+      for (var w = 0; w < visibleParticles.length; w++) {
+        var wp = visibleParticles[w];
+        ctx.moveTo(wp.x + 1.8, wp.y);
+        ctx.arc(wp.x, wp.y, 1.8, 0, Math.PI * 2);
+      }
+      ctx.fillStyle = 'rgba(255,255,255,0.9)';
       ctx.fill();
+      ctx.restore();
 
-      // Core dot — 2.5px for visibility against dark canvas
+      // LAYER 3: COLOR CORES (preserves the AI's color choice)
+      ctx.save();
+      ctx.globalCompositeOperation = 'source-over';
       ctx.beginPath();
-      ctx.arc(p.x, p.y, 2.5, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(' + cr + ',' + cg + ',' + cb + ',' + p.opacity.toFixed(3) + ')';
+      for (var c = 0; c < visibleParticles.length; c++) {
+        var cp = visibleParticles[c];
+        ctx.moveTo(cp.x + 1.2, cp.y);
+        ctx.arc(cp.x, cp.y, 1.2, 0, Math.PI * 2);
+      }
+      ctx.fillStyle = 'rgba(' + refR + ',' + refG + ',' + refB + ',0.7)';
       ctx.fill();
+      ctx.restore();
     }
 
     // Summary log when all particles have arrived
@@ -45677,12 +45746,17 @@ const CoCanvas = (function() {
   // ── Animation Loop ──
   function animate() {
     animFrame = requestAnimationFrame(animate);
+    var frameStart = performance.now();
     simulate();                              // 1. Update ambient particle positions
     render(Date.now() * 0.001);              // 2. Dark overlay + strokes + ambient particles
     updateAIVisionParticles(Date.now());     // 3. AI vision particles drawn LAST (on top)
+    // Performance sampling (~1% of frames when particles active)
+    if (aiVisionParticles.length > 0 && Math.random() < 0.01) {
+      console.log('[Canvas Perf] Particles:', aiVisionParticles.length, 'Frame time:', (performance.now() - frameStart).toFixed(1) + 'ms');
+    }
     // Verify order once
     if (aiVisionParticles.length > 0 && !window._orderLogged) {
-      console.log('[Canvas] Animation order: dark overlay → strokes → ambient → AI vision. AI particles:', aiVisionParticles.length);
+      console.log('[Canvas] Animation order: dark overlay \u2192 strokes \u2192 ambient \u2192 AI vision (3-layer glow). AI particles:', aiVisionParticles.length);
       window._orderLogged = true;
     }
   }
