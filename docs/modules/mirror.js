@@ -436,7 +436,7 @@
     return div.innerHTML;
   }
 
-  // ── Public API ──
+   // ── Public API ──
   async function refresh() {
     container.innerHTML = '<div style="text-align:center;padding:60px;color:var(--text-muted);font-style:italic;">Gathering reflections\u2026</div>';
     var data = await collectData();
@@ -444,7 +444,14 @@
     render(sections);
   }
 
-  // ── Init on tab switch ──
+  function init() {
+    // Called by FreeLatticeLoader after script loads.
+    // The tab was already switched to mirror when the loader fired,
+    // so we refresh immediately — don't wait for another tabChanged event.
+    refresh();
+  }
+
+  // ── Listen for future tab switches ──
   var initialized = false;
   if (typeof LatticeEvents !== 'undefined') {
     // app.html emits 'tabChanged' with { tabId } — support both old 'tab' and new 'tabId' keys
@@ -476,7 +483,10 @@
     }, 500);
   }
 
-  // Expose globally
-  window.MirrorModule = { refresh: refresh };
-
+  // ── Register with FreeLattice module system ──
+  var publicAPI = { init: init, refresh: refresh };
+  window.FreeLatticeModules = window.FreeLatticeModules || {};
+  window.FreeLatticeModules.Mirror = publicAPI;
+  // Legacy global
+  window.MirrorModule = publicAPI;
 })();
