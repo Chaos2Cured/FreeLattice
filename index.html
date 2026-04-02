@@ -3863,7 +3863,7 @@ input[type="range"]::-moz-range-thumb {
 @media (max-width: 600px) {
   .pwa-install-banner { flex-wrap: wrap; gap: 8px; padding: 8px 14px; font-size: 0.78rem; }
   header h1 { font-size: var(--type-h2); }
-  .chat-messages { height: calc(100vh - 260px); min-height: 200px; max-height: 500px; padding: 14px; }
+  .chat-messages { height: calc(100vh - 320px); min-height: 180px; max-height: none; padding: 14px; }
   .welcome-card { padding: 28px 22px; }
   .suggest-card { padding: 24px 20px; }
   .container { padding: 0 14px; }
@@ -3876,6 +3876,14 @@ input[type="range"]::-moz-range-thumb {
   .context-budget-bar { flex-wrap: wrap; gap: 6px; }
   .context-budget-text { min-width: auto; }
   .context-settings-row { grid-template-columns: 1fr; }
+  /* Mobile chat input — bigger send button, compact model switcher */
+  .chat-input-row { flex-wrap: wrap; }
+  .chat-input-row textarea { min-height: 44px; padding: 12px 14px; font-size: 1rem; order: 1; flex: 1 1 60%; }
+  #sendBtn { padding: 12px 20px; font-size: 0.95rem; order: 2; border-radius: 0; min-width: 72px; }
+  .model-switcher-wrap { order: 3; flex: 0 0 auto; border-left: none; border-top: 1px solid var(--border); }
+  .model-switcher-btn { padding: 6px 10px; font-size: 0.68rem; max-width: 120px; }
+  .mic-btn, .img-gen-btn { order: 4; padding: 8px; min-width: 36px; min-height: 36px; border-top: 1px solid var(--border); }
+  .chat-disclaimer { font-size: 0.65rem; padding: 4px 14px; }
 }
 /* ---- Font Size Button Active State ---- */
 .font-size-btn.active {
