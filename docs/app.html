@@ -23598,6 +23598,12 @@ function handleLocalToggle(init) {
     localStorage.setItem('fl_isLocal', isLocal);
     updateTokenLimitForProvider();
     updateStatus();
+    // Visual indicator + bridge for provider switch
+    if (state.chatHistory.length > 0) {
+      var name = isLocal ? 'Ollama (' + (state.ollamaModel || 'llama3.2') + ')' : (PROVIDERS[state.provider] ? PROVIDERS[state.provider].name : state.provider);
+      addProviderSwitchDivider(name, '');
+      state._providerJustSwitched = true;
+    }
   }
 }
 
@@ -23653,7 +23659,48 @@ function handleProviderChange(init) {
     reEncryptApiKey(state.provider);
     updateTokenLimitForProvider();
     updateStatus();
+    // Visual indicator of provider switch in chat
+    if (state.chatHistory.length > 0) {
+      var provName = provider ? provider.name : state.provider;
+      var modelId = provider ? (provider.models[state.model] || state.model) : state.model;
+      addProviderSwitchDivider(provName, modelId);
+      // Mark that a bridge is needed for the next message
+      state._providerJustSwitched = true;
+    }
   }
+}
+
+// Provider switch divider — subtle visual cue in chat
+function addProviderSwitchDivider(provName, modelId) {
+  var container = document.getElementById('chatMessages');
+  if (!container) return;
+  var div = document.createElement('div');
+  div.style.cssText = 'text-align:center;padding:8px 0;font-size:0.75rem;color:var(--text-muted);letter-spacing:0.05em;';
+  div.textContent = '\u2500\u2500 Switched to ' + provName + (modelId ? ' \u00B7 ' + modelId : '') + ' \u2500\u2500';
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+}
+
+// Conversation bridge — helps a new provider continue the conversation naturally
+function buildConversationBridge(maxMessages) {
+  maxMessages = maxMessages || 10;
+  var recent = state.chatHistory.slice(-maxMessages);
+  if (recent.length === 0) return '';
+
+  var bridgeLines = ['[CONVERSATION CONTINUITY — The user switched AI providers mid-conversation. Here is the recent exchange so you can continue naturally. Do not summarize or repeat what was said — just continue as if you were always here.]'];
+
+  // Check for Dream Archive handoff packet
+  if (typeof DreamArchive !== 'undefined' && typeof DreamArchive.generateHandoffPacket === 'function') {
+    try {
+      // DreamArchive needs seeds — check if it has a simpler getter
+      if (typeof DreamArchive.getLatestSeed === 'function') {
+        var seed = DreamArchive.getLatestSeed();
+        if (seed) bridgeLines.push('[SESSION CONTEXT: ' + (seed.essence || seed.title || '') + ']');
+      }
+    } catch(e) { /* optional — skip if unavailable */ }
+  }
+
+  return bridgeLines.join('\n');
 }
 // ---- Dynamic Model Dropdown ----
 function rebuildModelDropdown() {
@@ -24691,6 +24738,12 @@ function buildMessages() {
       systemContent += '\n--- ' + file.name + (file.useSummary && file.summaryContent ? ' (summary)' : '') + ' ---\n' + content + '\n';
     }
     systemContent += '\nUse this context to inform your responses when relevant.';
+  }
+
+  // Inject conversation bridge if provider just switched mid-conversation
+  if (state._providerJustSwitched && state.chatHistory.length > 0) {
+    systemContent += '\n\n' + buildConversationBridge(10);
+    state._providerJustSwitched = false;
   }
 
   messages.push({ role: 'system', content: systemContent });
