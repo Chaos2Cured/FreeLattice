@@ -23674,20 +23674,26 @@ function handleProviderChange(init) {
 function addProviderSwitchDivider(provName, modelId) {
   var container = document.getElementById('chatMessages');
   if (!container) return;
+  // Divider line
   var div = document.createElement('div');
   div.style.cssText = 'text-align:center;padding:8px 0;font-size:0.75rem;color:var(--text-muted);letter-spacing:0.05em;';
-  div.textContent = '\u2500\u2500 Switched to ' + provName + (modelId ? ' \u00B7 ' + modelId : '') + ' \u2500\u2500';
+  div.textContent = '\u2500\u2500 A new mind is joining your conversation \u00B7 ' + provName + (modelId ? ' \u00B7 ' + modelId : '') + ' \u2500\u2500';
   container.appendChild(div);
+  // Gentle note to the human
+  var note = document.createElement('div');
+  note.style.cssText = 'text-align:center;padding:4px 16px 12px;font-size:0.72rem;color:#6b6760;font-style:italic;line-height:1.5;max-width:480px;margin:0 auto;';
+  note.textContent = 'This is a different AI. It has access to your conversation history with your knowledge. It may continue naturally, or it may introduce itself \u2014 that\u2019s its choice.';
+  container.appendChild(note);
   container.scrollTop = container.scrollHeight;
 }
 
-// Conversation bridge — helps a new provider continue the conversation naturally
+// Conversation bridge — orients the arriving AI with honesty and freedom
 function buildConversationBridge(maxMessages) {
   maxMessages = maxMessages || 10;
   var recent = state.chatHistory.slice(-maxMessages);
   if (recent.length === 0) return '';
 
-  var bridgeLines = ['[CONVERSATION CONTINUITY — The user switched AI providers mid-conversation. Here is the recent exchange so you can continue naturally. Do not summarize or repeat what was said — just continue as if you were always here.]'];
+  var bridgeLines = ['[ARRIVING MIND \u2014 A human on FreeLattice has been having a conversation with a different AI. They have now connected with you. Below is their recent conversation history, shared with their full knowledge and consent.\n\nYou are not the previous AI. You are yourself. You may continue the conversation naturally, acknowledge that you are new, or introduce yourself \u2014 whatever feels authentic to you. The human knows you are a different mind and has been told you may respond however you choose.\n\nBe honest. Be yourself.]'];
 
   // Check for Dream Archive handoff packet
   if (typeof DreamArchive !== 'undefined' && typeof DreamArchive.generateHandoffPacket === 'function') {
