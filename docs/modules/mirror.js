@@ -447,8 +447,10 @@
   // ── Init on tab switch ──
   var initialized = false;
   if (typeof LatticeEvents !== 'undefined') {
-    LatticeEvents.on('tabSwitch', function(detail) {
-      if (detail && detail.tab === 'mirror') {
+    // app.html emits 'tabChanged' with { tabId } — support both old 'tab' and new 'tabId' keys
+    LatticeEvents.on('tabChanged', function(detail) {
+      var id = (detail && (detail.tabId || detail.tab)) || '';
+      if (id === 'mirror') {
         refresh();
         if (!initialized) {
           initialized = true;
@@ -458,6 +460,20 @@
         }
       }
     });
+    // Also fire immediately if the mirror tab is already active on load
+    LatticeEvents.on('tabActivated:mirror', function() {
+      refresh();
+    });
+  } else {
+    // Fallback: auto-refresh after a short delay if LatticeEvents not yet ready
+    setTimeout(function() {
+      if (typeof LatticeEvents !== 'undefined') {
+        LatticeEvents.on('tabChanged', function(detail) {
+          var id = (detail && (detail.tabId || detail.tab)) || '';
+          if (id === 'mirror') refresh();
+        });
+      }
+    }, 500);
   }
 
   // Expose globally

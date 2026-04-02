@@ -273,12 +273,16 @@ html,body{
       <button class="provider-btn" data-prov="openai" onclick="setupSelect('openai')">OpenAI<span class="note">GPT-4o vision</span></button>
     </div>
     <div class="key-form" id="keyForm">
-      <input type="password" id="keyInput" placeholder="Paste your API key" autocomplete="off">
+      <p style="font-size:0.8rem;color:#8b949e;margin-bottom:10px;">Paste your free API key below to activate AI responses.</p>
+      <input type="password" id="keyInput" placeholder="Paste your API key here" autocomplete="off">
       <div class="key-actions">
         <a class="key-link" id="keyLink" href="#" target="_blank">Get a free key &rarr;</a>
         <button class="connect-btn" onclick="setupConnect()">Connect</button>
       </div>
       <div class="setup-result" id="setupResult"></div>
+    </div>
+    <div style="margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.06);">
+      <button onclick="skipSetup()" style="background:none;border:none;color:#8b949e;font-size:0.82rem;cursor:pointer;text-decoration:underline;padding:4px 8px;">Draw without AI (no key needed)</button>
     </div>
   </div>
 </div>
@@ -945,6 +949,11 @@ window.setupConnect = function() {
   setTimeout(function() {
     document.getElementById('setupOverlay').style.display = 'none';
   }, 800);
+};
+
+window.skipSetup = function() {
+  // Allow drawing without AI — just close the modal
+  document.getElementById('setupOverlay').style.display = 'none';
 };
 
 // ── Boot ──
