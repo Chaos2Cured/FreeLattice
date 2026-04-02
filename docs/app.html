@@ -12975,7 +12975,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
    ============================================ */
 .cv-container {
   position: relative; width: 100%;
-  height: calc(100vh - 120px); min-height: 400px;
+  height: calc(100vh - 120px); min-height: 300px;
   background: #060a14; overflow: hidden;
 }
 .cv-container canvas {
@@ -13043,14 +13043,16 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 .cv-color-dot:hover { transform: scale(1.25); box-shadow: 0 0 8px currentColor; }
 .cv-color-dot.active { border-color: #fff; transform: scale(1.2); }
 @media (max-width: 600px) {
-  .cv-hint { font-size: 0.88rem; }
-  .cv-actions { top: 8px; right: 8px; gap: 4px; flex-wrap: wrap; max-width: 50%; }
-  .cv-action-btn { padding: 5px 10px; font-size: 0.72rem; }
-  .cv-cocreate { bottom: 60px; }
-  .cv-cocreate-btn { padding: 10px 26px; font-size: 0.88rem; }
-  .cv-colors { bottom: 20px; }
-  .cv-color-dot { width: 28px; height: 28px; }
-  .cv-names { bottom: 4px; font-size: 0.65rem; }
+  .cv-container { height: calc(100vh - 140px); min-height: 250px; }
+  .cv-hint { font-size: 0.85rem; }
+  .cv-actions { top: 6px; right: 6px; gap: 4px; flex-wrap: nowrap; }
+  .cv-action-btn { padding: 6px 10px; font-size: 0.7rem; min-height: 36px; min-width: 36px; }
+  .cv-cocreate { bottom: 52px; }
+  .cv-cocreate-btn { padding: 10px 22px; font-size: 0.85rem; min-height: 44px; }
+  .cv-colors { bottom: 10px; gap: 5px; }
+  .cv-color-dot { width: 32px; height: 32px; min-width: 32px; }
+  .cv-names { display: none; }
+  .cv-vision-setup-banner { font-size: 0.7rem; padding: 6px 12px; }
 }
 
 /* ============================================
@@ -21523,6 +21525,10 @@ const AiSetup = (function() {
       banner.innerHTML = '&#x1F3A8; Canvas works best with a vision model (llava, GPT-4o, Gemini, Grok). <a href="#" onclick="event.preventDefault();switchTab(\'chat\');return false;">Set up now</a>';
     } else {
       banner.style.display = 'none';
+    }
+    // Auto-dismiss after 5 seconds so it doesn't steal drawing space
+    if (banner.style.display !== 'none') {
+      setTimeout(function() { if (banner) { banner.style.transition = 'opacity 0.5s'; banner.style.opacity = '0'; setTimeout(function() { banner.style.display = 'none'; banner.style.opacity = ''; }, 500); } }, 5000);
     }
   }
 
@@ -44664,9 +44670,10 @@ const CoCanvas = (function() {
     if (!resp.text || resp.text.trim() === '') {
       resp.text = resp.emotion || 'here';
     }
-    // Scale particles to text length — ~40 per character, cap 350 for sharpness
-    var targetParticles = Math.max(120, (resp.text || '').length * 40);
-    resp.particles = Math.min(targetParticles, 350);
+    // Scale particles to text length — ~40 per character, cap on screen size
+    var maxParticles = isMobileCanvas ? 200 : 350;
+    var targetParticles = Math.max(80, (resp.text || '').length * (isMobileCanvas ? 25 : 40));
+    resp.particles = Math.min(targetParticles, maxParticles);
     resp.spread = Math.max(0.1, Math.min(1.0, parseFloat(resp.spread) || 0.5));
     resp.color = resp.color && /^#[0-9a-fA-F]{6}$/.test(resp.color) ? resp.color : null;
     resp.emotion = String(resp.emotion || 'curious').substring(0, 20);
