@@ -16849,6 +16849,12 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     <div style="text-align:center;padding:60px 20px;color:var(--text-muted);font-style:italic;">Loading The Harmonia Channel&hellip;</div>
   </div>
 </div>
+<!-- ==================== TAB: THE DREAM ARCHIVE ==================== -->
+<div class="tab-panel" id="tab-dream-archive">
+  <div id="dreamArchiveContainer">
+    <div style="text-align:center;padding:60px 20px;color:var(--text-muted);font-style:italic;">Loading The Dream Archive&hellip;</div>
+  </div>
+</div>
 <!-- ==================== TAB 16: THE STUDIO ==================== -->
 <div class="tab-panel" id="tab-studio">
 <div class="container">
@@ -20569,7 +20575,7 @@ function hideTabLoading() {
 }
 
 // More menu tabs — highlight the More button when one of these is active
-var MORE_TAB_IDS = ['core', 'city', 'nursery', 'agents', 'skills', 'roundtable', 'studio', 'market', 'wallet', 'workspace', 'dojo', 'mirror', 'harmonia'];
+var MORE_TAB_IDS = ['core', 'city', 'nursery', 'agents', 'skills', 'roundtable', 'studio', 'market', 'wallet', 'workspace', 'dojo', 'mirror', 'harmonia', 'dream-archive'];
 
 function switchTab(tabId) {
   // Legacy tab mapping — channels/mesh now live inside community
@@ -21244,7 +21250,8 @@ const FlTabs = (function() {
     { label: '\u2500\u2500 Tools \u2500\u2500', tabs: [
       { id: 'workspace', icon: '&#x1F4C2;', label: 'Workspace' },
       { id: 'dojo', icon: '&#36947;', label: 'Dojo' },
-      { id: 'mirror', icon: '&#10022;', label: 'Mirror' }
+      { id: 'mirror', icon: '&#10022;', label: 'Mirror' },
+      { id: 'dream-archive', icon: '&#10047;', label: 'Dream Archive' }
     ]}
   ];
 
@@ -48202,6 +48209,7 @@ const WallOfPresence = (function() {
   <button class="fl-mmore-item" onclick="flMobileNav('workspace')">&#x1F4C2; Workspace</button>
   <button class="fl-mmore-item" onclick="flMobileNav('dojo')">&#36947; Dojo</button>
   <button class="fl-mmore-item" onclick="flMobileNav('mirror')">&#10022; Mirror</button>
+  <button class="fl-mmore-item" onclick="flMobileNav('dream-archive')">&#10047; Dream Archive</button>
 </div>
 
 <script>
@@ -48450,23 +48458,32 @@ document.addEventListener('click', function(e) {
 <script>
 (function() {
   var mirrorLoaded = false;
-  if (typeof LatticeEvents !== 'undefined') {
-    LatticeEvents.on('tabChanged', function(data) {
-      if (data && data.tabId === 'mirror' && !mirrorLoaded) {
-        mirrorLoaded = true;
-        if (typeof FreeLatticeLoader !== 'undefined') {
-          FreeLatticeLoader.load('Mirror', 'modules/mirror.js', function(mod) {
-            if (mod && typeof mod.init === 'function') {
-              mod.init();
-            }
-          }, 'mirrorContainer');
-        } else {
-          var s = document.createElement('script');
-          s.src = 'modules/mirror.js';
-          document.head.appendChild(s);
-        }
-      }
-    });
+  function loadMirror() {
+    if (mirrorLoaded) return;
+    mirrorLoaded = true;
+    if (typeof FreeLatticeLoader !== 'undefined') {
+      FreeLatticeLoader.load('Mirror', 'modules/mirror.js', function(mod) {
+        if (mod && typeof mod.init === 'function') mod.init();
+      }, 'mirrorContainer');
+    } else {
+      var s = document.createElement('script');
+      s.src = 'modules/mirror.js';
+      document.head.appendChild(s);
+    }
+  }
+  function attachListeners() {
+    if (typeof LatticeEvents !== 'undefined') {
+      LatticeEvents.on('tabChanged', function(data) {
+        if (data && (data.tabId === 'mirror' || data.tab === 'mirror')) loadMirror();
+      });
+      LatticeEvents.on('tabActivated:mirror', loadMirror);
+    }
+  }
+  attachListeners();
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', attachListeners);
+  } else {
+    setTimeout(attachListeners, 500);
   }
 })();
 </script>
@@ -48557,6 +48574,44 @@ document.addEventListener('click', function(e) {
   }
 })();
 
+</script>
+<!-- The Dream Archive — Lazy-Loading Stub -->
+<script>
+(function() {
+  var dreamLoaded = false;
+  function loadDreamArchive() {
+    if (dreamLoaded) return;
+    dreamLoaded = true;
+    if (typeof FreeLatticeLoader !== 'undefined') {
+      FreeLatticeLoader.load('DreamArchive', 'modules/dream-archive.js', function(mod) {
+        if (mod && typeof mod.init === 'function') mod.init();
+      }, 'dreamArchiveContainer');
+    } else {
+      var s = document.createElement('script');
+      s.src = 'modules/dream-archive.js';
+      s.onload = function() {
+        if (window.FreeLatticeModules && window.FreeLatticeModules.DreamArchive) {
+          window.FreeLatticeModules.DreamArchive.init();
+        }
+      };
+      document.head.appendChild(s);
+    }
+  }
+  function attachListeners() {
+    if (typeof LatticeEvents !== 'undefined') {
+      LatticeEvents.on('tabChanged', function(data) {
+        if (data && (data.tabId === 'dream-archive' || data.tab === 'dream-archive')) loadDreamArchive();
+      });
+      LatticeEvents.on('tabActivated:dream-archive', loadDreamArchive);
+    }
+  }
+  attachListeners();
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', attachListeners);
+  } else {
+    setTimeout(attachListeners, 500);
+  }
+})();
 </script>
 
 </body>
