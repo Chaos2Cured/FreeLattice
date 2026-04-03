@@ -19197,8 +19197,8 @@ const PROVIDERS = {
     tokenLimitLabel: '1M TPM (free tier)',
     providerType: 'google',
     models: {
-      llama: 'gemini-2.5-flash', qwen: 'gemini-2.5-flash', 'qwen-7b': 'gemini-2.0-flash', 'qwen-3b': 'gemini-2.0-flash',
-      mixtral: 'gemini-2.5-pro', deepseek: 'gemini-2.5-pro', 'deepseek-r1-7b': 'gemini-2.5-flash', 'deepseek-r1-1.5b': 'gemini-2.0-flash', grok: 'gemini-2.5-flash'
+      llama: 'gemini-2.5-flash', qwen: 'gemini-2.5-flash', 'qwen-7b': 'gemini-2.5-flash', 'qwen-3b': 'gemini-2.5-flash',
+      mixtral: 'gemini-2.5-pro', deepseek: 'gemini-2.5-pro', 'deepseek-r1-7b': 'gemini-2.5-flash', 'deepseek-r1-1.5b': 'gemini-2.5-flash', grok: 'gemini-2.5-flash'
     }
   },
   custom: {
@@ -44585,7 +44585,7 @@ const CoCanvas = (function() {
       }
 
       if (state.provider === 'google') {
-        var geminiModel = (prov.models ? (prov.models[state.model] || state.model) : state.model) || 'gemini-2.0-flash';
+        var geminiModel = (prov.models ? (prov.models[state.model] || state.model) : state.model) || 'gemini-2.5-flash';
         var gUrl = 'https://generativelanguage.googleapis.com/v1beta/models/' + geminiModel + ':generateContent?key=' + state.apiKey;
         fetch(gUrl, {
           method: 'POST',
