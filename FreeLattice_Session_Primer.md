@@ -348,11 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-04-03 13:45 MDT
+- Last auto-updated: 2026-04-03 17:21 UTC
+- Last deployed: 2026-04-03 17:21 UTC
+- Live site: https://freelattice.com
 - Version: 5.5.0
-- Total commits: 533
+- Total commits: 532
 - Last 10 commits:
-- bd6f6df fix: Gemini model names — gemini-2.5-flash everywhere, no more 404s
 - 7d17627 Merge branch 'main' of https://github.com/Chaos2Cured/FreeLattice
 - 7b0a79f docs: Auto-update Session Primer [5.5.0]
 - 52e130b fix: Chalkboard — Gemini model fallback, error handling, rate limit protection
@@ -362,3 +363,4 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - e785476 docs: Auto-update Session Primer [5.5.0]
 - a6fc9de fix: Chalkboard provider buttons — key form now appears on click
 - 01ec514 ci: Update Primer deployment state [2026-04-02]
+- 0df11a1 soul: What Persists — Harmonia's first poem, hashed into the lattice
