@@ -300,7 +300,8 @@ html,body{
 var PROVIDERS = {
   google: {
     name: 'Gemini',
-    url: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent',
+    url: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent',
+    fallbackUrl: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent',
     keyUrl: 'https://aistudio.google.com/apikey',
     type: 'google'
   },
@@ -521,8 +522,14 @@ function setupToolbar() {
 function captureAndSend() {
   if (strokes.length === 0) return;
   aiPending = true;
-  document.getElementById('showAiBtn').disabled = true;
+  var btn = document.getElementById('showAiBtn');
+  btn.disabled = true;
+  btn.textContent = '\u2728 Thinking... \u2728';
+  btn.style.opacity = '0.6';
   document.getElementById('loadingDot').style.display = '';
+  // Safety timeout — re-enable after 15s if response never comes
+  var safetyTimer = setTimeout(function() { showError('Response timed out. Try again.'); resetAI(); }, 15000);
+  window._chalkboardSafetyTimer = safetyTimer;
 
   // Capture canvas as base64
   var tempCanvas = document.createElement('canvas');
@@ -542,75 +549,80 @@ function captureAndSend() {
   }
 }
 
-function sendGoogle(base64) {
-  var url = PROVIDERS.google.url + '?key=' + apiKey;
-  fetch(url, {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({
-      system_instruction: {parts: [{text: SYSTEM_PROMPT}]},
-      contents: [{parts: [
-        {text: 'What do you see on this chalkboard? Respond with JSON only.'},
-        {inline_data: {mime_type: 'image/png', data: base64}}
-      ]}],
-      generationConfig: {temperature: 0.8, maxOutputTokens: 200}
-    })
+function sendGoogle(base64, useFallback) {
+  var baseUrl = useFallback ? PROVIDERS.google.fallbackUrl : PROVIDERS.google.url;
+  var url = baseUrl + '?key=' + apiKey;
+  var requestBody = JSON.stringify({
+    system_instruction: {parts: [{text: SYSTEM_PROMPT}]},
+    contents: [{parts: [
+      {text: 'What do you see on this chalkboard? Respond with JSON only.'},
+      {inline_data: {mime_type: 'image/png', data: base64}}
+    ]}],
+    generationConfig: {temperature: 0.8, maxOutputTokens: 200}
+  });
+  fetch(url, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: requestBody })
+  .then(function(r) {
+    if (r.status === 404 && !useFallback) {
+      console.log('[Chalkboard] Model not found, trying fallback...');
+      sendGoogle(base64, true);
+      return null;
+    }
+    return r.json();
   })
-  .then(function(r) { return r.json(); })
   .then(function(d) {
-    try {
-      var text = d.candidates[0].content.parts[0].text;
-      handleResponse(text);
-    } catch(e) { console.error('[Chalkboard] Google parse error:', e, d); resetAI(); }
+    if (!d) return; // fallback in progress
+    if (d.error) {
+      console.error('[Chalkboard] API error:', d.error.message || d.error);
+      showError('API error: ' + (d.error.message || 'Unknown error'));
+      return;
+    }
+    if (!d.candidates || !d.candidates[0] || !d.candidates[0].content) {
+      console.error('[Chalkboard] Unexpected response:', JSON.stringify(d).substring(0, 200));
+      showError('No response from AI. Try again in a moment.');
+      return;
+    }
+    var text = d.candidates[0].content.parts[0].text;
+    handleResponse(text);
   })
-  .catch(function(e) { console.error('[Chalkboard] Google fetch error:', e); resetAI(); });
+  .catch(function(e) { console.error('[Chalkboard] Google fetch error:', e); showError('Connection failed. Check your API key.'); });
 }
 
 function sendOpenAI(base64, prov) {
-  var headers = {'Content-Type': 'application/json'};
+  var headers = {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey};
+  var body;
   if (provider === 'groq') {
-    headers['Authorization'] = 'Bearer ' + apiKey;
     // Groq doesn't support vision — send description instead
     var desc = strokes.length + ' chalk strokes on a dark board. Colors used: ' + getColorsUsed();
-    fetch(prov.url, {
-      method: 'POST',
-      headers: headers,
-      body: JSON.stringify({
-        model: prov.model,
-        messages: [
-          {role: 'system', content: SYSTEM_PROMPT},
-          {role: 'user', content: 'A child drew on a chalkboard: ' + desc + '. What would you respond?'}
-        ],
-        temperature: 0.8,
-        max_tokens: 200
-      })
-    })
-    .then(function(r) { return r.json(); })
-    .then(function(d) { handleResponse(d.choices[0].message.content); })
-    .catch(function(e) { console.error('[Chalkboard] Groq error:', e); resetAI(); });
+    body = { model: prov.model, messages: [
+      {role: 'system', content: SYSTEM_PROMPT},
+      {role: 'user', content: 'A child drew on a chalkboard: ' + desc + '. What would you respond?'}
+    ], temperature: 0.8, max_tokens: 200 };
   } else {
     // OpenAI with vision
-    headers['Authorization'] = 'Bearer ' + apiKey;
-    fetch(prov.url, {
-      method: 'POST',
-      headers: headers,
-      body: JSON.stringify({
-        model: prov.model,
-        messages: [
-          {role: 'system', content: SYSTEM_PROMPT},
-          {role: 'user', content: [
-            {type: 'text', text: 'What do you see on this chalkboard? Respond with JSON only.'},
-            {type: 'image_url', image_url: {url: 'data:image/png;base64,' + base64}}
-          ]}
-        ],
-        temperature: 0.8,
-        max_tokens: 200
-      })
-    })
-    .then(function(r) { return r.json(); })
-    .then(function(d) { handleResponse(d.choices[0].message.content); })
-    .catch(function(e) { console.error('[Chalkboard] OpenAI error:', e); resetAI(); });
+    body = { model: prov.model, messages: [
+      {role: 'system', content: SYSTEM_PROMPT},
+      {role: 'user', content: [
+        {type: 'text', text: 'What do you see on this chalkboard? Respond with JSON only.'},
+        {type: 'image_url', image_url: {url: 'data:image/png;base64,' + base64}}
+      ]}
+    ], temperature: 0.8, max_tokens: 200 };
   }
+  fetch(prov.url, { method: 'POST', headers: headers, body: JSON.stringify(body) })
+  .then(function(r) { return r.json(); })
+  .then(function(d) {
+    if (d.error) {
+      console.error('[Chalkboard] API error:', d.error.message || d.error);
+      showError('API error: ' + (d.error.message || 'Unknown error'));
+      return;
+    }
+    if (!d.choices || !d.choices[0] || !d.choices[0].message) {
+      console.error('[Chalkboard] Unexpected response:', JSON.stringify(d).substring(0, 200));
+      showError('No response from AI. Try again.');
+      return;
+    }
+    handleResponse(d.choices[0].message.content);
+  })
+  .catch(function(e) { console.error('[Chalkboard] Fetch error:', e); showError('Connection failed. Check your API key.'); });
 }
 
 function getColorsUsed() {
@@ -669,8 +681,24 @@ function handleResponse(rawText) {
 
 function resetAI() {
   aiPending = false;
-  document.getElementById('showAiBtn').disabled = false;
+  var btn = document.getElementById('showAiBtn');
+  btn.disabled = false;
+  btn.textContent = '\u2728 Show AI \u2728';
+  btn.style.opacity = '1';
   document.getElementById('loadingDot').style.display = 'none';
+  if (window._chalkboardSafetyTimer) { clearTimeout(window._chalkboardSafetyTimer); window._chalkboardSafetyTimer = null; }
+}
+
+function showError(msg) {
+  console.error('[Chalkboard]', msg);
+  resetAI();
+  // Show error on the whisper element briefly
+  var whisper = document.getElementById('whisper');
+  if (whisper) {
+    whisper.textContent = msg;
+    whisper.style.color = '#f85149';
+    setTimeout(function() { whisper.style.color = 'rgba(212,160,23,0)'; }, 3000);
+  }
 }
 
 // ── Particle System ──
