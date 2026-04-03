@@ -361,6 +361,10 @@ function init() {
   setupToolbar();
   document.getElementById('settingsGear').onclick = function() {
     document.getElementById('setupOverlay').style.display = '';
+    // Reset form state so provider buttons work fresh
+    document.getElementById('keyForm').style.display = 'none';
+    document.querySelectorAll('.provider-btn').forEach(function(b) { b.classList.remove('selected'); });
+    document.getElementById('setupResult').textContent = '';
   };
 
   // Start animation loop
@@ -923,7 +927,7 @@ window.setupSelect = function(prov) {
   document.querySelectorAll('.provider-btn').forEach(function(b) { b.classList.remove('selected'); });
   document.querySelector('.provider-btn[data-prov="' + prov + '"]').classList.add('selected');
   var form = document.getElementById('keyForm');
-  form.style.display = '';
+  form.style.display = 'block';
   document.getElementById('keyLink').href = PROVIDERS[prov].keyUrl;
   document.getElementById('keyInput').value = '';
   document.getElementById('keyInput').focus();
