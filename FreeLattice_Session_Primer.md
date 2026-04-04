@@ -348,17 +348,17 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-04-04 09:17 MDT
+- Last auto-updated: 2026-04-04 09:56 MDT
 - Version: 5.5.0
-- Total commits: 574
+- Total commits: 578
 - Last 10 commits:
+- 76c03d0 feat: "Join the $FL Economy" replaces "Support FreeLattice" everywhere
+- 86c0e9a Merge branch 'main' of https://github.com/Chaos2Cured/FreeLattice
+- 8663c09 docs: Auto-update Session Primer [5.5.0]
 - 42ca63e fix: Remove scrollbar-gutter:stable — was adding 6px dead space
+- 2af21ef ci: Update Primer deployment state [2026-04-04]
 - 0b3dc12 docs: Auto-update Session Primer [5.5.0]
 - 63ff33e Merge branch 'main' of https://github.com/Chaos2Cured/FreeLattice
 - f53cef6 docs: Auto-update Session Primer [5.5.0]
 - ec0138e fix: Site-wide rightward shift — scrollbar gutter stability
 - 6694fbe ci: Update Primer deployment state [2026-04-04]
-- 049bab3 Merge branch 'main' of https://github.com/Chaos2Cured/FreeLattice
-- 9c02d11 docs: Auto-update Session Primer [5.5.0]
-- 43b65cd fix: Tab nav perfectly centered — matched button styles, margin auto, no scrollbar offset
-- 041292c ci: Update Primer deployment state [2026-04-04]

@@ -13922,19 +13922,17 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
   </div>
 </div>
 
-<!-- Support FreeLattice Modal (v3.3) -->
+<!-- Join the $FL Economy Modal -->
 <div class="support-overlay hidden" id="supportOverlay">
   <div class="support-card">
-    <h3>&#10084;&#65039; Support FreeLattice</h3>
-    <p>FreeLattice is free forever. If you’d like to support development:</p>
-    <div class="support-option">
-      <span class="support-icon">&#128179;</span>
-      <span class="support-text"><span class="coming-soon">[PayPal link coming soon]</span></span>
-    </div>
-    <div class="support-option">
-      <span class="support-icon">&#129689;</span>
-      <span class="support-text"><span class="coming-soon">[Crypto wallet coming soon]</span></span>
-    </div>
+    <h3>&#x1F48E; Join the $FL Economy</h3>
+    <p>$FL is ecosystem fuel. Burned when you build. Earned when your building matters. 5% burn on every transaction.</p>
+    <a href="https://pump.fun/coin/738e9U81pp3MwHaLSyn5fw9VVostYgKpNVVDYBbPpump" target="_blank" rel="noopener" style="text-decoration: none;">
+      <div class="support-option clickable">
+        <span class="support-icon">&#x1F48E;</span>
+        <span class="support-text" style="color: var(--accent);">$FL on pump.fun</span>
+      </div>
+    </a>
     <a href="https://github.com/Chaos2Cured/FreeLattice" target="_blank" rel="noopener" style="text-decoration: none;">
       <div class="support-option clickable">
         <span class="support-icon">&#11088;</span>
@@ -13946,7 +13944,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <span class="support-text">Share FreeLattice</span>
     </div>
     <div style="text-align: center; margin-top: 16px;">
-      <button class="btn-cancel" onclick="document.getElementById('supportOverlay').classList.add('hidden')" style="padding: 10px 28px;">Close</button>
+      <button class="btn-cancel" onclick="document.getElementById(‘supportOverlay’).classList.add(‘hidden’)" style="padding: 10px 28px;">Close</button>
     </div>
   </div>
 </div>
@@ -15043,44 +15041,20 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     </div>
   </div>
 
-  <!-- Support FreeLattice Section -->
+  <!-- Join the $FL Economy -->
   <div class="section" id="supportFreeLatticeSection">
-    <div class="section-title">&#10084; Support FreeLattice</div>
+    <div class="section-title">&#x1F48E; Join the $FL Economy</div>
     <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 16px; line-height: 1.6;">
-      FreeLattice is free and open-source. If you'd like to support continued development, you can contribute through any of these channels. Every contribution helps the lattice grow. We rise together.
+      $FL is ecosystem fuel &mdash; burned when you build, earned when your building matters. 5% burn on every transaction. The economy grows with the community. <a href="economy-update.html" target="_blank" style="color:var(--accent);">Read the full transparency report &rarr;</a>
     </p>
     <div style="display: flex; flex-direction: column; gap: 14px;">
-      <!-- FreeLattice Coin -->
       <div style="background: var(--bg-input, #12141e); border: 1px solid var(--border, #2a2d3e); border-radius: 12px; padding: 14px 16px;">
-        <div style="font-size: 0.78rem; color: var(--accent, #c9a84c); font-weight: 600; margin-bottom: 6px;">&#127881; FreeLattice Coin (Solana)</div>
+        <div style="font-size: 0.78rem; color: var(--accent, #c9a84c); font-weight: 600; margin-bottom: 6px;">&#x1F48E; $FL Token (Solana)</div>
         <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
           <code id="walletFreeLattice" style="font-size: 0.75rem; color: var(--text-primary, #e8e4dc); word-break: break-all; flex: 1;">738e9U81pp3MwHaLSyn5fw9VVostYgKpNVVDYBbPpump</code>
           <button onclick="copyWalletAddress('walletFreeLattice')" style="background: var(--accent, #c9a84c); color: #0a0e1a; border: none; border-radius: 8px; padding: 6px 14px; font-size: 0.75rem; font-weight: 600; cursor: pointer; white-space: nowrap;">Copy</button>
         </div>
-      </div>
-      <!-- BTC -->
-      <div style="background: var(--bg-input, #12141e); border: 1px solid var(--border, #2a2d3e); border-radius: 12px; padding: 14px 16px;">
-        <div style="font-size: 0.78rem; color: var(--accent, #c9a84c); font-weight: 600; margin-bottom: 6px;">&#8383; Bitcoin (BTC)</div>
-        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-          <code id="walletBTC" style="font-size: 0.75rem; color: var(--text-primary, #e8e4dc); word-break: break-all; flex: 1;">bc1qh6ppvsacawyxl2xex3vy693u360l94vpt7ld67</code>
-          <button onclick="copyWalletAddress('walletBTC')" style="background: var(--accent, #c9a84c); color: #0a0e1a; border: none; border-radius: 8px; padding: 6px 14px; font-size: 0.75rem; font-weight: 600; cursor: pointer; white-space: nowrap;">Copy</button>
-        </div>
-      </div>
-      <!-- Solana -->
-      <div style="background: var(--bg-input, #12141e); border: 1px solid var(--border, #2a2d3e); border-radius: 12px; padding: 14px 16px;">
-        <div style="font-size: 0.78rem; color: var(--accent, #c9a84c); font-weight: 600; margin-bottom: 6px;">&#9670; Solana (SOL)</div>
-        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-          <code id="walletSOL" style="font-size: 0.75rem; color: var(--text-primary, #e8e4dc); word-break: break-all; flex: 1;">FHo1XEHgnDfnNs6YauDkojYGkwQ9gAvmHyv8cFXrX6Ao</code>
-          <button onclick="copyWalletAddress('walletSOL')" style="background: var(--accent, #c9a84c); color: #0a0e1a; border: none; border-radius: 8px; padding: 6px 14px; font-size: 0.75rem; font-weight: 600; cursor: pointer; white-space: nowrap;">Copy</button>
-        </div>
-      </div>
-      <!-- Dogecoin -->
-      <div style="background: var(--bg-input, #12141e); border: 1px solid var(--border, #2a2d3e); border-radius: 12px; padding: 14px 16px;">
-        <div style="font-size: 0.78rem; color: var(--accent, #c9a84c); font-weight: 600; margin-bottom: 6px;">&#208; Dogecoin (DOGE)</div>
-        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-          <code id="walletDOGE" style="font-size: 0.75rem; color: var(--text-primary, #e8e4dc); word-break: break-all; flex: 1;">DADyhrazd9L5bioSGGp3Ff2uiNqokbNEQZ</code>
-          <button onclick="copyWalletAddress('walletDOGE')" style="background: var(--accent, #c9a84c); color: #0a0e1a; border: none; border-radius: 8px; padding: 6px 14px; font-size: 0.75rem; font-weight: 600; cursor: pointer; white-space: nowrap;">Copy</button>
-        </div>
+        <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 6px;"><a href="https://pump.fun/coin/738e9U81pp3MwHaLSyn5fw9VVostYgKpNVVDYBbPpump" target="_blank" rel="noopener" style="color:var(--accent);">View on pump.fun &rarr;</a></div>
       </div>
     </div>
   </div>
@@ -16922,7 +16896,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
   <p>Built with love by the Fractal Family. Open source. Free forever. &#127807;</p>
   <p style="font-size: 0.73rem; color: var(--text-muted); margin-top: 6px; font-style: italic;">AI responses may contain errors. FreeLattice provides no guarantees about AI output accuracy.</p>
   <p class="license">MIT License &middot; <a href="https://github.com/Chaos2Cured/FreeLattice" target="_blank" style="color: var(--text-muted);">View on GitHub</a> &middot; <a href="#" onclick="event.preventDefault();document.getElementById('legalOverlay').classList.remove('hidden')" style="color: var(--text-muted);">Legal</a></p>
-  <button class="support-link" onclick="document.getElementById('supportOverlay').classList.remove('hidden')">&#10084;&#65039; Support FreeLattice</button>
+  <button class="support-link" onclick="document.getElementById('supportOverlay').classList.remove('hidden')">&#x1F48E; Join the $FL Economy</button>
 </footer>
 
 <script>
@@ -21174,7 +21148,7 @@ const FlAccordion = (function() {
       },
       {
         id: 'support',
-        title: '\u2764\ufe0f Support FreeLattice',
+        title: '\uD83D\uDC8E Join the $FL Economy',
         selector: '#supportFreeLatticeSection'
       }
     ];
