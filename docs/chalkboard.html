@@ -26,11 +26,12 @@ html,body{
 #chalkCanvas{
   display:block;
   position:absolute;
-  top:0;left:0;right:0;
-  bottom:64px;
+  top:0;left:0;
   width:100%;
+  height:calc(100vh - 64px);
   background:#0a0e1a;
   cursor:crosshair;
+  touch-action:none;
 }
 
 /* Bottom toolbar */
@@ -345,6 +346,7 @@ function init() {
   ctx = canvas.getContext('2d');
   resize();
   window.addEventListener('resize', resize);
+  window.addEventListener('orientationchange', function() { setTimeout(resize, 100); });
 
   // Create glow sprite
   glowSprite = createGlowSprite(24);
@@ -375,13 +377,27 @@ function init() {
 function resize() {
   dpr = window.devicePixelRatio || 1;
   var rect = canvas.getBoundingClientRect();
-  canvas.width = rect.width * dpr;
-  canvas.height = rect.height * dpr;
-  canvas.style.width = rect.width + 'px';
-  canvas.style.height = rect.height + 'px';
+  var newW = Math.floor(rect.width * dpr);
+  var newH = Math.floor(rect.height * dpr);
+
+  // Skip if dimensions haven't changed
+  if (canvas.width === newW && canvas.height === newH) return;
+
+  // Save current drawing before resize clears the canvas
+  var savedImage = null;
+  if (canvas.width > 0 && canvas.height > 0 && strokes.length > 0) {
+    try { savedImage = canvas.toDataURL(); } catch(e) {}
+  }
+
+  // Resize backing store (do NOT set canvas.style.* — CSS handles display size)
+  canvas.width = newW;
+  canvas.height = newH;
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  // Redraw strokes
+
+  // Restore by redrawing strokes (pixel-perfect at new resolution)
   redraw();
+
+  console.log('[Chalkboard] Canvas resized to', rect.width, 'x', rect.height, 'at', dpr + 'x DPR');
 }
 
 function redraw() {
