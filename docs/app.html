@@ -21603,6 +21603,8 @@ const FlUpdater = (function() {
   }
 
   async function doUpdate() {
+    // Mark that we just updated — skip banner on next load
+    try { localStorage.setItem('fl-just-updated', 'true'); } catch(e) {}
     try {
       // Clear service worker caches
       if ('caches' in window) {
@@ -21622,6 +21624,12 @@ const FlUpdater = (function() {
   }
 
   function init() {
+    // If we just updated, skip the check and show a brief success toast instead
+    if (localStorage.getItem('fl-just-updated')) {
+      localStorage.removeItem('fl-just-updated');
+      if (typeof showToast === 'function') showToast('Updated to v' + FL_VERSION + ' \u2714');
+      return;
+    }
     // Non-blocking silent check on startup
     setTimeout(function() { checkForUpdates(true); }, 3000);
   }
