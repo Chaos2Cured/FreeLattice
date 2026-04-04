@@ -558,7 +558,7 @@ function sendGoogle(base64, useFallback) {
       {inlineData: {mimeType: 'image/png', data: base64}},
       {text: 'Respond to what you see on this chalkboard. ONLY respond with a JSON object.'}
     ]}],
-    generationConfig: {temperature: 0.7, maxOutputTokens: 200}
+    generationConfig: {temperature: 0.7, maxOutputTokens: 1024}
   });
   console.log('[Chalkboard] Sending to Gemini' + (useFallback ? ' (fallback)' : '') + ', base64 length:', base64.length);
   fetch(url, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: requestBody })
