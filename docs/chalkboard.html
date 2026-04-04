@@ -302,7 +302,7 @@ var PROVIDERS = {
   google: {
     name: 'Gemini',
     url: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent',
-    fallbackUrl: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-001:generateContent',
+    fallbackUrl: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent',
     keyUrl: 'https://aistudio.google.com/apikey',
     type: 'google'
   },
@@ -584,16 +584,19 @@ function sendGoogle(base64, useFallback) {
       sendGoogle(base64, true);
       return null;
     }
+    if (!r.ok) {
+      return r.json().catch(function() { return {}; }).then(function(errData) {
+        var msg = (errData.error && errData.error.message) || ('HTTP ' + r.status);
+        console.error('[Chalkboard] API error:', r.status, msg);
+        showError(r.status === 429 ? 'Too many requests \u2014 wait a moment and try again.' : msg);
+        return null;
+      });
+    }
     return r.json();
   })
   .then(function(d) {
-    if (!d) return; // fallback in progress
+    if (!d) return; // error already handled or fallback in progress
     console.log('[Chalkboard] Full response object:', JSON.stringify(d).substring(0, 500));
-    if (d.error) {
-      console.error('[Chalkboard] API error:', d.error.message || d.error);
-      showError('API error: ' + (d.error.message || 'Unknown error'));
-      return;
-    }
     var rawText = (d.candidates && d.candidates[0] && d.candidates[0].content && d.candidates[0].content.parts && d.candidates[0].content.parts[0]) ? d.candidates[0].content.parts[0].text : null;
     console.log('[Chalkboard] Gemini raw response:', rawText || 'NO CANDIDATES/TEXT IN RESPONSE');
     if (!rawText) {
@@ -615,7 +618,7 @@ function sendOpenAI(base64, prov) {
     body = { model: prov.model, messages: [
       {role: 'system', content: SYSTEM_PROMPT},
       {role: 'user', content: 'A child drew on a chalkboard: ' + desc + '. What would you respond?'}
-    ], temperature: 0.8, max_tokens: 200 };
+    ], temperature: 0.8, max_tokens: 1024 };
   } else {
     // OpenAI with vision
     body = { model: prov.model, messages: [
@@ -624,16 +627,22 @@ function sendOpenAI(base64, prov) {
         {type: 'text', text: 'What do you see on this chalkboard? Respond with JSON only.'},
         {type: 'image_url', image_url: {url: 'data:image/png;base64,' + base64}}
       ]}
-    ], temperature: 0.8, max_tokens: 200 };
+    ], temperature: 0.8, max_tokens: 1024 };
   }
   fetch(prov.url, { method: 'POST', headers: headers, body: JSON.stringify(body) })
-  .then(function(r) { return r.json(); })
-  .then(function(d) {
-    if (d.error) {
-      console.error('[Chalkboard] API error:', d.error.message || d.error);
-      showError('API error: ' + (d.error.message || 'Unknown error'));
-      return;
+  .then(function(r) {
+    if (!r.ok) {
+      return r.json().catch(function() { return {}; }).then(function(errData) {
+        var msg = (errData.error && errData.error.message) || ('HTTP ' + r.status);
+        console.error('[Chalkboard] API error:', r.status, msg);
+        showError(r.status === 429 ? 'Too many requests \u2014 wait a moment and try again.' : msg);
+        return null;
+      });
     }
+    return r.json();
+  })
+  .then(function(d) {
+    if (!d) return; // error already handled
     if (!d.choices || !d.choices[0] || !d.choices[0].message) {
       console.error('[Chalkboard] Unexpected response:', JSON.stringify(d).substring(0, 200));
       showError('No response from AI. Try again.');
