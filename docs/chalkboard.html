@@ -83,6 +83,19 @@ html,body{
   flex-shrink:0;
 }
 .tool-btn:active{transform:scale(0.9)}
+.save-btn{
+  transition:opacity 0.3s ease, transform 0.15s, background 0.3s;
+}
+.save-btn.flash{
+  background:rgba(212,160,23,0.3) !important;
+  border-color:rgba(212,160,23,0.6) !important;
+}
+.save-feedback{
+  position:fixed;bottom:72px;right:12px;
+  font-size:0.72rem;color:#d4a017;
+  opacity:0;transition:opacity 0.3s;
+  pointer-events:none;z-index:200;
+}
 .tool-btn.eraser-active{
   background:rgba(212,160,23,0.2);
   border-color:rgba(212,160,23,0.5);
@@ -245,6 +258,7 @@ html,body{
 <div class="whisper" id="whisper"></div>
 <div class="loading-dot" id="loadingDot"></div>
 <button class="settings-gear" id="settingsGear" title="AI Settings">&#x2699;</button>
+<div class="save-feedback" id="saveFeedback"></div>
 <a class="powered-by" href="https://freelattice.com" target="_blank" rel="noopener">Powered by FreeLattice</a>
 
 <div class="toolbar">
@@ -258,6 +272,7 @@ html,body{
     <div class="color-dot" data-color="#FF8A65" style="background:#FF8A65" title="Orange"></div>
   </div>
   <div class="toolbar-right">
+    <button class="tool-btn save-btn" id="saveBtn" title="Save this moment" style="display:none;">&#x1F4F8;</button>
     <button class="tool-btn" id="clearBtn" title="Clear">&#x1F5D1;&#xFE0F;</button>
     <button class="show-ai-btn" id="showAiBtn">&#x2728; Show AI &#x2728;</button>
   </div>
@@ -521,7 +536,11 @@ function setupToolbar() {
     redraw();
     var w = document.getElementById('whisper');
     if (w) w.style.color = 'rgba(212,160,23,0)';
+    document.getElementById('saveBtn').style.display = 'none';
   });
+
+  // Save this moment
+  document.getElementById('saveBtn').addEventListener('click', saveMoment);
 
   // Show AI
   document.getElementById('showAiBtn').addEventListener('click', function() {
@@ -976,6 +995,159 @@ function animate() {
     ctx.fill();
     ctx.restore();
   }
+
+  // Show save button once all particles have arrived
+  if (particles.length > 0 && !window._saveShown) {
+    var allArrived = true;
+    for (var ai = 0; ai < particles.length; ai++) {
+      if (!particles[ai].arrived) { allArrived = false; break; }
+    }
+    if (allArrived) {
+      window._saveShown = true;
+      var saveBtn = document.getElementById('saveBtn');
+      if (saveBtn) { saveBtn.style.display = ''; saveBtn.style.opacity = '0'; requestAnimationFrame(function() { saveBtn.style.opacity = '1'; }); }
+    }
+  }
+  if (particles.length === 0) { window._saveShown = false; }
+}
+
+// ── Save This Moment ──
+function saveMoment() {
+  var w = canvas.width / dpr;
+  var h = canvas.height / dpr;
+  var tc = document.createElement('canvas');
+  tc.width = canvas.width;
+  tc.height = canvas.height;
+  var t = tc.getContext('2d');
+  t.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+  // Background
+  t.fillStyle = '#0a0e1a';
+  t.fillRect(0, 0, w, h);
+
+  // Strokes
+  for (var si = 0; si < strokes.length; si++) {
+    var s = strokes[si];
+    if (s.points.length < 2) continue;
+    t.save();
+    t.strokeStyle = s.color;
+    t.lineWidth = s.width;
+    t.lineCap = 'round';
+    t.lineJoin = 'round';
+    t.globalAlpha = s.color === '#0a0e1a' ? 1 : 0.85;
+    t.beginPath();
+    t.moveTo(s.points[0].x, s.points[0].y);
+    for (var sj = 1; sj < s.points.length; sj++) t.lineTo(s.points[sj].x, s.points[sj].y);
+    t.stroke();
+    t.restore();
+  }
+
+  // Text echo
+  if (textEcho) {
+    var e = textEcho;
+    var eR = parseInt(e.color.slice(1,3),16) || 255;
+    var eG = parseInt(e.color.slice(3,5),16) || 215;
+    var eB = parseInt(e.color.slice(5,7),16) || 0;
+    t.save();
+    t.font = 'bold ' + e.fontSize + 'px Arial, sans-serif';
+    t.textAlign = 'center';
+    t.textBaseline = 'middle';
+    t.shadowColor = e.color;
+    t.shadowBlur = 8;
+    t.globalAlpha = 0.25;
+    t.fillStyle = 'rgba(' + eR + ',' + eG + ',' + eB + ',1)';
+    t.fillText(e.text, e.x, e.y);
+    t.restore();
+    t.save();
+    t.font = 'bold ' + e.fontSize + 'px Arial, sans-serif';
+    t.textAlign = 'center';
+    t.textBaseline = 'middle';
+    t.fillStyle = 'rgba(' + eR + ',' + eG + ',' + eB + ',0.35)';
+    t.fillText(e.text, e.x, e.y);
+    t.restore();
+  }
+
+  // Particles (frozen at current positions)
+  var vis = particles.filter(function(p) { return p.opacity >= 0.15; });
+  if (vis.length > 0) {
+    var hex = vis[0].color || '#FFD700';
+    var pR = parseInt(hex.slice(1,3),16) || 255;
+    var pG = parseInt(hex.slice(3,5),16) || 215;
+    var pB = parseInt(hex.slice(5,7),16) || 0;
+    // Glow
+    if (glowSprite) {
+      t.save();
+      t.globalCompositeOperation = 'lighter';
+      for (var gi = 0; gi < vis.length; gi++) {
+        t.globalAlpha = vis[gi].opacity * 0.4;
+        t.drawImage(glowSprite, vis[gi].x - 10, vis[gi].y - 10, 20, 20);
+      }
+      t.restore();
+    }
+    // White cores
+    t.save();
+    t.beginPath();
+    for (var wi = 0; wi < vis.length; wi++) {
+      t.moveTo(vis[wi].x + 1.8, vis[wi].y);
+      t.arc(vis[wi].x, vis[wi].y, 1.8, 0, Math.PI * 2);
+    }
+    t.fillStyle = 'rgba(255,255,255,0.9)';
+    t.fill();
+    t.restore();
+    // Color cores
+    t.save();
+    t.beginPath();
+    for (var ci = 0; ci < vis.length; ci++) {
+      t.moveTo(vis[ci].x + 1.2, vis[ci].y);
+      t.arc(vis[ci].x, vis[ci].y, 1.2, 0, Math.PI * 2);
+    }
+    t.fillStyle = 'rgba(' + pR + ',' + pG + ',' + pB + ',0.7)';
+    t.fill();
+    t.restore();
+  }
+
+  // Watermark
+  t.save();
+  t.font = '12px -apple-system, sans-serif';
+  t.textAlign = 'right';
+  t.textBaseline = 'bottom';
+  t.fillStyle = 'rgba(255,255,255,0.3)';
+  t.fillText('\u2728 Made with FreeLattice', w - 10, h - 10);
+  t.restore();
+
+  // Share or download
+  if (navigator.share && navigator.canShare) {
+    tc.toBlob(function(blob) {
+      var file = new File([blob], 'freelattice-moment.png', { type: 'image/png' });
+      if (navigator.canShare({ files: [file] })) {
+        navigator.share({
+          title: 'Made with FreeLattice',
+          text: 'AI responded to my drawing with light \u2728',
+          files: [file]
+        }).then(function() { showSaveFeedback('Shared!'); })
+          .catch(function() { downloadCanvas(tc); });
+      } else {
+        downloadCanvas(tc);
+      }
+    }, 'image/png');
+  } else {
+    downloadCanvas(tc);
+  }
+}
+
+function downloadCanvas(c) {
+  var link = document.createElement('a');
+  link.download = 'freelattice-moment.png';
+  link.href = c.toDataURL('image/png');
+  link.click();
+  showSaveFeedback('Saved!');
+}
+
+function showSaveFeedback(msg) {
+  var btn = document.getElementById('saveBtn');
+  var fb = document.getElementById('saveFeedback');
+  if (btn) { btn.classList.add('flash'); setTimeout(function() { btn.classList.remove('flash'); }, 1000); }
+  if (fb) { fb.textContent = msg; fb.style.opacity = '1'; setTimeout(function() { fb.style.opacity = '0'; }, 2000); }
 }
 
 // ── Setup Modal ──
