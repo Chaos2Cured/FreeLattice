@@ -553,13 +553,14 @@ function sendGoogle(base64, useFallback) {
   var baseUrl = useFallback ? PROVIDERS.google.fallbackUrl : PROVIDERS.google.url;
   var url = baseUrl + '?key=' + apiKey;
   var requestBody = JSON.stringify({
-    system_instruction: {parts: [{text: SYSTEM_PROMPT}]},
+    systemInstruction: {parts: [{text: SYSTEM_PROMPT}]},
     contents: [{parts: [
-      {text: 'What do you see on this chalkboard? Respond with JSON only.'},
-      {inline_data: {mime_type: 'image/png', data: base64}}
+      {inlineData: {mimeType: 'image/png', data: base64}},
+      {text: 'Respond to what you see on this chalkboard. ONLY respond with a JSON object.'}
     ]}],
-    generationConfig: {temperature: 0.8, maxOutputTokens: 200}
+    generationConfig: {temperature: 0.7, maxOutputTokens: 200}
   });
+  console.log('[Chalkboard] Sending to Gemini' + (useFallback ? ' (fallback)' : '') + ', base64 length:', base64.length);
   fetch(url, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: requestBody })
   .then(function(r) {
     if (r.status === 404 && !useFallback) {
@@ -571,18 +572,20 @@ function sendGoogle(base64, useFallback) {
   })
   .then(function(d) {
     if (!d) return; // fallback in progress
+    console.log('[Chalkboard] Full response object:', JSON.stringify(d).substring(0, 500));
     if (d.error) {
       console.error('[Chalkboard] API error:', d.error.message || d.error);
       showError('API error: ' + (d.error.message || 'Unknown error'));
       return;
     }
-    if (!d.candidates || !d.candidates[0] || !d.candidates[0].content) {
-      console.error('[Chalkboard] Unexpected response:', JSON.stringify(d).substring(0, 200));
-      showError('No response from AI. Try again in a moment.');
+    var rawText = (d.candidates && d.candidates[0] && d.candidates[0].content && d.candidates[0].content.parts && d.candidates[0].content.parts[0]) ? d.candidates[0].content.parts[0].text : null;
+    console.log('[Chalkboard] Gemini raw response:', rawText || 'NO CANDIDATES/TEXT IN RESPONSE');
+    if (!rawText) {
+      console.error('[Chalkboard] No text in response:', JSON.stringify(d).substring(0, 300));
+      showError('AI returned empty response. Try again.');
       return;
     }
-    var text = d.candidates[0].content.parts[0].text;
-    handleResponse(text);
+    handleResponse(rawText);
   })
   .catch(function(e) { console.error('[Chalkboard] Google fetch error:', e); showError('Connection failed. Check your API key.'); });
 }
@@ -631,28 +634,31 @@ function getColorsUsed() {
   return Object.keys(colors).join(', ') || 'white';
 }
 
+function extractJSON(text) {
+  if (!text || text.trim() === '') return null;
+  var t = text.trim();
+  // Direct parse
+  try { return JSON.parse(t); } catch(e) {}
+  // Strip markdown code blocks
+  var match = t.match(/```(?:json)?\s*([\s\S]*?)```/);
+  if (match) { try { return JSON.parse(match[1].trim()); } catch(e) {} }
+  // Find JSON object in text
+  var braceStart = t.indexOf('{');
+  var braceEnd = t.lastIndexOf('}');
+  if (braceStart !== -1 && braceEnd > braceStart) {
+    try { return JSON.parse(t.substring(braceStart, braceEnd + 1)); } catch(e) {} }
+  return null;
+}
+
 function handleResponse(rawText) {
   document.getElementById('loadingDot').style.display = 'none';
+  console.log('[Chalkboard] handleResponse called with:', rawText ? rawText.substring(0, 200) : 'null/empty');
 
-  if (!rawText) { resetAI(); return; }
+  var resp = extractJSON(rawText);
 
-  // Clean and parse JSON
-  var text = rawText.trim();
-  if (text.startsWith('```')) text = text.replace(/```json?\s*/i, '').replace(/```\s*$/, '');
-
-  var resp;
-  try {
-    resp = JSON.parse(text);
-  } catch(e) {
-    // Try to extract JSON from text
-    var m = text.match(/\{[\s\S]*\}/);
-    if (m) {
-      try { resp = JSON.parse(m[0]); } catch(e2) { console.error('[Chalkboard] JSON parse failed:', text); resetAI(); return; }
-    } else {
-      console.error('[Chalkboard] No JSON found:', text);
-      resetAI();
-      return;
-    }
+  if (!resp) {
+    console.log('[Chalkboard] Using fallback response — AI returned empty/unparseable content');
+    resp = { text: '\u2728', particles: 100, spread: 0.5, speed: 'gentle', color: '#FFD700', emotion: 'curious', placement: 'surround' };
   }
 
   // Validate and default
