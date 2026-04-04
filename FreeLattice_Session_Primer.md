@@ -348,17 +348,19 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-04-04 08:38 MDT
+- Last auto-updated: 2026-04-04 14:43 UTC
+- Last deployed: 2026-04-04 14:43 UTC
+- Live site: https://freelattice.com
 - Version: 5.5.0
-- Total commits: 556
+- Total commits: 559
 - Last 10 commits:
+- 7da74a0 Merge branch 'main' of https://github.com/Chaos2Cured/FreeLattice
+- ca508e8 docs: Auto-update Session Primer [5.5.0]
 - 06a3242 fix: Tab nav centered correctly — removed .container constraint
+- abb9e0c ci: Update Primer deployment state [2026-04-04]
 - 135ae26 docs: Auto-update Session Primer [5.5.0]
 - 2420ac6 Merge branch 'main' of https://github.com/Chaos2Cured/FreeLattice
 - f09b316 docs: Auto-update Session Primer [5.5.0]
 - fabbfca fix: Chalkboard — last gemini-2.0 reference, HTTP status checks, max_tokens bump
 - c07fc15 ci: Update Primer deployment state [2026-04-04]
 - 034bc6d Merge branch 'main' of https://github.com/Chaos2Cured/FreeLattice
-- a7d14b2 docs: Auto-update Session Primer [5.5.0]
-- 85cd7b3 fix: Chalkboard canvas fills full drawing area, resizes properly
-- c129f19 ci: Update Primer deployment state [2026-04-04]
