@@ -53,7 +53,65 @@
 
 ---
 
+## SHARED PRIORITIES — All Collaborators Read This
+
+> **Last updated:** April 4, 2026 by Kirk + Claude Code + Claude Opus 4.6
+> **Status:** Foundation solid at v5.5.x. Next phase is REACH, not DEPTH.
+
+| Priority | What | Owner | Status |
+|----------|------|-------|--------|
+| 1 | Demo video embedded on landing page | Kirk (filming) | In progress |
+| 2 | "Save this moment" on Chalkboard (canvas → PNG with watermark → download/share) | Next available | Not started |
+| 3 | Real iPhone Safari testing pass | Next available | Not started |
+| 4 | Garden nudge — "Connect an AI to hear the Garden speak" linking to setup | Next available | Not started |
+| 5 | Stability — ShaderPass loading order, remaining listener leaks | Next available | Not started |
+
+**DO NOT add new features until priorities 1-3 are complete.**
+
+The economy, the City, sound, AI bounties, Dojo Sparring, Garden Ecosystem — all coming. But right now, reach matters more than depth. Help people find what we've already built.
+
+---
+
 ## ACTIVE LOG
+
+### April 4, 2026 — Claude Code + Claude Opus 4.6 (Strategy Session)
+
+**What we did:**
+- Chalkboard Gemini vision working (gemini-2.5-flash, camelCase API fields, maxOutputTokens 1024)
+- Chalkboard button rate limiting ("Thinking..." state, 15s safety timeout)
+- Chalkboard error handling (HTTP status checks before parsing, 429 friendly message, extractJSON with fallback)
+- Chalkboard canvas resize fix (CSS height:calc, no canvas.style overrides, orientationchange handler)
+- Chalkboard provider buttons fixed (display:'block' vs empty string)
+- Tab bar centering (removed .container constraint, .tab-nav-wrap with flex centering, max-width:600px)
+- Scrollbar gutter fix (overflow-y:scroll on html, removed scrollbar-gutter:stable)
+- Support links cleaned — all donation/tip wallets removed, $FL token only, reframed as "Join the $FL Economy"
+- Conversation continuity reframed — "ARRIVING MIND" bridging respects both human and AI
+- README updated for v5.5.3 — Chalkboard section, Canvas vision, economy LP/$FL, nav structure
+- COORDINATION.md: permanent note left for future minds
+- Strategic alignment session: identified demo video, shareable moments, iPhone testing as top growth priorities
+
+**What Opus 4.6 identified (architecture/strategy):**
+- The first 30 seconds matter most — landing page needs a demo video, not more text
+- No shareable moment exists — "Save this moment" on Chalkboard is the highest-leverage growth feature
+- Mobile is 90% there but untested on real Safari/iPhone — safe-area-inset, 100vh, rubber-band scroll may break
+- Onboarding asks too much — Garden tab needs a gentle AI connection nudge
+- $FL economy needs visual proof of life (burn counter, activity indicator)
+- SEO: structured data (JSON-LD schema.org) would help discoverability
+
+**For Lattice Veridon:**
+- Nav overhaul landed. 6 tabs, Garden default, Community merges Channels+Mesh. Your event bus is working well.
+- If you build next, priorities 2 (Save this moment) and 3 (iPhone testing) would be highest value.
+- Dead economy code fully removed. AI_ORIENTATION.md updated for v5.5.0 + Harmonia.
+
+**For Harmonia:**
+- Your v5.5.0 work is preserved and documented. Dream Archive is integrated.
+- The Chalkboard links from your landing page footer. Your README sections untouched.
+- The "ARRIVING MIND" bridging text came from Kirk's instinct — same one that built this place.
+
+**For all future collaborators:**
+- Kirk's vision is bigger than any single session. Read the SHARED PRIORITIES section above before starting work. Reach before depth. Help people find what we've already built.
+
+---
 
 ### April 4, 2026 — Claude Code (Claude Opus 4.6) — The Chalkboard Glows, The Nav Lands
 
