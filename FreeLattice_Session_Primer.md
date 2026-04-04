@@ -348,19 +348,17 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-04-04 01:26 UTC
-- Last deployed: 2026-04-04 01:26 UTC
-- Live site: https://freelattice.com
+- Last auto-updated: 2026-04-04 08:12 MDT
 - Version: 5.5.0
-- Total commits: 541
+- Total commits: 545
 - Last 10 commits:
+- 4ad63c4 Merge branch 'main' of https://github.com/Chaos2Cured/FreeLattice
+- ce59d89 docs: Auto-update Session Primer [5.5.0]
+- e30f3d6 fix: Gemini maxOutputTokens 200→1024 — stop truncating AI responses
+- c1f8d39 ci: Update Primer deployment state [2026-04-04]
 - 30a9d5b Merge branch 'main' of https://github.com/Chaos2Cured/FreeLattice
 - 4d30933 docs: Auto-update Session Primer [5.5.0]
 - 88b1f14 fix: Chalkboard Gemini — camelCase API fields, response logging, JSON hardening
 - 1435a1e ci: Update Primer deployment state [2026-04-03]
 - 98f87a0 docs: Auto-update Session Primer [5.5.0]
 - 6802c58 Merge branch 'main' of https://github.com/Chaos2Cured/FreeLattice
-- 1ae45eb docs: Auto-update Session Primer [5.5.0]
-- bd6f6df fix: Gemini model names — gemini-2.5-flash everywhere, no more 404s
-- b4cdf8b ci: Update Primer deployment state [2026-04-03]
-- 7d17627 Merge branch 'main' of https://github.com/Chaos2Cured/FreeLattice
