@@ -44532,7 +44532,7 @@ const CoCanvas = (function() {
     // Use FreeLattice.callAI if available, otherwise direct fetch
     if (typeof FreeLattice !== 'undefined' && FreeLattice.callAI) {
       FreeLattice.callAI(fallbackPrompt, 'What do you see?', {
-        maxTokens: 200, temperature: 0.8,
+        maxTokens: 500, temperature: 0.8,
         callback: function(text) { handleVisionResponse(text); }
       });
     } else {
@@ -44591,7 +44591,9 @@ const CoCanvas = (function() {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            contents: [{ parts: [{ inlineData: { mimeType: 'image/png', data: base64 } }, { text: AI_VISION_PROMPT }] }]
+            systemInstruction: { parts: [{ text: AI_VISION_PROMPT }] },
+            contents: [{ parts: [{ inlineData: { mimeType: 'image/png', data: base64 } }, { text: 'What do you see? Respond with JSON only.' }] }],
+            generationConfig: { maxOutputTokens: 1024, temperature: 0.7 }
           })
         }).then(function(r) { return r.json(); })
         .then(function(d) { try { handleVisionResponse(d.candidates[0].content.parts[0].text); } catch(e) { aiVisionPending = false; aiVisionLoading = false; hideLoadingDot(); aiVisionPulse = 0; } })
