@@ -9848,12 +9848,14 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
 .tab-nav .tab-btn[data-tab] {
   transition: color var(--transition), background var(--transition), border-color var(--transition), transform var(--transition), opacity 250ms ease, max-width 250ms ease;
 }
+/* Tab nav wrapper — full width, not constrained by .container */
+.tab-nav-wrap {
+  width: 100%;
+  padding: 0 var(--space-lg);
+}
 /* Primary tabs — 6 fixed items */
 .tab-btn .tab-icon { font-size: 1.1rem; }
 .tab-btn .tab-label { margin-left: 6px; font-size: 0.85rem; }
-@media (min-width: 1200px) {
-  .tab-nav { max-width: 800px; margin-left: auto; margin-right: auto; }
-}
 @media (max-width: 768px) {
   .tab-nav { max-height: 48px; }
   .tab-btn .tab-label { display: none; }
@@ -13969,7 +13971,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 </div>
 
 <!-- Tab Navigation -->
-<div class="container" style="position:relative;">
+<div class="tab-nav-wrap" style="position:relative;">
   <nav class="tab-nav" id="flTabNav">
     <button class="tab-btn active" data-tab="garden" onclick="switchTab('garden')"><span class="tab-icon">&#x1F33F;</span><span class="tab-label">Garden</span></button>
     <button class="tab-btn" data-tab="chat" onclick="switchTab('chat')"><span class="tab-icon">&#x1F4AC;</span><span class="tab-label">Chat</span></button>
