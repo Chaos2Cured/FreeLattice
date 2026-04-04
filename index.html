@@ -148,6 +148,8 @@
 html {
   scroll-behavior: smooth;
   font-size: var(--font-base);
+  overflow-y: scroll;
+  scrollbar-gutter: stable;
 }
 
 body {
@@ -157,7 +159,6 @@ body {
   line-height: var(--line-height-body);
   letter-spacing: var(--letter-spacing-body);
   min-height: 100vh;
-  overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   transition: background var(--transition-md), color var(--transition-md);
 }
