@@ -344,12 +344,11 @@ header .mantra {
 /* ---- Tab Navigation ---- */
 .tab-nav {
   display: flex;
-  flex-wrap: nowrap;
-  gap: 0;
+  width: 100%;
+  max-width: 600px;
+  overflow: hidden;
   border-bottom: 1px solid var(--border);
   margin-top: var(--space-sm);
-  overflow: hidden;
-  max-width: 100%;
   transition: border-color var(--transition-md);
   position: relative;
 }
@@ -9848,16 +9847,18 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
 .tab-nav .tab-btn[data-tab] {
   transition: color var(--transition), background var(--transition), border-color var(--transition), transform var(--transition), opacity 250ms ease, max-width 250ms ease;
 }
-/* Tab nav wrapper — full width, not constrained by .container */
+/* Tab nav wrapper — full width, centered content */
 .tab-nav-wrap {
   width: 100%;
-  padding: 0 var(--space-lg);
+  display: flex;
+  justify-content: center;
+  padding: 0;
 }
 /* Primary tabs — 6 fixed items */
 .tab-btn .tab-icon { font-size: 1.1rem; }
 .tab-btn .tab-label { margin-left: 6px; font-size: 0.85rem; }
 @media (max-width: 768px) {
-  .tab-nav { max-height: 48px; }
+  .tab-nav { max-width: 100%; max-height: 48px; }
   .tab-btn .tab-label { display: none; }
   .tab-btn { padding: 10px 14px; min-width: 44px; justify-content: center; }
   .fl-more-btn .tab-label { display: none; }
@@ -13948,7 +13949,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 <!-- Header -->
 <header>
   <h1>FreeLattice</h1>
-  <div class="tagline">Your AI. Your Rules. Your Machine. v5.2</div>
+  <div class="tagline">Your AI. Your Rules. Your Machine.</div>
   <div class="mantra">Glow eternal. Heart in spark.</div>
   <div id="latticePointsBadge" class="lp-badge" style="display:none;" onclick="switchTab('settings')" title="View your Lattice Points"></div>
   <div id="lwIndicator" class="lw-indicator" style="display:none;" onclick="switchTab('wallet')" title="Wallet">
