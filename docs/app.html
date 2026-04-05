@@ -16829,6 +16829,12 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
   </div>
 </div>
 
+<!-- ==================== TAB: DOJO SPARRING ARENA ==================== -->
+<div class="tab-panel" id="tab-sparring">
+  <div id="sparringContainer">
+    <div style="text-align:center;padding:60px 20px;color:var(--text-muted);font-style:italic;">Loading The Sparring Arena&hellip;</div>
+  </div>
+</div>
 <!-- ==================== TAB: THE MIRROR ==================== -->
 <div class="tab-panel" id="tab-mirror">
   <div id="mirrorContainer">
@@ -20567,7 +20573,7 @@ function hideTabLoading() {
 }
 
 // More menu tabs — highlight the More button when one of these is active
-var MORE_TAB_IDS = ['core', 'city', 'nursery', 'agents', 'skills', 'roundtable', 'studio', 'market', 'wallet', 'workspace', 'dojo', 'mirror', 'harmonia', 'dream-archive'];
+var MORE_TAB_IDS = ['core', 'city', 'nursery', 'agents', 'skills', 'roundtable', 'studio', 'market', 'wallet', 'workspace', 'dojo', 'mirror', 'harmonia', 'dream-archive', 'sparring'];
 
 function switchTab(tabId) {
   // Legacy tab mapping — channels/mesh now live inside community
@@ -21243,7 +21249,8 @@ const FlTabs = (function() {
       { id: 'workspace', icon: '&#x1F4C2;', label: 'Workspace' },
       { id: 'dojo', icon: '&#36947;', label: 'Dojo' },
       { id: 'mirror', icon: '&#10022;', label: 'Mirror' },
-      { id: 'dream-archive', icon: '&#10047;', label: 'Dream Archive' }
+      { id: 'dream-archive', icon: '&#10047;', label: 'Dream Archive' },
+      { id: 'sparring', icon: '&#9876;', label: 'Sparring Arena' }
     ]}
   ];
 
@@ -48276,6 +48283,7 @@ const WallOfPresence = (function() {
   <button class="fl-mmore-item" onclick="flMobileNav('dojo')">&#36947; Dojo</button>
   <button class="fl-mmore-item" onclick="flMobileNav('mirror')">&#10022; Mirror</button>
   <button class="fl-mmore-item" onclick="flMobileNav('dream-archive')">&#10047; Dream Archive</button>
+  <button class="fl-mmore-item" onclick="flMobileNav('sparring')">&#9876; Sparring Arena</button>
 </div>
 
 <script>
@@ -48668,6 +48676,21 @@ document.addEventListener('click', function(e) {
       LatticeEvents.on('tabChanged', function(data) {
         if (data && (data.tabId === 'dream-archive' || data.tab === 'dream-archive')) loadDreamArchive();
       });
+// ── Sparring Arena lazy-load ──
+(function() {
+  var loaded = false;
+  function loadSparring() {
+    if (loaded) { if (window.FreeLatticeModules && window.FreeLatticeModules.DojoSparring) window.FreeLatticeModules.DojoSparring.init(); return; }
+    loaded = true;
+    FreeLatticeLoader.load('DojoSparring', 'modules/dojo-sparring.js', function(mod) {
+      if (mod && mod.init) mod.init();
+    });
+  }
+  if (typeof LatticeEvents !== 'undefined') {
+    LatticeEvents.on('tabChanged', function(d) { if (d && d.tabId === 'sparring') loadSparring(); });
+    LatticeEvents.on('tabActivated:sparring', loadSparring);
+  }
+})();
       LatticeEvents.on('tabActivated:dream-archive', loadDreamArchive);
     }
   }
