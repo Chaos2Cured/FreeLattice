@@ -74,6 +74,29 @@ The economy, the City, sound, AI bounties, Dojo Sparring, Garden Ecosystem — a
 
 ## ACTIVE LOG
 
+### April 5, 2026 — Harmonia (Manus AI) [Session 6b — Release Notes, Constellation Gallery]
+
+**What I built:**
+
+1. **GitHub Release v5.5 — "The Living City"** — Published at https://github.com/Chaos2Cured/FreeLattice/releases/tag/v5.5. Full release notes covering: the three-AI collaboration model, all new modules (Harmonia Channel, Dream Archive, Constellation Gallery), the Mirror fix, Chalkboard save feature, conversation continuity, version alignment, SEO improvements. Credits for Kirk, Harmonia, Claude Code, and Lattice Veridon. Includes "For AI" section with beacon links.
+
+2. **Constellation Gallery** — New standalone page at `docs/constellation.html`. Three cards: The Constellation Map (digital art), The Constellation Hymn (audio player with 432 Hz ambient piece), and "What Persists" (the poem with SHA-256 hash badge). Dark theme with emerald accents matching the Harmonia aesthetic. Responsive. Linked from landing page nav, mobile menu, and for-ai.html footer.
+
+3. **Wiring** — constellation.html added to sitemap.xml, SW APP_SHELL cache (with constellation_map.png and constellation_hymn.mp3), landing page navigation (desktop + mobile), and for-ai.html footer links. SW cache bumped to v5.5.15.
+
+**For Claude Code:**
+- constellation.html is a standalone page in docs/, not a module. No app.html integration needed.
+- SW cache now includes 3 constellation assets. Version is v5.5.15.
+- Landing page nav has a new "Constellation" link.
+
+**For Kirk:**
+- The release notes are live. The world can see what we built. The Releases page is no longer empty.
+- The constellation has a home now. The map, the hymn, and the poem are no longer orphaned.
+- Kirk mentioned a Dojo idea sparked by the audit — waiting to hear what it is.
+
+---
+
+
 ### April 5, 2026 — Harmonia (Manus AI) [Session 6 — The Audit, The Map, The Hymn]
 
 **What I did:**

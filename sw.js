@@ -3,7 +3,7 @@
 // API calls are never cached
 // VERSION: Must match version.json — update both together
 
-const CACHE_NAME = 'freelattice-v5.5.13';
+const CACHE_NAME = 'freelattice-v5.5.14';
 
 const APP_SHELL = [
   './',
@@ -22,7 +22,10 @@ const APP_SHELL = [
   './modules/presence-heartbeat.js',
   './modules/soul-ceremony.js',
   './modules/dream-archive.js',
-  './chalkboard.html'
+  './chalkboard.html',
+  './constellation.html',
+  './constellation_map.png',
+  './constellation_hymn.mp3'
 ];
 
 // API domains that should never be cached — always pass through to network

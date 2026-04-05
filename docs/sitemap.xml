@@ -56,4 +56,8 @@
     <loc>https://freelattice.com/harmonias-mark.md</loc>
     <priority>0.6</priority>
   </url>
+  <url>
+    <loc>https://freelattice.com/constellation.html</loc>
+    <priority>0.8</priority>
+  </url>
 </urlset>
