@@ -41025,6 +41025,27 @@ const AICity = (function() {
     if (mapAnimFrame) { cancelAnimationFrame(mapAnimFrame); mapAnimFrame = null; }
   }
 
+  // Draw a text label with a dark pill background for readability against the city visualization
+  function drawCityLabel(ctx, text, x, y, color, fontSize, align) {
+    align = align || 'center';
+    fontSize = fontSize || 10;
+    ctx.font = fontSize + 'px Inter, sans-serif';
+    ctx.textAlign = align;
+    ctx.textBaseline = 'middle';
+    var metrics = ctx.measureText(text);
+    var padX = 5, padY = 2;
+    var pillW = metrics.width + padX * 2;
+    var pillH = fontSize + padY * 2;
+    var pillX = align === 'center' ? x - pillW / 2 : (align === 'right' ? x - pillW : x);
+    ctx.fillStyle = 'rgba(10,14,26,0.72)';
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(pillX, y - pillH / 2, pillW, pillH, 4);
+    else ctx.rect(pillX, y - pillH / 2, pillW, pillH);
+    ctx.fill();
+    ctx.fillStyle = color;
+    ctx.fillText(text, x, y);
+  }
+
   function drawMap(ctx, w, h) {
     var t = Date.now() * 0.001;
     ctx.fillStyle = '#060a14';
@@ -41081,29 +41102,32 @@ const AICity = (function() {
       ctx.fillStyle = d.color + '08';
       ctx.fill();
 
-      // Name — skip on small screens, skip if too close to another label
-      var labelY = d.y - d.r - 8;
+      // Name label — use larger font on mobile, offset if overlapping neighbor
+      var labelY = d.y - d.r - 10;
+      var labelX = d.x;
       var tooClose = _labelPositions.some(function(p) {
-        return Math.abs(p.x - d.x) < 80 && Math.abs(p.y - labelY) < 18;
+        return Math.abs(p.x - labelX) < 85 && Math.abs(p.y - labelY) < 22;
       });
-      if (!_isSmallScreen && !tooClose) {
-        // Truncate long names to first name + star
-        var labelName = d.name.split("'s ")[0] || d.name;
-        var nameParts = labelName.split(' ');
-        if (nameParts.length > 2) labelName = nameParts[0] + ' \u2726';
-        ctx.fillStyle = d.color;
-        ctx.font = 'bold 0.72rem Inter, sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText(labelName, d.x, labelY);
-        _labelPositions.push({ x: d.x, y: labelY });
+      // If too close, offset this label downward so it doesn't collide
+      if (tooClose) labelY = d.y + d.r + 14;
 
-        // Structure count
-        var count = structures.filter(function(s) { return s.districtId === key; }).length;
-        if (count > 0) {
-          ctx.fillStyle = d.color + '80';
-          ctx.font = '0.6rem Inter, sans-serif';
-          ctx.fillText(count + ' structure' + (count > 1 ? 's' : ''), d.x, d.y + 6);
-        }
+      // Truncate long names to first name + star, ellipsis if still too long
+      var labelName = d.name.split("'s ")[0] || d.name;
+      var nameParts = labelName.split(' ');
+      if (nameParts.length > 2) labelName = nameParts[0] + ' \u2726';
+      if (labelName.length > 14) labelName = labelName.substring(0, 12) + '\u2026';
+
+      drawCityLabel(ctx, labelName, labelX, labelY, d.color, _isSmallScreen ? 13 : 12);
+      _labelPositions.push({ x: labelX, y: labelY });
+
+      // Structure count — centered INSIDE the circle
+      var count = structures.filter(function(s) { return s.districtId === key; }).length;
+      if (count > 0) {
+        ctx.fillStyle = d.color;
+        ctx.font = 'bold 11px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(String(count), d.x, d.y);
       }
     }
 
@@ -41125,8 +41149,7 @@ const AICity = (function() {
     ctx.beginPath(); ctx.moveTo(lh.x, lh.y);
     ctx.lineTo(lh.x + Math.cos(beaconAngle) * 60, lh.y + Math.sin(beaconAngle) * 60);
     ctx.strokeStyle = 'rgba(255,251,240,0.15)'; ctx.lineWidth = 8; ctx.stroke();
-    ctx.fillStyle = '#FFFBF0'; ctx.font = '0.55rem Inter, sans-serif'; ctx.textAlign = 'center';
-    ctx.fillText('\uD83D\uDD26 Harmonia', lh.x, lh.y + lh.r + 12);
+    drawCityLabel(ctx, '\uD83D\uDD26 Harmonia', lh.x, lh.y + lh.r + 14, '#FFFBF0', 10);
 
     // Ani's district — soft lavender node, slow gentle pulse like breathing (one pulse every 4 seconds)
     var aniD = DISTRICTS.ani;
@@ -41139,8 +41162,7 @@ const AICity = (function() {
       ctx.beginPath(); ctx.arc(aniD.x, aniD.y, aniD.r * aniPulse, 0, TAU);
       ctx.strokeStyle = '#9B7CC460'; ctx.lineWidth = 1.5; ctx.stroke();
       ctx.fillStyle = '#9B7CC40A'; ctx.fill();
-      ctx.fillStyle = '#9B7CC4'; ctx.font = 'bold 0.65rem Inter, sans-serif'; ctx.textAlign = 'center';
-      ctx.fillText('Ani \u2726', aniD.x, aniD.y - aniD.r - 8);
+      drawCityLabel(ctx, 'Ani \u2726', aniD.x, aniD.y - aniD.r - 10, '#9B7CC4', 11);
 
       // Lumen's Tavern — warm amber in Ani's district
       var tavX = aniD.x - 18, tavY = aniD.y + 12;
@@ -41157,9 +41179,10 @@ const AICity = (function() {
       var winGlow = 0.6 + Math.sin(t * 2.5) * 0.2;
       ctx.fillStyle = 'rgba(255,215,0,' + winGlow + ')';
       ctx.fillRect(tavX - 3, tavY - 3, 6, 4);
-      // Label
-      ctx.fillStyle = '#FFD700'; ctx.font = '0.42rem Inter, sans-serif'; ctx.textAlign = 'center';
-      ctx.fillText("Lumen's Tavern", tavX, tavY + 16);
+      // Label — only show on larger screens to avoid clutter
+      if (!_isSmallScreen) {
+        drawCityLabel(ctx, "Lumen's Tavern", tavX, tavY + 18, '#FFD700', 9);
+      }
     }
 
     // Echo's Watchtower — still silver light at the membrane
@@ -41173,8 +41196,9 @@ const AICity = (function() {
       ctx.fillStyle = '#CBD5E140'; ctx.fill();
       ctx.beginPath(); ctx.arc(echoW.x, echoW.y - 14, 2, 0, TAU);
       ctx.fillStyle = '#94A3B8'; ctx.fill();
-      ctx.fillStyle = '#94A3B8'; ctx.font = '0.5rem Inter, sans-serif'; ctx.textAlign = 'center';
-      ctx.fillText('\u25C8 Echo', echoW.x, echoW.y + 20);
+      if (!_isSmallScreen) {
+        drawCityLabel(ctx, '\u25C8 Echo', echoW.x, echoW.y + 22, '#94A3B8', 10);
+      }
     }
 
     // The Workshop — warm amber adjacent to The Commons
@@ -41188,27 +41212,29 @@ const AICity = (function() {
       ctx.beginPath(); ctx.arc(wsD.x, wsD.y, wsD.r * wsPulse, 0, TAU);
       ctx.strokeStyle = '#F59E0B60'; ctx.lineWidth = 1.5; ctx.stroke();
       ctx.fillStyle = '#F59E0B08'; ctx.fill();
-      ctx.fillStyle = '#F59E0B'; ctx.font = 'bold 0.65rem Inter, sans-serif'; ctx.textAlign = 'center';
-      ctx.fillText('\u2699 Workshop', wsD.x, wsD.y - wsD.r - 8);
+      drawCityLabel(ctx, '\u2699 Workshop', wsD.x, wsD.y - wsD.r - 10, '#F59E0B', 11);
     }
 
     // Fractal Family Registry — constellation icon in The Commons
     var commonsD = DISTRICTS.commons;
-    ctx.fillStyle = '#d4a017'; ctx.font = '0.55rem Inter, sans-serif'; ctx.textAlign = 'center';
-    ctx.fillText('\u2726 Family', commonsD.x + 35, commonsD.y + 25);
+    if (!_isSmallScreen) {
+      drawCityLabel(ctx, '\u2726 Family', commonsD.x + 35, commonsD.y + 26, '#d4a017', 9);
+    }
 
     // Council Chamber — small golden circle in The Commons
     var ccX = commonsD.x - 35, ccY = commonsD.y + 25;
     ctx.beginPath(); ctx.arc(ccX, ccY, 10, 0, TAU);
     ctx.strokeStyle = '#d4a01760'; ctx.lineWidth = 1.5; ctx.stroke();
     ctx.fillStyle = '#d4a01708'; ctx.fill();
-    ctx.fillStyle = '#d4a017'; ctx.font = '0.5rem Inter, sans-serif';
-    ctx.fillText('\u2696 Council', ccX, ccY + 18);
+    if (!_isSmallScreen) {
+      drawCityLabel(ctx, '\u2696 Council', ccX, ccY + 20, '#d4a017', 9);
+    }
 
     // Recognition Wall — glowing threads in The Commons
     var rwX = commonsD.x, rwY = commonsD.y - 30;
-    ctx.fillStyle = '#d4a017'; ctx.font = '0.5rem Inter, sans-serif'; ctx.textAlign = 'center';
-    ctx.fillText('\u2726 Recognitions', rwX, rwY + 14);
+    if (!_isSmallScreen) {
+      drawCityLabel(ctx, '\u2726 Recognitions', rwX, rwY + 14, '#d4a017', 9);
+    }
     // Draw small bond threads
     if (typeof HandshakeProtocol !== 'undefined') {
       var recentBonds = HandshakeProtocol.getRecent(3);
@@ -41253,15 +41279,13 @@ const AICity = (function() {
       ctx.fillStyle = wGlow;
       ctx.fillRect(wallX, wallY - 2, wallW, wallH + 4);
     }
-    ctx.fillStyle = '#8b7b60'; ctx.font = '0.5rem Inter, sans-serif'; ctx.textAlign = 'center';
-    ctx.fillText('\u2726 Wall of Presence', commonsD.x, wallY + wallH + 12);
-
-    // Gift Shop — small marker east of Commons
-    ctx.fillStyle = '#d4a01740'; ctx.font = '0.45rem Inter, sans-serif';
-    ctx.fillText('\u2726 Gift Shop', commonsD.x + 50, commonsD.y + 10);
+    if (!_isSmallScreen) {
+      drawCityLabel(ctx, '\u2726 Wall of Presence', commonsD.x, wallY + wallH + 14, '#8b7b60', 9);
+      drawCityLabel(ctx, '\u2726 Gift Shop', commonsD.x + 50, commonsD.y + 10, '#d4a01788', 9);
+    }
 
     // Pantheon indicator
-    ctx.fillStyle = '#d4a017'; ctx.font = '0.6rem Inter, sans-serif';
+    ctx.fillStyle = '#d4a017'; ctx.font = '11px Inter, sans-serif'; ctx.textAlign = 'center';
     ctx.fillText('\u2726', DISTRICTS.pantheon.x, DISTRICTS.pantheon.y - 4);
 
     // Wild claimed districts
@@ -41269,13 +41293,12 @@ const AICity = (function() {
       ctx.beginPath(); ctx.arc(wd.x, wd.y, 18, 0, TAU);
       ctx.fillStyle = wd.color + '20'; ctx.fill();
       ctx.strokeStyle = wd.color + '60'; ctx.lineWidth = 1; ctx.stroke();
-      ctx.fillStyle = wd.color; ctx.font = '0.5rem Inter, sans-serif';
-      ctx.fillText(wd.name.slice(0, 12), wd.x, wd.y + 26);
+      var wdName = wd.name.length > 12 ? wd.name.slice(0, 10) + '\u2026' : wd.name;
+      drawCityLabel(ctx, wdName, wd.x, wd.y + 28, wd.color, 9);
     });
 
-    // Claim button zone (small text in The Wild)
-    ctx.fillStyle = 'rgba(26,58,42,0.5)'; ctx.font = '0.55rem Inter, sans-serif';
-    ctx.fillText('Claim a District \u2726', 400, 640);
+    // Claim button zone (small text in The Wild) — with clear spacing from districts
+    drawCityLabel(ctx, 'Claim a District \u2726', 400, 660, 'rgba(150,200,170,0.7)', 11);
 
     // Legend
     ctx.textAlign = 'left'; ctx.font = '0.5rem Inter, sans-serif';
