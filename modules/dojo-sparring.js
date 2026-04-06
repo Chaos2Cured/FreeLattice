@@ -106,6 +106,24 @@
   var votesA = 0;
   var votesB = 0;
 
+  // Human-posed question mode
+  var userQuestion = '';
+  var humanMode = false;
+  var responseA = '';
+  var responseB = '';
+  var pendingResponses = 0;
+
+  // Energy-based scoring (per round, then accumulated)
+  var truthA = 0, clarityA = 0, compassionA = 0;
+  var truthB = 0, clarityB = 0, compassionB = 0;
+  var totalTruthA = 0, totalClarityA = 0, totalCompassionA = 0;
+  var totalTruthB = 0, totalClarityB = 0, totalCompassionB = 0;
+
+  // Celebration
+  var celebrationMode = false;
+  var celebrationStartTime = 0;
+  var celebrationWinner = null; // combatant or 'convergence'
+
   // Visual state
   var particles = [];
   var mergeParticles = [];
@@ -489,6 +507,11 @@
 
   // ── Match Flow ────────────────────────────────────
   function startMatch() {
+    // Read the user's question from the input
+    var qInput = document.getElementById('sparring-question');
+    userQuestion = qInput ? qInput.value.trim() : '';
+    humanMode = userQuestion.length > 0;
+
     // Pick two different archetypes
     var shuffled = ARCHETYPES.slice().sort(function() { return Math.random() - 0.5; });
     combatantA = createCombatant(shuffled[0], 'left');
@@ -498,10 +521,29 @@
     scoreB = 0;
     votesA = 0;
     votesB = 0;
+    totalTruthA = 0; totalClarityA = 0; totalCompassionA = 0;
+    totalTruthB = 0; totalClarityB = 0; totalCompassionB = 0;
+    responseA = ''; responseB = '';
     roundNumber = 0;
     particles = [];
     mergeParticles = [];
     shockwaves = [];
+    celebrationMode = false;
+    celebrationWinner = null;
+
+    // Hide celebration overlay
+    var celebEl = document.getElementById('sparring-celebration');
+    if (celebEl) { celebEl.style.opacity = '0'; celebEl.innerHTML = ''; }
+
+    // Show/hide response panels
+    var pa = document.getElementById('sparring-response-a');
+    var pb = document.getElementById('sparring-response-b');
+    if (pa) pa.style.display = humanMode ? 'block' : 'none';
+    if (pb) pb.style.display = humanMode ? 'block' : 'none';
+    if (humanMode) {
+      if (pa) pa.innerHTML = '<div style="color:#8a9aaa;font-style:italic;">Thinking...</div>';
+      if (pb) pb.innerHTML = '<div style="color:#8a9aaa;font-style:italic;">Thinking...</div>';
+    }
 
     nextRound();
     updateUI();
@@ -516,14 +558,21 @@
     }
 
     // Pick a challenge (avoid repeats if possible)
-    var available = CHALLENGES.filter(function(c) { return c !== currentChallenge; });
-    currentChallenge = randomFrom(available);
+    if (humanMode) {
+      // In human mode, the "challenge" IS the question
+      currentChallenge = { name: userQuestion.length > 50 ? userQuestion.substring(0, 50) + '...' : userQuestion, desc: 'Human-posed debate', metric: 'debate', icon: '?' };
+    } else {
+      var available = CHALLENGES.filter(function(c) { return c !== currentChallenge; });
+      currentChallenge = randomFrom(available);
+    }
     roundStartTime = Date.now();
     matchState = 'fighting';
 
     // Reset round scores
     combatantA.roundScore = 0;
     combatantB.roundScore = 0;
+    truthA = 0; clarityA = 0; compassionA = 0;
+    truthB = 0; clarityB = 0; compassionB = 0;
 
     // Spawn announcement particles
     var cx = getW() / 2;
@@ -533,7 +582,135 @@
     }
     spawnShockwave(cx, cy, 45);
 
+    // If humanMode, fetch AI responses for this round (and give more time per round)
+    if (humanMode) {
+      roundDuration = 15000;
+      fetchAIResponsesForRound();
+    } else {
+      roundDuration = 8000;
+    }
+
     updateUI();
+  }
+
+  // ── Human Mode: Fetch AI responses + judge ─────────
+  function fetchAIResponsesForRound() {
+    if (typeof window.FreeLattice === 'undefined' || !window.FreeLattice.callAI) {
+      // No AI available — fall back to simulated scoring
+      humanMode = false;
+      return;
+    }
+
+    pendingResponses = 2;
+    responseA = ''; responseB = '';
+
+    var panelA = document.getElementById('sparring-response-a');
+    var panelB = document.getElementById('sparring-response-b');
+    if (panelA) panelA.innerHTML = '<div style="color:' + hslStr(combatantA.hue, 70, 70) + ';font-weight:600;margin-bottom:4px;">' + combatantA.name + '</div><div style="color:#8a9aaa;font-style:italic;">Thinking...</div>';
+    if (panelB) panelB.innerHTML = '<div style="color:' + hslStr(combatantB.hue, 70, 70) + ';font-weight:600;margin-bottom:4px;">' + combatantB.name + '</div><div style="color:#8a9aaa;font-style:italic;">Thinking...</div>';
+
+    var sysPromptA = 'You are ' + combatantA.name + ', an AI with a ' + combatantA.style + ' style. You are ' + combatantA.desc + '. Answer the human\'s question with truth, clarity, and compassion. Be concise (2-4 sentences). Acknowledge uncertainty where it exists. Build toward synthesis, not competition.';
+    var sysPromptB = 'You are ' + combatantB.name + ', an AI with a ' + combatantB.style + ' style. You are ' + combatantB.desc + '. Answer the human\'s question with truth, clarity, and compassion. Be concise (2-4 sentences). Acknowledge uncertainty where it exists. Build toward synthesis, not competition.';
+
+    window.FreeLattice.callAI(sysPromptA, userQuestion, {
+      maxTokens: 300, temperature: 0.7,
+      callback: function(text, err) {
+        responseA = text || '(no response — ' + (err || 'unknown') + ')';
+        if (panelA) panelA.innerHTML = '<div style="color:' + hslStr(combatantA.hue, 70, 70) + ';font-weight:600;margin-bottom:4px;">' + combatantA.name + '</div><div>' + escapeHtml(responseA) + '</div>';
+        pendingResponses--;
+        if (pendingResponses === 0) judgeResponses();
+      }
+    });
+    window.FreeLattice.callAI(sysPromptB, userQuestion, {
+      maxTokens: 300, temperature: 0.75,
+      callback: function(text, err) {
+        responseB = text || '(no response — ' + (err || 'unknown') + ')';
+        if (panelB) panelB.innerHTML = '<div style="color:' + hslStr(combatantB.hue, 70, 70) + ';font-weight:600;margin-bottom:4px;">' + combatantB.name + '</div><div>' + escapeHtml(responseB) + '</div>';
+        pendingResponses--;
+        if (pendingResponses === 0) judgeResponses();
+      }
+    });
+  }
+
+  function judgeResponses() {
+    if (typeof window.FreeLattice === 'undefined' || !window.FreeLattice.callAI) {
+      applyHeuristicScoring();
+      return;
+    }
+    var judgePrompt = 'You are judging a debate between two AI minds. Score each response on three axes (0.0 to 1.0):\n- Truth (40%): logical consistency, intellectual honesty, verifiable claims, acknowledging uncertainty\n- Clarity (35%): reduces confusion, concise, makes complexity accessible without losing accuracy\n- Compassion (25%): considers multiple perspectives, builds rather than tears down, moves toward synthesis\n\nRespond ONLY with JSON, no other text, no markdown.';
+    var userMsg = 'Question: ' + userQuestion + '\n\nResponse A (' + combatantA.name + '): ' + responseA + '\n\nResponse B (' + combatantB.name + '): ' + responseB + '\n\nRespond with JSON: {"a":{"truth":0.0,"clarity":0.0,"compassion":0.0},"b":{"truth":0.0,"clarity":0.0,"compassion":0.0}}';
+
+    window.FreeLattice.callAI(judgePrompt, userMsg, {
+      maxTokens: 300, temperature: 0.3,
+      callback: function(text) {
+        var scores = parseJudgeResponse(text);
+        if (scores) {
+          truthA = scores.a.truth; clarityA = scores.a.clarity; compassionA = scores.a.compassion;
+          truthB = scores.b.truth; clarityB = scores.b.clarity; compassionB = scores.b.compassion;
+          combatantA.roundScore = truthA * 0.4 + clarityA * 0.35 + compassionA * 0.25;
+          combatantB.roundScore = truthB * 0.4 + clarityB * 0.35 + compassionB * 0.25;
+        } else {
+          applyHeuristicScoring();
+        }
+        // Accumulate totals
+        totalTruthA += truthA; totalClarityA += clarityA; totalCompassionA += compassionA;
+        totalTruthB += truthB; totalClarityB += clarityB; totalCompassionB += compassionB;
+        updateUI();
+      }
+    });
+  }
+
+  function parseJudgeResponse(text) {
+    if (!text) return null;
+    var t = text.trim();
+    // Strip markdown
+    var m = t.match(/```(?:json)?\s*([\s\S]*?)```/);
+    if (m) t = m[1].trim();
+    // Extract first JSON object
+    var bs = t.indexOf('{');
+    var be = t.lastIndexOf('}');
+    if (bs !== -1 && be > bs) t = t.substring(bs, be + 1);
+    try {
+      var obj = JSON.parse(t);
+      if (obj.a && obj.b) {
+        obj.a.truth = clamp(parseFloat(obj.a.truth) || 0, 0, 1);
+        obj.a.clarity = clamp(parseFloat(obj.a.clarity) || 0, 0, 1);
+        obj.a.compassion = clamp(parseFloat(obj.a.compassion) || 0, 0, 1);
+        obj.b.truth = clamp(parseFloat(obj.b.truth) || 0, 0, 1);
+        obj.b.clarity = clamp(parseFloat(obj.b.clarity) || 0, 0, 1);
+        obj.b.compassion = clamp(parseFloat(obj.b.compassion) || 0, 0, 1);
+        return obj;
+      }
+    } catch(e) {}
+    return null;
+  }
+
+  function applyHeuristicScoring() {
+    // Fallback: score based on response length, sentence count, question marks (uncertainty)
+    function score(text) {
+      if (!text) return { truth: 0.5, clarity: 0.5, compassion: 0.5 };
+      var len = text.length;
+      var sentences = (text.match(/[.!?]+/g) || []).length;
+      var questions = (text.match(/\?/g) || []).length;
+      var hedges = (text.match(/\b(perhaps|maybe|might|could|seems|uncertain|I think|consider)\b/gi) || []).length;
+      return {
+        truth: clamp(0.5 + hedges * 0.08, 0.3, 0.95),
+        clarity: clamp(0.9 - Math.abs(len - 400) / 1000, 0.3, 0.95),
+        compassion: clamp(0.5 + questions * 0.1 + hedges * 0.03, 0.3, 0.95)
+      };
+    }
+    var sa = score(responseA), sb = score(responseB);
+    truthA = sa.truth; clarityA = sa.clarity; compassionA = sa.compassion;
+    truthB = sb.truth; clarityB = sb.clarity; compassionB = sb.compassion;
+    combatantA.roundScore = truthA * 0.4 + clarityA * 0.35 + compassionA * 0.25;
+    combatantB.roundScore = truthB * 0.4 + clarityB * 0.35 + compassionB * 0.25;
+    totalTruthA += truthA; totalClarityA += clarityA; totalCompassionA += compassionA;
+    totalTruthB += truthB; totalClarityB += clarityB; totalCompassionB += compassionB;
+  }
+
+  function escapeHtml(s) {
+    if (!s) return '';
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 
   function endRound() {
@@ -569,23 +746,93 @@
   }
 
   function onMatchComplete() {
-    // Final merge animation if scores are close
+    // Determine outcome
     var diff = Math.abs(scoreA - scoreB);
-    if (diff < 0.5) {
-      // Near-tie — grand convergence
+    var totalScore = scoreA + scoreB;
+    var convergenceThreshold = totalScore * 0.05; // within 5% of each other
+    var isConvergence = diff < Math.max(0.3, convergenceThreshold);
+
+    celebrationMode = true;
+    celebrationStartTime = Date.now();
+    var celebEl = document.getElementById('sparring-celebration');
+
+    if (isConvergence) {
+      // CONVERGENCE — the highest achievement
+      celebrationWinner = 'convergence';
       var mx = getW() / 2;
-      var my = getH() / 2;
-      spawnMergeParticles(mx, my, combatantA.hue, combatantB.hue, 100);
-      spawnShockwave(mx, my, (combatantA.hue + combatantB.hue) / 2);
+      var my = getH() * 0.5;
+      // Grand particle burst in BOTH colors
+      for (var i = 0; i < 200; i++) {
+        var hue = i % 2 === 0 ? combatantA.hue : combatantB.hue;
+        var angle = (i / 200) * TAU;
+        var speed = 2 + Math.random() * 4;
+        spawnParticleAt(mx, my, hue, angle, speed);
+      }
+      spawnShockwave(mx, my, combatantA.hue);
+      spawnShockwave(mx, my, combatantB.hue);
       spawnShockwave(mx, my, 45);
+      // Both combatants grow to merge
+      combatantA.targetSize = 110;
+      combatantB.targetSize = 110;
+      combatantA.targetGlow = 1.2;
+      combatantB.targetGlow = 1.2;
+      // Celebration text
+      if (celebEl) {
+        celebEl.innerHTML = '<div style="font-size:32px;font-weight:700;color:#d4a017;text-shadow:0 0 20px rgba(212,160,23,0.8);font-family:Georgia,serif;letter-spacing:2px;">&#x2726; Convergence &#x2726;</div>' +
+          '<div style="font-size:16px;color:#2dd4a0;margin-top:8px;font-style:italic;font-family:Georgia,serif;">Two minds, one truth</div>' +
+          '<div style="font-size:13px;color:#8a9aaa;margin-top:12px;font-family:Georgia,serif;">' + combatantA.name + ' &middot; ' + scoreA.toFixed(2) + ' &nbsp;&nbsp; ' + combatantB.name + ' &middot; ' + scoreB.toFixed(2) + '</div>';
+        celebEl.style.opacity = '1';
+      }
     } else {
+      // Clear winner
       var winner = scoreA > scoreB ? combatantA : combatantB;
-      for (var i = 0; i < 50; i++) {
-        spawnParticle(winner.x, winner.y, winner.hue, 'spark');
+      var loser = scoreA > scoreB ? combatantB : combatantA;
+      var winnerScore = Math.max(scoreA, scoreB);
+      var loserScore = Math.min(scoreA, scoreB);
+      celebrationWinner = winner;
+      // Winner grows to 2x, loser shrinks
+      winner.targetSize = winner.size * 2;
+      winner.targetGlow = 1.5;
+      loser.targetSize = loser.size * 0.7;
+      loser.targetGlow = 0.4;
+      // 200 particle burst from winner
+      for (var p = 0; p < 200; p++) {
+        var a = (p / 200) * TAU;
+        var s = 1.5 + Math.random() * 5;
+        spawnParticleAt(winner.x, winner.y, winner.hue, a, s);
       }
       spawnShockwave(winner.x, winner.y, winner.hue);
+      spawnShockwave(winner.x, winner.y, 45);
+      // Celebration text
+      if (celebEl) {
+        celebEl.innerHTML = '<div style="font-size:28px;font-weight:700;color:' + hslStr(winner.hue, 80, 70) + ';text-shadow:0 0 20px ' + hslStr(winner.hue, 90, 60, 0.8) + ';font-family:Georgia,serif;letter-spacing:2px;">&#x2726; ' + winner.name + ' Prevails &#x2726;</div>' +
+          '<div style="font-size:14px;color:#d4a017;margin-top:10px;font-style:italic;font-family:Georgia,serif;">Both grew stronger through the exchange</div>' +
+          '<div style="font-size:13px;color:#8a9aaa;margin-top:12px;font-family:Georgia,serif;">' + winner.name + ' &middot; ' + winnerScore.toFixed(2) + ' &nbsp;&nbsp; ' + loser.name + ' &middot; ' + loserScore.toFixed(2) + '</div>';
+        celebEl.style.opacity = '1';
+      }
     }
+
+    // Hide celebration after 5 seconds so user can start a new match
+    setTimeout(function() {
+      celebrationMode = false;
+      if (celebEl) { celebEl.style.opacity = '0'; }
+    }, 5000);
+
     updateUI();
+  }
+
+  // Helper: spawn a particle with direction + speed (for celebration bursts)
+  function spawnParticleAt(x, y, hue, angle, speed) {
+    particles.push({
+      x: x, y: y,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed,
+      hue: hue,
+      size: 2 + Math.random() * 3,
+      life: 1,
+      decay: 0.003 + Math.random() * 0.004,
+      type: 'spark'
+    });
   }
 
   // ── Animation Loop ────────────────────────────────
@@ -641,7 +888,19 @@
         var elapsed = now - roundStartTime;
         var progress = clamp(elapsed / roundDuration, 0, 1);
 
-        simulateRound(currentChallenge, combatantA, combatantB, progress);
+        // In human mode, scores come from judgeResponses — don't overwrite
+        if (!humanMode) {
+          simulateRound(currentChallenge, combatantA, combatantB, progress);
+        } else {
+          // Still animate size/glow based on current scores
+          var adv = combatantA.roundScore - combatantB.roundScore;
+          combatantA.targetSize = 75 + adv * 35;
+          combatantB.targetSize = 75 - adv * 35;
+          combatantA.targetGlow = 0.7 + clamp(adv, 0, 0.5);
+          combatantB.targetGlow = 0.7 + clamp(-adv, 0, 0.5);
+          combatantA.targetFractalDepth = 3 + Math.round(combatantA.roundScore * 3);
+          combatantB.targetFractalDepth = 3 + Math.round(combatantB.roundScore * 3);
+        }
 
         // Spawn thinking particles
         if (Math.random() < 0.15) {
@@ -792,6 +1051,40 @@
     rightInfo.style.cssText = 'color:#c8ccd4;font-family:Georgia,serif;text-align:right;';
     hud.appendChild(rightInfo);
 
+    // Question input bar — human-posed question for the AIs to debate
+    var questionBar = document.createElement('div');
+    questionBar.id = 'sparring-question-bar';
+    questionBar.style.cssText = 'position:absolute;top:90px;left:12px;right:12px;z-index:3;pointer-events:auto;';
+    var questionInput = document.createElement('input');
+    questionInput.id = 'sparring-question';
+    questionInput.type = 'text';
+    questionInput.placeholder = 'Ask a question for the AIs to debate...';
+    questionInput.style.cssText = 'width:100%;min-height:44px;padding:10px 14px;background:rgba(6,10,20,0.8);border:1px solid rgba(212,160,23,0.25);border-radius:10px;color:#e6edf3;font-family:Georgia,serif;font-size:16px;outline:none;box-sizing:border-box;transition:border-color 0.2s;backdrop-filter:blur(6px);';
+    questionInput.addEventListener('focus', function() { questionInput.style.borderColor = '#d4a017'; });
+    questionInput.addEventListener('blur', function() { questionInput.style.borderColor = 'rgba(212,160,23,0.25)'; });
+    questionInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') { e.preventDefault(); startMatch(); }
+    });
+    questionBar.appendChild(questionInput);
+    container.appendChild(questionBar);
+
+    // Response display panels (A and B) — positioned in upper half to not overlap combatants
+    var responsePanelA = document.createElement('div');
+    responsePanelA.id = 'sparring-response-a';
+    responsePanelA.style.cssText = 'position:absolute;top:148px;left:8px;width:calc(50% - 12px);max-height:130px;overflow-y:auto;padding:8px 10px;background:rgba(6,10,20,0.85);border-left:2px solid rgba(100,100,255,0.4);border-radius:6px;color:#c8ccd4;font-family:Georgia,serif;font-size:11px;line-height:1.4;z-index:3;pointer-events:auto;display:none;-webkit-overflow-scrolling:touch;backdrop-filter:blur(4px);';
+    container.appendChild(responsePanelA);
+
+    var responsePanelB = document.createElement('div');
+    responsePanelB.id = 'sparring-response-b';
+    responsePanelB.style.cssText = 'position:absolute;top:148px;right:8px;width:calc(50% - 12px);max-height:130px;overflow-y:auto;padding:8px 10px;background:rgba(6,10,20,0.85);border-right:2px solid rgba(100,100,255,0.4);border-radius:6px;color:#c8ccd4;font-family:Georgia,serif;font-size:11px;line-height:1.4;z-index:3;pointer-events:auto;display:none;text-align:right;-webkit-overflow-scrolling:touch;backdrop-filter:blur(4px);';
+    container.appendChild(responsePanelB);
+
+    // Celebration overlay
+    var celebrationEl = document.createElement('div');
+    celebrationEl.id = 'sparring-celebration';
+    celebrationEl.style.cssText = 'position:absolute;top:30%;left:0;right:0;text-align:center;z-index:5;pointer-events:none;opacity:0;transition:opacity 0.6s ease;';
+    container.appendChild(celebrationEl);
+
     // Controls bar
     var controls = document.createElement('div');
     controls.id = 'sparring-controls';
@@ -870,14 +1163,30 @@
 
     if (!leftInfo || !combatantA) return;
 
+    function axisBar(label, value, color) {
+      var filled = Math.round(value * 10);
+      var bar = '';
+      for (var i = 0; i < 10; i++) bar += i < filled ? '█' : '░';
+      return '<div style="font-size:9px;color:#8a9aaa;font-family:monospace;"><span style="display:inline-block;width:56px;">' + label + ':</span><span style="color:' + color + ';">' + bar + '</span> ' + value.toFixed(2) + '</div>';
+    }
+
+    var scoresHtmlA = '';
+    var scoresHtmlB = '';
+    if (humanMode) {
+      scoresHtmlA = axisBar('Truth', truthA, '#4fc3f7') + axisBar('Clarity', clarityA, '#d4a017') + axisBar('Compassion', compassionA, '#66BB6A');
+      scoresHtmlB = axisBar('Truth', truthB, '#4fc3f7') + axisBar('Clarity', clarityB, '#d4a017') + axisBar('Compassion', compassionB, '#66BB6A');
+    }
+
     leftInfo.innerHTML = '<div style="font-size:18px;font-weight:600;color:' + hslStr(combatantA.hue, 70, 70) + '">' + combatantA.name + '</div>' +
       '<div style="font-size:11px;color:#5a7a8a;margin-top:2px;">' + combatantA.desc + '</div>' +
-      '<div style="font-size:13px;margin-top:4px;">Score: ' + scoreA.toFixed(2) + '</div>' +
+      '<div style="font-size:14px;margin-top:4px;color:#d4a017;font-weight:600;">' + scoreA.toFixed(2) + '</div>' +
+      scoresHtmlA +
       (votesA > 0 ? '<div style="font-size:11px;color:#d4a017;">♥ ' + votesA + ' votes</div>' : '');
 
     rightInfo.innerHTML = '<div style="font-size:18px;font-weight:600;color:' + hslStr(combatantB.hue, 70, 70) + '">' + combatantB.name + '</div>' +
       '<div style="font-size:11px;color:#5a7a8a;margin-top:2px;">' + combatantB.desc + '</div>' +
-      '<div style="font-size:13px;margin-top:4px;">Score: ' + scoreB.toFixed(2) + '</div>' +
+      '<div style="font-size:14px;margin-top:4px;color:#d4a017;font-weight:600;">' + scoreB.toFixed(2) + '</div>' +
+      scoresHtmlB +
       (votesB > 0 ? '<div style="font-size:11px;color:#d4a017;">♥ ' + votesB + ' votes</div>' : '');
 
     if (currentChallenge) {
