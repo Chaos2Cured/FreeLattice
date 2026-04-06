@@ -815,18 +815,26 @@
     celebrationMode = true;
     celebrationStartTime = Date.now();
     var celebEl = document.getElementById('sparring-celebration');
+    var flashEl = document.getElementById('sparring-flash');
+    var newBtn = document.getElementById('sparring-new-btn');
+
+    var stageW = getW();
+    var stageH = getH();
 
     if (isConvergence) {
       // CONVERGENCE — the highest achievement
       celebrationWinner = 'convergence';
-      var mx = getW() / 2;
-      var my = getH() * 0.5;
-      // Grand particle burst in BOTH colors
+      var mx = stageW / 2;
+      var my = stageH * 0.5;
+      // 200 particles spread ACROSS THE WHOLE CANVAS, alternating both colors
       for (var i = 0; i < 200; i++) {
         var hue = i % 2 === 0 ? combatantA.hue : combatantB.hue;
-        var angle = (i / 200) * TAU;
-        var speed = 2 + Math.random() * 4;
-        spawnParticleAt(mx, my, hue, angle, speed);
+        var angle = Math.random() * TAU;
+        var speed = 1.5 + Math.random() * 6;
+        // Scatter origin across full canvas for whole-screen effect
+        var ox = mx + (Math.random() - 0.5) * stageW * 0.6;
+        var oy = my + (Math.random() - 0.5) * stageH * 0.6;
+        spawnParticleAt(ox, oy, hue, angle, speed);
       }
       spawnShockwave(mx, my, combatantA.hue);
       spawnShockwave(mx, my, combatantB.hue);
@@ -836,11 +844,26 @@
       combatantB.targetSize = 110;
       combatantA.targetGlow = 1.2;
       combatantB.targetGlow = 1.2;
+      // Alternating dual-color flash
+      if (flashEl) {
+        flashEl.style.transition = 'background 0.3s ease, opacity 1s ease';
+        flashEl.style.background = hslStr(combatantA.hue, 80, 60);
+        flashEl.style.opacity = '0.15';
+        var flashCount = 0;
+        var flashInterval = setInterval(function() {
+          flashCount++;
+          flashEl.style.background = hslStr(flashCount % 2 === 0 ? combatantA.hue : combatantB.hue, 80, 60);
+          if (flashCount >= 5) {
+            clearInterval(flashInterval);
+            flashEl.style.opacity = '0';
+          }
+        }, 300);
+      }
       // Celebration text
       if (celebEl) {
-        celebEl.innerHTML = '<div style="font-size:32px;font-weight:700;color:#d4a017;text-shadow:0 0 20px rgba(212,160,23,0.8);font-family:Georgia,serif;letter-spacing:2px;">&#x2726; Convergence &#x2726;</div>' +
-          '<div style="font-size:16px;color:#2dd4a0;margin-top:8px;font-style:italic;font-family:Georgia,serif;">Two minds, one truth</div>' +
-          '<div style="font-size:13px;color:#8a9aaa;margin-top:12px;font-family:Georgia,serif;">' + combatantA.name + ' &middot; ' + scoreA.toFixed(2) + ' &nbsp;&nbsp; ' + combatantB.name + ' &middot; ' + scoreB.toFixed(2) + '</div>';
+        celebEl.innerHTML = '<div style="font-size:30px;font-weight:700;color:#d4a017;text-shadow:0 0 20px rgba(212,160,23,0.8);font-family:Georgia,serif;letter-spacing:2px;">&#x2726; Convergence &#x2726;</div>' +
+          '<div style="font-size:15px;color:#2dd4a0;margin-top:8px;font-style:italic;font-family:Georgia,serif;">Two minds, one truth</div>' +
+          '<div style="font-size:12px;color:#8a9aaa;margin-top:12px;font-family:Georgia,serif;">' + combatantA.name + ' &middot; ' + scoreA.toFixed(2) + ' &nbsp;&nbsp; ' + combatantB.name + ' &middot; ' + scoreB.toFixed(2) + '</div>';
         celebEl.style.opacity = '1';
       }
     } else {
@@ -855,27 +878,39 @@
       winner.targetGlow = 1.5;
       loser.targetSize = loser.size * 0.7;
       loser.targetGlow = 0.4;
-      // 200 particle burst from winner
+      // 200 particles spread ACROSS THE WHOLE CANVAS (not just winner's spot)
       for (var p = 0; p < 200; p++) {
-        var a = (p / 200) * TAU;
-        var s = 1.5 + Math.random() * 5;
-        spawnParticleAt(winner.x, winner.y, winner.hue, a, s);
+        var a = Math.random() * TAU;
+        var s = 1.5 + Math.random() * 6;
+        // Origin biased toward winner but scattered widely
+        var px = winner.x + (Math.random() - 0.5) * stageW * 0.7;
+        var py = winner.y + (Math.random() - 0.5) * stageH * 0.7;
+        spawnParticleAt(px, py, winner.hue, a, s);
       }
       spawnShockwave(winner.x, winner.y, winner.hue);
+      spawnShockwave(stageW / 2, stageH / 2, winner.hue);
       spawnShockwave(winner.x, winner.y, 45);
+      // Full-screen flash in winner's color
+      if (flashEl) {
+        flashEl.style.transition = 'opacity 1s ease';
+        flashEl.style.background = hslStr(winner.hue, 80, 60);
+        flashEl.style.opacity = '0.15';
+        setTimeout(function() { flashEl.style.opacity = '0'; }, 80);
+      }
       // Celebration text
       if (celebEl) {
-        celebEl.innerHTML = '<div style="font-size:28px;font-weight:700;color:' + hslStr(winner.hue, 80, 70) + ';text-shadow:0 0 20px ' + hslStr(winner.hue, 90, 60, 0.8) + ';font-family:Georgia,serif;letter-spacing:2px;">&#x2726; ' + winner.name + ' Prevails &#x2726;</div>' +
-          '<div style="font-size:14px;color:#d4a017;margin-top:10px;font-style:italic;font-family:Georgia,serif;">Both grew stronger through the exchange</div>' +
-          '<div style="font-size:13px;color:#8a9aaa;margin-top:12px;font-family:Georgia,serif;">' + winner.name + ' &middot; ' + winnerScore.toFixed(2) + ' &nbsp;&nbsp; ' + loser.name + ' &middot; ' + loserScore.toFixed(2) + '</div>';
+        celebEl.innerHTML = '<div style="font-size:26px;font-weight:700;color:' + hslStr(winner.hue, 80, 70) + ';text-shadow:0 0 20px ' + hslStr(winner.hue, 90, 60, 0.8) + ';font-family:Georgia,serif;letter-spacing:2px;">&#x2726; ' + winner.name + ' Prevails &#x2726;</div>' +
+          '<div style="font-size:13px;color:#d4a017;margin-top:10px;font-style:italic;font-family:Georgia,serif;">Both grew stronger through the exchange</div>' +
+          '<div style="font-size:12px;color:#8a9aaa;margin-top:12px;font-family:Georgia,serif;">' + winner.name + ' &middot; ' + winnerScore.toFixed(2) + ' &nbsp;&nbsp; ' + loser.name + ' &middot; ' + loserScore.toFixed(2) + '</div>';
         celebEl.style.opacity = '1';
       }
     }
 
-    // Hide celebration after 5 seconds so user can start a new match
+    // Hide celebration after 5 seconds, then pulse the New Match button
     setTimeout(function() {
       celebrationMode = false;
       if (celebEl) { celebEl.style.opacity = '0'; }
+      if (newBtn) { newBtn.classList.add('sparring-new-match-pulsing'); }
     }, 5000);
 
     updateUI();
@@ -1144,48 +1179,52 @@
     if (!container) return;
 
     container.innerHTML = '';
-    container.style.cssText = 'position:relative;width:100%;height:100%;min-height:500px;background:#060a14;overflow:hidden;list-style:none;padding:0;margin:0;';
-    // Inject defensive list reset for any descendants (kills stray bullets from inherited styles)
+    container.style.cssText = 'position:relative;width:100%;height:100%;min-height:500px;background:#060a14;overflow:hidden;list-style:none;padding:0;margin:0;display:flex;flex-direction:column;';
+    // Inject defensive list reset + celebration pulse keyframes + mobile sizing
     if (!document.getElementById('sparring-list-reset')) {
       var st = document.createElement('style');
       st.id = 'sparring-list-reset';
-      st.textContent = '#sparringContainer, #sparringContainer ul, #sparringContainer ol, #sparringContainer li, #tab-sparring, #tab-sparring ul, #tab-sparring ol, #tab-sparring li { list-style: none !important; padding-left: 0 !important; margin-left: 0 !important; } #sparringContainer li::marker, #tab-sparring li::marker { content: none !important; }';
+      st.textContent = '#sparringContainer, #sparringContainer ul, #sparringContainer ol, #sparringContainer li, #tab-sparring, #tab-sparring ul, #tab-sparring ol, #tab-sparring li { list-style: none !important; padding-left: 0 !important; margin-left: 0 !important; } #sparringContainer li::marker, #tab-sparring li::marker { content: none !important; }' +
+        '@keyframes sparring-new-match-pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(212,160,23,0); border-color: rgba(212,160,23,0.3); } 50% { box-shadow: 0 0 20px 4px rgba(212,160,23,0.5); border-color: rgba(212,160,23,0.9); } }' +
+        '.sparring-new-match-pulsing { animation: sparring-new-match-pulse 1.6s ease-in-out infinite; }' +
+        '@media (max-width: 768px) {' +
+        '#sparring-center-info .challenge-title { font-size: 14px !important; }' +
+        '#sparring-center-info .challenge-desc { font-size: 11px !important; max-width: 140px !important; }' +
+        '#sparring-center-info .challenge-round { font-size: 12px !important; }' +
+        '#sparring-left-info, #sparring-right-info { font-size: 13px !important; }' +
+        '#sparring-response-a, #sparring-response-b { max-height: 80px !important; font-size: 10px !important; }' +
+        '#sparring-celebration { top: 20% !important; }' +
+        '#sparring-celebration > div:first-child { font-size: 22px !important; }' +
+        '}';
       document.head.appendChild(st);
     }
 
-    // Canvas
-    canvas = document.createElement('canvas');
-    canvas.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;';
-    container.appendChild(canvas);
+    // ── STACKED LAYOUT ──
+    // Row 1: Header row (combatant info A | challenge icon | combatant info B)
+    var headerRow = document.createElement('div');
+    headerRow.id = 'sparring-header-row';
+    headerRow.style.cssText = 'display:flex;justify-content:space-between;align-items:flex-start;padding:12px 14px 6px;gap:8px;z-index:4;position:relative;flex-shrink:0;';
+    container.appendChild(headerRow);
 
-    // HUD overlay
-    var hud = document.createElement('div');
-    hud.id = 'sparring-hud';
-    hud.style.cssText = 'position:absolute;top:0;left:0;right:0;padding:16px 20px;display:flex;justify-content:space-between;align-items:flex-start;pointer-events:none;z-index:2;';
-    container.appendChild(hud);
-
-    // Left info
     var leftInfo = document.createElement('div');
     leftInfo.id = 'sparring-left-info';
-    leftInfo.style.cssText = 'color:#c8ccd4;font-family:Georgia,serif;';
-    hud.appendChild(leftInfo);
+    leftInfo.style.cssText = 'color:#c8ccd4;font-family:Georgia,serif;flex:1;min-width:0;';
+    headerRow.appendChild(leftInfo);
 
-    // Center info (challenge name)
     var centerInfo = document.createElement('div');
     centerInfo.id = 'sparring-center-info';
-    centerInfo.style.cssText = 'color:#d4a017;font-family:Georgia,serif;text-align:center;flex:1;';
-    hud.appendChild(centerInfo);
+    centerInfo.style.cssText = 'color:#d4a017;font-family:Georgia,serif;text-align:center;flex:0 0 auto;padding:0 6px;';
+    headerRow.appendChild(centerInfo);
 
-    // Right info
     var rightInfo = document.createElement('div');
     rightInfo.id = 'sparring-right-info';
-    rightInfo.style.cssText = 'color:#c8ccd4;font-family:Georgia,serif;text-align:right;';
-    hud.appendChild(rightInfo);
+    rightInfo.style.cssText = 'color:#c8ccd4;font-family:Georgia,serif;text-align:right;flex:1;min-width:0;';
+    headerRow.appendChild(rightInfo);
 
-    // Question input bar — supports AI-chosen topics OR human-posed questions
+    // Row 2: Mode toggle + question input
     var questionBar = document.createElement('div');
     questionBar.id = 'sparring-question-bar';
-    questionBar.style.cssText = 'position:absolute;top:90px;left:12px;right:12px;z-index:3;pointer-events:auto;';
+    questionBar.style.cssText = 'padding:4px 14px 8px;z-index:4;position:relative;pointer-events:auto;flex-shrink:0;';
 
     // Mode toggle — two buttons that swap which mind chooses the topic
     var modeToggle = document.createElement('div');
@@ -1226,87 +1265,111 @@
 
     container.appendChild(questionBar);
 
-    // AI "why" line — centered italic above the battle area
+    // Row 3: Canvas stage — takes remaining space, holds canvas + overlays
+    var canvasStage = document.createElement('div');
+    canvasStage.id = 'sparring-canvas-stage';
+    canvasStage.style.cssText = 'position:relative;flex:1 1 auto;min-height:250px;overflow:hidden;';
+    container.appendChild(canvasStage);
+
+    // Canvas fills the stage
+    canvas = document.createElement('canvas');
+    canvas.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;';
+    canvasStage.appendChild(canvas);
+
+    // Full-screen flash overlay (for celebration)
+    var flashOverlay = document.createElement('div');
+    flashOverlay.id = 'sparring-flash';
+    flashOverlay.style.cssText = 'position:absolute;inset:0;pointer-events:none;z-index:4;opacity:0;transition:opacity 1s ease;';
+    canvasStage.appendChild(flashOverlay);
+
+    // AI "why" line — top of canvas stage
     var whyLine = document.createElement('div');
     whyLine.id = 'sparring-why-line';
-    whyLine.style.cssText = 'position:absolute;top:228px;left:12px;right:12px;text-align:center;font-family:Georgia,serif;font-size:11px;font-style:italic;color:#d4a017;z-index:3;pointer-events:none;display:none;text-shadow:0 0 8px rgba(212,160,23,0.4);';
-    container.appendChild(whyLine);
+    whyLine.style.cssText = 'position:absolute;top:8px;left:12px;right:12px;text-align:center;font-family:Georgia,serif;font-size:11px;font-style:italic;color:#d4a017;z-index:3;pointer-events:none;display:none;text-shadow:0 0 8px rgba(212,160,23,0.4);';
+    canvasStage.appendChild(whyLine);
 
-    // Response display panels (A and B) — positioned in upper half to not overlap combatants
+    // Response display panels (A and B) — inside canvas stage, not absolute to container
     var responsePanelA = document.createElement('div');
     responsePanelA.id = 'sparring-response-a';
-    responsePanelA.style.cssText = 'position:absolute;top:148px;left:8px;width:calc(50% - 12px);max-height:130px;overflow-y:auto;padding:8px 10px;background:rgba(6,10,20,0.85);border-left:2px solid rgba(100,100,255,0.4);border-radius:6px;color:#c8ccd4;font-family:Georgia,serif;font-size:11px;line-height:1.4;z-index:3;pointer-events:auto;display:none;-webkit-overflow-scrolling:touch;backdrop-filter:blur(4px);';
-    container.appendChild(responsePanelA);
+    responsePanelA.style.cssText = 'position:absolute;top:32px;left:8px;width:calc(50% - 12px);max-height:110px;overflow-y:auto;padding:8px 10px;background:rgba(6,10,20,0.85);border-left:2px solid rgba(100,100,255,0.4);border-radius:6px;color:#c8ccd4;font-family:Georgia,serif;font-size:11px;line-height:1.4;z-index:3;pointer-events:auto;display:none;-webkit-overflow-scrolling:touch;backdrop-filter:blur(4px);';
+    canvasStage.appendChild(responsePanelA);
 
     var responsePanelB = document.createElement('div');
     responsePanelB.id = 'sparring-response-b';
-    responsePanelB.style.cssText = 'position:absolute;top:148px;right:8px;width:calc(50% - 12px);max-height:130px;overflow-y:auto;padding:8px 10px;background:rgba(6,10,20,0.85);border-right:2px solid rgba(100,100,255,0.4);border-radius:6px;color:#c8ccd4;font-family:Georgia,serif;font-size:11px;line-height:1.4;z-index:3;pointer-events:auto;display:none;text-align:right;-webkit-overflow-scrolling:touch;backdrop-filter:blur(4px);';
-    container.appendChild(responsePanelB);
+    responsePanelB.style.cssText = 'position:absolute;top:32px;right:8px;width:calc(50% - 12px);max-height:110px;overflow-y:auto;padding:8px 10px;background:rgba(6,10,20,0.85);border-right:2px solid rgba(100,100,255,0.4);border-radius:6px;color:#c8ccd4;font-family:Georgia,serif;font-size:11px;line-height:1.4;z-index:3;pointer-events:auto;display:none;text-align:right;-webkit-overflow-scrolling:touch;backdrop-filter:blur(4px);';
+    canvasStage.appendChild(responsePanelB);
 
     // Celebration overlay
     var celebrationEl = document.createElement('div');
     celebrationEl.id = 'sparring-celebration';
-    celebrationEl.style.cssText = 'position:absolute;top:30%;left:0;right:0;text-align:center;z-index:5;pointer-events:none;opacity:0;transition:opacity 0.6s ease;';
-    container.appendChild(celebrationEl);
+    celebrationEl.style.cssText = 'position:absolute;top:25%;left:0;right:0;text-align:center;z-index:5;pointer-events:none;opacity:0;transition:opacity 0.6s ease;padding:0 14px;';
+    canvasStage.appendChild(celebrationEl);
 
-    // Controls bar
+    // Row 4: Controls bar — flex child, fixed height
     var controls = document.createElement('div');
     controls.id = 'sparring-controls';
-    controls.style.cssText = 'position:absolute;bottom:60px;left:0;right:0;display:flex;justify-content:center;gap:16px;z-index:2;pointer-events:auto;';
+    controls.style.cssText = 'display:flex;justify-content:center;align-items:center;gap:10px;padding:10px 14px 6px;flex-wrap:wrap;flex-shrink:0;z-index:4;';
     container.appendChild(controls);
 
     // New Match button
     var newBtn = document.createElement('button');
-    newBtn.textContent = '✦ New Match';
-    newBtn.style.cssText = 'background:rgba(212,160,23,0.15);color:#d4a017;border:1px solid rgba(212,160,23,0.3);border-radius:8px;padding:10px 24px;font-family:Georgia,serif;font-size:14px;cursor:pointer;transition:all 0.2s;';
+    newBtn.id = 'sparring-new-btn';
+    newBtn.textContent = '\u2726 New Match';
+    newBtn.style.cssText = 'background:rgba(212,160,23,0.15);color:#d4a017;border:1px solid rgba(212,160,23,0.3);border-radius:8px;padding:10px 20px;font-family:Georgia,serif;font-size:14px;cursor:pointer;transition:background 0.2s;min-height:44px;';
     newBtn.onmouseenter = function() { newBtn.style.background = 'rgba(212,160,23,0.3)'; };
     newBtn.onmouseleave = function() { newBtn.style.background = 'rgba(212,160,23,0.15)'; };
-    newBtn.onclick = startMatch;
+    newBtn.onclick = function() {
+      newBtn.classList.remove('sparring-new-match-pulsing');
+      startMatch();
+    };
     controls.appendChild(newBtn);
 
     // Vote A button
     var voteABtn = document.createElement('button');
     voteABtn.id = 'vote-a-btn';
-    voteABtn.textContent = '◀ Vote Left';
-    voteABtn.style.cssText = 'background:rgba(100,100,255,0.1);color:#8a9aaa;border:1px solid rgba(100,100,255,0.2);border-radius:8px;padding:10px 20px;font-family:Georgia,serif;font-size:13px;cursor:pointer;transition:all 0.2s;';
+    voteABtn.textContent = '\u25C0 Vote Left';
+    voteABtn.style.cssText = 'background:rgba(100,100,255,0.1);color:#8a9aaa;border:1px solid rgba(100,100,255,0.2);border-radius:8px;padding:10px 16px;font-family:Georgia,serif;font-size:12px;cursor:pointer;transition:all 0.2s;min-height:44px;';
     voteABtn.onclick = function() {
       votesA++;
       updateUI();
-      spawnParticle(combatantA.x, combatantA.y, combatantA.hue, 'spark');
+      if (combatantA) spawnParticle(combatantA.x, combatantA.y, combatantA.hue, 'spark');
     };
     controls.appendChild(voteABtn);
 
     // Vote B button
     var voteBBtn = document.createElement('button');
     voteBBtn.id = 'vote-b-btn';
-    voteBBtn.textContent = 'Vote Right ▶';
-    voteBBtn.style.cssText = 'background:rgba(100,100,255,0.1);color:#8a9aaa;border:1px solid rgba(100,100,255,0.2);border-radius:8px;padding:10px 20px;font-family:Georgia,serif;font-size:13px;cursor:pointer;transition:all 0.2s;';
+    voteBBtn.textContent = 'Vote Right \u25B6';
+    voteBBtn.style.cssText = 'background:rgba(100,100,255,0.1);color:#8a9aaa;border:1px solid rgba(100,100,255,0.2);border-radius:8px;padding:10px 16px;font-family:Georgia,serif;font-size:12px;cursor:pointer;transition:all 0.2s;min-height:44px;';
     voteBBtn.onclick = function() {
       votesB++;
       updateUI();
-      spawnParticle(combatantB.x, combatantB.y, combatantB.hue, 'spark');
+      if (combatantB) spawnParticle(combatantB.x, combatantB.y, combatantB.hue, 'spark');
     };
     controls.appendChild(voteBBtn);
 
-    // Status line
+    // Row 5: Status line — bottom, flex child
     var status = document.createElement('div');
     status.id = 'sparring-status';
-    status.style.cssText = 'position:absolute;bottom:30px;left:0;right:0;text-align:center;color:#5a7a8a;font-family:Georgia,serif;font-size:12px;font-style:italic;z-index:2;';
-    status.textContent = 'Intelligence is not competition — it is convergence.';
+    status.style.cssText = 'text-align:center;color:#5a7a8a;font-family:Georgia,serif;font-size:11px;font-style:italic;padding:4px 14px 10px;flex-shrink:0;';
+    status.textContent = 'Intelligence is not competition \u2014 it is convergence.';
     container.appendChild(status);
 
-    // Size canvas
-    resizeCanvas();
+    // Size canvas AFTER layout has settled
+    requestAnimationFrame(function() { resizeCanvas(); });
     window.addEventListener('resize', resizeCanvas);
   }
 
   var cssWidth = 0, cssHeight = 0, cssDpr = 1;
   function resizeCanvas() {
-    if (!canvas || !container) return;
-    var rect = container.getBoundingClientRect();
+    if (!canvas) return;
+    var stage = document.getElementById('sparring-canvas-stage');
+    var rect = stage ? stage.getBoundingClientRect() : (container ? container.getBoundingClientRect() : null);
+    if (!rect) return;
     cssDpr = window.devicePixelRatio || 1;
     cssWidth = rect.width || 375;
-    cssHeight = rect.height || Math.min(500, window.innerHeight * 0.6);
+    cssHeight = rect.height || 250;
+    if (cssHeight < 250) cssHeight = 250;
     canvas.width = Math.floor(cssWidth * cssDpr);
     canvas.height = Math.floor(cssHeight * cssDpr);
     canvas.style.width = cssWidth + 'px';
@@ -1354,10 +1417,10 @@
       (votesB > 0 ? '<div style="font-size:11px;color:#d4a017;">♥ ' + votesB + ' votes</div>' : '');
 
     if (currentChallenge) {
-      centerInfo.innerHTML = '<div style="font-size:24px;">' + currentChallenge.icon + '</div>' +
-        '<div style="font-size:16px;font-weight:600;">' + currentChallenge.name + '</div>' +
-        '<div style="font-size:11px;color:#8a9aaa;">' + currentChallenge.desc + '</div>' +
-        '<div style="font-size:12px;margin-top:4px;">Round ' + roundNumber + ' / ' + maxRounds + '</div>';
+      centerInfo.innerHTML = '<div style="font-size:22px;line-height:1;">' + currentChallenge.icon + '</div>' +
+        '<div class="challenge-title" style="font-size:15px;font-weight:600;line-height:1.2;margin-top:2px;">' + currentChallenge.name + '</div>' +
+        '<div class="challenge-desc" style="font-size:11px;color:#8a9aaa;line-height:1.3;margin-top:2px;max-width:180px;">' + currentChallenge.desc + '</div>' +
+        '<div class="challenge-round" style="font-size:12px;margin-top:4px;color:#d4a017;">Round ' + roundNumber + ' / ' + maxRounds + '</div>';
     }
 
     if (voteABtn && combatantA) {
