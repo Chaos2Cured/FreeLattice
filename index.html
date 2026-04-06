@@ -3865,7 +3865,30 @@ input[type="range"]::-moz-range-thumb {
 @media (max-width: 600px) {
   .pwa-install-banner { flex-wrap: wrap; gap: 8px; padding: 8px 14px; font-size: 0.78rem; }
   header h1 { font-size: var(--type-h2); }
-  .chat-messages { height: calc(100vh - 320px); min-height: 180px; max-height: none; padding: 14px; }
+  /* Heights account for mobile nav (64px) — subtract enough space */
+  .chat-messages { height: calc(100vh - 384px); min-height: 180px; max-height: none; padding: 14px; }
+  .garden-container { height: calc(100vh - 184px) !important; }
+  .cv-container { height: calc(100vh - 204px) !important; min-height: 250px; }
+  .ch-layout { min-height: calc(100vh - 264px); }
+  /* Fix overflow on long-form banner text */
+  .ollama-suggest-banner .suggest-text { min-width: 0 !important; }
+  .ollama-suggest-banner { flex-wrap: wrap; gap: 6px; }
+  /* Model switcher dropdown — clamp to viewport */
+  .model-switcher-dropdown { min-width: auto !important; max-width: 92vw; right: 4px !important; }
+  /* Garden touch card — let it shrink */
+  .gt-card { min-width: auto !important; max-width: 92vw; }
+  /* AI Status Card — stack on narrow screens */
+  .ai-status-card { flex-direction: column; align-items: flex-start; gap: 10px; padding: 12px 14px; }
+  .ai-status-card > div:last-child { width: 100%; flex-wrap: wrap; }
+  /* Mobile nav button — proper touch target */
+  .fl-mobile-nav-btn { padding: 8px 6px; min-height: 48px; }
+  /* Channels back button — proper touch target */
+  .ch-back-btn { padding: 10px 14px; min-height: 44px; }
+  /* Model switcher button — proper touch target */
+  .model-switcher-btn { min-height: 44px; }
+  /* Garden controls — wrap if needed */
+  .garden-controls { flex-wrap: wrap; gap: 4px; }
+  .garden-controls .garden-ctrl-btn { font-size: 0.78rem; padding: 6px 12px; }
   .welcome-card { padding: 28px 22px; }
   .suggest-card { padding: 24px 20px; }
   .container { padding: 0 14px; }
