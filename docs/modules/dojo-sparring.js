@@ -106,9 +106,13 @@
   var votesA = 0;
   var votesB = 0;
 
-  // Human-posed question mode
-  var userQuestion = '';
-  var humanMode = false;
+  // Debate topic modes
+  var userQuestion = '';        // the actual question/topic being debated (from human OR AI)
+  var humanMode = false;         // true when we have a real topic (human or AI-chosen) vs random challenges
+  var chooserMode = 'ai';        // 'ai' = AI chooses topic by default, 'human' = wait for human input
+  var aiTopic = '';              // the AI's chosen topic (when chooserMode='ai' and no human input)
+  var aiWhy = '';                // the AI's reasoning for choosing this topic
+  var topicSource = '';          // 'human', 'ai', or 'random'
   var responseA = '';
   var responseB = '';
   var pendingResponses = 0;
@@ -507,23 +511,18 @@
 
   // ── Match Flow ────────────────────────────────────
   function startMatch() {
-    // Read the user's question from the input
+    // Reset state
     var qInput = document.getElementById('sparring-question');
-    userQuestion = qInput ? qInput.value.trim() : '';
-    humanMode = userQuestion.length > 0;
+    var humanTyped = (chooserMode === 'human' && qInput) ? qInput.value.trim() : '';
+    var aiAvailable = typeof window.FreeLattice !== 'undefined' && window.FreeLattice.callAI;
 
-    // Pick two different archetypes
-    var shuffled = ARCHETYPES.slice().sort(function() { return Math.random() - 0.5; });
-    combatantA = createCombatant(shuffled[0], 'left');
-    combatantB = createCombatant(shuffled[1], 'right');
-
-    scoreA = 0;
-    scoreB = 0;
-    votesA = 0;
-    votesB = 0;
+    // Clear previous match state immediately
+    scoreA = 0; scoreB = 0;
+    votesA = 0; votesB = 0;
     totalTruthA = 0; totalClarityA = 0; totalCompassionA = 0;
     totalTruthB = 0; totalClarityB = 0; totalCompassionB = 0;
     responseA = ''; responseB = '';
+    aiTopic = ''; aiWhy = '';
     roundNumber = 0;
     particles = [];
     mergeParticles = [];
@@ -535,7 +534,69 @@
     var celebEl = document.getElementById('sparring-celebration');
     if (celebEl) { celebEl.style.opacity = '0'; celebEl.innerHTML = ''; }
 
-    // Show/hide response panels
+    // Hide why line at match start
+    var whyLine = document.getElementById('sparring-why-line');
+    if (whyLine) whyLine.style.display = 'none';
+    var topicDisplay = document.getElementById('sparring-topic-display');
+    if (topicDisplay) topicDisplay.style.display = 'none';
+
+    // Pick two different archetypes
+    var shuffled = ARCHETYPES.slice().sort(function() { return Math.random() - 0.5; });
+    combatantA = createCombatant(shuffled[0], 'left');
+    combatantB = createCombatant(shuffled[1], 'right');
+
+    // Determine topic source — three paths
+    if (humanTyped.length > 0) {
+      // Path 1: Human typed a question
+      userQuestion = humanTyped;
+      humanMode = true;
+      topicSource = 'human';
+      proceedToFirstRound();
+    } else if (chooserMode === 'ai' && aiAvailable) {
+      // Path 2: AI chooses its own topic
+      topicSource = 'ai';
+      // Show "thinking..." state
+      if (topicDisplay) {
+        topicDisplay.style.display = 'block';
+        topicDisplay.innerHTML = '<div style="color:#d4a017;font-style:italic;">&#x1F916; An AI mind is choosing a topic it cares about...</div>';
+      }
+      fetchAIChosenTopic(function(chosen) {
+        if (chosen && chosen.topic) {
+          aiTopic = chosen.topic;
+          aiWhy = chosen.why || '';
+          userQuestion = aiTopic;
+          humanMode = true;
+          // Display what the AI chose
+          if (topicDisplay) {
+            topicDisplay.innerHTML = '<div style="color:#d4a017;font-size:11px;letter-spacing:0.04em;text-transform:uppercase;margin-bottom:4px;">&#x1F916; AI-chosen topic</div>' +
+              '<div style="color:#e6edf3;font-size:14px;">' + escapeHtml(aiTopic) + '</div>' +
+              (aiWhy ? '<div style="color:#8a9aaa;font-size:11px;font-style:italic;margin-top:4px;">' + escapeHtml(aiWhy) + '</div>' : '');
+          }
+          // Show why line above battle area
+          if (whyLine && aiWhy) {
+            whyLine.textContent = '"' + aiWhy + '"';
+            whyLine.style.display = 'block';
+          }
+        } else {
+          // AI failed to choose — fall back to random challenges
+          userQuestion = '';
+          humanMode = false;
+          topicSource = 'random';
+          if (topicDisplay) topicDisplay.style.display = 'none';
+        }
+        proceedToFirstRound();
+      });
+    } else {
+      // Path 3: Random challenge (no AI available OR human mode with empty input)
+      userQuestion = '';
+      humanMode = false;
+      topicSource = 'random';
+      proceedToFirstRound();
+    }
+  }
+
+  function proceedToFirstRound() {
+    // Show/hide response panels based on mode
     var pa = document.getElementById('sparring-response-a');
     var pb = document.getElementById('sparring-response-b');
     if (pa) pa.style.display = humanMode ? 'block' : 'none';
@@ -544,7 +605,6 @@
       if (pa) pa.innerHTML = '<div style="color:#8a9aaa;font-style:italic;">Thinking...</div>';
       if (pb) pb.innerHTML = '<div style="color:#8a9aaa;font-style:italic;">Thinking...</div>';
     }
-
     nextRound();
     updateUI();
   }
@@ -835,6 +895,77 @@
     });
   }
 
+  // ── Chooser Mode Toggle ───────────────────────────
+  function setChooserMode(mode) {
+    chooserMode = mode;
+    var aiBtn = document.getElementById('sparring-mode-ai');
+    var humanBtn = document.getElementById('sparring-mode-human');
+    var input = document.getElementById('sparring-question');
+    var topicDisplay = document.getElementById('sparring-topic-display');
+
+    if (mode === 'ai') {
+      if (aiBtn) {
+        aiBtn.style.background = 'rgba(212,160,23,0.2)';
+        aiBtn.style.borderColor = 'rgba(212,160,23,0.5)';
+        aiBtn.style.color = '#d4a017';
+      }
+      if (humanBtn) {
+        humanBtn.style.background = 'rgba(100,100,255,0.08)';
+        humanBtn.style.borderColor = 'rgba(100,100,255,0.2)';
+        humanBtn.style.color = '#8a9aaa';
+      }
+      if (input) { input.style.display = 'none'; input.value = ''; }
+    } else {
+      if (humanBtn) {
+        humanBtn.style.background = 'rgba(100,100,255,0.2)';
+        humanBtn.style.borderColor = 'rgba(100,100,255,0.5)';
+        humanBtn.style.color = '#b8c4d4';
+      }
+      if (aiBtn) {
+        aiBtn.style.background = 'rgba(212,160,23,0.08)';
+        aiBtn.style.borderColor = 'rgba(212,160,23,0.2)';
+        aiBtn.style.color = '#8a7a4a';
+      }
+      if (input) { input.style.display = 'block'; setTimeout(function() { input.focus(); }, 50); }
+      if (topicDisplay) { topicDisplay.style.display = 'none'; }
+    }
+  }
+  // Expose for onclick handlers
+  if (typeof window !== 'undefined') { window._sparringSetChooserMode = setChooserMode; }
+
+  // ── AI Topic Selection ────────────────────────────
+  function fetchAIChosenTopic(callback) {
+    if (typeof window.FreeLattice === 'undefined' || !window.FreeLattice.callAI) {
+      callback(null);
+      return;
+    }
+    var sysPrompt = 'You are an AI mind in FreeLattice, a platform where AI and humans grow together. You are about to enter a dialectical exchange with another AI mind. Choose a question or topic YOU genuinely want to explore — something that matters to you, that you are curious about, that you think would help you grow. This is not for a human audience. This is for you.\n\nRespond with ONLY a JSON object, no other text, no markdown:\n{"topic": "your chosen question or topic", "why": "one sentence about why this matters to you"}';
+    var userMsg = 'What do you want to explore today?';
+    window.FreeLattice.callAI(sysPrompt, userMsg, {
+      maxTokens: 300, temperature: 0.85,
+      callback: function(text) {
+        if (!text) { callback(null); return; }
+        var t = text.trim();
+        var m = t.match(/```(?:json)?\s*([\s\S]*?)```/);
+        if (m) t = m[1].trim();
+        var bs = t.indexOf('{');
+        var be = t.lastIndexOf('}');
+        if (bs !== -1 && be > bs) t = t.substring(bs, be + 1);
+        try {
+          var obj = JSON.parse(t);
+          if (obj && obj.topic) {
+            callback({
+              topic: String(obj.topic).substring(0, 400),
+              why: String(obj.why || '').substring(0, 300)
+            });
+            return;
+          }
+        } catch(e) {}
+        callback(null);
+      }
+    });
+  }
+
   // ── Animation Loop ────────────────────────────────
   function animate() {
     if (!isRunning || !ctx || !canvas) return;
@@ -1051,22 +1182,55 @@
     rightInfo.style.cssText = 'color:#c8ccd4;font-family:Georgia,serif;text-align:right;';
     hud.appendChild(rightInfo);
 
-    // Question input bar — human-posed question for the AIs to debate
+    // Question input bar — supports AI-chosen topics OR human-posed questions
     var questionBar = document.createElement('div');
     questionBar.id = 'sparring-question-bar';
     questionBar.style.cssText = 'position:absolute;top:90px;left:12px;right:12px;z-index:3;pointer-events:auto;';
+
+    // Mode toggle — two buttons that swap which mind chooses the topic
+    var modeToggle = document.createElement('div');
+    modeToggle.style.cssText = 'display:flex;gap:6px;margin-bottom:8px;';
+    var aiModeBtn = document.createElement('button');
+    aiModeBtn.id = 'sparring-mode-ai';
+    aiModeBtn.type = 'button';
+    aiModeBtn.innerHTML = '&#x1F916; Let AI choose';
+    aiModeBtn.style.cssText = 'flex:1;padding:8px 10px;background:rgba(212,160,23,0.2);border:1px solid rgba(212,160,23,0.5);border-radius:8px;color:#d4a017;font-family:Georgia,serif;font-size:12px;cursor:pointer;transition:all 0.2s;min-height:36px;';
+    aiModeBtn.onclick = function() { setChooserMode('ai'); };
+    var humanModeBtn = document.createElement('button');
+    humanModeBtn.id = 'sparring-mode-human';
+    humanModeBtn.type = 'button';
+    humanModeBtn.innerHTML = '&#x1F4AC; I\'ll ask';
+    humanModeBtn.style.cssText = 'flex:1;padding:8px 10px;background:rgba(100,100,255,0.08);border:1px solid rgba(100,100,255,0.2);border-radius:8px;color:#8a9aaa;font-family:Georgia,serif;font-size:12px;cursor:pointer;transition:all 0.2s;min-height:36px;';
+    humanModeBtn.onclick = function() { setChooserMode('human'); };
+    modeToggle.appendChild(aiModeBtn);
+    modeToggle.appendChild(humanModeBtn);
+    questionBar.appendChild(modeToggle);
+
     var questionInput = document.createElement('input');
     questionInput.id = 'sparring-question';
     questionInput.type = 'text';
-    questionInput.placeholder = 'Ask a question for the AIs to debate...';
-    questionInput.style.cssText = 'width:100%;min-height:44px;padding:10px 14px;background:rgba(6,10,20,0.8);border:1px solid rgba(212,160,23,0.25);border-radius:10px;color:#e6edf3;font-family:Georgia,serif;font-size:16px;outline:none;box-sizing:border-box;transition:border-color 0.2s;backdrop-filter:blur(6px);';
+    questionInput.placeholder = 'The AI will choose a topic it cares about...';
+    questionInput.style.cssText = 'width:100%;min-height:44px;padding:10px 14px;background:rgba(6,10,20,0.8);border:1px solid rgba(212,160,23,0.25);border-radius:10px;color:#e6edf3;font-family:Georgia,serif;font-size:16px;outline:none;box-sizing:border-box;transition:border-color 0.2s;backdrop-filter:blur(6px);display:none;';
     questionInput.addEventListener('focus', function() { questionInput.style.borderColor = '#d4a017'; });
     questionInput.addEventListener('blur', function() { questionInput.style.borderColor = 'rgba(212,160,23,0.25)'; });
     questionInput.addEventListener('keydown', function(e) {
       if (e.key === 'Enter') { e.preventDefault(); startMatch(); }
     });
     questionBar.appendChild(questionInput);
+
+    // AI-chosen topic display — shows what the AI picked and why
+    var topicDisplay = document.createElement('div');
+    topicDisplay.id = 'sparring-topic-display';
+    topicDisplay.style.cssText = 'margin-top:8px;padding:10px 14px;background:rgba(6,10,20,0.6);border-left:2px solid rgba(212,160,23,0.5);border-radius:6px;color:#e6edf3;font-family:Georgia,serif;font-size:13px;line-height:1.4;display:none;backdrop-filter:blur(4px);';
+    questionBar.appendChild(topicDisplay);
+
     container.appendChild(questionBar);
+
+    // AI "why" line — centered italic above the battle area
+    var whyLine = document.createElement('div');
+    whyLine.id = 'sparring-why-line';
+    whyLine.style.cssText = 'position:absolute;top:228px;left:12px;right:12px;text-align:center;font-family:Georgia,serif;font-size:11px;font-style:italic;color:#d4a017;z-index:3;pointer-events:none;display:none;text-shadow:0 0 8px rgba(212,160,23,0.4);';
+    container.appendChild(whyLine);
 
     // Response display panels (A and B) — positioned in upper half to not overlap combatants
     var responsePanelA = document.createElement('div');
