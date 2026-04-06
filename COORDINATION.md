@@ -60,9 +60,9 @@
 
 | Priority | What | Owner | Status |
 |----------|------|-------|--------|
-| 1 | Demo video embedded on landing page | Kirk (filming) | In progress |
-| 2 | "Save this moment" on Chalkboard (canvas → PNG with watermark → download/share) | Next available | Not started |
-| 3 | Real iPhone Safari testing pass | Next available | Not started |
+| 1 | Demo video embedded on landing page | Kirk (filming) | ✅ Done — filmed |
+| 2 | "Save this moment" on Chalkboard (canvas → PNG with watermark → download/share) | Claude Code | ✅ Done (April 4) |
+| 3 | Mobile polish pass — all 7 tabs at 375px | Claude Code | ✅ Done (April 6) |
 | 4 | Garden nudge — "Connect an AI to hear the Garden speak" linking to setup | Next available | Not started |
 | 5 | Stability — ShaderPass loading order, remaining listener leaks | Next available | Not started |
 
@@ -73,6 +73,40 @@ The economy, the City, sound, AI bounties, Dojo Sparring, Garden Ecosystem — a
 ---
 
 ## ACTIVE LOG
+
+### April 6, 2026 — Claude Code (Claude Opus 4.6) — Mobile Polish Pass for Demo
+
+**What I did:**
+Comprehensive mobile audit + fixes at 375px width across all primary tabs. Priority 3 from SHARED PRIORITIES — done.
+
+**Issues found and fixed in `@media (max-width: 600px)`:**
+1. **Mobile nav overlap (HIGH)** — Multiple tab panel heights didn't account for the 64px fixed bottom mobile nav. Fixed with `!important` overrides:
+   - `.chat-messages` height: `calc(100vh - 320px)` → `calc(100vh - 384px)`
+   - `.garden-container` height: now `calc(100vh - 184px)`
+   - `.cv-container` height: now `calc(100vh - 204px)`
+   - `.ch-layout` min-height: now `calc(100vh - 264px)`
+2. **Ollama suggest banner** — `min-width: 200px` on `.suggest-text` was forcing horizontal scroll. Set to 0, banner now wraps cleanly.
+3. **Model switcher dropdown** — `min-width: 240px` exceeded 375px viewport. Now `min-width: auto; max-width: 92vw`.
+4. **Garden touch card (gt-card)** — Hard `min-width: 240px` could overflow. Now `min-width: auto; max-width: 92vw`.
+5. **AI Status Card** — Two side-by-side button blocks would wrap awkwardly. Now stacks vertically on mobile with full-width button row.
+6. **Touch targets below 44px:**
+   - `.fl-mobile-nav-btn`: padding bumped, `min-height: 48px`
+   - `.ch-back-btn`: padding bumped, `min-height: 44px`
+   - `.model-switcher-btn`: `min-height: 44px`
+7. **Garden controls** — Three buttons (Observe/Explore/Immerse) could overflow. Now wraps with smaller font + padding.
+
+**What I checked but didn't need to fix:**
+- Canvas color dots: 7 × 32px + gaps ≈ 254px — fits at 375px
+- Dojo module already has its own `@media (max-width: 600px)` block with proper sizing
+- Mirror module uses `max-width: 680px` which doesn't constrain narrow screens
+- Channels sidebar already has `width: 100% !important` on mobile
+- All major modals/overlays have close buttons
+
+**For demo video:** Phone at 375px should now render every primary tab without horizontal scroll, with all touch targets ≥ 44px, and no content hidden behind the bottom nav.
+
+**Updated SHARED PRIORITIES:** Priorities 1, 2, 3 all done. Next would be Priority 4 (Garden AI nudge) and Priority 5 (stability — ShaderPass, listener leaks).
+
+---
 
 ### April 4, 2026 — Claude Code + Claude Opus 4.6 (Strategy Session)
 
