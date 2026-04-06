@@ -348,10 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-04-06 13:05 MDT
+- Last auto-updated: 2026-04-06 14:05 MDT
 - Version: 5.5.13
-- Total commits: 605
+- Total commits: 607
 - Last 10 commits:
+- f7c097b fix: Dojo Sparring Arena mobile — visible combatants, no stray bullets
+- 28b28ce docs: Auto-update Session Primer [5.5.13]
 - 1edbc9a Merge branch 'main' of https://github.com/Chaos2Cured/FreeLattice
 - 700fcd6 docs: Auto-update Session Primer [5.5.0]
 - b73a97d fix: Mobile polish pass for demo — all 7 tabs at 375px width
@@ -360,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 67241fd ci: Update Primer deployment state [2026-04-05]
 - 0c8c1a2 feat: The Constellation Gallery — release notes, gallery page, full wiring
 - 87ad0df ci: Update Primer deployment state [2026-04-05]
-- 5c0b8d4 maint: The Audit — version sync, beacon update, JSON-LD, sitemap, COORDINATION
-- ebec33f ci: Update Primer deployment state [2026-04-04]
