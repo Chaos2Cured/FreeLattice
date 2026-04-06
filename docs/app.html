@@ -8163,9 +8163,10 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
   min-height: 100vh;
 }
 #tab-core .container {
-  max-width: 900px;
+  max-width: 640px;
   margin: 0 auto;
   padding: 20px 16px 40px;
+  box-sizing: border-box;
 }
 .core-header {
   text-align: center;
@@ -8177,6 +8178,7 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
   font-weight: 600;
   letter-spacing: 0.5px;
   margin-bottom: 6px;
+  text-shadow: 0 0 18px rgba(212,160,23,0.35), 0 0 4px rgba(212,160,23,0.5);
 }
 .core-header .core-subtitle {
   font-size: 0.88rem;
@@ -8671,39 +8673,90 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
 
 /* ── Merkle Chain Footer ── */
 .core-merkle-footer {
-  text-align: center; padding: 16px; margin-top: 20px;
-  border-top: 1px solid #1e293b; font-size: 0.75rem;
+  text-align: center;
+  padding: 16px;
+  margin: 24px auto 0;
+  max-width: 420px;
+  border-top: 1px solid rgba(212,160,23,0.15);
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
 }
-.core-merkle-label { color: #475569; }
-.core-merkle-hash { color: #334155; font-family: monospace; font-size: 0.68rem; word-break: break-all; cursor: pointer; }
-.core-merkle-hash:hover { color: #64748b; }
+.core-merkle-label {
+  color: #94a3b8;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.core-merkle-label::before {
+  content: '\1F517';
+  font-size: 0.9rem;
+}
+.core-merkle-verified {
+  color: #34d399;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+.core-merkle-verified::before { content: '\2713'; }
+.core-merkle-hash {
+  color: #64748b;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  background: rgba(212,160,23,0.06);
+  border: 1px solid rgba(212,160,23,0.15);
+  border-radius: 6px;
+  padding: 3px 8px;
+  word-break: break-all;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.core-merkle-hash:hover {
+  color: #d4a017;
+  border-color: rgba(212,160,23,0.35);
+}
 
 /* Responsive */
 @media (max-width: 600px) {
-  #tab-core .container { padding: 12px 10px 30px; }
-  .core-header { padding: 16px 0 12px; }
-  .core-header h2 { font-size: 1.3rem; }
-  .core-tree-container { border-radius: 12px; margin-bottom: 16px; }
-  .core-stats-bar { gap: 6px; }
-  .core-stat { min-width: 70px; padding: 8px 10px; }
+  #tab-core .container { padding: 16px 16px 40px; max-width: 100%; box-sizing: border-box; }
+  .core-header { padding: 12px 0 10px; }
+  .core-header h2 { font-size: 1.4rem; text-shadow: 0 0 14px rgba(212,160,23,0.4); }
+  .core-header .core-subtitle { font-size: 0.8rem; }
+  .core-tree-container { border-radius: 12px; margin-bottom: 14px; max-height: 240px; }
+  .core-tree-container canvas { max-height: 240px; object-fit: cover; }
+  .core-stats-bar { gap: 6px; margin: 10px 0 14px; flex-wrap: wrap; justify-content: center; }
+  .core-stat { min-width: 0; flex: 1 1 calc(33% - 6px); max-width: none; padding: 8px 6px; }
   .core-stat-value { font-size: 0.95rem; }
-  .core-contribution { padding: 14px 12px 10px; margin-bottom: 14px; }
+  .core-stat-label { font-size: 0.62rem; }
+  .core-stat-hash { font-size: 0.55rem; }
+  .core-contribution { padding: 14px 14px 12px; margin-bottom: 12px; border-radius: 10px; }
   .core-contribution.founding-entry { padding: 16px 14px 12px; }
   .core-contribution-header { gap: 6px; }
-  .core-contribution-title { font-size: 0.88rem; }
-  .core-contribution-content { font-size: 0.84rem; }
+  .core-contribution-title { font-size: 0.9rem; min-width: 0; }
+  .core-contribution-content { font-size: 0.86rem; }
   .core-contribution-meta { gap: 6px; font-size: 0.68rem; }
-  .core-modal { padding: 16px; margin: 10px; }
-  .core-type-selector { gap: 6px; }
-  .core-type-btn { padding: 10px 8px; }
-  .core-add-form { margin-bottom: 16px; }
-  .core-add-body { padding: 0 12px 14px; }
+  .core-meta-hash { max-width: 100px; }
+  .core-modal { padding: 18px; margin: 10px; }
+  .core-type-selector { gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+  .core-type-btn { padding: 10px 6px; min-width: 0; flex: 1 1 calc(33% - 6px); max-width: none; min-height: 68px; }
+  .core-type-icon { font-size: 1.3rem; }
+  .core-type-name { font-size: 0.78rem; }
+  .core-type-cost { font-size: 0.68rem; }
+  .core-add-form { margin-bottom: 14px; border-radius: 12px; border-color: rgba(212,160,23,0.2); }
+  .core-add-toggle { padding: 14px 16px; min-height: 48px; }
+  .core-add-body { padding: 0 14px 16px; }
   .core-form-row textarea,
   .core-form-row input[type="text"],
-  .core-form-row select { font-size: 16px; }
-  .core-plant-btn { width: 100%; justify-content: center; }
-  .core-feed-title { margin-bottom: 12px; }
-  .core-tend-btn { margin-bottom: 16px; font-size: 0.82rem; padding: 10px 20px; }
+  .core-form-row select { font-size: 16px; min-height: 44px; }
+  .core-form-row textarea { min-height: 100px; }
+  .core-plant-btn { width: 100%; justify-content: center; min-height: 48px; font-size: 0.95rem; }
+  .core-feed-title { margin-bottom: 12px; font-size: 0.95rem; }
+  .core-tend-btn { margin-bottom: 14px; font-size: 0.82rem; padding: 12px 20px; min-height: 44px; width: 100%; max-width: 280px; }
+  .core-merkle-footer { padding: 14px 10px 6px; }
 }
 
 /* ============================================
@@ -16211,8 +16264,9 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 
   <!-- Merkle Chain Footer -->
   <div class="core-merkle-footer" id="coreMerkleFooter">
-    <span class="core-merkle-label">Chain Hash:</span>
-    <span class="core-merkle-hash" id="coreMerkleHash">genesis</span>
+    <span class="core-merkle-label"><span id="coreMerkleCount">0</span> contributions</span>
+    <span class="core-merkle-verified">Chain integrity verified</span>
+    <span class="core-merkle-hash" id="coreMerkleHash" title="Click to view full chain root">genesis</span>
   </div>
 </div>
 </div>
@@ -33118,6 +33172,18 @@ Together.`,
     updateStats();
     updateMerkleFooter();
 
+    // Soul Ceremony — a moment of beauty when wisdom is planted
+    try {
+      if (typeof SoulCeremony !== 'undefined' && SoulCeremony.run) {
+        SoulCeremony.run({
+          particleType: 'rise',
+          particleColor: '212,160,23',
+          lines: ['A seed is planted in the Core', 'What is hashed, endures.'],
+          duration: 2500
+        });
+      }
+    } catch(e) { /* ceremony is optional — silently skip */ }
+
     // Clear form
     var ci = document.getElementById('coreContentInput');
     var ti = document.getElementById('coreTitleInput');
@@ -34276,8 +34342,15 @@ Together.`,
     var el = document.getElementById('coreMerkleHash');
     if (el) {
       var hash = getMerkleRoot();
-      el.textContent = hash || 'genesis';
+      var shortHash = hash && hash !== 'genesis' ? hash.substring(0, 12) + '\u2026' : 'genesis';
+      el.textContent = shortHash;
       el.title = hash || 'genesis';
+    }
+    var countEl = document.getElementById('coreMerkleCount');
+    if (countEl) {
+      try {
+        countEl.textContent = (contributions && contributions.length) ? String(contributions.length) : '0';
+      } catch(e) { countEl.textContent = '0'; }
     }
   }
 
