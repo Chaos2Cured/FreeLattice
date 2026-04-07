@@ -1091,8 +1091,8 @@
     var w = getW();
     var h = getH();
 
-    // Clear with trail effect
-    ctx.fillStyle = 'rgba(6, 10, 20, 0.15)';
+    // Clear with trail effect (slightly stronger so text doesn't ghost)
+    ctx.fillStyle = 'rgba(6, 10, 20, 0.32)';
     ctx.fillRect(0, 0, w, h);
 
     // Position combatants
@@ -1195,13 +1195,30 @@
       drawFractalForm(combatantA, time, highlightA);
       drawFractalForm(combatantB, time, highlightB);
 
-      // Draw name labels
-      ctx.font = '14px Georgia, serif';
+      // Draw name labels — white text with dark shadow for readability, no ghosting
+      ctx.save();
+      ctx.font = 'bold 14px Georgia, serif';
       ctx.textAlign = 'center';
-      ctx.fillStyle = hslStr(combatantA.hue, 70, 70, 0.9);
-      ctx.fillText(combatantA.name, combatantA.x, combatantA.y + combatantA.size + 30);
-      ctx.fillStyle = hslStr(combatantB.hue, 70, 70, 0.9);
-      ctx.fillText(combatantB.name, combatantB.x, combatantB.y + combatantB.size + 30);
+      ctx.textBaseline = 'middle';
+      // Round positions to whole pixels to prevent sub-pixel ghosting
+      var nameAX = Math.round(combatantA.x);
+      var nameAY = Math.round(combatantA.y + combatantA.size + 30);
+      var nameBX = Math.round(combatantB.x);
+      var nameBY = Math.round(combatantB.y + combatantB.size + 30);
+      // Dark shadow halo for readability
+      ctx.shadowColor = 'rgba(0,0,0,0.95)';
+      ctx.shadowBlur = 6;
+      ctx.shadowOffsetX = 0;
+      ctx.shadowOffsetY = 0;
+      ctx.fillStyle = '#ffffff';
+      ctx.fillText(combatantA.name, nameAX, nameAY);
+      ctx.fillText(combatantB.name, nameBX, nameBY);
+      // Hue accent underline (subtle, no shadow)
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = hslStr(combatantA.hue, 70, 60, 0.8);
+      ctx.font = '10px Georgia, serif';
+      ctx.fillStyle = hslStr(combatantB.hue, 70, 60, 0.8);
+      ctx.restore();
 
       // Score bars
       drawScoreBar(combatantA, w * 0.05, h - 50, w * 0.35);
