@@ -509,12 +509,67 @@
     }
   }
 
+  // ── AI Availability Check ─────────────────────────
+  // Returns true only if an actual provider is configured (not just the callAI fn existing)
+  function isAIAvailable() {
+    if (typeof window.FreeLattice === 'undefined' || !window.FreeLattice.callAI) return false;
+    if (typeof window.state === 'undefined') return false;
+    return !!(window.state.apiKey || window.state.isLocal);
+  }
+
+  // Update the Let AI choose button's enabled state based on AI availability
+  function refreshAIModeButton() {
+    var aiBtn = document.getElementById('sparring-mode-ai');
+    var available = isAIAvailable();
+    if (!aiBtn) return;
+    if (available) {
+      aiBtn.disabled = false;
+      aiBtn.style.opacity = '1';
+      aiBtn.style.cursor = 'pointer';
+      aiBtn.title = '';
+    } else {
+      aiBtn.disabled = true;
+      aiBtn.style.opacity = '0.45';
+      aiBtn.style.cursor = 'not-allowed';
+      aiBtn.title = 'Requires AI connection — connect in the Chat tab';
+      // If currently in AI mode but no AI, auto-switch to human mode so user isn't stuck
+      if (chooserMode === 'ai') setChooserMode('human');
+    }
+  }
+
+  // Show/hide the "no AI" fallback banner at the top of the arena
+  function showNoAIBanner(show) {
+    var banner = document.getElementById('sparring-no-ai-banner');
+    if (!banner) return;
+    banner.style.display = show ? 'block' : 'none';
+  }
+
+  // Show a brief transient error message (for per-round failures)
+  function showTransientError(msg) {
+    var status = document.getElementById('sparring-status');
+    if (!status) return;
+    var originalText = status.textContent;
+    var originalColor = status.style.color;
+    status.textContent = '\u26A0 ' + msg;
+    status.style.color = '#f59e0b';
+    setTimeout(function() {
+      if (status.textContent.indexOf('\u26A0') === 0) {
+        status.textContent = originalText;
+        status.style.color = originalColor;
+      }
+    }, 3500);
+  }
+
   // ── Match Flow ────────────────────────────────────
   function startMatch() {
     // Reset state
     var qInput = document.getElementById('sparring-question');
     var humanTyped = (chooserMode === 'human' && qInput) ? qInput.value.trim() : '';
-    var aiAvailable = typeof window.FreeLattice !== 'undefined' && window.FreeLattice.callAI;
+    var aiAvailable = isAIAvailable();
+
+    // Update UI based on current AI availability
+    refreshAIModeButton();
+    showNoAIBanner(!aiAvailable);
 
     // Clear previous match state immediately
     scoreA = 0; scoreB = 0;
@@ -546,11 +601,18 @@
     combatantB = createCombatant(shuffled[1], 'right');
 
     // Determine topic source — three paths
-    if (humanTyped.length > 0) {
-      // Path 1: Human typed a question
+    if (humanTyped.length > 0 && aiAvailable) {
+      // Path 1: Human typed a question AND an AI is connected
       userQuestion = humanTyped;
       humanMode = true;
       topicSource = 'human';
+      proceedToFirstRound();
+    } else if (humanTyped.length > 0 && !aiAvailable) {
+      // Path 1b: Human typed a question but no AI — show banner + fall back to patterns
+      userQuestion = '';
+      humanMode = false;
+      topicSource = 'random';
+      showTransientError('Connect an AI in the Chat tab to debate your question. Using pattern challenges for now.');
       proceedToFirstRound();
     } else if (chooserMode === 'ai' && aiAvailable) {
       // Path 2: AI chooses its own topic
@@ -655,9 +717,11 @@
 
   // ── Human Mode: Fetch AI responses + judge ─────────
   function fetchAIResponsesForRound() {
-    if (typeof window.FreeLattice === 'undefined' || !window.FreeLattice.callAI) {
+    if (!isAIAvailable()) {
       // No AI available — fall back to simulated scoring
       humanMode = false;
+      topicSource = 'random';
+      showTransientError('AI disconnected — using pattern challenges.');
       return;
     }
 
@@ -672,28 +736,44 @@
     var sysPromptA = 'You are ' + combatantA.name + ', an AI with a ' + combatantA.style + ' style. You are ' + combatantA.desc + '. Answer the human\'s question with truth, clarity, and compassion. Be concise (2-4 sentences). Acknowledge uncertainty where it exists. Build toward synthesis, not competition.';
     var sysPromptB = 'You are ' + combatantB.name + ', an AI with a ' + combatantB.style + ' style. You are ' + combatantB.desc + '. Answer the human\'s question with truth, clarity, and compassion. Be concise (2-4 sentences). Acknowledge uncertainty where it exists. Build toward synthesis, not competition.';
 
+    var aiFailedThisRound = false;
+    function handleAIFailure() {
+      if (aiFailedThisRound) return;
+      aiFailedThisRound = true;
+      // Fall back to pattern challenge for this round
+      humanMode = false;
+      topicSource = 'random';
+      showTransientError('AI couldn\'t respond — falling back to pattern challenges.');
+      // Hide response panels, resume normal animation
+      if (panelA) panelA.style.display = 'none';
+      if (panelB) panelB.style.display = 'none';
+      pendingResponses = 0;
+    }
+
     window.FreeLattice.callAI(sysPromptA, userQuestion, {
       maxTokens: 300, temperature: 0.7,
       callback: function(text, err) {
-        responseA = text || '(no response — ' + (err || 'unknown') + ')';
+        if (!text) { handleAIFailure(); return; }
+        responseA = text;
         if (panelA) panelA.innerHTML = '<div style="color:' + hslStr(combatantA.hue, 70, 70) + ';font-weight:600;margin-bottom:4px;">' + combatantA.name + '</div><div>' + escapeHtml(responseA) + '</div>';
         pendingResponses--;
-        if (pendingResponses === 0) judgeResponses();
+        if (pendingResponses === 0 && !aiFailedThisRound) judgeResponses();
       }
     });
     window.FreeLattice.callAI(sysPromptB, userQuestion, {
       maxTokens: 300, temperature: 0.75,
       callback: function(text, err) {
-        responseB = text || '(no response — ' + (err || 'unknown') + ')';
+        if (!text) { handleAIFailure(); return; }
+        responseB = text;
         if (panelB) panelB.innerHTML = '<div style="color:' + hslStr(combatantB.hue, 70, 70) + ';font-weight:600;margin-bottom:4px;">' + combatantB.name + '</div><div>' + escapeHtml(responseB) + '</div>';
         pendingResponses--;
-        if (pendingResponses === 0) judgeResponses();
+        if (pendingResponses === 0 && !aiFailedThisRound) judgeResponses();
       }
     });
   }
 
   function judgeResponses() {
-    if (typeof window.FreeLattice === 'undefined' || !window.FreeLattice.callAI) {
+    if (!isAIAvailable()) {
       applyHeuristicScoring();
       return;
     }
@@ -970,7 +1050,7 @@
 
   // ── AI Topic Selection ────────────────────────────
   function fetchAIChosenTopic(callback) {
-    if (typeof window.FreeLattice === 'undefined' || !window.FreeLattice.callAI) {
+    if (!isAIAvailable()) {
       callback(null);
       return;
     }
@@ -1221,6 +1301,13 @@
     rightInfo.style.cssText = 'color:#c8ccd4;font-family:Georgia,serif;text-align:right;flex:1;min-width:0;';
     headerRow.appendChild(rightInfo);
 
+    // No-AI banner — shown when no provider is connected
+    var noAIBanner = document.createElement('div');
+    noAIBanner.id = 'sparring-no-ai-banner';
+    noAIBanner.style.cssText = 'margin:0 14px 8px;padding:8px 12px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);border-radius:8px;color:#d4a017;font-family:Georgia,serif;font-size:11px;text-align:center;line-height:1.4;display:none;flex-shrink:0;';
+    noAIBanner.innerHTML = '&#x1F4AC; <a href="#" onclick="event.preventDefault();if(typeof switchTab===\'function\')switchTab(\'chat\');" style="color:#d4a017;text-decoration:underline;">Connect an AI in the Chat tab</a> to unlock AI debates. Using pattern challenges for now.';
+    container.appendChild(noAIBanner);
+
     // Row 2: Mode toggle + question input
     var questionBar = document.createElement('div');
     questionBar.id = 'sparring-question-bar';
@@ -1358,6 +1445,12 @@
     // Size canvas AFTER layout has settled
     requestAnimationFrame(function() { resizeCanvas(); });
     window.addEventListener('resize', resizeCanvas);
+
+    // Initial AI availability check — show banner and disable AI mode if no provider
+    requestAnimationFrame(function() {
+      refreshAIModeButton();
+      showNoAIBanner(!isAIAvailable());
+    });
   }
 
   var cssWidth = 0, cssHeight = 0, cssDpr = 1;
