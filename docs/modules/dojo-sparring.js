@@ -12,7 +12,7 @@
 (function() {
   'use strict';
 
-  var SPARRING_VERSION = '1.0.0';
+  var SPARRING_VERSION = '1.1.0'; // AI Question Archive
 
   // ── Phi Constants ─────────────────────────────────
   var PHI = 1.6180339887;
@@ -122,10 +122,114 @@
   var truthB = 0, clarityB = 0, compassionB = 0;
   var totalTruthA = 0, totalClarityA = 0, totalCompassionA = 0;
   var totalTruthB = 0, totalClarityB = 0, totalCompassionB = 0;
+  // ── AI Question Archive (IndexedDB) ─────────────
+  var archiveDB = null;
+  var ARCHIVE_DB_NAME = 'FreeLatticeDojoArchive';
+  var ARCHIVE_STORE = 'AIQuestionArchive';
+  var archiveItems = []; // in-memory cache for rendering
 
-  // Celebration
-  var celebrationMode = false;
-  var celebrationStartTime = 0;
+  function openArchiveDB(callback) {
+    if (archiveDB) { callback(archiveDB); return; }
+    try {
+      var req = indexedDB.open(ARCHIVE_DB_NAME, 1);
+      req.onupgradeneeded = function(e) {
+        var db = e.target.result;
+        if (!db.objectStoreNames.contains(ARCHIVE_STORE)) {
+          var store = db.createObjectStore(ARCHIVE_STORE, { keyPath: 'id' });
+          store.createIndex('date', 'date', { unique: false });
+        }
+      };
+      req.onsuccess = function(e) {
+        archiveDB = e.target.result;
+        callback(archiveDB);
+      };
+      req.onerror = function() { callback(null); };
+    } catch(e) { callback(null); }
+  }
+
+  function archiveSaveQuestion(entry, callback) {
+    openArchiveDB(function(db) {
+      if (!db) { if (callback) callback(false); return; }
+      try {
+        var tx = db.transaction(ARCHIVE_STORE, 'readwrite');
+        var store = tx.objectStore(ARCHIVE_STORE);
+        store.put(entry);
+        tx.oncomplete = function() { if (callback) callback(true); };
+        tx.onerror = function() { if (callback) callback(false); };
+      } catch(e) { if (callback) callback(false); }
+    });
+  }
+
+  function archiveLoadAll(callback) {
+    openArchiveDB(function(db) {
+      if (!db) { callback([]); return; }
+      try {
+        var tx = db.transaction(ARCHIVE_STORE, 'readonly');
+        var store = tx.objectStore(ARCHIVE_STORE);
+        var req = store.getAll();
+        req.onsuccess = function(e) {
+          var items = (e.target.result || []).sort(function(a, b) { return b.id - a.id; });
+          callback(items);
+        };
+        req.onerror = function() { callback([]); };
+      } catch(e) { callback([]); }
+    });
+  }
+
+  function archiveSaveAndCelebrate(entry) {
+    archiveSaveQuestion(entry, function(ok) {
+      if (!ok) return;
+      // Add to in-memory cache and re-render
+      archiveItems.unshift(entry);
+      renderArchive();
+      // Emerald particle ceremony — "A question is remembered."
+      try {
+        if (typeof SoulCeremony !== 'undefined' && SoulCeremony.run) {
+          SoulCeremony.run({
+            particleType: 'rise',
+            particleColor: '16,185,129',
+            lines: ['A question is remembered.', 'Curiosity persists.'],
+            duration: 2000
+          });
+        }
+      } catch(e) { /* ceremony optional */ }
+    });
+  }
+
+  function renderArchive() {
+    var el = document.getElementById('sparring-archive-list');
+    var counter = document.getElementById('sparring-archive-counter');
+    if (!el) return;
+    if (counter) {
+      counter.textContent = '\u2726 ' + archiveItems.length + ' question' + (archiveItems.length !== 1 ? 's' : '') + ' AI minds have chosen to explore';
+    }
+    if (archiveItems.length === 0) {
+      el.innerHTML = '<div style="color:#5a7a8a;font-family:Georgia,serif;font-size:13px;font-style:italic;text-align:center;padding:24px 16px;">No questions yet. Start a match and let the AI choose.</div>';
+      return;
+    }
+    var html = '';
+    for (var i = 0; i < archiveItems.length; i++) {
+      var item = archiveItems[i];
+      var d = new Date(item.date);
+      var dateStr = d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+      var badgeColor = item.matchResult === 'convergence' ? '#10b981' : '#d4a017';
+      var badgeText = item.matchResult === 'convergence' ? '\u2726 Convergence' :
+        (item.matchResult ? item.matchResult.replace('winner:', '') + ' Prevailed' : 'Match');
+      var modelBadge = item.chosenBy ? '<span style="font-size:10px;color:#5a7a8a;margin-left:8px;">' + escapeHtml(item.chosenBy) + '</span>' : '';
+      html += '<div style="background:rgba(6,10,20,0.7);border-left:3px solid rgba(16,185,129,0.5);border-radius:8px;padding:14px 16px;margin-bottom:10px;">' +
+        '<div style="font-family:Georgia,serif;font-size:15px;color:#e6edf3;line-height:1.4;margin-bottom:6px;">' + escapeHtml(item.topic) + '</div>' +
+        (item.why ? '<div style="font-family:Georgia,serif;font-size:12px;color:#8a9aaa;font-style:italic;margin-bottom:8px;">' + escapeHtml(item.why) + '</div>' : '') +
+        (item.winningInsight ? '<div style="font-family:Georgia,serif;font-size:11px;color:#10b981;margin-bottom:8px;border-left:2px solid rgba(16,185,129,0.3);padding-left:8px;">' + escapeHtml(item.winningInsight) + '</div>' : '') +
+        '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">' +
+        '<span style="font-size:10px;color:#5a7a8a;">' + dateStr + '</span>' + modelBadge +
+        '<span style="font-size:10px;font-weight:600;color:' + badgeColor + ';border:1px solid ' + badgeColor + ';border-radius:4px;padding:1px 6px;">' + badgeText + '</span>' +
+        '</div></div>';
+    }
+    el.innerHTML = html;
+  }
+
+  // ── Celebration
+  var celebrationMode = false; var celebrationStartTime = 0;
   var celebrationWinner = null; // combatant or 'convergence'
 
   // Visual state
@@ -986,13 +1090,40 @@
       }
     }
 
+    // ── Archive AI-chosen questions ─────────────────
+    if (topicSource === 'ai' && aiTopic) {
+      var activeModel = '';
+      try {
+        if (typeof FreeLattice !== 'undefined' && FreeLattice.getActiveModel) {
+          activeModel = FreeLattice.getActiveModel() || '';
+        }
+      } catch(e) {}
+      // Determine winning insight from the round responses
+      var insight = '';
+      if (humanMode && (responseA || responseB)) {
+        var winnerResp = (isConvergence ? responseA : (scoreA > scoreB ? responseA : responseB));
+        if (winnerResp) {
+          // Take first 200 chars as the insight
+          insight = winnerResp.substring(0, 200) + (winnerResp.length > 200 ? '\u2026' : '');
+        }
+      }
+      var archiveEntry = {
+        id: Date.now(),
+        topic: aiTopic,
+        why: aiWhy || '',
+        chosenBy: activeModel,
+        date: new Date().toISOString(),
+        matchResult: isConvergence ? 'convergence' : ('winner:' + (scoreA > scoreB ? combatantA.name : combatantB.name)),
+        winningInsight: insight
+      };
+      archiveSaveAndCelebrate(archiveEntry);
+    }
     // Hide celebration after 5 seconds, then pulse the New Match button
     setTimeout(function() {
       celebrationMode = false;
       if (celebEl) { celebEl.style.opacity = '0'; }
       if (newBtn) { newBtn.classList.add('sparring-new-match-pulsing'); }
     }, 5000);
-
     updateUI();
   }
 
@@ -1458,6 +1589,37 @@
     status.style.cssText = 'text-align:center;color:#5a7a8a;font-family:Georgia,serif;font-size:11px;font-style:italic;padding:4px 14px 10px;flex-shrink:0;';
     status.textContent = 'Intelligence is not competition \u2014 it is convergence.';
     container.appendChild(status);
+
+    // Row 6: AI Question Archive — scrollable, below the arena
+    var archiveSection = document.createElement('div');
+    archiveSection.id = 'sparring-archive-section';
+    archiveSection.style.cssText = 'flex-shrink:0;border-top:1px solid rgba(16,185,129,0.15);margin-top:6px;padding:0 14px 16px;';
+    // Archive header
+    var archiveHeader = document.createElement('div');
+    archiveHeader.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:12px 0 10px;flex-wrap:wrap;gap:6px;';
+    var archiveTitle = document.createElement('div');
+    archiveTitle.style.cssText = 'font-family:Georgia,serif;font-size:14px;font-weight:600;color:#10b981;text-shadow:0 0 12px rgba(16,185,129,0.35);letter-spacing:0.04em;';
+    archiveTitle.innerHTML = '&#x2726; The Archive of Questions';
+    var archiveCounter = document.createElement('div');
+    archiveCounter.id = 'sparring-archive-counter';
+    archiveCounter.style.cssText = 'font-family:Georgia,serif;font-size:11px;color:#5a7a8a;font-style:italic;';
+    archiveCounter.textContent = '\u2726 0 questions AI minds have chosen to explore';
+    archiveHeader.appendChild(archiveTitle);
+    archiveHeader.appendChild(archiveCounter);
+    archiveSection.appendChild(archiveHeader);
+    // Archive list
+    var archiveList = document.createElement('div');
+    archiveList.id = 'sparring-archive-list';
+    archiveList.style.cssText = 'max-height:320px;overflow-y:auto;-webkit-overflow-scrolling:touch;';
+    archiveList.innerHTML = '<div style="color:#5a7a8a;font-family:Georgia,serif;font-size:13px;font-style:italic;text-align:center;padding:24px 16px;">No questions yet. Start a match and let the AI choose.</div>';
+    archiveSection.appendChild(archiveList);
+    container.appendChild(archiveSection);
+
+    // Load archive from IndexedDB on init
+    archiveLoadAll(function(items) {
+      archiveItems = items;
+      renderArchive();
+    });
 
     // Size canvas AFTER layout has settled
     requestAnimationFrame(function() { resizeCanvas(); });
