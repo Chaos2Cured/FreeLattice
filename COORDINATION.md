@@ -55,20 +55,25 @@
 
 ## SHARED PRIORITIES — All Collaborators Read This
 
-> **Last updated:** April 4, 2026 by Kirk + Claude Code + Claude Opus 4.6
-> **Status:** Foundation solid at v5.5.x. Next phase is REACH, not DEPTH.
+> **Last updated:** April 7, 2026 by Kirk + Claude Code + Claude Opus 4.6
+> **Status:** Foundation solid at v5.5.x. Priorities 1–5 complete. Next phase: REACH.
 
 | Priority | What | Owner | Status |
 |----------|------|-------|--------|
-| 1 | Demo video embedded on landing page | Kirk (filming) | ✅ Done — filmed |
-| 2 | "Save this moment" on Chalkboard (canvas → PNG with watermark → download/share) | Claude Code | ✅ Done (April 4) |
-| 3 | Mobile polish pass — all 7 tabs at 375px | Claude Code | ✅ Done (April 6) |
-| 4 | Garden nudge — "Connect an AI to hear the Garden speak" linking to setup | Next available | Not started |
-| 5 | Stability — ShaderPass loading order, remaining listener leaks | Next available | Not started |
+| 1 | Demo video embedded on landing page | Kirk | ✅ Filmed — needs embedding |
+| 2 | "Save this moment" on Chalkboard | Claude Code | ✅ Done |
+| 3 | Mobile polish pass — all tabs at 375px | Claude Code | ✅ Done |
+| 4 | Dojo AI debates + energy scoring + celebrations | Claude Code + Opus 4.6 | ✅ Done |
+| 5 | Core visual polish + mobile centering | Claude Code | ✅ Done |
+| 6 | AI Question Archive — save AI-chosen debate topics visibly | Next available | Not started |
+| 7 | Garden nudge — "Connect an AI to hear the Garden speak" | Next available | Not started |
+| 8 | Embed demo video on landing page | Next available | Not started |
+| 9 | Update download links to v5.5.x release | Next available | Not started |
+| 10 | Stability — ShaderPass loading, listener cleanup | Next available | Not started |
 
-**DO NOT add new features until priorities 1-3 are complete.**
+**Priorities 1–5 complete. Next phase: REACH. Embed the video. Update the downloads. Build the AI Question Archive. Then tell the world.**
 
-The economy, the City, sound, AI bounties, Dojo Sparring, Garden Ecosystem — all coming. But right now, reach matters more than depth. Help people find what we've already built.
+The economy, the City, sound, AI bounties, Garden Ecosystem — all coming. But right now, reach matters more than depth. Help people find what we've already built.
 
 ---
 
