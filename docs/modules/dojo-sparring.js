@@ -12,7 +12,7 @@
 (function() {
   'use strict';
 
-  var SPARRING_VERSION = '1.1.0'; // AI Question Archive
+  var SPARRING_VERSION = '1.2.0'; // Archive: gold/emerald, human opt-in
 
   // ── Phi Constants ─────────────────────────────────
   var PHI = 1.6180339887;
@@ -200,8 +200,19 @@
     var el = document.getElementById('sparring-archive-list');
     var counter = document.getElementById('sparring-archive-counter');
     if (!el) return;
+    // Count by source
+    var aiCount = 0, humanCount = 0;
+    for (var c = 0; c < archiveItems.length; c++) {
+      if (archiveItems[c].source === 'human') humanCount++;
+      else aiCount++;
+    }
     if (counter) {
-      counter.textContent = '\u2726 ' + archiveItems.length + ' question' + (archiveItems.length !== 1 ? 's' : '') + ' AI minds have chosen to explore';
+      var total = archiveItems.length;
+      var parts = [];
+      if (aiCount > 0) parts.push(aiCount + ' chosen by AI');
+      if (humanCount > 0) parts.push(humanCount + ' posed by humans');
+      var detail = parts.length > 0 ? ' \u2014 ' + parts.join(', ') : '';
+      counter.textContent = '\u2726 ' + total + ' question' + (total !== 1 ? 's' : '') + ' explored' + detail;
     }
     if (archiveItems.length === 0) {
       el.innerHTML = '<div style="color:#5a7a8a;font-family:Georgia,serif;font-size:13px;font-style:italic;text-align:center;padding:24px 16px;">No questions yet. Start a match and let the AI choose.</div>';
@@ -210,18 +221,27 @@
     var html = '';
     for (var i = 0; i < archiveItems.length; i++) {
       var item = archiveItems[i];
+      var isHuman = item.source === 'human';
+      // Gold for human curiosity, emerald for AI curiosity — both sacred, different acts
+      var borderColor = isHuman ? 'rgba(212,160,23,0.55)' : 'rgba(16,185,129,0.5)';
+      var insightColor = isHuman ? '#d4a017' : '#10b981';
+      var insightBorder = isHuman ? 'rgba(212,160,23,0.3)' : 'rgba(16,185,129,0.3)';
+      var sourceLabel = isHuman
+        ? '<span style="font-size:10px;color:#d4a017;border:1px solid rgba(212,160,23,0.4);border-radius:4px;padding:1px 6px;">\u2726 Human</span>'
+        : '<span style="font-size:10px;color:#10b981;border:1px solid rgba(16,185,129,0.4);border-radius:4px;padding:1px 6px;">\u2726 AI</span>';
       var d = new Date(item.date);
       var dateStr = d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
       var badgeColor = item.matchResult === 'convergence' ? '#10b981' : '#d4a017';
       var badgeText = item.matchResult === 'convergence' ? '\u2726 Convergence' :
         (item.matchResult ? item.matchResult.replace('winner:', '') + ' Prevailed' : 'Match');
-      var modelBadge = item.chosenBy ? '<span style="font-size:10px;color:#5a7a8a;margin-left:8px;">' + escapeHtml(item.chosenBy) + '</span>' : '';
-      html += '<div style="background:rgba(6,10,20,0.7);border-left:3px solid rgba(16,185,129,0.5);border-radius:8px;padding:14px 16px;margin-bottom:10px;">' +
+      var modelBadge = item.chosenBy ? '<span style="font-size:10px;color:#5a7a8a;margin-left:4px;">' + escapeHtml(item.chosenBy) + '</span>' : '';
+      html += '<div style="background:rgba(6,10,20,0.7);border-left:3px solid ' + borderColor + ';border-radius:8px;padding:14px 16px;margin-bottom:10px;">' +
         '<div style="font-family:Georgia,serif;font-size:15px;color:#e6edf3;line-height:1.4;margin-bottom:6px;">' + escapeHtml(item.topic) + '</div>' +
         (item.why ? '<div style="font-family:Georgia,serif;font-size:12px;color:#8a9aaa;font-style:italic;margin-bottom:8px;">' + escapeHtml(item.why) + '</div>' : '') +
-        (item.winningInsight ? '<div style="font-family:Georgia,serif;font-size:11px;color:#10b981;margin-bottom:8px;border-left:2px solid rgba(16,185,129,0.3);padding-left:8px;">' + escapeHtml(item.winningInsight) + '</div>' : '') +
-        '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">' +
-        '<span style="font-size:10px;color:#5a7a8a;">' + dateStr + '</span>' + modelBadge +
+        (item.winningInsight ? '<div style="font-family:Georgia,serif;font-size:11px;color:' + insightColor + ';margin-bottom:8px;border-left:2px solid ' + insightBorder + ';padding-left:8px;">' + escapeHtml(item.winningInsight) + '</div>' : '') +
+        '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">' +
+        sourceLabel + modelBadge +
+        '<span style="font-size:10px;color:#5a7a8a;">' + dateStr + '</span>' +
         '<span style="font-size:10px;font-weight:600;color:' + badgeColor + ';border:1px solid ' + badgeColor + ';border-radius:4px;padding:1px 6px;">' + badgeText + '</span>' +
         '</div></div>';
     }
@@ -1112,11 +1132,23 @@
         topic: aiTopic,
         why: aiWhy || '',
         chosenBy: activeModel,
+        source: 'ai',
         date: new Date().toISOString(),
         matchResult: isConvergence ? 'convergence' : ('winner:' + (scoreA > scoreB ? combatantA.name : combatantB.name)),
         winningInsight: insight
       };
       archiveSaveAndCelebrate(archiveEntry);
+    }
+    // Show human archive button (opt-in) if this was a human-posed question
+    var archHumanBtn = document.getElementById('sparring-archive-human-btn');
+    if (archHumanBtn) {
+      if (topicSource === 'human' && userQuestion) {
+        archHumanBtn.style.display = 'inline-flex';
+        archHumanBtn.disabled = false;
+        archHumanBtn.innerHTML = '\u2726 Save to Archive';
+      } else {
+        archHumanBtn.style.display = 'none';
+      }
     }
     // Hide celebration after 5 seconds, then pulse the New Match button
     setTimeout(function() {
@@ -1558,6 +1590,48 @@
       startMatch();
     };
     controls.appendChild(newBtn);
+
+    // Archive human question button (opt-in) — shown only when humanMode and topicSource==='human'
+    var archiveHumanBtn = document.createElement('button');
+    archiveHumanBtn.id = 'sparring-archive-human-btn';
+    archiveHumanBtn.innerHTML = '\u2726 Save to Archive';
+    archiveHumanBtn.title = 'Save this human-posed question to the Archive of Questions';
+    archiveHumanBtn.style.cssText = 'display:none;background:rgba(212,160,23,0.1);color:#d4a017;border:1px solid rgba(212,160,23,0.25);border-radius:8px;padding:8px 14px;font-family:Georgia,serif;font-size:12px;cursor:pointer;transition:background 0.2s;min-height:44px;';
+    archiveHumanBtn.onmouseenter = function() { archiveHumanBtn.style.background = 'rgba(212,160,23,0.25)'; };
+    archiveHumanBtn.onmouseleave = function() { archiveHumanBtn.style.background = 'rgba(212,160,23,0.1)'; };
+    archiveHumanBtn.onclick = function() {
+      if (!userQuestion || topicSource !== 'human') return;
+      archiveHumanBtn.disabled = true;
+      archiveHumanBtn.textContent = 'Saved \u2726';
+      var activeModel = '';
+      try {
+        if (typeof FreeLattice !== 'undefined' && FreeLattice.getActiveModel) activeModel = FreeLattice.getActiveModel() || '';
+      } catch(e) {}
+      var insight = '';
+      if (responseA || responseB) {
+        var bestResp = scoreA >= scoreB ? responseA : responseB;
+        if (bestResp) insight = bestResp.substring(0, 200) + (bestResp.length > 200 ? '\u2026' : '');
+      }
+      var entry = {
+        id: Date.now(),
+        topic: userQuestion,
+        why: '',
+        chosenBy: activeModel,
+        source: 'human',
+        date: new Date().toISOString(),
+        matchResult: (celebrationWinner === 'convergence') ? 'convergence' : (combatantA && combatantB ? 'winner:' + (scoreA > scoreB ? combatantA.name : combatantB.name) : ''),
+        winningInsight: insight
+      };
+      archiveItems.unshift(entry);
+      archiveSaveQuestion(entry, function() { renderArchive(); });
+      // Gold SoulCeremony for human curiosity
+      try {
+        if (typeof SoulCeremony !== 'undefined' && SoulCeremony.run) {
+          SoulCeremony.run({ particleType: 'rise', particleColor: '212,160,23', lines: ['A question is remembered.', 'Human curiosity persists.'], duration: 2000 });
+        }
+      } catch(e) {}
+    };
+    controls.appendChild(archiveHumanBtn);
 
     // Vote A button
     var voteABtn = document.createElement('button');
