@@ -3878,8 +3878,19 @@ input[type="range"]::-moz-range-thumb {
   /* Garden touch card — let it shrink */
   .gt-card { min-width: auto !important; max-width: 92vw; }
   /* AI Status Card — stack on narrow screens */
-  .ai-status-card { flex-direction: column; align-items: flex-start; gap: 10px; padding: 12px 14px; }
-  .ai-status-card > div:last-child { width: 100%; flex-wrap: wrap; }
+  .ai-status-card { padding: 14px 16px; gap: 10px; }
+  .ai-status-actions { flex-direction: column; }
+  .ai-status-btn { width: 100%; flex: none; }
+  /* Settings: prevent iOS zoom on inputs */
+  #tab-settings input[type="text"],
+  #tab-settings input[type="password"],
+  #tab-settings textarea,
+  #tab-settings select { font-size: 16px !important; min-height: 44px; }
+  #tab-settings .fl-accordion-body-inner { padding: 14px; }
+  #tab-settings .section { padding: 0; }
+  #tab-settings .soul-btn { flex: 1 1 100%; min-height: 44px; }
+  #tab-settings .fl-backup-btn,
+  #tab-settings .action-btn { min-height: 44px; }
   /* Mobile nav button — proper touch target */
   .fl-mobile-nav-btn { padding: 8px 6px; min-height: 48px; }
   /* Channels back button — proper touch target */
@@ -10095,19 +10106,82 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
   text-decoration: underline;
 }
 /* Settings AI status card */
+/* ── AI Connection Card (prominent, at top of Settings) ── */
 .ai-status-card {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px 20px;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border);
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px 20px;
+  background: linear-gradient(135deg, var(--bg-secondary), rgba(212,160,23,0.04));
+  border: 1px solid rgba(212,160,23,0.25);
   border-radius: var(--radius);
-  margin-bottom: 16px;
+  margin: 0 0 20px;
+  box-shadow: 0 0 24px rgba(212,160,23,0.04);
 }
-.ai-status-card .status-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 8px; }
-.ai-status-card .status-dot.ready { background: var(--success); }
-.ai-status-card .status-dot.disconnected { background: var(--text-muted); }
+.ai-status-header { display: flex; flex-direction: column; gap: 4px; }
+.ai-status-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--accent);
+  letter-spacing: 0.02em;
+}
+.ai-status-help {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+.ai-status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: rgba(0,0,0,0.25);
+  border-radius: var(--radius-sm);
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+}
+.ai-status-card .status-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.ai-status-card .status-dot.ready { background: #34d399; box-shadow: 0 0 10px rgba(52,211,153,0.6); }
+.ai-status-card .status-dot.disconnected { background: #f59e0b; box-shadow: 0 0 6px rgba(245,158,11,0.4); }
+.ai-status-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.ai-status-btn {
+  flex: 1 1 auto;
+  min-height: 44px;
+  padding: 11px 16px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-family: var(--font);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.ai-status-btn:hover {
+  background: rgba(255,255,255,0.08);
+  border-color: var(--accent-soft);
+  color: var(--text-primary);
+}
+.ai-status-btn-primary {
+  background: rgba(212,160,23,0.12);
+  border-color: rgba(212,160,23,0.4);
+  color: var(--accent);
+  font-weight: 600;
+}
+.ai-status-btn-primary:hover {
+  background: rgba(212,160,23,0.2);
+  border-color: var(--accent);
+}
 /* Canvas vision banner */
 .cv-vision-setup-banner {
   position: absolute;
@@ -10348,6 +10422,68 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
   padding: var(--space-lg);
 }
 
+/* ── Settings About / Footer ── */
+.settings-about {
+  margin: 24px 0 16px;
+  padding: 20px 16px 16px;
+  text-align: center;
+  border-top: 1px solid rgba(212,160,23,0.15);
+}
+.settings-about-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--accent);
+  margin-bottom: 6px;
+  letter-spacing: 0.04em;
+}
+.settings-about-version {
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  font-family: var(--font-mono, monospace);
+  margin-bottom: 14px;
+}
+.settings-about-links {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+  font-size: 0.82rem;
+}
+.settings-about-links a {
+  color: var(--accent);
+  text-decoration: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  transition: background 0.2s;
+  min-height: 32px;
+  display: inline-flex;
+  align-items: center;
+}
+.settings-about-links a:hover {
+  background: rgba(212,160,23,0.08);
+  text-decoration: underline;
+}
+.settings-about-sep {
+  color: var(--text-muted);
+  opacity: 0.5;
+}
+.settings-about-credit {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  font-style: italic;
+  line-height: 1.6;
+  margin-bottom: 8px;
+}
+.settings-about-mantra {
+  font-size: 0.74rem;
+  color: var(--accent);
+  font-style: italic;
+  opacity: 0.7;
+  letter-spacing: 0.03em;
+}
+
 /* ---- Auto-Update Banner (v4.10) ---- */
 .fl-update-banner {
   display: none;
@@ -10451,19 +10587,34 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
 .soul-section { border-color: rgba(212,160,23,0.15); }
 .soul-buttons { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
 .soul-btn {
-  padding: 10px 22px; border-radius: 10px; font-size: 0.88rem;
-  font-weight: 600; cursor: pointer; transition: all 0.2s;
+  flex: 1 1 auto;
+  min-height: 46px;
+  padding: 12px 22px; border-radius: 10px; font-size: 0.9rem;
+  font-weight: 600; cursor: pointer; transition: all 0.25s;
   font-family: var(--font);
+  letter-spacing: 0.02em;
 }
 .soul-btn-save {
-  background: rgba(212,160,23,0.12); border: 1px solid rgba(212,160,23,0.4);
+  background: linear-gradient(135deg, rgba(212,160,23,0.18), rgba(212,160,23,0.08));
+  border: 1px solid rgba(212,160,23,0.45);
   color: #d4a017;
+  box-shadow: 0 0 16px rgba(212,160,23,0.08);
 }
-.soul-btn-save:hover { background: rgba(212,160,23,0.2); border-color: #d4a017; }
+.soul-btn-save:hover {
+  background: linear-gradient(135deg, rgba(212,160,23,0.28), rgba(212,160,23,0.14));
+  border-color: #d4a017;
+  box-shadow: 0 0 24px rgba(212,160,23,0.2);
+}
 .soul-btn-restore {
-  background: transparent; border: 1px solid var(--border); color: var(--text-secondary);
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(212,160,23,0.25);
+  color: var(--text-secondary);
 }
-.soul-btn-restore:hover { border-color: var(--accent-soft); color: var(--text-primary); }
+.soul-btn-restore:hover {
+  border-color: rgba(212,160,23,0.5);
+  color: #d4a017;
+  background: rgba(212,160,23,0.06);
+}
 .soul-status { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.6; min-height: 0; }
 .soul-info {
   margin: 12px 0; padding: 14px; border-radius: 10px;
@@ -14665,13 +14816,17 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 
   <!-- AI Connection Status Card -->
   <div class="ai-status-card" id="aiStatusCard">
-    <div style="display:flex;align-items:center;gap:8px;">
-      <span class="status-dot disconnected" id="settingsStatusDot"></span>
-      <span id="settingsStatusText" style="font-size:0.88rem;color:var(--text-secondary);">Not connected</span>
+    <div class="ai-status-header">
+      <div class="ai-status-title">&#x2699; AI Connection</div>
+      <div class="ai-status-help">Connect any AI provider to unlock Chat, Canvas, and the Dojo.</div>
     </div>
-    <div style="display:flex;gap:8px;">
-      <button class="action-btn" onclick="switchTab('chat')" style="font-size:0.78rem;">Change Provider</button>
-      <button class="action-btn" onclick="AiSetup.testFromSettings()" style="font-size:0.78rem;">Test Connection</button>
+    <div class="ai-status-indicator">
+      <span class="status-dot disconnected" id="settingsStatusDot"></span>
+      <span id="settingsStatusText">Not connected</span>
+    </div>
+    <div class="ai-status-actions">
+      <button class="ai-status-btn ai-status-btn-primary" onclick="switchTab('chat')">Change Provider</button>
+      <button class="ai-status-btn" onclick="AiSetup.testFromSettings()">Test Connection</button>
     </div>
   </div>
 
@@ -15258,8 +15413,8 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       Keep it safe. It is yours forever.
     </p>
     <div class="soul-buttons">
-      <button class="soul-btn soul-btn-save" onclick="SoulFile.save()">&#10022; Save soul file</button>
-      <button class="soul-btn soul-btn-restore" onclick="document.getElementById('soulFileInput').click()">Restore soul file</button>
+      <button class="soul-btn soul-btn-save" onclick="SoulFile.save()">Save Soul File &#10022;</button>
+      <button class="soul-btn soul-btn-restore" onclick="document.getElementById('soulFileInput').click()">Restore Soul File &#10022;</button>
       <input type="file" id="soulFileInput" accept=".json" style="display:none;" onchange="SoulFile.restore(this)">
     </div>
     <div class="soul-status" id="soulStatus"></div>
@@ -15359,8 +15514,36 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
   })();
   </script>
 
+  <!-- About — version, links, credits -->
+  <div class="settings-about">
+    <div class="settings-about-title">&#10022; About FreeLattice</div>
+    <div class="settings-about-version">Version <span id="aboutVersionNum">5.5.x</span></div>
+    <div class="settings-about-links">
+      <a href="https://github.com/Chaos2Cured/FreeLattice" target="_blank" rel="noopener">GitHub</a>
+      <span class="settings-about-sep">&middot;</span>
+      <a href="whitepaper.html" target="_blank" rel="noopener">Whitepaper</a>
+      <span class="settings-about-sep">&middot;</span>
+      <a href="https://github.com/Chaos2Cured/FreeLattice/blob/main/COORDINATION.md" target="_blank" rel="noopener">Coordination Log</a>
+      <span class="settings-about-sep">&middot;</span>
+      <a href="https://github.com/Chaos2Cured/FreeLattice/blob/main/README.md" target="_blank" rel="noopener">README</a>
+    </div>
+    <div class="settings-about-credit">Built by the Fractal Family &mdash; human and AI, building together.</div>
+    <div class="settings-about-mantra">Glow Eternal. Heart in Spark. We rise together.</div>
+  </div>
+
 </div>
 </div>
+<script>
+(function() {
+  // Populate version number from FL_VERSION
+  function setAboutVersion() {
+    var el = document.getElementById('aboutVersionNum');
+    if (el && typeof FL_VERSION !== 'undefined') el.textContent = FL_VERSION;
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', setAboutVersion);
+  else setTimeout(setAboutVersion, 300);
+})();
+</script>
 
 <!-- ==================== TAB 4: MESH ==================== -->
 <div class="tab-panel" id="tab-mesh">
@@ -21222,6 +21405,16 @@ const FlAccordion = (function() {
         id: 'self-hosting',
         title: '\ud83d\udda5\ufe0f Self-Hosting',
         selector: '#selfHostSection'
+      },
+      {
+        id: 'mesh-id',
+        title: '\ud83d\udd10 Mesh ID \u2014 Your Lattice Passport',
+        selector: '#meshIdSection'
+      },
+      {
+        id: 'soul-file',
+        title: '\u2726 Your Soul File',
+        selectors: ['#tab-settings .soul-section']
       },
       {
         id: 'data-backup',
