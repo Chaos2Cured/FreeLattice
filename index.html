@@ -11571,6 +11571,89 @@ body.fl-immersive-active {
   line-height: 1.5;
 }
 /* Loading state */
+/* Garden AI connection nudge — soft floating invitation */
+.garden-nudge {
+  position: absolute;
+  bottom: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px 10px 18px;
+  background: rgba(10,14,26,0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(212,160,23,0.35);
+  border-radius: 100px;
+  color: #d4a017;
+  font-family: Georgia, serif;
+  font-size: 0.88rem;
+  z-index: 60;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4), 0 0 24px rgba(212,160,23,0.08);
+  opacity: 0;
+  animation: garden-nudge-in 800ms ease 2s forwards;
+  max-width: calc(100% - 32px);
+  pointer-events: auto;
+}
+@keyframes garden-nudge-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(12px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+.garden-nudge-text {
+  flex: 1 1 auto;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.garden-nudge-btn {
+  flex-shrink: 0;
+  padding: 7px 14px;
+  background: rgba(212,160,23,0.18);
+  border: 1px solid rgba(212,160,23,0.5);
+  border-radius: 100px;
+  color: #d4a017;
+  font-family: Georgia, serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-height: 36px;
+}
+.garden-nudge-btn:hover {
+  background: rgba(212,160,23,0.3);
+  border-color: #d4a017;
+}
+.garden-nudge-dismiss {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  color: rgba(212,160,23,0.55);
+  font-size: 0.88rem;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: color 0.2s, background 0.2s;
+}
+.garden-nudge-dismiss:hover {
+  color: #d4a017;
+  background: rgba(212,160,23,0.12);
+}
+@media (max-width: 600px) {
+  .garden-nudge {
+    bottom: 14px;
+    padding: 8px 10px 8px 14px;
+    font-size: 0.78rem;
+    gap: 6px;
+  }
+  .garden-nudge-text { font-size: 0.78rem; }
+  .garden-nudge-btn { padding: 6px 12px; font-size: 0.75rem; min-height: 34px; }
+  .garden-nudge-dismiss { width: 26px; height: 26px; }
+}
+
 .garden-loading {
   position: absolute;
   inset: 0;
@@ -16512,6 +16595,12 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     <div class="garden-loading" id="gardenLoading">
       <div class="garden-loading-spinner"></div>
       <div class="garden-loading-text">Awakening the Garden&hellip;</div>
+    </div>
+    <!-- Gentle AI connection nudge — shown only if no provider configured, dismissible -->
+    <div class="garden-nudge" id="gardenNudge" style="display:none;">
+      <span class="garden-nudge-text">&#x2728; Connect an AI to hear the Garden speak</span>
+      <button class="garden-nudge-btn" onclick="switchTab('settings')">Set up AI &rarr;</button>
+      <button class="garden-nudge-dismiss" onclick="(function(b){b.parentElement.style.opacity=0;setTimeout(function(){b.parentElement.style.display='none';},400);try{localStorage.setItem('fl-garden-nudge-dismissed','true');}catch(e){}})(this)" title="Dismiss">&#x2715;</button>
     </div>
   </div>
 </div>
@@ -36716,7 +36805,34 @@ if (window.FL_LOW_MEMORY && window.FL_MOBILE) window.FL_GARDEN_PARTICLE_SCALE = 
     } else if (data.tabId !== 'garden' && gardenInitialized && window.FractalGarden) {
       window.FractalGarden.pause();
     }
+    // Update the Garden AI connection nudge visibility
+    if (data.tabId === 'garden') {
+      updateGardenNudge();
+    }
   });
+
+  // Show the Garden nudge only if no AI provider is configured AND not dismissed
+  function updateGardenNudge() {
+    var nudge = document.getElementById('gardenNudge');
+    if (!nudge) return;
+    var dismissed = false;
+    try { dismissed = localStorage.getItem('fl-garden-nudge-dismissed') === 'true'; } catch(e) {}
+    var connected = false;
+    try {
+      if (typeof window.state !== 'undefined') {
+        connected = !!(window.state.apiKey || window.state.isLocal);
+      }
+    } catch(e) {}
+    if (!dismissed && !connected) {
+      nudge.style.display = 'flex';
+      // Re-trigger the fade-in animation each time the tab reopens
+      nudge.style.animation = 'none';
+      void nudge.offsetWidth; // force reflow
+      nudge.style.animation = '';
+    } else {
+      nudge.style.display = 'none';
+    }
+  }
 
   // Safety net: if Garden panel is already active on page load, start loading immediately
   // This handles the case where switchTab('garden') fired before this listener registered,
@@ -36728,6 +36844,8 @@ if (window.FL_LOW_MEMORY && window.FL_MOBILE) window.FL_GARDEN_PARTICLE_SCALE = 
         console.log('FL-GARDEN: Panel already active on load — loading module directly');
         loadGarden();
       }
+      // Show the AI connection nudge if needed
+      updateGardenNudge();
     }, 100);
   });
 })();
