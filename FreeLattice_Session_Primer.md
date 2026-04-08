@@ -350,10 +350,9 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 ## PRIMER HEALTH
 - Last auto-updated: 2026-04-08 12:39 MDT
 - Version: 5.5.37
-- Total commits: 703
+- Total commits: 702
 - Last 10 commits:
-- cc3fb10 fix(garden): cache-bust module + granular branch logging (v5.5.37)
-- bbc2ee9 ci: Update Primer deployment state [2026-04-08]
+- 2499bba fix(garden): cache-bust module + granular branch logging (v5.5.37)
 - ad42018 docs: Auto-update Session Primer [5.5.36]
 - 33189f3 docs: Auto-update Session Primer [5.5.36]
 - 946e506 fix(CRITICAL): window.state = state — const doesn't auto-attach to window (v5.5.36)
@@ -362,3 +361,4 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 4541a32 docs: Auto-update Session Primer [5.5.35]
 - 74747f2 fix(garden-dialogue): delegate to FreeLattice.callAI (v5.5.35)
 - 2d92efa ci: Update Primer deployment state [2026-04-08]
+- 6610609 docs: Auto-update Session Primer [5.5.34]
