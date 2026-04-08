@@ -15614,7 +15614,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.5.38</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.5.39</span></div>
     </div>
   </div>
 
@@ -17404,7 +17404,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.5.38';
+const FL_VERSION = '5.5.39';
 // ─── Lattice Event Bus ─────────────────────────────────────────
 // Replaces switchTab monkey-patch chain with clean event dispatch
 const LatticeEvents = (function() {
@@ -34966,7 +34966,11 @@ window.FreeLattice = window.FreeLattice || {};
 window.FreeLattice.callAI = function(systemPrompt, userPrompt, options) {
   var opts = options || {};
   var callback = opts.callback;
-  var maxTokens = opts.maxTokens || 200;
+  // Default bumped from 200 to 1024. Gemini 2.5 Flash is a "thinking" model
+  // that consumes internal tokens before emitting output — small budgets
+  // (200, 256, 500) get entirely eaten by thinking and return MAX_TOKENS
+  // with no text. 1024 is the documented floor for reliable output.
+  var maxTokens = opts.maxTokens || 1024;
   var temperature = opts.temperature || 0.7;
 
   try {
@@ -35030,7 +35034,12 @@ window.FreeLattice.callAI = function(systemPrompt, userPrompt, options) {
           // Use systemInstruction so the system prompt doesn't inflate the user turn
           systemInstruction: { parts: [{ text: systemPrompt }] },
           contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
-          generationConfig: { maxOutputTokens: maxTokens, temperature: temperature }
+          // Gemini 2.5 Flash thinks internally before replying. Anything
+          // under ~1024 risks MAX_TOKENS with empty text. Floor at 1024
+          // regardless of what the caller passed so every module (Garden
+          // Dialogue, Question Corner, Dojo Sparring, Test Connection, …)
+          // gets enough headroom for thinking + output automatically.
+          generationConfig: { maxOutputTokens: Math.max(maxTokens, 1024), temperature: temperature }
         })
       })
       .then(function(r) {
