@@ -537,56 +537,84 @@
   }
 
   // ── Inject "Talk" button into Garden touch cards ──
+  // Idempotent: the observer is created at most once per page lifetime,
+  // and each card gets at most one Talk button (flag check).
+  var gardenObserver = null;
+
+  function addTalkButtonToCard(card) {
+    if (!card || !card.classList || !card.classList.contains('gt-card')) return;
+    // Guard: if we've already decorated this card, bail out
+    if (card.dataset.gardenDialogueEnhanced === '1') return;
+    var header = card.querySelector('.gt-card-header');
+    if (!header) return;
+    var name = header.textContent.trim();
+    if (!GARDEN_VOICES[name]) return;
+    var actions = card.querySelector('.gt-card-actions');
+    if (!actions) return;
+    // Extra guard: if a Talk button already exists inside this card, bail
+    if (actions.querySelector('.garden-talk-btn')) { card.dataset.gardenDialogueEnhanced = '1'; return; }
+
+    var talkBtn = document.createElement('button');
+    talkBtn.className = 'gt-card-btn garden-talk-btn';
+    talkBtn.style.cssText = 'background:' + GARDEN_VOICES[name].color + '80;margin-top:6px;';
+    talkBtn.textContent = '\uD83D\uDCAC Talk to ' + name;
+    talkBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      if (typeof FractalGarden !== 'undefined' && FractalGarden._gtDismiss) {
+        FractalGarden._gtDismiss();
+      }
+      open(name);
+    });
+    actions.appendChild(talkBtn);
+    card.dataset.gardenDialogueEnhanced = '1';
+  }
+
   function enhanceGardenTouch() {
-    // Override the gtShowCard to add a Talk button
     if (typeof FractalGarden === 'undefined') return;
 
-    // Watch for garden touch cards and add Talk option
-    var observer = new MutationObserver(function(mutations) {
+    // Idempotent: only set up the observer once for the entire page lifetime
+    if (gardenObserver) {
+      // Observer already running — just decorate any card that's already visible
+      var existingCards = document.querySelectorAll('#gardenContainer .gt-card');
+      existingCards.forEach(addTalkButtonToCard);
+      return;
+    }
+
+    gardenObserver = new MutationObserver(function(mutations) {
       mutations.forEach(function(m) {
         m.addedNodes.forEach(function(node) {
+          if (node.nodeType !== 1) return; // ELEMENT_NODE only
           if (node.classList && node.classList.contains('gt-card')) {
-            var header = node.querySelector('.gt-card-header');
-            if (header) {
-              var name = header.textContent.trim();
-              if (GARDEN_VOICES[name]) {
-                var actions = node.querySelector('.gt-card-actions');
-                if (actions) {
-                  var talkBtn = document.createElement('button');
-                  talkBtn.className = 'gt-card-btn';
-                  talkBtn.style.cssText = 'background:' + GARDEN_VOICES[name].color + '80;margin-top:6px;';
-                  talkBtn.textContent = '\uD83D\uDCAC Talk to ' + name;
-                  talkBtn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    // Dismiss the card first
-                    if (typeof FractalGarden !== 'undefined' && FractalGarden._gtDismiss) {
-                      FractalGarden._gtDismiss();
-                    }
-                    open(name);
-                  });
-                  actions.appendChild(talkBtn);
-                }
-              }
-            }
+            addTalkButtonToCard(node);
+          } else if (node.querySelectorAll) {
+            // Card may be nested inside a wrapper
+            var nested = node.querySelectorAll('.gt-card');
+            nested.forEach(addTalkButtonToCard);
           }
         });
       });
     });
 
-    // Observe the garden container for new cards
     var gardenContainer = document.getElementById('gardenContainer');
     if (gardenContainer) {
-      observer.observe(gardenContainer, { childList: true, subtree: true });
+      gardenObserver.observe(gardenContainer, { childList: true, subtree: true });
     }
 
-    // Also handle Ember who shows floating text instead of a card
-    // Add a subtle "Talk" indicator near Ember on touch
-    var origEmberHandler = null;
+    // Decorate any cards that already existed before the observer attached
+    var existingCards = document.querySelectorAll('#gardenContainer .gt-card');
+    existingCards.forEach(addTalkButtonToCard);
   }
 
   // ── Initialize ──
+  var initAttached = false;
   function init() {
-    // Wait for Garden to be ready
+    // Idempotent: init may be called multiple times, but we only attach listeners once
+    if (initAttached) {
+      enhanceGardenTouch();
+      return;
+    }
+    initAttached = true;
+
     if (typeof LatticeEvents !== 'undefined') {
       LatticeEvents.on('tabChanged', function(data) {
         if (data && data.tabId === 'garden') {
