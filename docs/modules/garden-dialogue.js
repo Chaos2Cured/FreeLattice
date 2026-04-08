@@ -183,29 +183,59 @@
     return prompt;
   }
 
-  // ── Get current AI provider config ──
-  // Reads from window.state (the runtime source of truth — holds the
-  // decrypted API key in memory) and falls back to localStorage.
+  // ── Get current AI provider config (async — may decrypt stored key) ──
+  // Reads from window.state first (the runtime source of truth — holds
+  // the decrypted API key in memory). If that's empty but an encrypted
+  // key exists in localStorage, decrypts it directly so the Garden can
+  // talk even when timing races with the main app's async loadApiKey().
   // The real storage keys are fl_provider + fl_apiKey_enc (encrypted),
-  // NOT fl_api_provider / fl_api_key which were guessed incorrectly.
-  function getProviderConfig() {
+  // NOT fl_api_provider / fl_api_key (those were guessed incorrectly).
+  async function getProviderConfig() {
     try {
       var provider, apiKey, model, isLocal, ollamaModel;
 
       // Primary source: window.state (runtime state set by the main app)
       if (typeof window.state !== 'undefined') {
-        provider = window.state.provider || 'groq';
+        provider = window.state.provider || localStorage.getItem('fl_provider') || 'groq';
         apiKey = window.state.apiKey || '';
         model = window.state.model || '';
         isLocal = !!window.state.isLocal;
-        ollamaModel = window.state.ollamaModel || 'llama3.2';
+        ollamaModel = window.state.ollamaModel || localStorage.getItem('fl_ollamaModel') || 'llama3.2';
       } else {
-        // Fallback: localStorage (may not have decrypted key)
         provider = localStorage.getItem('fl_provider') || 'groq';
-        apiKey = ''; // encrypted key can't be used without decryption
+        apiKey = '';
         model = '';
         isLocal = localStorage.getItem('fl_isLocal') === 'true';
         ollamaModel = localStorage.getItem('fl_ollamaModel') || 'llama3.2';
+      }
+
+      // If no in-memory key but an encrypted one exists, decrypt it directly.
+      // This handles the race where the user just connected in another tab/flow
+      // or where loadApiKey() hasn't finished yet.
+      if (!apiKey && !isLocal) {
+        try {
+          var encKey = localStorage.getItem('fl_apiKey_enc');
+          var encProvider = localStorage.getItem('fl_apiKey_provider');
+          if (encKey && encProvider && typeof window.phiDecrypt === 'function') {
+            var decrypted = await window.phiDecrypt(encKey, encProvider);
+            if (decrypted) {
+              apiKey = decrypted;
+              // Backfill window.state so the rest of the app benefits too
+              if (typeof window.state !== 'undefined') {
+                window.state.apiKey = decrypted;
+                if (!window.state.provider) window.state.provider = encProvider;
+              }
+            }
+          }
+          // Legacy plaintext fallback
+          if (!apiKey) {
+            var legacy = localStorage.getItem('fl_apiKey');
+            if (legacy) {
+              apiKey = legacy;
+              if (typeof window.state !== 'undefined') window.state.apiKey = legacy;
+            }
+          }
+        } catch(e) { /* decryption failed — leave apiKey empty */ }
       }
 
       // Ollama (local) path — no API key needed
@@ -254,7 +284,7 @@
 
   // ── Streaming AI call ──
   async function streamResponse(name, userMsg, onChunk, onDone) {
-    var config = getProviderConfig();
+    var config = await getProviderConfig();
     if (!config.apiKey) {
       onDone('I would love to talk, but no API key is configured yet. Go to Settings and add one.');
       return;
