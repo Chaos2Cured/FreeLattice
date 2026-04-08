@@ -1,1 +1,1 @@
-{"version": "5.5.36", "date": "2026-04-08", "note": "ROOT CAUSE FIX: window.state = state in app.html. const at top-level doesn't auto-attach to window — modules saw window.state as undefined. Garden Dialogue now sees the same key Chat does."}
+{"version": "5.5.37", "date": "2026-04-08", "note": "Cache-bust garden-dialogue.js with ?v=FL_VERSION + granular branch logging so we can see exactly which code path fires on Send."}

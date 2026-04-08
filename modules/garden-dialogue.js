@@ -210,6 +210,7 @@
     // is empty but an encrypted key is in localStorage, wake up the main
     // app's loadApiKey to populate it — the same path Chat uses on startup.
     if (window.state && !window.state.isLocal && !window.state.apiKey) {
+      console.log('[GardenDialogue] state.apiKey empty, running loadApiKey preflight');
       if (typeof window.loadApiKey === 'function') {
         try { await window.loadApiKey(); } catch(e) {}
       }
@@ -231,12 +232,14 @@
           }
         } catch(e) {}
       }
+      console.log('[GardenDialogue] after preflight, hasKey:', !!window.state.apiKey);
     }
 
     // callAI is the single source of truth. It lives in the same script
     // scope as `state`, so it reads state.apiKey directly. If this function
     // isn't available yet, the main app is still loading.
     if (typeof window.FreeLattice === 'undefined' || typeof window.FreeLattice.callAI !== 'function') {
+      console.log('[GardenDialogue] BRANCH: callAI not available');
       onDone('The main app has not finished loading yet. Give it a moment and try again.');
       return;
     }
@@ -244,9 +247,16 @@
     // Final check mirrors Chat's exact check in sendMessage (app.html ~24932):
     //   if (!state.isLocal && !state.apiKey)
     if (window.state && !window.state.isLocal && !window.state.apiKey) {
+      console.log('[GardenDialogue] BRANCH: no provider configured (final check failed)', {
+        hasState: !!window.state,
+        isLocal: window.state && window.state.isLocal,
+        hasKey: window.state && !!window.state.apiKey
+      });
       onDone('I would love to talk, but no AI provider is connected yet. Go to Settings and add one — then come back and I will be here.');
       return;
     }
+
+    console.log('[GardenDialogue] BRANCH: calling FreeLattice.callAI with provider', window.state && window.state.provider);
 
     // Build the system prompt with recent history appended as context
     var systemPrompt = buildPrompt(name);
@@ -265,6 +275,7 @@
         maxTokens: 500,
         temperature: 0.8,
         callback: function(text, err) {
+          console.log('[GardenDialogue] callAI callback:', { hasText: !!text, textLength: text ? text.length : 0, err: err });
           if (err || !text) {
             onDone('I tried to reach through, but something is quiet on the other side. (' + (err || 'no response') + ') Try again in a moment?');
             return;

@@ -15614,7 +15614,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.5.36</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.5.37</span></div>
     </div>
   </div>
 
@@ -17404,7 +17404,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.5.36';
+const FL_VERSION = '5.5.37';
 // ─── Lattice Event Bus ─────────────────────────────────────────
 // Replaces switchTab monkey-patch chain with clean event dispatch
 const LatticeEvents = (function() {
@@ -49234,7 +49234,9 @@ document.addEventListener('click', function(e) {
     if (loaded) return;
     loaded = true;
     var s = document.createElement('script');
-    s.src = 'modules/garden-dialogue.js';
+    // Cache-bust with FL_VERSION so every version bump forces a fresh fetch
+    // even when the Service Worker is serving stale precached modules.
+    s.src = 'modules/garden-dialogue.js?v=' + (typeof FL_VERSION !== 'undefined' ? FL_VERSION : Date.now());
     document.head.appendChild(s);
   }
   // Load when Garden tab is opened
