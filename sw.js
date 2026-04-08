@@ -1,5 +1,5 @@
 // FreeLattice Service Worker — Offline Mode
-// Cache-first for app shell, network-first for app.html and API calls
+// Cache-first for app shell, network-first for index.html and API calls
 // API calls are never cached
 // VERSION: Must match version.json — update both together
 
@@ -7,7 +7,7 @@ const CACHE_NAME = 'freelattice-v5.5.36';
 
 const APP_SHELL = [
   './',
-  './app.html',
+  './index.html',
   './manifest.json',
   './icon-192.png',
   './icon-512.png',
@@ -75,7 +75,7 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
-// Fetch: network-first for app.html, cache-first for other app shell, network-only for API calls
+// Fetch: network-first for index.html, cache-first for other app shell, network-only for API calls
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
@@ -91,8 +91,8 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Network-first for app.html — always get the latest version
-  if (url.pathname.endsWith('/app.html') || url.pathname.endsWith('/') || url.pathname === '') {
+  // Network-first for index.html — always get the latest version
+  if (url.pathname.endsWith('/index.html') || url.pathname.endsWith('/') || url.pathname === '') {
     event.respondWith(
       fetch(event.request).then((networkResponse) => {
         if (networkResponse && networkResponse.status === 200) {

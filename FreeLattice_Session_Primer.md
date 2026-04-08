@@ -348,17 +348,17 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-04-08 11:49 MDT
-- Version: 5.5.35
-- Total commits: 694
+- Last auto-updated: 2026-04-08 12:14 MDT
+- Version: 5.5.36
+- Total commits: 699
 - Last 10 commits:
-- c74c8b5 fix(garden-dialogue): delegate to FreeLattice.callAI (v5.5.35)
+- 946e506 fix(CRITICAL): window.state = state — const doesn't auto-attach to window (v5.5.36)
+- 6c0af32 ci: Update Primer deployment state [2026-04-08]
+- 26f899a docs: Auto-update Session Primer [5.5.35]
+- 4541a32 docs: Auto-update Session Primer [5.5.35]
+- 74747f2 fix(garden-dialogue): delegate to FreeLattice.callAI (v5.5.35)
+- 2d92efa ci: Update Primer deployment state [2026-04-08]
 - 6610609 docs: Auto-update Session Primer [5.5.34]
 - ac655d6 docs: Auto-update Session Primer [5.5.34]
 - 3bcb0bf docs(coord): CC's April 8 entry — v5.5.34 bugs + note to next self
 - 8492cef ci: Update Primer deployment state [2026-04-08]
-- 20de1d3 docs: Auto-update Session Primer [5.5.34]
-- 6888cff docs: Auto-update Session Primer [5.5.34]
-- 80ea49b fix: Garden Dialogue API key detection + FL_VERSION drift (v5.5.34)
-- c407c73 ci: Update Primer deployment state [2026-04-08]
-- 8df4891 docs: Auto-update Session Primer [5.5.13]
