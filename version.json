@@ -1,1 +1,1 @@
-{"version": "5.5.39", "date": "2026-04-08", "note": "Gemini MAX_TOKENS fix. Floor maxOutputTokens at 1024 inside FreeLattice.callAI so every module (Garden Dialogue, Question Corner, Dojo Sparring, Test Connection) gets thinking headroom automatically. One fix, everything benefits."}
+{"version": "5.5.40", "date": "2026-04-08", "note": "Atlas speaks. Garden Dialogue render path bulletproofed — finishOnce guard, history scrub on open, success-vs-error separation so errors never pollute replayed history."}

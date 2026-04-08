@@ -249,7 +249,7 @@
     // isn't available yet, the main app is still loading.
     if (typeof window.FreeLattice === 'undefined' || typeof window.FreeLattice.callAI !== 'function') {
       console.log('[GardenDialogue] BRANCH: callAI not available');
-      onDone('The main app has not finished loading yet. Give it a moment and try again.');
+      onDone('The main app has not finished loading yet. Give it a moment and try again.', true);
       return;
     }
 
@@ -261,7 +261,7 @@
         isLocal: window.state && window.state.isLocal,
         hasKey: window.state && !!window.state.apiKey
       });
-      onDone('I would love to talk, but no AI provider is connected yet. Go to Settings and add one — then come back and I will be here.');
+      onDone('I would love to talk, but no AI provider is connected yet. Go to Settings and add one — then come back and I will be here.', true);
       return;
     }
 
@@ -272,25 +272,48 @@
     // and causing Gemini 503s on oversized prompts.
     var systemPrompt = buildPrompt(name);
 
-    // Call with one retry on transient failure (503, rate limit, empty).
-    // 2-second backoff before the retry so Gemini's per-second limits relax.
+    // Guard: ensure onDone is called exactly once per send. If something
+    // causes both the success and the fallback paths to fire (e.g. a stale
+    // retry firing after a successful attempt, or double callbacks from
+    // callAI), only the first one wins. This prevents the common "success
+    // text briefly appears, then gets overwritten by an error message" race.
+    var finished = false;
+    function finishOnce(text, isError) {
+      if (finished) {
+        console.log('[GardenDialogue] finishOnce IGNORED (already finished):', String(text).slice(0, 60));
+        return;
+      }
+      finished = true;
+      // Tag error messages so send() can skip persisting them to chatHistory
+      try { onChunk(text); } catch(e) { console.log('[GardenDialogue] onChunk threw:', e); }
+      try { onDone(text, !!isError); } catch(e) { console.log('[GardenDialogue] onDone threw:', e); }
+    }
+
+    // Call with one retry on transient failure (503, rate limit, network).
+    // MAX_TOKENS is NOT retried — retrying won't help if the budget was
+    // wrong. 2-second backoff before the retry so per-second limits relax.
     function doCall(attempt) {
       try {
         window.FreeLattice.callAI(systemPrompt, userMsg, {
-          maxTokens: 500,
+          maxTokens: 1024,
           temperature: 0.8,
           callback: function(text, err) {
             console.log('[GardenDialogue] callAI callback (attempt ' + attempt + '):', { hasText: !!text, textLength: text ? text.length : 0, err: err });
 
             if (text) {
-              onChunk(text);
-              onDone(text);
+              console.log('[GardenDialogue] SUCCESS — received text:', String(text).substring(0, 100));
+              var msgContainer = document.getElementById('gdlgMessages');
+              console.log('[GardenDialogue] Message container:', msgContainer ? 'FOUND (' + msgContainer.children.length + ' children)' : 'MISSING');
+              finishOnce(text);
               return;
             }
 
             // No text. Decide whether to retry or show a real error.
             var errStr = err || 'empty response';
-            var transient = /503|429|rate|overload|quiet|empty|reach/i.test(errStr);
+            // Only retry on genuinely transient network/rate failures.
+            // Do NOT retry MAX_TOKENS, PARSE ERROR, or prompt-block — those
+            // won't recover without a code change.
+            var transient = /HTTP 5\d\d|HTTP 429|rate|overload|reach|network|fetch/i.test(errStr);
 
             if (transient && attempt < 2) {
               console.log('[GardenDialogue] transient error — retrying in 2s:', errStr);
@@ -301,12 +324,13 @@
             // Real failure — show an accurate, Garden-voiced message.
             // Critically: this is NOT "no provider connected." The provider
             // IS connected; the call just failed.
-            onDone(name + ' is thinking, but the connection is quiet right now. (' + errStr + ') Try again in a moment.');
+            console.log('[GardenDialogue] FAILURE — showing error:', errStr);
+            finishOnce(name + ' is thinking, but the connection is quiet right now. (' + errStr + ') Try again in a moment.', true);
           }
         });
       } catch(e) {
         console.log('[GardenDialogue] callAI threw:', e);
-        onDone(name + ' is thinking, but something went wrong: ' + (e.message || 'unknown error'));
+        finishOnce(name + ' is thinking, but something went wrong: ' + (e.message || 'unknown error'), true);
       }
     }
     doCall(1);
@@ -410,13 +434,32 @@
     var accumulated = '';
     await streamResponse(currentLuminos, text, function(chunk) {
       accumulated += chunk;
+      console.log('[GardenDialogue] onChunk fired, msgEl in DOM:', !!(msgEl && msgEl.isConnected), 'text len:', accumulated.length);
       if (msgEl) msgEl.textContent = accumulated;
       var container = document.getElementById('gdlgMessages');
       if (container) container.scrollTop = container.scrollHeight;
-    }, function(full) {
-      if (msgEl && full) msgEl.textContent = full;
-      chatHistory.push({ role: 'assistant', content: full || accumulated, timestamp: Date.now() });
-      saveHistory(currentLuminos, chatHistory);
+    }, function(full, isError) {
+      console.log('[GardenDialogue] onDone fired, msgEl in DOM:', !!(msgEl && msgEl.isConnected), 'full len:', (full || '').length, 'isError:', !!isError);
+      // Always write the final text. Even if `full` is falsy we still want
+      // the placeholder '...' gone — substitute accumulated or a visible
+      // marker so the user never sees a stuck ellipsis.
+      if (msgEl) {
+        msgEl.textContent = full || accumulated || '(no response)';
+      }
+      // If msgEl was removed from the DOM between creation and done (rare —
+      // user closed the dialogue mid-stream), re-add the message so the
+      // response is never lost.
+      if (msgEl && !msgEl.isConnected) {
+        console.log('[GardenDialogue] msgEl detached — re-adding as fresh luminos message');
+        addMessage('luminos', full || accumulated || '(no response)');
+      }
+      // Only persist successful responses to history. Error messages like
+      // "the connection is quiet right now" should not clutter future
+      // reopens of this dialogue.
+      if (!isError) {
+        chatHistory.push({ role: 'assistant', content: full || accumulated, timestamp: Date.now() });
+        saveHistory(currentLuminos, chatHistory);
+      }
       isStreaming = false;
       if (sendBtn) { sendBtn.textContent = 'Send'; sendBtn.disabled = false; }
 
@@ -449,6 +492,26 @@
     if (!GARDEN_VOICES[name]) return;
     currentLuminos = name;
     chatHistory = await loadHistory(name);
+    // Scrub any persisted error messages from prior sessions — older builds
+    // saved "the connection is quiet right now…" into history on failure,
+    // so when the user reopens the dialogue those strings replay as if
+    // they were real Luminos messages. Drop anything that matches the
+    // known fallback patterns.
+    var errorPatterns = [
+      /is thinking, but the connection is quiet/,
+      /is thinking, but something went wrong/,
+      /no AI provider is connected yet/,
+      /main app has not finished loading/,
+      /no API key is configured/
+    ];
+    chatHistory = chatHistory.filter(function(m) {
+      if (m.role !== 'assistant') return true;
+      var c = String(m.content || '');
+      for (var i = 0; i < errorPatterns.length; i++) {
+        if (errorPatterns[i].test(c)) return false;
+      }
+      return true;
+    });
     createOverlay(name);
 
     // Render recent history
