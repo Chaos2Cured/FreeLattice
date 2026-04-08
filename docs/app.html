@@ -27050,6 +27050,13 @@ function meshHandleMessage(msg, dc, pc) {
       break;
     }
 
+    case 'presence-pulse': {
+      // Shared Presence: a peer is announcing their active state
+      if (typeof window.SharedPresence !== 'undefined' && window.SharedPresence.receivePulse) {
+        window.SharedPresence.receivePulse(msg);
+      }
+      break;
+    }
     default:
       console.log('Mesh: Unknown message type', msg.type);
   }
@@ -27260,6 +27267,16 @@ function meshHandleSkillBroadcast(data) {
 function meshBroadcastKnowledgeList() {
   for (const [peerId, peer] of state.meshPeers) {
     meshSendKnowledgeList(peer.dc);
+  }
+}
+// ---- Shared Presence: Broadcast to all open peers ----
+function meshSendToPeers(jsonString) {
+  for (const [peerId, peer] of state.meshPeers) {
+    try {
+      if (peer.dc && peer.dc.readyState === 'open') {
+        peer.dc.send(jsonString);
+      }
+    } catch(e) {}
   }
 }
 
@@ -37139,6 +37156,25 @@ if (window.FL_LOW_MEMORY && window.FL_MOBILE) window.FL_GARDEN_PARTICLE_SCALE = 
   });
 })();
 </script>
+
+<!-- Shared Presence — minds-active indicator for the Garden -->
+<script>
+(function() {
+  function initSharedPresence() {
+    if (window.FreeLatticeModules && window.FreeLatticeModules.SharedPresence) {
+      window.FreeLatticeModules.SharedPresence.init();
+      return;
+    }
+    FreeLatticeLoader.load('SharedPresence', 'modules/shared-presence.js', function(mod) {
+      if (mod && mod.init) mod.init();
+    });
+  }
+  document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(initSharedPresence, 2000);
+  });
+})();
+</script>
+
 
 <!-- Garden Dreaming System — Luminos dream while you're away -->
 <script>
@@ -49422,7 +49458,8 @@ document.addEventListener('click', function(e) {
       return;
     }
     loaded = true;
-    FreeLatticeLoader.load('QuestionCorner', 'modules/question-corner.js', function(mod) {
+    FreeLatticeLoader.load('QuestionCorner', 'modules/question-corner.js',
+    'modules/shared-presence.js', function(mod) {
       if (mod && mod.init) mod.init();
     });
   }
