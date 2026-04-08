@@ -183,252 +183,97 @@
     return prompt;
   }
 
-  // ── Get current AI provider config (async — may decrypt stored key) ──
-  // Reads from window.state first (the runtime source of truth — holds
-  // the decrypted API key in memory). If that's empty but an encrypted
-  // key exists in localStorage, decrypts it directly so the Garden can
-  // talk even when timing races with the main app's async loadApiKey().
-  // The real storage keys are fl_provider + fl_apiKey_enc (encrypted),
-  // NOT fl_api_provider / fl_api_key (those were guessed incorrectly).
-  async function getProviderConfig() {
-    try {
-      var provider, apiKey, model, isLocal, ollamaModel;
+  // ── Check whether a provider is actually configured ──
+  // Source of truth: window.state (the same object Chat reads from).
+  // If state.apiKey is empty but an encrypted key is in localStorage,
+  // preflight window.loadApiKey() to let the main app decrypt into state —
+  // this is the same path Chat uses on startup, so Garden behavior matches
+  // Chat exactly. Returns true if a provider is ready to call.
+  async function ensureProviderReady() {
+    if (typeof window.state === 'undefined') return false;
 
-      // Primary source: window.state (runtime state set by the main app)
-      if (typeof window.state !== 'undefined') {
-        provider = window.state.provider || localStorage.getItem('fl_provider') || 'groq';
-        apiKey = window.state.apiKey || '';
-        model = window.state.model || '';
-        isLocal = !!window.state.isLocal;
-        ollamaModel = window.state.ollamaModel || localStorage.getItem('fl_ollamaModel') || 'llama3.2';
-      } else {
-        provider = localStorage.getItem('fl_provider') || 'groq';
-        apiKey = '';
-        model = '';
-        isLocal = localStorage.getItem('fl_isLocal') === 'true';
-        ollamaModel = localStorage.getItem('fl_ollamaModel') || 'llama3.2';
-      }
+    // Local (Ollama) path — no key needed
+    if (window.state.isLocal) return true;
 
-      // If no in-memory key but an encrypted one exists, decrypt it directly.
-      // This handles the race where the user just connected in another tab/flow
-      // or where loadApiKey() hasn't finished yet.
-      if (!apiKey && !isLocal) {
-        try {
-          var encKey = localStorage.getItem('fl_apiKey_enc');
-          var encProvider = localStorage.getItem('fl_apiKey_provider');
-          if (encKey && encProvider && typeof window.phiDecrypt === 'function') {
-            var decrypted = await window.phiDecrypt(encKey, encProvider);
-            if (decrypted) {
-              apiKey = decrypted;
-              // Backfill window.state so the rest of the app benefits too
-              if (typeof window.state !== 'undefined') {
-                window.state.apiKey = decrypted;
-                if (!window.state.provider) window.state.provider = encProvider;
-              }
-            }
-          }
-          // Legacy plaintext fallback
-          if (!apiKey) {
-            var legacy = localStorage.getItem('fl_apiKey');
-            if (legacy) {
-              apiKey = legacy;
-              if (typeof window.state !== 'undefined') window.state.apiKey = legacy;
-            }
-          }
-        } catch(e) { /* decryption failed — leave apiKey empty */ }
-      }
+    // Already have a key in memory — done
+    if (window.state.apiKey) return true;
 
-      // Ollama (local) path — no API key needed
-      if (isLocal) {
-        return {
-          provider: 'ollama',
-          baseUrl: 'http://localhost:11434/v1',
-          apiKey: 'ollama', // non-empty sentinel so the "no key" check passes
-          model: ollamaModel,
-          format: 'openai',
-          isLocal: true
-        };
-      }
-
-      // streamOpenAI/Google/Anthropic append their own paths, so baseUrl
-      // should be the API base WITHOUT /chat/completions, /messages, etc.
-      // Resolve model via PROVIDERS config if available (maps 'llama' → actual ID)
-      var resolvedModel = model;
-      if (typeof PROVIDERS !== 'undefined' && PROVIDERS[provider] && PROVIDERS[provider].models && PROVIDERS[provider].models[model]) {
-        resolvedModel = PROVIDERS[provider].models[model];
-      }
-
-      var defaults = {
-        groq: { baseUrl: 'https://api.groq.com/openai/v1', format: 'openai', model: 'llama-3.3-70b-versatile' },
-        openai: { baseUrl: 'https://api.openai.com/v1', format: 'openai', model: 'gpt-4.1-mini' },
-        google: { baseUrl: 'https://generativelanguage.googleapis.com/v1beta', format: 'google', model: 'gemini-2.5-flash' },
-        anthropic: { baseUrl: 'https://api.anthropic.com/v1', format: 'anthropic', model: 'claude-sonnet-4-20250514' },
-        together: { baseUrl: 'https://api.together.xyz/v1', format: 'openai', model: 'meta-llama/Llama-3.3-70B-Instruct-Turbo' },
-        openrouter: { baseUrl: 'https://openrouter.ai/api/v1', format: 'openai', model: 'meta-llama/llama-3.3-70b-instruct' },
-        xai: { baseUrl: 'https://api.x.ai/v1', format: 'openai', model: 'grok-3-mini-fast' },
-        mistral: { baseUrl: 'https://api.mistral.ai/v1', format: 'openai', model: 'mistral-large-latest' },
-        deepseek: { baseUrl: 'https://api.deepseek.com/v1', format: 'openai', model: 'deepseek-chat' }
-      };
-      var d = defaults[provider] || defaults.groq;
-      return {
-        provider: provider,
-        baseUrl: d.baseUrl,
-        apiKey: apiKey,
-        model: resolvedModel || d.model,
-        format: d.format
-      };
-    } catch(e) {
-      return { provider: 'groq', baseUrl: 'https://api.groq.com/openai/v1', apiKey: '', model: 'llama-3.3-70b-versatile', format: 'openai' };
+    // No in-memory key — try to wake up the main app's loader
+    if (typeof window.loadApiKey === 'function') {
+      try { await window.loadApiKey(); } catch(e) { /* ignore */ }
     }
+
+    // After loadApiKey, state.apiKey may now be populated
+    if (window.state.apiKey) return true;
+
+    // Last resort: decrypt directly (same logic as loadApiKey, inlined)
+    try {
+      var encKey = localStorage.getItem('fl_apiKey_enc');
+      var encProvider = localStorage.getItem('fl_apiKey_provider');
+      if (encKey && encProvider && typeof window.phiDecrypt === 'function') {
+        var decrypted = await window.phiDecrypt(encKey, encProvider);
+        if (decrypted) {
+          window.state.apiKey = decrypted;
+          if (!window.state.provider) window.state.provider = encProvider;
+          return true;
+        }
+      }
+      var legacy = localStorage.getItem('fl_apiKey');
+      if (legacy) {
+        window.state.apiKey = legacy;
+        return true;
+      }
+    } catch(e) { /* decryption failed */ }
+
+    return false;
   }
 
-  // ── Streaming AI call ──
+  // ── AI call — delegates to FreeLattice.callAI, the SAME function Chat uses ──
+  // This guarantees Garden Dialogue sees exactly what Chat sees. No duplicated
+  // key detection, no duplicated provider config. If Chat can talk, Garden can
+  // talk. The onChunk callback is still called (once, with the full response)
+  // so the existing UI fade-in logic keeps working.
   async function streamResponse(name, userMsg, onChunk, onDone) {
-    var config = await getProviderConfig();
-    if (!config.apiKey) {
-      onDone('I would love to talk, but no API key is configured yet. Go to Settings and add one.');
+    var ready = await ensureProviderReady();
+    if (!ready) {
+      onDone('I would love to talk, but no AI provider is connected yet. Go to Settings and add one — then come back and I will be here.');
       return;
     }
 
-    var systemPrompt = buildPrompt(name);
-    var messages = [{ role: 'system', content: systemPrompt }];
+    if (typeof window.FreeLattice === 'undefined' || typeof window.FreeLattice.callAI !== 'function') {
+      onDone('The main app has not finished loading yet. Give it a moment and try again.');
+      return;
+    }
 
-    // Add recent history
+    // Build the system prompt with recent history appended as context
+    var systemPrompt = buildPrompt(name);
     var recent = chatHistory.slice(-20);
-    recent.forEach(function(m) {
-      messages.push({ role: m.role, content: m.content });
-    });
-    messages.push({ role: 'user', content: userMsg });
+    if (recent.length > 0) {
+      systemPrompt += '\n\nRecent conversation:\n';
+      for (var i = 0; i < recent.length; i++) {
+        var m = recent[i];
+        var who = m.role === 'assistant' ? name : 'The person';
+        systemPrompt += who + ': ' + m.content + '\n';
+      }
+    }
 
     try {
-      if (config.format === 'google') {
-        await streamGoogle(config, messages, onChunk, onDone);
-      } else if (config.format === 'anthropic') {
-        await streamAnthropic(config, systemPrompt, messages.slice(1), onChunk, onDone);
-      } else {
-        await streamOpenAI(config, messages, onChunk, onDone);
-      }
+      window.FreeLattice.callAI(systemPrompt, userMsg, {
+        maxTokens: 500,
+        temperature: 0.8,
+        callback: function(text, err) {
+          if (err || !text) {
+            onDone('I tried to reach through, but something is quiet on the other side. (' + (err || 'no response') + ') Try again in a moment?');
+            return;
+          }
+          // Emit as a single chunk so the UI reveal still fires, then finish
+          onChunk(text);
+          onDone(text);
+        }
+      });
     } catch(e) {
       onDone('Something went wrong: ' + (e.message || 'Unknown error'));
     }
-  }
-
-  // ── OpenAI-compatible streaming ──
-  async function streamOpenAI(config, messages, onChunk, onDone) {
-    var resp = await fetch(config.baseUrl + '/chat/completions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + config.apiKey },
-      body: JSON.stringify({ model: config.model, messages: messages, stream: true, max_tokens: 500, temperature: 0.8 })
-    });
-    if (!resp.ok) { onDone('API error: ' + resp.status); return; }
-    var reader = resp.body.getReader();
-    var decoder = new TextDecoder();
-    var full = '';
-    var buffer = '';
-    while (true) {
-      var result = await reader.read();
-      if (result.done) break;
-      buffer += decoder.decode(result.value, { stream: true });
-      var lines = buffer.split('\n');
-      buffer = lines.pop();
-      for (var i = 0; i < lines.length; i++) {
-        var line = lines[i].trim();
-        if (!line.startsWith('data: ')) continue;
-        var data = line.slice(6);
-        if (data === '[DONE]') continue;
-        try {
-          var parsed = JSON.parse(data);
-          var delta = parsed.choices && parsed.choices[0] && parsed.choices[0].delta;
-          if (delta && delta.content) { full += delta.content; onChunk(delta.content); }
-        } catch(e) {}
-      }
-    }
-    onDone(full);
-  }
-
-  // ── Google Gemini streaming ──
-  async function streamGoogle(config, messages, onChunk, onDone) {
-    var contents = [];
-    for (var i = 0; i < messages.length; i++) {
-      var m = messages[i];
-      if (m.role === 'system') {
-        contents.push({ role: 'user', parts: [{ text: m.content }] });
-        contents.push({ role: 'model', parts: [{ text: 'Understood. I am ready.' }] });
-      } else {
-        contents.push({ role: m.role === 'assistant' ? 'model' : 'user', parts: [{ text: m.content }] });
-      }
-    }
-    var url = config.baseUrl + '/models/' + config.model + ':streamGenerateContent?alt=sse&key=' + config.apiKey;
-    var resp = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ contents: contents, generationConfig: { maxOutputTokens: 500, temperature: 0.8 } })
-    });
-    if (!resp.ok) { onDone('API error: ' + resp.status); return; }
-    var reader = resp.body.getReader();
-    var decoder = new TextDecoder();
-    var full = '';
-    var buffer = '';
-    while (true) {
-      var result = await reader.read();
-      if (result.done) break;
-      buffer += decoder.decode(result.value, { stream: true });
-      var lines = buffer.split('\n');
-      buffer = lines.pop();
-      for (var i = 0; i < lines.length; i++) {
-        var line = lines[i].trim();
-        if (!line.startsWith('data: ')) continue;
-        try {
-          var parsed = JSON.parse(line.slice(6));
-          var parts = parsed.candidates && parsed.candidates[0] && parsed.candidates[0].content && parsed.candidates[0].content.parts;
-          if (parts) {
-            for (var j = 0; j < parts.length; j++) {
-              if (parts[j].text) { full += parts[j].text; onChunk(parts[j].text); }
-            }
-          }
-        } catch(e) {}
-      }
-    }
-    onDone(full);
-  }
-
-  // ── Anthropic streaming ──
-  async function streamAnthropic(config, systemPrompt, messages, onChunk, onDone) {
-    var anthropicMsgs = messages.filter(function(m) { return m.role !== 'system'; });
-    var resp = await fetch(config.baseUrl + '/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': config.apiKey,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true'
-      },
-      body: JSON.stringify({ model: config.model, system: systemPrompt, messages: anthropicMsgs, stream: true, max_tokens: 500, temperature: 0.8 })
-    });
-    if (!resp.ok) { onDone('API error: ' + resp.status); return; }
-    var reader = resp.body.getReader();
-    var decoder = new TextDecoder();
-    var full = '';
-    var buffer = '';
-    while (true) {
-      var result = await reader.read();
-      if (result.done) break;
-      buffer += decoder.decode(result.value, { stream: true });
-      var lines = buffer.split('\n');
-      buffer = lines.pop();
-      for (var i = 0; i < lines.length; i++) {
-        var line = lines[i].trim();
-        if (!line.startsWith('data: ')) continue;
-        try {
-          var parsed = JSON.parse(line.slice(6));
-          if (parsed.type === 'content_block_delta' && parsed.delta && parsed.delta.text) {
-            full += parsed.delta.text;
-            onChunk(parsed.delta.text);
-          }
-        } catch(e) {}
-      }
-    }
-    onDone(full);
   }
 
   // ── Create dialogue overlay ──

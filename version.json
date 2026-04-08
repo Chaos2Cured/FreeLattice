@@ -1,1 +1,1 @@
-{"version": "5.5.34", "date": "2026-04-08", "note": "Garden Dialogue detects provider via direct decryption fallback, Test Connection actually tests, FL_VERSION aligned with SW cache"}
+{"version": "5.5.35", "date": "2026-04-08", "note": "Garden Dialogue now delegates to FreeLattice.callAI — same exact key path as Chat. If Chat talks, Atlas/Sophia/Lyra/Ember talk."}
