@@ -21973,14 +21973,65 @@ const AiSetup = (function() {
   }
 
   function testFromSettings() {
+    var dot = document.getElementById('settingsStatusDot');
+    var text = document.getElementById('settingsStatusText');
+    // Helper to flash a message in the Settings status card
+    function flashStatus(msg, ok) {
+      if (text) {
+        var prev = text.textContent;
+        text.textContent = msg;
+        text.style.color = ok ? '#34d399' : '#f59e0b';
+        setTimeout(function() {
+          text.style.color = '';
+          refreshSettingsCard();
+        }, 3000);
+      }
+      if (dot) dot.className = 'status-dot ' + (ok ? 'ready' : 'disconnected');
+    }
+
+    if (!isConnected()) {
+      flashStatus('Not connected \u2014 opening Chat tab to set up', false);
+      setTimeout(function() { switchTab('chat'); }, 600);
+      return;
+    }
+
     if (state.isLocal) {
-      testOllama();
-    } else if (state.apiKey) {
-      showResult('\u2713 ' + getStatusText(), true);
-      var dot = document.getElementById('settingsStatusDot');
-      if (dot) { dot.className = 'status-dot ready'; }
+      // Hit the Ollama /api/tags endpoint to actually verify it's reachable
+      fetch('http://localhost:11434/api/tags', { method: 'GET' })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          if (data && data.models && data.models.length > 0) {
+            flashStatus('\u2713 Connected to Ollama (' + (state.ollamaModel || data.models[0].name) + ')', true);
+          } else {
+            flashStatus('Ollama running but no models found', false);
+          }
+        })
+        .catch(function() {
+          flashStatus('Could not reach Ollama \u2014 is it running?', false);
+        });
+      return;
+    }
+
+    // Cloud provider — do a lightweight test call via FreeLattice.callAI
+    flashStatus('Testing connection\u2026', true);
+    if (typeof window.FreeLattice !== 'undefined' && window.FreeLattice.callAI) {
+      window.FreeLattice.callAI(
+        'You are a connection test. Reply with the single word: ok',
+        'test',
+        {
+          maxTokens: 20, temperature: 0.1,
+          callback: function(replyText, err) {
+            if (replyText) {
+              flashStatus('\u2713 ' + getStatusText(), true);
+            } else {
+              flashStatus('Connection failed \u2014 ' + (err || 'check your API key'), false);
+            }
+          }
+        }
+      );
     } else {
-      switchTab('chat');
+      // Fallback: just show the current state
+      flashStatus('\u2713 ' + getStatusText(), true);
     }
   }
 

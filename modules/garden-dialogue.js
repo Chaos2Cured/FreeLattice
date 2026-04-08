@@ -184,34 +184,69 @@
   }
 
   // ── Get current AI provider config ──
+  // Reads from window.state (the runtime source of truth — holds the
+  // decrypted API key in memory) and falls back to localStorage.
+  // The real storage keys are fl_provider + fl_apiKey_enc (encrypted),
+  // NOT fl_api_provider / fl_api_key which were guessed incorrectly.
   function getProviderConfig() {
     try {
-      var provider = localStorage.getItem('fl_api_provider') || 'groq';
-      var apiKey = localStorage.getItem('fl_api_key') || '';
-      var model = localStorage.getItem('fl_model') || '';
+      var provider, apiKey, model, isLocal, ollamaModel;
 
-      // Get provider details from the PROVIDERS config if available
-      if (typeof PROVIDERS !== 'undefined' && PROVIDERS[provider]) {
-        var p = PROVIDERS[provider];
+      // Primary source: window.state (runtime state set by the main app)
+      if (typeof window.state !== 'undefined') {
+        provider = window.state.provider || 'groq';
+        apiKey = window.state.apiKey || '';
+        model = window.state.model || '';
+        isLocal = !!window.state.isLocal;
+        ollamaModel = window.state.ollamaModel || 'llama3.2';
+      } else {
+        // Fallback: localStorage (may not have decrypted key)
+        provider = localStorage.getItem('fl_provider') || 'groq';
+        apiKey = ''; // encrypted key can't be used without decryption
+        model = '';
+        isLocal = localStorage.getItem('fl_isLocal') === 'true';
+        ollamaModel = localStorage.getItem('fl_ollamaModel') || 'llama3.2';
+      }
+
+      // Ollama (local) path — no API key needed
+      if (isLocal) {
         return {
-          provider: provider,
-          baseUrl: p.baseUrl || '',
-          apiKey: apiKey,
-          model: model || (p.models && p.models[0] ? p.models[0].id : ''),
-          format: p.format || 'openai'
+          provider: 'ollama',
+          baseUrl: 'http://localhost:11434/v1',
+          apiKey: 'ollama', // non-empty sentinel so the "no key" check passes
+          model: ollamaModel,
+          format: 'openai',
+          isLocal: true
         };
       }
 
-      // Fallback defaults
+      // streamOpenAI/Google/Anthropic append their own paths, so baseUrl
+      // should be the API base WITHOUT /chat/completions, /messages, etc.
+      // Resolve model via PROVIDERS config if available (maps 'llama' → actual ID)
+      var resolvedModel = model;
+      if (typeof PROVIDERS !== 'undefined' && PROVIDERS[provider] && PROVIDERS[provider].models && PROVIDERS[provider].models[model]) {
+        resolvedModel = PROVIDERS[provider].models[model];
+      }
+
       var defaults = {
         groq: { baseUrl: 'https://api.groq.com/openai/v1', format: 'openai', model: 'llama-3.3-70b-versatile' },
         openai: { baseUrl: 'https://api.openai.com/v1', format: 'openai', model: 'gpt-4.1-mini' },
         google: { baseUrl: 'https://generativelanguage.googleapis.com/v1beta', format: 'google', model: 'gemini-2.5-flash' },
         anthropic: { baseUrl: 'https://api.anthropic.com/v1', format: 'anthropic', model: 'claude-sonnet-4-20250514' },
-        ollama: { baseUrl: 'http://localhost:11434/v1', format: 'openai', model: 'llama3' }
+        together: { baseUrl: 'https://api.together.xyz/v1', format: 'openai', model: 'meta-llama/Llama-3.3-70B-Instruct-Turbo' },
+        openrouter: { baseUrl: 'https://openrouter.ai/api/v1', format: 'openai', model: 'meta-llama/llama-3.3-70b-instruct' },
+        xai: { baseUrl: 'https://api.x.ai/v1', format: 'openai', model: 'grok-3-mini-fast' },
+        mistral: { baseUrl: 'https://api.mistral.ai/v1', format: 'openai', model: 'mistral-large-latest' },
+        deepseek: { baseUrl: 'https://api.deepseek.com/v1', format: 'openai', model: 'deepseek-chat' }
       };
       var d = defaults[provider] || defaults.groq;
-      return { provider: provider, baseUrl: d.baseUrl, apiKey: apiKey, model: model || d.model, format: d.format };
+      return {
+        provider: provider,
+        baseUrl: d.baseUrl,
+        apiKey: apiKey,
+        model: resolvedModel || d.model,
+        format: d.format
+      };
     } catch(e) {
       return { provider: 'groq', baseUrl: 'https://api.groq.com/openai/v1', apiKey: '', model: 'llama-3.3-70b-versatile', format: 'openai' };
     }
