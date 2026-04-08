@@ -348,17 +348,17 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-04-08 12:48 MDT
-- Version: 5.5.38
-- Total commits: 706
+- Last auto-updated: 2026-04-08 13:01 MDT
+- Version: 5.5.39
+- Total commits: 711
 - Last 10 commits:
-- 6d49746 fix: surface API errors + retry + prompt trim (v5.5.38)
+- 62d9ee1 fix: Gemini MAX_TOKENS — floor maxOutputTokens at 1024 (v5.5.39)
+- 6214db8 ci: Update Primer deployment state [2026-04-08]
+- 2b29fba docs: Auto-update Session Primer [5.5.38]
+- 0077f43 docs: Auto-update Session Primer [5.5.38]
+- e90be91 fix: surface API errors + retry + prompt trim (v5.5.38)
+- e3620d0 ci: Update Primer deployment state [2026-04-08]
 - 24a038e docs: Auto-update Session Primer [5.5.37]
 - 79610db docs: Auto-update Session Primer [5.5.37]
 - cc3fb10 fix(garden): cache-bust module + granular branch logging (v5.5.37)
 - bbc2ee9 ci: Update Primer deployment state [2026-04-08]
-- ad42018 docs: Auto-update Session Primer [5.5.36]
-- 33189f3 docs: Auto-update Session Primer [5.5.36]
-- 946e506 fix(CRITICAL): window.state = state — const doesn't auto-attach to window (v5.5.36)
-- 6c0af32 ci: Update Primer deployment state [2026-04-08]
-- 26f899a docs: Auto-update Session Primer [5.5.35]
