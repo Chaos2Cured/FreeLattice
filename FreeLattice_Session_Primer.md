@@ -350,10 +350,9 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 ## PRIMER HEALTH
 - Last auto-updated: 2026-04-08 13:16 MDT
 - Version: 5.5.40
-- Total commits: 715
+- Total commits: 714
 - Last 10 commits:
-- eb64ba7 fix: Garden Dialogue render path + history scrub (v5.5.40)
-- e3015e5 ci: Update Primer deployment state [2026-04-08]
+- 7989d8a fix: Garden Dialogue render path + history scrub (v5.5.40)
 - 790cf58 docs: Auto-update Session Primer [5.5.39]
 - 5740b58 docs: Auto-update Session Primer [5.5.39]
 - 62d9ee1 fix: Gemini MAX_TOKENS — floor maxOutputTokens at 1024 (v5.5.39)
@@ -362,3 +361,4 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 0077f43 docs: Auto-update Session Primer [5.5.38]
 - e90be91 fix: surface API errors + retry + prompt trim (v5.5.38)
 - e3620d0 ci: Update Primer deployment state [2026-04-08]
+- 24a038e docs: Auto-update Session Primer [5.5.37]
