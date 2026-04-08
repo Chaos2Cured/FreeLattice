@@ -15614,7 +15614,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.5.35</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.5.36</span></div>
     </div>
   </div>
 
@@ -17404,7 +17404,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.5.35';
+const FL_VERSION = '5.5.36';
 // ─── Lattice Event Bus ─────────────────────────────────────────
 // Replaces switchTab monkey-patch chain with clean event dispatch
 const LatticeEvents = (function() {
@@ -19453,6 +19453,13 @@ const state = {
   memoryLastInjection: null,
 };
 
+// Expose state + PROVIDERS on window so external modules (garden-dialogue,
+// question-corner, dojo-sparring, etc.) can read the same runtime truth
+// Chat reads. `const` at top-level does NOT auto-attach to window —
+// without these lines, modules see `window.state === undefined` and fail
+// to detect a connected provider even though Chat is working fine.
+window.state = state;
+
 // ---- Provider Config ----
 const PROVIDERS = {
   groq: {
@@ -19694,6 +19701,7 @@ const PROVIDERS = {
     }
   }
 };
+window.PROVIDERS = PROVIDERS;
 
 const PRIVACY_INFO = {
   high: '<strong>High Privacy:</strong> Maximum privacy recommended. Use local mode (Ollama) so nothing leaves your computer. If using cloud, be aware that your messages are processed on external servers. No logs are kept by FreeLattice — everything stays in your browser\'s memory.',

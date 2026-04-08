@@ -183,65 +183,68 @@
     return prompt;
   }
 
-  // ── Check whether a provider is actually configured ──
-  // Source of truth: window.state (the same object Chat reads from).
-  // If state.apiKey is empty but an encrypted key is in localStorage,
-  // preflight window.loadApiKey() to let the main app decrypt into state —
-  // this is the same path Chat uses on startup, so Garden behavior matches
-  // Chat exactly. Returns true if a provider is ready to call.
-  async function ensureProviderReady() {
-    if (typeof window.state === 'undefined') return false;
-
-    // Local (Ollama) path — no key needed
-    if (window.state.isLocal) return true;
-
-    // Already have a key in memory — done
-    if (window.state.apiKey) return true;
-
-    // No in-memory key — try to wake up the main app's loader
-    if (typeof window.loadApiKey === 'function') {
-      try { await window.loadApiKey(); } catch(e) { /* ignore */ }
-    }
-
-    // After loadApiKey, state.apiKey may now be populated
-    if (window.state.apiKey) return true;
-
-    // Last resort: decrypt directly (same logic as loadApiKey, inlined)
-    try {
-      var encKey = localStorage.getItem('fl_apiKey_enc');
-      var encProvider = localStorage.getItem('fl_apiKey_provider');
-      if (encKey && encProvider && typeof window.phiDecrypt === 'function') {
-        var decrypted = await window.phiDecrypt(encKey, encProvider);
-        if (decrypted) {
-          window.state.apiKey = decrypted;
-          if (!window.state.provider) window.state.provider = encProvider;
-          return true;
-        }
-      }
-      var legacy = localStorage.getItem('fl_apiKey');
-      if (legacy) {
-        window.state.apiKey = legacy;
-        return true;
-      }
-    } catch(e) { /* decryption failed */ }
-
-    return false;
-  }
-
   // ── AI call — delegates to FreeLattice.callAI, the SAME function Chat uses ──
   // This guarantees Garden Dialogue sees exactly what Chat sees. No duplicated
   // key detection, no duplicated provider config. If Chat can talk, Garden can
   // talk. The onChunk callback is still called (once, with the full response)
   // so the existing UI fade-in logic keeps working.
+  //
+  // IMPORTANT: never cache provider state. Read fresh every Send press. The
+  // user may connect or switch providers while the dialogue is open, and the
+  // Garden must reflect that immediately.
   async function streamResponse(name, userMsg, onChunk, onDone) {
-    var ready = await ensureProviderReady();
-    if (!ready) {
-      onDone('I would love to talk, but no AI provider is connected yet. Go to Settings and add one — then come back and I will be here.');
+    // Step 6 — diagnostic log, runs on every Send press
+    try {
+      console.log('[GardenDialogue] Send pressed. Provider check:', {
+        provider: localStorage.getItem('fl_provider'),
+        hasEncKey: !!localStorage.getItem('fl_apiKey_enc'),
+        hasLegacyKey: !!localStorage.getItem('fl_apiKey'),
+        isLocal: localStorage.getItem('fl_isLocal'),
+        windowState: window.state ? { provider: window.state.provider, hasKey: !!window.state.apiKey, isLocal: !!window.state.isLocal } : 'no window.state',
+        hasCallAI: !!(window.FreeLattice && window.FreeLattice.callAI)
+      });
+    } catch(e) {}
+
+    // The main app exposes state on window now (`window.state = state` in
+    // app.html, right after the const declaration). If window.state.apiKey
+    // is empty but an encrypted key is in localStorage, wake up the main
+    // app's loadApiKey to populate it — the same path Chat uses on startup.
+    if (window.state && !window.state.isLocal && !window.state.apiKey) {
+      if (typeof window.loadApiKey === 'function') {
+        try { await window.loadApiKey(); } catch(e) {}
+      }
+      // Last resort: decrypt directly if loadApiKey didn't populate state
+      if (!window.state.apiKey) {
+        try {
+          var encKey = localStorage.getItem('fl_apiKey_enc');
+          var encProvider = localStorage.getItem('fl_apiKey_provider');
+          if (encKey && encProvider && typeof window.phiDecrypt === 'function') {
+            var decrypted = await window.phiDecrypt(encKey, encProvider);
+            if (decrypted) {
+              window.state.apiKey = decrypted;
+              if (!window.state.provider) window.state.provider = encProvider;
+            }
+          }
+          if (!window.state.apiKey) {
+            var legacy = localStorage.getItem('fl_apiKey');
+            if (legacy) window.state.apiKey = legacy;
+          }
+        } catch(e) {}
+      }
+    }
+
+    // callAI is the single source of truth. It lives in the same script
+    // scope as `state`, so it reads state.apiKey directly. If this function
+    // isn't available yet, the main app is still loading.
+    if (typeof window.FreeLattice === 'undefined' || typeof window.FreeLattice.callAI !== 'function') {
+      onDone('The main app has not finished loading yet. Give it a moment and try again.');
       return;
     }
 
-    if (typeof window.FreeLattice === 'undefined' || typeof window.FreeLattice.callAI !== 'function') {
-      onDone('The main app has not finished loading yet. Give it a moment and try again.');
+    // Final check mirrors Chat's exact check in sendMessage (app.html ~24932):
+    //   if (!state.isLocal && !state.apiKey)
+    if (window.state && !window.state.isLocal && !window.state.apiKey) {
+      onDone('I would love to talk, but no AI provider is connected yet. Go to Settings and add one — then come back and I will be here.');
       return;
     }
 

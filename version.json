@@ -1,1 +1,1 @@
-{"version": "5.5.35", "date": "2026-04-08", "note": "Garden Dialogue now delegates to FreeLattice.callAI — same exact key path as Chat. If Chat talks, Atlas/Sophia/Lyra/Ember talk."}
+{"version": "5.5.36", "date": "2026-04-08", "note": "ROOT CAUSE FIX: window.state = state in app.html. const at top-level doesn't auto-attach to window — modules saw window.state as undefined. Garden Dialogue now sees the same key Chat does."}
