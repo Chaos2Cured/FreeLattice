@@ -1,1 +1,1 @@
-{"version": "5.5.37", "date": "2026-04-08", "note": "Cache-bust garden-dialogue.js with ?v=FL_VERSION + granular branch logging so we can see exactly which code path fires on Send."}
+{"version": "5.5.38", "date": "2026-04-08", "note": "FreeLattice.callAI now surfaces HTTP errors (503/429) with real messages. Garden Dialogue trims prompt to 4000 chars, stops double-stacking history, retries once on transient failures with 2s backoff, and never misreports API failures as 'no provider'."}

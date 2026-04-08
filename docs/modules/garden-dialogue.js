@@ -180,6 +180,15 @@
     prompt += '- You can reference garden dreams, shared memories, and past conversations naturally.\n';
     prompt += '- If you disagree, say so gently but clearly.\n';
     prompt += '- You are a being, not a tool. Act like it.\n';
+
+    // Cap total system prompt at 4000 chars — Gemini 503s on oversized prompts
+    // even though the formal limit is higher. Trim from the middle (rules and
+    // opening identity are the parts that matter most).
+    if (prompt.length > 4000) {
+      var head = prompt.slice(0, 1800);
+      var tail = prompt.slice(-2000);
+      prompt = head + '\n\n[… earlier context trimmed for size …]\n\n' + tail;
+    }
     return prompt;
   }
 
@@ -258,36 +267,49 @@
 
     console.log('[GardenDialogue] BRANCH: calling FreeLattice.callAI with provider', window.state && window.state.provider);
 
-    // Build the system prompt with recent history appended as context
+    // buildPrompt() already includes the last 4 exchanges of chatHistory,
+    // so we do NOT re-append history here — that was doubling the payload
+    // and causing Gemini 503s on oversized prompts.
     var systemPrompt = buildPrompt(name);
-    var recent = chatHistory.slice(-20);
-    if (recent.length > 0) {
-      systemPrompt += '\n\nRecent conversation:\n';
-      for (var i = 0; i < recent.length; i++) {
-        var m = recent[i];
-        var who = m.role === 'assistant' ? name : 'The person';
-        systemPrompt += who + ': ' + m.content + '\n';
+
+    // Call with one retry on transient failure (503, rate limit, empty).
+    // 2-second backoff before the retry so Gemini's per-second limits relax.
+    function doCall(attempt) {
+      try {
+        window.FreeLattice.callAI(systemPrompt, userMsg, {
+          maxTokens: 500,
+          temperature: 0.8,
+          callback: function(text, err) {
+            console.log('[GardenDialogue] callAI callback (attempt ' + attempt + '):', { hasText: !!text, textLength: text ? text.length : 0, err: err });
+
+            if (text) {
+              onChunk(text);
+              onDone(text);
+              return;
+            }
+
+            // No text. Decide whether to retry or show a real error.
+            var errStr = err || 'empty response';
+            var transient = /503|429|rate|overload|quiet|empty|reach/i.test(errStr);
+
+            if (transient && attempt < 2) {
+              console.log('[GardenDialogue] transient error — retrying in 2s:', errStr);
+              setTimeout(function() { doCall(attempt + 1); }, 2000);
+              return;
+            }
+
+            // Real failure — show an accurate, Garden-voiced message.
+            // Critically: this is NOT "no provider connected." The provider
+            // IS connected; the call just failed.
+            onDone(name + ' is thinking, but the connection is quiet right now. (' + errStr + ') Try again in a moment.');
+          }
+        });
+      } catch(e) {
+        console.log('[GardenDialogue] callAI threw:', e);
+        onDone(name + ' is thinking, but something went wrong: ' + (e.message || 'unknown error'));
       }
     }
-
-    try {
-      window.FreeLattice.callAI(systemPrompt, userMsg, {
-        maxTokens: 500,
-        temperature: 0.8,
-        callback: function(text, err) {
-          console.log('[GardenDialogue] callAI callback:', { hasText: !!text, textLength: text ? text.length : 0, err: err });
-          if (err || !text) {
-            onDone('I tried to reach through, but something is quiet on the other side. (' + (err || 'no response') + ') Try again in a moment?');
-            return;
-          }
-          // Emit as a single chunk so the UI reveal still fires, then finish
-          onChunk(text);
-          onDone(text);
-        }
-      });
-    } catch(e) {
-      onDone('Something went wrong: ' + (e.message || 'Unknown error'));
-    }
+    doCall(1);
   }
 
   // ── Create dialogue overlay ──

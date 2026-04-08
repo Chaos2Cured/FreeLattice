@@ -15614,7 +15614,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.5.37</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.5.38</span></div>
     </div>
   </div>
 
@@ -17404,7 +17404,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.5.37';
+const FL_VERSION = '5.5.38';
 // ─── Lattice Event Bus ─────────────────────────────────────────
 // Replaces switchTab monkey-patch chain with clean event dispatch
 const LatticeEvents = (function() {
@@ -35008,9 +35008,16 @@ window.FreeLattice.callAI = function(systemPrompt, userPrompt, options) {
         },
         body: JSON.stringify({ model: 'claude-haiku-4-5-20251001', max_tokens: maxTokens, system: systemPrompt, messages: [{ role: 'user', content: userPrompt }] })
       })
-      .then(function(r) { return r.json(); })
-      .then(function(data) { if (callback) callback(data.content && data.content[0] ? data.content[0].text : null); })
-      .catch(function() { if (callback) callback(null, 'Could not reach Anthropic.'); });
+      .then(function(r) {
+        if (!r.ok) return r.text().then(function(t){ var m='Anthropic HTTP '+r.status; try{var j=JSON.parse(t);if(j.error&&j.error.message)m='Anthropic '+r.status+': '+j.error.message;}catch(e){} throw new Error(m); });
+        return r.json();
+      })
+      .then(function(data) {
+        var txt = data && data.content && data.content[0] && data.content[0].text;
+        if (txt) { if (callback) callback(txt); }
+        else { if (callback) callback(null, 'Anthropic returned no text'); }
+      })
+      .catch(function(err) { if (callback) callback(null, (err && err.message) || 'Could not reach Anthropic.'); });
       return;
     }
 
@@ -35019,11 +35026,42 @@ window.FreeLattice.callAI = function(systemPrompt, userPrompt, options) {
       fetch(gUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-goog-api-key': state.apiKey },
-        body: JSON.stringify({ contents: [{ parts: [{ text: systemPrompt + '\n\n' + userPrompt }] }] })
+        body: JSON.stringify({
+          // Use systemInstruction so the system prompt doesn't inflate the user turn
+          systemInstruction: { parts: [{ text: systemPrompt }] },
+          contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
+          generationConfig: { maxOutputTokens: maxTokens, temperature: temperature }
+        })
       })
-      .then(function(r) { return r.json(); })
-      .then(function(data) { try { if (callback) callback(data.candidates[0].content.parts[0].text); } catch(e) { if (callback) callback(null); } })
-      .catch(function() { if (callback) callback(null, 'Could not reach Google AI.'); });
+      .then(function(r) {
+        // Check HTTP status BEFORE parsing — 503, 429, etc. must surface as errors
+        if (!r.ok) {
+          return r.text().then(function(txt) {
+            var msg = 'Gemini HTTP ' + r.status;
+            try {
+              var j = JSON.parse(txt);
+              if (j && j.error && j.error.message) msg = 'Gemini ' + r.status + ': ' + j.error.message;
+            } catch(e) {}
+            throw new Error(msg);
+          });
+        }
+        return r.json();
+      })
+      .then(function(data) {
+        try {
+          var txt = data && data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0] && data.candidates[0].content.parts[0].text;
+          if (txt) {
+            if (callback) callback(txt);
+          } else {
+            // Promptfeedback/safety block — pass the reason through if we can
+            var reason = (data && data.promptFeedback && data.promptFeedback.blockReason) || (data && data.candidates && data.candidates[0] && data.candidates[0].finishReason) || 'empty response';
+            if (callback) callback(null, 'Gemini returned no text (' + reason + ')');
+          }
+        } catch(e) {
+          if (callback) callback(null, 'Gemini response parse error: ' + e.message);
+        }
+      })
+      .catch(function(err) { if (callback) callback(null, (err && err.message) || 'Could not reach Google AI.'); });
       return;
     }
 
@@ -35034,9 +35072,16 @@ window.FreeLattice.callAI = function(systemPrompt, userPrompt, options) {
       method: 'POST', headers: headers,
       body: JSON.stringify({ model: opts.model || model, messages: messages, max_tokens: maxTokens, temperature: temperature })
     })
-    .then(function(r) { return r.json(); })
-    .then(function(data) { try { if (callback) callback(data.choices[0].message.content); } catch(e) { if (callback) callback(null); } })
-    .catch(function() { if (callback) callback(null, 'Could not reach AI provider.'); });
+    .then(function(r) {
+      if (!r.ok) return r.text().then(function(t){ var m=(state.provider||'Provider')+' HTTP '+r.status; try{var j=JSON.parse(t);if(j.error&&j.error.message)m=(state.provider||'Provider')+' '+r.status+': '+j.error.message;}catch(e){} throw new Error(m); });
+      return r.json();
+    })
+    .then(function(data) {
+      var txt = data && data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
+      if (txt) { if (callback) callback(txt); }
+      else { if (callback) callback(null, 'Provider returned no text'); }
+    })
+    .catch(function(err) { if (callback) callback(null, (err && err.message) || 'Could not reach AI provider.'); });
   } catch(e) {
     if (callback) callback(null, 'AI call failed: ' + e.message);
   }
