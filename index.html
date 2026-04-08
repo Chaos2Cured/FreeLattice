@@ -17183,6 +17183,12 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     <div style="text-align:center;padding:60px 20px;color:var(--text-muted);font-style:italic;">Loading The Sparring Arena&hellip;</div>
   </div>
 </div>
+<!-- ==================== TAB: THE QUESTION CORNER ==================== -->
+<div class="tab-panel" id="tab-questions">
+  <div id="questionCornerContainer">
+    <div style="text-align:center;padding:60px 20px;color:var(--text-muted);font-style:italic;">Loading The Question Corner&hellip;</div>
+  </div>
+</div>
 <!-- ==================== TAB: THE MIRROR ==================== -->
 <div class="tab-panel" id="tab-mirror">
   <div id="mirrorContainer">
@@ -20921,7 +20927,7 @@ function hideTabLoading() {
 }
 
 // More menu tabs — highlight the More button when one of these is active
-var MORE_TAB_IDS = ['core', 'city', 'nursery', 'agents', 'skills', 'roundtable', 'studio', 'market', 'wallet', 'workspace', 'dojo', 'mirror', 'harmonia', 'dream-archive', 'sparring'];
+var MORE_TAB_IDS = ['core', 'city', 'nursery', 'agents', 'skills', 'roundtable', 'studio', 'market', 'wallet', 'workspace', 'dojo', 'mirror', 'harmonia', 'dream-archive', 'sparring', 'questions'];
 
 function switchTab(tabId) {
   // Legacy tab mapping — channels/mesh now live inside community
@@ -21592,7 +21598,8 @@ const FlTabs = (function() {
       { id: 'city', icon: '&#x1F3D9;', label: 'City' },
       { id: 'nursery', icon: '&#x1F331;', label: 'Nursery' },
       { id: 'agents', icon: '&#10022;', label: 'Pantheon' },
-      { id: 'harmonia', icon: '&#x1F4A0;', label: 'Harmonia Channel' }
+      { id: 'harmonia', icon: '&#x1F4A0;', label: 'Harmonia Channel' },
+      { id: 'questions', icon: '&#10067;', label: 'Questions' }
     ]},
     { label: '\u2500\u2500 Create \u2500\u2500', tabs: [
       { id: 'skills', icon: '&#9889;', label: 'Skills' },
@@ -48713,6 +48720,7 @@ const WallOfPresence = (function() {
   <button class="fl-mmore-item" onclick="flMobileNav('mirror')">&#10022; Mirror</button>
   <button class="fl-mmore-item" onclick="flMobileNav('dream-archive')">&#10047; Dream Archive</button>
   <button class="fl-mmore-item" onclick="flMobileNav('sparring')">&#9876; Sparring Arena</button>
+  <button class="fl-mmore-item" onclick="flMobileNav('questions')">&#10067; Questions</button>
 </div>
 
 <script>
@@ -49118,6 +49126,25 @@ document.addEventListener('click', function(e) {
   if (typeof LatticeEvents !== 'undefined') {
     LatticeEvents.on('tabChanged', function(d) { if (d && d.tabId === 'sparring') loadSparring(); });
     LatticeEvents.on('tabActivated:sparring', loadSparring);
+  }
+})();
+
+// ── Question Corner lazy-load ──
+(function() {
+  var loaded = false;
+  function loadQuestionCorner() {
+    if (loaded) {
+      if (window.FreeLatticeModules && window.FreeLatticeModules.QuestionCorner) window.FreeLatticeModules.QuestionCorner.init();
+      return;
+    }
+    loaded = true;
+    FreeLatticeLoader.load('QuestionCorner', 'modules/question-corner.js', function(mod) {
+      if (mod && mod.init) mod.init();
+    });
+  }
+  if (typeof LatticeEvents !== 'undefined') {
+    LatticeEvents.on('tabChanged', function(d) { if (d && d.tabId === 'questions') loadQuestionCorner(); });
+    LatticeEvents.on('tabActivated:questions', loadQuestionCorner);
   }
 })();
       LatticeEvents.on('tabActivated:dream-archive', loadDreamArchive);
