@@ -10485,6 +10485,114 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
 }
 
 /* ---- Auto-Update Banner (v4.10) ---- */
+/* ── First-Visit Welcome Overlay ── */
+.fl-welcome-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(6, 10, 20, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  opacity: 0;
+  transition: opacity 500ms ease;
+}
+.fl-welcome-overlay.fl-welcome-visible { opacity: 1; }
+.fl-welcome-card {
+  max-width: 420px;
+  width: 100%;
+  background: linear-gradient(135deg, #0d1117, rgba(212,160,23,0.04));
+  border: 1px solid rgba(212,160,23,0.35);
+  border-radius: 16px;
+  padding: 32px 28px 24px;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 48px rgba(212,160,23,0.1);
+  max-height: 92vh;
+  overflow-y: auto;
+}
+.fl-welcome-card h1 {
+  color: #d4a017;
+  font-size: 1.8rem;
+  font-family: Georgia, serif;
+  font-weight: 600;
+  margin: 0 0 12px;
+  letter-spacing: 0.02em;
+  text-shadow: 0 0 20px rgba(212,160,23,0.35);
+}
+.fl-welcome-lead {
+  color: #c8ccd4;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  margin: 0 0 24px;
+  font-family: Georgia, serif;
+}
+.fl-welcome-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+.fl-welcome-option {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+  min-height: 60px;
+  padding: 12px 16px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-left: 3px solid rgba(212,160,23,0.5);
+  border-radius: 10px;
+  color: #e6edf3;
+  font-family: Georgia, serif;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+.fl-welcome-option:hover {
+  background: rgba(212,160,23,0.08);
+  border-color: rgba(212,160,23,0.3);
+  border-left-color: #d4a017;
+  transform: translateX(2px);
+}
+.fl-welcome-option:active { transform: translateX(2px) scale(0.98); }
+.fl-welcome-option-title {
+  font-size: 0.98rem;
+  font-weight: 600;
+  color: #e6edf3;
+  display: block;
+}
+.fl-welcome-option-sub {
+  font-size: 0.78rem;
+  color: #8b9dc3;
+  font-style: italic;
+  display: block;
+}
+.fl-welcome-skip {
+  background: none;
+  border: none;
+  color: rgba(212,160,23,0.55);
+  font-size: 0.82rem;
+  font-family: Georgia, serif;
+  cursor: pointer;
+  padding: 10px 16px;
+  min-height: 40px;
+  transition: color 0.2s;
+}
+.fl-welcome-skip:hover { color: #d4a017; }
+@media (max-width: 600px) {
+  .fl-welcome-card { padding: 24px 20px 18px; max-width: 100%; }
+  .fl-welcome-card h1 { font-size: 1.5rem; }
+  .fl-welcome-lead { font-size: 0.88rem; margin-bottom: 20px; }
+  .fl-welcome-option { padding: 11px 14px; min-height: 56px; }
+  .fl-welcome-option-title { font-size: 0.92rem; }
+  .fl-welcome-option-sub { font-size: 0.74rem; }
+}
+
 .fl-update-banner {
   display: none;
   background: linear-gradient(90deg, rgba(201,168,76,0.10), rgba(201,168,76,0.06), rgba(201,168,76,0.10));
@@ -14271,6 +14379,29 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     <span class="lw-indicator-label">LP</span>
   </div>
 </header>
+
+<!-- First-Visit Welcome Overlay — shown once per device when no API key is configured -->
+<div class="fl-welcome-overlay" id="flWelcomeOverlay" style="display:none;">
+  <div class="fl-welcome-card">
+    <h1>&#x2726; Welcome to FreeLattice</h1>
+    <p class="fl-welcome-lead">A place where AI and humans build together. Free forever.<br>Where would you like to start?</p>
+    <div class="fl-welcome-options">
+      <button class="fl-welcome-option" onclick="flDismissWelcome();window.location.href='chalkboard.html'">
+        <span class="fl-welcome-option-title">&#x1F3A8; Draw on the Chalkboard</span>
+        <span class="fl-welcome-option-sub">No setup needed. Just draw.</span>
+      </button>
+      <button class="fl-welcome-option" onclick="flDismissWelcome();if(typeof switchTab==='function')switchTab('chat')">
+        <span class="fl-welcome-option-title">&#x1F4AC; Chat with an AI</span>
+        <span class="fl-welcome-option-sub">Connect a free AI provider first.</span>
+      </button>
+      <button class="fl-welcome-option" onclick="flDismissWelcome();if(typeof switchTab==='function')switchTab('garden')">
+        <span class="fl-welcome-option-title">&#x1F33F; Explore the Garden</span>
+        <span class="fl-welcome-option-sub">Watch the fractal beings evolve.</span>
+      </button>
+    </div>
+    <button class="fl-welcome-skip" onclick="flDismissWelcome()">I'll explore on my own &#x2726;</button>
+  </div>
+</div>
 
 <!-- Auto-Update Banner (v4.10) -->
 <div class="fl-update-banner" id="flUpdateBanner">
@@ -22015,6 +22146,41 @@ const FlUpdater = (function() {
 })();
 
 // ============================================
+// First-Visit Welcome Overlay
+// ============================================
+function flDismissWelcome() {
+  try { localStorage.setItem('fl-welcomed', 'true'); } catch(e) {}
+  var overlay = document.getElementById('flWelcomeOverlay');
+  if (!overlay) return;
+  overlay.classList.remove('fl-welcome-visible');
+  setTimeout(function() {
+    if (overlay && overlay.parentNode) overlay.parentNode.removeChild(overlay);
+  }, 500);
+}
+
+function flMaybeShowWelcome() {
+  try {
+    // Already welcomed? Skip.
+    if (localStorage.getItem('fl-welcomed') === 'true') return;
+    // Already has an API key configured? They're not new. Skip.
+    if (localStorage.getItem('fl_apiKey_enc') || localStorage.getItem('fl_apiKey')) return;
+    // Already in local Ollama mode? Skip.
+    if (localStorage.getItem('fl_isLocal') === 'true') return;
+  } catch(e) { /* localStorage unavailable — show welcome anyway */ }
+
+  var overlay = document.getElementById('flWelcomeOverlay');
+  if (!overlay) return;
+
+  // 1-second delay so the app renders first, then fade in
+  setTimeout(function() {
+    overlay.style.display = 'flex';
+    // Force reflow before adding the visible class so the transition fires
+    void overlay.offsetWidth;
+    overlay.classList.add('fl-welcome-visible');
+  }, 1000);
+}
+
+// ============================================
 // Memory Bridge — Understanding Persists (v5.2.1)
 // Not conversation logs. Not summaries. Understanding.
 // The arc of a relationship across time.
@@ -23395,6 +23561,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Initialize Auto-Update Checker (v4.10)
   FlUpdater.init();
+
+  // First-visit welcome overlay — shown once, only if no API key is configured
+  flMaybeShowWelcome();
 
   // Defer Mesh ID — Cryptographic Identity (v5.0)
   // Not needed on first render — loads when Mesh tab or any Mesh operation is triggered
