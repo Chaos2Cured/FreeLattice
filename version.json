@@ -1,1 +1,1 @@
-{"version": "5.5.44", "date": "2026-04-09", "note": "Chat UI Polish Part 1 — header softened (\"Chat · model\"), input split into primary + secondary rows, ≡ and + moved to header, voice/image moved to overflow popup, YOU label removed, disclaimer auto-fades after first message."}
+{"version": "5.5.45", "date": "2026-04-09", "note": "Chalkboard now supports Ollama as a vision provider. First option in setup, no key required, auto-detects locally installed vision models."}
