@@ -1,1 +1,1 @@
-{"version": "5.5.40", "date": "2026-04-08", "note": "Atlas speaks. Garden Dialogue render path bulletproofed — finishOnce guard, history scrub on open, success-vs-error separation so errors never pollute replayed history."}
+{"version": "5.5.41", "date": "2026-04-08", "note": "Nuclear render path — on success, Garden Dialogue writes directly to #gdlgMessages bypassing msgEl/addMessage. Guarantees Atlas's text reaches the screen even if prior render closures were stale."}

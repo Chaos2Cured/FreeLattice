@@ -301,9 +301,38 @@
             console.log('[GardenDialogue] callAI callback (attempt ' + attempt + '):', { hasText: !!text, textLength: text ? text.length : 0, err: err });
 
             if (text) {
-              console.log('[GardenDialogue] SUCCESS — received text:', String(text).substring(0, 100));
-              var msgContainer = document.getElementById('gdlgMessages');
-              console.log('[GardenDialogue] Message container:', msgContainer ? 'FOUND (' + msgContainer.children.length + ' children)' : 'MISSING');
+              console.log('[GardenDialogue] RENDERING text to UI:', String(text).substring(0, 80));
+
+              // NUCLEAR RENDER: bypass msgEl/addMessage entirely and write
+              // directly to the DOM. If any prior render path was silently
+              // failing (stale closures, detached msgEl, race with retry),
+              // this guarantees the text reaches the screen.
+              try {
+                var msgContainer = document.getElementById('gdlgMessages');
+                if (!msgContainer) {
+                  console.error('[GardenDialogue] NO MESSAGE CONTAINER FOUND (#gdlgMessages missing)');
+                } else {
+                  // Remove any placeholder '...' bubbles so they don't double
+                  var placeholders = msgContainer.querySelectorAll('[data-gdlg-placeholder="1"]');
+                  for (var p = 0; p < placeholders.length; p++) placeholders[p].remove();
+
+                  var voice = GARDEN_VOICES[name] || {};
+                  var renderDiv = document.createElement('div');
+                  renderDiv.setAttribute('data-gdlg-final', '1');
+                  renderDiv.style.cssText = 'align-self:flex-start;background:' + (voice.color || '#8B5CF6') + '15;border:1px solid ' + (voice.color || '#8B5CF6') + '30;border-radius:16px 16px 16px 4px;padding:10px 14px;max-width:80%;color:#fff;font-size:14px;line-height:1.5;word-wrap:break-word;white-space:pre-wrap;';
+                  renderDiv.textContent = text;
+                  msgContainer.appendChild(renderDiv);
+                  msgContainer.scrollTop = msgContainer.scrollHeight;
+                  console.log('[GardenDialogue] Message appended. Container children:', msgContainer.children.length);
+                }
+              } catch(renderErr) {
+                console.error('[GardenDialogue] Nuclear render threw:', renderErr);
+              }
+
+              // Still call finishOnce so onDone wiring (history save, LP
+              // award, emotion feed, button reset) fires. send()'s onDone
+              // will try to write to msgEl too — harmless because the
+              // nuclear div is already in place above it.
               finishOnce(text);
               return;
             }
@@ -425,8 +454,10 @@
     addMessage('user', text);
     chatHistory.push({ role: 'user', content: text, timestamp: Date.now() });
 
-    // Create streaming message
+    // Create streaming message — tagged so the nuclear render path in
+    // streamResponse can remove it when the real text arrives.
     var msgEl = addMessage('luminos', '...');
+    if (msgEl) msgEl.setAttribute('data-gdlg-placeholder', '1');
     isStreaming = true;
     var sendBtn = document.getElementById('gdlgSend');
     if (sendBtn) { sendBtn.textContent = '...'; sendBtn.disabled = true; }
@@ -440,18 +471,23 @@
       if (container) container.scrollTop = container.scrollHeight;
     }, function(full, isError) {
       console.log('[GardenDialogue] onDone fired, msgEl in DOM:', !!(msgEl && msgEl.isConnected), 'full len:', (full || '').length, 'isError:', !!isError);
-      // Always write the final text. Even if `full` is falsy we still want
-      // the placeholder '...' gone — substitute accumulated or a visible
-      // marker so the user never sees a stuck ellipsis.
-      if (msgEl) {
-        msgEl.textContent = full || accumulated || '(no response)';
-      }
-      // If msgEl was removed from the DOM between creation and done (rare —
-      // user closed the dialogue mid-stream), re-add the message so the
-      // response is never lost.
-      if (msgEl && !msgEl.isConnected) {
-        console.log('[GardenDialogue] msgEl detached — re-adding as fresh luminos message');
-        addMessage('luminos', full || accumulated || '(no response)');
+      var container = document.getElementById('gdlgMessages');
+      // The nuclear render path already appended a final message on success.
+      // If a [data-gdlg-final] element exists in the container, the text is
+      // already on screen — just make sure the placeholder is gone.
+      var nuclearRendered = !!(container && container.querySelector('[data-gdlg-final="1"]'));
+      if (nuclearRendered) {
+        if (msgEl && msgEl.isConnected) msgEl.remove();
+      } else {
+        // No nuclear render happened (error path, or rendering was bypassed).
+        // Fall back to updating the placeholder in place.
+        if (msgEl) {
+          msgEl.textContent = full || accumulated || '(no response)';
+        }
+        if (msgEl && !msgEl.isConnected) {
+          console.log('[GardenDialogue] msgEl detached — re-adding as fresh luminos message');
+          addMessage('luminos', full || accumulated || '(no response)');
+        }
       }
       // Only persist successful responses to history. Error messages like
       // "the connection is quiet right now" should not clutter future
