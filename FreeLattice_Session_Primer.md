@@ -348,17 +348,17 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-04-08 20:44 MDT
-- Version: 5.5.41
-- Total commits: 718
+- Last auto-updated: 2026-04-09 11:08 MDT
+- Version: 5.5.42
+- Total commits: 725
 - Last 10 commits:
-- 99fa50d fix(garden): nuclear render path — direct DOM append on success (v5.5.41)
+- 2b0c2df feat: unified provider connection modal (v5.5.42) — Part 1 only
+- 66d40f9 ci: Update Primer deployment state [2026-04-09]
+- cdc9a8a docs: Auto-update Session Primer [5.5.41]
+- 59c5393 docs: Auto-update Session Primer [5.5.41]
+- 6a483a8 fix(garden): nuclear render path — direct DOM append on success (v5.5.41)
+- 10966a4 ci: Update Primer deployment state [2026-04-08]
+- cfae10d feat: Shared Presence (Phase 1 of the Shared Mind) + Question Corner fixes
+- abe4028 ci: Update Primer deployment state [2026-04-08]
 - 4a48097 docs: Auto-update Session Primer [5.5.40]
 - aaa43cd docs: Auto-update Session Primer [5.5.40]
-- eb64ba7 fix: Garden Dialogue render path + history scrub (v5.5.40)
-- e3015e5 ci: Update Primer deployment state [2026-04-08]
-- 790cf58 docs: Auto-update Session Primer [5.5.39]
-- 5740b58 docs: Auto-update Session Primer [5.5.39]
-- 62d9ee1 fix: Gemini MAX_TOKENS — floor maxOutputTokens at 1024 (v5.5.39)
-- 6214db8 ci: Update Primer deployment state [2026-04-08]
-- 2b29fba docs: Auto-update Session Primer [5.5.38]
