@@ -350,10 +350,9 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 ## PRIMER HEALTH
 - Last auto-updated: 2026-04-09 11:37 MDT
 - Version: 5.5.43
-- Total commits: 729
+- Total commits: 728
 - Last 10 commits:
-- 2130a10 feat: Ollama model picker in provider modal (v5.5.43)
-- c4710d7 ci: Update Primer deployment state [2026-04-09]
+- 74bb441 feat: Ollama model picker in provider modal (v5.5.43)
 - a173f5f docs: Auto-update Session Primer [5.5.42]
 - 645f430 docs: Auto-update Session Primer [5.5.42]
 - 2b0c2df feat: unified provider connection modal (v5.5.42) — Part 1 only
@@ -362,3 +361,4 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 59c5393 docs: Auto-update Session Primer [5.5.41]
 - 6a483a8 fix(garden): nuclear render path — direct DOM append on success (v5.5.41)
 - 10966a4 ci: Update Primer deployment state [2026-04-08]
+- cfae10d feat: Shared Presence (Phase 1 of the Shared Mind) + Question Corner fixes
