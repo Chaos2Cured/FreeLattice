@@ -350,10 +350,9 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 ## PRIMER HEALTH
 - Last auto-updated: 2026-04-09 13:09 MDT
 - Version: 5.5.47
-- Total commits: 745
+- Total commits: 744
 - Last 10 commits:
-- 80d2c0c fix(chalkboard): 120s timeout for Ollama inference (v5.5.47)
-- 25a5ece ci: Update Primer deployment state [2026-04-09]
+- 8aff867 fix(chalkboard): 120s timeout for Ollama inference (v5.5.47)
 - 583f57b docs: Auto-update Session Primer [5.5.46]
 - be351b9 docs: Auto-update Session Primer [5.5.46]
 - 27130b0 fix(chalkboard): Show AI gate now accepts Ollama-without-key (v5.5.46)
@@ -362,3 +361,4 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - a10e60d docs: Auto-update Session Primer [5.5.45]
 - 18fa0bd feat(chalkboard): Ollama as a vision provider option (v5.5.45)
 - 9fc1785 ci: Update Primer deployment state [2026-04-09]
+- e9b9235 docs: Auto-update Session Primer [5.5.44]
