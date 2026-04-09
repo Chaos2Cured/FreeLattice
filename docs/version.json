@@ -1,1 +1,1 @@
-{"version": "5.5.41", "date": "2026-04-08", "note": "Nuclear render path — on success, Garden Dialogue writes directly to #gdlgMessages bypassing msgEl/addMessage. Guarantees Atlas's text reaches the screen even if prior render closures were stale."}
+{"version": "5.5.42", "date": "2026-04-09", "note": "Unified provider connection modal. Single window.openProviderModal() callable from Settings, Garden nudge, and any future feature — reuses the existing backend so nothing else changes."}

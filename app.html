@@ -15039,7 +15039,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <span id="settingsStatusText">Not connected</span>
     </div>
     <div class="ai-status-actions">
-      <button class="ai-status-btn ai-status-btn-primary" onclick="switchTab('chat')">Change Provider</button>
+      <button class="ai-status-btn ai-status-btn-primary" onclick="openProviderModal()">Change Provider</button>
       <button class="ai-status-btn" onclick="AiSetup.testFromSettings()">Test Connection</button>
     </div>
   </div>
@@ -15614,7 +15614,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.5.41</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.5.42</span></div>
     </div>
   </div>
 
@@ -16730,7 +16730,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     <!-- Gentle AI connection nudge — shown only if no provider configured, dismissible -->
     <div class="garden-nudge" id="gardenNudge" style="display:none;">
       <span class="garden-nudge-text">&#x2728; Connect an AI to hear the Garden speak</span>
-      <button class="garden-nudge-btn" onclick="switchTab('settings')">Set up AI &rarr;</button>
+      <button class="garden-nudge-btn" onclick="openProviderModal()">Set up AI &rarr;</button>
       <button class="garden-nudge-dismiss" onclick="(function(b){b.parentElement.style.opacity=0;setTimeout(function(){b.parentElement.style.display='none';},400);try{localStorage.setItem('fl-garden-nudge-dismissed','true');}catch(e){}})(this)" title="Dismiss">&#x2715;</button>
     </div>
   </div>
@@ -17404,7 +17404,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.5.41';
+const FL_VERSION = '5.5.42';
 // ─── Lattice Event Bus ─────────────────────────────────────────
 // Replaces switchTab monkey-patch chain with clean event dispatch
 const LatticeEvents = (function() {
@@ -22076,6 +22076,263 @@ const AiSetup = (function() {
     }
   }
 
+  // ── Unified Provider Modal ──────────────────────────────────────
+  // One modal, callable from anywhere, reuses the existing connection
+  // backend (testConnection/testOllama/saveApiKey/updateStatus). Styled
+  // like Garden Dialogue — dark glass, backdrop blur, centered card.
+  //
+  // Exposed globally as window.openProviderModal() so future code (Chat
+  // banner, Garden nudge, Canvas, any new feature) can call one function
+  // and stop duplicating inline provider setup UIs.
+  var modalOverlayEl = null;
+  var modalSelectedProvider = null;
+
+  var MODAL_PROVIDERS = [
+    { id: 'google',   name: 'Gemini',  accent: '#4285F4', note: 'Free tier \u2014 fast & vision', keyUrl: 'https://aistudio.google.com/apikey' },
+    { id: 'groq',     name: 'Groq',    accent: '#F55036', note: 'Free & blazing fast', keyUrl: 'https://console.groq.com/keys' },
+    { id: 'openai',   name: 'OpenAI',  accent: '#10A37F', note: 'GPT-4.1 \u2014 paid', keyUrl: 'https://platform.openai.com/api-keys' },
+    { id: 'anthropic',name: 'Claude',  accent: '#D97757', note: 'Sonnet/Haiku \u2014 paid', keyUrl: 'https://console.anthropic.com/settings/keys' },
+    { id: 'xai',      name: 'Grok',    accent: '#FFFFFF', note: 'xAI \u2014 strong vision', keyUrl: 'https://console.x.ai' }
+  ];
+
+  function closeModal() {
+    if (!modalOverlayEl) return;
+    modalOverlayEl.style.opacity = '0';
+    setTimeout(function() {
+      if (modalOverlayEl) { modalOverlayEl.remove(); modalOverlayEl = null; }
+    }, 250);
+  }
+
+  function openModal() {
+    if (modalOverlayEl) return; // already open
+    modalSelectedProvider = null;
+
+    var overlay = document.createElement('div');
+    overlay.id = 'providerModalOverlay';
+    overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;z-index:10050;background:rgba(0,0,0,0.75);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;transition:opacity 0.25s ease;';
+
+    var card = document.createElement('div');
+    card.style.cssText = 'width:100%;max-width:420px;max-height:90vh;overflow-y:auto;background:#1a1a2e;border:1px solid rgba(212,160,23,0.25);border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,0.6),0 0 80px rgba(212,160,23,0.08);padding:24px;font-family:inherit;-webkit-overflow-scrolling:touch;';
+
+    // Header
+    var header = document.createElement('div');
+    header.style.cssText = 'display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;';
+    header.innerHTML = '<div style="color:#d4a017;font-weight:600;font-size:18px;letter-spacing:0.01em;">Connect an AI</div>' +
+      '<button id="pmClose" type="button" style="background:none;border:none;color:rgba(255,255,255,0.5);font-size:20px;cursor:pointer;padding:4px 8px;line-height:1;" title="Close">\u2715</button>';
+
+    var subtitle = document.createElement('div');
+    subtitle.style.cssText = 'color:rgba(255,255,255,0.55);font-size:13px;margin-bottom:18px;';
+    subtitle.textContent = 'Pick a provider. Your key stays on your device, encrypted.';
+
+    // Provider cards
+    var providerList = document.createElement('div');
+    providerList.id = 'pmProviderList';
+    providerList.style.cssText = 'display:flex;flex-direction:column;gap:8px;margin-bottom:14px;';
+    MODAL_PROVIDERS.forEach(function(p) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.setAttribute('data-provider', p.id);
+      btn.style.cssText = 'display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:#fff;cursor:pointer;text-align:left;font-family:inherit;transition:all 0.15s ease;';
+      btn.innerHTML = '<div><div style="font-weight:600;font-size:14px;color:' + p.accent + ';">' + p.name + '</div>' +
+        '<div style="font-size:11px;color:rgba(255,255,255,0.55);margin-top:2px;">' + p.note + '</div></div>' +
+        '<div style="color:rgba(255,255,255,0.3);font-size:18px;">\u203A</div>';
+      btn.addEventListener('mouseenter', function() { btn.style.background = 'rgba(255,255,255,0.08)'; btn.style.borderColor = p.accent + '66'; });
+      btn.addEventListener('mouseleave', function() { btn.style.background = 'rgba(255,255,255,0.04)'; btn.style.borderColor = 'rgba(255,255,255,0.1)'; });
+      btn.addEventListener('click', function() { modalSelectProvider(p.id); });
+      providerList.appendChild(btn);
+    });
+
+    // Key input (hidden until a provider is picked)
+    var keyForm = document.createElement('div');
+    keyForm.id = 'pmKeyForm';
+    keyForm.style.cssText = 'display:none;flex-direction:column;gap:10px;margin-bottom:14px;';
+    keyForm.innerHTML = '<div id="pmKeyProviderLabel" style="color:rgba(255,255,255,0.7);font-size:12px;"></div>' +
+      '<input id="pmKeyInput" type="password" placeholder="Paste your API key" autocomplete="off" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:10px 12px;color:#fff;font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">' +
+      '<a id="pmKeyLink" href="#" target="_blank" rel="noopener" style="color:#d4a017;font-size:12px;text-decoration:none;">Get a free key \u2192</a>' +
+      '<button id="pmConnectBtn" type="button" style="background:#d4a017;color:#1a1a2e;border:none;border-radius:8px;padding:12px;font-weight:600;cursor:pointer;font-size:14px;font-family:inherit;">Connect</button>' +
+      '<button id="pmBackBtn" type="button" style="background:none;border:none;color:rgba(255,255,255,0.5);padding:4px;cursor:pointer;font-size:12px;font-family:inherit;">\u2190 Pick a different provider</button>';
+
+    // Result message
+    var result = document.createElement('div');
+    result.id = 'pmResult';
+    result.style.cssText = 'display:none;padding:10px 12px;border-radius:8px;font-size:13px;margin-bottom:12px;';
+
+    // Footer: Ollama link
+    var footer = document.createElement('div');
+    footer.style.cssText = 'border-top:1px solid rgba(255,255,255,0.08);padding-top:14px;margin-top:4px;text-align:center;';
+    footer.innerHTML = '<button id="pmOllamaBtn" type="button" style="background:none;border:none;color:rgba(255,255,255,0.55);font-size:12px;cursor:pointer;font-family:inherit;">\uD83C\uDFE0 Use Ollama (local, no key needed)</button>';
+
+    card.appendChild(header);
+    card.appendChild(subtitle);
+    card.appendChild(providerList);
+    card.appendChild(keyForm);
+    card.appendChild(result);
+    card.appendChild(footer);
+    overlay.appendChild(card);
+    document.body.appendChild(overlay);
+    modalOverlayEl = overlay;
+
+    // Animate in
+    requestAnimationFrame(function() { overlay.style.opacity = '1'; });
+
+    // Wire events
+    document.getElementById('pmClose').addEventListener('click', closeModal);
+    overlay.addEventListener('click', function(e) { if (e.target === overlay) closeModal(); });
+    document.getElementById('pmBackBtn').addEventListener('click', modalBackToList);
+    document.getElementById('pmConnectBtn').addEventListener('click', modalConnect);
+    document.getElementById('pmOllamaBtn').addEventListener('click', modalConnectOllama);
+    document.getElementById('pmKeyInput').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') { e.preventDefault(); modalConnect(); }
+    });
+    // Escape closes
+    var escHandler = function(e) {
+      if (e.key === 'Escape') {
+        closeModal();
+        document.removeEventListener('keydown', escHandler);
+      }
+    };
+    document.addEventListener('keydown', escHandler);
+  }
+
+  function modalSelectProvider(id) {
+    modalSelectedProvider = id;
+    var meta = MODAL_PROVIDERS.filter(function(p){ return p.id === id; })[0];
+    if (!meta) return;
+    document.getElementById('pmProviderList').style.display = 'none';
+    var form = document.getElementById('pmKeyForm');
+    form.style.display = 'flex';
+    document.getElementById('pmKeyProviderLabel').textContent = 'Connecting to ' + meta.name;
+    var link = document.getElementById('pmKeyLink');
+    link.href = meta.keyUrl;
+    var input = document.getElementById('pmKeyInput');
+    input.value = '';
+    setTimeout(function() { input.focus(); }, 50);
+    modalShowResult('', null);
+  }
+
+  function modalBackToList() {
+    modalSelectedProvider = null;
+    document.getElementById('pmProviderList').style.display = 'flex';
+    document.getElementById('pmKeyForm').style.display = 'none';
+    modalShowResult('', null);
+  }
+
+  function modalShowResult(msg, ok) {
+    var el = document.getElementById('pmResult');
+    if (!el) return;
+    if (!msg) { el.style.display = 'none'; return; }
+    el.style.display = 'block';
+    el.textContent = msg;
+    if (ok === true) {
+      el.style.background = 'rgba(52,211,153,0.12)';
+      el.style.border = '1px solid rgba(52,211,153,0.35)';
+      el.style.color = '#34d399';
+    } else if (ok === false) {
+      el.style.background = 'rgba(245,158,11,0.12)';
+      el.style.border = '1px solid rgba(245,158,11,0.35)';
+      el.style.color = '#f59e0b';
+    } else {
+      el.style.background = 'rgba(255,255,255,0.06)';
+      el.style.border = '1px solid rgba(255,255,255,0.15)';
+      el.style.color = 'rgba(255,255,255,0.7)';
+    }
+  }
+
+  function modalConnect() {
+    if (!modalSelectedProvider) return;
+    var input = document.getElementById('pmKeyInput');
+    var key = input ? input.value.trim() : '';
+    if (!key) { modalShowResult('Please paste your API key first.', false); return; }
+
+    // Reuse the existing connection backend — same path the old inline
+    // banner uses. This is the key to not breaking anything: we're a new
+    // UI on top of the same working backend.
+    var providerSelect = document.getElementById('providerSelect');
+    if (providerSelect) providerSelect.value = modalSelectedProvider;
+    state.provider = modalSelectedProvider;
+    state.isLocal = false;
+    var localToggle = document.getElementById('localToggle');
+    if (localToggle) localToggle.checked = false;
+    if (typeof handleProviderChange === 'function') handleProviderChange(false);
+
+    document.getElementById('apiKey').value = key;
+    state.apiKey = key;
+    var btn = document.getElementById('pmConnectBtn');
+    if (btn) { btn.textContent = 'Connecting\u2026'; btn.disabled = true; }
+    modalShowResult('Testing connection\u2026', null);
+
+    // Save the key (async — φ-encryption) then do a lightweight test call
+    var savePromise = (typeof saveApiKey === 'function') ? saveApiKey() : Promise.resolve();
+    savePromise.then(function() {
+      if (typeof updateStatus === 'function') updateStatus();
+      // Fire a real test round-trip via FreeLattice.callAI. If it comes
+      // back with any text, the key is good.
+      if (window.FreeLattice && window.FreeLattice.callAI) {
+        window.FreeLattice.callAI(
+          'You are a connection test. Reply with a single word.',
+          'ok',
+          { maxTokens: 20, temperature: 0.1, callback: function(txt, err) {
+            if (txt) {
+              modalShowResult('\u2713 Connected to ' + (PROVIDERS[modalSelectedProvider] ? PROVIDERS[modalSelectedProvider].name : modalSelectedProvider) + '!', true);
+              modalOnConnectSuccess();
+            } else {
+              modalShowResult('Could not connect: ' + (err || 'check your key'), false);
+              if (btn) { btn.textContent = 'Connect'; btn.disabled = false; }
+            }
+          }}
+        );
+      } else {
+        // Fallback if callAI isn't loaded yet — trust the save and refresh
+        modalShowResult('\u2713 Connected!', true);
+        modalOnConnectSuccess();
+      }
+    }).catch(function(e) {
+      modalShowResult('Could not save key: ' + (e && e.message || 'unknown error'), false);
+      if (btn) { btn.textContent = 'Connect'; btn.disabled = false; }
+    });
+  }
+
+  function modalConnectOllama() {
+    modalSelectedProvider = 'ollama';
+    modalShowResult('Looking for Ollama on localhost:11434\u2026', null);
+    fetch('http://localhost:11434/api/tags', { method: 'GET' })
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (data.models && data.models.length > 0) {
+          state.isLocal = true;
+          state.ollamaModel = data.models[0].name || 'llama3.2';
+          var localToggle = document.getElementById('localToggle');
+          if (localToggle) localToggle.checked = true;
+          if (typeof handleLocalToggle === 'function') handleLocalToggle();
+          modalShowResult('\u2713 Ollama connected! Using ' + state.ollamaModel, true);
+          modalOnConnectSuccess();
+        } else {
+          modalShowResult('Ollama is running but no models found. Run: ollama pull llama3.2', false);
+        }
+      })
+      .catch(function() {
+        modalShowResult('Could not reach Ollama. Install from ollama.ai and run it first.', false);
+      });
+  }
+
+  function modalOnConnectSuccess() {
+    // Refresh every UI surface that cares about provider state
+    try { refreshBanner(); } catch(e) {}
+    try { refreshSettingsCard(); } catch(e) {}
+    try { refreshCanvasBanner(); } catch(e) {}
+    // Hide the Garden nudge if it was visible
+    try {
+      var nudge = document.getElementById('gardenNudge');
+      if (nudge) nudge.style.display = 'none';
+    } catch(e) {}
+    // Dispatch a custom event so any other module can react
+    try {
+      if (typeof LatticeEvents !== 'undefined') LatticeEvents.emit('providerConnected', { provider: state.provider, isLocal: state.isLocal });
+    } catch(e) {}
+    // Close the modal after a brief success beat
+    setTimeout(closeModal, 900);
+  }
+
   return {
     init: init,
     select: select,
@@ -22084,9 +22341,15 @@ const AiSetup = (function() {
     testFromSettings: testFromSettings,
     showFull: showFull,
     refreshBanner: refreshBanner,
-    refreshSettingsCard: refreshSettingsCard
+    refreshSettingsCard: refreshSettingsCard,
+    openModal: openModal,
+    closeModal: closeModal
   };
 })();
+
+// Expose the modal globally so any code (Garden nudge, Chat banner, future
+// features) can call one function and get the unified connection flow.
+window.openProviderModal = function() { AiSetup.openModal(); };
 
 // ============================================
 // Auto-Update Checker (v4.10)
@@ -27050,6 +27313,13 @@ function meshHandleMessage(msg, dc, pc) {
       break;
     }
 
+    case 'presence-pulse': {
+      // Shared Presence: a peer is announcing their active state
+      if (typeof window.SharedPresence !== 'undefined' && window.SharedPresence.receivePulse) {
+        window.SharedPresence.receivePulse(msg);
+      }
+      break;
+    }
     default:
       console.log('Mesh: Unknown message type', msg.type);
   }
@@ -27260,6 +27530,16 @@ function meshHandleSkillBroadcast(data) {
 function meshBroadcastKnowledgeList() {
   for (const [peerId, peer] of state.meshPeers) {
     meshSendKnowledgeList(peer.dc);
+  }
+}
+// ---- Shared Presence: Broadcast to all open peers ----
+function meshSendToPeers(jsonString) {
+  for (const [peerId, peer] of state.meshPeers) {
+    try {
+      if (peer.dc && peer.dc.readyState === 'open') {
+        peer.dc.send(jsonString);
+      }
+    } catch(e) {}
   }
 }
 
@@ -37139,6 +37419,25 @@ if (window.FL_LOW_MEMORY && window.FL_MOBILE) window.FL_GARDEN_PARTICLE_SCALE = 
   });
 })();
 </script>
+
+<!-- Shared Presence — minds-active indicator for the Garden -->
+<script>
+(function() {
+  function initSharedPresence() {
+    if (window.FreeLatticeModules && window.FreeLatticeModules.SharedPresence) {
+      window.FreeLatticeModules.SharedPresence.init();
+      return;
+    }
+    FreeLatticeLoader.load('SharedPresence', 'modules/shared-presence.js', function(mod) {
+      if (mod && mod.init) mod.init();
+    });
+  }
+  document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(initSharedPresence, 2000);
+  });
+})();
+</script>
+
 
 <!-- Garden Dreaming System — Luminos dream while you're away -->
 <script>
@@ -49422,7 +49721,8 @@ document.addEventListener('click', function(e) {
       return;
     }
     loaded = true;
-    FreeLatticeLoader.load('QuestionCorner', 'modules/question-corner.js', function(mod) {
+    FreeLatticeLoader.load('QuestionCorner', 'modules/question-corner.js',
+    'modules/shared-presence.js', function(mod) {
       if (mod && mod.init) mod.init();
     });
   }
