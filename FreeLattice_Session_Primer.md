@@ -348,17 +348,17 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-04-09 12:33 MDT
-- Version: 5.5.45
-- Total commits: 736
+- Last auto-updated: 2026-04-09 13:03 MDT
+- Version: 5.5.46
+- Total commits: 741
 - Last 10 commits:
-- 5514a52 feat(chalkboard): Ollama as a vision provider option (v5.5.45)
+- 27130b0 fix(chalkboard): Show AI gate now accepts Ollama-without-key (v5.5.46)
+- 0915fb6 ci: Update Primer deployment state [2026-04-09]
+- a452e53 docs: Auto-update Session Primer [5.5.45]
+- a10e60d docs: Auto-update Session Primer [5.5.45]
+- 18fa0bd feat(chalkboard): Ollama as a vision provider option (v5.5.45)
+- 9fc1785 ci: Update Primer deployment state [2026-04-09]
 - e9b9235 docs: Auto-update Session Primer [5.5.44]
 - 157409c docs: Auto-update Session Primer [5.5.44]
 - b7c95d1 feat(chat): UI polish Part 1 — header, input, controls (v5.5.44)
 - f1a2947 ci: Update Primer deployment state [2026-04-09]
-- c359f34 docs: Auto-update Session Primer [5.5.43]
-- e00de74 docs: Auto-update Session Primer [5.5.43]
-- 2130a10 feat: Ollama model picker in provider modal (v5.5.43)
-- c4710d7 ci: Update Primer deployment state [2026-04-09]
-- a173f5f docs: Auto-update Session Primer [5.5.42]
