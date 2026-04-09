@@ -1,1 +1,1 @@
-{"version": "5.5.43", "date": "2026-04-09", "note": "Ollama model picker — when multiple local models are installed, the provider modal shows a tappable list with size and vision-hint tags. Single model still auto-selects."}
+{"version": "5.5.44", "date": "2026-04-09", "note": "Chat UI Polish Part 1 — header softened (\"Chat · model\"), input split into primary + secondary rows, ≡ and + moved to header, voice/image moved to overflow popup, YOU label removed, disclaimer auto-fades after first message."}
