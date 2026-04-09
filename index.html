@@ -1749,6 +1749,167 @@ header .mantra {
 #sendBtn:active { transform: scale(0.98); }
 #sendBtn:disabled { opacity: 0.5; cursor: not-allowed; }
 
+/* ---- Chat Header Polish (v5.5.44) ---- */
+.chat-section-title {
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.chat-title-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  flex: 1;
+}
+.chat-title-main {
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--text-primary);
+}
+.chat-title-model {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  opacity: 0.55;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 220px;
+  font-weight: 400;
+}
+.chat-header-icon-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 16px;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-family: inherit;
+}
+.chat-header-icon-btn:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+/* ---- Chat Input Secondary Row (model pill + overflow) ---- */
+.chat-input-secondary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background: var(--bg-tertiary);
+  border-top: 1px solid var(--border);
+  position: relative;
+  flex-wrap: wrap;
+}
+.chat-input-secondary .model-switcher-wrap {
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 220px;
+}
+.chat-input-secondary .mi-active-badge {
+  /* When memory badge is moved inline here, match the compact pill look */
+  font-size: 0.72rem;
+}
+.chat-overflow-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 18px;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  cursor: pointer;
+  padding: 0;
+  margin-left: auto;
+  line-height: 1;
+  font-family: inherit;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.chat-overflow-btn:hover {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+.chat-overflow-popup {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  right: 10px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 6px;
+  display: none;
+  flex-direction: column;
+  gap: 2px;
+  z-index: 100;
+  min-width: 160px;
+  box-shadow: 0 12px 32px rgba(0,0,0,0.45);
+}
+.chat-overflow-popup.open { display: flex; }
+.chat-overflow-popup > button,
+.chat-overflow-popup .mic-btn,
+.chat-overflow-popup .img-gen-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  padding: 9px 12px;
+  text-align: left;
+  cursor: pointer;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-width: 0;
+}
+.chat-overflow-popup > button:hover,
+.chat-overflow-popup .mic-btn:hover,
+.chat-overflow-popup .img-gen-btn:hover {
+  background: var(--bg-secondary);
+}
+
+/* Hide the "YOU" label on user messages — right-alignment is enough */
+.chat-message.user .msg-label { display: none; }
+
+/* Transient disclaimer — fades out after first message */
+.chat-disclaimer.transient-hidden {
+  opacity: 0;
+  max-height: 0;
+  padding: 0 14px;
+  margin: 0;
+  overflow: hidden;
+  transition: opacity 0.6s ease, max-height 0.6s ease, padding 0.6s ease;
+  pointer-events: none;
+}
+
+/* Mobile polish at 375px */
+@media (max-width: 600px) {
+  .chat-title-model { max-width: 140px; }
+  .chat-input-secondary { padding: 6px 10px; gap: 6px; }
+  .chat-input-secondary .model-switcher-wrap { max-width: 160px; }
+  .chat-overflow-popup {
+    position: fixed;
+    bottom: 88px;
+    left: 10px;
+    right: 10px;
+    min-width: 0;
+    max-height: 50vh;
+    overflow-y: auto;
+  }
+}
+
 /* ---- Status Bar ---- */
 .status-bar {
   display: flex;
@@ -14780,11 +14941,14 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 
   <!-- Chat Section -->
   <div class="section" style="border-bottom: none;">
-    <div class="section-title" style="display: flex; align-items: center; justify-content: space-between;">
-      <span>Chat</span>
-      <button class="conv-toggle-btn" onclick="toggleConvSidebar()" title="Toggle conversation list">
-        &#9776; Conversations <span id="convCountBadge" style="font-size: 0.72rem; color: var(--text-muted);"></span>
-      </button>
+    <div class="section-title chat-section-title">
+      <div class="chat-title-left">
+        <button class="chat-header-icon-btn" onclick="toggleConvSidebar()" title="Toggle conversations" aria-label="Toggle conversations">&#9776;</button>
+        <span class="chat-title-main">Chat</span>
+        <span class="chat-title-model" id="chatTitleModel"></span>
+        <span id="convCountBadge" style="display:none;"></span>
+      </div>
+      <button class="chat-header-icon-btn" onclick="openNewConvModal()" title="New conversation" aria-label="New conversation">&#10010;</button>
     </div>
     <div class="chat-layout">
       <!-- Conversation Sidebar -->
@@ -14828,6 +14992,9 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
           <div class="context-budget-tip" id="contextBudgetTip">Tip: Clear some context files or switch to Smart/Minimal mode to reduce token usage.</div>
           <div class="chat-input-row">
             <textarea id="chatInput" placeholder="Ask anything..." rows="1" onkeydown="handleChatKeydown(event)"></textarea>
+            <button id="sendBtn" onclick="sendMessage()">Send &#10022;</button>
+          </div>
+          <div class="chat-input-secondary" id="chatInputSecondary">
             <div class="model-switcher-wrap" id="modelSwitcherWrap">
               <button class="model-switcher-btn" id="modelSwitcherBtn" onclick="ModelSwitcher.toggle()" title="Switch AI model">
                 <span class="ms-dot"></span>
@@ -14840,19 +15007,24 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
                 <button class="ms-dropdown-refresh" onclick="ModelSwitcher.refresh()">&#8635; Refresh Models</button>
               </div>
             </div>
-            <button class="mic-btn" id="micBtn" onclick="toggleVoiceInput()" title="Voice input (speech-to-text)" style="display:none;">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="1" width="6" height="11" rx="3"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
-            </button>
-            <button class="img-gen-btn" id="imgGenBtn" onclick="handleImageGenClick()" title="Generate image (/imagine)">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-            </button>
-            <button id="sendBtn" onclick="sendMessage()">Send &#10022;</button>
+            <button class="chat-overflow-btn" id="chatOverflowBtn" onclick="FLChatOverflow.toggle()" aria-label="More options" title="More options">&#8943;</button>
+            <div class="chat-overflow-popup" id="chatOverflowPopup">
+              <button class="mic-btn" id="micBtn" onclick="toggleVoiceInput();FLChatOverflow.close()" title="Voice input" style="display:none;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="1" width="6" height="11" rx="3"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+                <span>Voice input</span>
+              </button>
+              <button class="img-gen-btn" id="imgGenBtn" onclick="handleImageGenClick();FLChatOverflow.close()" title="Generate image (/imagine)">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                <span>Generate image</span>
+              </button>
+            </div>
           </div>
-          <div class="chat-disclaimer">AI can make mistakes. Verify important information.</div>
+          <div class="chat-disclaimer" id="chatDisclaimer">AI can make mistakes. Verify important information.</div>
         </div>
       </div>
     </div>
-    <div class="action-row" style="margin-top: 10px;">
+    <!-- Legacy bottom action row hidden in v5.5.44 — these controls moved to the chat header (≡ toggle and + new conversation). Kept in DOM so any JS that targets them keeps working, but display:none so they don't compete with the input area. -->
+    <div class="action-row" style="display:none;">
       <button class="action-btn" onclick="openNewConvModal()">&#10010; New Conversation</button>
       <button class="conv-toggle-btn" onclick="toggleConvSidebar()">&#9776; Toggle Sidebar</button>
     </div>
@@ -15614,7 +15786,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.5.43</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.5.44</span></div>
     </div>
   </div>
 
@@ -17404,7 +17576,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.5.43';
+const FL_VERSION = '5.5.44';
 // ─── Lattice Event Bus ─────────────────────────────────────────
 // Replaces switchTab monkey-patch chain with clean event dispatch
 const LatticeEvents = (function() {
@@ -24867,24 +25039,90 @@ function updateStatus() {
   const dot = document.getElementById('statusDot');
   const text = document.getElementById('statusText');
 
+  // The subtle "Chat · model-name" subtitle in the Chat header
+  const chatTitleModel = document.getElementById('chatTitleModel');
+  let headerSubtitle = '';
+
   if (state.isLocal) {
     dot.className = 'status-dot ready';
     text.textContent = 'Local mode — Ollama (' + (state.ollamaModel || 'no model set') + ')';
+    headerSubtitle = state.ollamaModel ? ' \u00B7 ' + state.ollamaModel : '';
   } else if (state.apiKey) {
     const provider = PROVIDERS[state.provider];
     const modelId = provider.models[state.model] || state.model;
     dot.className = 'status-dot ready';
     text.textContent = 'Ready — ' + provider.name + ' · ' + modelId;
+    headerSubtitle = ' \u00B7 ' + modelId;
   } else {
     dot.className = 'status-dot';
     text.textContent = 'Enter your API key above to begin chatting';
+    headerSubtitle = '';
   }
+
+  if (chatTitleModel) chatTitleModel.textContent = headerSubtitle;
+
   // Toggle Ollama status badge visibility (v4.4)
   var ollamaBadge = document.getElementById('ollamaStatusBadge');
   if (ollamaBadge && !state.isLocal) ollamaBadge.style.display = 'none';
   // Update Model Switcher label (v5.0)
   if (typeof ModelSwitcher !== 'undefined') ModelSwitcher.updateLabel();
 }
+
+// ── Chat Overflow Popup (v5.5.44) ───────────────────────────────
+// Holds power-user controls (voice, image gen, future options) so
+// they don't clutter the primary input area. Toggled via the ⋯ button.
+window.FLChatOverflow = (function() {
+  var closeOnOutside = null;
+  function toggle() {
+    var popup = document.getElementById('chatOverflowPopup');
+    if (!popup) return;
+    var isOpen = popup.classList.contains('open');
+    if (isOpen) { close(); return; }
+    popup.classList.add('open');
+    // Close on any outside click
+    setTimeout(function() {
+      closeOnOutside = function(e) {
+        if (!popup.contains(e.target) && e.target.id !== 'chatOverflowBtn') close();
+      };
+      document.addEventListener('click', closeOnOutside);
+    }, 0);
+  }
+  function close() {
+    var popup = document.getElementById('chatOverflowPopup');
+    if (popup) popup.classList.remove('open');
+    if (closeOnOutside) {
+      document.removeEventListener('click', closeOnOutside);
+      closeOnOutside = null;
+    }
+  }
+  return { toggle: toggle, close: close };
+})();
+
+// Fade the "AI can make mistakes" disclaimer after the first user
+// message — visible once per session, never permanent clutter.
+(function() {
+  var faded = false;
+  document.addEventListener('DOMContentLoaded', function() {
+    // Listen for sent messages via a passive watch on the chat input
+    var input = document.getElementById('chatInput');
+    if (!input) return;
+    function onSendAttempt() {
+      if (faded) return;
+      var disc = document.getElementById('chatDisclaimer');
+      if (!disc) return;
+      setTimeout(function() {
+        disc.classList.add('transient-hidden');
+        faded = true;
+      }, 2400);
+    }
+    // Any Enter press without shift = send; also trigger on the Send button click
+    input.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && !e.shiftKey) onSendAttempt();
+    });
+    var sendBtn = document.getElementById('sendBtn');
+    if (sendBtn) sendBtn.addEventListener('click', onSendAttempt);
+  });
+})();
 
 // ---- File Handling (v1 drag-drop) ----
 function setupDropZone() {
