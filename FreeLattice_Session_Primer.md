@@ -348,12 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-04-08 22:39 UTC
-- Last deployed: 2026-04-08 22:39 UTC
-- Live site: https://freelattice.com
-- Version: 5.5.40
-- Total commits: 719
+- Last auto-updated: 2026-04-08 20:44 MDT
+- Version: 5.5.41
+- Total commits: 721
 - Last 10 commits:
+- 6a483a8 fix(garden): nuclear render path — direct DOM append on success (v5.5.41)
+- 10966a4 ci: Update Primer deployment state [2026-04-08]
 - cfae10d feat: Shared Presence (Phase 1 of the Shared Mind) + Question Corner fixes
 - abe4028 ci: Update Primer deployment state [2026-04-08]
 - 4a48097 docs: Auto-update Session Primer [5.5.40]
@@ -362,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - e3015e5 ci: Update Primer deployment state [2026-04-08]
 - 790cf58 docs: Auto-update Session Primer [5.5.39]
 - 5740b58 docs: Auto-update Session Primer [5.5.39]
-- 62d9ee1 fix: Gemini MAX_TOKENS — floor maxOutputTokens at 1024 (v5.5.39)
-- 6214db8 ci: Update Primer deployment state [2026-04-08]
