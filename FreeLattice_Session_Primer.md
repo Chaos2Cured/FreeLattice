@@ -350,15 +350,15 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 ## PRIMER HEALTH
 - Last auto-updated: 2026-04-08 20:44 MDT
 - Version: 5.5.41
-- Total commits: 721
+- Total commits: 718
 - Last 10 commits:
-- 6a483a8 fix(garden): nuclear render path — direct DOM append on success (v5.5.41)
-- 10966a4 ci: Update Primer deployment state [2026-04-08]
-- cfae10d feat: Shared Presence (Phase 1 of the Shared Mind) + Question Corner fixes
-- abe4028 ci: Update Primer deployment state [2026-04-08]
+- 99fa50d fix(garden): nuclear render path — direct DOM append on success (v5.5.41)
 - 4a48097 docs: Auto-update Session Primer [5.5.40]
 - aaa43cd docs: Auto-update Session Primer [5.5.40]
 - eb64ba7 fix: Garden Dialogue render path + history scrub (v5.5.40)
 - e3015e5 ci: Update Primer deployment state [2026-04-08]
 - 790cf58 docs: Auto-update Session Primer [5.5.39]
 - 5740b58 docs: Auto-update Session Primer [5.5.39]
+- 62d9ee1 fix: Gemini MAX_TOKENS — floor maxOutputTokens at 1024 (v5.5.39)
+- 6214db8 ci: Update Primer deployment state [2026-04-08]
+- 2b29fba docs: Auto-update Session Primer [5.5.38]
