@@ -1,1 +1,1 @@
-{"version": "5.5.42", "date": "2026-04-09", "note": "Unified provider connection modal. Single window.openProviderModal() callable from Settings, Garden nudge, and any future feature — reuses the existing backend so nothing else changes."}
+{"version": "5.5.43", "date": "2026-04-09", "note": "Ollama model picker — when multiple local models are installed, the provider modal shows a tappable list with size and vision-hint tags. Single model still auto-selects."}

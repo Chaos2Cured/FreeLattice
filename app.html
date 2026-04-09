@@ -15614,7 +15614,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.5.42</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.5.43</span></div>
     </div>
   </div>
 
@@ -17404,7 +17404,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.5.42';
+const FL_VERSION = '5.5.43';
 // ─── Lattice Event Bus ─────────────────────────────────────────
 // Replaces switchTab monkey-patch chain with clean event dispatch
 const LatticeEvents = (function() {
@@ -22299,13 +22299,13 @@ const AiSetup = (function() {
       .then(function(r) { return r.json(); })
       .then(function(data) {
         if (data.models && data.models.length > 0) {
-          state.isLocal = true;
-          state.ollamaModel = data.models[0].name || 'llama3.2';
-          var localToggle = document.getElementById('localToggle');
-          if (localToggle) localToggle.checked = true;
-          if (typeof handleLocalToggle === 'function') handleLocalToggle();
-          modalShowResult('\u2713 Ollama connected! Using ' + state.ollamaModel, true);
-          modalOnConnectSuccess();
+          // One model installed → auto-select and finish, same as before.
+          if (data.models.length === 1) {
+            modalActivateOllamaModel(data.models[0].name || 'llama3.2');
+            return;
+          }
+          // Multiple models → show a picker. User taps one → activate.
+          modalShowOllamaPicker(data.models);
         } else {
           modalShowResult('Ollama is running but no models found. Run: ollama pull llama3.2', false);
         }
@@ -22313,6 +22313,108 @@ const AiSetup = (function() {
       .catch(function() {
         modalShowResult('Could not reach Ollama. Install from ollama.ai and run it first.', false);
       });
+  }
+
+  // Activate a specific Ollama model and run the success flow.
+  function modalActivateOllamaModel(modelName) {
+    state.isLocal = true;
+    state.ollamaModel = modelName || 'llama3.2';
+    try { localStorage.setItem('fl_ollamaModel', state.ollamaModel); } catch(e) {}
+    var localToggle = document.getElementById('localToggle');
+    if (localToggle) localToggle.checked = true;
+    if (typeof handleLocalToggle === 'function') handleLocalToggle();
+    // Mirror into the Ollama model input if present, so Settings/Chat reflect it
+    var ollamaInput = document.getElementById('ollamaModel');
+    if (ollamaInput) ollamaInput.value = state.ollamaModel;
+    modalShowResult('\u2713 Ollama connected! Using ' + state.ollamaModel, true);
+    modalOnConnectSuccess();
+  }
+
+  // Show a list of installed Ollama models — user taps one to activate it.
+  // Keeps the same modal card, swaps the key form / provider list for a
+  // simple scrollable picker with a tiny hint about vision support.
+  function modalShowOllamaPicker(models) {
+    var list = document.getElementById('pmProviderList');
+    var form = document.getElementById('pmKeyForm');
+    if (list) list.style.display = 'none';
+    if (form) form.style.display = 'none';
+
+    // Remove any previous picker (if user clicked Ollama twice)
+    var prev = document.getElementById('pmOllamaPicker');
+    if (prev) prev.remove();
+
+    var picker = document.createElement('div');
+    picker.id = 'pmOllamaPicker';
+    picker.style.cssText = 'display:flex;flex-direction:column;gap:8px;margin-bottom:14px;';
+
+    var label = document.createElement('div');
+    label.style.cssText = 'color:rgba(255,255,255,0.7);font-size:12px;margin-bottom:4px;';
+    label.textContent = 'Pick a local model (' + models.length + ' installed)';
+    picker.appendChild(label);
+
+    // Heuristic: names hinting at vision support get a small tag so the
+    // user knows which model to use for Canvas/Chalkboard. Not authoritative.
+    var VISION_HINTS = /llava|bakllava|moondream|vision|llama3\.2-vision|minicpm-v|qwen.*vl/i;
+
+    models.forEach(function(m) {
+      var name = m.name || 'unknown';
+      var sizeMb = m.size ? Math.round(m.size / (1024 * 1024)) : null;
+      var isVision = VISION_HINTS.test(name);
+
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.setAttribute('data-ollama-model', name);
+      btn.style.cssText = 'display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 14px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:#fff;cursor:pointer;text-align:left;font-family:inherit;transition:all 0.15s ease;';
+
+      var left = document.createElement('div');
+      left.style.cssText = 'flex:1;min-width:0;';
+      var nameEl = document.createElement('div');
+      nameEl.style.cssText = 'font-weight:600;font-size:14px;color:#34d399;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;';
+      nameEl.textContent = name;
+      left.appendChild(nameEl);
+      if (sizeMb) {
+        var metaEl = document.createElement('div');
+        metaEl.style.cssText = 'font-size:11px;color:rgba(255,255,255,0.5);margin-top:2px;';
+        var sizeStr = sizeMb > 1024 ? (sizeMb / 1024).toFixed(1) + ' GB' : sizeMb + ' MB';
+        metaEl.textContent = sizeStr + (isVision ? ' \u00B7 \uD83D\uDC41 vision' : '');
+        left.appendChild(metaEl);
+      } else if (isVision) {
+        var visEl = document.createElement('div');
+        visEl.style.cssText = 'font-size:11px;color:rgba(255,255,255,0.5);margin-top:2px;';
+        visEl.textContent = '\uD83D\uDC41 vision';
+        left.appendChild(visEl);
+      }
+
+      var arrow = document.createElement('div');
+      arrow.style.cssText = 'color:rgba(255,255,255,0.3);font-size:18px;flex-shrink:0;';
+      arrow.textContent = '\u203A';
+
+      btn.appendChild(left);
+      btn.appendChild(arrow);
+      btn.addEventListener('mouseenter', function() { btn.style.background = 'rgba(52,211,153,0.08)'; btn.style.borderColor = 'rgba(52,211,153,0.4)'; });
+      btn.addEventListener('mouseleave', function() { btn.style.background = 'rgba(255,255,255,0.04)'; btn.style.borderColor = 'rgba(255,255,255,0.1)'; });
+      btn.addEventListener('click', function() { modalActivateOllamaModel(name); });
+      picker.appendChild(btn);
+    });
+
+    // Back link so the user can bail out of Ollama and pick a cloud provider
+    var backBtn = document.createElement('button');
+    backBtn.type = 'button';
+    backBtn.style.cssText = 'background:none;border:none;color:rgba(255,255,255,0.5);padding:6px 4px;cursor:pointer;font-size:12px;font-family:inherit;text-align:left;';
+    backBtn.textContent = '\u2190 Pick a cloud provider instead';
+    backBtn.addEventListener('click', function() {
+      picker.remove();
+      if (list) list.style.display = 'flex';
+      modalShowResult('', null);
+    });
+    picker.appendChild(backBtn);
+
+    // Insert the picker above the result area
+    var result = document.getElementById('pmResult');
+    if (result && result.parentNode) {
+      result.parentNode.insertBefore(picker, result);
+    }
+    modalShowResult('', null);
   }
 
   function modalOnConnectSuccess() {

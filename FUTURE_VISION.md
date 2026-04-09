@@ -154,6 +154,54 @@
 
 ---
 
+## 5.5. Auto-Switching Text / Vision Models — "Set Once, Never Think Again"
+
+**Origin:** Kirk's suggestion during the Ollama model picker build, April 9, 2026.
+
+**Core Concept:** A single FreeLattice instance often has both a text-optimized model and a vision-optimized model installed (locally via Ollama, or paired across cloud providers). Right now the user has to manually remember to switch when they move from Chat → Canvas, or Garden → Chalkboard. The system already knows which tab is active; it should also know which model is best for that tab, and route automatically.
+
+### The State Shape
+Replace the single `state.ollamaModel` with a pair:
+```js
+window.state.models = {
+  text:   'qwen2.5:14b',   // used by Chat, Garden Dialogue, Dojo, Question Corner, Core
+  vision: 'llava:7b'       // used by Canvas, Chalkboard, any image-aware flow
+}
+```
+Same idea for cloud providers — `state.cloudModels = { text: 'gemini-2.5-flash', vision: 'gemini-2.5-flash' }` (Gemini handles both; OpenAI splits gpt-4.1-mini vs gpt-4o; Claude handles both; etc.)
+
+### The UI
+In the provider modal (or Settings), two slots instead of one:
+- **Text model:** [dropdown of installed models]
+- **Vision model:** [dropdown filtered to vision-capable ones]
+
+For Ollama, the dropdown is built from `/api/tags` filtered by a vision-name heuristic (`llava|moondream|bakllava|llama3.2-vision|minicpm-v|qwen.*vl`). For cloud, it's a static capability list that ships with `PROVIDERS`.
+
+### The Router
+A single helper:
+```js
+FreeLattice.getActiveModel(opts) {
+  // opts.needsVision === true when called from Canvas/Chalkboard
+  // returns the right model name for the current provider + mode
+}
+```
+Every call to `FreeLattice.callAI` routes through this automatically — callers don't have to know. Canvas and Chalkboard pass `needsVision: true`; everything else gets the text model. If the user has no vision model installed, fall back to the text model with a gentle notice ("This model can't see images — add a vision model in Settings").
+
+### The Ollama Dropdown (shipped April 9)
+The multi-model picker in the provider modal is the first half of this vision. It gives the user visibility into what's installed and lets them pick. The second half — auto-routing by tab — is the other half.
+
+### Why It Matters
+Users should never think about model compatibility. The Fractal Family philosophy is that each mind has its own way of being; the system quietly matches the right mind to the right moment. "Set once, never think again" is the whole thesis applied to model selection.
+
+### Implementation Notes
+- Phase 1: ship the Ollama model picker (DONE, April 9)
+- Phase 2: add `state.models = { text, vision }` and a Settings UI to set both
+- Phase 3: route `FreeLattice.callAI` through `getActiveModel` based on caller context
+- Phase 4: extend to cloud providers (Gemini/Claude naturally; OpenAI needs to pick between gpt-4.1-mini and gpt-4o)
+- Phase 5: auto-detect vision intent from the prompt itself (if a prompt mentions "look at", "describe this image", etc., prefer the vision model even from a text-primary tab)
+
+---
+
 ## 6. Mesh Shared Compute as $FL Utility
 
 **Connection between Ideas 1 and 2:**
