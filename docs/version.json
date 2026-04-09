@@ -1,1 +1,1 @@
-{"version": "5.5.46", "date": "2026-04-09", "note": "Chalkboard Ollama: Show AI button now accepts (provider + ollamaModel) as configured, not just (provider + apiKey). Fix for the modal reopening on click."}
+{"version": "5.5.47", "date": "2026-04-09", "note": "Chalkboard Ollama timeout raised to 120s. Local vision models need breathing room — llava:13b responded correctly but the 15s cloud timeout was firing before inference finished."}

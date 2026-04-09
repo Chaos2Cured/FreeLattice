@@ -588,8 +588,13 @@ function captureAndSend() {
   btn.textContent = '\u2728 Thinking... \u2728';
   btn.style.opacity = '0.6';
   document.getElementById('loadingDot').style.display = '';
-  // Safety timeout — re-enable after 15s if response never comes
-  var safetyTimer = setTimeout(function() { showError('Response timed out. Try again.'); resetAI(); }, 15000);
+  // Safety timeout — re-enable if the response never comes.
+  // Local Ollama vision models take much longer than cloud APIs because
+  // inference runs on the user's GPU/CPU. llava:13b can take 30–90s on
+  // a warm machine and longer on the first request while the model loads.
+  // Give it 120s. Cloud providers stay at 15s.
+  var timeoutMs = (provider === 'ollama') ? 120000 : 15000;
+  var safetyTimer = setTimeout(function() { showError('Response timed out. Try again.'); resetAI(); }, timeoutMs);
   window._chalkboardSafetyTimer = safetyTimer;
 
   // Capture canvas as base64
