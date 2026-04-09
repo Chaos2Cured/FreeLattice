@@ -566,7 +566,12 @@ function setupToolbar() {
   // Show AI
   document.getElementById('showAiBtn').addEventListener('click', function() {
     if (aiPending) return;
-    if (!provider || !apiKey) {
+    console.log('[Chalkboard] Show AI clicked. Provider:', provider, 'Key:', !!apiKey, 'OllamaModel:', ollamaModel);
+    // Ollama is configured with (provider + ollamaModel), no key required.
+    // Cloud providers need (provider + apiKey). Either path is valid.
+    var ollamaReady = (provider === 'ollama' && ollamaModel);
+    var cloudReady = (provider && provider !== 'ollama' && apiKey);
+    if (!ollamaReady && !cloudReady) {
       document.getElementById('setupOverlay').style.display = '';
       return;
     }

@@ -1,1 +1,1 @@
-{"version": "5.5.45", "date": "2026-04-09", "note": "Chalkboard now supports Ollama as a vision provider. First option in setup, no key required, auto-detects locally installed vision models."}
+{"version": "5.5.46", "date": "2026-04-09", "note": "Chalkboard Ollama: Show AI button now accepts (provider + ollamaModel) as configured, not just (provider + apiKey). Fix for the modal reopening on click."}
