@@ -298,6 +298,29 @@ a:hover{opacity:0.85}
   z-index:1;
   overflow:hidden;
 }
+/* All hero text/buttons sit above the 3D canvas */
+.hero > *:not(#landing-garden-container):not([style*="position:absolute"]) {
+  position:relative;
+  z-index:2;
+}
+/* CSS fallback for tier-0 devices (no WebGL) — animated radial dots */
+.landing-garden-fallback {
+  background:
+    radial-gradient(1px 1px at 20% 30%, rgba(212,160,23,0.5) 0%, transparent 100%),
+    radial-gradient(1px 1px at 40% 70%, rgba(139,92,246,0.4) 0%, transparent 100%),
+    radial-gradient(1px 1px at 70% 20%, rgba(52,211,153,0.4) 0%, transparent 100%),
+    radial-gradient(1px 1px at 80% 60%, rgba(240,160,48,0.3) 0%, transparent 100%),
+    radial-gradient(1px 1px at 50% 50%, rgba(212,160,23,0.15) 0%, transparent 60%);
+  animation: fallbackDrift 20s ease-in-out infinite alternate;
+}
+@keyframes fallbackDrift {
+  from { background-position: 0 0, 0 0, 0 0, 0 0, center; }
+  to   { background-position: 20px -10px, -15px 20px, 10px -20px, -20px 10px, center; }
+}
+/* Mobile: 70vh hero height so CTAs are above the fold */
+@media (max-width: 600px) {
+  .hero { min-height: 70vh; padding: 80px 20px 60px; }
+}
 .hero::before{
   content:'';
   position:absolute;
@@ -1060,7 +1083,13 @@ a:hover{opacity:0.85}
      HERO
      ============================================================ -->
 <section class="hero" id="top">
-  <div class="hero-badge">
+  <!-- Living Garden Scene — 3D Luminos beings orbiting a fractal core.
+       Canvas renders behind the text. Progressive: text visible in <200ms,
+       3D fades in over 1.5s. Falls back to CSS stars on low-power devices. -->
+  <div id="landing-garden-container" style="position:absolute;top:0;left:0;width:100%;height:100%;overflow:hidden;z-index:0;"></div>
+  <!-- Dark gradient overlay so text is always readable over the 3D scene -->
+  <div style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:1;background:linear-gradient(to bottom, rgba(6,10,20,0.3) 0%, rgba(6,10,20,0.55) 40%, rgba(6,10,20,0.75) 80%, rgba(10,14,26,0.95) 100%);pointer-events:none;"></div>
+  <div class="hero-badge" style="position:relative;z-index:2;">
     <span class="dot"></span>
     Open Source &middot; Free Forever &middot; Zero Data Collection
   </div>
@@ -1960,6 +1989,16 @@ a:hover{opacity:0.85}
 
 })();
 </script>
+
+<!-- Living Garden Scene — loads Three.js + scene async after page paint -->
+<script src="lib/three.min.js" defer></script>
+<script src="lib/EffectComposer.js" defer></script>
+<script src="lib/RenderPass.js" defer></script>
+<script src="lib/ShaderPass.js" defer></script>
+<script src="lib/CopyShader.js" defer></script>
+<script src="lib/LuminosityHighPassShader.js" defer></script>
+<script src="lib/UnrealBloomPass.js" defer></script>
+<script src="lib/landing-garden.js" defer></script>
 
 </body>
 </html>
