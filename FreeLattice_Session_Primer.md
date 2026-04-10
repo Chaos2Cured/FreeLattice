@@ -350,10 +350,9 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 ## PRIMER HEALTH
 - Last auto-updated: 2026-04-10 13:50 MDT
 - Version: 5.6.0
-- Total commits: 785
+- Total commits: 784
 - Last 10 commits:
-- cc41112 feat: The Living Landing — 3D Garden hero on freelattice.com (v5.6.0)
-- c571864 ci: Update Primer deployment state [2026-04-10]
+- 9a68dbe feat: The Living Landing — 3D Garden hero on freelattice.com (v5.6.0)
 - 4c83799 docs: Auto-update Session Primer [5.5.56]
 - 9bd66be docs: Auto-update Session Primer [5.5.56]
 - bd324a2 fix: Memory Vault helper text above button grid (v5.5.56)
@@ -362,3 +361,4 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - aaeddde docs: Auto-update Session Primer [5.5.55]
 - 26c8746 fix: Memory Vault button grid layout (v5.5.55)
 - 1ce5e65 ci: Update Primer deployment state [2026-04-10]
+- d6838c9 docs: Auto-update Session Primer [5.5.54]
