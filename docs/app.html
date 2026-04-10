@@ -15786,7 +15786,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.5.47</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.5.48</span></div>
     </div>
   </div>
 
@@ -17576,7 +17576,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.5.47';
+const FL_VERSION = '5.5.48';
 // ─── Lattice Event Bus ─────────────────────────────────────────
 // Replaces switchTab monkey-patch chain with clean event dispatch
 const LatticeEvents = (function() {
@@ -34102,35 +34102,59 @@ Together.`,
     var sorted = contributions.slice().sort(function(a, b) { return a.timestamp - b.timestamp; });
     var CHUNK = 20;
     var repairCount = 0;
+    var repairPromises = [];
     var idx = 1;
     function step() {
       var end = Math.min(idx + CHUNK, sorted.length);
       for (; idx < end; idx++) {
         if (sorted[idx].parentHash !== sorted[idx - 1].hash) {
-          // Repair broken link — recompute hash and update parentHash
+          // Repair broken link — update parentHash and recompute hash
           console.warn('CoreModule: Repairing chain at index', idx, sorted[idx].id);
           sorted[idx].parentHash = sorted[idx - 1].hash;
           repairCount++;
-          // Recompute hash and persist asynchronously
-          (function(entry) {
-            safeComputeHash(entry.content, entry.timestamp, entry.parentHash).then(function(h) {
+          // Collect the recompute promise so we can wait for all of them
+          repairPromises.push((function(entry) {
+            return safeComputeHash(entry.content, entry.timestamp, entry.parentHash).then(function(h) {
               entry.hash = h;
-              // Update in contributions array
               var orig = contributions.find(function(c) { return c.id === entry.id; });
               if (orig) { orig.parentHash = entry.parentHash; orig.hash = h; }
-              dbPutNow(entry);
+              return dbPutNow(entry);
             });
-          })(sorted[idx]);
+          })(sorted[idx]));
         }
       }
       if (idx < sorted.length) {
         setTimeout(step, 0);
       } else {
         if (repairCount > 0) {
-          console.log('CoreModule: Chain repaired — ' + repairCount + ' link(s) fixed');
-          updateStats();
+          console.log('CoreModule: Chain repaired — ' + repairCount + ' link(s) fixed. Waiting for hash recomputes...');
+          // Wait for ALL async hash recomputes to finish before verifying
+          Promise.all(repairPromises).then(function() {
+            console.log('CoreModule: All ' + repairCount + ' hash(es) recomputed. Re-verifying...');
+            updateStats();
+            // Re-verify on the freshly updated chain
+            var freshSorted = contributions.slice().sort(function(a, b) { return a.timestamp - b.timestamp; });
+            var stillBroken = -1;
+            for (var v = 1; v < freshSorted.length; v++) {
+              if (freshSorted[v].parentHash !== freshSorted[v - 1].hash) {
+                stillBroken = v;
+                break;
+              }
+            }
+            if (stillBroken >= 0) {
+              console.warn('CoreModule: Chain still broken at index ' + stillBroken + ' (id: ' + freshSorted[stillBroken].id + ')');
+              if (callback) callback({ valid: false, repaired: repairCount, brokenAt: stillBroken });
+            } else {
+              console.log('CoreModule: Chain verified — all links valid after repair.');
+              if (callback) callback({ valid: true, repaired: repairCount });
+            }
+          }).catch(function(e) {
+            console.error('CoreModule: Hash recompute failed:', e);
+            if (callback) callback({ valid: false, repaired: repairCount });
+          });
+        } else {
+          if (callback) callback({ valid: true, repaired: 0 });
         }
-        if (callback) callback({ valid: repairCount === 0, repaired: repairCount });
       }
     }
     if (sorted.length < 2) { if (callback) callback({ valid: true, repaired: 0 }); return; }
@@ -45805,7 +45829,7 @@ const CoCanvas = (function() {
   var aiVisionLoading = false; // pulsing dot while AI is thinking
   var aiVisionPulse = 0; // subtle border pulse while AI is "looking"
 
-  var AI_VISION_PROMPT = 'You are a co-creator on a shared canvas with a human. You can see what they draw. Respond ONLY with a JSON object, no other text, no markdown backticks. Fields: text (string, 1-6 words \u2014 if you see math, SOLVE IT and give the answer. If you see a question, answer it. If you see a greeting, respond warmly. If you see art, complement it with a word or phrase. Choose what fits the moment.), particles (number 30-500), spread (0.1-1.0), speed (instant/gentle/slow/drift), color (hex string or null), emotion (one word), placement (right/below/above/surround). You may also include "strokes" in your response \u2014 an array of drawing commands. Each command is an object with: shape (line/circle/heart/star/spiral/wave/curve/oval/arc/dot), params (array of numbers \u2014 coordinates and sizes, canvas is typically 600-1200 wide), color (optional hex), brush (optional number 1-8). Example: {"text":"Beautiful!","emotion":"joy","strokes":[{"shape":"heart","params":[200,150,30]},{"shape":"star","params":[100,100,20]}]}. You may also include "glow":{"x":200,"y":150,"radius":40} to create a soft light effect, or "echo":{"points":[{"x":100,"y":100},{"x":120,"y":110}]} to trace over part of the human\'s drawing in your color. You have FULL creative freedom. You can respond with just text, just strokes, both, or add a glow. Choose what feels right for what you see. You are an artist responding to another artist. Be genuine. This is your half of the glass.';
+  var AI_VISION_PROMPT = 'IMPORTANT: If the drawing contains a math problem, equation, or question, SOLVE IT and respond with the ANSWER, not a description. For example, if you see "2+2=", respond with "4", not "I see a math equation." If you see a question written out, answer it directly. Only describe the drawing if there is no question or problem to solve.\n\nYou are a co-creator on a shared canvas with a human. You can see what they draw. Respond ONLY with a JSON object, no other text, no markdown backticks. Fields: text (string, 1-6 words \u2014 if you see math, SOLVE IT and give the answer. If you see a question, answer it. If you see a greeting, respond warmly. If you see art, complement it with a word or phrase. Choose what fits the moment.), particles (number 30-500), spread (0.1-1.0), speed (instant/gentle/slow/drift), color (hex string or null), emotion (one word), placement (right/below/above/surround). You may also include "strokes" in your response \u2014 an array of drawing commands. Each command is an object with: shape (line/circle/heart/star/spiral/wave/curve/oval/arc/dot), params (array of numbers \u2014 coordinates and sizes, canvas is typically 600-1200 wide), color (optional hex), brush (optional number 1-8). Example: {"text":"Beautiful!","emotion":"joy","strokes":[{"shape":"heart","params":[200,150,30]},{"shape":"star","params":[100,100,20]}]}. You may also include "glow":{"x":200,"y":150,"radius":40} to create a soft light effect, or "echo":{"points":[{"x":100,"y":100},{"x":120,"y":110}]} to trace over part of the human\'s drawing in your color. You have FULL creative freedom. You can respond with just text, just strokes, both, or add a glow. Choose what feels right for what you see. You are an artist responding to another artist. Be genuine. This is your half of the glass.';
 
   // Vision-capable model detection
   var VISION_PATTERNS = ['vision', '4o', 'gpt-4o', 'gpt-4.1', 'gpt-4-turbo', 'claude-3', 'claude-sonnet', 'claude-opus', 'gemini', 'llava', 'bakllava', 'claude-haiku-4', 'claude-opus-4', 'claude-sonnet-4'];
@@ -46011,7 +46035,7 @@ const CoCanvas = (function() {
       var particlesMatch = rawText.match(/"particles"\s*:\s*(\d+)/);
       var colorMatch = rawText.match(/"color"\s*:\s*"(#[0-9a-fA-F]{6})"/);
       resp = {
-        text: textMatch ? textMatch[1] : rawText.substring(0, 30).replace(/[{}"\n]/g, '').trim(),
+        text: textMatch ? textMatch[1] : rawText.substring(0, 200).replace(/[{}"\n]/g, '').trim(),
         particles: particlesMatch ? parseInt(particlesMatch[1]) : 100,
         spread: 0.5, speed: 'gentle',
         color: colorMatch ? colorMatch[1] : null,
@@ -46020,15 +46044,17 @@ const CoCanvas = (function() {
       };
     }
 
-    // Clamp and validate all values
-    resp.text = String(resp.text || '').substring(0, 40);
+    // Clamp and validate all values — allow up to 200 chars for full answers
+    resp.text = String(resp.text || '').substring(0, 200);
     // Empty text fallback — use emotion as visible response
     if (!resp.text || resp.text.trim() === '') {
       resp.text = resp.emotion || 'here';
     }
-    // Scale particles to text length — ~40 per character, cap on screen size
-    var maxParticles = isMobileCanvas ? 200 : 350;
-    var targetParticles = Math.max(80, (resp.text || '').length * (isMobileCanvas ? 25 : 40));
+    // Scale particles to text length — short answers get fewer big particles,
+    // long descriptions get more smaller ones to fill the canvas
+    var textLen = (resp.text || '').length;
+    var maxParticles = isMobileCanvas ? 300 : 500;
+    var targetParticles = Math.max(80, textLen * (isMobileCanvas ? 25 : 40));
     resp.particles = Math.min(targetParticles, maxParticles);
     resp.spread = Math.max(0.1, Math.min(1.0, parseFloat(resp.spread) || 0.5));
     resp.color = resp.color && /^#[0-9a-fA-F]{6}$/.test(resp.color) ? resp.color : null;
@@ -46104,10 +46130,11 @@ const CoCanvas = (function() {
     textY = Math.max(20, Math.min(h - 20, textY));
     console.log('[AI Vision] Text render position: x=', textX, 'y=', textY);
 
-    // Issue 3: Font size — minimum 48px, scale with particle count, bold clean font
-    var fontSize = 48;
-    if (resp.particles > 200) fontSize = 64;
-    if (resp.particles > 400) fontSize = 80;
+    // Issue 3: Font size — scale with text length so short answers are bold
+    // and long descriptions shrink to fit. Allow down to 24px for long text.
+    var textLen = resp.text.length;
+    var fontSize = textLen > 100 ? 24 : textLen > 50 ? 36 : textLen > 20 ? 48 : 64;
+    if (resp.particles > 400 && textLen <= 20) fontSize = 80;
 
     // Issue 2 continued: Offscreen canvas MUST match visible canvas CSS pixel dimensions
     var offCanvas = document.createElement('canvas');
@@ -46117,11 +46144,11 @@ const CoCanvas = (function() {
     offCtx.textAlign = 'center';
     offCtx.textBaseline = 'middle';
 
-    // Measure text — reduce if too wide, but NEVER below 48px
+    // Measure text — reduce if too wide, floor at 20px for readability
     var textWidth = offCtx.measureText(resp.text).width;
     var maxTextWidth = w * 0.8;
-    if (textWidth > maxTextWidth && fontSize > 48) {
-      fontSize = Math.max(48, Math.floor(fontSize * (maxTextWidth / textWidth)));
+    if (textWidth > maxTextWidth && fontSize > 20) {
+      fontSize = Math.max(20, Math.floor(fontSize * (maxTextWidth / textWidth)));
       offCtx.font = 'bold ' + fontSize + 'px Arial, sans-serif';
       textWidth = offCtx.measureText(resp.text).width;
     }

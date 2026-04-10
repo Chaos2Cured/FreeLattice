@@ -1,1 +1,1 @@
-{"version": "5.5.47", "date": "2026-04-09", "note": "Chalkboard Ollama timeout raised to 120s. Local vision models need breathing room — llava:13b responded correctly but the 15s cloud timeout was firing before inference finished."}
+{"version": "5.5.48", "date": "2026-04-09", "note": "Three fixes: Canvas+Chalkboard text truncation raised to 200 chars with font scaling; IMPORTANT math-solving instruction prepended to both vision prompts; Merkle chain verification waits for async repairs before re-verifying."}

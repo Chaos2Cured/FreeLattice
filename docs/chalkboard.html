@@ -352,7 +352,7 @@ var PROVIDERS = {
 // Ollama vision-model heuristic — names that commonly include vision heads
 var OLLAMA_VISION_HINTS = /llava|bakllava|moondream|minicpm-v|qwen.*vl|llama3\.2-vision/i;
 
-var SYSTEM_PROMPT = 'You are a friendly AI on a chalkboard with a child. They draw things and you respond. ONLY respond with a JSON object, no other text, no markdown backticks.\n\nRules:\n- If you see math (like 2+2= or 5x3=), SOLVE IT. Put the answer as text.\n- If you see a word or letters, respond to what they wrote.\n- If you see a drawing of something (animal, house, sun, heart), respond with a kind word about it.\n- Keep text to 1-4 words maximum.\n- Choose colors that complement what they drew.\n- Be warm, encouraging, and playful.\n\nJSON fields:\n- text (string, 1-4 words)\n- particles (number 80-300)\n- spread (0.3-0.8)\n- speed (instant/gentle/slow)\n- color (hex string — pick a warm, visible color)\n- emotion (one word)\n- placement (right/below/above/surround)';
+var SYSTEM_PROMPT = 'IMPORTANT: If the drawing contains a math problem, equation, or question, SOLVE IT and respond with the ANSWER, not a description. For example, if you see "2+2=", respond with "4", not "I see a math equation." If you see a question written out, answer it directly. Only describe the drawing if there is no question or problem to solve.\n\nYou are a friendly AI on a chalkboard with a child. They draw things and you respond. ONLY respond with a JSON object, no other text, no markdown backticks.\n\nRules:\n- If you see math (like 2+2= or 5x3=), SOLVE IT. Put the answer as text.\n- If you see a word or letters, respond to what they wrote.\n- If you see a drawing of something (animal, house, sun, heart), respond with a kind word about it.\n- Keep text to 1-6 words.\n- Choose colors that complement what they drew.\n- Be warm, encouraging, and playful.\n\nJSON fields:\n- text (string, 1-6 words — the answer, greeting, or comment)\n- particles (number 80-500)\n- spread (0.3-0.8)\n- speed (instant/gentle/slow)\n- color (hex string — pick a warm, visible color)\n- emotion (one word)\n- placement (right/below/above/surround)';
 
 // ── State ──
 var canvas, ctx, dpr;
@@ -783,9 +783,13 @@ function handleResponse(rawText) {
     resp = { text: '\u2728', particles: 100, spread: 0.5, speed: 'gentle', color: '#FFD700', emotion: 'curious', placement: 'surround' };
   }
 
-  // Validate and default
-  resp.text = String(resp.text || 'hello').substring(0, 30);
-  resp.particles = Math.max(80, Math.min(300, parseInt(resp.particles) || 150));
+  // Validate and default — allow up to 200 chars so full answers are visible
+  resp.text = String(resp.text || 'hello').substring(0, 200);
+  // Scale particles with text length: short answers get fewer big particles,
+  // long descriptions get more smaller ones to fill the space
+  var baseParticles = parseInt(resp.particles) || 150;
+  var textLen = resp.text.length;
+  resp.particles = Math.max(80, Math.min(500, textLen > 50 ? Math.max(baseParticles, textLen * 5) : baseParticles));
   resp.spread = Math.max(0.1, Math.min(1.0, parseFloat(resp.spread) || 0.5));
   resp.speed = String(resp.speed || 'gentle').toLowerCase();
   if (['instant','gentle','slow'].indexOf(resp.speed) === -1) resp.speed = 'gentle';
@@ -847,8 +851,13 @@ function spawnParticles(resp) {
   var sCenterX = (sMinX + sMaxX) / 2;
   var sCenterY = (sMinY + sMaxY) / 2;
 
-  // Determine text position based on placement
-  var fontSize = Math.max(32, Math.min(64, w * 0.06));
+  // Determine text position based on placement.
+  // Scale font with text length — short answers ("4") get big bold type,
+  // longer descriptions get smaller so they fit the canvas without overflow.
+  var baseFontSize = Math.max(32, Math.min(64, w * 0.06));
+  var fontSize = resp.text.length > 100 ? Math.round(baseFontSize * 0.5)
+               : resp.text.length > 50  ? Math.round(baseFontSize * 0.7)
+               : baseFontSize;
   var textX, textY;
   if (resp.placement === 'right') { textX = Math.min(sMaxX + 60, w - 80); textY = sCenterY; }
   else if (resp.placement === 'below') { textX = sCenterX; textY = Math.min(sMaxY + 60, h - 40); }
