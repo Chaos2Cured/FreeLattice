@@ -348,17 +348,17 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-04-10 10:02 MDT
-- Version: 5.5.50
-- Total commits: 760
+- Last auto-updated: 2026-04-10 10:17 MDT
+- Version: 5.5.51
+- Total commits: 765
 - Last 10 commits:
-- b400aa4 feat: landing page clarity + OG tags + model hints (v5.5.50)
+- 921bd5d feat(mobile): 375px polish sweep across every surface (v5.5.51)
+- cea16f7 ci: Update Primer deployment state [2026-04-10]
+- d03ec88 docs: Auto-update Session Primer [5.5.50]
+- ad36f4f docs: Auto-update Session Primer [5.5.50]
+- ca29700 feat: landing page clarity + OG tags + model hints (v5.5.50)
+- 99e1f74 ci: Update Primer deployment state [2026-04-10]
 - b462204 docs: Auto-update Session Primer [5.5.49]
 - d38d7f0 docs: Auto-update Session Primer [5.5.49]
 - 8a1a4a7 docs(coord): CC's April 9 entry — v5.5.34→v5.5.49 session summary
 - d1bacad ci: Update Primer deployment state [2026-04-10]
-- 43ec6c8 docs: Auto-update Session Primer [5.5.49]
-- 88e19ee docs: Auto-update Session Primer [5.5.49]
-- a981861 feat: math-solving prompt fix + chunked particles + tree glow (v5.5.49)
-- a417c1f ci: Update Primer deployment state [2026-04-10]
-- 1da00f1 docs: Auto-update Session Primer [5.5.48]

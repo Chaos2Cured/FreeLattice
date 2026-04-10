@@ -4079,9 +4079,93 @@ input[type="range"]::-moz-range-thumb {
   #sendBtn { padding: 12px 20px; font-size: 0.95rem; order: 2; border-radius: 0; min-width: 72px; }
   .model-switcher-wrap { order: 3; flex: 0 0 auto; border-left: none; border-top: 1px solid var(--border); }
   .model-switcher-btn { padding: 6px 10px; font-size: 0.68rem; max-width: 120px; }
-  .mic-btn, .img-gen-btn { order: 4; padding: 8px; min-width: 36px; min-height: 36px; border-top: 1px solid var(--border); }
+  .mic-btn, .img-gen-btn { order: 4; padding: 10px; min-width: 44px; min-height: 44px; border-top: 1px solid var(--border); }
   .chat-disclaimer { font-size: 0.65rem; padding: 4px 14px; }
 }
+
+/* ─── v5.5.51 Mobile Polish Sweep ─────────────────────────────────
+   Comprehensive 375px fixes across every surface. Addresses:
+   - iOS auto-zoom on <16px inputs (GLOBAL rule)
+   - Touch targets below 44px (WCAG 2.1 AA)
+   - Cards/modals overflowing viewport width
+   - Component-specific spacing issues
+   ─────────────────────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  /* ── GLOBAL: prevent iOS zoom on ALL inputs/textareas/selects ── */
+  input, textarea, select { font-size: 16px !important; }
+
+  /* ── GLOBAL: minimum 44px touch targets on ALL buttons ── */
+  button, .btn, [role="button"] { min-height: 44px; }
+
+  /* ── Cards & modals: cap at 92vw so nothing overflows ── */
+  .welcome-card,
+  .suggest-card,
+  .confirm-card,
+  .new-conv-card,
+  .wizard-provider-modal,
+  .wizard-apikey-section,
+  .nur-comp-feed-list { max-width: 92vw !important; }
+
+  /* ── Welcome overlay: readable buttons, tappable skip ── */
+  .welcome-card { padding: 24px 18px !important; }
+  .welcome-card-title { font-size: 1.1rem !important; }
+  .welcome-card-option { min-height: 52px; padding: 12px 14px !important; }
+
+  /* ── Provider modal: fill viewport, no horizontal scroll ── */
+  #providerModalOverlay > div { max-width: 92vw !important; padding: 20px 16px !important; }
+  #providerModalOverlay button[data-provider] { padding: 12px !important; min-height: 48px; }
+  #pmKeyInput { font-size: 16px !important; padding: 12px !important; }
+
+  /* ── Chat: header icons 44px, secondary row tight ── */
+  .chat-header-icon-btn { width: 44px; height: 44px; font-size: 18px; }
+  .chat-input-secondary { padding: 6px 10px; gap: 6px; }
+  .chat-input-secondary .model-switcher-wrap { max-width: 160px; }
+  .chat-overflow-popup {
+    position: fixed !important;
+    bottom: 88px !important;
+    left: 10px !important;
+    right: 10px !important;
+    min-width: 0 !important;
+  }
+
+  /* ── Garden: controls wrap, 44px targets, nudge tappable ── */
+  .garden-ctrl-btn { min-height: 44px !important; padding: 8px 14px !important; }
+  .garden-nudge-btn { min-height: 44px !important; padding: 10px 16px !important; }
+  .garden-nudge-dismiss { min-height: 44px; min-width: 44px; }
+
+  /* ── Garden Dialogue: overlay fills viewport ── */
+  #gdlgOverlay > div { max-width: 92vw !important; }
+  #gdlgInput { font-size: 16px !important; }
+  #gdlgSend { min-height: 44px; min-width: 56px; }
+
+  /* ── Canvas: toolbar fits, buttons 44px ── */
+  .cv-action-btn { min-height: 44px !important; min-width: 44px !important; padding: 8px !important; }
+  .cv-tool-btn { min-height: 44px; min-width: 44px; }
+
+  /* ── Dojo: score cards don't overflow ── */
+  .sparring-combatant { max-width: 46vw; overflow: hidden; }
+  .sparring-controls button { min-height: 44px; }
+
+  /* ── Question Corner: full-width cards, textarea no zoom ── */
+  .qc-card { max-width: 100% !important; }
+  .qc-textarea { font-size: 16px !important; min-height: 44px; }
+
+  /* ── Core: tree centered, form inputs 16px, Merkle badge wraps ── */
+  .core-tree-container { margin-left: auto; margin-right: auto; }
+  .core-merkle-footer { flex-wrap: wrap; gap: 6px; font-size: 0.7rem; }
+  .core-form-row input,
+  .core-form-row textarea,
+  .core-form-row select { font-size: 16px !important; min-height: 44px; }
+
+  /* ── Core External Voice: fix all 0.85rem inputs ── */
+  #coreExtVoiceForm input,
+  #coreExtVoiceForm textarea { font-size: 16px !important; min-height: 44px; }
+
+  /* ── Settings: HS notification, toast widths ── */
+  .hs-notification { max-width: 92vw !important; }
+  .toast { max-width: 92vw !important; }
+}
+
 /* ---- Font Size Button Active State ---- */
 .font-size-btn.active {
   background: var(--accent) !important;
@@ -15786,7 +15870,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.5.50</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.5.51</span></div>
     </div>
   </div>
 
@@ -17576,7 +17660,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.5.50';
+const FL_VERSION = '5.5.51';
 // ─── Lattice Event Bus ─────────────────────────────────────────
 // Replaces switchTab monkey-patch chain with clean event dispatch
 const LatticeEvents = (function() {
