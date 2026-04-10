@@ -1,1 +1,1 @@
-{"version": "5.5.52", "date": "2026-04-10", "note": "Chat welcome message adapts to connection state (shows provider name when connected instead of 'configure above'), Memory Vault copy rewritten for clarity, Sophia Engine silent on 0 identities."}
+{"version": "5.5.54", "date": "2026-04-10", "note": "New-conversation message is now Ollama-aware, Memory Vault buttons renamed to grandma-friendly 'Save/Restore Vault to/from File', all-conversations-deleted message references Memory Vault."}

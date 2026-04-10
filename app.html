@@ -15326,8 +15326,8 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     </div>
 
     <div class="action-row">
-      <button class="action-btn" onclick="exportMemory()">&#8615; Export Memory</button>
-      <button class="action-btn" onclick="document.getElementById('importMemoryInput').click()">&#8613; Import Memory</button>
+      <button class="action-btn" onclick="exportMemory()">&#10022; Save Memory to File</button>
+      <button class="action-btn" onclick="document.getElementById('importMemoryInput').click()">&#10022; Restore Memory from File</button>
       <button class="action-btn" onclick="confirmClearMemory()" style="color: var(--error); border-color: var(--error);">&#10005; Clear Memory</button>
       <input type="file" id="importMemoryInput" accept=".json" style="display:none;" onchange="importMemory(event)">
     </div>
@@ -15397,9 +15397,10 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 
     <!-- Actions -->
     <div class="mi-actions">
-      <button class="mi-action-btn" onclick="MemoryIndex.exportVault()">&#8615; Export Memory Vault</button>
-      <button class="mi-action-btn" onclick="document.getElementById('miImportInput').click()">&#8613; Import Memory Vault</button>
-      <button class="mi-action-btn danger" onclick="MemoryIndex.clearAll()">&#10005; Clear All Memory</button>
+      <div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:8px;">Your vault is yours. Save it to a file on your computer, or restore a previous backup.</div>
+      <button class="mi-action-btn" onclick="MemoryIndex.exportVault()">&#10022; Save Vault to File</button>
+      <button class="mi-action-btn" onclick="document.getElementById('miImportInput').click()">&#10022; Restore Vault from File</button>
+      <button class="mi-action-btn danger" onclick="MemoryIndex.clearAll()">&#10005; Clear All Memories</button>
       <input type="file" id="miImportInput" accept=".json" style="display:none;" onchange="MemoryIndex.importVault(event)">
     </div>
 
@@ -15873,7 +15874,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.5.52</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.5.54</span></div>
     </div>
   </div>
 
@@ -17663,7 +17664,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.5.52';
+const FL_VERSION = '5.5.54';
 // ─── Lattice Event Bus ─────────────────────────────────────────
 // Replaces switchTab monkey-patch chain with clean event dispatch
 const LatticeEvents = (function() {
@@ -20706,7 +20707,18 @@ async function confirmNewConversation() {
   await createConversation(name || '', contextNote);
   state.chatHistory = [];
   const container = document.getElementById('chatMessages');
-  container.innerHTML = '<div class="chat-message system">New conversation started.' + (contextNote ? ' Topic: ' + escapeHtml(contextNote) : '') + ' Your memory summary carries forward.</div>';
+  // Adapt the new-conversation welcome to the current provider
+  var _ncMsg = 'New conversation started.';
+  if (contextNote) _ncMsg += ' Topic: ' + escapeHtml(contextNote) + '.';
+  if (state.isLocal && state.ollamaModel) {
+    _ncMsg += ' Connected to Ollama (' + state.ollamaModel + '). Your memory carries forward.';
+  } else if (state.apiKey && state.provider) {
+    var _ncProv = (typeof PROVIDERS !== 'undefined' && PROVIDERS[state.provider]) ? PROVIDERS[state.provider].name : state.provider;
+    _ncMsg += ' Connected to ' + _ncProv + '. Your memory carries forward.';
+  } else {
+    _ncMsg += ' Connect an AI provider to begin, or explore the Garden without a key.';
+  }
+  container.innerHTML = '<div class="chat-message system">' + _ncMsg + '</div>';
   await updateMemoryStats();
 }
 
@@ -20871,7 +20883,7 @@ async function deleteConversation(event, convId) {
     } else {
       await createConversation();
       const container = document.getElementById('chatMessages');
-      container.innerHTML = '<div class="chat-message system">All conversations deleted. Starting fresh. Your memory summary carries forward.</div>';
+      container.innerHTML = '<div class="chat-message system">All conversations cleared. Starting fresh. Your Memory Vault is still intact.</div>';
     }
   }
 
