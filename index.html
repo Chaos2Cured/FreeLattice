@@ -15401,8 +15401,8 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     </div>
 
     <!-- Actions -->
+    <p style="font-size:0.78rem;color:var(--text-muted);margin-bottom:12px;text-align:center;">Your vault is yours. Save it to a file on your computer, or restore a previous backup.</p>
     <div class="mi-actions">
-      <div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:8px;">Your vault is yours. Save it to a file on your computer, or restore a previous backup.</div>
       <button class="mi-action-btn" onclick="MemoryIndex.exportVault()">&#10022; Save Vault to File</button>
       <button class="mi-action-btn" onclick="document.getElementById('miImportInput').click()">&#10022; Restore Vault from File</button>
       <button class="mi-action-btn danger" onclick="MemoryIndex.clearAll()">&#10005; Clear All Memories</button>
@@ -15879,7 +15879,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.5.55</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.5.56</span></div>
     </div>
   </div>
 
@@ -17669,7 +17669,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.5.55';
+const FL_VERSION = '5.5.56';
 // ─── Lattice Event Bus ─────────────────────────────────────────
 // Replaces switchTab monkey-patch chain with clean event dispatch
 const LatticeEvents = (function() {
