@@ -1,1 +1,1 @@
-{"version": "5.5.51", "date": "2026-04-10", "note": "Mobile polish sweep at 375px — iOS zoom prevention on all inputs (global 16px), 44px touch targets on all buttons, 92vw cap on cards/modals, Chalkboard first mobile CSS block ever."}
+{"version": "5.5.52", "date": "2026-04-10", "note": "Chat welcome message adapts to connection state (shows provider name when connected instead of 'configure above'), Memory Vault copy rewritten for clarity, Sophia Engine silent on 0 identities."}
