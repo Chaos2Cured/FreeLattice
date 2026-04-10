@@ -1,1 +1,1 @@
-{"version": "5.5.55", "date": "2026-04-10", "note": "Memory Vault + Memory Bridge buttons now use 2-column grid layout. Save and Restore side by side, Clear full-width below. Mobile stacks single-column."}
+{"version": "5.5.56", "date": "2026-04-10", "note": "Memory Vault helper text moved above button grid so it spans full width instead of sharing a grid cell with Save button."}
