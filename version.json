@@ -1,1 +1,1 @@
-{"version": "5.5.48", "date": "2026-04-09", "note": "Three fixes: Canvas+Chalkboard text truncation raised to 200 chars with font scaling; IMPORTANT math-solving instruction prepended to both vision prompts; Merkle chain verification waits for async repairs before re-verifying."}
+{"version": "5.5.49", "date": "2026-04-09", "note": "Canvas Ollama prompt merged into user message for math-solving, chunked 3-word particle bursts for long text on both Canvas and Chalkboard, Core tree ambient glow + gold pulse on plant."}

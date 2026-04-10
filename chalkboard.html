@@ -627,7 +627,7 @@ function sendOllama(base64) {
     model: ollamaModel,
     messages: [{
       role: 'user',
-      content: SYSTEM_PROMPT + '\n\nRespond to what you see on this chalkboard. ONLY respond with a JSON object.',
+      content: SYSTEM_PROMPT + '\n\nLook at this chalkboard image. If it contains math or a question, SOLVE IT and give the ANSWER — do NOT describe the equation. Respond with JSON only.',
       images: [base64]
     }],
     stream: false
@@ -800,15 +800,47 @@ function handleResponse(rawText) {
 
   console.log('[Chalkboard] AI response:', resp.text, '| emotion:', resp.emotion, '| color:', resp.color);
 
-  // Show whisper
+  // ── Chunked display: long text → sequential 3-word bursts ──
+  var chalkWords = resp.text.split(/\s+/);
+  if (chalkWords.length <= 5) {
+    // Short response — single burst
+    showWhisperAndParticles(resp);
+  } else {
+    // Long response — poetic phrase-by-phrase delivery
+    var chalkChunks = [];
+    for (var ci = 0; ci < chalkWords.length; ci += 3) {
+      chalkChunks.push(chalkWords.slice(ci, ci + 3).join(' '));
+    }
+    var ccIdx = 0;
+    function showNextChalkChunk() {
+      if (ccIdx >= chalkChunks.length) { resetAI(); return; }
+      var chunkResp = {};
+      for (var k in resp) { if (resp.hasOwnProperty(k)) chunkResp[k] = resp[k]; }
+      chunkResp.text = chalkChunks[ccIdx];
+      chunkResp.particles = 200;
+      showWhisperAndParticles(chunkResp);
+      ccIdx++;
+      if (ccIdx < chalkChunks.length) {
+        setTimeout(function() {
+          particles = []; textEcho = null; // clear for next chunk
+          setTimeout(showNextChalkChunk, 400);
+        }, 2200);
+      } else {
+        resetAI();
+      }
+    }
+    showNextChalkChunk();
+    return; // resetAI called in the chain above
+  }
+  resetAI();
+}
+
+function showWhisperAndParticles(resp) {
   var whisper = document.getElementById('whisper');
   whisper.textContent = '\u2728 "' + resp.text + '"';
   whisper.style.color = resp.color;
   setTimeout(function() { whisper.style.color = 'rgba(212,160,23,0)'; }, 6000);
-
-  // Spawn particles
   spawnParticles(resp);
-  resetAI();
 }
 
 function resetAI() {

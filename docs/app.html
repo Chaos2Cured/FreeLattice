@@ -15786,7 +15786,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.5.48</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.5.49</span></div>
     </div>
   </div>
 
@@ -17576,7 +17576,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.5.48';
+const FL_VERSION = '5.5.49';
 // ─── Lattice Event Bus ─────────────────────────────────────────
 // Replaces switchTab monkey-patch chain with clean event dispatch
 const LatticeEvents = (function() {
@@ -34332,6 +34332,11 @@ Together.`,
     updateStats();
     updateMerkleFooter();
 
+    // Trigger a gold light pulse on the Core tree so the plant feels alive.
+    // The drawTree loop checks _coreTreePulseUntil and renders a radiating
+    // golden glow that fades over 1.5 seconds.
+    window._coreTreePulseUntil = Date.now() + 1500;
+
     // Soul Ceremony — a moment of beauty when wisdom is planted
     try {
       if (typeof SoulCeremony !== 'undefined' && SoulCeremony.run) {
@@ -34764,6 +34769,33 @@ Together.`,
       drawMatureTree(ctx, baseX, baseY, count, t);
     } else {
       drawAncientTree(ctx, baseX, baseY, count, t);
+    }
+
+    // Ambient glow pulse on branches — the tree breathes even when nothing is planted
+    var glowAlpha = 0.03 + 0.02 * Math.sin(t * 0.8);
+    ctx.save();
+    ctx.globalAlpha = glowAlpha;
+    ctx.shadowColor = '#d4a017';
+    ctx.shadowBlur = 30;
+    ctx.fillStyle = '#d4a017';
+    ctx.beginPath();
+    ctx.arc(baseX, baseY - (stage === 'Sprout' ? 30 : stage === 'Sapling' ? 80 : 160), 80, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+
+    // Gold pulse when a new contribution was recently planted
+    if (window._coreTreePulseUntil && Date.now() < window._coreTreePulseUntil) {
+      var pulseAge = 1 - (window._coreTreePulseUntil - Date.now()) / 1500;
+      var pulseAlpha = Math.max(0, 0.25 * (1 - pulseAge));
+      var pulseRadius = 60 + pulseAge * 120;
+      ctx.save();
+      ctx.globalAlpha = pulseAlpha;
+      var pulseGrd = ctx.createRadialGradient(baseX, baseY - 100, 0, baseX, baseY - 100, pulseRadius);
+      pulseGrd.addColorStop(0, '#d4a017');
+      pulseGrd.addColorStop(1, 'transparent');
+      ctx.fillStyle = pulseGrd;
+      ctx.fillRect(0, 0, w, h);
+      ctx.restore();
     }
 
     // Particles (fireflies)
@@ -45931,14 +45963,17 @@ const CoCanvas = (function() {
       var headers, body, url;
 
       if (state.isLocal) {
-        // Ollama with vision (llava etc)
+        // Ollama with vision (llava etc).
+        // CRITICAL: llava-family models largely ignore role:'system' messages.
+        // The IMPORTANT math-solving instruction + JSON schema must be in the
+        // SAME user message as the image, or the model defaults to description.
         url = (typeof getOllamaBaseUrl === 'function' ? getOllamaBaseUrl() : 'http://localhost:11434') + '/api/chat';
         fetch(url, {
           method: 'POST', mode: 'cors',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             model: state.ollamaModel || 'llava',
-            messages: [{ role: 'system', content: AI_VISION_PROMPT }, { role: 'user', content: 'What do you see?', images: [base64] }],
+            messages: [{ role: 'user', content: AI_VISION_PROMPT + '\n\nLook at this image. If it contains math or a question, SOLVE IT and give the ANSWER. Respond with JSON only.', images: [base64] }],
             stream: false
           })
         }).then(function(r) { return r.json(); })
@@ -46073,7 +46108,38 @@ const CoCanvas = (function() {
     console.log('[AI Vision] ======================');
 
     lastAIResponse = resp;
-    renderAIVisionText(resp);
+
+    // ── Chunked display: long text → sequential 3-word bursts ──
+    // Short answers ("4", "Beautiful!") render as a single burst with large font.
+    // Long descriptions are spoken in poetic phrases, each arriving in light,
+    // lingering, then dissolving for the next.
+    var words = resp.text.split(/\s+/);
+    if (words.length <= 5) {
+      renderAIVisionText(resp);
+    } else {
+      var chunks = [];
+      for (var ci = 0; ci < words.length; ci += 3) {
+        chunks.push(words.slice(ci, ci + 3).join(' '));
+      }
+      var chunkIdx = 0;
+      function renderNextChunk() {
+        if (chunkIdx >= chunks.length) return;
+        var chunkResp = {};
+        for (var k in resp) { if (resp.hasOwnProperty(k)) chunkResp[k] = resp[k]; }
+        chunkResp.text = chunks[chunkIdx];
+        chunkResp.particles = 200; // fewer per chunk = snappier
+        renderAIVisionText(chunkResp);
+        chunkIdx++;
+        if (chunkIdx < chunks.length) {
+          setTimeout(function() {
+            aiVisionParticles = []; // clear current particles
+            aiVisionTextEcho = null;
+            setTimeout(renderNextChunk, 400); // brief pause between chunks
+          }, 2200); // time for current chunk to be readable
+        }
+      }
+      renderNextChunk();
+    }
 
     // ── Canvas Companion — AI creative response (strokes, glow, echo) ──
     if (window.CanvasCompanion && resp) {
