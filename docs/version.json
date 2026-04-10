@@ -1,1 +1,1 @@
-{"version": "5.5.54", "date": "2026-04-10", "note": "New-conversation message is now Ollama-aware, Memory Vault buttons renamed to grandma-friendly 'Save/Restore Vault to/from File', all-conversations-deleted message references Memory Vault."}
+{"version": "5.5.55", "date": "2026-04-10", "note": "Memory Vault + Memory Bridge buttons now use 2-column grid layout. Save and Restore side by side, Clear full-width below. Mobile stacks single-column."}

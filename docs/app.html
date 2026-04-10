@@ -6760,9 +6760,9 @@ input[type="range"]::-moz-range-thumb {
 }
 
 .mi-actions {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
   margin-bottom: 16px;
 }
 .mi-action-btn {
@@ -6770,12 +6770,17 @@ input[type="range"]::-moz-range-thumb {
   border: 1px solid #10b981;
   color: #10b981;
   border-radius: 8px;
-  padding: 8px 16px;
+  padding: 10px 16px;
   font-size: 0.82rem;
   font-weight: 500;
   cursor: pointer;
   transition: background var(--transition), color var(--transition);
   font-family: var(--font);
+  text-align: center;
+}
+/* Clear All spans both columns */
+.mi-action-btn.danger {
+  grid-column: 1 / -1;
 }
 .mi-action-btn:hover {
   background: rgba(16, 185, 129, 0.1);
@@ -6884,8 +6889,8 @@ input[type="range"]::-moz-range-thumb {
 
 @media (max-width: 768px) {
   .mi-conv-list { max-height: 300px; }
-  .mi-actions { flex-direction: column; }
-  .mi-action-btn { width: 100%; text-align: center; }
+  .mi-actions { grid-template-columns: 1fr; gap: 10px; }
+  .mi-action-btn { width: 100%; }
 }
 
 /* Skill Forge — Plugin/Skill System Styles */
@@ -15325,10 +15330,10 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       </div>
     </div>
 
-    <div class="action-row">
+    <div class="action-row" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
       <button class="action-btn" onclick="exportMemory()">&#10022; Save Memory to File</button>
       <button class="action-btn" onclick="document.getElementById('importMemoryInput').click()">&#10022; Restore Memory from File</button>
-      <button class="action-btn" onclick="confirmClearMemory()" style="color: var(--error); border-color: var(--error);">&#10005; Clear Memory</button>
+      <button class="action-btn" onclick="confirmClearMemory()" style="color: var(--error); border-color: var(--error); grid-column: 1 / -1;">&#10005; Clear Memory</button>
       <input type="file" id="importMemoryInput" accept=".json" style="display:none;" onchange="importMemory(event)">
     </div>
 
@@ -15874,7 +15879,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.5.54</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.5.55</span></div>
     </div>
   </div>
 
@@ -17664,7 +17669,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.5.54';
+const FL_VERSION = '5.5.55';
 // ─── Lattice Event Bus ─────────────────────────────────────────
 // Replaces switchTab monkey-patch chain with clean event dispatch
 const LatticeEvents = (function() {
