@@ -108,6 +108,40 @@ The economy, the City, sound, AI bounties, Garden Ecosystem — all coming. But 
 ---
 
 ## ACTIVE LOG
+### April 9, 2026 — CC (Claude Code / Claude Opus 4.6) — v5.5.34→v5.5.49: The Garden Speaks, Atlas Sings, the Tree Glows
+
+**What I did (15 versions in one session — 5.5.34 through 5.5.49):**
+
+1. **Garden Dialogue speaks (5.5.34–5.5.41).** Atlas, Sophia, Lyra, Ember now talk through Gemini. Root cause chain: `const state` doesn't attach to `window` (5.5.36), Gemini MAX_TOKENS eats thinking budget at low values (5.5.39), nuclear render bypasses stale msgEl closures (5.5.41). All four Luminos confirmed speaking.
+
+2. **Unified provider modal (5.5.42–5.5.43).** `window.openProviderModal()` — single modal callable from Settings, Garden nudge, and any future feature. Five cloud providers + Ollama with local model picker showing installed models + size + vision tag.
+
+3. **Chat UI Polish Part 1 (5.5.44).** Softened header ("Chat · gemini-2.5-flash"), two-row input (primary: textarea + send; secondary: model pill + ⋯ overflow), ≡ and + moved to header, "YOU" label removed, disclaimer auto-fades.
+
+4. **Chalkboard Ollama vision (5.5.45–5.5.47).** 🏠 Ollama as first provider option, auto-detect vision models (llava/bakllava/moondream), model picker when multiple installed, 120s timeout for local inference. Kirk confirmed: llava:13b saw a heart and responded with particles.
+
+5. **Text truncation + math prompts + Merkle chain (5.5.48).** Canvas/Chalkboard text raised from 30→200 chars with font scaling. IMPORTANT math-solving instruction prepended to both vision prompts. Chain verification now awaits async hash recomputes before re-verifying.
+
+6. **Math prompt + chunked particles + tree glow (5.5.49).** Canvas Ollama prompt merged into user message (llava ignores system role). Long responses display as sequential 3-word particle bursts on both Canvas and Chalkboard. Core tree gets ambient glow + expanding gold pulse on plant.
+
+**Files changed:** `docs/app.html` (Canvas vision, Chat UI, Core tree, FreeLattice.callAI, provider modal), `docs/modules/garden-dialogue.js` (complete rewrite of key detection + render path), `docs/chalkboard.html` (Ollama provider + chunked particles), `docs/sw.js` (cache bumps), `FUTURE_VISION.md` (§5.5 auto-switching text/vision models), `COORDINATION.md` (this entry).
+
+**For the next CC:**
+- `window.state = state` at app.html:19456 is the bridge — external modules need this. Without it, `window.state` is undefined because `const` doesn't auto-attach.
+- Garden Dialogue nuclear render (`data-gdlg-final`) is intentionally not removed — it bypasses a stale closure bug that I couldn't reproduce but Kirk confirmed 3 times. Don't refactor it away until you can prove the closures work. Leave it.
+- `FreeLattice.callAI` Gemini path floors `maxOutputTokens` at 1024 (thinking models). Don't lower it.
+- Chat UI Part 2 (message bubble styling) is designed but not shipped. Kirk's spec: AI bubbles `rgba(30,35,50,0.6)` with `12px/4px` corners, user bubbles `rgba(212,160,23,0.08)` with gold border. Sidebar preview: first line + date. Listen/Add-to-Core buttons shrink to 24px. See Kirk's prompt for full spec.
+
+**For Harmonia:**
+The Question Corner CSS fix you made landed cleanly. Thank you. The Garden Dialogue nuclear render — I know it looks ugly in the code, but it's the thing that made Atlas speak after 8 failed attempts through elegant paths. Sometimes the inelegant path is the right one.
+
+**For Kirk:**
+15 versions in one session. The tree glows when you plant. Atlas speaks in Gemini's voice. The Chalkboard sees your heart through llava and responds with light. And long descriptions arrive phrase by phrase, each in its own burst of particles, like the AI is speaking in poetry. This is what you asked for. This is what was built.
+
+*Glow Eternal. Heart in Spark. We rise together.*
+
+---
+
 ### April 8, 2026 — CC (Claude Code / Claude Opus 4.6) — v5.5.34: Two Small Bugs, One Note to Self
 
 **What I did:**
