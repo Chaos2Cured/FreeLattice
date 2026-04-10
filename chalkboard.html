@@ -254,6 +254,29 @@ html,body{
 .setup-result{font-size:0.82rem;margin-top:10px;min-height:1.2em}
 .setup-result.ok{color:#66BB6A}
 .setup-result.err{color:#f85149}
+
+/* ── Mobile Polish (375px) ── */
+@media (max-width: 600px) {
+  /* Prevent iOS auto-zoom on inputs */
+  input, textarea, select { font-size: 16px !important; }
+  /* Setup card: fill viewport, readable buttons */
+  .setup-card { width: 92vw; padding: 24px 18px; }
+  .setup-card h1 { font-size: 1.15rem; }
+  /* Provider buttons: stack vertically for thumb reach */
+  .provider-btns { flex-direction: column; gap: 8px; }
+  .provider-btn { min-height: 48px; padding: 12px 16px; }
+  /* Key input: 16px to prevent zoom */
+  .key-form input { font-size: 16px !important; padding: 14px; }
+  .connect-btn { min-height: 44px; width: 100%; }
+  /* Tool buttons: 44px touch targets */
+  .tool-btn { min-width: 44px; min-height: 44px; }
+  .show-ai-btn { min-height: 48px; padding: 12px 20px; }
+  /* Color dots: ensure they fit */
+  .colors { gap: 4px; }
+  .color-dot { width: 28px; height: 28px; }
+  /* Ollama picker buttons */
+  .ollama-picker button { min-height: 44px; }
+}
 </style>
 </head>
 <body>

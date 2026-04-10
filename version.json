@@ -1,1 +1,1 @@
-{"version": "5.5.50", "date": "2026-04-10", "note": "Landing page hero reworked for install clarity (Chalkboard CTA first, download row, reassurance text), OG/Twitter meta updated on both index + chalkboard, recommended model hints in Ollama sections."}
+{"version": "5.5.51", "date": "2026-04-10", "note": "Mobile polish sweep at 375px — iOS zoom prevention on all inputs (global 16px), 44px touch targets on all buttons, 92vw cap on cards/modals, Chalkboard first mobile CSS block ever."}
