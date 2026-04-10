@@ -348,17 +348,17 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-04-09 20:46 MDT
-- Version: 5.5.48
-- Total commits: 748
+- Last auto-updated: 2026-04-09 22:44 MDT
+- Version: 5.5.49
+- Total commits: 753
 - Last 10 commits:
-- 689c649 fix: text truncation + math prompts + Merkle chain race (v5.5.48)
+- a981861 feat: math-solving prompt fix + chunked particles + tree glow (v5.5.49)
+- a417c1f ci: Update Primer deployment state [2026-04-10]
+- 1da00f1 docs: Auto-update Session Primer [5.5.48]
+- f24c2d0 docs: Auto-update Session Primer [5.5.48]
+- c2c5dd2 fix: text truncation + math prompts + Merkle chain race (v5.5.48)
+- 11ed401 ci: Update Primer deployment state [2026-04-09]
 - 13aa1c4 docs: Auto-update Session Primer [5.5.47]
 - 914893f docs: Auto-update Session Primer [5.5.47]
 - 80d2c0c fix(chalkboard): 120s timeout for Ollama inference (v5.5.47)
 - 25a5ece ci: Update Primer deployment state [2026-04-09]
-- 583f57b docs: Auto-update Session Primer [5.5.46]
-- be351b9 docs: Auto-update Session Primer [5.5.46]
-- 27130b0 fix(chalkboard): Show AI gate now accepts Ollama-without-key (v5.5.46)
-- 0915fb6 ci: Update Primer deployment state [2026-04-09]
-- a452e53 docs: Auto-update Session Primer [5.5.45]
