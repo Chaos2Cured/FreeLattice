@@ -1,1 +1,1 @@
-{"version": "5.5.49", "date": "2026-04-09", "note": "Canvas Ollama prompt merged into user message for math-solving, chunked 3-word particle bursts for long text on both Canvas and Chalkboard, Core tree ambient glow + gold pulse on plant."}
+{"version": "5.5.50", "date": "2026-04-10", "note": "Landing page hero reworked for install clarity (Chalkboard CTA first, download row, reassurance text), OG/Twitter meta updated on both index + chalkboard, recommended model hints in Ollama sections."}

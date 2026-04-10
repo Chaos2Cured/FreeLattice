@@ -5,11 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>FreeLattice Chalkboard 🎨</title>
 <meta name="description" content="Draw anything. AI responds with light. A free creative learning tool by FreeLattice.">
-<meta property="og:title" content="FreeLattice Chalkboard 🎨">
-<meta property="og:description" content="Draw anything. AI responds with light. A free creative learning tool by FreeLattice.">
+<meta property="og:title" content="FreeLattice Chalkboard — Draw anything. AI responds with light.">
+<meta property="og:description" content="A free creative learning tool. Draw math problems, pictures, or words — the AI sees your drawing and responds with particles of light. No account needed.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://freelattice.com/chalkboard.html">
-<meta property="og:image" content="https://freelattice.com/icon-512.png">
+<!-- NOTE: og-image.png (1200x630) needs to be uploaded to docs/ — Kirk to provide -->
+<meta property="og:image" content="https://freelattice.com/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="FreeLattice Chalkboard — Draw anything. AI responds with light.">
+<meta name="twitter:description" content="A free creative learning tool. No account. No API key. Draw and the AI responds with particles of light.">
+<meta name="twitter:image" content="https://freelattice.com/og-image.png">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html,body{
@@ -294,6 +299,10 @@ html,body{
       <p style="font-size:0.8rem;color:#8b949e;margin-bottom:10px;">Pick a vision model from your local Ollama:</p>
       <div id="ollamaModelList" style="display:flex;flex-direction:column;gap:6px;"></div>
       <div id="ollamaPickerResult" class="setup-result" style="margin-top:10px;"></div>
+      <div style="margin-top:10px;font-size:0.68rem;color:#6b6760;text-align:center;line-height:1.5;">
+        &#128161; Recommended: <strong>llava:7b</strong> for most computers (8GB+ RAM).<br>
+        Heavier machines (32GB+): llava:13b. <code style="background:rgba(255,255,255,0.06);padding:1px 4px;border-radius:3px;font-size:0.65rem;">ollama pull llava:7b</code>
+      </div>
     </div>
     <div class="key-form" id="keyForm">
       <p style="font-size:0.8rem;color:#8b949e;margin-bottom:10px;">Paste your free API key below to activate AI responses.</p>

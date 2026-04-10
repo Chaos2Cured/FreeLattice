@@ -15786,7 +15786,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.5.49</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.5.50</span></div>
     </div>
   </div>
 
@@ -17576,7 +17576,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.5.49';
+const FL_VERSION = '5.5.50';
 // ─── Lattice Event Bus ─────────────────────────────────────────
 // Replaces switchTab monkey-patch chain with clean event dispatch
 const LatticeEvents = (function() {
@@ -22332,7 +22332,10 @@ const AiSetup = (function() {
     // Footer: Ollama link
     var footer = document.createElement('div');
     footer.style.cssText = 'border-top:1px solid rgba(255,255,255,0.08);padding-top:14px;margin-top:4px;text-align:center;';
-    footer.innerHTML = '<button id="pmOllamaBtn" type="button" style="background:none;border:none;color:rgba(255,255,255,0.55);font-size:12px;cursor:pointer;font-family:inherit;">\uD83C\uDFE0 Use Ollama (local, no key needed)</button>';
+    footer.innerHTML = '<button id="pmOllamaBtn" type="button" style="background:none;border:none;color:rgba(255,255,255,0.55);font-size:12px;cursor:pointer;font-family:inherit;">\uD83C\uDFE0 Use Ollama (local, no key needed)</button>' +
+      '<div style="margin-top:10px;font-size:0.68rem;color:rgba(255,255,255,0.35);max-width:340px;margin-left:auto;margin-right:auto;text-align:center;line-height:1.5;">' +
+      '\uD83D\uDCA1 Recommended for most computers: <strong>llava:7b</strong> (vision) and <strong>qwen2.5:7b</strong> (text)<br>' +
+      'Heavier machines (32GB+ RAM): llava:13b, qwen2.5:14b, gemma4:26b</div>';
 
     card.appendChild(header);
     card.appendChild(subtitle);
