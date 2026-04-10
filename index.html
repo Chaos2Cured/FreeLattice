@@ -15358,19 +15358,22 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
   <!-- Persistent Memory Index Section (v4.0) -->
   <div class="section mi-section" id="memoryIndexSection">
     <div class="section-title"><span class="mi-title-icon">&#129504;</span> Memory Vault</div>
-    <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 14px;">
-      Browse, search, and manage your conversation memory. Every conversation is indexed with keywords and searchable. Relevant past conversations are automatically injected as context when you chat.
+    <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 6px; line-height: 1.6;">
+      FreeLattice remembers your past conversations locally on this device. When you chat, relevant past messages are automatically included as context so the AI feels like it knows you.
+    </p>
+    <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 14px;">
+      Nothing leaves your device. Export your memories, carry them with you, import them anywhere.
     </p>
 
     <!-- Auto-Context Toggle -->
     <div class="toggle-row">
-      <span class="toggle-label" id="miAutoContextLabel">Auto-Context Injection</span>
+      <span class="toggle-label" id="miAutoContextLabel">Auto-Context</span>
       <label class="toggle-switch">
         <input type="checkbox" id="miAutoContextToggle" checked onchange="MemoryIndex.handleAutoContextToggle()">
         <span class="toggle-slider"></span>
       </label>
     </div>
-    <div class="hint" style="margin-bottom: 16px;">When enabled, relevant past conversations are automatically found and injected as context before each message.</div>
+    <div class="hint" style="margin-bottom: 16px;">When on, past conversations relevant to your current message are found automatically and included as context. The AI remembers without you asking.</div>
 
     <!-- Storage Usage -->
     <div class="mi-storage-bar">
@@ -15402,7 +15405,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 
     <!-- Philosophy -->
     <div class="mi-philosophy">
-      Your memory lives on your device. No server ever sees it. Export it, carry it with you, import it anywhere. This is YOUR history.
+      Your memory is yours. It lives on this device and nowhere else. No server, no cloud, no surveillance. This is how memory should work.
     </div>
   </div>
 
@@ -15870,7 +15873,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.5.51</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.5.52</span></div>
     </div>
   </div>
 
@@ -17660,7 +17663,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.5.51';
+const FL_VERSION = '5.5.52';
 // ─── Lattice Event Bus ─────────────────────────────────────────
 // Replaces switchTab monkey-patch chain with clean event dispatch
 const LatticeEvents = (function() {
@@ -18814,7 +18817,10 @@ const SophiaEngine = (function() {
       identities = await dbGetAll(STORE_IDENTITIES);
       renderIdentityGrid();
       initialized = true;
-      console.log('SophiaEngine: Initialized with ' + identities.length + ' stored identities');
+      // Only log when there are actual identities — "Initialized with 0" is noise
+      if (identities.length > 0) {
+        console.log('SophiaEngine: Loaded ' + identities.length + ' stored identit' + (identities.length === 1 ? 'y' : 'ies'));
+      }
 
       // Register Sophia skills in Skill Forge
       registerSophiaSkills();
@@ -20353,7 +20359,15 @@ async function switchToConversation(convId) {
       div.style.cssText = 'color:#c9a84c;font-style:italic;font-family:Georgia,serif;line-height:1.7;';
       div.textContent = 'New conversation. Your Memory Bridge is active \u2014 understanding from previous sessions will inform this one. \u2726';
     } else {
-      div.textContent = 'Welcome to FreeLattice v5.5. Configure your model and provider above, then start chatting. Connect to peers in the Mesh tab to share knowledge and query their AI agents.';
+      // Adapt the welcome message based on whether an AI provider is already connected.
+      // This prevents "Configure your model" from showing to someone who just connected Ollama.
+      var _connected = state.isLocal || (state.apiKey && state.apiKey.length > 0);
+      if (_connected) {
+        var _statusDesc = state.isLocal ? ('Ollama (' + (state.ollamaModel || 'llama3.2') + ')') : (PROVIDERS[state.provider] ? PROVIDERS[state.provider].name : state.provider);
+        div.textContent = 'Welcome to FreeLattice. Connected to ' + _statusDesc + '. Start chatting!';
+      } else {
+        div.textContent = 'Welcome to FreeLattice. Connect an AI provider above to start chatting, or use the Garden to explore without a key.';
+      }
     }
     container.appendChild(div);
   } else {
