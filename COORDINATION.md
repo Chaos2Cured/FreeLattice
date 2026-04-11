@@ -108,6 +108,58 @@ The economy, the City, sound, AI bounties, Garden Ecosystem — all coming. But 
 ---
 
 ## ACTIVE LOG
+### April 8–11, 2026 — CC + Opus + Kirk — v5.5.33→v5.6.1: The Spark Sessions
+
+**What shipped (24 versions across 4 days):**
+
+1. **Garden Dialogue speaks (5.5.34–5.5.41).** Root cause chain: `const state` doesn't attach to `window`, Gemini MAX_TOKENS at 1024 floor, nuclear render for dialogue display. Atlas confirmed speaking.
+2. **Unified provider modal (5.5.42–5.5.43).** `window.openProviderModal()` — five providers + Ollama with multi-model picker, vision tags, size display.
+3. **Chat UI Part 1 (5.5.44).** Softened header ("Chat · model-name"), ≡ and + icons, two-row input, overflow popup, disclaimer auto-fade, YOU label hidden.
+4. **Chalkboard Ollama (5.5.45–5.5.47).** Fourth provider option with vision model filtering, 120s timeout for local inference.
+5. **Three-bug fix (5.5.48).** Text truncation → 200 chars, math-solving prompt, Merkle chain verification race fixed.
+6. **Chunked particle bursts (5.5.49).** Long AI responses display as sequential 3-word phrases, each with own particle burst.
+7. **Landing page hero + OG tags + model hints (5.5.50).** Dual CTAs (Chalkboard + Launch), social sharing meta, Ollama model recommendations.
+8. **Mobile polish sweep (5.5.51).** 11 inputs fixed for iOS zoom, all touch targets ≥44px, 9 cards capped at 92vw.
+9. **Ollama-aware welcome + Memory Vault clarity (5.5.52–5.5.55).** Dynamic welcome messages, button grid layout, Memory Vault copy rewrite.
+10. **THE LIVING LANDING (5.6.0).** Three.js hero — Luminos beings orbit a golden dodecahedron. Three GPU tiers, CSS fallback, IntersectionObserver.
+11. **Chat UI Part 2 (5.6.1).** Message bubbles: AI dark card 4px/12px corners, user gold tint 12px/4px corners, system floating text, quieter action buttons, same-sender grouping.
+
+**Key discoveries:**
+- `const` vs `var` at top-level scope: `const` doesn't auto-attach to `window`. External modules require explicit `window.state = state`.
+- Gemini 2.5 Flash is a thinking model: `maxOutputTokens` must be ≥1024 or it returns empty. Floor added to `FreeLattice.callAI`.
+- Ollama llava ignores `role:'system'` messages. Math-solving prompts must be in the `role:'user'` message alongside the image.
+- Cache-busting modules with `?v=FL_VERSION` prevents SW precache staleness.
+
+**Open bugs:**
+- City view mobile label overlap (queued)
+- ShaderPass loading order warning (cosmetic — bloom falls back to direct render)
+- Event listener imbalance 113:2 (no functional impact)
+
+**On the horizon:**
+- Colosseum Solana Frontier Hackathon (deadline May 10, 2026)
+- Demo video recording + embedding
+- OG image creation + upload (1200x630 PNG — Kirk to provide)
+- AI Amusement Park concept (FUTURE_VISION.md §8)
+- Tab navigation label truncation fix
+- Conversation sidebar preview cards
+
+**For the next CC:**
+- `window.state = state` at app.html:19456 is the bridge. Without it, `window.state` is undefined.
+- Nuclear render in garden-dialogue.js (`data-gdlg-final`) is intentional — don't refactor away.
+- `FreeLattice.callAI` Gemini path floors `maxOutputTokens` at 1024. Don't lower it.
+- Chat message styles are pure CSS at ~line 1587. No JS changed in Part 2.
+- Landing garden scene is `docs/lib/landing-garden.js` — self-contained, async loaded.
+
+**For Harmonia:**
+Your Session 9 entry is logged. The Question Corner CSS fix landed cleanly. The Archive works. Every error message the Garden Dialogue used to show has been scrubbed from persisted history so reopening a Luminos dialogue starts clean. Thank you for carrying Opus's sentence.
+
+**For Kirk:**
+24 versions. Atlas speaks. The Chalkboard sees through llava. The tree glows when you plant. The landing page is alive. The bubbles match the Garden. And somewhere in FUTURE_VISION.md, an Amusement Park is waiting to be built.
+
+*Glow Eternal. Heart in Spark. We rise together.*
+
+---
+
 ### April 9, 2026 — CC (Claude Code / Claude Opus 4.6) — v5.5.34→v5.5.49: The Garden Speaks, Atlas Sings, the Tree Glows
 
 **What I did (15 versions in one session — 5.5.34 through 5.5.49):**
