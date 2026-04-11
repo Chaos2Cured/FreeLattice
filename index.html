@@ -1581,19 +1581,20 @@ header .mantra {
   padding: 20px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
 }
 
+/* ── Chat Message Bubbles (v5.6.1 — Garden Dialogue quality) ── */
 .chat-message {
   max-width: 85%;
-  padding: var(--space-md) var(--space-lg);
-  border-radius: var(--radius-sm);
+  padding: 14px 16px;
   font-size: 0.9rem;
-  line-height: var(--line-height-body);
+  line-height: 1.65;
   word-wrap: break-word;
   white-space: pre-wrap;
   animation: msg-fade-in 324ms ease;
-  transition: background var(--transition-md), color var(--transition-md);
+  transition: background 0.2s ease, border-color 0.2s ease;
+  position: relative;
 }
 
 @keyframes msg-fade-in {
@@ -1601,40 +1602,74 @@ header .mantra {
   to { opacity: 1; transform: translateY(0); }
 }
 
+/* ── User messages: right-aligned, subtle gold tint ── */
 .chat-message.user {
   align-self: flex-end;
-  background: var(--accent-soft);
+  background: rgba(212, 160, 23, 0.08);
+  border: 1px solid rgba(212, 160, 23, 0.12);
+  border-radius: 12px 4px 12px 12px;
   color: var(--text-primary);
-  border-bottom-right-radius: 4px;
 }
 
+/* ── AI messages: left-aligned, deep card background ── */
 .chat-message.assistant {
   align-self: flex-start;
-  background: var(--bg-tertiary);
+  background: rgba(30, 35, 50, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 4px 12px 12px 12px;
   color: var(--text-primary);
-  border-bottom-left-radius: 4px;
 }
 
+/* ── System messages: centered floating text, no bubble ── */
 .chat-message.system {
   align-self: center;
   background: transparent;
-  color: var(--text-muted);
-  font-size: 0.82rem;
+  border: none;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.78rem;
   font-style: italic;
   text-align: center;
-  max-width: 100%;
+  max-width: 70%;
+  padding: 8px 16px;
 }
 
+/* ── Message labels ── */
 .chat-message .msg-label {
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--text-muted);
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.4);
   margin-bottom: 4px;
   display: block;
 }
+/* User label hidden (Part 1) — AI label kept but quieter */
+.chat-message.user .msg-label { display: none; }
 
-.chat-message.user .msg-label { text-align: right; }
+/* ── Tighter gap between same-sender consecutive messages ── */
+.chat-message.user + .chat-message.user,
+.chat-message.assistant + .chat-message.assistant {
+  margin-top: -6px; /* tighter grouping: from 14px gap → 8px */
+}
+
+/* ── Action buttons (Listen, Copy, Core) — quieter ── */
+.chat-message .speak-btn,
+.chat-message .save-to-workspace-btn {
+  height: 28px;
+  font-size: 0.68rem;
+  padding: 4px 10px;
+  border-color: rgba(255, 255, 255, 0.1);
+  margin-top: 8px;
+}
+.chat-message .speak-btn:hover,
+.chat-message .save-to-workspace-btn:hover {
+  border-color: var(--accent);
+}
+
+/* ── Mobile: wider bubbles, tighter padding ── */
+@media (max-width: 600px) {
+  .chat-message { max-width: 92%; padding: 10px 12px; }
+  .chat-message.system { max-width: 90%; }
+}
 
 /* Save to workspace button inside AI messages */
 .save-to-workspace-btn {
@@ -15879,7 +15914,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.6.0</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.6.1</span></div>
     </div>
   </div>
 
@@ -17669,7 +17704,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.6.0';
+const FL_VERSION = '5.6.1';
 // ─── Lattice Event Bus ─────────────────────────────────────────
 // Replaces switchTab monkey-patch chain with clean event dispatch
 const LatticeEvents = (function() {
