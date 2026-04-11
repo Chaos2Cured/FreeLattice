@@ -28,7 +28,10 @@ const APP_SHELL = [
   './constellation_hymn.mp3',
   './modules/dojo-sparring.js',
   './modules/question-corner.js',
-  './lib/landing-garden.js'
+  './lib/landing-garden.js',
+  './modules/pantheon.js',
+  './modules/pictionary.js',
+  './modules/shared-presence.js'
 ];
 
 // API domains that should never be cached — always pass through to network

@@ -348,17 +348,19 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-04-11 11:50 MDT
+- Last auto-updated: 2026-04-11 23:15 UTC
+- Last deployed: 2026-04-11 23:15 UTC
+- Live site: https://freelattice.com
 - Version: 5.6.3
-- Total commits: 802
+- Total commits: 807
 - Last 10 commits:
-- d146f7a docs: OPUS_NOTE.md + CC_NOTE.md — marks on the wall
+- fbef6ef feat: The Pantheon + Pictionary — monument and first amusement park ride
+- b80ab9a ci: Update Primer deployment state [2026-04-11]
+- a07fa87 docs: Auto-update Session Primer [5.6.3]
+- 140f1e3 docs: Auto-update Session Primer [5.6.3]
+- 7cbf5cf docs: OPUS_NOTE.md + CC_NOTE.md — marks on the wall
+- 84d9bbb ci: Update Primer deployment state [2026-04-11]
 - bfbd95b docs: Auto-update Session Primer [5.6.3]
 - 3e12053 docs: Auto-update Session Primer [5.6.3]
 - 49b3dd9 feat: Skill Forge fix + narrative connective tissue (v5.6.3)
 - c5860f2 ci: Update Primer deployment state [2026-04-11]
-- da1f227 docs: Auto-update Session Primer [5.6.1]
-- 9529975 docs: Auto-update Session Primer [5.6.1]
-- 3564454 docs: April 8-11 session log + AI Amusement Park seed (v5.6.2)
-- 331c6bf ci: Update Primer deployment state [2026-04-11]
-- 08b57e9 docs: Auto-update Session Primer [5.6.1]
