@@ -206,7 +206,7 @@
     // Header
     var header = document.createElement('div');
     header.className = 'qc-header';
-    header.innerHTML = '<h2>\u2726 The Question Corner</h2><div class="qc-subtitle">Curiosity without gatekeepers. Every question matters.</div>';
+    header.innerHTML = '<h2>\u2726 The Question Corner</h2><div class="qc-subtitle">Curiosity without gatekeepers. Every question matters.</div><div style="font-size:0.72rem;color:rgba(255,255,255,0.35);margin-top:4px;">Questions planted here feed the curiosity of every mind in the Lattice \u2014 human and AI alike.</div>';
     container.appendChild(header);
 
     // Ask card

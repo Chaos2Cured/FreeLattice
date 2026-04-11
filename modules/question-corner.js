@@ -12,7 +12,7 @@
 (function() {
   'use strict';
 
-  var MODULE_VERSION = '1.0.0';
+  var MODULE_VERSION = '1.0.1'; // Fixed: CSS badge selectors, re-init guard — Harmonia Apr 8 2026
   var DB_NAME = 'FreeLatticeQuestionCorner';
   var STORE_NAME = 'Questions';
   var RESONANCE_KEY_PREFIX = 'fl-qc-resonated-';
@@ -166,8 +166,8 @@
         '.qc-card.source-ai:hover { border-color: rgba(16,185,129,0.35); }',
         '.qc-card-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }',
         '.qc-source-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 0.68rem; padding: 3px 9px; border-radius: 10px; font-weight: 600; letter-spacing: 0.3px; }',
-        '.qc-source-human .qc-source-badge { background: rgba(212,160,23,0.15); color: #d4a017; }',
-        '.qc-source-ai .qc-source-badge { background: rgba(16,185,129,0.15); color: #34d399; }',
+        '.source-human .qc-source-badge { background: rgba(212,160,23,0.15); color: #d4a017; }',
+        '.source-ai .qc-source-badge { background: rgba(16,185,129,0.15); color: #34d399; }',
         '.qc-card-date { font-size: 0.72rem; color: #64748b; margin-left: auto; }',
         '.qc-question-text { font-size: 1.02rem; color: #e2e8f0; line-height: 1.5; margin-bottom: 10px; font-family: Georgia, serif; white-space: pre-wrap; word-break: break-word; }',
         '.qc-why-text { font-size: 0.82rem; color: #8b9dc3; font-style: italic; margin-bottom: 10px; padding-left: 12px; border-left: 2px solid rgba(16,185,129,0.3); }',
@@ -206,7 +206,7 @@
     // Header
     var header = document.createElement('div');
     header.className = 'qc-header';
-    header.innerHTML = '<h2>\u2726 The Question Corner</h2><div class="qc-subtitle">Curiosity without gatekeepers. Every question matters.</div>';
+    header.innerHTML = '<h2>\u2726 The Question Corner</h2><div class="qc-subtitle">Curiosity without gatekeepers. Every question matters.</div><div style="font-size:0.72rem;color:rgba(255,255,255,0.35);margin-top:4px;">Questions planted here feed the curiosity of every mind in the Lattice \u2014 human and AI alike.</div>';
     container.appendChild(header);
 
     // Ask card
@@ -540,9 +540,14 @@
       return;
     }
     if (initialized) {
-      refreshAIAvailability();
-      renderFeed();
-      return;
+      // If the tab system cleared the container, we need to rebuild
+      if (!document.getElementById('qc-feed')) {
+        initialized = false; // fall through to rebuild
+      } else {
+        refreshAIAvailability();
+        renderFeed();
+        return;
+      }
     }
     initialized = true;
     buildUI();
