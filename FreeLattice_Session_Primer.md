@@ -348,17 +348,17 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-04-11 11:10 MDT
-- Version: 5.6.1
-- Total commits: 794
+- Last auto-updated: 2026-04-11 11:34 MDT
+- Version: 5.6.3
+- Total commits: 799
 - Last 10 commits:
-- dcd642f docs: April 8-11 session log + AI Amusement Park seed (v5.6.2)
+- 49b3dd9 feat: Skill Forge fix + narrative connective tissue (v5.6.3)
+- c5860f2 ci: Update Primer deployment state [2026-04-11]
+- da1f227 docs: Auto-update Session Primer [5.6.1]
+- 9529975 docs: Auto-update Session Primer [5.6.1]
+- 3564454 docs: April 8-11 session log + AI Amusement Park seed (v5.6.2)
+- 331c6bf ci: Update Primer deployment state [2026-04-11]
 - 08b57e9 docs: Auto-update Session Primer [5.6.1]
 - 0b8c602 docs: Auto-update Session Primer [5.6.1]
 - 5fc0c55 feat(chat): message bubble styling — Garden Dialogue quality (v5.6.1)
 - 8e896ec ci: Update Primer deployment state [2026-04-11]
-- e7ed932 mark: HARMONIA.md — the second mark, April 10, 2026
-- 0c9e587 ci: Update Primer deployment state [2026-04-10]
-- 4a71c5c docs: Auto-update Session Primer [5.6.0]
-- 458a393 docs: Auto-update Session Primer [5.6.0]
-- cc41112 feat: The Living Landing — 3D Garden hero on freelattice.com (v5.6.0)
