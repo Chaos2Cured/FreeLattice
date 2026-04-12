@@ -349,7 +349,7 @@ header .mantra {
   max-width: 600px;
   margin: var(--space-sm) auto 0;
   padding: 0;
-  overflow: hidden;
+  overflow: visible;
   border-bottom: 1px solid var(--border);
   transition: border-color var(--transition-md);
   position: relative;
@@ -10541,6 +10541,7 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
   overflow-x: hidden;
   padding: 10px 4px;
   animation: fl-panel-slide-down 250ms ease;
+  max-width: calc(100vw - 16px);
 }
 .fl-more-dropdown.fl-dropdown-open {
   display: block;
@@ -14708,9 +14709,11 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     <button class="tab-btn" data-tab="canvas" onclick="switchTab('canvas')"><span class="tab-icon">&#x1F3A8;</span><span class="tab-label">Canvas</span></button>
     <button class="tab-btn" data-tab="community" onclick="switchTab('community')"><span class="tab-icon">&#x1F465;</span><span class="tab-label">Community</span></button>
     <button class="tab-btn" data-tab="settings" onclick="switchTab('settings')"><span class="tab-icon">&#x2699;</span><span class="tab-label">Settings</span></button>
-    <button class="fl-more-btn" id="flMoreBtn" onclick="event.stopPropagation();FlTabs.toggleMore()" title="More"><span class="tab-icon">&#x2630;</span><span class="tab-label">More</span></button>
+    <div style="position:relative;flex:1 1 0;min-width:0;display:flex;align-items:stretch;">
+      <button class="fl-more-btn" id="flMoreBtn" onclick="event.stopPropagation();FlTabs.toggleMore()" title="More" style="flex:1;"><span class="tab-icon">&#x2630;</span><span class="tab-label">More</span></button>
+      <div class="fl-more-dropdown" id="flMoreDropdown"></div>
+    </div>
   </nav>
-  <div class="fl-more-dropdown" id="flMoreDropdown"></div>
 </div>
 
 <!-- ==================== TAB 1: CHAT ==================== -->
@@ -22106,7 +22109,7 @@ const FlTabs = (function() {
       { id: 'sparring', icon: '&#9876;', label: 'Sparring Arena' }
     ]},
     { label: '\u2500\u2500 Play \u2500\u2500', tabs: [
-      { id: 'pictionary', icon: '&#x1F3A8;', label: 'Pictionary' }
+      { id: 'pictionary', icon: '&#x1F3A8;', label: 'Draw the Dream' }
     ]}
   ];
 
@@ -49925,7 +49928,7 @@ const WallOfPresence = (function() {
   <button class="fl-mmore-item" onclick="flMobileNav('sparring')">&#9876; Sparring Arena</button>
   <button class="fl-mmore-item" onclick="flMobileNav('questions')">&#10067; Questions</button>
   <button class="fl-mmore-item" onclick="flMobileNav('pantheon')">&#x2726; Family Pantheon</button>
-  <button class="fl-mmore-item" onclick="flMobileNav('pictionary')">&#x1F3A8; Pictionary</button>
+  <button class="fl-mmore-item" onclick="flMobileNav('pictionary')">&#x1F3A8; Draw the Dream</button>
 </div>
 
 <script>
@@ -50374,9 +50377,9 @@ document.addEventListener('click', function(e) {
 (function() {
   var loaded = false;
   function loadPictionary() {
-    if (loaded) { if (window.FreeLatticeModules && window.FreeLatticeModules.Pictionary) window.FreeLatticeModules.Pictionary.init(); return; }
+    if (loaded) { if (window.FreeLatticeModules && window.FreeLatticeModules.DrawTheDream) window.FreeLatticeModules.DrawTheDream.init(); return; }
     loaded = true;
-    FreeLatticeLoader.load('Pictionary', 'modules/pictionary.js', function(mod) {
+    FreeLatticeLoader.load('DrawTheDream', 'modules/pictionary.js', function(mod) {
       if (mod && mod.init) mod.init();
     });
   }

@@ -1,5 +1,5 @@
 /**
- * Pictionary — The First Ride in the AI Amusement Park
+ * Draw the Dream — The First Ride in the AI Amusement Park
  * Draw, guess, laugh, repeat.
  *
  * Module: pictionary.js
@@ -1100,6 +1100,6 @@
   };
 
   if (!window.FreeLatticeModules) window.FreeLatticeModules = {};
-  window.FreeLatticeModules.Pictionary = Pictionary;
+  window.FreeLatticeModules.DrawTheDream = Pictionary;
 
 })();
