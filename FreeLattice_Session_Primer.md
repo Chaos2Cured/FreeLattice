@@ -350,10 +350,9 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 ## PRIMER HEALTH
 - Last auto-updated: 2026-04-13 12:36 MDT
 - Version: 5.6.8
-- Total commits: 853
+- Total commits: 852
 - Last 10 commits:
-- 0b8e83a feat: provider name pill + auto-speak toggle (v5.6.8 re-apply)
-- 549e76e ci: Update Primer deployment state [2026-04-13]
+- dc70721 feat: provider name pill + auto-speak toggle (v5.6.8 re-apply)
 - bf9b1b1 docs: Auto-update Session Primer [5.6.8]
 - 4263f4e ci: Update Primer deployment state [2026-04-13]
 - 13cb4aa feat: The Quiet Room - Stone 7, Sanctuary v5.6.8
@@ -362,3 +361,4 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - a77ad46 fix: More menu layout + reorganization (v5.6.7)
 - 0fb1a59 docs: Auto-update Session Primer [5.6.5]
 - b8cd8a1 docs: Auto-update Session Primer [5.6.5]
+- d4c46ee fix: More menu layout + reorganization (v5.6.5)
