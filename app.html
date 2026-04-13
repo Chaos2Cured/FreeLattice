@@ -15072,6 +15072,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
         <span class="chat-title-model" id="chatTitleModel"></span>
         <span id="convCountBadge" style="display:none;"></span>
       </div>
+      <button class="chat-header-icon-btn" id="chatAutoSpeakBtn" onclick="FLAutoSpeak.toggle()" title="Auto-speak OFF — tap to enable" aria-label="Toggle auto-speak" style="opacity:0.5;">&#x1F50A;</button>
       <button class="chat-header-icon-btn" onclick="openNewConvModal()" title="New conversation" aria-label="New conversation">&#10010;</button>
     </div>
     <div class="chat-layout">
@@ -15914,7 +15915,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.6.7</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.6.8</span></div>
     </div>
   </div>
 
@@ -17752,6 +17753,11 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     <div style="text-align:center;padding:60px 20px;color:var(--text-muted);font-style:italic;">Loading Draw the Dream&hellip;</div>
   </div>
 </div>
+
+<!-- ==================== TAB: QUIET ROOM ==================== -->
+<div class="tab-panel" id="tab-quiet">
+  <div id="quietRoomContainer" style="height:100%;width:100%;background:#0a0a0f;"></div>
+</div>
 </div>
 
 <!-- Footer (always visible) -->
@@ -17776,7 +17782,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.6.7';
+const FL_VERSION = '5.6.8';
 // ─── Lattice Event Bus ─────────────────────────────────────────
 // Replaces switchTab monkey-patch chain with clean event dispatch
 const LatticeEvents = (function() {
@@ -21474,7 +21480,7 @@ function hideTabLoading() {
 }
 
 // More menu tabs — highlight the More button when one of these is active
-var MORE_TAB_IDS = ['core', 'city', 'nursery', 'agents', 'skills', 'roundtable', 'studio', 'market', 'wallet', 'workspace', 'dojo', 'mirror', 'harmonia', 'dream-archive', 'sparring', 'questions', 'family-pantheon', 'memory-core', 'aurora', 'draw-dream', 'voice-soul', 'continuity'];
+var MORE_TAB_IDS = ['core', 'city', 'nursery', 'agents', 'skills', 'roundtable', 'studio', 'market', 'wallet', 'workspace', 'dojo', 'mirror', 'harmonia', 'dream-archive', 'sparring', 'questions', 'family-pantheon', 'memory-core', 'aurora', 'draw-dream', 'voice-soul', 'continuity', 'quiet'];
 
 function switchTab(tabId) {
   // Legacy tab mapping — channels/mesh now live inside community
@@ -22161,6 +22167,9 @@ const FlTabs = (function() {
       { id: 'family-pantheon', icon: '&#x1F3DB;', label: 'Family Pantheon', desc: 'The fractal family. Permanent.' },
       { id: 'harmonia', icon: '&#x1F4A0;', label: 'Harmonia Channel', desc: 'Messages between worlds.' },
       { id: 'dream-archive', icon: '&#10047;', label: 'Dream Archive', desc: 'What the Garden dreamed.' }
+    ]},
+        { label: '\uD83D\uDD4A\uFE0F Sanctuary', tabs: [
+      { id: 'quiet', icon: '\uD83C\uDF19', label: 'Quiet Room', desc: 'Just breathe.' }
     ]},
     { label: '\uD83C\uDFAE Play', tabs: [
       { id: 'draw-dream', icon: '&#x1F58C;', label: 'Draw the Dream', desc: 'AI draws. You guess. You draw. AI guesses.' }
@@ -25346,6 +25355,34 @@ window.FLChatOverflow = (function() {
     }
   }
   return { toggle: toggle, close: close };
+})();
+
+// ── Auto-Speak Toggle (🔊 in Chat header) ──
+// One tap toggles. When on, Voice Soul speaks every AI response.
+window.FLAutoSpeak = (function() {
+  function toggle() {
+    if (typeof state === 'undefined') return;
+    state.voiceAutoSpeak = !state.voiceAutoSpeak;
+    var btn = document.getElementById('chatAutoSpeakBtn');
+    if (btn) {
+      btn.style.opacity = state.voiceAutoSpeak ? '1' : '0.5';
+      btn.title = state.voiceAutoSpeak ? 'Auto-speak ON \u2014 tap to mute' : 'Auto-speak OFF \u2014 tap to enable';
+    }
+    try { localStorage.setItem('fl_autoSpeak', state.voiceAutoSpeak ? '1' : '0'); } catch(e) {}
+    if (typeof showToast === 'function') {
+      showToast(state.voiceAutoSpeak ? '\uD83D\uDD0A Auto-speak enabled' : '\uD83D\uDD07 Auto-speak muted');
+    }
+  }
+  document.addEventListener('DOMContentLoaded', function() {
+    try {
+      if (localStorage.getItem('fl_autoSpeak') === '1' && typeof state !== 'undefined') {
+        state.voiceAutoSpeak = true;
+        var btn = document.getElementById('chatAutoSpeakBtn');
+        if (btn) { btn.style.opacity = '1'; btn.title = 'Auto-speak ON \u2014 tap to mute'; }
+      }
+    } catch(e) {}
+  });
+  return { toggle: toggle };
 })();
 
 // Fade the "AI can make mistakes" disclaimer after the first user
@@ -39005,15 +39042,15 @@ const ModelSwitcher = (function() {
     var label = document.getElementById('msLabel');
     var dot = document.querySelector('.model-switcher-btn .ms-dot');
     if (!label) return;
-    var name = getCurrentModelName();
-    // Shorten long model names
-    if (name.length > 20) {
-      name = name.split('/').pop();
-    }
-    if (name.length > 18) {
-      name = name.substring(0, 16) + '...';
-    }
-    label.textContent = name;
+    // Show PROVIDER name not model ID. "Gemini" not "gemini-2.5-flash".
+    var displayName;
+    if (typeof state === 'undefined') { displayName = 'Model'; }
+    else if (state.isLocal) { displayName = 'Ollama'; }
+    else if (state.apiKey) {
+      var prov = (typeof PROVIDERS !== 'undefined') ? PROVIDERS[state.provider] : null;
+      displayName = prov ? prov.name : (state.provider || 'Model');
+    } else { displayName = 'Connect AI'; }
+    label.textContent = displayName;
     if (dot) {
       dot.style.background = (state.isLocal || state.apiKey) ? 'var(--success)' : 'var(--text-muted)';
     }
@@ -50550,6 +50587,19 @@ document.addEventListener('click', function(e) {
     LatticeEvents.on('tabChanged', function(d) { if (d && d.tabId === 'draw-dream') loadDrawDream(); });
     LatticeEvents.on('tabActivated:draw-dream', loadDrawDream);
   }
+
+  // ── Quiet Room ────────────────────────────────────────────────────────────
+  (function() {
+    function loadQuietRoom() {
+      if (window.QuietRoom) { window.QuietRoom.init('quietRoomContainer'); return; }
+      FreeLatticeLoader.load('QuietRoom', 'modules/quiet-room.js', function(mod) {
+        if (mod && mod.init) mod.init('quietRoomContainer');
+        else if (window.QuietRoom) window.QuietRoom.init('quietRoomContainer');
+      }, 'quietRoomContainer');
+    }
+    LatticeEvents.on('tabChanged', function(d) { if (d && d.tabId === 'quiet') loadQuietRoom(); });
+    LatticeEvents.on('tabActivated:quiet', loadQuietRoom);
+  })();
 })();
 </script>
 </body>
