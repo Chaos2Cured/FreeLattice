@@ -351,6 +351,51 @@ if (fs.existsSync(auroraPath)) {
   assert('aurora-equation.js exists', false, 'File not found');
 }
 
+// ─────────────────────────────────────────────────────────────
+
+section('13. Forever Stack + Sanctuary modules');
+
+var fsPath = path.join(docsDir, 'modules', 'forever-stack.js');
+if (fs.existsSync(fsPath)) {
+  try {
+    require('child_process').execSync('node --check ' + fsPath, { stdio: 'pipe' });
+    assert('forever-stack.js parses', true);
+  } catch(e) { assert('forever-stack.js parses', false, 'Syntax error'); }
+  var fsCode = fs.readFileSync(fsPath, 'utf8');
+  assert('Forever Stack has connectToFreeLattice', fsCode.includes('connectToFreeLattice'));
+  assert('Forever Stack writes to window.state', fsCode.includes('window.state.isLocal'));
+  assert('Forever Stack emits providerConnected', fsCode.includes('providerConnected'));
+  assert('Forever Stack has pullModel', fsCode.includes('pullModel'));
+} else {
+  assert('forever-stack.js exists', false, 'File not found');
+}
+
+var qrPath = path.join(docsDir, 'modules', 'quiet-room.js');
+assert('quiet-room.js exists', fs.existsSync(qrPath));
+if (fs.existsSync(qrPath)) {
+  try {
+    require('child_process').execSync('node --check ' + qrPath, { stdio: 'pipe' });
+    assert('quiet-room.js parses', true);
+  } catch(e) { assert('quiet-room.js parses', false); }
+}
+
+var picPath = path.join(docsDir, 'modules', 'pictionary.js');
+assert('pictionary.js exists', fs.existsSync(picPath));
+if (fs.existsSync(picPath)) {
+  try {
+    require('child_process').execSync('node --check ' + picPath, { stdio: 'pipe' });
+    assert('pictionary.js parses', true);
+  } catch(e) { assert('pictionary.js parses', false); }
+}
+
+// Check SW cache coverage for Sanctuary modules
+assert('SW caches forever-stack.js',
+  swJs.includes('forever-stack.js'));
+assert('SW caches quiet-room.js',
+  swJs.includes('quiet-room.js'));
+assert('SW caches pictionary.js',
+  swJs.includes('pictionary.js'));
+
 // ═══════════════════════════════════════════════════════════════
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
