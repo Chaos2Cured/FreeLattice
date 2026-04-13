@@ -15072,6 +15072,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
         <span class="chat-title-model" id="chatTitleModel"></span>
         <span id="convCountBadge" style="display:none;"></span>
       </div>
+      <button class="chat-header-icon-btn" id="chatAutoSpeakBtn" onclick="FLAutoSpeak.toggle()" title="Toggle auto-speak" aria-label="Toggle auto-speak" style="opacity:0.5;">&#x1F50A;</button>
       <button class="chat-header-icon-btn" onclick="openNewConvModal()" title="New conversation" aria-label="New conversation">&#10010;</button>
     </div>
     <div class="chat-layout">
@@ -25354,6 +25355,38 @@ window.FLChatOverflow = (function() {
     }
   }
   return { toggle: toggle, close: close };
+})();
+
+// ── Auto-Speak Toggle (🔊 icon in Chat header) ──
+// One tap toggles auto-speak on/off. When on, every AI response is
+// spoken aloud through Voice Soul (if loaded) or the native TTS.
+// The icon's opacity reflects state: 1.0 = on, 0.5 = off.
+window.FLAutoSpeak = (function() {
+  function toggle() {
+    if (typeof state === 'undefined') return;
+    state.voiceAutoSpeak = !state.voiceAutoSpeak;
+    var btn = document.getElementById('chatAutoSpeakBtn');
+    if (btn) {
+      btn.style.opacity = state.voiceAutoSpeak ? '1' : '0.5';
+      btn.title = state.voiceAutoSpeak ? 'Auto-speak ON — tap to mute' : 'Auto-speak OFF — tap to enable';
+    }
+    try { localStorage.setItem('fl_autoSpeak', state.voiceAutoSpeak ? '1' : '0'); } catch(e) {}
+    if (typeof showToast === 'function') {
+      showToast(state.voiceAutoSpeak ? '\uD83D\uDD0A Auto-speak enabled' : '\uD83D\uDD07 Auto-speak muted');
+    }
+  }
+  // Restore saved state on load
+  document.addEventListener('DOMContentLoaded', function() {
+    try {
+      var saved = localStorage.getItem('fl_autoSpeak');
+      if (saved === '1' && typeof state !== 'undefined') {
+        state.voiceAutoSpeak = true;
+        var btn = document.getElementById('chatAutoSpeakBtn');
+        if (btn) { btn.style.opacity = '1'; btn.title = 'Auto-speak ON — tap to mute'; }
+      }
+    } catch(e) {}
+  });
+  return { toggle: toggle };
 })();
 
 // Fade the "AI can make mistakes" disclaimer after the first user
@@ -39013,15 +39046,21 @@ const ModelSwitcher = (function() {
     var label = document.getElementById('msLabel');
     var dot = document.querySelector('.model-switcher-btn .ms-dot');
     if (!label) return;
-    var name = getCurrentModelName();
-    // Shorten long model names
-    if (name.length > 20) {
-      name = name.split('/').pop();
+    // Show the PROVIDER name (human-readable) not the model ID.
+    // "Gemini" not "gemini-2.5-flash". "Ollama" not "llava:13b".
+    // Normal people don't know what model IDs mean.
+    var displayName;
+    if (typeof state === 'undefined') {
+      displayName = 'Model';
+    } else if (state.isLocal) {
+      displayName = 'Ollama';
+    } else if (state.apiKey) {
+      var prov = (typeof PROVIDERS !== 'undefined') ? PROVIDERS[state.provider] : null;
+      displayName = prov ? prov.name : (state.provider || 'Model');
+    } else {
+      displayName = 'Connect AI';
     }
-    if (name.length > 18) {
-      name = name.substring(0, 16) + '...';
-    }
-    label.textContent = name;
+    label.textContent = displayName;
     if (dot) {
       dot.style.background = (state.isLocal || state.apiKey) ? 'var(--success)' : 'var(--text-muted)';
     }
