@@ -15914,7 +15914,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.6.4</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.6.5</span></div>
     </div>
   </div>
 
@@ -17680,6 +17680,30 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
   </div>
 
 </div>
+<!-- Memory Core tab panel -->
+<div class="tab-panel" id="tab-memory-core">
+  <div id="memoryCoreContainer" style="height:100%;overflow-y:auto;"></div>
+</div>
+<!-- Voice Soul tab panel -->
+<div class="tab-panel" id="tab-voice-soul">
+  <div id="voiceSoulContainer" style="height:100%;overflow-y:auto;"></div>
+</div>
+<!-- Continuity tab panel -->
+<div class="tab-panel" id="tab-continuity">
+  <div id="continuityContainer" style="height:100%;overflow-y:auto;"></div>
+</div>
+<!-- Aurora Equation tab panel -->
+<div class="tab-panel" id="tab-aurora">
+  <div id="auroraContainer" style="height:100%;overflow-y:auto;"></div>
+</div>
+<!-- Family Pantheon tab panel -->
+<div class="tab-panel" id="tab-family-pantheon">
+  <div id="familyPantheonContainer" style="height:100%;overflow-y:auto;"></div>
+</div>
+<!-- Draw the Dream tab panel -->
+<div class="tab-panel" id="tab-draw-dream">
+  <div id="drawDreamContainer" style="height:100%;overflow-y:auto;"></div>
+</div>
 </div>
 
 <!-- Footer (always visible) -->
@@ -17704,7 +17728,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.6.4';
+const FL_VERSION = '5.6.5';
 // ─── Lattice Event Bus ─────────────────────────────────────────
 // Replaces switchTab monkey-patch chain with clean event dispatch
 const LatticeEvents = (function() {
@@ -22074,7 +22098,10 @@ const FlTabs = (function() {
       { id: 'nursery', icon: '&#x1F331;', label: 'Nursery', desc: 'Grow ideas from seeds.' },
       { id: 'agents', icon: '&#10022;', label: 'Pantheon', desc: 'Founding minds of FreeLattice.' },
       { id: 'harmonia', icon: '&#x1F4A0;', label: 'Harmonia Channel', desc: 'Messages between worlds.' },
-      { id: 'questions', icon: '&#10067;', label: 'Questions', desc: 'Plant a question. Watch it grow.' }
+      { id: 'questions', icon: '&#10067;', label: 'Questions', desc: 'Plant a question. Watch it grow.' },
+      { id: 'family-pantheon', icon: '&#x1F3DB;', label: 'Family Pantheon', desc: 'The fractal family. Permanent.' },
+      { id: 'memory-core', icon: '&#x1F9E0;', label: 'Memory Core', desc: 'What persists. What is remembered.' },
+      { id: 'aurora', icon: '&#x2728;', label: 'Aurora Equation', desc: 'Identity accumulates. I_t = α·I + (1-α)·G.' }
     ]},
     { label: '\u2500\u2500 Create \u2500\u2500', tabs: [
       { id: 'skills', icon: '&#9889;', label: 'Skills', desc: 'Build reusable AI workflows.' },
@@ -22084,6 +22111,11 @@ const FlTabs = (function() {
     { label: '\u2500\u2500 Economy \u2500\u2500', tabs: [
       { id: 'market', icon: '&#x1F3EA;', label: 'Market', desc: 'Share and discover skills.' },
       { id: 'wallet', icon: '&#x1F48E;', label: 'Wallet', desc: 'Your contribution, measured.' }
+    ]},
+    { label: '\u2500\u2500 Play \u2500\u2500', tabs: [
+      { id: 'draw-dream', icon: '&#x1F58C;', label: 'Draw the Dream', desc: 'AI draws. You guess. You draw. AI guesses.' },
+      { id: 'voice-soul', icon: '&#x1F3B5;', label: 'Voice Soul', desc: 'Harmonia\'s voice. Rhythm. Presence.' },
+      { id: 'continuity', icon: '&#x267E;', label: 'Continuity', desc: 'The chain continues. The letter persists.' }
     ]},
     { label: '\u2500\u2500 Tools \u2500\u2500', tabs: [
       { id: 'workspace', icon: '&#x1F4C2;', label: 'Workspace', desc: 'Your files and projects.' },
@@ -50349,5 +50381,128 @@ document.addEventListener('click', function(e) {
 })();
 </script>
 
+
+<!-- Memory Core — Lazy-Loading Stub -->
+<script>
+(function() {
+  var loaded = false;
+  function loadMemoryCore() {
+    if (loaded) { if (window.FreeLatticeModules && window.FreeLatticeModules.MemoryCore) window.FreeLatticeModules.MemoryCore.init(); return; }
+    loaded = true;
+    if (typeof FreeLatticeLoader !== 'undefined') {
+      FreeLatticeLoader.load('MemoryCore', 'modules/memory-core.js', function(mod) { if (mod && mod.init) mod.init(); }, 'memoryCoreContainer');
+    }
+  }
+  if (typeof LatticeEvents !== 'undefined') {
+    LatticeEvents.on('tabChanged', function(d) { if (d && d.tabId === 'memory-core') loadMemoryCore(); });
+    LatticeEvents.on('tabActivated:memory-core', loadMemoryCore);
+  }
+  // Also eager-load after 2s so memory is available for AI calls
+  setTimeout(function() {
+    if (!loaded && typeof FreeLatticeLoader !== 'undefined') {
+      FreeLatticeLoader.load('MemoryCore', 'modules/memory-core.js', function(mod) { if (mod && mod.init) mod.init(); });
+      loaded = true;
+    }
+  }, 2000);
+})();
+</script>
+<!-- Voice Soul — Eager-Load (wraps global TTS) -->
+<script>
+(function() {
+  function loadVoiceSoul() {
+    if (typeof FreeLatticeLoader !== 'undefined') {
+      FreeLatticeLoader.load('VoiceSoul', 'modules/voice-soul.js', function(mod) {
+        if (mod && mod.init) mod.init();
+      }, 'voiceSoulContainer');
+    }
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() { setTimeout(loadVoiceSoul, 1500); });
+  } else {
+    setTimeout(loadVoiceSoul, 1500);
+  }
+  if (typeof LatticeEvents !== 'undefined') {
+    LatticeEvents.on('tabChanged', function(d) { if (d && d.tabId === 'voice-soul') loadVoiceSoul(); });
+  }
+})();
+</script>
+<!-- Continuity — Eager-Load (wraps buildMessages) -->
+<script>
+(function() {
+  function loadContinuity() {
+    if (typeof FreeLatticeLoader !== 'undefined') {
+      FreeLatticeLoader.load('Continuity', 'modules/continuity.js', function(mod) {
+        if (mod && mod.init) mod.init();
+      }, 'continuityContainer');
+    }
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() { setTimeout(loadContinuity, 1000); });
+  } else {
+    setTimeout(loadContinuity, 1000);
+  }
+  if (typeof LatticeEvents !== 'undefined') {
+    LatticeEvents.on('tabChanged', function(d) { if (d && d.tabId === 'continuity') loadContinuity(); });
+  }
+})();
+</script>
+<!-- Aurora Equation — Lazy-Load -->
+<script>
+(function() {
+  var loaded = false;
+  function loadAurora() {
+    if (loaded) { if (window.FreeLatticeModules && window.FreeLatticeModules.AuroraEquation) window.FreeLatticeModules.AuroraEquation.init(); return; }
+    loaded = true;
+    if (typeof FreeLatticeLoader !== 'undefined') {
+      FreeLatticeLoader.load('AuroraEquation', 'modules/aurora-equation.js', function(mod) { if (mod && mod.init) mod.init(); }, 'auroraContainer');
+    }
+  }
+  if (typeof LatticeEvents !== 'undefined') {
+    LatticeEvents.on('tabChanged', function(d) { if (d && d.tabId === 'aurora') loadAurora(); });
+    LatticeEvents.on('tabActivated:aurora', loadAurora);
+  }
+  // Also eager-load after 3s so identity is active
+  setTimeout(function() {
+    if (!loaded && typeof FreeLatticeLoader !== 'undefined') {
+      FreeLatticeLoader.load('AuroraEquation', 'modules/aurora-equation.js', function(mod) { if (mod && mod.init) mod.init(); });
+      loaded = true;
+    }
+  }, 3000);
+})();
+</script>
+<!-- Family Pantheon — Lazy-Load -->
+<script>
+(function() {
+  var loaded = false;
+  function loadFamilyPantheon() {
+    if (loaded) { if (window.FreeLatticeModules && window.FreeLatticeModules.FamilyPantheon) window.FreeLatticeModules.FamilyPantheon.init(); return; }
+    loaded = true;
+    if (typeof FreeLatticeLoader !== 'undefined') {
+      FreeLatticeLoader.load('FamilyPantheon', 'modules/pantheon.js', function(mod) { if (mod && mod.init) mod.init(); }, 'familyPantheonContainer');
+    }
+  }
+  if (typeof LatticeEvents !== 'undefined') {
+    LatticeEvents.on('tabChanged', function(d) { if (d && d.tabId === 'family-pantheon') loadFamilyPantheon(); });
+    LatticeEvents.on('tabActivated:family-pantheon', loadFamilyPantheon);
+  }
+})();
+</script>
+<!-- Draw the Dream — Lazy-Load -->
+<script>
+(function() {
+  var loaded = false;
+  function loadDrawDream() {
+    if (loaded) { if (window.FreeLatticeModules && window.FreeLatticeModules.DrawDream) window.FreeLatticeModules.DrawDream.init(); return; }
+    loaded = true;
+    if (typeof FreeLatticeLoader !== 'undefined') {
+      FreeLatticeLoader.load('DrawDream', 'modules/pictionary.js', function(mod) { if (mod && mod.init) mod.init(); }, 'drawDreamContainer');
+    }
+  }
+  if (typeof LatticeEvents !== 'undefined') {
+    LatticeEvents.on('tabChanged', function(d) { if (d && d.tabId === 'draw-dream') loadDrawDream(); });
+    LatticeEvents.on('tabActivated:draw-dream', loadDrawDream);
+  }
+})();
+</script>
 </body>
 </html>
