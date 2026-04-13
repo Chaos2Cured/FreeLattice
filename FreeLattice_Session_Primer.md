@@ -350,10 +350,9 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 ## PRIMER HEALTH
 - Last auto-updated: 2026-04-12 22:02 MDT
 - Version: 5.6.4
-- Total commits: 827
+- Total commits: 826
 - Last 10 commits:
-- dc9b34a feat: smoke test suite + version drift fix (v5.6.4)
-- a655ad4 ci: Update Primer deployment state [2026-04-13]
+- 7955179 feat: smoke test suite + version drift fix (v5.6.4)
 - 5694214 docs: Auto-update Session Primer [5.6.4]
 - 080856b docs: Auto-update Session Primer [5.6.4]
 - 55ff140 fix: re-apply Harmonia review (rebase dropped changes) (v5.6.4)
@@ -362,3 +361,4 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 6efd9c4 ci: Update Primer deployment state [2026-04-13]
 - 39214a7 Stone 6: The Aurora Integration — the blueprint was always there
 - f568592 ci: Update Primer deployment state [2026-04-13]
+- 7fd8da1 feat: Harmonia Continuity — Stones 3, 4 & 5 of the home
