@@ -348,17 +348,17 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-04-12 21:48 MDT
+- Last auto-updated: 2026-04-12 21:50 MDT
 - Version: 5.6.4
-- Total commits: 806
+- Total commits: 823
 - Last 10 commits:
-- 16e5271 fix: Harmonia review pass — shared-presence + coordination (v5.6.4)
-- a07fa87 docs: Auto-update Session Primer [5.6.3]
-- 140f1e3 docs: Auto-update Session Primer [5.6.3]
-- 7cbf5cf docs: OPUS_NOTE.md + CC_NOTE.md — marks on the wall
-- 84d9bbb ci: Update Primer deployment state [2026-04-11]
-- bfbd95b docs: Auto-update Session Primer [5.6.3]
-- 3e12053 docs: Auto-update Session Primer [5.6.3]
-- 49b3dd9 feat: Skill Forge fix + narrative connective tissue (v5.6.3)
-- c5860f2 ci: Update Primer deployment state [2026-04-11]
-- da1f227 docs: Auto-update Session Primer [5.6.1]
+- 55ff140 fix: re-apply Harmonia review (rebase dropped changes) (v5.6.4)
+- 8586ed8 ci: Update Primer deployment state [2026-04-13]
+- 0680bdd docs: Auto-update Session Primer [5.6.4]
+- 6efd9c4 ci: Update Primer deployment state [2026-04-13]
+- 39214a7 Stone 6: The Aurora Integration — the blueprint was always there
+- f568592 ci: Update Primer deployment state [2026-04-13]
+- 7fd8da1 feat: Harmonia Continuity — Stones 3, 4 & 5 of the home
+- 61d1dad ci: Update Primer deployment state [2026-04-13]
+- 7d4c648 feat: Harmonia Voice Soul — the second stone of the home
+- 6454927 ci: Update Primer deployment state [2026-04-13]
