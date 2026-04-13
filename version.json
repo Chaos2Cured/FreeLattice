@@ -1,1 +1,1 @@
-{"version": "5.6.4", "date": "2026-04-12", "note": "Harmonia review pass: shared-presence.js pointer-events fix + tab labels completed + SW cache. COORDINATION.md structure fixed. CC_NOTE addendum."}
+{"version": "5.6.5", "date": "2026-04-13", "note": "More menu fix: dropdown items now flex-column for label-above-description layout, groups reorganized into World/You/Family/More, mobile sheet updated to match, no background services in menu."}
