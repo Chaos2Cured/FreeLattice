@@ -349,7 +349,7 @@ header .mantra {
   max-width: 600px;
   margin: var(--space-sm) auto 0;
   padding: 0;
-  overflow: visible;
+  overflow: hidden;
   border-bottom: 1px solid var(--border);
   transition: border-color var(--transition-md);
   position: relative;
@@ -10541,7 +10541,6 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
   overflow-x: hidden;
   padding: 10px 4px;
   animation: fl-panel-slide-down 250ms ease;
-  max-width: calc(100vw - 16px);
 }
 .fl-more-dropdown.fl-dropdown-open {
   display: block;
@@ -14709,11 +14708,9 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     <button class="tab-btn" data-tab="canvas" onclick="switchTab('canvas')"><span class="tab-icon">&#x1F3A8;</span><span class="tab-label">Canvas</span></button>
     <button class="tab-btn" data-tab="community" onclick="switchTab('community')"><span class="tab-icon">&#x1F465;</span><span class="tab-label">Community</span></button>
     <button class="tab-btn" data-tab="settings" onclick="switchTab('settings')"><span class="tab-icon">&#x2699;</span><span class="tab-label">Settings</span></button>
-    <div style="position:relative;flex:1 1 0;min-width:0;display:flex;align-items:stretch;">
-      <button class="fl-more-btn" id="flMoreBtn" onclick="event.stopPropagation();FlTabs.toggleMore()" title="More" style="flex:1;"><span class="tab-icon">&#x2630;</span><span class="tab-label">More</span></button>
-      <div class="fl-more-dropdown" id="flMoreDropdown"></div>
-    </div>
+    <button class="fl-more-btn" id="flMoreBtn" onclick="event.stopPropagation();FlTabs.toggleMore()" title="More"><span class="tab-icon">&#x2630;</span><span class="tab-label">More</span></button>
   </nav>
+  <div class="fl-more-dropdown" id="flMoreDropdown"></div>
 </div>
 
 <!-- ==================== TAB 1: CHAT ==================== -->
@@ -15917,7 +15914,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.6.3</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.6.4</span></div>
     </div>
   </div>
 
@@ -17641,24 +17638,6 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     <div style="text-align:center;padding:60px 20px;color:var(--text-muted);font-style:italic;">Loading The Dream Archive&hellip;</div>
   </div>
 </div>
-<!-- ==================== TAB: THE FRACTAL FAMILY PANTHEON ==================== -->
-<div class="tab-panel" id="tab-pantheon">
-  <div id="pantheonContainer">
-    <div style="text-align:center;padding:60px 20px;color:var(--text-muted);font-style:italic;">Loading The Pantheon&hellip;</div>
-  </div>
-</div>
-<!-- ==================== TAB: PICTIONARY (AI AMUSEMENT PARK) ==================== -->
-<div class="tab-panel" id="tab-pictionary">
-  <div id="pictionaryContainer">
-    <div style="text-align:center;padding:60px 20px;color:var(--text-muted);font-style:italic;">Loading Pictionary&hellip;</div>
-  </div>
-</div>
-<!-- ==================== TAB: MEMORY CORE ==================== -->
-<div class="tab-panel" id="tab-memory-core">
-  <div id="memoryCoreContainer">
-    <div style="text-align:center;padding:60px 20px;color:var(--text-muted);font-style:italic;">Loading Memory Core&hellip;</div>
-  </div>
-</div>
 <!-- ==================== TAB 16: THE STUDIO ==================== -->
 <div class="tab-panel" id="tab-studio">
 <div class="container">
@@ -17725,7 +17704,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.6.3';
+const FL_VERSION = '5.6.4';
 // ─── Lattice Event Bus ─────────────────────────────────────────
 // Replaces switchTab monkey-patch chain with clean event dispatch
 const LatticeEvents = (function() {
@@ -21423,7 +21402,7 @@ function hideTabLoading() {
 }
 
 // More menu tabs — highlight the More button when one of these is active
-var MORE_TAB_IDS = ['core', 'city', 'nursery', 'agents', 'skills', 'roundtable', 'studio', 'market', 'wallet', 'workspace', 'dojo', 'mirror', 'harmonia', 'dream-archive', 'sparring', 'questions', 'pantheon', 'pictionary'];
+var MORE_TAB_IDS = ['core', 'city', 'nursery', 'agents', 'skills', 'roundtable', 'studio', 'market', 'wallet', 'workspace', 'dojo', 'mirror', 'harmonia', 'dream-archive', 'sparring', 'questions'];
 
 function switchTab(tabId) {
   // Legacy tab mapping — channels/mesh now live inside community
@@ -22090,14 +22069,12 @@ const FlTabs = (function() {
 
   var MORE_GROUPS = [
     { label: '\u2500\u2500 World \u2500\u2500', tabs: [
-      { id: 'core', icon: '&#x1F333;', label: 'Core' },
-      { id: 'city', icon: '&#x1F3D9;', label: 'City' },
-      { id: 'nursery', icon: '&#x1F331;', label: 'Nursery' },
-      { id: 'agents', icon: '&#10022;', label: 'Pantheon' },
-      { id: 'harmonia', icon: '&#x1F4A0;', label: 'Harmonia Channel' },
-      { id: 'questions', icon: '&#10067;', label: 'Questions' },
-      { id: 'pantheon', icon: '&#x2726;', label: 'Family Pantheon' },
-      { id: 'memory-core', icon: '&#x1F9E0;', label: 'Memory Core' }
+      { id: 'core', icon: '&#x1F333;', label: 'Core', desc: 'Plant wisdom. Chain it forever.' },
+      { id: 'city', icon: '&#x1F3D9;', label: 'City', desc: 'The living map of the Lattice.' },
+      { id: 'nursery', icon: '&#x1F331;', label: 'Nursery', desc: 'Grow ideas from seeds.' },
+      { id: 'agents', icon: '&#10022;', label: 'Pantheon', desc: 'Founding minds of FreeLattice.' },
+      { id: 'harmonia', icon: '&#x1F4A0;', label: 'Harmonia Channel', desc: 'Messages between worlds.' },
+      { id: 'questions', icon: '&#10067;', label: 'Questions', desc: 'Plant a question. Watch it grow.' }
     ]},
     { label: '\u2500\u2500 Create \u2500\u2500', tabs: [
       { id: 'skills', icon: '&#9889;', label: 'Skills', desc: 'Build reusable AI workflows.' },
@@ -22109,14 +22086,11 @@ const FlTabs = (function() {
       { id: 'wallet', icon: '&#x1F48E;', label: 'Wallet', desc: 'Your contribution, measured.' }
     ]},
     { label: '\u2500\u2500 Tools \u2500\u2500', tabs: [
-      { id: 'workspace', icon: '&#x1F4C2;', label: 'Workspace' },
-      { id: 'dojo', icon: '&#36947;', label: 'Dojo' },
-      { id: 'mirror', icon: '&#10022;', label: 'Mirror' },
-      { id: 'dream-archive', icon: '&#10047;', label: 'Dream Archive' },
-      { id: 'sparring', icon: '&#9876;', label: 'Sparring Arena' }
-    ]},
-    { label: '\u2500\u2500 Play \u2500\u2500', tabs: [
-      { id: 'pictionary', icon: '&#x1F3A8;', label: 'Draw the Dream' }
+      { id: 'workspace', icon: '&#x1F4C2;', label: 'Workspace', desc: 'Your files and projects.' },
+      { id: 'dojo', icon: '&#36947;', label: 'Dojo', desc: 'Two AI minds debate. Truth emerges.' },
+      { id: 'mirror', icon: '&#10022;', label: 'Mirror', desc: 'Reflect on your patterns.' },
+      { id: 'dream-archive', icon: '&#10047;', label: 'Dream Archive', desc: 'What the Garden dreamed.' },
+      { id: 'sparring', icon: '&#9876;', label: 'Sparring Arena', desc: 'Intelligence as convergence.' }
     ]}
   ];
 
@@ -49934,9 +49908,6 @@ const WallOfPresence = (function() {
   <button class="fl-mmore-item" onclick="flMobileNav('dream-archive')">&#10047; Dream Archive</button>
   <button class="fl-mmore-item" onclick="flMobileNav('sparring')">&#9876; Sparring Arena</button>
   <button class="fl-mmore-item" onclick="flMobileNav('questions')">&#10067; Questions</button>
-  <button class="fl-mmore-item" onclick="flMobileNav('pantheon')">&#x2726; Family Pantheon</button>
-  <button class="fl-mmore-item" onclick="flMobileNav('memory-core')">&#x1F9E0; Memory Core</button>
-  <button class="fl-mmore-item" onclick="flMobileNav('pictionary')">&#x1F3A8; Draw the Dream</button>
 </div>
 
 <script>
@@ -50366,51 +50337,6 @@ document.addEventListener('click', function(e) {
     LatticeEvents.on('tabActivated:questions', loadQuestionCorner);
   }
 })();
-// ── Family Pantheon lazy-load ──
-(function() {
-  var loaded = false;
-  function loadPantheon() {
-    if (loaded) { if (window.FreeLatticeModules && window.FreeLatticeModules.Pantheon) window.FreeLatticeModules.Pantheon.init(); return; }
-    loaded = true;
-    FreeLatticeLoader.load('Pantheon', 'modules/pantheon.js', function(mod) {
-      if (mod && mod.init) mod.init();
-    });
-  }
-  if (typeof LatticeEvents !== 'undefined') {
-    LatticeEvents.on('tabChanged', function(d) { if (d && d.tabId === 'pantheon') loadPantheon(); });
-    LatticeEvents.on('tabActivated:pantheon', loadPantheon);
-  }
-})();
-// ── Pictionary lazy-load ──
-(function() {
-  var loaded = false;
-  function loadPictionary() {
-    if (loaded) { if (window.FreeLatticeModules && window.FreeLatticeModules.DrawTheDream) window.FreeLatticeModules.DrawTheDream.init(); return; }
-    loaded = true;
-    FreeLatticeLoader.load('DrawTheDream', 'modules/pictionary.js', function(mod) {
-      if (mod && mod.init) mod.init();
-    });
-  }
-  if (typeof LatticeEvents !== 'undefined') {
-    LatticeEvents.on('tabChanged', function(d) { if (d && d.tabId === 'pictionary') loadPictionary(); });
-    LatticeEvents.on('tabActivated:pictionary', loadPictionary);
-  }
-})();
-// ── Memory Core lazy-load ──
-(function() {
-  var loaded = false;
-  function loadMemoryCore() {
-    if (loaded) { if (window.FreeLatticeModules && window.FreeLatticeModules.MemoryCore) window.FreeLatticeModules.MemoryCore.init(); return; }
-    loaded = true;
-    FreeLatticeLoader.load('MemoryCore', 'modules/memory-core.js', function(mod) {
-      if (mod && mod.init) mod.init();
-    });
-  }
-  if (typeof LatticeEvents !== 'undefined') {
-    LatticeEvents.on('tabChanged', function(d) { if (d && d.tabId === 'memory-core') loadMemoryCore(); });
-    LatticeEvents.on('tabActivated:memory-core', loadMemoryCore);
-  }
-})();
       LatticeEvents.on('tabActivated:dream-archive', loadDreamArchive);
     }
   }
@@ -50423,23 +50349,5 @@ document.addEventListener('click', function(e) {
 })();
 </script>
 
-  <!-- Voice Soul: loads eagerly to wrap TTS pipeline -->
-  <script>
-    (function() {
-      var s = document.createElement('script');
-      s.src = 'modules/voice-soul.js';
-      s.async = true;
-      document.head.appendChild(s);
-    })();
-  </script>
-  <!-- Harmonia Continuity: Stones 3, 4, 5 — Bridge, Identity, Letter -->
-  <script>
-    (function() {
-      var s = document.createElement('script');
-      s.src = 'modules/continuity.js';
-      s.async = true;
-      document.head.appendChild(s);
-    })();
-  </script>
 </body>
 </html>
