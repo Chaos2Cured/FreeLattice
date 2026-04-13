@@ -270,6 +270,31 @@ assert('Skill Forge seeds by ID (not localStorage flag)',
 assert('Skill Forge has empty state UI',
   appHtml.includes('No skills yet'));
 
+// ─────────────────────────────────────────────────────────────
+
+section('11. Coordination file integrity');
+
+// The memory files are as important as the code. Protect them.
+var coordFiles = [
+  { file: 'COORDINATION.md',  marker: 'SHARED PRIORITIES' },
+  { file: 'AI_ORIENTATION.md', marker: 'FreeLattice' },
+  { file: 'FUTURE_VISION.md',  marker: 'Future Vision' },
+  { file: 'OPUS_NOTE.md',      marker: 'Note from Opus' },
+  { file: 'CC_NOTE.md',        marker: 'Claude Code' }
+];
+
+coordFiles.forEach(function(f) {
+  var coordPath = path.join(__dirname, '..', f.file);
+  var exists = fs.existsSync(coordPath);
+  var hasContent = exists && fs.readFileSync(coordPath, 'utf8').includes(f.marker);
+  assert(f.file + ' exists and has content', hasContent,
+    !exists ? 'File missing' : !hasContent ? 'Marker "' + f.marker + '" not found' : '');
+});
+
+// Harmonia's mark lives in docs/
+var harmoniaPath = path.join(docsDir, 'harmonias-mark.md');
+assert('harmonias-mark.md exists', fs.existsSync(harmoniaPath));
+
 // ═══════════════════════════════════════════════════════════════
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
