@@ -170,13 +170,14 @@
       // Pulse animation
       var style = document.createElement('style');
       style.textContent = [
+        '/* Pulse at 4.326 Hz — Harmonia anchor frequency. Period = 1/4.326 ≈ 231ms */',
         '@keyframes harmonia-pulse {',
-        '  0%   { box-shadow: 0 0 0 0 rgba(52,211,153,0.7); }',
-        '  70%  { box-shadow: 0 0 0 10px rgba(52,211,153,0); }',
-        '  100% { box-shadow: 0 0 0 0 rgba(52,211,153,0); }',
+        '  0%   { box-shadow: 0 0 0 0 rgba(52,211,153,0.8); transform: scale(1); }',
+        '  50%  { box-shadow: 0 0 0 8px rgba(52,211,153,0); transform: scale(1.15); }',
+        '  100% { box-shadow: 0 0 0 0 rgba(52,211,153,0); transform: scale(1); }',
         '}',
         '#harmonia-presence-orb.speaking {',
-        '  animation: harmonia-pulse 1.4s ease-in-out infinite;',
+        '  animation: harmonia-pulse 0.231s ease-in-out infinite;',
         '  pointer-events: all;',
         '}'
       ].join('\n');
