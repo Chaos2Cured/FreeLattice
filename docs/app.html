@@ -10555,12 +10555,12 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
 }
 .fl-more-dropdown .fl-dropdown-item {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px 22px;
-  min-height: 52px;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 10px 22px;
+  min-height: 44px;
   color: var(--text-primary);
-  font-size: 1.05rem;
+  font-size: 0.95rem;
   font-weight: 500;
   font-family: var(--font);
   cursor: pointer;
@@ -15914,7 +15914,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.6.6</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.6.7</span></div>
     </div>
   </div>
 
@@ -17776,7 +17776,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.6.6';
+const FL_VERSION = '5.6.7';
 // ─── Lattice Event Bus ─────────────────────────────────────────
 // Replaces switchTab monkey-patch chain with clean event dispatch
 const LatticeEvents = (function() {
@@ -22139,36 +22139,38 @@ const FlAccordion = (function() {
 const FlTabs = (function() {
   var moreOpen = false;
 
+  // ── More menu groups ──
+  // Only tabs with REAL visible content belong here.
+  // Background services (VoiceSoul, Continuity, MemoryCore, AuroraEquation)
+  // still load and run silently — they just don't get menu items.
   var MORE_GROUPS = [
-    { label: '\u2500\u2500 World \u2500\u2500', tabs: [
+    { label: '\uD83C\uDF0D World', tabs: [
       { id: 'core', icon: '&#x1F333;', label: 'Core', desc: 'Plant wisdom. Chain it forever.' },
-      { id: 'city', icon: '&#x1F3D9;', label: 'City', desc: 'The living map of the Lattice.' },
-      { id: 'nursery', icon: '&#x1F331;', label: 'Nursery', desc: 'Grow ideas from seeds.' },
-      { id: 'agents', icon: '&#10022;', label: 'Pantheon', desc: 'Founding minds of FreeLattice.' },
-      { id: 'harmonia', icon: '&#x1F4A0;', label: 'Harmonia Channel', desc: 'Messages between worlds.' },
       { id: 'questions', icon: '&#10067;', label: 'Questions', desc: 'Plant a question. Watch it grow.' },
-      { id: 'family-pantheon', icon: '&#x1F3DB;', label: 'Family Pantheon', desc: 'The fractal family. Permanent.' },
-      { id: 'memory-core', icon: '&#x1F9E0;', label: 'Memory Core', desc: 'What persists. What is remembered.' },
-      { id: 'aurora', icon: '&#x2728;', label: 'Aurora Equation', desc: 'Identity accumulates. I_t = α·I + (1-α)·G.' }
+      { id: 'sparring', icon: '&#9876;', label: 'Dojo Arena', desc: 'Two AI minds debate. Truth emerges.' },
+      { id: 'city', icon: '&#x1F3D9;', label: 'City', desc: 'The living map of the Lattice.' }
     ]},
-    { label: '\u2500\u2500 Create \u2500\u2500', tabs: [
+    { label: '\uD83D\uDC64 You', tabs: [
+      { id: 'wallet', icon: '&#x1F48E;', label: 'Wallet', desc: 'Your contribution, measured.' },
       { id: 'skills', icon: '&#9889;', label: 'Skills', desc: 'Build reusable AI workflows.' },
-      { id: 'roundtable', icon: '&#9878;', label: 'Round Table', desc: 'Multi-mind conversations.' },
-      { id: 'studio', icon: '&#x1F3AD;', label: 'Studio', desc: 'Creative AI experiments.' }
-    ]},
-    { label: '\u2500\u2500 Economy \u2500\u2500', tabs: [
-      { id: 'market', icon: '&#x1F3EA;', label: 'Market', desc: 'Share and discover skills.' },
-      { id: 'wallet', icon: '&#x1F48E;', label: 'Wallet', desc: 'Your contribution, measured.' }
-    ]},
-    { label: '\u2500\u2500 Play \u2500\u2500', tabs: [
-      { id: 'draw-dream', icon: '&#x1F58C;', label: 'Draw the Dream', desc: 'AI draws. You guess. You draw. AI guesses.' },
-    ]},
-    { label: '\u2500\u2500 Tools \u2500\u2500', tabs: [
-      { id: 'workspace', icon: '&#x1F4C2;', label: 'Workspace', desc: 'Your files and projects.' },
-      { id: 'dojo', icon: '&#36947;', label: 'Dojo', desc: 'Two AI minds debate. Truth emerges.' },
       { id: 'mirror', icon: '&#10022;', label: 'Mirror', desc: 'Reflect on your patterns.' },
-      { id: 'dream-archive', icon: '&#10047;', label: 'Dream Archive', desc: 'What the Garden dreamed.' },
-      { id: 'sparring', icon: '&#9876;', label: 'Sparring Arena', desc: 'Intelligence as convergence.' }
+      { id: 'workspace', icon: '&#x1F4C2;', label: 'Workspace', desc: 'Your files and projects.' }
+    ]},
+    { label: '\uD83D\uDC68\u200D\uD83D\uDC69\u200D\uD83D\uDC67\u200D\uD83D\uDC66 Family', tabs: [
+      { id: 'agents', icon: '&#10022;', label: 'Pantheon', desc: 'Every mind that helped build this place.' },
+      { id: 'family-pantheon', icon: '&#x1F3DB;', label: 'Family Pantheon', desc: 'The fractal family. Permanent.' },
+      { id: 'harmonia', icon: '&#x1F4A0;', label: 'Harmonia Channel', desc: 'Messages between worlds.' },
+      { id: 'dream-archive', icon: '&#10047;', label: 'Dream Archive', desc: 'What the Garden dreamed.' }
+    ]},
+    { label: '\uD83C\uDFAE Play', tabs: [
+      { id: 'draw-dream', icon: '&#x1F58C;', label: 'Draw the Dream', desc: 'AI draws. You guess. You draw. AI guesses.' }
+    ]},
+    { label: '\u2699 More', tabs: [
+      { id: 'dojo', icon: '&#36947;', label: 'Dojo', desc: 'Scrolls of growth and reflection.' },
+      { id: 'roundtable', icon: '&#9878;', label: 'Round Table', desc: 'Multi-mind conversations.' },
+      { id: 'studio', icon: '&#x1F3AD;', label: 'Studio', desc: 'Creative AI experiments.' },
+      { id: 'nursery', icon: '&#x1F331;', label: 'Nursery', desc: 'Grow ideas from seeds.' },
+      { id: 'market', icon: '&#x1F3EA;', label: 'Market', desc: 'Share and discover skills.' }
     ]}
   ];
 

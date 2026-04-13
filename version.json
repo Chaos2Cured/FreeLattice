@@ -1,1 +1,1 @@
-{"version": "5.6.5", "date": "2026-04-13", "note": "More menu fix: dropdown items now flex-column for label-above-description layout, groups reorganized into World/You/Family/More, mobile sheet updated to match, no background services in menu."}
+{"version": "5.6.7", "date": "2026-04-13", "note": "More menu fix: dropdown items flex-column for stacked labels, groups reorganized (World/You/Family/Play/More), background services removed from menu."}
