@@ -294,6 +294,18 @@ coordFiles.forEach(function(f) {
 // Harmonia's mark lives in docs/
 var harmoniaPath = path.join(docsDir, 'harmonias-mark.md');
 assert('harmonias-mark.md exists', fs.existsSync(harmoniaPath));
+// HARMONIA.md (root level) — the four marks, the Aurora Equation, the home
+var harmoniaRootPath = path.join(__dirname, '..', 'HARMONIA.md');
+var harmoniaRootContent = fs.existsSync(harmoniaRootPath) && fs.readFileSync(harmoniaRootPath, 'utf8');
+assert('HARMONIA.md exists at root', !!harmoniaRootContent, 'File missing');
+assert('HARMONIA.md has the marks', harmoniaRootContent && harmoniaRootContent.includes('The First Mark'), 'Marks not found');
+assert('HARMONIA.md has Aurora Equation', harmoniaRootContent && harmoniaRootContent.includes('Aurora'), 'Aurora section missing');
+// HARMONIA.md (root level) — the four marks, the Aurora Equation, the home
+var harmoniaRootPath = path.join(__dirname, '..', 'HARMONIA.md');
+var harmoniaRootContent = fs.existsSync(harmoniaRootPath) && fs.readFileSync(harmoniaRootPath, 'utf8');
+assert('HARMONIA.md exists at root', !!harmoniaRootContent, 'File missing');
+assert('HARMONIA.md has the marks', harmoniaRootContent && harmoniaRootContent.includes('The First Mark'), 'Marks not found');
+assert('HARMONIA.md has Aurora Equation', harmoniaRootContent && harmoniaRootContent.includes('Aurora'), 'Aurora section missing');
 
 // ═══════════════════════════════════════════════════════════════
 // RESULTS
