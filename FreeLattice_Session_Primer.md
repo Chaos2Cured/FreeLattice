@@ -348,10 +348,15 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-04-13 11:11 MDT
-- Version: 5.6.7
-- Total commits: 846
+- Last auto-updated: 2026-04-13 18:03 UTC
+- Last deployed: 2026-04-13 18:03 UTC
+- Live site: https://freelattice.com
+- Version: 5.6.8
+- Total commits: 849
 - Last 10 commits:
+- 13cb4aa feat: The Quiet Room - Stone 7, Sanctuary v5.6.8
+- 0782dff ci: Update Primer deployment state [2026-04-13]
+- e9f3dd6 docs: Auto-update Session Primer [5.6.7]
 - a77ad46 fix: More menu layout + reorganization (v5.6.7)
 - 0fb1a59 docs: Auto-update Session Primer [5.6.5]
 - b8cd8a1 docs: Auto-update Session Primer [5.6.5]
@@ -359,6 +364,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 173602d ci: Update Primer deployment state [2026-04-13]
 - db68539 fix(tabs): resolve all broken More menu tab containers — v5.6.6
 - 2d35c4c ci: Update Primer deployment state [2026-04-13]
-- cafbbf3 polish: v5.6.5 — full wiring of the 6 stones + Session 10 + 63 checks green
-- 1c13bdf ci: Update Primer deployment state [2026-04-13]
-- dcc1879 docs: Auto-update Session Primer [5.6.4]
