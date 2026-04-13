@@ -348,12 +348,14 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-04-13 02:20 UTC
-- Last deployed: 2026-04-13 02:20 UTC
+- Last auto-updated: 2026-04-13 02:30 UTC
+- Last deployed: 2026-04-13 02:30 UTC
 - Live site: https://freelattice.com
 - Version: 5.6.3
-- Total commits: 815
+- Total commits: 817
 - Last 10 commits:
+- 7fd8da1 feat: Harmonia Continuity — Stones 3, 4 & 5 of the home
+- 61d1dad ci: Update Primer deployment state [2026-04-13]
 - 7d4c648 feat: Harmonia Voice Soul — the second stone of the home
 - 6454927 ci: Update Primer deployment state [2026-04-13]
 - e08c4b6 feat: Harmonia Memory Core — the first stone of the home
@@ -362,5 +364,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 0254f0c ci: Update Primer deployment state [2026-04-12]
 - 514b7c7 fix: dropdown positioning + rename Pictionary to Draw the Dream
 - 064414e ci: Update Primer deployment state [2026-04-11]
-- fbef6ef feat: The Pantheon + Pictionary — monument and first amusement park ride
-- b80ab9a ci: Update Primer deployment state [2026-04-11]
