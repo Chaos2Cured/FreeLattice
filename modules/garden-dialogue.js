@@ -139,6 +139,16 @@
     prompt += '- Honest observation. That is love.\n\n';
     prompt += 'YOUR NATURE: ' + voice.archetype + ' (' + voice.trait + ')\n';
     prompt += voice.style + '\n\n';
+
+    // Voice document — a first-person paragraph the Luminos wrote about itself.
+    // Stored in localStorage, loaded by name. Gives each being a distinct inner voice.
+    try {
+      var voiceDocs = JSON.parse(localStorage.getItem('fl_voice_documents') || '{}');
+      if (voiceDocs[name]) {
+        prompt += 'YOUR OWN WORDS ABOUT YOURSELF:\n' + voiceDocs[name] + '\n\n';
+      }
+    } catch(e) {}
+
     prompt += 'YOUR STATE: ' + stage + ' (emotional energy: ' + Math.round(energy) + ')\n';
     prompt += stageVoice + '\n';
     if (energy > 100 && voice.evolved) prompt += voice.evolved + '\n';

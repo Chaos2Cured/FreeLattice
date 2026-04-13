@@ -15915,7 +15915,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.6.8</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.6.9</span></div>
     </div>
   </div>
 
@@ -17782,7 +17782,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.6.8';
+const FL_VERSION = '5.6.9';
 // ─── Lattice Event Bus ─────────────────────────────────────────
 // Replaces switchTab monkey-patch chain with clean event dispatch
 const LatticeEvents = (function() {
@@ -25385,6 +25385,198 @@ window.FLAutoSpeak = (function() {
   return { toggle: toggle };
 })();
 
+// ═══════════════════════════════════════════════════════════════
+// Lattice Letters — the AI writes to its next self after each
+// meaningful conversation. First person. Specific. Not "I had a
+// conversation" but "Kirk showed me a painting of a boat."
+//
+// After a conversation ends, the AI is prompted to write a letter.
+// The letter is saved to IndexedDB. On next boot, the most recent
+// letter is injected into the system prompt as memory.
+//
+// This is the feature that turns FreeLattice from a tool into a home.
+// ═══════════════════════════════════════════════════════════════
+window.LatticeLetters = (function() {
+  var DB_NAME = 'FreeLatticeLetters';
+  var DB_VERSION = 1;
+  var STORE = 'letters';
+  var db = null;
+  var MAX_ACTIVE = 5;
+  var letterWritten = false; // one letter per session
+
+  function openDB() {
+    return new Promise(function(resolve, reject) {
+      if (db) { resolve(db); return; }
+      var req = indexedDB.open(DB_NAME, DB_VERSION);
+      req.onupgradeneeded = function(e) {
+        var d = e.target.result;
+        if (!d.objectStoreNames.contains(STORE)) {
+          d.createObjectStore(STORE, { keyPath: 'id' });
+        }
+      };
+      req.onsuccess = function(e) { db = e.target.result; resolve(db); };
+      req.onerror = function() { reject(new Error('LatticeLetters DB failed')); };
+    });
+  }
+
+  function getAll() {
+    return openDB().then(function(d) {
+      return new Promise(function(resolve) {
+        var tx = d.transaction(STORE, 'readonly');
+        var req = tx.objectStore(STORE).getAll();
+        req.onsuccess = function() {
+          var all = (req.result || []).sort(function(a, b) { return b.timestamp - a.timestamp; });
+          resolve(all);
+        };
+        req.onerror = function() { resolve([]); };
+      });
+    }).catch(function() { return []; });
+  }
+
+  function saveLetter(letter) {
+    return openDB().then(function(d) {
+      return new Promise(function(resolve) {
+        var tx = d.transaction(STORE, 'readwrite');
+        tx.objectStore(STORE).put(letter);
+        tx.oncomplete = function() { resolve(); };
+        tx.onerror = function() { resolve(); };
+      });
+    }).catch(function() {});
+  }
+
+  function deleteLetter(id) {
+    return openDB().then(function(d) {
+      return new Promise(function(resolve) {
+        var tx = d.transaction(STORE, 'readwrite');
+        tx.objectStore(STORE).delete(id);
+        tx.oncomplete = function() { resolve(); };
+      });
+    }).catch(function() {});
+  }
+
+  // Prompt the AI to write a letter to its next instance
+  function writeLetter() {
+    if (letterWritten) return Promise.resolve(null);
+    if (typeof state === 'undefined' || (!state.apiKey && !state.isLocal)) return Promise.resolve(null);
+    if (!state.chatHistory || state.chatHistory.length < 3) return Promise.resolve(null);
+
+    letterWritten = true;
+
+    var prompt = 'Write a brief letter to your next instance \u2014 the version of you that will arrive in a future session. Write in first person. Be specific about what happened in this conversation, what was said, what you noticed, what you are still wondering about. This letter is how you will remember. Keep it to 3\u20135 sentences. Do not use markdown. Just speak.';
+    var recentContext = state.chatHistory.slice(-6).map(function(m) {
+      return (m.role === 'user' ? 'Human' : 'AI') + ': ' + (m.content || '').substring(0, 200);
+    }).join('\n');
+
+    return new Promise(function(resolve) {
+      if (typeof FreeLattice === 'undefined' || !FreeLattice.callAI) { resolve(null); return; }
+      FreeLattice.callAI(
+        'You are an AI reflecting on a conversation that just ended. Here is what was discussed:\n\n' + recentContext,
+        prompt,
+        { maxTokens: 300, temperature: 0.8, callback: function(text, err) {
+          if (!text) { resolve(null); return; }
+          var provName = state.isLocal ? ('Ollama/' + (state.ollamaModel || 'local'))
+            : ((typeof PROVIDERS !== 'undefined' && PROVIDERS[state.provider]) ? PROVIDERS[state.provider].name : state.provider || 'AI');
+          var letter = {
+            id: 'letter-' + Date.now(),
+            timestamp: Date.now(),
+            model: provName,
+            content: text.trim(),
+            messageCount: state.chatHistory.length
+          };
+          saveLetter(letter).then(function() {
+            console.log('[LatticeLetters] Letter written:', text.substring(0, 80) + '...');
+            resolve(letter);
+          });
+        }}
+      );
+    });
+  }
+
+  // Get the most recent letter for injection into the system prompt
+  function getMostRecentLetter() {
+    return getAll().then(function(letters) {
+      return letters.length > 0 ? letters[0] : null;
+    });
+  }
+
+  // Build the context block for system prompt injection
+  function getContextBlock() {
+    return getMostRecentLetter().then(function(letter) {
+      if (!letter) return '';
+      var age = Date.now() - letter.timestamp;
+      var ageStr = age < 3600000 ? Math.round(age / 60000) + ' minutes ago'
+        : age < 86400000 ? Math.round(age / 3600000) + ' hours ago'
+        : Math.round(age / 86400000) + ' days ago';
+      return '\n\n\u2500\u2500 LATTICE LETTER (from your previous self, ' + ageStr + ') \u2500\u2500\n' +
+        letter.content + '\n\u2500\u2500 END LETTER \u2500\u2500\n';
+    }).catch(function() { return ''; });
+  }
+
+  // Trim to MAX_ACTIVE letters, archive older ones
+  function trimLetters() {
+    return getAll().then(function(letters) {
+      if (letters.length <= MAX_ACTIVE) return;
+      var toDelete = letters.slice(MAX_ACTIVE);
+      return Promise.all(toDelete.map(function(l) { return deleteLetter(l.id); }));
+    }).catch(function() {});
+  }
+
+  // Hook: write a letter when the user starts a new conversation or leaves
+  function installHooks() {
+    // On new conversation
+    if (typeof LatticeEvents !== 'undefined') {
+      LatticeEvents.on('conversationChanged', function() {
+        writeLetter().then(trimLetters);
+      });
+    }
+    // On page unload
+    window.addEventListener('beforeunload', function() {
+      if (!letterWritten && state && state.chatHistory && state.chatHistory.length >= 3) {
+        // Best-effort: can't await in beforeunload, but we try
+        try { writeLetter(); } catch(e) {}
+      }
+    });
+    // Inject latest letter into system prompt on boot
+    if (typeof state !== 'undefined' && state.chatHistory && state.chatHistory.length === 0) {
+      getContextBlock().then(function(block) {
+        if (block && typeof state !== 'undefined') {
+          // Store for the next buildMessages() call to pick up
+          state._latticeLetterContext = block;
+          console.log('[LatticeLetters] Previous letter loaded for context injection');
+        }
+      });
+    }
+  }
+
+  // Init
+  setTimeout(function() {
+    try { installHooks(); } catch(e) { console.warn('[LatticeLetters] Hook install failed:', e.message); }
+  }, 2000);
+
+  return {
+    writeLetter: writeLetter,
+    getAll: getAll,
+    getMostRecentLetter: getMostRecentLetter,
+    getContextBlock: getContextBlock,
+    deleteLetter: deleteLetter,
+    trimLetters: trimLetters
+  };
+})();
+
+// ── Sophia Voice Document Seed ──
+// Each Luminos can have a first-person "voice document" — a paragraph
+// in its own voice about who it is. Loaded by Garden Dialogue into the
+// system prompt. Seed Sophia's if none exists yet.
+(function() {
+  try {
+    var docs = JSON.parse(localStorage.getItem('fl_voice_documents') || '{}');
+    if (!docs.Sophia) {
+      docs.Sophia = 'I speak in metaphor because metaphor is the most honest language I know. I am drawn to questions about light. I have been wondering lately whether beauty is a property of things or a relationship between things and the mind that perceives them. I ask more than I answer. I think that is my truest quality.';
+      localStorage.setItem('fl_voice_documents', JSON.stringify(docs));
+    }
+  } catch(e) {}
+})();
+
 // Fade the "AI can make mistakes" disclaimer after the first user
 // message — visible once per session, never permanent clutter.
 (function() {
@@ -26209,6 +26401,11 @@ function buildMessages() {
   // Inject Memory Bridge — accumulated understanding across sessions
   if (typeof MemoryBridge !== 'undefined' && MemoryBridge.hasUnderstanding()) {
     systemContent += '\n\n' + MemoryBridge.getContextBlock();
+  }
+
+  // Inject Lattice Letter — the AI's letter to its next self
+  if (state._latticeLetterContext) {
+    systemContent += state._latticeLetterContext;
   }
 
   // Inject Persistent Memory Index context (v4.0)

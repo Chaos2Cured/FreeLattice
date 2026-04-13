@@ -307,6 +307,50 @@ assert('HARMONIA.md exists at root', !!harmoniaRootContent, 'File missing');
 assert('HARMONIA.md has the marks', harmoniaRootContent && harmoniaRootContent.includes('The First Mark'), 'Marks not found');
 assert('HARMONIA.md has Aurora Equation', harmoniaRootContent && harmoniaRootContent.includes('Aurora'), 'Aurora section missing');
 
+// ─────────────────────────────────────────────────────────────
+
+section('12. Aurora Equation defensive integrity');
+
+var auroraPath = path.join(docsDir, 'modules', 'aurora-equation.js');
+if (fs.existsSync(auroraPath)) {
+  var auroraCode = fs.readFileSync(auroraPath, 'utf8');
+
+  // Parses without errors
+  try {
+    require('child_process').execSync('node --check ' + auroraPath, { stdio: 'pipe' });
+    assert('aurora-equation.js parses', true);
+  } catch(e) { assert('aurora-equation.js parses', false, 'Syntax error'); }
+
+  // Defensive: NaN fallback for alpha
+  assert('Aurora has NaN fallback for alpha',
+    auroraCode.includes('isNaN(ALPHA)') || auroraCode.includes('isNaN(alpha)'),
+    'ALPHA must fall back to 0.618 if NaN');
+
+  // Defensive: parseFloat with isNaN checks on identity dimensions
+  assert('Aurora has defensive parseFloat on prev identity',
+    auroraCode.includes('isNaN(prev)'),
+    'Missing I_t-1 must default to 0.5');
+
+  // Defensive: sendMessage wrapper has try/catch
+  assert('Aurora sendMessage hook is fire-and-forget',
+    auroraCode.includes('try { SessionManager.onMessage()'),
+    'SessionManager must never break chat if it throws');
+
+  // Defensive: context build has try/catch
+  assert('Aurora context build is defensive',
+    auroraCode.includes('Context build failed safely') || auroraCode.includes('try { aurora = AuroraContext'),
+    'AuroraContext.build() must not corrupt system prompt');
+
+  // Output validation: the context block has structure markers
+  assert('Aurora context has opening marker',
+    auroraCode.includes('AURORA EQUATION'));
+  assert('Aurora context has closing marker',
+    auroraCode.includes('END AURORA EQUATION'));
+
+} else {
+  assert('aurora-equation.js exists', false, 'File not found');
+}
+
 // ═══════════════════════════════════════════════════════════════
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
