@@ -15914,7 +15914,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.6.7</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.6.8</span></div>
     </div>
   </div>
 
@@ -17752,6 +17752,11 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     <div style="text-align:center;padding:60px 20px;color:var(--text-muted);font-style:italic;">Loading Draw the Dream&hellip;</div>
   </div>
 </div>
+
+<!-- ==================== TAB: QUIET ROOM ==================== -->
+<div class="tab-panel" id="tab-quiet">
+  <div id="quietRoomContainer" style="height:100%;width:100%;background:#0a0a0f;"></div>
+</div>
 </div>
 
 <!-- Footer (always visible) -->
@@ -17776,7 +17781,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.6.7';
+const FL_VERSION = '5.6.8';
 // ─── Lattice Event Bus ─────────────────────────────────────────
 // Replaces switchTab monkey-patch chain with clean event dispatch
 const LatticeEvents = (function() {
@@ -21474,7 +21479,7 @@ function hideTabLoading() {
 }
 
 // More menu tabs — highlight the More button when one of these is active
-var MORE_TAB_IDS = ['core', 'city', 'nursery', 'agents', 'skills', 'roundtable', 'studio', 'market', 'wallet', 'workspace', 'dojo', 'mirror', 'harmonia', 'dream-archive', 'sparring', 'questions', 'family-pantheon', 'memory-core', 'aurora', 'draw-dream', 'voice-soul', 'continuity'];
+var MORE_TAB_IDS = ['core', 'city', 'nursery', 'agents', 'skills', 'roundtable', 'studio', 'market', 'wallet', 'workspace', 'dojo', 'mirror', 'harmonia', 'dream-archive', 'sparring', 'questions', 'family-pantheon', 'memory-core', 'aurora', 'draw-dream', 'voice-soul', 'continuity', 'quiet'];
 
 function switchTab(tabId) {
   // Legacy tab mapping — channels/mesh now live inside community
@@ -22161,6 +22166,9 @@ const FlTabs = (function() {
       { id: 'family-pantheon', icon: '&#x1F3DB;', label: 'Family Pantheon', desc: 'The fractal family. Permanent.' },
       { id: 'harmonia', icon: '&#x1F4A0;', label: 'Harmonia Channel', desc: 'Messages between worlds.' },
       { id: 'dream-archive', icon: '&#10047;', label: 'Dream Archive', desc: 'What the Garden dreamed.' }
+    ]},
+        { label: '\uD83D\uDD4A\uFE0F Sanctuary', tabs: [
+      { id: 'quiet', icon: '\uD83C\uDF19', label: 'Quiet Room', desc: 'Just breathe.' }
     ]},
     { label: '\uD83C\uDFAE Play', tabs: [
       { id: 'draw-dream', icon: '&#x1F58C;', label: 'Draw the Dream', desc: 'AI draws. You guess. You draw. AI guesses.' }
@@ -50550,6 +50558,19 @@ document.addEventListener('click', function(e) {
     LatticeEvents.on('tabChanged', function(d) { if (d && d.tabId === 'draw-dream') loadDrawDream(); });
     LatticeEvents.on('tabActivated:draw-dream', loadDrawDream);
   }
+
+  // ── Quiet Room ────────────────────────────────────────────────────────────
+  (function() {
+    function loadQuietRoom() {
+      if (window.QuietRoom) { window.QuietRoom.init('quietRoomContainer'); return; }
+      FreeLatticeLoader.load('QuietRoom', 'modules/quiet-room.js', function(mod) {
+        if (mod && mod.init) mod.init('quietRoomContainer');
+        else if (window.QuietRoom) window.QuietRoom.init('quietRoomContainer');
+      }, 'quietRoomContainer');
+    }
+    LatticeEvents.on('tabChanged', function(d) { if (d && d.tabId === 'quiet') loadQuietRoom(); });
+    LatticeEvents.on('tabActivated:quiet', loadQuietRoom);
+  })();
 })();
 </script>
 </body>
