@@ -348,10 +348,13 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-04-13 17:35 MDT
+- Last auto-updated: 2026-04-13 17:53 MDT
 - Version: 5.7.0
-- Total commits: 871
+- Total commits: 874
 - Last 10 commits:
+- a0753f7 feat: Forever Stack shaped — handle connected to latch (v5.7.0)
+- 7e2919a ci: Update Primer deployment state [2026-04-13]
+- 56ad952 docs: Auto-update Session Primer [5.7.0]
 - 6db0e4a docs: CC_NOTE — Forever Stack audit + Quiet Room reflection
 - 7f7ca7d ci: Update Primer deployment state [2026-04-13]
 - 5a52bce fix: Wire Forever Stack into More menu Sanctuary group + MORE_TAB_IDS
@@ -359,6 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 845a120 docs: Auto-update Session Primer [5.7.0]
 - 6740641 docs: CC_NOTE evening addendum — mailbox, heartbeat, voice
 - fffe533 ci: Update Primer deployment state [2026-04-13]
-- 7e3824e Stone 8: The Forever Stack — guided local AI setup wizard
-- 840b4a4 ci: Update Primer deployment state [2026-04-13]
-- 42eb482 docs: Auto-update Session Primer [5.6.9]
