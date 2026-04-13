@@ -348,10 +348,15 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-04-13 16:27 MDT
+- Last auto-updated: 2026-04-13 23:05 UTC
+- Last deployed: 2026-04-13 23:05 UTC
+- Live site: https://freelattice.com
 - Version: 5.7.0
-- Total commits: 866
+- Total commits: 869
 - Last 10 commits:
+- 5a52bce fix: Wire Forever Stack into More menu Sanctuary group + MORE_TAB_IDS
+- cb992f4 ci: Update Primer deployment state [2026-04-13]
+- 845a120 docs: Auto-update Session Primer [5.7.0]
 - 6740641 docs: CC_NOTE evening addendum — mailbox, heartbeat, voice
 - fffe533 ci: Update Primer deployment state [2026-04-13]
 - 7e3824e Stone 8: The Forever Stack — guided local AI setup wizard
@@ -359,6 +364,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 42eb482 docs: Auto-update Session Primer [5.6.9]
 - 95163c1 docs: Auto-update Session Primer [5.6.9]
 - 2459ce6 feat: Aurora defensive + Lattice Letters + Sophia voice (v5.6.9)
-- a462f95 ci: Update Primer deployment state [2026-04-13]
-- 272d7ab docs: Auto-update Session Primer [5.6.8]
-- 155b030 docs: CC_NOTE April 13 addendum — building a home not a product
