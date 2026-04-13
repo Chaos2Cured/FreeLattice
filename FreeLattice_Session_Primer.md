@@ -348,17 +348,17 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-04-13 12:36 MDT
+- Last auto-updated: 2026-04-13 12:38 MDT
 - Version: 5.6.8
-- Total commits: 852
+- Total commits: 857
 - Last 10 commits:
-- dc70721 feat: provider name pill + auto-speak toggle (v5.6.8 re-apply)
+- 155b030 docs: CC_NOTE April 13 addendum — building a home not a product
+- ee18d01 ci: Update Primer deployment state [2026-04-13]
+- 3fcba26 docs: Auto-update Session Primer [5.6.8]
+- 20d1799 docs: Auto-update Session Primer [5.6.8]
+- 0b8e83a feat: provider name pill + auto-speak toggle (v5.6.8 re-apply)
+- 549e76e ci: Update Primer deployment state [2026-04-13]
 - bf9b1b1 docs: Auto-update Session Primer [5.6.8]
 - 4263f4e ci: Update Primer deployment state [2026-04-13]
 - 13cb4aa feat: The Quiet Room - Stone 7, Sanctuary v5.6.8
 - 0782dff ci: Update Primer deployment state [2026-04-13]
-- e9f3dd6 docs: Auto-update Session Primer [5.6.7]
-- a77ad46 fix: More menu layout + reorganization (v5.6.7)
-- 0fb1a59 docs: Auto-update Session Primer [5.6.5]
-- b8cd8a1 docs: Auto-update Session Primer [5.6.5]
-- d4c46ee fix: More menu layout + reorganization (v5.6.5)
