@@ -1,5 +1,5 @@
 // FreeLattice Service Worker — Offline Mode
-// Cache-first for app shell, network-first for app.html and API calls
+// Cache-first for app shell, network-first for index.html and API calls
 // API calls are never cached
 // VERSION: Must match version.json — update both together
 
@@ -7,7 +7,7 @@ const CACHE_NAME = 'freelattice-v5.7.0';
 
 const APP_SHELL = [
   './',
-  './app.html',
+  './index.html',
   './manifest.json',
   './icon-192.png',
   './icon-512.png',
@@ -81,24 +81,31 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
-// Fetch: network-first for app.html, cache-first for other app shell, network-only for API calls
+// Fetch: network-first for index.html, cache-first for other app shell, passthrough for API/localhost
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
-  // Never cache API calls — always pass through to network
+  // CRITICAL: Never intercept localhost/127.0.0.1 requests AT ALL.
+  // Ollama (11434), Qdrant (6333), Mem0 bridge (8765) — the SW must
+  // not proxy these. event.respondWith(fetch()) changes the request
+  // origin and breaks CORS. Just return and let the browser handle it.
+  if (url.hostname === 'localhost' || url.hostname === '127.0.0.1') {
+    return; // browser handles it directly — no SW involvement
+  }
+
+  // Never intercept API calls — let them pass through to network directly.
+  // Same pattern: return without event.respondWith so the browser handles it.
   if (API_DOMAINS.some((domain) => url.hostname.includes(domain))) {
-    event.respondWith(fetch(event.request));
-    return;
+    return; // browser handles it directly
   }
 
   // Never cache external resources (e.g., ambient music MP3)
   if (url.origin !== self.location.origin) {
-    event.respondWith(fetch(event.request));
-    return;
+    return; // browser handles it directly
   }
 
-  // Network-first for app.html — always get the latest version
-  if (url.pathname.endsWith('/app.html') || url.pathname.endsWith('/') || url.pathname === '') {
+  // Network-first for index.html — always get the latest version
+  if (url.pathname.endsWith('/index.html') || url.pathname.endsWith('/') || url.pathname === '') {
     event.respondWith(
       fetch(event.request).then((networkResponse) => {
         if (networkResponse && networkResponse.status === 200) {
