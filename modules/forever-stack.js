@@ -268,35 +268,55 @@ if __name__ == '__main__':
 
   // ─── Layer Status Checking ────────────────────────────────────────────────────
 
+  // Status extension: CORS_BLOCKED means "server is running but won't
+  // talk to us." Distinct from STOPPED (server not running at all).
+  var STATUS_CORS = 'cors_blocked';
+
   async function checkLayer(layerId) {
-    const layer = LAYERS.find(l => l.id === layerId);
+    var layer = LAYERS.find(function(l) { return l.id === layerId; });
     if (!layer) return STATUS.STOPPED;
 
     state.layerStatus[layerId] = STATUS.CHECKING;
     updateStatusBadge(layerId);
 
+    // Step 1: Try a real CORS fetch. If this succeeds, the server is
+    // running AND has CORS configured correctly. Best case.
     try {
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 3000);
-      const response = await fetch(layer.testUrl + layer.testPath, {
-        signal: controller.signal,
-        mode: 'no-cors'
+      var controller = new AbortController();
+      var timeout = setTimeout(function() { controller.abort(); }, 3000);
+      var response = await fetch(layer.testUrl + layer.testPath, {
+        signal: controller.signal
       });
       clearTimeout(timeout);
-      // no-cors means we can't read the response, but if we got here, it's reachable
       state.layerStatus[layerId] = STATUS.RUNNING;
     } catch (e) {
-      // Try a cors-free ping approach
+      // Step 2: The real fetch failed. Is the server running at all?
+      // Try a no-cors opaque fetch — if it succeeds, the server is up
+      // but CORS is blocking us.
       try {
-        const img = new Image();
-        await new Promise((resolve, reject) => {
-          img.onload = img.onerror = resolve; // either way, server responded
-          img.src = layer.testUrl + '/favicon.ico?' + Date.now();
-          setTimeout(reject, 2000);
+        var controller2 = new AbortController();
+        var timeout2 = setTimeout(function() { controller2.abort(); }, 3000);
+        await fetch(layer.testUrl + layer.testPath, {
+          signal: controller2.signal,
+          mode: 'no-cors'
         });
-        state.layerStatus[layerId] = STATUS.RUNNING;
+        clearTimeout(timeout2);
+        // Server responded but CORS blocked the real fetch
+        state.layerStatus[layerId] = STATUS_CORS;
       } catch (e2) {
-        state.layerStatus[layerId] = STATUS.STOPPED;
+        // Step 3: Even opaque fetch failed. Try image ping as last resort.
+        try {
+          var img = new Image();
+          await new Promise(function(resolve, reject) {
+            img.onload = img.onerror = resolve;
+            img.src = layer.testUrl + '/favicon.ico?' + Date.now();
+            setTimeout(reject, 2000);
+          });
+          // Server responded to image but not fetch — CORS issue
+          state.layerStatus[layerId] = STATUS_CORS;
+        } catch (e3) {
+          state.layerStatus[layerId] = STATUS.STOPPED;
+        }
       }
     }
 
@@ -820,28 +840,30 @@ if __name__ == '__main__':
   // ─── UI Updates ──────────────────────────────────────────────────────────────
 
   function updateStatusBadge(layerId) {
-    const badge = document.getElementById('fsBadge_' + layerId);
+    var badge = document.getElementById('fsBadge_' + layerId);
     if (!badge) return;
-    const status = state.layerStatus[layerId];
-    badge.className = 'fs-status-badge ' + status;
-    const labels = {
-      unknown: '—',
-      checking: 'Checking…',
-      running: '● Running',
-      stopped: '○ Stopped'
+    var status = state.layerStatus[layerId];
+    badge.className = 'fs-status-badge ' + (status === STATUS_CORS ? 'stopped' : status);
+    var labels = {
+      unknown: '\u2014',
+      checking: 'Checking\u2026',
+      running: '\u25CF Running',
+      stopped: '\u25CB Stopped',
+      cors_blocked: '\u26A0 Needs permission'
     };
-    badge.textContent = labels[status] || '—';
+    badge.textContent = labels[status] || '\u2014';
   }
 
   function updateStackStatus() {
-    const dot = document.getElementById('fsStackDot');
-    const label = document.getElementById('fsStackLabel');
-    const btn = document.getElementById('fsConnectBtn');
+    var dot = document.getElementById('fsStackDot');
+    var label = document.getElementById('fsStackLabel');
+    var btn = document.getElementById('fsConnectBtn');
     if (!dot || !label) return;
 
-    const statuses = Object.values(state.layerStatus);
-    const running = statuses.filter(s => s === STATUS.RUNNING).length;
-    const total = LAYERS.length;
+    var statuses = Object.values(state.layerStatus);
+    var running = statuses.filter(function(s) { return s === STATUS.RUNNING; }).length;
+    var corsBlocked = statuses.filter(function(s) { return s === STATUS_CORS; }).length;
+    var total = LAYERS.length;
 
     if (running === total) {
       dot.className = 'fs-stack-dot running';
@@ -998,21 +1020,49 @@ if __name__ == '__main__':
     },
 
     checkAndShow: async function(layerId) {
-      const resultEl = document.getElementById('fsResult_' + layerId);
-      const layer = LAYERS.find(l => l.id === layerId);
+      var resultEl = document.getElementById('fsResult_' + layerId);
+      var layer = LAYERS.find(function(l) { return l.id === layerId; });
       if (!resultEl || !layer) return;
 
       resultEl.className = 'fs-check-result show';
-      resultEl.style.background = '#1c2a3a';
-      resultEl.style.color = '#58a6ff';
-      resultEl.style.border = '1px solid #1c3a5e';
-      resultEl.textContent = 'Checking…';
+      resultEl.style.cssText = 'display:block;margin-top:8px;font-size:0.72rem;padding:10px 12px;border-radius:6px;background:#1c2a3a;color:#58a6ff;border:1px solid #1c3a5e;';
+      resultEl.textContent = 'Checking\u2026';
 
       await checkLayer(layerId);
-      const status = state.layerStatus[layerId];
+      var status = state.layerStatus[layerId];
 
-      resultEl.className = 'fs-check-result show ' + (status === STATUS.RUNNING ? 'ok' : 'fail');
-      resultEl.textContent = status === STATUS.RUNNING ? '✓ ' + layer.testSuccess : '✗ ' + layer.testFail;
+      if (status === STATUS.RUNNING) {
+        resultEl.className = 'fs-check-result show ok';
+        resultEl.innerHTML = '\u2713 ' + layer.testSuccess;
+      } else if (status === STATUS_CORS) {
+        // ── CORS blocked: server is running but won't talk to us ──
+        // This is the #1 failure mode for new Ollama users on macOS.
+        // The fix is a one-time config file. Every word must be clear.
+        resultEl.className = 'fs-check-result show';
+        resultEl.style.cssText = 'display:block;margin-top:8px;padding:14px;border-radius:8px;background:#2d1f0f;color:#fbbf24;border:1px solid #78350f;font-size:0.78rem;line-height:1.7;';
+        resultEl.innerHTML =
+          '<div style="font-weight:600;margin-bottom:8px;">\u26A0 ' + layer.name + ' is running but needs permission to connect to FreeLattice.</div>' +
+          '<div style="margin-bottom:10px;">This is a one-time fix. ' + layer.name + ' needs a small settings file so your browser can talk to it.</div>' +
+          '<div style="font-weight:600;margin-bottom:6px;">Step 1: Open a command window</div>' +
+          '<div style="margin-bottom:8px;color:#e6edf3;">On Mac: press <strong>Cmd + Space</strong>, type <strong>Terminal</strong>, press Enter.</div>' +
+          '<div style="font-weight:600;margin-bottom:6px;">Step 2: Paste this line and press Enter</div>' +
+          '<div style="background:#0d1117;border:1px solid #30363d;border-radius:6px;padding:10px;margin-bottom:6px;">' +
+            '<code style="color:#79c0ff;font-size:0.75rem;font-family:monospace;user-select:all;word-break:break-all;">echo \'{"origins":["*"]}\' > ~/.ollama/config.json</code>' +
+          '</div>' +
+          '<button onclick="navigator.clipboard.writeText(\'echo \\\'{\u0022origins\u0022:[\u0022*\u0022]}\\\'  > ~/.ollama/config.json\').then(function(){this.textContent=\'\u2713 Copied!\'}.bind(this)).catch(function(){})" ' +
+            'style="background:#21262d;border:1px solid #30363d;color:#8b949e;border-radius:6px;padding:6px 12px;font-size:0.72rem;cursor:pointer;margin-bottom:10px;min-height:36px;">Copy command</button>' +
+          '<div style="font-weight:600;margin-bottom:6px;">Step 3: Quit and reopen ' + layer.name + '</div>' +
+          '<div style="margin-bottom:12px;color:#e6edf3;">Click the llama icon in your menu bar \u2192 <strong>Quit Ollama</strong>. Then open it again from Applications.</div>' +
+          '<button onclick="window.ForeverStack.checkAndShow(\'' + layerId + '\')" ' +
+            'style="width:100%;padding:10px;border-radius:8px;border:1px solid #10b981;background:#0d2818;color:#3fb950;font-size:0.82rem;font-weight:600;cursor:pointer;min-height:44px;">' +
+            'Check again' +
+          '</button>';
+      } else {
+        resultEl.className = 'fs-check-result show fail';
+        resultEl.innerHTML = '\u2717 ' + layer.testFail +
+          '<br><button onclick="window.ForeverStack.checkAndShow(\'' + layerId + '\')" ' +
+          'style="margin-top:8px;padding:8px 16px;border-radius:6px;border:1px solid #30363d;background:#21262d;color:#8b949e;font-size:0.72rem;cursor:pointer;min-height:36px;">Check again</button>';
+      }
     },
 
     copyBridge: function() {
