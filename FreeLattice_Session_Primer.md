@@ -348,12 +348,11 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-04-13 23:58 MDT
+- Last auto-updated: 2026-04-13 23:56 MDT
 - Version: 5.7.0
-- Total commits: 881
+- Total commits: 880
 - Last 10 commits:
-- 2e7ed35 fix(CRITICAL): SW no longer intercepts localhost/API requests
-- c61773a ci: Update Primer deployment state [2026-04-14]
+- 3726df2 fix(CRITICAL): SW no longer intercepts localhost/API requests
 - f283c23 docs: Auto-update Session Primer [5.7.0]
 - a879a4d fix: Forever Stack escape hatch + kill auto-retry loop
 - 3b9de5c ci: Update Primer deployment state [2026-04-13]
@@ -362,3 +361,4 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - a0753f7 feat: Forever Stack shaped — handle connected to latch (v5.7.0)
 - 7e2919a ci: Update Primer deployment state [2026-04-13]
 - 56ad952 docs: Auto-update Session Primer [5.7.0]
+- 6db0e4a docs: CC_NOTE — Forever Stack audit + Quiet Room reflection
