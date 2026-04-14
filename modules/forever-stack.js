@@ -321,11 +321,11 @@ if __name__ == '__main__':
     container.innerHTML = buildHTML();
     attachEvents();
     startOrb();
-    checkAllLayers();
 
-    // Periodic recheck every 30s
-    if (state.checkInterval) clearInterval(state.checkInterval);
-    state.checkInterval = setInterval(checkAllLayers, 30000);
+    // Check once on entry, then ONLY on user tap. No auto-retry loop.
+    // The old setInterval(checkAllLayers, 30000) was firing probes that
+    // blocked interaction when Ollama wasn't running.
+    checkAllLayers();
   }
 
   function buildHTML() {
@@ -702,6 +702,13 @@ if __name__ == '__main__':
       .fs-layer-header { min-height: 52px; }
     }
   </style>
+
+  <!-- Sticky back button — user must ALWAYS be able to leave -->
+  <div style="position:sticky;top:0;z-index:10;display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:rgba(13,17,23,0.95);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid #21262d;">
+    <button onclick="switchTab('garden')" style="background:none;border:none;color:#8b949e;font-size:0.82rem;cursor:pointer;padding:8px 12px;min-height:44px;font-family:inherit;">\u2190 Back</button>
+    <span style="font-size:0.7rem;color:#484f58;">Forever Stack</span>
+    <button onclick="switchTab('garden')" style="background:none;border:none;color:#8b949e;font-size:1.1rem;cursor:pointer;padding:8px 12px;min-height:44px;" title="Close">\u2715</button>
+  </div>
 
   <div class="fs-hero">
     <div class="fs-orb" id="fsOrb"></div>
@@ -1122,7 +1129,6 @@ if __name__ == '__main__':
     },
 
     destroy: function() {
-      if (state.checkInterval) clearInterval(state.checkInterval);
       if (state.orbInterval) clearInterval(state.orbInterval);
     }
   };
