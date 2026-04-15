@@ -13396,13 +13396,18 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
   display: flex; justify-content: space-around; align-items: center;
 }
 .fl-mobile-nav-btn {
-  display: flex; flex-direction: column; align-items: center; gap: 2px;
-  padding: 6px 8px; border: none; background: none; color: var(--text-muted);
-  font-size: 0.65rem; font-family: var(--font); cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
+  display: flex; flex-direction: column; align-items: center; gap: 1px;
+  padding: 6px 4px; border: none; background: none; color: rgba(255,255,255,0.5);
+  font-size: 9px; font-family: var(--font); cursor: pointer;
+  -webkit-tap-highlight-color: transparent; min-width: 0;
 }
-.fl-mobile-nav-btn .fl-mnav-icon { font-size: 1.2rem; }
-.fl-mobile-nav-btn.active { color: var(--accent); }
+.fl-mobile-nav-btn .fl-mnav-icon { font-size: 1.15rem; line-height: 1; }
+.fl-mobile-nav-btn.active { color: var(--accent); opacity: 1; }
+/* Very narrow screens: hide labels, icons only */
+@media (max-width: 320px) {
+  .fl-mobile-nav-btn { font-size: 0; gap: 0; }
+  .fl-mobile-nav-btn .fl-mnav-icon { font-size: 1.3rem; }
+}
 .fl-mobile-more-sheet {
   display: none; position: fixed; bottom: 0; left: 0; right: 0;
   z-index: 9999; background: var(--bg-secondary);
@@ -15332,13 +15337,26 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
   <div class="ai-status-card" id="aiStatusCard">
     <div class="ai-status-header">
       <div class="ai-status-title">&#x2699; AI Connection</div>
-      <div class="ai-status-help">Connect any AI provider to unlock Chat, Canvas, and the Dojo.</div>
+      <div class="ai-status-help">Choose how your AI runs — from the cloud or on your own computer.</div>
     </div>
+
+    <!-- Cloud / Local toggle — the first choice a user makes -->
+    <div style="display:flex;gap:8px;margin-bottom:14px;">
+      <button class="ai-status-btn" id="settingsModeCloud" onclick="settingsSetMode('cloud')" style="flex:1;text-align:center;">
+        &#9729; Cloud
+        <span style="display:block;font-size:0.65rem;color:inherit;opacity:0.7;margin-top:2px;">Use an API key</span>
+      </button>
+      <button class="ai-status-btn" id="settingsModeLocal" onclick="settingsSetMode('local')" style="flex:1;text-align:center;">
+        &#x1F3E0; Local
+        <span style="display:block;font-size:0.65rem;color:inherit;opacity:0.7;margin-top:2px;">Ollama on your computer</span>
+      </button>
+    </div>
+
     <div class="ai-status-indicator">
       <span class="status-dot disconnected" id="settingsStatusDot"></span>
       <span id="settingsStatusText">Not connected</span>
     </div>
-    <div class="ai-status-actions">
+    <div class="ai-status-actions" id="settingsActions">
       <button class="ai-status-btn ai-status-btn-primary" onclick="openProviderModal()">Change Provider</button>
       <button class="ai-status-btn" onclick="AiSetup.testFromSettings()">Test Connection</button>
     </div>
@@ -22890,6 +22908,83 @@ const AiSetup = (function() {
 // Expose the modal globally so any code (Garden nudge, Chat banner, future
 // features) can call one function and get the unified connection flow.
 window.openProviderModal = function() { AiSetup.openModal(); };
+
+// ── Settings Cloud/Local toggle ──
+// When Cloud is tapped: open the provider modal (cloud providers).
+// When Local is tapped: probe Ollama directly, switch to local mode.
+// The active button gets a gold border, the inactive stays muted.
+function settingsSetMode(mode) {
+  var cloudBtn = document.getElementById('settingsModeCloud');
+  var localBtn = document.getElementById('settingsModeLocal');
+  var actionsDiv = document.getElementById('settingsActions');
+
+  if (mode === 'local') {
+    // Highlight Local, dim Cloud
+    if (localBtn) { localBtn.style.borderColor = 'var(--accent)'; localBtn.style.color = 'var(--accent)'; }
+    if (cloudBtn) { cloudBtn.style.borderColor = ''; cloudBtn.style.color = ''; }
+
+    // Probe Ollama
+    var statusText = document.getElementById('settingsStatusText');
+    var statusDot = document.getElementById('settingsStatusDot');
+    if (statusText) statusText.textContent = 'Looking for Ollama\u2026';
+
+    fetch('http://localhost:11434/api/tags', { method: 'GET' })
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (data && data.models && data.models.length > 0) {
+          // Switch to local mode
+          state.isLocal = true;
+          state.ollamaModel = data.models[0].name || 'llama3.2';
+          state.provider = 'ollama';
+          state.apiKey = null;
+          localStorage.setItem('fl_isLocal', 'true');
+          localStorage.setItem('fl_provider', 'ollama');
+          localStorage.setItem('fl_ollamaModel', state.ollamaModel);
+          var localToggle = document.getElementById('localToggle');
+          if (localToggle) localToggle.checked = true;
+          if (typeof handleLocalToggle === 'function') handleLocalToggle();
+          if (typeof updateStatus === 'function') updateStatus();
+          if (typeof AiSetup !== 'undefined') { try { AiSetup.refreshBanner(); AiSetup.refreshSettingsCard(); } catch(e) {} }
+          // Update actions to show model name
+          if (actionsDiv) {
+            actionsDiv.innerHTML = '<button class="ai-status-btn ai-status-btn-primary" onclick="openProviderModal()">' + state.ollamaModel + '</button>' +
+              '<button class="ai-status-btn" onclick="AiSetup.testFromSettings()">Test Connection</button>';
+          }
+        } else {
+          if (statusText) statusText.textContent = 'Ollama is running but no models found. Use the Forever Stack to install one.';
+          if (statusDot) statusDot.className = 'status-dot disconnected';
+        }
+      })
+      .catch(function() {
+        if (statusText) statusText.textContent = 'Ollama not detected. Install it from ollama.ai or use the Forever Stack.';
+        if (statusDot) statusDot.className = 'status-dot disconnected';
+        // Show Forever Stack option
+        if (actionsDiv) {
+          actionsDiv.innerHTML = '<button class="ai-status-btn ai-status-btn-primary" onclick="switchTab(\'forever-stack\')">Open Forever Stack</button>' +
+            '<button class="ai-status-btn" onclick="settingsSetMode(\'local\')">Try Again</button>';
+        }
+      });
+  } else {
+    // Cloud mode — highlight Cloud, dim Local
+    if (cloudBtn) { cloudBtn.style.borderColor = 'var(--accent)'; cloudBtn.style.color = 'var(--accent)'; }
+    if (localBtn) { localBtn.style.borderColor = ''; localBtn.style.color = ''; }
+    // Open the provider modal with cloud options
+    openProviderModal();
+  }
+}
+
+// On boot, highlight the active mode button
+document.addEventListener('DOMContentLoaded', function() {
+  setTimeout(function() {
+    var cloudBtn = document.getElementById('settingsModeCloud');
+    var localBtn = document.getElementById('settingsModeLocal');
+    if (typeof state !== 'undefined' && state.isLocal) {
+      if (localBtn) { localBtn.style.borderColor = 'var(--accent)'; localBtn.style.color = 'var(--accent)'; }
+    } else if (typeof state !== 'undefined' && state.apiKey) {
+      if (cloudBtn) { cloudBtn.style.borderColor = 'var(--accent)'; cloudBtn.style.color = 'var(--accent)'; }
+    }
+  }, 1000);
+});
 
 // ============================================
 // Auto-Update Checker (v4.10)
