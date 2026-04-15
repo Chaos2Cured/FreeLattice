@@ -15123,12 +15123,13 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
           </div>
           <div class="chat-input-secondary" id="chatInputSecondary">
             <div class="model-switcher-wrap" id="modelSwitcherWrap">
-              <button class="model-switcher-btn" id="modelSwitcherBtn" onclick="ModelSwitcher.toggle()" title="Switch AI model">
+              <button class="model-switcher-btn" id="modelSwitcherBtn" onclick="FLModelPicker.open()" title="Choose your AI">
                 <span class="ms-dot"></span>
                 <span class="ms-label" id="msLabel">Model</span>
                 <span class="ms-chevron">&#9660;</span>
               </button>
-              <div class="model-switcher-dropdown" id="modelSwitcherDropdown">
+              <!-- Legacy dropdown kept for ModelSwitcher.toggle() compat -->
+              <div class="model-switcher-dropdown" id="modelSwitcherDropdown" style="display:none !important;">
                 <div class="ms-dropdown-header">Switch Model</div>
                 <div id="msModelList"></div>
                 <button class="ms-dropdown-refresh" onclick="ModelSwitcher.refresh()">&#8635; Refresh Models</button>
@@ -25479,6 +25480,179 @@ window.FLAutoSpeak = (function() {
     } catch(e) {}
   });
   return { toggle: toggle };
+})();
+
+// ═══════════════════════════════════════════════════════════════
+// Model Picker — the elegant overlay that replaces the raw dropdown.
+// Local models from Ollama + cloud providers in one view.
+// Same plumbing (handleProviderChange, saveApiKey, handleLocalToggle).
+// Better faucet.
+// ═══════════════════════════════════════════════════════════════
+window.FLModelPicker = (function() {
+  var overlay = null;
+  var VISION_HINTS = /llava|bakllava|moondream|minicpm|qwen.*vl|llama.*vision|gemma4/i;
+
+  var CLOUD_PROVIDERS = [
+    { id: 'groq',      name: 'Groq',    note: 'Free & fast',     keyUrl: 'https://console.groq.com/keys' },
+    { id: 'google',    name: 'Gemini',  note: 'Free tier',       keyUrl: 'https://aistudio.google.com/apikey' },
+    { id: 'openai',    name: 'OpenAI',  note: 'GPT-4o',          keyUrl: 'https://platform.openai.com/api-keys' },
+    { id: 'anthropic', name: 'Claude',  note: 'Anthropic',       keyUrl: 'https://console.anthropic.com/settings/keys' },
+    { id: 'xai',       name: 'Grok',    note: 'xAI',             keyUrl: 'https://console.x.ai' }
+  ];
+
+  function close() {
+    if (!overlay) return;
+    overlay.style.opacity = '0';
+    setTimeout(function() { if (overlay) { overlay.remove(); overlay = null; } }, 200);
+  }
+
+  function open() {
+    if (overlay) return;
+
+    overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;z-index:10100;background:rgba(0,0,0,0.75);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;transition:opacity 0.2s ease;';
+
+    var card = document.createElement('div');
+    card.style.cssText = 'width:100%;max-width:420px;max-height:85vh;overflow-y:auto;background:#1a1a2e;border:1px solid rgba(212,160,23,0.2);border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,0.6);padding:20px;font-family:inherit;-webkit-overflow-scrolling:touch;';
+
+    // Header
+    card.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">' +
+      '<div style="color:#d4a017;font-weight:600;font-size:16px;">Choose your AI</div>' +
+      '<button onclick="FLModelPicker.close()" style="background:none;border:none;color:rgba(255,255,255,0.5);font-size:18px;cursor:pointer;padding:4px 8px;min-height:44px;" title="Close">\u2715</button>' +
+      '</div>' +
+      '<div id="mpLocalSection"></div>' +
+      '<div id="mpCloudSection" style="margin-top:16px;"></div>' +
+      '<div style="margin-top:14px;text-align:center;">' +
+        '<button onclick="document.getElementById(\'chatAiSettingsBtn\').click();FLModelPicker.close();" style="background:none;border:none;color:rgba(255,255,255,0.35);font-size:0.72rem;cursor:pointer;padding:8px;">\u2699 Advanced settings\u2026</button>' +
+      '</div>';
+
+    overlay.appendChild(card);
+    overlay.addEventListener('click', function(e) { if (e.target === overlay) close(); });
+    document.addEventListener('keydown', function handler(e) {
+      if (e.key === 'Escape') { close(); document.removeEventListener('keydown', handler); }
+    });
+    document.body.appendChild(overlay);
+    requestAnimationFrame(function() { overlay.style.opacity = '1'; });
+
+    buildLocalSection();
+    buildCloudSection();
+  }
+
+  function buildLocalSection() {
+    var el = document.getElementById('mpLocalSection');
+    if (!el) return;
+
+    el.innerHTML = '<div style="font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:rgba(255,255,255,0.4);margin-bottom:8px;">\uD83C\uDFE0 Local Models (Ollama)</div>' +
+      '<div id="mpLocalList" style="font-size:0.78rem;color:rgba(255,255,255,0.5);padding:12px;text-align:center;">Checking Ollama\u2026</div>';
+
+    // Probe Ollama
+    fetch('http://localhost:11434/api/tags', { method: 'GET' })
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        var list = document.getElementById('mpLocalList');
+        if (!list) return;
+        var models = (data && data.models) || [];
+        if (models.length === 0) {
+          list.innerHTML = '<div style="padding:12px;color:rgba(255,255,255,0.4);font-size:0.78rem;">' +
+            'No local models found. <a href="#" onclick="event.preventDefault();switchTab(\'forever-stack\');FLModelPicker.close();" style="color:#d4a017;">Set up Ollama \u2192</a></div>';
+          return;
+        }
+
+        var currentModel = (typeof state !== 'undefined' && state.isLocal) ? state.ollamaModel : null;
+        list.innerHTML = '';
+        models.forEach(function(m) {
+          var name = m.name || 'unknown';
+          var sizeMb = m.size ? Math.round(m.size / (1024 * 1024)) : null;
+          var sizeStr = sizeMb ? (sizeMb > 1024 ? (sizeMb / 1024).toFixed(1) + ' GB' : sizeMb + ' MB') : '';
+          var isVision = VISION_HINTS.test(name);
+          var isActive = (currentModel === name);
+
+          var row = document.createElement('button');
+          row.type = 'button';
+          row.style.cssText = 'display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;background:' + (isActive ? 'rgba(52,211,153,0.08)' : 'rgba(255,255,255,0.03)') + ';border:1px solid ' + (isActive ? 'rgba(52,211,153,0.3)' : 'rgba(255,255,255,0.06)') + ';border-radius:10px;color:#fff;cursor:pointer;text-align:left;font-family:inherit;margin-bottom:6px;min-height:44px;transition:all 0.15s;';
+          row.innerHTML = '<div style="width:8px;height:8px;border-radius:50;flex-shrink:0;background:' + (isActive ? '#34d399' : 'transparent') + ';border:1px solid ' + (isActive ? '#34d399' : 'rgba(255,255,255,0.15)') + ';"></div>' +
+            '<div style="flex:1;min-width:0;">' +
+              '<div style="font-weight:600;font-size:0.82rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + name +
+                (isVision ? ' <span style="font-size:0.6rem;background:rgba(88,166,255,0.15);color:#58a6ff;border-radius:4px;padding:1px 5px;">\uD83D\uDC41 Vision</span>' : '') +
+                (isActive ? ' <span style="font-size:0.6rem;color:#34d399;">\u2713 Active</span>' : '') +
+              '</div>' +
+            '</div>' +
+            '<div style="font-size:0.65rem;color:rgba(255,255,255,0.35);white-space:nowrap;">' + sizeStr + '</div>';
+          row.addEventListener('click', function() { selectLocalModel(name); });
+          row.addEventListener('mouseenter', function() { if (!isActive) row.style.background = 'rgba(255,255,255,0.06)'; });
+          row.addEventListener('mouseleave', function() { if (!isActive) row.style.background = 'rgba(255,255,255,0.03)'; });
+          list.appendChild(row);
+        });
+      })
+      .catch(function() {
+        var list = document.getElementById('mpLocalList');
+        if (list) {
+          list.innerHTML = '<div style="padding:12px;color:rgba(255,255,255,0.4);font-size:0.78rem;">' +
+            '\uD83C\uDFE0 Ollama not running. <a href="#" onclick="event.preventDefault();switchTab(\'forever-stack\');FLModelPicker.close();" style="color:#d4a017;">Set up Ollama \u2192</a></div>';
+        }
+      });
+  }
+
+  function buildCloudSection() {
+    var el = document.getElementById('mpCloudSection');
+    if (!el) return;
+
+    var html = '<div style="font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:rgba(255,255,255,0.4);margin-bottom:8px;">\u2601 Cloud Providers</div>';
+
+    CLOUD_PROVIDERS.forEach(function(p) {
+      // Check if this provider has a saved key
+      var isActive = (typeof state !== 'undefined' && !state.isLocal && state.provider === p.id && state.apiKey);
+      var hasKey = false;
+      try {
+        var enc = localStorage.getItem('fl_apiKey_enc');
+        var encProv = localStorage.getItem('fl_apiKey_provider');
+        hasKey = !!(enc && encProv === p.id);
+      } catch(e) {}
+      if (isActive) hasKey = true;
+
+      html += '<button type="button" onclick="FLModelPicker.selectCloud(\'' + p.id + '\')" style="display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;background:' + (isActive ? 'rgba(212,160,23,0.06)' : 'rgba(255,255,255,0.03)') + ';border:1px solid ' + (isActive ? 'rgba(212,160,23,0.2)' : 'rgba(255,255,255,0.06)') + ';border-radius:10px;color:#fff;cursor:pointer;text-align:left;font-family:inherit;margin-bottom:6px;min-height:44px;transition:all 0.15s;">' +
+        '<div style="width:8px;height:8px;border-radius:50%;flex-shrink:0;background:' + (isActive ? '#d4a017' : hasKey ? '#34d399' : 'transparent') + ';border:1px solid ' + (isActive ? '#d4a017' : hasKey ? '#34d399' : 'rgba(255,255,255,0.15)') + ';"></div>' +
+        '<div style="flex:1;"><div style="font-weight:600;font-size:0.82rem;">' + p.name + (isActive ? ' <span style="font-size:0.6rem;color:#d4a017;">\u2713 Active</span>' : '') + '</div>' +
+        '<div style="font-size:0.65rem;color:rgba(255,255,255,0.4);">' + p.note + '</div></div>' +
+        (hasKey ? '' : '<div style="font-size:0.6rem;color:rgba(255,255,255,0.3);">\uD83D\uDD11</div>') +
+      '</button>';
+    });
+
+    el.innerHTML = html;
+  }
+
+  function selectLocalModel(modelName) {
+    if (typeof state === 'undefined') return;
+    state.isLocal = true;
+    state.ollamaModel = modelName;
+    state.provider = 'ollama';
+    state.apiKey = null;
+    localStorage.setItem('fl_isLocal', 'true');
+    localStorage.setItem('fl_provider', 'ollama');
+    localStorage.setItem('fl_ollamaModel', modelName);
+    try {
+      var localToggle = document.getElementById('localToggle');
+      if (localToggle) localToggle.checked = true;
+      if (typeof handleLocalToggle === 'function') handleLocalToggle();
+      if (typeof updateStatus === 'function') updateStatus();
+      if (typeof AiSetup !== 'undefined') { try { AiSetup.refreshBanner(); AiSetup.refreshSettingsCard(); } catch(e) {} }
+      if (typeof ModelSwitcher !== 'undefined') ModelSwitcher.updateLabel();
+    } catch(e) {}
+    close();
+  }
+
+  function selectCloud(providerId) {
+    // If we already have a key for this provider and it's active, just close
+    if (typeof state !== 'undefined' && !state.isLocal && state.provider === providerId && state.apiKey) {
+      close();
+      return;
+    }
+    // Otherwise open the provider modal which handles key entry
+    close();
+    openProviderModal();
+  }
+
+  return { open: open, close: close, selectCloud: selectCloud };
 })();
 
 // ═══════════════════════════════════════════════════════════════
