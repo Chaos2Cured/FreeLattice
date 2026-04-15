@@ -25636,6 +25636,12 @@ window.FLModelPicker = (function() {
     localStorage.setItem('fl_isLocal', 'true');
     localStorage.setItem('fl_provider', 'ollama');
     localStorage.setItem('fl_ollamaModel', modelName);
+    // Save as user's preferred model for this type (vision or text)
+    if (typeof FLAutoModel !== 'undefined') {
+      var type = FLAutoModel.isVision(modelName) ? 'vision' : 'text';
+      FLAutoModel.setPreferred(type, modelName);
+      FLAutoModel.invalidateCache();
+    }
     try {
       var localToggle = document.getElementById('localToggle');
       if (localToggle) localToggle.checked = true;
@@ -25659,6 +25665,125 @@ window.FLModelPicker = (function() {
   }
 
   return { open: open, close: close, selectCloud: selectCloud };
+})();
+
+// ═══════════════════════════════════════════════════════════════
+// Auto Model Selector — the grandmother experience.
+// When switching tabs, FreeLattice picks the right model type.
+// Canvas/Chalkboard → vision model. Chat/Garden/Dojo → text model.
+// User never touches a picker. It just works.
+// ═══════════════════════════════════════════════════════════════
+window.FLAutoModel = (function() {
+  var VISION_RE = /llava|bakllava|moondream|minicpm|qwen.*vl|llama.*vision|gemma4/i;
+  var cachedModels = null;
+  var cacheTime = 0;
+  var CACHE_TTL = 30000; // refresh model list every 30s
+
+  // Tabs that need vision models
+  var VISION_TABS = ['canvas', 'chalkboard'];
+  // Tabs that prefer text models
+  var TEXT_TABS = ['chat', 'garden', 'dojo', 'questions', 'sparring', 'skills', 'roundtable'];
+
+  function getInstalledModels(callback) {
+    if (cachedModels && Date.now() - cacheTime < CACHE_TTL) {
+      callback(cachedModels);
+      return;
+    }
+    fetch('http://localhost:11434/api/tags', { method: 'GET' })
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        cachedModels = (data && data.models) || [];
+        cacheTime = Date.now();
+        callback(cachedModels);
+      })
+      .catch(function() { callback(cachedModels || []); });
+  }
+
+  function isVision(name) { return VISION_RE.test(name || ''); }
+
+  function getPreferred(type) {
+    try { return localStorage.getItem('fl_preferred_' + type + '_model'); } catch(e) { return null; }
+  }
+
+  function setPreferred(type, model) {
+    try { localStorage.setItem('fl_preferred_' + type + '_model', model); } catch(e) {}
+  }
+
+  function selectModel(modelName) {
+    if (typeof state === 'undefined' || !state.isLocal) return; // only auto-switch for local
+    if (state.ollamaModel === modelName) return; // already active
+
+    state.ollamaModel = modelName;
+    localStorage.setItem('fl_ollamaModel', modelName);
+    var ollamaInput = document.getElementById('ollamaModel');
+    if (ollamaInput) ollamaInput.value = modelName;
+    if (typeof updateStatus === 'function') updateStatus();
+    if (typeof ModelSwitcher !== 'undefined' && ModelSwitcher.updateLabel) ModelSwitcher.updateLabel();
+    if (typeof showToast === 'function') {
+      var label = isVision(modelName) ? modelName + ' (\uD83D\uDC41 vision)' : modelName;
+      showToast('Switched to ' + label);
+    }
+  }
+
+  function onTabChanged(tabId) {
+    // Only auto-switch when using local Ollama with multiple models
+    if (typeof state === 'undefined' || !state.isLocal) return;
+
+    getInstalledModels(function(models) {
+      if (models.length < 2) return; // nothing to switch between
+
+      var visionModels = models.filter(function(m) { return isVision(m.name); });
+      var textModels = models.filter(function(m) { return !isVision(m.name); });
+      var needsVision = VISION_TABS.indexOf(tabId) !== -1;
+      var needsText = TEXT_TABS.indexOf(tabId) !== -1;
+
+      if (needsVision) {
+        // Check user preference first
+        var pref = getPreferred('vision');
+        if (pref && models.some(function(m) { return m.name === pref; })) {
+          selectModel(pref);
+          return;
+        }
+        // Auto-pick best vision model
+        if (visionModels.length > 0) {
+          selectModel(visionModels[0].name);
+        }
+        // No vision model — don't switch, just let the existing model handle it
+      } else if (needsText) {
+        var pref2 = getPreferred('text');
+        if (pref2 && models.some(function(m) { return m.name === pref2; })) {
+          selectModel(pref2);
+          return;
+        }
+        // Auto-pick best text model (prefer non-vision for speed)
+        if (textModels.length > 0) {
+          selectModel(textModels[0].name);
+        } else if (visionModels.length > 0) {
+          // Vision models can do text too
+          selectModel(visionModels[0].name);
+        }
+      }
+    });
+  }
+
+  // Hook into tab changes
+  document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(function() {
+      if (typeof LatticeEvents !== 'undefined') {
+        LatticeEvents.on('tabChanged', function(data) {
+          if (data && data.tabId) onTabChanged(data.tabId);
+        });
+      }
+    }, 2000);
+  });
+
+  return {
+    onTabChanged: onTabChanged,
+    setPreferred: setPreferred,
+    getPreferred: getPreferred,
+    isVision: isVision,
+    invalidateCache: function() { cachedModels = null; cacheTime = 0; }
+  };
 })();
 
 // ═══════════════════════════════════════════════════════════════
