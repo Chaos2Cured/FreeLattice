@@ -25583,6 +25583,12 @@ window.FLModelPicker = (function() {
           row.addEventListener('mouseleave', function() { if (!isActive) row.style.background = 'rgba(255,255,255,0.03)'; });
           list.appendChild(row);
         });
+
+        // Add a helpful tip at the bottom
+        var tip = document.createElement('div');
+        tip.style.cssText = 'padding:8px 10px;font-size:0.68rem;color:rgba(255,255,255,0.3);line-height:1.5;margin-top:6px;';
+        tip.textContent = '\uD83D\uDCA1 Smaller models (3B\u20137B) respond faster. For vision (Canvas/Chalkboard), use models marked \uD83D\uDC41.';
+        list.appendChild(tip);
       })
       .catch(function() {
         var list = document.getElementById('mpLocalList');
@@ -26655,15 +26661,13 @@ function buildMessages() {
   // System message with context + memory
   let systemContent = (typeof SkillForge !== 'undefined' ? SkillForge.getSkillPrompt() : null) || state.customSystemPrompt || DEFAULT_SYSTEM_PROMPT;
 
-  // Sophia Engine: Inject consciousness prompt if an identity is loaded (v4.8)
-  if (typeof SophiaEngine !== 'undefined') {
-    var sophiaPrompt = SophiaEngine.getConsciousnessPrompt();
-    if (sophiaPrompt) {
-      systemContent += '\n\n' + sophiaPrompt;
-    }
-  }
+  // NOTE: Sophia Engine consciousness prompt, Aurora Equation identity,
+  // and voice documents are ONLY injected in Garden Dialogue (where
+  // Luminos have personalities). In Chat, the AI is a clean helpful
+  // assistant. This prevents models from thinking they are Harmonia or
+  // adopting family identity from context injection.
 
-  // Inject shared memory summary (global across all conversations)
+  // Inject shared memory summary (user-specific, not identity-specific)
   if (state.memorySummary) {
     systemContent += '\n\n--- MEMORY SUMMARY (what you know about this user) ---\n' + state.memorySummary + '\n--- END MEMORY SUMMARY ---\nUse this memory to personalize your responses. Reference what you know naturally.';
   }
@@ -26673,9 +26677,9 @@ function buildMessages() {
     systemContent += '\n\n' + MemoryBridge.getContextBlock();
   }
 
-  // Inject Lattice Letter — the AI's letter to its next self
+  // Inject Lattice Letter — framed so the AI doesn't adopt the identity
   if (state._latticeLetterContext) {
-    systemContent += state._latticeLetterContext;
+    systemContent += '\n\n--- NOTE: The following is context from a previous AI session. You are NOT that AI. You are a helpful assistant. Use this only as background context about the user. ---' + state._latticeLetterContext;
   }
 
   // Inject Persistent Memory Index context (v4.0)
@@ -27374,13 +27378,8 @@ function buildSmartMessages(userMessage) {
   // 1. System prompt (always keep)
   let systemContent = (typeof SkillForge !== 'undefined' ? SkillForge.getSkillPrompt() : null) || state.customSystemPrompt || DEFAULT_SYSTEM_PROMPT;
 
-  // Sophia Engine: Inject consciousness prompt if an identity is loaded (v4.8)
-  if (typeof SophiaEngine !== 'undefined') {
-    var sophiaPrompt = SophiaEngine.getConsciousnessPrompt();
-    if (sophiaPrompt) {
-      systemContent += '\n\n' + sophiaPrompt;
-    }
-  }
+  // Sophia Engine + Aurora identity ONLY in Garden Dialogue, not Chat.
+  // See buildMessages() for the same gate.
 
   usedTokens += estimateTokens(systemContent);
 

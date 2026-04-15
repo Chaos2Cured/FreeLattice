@@ -334,6 +334,32 @@ if __name__ == '__main__':
 
   async function checkAllLayers() {
     await Promise.all(LAYERS.map(l => checkLayer(l.id)));
+    // After checking Ollama, mark installed models
+    if (state.layerStatus.ollama === STATUS.RUNNING) {
+      checkInstalledModels();
+    }
+  }
+
+  function checkInstalledModels() {
+    fetch('http://localhost:11434/api/tags', { method: 'GET' })
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        var installed = (data && data.models || []).map(function(m) { return m.name; });
+        // Update all Pull Model buttons
+        document.querySelectorAll('[id^="fsPull_"]').forEach(function(btn) {
+          var cardEl = btn.closest('.fs-model-option');
+          var modelId = cardEl ? cardEl.getAttribute('data-model-id') : '';
+          // Check if any installed model starts with this ID (handles tags like :latest)
+          var isInstalled = installed.some(function(n) { return n === modelId || n.startsWith(modelId.split(':')[0] + ':'); });
+          if (isInstalled) {
+            btn.textContent = '\u2713 Installed';
+            btn.style.borderColor = '#3fb950';
+            btn.style.color = '#3fb950';
+            btn.style.background = '#0d2818';
+            btn.disabled = true;
+          }
+        });
+      }).catch(function() {});
   }
 
   // ─── Rendering ───────────────────────────────────────────────────────────────
@@ -769,6 +795,26 @@ if __name__ == '__main__':
 </div>`;
   }
 
+  function buildModelCard(m) {
+    return '<div class="fs-model-option" data-model-id="' + m.id + '" style="flex-direction:row;align-items:center;justify-content:space-between;gap:10px;">' +
+      '<div style="flex:1;min-width:0;">' +
+        '<div class="fs-model-name">' + m.name +
+          (m.vision ? ' <span style="background:#1c2a3a;color:#58a6ff;border:1px solid #1c3a5e;border-radius:4px;padding:1px 5px;font-size:0.6rem;">\uD83D\uDC41 Vision</span>' : '') +
+          (m.recommended ? ' <span class="fs-recommended">Recommended</span>' : '') +
+        '</div>' +
+        '<div class="fs-model-desc">' + m.desc + '</div>' +
+        (m.ram ? '<div style="font-size:0.6rem;color:#6e7681;margin-top:2px;">' + m.ram + '</div>' : '') +
+      '</div>' +
+      '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;">' +
+        '<div class="fs-model-size">' + m.size + '</div>' +
+        '<button class="fs-check-btn" id="fsPull_' + m.id.replace(/[:.]/g, '_') + '" ' +
+          'onclick="event.stopPropagation();window.ForeverStack.pullModel(\'' + m.id + '\',this)" ' +
+          'style="padding:5px 12px;margin:0;width:auto;min-height:36px;font-size:0.7rem;background:#0d2818;border-color:#10b981;color:#3fb950;">' +
+          'Pull Model</button>' +
+      '</div>' +
+    '</div>';
+  }
+
   function buildLayerHTML(layer, index) {
     const platformOptions = layer.steps.map(s =>
       `<button class="fs-platform-tab ${state.selectedPlatform[layer.id] === s.platform ? 'active' : ''}"
@@ -784,29 +830,11 @@ if __name__ == '__main__':
     ).join('');
 
     const modelsHTML = layer.recommendedModels ? `
-      <div class="fs-models">
-        <div class="fs-models-label">Choose an AI model</div>
-        ${layer.recommendedModels.map(m => `
-          <div class="fs-model-option ${state.selectedModel === m.id ? 'selected' : ''}"
-            data-model-id="${m.id}"
-            onclick="window.ForeverStack.selectModel('${m.id}')">
-            <div class="fs-model-radio"></div>
-            <div style="flex:1;min-width:0;">
-              <div class="fs-model-name">
-                ${m.name}
-                ${m.vision ? '<span style="background:#1c2a3a;color:#58a6ff;border:1px solid #1c3a5e;border-radius:4px;padding:1px 5px;font-size:0.6rem;margin-left:6px;">\uD83D\uDC41 Vision</span>' : ''}
-                ${m.recommended ? '<span class="fs-recommended">Recommended</span>' : ''}
-              </div>
-              <div class="fs-model-desc">${m.desc}</div>
-              ${m.ram ? '<div style="font-size:0.6rem;color:#6e7681;margin-top:2px;">' + m.ram + '</div>' : ''}
-            </div>
-            <div class="fs-model-size">${m.size}</div>
-          </div>
-        `).join('')}
-        <button class="fs-check-btn" style="background:#0d2818;border-color:#10b981;color:#3fb950;" id="fsPullModelBtn" onclick="window.ForeverStack.pullModel()">
-          \u2B07 Install selected model (no command window needed)
-        </button>
-        <div class="fs-check-result" id="fsPullResult"></div>
+      <div class="fs-models" id="fsModelsContainer">
+        <div class="fs-models-label">\uD83D\uDC41 Vision Models \u2014 see your drawings</div>
+        ${layer.recommendedModels.filter(m => m.vision).map(m => buildModelCard(m)).join('')}
+        <div class="fs-models-label" style="margin-top:14px;">\uD83D\uDCAC Text Models \u2014 chat and reasoning</div>
+        ${layer.recommendedModels.filter(m => !m.vision).map(m => buildModelCard(m)).join('')}
       </div>` : '';
 
     const bridgeHTML = layer.bridgeScript ? `
@@ -966,19 +994,11 @@ if __name__ == '__main__':
       });
     },
 
-    pullModel: async function() {
+    pullModel: async function(modelId, btnEl) {
       // Auto-install a model via Ollama's pull API — zero terminal needed
-      var model = state.selectedModel || 'llama3.2';
-      var resultEl = document.getElementById('fsPullResult');
-      var btn = document.getElementById('fsPullModelBtn');
-      if (!resultEl) return;
-
-      resultEl.className = 'fs-check-result show';
-      resultEl.style.background = '#1c2a3a';
-      resultEl.style.color = '#58a6ff';
-      resultEl.style.border = '1px solid #1c3a5e';
-      resultEl.textContent = 'Downloading ' + model + '... this may take a few minutes. You can keep browsing.';
-      if (btn) { btn.disabled = true; btn.textContent = 'Downloading...'; }
+      var model = modelId || state.selectedModel || 'llama3.2';
+      var btn = btnEl || document.getElementById('fsPullModelBtn');
+      if (btn) { btn.disabled = true; btn.textContent = 'Downloading\u2026'; btn.style.minWidth = '90px'; }
 
       try {
         var resp = await fetch('http://localhost:11434/api/pull', {
@@ -987,11 +1007,9 @@ if __name__ == '__main__':
           body: JSON.stringify({ name: model })
         });
 
-        if (!resp.ok) {
-          throw new Error('Ollama returned ' + resp.status);
-        }
+        if (!resp.ok) throw new Error('Ollama returned ' + resp.status);
 
-        // The pull API streams progress — we read until done
+        // The pull API streams progress
         var reader = resp.body.getReader();
         var decoder = new TextDecoder();
         var lastStatus = '';
@@ -1004,32 +1022,35 @@ if __name__ == '__main__':
             try {
               var progress = JSON.parse(lines[li]);
               if (progress.status) lastStatus = progress.status;
-              if (progress.total && progress.completed) {
+              if (progress.total && progress.completed && btn) {
                 var pct = Math.round((progress.completed / progress.total) * 100);
-                resultEl.textContent = 'Downloading ' + model + '... ' + pct + '%';
-              } else if (lastStatus) {
-                resultEl.textContent = lastStatus;
+                btn.textContent = pct + '%';
               }
             } catch(pe) {}
           }
         }
 
-        resultEl.className = 'fs-check-result show ok';
-        resultEl.textContent = '\u2713 ' + model + ' is installed and ready!';
-        if (btn) { btn.textContent = '\u2713 Installed'; }
-
+        if (btn) {
+          btn.textContent = '\u2713 Installed';
+          btn.style.borderColor = '#3fb950';
+          btn.style.color = '#3fb950';
+          btn.style.background = '#0d2818';
+          btn.disabled = true;
+        }
         // Re-check Ollama to update status
         await checkLayer('ollama');
+        // Also update installed badges on all model cards
+        checkInstalledModels();
       } catch (e) {
-        resultEl.className = 'fs-check-result show fail';
-        if (e.message && e.message.includes('Failed to fetch')) {
-          resultEl.textContent = 'Ollama isn\'t running yet. Start Ollama first, then try again.';
-        } else {
-          resultEl.textContent = 'Could not install: ' + (e.message || 'unknown error') + '. Try running the command manually.';
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = e.message && e.message.includes('fetch') ? 'Start Ollama first' : 'Retry';
         }
-        if (btn) { btn.disabled = false; btn.textContent = '\u2B07 Try again'; }
       }
     },
+
+    // Check which models are already installed and update their buttons
+    checkInstalledModels: function() { checkInstalledModels(); },
 
     checkAndShow: async function(layerId) {
       var resultEl = document.getElementById('fsResult_' + layerId);
