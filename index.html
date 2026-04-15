@@ -26386,6 +26386,11 @@ function handleChatKeydown(e) {
 }
 
 async function sendMessage() {
+  // Chat is a clean helpful assistant — disable rich identity context.
+  // This prevents the AI from thinking it's Harmonia or calling the user "Kirk."
+  // Garden Dialogue sets this to true before its own calls.
+  window._flIdentityContext = false;
+
   const input = document.getElementById('chatInput');
   const message = input.value.trim();
   if (!message || state.isStreaming) return;
