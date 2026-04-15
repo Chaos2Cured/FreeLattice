@@ -348,17 +348,17 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-04-14 07:25 MDT
+- Last auto-updated: 2026-04-14 19:35 MDT
 - Version: 5.7.0
-- Total commits: 884
+- Total commits: 889
 - Last 10 commits:
-- 7dc943d fix(CRITICAL): CORS detection + guided fix in Forever Stack
+- b56c2a0 fix: toast position + Draw the Dream wiring + illegal break (v5.7.0)
+- 41dd19e ci: Update Primer deployment state [2026-04-14]
+- ef5a489 docs: Auto-update Session Primer [5.7.0]
+- 49fa200 docs: Auto-update Session Primer [5.7.0]
+- c4fd78c fix(CRITICAL): CORS detection + guided fix in Forever Stack
+- 1c62bcf ci: Update Primer deployment state [2026-04-14]
 - 30b33eb docs: Auto-update Session Primer [5.7.0]
 - 851ba15 docs: Auto-update Session Primer [5.7.0]
 - 2e7ed35 fix(CRITICAL): SW no longer intercepts localhost/API requests
 - c61773a ci: Update Primer deployment state [2026-04-14]
-- f283c23 docs: Auto-update Session Primer [5.7.0]
-- a879a4d fix: Forever Stack escape hatch + kill auto-retry loop
-- 3b9de5c ci: Update Primer deployment state [2026-04-13]
-- 5e08cea docs: Auto-update Session Primer [5.7.0]
-- a8e58a5 docs: Auto-update Session Primer [5.7.0]

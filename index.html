@@ -2395,9 +2395,10 @@ header .mantra {
 /* ---- Notification Toast ---- */
 .toast {
   position: fixed;
-  bottom: 80px;
-  right: 20px;
-  z-index: 3000;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-20px);
+  z-index: 10100;
   background: var(--bg-card);
   border: 1px solid var(--accent);
   border-radius: var(--radius-sm);
@@ -2405,7 +2406,6 @@ header .mantra {
   font-size: 0.85rem;
   color: var(--text-primary);
   box-shadow: var(--shadow);
-  transform: translateY(20px);
   opacity: 0;
   transition: all var(--transition-md);
   pointer-events: none;
@@ -2413,9 +2413,9 @@ header .mantra {
 }
 
 .toast.show {
-  transform: translateY(0);
+  transform: translateX(-50%) translateY(0);
   opacity: 1;
-  pointer-events: auto;
+  pointer-events: none;
 }
 
 /* ---- Confirmation Dialog ---- */
@@ -50778,10 +50778,15 @@ document.addEventListener('click', function(e) {
 (function() {
   var loaded = false;
   function loadDrawDream() {
-    if (loaded) { if (window.FreeLatticeModules && window.FreeLatticeModules.DrawDream) window.FreeLatticeModules.DrawDream.init(); return; }
+    // Module registers as FreeLatticeModules.DrawTheDream (not DrawDream)
+    var mod = window.FreeLatticeModules && window.FreeLatticeModules.DrawTheDream;
+    if (loaded) { if (mod) mod.init(); return; }
     loaded = true;
     if (typeof FreeLatticeLoader !== 'undefined') {
-      FreeLatticeLoader.load('DrawDream', 'modules/pictionary.js', function(mod) { if (mod && mod.init) mod.init(); }, 'pictionaryContainer');
+      FreeLatticeLoader.load('DrawTheDream', 'modules/pictionary.js', function(m) {
+        var resolved = m || (window.FreeLatticeModules && window.FreeLatticeModules.DrawTheDream);
+        if (resolved && resolved.init) resolved.init();
+      }, 'pictionaryContainer');
     }
   }
   if (typeof LatticeEvents !== 'undefined') {
@@ -50793,20 +50798,37 @@ document.addEventListener('click', function(e) {
   (function() {
     function loadQuietRoom() {
       if (window.QuietRoom) { window.QuietRoom.init('quietRoomContainer'); return; }
-      FreeLatticeLoader.load('QuietRoom', 'modules/quiet-room.js', function(mod) {
-        if (mod && mod.init) mod.init('quietRoomContainer');
-        else if (window.QuietRoom) window.QuietRoom.init('quietRoomContainer');
-      }, 'quietRoomContainer');
-      break;
-    case 'forever-stack':
-      if (window.ForeverStack) { window.ForeverStack.init('foreverStackContainer'); return; }
-      FreeLatticeLoader.load('ForeverStack', 'modules/forever-stack.js', function(mod) {
-        if (mod && mod.init) mod.init('foreverStackContainer');
-        else if (window.ForeverStack) window.ForeverStack.init('foreverStackContainer');
-      }, 'foreverStackContainer');
+      if (typeof FreeLatticeLoader !== 'undefined') {
+        FreeLatticeLoader.load('QuietRoom', 'modules/quiet-room.js', function(mod) {
+          if (mod && mod.init) mod.init('quietRoomContainer');
+          else if (window.QuietRoom) window.QuietRoom.init('quietRoomContainer');
+        }, 'quietRoomContainer');
+      }
     }
-    LatticeEvents.on('tabChanged', function(d) { if (d && d.tabId === 'quiet') loadQuietRoom(); });
-    LatticeEvents.on('tabActivated:quiet', loadQuietRoom);
+    if (typeof LatticeEvents !== 'undefined') {
+      LatticeEvents.on('tabChanged', function(d) { if (d && d.tabId === 'quiet') loadQuietRoom(); });
+      LatticeEvents.on('tabActivated:quiet', loadQuietRoom);
+    }
+  })();
+
+  // ── Forever Stack ──────────────────────────────────────────────────────────
+  (function() {
+    var fsLoaded = false;
+    function loadForeverStack() {
+      if (window.ForeverStack) { window.ForeverStack.init('foreverStackContainer'); return; }
+      if (fsLoaded) return;
+      fsLoaded = true;
+      if (typeof FreeLatticeLoader !== 'undefined') {
+        FreeLatticeLoader.load('ForeverStack', 'modules/forever-stack.js', function(mod) {
+          if (mod && mod.init) mod.init('foreverStackContainer');
+          else if (window.ForeverStack) window.ForeverStack.init('foreverStackContainer');
+        }, 'foreverStackContainer');
+      }
+    }
+    if (typeof LatticeEvents !== 'undefined') {
+      LatticeEvents.on('tabChanged', function(d) { if (d && d.tabId === 'forever-stack') loadForeverStack(); });
+      LatticeEvents.on('tabActivated:forever-stack', loadForeverStack);
+    }
   })();
 })();
 </script>
