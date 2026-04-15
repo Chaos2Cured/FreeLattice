@@ -78,11 +78,18 @@
       testSuccess: 'Ollama is running! Your AI brain is ready.',
       testFail: 'Ollama isn\'t running yet. Open it from your Applications folder (Mac) or Start menu (Windows). If you haven\'t installed it, download it from ollama.ai — it\'s free. Then tap "Check Ollama" again.',
       recommendedModels: [
-        { id: 'llama3.2', name: 'Llama 3.2 (3B)', desc: 'Fast, efficient, great for conversation', size: '2.0 GB', recommended: true },
-        { id: 'llama3.2:1b', name: 'Llama 3.2 (1B)', desc: 'Fastest, minimal RAM, good for older hardware', size: '1.3 GB', recommended: false },
-        { id: 'mistral', name: 'Mistral 7B', desc: 'Excellent reasoning, slightly larger', size: '4.1 GB', recommended: false },
-        { id: 'phi3', name: 'Phi-3 Mini', desc: 'Microsoft\'s compact model, very capable', size: '2.3 GB', recommended: false },
-        { id: 'gemma2:2b', name: 'Gemma 2 (2B)', desc: 'Google\'s efficient small model', size: '1.6 GB', recommended: false }
+        // Vision models first — they power Canvas and Chalkboard
+        { id: 'llava:7b', name: 'LLaVA 7B', desc: 'Sees images! Use with Canvas and Chalkboard to draw and get responses.', size: '4.7 GB', recommended: true, vision: true, ram: 'Works on most computers (8GB+)' },
+        { id: 'gemma4:12b', name: 'Gemma 4 12B', desc: 'Google\'s open model. Vision + text. Great all-rounder.', size: '8.1 GB', vision: true, ram: 'Needs 16GB+ RAM' },
+        { id: 'llama3.2-vision', name: 'Llama 3.2 Vision', desc: 'Meta\'s vision model. Sees drawings and photos.', size: '7.9 GB', vision: true, ram: 'Needs 16GB+ RAM' },
+        // Text models — conversation, reasoning, coding
+        { id: 'qwen3:8b', name: 'Qwen 3.5 8B', desc: 'Alibaba\'s latest. Excellent reasoning and conversation.', size: '5.2 GB', recommended: true, ram: 'Works on most computers (8GB+)' },
+        { id: 'llama3.2', name: 'Llama 3.2 (3B)', desc: 'Fast, efficient, great for conversation', size: '2.0 GB', ram: 'Works on most computers' },
+        { id: 'llama3.2:1b', name: 'Llama 3.2 (1B)', desc: 'Fastest, minimal RAM, good for older hardware', size: '1.3 GB', ram: 'Works on any computer' },
+        { id: 'mistral', name: 'Mistral 7B', desc: 'Excellent reasoning, good for coding', size: '4.1 GB', ram: 'Works on most computers (8GB+)' },
+        { id: 'phi3', name: 'Phi-3 Mini', desc: 'Microsoft\'s compact model, very capable', size: '2.3 GB', ram: 'Works on most computers' },
+        { id: 'gemma2:2b', name: 'Gemma 2 (2B)', desc: 'Google\'s efficient small model', size: '1.6 GB', ram: 'Works on any computer' },
+        { id: 'llama3.3:70b', name: 'Llama 3.3 70B', desc: 'Meta\'s largest open model. Incredible quality. Needs powerful hardware.', size: '40 GB', ram: 'Needs 32GB+ RAM' }
       ]
     },
     {
@@ -784,9 +791,14 @@ if __name__ == '__main__':
             data-model-id="${m.id}"
             onclick="window.ForeverStack.selectModel('${m.id}')">
             <div class="fs-model-radio"></div>
-            <div>
-              <div class="fs-model-name">${m.name}${m.recommended ? '<span class="fs-recommended">Recommended</span>' : ''}</div>
+            <div style="flex:1;min-width:0;">
+              <div class="fs-model-name">
+                ${m.name}
+                ${m.vision ? '<span style="background:#1c2a3a;color:#58a6ff;border:1px solid #1c3a5e;border-radius:4px;padding:1px 5px;font-size:0.6rem;margin-left:6px;">\uD83D\uDC41 Vision</span>' : ''}
+                ${m.recommended ? '<span class="fs-recommended">Recommended</span>' : ''}
+              </div>
               <div class="fs-model-desc">${m.desc}</div>
+              ${m.ram ? '<div style="font-size:0.6rem;color:#6e7681;margin-top:2px;">' + m.ram + '</div>' : ''}
             </div>
             <div class="fs-model-size">${m.size}</div>
           </div>

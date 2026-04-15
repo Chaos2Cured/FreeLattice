@@ -149,6 +149,7 @@ html {
   scroll-behavior: smooth;
   font-size: var(--font-base);
   overflow-y: scroll;
+  -webkit-overflow-scrolling: touch;
 }
 
 body {
@@ -393,8 +394,10 @@ header .mantra {
 .tab-panel {
   display: none;
   animation: neuro-fade-in 200ms ease;
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior: contain;
+  /* Removed overscroll-behavior:contain — tab panels are not scroll
+     containers. The PAGE scrolls. This was breaking two-finger trackpad
+     scroll on Mac because the browser thought the panel handled its own
+     scrolling but it didn't. */
 }
 
 .tab-panel.active {
