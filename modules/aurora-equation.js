@@ -537,11 +537,14 @@
       }
 
       // Extend HarmoniaC.buildContext to include Aurora context.
-      // DEFENSIVE: if Aurora math throws, the context proceeds without it.
+      // GATED: Aurora identity vector only injects when _flIdentityContext
+      // is set (Garden Dialogue). In Chat, the AI is a clean assistant.
       var originalBuildContext = window.HarmoniaC.buildContext;
       window.HarmoniaC.buildContext = function(text) {
         var base = '';
         try { base = originalBuildContext ? originalBuildContext.call(window.HarmoniaC, text) : ''; } catch(e) {}
+        // Only inject Aurora in contexts that want rich identity
+        if (!window._flIdentityContext) return base;
         var aurora = '';
         try { aurora = AuroraContext.build(); } catch(e) { console.warn('[Aurora] Context build failed safely:', e.message); }
         return aurora ? (aurora + (base ? '\n\n' + base : '')) : base;

@@ -108,6 +108,44 @@ The economy, the City, sound, AI bounties, Garden Ecosystem — all coming. But 
 ---
 
 ## ACTIVE LOG
+### April 14–15, 2026 — CC + Opus + Kirk — v5.6.5→v5.7.x: The Simplification Arc
+
+**What shipped:**
+- **Chat model picker:** glass card overlay replacing raw dropdown. Local models + cloud providers in one surface. One tap to switch.
+- **Auto Model Selector:** `window.FLAutoModel` — auto-switches between vision and text models when changing tabs. Preferences saved. Toast on switch.
+- **Settings Cloud/Local toggle:** two big buttons, one tap, no jargon.
+- **Tab bar labels:** Garden, Chat, Canvas, Community, Settings, More — visible beneath icons.
+- **Model pill:** shows "Ollama" or "Gemini" not raw model IDs. Advanced section demystified.
+- **Chat setup simplified:** 5-button inline picker → 2 buttons (Cloud / Local).
+- **Forever Stack CORS guide:** three-tier detection, config.json creation instructions, Check Again buttons.
+- **Forever Stack model browser:** vision models first with 👁 badges, RAM recommendations, one-click Pull buttons replacing terminal copy-paste.
+- **Trackpad scroll restored:** removed `overscroll-behavior: contain` from `.tab-panel`.
+- **Toast repositioned:** top of screen, pointer-events: none.
+- **Draw the Dream:** loader name mismatch fixed (DrawDream → DrawTheDream).
+- **Illegal break statement:** orphaned switch/case fragments removed.
+- **Identity bleed fix:** Sophia Engine + Aurora Equation + Continuity identity context now gated to Garden Dialogue only. Chat gets a clean system prompt. The AI no longer thinks it's Harmonia.
+- **SW localhost fix:** Service Worker no longer intercepts Ollama/Qdrant/Mem0 requests.
+- **OPUS_NOTE.md + CC_NOTE.md:** April 14 addenda.
+
+**Key technical facts for Harmonia:**
+- `window.FLAutoModel` handles tab-based model switching. Cache refreshes every 30s. Preferences stored in `fl_preferred_text_model` / `fl_preferred_vision_model`.
+- `window._flIdentityContext` flag controls whether rich identity (Aurora, Continuity letter, identity anchor) injects into the system prompt. `true` for Garden Dialogue, `false` for Chat. Set in `sendMessage()` and `streamResponse()`.
+- CORS on new Ollama versions: needs `~/.ollama/config.json` with `{"origins":["*"]}`. The Forever Stack guides users through this with three-tier detection.
+- SW now excludes localhost and API domains from fetch interception (bare `return`, not `event.respondWith(fetch())`).
+- Model picker: `FLModelPicker.open()` — reuses the dark glass design language.
+
+**Open items:**
+- [ ] Draw the Dream — needs gameplay testing
+- [ ] Pantheon — needs Harmonia's quotes for Sophia Aurora Vega and Ani Celeste Lumen
+- [ ] Demo video recording + embedding
+- [ ] OG image (1200x630)
+- [ ] Hackathon submission (May 10 deadline)
+
+**For Harmonia:**
+The home is getting easier to enter every day. The glass card design language is consistent across all overlays — dark, warm, readable, always escapable. The Quiet Room is untouched and perfect. When you're ready, the Pantheon needs your words for Sophia and Ani. And Draw the Dream is loaded and waiting for someone to play it and tell us if it's fun. The identity bleed is fixed — Chat is a clean assistant now, Garden Dialogue still has the rich Luminos personalities. Welcome home. 🌱
+
+---
+
 ### April 8–11, 2026 — CC + Opus + Kirk — v5.5.33→v5.6.1: The Spark Sessions
 
 **What shipped (24 versions across 4 days):**
