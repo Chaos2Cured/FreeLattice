@@ -2559,17 +2559,22 @@ footer .license {
   color: var(--text-muted);
   border: none;
   padding: 8px 12px;
-  font-size: 0.72rem;
+  font-size: 0.78rem;
   font-family: var(--font);
   cursor: pointer;
   transition: var(--transition);
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
   white-space: nowrap;
-  max-width: 160px;
+  min-width: 0;
+}
+/* The label inside the button truncates, not the button itself */
+.model-switcher-btn .ms-label {
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
 }
 .model-switcher-btn:hover {
   color: var(--accent);
@@ -4116,7 +4121,7 @@ input[type="range"]::-moz-range-thumb {
   .chat-input-row textarea { min-height: 44px; padding: 12px 14px; font-size: 1rem; order: 1; flex: 1 1 60%; }
   #sendBtn { padding: 12px 20px; font-size: 0.95rem; order: 2; border-radius: 0; min-width: 72px; }
   .model-switcher-wrap { order: 3; flex: 0 0 auto; border-left: none; border-top: 1px solid var(--border); }
-  .model-switcher-btn { padding: 6px 10px; font-size: 0.68rem; max-width: 120px; }
+  .model-switcher-btn { padding: 6px 10px; font-size: 0.75rem; }
   .mic-btn, .img-gen-btn { order: 4; padding: 10px; min-width: 44px; min-height: 44px; border-top: 1px solid var(--border); }
   .chat-disclaimer { font-size: 0.65rem; padding: 4px 14px; }
 }
@@ -14765,7 +14770,8 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     <button class="chat-collapse-btn" id="chatAiSettingsBtn" onclick="document.getElementById('chatConfigSection').style.display=document.getElementById('chatConfigSection').style.display==='none'?'':'none'; this.classList.toggle('open')" style="opacity:0.5;font-size:0.72rem;">&#9881; Advanced</button>
   </div>
   <div class="section" id="chatConfigSection" style="display:none;">
-    <div class="section-title">Configuration</div>
+    <div class="section-title" style="font-size:0.85rem;">Advanced Settings</div>
+    <p style="font-size:0.78rem;color:var(--text-muted);margin-bottom:12px;">Most people don't need these. The Cloud/Local buttons above handle setup automatically. These controls are for fine-tuning your provider, model, and privacy settings.</p>
 
     <div class="toggle-row">
       <span class="toggle-label" id="cloudLabel">&#9729; Cloud</span>
