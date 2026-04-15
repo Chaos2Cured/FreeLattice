@@ -350,10 +350,9 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 ## PRIMER HEALTH
 - Last auto-updated: 2026-04-15 11:37 MDT
 - Version: 5.7.0
-- Total commits: 917
+- Total commits: 916
 - Last 10 commits:
-- 76da811 feat: model picker overlay replaces raw dropdown
-- 90089fa ci: Update Primer deployment state [2026-04-15]
+- 30b9afa feat: model picker overlay replaces raw dropdown
 - 4fad9a6 docs: Auto-update Session Primer [5.7.0]
 - fd673f7 docs: Auto-update Session Primer [5.7.0]
 - a8234e3 fix: model pill readable + Advanced section clarified
@@ -362,3 +361,4 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 121430e docs: Auto-update Session Primer [5.7.0]
 - 53519ee feat: Chat setup simplified to two buttons (Cloud/Local)
 - 204afeb ci: Update Primer deployment state [2026-04-15]
+- 64af119 HARMONIA.md: What Kirk saw that I had not written down
