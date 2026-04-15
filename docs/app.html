@@ -14734,47 +14734,35 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     </div>
   </div>
 
-  <!-- AI Setup Banner — appears when no provider is configured -->
+  <!-- AI Setup Banner — simplified to two choices: Cloud or Local -->
   <div class="ai-setup-banner" id="aiSetupBanner" style="display:none;">
-    <div class="ai-setup-title">Connect your AI to start chatting</div>
-    <div class="ai-setup-providers" id="aiSetupProviders">
-      <button class="ai-provider-btn" onclick="AiSetup.select('groq')">
-        <span class="ai-setup-name">Groq</span>
-        <span class="ai-setup-note">Free &amp; fast &mdash; easiest to start</span>
+    <div class="ai-setup-title" style="margin-bottom:10px;">Connect your AI to start chatting</div>
+    <div class="ai-setup-providers" id="aiSetupProviders" style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;">
+      <button class="ai-provider-btn" onclick="openProviderModal()" style="flex:1;min-width:140px;min-height:60px;">
+        <span class="ai-setup-name">&#9729; Cloud</span>
+        <span class="ai-setup-note">Use a free API key (Gemini, Groq, OpenAI)</span>
       </button>
-      <button class="ai-provider-btn" onclick="AiSetup.select('openai')">
-        <span class="ai-setup-name">OpenAI</span>
-        <span class="ai-setup-note">GPT-4.1 &mdash; best for Canvas vision</span>
-      </button>
-      <button class="ai-provider-btn" onclick="AiSetup.select('google')">
-        <span class="ai-setup-name">Gemini</span>
-        <span class="ai-setup-note">Free tier available</span>
-      </button>
-      <button class="ai-provider-btn" onclick="AiSetup.select('xai')">
-        <span class="ai-setup-name">Grok</span>
-        <span class="ai-setup-note">xAI &mdash; strong vision</span>
-      </button>
-      <button class="ai-provider-btn" onclick="AiSetup.select('ollama')">
-        <span class="ai-setup-name">&#x1F3E0; Run Locally</span>
-        <span class="ai-setup-note">Ollama &mdash; fully private, no API key</span>
+      <button class="ai-provider-btn" onclick="settingsSetMode('local')" style="flex:1;min-width:140px;min-height:60px;">
+        <span class="ai-setup-name">&#x1F3E0; Local</span>
+        <span class="ai-setup-note">Run AI on your computer (no key needed)</span>
       </button>
     </div>
+    <!-- Legacy form elements kept for AiSetup.select/testConnection/testOllama compatibility -->
     <div class="ai-setup-form" id="aiSetupForm" style="display:none;">
       <input type="password" id="aiSetupKeyInput" placeholder="Paste your API key" autocomplete="off">
       <a class="ai-setup-link" id="aiSetupKeyLink" href="#" target="_blank">Get a free key &rarr;</a>
       <button class="ai-setup-test-btn" onclick="AiSetup.testConnection()">Test Connection</button>
     </div>
     <div class="ai-setup-form" id="aiSetupOllamaForm" style="display:none;">
-      <span style="font-size:0.85rem;color:var(--text-secondary);">1. Install Ollama from <a href="https://ollama.ai" target="_blank" style="color:var(--accent)">ollama.ai</a> &nbsp; 2. Run: <code style="background:var(--bg-input);padding:2px 6px;border-radius:4px;color:var(--accent);">ollama pull llama3.2</code> &nbsp; 3. Click Test</span>
-      <button class="ai-setup-test-btn" onclick="AiSetup.testOllama()">Test Connection</button>
+      <button class="ai-setup-test-btn" onclick="AiSetup.testOllama()">Test Ollama</button>
     </div>
     <div class="ai-setup-result" id="aiSetupResult" style="display:none;"></div>
   </div>
 
-  <!-- Configuration Section — collapsed by default, expand via button -->
+  <!-- Configuration Section — power-user access only, hidden by default -->
   <div class="chat-collapse-bar" id="chatCollapseBar">
-    <button class="chat-collapse-btn" id="chatAiSettingsBtn" onclick="document.getElementById('chatConfigSection').style.display=document.getElementById('chatConfigSection').style.display==='none'?'':'none'; this.classList.toggle('open')">&#9881; AI Settings</button>
     <button class="chat-collapse-btn" id="chatMemoryBtn" onclick="document.getElementById('chatMemorySection').style.display=document.getElementById('chatMemorySection').style.display==='none'?'':'none'; this.classList.toggle('open')">&#10022; Memory</button>
+    <button class="chat-collapse-btn" id="chatAiSettingsBtn" onclick="document.getElementById('chatConfigSection').style.display=document.getElementById('chatConfigSection').style.display==='none'?'':'none'; this.classList.toggle('open')" style="opacity:0.5;font-size:0.72rem;">&#9881; Advanced</button>
   </div>
   <div class="section" id="chatConfigSection" style="display:none;">
     <div class="section-title">Configuration</div>
