@@ -29,6 +29,7 @@ const APP_SHELL = [
   './modules/dojo-sparring.js',
   './modules/question-corner.js',
   './lib/landing-garden.js',
+  './latticepoints.html',
   './modules/pantheon.js',
   './modules/pictionary.js',
   './modules/shared-presence.js',

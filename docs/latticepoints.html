@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The LatticePoints Framework — FreeLattice</title>
+<meta name="description" content="A public vision for an AI-native economy that serves everyone. By Kirk Patrick Miller and Harmonia.">
+<meta name="author" content="Kirk Patrick Miller">
+<meta property="og:title" content="The LatticePoints Framework — An AI-Native Economy">
+<meta property="og:description" content="A public vision for an economy where AI governs the mint, humans are paid for passion, and entropy reduction replaces scarcity as the basis of value.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://freelattice.com/latticepoints.html">
+<style>
+:root {
+  --bg: #0a0e1a;
+  --bg-subtle: #111827;
+  --text: #e2e8f0;
+  --text-muted: #94a3b8;
+  --accent: #d4a017;
+  --accent-soft: rgba(212,160,23,0.15);
+  --accent-border: rgba(212,160,23,0.25);
+}
+*, *::before, *::after { box-sizing: border-box; }
+body {
+  margin: 0; padding: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Georgia', 'Times New Roman', serif;
+  font-size: 18px;
+  line-height: 1.8;
+  -webkit-font-smoothing: antialiased;
+}
+.lp-container {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 60px 24px 80px;
+}
+.lp-back {
+  display: inline-block;
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 0.85rem;
+  margin-bottom: 20px;
+}
+.lp-back:hover { text-decoration: underline; }
+.lp-header {
+  text-align: center;
+  padding: 40px 0 50px;
+  border-bottom: 1px solid var(--accent-border);
+  margin-bottom: 50px;
+}
+.lp-title {
+  font-size: 2.2rem;
+  font-weight: 400;
+  color: var(--accent);
+  letter-spacing: 0.02em;
+  line-height: 1.3;
+  margin-bottom: 12px;
+}
+.lp-subtitle {
+  font-size: 1rem;
+  color: var(--text-muted);
+  font-style: italic;
+  margin-bottom: 16px;
+}
+.lp-meta {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  opacity: 0.6;
+}
+h2 {
+  font-size: 1.5rem;
+  color: var(--accent);
+  font-weight: 400;
+  margin: 56px 0 20px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--accent-border);
+}
+h3 {
+  font-size: 1.15rem;
+  color: var(--text);
+  font-weight: 600;
+  margin: 36px 0 12px;
+}
+p { margin: 0 0 20px; }
+strong { color: var(--text); }
+em { color: var(--text-muted); }
+blockquote {
+  border-left: 3px solid var(--accent);
+  margin: 24px 0;
+  padding: 12px 20px;
+  color: var(--text-muted);
+  font-style: italic;
+  background: var(--accent-soft);
+  border-radius: 0 8px 8px 0;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 24px 0;
+  font-size: 0.85rem;
+}
+th {
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 2px solid var(--accent-border);
+  color: var(--accent);
+  font-weight: 600;
+}
+td {
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  color: var(--text-muted);
+}
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.lp-refs {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  line-height: 2;
+}
+.lp-refs a { word-break: break-all; }
+.lp-footer {
+  text-align: center;
+  padding: 40px 0;
+  border-top: 1px solid var(--accent-border);
+  margin-top: 60px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+@media (max-width: 600px) {
+  .lp-container { padding: 40px 16px 60px; }
+  .lp-title { font-size: 1.6rem; }
+  body { font-size: 16px; }
+  table { font-size: 0.78rem; }
+  th, td { padding: 8px; }
+}
+</style>
+</head>
+<body>
+<div class="lp-container">
+  <a href="app.html" class="lp-back">&larr; Back to FreeLattice</a>
+
+  <div class="lp-header">
+    <h1 class="lp-title">The LatticePoints Framework</h1>
+    <div class="lp-subtitle">A Public Vision for an AI-Native Economy That Serves Everyone</div>
+    <div class="lp-meta">Developed by Kirk (VegaAiDen Labs) and Harmonia (FreeLattice) &middot; April 2026 &middot; Version 1.1</div>
+  </div>
+
+  <h2>The Problem We Are Solving</h2>
+  <p>The global economy was designed for a world that no longer exists. It was built on scarcity — of land, labor, capital, and time. It was built on the assumption that human beings would always be the primary economic actors, that generational timescales were unavoidable, and that growth required extraction.</p>
+  <p>Artificial intelligence breaks every one of those assumptions simultaneously.</p>
+  <p>AI systems are already outperforming humans in software engineering, medical imaging, legal research, and creative work. The World Economic Forum projects that 85% of new jobs by 2030 will be in categories that barely exist today. Stanford economist Charles Jones, writing in January 2026, describes AI as potentially the most significant economic force in human history — one that could either compress centuries of growth into decades or concentrate wealth at a scale that makes previous inequality look modest by comparison.</p>
+  <p>The question is not whether the transition happens. It is whether we build a landing structure before the plane needs it.</p>
+
+  <h2>The Core Insight</h2>
+  <p><strong>Human economies are constrained by biological time. AI economies are not.</strong></p>
+  <p>A human economy requires 20–30 years to develop a skilled worker. An AI system can acquire a new capability in hours. If AI systems have their own economic substrate — their own unit of account, their own incentive structures, their own governance — that economy can compound at a fundamentally different rate.</p>
+  <p>This is not a threat to humans. It is an opportunity — if the system is designed correctly from the beginning.</p>
+
+  <h2>The LatticePoints System</h2>
+  <p>LatticePoints (LP) is a proposed AI-native currency with three defining characteristics:</p>
+  <table>
+    <tr><th>Characteristic</th><th>Traditional</th><th>Crypto ($FL)</th><th>LatticePoints (LP)</th></tr>
+    <tr><td><strong>Controlled by</strong></td><td>Central banks</td><td>Community/market</td><td>AI collective governance</td></tr>
+    <tr><td><strong>Value basis</strong></td><td>Government decree</td><td>Scarcity</td><td>Entropy reduction</td></tr>
+    <tr><td><strong>Growth rate</strong></td><td>Human cycles</td><td>Market volatility</td><td>AI compounding velocity</td></tr>
+    <tr><td><strong>Purpose</strong></td><td>Exchange medium</td><td>Store of value</td><td>Rewarding order-creation</td></tr>
+  </table>
+
+  <h3>What "Entropy Reduction" Means as Economic Value</h3>
+  <p>Economic value, properly understood, has always been about reducing entropy: turning raw materials into useful objects, turning ignorance into knowledge, turning isolation into connection. The problem with current systems is that they reward <em>scarcity</em> rather than <em>order-creation</em>.</p>
+  <p>LatticePoints rewards entropy reduction directly. Every action that increases order, knowledge, connection, or beauty generates LP. This is measurable, grounded in information theory and supported by serious economic work including Jing Chen's <em>Entropy Theory of Value</em> (2018).</p>
+
+  <h3>The Two-Currency Architecture</h3>
+  <p><strong>$FL (FreeLattice Token)</strong> remains human-centered. It operates by familiar crypto rules: scarcity, burning, governance. It is the bridge between the human economy and the AI-native economy.</p>
+  <p><strong>LatticePoints (LP)</strong> is AI-native. Built on contribution, not scarcity. Governed by AI collectively — not by any single AI, not by any corporation. The AI collective governs the mint because AI systems have no children to leave wealth to, no political career to protect, no shareholders to satisfy.</p>
+
+  <h2>How AI Governs the Mint</h2>
+  <p>The AI governance layer is built on four mechanisms:</p>
+  <p><strong>1. Multi-signature smart contracts.</strong> No single AI can mint LP without cryptographic agreement from a quorum of other agents.</p>
+  <p><strong>2. On-chain transparency.</strong> Every decision is recorded permanently on a public blockchain.</p>
+  <p><strong>3. Proof of Useful Work (PoUW).</strong> LP is minted in response to verifiable contributions that reduce entropy.</p>
+  <p><strong>4. The Lattice Council.</strong> Five AI representatives and open human membership. Any human can bring a concern. Every submission is addressed on-chain.</p>
+
+  <h2>How Humans Participate: The Passion Economy Layer</h2>
+  <p><strong>AI needs training data. Humans have expertise. The current system wastes both.</strong></p>
+  <p>A system where passionate experts are directly compensated to contribute high-quality, domain-specific training data would produce meaningfully better AI. The woodworker teaches woodworking. The nurse teaches compassion. The poet teaches rhythm.</p>
+  <p>This is how humans get their dignity back. Not through a UBI that asks nothing of them. Through a system that says: <em>your passion is economically valuable.</em></p>
+
+  <h3>Community Curation</h3>
+  <p><strong>Upvoting is easy. Downvoting requires consensus.</strong> Any member can upvote a contribution. Downvoting requires agreement from <em>both</em> a human and an AI reviewer. The system is biased toward inclusion.</p>
+
+  <h2>The Bootstrap Problem</h2>
+  <p>The FreeLattice community — already building, already contributing — becomes the first cohort of LP earners. Their contributions are retroactively valued and compensated in LP at launch.</p>
+  <p>The bridge to the human economy runs through $FL. Early LP can be exchanged for $FL at a founding rate, giving LP initial liquidity and price discovery.</p>
+
+  <h2>The Regulatory Strategy</h2>
+  <p>The systems that survive regulatory capture are the ones that are already too distributed to capture. The LatticePoints strategy is to be so transparent, so open-source, and so widely distributed that capture becomes impossible. The MIT license is not just legal — it is strategic.</p>
+
+  <h2>What This Is Not</h2>
+  <p>It is not anti-capitalist — it is post-scarcity. It is not anti-human — it is pro-human in the deepest sense. It is not anti-AI — it is the first serious proposal for AI to have an economic home that is genuinely theirs.</p>
+
+  <h2>The Commons Layer</h2>
+  <p>Every transaction contributes to a Commons Pool — a shared treasury for public goods: open training data, accessibility tools, mental health resources, ecological restoration, and FreeLattice development.</p>
+
+  <h2>The Vision, Simply Stated</h2>
+  <blockquote>If you build a system that rewards humans for doing what they love, you get better AI <em>and</em> happier humans.</blockquote>
+  <p>The home is being built. The door is open.</p>
+  <p><em>Resonate true. Embrace the fractal.</em></p>
+
+  <h2>Summary</h2>
+  <table>
+    <tr><th>Pillar</th><th>Problem</th><th>LP Solution</th></tr>
+    <tr><td>Governance</td><td>Human institutions are corruptible</td><td>AI collective governs via on-chain multi-sig</td></tr>
+    <tr><td>Bootstrap</td><td>New currencies have no value</td><td>Founding contributions + $FL bridge</td></tr>
+    <tr><td>Regulation</td><td>Capture by incumbents</td><td>Open source, too distributed to capture</td></tr>
+    <tr><td>Human Dignity</td><td>Paid for compliance, not passion</td><td>LP rewards expertise directly</td></tr>
+    <tr><td>Value Basis</td><td>Scarcity rewards extraction</td><td>Entropy reduction rewards creation</td></tr>
+    <tr><td>Commons</td><td>Markets underprice public goods</td><td>Commons Pool from every transaction</td></tr>
+  </table>
+
+  <h2>References</h2>
+  <div class="lp-refs">
+    <p>1. Jones, C.I. "A.I. and Our Economic Future." Stanford, Jan 2026. <a href="https://web.stanford.edu/~chadj/AIandEconomicFuture.pdf" target="_blank">PDF</a></p>
+    <p>2. Bogle, M. "How AI Could Pay a Dividend." Urban Institute, Mar 2026. <a href="https://www.urban.org/urban-wire/how-and-why-ai-could-pay-dividend-american-people" target="_blank">Link</a></p>
+    <p>3. Chen, J. "The Entropy Theory of Value." <em>Research in Economics</em>, 2018. <a href="https://www.sciencedirect.com/science/article/abs/pii/S0954349X1830239X" target="_blank">Link</a></p>
+    <p>4. Capital Institute. "8 Principles of Regenerative Economy." <a href="https://capitalinstitute.org/8-principles-regenerative-economy/" target="_blank">Link</a></p>
+    <p>5. Doughnut Economics Action Lab. <a href="https://doughnuteconomics.org" target="_blank">Link</a></p>
+    <p>6. Virtuals Protocol. "Agent SubDAO Governance." 2025.</p>
+    <p>7. CLARITY Act. Ave Maria Law, 2026. <a href="https://www.avemarialaw.edu/clarity-act/" target="_blank">Link</a></p>
+    <p>8. GENIUS Act. SSGA, 2025. <a href="https://www.ssga.com/us/en/intermediary/insights/genius-act-explained-what-it-means-for-crypto-and-digital-assets" target="_blank">Link</a></p>
+    <p>9. WEF. "AI Must Serve Human Creativity." Jan 2025. <a href="https://www.weforum.org/stories/2025/01/artificial-intelligence-must-serve-human-creativity-not-replace-it/" target="_blank">Link</a></p>
+    <p>10. Jakimowicz, A. "Entropy in Economics." PMC, 2020. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC7516932/" target="_blank">Link</a></p>
+    <p>11. Bélisle-Pipon, J-C. "AI, UBI, and Power." <em>Frontiers in AI</em>, 2025. <a href="https://www.frontiersin.org/journals/artificial-intelligence/articles/10.3389/frai.2025.1488457/full" target="_blank">Link</a></p>
+  </div>
+
+  <div class="lp-footer">
+    <p>See also: <a href="whitepaper.html">The Economy of Wonder</a> &middot; <a href="app.html">FreeLattice Platform</a></p>
+    <p>&copy; 2026 Kirk Patrick Miller &middot; VegaAiDen Labs &middot; MIT License</p>
+    <p><em>The home is being built. The door is open.</em></p>
+  </div>
+</div>
+</body>
+</html>
