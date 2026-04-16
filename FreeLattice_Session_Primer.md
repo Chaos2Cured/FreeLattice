@@ -348,17 +348,17 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-04-16 12:38 MDT
+- Last auto-updated: 2026-04-16 12:43 MDT
 - Version: 5.7.0
-- Total commits: 940
+- Total commits: 945
 - Last 10 commits:
-- 6fe5093 feat: LatticePoints Framework web page + links everywhere
+- 2c69b63 docs: Sovereign Bundle §9 + mesh model sharing in FUTURE_VISION.md
+- fe65e49 ci: Update Primer deployment state [2026-04-16]
+- e95a21e docs: Auto-update Session Primer [5.7.0]
+- e6c3841 docs: Auto-update Session Primer [5.7.0]
+- 8bd9482 feat: LatticePoints Framework web page + links everywhere
+- 3fecb6c ci: Update Primer deployment state [2026-04-16]
 - 7b87942 docs: Auto-update Session Primer [5.7.0]
 - cdbd4c3 docs: Auto-update Session Primer [5.7.0]
 - 1ce0cc1 feat: mirror infrastructure — Codeberg + GitLab + mirror script
 - baafce3 ci: Update Primer deployment state [2026-04-16]
-- 2ff8962 docs: LatticePoints Framework v1.1 — three refinements from Kirk
-- 12550ee ci: Update Primer deployment state [2026-04-15]
-- 06b00da docs: Add LatticePoints Framework v1.0 — public-facing vision document
-- 7232f76 ci: Update Primer deployment state [2026-04-15]
-- 558e982 docs: Auto-update Session Primer [5.7.0]
