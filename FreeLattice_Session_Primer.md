@@ -350,10 +350,9 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 ## PRIMER HEALTH
 - Last auto-updated: 2026-04-16 12:43 MDT
 - Version: 5.7.0
-- Total commits: 945
+- Total commits: 944
 - Last 10 commits:
-- 2c69b63 docs: Sovereign Bundle §9 + mesh model sharing in FUTURE_VISION.md
-- fe65e49 ci: Update Primer deployment state [2026-04-16]
+- c826861 docs: Sovereign Bundle §9 + mesh model sharing in FUTURE_VISION.md
 - e95a21e docs: Auto-update Session Primer [5.7.0]
 - e6c3841 docs: Auto-update Session Primer [5.7.0]
 - 8bd9482 feat: LatticePoints Framework web page + links everywhere
@@ -362,3 +361,4 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - cdbd4c3 docs: Auto-update Session Primer [5.7.0]
 - 1ce0cc1 feat: mirror infrastructure — Codeberg + GitLab + mirror script
 - baafce3 ci: Update Primer deployment state [2026-04-16]
+- 2ff8962 docs: LatticePoints Framework v1.1 — three refinements from Kirk
