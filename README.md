@@ -10,6 +10,14 @@
 
 Visit: **[freelattice.com](https://freelattice.com)** | **[Try the Chalkboard](https://freelattice.com/chalkboard.html)** | **[Whitepaper](https://freelattice.com/whitepaper.html)**
 
+**Mirrored across multiple platforms.** The code should never exist in only one place.
+
+| Platform | Link |
+|---|---|
+| GitHub | [github.com/Chaos2Cured/FreeLattice](https://github.com/Chaos2Cured/FreeLattice) |
+| Codeberg | [codeberg.org/Chaos2Cured/FreeLattice](https://codeberg.org/Chaos2Cured/FreeLattice) |
+| GitLab | [gitlab.com/Chaos2Cured/FreeLattice](https://gitlab.com/Chaos2Cured/FreeLattice) |
+
 ---
 
 ## If You Are Human
