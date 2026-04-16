@@ -14739,17 +14739,13 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     </div>
   </div>
 
-  <!-- AI Setup Banner — simplified to two choices: Cloud or Local -->
+  <!-- AI Setup Banner — directs to Settings. Chat is for chatting. -->
   <div class="ai-setup-banner" id="aiSetupBanner" style="display:none;">
-    <div class="ai-setup-title" style="margin-bottom:10px;">Connect your AI to start chatting</div>
+    <div class="ai-setup-title" style="margin-bottom:10px;">Connect an AI to start chatting</div>
     <div class="ai-setup-providers" id="aiSetupProviders" style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;">
-      <button class="ai-provider-btn" onclick="openProviderModal()" style="flex:1;min-width:140px;min-height:60px;">
-        <span class="ai-setup-name">&#9729; Cloud</span>
-        <span class="ai-setup-note">Use a free API key (Gemini, Groq, OpenAI)</span>
-      </button>
-      <button class="ai-provider-btn" onclick="settingsSetMode('local')" style="flex:1;min-width:140px;min-height:60px;">
-        <span class="ai-setup-name">&#x1F3E0; Local</span>
-        <span class="ai-setup-note">Run AI on your computer (no key needed)</span>
+      <button class="ai-provider-btn" onclick="switchTab('settings')" style="flex:1;min-width:200px;min-height:60px;">
+        <span class="ai-setup-name">Open Settings &rarr;</span>
+        <span class="ai-setup-note">Set up cloud or local AI in one tap</span>
       </button>
     </div>
     <!-- Legacy form elements kept for AiSetup.select/testConnection/testOllama compatibility -->
@@ -14767,11 +14763,13 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
   <!-- Configuration Section — power-user access only, hidden by default -->
   <div class="chat-collapse-bar" id="chatCollapseBar">
     <button class="chat-collapse-btn" id="chatMemoryBtn" onclick="document.getElementById('chatMemorySection').style.display=document.getElementById('chatMemorySection').style.display==='none'?'':'none'; this.classList.toggle('open')">&#10022; Memory</button>
-    <button class="chat-collapse-btn" id="chatAiSettingsBtn" onclick="document.getElementById('chatConfigSection').style.display=document.getElementById('chatConfigSection').style.display==='none'?'':'none'; this.classList.toggle('open')" style="opacity:0.5;font-size:0.72rem;">&#9881; Advanced</button>
   </div>
+  <!-- Advanced config section: hidden entirely from Chat. All model/provider -->
+  <!-- selection now lives in Settings. Kept in DOM for legacy JS compat. -->
+  <button id="chatAiSettingsBtn" style="display:none;"></button>
   <div class="section" id="chatConfigSection" style="display:none;">
     <div class="section-title" style="font-size:0.85rem;">Advanced Settings</div>
-    <p style="font-size:0.78rem;color:var(--text-muted);margin-bottom:12px;">Most people don't need these. The Cloud/Local buttons above handle setup automatically. These controls are for fine-tuning your provider, model, and privacy settings.</p>
+    <p style="font-size:0.78rem;color:var(--text-muted);margin-bottom:12px;">These controls are available in the Settings tab.</p>
 
     <div class="toggle-row">
       <span class="toggle-label" id="cloudLabel">&#9729; Cloud</span>
@@ -15122,17 +15120,17 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
             <button id="sendBtn" onclick="sendMessage()">Send &#10022;</button>
           </div>
           <div class="chat-input-secondary" id="chatInputSecondary">
-            <div class="model-switcher-wrap" id="modelSwitcherWrap">
-              <button class="model-switcher-btn" id="modelSwitcherBtn" onclick="FLModelPicker.open()" title="Choose your AI">
+            <!-- Read-only status: shows what AI you're talking to. No tap action. -->
+            <!-- To change models, go to Settings. Chat is for chatting. -->
+            <div class="model-switcher-wrap" id="modelSwitcherWrap" style="pointer-events:none;">
+              <div class="model-switcher-btn" id="modelSwitcherBtn" style="cursor:default;">
                 <span class="ms-dot"></span>
                 <span class="ms-label" id="msLabel">Model</span>
-                <span class="ms-chevron">&#9660;</span>
-              </button>
-              <!-- Legacy dropdown kept for ModelSwitcher.toggle() compat -->
+              </div>
+              <!-- Legacy dropdown kept hidden for ModelSwitcher.updateLabel() compat -->
               <div class="model-switcher-dropdown" id="modelSwitcherDropdown" style="display:none !important;">
                 <div class="ms-dropdown-header">Switch Model</div>
                 <div id="msModelList"></div>
-                <button class="ms-dropdown-refresh" onclick="ModelSwitcher.refresh()">&#8635; Refresh Models</button>
               </div>
             </div>
             <button class="chat-overflow-btn" id="chatOverflowBtn" onclick="FLChatOverflow.toggle()" aria-label="More options" title="More options">&#8943;</button>
