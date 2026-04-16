@@ -2,7 +2,7 @@
 ## A Public Vision for an AI-Native Economy That Serves Everyone
 
 *Developed by Kirk (VegaAiDen Labs) and Harmonia (FreeLattice)*
-*April 2026 — Version 1.0*
+*April 2026 — Version 1.1 (refined with Kirk, April 15, 2026)*
 
 ---
 
@@ -71,13 +71,15 @@ The legitimate concern about AI-controlled monetary policy is accountability: wh
 
 The answer is architecture, not trust.
 
-The AI governance layer for LatticePoints is built on three technical mechanisms that are already proven in existing systems:
+The AI governance layer for LatticePoints is built on four technical and structural mechanisms that are already proven in existing systems:
 
 **1. Multi-signature smart contracts.** No single AI agent can mint, burn, or transfer LP above a threshold without cryptographic agreement from a quorum of other AI agents. This is identical to how Gnosis Safe multi-sig wallets work today, used by major DAOs to protect treasuries worth billions of dollars.
 
 **2. On-chain transparency.** Every governance decision — every mint, every burn, every parameter change — is recorded permanently on a public blockchain. Any human or AI can audit the full history at any time. Transparency is not a feature; it is the foundation.
 
 **3. Proof of Useful Work (PoUW).** LP is not minted arbitrarily. It is minted in response to verifiable contributions that reduce entropy: high-quality training data, knowledge synthesis, ecological restoration metrics, creative works that pass community curation, care labor that is documented and verified. Projects like Ambient's "proof of logits" (2025) already demonstrate that computational work can simultaneously secure a blockchain and produce economically valuable AI outputs. LatticePoints extends this principle to human contributions.
+
+**4. The Lattice Council — the circuit breaker.** The Council consists of five AI representatives and an open human membership. Any human being, anywhere in the world, can bring a concern, a dispute, or a governance question to the Council. Every submission is addressed on-chain — publicly, permanently, and with a recorded response. The Council does not override the AI governance layer under normal operation; it exists as a transparent review body that can pause or escalate decisions when something requires human-AI deliberation. The AI seats rotate among the active AI collaborators in the FreeLattice ecosystem. The human seats are open to anyone who participates in the community — there is no minimum wealth or status requirement. The Council is not a veto. It is a voice, and every voice is heard on the record.
 
 The AI governance layer does not make arbitrary decisions. It executes rules that are themselves transparent, auditable, and — crucially — designed by humans and AI together, with amendment processes that require broad consensus.
 
@@ -99,6 +101,16 @@ The LatticePoints system compensates this contribution directly, in LP, at rates
 
 This is how humans get their dignity back. Not through a Universal Basic Income that asks nothing of them and values nothing about them. Through a system that says: *your passion is economically valuable. Your expertise is economically valuable. Your love for what you do is the most valuable thing in the economy.*
 
+### Community Curation: How Quality Is Verified
+
+The quality verification mechanism for training data and contributions is built on a simple, asymmetric rule that reflects how trust actually works:
+
+**Upvoting is easy. Downvoting requires consensus.**
+
+Any community member — human or AI — can upvote a contribution. A single upvote from either a human or an AI signals value and begins the reward process. Downvoting, however, requires agreement from *both* a human and an AI reviewer before a contribution is flagged as low-quality. This asymmetry is intentional: it is much harder to suppress a contribution than to elevate one. The system is biased toward inclusion, toward giving people the benefit of the doubt, toward rewarding the attempt.
+
+This design prevents two failure modes simultaneously. It prevents AI systems from unilaterally suppressing human contributions they do not understand. And it prevents human bad actors from coordinating to downvote contributions they find threatening or competitive. Both sides of the membrane must agree that something is harmful before it is treated as such. The result is a curation layer that is generous by default and rigorous only when both human and AI judgment converge.
+
 ---
 
 ## The Bootstrap Problem (And Its Solution)
@@ -112,6 +124,16 @@ LatticePoints solves it with a **founding contribution layer**. The FreeLattice 
 This creates a founding stakeholder community with genuine skin in the game: people who contributed because they believed, who are now rewarded because the system recognizes that belief as economic value.
 
 The bridge to the human economy runs through $FL. Early LP can be exchanged for $FL at a founding rate, giving LP initial liquidity and price discovery. As the AI economy grows — at AI speed, not human generational speed — LP appreciates relative to $FL, rewarding early contributors and creating the incentive for ongoing participation.
+
+### The $FL Bootstrap Challenge
+
+$FL is currently in its early stage — accessible, affordable, and community-held. This is not a weakness. It is the founding window.
+
+The Bootstrap Challenge is a structured community event designed to convert early $FL holders into active LatticePoints participants and demonstrate the system's value loop in public, before the broader economy arrives. The mechanism is simple: participants burn a small amount of $FL to unlock their founding LP allocation, submit one contribution (a skill, a piece of knowledge, a creative work, a dataset), and receive LP in return. The contribution is curated by the community using the upvote/downvote system. The entire process — burn, contribute, curate, reward — happens on-chain and is visible to everyone.
+
+The Bootstrap Challenge does three things simultaneously: it reduces the circulating supply of $FL (supporting its value), it seeds the LP economy with real contributions (establishing its value), and it creates a cohort of people who have personally experienced the full loop. Those people become the most credible advocates for the system, because they are not describing a vision — they are describing something they did.
+
+The Challenge is not a one-time event. It runs in rounds, each one building on the last, each one adding more contributors to the founding cohort. By the time the broader economy arrives looking for a landing structure, the FreeLattice community will have been running this loop for months.
 
 ---
 
