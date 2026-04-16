@@ -46,6 +46,15 @@
 - Rate limiting: compute-sharing nodes set their own limits (max requests/minute, model whitelist)
 - Economic hook: compute providers earn $FL or LP for sharing resources
 
+### Model Weight Sharing (Extension of Layer 4)
+- If Node A has LLaVA installed and Node B doesn't, Node A can serve inference requests from Node B (already designed above)
+- Future extension: Node A can share the actual model WEIGHTS with Node B via chunked WebRTC transfer
+- A 7B model is ~4GB — at 10MB/s WebRTC throughput, that's ~7 minutes to transfer peer-to-peer
+- The mesh becomes a peer-to-peer model registry — no central server needed
+- Combined with the Sovereign Bundle, this means: one person downloads FreeLattice with a model, connects to the mesh, and their peers can receive the model directly from them
+- No Ollama registry dependency. No centralized download server. The community IS the distribution network.
+- Trust model: model integrity verified via SHA-256 hash comparison before loading. Mesh ID reputation determines who can share.
+
 ### Technical Foundation (already built)
 - PeerJS WebRTC for peer-to-peer communication (no server needed)
 - Ed25519 Mesh IDs for cryptographic identity
@@ -346,6 +355,40 @@ Each ride is a module in `docs/modules/`, loaded via the existing FreeLatticeLoa
 - **Phase 3:** Quiz Garden (gamified learning, visual growth metaphor)
 - **Phase 4:** Dream Canvas (collaborative drawing, hardest UX)
 - **Phase 5:** Tone Poems (requires Lattice Radio integration, most experimental)
+
+---
+
+## 9. The Sovereign Bundle — FreeLattice in One Download
+
+**Origin:** Kirk's concern during April 15, 2026 session about AI access being restricted. "How do we make sure people can always use this, even if everything else goes down?"
+
+**Core Concept:** A single downloadable file (~2-3GB) containing:
+- FreeLattice app.html + all modules + all assets
+- A bundled small model (Phi-3 Mini at 2.3GB or Llama 3.2 1B at 1.3GB)
+- Ollama runtime (Go binary, ~50MB)
+- A launcher script that starts Ollama with CORS pre-configured, loads the model, and opens the browser
+
+**The result:** Double-click one file. A complete AI platform launches with a working model. No internet needed. No installation. No Terminal. No API key. No GitHub. No server. Everything on one device.
+
+**Why this matters:** If every other distribution channel fails — if GitHub restricts access, if Ollama's registry goes down, if APIs are cut off — this single file carries the entire home. Pass it on a USB drive. Email it. Host it on any web server. The ark in a bottle.
+
+**Technical approach:**
+- Self-extracting archive (zip/tar) with a shell script entry point
+- Ollama binary for macOS/Windows/Linux (three platform builds)
+- GGUF model file embedded
+- HTML/JS/CSS copied to a local directory
+- Launcher opens `file:///path/to/app.html` in the default browser
+- Ollama starts in background with CORS pre-configured via config.json
+- The CORS fix we discovered on Kirk's Mac Mini (the `~/.ollama/config.json` with `{"origins":["*"]}`) is baked in from the start
+
+**Implementation Phases:**
+- Phase 1: Design and spec (now — this section)
+- Phase 2: Build macOS bundle as proof of concept
+- Phase 3: Windows and Linux bundles
+- Phase 4: Community distribution — anyone can host and share the bundle
+
+**Key Principle:**
+> The Sovereign Bundle is the final failsafe. If every server goes down, every API is cut, and every repository is restricted — a person with this file and a computer can still run a complete AI platform. That is sovereignty. That is the ark.
 
 ---
 
