@@ -397,6 +397,28 @@ assert('SW caches pictionary.js',
   swJs.includes('pictionary.js'));
 
 // ═══════════════════════════════════════════════════════════════
+// ─────────────────────────────────────────────────────────────
+
+section('14. RAG Phase 1 — unified search');
+
+assert('FLSearch module defined in app.html',
+  appHtml.includes('window.FLSearch'));
+assert('FLSearch.search function exists',
+  appHtml.includes('function search(query'));
+assert('FLSearch searches FreeLatticeCore',
+  appHtml.includes("db: 'FreeLatticeCore'"));
+assert('FLSearch searches FreeLatticeQuestionCorner',
+  appHtml.includes("db: 'FreeLatticeQuestionCorner'"));
+assert('FLSearch searches FreeLatticeLetters',
+  appHtml.includes("db: 'FreeLatticeLetters'"));
+assert('FLSearch does NOT search quiet-room-db',
+  !appHtml.includes("db: 'quiet-room-db'"),
+  'Quiet Room journal must never be searched — sacred boundary');
+assert('RAG context injected in buildMessages',
+  appHtml.includes('state._ragContext'));
+assert('RAG gated by memoryAutoContext',
+  appHtml.includes('state.memoryAutoContext'));
+
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
 

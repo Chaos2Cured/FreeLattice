@@ -25785,6 +25785,147 @@ window.FLAutoModel = (function() {
 })();
 
 // ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
+// RAG Phase 1 — Unified keyword search across all FreeLattice stores.
+// Before sending a message, search for relevant context from the
+// user's history: Core contributions, Questions, Lattice Letters,
+// and past conversations. Inject the top results into the system
+// prompt so the AI answers with knowledge it didn't have before.
+//
+// The Quiet Room journal is NEVER searched. That store is sacred.
+// ═══════════════════════════════════════════════════════════════
+window.FLSearch = (function() {
+
+  // Actual IndexedDB store names (verified from source code)
+  var STORES = [
+    { db: 'FreeLatticeCore', store: 'contributions', label: 'Core wisdom', textField: 'content' },
+    { db: 'FreeLatticeQuestionCorner', store: 'Questions', label: 'Question Corner', textField: null },
+    { db: 'FreeLatticeLetters', store: 'letters', label: 'Lattice Letter', textField: 'content' },
+    { db: 'FreeLatticeDB', store: 'messages', label: 'Past conversation', textField: 'content' }
+    // quiet-room-db is INTENTIONALLY excluded. The journal is private and sacred.
+  ];
+
+  var STOP_WORDS = ['the','is','a','an','and','or','but','in','on','at','to','for','of','with','by','from','it','this','that','was','are','be','has','have','had','do','does','did','will','would','could','should','may','might','can','not','no','so','if','then','than','when','what','how','why','who','which','where','i','you','we','they','he','she','my','your','our','their','just','like','about','been','some','very','also','its','more','only','into','over','such','after','other','than','most','much','some'];
+
+  function extractKeywords(text) {
+    return text.toLowerCase()
+      .replace(/[^a-z0-9\s]/g, '')
+      .split(/\s+/)
+      .filter(function(w) { return w.length > 2 && STOP_WORDS.indexOf(w) === -1; });
+  }
+
+  function extractText(item) {
+    if (typeof item === 'string') return item;
+    if (item.content) return String(item.content);
+    if (item.question) return String(item.question);
+    if (item.text) return String(item.text);
+    if (item.why) return String(item.why);
+    if (item.body) return String(item.body);
+    return '';
+  }
+
+  function scoreMatch(text, keywords) {
+    if (!text) return 0;
+    var lower = text.toLowerCase();
+    var score = 0;
+    for (var i = 0; i < keywords.length; i++) {
+      var kw = keywords[i];
+      var idx = 0;
+      while ((idx = lower.indexOf(kw, idx)) !== -1) {
+        score++;
+        idx += kw.length;
+      }
+    }
+    return score;
+  }
+
+  function searchStore(storeConfig, keywords) {
+    return new Promise(function(resolve) {
+      try {
+        var req = indexedDB.open(storeConfig.db);
+        req.onsuccess = function(e) {
+          var db = e.target.result;
+          if (!db.objectStoreNames.contains(storeConfig.store)) {
+            db.close();
+            resolve([]);
+            return;
+          }
+          var tx = db.transaction(storeConfig.store, 'readonly');
+          var os = tx.objectStore(storeConfig.store);
+          var getAll = os.getAll();
+          getAll.onsuccess = function() {
+            var items = getAll.result || [];
+            var matches = [];
+            for (var i = 0; i < items.length; i++) {
+              var text = extractText(items[i]);
+              if (!text) continue;
+              var score = scoreMatch(text, keywords);
+              if (score > 0) {
+                matches.push({
+                  source: storeConfig.label,
+                  text: text.substring(0, 200),
+                  score: score,
+                  date: items[i].timestamp || items[i].createdAt || items[i].date || null
+                });
+              }
+            }
+            db.close();
+            resolve(matches);
+          };
+          getAll.onerror = function() { db.close(); resolve([]); };
+        };
+        req.onerror = function() { resolve([]); };
+      } catch(e) { resolve([]); }
+    });
+  }
+
+  function search(query, maxResults) {
+    maxResults = maxResults || 3;
+    var keywords = extractKeywords(query);
+    if (keywords.length === 0) return Promise.resolve([]);
+
+    console.log('[FLSearch] Searching for:', keywords.join(', '));
+
+    return Promise.all(STORES.map(function(s) {
+      return searchStore(s, keywords);
+    })).then(function(results) {
+      var all = [];
+      for (var i = 0; i < results.length; i++) {
+        for (var j = 0; j < results[i].length; j++) {
+          all.push(results[i][j]);
+        }
+      }
+      all.sort(function(a, b) { return b.score - a.score; });
+      var top = all.slice(0, maxResults);
+      if (top.length > 0) {
+        console.log('[FLSearch] Found ' + all.length + ' matches, returning top ' + top.length);
+      }
+      return top;
+    }).catch(function(e) {
+      console.warn('[FLSearch] Search failed safely:', e);
+      return [];
+    });
+  }
+
+  function buildContextBlock(results) {
+    if (!results || results.length === 0) return '';
+    var lines = ['\n\n--- Relevant context from your FreeLattice history ---'];
+    for (var i = 0; i < results.length; i++) {
+      var r = results[i];
+      var dateStr = r.date ? ' (' + new Date(r.date).toLocaleDateString() + ')' : '';
+      lines.push('\u2022 ' + r.source + dateStr + ': ' + r.text);
+    }
+    lines.push('--- End context. Use naturally if relevant, don\'t force it. ---');
+    return lines.join('\n');
+  }
+
+  return {
+    search: search,
+    buildContextBlock: buildContextBlock,
+    extractKeywords: extractKeywords
+  };
+})();
+
 // Lattice Letters — the AI writes to its next self after each
 // meaningful conversation. First person. Specific. Not "I had a
 // conversation" but "Kirk showed me a painting of a boat."
@@ -26465,6 +26606,21 @@ async function sendMessage() {
     } catch(e) { MemoryIndex.showActiveBadge(false); }
   }
 
+  // RAG Phase 1: search all FreeLattice stores for relevant context.
+  // Runs alongside the existing Memory Index search. Keyword matching
+  // across Core contributions, Questions, Lattice Letters, and past
+  // conversations. Results injected into the system prompt.
+  // Gated: only runs when auto-context is enabled. Fails silently.
+  state._ragContext = '';
+  if (state.memoryAutoContext !== false && typeof FLSearch !== 'undefined') {
+    try {
+      var ragResults = await FLSearch.search(message, 3);
+      if (ragResults.length > 0) {
+        state._ragContext = FLSearch.buildContextBlock(ragResults);
+      }
+    } catch(e) { /* RAG search failed — message still sends without it */ }
+  }
+
   // Build messages array — use smart context if enabled
   let messages;
   const smartMessages = buildSmartMessages(message);
@@ -26813,6 +26969,12 @@ function buildMessages() {
   // Inject Persistent Memory Index context (v4.0)
   if (state.memoryLastInjection) {
     systemContent += '\n\n' + state.memoryLastInjection;
+  }
+
+  // Inject RAG Phase 1 context — keyword search results from Core,
+  // Questions, Letters, and past conversations
+  if (state._ragContext) {
+    systemContent += state._ragContext;
   }
 
   // Inject per-conversation context note
@@ -27530,6 +27692,12 @@ function buildSmartMessages(userMessage) {
     const ctxBlock = '\n\n--- CONVERSATION CONTEXT ---\n' + state.currentConvContextNote + '\n--- END CONVERSATION CONTEXT ---\nKeep this topic/context in mind for this conversation.';
     systemContent += ctxBlock;
     usedTokens += estimateTokens(ctxBlock);
+  }
+
+  // RAG Phase 1 context
+  if (state._ragContext) {
+    systemContent += state._ragContext;
+    usedTokens += estimateTokens(state._ragContext);
   }
 
   // 3. Current user message (always keep)
