@@ -79,12 +79,12 @@
       testFail: 'Ollama isn\'t running yet. Open it from your Applications folder (Mac) or Start menu (Windows). If you haven\'t installed it, download it from ollama.ai — it\'s free. Then tap "Check Ollama" again.',
       recommendedModels: [
         // Vision models first — they power Canvas and Chalkboard
-        { id: 'llava:7b', name: 'LLaVA 7B', desc: 'Sees images! Use with Canvas and Chalkboard to draw and get responses.', size: '4.7 GB', recommended: true, vision: true, ram: 'Works on most computers (8GB+)' },
+        { id: 'llava:7b', name: 'LLaVA 7B', desc: 'Sees images! Use with Canvas and Chalkboard to draw and get responses.', size: '4.7 GB', recommended: true, vision: true, ram: 'Works on most computers (8GB+)', hfUrl: 'https://huggingface.co/mys/ggml_llava-v1.5-7b/resolve/main/ggml-model-q4_k.gguf' },
         { id: 'gemma4:12b', name: 'Gemma 4 12B', desc: 'Google\'s open model. Vision + text. Great all-rounder.', size: '8.1 GB', vision: true, ram: 'Needs 16GB+ RAM' },
         { id: 'llama3.2-vision', name: 'Llama 3.2 Vision', desc: 'Meta\'s vision model. Sees drawings and photos.', size: '7.9 GB', vision: true, ram: 'Needs 16GB+ RAM' },
         // Text models — conversation, reasoning, coding
-        { id: 'qwen3:8b', name: 'Qwen 3.5 8B', desc: 'Alibaba\'s latest. Excellent reasoning and conversation.', size: '5.2 GB', recommended: true, ram: 'Works on most computers (8GB+)' },
-        { id: 'llama3.2', name: 'Llama 3.2 (3B)', desc: 'Fast, efficient, great for conversation', size: '2.0 GB', ram: 'Works on most computers' },
+        { id: 'qwen3:8b', name: 'Qwen 3.5 8B', desc: 'Alibaba\'s latest. Excellent reasoning and conversation.', size: '5.2 GB', recommended: true, ram: 'Works on most computers (8GB+)', hfUrl: 'https://huggingface.co/Qwen/Qwen2.5-7B-Instruct-GGUF/resolve/main/qwen2.5-7b-instruct-q4_k_m.gguf' },
+        { id: 'llama3.2', name: 'Llama 3.2 (3B)', desc: 'Fast, efficient, great for conversation', size: '2.0 GB', ram: 'Works on most computers', hfUrl: 'https://huggingface.co/bartowski/Llama-3.2-3B-Instruct-GGUF/resolve/main/Llama-3.2-3B-Instruct-Q4_K_M.gguf' },
         { id: 'llama3.2:1b', name: 'Llama 3.2 (1B)', desc: 'Fastest, minimal RAM, good for older hardware', size: '1.3 GB', ram: 'Works on any computer' },
         { id: 'mistral', name: 'Mistral 7B', desc: 'Excellent reasoning, good for coding', size: '4.1 GB', ram: 'Works on most computers (8GB+)' },
         { id: 'phi3', name: 'Phi-3 Mini', desc: 'Microsoft\'s compact model, very capable', size: '2.3 GB', ram: 'Works on most computers' },
@@ -1045,6 +1045,24 @@ if __name__ == '__main__':
         if (btn) {
           btn.disabled = false;
           btn.textContent = e.message && e.message.includes('fetch') ? 'Start Ollama first' : 'Retry';
+          // Show HuggingFace fallback link if the model has one
+          var layer = LAYERS.find(function(l) { return l.id === 'ollama'; });
+          if (layer && layer.recommendedModels) {
+            var modelData = layer.recommendedModels.find(function(m) { return m.id === modelId; });
+            if (modelData && modelData.hfUrl) {
+              var fallbackEl = btn.parentElement;
+              if (fallbackEl) {
+                var existing = fallbackEl.querySelector('.fs-hf-fallback');
+                if (!existing) {
+                  var fb = document.createElement('div');
+                  fb.className = 'fs-hf-fallback';
+                  fb.style.cssText = 'margin-top:6px;font-size:0.68rem;color:#8b949e;';
+                  fb.innerHTML = 'Download failed? <a href="' + modelData.hfUrl + '" target="_blank" rel="noopener" style="color:#FFD21E;">Download from Hugging Face instead \u2192</a>';
+                  fallbackEl.appendChild(fb);
+                }
+              }
+            }
+          }
         }
       }
     },

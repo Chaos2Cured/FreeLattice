@@ -22951,6 +22951,67 @@ window.openProviderModal = function() { AiSetup.openModal(); };
 // When Cloud is tapped: open the provider modal (cloud providers).
 // When Local is tapped: probe Ollama directly, switch to local mode.
 // The active button gets a gold border, the inactive stays muted.
+// Auto-pull a model when Ollama has none installed.
+// Streams progress from /api/pull and switches to the model when done.
+async function flAutoPull(modelName, btn) {
+  if (btn) { btn.disabled = true; btn.textContent = 'Downloading ' + modelName + '\u2026 0%'; }
+  try {
+    var resp = await fetch('http://localhost:11434/api/pull', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: modelName, stream: true })
+    });
+    if (!resp.ok) throw new Error('Ollama returned ' + resp.status);
+
+    var reader = resp.body.getReader();
+    var decoder = new TextDecoder();
+    while (true) {
+      var chunk = await reader.read();
+      if (chunk.done) break;
+      var lines = decoder.decode(chunk.value, { stream: true }).split('\n');
+      for (var i = 0; i < lines.length; i++) {
+        if (!lines[i].trim()) continue;
+        try {
+          var progress = JSON.parse(lines[i]);
+          if (progress.total && progress.completed && btn) {
+            var pct = Math.round((progress.completed / progress.total) * 100);
+            var dlMB = (progress.completed / (1024 * 1024)).toFixed(0);
+            var totalMB = (progress.total / (1024 * 1024)).toFixed(0);
+            btn.textContent = 'Downloading ' + modelName + '\u2026 ' + pct + '% (' + dlMB + '/' + totalMB + ' MB)';
+          } else if (progress.status && btn) {
+            btn.textContent = progress.status;
+          }
+        } catch(pe) {}
+      }
+    }
+
+    // Success — switch to the model
+    if (btn) { btn.textContent = '\u2713 ' + modelName + ' installed!'; btn.style.borderColor = 'var(--success)'; btn.style.color = 'var(--success)'; }
+    state.isLocal = true;
+    state.ollamaModel = modelName;
+    state.provider = 'ollama';
+    state.apiKey = null;
+    localStorage.setItem('fl_isLocal', 'true');
+    localStorage.setItem('fl_provider', 'ollama');
+    localStorage.setItem('fl_ollamaModel', modelName);
+    var localToggle = document.getElementById('localToggle');
+    if (localToggle) localToggle.checked = true;
+    if (typeof handleLocalToggle === 'function') handleLocalToggle();
+    if (typeof updateStatus === 'function') updateStatus();
+    if (typeof AiSetup !== 'undefined') { try { AiSetup.refreshBanner(); AiSetup.refreshSettingsCard(); } catch(e) {} }
+    if (typeof showToast === 'function') showToast('\u2713 ' + modelName + ' ready! Your AI is installed.');
+    // SoulCeremony
+    if (typeof SoulCeremony !== 'undefined' && SoulCeremony.run) {
+      SoulCeremony.run({ particleType: 'rise', particleColor: '52,211,153', lines: ['Your AI is installed.', 'It runs on your computer. Free forever.'], duration: 3000 });
+    }
+  } catch(e) {
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = e.message && e.message.includes('fetch') ? 'Ollama not running \u2014 start it first' : 'Download failed \u2014 tap to retry';
+    }
+  }
+}
+
 function settingsSetMode(mode) {
   var cloudBtn = document.getElementById('settingsModeCloud');
   var localBtn = document.getElementById('settingsModeLocal');
@@ -22989,8 +23050,16 @@ function settingsSetMode(mode) {
               '<button class="ai-status-btn" onclick="AiSetup.testFromSettings()">Test Connection</button>';
           }
         } else {
-          if (statusText) statusText.textContent = 'Ollama is running but no models found. Use the Forever Stack to install one.';
+          // No models installed — offer to download one automatically
+          if (statusText) statusText.textContent = 'Ollama is running! Let\u2019s install your first AI model.';
           if (statusDot) statusDot.className = 'status-dot disconnected';
+          if (actionsDiv) {
+            actionsDiv.innerHTML =
+              '<div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:10px;">No AI models installed yet. Pick one to download:</div>' +
+              '<button class="ai-status-btn ai-status-btn-primary" onclick="flAutoPull(\'llava:7b\',this)" style="width:100%;text-align:left;margin-bottom:6px;">\uD83D\uDC41 LLaVA 7B \u2014 sees drawings, 4.7 GB, ~5 min</button>' +
+              '<button class="ai-status-btn" onclick="flAutoPull(\'llama3.2\',this)" style="width:100%;text-align:left;margin-bottom:6px;">\uD83D\uDCAC Llama 3.2 \u2014 fast chat, 1.9 GB, ~2 min</button>' +
+              '<button class="ai-status-btn" onclick="switchTab(\'forever-stack\')" style="width:100%;text-align:left;opacity:0.6;">Let me choose from the full list \u2192</button>';
+          }
         }
       })
       .catch(function() {
