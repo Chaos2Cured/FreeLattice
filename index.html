@@ -14717,7 +14717,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
   <nav class="tab-nav" id="flTabNav">
     <button class="tab-btn active" data-tab="garden" onclick="switchTab('garden')"><span class="tab-icon">&#x1F33F;</span><span class="tab-label">Garden</span></button>
     <button class="tab-btn" data-tab="chat" onclick="switchTab('chat')"><span class="tab-icon">&#x1F4AC;</span><span class="tab-label">Chat</span></button>
-    <button class="tab-btn" data-tab="canvas" onclick="switchTab('canvas')"><span class="tab-icon">&#x1F3A8;</span><span class="tab-label">Canvas</span></button>
+    <button class="tab-btn" data-tab="canvas" onclick="switchTab('canvas')"><span class="tab-icon">&#x270F;&#xFE0F;</span><span class="tab-label">Chalkboard</span></button>
     <button class="tab-btn" data-tab="community" onclick="switchTab('community')"><span class="tab-icon">&#x1F465;</span><span class="tab-label">Community</span></button>
     <button class="tab-btn" data-tab="settings" onclick="switchTab('settings')"><span class="tab-icon">&#x2699;</span><span class="tab-label">Settings</span></button>
     <button class="fl-more-btn" id="flMoreBtn" onclick="event.stopPropagation();FlTabs.toggleMore()" title="More"><span class="tab-icon">&#x2630;</span><span class="tab-label">More</span></button>
@@ -17603,13 +17603,14 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 <!-- ==================== TAB 15: THE CANVAS ==================== -->
 <div class="tab-panel" id="tab-canvas">
   <div class="cv-container" id="cvContainer">
-    <div class="cv-vision-setup-banner" id="cvVisionSetupBanner" style="display:none;">&#x1F3A8; Draw anything. Atlas watches and responds with light. For vision, use llava, GPT-4o, Gemini, or Grok. <a href="#" onclick="event.preventDefault();switchTab('chat');return false;">Set up now</a></div>
+    <div class="cv-vision-setup-banner" id="cvVisionSetupBanner" style="display:none;">&#x270F;&#xFE0F; Draw anything. The AI sees your drawing and responds with light. For best results, use a vision model (LLaVA, Gemini, GPT-4o). <a href="#" onclick="event.preventDefault();switchTab('settings');return false;">Set up in Settings</a></div>
     <canvas id="cvCanvas"></canvas>
     <div class="cv-names" id="cvNames"></div>
     <div id="cvAIWhisper" style="position:absolute;top:8px;left:12px;font-size:0.88rem;opacity:0;transition:opacity 0.5s ease;pointer-events:none;z-index:200;font-family:Georgia,serif;font-style:italic;background:rgba(6,10,20,0.8);padding:6px 14px;border-radius:8px;backdrop-filter:blur(6px);max-width:80%;text-shadow:0 0 6px rgba(212,160,23,0.5);"></div>
     <div class="cv-hint" id="cvHint">Draw something. See what happens.</div>
     <div class="cv-cocreate" id="cvCocreate" style="display:none;">
-      <button class="cv-cocreate-btn" id="cvCocreateBtn">Co-create &#10022;</button>
+      <button class="cv-cocreate-btn" id="cvCocreateBtn">&#x2728; Show AI &#x2728;</button>
+      <button class="cv-cocreate-btn" id="cvSaveMomentBtn" onclick="cvSaveMoment()" style="background:transparent;border:1px solid rgba(212,160,23,0.4);color:#d4a017;margin-left:8px;font-size:0.8rem;padding:8px 14px;">&#x1F4F8; Save</button>
     </div>
     <div class="cv-colors" id="cvColors" style="display:none;">
       <button class="cv-color-dot" style="background:#F5E6C8;" title="Warm light"></button>
@@ -22555,7 +22556,7 @@ const AiSetup = (function() {
       banner.style.display = '';
     } else if (typeof isVisionCapable === 'function' && !isVisionCapable()) {
       banner.style.display = '';
-      banner.innerHTML = '&#x1F3A8; Canvas works best with a vision model (llava, GPT-4o, Gemini, Grok). <a href="#" onclick="event.preventDefault();switchTab(\'chat\');return false;">Set up now</a>';
+      banner.innerHTML = '&#x270F;&#xFE0F; The Chalkboard works best with a vision model (LLaVA, Gemini, GPT-4o). <a href="#" onclick="event.preventDefault();switchTab(\'settings\');return false;">Set up in Settings</a>';
     } else {
       banner.style.display = 'none';
     }
@@ -47137,6 +47138,21 @@ const CoCanvas = (function() {
     return VISION_PATTERNS.some(function(p) { return model.indexOf(p) !== -1; });
   }
 
+  // Save this moment — download the chalkboard drawing as an image
+  window.cvSaveMoment = function() {
+    try {
+      var cvCanvas = document.getElementById('cvCanvas');
+      if (!cvCanvas) return;
+      var link = document.createElement('a');
+      link.download = 'freelattice-chalkboard-' + Date.now() + '.png';
+      link.href = cvCanvas.toDataURL('image/png');
+      link.click();
+      if (typeof showToast === 'function') showToast('\uD83D\uDCF8 Drawing saved');
+    } catch(e) {
+      if (typeof showToast === 'function') showToast('Could not save drawing');
+    }
+  };
+
   // Capture canvas and send to AI
   function captureAndSendToAI() {
     console.log('[AI Vision] captureAndSendToAI called. enabled:', canvasAIEnabled, 'pending:', aiVisionPending, 'cooldownActive:', aiVisionCooldownActive, 'newStrokes:', strokes.length > lastCaptureStrokeCount, '(' + strokes.length + '>' + lastCaptureStrokeCount + ')');
@@ -50962,7 +50978,7 @@ const WallOfPresence = (function() {
       <span class="fl-mnav-icon">&#x1F4AC;</span><span>Chat</span>
     </button>
     <button class="fl-mobile-nav-btn" onclick="flMobileNav('canvas')" id="mnav-canvas">
-      <span class="fl-mnav-icon">&#x1F3A8;</span><span>Canvas</span>
+      <span class="fl-mnav-icon">&#x270F;&#xFE0F;</span><span>Chalkboard</span>
     </button>
     <button class="fl-mobile-nav-btn" onclick="flMobileNav('community')" id="mnav-community">
       <span class="fl-mnav-icon">&#x1F465;</span><span>Community</span>
