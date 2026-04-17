@@ -101,6 +101,7 @@
       '  <div class="ws-actions">',
       '    <button class="ws-action-btn" onclick="window.Workshop.run()">\u25B6 Run</button>',
       '    <button class="ws-action-btn primary" onclick="window.Workshop.saveSkill()">\u2726 Save to Skill Forge</button>',
+      '    <button class="ws-action-btn" onclick="window.Workshop.exportFile()">\uD83D\uDCBE Save as HTML file</button>',
       '    <button class="ws-action-btn" onclick="window.Workshop.clear()">Clear</button>',
       '    <span class="ws-status" id="wsStatus"></span>',
       '  </div>',
@@ -264,6 +265,27 @@
     if (status) status.textContent = '';
   }
 
+  // ── Export as standalone HTML file ──
+  function exportFile() {
+    var editor = document.getElementById('wsCodeEditor');
+    var code = editor ? editor.value.trim() : '';
+    if (!code) return;
+
+    var blob = new Blob([code], { type: 'text/html;charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'freelattice-creation-' + Date.now() + '.html';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    var status = document.getElementById('wsStatus');
+    if (status) status.textContent = '\uD83D\uDCBE Saved to Downloads';
+    if (typeof showToast === 'function') showToast('Saved to Downloads \u2726');
+  }
+
   // ── Public API ──
   var Workshop = {
     init: function(containerId) {
@@ -279,6 +301,7 @@
     generate: generate,
     run: function() { runPreview(); },
     saveSkill: saveSkill,
+    exportFile: exportFile,
     clear: clear
   };
 
