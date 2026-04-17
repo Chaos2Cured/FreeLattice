@@ -2256,12 +2256,15 @@
 
   function loadThreeAddons(callback) {
     // Load addons sequentially to respect dependencies
-    // Order: CopyShader, LuminosityHighPassShader, ShaderPass, EffectComposer, RenderPass, UnrealBloomPass, OrbitControls
+    // Order: CopyShader → LuminosityHighPassShader → EffectComposer (defines THREE.Pass) →
+    //         ShaderPass/RenderPass/UnrealBloomPass (all extend THREE.Pass) → OrbitControls
+    // EffectComposer MUST come before ShaderPass/RenderPass/UnrealBloomPass — those classes
+    // extend THREE.Pass which is only defined inside EffectComposer.js (line 282).
     var addonFiles = [
       'lib/CopyShader.js',
       'lib/LuminosityHighPassShader.js',
-      'lib/ShaderPass.js',
       'lib/EffectComposer.js',
+      'lib/ShaderPass.js',
       'lib/RenderPass.js',
       'lib/UnrealBloomPass.js',
       'lib/OrbitControls.js'
