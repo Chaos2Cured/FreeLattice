@@ -348,12 +348,11 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-04-17 10:34 MDT
+- Last auto-updated: 2026-04-17 10:32 MDT
 - Version: 5.7.0
-- Total commits: 1001
+- Total commits: 1000
 - Last 10 commits:
-- dede1f7 feat: Canvas renamed to Chalkboard — one drawing tab, no redundancy
-- 4a0f1ba ci: Update Primer deployment state [2026-04-17]
+- 0163cb6 feat: Canvas renamed to Chalkboard — one drawing tab, no redundancy
 - 4480d46 docs: Auto-update Session Primer [5.7.0]
 - 4363fe5 docs: Auto-update Session Primer [5.7.0]
 - af58e61 fix: tab labels visible at desktop width + Workshop in Tauri
@@ -362,3 +361,4 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - dde511b docs: Auto-update Session Primer [5.7.0]
 - 6fd4cfc feat: auto-pull model + HuggingFace fallback links
 - fe500f7 ci: Update Primer deployment state [2026-04-17]
+- 16321d9 docs: Auto-update Session Primer [5.7.0]
