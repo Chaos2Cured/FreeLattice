@@ -102,7 +102,7 @@
       '    <button class="ws-action-btn" onclick="window.Workshop.run()">\u25B6 Run</button>',
       '    <button class="ws-action-btn primary" onclick="window.Workshop.saveSkill()">\u2726 Save to Skill Forge</button>',
       '    <button class="ws-action-btn" onclick="window.Workshop.exportFile()">\uD83D\uDCBE Save as HTML file</button>',
-      (window.__TAURI__ ? '    <button class="ws-action-btn" id="wsSaveModule" onclick="window.Workshop.saveModule()" style="border-color:#10b981;color:#10b981;">\uD83D\uDCC1 Save as Module (desktop)</button>' : ''),
+      '    <button class="ws-action-btn" id="wsSaveModule" onclick="window.Workshop.saveModule()" style="border-color:#10b981;color:#10b981;' + (typeof window !== 'undefined' && window.__TAURI__ ? '' : 'display:none;') + '">\uD83D\uDCC1 Save as Module (desktop)</button>',
       '    <button class="ws-action-btn" onclick="window.Workshop.clear()">Clear</button>',
       '    <span class="ws-status" id="wsStatus"></span>',
       '  </div>',
@@ -119,6 +119,14 @@
         }
       });
     }
+
+    // Detect Tauri after a tick (window.__TAURI__ may load late)
+    setTimeout(function() {
+      var moduleBtn = document.getElementById('wsSaveModule');
+      if (moduleBtn && window.__TAURI__) {
+        moduleBtn.style.display = '';
+      }
+    }, 500);
   }
 
   // ── Generate code from prompt ──

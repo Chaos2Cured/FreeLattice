@@ -347,10 +347,10 @@ header .mantra {
 .tab-nav {
   display: flex;
   width: 100%;
-  max-width: 600px;
+  max-width: 760px;
   margin: var(--space-sm) auto 0;
   padding: 0;
-  overflow: hidden;
+  overflow: visible;
   border-bottom: 1px solid var(--border);
   transition: border-color var(--transition-md);
   position: relative;
@@ -372,8 +372,7 @@ header .mantra {
   font-family: var(--font);
   letter-spacing: 0.03em;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  /* Only truncate on narrow screens — at 800px+ there's room for full labels */
 }
 
 .tab-btn:hover {
@@ -10243,9 +10242,9 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
 .tab-btn .tab-icon { font-size: 1.1rem; }
 .tab-btn .tab-label { margin-left: 6px; font-size: 0.85rem; }
 @media (max-width: 768px) {
-  .tab-nav { max-width: 100%; max-height: 48px; }
+  .tab-nav { max-width: 100%; max-height: 48px; overflow: hidden; }
   .tab-btn .tab-label { display: none; }
-  .tab-btn { padding: 10px 14px; min-width: 44px; justify-content: center; }
+  .tab-btn { padding: 10px 14px; min-width: 44px; justify-content: center; overflow: hidden; text-overflow: ellipsis; }
   .fl-more-btn .tab-label { display: none; }
   .ai-setup-providers { flex-direction: column; }
   .ai-provider-btn { flex: none; width: 100%; min-width: 0; }
@@ -51616,6 +51615,12 @@ document.addEventListener('click', function(e) {
           if (mod && mod.init) mod.init('workshopContainer');
           else if (window.Workshop) window.Workshop.init('workshopContainer');
         }, 'workshopContainer');
+      } else {
+        // Fallback: direct script load (handles Tauri and other environments)
+        var s = document.createElement('script');
+        s.src = 'modules/workshop.js';
+        s.onload = function() { if (window.Workshop) window.Workshop.init('workshopContainer'); };
+        document.head.appendChild(s);
       }
     }
     if (typeof LatticeEvents !== 'undefined') {
