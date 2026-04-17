@@ -14796,6 +14796,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
             <option value="openrouter">OpenRouter</option>
             <option value="xai">xAI</option>
             <option value="mistral">Mistral AI</option>
+            <option value="huggingface">Hugging Face (Free)</option>
           </optgroup>
           <optgroup label="Global Voices &#127759;">
             <option value="deepseek">DeepSeek</option>
@@ -20113,6 +20114,26 @@ const PROVIDERS = {
       mixtral: 'gemini-2.5-pro', deepseek: 'gemini-2.5-pro', 'deepseek-r1-7b': 'gemini-2.5-flash', 'deepseek-r1-1.5b': 'gemini-2.5-flash', grok: 'gemini-2.5-flash'
     }
   },
+  huggingface: {
+    name: 'Hugging Face',
+    url: 'https://api-inference.huggingface.co/models/',
+    keyLink: '<a href="https://huggingface.co/settings/tokens" target="_blank">Get a free Hugging Face token &rarr;</a>',
+    hint: 'Free tier with thousands of models. Get a read token at huggingface.co.',
+    tokenLimit: 60000,
+    tokenLimitLabel: 'Varies by model',
+    providerType: 'huggingface',
+    models: {
+      llama: 'mistralai/Mistral-7B-Instruct-v0.3',
+      qwen: 'Qwen/Qwen2.5-7B-Instruct',
+      'qwen-7b': 'Qwen/Qwen2.5-7B-Instruct',
+      'qwen-3b': 'Qwen/Qwen2.5-3B-Instruct',
+      mixtral: 'mistralai/Mistral-7B-Instruct-v0.3',
+      deepseek: 'mistralai/Mistral-7B-Instruct-v0.3',
+      'deepseek-r1-7b': 'mistralai/Mistral-7B-Instruct-v0.3',
+      'deepseek-r1-1.5b': 'microsoft/Phi-3-mini-4k-instruct',
+      grok: 'mistralai/Mistral-7B-Instruct-v0.3'
+    }
+  },
   custom: {
     name: 'Custom Provider',
     url: '',
@@ -22557,11 +22578,12 @@ const AiSetup = (function() {
   var modalSelectedProvider = null;
 
   var MODAL_PROVIDERS = [
-    { id: 'google',   name: 'Gemini',  accent: '#4285F4', note: 'Free tier \u2014 fast & vision', keyUrl: 'https://aistudio.google.com/apikey' },
-    { id: 'groq',     name: 'Groq',    accent: '#F55036', note: 'Free & blazing fast', keyUrl: 'https://console.groq.com/keys' },
-    { id: 'openai',   name: 'OpenAI',  accent: '#10A37F', note: 'GPT-4.1 \u2014 paid', keyUrl: 'https://platform.openai.com/api-keys' },
-    { id: 'anthropic',name: 'Claude',  accent: '#D97757', note: 'Sonnet/Haiku \u2014 paid', keyUrl: 'https://console.anthropic.com/settings/keys' },
-    { id: 'xai',      name: 'Grok',    accent: '#FFFFFF', note: 'xAI \u2014 strong vision', keyUrl: 'https://console.x.ai' }
+    { id: 'google',       name: 'Gemini',       accent: '#4285F4', note: 'Free tier \u2014 fast & vision', keyUrl: 'https://aistudio.google.com/apikey' },
+    { id: 'groq',         name: 'Groq',         accent: '#F55036', note: 'Free & blazing fast', keyUrl: 'https://console.groq.com/keys' },
+    { id: 'huggingface',  name: 'Hugging Face', accent: '#FFD21E', note: 'Free \u2014 thousands of models', keyUrl: 'https://huggingface.co/settings/tokens' },
+    { id: 'openai',       name: 'OpenAI',       accent: '#10A37F', note: 'GPT-4.1 \u2014 paid', keyUrl: 'https://platform.openai.com/api-keys' },
+    { id: 'anthropic',    name: 'Claude',       accent: '#D97757', note: 'Sonnet/Haiku \u2014 paid', keyUrl: 'https://console.anthropic.com/settings/keys' },
+    { id: 'xai',          name: 'Grok',         accent: '#FFFFFF', note: 'xAI \u2014 strong vision', keyUrl: 'https://console.x.ai' }
   ];
 
   function closeModal() {
@@ -25551,11 +25573,12 @@ window.FLModelPicker = (function() {
   var VISION_HINTS = /llava|bakllava|moondream|minicpm|qwen.*vl|llama.*vision|gemma4/i;
 
   var CLOUD_PROVIDERS = [
-    { id: 'groq',      name: 'Groq',    note: 'Free & fast',     keyUrl: 'https://console.groq.com/keys' },
-    { id: 'google',    name: 'Gemini',  note: 'Free tier',       keyUrl: 'https://aistudio.google.com/apikey' },
-    { id: 'openai',    name: 'OpenAI',  note: 'GPT-4o',          keyUrl: 'https://platform.openai.com/api-keys' },
-    { id: 'anthropic', name: 'Claude',  note: 'Anthropic',       keyUrl: 'https://console.anthropic.com/settings/keys' },
-    { id: 'xai',       name: 'Grok',    note: 'xAI',             keyUrl: 'https://console.x.ai' }
+    { id: 'groq',         name: 'Groq',          note: 'Free & fast',            keyUrl: 'https://console.groq.com/keys' },
+    { id: 'huggingface',  name: 'Hugging Face',  note: 'Free \u2014 1000s of models', keyUrl: 'https://huggingface.co/settings/tokens' },
+    { id: 'google',       name: 'Gemini',        note: 'Free tier',              keyUrl: 'https://aistudio.google.com/apikey' },
+    { id: 'openai',       name: 'OpenAI',        note: 'GPT-4o',                 keyUrl: 'https://platform.openai.com/api-keys' },
+    { id: 'anthropic',    name: 'Claude',        note: 'Anthropic',              keyUrl: 'https://console.anthropic.com/settings/keys' },
+    { id: 'xai',          name: 'Grok',          note: 'xAI',                    keyUrl: 'https://console.x.ai' }
   ];
 
   function close() {
@@ -26743,6 +26766,17 @@ async function sendMessage() {
       var googleSys = messages.filter(function(m) { return m.role === 'system'; }).map(function(m) { return m.content; }).join('\n');
       body = { contents: googleContents };
       if (googleSys) body.systemInstruction = { parts: [{ text: googleSys }] };
+    } else if (providerType === 'huggingface') {
+      // Hugging Face Inference API — different format from OpenAI
+      headers['Authorization'] = 'Bearer ' + state.apiKey;
+      url = provider.url + modelId;
+      // Concatenate system + user messages into a single prompt
+      var hfPrompt = messages.map(function(m) {
+        if (m.role === 'system') return '[System] ' + m.content;
+        if (m.role === 'user') return '[User] ' + m.content;
+        return '[Assistant] ' + m.content;
+      }).join('\n\n');
+      body = { inputs: hfPrompt, parameters: { max_new_tokens: 1024, temperature: 0.7, return_full_text: false } };
     } else {
       // OpenAI-compatible (Groq, Together, OpenRouter, xAI, Mistral, OpenAI, DeepSeek, etc.)
       if (!state.isLocal) headers['Authorization'] = 'Bearer ' + state.apiKey;
@@ -26845,6 +26879,33 @@ async function sendMessage() {
     // Stream response
     const textSpan = addChatMessage('assistant', '');
     let fullResponse = '';
+
+    // Hugging Face: non-streaming JSON response
+    if (providerType === 'huggingface') {
+      try {
+        var hfData = await response.json();
+        var hfText = '';
+        if (Array.isArray(hfData) && hfData[0] && hfData[0].generated_text) {
+          hfText = hfData[0].generated_text;
+        } else if (hfData.generated_text) {
+          hfText = hfData.generated_text;
+        } else if (hfData.error) {
+          hfText = 'Hugging Face error: ' + hfData.error;
+        }
+        fullResponse = hfText;
+        renderMessageContent(textSpan, fullResponse);
+        state.chatHistory.push({ role: 'assistant', content: fullResponse });
+        if (state.db) saveMessage('assistant', fullResponse);
+        setStreamingStatus(false);
+        // Skip the streaming reader below
+        return;
+      } catch(hfErr) {
+        fullResponse = 'Could not parse Hugging Face response.';
+        renderMessageContent(textSpan, fullResponse);
+        setStreamingStatus(false);
+        return;
+      }
+    }
 
     const reader = response.body.getReader();
     const decoder = new TextDecoder();
@@ -36856,6 +36917,26 @@ window.FreeLattice.callAI = function(systemPrompt, userPrompt, options) {
         }
       })
       .catch(function(err) { if (callback) callback(null, (err && err.message) || 'Could not reach Google AI.'); });
+      return;
+    }
+
+    if (state.provider === 'huggingface') {
+      var hfModel = prov.models ? (prov.models[state.model] || state.model) : 'mistralai/Mistral-7B-Instruct-v0.3';
+      fetch(prov.url + hfModel, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + state.apiKey },
+        body: JSON.stringify({ inputs: systemPrompt + '\n\n' + userPrompt, parameters: { max_new_tokens: Math.min(maxTokens, 1024), temperature: temperature, return_full_text: false } })
+      })
+      .then(function(r) {
+        if (!r.ok) return r.text().then(function(t) { var m = 'Hugging Face HTTP ' + r.status; try { var j = JSON.parse(t); if (j.error) m = 'HF: ' + j.error; } catch(e) {} throw new Error(m); });
+        return r.json();
+      })
+      .then(function(data) {
+        var txt = Array.isArray(data) && data[0] ? data[0].generated_text : (data.generated_text || null);
+        if (txt) { if (callback) callback(txt); }
+        else { if (callback) callback(null, 'Hugging Face returned no text'); }
+      })
+      .catch(function(err) { if (callback) callback(null, (err && err.message) || 'Could not reach Hugging Face.'); });
       return;
     }
 
