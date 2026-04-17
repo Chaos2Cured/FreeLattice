@@ -1,4 +1,5 @@
 __pycache__/
+node_modules/
 
 # Desktop app build artifacts
 desktop/node_modules/
@@ -8,3 +9,6 @@ desktop/app/*.js
 desktop/app/*.json
 desktop/app/*.png
 !desktop/app/.gitkeep
+desktop/src-tauri/target/
+desktop/src-tauri/gen/
+desktop/telegram-worker/node_modules/

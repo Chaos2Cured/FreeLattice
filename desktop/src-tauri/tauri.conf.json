@@ -6,7 +6,6 @@
     "frontendDist": "../../docs"
   },
   "app": {
-    "title": "FreeLattice — Your AI. Local. Free. Yours.",
     "windows": [
       {
         "title": "FreeLattice",

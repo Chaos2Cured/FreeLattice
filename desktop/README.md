@@ -58,12 +58,18 @@ cd desktop/src-tauri
 cargo tauri dev
 ```
 
-### Build for distribution
+### Build the distributable
 ```bash
+cd desktop/src-tauri
 cargo tauri build
 ```
 
-The built `.dmg` appears in `target/release/bundle/dmg/`.
+This creates:
+- **macOS:** `target/release/bundle/dmg/FreeLattice_5.8.0_aarch64.dmg`
+- **macOS (Intel):** `target/release/bundle/dmg/FreeLattice_5.8.0_x64.dmg`
+
+The app is unsigned. Users must right-click → Open on first launch.
+See [install instructions](../docs/install-mac.html) for the bypass flow.
 
 ## Security
 

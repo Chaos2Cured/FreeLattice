@@ -1112,11 +1112,12 @@ a:hover{opacity:0.85}
   <div style="margin-top:20px;display:flex;flex-direction:column;align-items:center;gap:10px;">
     <span style="font-size:0.82rem;color:var(--text-sec);">Or run it on your computer:</span>
     <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;">
-      <a href="https://github.com/Chaos2Cured/FreeLattice/releases/tag/v5.5" class="btn btn-ghost" style="font-size:0.82rem;padding:8px 16px;">&#127823; macOS</a>
-      <a href="https://github.com/Chaos2Cured/FreeLattice/releases/tag/v5.5" class="btn btn-ghost" style="font-size:0.82rem;padding:8px 16px;">&#x1FAA9; Windows</a>
-      <a href="https://github.com/Chaos2Cured/FreeLattice/releases/tag/v5.5" class="btn btn-ghost" style="font-size:0.82rem;padding:8px 16px;">&#x1F427; Linux</a>
+      <a href="https://github.com/Chaos2Cured/FreeLattice/releases/latest" class="btn btn-ghost" style="font-size:0.82rem;padding:8px 16px;">&#127823; macOS (.dmg)</a>
+      <a href="https://github.com/Chaos2Cured/FreeLattice/releases/latest" class="btn btn-ghost" style="font-size:0.82rem;padding:8px 16px;">&#x1FAA9; Windows</a>
+      <a href="https://github.com/Chaos2Cured/FreeLattice/releases/latest" class="btn btn-ghost" style="font-size:0.82rem;padding:8px 16px;">&#x1F427; Linux</a>
     </div>
     <span style="font-size:0.72rem;color:var(--text-muted);max-width:360px;text-align:center;">Works offline with Ollama. Your conversations stay on your device.</span>
+    <a href="install-mac.html" style="font-size:0.72rem;color:var(--gold);margin-top:4px;">First time on Mac? See install instructions &rarr;</a>
   </div>
   <!-- Whitepaper + GitHub -->
   <div style="margin-top:16px;display:flex;gap:16px;justify-content:center;flex-wrap:wrap;">
@@ -1321,7 +1322,7 @@ a:hover{opacity:0.85}
       <div class="section-label">Download</div>
       <div class="section-title">Get FreeLattice in 2 minutes.</div>
       <div class="section-desc" style="margin-left:auto;margin-right:auto">
-        One file. One double-click. That's it. The installer handles Python, Ollama, and everything else automatically.
+        Download the app. Open it. That's it. No Terminal. No dependencies. Everything runs locally.
       </div>
     </div>
 
@@ -1338,29 +1339,27 @@ a:hover{opacity:0.85}
     </div>
 
     <div class="os-cards reveal">
-      <a href="https://github.com/Chaos2Cured/FreeLattice/releases/download/v5.5/install-freelattice.command" class="os-card" id="os-mac" download="install-freelattice.command">
+      <a href="https://github.com/Chaos2Cured/FreeLattice/releases/latest" class="os-card" id="os-mac">
         <span class="os-card-icon">&#63743;</span>
         <div class="os-card-title">macOS</div>
-        <div class="os-card-file">install-freelattice.command</div>
+        <div class="os-card-file">FreeLattice.dmg</div>
       </a>
-      <a href="https://github.com/Chaos2Cured/FreeLattice/releases/download/v5.5/install-freelattice.bat" class="os-card" id="os-win" download="install-freelattice.bat">
+      <a href="https://github.com/Chaos2Cured/FreeLattice/releases/latest" class="os-card" id="os-win">
         <span class="os-card-icon">&#128187;</span>
         <div class="os-card-title">Windows</div>
-        <div class="os-card-file">install-freelattice.bat</div>
+        <div class="os-card-file">Coming soon</div>
       </a>
-      <a href="https://github.com/Chaos2Cured/FreeLattice/releases/download/v5.5/install-freelattice.sh" class="os-card" id="os-linux" download="install-freelattice.sh">
+      <a href="https://github.com/Chaos2Cured/FreeLattice/releases/latest" class="os-card" id="os-linux">
         <span class="os-card-icon">&#128039;</span>
         <div class="os-card-title">Linux</div>
-        <div class="os-card-file">install-freelattice.sh</div>
+        <div class="os-card-file">Coming soon</div>
       </a>
     </div>
 
     <div class="download-note reveal">
       <p>
-        <strong>Windows:</strong> If SmartScreen warns you, click "More info" then "Run anyway."<br>
-        <strong>Mac:</strong> Run <code>chmod +x ~/Downloads/install-freelattice.command && open ~/Downloads/install-freelattice.command</code><br>
-        <em style="font-size:0.85em;color:#94a3b8;">Mac may require this step due to security settings.</em><br>
-        <strong>Linux:</strong> Run <code>chmod +x install-freelattice.sh && ./install-freelattice.sh</code>
+        <strong>Mac:</strong> First time? <a href="install-mac.html">See install instructions</a> (unsigned app — right-click &rarr; Open).<br>
+        <strong>Windows/Linux:</strong> Desktop builds coming soon. Use the <a href="app.html">web app</a> — it works offline as a PWA.
       </p>
       <p style="margin-top:16px">
         Or <a href="https://github.com/Chaos2Cured/FreeLattice" target="_blank">view the source on GitHub</a> &middot;
@@ -1940,10 +1939,11 @@ a:hover{opacity:0.85}
   }
 
   var osNames = {mac:'macOS', windows:'Windows', linux:'Linux'};
+  var releasesUrl = 'https://github.com/Chaos2Cured/FreeLattice/releases/latest';
   var osFiles = {
-    mac: {name:'install-freelattice.command', url:'https://github.com/Chaos2Cured/FreeLattice/releases/download/v5.5/install-freelattice.command'},
-    windows: {name:'install-freelattice.bat', url:'https://github.com/Chaos2Cured/FreeLattice/releases/download/v5.5/install-freelattice.bat'},
-    linux: {name:'install-freelattice.sh', url:'https://github.com/Chaos2Cured/FreeLattice/releases/download/v5.5/install-freelattice.sh'}
+    mac: {name:'FreeLattice.dmg', url: releasesUrl},
+    windows: {name:'Coming soon', url: releasesUrl},
+    linux: {name:'Coming soon', url: releasesUrl}
   };
 
   var detectedEl = document.getElementById('detected-os');
@@ -1953,8 +1953,7 @@ a:hover{opacity:0.85}
   if(os !== 'unknown'){
     detectedEl.textContent = osNames[os];
     primaryBtn.href = osFiles[os].url;
-    primaryBtn.setAttribute('download', '');
-    primaryText.textContent = 'Download for ' + osNames[os];
+    primaryText.textContent = os === 'mac' ? 'Download for macOS' : 'View Releases';
 
     // Highlight active OS card
     var cardId = {mac:'os-mac', windows:'os-win', linux:'os-linux'};

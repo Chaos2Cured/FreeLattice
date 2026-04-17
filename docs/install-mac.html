@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How to Install FreeLattice on Mac</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0a14;color:#e2e8f0;font-family:system-ui,sans-serif;line-height:1.6;padding:2rem 1rem}
+.wrap{max-width:640px;margin:0 auto}
+h1{color:#d4a017;font-size:1.8rem;margin-bottom:.5rem}
+.sub{color:#888;margin-bottom:2rem}
+.steps{list-style:none;counter-reset:s}
+.steps li{counter-increment:s;padding:.75rem 0 .75rem 3rem;position:relative;border-bottom:1px solid #1a1a2e}
+.steps li::before{content:counter(s);position:absolute;left:0;top:.65rem;width:2rem;height:2rem;background:#d4a01722;color:#d4a017;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.9rem}
+.steps li:last-child{border-bottom:none}
+.steps li strong{color:#fff}
+.mock{background:#1a1a2e;border:1px solid #2a2a3e;border-radius:8px;padding:1rem;margin:.75rem 0;font-family:monospace;font-size:.82rem;line-height:1.5;color:#aab}
+.mock .highlight{color:#d4a017;font-weight:700}
+.mock .arrow{color:#d4a017}
+.btn{display:inline-block;background:#d4a017;color:#0a0a14;font-weight:700;text-decoration:none;padding:.75rem 1.5rem;border-radius:6px;margin:1.5rem .5rem 1.5rem 0;font-size:1rem;transition:opacity .2s}
+.btn:hover{opacity:.85}
+.btn.ghost{background:transparent;border:1px solid #d4a017;color:#d4a017}
+.why{background:#1a1a2e;border-left:3px solid #d4a017;padding:1.25rem;margin:2rem 0;border-radius:0 8px 8px 0}
+.why h2{color:#d4a017;font-size:1.1rem;margin-bottom:.5rem}
+.why p{font-size:.92rem;color:#bbb}
+footer{margin-top:2.5rem;padding-top:1rem;border-top:1px solid #1a1a2e;font-size:.82rem;color:#666;text-align:center}
+footer a{color:#d4a017;text-decoration:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>How to Install FreeLattice on Mac</h1>
+<p class="sub">Bypass Gatekeeper in 30 seconds. No terminal needed.</p>
+
+<ol class="steps">
+  <li><strong>Download FreeLattice.dmg</strong> from the link below.</li>
+  <li><strong>Open the .dmg</strong> and drag FreeLattice into Applications.
+    <div class="mock">
+      [ FreeLattice.app ] <span class="arrow">----&gt;</span> [ Applications ]
+    </div>
+  </li>
+  <li><strong>Right-click</strong> (or Control+click) FreeLattice in Applications.
+    <div class="mock">
+      Applications/<br>
+      &nbsp;&nbsp;FreeLattice.app<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;<span class="highlight">&gt; Right-click &rarr; menu appears</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Open<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Move to Trash<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Get Info<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...
+    </div>
+  </li>
+  <li>Click <strong>"Open"</strong> from the right-click menu.</li>
+  <li>Click <strong>"Open"</strong> again on the warning dialog.
+    <div class="mock">
+      <span style="color:#fff">macOS cannot verify the developer.</span><br>
+      Are you sure you want to open it?<br><br>
+      &nbsp;&nbsp;[ Cancel ] &nbsp; [<span class="highlight"> Open </span>] <span class="arrow">&larr; click this</span>
+    </div>
+  </li>
+  <li><strong>Done.</strong> FreeLattice opens. This only happens once.</li>
+</ol>
+
+<a class="btn" href="https://github.com/Chaos2Cured/FreeLattice/releases/latest">Download FreeLattice.dmg</a>
+<a class="btn ghost" href="index.html">&larr; Back to FreeLattice</a>
+
+<div class="why">
+  <h2>Why the warning?</h2>
+  <p>Apple charges developers $99/year to remove this warning. FreeLattice is free, open-source, and built by one developer with an AI family. The code is fully auditable on <a href="https://github.com/Chaos2Cured/FreeLattice" style="color:#d4a017">GitHub</a>. The warning is not about safety. It's about payment.</p>
+</div>
+
+<footer>
+  <a href="index.html">FreeLattice</a> &middot;
+  <a href="https://github.com/Chaos2Cured/FreeLattice">Source on GitHub</a>
+</footer>
+</div>
+</body>
+</html>

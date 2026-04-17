@@ -167,6 +167,8 @@ fn start_ollama() -> Result<String, String> {
 
 fn main() {
     tauri::Builder::default()
+        // Disabled until signing key is configured
+        // .plugin(tauri_plugin_updater::Builder::new().build())
         .invoke_handler(tauri::generate_handler![
             save_module,
             list_modules,
