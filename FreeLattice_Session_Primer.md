@@ -350,10 +350,9 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 ## PRIMER HEALTH
 - Last auto-updated: 2026-04-16 20:40 MDT
 - Version: 5.7.0
-- Total commits: 981
+- Total commits: 980
 - Last 10 commits:
-- e78c178 feat: Tauri desktop app proof of concept (experimental)
-- 24cbd0c ci: Update Primer deployment state [2026-04-17]
+- 0fd9d76 feat: Tauri desktop app proof of concept (experimental)
 - 48b4732 docs: Auto-update Session Primer [5.7.0]
 - 44a69bb docs: Auto-update Session Primer [5.7.0]
 - 6976974 feat: storage health monitor + Workshop file export
@@ -362,3 +361,4 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 74dd645 docs: Auto-update Session Primer [5.7.0]
 - 3410645 feat: The AI Workshop — sandboxed code environment
 - 7564cda ci: Update Primer deployment state [2026-04-17]
+- a04a451 docs: Auto-update Session Primer [5.7.0]
