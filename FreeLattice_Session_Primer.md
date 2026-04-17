@@ -348,17 +348,17 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-04-17 09:34 MDT
+- Last auto-updated: 2026-04-17 10:20 MDT
 - Version: 5.7.0
-- Total commits: 992
+- Total commits: 997
 - Last 10 commits:
-- d76266e feat: auto-pull model + HuggingFace fallback links
+- af58e61 fix: tab labels visible at desktop width + Workshop in Tauri
+- 6d53cdc ci: Update Primer deployment state [2026-04-17]
+- a69907c docs: Auto-update Session Primer [5.7.0]
+- dde511b docs: Auto-update Session Primer [5.7.0]
+- 6fd4cfc feat: auto-pull model + HuggingFace fallback links
+- fe500f7 ci: Update Primer deployment state [2026-04-17]
 - 16321d9 docs: Auto-update Session Primer [5.7.0]
 - a192e35 docs: Auto-update Session Primer [5.7.0]
 - 8de8665 feat: Hugging Face as a free cloud provider
 - 61f7873 ci: Update Primer deployment state [2026-04-17]
-- 9c26c6f docs: Auto-update Session Primer [5.7.0]
-- 1f3f21b docs: Auto-update Session Primer [5.7.0]
-- 7ca456b feat: Tauri auto-updater + one-click Ollama install
-- ba7c7ee ci: Update Primer deployment state [2026-04-17]
-- 3d241f0 docs: Auto-update Session Primer [5.7.0]
