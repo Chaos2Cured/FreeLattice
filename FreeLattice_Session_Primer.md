@@ -348,10 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-04-17 13:16 MDT
+- Last auto-updated: 2026-04-17 13:33 MDT
 - Version: 5.8.0
-- Total commits: 1025
+- Total commits: 1027
 - Last 10 commits:
+- 8992118 fix: auto-model-selector respects manual model choice
+- a8de457 docs: Auto-update Session Primer [5.8.0]
 - aac21d5 fix: install-mac.html — quarantine removal + security setting steps
 - 7ac750a ci: Update Primer deployment state [2026-04-17]
 - 5070940 Merge branch 'main' of https://github.com/Chaos2Cured/FreeLattice
@@ -360,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 801710c ci: Update Primer deployment state [2026-04-17]
 - e711104 docs: Auto-update Session Primer [5.8.0]
 - a910634 docs: Auto-update Session Primer [5.8.0]
-- fd3c1ac feat: PWA install banner + Tauri stabilization
-- c2716c3 ci: Update Primer deployment state [2026-04-17]
