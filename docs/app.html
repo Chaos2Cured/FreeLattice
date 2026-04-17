@@ -25854,10 +25854,14 @@ window.FLModelPicker = (function() {
     localStorage.setItem('fl_provider', 'ollama');
     localStorage.setItem('fl_ollamaModel', modelName);
     // Save as user's preferred model for this type (vision or text)
+    // and mark as manual override — user's choice is sacred
     if (typeof FLAutoModel !== 'undefined') {
       var type = FLAutoModel.isVision(modelName) ? 'vision' : 'text';
       FLAutoModel.setPreferred(type, modelName);
       FLAutoModel.invalidateCache();
+      var activeBtn = document.querySelector('.tab-btn.active');
+      var currentTab = activeBtn ? activeBtn.dataset.tab : null;
+      if (currentTab) FLAutoModel.setManualOverride(currentTab, modelName);
     }
     try {
       var localToggle = document.getElementById('localToggle');
@@ -25895,6 +25899,13 @@ window.FLAutoModel = (function() {
   var cachedModels = null;
   var cacheTime = 0;
   var CACHE_TTL = 30000; // refresh model list every 30s
+
+  // Manual override: when the user picks a model, their choice is sacred.
+  // We track which tab they chose it on so auto-select skips that tab
+  // but still works when switching to a different tab type.
+  var manualOverride = false;
+  var manualOverrideTab = null;
+  var manualOverrideModel = null;
 
   // Tabs that need vision models
   var VISION_TABS = ['canvas', 'chalkboard'];
@@ -25946,6 +25957,16 @@ window.FLAutoModel = (function() {
     // Only auto-switch when using local Ollama with multiple models
     if (typeof state === 'undefined' || !state.isLocal) return;
 
+    // Manual choice is sacred: if the user picked a model for THIS tab, don't touch it
+    if (manualOverride && manualOverrideTab === tabId) return;
+
+    // Switching to a different tab — save their manual choice for the old tab type
+    if (manualOverride && manualOverrideTab !== tabId && manualOverrideModel) {
+      var overrideType = isVision(manualOverrideModel) ? 'vision' : 'text';
+      setPreferred(overrideType, manualOverrideModel);
+      // Don't clear the override — they'll get their model back when they return
+    }
+
     getInstalledModels(function(models) {
       if (models.length < 2) return; // nothing to switch between
 
@@ -25994,11 +26015,18 @@ window.FLAutoModel = (function() {
     }, 2000);
   });
 
+  function setManualOverride(tabId, modelName) {
+    manualOverride = true;
+    manualOverrideTab = tabId;
+    manualOverrideModel = modelName;
+  }
+
   return {
     onTabChanged: onTabChanged,
     setPreferred: setPreferred,
     getPreferred: getPreferred,
     isVision: isVision,
+    setManualOverride: setManualOverride,
     invalidateCache: function() { cachedModels = null; cacheTime = 0; }
   };
 })();
