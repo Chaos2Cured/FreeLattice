@@ -350,10 +350,9 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 ## PRIMER HEALTH
 - Last auto-updated: 2026-04-16 20:12 MDT
 - Version: 5.7.0
-- Total commits: 973
+- Total commits: 972
 - Last 10 commits:
-- 3410645 feat: The AI Workshop — sandboxed code environment
-- 7564cda ci: Update Primer deployment state [2026-04-17]
+- 098339e feat: The AI Workshop — sandboxed code environment
 - a04a451 docs: Auto-update Session Primer [5.7.0]
 - 6f03e89 docs: Auto-update Session Primer [5.7.0]
 - ffd84cc docs: README rewritten for v5.7+ — the face of FreeLattice
@@ -362,3 +361,4 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - ad54472 docs: Auto-update Session Primer [5.7.0]
 - 43105d0 feat: RAG Phase 1 — unified keyword search across all stores
 - 93159b2 ci: Update Primer deployment state [2026-04-16]
+- ee5968b docs: Auto-update Session Primer [5.7.0]
