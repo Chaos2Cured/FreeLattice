@@ -35,7 +35,8 @@ const APP_SHELL = [
   './modules/shared-presence.js',
   './modules/workshop.js',
   './modules/quiet-room.js',
-    './modules/forever-stack.js'
+    './modules/forever-stack.js',
+    './install-mac.html'
 ];
 
 // API domains that should never be cached — always pass through to network

@@ -14212,15 +14212,10 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 </div>
 <div class="welcome-toast" id="welcomeToast"></div>
 
-<!-- PWA Install Banner -->
-<div class="pwa-install-banner" id="pwaInstallBanner">
-  <span>&#128241; Install FreeLattice on your device for quick access</span>
-  <button class="pwa-install-btn" id="pwaInstallBtn" onclick="pwaInstallApp()">Install App</button>
-  <button class="pwa-install-dismiss" onclick="pwaDismissBanner()" title="Dismiss">&times;</button>
-</div>
+<!-- iOS PWA Hint (Android/desktop handled by flInstallBanner below) -->
 <div class="pwa-ios-hint" id="pwaIosHint">
   &#127822; On iPhone/iPad: tap <strong>Share</strong> &#8594; <strong>Add to Home Screen</strong> to install FreeLattice
-  <button class="pwa-install-dismiss" onclick="document.getElementById('pwaIosHint').classList.remove('visible')" title="Dismiss" style="margin-left: 8px;">&times;</button>
+  <button class="pwa-install-dismiss" onclick="document.getElementById('pwaIosHint').classList.remove('visible');localStorage.setItem('fl-install-dismissed','1')" title="Dismiss" style="margin-left: 8px;">&times;</button>
 </div>
 
 <!-- Background Music -->
@@ -24720,6 +24715,24 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   };
 
+  // After install, hide banner
+  window.addEventListener('appinstalled', function() {
+    _flDeferredInstallPrompt = null;
+    var banner = document.getElementById('flInstallBanner');
+    if (banner) banner.style.display = 'none';
+    if (typeof showToast === 'function') showToast('\u2713 FreeLattice installed!');
+  });
+
+  // iOS: show hint for Safari Add to Home Screen
+  (function() {
+    var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    var isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+    if (isIOS && !isStandalone && !localStorage.getItem('fl-install-dismissed')) {
+      var hint = document.getElementById('pwaIosHint');
+      if (hint) hint.classList.add('visible');
+    }
+  })();
+
   // Defer Mesh ID — Cryptographic Identity (v5.0)
   // Not needed on first render — loads when Mesh tab or any Mesh operation is triggered
   setTimeout(async function() {
@@ -31167,53 +31180,7 @@ function friendlyErrorMessage(errMsg, provider) {
   return 'Error from ' + provName + ': ' + errMsg;
 }
 
-// ---- PWA Install Prompt ----
-let pwaInstallPrompt = null;
-
-window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault();
-  pwaInstallPrompt = e;
-  // Show the install banner
-  const banner = document.getElementById('pwaInstallBanner');
-  if (banner && !localStorage.getItem('fl_pwa_dismissed')) {
-    banner.classList.add('visible');
-  }
-});
-
-function pwaInstallApp() {
-  if (!pwaInstallPrompt) return;
-  pwaInstallPrompt.prompt();
-  pwaInstallPrompt.userChoice.then((result) => {
-    if (result.outcome === 'accepted') {
-      showToast('FreeLattice installed! Find it on your home screen.');
-    }
-    pwaInstallPrompt = null;
-    document.getElementById('pwaInstallBanner').classList.remove('visible');
-  });
-}
-
-function pwaDismissBanner() {
-  document.getElementById('pwaInstallBanner').classList.remove('visible');
-  localStorage.setItem('fl_pwa_dismissed', '1');
-}
-
-// After install, hide the banner
-window.addEventListener('appinstalled', () => {
-  document.getElementById('pwaInstallBanner').classList.remove('visible');
-  pwaInstallPrompt = null;
-  showToast('FreeLattice installed successfully!');
-  if (typeof LatticePoints !== 'undefined') LatticePoints.award('pwa_installed', 100, 'FreeLattice installed as PWA');
-});
-
-// iOS detection — show hint for Safari Add to Home Screen
-(function detectiOS() {
-  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
-  if (isIOS && !isStandalone && !localStorage.getItem('fl_pwa_ios_dismissed')) {
-    const hint = document.getElementById('pwaIosHint');
-    if (hint) hint.classList.add('visible');
-  }
-})();
+// PWA Install — consolidated handler is in the init block above (flInstallPWA)
 
 // ============================================
 // v3.3: New Functions — Mobile Context Reset, Copy Button, CORS Help, Support
