@@ -18,24 +18,17 @@ const APP_SHELL = [
   './modules/dojo.js',
   './modules/mirror.js',
   './modules/garden-dialogue.js',
-  './modules/harmonia-channel.js',
-  './modules/presence-heartbeat.js',
-  './modules/soul-ceremony.js',
-  './modules/dream-archive.js',
+  // harmonia-channel.js, presence-heartbeat.js, soul-ceremony.js, dream-archive.js
+  // pantheon.js, pictionary.js, quiet-room.js — not present in this build, removed to
+  // prevent cache.addAll() from rejecting the entire install on a single 404.
   './chalkboard.html',
-  './constellation.html',
-  './constellation_map.png',
-  './constellation_hymn.mp3',
+  // constellation.html, constellation_map.png, constellation_hymn.mp3, latticepoints.html
+  // lib/landing-garden.js — not present in this build, removed for same reason.
   './modules/dojo-sparring.js',
   './modules/question-corner.js',
-  './lib/landing-garden.js',
-  './latticepoints.html',
-  './modules/pantheon.js',
-  './modules/pictionary.js',
   './modules/shared-presence.js',
   './modules/workshop.js',
-  './modules/quiet-room.js',
-    './modules/forever-stack.js'
+  './modules/forever-stack.js'
 ];
 
 // API domains that should never be cached — always pass through to network

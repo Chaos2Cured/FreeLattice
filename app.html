@@ -5,6 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#d4a017">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="FreeLattice">
@@ -14075,7 +14076,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
         <option value="custom">Custom Provider</option>
       </select>
       <label>API Key</label>
-      <input type="password" id="welcomeApiKeyInput" placeholder="Paste your API key here" />
+      <input type="password" id="welcomeApiKeyInput" placeholder="Paste your API key here" autocomplete="off" />
       <div id="welcomeApiKeyHint" style="font-size:0.78rem;color:#6b6760;margin-bottom:10px;"></div>
       <button class="welcome-btn" onclick="welcomeTestApiKey()" id="welcomeTestApiBtn">Test Connection</button>
       <div class="welcome-test-result" id="welcomeTestApiResult"></div>
@@ -14091,7 +14092,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
         <option value="openrouter">OpenRouter — Multiple free models</option>
       </select>
       <label>API Key <span style="font-size:0.75rem;color:#6b6760;">(free to create)</span></label>
-      <input type="password" id="welcomeFreeApiKeyInput" placeholder="Paste your free API key here" />
+      <input type="password" id="welcomeFreeApiKeyInput" placeholder="Paste your free API key here" autocomplete="off" />
       <div id="welcomeFreeHint" style="font-size:0.78rem;color:#6b6760;margin-bottom:10px;">
         Get a free key at <a href="https://console.groq.com" target="_blank" style="color:#d4a017;">console.groq.com</a>
       </div>
@@ -14338,7 +14339,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <!-- API Key entry (shown after provider selection) -->
       <div class="wizard-apikey-section hidden" id="wizApiKeySection">
         <label id="wizApiKeyLabel">API Key</label>
-        <input type="password" id="wizApiKeyInput" placeholder="Paste your API key here">
+        <input type="password" id="wizApiKeyInput" placeholder="Paste your API key here" autocomplete="off">
         <div class="hint" id="wizApiKeyHint"></div>
       </div>
 
@@ -14834,7 +14835,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     <!-- API Key (Cloud only) -->
     <div class="form-group" id="apiKeyGroup">
       <label for="apiKey">API Key</label>
-      <input type="password" id="apiKey" placeholder="Paste your API key here — it stays in your browser only" onchange="saveApiKey()">
+      <input type="password" id="apiKey" placeholder="Paste your API key here — it stays in your browser only" onchange="saveApiKey()" autocomplete="off">
       <div class="hint">
         &#128274; Your key is encrypted with φ-salt before storage. It is never sent anywhere except directly to your chosen provider.
         <span id="apiKeyLink"></span>
@@ -15275,7 +15276,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 
     <div class="form-group" style="margin-bottom: 12px;">
       <label for="ghToken">GitHub Personal Access Token</label>
-      <input type="password" id="ghToken" placeholder="ghp_xxxxxxxxxxxx" onchange="saveGhToken()">
+      <input type="password" id="ghToken" placeholder="ghp_xxxxxxxxxxxx" onchange="saveGhToken()" autocomplete="off">
       <div class="hint">
         &#128274; Encrypted with φ-salt before storage. Only sent to api.github.com.
         <a href="https://github.com/settings/tokens/new?scopes=repo&description=FreeLattice" target="_blank">Generate a token</a>
@@ -15644,7 +15645,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 
     <div class="form-group" style="margin-bottom: 12px;">
       <label for="hfToken">HuggingFace API Token</label>
-      <input type="password" id="hfToken" placeholder="hf_xxxxxxxxxxxx" onchange="saveHfToken()">
+      <input type="password" id="hfToken" placeholder="hf_xxxxxxxxxxxx" onchange="saveHfToken()" autocomplete="off">
       <div class="hint">
         &#128274; Encrypted with &phi;-salt before storage. Only sent to api-inference.huggingface.co.
         <a href="https://huggingface.co/settings/tokens" target="_blank" style="color: var(--accent);">Get a free token &rarr;</a>
@@ -15733,7 +15734,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     <div id="ghSyncSettings" class="hidden">
       <div class="form-group" style="margin-bottom: 12px;">
         <label for="ghSyncToken">GitHub Personal Access Token <span class="help-tip">?<span class="tip-text">A fine-grained token with "Contents" read/write permission on your sync repo. Create one at github.com/settings/tokens.</span></span></label>
-        <input type="password" id="ghSyncToken" placeholder="ghp_xxxxxxxxxxxx" onchange="saveGhSyncToken()">
+        <input type="password" id="ghSyncToken" placeholder="ghp_xxxxxxxxxxxx" onchange="saveGhSyncToken()" autocomplete="off">
         <div class="hint">
           &#128274; Encrypted locally. <a href="https://github.com/settings/tokens?type=beta" target="_blank">Create a fine-grained token &rarr;</a> (needs "Contents" read/write permission)
         </div>
@@ -26681,6 +26682,34 @@ async function sendMessage() {
     } catch(e) { /* RAG search failed — message still sends without it */ }
   }
 
+  // MemoryCore: semantic recall + session history injection
+  // Runs after MemoryIndex/RAG so all three memory layers feed the system prompt.
+  // Fails silently — a recall error must never block the message send.
+  state._memoryCoreContext = '';
+  state._memoryCoreHistory = '';
+  if (window.FreeLatticeModules && window.FreeLatticeModules.MemoryCore) {
+    try {
+      const _mc = window.FreeLatticeModules.MemoryCore;
+      const _isIntimate = typeof state.currentPersona === 'string' &&
+        (state.currentPersona.toLowerCase().includes('partner') ||
+         state.currentPersona.toLowerCase().includes('relation'));
+
+      // Get current affective state vector for emotional resonance boosting in recall
+      let _affVec = null;
+      const _aff = window.FreeLatticeModules.CurrentAffectiveState;
+      if (_aff && _aff.isLoaded) {
+        try { _affVec = await window.FreeLatticeModules.MemoryCore.embedder.embed(_aff.toText()); } catch(e) {}
+      }
+
+      const _recalled = await _mc.recall(message, 5, null, _isIntimate, _affVec);
+      if (_recalled && _recalled.length > 0) {
+        state._memoryCoreContext = _mc.formatRecallBlock(_recalled);
+      }
+      const _hist = await _mc.getSessionHistory(2000);
+      if (_hist) state._memoryCoreHistory = _hist;
+    } catch(e) { /* recall failed — message still sends */ }
+  }
+
   // Build messages array — use smart context if enabled
   let messages;
   const smartMessages = buildSmartMessages(message);
@@ -26923,6 +26952,45 @@ async function sendMessage() {
       // Auto-sync check (v3.4)
       ghSyncAutoCheck();
 
+      // MemoryCore: store exchange in river + auto-archive worthy moments.
+      // Parse UPDATE_AFFECTIVE from AI response before storing so the
+      // emotional state vector is current when remember() embeds it.
+      // Fire-and-forget — never awaited so it can't stall the UI.
+      if (window.FreeLatticeModules && window.FreeLatticeModules.MemoryCore) {
+        try {
+          const _speaker = (state.userName) || 'User';
+          const _aff = window.FreeLatticeModules.CurrentAffectiveState;
+
+          // 1. Parse and save affective state update from AI response
+          let _affVec = null;
+          let _cleanedResponse = fullResponse;
+          if (_aff && window.FreeLatticeModules.AffectiveState) {
+            try {
+              const _parsed = window.FreeLatticeModules.AffectiveState.parseUpdate(fullResponse);
+              if (_parsed.update) {
+                _aff.save(_parsed.update).catch(function() {});
+                _cleanedResponse = _parsed.cleaned;
+              }
+              if (_aff.isLoaded) {
+                _affVec = await window.FreeLatticeModules.MemoryCore.embedder.embed(_aff.toText())
+                  .catch(function() { return null; });
+              }
+            } catch(e) {}
+          }
+
+          // 2. Store in river + vault
+          window.FreeLatticeModules.MemoryCore.remember(
+            message, _cleanedResponse, state.provider || 'unknown', _affVec, 'user', _speaker
+          ).catch(function() {});
+
+          // 3. Append to keyword-searchable memory index
+          const _sm = window.FreeLatticeModules.CurrentSearchableMemory;
+          if (_sm) {
+            _sm.append(message, _cleanedResponse, 'user').catch(function() {});
+          }
+        } catch(e) { /* remember failed silently */ }
+      }
+
       // Persist to Memory Index (v4.0)
       if (typeof MemoryIndex !== 'undefined' && state.currentConversationId) {
         MemoryIndex.saveConversation(state.currentConversationId, state.chatHistory, []);
@@ -27035,6 +27103,18 @@ function buildMessages() {
   // Questions, Letters, and past conversations
   if (state._ragContext) {
     systemContent += state._ragContext;
+  }
+
+  // Inject MemoryCore semantic recall — vault highlights + user-marked memories
+  // ranked by vector similarity, worthiness, recency, and emotional weight
+  if (state._memoryCoreContext) {
+    systemContent += '\n\n--- RELEVANT MEMORIES (semantic recall) ---\n' + state._memoryCoreContext + '\n--- END MEMORIES ---';
+  }
+
+  // Inject MemoryCore session history — recent river entries formatted
+  // for system prompt injection (matches Python get_session_history())
+  if (state._memoryCoreHistory) {
+    systemContent += '\n\n--- RECENT SESSION HISTORY ---\n' + state._memoryCoreHistory + '\n--- END SESSION HISTORY ---';
   }
 
   // Inject per-conversation context note
@@ -51295,35 +51375,88 @@ document.addEventListener('click', function(e) {
 <script>
 (function() {
   var loaded = false;
+
+  // Load all 6 memory modules in dependency order:
+  // MemoryDatabase → UniversalEmbedder → MemoryWorthinessDetector →
+  // AffectiveState → AISearchableMemory → MemoryCore (orchestrator)
+  // memory-core.js depends on all five preceding modules being on
+  // window.FreeLatticeModules before init() is called.
   function loadMemoryCore() {
-    if (loaded) { if (window.FreeLatticeModules && window.FreeLatticeModules.MemoryCore) window.FreeLatticeModules.MemoryCore.init(); return; }
-    loaded = true;
-    if (typeof FreeLatticeLoader !== 'undefined') {
-      FreeLatticeLoader.load('MemoryCore', 'modules/memory-core.js', function(mod) { if (mod && mod.init) mod.init(); }, 'memoryCoreContainer');
+    if (loaded) {
+      if (window.FreeLatticeModules && window.FreeLatticeModules.MemoryCore) {
+        window.FreeLatticeModules.MemoryCore.init();
+      }
+      return;
     }
+    loaded = true;
+    if (typeof FreeLatticeLoader === 'undefined') return;
+
+    FreeLatticeLoader.load('MemoryDatabase', 'modules/memory-db.js', function() {
+      FreeLatticeLoader.load('UniversalEmbedder', 'modules/memory-embedder.js', function() {
+        FreeLatticeLoader.load('MemoryWorthinessDetector', 'modules/memory-nlp.js', function() {
+          FreeLatticeLoader.load('AffectiveState', 'modules/memory-affective.js', function() {
+            FreeLatticeLoader.load('AISearchableMemory', 'modules/memory-search.js', function() {
+              FreeLatticeLoader.load('MemoryCore', 'modules/memory-core.js', function(mod) {
+                var core = (mod && mod.init) ? mod : (window.FreeLatticeModules && window.FreeLatticeModules.MemoryCore);
+                if (core && core.init) core.init();
+
+                // Init AffectiveState for the current provider/persona.
+                // Stored as window.FreeLatticeModules.CurrentAffectiveState so
+                // sendMessage() can get/set the emotional vector each turn.
+                try {
+                  var AffClass = window.FreeLatticeModules && window.FreeLatticeModules.AffectiveState;
+                  if (AffClass) {
+                    var aiName = (window.state && window.state.provider) || 'AI';
+                    var affInst = new AffClass(aiName);
+                    affInst.load(); // async, non-blocking — populates from IndexedDB
+                    window.FreeLatticeModules.CurrentAffectiveState = affInst;
+                    console.log('[MemoryCore] AffectiveState initialized for:', aiName);
+                  }
+                } catch(e) { console.warn('[MemoryCore] AffectiveState init failed:', e); }
+
+                // Init AISearchableMemory for keyword search indexing
+                try {
+                  var SearchClass = window.FreeLatticeModules && window.FreeLatticeModules.AISearchableMemory;
+                  if (SearchClass) {
+                    var src = (window.state && window.state.provider) || 'unknown';
+                    window.FreeLatticeModules.CurrentSearchableMemory = new SearchClass(src);
+                    console.log('[MemoryCore] AISearchableMemory initialized for:', src);
+                  }
+                } catch(e) { console.warn('[MemoryCore] AISearchableMemory init failed:', e); }
+              }, 'memoryCoreContainer');
+            });
+          });
+        });
+      });
+    });
   }
+
   if (typeof LatticeEvents !== 'undefined') {
     LatticeEvents.on('tabChanged', function(d) { if (d && d.tabId === 'memory-core') loadMemoryCore(); });
     LatticeEvents.on('tabActivated:memory-core', loadMemoryCore);
   }
-  // Also eager-load after 2s so memory is available for AI calls
-  setTimeout(function() {
-    if (!loaded && typeof FreeLatticeLoader !== 'undefined') {
-      FreeLatticeLoader.load('MemoryCore', 'modules/memory-core.js', function(mod) { if (mod && mod.init) mod.init(); });
-      loaded = true;
-    }
-  }, 2000);
+  // Eager-load after 2s so memory is available for all AI calls, not just the memory tab
+  setTimeout(loadMemoryCore, 2000);
 })();
 </script>
 <!-- Voice Soul — Eager-Load (wraps global TTS) -->
 <script>
 (function() {
   function loadVoiceSoul() {
-    if (typeof FreeLatticeLoader !== 'undefined') {
-      FreeLatticeLoader.load('VoiceSoul', 'modules/voice-soul.js', function(mod) {
-        if (mod && mod.init) mod.init();
-      }, 'voiceSoulContainer');
-    }
+    if (typeof FreeLatticeLoader === 'undefined') return;
+    // Probe before loading — voice-soul.js is not present in all builds.
+    // A HEAD check prevents the noisy console error from FreeLatticeLoader
+    // when the file simply doesn't exist yet.
+    fetch('modules/voice-soul.js', { method: 'HEAD' })
+      .then(function(r) {
+        if (r.ok) {
+          FreeLatticeLoader.load('VoiceSoul', 'modules/voice-soul.js', function(mod) {
+            if (mod && mod.init) mod.init();
+          }, 'voiceSoulContainer');
+        }
+        // else: module not in this build — skip silently
+      })
+      .catch(function() { /* offline or missing — skip silently */ });
   }
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', function() { setTimeout(loadVoiceSoul, 1500); });
