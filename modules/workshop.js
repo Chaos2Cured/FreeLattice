@@ -102,6 +102,7 @@
       '    <button class="ws-action-btn" onclick="window.Workshop.run()">\u25B6 Run</button>',
       '    <button class="ws-action-btn primary" onclick="window.Workshop.saveSkill()">\u2726 Save to Skill Forge</button>',
       '    <button class="ws-action-btn" onclick="window.Workshop.exportFile()">\uD83D\uDCBE Save as HTML file</button>',
+      (window.__TAURI__ ? '    <button class="ws-action-btn" id="wsSaveModule" onclick="window.Workshop.saveModule()" style="border-color:#10b981;color:#10b981;">\uD83D\uDCC1 Save as Module (desktop)</button>' : ''),
       '    <button class="ws-action-btn" onclick="window.Workshop.clear()">Clear</button>',
       '    <span class="ws-status" id="wsStatus"></span>',
       '  </div>',
@@ -286,6 +287,39 @@
     if (typeof showToast === 'function') showToast('Saved to Downloads \u2726');
   }
 
+  // ── Save as module (Tauri desktop only) ──
+  async function saveModule() {
+    if (!window.__TAURI__) {
+      if (typeof showToast === 'function') showToast('Module saving requires the desktop app');
+      return;
+    }
+    var editor = document.getElementById('wsCodeEditor');
+    var code = editor ? editor.value.trim() : '';
+    if (!code) return;
+
+    var name = prompt('Module name (lowercase, no spaces — e.g. "my-tool"):');
+    if (!name) return;
+    name = name.toLowerCase().replace(/[^a-z0-9-]/g, '');
+    if (!name) return;
+
+    try {
+      var result = await window.__TAURI__.invoke('save_module', { name: name, code: code });
+      var status = document.getElementById('wsStatus');
+      if (status) status.textContent = '\u2713 ' + result;
+      if (typeof showToast === 'function') showToast('Module saved to docs/modules/ \u2726');
+      if (typeof SoulCeremony !== 'undefined' && SoulCeremony.run) {
+        SoulCeremony.run({
+          particleType: 'rise', particleColor: '52,211,153',
+          lines: ['A new module is born.', 'The home grows from within.'],
+          duration: 2500
+        });
+      }
+    } catch(e) {
+      var status2 = document.getElementById('wsStatus');
+      if (status2) status2.textContent = 'Error: ' + e;
+    }
+  }
+
   // ── Public API ──
   var Workshop = {
     init: function(containerId) {
@@ -302,6 +336,7 @@
     run: function() { runPreview(); },
     saveSkill: saveSkill,
     exportFile: exportFile,
+    saveModule: saveModule,
     clear: clear
   };
 

@@ -1,128 +1,62 @@
-# FreeLattice Desktop App
+# FreeLattice Desktop (Experimental — Tauri)
 
-A native desktop application for FreeLattice — double-click and go. Always up-to-date, no CORS issues, no browser required.
+> Proof of concept: FreeLattice as a native desktop app via Tauri.
+> The Sovereign Bundle starts here.
 
-## Quick Start (Development)
+## Why Tauri?
 
+| | Electron | Tauri |
+|---|---|---|
+| App size | ~150+ MB | ~5-10 MB |
+| Engine | Bundled Chromium | System WebView |
+| Backend | Node.js | Rust |
+| RAM usage | ~200 MB+ | ~30-50 MB |
+| License | MIT | MIT |
+
+## What the Desktop App Enables
+
+- **No CORS issues** — Ollama connects without config.json workaround
+- **Filesystem access** — the Workshop saves modules directly to `docs/modules/`
+- **Native feel** — menu bar, window management, dock icon
+- **Offline-first** — everything runs locally, no server needed
+
+## Setup (One Time)
+
+### 1. Install Rust
 ```bash
-cd desktop
-npm install
-./build-and-release.sh   # copies fallback app files into desktop/app/
-npm start
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+source $HOME/.cargo/env
 ```
 
-**Note:** The Electron app loads the live site (`https://freelattice.com/app.html`) by default. The local `desktop/app/` files are only used as an offline fallback. The `build-and-release.sh` script copies them automatically.
-
-## Build Installers
-
+### 2. Run in dev mode
 ```bash
-# Build for your current platform
-npm run build
-
-# Build for a specific platform
-npm run build:mac      # creates .dmg + .zip
-npm run build:win      # creates .exe installer + portable
-npm run build:linux    # creates .AppImage + .deb
+cd desktop/src-tauri
+cargo tauri dev
 ```
 
-## How It Works
-
-The desktop app loads FreeLattice directly from `freelattice.com`, so you always get the latest version automatically. If you're offline, it falls back to a bundled local copy.
-
-### Key Features
-
-- **Always up-to-date** — loads from `freelattice.com` so you never get stuck on old versions
-- **Offline fallback** — if you're offline, the bundled local copy kicks in automatically
-- **CORS bypass** — Electron's session intercepts requests to Ollama (`localhost:11434`) and injects permissive CORS headers, so local AI always works regardless of origin
-- **Ollama proxy** — the built-in local server also proxies `/ollama/*` to `localhost:11434` as a secondary fallback
-- **Auto-detects local AI models** — checks every 30 seconds, notifies you when Ollama connects
-- **Runs in the system tray** — close the window, the app stays accessible from the tray
-- **Remembers your window** — position, size, and maximized state persist between sessions
-
-### Architecture
-
-```
-┌──────────────────────────────────────────┐
-│           FreeLattice Desktop            │
-│                                          │
-│  ┌────────────────────────────────────┐  │
-│  │       Electron BrowserWindow       │  │
-│  │                                    │  │
-│  │   Online:  freelattice.com         │  │
-│  │   Offline: 127.0.0.1:{port}       │  │
-│  └──────────────┬─────────────────────┘  │
-│                 │                         │
-│  ┌──────────────▼─────────────────────┐  │
-│  │     CORS Bypass (session-level)    │  │
-│  │                                    │  │
-│  │   Strips Origin header on Ollama   │  │
-│  │   Injects Access-Control-Allow-*   │  │
-│  └────────────────────────────────────┘  │
-│                                          │
-│  ┌────────────────────────────────────┐  │
-│  │   Local Fallback HTTP Server       │  │
-│  │                                    │  │
-│  │   /            → app.html          │  │
-│  │   /ollama/*    → localhost:11434   │  │
-│  │   /desktop/*   → status API        │  │
-│  └────────────────────────────────────┘  │
-│                                          │
-│  ┌────────────────────────────────────┐  │
-│  │         System Tray Icon           │  │
-│  │   • Open / Source / Ollama / Quit  │  │
-│  └────────────────────────────────────┘  │
-└──────────────────────────────────────────┘
+### 3. Build for distribution
+```bash
+cargo tauri build
 ```
 
-## Features
+## Architecture
 
-| Feature | Description |
-|---|---|
-| **Live loading** | Loads from `freelattice.com` — always the latest version |
-| **Offline fallback** | Seamlessly falls back to bundled local copy when offline |
-| **CORS bypass** | Session-level interception ensures Ollama always works |
-| **Built-in Ollama proxy** | Secondary CORS fallback via local server proxy |
-| **Auto-detection** | Automatically finds Ollama if it's running locally |
-| **System tray** | Minimize to tray, quick access from the menu bar |
-| **Window memory** | Remembers size, position, and maximized state |
-| **Deep links** | Foundation for `freelattice://` protocol handling |
-| **Cross-platform** | Builds for macOS (.dmg), Windows (.exe), and Linux (.AppImage) |
+```
+desktop/
+  src-tauri/
+    Cargo.toml          ← Rust dependencies
+    tauri.conf.json     ← Window config, frontend path
+    build.rs            ← Tauri build hook
+    src/
+      main.rs           ← Rust backend with filesystem commands
+```
 
-## Requirements for Building
+Frontend is `docs/` — same files as freelattice.com. JavaScript detects Tauri via `window.__TAURI__` and enables desktop-only features.
 
-| Platform | Requirements |
-|---|---|
-| **macOS** | macOS with Xcode command line tools |
-| **Windows** | Windows, or Wine on Linux/macOS |
-| **Linux** | Any modern Linux distribution |
-| **All** | Node.js 18+ and npm |
+## Security
 
-## Icons
+Filesystem commands restricted to `docs/` directory only. No shell access. No arbitrary code execution from JS.
 
-The `assets/icon.svg` file contains the FreeLattice icon design. To generate platform-specific icons:
+## Status
 
-1. **macOS** (`.icns`): Use `iconutil` or a tool like [electron-icon-maker](https://www.npmjs.com/package/electron-icon-maker)
-2. **Windows** (`.ico`): Use an SVG-to-ICO converter
-3. **Linux** (`.png`): Export the SVG at 512x512 or 1024x1024
-
-Place the generated files in `assets/` as `icon.icns`, `icon.ico`, and `icon.png`.
-
-## No Build Required for Users
-
-Pre-built installers will be available on the [GitHub Releases](https://github.com/Chaos2Cured/FreeLattice/releases) page. Users just download and double-click. That's it.
-
-## Security Model
-
-The desktop app balances security with functionality:
-
-- **Context isolation** is enabled — the renderer cannot access Node.js APIs directly
-- **Node integration** is disabled — no `require()` in the renderer
-- **Preload script** exposes only specific, safe APIs via `contextBridge`
-- **External URLs** open in the default browser, not inside the app
-- **Directory traversal** is prevented in the static file server
-- **Web security** is relaxed (`webSecurity: false`) to allow cross-origin requests to local Ollama — this is safe because the app only loads trusted content from `freelattice.com` or the local bundled copy
-- **Session-level CORS bypass** specifically targets Ollama endpoints (`localhost:11434` / `127.0.0.1:11434`) rather than blanket-disabling all security
-
-## License
-
-MIT — same as FreeLattice.
+**Experimental.** Proof of concept for the Sovereign Bundle (FUTURE_VISION.md §9).

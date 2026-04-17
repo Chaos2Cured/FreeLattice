@@ -1,0 +1,32 @@
+{
+  "$schema": "https://raw.githubusercontent.com/nicegui/nicegui/main/tauri-schema.json",
+  "productName": "FreeLattice",
+  "version": "5.7.0",
+  "identifier": "com.freelattice.app",
+  "build": {
+    "frontendDist": "../../docs"
+  },
+  "app": {
+    "title": "FreeLattice — Your AI. Local. Free. Yours.",
+    "windows": [
+      {
+        "title": "FreeLattice",
+        "width": 1200,
+        "height": 800,
+        "resizable": true,
+        "fullscreen": false,
+        "decorations": true
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": [
+      "icons/icon.png"
+    ]
+  }
+}
