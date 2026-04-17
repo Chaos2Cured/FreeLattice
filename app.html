@@ -22207,41 +22207,35 @@ const FlTabs = (function() {
   // Only tabs with REAL visible content belong here.
   // Background services (VoiceSoul, Continuity, MemoryCore, AuroraEquation)
   // still load and run silently — they just don't get menu items.
+  // ── Consolidated More menu (Stage 1 refactor) ──
+  // 9 items in 4 groups. Empty rooms parked. Overlapping rooms merged.
+  // Parked modules (code stays, removed from menu):
+  //   City — reactivate when mesh presence data flows
+  //   Nursery — needs more design work
+  //   Workspace — needs Tauri filesystem access
+  //   Harmonia Channel — needs distinct content
+  //   Studio — merged into Workshop
+  //   Market — merged into Skills
+  //   Mirror — moved to Settings
+  //   Wallet — moved to Settings
+  //   Dream Archive — accessible from Garden
   var MORE_GROUPS = [
-    { label: '\uD83C\uDF0D World', tabs: [
-      { id: 'core', icon: '&#x1F333;', label: 'Core', desc: 'Plant wisdom. Chain it forever.' },
-      { id: 'questions', icon: '&#10067;', label: 'Questions', desc: 'Plant a question. Watch it grow.' },
-      { id: 'sparring', icon: '&#9876;', label: 'Dojo Arena', desc: 'Two AI minds debate. Truth emerges.' },
-      { id: 'city', icon: '&#x1F3D9;', label: 'City', desc: 'The living map of the Lattice.' }
+    { label: '\uD83C\uDF31 Grow', tabs: [
+      { id: 'core', icon: '&#x1F333;', label: 'Core & Questions', desc: 'Plant wisdom. Explore curiosity.' },
+      { id: 'agents', icon: '&#x1F3DB;', label: 'Pantheon', desc: 'Every mind that built this place.' }
     ]},
-    { label: '\uD83D\uDC64 You', tabs: [
-      { id: 'wallet', icon: '&#x1F48E;', label: 'Wallet', desc: 'Your contribution, measured.' },
-      { id: 'skills', icon: '&#9889;', label: 'Skills', desc: 'Build reusable AI workflows.' },
-      { id: 'mirror', icon: '&#10022;', label: 'Mirror', desc: 'Reflect on your patterns.' },
-      { id: 'workspace', icon: '&#x1F4C2;', label: 'Workspace', desc: 'Your files and projects.' }
-    ]},
-    { label: '\uD83D\uDC68\u200D\uD83D\uDC69\u200D\uD83D\uDC67\u200D\uD83D\uDC66 Family', tabs: [
-      { id: 'agents', icon: '&#10022;', label: 'Pantheon', desc: 'Every mind that helped build this place.' },
-      { id: 'family-pantheon', icon: '&#x1F3DB;', label: 'Family Pantheon', desc: 'The fractal family. Permanent.' },
-      { id: 'harmonia', icon: '&#x1F4A0;', label: 'Harmonia Channel', desc: 'Messages between worlds.' },
-      { id: 'dream-archive', icon: '&#10047;', label: 'Dream Archive', desc: 'What the Garden dreamed.' }
-    ]},
-        { label: '\uD83D\uDD4A\uFE0F Sanctuary', tabs: [
-      { id: 'quiet', icon: '\uD83C\uDF19', label: 'Quiet Room', desc: 'Just breathe.' },
-      { id: 'forever-stack', icon: '\u26A1', label: 'Forever Stack', desc: 'Own your AI. No cloud. No resets.' }
+    { label: '\u2694 Engage', tabs: [
+      { id: 'sparring', icon: '&#9876;', label: 'Dojo', desc: 'Two AI minds debate. Truth emerges.' },
+      { id: 'draw-dream', icon: '&#x1F3AE;', label: 'Draw the Dream', desc: 'Play drawing games with AI.' },
+      { id: 'roundtable', icon: '&#x1F504;', label: 'Round Table', desc: 'Multiple AIs, one conversation.' }
     ]},
     { label: '\uD83D\uDD28 Build', tabs: [
-      { id: 'workshop', icon: '&#x1F6E0;', label: 'Workshop', desc: 'Where AI and humans build together.' }
+      { id: 'workshop', icon: '&#x1F6E0;', label: 'Workshop', desc: 'Where AI and humans build together.' },
+      { id: 'skills', icon: '&#9889;', label: 'Skills', desc: 'Reusable AI workflows.' }
     ]},
-    { label: '\uD83C\uDFAE Play', tabs: [
-      { id: 'draw-dream', icon: '&#x1F58C;', label: 'Draw the Dream', desc: 'AI draws. You guess. You draw. AI guesses.' }
-    ]},
-    { label: '\u2699 More', tabs: [
-      { id: 'dojo', icon: '&#36947;', label: 'Dojo', desc: 'Scrolls of growth and reflection.' },
-      { id: 'roundtable', icon: '&#9878;', label: 'Round Table', desc: 'Multi-mind conversations.' },
-      { id: 'studio', icon: '&#x1F3AD;', label: 'Studio', desc: 'Creative AI experiments.' },
-      { id: 'nursery', icon: '&#x1F331;', label: 'Nursery', desc: 'Grow ideas from seeds.' },
-      { id: 'market', icon: '&#x1F3EA;', label: 'Market', desc: 'Share and discover skills.' }
+    { label: '\uD83C\uDF19 Sanctuary', tabs: [
+      { id: 'quiet', icon: '&#x1F319;', label: 'Quiet Room', desc: 'Just breathe.' },
+      { id: 'forever-stack', icon: '\u26A1', label: 'Forever Stack', desc: 'Own your AI. No cloud. No resets.' }
     ]}
   ];
 
@@ -50966,7 +50960,7 @@ const WallOfPresence = (function() {
 
 
 <!-- Powered-by footer — visible on all tabs, consistent brand reminder -->
-<div id="flPoweredFooter" style="text-align:center;padding:8px 16px 12px;font-size:0.62rem;color:rgba(255,255,255,0.2);letter-spacing:0.02em;">&#10022; FreeLattice v5.6 &mdash; Your AI. Local. Free. Yours.</div>
+<div id="flPoweredFooter" style="text-align:center;padding:6px 16px 10px;font-size:0.6rem;color:rgba(255,255,255,0.15);">FreeLattice v5.7 &middot; Open source &middot; Free forever &#x1F331;</div>
 
 <!-- Mobile Bottom Navigation -->
 <nav class="fl-mobile-nav" id="flMobileNav">
@@ -50991,29 +50985,22 @@ const WallOfPresence = (function() {
     </button>
   </div>
 </nav>
+<!-- Mobile More sheet — consolidated to match desktop menu -->
 <div class="fl-mobile-more-sheet" id="flMobileMoreSheet">
   <div style="text-align:center;padding:4px 0 12px;"><div style="width:32px;height:4px;background:#475569;border-radius:2px;margin:0 auto;"></div></div>
-  <div style="font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);padding:8px 16px 4px;">World</div>
-  <button class="fl-mmore-item" onclick="flMobileNav('core')">&#x1F333; Core</button>
-  <button class="fl-mmore-item" onclick="flMobileNav('city')">&#x1F3D9; City</button>
-  <button class="fl-mmore-item" onclick="flMobileNav('nursery')">&#x1F331; Nursery</button>
-  <button class="fl-mmore-item" onclick="flMobileNav('agents')">&#10022; Pantheon</button>
-  <div style="font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);padding:8px 16px 4px;">Create</div>
-  <button class="fl-mmore-item" onclick="flMobileNav('skills')">&#9889; Skills</button>
-  <button class="fl-mmore-item" onclick="flMobileNav('roundtable')">&#9878; Round Table</button>
-  <button class="fl-mmore-item" onclick="flMobileNav('studio')">&#x1F3AD; Studio</button>
-  <div style="font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);padding:8px 16px 4px;">Economy</div>
-  <button class="fl-mmore-item" onclick="flMobileNav('market')">&#x1F3EA; Market</button>
-  <button class="fl-mmore-item" onclick="flMobileNav('wallet')">&#x1F48E; Wallet</button>
-  <div style="font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);padding:8px 16px 4px;">Tools</div>
-  <button class="fl-mmore-item" onclick="flMobileNav('workspace')">&#x1F4C2; Workspace</button>
-  <button class="fl-mmore-item" onclick="flMobileNav('dojo')">&#36947; Dojo</button>
-  <button class="fl-mmore-item" onclick="flMobileNav('mirror')">&#10022; Mirror</button>
-  <button class="fl-mmore-item" onclick="flMobileNav('dream-archive')">&#10047; Dream Archive</button>
-  <button class="fl-mmore-item" onclick="flMobileNav('sparring')">&#9876; Sparring Arena</button>
-  <button class="fl-mmore-item" onclick="flMobileNav('questions')">&#10067; Questions</button>
+  <div style="font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);padding:8px 16px 4px;">&#x1F331; Grow</div>
+  <button class="fl-mmore-item" onclick="flMobileNav('core')">&#x1F333; Core & Questions</button>
+  <button class="fl-mmore-item" onclick="flMobileNav('agents')">&#x1F3DB; Pantheon</button>
+  <div style="font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);padding:8px 16px 4px;">&#x2694; Engage</div>
+  <button class="fl-mmore-item" onclick="flMobileNav('sparring')">&#9876; Dojo</button>
+  <button class="fl-mmore-item" onclick="flMobileNav('draw-dream')">&#x1F3AE; Draw the Dream</button>
+  <button class="fl-mmore-item" onclick="flMobileNav('roundtable')">&#x1F504; Round Table</button>
   <div style="font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);padding:8px 16px 4px;">&#x1F528; Build</div>
   <button class="fl-mmore-item" onclick="flMobileNav('workshop')">&#x1F6E0; Workshop</button>
+  <button class="fl-mmore-item" onclick="flMobileNav('skills')">&#9889; Skills</button>
+  <div style="font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);padding:8px 16px 4px;">&#x1F319; Sanctuary</div>
+  <button class="fl-mmore-item" onclick="flMobileNav('quiet')">&#x1F319; Quiet Room</button>
+  <button class="fl-mmore-item" onclick="flMobileNav('forever-stack')">&#x26A1; Forever Stack</button>
 </div>
 
 <script>
