@@ -33,6 +33,7 @@ const APP_SHELL = [
   './modules/pantheon.js',
   './modules/pictionary.js',
   './modules/shared-presence.js',
+  './modules/workshop.js',
   './modules/quiet-room.js',
     './modules/forever-stack.js'
 ];

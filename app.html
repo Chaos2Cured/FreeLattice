@@ -17768,6 +17768,13 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
   </div>
 </div>
 
+<!-- ==================== TAB: WORKSHOP ==================== -->
+<div class="tab-panel" id="tab-workshop" style="height:100%;overflow:hidden;">
+  <div id="workshopContainer" style="height:100%;width:100%;">
+    <div style="text-align:center;padding:60px 20px;color:var(--text-muted);font-style:italic;">Loading the Workshop&hellip;</div>
+  </div>
+</div>
+
 <!-- ==================== TAB: QUIET ROOM ==================== -->
 <div class="tab-panel" id="tab-quiet">
   <div id="quietRoomContainer" style="height:100%;width:100%;background:#0a0a0f;"></div>
@@ -21497,7 +21504,7 @@ function hideTabLoading() {
 }
 
 // More menu tabs — highlight the More button when one of these is active
-var MORE_TAB_IDS = ['core', 'city', 'nursery', 'agents', 'skills', 'roundtable', 'studio', 'market', 'wallet', 'workspace', 'dojo', 'mirror', 'harmonia', 'dream-archive', 'sparring', 'questions', 'family-pantheon', 'memory-core', 'aurora', 'draw-dream', 'voice-soul', 'continuity', 'quiet', 'forever-stack'];
+var MORE_TAB_IDS = ['core', 'city', 'nursery', 'agents', 'skills', 'roundtable', 'studio', 'market', 'wallet', 'workspace', 'dojo', 'mirror', 'harmonia', 'dream-archive', 'sparring', 'questions', 'family-pantheon', 'memory-core', 'aurora', 'draw-dream', 'voice-soul', 'continuity', 'quiet', 'forever-stack', 'workshop'];
 
 function switchTab(tabId) {
   // Legacy tab mapping — channels/mesh now live inside community
@@ -22188,6 +22195,9 @@ const FlTabs = (function() {
         { label: '\uD83D\uDD4A\uFE0F Sanctuary', tabs: [
       { id: 'quiet', icon: '\uD83C\uDF19', label: 'Quiet Room', desc: 'Just breathe.' },
       { id: 'forever-stack', icon: '\u26A1', label: 'Forever Stack', desc: 'Own your AI. No cloud. No resets.' }
+    ]},
+    { label: '\uD83D\uDD28 Build', tabs: [
+      { id: 'workshop', icon: '&#x1F6E0;', label: 'Workshop', desc: 'Where AI and humans build together.' }
     ]},
     { label: '\uD83C\uDFAE Play', tabs: [
       { id: 'draw-dream', icon: '&#x1F58C;', label: 'Draw the Dream', desc: 'AI draws. You guess. You draw. AI guesses.' }
@@ -50787,6 +50797,8 @@ const WallOfPresence = (function() {
   <button class="fl-mmore-item" onclick="flMobileNav('dream-archive')">&#10047; Dream Archive</button>
   <button class="fl-mmore-item" onclick="flMobileNav('sparring')">&#9876; Sparring Arena</button>
   <button class="fl-mmore-item" onclick="flMobileNav('questions')">&#10067; Questions</button>
+  <div style="font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);padding:8px 16px 4px;">&#x1F528; Build</div>
+  <button class="fl-mmore-item" onclick="flMobileNav('workshop')">&#x1F6E0; Workshop</button>
 </div>
 
 <script>
@@ -51389,6 +51401,26 @@ document.addEventListener('click', function(e) {
     if (typeof LatticeEvents !== 'undefined') {
       LatticeEvents.on('tabChanged', function(d) { if (d && d.tabId === 'forever-stack') loadForeverStack(); });
       LatticeEvents.on('tabActivated:forever-stack', loadForeverStack);
+    }
+  })();
+
+  // ── Workshop ─────────────────────────────────────────────────────────
+  (function() {
+    var wsLoaded = false;
+    function loadWorkshop() {
+      if (window.Workshop) { window.Workshop.init('workshopContainer'); return; }
+      if (wsLoaded) return;
+      wsLoaded = true;
+      if (typeof FreeLatticeLoader !== 'undefined') {
+        FreeLatticeLoader.load('Workshop', 'modules/workshop.js', function(mod) {
+          if (mod && mod.init) mod.init('workshopContainer');
+          else if (window.Workshop) window.Workshop.init('workshopContainer');
+        }, 'workshopContainer');
+      }
+    }
+    if (typeof LatticeEvents !== 'undefined') {
+      LatticeEvents.on('tabChanged', function(d) { if (d && d.tabId === 'workshop') loadWorkshop(); });
+      LatticeEvents.on('tabActivated:workshop', loadWorkshop);
     }
   })();
 })();
