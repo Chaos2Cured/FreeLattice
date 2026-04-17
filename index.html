@@ -14745,6 +14745,13 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
   <div class="fl-more-dropdown" id="flMoreDropdown"></div>
 </div>
 
+<!-- PWA Install Banner — shows when the browser supports install -->
+<div id="flInstallBanner" style="display:none;background:rgba(212,160,23,0.08);border:1px solid rgba(212,160,23,0.2);border-radius:10px;margin:8px 16px;padding:10px 16px;display:none;align-items:center;gap:12px;flex-wrap:wrap;">
+  <span style="font-size:0.85rem;color:var(--text-primary);flex:1;min-width:0;">&#x1F4F2; Install FreeLattice &mdash; works offline, own window</span>
+  <button onclick="flInstallPWA()" style="background:#d4a017;color:#0a0a14;border:none;border-radius:8px;padding:8px 16px;font-weight:600;font-size:0.82rem;cursor:pointer;min-height:36px;">Install</button>
+  <button onclick="document.getElementById('flInstallBanner').style.display='none';localStorage.setItem('fl-install-dismissed','1')" style="background:none;border:none;color:var(--text-muted);font-size:0.78rem;cursor:pointer;">Maybe later</button>
+</div>
+
 <!-- ==================== TAB 1: CHAT ==================== -->
 <div class="tab-panel" id="tab-chat">
 <div class="container">
@@ -24685,6 +24692,33 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // First-visit welcome overlay — shown once, only if no API key is configured
   flMaybeShowWelcome();
+
+  // ── PWA Install Prompt ──
+  // When the browser fires beforeinstallprompt, we capture it and show
+  // a gentle banner. The user taps Install → native install dialog.
+  // "Maybe later" dismisses for the session.
+  var _flDeferredInstallPrompt = null;
+  window.addEventListener('beforeinstallprompt', function(e) {
+    e.preventDefault();
+    _flDeferredInstallPrompt = e;
+    // Don't show if already dismissed or already installed
+    if (localStorage.getItem('fl-install-dismissed') === '1') return;
+    if (window.matchMedia('(display-mode: standalone)').matches) return;
+    var banner = document.getElementById('flInstallBanner');
+    if (banner) banner.style.display = 'flex';
+  });
+  window.flInstallPWA = function() {
+    if (!_flDeferredInstallPrompt) return;
+    _flDeferredInstallPrompt.prompt();
+    _flDeferredInstallPrompt.userChoice.then(function(result) {
+      if (result.outcome === 'accepted') {
+        if (typeof showToast === 'function') showToast('\u2713 FreeLattice installed! Find it in your dock.');
+      }
+      _flDeferredInstallPrompt = null;
+      var banner = document.getElementById('flInstallBanner');
+      if (banner) banner.style.display = 'none';
+    });
+  };
 
   // Defer Mesh ID — Cryptographic Identity (v5.0)
   // Not needed on first render — loads when Mesh tab or any Mesh operation is triggered
