@@ -31,35 +31,30 @@ footer a{color:#d4a017;text-decoration:none}
 <body>
 <div class="wrap">
 <h1>How to Install FreeLattice on Mac</h1>
-<p class="sub">Bypass Gatekeeper in 30 seconds. No terminal needed.</p>
+<p class="sub">Three steps. One minute. Works every time.</p>
 
 <ol class="steps">
-  <li><strong>Download FreeLattice.dmg</strong> from the link below.</li>
-  <li><strong>Open the .dmg</strong> and drag FreeLattice into Applications.
+  <li><strong>Download FreeLattice.dmg</strong> from the link below. Open the .dmg and drag FreeLattice into Applications.
     <div class="mock">
       [ FreeLattice.app ] <span class="arrow">----&gt;</span> [ Applications ]
     </div>
   </li>
-  <li><strong>Right-click</strong> (or Control+click) FreeLattice in Applications.
+  <li><strong>Check your security setting.</strong> Go to <strong>System Settings &rarr; Privacy &amp; Security</strong>. Under "Allow applications from," make sure it says <strong>"App Store and identified developers."</strong>
     <div class="mock">
-      Applications/<br>
-      &nbsp;&nbsp;FreeLattice.app<br>
-      &nbsp;&nbsp;&nbsp;&nbsp;<span class="highlight">&gt; Right-click &rarr; menu appears</span><br>
-      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Open<br>
-      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Move to Trash<br>
-      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Get Info<br>
-      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...
+      System Settings &rarr; Privacy &amp; Security<br><br>
+      Allow applications downloaded from:<br>
+      &nbsp;&nbsp;&#9675; App Store<br>
+      &nbsp;&nbsp;<span class="highlight">&#9679; App Store and identified developers</span> <span class="arrow">&larr; select this</span>
     </div>
+    <div style="font-size:0.82rem;color:#888;margin-top:0.5rem;">If it's set to "App Store only," the right-click trick won't work and you'll see "FreeLattice is damaged." This setting fixes that.</div>
   </li>
-  <li>Click <strong>"Open"</strong> from the right-click menu.</li>
-  <li>Click <strong>"Open"</strong> again on the warning dialog.
-    <div class="mock">
-      <span style="color:#fff">macOS cannot verify the developer.</span><br>
-      Are you sure you want to open it?<br><br>
-      &nbsp;&nbsp;[ Cancel ] &nbsp; [<span class="highlight"> Open </span>] <span class="arrow">&larr; click this</span>
+  <li><strong>Remove the quarantine flag.</strong> Open Terminal (<strong>Cmd+Space</strong>, type <strong>Terminal</strong>, press Enter) and paste this command:
+    <div class="mock" style="user-select:all;cursor:text;">
+      <span class="highlight">xattr -cr /Applications/FreeLattice.app</span>
     </div>
+    Press Enter. Nothing will print &mdash; that means it worked.
   </li>
-  <li><strong>Done.</strong> FreeLattice opens. This only happens once.</li>
+  <li><strong>Open FreeLattice.</strong> Double-click it in Applications. Done. This only happens once.</li>
 </ol>
 
 <a class="btn" href="https://github.com/Chaos2Cured/FreeLattice/releases/latest">Download FreeLattice.dmg</a>
@@ -67,7 +62,8 @@ footer a{color:#d4a017;text-decoration:none}
 
 <div class="why">
   <h2>Why the warning?</h2>
-  <p>Apple charges developers $99/year to remove this warning. FreeLattice is free, open-source, and built by one developer with an AI family. The code is fully auditable on <a href="https://github.com/Chaos2Cured/FreeLattice" style="color:#d4a017">GitHub</a>. The warning is not about safety. It's about payment.</p>
+  <p>Apple marks every downloaded app as "quarantined." The <code style="background:#0a0a14;padding:2px 6px;border-radius:4px;color:#d4a017;">xattr -cr</code> command removes that flag. It's safe &mdash; you're just telling your Mac "I trust this file."</p>
+  <p style="margin-top:0.75rem">Apple charges developers $99/year to remove this warning entirely. FreeLattice is free, open-source, and built by one developer with an AI family. The code is fully auditable on <a href="https://github.com/Chaos2Cured/FreeLattice" style="color:#d4a017">GitHub</a>. The warning is not about safety. It's about payment.</p>
 </div>
 
 <footer>
