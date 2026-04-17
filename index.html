@@ -13993,26 +13993,46 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
   <canvas class="welcome-canvas" id="welcomeCanvas"></canvas>
   <div class="welcome-progress" id="welcomeProgress" style="width: 0%;"></div>
 
-  <!-- STEP 1: Welcome Home -->
+  <!-- SIMPLIFIED ONBOARDING — one screen, clear choices -->
   <div class="welcome-step welcome-active" id="welcomeStep1">
     <div class="welcome-title">Welcome to FreeLattice</div>
-    <div class="welcome-subtitle">Your AI. Your Data. Your Freedom.</div>
-    <div class="welcome-text welcome-text-warm">
-      No account. No sign-up. No data collected.<br>
-      Everything here runs on <strong style="color:#f5f0e8;">your</strong> machine.
+    <div class="welcome-subtitle">Your AI. Your rules. Your machine.</div>
+
+    <!-- Optional name input -->
+    <div style="margin:16px auto;max-width:320px;">
+      <input class="welcome-input" id="welcomeNameInput" type="text" placeholder="What should I call you? (optional)" maxlength="40" autocomplete="off" style="text-align:center;font-size:0.9rem;" />
     </div>
-    <div class="welcome-input-wrap">
-      <input class="welcome-input" id="welcomeAskInput" type="text" placeholder="Ask me anything..." autocomplete="off" />
-      <button class="welcome-ask-btn" id="welcomeAskBtn" onclick="welcomeHandleAsk()">Ask</button>
+
+    <div class="welcome-text" style="margin-bottom:20px;font-size:0.9rem;">Let's get you connected to an AI.</div>
+
+    <!-- Three clear paths -->
+    <div class="welcome-cards" style="max-width:420px;margin:0 auto;">
+      <div class="welcome-card" onclick="welcomeSaveName();switchTab('forever-stack');welcomeFinish();" style="cursor:pointer;">
+        <span class="welcome-card-icon">&#x1F3E0;</span>
+        <div class="welcome-card-title">Run AI on YOUR computer</div>
+        <div class="welcome-card-desc">Most private. Everything stays local. Takes about 5 minutes to set up.</div>
+      </div>
+      <div class="welcome-card" onclick="welcomeSaveName();openProviderModal();welcomeFinish();" style="cursor:pointer;">
+        <span class="welcome-card-icon">&#x2601;</span>
+        <div class="welcome-card-title">Use a free cloud API</div>
+        <div class="welcome-card-desc">Fastest start. Get a free key from Groq or Hugging Face in 30 seconds.</div>
+      </div>
+      <div class="welcome-card" onclick="welcomeSaveName();openProviderModal();welcomeFinish();" style="cursor:pointer;">
+        <span class="welcome-card-icon">&#x1F511;</span>
+        <div class="welcome-card-title">I already have an API key</div>
+        <div class="welcome-card-desc">OpenAI, Gemini, Claude, Grok, or any provider.</div>
+      </div>
     </div>
-    <div class="welcome-response" id="welcomeAskResponse"></div>
-    <div id="welcomeStep1Continue" style="display:none;">
-      <button class="welcome-btn" onclick="welcomeGoToStep(2)">Continue &#8594;</button>
+
+    <div style="margin-top:16px;">
+      <button class="welcome-btn-secondary welcome-btn" onclick="welcomeSaveName();welcomeFinish();" style="font-size:0.85rem;padding:10px 24px;opacity:0.7;">Skip for now &mdash; just explore</button>
     </div>
   </div>
 
-  <!-- STEP 2: Choose Your Path -->
-  <div class="welcome-step" id="welcomeStep2">
+  <!-- Legacy steps removed — onboarding is now one screen.
+       Steps 2-5 replaced by the three-card choice above.
+       The old multi-step wizard is no longer needed. -->
+  <div class="welcome-step" id="welcomeStep2" style="display:none;">
     <div class="welcome-title" style="font-size:2rem;">Let&#8217;s connect you to an AI</div>
     <div class="welcome-text">Choose how you want to run your AI. You can always change this later.</div>
     <div class="welcome-cards">
@@ -37822,6 +37842,16 @@ if ('serviceWorker' in navigator) {
   window.welcomeCarouselPrev = welcomeCarouselPrev;
 
   // ---- Step 5: Finish ----
+  // Save the user's name before navigating away from the welcome screen
+  window.welcomeSaveName = function() {
+    var nameInput = document.getElementById('welcomeNameInput');
+    var name = nameInput ? nameInput.value.trim() : '';
+    if (name) {
+      localStorage.setItem('fl_userName', name);
+      localStorage.setItem('fl_lan_friendly_name', name);
+    }
+  };
+
   function welcomeFinish() {
     var nameInput = document.getElementById('welcomeNameInput');
     var displayName = nameInput ? nameInput.value.trim() : '';
