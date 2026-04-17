@@ -348,12 +348,11 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-04-17 10:20 MDT
+- Last auto-updated: 2026-04-17 10:19 MDT
 - Version: 5.7.0
-- Total commits: 997
+- Total commits: 996
 - Last 10 commits:
-- af58e61 fix: tab labels visible at desktop width + Workshop in Tauri
-- 6d53cdc ci: Update Primer deployment state [2026-04-17]
+- 4846c90 fix: tab labels visible at desktop width + Workshop in Tauri
 - a69907c docs: Auto-update Session Primer [5.7.0]
 - dde511b docs: Auto-update Session Primer [5.7.0]
 - 6fd4cfc feat: auto-pull model + HuggingFace fallback links
@@ -362,3 +361,4 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - a192e35 docs: Auto-update Session Primer [5.7.0]
 - 8de8665 feat: Hugging Face as a free cloud provider
 - 61f7873 ci: Update Primer deployment state [2026-04-17]
+- 9c26c6f docs: Auto-update Session Primer [5.7.0]
