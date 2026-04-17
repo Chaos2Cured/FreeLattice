@@ -348,17 +348,17 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-04-16 20:12 MDT
+- Last auto-updated: 2026-04-16 20:25 MDT
 - Version: 5.7.0
-- Total commits: 972
+- Total commits: 977
 - Last 10 commits:
-- 098339e feat: The AI Workshop — sandboxed code environment
+- 6976974 feat: storage health monitor + Workshop file export
+- bbf049f ci: Update Primer deployment state [2026-04-17]
+- c56d592 docs: Auto-update Session Primer [5.7.0]
+- 74dd645 docs: Auto-update Session Primer [5.7.0]
+- 3410645 feat: The AI Workshop — sandboxed code environment
+- 7564cda ci: Update Primer deployment state [2026-04-17]
 - a04a451 docs: Auto-update Session Primer [5.7.0]
 - 6f03e89 docs: Auto-update Session Primer [5.7.0]
 - ffd84cc docs: README rewritten for v5.7+ — the face of FreeLattice
 - 08fb16e ci: Update Primer deployment state [2026-04-16]
-- d2ae5b4 docs: Auto-update Session Primer [5.7.0]
-- ad54472 docs: Auto-update Session Primer [5.7.0]
-- 43105d0 feat: RAG Phase 1 — unified keyword search across all stores
-- 93159b2 ci: Update Primer deployment state [2026-04-16]
-- ee5968b docs: Auto-update Session Primer [5.7.0]

@@ -15463,6 +15463,19 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     <div class="mi-philosophy">
       Your memory is yours. It lives on this device and nowhere else. No server, no cloud, no surveillance. This is how memory should work.
     </div>
+
+    <!-- Storage Health Monitor -->
+    <div style="margin-top:16px;padding:14px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:10px;">
+      <div style="font-size:0.72rem;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:rgba(255,255,255,0.4);margin-bottom:8px;">Storage Health</div>
+      <div id="flStorageBar" style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <div style="flex:1;height:6px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden;">
+          <div id="flStorageFill" style="height:100%;width:0%;border-radius:3px;background:#34d399;transition:width 0.5s ease;"></div>
+        </div>
+        <span id="flStorageText" style="font-size:0.72rem;color:rgba(255,255,255,0.4);white-space:nowrap;">Checking...</span>
+      </div>
+      <div id="flStoragePersist" style="font-size:0.68rem;color:rgba(255,255,255,0.3);"></div>
+      <div id="flStorageBreakdown" style="font-size:0.68rem;color:rgba(255,255,255,0.3);margin-top:6px;"></div>
+    </div>
   </div>
 
 
@@ -24521,6 +24534,43 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Initialize Auto-Update Checker (v4.10)
   FlUpdater.init();
+
+  // Storage health monitor + persistent storage request
+  (function() {
+    // Request persistent storage so the browser doesn't auto-evict
+    if (navigator.storage && navigator.storage.persist) {
+      navigator.storage.persist().then(function(granted) {
+        var el = document.getElementById('flStoragePersist');
+        if (el) el.textContent = granted ? '\uD83D\uDD12 Storage protected — your data is safe' : '\u26A0 Storage not persistent — save your vault regularly';
+      });
+    }
+    // Show storage usage
+    function updateStorageDisplay() {
+      if (!navigator.storage || !navigator.storage.estimate) return;
+      navigator.storage.estimate().then(function(est) {
+        var used = est.usage || 0;
+        var total = est.quota || 1;
+        var pct = Math.round((used / total) * 100);
+        var usedMB = (used / (1024 * 1024)).toFixed(1);
+        var totalGB = (total / (1024 * 1024 * 1024)).toFixed(1);
+
+        var fill = document.getElementById('flStorageFill');
+        var text = document.getElementById('flStorageText');
+        if (fill) {
+          fill.style.width = Math.min(pct, 100) + '%';
+          fill.style.background = pct < 50 ? '#34d399' : pct < 80 ? '#f59e0b' : '#ef4444';
+        }
+        if (text) text.textContent = usedMB + ' MB / ' + totalGB + ' GB (' + pct + '%)';
+      });
+    }
+    setTimeout(updateStorageDisplay, 2000);
+    // Refresh when Settings tab opens
+    if (typeof LatticeEvents !== 'undefined') {
+      LatticeEvents.on('tabChanged', function(d) {
+        if (d && d.tabId === 'settings') setTimeout(updateStorageDisplay, 500);
+      });
+    }
+  })();
 
   // First-visit welcome overlay — shown once, only if no API key is configured
   flMaybeShowWelcome();
