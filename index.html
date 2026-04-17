@@ -15962,7 +15962,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.7.0</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.8.0</span></div>
     </div>
   </div>
 
@@ -17840,7 +17840,13 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.7.0';
+const FL_VERSION = '5.8.0';
+
+// Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
+// The shipped app is quiet. Users enable for troubleshooting via Settings.
+var FL_DEBUG = localStorage.getItem('fl_debug') === 'true';
+function flLog() { if (FL_DEBUG) console.log.apply(console, arguments); }
+
 // ─── Lattice Event Bus ─────────────────────────────────────────
 // Replaces switchTab monkey-patch chain with clean event dispatch
 const LatticeEvents = (function() {
