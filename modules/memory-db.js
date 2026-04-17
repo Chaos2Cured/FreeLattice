@@ -130,18 +130,34 @@ class MemoryDatabase {
     }
 
     /**
-     * Format recent river entries as a session history string for prompt injection.
+     * Format river entries from PREVIOUS sessions for system prompt injection.
      * Matches Python: EnhancedSanctuaryMemory.get_session_history(token_limit)
      *
+     * Deliberately excludes the current session (today's entries) because
+     * state.chatHistory already carries the live conversation as the messages
+     * array — injecting it again wastes tokens and can confuse models.
+     * Cross-session context (yesterday, last week) is what's genuinely missing
+     * from the messages array and worth surfacing here.
+     *
      * @param {number} tokenLimit  Approximate token budget (100 chars ≈ 1 message slot)
+     * @param {string|null} currentSessionStart  ISO timestamp of session start;
+     *   defaults to today's date. Entries at or after this time are skipped.
      * @returns {Promise<string>}
      */
-    async getSessionHistory(tokenLimit = 15000) {
+    async getSessionHistory(tokenLimit = 15000, currentSessionStart = null) {
         const count = Math.min(500, Math.floor(tokenLimit / 100));
         const entries = await this.getRiverTail(count);
 
+        // Cutoff: start of today (or caller-supplied session start)
+        const cutoff = currentSessionStart
+            ? new Date(currentSessionStart)
+            : new Date(new Date().toISOString().substring(0, 10) + 'T00:00:00.000Z');
+
         const lines = [];
         for (const e of entries) {
+            // Skip anything from the current session — chatHistory covers it
+            if (e.timestamp && new Date(e.timestamp) >= cutoff) continue;
+
             const ts = (e.timestamp || '').substring(0, 16).replace('T', ' ');
             const source = ((e.source || '').toUpperCase().split('_')[0]) || 'AI';
             const speaker = e.speaker || 'User';
