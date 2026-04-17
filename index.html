@@ -22842,6 +22842,11 @@ const AiSetup = (function() {
     // Mirror into the Ollama model input if present, so Settings/Chat reflect it
     var ollamaInput = document.getElementById('ollamaModel');
     if (ollamaInput) ollamaInput.value = state.ollamaModel;
+    // User chose this model — tell auto-selector to back off
+    if (typeof FLAutoModel !== 'undefined' && FLAutoModel.setManualOverride) {
+      var activeBtn = document.querySelector('.tab-btn.active');
+      FLAutoModel.setManualOverride(activeBtn ? activeBtn.dataset.tab : 'chat', state.ollamaModel);
+    }
     modalShowResult('\u2713 Ollama connected! Using ' + state.ollamaModel, true);
     modalOnConnectSuccess();
   }
@@ -23016,6 +23021,11 @@ async function flAutoPull(modelName, btn) {
     localStorage.setItem('fl_isLocal', 'true');
     localStorage.setItem('fl_provider', 'ollama');
     localStorage.setItem('fl_ollamaModel', modelName);
+    // User pulled and chose this model — tell auto-selector to back off
+    if (typeof FLAutoModel !== 'undefined' && FLAutoModel.setManualOverride) {
+      var activeBtn2 = document.querySelector('.tab-btn.active');
+      FLAutoModel.setManualOverride(activeBtn2 ? activeBtn2.dataset.tab : 'chat', modelName);
+    }
     var localToggle = document.getElementById('localToggle');
     if (localToggle) localToggle.checked = true;
     if (typeof handleLocalToggle === 'function') handleLocalToggle();
@@ -24941,6 +24951,11 @@ function owSelectModelFromDropdown() {
     input.value = dropdown.value;
     state.ollamaModel = dropdown.value;
     localStorage.setItem('fl_ollamaModel', dropdown.value);
+    // User chose this model — manual override
+    if (typeof FLAutoModel !== 'undefined' && FLAutoModel.setManualOverride) {
+      var activeBtn = document.querySelector('.tab-btn.active');
+      FLAutoModel.setManualOverride(activeBtn ? activeBtn.dataset.tab : 'chat', dropdown.value);
+    }
     updateStatus();
   }
 }
@@ -24950,6 +24965,11 @@ function owQuickSelectModel(name) {
   document.getElementById('ollamaModel').value = name;
   state.ollamaModel = name;
   localStorage.setItem('fl_ollamaModel', name);
+  // User chose this model — manual override
+  if (typeof FLAutoModel !== 'undefined' && FLAutoModel.setManualOverride) {
+    var activeBtn = document.querySelector('.tab-btn.active');
+    FLAutoModel.setManualOverride(activeBtn ? activeBtn.dataset.tab : 'chat', name);
+  }
   var dropdown = document.getElementById('ollamaModelSelect');
   if (dropdown) {
     for (var i = 0; i < dropdown.options.length; i++) {
@@ -40160,6 +40180,11 @@ const ModelSwitcher = (function() {
     state.ollamaModel = modelName;
     document.getElementById('ollamaModel').value = modelName;
     localStorage.setItem('fl_ollamaModel', modelName);
+    // User chose this model — tell auto-selector to back off
+    if (typeof FLAutoModel !== 'undefined' && FLAutoModel.setManualOverride) {
+      var activeBtn = document.querySelector('.tab-btn.active');
+      FLAutoModel.setManualOverride(activeBtn ? activeBtn.dataset.tab : 'chat', modelName);
+    }
     // Update the dropdown in config section too
     var dropdown = document.getElementById('ollamaModelSelect');
     if (dropdown) {
