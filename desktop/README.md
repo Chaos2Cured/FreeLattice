@@ -10,7 +10,7 @@
 4. The app detects if Ollama is installed:
    - **Yes →** Select a model, start chatting
    - **No →** Tap "Install Local AI" → automatic download + CORS config → done
-5. Auto-updates keep you current. No Terminal needed. Ever.
+5. No Terminal needed. Ever.
 
 ## Why Tauri?
 
@@ -26,10 +26,10 @@
 
 - **No CORS issues** — Ollama connects without config.json workaround
 - **One-click Ollama install** — downloads, extracts, pre-configures CORS automatically
-- **Auto-updates** — checks GitHub Releases on launch, one-click update dialog
 - **Filesystem access** — Workshop saves modules directly to `docs/modules/`
 - **Native feel** — menu bar, window management, dock icon
 - **Offline-first** — everything runs locally, no server needed
+- **Auto-updates** — planned for Phase 2 (requires code-signing keypair)
 
 ## Tauri Commands (Rust Backend)
 
@@ -71,8 +71,7 @@ The built `.dmg` appears in `target/release/bundle/dmg/`.
 - Module names sanitized: lowercase alphanumeric + hyphens
 - No arbitrary shell access from JavaScript
 - `install_ollama` only runs a specific curl + unzip command
-- Auto-updater verifies checksums before applying updates
-
 ## Status
 
-**Experimental.** Proof of concept for the Sovereign Bundle (FUTURE_VISION.md §9).
+**Experimental (v5.8.0).** Proof of concept for the Sovereign Bundle (FUTURE_VISION.md §9).
+Auto-updater deferred until code-signing keypair is configured.

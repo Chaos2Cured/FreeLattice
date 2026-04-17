@@ -1,6 +1,6 @@
 {
   "productName": "FreeLattice",
-  "version": "5.7.0",
+  "version": "5.8.0",
   "identifier": "com.freelattice.app",
   "build": {
     "frontendDist": "../../docs"
@@ -27,14 +27,5 @@
     "icon": [
       "icons/icon.png"
     ]
-  },
-  "plugins": {
-    "updater": {
-      "active": true,
-      "dialog": true,
-      "endpoints": [
-        "https://github.com/Chaos2Cured/FreeLattice/releases/latest/download/latest.json"
-      ]
-    }
   }
 }

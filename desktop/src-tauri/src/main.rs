@@ -2,7 +2,7 @@
 // FreeLattice Desktop — Tauri Backend
 //
 // The Rust backend for the FreeLattice desktop app.
-// Filesystem access, auto-updates, and one-click Ollama install.
+// Filesystem access and one-click Ollama install.
 //
 // Why Tauri:
 //   - System WebView (no bundled Chromium): ~10 MB vs ~150 MB
@@ -167,7 +167,6 @@ fn start_ollama() -> Result<String, String> {
 
 fn main() {
     tauri::Builder::default()
-        .plugin(tauri_plugin_updater::Builder::new().build())
         .invoke_handler(tauri::generate_handler![
             save_module,
             list_modules,

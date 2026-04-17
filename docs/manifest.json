@@ -1,10 +1,10 @@
 {
   "name": "FreeLattice",
   "short_name": "FreeLattice",
-  "description": "Your private AI building partner. Free forever.",
-  "start_url": "./index.html",
+  "description": "Your AI. Local. Free. Yours.",
+  "start_url": "./app.html",
   "display": "standalone",
-  "background_color": "#0a0a2e",
+  "background_color": "#0a0a14",
   "theme_color": "#d4a017",
   "orientation": "any",
   "icons": [
