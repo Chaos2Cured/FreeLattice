@@ -130,7 +130,7 @@ const criticalIds = [
   // Settings
   'providerSelect', 'apiKey', 'localToggle',
   // Setup
-  'aiSetupBanner', 'welcomeOverlay'
+  'aiSetupBanner', 'flWelcomeOverlay'
 ];
 
 let missingIds = [];

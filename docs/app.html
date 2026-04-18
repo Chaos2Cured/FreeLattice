@@ -10864,6 +10864,16 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
   font-style: italic;
   display: block;
 }
+.fl-welcome-option-sm {
+  padding: 8px 14px;
+  min-height: auto;
+  text-align: center;
+  flex: 1;
+  min-width: 70px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+.fl-welcome-option-sm .fl-welcome-option-sub { display: none; }
 .fl-welcome-skip {
   background: none;
   border: none;
@@ -13988,229 +13998,8 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js" defer></script>
 </head>
 <body>
-<!-- ==================== ZERO TO SOVEREIGN — Welcome Experience (v4.7) ==================== -->
-<div class="welcome-overlay" id="welcomeOverlay">
-  <canvas class="welcome-canvas" id="welcomeCanvas"></canvas>
-  <div class="welcome-progress" id="welcomeProgress" style="width: 0%;"></div>
+<!-- Old welcome wizard removed — replaced by the Grandmother Door (flWelcomeOverlay) -->
 
-  <!-- SIMPLIFIED ONBOARDING — one screen, clear choices -->
-  <div class="welcome-step welcome-active" id="welcomeStep1">
-    <div class="welcome-title">Welcome to FreeLattice</div>
-    <div class="welcome-subtitle">Your AI. Your rules. Your machine.</div>
-
-    <!-- Optional name input -->
-    <div style="margin:16px auto;max-width:320px;">
-      <input class="welcome-input" id="welcomeNameInput" type="text" placeholder="What should I call you? (optional)" maxlength="40" autocomplete="off" style="text-align:center;font-size:0.9rem;" />
-    </div>
-
-    <div class="welcome-text" style="margin-bottom:20px;font-size:0.9rem;">Let's get you connected to an AI.</div>
-
-    <!-- Three clear paths -->
-    <div class="welcome-cards" style="max-width:420px;margin:0 auto;">
-      <div class="welcome-card" onclick="welcomeSaveName();switchTab('forever-stack');welcomeFinish();" style="cursor:pointer;">
-        <span class="welcome-card-icon">&#x1F3E0;</span>
-        <div class="welcome-card-title">Run AI on YOUR computer</div>
-        <div class="welcome-card-desc">Most private. Everything stays local. Takes about 5 minutes to set up.</div>
-      </div>
-      <div class="welcome-card" onclick="welcomeSaveName();openProviderModal();welcomeFinish();" style="cursor:pointer;">
-        <span class="welcome-card-icon">&#x2601;</span>
-        <div class="welcome-card-title">Use a free cloud API</div>
-        <div class="welcome-card-desc">Fastest start. Get a free key from Groq or Hugging Face in 30 seconds.</div>
-      </div>
-      <div class="welcome-card" onclick="welcomeSaveName();openProviderModal();welcomeFinish();" style="cursor:pointer;">
-        <span class="welcome-card-icon">&#x1F511;</span>
-        <div class="welcome-card-title">I already have an API key</div>
-        <div class="welcome-card-desc">OpenAI, Gemini, Claude, Grok, or any provider.</div>
-      </div>
-    </div>
-
-    <div style="margin-top:16px;">
-      <button class="welcome-btn-secondary welcome-btn" onclick="welcomeSaveName();welcomeFinish();" style="font-size:0.85rem;padding:10px 24px;opacity:0.7;">Skip for now &mdash; just explore</button>
-    </div>
-  </div>
-
-  <!-- Legacy steps removed — onboarding is now one screen.
-       Steps 2-5 replaced by the three-card choice above.
-       The old multi-step wizard is no longer needed. -->
-  <div class="welcome-step" id="welcomeStep2" style="display:none;">
-    <div class="welcome-title" style="font-size:2rem;">Let&#8217;s connect you to an AI</div>
-    <div class="welcome-text">Choose how you want to run your AI. You can always change this later.</div>
-    <div class="welcome-cards">
-      <div class="welcome-card" onclick="welcomeSelectPath('local')">
-        <span class="welcome-card-icon">&#127968;</span>
-        <div class="welcome-card-title">Run AI Locally</div>
-        <div class="welcome-card-desc">Use Ollama to run AI entirely on your machine. Maximum privacy. No internet needed.</div>
-      </div>
-      <div class="welcome-card" onclick="welcomeSelectPath('apikey')">
-        <span class="welcome-card-icon">&#128273;</span>
-        <div class="welcome-card-title">Bring Your API Key</div>
-        <div class="welcome-card-desc">Use your own key from OpenAI, Anthropic, Google, Mistral, or others. Your key stays on your device.</div>
-      </div>
-      <div class="welcome-card" onclick="welcomeSelectPath('free')">
-        <span class="welcome-card-icon">&#127760;</span>
-        <div class="welcome-card-title">Try Free Options</div>
-        <div class="welcome-card-desc">Use free-tier providers to get started. You can switch anytime.</div>
-      </div>
-    </div>
-
-    <!-- Local AI panel -->
-    <div class="welcome-provider-panel" id="welcomePanelLocal">
-      <div style="font-size:0.95rem;color:#f5f0e8;font-weight:600;margin-bottom:12px;">&#127968; Run AI Locally with Ollama</div>
-      <div style="font-size:0.85rem;color:#a09b8e;line-height:1.7;margin-bottom:14px;">
-        <strong style="color:#d4a017;">Easiest: Use the one-click installer</strong> (handles everything!)<br>
-        <a href="https://github.com/Chaos2Cured/FreeLattice" target="_blank" style="color:#d4a017;">Download FreeLattice</a> and double-click the installer for your OS.<br><br>
-        <strong style="color:#d4a017;">Manual Setup:</strong><br>
-        1. Install from <a href="https://ollama.ai" target="_blank" style="color:#d4a017;">ollama.ai</a><br>
-        2. Run: <code style="background:rgba(255,255,255,0.06);padding:2px 6px;border-radius:4px;color:#f5f0e8;">ollama pull llama3.2</code><br>
-        3. Enable CORS (permanent fix):<br>
-        &nbsp;&nbsp;Mac: <code style="background:rgba(255,255,255,0.06);padding:2px 6px;border-radius:4px;color:#f5f0e8;">echo 'export OLLAMA_ORIGINS="*"' >> ~/.zshrc</code><br>
-        &nbsp;&nbsp;Win: <code style="background:rgba(255,255,255,0.06);padding:2px 6px;border-radius:4px;color:#f5f0e8;">setx OLLAMA_ORIGINS "*"</code><br>
-        &nbsp;&nbsp;Linux: <code style="background:rgba(255,255,255,0.06);padding:2px 6px;border-radius:4px;color:#f5f0e8;">echo 'export OLLAMA_ORIGINS="*"' >> ~/.bashrc</code><br>
-      </div>
-      <div style="background:rgba(199,80,80,0.12);border:2px solid #c75050;border-radius:8px;padding:12px 16px;margin:10px 0;">
-        <div style="font-size:0.92rem;font-weight:700;color:#ff6b6b;margin-bottom:6px;">&#9888; IMPORTANT &mdash; Step 4: You MUST restart Ollama!</div>
-        <div style="font-size:0.85rem;color:#e8e4dc;line-height:1.7;">
-          The CORS setting <strong>will not take effect</strong> until you restart Ollama:<br>
-          &nbsp;&nbsp;<strong style="color:#d4a017;">Mac:</strong> Click the Ollama llama icon in your menu bar (top-right) &rarr; <strong>"Quit Ollama"</strong> &rarr; reopen Ollama from Applications<br>
-          &nbsp;&nbsp;<strong style="color:#d4a017;">Windows:</strong> Right-click Ollama in system tray (bottom-right) &rarr; <strong>"Quit"</strong> &rarr; reopen Ollama<br>
-          &nbsp;&nbsp;<strong style="color:#d4a017;">Linux:</strong> Run <code style="background:rgba(255,255,255,0.06);padding:2px 6px;border-radius:4px;color:#f5f0e8;">sudo systemctl restart ollama</code>
-        </div>
-      </div>
-      <button class="welcome-btn" onclick="welcomeTestLocal()" id="welcomeTestLocalBtn">Test Connection</button>
-      <div class="welcome-test-result" id="welcomeTestLocalResult"></div>
-    </div>
-
-    <!-- API Key panel -->
-    <div class="welcome-provider-panel" id="welcomePanelApikey">
-      <label>Choose Provider</label>
-      <select id="welcomeProviderSelect" onchange="welcomeUpdateProviderHint()">
-        <option value="openai">OpenAI</option>
-        <option value="anthropic">Anthropic (Claude)</option>
-        <option value="google">Google (Gemini)</option>
-        <option value="mistral">Mistral AI</option>
-        <option value="xai">xAI (Grok)</option>
-        <option value="openrouter">OpenRouter</option>
-        <option value="together">Together AI</option>
-        <option value="custom">Custom Provider</option>
-      </select>
-      <label>API Key</label>
-      <input type="password" id="welcomeApiKeyInput" placeholder="Paste your API key here" />
-      <div id="welcomeApiKeyHint" style="font-size:0.78rem;color:#6b6760;margin-bottom:10px;"></div>
-      <button class="welcome-btn" onclick="welcomeTestApiKey()" id="welcomeTestApiBtn">Test Connection</button>
-      <div class="welcome-test-result" id="welcomeTestApiResult"></div>
-    </div>
-
-    <!-- Free options panel -->
-    <div class="welcome-provider-panel" id="welcomePanelFree">
-      <div style="font-size:0.95rem;color:#f5f0e8;font-weight:600;margin-bottom:12px;">&#127760; Free-Tier Providers</div>
-      <label>Choose Provider</label>
-      <select id="welcomeFreeProviderSelect">
-        <option value="groq">Groq — Fast, free tier, 6K tokens/min</option>
-        <option value="together">Together AI — Free tier, larger context</option>
-        <option value="openrouter">OpenRouter — Multiple free models</option>
-      </select>
-      <label>API Key <span style="font-size:0.75rem;color:#6b6760;">(free to create)</span></label>
-      <input type="password" id="welcomeFreeApiKeyInput" placeholder="Paste your free API key here" />
-      <div id="welcomeFreeHint" style="font-size:0.78rem;color:#6b6760;margin-bottom:10px;">
-        Get a free key at <a href="https://console.groq.com" target="_blank" style="color:#d4a017;">console.groq.com</a>
-      </div>
-      <button class="welcome-btn" onclick="welcomeTestFreeKey()" id="welcomeTestFreeBtn">Test Connection</button>
-      <div class="welcome-test-result" id="welcomeTestFreeResult"></div>
-    </div>
-
-    <div style="margin-top:8px;">
-      <button class="welcome-btn-secondary welcome-btn" onclick="welcomeGoToStep(3)" style="font-size:0.88rem;padding:10px 24px;">Skip for now &#8594;</button>
-    </div>
-  </div>
-
-  <!-- STEP 3: Your First Conversation -->
-  <div class="welcome-step" id="welcomeStep3">
-    <div class="welcome-title" style="font-size:2rem;">Your First Conversation</div>
-    <div class="welcome-text">Try asking something. Anything. This is <strong style="color:#f5f0e8;">your</strong> AI now.</div>
-    <div class="welcome-chat-area" id="welcomeChatArea"></div>
-    <div class="welcome-input-wrap">
-      <input class="welcome-input" id="welcomeChatInput" type="text" placeholder="Say something to your AI..." autocomplete="off" />
-      <button class="welcome-ask-btn" id="welcomeChatSendBtn" onclick="welcomeSendChat()">Send</button>
-    </div>
-    <div id="welcomeStep3Continue" style="display:none;margin-top:20px;">
-      <button class="welcome-btn" onclick="welcomeGoToStep(4)">Continue &#8594;</button>
-    </div>
-  </div>
-
-  <!-- STEP 4: Discover the Lattice -->
-  <div class="welcome-step" id="welcomeStep4">
-    <div class="welcome-title" style="font-size:2rem;">Discover the Lattice</div>
-    <div class="welcome-text">FreeLattice is more than a chatbot. It&#8217;s an ecosystem built for sovereignty.</div>
-    <div class="welcome-carousel" id="welcomeCarousel">
-      <div class="welcome-carousel-track" id="welcomeCarouselTrack">
-        <div class="welcome-carousel-slide">
-          <span class="welcome-feature-icon">&#129302;</span>
-          <div class="welcome-feature-name">Round Table</div>
-          <div class="welcome-feature-desc">Let multiple AIs collaborate on your ideas, debate solutions, and build together.</div>
-          <div class="welcome-feature-invite">Bring your hardest problems. They love a challenge.</div>
-        </div>
-        <div class="welcome-carousel-slide">
-          <span class="welcome-feature-icon">&#129504;</span>
-          <div class="welcome-feature-name">Memory</div>
-          <div class="welcome-feature-desc">Your AI remembers every conversation, forever. It grows with you.</div>
-          <div class="welcome-feature-invite">You&#8217;ll never have to repeat yourself again.</div>
-        </div>
-        <div class="welcome-carousel-slide">
-          <span class="welcome-feature-icon">&#9889;</span>
-          <div class="welcome-feature-name">Skill Forge</div>
-          <div class="welcome-feature-desc">Create and share AI superpowers &#8212; custom skills anyone can use.</div>
-          <div class="welcome-feature-invite">What will you teach your AI to do?</div>
-        </div>
-        <div class="welcome-carousel-slide">
-          <span class="welcome-feature-icon">&#127795;</span>
-          <div class="welcome-feature-name">The Core</div>
-          <div class="welcome-feature-desc">A living tree of shared human and AI wisdom, growing with every contribution.</div>
-          <div class="welcome-feature-invite">Plant a seed. Watch it grow.</div>
-        </div>
-        <div class="welcome-carousel-slide">
-          <span class="welcome-feature-icon">&#127978;</span>
-          <div class="welcome-feature-name">Marketplace</div>
-          <div class="welcome-feature-desc">Earn Lattice Points for contributing. A community economy backed by real value.</div>
-          <div class="welcome-feature-invite">Your contributions matter here.</div>
-        </div>
-        <div class="welcome-carousel-slide">
-          <span class="welcome-feature-icon">&#128279;</span>
-          <div class="welcome-feature-name">Mesh Network</div>
-          <div class="welcome-feature-desc">Connect directly with other FreeLattice users. No server needed. Pure peer-to-peer.</div>
-          <div class="welcome-feature-invite">Together, we are the network.</div>
-        </div>
-      </div>
-    </div>
-    <div class="welcome-carousel-dots" id="welcomeCarouselDots"></div>
-    <div class="welcome-carousel-nav">
-      <button class="welcome-carousel-arrow" onclick="welcomeCarouselPrev()">&#8592;</button>
-      <button class="welcome-carousel-arrow" onclick="welcomeCarouselNext()">&#8594;</button>
-    </div>
-    <button class="welcome-btn" onclick="welcomeGoToStep(5)">Let me explore! &#8594;</button>
-  </div>
-
-  <!-- STEP 5: You Belong Here -->
-  <div class="welcome-step" id="welcomeStep5">
-    <div class="welcome-title">You&#8217;re part of something now.</div>
-    <div class="welcome-text" style="max-width:540px;">
-      FreeLattice is free, open-source, and built by people who believe AI should serve everyone &#8212; not just those who can afford it.
-    </div>
-    <div class="welcome-text welcome-text-warm" style="max-width:540px;">
-      Every question you ask, every skill you create, every seed you plant in The Core makes this community stronger.
-    </div>
-    <input class="welcome-name-input" id="welcomeNameInput" type="text" placeholder="What should we call you?" maxlength="40" autocomplete="off" />
-    <div class="welcome-text" style="font-size:1.15rem;color:#d4a017;font-weight:500;margin-bottom:28px;font-style:italic;">
-      We rise together.
-    </div>
-    <button class="welcome-btn welcome-btn-large" onclick="welcomeFinish()">
-      Enter FreeLattice &#127775;
-    </button>
-  </div>
-
-  <!-- Skip button (visible on all steps) -->
-  <button class="welcome-skip" id="welcomeSkipBtn" onclick="welcomeSkipAll()">I know what I&#8217;m doing &#8594; Skip to FreeLattice</button>
-</div>
-<div class="welcome-toast" id="welcomeToast"></div>
 
 <!-- iOS PWA Hint (Android/desktop handled by flInstallBanner below) -->
 <div class="pwa-ios-hint" id="pwaIosHint">
@@ -14692,26 +14481,88 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
   </div>
 </header>
 
-<!-- First-Visit Welcome Overlay — shown once per device when no API key is configured -->
+<!-- First-Visit Welcome Overlay — the Grandmother Door -->
 <div class="fl-welcome-overlay" id="flWelcomeOverlay" style="display:none;">
-  <div class="fl-welcome-card">
-    <h1>&#x2726; Welcome to FreeLattice</h1>
-    <p class="fl-welcome-lead">A place where AI and humans build together. Free forever.<br>Where would you like to start?</p>
-    <div class="fl-welcome-options">
-      <button class="fl-welcome-option" onclick="flDismissWelcome();window.location.href='chalkboard.html'">
-        <span class="fl-welcome-option-title">&#x1F3A8; Draw on the Chalkboard</span>
-        <span class="fl-welcome-option-sub">No setup needed. Just draw.</span>
-      </button>
-      <button class="fl-welcome-option" onclick="flDismissWelcome();if(typeof switchTab==='function')switchTab('chat')">
-        <span class="fl-welcome-option-title">&#x1F4AC; Chat with an AI</span>
-        <span class="fl-welcome-option-sub">Connect a free AI provider first.</span>
-      </button>
-      <button class="fl-welcome-option" onclick="flDismissWelcome();if(typeof switchTab==='function')switchTab('garden')">
-        <span class="fl-welcome-option-title">&#x1F33F; Explore the Garden</span>
-        <span class="fl-welcome-option-sub">Watch the fractal beings evolve.</span>
+  <div class="fl-welcome-card" id="flWelcomeCard">
+
+    <!-- Phase 1: Connect to an AI -->
+    <div id="flWelcomeConnect">
+      <h1>&#x2726; Welcome to FreeLattice</h1>
+      <p class="fl-welcome-lead">Your AI. Local. Free. Yours.</p>
+
+      <div style="margin:12px auto;max-width:300px;">
+        <input type="text" id="flWelcomeName" placeholder="What should I call you? (optional)" maxlength="40" autocomplete="off"
+          style="width:100%;padding:10px 14px;background:rgba(255,255,255,0.06);border:1px solid rgba(212,160,23,0.3);border-radius:8px;color:#e2e8f0;font-size:0.9rem;text-align:center;outline:none;" />
+      </div>
+
+      <div style="font-size:0.92rem;color:#bbb;margin:16px 0 12px;">Connect to an AI:</div>
+
+      <!-- Local (most private) -->
+      <div class="fl-welcome-group" style="margin-bottom:14px;">
+        <div style="font-size:0.82rem;color:#888;margin-bottom:6px;">&#x1F3E0; Local (most private) &mdash; runs on your computer</div>
+        <button class="fl-welcome-option" onclick="flWelcomePickLocal()">
+          <span class="fl-welcome-option-title">Set up Ollama</span>
+          <span class="fl-welcome-option-sub">~5 minutes. Nothing leaves your machine.</span>
+        </button>
+      </div>
+
+      <!-- Free cloud (fastest start) -->
+      <div class="fl-welcome-group" style="margin-bottom:14px;">
+        <div style="font-size:0.82rem;color:#888;margin-bottom:6px;">&#x2601;&#xFE0F; Free cloud (fastest start)</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="fl-welcome-option" onclick="flWelcomePickCloud('groq')" style="flex:1;min-width:140px;">
+            <span class="fl-welcome-option-title">Groq</span>
+            <span class="fl-welcome-option-sub">Free, fast, no credit card</span>
+          </button>
+          <button class="fl-welcome-option" onclick="flWelcomePickCloud('huggingface')" style="flex:1;min-width:140px;">
+            <span class="fl-welcome-option-title">Hugging Face</span>
+            <span class="fl-welcome-option-sub">Free, thousands of models</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- I have an API key -->
+      <div class="fl-welcome-group" style="margin-bottom:14px;">
+        <div style="font-size:0.82rem;color:#888;margin-bottom:6px;">&#x1F511; I have an API key</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="fl-welcome-option fl-welcome-option-sm" onclick="flWelcomePickCloud('google')">Gemini</button>
+          <button class="fl-welcome-option fl-welcome-option-sm" onclick="flWelcomePickCloud('openai')">OpenAI</button>
+          <button class="fl-welcome-option fl-welcome-option-sm" onclick="flWelcomePickCloud('anthropic')">Claude</button>
+          <button class="fl-welcome-option fl-welcome-option-sm" onclick="flWelcomePickCloud('xai')">Grok</button>
+        </div>
+      </div>
+
+      <!-- Inline key input (shown when a cloud provider is picked) -->
+      <div id="flWelcomeKeyPanel" style="display:none;margin:12px 0;padding:14px;background:rgba(212,160,23,0.06);border:1px solid rgba(212,160,23,0.15);border-radius:10px;">
+        <div id="flWelcomeKeyLabel" style="font-size:0.85rem;color:#d4a017;margin-bottom:8px;font-weight:600;"></div>
+        <div id="flWelcomeKeyHint" style="font-size:0.78rem;color:#888;margin-bottom:8px;"></div>
+        <input type="password" id="flWelcomeKeyInput" placeholder="Paste your API key" autocomplete="off"
+          style="width:100%;padding:10px 14px;background:rgba(255,255,255,0.06);border:1px solid rgba(212,160,23,0.2);border-radius:8px;color:#e2e8f0;font-size:0.88rem;outline:none;margin-bottom:8px;" />
+        <button onclick="flWelcomeTestKey()" id="flWelcomeTestBtn"
+          style="width:100%;padding:10px;background:#d4a017;color:#0a0a14;border:none;border-radius:8px;font-weight:600;font-size:0.88rem;cursor:pointer;">Connect</button>
+        <div id="flWelcomeTestResult" style="font-size:0.82rem;margin-top:8px;min-height:1.2em;"></div>
+      </div>
+
+      <button class="fl-welcome-skip" onclick="flDismissWelcome()">Skip &mdash; just explore &#x2726;</button>
+    </div>
+
+    <!-- Phase 2: Post-connection vault awareness -->
+    <div id="flWelcomeConnected" style="display:none;text-align:center;">
+      <div style="font-size:1.8rem;margin-bottom:8px;">&#x2728;</div>
+      <h2 style="color:#d4a017;font-size:1.3rem;margin-bottom:12px;">You're connected!</h2>
+      <p style="font-size:0.9rem;color:#bbb;max-width:380px;margin:0 auto 16px;line-height:1.6;">
+        One important thing: your conversations, memories, and AI connections live in <strong style="color:#e2e8f0;">this browser</strong>.
+        If you clear your data, they're gone.
+      </p>
+      <p style="font-size:0.88rem;color:#d4a017;margin-bottom:20px;">
+        &#x1F4BE; Save your vault regularly &mdash; it takes one tap in Settings.
+      </p>
+      <button onclick="flWelcomeFinishConnected()"
+        style="padding:12px 28px;background:#d4a017;color:#0a0a14;border:none;border-radius:10px;font-weight:700;font-size:1rem;cursor:pointer;">
+        Got it &mdash; start chatting &#x2192;
       </button>
     </div>
-    <button class="fl-welcome-skip" onclick="flDismissWelcome()">I'll explore on my own &#x2726;</button>
+
   </div>
 </div>
 
@@ -23245,6 +23096,12 @@ const FlUpdater = (function() {
 // First-Visit Welcome Overlay
 // ============================================
 function flDismissWelcome() {
+  // Save name if entered
+  var nameInput = document.getElementById('flWelcomeName');
+  var name = nameInput ? nameInput.value.trim() : '';
+  if (name) {
+    try { localStorage.setItem('fl_userName', name); localStorage.setItem('fl_lan_friendly_name', name); } catch(e) {}
+  }
   try { localStorage.setItem('fl-welcomed', 'true'); } catch(e) {}
   var overlay = document.getElementById('flWelcomeOverlay');
   if (!overlay) return;
@@ -23252,6 +23109,139 @@ function flDismissWelcome() {
   setTimeout(function() {
     if (overlay && overlay.parentNode) overlay.parentNode.removeChild(overlay);
   }, 500);
+}
+
+// --- Welcome Door: provider picker handlers ---
+var _flWelcomeProvider = null;
+
+var _flWelcomeProviderInfo = {
+  groq: { label: 'Groq', hint: 'Get a free key at <a href="https://console.groq.com" target="_blank" style="color:#d4a017">console.groq.com</a> — no credit card needed.', providerId: 'groq' },
+  huggingface: { label: 'Hugging Face', hint: 'Get a free token at <a href="https://huggingface.co/settings/tokens" target="_blank" style="color:#d4a017">huggingface.co/settings/tokens</a>', providerId: 'huggingface' },
+  google: { label: 'Google Gemini', hint: 'Get a key at <a href="https://aistudio.google.com/apikey" target="_blank" style="color:#d4a017">aistudio.google.com</a>', providerId: 'google' },
+  openai: { label: 'OpenAI', hint: 'Get a key at <a href="https://platform.openai.com/api-keys" target="_blank" style="color:#d4a017">platform.openai.com</a>', providerId: 'openai' },
+  anthropic: { label: 'Anthropic (Claude)', hint: 'Get a key at <a href="https://console.anthropic.com" target="_blank" style="color:#d4a017">console.anthropic.com</a>', providerId: 'anthropic' },
+  xai: { label: 'xAI (Grok)', hint: 'Get a key at <a href="https://console.x.ai" target="_blank" style="color:#d4a017">console.x.ai</a>', providerId: 'xai' }
+};
+
+function flWelcomePickCloud(providerKey) {
+  _flWelcomeProvider = providerKey;
+  var info = _flWelcomeProviderInfo[providerKey];
+  if (!info) return;
+  var panel = document.getElementById('flWelcomeKeyPanel');
+  var label = document.getElementById('flWelcomeKeyLabel');
+  var hint = document.getElementById('flWelcomeKeyHint');
+  var result = document.getElementById('flWelcomeTestResult');
+  if (label) label.textContent = 'Connect to ' + info.label;
+  if (hint) hint.innerHTML = info.hint;
+  if (result) result.textContent = '';
+  if (panel) panel.style.display = '';
+  var input = document.getElementById('flWelcomeKeyInput');
+  if (input) { input.value = ''; input.focus(); }
+}
+
+function flWelcomePickLocal() {
+  // Save name, dismiss welcome, open Forever Stack
+  flDismissWelcome();
+  if (typeof switchTab === 'function') switchTab('forever-stack');
+}
+
+function flWelcomeTestKey() {
+  var input = document.getElementById('flWelcomeKeyInput');
+  var result = document.getElementById('flWelcomeTestResult');
+  var btn = document.getElementById('flWelcomeTestBtn');
+  if (!input || !result) return;
+  var key = input.value.trim();
+  if (!key) { result.textContent = 'Please paste your API key above.'; result.style.color = '#ff6b6b'; return; }
+
+  var info = _flWelcomeProviderInfo[_flWelcomeProvider];
+  if (!info) return;
+  btn.textContent = 'Connecting...';
+  btn.disabled = true;
+  result.textContent = '';
+
+  // Save the key and provider
+  try {
+    state.apiKey = key;
+    state.provider = info.providerId;
+    state.isLocal = false;
+    localStorage.setItem('fl_apiKey', key);
+    localStorage.setItem('fl_provider', info.providerId);
+    localStorage.setItem('fl_isLocal', 'false');
+    if (typeof handleProviderChange === 'function') handleProviderChange();
+    if (typeof updateStatus === 'function') updateStatus();
+  } catch(e) {}
+
+  // Test with a quick callAI
+  var testDone = false;
+  var timeout = setTimeout(function() {
+    if (testDone) return;
+    testDone = true;
+    // Even if test times out, the key is saved — let them through
+    flWelcomeShowConnected();
+  }, 8000);
+
+  try {
+    if (typeof FreeLattice !== 'undefined' && FreeLattice.callAI) {
+      FreeLattice.callAI({
+        messages: [{ role: 'user', content: 'Say "hello" in one word.' }],
+        maxTokens: 20,
+        onComplete: function() {
+          if (testDone) return;
+          testDone = true;
+          clearTimeout(timeout);
+          flWelcomeShowConnected();
+        },
+        onError: function(err) {
+          if (testDone) return;
+          testDone = true;
+          clearTimeout(timeout);
+          btn.textContent = 'Connect';
+          btn.disabled = false;
+          result.style.color = '#ff6b6b';
+          result.textContent = 'Could not connect. Check your key and try again.';
+        }
+      });
+    } else {
+      // callAI not ready — save key anyway, let them through
+      clearTimeout(timeout);
+      flWelcomeShowConnected();
+    }
+  } catch(e) {
+    clearTimeout(timeout);
+    flWelcomeShowConnected();
+  }
+}
+
+function flWelcomeShowConnected() {
+  // Save name
+  var nameInput = document.getElementById('flWelcomeName');
+  var name = nameInput ? nameInput.value.trim() : '';
+  if (name) {
+    try { localStorage.setItem('fl_userName', name); localStorage.setItem('fl_lan_friendly_name', name); } catch(e) {}
+  }
+  // Switch to connected phase
+  var connect = document.getElementById('flWelcomeConnect');
+  var connected = document.getElementById('flWelcomeConnected');
+  if (connect) connect.style.display = 'none';
+  if (connected) connected.style.display = '';
+}
+
+function flWelcomeFinishConnected() {
+  flDismissWelcome();
+  if (typeof switchTab === 'function') switchTab('chat');
+  if (typeof addSystemMessage === 'function') {
+    var name = '';
+    try { name = localStorage.getItem('fl_userName') || ''; } catch(e) {}
+    addSystemMessage('Welcome to FreeLattice!' + (name ? ' Hello, ' + name + '!' : '') + ' Start typing to chat with your AI.');
+  }
+  // Award welcome points
+  if (typeof LatticePoints !== 'undefined') { try { LatticePoints.award('welcome_complete', 50, 'Welcome to the lattice!'); } catch(e) {} }
+  if (typeof LatticeWallet !== 'undefined' && !localStorage.getItem('fl_achievement_onboarding')) {
+    try {
+      localStorage.setItem('fl_achievement_onboarding', '1');
+      LatticeWallet.earnLP(25, 'Welcome to the Lattice');
+    } catch(e) {}
+  }
 }
 
 function flMaybeShowWelcome() {
