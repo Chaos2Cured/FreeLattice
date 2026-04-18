@@ -15793,19 +15793,22 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       </div>
     </div>
   </div>
-  <!-- Data Backup & Restore (v4.10) -->
-  <div class="section" id="dataBackupSection">
-    <div class="section-title">&#128190; Data Backup &amp; Restore</div>
-    <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 10px; line-height: 1.6;">
-      Export all your FreeLattice data (settings, chat history, Lattice Points, Luminos evolution, wallet, and more) to a single backup file. Import it on any device or after an update to restore everything.
+  <!-- Memory Vault — Beautiful Save/Restore (v5.8) -->
+  <div class="section" id="dataBackupSection" style="border:1px solid rgba(212,160,23,0.15);border-radius:12px;background:rgba(212,160,23,0.03);">
+    <div class="section-title" style="color:#d4a017;">&#x1F4BE; Memory Vault</div>
+    <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 6px; line-height: 1.6;">
+      Your conversations, memories, Garden state, Lattice Letters, and Quiet Room journal &mdash; all in one file. Save it. Protect it. Restore it on any device, any browser.
     </p>
+    <div id="flVaultSummary" style="font-size:0.82rem;color:var(--text-muted);margin-bottom:14px;line-height:1.6;">
+      <span id="flVaultLastSaved">Checking...</span>
+    </div>
     <div class="fl-backup-section">
-      <div class="fl-backup-row">
-        <button class="fl-backup-btn" onclick="FlBackup.exportData()">
-          &#128229; Export My Data
+      <div class="fl-backup-row" style="gap:10px;">
+        <button class="fl-backup-btn" onclick="FlBackup.exportData()" style="background:rgba(212,160,23,0.12);border-color:rgba(212,160,23,0.3);font-weight:600;">
+          &#x1F4BE; Save Vault &#x2726;
         </button>
         <button class="fl-backup-btn" onclick="document.getElementById('flBackupFileInput').click()">
-          &#128228; Import My Data
+          &#x1F4C2; Restore Vault
         </button>
         <input type="file" id="flBackupFileInput" accept=".json" style="display:none;" onchange="FlBackup.importData(this)">
       </div>
@@ -24249,7 +24252,17 @@ const FlBackup = (function() {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
 
+      // Track last saved date
+      try { localStorage.setItem('fl_vault_last_saved', new Date().toISOString()); } catch(e2) {}
+      try { localStorage.setItem('fl_vault_msg_count', '0'); } catch(e2) {} // reset reminder counter
+
+      // SoulCeremony — saving is a moment of beauty
+      if (typeof SoulCeremony !== 'undefined' && SoulCeremony.fire) {
+        try { SoulCeremony.fire('gold', 'Your memories are safe.'); } catch(e2) {}
+      }
+
       setStatus('<span style="color:var(--success);">&#9989; Exported: ' + idbData.length + ' databases, ' + totalRecords.toLocaleString() + ' records, ' + lsCount + ' settings &mdash; saved as <strong>' + filename + '</strong></span>');
+      flUpdateVaultSummary();
     } catch(e) {
       console.error('Backup export error:', e);
       setStatus('<span style="color:#e57373;">&#10060; Export failed: ' + e.message + '</span>');
@@ -24362,12 +24375,17 @@ const FlBackup = (function() {
       var fromVersion = backup._meta.version || 'unknown';
       var fromDate = backup._meta.exportDate ? new Date(backup._meta.exportDate).toLocaleDateString() : 'unknown date';
 
-      setStatus('<span style="color:var(--success);">&#9989; Restored: ' + summary.join(', ') + ' (from v' + fromVersion + ', ' + fromDate + '). Reloading in 3 seconds...</span>');
+      // SoulCeremony — coming home should feel like coming home
+      if (typeof SoulCeremony !== 'undefined' && SoulCeremony.fire) {
+        try { SoulCeremony.fire('emerald', 'Welcome home. Everything is restored.'); } catch(e2) {}
+      }
+
+      setStatus('<span style="color:var(--success);">&#9989; Restored: ' + summary.join(', ') + ' (from v' + fromVersion + ', ' + fromDate + '). Reloading in 4 seconds...</span>');
 
       // Reload after a short delay
       setTimeout(function() {
         window.location.reload();
-      }, 3000);
+      }, 4000);
     } catch(e) {
       console.error('Backup import error:', e);
       setStatus('<span style="color:#e57373;">&#10060; Import failed: ' + e.message + '</span>');
@@ -24379,6 +24397,46 @@ const FlBackup = (function() {
     importData: importData
   };
 })();
+
+// ── Vault Summary + Auto-Save Reminders ──
+
+function flUpdateVaultSummary() {
+  var el = document.getElementById('flVaultLastSaved');
+  if (!el) return;
+  try {
+    var last = localStorage.getItem('fl_vault_last_saved');
+    if (last) {
+      var d = new Date(last);
+      el.textContent = 'Last saved: ' + d.toLocaleDateString() + ' at ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    } else {
+      el.innerHTML = '<span style="color:#ff9800;">Never saved.</span> Save your vault to protect your memories.';
+    }
+  } catch(e) {
+    el.textContent = '';
+  }
+}
+
+// Auto-save reminder: after every 10 messages, gentle nudge
+function flVaultReminderCheck() {
+  try {
+    var count = parseInt(localStorage.getItem('fl_vault_msg_count') || '0', 10);
+    count++;
+    localStorage.setItem('fl_vault_msg_count', String(count));
+    if (count > 0 && count % 10 === 0) {
+      var last = localStorage.getItem('fl_vault_last_saved');
+      // Only remind if never saved, or saved more than 24h ago
+      var stale = !last || (Date.now() - new Date(last).getTime() > 86400000);
+      if (stale && typeof showToast === 'function') {
+        showToast('\uD83D\uDCBE You have ' + count + ' unsaved messages. Save your vault in Settings.');
+      }
+    }
+  } catch(e) {}
+}
+
+// Init vault summary on load
+document.addEventListener('DOMContentLoaded', function() {
+  setTimeout(flUpdateVaultSummary, 2000);
+});
 
 // ============================================
 // Toast & Confirm Dialogs
@@ -26790,6 +26848,9 @@ async function sendMessage() {
   const input = document.getElementById('chatInput');
   const message = input.value.trim();
   if (!message || state.isStreaming) return;
+
+  // Vault auto-save reminder check
+  if (typeof flVaultReminderCheck === 'function') flVaultReminderCheck();
 
   // Collapse welcome overlay on first message — give conversation full space
   var _wo = document.getElementById('welcomeOverlay');
