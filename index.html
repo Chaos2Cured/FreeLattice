@@ -14004,7 +14004,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 <!-- iOS PWA Hint (Android/desktop handled by flInstallBanner below) -->
 <div class="pwa-ios-hint" id="pwaIosHint">
   &#127822; On iPhone/iPad: tap <strong>Share</strong> &#8594; <strong>Add to Home Screen</strong> to install FreeLattice
-  <button class="pwa-install-dismiss" onclick="document.getElementById('pwaIosHint').classList.remove('visible');localStorage.setItem('fl-install-dismissed','1')" title="Dismiss" style="margin-left: 8px;">&times;</button>
+  <button class="pwa-install-dismiss" onclick="document.getElementById('pwaIosHint').classList.remove('visible');try{localStorage.setItem('fl-install-dismissed','1')}catch(e){}" title="Dismiss" style="margin-left: 8px;">&times;</button>
 </div>
 
 <!-- Background Music -->
@@ -14595,7 +14595,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 <div id="flInstallBanner" style="display:none;background:rgba(212,160,23,0.08);border:1px solid rgba(212,160,23,0.2);border-radius:10px;margin:8px 16px;padding:10px 16px;display:none;align-items:center;gap:12px;flex-wrap:wrap;">
   <span style="font-size:0.85rem;color:var(--text-primary);flex:1;min-width:0;">&#x1F4F2; Install FreeLattice &mdash; works offline, own window</span>
   <button onclick="flInstallPWA()" style="background:#d4a017;color:#0a0a14;border:none;border-radius:8px;padding:8px 16px;font-weight:600;font-size:0.82rem;cursor:pointer;min-height:36px;">Install</button>
-  <button onclick="document.getElementById('flInstallBanner').style.display='none';localStorage.setItem('fl-install-dismissed','1')" style="background:none;border:none;color:var(--text-muted);font-size:0.78rem;cursor:pointer;">Maybe later</button>
+  <button onclick="document.getElementById('flInstallBanner').style.display='none';try{localStorage.setItem('fl-install-dismissed','1')}catch(e){}" style="background:none;border:none;color:var(--text-muted);font-size:0.78rem;cursor:pointer;">Maybe later</button>
 </div>
 
 <!-- ==================== TAB 1: CHAT ==================== -->
@@ -24439,22 +24439,104 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // ============================================
+// Global resilience: catch unhandled clipboard/promise rejections silently
+// ============================================
+window.addEventListener('unhandledrejection', function(event) {
+  // Clipboard and AbortError are expected in private browsing / user cancel
+  if (event.reason && (
+    String(event.reason).indexOf('clipboard') !== -1 ||
+    String(event.reason).indexOf('AbortError') !== -1 ||
+    String(event.reason).indexOf('NotAllowedError') !== -1
+  )) {
+    event.preventDefault(); // swallow silently
+  }
+});
+
+// ============================================
+// Resilience Utilities — safe wrappers that never crash
+// ============================================
+
+// Safe localStorage — never crashes in private browsing
+function safeGet(key, fallback) {
+  try { return localStorage.getItem(key) || fallback; }
+  catch(e) { return fallback; }
+}
+function safeSet(key, value) {
+  try { localStorage.setItem(key, value); }
+  catch(e) { /* silent — private browsing */ }
+}
+
+// Safe clipboard — fallback for private browsing / denied permission
+function safeCopy(text) {
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      return navigator.clipboard.writeText(text).catch(function() {
+        _safeCopyFallback(text);
+      });
+    } else {
+      _safeCopyFallback(text);
+      return Promise.resolve();
+    }
+  } catch(e) { return Promise.resolve(); }
+}
+function _safeCopyFallback(text) {
+  try {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.cssText = 'position:fixed;left:-9999px;';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+  } catch(e) {}
+}
+
+// Fetch with timeout — never hangs forever
+function fetchWithTimeout(url, options, timeoutMs) {
+  timeoutMs = timeoutMs || 10000;
+  var controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+  var opts = Object.assign({}, options);
+  if (controller) opts.signal = controller.signal;
+  return Promise.race([
+    fetch(url, opts),
+    new Promise(function(_, reject) {
+      setTimeout(function() {
+        if (controller) controller.abort();
+        reject(new Error('Request timed out after ' + timeoutMs + 'ms'));
+      }, timeoutMs);
+    })
+  ]);
+}
+
+// ============================================
 // Toast & Confirm Dialogs
 // ============================================
 
-function showToast(msg) {
-  const toast = document.getElementById('toast');
-  toast.textContent = msg;
-  toast.classList.add('show');
-  clearTimeout(toast._timer);
-  toast._timer = setTimeout(() => toast.classList.remove('show'), 3500);
+function showToast(msg, duration) {
+  try {
+    var toast = document.getElementById('toast');
+    if (!toast) {
+      toast = document.createElement('div');
+      toast.id = 'toast';
+      toast.className = 'toast';
+      document.body.appendChild(toast);
+    }
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toast._timer);
+    toast._timer = setTimeout(function() { toast.classList.remove('show'); }, duration || 3500);
+  } catch(e) { /* silent — never crash for a toast */ }
 }
 
 function showConfirm(title, message) {
-  return new Promise((resolve) => {
-    document.getElementById('confirmTitle').textContent = title;
-    document.getElementById('confirmMessage').textContent = message;
-    document.getElementById('confirmOverlay').classList.remove('hidden');
+  return new Promise(function(resolve) {
+    var titleEl = document.getElementById('confirmTitle');
+    var msgEl = document.getElementById('confirmMessage');
+    var overlay = document.getElementById('confirmOverlay');
+    if (!titleEl || !msgEl || !overlay) { resolve(false); return; }
+    titleEl.textContent = title;
+    msgEl.textContent = message;
+    overlay.classList.remove('hidden');
     state.confirmResolve = resolve;
   });
 }
