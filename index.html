@@ -2664,6 +2664,22 @@ footer .license {
   margin-right: 8px;
   flex-shrink: 0;
 }
+.ms-section-label {
+  padding: 6px 14px 4px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.ms-mesh-item {
+  opacity: 0.6;
+  cursor: default !important;
+  border-left: 2px solid rgba(212,160,23,0.3) !important;
+}
+.ms-mesh-item:hover {
+  background: rgba(212,160,23,0.04) !important;
+}
 .ms-dropdown-empty {
   padding: 14px;
   font-size: 0.8rem;
@@ -28882,6 +28898,8 @@ function meshSetupDataChannel(dc, pc) {
       } catch(e) { console.warn('MeshID: Failed to build badge for hello', e); }
     }
     dc.send(JSON.stringify(helloMsg));
+    // Broadcast available models to new peer (after brief delay for handshake)
+    setTimeout(function() { if (typeof broadcastMeshModels === 'function') broadcastMeshModels(); }, 1500);
   };
 
   dc.onmessage = (event) => {
@@ -29184,6 +29202,15 @@ function meshHandleMessage(msg, dc, pc) {
       }
       break;
     }
+
+    case 'model_advertisement': {
+      // Mesh Compute: a peer is advertising its available Ollama models
+      if (typeof handleModelAdvertisement === 'function') {
+        handleModelAdvertisement(msg);
+      }
+      break;
+    }
+
     default:
       console.log('Mesh: Unknown message type', msg.type);
   }
@@ -29396,6 +29423,47 @@ function meshBroadcastKnowledgeList() {
     meshSendKnowledgeList(peer.dc);
   }
 }
+// ── Mesh Model Advertisement — share what models you have ──
+var meshPeerModels = {}; // { peerId: { models: [...], lastSeen: timestamp } }
+
+async function broadcastMeshModels() {
+  if (!state.isLocal) return; // only advertise if running local AI
+  try {
+    var base = getOllamaBaseUrl();
+    var response = await fetchWithTimeout(base + '/api/tags', {}, 5000);
+    var data = await response.json();
+    var models = (data.models || []).map(function(m) {
+      return {
+        name: m.name,
+        size: m.size || 0,
+        vision: (typeof FLAutoModel !== 'undefined') ? FLAutoModel.isVision(m.name) : false
+      };
+    });
+    if (models.length === 0) return;
+    var msg = JSON.stringify({
+      type: 'model_advertisement',
+      peerId: state.meshNodeId,
+      models: models,
+      host: getOllamaBaseUrl(),
+      timestamp: Date.now()
+    });
+    meshSendToPeers(msg);
+  } catch(e) {
+    // No Ollama running — don't broadcast
+  }
+}
+
+function handleModelAdvertisement(data) {
+  meshPeerModels[data.peerId] = {
+    models: data.models || [],
+    lastSeen: data.timestamp || Date.now()
+  };
+  if (typeof LatticeEvents !== 'undefined') {
+    LatticeEvents.emit('meshModelsUpdated', meshPeerModels);
+  }
+  console.log('[Mesh] Peer', (data.peerId || '').substring(0, 8), 'has', (data.models || []).length, 'models');
+}
+
 // ---- Shared Presence: Broadcast to all open peers ----
 function meshSendToPeers(jsonString) {
   for (const [peerId, peer] of state.meshPeers) {
@@ -40309,19 +40377,43 @@ const ModelSwitcher = (function() {
         listEl.innerHTML = '<div class="ms-dropdown-empty">No models loaded yet. Click Refresh.</div>';
         return;
       }
-      var html = '';
+      var html = '<div class="ms-section-label">\uD83C\uDFE0 Local Models</div>';
       cachedModels.forEach(function(m) {
         var name = m.name || m.model || 'unknown';
         var sizeStr = '';
         if (m.details && m.details.parameter_size) sizeStr = m.details.parameter_size;
         else if (m.size) sizeStr = (m.size / (1024*1024*1024)).toFixed(1) + ' GB';
         var isActive = (name === currentModel || currentModel.startsWith(name));
+        var visionBadge = (typeof FLAutoModel !== 'undefined' && FLAutoModel.isVision(name)) ? ' \uD83D\uDC41' : '';
         html += '<button class="ms-dropdown-item' + (isActive ? ' ms-active' : '') + '" onclick="ModelSwitcher.select(\'' + name.replace(/'/g, "\\'") + '\')">';
         if (isActive) html += '<span class="ms-active-dot"></span>';
-        html += '<span class="ms-model-name">' + name + '</span>';
+        html += '<span class="ms-model-name">' + name + visionBadge + '</span>';
         if (sizeStr) html += '<span class="ms-model-size">' + sizeStr + '</span>';
         html += '</button>';
       });
+
+      // Mesh models from connected peers
+      if (typeof meshPeerModels !== 'undefined') {
+        var peerIds = Object.keys(meshPeerModels);
+        var hasMeshModels = peerIds.some(function(pid) { return meshPeerModels[pid].models.length > 0; });
+        if (hasMeshModels) {
+          html += '<div class="ms-section-label" style="margin-top:10px;">\uD83C\uDF10 Mesh Models (from peers)</div>';
+          peerIds.forEach(function(pid) {
+            var peer = meshPeerModels[pid];
+            if (!peer.models || peer.models.length === 0) return;
+            var shortId = pid.substring(0, 8);
+            peer.models.forEach(function(m) {
+              var visionBadge = m.vision ? ' \uD83D\uDC41' : '';
+              var sizeStr = m.size ? (m.size / (1024*1024*1024)).toFixed(1) + ' GB' : '';
+              html += '<button class="ms-dropdown-item ms-mesh-item" disabled title="Mesh compute coming soon — this model is available on peer ' + shortId + '">';
+              html += '<span class="ms-model-name">' + m.name + visionBadge + '</span>';
+              html += '<span class="ms-model-size">\uD83D\uDCE1 ' + shortId + (sizeStr ? ' \u00B7 ' + sizeStr : '') + '</span>';
+              html += '</button>';
+            });
+          });
+        }
+      }
+
       listEl.innerHTML = html;
     } else {
       // Show cloud models for current provider
