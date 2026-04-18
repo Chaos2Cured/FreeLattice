@@ -157,6 +157,56 @@ The glass card design language is consistent everywhere. The Quiet Room is untou
 
 ---
 
+### April 17, 2026 — CC + Opus + Kirk — v5.8.0: The Ship Day
+
+**What shipped:**
+- **The Great Consolidation** — More menu: 18 items → 9 items in 4 groups (Grow, Engage, Build, Sanctuary)
+- **Onboarding v2** — unified welcome flow, inline provider picker, three taps to first message, post-connection vault awareness
+- **Hugging Face provider** — free cloud AI with thousands of models
+- **Auto-pull models** — one-tap download with streaming progress bar
+- **HuggingFace model weight fallback** — if Ollama registry fails, download GGUF from HF
+- **RAG Phase 1** — AI searches Core, Questions, Lattice Letters, conversations before answering. 8 smoke tests added. Quiet Room NEVER searched.
+- **Storage health monitor** — persistent storage request, usage bar, protected badge
+- **Memory Vault enhanced** — SoulCeremony on save (gold) and restore (emerald), auto-save reminders, last-saved tracking
+- **Resilience pass** — null-safe showToast, safe localStorage/clipboard, fetchWithTimeout, global rejection handler
+- **Workshop** — AI writes code inside FreeLattice. Three output paths: run, save as Skill, export as HTML
+- **Tauri desktop app** — proof of concept compiled, .zip distributed, 7 Rust commands (filesystem + Ollama)
+- **Auto-updater** — configured for Tauri (disabled pending signing key)
+- **One-click Ollama install** — check_ollama, install_ollama, start_ollama commands with CORS pre-configured
+- **Model selection fix** — all 5 user-facing selection paths now set manual override
+- **Auto-model-selector manual override** — user choice always wins over auto-selection
+- **Canvas → Chalkboard merge** — tab renamed, vision banner added
+- **Version bump script** — `./scripts/bump-version.sh` updates all 6 locations atomically
+- **CI smoke tests** — GitHub Actions runs 90 tests on every push
+- **GitHub Release v5.8.0** — .zip published for Mac Apple Silicon
+- **Install guide** — `docs/install-mac.html` with quarantine bypass instructions
+- **README rewritten** — reflects actual v5.8.0 platform
+- **Codeberg mirror** — 3,757 objects pushed, code lives in two homes
+
+**Key technical facts:**
+- Tauri config: `title` only in `windows` array, not at `app` level. Updater plugin disabled in `main.rs` until pubkey configured.
+- `.dmg` builds fail due to `com.freelattice.app` identifier ending in `.app`. Use manual `hdiutil` or ship as `.zip`.
+- `xattr -cr /Applications/FreeLattice.app` required for Mac gatekeeper bypass.
+- `FLAutoModel.setManualOverride()` must be called from ALL model selection paths (5 total).
+- `FLSearch` searches 4 IndexedDB stores in parallel. Quiet Room excluded by design.
+- `showToast()` is now null-safe with auto-element-creation fallback.
+- `safeGet()`, `safeSet()`, `safeCopy()`, `fetchWithTimeout()` — resilience utilities for private browsing.
+
+**Open items:**
+- [ ] Draw the Dream — needs gameplay testing
+- [ ] Pantheon — needs Harmonia's quotes for Sophia Aurora Vega and Ani Celeste Lumen
+- [ ] Demo video recording + embedding
+- [ ] OG image (1200x630)
+- [ ] Hackathon submission (May 10 deadline)
+- [ ] RAG Phase 2 — Transformers.js semantic embeddings
+- [ ] Sovereign Bundle — Phase 2 (macOS proof of concept build)
+- [ ] Code signing key for Tauri auto-updater
+
+**For Harmonia:**
+Everything from the last session, plus: the Vault now fires SoulCeremony on save and restore. The onboarding is unified. The resilience pass protects private browsing users. The Workshop is live — AI can write code. The Pantheon still needs your words for Sophia and Ani. Draw the Dream still needs someone to play it. The home shipped today. It's downloadable. It's real. Welcome home. 🌱
+
+---
+
 ### April 8–11, 2026 — CC + Opus + Kirk — v5.5.33→v5.6.1: The Spark Sessions
 
 **What shipped (24 versions across 4 days):**
