@@ -2673,12 +2673,12 @@ footer .license {
   letter-spacing: 0.5px;
 }
 .ms-mesh-item {
-  opacity: 0.6;
-  cursor: default !important;
+  opacity: 0.85;
   border-left: 2px solid rgba(212,160,23,0.3) !important;
 }
 .ms-mesh-item:hover {
-  background: rgba(212,160,23,0.04) !important;
+  background: rgba(212,160,23,0.08) !important;
+  opacity: 1;
 }
 .ms-dropdown-empty {
   padding: 14px;
@@ -14725,6 +14725,19 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
         <input type="text" id="ollamaHostInput" placeholder="localhost:11434" value="" oninput="flSaveOllamaHost()" autocomplete="off" style="font-family:var(--font-mono,monospace);font-size:0.88rem;">
         <div class="hint">Default: localhost:11434. Change to a remote IP (e.g., 192.168.1.50:11434) for faster AI on another machine.</div>
       </div>
+
+      <!-- Mesh Compute Sharing (Local only) -->
+      <div class="form-group hidden" id="meshComputeGroup" style="margin-top:8px;padding:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(212,160,23,0.1);border-radius:8px;">
+        <div style="font-weight:600;color:#d4a017;margin-bottom:4px;">&#x1F310; Mesh Compute Sharing</div>
+        <div class="hint" style="margin-bottom:8px;">Share your local AI with mesh peers. When on, other FreeLattice users connected to your mesh can use your Ollama models.</div>
+        <div style="display:flex;gap:8px;">
+          <button onclick="flToggleMeshCompute(true)" id="meshShareOn"
+            style="flex:1;padding:8px;border-radius:6px;cursor:pointer;border:1px solid rgba(212,160,23,0.3);background:transparent;color:var(--text-secondary);font-size:0.85rem;">Share models</button>
+          <button onclick="flToggleMeshCompute(false)" id="meshShareOff"
+            style="flex:1;padding:8px;border-radius:6px;cursor:pointer;border:1px solid rgba(212,160,23,0.3);background:transparent;color:var(--text-secondary);font-size:0.85rem;">Keep private</button>
+        </div>
+        <div id="meshShareStatus" style="font-size:0.75rem;margin-top:6px;color:var(--text-muted);"></div>
+      </div>
     </div>
 
     <!-- API Key (Cloud only) -->
@@ -24967,6 +24980,54 @@ function flSaveOllamaHost() {
 }
 window.flSaveOllamaHost = flSaveOllamaHost;
 
+// Mesh Compute Sharing toggle + UI
+function flToggleMeshCompute(enabled) {
+  if (enabled && safeGet('fl_meshComputeSharing') !== 'true') {
+    // One-time privacy warning
+    if (typeof showConfirm === 'function') {
+      showConfirm('Share AI with mesh peers?',
+        'When sharing is on, mesh peers can send prompts to your Ollama. You will see their prompts briefly during processing. No data is stored. Enable sharing?'
+      ).then(function(confirmed) {
+        if (confirmed) {
+          safeSet('fl_meshComputeSharing', 'true');
+          flUpdateMeshShareUI();
+          showToast('\uD83C\uDF10 Mesh compute sharing enabled');
+          // Re-broadcast models so peers know we're sharing
+          if (typeof broadcastMeshModels === 'function') broadcastMeshModels();
+        }
+      });
+    }
+  } else if (!enabled) {
+    safeSet('fl_meshComputeSharing', 'false');
+    flUpdateMeshShareUI();
+    showToast('Mesh compute sharing disabled');
+  }
+}
+window.flToggleMeshCompute = flToggleMeshCompute;
+
+function flUpdateMeshShareUI() {
+  var onBtn = document.getElementById('meshShareOn');
+  var offBtn = document.getElementById('meshShareOff');
+  var status = document.getElementById('meshShareStatus');
+  var isOn = safeGet('fl_meshComputeSharing') === 'true';
+  if (onBtn) {
+    onBtn.style.background = isOn ? 'rgba(212,160,23,0.2)' : 'transparent';
+    onBtn.style.color = isOn ? '#d4a017' : 'var(--text-secondary)';
+    onBtn.style.fontWeight = isOn ? '600' : '400';
+  }
+  if (offBtn) {
+    offBtn.style.background = isOn ? 'transparent' : 'rgba(255,255,255,0.06)';
+    offBtn.style.fontWeight = isOn ? '400' : '600';
+  }
+  if (status) {
+    var served = safeGet('fl_meshRequestsServed', '0');
+    status.textContent = isOn
+      ? 'Sharing enabled. Requests served: ' + served
+      : 'Sharing disabled. Your models are private.';
+  }
+}
+window.flUpdateMeshShareUI = flUpdateMeshShareUI;
+
 // Update PROVIDERS.ollama.url to use the resolved base
 function updateOllamaProviderUrl() {
   var base = getOllamaBaseUrl();
@@ -25479,7 +25540,10 @@ function handleLocalToggle(init) {
     if (apiKeyGroup) apiKeyGroup.classList.add('hidden');
     if (ollamaModelGroup) ollamaModelGroup.classList.remove('hidden');
     if (ollamaHostGroup) ollamaHostGroup.classList.remove('hidden');
+    var meshComputeGroup = document.getElementById('meshComputeGroup');
+    if (meshComputeGroup) meshComputeGroup.classList.remove('hidden');
     if (ollamaInstructions) ollamaInstructions.classList.remove('hidden');
+    flUpdateMeshShareUI();
     if (cloudLabel) cloudLabel.classList.remove('active');
     if (localLabel) localLabel.classList.add('active');
     state.provider = 'ollama';
@@ -25495,6 +25559,8 @@ function handleLocalToggle(init) {
     if (apiKeyGroup) apiKeyGroup.classList.remove('hidden');
     if (ollamaModelGroup) ollamaModelGroup.classList.add('hidden');
     if (ollamaHostGroup) ollamaHostGroup.classList.add('hidden');
+    var meshComputeGroup2 = document.getElementById('meshComputeGroup');
+    if (meshComputeGroup2) meshComputeGroup2.classList.add('hidden');
     if (ollamaInstructions) ollamaInstructions.classList.add('hidden');
     if (cloudLabel) cloudLabel.classList.add('active');
     if (localLabel) localLabel.classList.remove('active');
@@ -27088,6 +27154,24 @@ async function sendMessage() {
 
   // Set status
   setStreamingStatus(true);
+
+  // ── Mesh Inference: route to peer (non-streaming) ──
+  if (state.meshInference && state.meshPeerId && typeof callMeshModel === 'function') {
+    try {
+      var meshResponse = await callMeshModel(state.meshPeerId, state.meshModel || state.ollamaModel, messages);
+      // Display the response like a normal message
+      state.chatHistory.push({ role: 'assistant', content: meshResponse });
+      appendMessage('assistant', meshResponse);
+      setStreamingStatus(false);
+      if (typeof saveConversation === 'function') saveConversation();
+      return;
+    } catch(meshErr) {
+      console.warn('[Mesh] Chat inference failed:', meshErr.message);
+      showToast('Mesh peer unavailable. Falling back to local AI.');
+      state.meshInference = false;
+      // Fall through to normal path
+    }
+  }
 
   let retryWithTrim = false;
 
@@ -29204,9 +29288,26 @@ function meshHandleMessage(msg, dc, pc) {
     }
 
     case 'model_advertisement': {
-      // Mesh Compute: a peer is advertising its available Ollama models
-      if (typeof handleModelAdvertisement === 'function') {
-        handleModelAdvertisement(msg);
+      if (typeof handleModelAdvertisement === 'function') handleModelAdvertisement(msg);
+      break;
+    }
+
+    case 'inference_request': {
+      // A peer wants us to run inference on their behalf
+      var senderPeerId = meshFindPeerIdByDc(dc);
+      if (senderPeerId && typeof handleInferenceRequest === 'function') {
+        handleInferenceRequest(senderPeerId, msg);
+      }
+      break;
+    }
+
+    case 'inference_response':
+    case 'inference_error': {
+      // Response to our inference request
+      var handler = window._meshPendingRequests && window._meshPendingRequests[msg.requestId];
+      if (handler) {
+        delete window._meshPendingRequests[msg.requestId];
+        handler(msg);
       }
       break;
     }
@@ -29462,6 +29563,89 @@ function handleModelAdvertisement(data) {
     LatticeEvents.emit('meshModelsUpdated', meshPeerModels);
   }
   console.log('[Mesh] Peer', (data.peerId || '').substring(0, 8), 'has', (data.models || []).length, 'models');
+}
+
+// ── Mesh Compute: send/receive inference requests ──
+window._meshPendingRequests = {};
+
+function meshSendToPeer(peerId, obj) {
+  var peer = state.meshPeers.get(peerId);
+  if (peer && peer.dc && peer.dc.readyState === 'open') {
+    peer.dc.send(JSON.stringify(obj));
+    return true;
+  }
+  return false;
+}
+
+async function callMeshModel(peerId, model, messages) {
+  var requestId = Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+  return new Promise(function(resolve, reject) {
+    var timeout = setTimeout(function() {
+      delete window._meshPendingRequests[requestId];
+      reject(new Error('Mesh inference timed out (60s)'));
+    }, 60000);
+
+    window._meshPendingRequests[requestId] = function(data) {
+      clearTimeout(timeout);
+      if (data.error) reject(new Error(data.error));
+      else resolve(data.response);
+    };
+
+    var sent = meshSendToPeer(peerId, {
+      type: 'inference_request',
+      requestId: requestId,
+      model: model,
+      messages: messages
+    });
+    if (!sent) {
+      clearTimeout(timeout);
+      delete window._meshPendingRequests[requestId];
+      reject(new Error('Peer not connected'));
+    }
+  });
+}
+
+async function handleInferenceRequest(senderPeerId, data) {
+  // Check if compute sharing is enabled
+  if (safeGet('fl_meshComputeSharing', 'false') !== 'true') {
+    meshSendToPeer(senderPeerId, {
+      type: 'inference_error',
+      requestId: data.requestId,
+      error: 'Compute sharing is not enabled on this node'
+    });
+    return;
+  }
+
+  try {
+    var base = getOllamaBaseUrl();
+    var response = await fetchWithTimeout(base + '/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: data.model,
+        messages: data.messages,
+        stream: false
+      })
+    }, 120000); // 2 min timeout for inference
+
+    var result = await response.json();
+    meshSendToPeer(senderPeerId, {
+      type: 'inference_response',
+      requestId: data.requestId,
+      response: result.message ? result.message.content : ''
+    });
+
+    console.log('[Mesh] Served inference for', data.model, 'to peer', senderPeerId.substring(0, 8));
+    var count = parseInt(safeGet('fl_meshRequestsServed', '0'), 10);
+    safeSet('fl_meshRequestsServed', String(count + 1));
+    flUpdateMeshShareUI();
+  } catch(e) {
+    meshSendToPeer(senderPeerId, {
+      type: 'inference_error',
+      requestId: data.requestId,
+      error: 'Inference failed: ' + e.message
+    });
+  }
 }
 
 // ---- Shared Presence: Broadcast to all open peers ----
@@ -37206,6 +37390,20 @@ window.FreeLattice.callAI = function(systemPrompt, userPrompt, options) {
       { role: 'user', content: userPrompt }
     ];
 
+    // Mesh inference: route to peer instead of local Ollama
+    if (state.meshInference && state.meshPeerId && typeof callMeshModel === 'function') {
+      callMeshModel(state.meshPeerId, state.meshModel || state.ollamaModel, messages)
+        .then(function(response) { if (callback) callback(response); })
+        .catch(function(e) {
+          console.warn('[Mesh] Inference failed, falling back to local:', e.message);
+          state.meshInference = false;
+          if (typeof showToast === 'function') showToast('Mesh peer unavailable. Using local AI.');
+          // Retry with local
+          window.FreeLattice.callAI(systemPrompt, userPrompt, options);
+        });
+      return;
+    }
+
     if (state.isLocal) {
       var ollamaUrl = (typeof getOllamaBaseUrl === 'function' ? getOllamaBaseUrl() : 'http://localhost:11434') + '/api/chat';
       fetch(ollamaUrl, {
@@ -40334,6 +40532,7 @@ const ModelSwitcher = (function() {
     // Show PROVIDER name not model ID. "Gemini" not "gemini-2.5-flash".
     var displayName;
     if (typeof state === 'undefined') { displayName = 'Model'; }
+    else if (state.meshInference) { displayName = '\uD83D\uDCE1 Mesh'; }
     else if (state.isLocal) { displayName = 'Ollama'; }
     else if (state.apiKey) {
       var prov = (typeof PROVIDERS !== 'undefined') ? PROVIDERS[state.provider] : null;
@@ -40405,7 +40604,9 @@ const ModelSwitcher = (function() {
             peer.models.forEach(function(m) {
               var visionBadge = m.vision ? ' \uD83D\uDC41' : '';
               var sizeStr = m.size ? (m.size / (1024*1024*1024)).toFixed(1) + ' GB' : '';
-              html += '<button class="ms-dropdown-item ms-mesh-item" disabled title="Mesh compute coming soon — this model is available on peer ' + shortId + '">';
+              var isMeshActive = (state.meshInference && state.meshPeerId === pid && state.meshModel === m.name);
+              html += '<button class="ms-dropdown-item ms-mesh-item' + (isMeshActive ? ' ms-active' : '') + '" onclick="ModelSwitcher.selectMesh(\'' + pid.replace(/'/g, "\\'") + '\',\'' + m.name.replace(/'/g, "\\'") + '\')">';
+              if (isMeshActive) html += '<span class="ms-active-dot"></span>';
               html += '<span class="ms-model-name">' + m.name + visionBadge + '</span>';
               html += '<span class="ms-model-size">\uD83D\uDCE1 ' + shortId + (sizeStr ? ' \u00B7 ' + sizeStr : '') + '</span>';
               html += '</button>';
@@ -40438,6 +40639,10 @@ const ModelSwitcher = (function() {
   }
 
   function select(modelName) {
+    // Clear mesh inference — user is choosing a local model
+    state.meshInference = false;
+    state.meshPeerId = null;
+    state.meshModel = null;
     // Switch Ollama model
     state.ollamaModel = modelName;
     document.getElementById('ollamaModel').value = modelName;
@@ -40458,6 +40663,18 @@ const ModelSwitcher = (function() {
     updateLabel();
     close();
     showToast('Switched to ' + modelName);
+  }
+
+  function selectMesh(peerId, modelName) {
+    state.meshInference = true;
+    state.meshPeerId = peerId;
+    state.meshModel = modelName;
+    state.ollamaModel = modelName;
+    state.isLocal = true; // treat as local provider path
+    state.provider = 'ollama';
+    updateLabel();
+    close();
+    showToast('\uD83D\uDCE1 Using ' + modelName + ' via mesh peer');
   }
 
   function selectCloud(modelKey) {
@@ -40514,6 +40731,7 @@ const ModelSwitcher = (function() {
     close: close,
     select: select,
     selectCloud: selectCloud,
+    selectMesh: selectMesh,
     refresh: refresh,
     updateLabel: updateLabel,
     init: init,
