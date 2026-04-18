@@ -14702,6 +14702,13 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
         <input type="text" id="ollamaModel" placeholder="e.g., llama3.2, deepseek-r1, qwen2.5, mistral" value="llama3.2" style="margin-top:6px;">
         <div class="hint">Choose from the dropdown above, or type a model name manually.</div>
       </div>
+
+      <!-- Ollama Host (Local only) -->
+      <div class="form-group hidden" id="ollamaHostGroup">
+        <label for="ollamaHostInput">&#x1F3E0; Ollama Address</label>
+        <input type="text" id="ollamaHostInput" placeholder="localhost:11434" value="" oninput="flSaveOllamaHost()" autocomplete="off" style="font-family:var(--font-mono,monospace);font-size:0.88rem;">
+        <div class="hint">Default: localhost:11434. Change to a remote IP (e.g., 192.168.1.50:11434) for faster AI on another machine.</div>
+      </div>
     </div>
 
     <!-- API Key (Cloud only) -->
@@ -19855,7 +19862,7 @@ const PROVIDERS = {
   },
   ollama: {
     name: 'Ollama (Local)',
-    url: 'http://localhost:11434/v1/chat/completions',
+    url: 'http://localhost:11434/v1/chat/completions', // updated at runtime by updateOllamaProviderUrl()
     keyLink: '',
     hint: 'Running locally — completely private.',
     tokenLimit: 128000,
@@ -21639,7 +21646,7 @@ const FlOnboarding = (function() {
       });
     }
 
-    fetch('http://localhost:11434/api/tags', { mode: 'cors', signal: AbortSignal.timeout(3000) })
+    fetch(getOllamaBaseUrl() + '/api/tags', { mode: 'cors', signal: AbortSignal.timeout(3000) })
       .then(function(r) { return r.json(); })
       .then(function(data) {
         if (data && data.models && data.models.length > 0) {
@@ -21714,7 +21721,7 @@ const FlOnboarding = (function() {
       if (c.textContent.indexOf('Run AI Locally') !== -1 || c.textContent.indexOf('Local AI detected') !== -1) localCard = c;
     });
 
-    fetch('http://localhost:11434/api/tags', { mode: 'cors', signal: AbortSignal.timeout(3000) })
+    fetch(getOllamaBaseUrl() + '/api/tags', { mode: 'cors', signal: AbortSignal.timeout(3000) })
       .then(function(r) { return r.json(); })
       .then(function(data) {
         if (data && data.models && data.models.length > 0) {
@@ -21770,7 +21777,7 @@ const FlOnboarding = (function() {
     if (hasProvider) return; // Already configured
     if (localStorage.getItem('fl_ollama_toast_dismissed')) return;
 
-    fetch('http://localhost:11434/api/tags', { mode: 'cors', signal: AbortSignal.timeout(3000) })
+    fetch(getOllamaBaseUrl() + '/api/tags', { mode: 'cors', signal: AbortSignal.timeout(3000) })
       .then(function(r) { return r.json(); })
       .then(function(data) {
         if (data && data.models && data.models.length > 0) {
@@ -22325,7 +22332,7 @@ const AiSetup = (function() {
 
   function testOllama() {
     showResult('Testing Ollama connection...', true);
-    fetch('http://localhost:11434/api/tags', { method: 'GET' })
+    fetch(getOllamaBaseUrl() + '/api/tags', { method: 'GET' })
       .then(function(r) { return r.json(); })
       .then(function(data) {
         if (data.models && data.models.length > 0) {
@@ -22371,7 +22378,7 @@ const AiSetup = (function() {
 
     if (state.isLocal) {
       // Hit the Ollama /api/tags endpoint to actually verify it's reachable
-      fetch('http://localhost:11434/api/tags', { method: 'GET' })
+      fetch(getOllamaBaseUrl() + '/api/tags', { method: 'GET' })
         .then(function(r) { return r.json(); })
         .then(function(data) {
           if (data && data.models && data.models.length > 0) {
@@ -22664,8 +22671,8 @@ const AiSetup = (function() {
 
   function modalConnectOllama() {
     modalSelectedProvider = 'ollama';
-    modalShowResult('Looking for Ollama on localhost:11434\u2026', null);
-    fetch('http://localhost:11434/api/tags', { method: 'GET' })
+    modalShowResult('Looking for Ollama on ' + getOllamaBaseUrl().replace('http://', '') + '\u2026', null);
+    fetch(getOllamaBaseUrl() + '/api/tags', { method: 'GET' })
       .then(function(r) { return r.json(); })
       .then(function(data) {
         if (data.models && data.models.length > 0) {
@@ -22837,7 +22844,7 @@ window.openProviderModal = function() { AiSetup.openModal(); };
 async function flAutoPull(modelName, btn) {
   if (btn) { btn.disabled = true; btn.textContent = 'Downloading ' + modelName + '\u2026 0%'; }
   try {
-    var resp = await fetch('http://localhost:11434/api/pull', {
+    var resp = await fetch(getOllamaBaseUrl() + '/api/pull', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name: modelName, stream: true })
@@ -22913,7 +22920,7 @@ function settingsSetMode(mode) {
     var statusDot = document.getElementById('settingsStatusDot');
     if (statusText) statusText.textContent = 'Looking for Ollama\u2026';
 
-    fetch('http://localhost:11434/api/tags', { method: 'GET' })
+    fetch(getOllamaBaseUrl() + '/api/tags', { method: 'GET' })
       .then(function(r) { return r.json(); })
       .then(function(data) {
         if (data && data.models && data.models.length > 0) {
@@ -24903,7 +24910,7 @@ async function resolveOllamaBase(forceRefresh) {
   } catch(e) { /* proxy not available */ }
   // 2. Try direct localhost
   try {
-    var directUrl = localStorage.getItem('fl_localUrl') || 'http://localhost:11434';
+    var directUrl = getOllamaBaseUrl();
     var directResp = await fetch(directUrl + '/api/tags', { mode: 'cors', signal: AbortSignal.timeout(3000) });
     if (directResp.ok) {
       _ollamaResolvedBase = { base: directUrl, isProxy: false };
@@ -24918,8 +24925,31 @@ async function resolveOllamaBase(forceRefresh) {
 // Get the current Ollama base URL (synchronous, uses cached value)
 function getOllamaBaseUrl() {
   if (_ollamaResolvedBase) return _ollamaResolvedBase.base;
-  return localStorage.getItem('fl_localUrl') || 'http://localhost:11434';
+  // Check user-configured host first, then legacy key, then default
+  var host = localStorage.getItem('fl_ollamaHost') || localStorage.getItem('fl_localUrl') || null;
+  if (host) {
+    // Normalize: add http:// if missing
+    if (host.indexOf('://') === -1) host = 'http://' + host;
+    return host;
+  }
+  return 'http://localhost:11434';
 }
+
+// Save user-configured Ollama host + invalidate cache
+function flSaveOllamaHost() {
+  var input = document.getElementById('ollamaHostInput');
+  if (!input) return;
+  var val = input.value.trim();
+  if (val && val !== 'localhost:11434') {
+    try { localStorage.setItem('fl_ollamaHost', val); } catch(e) {}
+  } else {
+    try { localStorage.removeItem('fl_ollamaHost'); } catch(e) {}
+  }
+  // Invalidate the resolved base so next fetch uses the new host
+  _ollamaResolvedBase = null;
+  updateOllamaProviderUrl();
+}
+window.flSaveOllamaHost = flSaveOllamaHost;
 
 // Update PROVIDERS.ollama.url to use the resolved base
 function updateOllamaProviderUrl() {
@@ -24991,7 +25021,7 @@ async function owTestConnection() {
     if (e.name === 'TypeError' && e.message.includes('Failed to fetch')) {
       // Try a no-cors ping to distinguish "not running" from "running but CORS blocked"
       try {
-        await fetch('http://localhost:11434/api/tags', { mode: 'no-cors', signal: AbortSignal.timeout(2000) });
+        await fetch(getOllamaBaseUrl() + '/api/tags', { mode: 'no-cors', signal: AbortSignal.timeout(2000) });
         msg = '<strong>Ollama is running but CORS is not enabled.</strong> You need to quit Ollama first, then restart it with CORS. ';
         msg += '<strong>Stop Ollama:</strong> Windows: Right-click Ollama in system tray &rarr; Quit. Mac: Click Ollama in menu bar &rarr; Quit Ollama. Linux: <code>systemctl stop ollama</code> or <code>pkill ollama</code>. ';
         msg += 'Then run: <code>OLLAMA_ORIGINS=* ollama serve</code> (Mac/Linux) or <code>set OLLAMA_ORIGINS=* && ollama serve</code> (Windows).';
@@ -25117,7 +25147,7 @@ async function owRefreshModels() {
   if (btn) { btn.textContent = 'Refreshing...'; btn.disabled = true; }
   try {
     var resolved = await resolveOllamaBase(false);
-    var base = resolved ? resolved.base : (localStorage.getItem('fl_localUrl') || 'http://localhost:11434');
+    var base = resolved ? resolved.base : getOllamaBaseUrl();
     var resp = await fetch(base + '/api/tags', { mode: 'cors', signal: AbortSignal.timeout(5000) });
     var data = await resp.json();
     owPopulateModels(data.models || []);
@@ -25426,14 +25456,20 @@ function handleLocalToggle(init) {
   var cloudLabel = document.getElementById('cloudLabel');
   var localLabel = document.getElementById('localLabel');
 
+  var ollamaHostGroup = document.getElementById('ollamaHostGroup');
+
   if (isLocal) {
     if (providerGroup) providerGroup.classList.add('hidden');
     if (apiKeyGroup) apiKeyGroup.classList.add('hidden');
     if (ollamaModelGroup) ollamaModelGroup.classList.remove('hidden');
+    if (ollamaHostGroup) ollamaHostGroup.classList.remove('hidden');
     if (ollamaInstructions) ollamaInstructions.classList.remove('hidden');
     if (cloudLabel) cloudLabel.classList.remove('active');
     if (localLabel) localLabel.classList.add('active');
     state.provider = 'ollama';
+    // Populate host field from saved value
+    var hostInput = document.getElementById('ollamaHostInput');
+    if (hostInput) hostInput.value = localStorage.getItem('fl_ollamaHost') || '';
     // Auto-test Ollama connection when switching to local (v4.4)
     if (!init) owTestConnection();
     // Refresh model switcher for local models (v5.0)
@@ -25442,6 +25478,7 @@ function handleLocalToggle(init) {
     if (providerGroup) providerGroup.classList.remove('hidden');
     if (apiKeyGroup) apiKeyGroup.classList.remove('hidden');
     if (ollamaModelGroup) ollamaModelGroup.classList.add('hidden');
+    if (ollamaHostGroup) ollamaHostGroup.classList.add('hidden');
     if (ollamaInstructions) ollamaInstructions.classList.add('hidden');
     if (cloudLabel) cloudLabel.classList.add('active');
     if (localLabel) localLabel.classList.remove('active');
@@ -25913,7 +25950,7 @@ window.FLModelPicker = (function() {
       '<div id="mpLocalList" style="font-size:0.78rem;color:rgba(255,255,255,0.5);padding:12px;text-align:center;">Checking Ollama\u2026</div>';
 
     // Probe Ollama
-    fetch('http://localhost:11434/api/tags', { method: 'GET' })
+    fetch(getOllamaBaseUrl() + '/api/tags', { method: 'GET' })
       .then(function(r) { return r.json(); })
       .then(function(data) {
         var list = document.getElementById('mpLocalList');
@@ -26067,7 +26104,7 @@ window.FLAutoModel = (function() {
       callback(cachedModels);
       return;
     }
-    fetch('http://localhost:11434/api/tags', { method: 'GET' })
+    fetch(getOllamaBaseUrl() + '/api/tags', { method: 'GET' })
       .then(function(r) { return r.json(); })
       .then(function(data) {
         cachedModels = (data && data.models) || [];
@@ -31527,7 +31564,7 @@ async function corsRunDiagnostic() {
   }
   // Test 2: Try direct Ollama (no-cors mode to check if Ollama is running at all)
   try {
-    var pingResp = await fetch('http://localhost:11434/api/tags', { mode: 'no-cors', signal: AbortSignal.timeout(3000) });
+    var pingResp = await fetch(getOllamaBaseUrl() + '/api/tags', { mode: 'no-cors', signal: AbortSignal.timeout(3000) });
     // If we get here without error, Ollama IS running (even if response is opaque)
     ollamaIsRunning = true;
   } catch(e) {
@@ -31536,7 +31573,7 @@ async function corsRunDiagnostic() {
   }
   // Test 3: Try direct Ollama with CORS
   try {
-    var directResp = await fetch('http://localhost:11434/api/tags', { mode: 'cors', signal: AbortSignal.timeout(3000) });
+    var directResp = await fetch(getOllamaBaseUrl() + '/api/tags', { mode: 'cors', signal: AbortSignal.timeout(3000) });
     if (directResp.ok) {
       results.push('<span style="color:var(--success);">&#10003;</span> Direct connection to Ollama works!');
       diagEl.innerHTML = results.join('<br>') + '<br><span style="color:var(--success);font-weight:600;">Connection is working now! Close this dialog and try again.</span>';
@@ -37643,7 +37680,7 @@ if ('serviceWorker' in navigator) {
   function welcomeTestLocal() {
     var btn = document.getElementById('welcomeTestLocalBtn');
     if (btn) btn.textContent = 'Testing...';
-    fetch('http://localhost:11434/api/tags', { mode: 'cors', signal: AbortSignal.timeout(5000) })
+    fetch(getOllamaBaseUrl() + '/api/tags', { mode: 'cors', signal: AbortSignal.timeout(5000) })
       .then(function(r) { return r.json(); })
       .then(function(data) {
         if (data && data.models && data.models.length > 0) {
@@ -40348,7 +40385,7 @@ const ModelSwitcher = (function() {
     if (state.isLocal) {
       try {
         var resolved = typeof resolveOllamaBase === 'function' ? await resolveOllamaBase(false) : null;
-        var base = resolved ? resolved.base : (localStorage.getItem('fl_localUrl') || 'http://localhost:11434');
+        var base = resolved ? resolved.base : getOllamaBaseUrl();
         var resp = await fetch(base + '/api/tags', { mode: 'cors', signal: AbortSignal.timeout(5000) });
         var data = await resp.json();
         cachedModels = data.models || [];
@@ -40492,7 +40529,7 @@ const BrowseModels = (function() {
 
     try {
       var resolved = typeof resolveOllamaBase === 'function' ? await resolveOllamaBase(false) : null;
-      var base = resolved ? resolved.base : (localStorage.getItem('fl_localUrl') || 'http://localhost:11434');
+      var base = resolved ? resolved.base : getOllamaBaseUrl();
 
       var resp = await fetch(base + '/api/pull', {
         method: 'POST',
@@ -40563,7 +40600,7 @@ const BrowseModels = (function() {
     // Try to get installed models
     try {
       var resolved = typeof resolveOllamaBase === 'function' ? await resolveOllamaBase(false) : null;
-      var base = resolved ? resolved.base : (localStorage.getItem('fl_localUrl') || 'http://localhost:11434');
+      var base = resolved ? resolved.base : getOllamaBaseUrl();
       var resp = await fetch(base + '/api/tags', { mode: 'cors', signal: AbortSignal.timeout(5000) });
       var data = await resp.json();
       updateInstalled(data.models || []);
