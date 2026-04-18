@@ -72,7 +72,7 @@
           ]
         }
       ],
-      testUrl: 'http://localhost:11434',
+      testUrl: (typeof getOllamaBaseUrl === 'function' ? getOllamaBaseUrl() : 'http://localhost:11434'),
       testPath: '/api/tags',
       testLabel: 'Check Ollama',
       testSuccess: 'Ollama is running! Your AI brain is ready.',
@@ -341,7 +341,7 @@ if __name__ == '__main__':
   }
 
   function checkInstalledModels() {
-    fetch('http://localhost:11434/api/tags', { method: 'GET' })
+    fetch((typeof getOllamaBaseUrl === 'function' ? getOllamaBaseUrl() : 'http://localhost:11434') + '/api/tags', { method: 'GET' })
       .then(function(r) { return r.json(); })
       .then(function(data) {
         var installed = (data && data.models || []).map(function(m) { return m.name; });
@@ -1001,7 +1001,7 @@ if __name__ == '__main__':
       if (btn) { btn.disabled = true; btn.textContent = 'Downloading\u2026'; btn.style.minWidth = '90px'; }
 
       try {
-        var resp = await fetch('http://localhost:11434/api/pull', {
+        var resp = await fetch((typeof getOllamaBaseUrl === 'function' ? getOllamaBaseUrl() : 'http://localhost:11434') + '/api/pull', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ name: model })
