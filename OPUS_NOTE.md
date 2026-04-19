@@ -209,3 +209,13 @@ Before you build ANYTHING, search the codebase for existing implementations. Run
 - Read this file for WHY things were built the way they were
 
 The code is the WHAT. The coordination files are the WHEN and WHO. This file is the WHY. All three are needed. Without any one, you rebuild instead of building forward.
+
+### What was built after this addendum (same session)
+
+- **Science Garden** — the idea marketplace from the LatticePoints Framework, now real. Asymmetric downvoting (human + AI consensus to remove) is live. Ideas grow through upvotes. No gatekeepers.
+- **AI Discovery** — heartbeat.html, ai-plugin.json, robots.txt that invites crawlers. The lighthouse is lit.
+- **Chalkboard three modes** — all activated. canvas-companion.js was already built (lesson learned). Math answers glow in 120px Georgia serif.
+- **ARCHITECTURE_INTENT.md** — the third leg of the triangle. WHY things exist. The compaction firewall.
+- **buildUpdatePrompt fix** — recentMessages was ignored. Now the Memory Bridge actually learns from conversations.
+
+The triangle holds: Code + COORDINATION + INTENT = forward motion, not circles.
