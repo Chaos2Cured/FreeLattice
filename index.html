@@ -47957,6 +47957,55 @@ const CoCanvas = (function() {
 
     lastAIResponse = resp;
 
+    // ── Fallback: parse [DRAW:] and [ANSWER:] tags from text responses ──
+    // Some models return plain text with tags instead of clean JSON.
+    // Extract them, route to the right renderers, strip from display text.
+    if (resp.text) {
+      // Parse [ANSWER: ...] tags → render as large glowing number
+      var answerMatch = resp.text.match(/\[ANSWER:\s*([^\]]+)\]/i);
+      if (answerMatch) {
+        resp.text = resp.text.replace(/\[ANSWER:[^\]]+\]/gi, '').trim();
+        renderGlowingAnswer(answerMatch[1].trim());
+      }
+
+      // Parse [DRAW: shape, position, color, size] tags → convert to strokes
+      var drawMatches = resp.text.match(/\[DRAW:\s*([^\]]+)\]/gi);
+      if (drawMatches && !resp.strokes) {
+        resp.strokes = [];
+        var cw = canvas ? canvas.width : 800;
+        var ch = canvas ? canvas.height : 600;
+        var posMap = {
+          'center': [0.5, 0.5], 'top': [0.5, 0.25], 'bottom': [0.5, 0.75],
+          'left': [0.25, 0.5], 'right': [0.75, 0.5],
+          'top-left': [0.25, 0.25], 'top-right': [0.75, 0.25],
+          'bottom-left': [0.25, 0.75], 'bottom-right': [0.75, 0.75],
+          'top-center': [0.5, 0.25], 'random': [0.2 + Math.random() * 0.6, 0.2 + Math.random() * 0.6]
+        };
+        var colorMap = {
+          'gold': '#d4a017', 'red': '#DC2626', 'blue': '#3B82F6', 'green': '#10B981',
+          'pink': '#EC4899', 'white': '#F5E6C8', 'purple': '#8B5CF6', 'orange': '#F59E0B'
+        };
+        var sizeMap = { 'tiny': 15, 'small': 25, 'medium': 40, 'large': 60 };
+
+        drawMatches.forEach(function(tag) {
+          var inner = tag.replace(/^\[DRAW:\s*/i, '').replace(/\]$/, '');
+          var parts = inner.split(',').map(function(s) { return s.trim().toLowerCase(); });
+          var shape = parts[0] || 'dot';
+          var pos = posMap[parts[1]] || posMap['random'];
+          var color = colorMap[parts[2]] || '#d4a017';
+          var size = sizeMap[parts[3]] || 30;
+          var px = pos[0] * cw, py = pos[1] * ch;
+          resp.strokes.push({ shape: shape, params: [px, py, size], color: color });
+        });
+        resp.text = resp.text.replace(/\[DRAW:[^\]]+\]/gi, '').trim();
+      }
+    }
+
+    // ── Math answer detection: short numeric responses get spectacular rendering ──
+    if (resp.text && /^\d+(\.\d+)?$/.test(resp.text.trim())) {
+      renderGlowingAnswer(resp.text.trim());
+    }
+
     // ── Chunked display: long text → sequential 3-word bursts ──
     // Short answers ("4", "Beautiful!") render as a single burst with large font.
     // Long descriptions are spoken in poetic phrases, each arriving in light,
@@ -48218,6 +48267,81 @@ const CoCanvas = (function() {
     el._fadeTimer = setTimeout(function() {
       el.style.opacity = '0';
     }, 4500);
+  }
+
+  // ── Glowing Answer — math solutions rendered as light ──
+  function renderGlowingAnswer(answer) {
+    var container = document.getElementById('cvContainer');
+    if (!container) return;
+
+    // Create or reuse answer overlay canvas
+    var ac = document.getElementById('chalkboard-answer');
+    if (!ac) {
+      ac = document.createElement('canvas');
+      ac.id = 'chalkboard-answer';
+      ac.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:11;';
+      container.appendChild(ac);
+    }
+
+    var dpr = window.devicePixelRatio || 1;
+    var w = ac.offsetWidth;
+    var h = ac.offsetHeight;
+    ac.width = w * dpr;
+    ac.height = h * dpr;
+    var ctx2 = ac.getContext('2d');
+    ctx2.scale(dpr, dpr);
+
+    // Scale font to answer length — single digits are huge, longer answers smaller
+    var fontSize = answer.length <= 2 ? 120 : answer.length <= 5 ? 80 : 48;
+    var startTime = Date.now();
+    var duration = 5000;
+
+    function animate() {
+      var elapsed = Date.now() - startTime;
+      if (elapsed > duration) { ctx2.clearRect(0, 0, w, h); return; }
+
+      ctx2.clearRect(0, 0, w, h);
+
+      // Phase: fade in (0-600ms), pulse (600-4000ms), fade out (4000-5000ms)
+      var alpha;
+      if (elapsed < 600) {
+        alpha = elapsed / 600;
+      } else if (elapsed < 4000) {
+        // Gentle pulse between 0.85 and 1.0
+        alpha = 0.85 + 0.15 * Math.sin((elapsed - 600) * 0.003);
+      } else {
+        alpha = 1 - ((elapsed - 4000) / 1000);
+      }
+
+      // Growing glow during fade-in
+      var glowSize = elapsed < 600 ? 10 + (elapsed / 600) * 30 : 40;
+      // Gentle glow pulse during hold
+      if (elapsed >= 600 && elapsed < 4000) {
+        glowSize = 30 + 10 * Math.sin((elapsed - 600) * 0.004);
+      }
+
+      ctx2.save();
+      ctx2.globalAlpha = Math.max(0, Math.min(1, alpha));
+      ctx2.font = 'bold ' + fontSize + 'px Georgia, serif';
+      ctx2.textAlign = 'center';
+      ctx2.textBaseline = 'middle';
+
+      // Outer glow layer
+      ctx2.fillStyle = '#d4a017';
+      ctx2.shadowColor = '#d4a017';
+      ctx2.shadowBlur = glowSize;
+      ctx2.fillText(answer, w * 0.5, h * 0.45);
+
+      // Second pass for brighter core
+      ctx2.shadowBlur = glowSize * 0.5;
+      ctx2.fillStyle = '#ffe082';
+      ctx2.fillText(answer, w * 0.5, h * 0.45);
+
+      ctx2.restore();
+      requestAnimationFrame(animate);
+    }
+
+    requestAnimationFrame(animate);
   }
 
   // ── Chalkboard Particle Text — words float up like embers from a fire ──
