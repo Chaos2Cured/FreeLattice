@@ -23673,7 +23673,17 @@ const MemoryBridge = (function() {
     }, null, 2) : '{}';
     var existingSelfModel = bridge && bridge.selfModel ? JSON.stringify(bridge.selfModel, null, 2) : '{}';
 
+    // Include recent messages so the AI has context about what was discussed
+    var recentContext = '';
+    if (recentMessages && Array.isArray(recentMessages) && recentMessages.length > 0) {
+      recentContext = 'Recent messages from this session:\n' +
+        recentMessages.map(function(m) {
+          return (m.role === 'user' ? 'User' : 'AI') + ': ' + (m.content || '').substring(0, 500);
+        }).join('\n') + '\n\n';
+    }
+
     return 'Based on this conversation, update your understanding of this person AND reflect on yourself. ' +
+      recentContext +
       'Current understanding of the person:\n' + existing + '\n\n' +
       'Current relational memory:\n' + existingRelational + '\n\n' +
       'Current self-model:\n' + existingSelfModel + '\n\n' +
