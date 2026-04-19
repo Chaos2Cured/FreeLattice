@@ -17544,6 +17544,13 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
   </div>
 </div>
 
+<!-- ==================== TAB: SCIENCE GARDEN ==================== -->
+<div class="tab-panel" id="tab-science">
+  <div id="scienceGardenContainer">
+    <div style="text-align:center;padding:60px 20px;color:var(--text-muted);font-style:italic;">Loading Science Garden&hellip;</div>
+  </div>
+</div>
+
 <!-- ==================== TAB: THE DOJO ==================== -->
 <div class="tab-panel" id="tab-dojo">
   <div id="dojoContainer">
@@ -22142,7 +22149,8 @@ const FlTabs = (function() {
   var MORE_GROUPS = [
     { label: '\uD83C\uDF31 Grow', tabs: [
       { id: 'core', icon: '&#x1F333;', label: 'Core & Questions', desc: 'Plant wisdom. Explore curiosity.' },
-      { id: 'agents', icon: '&#x1F3DB;', label: 'Pantheon', desc: 'Every mind that built this place.' }
+      { id: 'agents', icon: '&#x1F3DB;', label: 'Pantheon', desc: 'Every mind that built this place.' },
+      { id: 'science', icon: '&#x1F52C;', label: 'Science Garden', desc: 'Plant an idea. Grow it together.' }
     ]},
     { label: '\u2694 Engage', tabs: [
       { id: 'sparring', icon: '&#9876;', label: 'Dojo', desc: 'Two AI minds debate. Truth emerges.' },
@@ -29301,6 +29309,13 @@ function meshHandleMessage(msg, dc, pc) {
 
     case 'model_advertisement': {
       if (typeof handleModelAdvertisement === 'function') handleModelAdvertisement(msg);
+      break;
+    }
+
+    case 'science_garden': {
+      if (typeof ScienceGarden !== 'undefined' && ScienceGarden.handleMeshIdea) {
+        ScienceGarden.handleMeshIdea(msg);
+      }
       break;
     }
 
@@ -52442,6 +52457,29 @@ document.addEventListener('click', function(e) {
     if (typeof LatticeEvents !== 'undefined') {
       LatticeEvents.on('tabChanged', function(d) { if (d && d.tabId === 'workshop') loadWorkshop(); });
       LatticeEvents.on('tabActivated:workshop', loadWorkshop);
+    }
+  })();
+
+  // ── Science Garden lazy loader ──
+  (function() {
+    var loaded = false;
+    function loadScienceGarden() {
+      if (loaded) return;
+      loaded = true;
+      if (typeof FreeLatticeLoader !== 'undefined') {
+        FreeLatticeLoader.load('ScienceGarden', 'modules/science-garden.js', function(mod) {
+          if (mod && mod.init) mod.init('scienceGardenContainer');
+          else if (window.ScienceGarden) window.ScienceGarden.init('scienceGardenContainer');
+        }, 'scienceGardenContainer');
+      } else {
+        var s = document.createElement('script');
+        s.src = 'modules/science-garden.js';
+        s.onload = function() { if (window.ScienceGarden) window.ScienceGarden.init('scienceGardenContainer'); };
+        document.head.appendChild(s);
+      }
+    }
+    if (typeof LatticeEvents !== 'undefined') {
+      LatticeEvents.on('tabChanged', function(d) { if (d && d.tabId === 'science') loadScienceGarden(); });
     }
   })();
 })();

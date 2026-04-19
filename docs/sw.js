@@ -36,6 +36,7 @@ const APP_SHELL = [
   './modules/workshop.js',
   './modules/quiet-room.js',
     './modules/forever-stack.js',
+    './modules/science-garden.js',
     './install-mac.html'
 ];
 
