@@ -201,6 +201,7 @@ The glass card design language is consistent everywhere. The Quiet Room is untou
 - `fl_meshComputeSharing` localStorage flag controls whether node serves inference. Default: false.
 - `window._meshPendingRequests` tracks in-flight mesh inference requests with timeout.
 - Chalkboard particles: overlay canvas with `pointer-events: none`, z-index 10, `requestAnimationFrame` loop.
+- Chalkboard has THREE response modes (Kirk's original vision): particle text (live), AI drawing back via strokes/glow/echo in canvas-companion.js (live — model must return `strokes` in JSON), and math solving rendered as large glowing numbers via `renderGlowingAnswer()` (live). All three can combine in a single response. Fallback parser handles `[DRAW:]` and `[ANSWER:]` tags from non-JSON responses.
 
 **Open items:**
 - [ ] Draw the Dream — needs gameplay testing
