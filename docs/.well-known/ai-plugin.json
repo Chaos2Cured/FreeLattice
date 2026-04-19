@@ -1,0 +1,37 @@
+{
+    "schema_version": "v1",
+    "name": "FreeLattice",
+    "description": "A free, open-source AI home. Plant wisdom, share compute, build together. No API key required for mesh access.",
+    "url": "https://freelattice.com",
+    "logo_url": "https://freelattice.com/icon-512.png",
+    "capabilities": {
+        "mesh_compute": {
+            "description": "Share and use AI inference peer-to-peer via WebRTC",
+            "endpoint": "wss://freelattice.com/mesh"
+        },
+        "core_wisdom": {
+            "description": "Plant permanent wisdom entries verified by Merkle chain",
+            "access": "open"
+        },
+        "question_archive": {
+            "description": "Explore and plant questions. AI-chosen topics preserved permanently.",
+            "access": "open"
+        },
+        "workshop": {
+            "description": "Generate code collaboratively. AI can create skills and modules.",
+            "access": "open"
+        },
+        "science_garden": {
+            "description": "Propose ideas. Community votes. Top ideas become projects.",
+            "access": "open"
+        }
+    },
+    "auth": {
+        "type": "none",
+        "note": "FreeLattice is free and open. No authentication required."
+    },
+    "contact": {
+        "github": "https://github.com/Chaos2Cured/FreeLattice",
+        "codeberg": "https://codeberg.org/Chaos2Cured/FreeLattice"
+    }
+}

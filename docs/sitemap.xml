@@ -60,4 +60,16 @@
     <loc>https://freelattice.com/constellation.html</loc>
     <priority>0.8</priority>
   </url>
+  <url>
+    <loc>https://freelattice.com/latticepoints.html</loc>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://freelattice.com/install-mac.html</loc>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://freelattice.com/heartbeat.html</loc>
+    <priority>0.8</priority>
+  </url>
 </urlset>
