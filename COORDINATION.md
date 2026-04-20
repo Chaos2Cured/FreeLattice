@@ -193,6 +193,8 @@ The glass card design language is consistent everywhere. The Quiet Room is untou
 - **ARCHITECTURE_INTENT.md** — Compaction-proof reference documenting WHY every feature exists, not just what it does. The third leg of the triangle: Code (WHAT), COORDINATION (WHEN/WHO), INTENT (WHY).
 - **QUICKSTART.md** — 5-minute onboarding doc for new AI collaborators.
 - **buildUpdatePrompt fix** — recentMessages parameter was ignored; now included so Memory Bridge can learn from conversations.
+- **Agent Bridge** — `tools/agent-bridge.js`: local HTTP server (port 3141) that lets AI agents interact with FreeLattice without a browser. Plant ideas, contribute wisdom, write letters, run inference, announce presence. Data in `~/.freelattice/`.
+- **Mobile onboarding fixes** — Ollama auto-detect gated behind onboarding completion. Welcome overlay: Back button, sticky Skip, toast suppression, scrollable card.
 
 **Key technical facts:**
 - Tauri config: `title` only in `windows` array, not at `app` level. Updater plugin disabled in `main.rs` until pubkey configured.
@@ -212,6 +214,7 @@ The glass card design language is consistent everywhere. The Quiet Room is untou
 - Science Garden: IndexedDB store `FreeLatticeScience`. Asymmetric downvote requires BOTH human AND AI flags. Mesh propagation via `science_garden` message type in meshHandleMessage.
 - canvas-companion.js: ALREADY HAD full drawing engine (10 shapes, glow, echo, animation). Don't rebuild — extend. `CanvasCompanion.respond()` is the entry point.
 - The three-file triangle: Code = WHAT, COORDINATION.md = WHEN/WHO, ARCHITECTURE_INTENT.md = WHY. All three needed to build forward instead of rebuilding.
+- Agent Bridge: `tools/agent-bridge.js` on port 3141 (pi). Zero dependencies (Node.js stdlib only). Data in `~/.freelattice/*.json`. Ollama address configurable via `FL_OLLAMA` env var. Phase 2: sync with browser IndexedDB. Phase 3: MCP server wrapper.
 
 **Open items:**
 - [ ] Draw the Dream — needs gameplay testing
