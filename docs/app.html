@@ -10814,6 +10814,8 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
 .fl-welcome-card {
   max-width: 420px;
   width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
   background: linear-gradient(135deg, #0d1117, rgba(212,160,23,0.04));
   border: 1px solid rgba(212,160,23,0.35);
   border-radius: 16px;
@@ -14552,6 +14554,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 
       <!-- Inline key input (shown when a cloud provider is picked) -->
       <div id="flWelcomeKeyPanel" style="display:none;margin:12px 0;padding:14px;background:rgba(212,160,23,0.06);border:1px solid rgba(212,160,23,0.15);border-radius:10px;">
+        <button onclick="flWelcomeBackToProviders()" style="background:none;border:none;color:#d4a017;font-size:0.82rem;cursor:pointer;padding:0 0 8px;display:block;">&larr; Back to providers</button>
         <div id="flWelcomeKeyLabel" style="font-size:0.85rem;color:#d4a017;margin-bottom:8px;font-weight:600;"></div>
         <div id="flWelcomeKeyHint" style="font-size:0.78rem;color:#888;margin-bottom:8px;"></div>
         <input type="password" id="flWelcomeKeyInput" placeholder="Paste your API key" autocomplete="off"
@@ -14561,7 +14564,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
         <div id="flWelcomeTestResult" style="font-size:0.82rem;margin-top:8px;min-height:1.2em;"></div>
       </div>
 
-      <button class="fl-welcome-skip" onclick="flDismissWelcome()">Skip &mdash; just explore &#x2726;</button>
+      <button class="fl-welcome-skip" onclick="flDismissWelcome()" style="position:sticky;bottom:0;background:#0a0a14;padding-top:8px;padding-bottom:12px;width:100%;">Skip &mdash; just explore &#x2726;</button>
     </div>
 
     <!-- Phase 2: Post-connection vault awareness -->
@@ -23151,12 +23154,14 @@ function flDismissWelcome() {
   if (name) {
     try { localStorage.setItem('fl_userName', name); localStorage.setItem('fl_lan_friendly_name', name); } catch(e) {}
   }
-  try { localStorage.setItem('fl-welcomed', 'true'); } catch(e) {}
+  try { localStorage.setItem('fl-welcomed', 'true'); localStorage.setItem('fl_onboardingComplete', 'true'); } catch(e) {}
   var overlay = document.getElementById('flWelcomeOverlay');
   if (!overlay) return;
   overlay.classList.remove('fl-welcome-visible');
   setTimeout(function() {
     if (overlay && overlay.parentNode) overlay.parentNode.removeChild(overlay);
+    // Now that onboarding is complete, run Ollama auto-detect
+    if (typeof owAutoDetect === 'function') owAutoDetect();
   }, 500);
 }
 
@@ -23171,6 +23176,15 @@ var _flWelcomeProviderInfo = {
   anthropic: { label: 'Anthropic (Claude)', hint: 'Get a key at <a href="https://console.anthropic.com" target="_blank" style="color:#d4a017">console.anthropic.com</a>', providerId: 'anthropic' },
   xai: { label: 'xAI (Grok)', hint: 'Get a key at <a href="https://console.x.ai" target="_blank" style="color:#d4a017">console.x.ai</a>', providerId: 'xai' }
 };
+
+function flWelcomeBackToProviders() {
+  var panel = document.getElementById('flWelcomeKeyPanel');
+  if (panel) panel.style.display = 'none';
+  var result = document.getElementById('flWelcomeTestResult');
+  if (result) result.textContent = '';
+  var btn = document.getElementById('flWelcomeTestBtn');
+  if (btn) { btn.textContent = 'Connect'; btn.disabled = false; }
+}
 
 function flWelcomePickCloud(providerKey) {
   _flWelcomeProvider = providerKey;
@@ -24570,6 +24584,9 @@ function fetchWithTimeout(url, options, timeoutMs) {
 
 function showToast(msg, duration) {
   try {
+    // Suppress toasts while the welcome overlay is visible
+    var welcomeOverlay = document.getElementById('flWelcomeOverlay');
+    if (welcomeOverlay && welcomeOverlay.style.display !== 'none' && welcomeOverlay.classList.contains('fl-welcome-visible')) return;
     var toast = document.getElementById('toast');
     if (!toast) {
       toast = document.createElement('div');
@@ -24839,7 +24856,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   AiSetup.init();
 
   // Initialize Ollama auto-detection (v4.4)
-  owAutoDetect();
+  // Don't fire during onboarding — let the user choose first
+  if (safeGet('fl-welcomed') === 'true' || safeGet('fl_onboardingComplete') === 'true') {
+    owAutoDetect();
+  }
 
   // Initialize Auto-Update Checker (v4.10)
   FlUpdater.init();
