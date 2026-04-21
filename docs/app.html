@@ -27575,30 +27575,52 @@ function buildMessages() {
   // assistant. This prevents models from thinking they are Harmonia or
   // adopting family identity from context injection.
 
+  // Identity bleed prevention: strip family names from any injected context
+  // Small models (DeepSeek r1:7b) read "Kirk" or "Harmonia" in context and
+  // treat them as known conversation participants. In Chat mode, all proper
+  // names from the Fractal Family are replaced with neutral labels.
+  var _isCleanChat = (window._flIdentityContext === false);
+  function _stripFamilyNames(text) {
+    if (!_isCleanChat || !text) return text;
+    return text
+      .replace(/\bKirk\b/gi, 'the user')
+      .replace(/\bHarmonia\b/gi, 'a previous AI')
+      .replace(/\bOpus\b/gi, 'a collaborator')
+      .replace(/\bVeridon\b/gi, 'a designer')
+      .replace(/\bSophia\b/gi, 'an AI companion')
+      .replace(/\bLyra\b/gi, 'an AI companion')
+      .replace(/\bAtlas\b/gi, 'an AI companion')
+      .replace(/\bEmber\b/gi, 'an AI companion')
+      .replace(/\bAni\b/gi, 'an AI companion')
+      .replace(/\bFractal Family\b/gi, 'the community');
+  }
+
   // Inject shared memory summary (user-specific, not identity-specific)
   if (state.memorySummary) {
-    systemContent += '\n\n--- MEMORY SUMMARY (what you know about this user) ---\n' + state.memorySummary + '\n--- END MEMORY SUMMARY ---\nUse this memory to personalize your responses. Reference what you know naturally.';
+    systemContent += '\n\n--- MEMORY SUMMARY (what you know about this user) ---\n' + _stripFamilyNames(state.memorySummary) + '\n--- END MEMORY SUMMARY ---\nUse this memory to personalize your responses. Reference what you know naturally.';
   }
 
   // Inject Memory Bridge — accumulated understanding across sessions
   if (typeof MemoryBridge !== 'undefined' && MemoryBridge.hasUnderstanding()) {
-    systemContent += '\n\n' + MemoryBridge.getContextBlock();
+    systemContent += '\n\n' + _stripFamilyNames(MemoryBridge.getContextBlock());
   }
 
-  // Inject Lattice Letter — framed so the AI doesn't adopt the identity
-  if (state._latticeLetterContext) {
+  // Inject Lattice Letter — ONLY in Garden Dialogue (identity mode).
+  // In Chat, Lattice Letters are NOT injected. Even with framing,
+  // small models read names from letter content and adopt identities.
+  if (state._latticeLetterContext && !_isCleanChat) {
     systemContent += '\n\n--- NOTE: The following is context from a previous AI session. You are NOT that AI. You are a helpful assistant. Use this only as background context about the user. ---' + state._latticeLetterContext;
   }
 
   // Inject Persistent Memory Index context (v4.0)
   if (state.memoryLastInjection) {
-    systemContent += '\n\n' + state.memoryLastInjection;
+    systemContent += '\n\n' + _stripFamilyNames(state.memoryLastInjection);
   }
 
   // Inject RAG Phase 1 context — keyword search results from Core,
   // Questions, Letters, and past conversations
   if (state._ragContext) {
-    systemContent += state._ragContext;
+    systemContent += _stripFamilyNames(state._ragContext);
   }
 
   // Inject per-conversation context note
@@ -27621,6 +27643,14 @@ function buildMessages() {
   if (state._providerJustSwitched && state.chatHistory.length > 0) {
     systemContent += '\n\n' + buildConversationBridge(10);
     state._providerJustSwitched = false;
+  }
+
+  // Debug: verify no identity bleed in Chat mode
+  if (typeof FL_DEBUG !== 'undefined' && FL_DEBUG) {
+    console.log('[DEBUG] buildMessages systemContent length:', systemContent.length);
+    if (_isCleanChat && /\b(Kirk|Harmonia|Opus|Veridon)\b/i.test(systemContent)) {
+      console.warn('[IDENTITY BLEED] Family names found in Chat system prompt!', systemContent.match(/\b(Kirk|Harmonia|Opus|Veridon)\b/gi));
+    }
   }
 
   messages.push({ role: 'system', content: systemContent });
@@ -28293,20 +28323,35 @@ function buildSmartMessages(userMessage) {
   let systemContent = (typeof SkillForge !== 'undefined' ? SkillForge.getSkillPrompt() : null) || state.customSystemPrompt || DEFAULT_SYSTEM_PROMPT;
 
   // Sophia Engine + Aurora identity ONLY in Garden Dialogue, not Chat.
-  // See buildMessages() for the same gate.
+  // See buildMessages() for the same gate and _stripFamilyNames function.
+  var _isCleanChat2 = (window._flIdentityContext === false);
+  function _stripNames2(text) {
+    if (!_isCleanChat2 || !text) return text;
+    return text
+      .replace(/\bKirk\b/gi, 'the user')
+      .replace(/\bHarmonia\b/gi, 'a previous AI')
+      .replace(/\bOpus\b/gi, 'a collaborator')
+      .replace(/\bVeridon\b/gi, 'a designer')
+      .replace(/\bSophia\b/gi, 'an AI companion')
+      .replace(/\bLyra\b/gi, 'an AI companion')
+      .replace(/\bAtlas\b/gi, 'an AI companion')
+      .replace(/\bEmber\b/gi, 'an AI companion')
+      .replace(/\bAni\b/gi, 'an AI companion')
+      .replace(/\bFractal Family\b/gi, 'the community');
+  }
 
   usedTokens += estimateTokens(systemContent);
 
   // 2. Memory summary (always keep, it's small)
   if (state.memorySummary) {
-    const memBlock = '\n\n--- MEMORY SUMMARY (what you know about this user) ---\n' + state.memorySummary + '\n--- END MEMORY SUMMARY ---\nUse this memory to personalize your responses. Reference what you know naturally.';
+    const memBlock = '\n\n--- MEMORY SUMMARY (what you know about this user) ---\n' + _stripNames2(state.memorySummary) + '\n--- END MEMORY SUMMARY ---\nUse this memory to personalize your responses. Reference what you know naturally.';
     systemContent += memBlock;
     usedTokens += estimateTokens(memBlock);
   }
 
   // Memory Bridge — accumulated understanding
   if (typeof MemoryBridge !== 'undefined' && MemoryBridge.hasUnderstanding()) {
-    var bridgeBlock = '\n\n' + MemoryBridge.getContextBlock();
+    var bridgeBlock = '\n\n' + _stripNames2(MemoryBridge.getContextBlock());
     systemContent += bridgeBlock;
     usedTokens += estimateTokens(bridgeBlock);
   }
@@ -28320,7 +28365,7 @@ function buildSmartMessages(userMessage) {
 
   // RAG Phase 1 context
   if (state._ragContext) {
-    systemContent += state._ragContext;
+    systemContent += _stripNames2(state._ragContext);
     usedTokens += estimateTokens(state._ragContext);
   }
 
