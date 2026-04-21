@@ -538,6 +538,21 @@
     // Generic ceremony runner for other modules to use
     run: runCeremony,
 
+    // Quick fire — color name/hex + message (convenience for Vault, Core, etc.)
+    fire: function(color, message) {
+      var colorMap = {
+        gold: '212,160,23', emerald: '16,185,129', blue: '59,130,246',
+        red: '220,38,38', purple: '139,92,246', pink: '236,72,153'
+      };
+      var rgb = colorMap[color] || color || '212,160,23';
+      runCeremony({
+        particleType: 'rise',
+        particleColor: rgb,
+        lines: [message || ''],
+        duration: 2500
+      });
+    },
+
     // Initialize
     init: function() {
       createOverlay();
