@@ -14724,6 +14724,11 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
         <div class="hint">Choose from the dropdown above, or type a model name manually.</div>
       </div>
 
+      <!-- Quick link to model browser (Local only) -->
+      <div class="form-group hidden" id="ollamaModelBrowseLink" style="margin-top:0;padding:0;">
+        <a href="#" onclick="event.preventDefault();if(typeof switchTab==='function')switchTab('forever-stack')" style="font-size:0.82rem;color:#d4a017;text-decoration:none;">Need more models? Browse &amp; download &darr;</a>
+      </div>
+
       <!-- Ollama Host (Local only) -->
       <div class="form-group hidden" id="ollamaHostGroup">
         <label for="ollamaHostInput">&#x1F3E0; Ollama Address</label>
@@ -25580,6 +25585,8 @@ function handleLocalToggle(init) {
     if (apiKeyGroup) apiKeyGroup.classList.add('hidden');
     if (ollamaModelGroup) ollamaModelGroup.classList.remove('hidden');
     if (ollamaHostGroup) ollamaHostGroup.classList.remove('hidden');
+    var modelBrowseLink = document.getElementById('ollamaModelBrowseLink');
+    if (modelBrowseLink) modelBrowseLink.classList.remove('hidden');
     var meshComputeGroup = document.getElementById('meshComputeGroup');
     if (meshComputeGroup) meshComputeGroup.classList.remove('hidden');
     if (ollamaInstructions) ollamaInstructions.classList.remove('hidden');
@@ -25599,6 +25606,8 @@ function handleLocalToggle(init) {
     if (apiKeyGroup) apiKeyGroup.classList.remove('hidden');
     if (ollamaModelGroup) ollamaModelGroup.classList.add('hidden');
     if (ollamaHostGroup) ollamaHostGroup.classList.add('hidden');
+    var modelBrowseLink2 = document.getElementById('ollamaModelBrowseLink');
+    if (modelBrowseLink2) modelBrowseLink2.classList.add('hidden');
     var meshComputeGroup2 = document.getElementById('meshComputeGroup');
     if (meshComputeGroup2) meshComputeGroup2.classList.add('hidden');
     if (ollamaInstructions) ollamaInstructions.classList.add('hidden');
@@ -36067,6 +36076,14 @@ Together.`,
       }
     }
 
+    // Show planting indicator while hashing
+    var plantingIndicator = document.createElement('div');
+    plantingIndicator.id = 'core-planting-indicator';
+    plantingIndicator.textContent = '\uD83C\uDF31 Planting wisdom...';
+    plantingIndicator.style.cssText = 'text-align:center;padding:12px;color:#d4a017;font-style:italic;font-size:0.85rem;animation:pulse 1.5s ease-in-out infinite;';
+    var plantBtn = document.getElementById('coreModalPlantBtn') || document.querySelector('.core-plant-btn');
+    if (plantBtn && plantBtn.parentNode) plantBtn.parentNode.insertBefore(plantingIndicator, plantBtn.nextSibling);
+
     var parentHash = getLatestHash();
     var timestamp = Date.now();
     var hash = await computeHash(content, timestamp, parentHash);
@@ -36109,6 +36126,10 @@ Together.`,
     updateStats();
     updateMerkleFooter();
 
+    // Remove planting indicator
+    var pi = document.getElementById('core-planting-indicator');
+    if (pi) pi.remove();
+
     // Trigger a gold light pulse on the Core tree so the plant feels alive.
     // The drawTree loop checks _coreTreePulseUntil and renders a radiating
     // golden glow that fades over 1.5 seconds.
@@ -36116,13 +36137,20 @@ Together.`,
 
     // Soul Ceremony — a moment of beauty when wisdom is planted
     try {
-      if (typeof SoulCeremony !== 'undefined' && SoulCeremony.run) {
-        SoulCeremony.run({
-          particleType: 'rise',
-          particleColor: '212,160,23',
-          lines: ['A seed is planted in the Core', 'What is hashed, endures.'],
-          duration: 2500
-        });
+      if (typeof SoulCeremony !== 'undefined') {
+        // Use source-specific color (Garden Dialogue passes Luminos color)
+        var ceremonyColor = (opts && opts.luminosColor) || '212,160,23';
+        var ceremonyMsg = (opts && opts.luminosName) ? 'Wisdom planted by ' + opts.luminosName : 'What is hashed, endures.';
+        if (SoulCeremony.coreContribution) {
+          SoulCeremony.coreContribution();
+        } else if (SoulCeremony.run) {
+          SoulCeremony.run({
+            particleType: 'rise',
+            particleColor: ceremonyColor,
+            lines: ['A seed is planted in the Core', ceremonyMsg],
+            duration: 2500
+          });
+        }
       }
     } catch(e) { /* ceremony is optional — silently skip */ }
 
@@ -49392,14 +49420,38 @@ const CoCanvas = (function() {
     }
   }
 
+  // ── Resize handler — keep canvas matched to container ──
+  function resizeChalkboard() {
+    if (!canvas) return;
+    var container = document.getElementById('cvContainer');
+    if (!container || container.clientWidth === 0) return;
+    var newW = container.clientWidth;
+    var newH = container.clientHeight;
+    if (newW === w && newH === h) return;
+    // Save current drawing
+    var imgData = null;
+    try { imgData = ctx.getImageData(0, 0, canvas.width, canvas.height); } catch(e) {}
+    w = newW;
+    h = newH;
+    canvas.width = w * dpr;
+    canvas.height = h * dpr;
+    canvas.style.width = w + 'px';
+    canvas.style.height = h + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    // Restore drawing (may stretch slightly on resize, but preserves work)
+    if (imgData) { try { ctx.putImageData(imgData, 0, 0); } catch(e) {} }
+  }
+  window.addEventListener('resize', resizeChalkboard);
+
   // ── Input Handlers ──
   function getPos(e) {
     var rect = canvas.getBoundingClientRect();
     var clientX = e.clientX || (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
     var clientY = e.clientY || (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
+    // Use rect dimensions directly — never stale
     return {
-      x: (clientX - rect.left) * (w / rect.width),
-      y: (clientY - rect.top) * (h / rect.height),
+      x: (clientX - rect.left) * (canvas.width / dpr / rect.width),
+      y: (clientY - rect.top) * (canvas.height / dpr / rect.height),
       t: Date.now()
     };
   }
@@ -49521,7 +49573,8 @@ const CoCanvas = (function() {
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
     if (initialized) {
-      // Re-entering tab — just restart animation
+      // Re-entering tab — resize to current container and restart
+      resizeChalkboard();
       animate();
       if (!autoResponseTimer) autoResponseTimer = setInterval(checkAutoResponse, 500);
       return;
