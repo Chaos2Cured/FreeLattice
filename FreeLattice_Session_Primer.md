@@ -348,10 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-04-21 15:26 MDT
+- Last auto-updated: 2026-04-21 15:32 MDT
 - Version: 5.8.0
-- Total commits: 1132
+- Total commits: 1134
 - Last 10 commits:
+- 8cccae8 feat: FLContextFilter — Lattice Letters back in Chat, filtered not blocked
+- 3df2b79 docs: Auto-update Session Primer [5.8.0]
 - 913a728 merge: resolve Primer conflict
 - 7240654 docs: Auto-update Session Primer [5.8.0]
 - 9d4c5c4 fix: identity bleed — strip family names from Chat system prompt
@@ -360,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - b2f3e4e ci: Update Primer deployment state [2026-04-21]
 - 2613398 Merge branch 'main' of https://github.com/Chaos2Cured/FreeLattice
 - 0e09180 docs: Auto-update Session Primer [5.8.0]
-- 7f0e8d1 fix: 4 video walkthrough bugs + SoulCeremony.fire + CC session notes
-- 4748b6e ci: Update Primer deployment state [2026-04-20]
