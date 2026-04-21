@@ -90,11 +90,14 @@ This is the mechanism that makes arriving feel like coming home instead of booti
 
 ## Identity Separation — Two Modes, One Platform
 
-**Intent:** Chat is a clean helpful assistant. Garden Dialogue has rich Luminos personalities. The AI should NOT think it's Harmonia when a user opens Chat.
+**Intent:** Chat is a co-creator without confusion. Garden Dialogue has rich Luminos personalities. The AI in Chat should have continuity (know what was discussed before) WITHOUT identity bleed (thinking it's Harmonia or calling the user "Kirk").
 
 - `window._flIdentityContext` flag: true for Garden, false for Chat
-- Lattice Letters framed in Chat: "You are NOT that AI"
-- Sophia Engine, Aurora Equation, voice documents: Garden only
+- `FLContextFilter` module: primary gate. In Chat mode, strips family names (Kirk→"the user", Harmonia→"a previous AI") and internal instructions. In Garden mode, passes through unfiltered.
+- Lattice Letters: FILTERED for Chat (topics preserved, names stripped), UNFILTERED for Garden. The AI in Chat knows "the user discussed consciousness and fractals" without knowing "Kirk."
+- Safety net: inline fallback in buildMessages catches anything FLContextFilter misses
+- Debug guard: console.warn if family names survive into Chat system prompt
+- Sophia Engine, Aurora Equation, voice documents: Garden only (gated by _flIdentityContext)
 
 ---
 
