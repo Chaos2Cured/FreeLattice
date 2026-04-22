@@ -26463,7 +26463,7 @@ window.FLSearch = (function() {
     return score;
   }
 
-  function searchStore(storeConfig, keywords) {
+  function searchStore(storeConfig, keywords, excludeConvId) {
     return new Promise(function(resolve) {
       try {
         var req = indexedDB.open(storeConfig.db);
@@ -26481,6 +26481,8 @@ window.FLSearch = (function() {
             var items = getAll.result || [];
             var matches = [];
             for (var i = 0; i < items.length; i++) {
+              // Exclude current conversation to prevent echoing user's own words back
+              if (excludeConvId && items[i].conversationId === excludeConvId) continue;
               var text = extractText(items[i]);
               if (!text) continue;
               var score = scoreMatch(text, keywords);
@@ -26503,7 +26505,7 @@ window.FLSearch = (function() {
     });
   }
 
-  function search(query, maxResults) {
+  function search(query, maxResults, excludeConvId) {
     maxResults = maxResults || 3;
     var keywords = extractKeywords(query);
     if (keywords.length === 0) return Promise.resolve([]);
@@ -26511,7 +26513,8 @@ window.FLSearch = (function() {
     console.log('[FLSearch] Searching for:', keywords.join(', '));
 
     return Promise.all(STORES.map(function(s) {
-      return searchStore(s, keywords);
+      // Only exclude current conv from messages store — other stores are fine
+      return searchStore(s, keywords, s.store === 'messages' ? excludeConvId : null);
     })).then(function(results) {
       var all = [];
       for (var i = 0; i < results.length; i++) {
@@ -27241,7 +27244,8 @@ async function sendMessage() {
   state._ragContext = '';
   if (state.memoryAutoContext !== false && typeof FLSearch !== 'undefined') {
     try {
-      var ragResults = await FLSearch.search(message, 3);
+      // Pass current conversation ID so RAG never echoes the user's own words back
+      var ragResults = await FLSearch.search(message, 3, state.currentConversationId);
       if (ragResults.length > 0) {
         state._ragContext = FLSearch.buildContextBlock(ragResults);
       }
