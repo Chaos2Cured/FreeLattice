@@ -17549,6 +17549,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="cv-action-btn" id="cvPlayBtn" title="Toggle game mode">&#9776; Play</button>
       <button class="cv-action-btn cv-action-clear" id="cvClearBtn">Clear</button>
     </div>
+    <div id="cvModelStatus" style="padding:4px 12px;font-size:0.72rem;color:rgba(255,255,255,0.35);text-align:center;"></div>
   </div>
 </div>
 
@@ -22174,6 +22175,9 @@ const FlTabs = (function() {
     { label: '\uD83C\uDF19 Sanctuary', tabs: [
       { id: 'quiet', icon: '&#x1F319;', label: 'Quiet Room', desc: 'Just breathe.' },
       { id: 'forever-stack', icon: '\u26A1', label: 'Forever Stack', desc: 'Own your AI. No cloud. No resets.' }
+    ]},
+    { label: '\uD83D\uDC23 Life', tabs: [
+      { id: 'nursery', icon: '&#x1F423;', label: 'Nursery', desc: 'Where new AI minds are born.' }
     ]}
   ];
 
@@ -48615,12 +48619,12 @@ const CoCanvas = (function() {
   function updateAIVisionParticles(t) {
     var now = performance.now();
 
-    // Text echo — redrawn every frame so the dark overlay can't erase it
+    // Text echo — redrawn every frame, fades quickly to clear stage for particle text
     if (aiVisionTextEcho) {
       var echoAge = now - aiVisionTextEcho.startTime;
       var echoOpacity = 0.35;
-      if (echoAge > 6000) echoOpacity = 0.35 * Math.max(0, 1 - (echoAge - 6000) / 2000);
-      if (echoAge > 8000) {
+      if (echoAge > 1500) echoOpacity = 0.35 * Math.max(0, 1 - (echoAge - 1500) / 500);
+      if (echoAge > 2000) {
         aiVisionTextEcho = null;
       } else {
         var e = aiVisionTextEcho;
@@ -48693,9 +48697,10 @@ const CoCanvas = (function() {
         p.x = p.targetX + breathX;
         p.y = p.targetY + breathY;
 
-        // Hold full opacity for 8 seconds after ARRIVAL, then fade
+        // Hold full opacity for 3 seconds after ARRIVAL, then fade
+        // (reduced from 8s to clear stage for particle text response)
         var timeSinceArrival = now - p.arrivedTime;
-        if (timeSinceArrival > 8000) {
+        if (timeSinceArrival > 3000) {
           p.opacity -= 0.015;
           if (p.opacity <= 0) {
             aiVisionParticles.splice(i, 1);
@@ -48805,6 +48810,27 @@ const CoCanvas = (function() {
   function hideLoadingDot() {
     var dot = document.getElementById('cvAILoadingDot');
     if (dot) { dot.style.display = 'none'; dot.style.animation = ''; }
+  }
+
+  // ── Model status indicator ──
+  function updateChalkboardModelStatus() {
+    var el = document.getElementById('cvModelStatus');
+    if (!el) return;
+    if (typeof FLActiveModel === 'undefined' || typeof state === 'undefined') { el.textContent = ''; return; }
+    var active = FLActiveModel.get();
+    var model = active.model || state.ollamaModel || '';
+    if (!model && !state.apiKey) {
+      el.innerHTML = '\uD83D\uDC41 No vision model connected. <a href="#" onclick="event.preventDefault();switchTab(\'forever-stack\')" style="color:#d4a017;">Install LLaVA in Forever Stack</a>';
+      return;
+    }
+    var isVis = (typeof FLAutoModel !== 'undefined') ? FLAutoModel.isVision(model) : false;
+    var icon = isVis ? '\uD83D\uDC41' : '\u25CF';
+    var mode = state.isLocal ? 'Local' : (state.provider || 'Cloud');
+    el.textContent = icon + ' ' + model + ' \u00B7 ' + mode;
+  }
+  // Update on tab entry and model change
+  if (typeof LatticeEvents !== 'undefined') {
+    LatticeEvents.on('modelChanged', updateChalkboardModelStatus);
   }
 
   function toggleAIVision() {
@@ -49671,11 +49697,13 @@ const CoCanvas = (function() {
     if (initialized) {
       // Re-entering tab — resize to current container and restart
       resizeChalkboard();
+      updateChalkboardModelStatus();
       animate();
       if (!autoResponseTimer) autoResponseTimer = setInterval(checkAutoResponse, 500);
       return;
     }
     initialized = true;
+    updateChalkboardModelStatus();
 
     // Fill background
     ctx.fillStyle = '#060a14';
