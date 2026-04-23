@@ -348,10 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-04-21 16:05 MDT
+- Last auto-updated: 2026-04-23 12:32 MDT
 - Version: 5.8.0
-- Total commits: 1141
+- Total commits: 1143
 - Last 10 commits:
+- 77ca86e feat: FLActiveModel — single source of truth for model selection
+- cb3aeb4 docs: Auto-update Session Primer [5.8.0]
 - 4e52914 merge: resolve Primer conflict
 - 23320ec docs: Auto-update Session Primer [5.8.0]
 - cce60ef feat: AI Residency System — Soul File, Relay, Curiosity Engine, Commons
@@ -360,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 8a5cc8c docs: Auto-update Session Primer [5.8.0]
 - 8cccae8 feat: FLContextFilter — Lattice Letters back in Chat, filtered not blocked
 - 5f3e7d2 ci: Update Primer deployment state [2026-04-21]
-- 3df2b79 docs: Auto-update Session Primer [5.8.0]
-- 913a728 merge: resolve Primer conflict

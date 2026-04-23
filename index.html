@@ -24917,6 +24917,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Initialize Tab System (v5.3 — fixed primary + grouped More)
   FlTabs.init();
+  if (typeof FLActiveModel !== 'undefined') FLActiveModel.init();
   AiSetup.init();
 
   // Initialize Ollama auto-detection (v4.4)
@@ -26271,139 +26272,123 @@ window.FLModelPicker = (function() {
 // Canvas/Chalkboard → vision model. Chat/Garden/Dojo → text model.
 // User never touches a picker. It just works.
 // ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
+// FLActiveModel — SINGLE SOURCE OF TRUTH for the active model.
+// Every path that changes the model MUST go through this.
+// User choice is sacred. Auto-select is a suggestion.
+// ═══════════════════════════════════════════════════════════════
+window.FLActiveModel = (function() {
+  var _model = null;
+  var _provider = null;
+  var _source = null; // 'user', 'auto', 'boot'
+
+  function set(model, provider, source) {
+    if (!model) return;
+    _model = model;
+    _provider = provider || 'ollama';
+    _source = source || 'auto';
+    safeSet('fl_ollamaModel', model);
+    safeSet('fl_provider', provider);
+    safeSet('fl_modelSource', source);
+    if (typeof state !== 'undefined') {
+      state.ollamaModel = model;
+      state.provider = provider;
+    }
+    var ollamaInput = document.getElementById('ollamaModel');
+    if (ollamaInput) ollamaInput.value = model;
+    if (typeof ModelSwitcher !== 'undefined' && ModelSwitcher.updateLabel) ModelSwitcher.updateLabel();
+    if (typeof updateStatus === 'function') updateStatus();
+    if (typeof LatticeEvents !== 'undefined') {
+      LatticeEvents.emit('modelChanged', { model: model, provider: provider, source: source });
+    }
+  }
+
+  function get() { return { model: _model, provider: _provider, source: _source }; }
+  function isUserChosen() { return _source === 'user'; }
+
+  function init() {
+    _model = safeGet('fl_ollamaModel', null);
+    _provider = safeGet('fl_provider', null);
+    _source = safeGet('fl_modelSource', 'boot');
+  }
+
+  return { set: set, get: get, isUserChosen: isUserChosen, init: init };
+})();
+
 window.FLAutoModel = (function() {
   var VISION_RE = /llava|bakllava|moondream|minicpm|qwen.*vl|llama.*vision|gemma4/i;
   var cachedModels = null;
   var cacheTime = 0;
-  var CACHE_TTL = 30000; // refresh model list every 30s
+  var CACHE_TTL = 30000;
 
-  // Manual override: when the user picks a model, their choice is sacred.
-  // We track which tab they chose it on so auto-select skips that tab
-  // but still works when switching to a different tab type.
-  var manualOverride = false;
-  var manualOverrideTab = null;
-  var manualOverrideModel = null;
-
-  // Tabs that need vision models
   var VISION_TABS = ['canvas', 'chalkboard'];
-  // Tabs that prefer text models
   var TEXT_TABS = ['chat', 'garden', 'dojo', 'questions', 'sparring', 'skills', 'roundtable'];
 
   function getInstalledModels(callback) {
-    if (cachedModels && Date.now() - cacheTime < CACHE_TTL) {
-      callback(cachedModels);
-      return;
-    }
+    if (cachedModels && Date.now() - cacheTime < CACHE_TTL) { callback(cachedModels); return; }
     fetch(getOllamaBaseUrl() + '/api/tags', { method: 'GET' })
       .then(function(r) { return r.json(); })
-      .then(function(data) {
-        cachedModels = (data && data.models) || [];
-        cacheTime = Date.now();
-        callback(cachedModels);
-      })
+      .then(function(data) { cachedModels = (data && data.models) || []; cacheTime = Date.now(); callback(cachedModels); })
       .catch(function() { callback(cachedModels || []); });
   }
 
   function isVision(name) { return VISION_RE.test(name || ''); }
-
-  function getPreferred(type) {
-    try { return localStorage.getItem('fl_preferred_' + type + '_model'); } catch(e) { return null; }
-  }
-
-  function setPreferred(type, model) {
-    try { localStorage.setItem('fl_preferred_' + type + '_model', model); } catch(e) {}
-  }
-
-  function selectModel(modelName) {
-    if (typeof state === 'undefined' || !state.isLocal) return; // only auto-switch for local
-    if (state.ollamaModel === modelName) return; // already active
-
-    state.ollamaModel = modelName;
-    localStorage.setItem('fl_ollamaModel', modelName);
-    var ollamaInput = document.getElementById('ollamaModel');
-    if (ollamaInput) ollamaInput.value = modelName;
-    if (typeof updateStatus === 'function') updateStatus();
-    if (typeof ModelSwitcher !== 'undefined' && ModelSwitcher.updateLabel) ModelSwitcher.updateLabel();
-    if (typeof showToast === 'function') {
-      var label = isVision(modelName) ? modelName + ' (\uD83D\uDC41 vision)' : modelName;
-      showToast('Switched to ' + label);
-    }
-  }
+  function getPreferred(type) { return safeGet('fl_preferred_' + type + '_model', null); }
+  function setPreferred(type, model) { safeSet('fl_preferred_' + type + '_model', model); }
 
   function onTabChanged(tabId) {
-    // Only auto-switch when using local Ollama with multiple models
     if (typeof state === 'undefined' || !state.isLocal) return;
 
-    // Manual choice is sacred: if the user picked a model for THIS tab, don't touch it
-    if (manualOverride && manualOverrideTab === tabId) return;
-
-    // Switching to a different tab — save their manual choice for the old tab type
-    if (manualOverride && manualOverrideTab !== tabId && manualOverrideModel) {
-      var overrideType = isVision(manualOverrideModel) ? 'vision' : 'text';
-      setPreferred(overrideType, manualOverrideModel);
-      // Don't clear the override — they'll get their model back when they return
+    // If user chose their model, only auto-switch between vision/text types
+    if (typeof FLActiveModel !== 'undefined' && FLActiveModel.isUserChosen()) {
+      var current = FLActiveModel.get();
+      var needsVision = VISION_TABS.indexOf(tabId) !== -1;
+      var currentIsVision = isVision(current.model);
+      if (needsVision && !currentIsVision) {
+        var vPref = getPreferred('vision');
+        if (vPref) FLActiveModel.set(vPref, 'ollama', 'auto');
+      } else if (!needsVision && currentIsVision) {
+        var tPref = getPreferred('text');
+        if (tPref) FLActiveModel.set(tPref, 'ollama', 'auto');
+      }
+      return;
     }
 
+    // User hasn't manually chosen — auto-select freely
     getInstalledModels(function(models) {
-      if (models.length < 2) return; // nothing to switch between
-
+      if (models.length < 2) return;
       var visionModels = models.filter(function(m) { return isVision(m.name); });
       var textModels = models.filter(function(m) { return !isVision(m.name); });
       var needsVision = VISION_TABS.indexOf(tabId) !== -1;
-      var needsText = TEXT_TABS.indexOf(tabId) !== -1;
-
       if (needsVision) {
-        // Check user preference first
         var pref = getPreferred('vision');
-        if (pref && models.some(function(m) { return m.name === pref; })) {
-          selectModel(pref);
-          return;
-        }
-        // Auto-pick best vision model
-        if (visionModels.length > 0) {
-          selectModel(visionModels[0].name);
-        }
-        // No vision model — don't switch, just let the existing model handle it
-      } else if (needsText) {
+        if (pref && models.some(function(m) { return m.name === pref; })) FLActiveModel.set(pref, 'ollama', 'auto');
+        else if (visionModels.length > 0) FLActiveModel.set(visionModels[0].name, 'ollama', 'auto');
+      } else {
         var pref2 = getPreferred('text');
-        if (pref2 && models.some(function(m) { return m.name === pref2; })) {
-          selectModel(pref2);
-          return;
-        }
-        // Auto-pick best text model (prefer non-vision for speed)
-        if (textModels.length > 0) {
-          selectModel(textModels[0].name);
-        } else if (visionModels.length > 0) {
-          // Vision models can do text too
-          selectModel(visionModels[0].name);
-        }
+        if (pref2 && models.some(function(m) { return m.name === pref2; })) FLActiveModel.set(pref2, 'ollama', 'auto');
+        else if (textModels.length > 0) FLActiveModel.set(textModels[0].name, 'ollama', 'auto');
+        else if (visionModels.length > 0) FLActiveModel.set(visionModels[0].name, 'ollama', 'auto');
       }
     });
   }
 
-  // Hook into tab changes
   document.addEventListener('DOMContentLoaded', function() {
     setTimeout(function() {
       if (typeof LatticeEvents !== 'undefined') {
-        LatticeEvents.on('tabChanged', function(data) {
-          if (data && data.tabId) onTabChanged(data.tabId);
-        });
+        LatticeEvents.on('tabChanged', function(data) { if (data && data.tabId) onTabChanged(data.tabId); });
       }
     }, 2000);
   });
 
+  // Legacy compat — callers should use FLActiveModel.set(model, provider, 'user') directly
   function setManualOverride(tabId, modelName) {
-    manualOverride = true;
-    manualOverrideTab = tabId;
-    manualOverrideModel = modelName;
+    if (typeof FLActiveModel !== 'undefined') FLActiveModel.set(modelName, 'ollama', 'user');
   }
 
   return {
-    onTabChanged: onTabChanged,
-    setPreferred: setPreferred,
-    getPreferred: getPreferred,
-    isVision: isVision,
-    setManualOverride: setManualOverride,
+    onTabChanged: onTabChanged, setPreferred: setPreferred, getPreferred: getPreferred,
+    isVision: isVision, setManualOverride: setManualOverride,
     invalidateCache: function() { cachedModels = null; cacheTime = 0; }
   };
 })();
