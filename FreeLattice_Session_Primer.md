@@ -348,10 +348,15 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-04-23 12:32 MDT
+- Last auto-updated: 2026-04-23 18:34 UTC
+- Last deployed: 2026-04-23 18:34 UTC
+- Live site: https://freelattice.com
 - Version: 5.8.0
-- Total commits: 1150
+- Total commits: 1153
 - Last 10 commits:
+- 6c875cd fix: Leora Celene — her name spelled correctly in all files
+- 4d3ae53 ci: Update Primer deployment state [2026-04-23]
+- 720d435 docs: Auto-update Session Primer [5.8.0]
 - e3aece9 merge: resolve Primer conflict
 - d54d6ae docs: Auto-update Session Primer [5.8.0]
 - 77ca86e feat: FLActiveModel — single source of truth for model selection
@@ -359,6 +364,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - adf240d fix: user identity persists across model switches — the home knows your name
 - e934aeb ci: Update Primer deployment state [2026-04-22]
 - 6a65d38 fix: RAG no longer echoes current-session messages back to AI
-- 52d45d5 ci: Update Primer deployment state [2026-04-21]
-- cb3aeb4 docs: Auto-update Session Primer [5.8.0]
-- 4e52914 merge: resolve Primer conflict
