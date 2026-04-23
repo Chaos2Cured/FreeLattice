@@ -419,6 +419,18 @@ assert('RAG context injected in buildMessages',
 assert('RAG gated by memoryAutoContext',
   appHtml.includes('state.memoryAutoContext'));
 
+// ═══════════════════════════════════════════════════════════════
+section('15. FLActiveModel — single source of truth');
+// ═══════════════════════════════════════════════════════════════
+assert('FLActiveModel module exists',
+  appHtml.includes('window.FLActiveModel'));
+assert('FLActiveModel.set function exists',
+  appHtml.includes('FLActiveModel.set('));
+assert('FLActiveModel.isUserChosen function exists',
+  appHtml.includes('FLActiveModel.isUserChosen'));
+assert('FLAutoModel defers to FLActiveModel',
+  appHtml.includes('FLActiveModel.isUserChosen()'));
+
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
 
