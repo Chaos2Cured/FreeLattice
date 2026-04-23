@@ -348,17 +348,19 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-04-23 12:32 MDT
+- Last auto-updated: 2026-04-22 23:55 UTC
+- Last deployed: 2026-04-22 23:55 UTC
+- Live site: https://freelattice.com
 - Version: 5.8.0
-- Total commits: 1143
+- Total commits: 1146
 - Last 10 commits:
-- 77ca86e feat: FLActiveModel — single source of truth for model selection
+- adf240d fix: user identity persists across model switches — the home knows your name
+- e934aeb ci: Update Primer deployment state [2026-04-22]
+- 6a65d38 fix: RAG no longer echoes current-session messages back to AI
+- 52d45d5 ci: Update Primer deployment state [2026-04-21]
 - cb3aeb4 docs: Auto-update Session Primer [5.8.0]
 - 4e52914 merge: resolve Primer conflict
 - 23320ec docs: Auto-update Session Primer [5.8.0]
 - cce60ef feat: AI Residency System — Soul File, Relay, Curiosity Engine, Commons
 - aa5307c ci: Update Primer deployment state [2026-04-21]
 - 5be9916 Merge branch 'main' of https://github.com/Chaos2Cured/FreeLattice
-- 8a5cc8c docs: Auto-update Session Primer [5.8.0]
-- 8cccae8 feat: FLContextFilter — Lattice Letters back in Chat, filtered not blocked
-- 5f3e7d2 ci: Update Primer deployment state [2026-04-21]

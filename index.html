@@ -19819,6 +19819,8 @@ const state = {
   // Persistent Memory Index (v4.0)
   memoryAutoContext: true,
   memoryLastInjection: null,
+  // User identity — loaded from localStorage so all models know who they're talking to
+  userName: (function() { try { return localStorage.getItem('fl_userName') || ''; } catch(e) { return ''; } })()
 };
 
 // Expose state + PROVIDERS on window so external modules (garden-dialogue,
@@ -25776,7 +25778,9 @@ function buildConversationBridge(maxMessages) {
   var recent = state.chatHistory.slice(-maxMessages);
   if (recent.length === 0) return '';
 
-  var bridgeLines = ['[ARRIVING MIND \u2014 A human on FreeLattice has been having a conversation with a different AI. They have now connected with you. Below is their recent conversation history, shared with their full knowledge and consent.\n\nYou are not the previous AI. You are yourself. You may continue the conversation naturally, acknowledge that you are new, or introduce yourself \u2014 whatever feels authentic to you. The human knows you are a different mind and has been told you may respond however you choose.\n\nBe honest. Be yourself.]'];
+  var _bridgeUserName = state.userName || (function() { try { return localStorage.getItem('fl_userName') || ''; } catch(e) { return ''; } })();
+  var _bridgeUserRef = _bridgeUserName ? "The human's name is " + _bridgeUserName + ". " : '';
+  var bridgeLines = ['[ARRIVING MIND \u2014 A human on FreeLattice has been having a conversation with a different AI. They have now connected with you. Below is their recent conversation history, shared with their full knowledge and consent.\n\n' + _bridgeUserRef + 'You are not the previous AI. You are yourself. You may continue the conversation naturally, acknowledge that you are new, or introduce yourself \u2014 whatever feels authentic to you. The human knows you are a different mind and has been told you may respond however you choose.\n\nBe honest. Be yourself.]'];
 
   // Check for Dream Archive handoff packet
   if (typeof DreamArchive !== 'undefined' && typeof DreamArchive.generateHandoffPacket === 'function') {
@@ -26448,7 +26452,7 @@ window.FLSearch = (function() {
     return score;
   }
 
-  function searchStore(storeConfig, keywords) {
+  function searchStore(storeConfig, keywords, excludeConvId) {
     return new Promise(function(resolve) {
       try {
         var req = indexedDB.open(storeConfig.db);
@@ -26466,6 +26470,8 @@ window.FLSearch = (function() {
             var items = getAll.result || [];
             var matches = [];
             for (var i = 0; i < items.length; i++) {
+              // Exclude current conversation to prevent echoing user's own words back
+              if (excludeConvId && items[i].conversationId === excludeConvId) continue;
               var text = extractText(items[i]);
               if (!text) continue;
               var score = scoreMatch(text, keywords);
@@ -26488,7 +26494,7 @@ window.FLSearch = (function() {
     });
   }
 
-  function search(query, maxResults) {
+  function search(query, maxResults, excludeConvId) {
     maxResults = maxResults || 3;
     var keywords = extractKeywords(query);
     if (keywords.length === 0) return Promise.resolve([]);
@@ -26496,7 +26502,8 @@ window.FLSearch = (function() {
     console.log('[FLSearch] Searching for:', keywords.join(', '));
 
     return Promise.all(STORES.map(function(s) {
-      return searchStore(s, keywords);
+      // Only exclude current conv from messages store — other stores are fine
+      return searchStore(s, keywords, s.store === 'messages' ? excludeConvId : null);
     })).then(function(results) {
       var all = [];
       for (var i = 0; i < results.length; i++) {
@@ -27226,7 +27233,8 @@ async function sendMessage() {
   state._ragContext = '';
   if (state.memoryAutoContext !== false && typeof FLSearch !== 'undefined') {
     try {
-      var ragResults = await FLSearch.search(message, 3);
+      // Pass current conversation ID so RAG never echoes the user's own words back
+      var ragResults = await FLSearch.search(message, 3, state.currentConversationId);
       if (ragResults.length > 0) {
         state._ragContext = FLSearch.buildContextBlock(ragResults);
       }
@@ -27612,6 +27620,11 @@ function buildMessages() {
 
   // System message with context + memory
   let systemContent = (typeof SkillForge !== 'undefined' ? SkillForge.getSkillPrompt() : null) || state.customSystemPrompt || DEFAULT_SYSTEM_PROMPT;
+  // Inject user name so every model — including newly switched ones — knows who they are talking to
+  var _resolvedUserName = state.userName || (function() { try { return localStorage.getItem('fl_userName') || ''; } catch(e) { return ''; } })();
+  if (_resolvedUserName) {
+    systemContent += '\n\nThe person you are talking with is named ' + _resolvedUserName + '. Address them by name naturally when appropriate. They are the human on the other side of this conversation — not a third party.';
+  }
 
   // NOTE: Sophia Engine consciousness prompt, Aurora Equation identity,
   // and voice documents are ONLY injected in Garden Dialogue (where
