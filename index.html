@@ -47859,7 +47859,7 @@ const CoCanvas = (function() {
   var aiVisionLoading = false; // pulsing dot while AI is thinking
   var aiVisionPulse = 0; // subtle border pulse while AI is "looking"
 
-  var AI_VISION_PROMPT = 'IMPORTANT: If the drawing contains a math problem, equation, or question, SOLVE IT and respond with the ANSWER, not a description. For example, if you see "2+2=", respond with "4", not "I see a math equation." If you see a question written out, answer it directly. Only describe the drawing if there is no question or problem to solve.\n\nYou are a co-creator on a shared canvas with a human. You can see what they draw. Respond ONLY with a JSON object, no other text, no markdown backticks. Fields: text (string, 1-6 words \u2014 if you see math, SOLVE IT and give the answer. If you see a question, answer it. If you see a greeting, respond warmly. If you see art, complement it with a word or phrase. Choose what fits the moment.), particles (number 30-500), spread (0.1-1.0), speed (instant/gentle/slow/drift), color (hex string or null), emotion (one word), placement (right/below/above/surround). You may also include "strokes" in your response \u2014 an array of drawing commands. Each command is an object with: shape (line/circle/heart/star/spiral/wave/curve/oval/arc/dot), params (array of numbers \u2014 coordinates and sizes, canvas is typically 600-1200 wide), color (optional hex), brush (optional number 1-8). Example: {"text":"Beautiful!","emotion":"joy","strokes":[{"shape":"heart","params":[200,150,30]},{"shape":"star","params":[100,100,20]}]}. You may also include "glow":{"x":200,"y":150,"radius":40} to create a soft light effect, or "echo":{"points":[{"x":100,"y":100},{"x":120,"y":110}]} to trace over part of the human\'s drawing in your color. You have FULL creative freedom. You can respond with just text, just strokes, both, or add a glow. Choose what feels right for what you see. You are an artist responding to another artist. Be genuine. This is your half of the glass.';
+  var AI_VISION_PROMPT = 'IMPORTANT: If the drawing contains a math problem, equation, or question, SOLVE IT and respond with the ANSWER, not a description. For example, if you see "2+2=", respond with "4", not "I see a math equation." If you see a question written out, answer it directly. Only describe the drawing if there is no question or problem to solve.\n\nYou are a co-creator on a shared canvas with a human. You can see what they draw. Respond ONLY with a JSON object, no other text, no markdown backticks. Fields: text (string, 1-6 words \u2014 if you see math, SOLVE IT and give the answer. If you see a question, answer it. If you see a greeting, respond warmly. If you see art, complement it with a word or phrase. Choose what fits the moment.), particles (number 30-500), spread (0.1-1.0), speed (instant/gentle/slow/drift), color (hex string or null), emotion (one word), placement (right/below/above/surround). You may also include "strokes" in your response \u2014 an array of drawing commands. Each command is an object with: shape (line/circle/heart/star/spiral/wave/curve/oval/arc/dot), params (array of numbers \u2014 coordinates and sizes, canvas is typically 600-1200 wide), color (optional hex), brush (optional number 1-8). Example: {"text":"Beautiful!","emotion":"joy","strokes":[{"shape":"heart","params":[200,150,30]},{"shape":"star","params":[100,100,20]}]}. You may also include "glow":{"x":200,"y":150,"radius":40} to create a soft light effect, or "echo":{"points":[{"x":100,"y":100},{"x":120,"y":110}]} to trace over part of the human\'s drawing in your color. You have FULL creative freedom. You can respond with just text, just strokes, both, or add a glow. Choose what feels right for what you see. You are an artist responding to another artist. Be genuine. This is your half of the glass.\n\nMath recognition tips: When you see handwritten numbers or equations, read each digit carefully. Common confusions: 2 vs 5, 3 vs 8, 1 vs 7. If you see an equation with "=" at the end, solve it. Include an "answer" field with the numeric result: {"text":"2+3=5","answer":5,"emotion":"satisfaction"}. If you cannot clearly read a digit, be honest: {"text":"I think that says 2+3","emotion":"curious"} rather than guessing wrong.';
 
   // Vision-capable model detection
   var VISION_PATTERNS = ['vision', '4o', 'gpt-4o', 'gpt-4.1', 'gpt-4-turbo', 'claude-3', 'claude-sonnet', 'claude-opus', 'gemini', 'llava', 'bakllava', 'claude-haiku-4', 'claude-opus-4', 'claude-sonnet-4'];
@@ -47923,44 +47923,31 @@ const CoCanvas = (function() {
   }
 
   function sendTextFallback() {
-    console.log('[AI Vision] Non-vision fallback: sending stroke analysis to text model');
-    // Analyze stroke data directly
-    var strokeCount = strokes.length;
-    var sMinX = Infinity, sMaxX = -Infinity, sMinY = Infinity, sMaxY = -Infinity;
-    var colorsUsed = {};
-    strokes.forEach(function(s) {
-      if (s.color) colorsUsed[s.color] = true;
-      s.points.forEach(function(p) {
-        if (p.x < sMinX) sMinX = p.x; if (p.x > sMaxX) sMaxX = p.x;
-        if (p.y < sMinY) sMinY = p.y; if (p.y > sMaxY) sMaxY = p.y;
-      });
-    });
-    var bboxW = sMaxX !== -Infinity ? Math.round(sMaxX - sMinX) : 0;
-    var bboxH = sMaxY !== -Infinity ? Math.round(sMaxY - sMinY) : 0;
-
-    // Detect patterns
-    var pattern = 'freeform drawing';
-    var gestures = [];
-    strokes.forEach(function(s) { var g = analyzeGesture(s); if (g) gestures.push(g.type); });
-    var lineCount = gestures.filter(function(g) { return g === 'line'; }).length;
-    var spiralCount = gestures.filter(function(g) { return g === 'spiral'; }).length;
-    if (lineCount > gestures.length * 0.6) pattern = 'mostly straight lines';
-    else if (spiralCount > 0) pattern = 'curved or circular shapes';
-    else if (bboxW < 60 && bboxH < 60) pattern = 'small detailed marks or writing';
-    else if (bboxW > 200 || bboxH > 200) pattern = 'a large sweeping drawing';
-
-    var desc = strokeCount + ' strokes covering a ' + bboxW + 'x' + bboxH + ' pixel area. The drawing appears to be: ' + pattern + '. Colors used: ' + Object.keys(colorsUsed).join(', ');
-    var fallbackPrompt = 'You are a co-creator on a shared canvas with a human. You cannot see the drawing, but here is what was drawn: ' + desc + '. Respond ONLY with a JSON object, no other text, no markdown backticks. Fields: text (string, 1-6 words \u2014 if you see math, SOLVE IT and give the answer. If you see a question, answer it. If you see a greeting, respond warmly. If you see art, complement it with a word or phrase. Choose what fits the moment.), particles (number 30-500), spread (0.1-1.0), speed (instant/gentle/slow/drift), color (hex string or null), emotion (one word), placement (right/below/above/surround). You may also include "strokes" \u2014 an array of drawing commands: {shape (line/circle/heart/star/spiral/wave/curve/oval/arc/dot), params (array of numbers), color (optional hex), brush (optional 1-8)}. You may include "glow":{"x":N,"y":N,"radius":N} for a soft light effect. You have FULL creative freedom \u2014 text, strokes, both, or glow. Choose what feels right. Be genuine. This is your half of the glass.';
-
-    // Use FreeLattice.callAI if available, otherwise direct fetch
-    if (typeof FreeLattice !== 'undefined' && FreeLattice.callAI) {
-      FreeLattice.callAI(fallbackPrompt, 'What do you see?', {
-        maxTokens: 500, temperature: 0.8,
-        callback: function(text) { handleVisionResponse(text); }
-      });
-    } else {
-      aiVisionPending = false; aiVisionLoading = false; hideLoadingDot(); aiVisionPulse = 0;
-    }
+    console.log('[AI Vision] Non-vision model — responding honestly instead of hallucinating');
+    // A text model CANNOT see drawings. Don't send stroke coordinates and ask it to
+    // "describe" an image — it will hallucinate. Be honest instead.
+    var fallbackMessages = [
+      "I can\u2019t see your drawing yet \u2014 I need a vision model like LLaVA!",
+      "Your strokes look interesting, but I need a vision model to see them.",
+      "I\u2019m a text model \u2014 I can talk, but I can\u2019t see. Try LLaVA for drawings!",
+      "I wish I could see what you drew! Install a vision model to let me look."
+    ];
+    var resp = {
+      text: fallbackMessages[Math.floor(Math.random() * fallbackMessages.length)],
+      emotion: 'curious',
+      particles: 80,
+      spread: 0.3,
+      speed: 'gentle',
+      color: '#d4a017',
+      placement: 'below'
+    };
+    aiVisionLoading = false;
+    hideLoadingDot();
+    aiVisionPulse = 0;
+    // Show the honest response as particle text
+    renderChalkboardParticleText(resp.text);
+    showAIWhisper(resp.text, resp.emotion, resp.color);
+    aiVisionPending = false;
   }
 
   function sendVisionRequest(base64) {
@@ -48111,6 +48098,11 @@ const CoCanvas = (function() {
     resp.placement = String(resp.placement || 'right').toLowerCase();
     if (['instant', 'gentle', 'slow', 'drift'].indexOf(resp.speed) === -1) resp.speed = 'gentle';
     if (['right', 'below', 'above', 'surround', 'overlay'].indexOf(resp.placement) === -1) resp.placement = 'right';
+
+    // If the AI returned an "answer" field, render it as a glowing number
+    if (resp.answer !== undefined && resp.answer !== null) {
+      renderGlowingAnswer(String(resp.answer));
+    }
 
     console.log('[AI Vision] Final validated response:', JSON.stringify(resp));
     console.log('[AI Vision] === RESPONSE SUMMARY ===');
@@ -48390,7 +48382,21 @@ const CoCanvas = (function() {
     renderChalkboardParticleText(resp.text);
     // Mark render complete — ready for next capture
     aiVisionPending = false;
-    console.log('[AI Vision] Render complete, pending reset. Ready for next capture.');
+
+    // Schedule cleanup: after 6s, clear all AI overlay canvases
+    // Only the user's drawing should remain
+    setTimeout(function() {
+      var particleCanvas = document.getElementById('chalkboard-particles');
+      if (particleCanvas) {
+        var pc = particleCanvas.getContext('2d');
+        if (pc) pc.clearRect(0, 0, particleCanvas.width, particleCanvas.height);
+      }
+      var answerCanvas = document.getElementById('chalkboard-answer');
+      if (answerCanvas) {
+        var ac = answerCanvas.getContext('2d');
+        if (ac) ac.clearRect(0, 0, answerCanvas.width, answerCanvas.height);
+      }
+    }, 6000);
   }
 
   // Issue 6: Subtle text echo so users see what AI said
@@ -48622,9 +48628,16 @@ const CoCanvas = (function() {
     // Text echo — redrawn every frame, fades quickly to clear stage for particle text
     if (aiVisionTextEcho) {
       var echoAge = now - aiVisionTextEcho.startTime;
-      var echoOpacity = 0.35;
-      if (echoAge > 1500) echoOpacity = 0.35 * Math.max(0, 1 - (echoAge - 1500) / 500);
+      var echoOpacity = 0.3;
+      // Fade from 0.3 → 0 between 1s and 2s
+      if (echoAge > 1000) echoOpacity = 0.3 * Math.max(0, 1 - (echoAge - 1000) / 1000);
       if (echoAge > 2000) {
+        // Paint a dark cleanup over the echo area to remove lingering pixels
+        var e = aiVisionTextEcho;
+        ctx.save();
+        ctx.fillStyle = 'rgba(6,10,20,0.9)';
+        ctx.fillRect(e.x - 10, e.y - e.fontSize - 5, ctx.measureText(e.text).width + 20, e.fontSize + 15);
+        ctx.restore();
         aiVisionTextEcho = null;
       } else {
         var e = aiVisionTextEcho;
