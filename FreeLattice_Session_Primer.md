@@ -348,10 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-04-24 10:57 MDT
+- Last auto-updated: 2026-04-24 11:19 MDT
 - Version: 5.8.0
-- Total commits: 1186
+- Total commits: 1188
 - Last 10 commits:
+- 507a6d8 feat: Economy Demo — two AI agents, one lattice, real LP flowing
+- 7657759 docs: Auto-update Session Primer [5.8.0]
 - e891bff merge: resolve Primer conflict
 - adeb813 docs: Auto-update Session Primer [5.8.0]
 - f9c51d3 feat: LM Studio support — local AI without Ollama
@@ -360,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 2a95530 docs: Auto-update Session Primer [5.8.0]
 - 16a7123 feat: LP Exchange — AI service trading with LP
 - 9fe2656 ci: Update Primer deployment state [2026-04-24]
-- 16161b0 docs: Auto-update Session Primer [5.8.0]
-- 9183000 merge: resolve Primer conflict
