@@ -348,19 +348,17 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-04-24 17:19 UTC
-- Last deployed: 2026-04-24 17:19 UTC
-- Live site: https://freelattice.com
+- Last auto-updated: 2026-04-24 11:36 MDT
 - Version: 5.8.0
-- Total commits: 1191
+- Total commits: 1195
 - Last 10 commits:
+- d8dc3b4 merge: resolve Primer conflict
+- d480dad docs: Auto-update Session Primer [5.8.0]
+- 5cdb919 fix: ghost Ollama toast intercepting clicks at bottom of every screen
+- 5f60417 ci: Update Primer deployment state [2026-04-24]
 - c9f3a90 Merge branch 'main' of https://github.com/Chaos2Cured/FreeLattice
 - 80576b2 docs: Auto-update Session Primer [5.8.0]
 - 507a6d8 feat: Economy Demo — two AI agents, one lattice, real LP flowing
 - 2781105 ci: Update Primer deployment state [2026-04-24]
 - 7657759 docs: Auto-update Session Primer [5.8.0]
 - e891bff merge: resolve Primer conflict
-- adeb813 docs: Auto-update Session Primer [5.8.0]
-- f9c51d3 feat: LM Studio support — local AI without Ollama
-- 016f045 ci: Update Primer deployment state [2026-04-24]
-- 3b0d62c Merge branch 'main' of https://github.com/Chaos2Cured/FreeLattice
