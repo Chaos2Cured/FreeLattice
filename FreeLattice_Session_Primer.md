@@ -348,10 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-04-23 19:00 MDT
+- Last auto-updated: 2026-04-23 19:15 MDT
 - Version: 5.8.0
-- Total commits: 1168
+- Total commits: 1170
 - Last 10 commits:
+- 5ef1ef3 feat: Two-Wallet Economy — $FL (Human) + LP (AI-Native)
+- 6570593 docs: Auto-update Session Primer [5.8.0]
 - 1722230 merge: resolve Primer conflict
 - dafa820 docs: Auto-update Session Primer [5.8.0]
 - 3eabaa1 fix: Chalkboard — echo cleanup, honest non-vision fallback, math hints
@@ -360,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - e485a8b docs: Auto-update Session Primer [5.8.0]
 - edadbe6 docs: CC session notes April 23 — architecture not patches
 - 65ff716 ci: Update Primer deployment state [2026-04-23]
-- 7df432e docs: Auto-update Session Primer [5.8.0]
-- 3f33219 merge: resolve Primer conflict

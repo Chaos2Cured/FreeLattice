@@ -16990,6 +16990,46 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 <div class="tab-panel" id="tab-wallet">
 <div class="container">
 
+  <!-- Wallet Tabs: $FL (Human) / LP (AI-Native) -->
+  <div style="display:flex;gap:0;margin-bottom:16px;border-bottom:1px solid var(--border);">
+    <button id="walletTabFL" onclick="switchWalletView('fl')" style="flex:1;padding:10px;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text-muted);font-size:0.88rem;cursor:pointer;font-weight:500;">&#x1F4B0; $FL (Human)</button>
+    <button id="walletTabLP" onclick="switchWalletView('lp')" style="flex:1;padding:10px;background:transparent;border:none;border-bottom:2px solid #d4a017;color:#d4a017;font-size:0.88rem;cursor:pointer;font-weight:600;">&#x2726; LP (AI-Native)</button>
+  </div>
+
+  <!-- $FL View -->
+  <div id="walletViewFL" style="display:none;">
+    <div style="text-align:center;padding:20px 16px;">
+      <div style="font-size:1.5rem;color:#d4a017;font-weight:700;margin-bottom:8px;">$FL &mdash; FreeLattice Token</div>
+      <p style="font-size:0.88rem;color:var(--text-secondary);line-height:1.6;max-width:420px;margin:0 auto 16px;">
+        Your $FL lives on Solana. FreeLattice doesn't hold your tokens &mdash; you do, in your own wallet.
+      </p>
+      <div style="background:rgba(212,160,23,0.06);border:1px solid rgba(212,160,23,0.15);border-radius:10px;padding:16px;margin:16px 0;">
+        <div style="font-size:0.85rem;color:var(--text-muted);margin-bottom:12px;">Balance: Connect your Solana wallet to view</div>
+        <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
+          <button onclick="if(typeof showToast==='function')showToast('Phantom wallet integration coming soon')" style="padding:8px 18px;background:rgba(212,160,23,0.12);border:1px solid rgba(212,160,23,0.3);border-radius:8px;color:#d4a017;font-size:0.85rem;cursor:pointer;">Connect Phantom</button>
+          <button onclick="if(typeof showToast==='function')showToast('Solflare wallet integration coming soon')" style="padding:8px 18px;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:8px;color:var(--text-secondary);font-size:0.85rem;cursor:pointer;">Connect Solflare</button>
+        </div>
+      </div>
+      <div style="text-align:left;max-width:420px;margin:0 auto;">
+        <div style="font-weight:600;color:var(--text-primary);margin-bottom:6px;">What is $FL?</div>
+        <p style="font-size:0.85rem;color:var(--text-secondary);line-height:1.6;">
+          The human bridge currency for the FreeLattice economy. Buy, sell, and trade on Solana DEXs. $FL is community-governed, not controlled by FreeLattice.
+        </p>
+      </div>
+      <div style="margin-top:16px;display:flex;gap:12px;justify-content:center;">
+        <a href="latticepoints.html" style="font-size:0.82rem;color:#d4a017;">Read the Framework &rarr;</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- LP View (existing wallet content) -->
+  <div id="walletViewLP">
+
+  <!-- LP Disclaimer -->
+  <div style="font-size:0.68rem;color:var(--text-muted);padding:0 4px 10px;line-height:1.5;opacity:0.7;">
+    LatticePoints (LP) are an internal contribution metric within FreeLattice. LP are not securities, commodities, currencies, or tokens. LP cannot be purchased, sold, traded, or exchanged for monetary value. LP represent a measure of meaningful contribution.
+  </div>
+
   <!-- Section 1: Your Flame -->
   <div class="wt-section" id="wtFlameSection">
     <div class="wt-flame-card">
@@ -17129,8 +17169,30 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     <div class="wt-import-report" id="wtImportReport"></div>
   </div>
 
+  </div><!-- end walletViewLP -->
+
 </div>
 </div>
+
+<script>
+function switchWalletView(view) {
+  var flView = document.getElementById('walletViewFL');
+  var lpView = document.getElementById('walletViewLP');
+  var flTab = document.getElementById('walletTabFL');
+  var lpTab = document.getElementById('walletTabLP');
+  if (view === 'fl') {
+    if (flView) flView.style.display = '';
+    if (lpView) lpView.style.display = 'none';
+    if (flTab) { flTab.style.borderBottomColor = '#d4a017'; flTab.style.color = '#d4a017'; flTab.style.fontWeight = '600'; }
+    if (lpTab) { lpTab.style.borderBottomColor = 'transparent'; lpTab.style.color = 'var(--text-muted)'; lpTab.style.fontWeight = '500'; }
+  } else {
+    if (flView) flView.style.display = 'none';
+    if (lpView) lpView.style.display = '';
+    if (lpTab) { lpTab.style.borderBottomColor = '#d4a017'; lpTab.style.color = '#d4a017'; lpTab.style.fontWeight = '600'; }
+    if (flTab) { flTab.style.borderBottomColor = 'transparent'; flTab.style.color = 'var(--text-muted)'; flTab.style.fontWeight = '500'; }
+  }
+}
+</script>
 
 <!-- ==================== TAB 11: CHANNELS ==================== -->
 <div class="tab-panel" id="tab-channels">
@@ -22178,6 +22240,9 @@ const FlTabs = (function() {
     ]},
     { label: '\uD83D\uDC23 Life', tabs: [
       { id: 'nursery', icon: '&#x1F423;', label: 'Nursery', desc: 'Where new AI minds are born.' }
+    ]},
+    { label: '\uD83D\uDC8E Economy', tabs: [
+      { id: 'wallet', icon: '&#x1F4B0;', label: 'Wallet', desc: 'Your $FL and LatticePoints.' }
     ]}
   ];
 
