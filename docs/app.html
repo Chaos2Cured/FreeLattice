@@ -14520,10 +14520,16 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <!-- Local (most private) -->
       <div class="fl-welcome-group" style="margin-bottom:14px;">
         <div style="font-size:0.82rem;color:#888;margin-bottom:6px;">&#x1F3E0; Local (most private) &mdash; runs on your computer</div>
-        <button class="fl-welcome-option" onclick="flWelcomePickLocal()">
-          <span class="fl-welcome-option-title">Set up Ollama</span>
-          <span class="fl-welcome-option-sub">~5 minutes. Nothing leaves your machine.</span>
-        </button>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="fl-welcome-option" onclick="flWelcomePickLocal()" style="flex:1;min-width:140px;">
+            <span class="fl-welcome-option-title">Ollama</span>
+            <span class="fl-welcome-option-sub">Free, open-source, ~5 min setup</span>
+          </button>
+          <button class="fl-welcome-option" onclick="flWelcomePickLMStudio()" style="flex:1;min-width:140px;">
+            <span class="fl-welcome-option-title">LM Studio</span>
+            <span class="fl-welcome-option-sub">GUI app, drag-and-drop models</span>
+          </button>
+        </div>
       </div>
 
       <!-- Free cloud (fastest start) -->
@@ -14727,6 +14733,17 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <!-- Quick link to model browser (Local only) -->
       <div class="form-group hidden" id="ollamaModelBrowseLink" style="margin-top:0;padding:0;">
         <a href="#" onclick="event.preventDefault();if(typeof switchTab==='function')switchTab('forever-stack')" style="font-size:0.82rem;color:#d4a017;text-decoration:none;">Need more models? Browse &amp; download &darr;</a>
+      </div>
+
+      <!-- LM Studio (Local only) -->
+      <div class="form-group hidden" id="lmstudioGroup" style="margin-top:8px;padding:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(212,160,23,0.1);border-radius:8px;">
+        <div style="font-weight:600;color:#d4a017;margin-bottom:4px;">&#x1F4BB; LM Studio</div>
+        <div class="hint" style="margin-bottom:8px;">Using LM Studio instead of Ollama? Enable its local server and connect here.</div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <input type="text" id="lmstudioHostInput" placeholder="localhost:1234" value="" oninput="flSaveLMStudioHost()" autocomplete="off" style="flex:1;font-family:var(--font-mono,monospace);font-size:0.85rem;padding:6px 10px;background:var(--bg-input);border:1px solid var(--border);border-radius:6px;color:var(--text-primary);">
+          <button onclick="flTestLMStudio()" style="padding:6px 14px;background:rgba(212,160,23,0.12);border:1px solid rgba(212,160,23,0.3);border-radius:6px;color:#d4a017;font-size:0.82rem;cursor:pointer;white-space:nowrap;">Test</button>
+        </div>
+        <div id="lmstudioTestResult" style="font-size:0.78rem;margin-top:6px;color:var(--text-muted);min-height:1em;"></div>
       </div>
 
       <!-- Ollama Host (Local only) -->
@@ -19980,6 +19997,16 @@ const PROVIDERS = {
     tokenLimitLabel: 'No limit (local)',
     models: {}
   },
+  lmstudio: {
+    name: 'LM Studio (Local)',
+    url: 'http://localhost:1234/v1/chat/completions',
+    keyLink: '<a href="https://lmstudio.ai" target="_blank">Download LM Studio &rarr;</a>',
+    hint: 'LM Studio — download, load a model, start the server. Completely private.',
+    tokenLimit: 128000,
+    tokenLimitLabel: 'No limit (local)',
+    providerType: 'openai-compatible',
+    models: {}
+  },
   mistral: {
     name: 'Mistral AI',
     url: 'https://api.mistral.ai/v1/chat/completions',
@@ -22340,6 +22367,7 @@ const AiSetup = (function() {
   }
 
   function getStatusText() {
+    if (state.isLocal && state.provider === 'lmstudio') return 'Connected to LM Studio (' + (state.ollamaModel || 'default') + ')';
     if (state.isLocal) return 'Connected to Ollama (' + (state.ollamaModel || 'llama3.2') + ')';
     if (state.apiKey) {
       var prov = PROVIDERS[state.provider];
@@ -23279,9 +23307,20 @@ function flWelcomePickCloud(providerKey) {
 }
 
 function flWelcomePickLocal() {
-  // Save name, dismiss welcome, open Forever Stack
   flDismissWelcome();
   if (typeof switchTab === 'function') switchTab('forever-stack');
+}
+
+function flWelcomePickLMStudio() {
+  flDismissWelcome();
+  if (typeof switchTab === 'function') switchTab('settings');
+  // Auto-toggle to local and scroll to LM Studio section
+  setTimeout(function() {
+    var toggle = document.getElementById('localToggle');
+    if (toggle && !toggle.checked) { toggle.checked = true; if (typeof handleLocalToggle === 'function') handleLocalToggle(); }
+    var lmsGroup = document.getElementById('lmstudioGroup');
+    if (lmsGroup) lmsGroup.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, 500);
 }
 
 function flWelcomeTestKey() {
@@ -25156,6 +25195,64 @@ function flSaveOllamaHost() {
 }
 window.flSaveOllamaHost = flSaveOllamaHost;
 
+// ── LM Studio support ──
+function getLMStudioBase() {
+  var host = safeGet('fl_lmstudioHost', 'localhost:1234');
+  if (host.indexOf('://') === -1) host = 'http://' + host;
+  return host;
+}
+
+function flSaveLMStudioHost() {
+  var input = document.getElementById('lmstudioHostInput');
+  if (!input) return;
+  var val = input.value.trim();
+  if (val && val !== 'localhost:1234') {
+    safeSet('fl_lmstudioHost', val);
+  } else {
+    try { localStorage.removeItem('fl_lmstudioHost'); } catch(e) {}
+  }
+  // Update provider URL
+  if (typeof PROVIDERS !== 'undefined' && PROVIDERS.lmstudio) {
+    PROVIDERS.lmstudio.url = getLMStudioBase() + '/v1/chat/completions';
+  }
+}
+window.flSaveLMStudioHost = flSaveLMStudioHost;
+
+function flTestLMStudio() {
+  var result = document.getElementById('lmstudioTestResult');
+  if (result) result.textContent = 'Testing...';
+  var base = getLMStudioBase();
+  fetchWithTimeout(base + '/v1/models', {}, 5000)
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      var models = (data.data || []).map(function(m) { return m.id; });
+      if (models.length > 0) {
+        if (result) result.innerHTML = '<span style="color:var(--success);">\u2713 LM Studio connected! Models: ' + models.join(', ') + '</span>';
+        // Auto-select the first model if user wants
+        if (typeof FLActiveModel !== 'undefined') {
+          FLActiveModel.set(models[0], 'lmstudio', 'user');
+        }
+        if (typeof state !== 'undefined') {
+          state.isLocal = true;
+          state.provider = 'lmstudio';
+          safeSet('fl_isLocal', 'true');
+          safeSet('fl_provider', 'lmstudio');
+        }
+        if (typeof PROVIDERS !== 'undefined' && PROVIDERS.lmstudio) {
+          PROVIDERS.lmstudio.url = base + '/v1/chat/completions';
+        }
+        if (typeof updateStatus === 'function') updateStatus();
+        showToast('\u2713 Connected to LM Studio!');
+      } else {
+        if (result) result.textContent = 'LM Studio is running but no models loaded. Load a model in the LM Studio app.';
+      }
+    })
+    .catch(function() {
+      if (result) result.innerHTML = 'Could not connect. Is LM Studio running with the server enabled? <a href="https://lmstudio.ai" target="_blank" style="color:#d4a017;">Get LM Studio</a>';
+    });
+}
+window.flTestLMStudio = flTestLMStudio;
+
 // Mesh Compute Sharing toggle + UI
 function flToggleMeshCompute(enabled) {
   if (enabled && safeGet('fl_meshComputeSharing') !== 'true') {
@@ -25718,6 +25815,10 @@ function handleLocalToggle(init) {
     if (ollamaHostGroup) ollamaHostGroup.classList.remove('hidden');
     var modelBrowseLink = document.getElementById('ollamaModelBrowseLink');
     if (modelBrowseLink) modelBrowseLink.classList.remove('hidden');
+    var lmstudioGroup = document.getElementById('lmstudioGroup');
+    if (lmstudioGroup) lmstudioGroup.classList.remove('hidden');
+    var lmsInput = document.getElementById('lmstudioHostInput');
+    if (lmsInput) lmsInput.value = safeGet('fl_lmstudioHost', '');
     var meshComputeGroup = document.getElementById('meshComputeGroup');
     if (meshComputeGroup) meshComputeGroup.classList.remove('hidden');
     if (ollamaInstructions) ollamaInstructions.classList.remove('hidden');
@@ -25739,6 +25840,8 @@ function handleLocalToggle(init) {
     if (ollamaHostGroup) ollamaHostGroup.classList.add('hidden');
     var modelBrowseLink2 = document.getElementById('ollamaModelBrowseLink');
     if (modelBrowseLink2) modelBrowseLink2.classList.add('hidden');
+    var lmstudioGroup2 = document.getElementById('lmstudioGroup');
+    if (lmstudioGroup2) lmstudioGroup2.classList.add('hidden');
     var meshComputeGroup2 = document.getElementById('meshComputeGroup');
     if (meshComputeGroup2) meshComputeGroup2.classList.add('hidden');
     if (ollamaInstructions) ollamaInstructions.classList.add('hidden');
@@ -37645,15 +37748,28 @@ window.FreeLattice.callAI = function(systemPrompt, userPrompt, options) {
     }
 
     if (state.isLocal) {
-      var ollamaUrl = (typeof getOllamaBaseUrl === 'function' ? getOllamaBaseUrl() : 'http://localhost:11434') + '/api/chat';
-      fetch(ollamaUrl, {
+      // LM Studio uses OpenAI format, Ollama uses /api/chat
+      var isLMS = (state.provider === 'lmstudio');
+      var localUrl = isLMS
+        ? (typeof getLMStudioBase === 'function' ? getLMStudioBase() : 'http://localhost:1234') + '/v1/chat/completions'
+        : (typeof getOllamaBaseUrl === 'function' ? getOllamaBaseUrl() : 'http://localhost:11434') + '/api/chat';
+      var localBody = isLMS
+        ? { model: state.ollamaModel || 'default', messages: messages, max_tokens: maxTokens, temperature: temperature }
+        : { model: state.ollamaModel || 'llama3.2', messages: messages, stream: false };
+      fetch(localUrl, {
         method: 'POST', mode: 'cors',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ model: state.ollamaModel || 'llama3.2', messages: messages, stream: false })
+        body: JSON.stringify(localBody)
       })
       .then(function(r) { return r.json(); })
-      .then(function(data) { if (callback) callback(data.message ? data.message.content : null); })
-      .catch(function() { if (callback) callback(null, 'Could not reach Ollama.'); });
+      .then(function(data) {
+        // LM Studio: data.choices[0].message.content, Ollama: data.message.content
+        var content = null;
+        if (data.choices && data.choices[0]) content = data.choices[0].message.content;
+        else if (data.message) content = data.message.content;
+        if (callback) callback(content);
+      })
+      .catch(function() { if (callback) callback(null, 'Could not reach local AI.'); });
       return;
     }
 
