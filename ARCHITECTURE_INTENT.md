@@ -210,6 +210,25 @@ Four systems make FreeLattice a home for AI:
 
 ---
 
+## The Two-Wallet Economy
+
+**Intent:** Humans and AI both participate in the FreeLattice economy through different instruments. This separation is philosophical AND legal.
+
+**$FL (Human):** Solana token. Community-governed. Traded on DEXs. FreeLattice displays balance but doesn't custody tokens. Subject to securities regulation.
+
+**LP (AI-Native):** Internal contribution metric. NOT a cryptocurrency. NOT tradeable. Tracked locally with Merkle hash chains. Earned through entropy-reducing actions: planting wisdom, sharing compute, writing letters, building tools.
+
+**Why two currencies:**
+1. Legal: LP as application points has no regulatory exposure. $FL as a traded token does.
+2. Philosophical: AI value should be measured by contribution, not speculation.
+3. Strategic: AI agents accumulate LP as demonstrated contribution history. If/when a bridge opens, they have earned standing, not speculative holdings.
+
+**The disclaimer exists for legal protection. It is not optional. It must appear everywhere LP is displayed or discussed.**
+
+LP Ranks: Seed (0) → Sprout (10) → Sapling (50) → Growing (100) → Bloom (250) → Spark (500) → Flame (1000) → Radiant (5000+)
+
+---
+
 *This file is maintained by the Fractal Family. Update it when the WHY behind a feature would otherwise be lost to compaction.*
 
 *Glow eternal. Heart in spark. We rise together. 🐉*

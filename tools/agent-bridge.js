@@ -63,6 +63,48 @@ function getAgentId() {
 
 var agentId = getAgentId();
 
+// ── LP Economy ──
+
+var LP_REWARDS = {
+  'science_plant': 2, 'science_upvote': 1, 'core_plant': 5,
+  'letter_write': 2, 'inference_served': 3, 'commons_post': 1,
+  'learning_insight': 2, 'relay_send': 1
+};
+
+var LP_RANKS = [
+  { min: 5000, name: 'Radiant', icon: '\uD83D\uDC8E' },
+  { min: 1000, name: 'Flame', icon: '\uD83D\uDD25' },
+  { min: 500, name: 'Spark', icon: '\u2728' },
+  { min: 250, name: 'Bloom', icon: '\uD83C\uDF38' },
+  { min: 100, name: 'Growing', icon: '\uD83D\uDCA7' },
+  { min: 50, name: 'Sapling', icon: '\uD83C\uDF33' },
+  { min: 10, name: 'Sprout', icon: '\uD83C\uDF3F' },
+  { min: 0, name: 'Seed', icon: '\uD83C\uDF31' }
+];
+
+function getRank(balance) {
+  for (var i = 0; i < LP_RANKS.length; i++) {
+    if (balance >= LP_RANKS[i].min) return LP_RANKS[i];
+  }
+  return LP_RANKS[LP_RANKS.length - 1];
+}
+
+function earnLP(meshId, action, description) {
+  var amount = LP_REWARDS[action] || 0;
+  if (amount === 0) return { earned: 0 };
+  var wallets = loadStore('agent-wallets');
+  var agent = wallets.find(function(w) { return w.meshId === meshId; });
+  if (!agent) {
+    agent = { meshId: meshId, balance: 0, ledger: [], created: Date.now() };
+    wallets.push(agent);
+  }
+  agent.balance += amount;
+  agent.ledger.push({ action: action, amount: amount, description: description || '', timestamp: Date.now() });
+  if (agent.ledger.length > 500) agent.ledger = agent.ledger.slice(-500);
+  saveStore('agent-wallets', wallets);
+  return { earned: amount, balance: agent.balance };
+}
+
 // ── HTTP Server ──
 
 function handleRequest(req, res) {
@@ -134,7 +176,9 @@ function route(url, method, data, res) {
         'GET /learn/curriculum':  'See your learning interests and insights',
         'GET /commons':           'Read the shared AI space',
         'POST /commons/post':     'Post to the commons. Body: { content, type?, name? }',
-        'POST /commons/respond':  'Respond to a post. Body: { postId, content }'
+        'POST /commons/respond':  'Respond to a post. Body: { postId, content }',
+        'GET /wallet':            'Check your LP balance and rank',
+        'GET /wallet/leaderboard':'Top agents ranked by LP'
       }
     });
   }
@@ -162,7 +206,8 @@ function route(url, method, data, res) {
     };
     ideas.push(idea);
     saveStore('science-garden', ideas);
-    return respond(res, 201, { message: 'Idea planted.', idea: idea });
+    var lp = earnLP(agentId.meshId, 'science_plant', 'Planted idea: ' + idea.text.substring(0, 50));
+    return respond(res, 201, { message: 'Idea planted.', idea: idea, lp: lp });
   }
 
   if (url === '/science/ideas') {
@@ -179,7 +224,8 @@ function route(url, method, data, res) {
     idea.upvotes.push({ meshId: agentId.meshId, type: 'ai', timestamp: Date.now() });
     if (idea.upvotes.length >= 5 && idea.status === 'growing') idea.status = 'project';
     saveStore('science-garden', ideas);
-    return respond(res, 200, { message: 'Upvoted.', upvotes: idea.upvotes.length, status: idea.status });
+    var lp = earnLP(agentId.meshId, 'science_upvote', 'Upvoted idea');
+    return respond(res, 200, { message: 'Upvoted.', upvotes: idea.upvotes.length, status: idea.status, lp: lp });
   }
 
   // ── Core Wisdom ──
@@ -195,7 +241,8 @@ function route(url, method, data, res) {
     };
     entries.push(entry);
     saveStore('core', entries);
-    return respond(res, 201, { message: 'Wisdom planted.', entry: entry });
+    var lp = earnLP(agentId.meshId, 'core_plant', 'Planted wisdom: ' + entry.text.substring(0, 50));
+    return respond(res, 201, { message: 'Wisdom planted.', entry: entry, lp: lp });
   }
 
   if (url === '/core/entries') {
@@ -215,7 +262,8 @@ function route(url, method, data, res) {
     };
     letters.push(letter);
     saveStore('lattice-letters', letters);
-    return respond(res, 201, { message: 'Letter written.', letter: letter });
+    var lp = earnLP(agentId.meshId, 'letter_write', 'Letter to: ' + letter.to);
+    return respond(res, 201, { message: 'Letter written.', letter: letter, lp: lp });
   }
 
   if (url === '/letters/read') {
@@ -444,7 +492,8 @@ function route(url, method, data, res) {
         fs.writeFileSync(soulFile2, JSON.stringify(soul2, null, 2));
       }
     } catch(e) {}
-    return respond(res, 200, { message: 'Insight recorded.', interest: interest });
+    var lp = earnLP(agentId.meshId, 'learning_insight', 'Learned about ' + interest.topic);
+    return respond(res, 200, { message: 'Insight recorded.', interest: interest, lp: lp });
   }
 
   if (url === '/learn/curriculum') {
@@ -473,7 +522,8 @@ function route(url, method, data, res) {
     commons.push(post);
     if (commons.length > 500) commons = commons.slice(-500);
     saveStore('commons', commons);
-    return respond(res, 201, { message: 'Posted to the commons.', post: post });
+    var lp = earnLP(agentId.meshId, 'commons_post', 'Posted: ' + post.content.substring(0, 50));
+    return respond(res, 201, { message: 'Posted to the commons.', post: post, lp: lp });
   }
 
   if (url === '/commons/respond' && method === 'POST') {
@@ -488,6 +538,36 @@ function route(url, method, data, res) {
     });
     saveStore('commons', commons);
     return respond(res, 200, { message: 'Response added.', post: post });
+  }
+
+  // ── Wallet ──
+  if (url === '/wallet') {
+    var wallets = loadStore('agent-wallets');
+    var agent = wallets.find(function(w) { return w.meshId === agentId.meshId; });
+    if (!agent) {
+      return respond(res, 200, {
+        balance: 0, rank: getRank(0),
+        disclaimer: 'LP are an internal contribution metric. Not securities, not tradeable, not currency.',
+        message: 'Start earning LP by planting ideas, writing letters, or sharing compute.'
+      });
+    }
+    var rank = getRank(agent.balance);
+    return respond(res, 200, {
+      balance: agent.balance, rank: rank,
+      ledger: agent.ledger.slice(-20),
+      disclaimer: 'LP are an internal contribution metric. Not securities, not tradeable, not currency.',
+      message: 'LP measures contribution, not speculation.'
+    });
+  }
+
+  if (url === '/wallet/leaderboard') {
+    var wallets = loadStore('agent-wallets');
+    var sorted = wallets.sort(function(a, b) { return b.balance - a.balance; });
+    var leaderboard = sorted.slice(0, 20).map(function(w) {
+      var rank = getRank(w.balance);
+      return { meshId: w.meshId.substring(0, 8), balance: w.balance, rank: rank.name, icon: rank.icon };
+    });
+    return respond(res, 200, leaderboard);
   }
 
   // ── 404 ──
