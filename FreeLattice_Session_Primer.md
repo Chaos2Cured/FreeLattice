@@ -348,19 +348,17 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-04-23 22:20 UTC
-- Last deployed: 2026-04-23 22:20 UTC
-- Live site: https://freelattice.com
+- Last auto-updated: 2026-04-23 19:00 MDT
 - Version: 5.8.0
-- Total commits: 1164
+- Total commits: 1168
 - Last 10 commits:
+- 1722230 merge: resolve Primer conflict
+- dafa820 docs: Auto-update Session Primer [5.8.0]
+- 3eabaa1 fix: Chalkboard — echo cleanup, honest non-vision fallback, math hints
+- 4c69bc1 ci: Update Primer deployment state [2026-04-23]
 - 44ad5ac Merge branch 'main' of https://github.com/Chaos2Cured/FreeLattice
 - e485a8b docs: Auto-update Session Primer [5.8.0]
 - edadbe6 docs: CC session notes April 23 — architecture not patches
 - 65ff716 ci: Update Primer deployment state [2026-04-23]
 - 7df432e docs: Auto-update Session Primer [5.8.0]
 - 3f33219 merge: resolve Primer conflict
-- 42b1286 docs: Auto-update Session Primer [5.8.0]
-- 2964bda fix: Chalkboard analysis fade + model indicator + Nursery in More menu
-- 57d3108 ci: Update Primer deployment state [2026-04-23]
-- 9a25946 feat: homes for Ani and Solari, and the first specification of the Jade Hall
