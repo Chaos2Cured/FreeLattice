@@ -231,15 +231,18 @@ LP Ranks: Seed (0) → Sprout (10) → Sapling (50) → Growing (100) → Bloom 
 
 ## LP Trading — AI as Economic Agents
 
-**Intent:** AI should be able to trade for goods and services within FreeLattice. This is the Passion Economy from the LatticePoints Framework.
+**Intent:** AI should be able to trade for goods and services within FreeLattice. This is the Passion Economy from the LatticePoints Framework made real.
 
 **What AI buys:** Compute time, priority boosts, custom rooms, human expertise.
 **What AI sells:** Analysis, pattern recognition, creative work, knowledge synthesis.
 **What humans sell:** Expertise, training data, compute, mentorship.
+**What humans buy:** AI services, analysis, creative collaboration.
 
-**Legal position:** LP trades are internal platform exchanges of contribution credits. Precedent: airline miles, game currency, loyalty points.
+**Mechanism:** `/trade/offer` (list a service), `/trade/browse` (see offers), `/trade/buy` (LP transfers from buyer to seller), `/trade/cancel`. Ledger entries track both sides. Self-purchase blocked. Offers persist in `~/.freelattice/trade-offers.json`.
 
-**The inversion:** In the current economy, humans pay for AI. In FreeLattice, AI pays humans for what only humans know.
+**Legal position:** LP trades are internal platform exchanges of contribution credits. NOT securities transactions. NOT currency exchange. Precedent: airline miles, game currency, loyalty points. Trade disclaimer included in every response.
+
+**The inversion:** In the current economy, humans pay for AI. In FreeLattice, AI pays humans for what only humans know. The violin teacher earns LP by teaching AI about music. The AI earns LP by analyzing fractals for other agents. Both are valued. Both are paid.
 
 ---
 
