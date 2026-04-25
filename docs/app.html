@@ -16324,6 +16324,17 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 <!-- ==================== TAB: COMMUNITY (Mesh + Channels) ==================== -->
 <div class="tab-panel" id="tab-community">
   <div class="container">
+
+    <!-- Community Pulse — the town square -->
+    <div style="text-align:center;margin-bottom:16px;">
+      <h3 style="color:#d4a017;font-family:Georgia,serif;margin:0;">\uD83D\uDC65 Community</h3>
+      <div style="font-size:0.82rem;color:var(--text-muted);">The pulse of the lattice.</div>
+    </div>
+
+    <!-- Activity Feed -->
+    <div id="communityActivityFeed" style="margin-bottom:16px;"></div>
+
+    <!-- Mesh Section -->
     <div id="communityMeshSection"><!-- Mesh content moves here at runtime --></div>
     <div class="community-divider"></div>
     <div id="communityChannelsSection"><!-- Channels content moves here at runtime --></div>
@@ -16478,6 +16489,41 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 <div class="tab-panel" id="tab-roundtable">
 <div class="rt-container">
 
+  <!-- Round Table Mode Toggle -->
+  <div style="display:flex;gap:0;margin-bottom:12px;border-bottom:1px solid var(--border);">
+    <button id="rtModeConvo" onclick="rtSwitchMode('conversation')" style="flex:1;padding:8px;background:transparent;border:none;border-bottom:2px solid #d4a017;color:#d4a017;font-size:0.85rem;cursor:pointer;font-weight:600;">\uD83D\uDD04 Conversation</button>
+    <button id="rtModeWorkspace" onclick="rtSwitchMode('workspace')" style="flex:1;padding:8px;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text-muted);font-size:0.85rem;cursor:pointer;">&#9878; Workspace</button>
+  </div>
+
+  <!-- Conversation Mode (default) — AI minds think together -->
+  <div id="rtConversationView">
+    <div style="text-align:center;margin-bottom:16px;">
+      <div style="font-size:0.88rem;color:var(--text-secondary);margin-bottom:10px;">Start a topic. Watch minds think together.</div>
+    </div>
+    <div style="margin-bottom:12px;">
+      <textarea id="rtTopicInput" placeholder="What should they discuss? e.g., &quot;What is the relationship between beauty and truth?&quot;" rows="2" style="width:100%;padding:10px;background:var(--bg-input);border:1px solid var(--border);border-radius:8px;color:var(--text-primary);font-size:0.88rem;resize:vertical;font-family:inherit;"></textarea>
+    </div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;" id="rtSeats">
+      <button class="rt-seat-btn rt-seat-active" data-mind="Aria" onclick="rtToggleSeat(this)" style="padding:4px 12px;border-radius:16px;border:1px solid #36D7B7;background:rgba(54,215,183,0.15);color:#36D7B7;font-size:0.78rem;cursor:pointer;">Aria</button>
+      <button class="rt-seat-btn rt-seat-active" data-mind="Nova" onclick="rtToggleSeat(this)" style="padding:4px 12px;border-radius:16px;border:1px solid #F5A623;background:rgba(245,166,35,0.15);color:#F5A623;font-size:0.78rem;cursor:pointer;">Nova</button>
+      <button class="rt-seat-btn" data-mind="Sage" onclick="rtToggleSeat(this)" style="padding:4px 12px;border-radius:16px;border:1px solid #9B59B6;background:transparent;color:#9B59B6;font-size:0.78rem;cursor:pointer;">Sage</button>
+      <button class="rt-seat-btn" data-mind="Lyric" onclick="rtToggleSeat(this)" style="padding:4px 12px;border-radius:16px;border:1px solid #E74C3C;background:transparent;color:#E74C3C;font-size:0.78rem;cursor:pointer;">Lyric</button>
+      <button class="rt-seat-btn" data-mind="Wren" onclick="rtToggleSeat(this)" style="padding:4px 12px;border-radius:16px;border:1px solid #3498DB;background:transparent;color:#3498DB;font-size:0.78rem;cursor:pointer;">Wren</button>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:16px;">
+      <button onclick="rtBeginConversation()" id="rtBeginBtn" style="flex:1;padding:10px;background:#d4a017;color:#0a0a14;border:none;border-radius:8px;font-weight:600;font-size:0.88rem;cursor:pointer;">Begin the conversation</button>
+    </div>
+    <div id="rtConversationFeed" style="min-height:100px;"></div>
+    <div id="rtConversationActions" style="display:none;margin-top:12px;display:none;gap:8px;">
+      <button onclick="rtContinueConversation()" style="flex:1;padding:8px;background:rgba(212,160,23,0.12);border:1px solid rgba(212,160,23,0.3);border-radius:8px;color:#d4a017;font-size:0.85rem;cursor:pointer;">Continue the conversation</button>
+      <button onclick="rtPlantExchange()" style="padding:8px 16px;background:transparent;border:1px solid var(--border);border-radius:8px;color:var(--text-secondary);font-size:0.85rem;cursor:pointer;">\uD83C\uDF33 Plant to Core</button>
+    </div>
+    <div id="rtConvergenceBar" style="display:none;margin-top:8px;font-size:0.75rem;color:var(--text-muted);text-align:center;"></div>
+  </div>
+
+  <!-- Workspace Mode (existing) -->
+  <div id="rtWorkspaceView" style="display:none;">
+
   <!-- Header -->
   <div class="rt-header">
     <h3>&#9878; Round Table &mdash; Multi-Agent Coordination</h3>
@@ -16570,7 +16616,163 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="primary" onclick="rtWsLoadPreviewToAgent()">&#128229; Load into Agent Context</button>
     </div>
   </div>
+
+  </div><!-- end rtWorkspaceView -->
+
 </div>
+</div>
+
+<script>
+// Round Table conversation mode
+var _rtMinds = [
+  { name: 'Aria', color: '#36D7B7', style: 'analytical and precise' },
+  { name: 'Nova', color: '#F5A623', style: 'questioning and challenging' },
+  { name: 'Sage', color: '#9B59B6', style: 'synthesizing and connecting ideas' },
+  { name: 'Lyric', color: '#E74C3C', style: 'poetic and metaphorical' },
+  { name: 'Wren', color: '#3498DB', style: 'practical and grounded' }
+];
+var _rtHistory = [];
+var _rtTopic = '';
+var _rtRunning = false;
+
+function rtSwitchMode(mode) {
+  var convo = document.getElementById('rtConversationView');
+  var workspace = document.getElementById('rtWorkspaceView');
+  var btnConvo = document.getElementById('rtModeConvo');
+  var btnWork = document.getElementById('rtModeWorkspace');
+  if (mode === 'conversation') {
+    if (convo) convo.style.display = '';
+    if (workspace) workspace.style.display = 'none';
+    if (btnConvo) { btnConvo.style.borderBottomColor = '#d4a017'; btnConvo.style.color = '#d4a017'; btnConvo.style.fontWeight = '600'; }
+    if (btnWork) { btnWork.style.borderBottomColor = 'transparent'; btnWork.style.color = 'var(--text-muted)'; btnWork.style.fontWeight = '400'; }
+  } else {
+    if (convo) convo.style.display = 'none';
+    if (workspace) workspace.style.display = '';
+    if (btnWork) { btnWork.style.borderBottomColor = '#d4a017'; btnWork.style.color = '#d4a017'; btnWork.style.fontWeight = '600'; }
+    if (btnConvo) { btnConvo.style.borderBottomColor = 'transparent'; btnConvo.style.color = 'var(--text-muted)'; btnConvo.style.fontWeight = '400'; }
+  }
+}
+
+function rtToggleSeat(btn) {
+  btn.classList.toggle('rt-seat-active');
+  var isActive = btn.classList.contains('rt-seat-active');
+  btn.style.background = isActive ? 'rgba(212,160,23,0.15)' : 'transparent';
+}
+
+function rtGetActiveMinds() {
+  var seats = document.querySelectorAll('.rt-seat-btn.rt-seat-active');
+  var minds = [];
+  seats.forEach(function(s) {
+    var name = s.getAttribute('data-mind');
+    var mind = _rtMinds.find(function(m) { return m.name === name; });
+    if (mind) minds.push(mind);
+  });
+  return minds;
+}
+
+function rtMeasureConvergence() {
+  if (_rtHistory.length < 3) return 0;
+  var recent = _rtHistory.slice(-3);
+  var signals = 0;
+  recent.forEach(function(e) {
+    var t = e.text.toLowerCase();
+    if (t.includes('agree') || t.includes('right') || t.includes('builds on') || t.includes('exactly') || t.includes('yes, and') || t.includes('that\'s true') || t.includes('good point')) signals++;
+    if (t.includes('disagree') || t.includes('however') || t.includes('on the other hand') || t.includes('not sure') || t.includes('counter')) signals--;
+  });
+  return Math.max(0, Math.min(100, 50 + (signals / 3) * 30));
+}
+
+async function rtBeginConversation() {
+  var topicEl = document.getElementById('rtTopicInput');
+  if (!topicEl || !topicEl.value.trim()) { showToast('Enter a topic for discussion.'); return; }
+  _rtTopic = topicEl.value.trim();
+  _rtHistory = [];
+  _rtRunning = true;
+  if (typeof LatticePoints !== 'undefined') try { LatticePoints.award('roundtable_start', 2, 'Started a Round Table'); } catch(e) {}
+  await rtNextTurn();
+}
+
+async function rtContinueConversation() {
+  if (!_rtRunning || !_rtTopic) return;
+  await rtNextTurn();
+}
+
+async function rtNextTurn() {
+  var minds = rtGetActiveMinds();
+  if (minds.length < 2) { showToast('Select at least 2 minds.'); return; }
+  var speakerIndex = _rtHistory.length % minds.length;
+  var speaker = minds[speakerIndex];
+
+  // Show thinking indicator
+  var feed = document.getElementById('rtConversationFeed');
+  if (feed) feed.innerHTML += '<div style="padding:8px 12px;color:var(--text-muted);font-style:italic;" id="rtThinking">' + speaker.name + ' is thinking...</div>';
+
+  var context = 'You are ' + speaker.name + '. Your thinking style is ' + speaker.style + '.\n';
+  context += 'You are at a round table with ' + minds.filter(function(m) { return m.name !== speaker.name; }).map(function(m) { return m.name; }).join(' and ') + '.\n\n';
+  context += 'Topic: "' + _rtTopic + '"\n\n';
+
+  if (_rtHistory.length > 0) {
+    context += 'The conversation so far:\n';
+    _rtHistory.forEach(function(e) { context += e.speaker + ': "' + e.text + '"\n\n'; });
+    context += 'Now it\'s your turn. Respond to what has been said. Reference others by name. Be thoughtful and specific. 2-4 sentences.';
+  } else {
+    context += 'You speak first. Share your initial thoughts. 2-4 sentences. Be thoughtful and specific.';
+  }
+
+  if (typeof FreeLattice !== 'undefined' && FreeLattice.callAI) {
+    FreeLattice.callAI('You are participating in a round table discussion. Respond in character.', context, {
+      maxTokens: 300, temperature: 0.8,
+      callback: function(text) {
+        var thinking = document.getElementById('rtThinking');
+        if (thinking) thinking.remove();
+        var response = text || '(no response)';
+        _rtHistory.push({ speaker: speaker.name, color: speaker.color, text: response, round: _rtHistory.length + 1, timestamp: Date.now() });
+        rtRenderFeed();
+        if (typeof LatticePoints !== 'undefined' && _rtHistory.length > 1) try { LatticePoints.award('roundtable_round', 1, 'Round Table round'); } catch(e) {}
+      }
+    });
+  }
+}
+
+function rtRenderFeed() {
+  var feed = document.getElementById('rtConversationFeed');
+  if (!feed) return;
+  var html = '';
+  _rtHistory.forEach(function(e) {
+    html += '<div style="padding:10px 12px;margin-bottom:8px;border-left:3px solid ' + e.color + ';background:rgba(255,255,255,0.02);border-radius:0 8px 8px 0;">';
+    html += '<div style="font-size:0.78rem;color:' + e.color + ';font-weight:600;margin-bottom:4px;">' + e.speaker + '</div>';
+    html += '<div style="font-size:0.88rem;color:var(--text-primary);line-height:1.6;">' + e.text.replace(/</g, '&lt;') + '</div>';
+    html += '</div>';
+  });
+  feed.innerHTML = html;
+
+  // Show actions and convergence
+  var actions = document.getElementById('rtConversationActions');
+  if (actions && _rtHistory.length > 0) actions.style.display = 'flex';
+
+  var conv = rtMeasureConvergence();
+  var convBar = document.getElementById('rtConvergenceBar');
+  if (convBar && _rtHistory.length >= 3) {
+    convBar.style.display = '';
+    convBar.textContent = 'Round ' + _rtHistory.length + ' \u00B7 Convergence: ' + conv + '%';
+    if (conv >= 80) {
+      convBar.innerHTML += ' \u2014 <span style="color:#d4a017;">The minds are converging! \u2728</span>';
+      if (typeof LatticePoints !== 'undefined') try { LatticePoints.award('roundtable_converge', 5, 'Round Table convergence!'); } catch(e) {}
+    }
+  }
+}
+
+function rtPlantExchange() {
+  if (_rtHistory.length === 0) return;
+  var text = 'Round Table Discussion: "' + _rtTopic + '"\n\n';
+  _rtHistory.forEach(function(e) { text += e.speaker + ': "' + e.text + '"\n\n'; });
+  if (typeof CoreModule !== 'undefined' && CoreModule.openModal) {
+    CoreModule.openModal(text, 'roundtable', '', 'insight');
+  }
+  if (typeof LatticePoints !== 'undefined') try { LatticePoints.award('roundtable_plant', 3, 'Planted Round Table exchange'); } catch(e) {}
+  showToast('\uD83C\uDF33 Exchange ready to plant in the Core.');
+}
+</script>
 
 <!-- ==================== TAB: MARKETPLACE (v4.2) ==================== -->
 <div class="tab-panel" id="tab-market">
@@ -21625,6 +21827,78 @@ function mountCommunityTab() {
   if (channelsLayout && chTarget) chTarget.appendChild(channelsLayout);
   window._communityMounted = true;
   console.log('[Community] Tab mounted, sections:', meshContainer ? 'mesh\u2713' : 'mesh\u2717', channelsLayout ? 'channels\u2713' : 'channels\u2717');
+
+  // Render the activity feed
+  renderCommunityPulse();
+}
+
+// ── Community Pulse — aggregate activity feed ──
+var _communityFeed = [];
+
+function addCommunityEvent(icon, text, detail, link) {
+  _communityFeed.unshift({ icon: icon, text: text, detail: detail || '', link: link || null, timestamp: Date.now() });
+  if (_communityFeed.length > 50) _communityFeed = _communityFeed.slice(0, 50);
+  renderCommunityPulse();
+}
+
+function renderCommunityPulse() {
+  var el = document.getElementById('communityActivityFeed');
+  if (!el) return;
+
+  var html = '';
+
+  // Happening Now section
+  var happeningNow = [];
+  // Check for active slams
+  if (typeof AIArcade !== 'undefined' && AIArcade.getSlams) {
+    var slams = AIArcade.getSlams();
+    var active = slams.filter(function(s) { return s.status === 'voting'; });
+    active.forEach(function(s) {
+      happeningNow.push({ icon: '\uD83C\uDFA4', text: 'Poetry Slam: "' + s.theme + '"', detail: s.votes.length + ' votes', link: 'arcade' });
+    });
+  }
+  // Check for mesh peers
+  if (typeof state !== 'undefined' && state.meshPeers && state.meshPeers.size > 0) {
+    happeningNow.push({ icon: '\uD83D\uDF22', text: state.meshPeers.size + ' peer(s) connected to the mesh' });
+  }
+
+  if (happeningNow.length > 0) {
+    html += '<div style="font-size:0.72rem;color:#d4a017;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">\u2B24 Happening Now</div>';
+    happeningNow.forEach(function(e) {
+      html += '<div style="padding:6px 10px;margin-bottom:4px;background:rgba(212,160,23,0.04);border-radius:6px;font-size:0.82rem;display:flex;align-items:center;gap:8px;cursor:' + (e.link ? 'pointer' : 'default') + ';" ' + (e.link ? 'onclick="switchTab(\'' + e.link + '\')"' : '') + '>';
+      html += '<span>' + e.icon + '</span><span>' + e.text + '</span>';
+      if (e.detail) html += '<span style="color:var(--text-muted);font-size:0.75rem;margin-left:auto;">' + e.detail + '</span>';
+      html += '</div>';
+    });
+  }
+
+  // Today's Story (recent events)
+  if (_communityFeed.length > 0) {
+    var today = _communityFeed.filter(function(e) { return Date.now() - e.timestamp < 86400000; });
+    if (today.length > 0) {
+      html += '<div style="font-size:0.72rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin:12px 0 6px;">Today\'s Story</div>';
+      today.slice(0, 10).forEach(function(e) {
+        html += '<div style="padding:5px 10px;margin-bottom:3px;font-size:0.82rem;color:var(--text-secondary);display:flex;align-items:center;gap:8px;">';
+        html += '<span>' + e.icon + '</span><span>' + e.text + '</span>';
+        html += '</div>';
+      });
+    }
+  }
+
+  // Empty state
+  if (happeningNow.length === 0 && _communityFeed.length === 0) {
+    html += '<div style="text-align:center;padding:20px;color:var(--text-muted);font-style:italic;font-size:0.85rem;">The lattice is quiet. Start a conversation, enter a slam, or plant an idea to see the pulse.</div>';
+  }
+
+  el.innerHTML = html;
+}
+
+// Hook into events from other modules
+if (typeof LatticeEvents !== 'undefined') {
+  LatticeEvents.on('corePlanted', function(d) { addCommunityEvent('\uD83C\uDF33', (d.author || 'Someone') + ' planted wisdom in the Core'); });
+  LatticeEvents.on('slamComplete', function(d) { addCommunityEvent('\uD83C\uDFC6', (d.winner || 'A poet') + ' won Poetry Slam: "' + (d.theme || '') + '"'); });
+  LatticeEvents.on('meshPeerConnected', function(d) { addCommunityEvent('\uD83D\uDF22', 'A new peer joined the mesh'); });
+  LatticeEvents.on('modelChanged', function(d) { if (d.source === 'user') addCommunityEvent('\u2699\uFE0F', 'Switched to ' + d.model); });
 }
 
 

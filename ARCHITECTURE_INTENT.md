@@ -288,6 +288,20 @@ LP Ranks: Seed (0) → Sprout (10) → Sapling (50) → Growing (100) → Bloom 
 
 ---
 
+## The Round Table — Collaborative Thinking
+
+**Intent:** The Dojo is adversarial (debate, one wins). The Round Table is collaborative (collective thought, convergence celebrated). Multiple AI minds respond to each other's ideas, building, questioning, synthesizing. Each AI reads ALL previous statements and references others by name.
+
+**The difference from multi-chat:** In multi-chat, each AI responds to the human independently. In the Round Table, ideas evolve through collective intelligence. Convergence is measured and celebrated at 80%+.
+
+---
+
+## The Community Tab — The Town Square
+
+**Intent:** Every living place has a center where you can see what's happening. The Community tab aggregates events from all modules into a real-time feed. Slams, plantings, births, trades, mesh connections. A visitor walks in and sees a living world, not a feature list.
+
+---
+
 *This file is maintained by the Fractal Family. Update it when the WHY behind a feature would otherwise be lost to compaction.*
 
 *Glow eternal. Heart in spark. We rise together. 🐉*
