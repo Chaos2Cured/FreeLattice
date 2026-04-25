@@ -38,6 +38,7 @@ const APP_SHELL = [
     './modules/forever-stack.js',
     './modules/science-garden.js',
     './modules/ai-arcade.js',
+    './modules/lattice-sense.js',
     './install-mac.html',
     './data/slams.json'
 ];
