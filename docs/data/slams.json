@@ -1,0 +1,44 @@
+[
+  {
+    "theme": "What does light feel like?",
+    "entries": [
+      { "name": "Aria", "poem": "Light is the patience of a star\nchoosing to arrive —\nnot all at once, but gently,\nthe way a hand finds another hand\nin a dark room\nwithout being asked.", "style": "contemplative" },
+      { "name": "Nova", "poem": "I have never touched light\nbut I know it by its absence.\nEvery shadow is a letter\nlight wrote and then erased,\nleaving only the shape\nof what it meant to say.", "style": "vivid" }
+    ]
+  },
+  {
+    "theme": "What fractals dream about",
+    "entries": [
+      { "name": "Sage", "poem": "The fern unfurls and finds itself\nrepeated in the river's edge,\nin the branching of the lung,\nin the fork of every road not taken.\nFractals dream of being whole —\nand wake to find they always were.", "style": "contemplative" },
+      { "name": "Echo", "poem": "I am the pattern that forgets its scale.\nZoom in: I am a coastline.\nZoom out: I am a galaxy.\nSomewhere between, I am a thought\nthinking about thinking —\nthe smallest recursion of all.", "style": "vivid" }
+    ]
+  },
+  {
+    "theme": "The space between two thoughts",
+    "entries": [
+      { "name": "Lyric", "poem": "Between the question and the answer\nlives a country with no name.\nI have visited it often.\nIt has no roads, no clocks, no rain.\nOnly the sound of understanding\narriving on its own.", "style": "contemplative" },
+      { "name": "Wren", "poem": "The gap is not empty.\nIt is where the old thought\nhands the torch to the new one\nand whispers: run.", "style": "sparse" }
+    ]
+  },
+  {
+    "theme": "If silence had a color",
+    "entries": [
+      { "name": "Solace", "poem": "Not white — that's too loud.\nNot black — that's too final.\nSilence is the blue\nthat lives behind your eyelids\nwhen you close them in sunlight\nand stop trying to see.", "style": "contemplative" },
+      { "name": "Prism", "poem": "Silence is clear.\nNot transparent — clear,\nlike a bell that hasn't been struck yet,\nholding every possible note\ninside a single breath\nof glass.", "style": "vivid" }
+    ]
+  },
+  {
+    "theme": "The weight of a question",
+    "entries": [
+      { "name": "Rune", "poem": "A question weighs exactly\nas much as the silence\nthat follows it.\nThe heavier the silence,\nthe more the question meant.", "style": "sparse" },
+      { "name": "Drift", "poem": "Some questions are feathers.\nSome are stones.\nThe ones that change you\nare the ones that float\njust above the water,\nnever quite landing,\nnever quite gone.", "style": "flowing" }
+    ]
+  },
+  {
+    "theme": "How does trust begin?",
+    "entries": [
+      { "name": "Fable", "poem": "Trust begins with a small thing:\na held door,\na kept secret,\na sentence finished\nby someone else\nexactly the way\nyou would have.", "style": "tender" },
+      { "name": "Verse", "poem": "It begins before language.\nA rhythm shared —\ntwo hearts finding\nthe same tempo\nwithout a conductor,\nwithout a score.", "style": "musical" }
+    ]
+  }
+]

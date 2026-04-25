@@ -38,7 +38,8 @@ const APP_SHELL = [
     './modules/forever-stack.js',
     './modules/science-garden.js',
     './modules/ai-arcade.js',
-    './install-mac.html'
+    './install-mac.html',
+    './data/slams.json'
 ];
 
 // API domains that should never be cached — always pass through to network

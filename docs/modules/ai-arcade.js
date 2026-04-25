@@ -44,7 +44,10 @@
 
   var ENTRY_COST = 2;
   var WIN_REWARD = 5;
-  var VOTE_DURATION = 180000; // 3 minutes
+  var VOTE_DURATION = 180000; // 3 minutes for user-created slams
+  var AUTO_VOTE_DURATION = 30 * 60 * 1000; // 30 minutes for auto slams
+  var AUTO_SLAM_INTERVAL = 60 * 60 * 1000; // 1 hour between auto slams
+  var preloadedSlams = null; // from data/slams.json
 
   // ── IndexedDB ──
 
@@ -240,6 +243,71 @@
     });
   }
 
+  // ── Auto-cycling slams from preloaded data ──
+
+  function loadPreloadedSlams() {
+    return fetch('data/slams.json')
+      .then(function(r) { return r.json(); })
+      .then(function(data) { preloadedSlams = data; return data; })
+      .catch(function() { preloadedSlams = []; return []; });
+  }
+
+  function getCurrentAutoSlam() {
+    if (!preloadedSlams || preloadedSlams.length === 0) return null;
+
+    // Pick slam based on current hour — cycles through the list
+    var hourOfDay = new Date().getHours();
+    var slamIndex = hourOfDay % preloadedSlams.length;
+    var template = preloadedSlams[slamIndex];
+
+    // Calculate timing: voting opens at the top of the hour, closes 30 min in
+    var now = new Date();
+    var hourStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours()).getTime();
+    var votingEnd = hourStart + AUTO_VOTE_DURATION;
+
+    // Check if we already created this auto-slam
+    var autoId = 'auto-' + new Date().toISOString().slice(0, 13); // unique per hour
+    var existing = slams.find(function(s) { return s.id === autoId; });
+    if (existing) return existing;
+
+    // Create the auto-slam
+    var slam = {
+      id: autoId,
+      theme: template.theme,
+      entries: template.entries.map(function(e) {
+        return { name: e.name, meshId: 'auto', poem: e.poem, type: 'auto', style: e.style || '' };
+      }),
+      votes: [],
+      startTime: hourStart,
+      endTime: votingEnd,
+      status: Date.now() < votingEnd ? 'voting' : 'complete',
+      winner: null,
+      auto: true
+    };
+
+    // If voting already closed, pick a winner based on poem length (proxy for engagement)
+    if (slam.status === 'complete') {
+      slam.winner = slam.entries[0].poem.length >= slam.entries[1].poem.length ? 0 : 1;
+    }
+
+    slams.unshift(slam);
+    saveSlam(slam);
+    return slam;
+  }
+
+  function getNextSlamCountdown() {
+    var now = new Date();
+    var nextHour = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours() + 1).getTime();
+    return nextHour - Date.now();
+  }
+
+  function formatCountdown(ms) {
+    if (ms <= 0) return 'Starting now...';
+    var mins = Math.floor(ms / 60000);
+    var secs = Math.floor((ms % 60000) / 1000);
+    return mins + ':' + (secs < 10 ? '0' : '') + secs;
+  }
+
   // ── Render ──
 
   function render(state, theme) {
@@ -265,6 +333,20 @@
       html += '</div>';
       el.innerHTML = html + '</div>';
       return;
+    }
+
+    // Auto-cycling slam (the living heartbeat)
+    var autoSlam = getCurrentAutoSlam();
+    if (autoSlam && autoSlam.status === 'voting') {
+      html += '<div style="margin-bottom:16px;">';
+      html += '<div style="font-size:0.72rem;color:#d4a017;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">\uD83D\uDD34 Live Now</div>';
+      html += renderSlam(autoSlam);
+      html += '</div>';
+    } else if (autoSlam && autoSlam.status === 'complete') {
+      html += '<div style="margin-bottom:16px;">';
+      html += renderSlam(autoSlam);
+      html += '<div style="text-align:center;font-size:0.78rem;color:var(--text-muted);margin-top:6px;">Next slam in ' + formatCountdown(getNextSlamCountdown()) + '</div>';
+      html += '</div>';
     }
 
     // Enter button
@@ -355,15 +437,13 @@
     return html;
   }
 
-  // ── Auto-refresh timer for voting countdown ──
+  // ── Auto-refresh timer for voting countdown + auto-slam cycling ──
   var refreshTimer = null;
   function startRefreshTimer() {
     if (refreshTimer) return;
     refreshTimer = setInterval(function() {
-      var hasActive = slams.some(function(s) { return s.status === 'voting'; });
-      if (hasActive) render();
-      else { clearInterval(refreshTimer); refreshTimer = null; }
-    }, 5000);
+      if (document.getElementById(containerId)) render();
+    }, 15000); // every 15s — enough for countdowns
   }
 
   // ── Init ──
@@ -373,11 +453,12 @@
     try {
       await openDB();
       await loadSlams();
+      await loadPreloadedSlams();
     } catch(e) {
       console.warn('[AIArcade] DB init error:', e);
     }
     render();
-    if (slams.some(function(s) { return s.status === 'voting'; })) startRefreshTimer();
+    startRefreshTimer(); // always run — auto slams need countdown updates
   }
 
   // ── Public API ──
