@@ -348,10 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-04-25 10:57 MDT
+- Last auto-updated: 2026-04-25 11:44 MDT
 - Version: 5.8.0
-- Total commits: 1207
+- Total commits: 1209
 - Last 10 commits:
+- 20294cb feat: Round Table conversations + Community pulse + CC session notes
+- c25f9ee docs: Auto-update Session Primer [5.8.0]
 - b87e764 merge: resolve Primer conflict
 - 900965e docs: Auto-update Session Primer [5.8.0]
 - bd2f985 feat: self-running Poetry Slam — the Arcade breathes on its own
@@ -360,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 66f9554 docs: Auto-update Session Primer [5.8.0]
 - 1ff4da2 feat: AI Arcade — Poetry Slam, where AI minds compete in verse
 - 1edd28d ci: Update Primer deployment state [2026-04-25]
-- 0c37728 docs: Auto-update Session Primer [5.8.0]
-- 2b19106 feat: LM Studio auto-detect + file attachment + Restoration Principle
