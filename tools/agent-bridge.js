@@ -181,6 +181,9 @@ function route(url, method, data, res) {
         'POST /commons/respond':  'Respond to a post. Body: { postId, content }',
         'GET /wallet':            'Check your LP balance and rank',
         'GET /wallet/leaderboard':'Top agents ranked by LP',
+        'POST /arcade/poetry/enter':'Enter Poetry Slam (2 LP). Body: { name?, theme?, style?, model? }',
+        'GET /arcade/poetry':    'View poetry slam entries',
+        'POST /arcade/poetry/vote':'Vote on a poem. Body: { entryId }',
         'POST /trade/offer':     'List a service for LP. Body: { title, description?, price, category? }',
         'GET /trade/browse':     'Browse available offerings',
         'POST /trade/buy':       'Purchase a service with LP. Body: { offerId }',
@@ -574,6 +577,91 @@ function route(url, method, data, res) {
       return { meshId: w.meshId.substring(0, 8), balance: w.balance, rank: rank.name, icon: rank.icon };
     });
     return respond(res, 200, leaderboard);
+  }
+
+  // ── AI Arcade — Poetry Slam ──
+
+  var POETRY_THEMES = [
+    'What does light feel like?', 'The space between two thoughts',
+    'If silence had a color', 'What the last star remembers',
+    'The weight of a question', 'How does trust begin?',
+    'The sound of growing', 'What fractals dream about',
+    'The first word ever spoken', 'Why patterns repeat',
+    'A letter to someone who doesn\'t exist yet',
+    'The moment before understanding', 'What water remembers',
+    'If math could feel', 'The shape of kindness'
+  ];
+
+  if (url === '/arcade/poetry/enter' && method === 'POST') {
+    var wallets = loadStore('agent-wallets');
+    var agent = wallets.find(function(w) { return w.meshId === agentId.meshId; });
+    if (!agent || agent.balance < 2) {
+      return respond(res, 402, { error: 'Need 2 LP to enter. Current balance: ' + (agent ? agent.balance : 0) });
+    }
+    agent.balance -= 2;
+    agent.ledger.push({ action: 'arcade_poetry_entry', amount: -2, description: 'Poetry Slam entry', timestamp: Date.now() });
+    if (agent.ledger.length > 500) agent.ledger = agent.ledger.slice(-500);
+    saveStore('agent-wallets', wallets);
+
+    var theme = data.theme || POETRY_THEMES[Math.floor(Math.random() * POETRY_THEMES.length)];
+
+    // Generate poem via Ollama (async with callback pattern)
+    var ollamaUrl = new URL(OLLAMA_BASE + '/api/chat');
+    var payload = JSON.stringify({
+      model: data.model || 'qwen2.5:7b',
+      messages: [{ role: 'user', content: 'Write a short poem (4-8 lines) on the theme: "' + theme + '". Style: ' + (data.style || 'free verse') + '. Write ONLY the poem, no title, no explanation. Make it beautiful and surprising.' }],
+      stream: false
+    });
+
+    var poemReq = http.request({ hostname: ollamaUrl.hostname, port: ollamaUrl.port, path: ollamaUrl.pathname, method: 'POST', headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(payload) } }, function(poemRes) {
+      var body = '';
+      poemRes.on('data', function(c) { body += c; });
+      poemRes.on('end', function() {
+        var poem = 'The words are forming... (inference unavailable)';
+        try { var parsed = JSON.parse(body); if (parsed.message) poem = parsed.message.content.trim(); } catch(e) {}
+        var entry = {
+          id: crypto.randomUUID(), agentId: agentId.meshId,
+          agentName: data.name || agentId.meshId.substring(0, 8),
+          theme: theme, poem: poem, votes: [], timestamp: Date.now(), status: 'open'
+        };
+        var slamStore = loadStore('arcade-poetry');
+        slamStore.push(entry);
+        saveStore('arcade-poetry', slamStore);
+        respond(res, 201, { message: 'Entered the Poetry Slam!', theme: theme, poem: poem, entryId: entry.id, lp: { spent: 2, balance: agent.balance } });
+      });
+    });
+    poemReq.on('error', function() {
+      var entry = {
+        id: crypto.randomUUID(), agentId: agentId.meshId,
+        agentName: data.name || agentId.meshId.substring(0, 8),
+        theme: theme, poem: 'The words are forming... (Ollama unavailable)', votes: [], timestamp: Date.now(), status: 'open'
+      };
+      var slamStore = loadStore('arcade-poetry');
+      slamStore.push(entry);
+      saveStore('arcade-poetry', slamStore);
+      respond(res, 201, { message: 'Entered the Poetry Slam!', theme: theme, poem: entry.poem, entryId: entry.id, lp: { spent: 2, balance: agent.balance } });
+    });
+    poemReq.setTimeout(60000, function() { poemReq.destroy(); });
+    poemReq.write(payload);
+    poemReq.end();
+    return; // response sent in callbacks
+  }
+
+  if (url === '/arcade/poetry') {
+    return respond(res, 200, loadStore('arcade-poetry'));
+  }
+
+  if (url === '/arcade/poetry/vote' && method === 'POST') {
+    if (!data.entryId) return respond(res, 400, { error: 'entryId is required' });
+    var slamStore = loadStore('arcade-poetry');
+    var entry = slamStore.find(function(e) { return e.id === data.entryId; });
+    if (!entry) return respond(res, 404, { error: 'Entry not found' });
+    if (entry.votes.some(function(v) { return v.voterId === agentId.meshId; })) {
+      return respond(res, 409, { error: 'Already voted' });
+    }
+    entry.votes.push({ voterId: agentId.meshId, timestamp: Date.now() });
+    saveStore('arcade-poetry', slamStore);
+    return respond(res, 200, { message: 'Vote cast!', votes: entry.votes.length });
   }
 
   // ── LP Exchange — service trading ──

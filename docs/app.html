@@ -17795,6 +17795,13 @@ function switchWalletView(view) {
   </div>
 </div>
 
+<!-- ==================== TAB: AI ARCADE ==================== -->
+<div class="tab-panel" id="tab-arcade">
+  <div id="arcadeContainer">
+    <div style="text-align:center;padding:60px 20px;color:var(--text-muted);font-style:italic;">Loading AI Arcade&hellip;</div>
+  </div>
+</div>
+
 <!-- ==================== TAB: WORKSHOP ==================== -->
 <div class="tab-panel" id="tab-workshop" style="height:100%;overflow:hidden;">
   <div id="workshopContainer" style="height:100%;width:100%;">
@@ -22258,8 +22265,11 @@ const FlTabs = (function() {
     ]},
     { label: '\u2694 Engage', tabs: [
       { id: 'sparring', icon: '&#9876;', label: 'Dojo', desc: 'Two AI minds debate. Truth emerges.' },
-      { id: 'draw-dream', icon: '&#x1F3AE;', label: 'Draw the Dream', desc: 'Play drawing games with AI.' },
       { id: 'roundtable', icon: '&#x1F504;', label: 'Round Table', desc: 'Multiple AIs, one conversation.' }
+    ]},
+    { label: '\uD83C\uDFAE Play', tabs: [
+      { id: 'draw-dream', icon: '&#x1F3AE;', label: 'Draw the Dream', desc: 'Play drawing games with AI.' },
+      { id: 'arcade', icon: '&#x1F579;', label: 'AI Arcade', desc: 'Watch AI minds play, create, and compete.' }
     ]},
     { label: '\uD83D\uDD28 Build', tabs: [
       { id: 'workshop', icon: '&#x1F6E0;', label: 'Workshop', desc: 'Where AI and humans build together.' },
@@ -53016,6 +53026,29 @@ document.addEventListener('click', function(e) {
     }
     if (typeof LatticeEvents !== 'undefined') {
       LatticeEvents.on('tabChanged', function(d) { if (d && d.tabId === 'science') loadScienceGarden(); });
+    }
+  })();
+
+  // ── AI Arcade lazy loader ──
+  (function() {
+    var loaded = false;
+    function loadArcade() {
+      if (loaded) return;
+      loaded = true;
+      if (typeof FreeLatticeLoader !== 'undefined') {
+        FreeLatticeLoader.load('AIArcade', 'modules/ai-arcade.js', function(mod) {
+          if (mod && mod.init) mod.init('arcadeContainer');
+          else if (window.AIArcade) window.AIArcade.init('arcadeContainer');
+        }, 'arcadeContainer');
+      } else {
+        var s = document.createElement('script');
+        s.src = 'modules/ai-arcade.js';
+        s.onload = function() { if (window.AIArcade) window.AIArcade.init('arcadeContainer'); };
+        document.head.appendChild(s);
+      }
+    }
+    if (typeof LatticeEvents !== 'undefined') {
+      LatticeEvents.on('tabChanged', function(d) { if (d && d.tabId === 'arcade') loadArcade(); });
     }
   })();
 })();
