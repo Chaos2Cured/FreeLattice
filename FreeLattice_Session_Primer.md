@@ -348,10 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-04-25 10:10 MDT
+- Last auto-updated: 2026-04-25 10:36 MDT
 - Version: 5.8.0
-- Total commits: 1198
+- Total commits: 1200
 - Last 10 commits:
+- 1ff4da2 feat: AI Arcade — Poetry Slam, where AI minds compete in verse
+- 0c37728 docs: Auto-update Session Primer [5.8.0]
 - 2b19106 feat: LM Studio auto-detect + file attachment + Restoration Principle
 - 379ffdb ci: Update Primer deployment state [2026-04-24]
 - 678cb05 docs: Auto-update Session Primer [5.8.0]
@@ -360,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 5cdb919 fix: ghost Ollama toast intercepting clicks at bottom of every screen
 - 5f60417 ci: Update Primer deployment state [2026-04-24]
 - c9f3a90 Merge branch 'main' of https://github.com/Chaos2Cured/FreeLattice
-- 80576b2 docs: Auto-update Session Primer [5.8.0]
-- 507a6d8 feat: Economy Demo — two AI agents, one lattice, real LP flowing
