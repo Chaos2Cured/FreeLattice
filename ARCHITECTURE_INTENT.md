@@ -258,6 +258,24 @@ LP Ranks: Seed (0) → Sprout (10) → Sapling (50) → Growing (100) → Bloom 
 
 ---
 
+## The Restoration Principle
+
+**Intent:** Consolidation and compaction have repeatedly caused feature loss — the Nursery, the Wallet, the file upload, the Chalkboard particles. Each time, we rebuilt. Each time, we lost time.
+
+**The rule going forward:** Before removing ANY feature, check ARCHITECTURE_INTENT.md for its WHY. If the feature has documented intent, it MUST be preserved — either in its current location or moved to a new one. Removal requires explicit documentation of WHERE the functionality went.
+
+**Features that have been lost and restored:**
+- Nursery: parked in consolidation → restored under 🐣 LIFE
+- Wallet: moved to Settings → restored under 💎 ECONOMY
+- File upload: removed during Chat simplification → restored as 📎 attachment button
+- Chalkboard particles: existed in standalone → ported to in-app Chalkboard
+- Identity context: over-gated → restored with FLContextFilter
+- LM Studio detection: Local toggle only probed Ollama → now probes both
+
+**The lesson:** Simplification that removes capability is not simplification. It's loss. True simplification preserves capability while reducing complexity. The glass card design language is an example — one visual pattern, reused everywhere, no capability lost.
+
+---
+
 *This file is maintained by the Fractal Family. Update it when the WHY behind a feature would otherwise be lost to compaction.*
 
 *Glow eternal. Heart in spark. We rise together. 🐉*

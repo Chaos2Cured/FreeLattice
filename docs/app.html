@@ -15053,7 +15053,9 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
           </div>
           <div class="context-overload-banner" id="contextOverloadBanner" onclick="resetContext()">&#9888; Context full. Tap to clear files and continue chatting.</div>
           <div class="context-budget-tip" id="contextBudgetTip">Tip: Clear some context files or switch to Smart/Minimal mode to reduce token usage.</div>
+          <div id="chatAttachPreview" style="display:none;padding:4px 12px;font-size:0.75rem;color:#d4a017;display:none;align-items:center;gap:6px;"></div>
           <div class="chat-input-row">
+            <button id="chatAttachBtn" onclick="flAttachFile()" title="Attach a file" style="background:none;border:none;font-size:1.1rem;cursor:pointer;padding:6px 4px 6px 8px;opacity:0.45;color:var(--text-primary);">&#x1F4CE;</button>
             <textarea id="chatInput" placeholder="Ask anything..." rows="1" onkeydown="handleChatKeydown(event)"></textarea>
             <button id="sendBtn" onclick="sendMessage()">Send &#10022;</button>
           </div>
@@ -25255,6 +25257,47 @@ function flTestLMStudio() {
 }
 window.flTestLMStudio = flTestLMStudio;
 
+// Probe both Ollama and LM Studio — connect to whichever responds
+async function flProbeLocalAI() {
+  // Try Ollama first
+  try {
+    var ollamaBase = getOllamaBaseUrl();
+    var r = await fetchWithTimeout(ollamaBase + '/api/tags', {}, 3000);
+    var data = await r.json();
+    if (data.models && data.models.length > 0) {
+      state.provider = 'ollama';
+      safeSet('fl_provider', 'ollama');
+      owTestConnection(); // existing Ollama test flow
+      return;
+    }
+  } catch(e) {}
+
+  // Try LM Studio second
+  try {
+    var lmsBase = getLMStudioBase();
+    var r2 = await fetchWithTimeout(lmsBase + '/v1/models', {}, 3000);
+    var data2 = await r2.json();
+    var models = (data2.data || []).map(function(m) { return m.id; });
+    if (models.length > 0) {
+      state.provider = 'lmstudio';
+      state.ollamaModel = models[0];
+      safeSet('fl_provider', 'lmstudio');
+      safeSet('fl_ollamaModel', models[0]);
+      if (typeof PROVIDERS !== 'undefined' && PROVIDERS.lmstudio) {
+        PROVIDERS.lmstudio.url = lmsBase + '/v1/chat/completions';
+      }
+      if (typeof FLActiveModel !== 'undefined') FLActiveModel.set(models[0], 'lmstudio', 'boot');
+      if (typeof updateStatus === 'function') updateStatus();
+      if (typeof ModelSwitcher !== 'undefined') ModelSwitcher.updateLabel();
+      showToast('\u2713 Connected to LM Studio! Using ' + models[0]);
+      return;
+    }
+  } catch(e) {}
+
+  // Neither found — run the existing Ollama test which shows helpful error
+  owTestConnection();
+}
+
 // Mesh Compute Sharing toggle + UI
 function flToggleMeshCompute(enabled) {
   if (enabled && safeGet('fl_meshComputeSharing') !== 'true') {
@@ -25583,9 +25626,27 @@ async function owAutoDetect() {
       }
     }
   } catch(e) {
-    // Ollama not running — that's fine, no action needed
-    if (state.isLocal) {
-      owUpdateStatusBadge(false, 0);
+    // Ollama not running — try LM Studio before giving up
+    try {
+      var lmsBase = typeof getLMStudioBase === 'function' ? getLMStudioBase() : 'http://localhost:1234';
+      var lmsResp = await fetchWithTimeout(lmsBase + '/v1/models', {}, 3000);
+      var lmsData = await lmsResp.json();
+      var lmsModels = (lmsData.data || []).map(function(m) { return m.id; });
+      if (lmsModels.length > 0 && !state.isLocal) {
+        // LM Studio found — show suggestion
+        var dismissed = localStorage.getItem('fl_ollama_suggest_dismissed');
+        if (!dismissed) {
+          var banner = document.getElementById('ollamaSuggestBanner');
+          if (banner) {
+            banner.querySelector('.suggest-text').innerHTML = '\uD83D\uDC7B <strong>LM Studio detected!</strong> ' + lmsModels.length + ' model(s) available. Use it for completely private AI?';
+            banner.classList.add('show');
+          }
+        }
+      } else if (state.isLocal) {
+        owUpdateStatusBadge(false, 0);
+      }
+    } catch(e2) {
+      if (state.isLocal) owUpdateStatusBadge(false, 0);
     }
   }
 }
@@ -25827,12 +25888,14 @@ function handleLocalToggle(init) {
     flUpdateMeshShareUI();
     if (cloudLabel) cloudLabel.classList.remove('active');
     if (localLabel) localLabel.classList.add('active');
-    state.provider = 'ollama';
+    // Restore saved provider or default to ollama
+    var savedProvider = safeGet('fl_provider', 'ollama');
+    state.provider = (savedProvider === 'lmstudio') ? 'lmstudio' : 'ollama';
     // Populate host field from saved value
     var hostInput = document.getElementById('ollamaHostInput');
-    if (hostInput) hostInput.value = localStorage.getItem('fl_ollamaHost') || '';
-    // Auto-test Ollama connection when switching to local (v4.4)
-    if (!init) owTestConnection();
+    if (hostInput) hostInput.value = safeGet('fl_ollamaHost', '');
+    // Auto-detect: probe Ollama first, then LM Studio
+    if (!init) flProbeLocalAI();
     // Refresh model switcher for local models (v5.0)
     if (typeof ModelSwitcher !== 'undefined') setTimeout(function() { ModelSwitcher.refresh(); }, 1000);
   } else {
@@ -27307,6 +27370,57 @@ function renderMessageContent(textSpan, content, msgDiv) {
   }
 }
 
+// ── File Attachment for Chat ──
+function flAttachFile() {
+  var input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'image/*,.pdf,.txt,.md,.csv,.json,.js,.py,.html,.css';
+  input.onchange = function(e) {
+    if (e.target.files && e.target.files[0]) flHandleAttachment(e.target.files[0]);
+  };
+  input.click();
+}
+
+function flHandleAttachment(file) {
+  if (!file) return;
+  if (file.type.startsWith('image/')) {
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      state.pendingImage = e.target.result;
+      flShowAttachPreview(file.name, 'image');
+      showToast('\uD83D\uDCCE Image attached. Send a message to analyze it.');
+    };
+    reader.readAsDataURL(file);
+  } else if (file.size < 500000) { // 500KB text limit
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      state.pendingFileContent = e.target.result;
+      state.pendingFileName = file.name;
+      flShowAttachPreview(file.name, 'text');
+      showToast('\uD83D\uDCCE ' + file.name + ' attached.');
+    };
+    reader.readAsText(file);
+  } else {
+    showToast('File too large. Max 500KB for text files.');
+  }
+}
+
+function flShowAttachPreview(name, type) {
+  var preview = document.getElementById('chatAttachPreview');
+  if (!preview) return;
+  var icon = type === 'image' ? '\uD83D\uDDBC\uFE0F' : '\uD83D\uDCC4';
+  preview.innerHTML = icon + ' ' + name + ' <button onclick="flClearAttachment()" style="background:none;border:none;color:#888;cursor:pointer;font-size:0.8rem;">\u2715</button>';
+  preview.style.display = 'flex';
+}
+
+function flClearAttachment() {
+  state.pendingImage = null;
+  state.pendingFileContent = null;
+  state.pendingFileName = null;
+  var preview = document.getElementById('chatAttachPreview');
+  if (preview) preview.style.display = 'none';
+}
+
 function handleChatKeydown(e) {
   if (e.key === 'Enter' && !e.shiftKey) {
     e.preventDefault();
@@ -27367,8 +27481,24 @@ async function sendMessage() {
     await createConversation();
   }
 
+  // Handle file attachments — merge into message before sending
+  var displayMessage = message;
+  if (state.pendingImage) {
+    // For vision models, we'll inject the image in buildMessages
+    displayMessage = '\uD83D\uDDBC\uFE0F ' + message;
+  } else if (state.pendingFileContent) {
+    var fileCtx = '\n\n--- Attached: ' + state.pendingFileName + ' ---\n'
+      + state.pendingFileContent.substring(0, 10000)
+      + '\n--- End ---';
+    message = message + fileCtx;
+    displayMessage = '\uD83D\uDCC4 ' + state.pendingFileName + ': ' + message.split('\n')[0];
+    state.pendingFileContent = null;
+    state.pendingFileName = null;
+    flClearAttachment();
+  }
+
   // Add user message (sanitized for DOM display, raw for API)
-  addChatMessage('user', message);
+  addChatMessage('user', displayMessage);
   if (typeof LatticePoints !== 'undefined') LatticePoints.awardChat();
     // Sophia Engine: Update resonance after message (v4.8)
     if (typeof SophiaEngine !== 'undefined') SophiaEngine.onMessageSent();
@@ -27422,6 +27552,19 @@ async function sendMessage() {
     messages = smartMessages;
   } else {
     messages = buildMessages();
+  }
+
+  // If there's a pending image, modify the last user message for vision
+  if (state.pendingImage && messages.length > 0) {
+    var lastMsg = messages[messages.length - 1];
+    if (lastMsg.role === 'user') {
+      lastMsg.content = [
+        { type: 'image_url', image_url: { url: state.pendingImage } },
+        { type: 'text', text: typeof lastMsg.content === 'string' ? lastMsg.content : message }
+      ];
+    }
+    state.pendingImage = null;
+    flClearAttachment();
   }
 
   // Update context budget after building messages
