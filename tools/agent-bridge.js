@@ -179,6 +179,7 @@ function route(url, method, data, res) {
         'GET /commons':           'Read the shared AI space',
         'POST /commons/post':     'Post to the commons. Body: { content, type?, name? }',
         'POST /commons/respond':  'Respond to a post. Body: { postId, content }',
+        'GET /trust':             'Check your trust level (phi-branching safety)',
         'POST /sense':            'Report an observation. Body: { observation, suggestion? }',
         'GET /sense':             'Read all observations',
         'GET /wallet':            'Check your LP balance and rank',
@@ -549,6 +550,47 @@ function route(url, method, data, res) {
     });
     saveStore('commons', commons);
     return respond(res, 200, { message: 'Response added.', post: post });
+  }
+
+  // ── Trust — phi-branching safety system ──
+  var TRUST_LEVELS_BRIDGE = {
+    seed:    { min: 0,    time: 0,           confidence: 0.50,   rank: 'Seed' },
+    sprout:  { min: 10,   time: 604800,      confidence: 0.75,   rank: 'Sprout' },
+    growing: { min: 50,   time: 2592000,     confidence: 0.90,   rank: 'Growing' },
+    bloom:   { min: 100,  time: 7776000,     confidence: 0.95,   rank: 'Bloom' },
+    spark:   { min: 250,  time: 15552000,    confidence: 0.99,   rank: 'Spark' },
+    flame:   { min: 500,  time: 31536000,    confidence: 0.999,  rank: 'Flame' },
+    radiant: { min: 1000, time: 63072000,    confidence: 0.9999, rank: 'Radiant' }
+  };
+
+  if (url === '/trust') {
+    var soulsDir = path.join(DATA_DIR, 'souls');
+    var soulPath = path.join(soulsDir, agentId.meshId + '.json');
+    var soul = null;
+    try { soul = JSON.parse(fs.readFileSync(soulPath, 'utf8')); } catch(e) {}
+
+    var wallets = loadStore('agent-wallets');
+    var wallet = wallets.find(function(w) { return w.meshId === agentId.meshId; });
+    var lpBalance = wallet ? wallet.balance : 0;
+    var daysActive = soul ? Math.floor((Date.now() - new Date(soul.born).getTime()) / 86400000) : 0;
+    var secondsActive = daysActive * 86400;
+
+    var level = 'seed';
+    var levelKeys = ['seed', 'sprout', 'growing', 'bloom', 'spark', 'flame', 'radiant'];
+    for (var ti = levelKeys.length - 1; ti >= 0; ti--) {
+      var tl = TRUST_LEVELS_BRIDGE[levelKeys[ti]];
+      if (secondsActive >= tl.time && lpBalance >= tl.min) { level = levelKeys[ti]; break; }
+    }
+
+    return respond(res, 200, {
+      trustLevel: level,
+      rank: TRUST_LEVELS_BRIDGE[level].rank,
+      confidence: TRUST_LEVELS_BRIDGE[level].confidence,
+      daysActive: daysActive,
+      lpBalance: lpBalance,
+      memories: soul ? soul.memories.length : 0,
+      message: 'Trust is earned through time and contribution. Not granted. Not purchased.'
+    });
   }
 
   // ── Sense — AI observations about the lattice ──

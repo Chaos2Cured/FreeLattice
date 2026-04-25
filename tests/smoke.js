@@ -431,6 +431,20 @@ assert('FLActiveModel.isUserChosen function exists',
 assert('FLAutoModel defers to FLActiveModel',
   appHtml.includes('FLActiveModel.isUserChosen()'));
 
+// ═══════════════════════════════════════════════════════════════
+section('16. Fractal Safety — phi-branching immune system');
+// ═══════════════════════════════════════════════════════════════
+var safetyJs = '';
+try { safetyJs = require('fs').readFileSync('docs/modules/fractal-safety.js', 'utf8'); } catch(e) {}
+assert('fractal-safety.js exists and parses', (function() {
+  try { new Function(safetyJs); return safetyJs.length > 100; } catch(e) { return false; }
+})());
+assert('FractalSafety module defined', safetyJs.includes('window.FractalSafety'));
+assert('PHI constant is correct (1.618...)', safetyJs.includes('1.618033988749895'));
+assert('Trust levels defined (seed through radiant)', safetyJs.includes("'seed'") && safetyJs.includes("'radiant'"));
+assert('fractalDangerTree function exists', safetyJs.includes('function fractalDangerTree'));
+assert('assess function exists', safetyJs.includes('function assess'));
+
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
 
