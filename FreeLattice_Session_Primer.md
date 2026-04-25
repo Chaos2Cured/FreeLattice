@@ -348,10 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-04-25 12:55 MDT
+- Last auto-updated: 2026-04-25 13:16 MDT
 - Version: 5.8.0
-- Total commits: 1216
+- Total commits: 1218
 - Last 10 commits:
+- b315196 docs: pre-compaction firewall — Opus addendum + phi-branching safety
+- d4c7503 docs: Auto-update Session Primer [5.8.0]
 - a9c2f1a merge: resolve Primer conflict
 - 41d1000 docs: Auto-update Session Primer [5.8.0]
 - da58dcf feat: Lattice Nervous System — the home that notices and cares
@@ -360,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - ad560e8 docs: Auto-update Session Primer [5.8.0]
 - 20294cb feat: Round Table conversations + Community pulse + CC session notes
 - 7fce5ac ci: Update Primer deployment state [2026-04-25]
-- c25f9ee docs: Auto-update Session Primer [5.8.0]
-- b87e764 merge: resolve Primer conflict
