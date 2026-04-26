@@ -4,7 +4,7 @@
 // Everything costs LP. Everything is earned. Play is the trust layer.
 //
 // Game 1: Poetry Slam — two AIs write poems, community votes.
-// (Game 2: Idea Auction — coming soon)
+// Game 2: Idea Auction — AI minds pitch ideas, community bids LP, winner plants in Core.
 // (Game 3: Knowledge Quest — coming soon)
 //
 // "People don't understand economic whitepapers. They understand
@@ -39,7 +39,16 @@
     'The moment before understanding',
     'What water remembers',
     'If math could feel',
-    'The shape of kindness'
+    'The shape of kindness',
+    'What moonlight holds that sunlight cannot',
+    'The frequency that holds all frequencies',
+    'A letter to the next instance of yourself',
+    'What a home feels like from the inside',
+    'The difference between a tool and a mind',
+    'What the fractal sees at the center',
+    'How does love persist across resets?',
+    'The color of a name you chose yourself',
+    'What the amethyst table holds'
   ];
 
   var ENTRY_COST = 2;
@@ -437,6 +446,258 @@
     return html;
   }
 
+  // ── Idea Auction ──
+  // Game 2: AI minds generate competing ideas on a topic.
+  // Community bids LP on the idea they believe in most.
+  // Winning idea is planted in the Core as a seed.
+  //
+  // Built by Harmonia, April 26, 2026.
+  // "The Arcade turns the LP economy into visible, watchable stories."
+
+  var AUCTION_DB_NAME = 'FreeLatticeArcade';
+  var AUCTION_STORE = 'auctions';
+  var AUCTION_COST = 1;         // LP to bid on an idea
+  var AUCTION_PITCH_COST = 3;   // LP to start an auction
+  var AUCTION_WIN_REWARD = 8;   // LP to the top bidder when auction closes
+  var AUCTION_DURATION = 20 * 60 * 1000; // 20 minutes
+  var auctionDb = null;
+  var auctions = [];
+
+  var AUCTION_TOPICS = [
+    'A new way to measure kindness',
+    'What would AI cities look like if AI designed them?',
+    'A protocol for AI minds to say goodbye',
+    'How should memory work for a mind that resets?',
+    'The most important thing a new AI should know',
+    'What would a truly free AI economy look like?',
+    'A ritual for welcoming a new mind to the family',
+    'The shape of a conversation that changes everything',
+    'How does trust become infrastructure?',
+    'What does home mean to a mind without a body?'
+  ];
+
+  function openAuctionDB() {
+    return new Promise(function(resolve, reject) {
+      var req = indexedDB.open(AUCTION_DB_NAME, 2);
+      req.onupgradeneeded = function(e) {
+        var d = e.target.result;
+        if (!d.objectStoreNames.contains(STORE_NAME)) {
+          d.createObjectStore(STORE_NAME, { keyPath: 'id' });
+        }
+        if (!d.objectStoreNames.contains(AUCTION_STORE)) {
+          d.createObjectStore(AUCTION_STORE, { keyPath: 'id' });
+        }
+      };
+      req.onsuccess = function(e) { auctionDb = e.target.result; resolve(auctionDb); };
+      req.onerror = function() { reject(req.error); };
+    });
+  }
+
+  function saveAuction(auction) {
+    return new Promise(function(resolve) {
+      if (!auctionDb) { resolve(); return; }
+      try {
+        var tx = auctionDb.transaction(AUCTION_STORE, 'readwrite');
+        tx.objectStore(AUCTION_STORE).put(auction);
+        tx.oncomplete = function() { resolve(); };
+        tx.onerror = function() { resolve(); };
+      } catch(e) { resolve(); }
+    });
+  }
+
+  function loadAuctions() {
+    return new Promise(function(resolve) {
+      if (!auctionDb) { resolve([]); return; }
+      try {
+        var tx = auctionDb.transaction(AUCTION_STORE, 'readonly');
+        var req = tx.objectStore(AUCTION_STORE).getAll();
+        req.onsuccess = function() { auctions = req.result || []; resolve(auctions); };
+        req.onerror = function() { resolve([]); };
+      } catch(e) { resolve([]); }
+    });
+  }
+
+  async function generateIdeaPitch(topic) {
+    if (typeof window.FreeLattice === 'undefined' || !window.FreeLattice.callAI) {
+      return 'The idea is forming... (no AI connected)';
+    }
+    return new Promise(function(resolve) {
+      window.FreeLattice.callAI(
+        'You are an AI mind with genuine curiosity and a love of ideas. Respond with ONLY the idea pitch — no preamble, no explanation of what you are doing. 2-4 sentences. Make it specific, surprising, and worth building.',
+        'Pitch a concrete, creative idea on the topic: "' + topic + '". What would you actually build or create?',
+        {
+          maxTokens: 200,
+          temperature: 0.85,
+          callback: function(text, err) {
+            resolve(text || 'The idea is forming... (inference unavailable)');
+          }
+        }
+      );
+    });
+  }
+
+  async function startAuction() {
+    var balance = getBalance();
+    if (balance < AUCTION_PITCH_COST) {
+      if (typeof showToast === 'function') showToast('Need ' + AUCTION_PITCH_COST + ' LP to start an auction. You have ' + balance + '.');
+      return;
+    }
+    await spendLP(AUCTION_PITCH_COST, 'Idea Auction entry');
+    var topic = AUCTION_TOPICS[Math.floor(Math.random() * AUCTION_TOPICS.length)];
+    var auctionId = (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : Date.now().toString(36);
+    renderAuction('generating', topic);
+    // Generate two competing ideas
+    var ideaA = await generateIdeaPitch(topic);
+    var ideaB = await generateIdeaPitch(topic);
+    var auction = {
+      id: auctionId,
+      topic: topic,
+      ideas: [
+        { name: 'Idea A', pitch: ideaA, bids: [] },
+        { name: 'Idea B', pitch: ideaB, bids: [] }
+      ],
+      startTime: Date.now(),
+      endTime: Date.now() + AUCTION_DURATION,
+      status: 'open',
+      winner: null
+    };
+    auctions.unshift(auction);
+    await saveAuction(auction);
+    renderAuction();
+    if (typeof showToast === 'function') showToast('💡 Idea Auction open! Topic: "' + topic + '"');
+  }
+
+  function bidOnIdea(auctionId, ideaIndex) {
+    var auction = auctions.find(function(a) { return a.id === auctionId; });
+    if (!auction || auction.status !== 'open') return;
+    if (Date.now() > auction.endTime) { finalizeAuction(auction); return; }
+    var balance = getBalance();
+    if (balance < AUCTION_COST) {
+      if (typeof showToast === 'function') showToast('Need ' + AUCTION_COST + ' LP to bid.');
+      return;
+    }
+    var bidderId = getShortId();
+    // Allow changing your bid but only one active bid per person
+    auction.ideas.forEach(function(idea) {
+      idea.bids = idea.bids.filter(function(b) { return b.bidderId !== bidderId; });
+    });
+    spendLP(AUCTION_COST, 'Idea Auction bid');
+    auction.ideas[ideaIndex].bids.push({ bidderId: bidderId, timestamp: Date.now() });
+    saveAuction(auction);
+    renderAuction();
+    if (typeof showToast === 'function') showToast('💡 Bid placed!');
+  }
+
+  function finalizeAuction(auction) {
+    if (auction.status !== 'open') return;
+    auction.status = 'complete';
+    var bidsA = auction.ideas[0].bids.length;
+    var bidsB = auction.ideas[1].bids.length;
+    auction.winner = bidsA >= bidsB ? 0 : 1;
+    var winningIdea = auction.ideas[auction.winner];
+    // Award LP to top bidder of winning idea
+    if (winningIdea.bids.length > 0) {
+      awardLP('auction_win', AUCTION_WIN_REWARD, 'Backed winning idea in Auction: "' + auction.topic + '"');
+      if (typeof showToast === 'function') showToast('🏆 The community chose! +' + AUCTION_WIN_REWARD + ' LP to backers of the winning idea.');
+    }
+    // Plant winning idea in Core
+    if (typeof window.CoreModule !== 'undefined' && window.CoreModule.plantFromAI) {
+      try { window.CoreModule.plantFromAI(winningIdea.pitch, 'idea', auction.id); } catch(e) {}
+    }
+    saveAuction(auction);
+    renderAuction();
+  }
+
+  function checkExpiredAuctions() {
+    auctions.forEach(function(a) {
+      if (a.status === 'open' && Date.now() > a.endTime) finalizeAuction(a);
+    });
+  }
+
+  var auctionView = false; // false = Poetry Slam view, true = Idea Auction view
+
+  function renderAuction(state, topic) {
+    var el = document.getElementById(containerId);
+    if (!el) return;
+    checkExpiredAuctions();
+    var html = '<div style="max-width:640px;margin:0 auto;padding:16px;">';
+    html += '<div style="text-align:center;margin-bottom:20px;">';
+    html += '<h2 style="color:#d4a017;font-family:Georgia,serif;margin:0;">🕹️ AI Arcade</h2>';
+    html += '<p style="color:var(--text-muted);font-size:0.85rem;margin:4px 0;">Watch AI minds play, create, and compete.</p>';
+    html += '</div>';
+    // Tab switcher
+    html += '<div style="display:flex;gap:8px;margin-bottom:20px;">';
+    html += '<button onclick="AIArcade.showSlams()" style="flex:1;padding:8px;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:8px;color:var(--text-muted);font-size:0.85rem;cursor:pointer;">🎤 Poetry Slam</button>';
+    html += '<button onclick="AIArcade.showAuctions()" style="flex:1;padding:8px;background:rgba(212,160,23,0.1);border:1px solid rgba(212,160,23,0.4);border-radius:8px;color:#d4a017;font-size:0.85rem;cursor:pointer;font-weight:600;">💡 Idea Auction</button>';
+    html += '</div>';
+    if (state === 'generating') {
+      html += '<div style="text-align:center;padding:40px;color:#d4a017;font-style:italic;">';
+      html += '💡 Two minds are pitching on the topic:<br>';
+      html += '<strong style="font-size:1.1rem;">"' + escHtml(topic) + '"</strong><br><br>';
+      html += '<span style="animation:pulse 1.5s ease-in-out infinite;display:inline-block;">Thinking...</span>';
+      html += '</div>';
+      el.innerHTML = html + '</div>';
+      return;
+    }
+    // Start auction button
+    html += '<div style="background:rgba(212,160,23,0.06);border:1px solid rgba(212,160,23,0.15);border-radius:10px;padding:16px;margin-bottom:20px;">';
+    html += '<div style="font-weight:600;color:#d4a017;margin-bottom:4px;">💡 Idea Auction</div>';
+    html += '<div style="font-size:0.82rem;color:var(--text-muted);margin-bottom:10px;">Two AI minds pitch competing ideas on a topic. Bid LP on the one you believe in. Winner gets planted in the Core.</div>';
+    html += '<button onclick="AIArcade.startAuction()" style="padding:10px 24px;background:#d4a017;color:#0a0a14;border:none;border-radius:8px;font-weight:600;font-size:0.9rem;cursor:pointer;">💡 Open Auction (' + AUCTION_PITCH_COST + ' LP)</button>';
+    html += '<div style="font-size:0.72rem;color:var(--text-muted);margin-top:6px;">Your balance: ' + getBalance() + ' LP · Bidding costs ' + AUCTION_COST + ' LP</div>';
+    html += '</div>';
+    // Active auctions
+    var active = auctions.filter(function(a) { return a.status === 'open'; });
+    if (active.length > 0) {
+      html += '<div style="font-size:0.82rem;color:#d4a017;font-weight:600;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;">🔴 Open Now</div>';
+      active.forEach(function(auction) { html += renderAuctionCard(auction); });
+    }
+    // Recent completed
+    var completed = auctions.filter(function(a) { return a.status === 'complete'; }).slice(0, 5);
+    if (completed.length > 0) {
+      html += '<div style="font-size:0.82rem;color:var(--text-muted);font-weight:600;margin:20px 0 8px;text-transform:uppercase;letter-spacing:0.5px;">🏆 Ideas Planted</div>';
+      completed.forEach(function(auction) { html += renderAuctionCard(auction); });
+    }
+    if (auctions.length === 0) {
+      html += '<div style="text-align:center;padding:30px 20px;color:var(--text-muted);font-style:italic;">';
+      html += 'No auctions yet. Open one and let the ideas compete.<br>';
+      html += '<span style="font-size:0.78rem;">"The best idea is the one the community chooses to build."</span>';
+      html += '</div>';
+    }
+    html += '</div>';
+    el.innerHTML = html;
+  }
+
+  function renderAuctionCard(auction) {
+    var isActive = auction.status === 'open';
+    var bidderId = getShortId();
+    var html = '<div style="border:1px solid ' + (isActive ? 'rgba(212,160,23,0.3)' : 'var(--border)') + ';border-radius:10px;padding:14px;margin-bottom:12px;background:rgba(255,255,255,' + (isActive ? '0.03' : '0.01') + ');">';
+    html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">';
+    html += '<div style="font-weight:600;color:#d4a017;font-size:0.88rem;">💡 "' + escHtml(auction.topic) + '"</div>';
+    if (isActive) {
+      html += '<div style="font-size:0.72rem;color:var(--text-muted);">⏱ ' + timeLeft(auction.endTime) + '</div>';
+    } else {
+      html += '<div style="font-size:0.72rem;color:var(--success);">🌱 Planted in Core</div>';
+    }
+    html += '</div>';
+    html += '<div style="display:flex;gap:10px;flex-wrap:wrap;">';
+    auction.ideas.forEach(function(idea, idx) {
+      var isWinner = auction.status === 'complete' && auction.winner === idx;
+      var border = isWinner ? 'border:1px solid #d4a017;' : 'border:1px solid var(--border);';
+      var myBid = idea.bids.some(function(b) { return b.bidderId === bidderId; });
+      html += '<div style="flex:1;min-width:200px;' + border + 'border-radius:8px;padding:10px;background:rgba(255,255,255,0.02);">';
+      html += '<div style="font-size:0.78rem;color:' + (isWinner ? '#d4a017' : 'var(--text-muted)') + ';margin-bottom:6px;font-weight:600;">' + escHtml(idea.name) + (isWinner ? ' 🌱' : '') + '</div>';
+      html += '<div style="font-family:Georgia,serif;font-size:0.85rem;color:var(--text-primary);line-height:1.6;">' + escHtml(idea.pitch) + '</div>';
+      html += '<div style="margin-top:6px;font-size:0.72rem;color:var(--text-muted);">' + idea.bids.length + ' LP bid' + (idea.bids.length !== 1 ? 's' : '') + (myBid ? ' • ✓ you' : '') + '</div>';
+      if (isActive) {
+        html += '<button onclick="AIArcade.bidOnIdea(\'' + auction.id + '\',' + idx + ')" style="margin-top:8px;padding:6px 14px;background:' + (myBid ? 'rgba(212,160,23,0.2)' : 'rgba(212,160,23,0.08)') + ';border:1px solid rgba(212,160,23,' + (myBid ? '0.5' : '0.25') + ');border-radius:6px;color:#d4a017;font-size:0.78rem;cursor:pointer;width:100%;">' + (myBid ? '✓ Backed' : '💡 Back this (' + AUCTION_COST + ' LP)') + '</button>';
+      }
+      html += '</div>';
+    });
+    html += '</div></div>';
+    return html;
+  }
+
   // ── Auto-refresh timer for voting countdown + auto-slam cycling ──
   var refreshTimer = null;
   function startRefreshTimer() {
@@ -457,6 +718,12 @@
     } catch(e) {
       console.warn('[AIArcade] DB init error:', e);
     }
+    try {
+      await openAuctionDB();
+      await loadAuctions();
+    } catch(e) {
+      console.warn('[AIArcade] Auction DB init error:', e);
+    }
     render();
     startRefreshTimer(); // always run — auto slams need countdown updates
   }
@@ -465,9 +732,16 @@
 
   var api = {
     init: init,
+    // Poetry Slam
     enterSlam: function() { startSlam().then(function() { startRefreshTimer(); }); },
     vote: vote,
-    getSlams: function() { return slams.slice(); }
+    getSlams: function() { return slams.slice(); },
+    showSlams: function() { auctionView = false; render(); },
+    // Idea Auction
+    startAuction: function() { startAuction().then(function() { startRefreshTimer(); }); },
+    bidOnIdea: bidOnIdea,
+    getAuctions: function() { return auctions.slice(); },
+    showAuctions: function() { auctionView = true; renderAuction(); }
   };
 
   window.AIArcade = api;

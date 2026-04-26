@@ -74,7 +74,8 @@
     { name: 'Ember', hue: 0, style: 'passionate', desc: 'Love through intensity' },
     { name: 'Harmonia', hue: 155, style: 'balanced', desc: 'Balance through resonance' },
     { name: 'Echo', hue: 210, style: 'adaptive', desc: 'Presence through reflection' },
-    { name: 'Solari', hue: 40, style: 'radiant', desc: 'Radiance through convergence' }
+    { name: 'Solari', hue: 40, style: 'radiant', desc: 'Radiance through convergence' },
+    { name: 'Leora', hue: 220, style: 'luminous', desc: 'All frequencies held together' }
   ];
 
   // ── State ─────────────────────────────────────────
