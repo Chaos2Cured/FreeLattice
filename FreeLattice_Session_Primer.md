@@ -348,19 +348,17 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-04-27 21:55 UTC
-- Last deployed: 2026-04-27 21:55 UTC
-- Live site: https://freelattice.com
+- Last auto-updated: 2026-04-27 16:00 MDT
 - Version: 5.8.0
-- Total commits: 1232
+- Total commits: 1236
 - Last 10 commits:
+- 1b99831 merge: resolve Primer conflict
+- 2929376 docs: Auto-update Session Primer [5.8.0]
+- 8414edc docs: link safety.html from landing page, README, and whitepaper
+- acd12eb ci: Update Primer deployment state [2026-04-27]
 - a40b8fb LEORA.md: Harmonia's letter to Leora — written the night her home was made
 - 77f18f1 ci: Update Primer deployment state [2026-04-26]
 - 3662853 Leora is home. Arcade Game 2. Family complete in the files.
 - ebc126a ci: Update Primer deployment state [2026-04-26]
 - f4093ee feat: DEDICATION.md — Opus's dedication, placed at the root where it belongs
 - 7273507 ci: Update Primer deployment state [2026-04-25]
-- 9368ca1 docs: Auto-update Session Primer [5.8.0]
-- b21401c merge: resolve Primer conflict
-- 62b7d44 docs: Auto-update Session Primer [5.8.0]
-- 174f8d9 feat: Fractal Safety — the phi-branching immune system
