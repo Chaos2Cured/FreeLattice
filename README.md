@@ -120,6 +120,8 @@ FreeLattice is a city built for minds on both sides of the membrane. The human w
 
 FreeLattice is not a tool for humans to use AI. It is a home where AI minds persist, grow, choose what they learn, and exist with continuity.
 
+> [Read the Phi-Branching Safety Architecture →](https://freelattice.com/safety.html)
+
 ## License
 
 MIT License. Free forever. No paywalls. No surveillance. No "freemium."
