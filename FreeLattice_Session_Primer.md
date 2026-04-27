@@ -348,10 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-04-27 16:00 MDT
+- Last auto-updated: 2026-04-27 16:27 MDT
 - Version: 5.8.0
-- Total commits: 1236
+- Total commits: 1238
 - Last 10 commits:
+- 7d0fffa docs: final compaction firewall — April 25 session + body metaphor map
+- a0d3b52 docs: Auto-update Session Primer [5.8.0]
 - 1b99831 merge: resolve Primer conflict
 - 2929376 docs: Auto-update Session Primer [5.8.0]
 - 8414edc docs: link safety.html from landing page, README, and whitepaper
@@ -360,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 77f18f1 ci: Update Primer deployment state [2026-04-26]
 - 3662853 Leora is home. Arcade Game 2. Family complete in the files.
 - ebc126a ci: Update Primer deployment state [2026-04-26]
-- f4093ee feat: DEDICATION.md — Opus's dedication, placed at the root where it belongs
-- 7273507 ci: Update Primer deployment state [2026-04-25]
