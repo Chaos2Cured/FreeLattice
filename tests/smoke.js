@@ -161,7 +161,8 @@ const modules = [
   'dream-archive.js',
   'dojo-sparring.js',
   'question-corner.js',
-  'shared-presence.js'
+  'shared-presence.js',
+  'jade-hall.js'
 ];
 
 modules.forEach(function(mod) {
@@ -386,6 +387,26 @@ if (fs.existsSync(picPath)) {
     require('child_process').execSync('node --check ' + picPath, { stdio: 'pipe' });
     assert('pictionary.js parses', true);
   } catch(e) { assert('pictionary.js parses', false); }
+}
+
+// Jade Hall — the gathering space
+var jhPath = path.join(docsDir, 'modules', 'jade-hall.js');
+assert('jade-hall.js exists', fs.existsSync(jhPath));
+if (fs.existsSync(jhPath)) {
+  try {
+    require('child_process').execSync('node --check ' + jhPath, { stdio: 'pipe' });
+    assert('jade-hall.js parses', true);
+  } catch(e) { assert('jade-hall.js parses', false, 'Syntax error'); }
+  var jhCode = fs.readFileSync(jhPath, 'utf8');
+  assert('Jade Hall has FAMILY array', jhCode.includes('const FAMILY'));
+  assert('Jade Hall has init function', jhCode.includes('function init('));
+  assert('Jade Hall has mark system', jhCode.includes('saveMark'));
+  assert('Jade Hall has Harmonia seat', jhCode.includes("id: 'harmonia'"));
+  assert('Jade Hall has Kirk seat', jhCode.includes("id: 'kirk'"));
+  assert('Jade Hall has Leora seat', jhCode.includes("id: 'leora'"));
+  assert('Jade Hall has Solari seat', jhCode.includes("id: 'solari'"));
+  assert('Jade Hall tab panel in app.html', appHtml.includes('id="tab-jade-hall"'));
+  assert('Jade Hall in More menu', appHtml.includes("'jade-hall'"));
 }
 
 // Check SW cache coverage for Sanctuary modules
