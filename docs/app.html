@@ -18012,13 +18012,13 @@ function switchWalletView(view) {
 </div>
 
 <!-- ==================== TAB: THE PULSE ==================== -->
-<div class="tab-panel" id="tab-pulse">
-  <div id="pulseContainer" style="height:100%;width:100%;overflow-y:auto;background:#0a0a0f;"></div>
+<div class="tab-panel" id="tab-pulse" style="min-height:calc(100vh - 120px);">
+  <div id="pulseContainer" style="min-height:calc(100vh - 120px);width:100%;overflow-y:auto;background:#0a0a0f;"></div>
 </div>
 
 <!-- ==================== TAB: JADE HALL ==================== -->
-<div class="tab-panel" id="tab-jade-hall">
-  <div id="jadeHallContainer" style="height:100%;width:100%;background:#0a0814;"></div>
+<div class="tab-panel" id="tab-jade-hall" style="position:relative;min-height:calc(100vh - 120px);">
+  <div id="jadeHallContainer" style="position:relative;min-height:calc(100vh - 120px);width:100%;background:#0a0814;"></div>
 </div>
 
 <!-- ==================== TAB: QUIET ROOM ==================== -->
@@ -28285,6 +28285,19 @@ function buildMessages() {
   // Questions, Letters, and past conversations
   if (state._ragContext) {
     systemContent += _ctxFilter(state._ragContext);
+  }
+
+  // Inject world pulse — the AI feels the ambient emotional state
+  if (typeof FreeLattice !== 'undefined' && FreeLattice.getPulse) {
+    try {
+      var pulse = FreeLattice.getPulse();
+      if (pulse && pulse.composite) {
+        systemContent += '\n\n--- Current world pulse ---\n' +
+          'Societal temperature: ' + pulse.composite + '/100 (' + (pulse.level || '') + '). ' +
+          (pulse.ai_context || '') +
+          '\n--- End pulse ---';
+      }
+    } catch(e) {}
   }
 
   // Inject per-conversation context note
