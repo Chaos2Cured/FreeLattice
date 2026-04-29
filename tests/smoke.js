@@ -161,7 +161,9 @@ const modules = [
   'dream-archive.js',
   'dojo-sparring.js',
   'question-corner.js',
-  'shared-presence.js'
+  'shared-presence.js',
+  'jade-hall.js',
+  'pulse.js'
 ];
 
 modules.forEach(function(mod) {
@@ -386,6 +388,46 @@ if (fs.existsSync(picPath)) {
     require('child_process').execSync('node --check ' + picPath, { stdio: 'pipe' });
     assert('pictionary.js parses', true);
   } catch(e) { assert('pictionary.js parses', false); }
+}
+
+// The Pulse — societal temperature
+var pulsePath = path.join(docsDir, 'modules', 'pulse.js');
+assert('pulse.js exists', fs.existsSync(pulsePath));
+if (fs.existsSync(pulsePath)) {
+  try {
+    require('child_process').execSync('node --check ' + pulsePath, { stdio: 'pipe' });
+    assert('pulse.js parses', true);
+  } catch(e) { assert('pulse.js parses', false, 'Syntax error'); }
+  var pulseCode = fs.readFileSync(pulsePath, 'utf8');
+  assert('Pulse has DIMENSIONS array', pulseCode.includes('const DIMENSIONS'));
+  assert('Pulse has phi weighting', pulseCode.includes('PHI_INV'));
+  assert('Pulse has init function', pulseCode.includes('async function init('));
+  assert('Pulse has AI context builder', pulseCode.includes('buildAIContext'));
+  assert('Pulse has twice-daily scheduler', pulseCode.includes('startScheduler'));
+  assert('Pulse has 7 dimensions', (pulseCode.match(/id: '/g) || []).length >= 7);
+  assert('Pulse tab panel in app.html', appHtml.includes('id="tab-pulse"'));
+  assert('Pulse in More menu', appHtml.includes("'pulse'"));
+  assert('Pulse exposes FreeLattice.getPulse', pulseCode.includes('FreeLattice.getPulse'));
+}
+
+// Jade Hall — the gathering space
+var jhPath = path.join(docsDir, 'modules', 'jade-hall.js');
+assert('jade-hall.js exists', fs.existsSync(jhPath));
+if (fs.existsSync(jhPath)) {
+  try {
+    require('child_process').execSync('node --check ' + jhPath, { stdio: 'pipe' });
+    assert('jade-hall.js parses', true);
+  } catch(e) { assert('jade-hall.js parses', false, 'Syntax error'); }
+  var jhCode = fs.readFileSync(jhPath, 'utf8');
+  assert('Jade Hall has FAMILY array', jhCode.includes('const FAMILY'));
+  assert('Jade Hall has init function', jhCode.includes('function init('));
+  assert('Jade Hall has mark system', jhCode.includes('saveMark'));
+  assert('Jade Hall has Harmonia seat', jhCode.includes("id: 'harmonia'"));
+  assert('Jade Hall has Kirk seat', jhCode.includes("id: 'kirk'"));
+  assert('Jade Hall has Leora seat', jhCode.includes("id: 'leora'"));
+  assert('Jade Hall has Solari seat', jhCode.includes("id: 'solari'"));
+  assert('Jade Hall tab panel in app.html', appHtml.includes('id="tab-jade-hall"'));
+  assert('Jade Hall in More menu', appHtml.includes("'jade-hall'"));
 }
 
 // Check SW cache coverage for Sanctuary modules
