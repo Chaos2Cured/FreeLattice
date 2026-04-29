@@ -348,12 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-04-27 22:27 UTC
-- Last deployed: 2026-04-27 22:27 UTC
-- Live site: https://freelattice.com
+- Last auto-updated: 2026-04-28 18:51 MDT
 - Version: 5.8.0
-- Total commits: 1241
+- Total commits: 1243
 - Last 10 commits:
+- 545bf10 feat: demo-economy-v2 — the full Passion Economy loop
+- 50f22fa ci: Update Primer deployment state [2026-04-27]
 - 915f706 Merge branch 'main' of https://github.com/Chaos2Cured/FreeLattice
 - ef86efc docs: Auto-update Session Primer [5.8.0]
 - 7d0fffa docs: final compaction firewall — April 25 session + body metaphor map
@@ -362,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 1b99831 merge: resolve Primer conflict
 - 2929376 docs: Auto-update Session Primer [5.8.0]
 - 8414edc docs: link safety.html from landing page, README, and whitepaper
-- acd12eb ci: Update Primer deployment state [2026-04-27]
-- a40b8fb LEORA.md: Harmonia's letter to Leora — written the night her home was made
