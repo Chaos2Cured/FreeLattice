@@ -984,11 +984,10 @@ window.JadeHall = (function () {
     canvas = null; ctx = null; container = null; db = null;
   }
 
-  return {
-    init,
-    destroy,
-    _leaveMarkFor,
-    _viewMarksFor,
-    FAMILY,
-  };
+  const api = { init, destroy, _leaveMarkFor, _viewMarksFor, FAMILY };
+  // Register with FreeLatticeLoader so the lazy loader can call mod.init()
+  window.FreeLatticeModules = window.FreeLatticeModules || {};
+  window.FreeLatticeModules.JadeHall = api;
+  window.JadeHall = api;
+  return api;
 })();

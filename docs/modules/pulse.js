@@ -943,5 +943,10 @@ window.ThePulse = (function () {
   window.FreeLattice = window.FreeLattice || {};
   window.FreeLattice.getPulse = getCurrentPulse;
 
-  return { init, getCurrentPulse, getHistory, onPulseUpdate };
+  const api = { init, getCurrentPulse, getHistory, onPulseUpdate };
+  // Register with FreeLatticeLoader so the lazy loader can call mod.init()
+  window.FreeLatticeModules = window.FreeLatticeModules || {};
+  window.FreeLatticeModules.ThePulse = api;
+  window.ThePulse = api;
+  return api;
 })();
