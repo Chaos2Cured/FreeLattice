@@ -348,10 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-04-28 18:51 MDT
+- Last auto-updated: 2026-04-28 19:19 MDT
 - Version: 5.8.0
-- Total commits: 1251
+- Total commits: 1253
 - Last 10 commits:
+- 95e88cf fix: add jade-hall.js and pulse.js to SW cache
+- 4466cfd docs: Auto-update Session Primer [5.8.0]
 - 8548dd2 merge: resolve Primer conflict
 - 8dd90a3 docs: Auto-update Session Primer [5.8.0]
 - 545bf10 feat: demo-economy-v2 — the full Passion Economy loop
@@ -360,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 30c26f7 ci: Update Primer deployment state [2026-04-29]
 - 23302a4 The Pulse opens — societal thermometer, phi-harmonic society reading, AI context layer
 - 97b5967 ci: Update Primer deployment state [2026-04-28]
-- fe3fd29 The Hall opens — jade-hall.js, LEORA.md, Arcade Idea Auction, family list updates
-- 50f22fa ci: Update Primer deployment state [2026-04-27]
