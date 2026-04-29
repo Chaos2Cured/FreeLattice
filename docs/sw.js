@@ -39,6 +39,8 @@ const APP_SHELL = [
     './modules/science-garden.js',
     './modules/ai-arcade.js',
     './modules/fractal-safety.js',
+    './modules/jade-hall.js',
+    './modules/pulse.js',
     './modules/lattice-sense.js',
     './install-mac.html',
     './data/slams.json'
