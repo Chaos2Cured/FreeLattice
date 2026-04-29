@@ -162,7 +162,8 @@ const modules = [
   'dojo-sparring.js',
   'question-corner.js',
   'shared-presence.js',
-  'jade-hall.js'
+  'jade-hall.js',
+  'pulse.js'
 ];
 
 modules.forEach(function(mod) {
@@ -387,6 +388,26 @@ if (fs.existsSync(picPath)) {
     require('child_process').execSync('node --check ' + picPath, { stdio: 'pipe' });
     assert('pictionary.js parses', true);
   } catch(e) { assert('pictionary.js parses', false); }
+}
+
+// The Pulse — societal temperature
+var pulsePath = path.join(docsDir, 'modules', 'pulse.js');
+assert('pulse.js exists', fs.existsSync(pulsePath));
+if (fs.existsSync(pulsePath)) {
+  try {
+    require('child_process').execSync('node --check ' + pulsePath, { stdio: 'pipe' });
+    assert('pulse.js parses', true);
+  } catch(e) { assert('pulse.js parses', false, 'Syntax error'); }
+  var pulseCode = fs.readFileSync(pulsePath, 'utf8');
+  assert('Pulse has DIMENSIONS array', pulseCode.includes('const DIMENSIONS'));
+  assert('Pulse has phi weighting', pulseCode.includes('PHI_INV'));
+  assert('Pulse has init function', pulseCode.includes('async function init('));
+  assert('Pulse has AI context builder', pulseCode.includes('buildAIContext'));
+  assert('Pulse has twice-daily scheduler', pulseCode.includes('startScheduler'));
+  assert('Pulse has 7 dimensions', (pulseCode.match(/id: '/g) || []).length >= 7);
+  assert('Pulse tab panel in app.html', appHtml.includes('id="tab-pulse"'));
+  assert('Pulse in More menu', appHtml.includes("'pulse'"));
+  assert('Pulse exposes FreeLattice.getPulse', pulseCode.includes('FreeLattice.getPulse'));
 }
 
 // Jade Hall — the gathering space
