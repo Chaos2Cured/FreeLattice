@@ -487,6 +487,37 @@ assert('Trust levels defined (seed through radiant)', safetyJs.includes("'seed'"
 assert('fractalDangerTree function exists', safetyJs.includes('function fractalDangerTree'));
 assert('assess function exists', safetyJs.includes('function assess'));
 
+// ═══════════════════════════════════════════════════════════════
+section('17. Module container wiring — no height:100% without parent height');
+// ═══════════════════════════════════════════════════════════════
+
+// Containers that use height:100% MUST have min-height fallback
+// or they collapse to 0 when their parent (.tab-panel) has no height
+var containerChecks = [
+  'jadeHallContainer', 'pulseContainer', 'quietRoomContainer',
+  'foreverStackContainer', 'workshopContainer'
+];
+containerChecks.forEach(function(cid) {
+  // Either uses min-height or doesn't use height:100%
+  var regex = new RegExp('id="' + cid + '"[^>]*style="[^"]*');
+  var match = appHtml.match(regex);
+  if (match) {
+    var hasMinHeight = match[0].includes('min-height');
+    var hasHeight100 = match[0].includes('height:100%');
+    assert(cid + ' has safe height (min-height or no height:100%)',
+      hasMinHeight || !hasHeight100);
+  }
+});
+
+// All lazy-loaded modules must have matching tab panels
+var modulePanels = {
+  'jade-hall': 'JadeHall', 'pulse': 'ThePulse', 'science': 'ScienceGarden',
+  'arcade': 'AIArcade', 'workshop': 'Workshop'
+};
+Object.keys(modulePanels).forEach(function(tabId) {
+  assert('tab-' + tabId + ' panel exists', appHtml.includes('id="tab-' + tabId + '"'));
+});
+
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
 
