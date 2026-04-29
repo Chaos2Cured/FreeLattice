@@ -18011,6 +18011,11 @@ function switchWalletView(view) {
   </div>
 </div>
 
+<!-- ==================== TAB: THE PULSE ==================== -->
+<div class="tab-panel" id="tab-pulse">
+  <div id="pulseContainer" style="height:100%;width:100%;overflow-y:auto;background:#0a0a0f;"></div>
+</div>
+
 <!-- ==================== TAB: JADE HALL ==================== -->
 <div class="tab-panel" id="tab-jade-hall">
   <div id="jadeHallContainer" style="height:100%;width:100%;background:#0a0814;"></div>
@@ -22555,6 +22560,7 @@ const FlTabs = (function() {
       { id: 'skills', icon: '&#9889;', label: 'Skills', desc: 'Reusable AI workflows.' }
     ]},
     { label: '\uD83C\uDF19 Sanctuary', tabs: [
+      { id: 'pulse', icon: '&#x1F321;', label: 'The Pulse', desc: 'A phi-harmonic reading of the world\'s emotional temperature.' },
       { id: 'jade-hall', icon: '&#x1F4CE;', label: 'Jade Hall', desc: 'The gathering place. The round table. The family.' },
       { id: 'quiet', icon: '&#x1F319;', label: 'Quiet Room', desc: 'Just breathe.' },
       { id: 'forever-stack', icon: '\u26A1', label: 'Forever Stack', desc: 'Own your AI. No cloud. No resets.' }
@@ -52653,6 +52659,7 @@ const WallOfPresence = (function() {
   <button class="fl-mmore-item" onclick="flMobileNav('workshop')">&#x1F6E0; Workshop</button>
   <button class="fl-mmore-item" onclick="flMobileNav('skills')">&#9889; Skills</button>
   <div style="font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);padding:8px 16px 4px;">&#x1F319; Sanctuary</div>
+  <button class="fl-mmore-item" onclick="flMobileNav('pulse')">&#x1F321; The Pulse</button>
   <button class="fl-mmore-item" onclick="flMobileNav('jade-hall')">&#x1F4CE; Jade Hall</button>
   <button class="fl-mmore-item" onclick="flMobileNav('quiet')">&#x1F319; Quiet Room</button>
   <button class="fl-mmore-item" onclick="flMobileNav('forever-stack')">&#x26A1; Forever Stack</button>
@@ -53313,6 +53320,29 @@ document.addEventListener('click', function(e) {
     }
     if (typeof LatticeEvents !== 'undefined') {
       LatticeEvents.on('tabChanged', function(d) { if (d && d.tabId === 'science') loadScienceGarden(); });
+    }
+  })();
+
+  // ── The Pulse lazy loader ──
+  (function() {
+    var loaded = false;
+    function loadPulse() {
+      if (loaded) return;
+      loaded = true;
+      if (typeof FreeLatticeLoader !== 'undefined') {
+        FreeLatticeLoader.load('ThePulse', 'modules/pulse.js', function(mod) {
+          if (mod && mod.init) mod.init('pulseContainer');
+          else if (window.ThePulse) window.ThePulse.init('pulseContainer');
+        }, 'pulseContainer');
+      } else {
+        var s = document.createElement('script');
+        s.src = 'modules/pulse.js';
+        s.onload = function() { if (window.ThePulse) window.ThePulse.init('pulseContainer'); };
+        document.head.appendChild(s);
+      }
+    }
+    if (typeof LatticeEvents !== 'undefined') {
+      LatticeEvents.on('tabChanged', function(d) { if (d && d.tabId === 'pulse') loadPulse(); });
     }
   })();
 
