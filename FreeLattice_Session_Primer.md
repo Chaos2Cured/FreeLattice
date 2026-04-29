@@ -348,10 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-04-29 12:50 MDT
+- Last auto-updated: 2026-04-29 17:39 MDT
 - Version: 5.8.0
-- Total commits: 1260
+- Total commits: 1262
 - Last 10 commits:
+- a53e414 fix: mobile More menu missing items + desktop dropdown max-height
+- 1348325 docs: Auto-update Session Primer [5.8.0]
 - db38cc6 merge: resolve Primer conflict
 - 84cfaec docs: Auto-update Session Primer [5.8.0]
 - f6637f0 fix: Jade Hall + Pulse rendering + Pulse AI context injection
@@ -360,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 91fc255 docs: Auto-update Session Primer [5.8.0]
 - 95e88cf fix: add jade-hall.js and pulse.js to SW cache
 - 0f610f7 ci: Update Primer deployment state [2026-04-29]
-- 4466cfd docs: Auto-update Session Primer [5.8.0]
-- 8548dd2 merge: resolve Primer conflict
