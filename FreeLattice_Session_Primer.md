@@ -348,11 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-04-29 12:49 MDT
+- Last auto-updated: 2026-04-29 01:19 UTC
+- Last deployed: 2026-04-29 01:19 UTC
+- Live site: https://freelattice.com
 - Version: 5.8.0
-- Total commits: 1257
+- Total commits: 1256
 - Last 10 commits:
-- f6637f0 fix: Jade Hall + Pulse rendering + Pulse AI context injection
 - 2bcdf3a Merge branch 'main' of https://github.com/Chaos2Cured/FreeLattice
 - 91fc255 docs: Auto-update Session Primer [5.8.0]
 - 95e88cf fix: add jade-hall.js and pulse.js to SW cache
@@ -362,3 +363,4 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 8dd90a3 docs: Auto-update Session Primer [5.8.0]
 - 545bf10 feat: demo-economy-v2 — the full Passion Economy loop
 - f174ec9 ci: Update Primer deployment state [2026-04-29]
+- 66f7a49 Fix: Jade Hall and Pulse now render — register with FreeLatticeModules
