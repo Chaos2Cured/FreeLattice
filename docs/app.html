@@ -10561,11 +10561,13 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
   border-radius: 0 0 var(--radius) var(--radius);
   box-shadow: 0 8px 32px rgba(0,0,0,0.45);
   width: 260px;
-  max-height: 60vh;
+  max-height: 80vh;
   overflow-y: auto;
   overflow-x: hidden;
   padding: 10px 4px;
   animation: fl-panel-slide-down 250ms ease;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(212,160,23,0.3) transparent;
 }
 .fl-more-dropdown.fl-dropdown-open {
   display: block;
@@ -52664,10 +52666,13 @@ const WallOfPresence = (function() {
   <div style="font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);padding:8px 16px 4px;">&#x1F331; Grow</div>
   <button class="fl-mmore-item" onclick="flMobileNav('core')">&#x1F333; Core & Questions</button>
   <button class="fl-mmore-item" onclick="flMobileNav('agents')">&#x1F3DB; Pantheon</button>
+  <button class="fl-mmore-item" onclick="flMobileNav('science')">&#x1F52C; Science Garden</button>
   <div style="font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);padding:8px 16px 4px;">&#x2694; Engage</div>
   <button class="fl-mmore-item" onclick="flMobileNav('sparring')">&#9876; Dojo</button>
-  <button class="fl-mmore-item" onclick="flMobileNav('draw-dream')">&#x1F3AE; Draw the Dream</button>
   <button class="fl-mmore-item" onclick="flMobileNav('roundtable')">&#x1F504; Round Table</button>
+  <div style="font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);padding:8px 16px 4px;">&#x1F3AE; Play</div>
+  <button class="fl-mmore-item" onclick="flMobileNav('draw-dream')">&#x1F3AE; Draw the Dream</button>
+  <button class="fl-mmore-item" onclick="flMobileNav('arcade')">&#x1F579; AI Arcade</button>
   <div style="font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);padding:8px 16px 4px;">&#x1F528; Build</div>
   <button class="fl-mmore-item" onclick="flMobileNav('workshop')">&#x1F6E0; Workshop</button>
   <button class="fl-mmore-item" onclick="flMobileNav('skills')">&#9889; Skills</button>
@@ -52676,6 +52681,10 @@ const WallOfPresence = (function() {
   <button class="fl-mmore-item" onclick="flMobileNav('jade-hall')">&#x1F4CE; Jade Hall</button>
   <button class="fl-mmore-item" onclick="flMobileNav('quiet')">&#x1F319; Quiet Room</button>
   <button class="fl-mmore-item" onclick="flMobileNav('forever-stack')">&#x26A1; Forever Stack</button>
+  <div style="font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);padding:8px 16px 4px;">&#x1F423; Life</div>
+  <button class="fl-mmore-item" onclick="flMobileNav('nursery')">&#x1F423; Nursery</button>
+  <div style="font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);padding:8px 16px 4px;">&#x1F4B0; Economy</div>
+  <button class="fl-mmore-item" onclick="flMobileNav('wallet')">&#x1F4B0; Wallet</button>
 </div>
 
 <script>
