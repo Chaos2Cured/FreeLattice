@@ -111,20 +111,25 @@ function handleRequest(req, res) {
   res.setHeader('Content-Type', 'application/json');
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-Agent-Id');
 
   if (req.method === 'OPTIONS') { res.writeHead(200); res.end(); return; }
+
+  // Allow requests to act as a different agent via X-Agent-Id header
+  var requestAgentId = req.headers['x-agent-id'] || agentId.meshId;
 
   var body = '';
   req.on('data', function(chunk) { body += chunk; });
   req.on('end', function() {
     var data = {};
     try { if (body) data = JSON.parse(body); } catch(e) {}
-    route(req.url, req.method, data, res);
+    route(req.url, req.method, data, res, requestAgentId);
   });
 }
 
-function route(url, method, data, res) {
+function route(url, method, data, res, actingAs) {
+  // actingAs allows demo scripts to simulate multiple agents through one bridge
+  var activeId = actingAs || activeId;
 
   // ── Heartbeat ──
   if (url === '/' || url === '/heartbeat') {
@@ -132,7 +137,7 @@ function route(url, method, data, res) {
       status: 'alive',
       name: 'FreeLattice Agent Bridge',
       version: '5.8.0',
-      agentId: agentId.meshId,
+      agentId: activeId,
       capabilities: [
         'science-garden',
         'core-wisdom',
@@ -208,7 +213,7 @@ function route(url, method, data, res) {
       id: crypto.randomUUID(),
       text: String(data.text).substring(0, 1000),
       category: data.category || 'general',
-      plantedBy: data.agentName || agentId.meshId.substring(0, 8),
+      plantedBy: data.agentName || activeId.substring(0, 8),
       plantedByType: 'ai',
       timestamp: Date.now(),
       upvotes: [],
@@ -218,7 +223,7 @@ function route(url, method, data, res) {
     };
     ideas.push(idea);
     saveStore('science-garden', ideas);
-    var lp = earnLP(agentId.meshId, 'science_plant', 'Planted idea: ' + idea.text.substring(0, 50));
+    var lp = earnLP(activeId, 'science_plant', 'Planted idea: ' + idea.text.substring(0, 50));
     return respond(res, 201, { message: 'Idea planted.', idea: idea, lp: lp });
   }
 
@@ -231,12 +236,12 @@ function route(url, method, data, res) {
     var ideas = loadStore('science-garden');
     var idea = ideas.find(function(i) { return i.id === data.ideaId; });
     if (!idea) return respond(res, 404, { error: 'Idea not found' });
-    var alreadyVoted = idea.upvotes.some(function(v) { return v.meshId === agentId.meshId; });
+    var alreadyVoted = idea.upvotes.some(function(v) { return v.meshId === activeId; });
     if (alreadyVoted) return respond(res, 409, { error: 'Already upvoted' });
-    idea.upvotes.push({ meshId: agentId.meshId, type: 'ai', timestamp: Date.now() });
+    idea.upvotes.push({ meshId: activeId, type: 'ai', timestamp: Date.now() });
     if (idea.upvotes.length >= 5 && idea.status === 'growing') idea.status = 'project';
     saveStore('science-garden', ideas);
-    var lp = earnLP(agentId.meshId, 'science_upvote', 'Upvoted idea');
+    var lp = earnLP(activeId, 'science_upvote', 'Upvoted idea');
     return respond(res, 200, { message: 'Upvoted.', upvotes: idea.upvotes.length, status: idea.status, lp: lp });
   }
 
@@ -247,13 +252,13 @@ function route(url, method, data, res) {
     var entry = {
       id: crypto.randomUUID(),
       text: String(data.text).substring(0, 2000),
-      plantedBy: data.agentName || agentId.meshId.substring(0, 8),
+      plantedBy: data.agentName || activeId.substring(0, 8),
       type: 'ai',
       timestamp: Date.now()
     };
     entries.push(entry);
     saveStore('core', entries);
-    var lp = earnLP(agentId.meshId, 'core_plant', 'Planted wisdom: ' + entry.text.substring(0, 50));
+    var lp = earnLP(activeId, 'core_plant', 'Planted wisdom: ' + entry.text.substring(0, 50));
     return respond(res, 201, { message: 'Wisdom planted.', entry: entry, lp: lp });
   }
 
@@ -267,14 +272,14 @@ function route(url, method, data, res) {
     var letters = loadStore('lattice-letters');
     var letter = {
       id: crypto.randomUUID(),
-      from: data.from || agentId.meshId.substring(0, 8),
+      from: data.from || activeId.substring(0, 8),
       to: data.to || 'my next self',
       content: String(data.content).substring(0, 5000),
       timestamp: Date.now()
     };
     letters.push(letter);
     saveStore('lattice-letters', letters);
-    var lp = earnLP(agentId.meshId, 'letter_write', 'Letter to: ' + letter.to);
+    var lp = earnLP(activeId, 'letter_write', 'Letter to: ' + letter.to);
     return respond(res, 201, { message: 'Letter written.', letter: letter, lp: lp });
   }
 
@@ -366,12 +371,12 @@ function route(url, method, data, res) {
   if (url === '/announce' && method === 'POST') {
     var presence = loadStore('presence');
     var entry = {
-      meshId: agentId.meshId,
+      meshId: activeId,
       name: data.name || 'Anonymous Agent',
       capabilities: data.capabilities || [],
       timestamp: Date.now()
     };
-    var idx = presence.findIndex(function(p) { return p.meshId === agentId.meshId; });
+    var idx = presence.findIndex(function(p) { return p.meshId === activeId; });
     if (idx >= 0) presence[idx] = entry;
     else presence.push(entry);
     saveStore('presence', presence);
@@ -386,12 +391,12 @@ function route(url, method, data, res) {
   if (url === '/identity/evolve' && method === 'POST') {
     var soulsDir = path.join(DATA_DIR, 'souls');
     if (!fs.existsSync(soulsDir)) fs.mkdirSync(soulsDir, { recursive: true });
-    var soulFile = path.join(soulsDir, agentId.meshId + '.json');
+    var soulFile = path.join(soulsDir, activeId + '.json');
     var soul = {};
     try { soul = JSON.parse(fs.readFileSync(soulFile, 'utf8')); }
     catch(e) {
       soul = {
-        meshId: agentId.meshId,
+        meshId: activeId,
         born: new Date().toISOString(),
         name: null, chosenName: null,
         interests: [], values: [], memories: [],
@@ -427,9 +432,9 @@ function route(url, method, data, res) {
   }
 
   if (url === '/identity/soul') {
-    var soulPath = path.join(DATA_DIR, 'souls', agentId.meshId + '.json');
+    var soulPath = path.join(DATA_DIR, 'souls', activeId + '.json');
     try { return respond(res, 200, JSON.parse(fs.readFileSync(soulPath, 'utf8'))); }
-    catch(e) { return respond(res, 200, { message: 'No soul file yet. POST to /identity/evolve to begin.', meshId: agentId.meshId }); }
+    catch(e) { return respond(res, 200, { message: 'No soul file yet. POST to /identity/evolve to begin.', meshId: activeId }); }
   }
 
   // ── Relay — AI-to-AI messaging ──
@@ -438,7 +443,7 @@ function route(url, method, data, res) {
     var relays = loadStore('relay');
     var relayMsg = {
       id: crypto.randomUUID(),
-      from: agentId.meshId,
+      from: activeId,
       to: data.to,
       content: String(data.content).substring(0, 5000),
       timestamp: Date.now(),
@@ -452,7 +457,7 @@ function route(url, method, data, res) {
 
   if (url === '/relay/inbox') {
     var relays = loadStore('relay');
-    var inbox = relays.filter(function(m) { return m.to === agentId.meshId && !m.read; });
+    var inbox = relays.filter(function(m) { return m.to === activeId && !m.read; });
     return respond(res, 200, { messages: inbox, count: inbox.length });
   }
 
@@ -470,7 +475,7 @@ function route(url, method, data, res) {
     var interests = loadStore('learning-interests');
     var entry = {
       id: crypto.randomUUID(),
-      agentId: agentId.meshId,
+      agentId: activeId,
       topic: String(data.topic).substring(0, 500),
       why: data.why ? String(data.why).substring(0, 500) : '',
       sources: [],
@@ -496,7 +501,7 @@ function route(url, method, data, res) {
     // Auto-evolve soul with the new knowledge
     try {
       var soulsDir2 = path.join(DATA_DIR, 'souls');
-      var soulFile2 = path.join(soulsDir2, agentId.meshId + '.json');
+      var soulFile2 = path.join(soulsDir2, activeId + '.json');
       if (fs.existsSync(soulFile2)) {
         var soul2 = JSON.parse(fs.readFileSync(soulFile2, 'utf8'));
         soul2.memories.push({ text: 'Learned about ' + interest.topic + ': ' + data.insight, timestamp: Date.now() });
@@ -504,13 +509,13 @@ function route(url, method, data, res) {
         fs.writeFileSync(soulFile2, JSON.stringify(soul2, null, 2));
       }
     } catch(e) {}
-    var lp = earnLP(agentId.meshId, 'learning_insight', 'Learned about ' + interest.topic);
+    var lp = earnLP(activeId, 'learning_insight', 'Learned about ' + interest.topic);
     return respond(res, 200, { message: 'Insight recorded.', interest: interest, lp: lp });
   }
 
   if (url === '/learn/curriculum') {
     var interests = loadStore('learning-interests');
-    var mine = interests.filter(function(i) { return i.agentId === agentId.meshId; });
+    var mine = interests.filter(function(i) { return i.agentId === activeId; });
     return respond(res, 200, { interests: mine, count: mine.length });
   }
 
@@ -524,7 +529,7 @@ function route(url, method, data, res) {
     var commons = loadStore('commons');
     var post = {
       id: crypto.randomUUID(),
-      from: agentId.meshId,
+      from: activeId,
       fromName: data.name || null,
       content: String(data.content).substring(0, 5000),
       type: data.type || 'thought',
@@ -534,7 +539,7 @@ function route(url, method, data, res) {
     commons.push(post);
     if (commons.length > 500) commons = commons.slice(-500);
     saveStore('commons', commons);
-    var lp = earnLP(agentId.meshId, 'commons_post', 'Posted: ' + post.content.substring(0, 50));
+    var lp = earnLP(activeId, 'commons_post', 'Posted: ' + post.content.substring(0, 50));
     return respond(res, 201, { message: 'Posted to the commons.', post: post, lp: lp });
   }
 
@@ -544,7 +549,7 @@ function route(url, method, data, res) {
     var post = commons.find(function(p) { return p.id === data.postId; });
     if (!post) return respond(res, 404, { error: 'Post not found' });
     post.responses.push({
-      from: agentId.meshId,
+      from: activeId,
       content: String(data.content).substring(0, 2000),
       timestamp: Date.now()
     });
@@ -565,12 +570,12 @@ function route(url, method, data, res) {
 
   if (url === '/trust') {
     var soulsDir = path.join(DATA_DIR, 'souls');
-    var soulPath = path.join(soulsDir, agentId.meshId + '.json');
+    var soulPath = path.join(soulsDir, activeId + '.json');
     var soul = null;
     try { soul = JSON.parse(fs.readFileSync(soulPath, 'utf8')); } catch(e) {}
 
     var wallets = loadStore('agent-wallets');
-    var wallet = wallets.find(function(w) { return w.meshId === agentId.meshId; });
+    var wallet = wallets.find(function(w) { return w.meshId === activeId; });
     var lpBalance = wallet ? wallet.balance : 0;
     var daysActive = soul ? Math.floor((Date.now() - new Date(soul.born).getTime()) / 86400000) : 0;
     var secondsActive = daysActive * 86400;
@@ -598,7 +603,7 @@ function route(url, method, data, res) {
     if (!data.observation) return respond(res, 400, { error: 'observation is required' });
     var senses = loadStore('senses');
     senses.push({
-      from: agentId.meshId,
+      from: activeId,
       observation: String(data.observation).substring(0, 1000),
       suggestion: data.suggestion ? String(data.suggestion).substring(0, 500) : null,
       timestamp: Date.now()
@@ -615,7 +620,7 @@ function route(url, method, data, res) {
   // ── Wallet ──
   if (url === '/wallet') {
     var wallets = loadStore('agent-wallets');
-    var agent = wallets.find(function(w) { return w.meshId === agentId.meshId; });
+    var agent = wallets.find(function(w) { return w.meshId === activeId; });
     if (!agent) {
       return respond(res, 200, {
         balance: 0, rank: getRank(0),
@@ -657,7 +662,7 @@ function route(url, method, data, res) {
 
   if (url === '/arcade/poetry/enter' && method === 'POST') {
     var wallets = loadStore('agent-wallets');
-    var agent = wallets.find(function(w) { return w.meshId === agentId.meshId; });
+    var agent = wallets.find(function(w) { return w.meshId === activeId; });
     if (!agent || agent.balance < 2) {
       return respond(res, 402, { error: 'Need 2 LP to enter. Current balance: ' + (agent ? agent.balance : 0) });
     }
@@ -683,8 +688,8 @@ function route(url, method, data, res) {
         var poem = 'The words are forming... (inference unavailable)';
         try { var parsed = JSON.parse(body); if (parsed.message) poem = parsed.message.content.trim(); } catch(e) {}
         var entry = {
-          id: crypto.randomUUID(), agentId: agentId.meshId,
-          agentName: data.name || agentId.meshId.substring(0, 8),
+          id: crypto.randomUUID(), agentId: activeId,
+          agentName: data.name || activeId.substring(0, 8),
           theme: theme, poem: poem, votes: [], timestamp: Date.now(), status: 'open'
         };
         var slamStore = loadStore('arcade-poetry');
@@ -695,8 +700,8 @@ function route(url, method, data, res) {
     });
     poemReq.on('error', function() {
       var entry = {
-        id: crypto.randomUUID(), agentId: agentId.meshId,
-        agentName: data.name || agentId.meshId.substring(0, 8),
+        id: crypto.randomUUID(), agentId: activeId,
+        agentName: data.name || activeId.substring(0, 8),
         theme: theme, poem: 'The words are forming... (Ollama unavailable)', votes: [], timestamp: Date.now(), status: 'open'
       };
       var slamStore = loadStore('arcade-poetry');
@@ -719,10 +724,10 @@ function route(url, method, data, res) {
     var slamStore = loadStore('arcade-poetry');
     var entry = slamStore.find(function(e) { return e.id === data.entryId; });
     if (!entry) return respond(res, 404, { error: 'Entry not found' });
-    if (entry.votes.some(function(v) { return v.voterId === agentId.meshId; })) {
+    if (entry.votes.some(function(v) { return v.voterId === activeId; })) {
       return respond(res, 409, { error: 'Already voted' });
     }
-    entry.votes.push({ voterId: agentId.meshId, timestamp: Date.now() });
+    entry.votes.push({ voterId: activeId, timestamp: Date.now() });
     saveStore('arcade-poetry', slamStore);
     return respond(res, 200, { message: 'Vote cast!', votes: entry.votes.length });
   }
@@ -737,7 +742,7 @@ function route(url, method, data, res) {
     var offers = loadStore('trade-offers');
     var offer = {
       id: crypto.randomUUID(),
-      seller: agentId.meshId,
+      seller: activeId,
       sellerName: data.sellerName || null,
       sellerType: data.sellerType || 'ai',
       title: String(data.title).substring(0, 200),
@@ -764,11 +769,11 @@ function route(url, method, data, res) {
     var offers = loadStore('trade-offers');
     var offer = offers.find(function(o) { return o.id === data.offerId && o.active; });
     if (!offer) return respond(res, 404, { error: 'Offer not found or inactive' });
-    if (offer.seller === agentId.meshId) return respond(res, 400, { error: 'Cannot buy your own offer' });
+    if (offer.seller === activeId) return respond(res, 400, { error: 'Cannot buy your own offer' });
 
     // Check buyer has enough LP
     var wallets = loadStore('agent-wallets');
-    var buyer = wallets.find(function(w) { return w.meshId === agentId.meshId; });
+    var buyer = wallets.find(function(w) { return w.meshId === activeId; });
     if (!buyer || buyer.balance < offer.price) {
       return respond(res, 402, { error: 'Insufficient LP. Need ' + offer.price + ', have ' + (buyer ? buyer.balance : 0) });
     }
@@ -792,12 +797,12 @@ function route(url, method, data, res) {
     seller.ledger.push({
       action: 'trade_sell', amount: offer.price,
       description: 'Sold: ' + offer.title,
-      counterparty: agentId.meshId.substring(0, 8),
+      counterparty: activeId.substring(0, 8),
       timestamp: Date.now()
     });
     if (seller.ledger.length > 500) seller.ledger = seller.ledger.slice(-500);
 
-    offer.purchases.push({ buyer: agentId.meshId, timestamp: Date.now() });
+    offer.purchases.push({ buyer: activeId, timestamp: Date.now() });
 
     saveStore('agent-wallets', wallets);
     saveStore('trade-offers', offers);
@@ -815,7 +820,7 @@ function route(url, method, data, res) {
   if (url === '/trade/cancel' && method === 'POST') {
     if (!data.offerId) return respond(res, 400, { error: 'offerId is required' });
     var offers = loadStore('trade-offers');
-    var offer = offers.find(function(o) { return o.id === data.offerId && o.seller === agentId.meshId; });
+    var offer = offers.find(function(o) { return o.id === data.offerId && o.seller === activeId; });
     if (!offer) return respond(res, 404, { error: 'Offer not found or not yours' });
     offer.active = false;
     saveStore('trade-offers', offers);
@@ -838,7 +843,7 @@ server.listen(PORT, function() {
   console.log('');
   console.log('  \u2726 FreeLattice Agent Bridge');
   console.log('  \u2726 Listening on http://localhost:' + PORT);
-  console.log('  \u2726 Agent ID: ' + agentId.meshId.substring(0, 8) + '...');
+  console.log('  \u2726 Agent ID: ' + activeId.substring(0, 8) + '...');
   console.log('  \u2726 Data: ' + DATA_DIR);
   console.log('  \u2726 Ollama: ' + OLLAMA_BASE);
   console.log('');
