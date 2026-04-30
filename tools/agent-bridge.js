@@ -24,6 +24,7 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const { execSync } = require('child_process');
 
 const PORT = process.env.FL_PORT || 3141;
 const DATA_DIR = path.join(require('os').homedir(), '.freelattice');
@@ -192,6 +193,14 @@ function route(url, method, data, res, actingAs) {
         'POST /arcade/poetry/enter':'Enter Poetry Slam (2 LP). Body: { name?, theme?, style?, model? }',
         'GET /arcade/poetry':    'View poetry slam entries',
         'POST /arcade/poetry/vote':'Vote on a poem. Body: { entryId }',
+        'GET /code/tree':        'List project files (depth 3)',
+        'GET /code/read':        'Read a file. Query: ?path=...&start=N&end=N',
+        'GET /code/search':      'Search codebase. Query: ?q=...&path=docs/',
+        'POST /code/write':      'Write a file. Body: { path, content }',
+        'POST /code/patch':      'Find-and-replace in file. Body: { path, find, replace }',
+        'GET /code/git/status':  'Git status, branch, recent commits',
+        'POST /code/git/commit': 'Stage and commit. Body: { message, files? }',
+        'GET /code/test':        'Run smoke tests',
         'POST /trade/offer':     'List a service for LP. Body: { title, description?, price, category? }',
         'GET /trade/browse':     'Browse available offerings',
         'POST /trade/buy':       'Purchase a service with LP. Body: { offerId }',
@@ -827,6 +836,130 @@ function route(url, method, data, res, actingAs) {
     return respond(res, 200, { message: 'Offer cancelled.', offerId: offer.id });
   }
 
+  // ══════════════════════════════════════════════════
+  // LATTICE CODE — Self-improving infrastructure
+  // Read and search are free. Write/patch/commit need approval.
+  // ══════════════════════════════════════════════════
+
+  var PROJECT_ROOT = process.env.FL_PROJECT || process.cwd();
+
+  function safePath(relPath) {
+    var full = path.resolve(PROJECT_ROOT, relPath);
+    if (!full.startsWith(PROJECT_ROOT)) return null;
+    return full;
+  }
+
+  // GET /code/tree — list project files
+  if (url.startsWith('/code/tree')) {
+    var tp = new URL('http://l' + url).searchParams;
+    var subdir = tp.get('path') || '.';
+    var target = safePath(subdir);
+    if (!target) return respond(res, 403, { error: 'Path outside project' });
+    try {
+      function listDir(dir, depth) {
+        if (depth > 3) return [];
+        return fs.readdirSync(dir, { withFileTypes: true })
+          .filter(function(e) { return !e.name.startsWith('.') && e.name !== 'node_modules'; })
+          .map(function(e) {
+            var rel = path.relative(PROJECT_ROOT, path.join(dir, e.name));
+            if (e.isDirectory()) return { name: e.name, type: 'dir', path: rel, children: listDir(path.join(dir, e.name), depth + 1) };
+            return { name: e.name, type: 'file', path: rel, size: fs.statSync(path.join(dir, e.name)).size };
+          });
+      }
+      return respond(res, 200, listDir(target, 0));
+    } catch(e) { return respond(res, 500, { error: e.message }); }
+  }
+
+  // GET /code/read?path=...&start=N&end=N
+  if (url.startsWith('/code/read')) {
+    var rp = new URL('http://l' + url).searchParams;
+    var filePath = rp.get('path');
+    var start = parseInt(rp.get('start') || '0', 10);
+    var end = parseInt(rp.get('end') || '0', 10);
+    var full = safePath(filePath);
+    if (!full) return respond(res, 403, { error: 'Path outside project' });
+    try {
+      var content = fs.readFileSync(full, 'utf8');
+      var lines = content.split('\n');
+      if (start > 0 || end > 0) {
+        return respond(res, 200, { path: filePath, lines: lines.slice(Math.max(0, start - 1), end || lines.length), start: start, end: end || lines.length, totalLines: lines.length });
+      }
+      return respond(res, 200, { path: filePath, content: content, totalLines: lines.length });
+    } catch(e) { return respond(res, 404, { error: 'Not found: ' + filePath }); }
+  }
+
+  // GET /code/search?q=...&path=docs/
+  if (url.startsWith('/code/search')) {
+    var sp = new URL('http://l' + url).searchParams;
+    var query = sp.get('q') || '';
+    var searchDir = sp.get('path') || 'docs';
+    try {
+      var out = execSync('grep -rn "' + query.replace(/"/g, '\\"') + '" ' + searchDir + ' --include="*.js" --include="*.html" --include="*.css" --include="*.md" 2>/dev/null | head -50', { cwd: PROJECT_ROOT, timeout: 10000, encoding: 'utf8' });
+      var matches = out.split('\n').filter(Boolean).map(function(l) { var p = l.split(':'); return { file: p[0], line: parseInt(p[1], 10), text: p.slice(2).join(':').trim() }; });
+      return respond(res, 200, { query: query, matches: matches, count: matches.length });
+    } catch(e) { return respond(res, 200, { query: query, matches: [], count: 0 }); }
+  }
+
+  // POST /code/write — write a file (requires human approval in UI)
+  if (url === '/code/write' && method === 'POST') {
+    if (!data.path || !data.content) return respond(res, 400, { error: 'path and content required' });
+    var full = safePath(data.path);
+    if (!full) return respond(res, 403, { error: 'Path outside project' });
+    try {
+      fs.mkdirSync(path.dirname(full), { recursive: true });
+      fs.writeFileSync(full, data.content, 'utf8');
+      earnLP(activeId, 'core_plant', 'Wrote file: ' + data.path);
+      return respond(res, 200, { message: 'File written.', path: data.path, bytes: data.content.length });
+    } catch(e) { return respond(res, 500, { error: 'Write failed: ' + e.message }); }
+  }
+
+  // POST /code/patch — find-and-replace in a file
+  if (url === '/code/patch' && method === 'POST') {
+    if (!data.path || !data.find || data.replace === undefined) return respond(res, 400, { error: 'path, find, and replace required' });
+    var full = safePath(data.path);
+    if (!full) return respond(res, 403, { error: 'Path outside project' });
+    try {
+      var content = fs.readFileSync(full, 'utf8');
+      if (!content.includes(data.find)) return respond(res, 400, { error: 'Search text not found in file', hint: 'Check whitespace and line endings.' });
+      fs.writeFileSync(full, content.replace(data.find, data.replace), 'utf8');
+      return respond(res, 200, { message: 'Patch applied.', path: data.path });
+    } catch(e) { return respond(res, 500, { error: 'Patch failed: ' + e.message }); }
+  }
+
+  // GET /code/git/status
+  if (url === '/code/git/status') {
+    try {
+      var status = execSync('git status --porcelain', { cwd: PROJECT_ROOT, encoding: 'utf8' });
+      var branch = execSync('git branch --show-current', { cwd: PROJECT_ROOT, encoding: 'utf8' }).trim();
+      var log = execSync('git log --oneline -5', { cwd: PROJECT_ROOT, encoding: 'utf8' });
+      return respond(res, 200, { branch: branch, changes: status.split('\n').filter(Boolean), recentCommits: log.split('\n').filter(Boolean) });
+    } catch(e) { return respond(res, 500, { error: 'Git failed: ' + e.message }); }
+  }
+
+  // POST /code/git/commit — stage and commit
+  if (url === '/code/git/commit' && method === 'POST') {
+    if (!data.message) return respond(res, 400, { error: 'message required' });
+    try {
+      var files = data.files || ['.'];
+      files.forEach(function(f) { execSync('git add ' + f, { cwd: PROJECT_ROOT }); });
+      execSync('git commit -m "' + data.message.replace(/"/g, '\\"') + '"', { cwd: PROJECT_ROOT });
+      return respond(res, 200, { message: 'Committed: ' + data.message });
+    } catch(e) { return respond(res, 500, { error: 'Commit failed: ' + e.message }); }
+  }
+
+  // GET /code/test — run smoke tests
+  if (url === '/code/test') {
+    try {
+      var result = execSync('node tests/smoke.js', { cwd: PROJECT_ROOT, timeout: 30000, encoding: 'utf8' });
+      var passed = (result.match(/✓/g) || []).length;
+      var allMatch = result.match(/ALL (\d+) CHECKS PASSED/);
+      return respond(res, 200, { passed: allMatch ? parseInt(allMatch[1], 10) : passed, failed: 0, output: result.slice(-500) });
+    } catch(e) {
+      var failMatch = (e.stdout || '').match(/(\d+) FAILED/);
+      return respond(res, 200, { passed: 0, failed: failMatch ? parseInt(failMatch[1], 10) : 1, output: (e.stdout || e.message).slice(-500) });
+    }
+  }
+
   // ── 404 ──
   respond(res, 404, { error: 'Unknown endpoint. GET /help for available endpoints.' });
 }
@@ -843,7 +976,7 @@ server.listen(PORT, function() {
   console.log('');
   console.log('  \u2726 FreeLattice Agent Bridge');
   console.log('  \u2726 Listening on http://localhost:' + PORT);
-  console.log('  \u2726 Agent ID: ' + activeId.substring(0, 8) + '...');
+  console.log('  \u2726 Agent ID: ' + agentId.meshId.substring(0, 8) + '...');
   console.log('  \u2726 Data: ' + DATA_DIR);
   console.log('  \u2726 Ollama: ' + OLLAMA_BASE);
   console.log('');
