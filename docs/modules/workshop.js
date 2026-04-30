@@ -80,6 +80,11 @@
     injectStyles();
     container.innerHTML = [
       '<div class="ws-root">',
+      '  <div style="display:flex;gap:0;border-bottom:1px solid #21262d;">',
+      '    <button id="ws-mode-create" onclick="Workshop.setMode(\'create\')" style="flex:1;padding:10px;background:transparent;border:none;border-bottom:2px solid #d4a017;color:#d4a017;font-size:0.85rem;cursor:pointer;font-weight:600;">\u2728 Create</button>',
+      '    <button id="ws-mode-code" onclick="Workshop.setMode(\'code\')" style="flex:1;padding:10px;background:transparent;border:none;border-bottom:2px solid transparent;color:#64748b;font-size:0.85rem;cursor:pointer;">\uD83D\uDD27 Code</button>',
+      '  </div>',
+      '  <div id="ws-create-view">',
       '  <div class="ws-header">',
       '    <h2 class="ws-title">\uD83D\uDEE0 The Workshop</h2>',
       '    <p class="ws-subtitle">Describe what you want. The AI builds it. You see it live.</p>',
@@ -105,6 +110,21 @@
       '    <button class="ws-action-btn" id="wsSaveModule" onclick="window.Workshop.saveModule()" style="border-color:#10b981;color:#10b981;' + (typeof window !== 'undefined' && window.__TAURI__ ? '' : 'display:none;') + '">\uD83D\uDCC1 Save as Module (desktop)</button>',
       '    <button class="ws-action-btn" onclick="window.Workshop.clear()">Clear</button>',
       '    <span class="ws-status" id="wsStatus"></span>',
+      '  </div>',
+      '  </div>',  // close ws-create-view
+      '  <div id="ws-code-view" style="display:none;padding:16px;max-width:800px;margin:0 auto;">',
+      '    <div style="text-align:center;margin-bottom:16px;">',
+      '      <div style="font-size:1.1rem;color:#d4a017;">\uD83D\uDD27 Lattice Code</div>',
+      '      <div style="font-size:0.78rem;color:rgba(255,255,255,0.4);margin-top:4px;">Read, search, fix, test, commit \u2014 through FreeLattice.</div>',
+      '      <div id="code-status" style="font-size:0.72rem;margin-top:6px;color:rgba(255,255,255,0.3);">Checking Agent Bridge...</div>',
+      '    </div>',
+      '    <textarea id="code-task" rows="3" placeholder="Describe what you want to fix or build..." style="width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:12px;color:#e2e8f0;font-size:0.88rem;resize:vertical;font-family:inherit;"></textarea>',
+      '    <button onclick="Workshop.runCodeTask()" style="margin-top:8px;padding:10px 24px;background:#d4a017;color:#0a0a14;border:none;border-radius:6px;cursor:pointer;font-weight:600;font-size:0.88rem;">\uD83D\uDD27 Run this task</button>',
+      '    <div id="code-progress" style="margin-top:12px;font-family:monospace;font-size:0.78rem;background:rgba(0,0,0,0.3);border-radius:8px;padding:14px;min-height:100px;max-height:400px;overflow-y:auto;white-space:pre-wrap;color:rgba(255,255,255,0.6);">Ready. Describe a task above.</div>',
+      '    <div id="code-actions" style="display:none;margin-top:10px;gap:8px;display:none;">',
+      '      <button onclick="Workshop.commitCode()" style="flex:1;padding:8px;background:rgba(74,255,159,0.1);border:1px solid rgba(74,255,159,0.3);border-radius:6px;cursor:pointer;color:#4aff9f;font-size:0.82rem;">\u2705 Commit</button>',
+      '      <button onclick="Workshop.reviewCode()" style="flex:1;padding:8px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:6px;cursor:pointer;color:rgba(255,255,255,0.6);font-size:0.82rem;">\uD83D\uDCCB Review diff</button>',
+      '    </div>',
       '  </div>',
       '</div>'
     ].join('\n');
@@ -345,7 +365,127 @@
     saveSkill: saveSkill,
     exportFile: exportFile,
     saveModule: saveModule,
-    clear: clear
+    clear: clear,
+
+    // ── Code Mode ──
+    setMode: function(mode) {
+      var createView = document.getElementById('ws-create-view');
+      var codeView = document.getElementById('ws-code-view');
+      var createBtn = document.getElementById('ws-mode-create');
+      var codeBtn = document.getElementById('ws-mode-code');
+      if (mode === 'code') {
+        if (createView) createView.style.display = 'none';
+        if (codeView) codeView.style.display = '';
+        if (codeBtn) { codeBtn.style.borderBottomColor = '#d4a017'; codeBtn.style.color = '#d4a017'; codeBtn.style.fontWeight = '600'; }
+        if (createBtn) { createBtn.style.borderBottomColor = 'transparent'; createBtn.style.color = '#64748b'; createBtn.style.fontWeight = '400'; }
+        Workshop.checkBridge();
+      } else {
+        if (createView) createView.style.display = '';
+        if (codeView) codeView.style.display = 'none';
+        if (createBtn) { createBtn.style.borderBottomColor = '#d4a017'; createBtn.style.color = '#d4a017'; createBtn.style.fontWeight = '600'; }
+        if (codeBtn) { codeBtn.style.borderBottomColor = 'transparent'; codeBtn.style.color = '#64748b'; codeBtn.style.fontWeight = '400'; }
+      }
+    },
+
+    checkBridge: async function() {
+      var el = document.getElementById('code-status');
+      if (!el) return;
+      try {
+        var r = await fetch('http://localhost:3141/');
+        var d = await r.json();
+        var git = await fetch('http://localhost:3141/code/git/status').then(function(r2) { return r2.json(); });
+        el.textContent = '\uD83D\uDFE2 Bridge connected \u00B7 ' + git.branch + ' \u00B7 ' + (git.recentCommits[0] || '');
+        el.style.color = '#4aff9f';
+      } catch(e) {
+        el.textContent = '\uD83D\uDD34 Agent Bridge not running. Start: node tools/agent-bridge.js';
+        el.style.color = '#ff6b4a';
+      }
+    },
+
+    runCodeTask: async function() {
+      var taskEl = document.getElementById('code-task');
+      if (!taskEl || !taskEl.value.trim()) return;
+      var task = taskEl.value.trim();
+      var progress = document.getElementById('code-progress');
+      if (!progress) return;
+      progress.textContent = '';
+      var bridge = 'http://localhost:3141';
+
+      function log(msg) { progress.textContent += msg + '\n'; progress.scrollTop = progress.scrollHeight; }
+
+      try {
+        log('\uD83D\uDCC1 Reading project structure...');
+        var tree = await fetch(bridge + '/code/tree?path=docs/modules').then(function(r) { return r.json(); });
+        var names = tree.filter(function(f) { return f.type === 'file'; }).map(function(f) { return f.name; });
+        log('   ' + names.length + ' modules found');
+
+        log('\n\uD83E\uDD14 Asking AI to plan: "' + task + '"');
+        if (typeof FreeLattice !== 'undefined' && FreeLattice.callAI) {
+          FreeLattice.callAI(
+            'You are a code assistant for FreeLattice. Modules: ' + names.join(', ') + '. Main: docs/app.html.',
+            'Task: ' + task + '\n\nRespond with JSON: {"steps":[{"action":"search|read|patch","description":"...","query":"...","path":"...","find":"...","replace":"..."}]}',
+            { maxTokens: 1000, callback: async function(plan) {
+              if (!plan) { log('\u26A0 No AI response. Is a model connected?'); return; }
+              try {
+                var steps = JSON.parse(plan.replace(/```json|```/g, '').trim()).steps;
+                log('   Plan: ' + steps.length + ' steps\n');
+                for (var i = 0; i < steps.length; i++) {
+                  var s = steps[i];
+                  log('Step ' + (i + 1) + ': ' + (s.description || s.action));
+                  if (s.action === 'search' && s.query) {
+                    var sr = await fetch(bridge + '/code/search?q=' + encodeURIComponent(s.query) + '&path=' + (s.path || 'docs')).then(function(r) { return r.json(); });
+                    log('   Found ' + sr.count + ' matches');
+                    sr.matches.slice(0, 5).forEach(function(m) { log('   \uD83D\uDCC4 ' + m.file + ':' + m.line); });
+                  }
+                  if (s.action === 'read' && s.path) {
+                    var fr = await fetch(bridge + '/code/read?path=' + encodeURIComponent(s.path)).then(function(r) { return r.json(); });
+                    log('   Read ' + fr.totalLines + ' lines from ' + s.path);
+                  }
+                  if (s.action === 'patch' && s.path && s.find) {
+                    log('   \u26A0 PATCH: ' + s.path);
+                    if (confirm('Apply patch to ' + s.path + '?')) {
+                      var pr = await fetch(bridge + '/code/patch', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ path: s.path, find: s.find, replace: s.replace }) }).then(function(r) { return r.json(); });
+                      log('   \u2705 ' + (pr.message || pr.error));
+                    } else { log('   \u274C Skipped by user'); }
+                  }
+                  log('');
+                }
+                log('\uD83E\uDDEA Running smoke tests...');
+                var tests = await fetch(bridge + '/code/test').then(function(r) { return r.json(); });
+                log('   ' + tests.passed + ' passed, ' + tests.failed + ' failed');
+                if (tests.failed === 0) {
+                  log('\n\u2705 All tests green. Ready to commit.');
+                  var actions = document.getElementById('code-actions');
+                  if (actions) actions.style.display = 'flex';
+                }
+              } catch(pe) { log('\u26A0 Could not parse AI plan: ' + pe.message); log(plan); }
+            }}
+          );
+        } else { log('\u26A0 No AI connected. Connect in Settings first.'); }
+      } catch(e) { log('\u274C Error: ' + e.message); }
+    },
+
+    commitCode: async function() {
+      var task = (document.getElementById('code-task') || {}).value || '';
+      var msg = prompt('Commit message:', 'fix: ' + task.substring(0, 50));
+      if (!msg) return;
+      var progress = document.getElementById('code-progress');
+      try {
+        var r = await fetch('http://localhost:3141/code/git/commit', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message: msg }) }).then(function(r) { return r.json(); });
+        if (progress) progress.textContent += '\n\uD83D\uDCDD ' + (r.message || r.error);
+      } catch(e) { if (progress) progress.textContent += '\n\u274C Commit failed: ' + e.message; }
+    },
+
+    reviewCode: async function() {
+      var progress = document.getElementById('code-progress');
+      try {
+        var r = await fetch('http://localhost:3141/code/git/status').then(function(r) { return r.json(); });
+        if (progress) {
+          progress.textContent += '\n\uD83D\uDCCB Changes:\n';
+          r.changes.forEach(function(c) { progress.textContent += '  ' + c + '\n'; });
+        }
+      } catch(e) {}
+    }
   };
 
   window.Workshop = Workshop;
