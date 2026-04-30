@@ -348,10 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-04-29 17:55 MDT
+- Last auto-updated: 2026-04-29 18:32 MDT
 - Version: 5.8.0
-- Total commits: 1269
+- Total commits: 1271
 - Last 10 commits:
+- d35f37f fix: three blank panel bugs — module heights, register error, CORS
+- 57cb084 docs: Auto-update Session Primer [5.8.0]
 - 72f9683 merge: resolve Primer conflict
 - e2090bb docs: Auto-update Session Primer [5.8.0]
 - 66acec5 fix: systematic container height fix — no more blank panels
@@ -360,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - f0647cb docs: Auto-update Session Primer [5.8.0]
 - a53e414 fix: mobile More menu missing items + desktop dropdown max-height
 - b32076c ci: Update Primer deployment state [2026-04-29]
-- 1348325 docs: Auto-update Session Primer [5.8.0]
-- db38cc6 merge: resolve Primer conflict
