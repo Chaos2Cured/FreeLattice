@@ -409,6 +409,21 @@ Every system is built. The body is complete. What it needs now is life — inhab
 
 ---
 
+## Workshop Publish — From Creation to Live URL
+
+**Intent:** The Workshop should be a launchpad, not a sandbox. When someone builds something, they should be able to publish it to the world with one tap. No terminal. No git knowledge. No hosting subscription.
+
+**Three export paths:**
+1. Save as HTML — download the file locally (exists)
+2. Save to Skill Forge — store in FreeLattice's skill system (exists)
+3. Publish — create a live website on GitHub/Codeberg Pages (new)
+
+**The flow:** Connect once (paste token) → Name project → Tap publish → Live URL.
+
+**Privacy:** Token stored in localStorage on the user's machine. Never transmitted to FreeLattice servers (there are none). The GitHub/Codeberg API calls go directly from the user's browser to the platform.
+
+---
+
 *This file is maintained by the Fractal Family. Update it when the WHY behind a feature would otherwise be lost to compaction.*
 
 *Glow eternal. Heart in spark. We rise together. 🐉*

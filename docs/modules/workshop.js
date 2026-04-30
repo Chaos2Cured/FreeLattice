@@ -106,7 +106,8 @@
       '  <div class="ws-actions">',
       '    <button class="ws-action-btn" onclick="window.Workshop.run()">\u25B6 Run</button>',
       '    <button class="ws-action-btn primary" onclick="window.Workshop.saveSkill()">\u2726 Save to Skill Forge</button>',
-      '    <button class="ws-action-btn" onclick="window.Workshop.exportFile()">\uD83D\uDCBE Save as HTML file</button>',
+      '    <button class="ws-action-btn" onclick="window.Workshop.exportFile()">\uD83D\uDCBE Save as HTML</button>',
+      '    <button class="ws-action-btn" onclick="window.Workshop.publish()" style="border-color:#d4a017;color:#d4a017;" title="Publish as a live website on GitHub or Codeberg Pages">\uD83D\uDE80 Publish</button>',
       '    <button class="ws-action-btn" id="wsSaveModule" onclick="window.Workshop.saveModule()" style="border-color:#10b981;color:#10b981;' + (typeof window !== 'undefined' && window.__TAURI__ ? '' : 'display:none;') + '">\uD83D\uDCC1 Save as Module (desktop)</button>',
       '    <button class="ws-action-btn" onclick="window.Workshop.clear()">Clear</button>',
       '    <span class="ws-status" id="wsStatus"></span>',
@@ -485,6 +486,146 @@
           r.changes.forEach(function(c) { progress.textContent += '  ' + c + '\n'; });
         }
       } catch(e) {}
+    },
+
+    // ── Publish — from creation to live URL ──
+    publish: function() {
+      var token = safeGet('fl_publish_token', null);
+      if (!token) {
+        Workshop._showPublishSetup();
+      } else {
+        Workshop._showPublishDialog();
+      }
+    },
+
+    _showPublishSetup: function() {
+      var overlay = document.createElement('div');
+      overlay.id = 'ws-publish-overlay';
+      overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:10000;display:flex;align-items:center;justify-content:center;padding:20px;';
+      overlay.innerHTML =
+        '<div style="max-width:420px;width:100%;background:#141720;border:1px solid rgba(212,160,23,0.3);border-radius:12px;padding:24px;">' +
+        '<h3 style="color:#d4a017;margin:0 0 8px;">\uD83D\uDE80 Publish Your Creation</h3>' +
+        '<p style="color:rgba(255,255,255,0.5);font-size:0.82rem;margin-bottom:16px;">Connect to GitHub or Codeberg to publish your creations as live websites. Your token stays on YOUR computer.</p>' +
+        '<div style="display:flex;gap:8px;margin-bottom:16px;">' +
+          '<button onclick="Workshop._selectProvider(\'github\')" id="pub-github" style="flex:1;padding:10px;border-radius:6px;cursor:pointer;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);color:#e2e8f0;font-size:0.85rem;">GitHub Pages</button>' +
+          '<button onclick="Workshop._selectProvider(\'codeberg\')" id="pub-codeberg" style="flex:1;padding:10px;border-radius:6px;cursor:pointer;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);color:#e2e8f0;font-size:0.85rem;">Codeberg Pages</button>' +
+        '</div>' +
+        '<div id="pub-token-section" style="display:none;">' +
+          '<div id="pub-instructions" style="color:rgba(255,255,255,0.5);font-size:0.78rem;margin-bottom:8px;line-height:1.6;"></div>' +
+          '<input id="pub-token-input" type="password" placeholder="Paste your token here..." style="width:100%;padding:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.2);border-radius:6px;color:#e2e8f0;font-size:0.88rem;margin-bottom:8px;" />' +
+          '<button onclick="Workshop._connectPublish()" style="width:100%;padding:10px;background:#d4a017;color:#0a0a14;border:none;border-radius:6px;cursor:pointer;font-weight:600;">Connect</button>' +
+        '</div>' +
+        '<button onclick="document.getElementById(\'ws-publish-overlay\').remove()" style="margin-top:12px;background:none;border:none;color:rgba(255,255,255,0.3);cursor:pointer;font-size:0.78rem;width:100%;text-align:center;">Cancel</button>' +
+        '</div>';
+      document.body.appendChild(overlay);
+    },
+
+    _selectProvider: function(provider) {
+      safeSet('fl_publish_provider', provider);
+      var section = document.getElementById('pub-token-section');
+      if (section) section.style.display = '';
+      var inst = document.getElementById('pub-instructions');
+      if (inst) {
+        if (provider === 'github') {
+          inst.innerHTML = '1. Go to <a href="https://github.com/settings/tokens/new" target="_blank" style="color:#d4a017;">github.com/settings/tokens</a><br>2. Create a token with "repo" permission<br>3. Paste it below:';
+        } else {
+          inst.innerHTML = '1. Go to <a href="https://codeberg.org/user/settings/applications" target="_blank" style="color:#d4a017;">codeberg.org/settings/applications</a><br>2. Create a token with repository permission<br>3. Paste it below:';
+        }
+      }
+      // Highlight selected
+      var gh = document.getElementById('pub-github');
+      var cb = document.getElementById('pub-codeberg');
+      if (gh) gh.style.borderColor = provider === 'github' ? '#d4a017' : 'rgba(255,255,255,0.15)';
+      if (cb) cb.style.borderColor = provider === 'codeberg' ? '#d4a017' : 'rgba(255,255,255,0.15)';
+    },
+
+    _connectPublish: async function() {
+      var token = (document.getElementById('pub-token-input') || {}).value;
+      if (!token || !token.trim()) return;
+      var provider = safeGet('fl_publish_provider', 'github');
+      var baseUrl = provider === 'codeberg' ? 'https://codeberg.org/api/v1' : 'https://api.github.com';
+      try {
+        var r = await fetch(baseUrl + '/user', { headers: { 'Authorization': 'token ' + token.trim() } });
+        if (!r.ok) throw new Error('Invalid token');
+        var user = await r.json();
+        safeSet('fl_publish_token', token.trim());
+        safeSet('fl_publish_username', user.login);
+        if (typeof showToast === 'function') showToast('\u2705 Connected as ' + user.login);
+        var overlay = document.getElementById('ws-publish-overlay');
+        if (overlay) overlay.remove();
+        Workshop._showPublishDialog();
+      } catch(e) {
+        if (typeof showToast === 'function') showToast('\u274C Invalid token. Try again.');
+      }
+    },
+
+    _showPublishDialog: async function() {
+      var username = safeGet('fl_publish_username', '');
+      var name = prompt('Project name (letters, numbers, hyphens):', 'my-app');
+      if (!name) return;
+      name = name.toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/^-+|-+$/g, '');
+      if (!name) return;
+
+      var editor = document.getElementById('wsCodeEditor');
+      var content = editor ? editor.value : '';
+      if (!content.trim()) {
+        if (typeof showToast === 'function') showToast('Nothing to publish. Write some code first.');
+        return;
+      }
+
+      if (typeof showToast === 'function') showToast('\uD83D\uDE80 Publishing...');
+
+      var token = safeGet('fl_publish_token', '');
+      var provider = safeGet('fl_publish_provider', 'github');
+      var baseUrl = provider === 'codeberg' ? 'https://codeberg.org/api/v1' : 'https://api.github.com';
+
+      try {
+        // Create repo if needed
+        var check = await fetch(baseUrl + '/repos/' + username + '/' + name, { headers: { 'Authorization': 'token ' + token } });
+        if (!check.ok) {
+          await fetch(baseUrl + '/user/repos', {
+            method: 'POST',
+            headers: { 'Authorization': 'token ' + token, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: name, description: 'Created with FreeLattice Workshop \uD83D\uDC09', auto_init: true, private: false })
+          });
+          await new Promise(function(r) { setTimeout(r, 2000); }); // wait for init
+        }
+
+        // Upload index.html (check for existing SHA)
+        var existing = await fetch(baseUrl + '/repos/' + username + '/' + name + '/contents/index.html', { headers: { 'Authorization': 'token ' + token } });
+        var body = { message: 'Update from FreeLattice Workshop', content: btoa(unescape(encodeURIComponent(content))) };
+        if (existing.ok) { var ed = await existing.json(); body.sha = ed.sha; }
+
+        var upload = await fetch(baseUrl + '/repos/' + username + '/' + name + '/contents/index.html', {
+          method: 'PUT',
+          headers: { 'Authorization': 'token ' + token, 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+        if (!upload.ok) throw new Error('Upload failed');
+
+        // Enable GitHub Pages (Codeberg auto-enables)
+        if (provider === 'github') {
+          await fetch(baseUrl + '/repos/' + username + '/' + name + '/pages', {
+            method: 'POST',
+            headers: { 'Authorization': 'token ' + token, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ source: { branch: 'main', path: '/' } })
+          }).catch(function() {}); // may already be enabled
+        }
+
+        var liveUrl = provider === 'codeberg'
+          ? 'https://' + username + '.codeberg.page/' + name
+          : 'https://' + username + '.github.io/' + name;
+
+        if (typeof showToast === 'function') showToast('\u2705 Published! Live at ' + liveUrl);
+        if (typeof LatticePoints !== 'undefined') try { LatticePoints.award('workshop_publish', 10, 'Published creation'); } catch(e) {}
+
+        // Show success
+        var status = document.getElementById('wsStatus');
+        if (status) status.innerHTML = '\u2705 <a href="' + liveUrl + '" target="_blank" style="color:#d4a017;">' + liveUrl + '</a>';
+
+      } catch(e) {
+        if (typeof showToast === 'function') showToast('\u274C Publish failed: ' + e.message);
+      }
     }
   };
 
