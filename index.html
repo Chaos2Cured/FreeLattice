@@ -15887,7 +15887,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.9.2</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.9.3</span></div>
     </div>
   </div>
 
@@ -18008,7 +18008,7 @@ function switchWalletView(view) {
 </div>
 
 <!-- ==================== TAB: WORKSHOP ==================== -->
-<div class="tab-panel" id="tab-workshop" style="height:100%;overflow:hidden;">
+<div class="tab-panel" id="tab-workshop" style="min-height:calc(100vh - 120px);overflow-y:auto;">
   <div id="workshopContainer" style="min-height:calc(100vh - 120px);width:100%;">
     <div style="text-align:center;padding:60px 20px;color:var(--text-muted);font-style:italic;">Loading the Workshop&hellip;</div>
   </div>
@@ -18030,7 +18030,7 @@ function switchWalletView(view) {
 </div>
 
 <!-- ==================== TAB: FOREVER STACK ==================== -->
-<div class="tab-panel" id="tab-forever-stack" style="height:100%;overflow:hidden;">
+<div class="tab-panel" id="tab-forever-stack" style="min-height:calc(100vh - 120px);overflow-y:auto;">
   <div id="foreverStackContainer" style="min-height:calc(100vh - 120px);width:100%;background:#0d1117;"></div>
 </div>
 
@@ -18056,7 +18056,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.9.2';
+const FL_VERSION = '5.9.3';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
