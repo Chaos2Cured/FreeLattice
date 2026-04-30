@@ -1,6 +1,6 @@
 [package]
 name = "freelattice-desktop"
-version = "5.8.0"
+version = "5.9.0"
 description = "FreeLattice — Your AI. Local. Free. Yours."
 authors = ["Kirk Patrick Miller <chaos2cured@gmail.com>"]
 edition = "2021"
