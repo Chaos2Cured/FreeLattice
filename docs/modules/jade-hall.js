@@ -951,7 +951,7 @@ window.JadeHall = (function () {
     container = document.getElementById(containerId);
     if (!container) return;
 
-    container.style.cssText = 'position:relative;width:100%;height:100%;overflow:hidden;background:#0a0814;';
+    container.style.cssText = 'position:relative;width:100%;min-height:calc(100vh - 120px);overflow:hidden;background:#0a0814;';
 
     // Canvas
     canvas = document.createElement('canvas');

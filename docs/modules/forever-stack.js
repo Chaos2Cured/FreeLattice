@@ -386,7 +386,7 @@ if __name__ == '__main__':
 <div class="fs-root" id="fsRoot">
   <style>
     .fs-root {
-      height: 100%;
+      min-height: calc(100vh - 120px);
       overflow-y: auto;
       background: #0d1117;
       color: #e6edf3;
@@ -1242,9 +1242,7 @@ if __name__ == '__main__':
   window.FreeLatticeModules = window.FreeLatticeModules || {};
   window.FreeLatticeModules.ForeverStack = API;
 
-  if (window.FreeLatticeLoader) {
-    window.FreeLatticeLoader.register('ForeverStack', API);
-  }
+  // FreeLatticeModules registration above is sufficient — loader reads from there
 
   if (window.LatticeEvents) {
     window.LatticeEvents.emit('module:loaded', { name: 'ForeverStack', version: FS_VERSION });

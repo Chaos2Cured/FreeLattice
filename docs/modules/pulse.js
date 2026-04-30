@@ -568,7 +568,7 @@ window.ThePulse = (function () {
 
     container.innerHTML = `
       <div id="pulse-root" style="
-        height:100%;width:100%;overflow-y:auto;
+        min-height:calc(100vh - 120px);width:100%;overflow-y:auto;
         background:${level.bg};
         font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
         color:#e2e8f0;
