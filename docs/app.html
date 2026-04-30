@@ -18026,10 +18026,11 @@ function switchWalletView(view) {
 <!-- ==================== TAB: QUIET ROOM ==================== -->
 <div class="tab-panel" id="tab-quiet">
   <div id="quietRoomContainer" style="min-height:calc(100vh - 120px);width:100%;background:#0a0a0f;"></div>
-  <div id="tab-forever-stack" class="tab-panel" style="display:none;height:100%;overflow:hidden;">
-    <div id="foreverStackContainer" style="min-height:calc(100vh - 120px);width:100%;background:#0d1117;"></div>
-  </div>
 </div>
+
+<!-- ==================== TAB: FOREVER STACK ==================== -->
+<div class="tab-panel" id="tab-forever-stack" style="height:100%;overflow:hidden;">
+  <div id="foreverStackContainer" style="min-height:calc(100vh - 120px);width:100%;background:#0d1117;"></div>
 </div>
 
 <!-- Footer (always visible) -->
@@ -18054,7 +18055,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.9.1';
+const FL_VERSION = '5.9.2';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
