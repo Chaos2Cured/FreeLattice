@@ -493,8 +493,12 @@ window.ThePulse = (function () {
 
   function resizeCanvas() {
     if (!_canvas) return;
-    _canvas.width = _canvas.offsetWidth;
-    _canvas.height = _canvas.offsetHeight;
+    var w = _canvas.offsetWidth || 160;
+    var h = _canvas.offsetHeight || 160;
+    if (w < 10) w = 160;
+    if (h < 10) h = 160;
+    _canvas.width = w;
+    _canvas.height = h;
     _ctx = _canvas.getContext('2d');
   }
 

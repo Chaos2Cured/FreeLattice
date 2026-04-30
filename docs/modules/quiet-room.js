@@ -145,7 +145,6 @@
       <div id="qr-root" style="
         position: relative;
         width: 100%;
-        height: 100%;
         min-height: 100vh;
         background: #0a0a0f;
         display: flex;

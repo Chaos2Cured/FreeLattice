@@ -175,8 +175,12 @@ window.JadeHall = (function () {
 
   function resize() {
     if (!canvas || !container) return;
-    canvas.width = container.clientWidth;
-    canvas.height = container.clientHeight;
+    // Use clientWidth/Height but fall back to computed style for display:none containers
+    var w = container.clientWidth || container.offsetWidth || parseInt(getComputedStyle(container).width) || 800;
+    var h = container.clientHeight || container.offsetHeight || parseInt(getComputedStyle(container).height) || 600;
+    if (w < 10 || h < 10) { w = 800; h = 600; } // safety minimum
+    canvas.width = w;
+    canvas.height = h;
   }
 
   function drawSky(t) {
