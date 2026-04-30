@@ -348,10 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-04-29 18:58 MDT
-- Version: 5.9.0
-- Total commits: 1278
+- Last auto-updated: 2026-04-29 19:31 MDT
+- Version: 5.9.1
+- Total commits: 1280
 - Last 10 commits:
+- 07006c3 fix: v5.9.1 — deferred rendering + canvas dimension safety
+- e529ac1 docs: Auto-update Session Primer [5.9.0]
 - 9ddf4c1 merge: resolve Primer conflict
 - 3278535 docs: Auto-update Session Primer [5.9.0]
 - 5c028ca chore: bump version to v5.9.0 — The Living Home
@@ -360,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - e0c883c docs: Auto-update Session Primer [5.8.0]
 - d35f37f fix: three blank panel bugs — module heights, register error, CORS
 - d51515a ci: Update Primer deployment state [2026-04-29]
-- 57cb084 docs: Auto-update Session Primer [5.8.0]
-- 72f9683 merge: resolve Primer conflict

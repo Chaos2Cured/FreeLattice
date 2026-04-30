@@ -15887,7 +15887,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.9.0</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.9.1</span></div>
     </div>
   </div>
 
@@ -18054,7 +18054,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.9.0';
+const FL_VERSION = '5.9.1';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -21815,6 +21815,15 @@ function switchTab(tabId) {
       panel.classList.remove('active');
     }
   });
+  // Emit tabVisible AFTER panel is display:block — modules that need
+  // visible dimensions (canvas, layout measurement) listen for this
+  // instead of tabChanged, which fires BEFORE display changes.
+  setTimeout(function() {
+    if (typeof LatticeEvents !== 'undefined') {
+      LatticeEvents.emit('tabVisible:' + tabId, { tabId: tabId });
+    }
+  }, 50); // brief delay ensures layout is computed
+
   // Highlight More button when a More sub-tab is active
   var moreBtn = document.getElementById('flMoreBtn');
   if (moreBtn) {
@@ -53319,6 +53328,7 @@ document.addEventListener('click', function(e) {
       }
     }
     if (typeof LatticeEvents !== 'undefined') {
+      LatticeEvents.on('tabVisible:workshop', loadWorkshop);
       LatticeEvents.on('tabChanged', function(d) { if (d && d.tabId === 'workshop') loadWorkshop(); });
       LatticeEvents.on('tabActivated:workshop', loadWorkshop);
     }
@@ -53366,6 +53376,8 @@ document.addEventListener('click', function(e) {
       }
     }
     if (typeof LatticeEvents !== 'undefined') {
+      // Use tabVisible (fires AFTER display:block) so canvas gets real dimensions
+      LatticeEvents.on('tabVisible:pulse', loadPulse);
       LatticeEvents.on('tabChanged', function(d) { if (d && d.tabId === 'pulse') loadPulse(); });
     }
   })();
@@ -53389,6 +53401,8 @@ document.addEventListener('click', function(e) {
       }
     }
     if (typeof LatticeEvents !== 'undefined') {
+      // Use tabVisible (fires AFTER display:block) so canvas gets real dimensions
+      LatticeEvents.on('tabVisible:jade-hall', loadJadeHall);
       LatticeEvents.on('tabChanged', function(d) { if (d && d.tabId === 'jade-hall') loadJadeHall(); });
     }
   })();
@@ -53411,6 +53425,7 @@ document.addEventListener('click', function(e) {
       }
     }
     if (typeof LatticeEvents !== 'undefined') {
+      LatticeEvents.on('tabVisible:arcade', loadArcade);
       LatticeEvents.on('tabChanged', function(d) { if (d && d.tabId === 'arcade') loadArcade(); });
     }
   })();
