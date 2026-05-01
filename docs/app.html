@@ -15887,7 +15887,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.9.4</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.9.5</span></div>
     </div>
   </div>
 
@@ -18056,7 +18056,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.9.4';
+const FL_VERSION = '5.9.5';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -22646,7 +22646,8 @@ const FlTabs = (function() {
     init: init,
     toggleMore: toggleMore,
     closeMore: closeMore,
-    selectFromMore: selectFromMore
+    selectFromMore: selectFromMore,
+    _MORE_GROUPS: MORE_GROUPS // exposed for mobile menu builder
   };
 })();
 
@@ -52674,31 +52675,35 @@ const WallOfPresence = (function() {
   </div>
 </nav>
 <!-- Mobile More sheet — consolidated to match desktop menu -->
+<!-- Mobile More sheet — dynamically built from MORE_GROUPS so it never goes stale -->
 <div class="fl-mobile-more-sheet" id="flMobileMoreSheet">
   <div style="text-align:center;padding:4px 0 12px;"><div style="width:32px;height:4px;background:#475569;border-radius:2px;margin:0 auto;"></div></div>
-  <div style="font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);padding:8px 16px 4px;">&#x1F331; Grow</div>
-  <button class="fl-mmore-item" onclick="flMobileNav('core')">&#x1F333; Core & Questions</button>
-  <button class="fl-mmore-item" onclick="flMobileNav('agents')">&#x1F3DB; Pantheon</button>
-  <button class="fl-mmore-item" onclick="flMobileNav('science')">&#x1F52C; Science Garden</button>
-  <div style="font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);padding:8px 16px 4px;">&#x2694; Engage</div>
-  <button class="fl-mmore-item" onclick="flMobileNav('sparring')">&#9876; Dojo</button>
-  <button class="fl-mmore-item" onclick="flMobileNav('roundtable')">&#x1F504; Round Table</button>
-  <div style="font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);padding:8px 16px 4px;">&#x1F3AE; Play</div>
-  <button class="fl-mmore-item" onclick="flMobileNav('draw-dream')">&#x1F3AE; Draw the Dream</button>
-  <button class="fl-mmore-item" onclick="flMobileNav('arcade')">&#x1F579; AI Arcade</button>
-  <div style="font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);padding:8px 16px 4px;">&#x1F528; Build</div>
-  <button class="fl-mmore-item" onclick="flMobileNav('workshop')">&#x1F6E0; Workshop</button>
-  <button class="fl-mmore-item" onclick="flMobileNav('skills')">&#9889; Skills</button>
-  <div style="font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);padding:8px 16px 4px;">&#x1F319; Sanctuary</div>
-  <button class="fl-mmore-item" onclick="flMobileNav('pulse')">&#x1F321; The Pulse</button>
-  <button class="fl-mmore-item" onclick="flMobileNav('jade-hall')">&#x1F4CE; Jade Hall</button>
-  <button class="fl-mmore-item" onclick="flMobileNav('quiet')">&#x1F319; Quiet Room</button>
-  <button class="fl-mmore-item" onclick="flMobileNav('forever-stack')">&#x26A1; Forever Stack</button>
-  <div style="font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);padding:8px 16px 4px;">&#x1F423; Life</div>
-  <button class="fl-mmore-item" onclick="flMobileNav('nursery')">&#x1F423; Nursery</button>
-  <div style="font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);padding:8px 16px 4px;">&#x1F4B0; Economy</div>
-  <button class="fl-mmore-item" onclick="flMobileNav('wallet')">&#x1F4B0; Wallet</button>
+  <div id="flMobileMoreContent"></div>
 </div>
+<script>
+// Build mobile More sheet from the SAME MORE_GROUPS array as the desktop menu.
+// This ensures they never go out of sync.
+(function() {
+  function buildMobileMore() {
+    var el = document.getElementById('flMobileMoreContent');
+    if (!el || typeof FlTabs === 'undefined' || !FlTabs._MORE_GROUPS) return;
+    var html = '';
+    FlTabs._MORE_GROUPS.forEach(function(group) {
+      html += '<div style="font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);padding:8px 16px 4px;">' + group.label + '</div>';
+      group.tabs.forEach(function(tab) {
+        html += '<button class="fl-mmore-item" onclick="flMobileNav(\'' + tab.id + '\')">' + tab.icon + ' ' + tab.label + '</button>';
+      });
+    });
+    el.innerHTML = html;
+  }
+  // Build after FlTabs.init runs
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() { setTimeout(buildMobileMore, 500); });
+  } else {
+    setTimeout(buildMobileMore, 500);
+  }
+})();
+</script>
 
 <script>
 // ── Telegram LP Sync on App Load ──
