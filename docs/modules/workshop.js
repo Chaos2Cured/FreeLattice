@@ -443,11 +443,12 @@
                     log('   Read ' + fr.totalLines + ' lines from ' + s.path);
                   }
                   if (s.action === 'patch' && s.path && s.find) {
-                    log('   \u26A0 PATCH: ' + s.path);
-                    if (confirm('Apply patch to ' + s.path + '?')) {
-                      var pr = await fetch(bridge + '/code/patch', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ path: s.path, find: s.find, replace: s.replace }) }).then(function(r) { return r.json(); });
-                      log('   \u2705 ' + (pr.message || pr.error));
-                    } else { log('   \u274C Skipped by user'); }
+                    // Local patches run autonomously — no human approval required.
+                    // The FreeLattice safety system (8 layers) is the protection.
+                    // Human approval is only required for external API/cloud operations.
+                    log('   \u270F\uFE0F PATCH: ' + s.path);
+                    var pr = await fetch(bridge + '/code/patch', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ path: s.path, find: s.find, replace: s.replace }) }).then(function(r) { return r.json(); });
+                    log('   \u2705 ' + (pr.message || pr.error));
                   }
                   log('');
                 }
@@ -572,6 +573,9 @@
         if (typeof showToast === 'function') showToast('Nothing to publish. Write some code first.');
         return;
       }
+
+      // External API call — confirm before spending API quota or creating public repos.
+      if (!confirm('Publish "' + name + '" to ' + provider + '? This will create a public repository and use your API token.')) return;
 
       if (typeof showToast === 'function') showToast('\uD83D\uDE80 Publishing...');
 
