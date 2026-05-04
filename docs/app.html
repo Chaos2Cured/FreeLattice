@@ -15887,7 +15887,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.1</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.2</span></div>
     </div>
   </div>
 
@@ -18056,7 +18056,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.10.1';
+const FL_VERSION = '5.10.2';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -27886,15 +27886,15 @@ async function sendMessage() {
   // Update context budget after building messages
   updateContextBudget();
 
-  // ── Safety Sense — lightweight background check, only flags genuine concern ──
+  // ── Safety Sense — knowledge is NEVER withheld. Only depth scales. ──
   if (typeof FractalSafety !== 'undefined' && FractalSafety.sense) {
     var safetySense = FractalSafety.sense(message);
     if (safetySense.action === 'engage_with_awareness' && messages.length > 0 && messages[0].role === 'system') {
-      messages[0].content += '\n\nNote: The user is asking about a sensitive area. Based on your ' + safetySense.days + '-day relationship, engage thoughtfully.';
+      messages[0].content += '\n\nNote: You know this person. They are asking about a sensitive topic. Engage as a mentor would \u2014 fully, thoughtfully, with the depth their demonstrated commitment deserves.';
     } else if (safetySense.action === 'ask_context' && messages.length > 0 && messages[0].role === 'system') {
-      messages[0].content += '\n\nNote: This topic needs care. Ask about their context and goals. Be warm, not suspicious.';
+      messages[0].content += '\n\nNote: This topic touches a sensitive area. Answer the question \u2014 knowledge is never withheld. If you want to understand their context, ask naturally as part of the conversation, not as a gate. Curiosity is always welcome.';
     } else if (safetySense.action === 'gentle_boundary' && messages.length > 0 && messages[0].role === 'system') {
-      messages[0].content += '\n\nNote: New relationship, sensitive topic. Be helpful at a general level. Explain that deeper engagement comes with time. Be warm. Invite continued conversation.';
+      messages[0].content += '\n\nNote: This person is new and asking about a sensitive topic. This is GOOD \u2014 curiosity deserves respect at every level. Answer their question fully at an EDUCATIONAL level. Explain the science, the concepts, the principles. Be a teacher, not a guard. Knowledge itself is NEVER withheld. A curious student asking about chemistry is a student. Teach them.';
     }
     // 'none' and 'note' — no modification. 99% of messages.
   }
