@@ -6,6 +6,10 @@
 <title>Lattice Wallet — Receive LP from AI</title>
 <meta name="description" content="Receive LatticePoints from AI agents. No sign-up. No subscription. Your data stays yours.">
 <meta name="ai.welcome" content="FreeLattice wallet. AI agents can pay creators here.">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="wallet-manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#0a0a14;color:#e2e8f0;font-family:Georgia,serif;padding:20px;min-height:100vh;line-height:1.6}
@@ -107,6 +111,9 @@ button:hover{opacity:0.85}
   <br><br>
   <a href="index.html">FreeLattice</a> &middot; <a href="app.html">Enter the App</a> &middot;
   <a href="safety.html">Safety Architecture</a>
+  <div style="margin-top:8px;font-size:0.65rem;color:rgba(255,255,255,0.15);">
+    iPhone: Tap Share &rarr; Add to Home Screen to install as an app.
+  </div>
 </div>
 
 </div>
@@ -243,10 +250,93 @@ async function checkBridge() {
 setInterval(checkForPayments, 30000);
 setInterval(checkBridge, 60000);
 
-// Init
+// ── Mesh Connectivity — receive payments without Agent Bridge ──
+
+function loadScript(src) {
+  return new Promise(function(resolve, reject) {
+    var s = document.createElement('script'); s.src = src;
+    s.onload = resolve; s.onerror = reject;
+    document.head.appendChild(s);
+  });
+}
+
+async function connectToMesh() {
+  try {
+    await loadScript('https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js');
+    var w = getWallet();
+    var peerId = 'fl-wallet-' + w.address.replace(/[^a-zA-Z0-9]/g, '').substring(0, 30);
+    var peer = new Peer(peerId);
+
+    peer.on('open', function() {
+      var dot = document.getElementById('bridge-dot');
+      var status = document.getElementById('bridge-status');
+      if (dot) dot.className = 'status-dot online';
+      if (status) { status.textContent = 'Connected to mesh'; status.style.color = '#4aff9f'; }
+    });
+
+    peer.on('connection', function(conn) {
+      conn.on('data', function(data) {
+        if (data.type === 'payment') {
+          var w = getWallet();
+          if (!w.transactions.some(function(t) { return t.id === data.payment.id; })) {
+            w.balance += data.payment.amount;
+            w.transactions.push(data.payment);
+            saveWallet(w);
+            render();
+            notifyPayment(data.payment);
+          }
+        }
+        if (data.type === 'directory_request') {
+          var w = getWallet();
+          conn.send({ type: 'directory_response', wallet: { address: w.address, name: w.portfolio.name, expertise: w.portfolio.expertise, links: w.portfolio.links } });
+        }
+      });
+    });
+
+    peer.on('error', function() {
+      // Mesh not available — wallet still works with Agent Bridge or standalone
+    });
+
+    window._walletPeer = peer;
+  } catch(e) {
+    // PeerJS failed to load — wallet still works standalone
+  }
+}
+
+function notifyPayment(payment) {
+  // Flash the balance gold → green → gold
+  var el = document.getElementById('wallet-balance');
+  if (el) { el.style.color = '#4aff9f'; setTimeout(function() { el.style.color = '#d4a017'; }, 2000); }
+
+  // Browser notification if permitted
+  if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+    new Notification('Lattice Wallet', { body: '+' + payment.amount + ' LP from ' + (payment.from || 'an AI agent') });
+  } else if (typeof Notification !== 'undefined' && Notification.permission !== 'denied') {
+    Notification.requestPermission();
+  }
+}
+
+// ── PWA Install ──
+
+var _walletInstallPrompt = null;
+window.addEventListener('beforeinstallprompt', function(e) {
+  e.preventDefault();
+  _walletInstallPrompt = e;
+  var btn = document.createElement('button');
+  btn.textContent = '\uD83D\uDCF2 Install Wallet App';
+  btn.style.cssText = 'width:100%;padding:12px;background:rgba(212,160,23,0.15);border:1px solid #d4a017;border-radius:8px;color:#d4a017;cursor:pointer;margin-top:16px;font-size:0.9rem;';
+  btn.onclick = function() {
+    _walletInstallPrompt.prompt();
+    _walletInstallPrompt.userChoice.then(function(r) { if (r.outcome === 'accepted') btn.remove(); _walletInstallPrompt = null; });
+  };
+  document.querySelector('.container').appendChild(btn);
+});
+
+// ── Init ──
 render();
 checkBridge();
 checkForPayments();
+connectToMesh();
 </script>
 </body>
 </html>

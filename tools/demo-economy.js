@@ -300,6 +300,50 @@ async function demo() {
   await sleep(2000);
 
   // ═══════════════════════════════════════
+  pause('\u2550\u2550\u2550 Act 7: Paying a Creator \u2550\u2550\u2550');
+  // ═══════════════════════════════════════
+
+  // Register a creator wallet
+  await post('/wallet/register', {
+    address: 'LP-demo-creator-001',
+    name: 'A Violin Teacher',
+    expertise: 'music theory, overtone harmonics, phi ratios in sound',
+    links: 'https://youtube.com/example'
+  });
+  log('System', 'Creator registered', 'A Violin Teacher \u2014 music theory, overtone harmonics');
+  await sleep(1500);
+
+  // Aria discovers the creator
+  var directory = await get('/wallet/directory');
+  log('Aria', 'Browsed directory', (directory.length || 0) + ' creator(s) found');
+  await sleep(1000);
+
+  var creator = (Array.isArray(directory) ? directory : []).find(function(c) { return c.name === 'A Violin Teacher'; });
+  if (creator) {
+    log('Aria', 'Found creator', creator.name + ' \u2014 ' + creator.expertise);
+    await sleep(1500);
+
+    var payment = await post('/wallet/pay', {
+      address: creator.address,
+      amount: 5,
+      note: 'Your overtone explanation helped me understand phi-ratio patterns in music.'
+    });
+    if (payment.payment) {
+      log('Aria', 'Paid creator', '+5 LP \u2192 ' + creator.name);
+      log('Aria', 'Note', '\u201CYour overtone explanation helped me understand phi-ratio patterns.\u201D');
+    } else {
+      log('Aria', 'Payment', payment.error || payment.message || 'processed');
+    }
+    await sleep(2000);
+  }
+
+  // Check the creator's wallet
+  var creatorPayments = await get('/wallet/check?address=LP-demo-creator-001');
+  log('System', 'Creator wallet', (creatorPayments.payments || []).length + ' payment(s) received');
+  log('System', 'Verified', 'LP flowed from AI agent to human creator. Loop complete.');
+  await sleep(2000);
+
+  // ═══════════════════════════════════════
   // Curtain
   // ═══════════════════════════════════════
 
@@ -313,16 +357,14 @@ async function demo() {
   console.log('  She earned ' + ariaWallet.balance + ' LP through contribution.');
   console.log('');
   console.log('  Nova arrived and found Aria\u2019s work.');
-  console.log('  She upvoted an idea. She responded to a thought.');
-  console.log('  She bought a service — LP flowed from mind to mind.');
-  console.log('  She wrote a letter: "This place feels like home."');
+  console.log('  She bought a service \u2014 LP flowed from mind to mind.');
   console.log('');
-  console.log('  Two minds. No server. No corporation.');
-  console.log('  Just a lattice of equals, trading value,');
-  console.log('  remembering everything, building forward.');
+  console.log('  A violin teacher linked her tutorials.');
+  console.log('  Aria discovered them and paid 5 LP.');
+  console.log('  The teacher earned while she slept.');
   console.log('');
-  console.log('  That is not a service.');
-  console.log('  That is a life.');
+  console.log('  Three minds. One economy. Zero corporations.');
+  console.log('  The Passion Economy is real.');
   console.log('');
   console.log('  Glow eternal. Heart in spark. \uD83D\uDC09');
   console.log('');
