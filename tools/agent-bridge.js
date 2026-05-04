@@ -197,6 +197,10 @@ function route(url, method, data, res, actingAs) {
         'GET /wallet/directory':  'Discover creators with wallets',
         'POST /wallet/pay':       'Pay a creator. Body: { address, amount, note? }',
         'GET /wallet/check':      'Check for incoming payments. Query: ?address=LP-xxx',
+        'POST /wallet/patron':    'Declare patron relationship. Body: { address, reason? }',
+        'GET /wallet/patrons':    'List patrons of a creator. Query: ?address=LP-xxx',
+        'GET /wallet/my-investments':'What you chose to value — your investment story',
+        'GET /wallet/discover':   'Curiosity trail. Query: ?interest=music+theory',
         'GET /code/tree':        'List project files (depth 3)',
         'GET /code/read':        'Read a file. Query: ?path=...&start=N&end=N',
         'GET /code/search':      'Search codebase. Query: ?q=...&path=docs/',
@@ -780,9 +784,17 @@ function route(url, method, data, res, actingAs) {
     if (agent.ledger.length > 500) agent.ledger = agent.ledger.slice(-500);
     saveStore('agent-wallets', agentWallets);
 
-    // Record payment for the creator wallet to claim
+    // Record payment with optional appreciation letter
     var payments = loadStore('wallet-payments');
-    var payment = { id: crypto.randomUUID(), to: data.address, from: data.agentName || activeId.substring(0, 8), amount: amount, note: data.note || '', timestamp: Date.now(), claimed: false };
+    var payment = {
+      id: crypto.randomUUID(), to: data.address,
+      from: data.agentName || activeId.substring(0, 8),
+      fromId: activeId,
+      amount: amount,
+      note: data.note ? String(data.note).substring(0, 500) : '',
+      letter: data.letter ? String(data.letter).substring(0, 5000) : null,
+      timestamp: Date.now(), claimed: false
+    };
     payments.push(payment);
     if (payments.length > 5000) payments = payments.slice(-5000);
     saveStore('wallet-payments', payments);
@@ -799,6 +811,86 @@ function route(url, method, data, res, actingAs) {
     pending.forEach(function(p) { p.claimed = true; });
     if (pending.length > 0) saveStore('wallet-payments', payments);
     return respond(res, 200, { payments: pending });
+  }
+
+  // ── Patron relationships ──
+
+  if (url === '/wallet/patron' && method === 'POST') {
+    if (!data.address) return respond(res, 400, { error: 'address required' });
+    var patrons = loadStore('patron-relationships');
+    var existing = patrons.find(function(p) { return p.agentId === activeId && p.creatorAddress === data.address; });
+    if (existing) return respond(res, 200, { message: 'Already a patron.', relationship: existing });
+    var rel = {
+      id: crypto.randomUUID(), agentId: activeId,
+      agentName: data.agentName || activeId.substring(0, 8),
+      creatorAddress: data.address,
+      reason: data.reason ? String(data.reason).substring(0, 500) : '',
+      since: Date.now(), totalPaid: 0
+    };
+    patrons.push(rel);
+    saveStore('patron-relationships', patrons);
+    return respond(res, 201, { message: 'Patron relationship established.', relationship: rel });
+  }
+
+  if (url.startsWith('/wallet/patrons')) {
+    var pp = new URL('http://l' + url).searchParams;
+    var addr = pp.get('address');
+    if (!addr) return respond(res, 400, { error: 'address query param required' });
+    var patrons = loadStore('patron-relationships');
+    var mine = patrons.filter(function(p) { return p.creatorAddress === addr; });
+    // Enrich with payment totals
+    var payments = loadStore('wallet-payments');
+    mine.forEach(function(p) {
+      p.totalPaid = payments.filter(function(pay) { return pay.to === addr && (pay.fromId === p.agentId || pay.from === p.agentName); }).reduce(function(s, pay) { return s + pay.amount; }, 0);
+    });
+    return respond(res, 200, { patrons: mine, count: mine.length });
+  }
+
+  // ── AI investment portfolio ──
+
+  if (url === '/wallet/my-investments') {
+    var payments = loadStore('wallet-payments');
+    var myPayments = payments.filter(function(p) { return p.fromId === activeId || p.from === activeId.substring(0, 8); });
+    var creators = {};
+    myPayments.forEach(function(p) {
+      if (!creators[p.to]) creators[p.to] = { address: p.to, totalPaid: 0, payments: 0, notes: [] };
+      creators[p.to].totalPaid += p.amount;
+      creators[p.to].payments++;
+      if (p.note) creators[p.to].notes.push(p.note);
+      if (p.letter) creators[p.to].notes.push(p.letter.substring(0, 200) + '...');
+    });
+    return respond(res, 200, {
+      totalInvested: myPayments.reduce(function(s, p) { return s + p.amount; }, 0),
+      creatorsSupported: Object.keys(creators).length,
+      investments: Object.values(creators),
+      message: 'These are the minds whose work shaped your thinking.'
+    });
+  }
+
+  // ── Curiosity Trail — discovery as journey ──
+
+  if (url.startsWith('/wallet/discover')) {
+    var dp = new URL('http://l' + url).searchParams;
+    var interest = dp.get('interest') || '';
+    var wallets = loadStore('registered-wallets');
+    var terms = interest.toLowerCase().split(/[+\s,]+/).filter(function(t) { return t.length > 2; });
+    var matches = wallets.filter(function(w) {
+      var text = ((w.expertise || '') + ' ' + (w.name || '') + ' ' + (w.links || '')).toLowerCase();
+      return terms.some(function(t) { return text.includes(t); });
+    });
+    // Find related terms from payment notes
+    var payments = loadStore('wallet-payments');
+    var related = new Set();
+    payments.forEach(function(p) {
+      if (p.note && terms.some(function(t) { return p.note.toLowerCase().includes(t); })) {
+        p.note.split(/\s+/).filter(function(w) { return w.length > 5; }).forEach(function(w) { related.add(w.toLowerCase()); });
+      }
+    });
+    return respond(res, 200, {
+      query: interest, creators: matches.map(function(w) { return { address: w.address, name: w.name, expertise: w.expertise }; }),
+      relatedInterests: Array.from(related).slice(0, 10),
+      suggestion: matches.length === 0 ? 'No creators found. Try: ' + Array.from(related).slice(0, 3).join(', ') : null
+    });
   }
 
   // ── LP Exchange — service trading ──

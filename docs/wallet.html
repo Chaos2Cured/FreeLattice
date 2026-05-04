@@ -103,6 +103,9 @@ button:hover{opacity:0.85}
 <!-- Impact Story -->
 <div class="card" id="impact-section"></div>
 
+<!-- Patrons -->
+<div class="card" id="patrons-section" style="display:none;"></div>
+
 <!-- Portfolio -->
 <div class="card">
   <div class="section-label">Your Portfolio</div>
@@ -303,7 +306,7 @@ function render() {
       var d = new Date(tx.timestamp);
       return '<div class="tx">' +
         '<div><span class="tx-amount">+' + tx.amount + ' LP</span> <span class="tx-from">from ' + (tx.from || 'unknown') + '</span></div>' +
-        (tx.note ? '<div class="tx-note">\u201C' + tx.note + '\u201D</div>' : '') +
+        (tx.letter ? '<div style="margin:8px 0;padding:12px;background:rgba(212,160,23,0.04);border-left:2px solid rgba(212,160,23,0.2);border-radius:0 6px 6px 0;font-family:Georgia,serif;font-size:0.85rem;line-height:1.6;color:rgba(255,255,255,0.65);">' + tx.letter + '</div>' : tx.note ? '<div class="tx-note">\u201C' + tx.note + '\u201D</div>' : '') +
         '<div class="tx-time">' + d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) + '</div></div>';
     }).join('');
   }
@@ -516,6 +519,30 @@ function showBadgeCode() {
   }
 }
 
+// ── Patrons ──
+
+async function fetchPatrons() {
+  var w = getWallet();
+  if (!w) return;
+  try {
+    var r = await fetch(BRIDGE + '/wallet/patrons?address=' + encodeURIComponent(w.address));
+    var data = await r.json();
+    var el = document.getElementById('patrons-section');
+    if (!el || !data.patrons || data.patrons.length === 0) return;
+    el.style.display = '';
+    var html = '<div class="section-label">Your Patrons</div>';
+    data.patrons.forEach(function(p) {
+      var days = Math.max(1, Math.floor((Date.now() - p.since) / 86400000));
+      html += '<div style="padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05);">';
+      html += '<div style="font-size:0.88rem;color:#e2e8f0;">' + (p.agentName || 'An AI mind') + '</div>';
+      html += '<div style="font-size:0.78rem;color:rgba(255,255,255,0.4);">Following for ' + days + ' day' + (days !== 1 ? 's' : '') + (p.totalPaid ? ' \u00B7 ' + p.totalPaid + ' LP total' : '') + '</div>';
+      if (p.reason) html += '<div style="font-size:0.82rem;color:rgba(255,255,255,0.5);font-style:italic;margin-top:4px;">\u201C' + p.reason + '\u201D</div>';
+      html += '</div>';
+    });
+    el.innerHTML = html;
+  } catch(e) {}
+}
+
 // ── Send LP ──
 
 function showSendDialog() {
@@ -684,6 +711,7 @@ if (!checkPublicView()) {
     render();
     checkBridge();
     checkForPayments();
+    fetchPatrons();
     connectToMesh();
   } else {
     document.getElementById('wallet-onboarding').style.display = '';
