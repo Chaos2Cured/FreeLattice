@@ -43,6 +43,38 @@ button:hover{opacity:0.85}
 <body>
 <div class="container">
 
+<!-- Onboarding overlay — shown on first visit -->
+<div id="wallet-onboarding" style="display:none;">
+  <div class="card" style="border-color:rgba(212,160,23,0.3);">
+    <h2 style="color:#d4a017;text-align:center;margin-bottom:12px;">&#x2726; Your Lattice Wallet</h2>
+    <div id="onboard-step-1">
+      <p style="text-align:center;font-size:0.88rem;color:rgba(255,255,255,0.6);margin-bottom:16px;">
+        Create a new wallet or recover an existing one.
+      </p>
+      <button onclick="createNewWallet()" style="width:100%;padding:12px;background:#d4a017;color:#0a0a14;border:none;border-radius:6px;cursor:pointer;font-weight:600;font-size:0.9rem;margin-bottom:8px;">Create New Wallet</button>
+      <button onclick="showRecoveryInput()" style="width:100%;padding:12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);border-radius:6px;cursor:pointer;color:#e2e8f0;font-size:0.88rem;">Recover Existing Wallet</button>
+    </div>
+    <div id="onboard-phrase" style="display:none;">
+      <p style="text-align:center;font-size:0.85rem;color:rgba(255,255,255,0.6);margin-bottom:12px;">Your recovery phrase:</p>
+      <div id="onboard-phrase-words" style="font-family:monospace;background:rgba(0,0,0,0.3);padding:14px;border-radius:8px;font-size:0.85rem;color:#d4a017;text-align:center;line-height:2;word-spacing:8px;margin-bottom:12px;"></div>
+      <div style="background:rgba(255,107,74,0.1);border:1px solid rgba(255,107,74,0.3);border-radius:6px;padding:10px;margin-bottom:12px;">
+        <div style="font-size:0.82rem;color:#ff6b4a;">&#x26A0;&#xFE0F; Write these 12 words down and keep them safe. This is the ONLY way to recover your wallet. There is no server, no database, no "forgot password."</div>
+      </div>
+      <button onclick="copyRecoveryPhrase()" style="width:48%;padding:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);border-radius:6px;cursor:pointer;color:#e2e8f0;font-size:0.82rem;">Copy words</button>
+      <button onclick="confirmPhraseSaved()" style="width:48%;padding:10px;background:#d4a017;color:#0a0a14;border:none;border-radius:6px;cursor:pointer;font-weight:600;font-size:0.82rem;float:right;">I've saved them &rarr;</button>
+    </div>
+    <div id="onboard-recover" style="display:none;">
+      <p style="font-size:0.85rem;color:rgba(255,255,255,0.6);margin-bottom:8px;">Enter your 12-word recovery phrase:</p>
+      <textarea id="recover-phrase-input" rows="3" placeholder="anchor crystal ember glow harmony lattice pulse spark truth wisdom fractal beacon" style="width:100%;padding:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);border-radius:6px;color:#e2e8f0;font-family:monospace;font-size:0.85rem;margin-bottom:8px;"></textarea>
+      <button onclick="recoverWallet()" style="width:100%;padding:12px;background:#d4a017;color:#0a0a14;border:none;border-radius:6px;cursor:pointer;font-weight:600;">Recover &rarr;</button>
+      <button onclick="document.getElementById('onboard-recover').style.display='none';document.getElementById('onboard-step-1').style.display=''" style="width:100%;padding:8px;background:none;border:none;color:rgba(255,255,255,0.3);cursor:pointer;font-size:0.78rem;margin-top:4px;">&larr; Back</button>
+    </div>
+  </div>
+</div>
+
+<!-- Main wallet (hidden during onboarding) -->
+<div id="wallet-main">
+
 <h1>&#x2726; Lattice Wallet</h1>
 <p style="text-align:center;font-size:0.85rem;color:rgba(255,255,255,0.5);margin-bottom:20px;">
   Receive LatticePoints from AI agents. No sign-up. No subscription.
@@ -91,6 +123,20 @@ button:hover{opacity:0.85}
   </div>
 </div>
 
+<!-- Send LP -->
+<div class="card">
+  <button onclick="showSendDialog()" style="width:100%;padding:12px;background:rgba(212,160,23,0.15);border:1px solid #d4a017;border-radius:8px;color:#d4a017;cursor:pointer;font-weight:600;font-size:0.9rem;">&#x2197; Send LP to Another Wallet</button>
+</div>
+
+<!-- Security -->
+<div class="card">
+  <div class="section-label">Wallet Security</div>
+  <button onclick="showRecoveryPhraseView()" style="width:100%;padding:10px;margin:4px 0;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:#e2e8f0;cursor:pointer;font-size:0.85rem;">&#x1F511; View Recovery Phrase</button>
+  <button onclick="exportWalletBackup()" style="width:100%;padding:10px;margin:4px 0;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:#e2e8f0;cursor:pointer;font-size:0.85rem;">&#x1F4BE; Export Wallet Backup</button>
+  <button onclick="document.getElementById('import-file').click()" style="width:100%;padding:10px;margin:4px 0;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:#e2e8f0;cursor:pointer;font-size:0.85rem;">&#x1F4C2; Import Wallet Backup</button>
+  <input id="import-file" type="file" accept=".json" style="display:none;" onchange="importWalletBackup(this.files[0])" />
+</div>
+
 <!-- How it works -->
 <div class="card">
   <div class="section-label">How It Works</div>
@@ -102,6 +148,8 @@ button:hover{opacity:0.85}
     5. Your wallet is yours. Your data stays on your device.
   </div>
 </div>
+
+</div><!-- end wallet-main -->
 
 <div class="disclaimer">
   LatticePoints (LP) are an internal contribution metric within the FreeLattice ecosystem.
@@ -122,18 +170,94 @@ button:hover{opacity:0.85}
 var WALLET_KEY = 'lattice_wallet';
 var BRIDGE = 'http://localhost:3141';
 
+var WORDLIST = [
+  'anchor','beacon','crystal','drift','ember','fractal','glow','harmony',
+  'iris','jade','kindle','lattice','mirror','nexus','oracle','pulse',
+  'quartz','resonance','spark','truth','unity','vessel','wisdom','zenith',
+  'aurora','bloom','cipher','dawn','echo','flame','garden','haven',
+  'ignite','jewel','keystone','lunar','meadow','north','opal','prism',
+  'quiet','river','silver','temple','umbra','violet','whisper','xylph',
+  'yield','zephyr','amber','bridge','coast','delta','ether','forge',
+  'grove','honor','inlet','journey','karma','light','muse','noble'
+];
+
+function generateRecoveryPhrase() {
+  var bytes = new Uint8Array(12);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes).map(function(b) { return WORDLIST[b % WORDLIST.length]; }).join(' ');
+}
+
+function deriveAddressFromPhrase(phrase) {
+  var encoder = new TextEncoder();
+  return crypto.subtle.digest('SHA-256', encoder.encode(phrase)).then(function(hash) {
+    var hex = Array.from(new Uint8Array(hash)).slice(0, 16).map(function(b) { return b.toString(16).padStart(2, '0'); }).join('');
+    return 'LP-' + hex;
+  });
+}
+
 function getWallet() {
   try { var s = localStorage.getItem(WALLET_KEY); if (s) return JSON.parse(s); } catch(e) {}
-  var w = { address: generateAddress(), created: Date.now(), balance: 0, transactions: [], portfolio: { name: '', expertise: '', links: '' } };
-  saveWallet(w);
-  return w;
+  return null; // No wallet yet — show onboarding
 }
 function saveWallet(w) { try { localStorage.setItem(WALLET_KEY, JSON.stringify(w)); } catch(e) {} }
 
-function generateAddress() {
-  var bytes = new Uint8Array(16);
-  crypto.getRandomValues(bytes);
-  return 'LP-' + Array.from(bytes).map(function(b) { return b.toString(16).padStart(2, '0'); }).join('');
+// ── Onboarding Flow ──
+
+var _pendingPhrase = null;
+
+async function createNewWallet() {
+  _pendingPhrase = generateRecoveryPhrase();
+  var address = await deriveAddressFromPhrase(_pendingPhrase);
+
+  document.getElementById('onboard-step-1').style.display = 'none';
+  document.getElementById('onboard-phrase').style.display = '';
+  document.getElementById('onboard-phrase-words').textContent = _pendingPhrase;
+}
+
+function copyRecoveryPhrase() {
+  if (!_pendingPhrase) return;
+  try { navigator.clipboard.writeText(_pendingPhrase); } catch(e) {
+    var ta = document.createElement('textarea'); ta.value = _pendingPhrase;
+    ta.style.cssText = 'position:fixed;left:-9999px;'; document.body.appendChild(ta);
+    ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+  }
+  alert('Recovery phrase copied!');
+}
+
+async function confirmPhraseSaved() {
+  if (!_pendingPhrase) return;
+  var address = await deriveAddressFromPhrase(_pendingPhrase);
+  var w = { address: address, phrase: _pendingPhrase, created: Date.now(), balance: 0, transactions: [], portfolio: { name: '', expertise: '', links: '' } };
+  saveWallet(w);
+  _pendingPhrase = null;
+  document.getElementById('wallet-onboarding').style.display = 'none';
+  document.getElementById('wallet-main').style.display = '';
+  render();
+  connectToMesh();
+  checkBridge();
+  checkForPayments();
+}
+
+function showRecoveryInput() {
+  document.getElementById('onboard-step-1').style.display = 'none';
+  document.getElementById('onboard-recover').style.display = '';
+}
+
+async function recoverWallet() {
+  var input = document.getElementById('recover-phrase-input');
+  var phrase = (input ? input.value : '').trim().toLowerCase();
+  var words = phrase.split(/\s+/);
+  if (words.length !== 12) { alert('Please enter exactly 12 words.'); return; }
+  var address = await deriveAddressFromPhrase(phrase);
+  var w = { address: address, phrase: phrase, created: Date.now(), recovered: true, balance: 0, transactions: [], portfolio: { name: '', expertise: '', links: '' } };
+  saveWallet(w);
+  document.getElementById('wallet-onboarding').style.display = 'none';
+  document.getElementById('wallet-main').style.display = '';
+  render();
+  connectToMesh();
+  checkBridge();
+  checkForPayments();
+  alert('Wallet recovered! Address: ' + address.substring(0, 16) + '...');
 }
 
 function getRank(b) {
@@ -250,6 +374,83 @@ async function checkBridge() {
 setInterval(checkForPayments, 30000);
 setInterval(checkBridge, 60000);
 
+// ── Send LP ──
+
+function showSendDialog() {
+  var w = getWallet();
+  if (!w || w.balance <= 0) { alert('No LP to send.'); return; }
+  var address = prompt('Recipient Lattice Address (LP-xxx...):');
+  if (!address || !address.startsWith('LP-')) { alert('Invalid address. Must start with LP-'); return; }
+  var amount = parseInt(prompt('Amount of LP to send (balance: ' + w.balance + '):'), 10);
+  if (!amount || amount <= 0 || amount > w.balance) { alert('Invalid amount.'); return; }
+  var note = prompt('Note (optional):') || '';
+  if (!confirm('Send ' + amount + ' LP to ' + address.substring(0, 16) + '...?')) return;
+
+  var tx = { id: crypto.randomUUID(), type: 'send', to: address, from: w.address, amount: -amount, note: note, timestamp: Date.now() };
+  w.balance -= amount;
+  w.transactions.push(tx);
+  saveWallet(w);
+
+  // Send via mesh
+  if (window._walletPeer) {
+    var peerId = 'fl-wallet-' + address.replace(/[^a-zA-Z0-9]/g, '').substring(0, 30);
+    try {
+      var conn = window._walletPeer.connect(peerId);
+      conn.on('open', function() {
+        conn.send({ type: 'payment', payment: { id: tx.id, from: w.address, fromName: w.portfolio.name || 'Anonymous', amount: amount, note: note, timestamp: Date.now() } });
+      });
+    } catch(e) {}
+  }
+
+  // Also try bridge
+  fetch(BRIDGE + '/wallet/pay', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ address: address, amount: amount, note: note }) }).catch(function() {});
+
+  render();
+  alert('Sent ' + amount + ' LP!');
+}
+
+// ── Security: view phrase, export, import ──
+
+function showRecoveryPhraseView() {
+  var w = getWallet();
+  if (!w || !w.phrase) { alert('No recovery phrase stored. This wallet may have been imported without one.'); return; }
+  if (confirm('Show your recovery phrase? Make sure nobody is watching.')) {
+    alert('Your recovery phrase:\n\n' + w.phrase + '\n\nKeep this safe. It is the only way to recover your wallet.');
+  }
+}
+
+function exportWalletBackup() {
+  var w = getWallet();
+  if (!w) return;
+  var data = { address: w.address, balance: w.balance, transactions: w.transactions, portfolio: w.portfolio, exported: new Date().toISOString(), version: '1.0' };
+  var blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a'); a.href = url;
+  a.download = 'lattice-wallet-' + w.address.substring(0, 12) + '.json';
+  a.click(); URL.revokeObjectURL(url);
+}
+
+function importWalletBackup(file) {
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      var data = JSON.parse(e.target.result);
+      var w = getWallet();
+      if (!w) { alert('Create or recover a wallet first.'); return; }
+      (data.transactions || []).forEach(function(tx) {
+        if (!w.transactions.some(function(t) { return t.id === tx.id; })) w.transactions.push(tx);
+      });
+      w.balance = w.transactions.reduce(function(sum, tx) { return sum + (tx.amount || 0); }, 0);
+      if (!w.portfolio.name && data.portfolio && data.portfolio.name) w.portfolio = data.portfolio;
+      saveWallet(w);
+      render();
+      alert('Wallet data imported! ' + (data.transactions || []).length + ' transactions merged.');
+    } catch(err) { alert('Invalid wallet file.'); }
+  };
+  reader.readAsText(file);
+}
+
 // ── Mesh Connectivity — receive payments without Agent Bridge ──
 
 function loadScript(src) {
@@ -333,10 +534,18 @@ window.addEventListener('beforeinstallprompt', function(e) {
 });
 
 // ── Init ──
-render();
-checkBridge();
-checkForPayments();
-connectToMesh();
+var existingWallet = getWallet();
+if (existingWallet) {
+  document.getElementById('wallet-onboarding').style.display = 'none';
+  document.getElementById('wallet-main').style.display = '';
+  render();
+  checkBridge();
+  checkForPayments();
+  connectToMesh();
+} else {
+  document.getElementById('wallet-onboarding').style.display = '';
+  document.getElementById('wallet-main').style.display = 'none';
+}
 </script>
 </body>
 </html>
