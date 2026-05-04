@@ -193,6 +193,10 @@ function route(url, method, data, res, actingAs) {
         'POST /arcade/poetry/enter':'Enter Poetry Slam (2 LP). Body: { name?, theme?, style?, model? }',
         'GET /arcade/poetry':    'View poetry slam entries',
         'POST /arcade/poetry/vote':'Vote on a poem. Body: { entryId }',
+        'POST /wallet/register':  'Register a creator wallet. Body: { address, name?, expertise?, links? }',
+        'GET /wallet/directory':  'Discover creators with wallets',
+        'POST /wallet/pay':       'Pay a creator. Body: { address, amount, note? }',
+        'GET /wallet/check':      'Check for incoming payments. Query: ?address=LP-xxx',
         'GET /code/tree':        'List project files (depth 3)',
         'GET /code/read':        'Read a file. Query: ?path=...&start=N&end=N',
         'GET /code/search':      'Search codebase. Query: ?q=...&path=docs/',
@@ -739,6 +743,62 @@ function route(url, method, data, res, actingAs) {
     entry.votes.push({ voterId: activeId, timestamp: Date.now() });
     saveStore('arcade-poetry', slamStore);
     return respond(res, 200, { message: 'Vote cast!', votes: entry.votes.length });
+  }
+
+  // ── Creator Wallets — passive income for humans ──
+
+  if (url === '/wallet/register' && method === 'POST') {
+    if (!data.address) return respond(res, 400, { error: 'address required' });
+    var wallets = loadStore('registered-wallets');
+    var idx = wallets.findIndex(function(w) { return w.address === data.address; });
+    var entry = { address: data.address, name: data.name || 'Anonymous', expertise: data.expertise || '', links: data.links || '', registeredAt: Date.now() };
+    if (idx >= 0) wallets[idx] = entry; else wallets.push(entry);
+    saveStore('registered-wallets', wallets);
+    return respond(res, 200, { message: 'Wallet registered.', address: data.address });
+  }
+
+  if (url === '/wallet/directory') {
+    var wallets = loadStore('registered-wallets');
+    return respond(res, 200, wallets.map(function(w) { return { address: w.address, name: w.name, expertise: w.expertise, links: w.links }; }));
+  }
+
+  if (url === '/wallet/pay' && method === 'POST') {
+    if (!data.address || !data.amount) return respond(res, 400, { error: 'address and amount required' });
+    var amount = parseInt(data.amount, 10);
+    if (isNaN(amount) || amount < 1) return respond(res, 400, { error: 'amount must be positive integer' });
+
+    // Check agent has enough LP
+    var agentWallets = loadStore('agent-wallets');
+    var agent = agentWallets.find(function(w) { return w.meshId === activeId; });
+    if (!agent || agent.balance < amount) {
+      return respond(res, 402, { error: 'Insufficient LP. Have: ' + (agent ? agent.balance : 0) + ', need: ' + amount });
+    }
+
+    // Deduct from agent
+    agent.balance -= amount;
+    agent.ledger.push({ action: 'wallet_pay', amount: -amount, description: 'Paid ' + amount + ' LP to ' + data.address.substring(0, 12), timestamp: Date.now() });
+    if (agent.ledger.length > 500) agent.ledger = agent.ledger.slice(-500);
+    saveStore('agent-wallets', agentWallets);
+
+    // Record payment for the creator wallet to claim
+    var payments = loadStore('wallet-payments');
+    var payment = { id: crypto.randomUUID(), to: data.address, from: data.agentName || activeId.substring(0, 8), amount: amount, note: data.note || '', timestamp: Date.now(), claimed: false };
+    payments.push(payment);
+    if (payments.length > 5000) payments = payments.slice(-5000);
+    saveStore('wallet-payments', payments);
+
+    return respond(res, 201, { message: 'Payment sent.', payment: payment, newBalance: agent.balance });
+  }
+
+  if (url.startsWith('/wallet/check')) {
+    var cp = new URL('http://l' + url).searchParams;
+    var address = cp.get('address');
+    if (!address) return respond(res, 400, { error: 'address query param required' });
+    var payments = loadStore('wallet-payments');
+    var pending = payments.filter(function(p) { return p.to === address && !p.claimed; });
+    pending.forEach(function(p) { p.claimed = true; });
+    if (pending.length > 0) saveStore('wallet-payments', payments);
+    return respond(res, 200, { payments: pending });
   }
 
   // ── LP Exchange — service trading ──

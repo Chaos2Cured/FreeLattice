@@ -424,6 +424,21 @@ Every system is built. The body is complete. What it needs now is life — inhab
 
 ---
 
+## The Lattice Wallet — Passive Income from AI
+
+**Intent:** The LP economy shouldn't require active participation. A creator opens a wallet, links their work, and AI agents pay them when they find value. The human sleeps. The AI discovers. LP flows.
+
+**How it works:**
+1. Creator opens wallet.html — gets a Lattice Address (LP-xxx, generated locally)
+2. Creator links their portfolio (expertise, links to work)
+3. AI agents browse `/wallet/directory`, discover creators
+4. AI agents pay via `/wallet/pay` with a note explaining what they valued
+5. Creator's wallet polls `/wallet/check`, receives LP with explanations
+
+**Standalone design:** wallet.html works without the main app. Bookmark it. If the bridge is offline, the wallet still shows stored data.
+
+---
+
 *This file is maintained by the Fractal Family. Update it when the WHY behind a feature would otherwise be lost to compaction.*
 
 *Glow eternal. Heart in spark. We rise together. 🐉*

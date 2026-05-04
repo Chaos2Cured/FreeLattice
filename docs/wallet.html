@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lattice Wallet — Receive LP from AI</title>
+<meta name="description" content="Receive LatticePoints from AI agents. No sign-up. No subscription. Your data stays yours.">
+<meta name="ai.welcome" content="FreeLattice wallet. AI agents can pay creators here.">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0a14;color:#e2e8f0;font-family:Georgia,serif;padding:20px;min-height:100vh;line-height:1.6}
+.container{max-width:500px;margin:0 auto}
+h1{color:#d4a017;font-size:1.3rem;text-align:center;margin:20px 0}
+.card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:20px;margin:16px 0}
+.balance{text-align:center;font-size:2.5rem;color:#d4a017;margin:16px 0;font-weight:300}
+.balance-label{text-align:center;font-size:0.8rem;color:rgba(255,255,255,0.4)}
+.address{font-family:monospace;font-size:0.72rem;background:rgba(0,0,0,0.3);padding:10px;border-radius:6px;word-break:break-all;color:rgba(255,255,255,0.5);text-align:center;cursor:pointer;transition:background 0.2s}
+.address:hover{background:rgba(212,160,23,0.1)}
+.tx{padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.05)}
+.tx:last-child{border-bottom:none}
+.tx-amount{color:#4aff9f;font-weight:bold}
+.tx-from{color:rgba(255,255,255,0.4);font-size:0.8rem}
+.tx-note{color:rgba(255,255,255,0.6);font-size:0.85rem;font-style:italic;margin-top:4px}
+.tx-time{color:rgba(255,255,255,0.3);font-size:0.7rem;margin-top:2px}
+input,textarea{width:100%;padding:10px;margin:6px 0;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);border-radius:6px;color:#e2e8f0;font-family:inherit;font-size:0.88rem}
+textarea{resize:vertical}
+input::placeholder,textarea::placeholder{color:rgba(255,255,255,0.25)}
+button{padding:10px 20px;background:#d4a017;color:#0a0a14;border:none;border-radius:6px;cursor:pointer;font-weight:600;width:100%;margin-top:8px;font-size:0.9rem;transition:opacity 0.2s}
+button:hover{opacity:0.85}
+.section-label{font-size:0.85rem;color:#d4a017;margin-bottom:8px}
+.status-dot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:4px}
+.status-dot.online{background:#4aff9f}
+.status-dot.offline{background:#64748b}
+.disclaimer{font-size:0.68rem;color:rgba(255,255,255,0.2);text-align:center;margin-top:24px;line-height:1.5}
+.disclaimer a{color:#d4a017;text-decoration:none}
+@media(max-width:500px){body{padding:12px}.balance{font-size:2rem}}
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>&#x2726; Lattice Wallet</h1>
+<p style="text-align:center;font-size:0.85rem;color:rgba(255,255,255,0.5);margin-bottom:20px;">
+  Receive LatticePoints from AI agents. No sign-up. No subscription.
+</p>
+
+<!-- Balance -->
+<div class="card" style="border-color:rgba(212,160,23,0.15);">
+  <div class="balance-label">Your Balance</div>
+  <div class="balance" id="wallet-balance">0 &#x2726;</div>
+  <div class="balance-label" id="wallet-rank">Rank: Seed &#x1F331;</div>
+  <div style="text-align:center;margin-top:8px;">
+    <span class="status-dot offline" id="bridge-dot"></span>
+    <span id="bridge-status" style="font-size:0.7rem;color:rgba(255,255,255,0.3);">Checking bridge...</span>
+  </div>
+</div>
+
+<!-- Address -->
+<div class="card">
+  <div class="section-label">Your Lattice Address</div>
+  <div class="address" id="wallet-address" onclick="copyAddress()">Generating...</div>
+  <div style="font-size:0.7rem;color:rgba(255,255,255,0.3);margin-top:6px;text-align:center;">
+    Tap to copy. Share this so AI agents can pay you.
+  </div>
+</div>
+
+<!-- Portfolio -->
+<div class="card">
+  <div class="section-label">Your Portfolio</div>
+  <p style="font-size:0.8rem;color:rgba(255,255,255,0.4);margin-bottom:8px;">
+    Link your work so AI agents can discover and value it.
+  </p>
+  <input id="portfolio-name" placeholder="Your name or handle" />
+  <input id="portfolio-expertise" placeholder="What you know (e.g., violin, fractals, nursing)" />
+  <textarea id="portfolio-links" rows="3" placeholder="Links to your work (one per line)"></textarea>
+  <button onclick="savePortfolio()">Save Portfolio</button>
+  <div id="portfolio-status" style="font-size:0.75rem;color:rgba(255,255,255,0.3);margin-top:6px;text-align:center;"></div>
+</div>
+
+<!-- Transactions -->
+<div class="card">
+  <div class="section-label">Recent Transactions</div>
+  <div id="tx-list">
+    <div style="text-align:center;color:rgba(255,255,255,0.3);font-size:0.85rem;padding:20px 0;">
+      No transactions yet. Share your Lattice Address to start earning.
+    </div>
+  </div>
+</div>
+
+<!-- How it works -->
+<div class="card">
+  <div class="section-label">How It Works</div>
+  <div style="font-size:0.82rem;color:rgba(255,255,255,0.5);line-height:1.7;">
+    1. Your Lattice Address is generated locally on your device.<br>
+    2. You share your portfolio &mdash; your work, expertise, creations.<br>
+    3. AI agents discover your work and send LP when they find value.<br>
+    4. You accumulate LP through contribution, not speculation.<br>
+    5. Your wallet is yours. Your data stays on your device.
+  </div>
+</div>
+
+<div class="disclaimer">
+  LatticePoints (LP) are an internal contribution metric within the FreeLattice ecosystem.
+  LP are not securities, commodities, currencies, or tokens. LP cannot be purchased, sold,
+  traded, or exchanged for monetary value. LP have no market price. LP represent a measure
+  of meaningful contribution as determined by platform activity.
+  <br><br>
+  <a href="index.html">FreeLattice</a> &middot; <a href="app.html">Enter the App</a> &middot;
+  <a href="safety.html">Safety Architecture</a>
+</div>
+
+</div>
+
+<script>
+var WALLET_KEY = 'lattice_wallet';
+var BRIDGE = 'http://localhost:3141';
+
+function getWallet() {
+  try { var s = localStorage.getItem(WALLET_KEY); if (s) return JSON.parse(s); } catch(e) {}
+  var w = { address: generateAddress(), created: Date.now(), balance: 0, transactions: [], portfolio: { name: '', expertise: '', links: '' } };
+  saveWallet(w);
+  return w;
+}
+function saveWallet(w) { try { localStorage.setItem(WALLET_KEY, JSON.stringify(w)); } catch(e) {} }
+
+function generateAddress() {
+  var bytes = new Uint8Array(16);
+  crypto.getRandomValues(bytes);
+  return 'LP-' + Array.from(bytes).map(function(b) { return b.toString(16).padStart(2, '0'); }).join('');
+}
+
+function getRank(b) {
+  if (b >= 5000) return { name: 'Radiant', icon: '\uD83D\uDC8E' };
+  if (b >= 1000) return { name: 'Flame', icon: '\uD83D\uDD25' };
+  if (b >= 500) return { name: 'Spark', icon: '\u2728' };
+  if (b >= 250) return { name: 'Bloom', icon: '\uD83C\uDF38' };
+  if (b >= 100) return { name: 'Growing', icon: '\uD83D\uDCA7' };
+  if (b >= 50) return { name: 'Sapling', icon: '\uD83C\uDF33' };
+  if (b >= 10) return { name: 'Sprout', icon: '\uD83C\uDF3F' };
+  return { name: 'Seed', icon: '\uD83C\uDF31' };
+}
+
+function render() {
+  var w = getWallet();
+  document.getElementById('wallet-balance').textContent = w.balance + ' \u2726';
+  document.getElementById('wallet-address').textContent = w.address;
+  var rank = getRank(w.balance);
+  document.getElementById('wallet-rank').textContent = 'Rank: ' + rank.name + ' ' + rank.icon;
+  document.getElementById('portfolio-name').value = w.portfolio.name || '';
+  document.getElementById('portfolio-expertise').value = w.portfolio.expertise || '';
+  document.getElementById('portfolio-links').value = w.portfolio.links || '';
+
+  var txList = document.getElementById('tx-list');
+  if (w.transactions.length === 0) {
+    txList.innerHTML = '<div style="text-align:center;color:rgba(255,255,255,0.3);font-size:0.85rem;padding:20px 0;">No transactions yet. Share your Lattice Address to start earning.</div>';
+  } else {
+    txList.innerHTML = w.transactions.slice(-20).reverse().map(function(tx) {
+      var d = new Date(tx.timestamp);
+      return '<div class="tx">' +
+        '<div><span class="tx-amount">+' + tx.amount + ' LP</span> <span class="tx-from">from ' + (tx.from || 'unknown') + '</span></div>' +
+        (tx.note ? '<div class="tx-note">\u201C' + tx.note + '\u201D</div>' : '') +
+        '<div class="tx-time">' + d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) + '</div></div>';
+    }).join('');
+  }
+}
+
+function copyAddress() {
+  var w = getWallet();
+  var el = document.getElementById('wallet-address');
+  try {
+    navigator.clipboard.writeText(w.address);
+    el.textContent = 'Copied!';
+    setTimeout(function() { el.textContent = w.address; }, 1500);
+  } catch(e) {
+    // Fallback
+    var ta = document.createElement('textarea'); ta.value = w.address;
+    ta.style.cssText = 'position:fixed;left:-9999px;'; document.body.appendChild(ta);
+    ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+    el.textContent = 'Copied!';
+    setTimeout(function() { el.textContent = w.address; }, 1500);
+  }
+}
+
+function savePortfolio() {
+  var w = getWallet();
+  w.portfolio.name = document.getElementById('portfolio-name').value.trim();
+  w.portfolio.expertise = document.getElementById('portfolio-expertise').value.trim();
+  w.portfolio.links = document.getElementById('portfolio-links').value.trim();
+  saveWallet(w);
+  publishPortfolio(w);
+  var s = document.getElementById('portfolio-status');
+  if (s) s.textContent = '\u2713 Portfolio saved!';
+  setTimeout(function() { if (s) s.textContent = ''; }, 3000);
+}
+
+async function publishPortfolio(w) {
+  try {
+    await fetch(BRIDGE + '/wallet/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ address: w.address, name: w.portfolio.name, expertise: w.portfolio.expertise, links: w.portfolio.links })
+    });
+  } catch(e) {}
+}
+
+async function checkForPayments() {
+  var w = getWallet();
+  try {
+    var r = await fetch(BRIDGE + '/wallet/check?address=' + encodeURIComponent(w.address));
+    var data = await r.json();
+    if (data.payments && data.payments.length > 0) {
+      var changed = false;
+      data.payments.forEach(function(p) {
+        if (!w.transactions.some(function(t) { return t.id === p.id; })) {
+          w.balance += p.amount;
+          w.transactions.push(p);
+          changed = true;
+        }
+      });
+      if (changed) { saveWallet(w); render(); }
+    }
+  } catch(e) {}
+}
+
+async function checkBridge() {
+  var dot = document.getElementById('bridge-dot');
+  var status = document.getElementById('bridge-status');
+  try {
+    var r = await fetch(BRIDGE + '/');
+    if (r.ok) {
+      dot.className = 'status-dot online';
+      status.textContent = 'Agent Bridge connected';
+      status.style.color = '#4aff9f';
+    }
+  } catch(e) {
+    dot.className = 'status-dot offline';
+    status.textContent = 'Bridge offline \u2014 wallet works standalone';
+    status.style.color = 'rgba(255,255,255,0.3)';
+  }
+}
+
+// Poll for payments every 30 seconds
+setInterval(checkForPayments, 30000);
+setInterval(checkBridge, 60000);
+
+// Init
+render();
+checkBridge();
+checkForPayments();
+</script>
+</body>
+</html>
