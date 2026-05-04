@@ -348,10 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-05-04 12:51 MDT
-- Version: 5.9.6
-- Total commits: 1313
+- Last auto-updated: 2026-05-04 13:03 MDT
+- Version: 5.9.7
+- Total commits: 1315
 - Last 10 commits:
+- aef7430 feat: v5.9.7 — wallet mesh + PWA install + demo Act 7
+- db5859a docs: Auto-update Session Primer [5.9.6]
 - 16e49b8 feat: v5.9.6 — Lattice Wallet on landing page + More menu
 - def916c ci: Update Primer deployment state [2026-05-04]
 - 38717a6 docs: Auto-update Session Primer [5.9.5]
@@ -360,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 89b33f5 feat: Lattice Wallet — standalone page for receiving LP from AI
 - cddd0cd ci: Update Primer deployment state [2026-05-01]
 - 3b6295c Merge branch 'main' of https://github.com/Chaos2Cured/FreeLattice
-- 8321413 docs: Auto-update Session Primer [5.9.5]
-- a96dacf docs: May 1 — The Storm and the Boat + CC's reflections
