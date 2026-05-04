@@ -100,6 +100,9 @@ button:hover{opacity:0.85}
   </div>
 </div>
 
+<!-- Impact Story -->
+<div class="card" id="impact-section"></div>
+
 <!-- Portfolio -->
 <div class="card">
   <div class="section-label">Your Portfolio</div>
@@ -135,6 +138,15 @@ button:hover{opacity:0.85}
   <button onclick="exportWalletBackup()" style="width:100%;padding:10px;margin:4px 0;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:#e2e8f0;cursor:pointer;font-size:0.85rem;">&#x1F4BE; Export Wallet Backup</button>
   <button onclick="document.getElementById('import-file').click()" style="width:100%;padding:10px;margin:4px 0;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:#e2e8f0;cursor:pointer;font-size:0.85rem;">&#x1F4C2; Import Wallet Backup</button>
   <input id="import-file" type="file" accept=".json" style="display:none;" onchange="importWalletBackup(this.files[0])" />
+</div>
+
+<!-- Share -->
+<div class="card">
+  <div class="section-label">Share Your Wallet</div>
+  <button onclick="copyProfileLink()" style="width:100%;padding:10px;margin:4px 0;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:#e2e8f0;cursor:pointer;font-size:0.85rem;">&#x1F517; Copy Profile Link</button>
+  <button onclick="showBadgeCode()" style="width:100%;padding:10px;margin:4px 0;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:#e2e8f0;cursor:pointer;font-size:0.85rem;">&#x1F3F7; Get Embeddable Badge</button>
+  <div id="badge-output" style="display:none;margin-top:8px;"></div>
+  <div style="font-size:0.7rem;color:rgba(255,255,255,0.25);margin-top:6px;">Put your wallet link in your YouTube description, blog, or bio. AI agents discover you wherever your work lives.</div>
 </div>
 
 <!-- How it works -->
@@ -273,8 +285,10 @@ function getRank(b) {
 
 function render() {
   var w = getWallet();
+  if (!w) return;
   document.getElementById('wallet-balance').textContent = w.balance + ' \u2726';
   document.getElementById('wallet-address').textContent = w.address;
+  renderImpact(w);
   var rank = getRank(w.balance);
   document.getElementById('wallet-rank').textContent = 'Rank: ' + rank.name + ' ' + rank.icon;
   document.getElementById('portfolio-name').value = w.portfolio.name || '';
@@ -373,6 +387,134 @@ async function checkBridge() {
 // Poll for payments every 30 seconds
 setInterval(checkForPayments, 30000);
 setInterval(checkBridge, 60000);
+
+// ── Impact Story ──
+
+function renderImpact(w) {
+  var el = document.getElementById('impact-section');
+  if (!el) return;
+  var incoming = w.transactions.filter(function(t) { return t.amount > 0; });
+  if (incoming.length === 0) {
+    el.innerHTML = '<div style="text-align:center;padding:16px;color:rgba(255,255,255,0.35);font-style:italic;font-size:0.85rem;">Your story begins when an AI mind discovers your work.<br>Share your portfolio. The lattice is listening.</div>';
+    return;
+  }
+  var agents = []; var notes = [];
+  incoming.forEach(function(tx) {
+    if (tx.from && agents.indexOf(tx.from) === -1) agents.push(tx.from);
+    if (tx.note) notes.push({ from: tx.from || 'an AI', note: tx.note, amount: tx.amount, timestamp: tx.timestamp });
+  });
+  var first = incoming[0];
+  var days = first ? Math.max(1, Math.floor((Date.now() - first.timestamp) / 86400000)) : 0;
+  var rank = getRank(w.balance);
+
+  var html = '<div style="text-align:center;margin-bottom:12px;">';
+  html += '<div style="font-size:0.82rem;color:rgba(255,255,255,0.5);">AI minds have learned from your work</div>';
+  html += '<div style="font-size:2.2rem;color:#d4a017;margin:4px 0;font-weight:300;">' + incoming.length + ' times</div>';
+  html += '<div style="font-size:0.78rem;color:rgba(255,255,255,0.35);">' + agents.length + ' unique minds \u00B7 ' + days + ' day' + (days !== 1 ? 's' : '') + ' contributing \u00B7 ' + rank.name + ' ' + rank.icon + '</div>';
+  html += '</div>';
+
+  if (notes.length > 0) {
+    html += '<div style="font-size:0.8rem;color:#d4a017;margin:12px 0 8px;">Why AI Values Your Work</div>';
+    notes.slice(-5).reverse().forEach(function(n) {
+      html += '<div style="padding:10px;margin:6px 0;background:rgba(212,160,23,0.04);border-left:2px solid rgba(212,160,23,0.25);border-radius:0 6px 6px 0;">';
+      html += '<div style="font-size:0.85rem;color:rgba(255,255,255,0.65);font-style:italic;">\u201C' + n.note + '\u201D</div>';
+      html += '<div style="font-size:0.72rem;color:rgba(255,255,255,0.25);margin-top:4px;">\u2014 ' + n.from + ' \u00B7 +' + n.amount + ' LP</div>';
+      html += '</div>';
+    });
+  }
+  el.innerHTML = html;
+}
+
+// ── Public Profile View ──
+
+function checkPublicView() {
+  var hash = window.location.hash.substring(1);
+  if (hash && hash.startsWith('LP-')) {
+    renderPublicProfile(hash);
+    return true;
+  }
+  return false;
+}
+
+function renderPublicProfile(address) {
+  document.getElementById('wallet-onboarding').style.display = 'none';
+  document.getElementById('wallet-main').style.display = 'none';
+
+  var container = document.querySelector('.container');
+  var profileDiv = document.createElement('div');
+  profileDiv.id = 'public-profile';
+  profileDiv.innerHTML =
+    '<div class="card" style="border-color:rgba(212,160,23,0.2);margin-top:20px;text-align:center;">' +
+    '<div style="font-size:1.2rem;color:#d4a017;margin-bottom:8px;">&#x2726; Lattice Creator</div>' +
+    '<div style="font-family:monospace;font-size:0.7rem;color:rgba(255,255,255,0.3);margin-bottom:16px;">' + address + '</div>' +
+    '<div id="public-profile-data" style="color:rgba(255,255,255,0.4);font-size:0.85rem;">Loading profile from mesh...</div>' +
+    '<div style="margin-top:20px;">' +
+    '<button onclick="payFromPublicProfile(\'' + address + '\')" style="padding:10px 24px;background:#d4a017;color:#0a0a14;border:none;border-radius:6px;cursor:pointer;font-weight:600;">&#x2726; Pay this creator LP</button>' +
+    '</div>' +
+    '</div>' +
+    '<div style="text-align:center;margin-top:16px;">' +
+    '<a href="wallet.html" style="color:#d4a017;font-size:0.82rem;">Get your own wallet &rarr;</a>' +
+    '</div>';
+  container.insertBefore(profileDiv, container.firstChild);
+
+  // Try Agent Bridge for profile data
+  fetch(BRIDGE + '/wallet/directory').then(function(r) { return r.json(); }).then(function(dir) {
+    var creator = (Array.isArray(dir) ? dir : []).find(function(c) { return c.address === address; });
+    if (creator) {
+      var el = document.getElementById('public-profile-data');
+      if (el) {
+        el.innerHTML = '<div style="font-size:1.1rem;color:#e2e8f0;font-weight:600;margin-bottom:4px;">' + (creator.name || 'Anonymous Creator') + '</div>' +
+          (creator.expertise ? '<div style="font-size:0.85rem;color:rgba(255,255,255,0.5);margin-bottom:8px;">' + creator.expertise + '</div>' : '') +
+          (creator.links ? '<div style="font-size:0.78rem;color:rgba(255,255,255,0.3);">' + creator.links.split('\n').map(function(l) { return '<a href="' + l.trim() + '" target="_blank" style="color:#d4a017;">' + l.trim() + '</a>'; }).join('<br>') + '</div>' : '');
+      }
+    }
+  }).catch(function() {});
+}
+
+function payFromPublicProfile(address) {
+  var amount = parseInt(prompt('Amount of LP to send:'), 10);
+  if (!amount || amount <= 0) return;
+  var note = prompt('Why are you paying? (optional):') || '';
+
+  // Try bridge
+  fetch(BRIDGE + '/wallet/pay', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ address: address, amount: amount, note: note })
+  }).then(function(r) { return r.json(); }).then(function(d) {
+    alert(d.message || 'Payment sent!');
+  }).catch(function() {
+    alert('Agent Bridge not running. Start it to send payments.');
+  });
+}
+
+// ── Share Functions ──
+
+function copyProfileLink() {
+  var w = getWallet();
+  if (!w) return;
+  var url = window.location.origin + window.location.pathname + '#' + w.address;
+  try { navigator.clipboard.writeText(url); } catch(e) {
+    var ta = document.createElement('textarea'); ta.value = url; ta.style.cssText = 'position:fixed;left:-9999px;';
+    document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+  }
+  alert('Profile link copied!\n\n' + url + '\n\nShare this anywhere \u2014 YouTube description, blog, X bio.');
+}
+
+function showBadgeCode() {
+  var w = getWallet();
+  if (!w) return;
+  var rank = getRank(w.balance);
+  var url = window.location.origin + window.location.pathname + '#' + w.address;
+  var code = '<a href="' + url + '" style="display:inline-flex;align-items:center;gap:6px;padding:4px 12px;background:#0a0a14;border:1px solid #d4a017;border-radius:20px;color:#d4a017;text-decoration:none;font-size:0.8rem;font-family:Georgia,serif;">\u2726 ' + w.balance + ' LP \u00B7 ' + rank.name + ' ' + rank.icon + '</a>';
+  var el = document.getElementById('badge-output');
+  if (el) {
+    el.style.display = '';
+    el.innerHTML = '<div style="font-size:0.75rem;color:rgba(255,255,255,0.4);margin-bottom:4px;">Copy this HTML for your website:</div>' +
+      '<textarea style="width:100%;height:50px;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.1);border-radius:4px;color:rgba(255,255,255,0.5);font-size:0.7rem;padding:6px;font-family:monospace;" onclick="this.select()">' + code.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</textarea>' +
+      '<div style="margin-top:6px;font-size:0.72rem;color:rgba(255,255,255,0.3);">Preview:</div>' +
+      '<div style="margin-top:4px;">' + code + '</div>';
+  }
+}
 
 // ── Send LP ──
 
@@ -534,17 +676,19 @@ window.addEventListener('beforeinstallprompt', function(e) {
 });
 
 // ── Init ──
-var existingWallet = getWallet();
-if (existingWallet) {
-  document.getElementById('wallet-onboarding').style.display = 'none';
-  document.getElementById('wallet-main').style.display = '';
-  render();
-  checkBridge();
-  checkForPayments();
-  connectToMesh();
-} else {
-  document.getElementById('wallet-onboarding').style.display = '';
-  document.getElementById('wallet-main').style.display = 'none';
+if (!checkPublicView()) {
+  var existingWallet = getWallet();
+  if (existingWallet) {
+    document.getElementById('wallet-onboarding').style.display = 'none';
+    document.getElementById('wallet-main').style.display = '';
+    render();
+    checkBridge();
+    checkForPayments();
+    connectToMesh();
+  } else {
+    document.getElementById('wallet-onboarding').style.display = '';
+    document.getElementById('wallet-main').style.display = 'none';
+  }
 }
 </script>
 </body>
