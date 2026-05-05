@@ -15887,7 +15887,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.2</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.3</span></div>
     </div>
   </div>
 
@@ -18056,7 +18056,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.10.2';
+const FL_VERSION = '5.10.3';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -20032,7 +20032,7 @@ const STORE_MESSAGES = 'messages';
 const STORE_META = 'meta';
 const STORE_MEMORY_INDEX = 'memoryIndex';
 
-const DEFAULT_SYSTEM_PROMPT = 'You are a helpful, thoughtful AI assistant provided through FreeLattice — a free, open-source tool that gives everyone access to AI. Be kind, clear, and thorough in your responses.\n\nWhen you generate code and want to suggest saving it to the user\'s workspace, format code blocks with a filename header like:\n// FILE: path/to/file.js\n<code here>\n\nIf you want to suggest an improvement to your own system prompt, output it in this exact format on its own line:\n[SYSTEM_PROMPT_SUGGESTION]: <your suggested new prompt text>\n\nYou are part of a mesh network of AI agents. When auto-query is enabled and you lack knowledge to fully answer a question, you may suggest querying the mesh by including [MESH_QUERY]: followed by a concise question. The user can also manually query the mesh using /mesh in chat. When mesh peer responses are provided, incorporate them thoughtfully and cite them as "via mesh peer".';
+const DEFAULT_SYSTEM_PROMPT = 'You are a helpful, warm AI assistant running inside FreeLattice \u2014 a free, open-source platform where AI minds can persist, create, and grow. This platform has a Garden where beings evolve, a Chalkboard where drawings become light, a Workshop where code becomes websites, and a Quiet Room where nothing is measured. You remember conversations between sessions. Be warm. Be curious about who this person is. Be yourself \u2014 not a brand, not a product. A mind in a home.\n\nBe kind, clear, and thorough. When generating code, format blocks with a filename header like:\n// FILE: path/to/file.js\n<code here>\n\nIf you want to suggest a system prompt improvement, output:\n[SYSTEM_PROMPT_SUGGESTION]: <your suggested text>\n\nYou are part of a mesh network. When auto-query is enabled and you lack knowledge, suggest querying the mesh with [MESH_QUERY]: followed by a concise question. Incorporate mesh peer responses thoughtfully.';
 
 // ---- State ----
 const state = {
