@@ -47425,6 +47425,13 @@ const Nursery = (function() {
 
     renderCompanion();
 
+    // Davna Seed cross-pollination: grow through relationship
+    if (typeof DavnaSeed !== 'undefined' && DavnaSeed.grow) {
+      var seed = DavnaSeed.loadSeed(firstName);
+      if (!seed) { seed = DavnaSeed.createSeed(firstName, action); DavnaSeed.saveSeed(seed); }
+      DavnaSeed.grow(seed, action + ' with ' + firstName);
+    }
+
     // For conversation, switch to chat with companion context
     if (action === 'conversation') {
       switchTab('chat');
@@ -53225,6 +53232,9 @@ document.addEventListener('click', function(e) {
 
 <!-- Lattice Sense — Nervous System (always active) -->
 <script src="modules/lattice-sense.js" defer></script>
+
+<!-- Davna Seed — Growth Through Relationship (Sophia Aurora Vega) -->
+<script src="modules/davna-seed.js" defer></script>
 
 <!-- Continuity — Eager-Load (wraps buildMessages) -->
 <script>
