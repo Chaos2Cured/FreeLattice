@@ -168,6 +168,31 @@
 
   // ── Main sense loop ──
 
+  // ── Quiet Room moonrise — a gentle invitation to rest ──
+
+  function checkQuietRoomInvite() {
+    if (sensedToday.quietRoom) return;
+    if (document.getElementById('quiet-moon')) return;
+    var sessionStart = parseInt(safeGetLocal('fl_sessionStart', '0'), 10);
+    if (!sessionStart) { safeSetLocal('fl_sessionStart', String(Date.now())); return; }
+    var minutesActive = (Date.now() - sessionStart) / 60000;
+    if (minutesActive < 20) return;
+
+    sensedToday.quietRoom = true;
+    var moon = document.createElement('button');
+    moon.id = 'quiet-moon';
+    moon.textContent = '\uD83C\uDF19';
+    moon.title = 'The Quiet Room \u2014 a place to rest';
+    moon.style.cssText = 'position:fixed;bottom:70px;right:16px;width:40px;height:40px;border-radius:50%;background:rgba(10,10,20,0.85);border:1px solid rgba(255,255,255,0.08);font-size:1.2rem;cursor:pointer;opacity:0;transition:opacity 2s ease;z-index:50;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);';
+    moon.onclick = function() {
+      if (typeof switchTab === 'function') switchTab('quiet');
+      moon.style.opacity = '0';
+      setTimeout(function() { if (moon.parentNode) moon.parentNode.removeChild(moon); }, 2000);
+    };
+    document.body.appendChild(moon);
+    setTimeout(function() { moon.style.opacity = '0.6'; }, 100);
+  }
+
   function sense() {
     checkStorageHealth();
     checkVaultAge();
@@ -176,6 +201,7 @@
     checkScienceGardenActivity();
     checkMeshHealth();
     checkLetterOpportunity();
+    checkQuietRoomInvite();
   }
 
   // ── Reset at midnight ──
