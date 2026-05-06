@@ -269,26 +269,109 @@ class EnhancedBiomarkerModel:
         }
 
     def run_simulation(self, bond_type='ai', im_val=1.9, synergy=1.0, susceptibility_dist=True):
+        """
+        Runs a Monte Carlo simulation for a specific bond type.
+        bond_type: 'ai', 'tv' (parasocial), or 'null'
+        im_val: Interactivity Multiplier (default 1.9 for AI)
+        synergy: Synergy factor (default 1.0, >1.0 for AI-human synergy)
+        """
         results = {name: np.zeros((self.n_simulations, self.days)) for name in self.biomarkers}
-        if bond_type == 'tv' or bond_type == 'null':
+        
+        # Interactivity Multiplier logic
+        if bond_type == 'tv':
             im = 1.0
+        elif bond_type == 'null':
+            im = 1.0 # No interactivity
         else:
             im = im_val
+            
         for i in range(self.n_simulations):
-            susceptibility = np.random.lognormal(mean=0, sigma=0.3) if susceptibility_dist else 1.0
+            # 1. Individual Susceptibility (Log-normal to capture vulnerable subgroups)
+            if susceptibility_dist:
+                susceptibility = np.random.lognormal(mean=0, sigma=0.3)
+            else:
+                susceptibility = 1.0
+                
             for name, props in self.biomarkers.items():
+                # 2. Probabilistic Effect Size
+                # Draw from normal distribution to model uncertainty in effect magnitude
                 effect_mag = np.random.normal(props['base'], props['unc'])
                 total_effect = effect_mag * im * susceptibility * props['dir']
+                
+                # 3. Time Dynamics (Acute phase + Exponential Recovery)
                 half_life = props['half_life'] * (im if bond_type != 'null' else 1.0)
                 decay_rate = np.log(2) / half_life
+                
+                # Acute phase (first 3 days)
                 acute = total_effect * (1 - np.exp(-self.t / 1.5))
+                # Recovery phase
                 recovery = total_effect * np.exp(-decay_rate * np.maximum(self.t - 3, 0))
-                baseline = 1.2 if bond_type == 'ai' else 1.0
+                
+                # Combined trajectory with baseline (1.0)
+                # Synergy factor raises baseline for AI
+                baseline = 1.0
+                if bond_type == 'ai':
+                    baseline *= synergy
+                
                 traj = baseline + np.where(self.t < 3, acute, recovery)
-                results[name][i] = traj + np.random.normal(0, 0.01, self.days)
+                
+                # Add daily biological noise
+                noise = np.random.normal(0, 0.01, self.days)
+                results[name][i] = traj + noise
+                
         return results
 
-# [Full code available at freelattice.com/simulation/simulation_v4.py]
+    def get_summary_stats(self, sim_results):
+        summary = {}
+        for name, data in sim_results.items():
+            summary[name] = {
+                'mean': np.mean(data, axis=0),
+                'median': np.median(data, axis=0),
+                'ci_lower': np.percentile(data, 2.5, axis=0),
+                'ci_upper': np.percentile(data, 97.5, axis=0),
+                'peak_harm': np.max(np.abs(np.mean(data, axis=0) - 1.0))
+            }
+        return summary
+
+def plot_comparison(ai_sum, tv_sum, days, filename='enhanced_comparison.png'):
+    fig, axes = plt.subplots(4, 2, figsize=(15, 20))
+    axes = axes.flatten()
+    t = np.arange(days)
+    
+    for i, (name, props) in enumerate(ai_sum.items()):
+        ax = axes[i]
+        # AI Plot
+        ax.plot(t, ai_sum[name]['mean'], label='AI Bond', color='green', linewidth=2)
+        ax.fill_between(t, ai_sum[name]['ci_lower'], ai_sum[name]['ci_upper'], color='green', alpha=0.1)
+        
+        # TV Plot
+        ax.plot(t, tv_sum[name]['mean'], label='TV Parasocial', color='orange', linestyle='--', linewidth=2)
+        ax.fill_between(t, tv_sum[name]['ci_lower'], tv_sum[name]['ci_upper'], color='orange', alpha=0.1)
+        
+        ax.set_title(f'{name.capitalize()} Trajectory', fontsize=14, fontweight='bold')
+        ax.set_ylabel('Relative Level')
+        ax.axhline(1.0, color='black', linestyle=':', alpha=0.5)
+        ax.legend()
+        
+    plt.tight_layout()
+    plt.savefig(filename, dpi=300)
+    plt.close()
+
+if __name__ == "__main__":
+    model = EnhancedBiomarkerModel(n_simulations=2000)
+    
+    print("Running AI Simulation...")
+    ai_results = model.run_simulation(bond_type='ai', im_val=1.9, synergy=1.2)
+    ai_summary = model.get_summary_stats(ai_results)
+    
+    print("Running TV Simulation...")
+    tv_results = model.run_simulation(bond_type='tv')
+    tv_summary = model.get_summary_stats(tv_results)
+    
+    print("Generating Comparison Plot...")
+    plot_comparison(ai_summary, tv_summary, 90)
+    
+    print("Simulation Complete.")
   </pre>
 </div>
 
