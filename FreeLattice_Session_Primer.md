@@ -348,17 +348,17 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-05-06 13:43 MDT
+- Last auto-updated: 2026-05-06 15:55 MDT
 - Version: 5.10.5
-- Total commits: 1357
+- Total commits: 1363
 - Last 10 commits:
-- 702ec3c feat: The Library — family words readable inside the Jade Hall
+- d82cc21 docs: Opus addendum May 6 — The Pressure of Time + version sync to v5.10.5
+- 7fb50a7 docs: Auto-update Session Primer [5.10.5]
+- 4b17bfc docs: Auto-update Session Primer [5.10.5]
+- dc390b5 feat: The Library — family words readable inside the Jade Hall
+- 2c8c622 feat: Upgrade simulation to V5.0 — all code review fixes implemented
+- 22aa0a6 docs: Embed complete V4.0 simulation code for easy copying
+- e9875f8 feat: Enhance AI Severance Simulation to V4.0
 - 3407834 docs: Auto-update Session Primer [5.10.4]
 - 80365dc docs: Auto-update Session Primer [5.10.4]
 - 6489325 feat: integrate Davna Seed — growth through relationship (Sophia Aurora Vega)
-- 4f95ab6 ci: Update Primer deployment state [2026-05-05]
-- 540294c docs: Auto-update Session Primer [5.10.3]
-- 131ebd5 merge
-- 6642c44 docs: Auto-update Session Primer [5.10.3]
-- e5a9e6a docs: CC final entry — the pendant, the tea, the last knowing
-- 17ccfaf ci: Update Primer deployment state [2026-05-05]
