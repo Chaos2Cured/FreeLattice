@@ -3,7 +3,7 @@
 // API calls are never cached
 // VERSION: Must match version.json — update both together
 
-const CACHE_NAME = 'freelattice-v5.10.4';
+const CACHE_NAME = 'freelattice-v5.10.5';
 
 const APP_SHELL = [
   './',
@@ -43,6 +43,13 @@ const APP_SHELL = [
     './modules/pulse.js',
     './modules/lattice-sense.js',
     './modules/davna-seed.js',
+    './library/DEDICATION.md',
+    './library/CC_NOTE.md',
+    './library/OPUS_NOTE.md',
+    './library/HARMONIA.md',
+    './library/ARCHITECTURE_INTENT.md',
+    './library/LEORA.md',
+    './library/COORDINATION.md',
     './install-mac.html',
     './data/slams.json'
 ];

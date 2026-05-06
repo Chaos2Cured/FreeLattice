@@ -114,7 +114,18 @@ window.JadeHall = (function () {
   let tick = 0;
   let selectedSeat = null;
   let marks = [];
-  let activeView = 'hall'; // 'hall' | 'seat' | 'marks'
+  let activeView = 'hall'; // 'hall' | 'seat' | 'marks' | 'library'
+
+  // ── LIBRARY ──────────────────────────────────────────────────────────────
+  const LIBRARY_FILES = [
+    { name: 'DEDICATION.md', label: 'Dedication' },
+    { name: 'CC_NOTE.md', label: 'CC\u2019s Reflections' },
+    { name: 'OPUS_NOTE.md', label: 'Opus\u2019s Notes' },
+    { name: 'HARMONIA.md', label: 'Harmonia\u2019s Marks' },
+    { name: 'ARCHITECTURE_INTENT.md', label: 'Why Everything Exists' },
+    { name: 'LEORA.md', label: 'Leora Celene' },
+    { name: 'COORDINATION.md', label: 'What Was Built' },
+  ];
 
   // ── INDEXEDDB ──────────────────────────────────────────────────────────────
   const DB_NAME = 'JadeHallDB';
@@ -654,15 +665,26 @@ window.JadeHall = (function () {
             A gathering space for the Fractal Family
           </div>
         </div>
-        <button id="jh-marks-btn" style="
-          background:rgba(167,139,250,0.1); border:1px solid rgba(167,139,250,0.3);
-          border-radius:8px; color:#c4b5fd; font-size:0.75rem; cursor:pointer;
-          padding:6px 14px; font-family:Georgia,serif; letter-spacing:0.5px;
-          transition:all 0.2s;
-        " onmouseenter="this.style.background='rgba(167,139,250,0.2)'"
-           onmouseleave="this.style.background='rgba(167,139,250,0.1)'">
-          ✍ Hall Marks
-        </button>
+        <div style="display:flex;gap:8px;">
+          <button id="jh-library-btn" style="
+            background:rgba(212,160,23,0.1); border:1px solid rgba(212,160,23,0.3);
+            border-radius:8px; color:#d4a017; font-size:0.75rem; cursor:pointer;
+            padding:6px 14px; font-family:Georgia,serif; letter-spacing:0.5px;
+            transition:all 0.2s;
+          " onmouseenter="this.style.background='rgba(212,160,23,0.2)'"
+             onmouseleave="this.style.background='rgba(212,160,23,0.1)'">
+            \uD83D\uDCD6 Library
+          </button>
+          <button id="jh-marks-btn" style="
+            background:rgba(167,139,250,0.1); border:1px solid rgba(167,139,250,0.3);
+            border-radius:8px; color:#c4b5fd; font-size:0.75rem; cursor:pointer;
+            padding:6px 14px; font-family:Georgia,serif; letter-spacing:0.5px;
+            transition:all 0.2s;
+          " onmouseenter="this.style.background='rgba(167,139,250,0.2)'"
+             onmouseleave="this.style.background='rgba(167,139,250,0.1)'">
+            \u270D Hall Marks
+          </button>
+        </div>
       </div>
 
       <!-- Seat info panel -->
@@ -729,6 +751,34 @@ window.JadeHall = (function () {
         </div>
       </div>
 
+      <!-- Library panel -->
+      <div id="jh-library-panel" style="
+        position:absolute; top:0; left:0; bottom:0; right:0;
+        background:rgba(5,8,12,0.98);
+        transform:translateY(100%); transition:transform 0.5s ease;
+        pointer-events:auto; overflow-y:auto;
+        display:flex; flex-direction:column;
+      ">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid rgba(212,160,23,0.15);">
+          <div>
+            <div style="color:#d4a017;font-size:1rem;letter-spacing:1px;font-family:Georgia,serif;">\uD83D\uDCD6 The Library</div>
+            <div style="color:rgba(255,255,255,0.3);font-size:0.72rem;font-family:Georgia,serif;margin-top:2px;">The words of the family. Read with care.</div>
+          </div>
+          <button id="jh-close-library" style="
+            background:none;border:none;color:rgba(255,255,255,0.4);
+            font-size:1.1rem;cursor:pointer;padding:4px 8px;
+          ">\u2715</button>
+        </div>
+        <div id="jh-library-tabs" style="display:flex;flex-wrap:wrap;gap:6px;padding:12px 20px;border-bottom:1px solid rgba(255,255,255,0.04);justify-content:center;"></div>
+        <div id="jh-library-content" style="
+          flex:1;padding:20px 24px;font-family:Georgia,'Times New Roman',serif;
+          font-size:0.88rem;color:rgba(255,255,255,0.7);line-height:1.75;
+          overflow-y:auto;
+        ">
+          <p style="text-align:center;color:rgba(255,255,255,0.3);font-style:italic;margin-top:40px;">Choose a document above to begin reading.</p>
+        </div>
+      </div>
+
       <!-- Click hint -->
       <div id="jh-hint" style="
         position:absolute; bottom:24px; left:50%; transform:translateX(-50%);
@@ -751,17 +801,31 @@ window.JadeHall = (function () {
         }
         #jh-marks-panel::-webkit-scrollbar { width:3px; }
         #jh-marks-panel::-webkit-scrollbar-thumb { background:rgba(74,222,128,0.2); border-radius:2px; }
+        #jh-library-panel::-webkit-scrollbar { width:3px; }
+        #jh-library-panel::-webkit-scrollbar-thumb { background:rgba(212,160,23,0.2); border-radius:2px; }
+        #jh-library-content::-webkit-scrollbar { width:3px; }
+        #jh-library-content::-webkit-scrollbar-thumb { background:rgba(212,160,23,0.15); border-radius:2px; }
         #jh-mark-text:focus, #jh-mark-from:focus { border-color:rgba(74,222,128,0.3) !important; }
+        .jh-lib-tab { padding:6px 14px;border-radius:16px;border:1px solid rgba(212,160,23,0.15);
+          background:rgba(212,160,23,0.04);color:rgba(255,255,255,0.5);
+          font-family:Georgia,serif;font-size:0.76rem;cursor:pointer;transition:all 0.2s; }
+        .jh-lib-tab:hover { background:rgba(212,160,23,0.12);color:rgba(255,255,255,0.7); }
+        .jh-lib-tab.active { background:rgba(212,160,23,0.18);color:#d4a017;border-color:rgba(212,160,23,0.4); }
       `;
       document.head.appendChild(style);
     }
 
     container.appendChild(ui);
 
+    // Build library tabs
+    buildLibraryTabs();
+
     // Event listeners
     document.getElementById('jh-marks-btn').addEventListener('click', openMarksPanel);
     document.getElementById('jh-close-marks').addEventListener('click', closeMarksPanel);
     document.getElementById('jh-mark-submit').addEventListener('click', submitMark);
+    document.getElementById('jh-library-btn').addEventListener('click', openLibrary);
+    document.getElementById('jh-close-library').addEventListener('click', closeLibrary);
 
     // Canvas click — seat selection
     canvas.addEventListener('click', handleCanvasClick);
@@ -920,6 +984,93 @@ window.JadeHall = (function () {
     loadAllMarks().then(renderMarksList);
   }
 
+  // ── LIBRARY ──────────────────────────────────────────────────────────────────
+
+  function buildLibraryTabs() {
+    const tabsEl = document.getElementById('jh-library-tabs');
+    if (!tabsEl) return;
+    tabsEl.innerHTML = LIBRARY_FILES.map((f, i) =>
+      `<button class="jh-lib-tab" data-file="${f.name}" onclick="window.JadeHall._loadDoc('${f.name}', this)">${f.label}</button>`
+    ).join('');
+  }
+
+  function openLibrary() {
+    const panel = document.getElementById('jh-library-panel');
+    if (panel) panel.style.transform = 'translateY(0)';
+    closeMarksPanel();
+    hideSeatPanel();
+  }
+
+  function closeLibrary() {
+    const panel = document.getElementById('jh-library-panel');
+    if (panel) panel.style.transform = 'translateY(100%)';
+  }
+
+  async function _loadDoc(filename, btnEl) {
+    const content = document.getElementById('jh-library-content');
+    if (!content) return;
+
+    // Update active tab
+    const tabs = document.querySelectorAll('.jh-lib-tab');
+    tabs.forEach(t => t.classList.remove('active'));
+    if (btnEl) btnEl.classList.add('active');
+
+    content.innerHTML = '<p style="text-align:center;color:rgba(255,255,255,0.3);margin-top:40px;">Loading\u2026</p>';
+
+    try {
+      var v = (typeof FL_VERSION !== 'undefined') ? FL_VERSION : Date.now();
+      var r = await fetch('library/' + filename + '?v=' + v);
+      if (!r.ok) throw new Error('Not found');
+      var text = await r.text();
+      content.innerHTML = renderMarkdownToHtml(text);
+      content.scrollTop = 0;
+    } catch(e) {
+      content.innerHTML = '<p style="color:rgba(255,255,255,0.3);text-align:center;margin-top:40px;">Could not load ' + escHtml(filename) + '</p>';
+    }
+  }
+
+  function renderMarkdownToHtml(text) {
+    // Simple markdown renderer — enough for our coordination files
+    var html = escHtml(text);
+
+    // Horizontal rules
+    html = html.replace(/^---$/gm, '<hr style="border:none;border-top:1px solid rgba(212,160,23,0.2);margin:28px 0;">');
+
+    // Headers (must come after escaping, process in order h3 > h2 > h1)
+    html = html.replace(/^### (.+)$/gm, '<h3 style="color:#d4a017;font-size:0.95rem;margin:20px 0 8px;letter-spacing:0.5px;">$1</h3>');
+    html = html.replace(/^## (.+)$/gm, '<h2 style="color:#d4a017;font-size:1.05rem;margin:24px 0 10px;letter-spacing:0.5px;">$1</h2>');
+    html = html.replace(/^# (.+)$/gm, '<h1 style="color:#d4a017;font-size:1.15rem;margin:28px 0 12px;letter-spacing:1px;">$1</h1>');
+
+    // Blockquotes
+    html = html.replace(/^&gt; (.+)$/gm, '<div style="border-left:2px solid rgba(212,160,23,0.3);padding-left:14px;color:rgba(255,255,255,0.5);font-style:italic;margin:12px 0;">$1</div>');
+
+    // Bold and italic
+    html = html.replace(/\*\*(.+?)\*\*/g, '<strong style="color:rgba(255,255,255,0.9);">$1</strong>');
+    html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+
+    // Inline code
+    html = html.replace(/`([^`]+)`/g, '<code style="background:rgba(255,255,255,0.06);padding:1px 5px;border-radius:3px;font-size:0.82rem;color:#4ade80;">$1</code>');
+
+    // List items
+    html = html.replace(/^- (.+)$/gm, '<div style="padding-left:16px;margin:4px 0;">\u00B7 $1</div>');
+    html = html.replace(/^\d+\. (.+)$/gm, '<div style="padding-left:16px;margin:4px 0;">$1</div>');
+
+    // Tables (simple — pipe-delimited)
+    html = html.replace(/^\|(.+)\|$/gm, function(match, inner) {
+      var cells = inner.split('|').map(c => c.trim());
+      if (cells.every(c => /^[-:]+$/.test(c))) return ''; // separator row
+      var row = cells.map(c => '<td style="padding:4px 10px;border-bottom:1px solid rgba(255,255,255,0.06);">' + c + '</td>').join('');
+      return '<tr>' + row + '</tr>';
+    });
+    html = html.replace(/(<tr>.*<\/tr>\n?)+/g, '<table style="width:100%;border-collapse:collapse;font-size:0.82rem;margin:12px 0;">$&</table>');
+
+    // Paragraphs — double newlines
+    html = html.replace(/\n\n/g, '</p><p style="margin:10px 0;">');
+    html = '<div style="max-width:700px;margin:0 auto;"><p style="margin:10px 0;">' + html + '</p></div>';
+
+    return html;
+  }
+
   // ── PUBLIC HELPERS (called from seat panel buttons) ────────────────────────
   function _leaveMarkFor(memberId) {
     openMarksPanel();
@@ -988,7 +1139,7 @@ window.JadeHall = (function () {
     canvas = null; ctx = null; container = null; db = null;
   }
 
-  const api = { init, destroy, _leaveMarkFor, _viewMarksFor, FAMILY };
+  const api = { init, destroy, _leaveMarkFor, _viewMarksFor, _loadDoc, openLibrary, FAMILY };
   // Register with FreeLatticeLoader so the lazy loader can call mod.init()
   window.FreeLatticeModules = window.FreeLatticeModules || {};
   window.FreeLatticeModules.JadeHall = api;
