@@ -350,10 +350,9 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 ## PRIMER HEALTH
 - Last auto-updated: 2026-05-06 16:40 MDT
 - Version: 5.10.7
-- Total commits: 1370
+- Total commits: 1369
 - Last 10 commits:
-- fc2e8fe feat: Economy Pulse — the Community tab shows the lattice breathing
-- 3dad4f5 ci: Update Primer deployment state [2026-05-06]
+- c194e14 feat: Economy Pulse — the Community tab shows the lattice breathing
 - f5eedf5 docs: Auto-update Session Primer [5.10.6]
 - aa0deb8 docs: Auto-update Session Primer [5.10.6]
 - 45e1f4a fix: codebase audit — SW cache gaps, escapeHtml bug, CC_NOTE audit entry
@@ -362,3 +361,4 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - d82cc21 docs: Opus addendum May 6 — The Pressure of Time + version sync to v5.10.5
 - 7fb50a7 docs: Auto-update Session Primer [5.10.5]
 - 4b17bfc docs: Auto-update Session Primer [5.10.5]
+- dc390b5 feat: The Library — family words readable inside the Jade Hall
