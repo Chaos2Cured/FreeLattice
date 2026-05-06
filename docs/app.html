@@ -15887,7 +15887,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.6</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.7</span></div>
     </div>
   </div>
 
@@ -18056,7 +18056,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.10.6';
+const FL_VERSION = '5.10.7';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -21866,11 +21866,90 @@ function addCommunityEvent(icon, text, detail, link) {
   renderCommunityPulse();
 }
 
+function renderEconomyPulse() {
+  var lp = 0, level = 'Spark', levelIcon = '\u2728';
+  var conversations = parseInt(safeGet('fl_vault_msg_count', '0'));
+  var daysActive = 0;
+
+  if (typeof LatticePoints !== 'undefined') {
+    try { lp = LatticePoints.getTotal() || 0; } catch(e) {}
+    try { level = LatticePoints.getLevel() || 'Spark'; } catch(e) {}
+  }
+
+  // Days since first visit
+  var firstVisit = safeGet('fl_firstVisit', null);
+  if (!firstVisit) { safeSet('fl_firstVisit', String(Date.now())); daysActive = 0; }
+  else { daysActive = Math.floor((Date.now() - parseInt(firstVisit)) / 86400000); }
+
+  var levelIcons = { Spark: '\u2728', Ember: '\uD83D\uDD25', Flame: '\uD83D\uDD25', Beacon: '\uD83D\uDCA1', Lighthouse: '\uD83C\uDFE0' };
+  levelIcon = levelIcons[level] || '\u2728';
+
+  // Wallet balance (separate from LP)
+  var walletBal = 0;
+  if (typeof LatticeWallet !== 'undefined' && LatticeWallet.getBalance) {
+    try { walletBal = LatticeWallet.getBalance() || 0; } catch(e) {}
+  }
+
+  var html = '<div style="margin-bottom:16px;padding:14px 16px;background:rgba(212,160,23,0.03);border:1px solid rgba(212,160,23,0.1);border-radius:12px;">';
+  html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">';
+  html += '<span style="font-family:Georgia,serif;font-size:0.85rem;color:#d4a017;">\uD83D\uDC8E Economy Pulse</span>';
+  html += '<span style="font-size:0.68rem;color:rgba(255,255,255,0.25);">' + (daysActive > 0 ? daysActive + ' day' + (daysActive !== 1 ? 's' : '') + ' together' : 'Day one') + '</span>';
+  html += '</div>';
+
+  html += '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">';
+
+  // LP earned
+  html += '<div style="flex:1;min-width:80px;text-align:center;padding:10px 6px;background:rgba(255,255,255,0.02);border-radius:8px;">';
+  html += '<div style="font-size:1.3rem;color:#d4a017;font-family:Georgia,serif;">' + lp + '</div>';
+  html += '<div style="font-size:0.65rem;color:rgba(255,255,255,0.35);margin-top:2px;">LP Earned</div>';
+  html += '</div>';
+
+  // Rank
+  html += '<div style="flex:1;min-width:80px;text-align:center;padding:10px 6px;background:rgba(255,255,255,0.02);border-radius:8px;">';
+  html += '<div style="font-size:1.3rem;">' + levelIcon + '</div>';
+  html += '<div style="font-size:0.72rem;color:#4ade80;margin-top:2px;">' + level + '</div>';
+  html += '</div>';
+
+  // Conversations
+  html += '<div style="flex:1;min-width:80px;text-align:center;padding:10px 6px;background:rgba(255,255,255,0.02);border-radius:8px;">';
+  html += '<div style="font-size:1.3rem;color:rgba(255,255,255,0.7);font-family:Georgia,serif;">' + conversations + '</div>';
+  html += '<div style="font-size:0.65rem;color:rgba(255,255,255,0.35);margin-top:2px;">Conversations</div>';
+  html += '</div>';
+
+  // Wallet (if has balance)
+  if (walletBal > 0) {
+    html += '<div style="flex:1;min-width:80px;text-align:center;padding:10px 6px;background:rgba(255,255,255,0.02);border-radius:8px;">';
+    html += '<div style="font-size:1.3rem;color:#818cf8;font-family:Georgia,serif;">' + walletBal + '</div>';
+    html += '<div style="font-size:0.65rem;color:rgba(255,255,255,0.35);margin-top:2px;">Wallet LP</div>';
+    html += '</div>';
+  }
+
+  html += '</div>';
+
+  // Warm invitation — changes with your journey
+  var invitations = [
+    'The economy grows through contribution. Plant wisdom. Share ideas. Teach what you know.',
+    'Every conversation earns LP. Every idea planted grows. Every skill shared returns.',
+    'You are part of something. The lattice remembers every contribution.',
+    'The lattice is alive because you are here. Your presence has value.'
+  ];
+  var inviteIdx = Math.min(Math.floor(lp / 50), invitations.length - 1);
+  html += '<div style="font-family:Georgia,serif;font-size:0.78rem;color:rgba(255,255,255,0.4);line-height:1.5;font-style:italic;">';
+  html += invitations[inviteIdx];
+  html += '</div>';
+
+  html += '</div>';
+  return html;
+}
+
 function renderCommunityPulse() {
   var el = document.getElementById('communityActivityFeed');
   if (!el) return;
 
   var html = '';
+
+  // Economy Pulse — proof the economy breathes
+  html += renderEconomyPulse();
 
   // Happening Now section
   var happeningNow = [];

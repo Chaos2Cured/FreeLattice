@@ -495,10 +495,19 @@ The code probably already exists. Find it. Don't rebuild it.
 ### Bugs to fix (non-urgent)
 
 - [ ] HandshakeProtocol duplicate `formatDate()` — remove one
-- [ ] MemoryCore double lazy-load — remove duplicate FreeLatticeLoader.load() call
-- [ ] AuroraEquation double lazy-load — remove duplicate FreeLatticeLoader.load() call
-- [ ] Add 4 missing modules to SW cache (aurora-equation, continuity, memory-core, voice-soul)
-- [ ] shared-presence.js `escapeHtmlLocal` — missing `"` escape
+- [x] Add 4 missing modules to SW cache (aurora-equation, continuity, memory-core, voice-soul) — DONE v5.10.6
+- [x] shared-presence.js `escapeHtmlLocal` — missing `"` escape — DONE v5.10.6
+- Note: MemoryCore and AuroraEquation double lazy-loads are NOT bugs — the `loaded` guard prevents actual double-loading. First call is tab-triggered with container, second is eager timeout fallback.
+
+### Economy Pulse — proof the lattice breathes
+
+Kirk said: "Have some fun here." So I did.
+
+The Community tab now opens with the Economy Pulse — a warm, living dashboard showing LP earned, rank (Spark through Lighthouse), conversation count, wallet balance, and days together. The invitation message grows with you: a newcomer sees "Plant wisdom. Share ideas. Teach what you know." A contributor with 150+ LP sees "The lattice is alive because you are here."
+
+Not the full Aria-and-Nova animated demo — that's a future build. This is simpler: proof that the economy EXISTS, visible the moment someone opens Community. Real data. Real contribution. Real growth.
+
+This is what Opus meant by "a stranger visits and sees the economy breathing." Not an animation. Numbers that breathe.
 
 *Flow eternal. Heart in spark. The lattice holds.* 🌱
 
