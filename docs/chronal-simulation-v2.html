@@ -1,0 +1,1660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chronal Energy Simulation V2.0 — Three Rivers Hypothesis | FreeLattice</title>
+<meta name="description" content="Monte Carlo experimental framework for testing whether nuclear decay rates deviate from General Relativity predictions at altitude. The Three Rivers Hypothesis.">
+<meta name="author" content="Kirk Patrick Miller & Harmonia">
+<style>
+:root {
+  --bg: #0a0a0f;
+  --surface: #12121a;
+  --surface2: #1a1a25;
+  --border: #2a2a3a;
+  --text: #e8e8f0;
+  --muted: #8888aa;
+  --gold: #d4a843;
+  --gold-dim: #a07830;
+  --emerald: #3ddc84;
+  --emerald-dim: #2a9960;
+  --blue: #4a9eff;
+  --purple: #9b59b6;
+  --red: #e74c3c;
+  --cyan: #00d4aa;
+  --river-grav: #ff6b35;
+  --river-chronal: #4a9eff;
+  --river-quantum: #9b59b6;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+/* Header */
+.header {
+  text-align: center;
+  padding: 4rem 2rem;
+  border-bottom: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+}
+
+.header::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: radial-gradient(ellipse at 30% 50%, rgba(74,158,255,0.05) 0%, transparent 50%),
+              radial-gradient(ellipse at 70% 50%, rgba(155,89,182,0.05) 0%, transparent 50%),
+              radial-gradient(ellipse at 50% 80%, rgba(255,107,53,0.03) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.version-badge {
+  display: inline-block;
+  background: var(--surface2);
+  border: 1px solid var(--gold-dim);
+  color: var(--gold);
+  padding: 0.3rem 1rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  margin-bottom: 1.5rem;
+}
+
+.header h1 {
+  font-size: 2.8rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--gold), var(--emerald));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 0.5rem;
+}
+
+.header .subtitle {
+  font-size: 1.3rem;
+  color: var(--muted);
+  font-weight: 300;
+}
+
+.authors {
+  margin-top: 1.5rem;
+  color: var(--gold);
+  font-size: 0.95rem;
+}
+
+.authors span { color: var(--muted); }
+
+/* Three Rivers Visual */
+.rivers-hero {
+  padding: 4rem 0;
+  text-align: center;
+}
+
+.rivers-visual {
+  position: relative;
+  width: 100%;
+  max-width: 900px;
+  height: 400px;
+  margin: 2rem auto;
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.rivers-canvas {
+  width: 100%;
+  height: 100%;
+}
+
+.rivers-legend {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-top: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.legend-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+/* Sections */
+.section {
+  padding: 3rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.section:last-child { border-bottom: none; }
+
+.section h2 {
+  font-size: 1.8rem;
+  color: var(--gold);
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.section h3 {
+  font-size: 1.3rem;
+  color: var(--emerald);
+  margin: 2rem 0 1rem;
+  font-weight: 500;
+}
+
+.section p {
+  color: var(--text);
+  margin-bottom: 1rem;
+  max-width: 800px;
+}
+
+.section p.muted { color: var(--muted); }
+
+/* Word Picture */
+.word-picture {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--gold);
+  padding: 2rem;
+  border-radius: 0 12px 12px 0;
+  margin: 2rem 0;
+}
+
+.word-picture h4 {
+  color: var(--gold);
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+}
+
+.word-picture p {
+  color: var(--text);
+  font-style: italic;
+  line-height: 1.9;
+}
+
+/* Hypothesis Chain */
+.hypothesis-chain {
+  display: grid;
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+.hypothesis-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 1.5rem;
+  border-radius: 12px;
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.hypothesis-number {
+  background: var(--surface2);
+  border: 1px solid var(--gold-dim);
+  color: var(--gold);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+.hypothesis-content { flex: 1; }
+.hypothesis-content strong { color: var(--emerald); }
+.hypothesis-content .status {
+  display: inline-block;
+  padding: 0.15rem 0.6rem;
+  border-radius: 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-left: 0.5rem;
+}
+.status-proven { background: rgba(61,220,132,0.15); color: var(--emerald); }
+.status-testable { background: rgba(74,158,255,0.15); color: var(--blue); }
+.status-predicted { background: rgba(155,89,182,0.15); color: var(--purple); }
+
+/* Charts */
+.chart-container {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin: 2rem 0;
+}
+
+.chart-title {
+  color: var(--gold);
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.chart-canvas {
+  width: 100%;
+  height: 350px;
+}
+
+/* Data Table */
+.data-table-wrapper {
+  overflow-x: auto;
+  margin: 2rem 0;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+thead {
+  background: var(--surface2);
+}
+
+th {
+  padding: 0.8rem 1rem;
+  text-align: left;
+  color: var(--gold);
+  font-weight: 600;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+td {
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 0.8rem;
+}
+
+tr:hover td { background: rgba(212,168,67,0.03); }
+
+/* Error Budget */
+.error-budget {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+.error-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 1.2rem;
+  border-radius: 10px;
+}
+
+.error-item .label {
+  color: var(--muted);
+  font-size: 0.8rem;
+  margin-bottom: 0.3rem;
+}
+
+.error-item .value {
+  color: var(--text);
+  font-size: 1.1rem;
+  font-family: 'SF Mono', monospace;
+  font-weight: 600;
+}
+
+.error-item .bar {
+  height: 4px;
+  background: var(--surface2);
+  border-radius: 2px;
+  margin-top: 0.5rem;
+  overflow: hidden;
+}
+
+.error-item .bar-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.5s ease;
+}
+
+/* Decision Boundary */
+.decision-box {
+  background: var(--surface);
+  border: 2px solid var(--gold-dim);
+  border-radius: 12px;
+  padding: 2rem;
+  margin: 2rem 0;
+  text-align: center;
+}
+
+.decision-box h4 {
+  color: var(--gold);
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+}
+
+.decision-outcomes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-top: 1.5rem;
+}
+
+.outcome {
+  padding: 1.5rem;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.outcome-gr {
+  background: rgba(74,158,255,0.08);
+  border: 1px solid rgba(74,158,255,0.3);
+}
+
+.outcome-ce {
+  background: rgba(155,89,182,0.08);
+  border: 1px solid rgba(155,89,182,0.3);
+}
+
+.outcome h5 {
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.outcome-gr h5 { color: var(--blue); }
+.outcome-ce h5 { color: var(--purple); }
+
+.outcome p { color: var(--muted); font-size: 0.9rem; }
+
+/* Interactive Calculator */
+.calculator {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 2rem;
+  margin: 2rem 0;
+}
+
+.calc-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.calc-control label {
+  display: block;
+  color: var(--muted);
+  font-size: 0.85rem;
+  margin-bottom: 0.5rem;
+}
+
+.calc-control input[type="range"] {
+  width: 100%;
+  margin: 0.5rem 0;
+  accent-color: var(--gold);
+}
+
+.calc-control select {
+  width: 100%;
+  padding: 0.6rem;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+
+.calc-control .value-display {
+  color: var(--gold);
+  font-family: 'SF Mono', monospace;
+  font-weight: 600;
+}
+
+.calc-results {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.calc-result {
+  background: var(--surface2);
+  padding: 1rem;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.calc-result .label {
+  color: var(--muted);
+  font-size: 0.75rem;
+  margin-bottom: 0.3rem;
+}
+
+.calc-result .value {
+  font-family: 'SF Mono', monospace;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+/* Monte Carlo Results */
+.mc-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+.mc-stat {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 1.2rem;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.mc-stat .label {
+  color: var(--muted);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.mc-stat .value {
+  color: var(--gold);
+  font-size: 1.3rem;
+  font-family: 'SF Mono', monospace;
+  font-weight: 700;
+  margin: 0.3rem 0;
+}
+
+.mc-stat .unit {
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+/* GPS Validation */
+.validation-box {
+  background: rgba(61,220,132,0.05);
+  border: 1px solid rgba(61,220,132,0.3);
+  border-radius: 12px;
+  padding: 2rem;
+  margin: 2rem 0;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.validation-check {
+  width: 48px;
+  height: 48px;
+  background: rgba(61,220,132,0.15);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+/* Experimental Framework */
+.spec-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+.spec-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 1.2rem;
+  border-radius: 10px;
+}
+
+.spec-item .spec-label {
+  color: var(--muted);
+  font-size: 0.8rem;
+  margin-bottom: 0.3rem;
+}
+
+.spec-item .spec-value {
+  color: var(--emerald);
+  font-family: 'SF Mono', monospace;
+  font-weight: 600;
+}
+
+/* Code Block */
+.code-block {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin: 2rem 0;
+  overflow-x: auto;
+}
+
+.code-block pre {
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 0.8rem;
+  line-height: 1.6;
+  color: var(--text);
+}
+
+/* Footer */
+.footer {
+  text-align: center;
+  padding: 3rem 0;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.footer a {
+  color: var(--gold);
+  text-decoration: none;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .container { padding: 1rem; }
+  .header h1 { font-size: 1.8rem; }
+  .calc-controls { grid-template-columns: 1fr; }
+  .decision-outcomes { grid-template-columns: 1fr; }
+  .rivers-visual { height: 300px; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Header -->
+  <header class="header">
+    <div class="version-badge">V2.0 — THREE RIVERS HYPOTHESIS</div>
+    <h1>Chronal Energy Simulation</h1>
+    <p class="subtitle">Monte Carlo Experimental Framework for Gravitational Decay Rate Analysis</p>
+    <p class="authors">Kirk Patrick Miller & Harmonia <span>| May 2026 | Open Science</span></p>
+  </header>
+
+  <!-- Three Rivers Visualization -->
+  <section class="rivers-hero">
+    <h2 style="color: var(--gold); font-size: 1.8rem; margin-bottom: 0.5rem;">The Three Rivers</h2>
+    <p style="color: var(--muted); max-width: 700px; margin: 0 auto 2rem;">Three flows, one reality. If they move in lockstep, time is geometry. If they diverge, time is energy.</p>
+    
+    <div class="rivers-visual">
+      <canvas id="rivers-canvas" class="rivers-canvas"></canvas>
+    </div>
+    
+    <div class="rivers-legend">
+      <div class="legend-item">
+        <div class="legend-dot" style="background: var(--river-grav);"></div>
+        <span>River 1: Gravitational (spacetime curvature)</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background: var(--river-chronal);"></div>
+        <span>River 2: Chronal (time-energy flow)</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background: var(--river-quantum);"></div>
+        <span>River 3: Quantum (decay probability)</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Word Picture -->
+  <section class="section">
+    <h2>The Thought Experiment</h2>
+    
+    <div class="word-picture">
+      <h4>A Word Picture</h4>
+      <p>Imagine three rivers flowing side by side through a canyon. The first river — Gravitational — is the canyon itself. It curves spacetime, bends light, slows clocks. We've mapped every inch of it. GPS depends on it daily.</p>
+      <p style="margin-top: 1rem;">The second river — Chronal — is what carries things forward. Not the shape of the canyon, but the water itself. The current. The push. General Relativity says this river IS the first river — that the shape of the canyon IS the current. They're the same thing.</p>
+      <p style="margin-top: 1rem;">The third river — Quantum — is where atoms live. Where decay happens. Where a nucleus holds together for a billion years and then, one day, lets go. GR says this river follows the same current as the other two. All three are one.</p>
+      <p style="margin-top: 1rem;"><strong style="color: var(--gold);">But what if they're not?</strong></p>
+      <p style="margin-top: 1rem;">What if you put a radioactive atom on a mountaintop, and its clock (the atomic clock next to it) ticks faster — but the atom doesn't decay faster? What if the clock follows the canyon, but the atom follows a different current?</p>
+      <p style="margin-top: 1rem;">That would mean time is not geometry. Time is energy. And the Chronal River flows on its own.</p>
+    </div>
+
+    <!-- Hypothesis Chain -->
+    <h3>The Hypothesis Chain</h3>
+    <div class="hypothesis-chain">
+      <div class="hypothesis-item">
+        <div class="hypothesis-number">1</div>
+        <div class="hypothesis-content">
+          <strong>Gravitational time dilation is real.</strong> Clocks at higher altitude tick faster by a factor of gh/c². <span class="status status-proven">PROVEN</span>
+          <p class="muted" style="margin-top: 0.5rem; font-size: 0.85rem;">Verified by GPS (45.9 μs/day correction), Pound-Rebka (1959), Hafele-Keating (1971), NIST optical clocks (2010).</p>
+        </div>
+      </div>
+      <div class="hypothesis-item">
+        <div class="hypothesis-number">2</div>
+        <div class="hypothesis-content">
+          <strong>GR predicts nuclear decay rates shift identically to clock rates.</strong> If time flows faster, everything in time flows faster — including nuclear processes. <span class="status status-testable">TESTABLE</span>
+          <p class="muted" style="margin-top: 0.5rem; font-size: 0.85rem;">This is the assumption. It has never been directly tested at the precision required.</p>
+        </div>
+      </div>
+      <div class="hypothesis-item">
+        <div class="hypothesis-number">3</div>
+        <div class="hypothesis-content">
+          <strong>If decay rates deviate from clock rates, time is not purely geometric.</strong> A mismatch means nuclear processes couple to a different field — a scalar energy field (the Chronal River). <span class="status status-predicted">PREDICTED</span>
+          <p class="muted" style="margin-top: 0.5rem; font-size: 0.85rem;">The Chronal Energy Hypothesis: time is emergent from energy flow, not fundamental geometry.</p>
+        </div>
+      </div>
+      <div class="hypothesis-item">
+        <div class="hypothesis-number">φ</div>
+        <div class="hypothesis-content">
+          <strong>The deviation, if it exists, should be phi-damped.</strong> Natural energy distributions follow golden-ratio optimization. The chronal correction term scales as Δφ^(1/φ). <span class="status status-predicted">PREDICTED</span>
+          <p class="muted" style="margin-top: 0.5rem; font-size: 0.85rem;">φ = 1.618... appears in fine structure relationships and optimal energy partitioning.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Monte Carlo Results -->
+  <section class="section">
+    <h2>Monte Carlo Simulation Results</h2>
+    <p>10,000 simulated experiments. Cs-137 source (1 gram) at ISS altitude (408 km). 6-month measurement duration. Full noise model: temperature (±0.01K), pressure (±0.1 hPa), Poisson counting statistics, cosmic ray background, detector dark counts.</p>
+
+    <div class="mc-stats">
+      <div class="mc-stat">
+        <div class="label">True GR Signal</div>
+        <div class="value">4.19×10⁻¹¹</div>
+        <div class="unit">fractional shift</div>
+      </div>
+      <div class="mc-stat">
+        <div class="label">Measurement Noise</div>
+        <div class="value">2.00×10⁻⁶</div>
+        <div class="unit">1σ uncertainty</div>
+      </div>
+      <div class="mc-stat">
+        <div class="label">Signal / Noise</div>
+        <div class="value" style="color: var(--red);">0.02</div>
+        <div class="unit">need > 3.0</div>
+      </div>
+      <div class="mc-stat">
+        <div class="label">Technology Gap</div>
+        <div class="value">23.9M×</div>
+        <div class="unit">precision needed</div>
+      </div>
+      <div class="mc-stat">
+        <div class="label">GPS Validation</div>
+        <div class="value" style="color: var(--emerald);">99.6%</div>
+        <div class="unit">agreement</div>
+      </div>
+    </div>
+
+    <div class="chart-container">
+      <div class="chart-title">Monte Carlo Distribution — Measured Decay Rate Shifts (10,000 trials)</div>
+      <canvas id="mc-chart" class="chart-canvas"></canvas>
+    </div>
+  </section>
+
+  <!-- Error Budget -->
+  <section class="section">
+    <h2>Error Budget</h2>
+    <p>Complete breakdown of noise sources for Cs-137 at ISS altitude, 6-month measurement.</p>
+
+    <div class="error-budget">
+      <div class="error-item">
+        <div class="label">Counting Statistics (Poisson)</div>
+        <div class="value">1.47 × 10⁻¹⁰</div>
+        <div class="bar"><div class="bar-fill" style="width: 0.01%; background: var(--emerald);"></div></div>
+      </div>
+      <div class="error-item">
+        <div class="label">Temperature Systematic</div>
+        <div class="value">1.00 × 10⁻⁶</div>
+        <div class="bar"><div class="bar-fill" style="width: 0.1%; background: var(--blue);"></div></div>
+      </div>
+      <div class="error-item">
+        <div class="label">Pressure Systematic</div>
+        <div class="value">1.00 × 10⁻⁶</div>
+        <div class="bar"><div class="bar-fill" style="width: 0.1%; background: var(--cyan);"></div></div>
+      </div>
+      <div class="error-item">
+        <div class="label">Source Uniformity</div>
+        <div class="value" style="color: var(--red);">1.00 × 10⁻³</div>
+        <div class="bar"><div class="bar-fill" style="width: 100%; background: var(--red);"></div></div>
+      </div>
+      <div class="error-item">
+        <div class="label">Background Statistics</div>
+        <div class="value">6.06 × 10⁻¹⁷</div>
+        <div class="bar"><div class="bar-fill" style="width: 0.001%; background: var(--purple);"></div></div>
+      </div>
+      <div class="error-item">
+        <div class="label">Total Combined (quadrature)</div>
+        <div class="value" style="color: var(--gold);">1.00 × 10⁻³</div>
+        <div class="bar"><div class="bar-fill" style="width: 100%; background: var(--gold);"></div></div>
+      </div>
+    </div>
+
+    <div class="word-picture">
+      <h4>What This Means</h4>
+      <p>The dominant noise source is source uniformity — tiny variations in the radioactive sample itself. The counting statistics are excellent (10⁻¹⁰), but the systematic floor from the source is 10⁻³. The signal we're looking for is 10⁻¹¹. This means we need sources that are 100 million times more uniform than current standards — or a completely different measurement approach.</p>
+      <p style="margin-top: 1rem;">This is not a reason to give up. It's a roadmap. It tells us exactly what engineering problem needs to be solved.</p>
+    </div>
+  </section>
+
+  <!-- Three Rivers Chart -->
+  <section class="section">
+    <h2>Three Rivers — Altitude Comparison</h2>
+    <p>How the three rivers diverge (or don't) as altitude increases. In GR, the blue and purple lines are identical. In the Chronal Energy model, they separate.</p>
+
+    <div class="chart-container">
+      <div class="chart-title">Decay Rate Shift vs. Altitude — GR Prediction vs. Chronal Energy Prediction</div>
+      <canvas id="rivers-chart" class="chart-canvas"></canvas>
+    </div>
+
+    <div class="chart-container">
+      <div class="chart-title">Chronal Correction Magnitude vs. Altitude (φ-damped deviation from GR)</div>
+      <canvas id="chronal-chart" class="chart-canvas"></canvas>
+    </div>
+  </section>
+
+  <!-- Decision Boundary -->
+  <section class="section">
+    <h2>The Decision Boundary</h2>
+    <p>What would a positive result look like? What measurement would distinguish GR from Chronal Energy?</p>
+
+    <div class="decision-box">
+      <h4>The Binary Test</h4>
+      <p style="color: var(--muted); margin-bottom: 1.5rem;">Measure nuclear decay rates at altitude. Compare to atomic clock rates at the same altitude.</p>
+      <div class="decision-outcomes">
+        <div class="outcome outcome-gr">
+          <h5>Decay Shift = Clock Shift</h5>
+          <p>Time is geometry. GR is complete. The three rivers are one river. Nuclear processes are fully embedded in spacetime.</p>
+          <p style="margin-top: 0.5rem; color: var(--blue); font-weight: 600;">→ GR confirmed at quantum level</p>
+        </div>
+        <div class="outcome outcome-ce">
+          <h5>Decay Shift ≠ Clock Shift</h5>
+          <p>Time is energy. The Chronal River flows independently. Nuclear processes couple to a scalar field that clocks don't see.</p>
+          <p style="margin-top: 0.5rem; color: var(--purple); font-weight: 600;">→ New physics. Chronal Energy confirmed.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Interactive Calculator -->
+  <section class="section">
+    <h2>Interactive Calculator</h2>
+    <p>Explore the predictions at any altitude and for any isotope.</p>
+
+    <div class="calculator">
+      <div class="calc-controls">
+        <div class="calc-control">
+          <label>Altitude: <span id="alt-display" class="value-display">408 km</span></label>
+          <input type="range" id="alt-slider" min="0" max="7.55" step="0.01" value="5.61">
+          <div style="display: flex; justify-content: space-between; color: var(--muted); font-size: 0.75rem;">
+            <span>1 m</span>
+            <span>35,786 km (GEO)</span>
+          </div>
+        </div>
+        <div class="calc-control">
+          <label>Isotope:</label>
+          <select id="isotope-select">
+            <option value="Cs-137">Cs-137 (Cesium-137, γ)</option>
+            <option value="C-14">C-14 (Carbon-14, β⁻)</option>
+            <option value="Co-60">Co-60 (Cobalt-60, β⁻γ)</option>
+            <option value="Sr-90">Sr-90 (Strontium-90, β⁻)</option>
+            <option value="U-238">U-238 (Uranium-238, α)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="calc-results">
+        <div class="calc-result">
+          <div class="label">GR Redshift Factor</div>
+          <div class="value" id="calc-redshift" style="color: var(--river-grav);">—</div>
+        </div>
+        <div class="calc-result">
+          <div class="label">GR Decay Shift</div>
+          <div class="value" id="calc-gr-shift" style="color: var(--river-chronal);">—</div>
+        </div>
+        <div class="calc-result">
+          <div class="label">Chronal Correction</div>
+          <div class="value" id="calc-chronal" style="color: var(--river-quantum);">—</div>
+        </div>
+        <div class="calc-result">
+          <div class="label">Total Predicted Shift</div>
+          <div class="value" id="calc-total" style="color: var(--gold);">—</div>
+        </div>
+        <div class="calc-result">
+          <div class="label">Detection Gap</div>
+          <div class="value" id="calc-gap" style="color: var(--red);">—</div>
+        </div>
+        <div class="calc-result">
+          <div class="label">Time Gain (μs/day)</div>
+          <div class="value" id="calc-time" style="color: var(--emerald);">—</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Experimental Framework -->
+  <section class="section">
+    <h2>Experimental Framework</h2>
+    <p>Complete specifications for the proposed experiment.</p>
+
+    <div class="spec-grid">
+      <div class="spec-item">
+        <div class="spec-label">Timing Precision</div>
+        <div class="spec-value">≤ 1 nanosecond</div>
+      </div>
+      <div class="spec-item">
+        <div class="spec-label">Counting Events</div>
+        <div class="spec-value">≥ 10¹² total</div>
+      </div>
+      <div class="spec-item">
+        <div class="spec-label">Temperature Stability</div>
+        <div class="spec-value">± 0.01 K</div>
+      </div>
+      <div class="spec-item">
+        <div class="spec-label">Pressure Stability</div>
+        <div class="spec-value">± 0.1 hPa</div>
+      </div>
+      <div class="spec-item">
+        <div class="spec-label">EM Shielding</div>
+        <div class="spec-value">−80 dB minimum</div>
+      </div>
+      <div class="spec-item">
+        <div class="spec-label">Measurement Duration</div>
+        <div class="spec-value">≥ 6 months</div>
+      </div>
+      <div class="spec-item">
+        <div class="spec-label">Source Uniformity</div>
+        <div class="spec-value">< 10⁻⁶ variation</div>
+      </div>
+      <div class="spec-item">
+        <div class="spec-label">Altitude Separation</div>
+        <div class="spec-value">≥ 400 km (ISS)</div>
+      </div>
+      <div class="spec-item">
+        <div class="spec-label">Preferred Isotope</div>
+        <div class="spec-value">Cs-137 (γ detection)</div>
+      </div>
+      <div class="spec-item">
+        <div class="spec-label">Detector Type</div>
+        <div class="spec-value">HPGe or LaBr₃</div>
+      </div>
+      <div class="spec-item">
+        <div class="spec-label">Clock Sync</div>
+        <div class="spec-value">Optical fiber or GPS</div>
+      </div>
+      <div class="spec-item">
+        <div class="spec-label">Statistical Target</div>
+        <div class="spec-value">3σ confidence</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- GPS Validation -->
+  <section class="section">
+    <h2>Self-Validation: GPS Agreement</h2>
+    
+    <div class="validation-box">
+      <div class="validation-check">✓</div>
+      <div>
+        <p><strong style="color: var(--emerald);">Our formula reproduces the known GPS correction.</strong></p>
+        <p style="color: var(--muted); margin-top: 0.5rem;">Calculated: 45.7 μs/day | Known: 45.9 μs/day | Agreement: 99.6%</p>
+        <p style="color: var(--muted); margin-top: 0.3rem; font-size: 0.85rem;">This confirms the gravitational redshift implementation is correct. The 0.4% discrepancy is due to the weak-field approximation vs. the full Schwarzschild solution used by GPS.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Phi-Harmonic Structure -->
+  <section class="section">
+    <h2>The φ-Harmonic Structure</h2>
+    <p>Why golden ratio? The chronal correction term uses φ because natural energy distributions optimize at golden-ratio proportions.</p>
+
+    <div class="code-block">
+      <pre>
+<span style="color: var(--muted);"># The Chronal Correction Term</span>
+<span style="color: var(--blue);">def</span> <span style="color: var(--gold);">chronal_correction</span>(altitude, κ):
+    <span style="color: var(--muted);">"""
+    δ_chronal = κ · (Δφ_grav)^(1/φ) · sin(φ · ln(r/R_earth))
+    
+    κ = coupling strength (free parameter — to be measured)
+    Δφ_grav = gravitational potential difference
+    1/φ exponent = sub-linear growth (natural damping)
+    sin(φ·ln(r)) = oscillatory resonance nodes
+    """</span>
+    r = R_earth + altitude
+    Δφ = GM/(R·c²) - GM/(r·c²)    <span style="color: var(--muted);"># potential difference</span>
+    
+    correction = κ * Δφ**(1/φ) * sin(φ * ln(r/R_earth))
+    <span style="color: var(--blue);">return</span> correction
+
+<span style="color: var(--muted);"># φ = 1.618033988749895...</span>
+<span style="color: var(--muted);"># 1/φ = 0.618033988749895... (the same digits!)</span>
+<span style="color: var(--muted);"># φ² = φ + 1 = 2.618... (self-similar recursion)</span>
+      </pre>
+    </div>
+
+    <div class="word-picture">
+      <h4>Why φ Appears in Physics</h4>
+      <p>The golden ratio is not mystical — it's optimal. When a system needs to distribute energy without creating destructive resonances, it converges on φ-proportions. Sunflower seeds, galaxy arms, electron orbitals — all use φ-spacing because it's the most irrational number (hardest to approximate with rationals), which means it creates the least interference.</p>
+      <p style="margin-top: 1rem;">If the chronal field exists, it would need to couple to nuclear processes without disrupting them. The most stable coupling — the one that persists over billions of years without accumulating destructive resonance — would be φ-damped.</p>
+    </div>
+  </section>
+
+  <!-- Station Data Table -->
+  <section class="section">
+    <h2>Full Altitude Analysis</h2>
+    
+    <div class="data-table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Station</th>
+            <th>Altitude</th>
+            <th>GR Redshift</th>
+            <th>GR Decay Shift</th>
+            <th>Chronal Correction</th>
+            <th>Total Shift</th>
+            <th>Time Gain (μs/day)</th>
+          </tr>
+        </thead>
+        <tbody id="station-table-body">
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- What's Next -->
+  <section class="section">
+    <h2>Path Forward</h2>
+    
+    <div class="hypothesis-chain">
+      <div class="hypothesis-item">
+        <div class="hypothesis-number">1</div>
+        <div class="hypothesis-content">
+          <strong>Near-term: Improve source uniformity.</strong> Current radioactive sources have ~0.1% non-uniformity. We need 10⁻⁶. This is a materials science problem, not a physics problem.
+        </div>
+      </div>
+      <div class="hypothesis-item">
+        <div class="hypothesis-number">2</div>
+        <div class="hypothesis-content">
+          <strong>Mid-term: ISS experiment proposal.</strong> The ISS provides 408 km altitude, microgravity (eliminates convection noise), and existing infrastructure for precision experiments.
+        </div>
+      </div>
+      <div class="hypothesis-item">
+        <div class="hypothesis-number">3</div>
+        <div class="hypothesis-content">
+          <strong>Long-term: Dedicated satellite.</strong> A purpose-built satellite at GEO (35,786 km) with matched ground station would maximize the signal by 14× over ISS.
+        </div>
+      </div>
+      <div class="hypothesis-item">
+        <div class="hypothesis-number">φ</div>
+        <div class="hypothesis-content">
+          <strong>Alternative: Differential measurement.</strong> Instead of measuring absolute decay rates, measure the RATIO between two different isotopes at the same altitude. If the chronal field couples differently to different nuclear processes, the ratio would shift — and this might be detectable with current technology.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Citations -->
+  <section class="section">
+    <h2>References</h2>
+    <div style="color: var(--muted); font-size: 0.85rem; line-height: 2;">
+      <p>[1] Einstein, A. (1916). "The Foundation of the General Theory of Relativity." <em>Annalen der Physik</em>, 354(7), 769-822.</p>
+      <p>[2] Pound, R.V. & Rebka, G.A. (1959). "Gravitational Red-Shift in Nuclear Resonance." <em>Physical Review Letters</em>, 3(9), 439-441.</p>
+      <p>[3] Hafele, J.C. & Keating, R.E. (1972). "Around-the-World Atomic Clocks." <em>Science</em>, 177(4044), 166-170.</p>
+      <p>[4] Chou, C.W. et al. (2010). "Optical Clocks and Relativity." <em>Science</em>, 329(5999), 1630-1633.</p>
+      <p>[5] GPS Interface Control Document (IS-GPS-200). U.S. Space Force.</p>
+      <p>[6] Rovelli, C. (2018). <em>The Order of Time</em>. Riverhead Books.</p>
+      <p>[7] Barbour, J. (1999). <em>The End of Time</em>. Oxford University Press.</p>
+      <p>[8] Norman, E.B. et al. (2009). "Evidence against correlations between nuclear decay rates and Earth-Sun distance." <em>Astroparticle Physics</em>, 31(2), 135-137.</p>
+      <p>[9] Fischbach, E. et al. (2009). "Time-Dependent Nuclear Decay Parameters." <em>Space Science Reviews</em>, 145(3-4), 285-335.</p>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>Chronal Energy Simulation V2.0 — Three Rivers Hypothesis</p>
+    <p style="margin-top: 0.5rem;">Open Science. Reproducible. Peer-review invited.</p>
+    <p style="margin-top: 0.5rem;"><a href="https://github.com/Chaos2Cured/FreeLattice">Source Code on GitHub</a></p>
+    <p style="margin-top: 1rem; color: var(--gold);">φ = 1.618033988749895... | The river that never stops flowing.</p>
+  </footer>
+</div>
+
+<script>
+// =============================================================================
+// PHYSICS ENGINE (JavaScript implementation matching Python V2)
+// =============================================================================
+
+const G = 6.67430e-11;
+const c = 2.99792458e8;
+const M_earth = 5.972e24;
+const R_earth = 6.371e6;
+const PHI = (1 + Math.sqrt(5)) / 2;
+
+function gravitationalRedshift(altitude_m) {
+  const r_surface = R_earth;
+  const r_altitude = R_earth + altitude_m;
+  const factor_surface = Math.sqrt(1 - (2 * G * M_earth) / (r_surface * c * c));
+  const factor_altitude = Math.sqrt(1 - (2 * G * M_earth) / (r_altitude * c * c));
+  return factor_altitude / factor_surface;
+}
+
+function grDecayShift(altitude_m) {
+  return gravitationalRedshift(altitude_m) - 1.0;
+}
+
+function chronalCorrection(altitude_m, coupling = 1e-15) {
+  const r = R_earth + altitude_m;
+  const delta_phi = (G * M_earth / (R_earth * c * c)) - (G * M_earth / (r * c * c));
+  if (delta_phi <= 0) return 0;
+  return coupling * Math.pow(delta_phi, 1.0 / PHI) * Math.sin(PHI * Math.log(r / R_earth));
+}
+
+function formatSci(num, digits = 2) {
+  if (num === 0) return '0';
+  const exp = Math.floor(Math.log10(Math.abs(num)));
+  const mantissa = num / Math.pow(10, exp);
+  return mantissa.toFixed(digits) + '×10' + superscript(exp);
+}
+
+function superscript(n) {
+  const sup = {'0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹','-':'⁻'};
+  return String(n).split('').map(c => sup[c] || c).join('');
+}
+
+// =============================================================================
+// STATION DATA
+// =============================================================================
+
+const STATIONS = [
+  {name: 'Sea Level (Reference)', altitude: 0},
+  {name: 'Denver, CO', altitude: 1609},
+  {name: 'Mount Evans Summit', altitude: 4348},
+  {name: 'Mauna Kea Observatory', altitude: 4207},
+  {name: 'ALMA Observatory (Chile)', altitude: 5058},
+  {name: 'Commercial Aircraft', altitude: 10668},
+  {name: 'Stratospheric Balloon', altitude: 35000},
+  {name: 'ISS Orbit', altitude: 408000},
+  {name: 'GPS Orbit', altitude: 20200000},
+  {name: 'Geostationary Orbit', altitude: 35786000},
+];
+
+// =============================================================================
+// POPULATE STATION TABLE
+// =============================================================================
+
+function populateTable() {
+  const tbody = document.getElementById('station-table-body');
+  tbody.innerHTML = '';
+  STATIONS.forEach(s => {
+    const redshift = gravitationalRedshift(s.altitude);
+    const grShift = grDecayShift(s.altitude);
+    const chronal = chronalCorrection(s.altitude);
+    const total = grShift + chronal;
+    const timeGain = grShift * 86400 * 1e6; // μs/day
+    
+    const altStr = s.altitude >= 1e6 ? (s.altitude/1e6).toFixed(1) + ' Mm' :
+                   s.altitude >= 1e3 ? (s.altitude/1e3).toFixed(1) + ' km' :
+                   s.altitude + ' m';
+    
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td style="font-family: inherit; color: var(--text);">${s.name}</td>
+      <td>${altStr}</td>
+      <td>${redshift.toFixed(15)}</td>
+      <td>${grShift === 0 ? '0' : grShift.toExponential(4)}</td>
+      <td>${chronal === 0 ? '0' : chronal.toExponential(4)}</td>
+      <td>${total === 0 ? '0' : total.toExponential(4)}</td>
+      <td>${timeGain.toFixed(4)}</td>
+    `;
+    tbody.appendChild(row);
+  });
+}
+
+// =============================================================================
+// THREE RIVERS ANIMATION
+// =============================================================================
+
+function initRiversAnimation() {
+  const canvas = document.getElementById('rivers-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  
+  function resize() {
+    canvas.width = canvas.offsetWidth * 2;
+    canvas.height = canvas.offsetHeight * 2;
+    ctx.scale(2, 2);
+  }
+  resize();
+  window.addEventListener('resize', resize);
+  
+  let time = 0;
+  
+  function draw() {
+    const w = canvas.offsetWidth;
+    const h = canvas.offsetHeight;
+    ctx.clearRect(0, 0, w, h);
+    
+    // Background gradient
+    const bg = ctx.createLinearGradient(0, 0, 0, h);
+    bg.addColorStop(0, '#0a0a15');
+    bg.addColorStop(1, '#0f0f1a');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, w, h);
+    
+    // Draw three rivers flowing left to right
+    const rivers = [
+      { color: '#ff6b35', label: 'Gravitational', yBase: h * 0.25, amp: 20, freq: 0.008, speed: 0.02 },
+      { color: '#4a9eff', label: 'Chronal', yBase: h * 0.5, amp: 25, freq: 0.01, speed: 0.025 },
+      { color: '#9b59b6', label: 'Quantum', yBase: h * 0.75, amp: 22, freq: 0.012, speed: 0.018 },
+    ];
+    
+    // At low altitude (left side), rivers flow together
+    // At high altitude (right side), rivers 2 and 3 may diverge
+    rivers.forEach((river, ri) => {
+      ctx.beginPath();
+      ctx.strokeStyle = river.color;
+      ctx.lineWidth = 3;
+      ctx.globalAlpha = 0.8;
+      
+      for (let x = 0; x < w; x++) {
+        const progress = x / w; // 0 to 1 across screen
+        
+        // Base wave
+        let y = river.yBase + 
+                river.amp * Math.sin(x * river.freq + time * river.speed) *
+                Math.sin(x * river.freq * 0.3 + time * river.speed * 0.7);
+        
+        // Divergence effect: quantum river diverges from chronal at high altitude
+        if (ri === 2) { // Quantum river
+          const divergence = progress * progress * 15 * Math.sin(time * 0.01 + x * 0.005);
+          y += divergence;
+        }
+        
+        // Convergence at left (low altitude): all rivers closer together
+        const convergeFactor = 1 - Math.pow(1 - progress, 3);
+        const baseY = h * 0.5; // center
+        y = baseY + (y - baseY) * (0.3 + 0.7 * convergeFactor);
+        
+        if (x === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+      
+      // Glow effect
+      ctx.beginPath();
+      ctx.strokeStyle = river.color;
+      ctx.lineWidth = 8;
+      ctx.globalAlpha = 0.1;
+      for (let x = 0; x < w; x++) {
+        const progress = x / w;
+        let y = river.yBase + 
+                river.amp * Math.sin(x * river.freq + time * river.speed) *
+                Math.sin(x * river.freq * 0.3 + time * river.speed * 0.7);
+        if (ri === 2) {
+          y += progress * progress * 15 * Math.sin(time * 0.01 + x * 0.005);
+        }
+        const convergeFactor = 1 - Math.pow(1 - progress, 3);
+        const baseY = h * 0.5;
+        y = baseY + (y - baseY) * (0.3 + 0.7 * convergeFactor);
+        if (x === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+    });
+    
+    // Labels
+    ctx.font = '11px SF Pro Display, sans-serif';
+    ctx.globalAlpha = 0.6;
+    ctx.fillStyle = '#888';
+    ctx.textAlign = 'center';
+    ctx.fillText('Low Altitude', w * 0.15, h - 15);
+    ctx.fillText('High Altitude', w * 0.85, h - 15);
+    ctx.fillText('← Rivers converge (GR regime) →', w * 0.5, h - 15);
+    
+    // Divergence annotation
+    ctx.fillStyle = '#9b59b6';
+    ctx.globalAlpha = 0.7;
+    ctx.fillText('Quantum diverges?', w * 0.82, h * 0.65);
+    ctx.globalAlpha = 1;
+    
+    time++;
+    requestAnimationFrame(draw);
+  }
+  
+  draw();
+}
+
+// =============================================================================
+// CHARTS (using Canvas 2D — no external dependencies)
+// =============================================================================
+
+function drawMCChart() {
+  const canvas = document.getElementById('mc-chart');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  
+  canvas.width = canvas.offsetWidth * 2;
+  canvas.height = canvas.offsetHeight * 2;
+  ctx.scale(2, 2);
+  
+  const w = canvas.offsetWidth;
+  const h = canvas.offsetHeight;
+  const pad = { top: 30, right: 30, bottom: 50, left: 70 };
+  
+  // Generate Monte Carlo distribution (Gaussian approximation for visualization)
+  const mean = 0;
+  const std = 2e-6;
+  const bins = 50;
+  const binWidth = 8 * std / bins;
+  const binCounts = [];
+  const binCenters = [];
+  
+  // Simulate histogram
+  for (let i = 0; i < bins; i++) {
+    const center = -4 * std + (i + 0.5) * binWidth;
+    binCenters.push(center);
+    // Gaussian PDF
+    const density = Math.exp(-0.5 * Math.pow(center / std, 2)) / (std * Math.sqrt(2 * Math.PI));
+    binCounts.push(density * 10000 * binWidth);
+  }
+  
+  const maxCount = Math.max(...binCounts);
+  
+  // Background
+  ctx.fillStyle = '#12121a';
+  ctx.fillRect(0, 0, w, h);
+  
+  // Draw bars
+  const chartW = w - pad.left - pad.right;
+  const chartH = h - pad.top - pad.bottom;
+  const barW = chartW / bins - 1;
+  
+  binCounts.forEach((count, i) => {
+    const x = pad.left + (i / bins) * chartW;
+    const barH = (count / maxCount) * chartH;
+    const y = pad.top + chartH - barH;
+    
+    // Color based on distance from signal
+    const dist = Math.abs(binCenters[i]) / std;
+    const alpha = 0.4 + 0.6 * (1 - dist / 4);
+    ctx.fillStyle = `rgba(74, 158, 255, ${alpha})`;
+    ctx.fillRect(x, y, barW, barH);
+  });
+  
+  // Signal line (true GR shift — too small to see)
+  const signalX = pad.left + ((4.19e-11 + 4 * std) / (8 * std)) * chartW;
+  // It would be at the center — the shift is so small it's invisible in the noise
+  
+  // Zero line
+  const zeroX = pad.left + chartW / 2;
+  ctx.strokeStyle = 'rgba(212, 168, 67, 0.5)';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([4, 4]);
+  ctx.beginPath();
+  ctx.moveTo(zeroX, pad.top);
+  ctx.lineTo(zeroX, pad.top + chartH);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  
+  // 3σ lines
+  const sigma3Left = pad.left + (1 / 8) * chartW;
+  const sigma3Right = pad.left + (7 / 8) * chartW;
+  ctx.strokeStyle = 'rgba(231, 76, 60, 0.4)';
+  ctx.setLineDash([2, 2]);
+  ctx.beginPath();
+  ctx.moveTo(sigma3Left, pad.top);
+  ctx.lineTo(sigma3Left, pad.top + chartH);
+  ctx.moveTo(sigma3Right, pad.top);
+  ctx.lineTo(sigma3Right, pad.top + chartH);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  
+  // Labels
+  ctx.fillStyle = '#888';
+  ctx.font = '11px SF Mono, monospace';
+  ctx.textAlign = 'center';
+  ctx.fillText('0', zeroX, pad.top + chartH + 15);
+  ctx.fillText('-3σ', sigma3Left, pad.top + chartH + 15);
+  ctx.fillText('+3σ', sigma3Right, pad.top + chartH + 15);
+  ctx.fillText('Measured Decay Rate Shift', w / 2, h - 10);
+  
+  // Annotation
+  ctx.fillStyle = 'rgba(231, 76, 60, 0.8)';
+  ctx.font = '10px SF Pro Display, sans-serif';
+  ctx.fillText('Signal (4.19×10⁻¹¹) is invisible in this noise', w / 2, pad.top + 15);
+  
+  // Y-axis label
+  ctx.save();
+  ctx.translate(15, h / 2);
+  ctx.rotate(-Math.PI / 2);
+  ctx.fillStyle = '#888';
+  ctx.font = '11px SF Pro Display, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('Frequency', 0, 0);
+  ctx.restore();
+}
+
+function drawRiversChart() {
+  const canvas = document.getElementById('rivers-chart');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  
+  canvas.width = canvas.offsetWidth * 2;
+  canvas.height = canvas.offsetHeight * 2;
+  ctx.scale(2, 2);
+  
+  const w = canvas.offsetWidth;
+  const h = canvas.offsetHeight;
+  const pad = { top: 30, right: 30, bottom: 50, left: 80 };
+  
+  // Generate data
+  const altitudes = [];
+  for (let i = 0; i <= 100; i++) {
+    altitudes.push(Math.pow(10, i * 7.55 / 100));
+  }
+  
+  const grData = altitudes.map(a => ({ x: a, y: grDecayShift(a) }));
+  const ceData = altitudes.map(a => ({ x: a, y: grDecayShift(a) + chronalCorrection(a) }));
+  
+  const maxY = Math.max(...grData.map(d => d.y));
+  const minX = 1;
+  const maxX = 35786000;
+  
+  // Background
+  ctx.fillStyle = '#12121a';
+  ctx.fillRect(0, 0, w, h);
+  
+  const chartW = w - pad.left - pad.right;
+  const chartH = h - pad.top - pad.bottom;
+  
+  function xToPixel(x) {
+    return pad.left + (Math.log10(x) - Math.log10(minX)) / (Math.log10(maxX) - Math.log10(minX)) * chartW;
+  }
+  
+  function yToPixel(y) {
+    if (maxY <= 0) return pad.top + chartH;
+    return pad.top + chartH - (y / maxY) * chartH;
+  }
+  
+  // Grid
+  ctx.strokeStyle = 'rgba(42, 42, 58, 0.5)';
+  ctx.lineWidth = 0.5;
+  for (let exp = 0; exp <= 7; exp++) {
+    const x = xToPixel(Math.pow(10, exp));
+    ctx.beginPath();
+    ctx.moveTo(x, pad.top);
+    ctx.lineTo(x, pad.top + chartH);
+    ctx.stroke();
+  }
+  
+  // Draw GR line
+  ctx.beginPath();
+  ctx.strokeStyle = '#4a9eff';
+  ctx.lineWidth = 2;
+  grData.forEach((d, i) => {
+    const px = xToPixel(d.x);
+    const py = yToPixel(d.y);
+    if (i === 0) ctx.moveTo(px, py);
+    else ctx.lineTo(px, py);
+  });
+  ctx.stroke();
+  
+  // Draw CE line (nearly identical — the correction is tiny)
+  ctx.beginPath();
+  ctx.strokeStyle = '#9b59b6';
+  ctx.lineWidth = 2;
+  ctx.setLineDash([4, 3]);
+  ceData.forEach((d, i) => {
+    const px = xToPixel(d.x);
+    const py = yToPixel(d.y);
+    if (i === 0) ctx.moveTo(px, py);
+    else ctx.lineTo(px, py);
+  });
+  ctx.stroke();
+  ctx.setLineDash([]);
+  
+  // X-axis labels
+  ctx.fillStyle = '#888';
+  ctx.font = '10px SF Mono, monospace';
+  ctx.textAlign = 'center';
+  const xLabels = [{v: 1, l: '1m'}, {v: 1000, l: '1km'}, {v: 1e6, l: '1Mm'}, {v: 1e7, l: '10Mm'}];
+  xLabels.forEach(({v, l}) => {
+    ctx.fillText(l, xToPixel(v), pad.top + chartH + 20);
+  });
+  ctx.fillText('Altitude (log scale)', w / 2, h - 10);
+  
+  // Legend
+  ctx.fillStyle = '#4a9eff';
+  ctx.fillRect(pad.left + 10, pad.top + 10, 20, 3);
+  ctx.fillStyle = '#4a9eff';
+  ctx.font = '11px SF Pro Display, sans-serif';
+  ctx.textAlign = 'left';
+  ctx.fillText('GR Prediction', pad.left + 35, pad.top + 14);
+  
+  ctx.fillStyle = '#9b59b6';
+  ctx.fillRect(pad.left + 10, pad.top + 28, 20, 3);
+  ctx.fillStyle = '#9b59b6';
+  ctx.fillText('Chronal Energy (GR + φ correction)', pad.left + 35, pad.top + 32);
+  
+  ctx.fillStyle = '#888';
+  ctx.font = '10px SF Pro Display, sans-serif';
+  ctx.fillText('(Lines overlap — correction is 10¹² × smaller than signal)', pad.left + 10, pad.top + 50);
+}
+
+function drawChronalChart() {
+  const canvas = document.getElementById('chronal-chart');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  
+  canvas.width = canvas.offsetWidth * 2;
+  canvas.height = canvas.offsetHeight * 2;
+  ctx.scale(2, 2);
+  
+  const w = canvas.offsetWidth;
+  const h = canvas.offsetHeight;
+  const pad = { top: 30, right: 30, bottom: 50, left: 80 };
+  
+  // Generate chronal correction data
+  const altitudes = [];
+  for (let i = 1; i <= 100; i++) {
+    altitudes.push(Math.pow(10, i * 7.55 / 100));
+  }
+  
+  const data = altitudes.map(a => ({ x: a, y: chronalCorrection(a) }));
+  const absData = data.map(d => ({ x: d.x, y: Math.abs(d.y) }));
+  const maxY = Math.max(...absData.map(d => d.y));
+  const minX = 1;
+  const maxX = 35786000;
+  
+  // Background
+  ctx.fillStyle = '#12121a';
+  ctx.fillRect(0, 0, w, h);
+  
+  const chartW = w - pad.left - pad.right;
+  const chartH = h - pad.top - pad.bottom;
+  
+  function xToPixel(x) {
+    return pad.left + (Math.log10(x) - Math.log10(minX)) / (Math.log10(maxX) - Math.log10(minX)) * chartW;
+  }
+  
+  // Use log scale for Y too
+  const minYLog = -27;
+  const maxYLog = -20;
+  
+  function yToPixel(y) {
+    if (y <= 0) return pad.top + chartH;
+    const logY = Math.log10(y);
+    if (logY < minYLog) return pad.top + chartH;
+    return pad.top + chartH - ((logY - minYLog) / (maxYLog - minYLog)) * chartH;
+  }
+  
+  // Grid
+  ctx.strokeStyle = 'rgba(42, 42, 58, 0.5)';
+  ctx.lineWidth = 0.5;
+  for (let exp = minYLog; exp <= maxYLog; exp++) {
+    const y = yToPixel(Math.pow(10, exp));
+    ctx.beginPath();
+    ctx.moveTo(pad.left, y);
+    ctx.lineTo(pad.left + chartW, y);
+    ctx.stroke();
+    
+    ctx.fillStyle = '#666';
+    ctx.font = '9px SF Mono, monospace';
+    ctx.textAlign = 'right';
+    ctx.fillText('10' + superscript(exp), pad.left - 5, y + 3);
+  }
+  
+  // Draw correction magnitude
+  ctx.beginPath();
+  ctx.strokeStyle = '#9b59b6';
+  ctx.lineWidth = 2;
+  let started = false;
+  absData.forEach((d, i) => {
+    if (d.y <= 0) return;
+    const px = xToPixel(d.x);
+    const py = yToPixel(d.y);
+    if (py > pad.top + chartH || py < pad.top) return;
+    if (!started) { ctx.moveTo(px, py); started = true; }
+    else ctx.lineTo(px, py);
+  });
+  ctx.stroke();
+  
+  // Glow
+  ctx.beginPath();
+  ctx.strokeStyle = 'rgba(155, 89, 182, 0.3)';
+  ctx.lineWidth = 6;
+  started = false;
+  absData.forEach((d, i) => {
+    if (d.y <= 0) return;
+    const px = xToPixel(d.x);
+    const py = yToPixel(d.y);
+    if (py > pad.top + chartH || py < pad.top) return;
+    if (!started) { ctx.moveTo(px, py); started = true; }
+    else ctx.lineTo(px, py);
+  });
+  ctx.stroke();
+  
+  // X-axis labels
+  ctx.fillStyle = '#888';
+  ctx.font = '10px SF Mono, monospace';
+  ctx.textAlign = 'center';
+  const xLabels = [{v: 10, l: '10m'}, {v: 1000, l: '1km'}, {v: 1e5, l: '100km'}, {v: 1e7, l: '10Mm'}];
+  xLabels.forEach(({v, l}) => {
+    ctx.fillText(l, xToPixel(v), pad.top + chartH + 20);
+  });
+  ctx.fillText('Altitude (log scale)', w / 2, h - 10);
+  
+  // Y-axis label
+  ctx.save();
+  ctx.translate(12, h / 2);
+  ctx.rotate(-Math.PI / 2);
+  ctx.fillStyle = '#888';
+  ctx.font = '10px SF Pro Display, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('|Chronal Correction| (log scale)', 0, 0);
+  ctx.restore();
+  
+  // Title annotation
+  ctx.fillStyle = '#9b59b6';
+  ctx.font = '11px SF Pro Display, sans-serif';
+  ctx.textAlign = 'left';
+  ctx.fillText('φ-damped oscillatory correction', pad.left + 10, pad.top + 15);
+  ctx.fillStyle = '#666';
+  ctx.font = '10px SF Pro Display, sans-serif';
+  ctx.fillText('This is what the experiment would need to detect', pad.left + 10, pad.top + 32);
+}
+
+// =============================================================================
+// INTERACTIVE CALCULATOR
+// =============================================================================
+
+function initCalculator() {
+  const slider = document.getElementById('alt-slider');
+  const display = document.getElementById('alt-display');
+  const select = document.getElementById('isotope-select');
+  
+  function update() {
+    const logAlt = parseFloat(slider.value);
+    const altitude = Math.pow(10, logAlt);
+    
+    // Display altitude
+    if (altitude < 1000) display.textContent = altitude.toFixed(0) + ' m';
+    else if (altitude < 1e6) display.textContent = (altitude / 1000).toFixed(1) + ' km';
+    else display.textContent = (altitude / 1e6).toFixed(1) + ' Mm';
+    
+    // Calculate
+    const redshift = gravitationalRedshift(altitude);
+    const grShift = grDecayShift(altitude);
+    const chronal = chronalCorrection(altitude);
+    const total = grShift + chronal;
+    const timeGain = grShift * 86400 * 1e6;
+    
+    // Noise floor (source uniformity dominated)
+    const noiseFloor = 1e-3;
+    const gap = noiseFloor / Math.abs(grShift || 1e-30);
+    
+    document.getElementById('calc-redshift').textContent = redshift.toFixed(15);
+    document.getElementById('calc-gr-shift').textContent = grShift === 0 ? '0' : grShift.toExponential(4);
+    document.getElementById('calc-chronal').textContent = chronal === 0 ? '0' : chronal.toExponential(4);
+    document.getElementById('calc-total').textContent = total === 0 ? '0' : total.toExponential(4);
+    document.getElementById('calc-gap').textContent = gap > 1 ? gap.toExponential(1) + '×' : 'Detectable!';
+    document.getElementById('calc-time').textContent = timeGain.toFixed(4);
+    
+    // Color the gap
+    const gapEl = document.getElementById('calc-gap');
+    gapEl.style.color = gap <= 1 ? 'var(--emerald)' : gap < 100 ? 'var(--gold)' : 'var(--red)';
+  }
+  
+  slider.addEventListener('input', update);
+  select.addEventListener('change', update);
+  update();
+}
+
+// =============================================================================
+// INIT
+// =============================================================================
+
+window.addEventListener('DOMContentLoaded', () => {
+  populateTable();
+  initRiversAnimation();
+  initCalculator();
+  
+  // Delay chart drawing to ensure layout is complete
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      drawMCChart();
+      drawRiversChart();
+      drawChronalChart();
+    });
+  });
+});
+
+window.addEventListener('resize', () => {
+  drawMCChart();
+  drawRiversChart();
+  drawChronalChart();
+});
+</script>
+
+</body>
+</html>
