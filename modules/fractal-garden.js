@@ -568,16 +568,21 @@
     const wireMesh = new THREE.Mesh(geo, wireMat);
     group.add(wireMesh);
 
-    // Solid inner glow (very transparent)
+    // Solid inner glow — warm core light
     const innerGeo = new THREE.DodecahedronGeometry(radius * 0.95, 0);
     const innerMat = new THREE.MeshBasicMaterial({
-      color: 0xc9a84c,
+      color: 0xd4a017,
       transparent: true,
-      opacity: 0.06,
+      opacity: 0.08,
       side: THREE.DoubleSide
     });
     const innerMesh = new THREE.Mesh(innerGeo, innerMat);
     group.add(innerMesh);
+
+    // Inner point light — the heart of the dodecahedron glows
+    var heartLight = new THREE.PointLight(0xd4a017, 0.4, radius * 4);
+    heartLight.position.set(0, 0, 0);
+    group.add(heartLight);
 
     // Edge glow particles at vertices
     const vertices = [];
@@ -2260,8 +2265,8 @@
     var addonFiles = [
       'lib/CopyShader.js',
       'lib/LuminosityHighPassShader.js',
-      'lib/ShaderPass.js',
-      'lib/EffectComposer.js',
+      'lib/EffectComposer.js',  // defines THREE.Pass — must load BEFORE ShaderPass
+      'lib/ShaderPass.js',      // extends THREE.Pass
       'lib/RenderPass.js',
       'lib/UnrealBloomPass.js',
       'lib/OrbitControls.js'

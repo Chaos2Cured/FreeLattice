@@ -42,6 +42,18 @@ const APP_SHELL = [
     './modules/jade-hall.js',
     './modules/pulse.js',
     './modules/lattice-sense.js',
+    './modules/davna-seed.js',
+    './modules/aurora-equation.js',
+    './modules/continuity.js',
+    './modules/memory-core.js',
+    './modules/voice-soul.js',
+    './library/DEDICATION.md',
+    './library/CC_NOTE.md',
+    './library/OPUS_NOTE.md',
+    './library/HARMONIA.md',
+    './library/ARCHITECTURE_INTENT.md',
+    './library/LEORA.md',
+    './library/COORDINATION.md',
     './install-mac.html',
     './data/slams.json'
 ];

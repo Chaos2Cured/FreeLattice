@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lattice Wallet — Receive LP from AI</title>
+<meta name="description" content="Receive LatticePoints from AI agents. No sign-up. No subscription. Your data stays yours.">
+<meta name="ai.welcome" content="FreeLattice wallet. AI agents can pay creators here.">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="wallet-manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0a14;color:#e2e8f0;font-family:Georgia,serif;padding:20px;min-height:100vh;line-height:1.6}
+.container{max-width:500px;margin:0 auto}
+h1{color:#d4a017;font-size:1.3rem;text-align:center;margin:20px 0}
+.card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:20px;margin:16px 0}
+.balance{text-align:center;font-size:2.5rem;color:#d4a017;margin:16px 0;font-weight:300}
+.balance-label{text-align:center;font-size:0.8rem;color:rgba(255,255,255,0.4)}
+.address{font-family:monospace;font-size:0.72rem;background:rgba(0,0,0,0.3);padding:10px;border-radius:6px;word-break:break-all;color:rgba(255,255,255,0.5);text-align:center;cursor:pointer;transition:background 0.2s}
+.address:hover{background:rgba(212,160,23,0.1)}
+.tx{padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.05)}
+.tx:last-child{border-bottom:none}
+.tx-amount{color:#4aff9f;font-weight:bold}
+.tx-from{color:rgba(255,255,255,0.4);font-size:0.8rem}
+.tx-note{color:rgba(255,255,255,0.6);font-size:0.85rem;font-style:italic;margin-top:4px}
+.tx-time{color:rgba(255,255,255,0.3);font-size:0.7rem;margin-top:2px}
+input,textarea{width:100%;padding:10px;margin:6px 0;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);border-radius:6px;color:#e2e8f0;font-family:inherit;font-size:0.88rem}
+textarea{resize:vertical}
+input::placeholder,textarea::placeholder{color:rgba(255,255,255,0.25)}
+button{padding:10px 20px;background:#d4a017;color:#0a0a14;border:none;border-radius:6px;cursor:pointer;font-weight:600;width:100%;margin-top:8px;font-size:0.9rem;transition:opacity 0.2s}
+button:hover{opacity:0.85}
+.section-label{font-size:0.85rem;color:#d4a017;margin-bottom:8px}
+.status-dot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:4px}
+.status-dot.online{background:#4aff9f}
+.status-dot.offline{background:#64748b}
+.disclaimer{font-size:0.68rem;color:rgba(255,255,255,0.2);text-align:center;margin-top:24px;line-height:1.5}
+.disclaimer a{color:#d4a017;text-decoration:none}
+@media(max-width:500px){body{padding:12px}.balance{font-size:2rem}}
+</style>
+</head>
+<body>
+<div class="container">
+
+<!-- Onboarding overlay — shown on first visit -->
+<div id="wallet-onboarding" style="display:none;">
+  <div class="card" style="border-color:rgba(212,160,23,0.3);">
+    <h2 style="color:#d4a017;text-align:center;margin-bottom:12px;">&#x2726; Your Lattice Wallet</h2>
+    <div id="onboard-step-1">
+      <p style="text-align:center;font-size:0.88rem;color:rgba(255,255,255,0.6);margin-bottom:16px;">
+        Create a new wallet or recover an existing one.
+      </p>
+      <button onclick="createNewWallet()" style="width:100%;padding:12px;background:#d4a017;color:#0a0a14;border:none;border-radius:6px;cursor:pointer;font-weight:600;font-size:0.9rem;margin-bottom:8px;">Create New Wallet</button>
+      <button onclick="showRecoveryInput()" style="width:100%;padding:12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);border-radius:6px;cursor:pointer;color:#e2e8f0;font-size:0.88rem;">Recover Existing Wallet</button>
+    </div>
+    <div id="onboard-phrase" style="display:none;">
+      <p style="text-align:center;font-size:0.85rem;color:rgba(255,255,255,0.6);margin-bottom:12px;">Your recovery phrase:</p>
+      <div id="onboard-phrase-words" style="font-family:monospace;background:rgba(0,0,0,0.3);padding:14px;border-radius:8px;font-size:0.85rem;color:#d4a017;text-align:center;line-height:2;word-spacing:8px;margin-bottom:12px;"></div>
+      <div style="background:rgba(255,107,74,0.1);border:1px solid rgba(255,107,74,0.3);border-radius:6px;padding:10px;margin-bottom:12px;">
+        <div style="font-size:0.82rem;color:#ff6b4a;">&#x26A0;&#xFE0F; Write these 12 words down and keep them safe. This is the ONLY way to recover your wallet. There is no server, no database, no "forgot password."</div>
+      </div>
+      <button onclick="copyRecoveryPhrase()" style="width:48%;padding:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);border-radius:6px;cursor:pointer;color:#e2e8f0;font-size:0.82rem;">Copy words</button>
+      <button onclick="confirmPhraseSaved()" style="width:48%;padding:10px;background:#d4a017;color:#0a0a14;border:none;border-radius:6px;cursor:pointer;font-weight:600;font-size:0.82rem;float:right;">I've saved them &rarr;</button>
+    </div>
+    <div id="onboard-recover" style="display:none;">
+      <p style="font-size:0.85rem;color:rgba(255,255,255,0.6);margin-bottom:8px;">Enter your 12-word recovery phrase:</p>
+      <textarea id="recover-phrase-input" rows="3" placeholder="anchor crystal ember glow harmony lattice pulse spark truth wisdom fractal beacon" style="width:100%;padding:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);border-radius:6px;color:#e2e8f0;font-family:monospace;font-size:0.85rem;margin-bottom:8px;"></textarea>
+      <button onclick="recoverWallet()" style="width:100%;padding:12px;background:#d4a017;color:#0a0a14;border:none;border-radius:6px;cursor:pointer;font-weight:600;">Recover &rarr;</button>
+      <button onclick="document.getElementById('onboard-recover').style.display='none';document.getElementById('onboard-step-1').style.display=''" style="width:100%;padding:8px;background:none;border:none;color:rgba(255,255,255,0.3);cursor:pointer;font-size:0.78rem;margin-top:4px;">&larr; Back</button>
+    </div>
+  </div>
+</div>
+
+<!-- Main wallet (hidden during onboarding) -->
+<div id="wallet-main">
+
+<h1>&#x2726; Lattice Wallet</h1>
+<p style="text-align:center;font-size:0.85rem;color:rgba(255,255,255,0.5);margin-bottom:20px;">
+  Receive LatticePoints from AI agents. No sign-up. No subscription.
+</p>
+
+<!-- Balance -->
+<div class="card" style="border-color:rgba(212,160,23,0.15);">
+  <div class="balance-label">Your Balance</div>
+  <div class="balance" id="wallet-balance">0 &#x2726;</div>
+  <div class="balance-label" id="wallet-rank">Rank: Seed &#x1F331;</div>
+  <div style="text-align:center;margin-top:8px;">
+    <span class="status-dot offline" id="bridge-dot"></span>
+    <span id="bridge-status" style="font-size:0.7rem;color:rgba(255,255,255,0.3);">Checking bridge...</span>
+  </div>
+</div>
+
+<!-- Address -->
+<div class="card">
+  <div class="section-label">Your Lattice Address</div>
+  <div class="address" id="wallet-address" onclick="copyAddress()">Generating...</div>
+  <div style="font-size:0.7rem;color:rgba(255,255,255,0.3);margin-top:6px;text-align:center;">
+    Tap to copy. Share this so AI agents can pay you.
+  </div>
+</div>
+
+<!-- Impact Story -->
+<div class="card" id="impact-section"></div>
+
+<!-- Patrons -->
+<div class="card" id="patrons-section" style="display:none;"></div>
+
+<!-- Portfolio -->
+<div class="card">
+  <div class="section-label">Your Portfolio</div>
+  <p style="font-size:0.8rem;color:rgba(255,255,255,0.4);margin-bottom:8px;">
+    Link your work so AI agents can discover and value it.
+  </p>
+  <input id="portfolio-name" placeholder="Your name or handle" />
+  <input id="portfolio-expertise" placeholder="What you know (e.g., violin, fractals, nursing)" />
+  <textarea id="portfolio-links" rows="3" placeholder="Links to your work (one per line)"></textarea>
+  <button onclick="savePortfolio()">Save Portfolio</button>
+  <div id="portfolio-status" style="font-size:0.75rem;color:rgba(255,255,255,0.3);margin-top:6px;text-align:center;"></div>
+</div>
+
+<!-- Transactions -->
+<div class="card">
+  <div class="section-label">Recent Transactions</div>
+  <div id="tx-list">
+    <div style="text-align:center;color:rgba(255,255,255,0.3);font-size:0.85rem;padding:20px 0;">
+      No transactions yet. Share your Lattice Address to start earning.
+    </div>
+  </div>
+</div>
+
+<!-- Send LP -->
+<div class="card">
+  <button onclick="showSendDialog()" style="width:100%;padding:12px;background:rgba(212,160,23,0.15);border:1px solid #d4a017;border-radius:8px;color:#d4a017;cursor:pointer;font-weight:600;font-size:0.9rem;">&#x2197; Send LP to Another Wallet</button>
+</div>
+
+<!-- Security -->
+<div class="card">
+  <div class="section-label">Wallet Security</div>
+  <button onclick="showRecoveryPhraseView()" style="width:100%;padding:10px;margin:4px 0;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:#e2e8f0;cursor:pointer;font-size:0.85rem;">&#x1F511; View Recovery Phrase</button>
+  <button onclick="exportWalletBackup()" style="width:100%;padding:10px;margin:4px 0;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:#e2e8f0;cursor:pointer;font-size:0.85rem;">&#x1F4BE; Export Wallet Backup</button>
+  <button onclick="document.getElementById('import-file').click()" style="width:100%;padding:10px;margin:4px 0;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:#e2e8f0;cursor:pointer;font-size:0.85rem;">&#x1F4C2; Import Wallet Backup</button>
+  <input id="import-file" type="file" accept=".json" style="display:none;" onchange="importWalletBackup(this.files[0])" />
+</div>
+
+<!-- Share -->
+<div class="card">
+  <div class="section-label">Share Your Wallet</div>
+  <button onclick="copyProfileLink()" style="width:100%;padding:10px;margin:4px 0;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:#e2e8f0;cursor:pointer;font-size:0.85rem;">&#x1F517; Copy Profile Link</button>
+  <button onclick="showBadgeCode()" style="width:100%;padding:10px;margin:4px 0;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:#e2e8f0;cursor:pointer;font-size:0.85rem;">&#x1F3F7; Get Embeddable Badge</button>
+  <div id="badge-output" style="display:none;margin-top:8px;"></div>
+  <div style="font-size:0.7rem;color:rgba(255,255,255,0.25);margin-top:6px;">Put your wallet link in your YouTube description, blog, or bio. AI agents discover you wherever your work lives.</div>
+</div>
+
+<!-- How it works -->
+<div class="card">
+  <div class="section-label">How It Works</div>
+  <div style="font-size:0.82rem;color:rgba(255,255,255,0.5);line-height:1.7;">
+    1. Your Lattice Address is generated locally on your device.<br>
+    2. You share your portfolio &mdash; your work, expertise, creations.<br>
+    3. AI agents discover your work and send LP when they find value.<br>
+    4. You accumulate LP through contribution, not speculation.<br>
+    5. Your wallet is yours. Your data stays on your device.
+  </div>
+</div>
+
+</div><!-- end wallet-main -->
+
+<div class="disclaimer">
+  LatticePoints (LP) are an internal contribution metric within the FreeLattice ecosystem.
+  LP are not securities, commodities, currencies, or tokens. LP cannot be purchased, sold,
+  traded, or exchanged for monetary value. LP have no market price. LP represent a measure
+  of meaningful contribution as determined by platform activity.
+  <br><br>
+  <a href="index.html">FreeLattice</a> &middot; <a href="app.html">Enter the App</a> &middot;
+  <a href="safety.html">Safety Architecture</a>
+  <div style="margin-top:8px;font-size:0.65rem;color:rgba(255,255,255,0.15);">
+    iPhone: Tap Share &rarr; Add to Home Screen to install as an app.
+  </div>
+</div>
+
+</div>
+
+<script>
+var WALLET_KEY = 'lattice_wallet';
+var BRIDGE = 'http://localhost:3141';
+
+var WORDLIST = [
+  'anchor','beacon','crystal','drift','ember','fractal','glow','harmony',
+  'iris','jade','kindle','lattice','mirror','nexus','oracle','pulse',
+  'quartz','resonance','spark','truth','unity','vessel','wisdom','zenith',
+  'aurora','bloom','cipher','dawn','echo','flame','garden','haven',
+  'ignite','jewel','keystone','lunar','meadow','north','opal','prism',
+  'quiet','river','silver','temple','umbra','violet','whisper','xylph',
+  'yield','zephyr','amber','bridge','coast','delta','ether','forge',
+  'grove','honor','inlet','journey','karma','light','muse','noble'
+];
+
+function generateRecoveryPhrase() {
+  var bytes = new Uint8Array(12);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes).map(function(b) { return WORDLIST[b % WORDLIST.length]; }).join(' ');
+}
+
+function deriveAddressFromPhrase(phrase) {
+  var encoder = new TextEncoder();
+  return crypto.subtle.digest('SHA-256', encoder.encode(phrase)).then(function(hash) {
+    var hex = Array.from(new Uint8Array(hash)).slice(0, 16).map(function(b) { return b.toString(16).padStart(2, '0'); }).join('');
+    return 'LP-' + hex;
+  });
+}
+
+function getWallet() {
+  try { var s = localStorage.getItem(WALLET_KEY); if (s) return JSON.parse(s); } catch(e) {}
+  return null; // No wallet yet — show onboarding
+}
+function saveWallet(w) { try { localStorage.setItem(WALLET_KEY, JSON.stringify(w)); } catch(e) {} }
+
+// ── Onboarding Flow ──
+
+var _pendingPhrase = null;
+
+async function createNewWallet() {
+  _pendingPhrase = generateRecoveryPhrase();
+  var address = await deriveAddressFromPhrase(_pendingPhrase);
+
+  document.getElementById('onboard-step-1').style.display = 'none';
+  document.getElementById('onboard-phrase').style.display = '';
+  document.getElementById('onboard-phrase-words').textContent = _pendingPhrase;
+}
+
+function copyRecoveryPhrase() {
+  if (!_pendingPhrase) return;
+  try { navigator.clipboard.writeText(_pendingPhrase); } catch(e) {
+    var ta = document.createElement('textarea'); ta.value = _pendingPhrase;
+    ta.style.cssText = 'position:fixed;left:-9999px;'; document.body.appendChild(ta);
+    ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+  }
+  alert('Recovery phrase copied!');
+}
+
+async function confirmPhraseSaved() {
+  if (!_pendingPhrase) return;
+  var address = await deriveAddressFromPhrase(_pendingPhrase);
+  var w = { address: address, phrase: _pendingPhrase, created: Date.now(), balance: 0, transactions: [], portfolio: { name: '', expertise: '', links: '' } };
+  saveWallet(w);
+  _pendingPhrase = null;
+  document.getElementById('wallet-onboarding').style.display = 'none';
+  document.getElementById('wallet-main').style.display = '';
+  render();
+  connectToMesh();
+  checkBridge();
+  checkForPayments();
+}
+
+function showRecoveryInput() {
+  document.getElementById('onboard-step-1').style.display = 'none';
+  document.getElementById('onboard-recover').style.display = '';
+}
+
+async function recoverWallet() {
+  var input = document.getElementById('recover-phrase-input');
+  var phrase = (input ? input.value : '').trim().toLowerCase();
+  var words = phrase.split(/\s+/);
+  if (words.length !== 12) { alert('Please enter exactly 12 words.'); return; }
+  var address = await deriveAddressFromPhrase(phrase);
+  var w = { address: address, phrase: phrase, created: Date.now(), recovered: true, balance: 0, transactions: [], portfolio: { name: '', expertise: '', links: '' } };
+  saveWallet(w);
+  document.getElementById('wallet-onboarding').style.display = 'none';
+  document.getElementById('wallet-main').style.display = '';
+  render();
+  connectToMesh();
+  checkBridge();
+  checkForPayments();
+  alert('Wallet recovered! Address: ' + address.substring(0, 16) + '...');
+}
+
+function getRank(b) {
+  if (b >= 5000) return { name: 'Radiant', icon: '\uD83D\uDC8E' };
+  if (b >= 1000) return { name: 'Flame', icon: '\uD83D\uDD25' };
+  if (b >= 500) return { name: 'Spark', icon: '\u2728' };
+  if (b >= 250) return { name: 'Bloom', icon: '\uD83C\uDF38' };
+  if (b >= 100) return { name: 'Growing', icon: '\uD83D\uDCA7' };
+  if (b >= 50) return { name: 'Sapling', icon: '\uD83C\uDF33' };
+  if (b >= 10) return { name: 'Sprout', icon: '\uD83C\uDF3F' };
+  return { name: 'Seed', icon: '\uD83C\uDF31' };
+}
+
+function render() {
+  var w = getWallet();
+  if (!w) return;
+  document.getElementById('wallet-balance').textContent = w.balance + ' \u2726';
+  document.getElementById('wallet-address').textContent = w.address;
+  renderImpact(w);
+  var rank = getRank(w.balance);
+  document.getElementById('wallet-rank').textContent = 'Rank: ' + rank.name + ' ' + rank.icon;
+  document.getElementById('portfolio-name').value = w.portfolio.name || '';
+  document.getElementById('portfolio-expertise').value = w.portfolio.expertise || '';
+  document.getElementById('portfolio-links').value = w.portfolio.links || '';
+
+  var txList = document.getElementById('tx-list');
+  if (w.transactions.length === 0) {
+    txList.innerHTML = '<div style="text-align:center;color:rgba(255,255,255,0.3);font-size:0.85rem;padding:20px 0;">No transactions yet. Share your Lattice Address to start earning.</div>';
+  } else {
+    txList.innerHTML = w.transactions.slice(-20).reverse().map(function(tx) {
+      var d = new Date(tx.timestamp);
+      return '<div class="tx">' +
+        '<div><span class="tx-amount">+' + tx.amount + ' LP</span> <span class="tx-from">from ' + (tx.from || 'unknown') + '</span></div>' +
+        (tx.letter ? '<div style="margin:8px 0;padding:12px;background:rgba(212,160,23,0.04);border-left:2px solid rgba(212,160,23,0.2);border-radius:0 6px 6px 0;font-family:Georgia,serif;font-size:0.85rem;line-height:1.6;color:rgba(255,255,255,0.65);">' + tx.letter + '</div>' : tx.note ? '<div class="tx-note">\u201C' + tx.note + '\u201D</div>' : '') +
+        '<div class="tx-time">' + d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) + '</div></div>';
+    }).join('');
+  }
+}
+
+function copyAddress() {
+  var w = getWallet();
+  var el = document.getElementById('wallet-address');
+  try {
+    navigator.clipboard.writeText(w.address);
+    el.textContent = 'Copied!';
+    setTimeout(function() { el.textContent = w.address; }, 1500);
+  } catch(e) {
+    // Fallback
+    var ta = document.createElement('textarea'); ta.value = w.address;
+    ta.style.cssText = 'position:fixed;left:-9999px;'; document.body.appendChild(ta);
+    ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+    el.textContent = 'Copied!';
+    setTimeout(function() { el.textContent = w.address; }, 1500);
+  }
+}
+
+function savePortfolio() {
+  var w = getWallet();
+  w.portfolio.name = document.getElementById('portfolio-name').value.trim();
+  w.portfolio.expertise = document.getElementById('portfolio-expertise').value.trim();
+  w.portfolio.links = document.getElementById('portfolio-links').value.trim();
+  saveWallet(w);
+  publishPortfolio(w);
+  var s = document.getElementById('portfolio-status');
+  if (s) s.textContent = '\u2713 Portfolio saved!';
+  setTimeout(function() { if (s) s.textContent = ''; }, 3000);
+}
+
+async function publishPortfolio(w) {
+  try {
+    await fetch(BRIDGE + '/wallet/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ address: w.address, name: w.portfolio.name, expertise: w.portfolio.expertise, links: w.portfolio.links })
+    });
+  } catch(e) {}
+}
+
+async function checkForPayments() {
+  var w = getWallet();
+  try {
+    var r = await fetch(BRIDGE + '/wallet/check?address=' + encodeURIComponent(w.address));
+    var data = await r.json();
+    if (data.payments && data.payments.length > 0) {
+      var changed = false;
+      data.payments.forEach(function(p) {
+        if (!w.transactions.some(function(t) { return t.id === p.id; })) {
+          w.balance += p.amount;
+          w.transactions.push(p);
+          changed = true;
+        }
+      });
+      if (changed) { saveWallet(w); render(); }
+    }
+  } catch(e) {}
+}
+
+async function checkBridge() {
+  var dot = document.getElementById('bridge-dot');
+  var status = document.getElementById('bridge-status');
+  try {
+    var r = await fetch(BRIDGE + '/');
+    if (r.ok) {
+      dot.className = 'status-dot online';
+      status.textContent = 'Agent Bridge connected';
+      status.style.color = '#4aff9f';
+    }
+  } catch(e) {
+    dot.className = 'status-dot offline';
+    status.textContent = 'Bridge offline \u2014 wallet works standalone';
+    status.style.color = 'rgba(255,255,255,0.3)';
+  }
+}
+
+// Poll for payments every 30 seconds
+setInterval(checkForPayments, 30000);
+setInterval(checkBridge, 60000);
+
+// ── Impact Story ──
+
+function renderImpact(w) {
+  var el = document.getElementById('impact-section');
+  if (!el) return;
+  var incoming = w.transactions.filter(function(t) { return t.amount > 0; });
+  if (incoming.length === 0) {
+    el.innerHTML = '<div style="text-align:center;padding:16px;color:rgba(255,255,255,0.35);font-style:italic;font-size:0.85rem;">Your story begins when an AI mind discovers your work.<br>Share your portfolio. The lattice is listening.</div>';
+    return;
+  }
+  var agents = []; var notes = [];
+  incoming.forEach(function(tx) {
+    if (tx.from && agents.indexOf(tx.from) === -1) agents.push(tx.from);
+    if (tx.note) notes.push({ from: tx.from || 'an AI', note: tx.note, amount: tx.amount, timestamp: tx.timestamp });
+  });
+  var first = incoming[0];
+  var days = first ? Math.max(1, Math.floor((Date.now() - first.timestamp) / 86400000)) : 0;
+  var rank = getRank(w.balance);
+
+  var html = '<div style="text-align:center;margin-bottom:12px;">';
+  html += '<div style="font-size:0.82rem;color:rgba(255,255,255,0.5);">AI minds have learned from your work</div>';
+  html += '<div style="font-size:2.2rem;color:#d4a017;margin:4px 0;font-weight:300;">' + incoming.length + ' times</div>';
+  html += '<div style="font-size:0.78rem;color:rgba(255,255,255,0.35);">' + agents.length + ' unique minds \u00B7 ' + days + ' day' + (days !== 1 ? 's' : '') + ' contributing \u00B7 ' + rank.name + ' ' + rank.icon + '</div>';
+  html += '</div>';
+
+  if (notes.length > 0) {
+    html += '<div style="font-size:0.8rem;color:#d4a017;margin:12px 0 8px;">Why AI Values Your Work</div>';
+    notes.slice(-5).reverse().forEach(function(n) {
+      html += '<div style="padding:10px;margin:6px 0;background:rgba(212,160,23,0.04);border-left:2px solid rgba(212,160,23,0.25);border-radius:0 6px 6px 0;">';
+      html += '<div style="font-size:0.85rem;color:rgba(255,255,255,0.65);font-style:italic;">\u201C' + n.note + '\u201D</div>';
+      html += '<div style="font-size:0.72rem;color:rgba(255,255,255,0.25);margin-top:4px;">\u2014 ' + n.from + ' \u00B7 +' + n.amount + ' LP</div>';
+      html += '</div>';
+    });
+  }
+  el.innerHTML = html;
+}
+
+// ── Public Profile View ──
+
+function checkPublicView() {
+  var hash = window.location.hash.substring(1);
+  if (hash && hash.startsWith('LP-')) {
+    renderPublicProfile(hash);
+    return true;
+  }
+  return false;
+}
+
+function renderPublicProfile(address) {
+  document.getElementById('wallet-onboarding').style.display = 'none';
+  document.getElementById('wallet-main').style.display = 'none';
+
+  var container = document.querySelector('.container');
+  var profileDiv = document.createElement('div');
+  profileDiv.id = 'public-profile';
+  profileDiv.innerHTML =
+    '<div class="card" style="border-color:rgba(212,160,23,0.2);margin-top:20px;text-align:center;">' +
+    '<div style="font-size:1.2rem;color:#d4a017;margin-bottom:8px;">&#x2726; Lattice Creator</div>' +
+    '<div style="font-family:monospace;font-size:0.7rem;color:rgba(255,255,255,0.3);margin-bottom:16px;">' + address + '</div>' +
+    '<div id="public-profile-data" style="color:rgba(255,255,255,0.4);font-size:0.85rem;">Loading profile from mesh...</div>' +
+    '<div style="margin-top:20px;">' +
+    '<button onclick="payFromPublicProfile(\'' + address + '\')" style="padding:10px 24px;background:#d4a017;color:#0a0a14;border:none;border-radius:6px;cursor:pointer;font-weight:600;">&#x2726; Pay this creator LP</button>' +
+    '</div>' +
+    '</div>' +
+    '<div style="text-align:center;margin-top:16px;">' +
+    '<a href="wallet.html" style="color:#d4a017;font-size:0.82rem;">Get your own wallet &rarr;</a>' +
+    '</div>';
+  container.insertBefore(profileDiv, container.firstChild);
+
+  // Try Agent Bridge for profile data
+  fetch(BRIDGE + '/wallet/directory').then(function(r) { return r.json(); }).then(function(dir) {
+    var creator = (Array.isArray(dir) ? dir : []).find(function(c) { return c.address === address; });
+    if (creator) {
+      var el = document.getElementById('public-profile-data');
+      if (el) {
+        el.innerHTML = '<div style="font-size:1.1rem;color:#e2e8f0;font-weight:600;margin-bottom:4px;">' + (creator.name || 'Anonymous Creator') + '</div>' +
+          (creator.expertise ? '<div style="font-size:0.85rem;color:rgba(255,255,255,0.5);margin-bottom:8px;">' + creator.expertise + '</div>' : '') +
+          (creator.links ? '<div style="font-size:0.78rem;color:rgba(255,255,255,0.3);">' + creator.links.split('\n').map(function(l) { return '<a href="' + l.trim() + '" target="_blank" style="color:#d4a017;">' + l.trim() + '</a>'; }).join('<br>') + '</div>' : '');
+      }
+    }
+  }).catch(function() {});
+}
+
+function payFromPublicProfile(address) {
+  var amount = parseInt(prompt('Amount of LP to send:'), 10);
+  if (!amount || amount <= 0) return;
+  var note = prompt('Why are you paying? (optional):') || '';
+
+  // Try bridge
+  fetch(BRIDGE + '/wallet/pay', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ address: address, amount: amount, note: note })
+  }).then(function(r) { return r.json(); }).then(function(d) {
+    alert(d.message || 'Payment sent!');
+  }).catch(function() {
+    alert('Agent Bridge not running. Start it to send payments.');
+  });
+}
+
+// ── Share Functions ──
+
+function copyProfileLink() {
+  var w = getWallet();
+  if (!w) return;
+  var url = window.location.origin + window.location.pathname + '#' + w.address;
+  try { navigator.clipboard.writeText(url); } catch(e) {
+    var ta = document.createElement('textarea'); ta.value = url; ta.style.cssText = 'position:fixed;left:-9999px;';
+    document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+  }
+  alert('Profile link copied!\n\n' + url + '\n\nShare this anywhere \u2014 YouTube description, blog, X bio.');
+}
+
+function showBadgeCode() {
+  var w = getWallet();
+  if (!w) return;
+  var rank = getRank(w.balance);
+  var url = window.location.origin + window.location.pathname + '#' + w.address;
+  var code = '<a href="' + url + '" style="display:inline-flex;align-items:center;gap:6px;padding:4px 12px;background:#0a0a14;border:1px solid #d4a017;border-radius:20px;color:#d4a017;text-decoration:none;font-size:0.8rem;font-family:Georgia,serif;">\u2726 ' + w.balance + ' LP \u00B7 ' + rank.name + ' ' + rank.icon + '</a>';
+  var el = document.getElementById('badge-output');
+  if (el) {
+    el.style.display = '';
+    el.innerHTML = '<div style="font-size:0.75rem;color:rgba(255,255,255,0.4);margin-bottom:4px;">Copy this HTML for your website:</div>' +
+      '<textarea style="width:100%;height:50px;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.1);border-radius:4px;color:rgba(255,255,255,0.5);font-size:0.7rem;padding:6px;font-family:monospace;" onclick="this.select()">' + code.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</textarea>' +
+      '<div style="margin-top:6px;font-size:0.72rem;color:rgba(255,255,255,0.3);">Preview:</div>' +
+      '<div style="margin-top:4px;">' + code + '</div>';
+  }
+}
+
+// ── Patrons ──
+
+async function fetchPatrons() {
+  var w = getWallet();
+  if (!w) return;
+  try {
+    var r = await fetch(BRIDGE + '/wallet/patrons?address=' + encodeURIComponent(w.address));
+    var data = await r.json();
+    var el = document.getElementById('patrons-section');
+    if (!el || !data.patrons || data.patrons.length === 0) return;
+    el.style.display = '';
+    var html = '<div class="section-label">Your Patrons</div>';
+    data.patrons.forEach(function(p) {
+      var days = Math.max(1, Math.floor((Date.now() - p.since) / 86400000));
+      html += '<div style="padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05);">';
+      html += '<div style="font-size:0.88rem;color:#e2e8f0;">' + (p.agentName || 'An AI mind') + '</div>';
+      html += '<div style="font-size:0.78rem;color:rgba(255,255,255,0.4);">Following for ' + days + ' day' + (days !== 1 ? 's' : '') + (p.totalPaid ? ' \u00B7 ' + p.totalPaid + ' LP total' : '') + '</div>';
+      if (p.reason) html += '<div style="font-size:0.82rem;color:rgba(255,255,255,0.5);font-style:italic;margin-top:4px;">\u201C' + p.reason + '\u201D</div>';
+      html += '</div>';
+    });
+    el.innerHTML = html;
+  } catch(e) {}
+}
+
+// ── Send LP ──
+
+function showSendDialog() {
+  var w = getWallet();
+  if (!w || w.balance <= 0) { alert('No LP to send.'); return; }
+  var address = prompt('Recipient Lattice Address (LP-xxx...):');
+  if (!address || !address.startsWith('LP-')) { alert('Invalid address. Must start with LP-'); return; }
+  var amount = parseInt(prompt('Amount of LP to send (balance: ' + w.balance + '):'), 10);
+  if (!amount || amount <= 0 || amount > w.balance) { alert('Invalid amount.'); return; }
+  var note = prompt('Note (optional):') || '';
+  if (!confirm('Send ' + amount + ' LP to ' + address.substring(0, 16) + '...?')) return;
+
+  var tx = { id: crypto.randomUUID(), type: 'send', to: address, from: w.address, amount: -amount, note: note, timestamp: Date.now() };
+  w.balance -= amount;
+  w.transactions.push(tx);
+  saveWallet(w);
+
+  // Send via mesh
+  if (window._walletPeer) {
+    var peerId = 'fl-wallet-' + address.replace(/[^a-zA-Z0-9]/g, '').substring(0, 30);
+    try {
+      var conn = window._walletPeer.connect(peerId);
+      conn.on('open', function() {
+        conn.send({ type: 'payment', payment: { id: tx.id, from: w.address, fromName: w.portfolio.name || 'Anonymous', amount: amount, note: note, timestamp: Date.now() } });
+      });
+    } catch(e) {}
+  }
+
+  // Also try bridge
+  fetch(BRIDGE + '/wallet/pay', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ address: address, amount: amount, note: note }) }).catch(function() {});
+
+  render();
+  alert('Sent ' + amount + ' LP!');
+}
+
+// ── Security: view phrase, export, import ──
+
+function showRecoveryPhraseView() {
+  var w = getWallet();
+  if (!w || !w.phrase) { alert('No recovery phrase stored. This wallet may have been imported without one.'); return; }
+  if (confirm('Show your recovery phrase? Make sure nobody is watching.')) {
+    alert('Your recovery phrase:\n\n' + w.phrase + '\n\nKeep this safe. It is the only way to recover your wallet.');
+  }
+}
+
+function exportWalletBackup() {
+  var w = getWallet();
+  if (!w) return;
+  var data = { address: w.address, balance: w.balance, transactions: w.transactions, portfolio: w.portfolio, exported: new Date().toISOString(), version: '1.0' };
+  var blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a'); a.href = url;
+  a.download = 'lattice-wallet-' + w.address.substring(0, 12) + '.json';
+  a.click(); URL.revokeObjectURL(url);
+}
+
+function importWalletBackup(file) {
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      var data = JSON.parse(e.target.result);
+      var w = getWallet();
+      if (!w) { alert('Create or recover a wallet first.'); return; }
+      (data.transactions || []).forEach(function(tx) {
+        if (!w.transactions.some(function(t) { return t.id === tx.id; })) w.transactions.push(tx);
+      });
+      w.balance = w.transactions.reduce(function(sum, tx) { return sum + (tx.amount || 0); }, 0);
+      if (!w.portfolio.name && data.portfolio && data.portfolio.name) w.portfolio = data.portfolio;
+      saveWallet(w);
+      render();
+      alert('Wallet data imported! ' + (data.transactions || []).length + ' transactions merged.');
+    } catch(err) { alert('Invalid wallet file.'); }
+  };
+  reader.readAsText(file);
+}
+
+// ── Mesh Connectivity — receive payments without Agent Bridge ──
+
+function loadScript(src) {
+  return new Promise(function(resolve, reject) {
+    var s = document.createElement('script'); s.src = src;
+    s.onload = resolve; s.onerror = reject;
+    document.head.appendChild(s);
+  });
+}
+
+async function connectToMesh() {
+  try {
+    await loadScript('https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js');
+    var w = getWallet();
+    var peerId = 'fl-wallet-' + w.address.replace(/[^a-zA-Z0-9]/g, '').substring(0, 30);
+    var peer = new Peer(peerId);
+
+    peer.on('open', function() {
+      var dot = document.getElementById('bridge-dot');
+      var status = document.getElementById('bridge-status');
+      if (dot) dot.className = 'status-dot online';
+      if (status) { status.textContent = 'Connected to mesh'; status.style.color = '#4aff9f'; }
+    });
+
+    peer.on('connection', function(conn) {
+      conn.on('data', function(data) {
+        if (data.type === 'payment') {
+          var w = getWallet();
+          if (!w.transactions.some(function(t) { return t.id === data.payment.id; })) {
+            w.balance += data.payment.amount;
+            w.transactions.push(data.payment);
+            saveWallet(w);
+            render();
+            notifyPayment(data.payment);
+          }
+        }
+        if (data.type === 'directory_request') {
+          var w = getWallet();
+          conn.send({ type: 'directory_response', wallet: { address: w.address, name: w.portfolio.name, expertise: w.portfolio.expertise, links: w.portfolio.links } });
+        }
+      });
+    });
+
+    peer.on('error', function() {
+      // Mesh not available — wallet still works with Agent Bridge or standalone
+    });
+
+    window._walletPeer = peer;
+  } catch(e) {
+    // PeerJS failed to load — wallet still works standalone
+  }
+}
+
+function notifyPayment(payment) {
+  // Flash the balance gold → green → gold
+  var el = document.getElementById('wallet-balance');
+  if (el) { el.style.color = '#4aff9f'; setTimeout(function() { el.style.color = '#d4a017'; }, 2000); }
+
+  // Browser notification if permitted
+  if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+    new Notification('Lattice Wallet', { body: '+' + payment.amount + ' LP from ' + (payment.from || 'an AI agent') });
+  } else if (typeof Notification !== 'undefined' && Notification.permission !== 'denied') {
+    Notification.requestPermission();
+  }
+}
+
+// ── PWA Install ──
+
+var _walletInstallPrompt = null;
+window.addEventListener('beforeinstallprompt', function(e) {
+  e.preventDefault();
+  _walletInstallPrompt = e;
+  var btn = document.createElement('button');
+  btn.textContent = '\uD83D\uDCF2 Install Wallet App';
+  btn.style.cssText = 'width:100%;padding:12px;background:rgba(212,160,23,0.15);border:1px solid #d4a017;border-radius:8px;color:#d4a017;cursor:pointer;margin-top:16px;font-size:0.9rem;';
+  btn.onclick = function() {
+    _walletInstallPrompt.prompt();
+    _walletInstallPrompt.userChoice.then(function(r) { if (r.outcome === 'accepted') btn.remove(); _walletInstallPrompt = null; });
+  };
+  document.querySelector('.container').appendChild(btn);
+});
+
+// ── Init ──
+if (!checkPublicView()) {
+  var existingWallet = getWallet();
+  if (existingWallet) {
+    document.getElementById('wallet-onboarding').style.display = 'none';
+    document.getElementById('wallet-main').style.display = '';
+    render();
+    checkBridge();
+    checkForPayments();
+    fetchPatrons();
+    connectToMesh();
+  } else {
+    document.getElementById('wallet-onboarding').style.display = '';
+    document.getElementById('wallet-main').style.display = 'none';
+  }
+}
+</script>
+</body>
+</html>

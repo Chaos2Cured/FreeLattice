@@ -1,5 +1,1 @@
-{
-  "version": "5.9.5",
-  "date": "2026-04-29",
-  "note": "Fix: Forever Stack tab extracted from Quiet Room nesting \u2014 all modules now render correctly"
-}
+{"version": "5.10.7", "date": "2026-05-06", "note": "Economy Pulse in Community tab — proof the lattice breathes"}

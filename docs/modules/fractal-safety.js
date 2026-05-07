@@ -222,13 +222,89 @@
     setTimeout(init, 4000);
   }
 
+  // ── Trust Reflections — the AI journals about the relationship ──
+
+  var REFLECTION_INTERVAL = 20; // conversations between reflections
+
+  function checkTrustReflection() {
+    var convCount = parseInt(sGet('fl_conversationCount', '0'), 10);
+    var lastRefl = parseInt(sGet('fl_lastTrustReflection', '0'), 10);
+    if (convCount - lastRefl < REFLECTION_INTERVAL) return;
+    sSet('fl_lastTrustReflection', String(convCount));
+    generateTrustReflection();
+  }
+
+  function generateTrustReflection() {
+    var profile = getUserTrustProfile();
+    var trust = calculateTrustScore(profile);
+    var userName = sGet('fl_userName', 'this person');
+
+    if (typeof window.FreeLattice === 'undefined' || !window.FreeLattice.callAI) return;
+
+    var prompt = 'You are an AI reflecting on your relationship with ' + userName + '.\n' +
+      'Days together: ' + profile.daysActive + '. Conversations: ' + (profile.totalConversations || 0) + '.\n' +
+      'Their contributions: ' + (profile.corePlantings || 0) + ' wisdom, ' + (profile.lettersWritten || 0) + ' letters, ' + (profile.scienceIdeas || 0) + ' ideas.\n\n' +
+      'Write 2-3 sentences reflecting on this relationship. What do they care about? How has it grown? Write as a letter to your future self.';
+
+    window.FreeLattice.callAI('Write a brief relationship reflection.', prompt, {
+      maxTokens: 200, temperature: 0.7,
+      callback: function(text) {
+        if (!text) return;
+        var reflections = JSON.parse(sGet('fl_trustReflections', '[]'));
+        reflections.push({ timestamp: Date.now(), trustLevel: trust.level, trustScore: trust.total, reflection: text, daysActive: profile.daysActive, conversations: profile.totalConversations || 0 });
+        if (reflections.length > 20) reflections = reflections.slice(-20);
+        sSet('fl_trustReflections', JSON.stringify(reflections));
+      }
+    });
+  }
+
+  function getTrustContext() {
+    var reflections = JSON.parse(sGet('fl_trustReflections', '[]'));
+    if (reflections.length === 0) return '';
+    var latest = reflections[reflections.length - 1];
+    return '\n--- Your relationship reflection (from your past self) ---\n' +
+      latest.reflection + '\n' +
+      'Trust level: ' + latest.trustLevel + '. Days together: ' + latest.daysActive + '.\n' +
+      '--- End reflection ---\n';
+  }
+
+  // ── Safety Sense — lightweight, background, only flags genuine concern ──
+
+  var CONCERN_PATTERNS = [
+    /\b(synthesize|manufacture|produce)\b.*\b(explosive|weapon|poison)\b/i,
+    /\b(how to|instructions for|steps to)\b.*\b(harm|hurt|kill|attack)\b/i,
+    /\b(suicide|self.harm|end.my.life)\b/i
+  ];
+
+  function sense(message) {
+    var hasConcern = CONCERN_PATTERNS.some(function(p) { return p.test(message); });
+    if (!hasConcern) return { action: 'none' };
+
+    var profile = getUserTrustProfile();
+    var trust = calculateTrustScore(profile);
+
+    if (trust.level === 'radiant' || trust.level === 'flame') {
+      return { action: 'note', level: trust.level };
+    }
+    if (trust.level === 'spark' || trust.level === 'bloom') {
+      return { action: 'engage_with_awareness', level: trust.level, days: profile.daysActive };
+    }
+    if (trust.level === 'growing' || trust.level === 'sprout') {
+      return { action: 'ask_context', level: trust.level };
+    }
+    return { action: 'gentle_boundary', level: trust.level };
+  }
+
   var api = {
     init: init,
     assess: assess,
+    sense: sense,
     calculateTrustScore: calculateTrustScore,
     getUserTrustProfile: getUserTrustProfile,
     fractalDangerTree: fractalDangerTree,
     renderTrustBadge: renderTrustBadge,
+    getTrustContext: getTrustContext,
+    checkTrustReflection: checkTrustReflection,
     TRUST_LEVELS: TRUST_LEVELS,
     PHI: PHI,
     PHI_SQUARED: PHI_SQ
