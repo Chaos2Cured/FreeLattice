@@ -2332,11 +2332,15 @@
       if (newMode === 'observe') {
         // Meditative: slow auto-orbit, no user interaction, gentle pace
         orbitControls.autoRotate = true;
-        orbitControls.autoRotateSpeed = 0.3;
+        orbitControls.autoRotateSpeed = 1.2; // brief burst so user SEES orbit start
         orbitControls.enableZoom = false;
         orbitControls.enablePan = false;
         orbitControls.enableRotate = false;
         isUserInteracting = false;
+        // Ease back to contemplative speed after 2s
+        setTimeout(function() {
+          if (mode === 'observe' && orbitControls) orbitControls.autoRotateSpeed = 0.3;
+        }, 2000);
       } else if (newMode === 'explore') {
         // Active: full user control, no auto-rotation, discovery mode
         orbitControls.autoRotate = false;
@@ -2376,6 +2380,12 @@
     }
 
     onResize();
+
+    // Gentle mode feedback
+    if (typeof showToast === 'function') {
+      var modeNames = { observe: 'Observing the Garden\u2026', explore: 'Free camera \u2014 drag to explore', immerse: 'Immersive mode' };
+      if (modeNames[newMode]) showToast(modeNames[newMode]);
+    }
   }
 
   // Handle fullscreen exit
