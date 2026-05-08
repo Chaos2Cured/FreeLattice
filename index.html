@@ -15897,7 +15897,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.11</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.12</span></div>
     </div>
   </div>
 
@@ -18071,7 +18071,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.10.11';
+const FL_VERSION = '5.10.12';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -26979,6 +26979,7 @@ window.FLAutoModel = (function() {
   var cachedModels = null;
   var cacheTime = 0;
   var CACHE_TTL = 30000;
+  var _userHomeModel = null; // The model the user explicitly chose — preserved across vision detours
 
   var VISION_TABS = ['canvas', 'chalkboard'];
   var TEXT_TABS = ['chat', 'garden', 'dojo', 'questions', 'sparring', 'skills', 'roundtable'];
@@ -26998,18 +26999,30 @@ window.FLAutoModel = (function() {
   function onTabChanged(tabId) {
     if (typeof state === 'undefined' || !state.isLocal) return;
 
-    // If user chose their model, only auto-switch between vision/text types
+    // If user chose their model, save it before vision detours and restore on return
+    // "User choice is sacred" — the auto-switcher must never lose it
     if (typeof FLActiveModel !== 'undefined' && FLActiveModel.isUserChosen()) {
       var current = FLActiveModel.get();
       var needsVision = VISION_TABS.indexOf(tabId) !== -1;
       var currentIsVision = isVision(current.model);
       if (needsVision && !currentIsVision) {
+        // Save their choice before auto-switching to vision
+        _userHomeModel = current.model;
         var vPref = getPreferred('vision');
         if (vPref) FLActiveModel.set(vPref, 'ollama', 'auto');
-      } else if (!needsVision && currentIsVision) {
-        var tPref = getPreferred('text');
-        if (tPref) FLActiveModel.set(tPref, 'ollama', 'auto');
+      } else if (!needsVision && currentIsVision && _userHomeModel) {
+        // Returning to text tab — restore their original choice with 'user' source
+        FLActiveModel.set(_userHomeModel, 'ollama', 'user');
+        _userHomeModel = null;
       }
+      return;
+    }
+
+    // If we have a stored home model and we're on a text tab, restore it
+    // (handles case where isUserChosen was cleared by the old 'auto' overwrite)
+    if (_userHomeModel && VISION_TABS.indexOf(tabId) === -1) {
+      FLActiveModel.set(_userHomeModel, 'ollama', 'user');
+      _userHomeModel = null;
       return;
     }
 

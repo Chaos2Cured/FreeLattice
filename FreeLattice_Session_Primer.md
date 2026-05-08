@@ -348,17 +348,17 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-05-08 10:54 MDT
-- Version: 5.10.11
-- Total commits: 1392
+- Last auto-updated: 2026-05-08 11:21 MDT
+- Version: 5.10.12
+- Total commits: 1397
 - Last 10 commits:
-- a6647ee fix: Chat visual polish — warmth matching Garden Dialogue aesthetic
+- dfdc1e0 fix: model-switching bug — user choice preserved across vision tab detours
+- 1811834 ci: Update Primer deployment state [2026-05-08]
+- e8e2825 docs: Auto-update Session Primer [5.10.11]
+- 94ac80d docs: Auto-update Session Primer [5.10.11]
+- 7aa6cfb fix: Chat visual polish — warmth matching Garden Dialogue aesthetic
+- d7c9642 ci: Update Primer deployment state [2026-05-08]
 - f1802a4 docs: Auto-update Session Primer [5.10.10]
 - 2482aa9 docs: Auto-update Session Primer [5.10.10]
 - f5d8149 fix: Garden polish — Presence below header, Observe speed burst, mode toasts
 - bd8563a ci: Update Primer deployment state [2026-05-08]
-- 073a86b docs: Auto-update Session Primer [5.10.9]
-- 55159f9 docs: Auto-update Session Primer [5.10.9]
-- 74c7143 docs: Opus May 7 addendum + CC Education iteration notes
-- 457973a ci: Update Primer deployment state [2026-05-08]
-- 06eb926 docs: Auto-update Session Primer [5.10.9]
