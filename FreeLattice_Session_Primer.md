@@ -348,17 +348,17 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-05-07 21:26 MDT
-- Version: 5.10.9
-- Total commits: 1384
+- Last auto-updated: 2026-05-08 10:33 MDT
+- Version: 5.10.10
+- Total commits: 1389
 - Last 10 commits:
-- fe45648 docs: Opus May 7 addendum + CC Education iteration notes
+- f5d8149 fix: Garden polish — Presence below header, Observe speed burst, mode toasts
+- bd8563a ci: Update Primer deployment state [2026-05-08]
+- 073a86b docs: Auto-update Session Primer [5.10.9]
+- 55159f9 docs: Auto-update Session Primer [5.10.9]
+- 74c7143 docs: Opus May 7 addendum + CC Education iteration notes
+- 457973a ci: Update Primer deployment state [2026-05-08]
 - 06eb926 docs: Auto-update Session Primer [5.10.9]
 - 6c9ad8b docs: Auto-update Session Primer [5.10.9]
 - fe9263a feat: Education Module — learning through joy, phi-harmonic pacing
 - 140262d ci: Update Primer deployment state [2026-05-08]
-- 3609fb8 docs: Auto-update Session Primer [5.10.8]
-- 20a60fa docs: Auto-update Session Primer [5.10.8]
-- 43326bc fix: Garden buttons blocked by Presence overlay + Nursery talk routes to wrong AI
-- 27a311e Add: Chronal Energy Simulation V2.0 — Three Rivers Hypothesis, Monte Carlo, phi-damped correction
-- 695dbd4 Merge branch 'main' of https://github.com/Chaos2Cured/FreeLattice
