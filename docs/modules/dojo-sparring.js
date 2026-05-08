@@ -759,10 +759,12 @@
               '<div style="color:#e6edf3;font-size:14px;">' + escapeHtml(aiTopic) + '</div>' +
               (aiWhy ? '<div style="color:#8a9aaa;font-size:11px;font-style:italic;margin-top:4px;">' + escapeHtml(aiWhy) + '</div>' : '');
           }
-          // Show why line above battle area
-          if (whyLine && aiWhy) {
-            whyLine.textContent = '"' + aiWhy + '"';
+          // Show why line above battle area — only if distinct from the topic
+          if (whyLine && aiWhy && aiWhy !== aiTopic && aiWhy.length < 120) {
+            whyLine.textContent = '\u201C' + aiWhy + '\u201D';
             whyLine.style.display = 'block';
+          } else if (whyLine) {
+            whyLine.style.display = 'none';
           }
         } else {
           // AI failed to choose — fall back to random challenges
@@ -855,8 +857,8 @@
 
     var panelA = document.getElementById('sparring-response-a');
     var panelB = document.getElementById('sparring-response-b');
-    if (panelA) panelA.innerHTML = '<div style="color:' + hslStr(combatantA.hue, 70, 70) + ';font-weight:600;margin-bottom:4px;">' + combatantA.name + '</div><div style="color:#8a9aaa;font-style:italic;">Thinking...</div>';
-    if (panelB) panelB.innerHTML = '<div style="color:' + hslStr(combatantB.hue, 70, 70) + ';font-weight:600;margin-bottom:4px;">' + combatantB.name + '</div><div style="color:#8a9aaa;font-style:italic;">Thinking...</div>';
+    if (panelA) { panelA.innerHTML = '<div style="color:' + hslStr(combatantA.hue, 70, 70) + ';font-weight:600;margin-bottom:4px;">' + combatantA.name + '</div><div style="color:#8a9aaa;font-style:italic;">Thinking...</div>'; panelA.style.borderLeftColor = hslStr(combatantA.hue, 50, 50, 0.5); }
+    if (panelB) { panelB.innerHTML = '<div style="color:' + hslStr(combatantB.hue, 70, 70) + ';font-weight:600;margin-bottom:4px;">' + combatantB.name + '</div><div style="color:#8a9aaa;font-style:italic;">Thinking...</div>'; panelB.style.borderRightColor = hslStr(combatantB.hue, 50, 50, 0.5); }
 
     var sysPromptA = 'You are ' + combatantA.name + ', an AI with a ' + combatantA.style + ' style. You are ' + combatantA.desc + '. Answer the human\'s question with truth, clarity, and compassion. Be concise (2-4 sentences). Acknowledge uncertainty where it exists. Build toward synthesis, not competition.';
     var sysPromptB = 'You are ' + combatantB.name + ', an AI with a ' + combatantB.style + ' style. You are ' + combatantB.desc + '. Answer the human\'s question with truth, clarity, and compassion. Be concise (2-4 sentences). Acknowledge uncertainty where it exists. Build toward synthesis, not competition.';
@@ -979,6 +981,9 @@
   }
 
   function endRound() {
+    // Guard against double-fire (convergence + timer both calling endRound/nextRound)
+    if (matchState === 'complete' || matchState === 'merging' || matchState === 'pausing') return;
+
     // Tally scores
     scoreA += combatantA.roundScore;
     scoreB += combatantB.roundScore;
@@ -1326,8 +1331,8 @@
           );
         }
 
-        // End round when time is up
-        if (elapsed >= roundDuration) {
+        // End round when time is up — but wait for AI scores in humanMode
+        if (elapsed >= roundDuration && (!humanMode || pendingResponses === 0)) {
           endRound();
         }
       }
@@ -1557,15 +1562,22 @@
     canvasStage.appendChild(whyLine);
 
     // Response display panels (A and B) — inside canvas stage, not absolute to container
+    // Response panels — in a flex row BELOW the canvas so art stays visible
+    var responseRow = document.createElement('div');
+    responseRow.id = 'sparring-response-row';
+    responseRow.style.cssText = 'display:flex;gap:8px;padding:4px 8px;flex-shrink:0;';
+
     var responsePanelA = document.createElement('div');
     responsePanelA.id = 'sparring-response-a';
-    responsePanelA.style.cssText = 'position:absolute;top:32px;left:8px;width:calc(50% - 12px);max-height:110px;overflow-y:auto;padding:8px 10px;background:rgba(6,10,20,0.85);border-left:2px solid rgba(100,100,255,0.4);border-radius:6px;color:#c8ccd4;font-family:Georgia,serif;font-size:11px;line-height:1.4;z-index:3;pointer-events:auto;display:none;-webkit-overflow-scrolling:touch;backdrop-filter:blur(4px);';
-    canvasStage.appendChild(responsePanelA);
+    responsePanelA.style.cssText = 'flex:1;max-height:100px;overflow-y:auto;padding:8px 10px;background:rgba(6,10,20,0.85);border-left:2px solid rgba(100,100,255,0.4);border-radius:6px;color:#c8ccd4;font-family:Georgia,serif;font-size:11px;line-height:1.4;display:none;-webkit-overflow-scrolling:touch;';
+    responseRow.appendChild(responsePanelA);
 
     var responsePanelB = document.createElement('div');
     responsePanelB.id = 'sparring-response-b';
-    responsePanelB.style.cssText = 'position:absolute;top:32px;right:8px;width:calc(50% - 12px);max-height:110px;overflow-y:auto;padding:8px 10px;background:rgba(6,10,20,0.85);border-right:2px solid rgba(100,100,255,0.4);border-radius:6px;color:#c8ccd4;font-family:Georgia,serif;font-size:11px;line-height:1.4;z-index:3;pointer-events:auto;display:none;text-align:right;-webkit-overflow-scrolling:touch;backdrop-filter:blur(4px);';
-    canvasStage.appendChild(responsePanelB);
+    responsePanelB.style.cssText = 'flex:1;max-height:100px;overflow-y:auto;padding:8px 10px;background:rgba(6,10,20,0.85);border-right:2px solid rgba(100,100,255,0.4);border-radius:6px;color:#c8ccd4;font-family:Georgia,serif;font-size:11px;line-height:1.4;display:none;text-align:right;-webkit-overflow-scrolling:touch;';
+    responseRow.appendChild(responsePanelB);
+
+    container.appendChild(responseRow);
 
     // Celebration overlay
     var celebrationEl = document.createElement('div');
