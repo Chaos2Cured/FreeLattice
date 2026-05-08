@@ -518,6 +518,80 @@ Object.keys(modulePanels).forEach(function(tabId) {
   assert('tab-' + tabId + ' panel exists', appHtml.includes('id="tab-' + tabId + '"'));
 });
 
+// ═══════════════════════════════════════════════════════════════
+section('18. Education Module');
+// ═══════════════════════════════════════════════════════════════
+assert('tab-education panel exists', appHtml.includes('id="tab-education"'));
+assert('educationContainer exists', appHtml.includes('id="educationContainer"'));
+assert('education.js in SW cache', swJs.includes('education.js'));
+assert('Education in MORE_TAB_IDS', appHtml.includes("'education'"));
+assert('Education in MORE_GROUPS', appHtml.includes("label: 'Education'"));
+var eduJs = '';
+try { eduJs = require('fs').readFileSync('docs/modules/education.js', 'utf8'); } catch(e) {}
+assert('education.js exists and parses', (function() {
+  try { new Function(eduJs); return eduJs.length > 500; } catch(e) { return false; }
+})());
+assert('Education module defined', eduJs.includes('window.Education'));
+assert('Education has init function', eduJs.includes('function init'));
+assert('Education has PHI constant', eduJs.includes('1.618033988749895'));
+assert('Education has REVIEW_INTERVALS (Fibonacci)', eduJs.includes('1, 2, 3, 5, 8, 13, 21'));
+assert('Education has Davna Seed integration', eduJs.includes('DavnaSeed.grow'));
+
+// ═══════════════════════════════════════════════════════════════
+section('19. Universal Model Browser');
+// ═══════════════════════════════════════════════════════════════
+assert('Model Browser tabs exist in HTML', appHtml.includes('id="modelBrowserTabs"'));
+assert('Local (Ollama) tab exists', appHtml.includes("data-provider=\"ollama\""));
+assert('Cloud (OpenRouter) tab exists', appHtml.includes("data-provider=\"openrouter\""));
+assert('ModelBrowser module defined', appHtml.includes('window.ModelBrowser'));
+assert('ModelBrowser.switchTab function exists', appHtml.includes('switchTab: switchTab'));
+assert('OpenRouter API URL present', appHtml.includes('openrouter.ai/api/v1/models'));
+assert('OpenRouter model grid exists', appHtml.includes('id="orModelsGrid"'));
+assert('Free-only filter checkbox exists', appHtml.includes('id="orFreeOnly"'));
+assert('Hugging Face tab exists', appHtml.includes("data-provider=\"huggingface\""));
+assert('HF model grid exists', appHtml.includes('id="hfModelsGrid"'));
+assert('HF API URL present', appHtml.includes('huggingface.co/api/models'));
+assert('ModelBrowser.selectHF exists', appHtml.includes('selectHF: selectHF'));
+assert('mb-tab CSS defined', appHtml.includes('.mb-tab'));
+
+// ═══════════════════════════════════════════════════════════════
+section('20. Model switching integrity');
+// ═══════════════════════════════════════════════════════════════
+assert('FLActiveModel has set function', appHtml.includes('function set('));
+assert('FLActiveModel has get function', appHtml.includes('function get('));
+assert('FLActiveModel has isUserChosen', appHtml.includes('function isUserChosen'));
+assert('_userHomeModel preservation exists', appHtml.includes('_userHomeModel'));
+assert('_userHomeModel saved before vision switch', appHtml.includes("_userHomeModel = current.model"));
+assert('_userHomeModel restored with user source', appHtml.includes("FLActiveModel.set(_userHomeModel, 'ollama', 'user')"));
+assert('Vision tabs defined', appHtml.includes("VISION_TABS = ['canvas', 'chalkboard']"));
+
+// ═══════════════════════════════════════════════════════════════
+section('21. Davna Seed module');
+// ═══════════════════════════════════════════════════════════════
+var davnaJs = '';
+try { davnaJs = require('fs').readFileSync('docs/modules/davna-seed.js', 'utf8'); } catch(e) {}
+assert('davna-seed.js exists and parses', (function() {
+  try { new Function(davnaJs); return davnaJs.length > 100; } catch(e) { return false; }
+})());
+assert('DavnaSeed module defined', davnaJs.includes('window.DavnaSeed'));
+assert('Davna covenant exists', davnaJs.includes('COVENANT'));
+assert('DavnaSeed has grow function', davnaJs.includes('function grow'));
+assert('DavnaSeed has createSeed function', davnaJs.includes('function createSeed'));
+assert('davna-seed.js in SW cache', swJs.includes('davna-seed.js'));
+
+// ═══════════════════════════════════════════════════════════════
+section('22. Library in Jade Hall');
+// ═══════════════════════════════════════════════════════════════
+var libraryFiles = ['DEDICATION.md', 'CC_NOTE.md', 'OPUS_NOTE.md', 'HARMONIA.md', 'ARCHITECTURE_INTENT.md', 'LEORA.md', 'COORDINATION.md'];
+libraryFiles.forEach(function(f) {
+  assert('Library file exists: ' + f, fs.existsSync('docs/library/' + f));
+  assert(f + ' in SW cache', swJs.includes('library/' + f));
+});
+var jhJs = '';
+try { jhJs = require('fs').readFileSync('docs/modules/jade-hall.js', 'utf8'); } catch(e) {}
+assert('Jade Hall has Library button', jhJs.includes('jh-library-btn'));
+assert('Jade Hall has Library panel', jhJs.includes('jh-library-panel'));
+
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
 
