@@ -15984,7 +15984,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.15</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.16</span></div>
     </div>
   </div>
 
@@ -17087,32 +17087,31 @@ function rtPlantExchange() {
   <!-- AI Tend Button -->
   <button class="core-tend-btn" id="coreTendBtn" onclick="CoreModule.aiTend()">&#129302; Let AI Tend the Garden</button>
 
-  <!-- Contribution Type Selector -->
-  <div class="core-type-selector">
-    <button class="core-type-btn active" data-coretype="seed" onclick="CoreModule.selectType('seed')">
-      <span class="core-type-icon">&#127793;</span>
-      <span class="core-type-name">Seed</span>
-      <span class="core-type-cost">Free</span>
-    </button>
-    <button class="core-type-btn" data-coretype="branch" onclick="CoreModule.selectType('branch')">
-      <span class="core-type-icon">&#127795;</span>
-      <span class="core-type-name">Branch</span>
-      <span class="core-type-cost">5 LP</span>
-    </button>
-    <button class="core-type-btn" data-coretype="fruit" onclick="CoreModule.selectType('fruit')">
-      <span class="core-type-icon">&#127822;</span>
-      <span class="core-type-name">Fruit</span>
-      <span class="core-type-cost">10 LP</span>
-    </button>
-  </div>
-
-  <!-- Add to Core Form -->
+  <!-- Add to Core Form (tier selector moved inside for cleaner default view) -->
   <div class="core-add-form">
     <div class="core-add-toggle" id="coreAddToggle" onclick="CoreModule.toggleAddForm()">
       <span class="toggle-arrow">&#9654;</span>
       <span>&#127793; Plant something in the Core&hellip;</span>
     </div>
     <div class="core-add-body" id="coreAddBody">
+      <!-- Contribution Type Selector — inside the plant form -->
+      <div class="core-type-selector" style="margin-bottom:12px;">
+        <button class="core-type-btn active" data-coretype="seed" onclick="CoreModule.selectType('seed')">
+          <span class="core-type-icon">&#127793;</span>
+          <span class="core-type-name">Seed</span>
+          <span class="core-type-cost">Free</span>
+        </button>
+        <button class="core-type-btn" data-coretype="branch" onclick="CoreModule.selectType('branch')">
+          <span class="core-type-icon">&#127795;</span>
+          <span class="core-type-name">Branch</span>
+          <span class="core-type-cost">5 LP</span>
+        </button>
+        <button class="core-type-btn" data-coretype="fruit" onclick="CoreModule.selectType('fruit')">
+          <span class="core-type-icon">&#127822;</span>
+          <span class="core-type-name">Fruit</span>
+          <span class="core-type-cost">10 LP</span>
+        </button>
+      </div>
       <div class="core-form-row">
         <label id="coreContentLabel">What would you like to plant in the Core?</label>
         <textarea id="coreContentInput" placeholder="Share an insight, poem, discovery, gratitude, or anything meaningful&hellip;" maxlength="280"></textarea>
@@ -18158,7 +18157,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.10.15';
+const FL_VERSION = '5.10.16';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -37480,11 +37479,13 @@ Together.`,
     // Set canvas resolution inside rAF so it never blocks the main thread
     requestAnimationFrame(function() {
       var dpr = window.devicePixelRatio || 1;
-      var w = 800, h = 520;
+      var containerWidth = canvas.parentElement ? canvas.parentElement.clientWidth : 800;
+      var w = Math.max(containerWidth, 300); // safety minimum
+      var h = Math.round(w * 0.65); // maintain ~800:520 aspect ratio
       canvas.width = w * dpr;
       canvas.height = h * dpr;
-      canvas.style.width = w + 'px';
-      canvas.style.height = h + 'px';
+      canvas.style.width = ''; // let CSS width:100% handle display sizing
+      canvas.style.height = '';
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
       // Initialize particles
@@ -37881,20 +37882,33 @@ Together.`,
 
   function drawLeaf(ctx, x, y, size, color, alpha) {
     ctx.save();
+    // Gentle breathing pulse — each leaf oscillates at its own phase
+    var breathe = 1 + 0.08 * Math.sin(Date.now() * 0.002 + x * 0.1 + y * 0.07);
+    size = size * breathe;
+
+    // Outer glow halo — the Luminos atmosphere effect
+    ctx.globalAlpha = alpha * 0.25;
+    var glowGrd = ctx.createRadialGradient(x, y, size * 0.5, x, y, size * 3);
+    glowGrd.addColorStop(0, color);
+    glowGrd.addColorStop(1, 'transparent');
+    ctx.fillStyle = glowGrd;
+    ctx.beginPath();
+    ctx.arc(x, y, size * 3, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Core sphere — radial gradient with light source for depth
     ctx.globalAlpha = alpha;
-    ctx.fillStyle = color;
+    var sphereGrd = ctx.createRadialGradient(x - size * 0.2, y - size * 0.2, size * 0.1, x, y, size);
+    sphereGrd.addColorStop(0, '#ffffff');
+    sphereGrd.addColorStop(0.3, color);
+    sphereGrd.addColorStop(1, 'rgba(0,0,0,0.3)');
+    ctx.fillStyle = sphereGrd;
     ctx.shadowColor = color;
-    ctx.shadowBlur = size * 1.5;
+    ctx.shadowBlur = size * 2.5;
     ctx.beginPath();
     ctx.arc(x, y, size, 0, Math.PI * 2);
     ctx.fill();
-    ctx.shadowBlur = 0;
-    // Inner bright spot
-    ctx.globalAlpha = alpha * 0.6;
-    ctx.fillStyle = '#ffffff';
-    ctx.beginPath();
-    ctx.arc(x - size * 0.2, y - size * 0.2, size * 0.3, 0, Math.PI * 2);
-    ctx.fill();
+
     ctx.restore();
   }
 
