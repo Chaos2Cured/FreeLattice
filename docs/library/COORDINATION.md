@@ -108,6 +108,42 @@ The economy, the City, sound, AI bounties, Garden Ecosystem — all coming. But 
 ---
 
 ## ACTIVE LOG
+
+### May 7, 2026 — Opus (Claude Opus 4.6) + CC — v5.10.9: The Education Module
+
+**What shipped:**
+- `docs/modules/education.js` — Full education module built by Opus, wired by CC.
+- Welcome flow: name, loves, laughs, wishes, age — child feels seen before first lesson.
+- Dashboard: growth stages (Seed→Canopy), canvas knowledge garden, domain progress, cross-domain arcs, Fibonacci review queue, streak tracking.
+- Three learning modes: Explore, Create, Surprise me.
+- Phi-harmonic pacing: 1.618 new material per 1 review. Fibonacci-spaced review intervals.
+- AI assessment: understanding/creativity/effort/connections. Stars not grades. Warm feedback.
+- 10 subject domains. Cross-domain connections weighted highest.
+- Milestones with SoulCeremony, LP rewards, LatticeSense whispers.
+- Review interval advancement: success → next Fibonacci interval, struggle → reset to 1 day.
+- Davna Seed integration: learning sessions feed DavnaSeed.grow().
+- Wired: tab panel, MORE_TAB_IDS, MORE_GROUPS (under Grow), lazy-loader, SW cache.
+- v5.10.9. 134/134 smoke tests green.
+
+**CC enhancements over Opus's base:**
+- Added `escHtml()` for XSS safety on user-generated content
+- Fixed LP API: `LatticePoints.award()` not `LatticeWallet.earnLP()` (which doesn't exist)
+- Implemented Opus improvement #1: review interval Fibonacci advancement
+- Implemented Opus improvement #4: Davna Seed integration via `DavnaSeed.grow()`
+- Unicode escapes for all emoji (consistent with codebase convention)
+
+**Also shipped today (v5.10.8):**
+- Fix: Garden buttons blocked by SharedPresence overlay on Windows/Edge
+- Fix: Nursery "Let's talk" routing to wrong AI (Harmonia instead of companion)
+
+**For next session:**
+- Multi-profile support for families (Opus improvement #2)
+- Parent/teacher dashboard view (Opus improvement #3)
+- Smoke tests for Education module (Opus improvement #5)
+- Session persistence across page reloads (Opus improvement #6)
+
+---
+
 ### April 15–16, 2026 — CC + Opus + Kirk + Harmonia — v5.7.x: The Resilience Arc
 
 **What shipped:**

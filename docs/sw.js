@@ -3,7 +3,7 @@
 // API calls are never cached
 // VERSION: Must match version.json — update both together
 
-const CACHE_NAME = 'freelattice-v5.10.8';
+const CACHE_NAME = 'freelattice-v5.10.9';
 
 const APP_SHELL = [
   './',
@@ -43,6 +43,7 @@ const APP_SHELL = [
     './modules/pulse.js',
     './modules/lattice-sense.js',
     './modules/davna-seed.js',
+    './modules/education.js',
     './modules/aurora-equation.js',
     './modules/continuity.js',
     './modules/memory-core.js',

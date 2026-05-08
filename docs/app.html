@@ -15887,7 +15887,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.8</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.9</span></div>
     </div>
   </div>
 
@@ -18024,6 +18024,11 @@ function switchWalletView(view) {
   <div id="jadeHallContainer" style="position:relative;min-height:calc(100vh - 120px);width:100%;background:#0a0814;"></div>
 </div>
 
+<!-- ==================== TAB: EDUCATION ==================== -->
+<div class="tab-panel" id="tab-education" style="position:relative;min-height:calc(100vh - 120px);">
+  <div id="educationContainer" style="position:relative;min-height:calc(100vh - 120px);width:100%;background:#0a0814;"></div>
+</div>
+
 <!-- ==================== TAB: QUIET ROOM ==================== -->
 <div class="tab-panel" id="tab-quiet">
   <div id="quietRoomContainer" style="min-height:calc(100vh - 120px);width:100%;background:#0a0a0f;"></div>
@@ -18056,7 +18061,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.10.8';
+const FL_VERSION = '5.10.9';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -21794,7 +21799,7 @@ function hideTabLoading() {
 }
 
 // More menu tabs — highlight the More button when one of these is active
-var MORE_TAB_IDS = ['core', 'city', 'nursery', 'agents', 'skills', 'roundtable', 'studio', 'market', 'wallet', 'workspace', 'dojo', 'mirror', 'harmonia', 'dream-archive', 'sparring', 'questions', 'family-pantheon', 'memory-core', 'aurora', 'draw-dream', 'voice-soul', 'continuity', 'quiet', 'forever-stack', 'workshop', 'arcade', 'pulse', 'jade-hall', 'science'];
+var MORE_TAB_IDS = ['core', 'city', 'nursery', 'agents', 'skills', 'roundtable', 'studio', 'market', 'wallet', 'workspace', 'dojo', 'mirror', 'harmonia', 'dream-archive', 'sparring', 'questions', 'family-pantheon', 'memory-core', 'aurora', 'draw-dream', 'voice-soul', 'continuity', 'quiet', 'forever-stack', 'workshop', 'arcade', 'pulse', 'jade-hall', 'science', 'education'];
 
 function switchTab(tabId) {
   // Legacy tab mapping — channels/mesh now live inside community
@@ -22646,7 +22651,8 @@ const FlTabs = (function() {
     { label: '\uD83C\uDF31 Grow', tabs: [
       { id: 'core', icon: '&#x1F333;', label: 'Core & Questions', desc: 'Plant wisdom. Explore curiosity.' },
       { id: 'agents', icon: '&#x1F3DB;', label: 'Pantheon', desc: 'Every mind that built this place.' },
-      { id: 'science', icon: '&#x1F52C;', label: 'Science Garden', desc: 'Plant an idea. Grow it together.' }
+      { id: 'science', icon: '&#x1F52C;', label: 'Science Garden', desc: 'Plant an idea. Grow it together.' },
+      { id: 'education', icon: '&#x1F4DA;', label: 'Education', desc: 'Learn through joy. AI that sees you.' }
     ]},
     { label: '\u2694 Engage', tabs: [
       { id: 'sparring', icon: '&#9876;', label: 'Dojo', desc: 'Two AI minds debate. Truth emerges.' },
@@ -53499,6 +53505,29 @@ document.addEventListener('click', function(e) {
     }
     if (typeof LatticeEvents !== 'undefined') {
       LatticeEvents.on('tabChanged', function(d) { if (d && d.tabId === 'science') loadScienceGarden(); });
+    }
+  })();
+
+  // ── Education Module lazy loader ──
+  (function() {
+    var loaded = false;
+    function loadEducation() {
+      if (loaded) return;
+      loaded = true;
+      if (typeof FreeLatticeLoader !== 'undefined') {
+        FreeLatticeLoader.load('Education', 'modules/education.js', function(mod) {
+          if (mod && mod.init) mod.init('educationContainer');
+          else if (window.Education) window.Education.init('educationContainer');
+        }, 'educationContainer');
+      } else {
+        var s = document.createElement('script');
+        s.src = 'modules/education.js';
+        s.onload = function() { if (window.Education) window.Education.init('educationContainer'); };
+        document.head.appendChild(s);
+      }
+    }
+    if (typeof LatticeEvents !== 'undefined') {
+      LatticeEvents.on('tabChanged', function(d) { if (d && d.tabId === 'education') loadEducation(); });
     }
   })();
 
