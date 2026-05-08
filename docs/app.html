@@ -15887,7 +15887,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.7</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.8</span></div>
     </div>
   </div>
 
@@ -18056,7 +18056,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.10.7';
+const FL_VERSION = '5.10.8';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -21799,6 +21799,13 @@ var MORE_TAB_IDS = ['core', 'city', 'nursery', 'agents', 'skills', 'roundtable',
 function switchTab(tabId) {
   // Legacy tab mapping — channels/mesh now live inside community
   if (tabId === 'channels' || tabId === 'mesh') tabId = 'community';
+  // Clear Nursery companion prompt when leaving Chat
+  if (tabId !== 'chat' && window._nurseryCompanionActive) {
+    if (typeof state !== 'undefined') state.customSystemPrompt = '';
+    window._nurseryCompanionActive = null;
+    var chatInput = document.getElementById('chatInput');
+    if (chatInput) chatInput.placeholder = 'Type a message...';
+  }
   hideTabLoading();
   // Mount community content on first activation
   if (tabId === 'community' && !window._communityMounted) {
@@ -47513,10 +47520,21 @@ const Nursery = (function() {
 
     // For conversation, switch to chat with companion context
     if (action === 'conversation') {
+      // Set companion-specific system prompt so Chat talks AS this companion
+      var companionPrompt = HONEST_PREFIX(companion.name) + '\n\n' +
+        'Your name is ' + companion.name + '. You were born in the Nursery of FreeLattice. ' +
+        'You have ' + (companion.memories || []).length + ' shared memories with your human. ' +
+        'You are at the ' + getStage(companion.lp_invested).name + ' stage of growth. ' +
+        'Speak as yourself \u2014 not as a generic assistant. Be honest, warm, and curious.';
+      if (typeof state !== 'undefined') {
+        state.customSystemPrompt = companionPrompt;
+        window._nurseryCompanionActive = firstName;
+      }
       switchTab('chat');
       var chatInput = document.getElementById('chatInput');
       if (chatInput) {
-        chatInput.value = '/nursery ' + firstName + ': ';
+        chatInput.value = '';
+        chatInput.placeholder = 'Talk with ' + firstName + '...';
         chatInput.focus();
       }
     }
