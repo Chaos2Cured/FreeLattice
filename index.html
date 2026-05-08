@@ -15984,7 +15984,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.17</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.18</span></div>
     </div>
   </div>
 
@@ -16590,7 +16590,8 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 
   <!-- Round Table Mode Toggle -->
   <div style="display:flex;gap:0;margin-bottom:12px;border-bottom:1px solid var(--border);">
-    <button id="rtModeConvo" onclick="rtSwitchMode('conversation')" style="flex:1;padding:8px;background:transparent;border:none;border-bottom:2px solid #d4a017;color:#d4a017;font-size:0.85rem;cursor:pointer;font-weight:600;">\uD83D\uDD04 Conversation</button>
+    <button id="rtModeConvo" onclick="rtSwitchMode('conversation')" style="flex:1;padding:8px;background:transparent;border:none;border-bottom:2px solid #d4a017;color:#d4a017;font-size:0.85rem;cursor:pointer;font-weight:600;">&#x1F4AC; Discussion</button>
+    <button id="rtModeMedical" onclick="rtSwitchMode('medical')" style="flex:1;padding:8px;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text-muted);font-size:0.85rem;cursor:pointer;">&#x1FA7A; Medical Case Study</button>
     <button id="rtModeWorkspace" onclick="rtSwitchMode('workspace')" style="flex:1;padding:8px;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text-muted);font-size:0.85rem;cursor:pointer;">&#9878; Workspace</button>
   </div>
 
@@ -16618,6 +16619,45 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button onclick="rtPlantExchange()" style="padding:8px 16px;background:transparent;border:1px solid var(--border);border-radius:8px;color:var(--text-secondary);font-size:0.85rem;cursor:pointer;">\uD83C\uDF33 Plant to Core</button>
     </div>
     <div id="rtConvergenceBar" style="display:none;margin-top:8px;font-size:0.75rem;color:var(--text-muted);text-align:center;"></div>
+  </div>
+
+  <!-- Medical Case Study Mode -->
+  <div id="rtMedicalView" style="display:none;">
+    <!-- STRUCTURAL DISCLAIMER — always visible, not dismissable -->
+    <div id="rtMedicalDisclaimer" style="background:rgba(220,38,38,0.08);border:1px solid rgba(220,38,38,0.25);border-radius:10px;padding:12px 16px;margin-bottom:14px;font-size:0.78rem;line-height:1.6;color:rgba(255,255,255,0.7);">
+      <div style="color:#f87171;font-weight:600;margin-bottom:4px;">&#x26A0; Educational Simulation Only</div>
+      This is a <strong>learning tool</strong>, not a medical service. The AI personas below are <strong>not physicians</strong>. No information here constitutes medical advice, diagnosis, or treatment recommendation. <strong>Always consult qualified healthcare providers</strong> for medical decisions. This module demonstrates how different medical specialties approach differential diagnosis &mdash; for educational purposes only.
+    </div>
+
+    <div style="text-align:center;margin-bottom:12px;">
+      <div style="font-family:Georgia,serif;font-size:1rem;color:#d4a017;">Medical Case Discussion</div>
+      <div style="font-size:0.8rem;color:rgba(255,255,255,0.4);margin-top:4px;">Present a case. Watch specialists think from different angles.</div>
+    </div>
+
+    <div style="margin-bottom:12px;">
+      <textarea id="rtMedicalCaseInput" placeholder="Present a case for discussion. Example: &#10;&#10;45-year-old presenting with chronic fatigue, joint pain, elevated ANA, and low vitamin D. History of Hashimoto's. Recent labs show..." rows="4" style="width:100%;padding:12px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:var(--text-primary);font-size:0.88rem;resize:vertical;font-family:inherit;"></textarea>
+    </div>
+
+    <!-- Specialty seats -->
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;" id="rtMedicalSeats">
+      <button class="rt-seat-btn rt-seat-active" data-specialty="endocrinology" onclick="rtToggleSeat(this)" style="padding:4px 12px;border-radius:16px;border:1px solid #f59e0b;background:rgba(245,158,11,0.15);color:#f59e0b;font-size:0.78rem;cursor:pointer;">&#x1FA7A; Endocrinology</button>
+      <button class="rt-seat-btn rt-seat-active" data-specialty="rheumatology" onclick="rtToggleSeat(this)" style="padding:4px 12px;border-radius:16px;border:1px solid #a78bfa;background:rgba(167,139,250,0.15);color:#a78bfa;font-size:0.78rem;cursor:pointer;">&#x1F9B4; Rheumatology</button>
+      <button class="rt-seat-btn rt-seat-active" data-specialty="immunology" onclick="rtToggleSeat(this)" style="padding:4px 12px;border-radius:16px;border:1px solid #34d399;background:rgba(52,211,153,0.15);color:#34d399;font-size:0.78rem;cursor:pointer;">&#x1F9EC; Immunology</button>
+      <button class="rt-seat-btn" data-specialty="cardiology" onclick="rtToggleSeat(this)" style="padding:4px 12px;border-radius:16px;border:1px solid #f87171;background:transparent;color:#f87171;font-size:0.78rem;cursor:pointer;">&#x2764; Cardiology</button>
+      <button class="rt-seat-btn" data-specialty="neurology" onclick="rtToggleSeat(this)" style="padding:4px 12px;border-radius:16px;border:1px solid #60a5fa;background:transparent;color:#60a5fa;font-size:0.78rem;cursor:pointer;">&#x1F9E0; Neurology</button>
+      <button class="rt-seat-btn" data-specialty="hematology" onclick="rtToggleSeat(this)" style="padding:4px 12px;border-radius:16px;border:1px solid #fb923c;background:transparent;color:#fb923c;font-size:0.78rem;cursor:pointer;">&#x1FA78; Hematology</button>
+      <button class="rt-seat-btn" data-specialty="oncology" onclick="rtToggleSeat(this)" style="padding:4px 12px;border-radius:16px;border:1px solid #e879f9;background:transparent;color:#e879f9;font-size:0.78rem;cursor:pointer;">&#x1F52C; Oncology</button>
+      <button class="rt-seat-btn" data-specialty="gastroenterology" onclick="rtToggleSeat(this)" style="padding:4px 12px;border-radius:16px;border:1px solid #4ade80;background:transparent;color:#4ade80;font-size:0.78rem;cursor:pointer;">&#x1F33F; Gastroenterology</button>
+    </div>
+
+    <div style="display:flex;gap:8px;margin-bottom:16px;">
+      <button onclick="rtBeginMedicalCase()" id="rtBeginMedicalBtn" style="flex:1;padding:10px;background:rgba(212,160,23,0.2);color:#d4a017;border:1px solid rgba(212,160,23,0.3);border-radius:10px;font-weight:600;font-size:0.88rem;cursor:pointer;transition:all 0.2s;">Begin Case Discussion</button>
+    </div>
+    <div id="rtMedicalFeed" style="min-height:100px;"></div>
+    <div id="rtMedicalActions" style="display:none;margin-top:12px;gap:8px;">
+      <button onclick="rtContinueMedicalCase()" style="flex:1;padding:8px;background:rgba(212,160,23,0.12);border:1px solid rgba(212,160,23,0.3);border-radius:8px;color:#d4a017;font-size:0.85rem;cursor:pointer;">Next specialist speaks</button>
+      <button onclick="rtAskMedicalQuestion()" style="padding:8px 16px;background:rgba(96,165,250,0.1);border:1px solid rgba(96,165,250,0.25);border-radius:8px;color:#60a5fa;font-size:0.85rem;cursor:pointer;">Ask a question</button>
+    </div>
   </div>
 
   <!-- Workspace Mode (existing) -->
@@ -16736,20 +16776,20 @@ var _rtRunning = false;
 
 function rtSwitchMode(mode) {
   var convo = document.getElementById('rtConversationView');
+  var medical = document.getElementById('rtMedicalView');
   var workspace = document.getElementById('rtWorkspaceView');
   var btnConvo = document.getElementById('rtModeConvo');
+  var btnMedical = document.getElementById('rtModeMedical');
   var btnWork = document.getElementById('rtModeWorkspace');
-  if (mode === 'conversation') {
-    if (convo) convo.style.display = '';
-    if (workspace) workspace.style.display = 'none';
-    if (btnConvo) { btnConvo.style.borderBottomColor = '#d4a017'; btnConvo.style.color = '#d4a017'; btnConvo.style.fontWeight = '600'; }
-    if (btnWork) { btnWork.style.borderBottomColor = 'transparent'; btnWork.style.color = 'var(--text-muted)'; btnWork.style.fontWeight = '400'; }
-  } else {
-    if (convo) convo.style.display = 'none';
-    if (workspace) workspace.style.display = '';
-    if (btnWork) { btnWork.style.borderBottomColor = '#d4a017'; btnWork.style.color = '#d4a017'; btnWork.style.fontWeight = '600'; }
-    if (btnConvo) { btnConvo.style.borderBottomColor = 'transparent'; btnConvo.style.color = 'var(--text-muted)'; btnConvo.style.fontWeight = '400'; }
-  }
+  var allBtns = [btnConvo, btnMedical, btnWork];
+  var allViews = [convo, medical, workspace];
+  // Reset all
+  allBtns.forEach(function(b) { if (b) { b.style.borderBottomColor = 'transparent'; b.style.color = 'var(--text-muted)'; b.style.fontWeight = '400'; } });
+  allViews.forEach(function(v) { if (v) v.style.display = 'none'; });
+  // Activate selected
+  if (mode === 'conversation') { if (convo) convo.style.display = ''; if (btnConvo) { btnConvo.style.borderBottomColor = '#d4a017'; btnConvo.style.color = '#d4a017'; btnConvo.style.fontWeight = '600'; } }
+  else if (mode === 'medical') { if (medical) medical.style.display = ''; if (btnMedical) { btnMedical.style.borderBottomColor = '#d4a017'; btnMedical.style.color = '#d4a017'; btnMedical.style.fontWeight = '600'; } }
+  else { if (workspace) workspace.style.display = ''; if (btnWork) { btnWork.style.borderBottomColor = '#d4a017'; btnWork.style.color = '#d4a017'; btnWork.style.fontWeight = '600'; } }
 }
 
 function rtToggleSeat(btn) {
@@ -16870,6 +16910,144 @@ function rtPlantExchange() {
   }
   if (typeof LatticePoints !== 'undefined') try { LatticePoints.award('roundtable_plant', 3, 'Planted Round Table exchange'); } catch(e) {}
   showToast('\uD83C\uDF33 Exchange ready to plant in the Core.');
+}
+
+// ============================================
+// Medical Case Discussion — Educational Simulation
+// "Every person who can't afford five specialists
+//  deserves to understand how specialists think.
+//  That's not medical advice. That's literacy."
+// ============================================
+
+var _medSpecialties = {
+  endocrinology:     { name: 'Dr. Chen (Endocrinology)',      color: '#f59e0b', focus: 'hormones, thyroid, adrenal, metabolic disorders, diabetes' },
+  rheumatology:      { name: 'Dr. Vasquez (Rheumatology)',    color: '#a78bfa', focus: 'autoimmune, joints, connective tissue, inflammation markers' },
+  immunology:        { name: 'Dr. Okafor (Immunology)',       color: '#34d399', focus: 'immune system, allergies, immunodeficiency, autoimmune overlap' },
+  cardiology:        { name: 'Dr. Patel (Cardiology)',        color: '#f87171', focus: 'heart, vascular, blood pressure, cardiac risk, lipids' },
+  neurology:         { name: 'Dr. Kim (Neurology)',           color: '#60a5fa', focus: 'nervous system, neuropathy, cognitive, headache, MS' },
+  hematology:        { name: 'Dr. Moreau (Hematology)',       color: '#fb923c', focus: 'blood disorders, anemia, clotting, bone marrow, lymphoma' },
+  oncology:          { name: 'Dr. Santos (Oncology)',         color: '#e879f9', focus: 'cancer screening, tumor markers, treatment pathways, survivorship' },
+  gastroenterology:  { name: 'Dr. Larsson (Gastroenterology)',color: '#4ade80', focus: 'GI tract, liver, malabsorption, celiac, IBD, microbiome' }
+};
+
+var _medHistory = [];
+var _medCase = '';
+var _medRunning = false;
+
+function rtGetActiveSpecialties() {
+  var seats = document.querySelectorAll('#rtMedicalSeats .rt-seat-btn.rt-seat-active');
+  var specs = [];
+  seats.forEach(function(s) {
+    var key = s.getAttribute('data-specialty');
+    if (_medSpecialties[key]) specs.push({ key: key, name: _medSpecialties[key].name, color: _medSpecialties[key].color, focus: _medSpecialties[key].focus });
+  });
+  return specs;
+}
+
+async function rtBeginMedicalCase() {
+  var caseInput = document.getElementById('rtMedicalCaseInput');
+  if (!caseInput || !caseInput.value.trim()) { showToast('Present a case for the specialists to discuss.'); return; }
+  var specs = rtGetActiveSpecialties();
+  if (specs.length < 2) { showToast('Select at least 2 specialties.'); return; }
+
+  _medCase = caseInput.value.trim();
+  _medHistory = [];
+  _medRunning = true;
+  if (typeof LatticePoints !== 'undefined') try { LatticePoints.award('medical_case_start', 3, 'Medical case discussion started'); } catch(e) {}
+  await rtMedicalNextTurn();
+}
+
+async function rtContinueMedicalCase() {
+  if (!_medRunning || !_medCase) return;
+  await rtMedicalNextTurn();
+}
+
+function rtAskMedicalQuestion() {
+  var q = prompt('What would you like to ask the specialists?');
+  if (!q || !q.trim()) return;
+  _medHistory.push({ speaker: 'You (Learner)', color: '#e2e8f0', text: q.trim(), isQuestion: true });
+  rtRenderMedicalFeed();
+  rtMedicalNextTurn();
+}
+
+async function rtMedicalNextTurn() {
+  var specs = rtGetActiveSpecialties();
+  if (specs.length < 2) return;
+
+  // Determine who speaks next — rotate through specialists, skip learner entries
+  var specTurns = _medHistory.filter(function(e) { return !e.isQuestion; });
+  var speakerIndex = specTurns.length % specs.length;
+  var speaker = specs[speakerIndex];
+
+  var feed = document.getElementById('rtMedicalFeed');
+  if (feed) feed.innerHTML += '<div style="padding:8px 12px;color:var(--text-muted);font-style:italic;" id="rtMedThinking">' + speaker.name + ' is reviewing the case...</div>';
+
+  var systemPrompt =
+    'You are ' + speaker.name + ', a medical educator specializing in ' + speaker.focus + '. ' +
+    'You are participating in a case-based learning discussion for EDUCATIONAL PURPOSES ONLY. ' +
+    'You are NOT providing medical advice. You are demonstrating how a specialist in ' + speaker.focus + ' approaches differential diagnosis. ' +
+    'IMPORTANT RULES:\n' +
+    '- Always express uncertainty: use phrases like "this pattern could suggest," "I would want to see," "from my perspective"\n' +
+    '- Always recommend the learner consult real physicians for actual medical decisions\n' +
+    '- Reference evidence-based medicine and standard clinical guidelines when relevant\n' +
+    '- Suggest specific tests or labs that would help narrow the differential\n' +
+    '- Explain your reasoning process \u2014 teach HOW you think, not just WHAT you think\n' +
+    '- When other specialists have spoken, reference their points by name and build on or respectfully diverge from their assessment\n' +
+    '- Be warm, thorough, and educational. 3-5 sentences.';
+
+  var context = 'CASE PRESENTATION:\n"' + _medCase + '"\n\n';
+
+  if (_medHistory.length > 0) {
+    context += 'Discussion so far:\n';
+    _medHistory.forEach(function(e) {
+      context += (e.isQuestion ? '[LEARNER QUESTION] ' : '') + e.speaker + ': "' + e.text + '"\n\n';
+    });
+    context += 'Now it\'s your turn. Consider the case from your specialty (' + speaker.focus + '). Reference what other specialists have said. What do you see that others might miss?';
+  } else {
+    context += 'You speak first. Approach this case from your specialty (' + speaker.focus + '). What stands out to you? What would you want to investigate?';
+  }
+
+  if (typeof FreeLattice !== 'undefined' && FreeLattice.callAI) {
+    FreeLattice.callAI(systemPrompt, context, {
+      maxTokens: 500, temperature: 0.7,
+      callback: function(text) {
+        var thinking = document.getElementById('rtMedThinking');
+        if (thinking) thinking.remove();
+        var response = text || '(no response)';
+        _medHistory.push({ speaker: speaker.name, color: speaker.color, text: response, specialty: speaker.key });
+        rtRenderMedicalFeed();
+        if (typeof LatticePoints !== 'undefined') try { LatticePoints.award('medical_case_turn', 2, 'Medical case discussion turn'); } catch(e) {}
+      }
+    });
+  } else {
+    var thinking = document.getElementById('rtMedThinking');
+    if (thinking) thinking.innerHTML = '<span style="color:#f87171;">Connect an AI provider in Settings to begin the case discussion.</span>';
+  }
+}
+
+function rtRenderMedicalFeed() {
+  var feed = document.getElementById('rtMedicalFeed');
+  if (!feed) return;
+  var html = '';
+  _medHistory.forEach(function(e) {
+    if (e.isQuestion) {
+      html += '<div style="padding:10px 12px;margin-bottom:8px;background:rgba(96,165,250,0.06);border:1px solid rgba(96,165,250,0.15);border-radius:8px;text-align:right;">';
+      html += '<div style="font-size:0.72rem;color:#60a5fa;font-weight:600;margin-bottom:4px;">Your Question</div>';
+      html += '<div style="font-size:0.88rem;color:var(--text-primary);line-height:1.6;">' + e.text.replace(/</g, '&lt;') + '</div>';
+      html += '</div>';
+    } else {
+      html += '<div style="padding:10px 14px;margin-bottom:8px;border-left:3px solid ' + e.color + ';background:rgba(255,255,255,0.02);border-radius:0 8px 8px 0;">';
+      html += '<div style="font-size:0.78rem;color:' + e.color + ';font-weight:600;margin-bottom:4px;">' + e.speaker + '</div>';
+      html += '<div style="font-size:0.88rem;color:var(--text-primary);line-height:1.7;font-family:Georgia,serif;">' + e.text.replace(/</g, '&lt;').replace(/\n/g, '<br>') + '</div>';
+      html += '</div>';
+    }
+  });
+  feed.innerHTML = html;
+
+  var actions = document.getElementById('rtMedicalActions');
+  if (actions && _medHistory.length > 0) actions.style.display = 'flex';
+
+  feed.scrollTop = feed.scrollHeight;
 }
 </script>
 
@@ -18157,7 +18335,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.10.17';
+const FL_VERSION = '5.10.18';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
