@@ -350,15 +350,15 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 ## PRIMER HEALTH
 - Last auto-updated: 2026-05-07 20:30 MDT
 - Version: 5.10.8
-- Total commits: 1377
+- Total commits: 1373
 - Last 10 commits:
-- 43326bc fix: Garden buttons blocked by Presence overlay + Nursery talk routes to wrong AI
-- 27a311e Add: Chronal Energy Simulation V2.0 — Three Rivers Hypothesis, Monte Carlo, phi-damped correction
-- 695dbd4 Merge branch 'main' of https://github.com/Chaos2Cured/FreeLattice
-- 5ae6085 Add: Chronal Energy Simulation V1.0 — gravitational decay rate analysis page
-- da8a0ce ci: Update Primer deployment state [2026-05-06]
+- 9df53df fix: Garden buttons blocked by Presence overlay + Nursery talk routes to wrong AI
 - c4eaf50 docs: Auto-update Session Primer [5.10.7]
 - 8c17250 docs: Auto-update Session Primer [5.10.7]
 - fc2e8fe feat: Economy Pulse — the Community tab shows the lattice breathing
 - 3dad4f5 ci: Update Primer deployment state [2026-05-06]
 - f5eedf5 docs: Auto-update Session Primer [5.10.6]
+- aa0deb8 docs: Auto-update Session Primer [5.10.6]
+- 45e1f4a fix: codebase audit — SW cache gaps, escapeHtml bug, CC_NOTE audit entry
+- d61c788 ci: Update Primer deployment state [2026-05-06]
+- 2e14902 docs: Auto-update Session Primer [5.10.5]
