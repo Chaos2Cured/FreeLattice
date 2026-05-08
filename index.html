@@ -1586,6 +1586,9 @@ header .mantra {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  background: rgba(22, 24, 34, 0.5);
+  border-radius: 8px;
+  margin: 0 4px;
 }
 
 /* ── Chat Message Bubbles (v5.6.1 — Garden Dialogue quality) ── */
@@ -1755,9 +1758,11 @@ header .mantra {
 
 .chat-input-row textarea {
   flex: 1;
-  background: var(--bg-input);
-  border: none;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
   padding: 14px 18px;
+  margin: 6px;
   color: var(--text-primary);
   font-size: 0.9rem;
   font-family: var(--font);
@@ -1766,6 +1771,10 @@ header .mantra {
   min-height: 48px;
   max-height: 120px;
   line-height: 1.5;
+  transition: border-color 0.2s;
+}
+.chat-input-row textarea:focus {
+  border-color: rgba(212, 160, 23, 0.35);
 }
 
 .chat-input-row textarea::placeholder { color: var(--text-muted); }
@@ -1782,7 +1791,8 @@ header .mantra {
   letter-spacing: 0.02em;
   min-height: 44px;
   min-width: 44px;
-  border-radius: 0;
+  border-radius: 10px;
+  margin: 6px 6px 6px 0;
 }
 #sendBtn:hover { background: var(--accent-hover); transform: scale(1.02); }
 #sendBtn:active { transform: scale(0.98); }
@@ -1846,8 +1856,8 @@ header .mantra {
   align-items: center;
   gap: 8px;
   padding: 8px 14px;
-  background: var(--bg-tertiary);
-  border-top: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.04);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
   position: relative;
   flex-wrap: wrap;
 }
@@ -15098,8 +15108,8 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     </div>
   </div>
 
-  <!-- How It Works -->
-  <div class="section">
+  <!-- How It Works — auto-hides once user has sent a message -->
+  <div class="section" id="chatHowItWorks">
     <div class="expandable">
       <div class="expandable-header" onclick="toggleExpand(this)">
         <h3>How It Works</h3>
@@ -15887,7 +15897,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.10</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.11</span></div>
     </div>
   </div>
 
@@ -18061,7 +18071,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.10.10';
+const FL_VERSION = '5.10.11';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -27848,6 +27858,10 @@ async function sendMessage() {
 
   // Vault auto-save reminder check
   if (typeof flVaultReminderCheck === 'function') flVaultReminderCheck();
+
+  // Hide "How It Works" once user is chatting — it's for newcomers, not active users
+  var _hiw = document.getElementById('chatHowItWorks');
+  if (_hiw) _hiw.style.display = 'none';
 
   // Collapse welcome overlay on first message — give conversation full space
   var _wo = document.getElementById('welcomeOverlay');
