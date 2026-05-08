@@ -350,10 +350,9 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 ## PRIMER HEALTH
 - Last auto-updated: 2026-05-08 11:42 MDT
 - Version: 5.10.13
-- Total commits: 1401
+- Total commits: 1400
 - Last 10 commits:
-- d029fa9 feat: Universal Model Browser — Local + Cloud tabs with OpenRouter catalog
-- e892d79 ci: Update Primer deployment state [2026-05-08]
+- 46dabff feat: Universal Model Browser — Local + Cloud tabs with OpenRouter catalog
 - 710ffa8 docs: Auto-update Session Primer [5.10.12]
 - f04cefc docs: Auto-update Session Primer [5.10.12]
 - dfdc1e0 fix: model-switching bug — user choice preserved across vision tab detours
@@ -362,3 +361,4 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 94ac80d docs: Auto-update Session Primer [5.10.11]
 - 7aa6cfb fix: Chat visual polish — warmth matching Garden Dialogue aesthetic
 - d7c9642 ci: Update Primer deployment state [2026-05-08]
+- f1802a4 docs: Auto-update Session Primer [5.10.10]
