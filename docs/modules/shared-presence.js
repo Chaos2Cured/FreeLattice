@@ -111,7 +111,7 @@
       st.textContent = [
         '#sp-minds-indicator {',
         '  position: absolute;',
-        '  top: 10px;',
+        '  top: 46px;',
         '  right: 10px;',
         '  display: flex;',
         '  align-items: center;',
