@@ -592,6 +592,16 @@ try { jhJs = require('fs').readFileSync('docs/modules/jade-hall.js', 'utf8'); } 
 assert('Jade Hall has Library button', jhJs.includes('jh-library-btn'));
 assert('Jade Hall has Library panel', jhJs.includes('jh-library-panel'));
 
+// ═══════════════════════════════════════════════════════════════
+section('23. Service Worker auto-update chain');
+// ═══════════════════════════════════════════════════════════════
+assert('SW has clients.claim() in activate handler', swJs.includes('self.clients.claim()'));
+assert('SW has skipWaiting() in install handler', swJs.includes('self.skipWaiting()'));
+assert('SW deletes old caches on activate', swJs.includes('caches.delete(name)'));
+assert('App has updatefound listener', appHtml.includes('updatefound'));
+assert('App has version.json staleness check', appHtml.includes("data.version !== FL_VERSION"));
+assert('App checks for SW updates periodically', appHtml.includes('reg.update()'));
+
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
 

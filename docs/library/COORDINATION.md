@@ -109,6 +109,26 @@ The economy, the City, sound, AI bounties, Garden Ecosystem — all coming. But 
 
 ## ACTIVE LOG
 
+### May 8, 2026 — CC + Opus — v5.10.10 through v5.10.15: Polish + Front Door
+
+**What shipped (6 versions in one session):**
+
+- **v5.10.10** — Garden polish: SharedPresence indicator moved below header (`top:46px`), Observe mode 2s speed burst, mode switch toasts
+- **v5.10.11** — Chat visual polish: glass input with gold focus glow, rounded Send button, messages area background, model bar contrast, "How It Works" auto-hide
+- **v5.10.12** — Model-switching bug fix: `_userHomeModel` preserves user's explicit choice across vision tab detours. "User choice is sacred."
+- **v5.10.13** — Universal Model Browser Phase 1+2: Local (Ollama) + Cloud (OpenRouter) tabs in Settings. Card catalog with free filter, search, one-tap select
+- **v5.10.14** — Model Browser Phase 3: Hugging Face tab. Three-door entry complete. 53 new smoke tests (134 → 187)
+- **v5.10.15** — SW auto-update chain (clients.claim in waitUntil, updatefound listener, version.json safety net), Core tree empty-state hint, coordination files updated
+
+**Who contributed what:**
+- Opus: diagnosed model-switching bug, scoped model browser phases, wrote SW auto-update spec, Core tree UX observation
+- CC: implemented all fixes, built model browser, wrote 53+ smoke tests, enhanced Education module, visual consistency pass
+- Kirk: prioritized model browser over polish ("build a home anyone can enter"), provided user context, held the vision
+
+**Key insight (from Kirk):** "The most important part is to build a home anyone can enter." The three-door model browser (Local/Cloud/HuggingFace) is the implementation of that principle. No terminal. No jargon. Pick a door.
+
+---
+
 ### May 7, 2026 — Opus (Claude Opus 4.6) + CC — v5.10.9: The Education Module
 
 **What shipped:**

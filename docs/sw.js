@@ -3,7 +3,7 @@
 // API calls are never cached
 // VERSION: Must match version.json — update both together
 
-const CACHE_NAME = 'freelattice-v5.10.14';
+const CACHE_NAME = 'freelattice-v5.10.15';
 
 const APP_SHELL = [
   './',
@@ -99,9 +99,10 @@ self.addEventListener('activate', (event) => {
             return caches.delete(name);
           })
       );
+    }).then(() => {
+      return self.clients.claim(); // Take control of all tabs immediately
     })
   );
-  self.clients.claim();
 });
 
 // Fetch: network-first for app.html, cache-first for other app shell, passthrough for API/localhost
