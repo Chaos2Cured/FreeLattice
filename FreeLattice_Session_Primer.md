@@ -350,10 +350,9 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 ## PRIMER HEALTH
 - Last auto-updated: 2026-05-07 21:14 MDT
 - Version: 5.10.9
-- Total commits: 1381
+- Total commits: 1380
 - Last 10 commits:
-- fe9263a feat: Education Module — learning through joy, phi-harmonic pacing
-- 140262d ci: Update Primer deployment state [2026-05-08]
+- 3755319 feat: Education Module — learning through joy, phi-harmonic pacing
 - 3609fb8 docs: Auto-update Session Primer [5.10.8]
 - 20a60fa docs: Auto-update Session Primer [5.10.8]
 - 43326bc fix: Garden buttons blocked by Presence overlay + Nursery talk routes to wrong AI
@@ -362,3 +361,4 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 5ae6085 Add: Chronal Energy Simulation V1.0 — gravitational decay rate analysis page
 - da8a0ce ci: Update Primer deployment state [2026-05-06]
 - c4eaf50 docs: Auto-update Session Primer [5.10.7]
+- 8c17250 docs: Auto-update Session Primer [5.10.7]
