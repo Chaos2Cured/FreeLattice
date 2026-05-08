@@ -15866,6 +15866,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     <div id="modelBrowserTabs" style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;">
       <button class="mb-tab active" data-provider="ollama" onclick="ModelBrowser.switchTab('ollama')">&#x1F3E0; Local (Ollama)</button>
       <button class="mb-tab" data-provider="openrouter" onclick="ModelBrowser.switchTab('openrouter')">&#x2601; Cloud (OpenRouter)</button>
+      <button class="mb-tab" data-provider="huggingface" onclick="ModelBrowser.switchTab('huggingface')">&#x1F917; Hugging Face</button>
     </div>
     <!-- Ollama grid -->
     <div id="modelBrowserOllama">
@@ -15883,6 +15884,16 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
         <div style="text-align:center;padding:24px;color:var(--text-muted);font-style:italic;">Loading models from OpenRouter...</div>
       </div>
       <div id="orStatus" style="margin-top:8px;font-size:0.75rem;color:var(--text-muted);"></div>
+    </div>
+    <!-- Hugging Face grid -->
+    <div id="modelBrowserHF" style="display:none;">
+      <div id="hfSearchRow" style="display:flex;gap:8px;margin-bottom:12px;">
+        <input type="text" id="hfSearchInput" placeholder="Search Hugging Face models..." style="flex:1;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:8px 12px;color:var(--text-primary);font-size:0.85rem;outline:none;" />
+      </div>
+      <div class="browse-models-grid" id="hfModelsGrid">
+        <div style="text-align:center;padding:24px;color:var(--text-muted);font-style:italic;">Loading models from Hugging Face...</div>
+      </div>
+      <div id="hfStatus" style="margin-top:8px;font-size:0.75rem;color:var(--text-muted);"></div>
     </div>
     <div id="browseModelsStatus" style="margin-top: 10px; font-size: 0.78rem; color: var(--text-muted);"></div>
   </div>
@@ -15973,7 +15984,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.13</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.14</span></div>
     </div>
   </div>
 
@@ -18147,7 +18158,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.10.13';
+const FL_VERSION = '5.10.14';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -41984,6 +41995,8 @@ const BrowseModels = (function() {
 window.ModelBrowser = (function() {
   var orModels = null;
   var orLoading = false;
+  var hfModels = null;
+  var hfLoading = false;
   var activeTab = 'ollama';
 
   function switchTab(provider) {
@@ -41992,9 +42005,12 @@ window.ModelBrowser = (function() {
     tabs.forEach(function(t) { t.classList.toggle('active', t.getAttribute('data-provider') === provider); });
     var ollamaPanel = document.getElementById('modelBrowserOllama');
     var orPanel = document.getElementById('modelBrowserOpenRouter');
+    var hfPanel = document.getElementById('modelBrowserHF');
     if (ollamaPanel) ollamaPanel.style.display = provider === 'ollama' ? '' : 'none';
     if (orPanel) orPanel.style.display = provider === 'openrouter' ? '' : 'none';
+    if (hfPanel) hfPanel.style.display = provider === 'huggingface' ? '' : 'none';
     if (provider === 'openrouter' && !orModels && !orLoading) fetchOpenRouterModels();
+    if (provider === 'huggingface' && !hfModels && !hfLoading) fetchHFModels();
   }
 
   function fetchOpenRouterModels() {
@@ -42119,8 +42135,107 @@ window.ModelBrowser = (function() {
     renderOpenRouter();
   }
 
+  // ── Hugging Face catalog ──────────────────────────────────
+
+  function fetchHFModels() {
+    hfLoading = true;
+    var status = document.getElementById('hfStatus');
+    if (status) status.textContent = 'Fetching models from Hugging Face...';
+
+    fetch('https://huggingface.co/api/models?pipeline_tag=text-generation&sort=likes&direction=-1&limit=100')
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        hfModels = (data || []).filter(function(m) {
+          return m.modelId && m.pipeline_tag === 'text-generation';
+        }).map(function(m) {
+          var likes = m.likes || 0;
+          var downloads = m.downloads || 0;
+          return {
+            id: m.modelId,
+            name: m.modelId.split('/').pop() || m.modelId,
+            author: m.modelId.split('/')[0] || '',
+            desc: (m.tags || []).slice(0, 5).join(', '),
+            likes: likes,
+            downloads: downloads,
+            isFree: true
+          };
+        });
+        hfLoading = false;
+        if (status) status.textContent = hfModels.length + ' models available';
+        renderHF();
+      })
+      .catch(function(e) {
+        hfLoading = false;
+        if (status) status.textContent = 'Could not reach Hugging Face. Check your connection.';
+        var grid = document.getElementById('hfModelsGrid');
+        if (grid) grid.innerHTML = '<div style="text-align:center;padding:24px;color:var(--text-muted);">Could not load models. <button onclick="ModelBrowser.switchTab(\'huggingface\')" style="color:#f59e0b;background:none;border:none;cursor:pointer;text-decoration:underline;">Retry</button></div>';
+      });
+  }
+
+  function renderHF() {
+    var grid = document.getElementById('hfModelsGrid');
+    if (!grid || !hfModels) return;
+
+    var searchInput = document.getElementById('hfSearchInput');
+    var query = searchInput ? searchInput.value.toLowerCase().trim() : '';
+
+    var filtered = hfModels.filter(function(m) {
+      if (query && m.id.toLowerCase().indexOf(query) === -1 && m.name.toLowerCase().indexOf(query) === -1) return false;
+      return true;
+    });
+
+    var shown = filtered.slice(0, 30);
+    var currentModel = '';
+    if (typeof FLActiveModel !== 'undefined') {
+      var cur = FLActiveModel.get();
+      currentModel = cur.model || '';
+    }
+
+    var html = '';
+    shown.forEach(function(m) {
+      var isSelected = currentModel === m.id;
+      var likesLabel = m.likes > 0 ? '\u2764 ' + (m.likes >= 1000 ? (m.likes / 1000).toFixed(1) + 'K' : m.likes) : '';
+      html += '<div class="or-model-card">';
+      html += '<div class="bm-header"><span class="bm-name">' + escapeHtml(m.name) + '</span>';
+      html += '<span class="or-free-badge">Free</span>';
+      html += '</div>';
+      if (m.desc) html += '<div class="bm-desc">' + escapeHtml(m.desc) + '</div>';
+      html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;">';
+      html += '<span style="font-size:0.68rem;color:var(--text-muted);">' + escapeHtml(m.author) + '</span>';
+      if (likesLabel) html += '<span style="font-size:0.68rem;color:var(--text-muted);">' + likesLabel + '</span>';
+      html += '</div>';
+      html += '<button class="or-select-btn' + (isSelected ? ' or-selected' : '') + '" style="' + (isSelected ? '' : 'background:rgba(249,158,11,0.12);color:#f59e0b;border-color:rgba(249,158,11,0.3);') + '" ' +
+        (isSelected ? 'disabled' : 'onclick="ModelBrowser.selectHF(\'' + escapeHtml(m.id).replace(/'/g, "\\'") + '\')"') + '>' +
+        (isSelected ? '\u2713 Selected' : 'Use this model') + '</button>';
+      html += '</div>';
+    });
+
+    if (shown.length === 0) {
+      html = '<div style="text-align:center;padding:24px;color:var(--text-muted);font-style:italic;">No models match your search.</div>';
+    } else if (filtered.length > 30) {
+      html += '<div style="text-align:center;padding:12px;color:var(--text-muted);font-size:0.78rem;">Showing 30 of ' + filtered.length + ' models. Use search to find more.</div>';
+    }
+
+    grid.innerHTML = html;
+  }
+
+  function selectHF(modelId) {
+    if (typeof state !== 'undefined') {
+      state.provider = 'huggingface';
+      state.model = modelId;
+      state.isLocal = false;
+      try { localStorage.setItem('fl_provider', 'huggingface'); } catch(e) {}
+      try { localStorage.setItem('fl_model', modelId); } catch(e) {}
+    }
+    if (typeof FLActiveModel !== 'undefined') {
+      FLActiveModel.set(modelId, 'huggingface', 'user');
+    }
+    if (typeof showToast === 'function') showToast('Switched to ' + modelId.split('/').pop());
+    renderHF();
+  }
+
   function init() {
-    // Wire search and filter
+    // Wire OpenRouter search and filter
     var searchInput = document.getElementById('orSearchInput');
     var freeOnly = document.getElementById('orFreeOnly');
     if (searchInput) {
@@ -42131,12 +42246,24 @@ window.ModelBrowser = (function() {
       });
     }
     if (freeOnly) freeOnly.addEventListener('change', renderOpenRouter);
+
+    // Wire HF search
+    var hfSearch = document.getElementById('hfSearchInput');
+    if (hfSearch) {
+      var hfDebounce = null;
+      hfSearch.addEventListener('input', function() {
+        clearTimeout(hfDebounce);
+        hfDebounce = setTimeout(renderHF, 300);
+      });
+    }
   }
 
   return {
     switchTab: switchTab,
     selectOpenRouter: selectOpenRouter,
+    selectHF: selectHF,
     renderOpenRouter: renderOpenRouter,
+    renderHF: renderHF,
     init: init
   };
 })();
