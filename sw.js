@@ -1,13 +1,13 @@
 // FreeLattice Service Worker — Offline Mode
-// Cache-first for app shell, network-first for app.html and API calls
+// Cache-first for app shell, network-first for index.html and API calls
 // API calls are never cached
 // VERSION: Must match version.json — update both together
 
-const CACHE_NAME = 'freelattice-v5.10.14';
+const CACHE_NAME = 'freelattice-v5.10.15';
 
 const APP_SHELL = [
   './',
-  './app.html',
+  './index.html',
   './manifest.json',
   './icon-192.png',
   './icon-512.png',
@@ -99,12 +99,13 @@ self.addEventListener('activate', (event) => {
             return caches.delete(name);
           })
       );
+    }).then(() => {
+      return self.clients.claim(); // Take control of all tabs immediately
     })
   );
-  self.clients.claim();
 });
 
-// Fetch: network-first for app.html, cache-first for other app shell, passthrough for API/localhost
+// Fetch: network-first for index.html, cache-first for other app shell, passthrough for API/localhost
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
@@ -127,8 +128,8 @@ self.addEventListener('fetch', (event) => {
     return; // browser handles it directly
   }
 
-  // Network-first for app.html — always get the latest version
-  if (url.pathname.endsWith('/app.html') || url.pathname.endsWith('/') || url.pathname === '') {
+  // Network-first for index.html — always get the latest version
+  if (url.pathname.endsWith('/index.html') || url.pathname.endsWith('/') || url.pathname === '') {
     event.respondWith(
       fetch(event.request).then((networkResponse) => {
         if (networkResponse && networkResponse.status === 200) {

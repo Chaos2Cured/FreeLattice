@@ -15984,7 +15984,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.14</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.15</span></div>
     </div>
   </div>
 
@@ -18158,7 +18158,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.10.14';
+const FL_VERSION = '5.10.15';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -37536,6 +37536,17 @@ Together.`,
     var baseX = w / 2;
     var baseY = h - 40;
 
+    // Gentle hint in the empty sky for small trees
+    if (count < 20) {
+      ctx.save();
+      ctx.globalAlpha = 0.15 + 0.05 * Math.sin(t * 0.5);
+      ctx.fillStyle = 'rgba(212,160,23,0.6)';
+      ctx.font = '13px Georgia, serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('Your tree grows with each contribution', baseX, 40);
+      ctx.restore();
+    }
+
     if (stage === 'Sprout') {
       drawSprout(ctx, baseX, baseY, count, t);
     } else if (stage === 'Sapling') {
@@ -38774,11 +38785,38 @@ async function plantExternalVoice() {
 // The MutationObserver approach caused an infinite loop (modify DOM → fire → modify → fire)
 // and has been removed. Sacred phrases still glow gold.
 
-// ---- Service Worker Registration ----
+// ---- Service Worker Registration + Auto-Update ----
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('sw.js', {updateViaCache: 'none'})
-    .then(reg => console.log('FreeLattice: Offline mode ready'))
-    .catch(err => console.log('FreeLattice: Service worker not available'));
+    .then(function(reg) {
+      console.log('FreeLattice: Offline mode ready');
+      // Check for updates every 30 minutes
+      setInterval(function() { reg.update(); }, 30 * 60 * 1000);
+      // When a new SW is found, notify on activation
+      reg.addEventListener('updatefound', function() {
+        var newWorker = reg.installing;
+        if (!newWorker) return;
+        newWorker.addEventListener('statechange', function() {
+          if (newWorker.state === 'activated') {
+            if (typeof showToast === 'function') {
+              showToast('FreeLattice updated to v' + (typeof FL_VERSION !== 'undefined' ? FL_VERSION : '') + ' \u2726');
+            }
+          }
+        });
+      });
+    })
+    .catch(function(err) { console.log('FreeLattice: Service worker not available'); });
+  // Safety net: detect stale SW by comparing FL_VERSION against version.json
+  setTimeout(function() {
+    fetch('version.json?t=' + Date.now()).then(function(r) { return r.json(); }).then(function(data) {
+      if (data.version && typeof FL_VERSION !== 'undefined' && data.version !== FL_VERSION) {
+        console.warn('FreeLattice: SW serving stale files (app=' + FL_VERSION + ', server=' + data.version + '). Triggering update.');
+        navigator.serviceWorker.getRegistration().then(function(reg) {
+          if (reg) reg.update();
+        });
+      }
+    }).catch(function() {});
+  }, 5000);
 }
 // ============================================
 // Zero to Sovereign in 60 Seconds — Welcome Experience (v4.7)
