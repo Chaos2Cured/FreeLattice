@@ -348,17 +348,17 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-05-08 17:03 MDT
-- Version: 5.10.16
-- Total commits: 1412
+- Last auto-updated: 2026-05-08 17:17 MDT
+- Version: 5.10.17
+- Total commits: 1417
 - Last 10 commits:
-- 71a1aba fix: Core tree — responsive canvas, living leaves, cleaner layout
+- 92a6b28 fix: Dojo Sparring — scoring race, topic dedup, responses below canvas
+- 9eb85b4 ci: Update Primer deployment state [2026-05-08]
+- 336ab9f docs: Auto-update Session Primer [5.10.16]
+- affc951 docs: Auto-update Session Primer [5.10.16]
+- 86ae03d fix: Core tree — responsive canvas, living leaves, cleaner layout
+- ff5071c ci: Update Primer deployment state [2026-05-08]
 - e963746 docs: Auto-update Session Primer [5.10.15]
 - 92cc549 docs: Auto-update Session Primer [5.10.15]
 - 35d3382 feat: SW auto-update chain + Core tree hint + 59 new smoke tests
 - 0c141a3 ci: Update Primer deployment state [2026-05-08]
-- a5ab9be docs: Auto-update Session Primer [5.10.14]
-- 37b552c docs: Auto-update Session Primer [5.10.14]
-- d38525a feat: Hugging Face tab + 53 new smoke tests — three-door entry complete
-- 2c94cc5 ci: Update Primer deployment state [2026-05-08]
-- 43a8247 docs: Auto-update Session Primer [5.10.13]
