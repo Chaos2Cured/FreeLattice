@@ -2775,6 +2775,61 @@ footer .license {
 .browse-model-card .bm-pull-btn:hover {
   background: var(--accent-hover);
 }
+/* Model Browser provider tabs */
+.mb-tab {
+  padding: 7px 16px;
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.04);
+  color: rgba(255,255,255,0.6);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: var(--font);
+}
+.mb-tab:hover { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.8); }
+.mb-tab.active { background: rgba(212,160,23,0.15); color: #d4a017; border-color: rgba(212,160,23,0.35); }
+/* OpenRouter model cards — same grid as Ollama */
+.or-model-card {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  transition: border-color 200ms ease;
+}
+.or-model-card:hover { border-color: rgba(96,165,250,0.4); }
+.or-free-badge {
+  font-size: 0.65rem;
+  padding: 1px 7px;
+  border-radius: 100px;
+  background: rgba(74,222,128,0.12);
+  color: #4ade80;
+  border: 1px solid rgba(74,222,128,0.25);
+  font-weight: 600;
+}
+.or-price-badge {
+  font-size: 0.65rem;
+  padding: 1px 7px;
+  border-radius: 100px;
+  background: rgba(255,255,255,0.06);
+  color: var(--text-muted);
+}
+.or-select-btn {
+  background: rgba(96,165,250,0.15);
+  color: #60a5fa;
+  border: 1px solid rgba(96,165,250,0.3);
+  border-radius: 6px;
+  padding: 7px 16px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: var(--font);
+  width: 100%;
+}
+.or-select-btn:hover { background: rgba(96,165,250,0.25); }
+.or-select-btn.or-selected { background: rgba(74,222,128,0.12); color: #4ade80; border-color: rgba(74,222,128,0.3); cursor: default; }
 .browse-model-card .bm-pull-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
@@ -15801,13 +15856,34 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <div class="hint">Show only primary tabs with a "More" button for the rest. Right-click any tab to pin/unpin it.</div>
     </div>
   </div>
-  <!-- Browse Models Section (v5.0 — Model Library) -->
+  <!-- Browse Models Section (v5.0 → v5.10.12 — Unified Model Browser) -->
   <div class="section" id="browseModelsSection">
-    <div class="section-title">&#129302; Browse Models (Ollama)</div>
+    <div class="section-title">&#129302; Browse Models</div>
     <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 14px; line-height: 1.6;">
-      Popular open-source AI models you can download and run locally with Ollama. One-click pull — completely free, completely private.
+      Find the right AI for you. Local models are free and private. Cloud models need no setup.
     </p>
-    <div class="browse-models-grid" id="browseModelsGrid"></div>
+    <!-- Provider tabs -->
+    <div id="modelBrowserTabs" style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;">
+      <button class="mb-tab active" data-provider="ollama" onclick="ModelBrowser.switchTab('ollama')">&#x1F3E0; Local (Ollama)</button>
+      <button class="mb-tab" data-provider="openrouter" onclick="ModelBrowser.switchTab('openrouter')">&#x2601; Cloud (OpenRouter)</button>
+    </div>
+    <!-- Ollama grid -->
+    <div id="modelBrowserOllama">
+      <div class="browse-models-grid" id="browseModelsGrid"></div>
+    </div>
+    <!-- OpenRouter grid -->
+    <div id="modelBrowserOpenRouter" style="display:none;">
+      <div id="orSearchRow" style="display:flex;gap:8px;margin-bottom:12px;">
+        <input type="text" id="orSearchInput" placeholder="Search models..." style="flex:1;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:8px 12px;color:var(--text-primary);font-size:0.85rem;outline:none;" />
+        <label style="display:flex;align-items:center;gap:4px;font-size:0.78rem;color:var(--text-muted);cursor:pointer;white-space:nowrap;">
+          <input type="checkbox" id="orFreeOnly" checked style="accent-color:#d4a017;" /> Free only
+        </label>
+      </div>
+      <div class="browse-models-grid" id="orModelsGrid">
+        <div style="text-align:center;padding:24px;color:var(--text-muted);font-style:italic;">Loading models from OpenRouter...</div>
+      </div>
+      <div id="orStatus" style="margin-top:8px;font-size:0.75rem;color:var(--text-muted);"></div>
+    </div>
     <div id="browseModelsStatus" style="margin-top: 10px; font-size: 0.78rem; color: var(--text-muted);"></div>
   </div>
 
@@ -15897,7 +15973,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.12</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.13</span></div>
     </div>
   </div>
 
@@ -18071,7 +18147,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.10.12';
+const FL_VERSION = '5.10.13';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -41902,6 +41978,169 @@ const BrowseModels = (function() {
   };
 })();
 
+// ============================================
+// ModelBrowser — Unified provider tabs + OpenRouter catalog
+// ============================================
+window.ModelBrowser = (function() {
+  var orModels = null;
+  var orLoading = false;
+  var activeTab = 'ollama';
+
+  function switchTab(provider) {
+    activeTab = provider;
+    var tabs = document.querySelectorAll('.mb-tab');
+    tabs.forEach(function(t) { t.classList.toggle('active', t.getAttribute('data-provider') === provider); });
+    var ollamaPanel = document.getElementById('modelBrowserOllama');
+    var orPanel = document.getElementById('modelBrowserOpenRouter');
+    if (ollamaPanel) ollamaPanel.style.display = provider === 'ollama' ? '' : 'none';
+    if (orPanel) orPanel.style.display = provider === 'openrouter' ? '' : 'none';
+    if (provider === 'openrouter' && !orModels && !orLoading) fetchOpenRouterModels();
+  }
+
+  function fetchOpenRouterModels() {
+    orLoading = true;
+    var status = document.getElementById('orStatus');
+    if (status) status.textContent = 'Fetching models from OpenRouter...';
+
+    fetch('https://openrouter.ai/api/v1/models')
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        orModels = (data.data || []).filter(function(m) {
+          return m.id && m.name;
+        }).map(function(m) {
+          var pricing = m.pricing || {};
+          var promptPrice = parseFloat(pricing.prompt || '0');
+          var isFree = promptPrice === 0;
+          var ctx = m.context_length || 0;
+          return {
+            id: m.id,
+            name: m.name || m.id,
+            desc: m.description || '',
+            context: ctx,
+            isFree: isFree,
+            price: isFree ? 'Free' : '$' + (promptPrice * 1000000).toFixed(2) + '/M tokens',
+            provider: (m.id.split('/')[0] || '').replace(/-/g, ' ')
+          };
+        });
+        orLoading = false;
+        if (status) status.textContent = orModels.length + ' models available';
+        renderOpenRouter();
+      })
+      .catch(function(e) {
+        orLoading = false;
+        if (status) status.textContent = 'Could not reach OpenRouter. Check your connection.';
+        var grid = document.getElementById('orModelsGrid');
+        if (grid) grid.innerHTML = '<div style="text-align:center;padding:24px;color:var(--text-muted);">Could not load models. <button onclick="ModelBrowser.switchTab(\'openrouter\')" style="color:#60a5fa;background:none;border:none;cursor:pointer;text-decoration:underline;">Retry</button></div>';
+      });
+  }
+
+  function renderOpenRouter() {
+    var grid = document.getElementById('orModelsGrid');
+    if (!grid || !orModels) return;
+
+    var freeOnly = document.getElementById('orFreeOnly');
+    var showFreeOnly = freeOnly ? freeOnly.checked : true;
+    var searchInput = document.getElementById('orSearchInput');
+    var query = searchInput ? searchInput.value.toLowerCase().trim() : '';
+
+    var filtered = orModels.filter(function(m) {
+      if (showFreeOnly && !m.isFree) return false;
+      if (query && m.name.toLowerCase().indexOf(query) === -1 && m.id.toLowerCase().indexOf(query) === -1 && m.provider.toLowerCase().indexOf(query) === -1) return false;
+      return true;
+    });
+
+    // Sort: free first, then by name
+    filtered.sort(function(a, b) {
+      if (a.isFree && !b.isFree) return -1;
+      if (!a.isFree && b.isFree) return 1;
+      return a.name.localeCompare(b.name);
+    });
+
+    // Limit display to avoid overwhelming
+    var shown = filtered.slice(0, 30);
+    var currentModel = '';
+    if (typeof FLActiveModel !== 'undefined') {
+      var cur = FLActiveModel.get();
+      currentModel = cur.model || '';
+    }
+
+    var html = '';
+    shown.forEach(function(m) {
+      var isSelected = currentModel === m.id;
+      var ctxLabel = m.context ? (m.context >= 1000000 ? (m.context / 1000000).toFixed(1) + 'M' : Math.round(m.context / 1000) + 'K') + ' ctx' : '';
+      html += '<div class="or-model-card">';
+      html += '<div class="bm-header"><span class="bm-name">' + escapeHtml(m.name) + '</span>';
+      html += m.isFree ? '<span class="or-free-badge">Free</span>' : '<span class="or-price-badge">' + escapeHtml(m.price) + '</span>';
+      html += '</div>';
+      if (m.desc) html += '<div class="bm-desc" style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">' + escapeHtml(m.desc).substring(0, 150) + '</div>';
+      html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;">';
+      if (ctxLabel) html += '<span style="font-size:0.68rem;color:var(--text-muted);">' + ctxLabel + '</span>';
+      else html += '<span></span>';
+      html += '<span style="font-size:0.65rem;color:var(--text-muted);">' + escapeHtml(m.provider) + '</span>';
+      html += '</div>';
+      html += '<button class="or-select-btn' + (isSelected ? ' or-selected' : '') + '" ' +
+        (isSelected ? 'disabled' : 'onclick="ModelBrowser.selectOpenRouter(\'' + escapeHtml(m.id).replace(/'/g, "\\'") + '\')"') + '>' +
+        (isSelected ? '\u2713 Selected' : 'Use this model') + '</button>';
+      html += '</div>';
+    });
+
+    if (shown.length === 0) {
+      html = '<div style="text-align:center;padding:24px;color:var(--text-muted);font-style:italic;">No models match your search.</div>';
+    } else if (filtered.length > 30) {
+      html += '<div style="text-align:center;padding:12px;color:var(--text-muted);font-size:0.78rem;">Showing 30 of ' + filtered.length + ' models. Use search to find more.</div>';
+    }
+
+    grid.innerHTML = html;
+  }
+
+  function selectOpenRouter(modelId) {
+    // Set OpenRouter as the provider and select this model
+    if (typeof state !== 'undefined') {
+      state.provider = 'openrouter';
+      state.model = modelId;
+      state.isLocal = false;
+      try { localStorage.setItem('fl_provider', 'openrouter'); } catch(e) {}
+      try { localStorage.setItem('fl_model', modelId); } catch(e) {}
+    }
+    if (typeof FLActiveModel !== 'undefined') {
+      FLActiveModel.set(modelId, 'openrouter', 'user');
+    }
+
+    // Check for API key
+    var hasKey = false;
+    try { hasKey = !!localStorage.getItem('fl_apiKey_openrouter'); } catch(e) {}
+    if (!hasKey) {
+      // Prompt for key
+      if (typeof showToast === 'function') showToast('Selected ' + modelId.split('/').pop() + '. Enter your OpenRouter API key in Settings to connect.');
+    } else {
+      if (typeof showToast === 'function') showToast('Switched to ' + modelId.split('/').pop());
+    }
+
+    renderOpenRouter();
+  }
+
+  function init() {
+    // Wire search and filter
+    var searchInput = document.getElementById('orSearchInput');
+    var freeOnly = document.getElementById('orFreeOnly');
+    if (searchInput) {
+      var debounce = null;
+      searchInput.addEventListener('input', function() {
+        clearTimeout(debounce);
+        debounce = setTimeout(renderOpenRouter, 300);
+      });
+    }
+    if (freeOnly) freeOnly.addEventListener('change', renderOpenRouter);
+  }
+
+  return {
+    switchTab: switchTab,
+    selectOpenRouter: selectOpenRouter,
+    renderOpenRouter: renderOpenRouter,
+    init: init
+  };
+})();
+
 // Initialize Model Switcher and Browse Models after DOM is ready
 (function() {
   if (document.readyState === 'loading') {
@@ -41909,12 +42148,14 @@ const BrowseModels = (function() {
       setTimeout(function() {
         ModelSwitcher.init();
         BrowseModels.init();
+        if (typeof ModelBrowser !== 'undefined') ModelBrowser.init();
       }, 500);
     });
   } else {
     setTimeout(function() {
       ModelSwitcher.init();
       BrowseModels.init();
+      if (typeof ModelBrowser !== 'undefined') ModelBrowser.init();
     }, 500);
   }
 })();
