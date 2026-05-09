@@ -350,10 +350,9 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 ## PRIMER HEALTH
 - Last auto-updated: 2026-05-08 18:06 MDT
 - Version: 5.10.19
-- Total commits: 1425
+- Total commits: 1424
 - Last 10 commits:
-- aa61776 feat: Legal Case Study + Pictionary trademark fix + More dropdown
-- a5b363d ci: Update Primer deployment state [2026-05-08]
+- 506b6d0 feat: Legal Case Study + Pictionary trademark fix + More dropdown
 - b626150 docs: Auto-update Session Primer [5.10.18]
 - be66d0b docs: Auto-update Session Primer [5.10.18]
 - 2c77f6c feat: Medical Case Discussion — educational multi-specialty simulator
@@ -362,3 +361,4 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - a68778d docs: Auto-update Session Primer [5.10.17]
 - 92a6b28 fix: Dojo Sparring — scoring race, topic dedup, responses below canvas
 - 9eb85b4 ci: Update Primer deployment state [2026-05-08]
+- 336ab9f docs: Auto-update Session Primer [5.10.16]
