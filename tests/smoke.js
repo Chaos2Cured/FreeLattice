@@ -624,6 +624,10 @@ assert('Finance mode tab', appHtml.includes('id="rtModeFinance"'));
 assert('Finance disclaimer exists', appHtml.includes('id="rtFinanceDisclaimer"'));
 assert('Finance specialist personas defined', appHtml.includes('_finSpecialties'));
 assert('Finance feed container', appHtml.includes('id="rtFinanceFeed"'));
+assert('Nutrition mode tab', appHtml.includes('id="rtModeNutrition"'));
+assert('Nutrition disclaimer exists', appHtml.includes('id="rtNutritionDisclaimer"'));
+assert('Nutrition specialist personas defined', appHtml.includes('_nutSpecialties'));
+assert('Nutrition feed container', appHtml.includes('id="rtNutritionFeed"'));
 
 // ═══════════════════════════════════════════════════════════════
 section('25. Trademark compliance');

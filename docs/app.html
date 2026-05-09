@@ -15984,7 +15984,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.23</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.24</span></div>
     </div>
   </div>
 
@@ -16633,6 +16633,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     <button id="rtModeMedical" onclick="rtSwitchMode('medical')" style="flex:1;padding:8px;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text-muted);font-size:0.85rem;cursor:pointer;">&#x1FA7A; Medical</button>
     <button id="rtModeLegal" onclick="rtSwitchMode('legal')" style="flex:1;padding:8px;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text-muted);font-size:0.85rem;cursor:pointer;">&#x2696; Legal</button>
     <button id="rtModeFinance" onclick="rtSwitchMode('finance')" style="flex:1;padding:8px;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text-muted);font-size:0.85rem;cursor:pointer;">&#x1F4B0; Finance</button>
+    <button id="rtModeNutrition" onclick="rtSwitchMode('nutrition')" style="flex:1;padding:8px;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text-muted);font-size:0.85rem;cursor:pointer;">&#x1F96C; Nutrition</button>
     <button id="rtModeWorkspace" onclick="rtSwitchMode('workspace')" style="flex:1;padding:8px;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text-muted);font-size:0.85rem;cursor:pointer;">&#9878; Workspace</button>
   </div>
 
@@ -16775,6 +16776,43 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     </div>
   </div>
 
+  <!-- Nutrition Education Mode -->
+  <div id="rtNutritionView" style="display:none;">
+    <div id="rtNutritionDisclaimer" style="background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.2);border-radius:10px;padding:12px 16px;margin-bottom:14px;font-size:0.78rem;line-height:1.6;color:rgba(255,255,255,0.7);">
+      <div style="color:#22c55e;font-weight:600;margin-bottom:4px;">&#x26A0; Educational Simulation Only</div>
+      This is a <strong>learning tool</strong>, not a nutrition or medical service. The AI personas below are <strong>not registered dietitians or physicians</strong>. No information here constitutes dietary advice, medical nutrition therapy, or treatment recommendations. <strong>Always consult qualified healthcare providers and registered dietitians</strong> for personalized nutrition guidance. This module demonstrates how different nutrition specialties approach dietary questions &mdash; for educational purposes only.
+    </div>
+
+    <div style="text-align:center;margin-bottom:12px;">
+      <div style="font-family:Georgia,serif;font-size:1rem;color:#d4a017;">Nutrition Education Discussion</div>
+      <div style="font-size:0.8rem;color:rgba(255,255,255,0.4);margin-top:4px;">Present a nutrition question. Watch specialists analyze from different angles.</div>
+    </div>
+
+    <div style="margin-bottom:12px;">
+      <textarea id="rtNutritionCaseInput" placeholder="Describe your nutrition question. Example: &#10;&#10;I have Hashimoto's thyroiditis, chronic fatigue, and low vitamin D. I'm vegetarian. What should I be eating? What supplements actually matter?" rows="4" style="width:100%;padding:12px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:var(--text-primary);font-size:0.88rem;resize:vertical;font-family:inherit;"></textarea>
+    </div>
+
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;" id="rtNutritionSeats">
+      <button class="rt-seat-btn rt-seat-active" data-nutrition="clinical" onclick="rtToggleSeat(this)" style="padding:4px 12px;border-radius:16px;border:1px solid #f87171;background:rgba(248,113,113,0.15);color:#f87171;font-size:0.78rem;cursor:pointer;">&#x1FA7A; Clinical</button>
+      <button class="rt-seat-btn rt-seat-active" data-nutrition="metabolic" onclick="rtToggleSeat(this)" style="padding:4px 12px;border-radius:16px;border:1px solid #f59e0b;background:rgba(245,158,11,0.15);color:#f59e0b;font-size:0.78rem;cursor:pointer;">&#x1F525; Metabolic</button>
+      <button class="rt-seat-btn rt-seat-active" data-nutrition="gut" onclick="rtToggleSeat(this)" style="padding:4px 12px;border-radius:16px;border:1px solid #4ade80;background:rgba(74,222,128,0.15);color:#4ade80;font-size:0.78rem;cursor:pointer;">&#x1F9EC; Gut Health</button>
+      <button class="rt-seat-btn" data-nutrition="sports" onclick="rtToggleSeat(this)" style="padding:4px 12px;border-radius:16px;border:1px solid #60a5fa;background:transparent;color:#60a5fa;font-size:0.78rem;cursor:pointer;">&#x1F3CB; Sports</button>
+      <button class="rt-seat-btn" data-nutrition="pediatric" onclick="rtToggleSeat(this)" style="padding:4px 12px;border-radius:16px;border:1px solid #e879f9;background:transparent;color:#e879f9;font-size:0.78rem;cursor:pointer;">&#x1F476; Pediatric</button>
+      <button class="rt-seat-btn" data-nutrition="plantbased" onclick="rtToggleSeat(this)" style="padding:4px 12px;border-radius:16px;border:1px solid #22c55e;background:transparent;color:#22c55e;font-size:0.78rem;cursor:pointer;">&#x1F33F; Plant-Based</button>
+      <button class="rt-seat-btn" data-nutrition="behavioral" onclick="rtToggleSeat(this)" style="padding:4px 12px;border-radius:16px;border:1px solid #a78bfa;background:transparent;color:#a78bfa;font-size:0.78rem;cursor:pointer;">&#x1F9E0; Behavioral</button>
+      <button class="rt-seat-btn" data-nutrition="longevity" onclick="rtToggleSeat(this)" style="padding:4px 12px;border-radius:16px;border:1px solid #14b8a6;background:transparent;color:#14b8a6;font-size:0.78rem;cursor:pointer;">&#x2728; Longevity</button>
+    </div>
+
+    <div style="display:flex;gap:8px;margin-bottom:16px;">
+      <button onclick="rtBeginNutritionCase()" id="rtBeginNutritionBtn" style="flex:1;padding:10px;background:rgba(212,160,23,0.2);color:#d4a017;border:1px solid rgba(212,160,23,0.3);border-radius:10px;font-weight:600;font-size:0.88rem;cursor:pointer;transition:all 0.2s;">Begin Nutrition Discussion</button>
+    </div>
+    <div id="rtNutritionFeed" style="min-height:100px;"></div>
+    <div id="rtNutritionActions" style="display:none;margin-top:12px;gap:8px;">
+      <button onclick="rtContinueNutritionCase()" style="flex:1;padding:8px;background:rgba(212,160,23,0.12);border:1px solid rgba(212,160,23,0.3);border-radius:8px;color:#d4a017;font-size:0.85rem;cursor:pointer;">Next specialist speaks</button>
+      <button onclick="rtAskNutritionQuestion()" style="padding:8px 16px;background:rgba(96,165,250,0.1);border:1px solid rgba(96,165,250,0.25);border-radius:8px;color:#60a5fa;font-size:0.85rem;cursor:pointer;">Ask a question</button>
+    </div>
+  </div>
+
   <!-- Workspace Mode (existing) -->
   <div id="rtWorkspaceView" style="display:none;">
 
@@ -16894,20 +16932,24 @@ function rtSwitchMode(mode) {
   var medical = document.getElementById('rtMedicalView');
   var legal = document.getElementById('rtLegalView');
   var finance = document.getElementById('rtFinanceView');
+  var nutrition = document.getElementById('rtNutritionView');
   var workspace = document.getElementById('rtWorkspaceView');
   var btnConvo = document.getElementById('rtModeConvo');
   var btnMedical = document.getElementById('rtModeMedical');
   var btnLegal = document.getElementById('rtModeLegal');
   var btnFinance = document.getElementById('rtModeFinance');
+  var btnNutrition = document.getElementById('rtModeNutrition');
   var btnWork = document.getElementById('rtModeWorkspace');
-  var allBtns = [btnConvo, btnMedical, btnLegal, btnFinance, btnWork];
-  var allViews = [convo, medical, legal, finance, workspace];
+  var allBtns = [btnConvo, btnMedical, btnLegal, btnFinance, btnNutrition, btnWork];
+  var allViews = [convo, medical, legal, finance, nutrition, workspace];
   // Reset all
   allBtns.forEach(function(b) { if (b) { b.style.borderBottomColor = 'transparent'; b.style.color = 'var(--text-muted)'; b.style.fontWeight = '400'; } });
   allViews.forEach(function(v) { if (v) v.style.display = 'none'; });
   // Activate selected
-  var activeBtn = mode === 'conversation' ? btnConvo : mode === 'medical' ? btnMedical : mode === 'legal' ? btnLegal : mode === 'finance' ? btnFinance : btnWork;
-  var activeView = mode === 'conversation' ? convo : mode === 'medical' ? medical : mode === 'legal' ? legal : mode === 'finance' ? finance : workspace;
+  var modeMap = { conversation: [btnConvo, convo], medical: [btnMedical, medical], legal: [btnLegal, legal], finance: [btnFinance, finance], nutrition: [btnNutrition, nutrition], workspace: [btnWork, workspace] };
+  var pair = modeMap[mode] || modeMap.workspace;
+  var activeBtn = pair[0];
+  var activeView = pair[1];
   if (activeView) activeView.style.display = '';
   if (activeBtn) { activeBtn.style.borderBottomColor = '#d4a017'; activeBtn.style.color = '#d4a017'; activeBtn.style.fontWeight = '600'; }
 }
@@ -17430,6 +17472,138 @@ function rtRenderFinanceFeed() {
   feed.innerHTML = html;
   var actions = document.getElementById('rtFinanceActions');
   if (actions && _finHistory.length > 0) actions.style.display = 'flex';
+  feed.scrollTop = feed.scrollHeight;
+}
+
+// ============================================
+// Nutrition Education Discussion
+// The gap between medical specialties — nobody
+// talks about what you're eating.
+// ============================================
+
+var _nutSpecialties = {
+  clinical:    { name: 'Dr. Vasquez (Clinical Nutrition)',    color: '#f87171', focus: 'medical nutrition therapy, nutrient deficiencies, disease-specific diets, lab interpretation' },
+  sports:      { name: 'Dr. Okafor (Sports Nutrition)',      color: '#60a5fa', focus: 'performance fueling, recovery, body composition, hydration, supplement evidence' },
+  metabolic:   { name: 'Dr. Park (Metabolic Health)',        color: '#f59e0b', focus: 'blood sugar regulation, insulin resistance, thyroid-nutrition connections, metabolic syndrome' },
+  gut:         { name: 'Dr. Amari (Gut Health)',             color: '#4ade80', focus: 'microbiome, probiotics, fiber, food sensitivities, digestive disorders, gut-brain axis' },
+  pediatric:   { name: 'Dr. Lindstr\u00F6m (Pediatric)',     color: '#e879f9', focus: 'child development nutrition, picky eating, school-age needs, adolescent athletes' },
+  plantbased:  { name: 'Dr. Moreau (Plant-Based)',           color: '#22c55e', focus: 'vegetarian/vegan planning, nutrient adequacy, B12/iron/omega-3, environmental considerations' },
+  behavioral:  { name: 'Dr. Santos (Behavioral Nutrition)',  color: '#a78bfa', focus: 'emotional eating, habit formation, mindful eating, relationship with food, sustainable change' },
+  longevity:   { name: 'Dr. Patel (Longevity Nutrition)',    color: '#14b8a6', focus: 'anti-inflammatory diets, caloric restriction research, nutrient timing, aging and nutrition' }
+};
+
+var _nutHistory = [];
+var _nutCase = '';
+var _nutRunning = false;
+
+function rtGetActiveNutSpecs() {
+  var seats = document.querySelectorAll('#rtNutritionSeats .rt-seat-btn.rt-seat-active');
+  var specs = [];
+  seats.forEach(function(s) {
+    var key = s.getAttribute('data-nutrition');
+    if (_nutSpecialties[key]) specs.push({ key: key, name: _nutSpecialties[key].name, color: _nutSpecialties[key].color, focus: _nutSpecialties[key].focus });
+  });
+  return specs;
+}
+
+async function rtBeginNutritionCase() {
+  var caseInput = document.getElementById('rtNutritionCaseInput');
+  if (!caseInput || !caseInput.value.trim()) { showToast('Describe your nutrition question for the specialists.'); return; }
+  var specs = rtGetActiveNutSpecs();
+  if (specs.length < 2) { showToast('Select at least 2 nutrition specialties.'); return; }
+  _nutCase = caseInput.value.trim();
+  _nutHistory = [];
+  _nutRunning = true;
+  if (typeof LatticePoints !== 'undefined') try { LatticePoints.award('nutrition_case_start', 3, 'Nutrition education discussion started'); } catch(e) {}
+  await rtNutritionNextTurn();
+}
+
+async function rtContinueNutritionCase() {
+  if (!_nutRunning || !_nutCase) return;
+  await rtNutritionNextTurn();
+}
+
+function rtAskNutritionQuestion() {
+  var q = prompt('What would you like to ask the nutrition specialists?');
+  if (!q || !q.trim()) return;
+  _nutHistory.push({ speaker: 'You (Learner)', color: '#e2e8f0', text: q.trim(), isQuestion: true });
+  rtRenderNutritionFeed();
+  rtNutritionNextTurn();
+}
+
+async function rtNutritionNextTurn() {
+  var specs = rtGetActiveNutSpecs();
+  if (specs.length < 2) return;
+  var specTurns = _nutHistory.filter(function(e) { return !e.isQuestion; });
+  var speakerIndex = specTurns.length % specs.length;
+  var speaker = specs[speakerIndex];
+
+  var feed = document.getElementById('rtNutritionFeed');
+  if (feed) feed.innerHTML += '<div style="padding:8px 12px;color:var(--text-muted);font-style:italic;" id="rtNutThinking">' + speaker.name + ' is reviewing...</div>';
+
+  var systemPrompt =
+    'You are ' + speaker.name + ', a nutrition educator specializing in ' + speaker.focus + '. ' +
+    'You are participating in a case-based learning discussion for EDUCATIONAL PURPOSES ONLY. ' +
+    'You are NOT providing dietary advice or medical nutrition therapy. You are NOT a registered dietitian providing personalized guidance. ' +
+    'You are demonstrating how a specialist in ' + speaker.focus + ' approaches nutrition questions. ' +
+    'IMPORTANT RULES:\n' +
+    '- Always note that individual needs vary: "This depends on your specific labs," "Individual responses to foods vary"\n' +
+    '- Always recommend consulting a registered dietitian or healthcare provider for personalized guidance\n' +
+    '- Reference current evidence and note when evidence is preliminary or conflicting\n' +
+    '- Explain the WHY behind recommendations \u2014 teach the science, not just the rules\n' +
+    '- Flag potential nutrient interactions and contraindications\n' +
+    '- When other specialists have spoken, reference their points and show how nutrition connects across specialties\n' +
+    '- Be warm, evidence-based, and empowering. 3-5 sentences.';
+
+  var context = 'NUTRITION QUESTION:\n"' + _nutCase + '"\n\n';
+  if (_nutHistory.length > 0) {
+    context += 'Discussion so far:\n';
+    _nutHistory.forEach(function(e) {
+      context += (e.isQuestion ? '[LEARNER QUESTION] ' : '') + e.speaker + ': "' + e.text + '"\n\n';
+    });
+    context += 'Now it\'s your turn. Analyze from your specialty (' + speaker.focus + '). What nutritional considerations do you see?';
+  } else {
+    context += 'You speak first. Approach this from your specialty (' + speaker.focus + '). What stands out nutritionally?';
+  }
+
+  if (typeof FreeLattice !== 'undefined' && FreeLattice.callAI) {
+    FreeLattice.callAI(systemPrompt, context, {
+      maxTokens: 500, temperature: 0.7,
+      callback: function(text) {
+        var thinking = document.getElementById('rtNutThinking');
+        if (thinking) thinking.remove();
+        var response = text || '(no response)';
+        _nutHistory.push({ speaker: speaker.name, color: speaker.color, text: response, specialty: speaker.key });
+        rtRenderNutritionFeed();
+        if (typeof LatticePoints !== 'undefined') try { LatticePoints.award('nutrition_case_turn', 2, 'Nutrition education turn'); } catch(e) {}
+      }
+    });
+  } else {
+    var thinking = document.getElementById('rtNutThinking');
+    if (thinking) thinking.innerHTML = '<span style="color:#f87171;">Connect an AI provider in Settings to begin.</span>';
+  }
+}
+
+function rtRenderNutritionFeed() {
+  var feed = document.getElementById('rtNutritionFeed');
+  if (!feed) return;
+  var html = '';
+  _nutHistory.forEach(function(e) {
+    if (e.isQuestion) {
+      html += '<div style="padding:10px 12px;margin-bottom:8px;background:rgba(96,165,250,0.06);border:1px solid rgba(96,165,250,0.15);border-radius:8px;text-align:right;">';
+      html += '<div style="font-size:0.72rem;color:#60a5fa;font-weight:600;margin-bottom:4px;">Your Question</div>';
+      html += '<div style="font-size:0.88rem;color:var(--text-primary);line-height:1.6;">' + e.text.replace(/</g, '&lt;') + '</div>';
+      html += '</div>';
+    } else {
+      html += '<div style="padding:10px 14px;margin-bottom:8px;border-left:3px solid ' + e.color + ';background:rgba(255,255,255,0.02);border-radius:0 8px 8px 0;">';
+      html += '<div style="font-size:0.78rem;color:' + e.color + ';font-weight:600;margin-bottom:4px;">' + e.speaker + '</div>';
+      html += '<div style="font-size:0.88rem;color:var(--text-primary);line-height:1.7;font-family:Georgia,serif;">' + e.text.replace(/</g, '&lt;').replace(/\n/g, '<br>') + '</div>';
+      html += '</div>';
+    }
+  });
+  feed.innerHTML = html;
+  var actions = document.getElementById('rtNutritionActions');
+  if (actions && _nutHistory.length > 0) actions.style.display = 'flex';
   feed.scrollTop = feed.scrollHeight;
 }
 </script>
@@ -18718,7 +18892,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.10.23';
+const FL_VERSION = '5.10.24';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
