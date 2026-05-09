@@ -109,6 +109,42 @@ The economy, the City, sound, AI bounties, Garden Ecosystem — all coming. But 
 
 ## ACTIVE LOG
 
+### May 8-9, 2026 — CC + Opus + Kirk — v5.10.10 through v5.10.24: The Sixteen Versions
+
+**The most productive period in FreeLattice history.** 16 versions. 134 → 219 smoke tests.
+
+**Versions shipped:**
+- v5.10.10: Garden polish (Presence below header, Observe speed burst, mode toasts)
+- v5.10.11: Chat polish (glass input, gold focus glow, rounded send, How It Works auto-hide)
+- v5.10.12: Model-switching fix (_userHomeModel preserves user choice)
+- v5.10.13: Universal Model Browser Phase 1+2 (Ollama + OpenRouter tabs)
+- v5.10.14: Model Browser Phase 3 (Hugging Face tab, three-door entry)
+- v5.10.15: SW auto-update chain, Core tree empty-state hint
+- v5.10.16: Core tree alive (responsive canvas, Luminos-style glowing leaves)
+- v5.10.17: Dojo Sparring fixes (scoring race, topic dedup, responses below canvas)
+- v5.10.18: Medical Case Discussion (8 specialist personas, structural disclaimer)
+- v5.10.19: Legal Case Study (8 specialists) + Pictionary→Guess and Draw + More dropdown fix
+- v5.10.20: Arcade IndexedDB deadlock fix
+- v5.10.21: Community tab redesign (The Lattice, Connect, Advanced collapsed)
+- v5.10.22: Jade Hall alive (Draco takes the seat, firefly particles, light shafts, table refraction)
+- v5.10.23: Financial Education (8 specialists) + safety.html origin timeline
+- v5.10.24: Nutrition Education (8 specialists)
+
+**Round Table: 6 modes, 32 specialist personas across 4 educational domains.**
+Each domain proves trust-based safety works. Each session is data for the safety paper.
+
+**Key decisions:**
+- Kirk → Draco in Jade Hall. "At the round table, no mind is above another."
+- Medical Case Discussion inspired by Kirk's father. "I am not asking for medical advice. I am asking for medical education."
+- The Round Table pattern: ~80 lines per domain, same architecture, structural disclaimers, trust-gated depth.
+
+**Next:**
+- Workshop Projects tab (GitHub repo connection)
+- Cross-Domain Round Table (mix specialists from different domains)
+- Safety paper with educational domains as case studies
+
+---
+
 ### May 8, 2026 — CC + Opus — v5.10.10 through v5.10.15: Polish + Front Door
 
 **What shipped (6 versions in one session):**
