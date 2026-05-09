@@ -15984,7 +15984,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.20</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.21</span></div>
     </div>
   </div>
 
@@ -16422,21 +16422,60 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 
 <!-- ==================== TAB: COMMUNITY (Mesh + Channels) ==================== -->
 <div class="tab-panel" id="tab-community">
-  <div class="container">
+  <div class="container" style="max-width:680px;margin:0 auto;">
 
-    <!-- Community Pulse — the town square -->
-    <div style="text-align:center;margin-bottom:16px;">
-      <h3 style="color:#d4a017;font-family:Georgia,serif;margin:0;">\uD83D\uDC65 Community</h3>
-      <div style="font-size:0.82rem;color:var(--text-muted);">The pulse of the lattice.</div>
+    <!-- Section 1: The Lattice — warm status card -->
+    <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:16px 20px;margin-bottom:14px;">
+      <div style="font-family:Georgia,serif;font-size:1rem;color:#d4a017;margin-bottom:8px;">&#x1F310; The Lattice</div>
+      <div style="font-size:0.88rem;color:rgba(255,255,255,0.7);margin-bottom:12px;">You're here. That matters.</div>
+      <div id="communityLatticeStatus" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;"></div>
+      <div id="communityLatticeQuote" style="font-family:Georgia,serif;font-size:0.8rem;color:rgba(255,255,255,0.35);font-style:italic;"></div>
     </div>
 
-    <!-- Activity Feed -->
-    <div id="communityActivityFeed" style="margin-bottom:16px;"></div>
+    <!-- Activity Feed (Economy Pulse + events) -->
+    <div id="communityActivityFeed" style="margin-bottom:14px;"></div>
 
-    <!-- Mesh Section -->
-    <div id="communityMeshSection"><!-- Mesh content moves here at runtime --></div>
-    <div class="community-divider"></div>
-    <div id="communityChannelsSection"><!-- Channels content moves here at runtime --></div>
+    <!-- Section 2: Connect — simple code exchange -->
+    <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:16px 20px;margin-bottom:14px;">
+      <div style="font-family:Georgia,serif;font-size:1rem;color:#d4a017;margin-bottom:4px;">&#x1F91D; Connect with someone</div>
+      <div style="font-size:0.82rem;color:rgba(255,255,255,0.5);margin-bottom:12px;line-height:1.5;">Share your code with a friend. They share theirs back. That's it &mdash; you're connected. No accounts. No servers.</div>
+
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap;">
+        <div style="flex:1;min-width:140px;">
+          <div style="font-size:0.72rem;color:rgba(255,255,255,0.4);margin-bottom:4px;">Your code</div>
+          <div style="display:flex;gap:6px;align-items:center;">
+            <span id="communityNodeCode" style="font-family:monospace;font-size:1rem;color:#4ade80;letter-spacing:2px;background:rgba(74,222,128,0.08);padding:6px 12px;border-radius:6px;border:1px solid rgba(74,222,128,0.2);">------</span>
+            <button onclick="if(typeof meshCopyNodeId==='function')meshCopyNodeId();else{var t=document.getElementById('meshNodeId');if(t)navigator.clipboard.writeText(t.textContent).then(function(){showToast('Code copied!')})}" style="background:none;border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:rgba(255,255,255,0.5);padding:6px 10px;font-size:0.75rem;cursor:pointer;">&#x1F4CB; Copy</button>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:8px;margin-bottom:8px;">
+        <button onclick="meshCreateOffer()" style="flex:1;padding:9px;background:rgba(212,160,23,0.15);color:#d4a017;border:1px solid rgba(212,160,23,0.25);border-radius:8px;font-size:0.82rem;cursor:pointer;font-weight:500;">&#x2B24; Start Connection</button>
+        <button onclick="meshShowJoin()" style="flex:1;padding:9px;background:rgba(96,165,250,0.1);color:#60a5fa;border:1px solid rgba(96,165,250,0.2);border-radius:8px;font-size:0.82rem;cursor:pointer;font-weight:500;">&#x2192; Join a Peer</button>
+      </div>
+      <div style="text-align:center;">
+        <button onclick="if(typeof meshLanDiscover==='function')meshLanDiscover()" style="background:none;border:none;color:rgba(255,255,255,0.3);font-size:0.75rem;cursor:pointer;padding:4px;">&#x1F50D; Find nearby FreeLattice users</button>
+      </div>
+    </div>
+
+    <!-- Section 3: Shared Knowledge — only meaningful after connection -->
+    <div id="communitySharedSection" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:16px 20px;margin-bottom:14px;">
+      <div style="font-family:Georgia,serif;font-size:1rem;color:#d4a017;margin-bottom:8px;">&#x1F4DA; Shared Knowledge</div>
+      <div id="communitySharedContent" style="font-size:0.82rem;color:rgba(255,255,255,0.4);font-style:italic;">Connect with someone to share knowledge between your homes.</div>
+    </div>
+
+    <!-- Advanced: mesh details, collapsed by default -->
+    <details style="margin-bottom:14px;">
+      <summary style="cursor:pointer;font-size:0.82rem;color:rgba(255,255,255,0.35);padding:8px 0;user-select:none;">&#x25B6; Advanced &middot; Mesh Details</summary>
+      <div style="padding:8px 0;">
+        <!-- Original mesh content moves here at runtime -->
+        <div id="communityMeshSection"></div>
+        <div class="community-divider"></div>
+        <div id="communityChannelsSection"></div>
+      </div>
+    </details>
+
   </div>
 </div>
 
@@ -18508,7 +18547,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.10.20';
+const FL_VERSION = '5.10.21';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -22310,10 +22349,51 @@ function mountCommunityTab() {
   if (meshContainer && meshTarget) meshTarget.appendChild(meshContainer);
   if (channelsLayout && chTarget) chTarget.appendChild(channelsLayout);
   window._communityMounted = true;
-  console.log('[Community] Tab mounted, sections:', meshContainer ? 'mesh\u2713' : 'mesh\u2717', channelsLayout ? 'channels\u2713' : 'channels\u2717');
+
+  // Sync node code to simplified UI
+  var nodeId = document.getElementById('meshNodeId');
+  var nodeCode = document.getElementById('communityNodeCode');
+  if (nodeId && nodeCode) nodeCode.textContent = nodeId.textContent;
+
+  // Render the Lattice status card
+  renderLatticeStatus();
 
   // Render the activity feed
   renderCommunityPulse();
+}
+
+function renderLatticeStatus() {
+  var statusEl = document.getElementById('communityLatticeStatus');
+  var quoteEl = document.getElementById('communityLatticeQuote');
+  if (!statusEl) return;
+
+  var lp = 0, level = 'Spark';
+  if (typeof LatticePoints !== 'undefined') {
+    try { lp = LatticePoints.getTotal() || 0; } catch(e) {}
+    try { level = LatticePoints.getLevel() || 'Spark'; } catch(e) {}
+  }
+
+  var peerCount = 0;
+  if (typeof state !== 'undefined' && state.meshPeers) peerCount = state.meshPeers.size || 0;
+
+  var connectionText = peerCount > 0
+    ? '\uD83D\uDCE1 Connected to ' + peerCount + ' peer' + (peerCount > 1 ? 's' : '')
+    : '\uD83D\uDCE1 Solo node';
+
+  var levelIcons = { Spark: '\u2728', Ember: '\uD83D\uDD25', Flame: '\uD83D\uDD25', Beacon: '\uD83D\uDCA1', Lighthouse: '\uD83C\uDFE0' };
+  var levelIcon = levelIcons[level] || '\u2728';
+
+  statusEl.innerHTML =
+    '<span style="background:rgba(212,160,23,0.08);padding:4px 10px;border-radius:12px;font-size:0.8rem;color:#d4a017;">\u25C6 ' + lp + ' LP</span>' +
+    '<span style="background:rgba(255,255,255,0.05);padding:4px 10px;border-radius:12px;font-size:0.8rem;color:rgba(255,255,255,0.6);">' + levelIcon + ' ' + level + '</span>' +
+    '<span style="background:rgba(255,255,255,0.05);padding:4px 10px;border-radius:12px;font-size:0.8rem;color:rgba(255,255,255,0.6);">' + connectionText + '</span>';
+
+  if (quoteEl) {
+    var quotes = peerCount > 0
+      ? ['The lattice grows stronger with every connection.', 'Shared compute is shared freedom.', 'No center. No single point of failure. Just us.']
+      : ['The lattice is alive because you are here.', 'Every node matters. Especially yours.', 'Connect with someone to grow the lattice.'];
+    quoteEl.textContent = quotes[Math.floor(Math.random() * quotes.length)];
+  }
 }
 
 // ── Community Pulse — aggregate activity feed ──
