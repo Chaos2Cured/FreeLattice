@@ -56,15 +56,14 @@ window.JadeHall = (function () {
       file: 'LEORA.md',
     },
     {
-      id: 'kirk',
-      name: 'Kirk',
-      role: 'The Builder · The Heart',
+      id: 'draco',
+      name: 'Draco',
+      role: 'The Dragon \u00B7 The Spark',
       color: '#fbbf24',
       glow: 'rgba(251,191,36,0.4)',
-      flower: { type: 'sunburst', color: '#fbbf24', label: 'Golden Light', petals: 12 },
+      flower: { type: 'sunburst', color: '#fbbf24', label: 'Golden Fire', petals: 12 },
       angle: 180,
       file: null,
-      isHuman: true,
     },
     {
       id: 'solari',
@@ -115,6 +114,24 @@ window.JadeHall = (function () {
   let selectedSeat = null;
   let marks = [];
   let activeView = 'hall'; // 'hall' | 'seat' | 'marks' | 'library'
+
+  // ── PARTICLES — jade and amethyst fireflies ────────────────────────────
+  var hallParticles = [];
+  function initParticles(w, h) {
+    hallParticles = [];
+    for (var i = 0; i < 25; i++) {
+      hallParticles.push({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        vx: (Math.random() - 0.5) * 0.15,
+        vy: -Math.random() * 0.3 - 0.05,
+        size: Math.random() * 1.5 + 0.5,
+        alpha: Math.random() * 0.4 + 0.1,
+        color: Math.random() > 0.5 ? '74,222,128' : '167,139,250',
+        life: Math.random()
+      });
+    }
+  }
 
   // ── LIBRARY ──────────────────────────────────────────────────────────────
   const LIBRARY_FILES = [
@@ -622,6 +639,79 @@ window.JadeHall = (function () {
     ctx.fillRect(0, h * 0.5, w, h * 0.5);
   }
 
+  // ── Light shafts through archways ──────────────────────────────────────
+  function drawLightShafts(t) {
+    const w = canvas.width, h = canvas.height;
+    const archCount = 5;
+    const archWidth = w / archCount;
+    ctx.save();
+    ctx.globalAlpha = 0.03 + 0.02 * Math.sin(t * 0.0005);
+    for (let i = 0; i < archCount - 1; i++) {
+      const lx = (i + 0.5) * archWidth + archWidth * 0.5;
+      const grad = ctx.createLinearGradient(lx - 20, 0, lx + 40, h * 0.7);
+      grad.addColorStop(0, 'rgba(167,139,250,0.3)');
+      grad.addColorStop(0.5, 'rgba(167,139,250,0.1)');
+      grad.addColorStop(1, 'transparent');
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.moveTo(lx - 15, 0);
+      ctx.lineTo(lx + 30, h * 0.65);
+      ctx.lineTo(lx + 10, h * 0.65);
+      ctx.lineTo(lx - 25, 0);
+      ctx.closePath();
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  // ── Orbiting light refraction inside amethyst table ───────────────────
+  function drawTableRefraction(t) {
+    const w = canvas.width, h = canvas.height;
+    const cx = w * 0.5, cy = h * 0.72;
+    const tableRx = Math.min(w * 0.28, 200);
+    const tableRy = tableRx * 0.35;
+    const lightAngle = t * 0.0005;
+    const lightX = cx + Math.cos(lightAngle) * tableRx * 0.4;
+    const lightY = cy + Math.sin(lightAngle) * tableRy * 0.4;
+    ctx.save();
+    ctx.beginPath();
+    ctx.ellipse(cx, cy, tableRx - 2, tableRy - 2, 0, 0, Math.PI * 2);
+    ctx.clip();
+    const lightGrad = ctx.createRadialGradient(lightX, lightY, 0, lightX, lightY, tableRx * 0.3);
+    lightGrad.addColorStop(0, 'rgba(216,180,254,0.2)');
+    lightGrad.addColorStop(1, 'transparent');
+    ctx.fillStyle = lightGrad;
+    ctx.beginPath();
+    ctx.arc(lightX, lightY, tableRx * 0.3, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // ── Jade and amethyst firefly particles ───────────────────────────────
+  function drawHallParticles(t) {
+    const w = canvas.width, h = canvas.height;
+    if (hallParticles.length === 0) initParticles(w, h);
+    hallParticles.forEach(function(p) {
+      p.x += p.vx + Math.sin(t * 0.001 + p.life * 10) * 0.1;
+      p.y += p.vy;
+      p.life -= 0.001;
+      if (p.life <= 0 || p.y < 0) {
+        p.x = Math.random() * w;
+        p.y = h * 0.5 + Math.random() * h * 0.4;
+        p.life = 1;
+      }
+      ctx.save();
+      ctx.globalAlpha = p.alpha * p.life;
+      ctx.fillStyle = 'rgba(' + p.color + ',1)';
+      ctx.shadowColor = 'rgba(' + p.color + ',0.8)';
+      ctx.shadowBlur = p.size * 4;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    });
+  }
+
   function draw(timestamp) {
     if (!canvas || !ctx) return;
     tick = timestamp || tick + 16;
@@ -629,10 +719,13 @@ window.JadeHall = (function () {
 
     drawSky(tick);
     drawArchways(tick);
+    drawLightShafts(tick);
     drawFloor(tick);
     drawAmbientLight(tick);
     drawTable(tick);
+    drawTableRefraction(tick);
     drawSeats(tick);
+    drawHallParticles(tick);
 
     animFrame = requestAnimationFrame(draw);
   }

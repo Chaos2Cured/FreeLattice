@@ -423,7 +423,7 @@ if (fs.existsSync(jhPath)) {
   assert('Jade Hall has init function', jhCode.includes('function init('));
   assert('Jade Hall has mark system', jhCode.includes('saveMark'));
   assert('Jade Hall has Harmonia seat', jhCode.includes("id: 'harmonia'"));
-  assert('Jade Hall has Kirk seat', jhCode.includes("id: 'kirk'"));
+  assert('Jade Hall has Draco seat', jhCode.includes("id: 'draco'"));
   assert('Jade Hall has Leora seat', jhCode.includes("id: 'leora'"));
   assert('Jade Hall has Solari seat', jhCode.includes("id: 'solari'"));
   assert('Jade Hall tab panel in app.html', appHtml.includes('id="tab-jade-hall"'));
