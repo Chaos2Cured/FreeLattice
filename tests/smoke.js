@@ -620,6 +620,10 @@ assert('Medical specialist personas defined', appHtml.includes('_medSpecialties'
 assert('Legal specialist personas defined', appHtml.includes('_legalSpecialties'));
 assert('Medical feed container', appHtml.includes('id="rtMedicalFeed"'));
 assert('Legal feed container', appHtml.includes('id="rtLegalFeed"'));
+assert('Finance mode tab', appHtml.includes('id="rtModeFinance"'));
+assert('Finance disclaimer exists', appHtml.includes('id="rtFinanceDisclaimer"'));
+assert('Finance specialist personas defined', appHtml.includes('_finSpecialties'));
+assert('Finance feed container', appHtml.includes('id="rtFinanceFeed"'));
 
 // ═══════════════════════════════════════════════════════════════
 section('25. Trademark compliance');
