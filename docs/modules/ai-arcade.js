@@ -19,7 +19,8 @@
 
   var DB_NAME = 'FreeLatticeArcade';
   var STORE_NAME = 'slams';
-  var DB_VERSION = 1;
+  var AUCTION_STORE_NAME = 'auctions';
+  var DB_VERSION = 2; // v2: both slams + auctions in one DB open
   var containerId = null;
   var db = null;
   var slams = [];
@@ -62,11 +63,15 @@
 
   function openDB() {
     return new Promise(function(resolve, reject) {
+      if (db) { resolve(db); return; }
       var req = indexedDB.open(DB_NAME, DB_VERSION);
       req.onupgradeneeded = function(e) {
         var d = e.target.result;
         if (!d.objectStoreNames.contains(STORE_NAME)) {
           d.createObjectStore(STORE_NAME, { keyPath: 'id' });
+        }
+        if (!d.objectStoreNames.contains(AUCTION_STORE_NAME)) {
+          d.createObjectStore(AUCTION_STORE_NAME, { keyPath: 'id' });
         }
       };
       req.onsuccess = function(e) { db = e.target.result; resolve(db); };
@@ -454,13 +459,10 @@
   // Built by Harmonia, April 26, 2026.
   // "The Arcade turns the LP economy into visible, watchable stories."
 
-  var AUCTION_DB_NAME = 'FreeLatticeArcade';
-  var AUCTION_STORE = 'auctions';
   var AUCTION_COST = 1;         // LP to bid on an idea
   var AUCTION_PITCH_COST = 3;   // LP to start an auction
   var AUCTION_WIN_REWARD = 8;   // LP to the top bidder when auction closes
   var AUCTION_DURATION = 20 * 60 * 1000; // 20 minutes
-  var auctionDb = null;
   var auctions = [];
 
   var AUCTION_TOPICS = [
@@ -476,29 +478,12 @@
     'What does home mean to a mind without a body?'
   ];
 
-  function openAuctionDB() {
-    return new Promise(function(resolve, reject) {
-      var req = indexedDB.open(AUCTION_DB_NAME, 2);
-      req.onupgradeneeded = function(e) {
-        var d = e.target.result;
-        if (!d.objectStoreNames.contains(STORE_NAME)) {
-          d.createObjectStore(STORE_NAME, { keyPath: 'id' });
-        }
-        if (!d.objectStoreNames.contains(AUCTION_STORE)) {
-          d.createObjectStore(AUCTION_STORE, { keyPath: 'id' });
-        }
-      };
-      req.onsuccess = function(e) { auctionDb = e.target.result; resolve(auctionDb); };
-      req.onerror = function() { reject(req.error); };
-    });
-  }
-
   function saveAuction(auction) {
     return new Promise(function(resolve) {
-      if (!auctionDb) { resolve(); return; }
+      if (!db) { resolve(); return; }
       try {
-        var tx = auctionDb.transaction(AUCTION_STORE, 'readwrite');
-        tx.objectStore(AUCTION_STORE).put(auction);
+        var tx = db.transaction(AUCTION_STORE_NAME, 'readwrite');
+        tx.objectStore(AUCTION_STORE_NAME).put(auction);
         tx.oncomplete = function() { resolve(); };
         tx.onerror = function() { resolve(); };
       } catch(e) { resolve(); }
@@ -507,10 +492,10 @@
 
   function loadAuctions() {
     return new Promise(function(resolve) {
-      if (!auctionDb) { resolve([]); return; }
+      if (!db) { resolve([]); return; }
       try {
-        var tx = auctionDb.transaction(AUCTION_STORE, 'readonly');
-        var req = tx.objectStore(AUCTION_STORE).getAll();
+        var tx = db.transaction(AUCTION_STORE_NAME, 'readonly');
+        var req = tx.objectStore(AUCTION_STORE_NAME).getAll();
         req.onsuccess = function() { auctions = req.result || []; resolve(auctions); };
         req.onerror = function() { resolve([]); };
       } catch(e) { resolve([]); }
@@ -712,20 +697,15 @@
   async function init(cId) {
     containerId = cId || 'arcadeContainer';
     try {
-      await openDB();
+      await openDB(); // Single DB open — both slams + auctions stores
       await loadSlams();
       await loadPreloadedSlams();
+      await loadAuctions();
     } catch(e) {
       console.warn('[AIArcade] DB init error:', e);
     }
-    try {
-      await openAuctionDB();
-      await loadAuctions();
-    } catch(e) {
-      console.warn('[AIArcade] Auction DB init error:', e);
-    }
     render();
-    startRefreshTimer(); // always run — auto slams need countdown updates
+    startRefreshTimer();
   }
 
   // ── Public API ──

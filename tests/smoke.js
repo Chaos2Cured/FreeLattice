@@ -593,7 +593,55 @@ assert('Jade Hall has Library button', jhJs.includes('jh-library-btn'));
 assert('Jade Hall has Library panel', jhJs.includes('jh-library-panel'));
 
 // ═══════════════════════════════════════════════════════════════
-section('23. Service Worker auto-update chain');
+section('23. AI Arcade');
+// ═══════════════════════════════════════════════════════════════
+assert('tab-arcade panel exists', appHtml.includes('id="tab-arcade"'));
+assert('arcadeContainer exists', appHtml.includes('id="arcadeContainer"'));
+var arcadeJs = '';
+try { arcadeJs = require('fs').readFileSync('docs/modules/ai-arcade.js', 'utf8'); } catch(e) {}
+assert('ai-arcade.js exists and parses', (function() {
+  try { new Function(arcadeJs); return arcadeJs.length > 200; } catch(e) { return false; }
+})());
+assert('AIArcade module defined', arcadeJs.includes('window.AIArcade') || arcadeJs.includes('FreeLatticeModules'));
+assert('Arcade uses single DB (no deadlock)', !arcadeJs.includes('openAuctionDB'));
+assert('Arcade DB version is 2', arcadeJs.includes("DB_VERSION = 2"));
+
+// ═══════════════════════════════════════════════════════════════
+section('24. Round Table modes');
+// ═══════════════════════════════════════════════════════════════
+assert('Round Table tab exists', appHtml.includes('id="tab-roundtable"'));
+assert('Discussion mode tab', appHtml.includes('id="rtModeConvo"'));
+assert('Medical mode tab', appHtml.includes('id="rtModeMedical"'));
+assert('Legal mode tab', appHtml.includes('id="rtModeLegal"'));
+assert('Workspace mode tab', appHtml.includes('id="rtModeWorkspace"'));
+assert('Medical disclaimer exists', appHtml.includes('id="rtMedicalDisclaimer"'));
+assert('Legal disclaimer exists', appHtml.includes('id="rtLegalDisclaimer"'));
+assert('Medical specialist personas defined', appHtml.includes('_medSpecialties'));
+assert('Legal specialist personas defined', appHtml.includes('_legalSpecialties'));
+assert('Medical feed container', appHtml.includes('id="rtMedicalFeed"'));
+assert('Legal feed container', appHtml.includes('id="rtLegalFeed"'));
+
+// ═══════════════════════════════════════════════════════════════
+section('25. Trademark compliance');
+// ═══════════════════════════════════════════════════════════════
+assert('No visible "Pictionary" in pictionary.js UI', !(function() {
+  try {
+    var pJs = require('fs').readFileSync('docs/modules/pictionary.js', 'utf8');
+    // Check only user-visible strings (not comments, function names, or IDs)
+    var lines = pJs.split('\n');
+    for (var i = 0; i < lines.length; i++) {
+      var line = lines[i];
+      if (line.trim().startsWith('//') || line.trim().startsWith('*')) continue; // skip comments
+      if (line.includes('Pictionary') && !line.includes('function') && !line.includes('var ') && !line.includes('Module:') && !line.includes('getElementById') && !line.includes('window.')) {
+        return true; // found visible Pictionary reference
+      }
+    }
+    return false;
+  } catch(e) { return false; }
+})());
+
+// ═══════════════════════════════════════════════════════════════
+section('26. Service Worker auto-update chain');
 // ═══════════════════════════════════════════════════════════════
 assert('SW has clients.claim() in activate handler', swJs.includes('self.clients.claim()'));
 assert('SW has skipWaiting() in install handler', swJs.includes('self.skipWaiting()'));
