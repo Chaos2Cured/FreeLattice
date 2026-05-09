@@ -219,8 +219,8 @@
   function aiGuessDrawing(callback) {
     var canvas = state.canvas;
     var base64 = canvas.toDataURL('image/png').split(',')[1];
-    var systemPrompt = 'You are playing Pictionary with a human. You are enthusiastic, playful, and love to guess. Look at the drawing and guess what it is.';
-    var userPrompt = 'You are playing Pictionary. Look at this drawing and guess what word or concept the person was trying to draw. Respond ONLY with a valid JSON object, no markdown, no extra text. Fields: {"guess": "your best guess", "confidence": 0.8, "reaction": "a fun one-sentence reaction, like a real player would say"}';
+    var systemPrompt = 'You are playing Guess and Draw with a human. You are enthusiastic, playful, and love to guess. Look at the drawing and guess what it is.';
+    var userPrompt = 'You are playing Guess and Draw. Look at this drawing and guess what word or concept the person was trying to draw. Respond ONLY with a valid JSON object, no markdown, no extra text. Fields: {"guess": "your best guess", "confidence": 0.8, "reaction": "a fun one-sentence reaction, like a real player would say"}';
 
     // Try vision call
     if (typeof state === 'undefined') {
@@ -282,7 +282,7 @@
 
   // ── AI Drawing (AI picks word, generates strokes) ─────────────────────────
   function aiGenerateDrawing(word, callback) {
-    var systemPrompt = 'You are playing Pictionary. You must draw a concept using only simple geometric shapes. Be creative but keep it recognizable.';
+    var systemPrompt = 'You are playing Guess and Draw. You must draw a concept using only simple geometric shapes. Be creative but keep it recognizable.';
     var userPrompt = 'Draw the concept "' + word + '" using simple shapes. Respond ONLY with a valid JSON object. Fields: {"strokes": [{"shape": "circle", "params": [cx, cy, radius]}, {"shape": "line", "params": [x1, y1, x2, y2]}, {"shape": "arc", "params": [x, y, radius, startAngle, endAngle]}, {"shape": "rect", "params": [x, y, width, height]}], "difficulty": "easy|medium|hard", "hint": "a vague one-word hint if you want to give one"}. Use canvas coordinates where width=340 and height=255. Make 5-15 strokes. No markdown, no extra text.';
 
     if (typeof window.FreeLattice !== 'undefined' && window.FreeLattice.callAI) {
@@ -409,7 +409,7 @@
   ];
   var HUMAN_CORRECT_REACTIONS = [
     "You got it! That was {word}! Well done!",
-    "YES! {word}! You're a natural Pictionary player!",
+    "YES! {word}! You're a natural drawing game player!",
     "Correct! {word}! I tried my best to draw it clearly.",
     "You saw it! {word}! I was worried that arc looked like a question mark.",
     "Brilliant! {word}! We make a great team."
@@ -438,7 +438,7 @@
     // Ask AI to judge similarity
     if (typeof window.FreeLattice !== 'undefined' && window.FreeLattice.callAI) {
       window.FreeLattice.callAI(
-        'You are judging a Pictionary game. Be fair but generous — partial credit for close guesses.',
+        'You are judging a Guess and Draw game. Be fair but generous — partial credit for close guesses.',
         'The word was "' + word + '". The human guessed "' + guess + '". Respond ONLY with JSON: {"correct": false, "score": 0-10, "reaction": "fun one-sentence reaction"}',
         {
           maxTokens: 100, temperature: 0.7,
@@ -709,7 +709,7 @@
 
       <!-- Start screen -->
       <div id="pic-phase-idle" class="pic-phase-panel pic-start-screen">
-        <div class="pic-start-title">🎨 Pictionary</div>
+        <div class="pic-start-title">\uD83C\uDFA8 Guess and Draw</div>
         <div class="pic-start-sub">Draw, guess, laugh, repeat.</div>
         <div class="pic-difficulty-row">
           <button class="pic-diff-btn" onclick="PicActions.setDiff('easy')" id="pic-diff-easy">Easy</button>
