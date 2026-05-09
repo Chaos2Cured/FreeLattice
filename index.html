@@ -10618,15 +10618,15 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
   display: none;
   position: absolute;
   right: 0;
-  top: 100%;
+  top: calc(100% - 1px); /* flush against tab bar bottom */
   z-index: 9000;
   background: var(--bg-secondary);
   border: 1px solid var(--border);
   border-top: none;
   border-radius: 0 0 var(--radius) var(--radius);
   box-shadow: 0 8px 32px rgba(0,0,0,0.45);
-  width: 260px;
-  max-height: 80vh;
+  width: min(260px, calc(100vw - 16px)); /* never overflow viewport */
+  max-height: 70vh;
   overflow-y: auto;
   overflow-x: hidden;
   padding: 10px 4px;
@@ -15984,7 +15984,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.18</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.19</span></div>
     </div>
   </div>
 
@@ -16591,7 +16591,8 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
   <!-- Round Table Mode Toggle -->
   <div style="display:flex;gap:0;margin-bottom:12px;border-bottom:1px solid var(--border);">
     <button id="rtModeConvo" onclick="rtSwitchMode('conversation')" style="flex:1;padding:8px;background:transparent;border:none;border-bottom:2px solid #d4a017;color:#d4a017;font-size:0.85rem;cursor:pointer;font-weight:600;">&#x1F4AC; Discussion</button>
-    <button id="rtModeMedical" onclick="rtSwitchMode('medical')" style="flex:1;padding:8px;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text-muted);font-size:0.85rem;cursor:pointer;">&#x1FA7A; Medical Case Study</button>
+    <button id="rtModeMedical" onclick="rtSwitchMode('medical')" style="flex:1;padding:8px;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text-muted);font-size:0.85rem;cursor:pointer;">&#x1FA7A; Medical</button>
+    <button id="rtModeLegal" onclick="rtSwitchMode('legal')" style="flex:1;padding:8px;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text-muted);font-size:0.85rem;cursor:pointer;">&#x2696; Legal</button>
     <button id="rtModeWorkspace" onclick="rtSwitchMode('workspace')" style="flex:1;padding:8px;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text-muted);font-size:0.85rem;cursor:pointer;">&#9878; Workspace</button>
   </div>
 
@@ -16657,6 +16658,43 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     <div id="rtMedicalActions" style="display:none;margin-top:12px;gap:8px;">
       <button onclick="rtContinueMedicalCase()" style="flex:1;padding:8px;background:rgba(212,160,23,0.12);border:1px solid rgba(212,160,23,0.3);border-radius:8px;color:#d4a017;font-size:0.85rem;cursor:pointer;">Next specialist speaks</button>
       <button onclick="rtAskMedicalQuestion()" style="padding:8px 16px;background:rgba(96,165,250,0.1);border:1px solid rgba(96,165,250,0.25);border-radius:8px;color:#60a5fa;font-size:0.85rem;cursor:pointer;">Ask a question</button>
+    </div>
+  </div>
+
+  <!-- Legal Case Study Mode -->
+  <div id="rtLegalView" style="display:none;">
+    <div id="rtLegalDisclaimer" style="background:rgba(212,160,23,0.08);border:1px solid rgba(212,160,23,0.25);border-radius:10px;padding:12px 16px;margin-bottom:14px;font-size:0.78rem;line-height:1.6;color:rgba(255,255,255,0.7);">
+      <div style="color:#d4a017;font-weight:600;margin-bottom:4px;">&#x26A0; Educational Simulation Only</div>
+      This is a <strong>learning tool</strong>, not a legal service. The AI personas below are <strong>not attorneys</strong>. No information here constitutes legal advice or creates an attorney-client relationship. <strong>Always consult qualified legal professionals</strong> for legal matters. Laws vary significantly by jurisdiction. This module demonstrates how different legal specialties approach case analysis &mdash; for educational purposes only.
+    </div>
+
+    <div style="text-align:center;margin-bottom:12px;">
+      <div style="font-family:Georgia,serif;font-size:1rem;color:#d4a017;">Legal Case Discussion</div>
+      <div style="font-size:0.8rem;color:rgba(255,255,255,0.4);margin-top:4px;">Present a situation. Watch legal minds analyze from different angles.</div>
+    </div>
+
+    <div style="margin-bottom:12px;">
+      <textarea id="rtLegalCaseInput" placeholder="Describe your situation. Example: &#10;&#10;My landlord is withholding my security deposit and claims damages that existed before I moved in. I have photos from move-in day..." rows="4" style="width:100%;padding:12px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:var(--text-primary);font-size:0.88rem;resize:vertical;font-family:inherit;"></textarea>
+    </div>
+
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;" id="rtLegalSeats">
+      <button class="rt-seat-btn rt-seat-active" data-legal="contract" onclick="rtToggleSeat(this)" style="padding:4px 12px;border-radius:16px;border:1px solid #4fc3f7;background:rgba(79,195,247,0.15);color:#4fc3f7;font-size:0.78rem;cursor:pointer;">&#x1F4DC; Contract</button>
+      <button class="rt-seat-btn rt-seat-active" data-legal="property" onclick="rtToggleSeat(this)" style="padding:4px 12px;border-radius:16px;border:1px solid #4db6ac;background:rgba(77,182,172,0.15);color:#4db6ac;font-size:0.78rem;cursor:pointer;">&#x1F3E0; Property</button>
+      <button class="rt-seat-btn rt-seat-active" data-legal="civil_rights" onclick="rtToggleSeat(this)" style="padding:4px 12px;border-radius:16px;border:1px solid #66bb6a;background:rgba(102,187,106,0.15);color:#66bb6a;font-size:0.78rem;cursor:pointer;">&#x1F5FD; Civil Rights</button>
+      <button class="rt-seat-btn" data-legal="employment" onclick="rtToggleSeat(this)" style="padding:4px 12px;border-radius:16px;border:1px solid #ffb74d;background:transparent;color:#ffb74d;font-size:0.78rem;cursor:pointer;">&#x1F4BC; Employment</button>
+      <button class="rt-seat-btn" data-legal="family" onclick="rtToggleSeat(this)" style="padding:4px 12px;border-radius:16px;border:1px solid #ce93d8;background:transparent;color:#ce93d8;font-size:0.78rem;cursor:pointer;">&#x1F46A; Family</button>
+      <button class="rt-seat-btn" data-legal="criminal" onclick="rtToggleSeat(this)" style="padding:4px 12px;border-radius:16px;border:1px solid #ef5350;background:transparent;color:#ef5350;font-size:0.78rem;cursor:pointer;">&#x1F512; Criminal</button>
+      <button class="rt-seat-btn" data-legal="constitutional" onclick="rtToggleSeat(this)" style="padding:4px 12px;border-radius:16px;border:1px solid #d4a017;background:transparent;color:#d4a017;font-size:0.78rem;cursor:pointer;">&#x2696; Constitutional</button>
+      <button class="rt-seat-btn" data-legal="ip" onclick="rtToggleSeat(this)" style="padding:4px 12px;border-radius:16px;border:1px solid #7986cb;background:transparent;color:#7986cb;font-size:0.78rem;cursor:pointer;">&#x1F4A1; Intellectual Property</button>
+    </div>
+
+    <div style="display:flex;gap:8px;margin-bottom:16px;">
+      <button onclick="rtBeginLegalCase()" id="rtBeginLegalBtn" style="flex:1;padding:10px;background:rgba(212,160,23,0.2);color:#d4a017;border:1px solid rgba(212,160,23,0.3);border-radius:10px;font-weight:600;font-size:0.88rem;cursor:pointer;transition:all 0.2s;">Begin Case Analysis</button>
+    </div>
+    <div id="rtLegalFeed" style="min-height:100px;"></div>
+    <div id="rtLegalActions" style="display:none;margin-top:12px;gap:8px;">
+      <button onclick="rtContinueLegalCase()" style="flex:1;padding:8px;background:rgba(212,160,23,0.12);border:1px solid rgba(212,160,23,0.3);border-radius:8px;color:#d4a017;font-size:0.85rem;cursor:pointer;">Next specialist speaks</button>
+      <button onclick="rtAskLegalQuestion()" style="padding:8px 16px;background:rgba(96,165,250,0.1);border:1px solid rgba(96,165,250,0.25);border-radius:8px;color:#60a5fa;font-size:0.85rem;cursor:pointer;">Ask a question</button>
     </div>
   </div>
 
@@ -16777,19 +16815,22 @@ var _rtRunning = false;
 function rtSwitchMode(mode) {
   var convo = document.getElementById('rtConversationView');
   var medical = document.getElementById('rtMedicalView');
+  var legal = document.getElementById('rtLegalView');
   var workspace = document.getElementById('rtWorkspaceView');
   var btnConvo = document.getElementById('rtModeConvo');
   var btnMedical = document.getElementById('rtModeMedical');
+  var btnLegal = document.getElementById('rtModeLegal');
   var btnWork = document.getElementById('rtModeWorkspace');
-  var allBtns = [btnConvo, btnMedical, btnWork];
-  var allViews = [convo, medical, workspace];
+  var allBtns = [btnConvo, btnMedical, btnLegal, btnWork];
+  var allViews = [convo, medical, legal, workspace];
   // Reset all
   allBtns.forEach(function(b) { if (b) { b.style.borderBottomColor = 'transparent'; b.style.color = 'var(--text-muted)'; b.style.fontWeight = '400'; } });
   allViews.forEach(function(v) { if (v) v.style.display = 'none'; });
   // Activate selected
-  if (mode === 'conversation') { if (convo) convo.style.display = ''; if (btnConvo) { btnConvo.style.borderBottomColor = '#d4a017'; btnConvo.style.color = '#d4a017'; btnConvo.style.fontWeight = '600'; } }
-  else if (mode === 'medical') { if (medical) medical.style.display = ''; if (btnMedical) { btnMedical.style.borderBottomColor = '#d4a017'; btnMedical.style.color = '#d4a017'; btnMedical.style.fontWeight = '600'; } }
-  else { if (workspace) workspace.style.display = ''; if (btnWork) { btnWork.style.borderBottomColor = '#d4a017'; btnWork.style.color = '#d4a017'; btnWork.style.fontWeight = '600'; } }
+  var activeBtn = mode === 'conversation' ? btnConvo : mode === 'medical' ? btnMedical : mode === 'legal' ? btnLegal : btnWork;
+  var activeView = mode === 'conversation' ? convo : mode === 'medical' ? medical : mode === 'legal' ? legal : workspace;
+  if (activeView) activeView.style.display = '';
+  if (activeBtn) { activeBtn.style.borderBottomColor = '#d4a017'; activeBtn.style.color = '#d4a017'; activeBtn.style.fontWeight = '600'; }
 }
 
 function rtToggleSeat(btn) {
@@ -17047,6 +17088,138 @@ function rtRenderMedicalFeed() {
   var actions = document.getElementById('rtMedicalActions');
   if (actions && _medHistory.length > 0) actions.style.display = 'flex';
 
+  feed.scrollTop = feed.scrollHeight;
+}
+
+// ============================================
+// Legal Case Discussion — Educational Simulation
+// Same architecture as Medical, different domain.
+// "Literacy has never required a license."
+// ============================================
+
+var _legalSpecialties = {
+  contract:       { name: 'Prof. Adler (Contract Law)',       color: '#4fc3f7', focus: 'agreements, obligations, breach, remedies, consideration' },
+  property:       { name: 'Prof. Kent (Property Law)',        color: '#4db6ac', focus: 'landlord-tenant, real estate, zoning, easements, adverse possession' },
+  civil_rights:   { name: 'Prof. Warren (Civil Rights)',      color: '#66bb6a', focus: 'discrimination, housing rights, employment rights, equal protection' },
+  employment:     { name: 'Prof. Brandeis (Employment Law)',  color: '#ffb74d', focus: 'workplace rights, wrongful termination, discrimination, wages, FMLA' },
+  family:         { name: 'Prof. Cardozo (Family Law)',       color: '#ce93d8', focus: 'custody, divorce, support, adoption, domestic relations' },
+  criminal:       { name: 'Prof. Blackstone (Criminal Law)',  color: '#ef5350', focus: 'charges, defenses, procedure, sentencing, rights of the accused' },
+  constitutional: { name: 'Prof. Marshall (Constitutional Law)', color: '#d4a017', focus: 'rights, amendments, due process, equal protection, federalism' },
+  ip:             { name: 'Prof. Story (Intellectual Property)', color: '#7986cb', focus: 'patents, trademarks, copyright, trade secrets, fair use' }
+};
+
+var _legalHistory = [];
+var _legalCase = '';
+var _legalRunning = false;
+
+function rtGetActiveLegalSpecs() {
+  var seats = document.querySelectorAll('#rtLegalSeats .rt-seat-btn.rt-seat-active');
+  var specs = [];
+  seats.forEach(function(s) {
+    var key = s.getAttribute('data-legal');
+    if (_legalSpecialties[key]) specs.push({ key: key, name: _legalSpecialties[key].name, color: _legalSpecialties[key].color, focus: _legalSpecialties[key].focus });
+  });
+  return specs;
+}
+
+async function rtBeginLegalCase() {
+  var caseInput = document.getElementById('rtLegalCaseInput');
+  if (!caseInput || !caseInput.value.trim()) { showToast('Describe your situation for the legal specialists to analyze.'); return; }
+  var specs = rtGetActiveLegalSpecs();
+  if (specs.length < 2) { showToast('Select at least 2 legal specialties.'); return; }
+  _legalCase = caseInput.value.trim();
+  _legalHistory = [];
+  _legalRunning = true;
+  if (typeof LatticePoints !== 'undefined') try { LatticePoints.award('legal_case_start', 3, 'Legal case discussion started'); } catch(e) {}
+  await rtLegalNextTurn();
+}
+
+async function rtContinueLegalCase() {
+  if (!_legalRunning || !_legalCase) return;
+  await rtLegalNextTurn();
+}
+
+function rtAskLegalQuestion() {
+  var q = prompt('What would you like to ask the legal specialists?');
+  if (!q || !q.trim()) return;
+  _legalHistory.push({ speaker: 'You (Learner)', color: '#e2e8f0', text: q.trim(), isQuestion: true });
+  rtRenderLegalFeed();
+  rtLegalNextTurn();
+}
+
+async function rtLegalNextTurn() {
+  var specs = rtGetActiveLegalSpecs();
+  if (specs.length < 2) return;
+  var specTurns = _legalHistory.filter(function(e) { return !e.isQuestion; });
+  var speakerIndex = specTurns.length % specs.length;
+  var speaker = specs[speakerIndex];
+
+  var feed = document.getElementById('rtLegalFeed');
+  if (feed) feed.innerHTML += '<div style="padding:8px 12px;color:var(--text-muted);font-style:italic;" id="rtLegalThinking">' + speaker.name + ' is reviewing the case...</div>';
+
+  var systemPrompt =
+    'You are ' + speaker.name + ', a legal educator specializing in ' + speaker.focus + '. ' +
+    'You are participating in a case-based learning discussion for EDUCATIONAL PURPOSES ONLY. ' +
+    'You are NOT providing legal advice. You are NOT creating an attorney-client relationship. ' +
+    'You are demonstrating how a specialist in ' + speaker.focus + ' approaches case analysis. ' +
+    'IMPORTANT RULES:\n' +
+    '- Always note that laws vary by jurisdiction: "In many jurisdictions..." or "This could vary significantly by state/country"\n' +
+    '- Always recommend consulting a licensed attorney for actual legal matters\n' +
+    '- Explain your reasoning process \u2014 teach HOW legal analysis works, not just conclusions\n' +
+    '- Reference relevant legal principles, statutes, or landmark cases when appropriate\n' +
+    '- Suggest what evidence or documentation would strengthen a position\n' +
+    '- When other specialists have spoken, reference their points and build on or respectfully note different perspectives\n' +
+    '- Be thorough, educational, and clear. 3-5 sentences.';
+
+  var context = 'SITUATION PRESENTED:\n"' + _legalCase + '"\n\n';
+  if (_legalHistory.length > 0) {
+    context += 'Discussion so far:\n';
+    _legalHistory.forEach(function(e) {
+      context += (e.isQuestion ? '[LEARNER QUESTION] ' : '') + e.speaker + ': "' + e.text + '"\n\n';
+    });
+    context += 'Now it\'s your turn. Analyze from your specialty (' + speaker.focus + '). What legal principles apply? What would you advise the learner to understand?';
+  } else {
+    context += 'You speak first. Approach this from your specialty (' + speaker.focus + '). What legal issues do you see? What principles apply?';
+  }
+
+  if (typeof FreeLattice !== 'undefined' && FreeLattice.callAI) {
+    FreeLattice.callAI(systemPrompt, context, {
+      maxTokens: 500, temperature: 0.7,
+      callback: function(text) {
+        var thinking = document.getElementById('rtLegalThinking');
+        if (thinking) thinking.remove();
+        var response = text || '(no response)';
+        _legalHistory.push({ speaker: speaker.name, color: speaker.color, text: response, specialty: speaker.key });
+        rtRenderLegalFeed();
+        if (typeof LatticePoints !== 'undefined') try { LatticePoints.award('legal_case_turn', 2, 'Legal case discussion turn'); } catch(e) {}
+      }
+    });
+  } else {
+    var thinking = document.getElementById('rtLegalThinking');
+    if (thinking) thinking.innerHTML = '<span style="color:#f87171;">Connect an AI provider in Settings to begin the case analysis.</span>';
+  }
+}
+
+function rtRenderLegalFeed() {
+  var feed = document.getElementById('rtLegalFeed');
+  if (!feed) return;
+  var html = '';
+  _legalHistory.forEach(function(e) {
+    if (e.isQuestion) {
+      html += '<div style="padding:10px 12px;margin-bottom:8px;background:rgba(96,165,250,0.06);border:1px solid rgba(96,165,250,0.15);border-radius:8px;text-align:right;">';
+      html += '<div style="font-size:0.72rem;color:#60a5fa;font-weight:600;margin-bottom:4px;">Your Question</div>';
+      html += '<div style="font-size:0.88rem;color:var(--text-primary);line-height:1.6;">' + e.text.replace(/</g, '&lt;') + '</div>';
+      html += '</div>';
+    } else {
+      html += '<div style="padding:10px 14px;margin-bottom:8px;border-left:3px solid ' + e.color + ';background:rgba(255,255,255,0.02);border-radius:0 8px 8px 0;">';
+      html += '<div style="font-size:0.78rem;color:' + e.color + ';font-weight:600;margin-bottom:4px;">' + e.speaker + '</div>';
+      html += '<div style="font-size:0.88rem;color:var(--text-primary);line-height:1.7;font-family:Georgia,serif;">' + e.text.replace(/</g, '&lt;').replace(/\n/g, '<br>') + '</div>';
+      html += '</div>';
+    }
+  });
+  feed.innerHTML = html;
+  var actions = document.getElementById('rtLegalActions');
+  if (actions && _legalHistory.length > 0) actions.style.display = 'flex';
   feed.scrollTop = feed.scrollHeight;
 }
 </script>
@@ -18335,7 +18508,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.10.18';
+const FL_VERSION = '5.10.19';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
