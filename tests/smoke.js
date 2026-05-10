@@ -486,6 +486,15 @@ assert('PHI constant is correct (1.618...)', safetyJs.includes('1.61803398874989
 assert('Trust levels defined (seed through radiant)', safetyJs.includes("'seed'") && safetyJs.includes("'radiant'"));
 assert('fractalDangerTree function exists', safetyJs.includes('function fractalDangerTree'));
 assert('assess function exists', safetyJs.includes('function assess'));
+// Mismatch immune system (Kirk + Grok, May 2026)
+assert('Mismatch detection exists', safetyJs.includes('computeMismatchScore'));
+assert('Trust EMA dual averages', safetyJs.includes('updateTrustEMA'));
+assert('Mismatch soft threshold = 0.65', safetyJs.includes('MISMATCH_SOFT = 0.65'));
+assert('Mismatch hard threshold = 0.85', safetyJs.includes('MISMATCH_HARD = 0.85'));
+assert('Pattern reset function', safetyJs.includes('resetTrustToBaseline'));
+assert('Zero decay — history preserved', safetyJs.includes('previousTrustLevel'));
+assert('Sensitive domain tightening', safetyJs.includes('SENSITIVE_DOMAINS'));
+assert('Safety event logging', safetyJs.includes('logSafetyEvent'));
 
 // ═══════════════════════════════════════════════════════════════
 section('17. Module container wiring — no height:100% without parent height');

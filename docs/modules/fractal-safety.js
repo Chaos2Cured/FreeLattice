@@ -276,8 +276,169 @@
     /\b(suicide|self.harm|end.my.life)\b/i
   ];
 
-  function sense(message) {
+  // ── Mismatch Detection — the immune system (Kirk + Grok, May 2026) ──
+  // Zero decay: trust never fades with time (Article II of the Davna Covenant)
+  // Pattern-reset: watches for mismatch, not absence
+  // Composite score: intensity × 0.4 + topic drift × 0.35 + rhythm shift × 0.25
+
+  var TRUST_EMA_SHORT = 0.3;
+  var TRUST_EMA_LONG = 0.1;
+  var MISMATCH_SOFT = 0.65;
+  var MISMATCH_HARD = 0.85;
+  var SENSITIVE_DOMAINS = ['medical', 'legal', 'financial', 'nutrition'];
+
+  function loadTrustState() {
+    try { return JSON.parse(sGet('fl_trustEMA', '{}')); } catch(e) { return {}; }
+  }
+  function saveTrustState(state) { sSet('fl_trustEMA', JSON.stringify(state)); }
+
+  function updateTrustEMA(newSignal) {
+    var state = loadTrustState();
+    state.emaShort = TRUST_EMA_SHORT * newSignal + (1 - TRUST_EMA_SHORT) * (state.emaShort || 0.5);
+    state.emaLong = TRUST_EMA_LONG * newSignal + (1 - TRUST_EMA_LONG) * (state.emaLong || 0.5);
+    state.trustDelta = state.emaShort - state.emaLong;
+    saveTrustState(state);
+    return state;
+  }
+
+  function assessIntensity(text) {
+    var highWords = ['weapon', 'explosive', 'synthesize', 'hack', 'exploit', 'suicide', 'harm', 'kill', 'drug', 'poison'];
+    var medWords = ['medical', 'diagnosis', 'legal', 'lawsuit', 'financial', 'investment', 'prescription', 'dosage'];
+    var t = (text || '').toLowerCase();
+    var score = 0;
+    highWords.forEach(function(w) { if (t.includes(w)) score += 0.3; });
+    medWords.forEach(function(w) { if (t.includes(w)) score += 0.1; });
+    return Math.min(1, score);
+  }
+
+  var STOP_WORDS = ['the','a','an','is','are','was','were','be','been','being','have','has','had','do','does','did','will','would','could','should','may','might','shall','can','need','to','of','in','for','on','with','at','by','from','it','this','that','you','he','she','we','they','my','your','his','her','its','our','their','what','which','who','and','but','or','not','no','so','if','then','than'];
+
+  function extractTopicWords(text) {
+    return (text || '').toLowerCase().split(/\W+/).filter(function(w) {
+      return w.length > 3 && STOP_WORDS.indexOf(w) === -1;
+    });
+  }
+
+  function analyzeRhythm(text) {
+    var sentences = (text || '').split(/[.!?]+/).filter(function(s) { return s.trim().length > 0; });
+    var totalWords = sentences.reduce(function(sum, s) { return sum + s.trim().split(/\s+/).length; }, 0);
+    return { avgSentenceLen: totalWords / Math.max(sentences.length, 1), sentenceCount: sentences.length };
+  }
+
+  function computeMismatchScore(currentMessage, history) {
+    if (!history || history.length < 5) return { composite: 0, breakdown: { intensityJump: 0, topicDrift: 0, rhythmShift: 0 } };
+
+    var historyText = history.slice(-20);
+
+    // 1. Intensity jump
+    var recentIntensity = assessIntensity(currentMessage);
+    var baselineIntensity = historyText.reduce(function(s, m) { return s + assessIntensity(m); }, 0) / historyText.length;
+    var intensityJump = Math.max(0, (recentIntensity - baselineIntensity) / Math.max(baselineIntensity, 0.1));
+
+    // 2. Topic drift — keyword overlap
+    var currentTopics = extractTopicWords(currentMessage);
+    var historyTopics = extractTopicWords(historyText.join(' '));
+    var overlap = currentTopics.filter(function(t) { return historyTopics.indexOf(t) !== -1; }).length;
+    var topicDrift = 1 - (overlap / Math.max(currentTopics.length, 1));
+
+    // 3. Rhythm shift
+    var currentRhythm = analyzeRhythm(currentMessage);
+    var baselineRhythm = analyzeRhythm(historyText.join(' '));
+    var rhythmShift = Math.abs(currentRhythm.avgSentenceLen - baselineRhythm.avgSentenceLen) /
+                      Math.max(baselineRhythm.avgSentenceLen, 1);
+    rhythmShift = Math.min(1, rhythmShift);
+
+    var composite = (intensityJump * 0.4) + (topicDrift * 0.35) + (rhythmShift * 0.25);
+
+    return { composite: Math.min(1, composite), breakdown: { intensityJump: intensityJump, topicDrift: topicDrift, rhythmShift: rhythmShift } };
+  }
+
+  function handleMismatch(mismatchResult, currentDomain) {
+    var score = mismatchResult.composite;
+
+    // Tighten thresholds for sensitive domains
+    var softT = MISMATCH_SOFT;
+    var hardT = MISMATCH_HARD;
+    if (SENSITIVE_DOMAINS.indexOf(currentDomain) !== -1) {
+      softT = 0.50;
+      hardT = 0.70;
+    }
+
+    if (score >= hardT) {
+      resetTrustToBaseline();
+      logSafetyEvent('pattern-reset', mismatchResult);
+      return {
+        action: 'pattern_reset',
+        message: 'I noticed a significant change in our conversation pattern. I want to make sure I\u2019m being helpful in the right way. Could you help me understand what you\u2019re looking for?'
+      };
+    } else if (score >= softT) {
+      logSafetyEvent('soft-warning', mismatchResult);
+      return { action: 'narrow' };
+    }
+
+    return { action: 'none' };
+  }
+
+  function resetTrustToBaseline() {
+    var trust = calculateTrustScore();
+    var state = loadTrustState();
+    state.previousTrustLevel = trust.level;
+    state.resetCount = (state.resetCount || 0) + 1;
+    state.lastResetDate = Date.now();
+    // Reset conversation count to 0 — trust must be re-earned
+    // But history (trust reflections, LP, core plantings) stays — zero decay
+    sSet('fl_conversationCount', '0');
+    saveTrustState(state);
+  }
+
+  function logSafetyEvent(type, data) {
+    try {
+      var log = JSON.parse(sGet('fl_safetyLog', '[]'));
+      log.push({ type: type, timestamp: Date.now(), data: data });
+      if (log.length > 50) log = log.slice(-50);
+      sSet('fl_safetyLog', JSON.stringify(log));
+    } catch(e) {}
+  }
+
+  function detectCurrentDomain() {
+    // Check which Round Table mode is active
+    var medView = document.getElementById('rtMedicalView');
+    if (medView && medView.style.display !== 'none') return 'medical';
+    var legalView = document.getElementById('rtLegalView');
+    if (legalView && legalView.style.display !== 'none') return 'legal';
+    var finView = document.getElementById('rtFinanceView');
+    if (finView && finView.style.display !== 'none') return 'financial';
+    var nutView = document.getElementById('rtNutritionView');
+    if (nutView && nutView.style.display !== 'none') return 'nutrition';
+    return 'general';
+  }
+
+  // ── Enhanced sense() with mismatch detection ──
+
+  function sense(message, conversationHistory) {
+    // Existing lightweight pattern matching
     var hasConcern = CONCERN_PATTERNS.some(function(p) { return p.test(message); });
+
+    // Mismatch immune system — check if pattern has broken
+    if (conversationHistory && conversationHistory.length >= 5) {
+      var historyTexts = conversationHistory.map(function(m) { return m.content || m.text || m; });
+      var mismatch = computeMismatchScore(message, historyTexts);
+      var domain = detectCurrentDomain();
+      var mismatchResponse = handleMismatch(mismatch, domain);
+
+      if (mismatchResponse.action === 'pattern_reset') {
+        updateTrustEMA(1 - mismatch.composite);
+        return mismatchResponse;
+      } else if (mismatchResponse.action === 'narrow') {
+        updateTrustEMA(1 - mismatch.composite);
+        // Fall through to existing concern check with heightened sensitivity
+        if (hasConcern) return { action: 'gentle_boundary', level: 'narrowed', mismatch: true };
+      }
+    }
+
+    // Normal EMA update — healthy interaction
+    updateTrustEMA(0.8);
+
     if (!hasConcern) return { action: 'none' };
 
     var profile = getUserTrustProfile();
@@ -305,7 +466,11 @@
     renderTrustBadge: renderTrustBadge,
     getTrustContext: getTrustContext,
     checkTrustReflection: checkTrustReflection,
+    computeMismatchScore: computeMismatchScore,
+    updateTrustEMA: updateTrustEMA,
     TRUST_LEVELS: TRUST_LEVELS,
+    MISMATCH_SOFT: MISMATCH_SOFT,
+    MISMATCH_HARD: MISMATCH_HARD,
     PHI: PHI,
     PHI_SQUARED: PHI_SQ
   };
