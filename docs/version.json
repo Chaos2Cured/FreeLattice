@@ -1,1 +1,1 @@
-{"version": "5.10.30", "date": "2026-05-10", "note": "rtCreateDomain factory, Plant this buttons, GitHub API caching, room connections"}
+{"version": "5.10.31", "date": "2026-05-10", "note": "Round Table maxTokens 1024, Cross Check age-aware relevance scoring, truncation fix"}

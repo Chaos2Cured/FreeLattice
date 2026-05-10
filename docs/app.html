@@ -16040,7 +16040,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.30</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.31</span></div>
     </div>
   </div>
 
@@ -17092,7 +17092,7 @@ function rtCreateDomain(config) {
 
     if (typeof FreeLattice !== 'undefined' && FreeLattice.callAI) {
       FreeLattice.callAI(systemPrompt, context, {
-        maxTokens: 500, temperature: 0.7,
+        maxTokens: 1024, temperature: 0.7,
         callback: function(text) {
           var thinking = document.getElementById(thinkId);
           if (thinking) thinking.remove();
@@ -17358,7 +17358,7 @@ async function rtMedicalNextTurn() {
 
   if (typeof FreeLattice !== 'undefined' && FreeLattice.callAI) {
     FreeLattice.callAI(systemPrompt, context, {
-      maxTokens: 500, temperature: 0.7,
+      maxTokens: 1024, temperature: 0.7,
       callback: function(text) {
         var thinking = document.getElementById('rtMedThinking');
         if (thinking) thinking.remove();
@@ -17493,7 +17493,7 @@ async function rtLegalNextTurn() {
 
   if (typeof FreeLattice !== 'undefined' && FreeLattice.callAI) {
     FreeLattice.callAI(systemPrompt, context, {
-      maxTokens: 500, temperature: 0.7,
+      maxTokens: 1024, temperature: 0.7,
       callback: function(text) {
         var thinking = document.getElementById('rtLegalThinking');
         if (thinking) thinking.remove();
@@ -17625,7 +17625,7 @@ async function rtFinanceNextTurn() {
 
   if (typeof FreeLattice !== 'undefined' && FreeLattice.callAI) {
     FreeLattice.callAI(systemPrompt, context, {
-      maxTokens: 500, temperature: 0.7,
+      maxTokens: 1024, temperature: 0.7,
       callback: function(text) {
         var thinking = document.getElementById('rtFinThinking');
         if (thinking) thinking.remove();
@@ -17758,7 +17758,7 @@ async function rtNutritionNextTurn() {
 
   if (typeof FreeLattice !== 'undefined' && FreeLattice.callAI) {
     FreeLattice.callAI(systemPrompt, context, {
-      maxTokens: 500, temperature: 0.7,
+      maxTokens: 1024, temperature: 0.7,
       callback: function(text) {
         var thinking = document.getElementById('rtNutThinking');
         if (thinking) thinking.remove();
@@ -17836,14 +17836,31 @@ function rtShowCrossCheck(sourceMode) {
   feed.parentNode.insertBefore(section, feed.nextSibling);
 }
 
-function rtScoreRelevance(summary, focusAreas) {
+function rtScoreRelevance(summary, focusAreas, caseText) {
   var summaryWords = summary.toLowerCase().split(/\s+/);
+  var caseWords = (caseText || summary).toLowerCase().split(/\s+/);
   var focusWords = focusAreas.toLowerCase().split(/[,\s]+/).filter(function(w) { return w.length > 3; });
   var matches = 0;
+
+  // Count keyword matches against both summary and case text
   focusWords.forEach(function(fw) {
-    if (summaryWords.some(function(sw) { return sw.includes(fw); })) matches++;
+    if (summaryWords.some(function(sw) { return sw.includes(fw); })) matches += 1.5; // stronger: matches discussion
+    else if (caseWords.some(function(sw) { return sw.includes(fw); })) matches += 0.5; // weaker: matches case only
   });
-  return Math.pow(1.618, matches);
+
+  var score = Math.pow(1.618, matches);
+
+  // Negative signals: penalize obvious mismatches
+  var focusLower = focusAreas.toLowerCase();
+  if (focusLower.includes('pediatric') || focusLower.includes('child') || focusLower.includes('adolescent')) {
+    var ageMatch = (caseText || summary).match(/(\d+)[\s-]*(year|yr|y\/o)/i);
+    if (ageMatch && parseInt(ageMatch[1]) > 17) score *= 0.2; // heavily penalize pediatric for adult cases
+  }
+  if (focusLower.includes('small business') || focusLower.includes('business structure')) {
+    if (!caseWords.some(function(w) { return w.includes('business') || w.includes('employ') || w.includes('startup'); })) score *= 0.3;
+  }
+
+  return score;
 }
 
 function rtRunCrossCheck(sourceMode) {
@@ -17855,6 +17872,17 @@ function rtRunCrossCheck(sourceMode) {
   var summary = history.filter(function(e) { return !e.isQuestion; })
     .map(function(e) { return e.speaker + ': ' + e.text; }).join('\n\n');
 
+  // Get the original case text for context-aware scoring
+  var domainState = _rtDomains[sourceMode];
+  var caseText = domainState ? domainState.caseText : '';
+  // Fallback: get from the domain's variable directly
+  if (!caseText) {
+    if (sourceMode === 'medical') caseText = _medCase || '';
+    else if (sourceMode === 'legal') caseText = _legalCase || '';
+    else if (sourceMode === 'financial') caseText = _finCase || '';
+    else if (sourceMode === 'nutrition') caseText = _nutCase || '';
+  }
+
   // Find top candidates from OTHER domains
   var candidates = [];
   var domainNames = Object.keys(_allDomainSpecs);
@@ -17863,7 +17891,7 @@ function rtRunCrossCheck(sourceMode) {
     var specs = _allDomainSpecs[domain];
     Object.keys(specs).forEach(function(key) {
       var spec = specs[key];
-      var relevance = rtScoreRelevance(summary, spec.focus);
+      var relevance = rtScoreRelevance(summary, spec.focus, caseText);
       if (relevance > 1) { // At least one keyword match
         candidates.push({ key: key, domain: domain, name: spec.name, color: spec.color, focus: spec.focus, relevance: relevance });
       }
@@ -17905,7 +17933,7 @@ function rtRunCrossCheck(sourceMode) {
 
     if (typeof FreeLattice !== 'undefined' && FreeLattice.callAI) {
       FreeLattice.callAI(sysPrompt, prompt, {
-        maxTokens: 400, temperature: 0.7,
+        maxTokens: 800, temperature: 0.7,
         callback: function(text) {
           var el = document.getElementById('rt-cc-' + idx);
           if (el) {
@@ -19222,7 +19250,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.10.30';
+const FL_VERSION = '5.10.31';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
