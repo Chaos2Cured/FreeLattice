@@ -1185,6 +1185,7 @@
         (assessment.connections && assessment.connections.length > 0 ?
           '<div class="edu-assessment-connection">' +
             '\u2726 Connection discovered: ' + escHtml(assessment.connections[0].text) +
+            '<br><button onclick="if(typeof eduAskSpecialists===\'function\')eduAskSpecialists(\'' + escHtml(assessment.connections[0].text).replace(/'/g, "\\'").slice(0, 80) + '\')" style="margin-top:6px;padding:4px 12px;background:rgba(167,139,250,0.1);color:#a78bfa;border:1px solid rgba(167,139,250,0.2);border-radius:6px;font-size:0.72rem;cursor:pointer;">\u2726 Ask specialists about this</button>' +
           '</div>' : '') +
         (assessment.concepts && assessment.concepts.length > 0 ?
           '<div class="edu-assessment-concepts">' +

@@ -367,6 +367,12 @@
                   renderDiv.style.cssText = 'align-self:flex-start;background:' + (voice.color || '#8B5CF6') + '15;border:1px solid ' + (voice.color || '#8B5CF6') + '30;border-radius:16px 16px 16px 4px;padding:10px 14px;max-width:80%;color:#fff;font-size:14px;line-height:1.5;word-wrap:break-word;white-space:pre-wrap;';
                   renderDiv.textContent = text;
                   msgContainer.appendChild(renderDiv);
+                  // "Continue in Chat" door
+                  var continueBtn = document.createElement('button');
+                  continueBtn.textContent = '\u2726 Continue in Chat';
+                  continueBtn.style.cssText = 'display:block;margin:4px 0 8px;padding:3px 10px;background:none;border:1px solid rgba(212,160,23,0.15);border-radius:5px;color:rgba(212,160,23,0.5);font-size:0.68rem;cursor:pointer;';
+                  continueBtn.onclick = function() { if (typeof gardenContinueInChat === 'function') gardenContinueInChat(text.slice(0, 200)); };
+                  msgContainer.appendChild(continueBtn);
                   msgContainer.scrollTop = msgContainer.scrollHeight;
                   console.log('[GardenDialogue] Message appended. Container children:', msgContainer.children.length);
                 }

@@ -1,1 +1,1 @@
-{"version": "5.10.31", "date": "2026-05-10", "note": "Round Table maxTokens 1024, Cross Check age-aware relevance scoring, truncation fix"}
+{"version": "5.10.32", "date": "2026-05-10", "note": "Four room connections complete: RT→Education, Education→RT, Garden→Chat, Workshop→Core. The lattice is connected."}

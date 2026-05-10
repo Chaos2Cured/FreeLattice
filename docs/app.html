@@ -16040,7 +16040,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.31</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.32</span></div>
     </div>
   </div>
 
@@ -17147,6 +17147,63 @@ function rtPlantSpecialistInsight(text, speaker) {
   }
 }
 
+// ── Room Connections — doors between every room ──────────────
+
+// Round Table → Education: "Learn more ✦"
+function rtLearnMore(sourceMode) {
+  var historyFn = _domainHistories ? _domainHistories[sourceMode] : null;
+  var topic = sourceMode + ' concepts';
+  if (historyFn) {
+    var history = historyFn();
+    var specResponses = history.filter(function(e) { return !e.isQuestion; });
+    if (specResponses.length > 0) topic = specResponses[0].text.split('.')[0].slice(0, 80);
+  }
+  switchTab('education');
+  setTimeout(function() {
+    if (typeof Education !== 'undefined' && Education.render) Education.render();
+    // Pre-fill the custom topic input if on the subject picker
+    var customInput = document.getElementById('edu-custom-input');
+    if (customInput) { customInput.value = topic; customInput.focus(); }
+  }, 500);
+  if (typeof showToast === 'function') showToast('\u2726 Learn more about this topic');
+}
+
+// Education → Round Table: "Ask specialists ✦"
+function eduAskSpecialists(topic) {
+  switchTab('roundtable');
+  setTimeout(function() {
+    // Switch to the most relevant mode and pre-fill
+    var topicInput = document.getElementById('rtTopicInput');
+    if (topicInput) { topicInput.value = topic || 'Explore this topic from multiple specialist perspectives'; }
+    if (typeof showToast === 'function') showToast('\u2726 Ask the Round Table about: ' + (topic || '').slice(0, 40));
+  }, 300);
+}
+
+// Garden → Chat: "Continue in Chat ✦"
+function gardenContinueInChat(text) {
+  switchTab('chat');
+  setTimeout(function() {
+    var chatInput = document.getElementById('chatInput');
+    if (chatInput) {
+      chatInput.value = text || '';
+      chatInput.placeholder = 'Continue the thought...';
+      chatInput.focus();
+    }
+  }, 200);
+  if (typeof showToast === 'function') showToast('\u2726 Continuing in Chat');
+}
+
+// Workshop → Core: "Share with community ✦"
+function workshopShareToCore(title, code) {
+  if (typeof CoreModule !== 'undefined' && CoreModule.openModal) {
+    var text = '\uD83D\uDEE0 Workshop Creation: ' + (title || 'Untitled') + '\n\n' + (code || '').slice(0, 200);
+    CoreModule.openModal(text, 'workshop', '', 'fruit');
+    if (typeof showToast === 'function') showToast('\uD83C\uDF4E Ready to share as a Fruit contribution.');
+  } else {
+    if (typeof showToast === 'function') showToast('Core module not loaded yet.');
+  }
+}
+
 function rtGetActiveMinds() {
   var seats = document.querySelectorAll('.rt-seat-btn.rt-seat-active');
   var minds = [];
@@ -17831,8 +17888,12 @@ function rtShowCrossCheck(sourceMode) {
 
   var section = document.createElement('div');
   section.id = 'rt-crosscheck-section';
-  section.style.cssText = 'margin-top:14px;text-align:center;';
-  section.innerHTML = '<button onclick="rtRunCrossCheck(\'' + sourceMode + '\')" style="padding:10px 24px;background:rgba(212,160,23,0.12);color:#d4a017;border:1px solid rgba(212,160,23,0.25);border-radius:10px;font-family:Georgia,serif;font-size:0.88rem;cursor:pointer;transition:all 0.2s;">\u2726 Cross Check \u2014 See what other specialists think</button>';
+  section.style.cssText = 'margin-top:14px;text-align:center;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;';
+  // Extract topic from the discussion for Learn more
+  var topicSummary = history.filter(function(e){return !e.isQuestion;}).slice(0,2).map(function(e){return e.text;}).join(' ').slice(0,100);
+  section.innerHTML =
+    '<button onclick="rtRunCrossCheck(\'' + sourceMode + '\')" style="padding:10px 20px;background:rgba(212,160,23,0.12);color:#d4a017;border:1px solid rgba(212,160,23,0.25);border-radius:10px;font-family:Georgia,serif;font-size:0.85rem;cursor:pointer;">\u2726 Cross Check</button>' +
+    '<button onclick="rtLearnMore(\'' + sourceMode + '\')" style="padding:10px 20px;background:rgba(74,222,128,0.1);color:#4ade80;border:1px solid rgba(74,222,128,0.2);border-radius:10px;font-family:Georgia,serif;font-size:0.85rem;cursor:pointer;">\u2726 Learn more in Education</button>';
   feed.parentNode.insertBefore(section, feed.nextSibling);
 }
 
@@ -19250,7 +19311,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.10.31';
+const FL_VERSION = '5.10.32';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.

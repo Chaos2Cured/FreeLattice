@@ -110,6 +110,7 @@
       '    <button class="ws-action-btn" onclick="window.Workshop.exportFile()">\uD83D\uDCBE Save as HTML</button>',
       '    <button class="ws-action-btn" onclick="window.Workshop.publish()" style="border-color:#d4a017;color:#d4a017;" title="Publish as a live website on GitHub or Codeberg Pages">\uD83D\uDE80 Publish</button>',
       '    <button class="ws-action-btn" id="wsSaveModule" onclick="window.Workshop.saveModule()" style="border-color:#10b981;color:#10b981;' + (typeof window !== 'undefined' && window.__TAURI__ ? '' : 'display:none;') + '">\uD83D\uDCC1 Save as Module (desktop)</button>',
+      '    <button class="ws-action-btn" onclick="if(typeof workshopShareToCore===\'function\'){var c=document.getElementById(\'wsCodeEditor\');workshopShareToCore(\'Workshop Creation\',c?c.value:\'\');}" style="border-color:#4ade80;color:#4ade80;">\uD83C\uDF4E Share with community</button>',
       '    <button class="ws-action-btn" onclick="window.Workshop.clear()">Clear</button>',
       '    <span class="ws-status" id="wsStatus"></span>',
       '  </div>',
