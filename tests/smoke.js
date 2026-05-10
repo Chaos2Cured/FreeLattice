@@ -554,6 +554,12 @@ assert('HF API URL present', appHtml.includes('huggingface.co/api/models'));
 assert('ModelBrowser.selectHF exists', appHtml.includes('selectHF: selectHF'));
 assert('mb-tab CSS defined', appHtml.includes('.mb-tab'));
 
+// Cross Check
+assert('Cross Check function exists', appHtml.includes('rtRunCrossCheck'));
+assert('Cross Check phi² constant', appHtml.includes('PHI_SQ'));
+assert('Cross Check relevance scoring', appHtml.includes('rtScoreRelevance'));
+assert('Go Deeper function exists', appHtml.includes('rtGoDeeper'));
+
 // ═══════════════════════════════════════════════════════════════
 section('20. Model switching integrity');
 // ═══════════════════════════════════════════════════════════════
@@ -605,6 +611,14 @@ assert('ai-arcade.js exists and parses', (function() {
 assert('AIArcade module defined', arcadeJs.includes('window.AIArcade') || arcadeJs.includes('FreeLatticeModules'));
 assert('Arcade uses single DB (no deadlock)', !arcadeJs.includes('openAuctionDB'));
 assert('Arcade DB version is 2', arcadeJs.includes("DB_VERSION = 2"));
+
+// Workshop Projects
+var wsJs = '';
+try { wsJs = require('fs').readFileSync('docs/modules/workshop.js', 'utf8'); } catch(e) {}
+assert('Workshop Projects tab exists', wsJs.includes('ws-mode-projects'));
+assert('WorkshopProjects module defined', wsJs.includes('window.WorkshopProjects'));
+assert('WorkshopProjects.connect exists', wsJs.includes('function connect'));
+assert('GitHub API integration', wsJs.includes('api.github.com'));
 
 // ═══════════════════════════════════════════════════════════════
 section('24. Round Table modes');

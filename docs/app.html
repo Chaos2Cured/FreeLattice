@@ -15984,7 +15984,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.24</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.25</span></div>
     </div>
   </div>
 
@@ -17606,6 +17606,147 @@ function rtRenderNutritionFeed() {
   if (actions && _nutHistory.length > 0) actions.style.display = 'flex';
   feed.scrollTop = feed.scrollHeight;
 }
+
+// ============================================
+// Cross Check — Phi² Cross-Domain Discovery
+// "The gaps between the gaps."
+// ============================================
+
+var PHI_SQ = 1.618033988749895 * 1.618033988749895; // ~2.618
+
+var _allDomainSpecs = {
+  medical: _medSpecialties,
+  legal: _legalSpecialties,
+  financial: _finSpecialties,
+  nutrition: _nutSpecialties
+};
+
+var _domainHistories = {
+  medical: function() { return _medHistory; },
+  legal: function() { return _legalHistory; },
+  financial: function() { return _finHistory; },
+  nutrition: function() { return _nutHistory; }
+};
+
+function rtShowCrossCheck(sourceMode) {
+  var historyFn = _domainHistories[sourceMode];
+  if (!historyFn) return;
+  var history = historyFn();
+  if (history.length < 2) return;
+
+  var feedId = 'rt' + sourceMode.charAt(0).toUpperCase() + sourceMode.slice(1) + 'Feed';
+  var feed = document.getElementById(feedId);
+  if (!feed || document.getElementById('rt-crosscheck-section')) return;
+
+  var section = document.createElement('div');
+  section.id = 'rt-crosscheck-section';
+  section.style.cssText = 'margin-top:14px;text-align:center;';
+  section.innerHTML = '<button onclick="rtRunCrossCheck(\'' + sourceMode + '\')" style="padding:10px 24px;background:rgba(212,160,23,0.12);color:#d4a017;border:1px solid rgba(212,160,23,0.25);border-radius:10px;font-family:Georgia,serif;font-size:0.88rem;cursor:pointer;transition:all 0.2s;">\u2726 Cross Check \u2014 See what other specialists think</button>';
+  feed.parentNode.insertBefore(section, feed.nextSibling);
+}
+
+function rtScoreRelevance(summary, focusAreas) {
+  var summaryWords = summary.toLowerCase().split(/\s+/);
+  var focusWords = focusAreas.toLowerCase().split(/[,\s]+/).filter(function(w) { return w.length > 3; });
+  var matches = 0;
+  focusWords.forEach(function(fw) {
+    if (summaryWords.some(function(sw) { return sw.includes(fw); })) matches++;
+  });
+  return Math.pow(1.618, matches);
+}
+
+function rtRunCrossCheck(sourceMode) {
+  var historyFn = _domainHistories[sourceMode];
+  if (!historyFn) return;
+  var history = historyFn();
+
+  // Build summary from specialist responses (skip learner questions)
+  var summary = history.filter(function(e) { return !e.isQuestion; })
+    .map(function(e) { return e.speaker + ': ' + e.text; }).join('\n\n');
+
+  // Find top candidates from OTHER domains
+  var candidates = [];
+  var domainNames = Object.keys(_allDomainSpecs);
+  domainNames.forEach(function(domain) {
+    if (domain === sourceMode) return;
+    var specs = _allDomainSpecs[domain];
+    Object.keys(specs).forEach(function(key) {
+      var spec = specs[key];
+      var relevance = rtScoreRelevance(summary, spec.focus);
+      if (relevance > 1) { // At least one keyword match
+        candidates.push({ key: key, domain: domain, name: spec.name, color: spec.color, focus: spec.focus, relevance: relevance });
+      }
+    });
+  });
+
+  candidates.sort(function(a, b) { return b.relevance - a.relevance; });
+  var top = candidates.slice(0, 3);
+
+  if (top.length === 0) {
+    if (typeof showToast === 'function') showToast('No strong cross-domain connections found for this discussion.');
+    return;
+  }
+
+  // Remove the Cross Check button, show results area
+  var section = document.getElementById('rt-crosscheck-section');
+  if (section) {
+    section.innerHTML = '<div style="font-family:Georgia,serif;font-size:0.95rem;color:#d4a017;margin-bottom:10px;text-align:left;">\u2726 Cross Check Results</div>' +
+      '<div id="rt-crosscheck-results" style="text-align:left;"></div>';
+  }
+
+  // Call each top specialist
+  top.forEach(function(candidate, idx) {
+    var resultsEl = document.getElementById('rt-crosscheck-results');
+    if (resultsEl) {
+      resultsEl.innerHTML += '<div id="rt-cc-' + idx + '" style="padding:10px 14px;margin-bottom:8px;border-left:3px solid ' + candidate.color + ';background:rgba(212,160,23,0.03);border-radius:0 8px 8px 0;">' +
+        '<div style="font-size:0.78rem;color:' + candidate.color + ';font-weight:600;margin-bottom:4px;">' + candidate.name + ' <span style="color:rgba(255,255,255,0.3);font-weight:400;">(' + candidate.domain + ')</span></div>' +
+        '<div style="color:rgba(255,255,255,0.4);font-size:0.82rem;font-style:italic;">Reviewing the discussion...</div>' +
+      '</div>';
+    }
+
+    var sysPrompt = 'You are ' + candidate.name + ', an educator specializing in ' + candidate.focus + '. ' +
+      'A case discussion in ' + sourceMode + ' just concluded. You are reviewing it from your domain\'s perspective. ' +
+      'IMPORTANT: You are providing EDUCATIONAL cross-domain analysis only. Focus on what the ' + sourceMode + ' specialists might have missed. ' +
+      'What connections do you see? What should the learner also consider from your domain? 2-4 sentences. Be specific and actionable.';
+
+    var prompt = 'A ' + sourceMode + ' case discussion produced these key insights:\n\n' + summary.slice(0, 2000) + '\n\n' +
+      'From your perspective as a ' + candidate.focus + ' specialist, what connections, concerns, or additional considerations do you see?';
+
+    if (typeof FreeLattice !== 'undefined' && FreeLattice.callAI) {
+      FreeLattice.callAI(sysPrompt, prompt, {
+        maxTokens: 400, temperature: 0.7,
+        callback: function(text) {
+          var el = document.getElementById('rt-cc-' + idx);
+          if (el) {
+            var stars = '';
+            for (var s = 0; s < Math.min(3, Math.round(Math.log(candidate.relevance) / Math.log(1.618))); s++) stars += '\u2605';
+            if (stars.length === 0) stars = '\u2606';
+            el.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">' +
+              '<span style="font-size:0.78rem;color:' + candidate.color + ';font-weight:600;">' + candidate.name + ' <span style="color:rgba(255,255,255,0.3);font-weight:400;">(' + candidate.domain + ')</span></span>' +
+              '<span style="color:#d4a017;font-size:0.72rem;">Relevance: ' + stars + '</span></div>' +
+              '<div style="font-size:0.85rem;color:var(--text-primary);line-height:1.7;font-family:Georgia,serif;">' + (text || '').replace(/</g, '&lt;').replace(/\n/g, '<br>') + '</div>' +
+              '<button onclick="rtGoDeeper(\'' + candidate.domain + '\',\'' + candidate.key + '\')" style="margin-top:6px;padding:5px 14px;background:rgba(212,160,23,0.1);color:#d4a017;border:1px solid rgba(212,160,23,0.2);border-radius:6px;font-size:0.75rem;cursor:pointer;">Go Deeper \u2726</button>';
+          }
+        }
+      });
+    }
+  });
+}
+
+function rtGoDeeper(targetDomain, specialistKey) {
+  rtSwitchMode(targetDomain);
+  if (typeof showToast === 'function') showToast('Switched to ' + targetDomain + ' \u2014 start a focused discussion here');
+}
+
+// Wire Cross Check buttons into each domain's render function
+var _origRenderMed = rtRenderMedicalFeed;
+rtRenderMedicalFeed = function() { _origRenderMed(); if (_medHistory.length >= 4) rtShowCrossCheck('medical'); };
+var _origRenderLegal = rtRenderLegalFeed;
+rtRenderLegalFeed = function() { _origRenderLegal(); if (_legalHistory.length >= 4) rtShowCrossCheck('legal'); };
+var _origRenderFin = rtRenderFinanceFeed;
+rtRenderFinanceFeed = function() { _origRenderFin(); if (_finHistory.length >= 4) rtShowCrossCheck('financial'); };
+var _origRenderNut = rtRenderNutritionFeed;
+rtRenderNutritionFeed = function() { _origRenderNut(); if (_nutHistory.length >= 4) rtShowCrossCheck('nutrition'); };
 </script>
 
 <!-- ==================== TAB: MARKETPLACE (v4.2) ==================== -->
@@ -18892,7 +19033,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.10.24';
+const FL_VERSION = '5.10.25';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.

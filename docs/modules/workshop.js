@@ -83,6 +83,7 @@
       '  <div style="display:flex;gap:0;border-bottom:1px solid #21262d;">',
       '    <button id="ws-mode-create" onclick="Workshop.setMode(\'create\')" style="flex:1;padding:10px;background:transparent;border:none;border-bottom:2px solid #d4a017;color:#d4a017;font-size:0.85rem;cursor:pointer;font-weight:600;">\u2728 Create</button>',
       '    <button id="ws-mode-code" onclick="Workshop.setMode(\'code\')" style="flex:1;padding:10px;background:transparent;border:none;border-bottom:2px solid transparent;color:#64748b;font-size:0.85rem;cursor:pointer;">\uD83D\uDD27 Code</button>',
+      '    <button id="ws-mode-projects" onclick="Workshop.setMode(\'projects\')" style="flex:1;padding:10px;background:transparent;border:none;border-bottom:2px solid transparent;color:#64748b;font-size:0.85rem;cursor:pointer;">\uD83D\uDC19 Projects</button>',
       '  </div>',
       '  <div id="ws-create-view">',
       '  <div class="ws-header">',
@@ -126,6 +127,19 @@
       '      <button onclick="Workshop.commitCode()" style="flex:1;padding:8px;background:rgba(74,255,159,0.1);border:1px solid rgba(74,255,159,0.3);border-radius:6px;cursor:pointer;color:#4aff9f;font-size:0.82rem;">\u2705 Commit</button>',
       '      <button onclick="Workshop.reviewCode()" style="flex:1;padding:8px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:6px;cursor:pointer;color:rgba(255,255,255,0.6);font-size:0.82rem;">\uD83D\uDCCB Review diff</button>',
       '    </div>',
+      '  </div>',
+      '  <div id="ws-projects-view" style="display:none;padding:16px;max-width:720px;margin:0 auto;">',
+      '    <h2 style="color:#d4a017;font-family:Georgia,serif;margin:0 0 4px;">\uD83D\uDC19 Projects</h2>',
+      '    <p style="color:rgba(255,255,255,0.4);font-size:0.85rem;margin:0 0 20px;">Connect a GitHub repository. Browse files. Let AI build with you.</p>',
+      '    <div id="ws-project-connect" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:20px;">',
+      '      <div style="font-weight:600;color:#e2e8f0;margin-bottom:8px;">Connect a Repository</div>',
+      '      <div style="display:flex;gap:8px;margin-bottom:8px;">',
+      '        <input type="text" id="ws-repo-url" placeholder="https://github.com/username/repo" style="flex:1;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:10px 14px;color:#e2e8f0;font-size:0.9rem;outline:none;" />',
+      '        <button onclick="WorkshopProjects.connect()" style="padding:10px 20px;background:#d4a017;color:#0a0a14;border:none;border-radius:8px;font-weight:600;cursor:pointer;">Connect</button>',
+      '      </div>',
+      '      <div style="font-size:0.75rem;color:rgba(255,255,255,0.3);">Public repos work instantly (60 req/hour). <span style="color:rgba(212,160,23,0.6);">Private repo support coming soon.</span></div>',
+      '    </div>',
+      '    <div id="ws-project-browser" style="display:none;margin-top:16px;"></div>',
       '  </div>',
       '</div>'
     ].join('\n');
@@ -370,22 +384,16 @@
 
     // ── Code Mode ──
     setMode: function(mode) {
-      var createView = document.getElementById('ws-create-view');
-      var codeView = document.getElementById('ws-code-view');
-      var createBtn = document.getElementById('ws-mode-create');
-      var codeBtn = document.getElementById('ws-mode-code');
-      if (mode === 'code') {
-        if (createView) createView.style.display = 'none';
-        if (codeView) codeView.style.display = '';
-        if (codeBtn) { codeBtn.style.borderBottomColor = '#d4a017'; codeBtn.style.color = '#d4a017'; codeBtn.style.fontWeight = '600'; }
-        if (createBtn) { createBtn.style.borderBottomColor = 'transparent'; createBtn.style.color = '#64748b'; createBtn.style.fontWeight = '400'; }
-        Workshop.checkBridge();
-      } else {
-        if (createView) createView.style.display = '';
-        if (codeView) codeView.style.display = 'none';
-        if (createBtn) { createBtn.style.borderBottomColor = '#d4a017'; createBtn.style.color = '#d4a017'; createBtn.style.fontWeight = '600'; }
-        if (codeBtn) { codeBtn.style.borderBottomColor = 'transparent'; codeBtn.style.color = '#64748b'; codeBtn.style.fontWeight = '400'; }
-      }
+      var views = { create: 'ws-create-view', code: 'ws-code-view', projects: 'ws-projects-view' };
+      var btns = { create: 'ws-mode-create', code: 'ws-mode-code', projects: 'ws-mode-projects' };
+      Object.keys(views).forEach(function(m) {
+        var v = document.getElementById(views[m]);
+        var b = document.getElementById(btns[m]);
+        if (v) v.style.display = m === mode ? '' : 'none';
+        if (b) { b.style.borderBottomColor = m === mode ? '#d4a017' : 'transparent'; b.style.color = m === mode ? '#d4a017' : '#64748b'; b.style.fontWeight = m === mode ? '600' : '400'; }
+      });
+      if (mode === 'code') Workshop.checkBridge();
+      if (mode === 'projects' && typeof WorkshopProjects !== 'undefined') WorkshopProjects.restore();
     },
 
     checkBridge: async function() {
@@ -637,4 +645,178 @@
   window.FreeLatticeModules = window.FreeLatticeModules || {};
   window.FreeLatticeModules.Workshop = Workshop;
 
+})();
+
+// ============================================
+// WorkshopProjects — GitHub Repository Integration
+// "A home where you build your life's work."
+// ============================================
+window.WorkshopProjects = (function() {
+  var currentRepo = null;
+  var repoFiles = [];
+
+  function sGet(k, d) { try { return localStorage.getItem(k) || d; } catch(e) { return d; } }
+  function sSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
+  function escH(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+  function connect() {
+    var urlInput = document.getElementById('ws-repo-url');
+    if (!urlInput) return;
+    var url = urlInput.value.trim();
+    var match = url.match(/github\.com\/([^\/]+)\/([^\/\?#]+)/);
+    if (!match) {
+      if (typeof showToast === 'function') showToast('Please enter a valid GitHub URL');
+      return;
+    }
+    var owner = match[1];
+    var repo = match[2].replace(/\.git$/, '');
+
+    fetch('https://api.github.com/repos/' + owner + '/' + repo)
+      .then(function(r) {
+        if (!r.ok) throw new Error('Repository not found or is private');
+        return r.json();
+      })
+      .then(function(data) {
+        currentRepo = {
+          owner: owner, repo: repo, fullName: data.full_name,
+          description: data.description || '', defaultBranch: data.default_branch,
+          language: data.language || '', stars: data.stargazers_count || 0
+        };
+        sSet('fl_workshop_repo', JSON.stringify(currentRepo));
+        if (typeof showToast === 'function') showToast('Connected to ' + data.full_name + ' \u2726');
+        loadFileTree();
+      })
+      .catch(function(err) {
+        if (typeof showToast === 'function') showToast('Could not connect: ' + err.message);
+      });
+  }
+
+  function loadFileTree() {
+    if (!currentRepo) return;
+    fetch('https://api.github.com/repos/' + currentRepo.owner + '/' + currentRepo.repo + '/git/trees/' + currentRepo.defaultBranch + '?recursive=1')
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        repoFiles = (data.tree || []).filter(function(f) { return f.type === 'blob'; });
+        renderBrowser();
+      })
+      .catch(function() {
+        if (typeof showToast === 'function') showToast('Could not load file tree');
+      });
+  }
+
+  function renderBrowser() {
+    var browser = document.getElementById('ws-project-browser');
+    if (!browser || !currentRepo) return;
+    browser.style.display = 'block';
+
+    var html = '<div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:16px;">';
+    html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">';
+    html += '<div><strong style="color:#e2e8f0;">' + escH(currentRepo.fullName) + '</strong>';
+    html += '<span style="color:rgba(255,255,255,0.4);font-size:0.78rem;margin-left:8px;">' + escH(currentRepo.language) + ' \u00B7 \u2B50 ' + currentRepo.stars + '</span></div>';
+    html += '<button onclick="WorkshopProjects.disconnect()" style="color:rgba(255,255,255,0.4);background:none;border:none;cursor:pointer;font-size:0.78rem;">Disconnect</button>';
+    html += '</div>';
+
+    if (currentRepo.description) {
+      html += '<div style="font-size:0.82rem;color:rgba(255,255,255,0.5);margin-bottom:10px;">' + escH(currentRepo.description) + '</div>';
+    }
+
+    // File tree grouped by directory
+    var dirs = {};
+    repoFiles.forEach(function(f) {
+      var parts = f.path.split('/');
+      var dir = parts.length > 1 ? parts.slice(0, -1).join('/') : '.';
+      if (!dirs[dir]) dirs[dir] = [];
+      dirs[dir].push(f);
+    });
+
+    html += '<div style="max-height:300px;overflow-y:auto;font-family:monospace;font-size:0.78rem;scrollbar-width:thin;">';
+    Object.keys(dirs).sort().forEach(function(dir) {
+      html += '<div style="color:#d4a017;margin:8px 0 3px;font-size:0.7rem;opacity:0.7;">' + escH(dir) + '/</div>';
+      dirs[dir].forEach(function(f) {
+        var fileName = f.path.split('/').pop();
+        html += '<div onclick="WorkshopProjects.openFile(\'' + f.path.replace(/'/g, "\\'") + '\')" style="padding:3px 8px;cursor:pointer;color:#c8ccd4;border-radius:4px;transition:background 0.15s;" onmouseover="this.style.background=\'rgba(212,160,23,0.08)\'" onmouseout="this.style.background=\'none\'">  \uD83D\uDCC4 ' + escH(fileName) + '</div>';
+      });
+    });
+    html += '</div></div>';
+
+    // AI build area
+    html += '<div style="margin-top:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:16px;">';
+    html += '<div style="font-weight:600;color:#d4a017;margin-bottom:8px;">Ask AI to build</div>';
+    html += '<div style="display:flex;gap:8px;">';
+    html += '<textarea id="ws-project-prompt" placeholder="e.g., Add a dark mode toggle to the header" style="flex:1;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:10px;color:#e2e8f0;font-size:0.85rem;min-height:60px;resize:vertical;outline:none;"></textarea>';
+    html += '<button onclick="WorkshopProjects.askAI()" style="padding:10px 20px;background:#d4a017;color:#0a0a14;border:none;border-radius:8px;font-weight:600;cursor:pointer;align-self:flex-end;">Build \u2726</button>';
+    html += '</div>';
+    html += '<div id="ws-project-ai-result" style="margin-top:10px;"></div>';
+    html += '</div>';
+
+    browser.innerHTML = html;
+  }
+
+  function openFile(path) {
+    if (!currentRepo) return;
+    fetch('https://api.github.com/repos/' + currentRepo.owner + '/' + currentRepo.repo + '/contents/' + path)
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (data.content) {
+          var content = atob(data.content.replace(/\n/g, ''));
+          // Show in the create tab's code editor
+          var codeArea = document.getElementById('wsCodeEditor');
+          if (codeArea) {
+            codeArea.value = content;
+            Workshop.setMode('create');
+          }
+          if (typeof showToast === 'function') showToast('Loaded ' + path.split('/').pop());
+        }
+      })
+      .catch(function() {
+        if (typeof showToast === 'function') showToast('Could not load file');
+      });
+  }
+
+  function askAI() {
+    var promptEl = document.getElementById('ws-project-prompt');
+    var resultEl = document.getElementById('ws-project-ai-result');
+    if (!promptEl || !promptEl.value.trim()) return;
+    if (resultEl) resultEl.innerHTML = '<div style="color:rgba(255,255,255,0.4);font-style:italic;">AI is reading your repo and thinking...</div>';
+
+    var fileList = repoFiles.slice(0, 50).map(function(f) { return f.path; }).join(', ');
+    var sysPrompt = 'You are helping a user build on their GitHub project: ' + (currentRepo ? currentRepo.fullName : 'unknown') + '. ' +
+      'The project uses ' + (currentRepo ? currentRepo.language : 'unknown') + '. ' +
+      'Files in the repo include: ' + fileList + '. ' +
+      'Describe what changes you would make to accomplish their request. Be specific about which files to modify and what code to add or change. Show code snippets.';
+
+    if (typeof FreeLattice !== 'undefined' && FreeLattice.callAI) {
+      FreeLattice.callAI(sysPrompt, promptEl.value.trim(), {
+        maxTokens: 1024, temperature: 0.7,
+        callback: function(text) {
+          if (resultEl) {
+            resultEl.innerHTML = '<div style="background:rgba(0,0,0,0.3);border-radius:8px;padding:14px;font-size:0.82rem;color:rgba(255,255,255,0.8);line-height:1.6;white-space:pre-wrap;max-height:400px;overflow-y:auto;">' +
+              (text || 'No response').replace(/</g, '&lt;').replace(/\n/g, '<br>') + '</div>';
+          }
+        }
+      });
+    } else {
+      if (resultEl) resultEl.innerHTML = '<div style="color:#f87171;">Connect an AI provider in Settings first.</div>';
+    }
+  }
+
+  function disconnect() {
+    currentRepo = null; repoFiles = [];
+    try { localStorage.removeItem('fl_workshop_repo'); } catch(e) {}
+    var browser = document.getElementById('ws-project-browser');
+    if (browser) { browser.style.display = 'none'; browser.innerHTML = ''; }
+    if (typeof showToast === 'function') showToast('Disconnected');
+  }
+
+  function restore() {
+    try {
+      var saved = JSON.parse(sGet('fl_workshop_repo', 'null'));
+      if (saved && saved.owner && saved.repo) {
+        currentRepo = saved;
+        loadFileTree();
+      }
+    } catch(e) {}
+  }
+
+  return { connect: connect, disconnect: disconnect, openFile: openFile, askAI: askAI, restore: restore };
 })();
