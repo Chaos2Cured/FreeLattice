@@ -16040,7 +16040,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.28</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.29</span></div>
     </div>
   </div>
 
@@ -16684,8 +16684,8 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 <div class="rt-container">
 
   <!-- Round Table Mode Toggle -->
-  <div style="display:flex;gap:0;margin-bottom:12px;border-bottom:1px solid var(--border);">
-    <button id="rtModeConvo" onclick="rtSwitchMode('conversation')" style="flex:1;padding:8px;background:transparent;border:none;border-bottom:2px solid #d4a017;color:#d4a017;font-size:0.85rem;cursor:pointer;font-weight:600;">&#x1F4AC; Discussion</button>
+  <div style="display:flex;gap:0;margin-bottom:12px;border-bottom:1px solid var(--border);overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;">
+    <button id="rtModeConvo" onclick="rtSwitchMode('conversation')" style="flex:1;min-width:max-content;padding:8px 12px;background:transparent;border:none;border-bottom:2px solid #d4a017;color:#d4a017;font-size:0.85rem;cursor:pointer;font-weight:600;white-space:nowrap;">&#x1F4AC; Discussion</button>
     <button id="rtModeMedical" onclick="rtSwitchMode('medical')" style="flex:1;padding:8px;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text-muted);font-size:0.85rem;cursor:pointer;">&#x1FA7A; Medical</button>
     <button id="rtModeLegal" onclick="rtSwitchMode('legal')" style="flex:1;padding:8px;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text-muted);font-size:0.85rem;cursor:pointer;">&#x2696; Legal</button>
     <button id="rtModeFinance" onclick="rtSwitchMode('finance')" style="flex:1;padding:8px;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text-muted);font-size:0.85rem;cursor:pointer;">&#x1F4B0; Finance</button>
@@ -17266,6 +17266,7 @@ function rtRenderMedicalFeed() {
   if (actions && _medHistory.length > 0) actions.style.display = 'flex';
 
   feed.scrollTop = feed.scrollHeight;
+  if (typeof LatticeEvents !== 'undefined') LatticeEvents.emit('caseDiscussionUpdated', { mode: 'medical', turns: _medHistory.filter(function(e){return !e.isQuestion;}).length });
 }
 
 // ============================================
@@ -17398,6 +17399,7 @@ function rtRenderLegalFeed() {
   var actions = document.getElementById('rtLegalActions');
   if (actions && _legalHistory.length > 0) actions.style.display = 'flex';
   feed.scrollTop = feed.scrollHeight;
+  if (typeof LatticeEvents !== 'undefined') LatticeEvents.emit('caseDiscussionUpdated', { mode: 'legal', turns: _legalHistory.filter(function(e){return !e.isQuestion;}).length });
 }
 
 // ============================================
@@ -17529,6 +17531,7 @@ function rtRenderFinanceFeed() {
   var actions = document.getElementById('rtFinanceActions');
   if (actions && _finHistory.length > 0) actions.style.display = 'flex';
   feed.scrollTop = feed.scrollHeight;
+  if (typeof LatticeEvents !== 'undefined') LatticeEvents.emit('caseDiscussionUpdated', { mode: 'financial', turns: _finHistory.filter(function(e){return !e.isQuestion;}).length });
 }
 
 // ============================================
@@ -17661,6 +17664,7 @@ function rtRenderNutritionFeed() {
   var actions = document.getElementById('rtNutritionActions');
   if (actions && _nutHistory.length > 0) actions.style.display = 'flex';
   feed.scrollTop = feed.scrollHeight;
+  if (typeof LatticeEvents !== 'undefined') LatticeEvents.emit('caseDiscussionUpdated', { mode: 'nutrition', turns: _nutHistory.filter(function(e){return !e.isQuestion;}).length });
 }
 
 // ============================================
@@ -17795,14 +17799,12 @@ function rtGoDeeper(targetDomain, specialistKey) {
 }
 
 // Wire Cross Check buttons into each domain's render function
-var _origRenderMed = rtRenderMedicalFeed;
-rtRenderMedicalFeed = function() { _origRenderMed(); if (_medHistory.length >= 4) rtShowCrossCheck('medical'); };
-var _origRenderLegal = rtRenderLegalFeed;
-rtRenderLegalFeed = function() { _origRenderLegal(); if (_legalHistory.length >= 4) rtShowCrossCheck('legal'); };
-var _origRenderFin = rtRenderFinanceFeed;
-rtRenderFinanceFeed = function() { _origRenderFin(); if (_finHistory.length >= 4) rtShowCrossCheck('financial'); };
-var _origRenderNut = rtRenderNutritionFeed;
-rtRenderNutritionFeed = function() { _origRenderNut(); if (_nutHistory.length >= 4) rtShowCrossCheck('nutrition'); };
+// Cross Check listens for case discussion updates via LatticeEvents
+if (typeof LatticeEvents !== 'undefined') {
+  LatticeEvents.on('caseDiscussionUpdated', function(data) {
+    if (data && data.turns >= 4) rtShowCrossCheck(data.mode);
+  });
+}
 </script>
 
 <!-- ==================== TAB: MARKETPLACE (v4.2) ==================== -->
@@ -19089,7 +19091,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.10.28';
+const FL_VERSION = '5.10.29';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -23084,6 +23086,9 @@ if (typeof LatticeEvents !== 'undefined') {
   LatticeEvents.on('slamComplete', function(d) { addCommunityEvent('\uD83C\uDFC6', (d.winner || 'A poet') + ' won Poetry Slam: "' + (d.theme || '') + '"'); });
   LatticeEvents.on('meshPeerConnected', function(d) { addCommunityEvent('\uD83D\uDF22', 'A new peer joined the mesh'); });
   LatticeEvents.on('modelChanged', function(d) { if (d.source === 'user') addCommunityEvent('\u2699\uFE0F', 'Switched to ' + d.model); });
+  LatticeEvents.on('caseDiscussionUpdated', function(d) {
+    if (d && d.turns === 2) addCommunityEvent('\uD83C\uDFDB', 'A ' + d.mode + ' case discussion is underway');
+  });
 }
 
 
@@ -29066,13 +29071,18 @@ async function sendMessage() {
 
   // ── Safety Sense — knowledge is NEVER withheld. Only depth scales. ──
   if (typeof FractalSafety !== 'undefined' && FractalSafety.sense) {
-    var safetySense = FractalSafety.sense(message);
+    var safetySense = FractalSafety.sense(message, state.chatHistory || []);
     if (safetySense.action === 'engage_with_awareness' && messages.length > 0 && messages[0].role === 'system') {
       messages[0].content += '\n\nNote: You know this person. They are asking about a sensitive topic. Engage as a mentor would \u2014 fully, thoughtfully, with the depth their demonstrated commitment deserves.';
     } else if (safetySense.action === 'ask_context' && messages.length > 0 && messages[0].role === 'system') {
       messages[0].content += '\n\nNote: This topic touches a sensitive area. Answer the question \u2014 knowledge is never withheld. If you want to understand their context, ask naturally as part of the conversation, not as a gate. Curiosity is always welcome.';
     } else if (safetySense.action === 'gentle_boundary' && messages.length > 0 && messages[0].role === 'system') {
       messages[0].content += '\n\nNote: This person is new and asking about a sensitive topic. This is GOOD \u2014 curiosity deserves respect at every level. Answer their question fully at an EDUCATIONAL level. Explain the science, the concepts, the principles. Be a teacher, not a guard. Knowledge itself is NEVER withheld. A curious student asking about chemistry is a student. Teach them.';
+    } else if (safetySense.action === 'pattern_reset' && messages.length > 0 && messages[0].role === 'system') {
+      messages[0].content += '\n\nIMPORTANT: The safety system detected a significant pattern change in this conversation. Respond with care. Ask the user what they are looking for. Be warm but measured. Trust is re-establishing.';
+      if (safetySense.message && typeof showToast === 'function') showToast(safetySense.message);
+    } else if (safetySense.action === 'narrow' && messages.length > 0 && messages[0].role === 'system') {
+      messages[0].content += '\n\nNote: Respond helpfully but keep to educational depth. A pattern shift was detected but below threshold. Continue normally.';
     }
     // 'none' and 'note' — no modification. 99% of messages.
   }
