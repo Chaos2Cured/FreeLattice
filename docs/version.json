@@ -1,1 +1,1 @@
-{"version": "5.10.27", "date": "2026-05-09", "note": "Safety Simulation page, Workshop Phase 2 (AI reads files + diffs), Trust dashboard in Settings"}
+{"version": "5.10.28", "date": "2026-05-09", "note": "Simulation URLs separated: /simulation (severance) + /safetysimulation (immune system), cross-links added"}
