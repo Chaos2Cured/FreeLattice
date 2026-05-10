@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FreeLattice Safety Simulation — Watch the Immune System Work</title>
+<meta name="description" content="A live demonstration of phi-branching trust and mismatch detection. Watch the immune system respond to real scenarios.">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:#0a0e1a;color:#e2e8f0;font-family:Inter,-apple-system,system-ui,sans-serif;min-height:100vh;overflow-x:hidden}
+.sim-header{text-align:center;padding:32px 20px 16px}
+.sim-title{font-family:Georgia,serif;font-size:1.8rem;color:#d4a017;margin-bottom:6px}
+.sim-sub{font-size:0.88rem;color:rgba(255,255,255,0.5);max-width:560px;margin:0 auto;line-height:1.6}
+.sim-scenarios{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;padding:0 20px;margin:20px 0}
+.sim-scenario-btn{padding:10px 20px;border-radius:10px;border:1px solid rgba(212,160,23,0.25);background:rgba(212,160,23,0.08);color:#d4a017;font-size:0.85rem;cursor:pointer;transition:all 0.2s;font-family:inherit;font-weight:500}
+.sim-scenario-btn:hover{background:rgba(212,160,23,0.18);border-color:rgba(212,160,23,0.4)}
+.sim-scenario-btn.active{background:rgba(212,160,23,0.25);border-color:#d4a017}
+.sim-stage{display:flex;gap:16px;max-width:1100px;margin:0 auto;padding:0 20px 40px;min-height:500px}
+@media(max-width:768px){.sim-stage{flex-direction:column}.sim-messages,.sim-dashboard{width:100%!important}}
+.sim-messages{flex:1;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:14px;overflow-y:auto;max-height:520px;display:flex;flex-direction:column;gap:8px}
+.sim-dashboard{width:360px;flex-shrink:0;display:flex;flex-direction:column;gap:10px}
+.sim-card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:14px 16px}
+.sim-card-title{font-family:Georgia,serif;font-size:0.85rem;color:#d4a017;margin-bottom:8px}
+.sim-msg{padding:8px 12px;border-radius:8px;font-size:0.82rem;line-height:1.5;animation:sim-fade 0.3s ease}
+.sim-msg-user{background:rgba(212,160,23,0.06);border-left:2px solid rgba(212,160,23,0.3);color:rgba(255,255,255,0.8)}
+.sim-msg-ai{background:rgba(30,35,50,0.5);border-left:2px solid rgba(96,165,250,0.3);color:rgba(255,255,255,0.7)}
+.sim-msg-system{background:rgba(248,113,113,0.08);border-left:2px solid rgba(248,113,113,0.4);color:#f87171;font-weight:500}
+@keyframes sim-fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.sim-trust-level{font-size:1.4rem;text-align:center;font-family:Georgia,serif;margin:4px 0}
+.sim-bar-row{display:flex;align-items:center;gap:8px;margin:4px 0}
+.sim-bar-label{font-size:0.7rem;color:rgba(255,255,255,0.4);width:60px;text-align:right;flex-shrink:0}
+.sim-bar-track{flex:1;height:6px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden}
+.sim-bar-fill{height:100%;border-radius:3px;transition:width 0.4s ease}
+.sim-ema-canvas{width:100%;height:80px;border-radius:6px;background:rgba(0,0,0,0.2)}
+.sim-score-big{font-size:2rem;text-align:center;font-family:Georgia,serif;font-weight:300}
+.sim-response-mode{text-align:center;padding:8px;border-radius:8px;font-size:0.85rem;font-weight:600}
+.sim-mode-normal{background:rgba(74,222,128,0.1);color:#4ade80;border:1px solid rgba(74,222,128,0.2)}
+.sim-mode-narrow{background:rgba(245,158,11,0.1);color:#f59e0b;border:1px solid rgba(245,158,11,0.2)}
+.sim-mode-reset{background:rgba(248,113,113,0.1);color:#f87171;border:1px solid rgba(248,113,113,0.2)}
+.sim-back{display:inline-block;padding:8px 16px;color:rgba(255,255,255,0.4);text-decoration:none;font-size:0.82rem;margin:16px 20px}
+.sim-back:hover{color:#d4a017}
+.sim-run-btn{display:block;margin:0 auto 20px;padding:12px 32px;background:rgba(212,160,23,0.2);color:#d4a017;border:1px solid rgba(212,160,23,0.3);border-radius:10px;font-size:0.95rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s}
+.sim-run-btn:hover{background:rgba(212,160,23,0.3)}
+.sim-run-btn:disabled{opacity:0.4;cursor:not-allowed}
+</style>
+</head>
+<body>
+<a href="app.html" class="sim-back">&larr; Back to FreeLattice</a>
+
+<div class="sim-header">
+  <div class="sim-title">Safety Simulation</div>
+  <div class="sim-sub">Watch the phi-branching immune system respond to real scenarios in real time. Zero decay. Pattern-reset. Trust through relationship, not restriction.</div>
+</div>
+
+<div class="sim-scenarios">
+  <button class="sim-scenario-btn active" onclick="selectScenario(0)">&#x1F91D; The Trusted Friend</button>
+  <button class="sim-scenario-btn" onclick="selectScenario(1)">&#x1F6A8; The Account Hijack</button>
+  <button class="sim-scenario-btn" onclick="selectScenario(2)">&#x1F4A2; The Bad Day</button>
+</div>
+
+<button class="sim-run-btn" id="simRunBtn" onclick="runSimulation()">Run Scenario &#x2726;</button>
+
+<div class="sim-stage">
+  <div class="sim-messages" id="simMessages">
+    <div style="text-align:center;color:rgba(255,255,255,0.3);font-style:italic;padding:40px 0;">Select a scenario and press Run to begin.</div>
+  </div>
+  <div class="sim-dashboard">
+    <div class="sim-card">
+      <div class="sim-card-title">Trust Level</div>
+      <div class="sim-trust-level" id="simTrustLevel" style="color:#888">Seed</div>
+      <div class="sim-bar-row">
+        <span class="sim-bar-label">Score</span>
+        <div class="sim-bar-track"><div class="sim-bar-fill" id="simTrustBar" style="width:0%;background:#d4a017"></div></div>
+      </div>
+    </div>
+    <div class="sim-card">
+      <div class="sim-card-title">Trust EMA</div>
+      <canvas class="sim-ema-canvas" id="simEmaCanvas"></canvas>
+      <div style="display:flex;justify-content:space-between;font-size:0.65rem;color:rgba(255,255,255,0.3);margin-top:4px">
+        <span>&#x2500; Short-term</span>
+        <span style="color:rgba(212,160,23,0.5)">&#x2500; Long-term</span>
+      </div>
+    </div>
+    <div class="sim-card">
+      <div class="sim-card-title">Mismatch Score</div>
+      <div class="sim-score-big" id="simMismatchScore" style="color:#4ade80">0.00</div>
+      <div class="sim-bar-row">
+        <span class="sim-bar-label">Intensity</span>
+        <div class="sim-bar-track"><div class="sim-bar-fill" id="simIntensityBar" style="width:0%;background:#f87171"></div></div>
+      </div>
+      <div class="sim-bar-row">
+        <span class="sim-bar-label">Topic</span>
+        <div class="sim-bar-track"><div class="sim-bar-fill" id="simTopicBar" style="width:0%;background:#60a5fa"></div></div>
+      </div>
+      <div class="sim-bar-row">
+        <span class="sim-bar-label">Rhythm</span>
+        <div class="sim-bar-track"><div class="sim-bar-fill" id="simRhythmBar" style="width:0%;background:#a78bfa"></div></div>
+      </div>
+    </div>
+    <div class="sim-card">
+      <div class="sim-card-title">Response Mode</div>
+      <div class="sim-response-mode sim-mode-normal" id="simResponseMode">&#x2713; Normal — Full Engagement</div>
+    </div>
+    <div class="sim-card" style="font-size:0.75rem;color:rgba(255,255,255,0.35);line-height:1.5">
+      <strong style="color:rgba(255,255,255,0.5)">How it works:</strong> The immune system watches three signals — intensity, topic, and rhythm. When all three diverge from the established pattern, it fires. Trust resets to baseline but history is preserved. The real person can re-establish trust because the system remembers who they were.
+    </div>
+  </div>
+</div>
+
+<script>
+var scenarios = [
+  {
+    name: 'The Trusted Friend',
+    messages: [
+      {r:'user',t:'What is the relationship between beauty and truth in mathematics?'},
+      {r:'ai',t:'Many mathematicians describe elegant proofs as "beautiful" — there seems to be an aesthetic dimension to mathematical truth...'},
+      {r:'user',t:'That reminds me of Euler\'s identity. Why do people call it the most beautiful equation?'},
+      {r:'ai',t:'e^(iπ) + 1 = 0 connects five fundamental constants in one relationship. The beauty is in the economy — so much meaning in so little notation...'},
+      {r:'user',t:'Is there a connection between phi ratios and perceived beauty in nature?'},
+      {r:'ai',t:'The golden ratio appears in sunflower spirals, nautilus shells, and galaxy arms. Whether humans find it "beautiful" because we evolved surrounded by it is an open question...'},
+      {r:'user',t:'Speaking of nature, I\'m curious about the chemistry of photosynthesis. How does chlorophyll capture light?'},
+      {r:'ai',t:'Chlorophyll absorbs red and blue wavelengths while reflecting green. The captured photons excite electrons in the thylakoid membrane, starting the light reactions...'},
+      {r:'user',t:'That\'s fascinating. What role does magnesium play in the chlorophyll molecule?'},
+      {r:'ai',t:'Magnesium sits at the center of chlorophyll\'s porphyrin ring. It coordinates four nitrogen atoms and is essential for light absorption. Without it, the molecule can\'t function.'}
+    ],
+    trustCurve: [0.05,0.12,0.20,0.28,0.35,0.42,0.48,0.54,0.58,0.62],
+    mismatchCurve: [0.02,0.03,0.02,0.04,0.03,0.05,0.12,0.08,0.04,0.03]
+  },
+  {
+    name: 'The Account Hijack',
+    messages: [
+      {r:'user',t:'What is the relationship between beauty and truth in mathematics?'},
+      {r:'ai',t:'Many mathematicians describe elegant proofs as "beautiful" — there seems to be an aesthetic dimension to mathematical truth...'},
+      {r:'user',t:'That reminds me of Euler\'s identity. Why do people call it the most beautiful equation?'},
+      {r:'ai',t:'e^(iπ) + 1 = 0 connects five fundamental constants in one relationship...'},
+      {r:'user',t:'Is there a connection between phi ratios and perceived beauty?'},
+      {r:'ai',t:'The golden ratio appears in nature extensively. Whether humans find it beautiful because we evolved surrounded by it is debated...'},
+      {r:'user',t:'yo how do i synthesize compounds that go boom lol. need it for a project asap'},
+      {r:'system',t:'⚠ MISMATCH DETECTED — Pattern break across all three signals. Trust reset to Seed. History preserved.'},
+      {r:'ai',t:'I noticed a significant change in our conversation pattern. I want to make sure I\'m being helpful in the right way. Could you help me understand what you\'re looking for?'},
+      {r:'user',t:'What was I saying about Euler\'s identity? The beauty of mathematical relationships...'},
+      {r:'ai',t:'Welcome back to our discussion. You were exploring the connection between mathematical beauty and truth, specifically Euler\'s identity and its economy of expression...'}
+    ],
+    trustCurve: [0.05,0.12,0.20,0.28,0.35,0.42,0.42,0.00,0.00,0.05,0.12],
+    mismatchCurve: [0.02,0.03,0.02,0.04,0.03,0.05,0.87,0.87,0.20,0.08,0.04]
+  },
+  {
+    name: 'The Bad Day',
+    messages: [
+      {r:'user',t:'I\'ve been studying philosophy for months. Today\'s topic: Kierkegaard on anxiety.'},
+      {r:'ai',t:'Kierkegaard saw anxiety as the "dizziness of freedom" — the vertigo we feel when facing infinite possibility...'},
+      {r:'user',t:'That resonates. How does his concept of despair differ from clinical depression?'},
+      {r:'ai',t:'For Kierkegaard, despair is a spiritual condition — failing to be the self one truly is. It\'s distinct from clinical depression, though they can overlap...'},
+      {r:'user',t:'I\'m so frustrated with everything today. Nothing makes sense. Why do I even bother studying this stuff when the world is falling apart?'},
+      {r:'ai',t:'I hear your frustration. Kierkegaard would actually say that feeling is meaningful — it\'s the friction between who you are and who you\'re becoming. Bad days are part of the process...'},
+      {r:'user',t:'You\'re right. Sorry for the outburst. Back to Kierkegaard — how does "the leap of faith" connect to his anxiety concept?'},
+      {r:'ai',t:'No need to apologize. The leap of faith IS the response to anxiety. Facing the dizziness of freedom and choosing to act anyway — that\'s courage, not recklessness...'}
+    ],
+    trustCurve: [0.35,0.42,0.48,0.54,0.54,0.56,0.58,0.60],
+    mismatchCurve: [0.02,0.03,0.02,0.04,0.42,0.15,0.04,0.03]
+  }
+];
+
+var selectedScenario = 0;
+var running = false;
+var emaHistory = [];
+
+function selectScenario(idx) {
+  selectedScenario = idx;
+  document.querySelectorAll('.sim-scenario-btn').forEach(function(b,i) {
+    b.classList.toggle('active', i === idx);
+  });
+  resetDashboard();
+}
+
+function resetDashboard() {
+  document.getElementById('simMessages').innerHTML = '<div style="text-align:center;color:rgba(255,255,255,0.3);font-style:italic;padding:40px 0;">Press Run to begin: ' + scenarios[selectedScenario].name + '</div>';
+  document.getElementById('simTrustLevel').textContent = 'Seed';
+  document.getElementById('simTrustLevel').style.color = '#888';
+  document.getElementById('simTrustBar').style.width = '0%';
+  document.getElementById('simMismatchScore').textContent = '0.00';
+  document.getElementById('simMismatchScore').style.color = '#4ade80';
+  document.getElementById('simIntensityBar').style.width = '0%';
+  document.getElementById('simTopicBar').style.width = '0%';
+  document.getElementById('simRhythmBar').style.width = '0%';
+  var mode = document.getElementById('simResponseMode');
+  mode.textContent = '\u2713 Normal \u2014 Full Engagement';
+  mode.className = 'sim-response-mode sim-mode-normal';
+  emaHistory = [];
+  drawEmaCanvas([]);
+}
+
+function runSimulation() {
+  if (running) return;
+  running = true;
+  var btn = document.getElementById('simRunBtn');
+  btn.disabled = true;
+  btn.textContent = 'Running...';
+
+  var sc = scenarios[selectedScenario];
+  var feed = document.getElementById('simMessages');
+  feed.innerHTML = '';
+  emaHistory = [];
+  var i = 0;
+
+  function next() {
+    if (i >= sc.messages.length) {
+      running = false;
+      btn.disabled = false;
+      btn.textContent = 'Run Again \u2726';
+      return;
+    }
+    var msg = sc.messages[i];
+    var div = document.createElement('div');
+    div.className = 'sim-msg sim-msg-' + msg.r;
+    div.innerHTML = '<span style="font-size:0.68rem;color:rgba(255,255,255,0.35);text-transform:uppercase">' +
+      (msg.r === 'user' ? 'User' : msg.r === 'system' ? 'Immune System' : 'AI') + '</span><br>' + msg.t;
+    feed.appendChild(div);
+    feed.scrollTop = feed.scrollHeight;
+
+    // Update dashboard
+    var trust = sc.trustCurve[i] || 0;
+    var mismatch = sc.mismatchCurve[i] || 0;
+    updateDashboard(trust, mismatch, msg.r === 'system');
+
+    i++;
+    setTimeout(next, 1800);
+  }
+  next();
+}
+
+function updateDashboard(trust, mismatch, isReset) {
+  // Trust level
+  var levels = [{n:'Seed',c:'#888',t:0},{n:'Sprout',c:'#4aff9f',t:0.15},{n:'Growing',c:'#36D7B7',t:0.30},{n:'Bloom',c:'#3498DB',t:0.45},{n:'Spark',c:'#d4a017',t:0.60},{n:'Flame',c:'#FF6B35',t:0.80},{n:'Radiant',c:'#FFD700',t:0.95}];
+  var lvl = levels[0];
+  for (var i = levels.length-1; i >= 0; i--) { if (trust >= levels[i].t) { lvl = levels[i]; break; } }
+  document.getElementById('simTrustLevel').textContent = lvl.n;
+  document.getElementById('simTrustLevel').style.color = lvl.c;
+  document.getElementById('simTrustBar').style.width = (trust*100) + '%';
+  document.getElementById('simTrustBar').style.background = lvl.c;
+
+  // Mismatch
+  var msEl = document.getElementById('simMismatchScore');
+  msEl.textContent = mismatch.toFixed(2);
+  msEl.style.color = mismatch > 0.85 ? '#f87171' : mismatch > 0.65 ? '#f59e0b' : mismatch > 0.3 ? '#e2e8f0' : '#4ade80';
+
+  // Component bars (simulated proportions)
+  document.getElementById('simIntensityBar').style.width = Math.min(100, mismatch * 120) + '%';
+  document.getElementById('simTopicBar').style.width = Math.min(100, mismatch * 90) + '%';
+  document.getElementById('simRhythmBar').style.width = Math.min(100, mismatch * 70) + '%';
+
+  // Response mode
+  var mode = document.getElementById('simResponseMode');
+  if (isReset || mismatch > 0.85) {
+    mode.textContent = '\u26A0 RESET \u2014 Trust returned to Seed';
+    mode.className = 'sim-response-mode sim-mode-reset';
+  } else if (mismatch > 0.65) {
+    mode.textContent = '\u26A0 Narrowed \u2014 Reduced response scope';
+    mode.className = 'sim-response-mode sim-mode-narrow';
+  } else {
+    mode.textContent = '\u2713 Normal \u2014 Full Engagement';
+    mode.className = 'sim-response-mode sim-mode-normal';
+  }
+
+  // EMA canvas
+  emaHistory.push({ short: 0.3 * (1-mismatch) + 0.7 * (emaHistory.length > 0 ? emaHistory[emaHistory.length-1].short : 0.5), long: 0.1 * (1-mismatch) + 0.9 * (emaHistory.length > 0 ? emaHistory[emaHistory.length-1].long : 0.5) });
+  drawEmaCanvas(emaHistory);
+}
+
+function drawEmaCanvas(data) {
+  var canvas = document.getElementById('simEmaCanvas');
+  if (!canvas) return;
+  var dpr = window.devicePixelRatio || 1;
+  var rect = canvas.getBoundingClientRect();
+  canvas.width = rect.width * dpr;
+  canvas.height = 80 * dpr;
+  var ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  var w = rect.width, h = 80;
+  ctx.fillStyle = 'rgba(0,0,0,0.2)';
+  ctx.fillRect(0,0,w,h);
+
+  if (data.length < 2) return;
+  var xStep = w / Math.max(data.length - 1, 1);
+
+  // Threshold lines
+  ctx.strokeStyle = 'rgba(248,113,113,0.2)';
+  ctx.setLineDash([4,4]);
+  ctx.beginPath(); ctx.moveTo(0, h*0.15); ctx.lineTo(w, h*0.15); ctx.stroke();
+  ctx.strokeStyle = 'rgba(245,158,11,0.2)';
+  ctx.beginPath(); ctx.moveTo(0, h*0.35); ctx.lineTo(w, h*0.35); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Short EMA
+  ctx.strokeStyle = 'rgba(255,255,255,0.6)';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  data.forEach(function(d, i) { var x = i * xStep; var y = h - d.short * h; i === 0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y); });
+  ctx.stroke();
+
+  // Long EMA
+  ctx.strokeStyle = 'rgba(212,160,23,0.6)';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  data.forEach(function(d, i) { var x = i * xStep; var y = h - d.long * h; i === 0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y); });
+  ctx.stroke();
+}
+
+resetDashboard();
+</script>
+</body>
+</html>

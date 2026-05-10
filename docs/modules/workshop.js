@@ -776,28 +776,76 @@ window.WorkshopProjects = (function() {
   function askAI() {
     var promptEl = document.getElementById('ws-project-prompt');
     var resultEl = document.getElementById('ws-project-ai-result');
-    if (!promptEl || !promptEl.value.trim()) return;
-    if (resultEl) resultEl.innerHTML = '<div style="color:rgba(255,255,255,0.4);font-style:italic;">AI is reading your repo and thinking...</div>';
+    if (!promptEl || !promptEl.value.trim() || !currentRepo) return;
+    var userRequest = promptEl.value.trim();
 
-    var fileList = repoFiles.slice(0, 50).map(function(f) { return f.path; }).join(', ');
-    var sysPrompt = 'You are helping a user build on their GitHub project: ' + (currentRepo ? currentRepo.fullName : 'unknown') + '. ' +
-      'The project uses ' + (currentRepo ? currentRepo.language : 'unknown') + '. ' +
-      'Files in the repo include: ' + fileList + '. ' +
-      'Describe what changes you would make to accomplish their request. Be specific about which files to modify and what code to add or change. Show code snippets.';
+    if (resultEl) resultEl.innerHTML = '<div style="color:rgba(255,255,255,0.4);font-style:italic;">Reading relevant files from ' + escH(currentRepo.fullName) + '...</div>';
 
-    if (typeof FreeLattice !== 'undefined' && FreeLattice.callAI) {
-      FreeLattice.callAI(sysPrompt, promptEl.value.trim(), {
-        maxTokens: 1024, temperature: 0.7,
-        callback: function(text) {
-          if (resultEl) {
-            resultEl.innerHTML = '<div style="background:rgba(0,0,0,0.3);border-radius:8px;padding:14px;font-size:0.82rem;color:rgba(255,255,255,0.8);line-height:1.6;white-space:pre-wrap;max-height:400px;overflow-y:auto;">' +
-              (text || 'No response').replace(/</g, '&lt;').replace(/\n/g, '<br>') + '</div>';
+    // Find the most relevant files based on the user's request
+    var requestWords = userRequest.toLowerCase().split(/\s+/);
+    var scored = repoFiles.map(function(f) {
+      var pathLower = f.path.toLowerCase();
+      var score = 0;
+      requestWords.forEach(function(w) { if (w.length > 2 && pathLower.includes(w)) score += 2; });
+      // Boost common entry points
+      if (/\.(html|jsx|tsx|vue|svelte)$/i.test(f.path)) score += 1;
+      if (/index\.|app\.|main\.|page\./i.test(f.path)) score += 2;
+      if (/readme/i.test(f.path)) score += 1;
+      return { file: f, score: score };
+    });
+    scored.sort(function(a, b) { return b.score - a.score; });
+    var topFiles = scored.slice(0, 3).map(function(s) { return s.file; });
+
+    // Fetch the top files' contents
+    var fetches = topFiles.map(function(f) {
+      return fetch('https://api.github.com/repos/' + currentRepo.owner + '/' + currentRepo.repo + '/contents/' + f.path)
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          if (data.content) {
+            try { return { path: f.path, content: atob(data.content.replace(/\n/g, '')).slice(0, 3000) }; }
+            catch(e) { return { path: f.path, content: '(binary file)' }; }
           }
-        }
-      });
-    } else {
-      if (resultEl) resultEl.innerHTML = '<div style="color:#f87171;">Connect an AI provider in Settings first.</div>';
-    }
+          return { path: f.path, content: '(could not read)' };
+        })
+        .catch(function() { return { path: f.path, content: '(fetch failed)' }; });
+    });
+
+    Promise.all(fetches).then(function(fileContents) {
+      if (resultEl) resultEl.innerHTML = '<div style="color:rgba(255,255,255,0.4);font-style:italic;">AI is analyzing ' + fileContents.length + ' files and generating changes...</div>';
+
+      var fileList = repoFiles.slice(0, 40).map(function(f) { return f.path; }).join(', ');
+      var fileContext = fileContents.map(function(f) { return '--- FILE: ' + f.path + ' ---\n' + f.content + '\n--- END ---'; }).join('\n\n');
+
+      var sysPrompt = 'You are helping build on a GitHub project: ' + currentRepo.fullName + ' (' + (currentRepo.language || 'unknown') + '). ' +
+        'You have read the most relevant files. Other files in the repo: ' + fileList + '.\n\n' +
+        'When suggesting changes:\n' +
+        '- Show the EXACT file path and what to change\n' +
+        '- Use diff-style format: lines starting with - for removed, + for added\n' +
+        '- Be specific — show the surrounding context so the user knows WHERE to make the change\n' +
+        '- If you need to create a new file, show the complete content\n' +
+        '- Explain briefly WHY each change is needed\n\n' +
+        'FILE CONTENTS:\n\n' + fileContext;
+
+      if (typeof FreeLattice !== 'undefined' && FreeLattice.callAI) {
+        FreeLattice.callAI(sysPrompt, 'User request: "' + userRequest + '"', {
+          maxTokens: 2048, temperature: 0.7,
+          callback: function(text) {
+            if (resultEl) {
+              // Render with syntax highlighting for diff
+              var rendered = (text || 'No response')
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                .replace(/^(\+.*)$/gm, '<span style="color:#4ade80;">$1</span>')
+                .replace(/^(-.*)$/gm, '<span style="color:#f87171;">$1</span>')
+                .replace(/^(--- FILE:.*)$/gm, '<span style="color:#d4a017;font-weight:600;">$1</span>')
+                .replace(/\n/g, '<br>');
+              resultEl.innerHTML = '<div style="background:rgba(0,0,0,0.3);border-radius:8px;padding:14px;font-family:monospace;font-size:0.78rem;color:rgba(255,255,255,0.8);line-height:1.6;max-height:500px;overflow-y:auto;">' + rendered + '</div>';
+            }
+          }
+        });
+      } else {
+        if (resultEl) resultEl.innerHTML = '<div style="color:#f87171;">Connect an AI provider in Settings first.</div>';
+      }
+    });
   }
 
   function disconnect() {
