@@ -16040,7 +16040,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.29</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.30</span></div>
     </div>
   </div>
 
@@ -17014,6 +17014,137 @@ function rtToggleSeat(btn) {
   btn.classList.toggle('rt-seat-active');
   var isActive = btn.classList.contains('rt-seat-active');
   btn.style.background = isActive ? 'rgba(212,160,23,0.15)' : 'transparent';
+}
+
+// ============================================
+// rtCreateDomain — generic Round Table domain factory
+// One function. Every domain is 5 lines of config.
+// ============================================
+var _rtDomains = {}; // Registry: { medical: { history, case, running, specs } }
+
+function rtCreateDomain(config) {
+  // config: { id, specialists, seatsId, inputId, feedId, actionsId, thinkingPrefix, lpPrefix, dataAttr }
+  var domain = { history: [], caseText: '', running: false, specialists: config.specialists };
+  _rtDomains[config.id] = domain;
+
+  function getActiveSpecs() {
+    var seats = document.querySelectorAll('#' + config.seatsId + ' .rt-seat-btn.rt-seat-active');
+    var specs = [];
+    seats.forEach(function(s) {
+      var key = s.getAttribute(config.dataAttr || 'data-specialty');
+      var sp = config.specialists[key];
+      if (sp) specs.push({ key: key, name: sp.name, color: sp.color, focus: sp.focus });
+    });
+    return specs;
+  }
+
+  function begin() {
+    var input = document.getElementById(config.inputId);
+    if (!input || !input.value.trim()) { showToast('Describe your question for the specialists.'); return; }
+    var specs = getActiveSpecs();
+    if (specs.length < 2) { showToast('Select at least 2 specialties.'); return; }
+    domain.caseText = input.value.trim();
+    domain.history = [];
+    domain.running = true;
+    if (typeof LatticePoints !== 'undefined') try { LatticePoints.award(config.lpPrefix + '_start', 3, config.id + ' case discussion started'); } catch(e) {}
+    nextTurn();
+  }
+
+  function cont() {
+    if (!domain.running || !domain.caseText) return;
+    nextTurn();
+  }
+
+  function ask() {
+    var q = prompt('What would you like to ask the specialists?');
+    if (!q || !q.trim()) return;
+    domain.history.push({ speaker: 'You (Learner)', color: '#e2e8f0', text: q.trim(), isQuestion: true });
+    render();
+    nextTurn();
+  }
+
+  function nextTurn() {
+    var specs = getActiveSpecs();
+    if (specs.length < 2) return;
+    var specTurns = domain.history.filter(function(e) { return !e.isQuestion; });
+    var speakerIndex = specTurns.length % specs.length;
+    var speaker = specs[speakerIndex];
+
+    var feed = document.getElementById(config.feedId);
+    var thinkId = config.thinkingPrefix + 'Thinking';
+    if (feed) feed.innerHTML += '<div style="padding:8px 12px;color:var(--text-muted);font-style:italic;" id="' + thinkId + '">' + speaker.name + ' is reviewing...</div>';
+
+    var systemPrompt = 'You are ' + speaker.name + ', an educator specializing in ' + speaker.focus + '. ' +
+      'You are participating in a case-based learning discussion for EDUCATIONAL PURPOSES ONLY. ' +
+      (config.promptRules || '') +
+      'When other specialists have spoken, reference their points and build on or respectfully diverge. Be warm and educational. 3-5 sentences.';
+
+    var context = 'QUESTION:\n"' + domain.caseText + '"\n\n';
+    if (domain.history.length > 0) {
+      context += 'Discussion so far:\n';
+      domain.history.forEach(function(e) {
+        context += (e.isQuestion ? '[LEARNER QUESTION] ' : '') + e.speaker + ': "' + e.text + '"\n\n';
+      });
+      context += 'Now it\'s your turn. Analyze from your specialty (' + speaker.focus + ').';
+    } else {
+      context += 'You speak first. Approach from your specialty (' + speaker.focus + '). What stands out?';
+    }
+
+    if (typeof FreeLattice !== 'undefined' && FreeLattice.callAI) {
+      FreeLattice.callAI(systemPrompt, context, {
+        maxTokens: 500, temperature: 0.7,
+        callback: function(text) {
+          var thinking = document.getElementById(thinkId);
+          if (thinking) thinking.remove();
+          domain.history.push({ speaker: speaker.name, color: speaker.color, text: text || '(no response)', specialty: speaker.key });
+          render();
+          if (typeof LatticePoints !== 'undefined') try { LatticePoints.award(config.lpPrefix + '_turn', 2, config.id + ' discussion turn'); } catch(e) {}
+        }
+      });
+    } else {
+      var thinking = document.getElementById(thinkId);
+      if (thinking) thinking.innerHTML = '<span style="color:#f87171;">Connect an AI provider in Settings to begin.</span>';
+    }
+  }
+
+  function render() {
+    var feed = document.getElementById(config.feedId);
+    if (!feed) return;
+    var html = '';
+    domain.history.forEach(function(e) {
+      if (e.isQuestion) {
+        html += '<div style="padding:10px 12px;margin-bottom:8px;background:rgba(96,165,250,0.06);border:1px solid rgba(96,165,250,0.15);border-radius:8px;text-align:right;">';
+        html += '<div style="font-size:0.72rem;color:#60a5fa;font-weight:600;margin-bottom:4px;">Your Question</div>';
+        html += '<div style="font-size:0.88rem;color:var(--text-primary);line-height:1.6;">' + e.text.replace(/</g, '&lt;') + '</div>';
+        html += '</div>';
+      } else {
+        html += '<div style="padding:10px 14px;margin-bottom:8px;border-left:3px solid ' + e.color + ';background:rgba(255,255,255,0.02);border-radius:0 8px 8px 0;">';
+        html += '<div style="font-size:0.78rem;color:' + e.color + ';font-weight:600;margin-bottom:4px;">' + e.speaker + '</div>';
+        html += '<div style="font-size:0.88rem;color:var(--text-primary);line-height:1.7;font-family:Georgia,serif;">' + e.text.replace(/</g, '&lt;').replace(/\n/g, '<br>') + '</div>';
+        // Plant this button
+        html += '<button onclick="rtPlantSpecialistInsight(\'' + e.text.replace(/'/g, "\\'").replace(/\n/g, ' ').slice(0, 200) + '\',\'' + e.speaker + '\')" style="margin-top:4px;padding:3px 10px;background:none;border:1px solid rgba(212,160,23,0.15);border-radius:5px;color:rgba(212,160,23,0.5);font-size:0.68rem;cursor:pointer;">Plant this \u2726</button>';
+        html += '</div>';
+      }
+    });
+    feed.innerHTML = html;
+    var actions = document.getElementById(config.actionsId);
+    if (actions && domain.history.length > 0) actions.style.display = 'flex';
+    feed.scrollTop = feed.scrollHeight;
+    if (typeof LatticeEvents !== 'undefined') LatticeEvents.emit('caseDiscussionUpdated', { mode: config.id, turns: domain.history.filter(function(e){return !e.isQuestion;}).length });
+  }
+
+  // Return the public API for this domain
+  return { begin: begin, cont: cont, ask: ask, render: render, getHistory: function() { return domain.history; } };
+}
+
+// "Plant this" from any specialist response → Core
+function rtPlantSpecialistInsight(text, speaker) {
+  if (typeof CoreModule !== 'undefined' && CoreModule.openModal) {
+    CoreModule.openModal(speaker + ': "' + text + '"', 'roundtable', '', 'insight');
+    if (typeof showToast === 'function') showToast('\uD83C\uDF33 Ready to plant in the Core.');
+  } else {
+    if (typeof showToast === 'function') showToast('Core module not loaded yet.');
+  }
 }
 
 function rtGetActiveMinds() {
@@ -19091,7 +19222,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.10.29';
+const FL_VERSION = '5.10.30';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.

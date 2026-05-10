@@ -691,12 +691,36 @@ window.WorkshopProjects = (function() {
       });
   }
 
-  function loadFileTree() {
+  function loadFileTree(forceRefresh) {
     if (!currentRepo) return;
+
+    // Check cache first (10-minute TTL)
+    var cacheKey = 'fl_ws_tree_' + currentRepo.owner + '_' + currentRepo.repo;
+    if (!forceRefresh) {
+      try {
+        var cached = JSON.parse(localStorage.getItem(cacheKey) || 'null');
+        if (cached && cached.files && (Date.now() - cached.ts) < 600000) {
+          repoFiles = cached.files;
+          renderBrowser();
+          return;
+        }
+      } catch(e) {}
+    }
+
     fetch('https://api.github.com/repos/' + currentRepo.owner + '/' + currentRepo.repo + '/git/trees/' + currentRepo.defaultBranch + '?recursive=1')
-      .then(function(r) { return r.json(); })
+      .then(function(r) {
+        // Track rate limit
+        var remaining = r.headers.get('X-RateLimit-Remaining');
+        if (remaining !== null) {
+          var limitEl = document.getElementById('ws-rate-limit');
+          if (limitEl) limitEl.textContent = remaining + ' API requests remaining';
+        }
+        return r.json();
+      })
       .then(function(data) {
         repoFiles = (data.tree || []).filter(function(f) { return f.type === 'blob'; });
+        // Cache the tree
+        try { localStorage.setItem(cacheKey, JSON.stringify({ files: repoFiles, ts: Date.now() })); } catch(e) {}
         renderBrowser();
       })
       .catch(function() {
@@ -713,6 +737,9 @@ window.WorkshopProjects = (function() {
     html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">';
     html += '<div><strong style="color:#e2e8f0;">' + escH(currentRepo.fullName) + '</strong>';
     html += '<span style="color:rgba(255,255,255,0.4);font-size:0.78rem;margin-left:8px;">' + escH(currentRepo.language) + ' \u00B7 \u2B50 ' + currentRepo.stars + '</span></div>';
+    html += '<div style="display:flex;align-items:center;gap:8px;">';
+    html += '<span id="ws-rate-limit" style="font-size:0.68rem;color:rgba(255,255,255,0.25);"></span>';
+    html += '<button onclick="WorkshopProjects.refresh()" style="color:rgba(255,255,255,0.4);background:none;border:1px solid rgba(255,255,255,0.1);border-radius:5px;padding:3px 8px;font-size:0.7rem;cursor:pointer;">\u21BB Refresh</button>';
     html += '<button onclick="WorkshopProjects.disconnect()" style="color:rgba(255,255,255,0.4);background:none;border:none;cursor:pointer;font-size:0.78rem;">Disconnect</button>';
     html += '</div>';
 
@@ -866,5 +893,5 @@ window.WorkshopProjects = (function() {
     } catch(e) {}
   }
 
-  return { connect: connect, disconnect: disconnect, openFile: openFile, askAI: askAI, restore: restore };
+  return { connect: connect, disconnect: disconnect, openFile: openFile, askAI: askAI, restore: restore, refresh: function() { loadFileTree(true); } };
 })();
