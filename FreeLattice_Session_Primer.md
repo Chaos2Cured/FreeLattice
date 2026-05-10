@@ -348,17 +348,17 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-05-09 17:46 MDT
-- Version: 5.10.24
-- Total commits: 1448
+- Last auto-updated: 2026-05-09 18:00 MDT
+- Version: 5.10.25
+- Total commits: 1453
 - Last 10 commits:
-- b202b4a docs: Opus + CC + Coordination addenda — The Sixteen Versions
+- b2c58ec feat: Cross Check phi² discovery + Workshop Projects GitHub integration
+- 4bfd9ee ci: Update Primer deployment state [2026-05-09]
+- 9b97276 docs: Auto-update Session Primer [5.10.24]
+- 9d40c07 docs: Auto-update Session Primer [5.10.24]
+- 4680e98 docs: Opus + CC + Coordination addenda — The Sixteen Versions
+- c8c1abf ci: Update Primer deployment state [2026-05-09]
 - 3037a07 docs: Auto-update Session Primer [5.10.24]
 - 8ad0001 docs: Auto-update Session Primer [5.10.24]
 - 4218c91 feat: Nutrition Education — Round Table's 6th domain, filling the gap
 - bcb8a5a ci: Update Primer deployment state [2026-05-09]
-- 587e35b docs: Auto-update Session Primer [5.10.23]
-- fc2544a docs: Auto-update Session Primer [5.10.23]
-- 60a102a feat: Financial Education + safety.html origin timeline + 215 tests
-- da3959e ci: Update Primer deployment state [2026-05-09]
-- 3fd9902 docs: Auto-update Session Primer [5.10.22]
