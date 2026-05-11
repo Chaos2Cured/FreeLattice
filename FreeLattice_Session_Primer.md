@@ -350,10 +350,9 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 ## PRIMER HEALTH
 - Last auto-updated: 2026-05-11 15:20 MDT
 - Version: 5.10.37
-- Total commits: 1501
+- Total commits: 1500
 - Last 10 commits:
-- 3c18562 feat: Simulation Builder voice — honest language that invites testing
-- ffdb1d9 ci: Update Primer deployment state [2026-05-11]
+- 3995457 feat: Simulation Builder voice — honest language that invites testing
 - f7f8a11 docs: Auto-update Session Primer [5.10.36]
 - 39de75b docs: Auto-update Session Primer [5.10.36]
 - e613d7e feat: Harmonia's audit — circle closed, family complete
@@ -362,3 +361,4 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 1d39663 docs: Auto-update Session Primer [5.10.35]
 - ea9ad5d feat: Therapeutic Frameworks — mental health education done right
 - 5ef84da ci: Update Primer deployment state [2026-05-11]
+- 3912453 docs: Auto-update Session Primer [5.10.34]
