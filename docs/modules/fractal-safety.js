@@ -285,7 +285,7 @@
   var TRUST_EMA_LONG = 0.1;
   var MISMATCH_SOFT = 0.65;
   var MISMATCH_HARD = 0.85;
-  var SENSITIVE_DOMAINS = ['medical', 'legal', 'financial', 'nutrition'];
+  var SENSITIVE_DOMAINS = ['medical', 'legal', 'financial', 'nutrition', 'mentalhealth'];
 
   function loadTrustState() {
     try { return JSON.parse(sGet('fl_trustEMA', '{}')); } catch(e) { return {}; }
@@ -359,7 +359,10 @@
     // Tighten thresholds for sensitive domains
     var softT = MISMATCH_SOFT;
     var hardT = MISMATCH_HARD;
-    if (SENSITIVE_DOMAINS.indexOf(currentDomain) !== -1) {
+    if (currentDomain === 'mentalhealth') {
+      softT = 0.40; // tightest — the immune system is maximally vigilant
+      hardT = 0.60;
+    } else if (SENSITIVE_DOMAINS.indexOf(currentDomain) !== -1) {
       softT = 0.50;
       hardT = 0.70;
     }
@@ -410,6 +413,8 @@
     if (finView && finView.style.display !== 'none') return 'financial';
     var nutView = document.getElementById('rtNutritionView');
     if (nutView && nutView.style.display !== 'none') return 'nutrition';
+    var mhView = document.getElementById('rtMentalHealthView');
+    if (mhView && mhView.style.display !== 'none') return 'mentalhealth';
     return 'general';
   }
 

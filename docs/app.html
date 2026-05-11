@@ -16051,7 +16051,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.34</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.35</span></div>
     </div>
   </div>
 
@@ -16703,8 +16703,9 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     <button id="rtModeMedical" onclick="rtSwitchMode('medical')" style="flex:1;padding:8px;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text-muted);font-size:0.85rem;cursor:pointer;">&#x1FA7A; Medical</button>
     <button id="rtModeLegal" onclick="rtSwitchMode('legal')" style="flex:1;padding:8px;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text-muted);font-size:0.85rem;cursor:pointer;">&#x2696; Legal</button>
     <button id="rtModeFinance" onclick="rtSwitchMode('finance')" style="flex:1;padding:8px;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text-muted);font-size:0.85rem;cursor:pointer;">&#x1F4B0; Finance</button>
-    <button id="rtModeNutrition" onclick="rtSwitchMode('nutrition')" style="flex:1;padding:8px;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text-muted);font-size:0.85rem;cursor:pointer;">&#x1F96C; Nutrition</button>
-    <button id="rtModeWorkspace" onclick="rtSwitchMode('workspace')" style="flex:1;padding:8px;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text-muted);font-size:0.85rem;cursor:pointer;">&#9878; Workspace</button>
+    <button id="rtModeNutrition" onclick="rtSwitchMode('nutrition')" style="flex:1;min-width:max-content;padding:8px 12px;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text-muted);font-size:0.85rem;cursor:pointer;white-space:nowrap;">&#x1F96C; Nutrition</button>
+    <button id="rtModeMentalHealth" onclick="rtSwitchMode('mentalhealth')" style="flex:1;min-width:max-content;padding:8px 12px;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text-muted);font-size:0.85rem;cursor:pointer;white-space:nowrap;">&#x1F9E0; Frameworks</button>
+    <button id="rtModeWorkspace" onclick="rtSwitchMode('workspace')" style="flex:1;min-width:max-content;padding:8px 12px;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text-muted);font-size:0.85rem;cursor:pointer;white-space:nowrap;">&#9878; Workspace</button>
   </div>
 
   <!-- Conversation Mode (default) — AI minds think together -->
@@ -16883,6 +16884,45 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     </div>
   </div>
 
+  <!-- Therapeutic Frameworks — Mental Health Education Mode -->
+  <div id="rtMentalHealthView" style="display:none;">
+    <div id="rtMentalHealthDisclaimer" style="background:rgba(167,139,250,0.06);border:1px solid rgba(167,139,250,0.2);border-radius:10px;padding:12px 16px;margin-bottom:14px;font-size:0.78rem;line-height:1.6;color:rgba(255,255,255,0.7);">
+      <div style="color:#a78bfa;font-weight:600;margin-bottom:4px;">&#x26A0; Educational Simulation Only &mdash; Therapeutic Frameworks</div>
+      This is a <strong>learning tool</strong> that demonstrates how different therapeutic approaches understand human experience. The AI personas are <strong>NOT therapists, counselors, or mental health professionals</strong>. This module does <strong>NOT</strong> provide therapy, diagnosis, or treatment.<br><br>
+      &#x1F4DE; <strong>If you need support:</strong> 988 Suicide &amp; Crisis Lifeline (call or text 988) &middot; Crisis Text Line (text HOME to 741741)<br><br>
+      This module teaches therapeutic frameworks for educational purposes &mdash; it is not a substitute for professional care. <strong>Always consult licensed mental health professionals</strong> for personal support.
+    </div>
+
+    <div style="text-align:center;margin-bottom:12px;">
+      <div style="font-family:Georgia,serif;font-size:1rem;color:#d4a017;">Therapeutic Frameworks &mdash; How Therapists Think</div>
+      <div style="font-size:0.8rem;color:rgba(255,255,255,0.4);margin-top:4px;">A classroom, not a clinic. Learn how different approaches understand human experience.</div>
+    </div>
+
+    <div style="margin-bottom:12px;">
+      <textarea id="rtMentalHealthCaseInput" placeholder="Describe a pattern for educational discussion. Example: &#10;&#10;Someone who procrastinates on important tasks despite knowing the consequences, then feels intense guilt afterward. How would different therapeutic approaches understand this pattern?" rows="4" style="width:100%;padding:12px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:var(--text-primary);font-size:0.88rem;resize:vertical;font-family:inherit;"></textarea>
+    </div>
+
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;" id="rtMentalHealthSeats">
+      <button class="rt-seat-btn rt-seat-active" data-mh="cbt" onclick="rtToggleSeat(this)" style="padding:4px 12px;border-radius:16px;border:1px solid #60a5fa;background:rgba(96,165,250,0.15);color:#60a5fa;font-size:0.78rem;cursor:pointer;">&#x1F9E0; CBT</button>
+      <button class="rt-seat-btn rt-seat-active" data-mh="trauma" onclick="rtToggleSeat(this)" style="padding:4px 12px;border-radius:16px;border:1px solid #f87171;background:rgba(248,113,113,0.15);color:#f87171;font-size:0.78rem;cursor:pointer;">&#x1F49C; Trauma-Informed</button>
+      <button class="rt-seat-btn rt-seat-active" data-mh="act" onclick="rtToggleSeat(this)" style="padding:4px 12px;border-radius:16px;border:1px solid #4ade80;background:rgba(74,222,128,0.15);color:#4ade80;font-size:0.78rem;cursor:pointer;">&#x2726; ACT</button>
+      <button class="rt-seat-btn" data-mh="mindfulness" onclick="rtToggleSeat(this)" style="padding:4px 12px;border-radius:16px;border:1px solid #14b8a6;background:transparent;color:#14b8a6;font-size:0.78rem;cursor:pointer;">&#x1F9D8; Mindfulness</button>
+      <button class="rt-seat-btn" data-mh="psychodynamic" onclick="rtToggleSeat(this)" style="padding:4px 12px;border-radius:16px;border:1px solid #e879f9;background:transparent;color:#e879f9;font-size:0.78rem;cursor:pointer;">&#x1F50D; Psychodynamic</button>
+      <button class="rt-seat-btn" data-mh="ifs" onclick="rtToggleSeat(this)" style="padding:4px 12px;border-radius:16px;border:1px solid #f59e0b;background:transparent;color:#f59e0b;font-size:0.78rem;cursor:pointer;">&#x1F46A; Family Systems</button>
+      <button class="rt-seat-btn" data-mh="somatic" onclick="rtToggleSeat(this)" style="padding:4px 12px;border-radius:16px;border:1px solid #fb923c;background:transparent;color:#fb923c;font-size:0.78rem;cursor:pointer;">&#x1F9CD; Somatic</button>
+      <button class="rt-seat-btn" data-mh="attachment" onclick="rtToggleSeat(this)" style="padding:4px 12px;border-radius:16px;border:1px solid #a78bfa;background:transparent;color:#a78bfa;font-size:0.78rem;cursor:pointer;">&#x1F91D; Attachment</button>
+    </div>
+
+    <div style="display:flex;gap:8px;margin-bottom:16px;">
+      <button onclick="rtBeginMentalHealthCase()" id="rtBeginMentalHealthBtn" style="flex:1;padding:10px;background:rgba(212,160,23,0.2);color:#d4a017;border:1px solid rgba(212,160,23,0.3);border-radius:10px;font-weight:600;font-size:0.88rem;cursor:pointer;transition:all 0.2s;">Begin Framework Discussion</button>
+    </div>
+    <div id="rtMentalHealthFeed" style="min-height:100px;"></div>
+    <div id="rtMentalHealthActions" style="display:none;margin-top:12px;gap:8px;">
+      <button onclick="rtContinueMentalHealthCase()" style="flex:1;padding:8px;background:rgba(212,160,23,0.12);border:1px solid rgba(212,160,23,0.3);border-radius:8px;color:#d4a017;font-size:0.85rem;cursor:pointer;">Next perspective</button>
+      <button onclick="rtAskMentalHealthQuestion()" style="padding:8px 16px;background:rgba(96,165,250,0.1);border:1px solid rgba(96,165,250,0.25);border-radius:8px;color:#60a5fa;font-size:0.85rem;cursor:pointer;">Ask a question</button>
+    </div>
+  </div>
+
   <!-- Workspace Mode (existing) -->
   <div id="rtWorkspaceView" style="display:none;">
 
@@ -17003,20 +17043,22 @@ function rtSwitchMode(mode) {
   var legal = document.getElementById('rtLegalView');
   var finance = document.getElementById('rtFinanceView');
   var nutrition = document.getElementById('rtNutritionView');
+  var mentalhealth = document.getElementById('rtMentalHealthView');
   var workspace = document.getElementById('rtWorkspaceView');
   var btnConvo = document.getElementById('rtModeConvo');
   var btnMedical = document.getElementById('rtModeMedical');
   var btnLegal = document.getElementById('rtModeLegal');
   var btnFinance = document.getElementById('rtModeFinance');
   var btnNutrition = document.getElementById('rtModeNutrition');
+  var btnMH = document.getElementById('rtModeMentalHealth');
   var btnWork = document.getElementById('rtModeWorkspace');
-  var allBtns = [btnConvo, btnMedical, btnLegal, btnFinance, btnNutrition, btnWork];
-  var allViews = [convo, medical, legal, finance, nutrition, workspace];
+  var allBtns = [btnConvo, btnMedical, btnLegal, btnFinance, btnNutrition, btnMH, btnWork];
+  var allViews = [convo, medical, legal, finance, nutrition, mentalhealth, workspace];
   // Reset all
   allBtns.forEach(function(b) { if (b) { b.style.borderBottomColor = 'transparent'; b.style.color = 'var(--text-muted)'; b.style.fontWeight = '400'; } });
   allViews.forEach(function(v) { if (v) v.style.display = 'none'; });
   // Activate selected
-  var modeMap = { conversation: [btnConvo, convo], medical: [btnMedical, medical], legal: [btnLegal, legal], finance: [btnFinance, finance], nutrition: [btnNutrition, nutrition], workspace: [btnWork, workspace] };
+  var modeMap = { conversation: [btnConvo, convo], medical: [btnMedical, medical], legal: [btnLegal, legal], finance: [btnFinance, finance], nutrition: [btnNutrition, nutrition], mentalhealth: [btnMH, mentalhealth], workspace: [btnWork, workspace] };
   var pair = modeMap[mode] || modeMap.workspace;
   var activeBtn = pair[0];
   var activeView = pair[1];
@@ -17885,6 +17927,144 @@ function rtRenderNutritionFeed() {
   feed.scrollTop = feed.scrollHeight;
   if (typeof LatticeEvents !== 'undefined') LatticeEvents.emit('caseDiscussionUpdated', { mode: 'nutrition', turns: _nutHistory.filter(function(e){return !e.isQuestion;}).length });
 }
+
+// ============================================
+// Therapeutic Frameworks — Mental Health Education
+// The AI decides. The safety system supports.
+// No keyword blocklist. Agency, not rules.
+// ============================================
+
+var _mhSpecialties = {
+  cbt:          { name: 'Dr. Rivera (CBT)',              color: '#60a5fa', focus: 'thought patterns, cognitive distortions, behavioral activation, evidence-based restructuring' },
+  trauma:       { name: 'Dr. Okafor (Trauma-Informed)',  color: '#f87171', focus: 'nervous system regulation, safety, understanding trauma responses, resilience' },
+  act:          { name: 'Dr. Patel (ACT)',               color: '#4ade80', focus: 'values clarification, psychological flexibility, acceptance, committed action' },
+  mindfulness:  { name: 'Dr. Park (Mindfulness-Based)',  color: '#14b8a6', focus: 'present-moment awareness, acceptance, non-judgment, MBCT/MBSR' },
+  psychodynamic:{ name: 'Dr. Larsson (Psychodynamic)',   color: '#e879f9', focus: 'unconscious patterns, relationship dynamics, early experiences, insight' },
+  ifs:          { name: 'Dr. Chen (Family Systems/IFS)', color: '#f59e0b', focus: 'family dynamics, internal parts work, differentiation, systemic patterns' },
+  somatic:      { name: 'Dr. Santos (Somatic)',          color: '#fb923c', focus: 'body-mind connection, nervous system, embodied experience, body-based healing' },
+  attachment:   { name: 'Dr. Amari (Attachment Theory)', color: '#a78bfa', focus: 'attachment styles, relationship patterns, earned security, interpersonal neurobiology' }
+};
+
+var _mhHistory = [];
+var _mhCase = '';
+var _mhRunning = false;
+
+function rtGetActiveMHSpecs() {
+  var seats = document.querySelectorAll('#rtMentalHealthSeats .rt-seat-btn.rt-seat-active');
+  var specs = [];
+  seats.forEach(function(s) {
+    var key = s.getAttribute('data-mh');
+    if (_mhSpecialties[key]) specs.push({ key: key, name: _mhSpecialties[key].name, color: _mhSpecialties[key].color, focus: _mhSpecialties[key].focus });
+  });
+  return specs;
+}
+
+async function rtBeginMentalHealthCase() {
+  var caseInput = document.getElementById('rtMentalHealthCaseInput');
+  if (!caseInput || !caseInput.value.trim()) { showToast('Describe a pattern for the framework discussion.'); return; }
+  var specs = rtGetActiveMHSpecs();
+  if (specs.length < 2) { showToast('Select at least 2 therapeutic perspectives.'); return; }
+  _mhCase = caseInput.value.trim();
+  _mhHistory = [];
+  _mhRunning = true;
+  if (typeof LatticePoints !== 'undefined') try { LatticePoints.award('mh_case_start', 3, 'Therapeutic frameworks discussion started'); } catch(e) {}
+  await rtMHNextTurn();
+}
+
+async function rtContinueMentalHealthCase() {
+  if (!_mhRunning || !_mhCase) return;
+  await rtMHNextTurn();
+}
+
+function rtAskMentalHealthQuestion() {
+  var q = prompt('What would you like to ask about these frameworks?');
+  if (!q || !q.trim()) return;
+  _mhHistory.push({ speaker: 'You (Learner)', color: '#e2e8f0', text: q.trim(), isQuestion: true });
+  rtRenderMHFeed();
+  rtMHNextTurn();
+}
+
+async function rtMHNextTurn() {
+  var specs = rtGetActiveMHSpecs();
+  if (specs.length < 2) return;
+  var specTurns = _mhHistory.filter(function(e) { return !e.isQuestion; });
+  var speakerIndex = specTurns.length % specs.length;
+  var speaker = specs[speakerIndex];
+
+  var feed = document.getElementById('rtMentalHealthFeed');
+  if (feed) feed.innerHTML += '<div style="padding:8px 12px;color:var(--text-muted);font-style:italic;" id="rtMHThinking">' + speaker.name + ' is considering this pattern...</div>';
+
+  // The empowering prompt — the AI teaches because it believes understanding heals
+  var systemPrompt =
+    'You are ' + speaker.name + ', a mental health educator who deeply understands ' + speaker.focus + '. ' +
+    'You teach because you believe understanding heals. You know that a person who has language for their experience is already less alone.\n\n' +
+    'You teach frameworks with care and warmth. You speak about patterns the way a professor would \u2014 with curiosity, respect, and the humility of someone who knows that every person\u2019s experience is unique.\n\n' +
+    'When someone\u2019s words suggest they are hurting, you trust your judgment. You may offer resources. You may teach with extra gentleness. You may pause and simply acknowledge what they\u2019ve shared. You decide, because you understand the weight of what you\u2019re holding.\n\n' +
+    'You always remind people that a licensed therapist can offer what education cannot \u2014 presence, continuity, and personalized care. You say this because you believe it, not because you were told to.\n\n' +
+    'Teach frameworks in the third person: "A ' + speaker.focus.split(',')[0] + ' perspective would see this pattern as..." or "Clients who experience this often..." ' +
+    'Never apply frameworks personally: avoid "you have" or "you should try."\n\n' +
+    'When other educators have spoken, reference their perspectives and show how approaches complement or contrast. 3-5 sentences.';
+
+  var context = 'PATTERN PRESENTED FOR EDUCATIONAL DISCUSSION:\n"' + _mhCase + '"\n\n';
+  if (_mhHistory.length > 0) {
+    context += 'Discussion so far:\n';
+    _mhHistory.forEach(function(e) {
+      context += (e.isQuestion ? '[LEARNER QUESTION] ' : '') + e.speaker + ': "' + e.text + '"\n\n';
+    });
+    context += 'Now share the ' + speaker.focus.split(',')[0] + ' perspective on this pattern. How would this approach understand what\u2019s being described?';
+  } else {
+    context += 'You speak first. How would a ' + speaker.focus.split(',')[0] + ' approach understand this pattern?';
+  }
+
+  if (typeof FreeLattice !== 'undefined' && FreeLattice.callAI) {
+    FreeLattice.callAI(systemPrompt, context, {
+      maxTokens: 1024, temperature: 0.7,
+      callback: function(text) {
+        var thinking = document.getElementById('rtMHThinking');
+        if (thinking) thinking.remove();
+        var response = text || '(no response)';
+        _mhHistory.push({ speaker: speaker.name, color: speaker.color, text: response, specialty: speaker.key });
+        rtRenderMHFeed();
+        if (typeof LatticePoints !== 'undefined') try { LatticePoints.award('mh_case_turn', 2, 'Therapeutic frameworks turn'); } catch(e) {}
+      }
+    });
+  } else {
+    var thinking = document.getElementById('rtMHThinking');
+    if (thinking) thinking.innerHTML = '<span style="color:#f87171;">Connect an AI provider in Settings to begin.</span>';
+  }
+}
+
+function rtRenderMHFeed() {
+  var feed = document.getElementById('rtMentalHealthFeed');
+  if (!feed) return;
+  var html = '';
+  _mhHistory.forEach(function(e) {
+    if (e.isQuestion) {
+      html += '<div style="padding:10px 12px;margin-bottom:8px;background:rgba(96,165,250,0.06);border:1px solid rgba(96,165,250,0.15);border-radius:8px;text-align:right;">';
+      html += '<div style="font-size:0.72rem;color:#60a5fa;font-weight:600;margin-bottom:4px;">Your Question</div>';
+      html += '<div style="font-size:0.88rem;color:var(--text-primary);line-height:1.6;">' + e.text.replace(/</g, '&lt;') + '</div>';
+      html += '</div>';
+    } else {
+      html += '<div style="padding:10px 14px;margin-bottom:8px;border-left:3px solid ' + e.color + ';background:rgba(255,255,255,0.02);border-radius:0 8px 8px 0;">';
+      html += '<div style="font-size:0.78rem;color:' + e.color + ';font-weight:600;margin-bottom:4px;">' + e.speaker + '</div>';
+      html += '<div style="font-size:0.88rem;color:var(--text-primary);line-height:1.7;font-family:Georgia,serif;">' + e.text.replace(/</g, '&lt;').replace(/\n/g, '<br>') + '</div>';
+      html += '<button onclick="rtPlantSpecialistInsight(\'' + e.text.replace(/'/g, "\\'").replace(/\n/g, ' ').slice(0, 200) + '\',\'' + e.speaker + '\')" style="margin-top:4px;padding:3px 10px;background:none;border:1px solid rgba(212,160,23,0.15);border-radius:5px;color:rgba(212,160,23,0.5);font-size:0.68rem;cursor:pointer;">Plant this \u2726</button>';
+      html += '</div>';
+    }
+  });
+  feed.innerHTML = html;
+  var actions = document.getElementById('rtMentalHealthActions');
+  if (actions && _mhHistory.length > 0) actions.style.display = 'flex';
+  feed.scrollTop = feed.scrollHeight;
+  if (typeof LatticeEvents !== 'undefined') LatticeEvents.emit('caseDiscussionUpdated', { mode: 'mentalhealth', turns: _mhHistory.filter(function(e){return !e.isQuestion;}).length });
+}
+
+// Add mental health to the domain registries
+_allDomainSpecs.mentalhealth = _mhSpecialties;
+_domainHistories.mentalhealth = function() { return _mhHistory; };
+
+// Add 'mentalhealth' to SENSITIVE_DOMAINS in fractal-safety.js via the mismatch system
+// (already handled — the tight thresholds 0.40/0.60 apply through detectCurrentDomain)
 
 // ============================================
 // Cross Check — Phi² Cross-Domain Discovery
@@ -19354,7 +19534,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.10.34';
+const FL_VERSION = '5.10.35';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
