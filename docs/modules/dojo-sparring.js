@@ -357,12 +357,11 @@
     ctx.arc(0, 0, glowRadius, 0, TAU);
     ctx.fill();
 
-    // Add canvas shadow blur for the fractal — gives every stroke a soft halo
-    ctx.shadowBlur = 12;
-    ctx.shadowColor = hslStr(hue, 90, 60, 0.8);
+    // Shadow only on the outer glow, NOT on recursive branches (massive perf win)
+    // Each branch with shadowBlur forces GPU compositing — 243+ per form at depth 5
 
-    // Draw recursive fractal
-    drawFractalBranch(0, 0, size * pulse, depth, hue, glow, 0, c.style);
+    // Draw recursive fractal (no shadowBlur — clean, fast)
+    drawFractalBranch(0, 0, size * pulse, Math.min(depth, 4), hue, glow, 0, c.style);
 
     // Reset shadow before highlight ring
     ctx.shadowBlur = 0;
@@ -460,6 +459,7 @@
 
   // ── Particle System ───────────────────────────────
   function spawnParticle(x, y, hue, type) {
+    if (particles.length > 200) return; // cap to prevent memory leak
     particles.push({
       x: x, y: y,
       vx: (Math.random() - 0.5) * 3,
@@ -622,8 +622,8 @@
     cB.targetSize = 75 - sizeShift;
     cA.targetGlow = 0.7 + clamp(advantage, 0, 0.5);
     cB.targetGlow = 0.7 + clamp(-advantage, 0, 0.5);
-    cA.targetFractalDepth = 3 + Math.round(cA.roundScore * 3);
-    cB.targetFractalDepth = 3 + Math.round(cB.roundScore * 3);
+    cA.targetFractalDepth = Math.min(4, 3 + Math.round(cA.roundScore * 1.5));
+    cB.targetFractalDepth = Math.min(4, 3 + Math.round(cB.roundScore * 1.5));
 
     // Color blending from adaptation
     if (cA.adaptation > 0.1) {
@@ -1313,8 +1313,8 @@
           combatantB.targetSize = 75 - adv * 35;
           combatantA.targetGlow = 0.7 + clamp(adv, 0, 0.5);
           combatantB.targetGlow = 0.7 + clamp(-adv, 0, 0.5);
-          combatantA.targetFractalDepth = 3 + Math.round(combatantA.roundScore * 3);
-          combatantB.targetFractalDepth = 3 + Math.round(combatantB.roundScore * 3);
+          combatantA.targetFractalDepth = Math.min(4, 3 + Math.round(combatantA.roundScore * 1.5));
+          combatantB.targetFractalDepth = Math.min(4, 3 + Math.round(combatantB.roundScore * 1.5));
         }
 
         // Spawn thinking particles

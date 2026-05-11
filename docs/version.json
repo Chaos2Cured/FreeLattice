@@ -1,1 +1,1 @@
-{"version": "5.10.32", "date": "2026-05-10", "note": "Four room connections complete: RT→Education, Education→RT, Garden→Chat, Workshop→Core. The lattice is connected."}
+{"version": "5.10.33", "date": "2026-05-10", "note": "Unified Memory (RT→RAG), Dojo perf fix (shadow removed, depth capped, particle limit), Education in FLSearch"}

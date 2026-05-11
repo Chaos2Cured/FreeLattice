@@ -16040,7 +16040,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.32</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.33</span></div>
     </div>
   </div>
 
@@ -17137,6 +17137,23 @@ function rtCreateDomain(config) {
   return { begin: begin, cont: cont, ask: ask, render: render, getHistory: function() { return domain.history; } };
 }
 
+// ── Unified Memory: persist RT exchanges for RAG + Lattice Letters ──
+function persistRTExchange(mode, specialistName, content, caseText) {
+  try {
+    var memory = JSON.parse(localStorage.getItem('fl_rtMemory') || '[]');
+    memory.push({
+      mode: mode,
+      specialist: specialistName,
+      content: (content || '').slice(0, 500),
+      caseContext: (caseText || '').slice(0, 200),
+      timestamp: Date.now()
+    });
+    // Keep last 50 entries — enough for context, light on storage
+    if (memory.length > 50) memory = memory.slice(-50);
+    localStorage.setItem('fl_rtMemory', JSON.stringify(memory));
+  } catch(e) {}
+}
+
 // "Plant this" from any specialist response → Core
 function rtPlantSpecialistInsight(text, speaker) {
   if (typeof CoreModule !== 'undefined' && CoreModule.openModal) {
@@ -18019,10 +18036,22 @@ function rtGoDeeper(targetDomain, specialistKey) {
 }
 
 // Wire Cross Check buttons into each domain's render function
-// Cross Check listens for case discussion updates via LatticeEvents
+// Cross Check + Memory persistence listens for case discussion updates
 if (typeof LatticeEvents !== 'undefined') {
   LatticeEvents.on('caseDiscussionUpdated', function(data) {
     if (data && data.turns >= 4) rtShowCrossCheck(data.mode);
+    // Persist latest exchange for unified memory / RAG
+    if (data && data.mode && typeof persistRTExchange === 'function') {
+      var histFn = _domainHistories[data.mode];
+      if (histFn) {
+        var h = histFn();
+        var latest = h.length > 0 ? h[h.length - 1] : null;
+        if (latest && !latest.isQuestion) {
+          var caseVar = data.mode === 'medical' ? _medCase : data.mode === 'legal' ? _legalCase : data.mode === 'financial' ? _finCase : _nutCase;
+          persistRTExchange(data.mode, latest.speaker, latest.text, caseVar || '');
+        }
+      }
+    }
   });
 }
 </script>
@@ -19311,7 +19340,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.10.32';
+const FL_VERSION = '5.10.33';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -28366,8 +28395,10 @@ window.FLSearch = (function() {
     { db: 'FreeLatticeCore', store: 'contributions', label: 'Core wisdom', textField: 'content' },
     { db: 'FreeLatticeQuestionCorner', store: 'Questions', label: 'Question Corner', textField: null },
     { db: 'FreeLatticeLetters', store: 'letters', label: 'Lattice Letter', textField: 'content' },
-    { db: 'FreeLatticeDB', store: 'messages', label: 'Past conversation', textField: 'content' }
+    { db: 'FreeLatticeDB', store: 'messages', label: 'Past conversation', textField: 'content' },
+    { db: 'FreeLatticeEducation', store: 'sessions', label: 'Education session', textField: 'topic' }
     // quiet-room-db is INTENTIONALLY excluded. The journal is private and sacred.
+    // Round Table discussions persist in localStorage (fl_rtMemory) and are searched separately.
   ];
 
   var STOP_WORDS = ['the','is','a','an','and','or','but','in','on','at','to','for','of','with','by','from','it','this','that','was','are','be','has','have','had','do','does','did','will','would','could','should','may','might','can','not','no','so','if','then','than','when','what','how','why','who','which','where','i','you','we','they','he','she','my','your','our','their','just','like','about','been','some','very','also','its','more','only','into','over','such','after','other','than','most','much','some'];
@@ -29263,6 +29294,23 @@ async function sendMessage() {
       }
     } catch(e) { /* RAG search failed — message still sends without it */ }
   }
+
+  // Enrich RAG with Round Table memory (unified context)
+  try {
+    var rtMem = JSON.parse(localStorage.getItem('fl_rtMemory') || '[]');
+    if (rtMem.length > 0 && message.length > 10) {
+      var msgWords = message.toLowerCase().split(/\s+/);
+      var relevant = rtMem.filter(function(m) {
+        return msgWords.some(function(w) { return w.length > 3 && m.content.toLowerCase().includes(w); });
+      }).slice(-3);
+      if (relevant.length > 0) {
+        state._ragContext += '\n[From Round Table discussions:]\n';
+        relevant.forEach(function(r) {
+          state._ragContext += '- ' + r.specialist + ' (' + r.mode + '): "' + r.content.slice(0, 120) + '..."\n';
+        });
+      }
+    }
+  } catch(e) {}
 
   // Build messages array — use smart context if enabled
   let messages;
