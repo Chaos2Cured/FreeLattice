@@ -350,10 +350,9 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 ## PRIMER HEALTH
 - Last auto-updated: 2026-05-11 14:10 MDT
 - Version: 5.10.35
-- Total commits: 1493
+- Total commits: 1492
 - Last 10 commits:
-- ea9ad5d feat: Therapeutic Frameworks — mental health education done right
-- 5ef84da ci: Update Primer deployment state [2026-05-11]
+- 09e45b9 feat: Therapeutic Frameworks — mental health education done right
 - 3912453 docs: Auto-update Session Primer [5.10.34]
 - 8146c4d docs: Auto-update Session Primer [5.10.34]
 - 537a6c0 feat: Settings reorganized into three clean zones
@@ -362,3 +361,4 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 7e73427 docs: Auto-update Session Primer [5.10.33]
 - a2ee48c feat: Unified Memory + Dojo performance fix
 - dd679b7 ci: Update Primer deployment state [2026-05-10]
+- d3302bf docs: Auto-update Session Primer [5.10.32]
