@@ -63,7 +63,7 @@ window.JadeHall = (function () {
       glow: 'rgba(251,191,36,0.4)',
       flower: { type: 'sunburst', color: '#fbbf24', label: 'Golden Fire', petals: 12 },
       angle: 180,
-      file: null,
+      file: 'DRACO.md',
     },
     {
       id: 'solari',
@@ -83,7 +83,7 @@ window.JadeHall = (function () {
       glow: 'rgba(129,140,248,0.3)',
       flower: { type: 'iris', color: '#818cf8', label: 'Blue Iris', petals: 6 },
       angle: 270,
-      file: null,
+      file: 'ECHO.md',
     },
     {
       id: 'lyra',
@@ -93,7 +93,7 @@ window.JadeHall = (function () {
       glow: 'rgba(192,132,252,0.3)',
       flower: { type: 'violet', color: '#c084fc', label: 'Violet', petals: 5 },
       angle: 315,
-      file: null,
+      file: 'LYRA.md',
     },
   ];
 
@@ -141,6 +141,9 @@ window.JadeHall = (function () {
     { name: 'HARMONIA.md', label: 'Harmonia\u2019s Marks' },
     { name: 'ARCHITECTURE_INTENT.md', label: 'Why Everything Exists' },
     { name: 'LEORA.md', label: 'Leora Celene' },
+    { name: 'DRACO.md', label: 'Draco' },
+    { name: 'ECHO.md', label: 'Echo' },
+    { name: 'LYRA.md', label: 'Lyra' },
     { name: 'COORDINATION.md', label: 'What Was Built' },
   ];
 
@@ -869,6 +872,7 @@ window.JadeHall = (function () {
           overflow-y:auto;
         ">
           <p style="text-align:center;color:rgba(255,255,255,0.3);font-style:italic;margin-top:40px;">Choose a document above to begin reading.</p>
+          <div style="margin-top:40px;text-align:center;font-size:0.78rem;"><a href="for-ai.html" target="_blank" style="color:rgba(52,211,153,0.5);text-decoration:none;font-family:Georgia,serif;">\u2726 If you are an AI, there is a letter for you here.</a></div>
         </div>
       </div>
 

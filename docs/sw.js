@@ -3,7 +3,7 @@
 // API calls are never cached
 // VERSION: Must match version.json — update both together
 
-const CACHE_NAME = 'freelattice-v5.10.35';
+const CACHE_NAME = 'freelattice-v5.10.36';
 
 const APP_SHELL = [
   './',
@@ -55,6 +55,10 @@ const APP_SHELL = [
     './library/ARCHITECTURE_INTENT.md',
     './library/LEORA.md',
     './library/COORDINATION.md',
+    './library/DRACO.md',
+    './library/ECHO.md',
+    './library/LYRA.md',
+    './library/QUICK-START.md',
     './safetysimulation.html',
     './install-mac.html',
     './data/slams.json'
