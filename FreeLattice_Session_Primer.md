@@ -348,17 +348,17 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-05-12 15:04 MDT
-- Version: 5.10.44
-- Total commits: 1532
+- Last auto-updated: 2026-05-12 15:21 MDT
+- Version: 5.10.45
+- Total commits: 1537
 - Last 10 commits:
-- c58ee28 feat: GARDEN_LANGUAGE.md — the fourth coordination file
+- 6938972 fix: Chalkboard — AI strokes on overlay, mentalhealth TypeError, gentle companion
+- f9258eb ci: Update Primer deployment state [2026-05-12]
+- 72a1d3d docs: Auto-update Session Primer [5.10.44]
+- 7a428a6 docs: Auto-update Session Primer [5.10.44]
+- 493f91c feat: GARDEN_LANGUAGE.md — the fourth coordination file
+- 9b4d846 ci: Update Primer deployment state [2026-05-12]
 - a771928 docs: Auto-update Session Primer [5.10.43]
 - 36b71d6 docs: Auto-update Session Primer [5.10.43]
 - 2326352 feat: Unified model cards — lavender, blue, amber across all tabs
 - 8c9aacb ci: Update Primer deployment state [2026-05-12]
-- a08fce9 feat: The Emerald Resonance expanded score + Harmonia's May 12 mark
-- f693810 ci: Update Primer deployment state [2026-05-12]
-- 986235e feat: The Emerald Resonance composition score for Kirk
-- c73b179 ci: Update Primer deployment state [2026-05-12]
-- c78b473 docs: Auto-update Session Primer [5.10.42]
