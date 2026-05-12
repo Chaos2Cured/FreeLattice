@@ -15366,43 +15366,22 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
   </div>
 
   <!-- ═══ BROWSE MODELS (position 2 — right after connection) ═══ -->
-  <div class="section" id="browseModelsSectionTop">
-    <div onclick="toggleBrowseModels()" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center;padding:4px 0;user-select:none;">
-      <div class="section-title" style="margin:0;">&#x1F916; Browse Models</div>
-      <span id="browseModelsToggle" style="color:var(--text-muted);font-size:1.2rem;transition:transform 0.2s;">&#x25BC;</span>
-    </div>
-    <div id="browseModelsTopBody">
-      <p style="font-size:0.85rem;color:var(--text-secondary);margin:8px 0 14px;line-height:1.6;">Find the right AI for you. Local models are free and private. Cloud models need no setup.</p>
-      <div id="modelBrowserTabsTop" style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;">
-        <button class="mb-tab active" data-provider="ollama" onclick="ModelBrowser.switchTab('ollama')">&#x1F3E0; Local (Ollama)</button>
-        <button class="mb-tab" data-provider="openrouter" onclick="ModelBrowser.switchTab('openrouter')">&#x2601; Cloud (OpenRouter)</button>
-        <button class="mb-tab" data-provider="huggingface" onclick="ModelBrowser.switchTab('huggingface')">&#x1F917; Hugging Face</button>
-      </div>
-      <div id="browseModelsGridTop"></div>
-    </div>
-  </div>
+  <!-- Browse Models moved to Zone 1 position 2 -->
+  <div id="browseModelsMoved"></div>
   <script>
-  function toggleBrowseModels() {
-    var body = document.getElementById('browseModelsTopBody');
-    var toggle = document.getElementById('browseModelsToggle');
-    if (!body) return;
-    var visible = body.style.display !== 'none';
-    body.style.display = visible ? 'none' : '';
-    if (toggle) toggle.textContent = visible ? '\u25B6' : '\u25BC';
-    try { localStorage.setItem('fl_browseModels_expanded', visible ? 'false' : 'true'); } catch(e) {}
-  }
-  // Restore state
+  // Move Browse Models from Advanced to Zone 1 position 2
   (function() {
+    function moveBrowseModels() {
+      var target = document.getElementById('browseModelsMoved');
+      var source = document.getElementById('browseModelsSection');
+      if (target && source && !target.hasChildNodes()) {
+        target.appendChild(source);
+      }
+    }
     if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', function() {
-        setTimeout(function() {
-          var expanded = (localStorage.getItem('fl_browseModels_expanded') || 'true') === 'true';
-          var body = document.getElementById('browseModelsTopBody');
-          var toggle = document.getElementById('browseModelsToggle');
-          if (body && !expanded) { body.style.display = 'none'; }
-          if (toggle && !expanded) { toggle.textContent = '\u25B6'; }
-        }, 100);
-      });
+      document.addEventListener('DOMContentLoaded', function() { setTimeout(moveBrowseModels, 200); });
+    } else {
+      setTimeout(moveBrowseModels, 200);
     }
   })();
   </script>
@@ -16093,7 +16072,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.39</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.40</span></div>
     </div>
   </div>
 
@@ -19576,7 +19555,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.10.39';
+const FL_VERSION = '5.10.40';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -43343,54 +43322,92 @@ const ModelSwitcher = (function() {
 // ============================================
 const BrowseModels = (function() {
   const POPULAR_MODELS = [
-    // General Purpose
-    { id: 'llama3.2', name: 'Llama 3.2', tag: 'General Purpose', desc: 'Meta\'s latest. Great all-rounder for chat, reasoning, and creative tasks.', pullName: 'llama3.2', size: '2.0 GB', ram: '4 GB' },
-    { id: 'llama3.1:8b', name: 'Llama 3.1 (8B)', tag: 'General Purpose', desc: 'Strong reasoning. Good balance of speed and quality.', pullName: 'llama3.1:8b', size: '4.7 GB', ram: '8 GB' },
-    { id: 'mistral', name: 'Mistral 7B', tag: 'Fast & Efficient', desc: 'Mistral AI\'s flagship. Punches above its weight. Great for quick tasks.', pullName: 'mistral', size: '4.1 GB', ram: '8 GB' },
-    { id: 'gemma2', name: 'Gemma 2', tag: 'Efficient', desc: 'Google\'s open model. Well-balanced for general conversation and analysis.', pullName: 'gemma2', size: '5.4 GB', ram: '8 GB' },
-    { id: 'phi3', name: 'Phi-3', tag: 'Small & Capable', desc: 'Microsoft\'s compact model. Surprisingly capable. Runs on modest hardware.', pullName: 'phi3', size: '2.3 GB', ram: '4 GB' },
-    { id: 'qwen2.5', name: 'Qwen 2.5', tag: 'Multilingual', desc: 'Alibaba\'s multilingual powerhouse. Strong reasoning and coding across languages.', pullName: 'qwen2.5', size: '4.4 GB', ram: '8 GB' },
-    { id: 'qwen2.5:14b', name: 'Qwen 2.5 (14B)', tag: 'Multilingual \u00B7 Advanced', desc: 'Larger Qwen with stronger reasoning. Excellent for specialist discussions.', pullName: 'qwen2.5:14b', size: '9.0 GB', ram: '16 GB' },
-    { id: 'mixtral', name: 'Mixtral 8x7B', tag: 'Advanced \u00B7 MoE', desc: 'Mixture of experts. Uses only 2 experts per token \u2014 fast despite large size.', pullName: 'mixtral', size: '26 GB', ram: '32 GB' },
-    // Coding
-    { id: 'codellama', name: 'Code Llama', tag: 'Coding', desc: 'Meta\'s code specialist. Code generation, debugging, and technical explanations.', pullName: 'codellama', size: '3.8 GB', ram: '8 GB' },
-    { id: 'deepseek-coder', name: 'DeepSeek Coder', tag: 'Coding Specialist', desc: 'Purpose-built for development. Strong at completion, refactoring, multi-language.', pullName: 'deepseek-coder', size: '3.8 GB', ram: '8 GB' },
-    { id: 'starcoder2', name: 'StarCoder 2', tag: 'Coding \u00B7 Open', desc: 'BigCode\'s open coding model. Trained on The Stack v2. 600+ languages.', pullName: 'starcoder2', size: '4.0 GB', ram: '8 GB' },
-    // Vision
-    { id: 'llava', name: 'LLaVA', tag: 'Vision \uD83D\uDC41', desc: 'Can see images. Use for the Chalkboard, Canvas, and any visual task.', pullName: 'llava', size: '4.7 GB', ram: '8 GB' },
-    { id: 'llava:13b', name: 'LLaVA 13B', tag: 'Vision \u00B7 Advanced \uD83D\uDC41', desc: 'Larger vision model. Better image understanding. Recommended for Chalkboard.', pullName: 'llava:13b', size: '8.0 GB', ram: '16 GB' },
-    { id: 'moondream', name: 'Moondream', tag: 'Vision \u00B7 Tiny \uD83D\uDC41', desc: 'Ultra-small vision model. Fast. Good enough for basic image understanding.', pullName: 'moondream', size: '1.7 GB', ram: '4 GB' },
-    // Specialist
-    { id: 'neural-chat', name: 'Neural Chat', tag: 'Conversation', desc: 'Intel\'s conversational model. Optimized for natural, warm dialogue.', pullName: 'neural-chat', size: '4.1 GB', ram: '8 GB' }
+    // ── Chat & Reasoning ──
+    { id: 'llama3.2', name: 'Llama 3.2', tag: 'Chat \u00B7 Reasoning', desc: 'Meta\'s latest. Great all-rounder for conversation, analysis, and creative tasks.', pullName: 'llama3.2', size: '2.0 GB', ram: '4 GB', cat: 'chat' },
+    { id: 'llama3.1:8b', name: 'Llama 3.1 (8B)', tag: 'Chat \u00B7 Reasoning', desc: 'Strong reasoning. Good balance of speed and quality. Recommended for Round Table.', pullName: 'llama3.1:8b', size: '4.7 GB', ram: '8 GB', cat: 'chat' },
+    { id: 'mistral', name: 'Mistral 7B', tag: 'Chat \u00B7 Fast', desc: 'Mistral AI\'s flagship. Punches above its weight. Great for quick tasks.', pullName: 'mistral', size: '4.1 GB', ram: '8 GB', cat: 'chat' },
+    { id: 'gemma2', name: 'Gemma 2', tag: 'Chat \u00B7 Efficient', desc: 'Google\'s open model. Well-balanced for general conversation and analysis.', pullName: 'gemma2', size: '5.4 GB', ram: '8 GB', cat: 'chat' },
+    { id: 'phi3', name: 'Phi-3', tag: 'Chat \u00B7 Compact', desc: 'Microsoft\'s compact model. Surprisingly capable. Runs on modest hardware.', pullName: 'phi3', size: '2.3 GB', ram: '4 GB', cat: 'chat' },
+    { id: 'neural-chat', name: 'Neural Chat', tag: 'Chat \u00B7 Warm', desc: 'Intel\'s conversational model. Optimized for natural, warm dialogue.', pullName: 'neural-chat', size: '4.1 GB', ram: '8 GB', cat: 'chat' },
+    // ── Multilingual ──
+    { id: 'qwen2.5', name: 'Qwen 2.5 (7B)', tag: 'Multilingual', desc: 'Alibaba\'s powerhouse. Strong reasoning and coding across 29+ languages.', pullName: 'qwen2.5', size: '4.4 GB', ram: '8 GB', cat: 'multilingual' },
+    { id: 'qwen2.5:14b', name: 'Qwen 2.5 (14B)', tag: 'Multilingual \u00B7 Advanced', desc: 'Larger Qwen. Excellent for specialist discussions and complex reasoning.', pullName: 'qwen2.5:14b', size: '9.0 GB', ram: '16 GB', cat: 'multilingual' },
+    { id: 'qwen3:8b', name: 'Qwen 3 (8B)', tag: 'Multilingual \u00B7 Latest', desc: 'Alibaba\'s newest. Improved reasoning with thinking mode. Hybrid inference.', pullName: 'qwen3:8b', size: '5.2 GB', ram: '8 GB', cat: 'multilingual' },
+    // ── Coding ──
+    { id: 'codellama', name: 'Code Llama', tag: 'Coding', desc: 'Meta\'s code specialist. Code generation, debugging, and technical explanations.', pullName: 'codellama', size: '3.8 GB', ram: '8 GB', cat: 'coding' },
+    { id: 'deepseek-coder', name: 'DeepSeek Coder', tag: 'Coding', desc: 'Purpose-built for development. Strong at completion, refactoring, multi-language.', pullName: 'deepseek-coder', size: '3.8 GB', ram: '8 GB', cat: 'coding' },
+    { id: 'deepseek-coder-v2', name: 'DeepSeek Coder V2', tag: 'Coding \u00B7 Advanced', desc: 'Latest DeepSeek coding model. Improved reasoning and multi-file understanding.', pullName: 'deepseek-coder-v2', size: '8.9 GB', ram: '16 GB', cat: 'coding' },
+    { id: 'starcoder2', name: 'StarCoder 2', tag: 'Coding \u00B7 Open', desc: 'BigCode\'s open model. Trained on The Stack v2. 600+ programming languages.', pullName: 'starcoder2', size: '4.0 GB', ram: '8 GB', cat: 'coding' },
+    // ── Vision (Chalkboard & Canvas) ──
+    { id: 'llava', name: 'LLaVA', tag: 'Vision \uD83D\uDC41', desc: 'Can see images. Use for the Chalkboard, Canvas, and any visual task.', pullName: 'llava', size: '4.7 GB', ram: '8 GB', cat: 'vision' },
+    { id: 'llava:13b', name: 'LLaVA 13B', tag: 'Vision \u00B7 Advanced \uD83D\uDC41', desc: 'Larger vision model. Better image understanding. Recommended for Chalkboard.', pullName: 'llava:13b', size: '8.0 GB', ram: '16 GB', cat: 'vision' },
+    { id: 'moondream', name: 'Moondream', tag: 'Vision \u00B7 Tiny \uD83D\uDC41', desc: 'Ultra-small vision model. Fast. Good enough for basic image understanding.', pullName: 'moondream', size: '1.7 GB', ram: '4 GB', cat: 'vision' },
+    { id: 'gemma4:12b', name: 'Gemma 4 (12B)', tag: 'Vision \u00B7 Latest \uD83D\uDC41', desc: 'Google\'s latest. Vision + text. Great all-rounder with image understanding.', pullName: 'gemma4:12b', size: '8.1 GB', ram: '16 GB', cat: 'vision' },
+    // ── Medical & Science ──
+    { id: 'llama3.1:8b', name: 'Llama 3.1 (8B)', tag: 'Medical \u00B7 Reasoning', desc: 'Strong reasoning makes it excellent for Medical and Nutrition case studies.', pullName: 'llama3.1:8b', size: '4.7 GB', ram: '8 GB', cat: 'medical' },
+    // ── Advanced (large models, powerful hardware) ──
+    { id: 'mixtral', name: 'Mixtral 8x7B', tag: 'Advanced \u00B7 MoE', desc: 'Mixture of experts. Uses only 2 experts per token \u2014 fast despite large size.', pullName: 'mixtral', size: '26 GB', ram: '32 GB', cat: 'advanced' },
+    { id: 'llama3.3:70b', name: 'Llama 3.3 (70B)', tag: 'Advanced \u00B7 Frontier', desc: 'Meta\'s largest open model. Near-frontier quality. Requires powerful hardware.', pullName: 'llama3.3:70b', size: '40 GB', ram: '48 GB', cat: 'advanced' },
+    { id: 'deepseek-r1', name: 'DeepSeek R1', tag: 'Advanced \u00B7 Reasoning', desc: 'DeepSeek\'s reasoning model. Chain-of-thought. Strong on math and logic.', pullName: 'deepseek-r1', size: '4.7 GB', ram: '8 GB', cat: 'advanced' }
   ];
 
   let installedModels = [];
   let pullControllers = {};
 
+  var CAT_LABELS = {
+    chat: '\uD83D\uDCAC Chat & Reasoning',
+    multilingual: '\uD83C\uDF10 Multilingual',
+    coding: '\uD83D\uDCBB Coding',
+    vision: '\uD83D\uDC41 Vision (Chalkboard & Canvas)',
+    medical: '\uD83C\uDFE5 Medical & Science',
+    advanced: '\u2B50 Advanced (powerful hardware)'
+  };
+
   function render() {
-    var grid = document.getElementById('browseModelsGridTop') || document.getElementById('browseModelsGrid');
+    var grid = document.getElementById('browseModelsGrid');
     if (!grid) return;
     var html = '';
+    var lastCat = '';
+
+    // Deduplicate by id (some models appear in multiple categories)
+    var seen = {};
     POPULAR_MODELS.forEach(function(m) {
+      if (seen[m.id + '_' + m.cat]) return;
+      seen[m.id + '_' + m.cat] = true;
+
+      // Category header
+      if (m.cat && m.cat !== lastCat) {
+        if (lastCat) html += '</div>'; // close previous grid
+        lastCat = m.cat;
+        html += '<div style="font-size:0.78rem;color:#d4a017;margin:16px 0 8px;font-weight:600;letter-spacing:0.5px;">' + (CAT_LABELS[m.cat] || m.cat) + '</div>';
+        html += '<div class="browse-models-grid">';
+      }
+
       var isInstalled = installedModels.some(function(im) {
-        var imName = (im.name || im.model || '').split(':')[0];
-        return imName === m.pullName || imName === m.id;
+        var imName = (im.name || im.model || '').toLowerCase();
+        var pullLower = m.pullName.toLowerCase();
+        var idLower = m.id.toLowerCase();
+        // Match more broadly: the installed model name might include a tag like ":latest"
+        return imName === pullLower || imName.split(':')[0] === pullLower.split(':')[0] ||
+               imName === idLower || imName.split(':')[0] === idLower.split(':')[0];
       });
-      html += '<div class="browse-model-card" id="bmCard_' + m.id + '">';
+
+      html += '<div class="browse-model-card" id="bmCard_' + m.id.replace(/[:.]/g, '_') + '">';
       html += '<div class="bm-header"><span class="bm-name">' + m.name + '</span><span class="bm-tag">' + m.tag + '</span></div>';
       html += '<div class="bm-desc">' + m.desc + '</div>';
-      if (m.size) html += '<div style="font-size:0.72rem;color:var(--text-muted);margin-top:4px;">\uD83D\uDCBE ' + m.size + ' download' + (m.ram ? ' \u00B7 ' + m.ram + ' RAM' : '') + '</div>';
+      if (m.size) html += '<div style="font-size:0.72rem;color:var(--text-muted);margin-top:4px;">\uD83D\uDCBE ' + m.size + ' \u00B7 ' + (m.ram || '?') + ' RAM</div>';
       if (isInstalled) {
-        html += '<button class="bm-pull-btn bm-installed" disabled>&#10003; Installed</button>';
+        html += '<button class="bm-pull-btn bm-installed" disabled>\u2713 Installed</button>';
       } else {
-        html += '<button class="bm-pull-btn" id="bmPull_' + m.id + '" onclick="BrowseModels.pull(\'' + m.id + '\', \'' + m.pullName + '\')">Pull Model</button>';
+        html += '<button class="bm-pull-btn" id="bmPull_' + m.id.replace(/[:.]/g, '_') + '" onclick="BrowseModels.pull(\'' + m.id + '\', \'' + m.pullName + '\')">Pull Model</button>';
       }
-      html += '<div class="bm-progress" id="bmProgress_' + m.id + '">';
-      html += '<div class="bm-progress-bar"><div class="bm-progress-fill" id="bmFill_' + m.id + '"></div></div>';
-      html += '<div class="bm-progress-text" id="bmText_' + m.id + '">Starting download...</div>';
+      html += '<div class="bm-progress" id="bmProgress_' + m.id.replace(/[:.]/g, '_') + '">';
+      html += '<div class="bm-progress-bar"><div class="bm-progress-fill" id="bmFill_' + m.id.replace(/[:.]/g, '_') + '"></div></div>';
+      html += '<div class="bm-progress-text" id="bmText_' + m.id.replace(/[:.]/g, '_') + '">Starting download...</div>';
       html += '</div>';
       html += '</div>';
     });
+    if (lastCat) html += '</div>'; // close last grid
     grid.innerHTML = html;
   }
 
