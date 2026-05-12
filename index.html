@@ -80,7 +80,92 @@
   --space-xl: 34px;
   --space-2xl: 55px;
   --space-3xl: 89px;
+
+  /* ═══ Garden Language Design Tokens ═══ */
+  /* Universe */
+  --sky-deep: #0a0814;
+  --sky-mid: #141028;
+  --floor-jade: #0a1412;
+
+  /* Glass Surfaces */
+  --glass-bg: rgba(255, 255, 255, 0.04);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-hover: rgba(255, 255, 255, 0.15);
+  --glass-input: rgba(255, 255, 255, 0.06);
+  --glass-input-border: rgba(255, 255, 255, 0.1);
+  --glass-radius: 12px;
+  --glass-radius-sm: 8px;
+
+  /* Light (accent colors) */
+  --gold: #d4a017;
+  --gold-soft: rgba(212, 160, 23, 0.15);
+  --gold-glow: rgba(212, 160, 23, 0.5);
+  --gold-bg: rgba(212, 160, 23, 0.08);
+  --emerald: #34d399;
+  --emerald-soft: rgba(52, 211, 153, 0.15);
+  --lavender: #a78bfa;
+  --lavender-soft: rgba(167, 139, 250, 0.15);
+  --blue-sky: #60a5fa;
+  --blue-soft: rgba(96, 165, 250, 0.15);
+  --amber-hf: #fde047;
+  --amber-soft: rgba(253, 224, 71, 0.15);
+
+  /* Character Colors (Luminos) */
+  --sophia-color: #ec4899;
+  --atlas-color: #14b8a6;
+  --ember-color: #f87171;
+  --lyra-color: #c084fc;
+  --harmonia-color: #34d399;
+  --solari-color: #fde68a;
+  --echo-color: #818cf8;
+  --leora-color: #c0c8d8;
+  --draco-color: #fbbf24;
+
+  /* Typography */
+  --font-soul: Georgia, 'Times New Roman', serif;
+  --font-builder: Inter, system-ui, -apple-system, sans-serif;
+
+  /* Text levels */
+  --text-bright: rgba(255, 255, 255, 0.9);
+  --text-whisper: rgba(255, 255, 255, 0.25);
+
+  /* Buttons */
+  --btn-primary-bg: var(--gold);
+  --btn-primary-text: #0a0a14;
+  --btn-radius: 8px;
+  --btn-radius-lg: 10px;
+
+  /* Motion */
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.2s ease;
+  --transition-slow: 0.3s ease;
+
+  /* Glows */
+  --glow-gold: 0 0 20px rgba(212, 160, 23, 0.15);
+  --glow-emerald: 0 0 20px rgba(52, 211, 153, 0.15);
+  --glow-lavender: 0 0 20px rgba(167, 139, 250, 0.15);
+
+  /* Round Table Domain Accents */
+  --rt-medical: #ef4444;
+  --rt-legal: #3b82f6;
+  --rt-financial: #f59e0b;
+  --rt-nutrition: #22c55e;
+  --rt-mental: #a78bfa;
 }
+
+/* ═══ Garden Language Reusable Classes ═══ */
+.fl-card{background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:var(--glass-radius);padding:var(--space-lg);transition:border-color var(--transition-normal)}
+.fl-card:hover{border-color:var(--glass-hover)}
+.fl-title{font-family:var(--font-soul);color:var(--gold);margin:0 0 var(--space-sm)}
+.fl-text{color:var(--text-primary);font-family:var(--font-builder)}
+.fl-text-muted{color:var(--text-muted);font-family:var(--font-builder)}
+.fl-btn-primary{background:var(--btn-primary-bg);color:var(--btn-primary-text);border:none;border-radius:var(--btn-radius);padding:var(--space-md) var(--space-xl);font-family:var(--font-builder);font-weight:600;cursor:pointer;transition:opacity var(--transition-fast)}
+.fl-btn-primary:hover{opacity:0.9}
+.fl-btn-secondary{background:var(--glass-bg);color:var(--text-primary);border:1px solid var(--glass-border);border-radius:var(--btn-radius);padding:var(--space-md) var(--space-xl);font-family:var(--font-builder);font-weight:500;cursor:pointer;transition:border-color var(--transition-normal)}
+.fl-btn-secondary:hover{border-color:var(--glass-hover)}
+.fl-input{background:var(--glass-input);border:1px solid var(--glass-input-border);border-radius:var(--glass-radius-sm);padding:var(--space-md) var(--space-lg);color:var(--text-bright);font-family:var(--font-builder);font-size:0.9rem;outline:none;transition:border-color var(--transition-normal)}
+.fl-input:focus{border-color:var(--gold-glow);box-shadow:var(--glow-gold)}
+.fl-tag{font-size:0.72rem;font-weight:600;padding:3px 10px;border-radius:12px;letter-spacing:0.3px}
 
 /* ---- Light Mode Theme ---- */
 [data-theme="light"] {
@@ -16062,7 +16147,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.45</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.46</span></div>
     </div>
   </div>
 
@@ -19543,7 +19628,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.10.45';
+const FL_VERSION = '5.10.46';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
