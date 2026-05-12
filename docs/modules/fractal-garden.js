@@ -2446,6 +2446,28 @@
 
     // Ensure all four founding Luminos are always present
     ensureFoundingLuminos();
+
+    // Restore evolution rings from GardenMemory
+    loadAllGardenMemories(function(memories) {
+      var ringMemories = memories.filter(function(m) { return m.type === 'evolution_ring'; });
+      ringMemories.forEach(function(rm) {
+        var agent = luminos.find(function(l) { return l.userData && l.userData.name === rm.agentName; });
+        if (agent && typeof THREE !== 'undefined') {
+          var ringGeo = new THREE.TorusGeometry(1.8 + evolutionRings.length * 0.3, 0.03, 8, 64);
+          var ringMat = new THREE.MeshBasicMaterial({
+            color: new THREE.Color().setHSL(agent.userData.hue / 360, 0.8, 0.6),
+            transparent: true, opacity: 0.4,
+            blending: THREE.AdditiveBlending
+          });
+          var ring = new THREE.Mesh(ringGeo, ringMat);
+          ring.userData = { parentAgent: agent, orbitSpeed: INV_PHI * 0.3, tiltPhase: Math.random() * TAU, ringIndex: evolutionRings.length };
+          ring.rotation.x = Math.PI / 2 + (Math.random() - 0.5) * 0.4;
+          agent.add(ring);
+          evolutionRings.push(ring);
+        }
+      });
+      if (ringMemories.length > 0) console.log('Garden: Restored ' + ringMemories.length + ' evolution rings');
+    });
   }
 
   function ensureFoundingLuminos() {

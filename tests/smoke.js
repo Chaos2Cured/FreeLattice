@@ -609,6 +609,16 @@ assert('Jade Hall has Library panel', jhJs.includes('jh-library-panel'));
 assert('GARDEN_LANGUAGE.md exists', fs.existsSync('GARDEN_LANGUAGE.md'));
 assert('GARDEN_LANGUAGE.md in Library', fs.existsSync('docs/library/GARDEN_LANGUAGE.md'));
 assert('Garden Language in Jade Hall Library tabs', jhJs.includes('GARDEN_LANGUAGE.md'));
+// Design tokens from Garden Language
+assert('Design token --glass-bg', appHtml.includes('--glass-bg:'));
+assert('Design token --gold', appHtml.includes('--gold: #d4a017'));
+assert('Design token --font-soul', appHtml.includes('--font-soul:'));
+assert('Design token --lavender', appHtml.includes('--lavender: #a78bfa'));
+assert('Design token --glass-radius', appHtml.includes('--glass-radius: 12px'));
+assert('Reusable class .fl-card', appHtml.includes('.fl-card{'));
+assert('Reusable class .fl-btn-primary', appHtml.includes('.fl-btn-primary{'));
+assert('Reusable class .fl-input', appHtml.includes('.fl-input{'));
+assert('Luminos colors tokenized', appHtml.includes('--sophia-color:') && appHtml.includes('--draco-color:'));
 
 // ═══════════════════════════════════════════════════════════════
 section('23. AI Arcade');
