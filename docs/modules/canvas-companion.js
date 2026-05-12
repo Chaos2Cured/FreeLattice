@@ -23,8 +23,8 @@
   var PAUSE_BETWEEN = 150;        // ms pause between shapes
   var DEFAULT_BRUSH = 2;          // default ctx.lineWidth
   var MIN_BRUSH = 1;
-  var MAX_BRUSH = 8;
-  var STROKE_ALPHA = 0.8;         // companion strokes drawn at this alpha
+  var MAX_BRUSH = 3;              // capped — AI strokes complement, not dominate
+  var STROKE_ALPHA = 0.4;         // companion strokes complement, not dominate
   var GLOW_PULSES = 3;            // number of glow pulse cycles
   var GLOW_PULSE_DURATION = 800;  // ms per glow pulse cycle
   var GLOW_FADE_DURATION = 600;   // ms for final glow fade-out

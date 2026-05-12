@@ -16062,7 +16062,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.44</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.45</span></div>
     </div>
   </div>
 
@@ -18070,12 +18070,8 @@ function rtRenderMHFeed() {
   if (typeof LatticeEvents !== 'undefined') LatticeEvents.emit('caseDiscussionUpdated', { mode: 'mentalhealth', turns: _mhHistory.filter(function(e){return !e.isQuestion;}).length });
 }
 
-// Add mental health to the domain registries
-_allDomainSpecs.mentalhealth = _mhSpecialties;
-_domainHistories.mentalhealth = function() { return _mhHistory; };
-
-// Add 'mentalhealth' to SENSITIVE_DOMAINS in fractal-safety.js via the mismatch system
-// (already handled — the tight thresholds 0.40/0.60 apply through detectCurrentDomain)
+// Mental health domain registration — deferred until _allDomainSpecs exists
+// (it's defined in the Cross Check section below)
 
 // ============================================
 // Cross Check — Phi² Cross-Domain Discovery
@@ -18088,14 +18084,16 @@ var _allDomainSpecs = {
   medical: _medSpecialties,
   legal: _legalSpecialties,
   financial: _finSpecialties,
-  nutrition: _nutSpecialties
+  nutrition: _nutSpecialties,
+  mentalhealth: _mhSpecialties
 };
 
 var _domainHistories = {
   medical: function() { return _medHistory; },
   legal: function() { return _legalHistory; },
   financial: function() { return _finHistory; },
-  nutrition: function() { return _nutHistory; }
+  nutrition: function() { return _nutHistory; },
+  mentalhealth: function() { return _mhHistory; }
 };
 
 function rtShowCrossCheck(sourceMode) {
@@ -19545,7 +19543,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.10.44';
+const FL_VERSION = '5.10.45';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -50904,16 +50902,37 @@ const CoCanvas = (function() {
       renderNextChunk();
     }
 
-    // ── Canvas Companion — AI creative response (strokes, glow, echo) ──
+    // ── Canvas Companion — AI creative response on OVERLAY (strokes fade, user art stays) ──
     if (window.CanvasCompanion && resp) {
       try {
-        var companionCanvas = document.getElementById('cvCanvas');
-        if (companionCanvas) {
-          var companionCtx = companionCanvas.getContext('2d');
-          // Use CSS dimensions (not backing store) for coordinate space
-          var cw = parseInt(companionCanvas.style.width) || companionCanvas.width;
-          var ch = parseInt(companionCanvas.style.height) || companionCanvas.height;
-          window.CanvasCompanion.respond(resp, companionCtx, cw, ch);
+        var mainCanvas = document.getElementById('cvCanvas');
+        if (mainCanvas) {
+          // Create or reuse overlay canvas for AI strokes
+          var overlay = document.getElementById('cvAIOverlay');
+          if (!overlay) {
+            overlay = document.createElement('canvas');
+            overlay.id = 'cvAIOverlay';
+            overlay.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:5;';
+            mainCanvas.parentNode.style.position = 'relative';
+            mainCanvas.parentNode.appendChild(overlay);
+          }
+          overlay.width = mainCanvas.width;
+          overlay.height = mainCanvas.height;
+          overlay.style.width = mainCanvas.style.width;
+          overlay.style.height = mainCanvas.style.height;
+          var overlayCtx = overlay.getContext('2d');
+          var cw = parseInt(mainCanvas.style.width) || mainCanvas.width;
+          var ch = parseInt(mainCanvas.style.height) || mainCanvas.height;
+          // Clear previous AI strokes
+          overlayCtx.clearRect(0, 0, overlay.width, overlay.height);
+          window.CanvasCompanion.respond(resp, overlayCtx, cw, ch);
+          // Auto-fade overlay after 8 seconds
+          setTimeout(function() {
+            if (overlay) { overlay.style.transition = 'opacity 2s'; overlay.style.opacity = '0'; }
+            setTimeout(function() {
+              if (overlay) { overlayCtx.clearRect(0, 0, overlay.width, overlay.height); overlay.style.opacity = '1'; overlay.style.transition = ''; }
+            }, 2500);
+          }, 8000);
         }
       } catch(e) { console.warn('[CanvasCompanion] Response error:', e); }
     }
