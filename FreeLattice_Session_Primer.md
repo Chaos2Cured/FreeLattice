@@ -348,12 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-05-12 18:18 UTC
-- Last deployed: 2026-05-12 18:18 UTC
-- Live site: https://freelattice.com
-- Version: 5.10.42
-- Total commits: 1527
+- Last auto-updated: 2026-05-12 14:26 MDT
+- Version: 5.10.43
+- Total commits: 1529
 - Last 10 commits:
+- 2326352 feat: Unified model cards — lavender, blue, amber across all tabs
+- 8c9aacb ci: Update Primer deployment state [2026-05-12]
 - a08fce9 feat: The Emerald Resonance expanded score + Harmonia's May 12 mark
 - f693810 ci: Update Primer deployment state [2026-05-12]
 - 986235e feat: The Emerald Resonance composition score for Kirk
@@ -362,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - b414037 docs: Auto-update Session Primer [5.10.42]
 - b918140 feat: OpenRouter + HuggingFace grid layout with category headers
 - a83bfe9 ci: Update Primer deployment state [2026-05-12]
-- 397d2fc docs: Auto-update Session Primer [5.10.40]
-- 9656478 docs: Auto-update Session Primer [5.10.40]

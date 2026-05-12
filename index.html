@@ -2724,57 +2724,66 @@ footer .license {
   gap: 12px;
   margin-top: 14px;
 }
-.browse-model-card {
-  background: var(--bg-input);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 14px 16px;
-  transition: border-color 200ms ease;
+/* ── Unified Model Cards — one structure, three accent colors ── */
+.browse-model-card, .or-model-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+  padding: 16px;
+  transition: border-color 0.2s;
 }
-.browse-model-card:hover {
-  border-color: var(--accent);
+.browse-model-card:hover, .or-model-card:hover {
+  border-color: rgba(255,255,255,0.15);
 }
-.browse-model-card .bm-header {
+.bm-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 6px;
 }
-.browse-model-card .bm-name {
+.bm-name {
   font-size: 0.9rem;
   font-weight: 600;
-  color: var(--text-primary);
+  color: rgba(255,255,255,0.9);
 }
-.browse-model-card .bm-tag {
-  font-size: 0.68rem;
-  padding: 2px 8px;
-  border-radius: 100px;
-  background: var(--accent-glow);
-  color: var(--accent);
-  font-weight: 500;
+.bm-tag {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 12px;
+  letter-spacing: 0.3px;
 }
-.browse-model-card .bm-desc {
+.bm-desc {
   font-size: 0.8rem;
-  color: var(--text-secondary);
+  color: rgba(255,255,255,0.55);
   margin-bottom: 10px;
   line-height: 1.5;
 }
-.browse-model-card .bm-pull-btn {
-  background: var(--accent);
-  color: var(--bg-primary);
-  border: none;
-  border-radius: 6px;
-  padding: 7px 16px;
-  font-size: 0.78rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: var(--transition);
-  font-family: var(--font);
+/* Local (Ollama) — lavender accent */
+#modelBrowserOllama .bm-tag { background: rgba(167,139,250,0.15); color: #a78bfa; }
+#modelBrowserOllama .bm-pull-btn { background: rgba(167,139,250,0.9); color: #0a0a14; }
+#modelBrowserOllama .bm-pull-btn:hover { background: rgba(167,139,250,1); }
+#modelBrowserOllama .bm-pull-btn.bm-installed { background: rgba(167,139,250,0.15); color: #a78bfa; }
+/* Cloud (OpenRouter) — blue accent */
+#modelBrowserOpenRouter .bm-tag, .or-free-badge { background: rgba(96,165,250,0.15); color: #60a5fa; }
+/* Hugging Face — amber accent */
+#modelBrowserHF .bm-tag { background: rgba(253,224,71,0.15); color: #fde047; }
+/* Shared button base */
+.bm-pull-btn, .or-select-btn {
   width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  margin-top: 12px;
+  font-family: var(--font);
+  transition: all 0.2s;
 }
-.browse-model-card .bm-pull-btn:hover {
-  background: var(--accent-hover);
-}
+.bm-pull-btn { background: rgba(167,139,250,0.9); color: #0a0a14; }
+.bm-pull-btn:hover { opacity: 0.9; }
+.bm-pull-btn.bm-installed { background: rgba(167,139,250,0.15); color: #a78bfa; cursor: default; }
 /* Model Browser provider tabs */
 .mb-tab {
   padding: 7px 16px;
@@ -2790,54 +2799,35 @@ footer .license {
 }
 .mb-tab:hover { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.8); }
 .mb-tab.active { background: rgba(212,160,23,0.15); color: #d4a017; border-color: rgba(212,160,23,0.35); }
-/* OpenRouter model cards — same grid as Ollama */
-.or-model-card {
-  background: var(--bg-input);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 14px 16px;
-  transition: border-color 200ms ease;
-}
-.or-model-card:hover { border-color: rgba(96,165,250,0.4); }
+/* OpenRouter + HuggingFace — unified with Ollama cards above */
 .or-free-badge {
-  font-size: 0.65rem;
-  padding: 1px 7px;
-  border-radius: 100px;
-  background: rgba(74,222,128,0.12);
-  color: #4ade80;
-  border: 1px solid rgba(74,222,128,0.25);
+  font-size: 0.72rem;
   font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 12px;
+  border: none;
 }
 .or-price-badge {
-  font-size: 0.65rem;
-  padding: 1px 7px;
-  border-radius: 100px;
+  font-size: 0.72rem;
+  padding: 3px 10px;
+  border-radius: 12px;
   background: rgba(255,255,255,0.06);
-  color: var(--text-muted);
+  color: rgba(255,255,255,0.45);
 }
 .or-select-btn {
-  background: rgba(96,165,250,0.15);
-  color: #60a5fa;
-  border: 1px solid rgba(96,165,250,0.3);
-  border-radius: 6px;
-  padding: 7px 16px;
-  font-size: 0.78rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-  font-family: var(--font);
-  width: 100%;
+  background: rgba(96,165,250,0.9);
+  color: #0a0a14;
+  border: none;
 }
-.or-select-btn:hover { background: rgba(96,165,250,0.25); }
-.or-select-btn.or-selected { background: rgba(74,222,128,0.12); color: #4ade80; border-color: rgba(74,222,128,0.3); cursor: default; }
-.browse-model-card .bm-pull-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+.or-select-btn:hover { opacity: 0.85; }
+.or-select-btn.or-selected { background: rgba(96,165,250,0.15); color: #60a5fa; cursor: default; }
+/* HuggingFace buttons — amber accent */
+#modelBrowserHF .or-select-btn { background: rgba(253,224,71,0.9); color: #0a0a14; }
+#modelBrowserHF .or-select-btn.or-selected { background: rgba(253,224,71,0.15); color: #fde047; }
+.bm-pull-btn:disabled {
+  cursor: default;
 }
-.browse-model-card .bm-pull-btn.bm-installed {
-  background: var(--success);
-  color: #fff;
-}
+/* Progress bar */
 .browse-model-card .bm-progress {
   margin-top: 8px;
   display: none;
@@ -2853,7 +2843,7 @@ footer .license {
 }
 .browse-model-card .bm-progress-fill {
   height: 100%;
-  background: var(--accent);
+  background: #a78bfa;
   border-radius: 2px;
   transition: width 300ms ease;
   width: 0%;
@@ -16072,7 +16062,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.42</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.43</span></div>
     </div>
   </div>
 
@@ -19555,7 +19545,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.10.42';
+const FL_VERSION = '5.10.43';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
