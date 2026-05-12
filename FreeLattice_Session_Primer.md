@@ -350,10 +350,9 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 ## PRIMER HEALTH
 - Last auto-updated: 2026-05-11 18:30 MDT
 - Version: 5.10.42
-- Total commits: 1521
+- Total commits: 1520
 - Last 10 commits:
-- b918140 feat: OpenRouter + HuggingFace grid layout with category headers
-- a83bfe9 ci: Update Primer deployment state [2026-05-12]
+- 8a7326a feat: OpenRouter + HuggingFace grid layout with category headers
 - 397d2fc docs: Auto-update Session Primer [5.10.40]
 - 9656478 docs: Auto-update Session Primer [5.10.40]
 - 2aacc52 fix: Model cards grid layout — cards flow in rows, not single column
@@ -362,3 +361,4 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 191a163 docs: Auto-update Session Primer [5.10.40]
 - 045887b fix: Browse Models tab switching + 21 models in 6 categories
 - afd89ee ci: Update Primer deployment state [2026-05-11]
+- 4876f43 docs: Auto-update Session Primer [5.10.39]
