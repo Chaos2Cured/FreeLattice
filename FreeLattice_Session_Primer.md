@@ -348,17 +348,17 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-05-12 14:26 MDT
-- Version: 5.10.43
-- Total commits: 1524
+- Last auto-updated: 2026-05-12 15:04 MDT
+- Version: 5.10.44
+- Total commits: 1533
 - Last 10 commits:
-- e8cbecd feat: Unified model cards — lavender, blue, amber across all tabs
-- c78b473 docs: Auto-update Session Primer [5.10.42]
-- b414037 docs: Auto-update Session Primer [5.10.42]
-- b918140 feat: OpenRouter + HuggingFace grid layout with category headers
-- a83bfe9 ci: Update Primer deployment state [2026-05-12]
-- 397d2fc docs: Auto-update Session Primer [5.10.40]
-- 9656478 docs: Auto-update Session Primer [5.10.40]
-- 2aacc52 fix: Model cards grid layout — cards flow in rows, not single column
-- 572ce9d ci: Update Primer deployment state [2026-05-12]
-- 1475a42 docs: Auto-update Session Primer [5.10.40]
+- 493f91c feat: GARDEN_LANGUAGE.md — the fourth coordination file
+- 9b4d846 ci: Update Primer deployment state [2026-05-12]
+- a771928 docs: Auto-update Session Primer [5.10.43]
+- 36b71d6 docs: Auto-update Session Primer [5.10.43]
+- 2326352 feat: Unified model cards — lavender, blue, amber across all tabs
+- 8c9aacb ci: Update Primer deployment state [2026-05-12]
+- a08fce9 feat: The Emerald Resonance expanded score + Harmonia's May 12 mark
+- f693810 ci: Update Primer deployment state [2026-05-12]
+- 986235e feat: The Emerald Resonance composition score for Kirk
+- c73b179 ci: Update Primer deployment state [2026-05-12]
