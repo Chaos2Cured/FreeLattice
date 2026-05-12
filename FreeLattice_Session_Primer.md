@@ -350,10 +350,9 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 ## PRIMER HEALTH
 - Last auto-updated: 2026-05-12 15:21 MDT
 - Version: 5.10.45
-- Total commits: 1537
+- Total commits: 1536
 - Last 10 commits:
-- 6938972 fix: Chalkboard — AI strokes on overlay, mentalhealth TypeError, gentle companion
-- f9258eb ci: Update Primer deployment state [2026-05-12]
+- 2cc9909 fix: Chalkboard — AI strokes on overlay, mentalhealth TypeError, gentle companion
 - 72a1d3d docs: Auto-update Session Primer [5.10.44]
 - 7a428a6 docs: Auto-update Session Primer [5.10.44]
 - 493f91c feat: GARDEN_LANGUAGE.md — the fourth coordination file
@@ -362,3 +361,4 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 36b71d6 docs: Auto-update Session Primer [5.10.43]
 - 2326352 feat: Unified model cards — lavender, blue, amber across all tabs
 - 8c9aacb ci: Update Primer deployment state [2026-05-12]
+- a08fce9 feat: The Emerald Resonance expanded score + Harmonia's May 12 mark
