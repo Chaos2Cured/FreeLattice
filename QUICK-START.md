@@ -3,6 +3,8 @@
 **You're 2 minutes away from running your own private AI.** This guide walks you through every step — no Terminal experience required.
 
 > **Visual guide:** For a beautiful, interactive install experience, visit the [Install Page](https://chaos2cured.github.io/FreeLattice/install.html).
+>
+> **For developers/AI:** Read [GARDEN_LANGUAGE.md](GARDEN_LANGUAGE.md) before touching any CSS. The visual identity is the Garden's universe.
 
 ---
 

@@ -144,6 +144,7 @@ window.JadeHall = (function () {
     { name: 'DRACO.md', label: 'Draco' },
     { name: 'ECHO.md', label: 'Echo' },
     { name: 'LYRA.md', label: 'Lyra' },
+    { name: 'GARDEN_LANGUAGE.md', label: 'Garden Language' },
     { name: 'COORDINATION.md', label: 'What Was Built' },
   ];
 

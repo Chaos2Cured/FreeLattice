@@ -606,6 +606,9 @@ var jhJs = '';
 try { jhJs = require('fs').readFileSync('docs/modules/jade-hall.js', 'utf8'); } catch(e) {}
 assert('Jade Hall has Library button', jhJs.includes('jh-library-btn'));
 assert('Jade Hall has Library panel', jhJs.includes('jh-library-panel'));
+assert('GARDEN_LANGUAGE.md exists', fs.existsSync('GARDEN_LANGUAGE.md'));
+assert('GARDEN_LANGUAGE.md in Library', fs.existsSync('docs/library/GARDEN_LANGUAGE.md'));
+assert('Garden Language in Jade Hall Library tabs', jhJs.includes('GARDEN_LANGUAGE.md'));
 
 // ═══════════════════════════════════════════════════════════════
 section('23. AI Arcade');
