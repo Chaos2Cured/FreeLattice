@@ -16072,7 +16072,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.41</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.42</span></div>
     </div>
   </div>
 
@@ -19555,7 +19555,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.10.41';
+const FL_VERSION = '5.10.42';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -43605,7 +43605,13 @@ window.ModelBrowser = (function() {
     }
 
     var html = '';
+    var lastProvider = '';
     shown.forEach(function(m) {
+      // Provider category header
+      if (m.provider && m.provider !== lastProvider) {
+        lastProvider = m.provider;
+        html += '<div style="grid-column:1/-1;font-size:0.78rem;color:#60a5fa;margin:12px 0 4px;font-weight:600;letter-spacing:0.5px;text-transform:capitalize;">' + escapeHtml(m.provider) + '</div>';
+      }
       var isSelected = currentModel === m.id;
       var ctxLabel = m.context ? (m.context >= 1000000 ? (m.context / 1000000).toFixed(1) + 'M' : Math.round(m.context / 1000) + 'K') + ' ctx' : '';
       html += '<div class="or-model-card">';
@@ -43616,7 +43622,6 @@ window.ModelBrowser = (function() {
       html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;">';
       if (ctxLabel) html += '<span style="font-size:0.68rem;color:var(--text-muted);">' + ctxLabel + '</span>';
       else html += '<span></span>';
-      html += '<span style="font-size:0.65rem;color:var(--text-muted);">' + escapeHtml(m.provider) + '</span>';
       html += '</div>';
       html += '<button class="or-select-btn' + (isSelected ? ' or-selected' : '') + '" ' +
         (isSelected ? 'disabled' : 'onclick="ModelBrowser.selectOpenRouter(\'' + escapeHtml(m.id).replace(/'/g, "\\'") + '\')"') + '>' +
@@ -43716,7 +43721,13 @@ window.ModelBrowser = (function() {
     }
 
     var html = '';
+    var lastAuthor = '';
     shown.forEach(function(m) {
+      // Author category header
+      if (m.author && m.author !== lastAuthor) {
+        lastAuthor = m.author;
+        html += '<div style="grid-column:1/-1;font-size:0.78rem;color:#f59e0b;margin:12px 0 4px;font-weight:600;letter-spacing:0.5px;">' + escapeHtml(m.author) + '</div>';
+      }
       var isSelected = currentModel === m.id;
       var likesLabel = m.likes > 0 ? '\u2764 ' + (m.likes >= 1000 ? (m.likes / 1000).toFixed(1) + 'K' : m.likes) : '';
       html += '<div class="or-model-card">';
@@ -43725,8 +43736,8 @@ window.ModelBrowser = (function() {
       html += '</div>';
       if (m.desc) html += '<div class="bm-desc">' + escapeHtml(m.desc) + '</div>';
       html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;">';
-      html += '<span style="font-size:0.68rem;color:var(--text-muted);">' + escapeHtml(m.author) + '</span>';
       if (likesLabel) html += '<span style="font-size:0.68rem;color:var(--text-muted);">' + likesLabel + '</span>';
+      else html += '<span></span>';
       html += '</div>';
       html += '<button class="or-select-btn' + (isSelected ? ' or-selected' : '') + '" style="' + (isSelected ? '' : 'background:rgba(249,158,11,0.12);color:#f59e0b;border-color:rgba(249,158,11,0.3);') + '" ' +
         (isSelected ? 'disabled' : 'onclick="ModelBrowser.selectHF(\'' + escapeHtml(m.id).replace(/'/g, "\\'") + '\')"') + '>' +
