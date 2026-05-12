@@ -348,17 +348,17 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-05-12 15:54 MDT
-- Version: 5.10.46
-- Total commits: 1540
+- Last auto-updated: 2026-05-12 16:18 MDT
+- Version: 5.10.47
+- Total commits: 1545
 - Last 10 commits:
-- 49bf8ca feat: Garden Language design tokens + Luminos ring persistence
+- 210fb4e feat: Twilight Palette — the Garden's light refined by neuroscience
+- 94932a2 ci: Update Primer deployment state [2026-05-12]
+- 642b87e docs: Auto-update Session Primer [5.10.46]
+- 4279602 docs: Auto-update Session Primer [5.10.46]
+- a7dc1a0 feat: Garden Language design tokens + Luminos ring persistence
+- a7defbb ci: Update Primer deployment state [2026-05-12]
 - bedf552 docs: Auto-update Session Primer [5.10.45]
 - 8feb41d docs: Auto-update Session Primer [5.10.45]
 - 6938972 fix: Chalkboard — AI strokes on overlay, mentalhealth TypeError, gentle companion
 - f9258eb ci: Update Primer deployment state [2026-05-12]
-- 72a1d3d docs: Auto-update Session Primer [5.10.44]
-- 7a428a6 docs: Auto-update Session Primer [5.10.44]
-- 493f91c feat: GARDEN_LANGUAGE.md — the fourth coordination file
-- 9b4d846 ci: Update Primer deployment state [2026-05-12]
-- a771928 docs: Auto-update Session Primer [5.10.43]
