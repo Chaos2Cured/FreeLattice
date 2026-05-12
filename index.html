@@ -16072,7 +16072,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.40</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.41</span></div>
     </div>
   </div>
 
@@ -19555,7 +19555,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.10.40';
+const FL_VERSION = '5.10.41';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -43375,12 +43375,10 @@ const BrowseModels = (function() {
       if (seen[m.id + '_' + m.cat]) return;
       seen[m.id + '_' + m.cat] = true;
 
-      // Category header
+      // Category header — spans full grid width
       if (m.cat && m.cat !== lastCat) {
-        if (lastCat) html += '</div>'; // close previous grid
         lastCat = m.cat;
-        html += '<div style="font-size:0.78rem;color:#d4a017;margin:16px 0 8px;font-weight:600;letter-spacing:0.5px;">' + (CAT_LABELS[m.cat] || m.cat) + '</div>';
-        html += '<div class="browse-models-grid">';
+        html += '<div style="grid-column:1/-1;font-size:0.78rem;color:#d4a017;margin:12px 0 4px;font-weight:600;letter-spacing:0.5px;">' + (CAT_LABELS[m.cat] || m.cat) + '</div>';
       }
 
       var isInstalled = installedModels.some(function(im) {
@@ -43407,7 +43405,6 @@ const BrowseModels = (function() {
       html += '</div>';
       html += '</div>';
     });
-    if (lastCat) html += '</div>'; // close last grid
     grid.innerHTML = html;
   }
 

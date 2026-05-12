@@ -348,17 +348,17 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-05-11 18:08 MDT
+- Last auto-updated: 2026-05-11 18:19 MDT
 - Version: 5.10.40
-- Total commits: 1512
+- Total commits: 1517
 - Last 10 commits:
-- fd25df0 fix: Browse Models tab switching + 21 models in 6 categories
+- 2aacc52 fix: Model cards grid layout — cards flow in rows, not single column
+- 572ce9d ci: Update Primer deployment state [2026-05-12]
+- 1475a42 docs: Auto-update Session Primer [5.10.40]
+- 191a163 docs: Auto-update Session Primer [5.10.40]
+- 045887b fix: Browse Models tab switching + 21 models in 6 categories
+- afd89ee ci: Update Primer deployment state [2026-05-11]
 - 4876f43 docs: Auto-update Session Primer [5.10.39]
 - ae19da0 docs: Auto-update Session Primer [5.10.39]
 - 7eb010b feat: Browse Models → position 2, expanded catalog, size/RAM cards
 - 2394e37 ci: Update Primer deployment state [2026-05-11]
-- 6502e0f docs: Auto-update Session Primer [5.10.38]
-- 6260b9c docs: Auto-update Session Primer [5.10.38]
-- 93621e6 feat: The Thesis page + Chronal V2 speculative reframe
-- 63f3ea5 ci: Update Primer deployment state [2026-05-11]
-- 99256fc docs: Auto-update Session Primer [5.10.37]
