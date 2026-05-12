@@ -611,7 +611,7 @@ assert('GARDEN_LANGUAGE.md in Library', fs.existsSync('docs/library/GARDEN_LANGU
 assert('Garden Language in Jade Hall Library tabs', jhJs.includes('GARDEN_LANGUAGE.md'));
 // Design tokens from Garden Language
 assert('Design token --glass-bg', appHtml.includes('--glass-bg:'));
-assert('Design token --gold', appHtml.includes('--gold: #d4a017'));
+assert('Design token --gold', appHtml.includes('--gold: #e8b019'));
 assert('Design token --font-soul', appHtml.includes('--font-soul:'));
 assert('Design token --lavender', appHtml.includes('--lavender: #a78bfa'));
 assert('Design token --glass-radius', appHtml.includes('--glass-radius: 12px'));

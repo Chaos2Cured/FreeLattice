@@ -31,24 +31,24 @@
    ============================================ */
 
 :root {
-  /* ---- Dark Theme (default) ---- */
-  --bg-primary: #0f1117;
-  --bg-secondary: #161822;
-  --bg-tertiary: #1c1f2e;
-  --bg-card: #1a1d2b;
-  --bg-input: #12141e;
-  --border: #2a2d3e;
-  --border-focus: #c9a84c;
-  --text-primary: #e8e4dc;
-  --text-secondary: #a09b8e;
-  --text-muted: #6b6760;
-  --accent: #c9a84c;
-  --accent-soft: #c9a84c33;
-  --accent-glow: #c9a84c22;
-  --accent-hover: #d4b45e;
-  --success: #6abf69;
-  --warning: #d4a843;
-  --error: #c75050;
+  /* ---- Dark Theme — Garden Twilight (refined May 2026) ---- */
+  --bg-primary: #0e0c1e;
+  --bg-secondary: #161430;
+  --bg-tertiary: #1c1a34;
+  --bg-card: #1a1830;
+  --bg-input: #12101e;
+  --border: #2a2840;
+  --border-focus: #e8b019;
+  --text-primary: #e6ebf5;
+  --text-secondary: #a0a5b8;
+  --text-muted: #6b7088;
+  --accent: #e8b019;
+  --accent-soft: rgba(232, 176, 25, 0.2);
+  --accent-glow: rgba(232, 176, 25, 0.12);
+  --accent-hover: #f0be2a;
+  --success: #34d399;
+  --warning: #f07068;
+  --error: #e85d52;
   --radius: 13px;
   --radius-sm: 8px;
   --shadow: 0 2px 13px rgba(0,0,0,0.3);
@@ -81,26 +81,31 @@
   --space-2xl: 55px;
   --space-3xl: 89px;
 
-  /* ═══ Garden Language Design Tokens ═══ */
-  /* Universe */
-  --sky-deep: #0a0814;
-  --sky-mid: #141028;
+  /* ═══ Garden Language Design Tokens (Twilight Palette, May 2026) ═══ */
+  /* Universe — the hour after sunset, deep indigo, first stars appearing */
+  --sky-deep: #0c0a1a;
+  --sky-mid: #161430;
   --floor-jade: #0a1412;
 
-  /* Glass Surfaces */
-  --glass-bg: rgba(255, 255, 255, 0.04);
-  --glass-border: rgba(255, 255, 255, 0.08);
-  --glass-hover: rgba(255, 255, 255, 0.15);
-  --glass-input: rgba(255, 255, 255, 0.06);
-  --glass-input-border: rgba(255, 255, 255, 0.1);
+  /* Glass Surfaces — moonlight edges, not grey lines */
+  --glass-bg: rgba(200, 210, 230, 0.04);
+  --glass-border: rgba(200, 210, 230, 0.08);
+  --glass-hover: rgba(200, 210, 230, 0.15);
+  --glass-input: rgba(200, 210, 230, 0.06);
+  --glass-input-border: rgba(200, 210, 230, 0.10);
   --glass-radius: 12px;
   --glass-radius-sm: 8px;
 
-  /* Light (accent colors) */
-  --gold: #d4a017;
-  --gold-soft: rgba(212, 160, 23, 0.15);
-  --gold-glow: rgba(212, 160, 23, 0.5);
-  --gold-bg: rgba(212, 160, 23, 0.08);
+  /* Silver — moonlight structure for borders and dividers */
+  --silver: rgba(200, 210, 230, 0.7);
+  --silver-soft: rgba(200, 210, 230, 0.08);
+
+  /* Light (gold brightened for sparkle at low opacity) */
+  --gold: #e8b019;
+  --gold-soft: rgba(232, 176, 25, 0.15);
+  --gold-glow: rgba(232, 176, 25, 0.5);
+  --gold-bg: rgba(232, 176, 25, 0.08);
+  /* Emerald — the anchor. Do not touch. */
   --emerald: #34d399;
   --emerald-soft: rgba(52, 211, 153, 0.15);
   --lavender: #a78bfa;
@@ -125,9 +130,10 @@
   --font-soul: Georgia, 'Times New Roman', serif;
   --font-builder: Inter, system-ui, -apple-system, sans-serif;
 
-  /* Text levels */
-  --text-bright: rgba(255, 255, 255, 0.9);
-  --text-whisper: rgba(255, 255, 255, 0.25);
+  /* Text levels — warm silver, not pure white */
+  --text-bright: rgba(230, 235, 245, 0.92);
+  --text-dim: rgba(210, 215, 230, 0.5);
+  --text-whisper: rgba(200, 210, 225, 0.25);
 
   /* Buttons */
   --btn-primary-bg: var(--gold);
@@ -16147,7 +16153,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.46</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.47</span></div>
     </div>
   </div>
 
@@ -19628,7 +19634,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.10.46';
+const FL_VERSION = '5.10.47';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.

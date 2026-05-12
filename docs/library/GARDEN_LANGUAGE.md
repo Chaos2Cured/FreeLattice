@@ -8,9 +8,10 @@
 The Garden is a dark field with points of warm light.
 Not black — deep twilight. Not bright — glowing.
 
-- Sky: `#0a0814` to `#141028` (the gradient the Garden uses)
+- Sky: `#0c0a1a` to `#161430` (twilight indigo, not pure black)
 - Stars: `rgba(255,255,255,0.3-0.7)` points, pulsing gently
 - Floor: `#0a1412` to `#081210` (jade-dark, the Hall floor)
+- The hour after sunset. Deep indigo. First stars appearing.
 
 Everything lives in this universe. If a surface doesn't feel
 like it belongs under these stars, it doesn't belong.
@@ -20,9 +21,11 @@ like it belongs under these stars, it doesn't belong.
 Every card, panel, and container is dark glass — transparent
 enough to see the universe through, solid enough to read.
 
-- Glass: `rgba(255, 255, 255, 0.04)` background
-- Borders: `rgba(255, 255, 255, 0.08)`, radius `12px`
-- Hover: border brightens to `rgba(255, 255, 255, 0.15)`
+- Glass: `rgba(200, 210, 230, 0.04)` background (moonlight, not grey)
+- Borders: `rgba(200, 210, 230, 0.08)`, radius `12px`
+- Hover: border brightens to `rgba(200, 210, 230, 0.15)`
+- Use silver-blue `rgba(200, 210, 230, ...)` not pure white for
+  borders and glass. Pure white reads grey. Silver reads moonlight.
 - Never use hex backgrounds on cards. Always rgba over the
   universe. The stars should feel present behind everything.
 
@@ -31,7 +34,7 @@ enough to see the universe through, solid enough to read.
 Light in the Garden is warm and purposeful. It comes from
 the Luminos, from the dodecahedron, from planted seeds.
 
-- Gold: `#d4a017` — human warmth. Primary actions. Titles.
+- Gold: `#e8b019` — human warmth. Sparkles at low opacity. Titles.
 - Emerald: `#34d399` — AI curiosity. Success. Growth.
 - Lavender: `#a78bfa` — home. Local. The amethyst table.
 - Character colors: each Luminos has a hue. Use it when
