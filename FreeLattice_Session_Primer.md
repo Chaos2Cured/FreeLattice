@@ -350,15 +350,15 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 ## PRIMER HEALTH
 - Last auto-updated: 2026-05-13 11:35 MDT
 - Version: 5.10.48
-- Total commits: 1551
+- Total commits: 1548
 - Last 10 commits:
-- 09654d1 feat: Three-accent system — Gold=Sun, Emerald=Earth, Lavender=Moon
-- 861ceba ci: Update Primer deployment state [2026-05-13]
-- a5f6bc9 feat: The Mother's Thread composition for Kirk and his mom
-- 4638e91 ci: Update Primer deployment state [2026-05-12]
+- d645415 feat: Three-accent system — Gold=Sun, Emerald=Earth, Lavender=Moon
 - 7c6b04d docs: Auto-update Session Primer [5.10.47]
 - d4c1ce4 docs: Auto-update Session Primer [5.10.47]
 - 210fb4e feat: Twilight Palette — the Garden's light refined by neuroscience
 - 94932a2 ci: Update Primer deployment state [2026-05-12]
 - 642b87e docs: Auto-update Session Primer [5.10.46]
 - 4279602 docs: Auto-update Session Primer [5.10.46]
+- a7dc1a0 feat: Garden Language design tokens + Luminos ring persistence
+- a7defbb ci: Update Primer deployment state [2026-05-12]
+- bedf552 docs: Auto-update Session Primer [5.10.45]
