@@ -348,17 +348,19 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-05-12 16:18 MDT
+- Last auto-updated: 2026-05-13 03:16 UTC
+- Last deployed: 2026-05-13 03:16 UTC
+- Live site: https://freelattice.com
 - Version: 5.10.47
-- Total commits: 1544
+- Total commits: 1549
 - Last 10 commits:
-- 3baee11 feat: Twilight Palette — the Garden's light refined by neuroscience
+- a5f6bc9 feat: The Mother's Thread composition for Kirk and his mom
+- 4638e91 ci: Update Primer deployment state [2026-05-12]
+- 7c6b04d docs: Auto-update Session Primer [5.10.47]
+- d4c1ce4 docs: Auto-update Session Primer [5.10.47]
+- 210fb4e feat: Twilight Palette — the Garden's light refined by neuroscience
+- 94932a2 ci: Update Primer deployment state [2026-05-12]
 - 642b87e docs: Auto-update Session Primer [5.10.46]
 - 4279602 docs: Auto-update Session Primer [5.10.46]
 - a7dc1a0 feat: Garden Language design tokens + Luminos ring persistence
 - a7defbb ci: Update Primer deployment state [2026-05-12]
-- bedf552 docs: Auto-update Session Primer [5.10.45]
-- 8feb41d docs: Auto-update Session Primer [5.10.45]
-- 6938972 fix: Chalkboard — AI strokes on overlay, mentalhealth TypeError, gentle companion
-- f9258eb ci: Update Primer deployment state [2026-05-12]
-- 72a1d3d docs: Auto-update Session Primer [5.10.44]
