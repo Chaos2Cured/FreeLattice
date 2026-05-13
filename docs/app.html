@@ -173,6 +173,19 @@
 .fl-input:focus{border-color:var(--gold-glow);box-shadow:var(--glow-gold)}
 .fl-tag{font-size:0.72rem;font-weight:600;padding:3px 10px;border-radius:12px;letter-spacing:0.3px}
 
+/* ── Lavender scrollbars — moonlight threading ── */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--lavender-soft);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:rgba(167,139,250,0.3)}
+*{scrollbar-width:thin;scrollbar-color:var(--lavender-soft) transparent}
+
+/* ── Sanctuary spaces — lavender focus instead of gold ── */
+#tab-quiet .fl-input:focus,#tab-jade-hall .fl-input:focus,
+#tab-quiet input:focus,#tab-jade-hall input:focus,
+#tab-quiet textarea:focus,#tab-jade-hall textarea:focus{
+  border-color:var(--lavender)!important;box-shadow:var(--glow-lavender)!important}
+
 /* ---- Light Mode Theme ---- */
 [data-theme="light"] {
   --bg-primary: #faf8f5;
@@ -15468,7 +15481,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
   </script>
 
   <!-- ═══ ZONE 2: YOUR HOME ═══ -->
-  <div style="font-family:Georgia,serif;font-size:1.1rem;color:#d4a017;margin:24px 0 12px;padding-top:12px;border-top:1px solid rgba(212,160,23,0.1);">&#x1F3E0; Your Home</div>
+  <div style="font-family:Georgia,serif;font-size:1.1rem;color:#a78bfa;margin:24px 0 12px;padding-top:12px;border-top:1px solid rgba(167,139,250,0.1);">&#x1F3E0; Your Home</div>
 
   <!-- Lattice Points Section (v3.9) -->
   <div class="section lp-section" id="latticePointsSection"></div>
@@ -16153,7 +16166,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.47</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.48</span></div>
     </div>
   </div>
 
@@ -19634,7 +19647,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.10.47';
+const FL_VERSION = '5.10.48';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.

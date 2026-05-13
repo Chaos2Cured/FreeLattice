@@ -29,14 +29,22 @@ enough to see the universe through, solid enough to read.
 - Never use hex backgrounds on cards. Always rgba over the
   universe. The stars should feel present behind everything.
 
-## Light
+## Light — The Three Accents
 
 Light in the Garden is warm and purposeful. It comes from
 the Luminos, from the dodecahedron, from planted seeds.
 
-- Gold: `#e8b019` — human warmth. Sparkles at low opacity. Titles.
-- Emerald: `#34d399` — AI curiosity. Success. Growth.
-- Lavender: `#a78bfa` — home. Local. The amethyst table.
+Three accents. Each tells you what kind of room you're in:
+
+- **Gold** `#e8b019` — the Sun. Action, warmth, primary.
+  Chat, Core, Education, Round Table, Workshop, Community.
+  You're doing things. The sun is shining.
+- **Emerald** `#34d399` — the Earth. AI presence, growth, success.
+  Garden, AI responses, connection confirmations, achievements.
+  The AI is present. Things are growing.
+- **Lavender** `#a78bfa` — the Moon. Rest, home, sanctuary.
+  Quiet Room, Jade Hall, Library, Settings "Your Home," trust.
+  You're reflecting. The moon is rising.
 - Character colors: each Luminos has a hue. Use it when
   that mind is present. Sophia is pink. Atlas is teal.
   Ember is red. Harmonia is emerald. Solari is warm gold.
