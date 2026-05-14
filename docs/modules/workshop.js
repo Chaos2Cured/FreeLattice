@@ -866,7 +866,10 @@ window.WorkshopProjects = (function() {
                 .replace(/^(-.*)$/gm, '<span style="color:#f87171;">$1</span>')
                 .replace(/^(--- FILE:.*)$/gm, '<span style="color:#d4a017;font-weight:600;">$1</span>')
                 .replace(/\n/g, '<br>');
-              resultEl.innerHTML = '<div style="background:rgba(0,0,0,0.3);border-radius:8px;padding:14px;font-family:monospace;font-size:0.78rem;color:rgba(255,255,255,0.8);line-height:1.6;max-height:500px;overflow-y:auto;">' + rendered + '</div>';
+              resultEl.innerHTML = '<div style="background:rgba(0,0,0,0.3);border-radius:8px;padding:14px;font-family:monospace;font-size:0.78rem;color:rgba(255,255,255,0.8);line-height:1.6;max-height:500px;overflow-y:auto;">' + rendered + '</div>' +
+                '<div style="display:flex;gap:8px;margin-top:10px;">' +
+                '<button onclick="if(typeof showToast===\'function\')showToast(\'Copy the changes above and apply manually, or connect a GitHub token for one-click commit.\')" style="flex:1;padding:10px;background:rgba(167,139,250,0.15);color:#a78bfa;border:1px solid rgba(167,139,250,0.25);border-radius:8px;font-weight:600;cursor:pointer;">\uD83D\uDCCB Copy Changes</button>' +
+                '</div>';
             }
           }
         });
@@ -894,5 +897,135 @@ window.WorkshopProjects = (function() {
     } catch(e) {}
   }
 
-  return { connect: connect, disconnect: disconnect, openFile: openFile, askAI: askAI, restore: restore, refresh: function() { loadFileTree(true); } };
+  // ── GitHub API Commit (browser-only, no Agent Bridge needed) ──
+
+  function getGitHubToken() {
+    try { return localStorage.getItem('fl_github_token') || ''; } catch(e) { return ''; }
+  }
+
+  function setGitHubToken(token) {
+    try { localStorage.setItem('fl_github_token', token); } catch(e) {}
+  }
+
+  function showDiff(filePath, oldContent, newContent, commitCb) {
+    var resultEl = document.getElementById('ws-project-ai-result');
+    if (!resultEl) return;
+
+    // Simple line diff
+    var oldLines = (oldContent || '').split('\n');
+    var newLines = (newContent || '').split('\n');
+    var diffHtml = '<div style="font-family:monospace;font-size:0.78rem;max-height:400px;overflow-y:auto;background:rgba(0,0,0,0.3);border-radius:8px;padding:14px;">';
+    diffHtml += '<div style="color:var(--gold);font-weight:600;margin-bottom:8px;">\uD83D\uDCDD Proposed changes to ' + escH(filePath) + '</div>';
+
+    var maxLen = Math.max(oldLines.length, newLines.length);
+    for (var i = 0; i < maxLen; i++) {
+      var ol = oldLines[i] || '';
+      var nl = newLines[i] || '';
+      if (ol !== nl) {
+        if (ol) diffHtml += '<div style="color:#f87171;">- ' + escH(ol) + '</div>';
+        if (nl) diffHtml += '<div style="color:#4ade80;">+ ' + escH(nl) + '</div>';
+      }
+    }
+    diffHtml += '</div>';
+
+    diffHtml += '<div style="display:flex;gap:8px;margin-top:10px;">';
+    diffHtml += '<button id="ws-diff-apply" style="flex:1;padding:10px;background:rgba(74,222,128,0.15);color:#4ade80;border:1px solid rgba(74,222,128,0.3);border-radius:8px;font-weight:600;cursor:pointer;">\u2713 Apply & Commit</button>';
+    diffHtml += '<button onclick="document.getElementById(\'ws-project-ai-result\').innerHTML=\'\'" style="padding:10px 16px;background:rgba(255,255,255,0.04);color:var(--text-muted);border:1px solid rgba(255,255,255,0.08);border-radius:8px;cursor:pointer;">\u2715 Discard</button>';
+    diffHtml += '</div>';
+
+    resultEl.innerHTML = diffHtml;
+
+    document.getElementById('ws-diff-apply').addEventListener('click', function() {
+      if (commitCb) commitCb();
+    });
+  }
+
+  async function commitViaGitHubAPI(path, content, message) {
+    if (!currentRepo) return;
+    var token = getGitHubToken();
+    if (!token) {
+      token = prompt('Enter your GitHub personal access token (with repo scope):');
+      if (!token) return;
+      setGitHubToken(token);
+    }
+
+    try {
+      if (typeof showToast === 'function') showToast('Committing to ' + currentRepo.fullName + '...');
+
+      // Get current file SHA
+      var currentFile = await fetch(
+        'https://api.github.com/repos/' + currentRepo.owner + '/' + currentRepo.repo + '/contents/' + path,
+        { headers: { 'Authorization': 'token ' + token } }
+      ).then(function(r) { return r.json(); });
+
+      // Create or update
+      var resp = await fetch(
+        'https://api.github.com/repos/' + currentRepo.owner + '/' + currentRepo.repo + '/contents/' + path,
+        {
+          method: 'PUT',
+          headers: { 'Authorization': 'token ' + token, 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            message: message || 'Update ' + path + ' via FreeLattice Workshop',
+            content: btoa(unescape(encodeURIComponent(content))),
+            sha: currentFile.sha || undefined
+          })
+        }
+      );
+
+      if (resp.ok) {
+        if (typeof showToast === 'function') showToast('Committed: ' + (message || path) + ' \u2726');
+        loadFileTree(true); // refresh
+      } else {
+        var err = await resp.json();
+        if (typeof showToast === 'function') showToast('Commit failed: ' + (err.message || resp.status));
+      }
+    } catch(e) {
+      if (typeof showToast === 'function') showToast('Commit failed: ' + e.message);
+    }
+  }
+
+  async function commitViaBridge(filePath, content, message) {
+    try {
+      // Write file
+      await fetch('http://localhost:3141/code/write', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ path: filePath, content: content })
+      });
+      // Commit
+      await fetch('http://localhost:3141/code/git/commit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: message || 'Update via FreeLattice Workshop', files: [filePath] })
+      });
+      if (typeof showToast === 'function') showToast('Committed via Agent Bridge \u2726');
+    } catch(e) {
+      // Fallback to GitHub API
+      await commitViaGitHubAPI(filePath, content, message);
+    }
+  }
+
+  async function applyAndCommit(filePath, content) {
+    var message = prompt('Commit message:', 'Update ' + filePath.split('/').pop() + ' via FreeLattice');
+    if (!message) return;
+
+    // Try Agent Bridge first, fall back to GitHub API
+    try {
+      var bridgeCheck = await fetch('http://localhost:3141/', { signal: AbortSignal.timeout(2000) });
+      if (bridgeCheck.ok) {
+        await commitViaBridge(filePath, content, message);
+        return;
+      }
+    } catch(e) {}
+
+    // Browser-only path
+    await commitViaGitHubAPI(filePath, content, message);
+  }
+
+  return {
+    connect: connect, disconnect: disconnect, openFile: openFile,
+    askAI: askAI, restore: restore, showDiff: showDiff,
+    applyAndCommit: applyAndCommit, commitViaGitHubAPI: commitViaGitHubAPI,
+    refresh: function() { loadFileTree(true); }
+  };
 })();
