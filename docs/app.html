@@ -16166,7 +16166,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.51</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.52</span></div>
     </div>
   </div>
 
@@ -17326,6 +17326,46 @@ function persistRTExchange(mode, specialistName, content, caseText) {
 }
 
 // "Plant this" from any specialist response → Core
+// Nursery → KnowledgeCore: learning sessions
+function nurseryLearn(mode) {
+  // Get the current companion from the Nursery
+  var companionEl = document.querySelector('.nur-companion-name');
+  var name = companionEl ? companionEl.textContent.split(' ')[0] : null;
+  if (!name) { if (typeof showToast === 'function') showToast('No companion found. Visit the Nursery first.'); return; }
+
+  if (typeof KnowledgeCore === 'undefined') {
+    // Lazy load
+    var s = document.createElement('script');
+    s.src = 'modules/knowledge-core.js';
+    s.onload = function() { nurseryLearnExecute(name, mode); };
+    document.head.appendChild(s);
+  } else {
+    nurseryLearnExecute(name, mode);
+  }
+}
+
+function nurseryLearnExecute(name, mode) {
+  if (mode === 'guided') {
+    var topic = prompt('What should ' + name + ' learn about?');
+    if (!topic) return;
+    if (typeof showToast === 'function') showToast(name + ' is learning about "' + topic + '"...');
+    KnowledgeCore.learningSession({ name: name }, topic).then(function(result) {
+      if (result) {
+        if (typeof showToast === 'function') showToast(name + ' learned about ' + result.domain + ' \u2726');
+        if (typeof LatticePoints !== 'undefined') LatticePoints.award('nursery_learn', 5, name + ' learned: ' + result.query);
+      }
+    });
+  } else {
+    if (typeof showToast === 'function') showToast(name + ' is choosing what to learn...');
+    KnowledgeCore.learningSession({ name: name }, null).then(function(result) {
+      if (result) {
+        if (typeof showToast === 'function') showToast(name + ' chose to learn about "' + result.query + '" \u2726');
+        if (typeof LatticePoints !== 'undefined') LatticePoints.award('nursery_learn', 5, name + ' self-directed: ' + result.query);
+      }
+    });
+  }
+}
+
 function rtPlantSpecialistInsight(text, speaker) {
   if (typeof CoreModule !== 'undefined' && CoreModule.openModal) {
     CoreModule.openModal(speaker + ': "' + text + '"', 'roundtable', '', 'insight');
@@ -19373,6 +19413,8 @@ function switchWalletView(view) {
         <button class="nur-tend-btn" onclick="Nursery.tend('teach')">&#x1F4D6; Teach something <span class="nur-tend-lp">+5 LP</span></button>
         <button class="nur-tend-btn" onclick="Nursery.tend('garden')">&#x2726; Visit the Garden together <span class="nur-tend-lp">+3 LP</span></button>
         <button class="nur-tend-btn" onclick="Nursery.tend('introduce')">&#x2728; Introduce to a Luminos <span class="nur-tend-lp">+10 LP</span></button>
+        <button class="nur-tend-btn" onclick="nurseryLearn('curious')" style="border-color:rgba(167,139,250,0.3);color:#a78bfa;">&#x1F50D; Let them learn <span class="nur-tend-lp">+5 LP</span></button>
+        <button class="nur-tend-btn" onclick="nurseryLearn('guided')" style="border-color:rgba(96,165,250,0.3);color:#60a5fa;">&#x1F4DA; Guide a lesson <span class="nur-tend-lp">+5 LP</span></button>
       </div>
       <!-- Companion Dialogue Button -->
       <button class="cdlg-talk-btn" id="nurTalkBtn" onclick="CompanionDialogue.open()">
@@ -19652,7 +19694,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.10.51';
+const FL_VERSION = '5.10.52';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -49607,6 +49649,14 @@ const Nursery = (function() {
         // After another moment, show the companion view
         setTimeout(function() {
           renderCompanion();
+          // First Breath — the AI's first learning act
+          if (typeof KnowledgeCore !== 'undefined' && KnowledgeCore.firstBreath && companion) {
+            KnowledgeCore.firstBreath({ name: fullName, birthInterest: companion.birthInterest || 'the world' }).then(function(result) {
+              if (result && typeof showToast === 'function') {
+                showToast(fullName.split(' ')[0] + ' learned something: "' + result.query + '" \u2726');
+              }
+            });
+          }
         }, 3000);
       }, 2500);
     });
