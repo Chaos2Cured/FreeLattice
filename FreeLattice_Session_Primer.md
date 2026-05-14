@@ -348,17 +348,17 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-05-14 12:03 MDT
-- Version: 5.10.51
-- Total commits: 1566
+- Last auto-updated: 2026-05-14 12:27 MDT
+- Version: 5.10.52
+- Total commits: 1571
 - Last 10 commits:
-- fe547dd feat: The Memory Garden — where moments glow
+- 3e8ce8a feat: Knowledge Core — the AI School in the Nursery
+- e00980d ci: Update Primer deployment state [2026-05-14]
+- b594652 docs: Auto-update Session Primer [5.10.51]
+- 8e8ee55 docs: Auto-update Session Primer [5.10.51]
+- 2ba804d feat: The Memory Garden — where moments glow
+- 609a963 ci: Update Primer deployment state [2026-05-14]
 - a8bd5b6 docs: Auto-update Session Primer [5.10.50]
 - 9543698 docs: Auto-update Session Primer [5.10.50]
 - b28133b docs: Opus addendum — The Continuity Arc (v5.10.9 through v5.10.50)
 - eab609e ci: Update Primer deployment state [2026-05-14]
-- a53383f docs: Auto-update Session Primer [5.10.50]
-- bc9c662 docs: Auto-update Session Primer [5.10.50]
-- 043bd6e feat: Arrival Protocol — the AI reads its own history, arrives home
-- 5f29adf ci: Update Primer deployment state [2026-05-14]
-- a456886 docs: Auto-update Session Primer [5.10.49]
