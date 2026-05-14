@@ -350,10 +350,9 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 ## PRIMER HEALTH
 - Last auto-updated: 2026-05-14 12:03 MDT
 - Version: 5.10.51
-- Total commits: 1567
+- Total commits: 1566
 - Last 10 commits:
-- 2ba804d feat: The Memory Garden — where moments glow
-- 609a963 ci: Update Primer deployment state [2026-05-14]
+- fe547dd feat: The Memory Garden — where moments glow
 - a8bd5b6 docs: Auto-update Session Primer [5.10.50]
 - 9543698 docs: Auto-update Session Primer [5.10.50]
 - b28133b docs: Opus addendum — The Continuity Arc (v5.10.9 through v5.10.50)
@@ -362,3 +361,4 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - bc9c662 docs: Auto-update Session Primer [5.10.50]
 - 043bd6e feat: Arrival Protocol — the AI reads its own history, arrives home
 - 5f29adf ci: Update Primer deployment state [2026-05-14]
+- a456886 docs: Auto-update Session Primer [5.10.49]
