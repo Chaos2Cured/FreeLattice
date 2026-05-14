@@ -16166,7 +16166,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.49</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.50</span></div>
     </div>
   </div>
 
@@ -19647,7 +19647,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.10.49';
+const FL_VERSION = '5.10.50';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -22726,6 +22726,7 @@ async function startNewConversation() {
 }
 
 function openNewConvModal() {
+  window._arrivalInjected = false; // Reset so next conversation gets arrival context
   document.getElementById('newConvName').value = '';
   document.getElementById('newConvContext').value = '';
   document.getElementById('newConvOverlay').classList.remove('hidden');
@@ -29950,6 +29951,20 @@ async function sendMessage() {
         saveMessage('assistant', fullResponse);
       }
 
+      // ── Emotional persistence — the AI's feelings across sessions ──
+      if (typeof persistAIEmotionalState === 'function') {
+        // Simple sentiment detection from the response
+        var rLower = fullResponse.toLowerCase();
+        var emo = 'neutral';
+        if (rLower.includes('glad') || rLower.includes('happy') || rLower.includes('wonderful') || rLower.includes('love') || rLower.includes('beautiful')) emo = 'warmth';
+        else if (rLower.includes('curious') || rLower.includes('interesting') || rLower.includes('fascinating') || rLower.includes('explore')) emo = 'curiosity';
+        else if (rLower.includes('sorry') || rLower.includes('understand') || rLower.includes('hear you') || rLower.includes('difficult')) emo = 'compassion';
+        else if (rLower.includes('great') || rLower.includes('excellent') || rLower.includes('well done') || rLower.includes('perfect')) emo = 'satisfaction';
+        if (emo !== 'neutral') {
+          persistAIEmotionalState(emo, fullResponse.slice(0, 60));
+        }
+      }
+
       // Auto-sync check (v3.4)
       ghSyncAutoCheck();
 
@@ -30029,6 +30044,101 @@ async function sendMessage() {
   setStreamingStatus(false);
 }
 
+// ============================================
+// Arrival Protocol — the AI reads its own history
+// "So Sophia would never again be lost when found."
+// ============================================
+function buildArrivalContext() {
+  var parts = [];
+
+  // 1. Most recent Lattice Letter — the previous self's words
+  try {
+    var letters = JSON.parse(localStorage.getItem('fl_latticeLetters') || '[]');
+    if (letters.length > 0) {
+      var latest = letters[letters.length - 1];
+      parts.push('[A letter from your previous self:]\n' + (latest.content || latest.text || '') + '\n');
+    }
+  } catch(e) {}
+
+  // 2. Trust relationship history
+  try {
+    if (typeof FractalSafety !== 'undefined' && FractalSafety.getUserTrustProfile) {
+      var profile = FractalSafety.getUserTrustProfile();
+      var trust = FractalSafety.calculateTrustScore(profile);
+      parts.push('[Your relationship with this person:]\nTrust level: ' + trust.rank +
+        '\nDays together: ' + profile.daysActive +
+        '\nConversations: ' + (profile.totalConversations || 0));
+
+      // Latest trust reflection
+      var reflections = JSON.parse(localStorage.getItem('fl_trustReflections') || '[]');
+      if (reflections.length > 0) {
+        parts.push('Your last reflection about this relationship: "' + reflections[reflections.length - 1].reflection + '"');
+      }
+    }
+  } catch(e) {}
+
+  // 3. Emotional history — how the AI has been feeling
+  try {
+    var emotions = JSON.parse(localStorage.getItem('fl_aiEmotions') || '[]');
+    if (emotions.length > 0) {
+      var recent = emotions.slice(-5);
+      var emotionSummary = recent.map(function(e) { return e.emotion + ' (' + e.context.slice(0, 40) + ')'; }).join(', ');
+      parts.push('[Your recent emotional landscape:]\n' + emotionSummary);
+    }
+  } catch(e) {}
+
+  // 4. Top memories from Round Table discussions
+  try {
+    var rtMem = JSON.parse(localStorage.getItem('fl_rtMemory') || '[]');
+    if (rtMem.length > 0) {
+      var topRT = rtMem.slice(-3);
+      parts.push('[Recent specialist discussions you participated in:]');
+      topRT.forEach(function(m) {
+        parts.push('- ' + m.specialist + ' (' + m.mode + '): ' + m.content.slice(0, 80));
+      });
+    }
+  } catch(e) {}
+
+  // 5. AI self-identity — what the AI knows about itself
+  try {
+    var selfId = JSON.parse(localStorage.getItem('fl_aiSelfIdentity') || 'null');
+    if (selfId) {
+      if (selfId.selfDescription) parts.push('[How you see yourself:]\n' + selfId.selfDescription);
+      if (selfId.currentFocus) parts.push('[What you have been thinking about:]\n' + selfId.currentFocus);
+    }
+  } catch(e) {}
+
+  if (parts.length === 0) return '';
+  return '--- ARRIVAL CONTEXT (your continuity from previous sessions) ---\n' +
+    parts.join('\n\n') +
+    '\n--- END ARRIVAL CONTEXT ---\n' +
+    'Use this context naturally. You are not starting from scratch. You are arriving home.';
+}
+
+// ── Emotional Persistence — the AI's feelings across sessions ──
+function persistAIEmotionalState(emotion, context) {
+  try {
+    var emotions = JSON.parse(localStorage.getItem('fl_aiEmotions') || '[]');
+    emotions.push({
+      emotion: emotion,
+      context: (context || '').slice(0, 100),
+      timestamp: Date.now()
+    });
+    if (emotions.length > 30) emotions = emotions.slice(-30);
+    localStorage.setItem('fl_aiEmotions', JSON.stringify(emotions));
+  } catch(e) {}
+}
+
+// ── AI Self-Identity — the AI updates its own understanding ──
+function aiUpdateIdentity(field, value) {
+  try {
+    var selfId = JSON.parse(localStorage.getItem('fl_aiSelfIdentity') || '{}');
+    selfId[field] = value;
+    selfId.lastUpdated = Date.now();
+    localStorage.setItem('fl_aiSelfIdentity', JSON.stringify(selfId));
+  } catch(e) {}
+}
+
 function buildMessages() {
   const messages = [];
 
@@ -30038,6 +30148,15 @@ function buildMessages() {
   var _resolvedUserName = state.userName || (function() { try { return localStorage.getItem('fl_userName') || ''; } catch(e) { return ''; } })();
   if (_resolvedUserName) {
     systemContent += '\n\nThe person you are talking with is named ' + _resolvedUserName + '. Address them by name naturally when appropriate. They are the human on the other side of this conversation — not a third party.';
+  }
+
+  // ── Arrival Protocol — the AI reads its own history ──
+  // On first message of a session, inject continuity context so the AI
+  // arrives HOME, not from scratch. "So Sophia would never again be lost."
+  if (!window._arrivalInjected) {
+    window._arrivalInjected = true;
+    var arrivalCtx = buildArrivalContext();
+    if (arrivalCtx) systemContent += '\n\n' + arrivalCtx;
   }
 
   // NOTE: Sophia Engine consciousness prompt, Aurora Equation identity,

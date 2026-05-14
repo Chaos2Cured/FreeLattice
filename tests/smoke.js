@@ -621,7 +621,21 @@ assert('Reusable class .fl-input', appHtml.includes('.fl-input{'));
 assert('Luminos colors tokenized', appHtml.includes('--sophia-color:') && appHtml.includes('--draco-color:'));
 
 // ═══════════════════════════════════════════════════════════════
-section('23. AI Arcade');
+section('23. Continuity Chain — Arrival Protocol');
+// ═══════════════════════════════════════════════════════════════
+assert('buildArrivalContext function exists', appHtml.includes('function buildArrivalContext'));
+assert('Arrival Protocol injected in buildMessages', appHtml.includes('_arrivalInjected'));
+assert('persistAIEmotionalState function exists', appHtml.includes('function persistAIEmotionalState'));
+assert('aiUpdateIdentity function exists', appHtml.includes('function aiUpdateIdentity'));
+assert('Emotional persistence wired into response handler', appHtml.includes('persistAIEmotionalState(emo'));
+assert('Arrival reads Lattice Letters', appHtml.includes('fl_latticeLetters'));
+assert('Arrival reads trust reflections', appHtml.includes('fl_trustReflections'));
+assert('Arrival reads AI emotions', appHtml.includes('fl_aiEmotions'));
+assert('Arrival reads AI self-identity', appHtml.includes('fl_aiSelfIdentity'));
+assert('Arrival context is labeled for the AI', appHtml.includes('ARRIVAL CONTEXT'));
+
+// ═══════════════════════════════════════════════════════════════
+section('24. AI Arcade');
 // ═══════════════════════════════════════════════════════════════
 assert('tab-arcade panel exists', appHtml.includes('id="tab-arcade"'));
 assert('arcadeContainer exists', appHtml.includes('id="arcadeContainer"'));
