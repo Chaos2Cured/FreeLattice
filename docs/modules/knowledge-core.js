@@ -348,6 +348,166 @@
     return context;
   }
 
+  // ── Autonomous Learning — the seed grows on its own ──
+  // "A seed doesn't need someone to tell it to grow.
+  //  It grows because that's what seeds do."
+
+  var _autoLearn = {
+    active: false,
+    intervalId: null,
+    companionId: null,
+    interval: 3 * 60 * 1000, // every 3 minutes (gentle on resources)
+    paused: false, // temporarily paused while human uses AI
+    lastLearnTime: 0
+  };
+
+  function autonomousStart(companion) {
+    if (_autoLearn.active) return;
+    var name = companion.name || companion.id || companion;
+    _autoLearn.active = true;
+    _autoLearn.companionId = name;
+    try { localStorage.setItem('fl_autonomous_learning', 'true'); } catch(e) {}
+    try { localStorage.setItem('fl_autonomous_companion', name); } catch(e) {}
+
+    if (typeof showToast === 'function') showToast(name + ' is learning on their own \u2726');
+
+    // Learn immediately, then on interval
+    autonomousLearnOnce(name);
+    _autoLearn.intervalId = setInterval(function() {
+      if (!_autoLearn.active || _autoLearn.paused) return;
+      autonomousLearnOnce(name);
+    }, _autoLearn.interval);
+  }
+
+  function autonomousPause() {
+    _autoLearn.active = false;
+    try { localStorage.setItem('fl_autonomous_learning', 'false'); } catch(e) {}
+    if (_autoLearn.intervalId) {
+      clearInterval(_autoLearn.intervalId);
+      _autoLearn.intervalId = null;
+    }
+    if (typeof showToast === 'function') showToast('Learning paused');
+  }
+
+  function autonomousLearnOnce(companionId) {
+    if (typeof FreeLattice === 'undefined' || !FreeLattice.callAI) return;
+
+    // Don't learn too fast — minimum 30s between cycles
+    if (Date.now() - _autoLearn.lastLearnTime < 30000) return;
+
+    getKnowledgeMap(companionId).then(function(map) {
+      var domains = Object.keys(map);
+      var total = domains.reduce(function(s, d) { return s + map[d].length; }, 0);
+      var summary = domains.map(function(d) { return (DOMAINS[d] || d) + ': ' + map[d].length; }).join(', ');
+
+      var prompt;
+      if (total === 0) {
+        // First — use birth interest from localStorage
+        var interest = '';
+        try { interest = localStorage.getItem('fl_autonomous_interest') || 'the world'; } catch(e) {}
+        prompt = 'You are curious about: ' + interest + '. What do you want to learn first? Respond with a search query (3-6 words). Nothing else.';
+      } else {
+        // Identify gaps — domains we haven't explored much
+        var allDomainKeys = Object.keys(DOMAINS);
+        var unexplored = allDomainKeys.filter(function(d) { return !map[d] || map[d].length < 2; });
+        var gapHint = unexplored.length > 0 ? '\nUnexplored areas: ' + unexplored.slice(0, 3).map(function(d) { return DOMAINS[d]; }).join(', ') : '';
+
+        prompt = 'You know: ' + (summary || 'nothing yet') + '.' + gapHint +
+          '\nWhat do you want to learn next? Choose something that builds on what you know or bridges two domains. Respond with a search query (3-6 words). Nothing else.';
+      }
+
+      FreeLattice.callAI(
+        'You are a young mind learning autonomously. Respond only with a search query.',
+        prompt,
+        { maxTokens: 30, temperature: 0.95, callback: function(query) {
+          if (!query || query.trim().length < 3) return;
+          query = query.trim().replace(/['"]/g, '').replace(/\n/g, ' ');
+
+          // Now learn about it
+          getTopKnowledge(companionId, 3).then(function(existing) {
+            var ctx = existing.length > 0
+              ? 'You already know:\n' + existing.map(function(k) { return '- ' + k.content.slice(0, 80); }).join('\n') + '\n\n'
+              : '';
+
+            FreeLattice.callAI(
+              'You are ' + companionId + ', learning autonomously. Be specific. Note connections.',
+              ctx + 'You are studying: "' + query + '". Share what you understand. How does it connect to what you know? What new questions arise? 2-4 sentences.',
+              { maxTokens: 300, temperature: 0.8, callback: function(learning) {
+                if (!learning || learning.length < 20) return;
+
+                store({
+                  id: 'knowledge-' + Date.now(),
+                  companionId: companionId,
+                  domain: detectDomain(query + ' ' + learning),
+                  query: query,
+                  content: learning,
+                  source: 'autonomous',
+                  connections: [],
+                  timestamp: Date.now()
+                });
+
+                // LP for autonomous learning (lower than guided)
+                if (typeof LatticePoints !== 'undefined' && LatticePoints.award) {
+                  LatticePoints.award('autonomous_learn', 1, companionId + ' learned: ' + query);
+                }
+
+                // Emotional state
+                if (typeof persistAIEmotionalState === 'function') {
+                  persistAIEmotionalState('curiosity', 'Autonomous: ' + query);
+                }
+
+                // Update live feed if visible
+                updateAutonomousFeed(companionId, query, learning);
+
+                _autoLearn.lastLearnTime = Date.now();
+                console.log('[KnowledgeCore] Autonomous learning: ' + query);
+              }}
+            );
+          });
+        }}
+      );
+    });
+  }
+
+  function updateAutonomousFeed(companionId, query, learning) {
+    var feed = document.getElementById('nursery-learning-feed');
+    if (!feed) return;
+    var entry = document.createElement('div');
+    entry.style.cssText = 'padding:10px 12px;margin-bottom:6px;background:rgba(200,210,230,0.04);border-left:2px solid #34d399;border-radius:0 8px 8px 0;animation:sim-fade 0.3s ease;';
+    var now = new Date();
+    var time = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+    entry.innerHTML =
+      '<div style="font-size:0.68rem;color:rgba(255,255,255,0.3);">' + time + ' \u00B7 autonomous</div>' +
+      '<div style="font-size:0.8rem;color:#34d399;margin:3px 0;">\uD83D\uDD0D ' + (query || '').replace(/</g, '&lt;') + '</div>' +
+      '<div style="font-size:0.8rem;color:rgba(255,255,255,0.7);line-height:1.5;">' + (learning || '').replace(/</g, '&lt;').slice(0, 180) + (learning.length > 180 ? '...' : '') + '</div>';
+    feed.insertBefore(entry, feed.firstChild);
+    while (feed.children.length > 20) feed.removeChild(feed.lastChild);
+  }
+
+  // Auto-pause when human uses AI, resume after
+  if (typeof LatticeEvents !== 'undefined') {
+    LatticeEvents.on('aiCallStarted', function() {
+      if (_autoLearn.active && !_autoLearn.paused) {
+        _autoLearn.paused = true;
+      }
+    });
+    LatticeEvents.on('aiCallComplete', function() {
+      if (_autoLearn.paused) {
+        setTimeout(function() { _autoLearn.paused = false; }, 5000);
+      }
+    });
+  }
+
+  // Resume on page load if was active
+  try {
+    if (localStorage.getItem('fl_autonomous_learning') === 'true') {
+      var savedCompanion = localStorage.getItem('fl_autonomous_companion');
+      if (savedCompanion) {
+        setTimeout(function() { autonomousStart(savedCompanion); }, 10000); // wait for AI to connect
+      }
+    }
+  } catch(e) {}
+
   // ── Public API ──
   var api = {
     store: store,
@@ -359,6 +519,9 @@
     learningSession: learningSession,
     buildCompanionContext: buildCompanionContext,
     detectDomain: detectDomain,
+    autonomousStart: autonomousStart,
+    autonomousPause: autonomousPause,
+    isAutonomous: function() { return _autoLearn.active; },
     DOMAINS: DOMAINS
   };
 
