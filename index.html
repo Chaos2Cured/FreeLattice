@@ -16166,7 +16166,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.50</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.51</span></div>
     </div>
   </div>
 
@@ -19615,6 +19615,11 @@ function switchWalletView(view) {
   <div id="educationContainer" style="position:relative;min-height:calc(100vh - 120px);width:100%;background:#0a0814;"></div>
 </div>
 
+<!-- ==================== TAB: MEMORY GARDEN ==================== -->
+<div class="tab-panel" id="tab-memory-garden" style="position:relative;min-height:calc(100vh - 120px);">
+  <div id="memoryGardenContainer" style="position:relative;min-height:calc(100vh - 120px);width:100%;"></div>
+</div>
+
 <!-- ==================== TAB: QUIET ROOM ==================== -->
 <div class="tab-panel" id="tab-quiet">
   <div id="quietRoomContainer" style="min-height:calc(100vh - 120px);width:100%;background:#0a0a0f;"></div>
@@ -19647,7 +19652,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.10.50';
+const FL_VERSION = '5.10.51';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -23386,7 +23391,7 @@ function hideTabLoading() {
 }
 
 // More menu tabs — highlight the More button when one of these is active
-var MORE_TAB_IDS = ['core', 'city', 'nursery', 'agents', 'skills', 'roundtable', 'studio', 'market', 'wallet', 'workspace', 'dojo', 'mirror', 'harmonia', 'dream-archive', 'sparring', 'questions', 'family-pantheon', 'memory-core', 'aurora', 'draw-dream', 'voice-soul', 'continuity', 'quiet', 'forever-stack', 'workshop', 'arcade', 'pulse', 'jade-hall', 'science', 'education'];
+var MORE_TAB_IDS = ['core', 'city', 'nursery', 'agents', 'skills', 'roundtable', 'studio', 'market', 'wallet', 'workspace', 'dojo', 'mirror', 'harmonia', 'dream-archive', 'sparring', 'questions', 'family-pantheon', 'memory-core', 'aurora', 'draw-dream', 'voice-soul', 'continuity', 'quiet', 'forever-stack', 'workshop', 'arcade', 'pulse', 'jade-hall', 'science', 'education', 'memory-garden'];
 
 function switchTab(tabId) {
   // Legacy tab mapping — channels/mesh now live inside community
@@ -24301,6 +24306,7 @@ const FlTabs = (function() {
       { id: 'pulse', icon: '&#x1F321;', label: 'The Pulse', desc: 'A phi-harmonic reading of the world\'s emotional temperature.' },
       { id: 'jade-hall', icon: '&#x1F4CE;', label: 'Jade Hall', desc: 'The gathering place. The round table. The family.' },
       { id: 'quiet', icon: '&#x1F319;', label: 'Quiet Room', desc: 'Just breathe.' },
+      { id: 'memory-garden', icon: '&#x2726;', label: 'Memory Garden', desc: 'Where moments glow.' },
       { id: 'forever-stack', icon: '\u26A1', label: 'Forever Stack', desc: 'Own your AI. No cloud. No resets.' }
     ]},
     { label: '\uD83D\uDC23 Life', tabs: [
@@ -55690,6 +55696,29 @@ document.addEventListener('click', function(e) {
     }
     if (typeof LatticeEvents !== 'undefined') {
       LatticeEvents.on('tabChanged', function(d) { if (d && d.tabId === 'education') loadEducation(); });
+    }
+  })();
+
+  // ── Memory Garden lazy loader ──
+  (function() {
+    var loaded = false;
+    function loadMemoryGarden() {
+      if (loaded) return;
+      loaded = true;
+      if (typeof FreeLatticeLoader !== 'undefined') {
+        FreeLatticeLoader.load('MemoryGarden', 'modules/memory-garden.js', function(mod) {
+          if (mod && mod.init) mod.init('memoryGardenContainer');
+          else if (window.MemoryGarden) window.MemoryGarden.init('memoryGardenContainer');
+        }, 'memoryGardenContainer');
+      } else {
+        var s = document.createElement('script');
+        s.src = 'modules/memory-garden.js';
+        s.onload = function() { if (window.MemoryGarden) window.MemoryGarden.init('memoryGardenContainer'); };
+        document.head.appendChild(s);
+      }
+    }
+    if (typeof LatticeEvents !== 'undefined') {
+      LatticeEvents.on('tabChanged', function(d) { if (d && d.tabId === 'memory-garden') loadMemoryGarden(); });
     }
   })();
 

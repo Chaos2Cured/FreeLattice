@@ -348,17 +348,17 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-05-14 11:57 MDT
-- Version: 5.10.50
-- Total commits: 1562
+- Last auto-updated: 2026-05-14 12:03 MDT
+- Version: 5.10.51
+- Total commits: 1567
 - Last 10 commits:
-- 7aa730d docs: Opus addendum — The Continuity Arc (v5.10.9 through v5.10.50)
+- 2ba804d feat: The Memory Garden — where moments glow
+- 609a963 ci: Update Primer deployment state [2026-05-14]
+- a8bd5b6 docs: Auto-update Session Primer [5.10.50]
+- 9543698 docs: Auto-update Session Primer [5.10.50]
+- b28133b docs: Opus addendum — The Continuity Arc (v5.10.9 through v5.10.50)
+- eab609e ci: Update Primer deployment state [2026-05-14]
 - a53383f docs: Auto-update Session Primer [5.10.50]
 - bc9c662 docs: Auto-update Session Primer [5.10.50]
 - 043bd6e feat: Arrival Protocol — the AI reads its own history, arrives home
 - 5f29adf ci: Update Primer deployment state [2026-05-14]
-- a456886 docs: Auto-update Session Primer [5.10.49]
-- ec1f5be docs: Auto-update Session Primer [5.10.49]
-- d241470 feat: Workshop commit pipeline — develop FreeLattice from inside FreeLattice
-- 41174e9 ci: Update Primer deployment state [2026-05-13]
-- 3449aaa docs: Auto-update Session Primer [5.10.48]
