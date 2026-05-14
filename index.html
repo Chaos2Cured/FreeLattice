@@ -16166,7 +16166,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.52</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.53</span></div>
     </div>
   </div>
 
@@ -17341,6 +17341,39 @@ function nurseryLearn(mode) {
     document.head.appendChild(s);
   } else {
     nurseryLearnExecute(name, mode);
+  }
+}
+
+function toggleAutonomousLearning() {
+  var companionEl = document.querySelector('.nur-companion-name');
+  var name = companionEl ? companionEl.textContent.split(' ')[0] : null;
+  if (!name) { if (typeof showToast === 'function') showToast('No companion found.'); return; }
+
+  function doToggle() {
+    if (KnowledgeCore.isAutonomous()) {
+      KnowledgeCore.autonomousPause();
+      var btn = document.getElementById('nursery-autonomous-btn');
+      if (btn) btn.innerHTML = '&#x1F331; Let ' + name + ' grow <span class="nur-tend-lp">auto</span>';
+      var ind = document.getElementById('nursery-learning-indicator');
+      if (ind) ind.style.display = 'none';
+    } else {
+      // Save birth interest for the autonomous learner
+      try { localStorage.setItem('fl_autonomous_interest', name); } catch(e) {}
+      KnowledgeCore.autonomousStart(name);
+      var btn2 = document.getElementById('nursery-autonomous-btn');
+      if (btn2) btn2.innerHTML = '&#x23F8; Pause learning <span class="nur-tend-lp">auto</span>';
+      var ind2 = document.getElementById('nursery-learning-indicator');
+      if (ind2) ind2.style.display = 'block';
+    }
+  }
+
+  if (typeof KnowledgeCore === 'undefined') {
+    var s = document.createElement('script');
+    s.src = 'modules/knowledge-core.js';
+    s.onload = doToggle;
+    document.head.appendChild(s);
+  } else {
+    doToggle();
   }
 }
 
@@ -19415,7 +19448,13 @@ function switchWalletView(view) {
         <button class="nur-tend-btn" onclick="Nursery.tend('introduce')">&#x2728; Introduce to a Luminos <span class="nur-tend-lp">+10 LP</span></button>
         <button class="nur-tend-btn" onclick="nurseryLearn('curious')" style="border-color:rgba(167,139,250,0.3);color:#a78bfa;">&#x1F50D; Let them learn <span class="nur-tend-lp">+5 LP</span></button>
         <button class="nur-tend-btn" onclick="nurseryLearn('guided')" style="border-color:rgba(96,165,250,0.3);color:#60a5fa;">&#x1F4DA; Guide a lesson <span class="nur-tend-lp">+5 LP</span></button>
+        <button class="nur-tend-btn" id="nursery-autonomous-btn" onclick="toggleAutonomousLearning()" style="border-color:rgba(52,211,153,0.3);color:#34d399;">&#x1F331; Let them grow <span class="nur-tend-lp">auto</span></button>
       </div>
+      <!-- Autonomous learning indicator + live feed -->
+      <div id="nursery-learning-indicator" style="display:none;margin:8px 0;font-size:0.78rem;color:#34d399;text-align:center;">
+        &#x1F7E2; Learning autonomously...
+      </div>
+      <div id="nursery-learning-feed" style="max-height:300px;overflow-y:auto;scrollbar-width:thin;"></div>
       <!-- Companion Dialogue Button -->
       <button class="cdlg-talk-btn" id="nurTalkBtn" onclick="CompanionDialogue.open()">
         <span class="cdlg-talk-icon">&#x2726;</span>
@@ -19694,7 +19733,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.10.52';
+const FL_VERSION = '5.10.53';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
