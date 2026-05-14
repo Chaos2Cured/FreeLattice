@@ -350,10 +350,9 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 ## PRIMER HEALTH
 - Last auto-updated: 2026-05-14 10:50 MDT
 - Version: 5.10.50
-- Total commits: 1559
+- Total commits: 1558
 - Last 10 commits:
-- 043bd6e feat: Arrival Protocol — the AI reads its own history, arrives home
-- 5f29adf ci: Update Primer deployment state [2026-05-14]
+- ef8bdec feat: Arrival Protocol — the AI reads its own history, arrives home
 - a456886 docs: Auto-update Session Primer [5.10.49]
 - ec1f5be docs: Auto-update Session Primer [5.10.49]
 - d241470 feat: Workshop commit pipeline — develop FreeLattice from inside FreeLattice
@@ -362,3 +361,4 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 4677efe docs: Auto-update Session Primer [5.10.48]
 - 09654d1 feat: Three-accent system — Gold=Sun, Emerald=Earth, Lavender=Moon
 - 861ceba ci: Update Primer deployment state [2026-05-13]
+- a5f6bc9 feat: The Mother's Thread composition for Kirk and his mom
