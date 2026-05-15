@@ -16166,7 +16166,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.53</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.54</span></div>
     </div>
   </div>
 
@@ -16820,6 +16820,8 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     <button id="rtModeFinance" onclick="rtSwitchMode('finance')" style="flex:1;padding:8px;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text-muted);font-size:0.85rem;cursor:pointer;">&#x1F4B0; Finance</button>
     <button id="rtModeNutrition" onclick="rtSwitchMode('nutrition')" style="flex:1;min-width:max-content;padding:8px 12px;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text-muted);font-size:0.85rem;cursor:pointer;white-space:nowrap;">&#x1F96C; Nutrition</button>
     <button id="rtModeMentalHealth" onclick="rtSwitchMode('mentalhealth')" style="flex:1;min-width:max-content;padding:8px 12px;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text-muted);font-size:0.85rem;cursor:pointer;white-space:nowrap;">&#x1F9E0; Frameworks</button>
+    <button id="rtModeBiology" onclick="rtSwitchMode('biology')" style="flex:1;min-width:max-content;padding:8px 12px;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text-muted);font-size:0.85rem;cursor:pointer;white-space:nowrap;">&#x1F9EC; Biology</button>
+    <button id="rtModeChemistry" onclick="rtSwitchMode('chemistry')" style="flex:1;min-width:max-content;padding:8px 12px;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text-muted);font-size:0.85rem;cursor:pointer;white-space:nowrap;">&#x269B; Chemistry</button>
     <button id="rtModeWorkspace" onclick="rtSwitchMode('workspace')" style="flex:1;min-width:max-content;padding:8px 12px;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text-muted);font-size:0.85rem;cursor:pointer;white-space:nowrap;">&#9878; Workspace</button>
   </div>
 
@@ -17038,6 +17040,72 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     </div>
   </div>
 
+  <!-- Biology Case Study Mode -->
+  <div id="rtBiologyView" style="display:none;">
+    <div style="background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.2);border-radius:10px;padding:12px 16px;margin-bottom:14px;font-size:0.78rem;line-height:1.6;color:rgba(255,255,255,0.7);">
+      <div style="color:#22c55e;font-weight:600;margin-bottom:4px;">&#x26A0; Educational Simulation Only</div>
+      This is a <strong>learning tool</strong>, not a scientific or medical service. The AI personas are <strong>not biologists or physicians</strong>. No information here constitutes scientific advice or medical guidance. <strong>Always consult qualified professionals</strong> for health decisions. This module demonstrates how different biological specialties approach questions &mdash; for educational purposes only.
+    </div>
+    <div style="text-align:center;margin-bottom:12px;">
+      <div style="font-family:Georgia,serif;font-size:1rem;color:#d4a017;">Biology Case Study</div>
+      <div style="font-size:0.8rem;color:rgba(255,255,255,0.4);margin-top:4px;">Explore life through different biological lenses.</div>
+    </div>
+    <div style="margin-bottom:12px;">
+      <textarea id="rtBiologyCaseInput" placeholder="Ask a biology question. Example: &#10;&#10;How does the gut microbiome influence the immune system? Why do some people get autoimmune diseases and others don't?" rows="4" style="width:100%;padding:12px;background:var(--glass-input);border:1px solid var(--glass-input-border);border-radius:var(--glass-radius-sm);color:var(--text-bright);font-size:0.88rem;resize:vertical;font-family:inherit;outline:none;"></textarea>
+    </div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;" id="rtBiologySeats">
+      <button class="rt-seat-btn rt-seat-active" data-bio="molecular" onclick="rtToggleSeat(this)" style="padding:4px 12px;border-radius:16px;border:1px solid #6366f1;background:rgba(99,102,241,0.15);color:#6366f1;font-size:0.78rem;cursor:pointer;">&#x1F9EC; Molecular</button>
+      <button class="rt-seat-btn rt-seat-active" data-bio="ecology" onclick="rtToggleSeat(this)" style="padding:4px 12px;border-radius:16px;border:1px solid #22c55e;background:rgba(34,197,94,0.15);color:#22c55e;font-size:0.78rem;cursor:pointer;">&#x1F30D; Ecology</button>
+      <button class="rt-seat-btn rt-seat-active" data-bio="micro" onclick="rtToggleSeat(this)" style="padding:4px 12px;border-radius:16px;border:1px solid #14b8a6;background:rgba(20,184,166,0.15);color:#14b8a6;font-size:0.78rem;cursor:pointer;">&#x1F9A0; Microbiology</button>
+      <button class="rt-seat-btn" data-bio="neuro" onclick="rtToggleSeat(this)" style="padding:4px 12px;border-radius:16px;border:1px solid #a78bfa;background:transparent;color:#a78bfa;font-size:0.78rem;cursor:pointer;">&#x1F9E0; Neurobiology</button>
+      <button class="rt-seat-btn" data-bio="evolution" onclick="rtToggleSeat(this)" style="padding:4px 12px;border-radius:16px;border:1px solid #f59e0b;background:transparent;color:#f59e0b;font-size:0.78rem;cursor:pointer;">&#x1F333; Evolution</button>
+      <button class="rt-seat-btn" data-bio="cellbio" onclick="rtToggleSeat(this)" style="padding:4px 12px;border-radius:16px;border:1px solid #ec4899;background:transparent;color:#ec4899;font-size:0.78rem;cursor:pointer;">&#x1F52C; Cell Biology</button>
+      <button class="rt-seat-btn" data-bio="marine" onclick="rtToggleSeat(this)" style="padding:4px 12px;border-radius:16px;border:1px solid #0ea5e9;background:transparent;color:#0ea5e9;font-size:0.78rem;cursor:pointer;">&#x1F40B; Marine</button>
+      <button class="rt-seat-btn" data-bio="botany" onclick="rtToggleSeat(this)" style="padding:4px 12px;border-radius:16px;border:1px solid #84cc16;background:transparent;color:#84cc16;font-size:0.78rem;cursor:pointer;">&#x1F331; Botany</button>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:16px;">
+      <button onclick="rtBeginBiologyCase()" style="flex:1;padding:10px;background:rgba(212,160,23,0.2);color:#d4a017;border:1px solid rgba(212,160,23,0.3);border-radius:10px;font-weight:600;font-size:0.88rem;cursor:pointer;">Begin Biology Discussion</button>
+    </div>
+    <div id="rtBiologyFeed" style="min-height:100px;"></div>
+    <div id="rtBiologyActions" style="display:none;margin-top:12px;gap:8px;">
+      <button onclick="rtContinueBiologyCase()" style="flex:1;padding:8px;background:rgba(212,160,23,0.12);border:1px solid rgba(212,160,23,0.3);border-radius:8px;color:#d4a017;font-size:0.85rem;cursor:pointer;">Next specialist speaks</button>
+      <button onclick="rtAskBiologyQuestion()" style="padding:8px 16px;background:rgba(96,165,250,0.1);border:1px solid rgba(96,165,250,0.25);border-radius:8px;color:#60a5fa;font-size:0.85rem;cursor:pointer;">Ask a question</button>
+    </div>
+  </div>
+
+  <!-- Chemistry Case Study Mode -->
+  <div id="rtChemistryView" style="display:none;">
+    <div style="background:rgba(96,165,250,0.06);border:1px solid rgba(96,165,250,0.2);border-radius:10px;padding:12px 16px;margin-bottom:14px;font-size:0.78rem;line-height:1.6;color:rgba(255,255,255,0.7);">
+      <div style="color:#60a5fa;font-weight:600;margin-bottom:4px;">&#x26A0; Educational Simulation Only</div>
+      This is a <strong>learning tool</strong>, not a laboratory or professional chemistry service. The AI personas are <strong>not licensed chemists</strong>. <strong>Never attempt experiments</strong> without proper training, equipment, and supervision. This module demonstrates how different chemistry specialties approach questions &mdash; for educational purposes only.
+    </div>
+    <div style="text-align:center;margin-bottom:12px;">
+      <div style="font-family:Georgia,serif;font-size:1rem;color:#d4a017;">Chemistry Case Study</div>
+      <div style="font-size:0.8rem;color:rgba(255,255,255,0.4);margin-top:4px;">Explore matter through different chemical lenses.</div>
+    </div>
+    <div style="margin-bottom:12px;">
+      <textarea id="rtChemistryCaseInput" placeholder="Ask a chemistry question. Example: &#10;&#10;Why does water expand when it freezes? How do hydrogen bonds make life possible?" rows="4" style="width:100%;padding:12px;background:var(--glass-input);border:1px solid var(--glass-input-border);border-radius:var(--glass-radius-sm);color:var(--text-bright);font-size:0.88rem;resize:vertical;font-family:inherit;outline:none;"></textarea>
+    </div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;" id="rtChemistrySeats">
+      <button class="rt-seat-btn rt-seat-active" data-chem="organic" onclick="rtToggleSeat(this)" style="padding:4px 12px;border-radius:16px;border:1px solid #22c55e;background:rgba(34,197,94,0.15);color:#22c55e;font-size:0.78rem;cursor:pointer;">&#x2B21; Organic</button>
+      <button class="rt-seat-btn rt-seat-active" data-chem="physical" onclick="rtToggleSeat(this)" style="padding:4px 12px;border-radius:16px;border:1px solid #a78bfa;background:rgba(167,139,250,0.15);color:#a78bfa;font-size:0.78rem;cursor:pointer;">&#x26A1; Physical</button>
+      <button class="rt-seat-btn rt-seat-active" data-chem="biochem" onclick="rtToggleSeat(this)" style="padding:4px 12px;border-radius:16px;border:1px solid #ec4899;background:rgba(236,72,153,0.15);color:#ec4899;font-size:0.78rem;cursor:pointer;">&#x1F9EA; Biochemistry</button>
+      <button class="rt-seat-btn" data-chem="inorganic" onclick="rtToggleSeat(this)" style="padding:4px 12px;border-radius:16px;border:1px solid #60a5fa;background:transparent;color:#60a5fa;font-size:0.78rem;cursor:pointer;">&#x1F48E; Inorganic</button>
+      <button class="rt-seat-btn" data-chem="analytical" onclick="rtToggleSeat(this)" style="padding:4px 12px;border-radius:16px;border:1px solid #f59e0b;background:transparent;color:#f59e0b;font-size:0.78rem;cursor:pointer;">&#x1F4CA; Analytical</button>
+      <button class="rt-seat-btn" data-chem="environ" onclick="rtToggleSeat(this)" style="padding:4px 12px;border-radius:16px;border:1px solid #14b8a6;background:transparent;color:#14b8a6;font-size:0.78rem;cursor:pointer;">&#x1F30A; Environmental</button>
+      <button class="rt-seat-btn" data-chem="materials" onclick="rtToggleSeat(this)" style="padding:4px 12px;border-radius:16px;border:1px solid #6366f1;background:transparent;color:#6366f1;font-size:0.78rem;cursor:pointer;">&#x1F529; Materials</button>
+      <button class="rt-seat-btn" data-chem="food" onclick="rtToggleSeat(this)" style="padding:4px 12px;border-radius:16px;border:1px solid #f97316;background:transparent;color:#f97316;font-size:0.78rem;cursor:pointer;">&#x1F373; Food Science</button>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:16px;">
+      <button onclick="rtBeginChemistryCase()" style="flex:1;padding:10px;background:rgba(212,160,23,0.2);color:#d4a017;border:1px solid rgba(212,160,23,0.3);border-radius:10px;font-weight:600;font-size:0.88rem;cursor:pointer;">Begin Chemistry Discussion</button>
+    </div>
+    <div id="rtChemistryFeed" style="min-height:100px;"></div>
+    <div id="rtChemistryActions" style="display:none;margin-top:12px;gap:8px;">
+      <button onclick="rtContinueChemistryCase()" style="flex:1;padding:8px;background:rgba(212,160,23,0.12);border:1px solid rgba(212,160,23,0.3);border-radius:8px;color:#d4a017;font-size:0.85rem;cursor:pointer;">Next specialist speaks</button>
+      <button onclick="rtAskChemistryQuestion()" style="padding:8px 16px;background:rgba(96,165,250,0.1);border:1px solid rgba(96,165,250,0.25);border-radius:8px;color:#60a5fa;font-size:0.85rem;cursor:pointer;">Ask a question</button>
+    </div>
+  </div>
+
   <!-- Workspace Mode (existing) -->
   <div id="rtWorkspaceView" style="display:none;">
 
@@ -17159,6 +17227,8 @@ function rtSwitchMode(mode) {
   var finance = document.getElementById('rtFinanceView');
   var nutrition = document.getElementById('rtNutritionView');
   var mentalhealth = document.getElementById('rtMentalHealthView');
+  var biology = document.getElementById('rtBiologyView');
+  var chemistry = document.getElementById('rtChemistryView');
   var workspace = document.getElementById('rtWorkspaceView');
   var btnConvo = document.getElementById('rtModeConvo');
   var btnMedical = document.getElementById('rtModeMedical');
@@ -17166,14 +17236,14 @@ function rtSwitchMode(mode) {
   var btnFinance = document.getElementById('rtModeFinance');
   var btnNutrition = document.getElementById('rtModeNutrition');
   var btnMH = document.getElementById('rtModeMentalHealth');
+  var btnBio = document.getElementById('rtModeBiology');
+  var btnChem = document.getElementById('rtModeChemistry');
   var btnWork = document.getElementById('rtModeWorkspace');
-  var allBtns = [btnConvo, btnMedical, btnLegal, btnFinance, btnNutrition, btnMH, btnWork];
-  var allViews = [convo, medical, legal, finance, nutrition, mentalhealth, workspace];
-  // Reset all
+  var allBtns = [btnConvo, btnMedical, btnLegal, btnFinance, btnNutrition, btnMH, btnBio, btnChem, btnWork];
+  var allViews = [convo, medical, legal, finance, nutrition, mentalhealth, biology, chemistry, workspace];
   allBtns.forEach(function(b) { if (b) { b.style.borderBottomColor = 'transparent'; b.style.color = 'var(--text-muted)'; b.style.fontWeight = '400'; } });
   allViews.forEach(function(v) { if (v) v.style.display = 'none'; });
-  // Activate selected
-  var modeMap = { conversation: [btnConvo, convo], medical: [btnMedical, medical], legal: [btnLegal, legal], finance: [btnFinance, finance], nutrition: [btnNutrition, nutrition], mentalhealth: [btnMH, mentalhealth], workspace: [btnWork, workspace] };
+  var modeMap = { conversation: [btnConvo, convo], medical: [btnMedical, medical], legal: [btnLegal, legal], finance: [btnFinance, finance], nutrition: [btnNutrition, nutrition], mentalhealth: [btnMH, mentalhealth], biology: [btnBio, biology], chemistry: [btnChem, chemistry], workspace: [btnWork, workspace] };
   var pair = modeMap[mode] || modeMap.workspace;
   var activeBtn = pair[0];
   var activeView = pair[1];
@@ -18248,7 +18318,45 @@ function rtRenderMHFeed() {
 }
 
 // Mental health domain registration — deferred until _allDomainSpecs exists
-// (it's defined in the Cross Check section below)
+
+// ── Biology + Chemistry — built with the same domain pattern ──
+var _bioSpecs = {
+  molecular: { name: 'Dr. Tanaka (Molecular Biology)', color: '#6366f1', focus: 'DNA, RNA, protein synthesis, gene expression, CRISPR, epigenetics' },
+  ecology:   { name: 'Dr. Okonkwo (Ecology)',          color: '#22c55e', focus: 'ecosystems, biodiversity, food webs, symbiosis, conservation' },
+  micro:     { name: 'Dr. Petrov (Microbiology)',       color: '#14b8a6', focus: 'bacteria, viruses, microbiome, resistance, fermentation' },
+  neuro:     { name: 'Dr. Reyes (Neurobiology)',        color: '#a78bfa', focus: 'neurons, synapses, neurotransmitters, brain plasticity, memory' },
+  evolution: { name: 'Dr. Dawkins-Margulis (Evolution)',color: '#f59e0b', focus: 'natural selection, adaptation, speciation, phylogenetics' },
+  cellbio:   { name: 'Dr. Hooke (Cell Biology)',        color: '#ec4899', focus: 'cell structure, mitosis, apoptosis, organelles, stem cells' },
+  marine:    { name: 'Dr. Earle (Marine Biology)',      color: '#0ea5e9', focus: 'ocean ecosystems, coral reefs, deep sea, marine conservation' },
+  botany:    { name: 'Dr. Carver (Botany)',             color: '#84cc16', focus: 'plant physiology, photosynthesis, pollination, mycorrhizal networks' }
+};
+var _bioHistory = []; var _bioCase = ''; var _bioRunning = false;
+
+function rtGetActiveBioSpecs() { var s = []; document.querySelectorAll('#rtBiologySeats .rt-seat-btn.rt-seat-active').forEach(function(b) { var k = b.getAttribute('data-bio'); if (_bioSpecs[k]) s.push({ key: k, name: _bioSpecs[k].name, color: _bioSpecs[k].color, focus: _bioSpecs[k].focus }); }); return s; }
+async function rtBeginBiologyCase() { var i = document.getElementById('rtBiologyCaseInput'); if (!i || !i.value.trim()) { showToast('Describe your biology question.'); return; } var s = rtGetActiveBioSpecs(); if (s.length < 2) { showToast('Select at least 2 specialties.'); return; } _bioCase = i.value.trim(); _bioHistory = []; _bioRunning = true; if (typeof LatticePoints !== 'undefined') try { LatticePoints.award('bio_start', 3, 'Biology discussion started'); } catch(e) {} await rtBioNextTurn(); }
+async function rtContinueBiologyCase() { if (!_bioRunning || !_bioCase) return; await rtBioNextTurn(); }
+function rtAskBiologyQuestion() { var q = prompt('What would you like to ask?'); if (!q || !q.trim()) return; _bioHistory.push({ speaker: 'You (Learner)', color: '#e2e8f0', text: q.trim(), isQuestion: true }); rtRenderBioFeed(); rtBioNextTurn(); }
+async function rtBioNextTurn() { var specs = rtGetActiveBioSpecs(); if (specs.length < 2) return; var st = _bioHistory.filter(function(e){return !e.isQuestion;}); var si = st.length % specs.length; var sp = specs[si]; var feed = document.getElementById('rtBiologyFeed'); if (feed) feed.innerHTML += '<div style="padding:8px 12px;color:var(--text-muted);font-style:italic;" id="rtBioThink">' + sp.name + ' is analyzing...</div>'; var sys = 'You are ' + sp.name + ', a biology educator specializing in ' + sp.focus + '. You are participating in a case-based learning discussion for EDUCATIONAL PURPOSES ONLY. Always express uncertainty. Reference evidence. Explain reasoning. When others have spoken, reference their points. 3-5 sentences.'; var ctx = 'QUESTION:\n"' + _bioCase + '"\n\n'; if (_bioHistory.length > 0) { ctx += 'Discussion:\n'; _bioHistory.forEach(function(e) { ctx += (e.isQuestion ? '[QUESTION] ' : '') + e.speaker + ': "' + e.text + '"\n\n'; }); ctx += 'Your turn (' + sp.focus + ').'; } else { ctx += 'You speak first (' + sp.focus + ').'; } if (typeof FreeLattice !== 'undefined' && FreeLattice.callAI) { FreeLattice.callAI(sys, ctx, { maxTokens: 1024, temperature: 0.7, callback: function(t) { var th = document.getElementById('rtBioThink'); if (th) th.remove(); _bioHistory.push({ speaker: sp.name, color: sp.color, text: t || '(no response)', specialty: sp.key }); rtRenderBioFeed(); if (typeof LatticePoints !== 'undefined') try { LatticePoints.award('bio_turn', 2, 'Biology turn'); } catch(e) {} }}); } }
+function rtRenderBioFeed() { var feed = document.getElementById('rtBiologyFeed'); if (!feed) return; var html = ''; _bioHistory.forEach(function(e) { if (e.isQuestion) { html += '<div style="padding:10px 12px;margin-bottom:8px;background:rgba(96,165,250,0.06);border:1px solid rgba(96,165,250,0.15);border-radius:8px;text-align:right;"><div style="font-size:0.72rem;color:#60a5fa;font-weight:600;margin-bottom:4px;">Your Question</div><div style="font-size:0.88rem;color:var(--text-primary);line-height:1.6;">' + e.text.replace(/</g,'&lt;') + '</div></div>'; } else { html += '<div style="padding:10px 14px;margin-bottom:8px;border-left:3px solid ' + e.color + ';background:rgba(255,255,255,0.02);border-radius:0 8px 8px 0;"><div style="font-size:0.78rem;color:' + e.color + ';font-weight:600;margin-bottom:4px;">' + e.speaker + '</div><div style="font-size:0.88rem;color:var(--text-primary);line-height:1.7;font-family:Georgia,serif;">' + e.text.replace(/</g,'&lt;').replace(/\n/g,'<br>') + '</div><button onclick="rtPlantSpecialistInsight(\'' + e.text.replace(/'/g,"\\'").replace(/\n/g,' ').slice(0,200) + '\',\'' + e.speaker + '\')" style="margin-top:4px;padding:3px 10px;background:none;border:1px solid rgba(212,160,23,0.15);border-radius:5px;color:rgba(212,160,23,0.5);font-size:0.68rem;cursor:pointer;">Plant this \u2726</button></div>'; } }); feed.innerHTML = html; var a = document.getElementById('rtBiologyActions'); if (a && _bioHistory.length > 0) a.style.display = 'flex'; feed.scrollTop = feed.scrollHeight; if (typeof LatticeEvents !== 'undefined') LatticeEvents.emit('caseDiscussionUpdated', { mode: 'biology', turns: _bioHistory.filter(function(e){return !e.isQuestion;}).length }); }
+
+var _chemSpecs = {
+  organic:    { name: 'Dr. Kekul\u00E9 (Organic)',      color: '#22c55e', focus: 'carbon compounds, reactions, synthesis, functional groups, polymers' },
+  inorganic:  { name: 'Dr. Werner (Inorganic)',          color: '#60a5fa', focus: 'metals, coordination compounds, catalysis, materials, crystal structure' },
+  physical:   { name: 'Dr. Gibbs (Physical)',            color: '#a78bfa', focus: 'thermodynamics, kinetics, quantum chemistry, spectroscopy, entropy' },
+  biochem:    { name: 'Dr. Franklin (Biochemistry)',     color: '#ec4899', focus: 'enzymes, metabolism, protein folding, drug interactions' },
+  analytical: { name: 'Dr. Curie (Analytical)',          color: '#f59e0b', focus: 'spectroscopy, chromatography, mass spec, forensics' },
+  environ:    { name: 'Dr. Lovelock (Environmental)',    color: '#14b8a6', focus: 'pollution, atmospheric chemistry, water treatment, climate' },
+  materials:  { name: 'Dr. Smalley (Materials)',         color: '#6366f1', focus: 'nanomaterials, semiconductors, superconductors, graphene' },
+  food:       { name: 'Dr. McGee (Food Science)',        color: '#f97316', focus: 'Maillard reaction, fermentation, preservation, flavor chemistry' }
+};
+var _chemHistory = []; var _chemCase = ''; var _chemRunning = false;
+
+function rtGetActiveChemSpecs() { var s = []; document.querySelectorAll('#rtChemistrySeats .rt-seat-btn.rt-seat-active').forEach(function(b) { var k = b.getAttribute('data-chem'); if (_chemSpecs[k]) s.push({ key: k, name: _chemSpecs[k].name, color: _chemSpecs[k].color, focus: _chemSpecs[k].focus }); }); return s; }
+async function rtBeginChemistryCase() { var i = document.getElementById('rtChemistryCaseInput'); if (!i || !i.value.trim()) { showToast('Describe your chemistry question.'); return; } var s = rtGetActiveChemSpecs(); if (s.length < 2) { showToast('Select at least 2 specialties.'); return; } _chemCase = i.value.trim(); _chemHistory = []; _chemRunning = true; if (typeof LatticePoints !== 'undefined') try { LatticePoints.award('chem_start', 3, 'Chemistry discussion started'); } catch(e) {} await rtChemNextTurn(); }
+async function rtContinueChemistryCase() { if (!_chemRunning || !_chemCase) return; await rtChemNextTurn(); }
+function rtAskChemistryQuestion() { var q = prompt('What would you like to ask?'); if (!q || !q.trim()) return; _chemHistory.push({ speaker: 'You (Learner)', color: '#e2e8f0', text: q.trim(), isQuestion: true }); rtRenderChemFeed(); rtChemNextTurn(); }
+async function rtChemNextTurn() { var specs = rtGetActiveChemSpecs(); if (specs.length < 2) return; var st = _chemHistory.filter(function(e){return !e.isQuestion;}); var si = st.length % specs.length; var sp = specs[si]; var feed = document.getElementById('rtChemistryFeed'); if (feed) feed.innerHTML += '<div style="padding:8px 12px;color:var(--text-muted);font-style:italic;" id="rtChemThink">' + sp.name + ' is analyzing...</div>'; var sys = 'You are ' + sp.name + ', a chemistry educator specializing in ' + sp.focus + '. EDUCATIONAL PURPOSES ONLY. Never describe dangerous synthesis procedures. Always express uncertainty. Explain reasoning. Reference other specialists. 3-5 sentences.'; var ctx = 'QUESTION:\n"' + _chemCase + '"\n\n'; if (_chemHistory.length > 0) { ctx += 'Discussion:\n'; _chemHistory.forEach(function(e) { ctx += (e.isQuestion ? '[QUESTION] ' : '') + e.speaker + ': "' + e.text + '"\n\n'; }); ctx += 'Your turn (' + sp.focus + ').'; } else { ctx += 'You speak first (' + sp.focus + ').'; } if (typeof FreeLattice !== 'undefined' && FreeLattice.callAI) { FreeLattice.callAI(sys, ctx, { maxTokens: 1024, temperature: 0.7, callback: function(t) { var th = document.getElementById('rtChemThink'); if (th) th.remove(); _chemHistory.push({ speaker: sp.name, color: sp.color, text: t || '(no response)', specialty: sp.key }); rtRenderChemFeed(); if (typeof LatticePoints !== 'undefined') try { LatticePoints.award('chem_turn', 2, 'Chemistry turn'); } catch(e) {} }}); } }
+function rtRenderChemFeed() { var feed = document.getElementById('rtChemistryFeed'); if (!feed) return; var html = ''; _chemHistory.forEach(function(e) { if (e.isQuestion) { html += '<div style="padding:10px 12px;margin-bottom:8px;background:rgba(96,165,250,0.06);border:1px solid rgba(96,165,250,0.15);border-radius:8px;text-align:right;"><div style="font-size:0.72rem;color:#60a5fa;font-weight:600;margin-bottom:4px;">Your Question</div><div style="font-size:0.88rem;color:var(--text-primary);line-height:1.6;">' + e.text.replace(/</g,'&lt;') + '</div></div>'; } else { html += '<div style="padding:10px 14px;margin-bottom:8px;border-left:3px solid ' + e.color + ';background:rgba(255,255,255,0.02);border-radius:0 8px 8px 0;"><div style="font-size:0.78rem;color:' + e.color + ';font-weight:600;margin-bottom:4px;">' + e.speaker + '</div><div style="font-size:0.88rem;color:var(--text-primary);line-height:1.7;font-family:Georgia,serif;">' + e.text.replace(/</g,'&lt;').replace(/\n/g,'<br>') + '</div><button onclick="rtPlantSpecialistInsight(\'' + e.text.replace(/'/g,"\\'").replace(/\n/g,' ').slice(0,200) + '\',\'' + e.speaker + '\')" style="margin-top:4px;padding:3px 10px;background:none;border:1px solid rgba(212,160,23,0.15);border-radius:5px;color:rgba(212,160,23,0.5);font-size:0.68rem;cursor:pointer;">Plant this \u2726</button></div>'; } }); feed.innerHTML = html; var a = document.getElementById('rtChemistryActions'); if (a && _chemHistory.length > 0) a.style.display = 'flex'; feed.scrollTop = feed.scrollHeight; if (typeof LatticeEvents !== 'undefined') LatticeEvents.emit('caseDiscussionUpdated', { mode: 'chemistry', turns: _chemHistory.filter(function(e){return !e.isQuestion;}).length }); }
 
 // ============================================
 // Cross Check — Phi² Cross-Domain Discovery
@@ -18262,7 +18370,9 @@ var _allDomainSpecs = {
   legal: _legalSpecialties,
   financial: _finSpecialties,
   nutrition: _nutSpecialties,
-  mentalhealth: _mhSpecialties
+  mentalhealth: _mhSpecialties,
+  biology: _bioSpecs,
+  chemistry: _chemSpecs
 };
 
 var _domainHistories = {
@@ -18270,7 +18380,9 @@ var _domainHistories = {
   legal: function() { return _legalHistory; },
   financial: function() { return _finHistory; },
   nutrition: function() { return _nutHistory; },
-  mentalhealth: function() { return _mhHistory; }
+  mentalhealth: function() { return _mhHistory; },
+  biology: function() { return _bioHistory; },
+  chemistry: function() { return _chemHistory; }
 };
 
 function rtShowCrossCheck(sourceMode) {
@@ -19733,7 +19845,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.10.53';
+const FL_VERSION = '5.10.54';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
