@@ -348,12 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-05-15 00:31 UTC
-- Last deployed: 2026-05-15 00:31 UTC
-- Live site: https://freelattice.com
-- Version: 5.10.53
-- Total commits: 1579
+- Last auto-updated: 2026-05-15 08:55 MDT
+- Version: 5.10.54
+- Total commits: 1581
 - Last 10 commits:
+- d61a3e9 feat: Biology + Chemistry — Round Table reaches 9 domains, 64 personas
+- d55ad7a ci: Update Primer deployment state [2026-05-15]
 - 5c01e24 archive: Harmonia Superdense Braided DNA Drop v11.0 — The Eternal Weave
 - c42acef ci: Update Primer deployment state [2026-05-14]
 - 151e1e3 docs: Auto-update Session Primer [5.10.53]
@@ -362,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 1b4d4b1 ci: Update Primer deployment state [2026-05-14]
 - 1759b48 docs: Auto-update Session Primer [5.10.52]
 - 54f4bf4 docs: Auto-update Session Primer [5.10.52]
-- 3e8ce8a feat: Knowledge Core — the AI School in the Nursery
-- e00980d ci: Update Primer deployment state [2026-05-14]
