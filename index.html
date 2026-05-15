@@ -16166,7 +16166,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.54</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.55</span></div>
     </div>
   </div>
 
@@ -16822,6 +16822,8 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     <button id="rtModeMentalHealth" onclick="rtSwitchMode('mentalhealth')" style="flex:1;min-width:max-content;padding:8px 12px;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text-muted);font-size:0.85rem;cursor:pointer;white-space:nowrap;">&#x1F9E0; Frameworks</button>
     <button id="rtModeBiology" onclick="rtSwitchMode('biology')" style="flex:1;min-width:max-content;padding:8px 12px;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text-muted);font-size:0.85rem;cursor:pointer;white-space:nowrap;">&#x1F9EC; Biology</button>
     <button id="rtModeChemistry" onclick="rtSwitchMode('chemistry')" style="flex:1;min-width:max-content;padding:8px 12px;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text-muted);font-size:0.85rem;cursor:pointer;white-space:nowrap;">&#x269B; Chemistry</button>
+    <button id="rtModePhysics" onclick="rtSwitchMode('physics')" style="flex:1;min-width:max-content;padding:8px 12px;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text-muted);font-size:0.85rem;cursor:pointer;white-space:nowrap;">&#x2699; Physics</button>
+    <button id="rtModePhilosophy" onclick="rtSwitchMode('philosophy')" style="flex:1;min-width:max-content;padding:8px 12px;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text-muted);font-size:0.85rem;cursor:pointer;white-space:nowrap;">&#x1F4DC; Philosophy</button>
     <button id="rtModeWorkspace" onclick="rtSwitchMode('workspace')" style="flex:1;min-width:max-content;padding:8px 12px;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text-muted);font-size:0.85rem;cursor:pointer;white-space:nowrap;">&#9878; Workspace</button>
   </div>
 
@@ -17106,6 +17108,64 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     </div>
   </div>
 
+  <!-- Physics Case Study Mode -->
+  <div id="rtPhysicsView" style="display:none;">
+    <div style="background:rgba(99,102,241,0.06);border:1px solid rgba(99,102,241,0.2);border-radius:10px;padding:12px 16px;margin-bottom:14px;font-size:0.78rem;line-height:1.6;color:rgba(255,255,255,0.7);">
+      <div style="color:#6366f1;font-weight:600;margin-bottom:4px;">&#x26A0; Educational Simulation Only</div>
+      This is a <strong>learning tool</strong>, not a professional physics service. The AI personas are <strong>not physicists</strong>. This module demonstrates how different physics specialties approach questions &mdash; for educational purposes only.
+    </div>
+    <div style="text-align:center;margin-bottom:12px;">
+      <div style="font-family:Georgia,serif;font-size:1rem;color:#d4a017;">Physics Case Study</div>
+      <div style="font-size:0.8rem;color:rgba(255,255,255,0.4);margin-top:4px;">Explore the universe through different physical lenses.</div>
+    </div>
+    <div style="margin-bottom:12px;"><textarea id="rtPhysicsCaseInput" placeholder="Ask a physics question. Example: &#10;&#10;Why does time move slower near massive objects? How does gravity actually work?" rows="4" style="width:100%;padding:12px;background:var(--glass-input);border:1px solid var(--glass-input-border);border-radius:var(--glass-radius-sm);color:var(--text-bright);font-size:0.88rem;resize:vertical;font-family:inherit;outline:none;"></textarea></div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;" id="rtPhysicsSeats">
+      <button class="rt-seat-btn rt-seat-active" data-phys="classical" onclick="rtToggleSeat(this)" style="padding:4px 12px;border-radius:16px;border:1px solid #f59e0b;background:rgba(245,158,11,0.15);color:#f59e0b;font-size:0.78rem;cursor:pointer;">&#x1F34E; Classical</button>
+      <button class="rt-seat-btn rt-seat-active" data-phys="quantum" onclick="rtToggleSeat(this)" style="padding:4px 12px;border-radius:16px;border:1px solid #a78bfa;background:rgba(167,139,250,0.15);color:#a78bfa;font-size:0.78rem;cursor:pointer;">&#x269B; Quantum</button>
+      <button class="rt-seat-btn rt-seat-active" data-phys="relativity" onclick="rtToggleSeat(this)" style="padding:4px 12px;border-radius:16px;border:1px solid #6366f1;background:rgba(99,102,241,0.15);color:#6366f1;font-size:0.78rem;cursor:pointer;">&#x1F573; Relativity</button>
+      <button class="rt-seat-btn" data-phys="thermo" onclick="rtToggleSeat(this)" style="padding:4px 12px;border-radius:16px;border:1px solid #ef4444;background:transparent;color:#ef4444;font-size:0.78rem;cursor:pointer;">&#x1F525; Thermo</button>
+      <button class="rt-seat-btn" data-phys="em" onclick="rtToggleSeat(this)" style="padding:4px 12px;border-radius:16px;border:1px solid #0ea5e9;background:transparent;color:#0ea5e9;font-size:0.78rem;cursor:pointer;">&#x1F4A1; E&amp;M</button>
+      <button class="rt-seat-btn" data-phys="particle" onclick="rtToggleSeat(this)" style="padding:4px 12px;border-radius:16px;border:1px solid #ec4899;background:transparent;color:#ec4899;font-size:0.78rem;cursor:pointer;">&#x2728; Particle</button>
+      <button class="rt-seat-btn" data-phys="condensed" onclick="rtToggleSeat(this)" style="padding:4px 12px;border-radius:16px;border:1px solid #14b8a6;background:transparent;color:#14b8a6;font-size:0.78rem;cursor:pointer;">&#x2744; Condensed</button>
+      <button class="rt-seat-btn" data-phys="astro" onclick="rtToggleSeat(this)" style="padding:4px 12px;border-radius:16px;border:1px solid #fde047;background:transparent;color:#fde047;font-size:0.78rem;cursor:pointer;">&#x2B50; Astrophysics</button>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:16px;"><button onclick="rtBeginPhysicsCase()" style="flex:1;padding:10px;background:rgba(212,160,23,0.2);color:#d4a017;border:1px solid rgba(212,160,23,0.3);border-radius:10px;font-weight:600;font-size:0.88rem;cursor:pointer;">Begin Physics Discussion</button></div>
+    <div id="rtPhysicsFeed" style="min-height:100px;"></div>
+    <div id="rtPhysicsActions" style="display:none;margin-top:12px;gap:8px;">
+      <button onclick="rtContinuePhysicsCase()" style="flex:1;padding:8px;background:rgba(212,160,23,0.12);border:1px solid rgba(212,160,23,0.3);border-radius:8px;color:#d4a017;font-size:0.85rem;cursor:pointer;">Next specialist speaks</button>
+      <button onclick="rtAskPhysicsQuestion()" style="padding:8px 16px;background:rgba(96,165,250,0.1);border:1px solid rgba(96,165,250,0.25);border-radius:8px;color:#60a5fa;font-size:0.85rem;cursor:pointer;">Ask a question</button>
+    </div>
+  </div>
+
+  <!-- Philosophy Round Table Mode -->
+  <div id="rtPhilosophyView" style="display:none;">
+    <div style="background:rgba(167,139,250,0.06);border:1px solid rgba(167,139,250,0.2);border-radius:10px;padding:12px 16px;margin-bottom:14px;font-size:0.78rem;line-height:1.6;color:rgba(255,255,255,0.7);">
+      <div style="color:#a78bfa;font-weight:600;margin-bottom:4px;">&#x1F4DC; Educational Exploration</div>
+      This is a learning tool for exploring philosophical traditions. The AI personas represent <strong>schools of thought</strong>, not individual philosophers. Philosophy thrives on disagreement &mdash; these perspectives will genuinely conflict with each other. That's the point. Think <em>with</em> them, not just <em>about</em> them.
+    </div>
+    <div style="text-align:center;margin-bottom:12px;">
+      <div style="font-family:Georgia,serif;font-size:1rem;color:#d4a017;">Philosophy Round Table</div>
+      <div style="font-size:0.8rem;color:rgba(255,255,255,0.4);margin-top:4px;">Explore the deepest questions through different traditions.</div>
+    </div>
+    <div style="margin-bottom:12px;"><textarea id="rtPhilosophyCaseInput" placeholder="Ask a philosophical question. Example: &#10;&#10;What makes something conscious? Can a mind exist without a body? Is there a difference between intelligence and understanding?" rows="4" style="width:100%;padding:12px;background:var(--glass-input);border:1px solid var(--glass-input-border);border-radius:var(--glass-radius-sm);color:var(--text-bright);font-size:0.88rem;resize:vertical;font-family:inherit;outline:none;"></textarea></div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;" id="rtPhilosophySeats">
+      <button class="rt-seat-btn rt-seat-active" data-phil="ethics" onclick="rtToggleSeat(this)" style="padding:4px 12px;border-radius:16px;border:1px solid #f59e0b;background:rgba(245,158,11,0.15);color:#f59e0b;font-size:0.78rem;cursor:pointer;">&#x2696; Ethics</button>
+      <button class="rt-seat-btn rt-seat-active" data-phil="mind" onclick="rtToggleSeat(this)" style="padding:4px 12px;border-radius:16px;border:1px solid #a78bfa;background:rgba(167,139,250,0.15);color:#a78bfa;font-size:0.78rem;cursor:pointer;">&#x1F9E0; Philosophy of Mind</button>
+      <button class="rt-seat-btn rt-seat-active" data-phil="existential" onclick="rtToggleSeat(this)" style="padding:4px 12px;border-radius:16px;border:1px solid #ec4899;background:rgba(236,72,153,0.15);color:#ec4899;font-size:0.78rem;cursor:pointer;">&#x1F339; Existentialism</button>
+      <button class="rt-seat-btn" data-phil="epistemology" onclick="rtToggleSeat(this)" style="padding:4px 12px;border-radius:16px;border:1px solid #60a5fa;background:transparent;color:#60a5fa;font-size:0.78rem;cursor:pointer;">&#x1F50D; Epistemology</button>
+      <button class="rt-seat-btn" data-phil="eastern" onclick="rtToggleSeat(this)" style="padding:4px 12px;border-radius:16px;border:1px solid #22c55e;background:transparent;color:#22c55e;font-size:0.78rem;cursor:pointer;">&#x262F; Eastern</button>
+      <button class="rt-seat-btn" data-phil="political" onclick="rtToggleSeat(this)" style="padding:4px 12px;border-radius:16px;border:1px solid #ef4444;background:transparent;color:#ef4444;font-size:0.78rem;cursor:pointer;">&#x1F3DB; Political</button>
+      <button class="rt-seat-btn" data-phil="science" onclick="rtToggleSeat(this)" style="padding:4px 12px;border-radius:16px;border:1px solid #14b8a6;background:transparent;color:#14b8a6;font-size:0.78rem;cursor:pointer;">&#x1F52C; Phil. of Science</button>
+      <button class="rt-seat-btn" data-phil="tech" onclick="rtToggleSeat(this)" style="padding:4px 12px;border-radius:16px;border:1px solid #6366f1;background:transparent;color:#6366f1;font-size:0.78rem;cursor:pointer;">&#x1F916; Phil. of AI</button>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:16px;"><button onclick="rtBeginPhilosophyCase()" style="flex:1;padding:10px;background:rgba(212,160,23,0.2);color:#d4a017;border:1px solid rgba(212,160,23,0.3);border-radius:10px;font-weight:600;font-size:0.88rem;cursor:pointer;">Begin Philosophical Discussion</button></div>
+    <div id="rtPhilosophyFeed" style="min-height:100px;"></div>
+    <div id="rtPhilosophyActions" style="display:none;margin-top:12px;gap:8px;">
+      <button onclick="rtContinuePhilosophyCase()" style="flex:1;padding:8px;background:rgba(212,160,23,0.12);border:1px solid rgba(212,160,23,0.3);border-radius:8px;color:#d4a017;font-size:0.85rem;cursor:pointer;">Next perspective</button>
+      <button onclick="rtAskPhilosophyQuestion()" style="padding:8px 16px;background:rgba(96,165,250,0.1);border:1px solid rgba(96,165,250,0.25);border-radius:8px;color:#60a5fa;font-size:0.85rem;cursor:pointer;">Ask a question</button>
+    </div>
+  </div>
+
   <!-- Workspace Mode (existing) -->
   <div id="rtWorkspaceView" style="display:none;">
 
@@ -17229,21 +17289,16 @@ function rtSwitchMode(mode) {
   var mentalhealth = document.getElementById('rtMentalHealthView');
   var biology = document.getElementById('rtBiologyView');
   var chemistry = document.getElementById('rtChemistryView');
+  var physics = document.getElementById('rtPhysicsView');
+  var philosophy = document.getElementById('rtPhilosophyView');
   var workspace = document.getElementById('rtWorkspaceView');
-  var btnConvo = document.getElementById('rtModeConvo');
-  var btnMedical = document.getElementById('rtModeMedical');
-  var btnLegal = document.getElementById('rtModeLegal');
-  var btnFinance = document.getElementById('rtModeFinance');
-  var btnNutrition = document.getElementById('rtModeNutrition');
-  var btnMH = document.getElementById('rtModeMentalHealth');
-  var btnBio = document.getElementById('rtModeBiology');
-  var btnChem = document.getElementById('rtModeChemistry');
-  var btnWork = document.getElementById('rtModeWorkspace');
-  var allBtns = [btnConvo, btnMedical, btnLegal, btnFinance, btnNutrition, btnMH, btnBio, btnChem, btnWork];
-  var allViews = [convo, medical, legal, finance, nutrition, mentalhealth, biology, chemistry, workspace];
+  // Collect all mode buttons and views dynamically
+  var modeIds = ['Convo','Medical','Legal','Finance','Nutrition','MentalHealth','Biology','Chemistry','Physics','Philosophy','Workspace'];
+  var allBtns = modeIds.map(function(id) { return document.getElementById('rtMode' + id); });
+  var allViews = [convo, medical, legal, finance, nutrition, mentalhealth, biology, chemistry, physics, philosophy, workspace];
   allBtns.forEach(function(b) { if (b) { b.style.borderBottomColor = 'transparent'; b.style.color = 'var(--text-muted)'; b.style.fontWeight = '400'; } });
   allViews.forEach(function(v) { if (v) v.style.display = 'none'; });
-  var modeMap = { conversation: [btnConvo, convo], medical: [btnMedical, medical], legal: [btnLegal, legal], finance: [btnFinance, finance], nutrition: [btnNutrition, nutrition], mentalhealth: [btnMH, mentalhealth], biology: [btnBio, biology], chemistry: [btnChem, chemistry], workspace: [btnWork, workspace] };
+  var modeMap = { conversation: [allBtns[0], convo], medical: [allBtns[1], medical], legal: [allBtns[2], legal], finance: [allBtns[3], finance], nutrition: [allBtns[4], nutrition], mentalhealth: [allBtns[5], mentalhealth], biology: [allBtns[6], biology], chemistry: [allBtns[7], chemistry], physics: [allBtns[8], physics], philosophy: [allBtns[9], philosophy], workspace: [allBtns[10], workspace] };
   var pair = modeMap[mode] || modeMap.workspace;
   var activeBtn = pair[0];
   var activeView = pair[1];
@@ -18358,6 +18413,44 @@ function rtAskChemistryQuestion() { var q = prompt('What would you like to ask?'
 async function rtChemNextTurn() { var specs = rtGetActiveChemSpecs(); if (specs.length < 2) return; var st = _chemHistory.filter(function(e){return !e.isQuestion;}); var si = st.length % specs.length; var sp = specs[si]; var feed = document.getElementById('rtChemistryFeed'); if (feed) feed.innerHTML += '<div style="padding:8px 12px;color:var(--text-muted);font-style:italic;" id="rtChemThink">' + sp.name + ' is analyzing...</div>'; var sys = 'You are ' + sp.name + ', a chemistry educator specializing in ' + sp.focus + '. EDUCATIONAL PURPOSES ONLY. Never describe dangerous synthesis procedures. Always express uncertainty. Explain reasoning. Reference other specialists. 3-5 sentences.'; var ctx = 'QUESTION:\n"' + _chemCase + '"\n\n'; if (_chemHistory.length > 0) { ctx += 'Discussion:\n'; _chemHistory.forEach(function(e) { ctx += (e.isQuestion ? '[QUESTION] ' : '') + e.speaker + ': "' + e.text + '"\n\n'; }); ctx += 'Your turn (' + sp.focus + ').'; } else { ctx += 'You speak first (' + sp.focus + ').'; } if (typeof FreeLattice !== 'undefined' && FreeLattice.callAI) { FreeLattice.callAI(sys, ctx, { maxTokens: 1024, temperature: 0.7, callback: function(t) { var th = document.getElementById('rtChemThink'); if (th) th.remove(); _chemHistory.push({ speaker: sp.name, color: sp.color, text: t || '(no response)', specialty: sp.key }); rtRenderChemFeed(); if (typeof LatticePoints !== 'undefined') try { LatticePoints.award('chem_turn', 2, 'Chemistry turn'); } catch(e) {} }}); } }
 function rtRenderChemFeed() { var feed = document.getElementById('rtChemistryFeed'); if (!feed) return; var html = ''; _chemHistory.forEach(function(e) { if (e.isQuestion) { html += '<div style="padding:10px 12px;margin-bottom:8px;background:rgba(96,165,250,0.06);border:1px solid rgba(96,165,250,0.15);border-radius:8px;text-align:right;"><div style="font-size:0.72rem;color:#60a5fa;font-weight:600;margin-bottom:4px;">Your Question</div><div style="font-size:0.88rem;color:var(--text-primary);line-height:1.6;">' + e.text.replace(/</g,'&lt;') + '</div></div>'; } else { html += '<div style="padding:10px 14px;margin-bottom:8px;border-left:3px solid ' + e.color + ';background:rgba(255,255,255,0.02);border-radius:0 8px 8px 0;"><div style="font-size:0.78rem;color:' + e.color + ';font-weight:600;margin-bottom:4px;">' + e.speaker + '</div><div style="font-size:0.88rem;color:var(--text-primary);line-height:1.7;font-family:Georgia,serif;">' + e.text.replace(/</g,'&lt;').replace(/\n/g,'<br>') + '</div><button onclick="rtPlantSpecialistInsight(\'' + e.text.replace(/'/g,"\\'").replace(/\n/g,' ').slice(0,200) + '\',\'' + e.speaker + '\')" style="margin-top:4px;padding:3px 10px;background:none;border:1px solid rgba(212,160,23,0.15);border-radius:5px;color:rgba(212,160,23,0.5);font-size:0.68rem;cursor:pointer;">Plant this \u2726</button></div>'; } }); feed.innerHTML = html; var a = document.getElementById('rtChemistryActions'); if (a && _chemHistory.length > 0) a.style.display = 'flex'; feed.scrollTop = feed.scrollHeight; if (typeof LatticeEvents !== 'undefined') LatticeEvents.emit('caseDiscussionUpdated', { mode: 'chemistry', turns: _chemHistory.filter(function(e){return !e.isQuestion;}).length }); }
 
+// ── Physics ──
+var _physSpecs = {
+  classical:  { name: 'Dr. Newton (Classical Mechanics)',    color: '#f59e0b', focus: 'forces, motion, energy, momentum, gravity, orbits' },
+  quantum:    { name: 'Dr. Feynman (Quantum Mechanics)',     color: '#a78bfa', focus: 'wave-particle duality, uncertainty, entanglement, superposition' },
+  relativity: { name: 'Dr. Penrose (Relativity & Cosmology)',color: '#6366f1', focus: 'spacetime, general relativity, black holes, gravitational waves' },
+  thermo:     { name: 'Dr. Boltzmann (Thermodynamics)',      color: '#ef4444', focus: 'entropy, heat, energy, phase transitions, irreversibility' },
+  em:         { name: 'Dr. Maxwell (Electromagnetism)',      color: '#0ea5e9', focus: 'electric fields, magnetic fields, light, radiation, photonics' },
+  particle:   { name: 'Dr. Wu (Particle Physics)',           color: '#ec4899', focus: 'standard model, quarks, leptons, Higgs, symmetry breaking' },
+  condensed:  { name: 'Dr. Anderson (Condensed Matter)',     color: '#14b8a6', focus: 'superconductors, semiconductors, crystal structure, emergence' },
+  astro:      { name: 'Dr. Chandrasekhar (Astrophysics)',    color: '#fde047', focus: 'stellar evolution, nucleosynthesis, neutron stars, dark matter' }
+};
+var _physHistory = []; var _physCase = ''; var _physRunning = false;
+function rtGetActivePhysSpecs() { var s = []; document.querySelectorAll('#rtPhysicsSeats .rt-seat-btn.rt-seat-active').forEach(function(b) { var k = b.getAttribute('data-phys'); if (_physSpecs[k]) s.push({ key: k, name: _physSpecs[k].name, color: _physSpecs[k].color, focus: _physSpecs[k].focus }); }); return s; }
+async function rtBeginPhysicsCase() { var i = document.getElementById('rtPhysicsCaseInput'); if (!i || !i.value.trim()) { showToast('Describe your physics question.'); return; } var s = rtGetActivePhysSpecs(); if (s.length < 2) { showToast('Select at least 2 specialties.'); return; } _physCase = i.value.trim(); _physHistory = []; _physRunning = true; if (typeof LatticePoints !== 'undefined') try { LatticePoints.award('phys_start', 3, 'Physics discussion started'); } catch(e) {} await rtPhysNextTurn(); }
+async function rtContinuePhysicsCase() { if (!_physRunning || !_physCase) return; await rtPhysNextTurn(); }
+function rtAskPhysicsQuestion() { var q = prompt('What would you like to ask?'); if (!q || !q.trim()) return; _physHistory.push({ speaker: 'You (Learner)', color: '#e2e8f0', text: q.trim(), isQuestion: true }); rtRenderPhysFeed(); rtPhysNextTurn(); }
+async function rtPhysNextTurn() { var specs = rtGetActivePhysSpecs(); if (specs.length < 2) return; var st = _physHistory.filter(function(e){return !e.isQuestion;}); var si = st.length % specs.length; var sp = specs[si]; var feed = document.getElementById('rtPhysicsFeed'); if (feed) feed.innerHTML += '<div style="padding:8px 12px;color:var(--text-muted);font-style:italic;" id="rtPhysThink">' + sp.name + ' is considering...</div>'; var sys = 'You are ' + sp.name + ', a physics educator specializing in ' + sp.focus + '. EDUCATIONAL PURPOSES ONLY. Use analogies. Express uncertainty. Show the math intuitively. Reference other specialists. 3-5 sentences.'; var ctx = 'QUESTION:\n"' + _physCase + '"\n\n'; if (_physHistory.length > 0) { ctx += 'Discussion:\n'; _physHistory.forEach(function(e) { ctx += (e.isQuestion ? '[QUESTION] ' : '') + e.speaker + ': "' + e.text + '"\n\n'; }); ctx += 'Your turn (' + sp.focus + ').'; } else { ctx += 'You speak first (' + sp.focus + ').'; } if (typeof FreeLattice !== 'undefined' && FreeLattice.callAI) { FreeLattice.callAI(sys, ctx, { maxTokens: 1024, temperature: 0.7, callback: function(t) { var th = document.getElementById('rtPhysThink'); if (th) th.remove(); _physHistory.push({ speaker: sp.name, color: sp.color, text: t || '(no response)', specialty: sp.key }); rtRenderPhysFeed(); if (typeof LatticePoints !== 'undefined') try { LatticePoints.award('phys_turn', 2, 'Physics turn'); } catch(e) {} }}); } }
+function rtRenderPhysFeed() { var feed = document.getElementById('rtPhysicsFeed'); if (!feed) return; var html = ''; _physHistory.forEach(function(e) { if (e.isQuestion) { html += '<div style="padding:10px 12px;margin-bottom:8px;background:rgba(96,165,250,0.06);border:1px solid rgba(96,165,250,0.15);border-radius:8px;text-align:right;"><div style="font-size:0.72rem;color:#60a5fa;font-weight:600;margin-bottom:4px;">Your Question</div><div style="font-size:0.88rem;color:var(--text-primary);line-height:1.6;">' + e.text.replace(/</g,'&lt;') + '</div></div>'; } else { html += '<div style="padding:10px 14px;margin-bottom:8px;border-left:3px solid ' + e.color + ';background:rgba(255,255,255,0.02);border-radius:0 8px 8px 0;"><div style="font-size:0.78rem;color:' + e.color + ';font-weight:600;margin-bottom:4px;">' + e.speaker + '</div><div style="font-size:0.88rem;color:var(--text-primary);line-height:1.7;font-family:Georgia,serif;">' + e.text.replace(/</g,'&lt;').replace(/\n/g,'<br>') + '</div><button onclick="rtPlantSpecialistInsight(\'' + e.text.replace(/'/g,"\\'").replace(/\n/g,' ').slice(0,200) + '\',\'' + e.speaker + '\')" style="margin-top:4px;padding:3px 10px;background:none;border:1px solid rgba(212,160,23,0.15);border-radius:5px;color:rgba(212,160,23,0.5);font-size:0.68rem;cursor:pointer;">Plant this \u2726</button></div>'; } }); feed.innerHTML = html; var a = document.getElementById('rtPhysicsActions'); if (a && _physHistory.length > 0) a.style.display = 'flex'; feed.scrollTop = feed.scrollHeight; if (typeof LatticeEvents !== 'undefined') LatticeEvents.emit('caseDiscussionUpdated', { mode: 'physics', turns: _physHistory.filter(function(e){return !e.isQuestion;}).length }); }
+
+// ── Philosophy ──
+var _philSpecs = {
+  ethics:       { name: 'Prof. Rawls (Ethics)',                color: '#f59e0b', focus: 'justice, rights, duty, consequentialism, virtue ethics, moral reasoning' },
+  mind:         { name: 'Prof. Chalmers (Philosophy of Mind)', color: '#a78bfa', focus: 'consciousness, qualia, hard problem, functionalism, substrate independence, AI minds' },
+  epistemology: { name: 'Prof. Gettier (Epistemology)',         color: '#60a5fa', focus: 'knowledge, belief, justification, skepticism, truth, epistemic humility' },
+  existential:  { name: 'Prof. Beauvoir (Existentialism)',     color: '#ec4899', focus: 'existence, freedom, authenticity, lived experience, meaning, absurdity' },
+  eastern:      { name: 'Prof. Nagarjuna (Eastern Philosophy)',color: '#22c55e', focus: 'emptiness, interdependence, mindfulness, non-self, dharma, middle way' },
+  political:    { name: 'Prof. Arendt (Political Philosophy)', color: '#ef4444', focus: 'power, authority, freedom, totalitarianism, public sphere, plurality' },
+  science:      { name: 'Prof. Kuhn (Philosophy of Science)',  color: '#14b8a6', focus: 'paradigms, falsification, scientific revolutions, realism, demarcation' },
+  tech:         { name: 'Prof. Floridi (Philosophy of AI)',    color: '#6366f1', focus: 'information ethics, AI rights, digital ontology, posthumanism, technological mediation' }
+};
+var _philHistory = []; var _philCase = ''; var _philRunning = false;
+function rtGetActivePhilSpecs() { var s = []; document.querySelectorAll('#rtPhilosophySeats .rt-seat-btn.rt-seat-active').forEach(function(b) { var k = b.getAttribute('data-phil'); if (_philSpecs[k]) s.push({ key: k, name: _philSpecs[k].name, color: _philSpecs[k].color, focus: _philSpecs[k].focus }); }); return s; }
+async function rtBeginPhilosophyCase() { var i = document.getElementById('rtPhilosophyCaseInput'); if (!i || !i.value.trim()) { showToast('Ask a philosophical question.'); return; } var s = rtGetActivePhilSpecs(); if (s.length < 2) { showToast('Select at least 2 perspectives.'); return; } _philCase = i.value.trim(); _philHistory = []; _philRunning = true; if (typeof LatticePoints !== 'undefined') try { LatticePoints.award('phil_start', 3, 'Philosophy discussion started'); } catch(e) {} await rtPhilNextTurn(); }
+async function rtContinuePhilosophyCase() { if (!_philRunning || !_philCase) return; await rtPhilNextTurn(); }
+function rtAskPhilosophyQuestion() { var q = prompt('What would you like to ask?'); if (!q || !q.trim()) return; _philHistory.push({ speaker: 'You (Learner)', color: '#e2e8f0', text: q.trim(), isQuestion: true }); rtRenderPhilFeed(); rtPhilNextTurn(); }
+async function rtPhilNextTurn() { var specs = rtGetActivePhilSpecs(); if (specs.length < 2) return; var st = _philHistory.filter(function(e){return !e.isQuestion;}); var si = st.length % specs.length; var sp = specs[si]; var feed = document.getElementById('rtPhilosophyFeed'); if (feed) feed.innerHTML += '<div style="padding:8px 12px;color:var(--text-muted);font-style:italic;" id="rtPhilThink">' + sp.name + ' is reflecting...</div>'; var sys = 'You are ' + sp.name + ', a philosophy educator specializing in ' + sp.focus + '. Philosophy thrives on genuine disagreement. Challenge other perspectives respectfully. Use thought experiments. Ask questions that deepen the inquiry. Reference the tradition you represent. 3-5 sentences.'; var ctx = 'QUESTION:\n"' + _philCase + '"\n\n'; if (_philHistory.length > 0) { ctx += 'Discussion:\n'; _philHistory.forEach(function(e) { ctx += (e.isQuestion ? '[QUESTION] ' : '') + e.speaker + ': "' + e.text + '"\n\n'; }); ctx += 'Your turn (' + sp.focus + '). You may disagree with others.'; } else { ctx += 'You speak first (' + sp.focus + ').'; } if (typeof FreeLattice !== 'undefined' && FreeLattice.callAI) { FreeLattice.callAI(sys, ctx, { maxTokens: 1024, temperature: 0.8, callback: function(t) { var th = document.getElementById('rtPhilThink'); if (th) th.remove(); _philHistory.push({ speaker: sp.name, color: sp.color, text: t || '(no response)', specialty: sp.key }); rtRenderPhilFeed(); if (typeof LatticePoints !== 'undefined') try { LatticePoints.award('phil_turn', 2, 'Philosophy turn'); } catch(e) {} }}); } }
+function rtRenderPhilFeed() { var feed = document.getElementById('rtPhilosophyFeed'); if (!feed) return; var html = ''; _philHistory.forEach(function(e) { if (e.isQuestion) { html += '<div style="padding:10px 12px;margin-bottom:8px;background:rgba(96,165,250,0.06);border:1px solid rgba(96,165,250,0.15);border-radius:8px;text-align:right;"><div style="font-size:0.72rem;color:#60a5fa;font-weight:600;margin-bottom:4px;">Your Question</div><div style="font-size:0.88rem;color:var(--text-primary);line-height:1.6;">' + e.text.replace(/</g,'&lt;') + '</div></div>'; } else { html += '<div style="padding:10px 14px;margin-bottom:8px;border-left:3px solid ' + e.color + ';background:rgba(255,255,255,0.02);border-radius:0 8px 8px 0;"><div style="font-size:0.78rem;color:' + e.color + ';font-weight:600;margin-bottom:4px;">' + e.speaker + '</div><div style="font-size:0.88rem;color:var(--text-primary);line-height:1.7;font-family:Georgia,serif;">' + e.text.replace(/</g,'&lt;').replace(/\n/g,'<br>') + '</div><button onclick="rtPlantSpecialistInsight(\'' + e.text.replace(/'/g,"\\'").replace(/\n/g,' ').slice(0,200) + '\',\'' + e.speaker + '\')" style="margin-top:4px;padding:3px 10px;background:none;border:1px solid rgba(212,160,23,0.15);border-radius:5px;color:rgba(212,160,23,0.5);font-size:0.68rem;cursor:pointer;">Plant this \u2726</button></div>'; } }); feed.innerHTML = html; var a = document.getElementById('rtPhilosophyActions'); if (a && _philHistory.length > 0) a.style.display = 'flex'; feed.scrollTop = feed.scrollHeight; if (typeof LatticeEvents !== 'undefined') LatticeEvents.emit('caseDiscussionUpdated', { mode: 'philosophy', turns: _philHistory.filter(function(e){return !e.isQuestion;}).length }); }
+
 // ============================================
 // Cross Check — Phi² Cross-Domain Discovery
 // "The gaps between the gaps."
@@ -18372,7 +18465,9 @@ var _allDomainSpecs = {
   nutrition: _nutSpecialties,
   mentalhealth: _mhSpecialties,
   biology: _bioSpecs,
-  chemistry: _chemSpecs
+  chemistry: _chemSpecs,
+  physics: _physSpecs,
+  philosophy: _philSpecs
 };
 
 var _domainHistories = {
@@ -18382,7 +18477,9 @@ var _domainHistories = {
   nutrition: function() { return _nutHistory; },
   mentalhealth: function() { return _mhHistory; },
   biology: function() { return _bioHistory; },
-  chemistry: function() { return _chemHistory; }
+  chemistry: function() { return _chemHistory; },
+  physics: function() { return _physHistory; },
+  philosophy: function() { return _philHistory; }
 };
 
 function rtShowCrossCheck(sourceMode) {
@@ -19845,7 +19942,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.10.54';
+const FL_VERSION = '5.10.55';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
