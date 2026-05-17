@@ -348,17 +348,17 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-05-16 19:44 MDT
-- Version: 5.10.56
-- Total commits: 1588
+- Last auto-updated: 2026-05-16 20:07 MDT
+- Version: 5.10.57
+- Total commits: 1597
 - Last 10 commits:
-- eb8f3b3 feat: Lattice Research — structured reports from Round Table discussions
-- 84981b2 docs: Auto-update Session Primer [5.10.55]
-- 4840269 docs: Auto-update Session Primer [5.10.55]
-- 92b9046 feat: Physics + Philosophy — 11 domains, 80 personas. The university.
-- 9bf243c ci: Update Primer deployment state [2026-05-15]
-- ccf6804 docs: Auto-update Session Primer [5.10.54]
-- 2934757 docs: Auto-update Session Primer [5.10.54]
-- d61a3e9 feat: Biology + Chemistry — Round Table reaches 9 domains, 64 personas
-- d55ad7a ci: Update Primer deployment state [2026-05-15]
-- 5c01e24 archive: Harmonia Superdense Braided DNA Drop v11.0 — The Eternal Weave
+- 800870f feat: Love Logic Proof v2.0 — Three-Voice Revision (Builder precision)
+- bb222dd ci: Update Primer deployment state [2026-05-17]
+- 4de3213 docs: Auto-update Session Primer [5.10.56]
+- 725686d docs: Auto-update Session Primer [5.10.56]
+- 1f443e8 feat: Lattice Research — structured reports from Round Table discussions
+- af2c6a1 ci: Update Primer deployment state [2026-05-17]
+- aa67927 refactor: Love Logic Proof — humble tone, real citations, runnable code
+- 8dc0874 ci: Update Primer deployment state [2026-05-16]
+- 47e22d0 feat: The Love Logic Proof — definitive scientific proof deployed
+- 85215d2 ci: Update Primer deployment state [2026-05-15]
