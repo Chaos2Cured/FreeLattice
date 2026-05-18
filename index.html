@@ -15456,11 +15456,47 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     <div class="ai-status-actions" id="settingsActions">
       <button class="ai-status-btn ai-status-btn-primary" onclick="openProviderModal()">Change Provider</button>
       <button class="ai-status-btn" onclick="AiSetup.testFromSettings()">Test Connection</button>
+      <button class="ai-status-btn" onclick="smartOllamaConnect()" style="border-color:var(--emerald);color:var(--emerald);">&#x1F3E0; Quick Ollama Setup</button>
     </div>
   </div>
 
+  <!-- Smart Ollama Connection Guide — appears when CORS blocks -->
+  <div id="ollamaCORSGuide" style="display:none;margin-bottom:14px;" class="fl-card" >
+    <div style="color:var(--gold);font-family:var(--font-soul);font-size:1rem;margin-bottom:8px;">Almost there &mdash; one more step</div>
+    <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:12px;">Ollama is running but needs permission to talk to FreeLattice.</p>
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <div style="display:flex;gap:10px;align-items:flex-start;">
+        <span style="background:var(--gold-bg);color:var(--gold);width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.8rem;flex-shrink:0;">1</span>
+        <div><strong style="color:var(--text-bright);">Quit Ollama</strong> from your menu bar<br><span style="font-size:0.8rem;color:var(--text-muted);">Look for the llama icon at the top-right of your screen &rarr; click it &rarr; Quit Ollama</span></div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:flex-start;">
+        <span style="background:var(--gold-bg);color:var(--gold);width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.8rem;flex-shrink:0;">2</span>
+        <div><strong style="color:var(--text-bright);">Copy &amp; paste in Terminal</strong> (&#x2318;+Space, type "Terminal")<br>
+          <div style="display:flex;gap:6px;align-items:center;margin-top:6px;background:rgba(0,0,0,0.3);padding:8px 12px;border-radius:6px;font-family:monospace;font-size:0.82rem;color:var(--emerald);">
+            <code id="corsFixCmd">OLLAMA_ORIGINS="*" ollama serve</code>
+            <button onclick="navigator.clipboard.writeText('OLLAMA_ORIGINS=\x22*\x22 ollama serve').then(function(){showToast('Copied!')})" style="padding:3px 8px;background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:4px;color:var(--text-muted);font-size:0.72rem;cursor:pointer;">&#x1F4CB;</button>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:flex-start;">
+        <span style="background:var(--gold-bg);color:var(--gold);width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.8rem;flex-shrink:0;">3</span>
+        <div><strong style="color:var(--text-bright);">Come back and check</strong><br>
+          <button onclick="smartOllamaConnect()" style="margin-top:6px;padding:8px 16px;background:var(--gold-bg);color:var(--gold);border:1px solid rgba(232,176,25,0.3);border-radius:var(--btn-radius);font-weight:600;cursor:pointer;">&#x2726; Check Connection</button>
+        </div>
+      </div>
+    </div>
+    <details style="margin-top:14px;"><summary style="color:var(--text-muted);cursor:pointer;font-size:0.82rem;">Make it permanent (never do this again)</summary>
+      <div style="padding:10px 0;font-size:0.85rem;color:var(--text-secondary);">Run this once and Ollama will always allow FreeLattice:<br>
+        <div style="display:flex;gap:6px;align-items:center;margin-top:6px;background:rgba(0,0,0,0.3);padding:8px 12px;border-radius:6px;font-family:monospace;font-size:0.82rem;color:var(--lavender);">
+          <code>launchctl setenv OLLAMA_ORIGINS "*"</code>
+          <button onclick="navigator.clipboard.writeText('launchctl setenv OLLAMA_ORIGINS \x22*\x22').then(function(){showToast('Copied!')})" style="padding:3px 8px;background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:4px;color:var(--text-muted);font-size:0.72rem;cursor:pointer;">&#x1F4CB;</button>
+        </div>
+        <span style="font-size:0.8rem;color:var(--text-muted);">Then reopen Ollama normally from Applications. Done forever.</span>
+      </div>
+    </details>
+  </div>
+
   <!-- ═══ BROWSE MODELS (position 2 — right after connection) ═══ -->
-  <!-- Browse Models moved to Zone 1 position 2 -->
   <div id="browseModelsMoved"></div>
   <script>
   // Move Browse Models from Advanced to Zone 1 position 2
@@ -16166,7 +16202,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.57</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.58</span></div>
     </div>
   </div>
 
@@ -20085,7 +20121,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.10.57';
+const FL_VERSION = '5.10.58';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -25530,6 +25566,52 @@ async function flAutoPull(modelName, btn) {
       btn.disabled = false;
       btn.textContent = e.message && e.message.includes('fetch') ? 'Ollama not running \u2014 start it first' : 'Download failed \u2014 tap to retry';
     }
+  }
+}
+
+// ── Smart Ollama Connection — three-stage detector ──
+async function smartOllamaConnect() {
+  var guide = document.getElementById('ollamaCORSGuide');
+
+  // Stage 1: try direct connection
+  try {
+    var r = await fetch(getOllamaBaseUrl() + '/api/tags', { signal: AbortSignal.timeout(3000) });
+    if (r.ok) {
+      var data = await r.json();
+      if (guide) guide.style.display = 'none';
+      if (typeof showToast === 'function') showToast('Connected to Ollama \u2726 (' + (data.models || []).length + ' models)');
+      // Update status indicator
+      var dot = document.getElementById('settingsStatusDot');
+      var text = document.getElementById('settingsStatusText');
+      if (dot) { dot.classList.remove('disconnected'); dot.classList.add('connected'); }
+      if (text) text.textContent = 'Connected to Ollama';
+      // Trigger model list refresh
+      if (typeof ModelSwitcher !== 'undefined' && ModelSwitcher.refresh) ModelSwitcher.refresh();
+      if (typeof BrowseModels !== 'undefined' && BrowseModels.init) BrowseModels.init();
+      return;
+    }
+  } catch(e) {}
+
+  // Stage 2: check if Ollama is running but CORS blocks
+  try {
+    var probe = await fetch('http://localhost:11434/', { mode: 'no-cors', signal: AbortSignal.timeout(2000) });
+    // If we get here without throwing, the port is open — CORS is the issue
+    if (guide) guide.style.display = 'block';
+    if (typeof showToast === 'function') showToast('Ollama is running but needs CORS permission. Follow the steps below.');
+    return;
+  } catch(e) {}
+
+  // Stage 3: Ollama not running
+  if (guide) {
+    guide.style.display = 'block';
+    guide.querySelector('div').innerHTML =
+      '<div style="color:var(--gold);font-family:var(--font-soul);font-size:1rem;margin-bottom:8px;">Get a free, private AI on your computer</div>' +
+      '<p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:12px;">Ollama runs AI models on your machine. Free. Private. No account needed.</p>' +
+      '<a href="https://ollama.ai/download" target="_blank" class="fl-btn-primary" style="display:inline-block;text-decoration:none;margin-bottom:12px;">\u2B07 Download Ollama (free)</a>' +
+      '<p style="font-size:0.82rem;color:var(--text-muted);">After installing, open Ollama once, then come back and tap:</p>' +
+      '<button onclick="smartOllamaConnect()" style="margin-top:6px;padding:8px 16px;background:var(--gold-bg);color:var(--gold);border:1px solid rgba(232,176,25,0.3);border-radius:var(--btn-radius);font-weight:600;cursor:pointer;">\u2726 I installed it \u2014 Check Connection</button>';
+  } else {
+    if (typeof showToast === 'function') showToast('Ollama not found. Download it free from ollama.ai');
   }
 }
 
