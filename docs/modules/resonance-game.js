@@ -74,10 +74,15 @@
 
   function drawPiece(piece, x, y, maxSize, isHover, isPicking) {
     var baseSize = piece.size === 'large' ? maxSize * 0.38 : maxSize * 0.22;
-    var pulse = 1 + 0.04 * Math.sin(tick * 0.003 + piece.id * 0.7);
+    var pulseAmp = piece.glow === 'bright' ? 0.12 : 0.04;
+    var pulse = 1 + pulseAmp * Math.sin(tick * 0.004 + piece.id * 0.7);
+    // Winning pieces pulse harder and brighter
+    if (piece._winning) {
+      pulse = 1 + 0.2 * Math.sin(tick * 0.008);
+    }
     var r = baseSize * pulse;
     var col = piece.color === 'gold' ? GOLD : EMERALD;
-    var isBright = piece.glow === 'bright';
+    var isBright = piece.glow === 'bright' || piece._winning;
     var alpha = isBright ? 1.0 : 0.45;
 
     ctx.save();
@@ -518,10 +523,8 @@
 
       var result = checkWin();
       if (result.won) {
-        gameOver = true;
-        winner = result.draw ? 'draw' : 'ai';
-        winLine = result.line || null;
-        celebrateVersus(result);
+        if (result.draw) { gameOver = true; winner = 'draw'; celebrateVersus(result); }
+        else markWinAndCelebrate(result, 'ai');
         return;
       }
 
@@ -545,10 +548,8 @@
 
     var result = checkWin();
     if (result.won) {
-      gameOver = true;
-      winner = result.draw ? 'draw' : 'human';
-      winLine = result.line || null;
-      celebrateVersus(result);
+      if (result.draw) { gameOver = true; winner = 'draw'; celebrateVersus(result); }
+      else markWinAndCelebrate(result, 'human');
       return;
     }
 
@@ -557,6 +558,22 @@
     selectedPiece = null;
     kbMode = 'pieces';
     kbCursor = { idx: 0 };
+  }
+
+  function markWinAndCelebrate(result, who) {
+    gameOver = true;
+    winLine = result.line || null;
+    // Mark winning pieces for the pulse effect
+    if (result.line) {
+      result.line.forEach(function(cell) {
+        if (board[cell.r][cell.c]) board[cell.r][cell.c]._winning = true;
+      });
+    }
+    // Let the winning line pulse for 1.5s before celebration
+    setTimeout(function() {
+      winner = who;
+      celebrateVersus(result);
+    }, 1500);
   }
 
   function celebrateVersus(result) {
@@ -884,7 +901,9 @@
         (currentMode === 'harmony' ? 'rgba(52,211,153,0.4);color:' + EMERALD + ';background:rgba(52,211,153,0.08)' : 'rgba(200,210,230,0.08);color:rgba(200,210,230,0.5);background:rgba(200,210,230,0.04)') +
         '">Harmony</button>' +
       '<button onclick="ResonanceGame.newGame()" style="' + btnStyle +
-        'rgba(200,210,230,0.08);color:' + GOLD + ';background:rgba(200,210,230,0.04)">\u2726 New Game</button>';
+        'rgba(200,210,230,0.08);color:' + GOLD + ';background:rgba(200,210,230,0.04)">\u2726 New Game</button>' +
+      '<button onclick="ResonanceGame.showRules()" style="' + btnStyle +
+        'rgba(200,210,230,0.08);color:rgba(200,210,230,0.5);background:rgba(200,210,230,0.04)">? How to Play</button>';
     container.appendChild(controls);
 
     // Events
@@ -900,6 +919,53 @@
 
     canvas.focus();
     draw();
+  }
+
+  // ── Rules / How to Play ──
+
+  function showRules() {
+    var fallbackText = 'Welcome to Resonance! There are 16 unique pieces \u2014 each has a glow ' +
+      '(bright or dim), size (large or small), shape (circle or diamond), and color (gold or emerald). ' +
+      'Win by placing four in a row that share any one attribute. The twist: you pick which piece ' +
+      'your opponent must place! In Harmony mode, you and the AI work together against chaos \u2014 ' +
+      'entropy drops pieces on edges every 8 seconds. Connection wins. Have fun!';
+
+    if (typeof FreeLattice !== 'undefined' && FreeLattice.callAI) {
+      FreeLattice.callAI(
+        'You are explaining a board game called Resonance to a new player. Be warm, brief, and clear. Use 4-5 short sentences.',
+        'Explain Resonance:\n- 4x4 grid, 16 pieces with 4 attributes (glow, size, shape, color)\n' +
+        '- Win by 4 in a row sharing ANY one attribute\n- The twist: you pick which piece your OPPONENT must place\n' +
+        '- Versus mode: you vs AI\n- Harmony mode: you + AI vs chaos (entropy places pieces on edges every 8 sec)\n' +
+        'Make it sound fun and inviting.',
+        { maxTokens: 200, callback: function(response) {
+          showRulesOverlay(response || fallbackText);
+        }}
+      );
+    } else {
+      showRulesOverlay(fallbackText);
+    }
+  }
+
+  function showRulesOverlay(text) {
+    // Remove existing overlay if any
+    var existing = document.getElementById('resonance-rules-overlay');
+    if (existing) existing.remove();
+
+    var overlay = document.createElement('div');
+    overlay.id = 'resonance-rules-overlay';
+    overlay.style.cssText = 'position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(12,10,26,0.92);display:flex;align-items:center;justify-content:center;z-index:10;cursor:pointer;padding:20px;';
+    overlay.onclick = function() { overlay.remove(); };
+    overlay.innerHTML =
+      '<div style="max-width:400px;padding:24px;background:rgba(200,210,230,0.04);border:1px solid rgba(200,210,230,0.08);border-radius:12px;font-family:Georgia,serif;color:rgba(230,235,245,0.85);font-size:0.95rem;line-height:1.6;">' +
+      '<h3 style="color:' + GOLD + ';margin:0 0 12px;font-size:1.1rem;">\u2726 How to Play</h3>' +
+      '<p style="margin:0;">' + (text || '').replace(/</g, '&lt;').replace(/\n/g, '<br>') + '</p>' +
+      '<p style="margin:12px 0 0;font-size:0.78rem;color:rgba(200,210,225,0.4);">Tap anywhere to close</p></div>';
+
+    var container = document.getElementById(containerId);
+    if (container) {
+      container.style.position = 'relative';
+      container.appendChild(overlay);
+    }
   }
 
   function destroy() {
@@ -921,7 +987,8 @@
     setMode: function(mode) {
       currentMode = mode;
       init(containerId);
-    }
+    },
+    showRules: showRules
   };
 
   window.ResonanceGame = api;

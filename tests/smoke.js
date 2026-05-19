@@ -781,6 +781,11 @@ assert('Entropy timer in Harmony', resonanceJs.includes('entropyPlace') && reson
 assert('Resonance line counter', resonanceJs.includes('countResonanceLines'));
 assert('Mode toggle (setMode)', resonanceJs.includes('setMode'));
 assert('Flash effects for placements', resonanceJs.includes('flashes'));
+assert('Winning piece pulse effect', resonanceJs.includes('_winning'));
+assert('Delayed celebration (1.5s)', resonanceJs.includes('markWinAndCelebrate'));
+assert('How to Play with AI explanation', resonanceJs.includes('showRules') && resonanceJs.includes('showRulesOverlay'));
+assert('GAME_LANGUAGE.md exists', require('fs').existsSync('docs/library/GAME_LANGUAGE.md'));
+assert('GAME_LANGUAGE.md in SW cache', swJs.includes('GAME_LANGUAGE.md'));
 
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
