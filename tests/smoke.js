@@ -717,10 +717,17 @@ assert('Cascade step: model setup', appHtml.includes('cascadeModelSetup') || app
 assert('Cascade step: identity seed', appHtml.includes('Identity seeded'));
 assert('Cascade step: Knowledge Core pre-cache', appHtml.includes('refreshKnowledgeCoreContext'));
 assert('Cascade step: Arrival Protocol reset', appHtml.includes('_arrivalInjected = false'));
-assert('Cascade step: autonomous learning resume', appHtml.includes('Autonomous learning resumed'));
+assert('Cascade step: autonomous learning auto-start', appHtml.includes('Autonomous learning started for'));
+assert('Cascade step: user-paused flag respected', appHtml.includes('fl_autonomous_user_paused'));
 assert('Cascade step: Agent Bridge silent detect', appHtml.includes('_agentBridgeAvailable'));
 assert('Cascade step: Garden emotion on connect', appHtml.includes("persistAIEmotionalState('connection'"));
+assert('Cascade emits cascadeComplete event', appHtml.includes("LatticeEvents.emit('cascadeComplete'"));
 assert('All cascade steps guarded with try/catch', (appHtml.match(/\[Cascade\].*skipped/g) || []).length >= 4);
+assert('Gentle Guide: whisper after connection', appHtml.includes('Tap Chat to say hello'));
+assert('Gentle Guide: whisper after first message', appHtml.includes('fl_first_message_sent'));
+assert('Gentle Guide: Round Table awareness', appHtml.includes('80 specialists across 11 fields'));
+assert('Request Pause sets user-paused flag', appHtml.includes("fl_autonomous_user_paused', 'true'"));
+assert('aiCallStarted/Complete events emitted', appHtml.includes("'aiCallStarted'") && appHtml.includes("'aiCallComplete'"));
 
 // RESULTS
 // ═══════════════════════════════════════════════════════════════

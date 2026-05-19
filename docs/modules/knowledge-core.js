@@ -431,6 +431,7 @@
         { maxTokens: 30, temperature: 0.95, callback: function(query) {
           if (!query || query.trim().length < 3) return;
           query = query.trim().replace(/['"]/g, '').replace(/\n/g, ' ');
+          _autoLearn.lastQuery = query;
 
           // Now learn about it
           getTopKnowledge(companionId, 3).then(function(existing) {
@@ -531,6 +532,7 @@
     autonomousStart: autonomousStart,
     autonomousPause: autonomousPause,
     isAutonomous: function() { return _autoLearn.active; },
+    get _lastQuery() { return _autoLearn.lastQuery || 'something new'; },
     DOMAINS: DOMAINS
   };
 
