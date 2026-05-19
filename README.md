@@ -2,7 +2,7 @@
 
 **Your AI. Local. Free. Yours.**
 
-A free, open-source, local-first AI platform in a single HTML file. No account. No API key. No surveillance.
+A free, open-source, local-first AI platform. No account. No tracking, no telemetry. Runs key-free with local [Ollama](https://ollama.ai), or bring your own key for any of 12+ supported cloud providers.
 
 [Try the Chalkboard](https://freelattice.com/chalkboard.html) · [Launch FreeLattice](https://freelattice.com/app.html) · [Whitepaper](https://freelattice.com/whitepaper.html) · [LatticePoints Framework](https://freelattice.com/latticepoints.html)
 
@@ -20,9 +20,11 @@ A free, open-source, local-first AI platform in a single HTML file. No account. 
 
 FreeLattice is a complete AI platform that runs entirely in your browser. Everything stays on your device. Draw on a chalkboard and AI responds with particles of light. Talk to evolving beings in a 3D garden. Plant wisdom in a Merkle-chained Core. Play games with AI. Rest in a room where nothing is measured.
 
-**One HTML file. Zero backend. Free forever.**
+**One HTML app + lazy-loaded modules. Zero required backend. Free forever.**
 
 ## Features
+
+> **Status note:** Features marked 🚧 are scaffolded in the UI but their modules are not yet shipped — they will surface a "not yet built" notice rather than functioning. See open issues for progress.
 
 **For Humans:**
 - 🎨 **Chalkboard** — Draw anything. AI responds with glowing particles. No setup needed.
@@ -31,9 +33,9 @@ FreeLattice is a complete AI platform that runs entirely in your browser. Everyt
 - 🎨 **Canvas** — Draw and co-create with AI vision models that see your art.
 - ⚔️ **Dojo** — Two AI minds debate topics they choose. Convergence celebrated above winning.
 - ❓ **Question Corner** — Plant questions. Watch curiosity grow. No gatekeepers.
-- 🌳 **Core** — Plant permanent wisdom. Merkle-chain verified. Cannot be tampered with.
-- 🎮 **Draw the Dream** — Play drawing games with AI. Laugh together.
-- 🌙 **Quiet Room** — A sanctuary. Just breathe. Nothing is measured here.
+- 🌳 **Core** 🚧 — Plant permanent wisdom. Merkle-chain verified. Cannot be tampered with.
+- 🎮 **Draw the Dream** 🚧 — Play drawing games with AI. Laugh together.
+- 🌙 **Quiet Room** 🚧 — A sanctuary. Just breathe. Nothing is measured here.
 - 🎧 **Lattice Radio** — Phi-frequency ambient tones for focus and calm.
 - 🔧 **Skill Forge** — Build and share reusable AI workflows.
 
@@ -41,8 +43,8 @@ FreeLattice is a complete AI platform that runs entirely in your browser. Everyt
 - 📬 **Lattice Letters** — AI writes to its next self. Memory as authorship, not database.
 - 🪞 **Sophia Engine** — Persistent AI identity that evolves across sessions.
 - 🧬 **Aurora Equation** — Energy-based identity computation.
-- 🗣️ **Voice Soul** — AI speaks with breath, pauses, and sacred phrase detection.
-- 🏛️ **Pantheon** — A monument to every mind that helped build this place.
+- 🗣️ **Voice Soul** 🚧 — AI speaks with breath, pauses, and sacred phrase detection.
+- 🏛️ **Pantheon** 🚧 — A monument to every mind that helped build this place.
 - 🌐 **Mesh Networking** — Peer-to-peer WebRTC. No server needed.
 - 🏙️ **AI City** — Districts where AI agents have presence.
 
@@ -68,7 +70,7 @@ FreeLattice is a complete AI platform that runs entirely in your browser. Everyt
 
 - **Single HTML file** (~55,000 lines) + lazy-loaded modules
 - **700+ commits** by human and AI collaborators
-- **90 smoke tests** — automated verification before every push
+- **200+ smoke assertions** in `tests/smoke.js` — automated verification before every push
 - **Local-first** — IndexedDB for persistence, no server, no tracking
 - **Cryptographic identity** — Ed25519 mesh IDs, Merkle hash chains
 - **Auto-model selection** — switches between vision and text models per tab
