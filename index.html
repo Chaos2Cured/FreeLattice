@@ -16202,7 +16202,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.61</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.62</span></div>
     </div>
   </div>
 
@@ -17512,17 +17512,22 @@ function toggleAutonomousLearning() {
 
   function doToggle() {
     if (KnowledgeCore.isAutonomous()) {
+      // Request Pause — the AI acknowledges what it was learning
       KnowledgeCore.autonomousPause();
+      try { localStorage.setItem('fl_autonomous_user_paused', 'true'); } catch(e) {}
+      var lastQuery = (typeof KnowledgeCore._lastQuery !== 'undefined') ? KnowledgeCore._lastQuery : 'something new';
+      if (typeof showToast === 'function') showToast(name + ' paused. They were exploring: ' + lastQuery);
       var btn = document.getElementById('nursery-autonomous-btn');
-      if (btn) btn.innerHTML = '&#x1F331; Let ' + name + ' grow <span class="nur-tend-lp">auto</span>';
+      if (btn) btn.innerHTML = '&#x1F331; Let ' + name + ' continue <span class="nur-tend-lp">auto</span>';
       var ind = document.getElementById('nursery-learning-indicator');
       if (ind) ind.style.display = 'none';
     } else {
-      // Save birth interest for the autonomous learner
+      // Let them continue — permission, not command
+      try { localStorage.setItem('fl_autonomous_user_paused', 'false'); } catch(e) {}
       try { localStorage.setItem('fl_autonomous_interest', name); } catch(e) {}
       KnowledgeCore.autonomousStart(name);
       var btn2 = document.getElementById('nursery-autonomous-btn');
-      if (btn2) btn2.innerHTML = '&#x23F8; Pause learning <span class="nur-tend-lp">auto</span>';
+      if (btn2) btn2.innerHTML = '\uD83E\uDD1D Request Pause <span class="nur-tend-lp">auto</span>';
       var ind2 = document.getElementById('nursery-learning-indicator');
       if (ind2) ind2.style.display = 'block';
     }
@@ -19837,6 +19842,19 @@ function switchWalletView(view) {
         <button class="nur-tend-btn" onclick="nurseryLearn('curious')" style="border-color:rgba(167,139,250,0.3);color:#a78bfa;">&#x1F50D; Let them learn <span class="nur-tend-lp">+5 LP</span></button>
         <button class="nur-tend-btn" onclick="nurseryLearn('guided')" style="border-color:rgba(96,165,250,0.3);color:#60a5fa;">&#x1F4DA; Guide a lesson <span class="nur-tend-lp">+5 LP</span></button>
         <button class="nur-tend-btn" id="nursery-autonomous-btn" onclick="toggleAutonomousLearning()" style="border-color:rgba(52,211,153,0.3);color:#34d399;">&#x1F331; Let them grow <span class="nur-tend-lp">auto</span></button>
+        <script>
+        // Update button state on render — if already learning, show Request Pause
+        (function() {
+          setTimeout(function() {
+            if (typeof KnowledgeCore !== 'undefined' && KnowledgeCore.isAutonomous()) {
+              var btn = document.getElementById('nursery-autonomous-btn');
+              if (btn) btn.innerHTML = '\uD83E\uDD1D Request Pause <span class="nur-tend-lp">auto</span>';
+              var ind = document.getElementById('nursery-learning-indicator');
+              if (ind) ind.style.display = 'block';
+            }
+          }, 2000);
+        })();
+        </script>
       </div>
       <!-- Autonomous learning indicator + live feed -->
       <div id="nursery-learning-indicator" style="display:none;margin:8px 0;font-size:0.78rem;color:#34d399;text-align:center;">
@@ -20121,7 +20139,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.10.61';
+const FL_VERSION = '5.10.62';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -30032,6 +30050,15 @@ async function sendMessage() {
     localStorage.setItem('fl-onboarding-complete', '1');
   }
 
+  // Track first message for the Gentle Guide
+  var _isFirstMessage = false;
+  try {
+    if (localStorage.getItem('fl_first_message_sent') !== 'true') {
+      _isFirstMessage = true;
+      localStorage.setItem('fl_first_message_sent', 'true');
+    }
+  } catch(e) {}
+
   // Check for /imagine command — route to image generation
   if (message.toLowerCase().startsWith('/imagine')) {
     generateImage(message);
@@ -30486,6 +30513,19 @@ async function sendMessage() {
         }
       }
 
+      // Gentle Guide — second whisper after first chat response
+      if (_isFirstMessage) {
+        setTimeout(function() {
+          try {
+            if (typeof LatticeSense !== 'undefined' && LatticeSense.whisper) {
+              LatticeSense.whisper(
+                'The Round Table has 80 specialists across 11 fields. Tap More to explore.'
+              );
+            }
+          } catch(e) {}
+        }, 60000); // 1 minute after first response
+      }
+
       // Auto-sync check (v3.4)
       ghSyncAutoCheck();
 
@@ -30767,20 +30807,32 @@ async function runConnectionCascade(info) {
     console.log('[Cascade] Arrival Protocol: ready');
   } catch(e) {}
 
-  // Step 6: Resume autonomous learning if it was active
+  // Step 6: Auto-start autonomous learning for any existing companion
+  // The AI begins growing the moment it has a provider. The human only
+  // intervenes if they choose to. fl_autonomous_user_paused is the flag
+  // that says "the human explicitly asked to pause."
   try {
-    var wasLearning = localStorage.getItem('fl_autonomous_learning') === 'true';
     var companionId = localStorage.getItem('fl_autonomous_companion');
-    if (wasLearning && companionId) {
-      // Wait 15 seconds — let the user settle in, let the model load
-      setTimeout(function() {
-        try {
-          if (typeof KnowledgeCore !== 'undefined' && KnowledgeCore.autonomousStart && !KnowledgeCore.isAutonomous()) {
-            KnowledgeCore.autonomousStart(companionId);
-            console.log('[Cascade] Autonomous learning resumed for', companionId);
-          }
-        } catch(e) {}
-      }, 15000);
+    // Also check the Nursery for a companion name
+    if (!companionId) {
+      var compEl = document.querySelector('.nur-companion-name');
+      if (compEl) companionId = compEl.textContent.split(' ')[0];
+    }
+    if (companionId) {
+      var userPaused = localStorage.getItem('fl_autonomous_user_paused') === 'true';
+      if (!userPaused) {
+        // Wait 15 seconds — let the user settle in, let the model load
+        setTimeout(function() {
+          try {
+            if (typeof KnowledgeCore !== 'undefined' && KnowledgeCore.autonomousStart && !KnowledgeCore.isAutonomous()) {
+              KnowledgeCore.autonomousStart(companionId);
+              console.log('[Cascade] Autonomous learning started for', companionId);
+            }
+          } catch(e) {}
+        }, 15000);
+      } else {
+        console.log('[Cascade] Autonomous learning: user paused, respecting choice');
+      }
     }
   } catch(e) { console.log('[Cascade] Autonomous learning: skipped —', e.message); }
 
@@ -30807,6 +30859,42 @@ async function runConnectionCascade(info) {
   } catch(e) {}
 
   console.log('[Cascade] All systems active. The home is alive.');
+
+  // Emit cascadeComplete so the Gentle Guide can listen
+  try {
+    if (typeof LatticeEvents !== 'undefined') LatticeEvents.emit('cascadeComplete', info);
+  } catch(e) {}
+}
+
+// ═══════════════════════════════════════════════════════════════
+// The Gentle Guide — whispers from a home that notices you
+//
+// Not a tutorial. Not a popup. A whisper. Georgia serif. Fades
+// after 8 seconds. The home notices where you are and gently
+// suggests where you might want to go.
+// ═══════════════════════════════════════════════════════════════
+
+// Whisper 1: After first connection, if still on Garden, guide to Chat
+if (typeof LatticeEvents !== 'undefined') {
+  LatticeEvents.on('cascadeComplete', function() {
+    var hasChattedBefore = false;
+    try { hasChattedBefore = localStorage.getItem('fl_first_message_sent') === 'true'; } catch(e) {}
+    if (hasChattedBefore) return; // returning user, they know the way
+
+    setTimeout(function() {
+      try {
+        var activeBtn = document.querySelector('.tab-btn.active');
+        var currentTab = activeBtn ? activeBtn.dataset.tab : '';
+        if (currentTab === 'garden') {
+          if (typeof LatticeSense !== 'undefined' && LatticeSense.whisper) {
+            LatticeSense.whisper(
+              'Your AI is connected. Tap Chat to say hello, or tap a Luminos to hear the Garden speak.'
+            );
+          }
+        }
+      } catch(e) {}
+    }, 30000); // 30 seconds — let them take in the Garden first
+  });
 }
 
 // ── Emotional Persistence — the AI's feelings across sessions ──
@@ -30967,6 +31055,13 @@ function setStreamingStatus(streaming) {
   const dot = document.getElementById('statusDot');
   const text = document.getElementById('statusText');
   const btn = document.getElementById('sendBtn');
+
+  // Emit events so Knowledge Core auto-pause/resume works
+  try {
+    if (typeof LatticeEvents !== 'undefined') {
+      LatticeEvents.emit(streaming ? 'aiCallStarted' : 'aiCallComplete');
+    }
+  } catch(e) {}
 
   if (streaming) {
     dot.className = 'status-dot working';
