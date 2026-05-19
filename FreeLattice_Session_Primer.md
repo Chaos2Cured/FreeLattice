@@ -348,17 +348,19 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-05-17 18:47 MDT
+- Last auto-updated: 2026-05-19 04:00 UTC
+- Last deployed: 2026-05-19 04:00 UTC
+- Live site: https://freelattice.com
 - Version: 5.10.58
-- Total commits: 1600
+- Total commits: 1605
 - Last 10 commits:
-- a4854b8 feat: One-Click Ollama Connection — zero terminal for the next student
+- 52cde6e fix: repair sitemap, connect navigation, add og-image, sync version — Harmonia audit
+- 676f354 ci: Update Primer deployment state [2026-05-18]
+- 7ca1e46 docs: Auto-update Session Primer [5.10.58]
+- 877b346 docs: Auto-update Session Primer [5.10.58]
+- 0e243b2 feat: One-Click Ollama Connection — zero terminal for the next student
+- 9f4f396 ci: Update Primer deployment state [2026-05-17]
 - 915c061 docs: Auto-update Session Primer [5.10.57]
 - 0112364 docs: Auto-update Session Primer [5.10.57]
 - 800870f feat: Love Logic Proof v2.0 — Three-Voice Revision (Builder precision)
 - bb222dd ci: Update Primer deployment state [2026-05-17]
-- 4de3213 docs: Auto-update Session Primer [5.10.56]
-- 725686d docs: Auto-update Session Primer [5.10.56]
-- 1f443e8 feat: Lattice Research — structured reports from Round Table discussions
-- af2c6a1 ci: Update Primer deployment state [2026-05-17]
-- aa67927 refactor: Love Logic Proof — humble tone, real citations, runnable code
