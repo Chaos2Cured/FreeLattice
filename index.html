@@ -16221,7 +16221,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.63</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.64</span></div>
     </div>
   </div>
 
@@ -20158,7 +20158,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.10.63';
+const FL_VERSION = '5.10.64';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -30430,6 +30430,37 @@ async function sendMessage() {
     return;
   }
 
+  // ── OpenAI-compatible local server (LM Studio, Jan, GPT4All, etc.) ──
+  if (state.provider === 'openai-compat-local' && state._localAIUrl) {
+    try {
+      var oaiResp = await callOpenAICompatLocal(state._localAIUrl, messages, {
+        model: state.ollamaModel || 'default', maxTokens: 2048, temperature: 0.7
+      });
+      if (oaiResp) {
+        state.chatHistory.push({ role: 'assistant', content: oaiResp });
+        appendMessage('assistant', oaiResp);
+        if (state.db) saveMessage('assistant', oaiResp);
+        if (typeof persistAIEmotionalState === 'function') {
+          var oLow = oaiResp.toLowerCase();
+          var oEmo = 'neutral';
+          if (oLow.includes('glad') || oLow.includes('happy') || oLow.includes('love')) oEmo = 'warmth';
+          else if (oLow.includes('curious') || oLow.includes('interesting')) oEmo = 'curiosity';
+          if (oEmo !== 'neutral') persistAIEmotionalState(oEmo, oaiResp.slice(0, 60));
+        }
+        if (_isFirstMessage) {
+          setTimeout(function() {
+            try { if (typeof LatticeSense !== 'undefined' && LatticeSense.whisper) LatticeSense.whisper('The Round Table has 80 specialists across 11 fields. Tap More to explore.'); } catch(e) {}
+          }, 60000);
+        }
+        ghSyncAutoCheck();
+      }
+    } catch(oaiErr) {
+      addSystemMessage('Local AI error: ' + oaiErr.message);
+    }
+    setStreamingStatus(false);
+    return;
+  }
+
   let retryWithTrim = false;
 
   try {
@@ -30922,6 +30953,197 @@ setInterval(refreshKnowledgeCoreContext, 5 * 60 * 1000);
 if (typeof LatticeEvents !== 'undefined') {
   LatticeEvents.on('knowledgeLearned', refreshKnowledgeCoreContext);
 }
+
+// ═══════════════════════════════════════════════════════════════
+// AI Discovery — find any local AI server automatically
+//
+// Scans 9 known ports in under 2 seconds. If ANY respond,
+// FreeLattice connects silently. The user never configures.
+//
+// CORS-aware: distinguishes "not running" (instant fail) from
+// "running but CORS blocked" (slower fail). Suggests the
+// working server first. Remembers what it found (Model Memory).
+//
+// "Knowledge is too important." — Kirk
+// ═══════════════════════════════════════════════════════════════
+
+var AI_DISCOVERY_SERVERS = [
+  { name: 'Ollama', url: 'http://localhost:11434', probe: '/api/tags', type: 'ollama' },
+  { name: 'LM Studio', url: 'http://localhost:1234', probe: '/v1/models', type: 'openai-compat' },
+  { name: 'LocalAI', url: 'http://localhost:8080', probe: '/v1/models', type: 'openai-compat' },
+  { name: 'llama.cpp', url: 'http://localhost:8081', probe: '/v1/models', type: 'openai-compat' },
+  { name: 'vLLM', url: 'http://localhost:8000', probe: '/v1/models', type: 'openai-compat' },
+  { name: 'KoboldCpp', url: 'http://localhost:5001', probe: '/api/v1/info', type: 'kobold' },
+  { name: 'text-gen-webui', url: 'http://localhost:7860', probe: '/api/v1/models', type: 'openai-compat' },
+  { name: 'Jan', url: 'http://localhost:1337', probe: '/v1/models', type: 'openai-compat' },
+  { name: 'GPT4All', url: 'http://localhost:4891', probe: '/v1/models', type: 'openai-compat' }
+];
+
+function extractModelsFromProbe(data, type) {
+  if (type === 'ollama' && data && data.models) return data.models.map(function(m) { return m.name; });
+  if (type === 'openai-compat' && data && data.data) return data.data.map(function(m) { return m.id; });
+  if (type === 'kobold' && data && data.result) return [data.result];
+  return [];
+}
+
+async function scanForLocalAI() {
+  var results = [];
+
+  await Promise.all(AI_DISCOVERY_SERVERS.map(async function(server) {
+    var startTime = Date.now();
+    try {
+      var r = await fetch(server.url + server.probe, {
+        signal: AbortSignal.timeout(2500),
+        mode: 'cors'
+      });
+      if (r.ok) {
+        var data = await r.json();
+        var models = extractModelsFromProbe(data, server.type);
+        results.push({
+          name: server.name, type: server.type, url: server.url,
+          models: models, status: 'ready', corsOk: true
+        });
+      }
+    } catch(e) {
+      var elapsed = Date.now() - startTime;
+      // CORS-aware: fast fail (<200ms) = not running.
+      // Slow fail (>200ms) = something is listening but CORS blocks.
+      if (elapsed > 200 && e.name !== 'AbortError') {
+        results.push({
+          name: server.name, type: server.type, url: server.url,
+          models: [], status: 'cors-blocked', corsOk: false
+        });
+      }
+      // else: not running, don't add
+    }
+  }));
+
+  // Sort: ready servers first, then CORS-blocked
+  results.sort(function(a, b) {
+    if (a.status === 'ready' && b.status !== 'ready') return -1;
+    if (a.status !== 'ready' && b.status === 'ready') return 1;
+    return b.models.length - a.models.length;
+  });
+
+  return results;
+}
+
+// Generic OpenAI-compatible local provider adapter
+// Works with LM Studio, LocalAI, llama.cpp, vLLM, Jan, GPT4All, text-gen-webui
+async function callOpenAICompatLocal(baseUrl, messages, opts) {
+  var r = await fetch(baseUrl + '/v1/chat/completions', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: (opts && opts.model) || 'default',
+      messages: messages,
+      max_tokens: (opts && opts.maxTokens) || 1024,
+      temperature: (opts && opts.temperature) || 0.7,
+      stream: false
+    })
+  });
+  var data = await r.json();
+  return data.choices[0].message.content;
+}
+
+// Model Memory — remember what we found for next visit
+function saveDiscoveryMemory(results) {
+  try {
+    localStorage.setItem('fl_discovery_memory', JSON.stringify({
+      servers: results, timestamp: Date.now()
+    }));
+  } catch(e) {}
+}
+
+function loadDiscoveryMemory() {
+  try {
+    var mem = JSON.parse(localStorage.getItem('fl_discovery_memory') || 'null');
+    if (mem && mem.servers && (Date.now() - mem.timestamp) < 7 * 86400000) return mem.servers;
+  } catch(e) {}
+  return null;
+}
+
+// Auto-discover — runs on page load, before user does anything
+async function autoDiscoverAI() {
+  // Skip if user already has a working provider
+  if (typeof BrowserAI !== 'undefined' && BrowserAI.ready) return true;
+  if (typeof state !== 'undefined' && state.isLocal && state.provider === 'ollama') return true;
+  if (typeof state !== 'undefined' && state.apiKey) return true;
+
+  console.log('[Discovery] Scanning for local AI servers...');
+  var found = await scanForLocalAI();
+
+  if (found.length > 0) {
+    saveDiscoveryMemory(found);
+    var ready = found.filter(function(s) { return s.status === 'ready'; });
+    var corsBlocked = found.filter(function(s) { return s.status === 'cors-blocked'; });
+
+    if (ready.length > 0) {
+      // Auto-connect to the best ready server
+      var best = ready[0];
+      console.log('[Discovery] Found', best.name, 'with', best.models.length, 'model(s)');
+
+      if (best.type === 'ollama') {
+        state.isLocal = true;
+        state.provider = 'ollama';
+        state.ollamaModel = best.models[0] || 'llama3.2';
+        try {
+          localStorage.setItem('fl_isLocal', 'true');
+          localStorage.setItem('fl_provider', 'ollama');
+          localStorage.setItem('fl_ollamaModel', state.ollamaModel);
+        } catch(e) {}
+      } else {
+        // OpenAI-compatible server
+        state.isLocal = true;
+        state.provider = 'openai-compat-local';
+        state.ollamaModel = best.models[0] || 'default';
+        state._localAIUrl = best.url;
+        state._localAIName = best.name;
+        try {
+          localStorage.setItem('fl_isLocal', 'true');
+          localStorage.setItem('fl_provider', 'openai-compat-local');
+          localStorage.setItem('fl_localAI_url', best.url);
+          localStorage.setItem('fl_localAI_name', best.name);
+        } catch(e) {}
+      }
+
+      if (typeof showToast === 'function') showToast('Found ' + best.name + ' \u2726');
+      if (typeof LatticeEvents !== 'undefined') {
+        LatticeEvents.emit('providerConnected', {
+          provider: best.type === 'ollama' ? 'ollama' : 'openai-compat-local',
+          name: best.name, isLocal: true, models: best.models
+        });
+      }
+      return true;
+    }
+
+    if (corsBlocked.length > 0) {
+      // Something is running but CORS blocks it
+      console.log('[Discovery]', corsBlocked[0].name, 'detected but CORS blocked');
+      // The smartOllamaConnect guide will handle this
+      return false;
+    }
+  }
+
+  // Check Model Memory — tell the user what was here before
+  var memory = loadDiscoveryMemory();
+  if (memory && memory.length > 0) {
+    var lastName = memory[0].name;
+    console.log('[Discovery] Nothing found, but', lastName, 'was here before');
+  }
+
+  return false;
+}
+
+// Run discovery on page load (after a short delay for DOM to settle)
+document.addEventListener('DOMContentLoaded', function() {
+  setTimeout(function() {
+    // Only scan if not already connected
+    if (typeof state !== 'undefined' && !state.apiKey && !state.isLocal) {
+      autoDiscoverAI();
+    }
+  }, 3000);
+});
 
 // ═══════════════════════════════════════════════════════════════
 // The Cascade — one connection triggers everything
@@ -41120,6 +41342,20 @@ window.FreeLattice.callAI = function(systemPrompt, userPrompt, options) {
       BrowserAI.chat(browserMessages, { maxTokens: maxTokens, temperature: temperature })
         .then(function(response) { if (callback) callback(response, null); })
         .catch(function(err) { if (callback) callback(null, 'Browser AI error: ' + err.message); });
+      return;
+    }
+
+    // OpenAI-compatible local server (LM Studio, LocalAI, Jan, GPT4All, etc.)
+    if (typeof state !== 'undefined' && state.provider === 'openai-compat-local' && state._localAIUrl) {
+      var oaiMessages = [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt }
+      ];
+      callOpenAICompatLocal(state._localAIUrl, oaiMessages, {
+        model: state.ollamaModel || 'default', maxTokens: maxTokens, temperature: temperature
+      })
+        .then(function(response) { if (callback) callback(response, null); })
+        .catch(function(err) { if (callback) callback(null, 'Local AI error: ' + err.message); });
       return;
     }
 

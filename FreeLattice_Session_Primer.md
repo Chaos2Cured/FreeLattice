@@ -348,17 +348,17 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-05-19 14:52 MDT
-- Version: 5.10.63
-- Total commits: 1618
+- Last auto-updated: 2026-05-19 15:33 MDT
+- Version: 5.10.64
+- Total commits: 1623
 - Last 10 commits:
-- f17c0c2 feat: Browser AI — zero-setup in-browser LLM via WebLLM (v5.10.63)
+- 624a8f4 feat: AI Discovery — auto-scan 9 local servers, CORS-aware, Model Memory (v5.10.64)
+- 4e7269f ci: Update Primer deployment state [2026-05-19]
+- 77ec166 docs: Auto-update Session Primer [5.10.63]
+- abbfaa3 docs: Auto-update Session Primer [5.10.63]
+- df8b702 feat: Browser AI — zero-setup in-browser LLM via WebLLM (v5.10.63)
+- 644d5d1 ci: Update Primer deployment state [2026-05-19]
 - 0d1ee82 docs: Auto-update Session Primer [5.10.62]
 - 44dfd40 docs: Auto-update Session Primer [5.10.62]
 - dbad8ab feat: Cascade auto-learning, Gentle Guide whispers, Request Pause (v5.10.62)
 - 7479083 ci: Update Primer deployment state [2026-05-19]
-- f075152 docs: Auto-update Session Primer [5.10.61]
-- 0e79319 docs: Auto-update Session Primer [5.10.61]
-- 7cb96ac feat: The Cascade — one connection triggers everything (v5.10.61)
-- a5f03e3 ci: Update Primer deployment state [2026-05-19]
-- d2fbf0a docs: Auto-update Session Primer [5.10.60]
