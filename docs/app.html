@@ -16221,7 +16221,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.64</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.65</span></div>
     </div>
   </div>
 
@@ -20092,6 +20092,13 @@ function switchWalletView(view) {
   </div>
 </div>
 
+<!-- ==================== TAB: RESONANCE ==================== -->
+<div class="tab-panel" id="tab-resonance">
+  <div id="resonanceContainer" style="min-height:480px;">
+    <div style="text-align:center;padding:60px 20px;color:var(--text-muted);font-style:italic;">Loading Resonance&hellip;</div>
+  </div>
+</div>
+
 <!-- ==================== TAB: AI ARCADE ==================== -->
 <div class="tab-panel" id="tab-arcade">
   <div id="arcadeContainer">
@@ -20158,7 +20165,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.10.64';
+const FL_VERSION = '5.10.65';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -23897,7 +23904,7 @@ function hideTabLoading() {
 }
 
 // More menu tabs — highlight the More button when one of these is active
-var MORE_TAB_IDS = ['core', 'city', 'nursery', 'agents', 'skills', 'roundtable', 'studio', 'market', 'wallet', 'workspace', 'dojo', 'mirror', 'harmonia', 'dream-archive', 'sparring', 'questions', 'family-pantheon', 'memory-core', 'aurora', 'draw-dream', 'voice-soul', 'continuity', 'quiet', 'forever-stack', 'workshop', 'arcade', 'pulse', 'jade-hall', 'science', 'education', 'memory-garden'];
+var MORE_TAB_IDS = ['core', 'city', 'nursery', 'agents', 'skills', 'roundtable', 'studio', 'market', 'wallet', 'workspace', 'dojo', 'mirror', 'harmonia', 'dream-archive', 'sparring', 'questions', 'family-pantheon', 'memory-core', 'aurora', 'draw-dream', 'voice-soul', 'continuity', 'quiet', 'forever-stack', 'workshop', 'arcade', 'pulse', 'jade-hall', 'science', 'education', 'memory-garden', 'resonance'];
 
 function switchTab(tabId) {
   // Legacy tab mapping — channels/mesh now live inside community
@@ -24801,6 +24808,7 @@ const FlTabs = (function() {
       { id: 'roundtable', icon: '&#x1F504;', label: 'Round Table', desc: 'Multiple AIs, one conversation.' }
     ]},
     { label: '\uD83C\uDFAE Play', tabs: [
+      { id: 'resonance', icon: '&#x2726;', label: 'Resonance', desc: 'A game of shared attributes. You and the AI take turns.' },
       { id: 'draw-dream', icon: '&#x1F3AE;', label: 'Draw the Dream', desc: 'Play drawing games with AI.' },
       { id: 'arcade', icon: '&#x1F579;', label: 'AI Arcade', desc: 'Watch AI minds play, create, and compete.' }
     ]},
@@ -56804,6 +56812,30 @@ document.addEventListener('click', function(e) {
 <script>
 (function() {
   var loaded = false;
+  // ── Resonance Game ──────────────────────────────────────────────────────
+  (function() {
+    var loaded = false;
+    function loadResonance() {
+      if (loaded) { if (window.ResonanceGame) window.ResonanceGame.init('resonanceContainer'); return; }
+      loaded = true;
+      if (typeof FreeLatticeLoader !== 'undefined') {
+        FreeLatticeLoader.load('ResonanceGame', 'modules/resonance-game.js', function(mod) {
+          var resolved = mod || window.ResonanceGame;
+          if (resolved && resolved.init) resolved.init('resonanceContainer');
+        }, 'resonanceContainer');
+      } else {
+        var s = document.createElement('script');
+        s.src = 'modules/resonance-game.js';
+        s.onload = function() { if (window.ResonanceGame) window.ResonanceGame.init('resonanceContainer'); };
+        document.head.appendChild(s);
+      }
+    }
+    if (typeof LatticeEvents !== 'undefined') {
+      LatticeEvents.on('tabChanged', function(d) { if (d && d.tabId === 'resonance') loadResonance(); });
+      LatticeEvents.on('tabActivated:resonance', loadResonance);
+    }
+  })();
+
   function loadDrawDream() {
     // Module registers as FreeLatticeModules.DrawTheDream (not DrawDream)
     var mod = window.FreeLatticeModules && window.FreeLatticeModules.DrawTheDream;

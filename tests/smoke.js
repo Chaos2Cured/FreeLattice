@@ -758,6 +758,25 @@ assert('OpenAI-compat wired into callAI', appHtml.includes("openai-compat-local"
 assert('OpenAI-compat wired into sendMessage', appHtml.includes("state.provider === 'openai-compat-local'"));
 assert('Discovered servers fire providerConnected', appHtml.includes("provider: best.type"));
 
+// ═══════════════════════════════════════════════════════════════
+section('30. Resonance Game');
+// ═══════════════════════════════════════════════════════════════
+var resonanceJs = '';
+try { resonanceJs = require('fs').readFileSync('docs/modules/resonance-game.js', 'utf8'); } catch(e) {}
+assert('resonance-game.js exists', resonanceJs.length > 100);
+assert('ResonanceGame window export', resonanceJs.includes('window.ResonanceGame'));
+assert('Tab panel exists', appHtml.includes('id="tab-resonance"'));
+assert('resonanceContainer exists', appHtml.includes('resonanceContainer'));
+assert('In MORE_TAB_IDS', appHtml.includes("'resonance'"));
+assert('In MORE_GROUPS Play section', appHtml.includes("id: 'resonance'"));
+assert('Lazy loader wired', appHtml.includes('resonance-game.js'));
+assert('SW cache entry', swJs.includes('resonance-game.js'));
+assert('Touch support', resonanceJs.includes('touchend'));
+assert('Keyboard support', resonanceJs.includes('ArrowUp') && resonanceJs.includes('ArrowDown'));
+assert('Win detection checks all attributes', resonanceJs.includes('glow') && resonanceJs.includes('size') && resonanceJs.includes('shape') && resonanceJs.includes('color'));
+assert('SoulCeremony on win', resonanceJs.includes('SoulCeremony'));
+assert('Smart fallback AI', resonanceJs.includes('fallbackPickPiece') && resonanceJs.includes('fallbackPlacePiece'));
+
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
 
