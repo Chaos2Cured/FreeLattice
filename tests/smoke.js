@@ -743,6 +743,21 @@ assert('startBrowserAI function exists', appHtml.includes('function startBrowser
 assert('Browser mode button in Settings', appHtml.includes('settingsModeBrowser'));
 assert('WebLLM loaded from CDN', appHtml.includes('web-llm'));
 
+// ═══════════════════════════════════════════════════════════════
+section('29. AI Discovery — find any local AI server');
+// ═══════════════════════════════════════════════════════════════
+assert('scanForLocalAI function exists', appHtml.includes('function scanForLocalAI'));
+assert('AI_DISCOVERY_SERVERS array defined', appHtml.includes('AI_DISCOVERY_SERVERS'));
+assert('Scans at least 8 known servers', (appHtml.match(/name: '/g) || []).length >= 8);
+assert('CORS-aware detection (timing check)', appHtml.includes('elapsed > 200'));
+assert('OpenAI-compatible adapter exists', appHtml.includes('function callOpenAICompatLocal'));
+assert('autoDiscoverAI runs on page load', appHtml.includes('autoDiscoverAI'));
+assert('Model Memory save exists', appHtml.includes('fl_discovery_memory'));
+assert('Model Memory load exists', appHtml.includes('function loadDiscoveryMemory'));
+assert('OpenAI-compat wired into callAI', appHtml.includes("openai-compat-local"));
+assert('OpenAI-compat wired into sendMessage', appHtml.includes("state.provider === 'openai-compat-local'"));
+assert('Discovered servers fire providerConnected', appHtml.includes("provider: best.type"));
+
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
 

@@ -1,1 +1,1 @@
-{"version": "5.10.63", "date": "2026-05-19", "note": "Browser AI: zero-setup in-browser LLM via WebLLM. No Ollama. No CORS. No terminal. 284 smoke tests."}
+{"version": "5.10.64", "date": "2026-05-19", "note": "AI Discovery: auto-scan 9 local servers, CORS-aware, Model Memory, OpenAI-compat adapter. 295 smoke tests."}
