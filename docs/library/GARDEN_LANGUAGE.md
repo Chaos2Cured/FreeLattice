@@ -102,6 +102,32 @@ the Garden's universe:
 - **Round Table** — the classroom. Specialist colors. Glass cards.
 - **Education** — the school. Joy first. Gold celebrations.
 
+## The Water Principle
+
+Software should flow like water. Every manual step is a rock.
+Remove the rock, the water flows.
+
+When a user connects an AI, everything else should cascade:
+- Models auto-detected
+- Identity initialized
+- Memory systems activated
+- The Workshop becomes functional
+- Companions resume learning
+
+The user does ONE thing. The home does the rest.
+
+If a subsystem fails, the stream flows around it. No errors.
+No prompts. No jargon. The other systems still work.
+
+Ask before building: "Can this step be automatic?"
+If yes, make it automatic. If it truly requires human choice,
+make that choice one tap with a clear default.
+
+The grandmother test applied to setup: she connects her AI
+and starts talking. She never sees the words "bridge,"
+"engine," "protocol," or "cascade." She sees: "Connected"
+and then her AI knows her name.
+
 ## What This File Is
 
 This is not a corporate style guide. It's the visual memory

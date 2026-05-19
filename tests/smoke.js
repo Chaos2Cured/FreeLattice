@@ -708,6 +708,20 @@ assert('App has updatefound listener', appHtml.includes('updatefound'));
 assert('App has version.json staleness check', appHtml.includes("data.version !== FL_VERSION"));
 assert('App checks for SW updates periodically', appHtml.includes('reg.update()'));
 
+// ═══════════════════════════════════════════════════════════════
+section('27. The Cascade — connection triggers everything');
+// ═══════════════════════════════════════════════════════════════
+assert('Cascade function exists', appHtml.includes('function runConnectionCascade'));
+assert('Cascade listens to providerConnected', appHtml.includes("LatticeEvents.on('providerConnected'"));
+assert('Cascade step: model setup', appHtml.includes('cascadeModelSetup') || appHtml.includes('Auto-detect models'));
+assert('Cascade step: identity seed', appHtml.includes('Identity seeded'));
+assert('Cascade step: Knowledge Core pre-cache', appHtml.includes('refreshKnowledgeCoreContext'));
+assert('Cascade step: Arrival Protocol reset', appHtml.includes('_arrivalInjected = false'));
+assert('Cascade step: autonomous learning resume', appHtml.includes('Autonomous learning resumed'));
+assert('Cascade step: Agent Bridge silent detect', appHtml.includes('_agentBridgeAvailable'));
+assert('Cascade step: Garden emotion on connect', appHtml.includes("persistAIEmotionalState('connection'"));
+assert('All cascade steps guarded with try/catch', (appHtml.match(/\[Cascade\].*skipped/g) || []).length >= 4);
+
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
 

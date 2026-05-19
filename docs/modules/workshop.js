@@ -406,11 +406,12 @@
         var r = await fetch('http://localhost:3141/');
         var d = await r.json();
         var git = await fetch('http://localhost:3141/code/git/status').then(function(r2) { return r2.json(); });
-        el.textContent = '\uD83D\uDFE2 Bridge connected \u00B7 ' + git.branch + ' \u00B7 ' + (git.recentCommits[0] || '');
+        el.textContent = '\uD83D\uDFE2 Connected \u00B7 ' + git.branch + ' \u00B7 ' + (git.recentCommits[0] || '');
         el.style.color = '#4aff9f';
       } catch(e) {
-        el.textContent = '\uD83D\uDD34 Agent Bridge not running. Start: node tools/agent-bridge.js';
-        el.style.color = '#ff6b4a';
+        // No scary error. Gentle guidance.
+        el.textContent = 'For local builds, run: node tools/agent-bridge.js';
+        el.style.color = 'rgba(255,255,255,0.3)';
       }
     },
 
