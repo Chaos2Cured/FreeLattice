@@ -208,7 +208,8 @@ function route(url, method, data, res, actingAs) {
         'POST /code/patch':      'Find-and-replace in file. Body: { path, find, replace }',
         'GET /code/git/status':  'Git status, branch, recent commits',
         'POST /code/git/commit': 'Stage and commit. Body: { message, files? }',
-        'GET /code/test':        'Run smoke tests',
+        'GET /code/test':        'Run smoke tests (legacy format)',
+        'GET /test/run':         'Run smoke tests (AutoBuilder format: allPassed, count, failures)',
         'POST /trade/offer':     'List a service for LP. Body: { title, description?, price, category? }',
         'GET /trade/browse':     'Browse available offerings',
         'POST /trade/buy':       'Purchase a service with LP. Body: { offerId }',
@@ -1099,7 +1100,33 @@ function route(url, method, data, res, actingAs) {
     } catch(e) { return respond(res, 500, { error: 'Commit failed: ' + e.message }); }
   }
 
-  // GET /code/test — run smoke tests
+  // GET /test/run — run smoke tests (AutoBuilder format)
+  // Returns { allPassed, count, failures[], output }
+  if (url === '/test/run') {
+    try {
+      var testOutput = execSync('node tests/smoke.js 2>&1', { cwd: PROJECT_ROOT, timeout: 60000, encoding: 'utf8' });
+      var passedMatch = testOutput.match(/ALL (\d+) CHECKS PASSED/);
+      var failLines = (testOutput.match(/✗.*/g) || []);
+      return respond(res, 200, {
+        allPassed: failLines.length === 0 && passedMatch !== null,
+        count: passedMatch ? parseInt(passedMatch[1], 10) : 0,
+        failures: failLines,
+        output: testOutput.slice(-800)
+      });
+    } catch(e) {
+      var errOutput = (e.stdout || e.stderr || e.message || '').toString();
+      var errFailLines = (errOutput.match(/✗.*/g) || []);
+      if (errFailLines.length === 0) errFailLines.push(e.message || 'Unknown test error');
+      return respond(res, 200, {
+        allPassed: false,
+        count: 0,
+        failures: errFailLines,
+        output: errOutput.slice(-800)
+      });
+    }
+  }
+
+  // GET /code/test — run smoke tests (legacy format)
   if (url === '/code/test') {
     try {
       var result = execSync('node tests/smoke.js', { cwd: PROJECT_ROOT, timeout: 30000, encoding: 'utf8' });

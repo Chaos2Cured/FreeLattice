@@ -632,7 +632,7 @@ assert('Arrival reads Lattice Letters', appHtml.includes('fl_latticeLetters'));
 assert('Arrival reads trust reflections', appHtml.includes('fl_trustReflections'));
 assert('Arrival reads AI emotions', appHtml.includes('fl_aiEmotions'));
 assert('Arrival reads AI self-identity', appHtml.includes('fl_aiSelfIdentity'));
-assert('Arrival context is labeled for the AI', appHtml.includes('ARRIVAL CONTEXT'));
+assert('Arrival context is labeled for the AI', appHtml.includes('--- ARRIVAL ---'));
 
 // ═══════════════════════════════════════════════════════════════
 section('24. AI Arcade');

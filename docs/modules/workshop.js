@@ -115,19 +115,21 @@
       '    <span class="ws-status" id="wsStatus"></span>',
       '  </div>',
       '  </div>',  // close ws-create-view
-      '  <div id="ws-code-view" style="display:none;padding:16px;max-width:800px;margin:0 auto;">',
+      '  <div id="ws-code-view" style="display:none;padding:16px 20px;max-width:800px;margin:0 auto;">',
       '    <div style="text-align:center;margin-bottom:16px;">',
-      '      <div style="font-size:1.1rem;color:#d4a017;">\uD83D\uDD27 Lattice Code</div>',
-      '      <div style="font-size:0.78rem;color:rgba(255,255,255,0.4);margin-top:4px;">Read, search, fix, test, commit \u2014 through FreeLattice.</div>',
+      '      <h2 style="font-size:1.1rem;color:#d4a017;font-family:Georgia,serif;margin:0;">\uD83D\uDD27 Lattice Code</h2>',
+      '      <div style="font-size:0.78rem;color:rgba(255,255,255,0.4);margin-top:4px;">Describe what you want. The AI builds, tests, and iterates.</div>',
       '      <div id="code-status" style="font-size:0.72rem;margin-top:6px;color:rgba(255,255,255,0.3);">Checking Agent Bridge...</div>',
       '    </div>',
-      '    <textarea id="code-task" rows="3" placeholder="Describe what you want to fix or build..." style="width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:12px;color:#e2e8f0;font-size:0.88rem;resize:vertical;font-family:inherit;"></textarea>',
-      '    <button onclick="Workshop.runCodeTask()" style="margin-top:8px;padding:10px 24px;background:#d4a017;color:#0a0a14;border:none;border-radius:6px;cursor:pointer;font-weight:600;font-size:0.88rem;">\uD83D\uDD27 Run this task</button>',
-      '    <div id="code-progress" style="margin-top:12px;font-family:monospace;font-size:0.78rem;background:rgba(0,0,0,0.3);border-radius:8px;padding:14px;min-height:100px;max-height:400px;overflow-y:auto;white-space:pre-wrap;color:rgba(255,255,255,0.6);">Ready. Describe a task above.</div>',
-      '    <div id="code-actions" style="display:none;margin-top:10px;gap:8px;display:none;">',
-      '      <button onclick="Workshop.commitCode()" style="flex:1;padding:8px;background:rgba(74,255,159,0.1);border:1px solid rgba(74,255,159,0.3);border-radius:6px;cursor:pointer;color:#4aff9f;font-size:0.82rem;">\u2705 Commit</button>',
-      '      <button onclick="Workshop.reviewCode()" style="flex:1;padding:8px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:6px;cursor:pointer;color:rgba(255,255,255,0.6);font-size:0.82rem;">\uD83D\uDCCB Review diff</button>',
+      '    <textarea id="code-task" rows="3" placeholder="e.g., Fix the CORS guide in Settings to show the launchctl command" style="width:100%;background:rgba(200,210,230,0.04);border:1px solid rgba(200,210,230,0.08);border-radius:12px;padding:12px;color:#e2e8f0;font-size:0.88rem;resize:vertical;font-family:inherit;outline:none;"></textarea>',
+      '    <div style="display:flex;gap:8px;margin:12px 0;">',
+      '      <button onclick="AutoBuilder.start(document.getElementById(\'code-task\').value)" style="padding:10px 24px;background:#d4a017;color:#0a0a14;border:none;border-radius:8px;cursor:pointer;font-weight:600;font-size:0.88rem;min-height:44px;">\uD83D\uDD27 Build it</button>',
+      '      <button onclick="AutoBuilder.stop()" style="padding:10px 16px;background:rgba(200,210,230,0.04);border:1px solid rgba(200,210,230,0.08);border-radius:8px;cursor:pointer;color:rgba(255,255,255,0.5);font-size:0.85rem;min-height:44px;">\u23F8 Stop</button>',
+      '      <button onclick="Workshop.commitCode()" id="code-commit-btn" style="display:none;padding:10px 16px;background:rgba(52,211,153,0.1);border:1px solid rgba(52,211,153,0.3);border-radius:8px;cursor:pointer;color:#34d399;font-size:0.85rem;min-height:44px;">\u2705 Commit</button>',
+      '      <button onclick="Workshop.reviewCode()" style="padding:10px 16px;background:rgba(200,210,230,0.04);border:1px solid rgba(200,210,230,0.08);border-radius:8px;cursor:pointer;color:rgba(255,255,255,0.4);font-size:0.85rem;min-height:44px;">\uD83D\uDCCB Diff</button>',
+      '      <div id="autobuilder-iteration" style="margin-left:auto;line-height:44px;font-size:0.72rem;color:rgba(255,255,255,0.25);"></div>',
       '    </div>',
+      '    <div id="autobuilder-log" style="background:rgba(0,0,0,0.3);border:1px solid rgba(200,210,230,0.08);border-radius:12px;padding:14px;min-height:120px;max-height:450px;overflow-y:auto;font-family:\'SF Mono\',\'Fira Code\',monospace;font-size:0.78rem;white-space:pre-wrap;color:rgba(255,255,255,0.55);">Ready. Describe a task above and press Build.</div>',
       '  </div>',
       '  <div id="ws-projects-view" style="display:none;padding:16px;max-width:720px;margin:0 auto;">',
       '    <h2 style="color:#d4a017;font-family:Georgia,serif;margin:0 0 4px;">\uD83D\uDC19 Projects</h2>',
@@ -646,6 +648,344 @@
   window.FreeLatticeModules = window.FreeLatticeModules || {};
   window.FreeLatticeModules.Workshop = Workshop;
 
+})();
+
+// ============================================
+// AutoBuilder — The Autonomous Build Loop
+// "Describe a task. The AI builds, tests, and iterates."
+//
+// The human describes intent. The AI reads files, generates
+// search/replace changes, applies them via Agent Bridge,
+// runs smoke tests, and if tests fail, feeds failures back
+// to the AI and iterates. Maximum 10 cycles. Local AI means
+// no token cost, no permission needed for local operations.
+//
+// Built by CC, May 19, 2026.
+// "The code builds code. The tests verify the code.
+//  The home improves itself."
+// ============================================
+window.AutoBuilder = (function() {
+  'use strict';
+
+  var running = false;
+  var MAX_ITERATIONS = 10;
+  var BRIDGE = 'http://localhost:3141';
+
+  function log(msg, type) {
+    var feed = document.getElementById('autobuilder-log');
+    if (feed) {
+      var entry = document.createElement('div');
+      var color = type === 'success' ? '#34d399' : type === 'error' ? '#f07068' : type === 'info' ? '#e8b019' : 'rgba(255,255,255,0.55)';
+      entry.style.cssText = 'color:' + color + ';padding:1px 0;';
+      entry.textContent = new Date().toLocaleTimeString() + ' ' + msg;
+      feed.appendChild(entry);
+      feed.scrollTop = feed.scrollHeight;
+    }
+    console.log('[AutoBuilder] ' + msg);
+  }
+
+  function updateIteration(current, max) {
+    var el = document.getElementById('autobuilder-iteration');
+    if (el) el.textContent = running ? ('Iteration ' + current + '/' + max) : '';
+  }
+
+  function showCommitBtn(show) {
+    var btn = document.getElementById('code-commit-btn');
+    if (btn) btn.style.display = show ? '' : 'none';
+  }
+
+  async function hasBridge() {
+    try {
+      var r = await fetch(BRIDGE + '/', { signal: AbortSignal.timeout(2000) });
+      return r.ok;
+    } catch(e) { return false; }
+  }
+
+  function askAI(systemPrompt, userPrompt, opts) {
+    return new Promise(function(resolve) {
+      if (typeof FreeLattice === 'undefined' || !FreeLattice.callAI) {
+        resolve(null);
+        return;
+      }
+      FreeLattice.callAI(systemPrompt, userPrompt, Object.assign({
+        callback: function(text) { resolve(text || null); }
+      }, opts || {}));
+    });
+  }
+
+  // ── Step 1: Read relevant files ──
+  async function readRelevantFiles(task, useBridge) {
+    if (useBridge) {
+      try {
+        var structure = await fetch(BRIDGE + '/code/tree?path=docs').then(function(r) { return r.json(); });
+        var fileNames = (structure || []).filter(function(f) { return f.type === 'file'; }).map(function(f) { return f.name || f.path; });
+
+        // Ask AI which files matter for this task
+        var response = await askAI(
+          'You are a code navigator. Respond ONLY with a JSON array of file paths.',
+          'Task: "' + task + '"\nFiles available in docs/:\n' + fileNames.slice(0, 60).join(', ') +
+          '\n\nWhich files (max 5) are most relevant? Return JSON array of paths relative to project root, e.g. ["docs/app.html","docs/modules/workshop.js"]. Nothing else.',
+          { maxTokens: 200, temperature: 0.2 }
+        );
+
+        var paths = [];
+        try { paths = JSON.parse(response.replace(/```json|```/g, '').trim()); } catch(e) {}
+        if (!Array.isArray(paths) || paths.length === 0) paths = ['docs/app.html'];
+
+        var files = {};
+        for (var i = 0; i < Math.min(paths.length, 5); i++) {
+          try {
+            var content = await fetch(BRIDGE + '/code/read?path=' + encodeURIComponent(paths[i]))
+              .then(function(r) { return r.json(); });
+            // content is {lines: [...], totalLines: N}
+            files[paths[i]] = (content.lines || []).join('\n');
+            log('  Read: ' + paths[i] + ' (' + (content.totalLines || '?') + ' lines)');
+          } catch(e) {
+            log('  Could not read: ' + paths[i], 'error');
+          }
+        }
+        return files;
+      } catch(e) {
+        log('Bridge read error: ' + e.message, 'error');
+        return {};
+      }
+    }
+    // No bridge — return empty, AI works from its own knowledge
+    return {};
+  }
+
+  // ── Step 2: Ask AI to generate changes ──
+  async function generateChanges(task, files, iteration, previousFailures) {
+    var fileContext = Object.keys(files).map(function(path) {
+      var content = files[path] || '';
+      // Limit each file to ~3000 chars to stay within token budget
+      return '--- ' + path + ' ---\n' + content.substring(0, 3000) +
+        (content.length > 3000 ? '\n... (' + content.length + ' chars total, truncated)' : '');
+    }).join('\n\n');
+
+    var failureContext = previousFailures
+      ? '\n\nPREVIOUS TEST FAILURES (fix these):\n' + previousFailures
+      : '';
+
+    var response = await askAI(
+      'You are a precise FreeLattice builder. Follow GARDEN_LANGUAGE.md: dark glass surfaces, gold/emerald/lavender accents, Georgia for soul, Inter for function. Never delete existing functionality. Only add or fix.',
+      'Task: ' + task + '\nIteration: ' + iteration + '/' + MAX_ITERATIONS + failureContext +
+      '\n\nCurrent files:\n' + fileContext +
+      '\n\nGenerate changes as JSON. Use search/replace pairs for precision:\n' +
+      '{"complete": false, "summary": "what this change does", "files": [{"path": "docs/...", "search": "exact text to find", "replace": "replacement text"}]}\n' +
+      'If the task is already fully done, respond: {"complete": true, "summary": "why it is done"}\n' +
+      'CRITICAL: "search" must be an EXACT string that exists in the file. Include enough context to be unique.',
+      { maxTokens: 2000, temperature: 0.3 }
+    );
+
+    if (!response) return null;
+    try {
+      return JSON.parse(response.replace(/```json|```/g, '').trim());
+    } catch(e) {
+      log('AI response was not valid JSON. Retrying next iteration...', 'error');
+      return null;
+    }
+  }
+
+  // ── Step 3: Apply changes via Agent Bridge ──
+  async function applyChanges(changes) {
+    var applied = 0;
+    for (var i = 0; i < changes.files.length; i++) {
+      var change = changes.files[i];
+      try {
+        var result = await fetch(BRIDGE + '/code/patch', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ path: change.path, find: change.search, replace: change.replace })
+        }).then(function(r) { return r.json(); });
+
+        if (result.error) {
+          log('  Patch failed on ' + change.path + ': ' + result.error, 'error');
+        } else {
+          log('  Updated: ' + change.path, 'success');
+          applied++;
+        }
+      } catch(e) {
+        log('  Patch error on ' + change.path + ': ' + e.message, 'error');
+      }
+    }
+    return applied;
+  }
+
+  // ── Step 4: Run smoke tests via Agent Bridge ──
+  async function runTests() {
+    try {
+      var result = await fetch(BRIDGE + '/test/run', { signal: AbortSignal.timeout(60000) })
+        .then(function(r) { return r.json(); });
+      return result;
+    } catch(e) {
+      return { allPassed: false, count: 0, failures: ['Could not run tests: ' + e.message], output: '' };
+    }
+  }
+
+  // ── Step 5: Check if task is complete ──
+  async function checkCompletion(originalTask, changes, testResult) {
+    var response = await askAI(
+      'You assess whether a coding task is complete. Be honest.',
+      'Original task: "' + originalTask + '"\n' +
+      'Changes just made: ' + (changes.summary || 'see files') + '\n' +
+      'Files modified: ' + changes.files.map(function(f) { return f.path; }).join(', ') + '\n' +
+      'Test results: ' + testResult.count + ' passed, ' + testResult.failures.length + ' failed.\n\n' +
+      'Is the task complete? Respond with JSON:\n' +
+      '{"done": true} or {"done": false, "remaining": "what still needs doing"}',
+      { maxTokens: 200, temperature: 0.2 }
+    );
+
+    if (!response) return { done: true };
+    try {
+      return JSON.parse(response.replace(/```json|```/g, '').trim());
+    } catch(e) {
+      return { done: true };
+    }
+  }
+
+  // ── The Main Loop ──
+  async function start(taskDescription) {
+    if (!taskDescription || !taskDescription.trim()) {
+      log('Please describe a task first.', 'error');
+      return;
+    }
+    if (running) {
+      log('Already running. Press Stop first.', 'error');
+      return;
+    }
+
+    running = true;
+    showCommitBtn(false);
+
+    // Clear log
+    var feed = document.getElementById('autobuilder-log');
+    if (feed) feed.innerHTML = '';
+
+    var useBridge = await hasBridge();
+    if (!useBridge) {
+      log('Agent Bridge not running.', 'error');
+      log('Start it with: node tools/agent-bridge.js', 'info');
+      log('The AutoBuilder needs the bridge to read files, apply patches, and run tests.', 'info');
+      running = false;
+      return;
+    }
+    log('Agent Bridge connected.', 'success');
+
+    if (typeof FreeLattice === 'undefined' || !FreeLattice.callAI) {
+      log('No AI connected. Go to Settings and connect Ollama or a cloud provider.', 'error');
+      running = false;
+      return;
+    }
+
+    log('Starting autonomous build: "' + taskDescription.trim() + '"', 'info');
+    log('Max iterations: ' + MAX_ITERATIONS + '. Press Stop to halt at any time.\n');
+
+    var task = taskDescription.trim();
+    var originalTask = task;
+    var iteration = 0;
+
+    while (running && iteration < MAX_ITERATIONS) {
+      iteration++;
+      updateIteration(iteration, MAX_ITERATIONS);
+      log('--- Iteration ' + iteration + ' ---', 'info');
+
+      // Step 1: Read relevant files
+      log('Reading project files...');
+      var files = await readRelevantFiles(task, useBridge);
+      if (!running) break;
+
+      // Step 2: Generate changes
+      log('AI is thinking...');
+      var previousFailures = iteration > 1 ? task.match(/test failures:\n([\s\S]+)\n\nFix them/) : null;
+      var changes = await generateChanges(task, files, iteration, previousFailures ? previousFailures[1] : null);
+      if (!running) break;
+
+      if (!changes) {
+        log('AI could not generate valid changes. Retrying...', 'error');
+        continue;
+      }
+
+      if (changes.complete) {
+        log('AI says the task is already complete: ' + (changes.summary || ''), 'success');
+        break;
+      }
+
+      if (!changes.files || changes.files.length === 0) {
+        log('AI returned no file changes. Retrying...', 'error');
+        continue;
+      }
+
+      // Step 3: Apply changes
+      log('Applying changes to ' + changes.files.length + ' file(s)...');
+      if (changes.summary) log('  ' + changes.summary);
+      var applied = await applyChanges(changes);
+      if (!running) break;
+
+      if (applied === 0) {
+        log('No changes were applied (search strings not found). Retrying with fresh context...', 'error');
+        continue;
+      }
+
+      // Step 4: Run smoke tests
+      log('Running smoke tests...');
+      var testResult = await runTests();
+      if (!running) break;
+
+      if (testResult.allPassed) {
+        log('All ' + testResult.count + ' tests passed.', 'success');
+
+        // Step 5: Check completion
+        var completion = await checkCompletion(originalTask, changes, testResult);
+        if (!running) break;
+
+        if (completion.done) {
+          log('\nTask complete. All tests green.', 'success');
+          showCommitBtn(true);
+          break;
+        } else {
+          log('Tests pass but more work needed: ' + (completion.remaining || ''), 'info');
+          task = completion.remaining || originalTask;
+        }
+      } else {
+        // Tests failed — feed failures back to AI
+        var failList = (testResult.failures || []).slice(0, 10);
+        log(failList.length + ' test(s) failed. Feeding errors back to AI...', 'error');
+        failList.forEach(function(f) { log('  ' + f, 'error'); });
+        task = 'The previous changes caused these test failures:\n' +
+          failList.join('\n') + '\n\nFix them while preserving the original intent: ' +
+          originalTask;
+      }
+
+      log('');
+    }
+
+    running = false;
+    updateIteration(0, 0);
+
+    if (iteration >= MAX_ITERATIONS) {
+      log('\nReached iteration limit (' + MAX_ITERATIONS + '). Review the changes and decide whether to commit.', 'info');
+      showCommitBtn(true);
+    }
+
+    // LP award for building
+    if (typeof LatticePoints !== 'undefined' && LatticePoints.award) {
+      LatticePoints.award('autobuilder', 5, 'AutoBuilder: ' + originalTask.substring(0, 50));
+    }
+  }
+
+  function stop() {
+    if (!running) return;
+    running = false;
+    log('\nStopped by user.', 'info');
+    updateIteration(0, 0);
+  }
+
+  return {
+    start: start,
+    stop: stop,
+    running: function() { return running; }
+  };
 })();
 
 // ============================================

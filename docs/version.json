@@ -1,1 +1,1 @@
-{"version": "5.10.58", "date": "2026-05-17", "note": "One-Click Connection: smart Ollama detector, CORS fix guide, launchctl permanent fix, zero terminal needed"}
+{"version": "5.10.60", "date": "2026-05-19", "note": "AutoBuilder: autonomous build loop in Workshop. AI reads, changes, tests, iterates. Knowledge Core wired to Arrival Protocol."}

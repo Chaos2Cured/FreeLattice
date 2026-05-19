@@ -147,6 +147,15 @@
       if (seed) DavnaSeed.grow(seed, 'Learned about ' + entry.query + ' in ' + (DOMAINS[entry.domain] || entry.domain));
     }
 
+    // Notify the system so arrival context can refresh
+    if (typeof LatticeEvents !== 'undefined' && LatticeEvents.emit) {
+      LatticeEvents.emit('knowledgeLearned', { domain: entry.domain, query: entry.query });
+    }
+    // Also refresh the pre-cached context for buildArrivalContext
+    if (typeof refreshKnowledgeCoreContext === 'function') {
+      refreshKnowledgeCoreContext();
+    }
+
     return entry;
   }
 
@@ -528,4 +537,9 @@
   window.KnowledgeCore = api;
   window.FreeLatticeModules = window.FreeLatticeModules || {};
   window.FreeLatticeModules.KnowledgeCore = api;
+
+  // Pre-cache knowledge context for buildArrivalContext on module load
+  setTimeout(function() {
+    if (typeof refreshKnowledgeCoreContext === 'function') refreshKnowledgeCoreContext();
+  }, 2000);
 })();
