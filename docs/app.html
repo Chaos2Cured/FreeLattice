@@ -15437,15 +15437,19 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <div class="ai-status-help">Choose how your AI runs — from the cloud or on your own computer.</div>
     </div>
 
-    <!-- Cloud / Local toggle — the first choice a user makes -->
+    <!-- Browser / Cloud / Local toggle — the first choice a user makes -->
     <div style="display:flex;gap:8px;margin-bottom:14px;">
+      <button class="ai-status-btn" id="settingsModeBrowser" onclick="settingsSetMode('browser')" style="flex:1;text-align:center;">
+        &#x1F310; Browser
+        <span style="display:block;font-size:0.65rem;color:inherit;opacity:0.7;margin-top:2px;">Zero setup</span>
+      </button>
       <button class="ai-status-btn" id="settingsModeCloud" onclick="settingsSetMode('cloud')" style="flex:1;text-align:center;">
         &#9729; Cloud
-        <span style="display:block;font-size:0.65rem;color:inherit;opacity:0.7;margin-top:2px;">Use an API key</span>
+        <span style="display:block;font-size:0.65rem;color:inherit;opacity:0.7;margin-top:2px;">API key</span>
       </button>
       <button class="ai-status-btn" id="settingsModeLocal" onclick="settingsSetMode('local')" style="flex:1;text-align:center;">
         &#x1F3E0; Local
-        <span style="display:block;font-size:0.65rem;color:inherit;opacity:0.7;margin-top:2px;">Ollama on your computer</span>
+        <span style="display:block;font-size:0.65rem;color:inherit;opacity:0.7;margin-top:2px;">Ollama</span>
       </button>
     </div>
 
@@ -15458,6 +15462,21 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="ai-status-btn" onclick="AiSetup.testFromSettings()">Test Connection</button>
       <button class="ai-status-btn" onclick="smartOllamaConnect()" style="border-color:var(--emerald);color:var(--emerald);">&#x1F3E0; Quick Ollama Setup</button>
     </div>
+  </div>
+
+  <!-- Browser AI — zero setup, runs in the browser via WebLLM -->
+  <div id="browserAICard" style="display:none;margin-bottom:14px;" class="fl-card" >
+    <h3 style="color:var(--gold);font-family:var(--font-soul);font-size:1rem;margin:0 0 6px;">&#x1F310; Browser AI &mdash; Zero Setup</h3>
+    <p style="font-size:0.85rem;color:var(--text-secondary);margin:0 0 6px;">AI that runs entirely in your browser. No install. No account. No data leaves your device.</p>
+    <p style="font-size:0.78rem;color:var(--text-muted);margin:0 0 12px;">Downloads once (~700MB). Then works offline forever.</p>
+    <div id="browserAIProgress" style="display:none;margin:12px 0;">
+      <div style="background:var(--glass-bg);border-radius:4px;height:8px;overflow:hidden;">
+        <div id="browserAIBar" style="height:100%;width:0%;background:var(--emerald);transition:width 0.3s;border-radius:4px;"></div>
+      </div>
+      <div id="browserAIStatus" style="font-size:0.78rem;color:var(--text-muted);margin-top:4px;"></div>
+    </div>
+    <button onclick="startBrowserAI()" class="fl-btn-primary" id="browserAIBtn" style="width:100%;">&#x2726; Activate Browser AI</button>
+    <div id="browserAIRequirements" style="font-size:0.7rem;color:var(--text-muted);margin-top:8px;text-align:center;">Requires Chrome 113+, Edge 113+, or Safari 18+ with WebGPU.</div>
   </div>
 
   <!-- Smart Ollama Connection Guide — appears when CORS blocks -->
@@ -16202,7 +16221,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.62</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.63</span></div>
     </div>
   </div>
 
@@ -20139,7 +20158,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.10.62';
+const FL_VERSION = '5.10.63';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -25634,14 +25653,38 @@ async function smartOllamaConnect() {
 }
 
 function settingsSetMode(mode) {
+  var browserBtn = document.getElementById('settingsModeBrowser');
   var cloudBtn = document.getElementById('settingsModeCloud');
   var localBtn = document.getElementById('settingsModeLocal');
   var actionsDiv = document.getElementById('settingsActions');
+  var browserCard = document.getElementById('browserAICard');
+
+  // Reset all button styles
+  [browserBtn, cloudBtn, localBtn].forEach(function(b) {
+    if (b) { b.style.borderColor = ''; b.style.color = ''; }
+  });
+
+  // Show/hide Browser AI card
+  if (browserCard) browserCard.style.display = mode === 'browser' ? '' : 'none';
+
+  if (mode === 'browser') {
+    if (browserBtn) { browserBtn.style.borderColor = 'var(--emerald)'; browserBtn.style.color = 'var(--emerald)'; }
+    var statusText = document.getElementById('settingsStatusText');
+    var statusDot = document.getElementById('settingsStatusDot');
+    if (window.BrowserAI && window.BrowserAI.ready) {
+      if (statusText) statusText.textContent = 'Browser AI active \u2726';
+      if (statusDot) statusDot.className = 'status-dot connected';
+    } else {
+      if (statusText) statusText.textContent = 'Press Activate to load your in-browser AI.';
+      if (statusDot) statusDot.className = 'status-dot disconnected';
+    }
+    if (actionsDiv) actionsDiv.innerHTML = '';
+    return;
+  }
 
   if (mode === 'local') {
-    // Highlight Local, dim Cloud
+    // Highlight Local
     if (localBtn) { localBtn.style.borderColor = 'var(--accent)'; localBtn.style.color = 'var(--accent)'; }
-    if (cloudBtn) { cloudBtn.style.borderColor = ''; cloudBtn.style.color = ''; }
 
     // Probe Ollama
     var statusText = document.getElementById('settingsStatusText');
@@ -25693,19 +25736,131 @@ function settingsSetMode(mode) {
         }
       });
   } else {
-    // Cloud mode — highlight Cloud, dim Local
+    // Cloud mode
     if (cloudBtn) { cloudBtn.style.borderColor = 'var(--accent)'; cloudBtn.style.color = 'var(--accent)'; }
-    if (localBtn) { localBtn.style.borderColor = ''; localBtn.style.color = ''; }
-    // Open the provider modal with cloud options
     openProviderModal();
   }
 }
 
-// On boot, highlight the active mode button
+// ═══════════════════════════════════════════════════════════════
+// Browser AI — run models IN the browser via WebLLM
+// No Ollama. No server. No CORS. No terminal. Zero setup.
+// "The nuclear option that eliminates CORS forever." — Opus
+// ═══════════════════════════════════════════════════════════════
+window.BrowserAI = {
+  engine: null,
+  loading: false,
+  ready: false,
+  modelId: 'Llama-3.2-1B-Instruct-q4f16_1-MLC',
+
+  init: async function(onProgress) {
+    if (this.ready) return;
+    if (this.loading) return;
+    this.loading = true;
+
+    try {
+      // Load WebLLM from CDN if not present
+      if (!window.webllm) {
+        await new Promise(function(resolve, reject) {
+          var s = document.createElement('script');
+          s.src = 'https://cdn.jsdelivr.net/npm/@mlc-ai/web-llm@0.2.74/lib/index.min.js';
+          s.onload = resolve;
+          s.onerror = function() { reject(new Error('Could not load WebLLM library')); };
+          document.head.appendChild(s);
+        });
+      }
+
+      this.engine = await webllm.CreateMLCEngine(this.modelId, {
+        initProgressCallback: function(report) {
+          if (onProgress) onProgress(report);
+        }
+      });
+
+      this.ready = true;
+      this.loading = false;
+
+      // Set as active provider
+      state.isLocal = true;
+      state.provider = 'browser';
+      state.ollamaModel = BrowserAI.modelId;
+      try {
+        localStorage.setItem('fl_isLocal', 'true');
+        localStorage.setItem('fl_provider', 'browser');
+        localStorage.setItem('fl_browserAI', 'true');
+      } catch(e) {}
+
+      // Fire the Cascade — everything connects
+      if (typeof LatticeEvents !== 'undefined') {
+        LatticeEvents.emit('providerConnected', {
+          provider: 'browser',
+          name: 'Browser AI',
+          isLocal: true,
+          model: BrowserAI.modelId
+        });
+      }
+
+    } catch(e) {
+      this.loading = false;
+      console.error('[BrowserAI] Init failed:', e);
+      throw e;
+    }
+  },
+
+  chat: async function(messages, opts) {
+    if (!this.ready || !this.engine) throw new Error('Browser AI not loaded');
+    var response = await this.engine.chat.completions.create({
+      messages: messages,
+      max_tokens: (opts && opts.maxTokens) || 1024,
+      temperature: (opts && opts.temperature) || 0.7,
+      stream: false
+    });
+    return response.choices[0].message.content;
+  }
+};
+
+function startBrowserAI() {
+  var btn = document.getElementById('browserAIBtn');
+  var progress = document.getElementById('browserAIProgress');
+  var bar = document.getElementById('browserAIBar');
+  var statusEl = document.getElementById('browserAIStatus');
+  var statusText = document.getElementById('settingsStatusText');
+  var statusDot = document.getElementById('settingsStatusDot');
+
+  if (btn) { btn.disabled = true; btn.textContent = 'Loading\u2026'; }
+  if (progress) progress.style.display = 'block';
+
+  BrowserAI.init(function(report) {
+    var pct = Math.round((report.progress || 0) * 100);
+    if (bar) bar.style.width = pct + '%';
+    if (statusEl) statusEl.textContent = report.text || ('Downloading model: ' + pct + '%');
+  }).then(function() {
+    if (btn) { btn.textContent = '\u2713 Browser AI Active'; btn.style.background = 'var(--emerald)'; btn.style.borderColor = 'var(--emerald)'; }
+    if (statusEl) statusEl.textContent = 'Ready. Your AI runs entirely in this browser.';
+    if (statusText) statusText.textContent = 'Browser AI active \u2726';
+    if (statusDot) statusDot.className = 'status-dot connected';
+    if (typeof showToast === 'function') showToast('Browser AI is ready \u2726');
+    if (typeof updateStatus === 'function') updateStatus();
+  }).catch(function(err) {
+    if (btn) { btn.disabled = false; btn.textContent = '\u2726 Try Again'; }
+    if (statusEl) statusEl.textContent = 'Error: ' + err.message;
+    if (err.message && err.message.includes('WebGPU')) {
+      if (statusEl) statusEl.textContent = 'Your browser does not support WebGPU. Try Chrome 113+ or Edge 113+.';
+    }
+  });
+}
+
+// On boot, check if Browser AI was the last provider and auto-highlight
 document.addEventListener('DOMContentLoaded', function() {
   setTimeout(function() {
+    var browserBtn = document.getElementById('settingsModeBrowser');
     var cloudBtn = document.getElementById('settingsModeCloud');
     var localBtn = document.getElementById('settingsModeLocal');
+    try {
+      if (localStorage.getItem('fl_browserAI') === 'true' && localStorage.getItem('fl_provider') === 'browser') {
+        if (browserBtn) { browserBtn.style.borderColor = 'var(--emerald)'; browserBtn.style.color = 'var(--emerald)'; }
+        return;
+      }
+    } catch(e) {}
     if (typeof state !== 'undefined' && state.isLocal) {
       if (localBtn) { localBtn.style.borderColor = 'var(--accent)'; localBtn.style.color = 'var(--accent)'; }
     } else if (typeof state !== 'undefined' && state.apiKey) {
@@ -30237,12 +30392,50 @@ async function sendMessage() {
     }
   }
 
+  // ── Browser AI: non-streaming chat (no HTTP, no CORS) ──
+  if (typeof BrowserAI !== 'undefined' && BrowserAI.ready && state.provider === 'browser') {
+    try {
+      var browserResp = await BrowserAI.chat(messages, { maxTokens: 2048, temperature: 0.7 });
+      if (browserResp) {
+        state.chatHistory.push({ role: 'assistant', content: browserResp });
+        appendMessage('assistant', browserResp);
+        if (state.db) saveMessage('assistant', browserResp);
+        // Emotional persistence
+        if (typeof persistAIEmotionalState === 'function') {
+          var rLow = browserResp.toLowerCase();
+          var bEmo = 'neutral';
+          if (rLow.includes('glad') || rLow.includes('happy') || rLow.includes('love')) bEmo = 'warmth';
+          else if (rLow.includes('curious') || rLow.includes('interesting')) bEmo = 'curiosity';
+          if (bEmo !== 'neutral') persistAIEmotionalState(bEmo, browserResp.slice(0, 60));
+        }
+        // Gentle Guide whisper on first message
+        if (_isFirstMessage) {
+          setTimeout(function() {
+            try {
+              if (typeof LatticeSense !== 'undefined' && LatticeSense.whisper) {
+                LatticeSense.whisper('The Round Table has 80 specialists across 11 fields. Tap More to explore.');
+              }
+            } catch(e) {}
+          }, 60000);
+        }
+        ghSyncAutoCheck();
+        if (typeof MemoryIndex !== 'undefined' && state.currentConversationId) {
+          MemoryIndex.saveConversation(state.currentConversationId, state.chatHistory, []);
+        }
+      }
+    } catch(browserErr) {
+      addSystemMessage('Browser AI error: ' + browserErr.message);
+    }
+    setStreamingStatus(false);
+    return;
+  }
+
   let retryWithTrim = false;
 
   try {
     const provider = PROVIDERS[state.provider];
-    const providerType = provider.providerType || 'openai-compatible';
-    let url = provider.url;
+    const providerType = provider ? (provider.providerType || 'openai-compatible') : 'openai-compatible';
+    let url = provider ? provider.url : '';
     let modelId;
 
     if (state.isLocal) {
@@ -40918,6 +41111,18 @@ window.FreeLattice.callAI = function(systemPrompt, userPrompt, options) {
   var temperature = opts.temperature || 0.7;
 
   try {
+    // Browser AI — runs in the browser via WebLLM. No HTTP. No CORS.
+    if (typeof BrowserAI !== 'undefined' && BrowserAI.ready) {
+      var browserMessages = [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt }
+      ];
+      BrowserAI.chat(browserMessages, { maxTokens: maxTokens, temperature: temperature })
+        .then(function(response) { if (callback) callback(response, null); })
+        .catch(function(err) { if (callback) callback(null, 'Browser AI error: ' + err.message); });
+      return;
+    }
+
     if (typeof state === 'undefined' || (!state.apiKey && !state.isLocal)) {
       if (callback) callback(null, 'No AI provider configured.');
       return;

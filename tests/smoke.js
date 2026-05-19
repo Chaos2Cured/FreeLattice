@@ -729,6 +729,20 @@ assert('Gentle Guide: Round Table awareness', appHtml.includes('80 specialists a
 assert('Request Pause sets user-paused flag', appHtml.includes("fl_autonomous_user_paused', 'true'"));
 assert('aiCallStarted/Complete events emitted', appHtml.includes("'aiCallStarted'") && appHtml.includes("'aiCallComplete'"));
 
+// ═══════════════════════════════════════════════════════════════
+section('28. Browser AI — zero setup provider');
+// ═══════════════════════════════════════════════════════════════
+assert('BrowserAI object defined', appHtml.includes('window.BrowserAI'));
+assert('BrowserAI has init function', appHtml.includes('BrowserAI') && appHtml.includes('init: async function'));
+assert('BrowserAI has chat function', appHtml.includes('chat: async function'));
+assert('BrowserAI wired into callAI', appHtml.includes('BrowserAI.ready'));
+assert('BrowserAI wired into sendMessage chat', appHtml.includes("state.provider === 'browser'"));
+assert('BrowserAI fires providerConnected on init', appHtml.includes("provider: 'browser'"));
+assert('Browser AI Settings card exists', appHtml.includes('browserAICard'));
+assert('startBrowserAI function exists', appHtml.includes('function startBrowserAI'));
+assert('Browser mode button in Settings', appHtml.includes('settingsModeBrowser'));
+assert('WebLLM loaded from CDN', appHtml.includes('web-llm'));
+
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
 

@@ -1,1 +1,1 @@
-{"version": "5.10.62", "date": "2026-05-19", "note": "Cascade auto-starts learning, Gentle Guide whispers, Request Pause, aiCallStarted/Complete events. 274 smoke tests."}
+{"version": "5.10.63", "date": "2026-05-19", "note": "Browser AI: zero-setup in-browser LLM via WebLLM. No Ollama. No CORS. No terminal. 284 smoke tests."}
