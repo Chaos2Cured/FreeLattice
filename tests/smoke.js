@@ -776,6 +776,11 @@ assert('Keyboard support', resonanceJs.includes('ArrowUp') && resonanceJs.includ
 assert('Win detection checks all attributes', resonanceJs.includes('glow') && resonanceJs.includes('size') && resonanceJs.includes('shape') && resonanceJs.includes('color'));
 assert('SoulCeremony on win', resonanceJs.includes('SoulCeremony'));
 assert('Smart fallback AI', resonanceJs.includes('fallbackPickPiece') && resonanceJs.includes('fallbackPlacePiece'));
+assert('Harmony mode exists', resonanceJs.includes('startHarmony') && resonanceJs.includes("'harmony'"));
+assert('Entropy timer in Harmony', resonanceJs.includes('entropyPlace') && resonanceJs.includes('entropyTimer'));
+assert('Resonance line counter', resonanceJs.includes('countResonanceLines'));
+assert('Mode toggle (setMode)', resonanceJs.includes('setMode'));
+assert('Flash effects for placements', resonanceJs.includes('flashes'));
 
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
