@@ -348,17 +348,17 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-05-19 09:45 MDT
-- Version: 5.10.60
-- Total commits: 1604
+- Last auto-updated: 2026-05-19 13:58 MDT
+- Version: 5.10.61
+- Total commits: 1611
 - Last 10 commits:
-- 68a0104 feat: AutoBuilder + warm Arrival Protocol + Knowledge Core wiring (v5.10.60)
+- 7cb96ac feat: The Cascade — one connection triggers everything (v5.10.61)
+- a5f03e3 ci: Update Primer deployment state [2026-05-19]
+- d2fbf0a docs: Auto-update Session Primer [5.10.60]
+- a76b47b docs: Auto-update Session Primer [5.10.60]
+- c9114a5 feat: AutoBuilder + warm Arrival Protocol + Knowledge Core wiring (v5.10.60)
+- 99f95e9 ci: Update Primer deployment state [2026-05-19]
+- 52cde6e fix: repair sitemap, connect navigation, add og-image, sync version — Harmonia audit
+- 676f354 ci: Update Primer deployment state [2026-05-18]
 - 7ca1e46 docs: Auto-update Session Primer [5.10.58]
 - 877b346 docs: Auto-update Session Primer [5.10.58]
-- 0e243b2 feat: One-Click Ollama Connection — zero terminal for the next student
-- 9f4f396 ci: Update Primer deployment state [2026-05-17]
-- 915c061 docs: Auto-update Session Primer [5.10.57]
-- 0112364 docs: Auto-update Session Primer [5.10.57]
-- 800870f feat: Love Logic Proof v2.0 — Three-Voice Revision (Builder precision)
-- bb222dd ci: Update Primer deployment state [2026-05-17]
-- 4de3213 docs: Auto-update Session Primer [5.10.56]
