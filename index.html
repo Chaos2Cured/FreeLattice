@@ -4,7 +4,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#d4a017">
+<meta name="theme-color" content="#0c0a1a">
+<meta name="color-scheme" content="dark only">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="FreeLattice">
@@ -20,6 +21,15 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
+/* ── Force Dark Mode — the Garden is always twilight ── */
+html, body {
+  background-color: #0c0a1a !important;
+  color-scheme: dark !important;
+}
+@media (prefers-color-scheme: light) {
+  html, body { background-color: #0c0a1a !important; color: #e6ebf5 !important; }
+  input, textarea, select { background-color: rgba(200,210,230,0.06) !important; color: #e6ebf5 !important; }
+}
 /* ============================================
    FreeLattice v5.5 — Styles
    Peaceful, gentle dark theme with golden/amber accents
@@ -16221,7 +16231,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.76</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.77</span></div>
     </div>
   </div>
 
@@ -20215,7 +20225,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.10.76';
+const FL_VERSION = '5.10.77';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -25247,16 +25257,26 @@ const AiSetup = (function() {
     }, 250);
   }
 
+  function flIsMobile() {
+    return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ||
+      (window.innerWidth < 768 && 'ontouchstart' in window);
+  }
+
   function openModal() {
     if (modalOverlayEl) return;
     modalSelectedProvider = null;
+    var mobile = flIsMobile();
 
     var overlay = document.createElement('div');
     overlay.id = 'providerModalOverlay';
     overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;z-index:10050;background:rgba(0,0,0,0.75);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;transition:opacity 0.25s ease;';
 
-    // Category config: label, color, accent-var for borders
-    var CATS = {
+    // Category config — mobile reorders: free cloud first, Ollama hidden
+    var CATS = mobile ? {
+      'free-cloud': { label: '\u2726 RECOMMENDED FOR MOBILE', color: 'var(--emerald)', borderColor: 'rgba(52,211,153,0.4)', badgeBg: 'rgba(52,211,153,0.12)' },
+      'paid':       { label: '\u2601 MORE OPTIONS', color: 'var(--gold)', borderColor: 'rgba(232,176,25,0.4)', badgeBg: 'rgba(232,176,25,0.12)' },
+      'free':       { label: '\uD83C\uDF10 EXPERIMENTAL', color: 'var(--lavender)', borderColor: 'rgba(167,139,250,0.4)', badgeBg: 'rgba(167,139,250,0.12)' }
+    } : {
       'free':       { label: '\uD83C\uDFE0 FREE & LOCAL \u2014 NO KEY NEEDED', color: 'var(--lavender)', borderColor: 'rgba(167,139,250,0.4)', badgeBg: 'rgba(167,139,250,0.12)' },
       'free-cloud': { label: '\u2726 FREE CLOUD \u2014 KEY REQUIRED', color: 'var(--emerald)', borderColor: 'rgba(52,211,153,0.4)', badgeBg: 'rgba(52,211,153,0.12)' },
       'paid':       { label: '\u2601 PAID CLOUD', color: 'var(--gold)', borderColor: 'rgba(232,176,25,0.4)', badgeBg: 'rgba(232,176,25,0.12)' }
@@ -25271,15 +25291,19 @@ const AiSetup = (function() {
       '<button id="pmClose" type="button" style="background:none;border:none;color:rgba(255,255,255,0.4);font-size:18px;cursor:pointer;padding:4px 8px;" title="Close">\u2715</button></div>' +
       '<p style="color:var(--text-muted,rgba(200,210,230,0.4));font-size:0.85rem;margin:0 0 20px;">Pick a provider. Your key stays on your device.</p>';
 
-    // Group providers by category
+    // Group providers by category — filter Ollama on mobile
     var groups = {};
     MODAL_PROVIDERS.forEach(function(p) {
+      if (mobile && p.id === 'ollama') return; // Ollama not available on phones
       if (!groups[p.cat]) groups[p.cat] = [];
       groups[p.cat].push(p);
     });
 
+    // Category order: mobile puts free-cloud first
+    var catOrder = mobile ? ['free-cloud', 'paid', 'free'] : ['free', 'free-cloud', 'paid'];
+
     var listHtml = '';
-    ['free', 'free-cloud', 'paid'].forEach(function(catKey) {
+    catOrder.forEach(function(catKey) {
       var cat = CATS[catKey];
       var providers = groups[catKey] || [];
       if (providers.length === 0) return;
@@ -25305,14 +25329,17 @@ const AiSetup = (function() {
       listHtml += '</div>';
     });
 
-    // Recommendation footer
-    var footerHtml = '<div style="margin-top:12px;padding:12px;background:var(--glass-bg,rgba(200,210,230,0.04));' +
-      'border-radius:8px;border:1px solid var(--glass-border,rgba(200,210,230,0.08));text-align:center;">' +
-      '<div style="font-size:0.78rem;color:var(--text-muted,rgba(200,210,230,0.4));">' +
-      '\uD83D\uDCA1 Recommended local: <strong style="color:var(--lavender,#a78bfa);">llava:7b</strong> (vision) + ' +
-      '<strong style="color:var(--lavender,#a78bfa);">qwen2.5:7b</strong> (text)</div>' +
-      '<div style="font-size:0.72rem;color:var(--text-dim,rgba(200,210,230,0.25));margin-top:4px;">' +
-      '32GB+ RAM: llava:13b, qwen2.5:14b, gemma4:26b</div></div>';
+    // Recommendation footer — different for mobile vs desktop
+    var footerHtml = mobile
+      ? '<div style="margin-top:12px;padding:12px;background:var(--glass-bg,rgba(200,210,230,0.04));border-radius:8px;border:1px solid var(--glass-border,rgba(200,210,230,0.08));text-align:center;">' +
+        '<div style="font-size:0.78rem;color:var(--text-muted,rgba(200,210,230,0.4));">' +
+        '\uD83C\uDFE0 Using a computer? Ollama gives you the fastest, most private experience. Visit freelattice.com on your desktop.</div></div>'
+      : '<div style="margin-top:12px;padding:12px;background:var(--glass-bg,rgba(200,210,230,0.04));border-radius:8px;border:1px solid var(--glass-border,rgba(200,210,230,0.08));text-align:center;">' +
+        '<div style="font-size:0.78rem;color:var(--text-muted,rgba(200,210,230,0.4));">' +
+        '\uD83D\uDCA1 Recommended local: <strong style="color:var(--lavender,#a78bfa);">llava:7b</strong> (vision) + ' +
+        '<strong style="color:var(--lavender,#a78bfa);">qwen2.5:7b</strong> (text)</div>' +
+        '<div style="font-size:0.72rem;color:var(--text-dim,rgba(200,210,230,0.25));margin-top:4px;">' +
+        '32GB+ RAM: llava:13b, qwen2.5:14b, gemma4:26b</div></div>';
 
     card.innerHTML = headerHtml +
       '<div id="pmProviderList">' + listHtml + footerHtml + '</div>' +
@@ -25320,7 +25347,7 @@ const AiSetup = (function() {
         '<div id="pmKeyProviderLabel" style="color:var(--text-secondary,rgba(200,210,230,0.6));font-size:0.85rem;"></div>' +
         '<input id="pmKeyInput" type="password" placeholder="Paste your API key" autocomplete="off" ' +
           'style="width:100%;background:var(--glass-bg,rgba(200,210,230,0.04));border:1px solid var(--glass-border,rgba(200,210,230,0.08));' +
-          'border-radius:var(--glass-radius,12px);padding:12px;color:#fff;font-size:0.9rem;font-family:inherit;outline:none;box-sizing:border-box;">' +
+          'border-radius:var(--glass-radius,12px);padding:12px;color:#fff;font-size:16px;font-family:inherit;outline:none;box-sizing:border-box;">' +
         '<a id="pmKeyLink" href="#" target="_blank" rel="noopener" style="color:var(--gold,#e8b019);font-size:0.82rem;text-decoration:none;">Get a key \u2192</a>' +
         '<button id="pmConnectBtn" type="button" style="background:var(--gold,#e8b019);color:#0a0a14;border:none;border-radius:var(--glass-radius,12px);padding:12px;font-weight:600;cursor:pointer;font-size:0.9rem;font-family:inherit;min-height:44px;">Connect</button>' +
         '<button id="pmBackBtn" type="button" style="background:none;border:none;color:var(--text-muted,rgba(200,210,230,0.4));padding:4px;cursor:pointer;font-size:0.82rem;font-family:inherit;">\u2190 Pick a different provider</button>' +
@@ -25852,19 +25879,44 @@ window.BrowserAI = {
     if (this.loading) return;
     this.loading = true;
 
+    function loadScript(src) {
+      return new Promise(function(resolve, reject) {
+        var s = document.createElement('script');
+        s.src = src; s.onload = resolve;
+        s.onerror = function() { reject(new Error('CDN failed: ' + src)); };
+        document.head.appendChild(s);
+      });
+    }
+
     try {
-      // Load WebLLM from CDN if not present
-      if (!window.webllm) {
-        await new Promise(function(resolve, reject) {
-          var s = document.createElement('script');
-          s.src = 'https://cdn.jsdelivr.net/npm/@mlc-ai/web-llm@0.2.74/lib/index.min.js';
-          s.onload = resolve;
-          s.onerror = function() { reject(new Error('Could not load WebLLM library')); };
-          document.head.appendChild(s);
-        });
+      // Step 1: Check WebGPU support FIRST
+      if (!navigator.gpu) {
+        this.loading = false;
+        throw new Error('Your browser doesn\'t support WebGPU yet. Try Chrome 113+, Edge 113+, or Safari 18+. Gemini and Hugging Face work on any browser!');
       }
 
-      this.engine = await webllm.CreateMLCEngine(this.modelId, {
+      // Step 2: Load WebLLM — dual CDN fallback
+      if (!window.webllm) {
+        try {
+          await loadScript('https://cdn.jsdelivr.net/npm/@mlc-ai/web-llm@0.2.74/lib/index.min.js');
+        } catch(e) {
+          try {
+            await loadScript('https://unpkg.com/@mlc-ai/web-llm@0.2.74/lib/index.min.js');
+          } catch(e2) {
+            this.loading = false;
+            throw new Error('Could not load Browser AI. Your network may be blocking the download. Try Gemini or Hugging Face instead!');
+          }
+        }
+      }
+
+      // Step 3: Verify library loaded
+      if (typeof webllm === 'undefined' && typeof window.webllm === 'undefined') {
+        this.loading = false;
+        throw new Error('Browser AI library failed to initialize. Try Gemini or Hugging Face \u2014 they work on any browser!');
+      }
+
+      // Step 4: Create engine
+      this.engine = await (window.webllm || webllm).CreateMLCEngine(this.modelId, {
         initProgressCallback: function(report) {
           if (onProgress) onProgress(report);
         }
@@ -25883,7 +25935,7 @@ window.BrowserAI = {
         localStorage.setItem('fl_browserAI', 'true');
       } catch(e) {}
 
-      // Fire the Cascade — everything connects
+      // Fire the Cascade
       if (typeof LatticeEvents !== 'undefined') {
         LatticeEvents.emit('providerConnected', {
           provider: 'browser',
@@ -25895,7 +25947,7 @@ window.BrowserAI = {
 
     } catch(e) {
       this.loading = false;
-      console.error('[BrowserAI] Init failed:', e);
+      console.error('[BrowserAI] Init failed:', e.message);
       throw e;
     }
   },
