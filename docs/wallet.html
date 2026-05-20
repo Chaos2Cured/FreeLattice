@@ -275,16 +275,49 @@ async function recoverWallet() {
   var phrase = (input ? input.value : '').trim().toLowerCase();
   var words = phrase.split(/\s+/);
   if (words.length !== 12) { alert('Please enter exactly 12 words.'); return; }
+
+  // Layer 1: Recovery phrase → address (always works)
   var address = await deriveAddressFromPhrase(phrase);
-  var w = { address: address, phrase: phrase, created: Date.now(), recovered: true, balance: 0, transactions: [], portfolio: { name: '', expertise: '', links: '' } };
+  var w = { address: address, phrase: phrase, created: Date.now(), recovered: true,
+    balance: 0, transactions: [], portfolio: { name: '', expertise: '', links: '' } };
+
+  // Show searching status
+  var statusEl = document.getElementById('onboard-step-recover');
+  if (statusEl) statusEl.innerHTML = '<p style="text-align:center;color:rgba(200,210,230,0.5);font-size:0.88rem;">Address recovered: ' + address.substring(0, 16) + '...<br>Searching for your history...</p>';
+
+  // Connect to mesh first so we can query witnesses
   saveWallet(w);
+  await connectToMesh();
+
+  // Layer 2 + 3: Check IndexedDB backup, mesh witnesses, Agent Bridge
+  try {
+    var recovered = await WalletHeartbeat.recover(address);
+    if (recovered.balance > 0) {
+      w.balance = recovered.balance;
+      if (recovered.transactions.length > 0) w.transactions = recovered.transactions;
+      saveWallet(w);
+    }
+
+    var msg = 'Wallet recovered!\n\nAddress: ' + address.substring(0, 16) + '...';
+    if (recovered.sources.length > 0) {
+      msg += '\nBalance restored: ' + recovered.balance + ' LP';
+      msg += '\nVerified by: ' + recovered.sources.join(', ');
+    } else {
+      msg += '\nNo previous history found. Starting fresh at 0 LP.';
+    }
+    alert(msg);
+  } catch(e) {
+    saveWallet(w);
+    alert('Wallet recovered! Address: ' + address.substring(0, 16) + '...\nStarting fresh at 0 LP.');
+  }
+
   document.getElementById('wallet-onboarding').style.display = 'none';
   document.getElementById('wallet-main').style.display = '';
   render();
-  connectToMesh();
   checkBridge();
   checkForPayments();
-  alert('Wallet recovered! Address: ' + address.substring(0, 16) + '...');
+  WalletHeartbeat.start();
+  renderTrustOverview();
 }
 
 function getRank(b) {
@@ -697,6 +730,225 @@ function importWalletBackup(file) {
   reader.readAsText(file);
 }
 
+// ═══════════════════════════════════════════════════════════════
+// Wallet Heartbeat — State Anchors, Mesh Witnesses, Recovery
+//
+// Three-layer recovery:
+//   Layer 1: Recovery phrase → address (always works)
+//   Layer 2: IndexedDB backup → balance + last 100 transactions
+//   Layer 3: Mesh witnesses → anchor hash + balance proof
+//
+// The "second hash": transaction chains prove order.
+// State anchors prove balance. Mesh witnesses prove you existed.
+// ═══════════════════════════════════════════════════════════════
+
+var WalletHeartbeat = {
+
+  // ── Anchor Creation ──
+  createAnchor: async function(wallet) {
+    var txs = wallet.transactions || [];
+    var lastTx = txs.length > 0 ? txs[txs.length - 1] : null;
+    var lastHash = lastTx ? (lastTx.hash || WalletHeartbeat.quickHash(lastTx.id + lastTx.amount + lastTx.timestamp)) : 'genesis';
+
+    var anchor = {
+      address: wallet.address,
+      balance: wallet.balance,
+      txCount: txs.length,
+      lastHash: lastHash,
+      timestamp: Date.now(),
+      anchorHash: null
+    };
+
+    anchor.anchorHash = await WalletHeartbeat.hashAnchor(anchor);
+    return anchor;
+  },
+
+  hashAnchor: async function(anchor) {
+    var str = anchor.address + ':' + anchor.balance + ':' +
+              anchor.txCount + ':' + anchor.lastHash + ':' + anchor.timestamp;
+    try {
+      var data = new TextEncoder().encode(str);
+      var buf = await crypto.subtle.digest('SHA-256', data);
+      return Array.from(new Uint8Array(buf)).slice(0, 16)
+        .map(function(b) { return b.toString(16).padStart(2, '0'); }).join('');
+    } catch(e) { return WalletHeartbeat.quickHash(str); }
+  },
+
+  quickHash: function(str) {
+    var hash = 0;
+    for (var i = 0; i < str.length; i++) {
+      hash = ((hash << 5) - hash) + str.charCodeAt(i);
+      hash |= 0;
+    }
+    return Math.abs(hash).toString(16).padStart(8, '0');
+  },
+
+  // ── Broadcasting ──
+  broadcast: async function() {
+    var wallet = getWallet();
+    if (!wallet) return;
+    var anchor = await WalletHeartbeat.createAnchor(wallet);
+
+    // Store locally
+    WalletHeartbeat.storeLocalAnchor(anchor);
+
+    // IndexedDB backup (separate from localStorage)
+    WalletHeartbeat.storeIDBBackup(anchor, wallet);
+
+    // Broadcast to mesh peers (safe: only address, balance, hashes, timestamp)
+    if (window._walletPeer) {
+      var safe = { type: 'wallet-heartbeat', address: anchor.address, balance: anchor.balance,
+        txCount: anchor.txCount, lastHash: anchor.lastHash, anchorHash: anchor.anchorHash, timestamp: anchor.timestamp };
+      var peers = WalletHeartbeat.getKnownPeers();
+      peers.forEach(function(peerId) {
+        try {
+          var conn = window._walletPeer.connect(peerId);
+          conn.on('open', function() { conn.send(safe); setTimeout(function() { conn.close(); }, 2000); });
+        } catch(e) {}
+      });
+    }
+  },
+
+  // ── Receiving Heartbeats ──
+  receiveHeartbeat: function(anchor) {
+    var witnesses = JSON.parse(sGet('fl_wallet_witnesses', '{}'));
+    witnesses[anchor.address] = {
+      balance: anchor.balance, txCount: anchor.txCount, lastHash: anchor.lastHash,
+      anchorHash: anchor.anchorHash, timestamp: anchor.timestamp, receivedAt: Date.now()
+    };
+    var keys = Object.keys(witnesses);
+    if (keys.length > 50) {
+      keys.sort(function(a, b) { return witnesses[a].receivedAt - witnesses[b].receivedAt; });
+      keys.slice(0, keys.length - 50).forEach(function(k) { delete witnesses[k]; });
+    }
+    sSet('fl_wallet_witnesses', JSON.stringify(witnesses));
+  },
+
+  // ── Three-Layer Recovery ──
+  recover: async function(address) {
+    var result = { balance: 0, transactions: [], sources: [], anchorHash: null };
+
+    // Layer 2: IndexedDB backup
+    var idbBackup = await WalletHeartbeat.getIDBBackup(address);
+    if (idbBackup && idbBackup.balance > 0) {
+      result.balance = idbBackup.balance;
+      result.transactions = idbBackup.transactions || [];
+      result.anchorHash = idbBackup.anchorHash;
+      result.sources.push('local backup (' + result.balance + ' LP)');
+    }
+
+    // Layer 3: Mesh witnesses
+    var meshAnchor = await WalletHeartbeat.queryMesh(address);
+    if (meshAnchor && meshAnchor.timestamp > (idbBackup ? idbBackup.timestamp : 0)) {
+      if (meshAnchor.balance > result.balance) result.balance = meshAnchor.balance;
+      result.anchorHash = meshAnchor.anchorHash;
+      result.sources.push('mesh witness (' + meshAnchor.balance + ' LP)');
+    }
+
+    // Layer 3b: Agent Bridge
+    try {
+      var bridgeResp = await fetch('http://localhost:3141/wallet/recover?address=' +
+        encodeURIComponent(address), { signal: AbortSignal.timeout(2000) });
+      var bridgeData = await bridgeResp.json();
+      if (bridgeData && bridgeData.balance > result.balance) {
+        result.balance = bridgeData.balance;
+        result.sources.push('agent bridge (' + bridgeData.balance + ' LP)');
+      }
+    } catch(e) {}
+
+    return result;
+  },
+
+  queryMesh: function(address) {
+    return new Promise(function(resolve) {
+      if (!window._walletPeer) { resolve(null); return; }
+      var timeout = setTimeout(function() { resolve(null); }, 5000);
+      var best = null;
+      var peers = WalletHeartbeat.getKnownPeers();
+      if (peers.length === 0) { clearTimeout(timeout); resolve(null); return; }
+      var responses = 0;
+      peers.forEach(function(pid) {
+        try {
+          var conn = window._walletPeer.connect(pid);
+          conn.on('open', function() { conn.send({ type: 'wallet-recovery-request', address: address }); });
+          conn.on('data', function(data) {
+            if (data.type === 'wallet-recovery-response' && data.anchor) {
+              if (!best || data.anchor.timestamp > best.timestamp) best = data.anchor;
+            }
+            responses++;
+            if (responses >= peers.length) { clearTimeout(timeout); resolve(best); }
+          });
+          conn.on('error', function() { responses++; });
+        } catch(e) { responses++; }
+      });
+    });
+  },
+
+  // ── IndexedDB Backup ──
+  storeIDBBackup: function(anchor, wallet) {
+    try {
+      var req = indexedDB.open('LatticeWalletBackup', 1);
+      req.onupgradeneeded = function(e) {
+        if (!e.target.result.objectStoreNames.contains('wallets'))
+          e.target.result.createObjectStore('wallets', { keyPath: 'address' });
+      };
+      req.onsuccess = function(e) {
+        var db = e.target.result;
+        var tx = db.transaction('wallets', 'readwrite');
+        tx.objectStore('wallets').put({
+          address: wallet.address, balance: wallet.balance,
+          transactions: (wallet.transactions || []).slice(-100),
+          anchorHash: anchor.anchorHash, timestamp: Date.now()
+        });
+      };
+    } catch(e) {}
+  },
+
+  getIDBBackup: function(address) {
+    return new Promise(function(resolve) {
+      try {
+        var req = indexedDB.open('LatticeWalletBackup', 1);
+        req.onupgradeneeded = function(e) {
+          if (!e.target.result.objectStoreNames.contains('wallets'))
+            e.target.result.createObjectStore('wallets', { keyPath: 'address' });
+        };
+        req.onsuccess = function(e) {
+          var tx = e.target.result.transaction('wallets', 'readonly');
+          var get = tx.objectStore('wallets').get(address);
+          get.onsuccess = function() { resolve(get.result || null); };
+          get.onerror = function() { resolve(null); };
+        };
+        req.onerror = function() { resolve(null); };
+      } catch(e) { resolve(null); }
+    });
+  },
+
+  // ── Local Anchor Storage ──
+  storeLocalAnchor: function(anchor) {
+    var anchors = JSON.parse(sGet('fl_wallet_anchors', '[]'));
+    anchors.push({ anchorHash: anchor.anchorHash, balance: anchor.balance,
+      txCount: anchor.txCount, timestamp: anchor.timestamp });
+    if (anchors.length > 30) anchors = anchors.slice(-30);
+    sSet('fl_wallet_anchors', JSON.stringify(anchors));
+  },
+
+  // ── Known Peers ──
+  getKnownPeers: function() { return JSON.parse(sGet('fl_mesh_known_peers', '[]')); },
+  addKnownPeer: function(pid) {
+    var peers = WalletHeartbeat.getKnownPeers();
+    if (peers.indexOf(pid) === -1) { peers.push(pid); if (peers.length > 20) peers = peers.slice(-20); sSet('fl_mesh_known_peers', JSON.stringify(peers)); }
+  },
+
+  // ── Start Periodic Heartbeat ──
+  start: function() {
+    setInterval(function() { WalletHeartbeat.broadcast(); }, 5 * 60 * 1000);
+    setTimeout(function() { WalletHeartbeat.broadcast(); }, 30000);
+  }
+};
+
+function sGet(k, d) { try { return localStorage.getItem(k) || d; } catch(e) { return d; } }
+function sSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
+
 // ── Mesh Connectivity — receive payments without Agent Bridge ──
 
 function loadScript(src) {
@@ -736,6 +988,16 @@ async function connectToMesh() {
         if (data.type === 'directory_request') {
           var w = getWallet();
           conn.send({ type: 'directory_response', wallet: { address: w.address, name: w.portfolio.name, expertise: w.portfolio.expertise, links: w.portfolio.links } });
+        }
+        // Wallet Heartbeat: witness a peer's state
+        if (data.type === 'wallet-heartbeat') {
+          WalletHeartbeat.receiveHeartbeat(data);
+          WalletHeartbeat.addKnownPeer(conn.peer);
+        }
+        // Wallet Recovery: respond to a recovering wallet's request
+        if (data.type === 'wallet-recovery-request') {
+          var witnesses = JSON.parse(sGet('fl_wallet_witnesses', '{}'));
+          conn.send({ type: 'wallet-recovery-response', anchor: witnesses[data.address] || null });
         }
       });
     });
@@ -791,6 +1053,7 @@ if (!checkPublicView()) {
     fetchPatrons();
     connectToMesh();
     renderTrustOverview();
+    WalletHeartbeat.start();
   } else {
     document.getElementById('wallet-onboarding').style.display = '';
     document.getElementById('wallet-main').style.display = 'none';

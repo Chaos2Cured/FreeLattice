@@ -879,6 +879,22 @@ assert('getWalletRank function', protocolJs.includes('getWalletRank'));
 assert('Protocol ready event', protocolJs.includes('lattice-protocol-ready'));
 assert('SW cache entry for protocol', swJs.includes('lattice-protocol.js'));
 
+// ═══════════════════════════════════════════════════════════════
+section('36. Wallet Heartbeat — State Anchors & Recovery');
+// ═══════════════════════════════════════════════════════════════
+assert('WalletHeartbeat in app.html', appHtml.includes('WalletHeartbeat'));
+assert('Anchor hash generation', appHtml.includes('hashAnchor'));
+assert('Heartbeat broadcast', appHtml.includes('walletHeartbeat'));
+assert('Heartbeat starts periodically', appHtml.includes('WH.start'));
+assert('WalletHeartbeat in wallet.html', walletHtml.includes('WalletHeartbeat'));
+assert('Three-layer recovery', walletHtml.includes('recover: async function'));
+assert('IndexedDB backup layer', walletHtml.includes('LatticeWalletBackup'));
+assert('Mesh witness storage', walletHtml.includes('fl_wallet_witnesses'));
+assert('Mesh recovery query', walletHtml.includes('wallet-recovery-request'));
+assert('Recovery handles mesh response', walletHtml.includes('wallet-recovery-response'));
+assert('Heartbeat starts on wallet init', walletHtml.includes('WalletHeartbeat.start()'));
+assert('Anchor stored locally', walletHtml.includes('fl_wallet_anchors'));
+
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
 
