@@ -350,10 +350,9 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 ## PRIMER HEALTH
 - Last auto-updated: 2026-05-19 18:45 MDT
 - Version: 5.10.70
-- Total commits: 1647
+- Total commits: 1646
 - Last 10 commits:
-- b143431 feat: Transaction Trust + Provider modal redesign (v5.10.70)
-- 5f0f60c ci: Update Primer deployment state [2026-05-20]
+- e7fe338 feat: Transaction Trust + Provider modal redesign (v5.10.70)
 - 4ec429d docs: Auto-update Session Primer [5.10.69]
 - e81a186 docs: Auto-update Session Primer [5.10.69]
 - 6ab25fe feat: Provider modal redesign — Garden Language, free first (v5.10.69)
@@ -362,3 +361,4 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 1f936ef docs: Auto-update Session Primer [5.10.68]
 - 7dceb0c feat: Lattice Puzzles — AI creates, human solves, both stake LP (v5.10.68)
 - aaae77f ci: Update Primer deployment state [2026-05-19]
+- fd65083 docs: Auto-update Session Primer [5.10.67]
