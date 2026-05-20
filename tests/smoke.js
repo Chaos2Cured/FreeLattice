@@ -846,6 +846,39 @@ try { kcJs = require('fs').readFileSync('docs/modules/knowledge-core.js', 'utf8'
 assert('Autonomous learning earns to companion bank', kcJs.includes("LatticeBank.earn(companionId"));
 assert('Cross-domain connections earn 5 LP', kcJs.includes("LatticeBank.earn(companionId, 5"));
 
+// ═══════════════════════════════════════════════════════════════
+section('34. Math Translator');
+// ═══════════════════════════════════════════════════════════════
+var mathJs = '';
+try { mathJs = require('fs').readFileSync('docs/modules/math-translator.js', 'utf8'); } catch(e) {}
+assert('math-translator.js exists', mathJs.length > 100);
+assert('MathTranslator window export', mathJs.includes('window.MathTranslator'));
+assert('Tab panel exists', appHtml.includes('id="tab-mathtranslator"'));
+assert('In MORE_TAB_IDS', appHtml.includes("'mathtranslator'"));
+assert('Lazy loader wired', appHtml.includes('math-translator.js'));
+assert('SW cache entry', swJs.includes('math-translator.js'));
+assert('Encoder specialist', mathJs.includes('Encoder'));
+assert('Decoder specialist', mathJs.includes('Decoder'));
+assert('MathJax integration', mathJs.includes('MathJax'));
+assert('Safety check via AI', mathJs.includes('checkSafety'));
+assert('Plant in Core', mathJs.includes('plantInCore'));
+
+// ═══════════════════════════════════════════════════════════════
+section('35. Lattice Protocol — embeddable economy');
+// ═══════════════════════════════════════════════════════════════
+var protocolJs = '';
+try { protocolJs = require('fs').readFileSync('docs/lattice-protocol.js', 'utf8'); } catch(e) {}
+assert('lattice-protocol.js exists', protocolJs.length > 100);
+assert('LatticeProtocol defined', protocolJs.includes('LatticeProtocol'));
+assert('hasWallet function', protocolJs.includes('hasWallet'));
+assert('getAddress function', protocolJs.includes('getAddress'));
+assert('requestPayment with trust validation', protocolJs.includes('requestPayment') && protocolJs.includes('getTrustTier'));
+assert('Fibonacci trust tiers', protocolJs.includes('First Contact') && protocolJs.includes('Infinite'));
+assert('renderBadge function', protocolJs.includes('renderBadge'));
+assert('getWalletRank function', protocolJs.includes('getWalletRank'));
+assert('Protocol ready event', protocolJs.includes('lattice-protocol-ready'));
+assert('SW cache entry for protocol', swJs.includes('lattice-protocol.js'));
+
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
 
