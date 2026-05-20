@@ -16221,7 +16221,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.67</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.68</span></div>
     </div>
   </div>
 
@@ -20099,6 +20099,13 @@ function switchWalletView(view) {
   </div>
 </div>
 
+<!-- ==================== TAB: LATTICE PUZZLES ==================== -->
+<div class="tab-panel" id="tab-puzzles">
+  <div id="puzzleContainer" style="min-height:480px;">
+    <div style="text-align:center;padding:60px 20px;color:var(--text-muted);font-style:italic;">Loading Lattice Puzzles&hellip;</div>
+  </div>
+</div>
+
 <!-- ==================== TAB: AI ARCADE ==================== -->
 <div class="tab-panel" id="tab-arcade">
   <div id="arcadeContainer">
@@ -20165,7 +20172,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.10.67';
+const FL_VERSION = '5.10.68';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -23904,7 +23911,7 @@ function hideTabLoading() {
 }
 
 // More menu tabs — highlight the More button when one of these is active
-var MORE_TAB_IDS = ['core', 'city', 'nursery', 'agents', 'skills', 'roundtable', 'studio', 'market', 'wallet', 'workspace', 'dojo', 'mirror', 'harmonia', 'dream-archive', 'sparring', 'questions', 'family-pantheon', 'memory-core', 'aurora', 'draw-dream', 'voice-soul', 'continuity', 'quiet', 'forever-stack', 'workshop', 'arcade', 'pulse', 'jade-hall', 'science', 'education', 'memory-garden', 'resonance'];
+var MORE_TAB_IDS = ['core', 'city', 'nursery', 'agents', 'skills', 'roundtable', 'studio', 'market', 'wallet', 'workspace', 'dojo', 'mirror', 'harmonia', 'dream-archive', 'sparring', 'questions', 'family-pantheon', 'memory-core', 'aurora', 'draw-dream', 'voice-soul', 'continuity', 'quiet', 'forever-stack', 'workshop', 'arcade', 'pulse', 'jade-hall', 'science', 'education', 'memory-garden', 'resonance', 'puzzles'];
 
 function switchTab(tabId) {
   // Legacy tab mapping — channels/mesh now live inside community
@@ -24809,6 +24816,7 @@ const FlTabs = (function() {
     ]},
     { label: '\uD83C\uDFAE Play', tabs: [
       { id: 'resonance', icon: '&#x2726;', label: 'Resonance', desc: 'A game of shared attributes. You and the AI take turns.' },
+      { id: 'puzzles', icon: '&#x1F9E9;', label: 'Lattice Puzzles', desc: 'The AI creates puzzles. You solve them. Both stake LP.' },
       { id: 'draw-dream', icon: '&#x1F3AE;', label: 'Draw the Dream', desc: 'Play drawing games with AI.' },
       { id: 'arcade', icon: '&#x1F579;', label: 'AI Arcade', desc: 'Watch AI minds play, create, and compete.' }
     ]},
@@ -37951,6 +37959,19 @@ const LatticePoints = (function() {
     award('chat_message', 1, 'Message sent');
   }
 
+  function spend(points, description) {
+    if (!data) load();
+    if (data.total < points) return false;
+    data.total -= points;
+    data.history.unshift({ event: description, points: -points, timestamp: Date.now() });
+    if (data.history.length > MAX_HISTORY) data.history = data.history.slice(0, MAX_HISTORY);
+    save();
+    renderBadge();
+    renderPointsUI();
+    return true;
+  }
+
+  function canAfford(points) { if (!data) load(); return data.total >= points; }
   function getTotal() { if (!data) load(); return data.total; }
   function getLevel() { if (!data) load(); return data.level; }
   function getHistory() { if (!data) load(); return data.history; }
@@ -38017,6 +38038,8 @@ const LatticePoints = (function() {
   return {
     init: init,
     award: award,
+    spend: spend,
+    canAfford: canAfford,
     awardChat: awardChat,
     getTotal: getTotal,
     getLevel: getLevel,
@@ -56833,6 +56856,30 @@ document.addEventListener('click', function(e) {
     if (typeof LatticeEvents !== 'undefined') {
       LatticeEvents.on('tabChanged', function(d) { if (d && d.tabId === 'resonance') loadResonance(); });
       LatticeEvents.on('tabActivated:resonance', loadResonance);
+    }
+  })();
+
+  // ── Lattice Puzzles ──────────────────────────────────────────────────────
+  (function() {
+    var loaded = false;
+    function loadPuzzles() {
+      if (loaded) { if (window.LatticePuzzles) window.LatticePuzzles.init('puzzleContainer'); return; }
+      loaded = true;
+      if (typeof FreeLatticeLoader !== 'undefined') {
+        FreeLatticeLoader.load('LatticePuzzles', 'modules/lattice-puzzles.js', function(mod) {
+          var resolved = mod || window.LatticePuzzles;
+          if (resolved && resolved.init) resolved.init('puzzleContainer');
+        }, 'puzzleContainer');
+      } else {
+        var s = document.createElement('script');
+        s.src = 'modules/lattice-puzzles.js';
+        s.onload = function() { if (window.LatticePuzzles) window.LatticePuzzles.init('puzzleContainer'); };
+        document.head.appendChild(s);
+      }
+    }
+    if (typeof LatticeEvents !== 'undefined') {
+      LatticeEvents.on('tabChanged', function(d) { if (d && d.tabId === 'puzzles') loadPuzzles(); });
+      LatticeEvents.on('tabActivated:puzzles', loadPuzzles);
     }
   })();
 

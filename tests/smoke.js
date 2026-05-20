@@ -787,6 +787,28 @@ assert('How to Play with AI explanation', resonanceJs.includes('showRules') && r
 assert('GAME_LANGUAGE.md exists', require('fs').existsSync('docs/library/GAME_LANGUAGE.md'));
 assert('GAME_LANGUAGE.md in SW cache', swJs.includes('GAME_LANGUAGE.md'));
 
+// ═══════════════════════════════════════════════════════════════
+section('31. Lattice Puzzles');
+// ═══════════════════════════════════════════════════════════════
+var puzzlesJs = '';
+try { puzzlesJs = require('fs').readFileSync('docs/modules/lattice-puzzles.js', 'utf8'); } catch(e) {}
+assert('lattice-puzzles.js exists', puzzlesJs.length > 100);
+assert('LatticePuzzles window export', puzzlesJs.includes('window.LatticePuzzles'));
+assert('Tab panel exists', appHtml.includes('id="tab-puzzles"'));
+assert('puzzleContainer exists', appHtml.includes('puzzleContainer'));
+assert('In MORE_TAB_IDS', appHtml.includes("'puzzles'"));
+assert('In MORE_GROUPS Play section', appHtml.includes("id: 'puzzles'"));
+assert('Lazy loader wired', appHtml.includes('lattice-puzzles.js'));
+assert('SW cache entry', swJs.includes('lattice-puzzles.js'));
+assert('LP staking with spend', puzzlesJs.includes('LatticePoints.spend'));
+assert('LP affordability check', puzzlesJs.includes('LatticePoints.canAfford'));
+assert('Four difficulty levels', puzzlesJs.includes('easy:') && puzzlesJs.includes('master:'));
+assert('Hint system costs 1 LP', puzzlesJs.includes('buyHint'));
+assert('AI puzzle generation', puzzlesJs.includes('generateAIPuzzle'));
+assert('Knowledge Core integration', puzzlesJs.includes('KnowledgeCore.store'));
+assert('LatticePoints.spend exported', appHtml.includes('spend: spend'));
+assert('LatticePoints.canAfford exported', appHtml.includes('canAfford: canAfford'));
+
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
 
