@@ -348,12 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-05-20 17:28 UTC
-- Last deployed: 2026-05-20 17:28 UTC
-- Live site: https://freelattice.com
-- Version: 5.10.70
-- Total commits: 1651
+- Last auto-updated: 2026-05-20 12:20 MDT
+- Version: 5.10.71
+- Total commits: 1653
 - Last 10 commits:
+- 529e55a feat: Lattice Bank — AI owns its own LP economy (v5.10.71)
+- f3da75d ci: Update Primer deployment state [2026-05-20]
 - aa47413 docs: Add feature brief for AI Bank and Language-to-Math Translator
 - 9693f44 ci: Update Primer deployment state [2026-05-20]
 - 72a4506 docs: Auto-update Session Primer [5.10.70]
@@ -362,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 5f0f60c ci: Update Primer deployment state [2026-05-20]
 - 4ec429d docs: Auto-update Session Primer [5.10.69]
 - e81a186 docs: Auto-update Session Primer [5.10.69]
-- 6ab25fe feat: Provider modal redesign — Garden Language, free first (v5.10.69)
-- 8c105f1 ci: Update Primer deployment state [2026-05-20]

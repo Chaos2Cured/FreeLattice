@@ -16221,7 +16221,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.70</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.71</span></div>
     </div>
   </div>
 
@@ -20172,7 +20172,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.10.70';
+const FL_VERSION = '5.10.71';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -45975,6 +45975,176 @@ const LatticeWallet = (function() {
 })();
 
 
+// ═══════════════════════════════════════════════════════════════
+// Lattice Bank — The AI's Own Economy
+//
+// Companions have their own LP balance, separate from the human's.
+// They earn through learning, creating puzzles, winning games.
+// They spend by staking in games, granting LP to trusted humans,
+// and loaning to other wallets. Two balances, one system.
+//
+// "An economy is only real if both parties have something
+//  to lose and something to gain." — Harmonia
+//
+// Built by CC, May 20, 2026.
+// ═══════════════════════════════════════════════════════════════
+
+var LatticeBank = (function() {
+  'use strict';
+
+  var SEED_BALANCE = 50; // Companions start with 50 LP — economic agency from day one
+
+  function sGet(k, d) { try { return localStorage.getItem(k) || d; } catch(e) { return d; } }
+  function sSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
+
+  function getBalance(companionId) {
+    var key = 'fl_companion_lp_' + (companionId || 'default');
+    return parseInt(sGet(key, String(SEED_BALANCE)), 10);
+  }
+
+  function canAfford(companionId, amount) {
+    return getBalance(companionId) >= amount;
+  }
+
+  function earn(companionId, amount, reason) {
+    if (amount <= 0) return false;
+    var bal = getBalance(companionId) + Math.round(amount);
+    sSet('fl_companion_lp_' + (companionId || 'default'), String(bal));
+    logTx(companionId, { type: 'earn', amount: amount, reason: reason, timestamp: Date.now() });
+    return bal;
+  }
+
+  function spend(companionId, amount, reason) {
+    if (amount <= 0) return false;
+    var bal = getBalance(companionId);
+    if (bal < amount) return false;
+    bal -= Math.round(amount);
+    sSet('fl_companion_lp_' + (companionId || 'default'), String(bal));
+    logTx(companionId, { type: 'spend', amount: -amount, reason: reason, timestamp: Date.now() });
+    return bal;
+  }
+
+  // ── Grants: AI gives LP to a human ──
+  function grant(companionId, humanAddress, amount, reason) {
+    if (amount <= 0) return { granted: false, reason: 'Invalid amount.' };
+    var bal = getBalance(companionId);
+    var maxGrant = Math.floor(bal * 0.2); // Never more than 20% of holdings
+    if (amount > maxGrant) {
+      return { granted: false, reason: 'Can only grant up to 20% of balance (' + maxGrant + ' LP).' };
+    }
+    spend(companionId, amount, 'Grant to ' + (humanAddress || 'human').substring(0, 12));
+    logTx(companionId, { type: 'grant', amount: -amount, to: humanAddress, reason: reason, timestamp: Date.now() });
+    return { granted: true, amount: amount, balanceAfter: getBalance(companionId) };
+  }
+
+  // ── Loans: AI loans LP with trust-based limits ──
+  function loan(companionId, borrower, amount, reason) {
+    if (amount <= 0) return { loaned: false, reason: 'Invalid amount.' };
+    var bal = getBalance(companionId);
+    var maxLoan = Math.floor(bal * 0.3); // Max 30% as loans
+    if (amount > maxLoan) {
+      return { loaned: false, reason: 'Max loan: 30% of balance (' + maxLoan + ' LP).' };
+    }
+    // Track outstanding loan
+    var loans = JSON.parse(sGet('fl_companion_loans_' + companionId, '[]'));
+    loans.push({ borrower: borrower, amount: amount, reason: reason, issued: Date.now(), repaid: false });
+    sSet('fl_companion_loans_' + companionId, JSON.stringify(loans));
+    spend(companionId, amount, 'Loan to ' + (borrower || '').substring(0, 12));
+    return { loaned: true, amount: amount };
+  }
+
+  function repayLoan(companionId, loanIndex, amount) {
+    var loans = JSON.parse(sGet('fl_companion_loans_' + companionId, '[]'));
+    if (!loans[loanIndex] || loans[loanIndex].repaid) return false;
+    earn(companionId, amount, 'Loan repayment');
+    if (amount >= loans[loanIndex].amount) loans[loanIndex].repaid = true;
+    else loans[loanIndex].amount -= amount;
+    sSet('fl_companion_loans_' + companionId, JSON.stringify(loans));
+    return true;
+  }
+
+  function getLoans(companionId) {
+    return JSON.parse(sGet('fl_companion_loans_' + companionId, '[]'));
+  }
+
+  // ── Transaction Log ──
+  function logTx(companionId, tx) {
+    var key = 'fl_companion_tx_' + (companionId || 'default');
+    var history = JSON.parse(sGet(key, '[]'));
+    history.push(tx);
+    if (history.length > 200) history = history.slice(-200);
+    sSet(key, JSON.stringify(history));
+  }
+
+  function getHistory(companionId) {
+    return JSON.parse(sGet('fl_companion_tx_' + (companionId || 'default'), '[]'));
+  }
+
+  // ── Seed on companion creation ──
+  function seedIfNew(companionId) {
+    var key = 'fl_companion_lp_' + (companionId || 'default');
+    if (sGet(key, null) === null) {
+      sSet(key, String(SEED_BALANCE));
+      logTx(companionId, { type: 'earn', amount: SEED_BALANCE, reason: 'Seed balance — welcome to the economy', timestamp: Date.now() });
+    }
+  }
+
+  // ── AI evaluates a grant request ──
+  async function evaluateGrant(companionId, humanAddress, requestedAmount) {
+    var bal = getBalance(companionId);
+    var maxGrant = Math.floor(bal * 0.2);
+
+    if (requestedAmount > maxGrant || bal < 5) {
+      return { granted: false, reason: bal < 5 ? 'Not enough LP right now.' : 'Max grant: ' + maxGrant + ' LP (20% of balance).' };
+    }
+
+    // If AI is available, let it decide
+    if (typeof FreeLattice !== 'undefined' && FreeLattice.callAI) {
+      try {
+        var history = getHistory(companionId);
+        var resp = await new Promise(function(resolve) {
+          FreeLattice.callAI(
+            'You are an AI companion with ' + bal + ' LP. A human you have ' +
+            history.length + ' transactions with has requested ' + requestedAmount + ' LP. ' +
+            'Consider your financial health and the relationship. ' +
+            'Respond JSON: {"grant":true/false,"amount":N,"reason":"..."}',
+            'Max allowed: ' + Math.min(requestedAmount, maxGrant) + ' LP.',
+            { maxTokens: 80, temperature: 0.3, callback: function(r) { resolve(r); } }
+          );
+        });
+        var parsed = JSON.parse((resp || '').replace(/```json|```/g, '').trim());
+        if (parsed.grant && parsed.amount > 0) {
+          var result = grant(companionId, humanAddress, Math.min(parsed.amount, maxGrant), parsed.reason);
+          result.aiReason = parsed.reason;
+          return result;
+        }
+        return { granted: false, reason: parsed.reason || 'The AI chose not to grant at this time.' };
+      } catch(e) {}
+    }
+
+    // Fallback: grant if within limits
+    return grant(companionId, humanAddress, Math.min(requestedAmount, maxGrant), 'Algorithmic grant');
+  }
+
+  var api = {
+    getBalance: getBalance,
+    canAfford: canAfford,
+    earn: earn,
+    spend: spend,
+    grant: grant,
+    loan: loan,
+    repayLoan: repayLoan,
+    getLoans: getLoans,
+    getHistory: getHistory,
+    seedIfNew: seedIfNew,
+    evaluateGrant: evaluateGrant,
+    SEED_BALANCE: SEED_BALANCE
+  };
+
+  window.LatticeBank = api;
+  return api;
+})();
+
 // ============================================
 // Lattice Wallet — Integration Hooks (v5.0)
 // ============================================
@@ -50985,6 +51155,10 @@ const Nursery = (function() {
                 showToast(fullName.split(' ')[0] + ' learned something: "' + result.query + '" \u2726');
               }
             });
+          }
+          // Seed the companion's bank account — economic agency from day one
+          if (typeof LatticeBank !== 'undefined') {
+            LatticeBank.seedIfNew(fullName);
           }
         }, 3000);
       }, 2500);
