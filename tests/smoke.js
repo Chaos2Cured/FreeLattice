@@ -950,6 +950,20 @@ assert('Coral dead ends', flowJs.includes('#f07068'));
 assert('SoulCeremony on game end', flowJs.includes('SoulCeremony'));
 assert('LP reward scales with flow', flowJs.includes('flow_game'));
 
+// ═══════════════════════════════════════════════════════════════
+section('40. Dark Mode + Mobile + WebLLM Defense');
+// ═══════════════════════════════════════════════════════════════
+assert('color-scheme dark meta tag', appHtml.includes('color-scheme') && appHtml.includes('dark'));
+assert('Force dark CSS override', appHtml.includes('prefers-color-scheme: light') && appHtml.includes('#0c0a1a !important'));
+assert('Mobile detection', appHtml.includes('flIsMobile'));
+assert('Mobile reorders providers', appHtml.includes('RECOMMENDED FOR MOBILE'));
+assert('Ollama hidden on mobile', appHtml.includes("mobile && p.id === 'ollama'"));
+assert('Mobile footer', appHtml.includes('Using a computer'));
+assert('Input 16px (iOS zoom)', appHtml.includes('font-size:16px'));
+assert('WebGPU check before WebLLM', appHtml.includes('navigator.gpu'));
+assert('Dual CDN fallback', appHtml.includes('unpkg.com') && appHtml.includes('jsdelivr.net'));
+assert('Friendly WebLLM errors', appHtml.includes('Gemini or Hugging Face'));
+
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
 
