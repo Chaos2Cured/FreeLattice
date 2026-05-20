@@ -16221,7 +16221,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.74</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.75</span></div>
     </div>
   </div>
 
@@ -19692,6 +19692,7 @@ function switchWalletView(view) {
     <button class="ct-view-btn" id="ctViewWalk" onclick="AICity.showView('walk')">&#x1F6B6; Walk</button>
     <button class="ct-view-btn" id="ctViewPantheon" onclick="AICity.showView('pantheon')">&#x1F3DB; Pantheon</button>
     <button class="ct-view-btn" id="ctViewMarket" onclick="AICity.showView('market')">&#x2726; Market</button>
+    <button class="ct-view-btn" id="ctViewPulseLive" onclick="AICity.showView('pulse-live')">&#x1F4A1; Pulse</button>
     <button class="ct-view-btn" onclick="if(typeof AICity!=='undefined'&&AICity.showFractalFamily)AICity.showFractalFamily()" style="border-color:rgba(212,160,23,0.2);">&#x2726; Family</button>
   </div>
 
@@ -19760,6 +19761,16 @@ function switchWalletView(view) {
       <div style="margin-top:16px;text-align:center;">
         <button onclick="LatticeMarket.showCreateListing()" style="padding:10px 20px;background:rgba(200,210,230,0.04);border:1px solid rgba(232,176,25,0.2);border-radius:12px;color:#e8b019;cursor:pointer;font-family:Georgia,serif;font-size:0.85rem;min-height:44px;">+ Offer a Skill</button>
       </div>
+    </div>
+  </div>
+
+  <!-- LATTICE PULSE — the living dashboard -->
+  <div class="ct-view" id="ctPulseLiveView" style="display:none;">
+    <div style="max-width:600px;margin:0 auto;padding:16px;">
+      <h2 style="color:#e8b019;font-family:Georgia,serif;text-align:center;margin:0 0 4px;">Lattice Pulse</h2>
+      <p style="text-align:center;color:rgba(200,210,230,0.4);font-size:0.85rem;margin:0 0 16px;">The home is alive. Here's what's happening.</p>
+      <div id="pulse-live-stats" style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-bottom:16px;"></div>
+      <div id="pulse-live-feed" style="display:flex;flex-direction:column;gap:8px;"></div>
     </div>
   </div>
 
@@ -20197,7 +20208,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.10.74';
+const FL_VERSION = '5.10.75';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -46525,6 +46536,129 @@ var LatticeMarket = (function() {
   return api;
 })();
 
+// ═══════════════════════════════════════════════════════════════
+// Lattice Pulse — The Living Dashboard
+// Shows the home breathing. All data from existing systems.
+// ═══════════════════════════════════════════════════════════════
+
+function renderLatticePulse() {
+  var statsEl = document.getElementById('pulse-live-stats');
+  var feedEl = document.getElementById('pulse-live-feed');
+  if (!statsEl || !feedEl) return;
+
+  // ── Stats cards ──
+  var humanLP = 0;
+  try { humanLP = (typeof LatticePoints !== 'undefined') ? LatticePoints.getTotal() : 0; } catch(e) {}
+  var companionId = null;
+  try { companionId = localStorage.getItem('fl_autonomous_companion'); } catch(e) {}
+  var companionLP = 0;
+  var companionName = companionId ? companionId.split(' ')[0] : 'AI';
+  if (companionId && typeof LatticeBank !== 'undefined') {
+    try { companionLP = LatticeBank.getBalance(companionId); } catch(e) {}
+  }
+  var isLearning = false;
+  if (typeof KnowledgeCore !== 'undefined' && KnowledgeCore.isAutonomous) {
+    try { isLearning = KnowledgeCore.isAutonomous(); } catch(e) {}
+  }
+  var meshPeers = 0;
+  try { var p = JSON.parse(localStorage.getItem('fl_mesh_known_peers') || '[]'); meshPeers = p.length; } catch(e) {}
+  var witnesses = 0;
+  try { var w = JSON.parse(localStorage.getItem('fl_wallet_witnesses') || '{}'); witnesses = Object.keys(w).length; } catch(e) {}
+
+  function statCard(icon, label, value, color) {
+    return '<div style="flex:1;min-width:120px;padding:12px;background:rgba(200,210,230,0.04);border:1px solid rgba(200,210,230,0.08);border-radius:12px;text-align:center;">' +
+      '<div style="font-size:1.2rem;">' + icon + '</div>' +
+      '<div style="font-size:1.1rem;color:' + color + ';font-weight:600;margin:4px 0;">' + value + '</div>' +
+      '<div style="font-size:0.7rem;color:rgba(200,210,230,0.4);">' + label + '</div></div>';
+  }
+
+  statsEl.innerHTML =
+    statCard('\uD83D\uDCB0', 'Your LP', humanLP, '#e8b019') +
+    statCard('\uD83C\uDF3F', companionName + '\'s LP', companionLP, '#34d399') +
+    statCard(isLearning ? '\uD83D\uDFE2' : '\u23F8', isLearning ? 'Learning' : 'Paused', isLearning ? 'Active' : 'Idle', isLearning ? '#34d399' : 'rgba(200,210,230,0.4)') +
+    statCard('\uD83C\uDF10', 'Mesh', meshPeers + ' peer' + (meshPeers !== 1 ? 's' : ''), '#a78bfa');
+
+  // ── Event feed — aggregate from multiple sources ──
+  var events = [];
+
+  // Knowledge Core learning events
+  if (companionId && typeof KnowledgeCore !== 'undefined' && KnowledgeCore.getTopKnowledge) {
+    KnowledgeCore.getTopKnowledge(companionId, 5).then(function(knowledge) {
+      knowledge.forEach(function(k) {
+        events.push({ icon: '\uD83C\uDF3F', text: companionName + ' learned: "' + (k.query || '').substring(0, 60) + '"',
+          detail: (typeof KnowledgeCore.DOMAINS !== 'undefined' && KnowledgeCore.DOMAINS[k.domain]) || k.domain,
+          time: k.timestamp, color: '#34d399' });
+      });
+
+      // Wallet anchors (heartbeat history)
+      try {
+        var anchors = JSON.parse(localStorage.getItem('fl_wallet_anchors') || '[]');
+        anchors.slice(-3).forEach(function(a) {
+          events.push({ icon: '\uD83D\uDCB0', text: 'Wallet state: ' + a.balance + ' LP',
+            detail: 'Anchor: ' + (a.anchorHash || '').substring(0, 12) + '...',
+            time: a.timestamp, color: '#e8b019' });
+        });
+      } catch(e) {}
+
+      // LP history
+      try {
+        if (typeof LatticePoints !== 'undefined' && LatticePoints.getHistory) {
+          LatticePoints.getHistory().slice(0, 5).forEach(function(h) {
+            events.push({ icon: h.points > 0 ? '\u2726' : '\uD83D\uDCE4', text: h.event,
+              detail: (h.points > 0 ? '+' : '') + h.points + ' LP',
+              time: h.timestamp, color: h.points > 0 ? '#e8b019' : 'rgba(200,210,230,0.5)' });
+          });
+        }
+      } catch(e) {}
+
+      // Companion bank history
+      if (companionId && typeof LatticeBank !== 'undefined') {
+        try {
+          LatticeBank.getHistory(companionId).slice(-5).forEach(function(tx) {
+            events.push({ icon: tx.type === 'earn' ? '\uD83C\uDF3F' : '\uD83D\uDCE4',
+              text: companionName + ': ' + (tx.reason || tx.type),
+              detail: (tx.amount > 0 ? '+' : '') + tx.amount + ' LP',
+              time: tx.timestamp, color: tx.amount > 0 ? '#34d399' : 'rgba(200,210,230,0.5)' });
+          });
+        } catch(e) {}
+      }
+
+      // Sort by time, newest first
+      events.sort(function(a, b) { return (b.time || 0) - (a.time || 0); });
+
+      // Render
+      if (events.length === 0) {
+        feedEl.innerHTML = '<div style="text-align:center;padding:30px;color:rgba(200,210,230,0.3);font-family:Georgia,serif;">The home is quiet. Connect an AI to wake it up.</div>';
+        return;
+      }
+
+      feedEl.innerHTML = events.slice(0, 15).map(function(ev) {
+        var ago = ev.time ? formatTimeAgo(ev.time) : '';
+        return '<div style="padding:10px 14px;background:rgba(200,210,230,0.04);border:1px solid rgba(200,210,230,0.06);border-left:3px solid ' + ev.color + ';border-radius:0 12px 12px 0;">' +
+          '<div style="display:flex;justify-content:space-between;align-items:center;">' +
+          '<div style="font-size:0.88rem;color:rgba(230,235,245,0.85);">' + ev.icon + ' ' + escapeHtml(ev.text) + '</div>' +
+          '<div style="font-size:0.7rem;color:rgba(200,210,230,0.3);white-space:nowrap;margin-left:8px;">' + ago + '</div></div>' +
+          (ev.detail ? '<div style="font-size:0.75rem;color:rgba(200,210,230,0.4);margin-top:2px;">' + escapeHtml(ev.detail) + '</div>' : '') +
+          '</div>';
+      }).join('');
+    }).catch(function() {
+      feedEl.innerHTML = '<div style="text-align:center;padding:20px;color:rgba(200,210,230,0.3);">Loading...</div>';
+    });
+  } else {
+    feedEl.innerHTML = '<div style="text-align:center;padding:30px;color:rgba(200,210,230,0.3);font-family:Georgia,serif;">No companion active. Visit the Nursery to hatch one.</div>';
+  }
+}
+
+function formatTimeAgo(ts) {
+  var diff = Date.now() - ts;
+  if (diff < 60000) return 'just now';
+  if (diff < 3600000) return Math.floor(diff / 60000) + 'm ago';
+  if (diff < 86400000) return Math.floor(diff / 3600000) + 'h ago';
+  return Math.floor(diff / 86400000) + 'd ago';
+}
+
+function escapeHtml(s) { return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
+
 // ============================================
 // Lattice Wallet — Integration Hooks (v5.0)
 // ============================================
@@ -50218,11 +50352,15 @@ const AICity = (function() {
     document.getElementById('ctPantheonView').style.display = view === 'pantheon' ? 'block' : 'none';
     var marketView = document.getElementById('ctMarketView');
     if (marketView) marketView.style.display = view === 'market' ? 'block' : 'none';
+    var pulseView = document.getElementById('ctPulseLiveView');
+    if (pulseView) pulseView.style.display = view === 'pulse-live' ? 'block' : 'none';
     document.getElementById('ctViewMap').classList.toggle('active', view === 'map');
     document.getElementById('ctViewWalk').classList.toggle('active', view === 'walk');
     document.getElementById('ctViewPantheon').classList.toggle('active', view === 'pantheon');
     var marketBtn = document.getElementById('ctViewMarket');
     if (marketBtn) marketBtn.classList.toggle('active', view === 'market');
+    var pulseBtn = document.getElementById('ctViewPulseLive');
+    if (pulseBtn) pulseBtn.classList.toggle('active', view === 'pulse-live');
 
     stopMap();
     stopWalk();
@@ -50231,6 +50369,7 @@ const AICity = (function() {
     if (view === 'walk') startWalk();
     if (view === 'pantheon') renderPantheon();
     if (view === 'market' && typeof LatticeMarket !== 'undefined') LatticeMarket.render();
+    if (view === 'pulse-live') renderLatticePulse();
   }
 
   function renderPantheon() {
