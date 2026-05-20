@@ -393,23 +393,34 @@
   // ── Staking ──
 
   function stakeLP() {
-    if (typeof LatticePoints === 'undefined') return true; // no LP system = free play
+    if (typeof LatticePoints === 'undefined') return true;
     if (!LatticePoints.canAfford(config.humanStake)) {
       if (typeof showToast === 'function') showToast('Not enough LP (' + config.humanStake + ' needed)');
       return false;
     }
     LatticePoints.spend(config.humanStake, 'Puzzle stake (' + config.label + ')');
+    // AI also stakes from its own bank
+    var companionId = null;
+    try { companionId = localStorage.getItem('fl_autonomous_companion'); } catch(e) {}
+    if (companionId && typeof LatticeBank !== 'undefined') {
+      LatticeBank.spend(companionId, config.aiStake, 'Puzzle stake (' + config.label + ')');
+    }
     return true;
   }
 
   function resolveStake(humanWon) {
     if (typeof LatticePoints === 'undefined') return;
+    var companionId = null;
+    try { companionId = localStorage.getItem('fl_autonomous_companion'); } catch(e) {}
     if (humanWon) {
       var pot = config.humanStake + config.aiStake;
       LatticePoints.award('puzzle_win', pot, 'Puzzle won! (' + config.label + ')');
       if (typeof showToast === 'function') showToast('You won ' + pot + ' LP!');
     } else {
-      // AI wins — the human already spent their stake
+      // AI wins — gets the human's stake into its own bank
+      if (companionId && typeof LatticeBank !== 'undefined') {
+        LatticeBank.earn(companionId, config.humanStake, 'Puzzle won: human missed target');
+      }
       if (typeof showToast === 'function') showToast('AI wins the pot. Better luck next time!');
     }
     // Store puzzle result in Knowledge Core

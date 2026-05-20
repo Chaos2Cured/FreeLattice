@@ -456,9 +456,13 @@
                   timestamp: Date.now()
                 });
 
-                // LP for autonomous learning (lower than guided)
-                if (typeof LatticePoints !== 'undefined' && LatticePoints.award) {
-                  LatticePoints.award('autonomous_learn', 1, companionId + ' learned: ' + query);
+                // LP for autonomous learning — goes to the COMPANION's bank
+                if (typeof LatticeBank !== 'undefined' && LatticeBank.earn) {
+                  LatticeBank.earn(companionId, 1, 'Learned: ' + query);
+                }
+                // Cross-domain connections earn more
+                if (entry.connections && entry.connections.length > 0 && typeof LatticeBank !== 'undefined') {
+                  LatticeBank.earn(companionId, 5, 'Cross-domain connection discovered');
                 }
 
                 // Emotional state

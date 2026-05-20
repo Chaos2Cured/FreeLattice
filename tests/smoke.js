@@ -826,6 +826,26 @@ assert('wallet.html has trust overview', walletHtml.includes('trust-overview'));
 assert('wallet.html Garden Language bg', walletHtml.includes('#0c0a1a'));
 assert('wallet.html Fibonacci note', walletHtml.includes('Fibonacci'));
 
+// ═══════════════════════════════════════════════════════════════
+section('33. Lattice Bank — AI Economic Agency');
+// ═══════════════════════════════════════════════════════════════
+assert('LatticeBank defined', appHtml.includes('window.LatticeBank'));
+assert('Companion balance getter', appHtml.includes('getBalance(companionId)'));
+assert('Companion earn function', appHtml.includes("earn(companionId, amount"));
+assert('Companion spend function', appHtml.includes("spend(companionId, amount"));
+assert('Grant system (20% max)', appHtml.includes('maxGrant') && appHtml.includes('0.2'));
+assert('Loan system', appHtml.includes('function loan') && appHtml.includes('function repayLoan'));
+assert('Seed balance on creation', appHtml.includes('seedIfNew'));
+assert('50 LP seed', appHtml.includes('SEED_BALANCE = 50'));
+assert('AI evaluates grants with callAI', appHtml.includes('evaluateGrant'));
+assert('Bank seeded on companion hatch', appHtml.includes("LatticeBank.seedIfNew(fullName)"));
+assert('Puzzles use companion bank for AI stakes', puzzlesJs.includes("LatticeBank.spend(companionId"));
+assert('Puzzles credit AI bank on win', puzzlesJs.includes("LatticeBank.earn(companionId"));
+var kcJs = '';
+try { kcJs = require('fs').readFileSync('docs/modules/knowledge-core.js', 'utf8'); } catch(e) {}
+assert('Autonomous learning earns to companion bank', kcJs.includes("LatticeBank.earn(companionId"));
+assert('Cross-domain connections earn 5 LP', kcJs.includes("LatticeBank.earn(companionId, 5"));
+
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
 
