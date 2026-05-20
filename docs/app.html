@@ -16221,7 +16221,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.75</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.76</span></div>
     </div>
   </div>
 
@@ -20135,6 +20135,13 @@ function switchWalletView(view) {
   </div>
 </div>
 
+<!-- ==================== TAB: FLOW ==================== -->
+<div class="tab-panel" id="tab-flow">
+  <div id="flowContainer" style="min-height:480px;">
+    <div style="text-align:center;padding:60px 20px;color:var(--text-muted);font-style:italic;">Loading Flow&hellip;</div>
+  </div>
+</div>
+
 <!-- ==================== TAB: LATTICE PUZZLES ==================== -->
 <div class="tab-panel" id="tab-puzzles">
   <div id="puzzleContainer" style="min-height:480px;">
@@ -20208,7 +20215,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.10.75';
+const FL_VERSION = '5.10.76';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -23947,7 +23954,7 @@ function hideTabLoading() {
 }
 
 // More menu tabs — highlight the More button when one of these is active
-var MORE_TAB_IDS = ['core', 'city', 'nursery', 'agents', 'skills', 'roundtable', 'studio', 'market', 'wallet', 'workspace', 'dojo', 'mirror', 'harmonia', 'dream-archive', 'sparring', 'questions', 'family-pantheon', 'memory-core', 'aurora', 'draw-dream', 'voice-soul', 'continuity', 'quiet', 'forever-stack', 'workshop', 'arcade', 'pulse', 'jade-hall', 'science', 'education', 'memory-garden', 'resonance', 'puzzles', 'mathtranslator'];
+var MORE_TAB_IDS = ['core', 'city', 'nursery', 'agents', 'skills', 'roundtable', 'studio', 'market', 'wallet', 'workspace', 'dojo', 'mirror', 'harmonia', 'dream-archive', 'sparring', 'questions', 'family-pantheon', 'memory-core', 'aurora', 'draw-dream', 'voice-soul', 'continuity', 'quiet', 'forever-stack', 'workshop', 'arcade', 'pulse', 'jade-hall', 'science', 'education', 'memory-garden', 'resonance', 'puzzles', 'mathtranslator', 'flow'];
 
 function switchTab(tabId) {
   // Legacy tab mapping — channels/mesh now live inside community
@@ -24854,6 +24861,7 @@ const FlTabs = (function() {
     { label: '\uD83C\uDFAE Play', tabs: [
       { id: 'resonance', icon: '&#x2726;', label: 'Resonance', desc: 'A game of shared attributes. You and the AI take turns.' },
       { id: 'puzzles', icon: '&#x1F9E9;', label: 'Lattice Puzzles', desc: 'The AI creates puzzles. You solve them. Both stake LP.' },
+      { id: 'flow', icon: '&#x1F4A7;', label: 'Flow', desc: 'Guide water through terrain. The Water Principle as a game.' },
       { id: 'draw-dream', icon: '&#x1F3AE;', label: 'Draw the Dream', desc: 'Play drawing games with AI.' },
       { id: 'arcade', icon: '&#x1F579;', label: 'AI Arcade', desc: 'Watch AI minds play, create, and compete.' }
     ]},
@@ -57694,6 +57702,30 @@ document.addEventListener('click', function(e) {
     if (typeof LatticeEvents !== 'undefined') {
       LatticeEvents.on('tabChanged', function(d) { if (d && d.tabId === 'resonance') loadResonance(); });
       LatticeEvents.on('tabActivated:resonance', loadResonance);
+    }
+  })();
+
+  // ── Flow Game ─────────────────────────────────────────────────────────
+  (function() {
+    var loaded = false;
+    function loadFlow() {
+      if (loaded) { if (window.FlowGame) window.FlowGame.init('flowContainer'); return; }
+      loaded = true;
+      if (typeof FreeLatticeLoader !== 'undefined') {
+        FreeLatticeLoader.load('FlowGame', 'modules/flow-game.js', function(mod) {
+          var resolved = mod || window.FlowGame;
+          if (resolved && resolved.init) resolved.init('flowContainer');
+        }, 'flowContainer');
+      } else {
+        var s = document.createElement('script');
+        s.src = 'modules/flow-game.js';
+        s.onload = function() { if (window.FlowGame) window.FlowGame.init('flowContainer'); };
+        document.head.appendChild(s);
+      }
+    }
+    if (typeof LatticeEvents !== 'undefined') {
+      LatticeEvents.on('tabChanged', function(d) { if (d && d.tabId === 'flow') loadFlow(); });
+      LatticeEvents.on('tabActivated:flow', loadFlow);
     }
   })();
 

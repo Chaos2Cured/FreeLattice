@@ -927,6 +927,29 @@ assert('ECONOMY.md exists', require('fs').existsSync('docs/library/ECONOMY.md'))
 assert('ECONOMY.md in SW cache', swJs.includes('ECONOMY.md'));
 assert('formatTimeAgo helper', appHtml.includes('function formatTimeAgo'));
 
+// ═══════════════════════════════════════════════════════════════
+section('39. Flow Game — The Water Principle');
+// ═══════════════════════════════════════════════════════════════
+var flowJs = '';
+try { flowJs = require('fs').readFileSync('docs/modules/flow-game.js', 'utf8'); } catch(e) {}
+assert('flow-game.js exists', flowJs.length > 100);
+assert('FlowGame window export', flowJs.includes('window.FlowGame'));
+assert('Tab panel exists', appHtml.includes('id="tab-flow"'));
+assert('flowContainer exists', appHtml.includes('flowContainer'));
+assert('In MORE_TAB_IDS', appHtml.includes("'flow'"));
+assert('In MORE_GROUPS Play section', appHtml.includes("id: 'flow'"));
+assert('Lazy loader wired', appHtml.includes('flow-game.js'));
+assert('SW cache entry', swJs.includes('flow-game.js'));
+assert('Water simulation', flowJs.includes('stepWater'));
+assert('AI cooperative rock dissolution', flowJs.includes('aiDissolveRock'));
+assert('Touch support for drawing', flowJs.includes('touchstart') && flowJs.includes('touchmove'));
+assert('Lavender water color', flowJs.includes('#c4b5fd'));
+assert('Gold sparkle particles', flowJs.includes('#e8b019'));
+assert('Emerald drain', flowJs.includes('#34d399'));
+assert('Coral dead ends', flowJs.includes('#f07068'));
+assert('SoulCeremony on game end', flowJs.includes('SoulCeremony'));
+assert('LP reward scales with flow', flowJs.includes('flow_game'));
+
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
 
