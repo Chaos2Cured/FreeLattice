@@ -912,6 +912,21 @@ assert('Economic event emitted on purchase', appHtml.includes("'economicEvent'")
 assert('Human skill listing creation', appHtml.includes('createListing'));
 assert('Create listing button', appHtml.includes('Offer a Skill'));
 
+// ═══════════════════════════════════════════════════════════════
+section('38. Lattice Pulse — Living Dashboard');
+// ═══════════════════════════════════════════════════════════════
+assert('Pulse view in Community tab', appHtml.includes('ctPulseLiveView'));
+assert('Pulse view button', appHtml.includes('ctViewPulseLive'));
+assert('renderLatticePulse function', appHtml.includes('function renderLatticePulse'));
+assert('Pulse shows human LP', appHtml.includes('Your LP'));
+assert('Pulse shows companion LP', appHtml.includes("companion\\'s LP") || appHtml.includes("companionName + '\\'s LP'") || appHtml.includes("companionLP"));
+assert('Pulse shows learning status', appHtml.includes('isLearning'));
+assert('Pulse shows mesh peers', appHtml.includes('Mesh'));
+assert('Pulse event feed', appHtml.includes('pulse-live-feed'));
+assert('ECONOMY.md exists', require('fs').existsSync('docs/library/ECONOMY.md'));
+assert('ECONOMY.md in SW cache', swJs.includes('ECONOMY.md'));
+assert('formatTimeAgo helper', appHtml.includes('function formatTimeAgo'));
+
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
 
