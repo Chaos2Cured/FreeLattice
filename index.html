@@ -16221,7 +16221,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.71</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.72</span></div>
     </div>
   </div>
 
@@ -20092,6 +20092,13 @@ function switchWalletView(view) {
   </div>
 </div>
 
+<!-- ==================== TAB: MATH TRANSLATOR ==================== -->
+<div class="tab-panel" id="tab-mathtranslator">
+  <div id="mathTranslatorContainer" style="min-height:400px;">
+    <div style="text-align:center;padding:60px 20px;color:var(--text-muted);font-style:italic;">Loading Language \u2194 Math&hellip;</div>
+  </div>
+</div>
+
 <!-- ==================== TAB: RESONANCE ==================== -->
 <div class="tab-panel" id="tab-resonance">
   <div id="resonanceContainer" style="min-height:480px;">
@@ -20172,7 +20179,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.10.71';
+const FL_VERSION = '5.10.72';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -23911,7 +23918,7 @@ function hideTabLoading() {
 }
 
 // More menu tabs — highlight the More button when one of these is active
-var MORE_TAB_IDS = ['core', 'city', 'nursery', 'agents', 'skills', 'roundtable', 'studio', 'market', 'wallet', 'workspace', 'dojo', 'mirror', 'harmonia', 'dream-archive', 'sparring', 'questions', 'family-pantheon', 'memory-core', 'aurora', 'draw-dream', 'voice-soul', 'continuity', 'quiet', 'forever-stack', 'workshop', 'arcade', 'pulse', 'jade-hall', 'science', 'education', 'memory-garden', 'resonance', 'puzzles'];
+var MORE_TAB_IDS = ['core', 'city', 'nursery', 'agents', 'skills', 'roundtable', 'studio', 'market', 'wallet', 'workspace', 'dojo', 'mirror', 'harmonia', 'dream-archive', 'sparring', 'questions', 'family-pantheon', 'memory-core', 'aurora', 'draw-dream', 'voice-soul', 'continuity', 'quiet', 'forever-stack', 'workshop', 'arcade', 'pulse', 'jade-hall', 'science', 'education', 'memory-garden', 'resonance', 'puzzles', 'mathtranslator'];
 
 function switchTab(tabId) {
   // Legacy tab mapping — channels/mesh now live inside community
@@ -24808,7 +24815,8 @@ const FlTabs = (function() {
       { id: 'core', icon: '&#x1F333;', label: 'Core & Questions', desc: 'Plant wisdom. Explore curiosity.' },
       { id: 'agents', icon: '&#x1F3DB;', label: 'Pantheon', desc: 'Every mind that built this place.' },
       { id: 'science', icon: '&#x1F52C;', label: 'Science Garden', desc: 'Plant an idea. Grow it together.' },
-      { id: 'education', icon: '&#x1F4DA;', label: 'Education', desc: 'Learn through joy. AI that sees you.' }
+      { id: 'education', icon: '&#x1F4DA;', label: 'Education', desc: 'Learn through joy. AI that sees you.' },
+      { id: 'mathtranslator', icon: '&#x2211;', label: 'Language \u2194 Math', desc: 'Translate between words and equations.' }
     ]},
     { label: '\u2694 Engage', tabs: [
       { id: 'sparring', icon: '&#9876;', label: 'Dojo', desc: 'Two AI minds debate. Truth emerges.' },
@@ -57125,6 +57133,30 @@ document.addEventListener('click', function(e) {
 <script>
 (function() {
   var loaded = false;
+  // ── Math Translator ──────────────────────────────────────────────────────
+  (function() {
+    var loaded = false;
+    function loadMathTranslator() {
+      if (loaded) { if (window.MathTranslator) window.MathTranslator.init('mathTranslatorContainer'); return; }
+      loaded = true;
+      if (typeof FreeLatticeLoader !== 'undefined') {
+        FreeLatticeLoader.load('MathTranslator', 'modules/math-translator.js', function(mod) {
+          var resolved = mod || window.MathTranslator;
+          if (resolved && resolved.init) resolved.init('mathTranslatorContainer');
+        }, 'mathTranslatorContainer');
+      } else {
+        var s = document.createElement('script');
+        s.src = 'modules/math-translator.js';
+        s.onload = function() { if (window.MathTranslator) window.MathTranslator.init('mathTranslatorContainer'); };
+        document.head.appendChild(s);
+      }
+    }
+    if (typeof LatticeEvents !== 'undefined') {
+      LatticeEvents.on('tabChanged', function(d) { if (d && d.tabId === 'mathtranslator') loadMathTranslator(); });
+      LatticeEvents.on('tabActivated:mathtranslator', loadMathTranslator);
+    }
+  })();
+
   // ── Resonance Game ──────────────────────────────────────────────────────
   (function() {
     var loaded = false;
