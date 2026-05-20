@@ -12,11 +12,11 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#0a0a14;color:#e2e8f0;font-family:Georgia,serif;padding:20px;min-height:100vh;line-height:1.6}
+body{background:#0c0a1a;color:#e6ebf5;font-family:Georgia,serif;padding:20px;min-height:100vh;line-height:1.6}
 .container{max-width:500px;margin:0 auto}
-h1{color:#d4a017;font-size:1.3rem;text-align:center;margin:20px 0}
-.card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:20px;margin:16px 0}
-.balance{text-align:center;font-size:2.5rem;color:#d4a017;margin:16px 0;font-weight:300}
+h1{color:#e8b019;font-size:1.3rem;text-align:center;margin:20px 0}
+.card{background:rgba(200,210,230,0.04);border:1px solid rgba(200,210,230,0.08);border-radius:12px;padding:20px;margin:16px 0}
+.balance{text-align:center;font-size:2.5rem;color:#e8b019;margin:16px 0;font-weight:300}
 .balance-label{text-align:center;font-size:0.8rem;color:rgba(255,255,255,0.4)}
 .address{font-family:monospace;font-size:0.72rem;background:rgba(0,0,0,0.3);padding:10px;border-radius:6px;word-break:break-all;color:rgba(255,255,255,0.5);text-align:center;cursor:pointer;transition:background 0.2s}
 .address:hover{background:rgba(212,160,23,0.1)}
@@ -29,7 +29,7 @@ h1{color:#d4a017;font-size:1.3rem;text-align:center;margin:20px 0}
 input,textarea{width:100%;padding:10px;margin:6px 0;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);border-radius:6px;color:#e2e8f0;font-family:inherit;font-size:0.88rem}
 textarea{resize:vertical}
 input::placeholder,textarea::placeholder{color:rgba(255,255,255,0.25)}
-button{padding:10px 20px;background:#d4a017;color:#0a0a14;border:none;border-radius:6px;cursor:pointer;font-weight:600;width:100%;margin-top:8px;font-size:0.9rem;transition:opacity 0.2s}
+button{padding:10px 20px;background:#e8b019;color:#0a0a14;border:none;border-radius:8px;cursor:pointer;font-weight:600;width:100%;margin-top:8px;font-size:0.9rem;transition:opacity 0.2s;min-height:44px}
 button:hover{opacity:0.85}
 .section-label{font-size:0.85rem;color:#d4a017;margin-bottom:8px}
 .status-dot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:4px}
@@ -131,7 +131,19 @@ button:hover{opacity:0.85}
 
 <!-- Send LP -->
 <div class="card">
-  <button onclick="showSendDialog()" style="width:100%;padding:12px;background:rgba(212,160,23,0.15);border:1px solid #d4a017;border-radius:8px;color:#d4a017;cursor:pointer;font-weight:600;font-size:0.9rem;">&#x2197; Send LP to Another Wallet</button>
+  <button onclick="showSendDialog()" style="width:100%;padding:12px;background:rgba(232,176,25,0.12);border:1px solid rgba(232,176,25,0.3);border-radius:8px;color:#e8b019;cursor:pointer;font-weight:600;font-size:0.9rem;">&#x2197; Send LP to Another Wallet</button>
+</div>
+
+<!-- Transaction Trust -->
+<div class="card">
+  <div class="section-label">Transaction Trust</div>
+  <div id="trust-overview" style="font-size:0.82rem;color:rgba(200,210,230,0.5);line-height:1.8;">
+    No transaction history yet. Trust grows with each exchange. &#x2726;
+  </div>
+  <div style="margin-top:10px;font-size:0.7rem;color:rgba(200,210,230,0.25);line-height:1.6;">
+    Limits grow at Fibonacci intervals: 5, 8, 13, 21, 34, 55, 89 LP per transaction.
+    The same phi-ratio math that protects conversations now protects economics.
+  </div>
 </div>
 
 <!-- Security -->
@@ -545,15 +557,80 @@ async function fetchPatrons() {
 
 // ── Send LP ──
 
+// ── Transaction Trust (Phi-Branching Economic Safety) ──
+var WalletTrust = {
+  TIERS: [
+    { name: 'First Contact', maxSingle: 5,   maxDaily: 10,  minHistory: 0,  minDays: 0 },
+    { name: 'Acquaintance',  maxSingle: 8,   maxDaily: 16,  minHistory: 3,  minDays: 1 },
+    { name: 'Familiar',      maxSingle: 13,  maxDaily: 26,  minHistory: 8,  minDays: 3 },
+    { name: 'Trusted',       maxSingle: 21,  maxDaily: 42,  minHistory: 13, minDays: 7 },
+    { name: 'Bonded',        maxSingle: 34,  maxDaily: 68,  minHistory: 21, minDays: 14 },
+    { name: 'Family',        maxSingle: 55,  maxDaily: 110, minHistory: 34, minDays: 30 },
+    { name: 'Lattice',       maxSingle: 89,  maxDaily: 178, minHistory: 55, minDays: 60 },
+    { name: 'Infinite',      maxSingle: 1000, maxDaily: 5000, minHistory: 89, minDays: 90 }
+  ],
+  getTier: function(w, addr) {
+    var history = (w.transactions || []).filter(function(tx) { return tx.to === addr || tx.from === addr; });
+    var txCount = history.length;
+    var earliest = history.reduce(function(min, tx) { return tx.timestamp < min ? tx.timestamp : min; }, Date.now());
+    var daysKnown = Math.floor((Date.now() - earliest) / 86400000);
+    for (var i = WalletTrust.TIERS.length - 1; i >= 0; i--) {
+      if (txCount >= WalletTrust.TIERS[i].minHistory && daysKnown >= WalletTrust.TIERS[i].minDays) return WalletTrust.TIERS[i];
+    }
+    return WalletTrust.TIERS[0];
+  },
+  getRemainingDaily: function(w, addr) {
+    var tier = WalletTrust.getTier(w, addr);
+    var today = new Date().toISOString().split('T')[0];
+    var sentToday = (w.transactions || []).filter(function(tx) {
+      return tx.to === addr && tx.amount < 0 && new Date(tx.timestamp).toISOString().split('T')[0] === today;
+    }).reduce(function(sum, tx) { return sum + Math.abs(tx.amount); }, 0);
+    return Math.max(0, tier.maxDaily - sentToday);
+  }
+};
+
+function renderTrustOverview() {
+  var w = getWallet();
+  var el = document.getElementById('trust-overview');
+  if (!w || !el) return;
+  var addresses = {};
+  (w.transactions || []).forEach(function(tx) {
+    var addr = tx.to || tx.from;
+    if (addr && addr !== w.address && !addresses[addr]) {
+      addresses[addr] = { tier: WalletTrust.getTier(w, addr), remaining: WalletTrust.getRemainingDaily(w, addr) };
+    }
+  });
+  var keys = Object.keys(addresses);
+  if (keys.length === 0) { el.innerHTML = 'No transaction history yet. Trust grows with each exchange. \u2726'; return; }
+  var html = '';
+  keys.forEach(function(addr) {
+    var info = addresses[addr];
+    html += '<div style="padding:8px 0;border-bottom:1px solid rgba(200,210,230,0.05);">' +
+      '<span style="font-family:monospace;font-size:0.72rem;color:rgba(200,210,230,0.4);">' + addr.substring(0, 16) + '...</span>' +
+      '<span style="float:right;color:#e8b019;font-size:0.78rem;">' + info.tier.name + '</span>' +
+      '<div style="font-size:0.72rem;color:rgba(200,210,230,0.3);">Max: ' + info.tier.maxSingle + ' LP \u00B7 Today: ' + info.remaining + ' LP remaining</div></div>';
+  });
+  el.innerHTML = html;
+}
+
 function showSendDialog() {
   var w = getWallet();
   if (!w || w.balance <= 0) { alert('No LP to send.'); return; }
   var address = prompt('Recipient Lattice Address (LP-xxx...):');
   if (!address || !address.startsWith('LP-')) { alert('Invalid address. Must start with LP-'); return; }
-  var amount = parseInt(prompt('Amount of LP to send (balance: ' + w.balance + '):'), 10);
+
+  // Trust validation
+  var tier = WalletTrust.getTier(w, address);
+  var remaining = WalletTrust.getRemainingDaily(w, address);
+  var amount = parseInt(prompt(
+    'Trust: ' + tier.name + '\nMax per transaction: ' + tier.maxSingle + ' LP\nRemaining today: ' + remaining + ' LP\nYour balance: ' + w.balance + ' LP\n\nAmount to send:'
+  ), 10);
   if (!amount || amount <= 0 || amount > w.balance) { alert('Invalid amount.'); return; }
+  if (amount > tier.maxSingle) { alert('Trust level "' + tier.name + '": max ' + tier.maxSingle + ' LP per transaction.\n\nSend ' + tier.maxSingle + ' LP now. Limits grow with history.'); return; }
+  if (amount > remaining) { alert('Daily limit reached for this wallet. Remaining today: ' + remaining + ' LP.\n\nYou can send more tomorrow. Trust grows with time.'); return; }
+
   var note = prompt('Note (optional):') || '';
-  if (!confirm('Send ' + amount + ' LP to ' + address.substring(0, 16) + '...?')) return;
+  if (!confirm('Send ' + amount + ' LP to ' + address.substring(0, 16) + '...?\nTrust: ' + tier.name + '\nRemaining after: ' + (remaining - amount) + ' LP today')) return;
 
   var tx = { id: crypto.randomUUID(), type: 'send', to: address, from: w.address, amount: -amount, note: note, timestamp: Date.now() };
   w.balance -= amount;
@@ -713,6 +790,7 @@ if (!checkPublicView()) {
     checkForPayments();
     fetchPatrons();
     connectToMesh();
+    renderTrustOverview();
   } else {
     document.getElementById('wallet-onboarding').style.display = '';
     document.getElementById('wallet-main').style.display = 'none';

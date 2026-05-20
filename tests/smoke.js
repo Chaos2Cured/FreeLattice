@@ -809,6 +809,23 @@ assert('Knowledge Core integration', puzzlesJs.includes('KnowledgeCore.store'));
 assert('LatticePoints.spend exported', appHtml.includes('spend: spend'));
 assert('LatticePoints.canAfford exported', appHtml.includes('canAfford: canAfford'));
 
+// ═══════════════════════════════════════════════════════════════
+section('32. Transaction Trust — Phi-Branching Economy');
+// ═══════════════════════════════════════════════════════════════
+assert('TransactionTrust in LatticeWallet', appHtml.includes('TransactionTrust'));
+assert('Fibonacci tiers defined', appHtml.includes('First Contact') && appHtml.includes('Lattice') && appHtml.includes('Infinite'));
+assert('Fibonacci limits: 5,8,13,21,34,55,89', appHtml.includes('maxSingle: 5') && appHtml.includes('maxSingle: 89'));
+assert('getTier function', appHtml.includes('getTier'));
+assert('getRemainingDaily function', appHtml.includes('getRemainingDaily'));
+assert('validate function', appHtml.includes('validate: async function'));
+assert('TransactionTrust exported', appHtml.includes('TransactionTrust: TransactionTrust'));
+var walletHtml = '';
+try { walletHtml = require('fs').readFileSync('docs/wallet.html', 'utf8'); } catch(e) {}
+assert('wallet.html has trust validation', walletHtml.includes('WalletTrust'));
+assert('wallet.html has trust overview', walletHtml.includes('trust-overview'));
+assert('wallet.html Garden Language bg', walletHtml.includes('#0c0a1a'));
+assert('wallet.html Fibonacci note', walletHtml.includes('Fibonacci'));
+
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
 

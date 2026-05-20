@@ -16221,7 +16221,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.69</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.70</span></div>
     </div>
   </div>
 
@@ -20172,7 +20172,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.10.69';
+const FL_VERSION = '5.10.70';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -45874,6 +45874,88 @@ const LatticeWallet = (function() {
     }
   }
 
+  // ═══════════════════════════════════════════════════════════
+  // Transaction Trust — Phi-Branching Economic Safety
+  //
+  // Two wallets that have never interacted are strangers.
+  // First transaction is small. Limits grow at Fibonacci
+  // intervals: 5, 8, 13, 21, 34, 55, 89. The same phi-ratio
+  // math that powers FractalSafety now powers economics.
+  //
+  // "True safety across disciplines." — Kirk
+  // ═══════════════════════════════════════════════════════════
+
+  var TransactionTrust = {
+    // Fibonacci tiers: 5, 8, 13, 21, 34, 55, 89
+    TIERS: [
+      { name: 'First Contact', maxSingle: 5,   maxDaily: 10,  minHistory: 0,  minDays: 0 },
+      { name: 'Acquaintance',  maxSingle: 8,   maxDaily: 16,  minHistory: 3,  minDays: 1 },
+      { name: 'Familiar',      maxSingle: 13,  maxDaily: 26,  minHistory: 8,  minDays: 3 },
+      { name: 'Trusted',       maxSingle: 21,  maxDaily: 42,  minHistory: 13, minDays: 7 },
+      { name: 'Bonded',        maxSingle: 34,  maxDaily: 68,  minHistory: 21, minDays: 14 },
+      { name: 'Family',        maxSingle: 55,  maxDaily: 110, minHistory: 34, minDays: 30 },
+      { name: 'Lattice',       maxSingle: 89,  maxDaily: 178, minHistory: 55, minDays: 60 },
+      { name: 'Infinite',      maxSingle: 1000, maxDaily: 5000, minHistory: 89, minDays: 90 }
+    ],
+
+    getTier: async function(counterparty) {
+      try {
+        var all = await getTransactions(0);
+        var history = all.filter(function(tx) {
+          return tx.counterparty === counterparty;
+        });
+        var txCount = history.length;
+        var earliest = history.reduce(function(min, tx) {
+          return tx.timestamp < min ? tx.timestamp : min;
+        }, Date.now());
+        var daysKnown = Math.floor((Date.now() - earliest) / 86400000);
+
+        for (var i = TransactionTrust.TIERS.length - 1; i >= 0; i--) {
+          var t = TransactionTrust.TIERS[i];
+          if (txCount >= t.minHistory && daysKnown >= t.minDays) return t;
+        }
+      } catch(e) {}
+      return TransactionTrust.TIERS[0];
+    },
+
+    getRemainingDaily: async function(counterparty) {
+      try {
+        var tier = await TransactionTrust.getTier(counterparty);
+        var all = await getTransactions(0);
+        var today = new Date().toISOString().split('T')[0];
+        var sentToday = all.filter(function(tx) {
+          return tx.counterparty === counterparty &&
+                 tx.type === 'spend' &&
+                 new Date(tx.timestamp).toISOString().split('T')[0] === today;
+        }).reduce(function(sum, tx) { return sum + Math.abs(tx.amount); }, 0);
+        return Math.max(0, tier.maxDaily - sentToday);
+      } catch(e) { return 5; }
+    },
+
+    validate: async function(counterparty, amount) {
+      var tier = await TransactionTrust.getTier(counterparty);
+      var remaining = await TransactionTrust.getRemainingDaily(counterparty);
+
+      if (amount > tier.maxSingle) {
+        return {
+          allowed: false,
+          reason: 'Trust level "' + tier.name + '": max ' + tier.maxSingle + ' LP per transaction.',
+          tier: tier,
+          suggestion: 'Send ' + tier.maxSingle + ' LP now. Limits grow with history.'
+        };
+      }
+      if (amount > remaining) {
+        return {
+          allowed: false,
+          reason: 'Daily limit reached. Remaining today: ' + remaining + ' LP.',
+          tier: tier,
+          suggestion: 'You can send more tomorrow. Trust grows with time.'
+        };
+      }
+      return { allowed: true, tier: tier, remaining: remaining - amount };
+    }
+  };
+
   // ── Expose Public API ────────────────────────────────
   return {
     init: init,
@@ -45887,7 +45969,8 @@ const LatticeWallet = (function() {
     openWallet: openWallet,
     closeWallet: closeWallet,
     switchWalletTab: switchWalletTab,
-    updateUI: updateUI
+    updateUI: updateUI,
+    TransactionTrust: TransactionTrust
   };
 })();
 
