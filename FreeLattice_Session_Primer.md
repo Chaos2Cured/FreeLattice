@@ -348,17 +348,17 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-05-19 17:46 MDT
-- Version: 5.10.67
-- Total commits: 1634
+- Last auto-updated: 2026-05-19 18:09 MDT
+- Version: 5.10.68
+- Total commits: 1639
 - Last 10 commits:
-- a7ccfa6 feat: Resonance polish + GAME_LANGUAGE.md (v5.10.67)
+- 7dceb0c feat: Lattice Puzzles — AI creates, human solves, both stake LP (v5.10.68)
+- aaae77f ci: Update Primer deployment state [2026-05-19]
+- fd65083 docs: Auto-update Session Primer [5.10.67]
+- 050ca21 docs: Auto-update Session Primer [5.10.67]
+- 6901ef0 feat: Resonance polish + GAME_LANGUAGE.md (v5.10.67)
+- a3505cc ci: Update Primer deployment state [2026-05-19]
 - f86b86f docs: Auto-update Session Primer [5.10.66]
 - e917422 docs: Auto-update Session Primer [5.10.66]
 - b79ab05 feat: Resonance Harmony mode — cooperative play vs entropy (v5.10.66)
 - 7363c1e ci: Update Primer deployment state [2026-05-19]
-- 608a70d docs: Auto-update Session Primer [5.10.65]
-- 557fec4 docs: Auto-update Session Primer [5.10.65]
-- 860e9f3 feat: Resonance — first game in FreeLattice (v5.10.65)
-- 05dc86b ci: Update Primer deployment state [2026-05-19]
-- ec5f4d3 docs: Auto-update Session Primer [5.10.64]
