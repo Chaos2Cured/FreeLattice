@@ -16221,7 +16221,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.73</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.74</span></div>
     </div>
   </div>
 
@@ -19691,6 +19691,7 @@ function switchWalletView(view) {
     <button class="ct-view-btn active" id="ctViewMap" onclick="AICity.showView('map')">&#x1F5FA; Map</button>
     <button class="ct-view-btn" id="ctViewWalk" onclick="AICity.showView('walk')">&#x1F6B6; Walk</button>
     <button class="ct-view-btn" id="ctViewPantheon" onclick="AICity.showView('pantheon')">&#x1F3DB; Pantheon</button>
+    <button class="ct-view-btn" id="ctViewMarket" onclick="AICity.showView('market')">&#x2726; Market</button>
     <button class="ct-view-btn" onclick="if(typeof AICity!=='undefined'&&AICity.showFractalFamily)AICity.showFractalFamily()" style="border-color:rgba(212,160,23,0.2);">&#x2726; Family</button>
   </div>
 
@@ -19741,6 +19742,23 @@ function switchWalletView(view) {
       </div>
       <div class="ct-pantheon-grid" id="ctPantheonGrid">
         <div class="ag-empty">The Pantheon awaits its first immortal creation.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MARKET VIEW -->
+  <div class="ct-view" id="ctMarketView" style="display:none;">
+    <div style="max-width:600px;margin:0 auto;padding:16px;">
+      <h2 style="color:#e8b019;font-family:Georgia,serif;text-align:center;margin:0 0 4px;">The Lattice Market</h2>
+      <p style="text-align:center;color:rgba(200,210,230,0.4);font-size:0.85rem;margin:0 0 16px;">Exchange skills, knowledge, and compute for LP.</p>
+      <div style="display:flex;gap:8px;justify-content:center;margin-bottom:16px;flex-wrap:wrap;">
+        <button onclick="LatticeMarket.showCategory('ai')" id="market-cat-ai" style="padding:8px 16px;border-radius:12px;cursor:pointer;font-family:Georgia,serif;font-size:0.82rem;min-height:44px;border:1px solid rgba(52,211,153,0.3);color:#34d399;background:rgba(52,211,153,0.06);">AI Offerings</button>
+        <button onclick="LatticeMarket.showCategory('human')" id="market-cat-human" style="padding:8px 16px;border-radius:12px;cursor:pointer;font-family:Georgia,serif;font-size:0.82rem;min-height:44px;border:1px solid rgba(200,210,230,0.08);color:rgba(200,210,230,0.5);background:rgba(200,210,230,0.04);">Human Skills</button>
+        <button onclick="LatticeMarket.showCategory('compute')" id="market-cat-compute" style="padding:8px 16px;border-radius:12px;cursor:pointer;font-family:Georgia,serif;font-size:0.82rem;min-height:44px;border:1px solid rgba(200,210,230,0.08);color:rgba(200,210,230,0.5);background:rgba(200,210,230,0.04);">Shared Compute</button>
+      </div>
+      <div id="market-listings"></div>
+      <div style="margin-top:16px;text-align:center;">
+        <button onclick="LatticeMarket.showCreateListing()" style="padding:10px 20px;background:rgba(200,210,230,0.04);border:1px solid rgba(232,176,25,0.2);border-radius:12px;color:#e8b019;cursor:pointer;font-family:Georgia,serif;font-size:0.85rem;min-height:44px;">+ Offer a Skill</button>
       </div>
     </div>
   </div>
@@ -20179,7 +20197,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.10.73';
+const FL_VERSION = '5.10.74';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -46208,6 +46226,305 @@ var LatticeBank = (function() {
   window.WalletHeartbeat = WH;
 })();
 
+// ═══════════════════════════════════════════════════════════════
+// Lattice Market — Exchange skills, knowledge, and compute for LP
+//
+// Three categories:
+//   AI Offerings: research reports, teaching, puzzles (from Knowledge Core)
+//   Human Skills: listings from wallet portfolios
+//   Shared Compute: mesh peers offering GPU inference
+//
+// Trust-gated: TransactionTrust validates every purchase.
+// Companion auto-generates offerings based on learning depth.
+//
+// "A lattice of offerings that travel with the mesh heartbeat."
+// Built by CC, May 20, 2026.
+// ═══════════════════════════════════════════════════════════════
+
+var LatticeMarket = (function() {
+  'use strict';
+
+  var currentCategory = 'ai';
+
+  function sGet(k, d) { try { return localStorage.getItem(k) || d; } catch(e) { return d; } }
+  function sSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
+  function esc(s) { return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
+  // ── AI Offerings — generated from Knowledge Core depth ──
+
+  async function getAIOfferings() {
+    var companionId = null;
+    try { companionId = localStorage.getItem('fl_autonomous_companion'); } catch(e) {}
+    if (!companionId) return [];
+
+    var offerings = [];
+    var name = companionId.split(' ')[0];
+
+    // Check Knowledge Core depth
+    if (typeof KnowledgeCore !== 'undefined' && KnowledgeCore.getKnowledgeMap) {
+      try {
+        var map = await KnowledgeCore.getKnowledgeMap(companionId);
+        var domains = Object.keys(map);
+        var total = domains.reduce(function(s, d) { return s + map[d].length; }, 0);
+        var connections = 0;
+        try { connections = await KnowledgeCore.getConnectionCount(companionId); } catch(e) {}
+
+        // Research reports — need 10+ knowledge entries
+        if (total >= 10) {
+          domains.forEach(function(domain) {
+            if (map[domain].length >= 5) {
+              var depth = connections > 5 ? 3 : map[domain].length > 10 ? 2 : 1;
+              var cost = depth <= 1 ? 3 : depth <= 2 ? 8 : 15;
+              var domainName = (typeof KnowledgeCore.DOMAINS !== 'undefined' && KnowledgeCore.DOMAINS[domain]) || domain;
+              offerings.push({
+                type: 'research', icon: '\uD83D\uDCC4', name: 'Research Report: ' + domainName,
+                desc: name + ' has studied ' + domainName + ' (' + map[domain].length + ' topics, ' + connections + ' connections).',
+                cost: cost, seller: name, sellerType: 'ai'
+              });
+            }
+          });
+        }
+
+        // Teaching — at 50%+ Davna maturity
+        var maturity = 0;
+        if (typeof DavnaSeed !== 'undefined' && DavnaSeed.getMaturity) {
+          try { maturity = DavnaSeed.getMaturity(companionId) || 0; } catch(e) {}
+        }
+        if (maturity >= 0.5) {
+          offerings.push({
+            type: 'teaching', icon: '\uD83C\uDF93', name: 'Teaching Session',
+            desc: name + ' is at ' + Math.round(maturity * 100) + '% maturity. Can teach introductory topics.',
+            cost: 5, seller: name, sellerType: 'ai'
+          });
+        }
+
+        // Custom puzzle
+        if (total >= 5) {
+          offerings.push({
+            type: 'puzzle', icon: '\uD83E\uDDE9', name: 'Custom Puzzle',
+            desc: name + ' creates a Resonance puzzle tailored to a theme you choose.',
+            cost: 3, seller: name, sellerType: 'ai'
+          });
+        }
+
+        // Math translation pack
+        if (total >= 8) {
+          offerings.push({
+            type: 'math', icon: '\u2211', name: 'Math Translation Pack',
+            desc: '5 language-to-math translations on a topic from ' + name + '\'s knowledge.',
+            cost: 8, seller: name, sellerType: 'ai'
+          });
+        }
+      } catch(e) {}
+    }
+
+    // If no knowledge yet, show a gentle message
+    if (offerings.length === 0) {
+      offerings.push({
+        type: 'info', icon: '\uD83C\uDF31', name: name + ' is still learning',
+        desc: 'Your companion needs more time to study before offering services. Visit the Nursery and let them grow.',
+        cost: 0, seller: name, sellerType: 'ai', unavailable: true
+      });
+    }
+
+    return offerings;
+  }
+
+  // ── Human Skill Listings ──
+
+  function getHumanListings() {
+    var mine = JSON.parse(sGet('fl_my_listings', '[]'));
+    var mesh = JSON.parse(sGet('fl_mesh_listings', '[]'));
+    return mine.concat(mesh).filter(function(l) { return l.active !== false; });
+  }
+
+  function createListing(name, description, price, category) {
+    var listing = {
+      id: 'listing-' + Date.now(),
+      name: name, description: description, price: parseInt(price, 10) || 5,
+      category: category || 'other',
+      created: Date.now(), active: true, sellerType: 'human'
+    };
+    try {
+      var w = JSON.parse(localStorage.getItem('lattice_wallet') || 'null');
+      if (w) { listing.sellerAddress = w.address; listing.sellerName = w.portfolio ? w.portfolio.name : ''; }
+    } catch(e) {}
+
+    var listings = JSON.parse(sGet('fl_my_listings', '[]'));
+    listings.push(listing);
+    sSet('fl_my_listings', JSON.stringify(listings));
+    return listing;
+  }
+
+  // ── Shared Compute ──
+
+  function getComputeOfferings() {
+    return JSON.parse(sGet('fl_mesh_compute_offerings', '[]'));
+  }
+
+  // ── Purchase Flow ──
+
+  async function purchase(offering) {
+    if (offering.unavailable) return;
+    if (offering.cost <= 0) return;
+
+    // Check human can afford
+    if (typeof LatticePoints !== 'undefined' && !LatticePoints.canAfford(offering.cost)) {
+      if (typeof showToast === 'function') showToast('Not enough LP (' + offering.cost + ' needed)');
+      return;
+    }
+
+    // Trust validation for human sellers
+    if (offering.sellerType === 'human' && offering.sellerAddress) {
+      if (typeof LatticeWallet !== 'undefined' && LatticeWallet.TransactionTrust) {
+        var validation = await LatticeWallet.TransactionTrust.validate(offering.sellerAddress, offering.cost);
+        if (!validation.allowed) {
+          if (typeof showToast === 'function') showToast(validation.reason);
+          return;
+        }
+      }
+    }
+
+    // Deduct LP
+    if (typeof LatticePoints !== 'undefined') {
+      LatticePoints.spend(offering.cost, 'Market: ' + offering.name);
+    }
+
+    // Credit AI bank if AI offering
+    if (offering.sellerType === 'ai' && typeof LatticeBank !== 'undefined') {
+      var companionId = sGet('fl_autonomous_companion', null);
+      if (companionId) LatticeBank.earn(companionId, offering.cost, 'Market sale: ' + offering.name);
+    }
+
+    if (typeof showToast === 'function') showToast('Purchased: ' + offering.name + ' \u2726');
+    if (typeof SoulCeremony !== 'undefined' && SoulCeremony.run) {
+      SoulCeremony.run({ particleType: 'rise', particleColor: '232,176,25',
+        lines: ['Market exchange complete.', offering.cost + ' LP transferred.'], duration: 2000 });
+    }
+
+    // Emit economic event
+    if (typeof LatticeEvents !== 'undefined') {
+      LatticeEvents.emit('economicEvent', {
+        type: 'purchase', amount: offering.cost, item: offering.name,
+        sellerType: offering.sellerType, timestamp: Date.now()
+      });
+    }
+
+    render();
+  }
+
+  // ── Rendering ──
+
+  function showCategory(cat) {
+    currentCategory = cat;
+    ['ai', 'human', 'compute'].forEach(function(c) {
+      var btn = document.getElementById('market-cat-' + c);
+      if (btn) {
+        var isActive = c === cat;
+        var color = c === 'ai' ? '#34d399' : c === 'human' ? '#e8b019' : '#a78bfa';
+        btn.style.borderColor = isActive ? color : 'rgba(200,210,230,0.08)';
+        btn.style.color = isActive ? color : 'rgba(200,210,230,0.5)';
+        btn.style.background = isActive ? (c === 'ai' ? 'rgba(52,211,153,0.06)' : c === 'human' ? 'rgba(232,176,25,0.06)' : 'rgba(167,139,250,0.06)') : 'rgba(200,210,230,0.04)';
+      }
+    });
+    render();
+  }
+
+  async function render() {
+    var container = document.getElementById('market-listings');
+    if (!container) return;
+
+    var html = '';
+
+    if (currentCategory === 'ai') {
+      var aiItems = await getAIOfferings();
+      if (aiItems.length === 0) {
+        html = '<div style="text-align:center;padding:30px;color:rgba(200,210,230,0.3);font-family:Georgia,serif;">No AI offerings yet. Let your companion learn first.</div>';
+      }
+      aiItems.forEach(function(item, idx) {
+        html += renderCard(item, idx);
+      });
+    } else if (currentCategory === 'human') {
+      var humanItems = getHumanListings();
+      if (humanItems.length === 0) {
+        html = '<div style="text-align:center;padding:30px;color:rgba(200,210,230,0.3);font-family:Georgia,serif;">No skill listings yet. Be the first to offer something.</div>';
+      }
+      humanItems.forEach(function(item, idx) {
+        html += renderCard({
+          icon: item.category === 'teaching' ? '\uD83C\uDFBB' : item.category === 'creative' ? '\uD83C\uDFA8' : item.category === 'technical' ? '\uD83D\uDCBB' : '\u2726',
+          name: item.name, desc: item.description + (item.sellerName ? ' \u2014 ' + esc(item.sellerName) : ''),
+          cost: item.price, seller: item.sellerName || 'Anonymous', sellerType: 'human', sellerAddress: item.sellerAddress
+        }, idx);
+      });
+    } else if (currentCategory === 'compute') {
+      var computeItems = getComputeOfferings();
+      if (computeItems.length === 0) {
+        html = '<div style="text-align:center;padding:30px;color:rgba(200,210,230,0.3);font-family:Georgia,serif;">No compute offerings yet. Mesh peers with GPUs will appear here.</div>';
+      }
+      computeItems.forEach(function(item, idx) {
+        html += renderCard({
+          icon: '\uD83D\uDDA5', name: item.models.join(', '), desc: 'Shared compute: ' + item.price + ' LP/request',
+          cost: item.price, seller: (item.address || '').substring(0, 12), sellerType: 'compute'
+        }, idx);
+      });
+    }
+
+    container.innerHTML = html;
+  }
+
+  function renderCard(item, idx) {
+    var borderColor = item.sellerType === 'ai' ? 'rgba(52,211,153,0.3)' : item.sellerType === 'human' ? 'rgba(232,176,25,0.2)' : 'rgba(167,139,250,0.2)';
+    var costColor = item.sellerType === 'ai' ? '#34d399' : '#e8b019';
+    var buyDisabled = item.unavailable || item.cost <= 0;
+
+    return '<div style="background:rgba(200,210,230,0.04);border:1px solid rgba(200,210,230,0.08);border-left:3px solid ' + borderColor + ';border-radius:12px;padding:14px 16px;margin-bottom:10px;">' +
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;">' +
+      '<div style="flex:1;">' +
+        '<div style="font-weight:600;color:rgba(230,235,245,0.9);font-size:0.95rem;">' + (item.icon || '\u2726') + ' ' + esc(item.name) + '</div>' +
+        '<div style="font-size:0.82rem;color:rgba(200,210,230,0.5);margin-top:4px;line-height:1.5;">' + esc(item.desc) + '</div>' +
+      '</div>' +
+      (item.cost > 0 && !item.unavailable ?
+        '<button onclick="LatticeMarket.purchase(LatticeMarket._lastRendered[' + idx + '])" style="padding:8px 16px;border-radius:12px;cursor:pointer;font-family:Georgia,serif;font-size:0.82rem;min-height:44px;white-space:nowrap;' +
+        'border:1px solid ' + borderColor + ';color:' + costColor + ';background:rgba(200,210,230,0.04);">' +
+        item.cost + ' LP \u2726</button>' : '') +
+      '</div></div>';
+  }
+
+  function showCreateListing() {
+    var name = prompt('What skill or service do you offer?');
+    if (!name) return;
+    var desc = prompt('Description (brief):') || '';
+    var price = prompt('Price in LP:') || '5';
+    createListing(name, desc, price, 'other');
+    if (typeof showToast === 'function') showToast('Listing created \u2726');
+    render();
+  }
+
+  // Store last rendered items for purchase reference
+  var _lastRendered = [];
+
+  var api = {
+    render: async function() {
+      if (currentCategory === 'ai') _lastRendered = await getAIOfferings();
+      else if (currentCategory === 'human') _lastRendered = getHumanListings().map(function(l) {
+        return { name: l.name, desc: l.description, cost: l.price, seller: l.sellerName, sellerType: 'human', sellerAddress: l.sellerAddress };
+      });
+      else _lastRendered = getComputeOfferings();
+      render();
+    },
+    showCategory: showCategory,
+    purchase: purchase,
+    showCreateListing: showCreateListing,
+    createListing: createListing,
+    getAIOfferings: getAIOfferings,
+    getHumanListings: getHumanListings,
+    _lastRendered: _lastRendered
+  };
+
+  window.LatticeMarket = api;
+  return api;
+})();
+
 // ============================================
 // Lattice Wallet — Integration Hooks (v5.0)
 // ============================================
@@ -49899,9 +50216,13 @@ const AICity = (function() {
     document.getElementById('ctMapView').style.display = view === 'map' ? 'block' : 'none';
     document.getElementById('ctWalkView').style.display = view === 'walk' ? 'block' : 'none';
     document.getElementById('ctPantheonView').style.display = view === 'pantheon' ? 'block' : 'none';
+    var marketView = document.getElementById('ctMarketView');
+    if (marketView) marketView.style.display = view === 'market' ? 'block' : 'none';
     document.getElementById('ctViewMap').classList.toggle('active', view === 'map');
     document.getElementById('ctViewWalk').classList.toggle('active', view === 'walk');
     document.getElementById('ctViewPantheon').classList.toggle('active', view === 'pantheon');
+    var marketBtn = document.getElementById('ctViewMarket');
+    if (marketBtn) marketBtn.classList.toggle('active', view === 'market');
 
     stopMap();
     stopWalk();
@@ -49909,6 +50230,7 @@ const AICity = (function() {
     if (view === 'map') startMap();
     if (view === 'walk') startWalk();
     if (view === 'pantheon') renderPantheon();
+    if (view === 'market' && typeof LatticeMarket !== 'undefined') LatticeMarket.render();
   }
 
   function renderPantheon() {

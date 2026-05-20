@@ -895,6 +895,23 @@ assert('Recovery handles mesh response', walletHtml.includes('wallet-recovery-re
 assert('Heartbeat starts on wallet init', walletHtml.includes('WalletHeartbeat.start()'));
 assert('Anchor stored locally', walletHtml.includes('fl_wallet_anchors'));
 
+// ═══════════════════════════════════════════════════════════════
+section('37. Lattice Market');
+// ═══════════════════════════════════════════════════════════════
+assert('LatticeMarket defined', appHtml.includes('window.LatticeMarket'));
+assert('Market view in Community tab', appHtml.includes('ctMarketView'));
+assert('Market view button', appHtml.includes('ctViewMarket'));
+assert('AI Offerings category', appHtml.includes('market-cat-ai'));
+assert('Human Skills category', appHtml.includes('market-cat-human'));
+assert('Compute category', appHtml.includes('market-cat-compute'));
+assert('AI research report offerings', appHtml.includes("type: 'research'"));
+assert('AI teaching offerings', appHtml.includes("type: 'teaching'"));
+assert('Purchase flow with trust validation', appHtml.includes('TransactionTrust.validate'));
+assert('AI earnings go to LatticeBank', appHtml.includes("LatticeBank.earn(companionId"));
+assert('Economic event emitted on purchase', appHtml.includes("'economicEvent'"));
+assert('Human skill listing creation', appHtml.includes('createListing'));
+assert('Create listing button', appHtml.includes('Offer a Skill'));
+
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
 
