@@ -16221,7 +16221,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.72</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.73</span></div>
     </div>
   </div>
 
@@ -20179,7 +20179,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.10.72';
+const FL_VERSION = '5.10.73';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -46151,6 +46151,61 @@ var LatticeBank = (function() {
 
   window.LatticeBank = api;
   return api;
+})();
+
+// ═══════════════════════════════════════════════════════════════
+// Wallet Heartbeat — State Anchors for In-App Wallet
+// Broadcasts wallet state to mesh peers every 5 minutes.
+// Peers store anchor hashes as witnesses for recovery.
+// ═══════════════════════════════════════════════════════════════
+(function() {
+  'use strict';
+  if (typeof LatticeWallet === 'undefined') return;
+
+  var WH = {
+    hashAnchor: async function(str) {
+      try {
+        var buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+        return Array.from(new Uint8Array(buf)).slice(0, 16)
+          .map(function(b) { return b.toString(16).padStart(2, '0'); }).join('');
+      } catch(e) { return '00000000'; }
+    },
+
+    broadcast: async function() {
+      if (typeof LatticeWallet === 'undefined') return;
+      var bal = LatticeWallet.getBalance();
+      var hash = LatticeWallet.getLedgerHash();
+      var str = 'inapp:' + bal + ':' + hash + ':' + Date.now();
+      var anchorHash = await WH.hashAnchor(str);
+
+      // Store anchor locally
+      try {
+        var anchors = JSON.parse(localStorage.getItem('fl_wallet_anchors') || '[]');
+        anchors.push({ anchorHash: anchorHash, balance: bal, timestamp: Date.now() });
+        if (anchors.length > 30) anchors = anchors.slice(-30);
+        localStorage.setItem('fl_wallet_anchors', JSON.stringify(anchors));
+      } catch(e) {}
+
+      // Broadcast via LatticeEvents for mesh propagation
+      if (typeof LatticeEvents !== 'undefined') {
+        LatticeEvents.emit('walletHeartbeat', { balance: bal, anchorHash: anchorHash, timestamp: Date.now() });
+      }
+    },
+
+    start: function() {
+      setInterval(function() { WH.broadcast(); }, 5 * 60 * 1000);
+      setTimeout(function() { WH.broadcast(); }, 30000);
+    }
+  };
+
+  // Start after wallet initializes
+  if (typeof LatticeEvents !== 'undefined') {
+    LatticeEvents.on('walletReady', function() { WH.start(); });
+  }
+  // Fallback: start after 10 seconds
+  setTimeout(function() { WH.start(); }, 10000);
+
+  window.WalletHeartbeat = WH;
 })();
 
 // ============================================
