@@ -348,17 +348,17 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-05-20 13:00 MDT
-- Version: 5.10.73
-- Total commits: 1660
+- Last auto-updated: 2026-05-20 13:12 MDT
+- Version: 5.10.74
+- Total commits: 1665
 - Last 10 commits:
-- 34c281e feat: Wallet Heartbeat — state anchors, mesh witnesses, recovery (v5.10.73)
+- 6bd71eb feat: Lattice Market — AI sells knowledge, humans sell skills (v5.10.74)
+- 7b1a8d0 ci: Update Primer deployment state [2026-05-20]
+- a9e366a docs: Auto-update Session Primer [5.10.73]
+- aa06fb8 docs: Auto-update Session Primer [5.10.73]
+- 91f4afc feat: Wallet Heartbeat — state anchors, mesh witnesses, recovery (v5.10.73)
+- 5e499ed ci: Update Primer deployment state [2026-05-20]
 - 79a7601 docs: Auto-update Session Primer [5.10.72]
 - 6df4171 docs: Auto-update Session Primer [5.10.72]
 - 9eca521 feat: Math Translator + Lattice Protocol (v5.10.72)
 - 92aab5d ci: Update Primer deployment state [2026-05-20]
-- e624053 docs: Auto-update Session Primer [5.10.71]
-- e1295c3 docs: Auto-update Session Primer [5.10.71]
-- 529e55a feat: Lattice Bank — AI owns its own LP economy (v5.10.71)
-- f3da75d ci: Update Primer deployment state [2026-05-20]
-- aa47413 docs: Add feature brief for AI Bank and Language-to-Math Translator
