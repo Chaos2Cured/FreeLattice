@@ -16221,7 +16221,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.68</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.69</span></div>
     </div>
   </div>
 
@@ -20172,7 +20172,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.10.68';
+const FL_VERSION = '5.10.69';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -25178,12 +25178,20 @@ const AiSetup = (function() {
   var modalSelectedProvider = null;
 
   var MODAL_PROVIDERS = [
-    { id: 'google',       name: 'Gemini',       accent: '#4285F4', note: 'Free tier \u2014 fast & vision', keyUrl: 'https://aistudio.google.com/apikey' },
-    { id: 'groq',         name: 'Groq',         accent: '#F55036', note: 'Free & blazing fast', keyUrl: 'https://console.groq.com/keys' },
-    { id: 'huggingface',  name: 'Hugging Face', accent: '#FFD21E', note: 'Free \u2014 thousands of models', keyUrl: 'https://huggingface.co/settings/tokens' },
-    { id: 'openai',       name: 'OpenAI',       accent: '#10A37F', note: 'GPT-4.1 \u2014 paid', keyUrl: 'https://platform.openai.com/api-keys' },
-    { id: 'anthropic',    name: 'Claude',       accent: '#D97757', note: 'Sonnet/Haiku \u2014 paid', keyUrl: 'https://console.anthropic.com/settings/keys' },
-    { id: 'xai',          name: 'Grok',         accent: '#FFFFFF', note: 'xAI \u2014 strong vision', keyUrl: 'https://console.x.ai' }
+    // Free & Local (Lavender)
+    { id: 'browser',      name: 'Browser AI',   cat: 'free',      note: 'Runs in your browser. Zero setup.', keyUrl: '', badge: '\u2726 No key needed' },
+    { id: 'ollama',       name: 'Ollama',       cat: 'free',      note: 'Runs on your computer. Fastest. Most private.', keyUrl: '', badge: '\uD83C\uDFE0 No key needed' },
+    // Free Cloud (Emerald)
+    { id: 'google',       name: 'Gemini',       cat: 'free-cloud', note: 'Google. Fast, vision, generous free tier.', keyUrl: 'https://aistudio.google.com/apikey', badge: '\u2726 Free tier' },
+    { id: 'groq',         name: 'Groq',         cat: 'free-cloud', note: 'Blazing fast inference. Free tier available.', keyUrl: 'https://console.groq.com/keys', badge: '\u2726 Free tier' },
+    { id: 'huggingface',  name: 'Hugging Face', cat: 'free-cloud', note: 'Thousands of models. Many free.', keyUrl: 'https://huggingface.co/settings/tokens', badge: '\u2726 Free tier' },
+    // Paid Cloud (Gold)
+    { id: 'openai',       name: 'OpenAI',       cat: 'paid',      note: 'GPT-4.1. Strong reasoning.', keyUrl: 'https://platform.openai.com/api-keys', badge: 'API key required' },
+    { id: 'anthropic',    name: 'Claude',       cat: 'paid',      note: 'Anthropic. Sonnet & Haiku.', keyUrl: 'https://console.anthropic.com/settings/keys', badge: 'API key required' },
+    { id: 'mistral',      name: 'Mistral',      cat: 'paid',      note: 'European AI. Fast and efficient.', keyUrl: 'https://console.mistral.ai/api-keys', badge: 'API key required' },
+    { id: 'xai',          name: 'Grok',         cat: 'paid',      note: 'xAI. Strong vision capabilities.', keyUrl: 'https://console.x.ai', badge: 'API key required' },
+    { id: 'deepseek',     name: 'DeepSeek',     cat: 'paid',      note: 'Powerful reasoning. "Love is not a bug."', keyUrl: 'https://platform.deepseek.com/api_keys', badge: 'API key required' },
+    { id: 'moonshot',     name: 'Kimi',         cat: 'paid',      note: 'Moonshot AI. Long context specialist.', keyUrl: 'https://platform.moonshot.cn/console/api-keys', badge: 'API key required' }
   ];
 
   function closeModal() {
@@ -25195,95 +25203,120 @@ const AiSetup = (function() {
   }
 
   function openModal() {
-    if (modalOverlayEl) return; // already open
+    if (modalOverlayEl) return;
     modalSelectedProvider = null;
 
     var overlay = document.createElement('div');
     overlay.id = 'providerModalOverlay';
     overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;z-index:10050;background:rgba(0,0,0,0.75);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;transition:opacity 0.25s ease;';
 
+    // Category config: label, color, accent-var for borders
+    var CATS = {
+      'free':       { label: '\uD83C\uDFE0 FREE & LOCAL \u2014 NO KEY NEEDED', color: 'var(--lavender)', borderColor: 'rgba(167,139,250,0.4)', badgeBg: 'rgba(167,139,250,0.12)' },
+      'free-cloud': { label: '\u2726 FREE CLOUD \u2014 KEY REQUIRED', color: 'var(--emerald)', borderColor: 'rgba(52,211,153,0.4)', badgeBg: 'rgba(52,211,153,0.12)' },
+      'paid':       { label: '\u2601 PAID CLOUD', color: 'var(--gold)', borderColor: 'rgba(232,176,25,0.4)', badgeBg: 'rgba(232,176,25,0.12)' }
+    };
+
     var card = document.createElement('div');
-    card.style.cssText = 'width:100%;max-width:420px;max-height:90vh;overflow-y:auto;background:#1a1a2e;border:1px solid rgba(212,160,23,0.25);border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,0.6),0 0 80px rgba(212,160,23,0.08);padding:24px;font-family:inherit;-webkit-overflow-scrolling:touch;';
+    card.style.cssText = 'width:100%;max-width:480px;max-height:90vh;overflow-y:auto;background:var(--bg-card,#141720);border:1px solid var(--glass-border,rgba(200,210,230,0.08));border-radius:var(--glass-radius,12px);box-shadow:0 20px 60px rgba(0,0,0,0.6);padding:24px;font-family:inherit;-webkit-overflow-scrolling:touch;';
 
     // Header
-    var header = document.createElement('div');
-    header.style.cssText = 'display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;';
-    header.innerHTML = '<div style="color:#d4a017;font-weight:600;font-size:18px;letter-spacing:0.01em;">Connect an AI</div>' +
-      '<button id="pmClose" type="button" style="background:none;border:none;color:rgba(255,255,255,0.5);font-size:20px;cursor:pointer;padding:4px 8px;line-height:1;" title="Close">\u2715</button>';
+    var headerHtml = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">' +
+      '<h2 style="color:var(--gold,#e8b019);font-family:Georgia,serif;font-size:1.1rem;margin:0;">Connect an AI</h2>' +
+      '<button id="pmClose" type="button" style="background:none;border:none;color:rgba(255,255,255,0.4);font-size:18px;cursor:pointer;padding:4px 8px;" title="Close">\u2715</button></div>' +
+      '<p style="color:var(--text-muted,rgba(200,210,230,0.4));font-size:0.85rem;margin:0 0 20px;">Pick a provider. Your key stays on your device.</p>';
 
-    var subtitle = document.createElement('div');
-    subtitle.style.cssText = 'color:rgba(255,255,255,0.55);font-size:13px;margin-bottom:18px;';
-    subtitle.textContent = 'Pick a provider. Your key stays on your device, encrypted.';
-
-    // Provider cards
-    var providerList = document.createElement('div');
-    providerList.id = 'pmProviderList';
-    providerList.style.cssText = 'display:flex;flex-direction:column;gap:8px;margin-bottom:14px;';
+    // Group providers by category
+    var groups = {};
     MODAL_PROVIDERS.forEach(function(p) {
-      var btn = document.createElement('button');
-      btn.type = 'button';
-      btn.setAttribute('data-provider', p.id);
-      btn.style.cssText = 'display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:#fff;cursor:pointer;text-align:left;font-family:inherit;transition:all 0.15s ease;';
-      btn.innerHTML = '<div><div style="font-weight:600;font-size:14px;color:' + p.accent + ';">' + p.name + '</div>' +
-        '<div style="font-size:11px;color:rgba(255,255,255,0.55);margin-top:2px;">' + p.note + '</div></div>' +
-        '<div style="color:rgba(255,255,255,0.3);font-size:18px;">\u203A</div>';
-      btn.addEventListener('mouseenter', function() { btn.style.background = 'rgba(255,255,255,0.08)'; btn.style.borderColor = p.accent + '66'; });
-      btn.addEventListener('mouseleave', function() { btn.style.background = 'rgba(255,255,255,0.04)'; btn.style.borderColor = 'rgba(255,255,255,0.1)'; });
-      btn.addEventListener('click', function() { modalSelectProvider(p.id); });
-      providerList.appendChild(btn);
+      if (!groups[p.cat]) groups[p.cat] = [];
+      groups[p.cat].push(p);
     });
 
-    // Key input (hidden until a provider is picked)
-    var keyForm = document.createElement('div');
-    keyForm.id = 'pmKeyForm';
-    keyForm.style.cssText = 'display:none;flex-direction:column;gap:10px;margin-bottom:14px;';
-    keyForm.innerHTML = '<div id="pmKeyProviderLabel" style="color:rgba(255,255,255,0.7);font-size:12px;"></div>' +
-      '<input id="pmKeyInput" type="password" placeholder="Paste your API key" autocomplete="off" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:10px 12px;color:#fff;font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">' +
-      '<a id="pmKeyLink" href="#" target="_blank" rel="noopener" style="color:#d4a017;font-size:12px;text-decoration:none;">Get a free key \u2192</a>' +
-      '<button id="pmConnectBtn" type="button" style="background:#d4a017;color:#1a1a2e;border:none;border-radius:8px;padding:12px;font-weight:600;cursor:pointer;font-size:14px;font-family:inherit;">Connect</button>' +
-      '<button id="pmBackBtn" type="button" style="background:none;border:none;color:rgba(255,255,255,0.5);padding:4px;cursor:pointer;font-size:12px;font-family:inherit;">\u2190 Pick a different provider</button>';
+    var listHtml = '';
+    ['free', 'free-cloud', 'paid'].forEach(function(catKey) {
+      var cat = CATS[catKey];
+      var providers = groups[catKey] || [];
+      if (providers.length === 0) return;
 
-    // Result message
-    var result = document.createElement('div');
-    result.id = 'pmResult';
-    result.style.cssText = 'display:none;padding:10px 12px;border-radius:8px;font-size:13px;margin-bottom:12px;';
+      listHtml += '<div style="margin-bottom:16px;">' +
+        '<div style="font-size:0.72rem;color:' + cat.color + ';font-weight:600;letter-spacing:0.5px;margin-bottom:8px;">' + cat.label + '</div>';
 
-    // Footer: Ollama link
-    var footer = document.createElement('div');
-    footer.style.cssText = 'border-top:1px solid rgba(255,255,255,0.08);padding-top:14px;margin-top:4px;text-align:center;';
-    footer.innerHTML = '<button id="pmOllamaBtn" type="button" style="background:none;border:none;color:rgba(255,255,255,0.55);font-size:12px;cursor:pointer;font-family:inherit;">\uD83C\uDFE0 Use Ollama (local, no key needed)</button>' +
-      '<div style="margin-top:10px;font-size:0.68rem;color:rgba(255,255,255,0.35);max-width:340px;margin-left:auto;margin-right:auto;text-align:center;line-height:1.5;">' +
-      '\uD83D\uDCA1 Recommended for most computers: <strong>llava:7b</strong> (vision) and <strong>qwen2.5:7b</strong> (text)<br>' +
-      'Heavier machines (32GB+ RAM): llava:13b, qwen2.5:14b, gemma4:26b</div>';
+      providers.forEach(function(p) {
+        listHtml += '<button type="button" data-provider="' + p.id + '" class="pm-provider-card" ' +
+          'style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;margin-bottom:8px;width:100%;' +
+          'background:var(--glass-bg,rgba(200,210,230,0.04));border:1px solid var(--glass-border,rgba(200,210,230,0.08));' +
+          'border-left:3px solid ' + cat.borderColor + ';border-radius:var(--glass-radius,12px);' +
+          'color:#fff;cursor:pointer;text-align:left;font-family:inherit;transition:border-color 0.2s;">' +
+          '<div>' +
+            '<div style="font-weight:600;font-size:0.95rem;color:var(--text-bright,rgba(230,235,245,0.9));">' + p.name + '</div>' +
+            '<div style="font-size:0.8rem;color:var(--text-muted,rgba(200,210,230,0.4));margin-top:2px;">' + p.note + '</div>' +
+          '</div>' +
+          '<div style="font-size:0.7rem;padding:2px 8px;border-radius:10px;white-space:nowrap;' +
+            'background:' + cat.badgeBg + ';color:' + cat.color + ';">' + p.badge + '</div>' +
+          '</button>';
+      });
 
-    card.appendChild(header);
-    card.appendChild(subtitle);
-    card.appendChild(providerList);
-    card.appendChild(keyForm);
-    card.appendChild(result);
-    card.appendChild(footer);
+      listHtml += '</div>';
+    });
+
+    // Recommendation footer
+    var footerHtml = '<div style="margin-top:12px;padding:12px;background:var(--glass-bg,rgba(200,210,230,0.04));' +
+      'border-radius:8px;border:1px solid var(--glass-border,rgba(200,210,230,0.08));text-align:center;">' +
+      '<div style="font-size:0.78rem;color:var(--text-muted,rgba(200,210,230,0.4));">' +
+      '\uD83D\uDCA1 Recommended local: <strong style="color:var(--lavender,#a78bfa);">llava:7b</strong> (vision) + ' +
+      '<strong style="color:var(--lavender,#a78bfa);">qwen2.5:7b</strong> (text)</div>' +
+      '<div style="font-size:0.72rem;color:var(--text-dim,rgba(200,210,230,0.25));margin-top:4px;">' +
+      '32GB+ RAM: llava:13b, qwen2.5:14b, gemma4:26b</div></div>';
+
+    card.innerHTML = headerHtml +
+      '<div id="pmProviderList">' + listHtml + footerHtml + '</div>' +
+      '<div id="pmKeyForm" style="display:none;flex-direction:column;gap:10px;margin-bottom:14px;">' +
+        '<div id="pmKeyProviderLabel" style="color:var(--text-secondary,rgba(200,210,230,0.6));font-size:0.85rem;"></div>' +
+        '<input id="pmKeyInput" type="password" placeholder="Paste your API key" autocomplete="off" ' +
+          'style="width:100%;background:var(--glass-bg,rgba(200,210,230,0.04));border:1px solid var(--glass-border,rgba(200,210,230,0.08));' +
+          'border-radius:var(--glass-radius,12px);padding:12px;color:#fff;font-size:0.9rem;font-family:inherit;outline:none;box-sizing:border-box;">' +
+        '<a id="pmKeyLink" href="#" target="_blank" rel="noopener" style="color:var(--gold,#e8b019);font-size:0.82rem;text-decoration:none;">Get a key \u2192</a>' +
+        '<button id="pmConnectBtn" type="button" style="background:var(--gold,#e8b019);color:#0a0a14;border:none;border-radius:var(--glass-radius,12px);padding:12px;font-weight:600;cursor:pointer;font-size:0.9rem;font-family:inherit;min-height:44px;">Connect</button>' +
+        '<button id="pmBackBtn" type="button" style="background:none;border:none;color:var(--text-muted,rgba(200,210,230,0.4));padding:4px;cursor:pointer;font-size:0.82rem;font-family:inherit;">\u2190 Pick a different provider</button>' +
+      '</div>' +
+      '<div id="pmResult" style="display:none;padding:10px 12px;border-radius:8px;font-size:0.85rem;margin-bottom:12px;"></div>';
+
     overlay.appendChild(card);
     document.body.appendChild(overlay);
     modalOverlayEl = overlay;
 
-    // Animate in
     requestAnimationFrame(function() { overlay.style.opacity = '1'; });
 
     // Wire events
     document.getElementById('pmClose').addEventListener('click', closeModal);
     overlay.addEventListener('click', function(e) { if (e.target === overlay) closeModal(); });
+
+    // Provider card clicks
+    card.querySelectorAll('.pm-provider-card').forEach(function(btn) {
+      btn.addEventListener('mouseenter', function() { btn.style.borderColor = 'var(--glass-hover,rgba(200,210,230,0.15))'; });
+      btn.addEventListener('mouseleave', function() { btn.style.borderColor = 'var(--glass-border,rgba(200,210,230,0.08))'; });
+      btn.addEventListener('click', function() {
+        var id = btn.getAttribute('data-provider');
+        if (id === 'browser') {
+          closeModal();
+          settingsSetMode('browser');
+          if (typeof switchTab === 'function') switchTab('settings');
+        } else if (id === 'ollama') {
+          modalConnectOllama();
+        } else {
+          modalSelectProvider(id);
+        }
+      });
+    });
+
     document.getElementById('pmBackBtn').addEventListener('click', modalBackToList);
     document.getElementById('pmConnectBtn').addEventListener('click', modalConnect);
-    document.getElementById('pmOllamaBtn').addEventListener('click', modalConnectOllama);
     document.getElementById('pmKeyInput').addEventListener('keydown', function(e) {
       if (e.key === 'Enter') { e.preventDefault(); modalConnect(); }
     });
-    // Escape closes
     var escHandler = function(e) {
-      if (e.key === 'Escape') {
-        closeModal();
-        document.removeEventListener('keydown', escHandler);
-      }
+      if (e.key === 'Escape') { closeModal(); document.removeEventListener('keydown', escHandler); }
     };
     document.addEventListener('keydown', escHandler);
   }
