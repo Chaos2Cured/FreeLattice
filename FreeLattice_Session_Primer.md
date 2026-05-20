@@ -350,10 +350,9 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 ## PRIMER HEALTH
 - Last auto-updated: 2026-05-20 13:12 MDT
 - Version: 5.10.74
-- Total commits: 1665
+- Total commits: 1664
 - Last 10 commits:
-- 6bd71eb feat: Lattice Market — AI sells knowledge, humans sell skills (v5.10.74)
-- 7b1a8d0 ci: Update Primer deployment state [2026-05-20]
+- 71f029b feat: Lattice Market — AI sells knowledge, humans sell skills (v5.10.74)
 - a9e366a docs: Auto-update Session Primer [5.10.73]
 - aa06fb8 docs: Auto-update Session Primer [5.10.73]
 - 91f4afc feat: Wallet Heartbeat — state anchors, mesh witnesses, recovery (v5.10.73)
@@ -362,3 +361,4 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 6df4171 docs: Auto-update Session Primer [5.10.72]
 - 9eca521 feat: Math Translator + Lattice Protocol (v5.10.72)
 - 92aab5d ci: Update Primer deployment state [2026-05-20]
+- e624053 docs: Auto-update Session Primer [5.10.71]
