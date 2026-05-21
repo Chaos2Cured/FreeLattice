@@ -976,6 +976,17 @@ assert('Gradual overlay fade (compositing)', appHtml.includes('destination-out')
 assert('Vision error handler', appHtml.includes('function handleVisionError'));
 assert('Gentle whisper on 503', appHtml.includes('AI is resting'));
 
+// ═══════════════════════════════════════════════════════════════
+section('42. Light Mode Killed + Accent Colors');
+// ═══════════════════════════════════════════════════════════════
+assert('Light mode CSS removed', !appHtml.includes('--bg-primary: #faf8f5'));
+assert('Stale fl_theme removed on init', appHtml.includes("removeItem('fl_theme')"));
+assert('ACCENT_PRESETS defined', appHtml.includes('ACCENT_PRESETS'));
+assert('applyAccentColor function', appHtml.includes('function applyAccentColor'));
+assert('Accent color picker in Settings', appHtml.includes('accentColorPicker'));
+assert('Multiple accent presets', appHtml.includes("rose:") && appHtml.includes("sky:"));
+assert('Accent saved to localStorage', appHtml.includes('fl_accent_color'));
+
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
 
