@@ -1,1 +1,1 @@
-{"version": "5.10.86", "date": "2026-05-21", "note": "Five-door navigation: Garden, Chat, Play, Learn, More. Play and Learn landing pages. 493 smoke tests."}
+{"version": "5.10.87", "date": "2026-05-21", "note": "Emoji fix: HTML entities replace unicode escapes. Duplicate LP badge hidden. 493 smoke tests."}
