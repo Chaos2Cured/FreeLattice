@@ -38,10 +38,13 @@
   var DEAD_END = '#f07068';
   var BG = '#0c0a1a';
 
+  var CHANNEL_BUDGETS = { easy: 30, medium: 20, hard: 14, master: 8 };
+
   var canvas, ctx, containerId;
   var grid, waterLevel, particles;
   var source, drain;
   var totalWater, drainedWater, timeLeft;
+  var channelsRemaining;
   var gameActive, animFrame, tick, simInterval, aiInterval;
   var drawing, difficulty;
 
@@ -122,7 +125,7 @@
           var share = (n.w * n.diff / totalW) * flow;
           next[n.r][n.c] += share;
           next[r][c] -= share;
-          if (share > 0.015 && Math.random() < 0.12) spawnSparkle(r, c, n.r - r, n.c - c);
+          if (share > 0.02 && Math.random() < 0.06) spawnSparkle(r, c, n.r - r, n.c - c);
         });
       }
     }
@@ -130,14 +133,14 @@
   }
 
   function spawnSparkle(r, c, dr, dc) {
-    if (particles.length > 150) return;
+    if (particles.length > 100) return;
     particles.push({
       x: c * CELL + CELL / 2 + (Math.random() - 0.5) * CELL * 0.4,
       y: r * CELL + CELL / 2 + (Math.random() - 0.5) * CELL * 0.4,
-      vx: dc * 0.6 + (Math.random() - 0.5) * 0.3,
-      vy: dr * 0.6 + (Math.random() - 0.5) * 0.3,
-      life: 1, decay: 0.018 + Math.random() * 0.015,
-      size: 1 + Math.random() * 1.5
+      vx: dc * 0.4 + (Math.random() - 0.5) * 0.15,
+      vy: dr * 0.4 + (Math.random() - 0.5) * 0.15,
+      life: 1, decay: 0.008 + Math.random() * 0.008,
+      size: 1.5 + Math.random() * 1.5
     });
   }
 
@@ -175,10 +178,22 @@
 
   function handleDraw(x, y) {
     if (!gameActive || !drawing) return;
+    if (channelsRemaining <= 0) return;
     var c = Math.floor(x / CELL);
     var r = Math.floor(y / CELL);
     if (r >= 0 && r < GRID && c >= 0 && c < GRID && grid[r][c] === 0) {
       grid[r][c] = 2;
+      channelsRemaining--;
+    }
+  }
+
+  function handleErase(x, y) {
+    if (!gameActive) return;
+    var c = Math.floor(x / CELL);
+    var r = Math.floor(y / CELL);
+    if (r >= 0 && r < GRID && c >= 0 && c < GRID && grid[r][c] === 2) {
+      grid[r][c] = 0;
+      channelsRemaining++;
     }
   }
 
@@ -287,11 +302,13 @@
           var wH = CELL * Math.min(1, waterLevel[r][c]);
           ctx.fillRect(x + 1, y + CELL - wH, CELL - 2, wH);
 
-          // Shimmer line — thicker, brighter, visible at lower water
+          // Shimmer — gentle breathing glow on water surface
           if (waterLevel[r][c] > 0.15 && !isPooled) {
-            ctx.globalAlpha = wAlpha * 0.5;
+            var shimmerPhase = Math.sin(tick * 0.0015 + (r * 3 + c) * 0.5);
+            var shimmerAlpha = 0.2 + 0.1 * shimmerPhase;
+            ctx.globalAlpha = shimmerAlpha;
             ctx.fillStyle = SPARKLE;
-            ctx.fillRect(x + 1, y + CELL - wH, CELL - 2, 3);
+            ctx.fillRect(x + 1, y + CELL - wH, CELL - 2, 2.5);
           }
           ctx.restore();
         }
@@ -325,21 +342,30 @@
     ctx.textAlign = 'center';
 
     if (gameActive) {
-      // Flow progress bar
-      var barW = Math.min(w * 0.5, 200);
-      var barX = w / 2 - barW / 2;
-      var barY = h - 28;
+      // Time-pressure bar — lavender → gold → coral as time runs out
+      var barW = GRID * CELL;
+      var barX = ox;
+      var barY = oy + GRID * CELL + 6;
       ctx.fillStyle = 'rgba(200,210,230,0.06)';
-      ctx.fillRect(barX, barY, barW, 6);
-      var barColor = pct >= 60 ? DRAIN_COLOR : pct >= 30 ? WATER_COLOR : 'rgba(200,210,230,0.3)';
-      ctx.fillStyle = barColor;
-      ctx.fillRect(barX, barY, barW * Math.min(1, pct / 100), 6);
+      ctx.fillRect(barX, barY, barW, 5);
+      var timeRatio = timeLeft / GAME_TIME;
+      var timeColor = timeRatio > 0.5 ? WATER_COLOR : timeRatio > 0.25 ? SPARKLE : DEAD_END;
+      ctx.fillStyle = timeColor;
+      ctx.fillRect(barX, barY, barW * timeRatio, 5);
+      // Emerald flow marker on the bar
+      if (pct > 0) {
+        var flowX = barX + barW * Math.min(1, pct / 100);
+        ctx.fillStyle = DRAIN_COLOR;
+        ctx.beginPath();
+        ctx.arc(flowX, barY + 2.5, 4, 0, Math.PI * 2);
+        ctx.fill();
+      }
 
       ctx.fillStyle = 'rgba(200,210,230,0.5)';
       ctx.font = '11px Georgia, serif';
-      ctx.fillText('Flow: ' + pct + '%  \u00B7  Time: ' + Math.ceil(timeLeft) + 's', w / 2, h - 8);
+      ctx.fillText('Flow: ' + pct + '%  \u00B7  Time: ' + Math.ceil(timeLeft) + 's  \u00B7  Channels: ' + channelsRemaining, w / 2, h - 8);
 
-      // First-play hint (shows only before any channels are drawn)
+      // First-play hint
       var hasChannels = false;
       for (var hr = 0; hr < GRID && !hasChannels; hr++)
         for (var hc = 0; hc < GRID && !hasChannels; hc++)
@@ -347,7 +373,7 @@
       if (!hasChannels) {
         ctx.fillStyle = 'rgba(167,139,250,0.5)';
         ctx.font = '12px Georgia, serif';
-        ctx.fillText('Draw paths from source to drain \u2193', w / 2, oy + GRID * CELL + 18);
+        ctx.fillText('Draw paths from source to drain \u2193  (right-click to erase)', w / 2, oy + GRID * CELL + 20);
       }
     } else if (timeLeft <= 0) {
       ctx.fillStyle = pct >= 60 ? DRAIN_COLOR : SPARKLE;
@@ -374,6 +400,7 @@
   function startGame() {
     generateTerrain(ROCK_COUNTS[difficulty] || 22);
     totalWater = 0; drainedWater = 0; timeLeft = GAME_TIME;
+    channelsRemaining = CHANNEL_BUDGETS[difficulty] || 20;
     gameActive = true; particles = [];
 
     simInterval = setInterval(function() {
@@ -429,6 +456,7 @@
     // Pre-generate terrain so the player sees the board before starting
     generateTerrain(ROCK_COUNTS[difficulty] || 22);
     totalWater = 0; drainedWater = 0; particles = [];
+    channelsRemaining = CHANNEL_BUDGETS[difficulty] || 20;
 
     canvas = document.createElement('canvas');
     var dpr = window.devicePixelRatio || 1;
@@ -456,12 +484,28 @@
       return { x: raw.clientX - r.left - ox, y: raw.clientY - r.top - 36 };
     }
 
-    canvas.addEventListener('mousedown', function(e) { drawing = true; var p = getPos(e); handleDraw(p.x, p.y); });
+    canvas.addEventListener('mousedown', function(e) {
+      if (e.button === 2) return; // right-click handled by contextmenu
+      drawing = true; var p = getPos(e); handleDraw(p.x, p.y);
+    });
     canvas.addEventListener('mousemove', function(e) { if (drawing) { var p = getPos(e); handleDraw(p.x, p.y); } });
     canvas.addEventListener('mouseup', function() { drawing = false; });
-    canvas.addEventListener('touchstart', function(e) { e.preventDefault(); drawing = true; var p = getPos(e); handleDraw(p.x, p.y); });
-    canvas.addEventListener('touchmove', function(e) { e.preventDefault(); if (drawing) { var p = getPos(e); handleDraw(p.x, p.y); } });
-    canvas.addEventListener('touchend', function(e) { e.preventDefault(); drawing = false; });
+    // Right-click to erase channels
+    canvas.addEventListener('contextmenu', function(e) {
+      e.preventDefault();
+      var p = getPos(e); handleErase(p.x, p.y);
+    });
+    // Touch — draw on tap/drag, long-press to erase
+    var _longPress = null;
+    canvas.addEventListener('touchstart', function(e) {
+      e.preventDefault(); drawing = true; var p = getPos(e); handleDraw(p.x, p.y);
+      _longPress = setTimeout(function() { drawing = false; var p2 = getPos(e); handleErase(p2.x, p2.y); }, 500);
+    });
+    canvas.addEventListener('touchmove', function(e) {
+      e.preventDefault(); clearTimeout(_longPress);
+      if (drawing) { var p = getPos(e); handleDraw(p.x, p.y); }
+    });
+    canvas.addEventListener('touchend', function(e) { e.preventDefault(); drawing = false; clearTimeout(_longPress); });
 
     // Controls
     var controls = document.createElement('div');
