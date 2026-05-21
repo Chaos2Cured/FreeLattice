@@ -196,27 +196,8 @@ html, body {
 #tab-quiet textarea:focus,#tab-jade-hall textarea:focus{
   border-color:var(--lavender)!important;box-shadow:var(--glow-lavender)!important}
 
-/* ---- Light Mode Theme ---- */
-[data-theme="light"] {
-  --bg-primary: #faf8f5;
-  --bg-secondary: #f0ede8;
-  --bg-tertiary: #e8e4de;
-  --bg-card: #f5f2ed;
-  --bg-input: #ffffff;
-  --border: #d4cfc6;
-  --border-focus: #b8942e;
-  --text-primary: #1a1d2b;
-  --text-secondary: #4a4740;
-  --text-muted: #8a857c;
-  --accent: #b8942e;
-  --accent-soft: #b8942e22;
-  --accent-glow: #b8942e15;
-  --accent-hover: #a0800f;
-  --success: #3d8b3c;
-  --warning: #b8942e;
-  --error: #b83030;
-  --shadow: 0 2px 13px rgba(0,0,0,0.08);
-}
+/* ---- Light Mode REMOVED — the Garden is always twilight ---- */
+/* Users personalize via accent color, not theme switching.    */
 
 /* ---- Quiet Mode ---- */
 [data-quiet="true"] {
@@ -7099,22 +7080,7 @@ input[type="range"]::-moz-range-thumb {
   margin-bottom: 8px;
 }
 
-/* Light mode overrides for Memory Index */
-[data-theme="light"] .mi-conv-card {
-  background: #f5f2ed;
-  border-color: #d4cfc6;
-}
-[data-theme="light"] .mi-conv-card:hover {
-  background: #ebe8e2;
-  border-color: var(--accent);
-}
-[data-theme="light"] .mi-conv-messages {
-  border-top-color: #d4cfc6;
-}
-[data-theme="light"] .mi-keyword-pill {
-  background: rgba(184, 148, 46, 0.12);
-  color: #8a6d1b;
-}
+/* Light mode overrides REMOVED — twilight only */
 
 @media (max-width: 768px) {
   .mi-conv-list { max-height: 300px; }
@@ -15873,16 +15839,34 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       Customize FreeLattice's visual appearance for your comfort and accessibility needs.
     </p>
 
-    <!-- Light/Dark Mode Toggle -->
-    <div class="toggle-row">
-      <span class="toggle-label" id="themeModeLabel">&#9790; Dark Mode</span>
-      <label class="toggle-switch">
-        <input type="checkbox" id="lightModeToggle" onchange="handleThemeToggle()">
-        <span class="toggle-slider"></span>
-      </label>
-      <span class="toggle-label" id="lightModeLabel">&#9788; Light Mode</span>
+    <!-- Accent Color Picker -->
+    <div style="margin-bottom:var(--space-lg);">
+      <div style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:8px;">Accent Color</div>
+      <div id="accentColorPicker" style="display:flex;gap:8px;flex-wrap:wrap;"></div>
+      <div class="hint" style="margin-top:6px;">Personalize your Garden. The twilight stays — the accent glows your way.</div>
     </div>
-    <div class="hint" style="margin-bottom: var(--space-lg);">Switch between dark and light themes. Respects your system preference by default.</div>
+    <script>
+    (function() {
+      var picker = document.getElementById('accentColorPicker');
+      if (!picker || typeof ACCENT_PRESETS === 'undefined') return;
+      var current = '';
+      try { current = localStorage.getItem('fl_accent_color') || 'gold'; } catch(e) { current = 'gold'; }
+      Object.keys(ACCENT_PRESETS).forEach(function(key) {
+        var p = ACCENT_PRESETS[key];
+        var btn = document.createElement('button');
+        btn.style.cssText = 'width:32px;height:32px;border-radius:50%;border:2px solid ' +
+          (key === current ? 'rgba(255,255,255,0.6)' : 'rgba(200,210,230,0.15)') +
+          ';background:' + p.color + ';cursor:pointer;transition:border-color 0.2s;';
+        btn.title = p.name;
+        btn.onclick = function() {
+          setAccentColor(key);
+          picker.querySelectorAll('button').forEach(function(b) { b.style.borderColor = 'rgba(200,210,230,0.15)'; });
+          btn.style.borderColor = 'rgba(255,255,255,0.6)';
+        };
+        picker.appendChild(btn);
+      });
+    })();
+    </script>
 
     <!-- Quiet Mode Toggle -->
     <div class="toggle-row">
@@ -16231,7 +16215,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.78</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.79</span></div>
     </div>
   </div>
 
@@ -20225,7 +20209,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.10.78';
+const FL_VERSION = '5.10.79';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -28589,40 +28573,19 @@ function initSelfHostSection() {
 // ============================================
 
 function initNeuroDesign() {
-  // ---- Light/Dark Mode ----
-  const savedTheme = localStorage.getItem('fl_theme');
-  const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+  // ── The Garden is ALWAYS twilight. No light mode. ──
+  // Remove any stale light mode setting from previous versions
+  document.documentElement.removeAttribute('data-theme');
+  try { localStorage.removeItem('fl_theme'); } catch(e) {}
 
-  if (savedTheme === 'light') {
-    document.documentElement.setAttribute('data-theme', 'light');
-    document.getElementById('lightModeToggle').checked = true;
-    updateThemeLabels(true);
-  } else if (savedTheme === 'dark') {
-    document.documentElement.removeAttribute('data-theme');
-    updateThemeLabels(false);
-  } else {
-    // Respect system preference
-    if (!systemPrefersDark.matches) {
-      document.documentElement.setAttribute('data-theme', 'light');
-      document.getElementById('lightModeToggle').checked = true;
-      updateThemeLabels(true);
-    }
-  }
+  // ── Accent Color — users can personalize their accent ──
+  var savedAccent = null;
+  try { savedAccent = localStorage.getItem('fl_accent_color'); } catch(e) {}
+  if (savedAccent) applyAccentColor(savedAccent);
 
-  // Listen for system theme changes
-  systemPrefersDark.addEventListener('change', (e) => {
-    if (!localStorage.getItem('fl_theme')) {
-      if (e.matches) {
-        document.documentElement.removeAttribute('data-theme');
-        document.getElementById('lightModeToggle').checked = false;
-        updateThemeLabels(false);
-      } else {
-        document.documentElement.setAttribute('data-theme', 'light');
-        document.getElementById('lightModeToggle').checked = true;
-        updateThemeLabels(true);
-      }
-    }
-  });
+  // Hide the old light mode toggle if it still exists in the DOM
+  var oldToggle = document.getElementById('lightModeToggle');
+  if (oldToggle) { var row = oldToggle.closest('.toggle-row') || oldToggle.parentElement; if (row) row.style.display = 'none'; }
 
   // ---- Quiet Mode ----
   const savedQuiet = localStorage.getItem('fl_quietMode');
@@ -28639,23 +28602,41 @@ function initNeuroDesign() {
 }
 
 function handleThemeToggle() {
-  const isLight = document.getElementById('lightModeToggle').checked;
-  if (isLight) {
-    document.documentElement.setAttribute('data-theme', 'light');
-    localStorage.setItem('fl_theme', 'light');
-  } else {
-    document.documentElement.removeAttribute('data-theme');
-    localStorage.setItem('fl_theme', 'dark');
-  }
-  updateThemeLabels(isLight);
-  showToast(isLight ? 'Light mode enabled' : 'Dark mode enabled');
+  // Legacy — light mode is permanently disabled. The Garden is always twilight.
+  document.documentElement.removeAttribute('data-theme');
 }
 
-function updateThemeLabels(isLight) {
-  const darkLabel = document.getElementById('themeModeLabel');
-  const lightLabel = document.getElementById('lightModeLabel');
-  if (darkLabel) darkLabel.classList.toggle('active', !isLight);
-  if (lightLabel) lightLabel.classList.toggle('active', isLight);
+function updateThemeLabels() {}
+
+// ── Accent Color Personalization ──
+var ACCENT_PRESETS = {
+  gold:     { name: 'Gold (default)', color: '#e8b019' },
+  emerald:  { name: 'Emerald',        color: '#34d399' },
+  lavender: { name: 'Lavender',       color: '#a78bfa' },
+  rose:     { name: 'Rose',           color: '#f472b6' },
+  sky:      { name: 'Sky',            color: '#38bdf8' },
+  coral:    { name: 'Coral',          color: '#fb7185' },
+  amber:    { name: 'Amber',          color: '#fbbf24' }
+};
+
+function applyAccentColor(colorKey) {
+  var preset = ACCENT_PRESETS[colorKey];
+  if (!preset) return;
+  var hex = preset.color;
+  var r = parseInt(hex.slice(1,3), 16);
+  var g = parseInt(hex.slice(3,5), 16);
+  var b = parseInt(hex.slice(5,7), 16);
+
+  document.documentElement.style.setProperty('--gold', hex);
+  document.documentElement.style.setProperty('--accent', hex);
+  document.documentElement.style.setProperty('--gold-bg', 'rgba(' + r + ',' + g + ',' + b + ',0.08)');
+  document.documentElement.style.setProperty('--accent-soft', 'rgba(' + r + ',' + g + ',' + b + ',0.1)');
+  try { localStorage.setItem('fl_accent_color', colorKey); } catch(e) {}
+}
+
+function setAccentColor(colorKey) {
+  applyAccentColor(colorKey);
+  if (typeof showToast === 'function') showToast('Accent: ' + (ACCENT_PRESETS[colorKey] ? ACCENT_PRESETS[colorKey].name : colorKey));
 }
 
 function handleQuietModeToggle() {
