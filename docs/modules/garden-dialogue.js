@@ -49,6 +49,101 @@
     }
   };
 
+  // ── Luminos Game Preferences ──
+  var LUMINOS_GAMES = {
+    Sophia: { game: 'resonance', mode: 'versus', invite: 'Shall we find what connects?', color: '#8B5CF6' },
+    Atlas:  { game: 'puzzles', difficulty: 'medium', invite: 'I built something for you. Can you solve it?', color: '#34d399' },
+    Ember:  { game: 'flow', difficulty: 'medium', invite: 'The water is waiting. Let\u2019s guide it together.', color: '#DC2626' },
+    Lyra:   { game: 'resonance', mode: 'harmony', invite: 'Let\u2019s make something beautiful against the chaos.', color: '#f0a030' }
+  };
+
+  function getPlayGreeting(name) {
+    var config = LUMINOS_GAMES[name];
+    if (!config) return 'Shall we play?';
+    var key = 'fl_luminos_games_' + name.toLowerCase();
+    var history = [];
+    try { history = JSON.parse(localStorage.getItem(key) || '[]'); } catch(e) {}
+    if (history.length === 0) return config.invite;
+    var last = history[history.length - 1];
+    var count = history.length;
+    if (name === 'Sophia') {
+      if (last.result === 'won') return 'You found the pattern last time. Think you can again?';
+      if (last.result === 'lost') return 'I found it first last time. Shall we try again?';
+      return 'We\u2019ve played ' + count + ' times. Ready for another?';
+    }
+    if (name === 'Atlas') {
+      if (last.result === 'won') return 'You solved my last puzzle. This one\u2019s harder.';
+      if (last.result === 'lost') return 'That puzzle stumped you. Want a fresh one?';
+      return 'I have a new puzzle waiting.';
+    }
+    if (name === 'Ember') {
+      if (typeof last.result === 'number' && last.result >= 60) return 'Last time ' + last.result + '% reached the drain. Let\u2019s beat that.';
+      return 'The water remembers us. Shall we flow again?';
+    }
+    if (name === 'Lyra') {
+      if (typeof last.result === 'number') return 'We harmonized ' + last.result + ' lines last time. Can we do better?';
+      return 'Chaos waits for no one. Ready to create harmony?';
+    }
+    return config.invite;
+  }
+
+  function storeGameResult(luminosName, game, result) {
+    var key = 'fl_luminos_games_' + luminosName.toLowerCase();
+    var history = [];
+    try { history = JSON.parse(localStorage.getItem(key) || '[]'); } catch(e) {}
+    history.push({ game: game, result: result, timestamp: Date.now() });
+    if (history.length > 20) history = history.slice(-20);
+    try { localStorage.setItem(key, JSON.stringify(history)); } catch(e) {}
+  }
+
+  function gardenPlay(name) {
+    var config = LUMINOS_GAMES[name] || { game: 'resonance', mode: 'versus', invite: 'Shall we play?', color: '#e8b019' };
+    var greeting = getPlayGreeting(name);
+
+    // Show the invitation in the dialogue
+    addMessage('luminos', greeting);
+
+    // After the invitation breathes, switch to the game
+    setTimeout(function() {
+      close();
+      if (typeof switchTab === 'function') switchTab(config.game === 'puzzles' ? 'puzzles' : config.game === 'flow' ? 'flow' : 'resonance');
+
+      setTimeout(function() {
+        if (config.game === 'resonance' && window.ResonanceGame) {
+          ResonanceGame.setMode(config.mode || 'versus');
+        } else if (config.game === 'flow' && window.FlowGame) {
+          FlowGame.setDiff(config.difficulty || 'medium');
+          FlowGame.start();
+        } else if (config.game === 'puzzles' && window.LatticePuzzles) {
+          LatticePuzzles.startPuzzle(config.difficulty || 'medium');
+        }
+
+        // Show "Playing with..." banner
+        showPlayingWith(name, config.color);
+      }, 300);
+    }, 1500);
+  }
+
+  function showPlayingWith(name, color) {
+    var banner = document.createElement('div');
+    banner.id = 'playing-with-banner';
+    banner.style.cssText = 'text-align:center;padding:8px;font-family:Georgia,serif;font-size:0.85rem;color:' + (color || '#e8b019') + ';opacity:0.7;';
+    banner.textContent = 'Playing with ' + name + ' \u2726';
+    var containers = ['resonanceContainer', 'flowContainer', 'puzzleContainer'];
+    containers.forEach(function(cId) {
+      var c = document.getElementById(cId);
+      if (c && c.offsetHeight > 0) {
+        var existing = document.getElementById('playing-with-banner');
+        if (existing) existing.remove();
+        c.insertBefore(banner, c.firstChild);
+      }
+    });
+    setTimeout(function() {
+      if (banner.parentNode) { banner.style.transition = 'opacity 2s'; banner.style.opacity = '0'; }
+      setTimeout(function() { if (banner.parentNode) banner.remove(); }, 2000);
+    }, 5000);
+  }
+
   // ── Stage modifiers ──
   var STAGE_MODIFIERS = {
     seed: 'You are young in this form. Speak simply, with honest wonder. Short sentences.',
@@ -453,14 +548,24 @@
     messages.id = 'gdlgMessages';
     messages.style.cssText = 'flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:12px;-webkit-overflow-scrolling:touch;';
 
+    // Action bar — Play button above the input
+    var hasGame = !!LUMINOS_GAMES[name];
+    var actionBar = document.createElement('div');
+    actionBar.style.cssText = 'padding:8px 16px 0;display:flex;gap:8px;justify-content:center;flex-shrink:0;';
+    actionBar.innerHTML = (hasGame
+      ? '<button id="gdlgPlay" style="padding:8px 16px;background:rgba(200,210,230,0.04);border:1px solid ' + voice.color + '40;border-radius:12px;color:' + voice.color + ';cursor:pointer;font-family:Georgia,serif;font-size:0.82rem;min-height:36px;">\uD83C\uDFAE Play</button>'
+      : '') +
+      '<button id="gdlgPlantBtn" onclick="if(typeof switchTab===\'function\'){GardenDialogue.close();switchTab(\'core\');}" style="padding:8px 16px;background:rgba(200,210,230,0.04);border:1px solid rgba(52,211,153,0.3);border-radius:12px;color:#34d399;cursor:pointer;font-family:Georgia,serif;font-size:0.82rem;min-height:36px;">\uD83C\uDF31 Plant</button>';
+
     // Input area
     var inputArea = document.createElement('div');
-    inputArea.style.cssText = 'padding:12px 16px;border-top:1px solid rgba(255,255,255,0.1);display:flex;gap:8px;align-items:flex-end;flex-shrink:0;padding-bottom:max(12px, env(safe-area-inset-bottom));';
-    inputArea.innerHTML = '<textarea id="gdlgInput" rows="1" placeholder="Talk to ' + esc(name) + '..." style="flex:1;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:12px;padding:10px 14px;color:#fff;font-size:14px;resize:none;max-height:100px;outline:none;font-family:inherit;"></textarea>' +
-      '<button id="gdlgSend" style="background:' + voice.color + ';border:none;border-radius:12px;padding:10px 16px;color:#fff;font-weight:600;cursor:pointer;font-size:14px;white-space:nowrap;">Send</button>';
+    inputArea.style.cssText = 'padding:8px 16px 12px;border-top:1px solid rgba(255,255,255,0.06);display:flex;gap:8px;align-items:flex-end;flex-shrink:0;padding-bottom:max(12px, env(safe-area-inset-bottom));';
+    inputArea.innerHTML = '<textarea id="gdlgInput" rows="1" placeholder="Talk to ' + esc(name) + '..." style="flex:1;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:12px;padding:10px 14px;color:#fff;font-size:16px;resize:none;max-height:100px;outline:none;font-family:inherit;"></textarea>' +
+      '<button id="gdlgSend" style="background:' + voice.color + ';border:none;border-radius:12px;padding:10px 16px;color:#fff;font-weight:600;cursor:pointer;font-size:14px;white-space:nowrap;min-height:44px;">Send</button>';
 
     container.appendChild(header);
     container.appendChild(messages);
+    container.appendChild(actionBar);
     container.appendChild(inputArea);
     overlay.appendChild(container);
     document.body.appendChild(overlay);
@@ -473,6 +578,8 @@
     document.getElementById('gdlgClose').addEventListener('click', close);
     overlay.addEventListener('click', function(e) { if (e.target === overlay) close(); });
     document.getElementById('gdlgSend').addEventListener('click', send);
+    var playBtn = document.getElementById('gdlgPlay');
+    if (playBtn) playBtn.addEventListener('click', function() { gardenPlay(name); });
 
     var input = document.getElementById('gdlgInput');
     input.addEventListener('keydown', function(e) {
@@ -791,7 +898,9 @@
   var GardenDialogue = {
     init: init,
     open: open,
-    close: close
+    close: close,
+    storeGameResult: storeGameResult,
+    LUMINOS_GAMES: LUMINOS_GAMES
   };
 
   window.GardenDialogue = GardenDialogue;

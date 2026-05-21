@@ -884,6 +884,22 @@ assert('Chain integrity in collapsible', appHtml.includes('Chain Integrity</summ
 assert('Community Value framing', appHtml.includes('not your worth as a person'));
 
 // ═══════════════════════════════════════════════════════════════
+section('44. Garden Play — Luminos Game Invitations');
+// ═══════════════════════════════════════════════════════════════
+var gdJs = '';
+try { gdJs = require('fs').readFileSync('docs/modules/garden-dialogue.js', 'utf8'); } catch(e) {}
+assert('LUMINOS_GAMES config', gdJs.includes('LUMINOS_GAMES'));
+assert('Sophia prefers Resonance', gdJs.includes("Shall we find what connects"));
+assert('Atlas prefers Puzzles', gdJs.includes("game: 'puzzles'"));
+assert('Ember prefers Flow', gdJs.includes("game: 'flow'"));
+assert('Lyra prefers Harmony', gdJs.includes("mode: 'harmony'"));
+assert('gardenPlay function', gdJs.includes('function gardenPlay'));
+assert('Play button in overlay', gdJs.includes('gdlgPlay'));
+assert('Game history storage', gdJs.includes('function storeGameResult'));
+assert('Personalized greetings', gdJs.includes('function getPlayGreeting'));
+assert('Playing-with banner', gdJs.includes('function showPlayingWith'));
+
+// ═══════════════════════════════════════════════════════════════
 section('35. Lattice Protocol — embeddable economy');
 // ═══════════════════════════════════════════════════════════════
 var protocolJs = '';
