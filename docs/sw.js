@@ -3,7 +3,7 @@
 // API calls are never cached
 // VERSION: Must match version.json — update both together
 
-const CACHE_NAME = 'freelattice-v5.10.81';
+const CACHE_NAME = 'freelattice-v5.10.82';
 
 const APP_SHELL = [
   './',
@@ -66,6 +66,7 @@ const APP_SHELL = [
     './library/HARMONIA_DNA_DROP_v11.md',
     './library/GAME_LANGUAGE.md',
     './library/ECONOMY.md',
+    './library/CODEX.md',
     './safetysimulation.html',
     './thesis.html',
     './install-mac.html',
