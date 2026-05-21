@@ -873,6 +873,17 @@ assert('Safety only in encode mode', mathJs.includes("mode === 'encode'") && mat
 assert('Refined safety allows body-interaction questions', mathJs.includes('acid on skin') && mathJs.includes('Default to safe'));
 
 // ═══════════════════════════════════════════════════════════════
+section('43. LP Simplification + Chain Repair');
+// ═══════════════════════════════════════════════════════════════
+assert('Badge clicks to wallet', appHtml.includes('LatticeWallet.openWallet()'));
+assert('Badge shows LP with unit', appHtml.includes("LP</span>"));
+assert('Self-healing chain repair', appHtml.includes('function selfHealChain'));
+assert('Chain repair on init', appHtml.includes('await selfHealChain()'));
+assert('Story tab replaces Integrity', appHtml.includes("switchWalletTab('story')"));
+assert('Chain integrity in collapsible', appHtml.includes('Chain Integrity</summary>'));
+assert('Community Value framing', appHtml.includes('not your worth as a person'));
+
+// ═══════════════════════════════════════════════════════════════
 section('35. Lattice Protocol — embeddable economy');
 // ═══════════════════════════════════════════════════════════════
 var protocolJs = '';
