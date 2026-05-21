@@ -350,10 +350,9 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 ## PRIMER HEALTH
 - Last auto-updated: 2026-05-20 18:59 MDT
 - Version: 5.10.78
-- Total commits: 1685
+- Total commits: 1684
 - Last 10 commits:
-- d511eb8 fix: Chalkboard restoration — brighter sparkles, gradual fade, 503 handling (v5.10.78)
-- 80b063f ci: Update Primer deployment state [2026-05-20]
+- dec81ba fix: Chalkboard restoration — brighter sparkles, gradual fade, 503 handling (v5.10.78)
 - eb35170 docs: Auto-update Session Primer [5.10.77]
 - 413a128 docs: Auto-update Session Primer [5.10.77]
 - 4ac3b4d fix: Force dark mode, mobile-first providers, WebLLM defense (v5.10.77)
@@ -362,3 +361,4 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - c367e3a docs: Auto-update Session Primer [5.10.76]
 - 1be20c3 feat: Flow — the Water Principle as a game (v5.10.76)
 - d8ae9bf ci: Update Primer deployment state [2026-05-20]
+- a03608b docs: Auto-update Session Primer [5.10.75]
