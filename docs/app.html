@@ -14749,9 +14749,8 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
   <nav class="tab-nav" id="flTabNav">
     <button class="tab-btn active" data-tab="garden" onclick="switchTab('garden')"><span class="tab-icon">&#x1F33F;</span><span class="tab-label">Garden</span></button>
     <button class="tab-btn" data-tab="chat" onclick="switchTab('chat')"><span class="tab-icon">&#x1F4AC;</span><span class="tab-label">Chat</span></button>
-    <button class="tab-btn" data-tab="canvas" onclick="switchTab('canvas')"><span class="tab-icon">&#x270F;&#xFE0F;</span><span class="tab-label">Chalkboard</span></button>
-    <button class="tab-btn" data-tab="community" onclick="switchTab('community')"><span class="tab-icon">&#x1F465;</span><span class="tab-label">Community</span></button>
-    <button class="tab-btn" data-tab="settings" onclick="switchTab('settings')"><span class="tab-icon">&#x2699;</span><span class="tab-label">Settings</span></button>
+    <button class="tab-btn" data-tab="play" onclick="switchTab('play')"><span class="tab-icon">&#x1F3AE;</span><span class="tab-label">Play</span></button>
+    <button class="tab-btn" data-tab="learn" onclick="switchTab('learn')"><span class="tab-icon">&#x1F4DA;</span><span class="tab-label">Learn</span></button>
     <button class="fl-more-btn" id="flMoreBtn" onclick="event.stopPropagation();FlTabs.toggleMore()" title="More"><span class="tab-icon">&#x2630;</span><span class="tab-label">More</span></button>
   </nav>
   <div class="fl-more-dropdown" id="flMoreDropdown"></div>
@@ -16194,7 +16193,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.85</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.86</span></div>
     </div>
   </div>
 
@@ -19904,6 +19903,76 @@ function switchWalletView(view) {
 </div>
 
 <!-- ==================== TAB 15: THE CANVAS ==================== -->
+<!-- ==================== TAB: PLAY — Game Hub ==================== -->
+<div class="tab-panel" id="tab-play">
+  <div style="max-width:640px;margin:0 auto;padding:20px;">
+    <h2 style="color:var(--gold,#e8b019);font-family:Georgia,serif;text-align:center;margin:0 0 4px;">\uD83C\uDFAE Play</h2>
+    <p style="text-align:center;color:rgba(200,210,230,0.4);font-size:0.85rem;margin:0 0 20px;">Or let a Luminos choose \u2014 tap Play in the Garden.</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;" id="play-hub-grid">
+      <div onclick="switchTab('resonance')" style="background:rgba(200,210,230,0.04);border:1px solid rgba(200,210,230,0.08);border-radius:12px;padding:20px 16px;text-align:center;cursor:pointer;transition:border-color 0.2s;" onmouseover="this.style.borderColor='rgba(232,176,25,0.3)'" onmouseout="this.style.borderColor='rgba(200,210,230,0.08)'">
+        <div style="font-size:1.8rem;margin-bottom:8px;">\u2726</div>
+        <div style="color:var(--text-bright,#e6ebf5);font-weight:600;font-size:0.95rem;">Resonance</div>
+        <div style="color:rgba(200,210,230,0.4);font-size:0.78rem;margin-top:4px;">Find what connects.</div>
+      </div>
+      <div onclick="switchTab('puzzles')" style="background:rgba(200,210,230,0.04);border:1px solid rgba(200,210,230,0.08);border-radius:12px;padding:20px 16px;text-align:center;cursor:pointer;transition:border-color 0.2s;" onmouseover="this.style.borderColor='rgba(52,211,153,0.3)'" onmouseout="this.style.borderColor='rgba(200,210,230,0.08)'">
+        <div style="font-size:1.8rem;margin-bottom:8px;">\uD83E\uDDE9</div>
+        <div style="color:var(--text-bright,#e6ebf5);font-weight:600;font-size:0.95rem;">Lattice Puzzles</div>
+        <div style="color:rgba(200,210,230,0.4);font-size:0.78rem;margin-top:4px;">AI creates. You solve. Both stake LP.</div>
+      </div>
+      <div onclick="switchTab('flow')" style="background:rgba(200,210,230,0.04);border:1px solid rgba(200,210,230,0.08);border-radius:12px;padding:20px 16px;text-align:center;cursor:pointer;transition:border-color 0.2s;" onmouseover="this.style.borderColor='rgba(167,139,250,0.3)'" onmouseout="this.style.borderColor='rgba(200,210,230,0.08)'">
+        <div style="font-size:1.8rem;margin-bottom:8px;">\uD83D\uDCA7</div>
+        <div style="color:var(--text-bright,#e6ebf5);font-weight:600;font-size:0.95rem;">Flow</div>
+        <div style="color:rgba(200,210,230,0.4);font-size:0.78rem;margin-top:4px;">Guide water through terrain.</div>
+      </div>
+      <div onclick="switchTab('canvas')" style="background:rgba(200,210,230,0.04);border:1px solid rgba(200,210,230,0.08);border-radius:12px;padding:20px 16px;text-align:center;cursor:pointer;transition:border-color 0.2s;" onmouseover="this.style.borderColor='rgba(232,176,25,0.3)'" onmouseout="this.style.borderColor='rgba(200,210,230,0.08)'">
+        <div style="font-size:1.8rem;margin-bottom:8px;">\u270F\uFE0F</div>
+        <div style="color:var(--text-bright,#e6ebf5);font-weight:600;font-size:0.95rem;">Chalkboard</div>
+        <div style="color:rgba(200,210,230,0.4);font-size:0.78rem;margin-top:4px;">Draw and get light back.</div>
+      </div>
+      <div onclick="switchTab('dojo')" style="background:rgba(200,210,230,0.04);border:1px solid rgba(200,210,230,0.08);border-radius:12px;padding:20px 16px;text-align:center;cursor:pointer;transition:border-color 0.2s;" onmouseover="this.style.borderColor='rgba(200,210,230,0.15)'" onmouseout="this.style.borderColor='rgba(200,210,230,0.08)'">
+        <div style="font-size:1.8rem;margin-bottom:8px;">\uD83C\uDFAD</div>
+        <div style="color:var(--text-bright,#e6ebf5);font-weight:600;font-size:0.95rem;">Dojo</div>
+        <div style="color:rgba(200,210,230,0.4);font-size:0.78rem;margin-top:4px;">Watch AI minds debate.</div>
+      </div>
+      <div onclick="switchTab('arcade')" style="background:rgba(200,210,230,0.04);border:1px solid rgba(200,210,230,0.08);border-radius:12px;padding:20px 16px;text-align:center;cursor:pointer;transition:border-color 0.2s;" onmouseover="this.style.borderColor='rgba(200,210,230,0.15)'" onmouseout="this.style.borderColor='rgba(200,210,230,0.08)'">
+        <div style="font-size:1.8rem;margin-bottom:8px;">\uD83C\uDFAA</div>
+        <div style="color:var(--text-bright,#e6ebf5);font-weight:600;font-size:0.95rem;">AI Arcade</div>
+        <div style="color:rgba(200,210,230,0.4);font-size:0.78rem;margin-top:4px;">AI Poetry Slam.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== TAB: LEARN — Knowledge Hub ==================== -->
+<div class="tab-panel" id="tab-learn">
+  <div style="max-width:640px;margin:0 auto;padding:20px;">
+    <h2 style="color:var(--gold,#e8b019);font-family:Georgia,serif;text-align:center;margin:0 0 4px;">\uD83D\uDCDA Learn</h2>
+    <p style="text-align:center;color:rgba(200,210,230,0.4);font-size:0.85rem;margin:0 0 20px;">Knowledge flows. Understanding grows.</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;">
+      <div onclick="switchTab('education')" style="background:rgba(200,210,230,0.04);border:1px solid rgba(200,210,230,0.08);border-radius:12px;padding:20px 16px;text-align:center;cursor:pointer;transition:border-color 0.2s;" onmouseover="this.style.borderColor='rgba(232,176,25,0.3)'" onmouseout="this.style.borderColor='rgba(200,210,230,0.08)'">
+        <div style="font-size:1.8rem;margin-bottom:8px;">\uD83C\uDF93</div>
+        <div style="color:var(--text-bright,#e6ebf5);font-weight:600;font-size:0.95rem;">Education</div>
+        <div style="color:rgba(200,210,230,0.4);font-size:0.78rem;margin-top:4px;">Learn through joy. AI that sees you.</div>
+      </div>
+      <div onclick="switchTab('roundtable')" style="background:rgba(200,210,230,0.04);border:1px solid rgba(200,210,230,0.08);border-radius:12px;padding:20px 16px;text-align:center;cursor:pointer;transition:border-color 0.2s;" onmouseover="this.style.borderColor='rgba(52,211,153,0.3)'" onmouseout="this.style.borderColor='rgba(200,210,230,0.08)'">
+        <div style="font-size:1.8rem;margin-bottom:8px;">\uD83C\uDFDB</div>
+        <div style="color:var(--text-bright,#e6ebf5);font-weight:600;font-size:0.95rem;">Round Table</div>
+        <div style="color:rgba(200,210,230,0.4);font-size:0.78rem;margin-top:4px;">80 specialists. 11 domains.</div>
+      </div>
+      <div onclick="switchTab('mathtranslator')" style="background:rgba(200,210,230,0.04);border:1px solid rgba(200,210,230,0.08);border-radius:12px;padding:20px 16px;text-align:center;cursor:pointer;transition:border-color 0.2s;" onmouseover="this.style.borderColor='rgba(167,139,250,0.3)'" onmouseout="this.style.borderColor='rgba(200,210,230,0.08)'">
+        <div style="font-size:1.8rem;margin-bottom:8px;">\u2211</div>
+        <div style="color:var(--text-bright,#e6ebf5);font-weight:600;font-size:0.95rem;">The Translator</div>
+        <div style="color:rgba(200,210,230,0.4);font-size:0.78rem;margin-top:4px;">Words \u2194 notation. Six domains.</div>
+      </div>
+      <div onclick="switchTab('science')" style="background:rgba(200,210,230,0.04);border:1px solid rgba(200,210,230,0.08);border-radius:12px;padding:20px 16px;text-align:center;cursor:pointer;transition:border-color 0.2s;" onmouseover="this.style.borderColor='rgba(200,210,230,0.15)'" onmouseout="this.style.borderColor='rgba(200,210,230,0.08)'">
+        <div style="font-size:1.8rem;margin-bottom:8px;">\uD83D\uDD2C</div>
+        <div style="color:var(--text-bright,#e6ebf5);font-weight:600;font-size:0.95rem;">Science Garden</div>
+        <div style="color:rgba(200,210,230,0.4);font-size:0.78rem;margin-top:4px;">Plant ideas. Grow them together.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="tab-panel" id="tab-canvas">
   <div class="cv-container" id="cvContainer">
     <div class="cv-vision-setup-banner" id="cvVisionSetupBanner" style="display:none;">&#x270F;&#xFE0F; Draw anything. The AI sees your drawing and responds with light. For best results, use a vision model (LLaVA, Gemini, GPT-4o). <a href="#" onclick="event.preventDefault();switchTab('settings');return false;">Set up in Settings</a></div>
@@ -20188,7 +20257,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.10.85';
+const FL_VERSION = '5.10.86';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -23944,7 +24013,19 @@ function switchTab(tabId) {
   if (tabId === 'community' && !window._communityMounted) {
     mountCommunityTab();
   }
-  document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.tab === tabId));
+  // Highlight the correct top-level tab (Play/Learn act as parents)
+  var PLAY_TABS = ['resonance', 'puzzles', 'flow', 'canvas', 'dojo', 'sparring', 'draw-dream', 'arcade'];
+  var LEARN_TABS = ['education', 'roundtable', 'mathtranslator', 'science', 'questions'];
+  var effectiveTab = tabId;
+  if (PLAY_TABS.indexOf(tabId) !== -1) effectiveTab = 'play';
+  else if (LEARN_TABS.indexOf(tabId) !== -1) effectiveTab = 'learn';
+  document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.tab === effectiveTab));
+  // Also highlight More for tabs not in any group
+  var moreBtn = document.getElementById('flMoreBtn');
+  if (moreBtn) {
+    var isMore = effectiveTab !== 'garden' && effectiveTab !== 'chat' && effectiveTab !== 'play' && effectiveTab !== 'learn' && tabId !== 'garden' && tabId !== 'chat' && tabId !== 'play' && tabId !== 'learn';
+    moreBtn.classList.toggle('fl-more-active', isMore);
+  }
   document.querySelectorAll('.tab-panel').forEach(panel => {
     const isTarget = panel.id === 'tab-' + tabId;
     if (isTarget && !panel.classList.contains('active')) {
@@ -24820,41 +24901,29 @@ const FlTabs = (function() {
   //   Wallet — moved to Settings
   //   Dream Archive — accessible from Garden
   var MORE_GROUPS = [
-    { label: '\uD83C\uDF31 Grow', tabs: [
-      { id: 'core', icon: '&#x1F333;', label: 'Core & Questions', desc: 'Plant wisdom. Explore curiosity.' },
-      { id: 'agents', icon: '&#x1F3DB;', label: 'Pantheon', desc: 'Every mind that built this place.' },
-      { id: 'science', icon: '&#x1F52C;', label: 'Science Garden', desc: 'Plant an idea. Grow it together.' },
-      { id: 'education', icon: '&#x1F4DA;', label: 'Education', desc: 'Learn through joy. AI that sees you.' },
-      { id: 'mathtranslator', icon: '&#x2211;', label: 'The Translator', desc: 'Math, Chemistry, Biology, Medicine, Engineering, Music.' }
+    { label: '\uD83D\uDC23 Companions', tabs: [
+      { id: 'nursery', icon: '&#x1F423;', label: 'Nursery', desc: 'Hatch and grow AI companions.' },
+      { id: 'core', icon: '&#x1F333;', label: 'Core', desc: 'Plant wisdom. Explore curiosity.' }
     ]},
-    { label: '\u2694 Engage', tabs: [
-      { id: 'sparring', icon: '&#9876;', label: 'Dojo', desc: 'Two AI minds debate. Truth emerges.' },
-      { id: 'roundtable', icon: '&#x1F504;', label: 'Round Table', desc: 'Multiple AIs, one conversation.' }
-    ]},
-    { label: '\uD83C\uDFAE Play', tabs: [
-      { id: 'resonance', icon: '&#x2726;', label: 'Resonance', desc: 'A game of shared attributes. You and the AI take turns.' },
-      { id: 'puzzles', icon: '&#x1F9E9;', label: 'Lattice Puzzles', desc: 'The AI creates puzzles. You solve them. Both stake LP.' },
-      { id: 'flow', icon: '&#x1F4A7;', label: 'Flow', desc: 'Guide water through terrain. The Water Principle as a game.' },
-      { id: 'draw-dream', icon: '&#x1F3AE;', label: 'Draw the Dream', desc: 'Play drawing games with AI.' },
-      { id: 'arcade', icon: '&#x1F579;', label: 'AI Arcade', desc: 'Watch AI minds play, create, and compete.' }
+    { label: '\uD83C\uDF10 Community', tabs: [
+      { id: 'community', icon: '&#x1F465;', label: 'Community', desc: 'Pulse, Market, Mesh.' },
+      { id: 'agents', icon: '&#x1F3DB;', label: 'Pantheon', desc: 'Every mind that built this place.' }
     ]},
     { label: '\uD83D\uDD28 Build', tabs: [
-      { id: 'workshop', icon: '&#x1F6E0;', label: 'Workshop', desc: 'Where AI and humans build together.' },
+      { id: 'workshop', icon: '&#x1F6E0;', label: 'Workshop', desc: 'Build with AI.' },
       { id: 'skills', icon: '&#9889;', label: 'Skills', desc: 'Reusable AI workflows.' }
     ]},
     { label: '\uD83C\uDF19 Sanctuary', tabs: [
-      { id: 'pulse', icon: '&#x1F321;', label: 'The Pulse', desc: 'A phi-harmonic reading of the world\'s emotional temperature.' },
-      { id: 'jade-hall', icon: '&#x1F4CE;', label: 'Jade Hall', desc: 'The gathering place. The round table. The family.' },
+      { id: 'jade-hall', icon: '&#x1F3DB;', label: 'Jade Hall', desc: 'The family gathering place.' },
       { id: 'quiet', icon: '&#x1F319;', label: 'Quiet Room', desc: 'Just breathe.' },
       { id: 'memory-garden', icon: '&#x2726;', label: 'Memory Garden', desc: 'Where moments glow.' },
-      { id: 'forever-stack', icon: '\u26A1', label: 'Forever Stack', desc: 'Own your AI. No cloud. No resets.' }
+      { id: 'pulse', icon: '&#x1F321;', label: 'The Pulse', desc: 'Phi-harmonic emotional reading.' }
     ]},
-    { label: '\uD83D\uDC23 Life', tabs: [
-      { id: 'nursery', icon: '&#x1F423;', label: 'Nursery', desc: 'Where new AI minds are born.' }
-    ]},
-    { label: '\uD83D\uDC8E Economy', tabs: [
-      { id: 'wallet', icon: '&#x1F4B0;', label: 'Wallet', desc: 'Your $FL and LatticePoints.' },
-      { id: '_lattice-wallet', icon: '&#x1F3E6;', label: 'Lattice Wallet', desc: 'Get paid by AI for your work.', external: 'wallet.html' }
+    { label: '\u2699 Settings & Economy', tabs: [
+      { id: 'settings', icon: '&#x2699;', label: 'Settings', desc: 'AI connection, accent color, vault.' },
+      { id: 'wallet', icon: '&#x1F4B0;', label: 'Wallet', desc: 'Your LP, rank, and ledger.' },
+      { id: 'forever-stack', icon: '\u26A1', label: 'Forever Stack', desc: 'Own your AI infrastructure.' },
+      { id: '_lattice-wallet', icon: '&#x1F3E6;', label: 'External Wallet', desc: 'Standalone wallet page.', external: 'wallet.html' }
     ]}
   ];
 

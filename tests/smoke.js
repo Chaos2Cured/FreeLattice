@@ -534,7 +534,7 @@ assert('tab-education panel exists', appHtml.includes('id="tab-education"'));
 assert('educationContainer exists', appHtml.includes('id="educationContainer"'));
 assert('education.js in SW cache', swJs.includes('education.js'));
 assert('Education in MORE_TAB_IDS', appHtml.includes("'education'"));
-assert('Education in MORE_GROUPS', appHtml.includes("label: 'Education'"));
+assert('Education accessible from Learn tab', appHtml.includes("switchTab('education')"));
 var eduJs = '';
 try { eduJs = require('fs').readFileSync('docs/modules/education.js', 'utf8'); } catch(e) {}
 assert('education.js exists and parses', (function() {
@@ -768,7 +768,7 @@ assert('ResonanceGame window export', resonanceJs.includes('window.ResonanceGame
 assert('Tab panel exists', appHtml.includes('id="tab-resonance"'));
 assert('resonanceContainer exists', appHtml.includes('resonanceContainer'));
 assert('In MORE_TAB_IDS', appHtml.includes("'resonance'"));
-assert('In MORE_GROUPS Play section', appHtml.includes("id: 'resonance'"));
+assert('Accessible from Play hub', appHtml.includes("switchTab('resonance')"));
 assert('Lazy loader wired', appHtml.includes('resonance-game.js'));
 assert('SW cache entry', swJs.includes('resonance-game.js'));
 assert('Touch support', resonanceJs.includes('touchend'));
@@ -797,7 +797,7 @@ assert('LatticePuzzles window export', puzzlesJs.includes('window.LatticePuzzles
 assert('Tab panel exists', appHtml.includes('id="tab-puzzles"'));
 assert('puzzleContainer exists', appHtml.includes('puzzleContainer'));
 assert('In MORE_TAB_IDS', appHtml.includes("'puzzles'"));
-assert('In MORE_GROUPS Play section', appHtml.includes("id: 'puzzles'"));
+assert('Accessible from Play hub', appHtml.includes("switchTab('puzzles')"));
 assert('Lazy loader wired', appHtml.includes('lattice-puzzles.js'));
 assert('SW cache entry', swJs.includes('lattice-puzzles.js'));
 assert('LP staking with spend', puzzlesJs.includes('LatticePoints.spend'));
@@ -900,6 +900,19 @@ assert('Personalized greetings', gdJs.includes('function getPlayGreeting'));
 assert('Playing-with banner', gdJs.includes('function showPlayingWith'));
 
 // ═══════════════════════════════════════════════════════════════
+section('45. Five-Door Navigation');
+// ═══════════════════════════════════════════════════════════════
+assert('Play tab in nav bar', appHtml.includes('data-tab="play"'));
+assert('Learn tab in nav bar', appHtml.includes('data-tab="learn"'));
+assert('Play landing page', appHtml.includes('id="tab-play"'));
+assert('Learn landing page', appHtml.includes('id="tab-learn"'));
+assert('Play hub has game cards', appHtml.includes('play-hub-grid'));
+assert('Play highlights for game tabs', appHtml.includes('PLAY_TABS'));
+assert('Learn highlights for learn tabs', appHtml.includes('LEARN_TABS'));
+assert('Settings in More menu', appHtml.includes("label: 'Settings'"));
+assert('Community in More menu', appHtml.includes("label: 'Community'"));
+
+// ═══════════════════════════════════════════════════════════════
 section('35. Lattice Protocol — embeddable economy');
 // ═══════════════════════════════════════════════════════════════
 var protocolJs = '';
@@ -973,7 +986,7 @@ assert('FlowGame window export', flowJs.includes('window.FlowGame'));
 assert('Tab panel exists', appHtml.includes('id="tab-flow"'));
 assert('flowContainer exists', appHtml.includes('flowContainer'));
 assert('In MORE_TAB_IDS', appHtml.includes("'flow'"));
-assert('In MORE_GROUPS Play section', appHtml.includes("id: 'flow'"));
+assert('Accessible from Play hub', appHtml.includes("switchTab('flow')"));
 assert('Lazy loader wired', appHtml.includes('flow-game.js'));
 assert('SW cache entry', swJs.includes('flow-game.js'));
 assert('Water simulation', flowJs.includes('stepWater'));
