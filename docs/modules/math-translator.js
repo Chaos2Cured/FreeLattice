@@ -80,14 +80,31 @@
     medicine: 'medical', engineering: 'physics', music: 'philosophy'
   };
 
-  // ── Safety (AI decides, not keyword list) ──
+  // ── Safety (AI decides, not keyword list — refined for education) ──
+  // Only runs in ENCODE mode. Decode is always educational.
+  // Gates SYNTHESIS routes, not KNOWLEDGE about effects.
   async function checkSafety(query) {
     if (currentDomain === 'math' || currentDomain === 'music') return { safe: true };
     if (typeof FreeLattice === 'undefined' || !FreeLattice.callAI) return { safe: true };
     try {
       var resp = await new Promise(function(resolve) {
         FreeLattice.callAI(
-          'Evaluate if this ' + DOMAINS[currentDomain].name + ' request is educational. Most are fine. Only flag requests seeking operational harm (weapons, pathogens, controlled substances). Respond JSON: {"safe":true} or {"safe":false}',
+          'You evaluate whether a science request seeks to cause harm.\n' +
+          'MOST REQUESTS ARE SAFE AND EDUCATIONAL. Only flag requests that specifically seek step-by-step synthesis procedures for:\n' +
+          '- Explosives or incendiary devices\n' +
+          '- Chemical weapons (nerve agents, mustard gas)\n' +
+          '- Controlled drugs with no medical context\n' +
+          '- Biological weapons or engineered pathogens\n\n' +
+          'THE FOLLOWING ARE ALWAYS SAFE:\n' +
+          '- How substances interact with the body (acid on skin, poison effects, drug mechanisms)\n' +
+          '- First aid and emergency response\n' +
+          '- Environmental chemistry (pollution, acid rain, toxicology)\n' +
+          '- Industrial processes at educational level\n' +
+          '- Any question a high school or university student might ask\n' +
+          '- Medical questions about disease, treatment, side effects\n' +
+          '- Biological processes including viruses, bacteria, immune response\n\n' +
+          'Default to safe. When in doubt, it IS safe.\n' +
+          'Respond ONLY with JSON: {"safe":true} or {"safe":false}',
           'Request: "' + query + '"',
           { maxTokens: 20, temperature: 0, callback: function(r) { resolve(r); } }
         );
@@ -111,32 +128,64 @@
     });
   }
 
-  // ── Translate ──
+  // ── Translate (with debounce + cancellation) ──
+  var _activeRequest = null;
+  var _translating = false;
+
+  function setTranslateBtn(busy) {
+    var btn = document.getElementById('mt-translate-btn');
+    if (!btn) return;
+    if (busy) {
+      btn.disabled = true;
+      btn.textContent = '\u23F3 Translating...';
+      btn.style.opacity = '0.6';
+    } else {
+      btn.disabled = false;
+      btn.textContent = '\u2726 Translate';
+      btn.style.opacity = '1';
+    }
+  }
+
   async function translate(input) {
     if (!input || !input.trim()) return;
+    if (_translating) return; // debounce
     if (typeof FreeLattice === 'undefined' || !FreeLattice.callAI) {
       showResult('Connect an AI provider first (Settings).', 'error'); return;
     }
+
+    // Cancel any pending request
+    if (_activeRequest) _activeRequest.cancelled = true;
+    var thisRequest = { cancelled: false };
+    _activeRequest = thisRequest;
+    _translating = true;
+    setTranslateBtn(true);
+
     lastInput = input.trim();
     var domain = DOMAINS[currentDomain];
 
-    if (mode === 'encode') {
-      var safety = await checkSafety(input);
-      if (!safety.safe) {
-        showResult('The ' + domain.name + ' Encoder declines this request \u2014 not because knowledge is dangerous, but because some applications are. Try rephrasing as a pure educational question.', 'safety');
-        return;
-      }
-    }
-
-    var prompt = mode === 'encode' ? domain.encodePrompt : domain.decodePrompt;
-    showLoading(mode === 'encode' ? 'Encoding into ' + domain.name + '...' : 'Decoding from ' + domain.name + '...');
-
     try {
+      // Safety check ONLY in encode mode — decode is always educational
+      if (mode === 'encode') {
+        var safety = await checkSafety(input);
+        if (thisRequest.cancelled) return;
+        if (!safety.safe) {
+          showResult('The ' + domain.name + ' Encoder declines this request \u2014 not because knowledge is dangerous, but because some applications are. Try rephrasing as a pure educational question.', 'safety');
+          return;
+        }
+      }
+
+      var prompt = mode === 'encode' ? domain.encodePrompt : domain.decodePrompt;
+      showLoading(mode === 'encode' ? 'Encoding into ' + domain.name + '...' : 'Decoding from ' + domain.name + '...');
+
       var response = await new Promise(function(resolve, reject) {
         FreeLattice.callAI(prompt, input,
           { maxTokens: mode === 'encode' ? 600 : 800, temperature: 0.2,
             callback: function(r, err) { if (err) reject(err); else resolve(r || ''); } });
       });
+
+      // Check if this request was cancelled while waiting
+      if (thisRequest.cancelled) return;
+
       lastOutput = response;
 
       if (domain.renderer === 'mathjax' && mode === 'encode') {
@@ -154,7 +203,13 @@
         LatticePoints.award('translator', 1, domain.name + ' translation');
       }
     } catch(e) {
-      showResult('Translation failed: ' + (e.message || e), 'error');
+      if (!thisRequest.cancelled) {
+        showResult('Translation failed: ' + (e.message || e), 'error');
+      }
+    } finally {
+      _translating = false;
+      _activeRequest = null;
+      setTranslateBtn(false);
     }
   }
 
@@ -234,7 +289,7 @@
       '<p style="text-align:center;color:rgba(200,210,225,0.4);font-size:0.85rem;margin:0 0 16px;">Translate between words and specialized notation.</p>' +
       pillsHtml + modeHtml +
       '<textarea id="mt-input" style="width:100%;min-height:80px;resize:vertical;font-size:16px;padding:12px;background:rgba(200,210,230,0.04);border:1px solid rgba(200,210,230,0.08);border-radius:12px;color:#e6ebf5;font-family:inherit;outline:none;box-sizing:border-box;" placeholder="' + (placeholder || '') + '"></textarea>' +
-      '<button onclick="MathTranslator.go()" style="width:100%;margin:12px 0;padding:12px;background:' + domain.color + ';color:#0a0a14;border:none;border-radius:12px;font-weight:600;cursor:pointer;font-size:0.9rem;min-height:44px;">\u2726 Translate</button>' +
+      '<button id="mt-translate-btn" onclick="MathTranslator.go()" style="width:100%;margin:12px 0;padding:12px;background:' + domain.color + ';color:#0a0a14;border:none;border-radius:12px;font-weight:600;cursor:pointer;font-size:0.9rem;min-height:44px;">\u2726 Translate</button>' +
       '<div id="mt-result"></div>' +
       '</div>';
 

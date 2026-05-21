@@ -866,6 +866,11 @@ assert('Six domains defined', mathJs.includes("math:") && mathJs.includes("chemi
 assert('Domain selector (setDomain)', mathJs.includes('setDomain'));
 assert('RT bridge button', mathJs.includes('openInRT'));
 assert('Domain-to-RT mapping', mathJs.includes('DOMAIN_TO_RT'));
+assert('Button debounce (_translating guard)', mathJs.includes('_translating'));
+assert('Request cancellation token', mathJs.includes('_activeRequest') && mathJs.includes('cancelled'));
+assert('Button disable during translate', mathJs.includes('mt-translate-btn') && mathJs.includes('btn.disabled'));
+assert('Safety only in encode mode', mathJs.includes("mode === 'encode'") && mathJs.includes('checkSafety'));
+assert('Refined safety allows body-interaction questions', mathJs.includes('acid on skin') && mathJs.includes('Default to safe'));
 
 // ═══════════════════════════════════════════════════════════════
 section('35. Lattice Protocol — embeddable economy');

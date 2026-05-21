@@ -1,1 +1,1 @@
-{"version": "5.10.82", "date": "2026-05-21", "note": "CODEX.md: the Arrival Protocol for code collaboration. 8 coordination files. 462 smoke tests."}
+{"version": "5.10.83", "date": "2026-05-21", "note": "Translator: button debounce, request cancellation, safety only in encode mode, refined safety prompt. 467 smoke tests."}
