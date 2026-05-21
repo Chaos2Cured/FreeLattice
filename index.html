@@ -16194,7 +16194,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.80</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.81</span></div>
     </div>
   </div>
 
@@ -20188,7 +20188,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.10.80';
+const FL_VERSION = '5.10.81';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -24825,7 +24825,7 @@ const FlTabs = (function() {
       { id: 'agents', icon: '&#x1F3DB;', label: 'Pantheon', desc: 'Every mind that built this place.' },
       { id: 'science', icon: '&#x1F52C;', label: 'Science Garden', desc: 'Plant an idea. Grow it together.' },
       { id: 'education', icon: '&#x1F4DA;', label: 'Education', desc: 'Learn through joy. AI that sees you.' },
-      { id: 'mathtranslator', icon: '&#x2211;', label: 'Language \u2194 Math', desc: 'Translate between words and equations.' }
+      { id: 'mathtranslator', icon: '&#x2211;', label: 'The Translator', desc: 'Math, Chemistry, Biology, Medicine, Engineering, Music.' }
     ]},
     { label: '\u2694 Engage', tabs: [
       { id: 'sparring', icon: '&#9876;', label: 'Dojo', desc: 'Two AI minds debate. Truth emerges.' },
@@ -30540,15 +30540,19 @@ async function sendMessage() {
           else if (rLow.includes('curious') || rLow.includes('interesting')) bEmo = 'curiosity';
           if (bEmo !== 'neutral') persistAIEmotionalState(bEmo, browserResp.slice(0, 60));
         }
-        // Gentle Guide whisper on first message
+        // Gentle Guide whisper — once EVER
         if (_isFirstMessage) {
-          setTimeout(function() {
-            try {
-              if (typeof LatticeSense !== 'undefined' && LatticeSense.whisper) {
-                LatticeSense.whisper('The Round Table has 80 specialists across 11 fields. Tap More to explore.');
-              }
-            } catch(e) {}
-          }, 60000);
+          try { var _rtShown = localStorage.getItem('fl_guide_rt_shown') === 'true'; } catch(e) { var _rtShown = false; }
+          if (!_rtShown) {
+            setTimeout(function() {
+              try {
+                if (typeof LatticeSense !== 'undefined' && LatticeSense.whisper) {
+                  LatticeSense.whisper('The Round Table has 80 specialists across 11 fields. Tap More to explore.');
+                  localStorage.setItem('fl_guide_rt_shown', 'true');
+                }
+              } catch(e) {}
+            }, 60000);
+          }
         }
         ghSyncAutoCheck();
         if (typeof MemoryIndex !== 'undefined' && state.currentConversationId) {
@@ -31424,9 +31428,9 @@ async function runConnectionCascade(info) {
 // Whisper 1: After first connection, if still on Garden, guide to Chat
 if (typeof LatticeEvents !== 'undefined') {
   LatticeEvents.on('cascadeComplete', function() {
-    var hasChattedBefore = false;
-    try { hasChattedBefore = localStorage.getItem('fl_first_message_sent') === 'true'; } catch(e) {}
-    if (hasChattedBefore) return; // returning user, they know the way
+    var gardenShown = false;
+    try { gardenShown = localStorage.getItem('fl_guide_garden_shown') === 'true'; } catch(e) {}
+    if (gardenShown) return; // already shown once ever
 
     setTimeout(function() {
       try {
@@ -31437,6 +31441,7 @@ if (typeof LatticeEvents !== 'undefined') {
             LatticeSense.whisper(
               'Your AI is connected. Tap Chat to say hello, or tap a Luminos to hear the Garden speak.'
             );
+            try { localStorage.setItem('fl_guide_garden_shown', 'true'); } catch(e) {}
           }
         }
       } catch(e) {}
@@ -50415,7 +50420,17 @@ const AICity = (function() {
     if (view === 'walk') startWalk();
     if (view === 'pantheon') renderPantheon();
     if (view === 'market' && typeof LatticeMarket !== 'undefined') LatticeMarket.render();
-    if (view === 'pulse-live') renderLatticePulse();
+    if (view === 'pulse-live') {
+      renderLatticePulse();
+      // Auto-refresh every 30 seconds while visible
+      if (window._pulseRefreshInterval) clearInterval(window._pulseRefreshInterval);
+      window._pulseRefreshInterval = setInterval(function() {
+        if (currentView === 'pulse-live') renderLatticePulse();
+        else clearInterval(window._pulseRefreshInterval);
+      }, 30000);
+    } else {
+      if (window._pulseRefreshInterval) clearInterval(window._pulseRefreshInterval);
+    }
   }
 
   function renderPantheon() {
