@@ -913,6 +913,26 @@ assert('Settings in More menu', appHtml.includes("label: 'Settings'"));
 assert('Community in More menu', appHtml.includes("label: 'Community'"));
 
 // ═══════════════════════════════════════════════════════════════
+section('46. Idea Forge');
+// ═══════════════════════════════════════════════════════════════
+var forgeJs = '';
+try { forgeJs = require('fs').readFileSync('docs/modules/idea-forge.js', 'utf8'); } catch(e) {}
+assert('idea-forge.js exists', forgeJs.length > 100);
+assert('IdeaForge window export', forgeJs.includes('window.IdeaForge'));
+assert('Tab panel exists', appHtml.includes('id="tab-ideaforge"'));
+assert('In MORE_TAB_IDS', appHtml.includes("'ideaforge'"));
+assert('In LEARN_TABS', appHtml.includes("'ideaforge'"));
+assert('Lazy loader wired', appHtml.includes('idea-forge.js'));
+assert('SW cache entry', swJs.includes('idea-forge.js'));
+assert('Three stages (shape, deepen, plan)', forgeJs.includes('shape') && forgeJs.includes('deepen') && forgeJs.includes('plan'));
+assert('Specialist consultation', forgeJs.includes('specialist'));
+assert('Feasibility rating', forgeJs.includes('feasibility'));
+assert('Plant in Core action', forgeJs.includes('plantInCore'));
+assert('RT bridge action', forgeJs.includes('openInRT'));
+assert('See the Math action', forgeJs.includes('seeTheMath'));
+assert('Learn landing page has Idea Forge card', appHtml.includes("switchTab('ideaforge')"));
+
+// ═══════════════════════════════════════════════════════════════
 section('35. Lattice Protocol — embeddable economy');
 // ═══════════════════════════════════════════════════════════════
 var protocolJs = '';

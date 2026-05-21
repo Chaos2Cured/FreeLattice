@@ -3,7 +3,7 @@
 // API calls are never cached
 // VERSION: Must match version.json — update both together
 
-const CACHE_NAME = 'freelattice-v5.10.89';
+const CACHE_NAME = 'freelattice-v5.10.90';
 
 const APP_SHELL = [
   './',
@@ -75,6 +75,7 @@ const APP_SHELL = [
     './modules/lattice-puzzles.js',
     './modules/flow-game.js',
     './modules/math-translator.js',
+    './modules/idea-forge.js',
     './lattice-protocol.js'
 ];
 

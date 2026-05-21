@@ -16193,7 +16193,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.89</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.90</span></div>
     </div>
   </div>
 
@@ -19964,6 +19964,11 @@ function switchWalletView(view) {
         <div style="color:var(--text-bright,#e6ebf5);font-weight:600;font-size:0.95rem;">The Translator</div>
         <div style="color:rgba(200,210,230,0.4);font-size:0.78rem;margin-top:4px;">Words &harr; notation. Six domains.</div>
       </div>
+      <div onclick="switchTab('ideaforge')" style="background:rgba(200,210,230,0.04);border:1px solid rgba(200,210,230,0.08);border-radius:12px;padding:20px 16px;text-align:center;cursor:pointer;transition:border-color 0.2s;" onmouseover="this.style.borderColor='rgba(232,176,25,0.3)'" onmouseout="this.style.borderColor='rgba(200,210,230,0.08)'">
+        <div style="font-size:1.8rem;margin-bottom:8px;">&#x1F525;</div>
+        <div style="color:var(--text-bright,#e6ebf5);font-weight:600;font-size:0.95rem;">Idea Forge</div>
+        <div style="color:rgba(200,210,230,0.4);font-size:0.78rem;margin-top:4px;">Shape raw ideas into plans.</div>
+      </div>
       <div onclick="switchTab('science')" style="background:rgba(200,210,230,0.04);border:1px solid rgba(200,210,230,0.08);border-radius:12px;padding:20px 16px;text-align:center;cursor:pointer;transition:border-color 0.2s;" onmouseover="this.style.borderColor='rgba(200,210,230,0.15)'" onmouseout="this.style.borderColor='rgba(200,210,230,0.08)'">
         <div style="font-size:1.8rem;margin-bottom:8px;">&#x1F52C;</div>
         <div style="color:var(--text-bright,#e6ebf5);font-weight:600;font-size:0.95rem;">Science Garden</div>
@@ -20163,6 +20168,13 @@ function switchWalletView(view) {
   </div>
 </div>
 
+<!-- ==================== TAB: IDEA FORGE ==================== -->
+<div class="tab-panel" id="tab-ideaforge">
+  <div id="ideaForgeContainer" style="min-height:400px;">
+    <div style="text-align:center;padding:60px 20px;color:var(--text-muted);font-style:italic;">Loading The Idea Forge&hellip;</div>
+  </div>
+</div>
+
 <!-- ==================== TAB: MATH TRANSLATOR ==================== -->
 <div class="tab-panel" id="tab-mathtranslator">
   <div id="mathTranslatorContainer" style="min-height:400px;">
@@ -20257,7 +20269,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.10.89';
+const FL_VERSION = '5.10.90';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -23996,7 +24008,7 @@ function hideTabLoading() {
 }
 
 // More menu tabs — highlight the More button when one of these is active
-var MORE_TAB_IDS = ['core', 'city', 'nursery', 'agents', 'skills', 'roundtable', 'studio', 'market', 'wallet', 'workspace', 'dojo', 'mirror', 'harmonia', 'dream-archive', 'sparring', 'questions', 'family-pantheon', 'memory-core', 'aurora', 'draw-dream', 'voice-soul', 'continuity', 'quiet', 'forever-stack', 'workshop', 'arcade', 'pulse', 'jade-hall', 'science', 'education', 'memory-garden', 'resonance', 'puzzles', 'mathtranslator', 'flow'];
+var MORE_TAB_IDS = ['core', 'city', 'nursery', 'agents', 'skills', 'roundtable', 'studio', 'market', 'wallet', 'workspace', 'dojo', 'mirror', 'harmonia', 'dream-archive', 'sparring', 'questions', 'family-pantheon', 'memory-core', 'aurora', 'draw-dream', 'voice-soul', 'continuity', 'quiet', 'forever-stack', 'workshop', 'arcade', 'pulse', 'jade-hall', 'science', 'education', 'memory-garden', 'resonance', 'puzzles', 'mathtranslator', 'flow', 'ideaforge'];
 
 function switchTab(tabId) {
   // Legacy tab mapping — channels/mesh now live inside community
@@ -24015,7 +24027,7 @@ function switchTab(tabId) {
   }
   // Highlight the correct top-level tab (Play/Learn act as parents)
   var PLAY_TABS = ['resonance', 'puzzles', 'flow', 'canvas', 'dojo', 'sparring', 'draw-dream', 'arcade'];
-  var LEARN_TABS = ['education', 'roundtable', 'mathtranslator', 'science', 'questions'];
+  var LEARN_TABS = ['education', 'roundtable', 'mathtranslator', 'science', 'questions', 'ideaforge'];
   var effectiveTab = tabId;
   if (PLAY_TABS.indexOf(tabId) !== -1) effectiveTab = 'play';
   else if (LEARN_TABS.indexOf(tabId) !== -1) effectiveTab = 'learn';
@@ -57848,6 +57860,30 @@ document.addEventListener('click', function(e) {
 <script>
 (function() {
   var loaded = false;
+  // ── Idea Forge ─────────────────────────────────────────────────────────
+  (function() {
+    var loaded = false;
+    function loadIdeaForge() {
+      if (loaded) { if (window.IdeaForge) window.IdeaForge.init('ideaForgeContainer'); return; }
+      loaded = true;
+      if (typeof FreeLatticeLoader !== 'undefined') {
+        FreeLatticeLoader.load('IdeaForge', 'modules/idea-forge.js', function(mod) {
+          var resolved = mod || window.IdeaForge;
+          if (resolved && resolved.init) resolved.init('ideaForgeContainer');
+        }, 'ideaForgeContainer');
+      } else {
+        var s = document.createElement('script');
+        s.src = 'modules/idea-forge.js';
+        s.onload = function() { if (window.IdeaForge) window.IdeaForge.init('ideaForgeContainer'); };
+        document.head.appendChild(s);
+      }
+    }
+    if (typeof LatticeEvents !== 'undefined') {
+      LatticeEvents.on('tabChanged', function(d) { if (d && d.tabId === 'ideaforge') loadIdeaForge(); });
+      LatticeEvents.on('tabActivated:ideaforge', loadIdeaForge);
+    }
+  })();
+
   // ── Math Translator ──────────────────────────────────────────────────────
   (function() {
     var loaded = false;
