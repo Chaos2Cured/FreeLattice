@@ -348,17 +348,17 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-05-21 11:15 MDT
-- Version: 5.10.86
-- Total commits: 1716
+- Last auto-updated: 2026-05-21 11:41 MDT
+- Version: 5.10.87
+- Total commits: 1721
 - Last 10 commits:
-- 0167cf2 feat: Five-door navigation — Garden, Chat, Play, Learn, More (v5.10.86)
+- 6487424 fix: Emoji visible + duplicate LP badge hidden (v5.10.87)
+- 6bbdfda ci: Update Primer deployment state [2026-05-21]
+- 74410b8 docs: Auto-update Session Primer [5.10.86]
+- f0fe42b docs: Auto-update Session Primer [5.10.86]
+- 5e5a6b8 feat: Five-door navigation — Garden, Chat, Play, Learn, More (v5.10.86)
+- 4deaaaa ci: Update Primer deployment state [2026-05-21]
 - d8cc72c docs: Auto-update Session Primer [5.10.85]
 - 4b99cf6 docs: Auto-update Session Primer [5.10.85]
 - 40f846a feat: Garden Play — Luminos invite you to games (v5.10.85)
 - 49f1f52 ci: Update Primer deployment state [2026-05-21]
-- e6687d3 docs: Auto-update Session Primer [5.10.84]
-- bc84be5 docs: Auto-update Session Primer [5.10.84]
-- fece519 fix: LP simplified — one number, self-healing chain, Your Story (v5.10.84)
-- 83a2941 ci: Update Primer deployment state [2026-05-21]
-- ebe2cc7 docs: Auto-update Session Primer [5.10.83]
