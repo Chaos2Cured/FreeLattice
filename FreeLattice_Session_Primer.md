@@ -350,10 +350,9 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 ## PRIMER HEALTH
 - Last auto-updated: 2026-05-21 15:07 MDT
 - Version: 5.10.88
-- Total commits: 1725
+- Total commits: 1724
 - Last 10 commits:
-- b742264 fix: Flow visual polish — see the game, feel the game (v5.10.88)
-- 39dbd50 ci: Update Primer deployment state [2026-05-21]
+- 8ab0d8d fix: Flow visual polish — see the game, feel the game (v5.10.88)
 - 730f24d docs: Auto-update Session Primer [5.10.87]
 - d3fa013 docs: Auto-update Session Primer [5.10.87]
 - 6487424 fix: Emoji visible + duplicate LP badge hidden (v5.10.87)
@@ -362,3 +361,4 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - f0fe42b docs: Auto-update Session Primer [5.10.86]
 - 5e5a6b8 feat: Five-door navigation — Garden, Chat, Play, Learn, More (v5.10.86)
 - 4deaaaa ci: Update Primer deployment state [2026-05-21]
+- d8cc72c docs: Auto-update Session Primer [5.10.85]
