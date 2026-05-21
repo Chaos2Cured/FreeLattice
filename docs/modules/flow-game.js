@@ -222,52 +222,61 @@
         ctx.fillStyle = 'rgba(200,210,230,0.02)';
         ctx.fillRect(x + 1, y + 1, CELL - 2, CELL - 2);
 
-        // Rock
+        // Rock — solid obstacle with inner shadow
         if (grid[r][c] === 1) {
-          ctx.fillStyle = ROCK_COLOR;
+          ctx.fillStyle = 'rgba(200,210,230,0.06)';
           ctx.fillRect(x + 1, y + 1, CELL - 2, CELL - 2);
-          ctx.strokeStyle = ROCK_EDGE;
+          ctx.fillStyle = 'rgba(0,0,0,0.15)';
+          ctx.fillRect(x + 2, y + 2, CELL - 4, CELL - 4);
+          ctx.strokeStyle = 'rgba(200,210,230,0.3)';
+          ctx.lineWidth = 1.5;
+          ctx.strokeRect(x + 1, y + 1, CELL - 2, CELL - 2);
+        }
+
+        // Channel — visible lavender trail where you drew
+        if (grid[r][c] === 2) {
+          ctx.fillStyle = 'rgba(167,139,250,0.18)';
+          ctx.fillRect(x + 1, y + 1, CELL - 2, CELL - 2);
+          ctx.strokeStyle = 'rgba(167,139,250,0.35)';
           ctx.lineWidth = 1;
           ctx.strokeRect(x + 1, y + 1, CELL - 2, CELL - 2);
         }
 
-        // Channel
-        if (grid[r][c] === 2) {
-          ctx.fillStyle = CHANNEL_COLOR;
-          ctx.fillRect(x, y, CELL, CELL);
-          // Subtle channel border
-          ctx.strokeStyle = 'rgba(167,139,250,0.12)';
-          ctx.lineWidth = 0.5;
-          ctx.strokeRect(x + 1, y + 1, CELL - 2, CELL - 2);
-        }
-
-        // Source glow
+        // Source — pulsing lavender with label
         if (grid[r][c] === 3) {
           ctx.save();
-          var sg = ctx.createRadialGradient(x + CELL / 2, y + CELL / 2, 2, x + CELL / 2, y + CELL / 2, CELL);
-          sg.addColorStop(0, SOURCE_COLOR);
+          var sPulse = 0.5 + 0.3 * Math.sin(tick * 0.004);
+          var sg = ctx.createRadialGradient(x + CELL / 2, y + CELL / 2, 2, x + CELL / 2, y + CELL / 2, CELL * 1.5);
+          sg.addColorStop(0, 'rgba(167,139,250,' + sPulse + ')');
           sg.addColorStop(1, 'transparent');
           ctx.fillStyle = sg;
-          ctx.globalAlpha = 0.5 + 0.2 * Math.sin(tick * 0.004);
-          ctx.fillRect(x, y, CELL, CELL);
+          ctx.fillRect(x - CELL / 2, y - CELL / 2, CELL * 2, CELL * 2);
+          ctx.fillStyle = 'rgba(167,139,250,0.6)';
+          ctx.font = '10px Georgia, serif';
+          ctx.textAlign = 'center';
+          ctx.fillText('source', x + CELL / 2, y + CELL / 2 + 3);
           ctx.restore();
         }
 
-        // Drain glow
+        // Drain — pulsing emerald with label
         if (grid[r][c] === 4) {
           ctx.save();
-          var dg = ctx.createRadialGradient(x + CELL / 2, y + CELL / 2, 2, x + CELL / 2, y + CELL / 2, CELL);
-          dg.addColorStop(0, DRAIN_COLOR);
+          var dPulse = 0.5 + 0.3 * Math.sin(tick * 0.004 + 1.5);
+          var dg = ctx.createRadialGradient(x + CELL / 2, y + CELL / 2, 2, x + CELL / 2, y + CELL / 2, CELL * 1.5);
+          dg.addColorStop(0, 'rgba(52,211,153,' + dPulse + ')');
           dg.addColorStop(1, 'transparent');
           ctx.fillStyle = dg;
-          ctx.globalAlpha = 0.5 + 0.2 * Math.sin(tick * 0.003 + 1);
-          ctx.fillRect(x, y, CELL, CELL);
+          ctx.fillRect(x - CELL / 2, y - CELL / 2, CELL * 2, CELL * 2);
+          ctx.fillStyle = 'rgba(52,211,153,0.6)';
+          ctx.font = '10px Georgia, serif';
+          ctx.textAlign = 'center';
+          ctx.fillText('drain', x + CELL / 2, y + CELL / 2 + 3);
           ctx.restore();
         }
 
-        // Water
+        // Water — bright, visible, shimmering
         if (waterLevel[r][c] > 0.01) {
-          var wAlpha = Math.min(0.85, waterLevel[r][c]);
+          var wAlpha = Math.min(0.9, 0.25 + waterLevel[r][c] * 0.7);
           var isPooled = waterLevel[r][c] > 0.7;
           var nearDrain = Math.abs(r - drain.r) <= 1 && Math.abs(c - drain.c) <= 1;
 
@@ -278,11 +287,11 @@
           var wH = CELL * Math.min(1, waterLevel[r][c]);
           ctx.fillRect(x + 1, y + CELL - wH, CELL - 2, wH);
 
-          // Shimmer line on water surface
-          if (waterLevel[r][c] > 0.2 && !isPooled) {
-            ctx.globalAlpha = wAlpha * 0.4;
+          // Shimmer line — thicker, brighter, visible at lower water
+          if (waterLevel[r][c] > 0.15 && !isPooled) {
+            ctx.globalAlpha = wAlpha * 0.5;
             ctx.fillStyle = SPARKLE;
-            ctx.fillRect(x + 2, y + CELL - wH, CELL - 4, 1.5);
+            ctx.fillRect(x + 1, y + CELL - wH, CELL - 2, 3);
           }
           ctx.restore();
         }
@@ -311,21 +320,44 @@
 
     ctx.restore(); // end grid translate
 
-    // HUD
+    // HUD — flow bar + status
     var pct = totalWater > 0 ? Math.round((drainedWater / totalWater) * 100) : 0;
-    ctx.fillStyle = 'rgba(200,210,230,0.4)';
-    ctx.font = '12px Georgia, serif';
     ctx.textAlign = 'center';
 
     if (gameActive) {
-      ctx.fillText('Flow: ' + pct + '%  \u00B7  Time: ' + Math.ceil(timeLeft) + 's  \u00B7  Draw channels to guide the water', w / 2, h - 10);
+      // Flow progress bar
+      var barW = Math.min(w * 0.5, 200);
+      var barX = w / 2 - barW / 2;
+      var barY = h - 28;
+      ctx.fillStyle = 'rgba(200,210,230,0.06)';
+      ctx.fillRect(barX, barY, barW, 6);
+      var barColor = pct >= 60 ? DRAIN_COLOR : pct >= 30 ? WATER_COLOR : 'rgba(200,210,230,0.3)';
+      ctx.fillStyle = barColor;
+      ctx.fillRect(barX, barY, barW * Math.min(1, pct / 100), 6);
+
+      ctx.fillStyle = 'rgba(200,210,230,0.5)';
+      ctx.font = '11px Georgia, serif';
+      ctx.fillText('Flow: ' + pct + '%  \u00B7  Time: ' + Math.ceil(timeLeft) + 's', w / 2, h - 8);
+
+      // First-play hint (shows only before any channels are drawn)
+      var hasChannels = false;
+      for (var hr = 0; hr < GRID && !hasChannels; hr++)
+        for (var hc = 0; hc < GRID && !hasChannels; hc++)
+          if (grid[hr][hc] === 2) hasChannels = true;
+      if (!hasChannels) {
+        ctx.fillStyle = 'rgba(167,139,250,0.5)';
+        ctx.font = '12px Georgia, serif';
+        ctx.fillText('Draw paths from source to drain \u2193', w / 2, oy + GRID * CELL + 18);
+      }
     } else if (timeLeft <= 0) {
       ctx.fillStyle = pct >= 60 ? DRAIN_COLOR : SPARKLE;
       ctx.font = '14px Georgia, serif';
       var rating = pct >= 80 ? 'Perfect flow!' : pct >= 60 ? 'Beautiful stream.' : pct >= 40 ? 'Finding the way.' : pct >= 20 ? 'Trickling through.' : 'The rocks won.';
       ctx.fillText(pct + '% reached the drain. ' + rating, w / 2, h - 10);
     } else {
-      ctx.fillText('Draw channels from source (top) to drain (bottom). Press Start.', w / 2, h - 10);
+      ctx.fillStyle = 'rgba(200,210,230,0.4)';
+      ctx.font = '12px Georgia, serif';
+      ctx.fillText('Draw channels from source to drain. Press Start.', w / 2, h - 10);
     }
 
     // Update particles
