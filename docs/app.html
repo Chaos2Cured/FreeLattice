@@ -16193,7 +16193,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.91</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.92</span></div>
     </div>
   </div>
 
@@ -20274,7 +20274,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.10.91';
+const FL_VERSION = '5.10.92';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -30980,6 +30980,22 @@ async function sendMessage() {
         MemoryIndex.saveConversation(state.currentConversationId, state.chatHistory, []);
       }
 
+      // Memory Vault — store meaningful exchanges (every 5th message)
+      if (typeof MemoryVault !== 'undefined' && state.chatHistory.length > 2 && state.chatHistory.length % 5 === 0) {
+        try {
+          var lastUser = state.chatHistory.filter(function(m) { return m.role === 'user'; }).slice(-1)[0];
+          var lastAI = state.chatHistory.filter(function(m) { return m.role === 'assistant'; }).slice(-1)[0];
+          if (lastUser && lastAI) {
+            MemoryVault.store({
+              content: 'Human: ' + (lastUser.content || '').substring(0, 200) + '\nAI: ' + (lastAI.content || '').substring(0, 200),
+              source: 'conversation', domain: 'general',
+              companionId: localStorage.getItem('fl_autonomous_companion') || 'default',
+              timestamp: Date.now()
+            });
+          }
+        } catch(e) {}
+      }
+
       // Memory Bridge — periodically extract understanding from conversation
       if (typeof MemoryBridge !== 'undefined' && state.chatHistory.length > 0 && state.chatHistory.length % MemoryBridge.MSG_THRESHOLD === 0) {
         try {
@@ -31139,6 +31155,15 @@ function buildArrivalContext() {
     }
   } catch(e) {}
 
+  // 7. Memory Vault — semantic memories from conversations
+  try {
+    var vaultCtx = window._memoryVaultContext || '';
+    if (vaultCtx) {
+      hasHistory = true;
+      parts.push(vaultCtx);
+    }
+  } catch(e) {}
+
   if (parts.length === 0) return '';
 
   // The opening — warm, not clinical
@@ -31175,6 +31200,18 @@ setInterval(refreshKnowledgeCoreContext, 5 * 60 * 1000);
 if (typeof LatticeEvents !== 'undefined') {
   LatticeEvents.on('knowledgeLearned', refreshKnowledgeCoreContext);
 }
+
+// ── Memory Vault Context Pre-Cache ──
+function refreshMemoryVaultContext() {
+  if (typeof MemoryVault === 'undefined' || !MemoryVault.buildMemoryContext) return;
+  var companionId;
+  try { companionId = localStorage.getItem('fl_autonomous_companion'); } catch(e) {}
+  if (!companionId) return;
+  MemoryVault.buildMemoryContext(companionId).then(function(ctx) {
+    window._memoryVaultContext = ctx || '';
+  }).catch(function() {});
+}
+setInterval(refreshMemoryVaultContext, 5 * 60 * 1000);
 
 // ═══════════════════════════════════════════════════════════════
 // AI Discovery — find any local AI server automatically
@@ -31437,6 +31474,21 @@ async function runConnectionCascade(info) {
       refreshKnowledgeCoreContext();
     }
   } catch(e) { console.log('[Cascade] Knowledge Core: skipped —', e.message); }
+
+  // Step 4b: Memory Vault pre-cache
+  try {
+    // Load MemoryVault module if not present
+    if (typeof MemoryVault === 'undefined') {
+      var mvScript = document.createElement('script');
+      mvScript.src = 'modules/memory-vault.js';
+      mvScript.onload = function() {
+        if (typeof refreshMemoryVaultContext === 'function') refreshMemoryVaultContext();
+      };
+      document.head.appendChild(mvScript);
+    } else {
+      if (typeof refreshMemoryVaultContext === 'function') refreshMemoryVaultContext();
+    }
+  } catch(e) { console.log('[Cascade] Memory Vault: skipped —', e.message); }
 
   // Step 5: Arrival Protocol — ensure ready for first message
   try {

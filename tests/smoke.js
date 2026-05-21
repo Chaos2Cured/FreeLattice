@@ -933,6 +933,22 @@ assert('See the Math action', forgeJs.includes('seeTheMath'));
 assert('Learn landing page has Idea Forge card', appHtml.includes("switchTab('ideaforge')"));
 
 // ═══════════════════════════════════════════════════════════════
+section('47. Memory Vault — Browser-Native Semantic Memory');
+// ═══════════════════════════════════════════════════════════════
+var vaultJs = '';
+try { vaultJs = require('fs').readFileSync('docs/modules/memory-vault.js', 'utf8'); } catch(e) {}
+assert('memory-vault.js exists', vaultJs.length > 100);
+assert('MemoryVault window export', vaultJs.includes('window.MemoryVault'));
+assert('Cosine similarity', vaultJs.includes('cosineSimilarity'));
+assert('Word-frequency vectors', vaultJs.includes('textToVector'));
+assert('Optional Ollama embeddings', vaultJs.includes('nomic-embed-text'));
+assert('buildMemoryContext for Arrival', vaultJs.includes('buildMemoryContext'));
+assert('SW cache entry', swJs.includes('memory-vault.js'));
+assert('Wired into Arrival Protocol', appHtml.includes('_memoryVaultContext'));
+assert('Wired into Cascade', appHtml.includes('Memory Vault'));
+assert('Stores conversation exchanges', appHtml.includes('MemoryVault.store'));
+
+// ═══════════════════════════════════════════════════════════════
 section('35. Lattice Protocol — embeddable economy');
 // ═══════════════════════════════════════════════════════════════
 var protocolJs = '';

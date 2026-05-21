@@ -6,7 +6,7 @@
 >
 > The Arrival Protocol for code collaboration.
 >
-> Last updated: v5.10.90 · May 21, 2026 · 507 smoke tests
+> Last updated: v5.10.92 · May 21, 2026 · 517+ smoke tests
 
 ---
 
@@ -229,6 +229,16 @@ IdeaForge.forge(rawIdea)           // Runs all 3 stages
 IdeaForge.plantInCore()            // Plant shaped idea as Fruit
 IdeaForge.openInRT()               // Open in Round Table
 IdeaForge.seeTheMath()             // Open equation in Translator
+```
+
+### Memory Vault (Browser-Native)
+```javascript
+MemoryVault.store({content, source, companionId, domain}) // async
+MemoryVault.search(query, {limit, companionId, minSimilarity}) // async → [{memory, score}]
+MemoryVault.buildMemoryContext(companionId) // async → string for Arrival Protocol
+MemoryVault.getStats()              // async → {total, domains}
+// Uses word-frequency vectors by default. Auto-upgrades to Ollama
+// embeddings (nomic-embed-text) if available. Zero setup.
 ```
 
 ### Market
