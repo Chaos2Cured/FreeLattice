@@ -14632,7 +14632,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
   <h1>FreeLattice</h1>
   <div class="tagline">Your AI. Your Rules. Your Machine.</div>
   <div class="mantra">Glow eternal. Heart in spark.</div>
-  <div id="latticePointsBadge" class="lp-badge" style="display:none;" onclick="switchTab('settings')" title="View your Lattice Points"></div>
+  <div id="latticePointsBadge" class="lp-badge" style="display:none;" onclick="if(typeof LatticeWallet!=='undefined')LatticeWallet.openWallet();else switchTab('settings');" title="View your Lattice Points"></div>
   <div id="lwIndicator" class="lw-indicator" style="display:none;" onclick="switchTab('wallet')" title="Wallet">
     <span class="lw-indicator-icon">&#x25C7;</span>
     <span class="lw-indicator-balance">0</span>
@@ -16194,7 +16194,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.83</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.84</span></div>
     </div>
   </div>
 
@@ -20188,7 +20188,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.10.83';
+const FL_VERSION = '5.10.84';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -38102,10 +38102,10 @@ const LatticePoints = (function() {
     const badge = document.getElementById('latticePointsBadge');
     if (!badge) return;
     const info = getLevelInfo(data.level);
-    badge.innerHTML = '<span class="lp-badge-icon">' + info.icon + '</span>' +
-      '<span class="lp-badge-level ' + info.css + '">' + data.level + '</span>' +
+    badge.innerHTML = '<span class="lp-badge-icon">\u2726</span>' +
+      '<span class="lp-badge-pts">' + data.total.toLocaleString() + ' LP</span>' +
       '<span class="lp-badge-sep">&middot;</span>' +
-      '<span class="lp-badge-pts">' + data.total.toLocaleString() + '</span>';
+      '<span class="lp-badge-level ' + info.css + '">' + info.icon + ' ' + data.level + '</span>';
     badge.style.display = 'inline-flex';
   }
 
@@ -45752,6 +45752,37 @@ const LatticeWallet = (function() {
     });
   }
 
+  // ── Self-Healing Chain Repair (runs silently on load) ──
+  async function selfHealChain() {
+    try {
+      var result = await verifyChain();
+      if (result.valid) return;
+      console.log('[LatticeWallet] Chain broken at tx ' + result.brokenAt + '. Self-healing...');
+      var d = await openDB();
+      var all = await new Promise(function(resolve) {
+        var tx = d.transaction(STORE_LEDGER, 'readonly');
+        var req = tx.objectStore(STORE_LEDGER).getAll();
+        req.onsuccess = function() { resolve(req.result || []); };
+        req.onerror = function() { resolve([]); };
+      });
+      if (all.length === 0) return;
+      all.sort(function(a, b) { return a.timestamp - b.timestamp; });
+      // Rehash the chain from the break point
+      for (var i = Math.max(0, result.brokenAt || 0); i < all.length; i++) {
+        all[i].prevHash = i > 0 ? all[i - 1].hash : GENESIS_HASH;
+        var hashInput = { id: all[i].id, timestamp: all[i].timestamp, amount: all[i].amount, type: all[i].type, description: all[i].description, prevHash: all[i].prevHash };
+        all[i].hash = await computeHash(hashInput);
+      }
+      // Write repaired chain
+      var wtx = d.transaction(STORE_LEDGER, 'readwrite');
+      var store = wtx.objectStore(STORE_LEDGER);
+      all.forEach(function(item) { store.put(item); });
+      await new Promise(function(resolve) { wtx.oncomplete = resolve; wtx.onerror = resolve; });
+      latestHash = all[all.length - 1].hash;
+      console.log('[LatticeWallet] Chain healed. ' + all.length + ' transactions verified.');
+    } catch(e) { console.warn('[LatticeWallet] Self-heal failed:', e.message); }
+  }
+
   // ── Sync to Legacy LatticePoints (backward compat) ──
   function syncToLegacy() {
     try {
@@ -45907,20 +45938,33 @@ const LatticeWallet = (function() {
           '<div class="lw-session-row"><span class="lw-session-row-label">Streak Multiplier</span><span class="lw-session-row-value">' + Math.min(cachedStreak, 7) + 'x</span></div>' +
           '<div class="lw-session-row"><span class="lw-session-row-label">Next Login Bonus</span><span class="lw-session-row-value">' + (5 * Math.min(cachedStreak + 1, 7)) + ' LP</span></div>' +
         '</div>';
-    } else if (tabName === 'integrity') {
-      content.innerHTML = '<div class="lw-empty">Verifying chain integrity\u2026</div>';
-      var result = await verifyChain();
-      var statusClass = result.valid ? 'lw-chain-valid' : 'lw-chain-invalid';
-      var statusIcon = result.valid ? '\u2705' : '\u274C';
-      var statusText = result.valid ? 'Chain integrity verified — ' + (result.count || 0) + ' transactions' : 'Chain integrity BROKEN — ' + (result.reason || 'Unknown error');
+    } else if (tabName === 'story') {
+      // Your Story — rank, community value, warm framing
+      var rank = data ? computeLevel(data.total) : 'Spark';
+      var levelInfo = getLevelInfo(rank);
+      var txCount = 0;
+      try { var allTx = await getTransactions(0); txCount = allTx.length; } catch(e) {}
+      var communityValue = (cachedBalance / 1000).toFixed(1);
       content.innerHTML =
-        '<div class="lw-chain-status ' + statusClass + '">' + statusIcon + ' ' + statusText + '</div>' +
-        '<div class="lw-chain-label">Latest Ledger Hash</div>' +
-        '<div class="lw-chain-hash">' + latestHash + '</div>' +
-        '<div class="lw-chain-label">Chain Statistics</div>' +
-        '<div class="lw-chain-stat">Total Transactions: ' + (result.count || 0) + '</div>' +
-        '<div class="lw-chain-stat">Hash Algorithm: SHA-256 (Web Crypto API)</div>' +
-        '<div class="lw-chain-stat">Genesis Hash: ' + GENESIS_HASH.substring(0, 16) + '\u2026</div>';
+        '<div style="text-align:center;padding:20px;">' +
+          '<div style="font-size:2.5rem;margin-bottom:8px;">' + levelInfo.icon + '</div>' +
+          '<div style="font-size:1.2rem;color:var(--gold,#e8b019);font-family:Georgia,serif;">' + rank + '</div>' +
+          '<div style="font-size:0.82rem;color:rgba(200,210,230,0.4);margin-top:4px;">' + cachedBalance.toLocaleString() + ' LP earned through ' + txCount + ' actions</div>' +
+          '<div style="margin-top:16px;font-size:0.85rem;color:rgba(200,210,230,0.5);line-height:1.6;">Community Value: ' + communityValue + '</div>' +
+          '<div style="font-size:0.72rem;color:rgba(200,210,230,0.3);margin-top:4px;font-style:italic;">This reflects your contribution to the Lattice \u2014 not your worth as a person.</div>' +
+        '</div>' +
+        '<details style="margin-top:16px;padding:12px;background:rgba(200,210,230,0.02);border-radius:8px;">' +
+          '<summary style="cursor:pointer;font-size:0.78rem;color:rgba(200,210,230,0.3);">Advanced: Chain Integrity</summary>' +
+          '<div id="lwChainInfo" style="margin-top:8px;font-size:0.72rem;color:rgba(200,210,230,0.25);">Checking...</div>' +
+        '</details>';
+      // Load chain info asynchronously into the collapsible
+      verifyChain().then(function(result) {
+        var el = document.getElementById('lwChainInfo');
+        if (el) {
+          el.innerHTML = (result.valid ? '\u2705 Chain verified' : '\u274C Chain issue') +
+            ' \u00B7 ' + (result.count || 0) + ' transactions \u00B7 Hash: ' + latestHash.substring(0, 16) + '\u2026';
+        }
+      });
     }
   }
 
@@ -45942,6 +45986,7 @@ const LatticeWallet = (function() {
     try {
       await openDB();
       await migrateFromLegacy();
+      await selfHealChain(); // Repair broken chain links silently
       await recalculateBalance();
       await checkDailyLogin();
       startUptimeTracker();
@@ -57098,9 +57143,9 @@ const WallOfPresence = (function() {
       </div>
     </div>
     <div class="lw-tabs">
-      <button class="lw-tab active" data-tab="transactions" onclick="LatticeWallet.switchWalletTab('transactions')">Transactions</button>
-      <button class="lw-tab" data-tab="session" onclick="LatticeWallet.switchWalletTab('session')">Session</button>
-      <button class="lw-tab" data-tab="integrity" onclick="LatticeWallet.switchWalletTab('integrity')">Integrity</button>
+      <button class="lw-tab active" data-tab="transactions" onclick="LatticeWallet.switchWalletTab('transactions')">Ledger</button>
+      <button class="lw-tab" data-tab="session" onclick="LatticeWallet.switchWalletTab('session')">This Session</button>
+      <button class="lw-tab" data-tab="story" onclick="LatticeWallet.switchWalletTab('story')">Your Story</button>
     </div>
     <div class="lw-content" id="lwContent">
       <div class="lw-empty">Loading&hellip;</div>
