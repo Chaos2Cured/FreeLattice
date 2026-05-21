@@ -1,1 +1,1 @@
-{"version": "5.10.79", "date": "2026-05-20", "note": "Light mode killed permanently. Accent color picker (7 presets). Stale theme cleared. 458 smoke tests."}
+{"version": "5.10.80", "date": "2026-05-20", "note": "Accent color circles now render. Init timing fixed. 458 smoke tests."}
