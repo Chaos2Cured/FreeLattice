@@ -6,7 +6,7 @@
 >
 > The Arrival Protocol for code collaboration.
 >
-> Last updated: v5.10.81 · May 21, 2026 · 462 smoke tests
+> Last updated: v5.10.90 · May 21, 2026 · 507 smoke tests
 
 ---
 
@@ -222,6 +222,15 @@ MathTranslator.openInRT()         // Bridge to Round Table
 MathTranslator.DOMAINS            // Full domain config object
 ```
 
+### Idea Forge
+```javascript
+IdeaForge.init(containerId)
+IdeaForge.forge(rawIdea)           // Runs all 3 stages
+IdeaForge.plantInCore()            // Plant shaped idea as Fruit
+IdeaForge.openInRT()               // Open in Round Table
+IdeaForge.seeTheMath()             // Open equation in Translator
+```
+
 ### Market
 ```javascript
 LatticeMarket.render()
@@ -244,9 +253,24 @@ LatticeMarket.createListing(name, desc, price, category)
 })();
 ```
 
+### Five-Door Navigation (v5.10.86+)
+```
+Top bar: Garden | Chat | Play | Learn | More
+
+Play landing page → Resonance, Puzzles, Flow, Chalkboard, Dojo, Arcade
+Learn landing page → Education, Round Table, Translator, Idea Forge,
+                     Science Garden, Question Corner
+More menu → Nursery, Core, Community, Workshop, Jade Hall,
+            Quiet Room, Wallet, Settings, Forever Stack
+
+PLAY_TABS  = ['resonance','puzzles','flow','canvas','dojo','sparring','draw-dream','arcade']
+LEARN_TABS = ['education','roundtable','mathtranslator','science','questions','ideaforge']
+```
+Clicking a sub-tab highlights its parent (Play or Learn) in the nav bar.
+
 ### Tab Wiring (5 steps in app.html)
-1. Add to `MORE_TAB_IDS` array
-2. Add to `MORE_GROUPS` under correct group
+1. Add to `MORE_TAB_IDS` array (and `PLAY_TABS` or `LEARN_TABS` if applicable)
+2. Add to `MORE_GROUPS` under correct group (or Play/Learn landing page)
 3. Add tab panel HTML: `<div class="tab-panel" id="tab-{id}"><div id="{name}Container">Loading...</div></div>`
 4. Add lazy loader listening to `tabChanged` and `tabActivated:{id}`
 5. Add to `sw.js` APP_SHELL array
@@ -276,10 +300,10 @@ All games: mouse + touch + keyboard. 44px min touch targets. SoulCeremony after 
 
 ## Current Known Issues (Pass 2)
 
-- OG image missing (og-image.png referenced in meta tags)
+- OG image is a dark placeholder (needs Garden screenshot for full beauty)
 - rtCreateDomain migration incomplete (4 handwritten domains)
 - Settings has some hardcoded colors not yet using tokens
-- More menu icons inconsistent across items
+- Idea Forge "Plant" should send shaped structure to Science Garden (not just raw text)
 
 ## What NOT to Rebuild
 
