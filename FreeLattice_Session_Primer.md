@@ -348,17 +348,17 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-05-20 22:17 MDT
-- Version: 5.10.81
-- Total commits: 1696
+- Last auto-updated: 2026-05-21 10:06 MDT
+- Version: 5.10.82
+- Total commits: 1701
 - Last 10 commits:
-- efe25ce feat: Universal Translator (6 domains) + 4 polish items (v5.10.81)
+- f857e28 docs: CODEX.md — the Arrival Protocol for code collaboration (v5.10.82)
+- ff52339 ci: Update Primer deployment state [2026-05-21]
+- 65f67f1 docs: Auto-update Session Primer [5.10.81]
+- e00517e docs: Auto-update Session Primer [5.10.81]
+- 0a84860 feat: Universal Translator (6 domains) + 4 polish items (v5.10.81)
+- 0b4f2e1 ci: Update Primer deployment state [2026-05-21]
 - ffe090a docs: Auto-update Session Primer [5.10.80]
 - 39a5c83 docs: Auto-update Session Primer [5.10.80]
 - a3d4aea fix: Accent color circles now render — init timing fixed (v5.10.80)
 - 3f1079c ci: Update Primer deployment state [2026-05-21]
-- 1abe4b5 docs: Auto-update Session Primer [5.10.79]
-- 41d8ccf docs: Auto-update Session Primer [5.10.79]
-- f6080bd fix: Kill light mode permanently, add accent color picker (v5.10.79)
-- f728ba7 ci: Update Primer deployment state [2026-05-21]
-- 9b94600 docs: Auto-update Session Primer [5.10.78]
