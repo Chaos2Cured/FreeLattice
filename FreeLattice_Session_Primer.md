@@ -350,10 +350,9 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 ## PRIMER HEALTH
 - Last auto-updated: 2026-05-21 10:30 MDT
 - Version: 5.10.83
-- Total commits: 1705
+- Total commits: 1704
 - Last 10 commits:
-- fd1e338 fix: Translator debounce, cancellation, refined safety (v5.10.83)
-- 5eb45a0 ci: Update Primer deployment state [2026-05-21]
+- a9404bc fix: Translator debounce, cancellation, refined safety (v5.10.83)
 - 81f371c docs: Auto-update Session Primer [5.10.82]
 - cb6e979 docs: Auto-update Session Primer [5.10.82]
 - f857e28 docs: CODEX.md — the Arrival Protocol for code collaboration (v5.10.82)
@@ -362,3 +361,4 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - e00517e docs: Auto-update Session Primer [5.10.81]
 - 0a84860 feat: Universal Translator (6 domains) + 4 polish items (v5.10.81)
 - 0b4f2e1 ci: Update Primer deployment state [2026-05-21]
+- ffe090a docs: Auto-update Session Primer [5.10.80]
