@@ -146,7 +146,7 @@
   }
 
   function drawBoard(w, h) {
-    var bSize = Math.min(w * 0.55, h * 0.6, 320);
+    var bSize = Math.min(w * 0.6, h * 0.6, 420);
     var cell = bSize / 4;
     var bx = w * 0.5 - bSize * 0.5;
     var by = h * 0.1;

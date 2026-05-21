@@ -862,6 +862,10 @@ assert('Decoder specialist', mathJs.includes('Decoder'));
 assert('MathJax integration', mathJs.includes('MathJax'));
 assert('Safety check via AI', mathJs.includes('checkSafety'));
 assert('Plant in Core', mathJs.includes('plantInCore'));
+assert('Six domains defined', mathJs.includes("math:") && mathJs.includes("chemistry:") && mathJs.includes("biology:") && mathJs.includes("medicine:") && mathJs.includes("engineering:") && mathJs.includes("music:"));
+assert('Domain selector (setDomain)', mathJs.includes('setDomain'));
+assert('RT bridge button', mathJs.includes('openInRT'));
+assert('Domain-to-RT mapping', mathJs.includes('DOMAIN_TO_RT'));
 
 // ═══════════════════════════════════════════════════════════════
 section('35. Lattice Protocol — embeddable economy');
