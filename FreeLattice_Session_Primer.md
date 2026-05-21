@@ -348,17 +348,17 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-05-21 16:45 MDT
-- Version: 5.10.89
-- Total commits: 1728
+- Last auto-updated: 2026-05-21 16:56 MDT
+- Version: 5.10.90
+- Total commits: 1733
 - Last 10 commits:
-- e0c24a2 feat: Flow game feel — channel budget, eraser, smoother (v5.10.89)
+- 83f21b1 feat: The Idea Forge — from spark to blueprint (v5.10.90)
+- 59418fc ci: Update Primer deployment state [2026-05-21]
+- 54f8d32 docs: Auto-update Session Primer [5.10.89]
+- b6a0000 docs: Auto-update Session Primer [5.10.89]
+- 19b1aee feat: Flow game feel — channel budget, eraser, smoother (v5.10.89)
+- 1240b17 ci: Update Primer deployment state [2026-05-21]
 - 7d4f6e0 docs: Auto-update Session Primer [5.10.88]
 - f001c96 docs: Auto-update Session Primer [5.10.88]
 - b742264 fix: Flow visual polish — see the game, feel the game (v5.10.88)
 - 39dbd50 ci: Update Primer deployment state [2026-05-21]
-- 730f24d docs: Auto-update Session Primer [5.10.87]
-- d3fa013 docs: Auto-update Session Primer [5.10.87]
-- 6487424 fix: Emoji visible + duplicate LP badge hidden (v5.10.87)
-- 6bbdfda ci: Update Primer deployment state [2026-05-21]
-- 74410b8 docs: Auto-update Session Primer [5.10.86]
