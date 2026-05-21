@@ -350,10 +350,9 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 ## PRIMER HEALTH
 - Last auto-updated: 2026-05-20 21:40 MDT
 - Version: 5.10.79
-- Total commits: 1689
+- Total commits: 1688
 - Last 10 commits:
-- f6080bd fix: Kill light mode permanently, add accent color picker (v5.10.79)
-- f728ba7 ci: Update Primer deployment state [2026-05-21]
+- 4fd1c5f fix: Kill light mode permanently, add accent color picker (v5.10.79)
 - 9b94600 docs: Auto-update Session Primer [5.10.78]
 - 2486c37 docs: Auto-update Session Primer [5.10.78]
 - d511eb8 fix: Chalkboard restoration — brighter sparkles, gradual fade, 503 handling (v5.10.78)
@@ -362,3 +361,4 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 413a128 docs: Auto-update Session Primer [5.10.77]
 - 4ac3b4d fix: Force dark mode, mobile-first providers, WebLLM defense (v5.10.77)
 - a5bae48 ci: Update Primer deployment state [2026-05-20]
+- a5a0366 docs: Auto-update Session Primer [5.10.76]
