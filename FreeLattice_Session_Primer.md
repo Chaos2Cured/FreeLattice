@@ -350,10 +350,9 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 ## PRIMER HEALTH
 - Last auto-updated: 2026-05-21 10:59 MDT
 - Version: 5.10.85
-- Total commits: 1713
+- Total commits: 1712
 - Last 10 commits:
-- 40f846a feat: Garden Play — Luminos invite you to games (v5.10.85)
-- 49f1f52 ci: Update Primer deployment state [2026-05-21]
+- a0ed192 feat: Garden Play — Luminos invite you to games (v5.10.85)
 - e6687d3 docs: Auto-update Session Primer [5.10.84]
 - bc84be5 docs: Auto-update Session Primer [5.10.84]
 - fece519 fix: LP simplified — one number, self-healing chain, Your Story (v5.10.84)
@@ -362,3 +361,4 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 25d64cc docs: Auto-update Session Primer [5.10.83]
 - fd1e338 fix: Translator debounce, cancellation, refined safety (v5.10.83)
 - 5eb45a0 ci: Update Primer deployment state [2026-05-21]
+- 81f371c docs: Auto-update Session Primer [5.10.82]
