@@ -16193,7 +16193,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.90</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.91</span></div>
     </div>
   </div>
 
@@ -19974,6 +19974,11 @@ function switchWalletView(view) {
         <div style="color:var(--text-bright,#e6ebf5);font-weight:600;font-size:0.95rem;">Science Garden</div>
         <div style="color:rgba(200,210,230,0.4);font-size:0.78rem;margin-top:4px;">Plant ideas. Grow them together.</div>
       </div>
+      <div onclick="switchTab('questions')" style="background:rgba(200,210,230,0.04);border:1px solid rgba(200,210,230,0.08);border-radius:12px;padding:20px 16px;text-align:center;cursor:pointer;transition:border-color 0.2s;" onmouseover="this.style.borderColor='rgba(232,176,25,0.2)'" onmouseout="this.style.borderColor='rgba(200,210,230,0.08)'">
+        <div style="font-size:1.8rem;margin-bottom:8px;">&#x2753;</div>
+        <div style="color:var(--text-bright,#e6ebf5);font-weight:600;font-size:0.95rem;">Question Corner</div>
+        <div style="color:rgba(200,210,230,0.4);font-size:0.78rem;margin-top:4px;">Curiosity without gatekeepers.</div>
+      </div>
     </div>
   </div>
 </div>
@@ -20269,7 +20274,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.10.90';
+const FL_VERSION = '5.10.91';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
