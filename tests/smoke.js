@@ -964,6 +964,18 @@ assert('WebGPU check before WebLLM', appHtml.includes('navigator.gpu'));
 assert('Dual CDN fallback', appHtml.includes('unpkg.com') && appHtml.includes('jsdelivr.net'));
 assert('Friendly WebLLM errors', appHtml.includes('Gemini or Hugging Face'));
 
+// ═══════════════════════════════════════════════════════════════
+section('41. Chalkboard Restoration');
+// ═══════════════════════════════════════════════════════════════
+assert('Brighter glow sprite center', appHtml.includes("rgba(255,255,255,1.0)"));
+assert('Larger glow halo', appHtml.includes('isMobileCanvas ? 22 : 28'));
+assert('Higher glow opacity', appHtml.includes('gp.opacity * 0.55'));
+assert('Larger white cores', appHtml.includes('wp.y, 2.0'));
+assert('AI strokes on overlay canvas', appHtml.includes('cvAIOverlay'));
+assert('Gradual overlay fade (compositing)', appHtml.includes('destination-out'));
+assert('Vision error handler', appHtml.includes('function handleVisionError'));
+assert('Gentle whisper on 503', appHtml.includes('AI is resting'));
+
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
 

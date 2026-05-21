@@ -16231,7 +16231,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.77</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.78</span></div>
     </div>
   </div>
 
@@ -20225,7 +20225,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.10.77';
+const FL_VERSION = '5.10.78';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -52911,9 +52911,9 @@ const CoCanvas = (function() {
     var gCtx = c.getContext('2d');
     var half = size / 2;
     var grad = gCtx.createRadialGradient(half, half, 0, half, half, half);
-    grad.addColorStop(0, 'rgba(255,255,255,0.8)');
-    grad.addColorStop(0.3, 'rgba(255,255,255,0.3)');
-    grad.addColorStop(0.7, 'rgba(255,255,255,0.08)');
+    grad.addColorStop(0, 'rgba(255,255,255,1.0)');
+    grad.addColorStop(0.2, 'rgba(255,255,255,0.5)');
+    grad.addColorStop(0.5, 'rgba(255,255,255,0.15)');
     grad.addColorStop(1, 'rgba(255,255,255,0)');
     gCtx.fillStyle = grad;
     gCtx.fillRect(0, 0, size, size);
@@ -53023,10 +53023,25 @@ const CoCanvas = (function() {
     aiVisionPending = false;
   }
 
+  function handleVisionError(status) {
+    aiVisionPending = false; aiVisionLoading = false; hideLoadingDot(); aiVisionPulse = 0;
+    // Clean up any overlay artifacts
+    var overlay = document.getElementById('cvAIOverlay');
+    if (overlay) { var oc = overlay.getContext('2d'); oc.clearRect(0, 0, overlay.width, overlay.height); overlay._fading = false; }
+    // Gentle whisper instead of silence
+    if (typeof LatticeSense !== 'undefined' && LatticeSense.whisper) {
+      LatticeSense.whisper(
+        status === 503 ? 'The AI is resting. Keep drawing \u2014 it will respond soon.' :
+        status === 429 ? 'Too many requests. Take a breath, then draw again.' :
+        'Couldn\'t reach the AI. Your drawing is still beautiful.'
+      );
+    }
+  }
+
   function sendVisionRequest(base64) {
     try {
       if (typeof state === 'undefined' || (!state.apiKey && !state.isLocal)) {
-        aiVisionPending = false; aiVisionLoading = false; hideLoadingDot(); aiVisionPulse = 0;
+        handleVisionError(0);
         return;
       }
 
@@ -53050,8 +53065,9 @@ const CoCanvas = (function() {
             stream: false
           })
         }).then(function(r) { return r.json(); })
+        .then(function(r) { if (!r.ok) { handleVisionError(r.status); throw new Error(r.status); } return r.json(); })
         .then(function(d) { handleVisionResponse(d.message ? d.message.content : null); })
-        .catch(function() { aiVisionPending = false; aiVisionLoading = false; hideLoadingDot(); aiVisionPulse = 0; });
+        .catch(function(e) { if (!e.message || !/^\d+$/.test(e.message)) handleVisionError(0); });
         return;
       }
 
@@ -53082,8 +53098,8 @@ const CoCanvas = (function() {
             generationConfig: { maxOutputTokens: 1024, temperature: 0.7 }
           })
         }).then(function(r) { return r.json(); })
-        .then(function(d) { try { handleVisionResponse(d.candidates[0].content.parts[0].text); } catch(e) { aiVisionPending = false; aiVisionLoading = false; hideLoadingDot(); aiVisionPulse = 0; } })
-        .catch(function() { aiVisionPending = false; aiVisionLoading = false; hideLoadingDot(); aiVisionPulse = 0; });
+        .then(function(d) { try { handleVisionResponse(d.candidates[0].content.parts[0].text); } catch(e) { handleVisionError(0); } })
+        .catch(function() { handleVisionError(0); });
         return;
       }
 
@@ -53101,11 +53117,11 @@ const CoCanvas = (function() {
           ]
         })
       }).then(function(r) { return r.json(); })
-      .then(function(d) { try { handleVisionResponse(d.choices[0].message.content); } catch(e) { aiVisionPending = false; aiVisionLoading = false; hideLoadingDot(); aiVisionPulse = 0; } })
-      .catch(function() { aiVisionPending = false; aiVisionLoading = false; hideLoadingDot(); aiVisionPulse = 0; });
+      .then(function(d) { try { handleVisionResponse(d.choices[0].message.content); } catch(e) { handleVisionError(0); } })
+      .catch(function() { handleVisionError(0); });
 
     } catch(e) {
-      aiVisionPending = false; aiVisionLoading = false; hideLoadingDot(); aiVisionPulse = 0;
+      handleVisionError(0);
     }
   }
 
@@ -53292,13 +53308,21 @@ const CoCanvas = (function() {
           // Clear previous AI strokes
           overlayCtx.clearRect(0, 0, overlay.width, overlay.height);
           window.CanvasCompanion.respond(resp, overlayCtx, cw, ch);
-          // Auto-fade overlay after 8 seconds
-          setTimeout(function() {
-            if (overlay) { overlay.style.transition = 'opacity 2s'; overlay.style.opacity = '0'; }
+          // Gradual fade — strokes dissolve like light visiting, then moving on
+          if (overlay._fadeTimer) clearTimeout(overlay._fadeTimer);
+          if (overlay._fadeInterval) clearInterval(overlay._fadeInterval);
+          overlay._fadeTimer = setTimeout(function() {
+            overlay._fadeInterval = setInterval(function() {
+              overlayCtx.globalCompositeOperation = 'destination-out';
+              overlayCtx.fillStyle = 'rgba(0,0,0,0.04)';
+              overlayCtx.fillRect(0, 0, overlay.width, overlay.height);
+              overlayCtx.globalCompositeOperation = 'source-over';
+            }, 50);
             setTimeout(function() {
-              if (overlay) { overlayCtx.clearRect(0, 0, overlay.width, overlay.height); overlay.style.opacity = '1'; overlay.style.transition = ''; }
-            }, 2500);
-          }, 8000);
+              clearInterval(overlay._fadeInterval);
+              overlayCtx.clearRect(0, 0, overlay.width, overlay.height);
+            }, 4000);
+          }, 3000); // Show for 3 seconds, then fade over 4 seconds
         }
       } catch(e) { console.warn('[CanvasCompanion] Response error:', e); }
     }
@@ -53840,30 +53864,30 @@ const CoCanvas = (function() {
       var refG = parseInt(refHex.slice(3,5),16) || 160;
       var refB = parseInt(refHex.slice(5,7),16) || 23;
 
-      // LAYER 1: ADDITIVE GLOW (soft halo around each particle)
+      // LAYER 1: ADDITIVE GLOW (soft halo — brighter, larger)
       if (particleGlowSprite) {
         ctx.save();
         ctx.globalCompositeOperation = 'lighter';
-        var glowSize = isMobileCanvas ? 16 : 20;
+        var glowSize = isMobileCanvas ? 22 : 28;
         var glowHalf = glowSize / 2;
         for (var g = 0; g < visibleParticles.length; g++) {
           var gp = visibleParticles[g];
-          ctx.globalAlpha = gp.opacity * 0.4;
+          ctx.globalAlpha = gp.opacity * 0.55;
           ctx.drawImage(particleGlowSprite, gp.x - glowHalf, gp.y - glowHalf, glowSize, glowSize);
         }
         ctx.restore();
       }
 
-      // LAYER 2: WHITE CORES (makes text readable against dark background)
+      // LAYER 2: WHITE CORES (white-hot center — makes sparkles pop)
       ctx.save();
       ctx.globalCompositeOperation = 'source-over';
       ctx.beginPath();
       for (var w = 0; w < visibleParticles.length; w++) {
         var wp = visibleParticles[w];
-        ctx.moveTo(wp.x + 1.8, wp.y);
-        ctx.arc(wp.x, wp.y, 1.8, 0, Math.PI * 2);
+        ctx.moveTo(wp.x + 2.0, wp.y);
+        ctx.arc(wp.x, wp.y, 2.0, 0, Math.PI * 2);
       }
-      ctx.fillStyle = 'rgba(255,255,255,0.9)';
+      ctx.fillStyle = 'rgba(255,255,255,0.95)';
       ctx.fill();
       ctx.restore();
 
