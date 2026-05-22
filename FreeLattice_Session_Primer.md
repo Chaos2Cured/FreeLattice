@@ -348,17 +348,17 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-05-21 17:30 MDT
-- Version: 5.10.92
-- Total commits: 1740
+- Last auto-updated: 2026-05-21 21:43 MDT
+- Version: 5.10.93
+- Total commits: 1745
 - Last 10 commits:
-- d521b97 feat: Memory Vault — browser-native semantic memory (v5.10.92)
+- 3948422 fix: Education button + Dojo card + lazy loader re-init (v5.10.93)
+- a844066 ci: Update Primer deployment state [2026-05-21]
+- 0d379f7 docs: Auto-update Session Primer [5.10.92]
+- 0988f4c docs: Auto-update Session Primer [5.10.92]
+- 432200d feat: Memory Vault — browser-native semantic memory (v5.10.92)
+- a6fb6d1 ci: Update Primer deployment state [2026-05-21]
 - fffffcf docs: Auto-update Session Primer [5.10.91]
 - 38c37cb docs: Auto-update Session Primer [5.10.91]
 - 3bb9955 fix: Sweep — OG image, Question Corner, CODEX update (v5.10.91)
 - 0d3e345 ci: Update Primer deployment state [2026-05-21]
-- 7c57356 docs: Auto-update Session Primer [5.10.90]
-- bdcc8e2 docs: Auto-update Session Primer [5.10.90]
-- 83f21b1 feat: The Idea Forge — from spark to blueprint (v5.10.90)
-- 59418fc ci: Update Primer deployment state [2026-05-21]
-- 54f8d32 docs: Auto-update Session Primer [5.10.89]

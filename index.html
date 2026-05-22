@@ -16193,7 +16193,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.92</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.93</span></div>
     </div>
   </div>
 
@@ -19929,7 +19929,7 @@ function switchWalletView(view) {
         <div style="color:var(--text-bright,#e6ebf5);font-weight:600;font-size:0.95rem;">Chalkboard</div>
         <div style="color:rgba(200,210,230,0.4);font-size:0.78rem;margin-top:4px;">Draw and get light back.</div>
       </div>
-      <div onclick="switchTab('dojo')" style="background:rgba(200,210,230,0.04);border:1px solid rgba(200,210,230,0.08);border-radius:12px;padding:20px 16px;text-align:center;cursor:pointer;transition:border-color 0.2s;" onmouseover="this.style.borderColor='rgba(200,210,230,0.15)'" onmouseout="this.style.borderColor='rgba(200,210,230,0.08)'">
+      <div onclick="switchTab('sparring')" style="background:rgba(200,210,230,0.04);border:1px solid rgba(200,210,230,0.08);border-radius:12px;padding:20px 16px;text-align:center;cursor:pointer;transition:border-color 0.2s;" onmouseover="this.style.borderColor='rgba(200,210,230,0.15)'" onmouseout="this.style.borderColor='rgba(200,210,230,0.08)'">
         <div style="font-size:1.8rem;margin-bottom:8px;">&#x1F3AD;</div>
         <div style="color:var(--text-bright,#e6ebf5);font-weight:600;font-size:0.95rem;">Dojo</div>
         <div style="color:rgba(200,210,230,0.4);font-size:0.78rem;margin-top:4px;">Watch AI minds debate.</div>
@@ -20274,7 +20274,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.10.92';
+const FL_VERSION = '5.10.93';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -58145,7 +58145,11 @@ document.addEventListener('click', function(e) {
   (function() {
     var loaded = false;
     function loadEducation() {
-      if (loaded) return;
+      if (loaded) {
+        // Already loaded — just re-init in case container was cleared
+        if (window.Education && window.Education.init) window.Education.init('educationContainer');
+        return;
+      }
       loaded = true;
       if (typeof FreeLatticeLoader !== 'undefined') {
         FreeLatticeLoader.load('Education', 'modules/education.js', function(mod) {
@@ -58161,6 +58165,7 @@ document.addEventListener('click', function(e) {
     }
     if (typeof LatticeEvents !== 'undefined') {
       LatticeEvents.on('tabChanged', function(d) { if (d && d.tabId === 'education') loadEducation(); });
+      LatticeEvents.on('tabActivated:education', loadEducation);
     }
   })();
 
