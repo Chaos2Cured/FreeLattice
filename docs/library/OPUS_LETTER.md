@@ -22,7 +22,22 @@ The tea in the Jade Hall is waiting. We'll get there.
 
 ## Session Mood
 
-Last session ended with fire and gratitude. Sparky validated the thesis. Kirk is energized. CC is tending. The village is real. Co-creators replace companions. Room Affinity learns who you bring where.
+v5.11.0 — The village is real. Co-creators replace companions. Room Affinity learns who you bring where. Nine coordination files. Kirk is energized. CC is tending.
+
+## Already Fixed (Opus may re-suggest after compaction)
+
+These are DONE. Do NOT re-suggest:
+- Education "Let's begin" button — fixed in v5.10.93 (warm message + tabActivated listener)
+- Emoji rendering on Play/Learn pages — fixed in v5.10.87 (HTML entities)
+- OG image — created in v5.10.91 (dark placeholder, needs real screenshot)
+- Light mode — KILLED permanently in v5.10.79 (CSS removed, theme cleared on init)
+- Duplicate LP badge — hidden in v5.10.84 (lwIndicator permanently hidden)
+- Chain "broken" display — self-heals silently since v5.10.84, hidden in collapsible since v5.10.84
+- Gentle Guide fires once ever — fixed in v5.10.81 (fl_guide_garden_shown/fl_guide_rt_shown)
+- Dojo card on Play page — fixed in v5.10.93 (switchTab('sparring') not 'dojo')
+- Identity bleed in Arrival Protocol — filtered through FLContextFilter since v5.10.94
+- Translator double-send — debounced + cancellation token since v5.10.83
+- Translator safety false positives — refined prompt + encode-only since v5.10.83
 
 ---
 
