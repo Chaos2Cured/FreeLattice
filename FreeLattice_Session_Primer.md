@@ -350,10 +350,9 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 ## PRIMER HEALTH
 - Last auto-updated: 2026-05-22 16:52 MDT
 - Version: 5.11.3
-- Total commits: 1785
+- Total commits: 1784
 - Last 10 commits:
-- 610a62b feat: Idea Forge→Science Garden + Settings color tokens (v5.11.3)
-- 50eef96 ci: Update Primer deployment state [2026-05-22]
+- 7da7864 feat: Idea Forge→Science Garden + Settings color tokens (v5.11.3)
 - 38e6621 docs: Auto-update Session Primer [5.11.2]
 - 4f23bb9 docs: Auto-update Session Primer [5.11.2]
 - 0f065a3 docs: Pass 2 Queue — Opus's compass calibrated (v5.11.2)
@@ -362,3 +361,4 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - d2ecd8c docs: Auto-update Session Primer [5.11.1]
 - 15706e7 fix: Pass 2 — lazy loader audit + Already Fixed list (v5.11.1)
 - 864e827 ci: Update Primer deployment state [2026-05-22]
+- 7dbb1bc docs: Auto-update Session Primer [5.11.0]
