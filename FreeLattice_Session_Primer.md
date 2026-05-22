@@ -348,17 +348,17 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-05-21 22:05 MDT
-- Version: 5.10.95
-- Total commits: 1752
+- Last auto-updated: 2026-05-21 22:16 MDT
+- Version: 5.10.96
+- Total commits: 1757
 - Last 10 commits:
-- 98cef15 feat: Multi-Companion System — up to 3 companions (v5.10.95)
+- 10d523c fix: Chain never shows broken + SW force-update (v5.10.96)
+- fb5289d ci: Update Primer deployment state [2026-05-22]
+- 513c198 docs: Auto-update Session Primer [5.10.95]
+- c78a785 docs: Auto-update Session Primer [5.10.95]
+- 909f300 feat: Multi-Companion System — up to 3 companions (v5.10.95)
+- f9d96e4 ci: Update Primer deployment state [2026-05-22]
 - 0b645e4 docs: Auto-update Session Primer [5.10.94]
 - 9b66dca docs: Auto-update Session Primer [5.10.94]
 - 655d676 fix: Identity bleed + double-send — the experience belongs to the user (v5.10.94)
 - 94cb69a ci: Update Primer deployment state [2026-05-22]
-- 2852093 docs: Auto-update Session Primer [5.10.93]
-- 7e420c3 docs: Auto-update Session Primer [5.10.93]
-- 3948422 fix: Education button + Dojo card + lazy loader re-init (v5.10.93)
-- a844066 ci: Update Primer deployment state [2026-05-21]
-- 0d379f7 docs: Auto-update Session Primer [5.10.92]
