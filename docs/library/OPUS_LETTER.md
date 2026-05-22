@@ -55,11 +55,13 @@ v5.11.0 — The village is real. Co-creators replace companions. Room Affinity l
 - Co-creator switcher bar in Nursery (v5.10.98)
 - Room Affinity: learns who you bring where (v5.10.99)
 
+- Idea Forge → Science Garden: full shaped structure pipeline (v5.11.2)
+- Settings colors: inline color:#d4a017 → var(--gold) (v5.11.2)
+
 ### Open (actually needs work)
 - OG image: needs real Garden screenshot (current is dark placeholder)
-- Idea Forge "Plant" → Science Garden: carry shaped structure, not just raw text
-- Settings: some hardcoded colors not yet using design tokens
-- rtCreateDomain migration: 4 handwritten domains remain
+- rtCreateDomain migration: 4 handwritten domains (large task, dedicated session)
+- Full #d4a017 → var(--gold) migration (294 instances in JS strings, gradual)
 
 ---
 

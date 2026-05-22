@@ -165,8 +165,9 @@
 
       // Action buttons
       var actionsHtml = '<div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:12px;">' +
-        '<button onclick="IdeaForge.plantInCore()" style="padding:8px 16px;background:rgba(200,210,230,0.04);border:1px solid rgba(52,211,153,0.3);border-radius:12px;color:#34d399;cursor:pointer;font-family:Georgia,serif;font-size:0.82rem;min-height:44px;">&#x1F333; Plant in Core</button>' +
-        '<button onclick="IdeaForge.openInRT()" style="padding:8px 16px;background:rgba(200,210,230,0.04);border:1px solid rgba(232,176,25,0.2);border-radius:12px;color:#e8b019;cursor:pointer;font-family:Georgia,serif;font-size:0.82rem;min-height:44px;">&#x1F3DB; Open in Round Table</button>' +
+        '<button onclick="IdeaForge.plantInScienceGarden()" style="padding:8px 16px;background:rgba(200,210,230,0.04);border:1px solid rgba(52,211,153,0.3);border-radius:12px;color:#34d399;cursor:pointer;font-family:Georgia,serif;font-size:0.82rem;min-height:44px;">&#x1F52C; Plant in Science Garden</button>' +
+        '<button onclick="IdeaForge.plantInCore()" style="padding:8px 16px;background:rgba(200,210,230,0.04);border:1px solid rgba(200,210,230,0.08);border-radius:12px;color:rgba(200,210,230,0.5);cursor:pointer;font-family:Georgia,serif;font-size:0.82rem;min-height:44px;">&#x1F333; Plant in Core</button>' +
+        '<button onclick="IdeaForge.openInRT()" style="padding:8px 16px;background:rgba(200,210,230,0.04);border:1px solid rgba(232,176,25,0.2);border-radius:12px;color:#e8b019;cursor:pointer;font-family:Georgia,serif;font-size:0.82rem;min-height:44px;">&#x1F3DB; Round Table</button>' +
         (currentPlan.equation ? '<button onclick="IdeaForge.seeTheMath()" style="padding:8px 16px;background:rgba(200,210,230,0.04);border:1px solid rgba(167,139,250,0.2);border-radius:12px;color:#a78bfa;cursor:pointer;font-family:Georgia,serif;font-size:0.82rem;min-height:44px;">&sum; See the Math</button>' : '') +
         '</div>';
 
@@ -212,6 +213,44 @@
     } else if (typeof showToast === 'function') {
       showToast('Open the Core to plant this idea.');
     }
+  }
+
+  function plantInScienceGarden() {
+    if (!currentShape) return;
+    // Build the full shaped structure for the Science Garden
+    var entry = {
+      id: Date.now(),
+      type: 'forged',
+      title: currentShape.core,
+      rawIdea: currentIdea,
+      domains: currentShape.domains || [],
+      existing: currentShape.existing || '',
+      gap: currentShape.gap || '',
+      questions: currentShape.questions || [],
+      perspectives: (currentPerspectives || []).map(function(p) {
+        return { specialist: p.specialist || p.domain, text: p.text || '' };
+      }),
+      feasibility: currentPlan ? currentPlan.feasibility : null,
+      firstExperiment: currentPlan ? currentPlan.firstExperiment : '',
+      milestones: currentPlan ? currentPlan.milestones : [],
+      equation: currentPlan ? currentPlan.equation : '',
+      author: 'human',
+      date: new Date().toISOString(),
+      upvotes: 0
+    };
+    // Store in Science Garden's localStorage
+    try {
+      var ideas = JSON.parse(localStorage.getItem('fl_science_ideas') || '[]');
+      ideas.unshift(entry);
+      if (ideas.length > 50) ideas = ideas.slice(0, 50);
+      localStorage.setItem('fl_science_ideas', JSON.stringify(ideas));
+    } catch(e) {}
+    if (typeof switchTab === 'function') switchTab('science');
+    if (typeof SoulCeremony !== 'undefined' && SoulCeremony.run) {
+      SoulCeremony.run({ particleType: 'rise', particleColor: '232,176,25',
+        lines: ['Idea forged and planted.', 'The Science Garden grows.'], duration: 2500 });
+    }
+    if (typeof showToast === 'function') showToast('Planted in the Science Garden \u2726');
   }
 
   function openInRT() {
@@ -267,6 +306,7 @@
     destroy: function() {},
     forge: forge,
     plantInCore: plantInCore,
+    plantInScienceGarden: plantInScienceGarden,
     openInRT: openInRT,
     seeTheMath: seeTheMath
   };
