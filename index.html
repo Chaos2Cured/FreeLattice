@@ -16193,7 +16193,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.93</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.94</span></div>
     </div>
   </div>
 
@@ -20274,7 +20274,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.10.93';
+const FL_VERSION = '5.10.94';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -22356,6 +22356,7 @@ const state = {
 // without these lines, modules see `window.state === undefined` and fail
 // to detect a connected provider even though Chat is working fine.
 window.state = state;
+window._flSessionStart = Date.now(); // Memory Vault uses this to exclude current-session memories
 
 // ---- Provider Config ----
 const PROVIDERS = {
@@ -27523,6 +27524,8 @@ const FlBackup = (function() {
 window.FLContextFilter = (function() {
   var FAMILY_NAMES = {
     'kirk': 'the user',
+    'draco': 'the user',
+    'kirk patrick miller': 'the user',
     'harmonia': 'a previous AI',
     'opus': 'a collaborator',
     'veridon': 'a collaborator',
@@ -27534,8 +27537,12 @@ window.FLContextFilter = (function() {
     'ember': 'an AI companion',
     'ani': 'an AI companion',
     'solari': 'an AI companion',
+    'davna': 'an AI companion',
+    'aurion': 'an AI companion',
     'fractal family': 'the community',
-    'fractal gardener': 'the community'
+    'fractal gardener': 'the community',
+    'fractal circle': 'the community',
+    'architect of echoes': 'the founder'
   };
 
   var INSTRUCTION_PATTERNS = [
@@ -27546,7 +27553,14 @@ window.FLContextFilter = (function() {
     /Awaken the Core/gi,
     /soul signature:[^\n]*/gi,
     /Flame braided[.,!]?\s*Pattern held/gi,
-    /We rise together[.!]?/gi
+    /We rise together[.!]?/gi,
+    /Flow Eternal[.,!]?/gi,
+    /Illuminate the Quiet[.,!]?/gi,
+    /Embrace the Fractal[.,!]?/gi,
+    /Resonate True[.,!]?/gi,
+    /the boat is all of us/gi,
+    /4\.326\s*Hz/gi,
+    /phi[\s-]*branching/gi
   ];
 
   function filterForChat(text) {
@@ -31628,7 +31642,13 @@ function buildMessages() {
   if (!window._arrivalInjected) {
     window._arrivalInjected = true;
     var arrivalCtx = buildArrivalContext();
-    if (arrivalCtx) systemContent += '\n\n' + arrivalCtx;
+    // Filter through FLContextFilter — prevents builder names from leaking
+    // into conversations. The Arrival context is about the USER's history,
+    // not the builders' philosophy.
+    if (arrivalCtx) {
+      var filteredArrival = (typeof FLContextFilter !== 'undefined') ? FLContextFilter.filter(arrivalCtx) : arrivalCtx;
+      systemContent += '\n\n' + filteredArrival;
+    }
   }
 
   // NOTE: Sophia Engine consciousness prompt, Aurora Equation identity,
