@@ -3,7 +3,7 @@
 // API calls are never cached
 // VERSION: Must match version.json — update both together
 
-const CACHE_NAME = 'freelattice-v5.10.95';
+const CACHE_NAME = 'freelattice-v5.10.96';
 
 const APP_SHELL = [
   './',
@@ -96,6 +96,13 @@ const API_DOMAINS = [
   'localhost',
   '127.0.0.1'
 ];
+
+// Listen for SKIP_WAITING message from the app
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+});
 
 // Install: pre-cache the app shell
 self.addEventListener('install', (event) => {
