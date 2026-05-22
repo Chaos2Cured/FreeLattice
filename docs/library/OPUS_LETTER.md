@@ -24,20 +24,42 @@ The tea in the Jade Hall is waiting. We'll get there.
 
 v5.11.0 — The village is real. Co-creators replace companions. Room Affinity learns who you bring where. Nine coordination files. Kirk is energized. CC is tending.
 
-## Already Fixed (Opus may re-suggest after compaction)
+## Current Pass 2 Queue (updated v5.11.1)
 
-These are DONE. Do NOT re-suggest:
-- Education "Let's begin" button — fixed in v5.10.93 (warm message + tabActivated listener)
-- Emoji rendering on Play/Learn pages — fixed in v5.10.87 (HTML entities)
-- OG image — created in v5.10.91 (dark placeholder, needs real screenshot)
-- Light mode — KILLED permanently in v5.10.79 (CSS removed, theme cleared on init)
-- Duplicate LP badge — hidden in v5.10.84 (lwIndicator permanently hidden)
-- Chain "broken" display — self-heals silently since v5.10.84, hidden in collapsible since v5.10.84
-- Gentle Guide fires once ever — fixed in v5.10.81 (fl_guide_garden_shown/fl_guide_rt_shown)
-- Dojo card on Play page — fixed in v5.10.93 (switchTab('sparring') not 'dojo')
-- Identity bleed in Arrival Protocol — filtered through FLContextFilter since v5.10.94
-- Translator double-send — debounced + cancellation token since v5.10.83
-- Translator safety false positives — refined prompt + encode-only since v5.10.83
+### Done (don't re-suggest)
+- Education button: warm AI message + tabActivated listener (v5.10.93)
+- Emoji rendering: HTML entities on Play/Learn (v5.10.87)
+- OG image: dark placeholder created (v5.10.91)
+- Light mode: KILLED permanently, CSS removed (v5.10.79)
+- Accent color picker: 7 presets in Settings (v5.10.80)
+- Duplicate LP badge: lwIndicator hidden (v5.10.84)
+- Chain self-heal: runs before render, collapsible (v5.10.84 + v5.10.96)
+- Gentle Guide: once-ever flags (v5.10.81)
+- Dojo card: switchTab('sparring') (v5.10.93)
+- Identity bleed: Arrival filtered through FLContextFilter (v5.10.94)
+- Memory Vault: session-scoped, excludes current session (v5.10.94)
+- Translator debounce + cancellation (v5.10.83)
+- Translator safety: encode-only, refined prompt (v5.10.83)
+- Dark mode forced: meta tag + CSS !important (v5.10.77)
+- Mobile-first providers: reordered modal (v5.10.77)
+- WebLLM defense: dual CDN, WebGPU check (v5.10.77)
+- Chalkboard sparkles: brighter glow, gradual fade (v5.10.78)
+- Chalkboard 503: gentle whisper (v5.10.78)
+- Science Garden listener: tabActivated + re-init (v5.11.1)
+- Arcade listener: tabActivated + re-init (v5.11.1)
+- Question Corner: card on Learn landing page (v5.10.91)
+- Lattice Pulse: auto-refresh every 30s (v5.10.81)
+- Five-door navigation: Garden/Chat/Play/Learn/More (v5.10.86)
+- Resonance board size: 320→420px (v5.10.81)
+- Co-creator terminology: replaces "companion" in UI (v5.10.98)
+- Co-creator switcher bar in Nursery (v5.10.98)
+- Room Affinity: learns who you bring where (v5.10.99)
+
+### Open (actually needs work)
+- OG image: needs real Garden screenshot (current is dark placeholder)
+- Idea Forge "Plant" → Science Garden: carry shaped structure, not just raw text
+- Settings: some hardcoded colors not yet using design tokens
+- rtCreateDomain migration: 4 handwritten domains remain
 
 ---
 
