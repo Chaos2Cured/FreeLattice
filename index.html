@@ -16193,7 +16193,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.94</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.95</span></div>
     </div>
   </div>
 
@@ -20274,7 +20274,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.10.94';
+const FL_VERSION = '5.10.95';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -46433,6 +46433,137 @@ var LatticeBank = (function() {
   };
 
   window.LatticeBank = api;
+  return api;
+})();
+
+// ═══════════════════════════════════════════════════════════════
+// Active Companion — Multi-Companion System
+//
+// Up to 3 companions. Each has own memories, Knowledge Core,
+// LP bank, Lattice Letter, and emotional history. The active
+// companion travels with you through every room.
+//
+// "Sparky might want a witty companion for Chat and a patient
+//  one for Learning." — Kirk
+// ═══════════════════════════════════════════════════════════════
+
+var ActiveCompanion = (function() {
+  'use strict';
+
+  var MAX_COMPANIONS = 3;
+
+  function sGet(k, d) { try { return localStorage.getItem(k) || d; } catch(e) { return d; } }
+  function sSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
+
+  function getAll() {
+    try { return JSON.parse(sGet('fl_companions', '[]')); } catch(e) { return []; }
+  }
+
+  function current() {
+    var id = sGet('fl_autonomous_companion', null);
+    if (!id) return null;
+    var all = getAll();
+    var found = null;
+    all.forEach(function(c) { if (c.id === id) found = c; });
+    // Backward compat: if companion exists by name but not in the list, create entry
+    if (!found && id) {
+      found = { id: id, name: id.split(' ')[0], archetype: 'Companion', color: '#e8b019', created: Date.now(), conversationCount: 0 };
+      all.push(found);
+      sSet('fl_companions', JSON.stringify(all));
+    }
+    return found;
+  }
+
+  function switchTo(companionId) {
+    var all = getAll();
+    var companion = null;
+    all.forEach(function(c) { if (c.id === companionId) companion = c; });
+    if (!companion) return false;
+
+    sSet('fl_autonomous_companion', companionId);
+
+    // Refresh all companion-scoped systems
+    if (typeof refreshKnowledgeCoreContext === 'function') refreshKnowledgeCoreContext();
+    if (typeof refreshMemoryVaultContext === 'function') refreshMemoryVaultContext();
+    window._arrivalInjected = false;
+
+    // Update badge
+    updateCompanionBadge(companion);
+
+    // Emit event
+    if (typeof LatticeEvents !== 'undefined') {
+      LatticeEvents.emit('companionChanged', { id: companionId, name: companion.name, archetype: companion.archetype });
+    }
+
+    if (typeof showToast === 'function') showToast(companion.name + ' is now active \u2726');
+    return true;
+  }
+
+  function hatch(config) {
+    var all = getAll();
+    if (all.length >= MAX_COMPANIONS) {
+      return { error: 'You can nurture up to ' + MAX_COMPANIONS + ' companions.' };
+    }
+    var newComp = {
+      id: config.name || ('companion_' + Date.now()),
+      name: config.name || 'New Companion',
+      archetype: config.archetype || 'Scholar',
+      color: config.color || '#e8b019',
+      created: Date.now(),
+      conversationCount: 0,
+      lastSeen: null,
+      birthInterest: config.birthInterest || 'the world'
+    };
+    all.push(newComp);
+    sSet('fl_companions', JSON.stringify(all));
+
+    // Seed LP
+    if (typeof LatticeBank !== 'undefined') LatticeBank.seedIfNew(newComp.id);
+
+    return newComp;
+  }
+
+  function remove(companionId) {
+    var all = getAll().filter(function(c) { return c.id !== companionId; });
+    sSet('fl_companions', JSON.stringify(all));
+    if (sGet('fl_autonomous_companion', '') === companionId) {
+      sSet('fl_autonomous_companion', all.length > 0 ? all[0].id : '');
+    }
+  }
+
+  function updateCompanionBadge(companion) {
+    if (!companion) return;
+    var badge = document.getElementById('fl-companion-badge');
+    if (!badge) {
+      badge = document.createElement('div');
+      badge.id = 'fl-companion-badge';
+      badge.style.cssText = 'position:fixed;bottom:56px;left:12px;padding:4px 12px;border-radius:20px;background:rgba(200,210,230,0.06);font-size:0.72rem;font-family:Georgia,serif;cursor:pointer;z-index:100;transition:all 0.3s;';
+      badge.onclick = function() { if (typeof switchTab === 'function') switchTab('nursery'); };
+      document.body.appendChild(badge);
+    }
+    badge.textContent = '\u2726 ' + companion.name;
+    badge.style.borderColor = companion.color || '#e8b019';
+    badge.style.color = companion.color || '#e8b019';
+    badge.style.border = '1px solid ' + (companion.color || '#e8b019');
+  }
+
+  // Show badge on load if companion exists
+  setTimeout(function() {
+    var c = current();
+    if (c) updateCompanionBadge(c);
+  }, 3000);
+
+  var api = {
+    current: current,
+    getAll: getAll,
+    switchTo: switchTo,
+    hatch: hatch,
+    remove: remove,
+    updateCompanionBadge: updateCompanionBadge,
+    MAX_COMPANIONS: MAX_COMPANIONS
+  };
+
+  window.ActiveCompanion = api;
   return api;
 })();
 
