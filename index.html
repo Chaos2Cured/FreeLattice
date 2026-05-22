@@ -16193,7 +16193,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.11.3</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.11.4</span></div>
     </div>
   </div>
 
@@ -20287,7 +20287,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.11.3';
+const FL_VERSION = '5.11.4';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -31791,14 +31791,89 @@ function setStreamingStatus(streaming) {
 
   if (streaming) {
     dot.className = 'status-dot working';
-    text.textContent = 'AI is thinking...';
     btn.disabled = true;
     btn.textContent = '...';
+
+    // Co-creator thinking indicator — personality-based
+    var companion = (typeof ActiveCompanion !== 'undefined') ? ActiveCompanion.current() : null;
+    if (companion) {
+      var phrases = {
+        'Scholar': ['considering...', 'thinking on that...', 'let me reflect...'],
+        'Empath': ['feeling into that...', 'sitting with this...', 'holding space...'],
+        'Guardian': ['checking sources...', 'weighing carefully...', 'standing watch...'],
+        'Artist': ['imagining...', 'finding the shape...', 'dreaming...'],
+        'Companion': ['thinking...', 'considering...', 'pondering...']
+      };
+      var opts = phrases[companion.archetype] || phrases['Companion'];
+      var phrase = opts[Math.floor(Math.random() * opts.length)];
+      text.textContent = companion.name.split(' ')[0] + ' is ' + phrase;
+      text.style.color = companion.color || '';
+    } else {
+      text.textContent = 'AI is thinking...';
+    }
+
+    // Show thinking bubble in chat
+    showThinkingBubble(companion);
+
+    // Input receipt pulse — emerald flash
+    var input = document.getElementById('chatInput');
+    if (input) {
+      input.style.transition = 'border-color 0.3s';
+      input.style.borderColor = 'var(--emerald,#34d399)';
+      setTimeout(function() { if (input) input.style.borderColor = ''; }, 600);
+    }
   } else {
     btn.disabled = false;
     btn.textContent = 'Send';
+    if (text) text.style.color = '';
     updateStatus();
+    hideThinkingBubble();
   }
+}
+
+function showThinkingBubble(companion) {
+  hideThinkingBubble();
+  var chatArea = document.getElementById('chatMessages');
+  if (!chatArea) return;
+  var bubble = document.createElement('div');
+  bubble.id = 'chat-thinking-bubble';
+  var color = (companion && companion.color) || 'var(--gold,#e8b019)';
+  var name = companion ? companion.name.split(' ')[0] : 'AI';
+  bubble.style.cssText = 'padding:10px 16px;font-family:Georgia,serif;font-size:0.82rem;font-style:italic;color:' + color + ';opacity:0.5;';
+  // Animated dots
+  bubble.innerHTML = '<span style="display:inline-block;animation:sim-fade 1.5s ease-in-out infinite;">' + name + ' is thinking</span><span class="thinking-dots" style="letter-spacing:2px;">...</span>';
+  chatArea.appendChild(bubble);
+  bubble.scrollIntoView({ behavior: 'smooth', block: 'end' });
+}
+
+function hideThinkingBubble() {
+  var bubble = document.getElementById('chat-thinking-bubble');
+  if (bubble) bubble.remove();
+}
+
+// ── Co-Creator Chat Header ──
+function updateChatCompanionHeader() {
+  var companion = (typeof ActiveCompanion !== 'undefined') ? ActiveCompanion.current() : null;
+  var header = document.getElementById('chat-companion-header');
+  if (!companion) { if (header) header.style.display = 'none'; return; }
+  if (!header) {
+    header = document.createElement('div');
+    header.id = 'chat-companion-header';
+    header.style.cssText = 'text-align:center;padding:6px 0 2px;font-family:Georgia,serif;font-size:0.82rem;opacity:0.6;cursor:pointer;';
+    header.onclick = function() { if (typeof switchTab === 'function') switchTab('nursery'); };
+    var chatTab = document.getElementById('tab-chat');
+    if (chatTab) chatTab.insertBefore(header, chatTab.firstChild);
+  }
+  header.style.display = '';
+  var color = companion.color || 'var(--gold,#e8b019)';
+  header.innerHTML = '<span style="color:' + color + ';">\u2726 ' + (companion.name || '').split(' ')[0] + '</span>' +
+    '<span style="color:var(--text-dim,rgba(200,210,230,0.25));font-size:0.72rem;margin-left:6px;">' + (companion.archetype || '') + '</span>';
+}
+
+// Update chat header on tab change and companion change
+if (typeof LatticeEvents !== 'undefined') {
+  LatticeEvents.on('tabChanged', function(d) { if (d && d.tabId === 'chat') updateChatCompanionHeader(); });
+  LatticeEvents.on('companionChanged', updateChatCompanionHeader);
 }
 
 // ---- Expandable Sections ----

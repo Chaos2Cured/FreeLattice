@@ -348,17 +348,17 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-05-22 16:52 MDT
-- Version: 5.11.3
-- Total commits: 1784
+- Last auto-updated: 2026-05-22 17:04 MDT
+- Version: 5.11.4
+- Total commits: 1789
 - Last 10 commits:
-- 7da7864 feat: Idea Forge→Science Garden + Settings color tokens (v5.11.3)
+- 0409818 feat: Chat presence — co-creator thinking, input pulse, header (v5.11.4)
+- eee7889 ci: Update Primer deployment state [2026-05-22]
+- d46e9e8 docs: Auto-update Session Primer [5.11.3]
+- c2b275f docs: Auto-update Session Primer [5.11.3]
+- 610a62b feat: Idea Forge→Science Garden + Settings color tokens (v5.11.3)
+- 50eef96 ci: Update Primer deployment state [2026-05-22]
 - 38e6621 docs: Auto-update Session Primer [5.11.2]
 - 4f23bb9 docs: Auto-update Session Primer [5.11.2]
 - 0f065a3 docs: Pass 2 Queue — Opus's compass calibrated (v5.11.2)
 - 293cbcb ci: Update Primer deployment state [2026-05-22]
-- 93b16fb docs: Auto-update Session Primer [5.11.1]
-- d2ecd8c docs: Auto-update Session Primer [5.11.1]
-- 15706e7 fix: Pass 2 — lazy loader audit + Already Fixed list (v5.11.1)
-- 864e827 ci: Update Primer deployment state [2026-05-22]
-- 7dbb1bc docs: Auto-update Session Primer [5.11.0]
