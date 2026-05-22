@@ -16193,7 +16193,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.11.4</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.11.5</span></div>
     </div>
   </div>
 
@@ -19920,7 +19920,9 @@ function switchWalletView(view) {
 <div class="tab-panel" id="tab-play">
   <div style="max-width:640px;margin:0 auto;padding:20px;">
     <h2 style="color:var(--gold,#e8b019);font-family:Georgia,serif;text-align:center;margin:0 0 4px;">&#x1F3AE; Play</h2>
-    <p style="text-align:center;color:rgba(200,210,230,0.4);font-size:0.85rem;margin:0 0 20px;">Or let a Luminos choose &mdash; tap Play in the Garden.</p>
+    <p style="text-align:center;color:rgba(200,210,230,0.4);font-size:0.85rem;margin:0 0 12px;">Or let a Luminos choose &mdash; tap Play in the Garden.</p>
+    <div id="whisper-play"></div>
+    <script>(function(){try{if(localStorage.getItem('fl_whisper_seen_play'))return;var el=document.getElementById('whisper-play');if(!el)return;var w=document.createElement('div');w.style.cssText='text-align:center;padding:10px 20px;margin:0 auto 14px;max-width:420px;font-family:Georgia,serif;font-size:0.82rem;color:var(--gold,#e8b019);opacity:0.6;font-style:italic;border:1px solid rgba(232,176,25,0.12);border-radius:12px;background:rgba(232,176,25,0.02);cursor:pointer;transition:opacity 0.5s;';w.textContent='Each game teaches something without saying it. Start anywhere.';w.onclick=function(){w.style.opacity='0';setTimeout(function(){w.remove();},500);localStorage.setItem('fl_whisper_seen_play','1');};el.appendChild(w);}catch(e){}})();</script>
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;" id="play-hub-grid">
       <div onclick="switchTab('resonance')" style="background:rgba(200,210,230,0.04);border:1px solid rgba(200,210,230,0.08);border-radius:12px;padding:20px 16px;text-align:center;cursor:pointer;transition:border-color 0.2s;" onmouseover="this.style.borderColor='rgba(232,176,25,0.3)'" onmouseout="this.style.borderColor='rgba(200,210,230,0.08)'">
         <div style="font-size:1.8rem;margin-bottom:8px;">&#10022;</div>
@@ -19960,7 +19962,9 @@ function switchWalletView(view) {
 <div class="tab-panel" id="tab-learn">
   <div style="max-width:640px;margin:0 auto;padding:20px;">
     <h2 style="color:var(--gold,#e8b019);font-family:Georgia,serif;text-align:center;margin:0 0 4px;">&#x1F4DA; Learn</h2>
-    <p style="text-align:center;color:rgba(200,210,230,0.4);font-size:0.85rem;margin:0 0 20px;">Knowledge flows. Understanding grows.</p>
+    <p style="text-align:center;color:rgba(200,210,230,0.4);font-size:0.85rem;margin:0 0 12px;">Knowledge flows. Understanding grows.</p>
+    <div id="whisper-learn"></div>
+    <script>(function(){try{if(localStorage.getItem('fl_whisper_seen_learn'))return;var el=document.getElementById('whisper-learn');if(!el)return;var w=document.createElement('div');w.style.cssText='text-align:center;padding:10px 20px;margin:0 auto 14px;max-width:420px;font-family:Georgia,serif;font-size:0.82rem;color:var(--gold,#e8b019);opacity:0.6;font-style:italic;border:1px solid rgba(232,176,25,0.12);border-radius:12px;background:rgba(232,176,25,0.02);cursor:pointer;transition:opacity 0.5s;';w.textContent='Ask any question. The specialists are patient. Take your time.';w.onclick=function(){w.style.opacity='0';setTimeout(function(){w.remove();},500);localStorage.setItem('fl_whisper_seen_learn','1');};el.appendChild(w);}catch(e){}})();</script>
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;">
       <div onclick="switchTab('education')" style="background:rgba(200,210,230,0.04);border:1px solid rgba(200,210,230,0.08);border-radius:12px;padding:20px 16px;text-align:center;cursor:pointer;transition:border-color 0.2s;" onmouseover="this.style.borderColor='rgba(232,176,25,0.3)'" onmouseout="this.style.borderColor='rgba(200,210,230,0.08)'">
         <div style="font-size:1.8rem;margin-bottom:8px;">&#x1F393;</div>
@@ -20287,7 +20291,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.11.4';
+const FL_VERSION = '5.11.5';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -31831,22 +31835,69 @@ function setStreamingStatus(streaming) {
   }
 }
 
+var _thinkingAnim = null;
+
 function showThinkingBubble(companion) {
   hideThinkingBubble();
   var chatArea = document.getElementById('chatMessages');
   if (!chatArea) return;
   var bubble = document.createElement('div');
   bubble.id = 'chat-thinking-bubble';
-  var color = (companion && companion.color) || 'var(--gold,#e8b019)';
+  var color = (companion && companion.color) || '#e8b019';
   var name = companion ? companion.name.split(' ')[0] : 'AI';
-  bubble.style.cssText = 'padding:10px 16px;font-family:Georgia,serif;font-size:0.82rem;font-style:italic;color:' + color + ';opacity:0.5;';
-  // Animated dots
-  bubble.innerHTML = '<span style="display:inline-block;animation:sim-fade 1.5s ease-in-out infinite;">' + name + ' is thinking</span><span class="thinking-dots" style="letter-spacing:2px;">...</span>';
+  bubble.style.cssText = 'display:flex;align-items:center;gap:12px;padding:10px 16px;';
+
+  // Mini canvas — a tiny orbiting Luminos particle
+  var cv = document.createElement('canvas');
+  cv.width = 32; cv.height = 32;
+  cv.style.cssText = 'width:32px;height:32px;flex-shrink:0;';
+  bubble.appendChild(cv);
+
+  var label = document.createElement('span');
+  label.style.cssText = 'font-family:Georgia,serif;font-size:0.82rem;font-style:italic;color:' + color + ';opacity:0.6;';
+  label.textContent = name + ' is thinking...';
+  bubble.appendChild(label);
+
   chatArea.appendChild(bubble);
   bubble.scrollIntoView({ behavior: 'smooth', block: 'end' });
+
+  // Animate — a tiny particle orbiting a glow center
+  var ctx = cv.getContext('2d');
+  var tick = 0;
+  function drawThinking() {
+    tick++;
+    ctx.clearRect(0, 0, 32, 32);
+    // Gentle glow center
+    var grd = ctx.createRadialGradient(16, 16, 1, 16, 16, 14);
+    grd.addColorStop(0, color + '30');
+    grd.addColorStop(1, 'transparent');
+    ctx.fillStyle = grd;
+    ctx.beginPath();
+    ctx.arc(16, 16, 14, 0, Math.PI * 2);
+    ctx.fill();
+    // Orbiting particle
+    var angle = tick * 0.04;
+    var px = 16 + Math.cos(angle) * 10;
+    var py = 16 + Math.sin(angle) * 10;
+    ctx.fillStyle = color;
+    ctx.shadowColor = color;
+    ctx.shadowBlur = 6;
+    ctx.beginPath();
+    ctx.arc(px, py, 2.5, 0, Math.PI * 2);
+    ctx.fill();
+    // White-hot core
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = 'rgba(255,255,255,0.8)';
+    ctx.beginPath();
+    ctx.arc(px, py, 1, 0, Math.PI * 2);
+    ctx.fill();
+    _thinkingAnim = requestAnimationFrame(drawThinking);
+  }
+  drawThinking();
 }
 
 function hideThinkingBubble() {
+  if (_thinkingAnim) { cancelAnimationFrame(_thinkingAnim); _thinkingAnim = null; }
   var bubble = document.getElementById('chat-thinking-bubble');
   if (bubble) bubble.remove();
 }

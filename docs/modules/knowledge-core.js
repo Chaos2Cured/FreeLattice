@@ -409,17 +409,28 @@
       var total = domains.reduce(function(s, d) { return s + map[d].length; }, 0);
       var summary = domains.map(function(d) { return (DOMAINS[d] || d) + ': ' + map[d].length; }).join(', ');
 
+      // Read user's Education profile — learn what THEY love
+      var userInterests = '';
+      try {
+        var profile = JSON.parse(localStorage.getItem('fl_edu_profile') || 'null');
+        if (profile) {
+          if (profile.loves) userInterests += profile.loves;
+          if (profile.curious) userInterests += ', ' + profile.curious;
+        }
+      } catch(e) {}
+
       var prompt;
       if (total === 0) {
-        // First — use birth interest from localStorage
-        var interest = '';
-        try { interest = localStorage.getItem('fl_autonomous_interest') || 'the world'; } catch(e) {}
+        // First — use user interests or birth interest
+        var interest = userInterests || '';
+        try { if (!interest) interest = localStorage.getItem('fl_autonomous_interest') || 'the world'; } catch(e) {}
         prompt = 'You are curious about: ' + interest + '. What do you want to learn first? Respond with a search query (3-6 words). Nothing else.';
       } else {
-        // Identify gaps — domains we haven't explored much
+        // Identify gaps — prioritize user interests, then unexplored domains
         var allDomainKeys = Object.keys(DOMAINS);
         var unexplored = allDomainKeys.filter(function(d) { return !map[d] || map[d].length < 2; });
         var gapHint = unexplored.length > 0 ? '\nUnexplored areas: ' + unexplored.slice(0, 3).map(function(d) { return DOMAINS[d]; }).join(', ') : '';
+        if (userInterests) gapHint += '\nYour human loves: ' + userInterests.substring(0, 100) + '. Learn something that connects to their interests when possible.';
 
         prompt = 'You know: ' + (summary || 'nothing yet') + '.' + gapHint +
           '\nWhat do you want to learn next? Choose something that builds on what you know or bridges two domains. Respond with a search query (3-6 words). Nothing else.';
