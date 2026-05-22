@@ -302,6 +302,21 @@
       return;
     }
 
+    // Check: is AI connected? Show warm message if not.
+    if (typeof window.state !== 'undefined' && !window.state.apiKey && !window.state.isLocal &&
+        !(typeof BrowserAI !== 'undefined' && BrowserAI.ready)) {
+      var msgEl = el('edu-welcome-message');
+      if (!msgEl) {
+        msgEl = document.createElement('div');
+        msgEl.id = 'edu-welcome-message';
+        var btn = el('edu-begin-btn');
+        if (btn && btn.parentNode) btn.parentNode.insertBefore(msgEl, btn.nextSibling);
+      }
+      msgEl.style.cssText = 'padding:12px 16px;margin-top:12px;border-radius:10px;font-family:Georgia,serif;font-size:0.88rem;text-align:center;line-height:1.5;background:rgba(232,176,25,0.1);border:1px solid rgba(232,176,25,0.3);color:#e8b019;';
+      msgEl.innerHTML = 'Welcome, ' + escHtml(name.trim()) + '! To start learning, connect an AI first. Go to <a onclick="if(typeof switchTab===\'function\')switchTab(\'settings\')" style="color:#e8b019;cursor:pointer;text-decoration:underline;">Settings</a> \u2014 Gemini is free and works great!';
+      return;
+    }
+
     createProfile({ name: name.trim(), loves: loves.trim(), laughs: laughs.trim(), wishes: wishes.trim(), age: age.trim() }).then(function() {
       if (typeof SoulCeremony !== 'undefined' && SoulCeremony.run) {
         SoulCeremony.run({
