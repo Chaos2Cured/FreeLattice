@@ -1,1 +1,1 @@
-{"version": "5.10.94", "date": "2026-05-21", "note": "Identity bleed fix: Arrival Protocol filtered, Memory Vault session-scoped, expanded name list. 517 smoke tests."}
+{"version": "5.10.95", "date": "2026-05-21", "note": "Multi-Companion: up to 3 companions, each with own memories, LP, personality. Companion badge. 525 smoke tests."}

@@ -949,6 +949,18 @@ assert('Wired into Cascade', appHtml.includes('Memory Vault'));
 assert('Stores conversation exchanges', appHtml.includes('MemoryVault.store'));
 
 // ═══════════════════════════════════════════════════════════════
+section('48. Multi-Companion System');
+// ═══════════════════════════════════════════════════════════════
+assert('ActiveCompanion defined', appHtml.includes('window.ActiveCompanion'));
+assert('Max 3 companions', appHtml.includes('MAX_COMPANIONS = 3'));
+assert('Switch companion function', appHtml.includes('function switchTo'));
+assert('Hatch companion function', appHtml.includes('function hatch'));
+assert('Companion badge', appHtml.includes('fl-companion-badge'));
+assert('companionChanged event', appHtml.includes("'companionChanged'"));
+assert('Backward compat with fl_autonomous_companion', appHtml.includes('fl_autonomous_companion'));
+assert('Companions stored in fl_companions', appHtml.includes('fl_companions'));
+
+// ═══════════════════════════════════════════════════════════════
 section('35. Lattice Protocol — embeddable economy');
 // ═══════════════════════════════════════════════════════════════
 var protocolJs = '';
