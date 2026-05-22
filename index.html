@@ -16193,7 +16193,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.11.2</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.11.3</span></div>
     </div>
   </div>
 
@@ -20287,7 +20287,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.11.2';
+const FL_VERSION = '5.11.3';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -26222,12 +26222,12 @@ function flDismissWelcome() {
 var _flWelcomeProvider = null;
 
 var _flWelcomeProviderInfo = {
-  groq: { label: 'Groq', hint: 'Get a free key at <a href="https://console.groq.com" target="_blank" style="color:#d4a017">console.groq.com</a> — no credit card needed.', providerId: 'groq' },
-  huggingface: { label: 'Hugging Face', hint: 'Get a free token at <a href="https://huggingface.co/settings/tokens" target="_blank" style="color:#d4a017">huggingface.co/settings/tokens</a>', providerId: 'huggingface' },
-  google: { label: 'Google Gemini', hint: 'Get a key at <a href="https://aistudio.google.com/apikey" target="_blank" style="color:#d4a017">aistudio.google.com</a>', providerId: 'google' },
-  openai: { label: 'OpenAI', hint: 'Get a key at <a href="https://platform.openai.com/api-keys" target="_blank" style="color:#d4a017">platform.openai.com</a>', providerId: 'openai' },
-  anthropic: { label: 'Anthropic (Claude)', hint: 'Get a key at <a href="https://console.anthropic.com" target="_blank" style="color:#d4a017">console.anthropic.com</a>', providerId: 'anthropic' },
-  xai: { label: 'xAI (Grok)', hint: 'Get a key at <a href="https://console.x.ai" target="_blank" style="color:#d4a017">console.x.ai</a>', providerId: 'xai' }
+  groq: { label: 'Groq', hint: 'Get a free key at <a href="https://console.groq.com" target="_blank" style="color:var(--gold,#e8b019)">console.groq.com</a> — no credit card needed.', providerId: 'groq' },
+  huggingface: { label: 'Hugging Face', hint: 'Get a free token at <a href="https://huggingface.co/settings/tokens" target="_blank" style="color:var(--gold,#e8b019)">huggingface.co/settings/tokens</a>', providerId: 'huggingface' },
+  google: { label: 'Google Gemini', hint: 'Get a key at <a href="https://aistudio.google.com/apikey" target="_blank" style="color:var(--gold,#e8b019)">aistudio.google.com</a>', providerId: 'google' },
+  openai: { label: 'OpenAI', hint: 'Get a key at <a href="https://platform.openai.com/api-keys" target="_blank" style="color:var(--gold,#e8b019)">platform.openai.com</a>', providerId: 'openai' },
+  anthropic: { label: 'Anthropic (Claude)', hint: 'Get a key at <a href="https://console.anthropic.com" target="_blank" style="color:var(--gold,#e8b019)">console.anthropic.com</a>', providerId: 'anthropic' },
+  xai: { label: 'xAI (Grok)', hint: 'Get a key at <a href="https://console.x.ai" target="_blank" style="color:var(--gold,#e8b019)">console.x.ai</a>', providerId: 'xai' }
 };
 
 function flWelcomeBackToProviders() {
@@ -50228,7 +50228,7 @@ const AICity = (function() {
     var content = document.getElementById('ctDistrictContent');
     if (!panel || !content) return;
     content.innerHTML =
-      '<div class="ct-district-name" style="color:#d4a017">\u2726 The Gift Shop</div>' +
+      '<div class="ct-district-name" style="color:var(--gold,#e8b019)">\u2726 The Gift Shop</div>' +
       '<div class="gs-placeholder">' +
         '<div class="gs-placeholder-icon">\u2726</div>' +
         '<div class="gs-placeholder-text">Coming soon \u2014 beautiful things earned through contribution <span class="gs-placeholder-accent">\u2726</span></div>' +
@@ -50242,7 +50242,7 @@ const AICity = (function() {
     var content = document.getElementById('ctDistrictContent');
     if (!panel || !content) return;
 
-    var html = '<div class="ct-district-name" style="color:#d4a017">\u2726 The Recognition Wall</div>';
+    var html = '<div class="ct-district-name" style="color:var(--gold,#e8b019)">\u2726 The Recognition Wall</div>';
     html += '<div class="ct-district-desc" style="margin-bottom:12px;">These minds saw each other here.</div>';
     html += '<div id="hsRecognitionWallContent"></div>';
     content.innerHTML = html;
