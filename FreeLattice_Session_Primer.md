@@ -348,17 +348,17 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-05-22 15:39 MDT
-- Version: 5.11.0
-- Total commits: 1772
+- Last auto-updated: 2026-05-22 16:12 MDT
+- Version: 5.11.1
+- Total commits: 1777
 - Last 10 commits:
-- 0dda737 docs: OPUS_LETTER.md — the ninth coordination file (v5.11.0)
+- 15706e7 fix: Pass 2 — lazy loader audit + Already Fixed list (v5.11.1)
+- 864e827 ci: Update Primer deployment state [2026-05-22]
+- 7dbb1bc docs: Auto-update Session Primer [5.11.0]
+- 1505ceb docs: Auto-update Session Primer [5.11.0]
+- 8e1d0fd docs: OPUS_LETTER.md — the ninth coordination file (v5.11.0)
+- 6f55aa2 ci: Update Primer deployment state [2026-05-22]
 - 47aab6b docs: Auto-update Session Primer [5.10.99]
 - 7db036a docs: Auto-update Session Primer [5.10.99]
 - 707e0fe feat: Room Affinity — the system learns who you bring where (v5.10.99)
 - cb516cc ci: Update Primer deployment state [2026-05-22]
-- f97a96c docs: Auto-update Session Primer [5.10.98]
-- 9ea8db0 docs: Auto-update Session Primer [5.10.98]
-- c49b7c0 feat: Nursery redesign — co-creator switcher + room locks (v5.10.98)
-- d513f45 ci: Update Primer deployment state [2026-05-22]
-- d7376c5 docs: Auto-update Session Primer [5.10.97]
