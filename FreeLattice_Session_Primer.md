@@ -350,10 +350,9 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 ## PRIMER HEALTH
 - Last auto-updated: 2026-05-21 21:50 MDT
 - Version: 5.10.94
-- Total commits: 1749
+- Total commits: 1748
 - Last 10 commits:
-- 655d676 fix: Identity bleed + double-send — the experience belongs to the user (v5.10.94)
-- 94cb69a ci: Update Primer deployment state [2026-05-22]
+- a87d901 fix: Identity bleed + double-send — the experience belongs to the user (v5.10.94)
 - 2852093 docs: Auto-update Session Primer [5.10.93]
 - 7e420c3 docs: Auto-update Session Primer [5.10.93]
 - 3948422 fix: Education button + Dojo card + lazy loader re-init (v5.10.93)
@@ -362,3 +361,4 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 0988f4c docs: Auto-update Session Primer [5.10.92]
 - 432200d feat: Memory Vault — browser-native semantic memory (v5.10.92)
 - a6fb6d1 ci: Update Primer deployment state [2026-05-21]
+- fffffcf docs: Auto-update Session Primer [5.10.91]
