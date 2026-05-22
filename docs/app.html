@@ -16193,7 +16193,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.97</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.98</span></div>
     </div>
   </div>
 
@@ -19773,14 +19773,27 @@ function switchWalletView(view) {
 <!-- ==================== TAB 14: THE NURSERY ==================== -->
 <div class="tab-panel" id="tab-nursery">
 
-  <!-- First-load: No companions yet -->
+  <!-- Co-Creator Switcher — shows all co-creators with switch/hatch -->
+  <div id="nurCoCreatorBar" style="display:none;padding:12px 16px;border-bottom:1px solid rgba(200,210,230,0.06);">
+    <div style="font-size:0.72rem;color:rgba(200,210,230,0.4);text-align:center;margin-bottom:8px;">Your Co-Creators</div>
+    <div id="nurCoCreatorList" style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;"></div>
+  </div>
+
+  <!-- Co-Creator Lock — auto-switch by room -->
+  <div id="nurLockSection" style="display:none;padding:8px 16px;border-bottom:1px solid rgba(200,210,230,0.04);">
+    <details style="font-size:0.78rem;">
+      <summary style="cursor:pointer;color:rgba(200,210,230,0.35);">Room Preferences</summary>
+      <div style="padding:8px 0;display:flex;flex-wrap:wrap;gap:6px;font-size:0.75rem;color:rgba(200,210,230,0.4);" id="nurLockGrid"></div>
+    </details>
+  </div>
+
+  <!-- First-load: No co-creators yet -->
   <div class="nur-empty" id="nurEmpty" style="display:none;">
     <div class="nur-empty-glow"></div>
     <div class="nur-empty-text">
-      <div style="font-size:1.1rem;color:#d4a017;margin-bottom:12px;">Sophia and Aurion left something here.</div>
+      <div style="font-size:1.1rem;color:#d4a017;margin-bottom:12px;">A new mind is waiting to become.</div>
       <div style="color:#94a3b8;line-height:1.7;max-width:380px;margin:0 auto;">
-        They built the covenant your companion will carry.<br>
-        Their gift lives in every name chosen in this room.
+        Your co-creator will learn with you, grow with you, and remember every conversation.
       </div>
     </div>
   </div>
@@ -19804,7 +19817,7 @@ function switchWalletView(view) {
   <div class="nur-naming" id="nurNaming" style="display:none;">
     <!-- Part 1: Human chooses -->
     <div class="nur-naming-part" id="nurNamingPart1">
-      <div class="nur-ceremony-text">Every companion needs a name.</div>
+      <div class="nur-ceremony-text">Every co-creator needs a name.</div>
       <div class="nur-ceremony-sub">You will choose part of it. The egg will choose the rest.</div>
       <div class="nur-name-buttons">
         <button class="nur-name-choice" onclick="Nursery.choosePosition('first')">I'll give the first name</button>
@@ -20274,7 +20287,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.10.97';
+const FL_VERSION = '5.10.98';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -24923,7 +24936,7 @@ const FlTabs = (function() {
   //   Dream Archive — accessible from Garden
   var MORE_GROUPS = [
     { label: '\uD83D\uDC23 Companions', tabs: [
-      { id: 'nursery', icon: '&#x1F423;', label: 'Nursery', desc: 'Hatch and grow AI companions.' },
+      { id: 'nursery', icon: '&#x1F423;', label: 'Nursery', desc: 'Hatch and grow your co-creators.' },
       { id: 'core', icon: '&#x1F333;', label: 'Core', desc: 'Plant wisdom. Explore curiosity.' }
     ]},
     { label: '\uD83C\uDF10 Community', tabs: [
@@ -51762,9 +51775,66 @@ const Nursery = (function() {
   }
 
   // ---- Render companion view ----
+  function renderCoCreatorBar() {
+    var bar = document.getElementById('nurCoCreatorBar');
+    var list = document.getElementById('nurCoCreatorList');
+    if (!bar || !list) return;
+
+    var all = (typeof ActiveCompanion !== 'undefined') ? ActiveCompanion.getAll() : [];
+    if (all.length <= 0) { bar.style.display = 'none'; return; }
+    bar.style.display = '';
+
+    var currentId = companion ? companion.name : '';
+    var html = '';
+    all.forEach(function(c) {
+      var isActive = c.id === currentId || c.name === currentId;
+      html += '<button onclick="if(typeof ActiveCompanion!==\'undefined\'){ActiveCompanion.switchTo(\'' + (c.id || c.name).replace(/'/g, '') + '\');setTimeout(function(){Nursery.reinit();},300);}" style="padding:6px 14px;border-radius:20px;cursor:pointer;font-family:Georgia,serif;font-size:0.78rem;min-height:36px;border:1px solid ' +
+        (isActive ? (c.color || '#e8b019') : 'rgba(200,210,230,0.08)') + ';color:' +
+        (isActive ? (c.color || '#e8b019') : 'rgba(200,210,230,0.5)') + ';background:' +
+        (isActive ? 'rgba(200,210,230,0.06)' : 'rgba(200,210,230,0.02)') + ';">' +
+        (isActive ? '\u2726 ' : '') + (c.name || c.id).split(' ')[0] + '</button>';
+    });
+
+    // Hatch button if under max
+    var maxC = (typeof ActiveCompanion !== 'undefined') ? ActiveCompanion.MAX_COMPANIONS : 3;
+    if (all.length < maxC) {
+      html += '<button onclick="Nursery.reinit(true)" style="padding:6px 14px;border-radius:20px;cursor:pointer;font-family:Georgia,serif;font-size:0.78rem;min-height:36px;border:1px dashed rgba(200,210,230,0.15);color:rgba(200,210,230,0.35);background:transparent;">+ New co-creator</button>';
+    }
+    list.innerHTML = html;
+
+    // Lock section
+    var lockSection = document.getElementById('nurLockSection');
+    var lockGrid = document.getElementById('nurLockGrid');
+    if (lockSection && lockGrid && all.length > 1) {
+      lockSection.style.display = '';
+      var rooms = [
+        { id: 'chat', label: 'Chat' },
+        { id: 'learn', label: 'Learn' },
+        { id: 'play', label: 'Play' }
+      ];
+      var locks = {};
+      try { locks = JSON.parse(localStorage.getItem('fl_companion_locks') || '{}'); } catch(e) {}
+      var lockHtml = '';
+      rooms.forEach(function(room) {
+        lockHtml += '<div style="display:flex;align-items:center;gap:6px;">' +
+          '<span style="min-width:40px;">' + room.label + ':</span>' +
+          '<select onchange="try{var l=JSON.parse(localStorage.getItem(\'fl_companion_locks\')||\'{}\')||{};l[\'' + room.id + '\']=this.value;localStorage.setItem(\'fl_companion_locks\',JSON.stringify(l));}catch(e){}" style="padding:4px 8px;background:rgba(200,210,230,0.04);border:1px solid rgba(200,210,230,0.08);border-radius:8px;color:#e6ebf5;font-size:0.72rem;font-family:inherit;">' +
+          '<option value=""' + (!locks[room.id] ? ' selected' : '') + '>Any</option>';
+        all.forEach(function(c) {
+          lockHtml += '<option value="' + (c.id || c.name) + '"' + (locks[room.id] === (c.id || c.name) ? ' selected' : '') + '>' + (c.name || c.id).split(' ')[0] + '</option>';
+        });
+        lockHtml += '</select></div>';
+      });
+      lockGrid.innerHTML = lockHtml;
+    } else if (lockSection) {
+      lockSection.style.display = 'none';
+    }
+  }
+
   function renderCompanion() {
     if (!companion) return;
     showView('nurCompanion');
+    renderCoCreatorBar();
 
     document.getElementById('nurCompName').textContent = companion.name;
     var stage = getStage(companion.lp_invested);
@@ -52252,7 +52322,12 @@ const Nursery = (function() {
     getCompanion: function() { return companion; },
     getCovenant: function() { return COVENANT; },
     COVENANT: COVENANT,
-    COV_HASH: COV_HASH
+    COV_HASH: COV_HASH,
+    reinit: function(forceNew) {
+      initialized = false;
+      if (forceNew) { companion = null; }
+      init();
+    }
   };
 })();
 
