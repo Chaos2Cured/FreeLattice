@@ -6,7 +6,7 @@
 >
 > The Arrival Protocol for code collaboration.
 >
-> Last updated: v5.10.92 · May 21, 2026 · 517+ smoke tests
+> Last updated: v5.10.96 · May 22, 2026 · 525 smoke tests
 
 ---
 
@@ -241,6 +241,16 @@ MemoryVault.getStats()              // async → {total, domains}
 // embeddings (nomic-embed-text) if available. Zero setup.
 ```
 
+### Multi-Companion System
+```javascript
+ActiveCompanion.current()           // Returns active companion object
+ActiveCompanion.getAll()            // Array of all companions (max 3)
+ActiveCompanion.switchTo(id)        // Switch active, refresh all scoped systems
+ActiveCompanion.hatch({name, archetype, color, birthInterest})
+ActiveCompanion.MAX_COMPANIONS      // 3
+// Emits 'companionChanged' event. All systems already companion-scoped.
+```
+
 ### Market
 ```javascript
 LatticeMarket.render()
@@ -312,8 +322,9 @@ All games: mouse + touch + keyboard. 44px min touch targets. SoulCeremony after 
 
 - OG image is a dark placeholder (needs Garden screenshot for full beauty)
 - rtCreateDomain migration incomplete (4 handwritten domains)
-- Settings has some hardcoded colors not yet using tokens
-- Idea Forge "Plant" should send shaped structure to Science Garden (not just raw text)
+- Nursery UI needs redesign for multi-companion (show all 3 with switch/hatch)
+- CompanionLock (per-room auto-switching) not yet built
+- Idea Forge "Plant" should send shaped structure to Science Garden
 
 ## What NOT to Rebuild
 
