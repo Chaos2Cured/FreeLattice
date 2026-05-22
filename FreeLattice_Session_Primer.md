@@ -350,10 +350,9 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 ## PRIMER HEALTH
 - Last auto-updated: 2026-05-22 14:31 MDT
 - Version: 5.10.97
-- Total commits: 1761
+- Total commits: 1760
 - Last 10 commits:
-- 0466827 docs: Village Session summary — all coordination files updated (v5.10.97)
-- 5a6997d ci: Update Primer deployment state [2026-05-22]
+- 81c5267 docs: Village Session summary — all coordination files updated (v5.10.97)
 - f8c6b9e docs: Auto-update Session Primer [5.10.96]
 - 11bd513 docs: Auto-update Session Primer [5.10.96]
 - 10d523c fix: Chain never shows broken + SW force-update (v5.10.96)
@@ -362,3 +361,4 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - c78a785 docs: Auto-update Session Primer [5.10.95]
 - 909f300 feat: Multi-Companion System — up to 3 companions (v5.10.95)
 - f9d96e4 ci: Update Primer deployment state [2026-05-22]
+- 0b645e4 docs: Auto-update Session Primer [5.10.94]
