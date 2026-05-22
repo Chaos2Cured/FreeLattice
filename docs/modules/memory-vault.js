@@ -170,6 +170,9 @@
 
   async function buildMemoryContext(companionId) {
     var memories = await getCompanionMemories(companionId, 15);
+    // Only include memories from BEFORE this session — prevents double-send
+    var sessionStart = window._flSessionStart || Date.now();
+    memories = memories.filter(function(m) { return m.timestamp < sessionStart; });
     if (memories.length === 0) return '';
     var ctx = '\n[Memory Vault — ' + memories.length + ' memories:]\n';
     memories.forEach(function(m) {

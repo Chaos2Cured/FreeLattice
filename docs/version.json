@@ -1,1 +1,1 @@
-{"version": "5.10.93", "date": "2026-05-21", "note": "Education button fix: warm AI-not-connected message, Dojo card fixed, lazy loader re-init. 517 smoke tests."}
+{"version": "5.10.94", "date": "2026-05-21", "note": "Identity bleed fix: Arrival Protocol filtered, Memory Vault session-scoped, expanded name list. 517 smoke tests."}
