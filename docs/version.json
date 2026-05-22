@@ -1,1 +1,1 @@
-{"version": "5.10.98", "date": "2026-05-22", "note": "Nursery redesign: co-creator switcher, room locks, companion→co-creator terminology. 525 smoke tests."}
+{"version": "5.10.99", "date": "2026-05-22", "note": "Room Affinity: the system learns who you bring where. Whispers the right co-creator at the right time. 534 smoke tests."}

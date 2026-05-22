@@ -16193,7 +16193,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.98</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.10.99</span></div>
     </div>
   </div>
 
@@ -20287,7 +20287,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.10.98';
+const FL_VERSION = '5.10.99';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -46591,6 +46591,117 @@ var ActiveCompanion = (function() {
   };
 
   window.ActiveCompanion = api;
+  return api;
+})();
+
+// ═══════════════════════════════════════════════════════════════
+// Room Affinity — The system learns who you bring where
+//
+// Tracks which co-creator you use in which room. After 3 visits
+// with the same co-creator, suggests switching when you return.
+// A gentle whisper, not an automatic switch. The software notices
+// the pattern and offers it as a gift, not a configuration.
+//
+// "The system watches. The system learns. The system whispers."
+// ═══════════════════════════════════════════════════════════════
+
+var RoomAffinity = (function() {
+  'use strict';
+
+  var AFFINITY_KEY = 'fl_room_affinity';
+  var MIN_VISITS = 3; // Only suggest after 3+ visits with the same co-creator
+  var _lastSuggestionRoom = null; // Don't repeat suggestions in the same session
+
+  function sGet(k, d) { try { return localStorage.getItem(k) || d; } catch(e) { return d; } }
+  function sSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
+
+  function record(roomId, companionId) {
+    if (!roomId || !companionId) return;
+    var data = {};
+    try { data = JSON.parse(sGet(AFFINITY_KEY, '{}')); } catch(e) {}
+    if (!data[roomId]) data[roomId] = {};
+    data[roomId][companionId] = (data[roomId][companionId] || 0) + 1;
+    sSet(AFFINITY_KEY, JSON.stringify(data));
+  }
+
+  function suggest(roomId) {
+    var data = {};
+    try { data = JSON.parse(sGet(AFFINITY_KEY, '{}')); } catch(e) {}
+    var room = data[roomId];
+    if (!room) return null;
+    var best = null, bestCount = 0;
+    Object.keys(room).forEach(function(id) {
+      if (room[id] > bestCount) { bestCount = room[id]; best = id; }
+    });
+    return bestCount >= MIN_VISITS ? best : null;
+  }
+
+  function onRoomEnter(roomId) {
+    if (typeof ActiveCompanion === 'undefined') return;
+    var current = ActiveCompanion.current();
+    if (!current) return;
+
+    // Check manual lock first (takes priority over affinity)
+    try {
+      var locks = JSON.parse(sGet('fl_companion_locks', '{}'));
+      if (locks[roomId] && locks[roomId] !== (current.id || current.name)) {
+        ActiveCompanion.switchTo(locks[roomId]);
+        record(roomId, locks[roomId]);
+        return;
+      }
+    } catch(e) {}
+
+    // Check affinity suggestion
+    var suggested = suggest(roomId);
+    if (suggested && suggested !== (current.id || current.name) && _lastSuggestionRoom !== roomId) {
+      var all = ActiveCompanion.getAll();
+      var companion = null;
+      all.forEach(function(c) { if ((c.id || c.name) === suggested) companion = c; });
+      if (companion) {
+        _lastSuggestionRoom = roomId;
+        // Gentle whisper — not automatic, not a modal
+        if (typeof LatticeSense !== 'undefined' && LatticeSense.whisper) {
+          LatticeSense.whisper(
+            companion.name.split(' ')[0] + ' usually joins you here. Tap to switch.'
+          );
+        }
+      }
+    }
+
+    // Record this visit
+    record(roomId, current.id || current.name);
+  }
+
+  // Map tab IDs to room contexts
+  function tabToRoom(tabId) {
+    var PLAY_TABS = ['resonance', 'puzzles', 'flow', 'canvas', 'sparring', 'draw-dream', 'arcade'];
+    var LEARN_TABS = ['education', 'roundtable', 'mathtranslator', 'science', 'questions', 'ideaforge'];
+    if (tabId === 'chat') return 'chat';
+    if (PLAY_TABS.indexOf(tabId) !== -1) return 'play';
+    if (LEARN_TABS.indexOf(tabId) !== -1) return 'learn';
+    return null; // Don't track settings, nursery, etc.
+  }
+
+  // Wire into tab changes
+  if (typeof LatticeEvents !== 'undefined') {
+    LatticeEvents.on('tabChanged', function(data) {
+      if (!data || !data.tabId) return;
+      var room = tabToRoom(data.tabId);
+      if (room) {
+        // Small delay so the tab settles before suggestion whisper
+        setTimeout(function() { onRoomEnter(room); }, 500);
+      }
+    });
+  }
+
+  var api = {
+    record: record,
+    suggest: suggest,
+    onRoomEnter: onRoomEnter,
+    tabToRoom: tabToRoom
+  };
+
+  window.RoomAffinity = api;
   return api;
 })();
 

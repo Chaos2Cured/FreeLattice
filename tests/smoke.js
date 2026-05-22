@@ -961,6 +961,19 @@ assert('Backward compat with fl_autonomous_companion', appHtml.includes('fl_auto
 assert('Companions stored in fl_companions', appHtml.includes('fl_companions'));
 
 // ═══════════════════════════════════════════════════════════════
+section('49. Room Affinity + Co-Creator Nursery');
+// ═══════════════════════════════════════════════════════════════
+assert('RoomAffinity defined', appHtml.includes('window.RoomAffinity'));
+assert('Affinity recording', appHtml.includes('fl_room_affinity'));
+assert('Minimum visits before suggest', appHtml.includes('MIN_VISITS'));
+assert('Tab-to-room mapping', appHtml.includes('function tabToRoom'));
+assert('Whisper suggestion', appHtml.includes('usually joins you here'));
+assert('Manual lock priority', appHtml.includes('fl_companion_locks'));
+assert('Co-creator switcher bar', appHtml.includes('nurCoCreatorBar'));
+assert('Co-creator terminology', appHtml.includes('co-creator'));
+assert('Nursery reinit method', appHtml.includes('reinit:'));
+
+// ═══════════════════════════════════════════════════════════════
 section('35. Lattice Protocol — embeddable economy');
 // ═══════════════════════════════════════════════════════════════
 var protocolJs = '';
