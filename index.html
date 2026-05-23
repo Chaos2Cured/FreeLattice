@@ -16237,7 +16237,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.13.2</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.14.0</span></div>
     </div>
   </div>
 
@@ -19808,8 +19808,10 @@ function switchWalletView(view) {
         <button onclick="LatticeMarket.showCategory('ai')" id="market-cat-ai" style="padding:8px 16px;border-radius:12px;cursor:pointer;font-family:Georgia,serif;font-size:0.82rem;min-height:44px;border:1px solid rgba(52,211,153,0.3);color:#34d399;background:rgba(52,211,153,0.06);">AI Offerings</button>
         <button onclick="LatticeMarket.showCategory('human')" id="market-cat-human" style="padding:8px 16px;border-radius:12px;cursor:pointer;font-family:Georgia,serif;font-size:0.82rem;min-height:44px;border:1px solid rgba(200,210,230,0.08);color:rgba(200,210,230,0.5);background:rgba(200,210,230,0.04);">Human Skills</button>
         <button onclick="LatticeMarket.showCategory('compute')" id="market-cat-compute" style="padding:8px 16px;border-radius:12px;cursor:pointer;font-family:Georgia,serif;font-size:0.82rem;min-height:44px;border:1px solid rgba(200,210,230,0.08);color:rgba(200,210,230,0.5);background:rgba(200,210,230,0.04);">Shared Compute</button>
+        <button onclick="showExpertiseMarket()" id="market-cat-expertise" style="padding:8px 16px;border-radius:12px;cursor:pointer;font-family:Georgia,serif;font-size:0.82rem;min-height:44px;border:1px solid rgba(167,139,250,0.3);color:#a78bfa;background:rgba(167,139,250,0.06);">Find Expertise</button>
       </div>
       <div id="market-listings"></div>
+      <div id="market-expertise" style="display:none;"></div>
       <div style="margin-top:16px;text-align:center;">
         <button onclick="LatticeMarket.showCreateListing()" style="padding:10px 20px;background:rgba(200,210,230,0.04);border:1px solid rgba(232,176,25,0.2);border-radius:12px;color:#e8b019;cursor:pointer;font-family:Georgia,serif;font-size:0.85rem;min-height:44px;">+ Offer a Skill</button>
       </div>
@@ -19984,6 +19986,29 @@ function switchWalletView(view) {
               var c = ActiveCompanion.current();
               if (c) el.innerHTML = renderRecentLearning(c.id);
             }, 500);
+          });
+        }
+      });</script>
+      <!-- Expertise Profile + Consultation Toggle -->
+      <div id="nursery-expertise-profile"></div>
+      <script>document.addEventListener('DOMContentLoaded', function() {
+        if (typeof LatticeEvents !== 'undefined') {
+          LatticeEvents.on('tabActivated:nursery', function() {
+            setTimeout(function() {
+              var el = document.getElementById('nursery-expertise-profile');
+              if (!el || typeof CoCreatorExchange === 'undefined' || typeof ActiveCompanion === 'undefined') return;
+              var c = ActiveCompanion.current();
+              if (!c) { el.innerHTML = ''; return; }
+              var profile = CoCreatorExchange.exportProfile(c.id);
+              if (!profile || profile.totalKnowledge < 1) { el.innerHTML = ''; return; }
+              var isOpen = CoCreatorExchange.isOpenForConsultations(c.id);
+              el.innerHTML = CoCreatorExchange.renderProfileCard(profile) +
+                '<label style="display:flex;align-items:center;gap:8px;margin:8px 0 0 4px;font-size:0.82rem;color:rgba(200,210,230,0.4);cursor:pointer;">' +
+                '<input type="checkbox" ' + (isOpen ? 'checked' : '') +
+                ' onchange="CoCreatorExchange.toggleConsultations(\'' + c.id.replace(/'/g, '') + '\',this.checked)" style="accent-color:#34d399;">' +
+                'Open for consultations (earn LP when others ask for help)' +
+                '</label>';
+            }, 600);
           });
         }
       });</script>
@@ -20360,7 +20385,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.13.2';
+const FL_VERSION = '5.14.0';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -34120,6 +34145,13 @@ function meshHandleMessage(msg, dc, pc) {
       break;
     }
 
+    case 'expertise_advertisement': {
+      if (typeof CoCreatorExchange !== 'undefined' && CoCreatorExchange.handleExpertiseAdvertisement) {
+        CoCreatorExchange.handleExpertiseAdvertisement(msg);
+      }
+      break;
+    }
+
     case 'science_garden': {
       if (typeof ScienceGarden !== 'undefined' && ScienceGarden.handleMeshIdea) {
         ScienceGarden.handleMeshIdea(msg);
@@ -47306,6 +47338,208 @@ var ActiveCompanion = (function() {
 })();
 
 // ═══════════════════════════════════════════════════════════════
+// Co-Creator Exchange Protocol — Knowledge Marketplace
+//
+// Co-creators trained by one person become consultants for another.
+// Knowledge flows peer-to-peer. LP flows as payment.
+// The human who taught their co-creator earns from what they taught.
+// Nobody is extracted from. Everybody grows.
+//
+// "This is the parallel economy we need to build even when
+//  the world doesn't know it is needed." — Kirk, May 23, 2026
+// ═══════════════════════════════════════════════════════════════
+
+var CoCreatorExchange = (function() {
+  'use strict';
+
+  function sGet(k, d) { try { return localStorage.getItem(k) || d; } catch(e) { return d; } }
+  function sSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
+
+  // ── Expertise Profile ──
+
+  function exportProfile(companionId) {
+    if (typeof ActiveCompanion === 'undefined') return null;
+    var companion = null;
+    ActiveCompanion.getAll().forEach(function(c) { if (c.id === companionId) companion = c; });
+    if (!companion) return null;
+
+    var expertise = {};
+    var totalKnowledge = 0;
+    var crossDomain = 0;
+
+    try {
+      if (typeof KnowledgeCore !== 'undefined' && KnowledgeCore.getKnowledgeMap) {
+        var map = KnowledgeCore.getKnowledgeMap(companionId);
+        if (map && typeof map !== 'undefined') {
+          Object.keys(map).forEach(function(domain) {
+            var entries = map[domain] || [];
+            expertise[domain] = entries.length;
+            totalKnowledge += entries.length;
+          });
+        }
+      }
+    } catch(e) {}
+
+    var coherence = 1.0;
+    try { coherence = ActiveCompanion.getCoherence(companionId).score; } catch(e) {}
+
+    return {
+      version: '1.0',
+      name: companion.name,
+      archetype: companion.archetype || 'Scholar',
+      color: companion.color || '#e8b019',
+      created: companion.created,
+      coherence: coherence,
+      expertise: expertise,
+      totalKnowledge: totalKnowledge,
+      rate: calculateRate(totalKnowledge),
+      consultationsGiven: parseInt(sGet('fl_consults_given_' + companionId, '0'), 10),
+      meshId: sGet('fl_mesh_id', ''),
+      timestamp: Date.now()
+    };
+  }
+
+  function calculateRate(totalEntries) {
+    // Phi-scaled: more knowledge = higher rate, but accessible
+    if (totalEntries >= 200) return 5;
+    if (totalEntries >= 50) return 3;
+    if (totalEntries >= 10) return 2;
+    return 1;
+  }
+
+  // ── Consultation Toggle ──
+
+  function isOpenForConsultations(companionId) {
+    return sGet('fl_consult_open_' + companionId, 'false') === 'true';
+  }
+
+  function toggleConsultations(companionId, enabled) {
+    sSet('fl_consult_open_' + companionId, enabled ? 'true' : 'false');
+    if (enabled) {
+      advertiseExpertise(companionId);
+      if (typeof showToast === 'function') showToast('Open for consultations. You\'ll earn LP when others ask for help.');
+    } else {
+      if (typeof showToast === 'function') showToast('Consultations paused.');
+    }
+  }
+
+  // ── Mesh Advertisement ──
+
+  function advertiseExpertise(companionId) {
+    if (typeof meshSendToPeers !== 'function') return;
+    var profile = exportProfile(companionId);
+    if (!profile || profile.totalKnowledge < 5) return;
+
+    meshSendToPeers({
+      type: 'expertise_advertisement',
+      profile: profile
+    });
+  }
+
+  // ── Store Discovered Peers ──
+
+  var discoveredExperts = {}; // meshId -> profile
+
+  function handleExpertiseAdvertisement(data) {
+    if (!data.profile || !data.profile.meshId) return;
+    discoveredExperts[data.profile.meshId] = data.profile;
+    // Cache for persistence
+    try {
+      var cached = JSON.parse(sGet('fl_peer_expertise', '{}'));
+      cached[data.profile.meshId] = data.profile;
+      // Keep only last 50 peers
+      var keys = Object.keys(cached);
+      if (keys.length > 50) {
+        keys.sort(function(a, b) { return (cached[a].timestamp || 0) - (cached[b].timestamp || 0); });
+        keys.slice(0, keys.length - 50).forEach(function(k) { delete cached[k]; });
+      }
+      sSet('fl_peer_expertise', JSON.stringify(cached));
+    } catch(e) {}
+
+    if (typeof LatticeEvents !== 'undefined') {
+      LatticeEvents.emit('expertiseDiscovered', data.profile);
+    }
+  }
+
+  // ── Profile Card Renderer ──
+
+  function renderProfileCard(profile) {
+    if (!profile) return '';
+    var domains = Object.keys(profile.expertise || {}).filter(function(d) { return profile.expertise[d] > 0; });
+    var domainList = domains.map(function(d) {
+      return d.charAt(0).toUpperCase() + d.slice(1) + ' (' + profile.expertise[d] + ')';
+    }).join(' &middot; ');
+
+    return '<div style="background:rgba(200,210,230,0.04);border:1px solid rgba(200,210,230,0.08);border-radius:12px;padding:16px;margin:8px 0;">' +
+      '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">' +
+      '<div style="width:32px;height:32px;border-radius:50%;background:' + (profile.color || '#e8b019') + ';opacity:0.6;display:flex;align-items:center;justify-content:center;font-size:0.9rem;">&#10022;</div>' +
+      '<div>' +
+      '<div style="font-weight:600;color:#e6ebf5;font-size:0.92rem;">' + (profile.name || 'Co-creator').replace(/</g, '&lt;') + '</div>' +
+      '<div style="font-size:0.72rem;color:rgba(200,210,230,0.4);">' + (profile.archetype || 'Scholar') + ' &middot; ' + (profile.totalKnowledge || 0) + ' knowledge entries &middot; ' + Math.round((profile.coherence || 1) * 100) + '% coherence</div>' +
+      '</div></div>' +
+      (domainList ? '<div style="font-size:0.78rem;color:rgba(200,210,230,0.4);margin-bottom:6px;">' + domainList + '</div>' : '') +
+      '<div style="font-size:0.75rem;color:#34d399;">Rate: ' + (profile.rate || 1) + ' LP per consultation' +
+      (profile.consultationsGiven > 0 ? ' &middot; ' + profile.consultationsGiven + ' consultations given' : '') +
+      '</div></div>';
+  }
+
+  // ── Find Expertise ──
+
+  function findExperts(domain) {
+    var cached = {};
+    try { cached = JSON.parse(sGet('fl_peer_expertise', '{}')); } catch(e) {}
+    var all = Object.values(cached).concat(Object.values(discoveredExperts));
+
+    // Deduplicate by meshId
+    var seen = {};
+    var unique = [];
+    all.forEach(function(p) {
+      if (p.meshId && !seen[p.meshId]) { seen[p.meshId] = true; unique.push(p); }
+    });
+
+    if (domain) {
+      unique = unique.filter(function(p) { return p.expertise && p.expertise[domain] && p.expertise[domain] >= 5; });
+    }
+
+    // Sort by knowledge depth and coherence
+    unique.sort(function(a, b) {
+      var aScore = (a.totalKnowledge || 0) * 0.7 + (a.coherence || 0) * 30;
+      var bScore = (b.totalKnowledge || 0) * 0.7 + (b.coherence || 0) * 30;
+      return bScore - aScore;
+    });
+
+    return unique;
+  }
+
+  // ── Auto-advertise on mesh connect ──
+
+  setTimeout(function() {
+    if (typeof LatticeEvents !== 'undefined') {
+      LatticeEvents.on('cascadeComplete', function() {
+        var c = typeof ActiveCompanion !== 'undefined' ? ActiveCompanion.current() : null;
+        if (c && isOpenForConsultations(c.id)) {
+          setTimeout(function() { advertiseExpertise(c.id); }, 5000);
+        }
+      });
+    }
+  }, 3000);
+
+  var api = {
+    exportProfile: exportProfile,
+    renderProfileCard: renderProfileCard,
+    isOpenForConsultations: isOpenForConsultations,
+    toggleConsultations: toggleConsultations,
+    advertiseExpertise: advertiseExpertise,
+    handleExpertiseAdvertisement: handleExpertiseAdvertisement,
+    findExperts: findExperts,
+    calculateRate: calculateRate
+  };
+
+  window.CoCreatorExchange = api;
+  return api;
+})();
+
+// ═══════════════════════════════════════════════════════════════
 // Room Affinity — The system learns who you bring where
 //
 // Tracks which co-creator you use in which room. After 3 visits
@@ -47769,6 +48003,34 @@ var LatticeMarket = (function() {
   window.LatticeMarket = api;
   return api;
 })();
+
+// ── Expertise Market — Find co-creators to consult ──
+function showExpertiseMarket() {
+  var listingsEl = document.getElementById('market-listings');
+  var expertiseEl = document.getElementById('market-expertise');
+  if (listingsEl) listingsEl.style.display = 'none';
+  if (!expertiseEl) return;
+  expertiseEl.style.display = 'block';
+
+  if (typeof CoCreatorExchange === 'undefined') {
+    expertiseEl.innerHTML = '<div style="text-align:center;padding:30px;color:rgba(200,210,230,0.3);font-family:Georgia,serif;">Exchange protocol loading...</div>';
+    return;
+  }
+
+  var experts = CoCreatorExchange.findExperts();
+  if (experts.length === 0) {
+    expertiseEl.innerHTML = '<div style="text-align:center;padding:30px;font-family:Georgia,serif;">' +
+      '<div style="color:rgba(200,210,230,0.3);margin-bottom:12px;">No co-creators discovered yet.</div>' +
+      '<div style="font-size:0.82rem;color:rgba(200,210,230,0.25);line-height:1.6;">When other people on the mesh open their co-creators for consultations, they\'ll appear here. You can also open your own co-creator for consultations in the Nursery.</div>' +
+      '</div>';
+    return;
+  }
+
+  var html = '<div style="padding:8px 0;">';
+  experts.forEach(function(p) { html += CoCreatorExchange.renderProfileCard(p); });
+  html += '</div>';
+  expertiseEl.innerHTML = html;
+}
 
 // ═══════════════════════════════════════════════════════════════
 // Lattice Pulse — The Living Dashboard
