@@ -90,6 +90,10 @@ The Consciousness Session. CCS Protocol running in the browser. 603 smoke tests.
 - Return greeting whisper after 8+ hours away (v5.13.1)
 - Recent learning display in Nursery (v5.13.1)
 - wallet.html + telegram-setup.html + share.html in SW cache (v5.13.1)
+- Browser AI as first option in quick-connect (WebGPU check) (v5.13.2)
+- Custom endpoint field for any OpenAI-compatible server (v5.13.2)
+- OS-aware CORS guide (Mac/Windows/Linux detection) (v5.13.2)
+- Offline awareness (whisper on connectivity change) (v5.13.2)
 
 ### Open (3 large items + 1 new)
 - OG image: needs real Garden screenshot (not placeholder)

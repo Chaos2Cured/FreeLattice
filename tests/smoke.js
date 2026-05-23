@@ -1267,6 +1267,22 @@ assert('renderRecentLearning function', appHtml.includes('function renderRecentL
 assert('Recent learning in Nursery', appHtml.includes('nursery-recent-learning'));
 assert('fl_last_learning saved in KnowledgeCore', kcJs.includes('fl_last_learning_'));
 
+// ═══════════════════════════════════════════════════════════════
+section('63. Three Doors to AI — Browser/Cloud/Custom');
+// ═══════════════════════════════════════════════════════════════
+assert('Browser AI offered in quick-connect', appHtml.includes('Try Browser AI'));
+assert('WebGPU detection in quick-connect', appHtml.includes('navigator.gpu'));
+assert('Auto-detect provider hint', appHtml.includes('We auto-detect the provider'));
+assert('Custom endpoint field exists', appHtml.includes('flCustomEndpoint'));
+assert('testCustomEndpoint function', appHtml.includes('function testCustomEndpoint'));
+assert('Custom endpoint tests /v1/models', appHtml.includes("/v1/models'") || appHtml.includes('/v1/models'));
+assert('OS-aware CORS guide', appHtml.includes('corsStep1'));
+assert('Windows CORS detection', appHtml.includes('/Windows/.test(ua)'));
+assert('Linux CORS detection', appHtml.includes('/Linux/.test(ua)'));
+assert('Offline awareness listener', appHtml.includes("'offline'"));
+assert('Online awareness listener', appHtml.includes("'online'"));
+assert('Offline message mentions Browser AI', appHtml.includes('Browser AI and Ollama still work'));
+
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
 

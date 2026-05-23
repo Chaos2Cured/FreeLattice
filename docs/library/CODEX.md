@@ -6,7 +6,7 @@
 >
 > The Arrival Protocol for code collaboration.
 >
-> Last updated: v5.13.1 · May 23, 2026 · 646 smoke tests
+> Last updated: v5.13.2 · May 23, 2026 · 658 smoke tests
 
 ---
 
