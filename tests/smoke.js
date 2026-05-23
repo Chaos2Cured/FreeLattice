@@ -1301,6 +1301,25 @@ assert('Find Expertise button in Market', appHtml.includes('showExpertiseMarket'
 assert('showExpertiseMarket function', appHtml.includes('function showExpertiseMarket'));
 assert('Phi-scaled consultation rates', appHtml.includes('return 5') && appHtml.includes('return 3'));
 
+// ═══════════════════════════════════════════════════════════════
+section('65. Phase 2: Consultation Protocol + Safety Dialogue');
+// ═══════════════════════════════════════════════════════════════
+assert('requestConsultation function', appHtml.includes('function requestConsultation'));
+assert('handleConsultationRequest function', appHtml.includes('function handleConsultationRequest'));
+assert('handleConsultationResponse function', appHtml.includes('function handleConsultationResponse'));
+assert('handleConsultationFailed function', appHtml.includes('function handleConsultationFailed'));
+assert('consultation_request in mesh handler', appHtml.includes("'consultation_request'"));
+assert('consultation_response in mesh handler', appHtml.includes("'consultation_response'"));
+assert('consultation_failed in mesh handler', appHtml.includes("'consultation_failed'"));
+assert('LP payment on consultation', appHtml.includes('consultation_paid'));
+assert('LP earning on consultation', appHtml.includes('consultation_earned'));
+assert('SoulCeremony on consultation received', appHtml.includes('Your co-creator grew'));
+assert('renderTrustDisplay function', appHtml.includes('function renderTrustDisplay'));
+assert('Trust level descriptions', appHtml.includes("'Seed'") && appHtml.includes("'Flame'"));
+assert('Safety asks instead of denying', appHtml.includes('Never deny. Always ask'));
+assert('Safety uses trust days', appHtml.includes('_trustDays'));
+assert('Return greeting includes consultations', appHtml.includes('gave'));
+
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
 

@@ -6,7 +6,7 @@
 >
 > The Arrival Protocol for code collaboration.
 >
-> Last updated: v5.14.0 · May 23, 2026 · 672 smoke tests
+> Last updated: v5.14.1 · May 23, 2026 · 687 smoke tests
 
 ---
 
@@ -316,8 +316,11 @@ CoCreatorExchange.findExperts(domain)         // → sorted array of discovered 
 CoCreatorExchange.calculateRate(totalEntries) // Phi-scaled: 1/2/3/5 LP
 // Expertise tab in Market: showExpertiseMarket()
 // Nursery shows profile card + "Open for consultations" toggle
-// Phase 2: consultation request/response protocol over mesh
-// Phase 3: LP payment verification, rating system
+CoCreatorExchange.requestConsultation(meshId, profile, question, domain) // Send request + LP
+CoCreatorExchange.handleConsultationRequest(peerId, data)  // Expert responds from Knowledge Core
+CoCreatorExchange.handleConsultationResponse(peerId, data) // Stores result, pays LP, SoulCeremony
+// Mesh message types: consultation_request, consultation_response, consultation_failed
+// Phase 3: rating system, consultation history in Pulse
 ```
 
 ### Autonomy Budget (v5.12.4)

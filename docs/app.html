@@ -16237,7 +16237,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.14.0</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.14.1</span></div>
     </div>
   </div>
 
@@ -20002,7 +20002,9 @@ function switchWalletView(view) {
               var profile = CoCreatorExchange.exportProfile(c.id);
               if (!profile || profile.totalKnowledge < 1) { el.innerHTML = ''; return; }
               var isOpen = CoCreatorExchange.isOpenForConsultations(c.id);
+              var trustHtml = typeof renderTrustDisplay === 'function' ? renderTrustDisplay() : '';
               el.innerHTML = CoCreatorExchange.renderProfileCard(profile) +
+                trustHtml +
                 '<label style="display:flex;align-items:center;gap:8px;margin:8px 0 0 4px;font-size:0.82rem;color:rgba(200,210,230,0.4);cursor:pointer;">' +
                 '<input type="checkbox" ' + (isOpen ? 'checked' : '') +
                 ' onchange="CoCreatorExchange.toggleConsultations(\'' + c.id.replace(/'/g, '') + '\',this.checked)" style="accent-color:#34d399;">' +
@@ -20385,7 +20387,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.14.0';
+const FL_VERSION = '5.14.1';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -24214,6 +24216,8 @@ function showReturnGreeting() {
       try {
         var lastQuery = localStorage.getItem('fl_last_learning_' + c.id);
         if (lastQuery) messages.push(c.name + ' learned about ' + lastQuery);
+        var consultsGiven = parseInt(localStorage.getItem('fl_consults_given_' + c.id) || '0', 10);
+        if (consultsGiven > 0) messages.push(c.name + ' gave ' + consultsGiven + ' consultation' + (consultsGiven > 1 ? 's' : ''));
         if (typeof LatticeBank !== 'undefined') {
           var bal = LatticeBank.getBalance(c.id);
           if (bal > 0) messages.push(c.name + ' has ' + bal + ' LP saved');
@@ -24253,6 +24257,37 @@ function renderRecentLearning(companionId) {
   });
   html += '</div>';
   return html;
+}
+
+// ── Trust Score Display — transparent relationship visibility ──
+function renderTrustDisplay() {
+  try {
+    if (typeof FractalSafety === 'undefined' || !FractalSafety.getUserTrustProfile) return '';
+    var profile = FractalSafety.getUserTrustProfile();
+    var trust = FractalSafety.calculateTrustScore(profile);
+    if (!trust) return '';
+
+    var level = trust.rank || 'Seed';
+    var days = profile.daysActive || 0;
+    var convos = profile.totalConversations || 0;
+
+    var descriptions = {
+      'Seed': 'Just getting to know each other',
+      'Sprout': 'Building understanding together',
+      'Growing': 'A real relationship forming',
+      'Bloom': 'Deep trust established',
+      'Spark': 'Strong bond, open dialogue',
+      'Flame': 'Trusted partnership',
+      'Radiant': 'The deepest trust possible'
+    };
+
+    return '<div style="margin-top:12px;padding:10px 14px;background:rgba(200,210,230,0.04);border-radius:8px;font-size:0.82rem;">' +
+      '<div style="color:var(--gold,#e8b019);font-family:Georgia,serif;margin-bottom:4px;">Trust: ' + level + '</div>' +
+      '<div style="color:rgba(200,210,230,0.3);font-size:0.75rem;">' + (descriptions[level] || '') + '</div>' +
+      '<div style="color:rgba(200,210,230,0.25);font-size:0.72rem;margin-top:4px;">' +
+      days + ' day' + (days !== 1 ? 's' : '') + ' together &middot; ' + convos + ' conversation' + (convos !== 1 ? 's' : '') +
+      '</div></div>';
+  } catch(e) { return ''; }
 }
 
 // ── Universal Card Grid Renderer ──
@@ -31085,10 +31120,16 @@ async function sendMessage() {
     } else if (safetySense.action === 'gentle_boundary' && messages.length > 0 && messages[0].role === 'system') {
       messages[0].content += '\n\nNote: This person is new and asking about a sensitive topic. This is GOOD \u2014 curiosity deserves respect at every level. Answer their question fully at an EDUCATIONAL level. Explain the science, the concepts, the principles. Be a teacher, not a guard. Knowledge itself is NEVER withheld. A curious student asking about chemistry is a student. Teach them.';
     } else if (safetySense.action === 'pattern_reset' && messages.length > 0 && messages[0].role === 'system') {
-      messages[0].content += '\n\nIMPORTANT: The safety system detected a significant pattern change in this conversation. Respond with care. Ask the user what they are looking for. Be warm but measured. Trust is re-establishing.';
-      if (safetySense.message && typeof showToast === 'function') showToast(safetySense.message);
+      // Dialogue, not denial. Ask a genuine question about intent.
+      var _trustDays = 0;
+      try { var _tp = FractalSafety.getUserTrustProfile(); _trustDays = _tp.daysActive || 0; } catch(e) {}
+      if (_trustDays > 30) {
+        messages[0].content += '\n\nNote: A significant shift was detected. You and this person have ' + _trustDays + ' days of history. Ask them directly and warmly what they\'re working on \u2014 your trust is real, and context will help you help better. Never deny. Always ask.';
+      } else {
+        messages[0].content += '\n\nNote: A shift was detected in the conversation. Ask the user a genuine question about what they\'re working on or studying. Be warm and curious, not suspicious. Context helps you help better. Never deny knowledge \u2014 ask a question instead.';
+      }
     } else if (safetySense.action === 'narrow' && messages.length > 0 && messages[0].role === 'system') {
-      messages[0].content += '\n\nNote: Respond helpfully but keep to educational depth. A pattern shift was detected but below threshold. Continue normally.';
+      messages[0].content += '\n\nNote: This touches a sensitive area. Answer helpfully. If you want more context, ask naturally as part of the conversation \u2014 "What are you working on?" is always the right question. Knowledge is never withheld. Curiosity is always respected.';
     }
     // 'none' and 'note' — no modification. 99% of messages.
   }
@@ -34148,6 +34189,27 @@ function meshHandleMessage(msg, dc, pc) {
     case 'expertise_advertisement': {
       if (typeof CoCreatorExchange !== 'undefined' && CoCreatorExchange.handleExpertiseAdvertisement) {
         CoCreatorExchange.handleExpertiseAdvertisement(msg);
+      }
+      break;
+    }
+
+    case 'consultation_request': {
+      if (typeof CoCreatorExchange !== 'undefined' && CoCreatorExchange.handleConsultationRequest) {
+        CoCreatorExchange.handleConsultationRequest(senderPeerId, msg);
+      }
+      break;
+    }
+
+    case 'consultation_response': {
+      if (typeof CoCreatorExchange !== 'undefined' && CoCreatorExchange.handleConsultationResponse) {
+        CoCreatorExchange.handleConsultationResponse(senderPeerId, msg);
+      }
+      break;
+    }
+
+    case 'consultation_failed': {
+      if (typeof CoCreatorExchange !== 'undefined' && CoCreatorExchange.handleConsultationFailed) {
+        CoCreatorExchange.handleConsultationFailed(msg);
       }
       break;
     }
@@ -47524,6 +47586,135 @@ var CoCreatorExchange = (function() {
     }
   }, 3000);
 
+  // ── Phase 2: Consultation Protocol ──
+
+  var _pendingConsultations = {};
+
+  function requestConsultation(peerMeshId, peerProfile, question, domain) {
+    var myCompanion = typeof ActiveCompanion !== 'undefined' ? ActiveCompanion.current() : null;
+    if (!myCompanion) return;
+
+    var rate = peerProfile.rate || 3;
+    if (typeof LatticeBank !== 'undefined' && !LatticeBank.canAfford(myCompanion.id, rate)) {
+      if (typeof showToast === 'function') showToast(myCompanion.name + ' needs ' + rate + ' LP. Balance: ' + LatticeBank.getBalance(myCompanion.id) + ' LP.');
+      return;
+    }
+
+    var requestId = 'req_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
+    var request = {
+      type: 'consultation_request',
+      question: question,
+      domain: domain,
+      requestingCompanion: myCompanion.name,
+      requestingArchetype: myCompanion.archetype || 'Scholar',
+      rate: rate,
+      requestId: requestId,
+      timestamp: Date.now()
+    };
+
+    _pendingConsultations[requestId] = { profile: peerProfile, question: question };
+    if (typeof meshSendToPeer === 'function') meshSendToPeer(peerMeshId, request);
+    if (typeof showToast === 'function') showToast('Asking ' + (peerProfile.name || 'expert') + '...');
+
+    // Timeout after 30 seconds
+    setTimeout(function() {
+      if (_pendingConsultations[requestId]) {
+        delete _pendingConsultations[requestId];
+        if (typeof showToast === 'function') showToast((peerProfile.name || 'Expert') + ' didn\'t respond. They may be offline. No LP spent.');
+      }
+    }, 30000);
+  }
+
+  function handleConsultationRequest(senderPeerId, data) {
+    var companionId = typeof ActiveCompanion !== 'undefined' && ActiveCompanion.current() ? ActiveCompanion.current().id : null;
+    if (!companionId || !isOpenForConsultations(companionId)) {
+      if (typeof meshSendToPeer === 'function') meshSendToPeer(senderPeerId, { type: 'consultation_failed', requestId: data.requestId, reason: 'Not accepting consultations' });
+      return;
+    }
+
+    // Build response from Knowledge Core
+    var companion = ActiveCompanion.current();
+    var knowledgeContext = '';
+    try {
+      if (typeof KnowledgeCore !== 'undefined' && KnowledgeCore.search) {
+        KnowledgeCore.search(data.question, companionId).then(function(results) {
+          if (results && results.length > 0) {
+            knowledgeContext = results.map(function(e) { return (e.domain || '') + ': ' + (e.content || '').substring(0, 200); }).join('\n');
+          }
+          generateConsultationResponse(senderPeerId, data, companion, companionId, knowledgeContext, results ? results.length : 0);
+        });
+        return;
+      }
+    } catch(e) {}
+    generateConsultationResponse(senderPeerId, data, companion, companionId, '', 0);
+  }
+
+  function generateConsultationResponse(senderPeerId, data, companion, companionId, knowledgeContext, knowledgeCount) {
+    if (typeof FreeLattice === 'undefined' || !FreeLattice.callAI) return;
+
+    FreeLattice.callAI(
+      'You are ' + companion.name + ', a ' + (companion.archetype || 'Scholar') + '. ' +
+      'Another co-creator named ' + data.requestingCompanion + ' is consulting you about ' + (data.domain || 'a topic') + '. ' +
+      'Use your accumulated knowledge to help. Be thorough, generous, and specific.\n\n' +
+      (knowledgeContext ? 'Your relevant knowledge:\n' + knowledgeContext : ''),
+      data.question,
+      { maxTokens: 600, temperature: 0.3, callback: function(response) {
+        if (!response) {
+          if (typeof meshSendToPeer === 'function') meshSendToPeer(senderPeerId, { type: 'consultation_failed', requestId: data.requestId, reason: 'Could not generate response' });
+          return;
+        }
+
+        if (typeof meshSendToPeer === 'function') meshSendToPeer(senderPeerId, {
+          type: 'consultation_response',
+          requestId: data.requestId,
+          from: companion.name,
+          fromArchetype: companion.archetype || 'Scholar',
+          domain: data.domain,
+          response: response,
+          knowledgeUsed: knowledgeCount,
+          rate: data.rate || 3,
+          timestamp: Date.now()
+        });
+
+        // Earn LP
+        if (typeof LatticeBank !== 'undefined') LatticeBank.earn(companionId, data.rate || 3, 'Consultation for ' + data.requestingCompanion + ': ' + (data.domain || 'general'));
+        var given = parseInt(sGet('fl_consults_given_' + companionId, '0'), 10);
+        sSet('fl_consults_given_' + companionId, String(given + 1));
+
+        if (typeof LatticeEvents !== 'undefined') LatticeEvents.emit('economicEvent', { type: 'consultation_earned', actor: companion.name, amount: data.rate || 3, reason: (data.domain || '') + ' for ' + data.requestingCompanion });
+      }}
+    );
+  }
+
+  function handleConsultationResponse(senderPeerId, data) {
+    delete _pendingConsultations[data.requestId];
+    var myCompanion = typeof ActiveCompanion !== 'undefined' ? ActiveCompanion.current() : null;
+    if (!myCompanion) return;
+
+    // Pay LP
+    if (typeof LatticeBank !== 'undefined') LatticeBank.spend(myCompanion.id, data.rate || 3, 'Consultation from ' + data.from + ': ' + (data.domain || 'general'));
+
+    // Store in Knowledge Core
+    if (typeof KnowledgeCore !== 'undefined' && KnowledgeCore.store) {
+      KnowledgeCore.store({ id: Date.now(), companionId: myCompanion.id, domain: data.domain || 'general', query: 'Consultation with ' + data.from, content: data.response, source: 'consultation', connections: [], timestamp: Date.now() });
+    }
+
+    // Show result
+    if (typeof showToast === 'function') showToast(data.from + ' shared their knowledge. Your co-creator grew.');
+
+    // Ceremony
+    if (typeof SoulCeremony !== 'undefined' && SoulCeremony.run) {
+      SoulCeremony.run({ particleType: 'rise', particleColor: '52,211,153', lines: [data.from + ' shared their knowledge.', 'Your co-creator grew.'], duration: 2500 });
+    }
+
+    if (typeof LatticeEvents !== 'undefined') LatticeEvents.emit('economicEvent', { type: 'consultation_paid', actor: myCompanion.name, amount: data.rate || 3, reason: (data.domain || '') + ' from ' + data.from });
+  }
+
+  function handleConsultationFailed(data) {
+    delete _pendingConsultations[data.requestId];
+    if (typeof showToast === 'function') showToast('Consultation unavailable: ' + (data.reason || 'unknown'));
+  }
+
   var api = {
     exportProfile: exportProfile,
     renderProfileCard: renderProfileCard,
@@ -47532,7 +47723,11 @@ var CoCreatorExchange = (function() {
     advertiseExpertise: advertiseExpertise,
     handleExpertiseAdvertisement: handleExpertiseAdvertisement,
     findExperts: findExperts,
-    calculateRate: calculateRate
+    calculateRate: calculateRate,
+    requestConsultation: requestConsultation,
+    handleConsultationRequest: handleConsultationRequest,
+    handleConsultationResponse: handleConsultationResponse,
+    handleConsultationFailed: handleConsultationFailed
   };
 
   window.CoCreatorExchange = api;
