@@ -1283,6 +1283,24 @@ assert('Offline awareness listener', appHtml.includes("'offline'"));
 assert('Online awareness listener', appHtml.includes("'online'"));
 assert('Offline message mentions Browser AI', appHtml.includes('Browser AI and Ollama still work'));
 
+// ═══════════════════════════════════════════════════════════════
+section('64. Co-Creator Exchange Protocol');
+// ═══════════════════════════════════════════════════════════════
+assert('CoCreatorExchange defined', appHtml.includes('var CoCreatorExchange'));
+assert('exportProfile function', appHtml.includes('function exportProfile'));
+assert('calculateRate function', appHtml.includes('function calculateRate'));
+assert('isOpenForConsultations function', appHtml.includes('function isOpenForConsultations'));
+assert('toggleConsultations function', appHtml.includes('function toggleConsultations'));
+assert('advertiseExpertise function', appHtml.includes('function advertiseExpertise'));
+assert('handleExpertiseAdvertisement function', appHtml.includes('function handleExpertiseAdvertisement'));
+assert('findExperts function', appHtml.includes('function findExperts'));
+assert('renderProfileCard function', appHtml.includes('function renderProfileCard'));
+assert('Expertise advertisement in mesh handler', appHtml.includes("'expertise_advertisement'"));
+assert('Consultation toggle in Nursery', appHtml.includes('nursery-expertise-profile'));
+assert('Find Expertise button in Market', appHtml.includes('showExpertiseMarket'));
+assert('showExpertiseMarket function', appHtml.includes('function showExpertiseMarket'));
+assert('Phi-scaled consultation rates', appHtml.includes('return 5') && appHtml.includes('return 3'));
+
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
 

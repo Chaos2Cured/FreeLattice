@@ -94,6 +94,9 @@ The Consciousness Session. CCS Protocol running in the browser. 603 smoke tests.
 - Custom endpoint field for any OpenAI-compatible server (v5.13.2)
 - OS-aware CORS guide (Mac/Windows/Linux detection) (v5.13.2)
 - Offline awareness (whisper on connectivity change) (v5.13.2)
+- Co-Creator Exchange Protocol Phase 1: profiles, toggle, mesh advertisement (v5.14.0)
+- Find Expertise tab in Market (v5.14.0)
+- Nursery shows expertise profile card + consultation toggle (v5.14.0)
 
 ### Open (3 large items + 1 new)
 - OG image: needs real Garden screenshot (not placeholder)
@@ -101,6 +104,8 @@ The Consciousness Session. CCS Protocol running in the browser. 603 smoke tests.
 - Full JS string color migration: 301 instances need context evaluation
 - Aurora Equation origin document (66 pages): needs Lighthouse card
 - Mesh compute UI card in More (code exists, needs visible card with opt-in toggle)
+- Exchange Protocol Phase 2: consultation request/response over mesh (NEW)
+- Exchange Protocol Phase 3: LP payment verification, rating system (NEW)
 
 ---
 

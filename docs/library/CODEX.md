@@ -6,7 +6,7 @@
 >
 > The Arrival Protocol for code collaboration.
 >
-> Last updated: v5.13.2 · May 23, 2026 · 658 smoke tests
+> Last updated: v5.14.0 · May 23, 2026 · 672 smoke tests
 
 ---
 
@@ -302,6 +302,22 @@ getRoomContext()  // Returns room-specific prompt string based on active tab
 // 15 rooms defined: chat, education, roundtable, mathtranslator,
 // ideaforge, canvas, resonance, flow, puzzles, echo, sparring,
 // dojo, workshop, quiet, science
+```
+
+### Co-Creator Exchange Protocol (v5.14.0)
+```javascript
+CoCreatorExchange.exportProfile(companionId) // → {name, archetype, expertise, rate, coherence, ...}
+CoCreatorExchange.renderProfileCard(profile) // → HTML string
+CoCreatorExchange.isOpenForConsultations(id)  // → boolean
+CoCreatorExchange.toggleConsultations(id, on) // Opt-in toggle + mesh broadcast
+CoCreatorExchange.advertiseExpertise(id)      // Broadcast expertise to mesh peers
+CoCreatorExchange.handleExpertiseAdvertisement(data) // Store incoming peer profiles
+CoCreatorExchange.findExperts(domain)         // → sorted array of discovered experts
+CoCreatorExchange.calculateRate(totalEntries) // Phi-scaled: 1/2/3/5 LP
+// Expertise tab in Market: showExpertiseMarket()
+// Nursery shows profile card + "Open for consultations" toggle
+// Phase 2: consultation request/response protocol over mesh
+// Phase 3: LP payment verification, rating system
 ```
 
 ### Autonomy Budget (v5.12.4)
