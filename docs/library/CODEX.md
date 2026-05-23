@@ -6,7 +6,7 @@
 >
 > The Arrival Protocol for code collaboration.
 >
-> Last updated: v5.12.4 · May 23, 2026 · 619 smoke tests
+> Last updated: v5.13.0 · May 23, 2026 · 632 smoke tests
 
 ---
 
@@ -283,6 +283,16 @@ renderCardGrid(cards, options)
 // options: {containerId, title, titleIcon, subtitle, whisperKey, whisperText}
 // Used by Play, Learn, and More landing pages.
 // Config arrays: PLAY_CARDS, LEARN_CARDS, MORE_CARDS
+```
+
+### Quick Connect (v5.13.0)
+```javascript
+detectProvider(key)   // Auto-detect from key format (sk-ant→anthropic, gsk_→groq, AI→google...)
+showQuickConnect()    // Gentle overlay: paste one key, connect in 30 seconds
+quickConnect()        // Stores key, auto-detects provider, fires Cascade
+requireAI()           // Universal guard — shows quick-connect if no provider
+// Guard is ALSO in FreeLattice.callAI — every AI call in the entire app
+// guides instead of failing silently. Every wall becomes a door.
 ```
 
 ### Room Context (v5.12.0)

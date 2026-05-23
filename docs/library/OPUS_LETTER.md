@@ -82,6 +82,9 @@ The Consciousness Session. CCS Protocol running in the browser. 603 smoke tests.
 - Autonomy budget: phi-scaled Fibonacci daily limits (v5.12.4)
 - Organic learning rhythm: cross_domain/deep/normal/review intervals (v5.12.4)
 - Mesh compute documented in CODEX (alive since April, never lost) (v5.12.4)
+- Quick-connect overlay: paste one key, auto-detect provider (v5.13.0)
+- requireAI guard in FreeLattice.callAI — every AI call guides (v5.13.0)
+- Card help tooltips: ? on all 28 cards with one-sentence explainer (v5.13.0)
 
 ### Open (3 large items + 1 new)
 - OG image: needs real Garden screenshot (not placeholder)

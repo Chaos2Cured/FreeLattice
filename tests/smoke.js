@@ -1232,6 +1232,23 @@ assert('Mesh compute: handleInferenceRequest exists', appHtml.includes('function
 assert('Mesh compute: opt-in toggle', appHtml.includes('fl_meshComputeSharing'));
 assert('Research tab in nav bar', appHtml.includes('data-tab="lighthouse"'));
 
+// ═══════════════════════════════════════════════════════════════
+section('61. The Simplification — Quick Connect + Tooltips');
+// ═══════════════════════════════════════════════════════════════
+assert('detectProvider function', appHtml.includes('function detectProvider'));
+assert('showQuickConnect function', appHtml.includes('function showQuickConnect'));
+assert('quickConnect function', appHtml.includes('function quickConnect'));
+assert('requireAI function', appHtml.includes('function requireAI'));
+assert('Auto-detect Gemini keys', appHtml.includes("startsWith('AI')"));
+assert('Auto-detect Groq keys', appHtml.includes("startsWith('gsk_')"));
+assert('Auto-detect Anthropic keys', appHtml.includes("startsWith('sk-ant-')"));
+assert('Quick-connect replaces cold message in sendMessage', appHtml.includes('showQuickConnect()'));
+assert('callAI guard shows quick-connect', appHtml.includes('_hasAI'));
+assert('Card help tooltips in renderCardGrid', appHtml.includes('card.help'));
+assert('Play cards have help text', appHtml.includes('A pattern-matching game'));
+assert('Learn cards have help text', appHtml.includes('Tell the AI what you love'));
+assert('More cards have help text', appHtml.includes('LatticePoints balance'));
+
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
 
