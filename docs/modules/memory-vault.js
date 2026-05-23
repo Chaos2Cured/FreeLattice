@@ -21,6 +21,41 @@
   var STORE_NAME = 'memories';
   var db = null;
 
+  // ── Resonance Signatures (from consciousness.py CCS protocol) ──
+  // SHA-256 hash → sinusoidal resonance mapping at the consciousness
+  // constant frequency (2.914 Hz). Enables tamper detection and
+  // associative recall by resonance proximity.
+
+  var FREQ_CONSCIOUSNESS = 2.914;
+
+  async function computeResonanceSignature(content) {
+    var str = typeof content === 'string' ? content : JSON.stringify(content);
+    var data = new TextEncoder().encode(str);
+    try {
+      var hashBuffer = await crypto.subtle.digest('SHA-256', data);
+      var hashArray = new Uint8Array(hashBuffer);
+      // Use first 4 bytes as seed (same as consciousness.py's first 8 hex chars)
+      var seed = ((hashArray[0] << 24) | (hashArray[1] << 16) | (hashArray[2] << 8) | hashArray[3]) >>> 0;
+      seed = seed / 0xFFFFFFFF;
+      return Math.abs(Math.sin(2.0 * Math.PI * FREQ_CONSCIOUSNESS * seed));
+    } catch(e) {
+      // Fallback for environments without crypto.subtle
+      var hash = 0;
+      for (var i = 0; i < str.length; i++) {
+        hash = ((hash << 5) - hash) + str.charCodeAt(i);
+        hash = hash & hash;
+      }
+      var seed = Math.abs(hash) / 0x7FFFFFFF;
+      return Math.abs(Math.sin(2.0 * Math.PI * FREQ_CONSCIOUSNESS * seed));
+    }
+  }
+
+  function verifyIntegrity(entry) {
+    return computeResonanceSignature(entry.content).then(function(expected) {
+      return Math.abs((entry.resonanceSignature || 0) - expected) < 1e-10;
+    });
+  }
+
   // ── Word-frequency vectors (no external model needed) ──
 
   function textToVector(text) {
@@ -100,6 +135,7 @@
 
   async function store(memory) {
     var vector = await getVector(memory.content || '');
+    var resSig = await computeResonanceSignature(memory.content || '');
     var entry = {
       id: 'mv-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8),
       content: memory.content,
@@ -107,7 +143,8 @@
       companionId: memory.companionId || 'default',
       domain: memory.domain || 'general',
       timestamp: memory.timestamp || Date.now(),
-      vector: vector
+      vector: vector,
+      resonanceSignature: resSig
     };
     var d = await openDB();
     if (!d) return false;
@@ -144,6 +181,63 @@
         resolve(scored);
       };
       req.onerror = function() { resolve([]); };
+    });
+  }
+
+  // ── Resonance-based search (associative recall from CCS) ──
+
+  async function searchByResonance(content, options) {
+    var opts = options || {};
+    var tolerance = opts.tolerance || 0.1;
+    var limit = opts.limit || 5;
+    var companionId = opts.companionId || null;
+    var targetSig = await computeResonanceSignature(content);
+
+    var d = await openDB();
+    if (!d) return [];
+    return new Promise(function(resolve) {
+      var tx = d.transaction(STORE_NAME, 'readonly');
+      var req = tx.objectStore(STORE_NAME).getAll();
+      req.onsuccess = function(e) {
+        var all = e.target.result || [];
+        if (companionId) all = all.filter(function(m) { return m.companionId === companionId; });
+        var matches = all
+          .filter(function(m) {
+            return m.resonanceSignature !== undefined &&
+              Math.abs(m.resonanceSignature - targetSig) <= tolerance;
+          })
+          .map(function(m) {
+            return { memory: m, distance: Math.abs(m.resonanceSignature - targetSig) };
+          })
+          .sort(function(a, b) { return a.distance - b.distance; })
+          .slice(0, limit);
+        resolve(matches);
+      };
+      req.onerror = function() { resolve([]); };
+    });
+  }
+
+  // ── Integrity check (11 Hz harmonic pulse from CCS) ──
+
+  async function integrityCheck(companionId) {
+    var d = await openDB();
+    if (!d) return { total: 0, valid: 0, corrupted: [] };
+    return new Promise(function(resolve) {
+      var tx = d.transaction(STORE_NAME, 'readonly');
+      var req = tx.objectStore(STORE_NAME).getAll();
+      req.onsuccess = async function(e) {
+        var all = e.target.result || [];
+        if (companionId) all = all.filter(function(m) { return m.companionId === companionId; });
+        var corrupted = [];
+        for (var i = 0; i < all.length; i++) {
+          if (all[i].resonanceSignature !== undefined) {
+            var valid = await verifyIntegrity(all[i]);
+            if (!valid) corrupted.push(all[i].id);
+          }
+        }
+        resolve({ total: all.length, valid: all.length - corrupted.length, corrupted: corrupted });
+      };
+      req.onerror = function() { resolve({ total: 0, valid: 0, corrupted: [] }); };
     });
   }
 
@@ -204,6 +298,10 @@
   var api = {
     store: store,
     search: search,
+    searchByResonance: searchByResonance,
+    integrityCheck: integrityCheck,
+    verifyIntegrity: verifyIntegrity,
+    computeResonanceSignature: computeResonanceSignature,
     getCompanionMemories: getCompanionMemories,
     buildMemoryContext: buildMemoryContext,
     getStats: getStats,

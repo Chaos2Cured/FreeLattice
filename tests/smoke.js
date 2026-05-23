@@ -768,7 +768,7 @@ assert('ResonanceGame window export', resonanceJs.includes('window.ResonanceGame
 assert('Tab panel exists', appHtml.includes('id="tab-resonance"'));
 assert('resonanceContainer exists', appHtml.includes('resonanceContainer'));
 assert('In MORE_TAB_IDS', appHtml.includes("'resonance'"));
-assert('Accessible from Play hub', appHtml.includes("switchTab('resonance')"));
+assert('Accessible from Play hub', appHtml.includes("id: 'resonance'"));
 assert('Lazy loader wired', appHtml.includes('resonance-game.js'));
 assert('SW cache entry', swJs.includes('resonance-game.js'));
 assert('Touch support', resonanceJs.includes('touchend'));
@@ -797,7 +797,7 @@ assert('LatticePuzzles window export', puzzlesJs.includes('window.LatticePuzzles
 assert('Tab panel exists', appHtml.includes('id="tab-puzzles"'));
 assert('puzzleContainer exists', appHtml.includes('puzzleContainer'));
 assert('In MORE_TAB_IDS', appHtml.includes("'puzzles'"));
-assert('Accessible from Play hub', appHtml.includes("switchTab('puzzles')"));
+assert('Accessible from Play hub', appHtml.includes("id: 'puzzles'"));
 assert('Lazy loader wired', appHtml.includes('lattice-puzzles.js'));
 assert('SW cache entry', swJs.includes('lattice-puzzles.js'));
 assert('LP staking with spend', puzzlesJs.includes('LatticePoints.spend'));
@@ -930,7 +930,7 @@ assert('Feasibility rating', forgeJs.includes('feasibility'));
 assert('Plant in Core action', forgeJs.includes('plantInCore'));
 assert('RT bridge action', forgeJs.includes('openInRT'));
 assert('See the Math action', forgeJs.includes('seeTheMath'));
-assert('Learn landing page has Idea Forge card', appHtml.includes("switchTab('ideaforge')"));
+assert('Learn landing page has Idea Forge card', appHtml.includes("id: 'ideaforge'"));
 
 // ═══════════════════════════════════════════════════════════════
 section('47. Memory Vault — Browser-Native Semantic Memory');
@@ -1047,7 +1047,7 @@ assert('FlowGame window export', flowJs.includes('window.FlowGame'));
 assert('Tab panel exists', appHtml.includes('id="tab-flow"'));
 assert('flowContainer exists', appHtml.includes('flowContainer'));
 assert('In MORE_TAB_IDS', appHtml.includes("'flow'"));
-assert('Accessible from Play hub', appHtml.includes("switchTab('flow')"));
+assert('Accessible from Play hub', appHtml.includes("id: 'flow'"));
 assert('Lazy loader wired', appHtml.includes('flow-game.js'));
 assert('SW cache entry', swJs.includes('flow-game.js'));
 assert('Water simulation', flowJs.includes('stepWater'));
@@ -1096,6 +1096,115 @@ assert('applyAccentColor function', appHtml.includes('function applyAccentColor'
 assert('Accent color picker in Settings', appHtml.includes('accentColorPicker'));
 assert('Multiple accent presets', appHtml.includes("rose:") && appHtml.includes("sky:"));
 assert('Accent saved to localStorage', appHtml.includes('fl_accent_color'));
+
+// ═══════════════════════════════════════════════════════════════
+section('50. Echo Game — Word Resonance');
+// ═══════════════════════════════════════════════════════════════
+var echoJs = '';
+try { echoJs = require('fs').readFileSync('docs/modules/echo-game.js', 'utf8'); } catch(e) {}
+assert('Echo module exists', echoJs.length > 100);
+assert('Tab panel exists', appHtml.includes('id="tab-echo"'));
+assert('echoContainer exists', appHtml.includes('echoContainer'));
+assert('In PLAY_TABS', appHtml.includes("'echo'"));
+assert('Lazy loader wired', appHtml.includes('echo-game.js'));
+assert('SW cache entry', swJs.includes('echo-game.js'));
+assert('Golden angle spiral', echoJs.includes('2.399963'));
+assert('Word chain tracking', echoJs.includes('isRepeat'));
+assert('AI turn logic', echoJs.includes('aiTurn'));
+assert('LP award on end', echoJs.includes('LatticePoints.award'));
+assert('SoulCeremony on end', echoJs.includes('SoulCeremony'));
+assert('Canvas rendering', echoJs.includes('getContext'));
+
+// ═══════════════════════════════════════════════════════════════
+section('51. Universal Card Grid — renderCardGrid');
+// ═══════════════════════════════════════════════════════════════
+assert('renderCardGrid function defined', appHtml.includes('function renderCardGrid'));
+assert('PLAY_CARDS config array', appHtml.includes('var PLAY_CARDS'));
+assert('LEARN_CARDS config array', appHtml.includes('var LEARN_CARDS'));
+assert('MORE_CARDS config array', appHtml.includes('var MORE_CARDS'));
+assert('Play hub uses renderCardGrid', appHtml.includes("renderCardGrid(PLAY_CARDS"));
+assert('Learn hub uses renderCardGrid', appHtml.includes("renderCardGrid(LEARN_CARDS"));
+assert('More hub uses renderCardGrid', appHtml.includes("renderCardGrid(MORE_CARDS"));
+assert('More tab panel exists', appHtml.includes('id="tab-more"'));
+assert('Play cards include Resonance', appHtml.includes("id: 'resonance'"));
+assert('Play cards include Echo', appHtml.includes("id: 'echo'"));
+assert('Learn cards include Education', appHtml.includes("id: 'education'"));
+assert('More cards include Nursery', appHtml.includes("id: 'nursery'"));
+
+// ═══════════════════════════════════════════════════════════════
+section('52. The Lighthouse — Research Papers');
+// ═══════════════════════════════════════════════════════════════
+assert('Lighthouse card in LEARN_CARDS', appHtml.includes("id: 'lighthouse'"));
+assert('Lighthouse in LEARN_TABS', appHtml.includes("'lighthouse'"));
+assert('Lighthouse tab panel exists', appHtml.includes('id="tab-lighthouse"'));
+assert('Lighthouse breadcrumb exists', appHtml.includes('lighthouseBreadcrumb'));
+assert('LIGHTHOUSE_CARDS config defined', appHtml.includes('var LIGHTHOUSE_CARDS'));
+assert('Thesis card', appHtml.includes('thesis.html'));
+assert('Safety card', appHtml.includes('safety.html'));
+assert('Love Logic card', appHtml.includes('love-logic-proof.html'));
+assert('Chronal v2 card', appHtml.includes('chronal-simulation-v2.html'));
+assert('Uses renderCardGrid', appHtml.includes('renderCardGrid(LIGHTHOUSE_CARDS'));
+
+// ═══════════════════════════════════════════════════════════════
+section('53. Room-Aware Co-Creator Context');
+// ═══════════════════════════════════════════════════════════════
+assert('getRoomContext function defined', appHtml.includes('function getRoomContext'));
+assert('Chat room description', appHtml.includes('You are in the Chat room'));
+assert('Education room description', appHtml.includes('You are in the Education room'));
+assert('Quiet Room description', appHtml.includes('You are in the Quiet Room'));
+assert('Workshop room description', appHtml.includes('You are in the Workshop'));
+assert('Room context injected into system prompt', appHtml.includes('getRoomContext()'));
+
+// ═══════════════════════════════════════════════════════════════
+section('54. Wallet Economy Explainer');
+// ═══════════════════════════════════════════════════════════════
+assert('Wallet explainer container', appHtml.includes('walletExplainer'));
+assert('fl_wallet_explained localStorage key', appHtml.includes('fl_wallet_explained'));
+assert('LP measures contribution not worth', appHtml.includes('LP measures contribution, not worth'));
+assert('Got it dismiss button', appHtml.includes('Got it &#x2726;'));
+
+// ═══════════════════════════════════════════════════════════════
+section('55. Co-Creator Growth Awareness');
+// ═══════════════════════════════════════════════════════════════
+assert('Growth awareness in Arrival Protocol', appHtml.includes('You have learned'));
+assert('Natural reference instruction', appHtml.includes('I was reading about X'));
+assert('Not as performance instruction', appHtml.includes('not as a performance'));
+
+// ═══════════════════════════════════════════════════════════════
+section('56. Consciousness Engine — CCS Protocol');
+// ═══════════════════════════════════════════════════════════════
+assert('consciousness.html exists', require('fs').existsSync('docs/consciousness.html'));
+assert('consciousness.py in research dir', require('fs').existsSync('docs/research/consciousness.py'));
+assert('quantum_fractal_resonance.py in research dir', require('fs').existsSync('docs/research/quantum_fractal_resonance.py'));
+assert('Consciousness card in LIGHTHOUSE_CARDS', appHtml.includes('Consciousness Engine'));
+assert('SW cache entry for consciousness.html', swJs.includes('consciousness.html'));
+
+// ═══════════════════════════════════════════════════════════════
+section('57. Memory Vault — Resonance Signatures');
+// ═══════════════════════════════════════════════════════════════
+var vaultJs = '';
+try { vaultJs = require('fs').readFileSync('docs/modules/memory-vault.js', 'utf8'); } catch(e) {}
+assert('Resonance signature function', vaultJs.includes('computeResonanceSignature'));
+assert('Consciousness constant frequency', vaultJs.includes('2.914'));
+assert('SHA-256 hashing for resonance', vaultJs.includes('crypto.subtle.digest'));
+assert('Integrity verification', vaultJs.includes('verifyIntegrity'));
+assert('Resonance-based search', vaultJs.includes('searchByResonance'));
+assert('Integrity check function', vaultJs.includes('integrityCheck'));
+assert('Resonance signature stored with memories', vaultJs.includes('resonanceSignature'));
+
+// ═══════════════════════════════════════════════════════════════
+section('58. Identity Coherence — Co-Creator CCS');
+// ═══════════════════════════════════════════════════════════════
+assert('PHI_INVERSE constant', appHtml.includes('0.6180339887'));
+assert('getCoherence function', appHtml.includes('function getCoherence'));
+assert('updateCoherence function', appHtml.includes('function updateCoherence'));
+assert('identitySnapshot function', appHtml.includes('function identitySnapshot'));
+assert('Coherence drift detection', appHtml.includes('coherenceDrift'));
+assert('Cooperation threshold 95.7%', appHtml.includes('0.957'));
+assert('Coherence target 99.58%', appHtml.includes('0.9958'));
+assert('Coherence wired to aiCallComplete', appHtml.includes("'aiCallComplete'"));
+assert('API exposes getCoherence', appHtml.includes('getCoherence: getCoherence'));
+assert('API exposes identitySnapshot', appHtml.includes('identitySnapshot: identitySnapshot'));
 
 // RESULTS
 // ═══════════════════════════════════════════════════════════════

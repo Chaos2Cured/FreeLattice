@@ -6,7 +6,7 @@
 >
 > The Arrival Protocol for code collaboration.
 >
-> Last updated: v5.10.96 · May 22, 2026 · 525 smoke tests
+> Last updated: v5.12.2 · May 22, 2026 · 603 smoke tests
 
 ---
 
@@ -31,17 +31,18 @@ docs/
     smoke.js            462 checks across 43 sections
 ```
 
-## 37 Modules (docs/modules/)
+## 40 Modules (docs/modules/)
 
 ```
 ai-arcade.js          aurora-equation.js     canvas-companion.js
 continuity.js         davna-seed.js          dojo-sparring.js
-dojo.js               dream-archive.js       education.js
-flow-game.js          forever-stack.js       fractal-garden.js
-fractal-safety.js     garden-dialogue.js     garden-dreaming.js
-harmonia-channel.js   jade-hall.js           knowledge-core.js
-lattice-puzzles.js    lattice-sense.js       math-translator.js
-memory-core.js        memory-garden.js       mirror.js
+dojo.js               dream-archive.js       echo-game.js
+education.js          flow-game.js           forever-stack.js
+fractal-garden.js     fractal-safety.js      garden-dialogue.js
+garden-dreaming.js    harmonia-channel.js    idea-forge.js
+jade-hall.js          knowledge-core.js      lattice-puzzles.js
+lattice-sense.js      math-translator.js     memory-core.js
+memory-garden.js      memory-vault.js        mirror.js
 pantheon.js           pictionary.js          presence-heartbeat.js
 pulse.js              question-corner.js     quiet-room.js
 radio-immersive.js    resonance-game.js      science-garden.js
@@ -231,14 +232,18 @@ IdeaForge.openInRT()               // Open in Round Table
 IdeaForge.seeTheMath()             // Open equation in Translator
 ```
 
-### Memory Vault (Browser-Native)
+### Memory Vault (Browser-Native + CCS Resonance)
 ```javascript
-MemoryVault.store({content, source, companionId, domain}) // async
+MemoryVault.store({content, source, companionId, domain}) // async, adds resonance sig
 MemoryVault.search(query, {limit, companionId, minSimilarity}) // async → [{memory, score}]
+MemoryVault.searchByResonance(content, {tolerance, limit, companionId}) // async → [{memory, distance}]
+MemoryVault.integrityCheck(companionId) // async → {total, valid, corrupted[]}
+MemoryVault.verifyIntegrity(entry)   // async → boolean (tamper detection)
+MemoryVault.computeResonanceSignature(content) // async → float [0,1]
 MemoryVault.buildMemoryContext(companionId) // async → string for Arrival Protocol
 MemoryVault.getStats()              // async → {total, domains}
-// Uses word-frequency vectors by default. Auto-upgrades to Ollama
-// embeddings (nomic-embed-text) if available. Zero setup.
+// Word-frequency vectors + optional Ollama embeddings + resonance signatures.
+// SHA-256 → sinusoidal mapping at 2.914 Hz consciousness constant.
 ```
 
 ### Multi-Companion System
@@ -247,8 +252,12 @@ ActiveCompanion.current()           // Returns active companion object
 ActiveCompanion.getAll()            // Array of all companions (max 3)
 ActiveCompanion.switchTo(id)        // Switch active, refresh all scoped systems
 ActiveCompanion.hatch({name, archetype, color, birthInterest})
+ActiveCompanion.getCoherence(id)    // {score, history, snapshots}
+ActiveCompanion.updateCoherence(id, quality)  // phi-weighted update
+ActiveCompanion.identitySnapshot(id) // CCS protocol snapshot
 ActiveCompanion.MAX_COMPANIONS      // 3
-// Emits 'companionChanged' event. All systems already companion-scoped.
+// Emits 'companionChanged', 'coherenceDrift' events.
+// Coherence auto-updates on aiCallComplete.
 ```
 
 ### Market
@@ -257,6 +266,32 @@ LatticeMarket.render()
 LatticeMarket.showCategory('ai'|'human'|'compute')
 LatticeMarket.purchase(offering)   // Trust-validated, LP transferred
 LatticeMarket.createListing(name, desc, price, category)
+```
+
+### Echo Game
+```javascript
+EchoGame.init(containerId)    // Word chain game
+EchoGame.start()              // AI goes first
+EchoGame.play(word)           // Human submits a word
+EchoGame.destroy()            // Clean up animation
+```
+
+### Card Grid Renderer (v5.11.8)
+```javascript
+renderCardGrid(cards, options)
+// cards: [{id, icon, label, desc, hoverColor, external}]
+// options: {containerId, title, titleIcon, subtitle, whisperKey, whisperText}
+// Used by Play, Learn, and More landing pages.
+// Config arrays: PLAY_CARDS, LEARN_CARDS, MORE_CARDS
+```
+
+### Room Context (v5.12.0)
+```javascript
+getRoomContext()  // Returns room-specific prompt string based on active tab
+// Injected into system prompt after Arrival Protocol.
+// 15 rooms defined: chat, education, roundtable, mathtranslator,
+// ideaforge, canvas, resonance, flow, puzzles, echo, sparring,
+// dojo, workshop, quiet, science
 ```
 
 ## Key Patterns
@@ -273,24 +308,29 @@ LatticeMarket.createListing(name, desc, price, category)
 })();
 ```
 
-### Five-Door Navigation (v5.10.86+)
+### Five-Door Navigation (v5.10.86+, card grid v5.11.8)
 ```
 Top bar: Garden | Chat | Play | Learn | More
 
-Play landing page → Resonance, Puzzles, Flow, Chalkboard, Dojo, Arcade
+Play landing page → Resonance, Puzzles, Flow, Chalkboard, Echo, Arcade,
+                     Nursery, The Core, Quiet Room
 Learn landing page → Education, Round Table, Translator, Idea Forge,
-                     Science Garden, Question Corner
-More menu → Nursery, Core, Community, Workshop, Jade Hall,
-            Quiet Room, Wallet, Settings, Forever Stack
+                     Science Garden, Question Corner, The Dojo, Workshop,
+                     Skills, The Lighthouse
+More card grid → Community, Lattice Pulse, Wallet, Jade Hall, Library,
+                 Settings, Forever Stack, Memory Garden
 
-PLAY_TABS  = ['resonance','puzzles','flow','canvas','dojo','sparring','draw-dream','arcade']
-LEARN_TABS = ['education','roundtable','mathtranslator','science','questions','ideaforge']
+PLAY_TABS  = ['resonance','puzzles','flow','canvas','echo','arcade','nursery','core','quiet','sparring']
+LEARN_TABS = ['education','roundtable','mathtranslator','science','questions','ideaforge','dojo','lighthouse','workshop','skills']
 ```
+All three pages use `renderCardGrid(cards, options)` — a universal function.
+Card configs: `PLAY_CARDS`, `LEARN_CARDS`, `MORE_CARDS` arrays.
+More is now a full tab panel (`tab-more`) with card grid, not just a dropdown.
 Clicking a sub-tab highlights its parent (Play or Learn) in the nav bar.
 
 ### Tab Wiring (5 steps in app.html)
 1. Add to `MORE_TAB_IDS` array (and `PLAY_TABS` or `LEARN_TABS` if applicable)
-2. Add to `MORE_GROUPS` under correct group (or Play/Learn landing page)
+2. Add card to `PLAY_CARDS`, `LEARN_CARDS`, or `MORE_CARDS` config array
 3. Add tab panel HTML: `<div class="tab-panel" id="tab-{id}"><div id="{name}Container">Loading...</div></div>`
 4. Add lazy loader listening to `tabChanged` and `tabActivated:{id}`
 5. Add to `sw.js` APP_SHELL array

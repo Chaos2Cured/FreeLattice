@@ -1,1 +1,1 @@
-{"version": "5.11.7", "date": "2026-05-22", "note": "Echo game (word chains). Dojo moved to Learn. Play has 6 clean cards. 534 smoke tests."}
+{"version": "5.12.2", "date": "2026-05-22", "note": "Five-door card reorganization: Nursery/Core/Quiet→Play, Workshop/Skills→Learn, More trimmed to 8 neighborhood cards. 603 smoke tests."}
