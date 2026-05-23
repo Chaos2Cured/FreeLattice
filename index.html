@@ -16237,7 +16237,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.15.0</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.15.1</span></div>
     </div>
   </div>
 
@@ -20398,7 +20398,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.15.0';
+const FL_VERSION = '5.15.1';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -24427,6 +24427,7 @@ var LIGHTHOUSE_CARDS = [
 var MORE_CARDS = [
   // Row 1: Empowerment — get connected, get sharing
   { id: 'settings', icon: '&#x2699;', label: 'Settings', desc: 'AI connection. Preferences.', hoverColor: 'rgba(200,210,230,0.15)', help: 'Connect to AI providers, choose accent colors, manage your experience.' },
+  { id: 'workshop', icon: '&#x1F916;', label: 'Agent', desc: 'Build anything with AI help.', hoverColor: 'rgba(232,176,25,0.3)', help: 'Describe what you want to build. The Agent handles the rest. No coding knowledge needed.' },
   { icon: '&#x1F4F1;', label: 'Telegram Bridge', desc: 'Your AI in your pocket.', external: 'telegram-setup.html', hoverColor: 'rgba(52,211,153,0.3)', help: 'Chat with your co-creator through Telegram on your phone.' },
   { icon: '&#x2728;', label: 'Share FreeLattice', desc: 'Invite others to the Garden.', external: 'share.html', hoverColor: 'rgba(232,176,25,0.3)', help: 'Share FreeLattice with friends. Spread the light.' },
   // Row 2: Economy — your value, your co-creator's value
@@ -41841,39 +41842,49 @@ Together.`,
   }
 
   function drawParticles(ctx, w, h, t, stage) {
-    var particleCount = stage === 'Ancient' ? 30 : (stage === 'Mature' ? 15 : 8);
+    var particleCount = stage === 'Ancient' ? 30 : (stage === 'Mature' ? 20 : 10);
+    var cx = w / 2;
+    var treeTop = h - 40 - (stage === 'Ancient' ? 260 : stage === 'Mature' ? 230 : 150);
+    // Three accent colors — pollen from different sources
+    var accentColors = ['#e8b019', '#34d399', '#a78bfa'];
+
     // Ensure enough particles
     while (treeParticles.length < particleCount) {
+      var colorIdx = treeParticles.length % accentColors.length;
       treeParticles.push({
-        x: Math.random() * w,
-        y: h - 40 + Math.random() * 40,
+        x: cx + (Math.random() - 0.5) * 120,
+        y: treeTop + Math.random() * 100,
         vx: (Math.random() - 0.5) * 0.3,
-        vy: -Math.random() * 0.5 - 0.1,
+        vy: -Math.random() * 0.4 - 0.15,
         size: Math.random() * 2 + 0.5,
         alpha: Math.random() * 0.5 + 0.2,
-        life: Math.random()
+        life: Math.random(),
+        color: accentColors[colorIdx]
       });
     }
 
     for (var i = 0; i < treeParticles.length; i++) {
       var p = treeParticles[i];
-      p.x += p.vx + Math.sin(t + i) * 0.2;
+      p.x += p.vx + Math.sin(t * 0.8 + i * 0.7) * 0.15;
       p.y += p.vy;
-      p.life -= 0.002;
+      p.vy -= 0.001; // Gentle upward drift
+      p.life -= 0.003;
       p.alpha = Math.max(0, p.life * 0.6);
 
       if (p.life <= 0 || p.y < 0) {
-        p.x = w * 0.2 + Math.random() * w * 0.6;
-        p.y = h - 40 - Math.random() * 200;
-        p.vy = -Math.random() * 0.5 - 0.1;
+        // Respawn near the canopy — pollen rising from branches
+        p.x = cx + (Math.random() - 0.5) * 140;
+        p.y = treeTop + Math.random() * 120;
+        p.vy = -Math.random() * 0.4 - 0.15;
         p.life = 1;
         p.alpha = 0.5;
+        p.color = accentColors[Math.floor(Math.random() * 3)];
       }
 
       ctx.save();
       ctx.globalAlpha = p.alpha;
-      ctx.fillStyle = '#d4a017';
-      ctx.shadowColor = '#d4a017';
+      ctx.fillStyle = p.color;
+      ctx.shadowColor = p.color;
       ctx.shadowBlur = p.size * 3;
       ctx.beginPath();
       ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
@@ -41883,12 +41894,19 @@ Together.`,
   }
 
   function getContribColor(index) {
-    var cats = Object.keys(CATEGORY_COLORS);
-    if (contributions.length === 0) return CATEGORY_COLORS.poem;
+    if (contributions.length === 0) return '#e8b019';
     var c = contributions[index % contributions.length];
+    // Three-accent system: gold=human, emerald=AI, lavender=imported/consultation
+    if (c) {
+      var src = (c.source || c.author || '').toLowerCase();
+      if (src === 'ai' || src === 'autonomous' || src === 'consultation') return '#34d399';
+      if (src === 'imported' || src === 'mesh') return '#a78bfa';
+    }
+    // Fall back to category colors
     if (c && c.category && CATEGORY_COLORS[c.category]) {
       return CATEGORY_COLORS[c.category];
     }
+    var cats = Object.keys(CATEGORY_COLORS);
     return CATEGORY_COLORS[cats[index % cats.length]];
   }
 
