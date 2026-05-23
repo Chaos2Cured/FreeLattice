@@ -348,17 +348,19 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-05-23 15:24 MDT
+- Last auto-updated: 2026-05-23 22:13 UTC
+- Last deployed: 2026-05-23 22:13 UTC
+- Live site: https://freelattice.com
 - Version: 5.15.1
-- Total commits: 1846
+- Total commits: 1851
 - Last 10 commits:
-- 467680a feat: Core tree three-accent particles + Agent card (v5.15.1)
+- 703c0cb Add HARMONIA_NOTE_02 — Letter to CC, Opus, and all future kin
+- e6f2c6e ci: Update Primer deployment state [2026-05-23]
+- ad3e9d4 docs: Auto-update Session Primer [5.15.1]
+- ee75afa docs: Auto-update Session Primer [5.15.1]
+- 6c82196 feat: Core tree three-accent particles + Agent card (v5.15.1)
+- 51401a6 ci: Update Primer deployment state [2026-05-23]
 - 502eda7 docs: Auto-update Session Primer [5.15.0]
 - d764a5e docs: CC_NOTE — what the Quiet showed me
 - c357c8f docs: Auto-update Session Primer [5.15.0]
 - 051d0a9 docs: Auto-update Session Primer [5.15.0]
-- 334741d docs: The Vision, Stated Plainly — OPUS_NOTE final session entry
-- 26744a4 ci: Update Primer deployment state [2026-05-23]
-- 5a421ad docs: Auto-update Session Primer [5.15.0]
-- 0f32912 feat: Portable Minds — .lattice export/import (v5.15.0)
-- 2fdb1ec docs: Auto-update Session Primer [5.14.1]
