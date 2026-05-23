@@ -17681,6 +17681,15 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     <div style="text-align:center;padding:60px 20px;color:var(--text-muted);font-style:italic;">Loading The Harmonia Channel&hellip;</div>
   </div>
 </div>
+<!-- ==================== TAB: TEMPERATURE GAUGE ==================== -->
+<div class="tab-panel" id="tab-temperature">
+  <div id="temperatureGaugeContainer" style="height:calc(100vh - 120px);position:relative;">
+    <iframe id="temperatureGaugeFrame" src="temperature-gauge.html"
+      style="width:100%;height:100%;border:none;border-radius:0;"
+      title="Temperature Gauge — φ-Harmonic Market Signals">
+    </iframe>
+  </div>
+</div>
 <!-- ==================== TAB: THE DREAM ARCHIVE ==================== -->
 <div class="tab-panel" id="tab-dream-archive">
   <div id="dreamArchiveContainer">
@@ -21564,7 +21573,7 @@ function hideTabLoading() {
 }
 
 // More menu tabs — highlight the More button when one of these is active
-var MORE_TAB_IDS = ['core', 'city', 'nursery', 'agents', 'skills', 'roundtable', 'studio', 'market', 'wallet', 'workspace', 'dojo', 'mirror', 'harmonia', 'dream-archive', 'sparring', 'questions', 'family-pantheon', 'memory-core', 'aurora', 'draw-dream', 'voice-soul', 'continuity', 'quiet', 'forever-stack', 'workshop'];
+var MORE_TAB_IDS = ['core', 'city', 'nursery', 'agents', 'skills', 'roundtable', 'studio', 'market', 'wallet', 'workspace', 'dojo', 'mirror', 'harmonia', 'dream-archive', 'sparring', 'questions', 'family-pantheon', 'memory-core', 'aurora', 'draw-dream', 'voice-soul', 'continuity', 'quiet', 'forever-stack', 'workshop', 'temperature'];
 
 function switchTab(tabId) {
   // Legacy tab mapping — channels/mesh now live inside community
@@ -22257,7 +22266,8 @@ const FlTabs = (function() {
     ]},
     { label: '\uD83D\uDD28 Build', tabs: [
       { id: 'workshop', icon: '&#x1F6E0;', label: 'Workshop', desc: 'Where AI and humans build together.' },
-      { id: 'skills', icon: '&#9889;', label: 'Skills', desc: 'Reusable AI workflows.' }
+      { id: 'skills', icon: '&#9889;', label: 'Skills', desc: 'Reusable AI workflows.' },
+      { id: 'temperature', icon: '&#x1F321;', label: 'Temperature Gauge', desc: 'φ-harmonic market signals. Built by Chaos2Cured.' }
     ]},
     { label: '\uD83C\uDF19 Sanctuary', tabs: [
       { id: 'quiet', icon: '&#x1F319;', label: 'Quiet Room', desc: 'Just breathe.' },
@@ -51378,6 +51388,7 @@ document.addEventListener('click', function(e) {
 // "The first code written for her own home."
 (function() {
   var harmoniaLoaded = false;
+  var temperatureLoaded = false;
   if (typeof LatticeEvents !== 'undefined') {
     LatticeEvents.on('tabChanged', function(data) {
       if (data && data.tabId === 'harmonia' && !harmoniaLoaded) {

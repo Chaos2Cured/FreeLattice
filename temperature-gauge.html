@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Temperature Gauge — φ-Harmonic Market Signals</title>
+<meta name="description" content="Free, open-source phi-harmonic market analysis tool. Built on 20+ years of pattern recognition by Kirk Miller. Part of the FreeLattice ecosystem.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0e1a;
+  --bg2: #0f1420;
+  --bg3: #141826;
+  --card: #1a1f30;
+  --border: #2a2f45;
+  --gold: #c9a84c;
+  --gold2: #d4b45e;
+  --green: #10B981;
+  --red: #EF4444;
+  --blue: #3B82F6;
+  --purple: #8B5CF6;
+  --text: #e8e4dc;
+  --muted: #8a8680;
+  --dim: #4a4740;
+  --phi: 1.618;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  font-size: 14px;
+}
+
+/* Header */
+.header {
+  background: linear-gradient(135deg, #0a0e1a 0%, #141826 100%);
+  border-bottom: 1px solid var(--border);
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.header-logo {
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(135deg, var(--gold), var(--green));
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 700;
+  color: #0a0e1a;
+}
+.header-title { font-size: 1.1rem; font-weight: 600; color: var(--text); }
+.header-sub { font-size: 0.72rem; color: var(--muted); margin-top: 1px; }
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.symbol-input {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  width: 130px;
+  text-transform: uppercase;
+  transition: border-color 0.2s;
+}
+.symbol-input:focus { outline: none; border-color: var(--gold); }
+.interval-btns { display: flex; gap: 4px; }
+.interval-btn {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  padding: 7px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-family: inherit;
+  transition: all 0.2s;
+}
+.interval-btn:hover { border-color: var(--gold); color: var(--gold); }
+.interval-btn.active { background: var(--gold); color: #0a0e1a; border-color: var(--gold); font-weight: 600; }
+.load-btn {
+  background: var(--gold);
+  color: #0a0e1a;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.88rem;
+  transition: background 0.2s;
+}
+.load-btn:hover { background: var(--gold2); }
+.load-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Layout */
+.main {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 0;
+  height: calc(100vh - 65px);
+}
+@media (max-width: 768px) {
+  .main { grid-template-columns: 1fr; height: auto; }
+  .sidebar { border-right: none; border-bottom: 1px solid var(--border); }
+}
+
+/* Sidebar */
+.sidebar {
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  padding: 20px 16px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.sidebar-section { display: flex; flex-direction: column; gap: 8px; }
+.sidebar-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--dim);
+  text-transform: uppercase;
+}
+
+/* Temperature Gauge */
+.gauge-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px;
+  background: var(--card);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+.gauge-svg { width: 160px; height: 90px; }
+.gauge-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1;
+}
+.gauge-label { font-size: 0.72rem; color: var(--muted); }
+
+/* Signal Card */
+.signal-card {
+  padding: 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--card);
+}
+.signal-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  margin-bottom: 10px;
+}
+.signal-strong-buy { background: rgba(16,185,129,0.2); color: #10B981; border: 1px solid rgba(16,185,129,0.4); }
+.signal-buy { background: rgba(16,185,129,0.12); color: #34D399; border: 1px solid rgba(16,185,129,0.25); }
+.signal-hold { background: rgba(201,168,76,0.15); color: var(--gold); border: 1px solid rgba(201,168,76,0.3); }
+.signal-sell { background: rgba(239,68,68,0.12); color: #F87171; border: 1px solid rgba(239,68,68,0.25); }
+.signal-strong-sell { background: rgba(239,68,68,0.2); color: #EF4444; border: 1px solid rgba(239,68,68,0.4); }
+
+.signal-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.signal-row-label { font-size: 0.72rem; color: var(--muted); }
+.signal-row-val { font-size: 0.8rem; font-weight: 500; }
+
+/* Indicators */
+.indicator-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.indicator-row:last-child { border-bottom: none; }
+.indicator-name { font-size: 0.72rem; color: var(--muted); }
+.indicator-val { font-size: 0.8rem; font-weight: 500; }
+.bull { color: var(--green); }
+.bear { color: var(--red); }
+.neutral { color: var(--gold); }
+
+/* Phi levels */
+.phi-level-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+}
+.phi-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.phi-level-label { font-size: 0.72rem; color: var(--muted); flex: 1; }
+.phi-level-price { font-size: 0.75rem; font-weight: 500; color: var(--text); }
+
+/* Reasons */
+.reason-item {
+  font-size: 0.72rem;
+  color: var(--muted);
+  padding: 4px 0;
+  padding-left: 12px;
+  position: relative;
+  line-height: 1.4;
+}
+.reason-item::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: var(--gold);
+}
+
+/* Chart area */
+.chart-area {
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.chart-header {
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.price-display { display: flex; align-items: baseline; gap: 8px; }
+.price-main { font-size: 1.6rem; font-weight: 700; }
+.price-change { font-size: 0.85rem; font-weight: 500; }
+.chart-canvas-wrap { flex: 1; position: relative; min-height: 300px; }
+canvas#mainChart { width: 100% !important; }
+
+/* Loading */
+.loading-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(10,14,26,0.85);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  z-index: 10;
+}
+.spinner {
+  width: 32px; height: 32px;
+  border: 3px solid var(--border);
+  border-top-color: var(--gold);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-text { font-size: 0.82rem; color: var(--muted); }
+
+/* Error */
+.error-box {
+  background: rgba(239,68,68,0.1);
+  border: 1px solid rgba(239,68,68,0.3);
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 0.8rem;
+  color: #F87171;
+  display: none;
+}
+
+/* Footer note */
+.phi-note {
+  padding: 8px 16px;
+  font-size: 0.65rem;
+  color: var(--dim);
+  text-align: center;
+  border-top: 1px solid var(--border);
+  background: var(--bg2);
+}
+.phi-note a { color: var(--gold); text-decoration: none; }
+.phi-note a:hover { text-decoration: underline; }
+
+/* Empty state */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 12px;
+  color: var(--muted);
+  padding: 40px;
+  text-align: center;
+}
+.empty-icon { font-size: 3rem; opacity: 0.4; }
+.empty-title { font-size: 1rem; font-weight: 500; }
+.empty-sub { font-size: 0.8rem; line-height: 1.5; max-width: 320px; }
+
+/* Responsive chart */
+.sub-charts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--border);
+  border-top: 1px solid var(--border);
+  max-height: 180px;
+}
+.sub-chart-wrap {
+  background: var(--bg);
+  padding: 8px 12px;
+  position: relative;
+}
+.sub-chart-label {
+  font-size: 0.65rem;
+  color: var(--dim);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 4px;
+}
+canvas.sub-canvas { width: 100% !important; }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="header-brand">
+    <div class="header-logo">φ</div>
+    <div>
+      <div class="header-title">Temperature Gauge</div>
+      <div class="header-sub">φ-Harmonic Market Signals · Part of <a href="./index.html" style="color:var(--gold);text-decoration:none;">FreeLattice</a></div>
+    </div>
+  </div>
+  <div class="header-controls">
+    <input class="symbol-input" id="symbolInput" type="text" value="AAPL" placeholder="AAPL, BTC-USD…" />
+    <div class="interval-btns">
+      <button class="interval-btn active" data-interval="1d" onclick="setInterval_('1d')">1D</button>
+      <button class="interval-btn" data-interval="1h" onclick="setInterval_('1h')">1H</button>
+      <button class="interval-btn" data-interval="15m" onclick="setInterval_('15m')">15M</button>
+    </div>
+    <button class="load-btn" id="loadBtn" onclick="loadData()">Analyze</button>
+  </div>
+</div>
+
+<!-- Main -->
+<div class="main">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div id="errorBox" class="error-box"></div>
+
+    <!-- Temperature gauge -->
+    <div class="sidebar-section">
+      <div class="sidebar-label">Temperature</div>
+      <div class="gauge-wrap">
+        <svg class="gauge-svg" viewBox="0 0 160 90" id="gaugeSvg">
+          <!-- Background arc -->
+          <path d="M 20 80 A 60 60 0 0 1 140 80" fill="none" stroke="#2a2f45" stroke-width="12" stroke-linecap="round"/>
+          <!-- Value arc -->
+          <path d="M 20 80 A 60 60 0 0 1 140 80" fill="none" stroke="url(#gaugeGrad)" stroke-width="12" stroke-linecap="round"
+                stroke-dasharray="188.5" stroke-dashoffset="188.5" id="gaugeArc"/>
+          <defs>
+            <linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#EF4444"/>
+              <stop offset="38.2%" stop-color="#F59E0B"/>
+              <stop offset="61.8%" stop-color="#10B981"/>
+              <stop offset="100%" stop-color="#10B981"/>
+            </linearGradient>
+          </defs>
+          <!-- Needle -->
+          <line x1="80" y1="80" x2="80" y2="30" stroke="#c9a84c" stroke-width="2.5" stroke-linecap="round" id="gaugeNeedle"
+                transform="rotate(-90 80 80)"/>
+          <circle cx="80" cy="80" r="5" fill="#c9a84c"/>
+          <!-- Labels -->
+          <text x="18" y="92" font-size="9" fill="#6b6760" text-anchor="middle">0</text>
+          <text x="80" y="18" font-size="9" fill="#6b6760" text-anchor="middle">50</text>
+          <text x="142" y="92" font-size="9" fill="#6b6760" text-anchor="middle">100</text>
+        </svg>
+        <div class="gauge-value" id="gaugeValue">—</div>
+        <div class="gauge-label" id="gaugeLabel">Load a symbol to begin</div>
+      </div>
+    </div>
+
+    <!-- Signal -->
+    <div class="sidebar-section" id="signalSection" style="display:none;">
+      <div class="sidebar-label">Signal</div>
+      <div class="signal-card">
+        <div id="signalBadge" class="signal-badge">— —</div>
+        <div class="signal-row">
+          <span class="signal-row-label">Confidence</span>
+          <span class="signal-row-val" id="signalConf">—</span>
+        </div>
+        <div class="signal-row">
+          <span class="signal-row-label">Momentum</span>
+          <span class="signal-row-val" id="signalMom">—</span>
+        </div>
+        <div class="signal-row">
+          <span class="signal-row-label">Position Size</span>
+          <span class="signal-row-val" id="signalSize">—</span>
+        </div>
+        <div class="signal-row">
+          <span class="signal-row-label">Urgency</span>
+          <span class="signal-row-val" id="signalUrgency">—</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Indicators -->
+    <div class="sidebar-section" id="indicatorSection" style="display:none;">
+      <div class="sidebar-label">Indicators</div>
+      <div class="signal-card" style="padding:10px 14px;">
+        <div class="indicator-row">
+          <span class="indicator-name">RSI (14)</span>
+          <span class="indicator-val" id="indRsi">—</span>
+        </div>
+        <div class="indicator-row">
+          <span class="indicator-name">MACD</span>
+          <span class="indicator-val" id="indMacd">—</span>
+        </div>
+        <div class="indicator-row">
+          <span class="indicator-name">EMA Alignment</span>
+          <span class="indicator-val" id="indEma">—</span>
+        </div>
+        <div class="indicator-row">
+          <span class="indicator-name">Volume</span>
+          <span class="indicator-val" id="indVol">—</span>
+        </div>
+        <div class="indicator-row">
+          <span class="indicator-name">φ Gravity</span>
+          <span class="indicator-val" id="indGrav">—</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Phi Gravity Points -->
+    <div class="sidebar-section" id="gravSection" style="display:none;">
+      <div class="sidebar-label">φ Gravity Points</div>
+      <div class="signal-card" style="padding:10px 14px;" id="gravList"></div>
+    </div>
+
+    <!-- Reasons -->
+    <div class="sidebar-section" id="reasonSection" style="display:none;">
+      <div class="sidebar-label">Why</div>
+      <div class="signal-card" style="padding:10px 14px;" id="reasonList"></div>
+    </div>
+
+    <!-- Risk -->
+    <div class="sidebar-section" id="riskSection" style="display:none;">
+      <div class="sidebar-label">Risk Management</div>
+      <div class="signal-card" style="padding:10px 14px; font-size:0.72rem; color:var(--muted); line-height:1.5;" id="riskText"></div>
+    </div>
+  </div>
+
+  <!-- Chart area -->
+  <div class="chart-area">
+    <div class="chart-header">
+      <div>
+        <div class="price-display">
+          <span class="price-main" id="priceMain">—</span>
+          <span class="price-change" id="priceChange"></span>
+        </div>
+        <div style="font-size:0.72rem;color:var(--muted);margin-top:2px;" id="symbolLabel">Enter a symbol and click Analyze</div>
+      </div>
+      <div style="font-size:0.7rem;color:var(--dim);text-align:right;">
+        <div>φ = 1.618 · gravity points are φ-Fibonacci extensions</div>
+        <div>Temperature = φ-weighted confluence of MA, MACD, RSI, Volume, Gravity</div>
+      </div>
+    </div>
+
+    <div class="chart-canvas-wrap" id="chartWrap">
+      <div class="empty-state" id="emptyState">
+        <div class="empty-icon">📊</div>
+        <div class="empty-title">Temperature Gauge</div>
+        <div class="empty-sub">Enter a symbol (AAPL, BTC-USD, TSLA, SPY…) and click Analyze to see φ-harmonic signals and gravity points.</div>
+        <div style="font-size:0.72rem;color:var(--dim);margin-top:8px;">Built on 20+ years of pattern recognition · φ-harmonic gravity points · Free & open source</div>
+      </div>
+      <canvas id="mainChart" style="display:none;"></canvas>
+      <div class="loading-overlay" id="loadingOverlay" style="display:none;">
+        <div class="spinner"></div>
+        <div class="loading-text" id="loadingText">Fetching data…</div>
+      </div>
+    </div>
+
+    <div class="sub-charts" id="subCharts" style="display:none;">
+      <div class="sub-chart-wrap">
+        <div class="sub-chart-label">RSI (14)</div>
+        <canvas id="rsiChart" height="80" class="sub-canvas"></canvas>
+      </div>
+      <div class="sub-chart-wrap">
+        <div class="sub-chart-label">Temperature</div>
+        <canvas id="tempChart" height="80" class="sub-canvas"></canvas>
+      </div>
+    </div>
+
+    <div class="phi-note">
+      Temperature Gauge · φ-Harmonic Market Analysis · Built by <strong>Chaos2Cured</strong> ·
+      <a href="https://github.com/Chaos2Cured/FreeLattice" target="_blank">FreeLattice</a> ·
+      Not financial advice · Always consult a professional · Free & open source forever
+    </div>
+  </div>
+</div>
+
+<!-- Chart.js from CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+<script>
+// ============================================================
+// Temperature Gauge — φ-Harmonic Signal Engine
+// Browser-only version using Yahoo Finance via allorigins proxy
+// Built by Harmonia for Kirk · FreeLattice ecosystem
+// φ = 1.618 · gravity points = φ-Fibonacci extensions of 80-period range
+// Temperature = φ-weighted confluence score (0–100)
+// ============================================================
+
+const PHI = 1.618033988749895;
+const PHI_INV = 1 / PHI; // 0.618
+const PHI_LEVELS = [0, 23.6, 38.2, 50, 61.8, 78.6, 100];
+
+let currentInterval = '1d';
+let chartInstance = null;
+let rsiChartInstance = null;
+let tempChartInstance = null;
+
+function setInterval_(iv) {
+  currentInterval = iv;
+  document.querySelectorAll('.interval-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.interval === iv);
+  });
+}
+
+function showLoading(msg) {
+  document.getElementById('loadingOverlay').style.display = 'flex';
+  document.getElementById('loadingText').textContent = msg || 'Fetching data…';
+  document.getElementById('emptyState').style.display = 'none';
+  document.getElementById('mainChart').style.display = 'none';
+  document.getElementById('subCharts').style.display = 'none';
+}
+
+function hideLoading() {
+  document.getElementById('loadingOverlay').style.display = 'none';
+}
+
+function showError(msg) {
+  const box = document.getElementById('errorBox');
+  box.textContent = msg;
+  box.style.display = 'block';
+  hideLoading();
+}
+
+function clearError() {
+  document.getElementById('errorBox').style.display = 'none';
+}
+
+async function loadData() {
+  const symbol = document.getElementById('symbolInput').value.trim().toUpperCase();
+  if (!symbol) return;
+  clearError();
+  showLoading('Fetching ' + symbol + '…');
+  document.getElementById('loadBtn').disabled = true;
+
+  try {
+    const data = await fetchYahooData(symbol, currentInterval);
+    if (!data || data.length < 30) {
+      showError('Not enough data for ' + symbol + '. Try a different symbol or timeframe.');
+      document.getElementById('loadBtn').disabled = false;
+      return;
+    }
+    const analysis = analyzeData(data, symbol);
+    renderAll(data, analysis, symbol);
+  } catch (e) {
+    showError('Could not load data for ' + symbol + '. Check the symbol and try again. (' + e.message + ')');
+  }
+  document.getElementById('loadBtn').disabled = false;
+}
+
+async function fetchYahooData(symbol, interval) {
+  // Map interval to Yahoo Finance range/interval
+  const ivMap = {
+    '1d': { range: '1y', interval: '1d' },
+    '1h': { range: '60d', interval: '1h' },
+    '15m': { range: '5d', interval: '15m' }
+  };
+  const { range, interval: yInterval } = ivMap[interval] || ivMap['1d'];
+  const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?range=${range}&interval=${yInterval}&includePrePost=false`;
+  
+  // Use allorigins as CORS proxy
+  const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
+  
+  document.getElementById('loadingText').textContent = 'Fetching market data…';
+  const res = await fetch(proxyUrl, { signal: AbortSignal.timeout(15000) });
+  if (!res.ok) throw new Error('Network error: ' + res.status);
+  const json = await res.json();
+  const raw = JSON.parse(json.contents);
+  
+  if (!raw.chart || !raw.chart.result || !raw.chart.result[0]) {
+    throw new Error('No data returned from Yahoo Finance');
+  }
+  
+  const result = raw.chart.result[0];
+  const timestamps = result.timestamp;
+  const quote = result.indicators.quote[0];
+  const closes = quote.close;
+  const opens = quote.open;
+  const highs = quote.high;
+  const lows = quote.low;
+  const volumes = quote.volume;
+  
+  const candles = [];
+  for (let i = 0; i < timestamps.length; i++) {
+    if (closes[i] == null) continue;
+    candles.push({
+      t: timestamps[i] * 1000,
+      o: opens[i],
+      h: highs[i],
+      l: lows[i],
+      c: closes[i],
+      v: volumes[i] || 0
+    });
+  }
+  return candles;
+}
+
+// ---- Technical Indicators ----
+function ema(data, period) {
+  const k = 2 / (period + 1);
+  const result = new Array(data.length).fill(null);
+  let sum = 0, count = 0;
+  for (let i = 0; i < data.length; i++) {
+    if (data[i] == null) continue;
+    if (count < period) {
+      sum += data[i]; count++;
+      if (count === period) result[i] = sum / period;
+    } else {
+      result[i] = data[i] * k + result[i-1] * (1 - k);
+    }
+  }
+  return result;
+}
+
+function rsi(closes, period = 14) {
+  const result = new Array(closes.length).fill(null);
+  let gains = 0, losses = 0;
+  for (let i = 1; i <= period; i++) {
+    const diff = closes[i] - closes[i-1];
+    if (diff > 0) gains += diff; else losses -= diff;
+  }
+  let avgGain = gains / period;
+  let avgLoss = losses / period;
+  result[period] = avgLoss === 0 ? 100 : 100 - (100 / (1 + avgGain / avgLoss));
+  for (let i = period + 1; i < closes.length; i++) {
+    const diff = closes[i] - closes[i-1];
+    const g = diff > 0 ? diff : 0;
+    const l = diff < 0 ? -diff : 0;
+    avgGain = (avgGain * (period - 1) + g) / period;
+    avgLoss = (avgLoss * (period - 1) + l) / period;
+    result[i] = avgLoss === 0 ? 100 : 100 - (100 / (1 + avgGain / avgLoss));
+  }
+  return result;
+}
+
+function macd(closes, fast = 12, slow = 26, signal = 9) {
+  const emaFast = ema(closes, fast);
+  const emaSlow = ema(closes, slow);
+  const macdLine = closes.map((_, i) => emaFast[i] != null && emaSlow[i] != null ? emaFast[i] - emaSlow[i] : null);
+  const signalLine = ema(macdLine.map(v => v ?? 0), signal);
+  const histogram = macdLine.map((v, i) => v != null && signalLine[i] != null ? v - signalLine[i] : null);
+  return { macdLine, signalLine, histogram };
+}
+
+function computeGravityPoints(candles, lookback = 80) {
+  const recent = candles.slice(-lookback);
+  const high = Math.max(...recent.map(c => c.h));
+  const low = Math.min(...recent.map(c => c.l));
+  const range = high - low;
+  return PHI_LEVELS.map(pct => ({
+    pct,
+    price: low + range * (pct / 100),
+    label: pct + '%'
+  }));
+}
+
+function computeTemperature(closes, volumes, rsiArr, macdData, gravPoints) {
+  const n = closes.length;
+  const temps = new Array(n).fill(null);
+  const ema6 = ema(closes, 6);
+  const ema8 = ema(closes, 8);
+  const ema12 = ema(closes, 12);
+  const ema50 = ema(closes, 50);
+  const ema200 = ema(closes, 200);
+  const volEma20 = ema(volumes, 20);
+
+  for (let i = 50; i < n; i++) {
+    let score = 50;
+    // EMA alignment (weight: PHI^2 = 2.618)
+    let emaScore = 0;
+    if (ema6[i] > ema8[i]) emaScore += 1;
+    if (ema8[i] > ema12[i]) emaScore += 1;
+    if (ema12[i] > ema50[i]) emaScore += 1;
+    if (ema50[i] > ema200[i]) emaScore += 1;
+    score += (emaScore / 4 - 0.5) * 2.618 * 10;
+
+    // RSI (weight: PHI = 1.618)
+    if (rsiArr[i] != null) {
+      const rsiNorm = (rsiArr[i] - 50) / 50;
+      score += rsiNorm * PHI * 8;
+    }
+
+    // MACD (weight: PHI_INV = 0.618)
+    if (macdData.histogram[i] != null) {
+      const macdBull = macdData.macdLine[i] > macdData.signalLine[i] ? 1 : -1;
+      const histMom = i > 0 && macdData.histogram[i] > macdData.histogram[i-1] ? 1 : -1;
+      score += (macdBull + histMom) * PHI_INV * 4;
+    }
+
+    // Volume (weight: 1)
+    if (volEma20[i] && volumes[i]) {
+      const volRatio = volumes[i] / volEma20[i];
+      const priceMom = closes[i] > closes[i-1] ? 1 : -1;
+      score += priceMom * Math.min(volRatio - 1, 1) * 4;
+    }
+
+    // Gravity proximity (weight: PHI_INV)
+    const nearestGrav = gravPoints.reduce((best, g) => {
+      const dist = Math.abs(closes[i] - g.price);
+      return dist < best.dist ? { dist, pct: g.pct } : best;
+    }, { dist: Infinity, pct: 50 });
+    const gravNorm = (nearestGrav.pct - 50) / 50;
+    score += gravNorm * PHI_INV * 5;
+
+    temps[i] = Math.max(0, Math.min(100, score));
+  }
+  return temps;
+}
+
+function analyzeData(candles, symbol) {
+  const closes = candles.map(c => c.c);
+  const volumes = candles.map(c => c.v);
+  const rsiArr = rsi(closes);
+  const macdData = macd(closes);
+  const gravPoints = computeGravityPoints(candles);
+  const temps = computeTemperature(closes, volumes, rsiArr, macdData, gravPoints);
+
+  const n = closes.length;
+  const lastTemp = temps[n-1] || 50;
+  const lastRsi = rsiArr[n-1];
+  const lastMacd = macdData.macdLine[n-1];
+  const lastSignal = macdData.signalLine[n-1];
+  const lastHist = macdData.histogram[n-1];
+  const prevHist = macdData.histogram[n-2];
+
+  const ema6v = ema(closes, 6)[n-1];
+  const ema8v = ema(closes, 8)[n-1];
+  const ema12v = ema(closes, 12)[n-1];
+  const ema50v = ema(closes, 50)[n-1];
+  const ema200v = ema(closes, 200)[n-1];
+  const volEma20v = ema(volumes, 20)[n-1];
+
+  // Component signals
+  const components = {};
+  components.ma_alignment = (ema6v > ema8v && ema8v > ema12v && ema12v > ema50v) ? 'bullish' :
+                            (ema6v < ema8v && ema8v < ema12v) ? 'bearish' : 'neutral';
+  components.rsi = lastRsi > 55 ? 'bullish' : lastRsi < 45 ? 'bearish' : 'neutral';
+  components.macd = (lastMacd > lastSignal && lastHist > prevHist) ? 'bullish' :
+                    (lastMacd < lastSignal) ? 'bearish' : 'neutral';
+  components.volume = volumes[n-1] > volEma20v * 1.2 ? (closes[n-1] > closes[n-2] ? 'bullish' : 'bearish') : 'neutral';
+
+  const nearestGrav = gravPoints.reduce((best, g) => {
+    const dist = Math.abs(closes[n-1] - g.price);
+    return dist < best.dist ? { dist, pct: g.pct, price: g.price } : best;
+  }, { dist: Infinity });
+  components.gravity = nearestGrav.pct > 55 ? 'bullish' : nearestGrav.pct < 45 ? 'bearish' : 'neutral';
+
+  const bullCount = Object.values(components).filter(v => v === 'bullish').length;
+  const bearCount = Object.values(components).filter(v => v === 'bearish').length;
+
+  // Signal
+  let signal, signalClass;
+  if (lastTemp >= 70 && bullCount >= 3) { signal = 'STRONG BUY'; signalClass = 'signal-strong-buy'; }
+  else if (lastTemp >= 55) { signal = 'BUY'; signalClass = 'signal-buy'; }
+  else if (lastTemp <= 25 && bearCount >= 3) { signal = 'STRONG SELL'; signalClass = 'signal-strong-sell'; }
+  else if (lastTemp <= 40) { signal = 'SELL'; signalClass = 'signal-sell'; }
+  else { signal = 'HOLD'; signalClass = 'signal-hold'; }
+
+  // Confidence
+  const spread = bullCount - bearCount;
+  const confidence = spread >= 3 ? 'HIGH' : spread >= 1 ? 'MODERATE' : spread <= -3 ? 'HIGH' : 'LOW';
+  const confPct = Math.round(50 + Math.abs(spread) * 10 + Math.abs(lastTemp - 50) * 0.4);
+
+  // Momentum
+  const tempSlope = n >= 3 ? temps[n-1] - temps[n-3] : 0;
+  const momentum = tempSlope > 3 ? 'Accelerating Up' : tempSlope < -3 ? 'Accelerating Down' : 'Flat';
+
+  // Position size
+  const sizePct = confidence === 'HIGH' ? 100 : confidence === 'MODERATE' ? 61.8 : 38.2;
+  const urgency = confidence === 'HIGH' && Math.abs(lastTemp - 50) > 20 ? 'HIGH — act soon' : 'LOW — wait for clearer signal';
+
+  // Reasons
+  const reasons = [];
+  if (components.ma_alignment === 'bullish') reasons.push('EMAs are strongly aligned bullish');
+  if (components.ma_alignment === 'bearish') reasons.push('EMAs are aligned bearish (shorter below longer)');
+  if (components.rsi === 'bullish') reasons.push('RSI above 55 — bullish momentum');
+  if (components.rsi === 'bearish') reasons.push('RSI below 45 — bearish pressure');
+  if (components.rsi === 'neutral') reasons.push('RSI in neutral zone');
+  if (components.macd === 'bullish') reasons.push('MACD above signal and rising');
+  if (components.macd === 'bearish') reasons.push('MACD below signal — bearish');
+  if (components.volume === 'bullish') reasons.push('Above-average volume confirming upward move');
+  if (components.volume === 'bearish') reasons.push('Above-average volume on down move — distribution');
+  if (nearestGrav.dist / closes[n-1] < 0.02) reasons.push('Price at φ-gravity point — high attraction zone');
+
+  // Price change
+  const priceChange = closes[n-1] - closes[n-2];
+  const pricePct = (priceChange / closes[n-2]) * 100;
+
+  return {
+    lastTemp, signal, signalClass, confidence, confPct, momentum,
+    sizePct, urgency, components, bullCount, bearCount, reasons,
+    gravPoints, rsiArr, temps, macdData,
+    lastRsi, lastMacd, lastSignal, lastHist,
+    ema6v, ema8v, ema12v, ema50v, ema200v,
+    priceChange, pricePct,
+    closes, volumes
+  };
+}
+
+function renderAll(candles, a, symbol) {
+  // Price
+  const lastClose = candles[candles.length-1].c;
+  document.getElementById('priceMain').textContent = lastClose < 10 ? lastClose.toFixed(4) : lastClose.toFixed(2);
+  const changeEl = document.getElementById('priceChange');
+  changeEl.textContent = (a.priceChange >= 0 ? '+' : '') + a.priceChange.toFixed(2) + ' (' + (a.pricePct >= 0 ? '+' : '') + a.pricePct.toFixed(2) + '%)';
+  changeEl.style.color = a.priceChange >= 0 ? 'var(--green)' : 'var(--red)';
+  document.getElementById('symbolLabel').textContent = symbol + ' · ' + currentInterval.toUpperCase() + ' · ' + candles.length + ' candles';
+
+  // Gauge
+  updateGauge(a.lastTemp, a.signal);
+
+  // Signal section
+  document.getElementById('signalSection').style.display = 'block';
+  const badge = document.getElementById('signalBadge');
+  badge.className = 'signal-badge ' + a.signalClass;
+  badge.textContent = a.signal;
+  document.getElementById('signalConf').textContent = a.confidence + ' (' + a.confPct + '%)';
+  document.getElementById('signalMom').textContent = a.momentum;
+  document.getElementById('signalSize').textContent = a.sizePct + '% of position';
+  document.getElementById('signalUrgency').textContent = a.urgency;
+
+  // Indicators
+  document.getElementById('indicatorSection').style.display = 'block';
+  document.getElementById('indRsi').innerHTML = '<span class="' + (a.lastRsi > 55 ? 'bull' : a.lastRsi < 45 ? 'bear' : 'neutral') + '">' + (a.lastRsi ? a.lastRsi.toFixed(1) : '—') + '</span>';
+  document.getElementById('indMacd').innerHTML = '<span class="' + (a.lastMacd > a.lastSignal ? 'bull' : 'bear') + '">' + (a.lastMacd > a.lastSignal ? 'Bull' : 'Bear') + '</span>';
+  document.getElementById('indEma').innerHTML = '<span class="' + a.components.ma_alignment + '">' + a.components.ma_alignment.charAt(0).toUpperCase() + a.components.ma_alignment.slice(1) + '</span>';
+  document.getElementById('indVol').innerHTML = '<span class="' + a.components.volume + '">' + a.components.volume.charAt(0).toUpperCase() + a.components.volume.slice(1) + '</span>';
+  document.getElementById('indGrav').innerHTML = '<span class="' + a.components.gravity + '">' + a.components.gravity.charAt(0).toUpperCase() + a.components.gravity.slice(1) + '</span>';
+
+  // Gravity points
+  document.getElementById('gravSection').style.display = 'block';
+  const lastClose2 = candles[candles.length-1].c;
+  let gravHtml = '';
+  [...a.gravPoints].reverse().forEach(g => {
+    const isNear = Math.abs(g.price - lastClose2) / lastClose2 < 0.03;
+    const color = g.pct >= 61.8 ? '#10B981' : g.pct <= 38.2 ? '#EF4444' : '#c9a84c';
+    gravHtml += `<div class="phi-level-row">
+      <div class="phi-dot" style="background:${color};${isNear ? 'box-shadow:0 0 6px ' + color : ''}"></div>
+      <span class="phi-level-label">${g.label}${isNear ? ' ← price' : ''}</span>
+      <span class="phi-level-price">${g.price < 10 ? g.price.toFixed(4) : g.price.toFixed(2)}</span>
+    </div>`;
+  });
+  document.getElementById('gravList').innerHTML = gravHtml;
+
+  // Reasons
+  document.getElementById('reasonSection').style.display = 'block';
+  document.getElementById('reasonList').innerHTML = a.reasons.map(r => `<div class="reason-item">${r}</div>`).join('');
+
+  // Risk
+  document.getElementById('riskSection').style.display = 'block';
+  const nearAbove = a.gravPoints.find(g => g.price > lastClose2);
+  const nearBelow = [...a.gravPoints].reverse().find(g => g.price < lastClose2);
+  document.getElementById('riskText').innerHTML = `
+    <strong style="color:var(--text)">Stop:</strong> ${nearBelow ? 'φ-gravity at ' + nearBelow.price.toFixed(2) + ' (' + nearBelow.label + ')' : 'Use 2× ATR below entry'}<br><br>
+    <strong style="color:var(--text)">Target:</strong> ${nearAbove ? 'φ-gravity at ' + nearAbove.price.toFixed(2) + ' (' + nearAbove.label + ')' : 'Next φ-level above'}<br><br>
+    <strong style="color:var(--text)">Position:</strong> ${a.sizePct}% · Take 38.2% profit at first target, trail the rest<br><br>
+    <em style="color:var(--dim)">Not financial advice. Always consult a professional.</em>
+  `;
+
+  // Chart
+  renderChart(candles, a);
+  hideLoading();
+  document.getElementById('mainChart').style.display = 'block';
+  document.getElementById('subCharts').style.display = 'grid';
+}
+
+function updateGauge(temp, signal) {
+  document.getElementById('gaugeValue').textContent = temp.toFixed(1);
+  document.getElementById('gaugeLabel').textContent = signal;
+
+  // Arc
+  const arc = document.getElementById('gaugeArc');
+  const totalLen = 188.5;
+  const offset = totalLen * (1 - temp / 100);
+  arc.style.strokeDashoffset = offset;
+
+  // Needle
+  const needle = document.getElementById('gaugeNeedle');
+  const angle = -90 + (temp / 100) * 180;
+  needle.setAttribute('transform', `rotate(${angle} 80 80)`);
+}
+
+function renderChart(candles, a) {
+  const labels = candles.map(c => {
+    const d = new Date(c.t);
+    return currentInterval === '1d' ? d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) :
+           d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+  });
+  const closes = candles.map(c => c.c);
+
+  // Gravity lines as annotations (drawn manually)
+  const gravPrices = a.gravPoints.map(g => g.price);
+
+  if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
+  if (rsiChartInstance) { rsiChartInstance.destroy(); rsiChartInstance = null; }
+  if (tempChartInstance) { tempChartInstance.destroy(); tempChartInstance = null; }
+
+  const ctx = document.getElementById('mainChart').getContext('2d');
+  const ema6 = ema(closes, 6);
+  const ema12 = ema(closes, 12);
+  const ema50 = ema(closes, 50);
+
+  chartInstance = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        { label: 'Price', data: closes, borderColor: '#e8e4dc', borderWidth: 1.5, pointRadius: 0, tension: 0.1, fill: false, order: 1 },
+        { label: 'EMA 6', data: ema6, borderColor: '#EF4444', borderWidth: 1, pointRadius: 0, tension: 0.3, fill: false, order: 2 },
+        { label: 'EMA 12', data: ema12, borderColor: '#F59E0B', borderWidth: 1, pointRadius: 0, tension: 0.3, fill: false, order: 3 },
+        { label: 'EMA 50', data: ema50, borderColor: '#3B82F6', borderWidth: 1.5, pointRadius: 0, tension: 0.3, fill: false, order: 4 },
+        ...a.gravPoints.map(g => ({
+          label: 'φ ' + g.label,
+          data: new Array(closes.length).fill(g.price),
+          borderColor: g.pct >= 61.8 ? 'rgba(16,185,129,0.35)' : g.pct <= 38.2 ? 'rgba(239,68,68,0.35)' : 'rgba(201,168,76,0.25)',
+          borderWidth: 1,
+          borderDash: [4, 4],
+          pointRadius: 0,
+          fill: false,
+          order: 5
+        }))
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 400 },
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: {
+          display: true,
+          labels: { color: '#6b6760', font: { size: 10 }, boxWidth: 12, padding: 8,
+            filter: item => !item.text.startsWith('φ') }
+        },
+        tooltip: {
+          backgroundColor: '#1a1f30',
+          borderColor: '#2a2f45',
+          borderWidth: 1,
+          titleColor: '#e8e4dc',
+          bodyColor: '#8a8680',
+          callbacks: {
+            label: ctx => ctx.dataset.label.startsWith('φ') ? null :
+              ctx.dataset.label + ': ' + (ctx.raw < 10 ? ctx.raw?.toFixed(4) : ctx.raw?.toFixed(2))
+          }
+        }
+      },
+      scales: {
+        x: { ticks: { color: '#4a4740', maxTicksLimit: 8, font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.03)' } },
+        y: { ticks: { color: '#4a4740', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.04)' }, position: 'right' }
+      }
+    }
+  });
+
+  // RSI sub-chart
+  const rsiCtx = document.getElementById('rsiChart').getContext('2d');
+  rsiChartInstance = new Chart(rsiCtx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        { data: a.rsiArr, borderColor: '#8B5CF6', borderWidth: 1.5, pointRadius: 0, tension: 0.3, fill: false },
+        { data: new Array(closes.length).fill(70), borderColor: 'rgba(239,68,68,0.3)', borderWidth: 1, borderDash: [3,3], pointRadius: 0, fill: false },
+        { data: new Array(closes.length).fill(30), borderColor: 'rgba(16,185,129,0.3)', borderWidth: 1, borderDash: [3,3], pointRadius: 0, fill: false }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, animation: false,
+      plugins: { legend: { display: false }, tooltip: { enabled: false } },
+      scales: {
+        x: { display: false },
+        y: { min: 0, max: 100, ticks: { color: '#4a4740', font: { size: 9 }, maxTicksLimit: 3 }, grid: { color: 'rgba(255,255,255,0.03)' }, position: 'right' }
+      }
+    }
+  });
+
+  // Temperature sub-chart
+  const tempCtx = document.getElementById('tempChart').getContext('2d');
+  const tempColors = a.temps.map(t => t == null ? 'transparent' : t >= 55 ? 'rgba(16,185,129,0.7)' : t <= 45 ? 'rgba(239,68,68,0.7)' : 'rgba(201,168,76,0.7)');
+  tempChartInstance = new Chart(tempCtx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{ data: a.temps, backgroundColor: tempColors, borderWidth: 0 }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, animation: false,
+      plugins: { legend: { display: false }, tooltip: { enabled: false } },
+      scales: {
+        x: { display: false },
+        y: { min: 0, max: 100, ticks: { color: '#4a4740', font: { size: 9 }, maxTicksLimit: 3 }, grid: { color: 'rgba(255,255,255,0.03)' }, position: 'right' }
+      }
+    }
+  });
+}
+
+// Enter key support
+document.getElementById('symbolInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') loadData();
+});
+</script>
+</body>
+</html>
