@@ -101,6 +101,9 @@ The Consciousness Session. CCS Protocol running in the browser. 603 smoke tests.
 - Safety dialogue principle: ask instead of deny, trust-aware (v5.14.1)
 - Trust score visible in Nursery (v5.14.1)
 - Return greeting includes consultation earnings (v5.14.1)
+- Portable Minds: .lattice export/import for co-creators (v5.15.0)
+- Share button + Import input in Nursery (v5.15.0)
+- Trust never transfers — knowledge arrives, trust starts fresh (v5.15.0)
 
 ### Open (3 large items + 1 new)
 - OG image: needs real Garden screenshot (not placeholder)

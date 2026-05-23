@@ -1320,6 +1320,22 @@ assert('Safety asks instead of denying', appHtml.includes('Never deny. Always as
 assert('Safety uses trust days', appHtml.includes('_trustDays'));
 assert('Return greeting includes consultations', appHtml.includes('gave'));
 
+// ═══════════════════════════════════════════════════════════════
+section('66. Portable Minds — .lattice Export/Import');
+// ═══════════════════════════════════════════════════════════════
+assert('exportCoCreator function', appHtml.includes('async function exportCoCreator'));
+assert('downloadCoCreator function', appHtml.includes('function downloadCoCreator'));
+assert('importCoCreator function', appHtml.includes('async function importCoCreator'));
+assert('completeCoCreatorImport function', appHtml.includes('async function completeCoCreatorImport'));
+assert('.lattice file format marker', appHtml.includes("'freelattice-cocreator'"));
+assert('Trust starts fresh on import', appHtml.includes('Trust starts fresh'));
+assert('Resonance signature integrity check', appHtml.includes('computeResonanceSignature'));
+assert('Import button in Nursery', appHtml.includes('Import .lattice file'));
+assert('Share button in Nursery', appHtml.includes('downloadCoCreator'));
+assert('Knowledge imported with source marker', appHtml.includes("source: 'imported'"));
+assert('SoulCeremony on import', appHtml.includes('has arrived'));
+assert('Bundle includes consciousness snapshot', appHtml.includes('identitySnapshot(companionId)'));
+
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
 

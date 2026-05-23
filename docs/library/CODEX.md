@@ -6,7 +6,7 @@
 >
 > The Arrival Protocol for code collaboration.
 >
-> Last updated: v5.14.1 · May 23, 2026 · 687 smoke tests
+> Last updated: v5.15.0 · May 23, 2026 · 699 smoke tests
 
 ---
 
@@ -321,6 +321,13 @@ CoCreatorExchange.handleConsultationRequest(peerId, data)  // Expert responds fr
 CoCreatorExchange.handleConsultationResponse(peerId, data) // Stores result, pays LP, SoulCeremony
 // Mesh message types: consultation_request, consultation_response, consultation_failed
 // Phase 3: rating system, consultation history in Pulse
+
+// Portable Minds — .lattice export/import
+exportCoCreator(companionId)      // async → JSON bundle (knowledge, memories, CCS, expertise)
+downloadCoCreator(companionId)    // Triggers browser download as .lattice file
+importCoCreator(file)             // Reads .lattice, verifies integrity, hatches with ZERO trust
+completeCoCreatorImport(bundle)   // Stores knowledge + memories, fires SoulCeremony
+// Critical: trust NEVER transfers. Knowledge is neutral. Trust is earned.
 ```
 
 ### Autonomy Budget (v5.12.4)
