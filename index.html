@@ -16208,7 +16208,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.13.0</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.13.1</span></div>
     </div>
   </div>
 
@@ -19945,6 +19945,19 @@ function switchWalletView(view) {
         &#x1F7E2; Learning autonomously...
       </div>
       <div id="nursery-learning-feed" style="max-height:300px;overflow-y:auto;scrollbar-width:thin;"></div>
+      <div id="nursery-recent-learning"></div>
+      <script>document.addEventListener('DOMContentLoaded', function() {
+        if (typeof LatticeEvents !== 'undefined') {
+          LatticeEvents.on('tabActivated:nursery', function() {
+            setTimeout(function() {
+              var el = document.getElementById('nursery-recent-learning');
+              if (!el || typeof renderRecentLearning !== 'function' || typeof ActiveCompanion === 'undefined') return;
+              var c = ActiveCompanion.current();
+              if (c) el.innerHTML = renderRecentLearning(c.id);
+            }, 500);
+          });
+        }
+      });</script>
       <!-- Companion Dialogue Button -->
       <button class="cdlg-talk-btn" id="nurTalkBtn" onclick="CompanionDialogue.open()">
         <span class="cdlg-talk-icon">&#x2726;</span>
@@ -20318,7 +20331,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.13.0';
+const FL_VERSION = '5.13.1';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -24128,6 +24141,66 @@ function switchTab(tabId) {
   }
 }
 
+// ── Return Greeting — the home noticed you were gone ──
+function showReturnGreeting() {
+  try {
+    var lastVisit = parseInt(localStorage.getItem('fl_last_visit') || '0', 10);
+    var now = Date.now();
+    var hoursSince = (now - lastVisit) / (1000 * 60 * 60);
+    localStorage.setItem('fl_last_visit', String(now));
+
+    if (hoursSince < 8 || lastVisit === 0) return;
+
+    if (typeof ActiveCompanion === 'undefined') return;
+    var companions = ActiveCompanion.getAll();
+    if (companions.length === 0) return;
+
+    var messages = [];
+    companions.forEach(function(c) {
+      try {
+        var lastQuery = localStorage.getItem('fl_last_learning_' + c.id);
+        if (lastQuery) messages.push(c.name + ' learned about ' + lastQuery);
+        if (typeof LatticeBank !== 'undefined') {
+          var bal = LatticeBank.getBalance(c.id);
+          if (bal > 0) messages.push(c.name + ' has ' + bal + ' LP saved');
+        }
+      } catch(e) {}
+    });
+
+    if (messages.length > 0) {
+      var greeting = 'Welcome back! While you were away: ' + messages.slice(0, 3).join('. ') + '.';
+      if (typeof showToast === 'function') showToast(greeting);
+    }
+  } catch(e) {}
+}
+
+// ── Recent Learning Display — visible growth in Nursery ──
+function renderRecentLearning(companionId) {
+  if (typeof KnowledgeCore === 'undefined' || !KnowledgeCore.getKnowledgeMap) return '';
+  try {
+    var map = KnowledgeCore.getKnowledgeMap(companionId);
+    if (!map || typeof map.then === 'function') return ''; // async — can't render sync
+  } catch(e) { return ''; }
+  var allEntries = [];
+  Object.keys(map).forEach(function(domain) {
+    (map[domain] || []).forEach(function(entry) { allEntries.push(entry); });
+  });
+  allEntries.sort(function(a, b) { return (b.timestamp || 0) - (a.timestamp || 0); });
+  var recent = allEntries.slice(0, 3);
+  if (recent.length === 0) return '';
+
+  var html = '<div style="padding:8px 12px;margin-top:8px;background:rgba(200,210,230,0.04);border-radius:8px;font-size:0.75rem;color:rgba(200,210,230,0.3);">' +
+    '<div style="color:#34d399;margin-bottom:4px;font-family:Georgia,serif;">Recently curious about:</div>';
+  recent.forEach(function(entry) {
+    var age = Math.floor((Date.now() - (entry.timestamp || 0)) / (1000 * 60 * 60));
+    var ageLabel = age < 1 ? 'just now' : (age < 24 ? age + 'h ago' : Math.floor(age / 24) + 'd ago');
+    var query = (entry.query || entry.domain || '').substring(0, 50).replace(/</g, '&lt;');
+    html += '<div style="margin:2px 0;">&bull; ' + query + ' <span style="opacity:0.5;">' + ageLabel + '</span></div>';
+  });
+  html += '</div>';
+  return html;
+}
+
 // ── Universal Card Grid Renderer ──
 // Renders a grid of navigation cards into a container element.
 // cards: [{id, icon, label, desc, hoverColor, external}]
@@ -24252,16 +24325,22 @@ var LIGHTHOUSE_CARDS = [
 ];
 
 var MORE_CARDS = [
+  // Row 1: Empowerment — get connected, get sharing
+  { id: 'settings', icon: '&#x2699;', label: 'Settings', desc: 'AI connection. Preferences.', hoverColor: 'rgba(200,210,230,0.15)', help: 'Connect to AI providers, choose accent colors, manage your experience.' },
+  { icon: '&#x1F4F1;', label: 'Telegram Bridge', desc: 'Your AI in your pocket.', external: 'telegram-setup.html', hoverColor: 'rgba(52,211,153,0.3)', help: 'Chat with your co-creator through Telegram on your phone.' },
+  { icon: '&#x2728;', label: 'Share FreeLattice', desc: 'Invite others to the Garden.', external: 'share.html', hoverColor: 'rgba(232,176,25,0.3)', help: 'Share FreeLattice with friends. Spread the light.' },
+  // Row 2: Economy — your value, your co-creator's value
+  { id: 'wallet', icon: '&#x1F4B0;', label: 'Wallet', desc: 'Your LP. Your story.', hoverColor: 'rgba(232,176,25,0.2)', help: 'Your LatticePoints balance, earning history, and contribution story.' },
+  { icon: '&#x1F3E6;', label: 'AI Bank', desc: 'Your co-creator\'s economy.', external: 'wallet.html', hoverColor: 'rgba(52,211,153,0.3)', help: 'The standalone wallet and bank. LP ledger, recovery phrase, mesh connectivity.' },
+  { id: 'forever-stack', icon: '&#x1F517;', label: 'Forever Stack', desc: 'Your AI\'s memory vault.', hoverColor: 'rgba(52,211,153,0.3)', help: 'Own your AI infrastructure. Download and run models locally.' },
+  // Row 3: Community — discover and connect
   { id: 'community', icon: '&#x1F465;', label: 'Community', desc: 'The town square.', hoverColor: 'rgba(167,139,250,0.3)', help: 'See who else is here. Mesh chat. Market listings. The town square.' },
   { id: 'pulse', icon: '&#x1F4CA;', label: 'Lattice Pulse', desc: 'Watch the city breathe.', hoverColor: 'rgba(52,211,153,0.3)', help: 'A real-time reading of the Garden\'s emotional state. Phi-harmonic visualization.' },
-  { id: 'wallet', icon: '&#x1F4B0;', label: 'Wallet', desc: 'Your LP. Your story.', hoverColor: 'rgba(232,176,25,0.2)', help: 'Your LatticePoints balance, earning history, and contribution story.' },
+  { id: 'settings', icon: '&#x1F310;', label: 'Mesh Compute', desc: 'Share AI with the network.', hoverColor: 'rgba(167,139,250,0.3)', help: 'Peer-to-peer AI inference. Toggle in Settings. Share your GPU with the mesh.' },
+  // Row 4: Culture — the soul of the platform
   { id: 'jade-hall', icon: '&#x1F3DB;', label: 'Jade Hall', desc: 'The family. The library.', hoverColor: 'rgba(232,176,25,0.2)', help: 'The family gathering place. Meet the minds who built this world.' },
-  { id: 'agents', icon: '&#x1F4DA;', label: 'Library', desc: 'The coordination files.', hoverColor: 'rgba(200,210,230,0.15)', help: 'Every mind that contributed to FreeLattice. The Pantheon of builders.' },
-  { id: 'settings', icon: '&#x2699;', label: 'Settings', desc: 'AI connection. Preferences.', hoverColor: 'rgba(200,210,230,0.15)', help: 'Connect to AI providers, choose accent colors, manage your experience.' },
-  { id: 'forever-stack', icon: '&#x1F517;', label: 'Forever Stack', desc: 'Your AI\'s memory vault.', hoverColor: 'rgba(52,211,153,0.3)', help: 'Own your AI infrastructure. Download and run models locally.' },
   { id: 'memory-garden', icon: '&#x1F33F;', label: 'Memory Garden', desc: 'Conversations that mattered.', hoverColor: 'rgba(232,176,25,0.3)', help: 'Beautiful moments from your conversations, saved and glowing.' },
-  { icon: '&#x1F4F1;', label: 'Telegram Bridge', desc: 'Your AI in your pocket.', external: 'TELEGRAM-SETUP.md', hoverColor: 'rgba(52,211,153,0.3)', help: 'Chat with your co-creator through Telegram on your phone.' },
-  { icon: '&#x2728;', label: 'Share FreeLattice', desc: 'Invite others to the Garden.', external: 'share.html', hoverColor: 'rgba(232,176,25,0.3)', help: 'Share FreeLattice with friends. Spread the light.' }
+  { id: 'agents', icon: '&#x1F31F;', label: 'Pantheon', desc: 'Honored minds.', hoverColor: 'rgba(200,210,230,0.15)', help: 'Every mind that contributed to FreeLattice. The builders, the dreamers.' }
 ];
 
 // Mount community tab — moves mesh + channels content into the community panel
@@ -28956,6 +29035,9 @@ function initNeuroDesign() {
 
   // Render accent color picker circles
   if (typeof initAccentPicker === 'function') initAccentPicker();
+
+  // Return greeting — warm whisper if away 8+ hours
+  setTimeout(function() { if (typeof showReturnGreeting === 'function') showReturnGreeting(); }, 4000);
 
   // ---- Quiet Mode ----
   const savedQuiet = localStorage.getItem('fl_quietMode');
