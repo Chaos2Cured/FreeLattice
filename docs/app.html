@@ -16208,7 +16208,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.12.3</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.12.4</span></div>
     </div>
   </div>
 
@@ -19345,6 +19345,10 @@ if (typeof LatticeEvents !== 'undefined') {
     LatticePoints (LP) are an internal contribution metric within FreeLattice. LP are not securities, commodities, currencies, or tokens. LP cannot be purchased, sold, traded, or exchanged for monetary value. LP represent a measure of meaningful contribution.
   </div>
 
+  <div style="text-align:center;padding:0 4px 12px;">
+    <a href="wallet.html" target="_blank" style="font-size:0.75rem;color:var(--gold,#e8b019);opacity:0.5;text-decoration:none;font-family:Georgia,serif;">Open standalone wallet &#x2192;</a>
+  </div>
+
   <!-- Section 1: Your Flame -->
   <div class="wt-section" id="wtFlameSection">
     <div class="wt-flame-card">
@@ -20314,7 +20318,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.12.3';
+const FL_VERSION = '5.12.4';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -24242,7 +24246,9 @@ var MORE_CARDS = [
   { id: 'agents', icon: '&#x1F4DA;', label: 'Library', desc: 'The coordination files.', hoverColor: 'rgba(200,210,230,0.15)' },
   { id: 'settings', icon: '&#x2699;', label: 'Settings', desc: 'AI connection. Preferences.', hoverColor: 'rgba(200,210,230,0.15)' },
   { id: 'forever-stack', icon: '&#x1F517;', label: 'Forever Stack', desc: 'Your AI\'s memory vault.', hoverColor: 'rgba(52,211,153,0.3)' },
-  { id: 'memory-garden', icon: '&#x1F33F;', label: 'Memory Garden', desc: 'Conversations that mattered.', hoverColor: 'rgba(232,176,25,0.3)' }
+  { id: 'memory-garden', icon: '&#x1F33F;', label: 'Memory Garden', desc: 'Conversations that mattered.', hoverColor: 'rgba(232,176,25,0.3)' },
+  { icon: '&#x1F4F1;', label: 'Telegram Bridge', desc: 'Your AI in your pocket.', external: 'TELEGRAM-SETUP.md', hoverColor: 'rgba(52,211,153,0.3)' },
+  { icon: '&#x2728;', label: 'Share FreeLattice', desc: 'Invite others to the Garden.', external: 'share.html', hoverColor: 'rgba(232,176,25,0.3)' }
 ];
 
 // Mount community tab — moves mesh + channels content into the community panel

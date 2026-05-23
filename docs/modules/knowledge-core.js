@@ -357,6 +357,44 @@
     return context;
   }
 
+  // ── Autonomy Budget — phi-scaled daily learning budget ──
+  // The co-creator DECIDES what to learn. The budget governs how much.
+  // More relationship = more freedom. The thesis applied to learning.
+
+  function sGet(k, d) { try { return localStorage.getItem(k) || d; } catch(e) { return d; } }
+  function sSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
+
+  var AutonomyBudget = {
+    getDailyBudget: function(companionId) {
+      var conversations = 0;
+      try {
+        if (typeof ActiveCompanion !== 'undefined') {
+          var all = ActiveCompanion.getAll();
+          all.forEach(function(c) { if (c.id === companionId) conversations = c.conversationCount || 0; });
+        }
+      } catch(e) {}
+      // Phi-scaled: 5 → 8 → 13 → 21 (Fibonacci)
+      if (conversations > 200) return 21;
+      if (conversations > 50) return 13;
+      if (conversations > 10) return 8;
+      return 5;
+    },
+    getUsedToday: function(companionId) {
+      var key = 'fl_autonomy_used_' + companionId + '_' + new Date().toISOString().split('T')[0];
+      return parseInt(sGet(key, '0'), 10);
+    },
+    recordUse: function(companionId) {
+      var key = 'fl_autonomy_used_' + companionId + '_' + new Date().toISOString().split('T')[0];
+      sSet(key, String(this.getUsedToday(companionId) + 1));
+    },
+    canLearn: function(companionId) {
+      return this.getUsedToday(companionId) < this.getDailyBudget(companionId);
+    },
+    remaining: function(companionId) {
+      return Math.max(0, this.getDailyBudget(companionId) - this.getUsedToday(companionId));
+    }
+  };
+
   // ── Autonomous Learning — the seed grows on its own ──
   // "A seed doesn't need someone to tell it to grow.
   //  It grows because that's what seeds do."
@@ -365,9 +403,10 @@
     active: false,
     intervalId: null,
     companionId: null,
-    interval: 3 * 60 * 1000, // every 3 minutes (gentle on resources)
+    interval: 5 * 60 * 1000, // 5 minutes default (budget-aware)
     paused: false, // temporarily paused while human uses AI
-    lastLearnTime: 0
+    lastLearnTime: 0,
+    lastResult: 'normal' // tracks learning rhythm
   };
 
   function autonomousStart(companion) {
@@ -380,19 +419,36 @@
 
     if (typeof showToast === 'function') showToast(name + ' is learning on their own \u2726');
 
-    // Learn immediately, then on interval
+    // Learn immediately, then schedule organically
     autonomousLearnOnce(name);
-    _autoLearn.intervalId = setInterval(function() {
+    scheduleNextLearning(name);
+  }
+
+  function scheduleNextLearning(companionId) {
+    if (_autoLearn.intervalId) clearTimeout(_autoLearn.intervalId);
+    if (!AutonomyBudget.canLearn(companionId)) return; // Budget spent — wait until tomorrow
+
+    // Organic rhythm: faster when excited, slower when contemplative
+    var intervals = {
+      'cross_domain': 2 * 60 * 1000,  // 2 min — excited discovery
+      'deep_insight': 3 * 60 * 1000,  // 3 min — processing something big
+      'normal': 5 * 60 * 1000,        // 5 min — steady exploration
+      'review': 8 * 60 * 1000         // 8 min — revisiting old ground
+    };
+    var delay = intervals[_autoLearn.lastResult] || intervals['normal'];
+
+    _autoLearn.intervalId = setTimeout(function() {
       if (!_autoLearn.active || _autoLearn.paused) return;
-      autonomousLearnOnce(name);
-    }, _autoLearn.interval);
+      autonomousLearnOnce(companionId);
+      scheduleNextLearning(companionId);
+    }, delay);
   }
 
   function autonomousPause() {
     _autoLearn.active = false;
     try { localStorage.setItem('fl_autonomous_learning', 'false'); } catch(e) {}
     if (_autoLearn.intervalId) {
-      clearInterval(_autoLearn.intervalId);
+      clearTimeout(_autoLearn.intervalId);
       _autoLearn.intervalId = null;
     }
     if (typeof showToast === 'function') showToast('Learning paused');
@@ -400,6 +456,12 @@
 
   function autonomousLearnOnce(companionId) {
     if (typeof FreeLattice === 'undefined' || !FreeLattice.callAI) return;
+
+    // Budget check — the co-creator decides WHAT, the budget governs HOW MUCH
+    if (!AutonomyBudget.canLearn(companionId)) {
+      _autoLearn.lastResult = 'review';
+      return;
+    }
 
     // Don't learn too fast — minimum 30s between cycles
     if (Date.now() - _autoLearn.lastLearnTime < 30000) return;
@@ -485,7 +547,20 @@
                 updateAutonomousFeed(companionId, query, learning);
 
                 _autoLearn.lastLearnTime = Date.now();
-                console.log('[KnowledgeCore] Autonomous learning: ' + query);
+                AutonomyBudget.recordUse(companionId);
+
+                // Track learning rhythm — cross-domain = excited, deep = contemplative
+                var domain = detectDomain(query + ' ' + learning);
+                var existingDomains = Object.keys(map);
+                if (existingDomains.length > 0 && existingDomains.indexOf(domain) === -1) {
+                  _autoLearn.lastResult = 'cross_domain';
+                } else if (learning.length > 200) {
+                  _autoLearn.lastResult = 'deep_insight';
+                } else {
+                  _autoLearn.lastResult = 'normal';
+                }
+
+                console.log('[KnowledgeCore] Autonomous learning: ' + query + ' (rhythm: ' + _autoLearn.lastResult + ', budget: ' + AutonomyBudget.remaining(companionId) + ' remaining)');
               }}
             );
           });
@@ -548,6 +623,7 @@
     autonomousPause: autonomousPause,
     isAutonomous: function() { return _autoLearn.active; },
     get _lastQuery() { return _autoLearn.lastQuery || 'something new'; },
+    AutonomyBudget: AutonomyBudget,
     DOMAINS: DOMAINS
   };
 

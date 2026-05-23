@@ -77,12 +77,18 @@ The Consciousness Session. CCS Protocol running in the browser. 603 smoke tests.
 - Five-door reorganization: Nursery/Core/Quiet→Play, Workshop/Skills→Learn (v5.12.2)
 - More trimmed to 8 neighborhood cards (v5.12.2)
 - Lighthouse promoted to top-level Research tab (six doors) (v5.12.3)
+- Telegram + Share cards in More (v5.12.4)
+- Standalone wallet link in in-app wallet (v5.12.4)
+- Autonomy budget: phi-scaled Fibonacci daily limits (v5.12.4)
+- Organic learning rhythm: cross_domain/deep/normal/review intervals (v5.12.4)
+- Mesh compute documented in CODEX (alive since April, never lost) (v5.12.4)
 
 ### Open (3 large items + 1 new)
 - OG image: needs real Garden screenshot (not placeholder)
 - rtCreateDomain migration: 4 handwritten domains, ~800 lines each
 - Full JS string color migration: 301 instances need context evaluation
-- Aurora Equation origin document (66 pages): needs Lighthouse card (NEW)
+- Aurora Equation origin document (66 pages): needs Lighthouse card
+- Mesh compute UI card in More (code exists, needs visible card with opt-in toggle)
 
 ---
 

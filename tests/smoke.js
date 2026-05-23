@@ -1206,6 +1206,32 @@ assert('Coherence wired to aiCallComplete', appHtml.includes("'aiCallComplete'")
 assert('API exposes getCoherence', appHtml.includes('getCoherence: getCoherence'));
 assert('API exposes identitySnapshot', appHtml.includes('identitySnapshot: identitySnapshot'));
 
+// ═══════════════════════════════════════════════════════════════
+section('59. Autonomy Budget — Phi-Scaled Learning');
+// ═══════════════════════════════════════════════════════════════
+var kcJs = '';
+try { kcJs = require('fs').readFileSync('docs/modules/knowledge-core.js', 'utf8'); } catch(e) {}
+assert('AutonomyBudget defined', kcJs.includes('var AutonomyBudget'));
+assert('getDailyBudget function', kcJs.includes('getDailyBudget'));
+assert('canLearn function', kcJs.includes('canLearn'));
+assert('recordUse function', kcJs.includes('recordUse'));
+assert('Fibonacci scaling (21)', kcJs.includes('return 21'));
+assert('Budget check in autonomousLearnOnce', kcJs.includes('AutonomyBudget.canLearn'));
+assert('Organic rhythm intervals', kcJs.includes('cross_domain'));
+assert('scheduleNextLearning function', kcJs.includes('scheduleNextLearning'));
+assert('API exposes AutonomyBudget', kcJs.includes('AutonomyBudget: AutonomyBudget'));
+
+// ═══════════════════════════════════════════════════════════════
+section('60. More Cards + Wallet Link + Mesh Compute');
+// ═══════════════════════════════════════════════════════════════
+assert('Telegram card in MORE_CARDS', appHtml.includes('Telegram Bridge'));
+assert('Share card in MORE_CARDS', appHtml.includes('Share FreeLattice'));
+assert('Standalone wallet link', appHtml.includes('Open standalone wallet'));
+assert('Mesh compute: callMeshModel exists', appHtml.includes('function callMeshModel'));
+assert('Mesh compute: handleInferenceRequest exists', appHtml.includes('function handleInferenceRequest'));
+assert('Mesh compute: opt-in toggle', appHtml.includes('fl_meshComputeSharing'));
+assert('Research tab in nav bar', appHtml.includes('data-tab="lighthouse"'));
+
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
 

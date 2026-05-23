@@ -6,7 +6,7 @@
 >
 > The Arrival Protocol for code collaboration.
 >
-> Last updated: v5.12.3 · May 22, 2026 · 603 smoke tests
+> Last updated: v5.12.4 · May 23, 2026 · 619 smoke tests
 
 ---
 
@@ -292,6 +292,28 @@ getRoomContext()  // Returns room-specific prompt string based on active tab
 // 15 rooms defined: chat, education, roundtable, mathtranslator,
 // ideaforge, canvas, resonance, flow, puzzles, echo, sparring,
 // dojo, workshop, quiet, science
+```
+
+### Autonomy Budget (v5.12.4)
+```javascript
+KnowledgeCore.AutonomyBudget.getDailyBudget(companionId) // Fibonacci: 5/8/13/21
+KnowledgeCore.AutonomyBudget.canLearn(companionId)       // Budget remaining?
+KnowledgeCore.AutonomyBudget.remaining(companionId)      // Sessions left today
+KnowledgeCore.AutonomyBudget.recordUse(companionId)      // Record a session
+// Learning rhythm: cross_domain=2min, deep_insight=3min, normal=5min, review=8min
+// Budget scales with relationship: 5 base, 8 after 10 convos, 13 after 50, 21 after 200
+```
+
+### Mesh Compute (WORKING — wired since April 2026)
+```javascript
+callMeshModel(peerId, model, messages)    // async — routes inference to peer's Ollama
+handleInferenceRequest(senderPeerId, data) // Serves inference if fl_meshComputeSharing='true'
+meshSendToPeer(peerId, obj)               // WebRTC data channel send
+meshSendToPeers(obj)                      // Broadcast to all connected peers
+// fl_meshComputeSharing: localStorage toggle, default 'false', opt-in only
+// Priority in callAI: BrowserAI → Local → Ollama → Mesh → Cloud
+// Mesh model advertisement: peers broadcast available Ollama models
+// PeerJS for WebRTC signaling. No server for data. Generosity chosen, never extracted.
 ```
 
 ## Key Patterns
