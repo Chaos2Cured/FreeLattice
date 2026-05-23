@@ -350,10 +350,9 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 ## PRIMER HEALTH
 - Last auto-updated: 2026-05-22 23:00 MDT
 - Version: 5.12.3
-- Total commits: 1809
+- Total commits: 1808
 - Last 10 commits:
-- 51fcbec feat: Lighthouse promoted to top-level Research tab (v5.12.3)
-- c4703e4 ci: Update Primer deployment state [2026-05-23]
+- 7e0921d feat: Lighthouse promoted to top-level Research tab (v5.12.3)
 - 78d177e docs: Auto-update Session Primer [5.12.2]
 - b7cdaa8 docs: Auto-update Session Primer [5.12.2]
 - 4322ccd feat: CCS Protocol, Lighthouse, five-door reorganization (v5.12.2)
@@ -362,3 +361,4 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 3915bbd docs: Auto-update Session Primer [5.11.7]
 - 7027a4e feat: Echo game + nav reorganization (v5.11.7)
 - dd1eee8 ci: Update Primer deployment state [2026-05-23]
+- 3bcd221 docs: Auto-update Session Primer [5.11.6]
