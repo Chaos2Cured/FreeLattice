@@ -6,7 +6,7 @@
 >
 > The Arrival Protocol for code collaboration.
 >
-> Last updated: v5.12.2 · May 22, 2026 · 603 smoke tests
+> Last updated: v5.12.3 · May 22, 2026 · 603 smoke tests
 
 ---
 
@@ -310,18 +310,19 @@ getRoomContext()  // Returns room-specific prompt string based on active tab
 
 ### Five-Door Navigation (v5.10.86+, card grid v5.11.8)
 ```
-Top bar: Garden | Chat | Play | Learn | More
+Top bar: Garden | Chat | Play | Learn | Research | More
 
 Play landing page → Resonance, Puzzles, Flow, Chalkboard, Echo, Arcade,
                      Nursery, The Core, Quiet Room
 Learn landing page → Education, Round Table, Translator, Idea Forge,
-                     Science Garden, Question Corner, The Dojo, Workshop,
-                     Skills, The Lighthouse
+                     Science Garden, Question Corner, The Dojo, Workshop, Skills
+Research (Lighthouse) → 7 research paper cards (one click from top nav)
 More card grid → Community, Lattice Pulse, Wallet, Jade Hall, Library,
                  Settings, Forever Stack, Memory Garden
 
 PLAY_TABS  = ['resonance','puzzles','flow','canvas','echo','arcade','nursery','core','quiet','sparring']
-LEARN_TABS = ['education','roundtable','mathtranslator','science','questions','ideaforge','dojo','lighthouse','workshop','skills']
+LEARN_TABS = ['education','roundtable','mathtranslator','science','questions','ideaforge','dojo','workshop','skills']
+Lighthouse is its own top-level tab (data-tab="lighthouse"), not inside LEARN_TABS.
 ```
 All three pages use `renderCardGrid(cards, options)` — a universal function.
 Card configs: `PLAY_CARDS`, `LEARN_CARDS`, `MORE_CARDS` arrays.

@@ -1134,8 +1134,8 @@ assert('More cards include Nursery', appHtml.includes("id: 'nursery'"));
 // ═══════════════════════════════════════════════════════════════
 section('52. The Lighthouse — Research Papers');
 // ═══════════════════════════════════════════════════════════════
-assert('Lighthouse card in LEARN_CARDS', appHtml.includes("id: 'lighthouse'"));
-assert('Lighthouse in LEARN_TABS', appHtml.includes("'lighthouse'"));
+assert('Lighthouse top-level tab button', appHtml.includes('data-tab="lighthouse"'));
+assert('Lighthouse tab label', appHtml.includes("switchTab('lighthouse')"));
 assert('Lighthouse tab panel exists', appHtml.includes('id="tab-lighthouse"'));
 assert('Lighthouse breadcrumb exists', appHtml.includes('lighthouseBreadcrumb'));
 assert('LIGHTHOUSE_CARDS config defined', appHtml.includes('var LIGHTHOUSE_CARDS'));

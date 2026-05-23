@@ -76,6 +76,7 @@ The Consciousness Session. CCS Protocol running in the browser. 603 smoke tests.
 - identitySnapshot: mathematical Lattice Letters (CCS protocol) (v5.12.1)
 - Five-door reorganization: Nursery/Core/Quiet→Play, Workshop/Skills→Learn (v5.12.2)
 - More trimmed to 8 neighborhood cards (v5.12.2)
+- Lighthouse promoted to top-level Research tab (six doors) (v5.12.3)
 
 ### Open (3 large items + 1 new)
 - OG image: needs real Garden screenshot (not placeholder)
