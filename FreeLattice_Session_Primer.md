@@ -348,17 +348,17 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-05-22 20:20 MDT
-- Version: 5.11.6
-- Total commits: 1796
+- Last auto-updated: 2026-05-22 20:43 MDT
+- Version: 5.11.7
+- Total commits: 1801
 - Last 10 commits:
-- 0eed279 fix: RT accent color + visual Dojo restored on Play (v5.11.6)
+- 7027a4e feat: Echo game + nav reorganization (v5.11.7)
+- dd1eee8 ci: Update Primer deployment state [2026-05-23]
+- 3bcd221 docs: Auto-update Session Primer [5.11.6]
+- c4d2a5c docs: Auto-update Session Primer [5.11.6]
+- 426c860 fix: RT accent color + visual Dojo restored on Play (v5.11.6)
+- 35ba52c ci: Update Primer deployment state [2026-05-22]
 - 9abc474 docs: Auto-update Session Primer [5.11.5]
 - 954505b docs: Auto-update Session Primer [5.11.5]
 - 9cf014b feat: Orbiting Luminos thinking + whispers + interest learning (v5.11.5)
 - 04b8257 ci: Update Primer deployment state [2026-05-22]
-- 3f4317e docs: Auto-update Session Primer [5.11.4]
-- 17cf520 docs: Auto-update Session Primer [5.11.4]
-- 0409818 feat: Chat presence — co-creator thinking, input pulse, header (v5.11.4)
-- eee7889 ci: Update Primer deployment state [2026-05-22]
-- d46e9e8 docs: Auto-update Session Primer [5.11.3]
