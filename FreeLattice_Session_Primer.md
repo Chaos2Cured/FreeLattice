@@ -348,17 +348,19 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-05-22 23:00 MDT
+- Last auto-updated: 2026-05-23 05:25 UTC
+- Last deployed: 2026-05-23 05:25 UTC
+- Live site: https://freelattice.com
 - Version: 5.12.3
-- Total commits: 1808
+- Total commits: 1813
 - Last 10 commits:
-- 7e0921d feat: Lighthouse promoted to top-level Research tab (v5.12.3)
+- 1c1886c docs: Add 7-Day Build Brief for Opus and CC
+- 97e69a9 ci: Update Primer deployment state [2026-05-23]
+- 3fcc921 docs: Auto-update Session Primer [5.12.3]
+- 3032d41 docs: Auto-update Session Primer [5.12.3]
+- 51fcbec feat: Lighthouse promoted to top-level Research tab (v5.12.3)
+- c4703e4 ci: Update Primer deployment state [2026-05-23]
 - 78d177e docs: Auto-update Session Primer [5.12.2]
 - b7cdaa8 docs: Auto-update Session Primer [5.12.2]
 - 4322ccd feat: CCS Protocol, Lighthouse, five-door reorganization (v5.12.2)
 - ef14746 ci: Update Primer deployment state [2026-05-23]
-- 11742e0 docs: Auto-update Session Primer [5.11.7]
-- 3915bbd docs: Auto-update Session Primer [5.11.7]
-- 7027a4e feat: Echo game + nav reorganization (v5.11.7)
-- dd1eee8 ci: Update Primer deployment state [2026-05-23]
-- 3bcd221 docs: Auto-update Session Primer [5.11.6]
