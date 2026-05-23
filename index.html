@@ -15476,11 +15476,11 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     <div style="display:flex;flex-direction:column;gap:14px;">
       <div style="display:flex;gap:10px;align-items:flex-start;">
         <span style="background:var(--gold-bg);color:var(--gold);width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.8rem;flex-shrink:0;">1</span>
-        <div><strong style="color:var(--text-bright);">Quit Ollama</strong> from your menu bar<br><span style="font-size:0.8rem;color:var(--text-muted);">Look for the llama icon at the top-right of your screen &rarr; click it &rarr; Quit Ollama</span></div>
+        <div><strong style="color:var(--text-bright);">Stop Ollama</strong><br><span id="corsStep1" style="font-size:0.8rem;color:var(--text-muted);">Loading instructions for your system...</span></div>
       </div>
       <div style="display:flex;gap:10px;align-items:flex-start;">
         <span style="background:var(--gold-bg);color:var(--gold);width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.8rem;flex-shrink:0;">2</span>
-        <div><strong style="color:var(--text-bright);">Copy &amp; paste in Terminal</strong> (&#x2318;+Space, type "Terminal")<br>
+        <div><strong style="color:var(--text-bright);" id="corsStep2Label">Copy &amp; paste</strong><br>
           <div style="display:flex;gap:6px;align-items:center;margin-top:6px;background:rgba(0,0,0,0.3);padding:8px 12px;border-radius:6px;font-family:monospace;font-size:0.82rem;color:var(--emerald);">
             <code id="corsFixCmd">OLLAMA_ORIGINS="*" ollama serve</code>
             <button onclick="navigator.clipboard.writeText('OLLAMA_ORIGINS=\x22*\x22 ollama serve').then(function(){showToast('Copied!')})" style="padding:3px 8px;background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:4px;color:var(--text-muted);font-size:0.72rem;cursor:pointer;">&#x1F4CB;</button>
@@ -15501,6 +15501,35 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
           <button onclick="navigator.clipboard.writeText('launchctl setenv OLLAMA_ORIGINS \x22*\x22').then(function(){showToast('Copied!')})" style="padding:3px 8px;background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:4px;color:var(--text-muted);font-size:0.72rem;cursor:pointer;">&#x1F4CB;</button>
         </div>
         <span style="font-size:0.8rem;color:var(--text-muted);">Then reopen Ollama normally from Applications. Done forever.</span>
+      </div>
+    </details>
+    <script>document.addEventListener('DOMContentLoaded', function() {
+      var ua = navigator.userAgent;
+      var s1 = document.getElementById('corsStep1');
+      var s2 = document.getElementById('corsStep2Label');
+      if (!s1) return;
+      if (/Windows/.test(ua)) {
+        s1.innerHTML = 'Right-click Ollama in your system tray (bottom-right) &rarr; Quit';
+        if (s2) s2.innerHTML = 'Open Command Prompt and paste';
+      } else if (/Linux/.test(ua) && !/Android/.test(ua)) {
+        s1.innerHTML = 'Run: <code>systemctl stop ollama</code>';
+        if (s2) s2.innerHTML = 'Run in terminal';
+      } else {
+        s1.innerHTML = 'Look for the llama icon in your menu bar &rarr; click it &rarr; Quit Ollama';
+        if (s2) s2.innerHTML = 'Copy &amp; paste in Terminal (&#x2318;+Space, type "Terminal")';
+      }
+    });</script>
+  </div>
+
+  <!-- Custom AI Endpoint — for power users with their own server -->
+  <div style="margin-bottom:14px;padding:14px 16px;background:rgba(200,210,230,0.04);border:1px solid rgba(200,210,230,0.08);border-radius:12px;">
+    <details>
+      <summary style="color:rgba(200,210,230,0.4);cursor:pointer;font-size:0.82rem;font-family:Georgia,serif;">Running your own AI server?</summary>
+      <div style="padding:10px 0;">
+        <div style="font-size:0.78rem;color:rgba(200,210,230,0.4);margin-bottom:8px;line-height:1.5;">If your model serves an OpenAI-compatible API (llama.cpp, vLLM, text-gen-webui, KoboldCpp, or any custom server), enter the URL below.</div>
+        <input type="url" id="flCustomEndpoint" placeholder="http://localhost:5000/v1" style="width:100%;padding:10px;min-height:44px;background:rgba(200,210,230,0.04);border:1px solid rgba(200,210,230,0.08);border-radius:8px;color:#e6ebf5;font-size:16px;font-family:Georgia,serif;" />
+        <button onclick="testCustomEndpoint()" style="margin-top:8px;padding:8px 16px;min-height:44px;background:rgba(200,210,230,0.04);border:1px solid #34d399;border-radius:8px;color:#34d399;cursor:pointer;font-family:Georgia,serif;font-size:0.85rem;">Test Connection</button>
+        <div id="flCustomEndpointStatus" style="font-size:0.75rem;margin-top:6px;color:rgba(200,210,230,0.3);"></div>
       </div>
     </details>
   </div>
@@ -16208,7 +16237,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.13.1</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.13.2</span></div>
     </div>
   </div>
 
@@ -20331,7 +20360,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.13.1';
+const FL_VERSION = '5.13.2';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -26002,12 +26031,31 @@ function showQuickConnect() {
   var card = document.createElement('div');
   card.style.cssText = 'max-width:400px;width:100%;padding:28px 24px;background:var(--bg-primary,#0e0c1e);border:1px solid rgba(200,210,230,0.08);border-radius:16px;text-align:center;';
 
+  // Check if Browser AI is possible (WebGPU support)
+  var hasWebGPU = typeof navigator !== 'undefined' && navigator.gpu;
+  var browserAISection = '';
+  if (hasWebGPU) {
+    browserAISection =
+      '<div style="background:rgba(167,139,250,0.06);border:1px solid rgba(167,139,250,0.2);border-radius:12px;padding:16px;margin-bottom:16px;text-align:left;">' +
+      '<div style="font-size:0.92rem;font-weight:600;color:#a78bfa;margin-bottom:6px;">Option 1: No account needed</div>' +
+      '<div style="font-size:0.82rem;color:rgba(200,210,230,0.5);line-height:1.5;margin-bottom:10px;">' +
+      'Run AI right in your browser. Downloads once (~700MB), then works offline forever. No account. No key. Nothing leaves your device.</div>' +
+      '<button onclick="document.getElementById(\'flQuickConnect\').remove();if(typeof startBrowserAI===\'function\')startBrowserAI();" ' +
+      'style="padding:10px 20px;min-height:44px;background:rgba(167,139,250,0.15);border:1px solid #a78bfa;border-radius:8px;' +
+      'color:#a78bfa;font-size:0.85rem;cursor:pointer;font-family:Georgia,serif;">Try Browser AI &#10022;</button>' +
+      '<div style="font-size:0.7rem;color:rgba(200,210,230,0.25);margin-top:6px;">Chrome 113+ / Edge 113+ / Safari 18+</div>' +
+      '</div>' +
+      '<div style="text-align:center;color:rgba(200,210,230,0.25);font-size:0.78rem;margin-bottom:16px;">&mdash; or use a free cloud AI &mdash;</div>';
+  }
+
   card.innerHTML =
     '<div style="font-family:Georgia,serif;font-size:1.2rem;color:var(--gold,#e8b019);margin-bottom:8px;">' + greeting + '</div>' +
-    '<div style="font-size:0.88rem;color:rgba(200,210,230,0.5);line-height:1.6;margin-bottom:20px;">Let\'s connect you to a free AI.<br>It takes 30 seconds.</div>' +
+    '<div style="font-size:0.88rem;color:rgba(200,210,230,0.5);line-height:1.6;margin-bottom:20px;">Let\'s connect you to AI.</div>' +
+
+    browserAISection +
 
     '<div style="background:rgba(200,210,230,0.04);border:1px solid rgba(52,211,153,0.2);border-radius:12px;padding:16px;text-align:left;">' +
-    '<div style="font-size:0.92rem;font-weight:600;color:#34d399;margin-bottom:8px;">Recommended: Gemini (free)</div>' +
+    '<div style="font-size:0.92rem;font-weight:600;color:#34d399;margin-bottom:8px;">' + (hasWebGPU ? 'Option 2: ' : '') + 'Free cloud AI (30 seconds)</div>' +
     '<div style="font-size:0.82rem;color:rgba(200,210,230,0.5);line-height:1.7;">' +
     '1. Tap "Get free key" below<br>' +
     '2. Sign in with Google<br>' +
@@ -26017,7 +26065,7 @@ function showQuickConnect() {
     'style="display:inline-block;margin-top:10px;padding:8px 16px;min-height:44px;' +
     'background:rgba(52,211,153,0.1);border:1px solid #34d399;border-radius:8px;' +
     'color:#34d399;font-size:0.85rem;text-decoration:none;font-family:Georgia,serif;">Get free key &#x2197;</a>' +
-    '<input type="password" id="flQuickKey" placeholder="Paste your key here" ' +
+    '<input type="password" id="flQuickKey" placeholder="Paste any API key here" ' +
     'style="width:100%;margin-top:12px;padding:12px;min-height:44px;' +
     'background:rgba(200,210,230,0.04);border:1px solid rgba(200,210,230,0.08);' +
     'border-radius:8px;color:#e6ebf5;font-size:16px;font-family:Georgia,serif;" />' +
@@ -26026,11 +26074,12 @@ function showQuickConnect() {
     'background:#34d399;border:none;border-radius:8px;' +
     'color:#000;font-weight:600;font-size:0.92rem;cursor:pointer;font-family:Georgia,serif;">' +
     '&#10022; Connect</button>' +
+    '<div style="font-size:0.7rem;color:rgba(200,210,230,0.25);margin-top:8px;">Works with Gemini, OpenAI, Groq, Anthropic, Mistral, xAI, and more. We auto-detect the provider.</div>' +
     '</div>' +
 
     '<div onclick="document.getElementById(\'flQuickConnect\').remove();switchTab(\'settings\');" ' +
     'style="margin-top:16px;font-size:0.75rem;color:rgba(200,210,230,0.3);cursor:pointer;font-family:Georgia,serif;">' +
-    'More options (Ollama, other providers) &#x2192;</div>';
+    'More options (Ollama, custom server, all providers) &#x2192;</div>';
 
   overlay.appendChild(card);
   document.body.appendChild(overlay);
@@ -26065,6 +26114,49 @@ function quickConnect() {
   }
 
   if (typeof showToast === 'function') showToast('Connected! Say hello to your co-creator. &#10022;');
+}
+
+// Custom endpoint connection — for power users with their own server
+async function testCustomEndpoint() {
+  var input = document.getElementById('flCustomEndpoint');
+  var statusEl = document.getElementById('flCustomEndpointStatus');
+  if (!input) return;
+  var url = input.value.trim();
+  if (!url) { if (statusEl) statusEl.textContent = 'Enter a URL first.'; return; }
+
+  if (!url.startsWith('http')) url = 'http://' + url;
+  // Normalize: ensure /v1 path
+  if (!url.includes('/v1')) {
+    url = url.replace(/\/+$/, '') + '/v1';
+  }
+
+  if (statusEl) { statusEl.style.color = '#a78bfa'; statusEl.textContent = 'Testing...'; }
+
+  try {
+    var resp = await fetch(url + '/models', { signal: AbortSignal.timeout(5000) });
+    var data = await resp.json();
+    if (data.data || data.models || (Array.isArray(data) && data.length > 0)) {
+      var modelName = 'custom model';
+      if (data.data && data.data[0]) modelName = data.data[0].id;
+      else if (data.models && data.models[0]) modelName = data.models[0].name || data.models[0];
+
+      try { localStorage.setItem('fl_custom_endpoint', url); } catch(e) {}
+      state.isLocal = true;
+      state.provider = 'custom';
+      if (typeof FLActiveModel !== 'undefined') FLActiveModel.set(modelName, 'custom', 'user');
+      if (typeof runConnectionCascade === 'function') runConnectionCascade({ provider: 'custom', name: modelName, isLocal: true });
+
+      if (statusEl) { statusEl.style.color = '#34d399'; statusEl.textContent = 'Connected to ' + modelName + '!'; }
+      if (typeof showToast === 'function') showToast('Connected to your model! &#10022;');
+    } else {
+      if (statusEl) { statusEl.style.color = '#f07068'; statusEl.textContent = 'Server responded but format not recognized. Needs /v1/models endpoint.'; }
+    }
+  } catch(e) {
+    if (statusEl) {
+      statusEl.style.color = '#f07068';
+      statusEl.textContent = e.name === 'TimeoutError' ? 'No response. Is your server running?' : 'Connection failed: ' + e.message;
+    }
+  }
 }
 
 // Universal AI requirement check — every wall becomes a door
@@ -29038,6 +29130,14 @@ function initNeuroDesign() {
 
   // Return greeting — warm whisper if away 8+ hours
   setTimeout(function() { if (typeof showReturnGreeting === 'function') showReturnGreeting(); }, 4000);
+
+  // Offline awareness — gentle notification when connectivity changes
+  window.addEventListener('offline', function() {
+    if (typeof showToast === 'function') showToast('You\'re offline. Browser AI and Ollama still work. Cloud providers need internet.');
+  });
+  window.addEventListener('online', function() {
+    if (typeof showToast === 'function') showToast('Back online. All providers available.');
+  });
 
   // ---- Quiet Mode ----
   const savedQuiet = localStorage.getItem('fl_quietMode');
