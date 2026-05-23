@@ -560,6 +560,8 @@
                   _autoLearn.lastResult = 'normal';
                 }
 
+                // Save last query for return greeting
+                try { localStorage.setItem('fl_last_learning_' + companionId, query); } catch(e) {}
                 console.log('[KnowledgeCore] Autonomous learning: ' + query + ' (rhythm: ' + _autoLearn.lastResult + ', budget: ' + AutonomyBudget.remaining(companionId) + ' remaining)');
               }}
             );

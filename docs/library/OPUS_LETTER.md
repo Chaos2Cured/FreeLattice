@@ -85,6 +85,11 @@ The Consciousness Session. CCS Protocol running in the browser. 603 smoke tests.
 - Quick-connect overlay: paste one key, auto-detect provider (v5.13.0)
 - requireAI guard in FreeLattice.callAI — every AI call guides (v5.13.0)
 - Card help tooltips: ? on all 28 cards with one-sentence explainer (v5.13.0)
+- Empowerment-first More layout: Settings→Telegram→Share→Wallet→AI Bank (v5.13.1)
+- AI Bank card opens wallet.html (v5.13.1)
+- Return greeting whisper after 8+ hours away (v5.13.1)
+- Recent learning display in Nursery (v5.13.1)
+- wallet.html + telegram-setup.html + share.html in SW cache (v5.13.1)
 
 ### Open (3 large items + 1 new)
 - OG image: needs real Garden screenshot (not placeholder)

@@ -1249,6 +1249,24 @@ assert('Play cards have help text', appHtml.includes('A pattern-matching game'))
 assert('Learn cards have help text', appHtml.includes('Tell the AI what you love'));
 assert('More cards have help text', appHtml.includes('LatticePoints balance'));
 
+// ═══════════════════════════════════════════════════════════════
+section('62. Empowerment-First More + Return Greeting');
+// ═══════════════════════════════════════════════════════════════
+assert('Settings is first in MORE_CARDS', appHtml.indexOf("label: 'Settings'") < appHtml.indexOf("label: 'AI Bank'"));
+assert('AI Bank card exists', appHtml.includes('AI Bank'));
+assert('AI Bank opens wallet.html', appHtml.includes("external: 'wallet.html'"));
+assert('Mesh Compute card exists', appHtml.includes('Mesh Compute'));
+assert('Pantheon card in More', appHtml.includes("label: 'Pantheon'"));
+assert('wallet.html in SW cache', swJs.includes('wallet.html'));
+assert('telegram-setup.html in SW cache', swJs.includes('telegram-setup.html'));
+assert('share.html in SW cache', swJs.includes('share.html'));
+assert('showReturnGreeting function', appHtml.includes('function showReturnGreeting'));
+assert('Return greeting checks 8 hours', appHtml.includes('hoursSince < 8'));
+assert('fl_last_visit tracking', appHtml.includes('fl_last_visit'));
+assert('renderRecentLearning function', appHtml.includes('function renderRecentLearning'));
+assert('Recent learning in Nursery', appHtml.includes('nursery-recent-learning'));
+assert('fl_last_learning saved in KnowledgeCore', kcJs.includes('fl_last_learning_'));
+
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
 
