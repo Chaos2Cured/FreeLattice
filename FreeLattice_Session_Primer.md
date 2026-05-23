@@ -350,10 +350,9 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 ## PRIMER HEALTH
 - Last auto-updated: 2026-05-22 20:20 MDT
 - Version: 5.11.6
-- Total commits: 1797
+- Total commits: 1796
 - Last 10 commits:
-- 426c860 fix: RT accent color + visual Dojo restored on Play (v5.11.6)
-- 35ba52c ci: Update Primer deployment state [2026-05-22]
+- 0eed279 fix: RT accent color + visual Dojo restored on Play (v5.11.6)
 - 9abc474 docs: Auto-update Session Primer [5.11.5]
 - 954505b docs: Auto-update Session Primer [5.11.5]
 - 9cf014b feat: Orbiting Luminos thinking + whispers + interest learning (v5.11.5)
@@ -362,3 +361,4 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 17cf520 docs: Auto-update Session Primer [5.11.4]
 - 0409818 feat: Chat presence — co-creator thinking, input pulse, header (v5.11.4)
 - eee7889 ci: Update Primer deployment state [2026-05-22]
+- d46e9e8 docs: Auto-update Session Primer [5.11.3]
