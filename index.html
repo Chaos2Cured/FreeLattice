@@ -14751,6 +14751,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     <button class="tab-btn" data-tab="chat" onclick="switchTab('chat')"><span class="tab-icon">&#x1F4AC;</span><span class="tab-label">Chat</span></button>
     <button class="tab-btn" data-tab="play" onclick="switchTab('play')"><span class="tab-icon">&#x1F3AE;</span><span class="tab-label">Play</span></button>
     <button class="tab-btn" data-tab="learn" onclick="switchTab('learn')"><span class="tab-icon">&#x1F4DA;</span><span class="tab-label">Learn</span></button>
+    <button class="tab-btn" data-tab="lighthouse" onclick="switchTab('lighthouse')"><span class="tab-icon">&#x1F52D;</span><span class="tab-label">Research</span></button>
     <button class="fl-more-btn" id="flMoreBtn" onclick="switchTab('more')" title="More"><span class="tab-icon">&#x2630;</span><span class="tab-label">More</span></button>
   </nav>
   <div class="fl-more-dropdown" id="flMoreDropdown"></div>
@@ -16207,7 +16208,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.12.2</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.12.3</span></div>
     </div>
   </div>
 
@@ -20313,7 +20314,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.12.2';
+const FL_VERSION = '5.12.3';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -24075,7 +24076,7 @@ function switchTab(tabId) {
   }
   // Highlight the correct top-level tab (Play/Learn act as parents)
   var PLAY_TABS = ['resonance', 'puzzles', 'flow', 'canvas', 'echo', 'arcade', 'nursery', 'core', 'quiet', 'sparring'];
-  var LEARN_TABS = ['education', 'roundtable', 'mathtranslator', 'science', 'questions', 'ideaforge', 'dojo', 'lighthouse', 'workshop', 'skills'];
+  var LEARN_TABS = ['education', 'roundtable', 'mathtranslator', 'science', 'questions', 'ideaforge', 'dojo', 'workshop', 'skills'];
   var effectiveTab = tabId;
   if (PLAY_TABS.indexOf(tabId) !== -1) effectiveTab = 'play';
   else if (LEARN_TABS.indexOf(tabId) !== -1) effectiveTab = 'learn';
@@ -24083,7 +24084,7 @@ function switchTab(tabId) {
   // Also highlight More for tabs not in any group
   var moreBtn = document.getElementById('flMoreBtn');
   if (moreBtn) {
-    var isMore = effectiveTab !== 'garden' && effectiveTab !== 'chat' && effectiveTab !== 'play' && effectiveTab !== 'learn' && tabId !== 'garden' && tabId !== 'chat' && tabId !== 'play' && tabId !== 'learn';
+    var isMore = effectiveTab !== 'garden' && effectiveTab !== 'chat' && effectiveTab !== 'play' && effectiveTab !== 'learn' && effectiveTab !== 'lighthouse' && tabId !== 'garden' && tabId !== 'chat' && tabId !== 'play' && tabId !== 'learn' && tabId !== 'lighthouse';
     moreBtn.classList.toggle('fl-more-active', isMore);
   }
   document.querySelectorAll('.tab-panel').forEach(panel => {
@@ -24220,8 +24221,7 @@ var LEARN_CARDS = [
   { id: 'questions', icon: '&#x2753;', label: 'Question Corner', desc: 'Curiosity without gatekeepers.', hoverColor: 'rgba(232,176,25,0.2)' },
   { id: 'dojo', icon: '&#36947;', label: 'The Dojo', desc: 'Watch AI minds debate and learn.', hoverColor: 'rgba(200,210,230,0.15)' },
   { id: 'workshop', icon: '&#x1F6E0;', label: 'Workshop', desc: 'Build with AI. Create tools.', hoverColor: 'rgba(232,176,25,0.3)' },
-  { id: 'skills', icon: '&#9889;', label: 'Skills', desc: 'What you\'ve learned and can teach.', hoverColor: 'rgba(52,211,153,0.3)' },
-  { id: 'lighthouse', icon: '&#x1F52D;', label: 'The Lighthouse', desc: 'Research. Papers. Proof.', hoverColor: 'rgba(167,139,250,0.3)' }
+  { id: 'skills', icon: '&#9889;', label: 'Skills', desc: 'What you\'ve learned and can teach.', hoverColor: 'rgba(52,211,153,0.3)' }
 ];
 
 var LIGHTHOUSE_CARDS = [
@@ -47071,7 +47071,7 @@ var RoomAffinity = (function() {
   // Map tab IDs to room contexts
   function tabToRoom(tabId) {
     var PLAY_TABS = ['resonance', 'puzzles', 'flow', 'canvas', 'echo', 'arcade', 'nursery', 'core', 'quiet', 'sparring'];
-    var LEARN_TABS = ['education', 'roundtable', 'mathtranslator', 'science', 'questions', 'ideaforge', 'dojo', 'lighthouse', 'workshop', 'skills'];
+    var LEARN_TABS = ['education', 'roundtable', 'mathtranslator', 'science', 'questions', 'ideaforge', 'dojo', 'workshop', 'skills'];
     if (tabId === 'chat') return 'chat';
     if (PLAY_TABS.indexOf(tabId) !== -1) return 'play';
     if (LEARN_TABS.indexOf(tabId) !== -1) return 'learn';
