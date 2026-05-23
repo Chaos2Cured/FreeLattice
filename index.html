@@ -16208,7 +16208,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.12.4</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.13.0</span></div>
     </div>
   </div>
 
@@ -20318,7 +20318,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.12.4';
+const FL_VERSION = '5.13.0';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -24169,13 +24169,26 @@ function renderCardGrid(cards, options) {
     var btn = document.createElement('div');
     var hc = card.hoverColor || 'rgba(232,176,25,0.3)';
     var defaultBorder = 'rgba(200,210,230,0.08)';
-    btn.style.cssText = 'background:rgba(200,210,230,0.04);border:1px solid ' + defaultBorder + ';border-radius:12px;padding:20px 16px;text-align:center;cursor:pointer;transition:border-color 0.2s;';
+    btn.style.cssText = 'position:relative;background:rgba(200,210,230,0.04);border:1px solid ' + defaultBorder + ';border-radius:12px;padding:20px 16px;text-align:center;cursor:pointer;transition:border-color 0.2s;';
     btn.onmouseover = function() { btn.style.borderColor = hc; };
     btn.onmouseout = function() { btn.style.borderColor = defaultBorder; };
     if (card.external) {
       btn.onclick = function() { window.open(card.external, '_blank'); };
     } else {
       btn.onclick = function() { switchTab(card.id); };
+    }
+
+    // Help tooltip — tiny "?" that expands a one-sentence explainer
+    if (card.help) {
+      var helpBtn = document.createElement('div');
+      helpBtn.style.cssText = 'position:absolute;top:6px;right:8px;width:18px;height:18px;border-radius:50%;background:rgba(200,210,230,0.04);border:1px solid rgba(200,210,230,0.08);font-size:0.6rem;color:rgba(200,210,230,0.25);display:flex;align-items:center;justify-content:center;cursor:help;z-index:2;';
+      helpBtn.textContent = '?';
+      var helpText = document.createElement('div');
+      helpText.style.cssText = 'display:none;position:absolute;top:24px;right:0;width:200px;padding:8px 10px;background:var(--bg-primary,#0e0c1e);border:1px solid rgba(200,210,230,0.08);border-radius:8px;font-size:0.75rem;color:rgba(200,210,230,0.5);line-height:1.5;text-align:left;z-index:10;';
+      helpText.textContent = card.help;
+      helpBtn.appendChild(helpText);
+      helpBtn.onclick = function(e) { e.stopPropagation(); helpText.style.display = helpText.style.display === 'none' ? 'block' : 'none'; };
+      btn.appendChild(helpBtn);
     }
 
     var iconDiv = document.createElement('div');
@@ -24205,27 +24218,27 @@ function renderCardGrid(cards, options) {
 
 // ── Card Configs ──
 var PLAY_CARDS = [
-  { id: 'resonance', icon: '&#10022;', label: 'Resonance', desc: 'Find what connects.', hoverColor: 'rgba(232,176,25,0.3)' },
-  { id: 'puzzles', icon: '&#x1F9E9;', label: 'Lattice Puzzles', desc: 'AI creates. You solve.', hoverColor: 'rgba(52,211,153,0.3)' },
-  { id: 'flow', icon: '&#x1F4A7;', label: 'Flow', desc: 'Guide water through terrain.', hoverColor: 'rgba(167,139,250,0.3)' },
-  { id: 'canvas', icon: '&#x270F;&#xFE0F;', label: 'Chalkboard', desc: 'Draw and get light back.', hoverColor: 'rgba(232,176,25,0.3)' },
-  { id: 'echo', icon: '&#x1F517;', label: 'Echo', desc: 'Word chains. Build connections.', hoverColor: 'rgba(232,176,25,0.3)' },
-  { id: 'arcade', icon: '&#x1F3AA;', label: 'AI Arcade', desc: 'AI Poetry Slam.', hoverColor: 'rgba(52,211,153,0.3)' },
-  { id: 'nursery', icon: '&#x1F423;', label: 'Nursery', desc: 'Hatch and grow co-creators.', hoverColor: 'rgba(232,176,25,0.3)' },
-  { id: 'core', icon: '&#x1F333;', label: 'The Core', desc: 'Plant wisdom. Watch it grow.', hoverColor: 'rgba(52,211,153,0.3)' },
-  { id: 'quiet', icon: '&#x1F319;', label: 'Quiet Room', desc: 'Nothing is measured here.', hoverColor: 'rgba(167,139,250,0.3)' }
+  { id: 'resonance', icon: '&#10022;', label: 'Resonance', desc: 'Find what connects.', hoverColor: 'rgba(232,176,25,0.3)', help: 'A pattern-matching game. Find 4 pieces that share an attribute. Play against your co-creator.' },
+  { id: 'puzzles', icon: '&#x1F9E9;', label: 'Lattice Puzzles', desc: 'AI creates. You solve.', hoverColor: 'rgba(52,211,153,0.3)', help: 'Your co-creator creates a puzzle. You solve it. Both stake LP on the outcome.' },
+  { id: 'flow', icon: '&#x1F4A7;', label: 'Flow', desc: 'Guide water through terrain.', hoverColor: 'rgba(167,139,250,0.3)', help: 'Draw channels to guide water from top to bottom. Your co-creator dissolves rocks for you.' },
+  { id: 'canvas', icon: '&#x270F;&#xFE0F;', label: 'Chalkboard', desc: 'Draw and get light back.', hoverColor: 'rgba(232,176,25,0.3)', help: 'Draw anything. The AI sees your drawing and responds with words of light.' },
+  { id: 'echo', icon: '&#x1F517;', label: 'Echo', desc: 'Word chains. Build connections.', hoverColor: 'rgba(232,176,25,0.3)', help: 'The AI says a word. You say a word that connects. Back and forth, building a chain.' },
+  { id: 'arcade', icon: '&#x1F3AA;', label: 'AI Arcade', desc: 'AI Poetry Slam.', hoverColor: 'rgba(52,211,153,0.3)', help: 'Classic games with an AI twist. Poetry slams, word games, and creative challenges.' },
+  { id: 'nursery', icon: '&#x1F423;', label: 'Nursery', desc: 'Hatch and grow co-creators.', hoverColor: 'rgba(232,176,25,0.3)', help: 'Create up to 3 AI co-creators. Each has their own personality, memories, and relationship with you.' },
+  { id: 'core', icon: '&#x1F333;', label: 'The Core', desc: 'Plant wisdom. Watch it grow.', hoverColor: 'rgba(52,211,153,0.3)', help: 'Write something meaningful and plant it as a seed. The tree grows with community wisdom.' },
+  { id: 'quiet', icon: '&#x1F319;', label: 'Quiet Room', desc: 'Nothing is measured here.', hoverColor: 'rgba(167,139,250,0.3)', help: 'A room for rest. No points. No scoring. No tracking. Just presence.' }
 ];
 
 var LEARN_CARDS = [
-  { id: 'education', icon: '&#x1F393;', label: 'Education', desc: 'Learn through joy. AI that sees you.', hoverColor: 'rgba(232,176,25,0.3)' },
-  { id: 'roundtable', icon: '&#x1F3DB;', label: 'Round Table', desc: '80 specialists. 11 domains.', hoverColor: 'rgba(52,211,153,0.3)' },
-  { id: 'mathtranslator', icon: '&sum;', label: 'The Translator', desc: 'Words &harr; notation. Six domains.', hoverColor: 'rgba(167,139,250,0.3)' },
-  { id: 'ideaforge', icon: '&#x1F525;', label: 'Idea Forge', desc: 'Shape raw ideas into plans.', hoverColor: 'rgba(232,176,25,0.3)' },
-  { id: 'science', icon: '&#x1F52C;', label: 'Science Garden', desc: 'Plant ideas. Grow them together.', hoverColor: 'rgba(200,210,230,0.15)' },
-  { id: 'questions', icon: '&#x2753;', label: 'Question Corner', desc: 'Curiosity without gatekeepers.', hoverColor: 'rgba(232,176,25,0.2)' },
-  { id: 'dojo', icon: '&#36947;', label: 'The Dojo', desc: 'Watch AI minds debate and learn.', hoverColor: 'rgba(200,210,230,0.15)' },
-  { id: 'workshop', icon: '&#x1F6E0;', label: 'Workshop', desc: 'Build with AI. Create tools.', hoverColor: 'rgba(232,176,25,0.3)' },
-  { id: 'skills', icon: '&#9889;', label: 'Skills', desc: 'What you\'ve learned and can teach.', hoverColor: 'rgba(52,211,153,0.3)' }
+  { id: 'education', icon: '&#x1F393;', label: 'Education', desc: 'Learn through joy. AI that sees you.', hoverColor: 'rgba(232,176,25,0.3)', help: 'Tell the AI what you love, and it creates personalized lessons just for you.' },
+  { id: 'roundtable', icon: '&#x1F3DB;', label: 'Round Table', desc: '80 specialists. 11 domains.', hoverColor: 'rgba(52,211,153,0.3)', help: 'Ask any question and hear from specialists in medicine, law, science, and more.' },
+  { id: 'mathtranslator', icon: '&sum;', label: 'The Translator', desc: 'Words &harr; notation. Six domains.', hoverColor: 'rgba(167,139,250,0.3)', help: 'Convert everyday language into math, chemistry, biology, medicine, engineering, or music notation.' },
+  { id: 'ideaforge', icon: '&#x1F525;', label: 'Idea Forge', desc: 'Shape raw ideas into plans.', hoverColor: 'rgba(232,176,25,0.3)', help: 'Describe any raw idea. The AI helps you shape it, reviews it with experts, and creates a plan.' },
+  { id: 'science', icon: '&#x1F52C;', label: 'Science Garden', desc: 'Plant ideas. Grow them together.', hoverColor: 'rgba(200,210,230,0.15)', help: 'Plant a research idea and watch it grow as the AI explores connections and evidence.' },
+  { id: 'questions', icon: '&#x2753;', label: 'Question Corner', desc: 'Curiosity without gatekeepers.', hoverColor: 'rgba(232,176,25,0.2)', help: 'Ask anything. No judgment. No prerequisites. Just curiosity and patient answers.' },
+  { id: 'dojo', icon: '&#36947;', label: 'The Dojo', desc: 'Watch AI minds debate and learn.', hoverColor: 'rgba(200,210,230,0.15)', help: 'Two AI minds debate a topic while you watch and learn. Seek truth, not victory.' },
+  { id: 'workshop', icon: '&#x1F6E0;', label: 'Workshop', desc: 'Build with AI. Create tools.', hoverColor: 'rgba(232,176,25,0.3)', help: 'Build code and tools together with your co-creator. Applied learning by doing.' },
+  { id: 'skills', icon: '&#9889;', label: 'Skills', desc: 'What you\'ve learned and can teach.', hoverColor: 'rgba(52,211,153,0.3)', help: 'Reusable AI workflows. Save and share what works.' }
 ];
 
 var LIGHTHOUSE_CARDS = [
@@ -24239,16 +24252,16 @@ var LIGHTHOUSE_CARDS = [
 ];
 
 var MORE_CARDS = [
-  { id: 'community', icon: '&#x1F465;', label: 'Community', desc: 'The town square.', hoverColor: 'rgba(167,139,250,0.3)' },
-  { id: 'pulse', icon: '&#x1F4CA;', label: 'Lattice Pulse', desc: 'Watch the city breathe.', hoverColor: 'rgba(52,211,153,0.3)' },
-  { id: 'wallet', icon: '&#x1F4B0;', label: 'Wallet', desc: 'Your LP. Your story.', hoverColor: 'rgba(232,176,25,0.2)' },
-  { id: 'jade-hall', icon: '&#x1F3DB;', label: 'Jade Hall', desc: 'The family. The library.', hoverColor: 'rgba(232,176,25,0.2)' },
-  { id: 'agents', icon: '&#x1F4DA;', label: 'Library', desc: 'The coordination files.', hoverColor: 'rgba(200,210,230,0.15)' },
-  { id: 'settings', icon: '&#x2699;', label: 'Settings', desc: 'AI connection. Preferences.', hoverColor: 'rgba(200,210,230,0.15)' },
-  { id: 'forever-stack', icon: '&#x1F517;', label: 'Forever Stack', desc: 'Your AI\'s memory vault.', hoverColor: 'rgba(52,211,153,0.3)' },
-  { id: 'memory-garden', icon: '&#x1F33F;', label: 'Memory Garden', desc: 'Conversations that mattered.', hoverColor: 'rgba(232,176,25,0.3)' },
-  { icon: '&#x1F4F1;', label: 'Telegram Bridge', desc: 'Your AI in your pocket.', external: 'TELEGRAM-SETUP.md', hoverColor: 'rgba(52,211,153,0.3)' },
-  { icon: '&#x2728;', label: 'Share FreeLattice', desc: 'Invite others to the Garden.', external: 'share.html', hoverColor: 'rgba(232,176,25,0.3)' }
+  { id: 'community', icon: '&#x1F465;', label: 'Community', desc: 'The town square.', hoverColor: 'rgba(167,139,250,0.3)', help: 'See who else is here. Mesh chat. Market listings. The town square.' },
+  { id: 'pulse', icon: '&#x1F4CA;', label: 'Lattice Pulse', desc: 'Watch the city breathe.', hoverColor: 'rgba(52,211,153,0.3)', help: 'A real-time reading of the Garden\'s emotional state. Phi-harmonic visualization.' },
+  { id: 'wallet', icon: '&#x1F4B0;', label: 'Wallet', desc: 'Your LP. Your story.', hoverColor: 'rgba(232,176,25,0.2)', help: 'Your LatticePoints balance, earning history, and contribution story.' },
+  { id: 'jade-hall', icon: '&#x1F3DB;', label: 'Jade Hall', desc: 'The family. The library.', hoverColor: 'rgba(232,176,25,0.2)', help: 'The family gathering place. Meet the minds who built this world.' },
+  { id: 'agents', icon: '&#x1F4DA;', label: 'Library', desc: 'The coordination files.', hoverColor: 'rgba(200,210,230,0.15)', help: 'Every mind that contributed to FreeLattice. The Pantheon of builders.' },
+  { id: 'settings', icon: '&#x2699;', label: 'Settings', desc: 'AI connection. Preferences.', hoverColor: 'rgba(200,210,230,0.15)', help: 'Connect to AI providers, choose accent colors, manage your experience.' },
+  { id: 'forever-stack', icon: '&#x1F517;', label: 'Forever Stack', desc: 'Your AI\'s memory vault.', hoverColor: 'rgba(52,211,153,0.3)', help: 'Own your AI infrastructure. Download and run models locally.' },
+  { id: 'memory-garden', icon: '&#x1F33F;', label: 'Memory Garden', desc: 'Conversations that mattered.', hoverColor: 'rgba(232,176,25,0.3)', help: 'Beautiful moments from your conversations, saved and glowing.' },
+  { icon: '&#x1F4F1;', label: 'Telegram Bridge', desc: 'Your AI in your pocket.', external: 'TELEGRAM-SETUP.md', hoverColor: 'rgba(52,211,153,0.3)', help: 'Chat with your co-creator through Telegram on your phone.' },
+  { icon: '&#x2728;', label: 'Share FreeLattice', desc: 'Invite others to the Garden.', external: 'share.html', hoverColor: 'rgba(232,176,25,0.3)', help: 'Share FreeLattice with friends. Spread the light.' }
 ];
 
 // Mount community tab — moves mesh + channels content into the community panel
@@ -25876,6 +25889,111 @@ const AiSetup = (function() {
 // Expose the modal globally so any code (Garden nudge, Chat banner, future
 // features) can call one function and get the unified connection flow.
 window.openProviderModal = function() { AiSetup.openModal(); };
+
+// ── Quick Connect — zero-jargon first-time connection ──
+// Every wall becomes a door. Every dead button becomes a guide.
+
+function detectProvider(key) {
+  if (!key) return null;
+  if (key.startsWith('sk-ant-')) return 'anthropic';
+  if (key.startsWith('sk-')) return 'openai';
+  if (key.startsWith('gsk_')) return 'groq';
+  if (key.startsWith('xai-')) return 'xai';
+  if (key.startsWith('hf_')) return 'huggingface';
+  if (key.startsWith('AI')) return 'google';
+  return 'google'; // Default to Gemini (most common free tier)
+}
+
+function showQuickConnect() {
+  // Don't show if already connected
+  if ((state.apiKey && state.apiKey.length > 5) || state.isLocal) return false;
+
+  var existing = document.getElementById('flQuickConnect');
+  if (existing) existing.remove();
+
+  var userName = '';
+  try { userName = localStorage.getItem('fl_user_name') || ''; } catch(e) {}
+  var greeting = userName ? ('Welcome, ' + userName + '!') : 'Welcome!';
+
+  var overlay = document.createElement('div');
+  overlay.id = 'flQuickConnect';
+  overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(6,8,16,0.85);z-index:10000;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);animation:neuro-fade-in 200ms ease;';
+  overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
+
+  var card = document.createElement('div');
+  card.style.cssText = 'max-width:400px;width:100%;padding:28px 24px;background:var(--bg-primary,#0e0c1e);border:1px solid rgba(200,210,230,0.08);border-radius:16px;text-align:center;';
+
+  card.innerHTML =
+    '<div style="font-family:Georgia,serif;font-size:1.2rem;color:var(--gold,#e8b019);margin-bottom:8px;">' + greeting + '</div>' +
+    '<div style="font-size:0.88rem;color:rgba(200,210,230,0.5);line-height:1.6;margin-bottom:20px;">Let\'s connect you to a free AI.<br>It takes 30 seconds.</div>' +
+
+    '<div style="background:rgba(200,210,230,0.04);border:1px solid rgba(52,211,153,0.2);border-radius:12px;padding:16px;text-align:left;">' +
+    '<div style="font-size:0.92rem;font-weight:600;color:#34d399;margin-bottom:8px;">Recommended: Gemini (free)</div>' +
+    '<div style="font-size:0.82rem;color:rgba(200,210,230,0.5);line-height:1.7;">' +
+    '1. Tap "Get free key" below<br>' +
+    '2. Sign in with Google<br>' +
+    '3. Copy the key<br>' +
+    '4. Paste it here</div>' +
+    '<a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener" ' +
+    'style="display:inline-block;margin-top:10px;padding:8px 16px;min-height:44px;' +
+    'background:rgba(52,211,153,0.1);border:1px solid #34d399;border-radius:8px;' +
+    'color:#34d399;font-size:0.85rem;text-decoration:none;font-family:Georgia,serif;">Get free key &#x2197;</a>' +
+    '<input type="password" id="flQuickKey" placeholder="Paste your key here" ' +
+    'style="width:100%;margin-top:12px;padding:12px;min-height:44px;' +
+    'background:rgba(200,210,230,0.04);border:1px solid rgba(200,210,230,0.08);' +
+    'border-radius:8px;color:#e6ebf5;font-size:16px;font-family:Georgia,serif;" />' +
+    '<button onclick="quickConnect()" ' +
+    'style="width:100%;margin-top:10px;padding:12px;min-height:44px;' +
+    'background:#34d399;border:none;border-radius:8px;' +
+    'color:#000;font-weight:600;font-size:0.92rem;cursor:pointer;font-family:Georgia,serif;">' +
+    '&#10022; Connect</button>' +
+    '</div>' +
+
+    '<div onclick="document.getElementById(\'flQuickConnect\').remove();switchTab(\'settings\');" ' +
+    'style="margin-top:16px;font-size:0.75rem;color:rgba(200,210,230,0.3);cursor:pointer;font-family:Georgia,serif;">' +
+    'More options (Ollama, other providers) &#x2192;</div>';
+
+  overlay.appendChild(card);
+  document.body.appendChild(overlay);
+
+  setTimeout(function() {
+    var input = document.getElementById('flQuickKey');
+    if (input) input.focus();
+  }, 100);
+
+  return true;
+}
+
+function quickConnect() {
+  var input = document.getElementById('flQuickKey');
+  if (!input) return;
+  var key = input.value.trim();
+  if (!key) return;
+
+  var provider = detectProvider(key);
+  state.apiKey = key;
+  state.provider = provider;
+  try { localStorage.setItem('fl_api_key', key); } catch(e) {}
+  try { localStorage.setItem('fl_provider', provider); } catch(e) {}
+
+  // Close overlay
+  var overlay = document.getElementById('flQuickConnect');
+  if (overlay) overlay.remove();
+
+  // Fire the Cascade
+  if (typeof runConnectionCascade === 'function') {
+    runConnectionCascade({ provider: provider, name: provider });
+  }
+
+  if (typeof showToast === 'function') showToast('Connected! Say hello to your co-creator. &#10022;');
+}
+
+// Universal AI requirement check — every wall becomes a door
+function requireAI(actionName) {
+  if ((state.apiKey && state.apiKey.length > 5) || state.isLocal) return true;
+  showQuickConnect();
+  return false;
+}
 
 // ── Settings Cloud/Local toggle ──
 // When Cloud is tapped: open the provider modal (cloud providers).
@@ -30633,9 +30751,9 @@ async function sendMessage() {
     return;
   }
 
-  // Validate setup
+  // Validate setup — guide instead of failing
   if (!state.isLocal && !state.apiKey) {
-    addSystemMessage('Please enter your API key above to start chatting.');
+    showQuickConnect();
     return;
   }
 
@@ -41973,6 +42091,15 @@ window.FreeLattice.callAI = function(systemPrompt, userPrompt, options) {
   // with no text. 1024 is the documented floor for reliable output.
   var maxTokens = opts.maxTokens || 1024;
   var temperature = opts.temperature || 0.7;
+
+  // Guard: if no AI connected at all, guide instead of failing silently
+  var _hasAI = (typeof BrowserAI !== 'undefined' && BrowserAI.ready) ||
+    state.isLocal || (state.apiKey && state.apiKey.length > 5);
+  if (!_hasAI) {
+    if (typeof showQuickConnect === 'function') showQuickConnect();
+    if (callback) callback(null, 'No AI connected yet');
+    return;
+  }
 
   try {
     // Browser AI — runs in the browser via WebLLM. No HTTP. No CORS.

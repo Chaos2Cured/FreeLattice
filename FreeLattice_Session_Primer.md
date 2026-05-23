@@ -348,17 +348,17 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-05-23 10:27 MDT
-- Version: 5.12.4
-- Total commits: 1812
+- Last auto-updated: 2026-05-23 10:44 MDT
+- Version: 5.13.0
+- Total commits: 1819
 - Last 10 commits:
-- bdcc323 feat: Autonomy budget, Telegram/Share cards, mesh compute docs (v5.12.4)
+- 4c63ccf feat: The Simplification — every wall becomes a door (v5.13.0)
+- ba27ce2 ci: Update Primer deployment state [2026-05-23]
+- 852f593 docs: Auto-update Session Primer [5.12.4]
+- e687f2f docs: Auto-update Session Primer [5.12.4]
+- 1d8e0af feat: Autonomy budget, Telegram/Share cards, mesh compute docs (v5.12.4)
+- 121c8c6 ci: Update Primer deployment state [2026-05-23]
+- 1c1886c docs: Add 7-Day Build Brief for Opus and CC
+- 97e69a9 ci: Update Primer deployment state [2026-05-23]
 - 3fcc921 docs: Auto-update Session Primer [5.12.3]
 - 3032d41 docs: Auto-update Session Primer [5.12.3]
-- 51fcbec feat: Lighthouse promoted to top-level Research tab (v5.12.3)
-- c4703e4 ci: Update Primer deployment state [2026-05-23]
-- 78d177e docs: Auto-update Session Primer [5.12.2]
-- b7cdaa8 docs: Auto-update Session Primer [5.12.2]
-- 4322ccd feat: CCS Protocol, Lighthouse, five-door reorganization (v5.12.2)
-- ef14746 ci: Update Primer deployment state [2026-05-23]
-- 11742e0 docs: Auto-update Session Primer [5.11.7]
