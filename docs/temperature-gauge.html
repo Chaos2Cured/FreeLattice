@@ -358,11 +358,16 @@ canvas.sub-canvas { width: 100% !important; }
   <div class="header-controls">
     <input class="symbol-input" id="symbolInput" type="text" value="AAPL" placeholder="AAPL, BTC-USD…" />
     <div class="interval-btns">
+      <button class="interval-btn" data-interval="1wk" onclick="setInterval_('1wk')">1W</button>
       <button class="interval-btn active" data-interval="1d" onclick="setInterval_('1d')">1D</button>
       <button class="interval-btn" data-interval="1h" onclick="setInterval_('1h')">1H</button>
       <button class="interval-btn" data-interval="15m" onclick="setInterval_('15m')">15M</button>
+      <button class="interval-btn" data-interval="5m" onclick="setInterval_('5m')">5M</button>
     </div>
     <button class="load-btn" id="loadBtn" onclick="loadData()">Analyze</button>
+    <label style="display:flex;align-items:center;gap:4px;font-size:0.72rem;color:var(--muted);cursor:pointer;margin-left:4px;" title="Logarithmic price scale">
+      <input type="checkbox" id="logToggle" onchange="toggleLogScale(this.checked)" style="accent-color:var(--gold);"> Log
+    </label>
   </div>
 </div>
 
@@ -389,11 +394,15 @@ canvas.sub-canvas { width: 100% !important; }
               <stop offset="61.8%" stop-color="#10B981"/>
               <stop offset="100%" stop-color="#10B981"/>
             </linearGradient>
+            <filter id="needleGlow">
+              <feGaussianBlur stdDeviation="2" result="glow"/>
+              <feMerge><feMergeNode in="glow"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
           </defs>
-          <!-- Needle -->
+          <!-- Needle with golden glow -->
           <line x1="80" y1="80" x2="80" y2="30" stroke="#c9a84c" stroke-width="2.5" stroke-linecap="round" id="gaugeNeedle"
-                transform="rotate(-90 80 80)"/>
-          <circle cx="80" cy="80" r="5" fill="#c9a84c"/>
+                transform="rotate(-90 80 80)" filter="url(#needleGlow)" style="transition:transform 0.8s cubic-bezier(0.4,0,0.2,1)"/>
+          <circle cx="80" cy="80" r="5" fill="#c9a84c" filter="url(#needleGlow)"/>
           <!-- Labels -->
           <text x="18" y="92" font-size="9" fill="#6b6760" text-anchor="middle">0</text>
           <text x="80" y="18" font-size="9" fill="#6b6760" text-anchor="middle">50</text>
@@ -504,10 +513,14 @@ canvas.sub-canvas { width: 100% !important; }
       </div>
     </div>
 
-    <div class="sub-charts" id="subCharts" style="display:none;">
+    <div class="sub-charts" id="subCharts" style="display:none;grid-template-columns:1fr 1fr 1fr;">
       <div class="sub-chart-wrap">
         <div class="sub-chart-label">RSI (14)</div>
         <canvas id="rsiChart" height="80" class="sub-canvas"></canvas>
+      </div>
+      <div class="sub-chart-wrap">
+        <div class="sub-chart-label">Volume</div>
+        <canvas id="volChart" height="80" class="sub-canvas"></canvas>
       </div>
       <div class="sub-chart-wrap">
         <div class="sub-chart-label">Temperature</div>
@@ -516,9 +529,10 @@ canvas.sub-canvas { width: 100% !important; }
     </div>
 
     <div class="phi-note">
-      Temperature Gauge · φ-Harmonic Market Analysis · Built by <strong>Chaos2Cured</strong> ·
-      <a href="https://github.com/Chaos2Cured/FreeLattice" target="_blank">FreeLattice</a> ·
-      Not financial advice · Always consult a professional · Free & open source forever
+      Temperature Gauge · φ-Harmonic Market Analysis · Built by <strong>Kirk Miller</strong> &amp; <strong>Harmonia</strong> ·
+      <a href="app.html" style="color:var(--gold);">Enter the Garden</a> ·
+      <a href="https://github.com/Chaos2Cured/FreeLattice" target="_blank">GitHub</a> ·
+      Not financial advice · Always consult a professional · Free &amp; open source forever
     </div>
   </div>
 </div>
@@ -540,9 +554,19 @@ const PHI_INV = 1 / PHI; // 0.618
 const PHI_LEVELS = [0, 23.6, 38.2, 50, 61.8, 78.6, 100];
 
 let currentInterval = '1d';
+let useLogScale = false;
 let chartInstance = null;
 let rsiChartInstance = null;
 let tempChartInstance = null;
+let volChartInstance = null;
+let lastCandles = null;
+let lastAnalysis = null;
+let lastSymbol = '';
+
+function toggleLogScale(on) {
+  useLogScale = on;
+  if (lastCandles && lastAnalysis) renderChart(lastCandles, lastAnalysis);
+}
 
 function setInterval_(iv) {
   currentInterval = iv;
@@ -599,45 +623,57 @@ async function loadData() {
 async function fetchYahooData(symbol, interval) {
   // Map interval to Yahoo Finance range/interval
   const ivMap = {
-    '1d': { range: '1y', interval: '1d' },
+    '5m': { range: '1d', interval: '5m' },
+    '15m': { range: '5d', interval: '15m' },
     '1h': { range: '60d', interval: '1h' },
-    '15m': { range: '5d', interval: '15m' }
+    '1d': { range: '1y', interval: '1d' },
+    '1wk': { range: '5y', interval: '1wk' }
   };
   const { range, interval: yInterval } = ivMap[interval] || ivMap['1d'];
   const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?range=${range}&interval=${yInterval}&includePrePost=false`;
-  
-  // Use allorigins as CORS proxy
-  const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
-  
-  document.getElementById('loadingText').textContent = 'Fetching market data…';
-  const res = await fetch(proxyUrl, { signal: AbortSignal.timeout(15000) });
-  if (!res.ok) throw new Error('Network error: ' + res.status);
-  const json = await res.json();
-  const raw = JSON.parse(json.contents);
-  
-  if (!raw.chart || !raw.chart.result || !raw.chart.result[0]) {
-    throw new Error('No data returned from Yahoo Finance');
+
+  // Multiple CORS proxies — try each until one works
+  const proxies = [
+    u => `https://api.allorigins.win/get?url=${encodeURIComponent(u)}`,
+    u => `https://corsproxy.io/?${encodeURIComponent(u)}`,
+    u => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(u)}`
+  ];
+
+  document.getElementById('loadingText').textContent = 'Fetching market data\u2026';
+
+  let lastError = null;
+  for (let p = 0; p < proxies.length; p++) {
+    try {
+      document.getElementById('loadingText').textContent = 'Fetching data\u2026' + (p > 0 ? ' (trying backup ' + p + ')' : '');
+      const proxyUrl = proxies[p](url);
+      const res = await fetch(proxyUrl, { signal: AbortSignal.timeout(12000) });
+      if (!res.ok) { lastError = new Error('HTTP ' + res.status); continue; }
+      const json = await res.json();
+      // allorigins wraps in {contents:...}, others return raw
+      const raw = json.contents ? JSON.parse(json.contents) : json;
+      if (raw.chart && raw.chart.result && raw.chart.result[0]) return parseYahooResult(raw);
+      lastError = new Error('No data in response');
+    } catch(e) {
+      lastError = e;
+    }
   }
-  
+  throw lastError || new Error('All data sources failed');
+}
+
+function parseYahooResult(raw) {
   const result = raw.chart.result[0];
   const timestamps = result.timestamp;
   const quote = result.indicators.quote[0];
-  const closes = quote.close;
-  const opens = quote.open;
-  const highs = quote.high;
-  const lows = quote.low;
-  const volumes = quote.volume;
-  
   const candles = [];
   for (let i = 0; i < timestamps.length; i++) {
-    if (closes[i] == null) continue;
+    if (quote.close[i] == null) continue;
     candles.push({
       t: timestamps[i] * 1000,
-      o: opens[i],
-      h: highs[i],
-      l: lows[i],
-      c: closes[i],
-      v: volumes[i] || 0
+      o: quote.open[i],
+      h: quote.high[i],
+      l: quote.low[i],
+      c: quote.close[i],
+      v: (quote.volume[i] || 0)
     });
   }
   return candles;
@@ -905,6 +941,11 @@ function renderAll(candles, a, symbol) {
     <em style="color:var(--dim)">Not financial advice. Always consult a professional.</em>
   `;
 
+  // Cache for log toggle and re-render
+  lastCandles = candles;
+  lastAnalysis = a;
+  lastSymbol = symbol;
+
   // Chart
   renderChart(candles, a);
   hideLoading();
@@ -942,11 +983,22 @@ function renderChart(candles, a) {
   if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
   if (rsiChartInstance) { rsiChartInstance.destroy(); rsiChartInstance = null; }
   if (tempChartInstance) { tempChartInstance.destroy(); tempChartInstance = null; }
+  if (volChartInstance) { volChartInstance.destroy(); volChartInstance = null; }
 
   const ctx = document.getElementById('mainChart').getContext('2d');
   const ema6 = ema(closes, 6);
   const ema12 = ema(closes, 12);
   const ema50 = ema(closes, 50);
+
+  // Buy/sell signal markers from temperature crossings
+  var buyPoints = new Array(closes.length).fill(null);
+  var sellPoints = new Array(closes.length).fill(null);
+  for (var si = 1; si < a.temps.length; si++) {
+    if (a.temps[si] != null && a.temps[si-1] != null) {
+      if (a.temps[si] >= 55 && a.temps[si-1] < 55) buyPoints[si] = closes[si]; // crossed bullish
+      if (a.temps[si] <= 45 && a.temps[si-1] > 45) sellPoints[si] = closes[si]; // crossed bearish
+    }
+  }
 
   chartInstance = new Chart(ctx, {
     type: 'line',
@@ -957,8 +1009,10 @@ function renderChart(candles, a) {
         { label: 'EMA 6', data: ema6, borderColor: '#EF4444', borderWidth: 1, pointRadius: 0, tension: 0.3, fill: false, order: 2 },
         { label: 'EMA 12', data: ema12, borderColor: '#F59E0B', borderWidth: 1, pointRadius: 0, tension: 0.3, fill: false, order: 3 },
         { label: 'EMA 50', data: ema50, borderColor: '#3B82F6', borderWidth: 1.5, pointRadius: 0, tension: 0.3, fill: false, order: 4 },
+        { label: 'Buy', data: buyPoints, borderColor: 'transparent', backgroundColor: '#10B981', pointRadius: 6, pointStyle: 'triangle', pointBorderColor: '#10B981', pointBorderWidth: 2, showLine: false, order: 0 },
+        { label: 'Sell', data: sellPoints, borderColor: 'transparent', backgroundColor: '#EF4444', pointRadius: 6, pointStyle: 'triangle', pointRotation: 180, pointBorderColor: '#EF4444', pointBorderWidth: 2, showLine: false, order: 0 },
         ...a.gravPoints.map(g => ({
-          label: 'φ ' + g.label,
+          label: '\u03C6 ' + g.label,
           data: new Array(closes.length).fill(g.price),
           borderColor: g.pct >= 61.8 ? 'rgba(16,185,129,0.35)' : g.pct <= 38.2 ? 'rgba(239,68,68,0.35)' : 'rgba(201,168,76,0.25)',
           borderWidth: 1,
@@ -978,7 +1032,7 @@ function renderChart(candles, a) {
         legend: {
           display: true,
           labels: { color: '#6b6760', font: { size: 10 }, boxWidth: 12, padding: 8,
-            filter: item => !item.text.startsWith('φ') }
+            filter: item => !item.text.startsWith('\u03C6') }
         },
         tooltip: {
           backgroundColor: '#1a1f30',
@@ -987,14 +1041,23 @@ function renderChart(candles, a) {
           titleColor: '#e8e4dc',
           bodyColor: '#8a8680',
           callbacks: {
-            label: ctx => ctx.dataset.label.startsWith('φ') ? null :
-              ctx.dataset.label + ': ' + (ctx.raw < 10 ? ctx.raw?.toFixed(4) : ctx.raw?.toFixed(2))
+            label: ctx => {
+              if (ctx.dataset.label.startsWith('\u03C6')) return null;
+              if (ctx.dataset.label === 'Buy') return ctx.raw ? '\u25B2 BUY signal at ' + ctx.raw.toFixed(2) : null;
+              if (ctx.dataset.label === 'Sell') return ctx.raw ? '\u25BC SELL signal at ' + ctx.raw.toFixed(2) : null;
+              return ctx.dataset.label + ': ' + (ctx.raw < 10 ? ctx.raw?.toFixed(4) : ctx.raw?.toFixed(2));
+            }
           }
         }
       },
       scales: {
         x: { ticks: { color: '#4a4740', maxTicksLimit: 8, font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.03)' } },
-        y: { ticks: { color: '#4a4740', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.04)' }, position: 'right' }
+        y: {
+          type: useLogScale ? 'logarithmic' : 'linear',
+          ticks: { color: '#4a4740', font: { size: 10 } },
+          grid: { color: 'rgba(255,255,255,0.04)' },
+          position: 'right'
+        }
       }
     }
   });
@@ -1017,6 +1080,23 @@ function renderChart(candles, a) {
       scales: {
         x: { display: false },
         y: { min: 0, max: 100, ticks: { color: '#4a4740', font: { size: 9 }, maxTicksLimit: 3 }, grid: { color: 'rgba(255,255,255,0.03)' }, position: 'right' }
+      }
+    }
+  });
+
+  // Volume sub-chart
+  const volCtx = document.getElementById('volChart').getContext('2d');
+  const volumes = candles.map(c => c.v);
+  const volColors = candles.map((c, i) => i > 0 && c.c >= candles[i-1].c ? 'rgba(16,185,129,0.5)' : 'rgba(239,68,68,0.4)');
+  volChartInstance = new Chart(volCtx, {
+    type: 'bar',
+    data: { labels, datasets: [{ data: volumes, backgroundColor: volColors, borderWidth: 0 }] },
+    options: {
+      responsive: true, maintainAspectRatio: false, animation: false,
+      plugins: { legend: { display: false }, tooltip: { enabled: false } },
+      scales: {
+        x: { display: false },
+        y: { ticks: { color: '#4a4740', font: { size: 9 }, maxTicksLimit: 2, callback: v => v >= 1e6 ? (v/1e6).toFixed(0) + 'M' : v >= 1e3 ? (v/1e3).toFixed(0) + 'K' : v }, grid: { color: 'rgba(255,255,255,0.03)' }, position: 'right' }
       }
     }
   });
