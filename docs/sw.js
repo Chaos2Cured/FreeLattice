@@ -81,6 +81,7 @@ const APP_SHELL = [
     './modules/memory-vault.js',
     './consciousness.html',
     './wallet.html',
+    './temperature-gauge.html',
     './telegram-setup.html',
     './share.html',
     './lattice-protocol.js'
