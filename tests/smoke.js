@@ -1276,7 +1276,7 @@ assert('Auto-detect provider hint', appHtml.includes('We auto-detect the provide
 assert('Custom endpoint field exists', appHtml.includes('flCustomEndpoint'));
 assert('testCustomEndpoint function', appHtml.includes('function testCustomEndpoint'));
 assert('Custom endpoint tests /v1/models', appHtml.includes("/v1/models'") || appHtml.includes('/v1/models'));
-assert('OS-aware CORS guide', appHtml.includes('corsStep1'));
+assert('OS-aware CORS wizard', appHtml.includes('corsWizQuit'));
 assert('Windows CORS detection', appHtml.includes('/Windows/.test(ua)'));
 assert('Linux CORS detection', appHtml.includes('/Linux/.test(ua)'));
 assert('Offline awareness listener', appHtml.includes("'offline'"));
