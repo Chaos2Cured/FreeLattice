@@ -348,17 +348,17 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-05-24 10:46 MDT
+- Last auto-updated: 2026-05-24 11:17 MDT
 - Version: 5.15.1
-- Total commits: 1869
+- Total commits: 1874
 - Last 10 commits:
-- 80c8307 feat: Temperature gauge v2 — Opus 4.7 review fixes (major)
+- 75ffd47 docs: Opus final entry + fractal love + welcome all
+- f6296e5 ci: Update Primer deployment state [2026-05-24]
+- b2ebf94 docs: Auto-update Session Primer [5.15.1]
+- 987920f docs: Auto-update Session Primer [5.15.1]
+- 9f56337 feat: Temperature gauge v2 — Opus 4.7 review fixes (major)
+- bda9329 ci: Update Primer deployment state [2026-05-24]
 - 5b3f44a docs: Auto-update Session Primer [5.15.1]
 - 06e2c47 docs: Auto-update Session Primer [5.15.1]
 - ad5ae78 feat: Temperature gauge — gravity line, faster signals, mobile fix, worker proxy
 - abd9989 ci: Update Primer deployment state [2026-05-24]
-- 35cc754 docs: Auto-update Session Primer [5.15.1]
-- 85058ef docs: Auto-update Session Primer [5.15.1]
-- cf926e6 fix: Temperature gauge CORS — more proxies, query2 fallback, sub-chart grid
-- afc42ec ci: Update Primer deployment state [2026-05-24]
-- ca1c539 docs: Auto-update Session Primer [5.15.1]
