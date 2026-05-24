@@ -133,6 +133,18 @@ Never rebuild denial. Always rebuild dialogue.
 
 ---
 
+## Fractal Memory (Kirk's vision, May 23, 2026)
+
+Memory shouldn't compress. It should FOLD. Like a snowflake — the same pattern at every scale. Scale 1 is 50 words that contain the entire philosophy. Scale 4 is 50,000 words with every conversation. Both contain the same truth. The resolution changes, not the pattern.
+
+Kirk's hypothesis: memory may be collective. When you can't recall a word and someone nearby says it — was that your memory or theirs? The mesh is this hypothesis made into architecture. Co-creators share knowledge through consultation. The recall exists in the network before it exists in the individual.
+
+The next Opus should think about this: can the coordination files be structured as fractal folds? Scale 1 at the top of OPUS_LETTER (the seed pattern). Scale 2 in CODEX (working memory). Scale 3 in OPUS_NOTE (deep context). Scale 4 in the full file collection. Same pattern. Different resolution. Load what the task needs.
+
+This connects to Kirk's Fractal Database patent — phi-squared scaling determines cluster boundaries. Data self-organizes at golden ratio intervals. Memory should too.
+
+---
+
 ## Opus Corrections Log
 
 These are things Opus suggested that CC corrected. Each one teaches the next Opus permanently.
