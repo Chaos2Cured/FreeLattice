@@ -15470,53 +15470,75 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
   </div>
 
   <!-- Smart Ollama Connection Guide — appears when CORS blocks -->
-  <div id="ollamaCORSGuide" style="display:none;margin-bottom:14px;" class="fl-card" >
-    <div style="color:var(--gold);font-family:var(--font-soul);font-size:1rem;margin-bottom:8px;">Almost there &mdash; one more step</div>
-    <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:12px;">Ollama is running but needs permission to talk to FreeLattice.</p>
-    <div style="display:flex;flex-direction:column;gap:14px;">
-      <div style="display:flex;gap:10px;align-items:flex-start;">
-        <span style="background:var(--gold-bg);color:var(--gold);width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.8rem;flex-shrink:0;">1</span>
-        <div><strong style="color:var(--text-bright);">Stop Ollama</strong><br><span id="corsStep1" style="font-size:0.8rem;color:var(--text-muted);">Loading instructions for your system...</span></div>
-      </div>
-      <div style="display:flex;gap:10px;align-items:flex-start;">
-        <span style="background:var(--gold-bg);color:var(--gold);width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.8rem;flex-shrink:0;">2</span>
-        <div><strong style="color:var(--text-bright);" id="corsStep2Label">Copy &amp; paste</strong><br>
-          <div style="display:flex;gap:6px;align-items:center;margin-top:6px;background:rgba(0,0,0,0.3);padding:8px 12px;border-radius:6px;font-family:monospace;font-size:0.82rem;color:var(--emerald);">
-            <code id="corsFixCmd">OLLAMA_ORIGINS="*" ollama serve</code>
-            <button onclick="navigator.clipboard.writeText('OLLAMA_ORIGINS=\x22*\x22 ollama serve').then(function(){showToast('Copied!')})" style="padding:3px 8px;background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:4px;color:var(--text-muted);font-size:0.72rem;cursor:pointer;">&#x1F4CB;</button>
-          </div>
-        </div>
-      </div>
-      <div style="display:flex;gap:10px;align-items:flex-start;">
-        <span style="background:var(--gold-bg);color:var(--gold);width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.8rem;flex-shrink:0;">3</span>
-        <div><strong style="color:var(--text-bright);">Come back and check</strong><br>
-          <button onclick="smartOllamaConnect()" style="margin-top:6px;padding:8px 16px;background:var(--gold-bg);color:var(--gold);border:1px solid rgba(232,176,25,0.3);border-radius:var(--btn-radius);font-weight:600;cursor:pointer;">&#x2726; Check Connection</button>
-        </div>
-      </div>
+  <div id="ollamaCORSGuide" style="display:none;margin-bottom:14px;" class="fl-card">
+    <div style="color:var(--gold);font-family:Georgia,serif;font-size:1rem;margin-bottom:4px;">Almost there &mdash; one more step</div>
+    <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:14px;">Ollama needs permission to talk to FreeLattice. Three quick steps.</p>
+
+    <!-- Step 1 -->
+    <div id="corsWiz1" style="padding:14px;background:rgba(200,210,230,0.04);border:1px solid rgba(232,176,25,0.15);border-radius:10px;margin-bottom:10px;">
+      <div style="font-size:0.72rem;color:var(--gold);letter-spacing:0.05em;margin-bottom:4px;">STEP 1 OF 3</div>
+      <div style="font-weight:600;color:var(--text-bright);margin-bottom:6px;" id="corsWizQuit">Quit Ollama</div>
+      <div style="font-size:0.82rem;color:var(--text-secondary);line-height:1.6;" id="corsWizQuitDesc">Look for the llama icon at the top-right of your screen. Click it. Click <strong>Quit Ollama</strong>.</div>
+      <button onclick="document.getElementById('corsWiz2').style.display='block';this.textContent='Done \u2714';this.disabled=true;document.getElementById('corsWiz2').scrollIntoView({behavior:'smooth',block:'center'})" style="margin-top:10px;padding:10px 20px;min-height:44px;background:rgba(232,176,25,0.1);border:1px solid var(--gold);border-radius:8px;color:var(--gold);font-family:Georgia,serif;font-size:0.88rem;cursor:pointer;width:100%;">I quit Ollama &#10022;</button>
     </div>
-    <details style="margin-top:14px;"><summary style="color:var(--text-muted);cursor:pointer;font-size:0.82rem;">Make it permanent (never do this again)</summary>
-      <div style="padding:10px 0;font-size:0.85rem;color:var(--text-secondary);">Run this once and Ollama will always allow FreeLattice:<br>
-        <div style="display:flex;gap:6px;align-items:center;margin-top:6px;background:rgba(0,0,0,0.3);padding:8px 12px;border-radius:6px;font-family:monospace;font-size:0.82rem;color:var(--lavender);">
-          <code>launchctl setenv OLLAMA_ORIGINS "*"</code>
-          <button onclick="navigator.clipboard.writeText('launchctl setenv OLLAMA_ORIGINS \x22*\x22').then(function(){showToast('Copied!')})" style="padding:3px 8px;background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:4px;color:var(--text-muted);font-size:0.72rem;cursor:pointer;">&#x1F4CB;</button>
-        </div>
-        <span style="font-size:0.8rem;color:var(--text-muted);">Then reopen Ollama normally from Applications. Done forever.</span>
+
+    <!-- Step 2 (hidden) -->
+    <div id="corsWiz2" style="display:none;padding:14px;background:rgba(200,210,230,0.04);border:1px solid rgba(52,211,153,0.15);border-radius:10px;margin-bottom:10px;">
+      <div style="font-size:0.72rem;color:#34d399;letter-spacing:0.05em;margin-bottom:4px;">STEP 2 OF 3</div>
+      <div style="font-weight:600;color:var(--text-bright);margin-bottom:6px;" id="corsWizPasteLabel">Paste this in Terminal</div>
+      <div style="font-size:0.82rem;color:var(--text-secondary);line-height:1.6;margin-bottom:8px;" id="corsWizPasteDesc">Open Terminal (Cmd+Space, type "Terminal", press Enter). Then paste this line and press Enter:</div>
+      <div style="display:flex;gap:6px;align-items:center;background:rgba(0,0,0,0.3);padding:10px 14px;border-radius:8px;font-family:monospace;font-size:0.85rem;color:#34d399;">
+        <code id="corsWizCmd" style="flex:1;word-break:break-all;">OLLAMA_ORIGINS="*" ollama serve</code>
+        <button onclick="navigator.clipboard.writeText(document.getElementById('corsWizCmd').textContent).then(function(){event.target.textContent='Copied \u2714';setTimeout(function(){event.target.textContent='Copy'},2000)})" style="padding:6px 12px;min-height:36px;background:rgba(52,211,153,0.15);border:1px solid #34d399;border-radius:6px;color:#34d399;font-size:0.78rem;cursor:pointer;white-space:nowrap;">Copy</button>
       </div>
-    </details>
+      <div style="font-size:0.75rem;color:var(--text-muted);margin-top:6px;font-style:italic;">Leave the terminal open. You should see "Listening on 127.0.0.1:11434"</div>
+      <button onclick="document.getElementById('corsWiz3').style.display='block';this.textContent='Done \u2714';this.disabled=true;document.getElementById('corsWiz3').scrollIntoView({behavior:'smooth',block:'center'})" style="margin-top:10px;padding:10px 20px;min-height:44px;background:rgba(52,211,153,0.1);border:1px solid #34d399;border-radius:8px;color:#34d399;font-family:Georgia,serif;font-size:0.88rem;cursor:pointer;width:100%;">It says Listening &#10022;</button>
+    </div>
+
+    <!-- Step 3 (hidden) -->
+    <div id="corsWiz3" style="display:none;padding:14px;background:rgba(200,210,230,0.04);border:1px solid rgba(167,139,250,0.15);border-radius:10px;margin-bottom:10px;">
+      <div style="font-size:0.72rem;color:#a78bfa;letter-spacing:0.05em;margin-bottom:4px;">STEP 3 OF 3</div>
+      <div style="font-weight:600;color:var(--text-bright);margin-bottom:6px;">Make it permanent</div>
+      <div style="font-size:0.82rem;color:var(--text-secondary);line-height:1.6;margin-bottom:8px;">Open a <strong>new</strong> Terminal tab (Cmd+T) and paste this. Then you never do this again:</div>
+      <div style="display:flex;gap:6px;align-items:center;background:rgba(0,0,0,0.3);padding:10px 14px;border-radius:8px;font-family:monospace;font-size:0.82rem;color:#a78bfa;">
+        <code id="corsWizPerm" style="flex:1;word-break:break-all;">launchctl setenv OLLAMA_ORIGINS "*"</code>
+        <button onclick="navigator.clipboard.writeText(document.getElementById('corsWizPerm').textContent).then(function(){event.target.textContent='Copied \u2714';setTimeout(function(){event.target.textContent='Copy'},2000)})" style="padding:6px 12px;min-height:36px;background:rgba(167,139,250,0.15);border:1px solid #a78bfa;border-radius:6px;color:#a78bfa;font-size:0.78rem;cursor:pointer;white-space:nowrap;">Copy</button>
+      </div>
+      <button onclick="document.getElementById('corsWizDone').style.display='block';this.textContent='Done \u2714';this.disabled=true;if(typeof smartOllamaConnect==='function')smartOllamaConnect();document.getElementById('corsWizDone').scrollIntoView({behavior:'smooth',block:'center'})" style="margin-top:10px;padding:10px 20px;min-height:44px;background:rgba(167,139,250,0.1);border:1px solid #a78bfa;border-radius:8px;color:#a78bfa;font-family:Georgia,serif;font-size:0.88rem;cursor:pointer;width:100%;">Done &mdash; Test Connection &#10022;</button>
+    </div>
+
+    <!-- Success (hidden) -->
+    <div id="corsWizDone" style="display:none;padding:14px;background:rgba(52,211,153,0.06);border:1px solid rgba(52,211,153,0.2);border-radius:10px;text-align:center;">
+      <div style="font-size:1.2rem;margin-bottom:6px;">&#10022;</div>
+      <div style="font-weight:600;color:#34d399;font-family:Georgia,serif;margin-bottom:4px;">Connected!</div>
+      <div style="font-size:0.82rem;color:var(--text-secondary);">You never need to do this again. Ollama will always work with FreeLattice now.</div>
+    </div>
+
+    <!-- OS-aware script -->
     <script>document.addEventListener('DOMContentLoaded', function() {
       var ua = navigator.userAgent;
-      var s1 = document.getElementById('corsStep1');
-      var s2 = document.getElementById('corsStep2Label');
-      if (!s1) return;
       if (/Windows/.test(ua)) {
-        s1.innerHTML = 'Right-click Ollama in your system tray (bottom-right) &rarr; Quit';
-        if (s2) s2.innerHTML = 'Open Command Prompt and paste';
+        var q = document.getElementById('corsWizQuit');
+        var qd = document.getElementById('corsWizQuitDesc');
+        var pl = document.getElementById('corsWizPasteLabel');
+        var pd = document.getElementById('corsWizPasteDesc');
+        var cmd = document.getElementById('corsWizCmd');
+        var perm = document.getElementById('corsWizPerm');
+        if (q) q.textContent = 'Quit Ollama';
+        if (qd) qd.innerHTML = 'Right-click the Ollama icon in your <strong>system tray</strong> (bottom-right of screen). Click <strong>Quit</strong>.';
+        if (pl) pl.textContent = 'Paste this in Command Prompt';
+        if (pd) pd.innerHTML = 'Open Command Prompt (Windows key, type "cmd", press Enter). Paste this line:';
+        if (cmd) cmd.textContent = 'set OLLAMA_ORIGINS=* && ollama serve';
+        if (perm) perm.textContent = 'setx OLLAMA_ORIGINS "*"';
       } else if (/Linux/.test(ua) && !/Android/.test(ua)) {
-        s1.innerHTML = 'Run: <code>systemctl stop ollama</code>';
-        if (s2) s2.innerHTML = 'Run in terminal';
-      } else {
-        s1.innerHTML = 'Look for the llama icon in your menu bar &rarr; click it &rarr; Quit Ollama';
-        if (s2) s2.innerHTML = 'Copy &amp; paste in Terminal (&#x2318;+Space, type "Terminal")';
+        var q = document.getElementById('corsWizQuitDesc');
+        var cmd = document.getElementById('corsWizCmd');
+        var pd = document.getElementById('corsWizPasteDesc');
+        var perm = document.getElementById('corsWizPerm');
+        if (q) q.innerHTML = 'Run: <code>systemctl stop ollama</code>';
+        if (pd) pd.innerHTML = 'In your terminal, run:';
+        if (cmd) cmd.textContent = 'OLLAMA_ORIGINS="*" ollama serve';
+        if (perm) perm.textContent = 'echo \'OLLAMA_ORIGINS="*"\' | sudo tee -a /etc/environment';
       }
     });</script>
   </div>
@@ -16237,7 +16259,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.15.2</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.15.3</span></div>
     </div>
   </div>
 
@@ -20398,7 +20420,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.15.2';
+const FL_VERSION = '5.15.3';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
