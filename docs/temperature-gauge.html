@@ -256,8 +256,12 @@ body {
 .price-display { display: flex; align-items: baseline; gap: 8px; }
 .price-main { font-size: 1.6rem; font-weight: 700; }
 .price-change { font-size: 0.85rem; font-weight: 500; }
-.chart-canvas-wrap { flex: 1; position: relative; min-height: 300px; }
-canvas#mainChart { width: 100% !important; }
+.chart-canvas-wrap { flex: 1; position: relative; min-height: 250px; max-height: 400px; }
+canvas#mainChart { width: 100% !important; height: 100% !important; max-height: 400px; }
+@media (max-width: 600px) {
+  .chart-canvas-wrap { min-height: 200px; max-height: 280px; }
+  canvas#mainChart { max-height: 280px; }
+}
 
 /* Loading */
 .loading-overlay {
@@ -327,24 +331,25 @@ canvas#mainChart { width: 100% !important; }
   gap: 1px;
   background: var(--border);
   border-top: 1px solid var(--border);
-  max-height: 180px;
 }
 @media (max-width: 600px) {
-  .sub-charts { grid-template-columns: 1fr; max-height: none; }
+  .sub-charts { grid-template-columns: 1fr; }
+  .sub-chart-wrap { max-height: 100px; }
 }
 .sub-chart-wrap {
   background: var(--bg);
-  padding: 8px 12px;
+  padding: 6px 10px;
   position: relative;
+  height: 100px;
 }
 .sub-chart-label {
   font-size: 0.65rem;
   color: var(--dim);
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  margin-bottom: 4px;
+  margin-bottom: 2px;
 }
-canvas.sub-canvas { width: 100% !important; }
+canvas.sub-canvas { width: 100% !important; height: 80px !important; }
 </style>
 </head>
 <body>
@@ -546,8 +551,7 @@ canvas.sub-canvas { width: 100% !important; }
 <script>
 // ============================================================
 // Temperature Gauge — φ-Harmonic Signal Engine
-// Browser-only version using Yahoo Finance via allorigins proxy
-// Built by Harmonia for Kirk · FreeLattice ecosystem
+// Built by Kirk Miller & Harmonia · FreeLattice ecosystem
 // φ = 1.618 · gravity points = φ-Fibonacci extensions of 80-period range
 // Temperature = φ-weighted confluence score (0–100)
 // ============================================================
@@ -555,6 +559,10 @@ canvas.sub-canvas { width: 100% !important; }
 const PHI = 1.618033988749895;
 const PHI_INV = 1 / PHI; // 0.618
 const PHI_LEVELS = [0, 23.6, 38.2, 50, 61.8, 78.6, 100];
+
+// Cloudflare Worker URL — deploy desktop/data-proxy-worker for stable data
+// Set to your deployed worker URL, or leave empty to use free proxies
+const WORKER_URL = ''; // e.g. 'https://freelattice-data.YOUR.workers.dev'
 
 let currentInterval = '1d';
 let useLogScale = false;
@@ -636,10 +644,21 @@ async function fetchYahooData(symbol, interval) {
   const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?range=${range}&interval=${yInterval}&includePrePost=false`;
 
   // Multiple CORS proxies — try each until one works
-  // Try both Yahoo endpoints (query1 and query2)
+  // Strategy 1: Own Cloudflare Worker (most reliable if deployed)
+  if (WORKER_URL) {
+    try {
+      document.getElementById('loadingText').textContent = 'Fetching data\u2026';
+      const workerRes = await fetch(`${WORKER_URL}/chart/${encodeURIComponent(symbol)}?range=${range}&interval=${yInterval}`, { signal: AbortSignal.timeout(10000) });
+      if (workerRes.ok) {
+        const raw = await workerRes.json();
+        if (raw.chart && raw.chart.result && raw.chart.result[0]) return parseYahooResult(raw);
+      }
+    } catch(e) { /* fall through to proxies */ }
+  }
+
+  // Strategy 2: Free CORS proxies as fallback
   const urls = [url, url.replace('query1.finance', 'query2.finance')];
 
-  // Multiple proxy strategies with different formats
   const proxies = [
     { name: 'allorigins-raw', fn: u => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`, wrapped: false },
     { name: 'codetabs', fn: u => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(u)}`, wrapped: false },
@@ -1011,15 +1030,28 @@ function renderChart(candles, a) {
   const ema12 = ema(closes, 12);
   const ema50 = ema(closes, 50);
 
-  // Buy/sell signal markers from temperature crossings
+  // Buy/sell signals: EMA6 crossing EMA12 + temperature confirmation (less lag)
   var buyPoints = new Array(closes.length).fill(null);
   var sellPoints = new Array(closes.length).fill(null);
-  for (var si = 1; si < a.temps.length; si++) {
-    if (a.temps[si] != null && a.temps[si-1] != null) {
-      if (a.temps[si] >= 55 && a.temps[si-1] < 55) buyPoints[si] = closes[si]; // crossed bullish
-      if (a.temps[si] <= 45 && a.temps[si-1] > 45) sellPoints[si] = closes[si]; // crossed bearish
-    }
+  for (var si = 2; si < closes.length; si++) {
+    if (ema6[si] == null || ema12[si] == null || ema6[si-1] == null || ema12[si-1] == null) continue;
+    var crossUp = ema6[si] > ema12[si] && ema6[si-1] <= ema12[si-1];
+    var crossDown = ema6[si] < ema12[si] && ema6[si-1] >= ema12[si-1];
+    var tempBull = a.temps[si] != null && a.temps[si] >= 48;
+    var tempBear = a.temps[si] != null && a.temps[si] <= 52;
+    if (crossUp && tempBull) buyPoints[si] = closes[si];
+    if (crossDown && tempBear) sellPoints[si] = closes[si];
   }
+
+  // Gravity centerline — the phi-weighted mean price (volume-weighted attractor)
+  var gravCenter = new Array(closes.length).fill(null);
+  var gravHigh = Math.max(...candles.slice(-80).map(c => c.h));
+  var gravLow = Math.min(...candles.slice(-80).map(c => c.l));
+  var gravMid = gravLow + (gravHigh - gravLow) * 0.5; // 50% level
+  var gravPhi = gravLow + (gravHigh - gravLow) * 0.618; // phi level
+  // Blend: gravity line = 0.618 * phi_level + 0.382 * midpoint (phi-weighted center)
+  var gravityPrice = PHI_INV * gravPhi + (1 - PHI_INV) * gravMid;
+  for (var gi = 0; gi < closes.length; gi++) gravCenter[gi] = gravityPrice;
 
   chartInstance = new Chart(ctx, {
     type: 'line',
@@ -1030,8 +1062,9 @@ function renderChart(candles, a) {
         { label: 'EMA 6', data: ema6, borderColor: '#EF4444', borderWidth: 1, pointRadius: 0, tension: 0.3, fill: false, order: 2 },
         { label: 'EMA 12', data: ema12, borderColor: '#F59E0B', borderWidth: 1, pointRadius: 0, tension: 0.3, fill: false, order: 3 },
         { label: 'EMA 50', data: ema50, borderColor: '#3B82F6', borderWidth: 1.5, pointRadius: 0, tension: 0.3, fill: false, order: 4 },
-        { label: 'Buy', data: buyPoints, borderColor: 'transparent', backgroundColor: '#10B981', pointRadius: 6, pointStyle: 'triangle', pointBorderColor: '#10B981', pointBorderWidth: 2, showLine: false, order: 0 },
-        { label: 'Sell', data: sellPoints, borderColor: 'transparent', backgroundColor: '#EF4444', pointRadius: 6, pointStyle: 'triangle', pointRotation: 180, pointBorderColor: '#EF4444', pointBorderWidth: 2, showLine: false, order: 0 },
+        { label: 'Gravity', data: gravCenter, borderColor: 'rgba(201,168,76,0.6)', borderWidth: 2, borderDash: [8, 4], pointRadius: 0, fill: false, order: 3 },
+        { label: 'Buy', data: buyPoints, borderColor: 'transparent', backgroundColor: '#10B981', pointRadius: 7, pointStyle: 'triangle', pointBorderColor: '#10B981', pointBorderWidth: 2, showLine: false, order: 0 },
+        { label: 'Sell', data: sellPoints, borderColor: 'transparent', backgroundColor: '#EF4444', pointRadius: 7, pointStyle: 'triangle', pointRotation: 180, pointBorderColor: '#EF4444', pointBorderWidth: 2, showLine: false, order: 0 },
         ...a.gravPoints.map(g => ({
           label: '\u03C6 ' + g.label,
           data: new Array(closes.length).fill(g.price),
@@ -1053,7 +1086,7 @@ function renderChart(candles, a) {
         legend: {
           display: true,
           labels: { color: '#6b6760', font: { size: 10 }, boxWidth: 12, padding: 8,
-            filter: item => !item.text.startsWith('\u03C6') }
+            filter: item => !item.text.startsWith('\u03C6') && item.text !== 'Buy' && item.text !== 'Sell' }
         },
         tooltip: {
           backgroundColor: '#1a1f30',
@@ -1064,8 +1097,9 @@ function renderChart(candles, a) {
           callbacks: {
             label: ctx => {
               if (ctx.dataset.label.startsWith('\u03C6')) return null;
-              if (ctx.dataset.label === 'Buy') return ctx.raw ? '\u25B2 BUY signal at ' + ctx.raw.toFixed(2) : null;
-              if (ctx.dataset.label === 'Sell') return ctx.raw ? '\u25BC SELL signal at ' + ctx.raw.toFixed(2) : null;
+              if (ctx.dataset.label === 'Buy') return ctx.raw ? '\u25B2 BUY signal' : null;
+              if (ctx.dataset.label === 'Sell') return ctx.raw ? '\u25BC SELL signal' : null;
+              if (ctx.dataset.label === 'Gravity') return '\u03C6-Gravity: ' + (ctx.raw < 10 ? ctx.raw?.toFixed(4) : ctx.raw?.toFixed(2));
               return ctx.dataset.label + ': ' + (ctx.raw < 10 ? ctx.raw?.toFixed(4) : ctx.raw?.toFixed(2));
             }
           }
