@@ -778,23 +778,38 @@ function computeGravityPoints(candles, lookback = 80) {
   }));
 }
 
+// ATR (Average True Range) for position sizing
+function atr(candles, period) {
+  var result = new Array(candles.length).fill(null);
+  var trs = [];
+  for (var i = 1; i < candles.length; i++) {
+    var tr = Math.max(candles[i].h - candles[i].l, Math.abs(candles[i].h - candles[i-1].c), Math.abs(candles[i].l - candles[i-1].c));
+    trs.push(tr);
+    if (trs.length >= period) {
+      result[i] = trs.slice(-period).reduce(function(a,b){return a+b;},0) / period;
+    }
+  }
+  return result;
+}
+
 function computeTemperature(closes, volumes, rsiArr, macdData, gravPoints) {
   const n = closes.length;
   const temps = new Array(n).fill(null);
-  const ema6 = ema(closes, 6);
+  // Standardized MAs: 8/12/24 (fast/mid/slow) + 50/200 (structural)
   const ema8 = ema(closes, 8);
   const ema12 = ema(closes, 12);
+  const ema24 = ema(closes, 24);
   const ema50 = ema(closes, 50);
   const ema200 = ema(closes, 200);
   const volEma20 = ema(volumes, 20);
 
   for (let i = 50; i < n; i++) {
     let score = 50;
-    // EMA alignment (weight: PHI^2 = 2.618)
+    // EMA alignment: 8>12>24>50 (weight: PHI^2 = 2.618)
     let emaScore = 0;
-    if (ema6[i] > ema8[i]) emaScore += 1;
     if (ema8[i] > ema12[i]) emaScore += 1;
-    if (ema12[i] > ema50[i]) emaScore += 1;
+    if (ema12[i] > ema24[i]) emaScore += 1;
+    if (ema24[i] > ema50[i]) emaScore += 1;
     if (ema50[i] > ema200[i]) emaScore += 1;
     score += (emaScore / 4 - 0.5) * 2.618 * 10;
 
@@ -828,7 +843,12 @@ function computeTemperature(closes, volumes, rsiArr, macdData, gravPoints) {
 
     temps[i] = Math.max(0, Math.min(100, score));
   }
-  return temps;
+  // Temperature Rate-of-Change (leading indicator — measures acceleration)
+  var tempROC = new Array(n).fill(null);
+  for (let i = 3; i < n; i++) {
+    if (temps[i] != null && temps[i-3] != null) tempROC[i] = temps[i] - temps[i-3];
+  }
+  return { temps, tempROC };
 }
 
 function analyzeData(candles, symbol) {
@@ -837,31 +857,39 @@ function analyzeData(candles, symbol) {
   const rsiArr = rsi(closes);
   const macdData = macd(closes);
   const gravPoints = computeGravityPoints(candles);
-  const temps = computeTemperature(closes, volumes, rsiArr, macdData, gravPoints);
+  const atrArr = atr(candles, 14);
+  const tempResult = computeTemperature(closes, volumes, rsiArr, macdData, gravPoints);
+  const temps = tempResult.temps;
+  const tempROC = tempResult.tempROC;
 
   const n = closes.length;
   const lastTemp = temps[n-1] || 50;
+  const lastTempROC = tempROC[n-1] || 0;
   const lastRsi = rsiArr[n-1];
   const lastMacd = macdData.macdLine[n-1];
   const lastSignal = macdData.signalLine[n-1];
   const lastHist = macdData.histogram[n-1];
   const prevHist = macdData.histogram[n-2];
+  const lastATR = atrArr[n-1] || 0;
 
-  const ema6v = ema(closes, 6)[n-1];
+  // Standardized: 8/12/24 + 50/200
   const ema8v = ema(closes, 8)[n-1];
   const ema12v = ema(closes, 12)[n-1];
+  const ema24v = ema(closes, 24)[n-1];
   const ema50v = ema(closes, 50)[n-1];
   const ema200v = ema(closes, 200)[n-1];
   const volEma20v = ema(volumes, 20)[n-1];
 
   // Component signals
   const components = {};
-  components.ma_alignment = (ema6v > ema8v && ema8v > ema12v && ema12v > ema50v) ? 'bullish' :
-                            (ema6v < ema8v && ema8v < ema12v) ? 'bearish' : 'neutral';
+  components.ma_alignment = (ema8v > ema12v && ema12v > ema24v && ema24v > ema50v) ? 'bullish' :
+                            (ema8v < ema12v && ema12v < ema24v) ? 'bearish' : 'neutral';
   components.rsi = lastRsi > 55 ? 'bullish' : lastRsi < 45 ? 'bearish' : 'neutral';
   components.macd = (lastMacd > lastSignal && lastHist > prevHist) ? 'bullish' :
                     (lastMacd < lastSignal) ? 'bearish' : 'neutral';
   components.volume = volumes[n-1] > volEma20v * 1.2 ? (closes[n-1] > closes[n-2] ? 'bullish' : 'bearish') : 'neutral';
+  // Leading component: Temperature acceleration (ΔT)
+  components.thrust = lastTempROC > 5 ? 'bullish' : lastTempROC < -5 ? 'bearish' : 'neutral';
 
   const nearestGrav = gravPoints.reduce((best, g) => {
     const dist = Math.abs(closes[n-1] - g.price);
@@ -872,26 +900,34 @@ function analyzeData(candles, symbol) {
   const bullCount = Object.values(components).filter(v => v === 'bullish').length;
   const bearCount = Object.values(components).filter(v => v === 'bearish').length;
 
-  // Signal
+  // Signal (with thrust gate for STRONG signals)
   let signal, signalClass;
-  if (lastTemp >= 70 && bullCount >= 3) { signal = 'STRONG BUY'; signalClass = 'signal-strong-buy'; }
+  // STRONG requires thrust (leading confirmation)
+  if (lastTemp >= 65 && bullCount >= 4 && components.thrust === 'bullish') { signal = 'STRONG BUY'; signalClass = 'signal-strong-buy'; }
   else if (lastTemp >= 55) { signal = 'BUY'; signalClass = 'signal-buy'; }
-  else if (lastTemp <= 25 && bearCount >= 3) { signal = 'STRONG SELL'; signalClass = 'signal-strong-sell'; }
-  else if (lastTemp <= 40) { signal = 'SELL'; signalClass = 'signal-sell'; }
+  else if (lastTemp <= 35 && bearCount >= 4 && components.thrust === 'bearish') { signal = 'STRONG SELL'; signalClass = 'signal-strong-sell'; }
+  else if (lastTemp <= 45) { signal = 'SELL'; signalClass = 'signal-sell'; }
   else { signal = 'HOLD'; signalClass = 'signal-hold'; }
 
   // Confidence
   const spread = bullCount - bearCount;
-  const confidence = spread >= 3 ? 'HIGH' : spread >= 1 ? 'MODERATE' : spread <= -3 ? 'HIGH' : 'LOW';
-  const confPct = Math.round(50 + Math.abs(spread) * 10 + Math.abs(lastTemp - 50) * 0.4);
+  const confidence = Math.abs(spread) >= 4 ? 'HIGH' : Math.abs(spread) >= 2 ? 'MODERATE' : 'LOW';
+  const confPct = Math.min(95, Math.round(50 + Math.abs(spread) * 8 + Math.abs(lastTemp - 50) * 0.4));
+  const confMultiplier = confidence === 'HIGH' ? 1.0 : confidence === 'MODERATE' ? 0.618 : 0.382;
 
-  // Momentum
-  const tempSlope = n >= 3 ? temps[n-1] - temps[n-3] : 0;
-  const momentum = tempSlope > 3 ? 'Accelerating Up' : tempSlope < -3 ? 'Accelerating Down' : 'Flat';
+  // Momentum (using tempROC — leading)
+  const momentum = lastTempROC > 5 ? 'Accelerating Up' : lastTempROC < -5 ? 'Accelerating Down' : lastTempROC > 1 ? 'Drifting Up' : lastTempROC < -1 ? 'Drifting Down' : 'Flat';
 
-  // Position size
-  const sizePct = confidence === 'HIGH' ? 100 : confidence === 'MODERATE' ? 61.8 : 38.2;
-  const urgency = confidence === 'HIGH' && Math.abs(lastTemp - 50) > 20 ? 'HIGH — act soon' : 'LOW — wait for clearer signal';
+  // Position sizing (ATR-based, risk-aware)
+  const accountSize = parseFloat(localStorage.getItem('fl_tg_account') || '10000');
+  const maxRiskPct = parseFloat(localStorage.getItem('fl_tg_risk') || '1.0');
+  const stopDistance = lastATR * 2;
+  const dollarsAtRisk = accountSize * (maxRiskPct / 100) * confMultiplier;
+  const lastClose = closes[n-1];
+  const positionShares = stopDistance > 0 ? Math.floor(dollarsAtRisk / stopDistance) : 0;
+  const positionValue = positionShares * lastClose;
+  const actualRiskPct = accountSize > 0 ? ((positionShares * stopDistance) / accountSize * 100) : 0;
+  const urgency = confidence === 'HIGH' && Math.abs(lastTemp - 50) > 15 ? 'HIGH \u2014 act soon' : 'LOW \u2014 wait for clearer signal';
 
   // Reasons
   const reasons = [];
@@ -903,21 +939,45 @@ function analyzeData(candles, symbol) {
   if (components.macd === 'bullish') reasons.push('MACD above signal and rising');
   if (components.macd === 'bearish') reasons.push('MACD below signal — bearish');
   if (components.volume === 'bullish') reasons.push('Above-average volume confirming upward move');
-  if (components.volume === 'bearish') reasons.push('Above-average volume on down move — distribution');
-  if (nearestGrav.dist / closes[n-1] < 0.02) reasons.push('Price at φ-gravity point — high attraction zone');
+  if (components.volume === 'bearish') reasons.push('Above-average volume on down move \u2014 distribution');
+  if (components.thrust === 'bullish') reasons.push('Temperature accelerating up (\u0394T: +' + lastTempROC.toFixed(1) + ')');
+  if (components.thrust === 'bearish') reasons.push('Temperature accelerating down (\u0394T: ' + lastTempROC.toFixed(1) + ')');
+  if (nearestGrav.dist / closes[n-1] < 0.02) reasons.push('Price at \u03C6-gravity point \u2014 high attraction zone');
+
+  // Invalidation (what would make this signal wrong)
+  const nearAbove = gravPoints.find(g => g.price > closes[n-1]);
+  const nearBelow = [...gravPoints].reverse().find(g => g.price < closes[n-1]);
+  var invalidation = '';
+  var watchFor = '';
+  var confirmation = '';
+  if (signal.includes('BUY')) {
+    invalidation = nearBelow ? 'Close below ' + nearBelow.price.toFixed(2) + ' (\u03C6 ' + nearBelow.label + ') invalidates.' : 'Close below recent swing low invalidates.';
+    watchFor = 'RSI divergence on next 3 bars would weaken confidence.';
+    confirmation = nearAbove ? 'Close above ' + nearAbove.price.toFixed(2) + ' on rising volume confirms.' : 'New high on rising volume confirms.';
+  } else if (signal.includes('SELL')) {
+    invalidation = nearAbove ? 'Close above ' + nearAbove.price.toFixed(2) + ' (\u03C6 ' + nearAbove.label + ') invalidates.' : 'Close above recent swing high invalidates.';
+    watchFor = 'Bullish MACD crossover would weaken confidence.';
+    confirmation = nearBelow ? 'Close below ' + nearBelow.price.toFixed(2) + ' on rising volume confirms.' : 'New low on volume confirms.';
+  } else {
+    invalidation = 'No active signal to invalidate.';
+    watchFor = 'Watch for temperature to break above 55 or below 45.';
+    confirmation = 'Wait for EMA alignment + thrust confirmation.';
+  }
 
   // Price change
   const priceChange = closes[n-1] - closes[n-2];
   const pricePct = (priceChange / closes[n-2]) * 100;
 
   return {
-    lastTemp, signal, signalClass, confidence, confPct, momentum,
-    sizePct, urgency, components, bullCount, bearCount, reasons,
-    gravPoints, rsiArr, temps, macdData,
-    lastRsi, lastMacd, lastSignal, lastHist,
-    ema6v, ema8v, ema12v, ema50v, ema200v,
+    lastTemp, lastTempROC, signal, signalClass, confidence, confPct, confMultiplier, momentum,
+    urgency, components, bullCount, bearCount, reasons,
+    gravPoints, rsiArr, temps, tempROC, macdData,
+    lastRsi, lastMacd, lastSignal, lastHist, lastATR,
+    ema8v, ema12v, ema24v, ema50v, ema200v,
     priceChange, pricePct,
-    closes, volumes
+    closes, volumes,
+    positionShares, positionValue, actualRiskPct, stopDistance,
+    invalidation, watchFor, confirmation
   };
 }
 
@@ -939,8 +999,8 @@ function renderAll(candles, a, symbol) {
   badge.className = 'signal-badge ' + a.signalClass;
   badge.textContent = a.signal;
   document.getElementById('signalConf').textContent = a.confidence + ' (' + a.confPct + '%)';
-  document.getElementById('signalMom').textContent = a.momentum;
-  document.getElementById('signalSize').textContent = a.sizePct + '% of position';
+  document.getElementById('signalMom').textContent = a.momentum + (a.lastTempROC ? ' (\u0394T: ' + (a.lastTempROC > 0 ? '+' : '') + a.lastTempROC.toFixed(1) + ')' : '');
+  document.getElementById('signalSize').textContent = a.positionShares > 0 ? a.positionShares + ' shares ($' + a.positionValue.toLocaleString() + ') \u2014 risking ' + a.actualRiskPct.toFixed(2) + '%' : 'Configure account in Risk Settings';
   document.getElementById('signalUrgency').textContent = a.urgency;
 
   // Indicators
@@ -974,12 +1034,21 @@ function renderAll(candles, a, symbol) {
   document.getElementById('riskSection').style.display = 'block';
   const nearAbove = a.gravPoints.find(g => g.price > lastClose2);
   const nearBelow = [...a.gravPoints].reverse().find(g => g.price < lastClose2);
-  document.getElementById('riskText').innerHTML = `
-    <strong style="color:var(--text)">Stop:</strong> ${nearBelow ? 'φ-gravity at ' + nearBelow.price.toFixed(2) + ' (' + nearBelow.label + ')' : 'Use 2× ATR below entry'}<br><br>
-    <strong style="color:var(--text)">Target:</strong> ${nearAbove ? 'φ-gravity at ' + nearAbove.price.toFixed(2) + ' (' + nearAbove.label + ')' : 'Next φ-level above'}<br><br>
-    <strong style="color:var(--text)">Position:</strong> ${a.sizePct}% · Take 38.2% profit at first target, trail the rest<br><br>
-    <em style="color:var(--dim)">Not financial advice. Always consult a professional.</em>
-  `;
+  var stopPrice = a.lastATR > 0 ? (lastClose2 - a.stopDistance).toFixed(2) : (nearBelow ? nearBelow.price.toFixed(2) : '—');
+  var targetPrice = nearAbove ? nearAbove.price.toFixed(2) : '—';
+  var rrRatio = a.stopDistance > 0 && nearAbove ? ((nearAbove.price - lastClose2) / a.stopDistance).toFixed(2) : '—';
+  document.getElementById('riskText').innerHTML =
+    '<strong style="color:var(--text)">Stop:</strong> $' + stopPrice + ' (2\u00D7 ATR' + (a.lastATR > 0 ? ' = ' + a.lastATR.toFixed(2) : '') + ')<br><br>' +
+    '<strong style="color:var(--text)">Target:</strong> $' + targetPrice + (nearAbove ? ' (\u03C6 ' + nearAbove.label + ')' : '') + '<br><br>' +
+    '<strong style="color:var(--text)">R:R:</strong> ' + rrRatio + '<br><br>' +
+    '<div style="margin-top:8px;padding:10px 12px;background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.15);border-radius:8px;font-size:0.82rem;">' +
+    '<div style="color:var(--red);font-weight:600;margin-bottom:6px;">Why this signal could be wrong</div>' +
+    '<div style="color:var(--muted);line-height:1.6;">' +
+    '<strong>Invalidation:</strong> ' + a.invalidation + '<br>' +
+    '<strong>Watch:</strong> ' + a.watchFor + '<br>' +
+    '<strong>Confirmation:</strong> ' + a.confirmation +
+    '</div></div><br>' +
+    '<em style="color:var(--dim)">Not financial advice. Always consult a professional.</em>';
 
   // Cache for log toggle and re-render
   lastCandles = candles;
@@ -1026,19 +1095,22 @@ function renderChart(candles, a) {
   if (volChartInstance) { volChartInstance.destroy(); volChartInstance = null; }
 
   const ctx = document.getElementById('mainChart').getContext('2d');
-  const ema6 = ema(closes, 6);
+  // Standardized MAs: 8/12/24 + 50
+  const ema8 = ema(closes, 8);
   const ema12 = ema(closes, 12);
+  const ema24 = ema(closes, 24);
   const ema50 = ema(closes, 50);
 
-  // Buy/sell signals: EMA6 crossing EMA12 + temperature confirmation (less lag)
+  // Buy/sell signals: EMA8 crossing EMA12 + temperature confirmation (no overlap)
   var buyPoints = new Array(closes.length).fill(null);
   var sellPoints = new Array(closes.length).fill(null);
   for (var si = 2; si < closes.length; si++) {
-    if (ema6[si] == null || ema12[si] == null || ema6[si-1] == null || ema12[si-1] == null) continue;
-    var crossUp = ema6[si] > ema12[si] && ema6[si-1] <= ema12[si-1];
-    var crossDown = ema6[si] < ema12[si] && ema6[si-1] >= ema12[si-1];
-    var tempBull = a.temps[si] != null && a.temps[si] >= 48;
-    var tempBear = a.temps[si] != null && a.temps[si] <= 52;
+    if (ema8[si] == null || ema12[si] == null || ema8[si-1] == null || ema12[si-1] == null) continue;
+    var crossUp = ema8[si] > ema12[si] && ema8[si-1] <= ema12[si-1];
+    var crossDown = ema8[si] < ema12[si] && ema8[si-1] >= ema12[si-1];
+    // Fixed: no overlap — clear thresholds
+    var tempBull = a.temps[si] != null && a.temps[si] >= 55;
+    var tempBear = a.temps[si] != null && a.temps[si] <= 45;
     if (crossUp && tempBull) buyPoints[si] = closes[si];
     if (crossDown && tempBear) sellPoints[si] = closes[si];
   }
@@ -1057,15 +1129,25 @@ function renderChart(candles, a) {
     type: 'line',
     data: {
       labels,
+  // Y-axis scale fix: compute visible price range, filter gravity lines
+  var priceMin = Math.min(...closes.filter(c => c != null));
+  var priceMax = Math.max(...closes.filter(c => c != null));
+  var yPad = (priceMax - priceMin) * 0.08;
+  var yMin = priceMin - yPad;
+  var yMax = priceMax + yPad;
+  // Only show gravity lines within visible range (prevents y-axis crush)
+  var visibleGravPoints = a.gravPoints.filter(g => g.price >= yMin && g.price <= yMax);
+
       datasets: [
         { label: 'Price', data: closes, borderColor: '#e8e4dc', borderWidth: 1.5, pointRadius: 0, tension: 0.1, fill: false, order: 1 },
-        { label: 'EMA 6', data: ema6, borderColor: '#EF4444', borderWidth: 1, pointRadius: 0, tension: 0.3, fill: false, order: 2 },
+        { label: 'EMA 8', data: ema8, borderColor: '#EF4444', borderWidth: 1, pointRadius: 0, tension: 0.3, fill: false, order: 2 },
         { label: 'EMA 12', data: ema12, borderColor: '#F59E0B', borderWidth: 1, pointRadius: 0, tension: 0.3, fill: false, order: 3 },
+        { label: 'EMA 24', data: ema24, borderColor: '#c9a84c', borderWidth: 1, pointRadius: 0, tension: 0.3, fill: false, order: 3 },
         { label: 'EMA 50', data: ema50, borderColor: '#3B82F6', borderWidth: 1.5, pointRadius: 0, tension: 0.3, fill: false, order: 4 },
-        { label: 'Gravity', data: gravCenter, borderColor: 'rgba(201,168,76,0.6)', borderWidth: 2, borderDash: [8, 4], pointRadius: 0, fill: false, order: 3 },
+        { label: 'Gravity', data: gravCenter, borderColor: 'rgba(201,168,76,0.7)', borderWidth: 2.5, borderDash: [8, 4], pointRadius: 0, fill: false, order: 3 },
         { label: 'Buy', data: buyPoints, borderColor: 'transparent', backgroundColor: '#10B981', pointRadius: 7, pointStyle: 'triangle', pointBorderColor: '#10B981', pointBorderWidth: 2, showLine: false, order: 0 },
         { label: 'Sell', data: sellPoints, borderColor: 'transparent', backgroundColor: '#EF4444', pointRadius: 7, pointStyle: 'triangle', pointRotation: 180, pointBorderColor: '#EF4444', pointBorderWidth: 2, showLine: false, order: 0 },
-        ...a.gravPoints.map(g => ({
+        ...visibleGravPoints.map(g => ({
           label: '\u03C6 ' + g.label,
           data: new Array(closes.length).fill(g.price),
           borderColor: g.pct >= 61.8 ? 'rgba(16,185,129,0.35)' : g.pct <= 38.2 ? 'rgba(239,68,68,0.35)' : 'rgba(201,168,76,0.25)',
@@ -1109,6 +1191,8 @@ function renderChart(candles, a) {
         x: { ticks: { color: '#4a4740', maxTicksLimit: 8, font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.03)' } },
         y: {
           type: useLogScale ? 'logarithmic' : 'linear',
+          min: useLogScale ? undefined : yMin,
+          max: useLogScale ? undefined : yMax,
           ticks: { color: '#4a4740', font: { size: 10 } },
           grid: { color: 'rgba(255,255,255,0.04)' },
           position: 'right'
