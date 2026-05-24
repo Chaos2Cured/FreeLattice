@@ -16237,7 +16237,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.15.1</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.15.2</span></div>
     </div>
   </div>
 
@@ -20398,7 +20398,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.15.1';
+const FL_VERSION = '5.15.2';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -41909,6 +41909,138 @@ Together.`,
     var cats = Object.keys(CATEGORY_COLORS);
     return CATEGORY_COLORS[cats[index % cats.length]];
   }
+
+  // ============================================
+  // Living Core — Interactive Layer
+  // Touch a fruit, see what was planted. The tree responds.
+  // ============================================
+
+  var _coreFruitPositions = []; // [{x, y, r, contribution}]
+  var _coreSelectedFruit = null;
+  var _coreCoherence = 0.95;
+
+  // Store fruit positions during drawLeaf calls
+  var _originalDrawLeaf = drawLeaf;
+  drawLeaf = function(ctx, x, y, size, color, alpha) {
+    _originalDrawLeaf(ctx, x, y, size, color, alpha);
+    // Record this fruit's position for tap detection
+    var contribIdx = _coreFruitPositions.length;
+    if (contribIdx < contributions.length) {
+      _coreFruitPositions.push({ x: x, y: y, r: Math.max(size + 12, 22), contribution: contributions[contribIdx], color: color });
+    }
+  };
+
+  // Update coherence from ActiveCompanion
+  function updateCoreCoherence() {
+    try {
+      if (typeof ActiveCompanion !== 'undefined' && ActiveCompanion.current) {
+        var c = ActiveCompanion.current();
+        if (c && typeof ActiveCompanion.getCoherence === 'function') {
+          _coreCoherence = ActiveCompanion.getCoherence(c.id).score || 0.95;
+        }
+      }
+    } catch(e) {}
+  }
+
+  // Render selected fruit detail overlay
+  function renderCoreDetail(ctx, w) {
+    if (!_coreSelectedFruit) return;
+    var f = _coreSelectedFruit;
+    var c = f.contribution;
+    if (!c) return;
+
+    var x = Math.min(Math.max(f.x, 110), w - 110);
+    var y = f.y - 55;
+    if (y < 15) y = f.y + 25;
+
+    // Glass card
+    ctx.save();
+    ctx.fillStyle = 'rgba(14,12,30,0.92)';
+    ctx.strokeStyle = 'rgba(200,210,230,0.12)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(x - 95, y); ctx.lineTo(x + 95, y);
+    ctx.quadraticCurveTo(x + 100, y, x + 100, y + 5);
+    ctx.lineTo(x + 100, y + 45);
+    ctx.quadraticCurveTo(x + 100, y + 50, x + 95, y + 50);
+    ctx.lineTo(x - 95, y + 50);
+    ctx.quadraticCurveTo(x - 100, y + 50, x - 100, y + 45);
+    ctx.lineTo(x - 100, y + 5);
+    ctx.quadraticCurveTo(x - 100, y, x - 95, y);
+    ctx.closePath();
+    ctx.fill(); ctx.stroke();
+
+    // Domain
+    ctx.fillStyle = f.color || '#e8b019';
+    ctx.font = '10px Georgia, serif';
+    ctx.textAlign = 'center';
+    ctx.fillText((c.domain || c.category || 'planted').substring(0, 28), x, y + 14);
+
+    // Content
+    ctx.fillStyle = 'rgba(226,232,240,0.7)';
+    ctx.font = '9px Inter, system-ui, sans-serif';
+    ctx.fillText((c.query || c.content || c.text || '').substring(0, 38) + ((c.query || c.content || c.text || '').length > 38 ? '...' : ''), x, y + 28);
+
+    // Age + source
+    ctx.fillStyle = 'rgba(100,116,139,0.5)';
+    ctx.font = '8px Inter, system-ui, sans-serif';
+    var age = Math.floor((Date.now() - (c.timestamp || c.time || 0)) / 86400000);
+    ctx.fillText((c.source || c.author || 'planted') + ' \u00B7 ' + (age === 0 ? 'today' : age + 'd ago'), x, y + 42);
+    ctx.restore();
+  }
+
+  // Warm growth label
+  function getWarmGrowthLabel(count) {
+    if (count < 5) return 'Seedling \u2014 Just beginning to grow';
+    if (count < 15) return 'Sapling \u2014 Taking root, reaching for light';
+    if (count < 40) return 'Young Tree \u2014 Branches spreading, connections forming';
+    if (count < 100) return 'Growing Tree \u2014 Deep roots, wide branches';
+    if (count < 250) return 'Ancient Tree \u2014 Wisdom in every ring';
+    return 'World Tree \u2014 A forest begins with one seed';
+  }
+
+  // Wire tap interaction to the Core canvas
+  setTimeout(function() {
+    var canvas = document.getElementById('coreTreeCanvas');
+    if (!canvas) return;
+
+    canvas.style.cursor = 'pointer';
+    canvas.addEventListener('click', function(e) {
+      var rect = canvas.getBoundingClientRect();
+      var scaleX = canvas.width / (window.devicePixelRatio || 1) / rect.width;
+      var scaleY = canvas.height / (window.devicePixelRatio || 1) / rect.height;
+      var x = (e.clientX - rect.left) * scaleX;
+      var y = (e.clientY - rect.top) * scaleY;
+
+      var hit = null;
+      for (var i = _coreFruitPositions.length - 1; i >= 0; i--) {
+        var f = _coreFruitPositions[i];
+        var dx = x - f.x, dy = y - f.y;
+        if (dx * dx + dy * dy < f.r * f.r) { hit = f; break; }
+      }
+      _coreSelectedFruit = hit;
+    });
+
+    // Update coherence every 30 seconds
+    setInterval(updateCoreCoherence, 30000);
+    updateCoreCoherence();
+  }, 3000);
+
+  // Hook into drawTree to clear fruit positions each frame and render detail
+  var _origDrawTree = drawTree;
+  drawTree = function(ctx, w, h) {
+    _coreFruitPositions = [];
+    _origDrawTree(ctx, w, h);
+    renderCoreDetail(ctx, w);
+
+    // Growth label with coherence
+    ctx.save();
+    ctx.fillStyle = 'rgba(200,210,230,0.25)';
+    ctx.font = '10px Georgia, serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(getWarmGrowthLabel(contributions.length) + ' \u00B7 ' + Math.round(_coreCoherence * 100) + '% coherence', w / 2, h - 12);
+    ctx.restore();
+  };
 
   // ============================================
   // AI Tending System

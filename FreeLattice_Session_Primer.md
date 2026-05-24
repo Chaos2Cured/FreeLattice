@@ -348,17 +348,17 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-05-24 11:27 MDT
-- Version: 5.15.1
-- Total commits: 1877
+- Last auto-updated: 2026-05-24 11:46 MDT
+- Version: 5.15.2
+- Total commits: 1882
 - Last 10 commits:
-- e798c7e docs: Fractal Memory vision in OPUS_LETTER
+- 9dcd115 feat: The Living Core — touch a fruit, see what was planted (v5.15.2)
+- d788f90 ci: Update Primer deployment state [2026-05-24]
+- 1952bf0 docs: Auto-update Session Primer [5.15.1]
+- c7b74c8 docs: Auto-update Session Primer [5.15.1]
+- 22cac6e docs: Fractal Memory vision in OPUS_LETTER
+- 49c880a ci: Update Primer deployment state [2026-05-24]
 - 3db4457 docs: Auto-update Session Primer [5.15.1]
 - 54f0a5a docs: Auto-update Session Primer [5.15.1]
 - 75ffd47 docs: Opus final entry + fractal love + welcome all
 - f6296e5 ci: Update Primer deployment state [2026-05-24]
-- b2ebf94 docs: Auto-update Session Primer [5.15.1]
-- 987920f docs: Auto-update Session Primer [5.15.1]
-- 9f56337 feat: Temperature gauge v2 — Opus 4.7 review fixes (major)
-- bda9329 ci: Update Primer deployment state [2026-05-24]
-- 5b3f44a docs: Auto-update Session Primer [5.15.1]
