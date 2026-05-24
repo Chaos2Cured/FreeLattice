@@ -283,6 +283,14 @@ canvas#mainChart { width: 100% !important; height: 100% !important; max-height: 
   animation: spin 0.8s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
+/* Chart glow effect after data loads */
+.chart-canvas-wrap.loaded {
+  animation: chartGlow 2s ease-out;
+}
+@keyframes chartGlow {
+  0% { box-shadow: 0 0 30px rgba(201,168,76,0.15); }
+  100% { box-shadow: none; }
+}
 .loading-text { font-size: 0.82rem; color: var(--muted); }
 
 /* Error */
@@ -516,7 +524,7 @@ canvas.sub-canvas { width: 100% !important; height: 80px !important; }
       </div>
       <canvas id="mainChart" style="display:none;"></canvas>
       <div class="loading-overlay" id="loadingOverlay" style="display:none;">
-        <div class="spinner"></div>
+        <canvas id="loadingCanvas" width="120" height="120" style="width:60px;height:60px;"></canvas>
         <div class="loading-text" id="loadingText">Fetching data…</div>
       </div>
     </div>
@@ -1060,6 +1068,9 @@ function renderAll(candles, a, symbol) {
   hideLoading();
   document.getElementById('mainChart').style.display = 'block';
   document.getElementById('subCharts').style.display = 'grid';
+  // Golden glow pulse on chart load
+  var chartWrap = document.getElementById('chartWrap');
+  if (chartWrap) { chartWrap.classList.remove('loaded'); void chartWrap.offsetWidth; chartWrap.classList.add('loaded'); }
 }
 
 function updateGauge(temp, signal) {
@@ -1125,10 +1136,6 @@ function renderChart(candles, a) {
   var gravityPrice = PHI_INV * gravPhi + (1 - PHI_INV) * gravMid;
   for (var gi = 0; gi < closes.length; gi++) gravCenter[gi] = gravityPrice;
 
-  chartInstance = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels,
   // Y-axis scale fix: compute visible price range, filter gravity lines
   var priceMin = Math.min(...closes.filter(c => c != null));
   var priceMax = Math.max(...closes.filter(c => c != null));
@@ -1138,6 +1145,10 @@ function renderChart(candles, a) {
   // Only show gravity lines within visible range (prevents y-axis crush)
   var visibleGravPoints = a.gravPoints.filter(g => g.price >= yMin && g.price <= yMax);
 
+  chartInstance = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
       datasets: [
         { label: 'Price', data: closes, borderColor: '#e8e4dc', borderWidth: 1.5, pointRadius: 0, tension: 0.1, fill: false, order: 1 },
         { label: 'EMA 8', data: ema8, borderColor: '#EF4444', borderWidth: 1, pointRadius: 0, tension: 0.3, fill: false, order: 2 },
@@ -1264,6 +1275,101 @@ function renderChart(candles, a) {
 document.getElementById('symbolInput').addEventListener('keydown', e => {
   if (e.key === 'Enter') loadData();
 });
+
+// ── Phi-Spiral Loading Animation ──
+// Golden ratio spiral drawn as a particle system while waiting
+(function() {
+  var loadCanvas = document.getElementById('loadingCanvas');
+  if (!loadCanvas) return;
+  var lctx = loadCanvas.getContext('2d');
+  var loadAnim = null;
+  var loadTick = 0;
+
+  window._startLoadAnim = function() {
+    if (loadAnim) return;
+    loadTick = 0;
+    function frame() {
+      loadTick++;
+      lctx.fillStyle = 'rgba(10,14,26,0.2)';
+      lctx.fillRect(0, 0, 120, 120);
+      var cx = 60, cy = 60;
+      // Draw phi spiral points
+      for (var i = 0; i < 40; i++) {
+        var angle = i * 2.399963 + loadTick * 0.03; // golden angle + rotation
+        var r = 3 + i * 1.1;
+        var x = cx + Math.cos(angle) * r;
+        var y = cy + Math.sin(angle) * r;
+        var alpha = 0.3 + 0.5 * Math.abs(Math.sin(loadTick * 0.04 + i * 0.3));
+        var hue = i < 15 ? '201,168,76' : i < 30 ? '52,211,153' : '167,139,250';
+        lctx.beginPath();
+        lctx.arc(x, y, 1.5 + Math.sin(loadTick * 0.02 + i) * 0.5, 0, Math.PI * 2);
+        lctx.fillStyle = 'rgba(' + hue + ',' + alpha + ')';
+        lctx.fill();
+      }
+      // Center glow
+      var cAlpha = 0.4 + 0.2 * Math.sin(loadTick * 0.05);
+      lctx.beginPath();
+      lctx.arc(cx, cy, 4, 0, Math.PI * 2);
+      lctx.fillStyle = 'rgba(232,176,25,' + cAlpha + ')';
+      lctx.fill();
+      loadAnim = requestAnimationFrame(frame);
+    }
+    loadAnim = requestAnimationFrame(frame);
+  };
+  window._stopLoadAnim = function() {
+    if (loadAnim) { cancelAnimationFrame(loadAnim); loadAnim = null; }
+    lctx.clearRect(0, 0, 120, 120);
+  };
+})();
+
+// Hook loading animation to show/hide
+var _origShowLoading = showLoading;
+showLoading = function(msg) {
+  _origShowLoading(msg);
+  if (window._startLoadAnim) window._startLoadAnim();
+};
+var _origHideLoading = hideLoading;
+hideLoading = function() {
+  _origHideLoading();
+  if (window._stopLoadAnim) window._stopLoadAnim();
+};
+
+// ── Color Theme Toggle ──
+// Let users switch the accent from gold to emerald to lavender
+(function() {
+  var themes = [
+    { name: 'Gold', gold: '#c9a84c', gold2: '#d4b45e', accent: 'rgba(201,168,76,' },
+    { name: 'Emerald', gold: '#10B981', gold2: '#34d399', accent: 'rgba(16,185,129,' },
+    { name: 'Lavender', gold: '#8B5CF6', gold2: '#a78bfa', accent: 'rgba(139,92,246,' },
+    { name: 'Coral', gold: '#f07068', gold2: '#f59e0b', accent: 'rgba(240,112,104,' }
+  ];
+  var currentTheme = parseInt(localStorage.getItem('fl_tg_theme') || '0', 10);
+
+  function applyTheme(idx) {
+    var t = themes[idx % themes.length];
+    document.documentElement.style.setProperty('--gold', t.gold);
+    document.documentElement.style.setProperty('--gold2', t.gold2);
+    localStorage.setItem('fl_tg_theme', String(idx % themes.length));
+  }
+
+  // Add theme toggle button to header
+  var controls = document.querySelector('.header-controls');
+  if (controls) {
+    var btn = document.createElement('button');
+    btn.className = 'interval-btn';
+    btn.textContent = '\u2726';
+    btn.title = 'Change accent color';
+    btn.style.fontSize = '1rem';
+    btn.onclick = function() {
+      currentTheme = (currentTheme + 1) % themes.length;
+      applyTheme(currentTheme);
+      btn.title = themes[currentTheme].name;
+    };
+    controls.appendChild(btn);
+  }
+
+  if (currentTheme > 0) applyTheme(currentTheme);
+})();
 </script>
 </body>
 </html>
