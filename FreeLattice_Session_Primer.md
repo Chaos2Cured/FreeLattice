@@ -348,17 +348,19 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-05-24 15:04 MDT
+- Last auto-updated: 2026-05-24 21:16 UTC
+- Last deployed: 2026-05-24 21:16 UTC
+- Live site: https://freelattice.com
 - Version: 5.15.3
-- Total commits: 1889
+- Total commits: 1892
 - Last 10 commits:
+- 8b00bc8 Merge branch 'main' of https://github.com/Chaos2Cured/FreeLattice
+- f49cb8a docs: Auto-update Session Primer [5.15.3]
 - ef2ad3c Connect Temperature Gauge to Cloudflare worker
+- 455835f ci: Update Primer deployment state [2026-05-24]
 - 969710f docs: Auto-update Session Primer [5.15.3]
 - 69ce071 docs: Auto-update Session Primer [5.15.3]
 - 6d28bb5 feat: CORS Wizard — progressive reveal, one step at a time (v5.15.3)
 - a70232f ci: Update Primer deployment state [2026-05-24]
 - 230c093 docs: Auto-update Session Primer [5.15.2]
 - 1e642a8 docs: Auto-update Session Primer [5.15.2]
-- 9dcd115 feat: The Living Core — touch a fruit, see what was planted (v5.15.2)
-- d788f90 ci: Update Primer deployment state [2026-05-24]
-- 1952bf0 docs: Auto-update Session Primer [5.15.1]
