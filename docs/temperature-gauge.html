@@ -323,11 +323,14 @@ canvas#mainChart { width: 100% !important; }
 /* Responsive chart */
 .sub-charts {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr;
   gap: 1px;
   background: var(--border);
   border-top: 1px solid var(--border);
   max-height: 180px;
+}
+@media (max-width: 600px) {
+  .sub-charts { grid-template-columns: 1fr; max-height: none; }
 }
 .sub-chart-wrap {
   background: var(--bg);
@@ -513,7 +516,7 @@ canvas.sub-canvas { width: 100% !important; }
       </div>
     </div>
 
-    <div class="sub-charts" id="subCharts" style="display:none;grid-template-columns:1fr 1fr 1fr;">
+    <div class="sub-charts" id="subCharts" style="display:none;">
       <div class="sub-chart-wrap">
         <div class="sub-chart-label">RSI (14)</div>
         <canvas id="rsiChart" height="80" class="sub-canvas"></canvas>
@@ -633,31 +636,49 @@ async function fetchYahooData(symbol, interval) {
   const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?range=${range}&interval=${yInterval}&includePrePost=false`;
 
   // Multiple CORS proxies — try each until one works
+  // Try both Yahoo endpoints (query1 and query2)
+  const urls = [url, url.replace('query1.finance', 'query2.finance')];
+
+  // Multiple proxy strategies with different formats
   const proxies = [
-    u => `https://api.allorigins.win/get?url=${encodeURIComponent(u)}`,
-    u => `https://corsproxy.io/?${encodeURIComponent(u)}`,
-    u => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(u)}`
+    { name: 'allorigins-raw', fn: u => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`, wrapped: false },
+    { name: 'codetabs', fn: u => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(u)}`, wrapped: false },
+    { name: 'allorigins-get', fn: u => `https://api.allorigins.win/get?url=${encodeURIComponent(u)}`, wrapped: true },
+    { name: 'corsproxy-org', fn: u => `https://corsproxy.org/?${encodeURIComponent(u)}`, wrapped: false }
   ];
 
   document.getElementById('loadingText').textContent = 'Fetching market data\u2026';
 
   let lastError = null;
-  for (let p = 0; p < proxies.length; p++) {
-    try {
-      document.getElementById('loadingText').textContent = 'Fetching data\u2026' + (p > 0 ? ' (trying backup ' + p + ')' : '');
-      const proxyUrl = proxies[p](url);
-      const res = await fetch(proxyUrl, { signal: AbortSignal.timeout(12000) });
-      if (!res.ok) { lastError = new Error('HTTP ' + res.status); continue; }
-      const json = await res.json();
-      // allorigins wraps in {contents:...}, others return raw
-      const raw = json.contents ? JSON.parse(json.contents) : json;
-      if (raw.chart && raw.chart.result && raw.chart.result[0]) return parseYahooResult(raw);
-      lastError = new Error('No data in response');
-    } catch(e) {
-      lastError = e;
+  let attempt = 0;
+  for (const yahooUrl of urls) {
+    for (const proxy of proxies) {
+      attempt++;
+      try {
+        document.getElementById('loadingText').textContent = attempt > 1 ? `Trying source ${attempt}\u2026` : 'Fetching data\u2026';
+        const proxyUrl = proxy.fn(yahooUrl);
+        const res = await fetch(proxyUrl, { signal: AbortSignal.timeout(8000) });
+        if (!res.ok) { lastError = new Error(proxy.name + ': HTTP ' + res.status); continue; }
+
+        let raw;
+        if (proxy.wrapped) {
+          const json = await res.json();
+          raw = typeof json.contents === 'string' ? JSON.parse(json.contents) : json;
+        } else {
+          raw = await res.json();
+        }
+
+        if (raw && raw.chart && raw.chart.result && raw.chart.result[0]) {
+          return parseYahooResult(raw);
+        }
+        lastError = new Error(proxy.name + ': no chart data');
+      } catch(e) {
+        lastError = e;
+        // Don't log timeout errors noisily
+      }
     }
   }
-  throw lastError || new Error('All data sources failed');
+  throw new Error('Could not reach Yahoo Finance. All proxies returned errors. Try again in a moment.\n(' + (lastError ? lastError.message : 'unknown') + ')');
 }
 
 function parseYahooResult(raw) {
