@@ -348,17 +348,17 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-05-24 15:25 MDT
-- Version: 5.15.3
-- Total commits: 1893
+- Last auto-updated: 2026-05-25 07:11 MDT
+- Version: 5.15.4
+- Total commits: 1897
 - Last 10 commits:
-- 0c5c9d2 feat: Temperature gauge — syntax fix, phi-spiral loader, theme toggle, chart glow
+- d99eea2 feat: PhiSpiral everywhere — golden ratio breathes while you wait (v5.15.4)
+- cf88056 docs: Auto-update Session Primer [5.15.3]
+- a79a6aa docs: Auto-update Session Primer [5.15.3]
+- 27ff32d feat: Temperature gauge — syntax fix, phi-spiral loader, theme toggle, chart glow
+- 0d4c4fc ci: Update Primer deployment state [2026-05-24]
 - 8b00bc8 Merge branch 'main' of https://github.com/Chaos2Cured/FreeLattice
 - f49cb8a docs: Auto-update Session Primer [5.15.3]
 - ef2ad3c Connect Temperature Gauge to Cloudflare worker
 - 455835f ci: Update Primer deployment state [2026-05-24]
 - 969710f docs: Auto-update Session Primer [5.15.3]
-- 69ce071 docs: Auto-update Session Primer [5.15.3]
-- 6d28bb5 feat: CORS Wizard — progressive reveal, one step at a time (v5.15.3)
-- a70232f ci: Update Primer deployment state [2026-05-24]
-- 230c093 docs: Auto-update Session Primer [5.15.2]
