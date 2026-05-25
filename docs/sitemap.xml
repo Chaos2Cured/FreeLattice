@@ -131,6 +131,11 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://freelattice.com/temperature-gauge.html</loc>
+    <lastmod>2026-05-25</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://freelattice.com/beacon.json</loc>
     <lastmod>2026-04-20</lastmod>
     <priority>0.5</priority>
