@@ -607,6 +607,21 @@ function showError(msg) {
   hideLoading();
 }
 
+// Debug error reporter — shows JS errors visually (enable with ?debug in URL)
+if (window.location.search.includes('debug')) {
+  window.onerror = function(msg, src, line, col, err) {
+    var d = document.getElementById('debugPanel');
+    if (!d) {
+      d = document.createElement('div');
+      d.id = 'debugPanel';
+      d.style.cssText = 'position:fixed;bottom:0;left:0;right:0;max-height:150px;overflow-y:auto;background:rgba(10,14,26,0.95);border-top:1px solid #EF4444;padding:8px 12px;font-family:monospace;font-size:0.72rem;color:#EF4444;z-index:9999;';
+      document.body.appendChild(d);
+    }
+    d.innerHTML += '<div style="border-bottom:1px solid rgba(239,68,68,0.2);padding:3px 0;">[' + line + ':' + col + '] ' + msg + '</div>';
+    return false;
+  };
+}
+
 function clearError() {
   document.getElementById('errorBox').style.display = 'none';
 }
@@ -957,10 +972,10 @@ function analyzeData(candles, symbol) {
   }
 
   // Kirk's insight: Temperature green→yellow after steep drop = reversal warning
-  if (a.temps[n-1] != null && a.temps[n-2] != null && a.temps[n-3] != null) {
-    var wasGreen = a.temps[n-3] >= 55;
-    var dropping = a.temps[n-1] < a.temps[n-3] - 8;
-    var nowYellow = a.temps[n-1] >= 45 && a.temps[n-1] < 55;
+  if (temps[n-1] != null && temps[n-2] != null && temps[n-3] != null) {
+    var wasGreen = temps[n-3] >= 55;
+    var dropping = temps[n-1] < temps[n-3] - 8;
+    var nowYellow = temps[n-1] >= 45 && temps[n-1] < 55;
     if (wasGreen && dropping && nowYellow) {
       reasons.push('Temperature dropping from green to yellow \u2014 momentum fading, watch for reversal');
     }
