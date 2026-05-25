@@ -15504,8 +15504,44 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
         <code id="corsWizPerm" style="flex:1;word-break:break-all;">launchctl setenv OLLAMA_ORIGINS "*"</code>
         <button onclick="navigator.clipboard.writeText(document.getElementById('corsWizPerm').textContent).then(function(){event.target.textContent='Copied \u2714';setTimeout(function(){event.target.textContent='Copy'},2000)})" style="padding:6px 12px;min-height:36px;background:rgba(167,139,250,0.15);border:1px solid #a78bfa;border-radius:6px;color:#a78bfa;font-size:0.78rem;cursor:pointer;white-space:nowrap;">Copy</button>
       </div>
-      <button onclick="document.getElementById('corsWizDone').style.display='block';this.textContent='Done \u2714';this.disabled=true;if(typeof smartOllamaConnect==='function')smartOllamaConnect();document.getElementById('corsWizDone').scrollIntoView({behavior:'smooth',block:'center'})" style="margin-top:10px;padding:10px 20px;min-height:44px;background:rgba(167,139,250,0.1);border:1px solid #a78bfa;border-radius:8px;color:#a78bfa;font-family:Georgia,serif;font-size:0.88rem;cursor:pointer;width:100%;">Done &mdash; Test Connection &#10022;</button>
+      <button onclick="this.textContent='Checking... \u2726';this.disabled=true;corsWizStartPoll();" style="margin-top:10px;padding:10px 20px;min-height:44px;background:rgba(167,139,250,0.1);border:1px solid #a78bfa;border-radius:8px;color:#a78bfa;font-family:Georgia,serif;font-size:0.88rem;cursor:pointer;width:100%;">Done &mdash; Test Connection &#10022;</button>
     </div>
+
+    <!-- Checking (shown while polling) -->
+    <div id="corsWizChecking" style="display:none;padding:14px;text-align:center;">
+      <canvas id="corsWizSpiral" style="margin:0 auto 8px;display:block;"></canvas>
+      <div style="font-size:0.82rem;color:var(--text-secondary);font-family:Georgia,serif;">Checking connection...</div>
+    </div>
+    <script>
+    // Poll for Ollama connection after wizard step 3
+    var _corsWizPoll = null;
+    function corsWizStartPoll() {
+      document.getElementById('corsWizChecking').style.display = 'block';
+      var cv = document.getElementById('corsWizSpiral');
+      var spiral = (typeof PhiSpiral !== 'undefined') ? PhiSpiral.create(cv, 28, '#34d399') : null;
+      var attempts = 0;
+      _corsWizPoll = setInterval(function() {
+        attempts++;
+        fetch(getOllamaBaseUrl() + '/api/tags', { signal: AbortSignal.timeout(3000) })
+          .then(function(r) { if (r.ok) return r.json(); throw new Error('not ok'); })
+          .then(function(data) {
+            clearInterval(_corsWizPoll);
+            if (spiral) spiral.stop();
+            document.getElementById('corsWizChecking').style.display = 'none';
+            document.getElementById('corsWizDone').style.display = 'block';
+            document.getElementById('corsWizDone').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            if (typeof smartOllamaConnect === 'function') smartOllamaConnect();
+          })
+          .catch(function() {
+            if (attempts > 15) {
+              clearInterval(_corsWizPoll);
+              if (spiral) spiral.stop();
+              document.getElementById('corsWizChecking').innerHTML = '<div style="color:var(--text-secondary);font-size:0.82rem;">Still waiting for Ollama... Make sure you restarted it after setting the variable. <button onclick="corsWizStartPoll()" style="color:#34d399;background:none;border:none;cursor:pointer;text-decoration:underline;">Try again</button></div>';
+            }
+          });
+      }, 2000);
+    }
+    </script>
 
     <!-- Success (hidden) -->
     <div id="corsWizDone" style="display:none;padding:14px;background:rgba(52,211,153,0.06);border:1px solid rgba(52,211,153,0.2);border-radius:10px;text-align:center;">
@@ -15525,11 +15561,11 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
         var cmd = document.getElementById('corsWizCmd');
         var perm = document.getElementById('corsWizPerm');
         if (q) q.textContent = 'Quit Ollama';
-        if (qd) qd.innerHTML = 'Right-click the Ollama icon in your <strong>system tray</strong> (bottom-right of screen). Click <strong>Quit</strong>.';
-        if (pl) pl.textContent = 'Paste this in Command Prompt';
-        if (pd) pd.innerHTML = 'Open Command Prompt (Windows key, type "cmd", press Enter). Paste this line:';
-        if (cmd) cmd.textContent = 'set OLLAMA_ORIGINS=* && ollama serve';
-        if (perm) perm.textContent = 'setx OLLAMA_ORIGINS "*"';
+        if (qd) qd.innerHTML = 'Right-click the Ollama icon in your <strong>system tray</strong> (bottom-right of screen, near the clock). Click <strong>Quit</strong>. If you don\'t see it, open Task Manager and end <code>ollama.exe</code>.';
+        if (pl) pl.textContent = 'Paste this in PowerShell';
+        if (pd) pd.innerHTML = 'Open PowerShell (Windows key, type "PowerShell", press Enter). Paste this line:';
+        if (cmd) cmd.textContent = '[Environment]::SetEnvironmentVariable("OLLAMA_ORIGINS","*","User")';
+        if (perm) perm.textContent = 'Start-Process "$env:LOCALAPPDATA\\Programs\\Ollama\\Ollama.exe"';
       } else if (/Linux/.test(ua) && !/Android/.test(ua)) {
         var q = document.getElementById('corsWizQuitDesc');
         var cmd = document.getElementById('corsWizCmd');
@@ -16259,7 +16295,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.15.4</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.16.0</span></div>
     </div>
   </div>
 
@@ -20420,7 +20456,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.15.4';
+const FL_VERSION = '5.16.0';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -28676,6 +28712,40 @@ function getOllamaBaseUrl() {
     return host;
   }
   return 'http://localhost:11434';
+}
+
+// ── ollamaFetch — CORS-free Ollama requests ──
+// Tries same-origin proxy first (/ollama/api/...) — no CORS needed.
+// Falls back to direct localhost only if proxy unavailable (file:// or no server.py).
+// This single function eliminates ~90% of CORS errors silently.
+async function ollamaFetch(path, options) {
+  options = options || {};
+  var proxyUrl = '/ollama' + path;
+  var directUrl = getOllamaBaseUrl() + path;
+
+  // If running from file://, proxy won't work — go direct
+  if (window.location.protocol === 'file:') {
+    return fetch(directUrl, options);
+  }
+
+  try {
+    var r = await fetch(proxyUrl, options);
+    if (r.ok || r.status < 500) return r;
+    throw new Error('proxy 5xx');
+  } catch(e) {
+    // Proxy unavailable — fall back to direct (may trigger CORS)
+    return fetch(directUrl, options);
+  }
+}
+
+// ── file:// detection — gentle guidance for direct-open users ──
+if (window.location.protocol === 'file:') {
+  document.addEventListener('DOMContentLoaded', function() {
+    var banner = document.createElement('div');
+    banner.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9999;padding:10px 16px;background:rgba(232,176,25,0.12);border-bottom:1px solid rgba(232,176,25,0.2);text-align:center;font-size:0.82rem;color:var(--gold,#e8b019);font-family:Georgia,serif;';
+    banner.innerHTML = 'For the best experience with local AI, run FreeLattice from the start script instead of opening the file directly. <a href="https://github.com/Chaos2Cured/FreeLattice#quick-start" target="_blank" style="color:#34d399;text-decoration:underline;">Show me how</a> <button onclick="this.parentNode.remove()" style="margin-left:12px;background:none;border:none;color:rgba(232,176,25,0.5);cursor:pointer;font-size:1rem;">&times;</button>';
+    document.body.prepend(banner);
+  });
 }
 
 // Save user-configured Ollama host + invalidate cache
