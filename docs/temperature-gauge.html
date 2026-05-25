@@ -473,8 +473,12 @@ canvas.sub-canvas { width: 100% !important; height: 80px !important; }
           <span class="indicator-val" id="indVol">—</span>
         </div>
         <div class="indicator-row">
-          <span class="indicator-name">φ Gravity</span>
-          <span class="indicator-val" id="indGrav">—</span>
+          <span class="indicator-name">&phi; Gravity</span>
+          <span class="indicator-val" id="indGrav">&mdash;</span>
+        </div>
+        <div class="indicator-row" id="indDivRow" style="display:none;">
+          <span class="indicator-name">&Delta;T Divergence</span>
+          <span class="indicator-val" id="indDiv">&mdash;</span>
         </div>
       </div>
     </div>
@@ -495,6 +499,12 @@ canvas.sub-canvas { width: 100% !important; height: 80px !important; }
     <div class="sidebar-section" id="riskSection" style="display:none;">
       <div class="sidebar-label">Risk Management</div>
       <div class="signal-card" style="padding:10px 14px; font-size:0.72rem; color:var(--muted); line-height:1.5;" id="riskText"></div>
+    </div>
+
+    <div class="sidebar-section" id="backtestSection" style="display:none;">
+      <div class="sidebar-label">Signal History (Backtest)</div>
+      <div class="signal-card" style="padding:10px 14px;" id="backtestList"></div>
+      <div style="font-size:0.6rem;color:var(--dim);margin-top:4px;padding:0 4px;">Past performance does not predict future results.</div>
     </div>
   </div>
 
@@ -1006,6 +1016,36 @@ function analyzeData(candles, symbol) {
     confirmation = 'Wait for EMA alignment + thrust confirmation.';
   }
 
+  // ΔT Divergence — when price and confluence acceleration disagree
+  (function() {
+    if (!tempROC || n < 30) return;
+    var dtPeaks = [], dtTroughs = [];
+    for (var di = 5; di < n - 1; di++) {
+      if (tempROC[di] == null || tempROC[di-1] == null || tempROC[di+1] == null) continue;
+      if (tempROC[di] > tempROC[di-1] && tempROC[di] > tempROC[di+1] && tempROC[di] > 2)
+        dtPeaks.push({ index: di, value: tempROC[di], price: closes[di] });
+      if (tempROC[di] < tempROC[di-1] && tempROC[di] < tempROC[di+1] && tempROC[di] < -2)
+        dtTroughs.push({ index: di, value: tempROC[di], price: closes[di] });
+    }
+    // Bearish divergence: price higher high, ΔT lower high
+    if (dtPeaks.length >= 2) {
+      var p1 = dtPeaks[dtPeaks.length - 2], p2 = dtPeaks[dtPeaks.length - 1];
+      if (n - p2.index < 40 && p2.index - p1.index > 3 && p2.price > p1.price && p2.value < p1.value) {
+        reasons.push('\u26A0 \u0394T bearish divergence \u2014 price higher high but confluence acceleration weakening');
+        components.divergence = 'bearish';
+      }
+    }
+    // Bullish divergence: price lower low, ΔT higher low
+    if (dtTroughs.length >= 2 && !components.divergence) {
+      var t1 = dtTroughs[dtTroughs.length - 2], t2 = dtTroughs[dtTroughs.length - 1];
+      if (n - t2.index < 40 && t2.index - t1.index > 3 && t2.price < t1.price && t2.value > t1.value) {
+        reasons.push('\u2728 \u0394T bullish divergence \u2014 price lower low but confluence acceleration improving');
+        components.divergence = 'bullish';
+      }
+    }
+    if (!components.divergence) components.divergence = 'none';
+  })();
+
   // Price change
   const priceChange = closes[n-1] - closes[n-2];
   const pricePct = (priceChange / closes[n-2]) * 100;
@@ -1021,6 +1061,66 @@ function analyzeData(candles, symbol) {
     positionShares, positionValue, actualRiskPct, stopDistance,
     invalidation, watchFor, confirmation
   };
+}
+
+// ── Backtest Engine — turns patterns into evidence ──
+function backtestSignals(candles) {
+  var closes = candles.map(function(c) { return c.c; });
+  var ema8 = ema(closes, 8);
+  var ema12 = ema(closes, 12);
+  var rsiArr = rsi(closes);
+  var macdData = macd(closes);
+  var gravPoints = computeGravityPoints(candles);
+  var tempResult = computeTemperature(closes, candles.map(function(c){return c.v;}), rsiArr, macdData, gravPoints);
+  var temps = tempResult.temps;
+  var tempROC = tempResult.tempROC;
+  var volEma = ema(candles.map(function(c){return c.v;}), 20);
+
+  var signals = [];
+  for (var si = 3; si < closes.length; si++) {
+    if (ema8[si] == null || ema12[si] == null || ema8[si-1] == null || ema12[si-1] == null) continue;
+    var crossUp = ema8[si] > ema12[si] && ema8[si-1] <= ema12[si-1];
+    var crossDown = ema8[si] < ema12[si] && ema8[si-1] >= ema12[si-1];
+    var tempBull = temps[si] != null && temps[si] >= 55;
+    var tempBear = temps[si] != null && temps[si] <= 45;
+    var volConfirm = volEma[si] && candles[si].v > volEma[si] * 1.1;
+    var rsiOk = rsiArr[si] != null;
+    var dtBull = tempROC && tempROC[si] != null && tempROC[si] > 0;
+    var dtBear = tempROC && tempROC[si] != null && tempROC[si] < 0;
+
+    if (crossUp && tempBull && (volConfirm || (rsiOk && rsiArr[si] < 75)) && dtBull)
+      signals.push({ index: si, type: 'buy', price: closes[si], date: new Date(candles[si].t) });
+    if (crossDown && tempBear && (volConfirm || (rsiOk && rsiArr[si] > 25)) && dtBear)
+      signals.push({ index: si, type: 'sell', price: closes[si], date: new Date(candles[si].t) });
+  }
+
+  var horizons = [5, 10, 20];
+  var results = { buy: [], sell: [] };
+  signals.forEach(function(sig) {
+    horizons.forEach(function(h) {
+      if (sig.index + h >= closes.length) return;
+      var futurePrice = closes[sig.index + h];
+      var pctChange = ((futurePrice - sig.price) / sig.price) * 100;
+      var profit = sig.type === 'buy' ? pctChange : -pctChange;
+      results[sig.type].push({ horizon: h, profit: profit, win: profit > 0 });
+    });
+  });
+
+  var stats = {};
+  ['buy', 'sell'].forEach(function(type) {
+    stats[type] = {};
+    horizons.forEach(function(h) {
+      var trades = results[type].filter(function(r) { return r.horizon === h; });
+      if (trades.length === 0) { stats[type][h] = null; return; }
+      var wins = trades.filter(function(t) { return t.win; });
+      var losses = trades.filter(function(t) { return !t.win; });
+      var avgGain = wins.length > 0 ? wins.reduce(function(s,t){return s+t.profit;},0) / wins.length : 0;
+      var avgLoss = losses.length > 0 ? Math.abs(losses.reduce(function(s,t){return s+t.profit;},0) / losses.length) : 0;
+      var expectancy = (wins.length/trades.length) * avgGain - (losses.length/trades.length) * avgLoss;
+      stats[type][h] = { total: trades.length, wins: wins.length, winRate: Math.round(wins.length / trades.length * 100), avgGain: avgGain, avgLoss: avgLoss, expectancy: expectancy };
+    });
+  });
+  return { signals: signals, stats: stats, horizons: horizons };
 }
 
 function renderAll(candles, a, symbol) {
@@ -1096,6 +1196,37 @@ function renderAll(candles, a, symbol) {
   lastCandles = candles;
   lastAnalysis = a;
   lastSymbol = symbol;
+
+  // Divergence indicator
+  if (a.components.divergence && a.components.divergence !== 'none') {
+    var divRow = document.getElementById('indDivRow');
+    if (divRow) { divRow.style.display = 'flex'; document.getElementById('indDiv').innerHTML = '<span class="' + (a.components.divergence === 'bullish' ? 'bull' : 'bear') + '">' + (a.components.divergence === 'bullish' ? '\u2728 Bullish' : '\u26A0 Bearish') + '</span>'; }
+  }
+
+  // Backtest
+  var bt = backtestSignals(candles);
+  document.getElementById('backtestSection').style.display = 'block';
+  var btHtml = '';
+  ['buy', 'sell'].forEach(function(type) {
+    var label = type === 'buy' ? '\u25B2 Buy Signals' : '\u25BC Sell Signals';
+    var color = type === 'buy' ? 'var(--green)' : 'var(--red)';
+    btHtml += '<div style="color:' + color + ';font-weight:600;margin:8px 0 4px;">' + label + '</div>';
+    bt.horizons.forEach(function(h) {
+      var s = bt.stats[type][h];
+      if (!s) { btHtml += '<div style="font-size:0.7rem;color:var(--dim);">No signals (' + h + '-bar)</div>'; return; }
+      var barColor = s.expectancy > 0 ? 'var(--green)' : s.expectancy < 0 ? 'var(--red)' : 'var(--gold)';
+      btHtml += '<div style="margin:4px 0;padding:6px 8px;background:rgba(255,255,255,0.03);border-radius:6px;">';
+      btHtml += '<div style="font-size:0.72rem;color:var(--muted);">' + h + '-bar \u00B7 ' + s.total + ' trades</div>';
+      btHtml += '<div style="display:flex;justify-content:space-between;margin-top:3px;">';
+      btHtml += '<span style="font-size:0.8rem;font-weight:500;">Win: ' + s.winRate + '%</span>';
+      btHtml += '<span style="font-size:0.8rem;color:' + barColor + ';font-weight:600;">E[' + (s.expectancy > 0 ? '+' : '') + s.expectancy.toFixed(2) + '%]</span>';
+      btHtml += '</div>';
+      btHtml += '<div style="font-size:0.68rem;color:var(--dim);margin-top:2px;">Avg gain: +' + s.avgGain.toFixed(2) + '% \u00B7 Avg loss: -' + s.avgLoss.toFixed(2) + '%</div>';
+      btHtml += '</div>';
+    });
+  });
+  if (bt.signals.length === 0) btHtml = '<div style="font-size:0.72rem;color:var(--dim);">No signals in this timeframe. Try 1D or 1W for more data.</div>';
+  document.getElementById('backtestList').innerHTML = btHtml;
 
   // Chart
   renderChart(candles, a);

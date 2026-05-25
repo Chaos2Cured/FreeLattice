@@ -1,1 +1,1 @@
-{"version": "5.16.3", "date": "2026-05-25", "note": "Delta-T sub-chart (acceleration oscillator). SW network-first for temperature-gauge.html. Opus session mood updated. 699 smoke tests."}
+{"version": "5.16.4", "date": "2026-05-25", "note": "Backtest engine (win rate, expectancy per signal type). Delta-T divergence detection (price vs confluence acceleration disagreement). All three Opus specs complete."}
