@@ -335,7 +335,7 @@ canvas#mainChart { width: 100% !important; height: 100% !important; max-height: 
 /* Responsive chart */
 .sub-charts {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr;
   gap: 1px;
   background: var(--border);
   border-top: 1px solid var(--border);
@@ -534,8 +534,12 @@ canvas.sub-canvas { width: 100% !important; height: 80px !important; }
         <canvas id="rsiChart" height="80" class="sub-canvas"></canvas>
       </div>
       <div class="sub-chart-wrap">
-        <div class="sub-chart-label">Temperature &middot; &Delta;T</div>
+        <div class="sub-chart-label">Temperature</div>
         <canvas id="tempChart" height="80" class="sub-canvas"></canvas>
+      </div>
+      <div class="sub-chart-wrap">
+        <div class="sub-chart-label">&Delta;T (acceleration)</div>
+        <canvas id="dtChart" height="80" class="sub-canvas"></canvas>
       </div>
     </div>
 
@@ -572,6 +576,7 @@ let useLogScale = false;
 let chartInstance = null;
 let rsiChartInstance = null;
 let tempChartInstance = null;
+let dtChartInstance = null;
 let lastCandles = null;
 let lastAnalysis = null;
 let lastSymbol = '';
@@ -1132,6 +1137,7 @@ function renderChart(candles, a) {
   if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
   if (rsiChartInstance) { rsiChartInstance.destroy(); rsiChartInstance = null; }
   if (tempChartInstance) { tempChartInstance.destroy(); tempChartInstance = null; }
+  if (dtChartInstance) { dtChartInstance.destroy(); dtChartInstance = null; }
 
   const ctx = document.getElementById('mainChart').getContext('2d');
   // Standardized MAs: 8/12/24 + 50
@@ -1333,6 +1339,35 @@ function renderChart(candles, a) {
       }
     }
   });
+
+  // ΔT sub-chart — temperature acceleration oscillator around zero
+  var dtCtx = document.getElementById('dtChart');
+  if (dtCtx) {
+    dtCtx = dtCtx.getContext('2d');
+    var dtData = a.tempROC || [];
+    var dtColors = dtData.map(function(v) {
+      if (v == null) return 'transparent';
+      return v > 0 ? 'rgba(16,185,129,0.7)' : 'rgba(239,68,68,0.7)';
+    });
+    dtChartInstance = new Chart(dtCtx, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [
+          { data: dtData, backgroundColor: dtColors, borderWidth: 0 },
+          { data: new Array(closes.length).fill(0), borderColor: 'rgba(200,210,230,0.15)', borderWidth: 1, pointRadius: 0, type: 'line', fill: false }
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false, animation: false,
+        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+        scales: {
+          x: { display: false },
+          y: { ticks: { color: '#4a4740', font: { size: 9 }, maxTicksLimit: 3 }, grid: { color: 'rgba(255,255,255,0.03)' }, position: 'right' }
+        }
+      }
+    });
+  }
 }
 
 // Enter key support

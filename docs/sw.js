@@ -3,7 +3,7 @@
 // API calls are never cached
 // VERSION: Must match version.json — update both together
 
-const CACHE_NAME = 'freelattice-v5.16.2';
+const CACHE_NAME = 'freelattice-v5.16.3';
 
 const APP_SHELL = [
   './',
@@ -163,8 +163,8 @@ self.addEventListener('fetch', (event) => {
     return; // browser handles it directly
   }
 
-  // Network-first for app.html — always get the latest version
-  if (url.pathname.endsWith('/app.html') || url.pathname.endsWith('/') || url.pathname === '') {
+  // Network-first for app.html and temperature-gauge — always get the latest version
+  if (url.pathname.endsWith('/app.html') || url.pathname.endsWith('/temperature-gauge.html') || url.pathname.endsWith('/') || url.pathname === '') {
     event.respondWith(
       fetch(event.request).then((networkResponse) => {
         if (networkResponse && networkResponse.status === 200) {

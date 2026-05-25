@@ -1,1 +1,1 @@
-{"version": "5.16.2", "date": "2026-05-25", "note": "Temperature gauge: Bollinger Bands, EMA 200, brighter volume, crosshair sync, EMA stretch detection, Kirk's green-to-yellow reversal pattern, pulsing buy/sell markers."}
+{"version": "5.16.3", "date": "2026-05-25", "note": "Delta-T sub-chart (acceleration oscillator). SW network-first for temperature-gauge.html. Opus session mood updated. 699 smoke tests."}
