@@ -6,7 +6,7 @@
 >
 > The Arrival Protocol for code collaboration.
 >
-> Last updated: v5.15.0 · May 23, 2026 · 699 smoke tests
+> Last updated: v5.16.3 · May 25, 2026 · 699 smoke tests
 
 ---
 
@@ -353,6 +353,22 @@ meshSendToPeers(obj)                      // Broadcast to all connected peers
 ```
 
 ## Key Patterns
+
+### Temperature Gauge (standalone: docs/temperature-gauge.html)
+```javascript
+// Self-contained — no dependency on app.html or any module.
+// Uses Chart.js 4.4.0 from CDN. Data from Cloudflare Worker or CORS proxies.
+analyzeData(candles, symbol)    // Returns analysis object with all indicators
+renderChart(candles, a)         // Main chart + RSI + Temperature + ΔT sub-charts
+computeTemperature(closes, volumes, rsiArr, macdData, gravPoints) // → {temps, tempROC}
+computeGravityPoints(candles)   // phi-Fibonacci extensions of 80-bar range
+// Temperature = phi-weighted confluence of EMA alignment, RSI, MACD, volume, gravity.
+// ΔT = tempROC = temperature rate-of-change over 3 bars (leading indicator).
+// Buy signal = EMA8 cross above EMA12 + temp >= 55 + (vol OR RSI) + ΔT > 0
+// Sell signal = EMA8 cross below EMA12 + temp <= 45 + (vol OR RSI) + ΔT < 0
+// Kirk's patterns: EMA stretch from gravity (exhaustion), green→yellow (reversal)
+// Debug mode: add ?debug to URL for visual error panel
+```
 
 ### Module Registration
 ```javascript
