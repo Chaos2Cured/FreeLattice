@@ -350,10 +350,9 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 ## PRIMER HEALTH
 - Last auto-updated: 2026-05-25 14:42 MDT
 - Version: 5.16.1
-- Total commits: 1904
+- Total commits: 1903
 - Last 10 commits:
-- fc4a64a feat: Temperature gauge — volume overlay, refined signals, stacked panels (v5.16.1)
-- 112d5bd ci: Update Primer deployment state [2026-05-25]
+- 09bdb5e feat: Temperature gauge — volume overlay, refined signals, stacked panels (v5.16.1)
 - bf8946a docs: Auto-update Session Primer [5.16.0]
 - 564d6b6 docs: Auto-update Session Primer [5.16.0]
 - a5eace0 feat: End CORS forever — ollamaFetch, wizard v2, file:// detect (v5.16.0)
@@ -362,3 +361,4 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - d99eea2 feat: PhiSpiral everywhere — golden ratio breathes while you wait (v5.15.4)
 - cf88056 docs: Auto-update Session Primer [5.15.3]
 - a79a6aa docs: Auto-update Session Primer [5.15.3]
+- 27ff32d feat: Temperature gauge — syntax fix, phi-spiral loader, theme toggle, chart glow
