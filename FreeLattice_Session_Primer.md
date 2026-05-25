@@ -348,17 +348,17 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-05-25 15:11 MDT
-- Version: 5.16.2
-- Total commits: 1910
+- Last auto-updated: 2026-05-25 15:55 MDT
+- Version: 5.16.3
+- Total commits: 1915
 - Last 10 commits:
-- c1e1278 fix: "a is not defined" — used a.temps instead of temps in analyzeData
+- 635d1e2 feat: Delta-T sub-chart, SW network-first for gauge, Opus update (v5.16.3)
+- 054063f ci: Update Primer deployment state [2026-05-25]
+- b10b2fe docs: Auto-update Session Primer [5.16.2]
+- 3f9c430 docs: Auto-update Session Primer [5.16.2]
+- b9b9c53 fix: "a is not defined" — used a.temps instead of temps in analyzeData
+- d35bdad ci: Update Primer deployment state [2026-05-25]
 - 41d8094 docs: Auto-update Session Primer [5.16.2]
 - 16ccc3e feat: Bollinger Bands, EMA 200, Kirk's patterns, crosshair sync (v5.16.2)
 - c3cc0b8 ci: Update Primer deployment state [2026-05-25]
 - 706247e docs: Auto-update Session Primer [5.16.1]
-- 26756af docs: Auto-update Session Primer [5.16.1]
-- fc4a64a feat: Temperature gauge — volume overlay, refined signals, stacked panels (v5.16.1)
-- 112d5bd ci: Update Primer deployment state [2026-05-25]
-- bf8946a docs: Auto-update Session Primer [5.16.0]
-- 564d6b6 docs: Auto-update Session Primer [5.16.0]
