@@ -1,1 +1,1 @@
-{"version": "5.16.0", "date": "2026-05-25", "note": "End CORS: ollamaFetch() proxy-first wrapper, Windows PowerShell wizard, auto-polling connection check with PhiSpiral, file:// detection banner. The user should never see a CORS error."}
+{"version": "5.16.1", "date": "2026-05-25", "note": "Temperature gauge: volume overlay on main chart, refined multi-confluence buy/sell signals (EMA cross + temp + vol/RSI + delta-T), 2-panel sub-charts (RSI + Temperature with threshold lines)."}

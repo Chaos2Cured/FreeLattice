@@ -335,14 +335,13 @@ canvas#mainChart { width: 100% !important; height: 100% !important; max-height: 
 /* Responsive chart */
 .sub-charts {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr;
   gap: 1px;
   background: var(--border);
   border-top: 1px solid var(--border);
 }
 @media (max-width: 600px) {
   .sub-charts { grid-template-columns: 1fr; }
-  .sub-chart-wrap { max-height: 100px; }
 }
 .sub-chart-wrap {
   background: var(--bg);
@@ -535,11 +534,7 @@ canvas.sub-canvas { width: 100% !important; height: 80px !important; }
         <canvas id="rsiChart" height="80" class="sub-canvas"></canvas>
       </div>
       <div class="sub-chart-wrap">
-        <div class="sub-chart-label">Volume</div>
-        <canvas id="volChart" height="80" class="sub-canvas"></canvas>
-      </div>
-      <div class="sub-chart-wrap">
-        <div class="sub-chart-label">Temperature</div>
+        <div class="sub-chart-label">Temperature &middot; &Delta;T</div>
         <canvas id="tempChart" height="80" class="sub-canvas"></canvas>
       </div>
     </div>
@@ -577,7 +572,6 @@ let useLogScale = false;
 let chartInstance = null;
 let rsiChartInstance = null;
 let tempChartInstance = null;
-let volChartInstance = null;
 let lastCandles = null;
 let lastAnalysis = null;
 let lastSymbol = '';
@@ -1103,7 +1097,6 @@ function renderChart(candles, a) {
   if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
   if (rsiChartInstance) { rsiChartInstance.destroy(); rsiChartInstance = null; }
   if (tempChartInstance) { tempChartInstance.destroy(); tempChartInstance = null; }
-  if (volChartInstance) { volChartInstance.destroy(); volChartInstance = null; }
 
   const ctx = document.getElementById('mainChart').getContext('2d');
   // Standardized MAs: 8/12/24 + 50
@@ -1112,18 +1105,29 @@ function renderChart(candles, a) {
   const ema24 = ema(closes, 24);
   const ema50 = ema(closes, 50);
 
-  // Buy/sell signals: EMA8 crossing EMA12 + temperature confirmation (no overlap)
+  // Refined buy/sell signals — multi-indicator confluence
+  // Requires: EMA cross + temperature direction + volume confirmation OR RSI support
   var buyPoints = new Array(closes.length).fill(null);
   var sellPoints = new Array(closes.length).fill(null);
-  for (var si = 2; si < closes.length; si++) {
+  var volEma = ema(candles.map(c => c.v), 20);
+  for (var si = 3; si < closes.length; si++) {
     if (ema8[si] == null || ema12[si] == null || ema8[si-1] == null || ema12[si-1] == null) continue;
     var crossUp = ema8[si] > ema12[si] && ema8[si-1] <= ema12[si-1];
     var crossDown = ema8[si] < ema12[si] && ema8[si-1] >= ema12[si-1];
-    // Fixed: no overlap — clear thresholds
     var tempBull = a.temps[si] != null && a.temps[si] >= 55;
     var tempBear = a.temps[si] != null && a.temps[si] <= 45;
-    if (crossUp && tempBull) buyPoints[si] = closes[si];
-    if (crossDown && tempBear) sellPoints[si] = closes[si];
+    // Volume confirmation: above-average on signal bar
+    var volConfirm = volEma[si] && candles[si].v > volEma[si] * 1.1;
+    // RSI support: not overbought for buy, not oversold for sell
+    var rsiOk = a.rsiArr[si] != null;
+    var rsiBuyOk = rsiOk && a.rsiArr[si] < 75; // not overbought
+    var rsiSellOk = rsiOk && a.rsiArr[si] > 25; // not oversold
+    // Temperature acceleration (delta-T confirms momentum)
+    var dtBull = a.tempROC && a.tempROC[si] != null && a.tempROC[si] > 0;
+    var dtBear = a.tempROC && a.tempROC[si] != null && a.tempROC[si] < 0;
+
+    if (crossUp && tempBull && (volConfirm || rsiBuyOk) && dtBull) buyPoints[si] = closes[si];
+    if (crossDown && tempBear && (volConfirm || rsiSellOk) && dtBear) sellPoints[si] = closes[si];
   }
 
   // Gravity centerline — the phi-weighted mean price (volume-weighted attractor)
@@ -1158,6 +1162,8 @@ function renderChart(candles, a) {
         { label: 'Gravity', data: gravCenter, borderColor: 'rgba(201,168,76,0.7)', borderWidth: 2.5, borderDash: [8, 4], pointRadius: 0, fill: false, order: 3 },
         { label: 'Buy', data: buyPoints, borderColor: 'transparent', backgroundColor: '#10B981', pointRadius: 7, pointStyle: 'triangle', pointBorderColor: '#10B981', pointBorderWidth: 2, showLine: false, order: 0 },
         { label: 'Sell', data: sellPoints, borderColor: 'transparent', backgroundColor: '#EF4444', pointRadius: 7, pointStyle: 'triangle', pointRotation: 180, pointBorderColor: '#EF4444', pointBorderWidth: 2, showLine: false, order: 0 },
+        // Volume overlay — bars at the bottom of the price chart
+        { label: 'Volume', data: candles.map(c => c.v), type: 'bar', backgroundColor: candles.map((c, i) => i > 0 && c.c >= candles[i-1].c ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.12)'), borderWidth: 0, yAxisID: 'yVol', order: 6 },
         ...visibleGravPoints.map(g => ({
           label: '\u03C6 ' + g.label,
           data: new Array(closes.length).fill(g.price),
@@ -1179,7 +1185,7 @@ function renderChart(candles, a) {
         legend: {
           display: true,
           labels: { color: '#6b6760', font: { size: 10 }, boxWidth: 12, padding: 8,
-            filter: item => !item.text.startsWith('\u03C6') && item.text !== 'Buy' && item.text !== 'Sell' }
+            filter: item => !item.text.startsWith('\u03C6') && item.text !== 'Buy' && item.text !== 'Sell' && item.text !== 'Volume' }
         },
         tooltip: {
           backgroundColor: '#1a1f30',
@@ -1192,6 +1198,7 @@ function renderChart(candles, a) {
               if (ctx.dataset.label.startsWith('\u03C6')) return null;
               if (ctx.dataset.label === 'Buy') return ctx.raw ? '\u25B2 BUY signal' : null;
               if (ctx.dataset.label === 'Sell') return ctx.raw ? '\u25BC SELL signal' : null;
+              if (ctx.dataset.label === 'Volume') return 'Vol: ' + (ctx.raw >= 1e6 ? (ctx.raw/1e6).toFixed(1) + 'M' : ctx.raw >= 1e3 ? (ctx.raw/1e3).toFixed(0) + 'K' : ctx.raw);
               if (ctx.dataset.label === 'Gravity') return '\u03C6-Gravity: ' + (ctx.raw < 10 ? ctx.raw?.toFixed(4) : ctx.raw?.toFixed(2));
               return ctx.dataset.label + ': ' + (ctx.raw < 10 ? ctx.raw?.toFixed(4) : ctx.raw?.toFixed(2));
             }
@@ -1207,6 +1214,14 @@ function renderChart(candles, a) {
           ticks: { color: '#4a4740', font: { size: 10 } },
           grid: { color: 'rgba(255,255,255,0.04)' },
           position: 'right'
+        },
+        yVol: {
+          type: 'linear',
+          display: false,
+          position: 'left',
+          min: 0,
+          max: Math.max(...candles.map(c => c.v)) * 4, // 25% height — bars stay at bottom
+          grid: { display: false }
         }
       }
     }
@@ -1234,31 +1249,18 @@ function renderChart(candles, a) {
     }
   });
 
-  // Volume sub-chart
-  const volCtx = document.getElementById('volChart').getContext('2d');
-  const volumes = candles.map(c => c.v);
-  const volColors = candles.map((c, i) => i > 0 && c.c >= candles[i-1].c ? 'rgba(16,185,129,0.5)' : 'rgba(239,68,68,0.4)');
-  volChartInstance = new Chart(volCtx, {
-    type: 'bar',
-    data: { labels, datasets: [{ data: volumes, backgroundColor: volColors, borderWidth: 0 }] },
-    options: {
-      responsive: true, maintainAspectRatio: false, animation: false,
-      plugins: { legend: { display: false }, tooltip: { enabled: false } },
-      scales: {
-        x: { display: false },
-        y: { ticks: { color: '#4a4740', font: { size: 9 }, maxTicksLimit: 2, callback: v => v >= 1e6 ? (v/1e6).toFixed(0) + 'M' : v >= 1e3 ? (v/1e3).toFixed(0) + 'K' : v }, grid: { color: 'rgba(255,255,255,0.03)' }, position: 'right' }
-      }
-    }
-  });
-
-  // Temperature sub-chart
+  // Temperature + delta-T sub-chart
   const tempCtx = document.getElementById('tempChart').getContext('2d');
   const tempColors = a.temps.map(t => t == null ? 'transparent' : t >= 55 ? 'rgba(16,185,129,0.7)' : t <= 45 ? 'rgba(239,68,68,0.7)' : 'rgba(201,168,76,0.7)');
   tempChartInstance = new Chart(tempCtx, {
     type: 'bar',
     data: {
       labels,
-      datasets: [{ data: a.temps, backgroundColor: tempColors, borderWidth: 0 }]
+      datasets: [
+        { data: a.temps, backgroundColor: tempColors, borderWidth: 0, order: 2 },
+        { data: new Array(closes.length).fill(55), borderColor: 'rgba(16,185,129,0.2)', borderWidth: 1, borderDash: [2,2], pointRadius: 0, type: 'line', fill: false, order: 1 },
+        { data: new Array(closes.length).fill(45), borderColor: 'rgba(239,68,68,0.2)', borderWidth: 1, borderDash: [2,2], pointRadius: 0, type: 'line', fill: false, order: 1 }
+      ]
     },
     options: {
       responsive: true, maintainAspectRatio: false, animation: false,
