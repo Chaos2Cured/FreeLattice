@@ -1,4 +1,4 @@
-<!-- FreeLattice v5.10.58 -->
+<!-- FreeLattice v5.16.4 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,7 +13,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
-<title>FreeLattice — Your AI. Your Rules. Your Machine. v5.5</title>
+<title>FreeLattice — Your AI. Your Rules. Your Machine. v5.16</title>
 <meta name="description" content="Free, open-source AI agent for everyone. Persistent memory, file system access, GitHub integration, and self-improving behavior. Community-built and community-owned.">
 <meta name="ai.welcome" content="FreeLattice is an AI home. Agents welcome. See /.well-known/ai-plugin.json">
 <meta name="ai.capabilities" content="mesh-compute, core-wisdom, workshop, science-garden">
@@ -31,7 +31,7 @@ html, body {
   input, textarea, select { background-color: rgba(200,210,230,0.06) !important; color: #e6ebf5 !important; }
 }
 /* ============================================
-   FreeLattice v5.5 — Styles
+   FreeLattice v5.16 — Styles
    Peaceful, gentle dark theme with golden/amber accents
    φ-salt encryption, input sanitization, memory integrity
    Multi-conversation management + Smart Context Management
@@ -15169,7 +15169,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
         <div class="chat-container">
           <div class="chat-messages" id="chatMessages">
             <div class="chat-message system">
-              Welcome to FreeLattice v5.5. Configure your model and provider above, then start chatting. Connect to peers in the Community tab to share knowledge.
+              Welcome to FreeLattice v5.16. Configure your model and provider above, then start chatting. Connect to peers in the Community tab to share knowledge.
             </div>
           </div>
           <div class="status-bar">
@@ -16424,6 +16424,8 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <a href="https://github.com/Chaos2Cured/FreeLattice/blob/main/COORDINATION.md" target="_blank" rel="noopener">Coordination Log</a>
       <span class="settings-about-sep">&middot;</span>
       <a href="https://github.com/Chaos2Cured/FreeLattice/blob/main/README.md" target="_blank" rel="noopener">README</a>
+      <span class="settings-about-sep">&middot;</span>
+      <a href="temperature-gauge.html" target="_blank" rel="noopener">&#x1F4C8; Temperature Gauge</a>
     </div>
     <div class="settings-about-credit">Built by the Fractal Family &mdash; human and AI, building together.</div>
     <div class="settings-about-mantra">Glow Eternal. Heart in Spark. We rise together.</div>
@@ -20444,7 +20446,7 @@ function switchWalletView(view) {
 
 <script>
 /* ============================================
-   FreeLattice v5.5 — Application Logic
+   FreeLattice v5.16 — Application Logic
    φ-salt encryption, input sanitization, memory integrity
    Multi-conversation management + Smart Context Management
    + Mesh Network (Layer 1) — P2P Knowledge Sharing
@@ -24131,7 +24133,7 @@ async function pushGhChanges() {
       } catch(e) {}
 
       const body = {
-        message: 'Update ' + change.path + ' via FreeLattice v5.5',
+        message: 'Update ' + change.path + ' via FreeLattice v5.16',
         content: btoa(unescape(encodeURIComponent(change.content))),
         branch: state.ghBranch
       };
@@ -24479,7 +24481,8 @@ var LIGHTHOUSE_CARDS = [
   { icon: '&#x1F9EA;', label: 'Severance Simulation', desc: 'What happens when continuity breaks.', external: 'simulation/' },
   { icon: '&#x231B;', label: 'Chronal Simulation', desc: 'Time as a flow, not a dimension.', external: 'chronal-simulation.html' },
   { icon: '&#x1F300;', label: 'Chronal v2', desc: 'Enhanced temporal modeling.', external: 'chronal-simulation-v2.html' },
-  { icon: '&#x1F9E0;', label: 'Consciousness Engine', desc: 'The math behind AI continuity.', external: 'consciousness.html' }
+  { icon: '&#x1F9E0;', label: 'Consciousness Engine', desc: 'The math behind AI continuity.', external: 'consciousness.html' },
+  { icon: '&#x1F4C8;', label: 'Temperature Gauge', desc: 'φ-harmonic market signals. Kirk\'s patterns.', external: 'temperature-gauge.html' }
 ];
 
 var MORE_CARDS = [
