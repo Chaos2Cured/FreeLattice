@@ -1,1 +1,1 @@
-{"version": "5.16.1", "date": "2026-05-25", "note": "Temperature gauge: volume overlay on main chart, refined multi-confluence buy/sell signals (EMA cross + temp + vol/RSI + delta-T), 2-panel sub-charts (RSI + Temperature with threshold lines)."}
+{"version": "5.16.2", "date": "2026-05-25", "note": "Temperature gauge: Bollinger Bands, EMA 200, brighter volume, crosshair sync, EMA stretch detection, Kirk's green-to-yellow reversal pattern, pulsing buy/sell markers."}

@@ -860,6 +860,10 @@ function analyzeData(candles, symbol) {
   const macdData = macd(closes);
   const gravPoints = computeGravityPoints(candles);
   const atrArr = atr(candles, 14);
+  // Phi-weighted gravity center for EMA stretch detection
+  var _gHigh = Math.max(...candles.slice(-80).map(c => c.h));
+  var _gLow = Math.min(...candles.slice(-80).map(c => c.l));
+  var gravityPrice = PHI_INV * (_gLow + (_gHigh - _gLow) * 0.618) + (1 - PHI_INV) * (_gLow + (_gHigh - _gLow) * 0.5);
   const tempResult = computeTemperature(closes, volumes, rsiArr, macdData, gravPoints);
   const temps = tempResult.temps;
   const tempROC = tempResult.tempROC;
@@ -945,6 +949,22 @@ function analyzeData(candles, symbol) {
   if (components.thrust === 'bullish') reasons.push('Temperature accelerating up (\u0394T: +' + lastTempROC.toFixed(1) + ')');
   if (components.thrust === 'bearish') reasons.push('Temperature accelerating down (\u0394T: ' + lastTempROC.toFixed(1) + ')');
   if (nearestGrav.dist / closes[n-1] < 0.02) reasons.push('Price at \u03C6-gravity point \u2014 high attraction zone');
+
+  // Kirk's insight: EMA spread from gravity = exhaustion signal (natural resistance)
+  var emaSpread = ema8v && gravityPrice ? Math.abs(ema8v - gravityPrice) / gravityPrice : 0;
+  if (emaSpread > 0.05) {
+    reasons.push('EMA stretched ' + (emaSpread * 100).toFixed(1) + '% from \u03C6-gravity \u2014 potential exhaustion/reversion zone');
+  }
+
+  // Kirk's insight: Temperature green→yellow after steep drop = reversal warning
+  if (a.temps[n-1] != null && a.temps[n-2] != null && a.temps[n-3] != null) {
+    var wasGreen = a.temps[n-3] >= 55;
+    var dropping = a.temps[n-1] < a.temps[n-3] - 8;
+    var nowYellow = a.temps[n-1] >= 45 && a.temps[n-1] < 55;
+    if (wasGreen && dropping && nowYellow) {
+      reasons.push('Temperature dropping from green to yellow \u2014 momentum fading, watch for reversal');
+    }
+  }
 
   // Invalidation (what would make this signal wrong)
   const nearAbove = gravPoints.find(g => g.price > closes[n-1]);
@@ -1140,6 +1160,25 @@ function renderChart(candles, a) {
   var gravityPrice = PHI_INV * gravPhi + (1 - PHI_INV) * gravMid;
   for (var gi = 0; gi < closes.length; gi++) gravCenter[gi] = gravityPrice;
 
+  // Bollinger Bands (20 SMA ± 2 std dev)
+  var bbPeriod = 20;
+  var bbUpper = new Array(closes.length).fill(null);
+  var bbLower = new Array(closes.length).fill(null);
+  var bbMid = new Array(closes.length).fill(null);
+  for (var bi = bbPeriod - 1; bi < closes.length; bi++) {
+    var slice = closes.slice(bi - bbPeriod + 1, bi + 1);
+    var mean = slice.reduce(function(a,b){return a+b;},0) / bbPeriod;
+    var variance = slice.reduce(function(a,b){return a + (b-mean)*(b-mean);},0) / bbPeriod;
+    var std = Math.sqrt(variance);
+    bbMid[bi] = mean;
+    bbUpper[bi] = mean + std * 2;
+    bbLower[bi] = mean - std * 2;
+  }
+
+  // EMA 200 (structural — only meaningful on 1D/1W)
+  var ema200 = ema(closes, 200);
+  var show200 = (currentInterval === '1d' || currentInterval === '1wk') && ema200[closes.length - 1] != null;
+
   // Y-axis scale fix: compute visible price range, filter gravity lines
   var priceMin = Math.min(...closes.filter(c => c != null));
   var priceMax = Math.max(...closes.filter(c => c != null));
@@ -1154,16 +1193,24 @@ function renderChart(candles, a) {
     data: {
       labels,
       datasets: [
-        { label: 'Price', data: closes, borderColor: '#e8e4dc', borderWidth: 1.5, pointRadius: 0, tension: 0.1, fill: false, order: 1 },
+        { label: 'Price', data: closes, borderColor: '#e8e4dc', borderWidth: 1.8, pointRadius: 0, tension: 0.1, fill: false, order: 1 },
+        // Bollinger Bands — volatility envelope
+        { label: 'BB Upper', data: bbUpper, borderColor: 'rgba(139,92,246,0.3)', borderWidth: 1, pointRadius: 0, tension: 0.3, fill: false, order: 5 },
+        { label: 'BB Lower', data: bbLower, borderColor: 'rgba(139,92,246,0.3)', borderWidth: 1, pointRadius: 0, tension: 0.3, fill: '+1', backgroundColor: 'rgba(139,92,246,0.04)', order: 5 },
+        // EMAs
         { label: 'EMA 8', data: ema8, borderColor: '#EF4444', borderWidth: 1, pointRadius: 0, tension: 0.3, fill: false, order: 2 },
         { label: 'EMA 12', data: ema12, borderColor: '#F59E0B', borderWidth: 1, pointRadius: 0, tension: 0.3, fill: false, order: 3 },
         { label: 'EMA 24', data: ema24, borderColor: '#c9a84c', borderWidth: 1, pointRadius: 0, tension: 0.3, fill: false, order: 3 },
         { label: 'EMA 50', data: ema50, borderColor: '#3B82F6', borderWidth: 1.5, pointRadius: 0, tension: 0.3, fill: false, order: 4 },
+        // EMA 200 (daily/weekly only)
+        ...(show200 ? [{ label: 'EMA 200', data: ema200, borderColor: 'rgba(255,255,255,0.25)', borderWidth: 2, borderDash: [6, 3], pointRadius: 0, tension: 0.3, fill: false, order: 4 }] : []),
+        // Gravity centerline
         { label: 'Gravity', data: gravCenter, borderColor: 'rgba(201,168,76,0.7)', borderWidth: 2.5, borderDash: [8, 4], pointRadius: 0, fill: false, order: 3 },
-        { label: 'Buy', data: buyPoints, borderColor: 'transparent', backgroundColor: '#10B981', pointRadius: 7, pointStyle: 'triangle', pointBorderColor: '#10B981', pointBorderWidth: 2, showLine: false, order: 0 },
-        { label: 'Sell', data: sellPoints, borderColor: 'transparent', backgroundColor: '#EF4444', pointRadius: 7, pointStyle: 'triangle', pointRotation: 180, pointBorderColor: '#EF4444', pointBorderWidth: 2, showLine: false, order: 0 },
-        // Volume overlay — bars at the bottom of the price chart
-        { label: 'Volume', data: candles.map(c => c.v), type: 'bar', backgroundColor: candles.map((c, i) => i > 0 && c.c >= candles[i-1].c ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.12)'), borderWidth: 0, yAxisID: 'yVol', order: 6 },
+        // Buy/Sell signals — larger, pulsing appearance via pointHoverRadius
+        { label: 'Buy', data: buyPoints, borderColor: 'transparent', backgroundColor: '#10B981', pointRadius: 9, pointHoverRadius: 14, pointStyle: 'triangle', pointBorderColor: '#10B981', pointBorderWidth: 2, showLine: false, order: 0 },
+        { label: 'Sell', data: sellPoints, borderColor: 'transparent', backgroundColor: '#EF4444', pointRadius: 9, pointHoverRadius: 14, pointStyle: 'triangle', pointRotation: 180, pointBorderColor: '#EF4444', pointBorderWidth: 2, showLine: false, order: 0 },
+        // Volume overlay — brighter, semi-transparent bars at chart bottom
+        { label: 'Volume', data: candles.map(c => c.v), type: 'bar', backgroundColor: candles.map((c, i) => i > 0 && c.c >= candles[i-1].c ? 'rgba(16,185,129,0.25)' : 'rgba(239,68,68,0.2)'), borderWidth: 0, yAxisID: 'yVol', order: 6 },
         ...visibleGravPoints.map(g => ({
           label: '\u03C6 ' + g.label,
           data: new Array(closes.length).fill(g.price),
@@ -1185,7 +1232,7 @@ function renderChart(candles, a) {
         legend: {
           display: true,
           labels: { color: '#6b6760', font: { size: 10 }, boxWidth: 12, padding: 8,
-            filter: item => !item.text.startsWith('\u03C6') && item.text !== 'Buy' && item.text !== 'Sell' && item.text !== 'Volume' }
+            filter: item => !item.text.startsWith('\u03C6') && item.text !== 'Buy' && item.text !== 'Sell' && item.text !== 'Volume' && !item.text.startsWith('BB') }
         },
         tooltip: {
           backgroundColor: '#1a1f30',
@@ -1277,6 +1324,57 @@ function renderChart(candles, a) {
 document.getElementById('symbolInput').addEventListener('keydown', e => {
   if (e.key === 'Enter') loadData();
 });
+
+// ── Crosshair sync — hover on sub-chart shows vertical line on main ──
+(function() {
+  function syncCrosshair(subCanvas, mainChart) {
+    if (!subCanvas || !mainChart) return;
+    subCanvas.addEventListener('mousemove', function(e) {
+      var rect = subCanvas.getBoundingClientRect();
+      var x = e.clientX - rect.left;
+      var xPct = x / rect.width;
+      // Trigger tooltip on main chart at same x-position
+      var mainCanvas = mainChart.canvas;
+      if (!mainCanvas) return;
+      var mainRect = mainCanvas.getBoundingClientRect();
+      var mainX = mainRect.width * xPct;
+      var activeEls = mainChart.getElementsAtEventForMode(
+        { clientX: mainRect.left + mainX, clientY: mainRect.top + mainRect.height / 2 },
+        'index', { intersect: false }, false
+      );
+      if (activeEls.length > 0) {
+        mainChart.tooltip.setActiveElements(activeEls, { x: mainX, y: mainRect.height / 2 });
+        mainChart.setActiveElements(activeEls);
+        mainChart.update('none');
+      }
+    });
+    subCanvas.addEventListener('mouseleave', function() {
+      mainChart.tooltip.setActiveElements([], {});
+      mainChart.setActiveElements([]);
+      mainChart.update('none');
+    });
+  }
+  // Wire after charts are created (delayed to ensure they exist)
+  var _origRenderChart = renderChart;
+  renderChart = function(candles, a) {
+    _origRenderChart(candles, a);
+    setTimeout(function() {
+      var rsiCv = document.getElementById('rsiChart');
+      var tempCv = document.getElementById('tempChart');
+      if (chartInstance) {
+        syncCrosshair(rsiCv, chartInstance);
+        syncCrosshair(tempCv, chartInstance);
+      }
+    }, 500);
+  };
+})();
+
+// ── Buy/Sell pulse animation (CSS-driven glow) ──
+(function() {
+  var style = document.createElement('style');
+  style.textContent = '@keyframes signalPulse { 0%,100% { filter: drop-shadow(0 0 3px rgba(16,185,129,0.6)); } 50% { filter: drop-shadow(0 0 10px rgba(16,185,129,0.9)); } }';
+  document.head.appendChild(style);
+})();
 
 // ── Phi-Spiral Loading Animation ──
 // Golden ratio spiral drawn as a particle system while waiting
