@@ -396,6 +396,15 @@ canvas.sub-canvas { width: 100% !important; height: 80px !important; }
 </div>
 
 <!-- Custom Indicator Builder -->
+<!-- Signal Layer Toggles -->
+<div id="layerToggles" style="display:none;padding:6px 16px;background:var(--bg2);border-bottom:1px solid var(--border);font-size:0.72rem;color:var(--muted);display:none;">
+  <span style="color:var(--gold);font-weight:600;margin-right:8px;">Signal Layers:</span>
+  <label style="cursor:pointer;margin-right:10px;"><input type="checkbox" id="layerEma" checked onchange="if(lastCandles&&lastAnalysis)renderChart(lastCandles,lastAnalysis)" style="accent-color:var(--gold);"> EMA</label>
+  <label style="cursor:pointer;margin-right:10px;"><input type="checkbox" id="layerVol" checked onchange="if(lastCandles&&lastAnalysis)renderChart(lastCandles,lastAnalysis)" style="accent-color:var(--gold);"> Volume</label>
+  <label style="cursor:pointer;margin-right:10px;"><input type="checkbox" id="layerDt" onchange="if(lastCandles&&lastAnalysis)renderChart(lastCandles,lastAnalysis)" style="accent-color:var(--gold);"> Acceleration</label>
+  <span style="opacity:0.5;font-size:0.65rem;">(Temperature always required)</span>
+</div>
+
 <div id="customPanel" style="display:none;padding:12px 16px;background:var(--bg2);border-bottom:1px solid var(--border);">
   <div style="display:flex;gap:8px;align-items:flex-start;flex-wrap:wrap;">
     <div style="flex:1;min-width:200px;">
@@ -1335,6 +1344,7 @@ function renderAll(candles, a, symbol) {
   document.getElementById('mainChart').style.display = 'block';
   document.getElementById('subCharts').style.display = 'grid';
   document.getElementById('subChartsControls').style.display = 'block';
+  document.getElementById('layerToggles').style.display = 'block';
   // Golden glow pulse on chart load
   var chartWrap = document.getElementById('chartWrap');
   if (chartWrap) { chartWrap.classList.remove('loaded'); void chartWrap.offsetWidth; chartWrap.classList.add('loaded'); }
@@ -1380,39 +1390,44 @@ function renderChart(candles, a) {
   const ema50 = ema(closes, 50);
 
   // ═══ Kirk's Layered Signal Architecture ═══
-  // ALL THREE layers must agree. No exceptions.
-  // Layer 1 (Temperature): zone transition is the trigger
-  // Layer 2 (EMA): alignment confirms trend direction
-  // Layer 3 (Volume): above-average volume confirms conviction
-  // No sells in red zone. No buys in green zone.
+  // Layer 1 (Temperature): ALWAYS required — zone transition is the trigger
+  // Layer 2 (EMA): alignment confirms trend — toggleable
+  // Layer 3 (Volume): above-average confirms conviction — toggleable
+  // Layer 4 (Acceleration): ΔT confirms momentum building — toggleable
+  // Temperature is weighted highest — it's the ONLY required layer.
   var buyPoints = new Array(closes.length).fill(null);
   var sellPoints = new Array(closes.length).fill(null);
   var volEma20 = ema(candles.map(function(c){return c.v;}), 20);
+
+  // Layer toggles (persisted)
+  var layerEma = !(document.getElementById('layerEma') && !document.getElementById('layerEma').checked);
+  var layerVol = !(document.getElementById('layerVol') && !document.getElementById('layerVol').checked);
+  var layerDt = document.getElementById('layerDt') && document.getElementById('layerDt').checked;
+
   for (var si = 1; si < closes.length; si++) {
     if (a.temps[si] == null || a.temps[si-1] == null) continue;
 
-    // Layer 1: Temperature zone transition
-    // BUY only: was in red/yellow, now crossing INTO green (above 55)
-    //   OR: was in red (<45), now crossing into yellow (above 45)
+    // Layer 1: Temperature zone transition (ALWAYS required)
     var tempBuy = (a.temps[si-1] < 55 && a.temps[si] >= 55) ||
                   (a.temps[si-1] < 45 && a.temps[si] >= 45);
-    // SELL only: was in green (>=55), now dropping into yellow (below 55)
     var tempSell = (a.temps[si-1] >= 55 && a.temps[si] < 55);
 
     if (tempBuy) {
-      // Layer 2: EMA 8 above EMA 12 (trend is up)
-      var emaUp = ema8[si] != null && ema12[si] != null && ema8[si] > ema12[si];
-      // Layer 3: Volume above 20-bar average (conviction)
-      var volUp = volEma20[si] && candles[si].v > volEma20[si];
-      // ALL THREE must agree
-      if (emaUp && volUp) buyPoints[si] = closes[si];
+      var pass = true;
+      // Layer 2: EMA alignment (if enabled)
+      if (layerEma && !(ema8[si] != null && ema12[si] != null && ema8[si] > ema12[si])) pass = false;
+      // Layer 3: Volume (if enabled)
+      if (layerVol && !(volEma20[si] && candles[si].v > volEma20[si])) pass = false;
+      // Layer 4: Acceleration (if enabled)
+      if (layerDt && !(a.tempROC && a.tempROC[si] != null && a.tempROC[si] > 0)) pass = false;
+      if (pass) buyPoints[si] = closes[si];
     }
 
     if (tempSell) {
-      // Layer 2: EMA 8 below EMA 12 (trend weakening)
-      var emaDn = ema8[si] != null && ema12[si] != null && ema8[si] < ema12[si];
-      // Layer 3: Volume above average (selling conviction)
-      var volDn = volEma20[si] && candles[si].v > volEma20[si];
+      var sPass = true;
+      if (layerEma && !(ema8[si] != null && ema12[si] != null && ema8[si] < ema12[si])) sPass = false;
+      if (layerVol && !(volEma20[si] && candles[si].v > volEma20[si])) sPass = false;
+      if (layerDt && !(a.tempROC && a.tempROC[si] != null && a.tempROC[si] < 0)) sPass = false;
       // ALL THREE must agree
       if (emaDn && volDn) sellPoints[si] = closes[si];
     }
@@ -1492,7 +1507,9 @@ function renderChart(candles, a) {
         { label: 'Sell', data: sellPoints, borderColor: 'transparent', backgroundColor: '#EF4444', pointRadius: sigR, pointHoverRadius: sigH, pointStyle: 'triangle', pointRotation: 180, pointBorderColor: '#f87171', pointBorderWidth: sigB, showLine: false, order: 0 },
         // (Old diamond signals removed — unified temperature-first system)
         // Volume overlay — brighter, semi-transparent bars at chart bottom
-        { label: 'Volume', data: candles.map(c => c.v), type: 'bar', backgroundColor: candles.map((c, i) => i > 0 && c.c >= candles[i-1].c ? 'rgba(16,185,129,0.25)' : 'rgba(239,68,68,0.2)'), borderWidth: 0, yAxisID: 'yVol', order: 6 },
+        { label: 'Volume', data: candles.map(c => c.v), type: 'bar', backgroundColor: candles.map((c, i) => i > 0 && c.c >= candles[i-1].c ? 'rgba(16,185,129,0.35)' : 'rgba(239,68,68,0.3)'), borderWidth: 0, yAxisID: 'yVol', order: 6 },
+        // Temperature overlay — subtle colored zone fill behind price
+        { label: 'Temp Zone', data: a.temps, type: 'bar', backgroundColor: a.temps.map(function(t) { if (t==null) return 'transparent'; if (t>=55) return 'rgba(16,185,129,0.06)'; if (t<=45) return 'rgba(239,68,68,0.06)'; return 'rgba(201,168,76,0.04)'; }), borderWidth: 0, yAxisID: 'yTemp', order: 8 },
         ...visibleGravPoints.map(g => ({
           label: '\u03C6 ' + g.label,
           data: new Array(closes.length).fill(g.price),
@@ -1514,7 +1531,7 @@ function renderChart(candles, a) {
         legend: {
           display: true,
           labels: { color: '#6b6760', font: { size: 10 }, boxWidth: 12, padding: 8,
-            filter: item => !item.text.startsWith('\u03C6') && !item.text.includes('Buy') && !item.text.includes('Sell') && item.text !== 'Volume' && !item.text.startsWith('BB') }
+            filter: item => !item.text.startsWith('\u03C6') && !item.text.includes('Buy') && !item.text.includes('Sell') && item.text !== 'Volume' && item.text !== 'Temp Zone' && !item.text.startsWith('BB') }
         },
         tooltip: {
           backgroundColor: 'rgba(26,31,48,0.95)',
@@ -1559,7 +1576,14 @@ function renderChart(candles, a) {
           display: false,
           position: 'left',
           min: 0,
-          max: Math.max(...candles.map(c => c.v)) * 4, // 25% height — bars stay at bottom
+          max: Math.max(...candles.map(c => c.v)) * 3.5,
+          grid: { display: false }
+        },
+        yTemp: {
+          type: 'linear',
+          display: false,
+          min: 0,
+          max: 100,
           grid: { display: false }
         }
       }

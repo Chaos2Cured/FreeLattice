@@ -1,1 +1,1 @@
-{"version": "5.20.1", "date": "2026-05-26", "note": "Layered signals: ALL THREE must agree — temperature transition AND EMA alignment AND volume. No OR logic. Fewer signals, higher quality. Backtest matches."}
+{"version": "5.21.0", "date": "2026-05-26", "note": "4-layer signals with toggleable layers. Acceleration (ΔT) as Layer 4. Temperature overlay on main chart. Brighter volume. Layer control panel."}
