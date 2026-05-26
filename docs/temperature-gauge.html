@@ -1428,8 +1428,7 @@ function renderChart(candles, a) {
       if (layerEma && !(ema8[si] != null && ema12[si] != null && ema8[si] < ema12[si])) sPass = false;
       if (layerVol && !(volEma20[si] && candles[si].v > volEma20[si])) sPass = false;
       if (layerDt && !(a.tempROC && a.tempROC[si] != null && a.tempROC[si] < 0)) sPass = false;
-      // ALL THREE must agree
-      if (emaDn && volDn) sellPoints[si] = closes[si];
+      if (sPass) sellPoints[si] = closes[si];
     }
   }
 
