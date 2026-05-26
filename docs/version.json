@@ -1,1 +1,1 @@
-{"version": "5.17.0", "date": "2026-05-25", "note": "Custom Indicator Builder: type any math expression, see it as a live sub-chart. Safe evaluator (no eval). Max 3 indicators, persisted in localStorage. The gauge becomes a platform."}
+{"version": "5.18.0", "date": "2026-05-25", "note": "Pulsing signal glows, compact tooltip, pinch-zoom, Kirk's temperature transition signals (diamonds), RSI+Temp stacking toggle, bigger buy/sell markers."}

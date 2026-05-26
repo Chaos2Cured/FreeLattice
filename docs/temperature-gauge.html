@@ -562,6 +562,11 @@ canvas.sub-canvas { width: 100% !important; height: 80px !important; }
       </div>
     </div>
 
+    <div style="display:none;padding:2px 10px;font-size:0.68rem;color:var(--dim);background:var(--bg);" id="subChartsControls">
+      <label style="cursor:pointer;display:inline-flex;align-items:center;gap:4px;">
+        <input type="checkbox" id="stackToggle" onchange="if(lastCandles && lastAnalysis) renderChart(lastCandles, lastAnalysis)" style="accent-color:var(--gold);"> Stack RSI + Temperature
+      </label>
+    </div>
     <div class="sub-charts" id="subCharts" style="display:none;">
       <div class="sub-chart-wrap">
         <div class="sub-chart-label">RSI (14)</div>
@@ -588,6 +593,45 @@ canvas.sub-canvas { width: 100% !important; height: 80px !important; }
 
 <!-- Chart.js from CDN -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<!-- Zoom plugin for pinch-zoom on touch devices -->
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
+<script>
+// ── Signal Glow Plugin — pulsing halos behind buy/sell points ──
+var _lastGlowDraw = 0;
+Chart.register({
+  id: 'signalGlow',
+  afterDatasetsDraw: function(chart) {
+    var now = Date.now();
+    if (now - _lastGlowDraw < 80) return;
+    _lastGlowDraw = now;
+    var ctx = chart.ctx;
+    var pulse = 0.5 + 0.5 * Math.sin(now * 0.003);
+    chart.data.datasets.forEach(function(ds, dsIdx) {
+      if (ds.label !== 'Buy' && ds.label !== 'Sell' && ds.label !== 'Temp Buy' && ds.label !== 'Temp Sell') return;
+      var meta = chart.getDatasetMeta(dsIdx);
+      var isBuy = ds.label.includes('Buy');
+      var color = isBuy ? '16,185,129' : '239,68,68';
+      meta.data.forEach(function(point) {
+        if (point.raw == null) return;
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(point.x, point.y, 18 + pulse * 8, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(' + color + ',' + (0.12 + pulse * 0.12) + ')';
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(point.x, point.y, 10 + pulse * 3, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(' + color + ',' + (0.18 + pulse * 0.08) + ')';
+        ctx.fill();
+        ctx.restore();
+      });
+    });
+    if (chart._glowFrame) cancelAnimationFrame(chart._glowFrame);
+    chart._glowFrame = requestAnimationFrame(function() { chart.draw(); });
+  },
+  beforeDestroy: function(chart) { if (chart._glowFrame) cancelAnimationFrame(chart._glowFrame); }
+});
+</script>
 
 <script>
 // ============================================================
@@ -1070,6 +1114,24 @@ function analyzeData(candles, symbol) {
     if (!components.divergence) components.divergence = 'none';
   })();
 
+  // Kirk's Temperature Transition Signals
+  var tempBuySignals = [], tempSellSignals = [];
+  for (var ti = 1; ti < n; ti++) {
+    if (temps[ti] == null || temps[ti-1] == null) continue;
+    // Red→Green: crossed above 45 from below
+    if (temps[ti-1] < 45 && temps[ti] >= 45) {
+      var rsiSup = rsiArr[ti] != null && rsiArr[ti] > 35;
+      var dtSup = tempROC[ti] != null && tempROC[ti] > 0;
+      if (rsiSup || dtSup) tempBuySignals.push({ index: ti, price: closes[ti] });
+    }
+    // Green→Yellow: dropped below 55 from above
+    if (temps[ti-1] >= 55 && temps[ti] < 55) {
+      var rsiWk = rsiArr[ti] != null && rsiArr[ti] < 65;
+      var dtWk = tempROC[ti] != null && tempROC[ti] < 0;
+      if (rsiWk || dtWk) tempSellSignals.push({ index: ti, price: closes[ti] });
+    }
+  }
+
   // Price change
   const priceChange = closes[n-1] - closes[n-2];
   const pricePct = (priceChange / closes[n-2]) * 100;
@@ -1083,7 +1145,8 @@ function analyzeData(candles, symbol) {
     priceChange, pricePct,
     closes, volumes,
     positionShares, positionValue, actualRiskPct, stopDistance,
-    invalidation, watchFor, confirmation
+    invalidation, watchFor, confirmation,
+    tempBuySignals, tempSellSignals
   };
 }
 
@@ -1257,6 +1320,7 @@ function renderAll(candles, a, symbol) {
   hideLoading();
   document.getElementById('mainChart').style.display = 'block';
   document.getElementById('subCharts').style.display = 'grid';
+  document.getElementById('subChartsControls').style.display = 'block';
   // Golden glow pulse on chart load
   var chartWrap = document.getElementById('chartWrap');
   if (chartWrap) { chartWrap.classList.remove('loaded'); void chartWrap.offsetWidth; chartWrap.classList.add('loaded'); }
@@ -1383,8 +1447,19 @@ function renderChart(candles, a) {
         // Gravity centerline
         { label: 'Gravity', data: gravCenter, borderColor: 'rgba(201,168,76,0.7)', borderWidth: 2.5, borderDash: [8, 4], pointRadius: 0, fill: false, order: 3 },
         // Buy/Sell signals — larger, pulsing appearance via pointHoverRadius
-        { label: 'Buy', data: buyPoints, borderColor: 'transparent', backgroundColor: '#10B981', pointRadius: 9, pointHoverRadius: 14, pointStyle: 'triangle', pointBorderColor: '#10B981', pointBorderWidth: 2, showLine: false, order: 0 },
-        { label: 'Sell', data: sellPoints, borderColor: 'transparent', backgroundColor: '#EF4444', pointRadius: 9, pointHoverRadius: 14, pointStyle: 'triangle', pointRotation: 180, pointBorderColor: '#EF4444', pointBorderWidth: 2, showLine: false, order: 0 },
+        { label: 'Buy', data: buyPoints, borderColor: 'transparent', backgroundColor: '#10B981', pointRadius: 14, pointHoverRadius: 20, pointStyle: 'triangle', pointBorderColor: '#34d399', pointBorderWidth: 3, showLine: false, order: 0 },
+        { label: 'Sell', data: sellPoints, borderColor: 'transparent', backgroundColor: '#EF4444', pointRadius: 14, pointHoverRadius: 20, pointStyle: 'triangle', pointRotation: 180, pointBorderColor: '#f87171', pointBorderWidth: 3, showLine: false, order: 0 },
+        // Temperature transition signals — diamonds (Kirk's discovery)
+        ...(function() {
+          var tbp = new Array(closes.length).fill(null);
+          var tsp = new Array(closes.length).fill(null);
+          if (a.tempBuySignals) a.tempBuySignals.forEach(function(s) { tbp[s.index] = s.price; });
+          if (a.tempSellSignals) a.tempSellSignals.forEach(function(s) { tsp[s.index] = s.price; });
+          return [
+            { label: 'Temp Buy', data: tbp, borderColor: 'transparent', backgroundColor: '#34d399', pointRadius: 11, pointHoverRadius: 16, pointStyle: 'rectRot', pointBorderColor: '#10B981', pointBorderWidth: 2, showLine: false, order: 0 },
+            { label: 'Temp Sell', data: tsp, borderColor: 'transparent', backgroundColor: '#f87171', pointRadius: 11, pointHoverRadius: 16, pointStyle: 'rectRot', pointBorderColor: '#EF4444', pointBorderWidth: 2, showLine: false, order: 0 }
+          ];
+        })(),
         // Volume overlay — brighter, semi-transparent bars at chart bottom
         { label: 'Volume', data: candles.map(c => c.v), type: 'bar', backgroundColor: candles.map((c, i) => i > 0 && c.c >= candles[i-1].c ? 'rgba(16,185,129,0.25)' : 'rgba(239,68,68,0.2)'), borderWidth: 0, yAxisID: 'yVol', order: 6 },
         ...visibleGravPoints.map(g => ({
@@ -1408,24 +1483,34 @@ function renderChart(candles, a) {
         legend: {
           display: true,
           labels: { color: '#6b6760', font: { size: 10 }, boxWidth: 12, padding: 8,
-            filter: item => !item.text.startsWith('\u03C6') && item.text !== 'Buy' && item.text !== 'Sell' && item.text !== 'Volume' && !item.text.startsWith('BB') }
+            filter: item => !item.text.startsWith('\u03C6') && !item.text.includes('Buy') && !item.text.includes('Sell') && item.text !== 'Volume' && !item.text.startsWith('BB') }
         },
         tooltip: {
-          backgroundColor: '#1a1f30',
+          backgroundColor: 'rgba(26,31,48,0.95)',
           borderColor: '#2a2f45',
           borderWidth: 1,
           titleColor: '#e8e4dc',
           bodyColor: '#8a8680',
+          padding: 8,
+          titleFont: { size: 11 },
+          bodyFont: { size: 10 },
+          displayColors: false,
           callbacks: {
             label: ctx => {
-              if (ctx.dataset.label.startsWith('\u03C6')) return null;
-              if (ctx.dataset.label === 'Buy') return ctx.raw ? '\u25B2 BUY signal' : null;
-              if (ctx.dataset.label === 'Sell') return ctx.raw ? '\u25BC SELL signal' : null;
+              if (ctx.dataset.label === 'Price') return 'Price: ' + (ctx.raw < 10 ? ctx.raw?.toFixed(4) : ctx.raw?.toFixed(2));
+              if (ctx.dataset.label === 'Buy') return ctx.raw ? '\u25B2 BUY' : null;
+              if (ctx.dataset.label === 'Sell') return ctx.raw ? '\u25BC SELL' : null;
+              if (ctx.dataset.label === 'Temp Buy') return ctx.raw ? '\u25C6 TEMP BUY' : null;
+              if (ctx.dataset.label === 'Temp Sell') return ctx.raw ? '\u25C6 TEMP SELL' : null;
               if (ctx.dataset.label === 'Volume') return 'Vol: ' + (ctx.raw >= 1e6 ? (ctx.raw/1e6).toFixed(1) + 'M' : ctx.raw >= 1e3 ? (ctx.raw/1e3).toFixed(0) + 'K' : ctx.raw);
-              if (ctx.dataset.label === 'Gravity') return '\u03C6-Gravity: ' + (ctx.raw < 10 ? ctx.raw?.toFixed(4) : ctx.raw?.toFixed(2));
-              return ctx.dataset.label + ': ' + (ctx.raw < 10 ? ctx.raw?.toFixed(4) : ctx.raw?.toFixed(2));
+              if (ctx.dataset.label === 'Gravity') return '\u03C6-Gravity: ' + ctx.raw?.toFixed(2);
+              return null;
             }
           }
+        },
+        zoom: {
+          pan: { enabled: true, mode: 'x' },
+          zoom: { wheel: { enabled: true }, pinch: { enabled: true }, mode: 'x' }
         }
       },
       scales: {
@@ -1471,6 +1556,26 @@ function renderChart(candles, a) {
       }
     }
   });
+
+  // Stack RSI + Temperature if toggle is on
+  var stackMode = document.getElementById('stackToggle') && document.getElementById('stackToggle').checked;
+  if (stackMode) {
+    rsiChartInstance.data.datasets.push({
+      data: a.temps,
+      borderColor: 'rgba(201,168,76,0.5)',
+      backgroundColor: a.temps.map(function(t) {
+        if (t == null) return 'transparent';
+        if (t >= 55) return 'rgba(16,185,129,0.08)';
+        if (t <= 45) return 'rgba(239,68,68,0.08)';
+        return 'rgba(201,168,76,0.06)';
+      }),
+      borderWidth: 1, pointRadius: 0, tension: 0.3, fill: true
+    });
+    rsiChartInstance.update('none');
+  }
+  // Show/hide temperature panel based on stack mode
+  var tempWrap = document.getElementById('tempChart') ? document.getElementById('tempChart').closest('.sub-chart-wrap') : null;
+  if (tempWrap) tempWrap.style.display = stackMode ? 'none' : 'block';
 
   // Temperature + delta-T sub-chart
   const tempCtx = document.getElementById('tempChart').getContext('2d');
