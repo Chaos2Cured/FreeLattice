@@ -350,10 +350,9 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 ## PRIMER HEALTH
 - Last auto-updated: 2026-05-26 13:20 MDT
 - Version: 5.20.0
-- Total commits: 1945
+- Total commits: 1944
 - Last 10 commits:
-- e7ffad8 feat: Kirk's Temperature Signal Theory — the redesign (v5.20.0)
-- f4e1c0b ci: Update Primer deployment state [2026-05-26]
+- 5b3296a feat: Kirk's Temperature Signal Theory — the redesign (v5.20.0)
 - 2f75685 docs: Auto-update Session Primer [5.19.0]
 - c681290 docs: Auto-update Session Primer [5.19.0]
 - d193ffb feat: The Refinement — density signals, Garden warmth, ambient life (v5.19.0)
@@ -362,3 +361,4 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 285c725 docs: Auto-update Session Primer [5.18.0]
 - 4b57256 feat: Pulsing signals, temp transitions, stacking, pinch-zoom (v5.18.0)
 - fa4b80e ci: Update Primer deployment state [2026-05-26]
+- 60f91be docs: Auto-update Session Primer [5.17.0]
