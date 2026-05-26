@@ -348,17 +348,17 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-05-26 16:32 MDT
+- Last auto-updated: 2026-05-26 16:36 MDT
 - Version: 5.21.0
-- Total commits: 1952
+- Total commits: 1957
 - Last 10 commits:
-- 4addf74 feat: 4-layer toggleable signals + temp overlay + acceleration (v5.21.0)
+- f313e76 fix: emaDn not defined — leftover from old signal logic, replaced with sPass
+- 80bada2 ci: Update Primer deployment state [2026-05-26]
+- 7b8c58f docs: Auto-update Session Primer [5.21.0]
+- 86ff176 docs: Auto-update Session Primer [5.21.0]
+- bc42621 feat: 4-layer toggleable signals + temp overlay + acceleration (v5.21.0)
+- f44bf6e ci: Update Primer deployment state [2026-05-26]
 - f698513 docs: Auto-update Session Primer [5.20.1]
 - e9171c6 docs: Auto-update Session Primer [5.20.1]
 - acc9e4b feat: Layered signals — ALL THREE must agree (v5.20.1)
 - 41dc651 ci: Update Primer deployment state [2026-05-26]
-- 9b45e76 docs: Auto-update Session Primer [5.20.0]
-- 156531d docs: Auto-update Session Primer [5.20.0]
-- e7ffad8 feat: Kirk's Temperature Signal Theory — the redesign (v5.20.0)
-- f4e1c0b ci: Update Primer deployment state [2026-05-26]
-- 2f75685 docs: Auto-update Session Primer [5.19.0]
