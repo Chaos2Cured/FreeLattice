@@ -348,17 +348,17 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-05-25 20:18 MDT
-- Version: 5.18.0
-- Total commits: 1936
+- Last auto-updated: 2026-05-26 11:27 MDT
+- Version: 5.19.0
+- Total commits: 1941
 - Last 10 commits:
-- ff6a583 feat: Pulsing signals, temp transitions, stacking, pinch-zoom (v5.18.0)
+- d193ffb feat: The Refinement — density signals, Garden warmth, ambient life (v5.19.0)
+- 7424c86 ci: Update Primer deployment state [2026-05-26]
+- 4f3a528 docs: Auto-update Session Primer [5.18.0]
+- 285c725 docs: Auto-update Session Primer [5.18.0]
+- 4b57256 feat: Pulsing signals, temp transitions, stacking, pinch-zoom (v5.18.0)
+- fa4b80e ci: Update Primer deployment state [2026-05-26]
 - 60f91be docs: Auto-update Session Primer [5.17.0]
 - 7b7ee89 docs: Auto-update Session Primer [5.17.0]
 - 3040eba feat: Custom Indicator Builder — the gauge becomes a platform (v5.17.0)
 - ac6015d ci: Update Primer deployment state [2026-05-26]
-- 8ed5d09 docs: Auto-update Session Primer [5.16.5]
-- aca8bd6 docs: Auto-update Session Primer [5.16.5]
-- 701dd0d feat: AI landing page enhanced, social meta, backtest polish (v5.16.5)
-- e1248a3 ci: Update Primer deployment state [2026-05-25]
-- d311f14 fix: temperature-gauge integration + v5.16 version sync (Harmonia audit)
