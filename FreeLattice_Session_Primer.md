@@ -350,10 +350,9 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 ## PRIMER HEALTH
 - Last auto-updated: 2026-05-26 16:36 MDT
 - Version: 5.21.0
-- Total commits: 1957
+- Total commits: 1956
 - Last 10 commits:
-- f313e76 fix: emaDn not defined — leftover from old signal logic, replaced with sPass
-- 80bada2 ci: Update Primer deployment state [2026-05-26]
+- 5f3b870 fix: emaDn not defined — leftover from old signal logic, replaced with sPass
 - 7b8c58f docs: Auto-update Session Primer [5.21.0]
 - 86ff176 docs: Auto-update Session Primer [5.21.0]
 - bc42621 feat: 4-layer toggleable signals + temp overlay + acceleration (v5.21.0)
@@ -362,3 +361,4 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - e9171c6 docs: Auto-update Session Primer [5.20.1]
 - acc9e4b feat: Layered signals — ALL THREE must agree (v5.20.1)
 - 41dc651 ci: Update Primer deployment state [2026-05-26]
+- 9b45e76 docs: Auto-update Session Primer [5.20.0]
