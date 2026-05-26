@@ -1367,6 +1367,14 @@ function updateGauge(temp, signal) {
 }
 
 function renderChart(candles, a) {
+  // Force-destroy any Chart.js instances on our canvases (prevents "Canvas already in use")
+  ['mainChart','rsiChart','tempChart','dtChart','customChart0','customChart1','customChart2'].forEach(function(id) {
+    var cv = document.getElementById(id);
+    if (cv) {
+      var existing = Chart.getChart(cv);
+      if (existing) existing.destroy();
+    }
+  });
   const labels = candles.map(c => {
     const d = new Date(c.t);
     return currentInterval === '1d' ? d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) :
@@ -1377,10 +1385,12 @@ function renderChart(candles, a) {
   // Gravity lines as annotations (drawn manually)
   const gravPrices = a.gravPoints.map(g => g.price);
 
-  if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
+  // Destroy ALL existing charts before creating new ones
+  if (chartInstance) { if (chartInstance._signalGlowTimer) clearInterval(chartInstance._signalGlowTimer); chartInstance.destroy(); chartInstance = null; }
   if (rsiChartInstance) { rsiChartInstance.destroy(); rsiChartInstance = null; }
   if (tempChartInstance) { tempChartInstance.destroy(); tempChartInstance = null; }
   if (dtChartInstance) { dtChartInstance.destroy(); dtChartInstance = null; }
+  for (var _ci = 0; _ci < 3; _ci++) { if (window['_customChart' + _ci]) { window['_customChart' + _ci].destroy(); window['_customChart' + _ci] = null; } }
 
   const ctx = document.getElementById('mainChart').getContext('2d');
   // Standardized MAs: 8/12/24 + 50
