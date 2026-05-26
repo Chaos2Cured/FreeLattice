@@ -1,1 +1,1 @@
-{"version": "5.18.0", "date": "2026-05-25", "note": "Pulsing signal glows, compact tooltip, pinch-zoom, Kirk's temperature transition signals (diamonds), RSI+Temp stacking toggle, bigger buy/sell markers."}
+{"version": "5.19.0", "date": "2026-05-26", "note": "The Refinement: density-scaled signals, Garden-warm colors, ambient particles, compact tooltip, pan+zoom+reset, disclaimer banner, glow throttle to 5fps."}

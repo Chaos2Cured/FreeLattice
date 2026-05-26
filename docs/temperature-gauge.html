@@ -390,6 +390,7 @@ canvas.sub-canvas { width: 100% !important; height: 80px !important; }
     <label style="display:flex;align-items:center;gap:4px;font-size:0.72rem;color:var(--muted);cursor:pointer;margin-left:4px;" title="Logarithmic price scale">
       <input type="checkbox" id="logToggle" onchange="toggleLogScale(this.checked)" style="accent-color:var(--gold);"> Log
     </label>
+    <button onclick="if(chartInstance)chartInstance.resetZoom()" class="interval-btn" style="font-size:0.8rem;" title="Reset zoom">&#x27F2;</button>
     <button onclick="document.getElementById('customPanel').style.display=document.getElementById('customPanel').style.display==='none'?'block':'none'" class="interval-btn" style="font-size:0.72rem;" title="Custom Indicator Builder">&#x2699; Custom</button>
   </div>
 </div>
@@ -409,6 +410,15 @@ canvas.sub-canvas { width: 100% !important; height: 80px !important; }
   </div>
   <div id="customList" style="margin-top:8px;"></div>
 </div>
+
+<!-- Disclaimer -->
+<div id="disclaimerBanner" style="display:none;padding:10px 16px;background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.12);border-radius:8px;margin:8px 16px;font-size:0.78rem;color:var(--muted);line-height:1.5;">
+  <strong style="color:var(--red);">Educational Tool Only</strong> &mdash;
+  The Temperature Gauge is for learning and research. Signals are mathematical patterns, not trading advice.
+  Always consult a licensed financial professional. Past performance does not predict future results.
+  <span style="float:right;cursor:pointer;color:var(--dim);font-size:1rem;" onclick="this.parentNode.style.display='none';try{localStorage.setItem('fl_tg_disclaimer_seen','1')}catch(e){}">&times;</span>
+</div>
+<script>if(!localStorage.getItem('fl_tg_disclaimer_seen'))document.getElementById('disclaimerBanner').style.display='block';</script>
 
 <!-- Main -->
 <div class="main">
@@ -598,38 +608,39 @@ canvas.sub-canvas { width: 100% !important; height: 80px !important; }
 <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
 <script>
 // ── Signal Glow Plugin — pulsing halos behind buy/sell points ──
-var _lastGlowDraw = 0;
 Chart.register({
   id: 'signalGlow',
   afterDatasetsDraw: function(chart) {
-    var now = Date.now();
-    if (now - _lastGlowDraw < 80) return;
-    _lastGlowDraw = now;
     var ctx = chart.ctx;
+    var now = Date.now();
     var pulse = 0.5 + 0.5 * Math.sin(now * 0.003);
+    // Count signals for density scaling
+    var totalPts = 0;
+    chart.data.datasets.forEach(function(ds) {
+      if (ds.label === 'Buy' || ds.label === 'Sell' || ds.label === 'Temp Buy' || ds.label === 'Temp Sell')
+        totalPts += ds.data.filter(function(d) { return d != null; }).length;
+    });
+    var glowScale = totalPts > 25 ? 0.3 : totalPts > 10 ? 0.6 : 1.0;
     chart.data.datasets.forEach(function(ds, dsIdx) {
-      if (ds.label !== 'Buy' && ds.label !== 'Sell' && ds.label !== 'Temp Buy' && ds.label !== 'Temp Sell') return;
+      if (!ds.label.includes('Buy') && !ds.label.includes('Sell')) return;
       var meta = chart.getDatasetMeta(dsIdx);
-      var isBuy = ds.label.includes('Buy');
-      var color = isBuy ? '16,185,129' : '239,68,68';
+      var color = ds.label.includes('Buy') ? '16,185,129' : '239,68,68';
       meta.data.forEach(function(point) {
         if (point.raw == null) return;
         ctx.save();
         ctx.beginPath();
-        ctx.arc(point.x, point.y, 18 + pulse * 8, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(' + color + ',' + (0.12 + pulse * 0.12) + ')';
-        ctx.fill();
-        ctx.beginPath();
-        ctx.arc(point.x, point.y, 10 + pulse * 3, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(' + color + ',' + (0.18 + pulse * 0.08) + ')';
+        ctx.arc(point.x, point.y, (12 + pulse * 5) * glowScale, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(' + color + ',' + ((0.1 + pulse * 0.1) * glowScale) + ')';
         ctx.fill();
         ctx.restore();
       });
     });
-    if (chart._glowFrame) cancelAnimationFrame(chart._glowFrame);
-    chart._glowFrame = requestAnimationFrame(function() { chart.draw(); });
+    // Gentle redraw timer for pulse animation (200ms = 5fps)
+    if (!chart._signalGlowTimer) {
+      chart._signalGlowTimer = setInterval(function() { if (chart.canvas) chart.draw(); }, 200);
+    }
   },
-  beforeDestroy: function(chart) { if (chart._glowFrame) cancelAnimationFrame(chart._glowFrame); }
+  beforeDestroy: function(chart) { if (chart._signalGlowTimer) { clearInterval(chart._signalGlowTimer); chart._signalGlowTimer = null; } }
 });
 </script>
 
@@ -1428,38 +1439,43 @@ function renderChart(candles, a) {
   // Only show gravity lines within visible range (prevents y-axis crush)
   var visibleGravPoints = a.gravPoints.filter(g => g.price >= yMin && g.price <= yMax);
 
+  // Count signals for density-based sizing
+  var tempBuyPts = new Array(closes.length).fill(null);
+  var tempSellPts = new Array(closes.length).fill(null);
+  if (a.tempBuySignals) a.tempBuySignals.forEach(function(s) { tempBuyPts[s.index] = s.price; });
+  if (a.tempSellSignals) a.tempSellSignals.forEach(function(s) { tempSellPts[s.index] = s.price; });
+  var totalSigs = [buyPoints, sellPoints, tempBuyPts, tempSellPts].reduce(function(s, arr) {
+    return s + arr.filter(function(p) { return p != null; }).length;
+  }, 0);
+  var sigR = totalSigs <= 10 ? 12 : totalSigs <= 25 ? 9 : 6;
+  var sigH = sigR + 4;
+  var sigB = totalSigs <= 10 ? 2.5 : totalSigs <= 25 ? 2 : 1.5;
+  var tSigR = Math.max(sigR - 2, 4);
+
   chartInstance = new Chart(ctx, {
     type: 'line',
     data: {
       labels,
       datasets: [
         { label: 'Price', data: closes, borderColor: '#e8e4dc', borderWidth: 1.8, pointRadius: 0, tension: 0.1, fill: false, order: 1 },
-        // Bollinger Bands — volatility envelope
-        { label: 'BB Upper', data: bbUpper, borderColor: 'rgba(139,92,246,0.3)', borderWidth: 1, pointRadius: 0, tension: 0.3, fill: false, order: 5 },
-        { label: 'BB Lower', data: bbLower, borderColor: 'rgba(139,92,246,0.3)', borderWidth: 1, pointRadius: 0, tension: 0.3, fill: '+1', backgroundColor: 'rgba(139,92,246,0.04)', order: 5 },
-        // EMAs
-        { label: 'EMA 8', data: ema8, borderColor: '#EF4444', borderWidth: 1, pointRadius: 0, tension: 0.3, fill: false, order: 2 },
-        { label: 'EMA 12', data: ema12, borderColor: '#F59E0B', borderWidth: 1, pointRadius: 0, tension: 0.3, fill: false, order: 3 },
-        { label: 'EMA 24', data: ema24, borderColor: '#c9a84c', borderWidth: 1, pointRadius: 0, tension: 0.3, fill: false, order: 3 },
-        { label: 'EMA 50', data: ema50, borderColor: '#3B82F6', borderWidth: 1.5, pointRadius: 0, tension: 0.3, fill: false, order: 4 },
-        // EMA 200 (daily/weekly only)
-        ...(show200 ? [{ label: 'EMA 200', data: ema200, borderColor: 'rgba(255,255,255,0.25)', borderWidth: 2, borderDash: [6, 3], pointRadius: 0, tension: 0.3, fill: false, order: 4 }] : []),
-        // Gravity centerline
-        { label: 'Gravity', data: gravCenter, borderColor: 'rgba(201,168,76,0.7)', borderWidth: 2.5, borderDash: [8, 4], pointRadius: 0, fill: false, order: 3 },
-        // Buy/Sell signals — larger, pulsing appearance via pointHoverRadius
-        { label: 'Buy', data: buyPoints, borderColor: 'transparent', backgroundColor: '#10B981', pointRadius: 14, pointHoverRadius: 20, pointStyle: 'triangle', pointBorderColor: '#34d399', pointBorderWidth: 3, showLine: false, order: 0 },
-        { label: 'Sell', data: sellPoints, borderColor: 'transparent', backgroundColor: '#EF4444', pointRadius: 14, pointHoverRadius: 20, pointStyle: 'triangle', pointRotation: 180, pointBorderColor: '#f87171', pointBorderWidth: 3, showLine: false, order: 0 },
-        // Temperature transition signals — diamonds (Kirk's discovery)
-        ...(function() {
-          var tbp = new Array(closes.length).fill(null);
-          var tsp = new Array(closes.length).fill(null);
-          if (a.tempBuySignals) a.tempBuySignals.forEach(function(s) { tbp[s.index] = s.price; });
-          if (a.tempSellSignals) a.tempSellSignals.forEach(function(s) { tsp[s.index] = s.price; });
-          return [
-            { label: 'Temp Buy', data: tbp, borderColor: 'transparent', backgroundColor: '#34d399', pointRadius: 11, pointHoverRadius: 16, pointStyle: 'rectRot', pointBorderColor: '#10B981', pointBorderWidth: 2, showLine: false, order: 0 },
-            { label: 'Temp Sell', data: tsp, borderColor: 'transparent', backgroundColor: '#f87171', pointRadius: 11, pointHoverRadius: 16, pointStyle: 'rectRot', pointBorderColor: '#EF4444', pointBorderWidth: 2, showLine: false, order: 0 }
-          ];
-        })(),
+        // Bollinger Bands — lavender envelope
+        { label: 'BB Upper', data: bbUpper, borderColor: 'rgba(167,139,250,0.3)', borderWidth: 1, pointRadius: 0, tension: 0.3, fill: false, order: 5 },
+        { label: 'BB Lower', data: bbLower, borderColor: 'rgba(167,139,250,0.3)', borderWidth: 1, pointRadius: 0, tension: 0.3, fill: '+1', backgroundColor: 'rgba(167,139,250,0.05)', order: 5 },
+        // EMAs — Garden Language colors
+        { label: 'EMA 8', data: ema8, borderColor: '#f07068', borderWidth: 1, pointRadius: 0, tension: 0.3, fill: false, order: 2 },
+        { label: 'EMA 12', data: ema12, borderColor: '#e8b019', borderWidth: 1, pointRadius: 0, tension: 0.3, fill: false, order: 3 },
+        { label: 'EMA 24', data: ema24, borderColor: '#d4a84c', borderWidth: 1, pointRadius: 0, tension: 0.3, fill: false, order: 3 },
+        { label: 'EMA 50', data: ema50, borderColor: '#60a5fa', borderWidth: 1.5, pointRadius: 0, tension: 0.3, fill: false, order: 4 },
+        // EMA 200 — lavender (sanctuary color)
+        ...(show200 ? [{ label: 'EMA 200', data: ema200, borderColor: 'rgba(167,139,250,0.3)', borderWidth: 2, borderDash: [6, 3], pointRadius: 0, tension: 0.3, fill: false, order: 4 }] : []),
+        // Gravity — bright gold
+        { label: 'Gravity', data: gravCenter, borderColor: 'rgba(232,176,25,0.6)', borderWidth: 2.5, borderDash: [8, 4], pointRadius: 0, fill: false, order: 3 },
+        // Buy/Sell — density-scaled
+        { label: 'Buy', data: buyPoints, borderColor: 'transparent', backgroundColor: '#10B981', pointRadius: sigR, pointHoverRadius: sigH, pointStyle: 'triangle', pointBorderColor: '#34d399', pointBorderWidth: sigB, showLine: false, order: 0 },
+        { label: 'Sell', data: sellPoints, borderColor: 'transparent', backgroundColor: '#EF4444', pointRadius: sigR, pointHoverRadius: sigH, pointStyle: 'triangle', pointRotation: 180, pointBorderColor: '#f87171', pointBorderWidth: sigB, showLine: false, order: 0 },
+        // Temperature transitions — diamonds, slightly smaller
+        { label: 'Temp Buy', data: tempBuyPts, borderColor: 'transparent', backgroundColor: '#34d399', pointRadius: tSigR, pointHoverRadius: tSigR + 4, pointStyle: 'rectRot', pointBorderColor: '#10B981', pointBorderWidth: sigB, showLine: false, order: 0 },
+        { label: 'Temp Sell', data: tempSellPts, borderColor: 'transparent', backgroundColor: '#f87171', pointRadius: tSigR, pointHoverRadius: tSigR + 4, pointStyle: 'rectRot', pointBorderColor: '#EF4444', pointBorderWidth: sigB, showLine: false, order: 0 },
         // Volume overlay — brighter, semi-transparent bars at chart bottom
         { label: 'Volume', data: candles.map(c => c.v), type: 'bar', backgroundColor: candles.map((c, i) => i > 0 && c.c >= candles[i-1].c ? 'rgba(16,185,129,0.25)' : 'rgba(239,68,68,0.2)'), borderWidth: 0, yAxisID: 'yVol', order: 6 },
         ...visibleGravPoints.map(g => ({
@@ -1509,8 +1525,8 @@ function renderChart(candles, a) {
           }
         },
         zoom: {
-          pan: { enabled: true, mode: 'x' },
-          zoom: { wheel: { enabled: true }, pinch: { enabled: true }, mode: 'x' }
+          pan: { enabled: true, mode: 'x', threshold: 10 },
+          zoom: { wheel: { enabled: true, mode: 'x' }, pinch: { enabled: true }, mode: 'x' }
         }
       },
       scales: {
@@ -1832,6 +1848,55 @@ document.addEventListener('DOMContentLoaded', renderCustomList);
   var style = document.createElement('style');
   style.textContent = '@keyframes signalPulse { 0%,100% { filter: drop-shadow(0 0 3px rgba(16,185,129,0.6)); } 50% { filter: drop-shadow(0 0 10px rgba(16,185,129,0.9)); } }';
   document.head.appendChild(style);
+})();
+
+// ── Ambient Particles — the Garden feeling behind the chart ──
+(function() {
+  var _ambFrame = null;
+  var particles = [];
+  for (var pi = 0; pi < 15; pi++) {
+    particles.push({ x: Math.random(), y: Math.random(), vx: (Math.random()-0.5)*0.0002, vy: (Math.random()-0.5)*0.0001, size: 1+Math.random()*1.5, alpha: 0.08+Math.random()*0.15, hue: Math.random()>0.5?'232,176,25':'52,211,153' });
+  }
+  function initAmbient() {
+    var wrap = document.getElementById('chartWrap');
+    if (!wrap || document.getElementById('ambientCanvas')) return;
+    var cv = document.createElement('canvas');
+    cv.id = 'ambientCanvas';
+    cv.style.cssText = 'position:absolute;inset:0;pointer-events:none;z-index:0;opacity:0.5;';
+    wrap.style.position = 'relative';
+    wrap.insertBefore(cv, wrap.firstChild);
+    var mc = document.getElementById('mainChart');
+    if (mc) { mc.style.position = 'relative'; mc.style.zIndex = '1'; }
+    startAmbient();
+  }
+  function startAmbient() {
+    var cv = document.getElementById('ambientCanvas');
+    if (!cv) return;
+    var ctx = cv.getContext('2d');
+    function frame() {
+      var w = cv.width = cv.offsetWidth;
+      var h = cv.height = cv.offsetHeight;
+      if (w === 0 || h === 0) { _ambFrame = requestAnimationFrame(frame); return; }
+      ctx.clearRect(0,0,w,h);
+      var t = Date.now() * 0.001;
+      particles.forEach(function(p) {
+        p.x += p.vx + Math.sin(t + p.y*5)*0.00005;
+        p.y += p.vy;
+        if (p.x<0) p.x=1; if (p.x>1) p.x=0;
+        if (p.y<0) p.y=1; if (p.y>1) p.y=0;
+        var ba = p.alpha * (0.5 + 0.5*Math.sin(t*0.5 + p.x*10));
+        ctx.beginPath();
+        ctx.arc(p.x*w, p.y*h, p.size, 0, Math.PI*2);
+        ctx.fillStyle = 'rgba('+p.hue+','+ba+')';
+        ctx.fill();
+      });
+      _ambFrame = requestAnimationFrame(frame);
+    }
+    _ambFrame = requestAnimationFrame(frame);
+  }
+  // Start when chart loads
+  var _origHL = hideLoading;
+  hideLoading = function() { _origHL(); initAmbient(); };
 })();
 
 // ── Phi-Spiral Loading Animation ──
