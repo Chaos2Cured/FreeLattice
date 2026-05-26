@@ -390,7 +390,24 @@ canvas.sub-canvas { width: 100% !important; height: 80px !important; }
     <label style="display:flex;align-items:center;gap:4px;font-size:0.72rem;color:var(--muted);cursor:pointer;margin-left:4px;" title="Logarithmic price scale">
       <input type="checkbox" id="logToggle" onchange="toggleLogScale(this.checked)" style="accent-color:var(--gold);"> Log
     </label>
+    <button onclick="document.getElementById('customPanel').style.display=document.getElementById('customPanel').style.display==='none'?'block':'none'" class="interval-btn" style="font-size:0.72rem;" title="Custom Indicator Builder">&#x2699; Custom</button>
   </div>
+</div>
+
+<!-- Custom Indicator Builder -->
+<div id="customPanel" style="display:none;padding:12px 16px;background:var(--bg2);border-bottom:1px solid var(--border);">
+  <div style="display:flex;gap:8px;align-items:flex-start;flex-wrap:wrap;">
+    <div style="flex:1;min-width:200px;">
+      <input type="text" id="customExpr" placeholder="e.g. abs(close - ema50) / atr14" style="width:100%;padding:8px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:monospace;font-size:0.82rem;">
+      <div style="font-size:0.62rem;color:var(--dim);margin-top:4px;line-height:1.4;">Variables: open, high, low, close, volume, bar, ema8, ema12, ema24, ema50, ema200, rsi14, atr14, temp, dt, pi, phi</div>
+    </div>
+    <div style="display:flex;gap:4px;flex-shrink:0;">
+      <input type="text" id="customLabel" placeholder="Label" style="width:80px;padding:8px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:0.78rem;">
+      <input type="color" id="customColor" value="#8B5CF6" style="width:36px;height:36px;border:1px solid var(--border);border-radius:6px;background:var(--bg3);cursor:pointer;">
+      <button onclick="addCustomFromUI()" style="padding:8px 14px;background:rgba(139,92,246,0.15);border:1px solid var(--purple);border-radius:6px;color:var(--purple);font-size:0.82rem;cursor:pointer;white-space:nowrap;">Add &#10022;</button>
+    </div>
+  </div>
+  <div id="customList" style="margin-top:8px;"></div>
 </div>
 
 <!-- Main -->
@@ -1506,6 +1523,48 @@ function renderChart(candles, a) {
       }
     });
   }
+
+  // ── Custom Indicator Sub-Charts ──
+  var customs = getCustomIndicators();
+  // Clean up old custom chart elements beyond current count
+  for (var ci = customs.length; ci < 3; ci++) {
+    var oldWrap = document.getElementById('customWrap' + ci);
+    if (oldWrap) oldWrap.remove();
+    if (window['_customChart' + ci]) { window['_customChart' + ci].destroy(); window['_customChart' + ci] = null; }
+  }
+  customs.forEach(function(custom, idx) {
+    var canvasId = 'customChart' + idx;
+    var wrap = document.getElementById('customWrap' + idx);
+    if (!wrap) {
+      wrap = document.createElement('div');
+      wrap.id = 'customWrap' + idx;
+      wrap.className = 'sub-chart-wrap';
+      wrap.innerHTML = '<div class="sub-chart-label" style="color:' + custom.color + ';">' +
+        custom.label.substring(0, 20).replace(/</g,'&lt;') +
+        ' <span onclick="removeCustomIndicator(' + idx + ')" style="cursor:pointer;opacity:0.4;font-size:0.8rem;" title="Remove">\u2715</span></div>' +
+        '<canvas id="' + canvasId + '" height="80" class="sub-canvas"></canvas>';
+      document.getElementById('subCharts').appendChild(wrap);
+    }
+    var values = evaluateCustom(custom.expression, candles, {
+      ema8: ema(closes, 8), ema12: ema(closes, 12), ema24: ema(closes, 24),
+      ema50: ema(closes, 50), ema200: ema(closes, 200),
+      rsi14: a.rsiArr, atr14: atr(candles, 14),
+      temps: a.temps, tempROC: a.tempROC
+    });
+    var cCtx = document.getElementById(canvasId);
+    if (!cCtx) return;
+    cCtx = cCtx.getContext('2d');
+    if (window['_customChart' + idx]) window['_customChart' + idx].destroy();
+    window['_customChart' + idx] = new Chart(cCtx, {
+      type: 'line',
+      data: { labels: labels, datasets: [{ data: values, borderColor: custom.color, borderWidth: 1.5, pointRadius: 0, tension: 0.3, fill: false }] },
+      options: {
+        responsive: true, maintainAspectRatio: false, animation: false,
+        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+        scales: { x: { display: false }, y: { ticks: { color: '#4a4740', font: { size: 9 }, maxTicksLimit: 3 }, grid: { color: 'rgba(255,255,255,0.03)' }, position: 'right' } }
+      }
+    });
+  });
 }
 
 // Enter key support
@@ -1556,6 +1615,112 @@ document.getElementById('symbolInput').addEventListener('keydown', e => {
     }, 500);
   };
 })();
+
+// ── Custom Indicator Engine ──
+// Safe expression evaluator — NO eval(). Whitelist-only math operations.
+var _customCharts = [];
+
+function safeEval(expr, scope) {
+  // Simple tokenizer: replace variable names with values, evaluate math
+  var result = expr;
+  // Replace variables with their numeric values (longest first to avoid partial matches)
+  var vars = Object.keys(scope).sort(function(a,b){return b.length - a.length;});
+  vars.forEach(function(v) {
+    var val = scope[v];
+    if (val == null || isNaN(val)) val = 0;
+    result = result.replace(new RegExp('\\b' + v + '\\b', 'g'), '(' + val + ')');
+  });
+  // Only allow: numbers, operators, parens, math functions
+  var safe = result.replace(/\s/g, '');
+  if (!/^[0-9.+\-*/(),%<>=!&|?:eE]+$/.test(safe.replace(/(abs|sqrt|pow|log|sin|cos|tan|atan|max|min|floor|ceil|round)\(/g, '('))) {
+    return null;
+  }
+  try {
+    // Use Function with a constrained scope (no global access)
+    var fn = new Function('Math', 'return ' + result
+      .replace(/\babs\(/g, 'Math.abs(')
+      .replace(/\bsqrt\(/g, 'Math.sqrt(')
+      .replace(/\bpow\(/g, 'Math.pow(')
+      .replace(/\blog\(/g, 'Math.log(')
+      .replace(/\bsin\(/g, 'Math.sin(')
+      .replace(/\bcos\(/g, 'Math.cos(')
+      .replace(/\btan\(/g, 'Math.tan(')
+      .replace(/\batan\(/g, 'Math.atan(')
+      .replace(/\bfloor\(/g, 'Math.floor(')
+      .replace(/\bceil\(/g, 'Math.ceil(')
+      .replace(/\bround\(/g, 'Math.round(')
+      .replace(/\bmax\(/g, 'Math.max(')
+      .replace(/\bmin\(/g, 'Math.min(')
+    );
+    var v = fn(Math);
+    return isFinite(v) ? v : null;
+  } catch(e) { return null; }
+}
+
+function evaluateCustom(expression, candles, helpers) {
+  var results = new Array(candles.length).fill(null);
+  for (var i = 0; i < candles.length; i++) {
+    var scope = {
+      open: candles[i].o, high: candles[i].h, low: candles[i].l,
+      close: candles[i].c, volume: candles[i].v,
+      bar: i, time: candles[i].t / 1000,
+      pi: Math.PI, phi: 1.618033988749895, e: Math.E,
+      ema8: helpers.ema8[i] || 0, ema12: helpers.ema12[i] || 0,
+      ema24: helpers.ema24[i] || 0, ema50: helpers.ema50[i] || 0,
+      ema200: helpers.ema200[i] || 0,
+      rsi14: helpers.rsi14[i] || 0, atr14: helpers.atr14[i] || 0,
+      temp: helpers.temps[i] || 0, dt: helpers.tempROC[i] || 0
+    };
+    results[i] = safeEval(expression, scope);
+  }
+  return results;
+}
+
+function getCustomIndicators() {
+  try { return JSON.parse(localStorage.getItem('fl_tg_customs') || '[]'); } catch(e) { return []; }
+}
+
+function addCustomFromUI() {
+  var expr = document.getElementById('customExpr').value.trim();
+  if (!expr) return;
+  var label = document.getElementById('customLabel').value.trim() || expr.substring(0, 20);
+  var color = document.getElementById('customColor').value || '#8B5CF6';
+  var customs = getCustomIndicators();
+  if (customs.length >= 3) { showError('Maximum 3 custom indicators. Remove one first.'); return; }
+  customs.push({ expression: expr, label: label, color: color });
+  localStorage.setItem('fl_tg_customs', JSON.stringify(customs));
+  document.getElementById('customExpr').value = '';
+  document.getElementById('customLabel').value = '';
+  renderCustomList();
+  if (lastCandles && lastAnalysis) renderChart(lastCandles, lastAnalysis);
+}
+
+function removeCustomIndicator(idx) {
+  var customs = getCustomIndicators();
+  customs.splice(idx, 1);
+  localStorage.setItem('fl_tg_customs', JSON.stringify(customs));
+  renderCustomList();
+  // Remove the DOM element
+  var wrap = document.getElementById('customWrap' + idx);
+  if (wrap) wrap.remove();
+  if (lastCandles && lastAnalysis) renderChart(lastCandles, lastAnalysis);
+}
+
+function renderCustomList() {
+  var el = document.getElementById('customList');
+  if (!el) return;
+  var customs = getCustomIndicators();
+  if (customs.length === 0) { el.innerHTML = ''; return; }
+  el.innerHTML = customs.map(function(c, i) {
+    return '<div style="display:inline-flex;align-items:center;gap:6px;margin:3px 4px 3px 0;padding:4px 8px;background:var(--bg3);border-radius:4px;font-size:0.7rem;">' +
+      '<span style="width:8px;height:8px;border-radius:50%;background:' + c.color + ';"></span>' +
+      '<span style="color:var(--muted);">' + c.label.substring(0, 20) + '</span>' +
+      '<span onclick="removeCustomIndicator(' + i + ')" style="cursor:pointer;color:var(--dim);font-size:0.8rem;" title="Remove">\u2715</span></div>';
+  }).join('');
+}
+
+// Render on load
+document.addEventListener('DOMContentLoaded', renderCustomList);
 
 // ── Buy/Sell pulse animation (CSS-driven glow) ──
 (function() {
