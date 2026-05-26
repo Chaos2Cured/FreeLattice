@@ -5,14 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Temperature Gauge — φ-Harmonic Market Signals</title>
 <meta name="description" content="Free, open-source phi-harmonic market analysis tool. Built on 20+ years of pattern recognition by Kirk Miller. Part of the FreeLattice ecosystem.">
-<meta property="og:title" content="Temperature Gauge &#x2014; &#x3C6;-Harmonic Market Signals">
-<meta property="og:description" content="Free phi-harmonic market analysis. Bollinger Bands, EMA 200, &#x394;T divergence detection, backtest engine. Built by Kirk Miller &amp; Harmonia. Part of FreeLattice.">
-<meta property="og:type" content="website">
+<meta property="og:title" content="Temperature Gauge — φ-Harmonic Market Signals">
+<meta property="og:description" content="Free phi-harmonic market analysis. Gravity points, confluence temperature, backtested signals. Open source.">
 <meta property="og:url" content="https://freelattice.com/temperature-gauge.html">
-<meta property="og:image" content="https://freelattice.com/og-image.png">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Temperature Gauge &#x2014; &#x3C6;-Harmonic Market Signals">
-<meta name="twitter:description" content="Free phi-harmonic market analysis. Built by Kirk Miller &amp; Harmonia. Part of FreeLattice.">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Temperature Gauge — φ-Harmonic Market Signals">
+<meta name="twitter:description" content="Free phi-harmonic market analysis. Gravity points, confluence temperature, backtested signals by Kirk Miller.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -512,7 +511,7 @@ canvas.sub-canvas { width: 100% !important; height: 80px !important; }
     <div class="sidebar-section" id="backtestSection" style="display:none;">
       <div class="sidebar-label">Signal History (Backtest)</div>
       <div class="signal-card" style="padding:10px 14px;" id="backtestList"></div>
-      <div style="font-size:0.6rem;color:var(--dim);margin-top:4px;padding:0 4px;">Past performance does not predict future results.</div>
+      <div style="font-size:0.62rem;color:var(--dim);margin-top:6px;padding:0 4px;line-height:1.5;">Past signals are measured against the same logic shown on the chart. Past performance does not predict future results. Use alongside your own analysis.</div>
     </div>
   </div>
 
@@ -1233,7 +1232,7 @@ function renderAll(candles, a, symbol) {
       btHtml += '</div>';
     });
   });
-  if (bt.signals.length === 0) btHtml = '<div style="font-size:0.72rem;color:var(--dim);">No signals in this timeframe. Try 1D or 1W for more data.</div>';
+  if (bt.signals.length === 0) btHtml = '<div style="font-size:0.72rem;color:var(--muted);line-height:1.5;">No buy or sell signals in this timeframe. The system needs enough bars to detect EMA crossovers with temperature confirmation. Try <strong>1D</strong> or <strong>1W</strong> for richer signal history.</div>';
   document.getElementById('backtestList').innerHTML = btHtml;
 
   // Chart
