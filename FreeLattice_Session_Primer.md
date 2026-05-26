@@ -350,10 +350,9 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 ## PRIMER HEALTH
 - Last auto-updated: 2026-05-25 19:02 MDT
 - Version: 5.17.0
-- Total commits: 1933
+- Total commits: 1932
 - Last 10 commits:
-- 3040eba feat: Custom Indicator Builder — the gauge becomes a platform (v5.17.0)
-- ac6015d ci: Update Primer deployment state [2026-05-26]
+- b839e7f feat: Custom Indicator Builder — the gauge becomes a platform (v5.17.0)
 - 8ed5d09 docs: Auto-update Session Primer [5.16.5]
 - aca8bd6 docs: Auto-update Session Primer [5.16.5]
 - 701dd0d feat: AI landing page enhanced, social meta, backtest polish (v5.16.5)
@@ -362,3 +361,4 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - bb63989 ci: Update Primer deployment state [2026-05-25]
 - e987950 docs: Auto-update Session Primer [5.16.4]
 - 2fa6cec docs: Auto-update Session Primer [5.16.4]
+- 519b3b1 feat: Backtest engine + ΔT divergence detection (v5.16.4)
