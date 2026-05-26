@@ -350,10 +350,9 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 ## PRIMER HEALTH
 - Last auto-updated: 2026-05-26 17:22 MDT
 - Version: 5.21.0
-- Total commits: 1961
+- Total commits: 1960
 - Last 10 commits:
-- 86760ef fix: Canvas already in use — force-destroy all Chart instances before re-render
-- e046b55 ci: Update Primer deployment state [2026-05-26]
+- 47be9cc fix: Canvas already in use — force-destroy all Chart instances before re-render
 - def2914 docs: Auto-update Session Primer [5.21.0]
 - 9a4ad21 docs: Auto-update Session Primer [5.21.0]
 - f313e76 fix: emaDn not defined — leftover from old signal logic, replaced with sPass
@@ -362,3 +361,4 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 86ff176 docs: Auto-update Session Primer [5.21.0]
 - bc42621 feat: 4-layer toggleable signals + temp overlay + acceleration (v5.21.0)
 - f44bf6e ci: Update Primer deployment state [2026-05-26]
+- f698513 docs: Auto-update Session Primer [5.20.1]
