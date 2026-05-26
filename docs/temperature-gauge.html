@@ -390,7 +390,7 @@ canvas.sub-canvas { width: 100% !important; height: 80px !important; }
     <label style="display:flex;align-items:center;gap:4px;font-size:0.72rem;color:var(--muted);cursor:pointer;margin-left:4px;" title="Logarithmic price scale">
       <input type="checkbox" id="logToggle" onchange="toggleLogScale(this.checked)" style="accent-color:var(--gold);"> Log
     </label>
-    <button onclick="if(chartInstance)chartInstance.resetZoom()" class="interval-btn" style="font-size:0.8rem;" title="Reset zoom">&#x27F2;</button>
+    <button onclick="resetAllZoom()" class="interval-btn" style="font-size:0.8rem;" title="Reset zoom">&#x27F2;</button>
     <button onclick="document.getElementById('customPanel').style.display=document.getElementById('customPanel').style.display==='none'?'block':'none'" class="interval-btn" style="font-size:0.72rem;" title="Custom Indicator Builder">&#x2699; Custom</button>
   </div>
 </div>
@@ -579,15 +579,15 @@ canvas.sub-canvas { width: 100% !important; height: 80px !important; }
     </div>
     <div class="sub-charts" id="subCharts" style="display:none;">
       <div class="sub-chart-wrap">
-        <div class="sub-chart-label">RSI (14)</div>
+        <div class="sub-chart-label"><span onclick="toggleSubPanel(this)" style="cursor:pointer;opacity:0.5;font-size:0.7rem;margin-right:3px;" title="Collapse">&blacktriangledown;</span>RSI (14)</div>
         <canvas id="rsiChart" height="80" class="sub-canvas"></canvas>
       </div>
       <div class="sub-chart-wrap">
-        <div class="sub-chart-label">Temperature</div>
+        <div class="sub-chart-label"><span onclick="toggleSubPanel(this)" style="cursor:pointer;opacity:0.5;font-size:0.7rem;margin-right:3px;" title="Collapse">&blacktriangledown;</span>Temperature</div>
         <canvas id="tempChart" height="80" class="sub-canvas"></canvas>
       </div>
       <div class="sub-chart-wrap">
-        <div class="sub-chart-label">&Delta;T (acceleration)</div>
+        <div class="sub-chart-label"><span onclick="toggleSubPanel(this)" style="cursor:pointer;opacity:0.5;font-size:0.7rem;margin-right:3px;" title="Collapse">&blacktriangledown;</span>&Delta;T (acceleration)</div>
         <canvas id="dtChart" height="80" class="sub-canvas"></canvas>
       </div>
     </div>
@@ -1174,22 +1174,24 @@ function backtestSignals(candles) {
   var tempROC = tempResult.tempROC;
   var volEma = ema(candles.map(function(c){return c.v;}), 20);
 
+  // Temperature-first signals (same logic as renderChart)
   var signals = [];
-  for (var si = 3; si < closes.length; si++) {
-    if (ema8[si] == null || ema12[si] == null || ema8[si-1] == null || ema12[si-1] == null) continue;
-    var crossUp = ema8[si] > ema12[si] && ema8[si-1] <= ema12[si-1];
-    var crossDown = ema8[si] < ema12[si] && ema8[si-1] >= ema12[si-1];
-    var tempBull = temps[si] != null && temps[si] >= 55;
-    var tempBear = temps[si] != null && temps[si] <= 45;
-    var volConfirm = volEma[si] && candles[si].v > volEma[si] * 1.1;
-    var rsiOk = rsiArr[si] != null;
-    var dtBull = tempROC && tempROC[si] != null && tempROC[si] > 0;
-    var dtBear = tempROC && tempROC[si] != null && tempROC[si] < 0;
-
-    if (crossUp && tempBull && (volConfirm || (rsiOk && rsiArr[si] < 75)) && dtBull)
-      signals.push({ index: si, type: 'buy', price: closes[si], date: new Date(candles[si].t) });
-    if (crossDown && tempBear && (volConfirm || (rsiOk && rsiArr[si] > 25)) && dtBear)
-      signals.push({ index: si, type: 'sell', price: closes[si], date: new Date(candles[si].t) });
+  for (var si = 1; si < closes.length; si++) {
+    if (temps[si] == null || temps[si-1] == null) continue;
+    var tempCrossUp = (temps[si-1] < 45 && temps[si] >= 45) || (temps[si-1] < 55 && temps[si] >= 55);
+    var tempCrossDown = (temps[si-1] >= 55 && temps[si] < 55) || (temps[si-1] >= 45 && temps[si] < 45);
+    if (tempCrossUp) {
+      var eOk = ema8[si] != null && ema12[si] != null && ema8[si] > ema12[si];
+      var rOk = rsiArr[si] != null && rsiArr[si] > 35 && rsiArr[si] < 80;
+      var dOk = tempROC && tempROC[si] != null && tempROC[si] > 0;
+      if (eOk || rOk || dOk) signals.push({ index: si, type: 'buy', price: closes[si], date: new Date(candles[si].t) });
+    }
+    if (tempCrossDown) {
+      var eWk = ema8[si] != null && ema12[si] != null && ema8[si] < ema12[si];
+      var rWk = rsiArr[si] != null && rsiArr[si] < 65;
+      var dWk = tempROC && tempROC[si] != null && tempROC[si] < 0;
+      if (eWk || rWk || dWk) signals.push({ index: si, type: 'sell', price: closes[si], date: new Date(candles[si].t) });
+    }
   }
 
   var horizons = [5, 10, 20];
@@ -1376,29 +1378,36 @@ function renderChart(candles, a) {
   const ema24 = ema(closes, 24);
   const ema50 = ema(closes, 50);
 
-  // Refined buy/sell signals — multi-indicator confluence
-  // Requires: EMA cross + temperature direction + volume confirmation OR RSI support
+  // ═══ Kirk's Temperature-First Signal Architecture ═══
+  // Temperature transitions are PRIMARY. EMA/RSI/ΔT are CONFIRMATION.
+  // BUY: temperature rises from red (<45) into yellow/green (crossing 45 or 55)
+  // SELL: temperature drops from green (>55) into yellow/red (crossing below 55 or 45)
+  // No sells in red zone. No buys in green zone. The transition IS the signal.
   var buyPoints = new Array(closes.length).fill(null);
   var sellPoints = new Array(closes.length).fill(null);
-  var volEma = ema(candles.map(c => c.v), 20);
-  for (var si = 3; si < closes.length; si++) {
-    if (ema8[si] == null || ema12[si] == null || ema8[si-1] == null || ema12[si-1] == null) continue;
-    var crossUp = ema8[si] > ema12[si] && ema8[si-1] <= ema12[si-1];
-    var crossDown = ema8[si] < ema12[si] && ema8[si-1] >= ema12[si-1];
-    var tempBull = a.temps[si] != null && a.temps[si] >= 55;
-    var tempBear = a.temps[si] != null && a.temps[si] <= 45;
-    // Volume confirmation: above-average on signal bar
-    var volConfirm = volEma[si] && candles[si].v > volEma[si] * 1.1;
-    // RSI support: not overbought for buy, not oversold for sell
-    var rsiOk = a.rsiArr[si] != null;
-    var rsiBuyOk = rsiOk && a.rsiArr[si] < 75; // not overbought
-    var rsiSellOk = rsiOk && a.rsiArr[si] > 25; // not oversold
-    // Temperature acceleration (delta-T confirms momentum)
-    var dtBull = a.tempROC && a.tempROC[si] != null && a.tempROC[si] > 0;
-    var dtBear = a.tempROC && a.tempROC[si] != null && a.tempROC[si] < 0;
+  for (var si = 1; si < closes.length; si++) {
+    if (a.temps[si] == null || a.temps[si-1] == null) continue;
 
-    if (crossUp && tempBull && (volConfirm || rsiBuyOk) && dtBull) buyPoints[si] = closes[si];
-    if (crossDown && tempBear && (volConfirm || rsiSellOk) && dtBear) sellPoints[si] = closes[si];
+    // BUY: cold→warm (crossing above 45) or warm→hot (crossing above 55)
+    var tempCrossUp = (a.temps[si-1] < 45 && a.temps[si] >= 45) ||
+                      (a.temps[si-1] < 55 && a.temps[si] >= 55);
+    // SELL: hot→cooling (crossing below 55) or cooling→cold (crossing below 45)
+    var tempCrossDown = (a.temps[si-1] >= 55 && a.temps[si] < 55) ||
+                        (a.temps[si-1] >= 45 && a.temps[si] < 45);
+
+    if (tempCrossUp) {
+      var emaOk = ema8[si] != null && ema12[si] != null && ema8[si] > ema12[si];
+      var rsiOk = a.rsiArr[si] != null && a.rsiArr[si] > 35 && a.rsiArr[si] < 80;
+      var dtOk = a.tempROC && a.tempROC[si] != null && a.tempROC[si] > 0;
+      if (emaOk || rsiOk || dtOk) buyPoints[si] = closes[si];
+    }
+
+    if (tempCrossDown) {
+      var emaWk = ema8[si] != null && ema12[si] != null && ema8[si] < ema12[si];
+      var rsiWk = a.rsiArr[si] != null && a.rsiArr[si] < 65;
+      var dtWk = a.tempROC && a.tempROC[si] != null && a.tempROC[si] < 0;
+      if (emaWk || rsiWk || dtWk) sellPoints[si] = closes[si];
+    }
   }
 
   // Gravity centerline — the phi-weighted mean price (volume-weighted attractor)
@@ -1473,9 +1482,7 @@ function renderChart(candles, a) {
         // Buy/Sell — density-scaled
         { label: 'Buy', data: buyPoints, borderColor: 'transparent', backgroundColor: '#10B981', pointRadius: sigR, pointHoverRadius: sigH, pointStyle: 'triangle', pointBorderColor: '#34d399', pointBorderWidth: sigB, showLine: false, order: 0 },
         { label: 'Sell', data: sellPoints, borderColor: 'transparent', backgroundColor: '#EF4444', pointRadius: sigR, pointHoverRadius: sigH, pointStyle: 'triangle', pointRotation: 180, pointBorderColor: '#f87171', pointBorderWidth: sigB, showLine: false, order: 0 },
-        // Temperature transitions — diamonds, slightly smaller
-        { label: 'Temp Buy', data: tempBuyPts, borderColor: 'transparent', backgroundColor: '#34d399', pointRadius: tSigR, pointHoverRadius: tSigR + 4, pointStyle: 'rectRot', pointBorderColor: '#10B981', pointBorderWidth: sigB, showLine: false, order: 0 },
-        { label: 'Temp Sell', data: tempSellPts, borderColor: 'transparent', backgroundColor: '#f87171', pointRadius: tSigR, pointHoverRadius: tSigR + 4, pointStyle: 'rectRot', pointBorderColor: '#EF4444', pointBorderWidth: sigB, showLine: false, order: 0 },
+        // (Old diamond signals removed — unified temperature-first system)
         // Volume overlay — brighter, semi-transparent bars at chart bottom
         { label: 'Volume', data: candles.map(c => c.v), type: 'bar', backgroundColor: candles.map((c, i) => i > 0 && c.c >= candles[i-1].c ? 'rgba(16,185,129,0.25)' : 'rgba(239,68,68,0.2)'), borderWidth: 0, yAxisID: 'yVol', order: 6 },
         ...visibleGravPoints.map(g => ({
@@ -1525,8 +1532,8 @@ function renderChart(candles, a) {
           }
         },
         zoom: {
-          pan: { enabled: true, mode: 'x', threshold: 10 },
-          zoom: { wheel: { enabled: true, mode: 'x' }, pinch: { enabled: true }, mode: 'x' }
+          pan: { enabled: true, mode: 'x', threshold: 5, onPan: function(ctx) { syncSubChartZoom(ctx.chart); }, onPanComplete: function(ctx) { syncSubChartZoom(ctx.chart); } },
+          zoom: { wheel: { enabled: true, mode: 'x', speed: 0.05 }, pinch: { enabled: true }, mode: 'x', onZoom: function(ctx) { syncSubChartZoom(ctx.chart); }, onZoomComplete: function(ctx) { syncSubChartZoom(ctx.chart); } }
         }
       },
       scales: {
@@ -1686,6 +1693,50 @@ function renderChart(candles, a) {
       }
     });
   });
+}
+
+// ── Zoom/Pan sync across all charts ──
+function syncSubChartZoom(mainChart) {
+  if (!mainChart || !mainChart.scales || !mainChart.scales.x) return;
+  var min = mainChart.scales.x.min;
+  var max = mainChart.scales.x.max;
+  var subs = [rsiChartInstance, tempChartInstance];
+  if (typeof dtChartInstance !== 'undefined' && dtChartInstance) subs.push(dtChartInstance);
+  for (var ci = 0; ci < 3; ci++) { if (window['_customChart' + ci]) subs.push(window['_customChart' + ci]); }
+  subs.forEach(function(sub) {
+    if (!sub || !sub.scales || !sub.scales.x) return;
+    sub.scales.x.options.min = min;
+    sub.scales.x.options.max = max;
+    sub.update('none');
+  });
+}
+
+function resetAllZoom() {
+  if (chartInstance && chartInstance.resetZoom) chartInstance.resetZoom();
+  [rsiChartInstance, tempChartInstance, typeof dtChartInstance !== 'undefined' ? dtChartInstance : null].forEach(function(c) {
+    if (c && c.resetZoom) c.resetZoom();
+  });
+  for (var ci = 0; ci < 3; ci++) { if (window['_customChart' + ci] && window['_customChart' + ci].resetZoom) window['_customChart' + ci].resetZoom(); }
+}
+
+// ── Collapse/Expand sub-chart panels ──
+function toggleSubPanel(toggleEl) {
+  var wrap = toggleEl.closest('.sub-chart-wrap');
+  var canvas = wrap.querySelector('canvas');
+  var isCollapsed = canvas.style.display === 'none';
+  if (isCollapsed) {
+    canvas.style.display = 'block';
+    wrap.style.height = '';
+    wrap.style.minHeight = '';
+    wrap.style.overflow = '';
+    toggleEl.textContent = '\u25BE';
+  } else {
+    canvas.style.display = 'none';
+    wrap.style.height = '20px';
+    wrap.style.minHeight = '20px';
+    wrap.style.overflow = 'hidden';
+    toggleEl.textContent = '\u25B8';
+  }
 }
 
 // Enter key support
