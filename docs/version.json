@@ -1,1 +1,1 @@
-{"version": "5.20.0", "date": "2026-05-26", "note": "Kirk's Temperature Signal Theory: temperature transitions are primary, EMAs are confirmation. No sells in red, no buys in green. Zoom syncs all charts. Collapse toggles. Backtest matches new logic."}
+{"version": "5.20.1", "date": "2026-05-26", "note": "Layered signals: ALL THREE must agree — temperature transition AND EMA alignment AND volume. No OR logic. Fewer signals, higher quality. Backtest matches."}

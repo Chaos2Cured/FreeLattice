@@ -1174,23 +1174,24 @@ function backtestSignals(candles) {
   var tempROC = tempResult.tempROC;
   var volEma = ema(candles.map(function(c){return c.v;}), 20);
 
-  // Temperature-first signals (same logic as renderChart)
+  // Layered signals (same logic as renderChart — ALL THREE layers must agree)
   var signals = [];
+  var volEma20 = ema(candles.map(function(c){return c.v;}), 20);
   for (var si = 1; si < closes.length; si++) {
     if (temps[si] == null || temps[si-1] == null) continue;
-    var tempCrossUp = (temps[si-1] < 45 && temps[si] >= 45) || (temps[si-1] < 55 && temps[si] >= 55);
-    var tempCrossDown = (temps[si-1] >= 55 && temps[si] < 55) || (temps[si-1] >= 45 && temps[si] < 45);
-    if (tempCrossUp) {
-      var eOk = ema8[si] != null && ema12[si] != null && ema8[si] > ema12[si];
-      var rOk = rsiArr[si] != null && rsiArr[si] > 35 && rsiArr[si] < 80;
-      var dOk = tempROC && tempROC[si] != null && tempROC[si] > 0;
-      if (eOk || rOk || dOk) signals.push({ index: si, type: 'buy', price: closes[si], date: new Date(candles[si].t) });
+    // Layer 1: Temperature transition
+    var tBuy = (temps[si-1] < 55 && temps[si] >= 55) || (temps[si-1] < 45 && temps[si] >= 45);
+    var tSell = (temps[si-1] >= 55 && temps[si] < 55);
+    if (tBuy) {
+      // Layer 2: EMA alignment + Layer 3: Volume
+      var eUp = ema8[si] != null && ema12[si] != null && ema8[si] > ema12[si];
+      var vUp = volEma20[si] && candles[si].v > volEma20[si];
+      if (eUp && vUp) signals.push({ index: si, type: 'buy', price: closes[si], date: new Date(candles[si].t) });
     }
-    if (tempCrossDown) {
-      var eWk = ema8[si] != null && ema12[si] != null && ema8[si] < ema12[si];
-      var rWk = rsiArr[si] != null && rsiArr[si] < 65;
-      var dWk = tempROC && tempROC[si] != null && tempROC[si] < 0;
-      if (eWk || rWk || dWk) signals.push({ index: si, type: 'sell', price: closes[si], date: new Date(candles[si].t) });
+    if (tSell) {
+      var eDn = ema8[si] != null && ema12[si] != null && ema8[si] < ema12[si];
+      var vDn = volEma20[si] && candles[si].v > volEma20[si];
+      if (eDn && vDn) signals.push({ index: si, type: 'sell', price: closes[si], date: new Date(candles[si].t) });
     }
   }
 
@@ -1378,35 +1379,42 @@ function renderChart(candles, a) {
   const ema24 = ema(closes, 24);
   const ema50 = ema(closes, 50);
 
-  // ═══ Kirk's Temperature-First Signal Architecture ═══
-  // Temperature transitions are PRIMARY. EMA/RSI/ΔT are CONFIRMATION.
-  // BUY: temperature rises from red (<45) into yellow/green (crossing 45 or 55)
-  // SELL: temperature drops from green (>55) into yellow/red (crossing below 55 or 45)
-  // No sells in red zone. No buys in green zone. The transition IS the signal.
+  // ═══ Kirk's Layered Signal Architecture ═══
+  // ALL THREE layers must agree. No exceptions.
+  // Layer 1 (Temperature): zone transition is the trigger
+  // Layer 2 (EMA): alignment confirms trend direction
+  // Layer 3 (Volume): above-average volume confirms conviction
+  // No sells in red zone. No buys in green zone.
   var buyPoints = new Array(closes.length).fill(null);
   var sellPoints = new Array(closes.length).fill(null);
+  var volEma20 = ema(candles.map(function(c){return c.v;}), 20);
   for (var si = 1; si < closes.length; si++) {
     if (a.temps[si] == null || a.temps[si-1] == null) continue;
 
-    // BUY: cold→warm (crossing above 45) or warm→hot (crossing above 55)
-    var tempCrossUp = (a.temps[si-1] < 45 && a.temps[si] >= 45) ||
-                      (a.temps[si-1] < 55 && a.temps[si] >= 55);
-    // SELL: hot→cooling (crossing below 55) or cooling→cold (crossing below 45)
-    var tempCrossDown = (a.temps[si-1] >= 55 && a.temps[si] < 55) ||
-                        (a.temps[si-1] >= 45 && a.temps[si] < 45);
+    // Layer 1: Temperature zone transition
+    // BUY only: was in red/yellow, now crossing INTO green (above 55)
+    //   OR: was in red (<45), now crossing into yellow (above 45)
+    var tempBuy = (a.temps[si-1] < 55 && a.temps[si] >= 55) ||
+                  (a.temps[si-1] < 45 && a.temps[si] >= 45);
+    // SELL only: was in green (>=55), now dropping into yellow (below 55)
+    var tempSell = (a.temps[si-1] >= 55 && a.temps[si] < 55);
 
-    if (tempCrossUp) {
-      var emaOk = ema8[si] != null && ema12[si] != null && ema8[si] > ema12[si];
-      var rsiOk = a.rsiArr[si] != null && a.rsiArr[si] > 35 && a.rsiArr[si] < 80;
-      var dtOk = a.tempROC && a.tempROC[si] != null && a.tempROC[si] > 0;
-      if (emaOk || rsiOk || dtOk) buyPoints[si] = closes[si];
+    if (tempBuy) {
+      // Layer 2: EMA 8 above EMA 12 (trend is up)
+      var emaUp = ema8[si] != null && ema12[si] != null && ema8[si] > ema12[si];
+      // Layer 3: Volume above 20-bar average (conviction)
+      var volUp = volEma20[si] && candles[si].v > volEma20[si];
+      // ALL THREE must agree
+      if (emaUp && volUp) buyPoints[si] = closes[si];
     }
 
-    if (tempCrossDown) {
-      var emaWk = ema8[si] != null && ema12[si] != null && ema8[si] < ema12[si];
-      var rsiWk = a.rsiArr[si] != null && a.rsiArr[si] < 65;
-      var dtWk = a.tempROC && a.tempROC[si] != null && a.tempROC[si] < 0;
-      if (emaWk || rsiWk || dtWk) sellPoints[si] = closes[si];
+    if (tempSell) {
+      // Layer 2: EMA 8 below EMA 12 (trend weakening)
+      var emaDn = ema8[si] != null && ema12[si] != null && ema8[si] < ema12[si];
+      // Layer 3: Volume above average (selling conviction)
+      var volDn = volEma20[si] && candles[si].v > volEma20[si];
+      // ALL THREE must agree
+      if (emaDn && volDn) sellPoints[si] = closes[si];
     }
   }
 
