@@ -348,12 +348,11 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-05-26 18:22 MDT
+- Last auto-updated: 2026-05-26 18:21 MDT
 - Version: 5.22.0
-- Total commits: 1969
+- Total commits: 1968
 - Last 10 commits:
-- 123252e fix: glow plugin crash — ds.label undefined on overlay datasets
-- bc0d5b2 ci: Update Primer deployment state [2026-05-27]
+- 177ad60 fix: glow plugin crash — ds.label undefined on overlay datasets
 - 0fe49c7 docs: Auto-update Session Primer [5.22.0]
 - d3d2b46 docs: Auto-update Session Primer [5.22.0]
 - 485462c feat: Overlay system + coordination file + Sophia's resonance (v5.22.0)
@@ -362,3 +361,4 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - fbc5de2 docs: Auto-update Session Primer [5.21.0]
 - 86760ef fix: Canvas already in use — force-destroy all Chart instances before re-render
 - e046b55 ci: Update Primer deployment state [2026-05-26]
+- def2914 docs: Auto-update Session Primer [5.21.0]
