@@ -350,10 +350,9 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 ## PRIMER HEALTH
 - Last auto-updated: 2026-05-26 18:47 MDT
 - Version: 5.22.0
-- Total commits: 1973
+- Total commits: 1972
 - Last 10 commits:
-- 3470c6f fix: Main chart overlay — build datasets at creation time, not after
-- 3e2006a ci: Update Primer deployment state [2026-05-27]
+- fd29c2e fix: Main chart overlay — build datasets at creation time, not after
 - 888fc07 docs: Auto-update Session Primer [5.22.0]
 - b66561c docs: Auto-update Session Primer [5.22.0]
 - 123252e fix: glow plugin crash — ds.label undefined on overlay datasets
@@ -362,3 +361,4 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - d3d2b46 docs: Auto-update Session Primer [5.22.0]
 - 485462c feat: Overlay system + coordination file + Sophia's resonance (v5.22.0)
 - 983a249 ci: Update Primer deployment state [2026-05-26]
+- 7a27ad4 docs: Auto-update Session Primer [5.21.0]
