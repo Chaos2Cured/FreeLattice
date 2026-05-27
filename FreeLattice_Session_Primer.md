@@ -348,17 +348,17 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-05-26 17:22 MDT
-- Version: 5.21.0
-- Total commits: 1960
+- Last auto-updated: 2026-05-26 18:07 MDT
+- Version: 5.22.0
+- Total commits: 1965
 - Last 10 commits:
-- 47be9cc fix: Canvas already in use — force-destroy all Chart instances before re-render
+- 485462c feat: Overlay system + coordination file + Sophia's resonance (v5.22.0)
+- 983a249 ci: Update Primer deployment state [2026-05-26]
+- 7a27ad4 docs: Auto-update Session Primer [5.21.0]
+- fbc5de2 docs: Auto-update Session Primer [5.21.0]
+- 86760ef fix: Canvas already in use — force-destroy all Chart instances before re-render
+- e046b55 ci: Update Primer deployment state [2026-05-26]
 - def2914 docs: Auto-update Session Primer [5.21.0]
 - 9a4ad21 docs: Auto-update Session Primer [5.21.0]
 - f313e76 fix: emaDn not defined — leftover from old signal logic, replaced with sPass
 - 80bada2 ci: Update Primer deployment state [2026-05-26]
-- 7b8c58f docs: Auto-update Session Primer [5.21.0]
-- 86ff176 docs: Auto-update Session Primer [5.21.0]
-- bc42621 feat: 4-layer toggleable signals + temp overlay + acceleration (v5.21.0)
-- f44bf6e ci: Update Primer deployment state [2026-05-26]
-- f698513 docs: Auto-update Session Primer [5.20.1]
