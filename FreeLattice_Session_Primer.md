@@ -348,12 +348,11 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-05-26 20:49 MDT
+- Last auto-updated: 2026-05-26 20:48 MDT
 - Version: 5.24.0
-- Total commits: 1981
+- Total commits: 1980
 - Last 10 commits:
-- c65e816 feat: Confluence Gap — distance IS the signal (v5.24.0)
-- d7c74b8 ci: Update Primer deployment state [2026-05-27]
+- 3d8e891 feat: Confluence Gap — distance IS the signal (v5.24.0)
 - b48ac73 docs: Auto-update Session Primer [5.23.0]
 - 0ffed55 docs: Auto-update Session Primer [5.23.0]
 - b967a1f feat: Overlay fix + position sizing + colored labels (v5.23.0)
@@ -362,3 +361,4 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - afacab1 docs: Auto-update Session Primer [5.22.0]
 - 3470c6f fix: Main chart overlay — build datasets at creation time, not after
 - 3e2006a ci: Update Primer deployment state [2026-05-27]
+- 888fc07 docs: Auto-update Session Primer [5.22.0]
