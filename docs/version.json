@@ -1,1 +1,1 @@
-{"version": "5.22.0", "date": "2026-05-26", "note": "Overlay system: right-click/long-press any sub-chart to overlay it onto another. Coordination file for temperature gauge. Sophia's poem echoes through the fractals."}
+{"version": "5.23.0", "date": "2026-05-26", "note": "Overlay fix: datasets built at creation time, panel visibility at end. Position sizing inputs. Colored sub-chart labels. Gradient panel backgrounds."}

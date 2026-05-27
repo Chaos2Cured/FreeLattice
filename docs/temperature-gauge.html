@@ -351,7 +351,7 @@ canvas#mainChart { width: 100% !important; height: 100% !important; max-height: 
   .sub-charts { grid-template-columns: 1fr; }
 }
 .sub-chart-wrap {
-  background: var(--bg);
+  background: linear-gradient(180deg, rgba(12,10,26,0.95) 0%, rgba(15,13,28,0.98) 100%);
   padding: 6px 10px;
   position: relative;
   height: 100px;
@@ -541,6 +541,11 @@ canvas.sub-canvas { width: 100% !important; height: 80px !important; }
     <!-- Risk -->
     <div class="sidebar-section" id="riskSection" style="display:none;">
       <div class="sidebar-label">Risk Management</div>
+      <div style="display:flex;gap:6px;margin-bottom:8px;padding:0 14px;">
+        <div style="flex:1;"><div style="font-size:0.62rem;color:var(--dim);">Account $</div><input type="number" id="accountInput" value="10000" onchange="localStorage.setItem('fl_tg_account',this.value);if(lastCandles&&lastAnalysis)renderAll(lastCandles,lastAnalysis,lastSymbol)" style="width:100%;padding:4px 6px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;color:var(--text);font-size:0.78rem;"></div>
+        <div style="flex:1;"><div style="font-size:0.62rem;color:var(--dim);">Risk %</div><input type="number" id="riskInput" value="1.0" step="0.1" onchange="localStorage.setItem('fl_tg_risk',this.value);if(lastCandles&&lastAnalysis)renderAll(lastCandles,lastAnalysis,lastSymbol)" style="width:100%;padding:4px 6px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;color:var(--text);font-size:0.78rem;"></div>
+      </div>
+      <script>document.addEventListener('DOMContentLoaded',function(){var a=localStorage.getItem('fl_tg_account');var r=localStorage.getItem('fl_tg_risk');if(a)document.getElementById('accountInput').value=a;if(r)document.getElementById('riskInput').value=r;});</script>
       <div class="signal-card" style="padding:10px 14px; font-size:0.72rem; color:var(--muted); line-height:1.5;" id="riskText"></div>
     </div>
 
@@ -588,15 +593,15 @@ canvas.sub-canvas { width: 100% !important; height: 80px !important; }
     </div>
     <div class="sub-charts" id="subCharts" style="display:none;">
       <div class="sub-chart-wrap">
-        <div class="sub-chart-label"><span onclick="toggleSubPanel(this)" style="cursor:pointer;opacity:0.5;font-size:0.7rem;margin-right:3px;" title="Collapse">&blacktriangledown;</span>RSI (14)</div>
+        <div class="sub-chart-label" style="color:#8B5CF6;"><span onclick="toggleSubPanel(this)" style="cursor:pointer;opacity:0.5;font-size:0.7rem;margin-right:3px;" title="Collapse">&blacktriangledown;</span>RSI (14)</div>
         <canvas id="rsiChart" height="80" class="sub-canvas"></canvas>
       </div>
       <div class="sub-chart-wrap">
-        <div class="sub-chart-label"><span onclick="toggleSubPanel(this)" style="cursor:pointer;opacity:0.5;font-size:0.7rem;margin-right:3px;" title="Collapse">&blacktriangledown;</span>Temperature</div>
+        <div class="sub-chart-label" style="color:var(--gold);"><span onclick="toggleSubPanel(this)" style="cursor:pointer;opacity:0.5;font-size:0.7rem;margin-right:3px;" title="Collapse">&blacktriangledown;</span>Temperature</div>
         <canvas id="tempChart" height="80" class="sub-canvas"></canvas>
       </div>
       <div class="sub-chart-wrap">
-        <div class="sub-chart-label"><span onclick="toggleSubPanel(this)" style="cursor:pointer;opacity:0.5;font-size:0.7rem;margin-right:3px;" title="Collapse">&blacktriangledown;</span>&Delta;T (acceleration)</div>
+        <div class="sub-chart-label" style="color:#34d399;"><span onclick="toggleSubPanel(this)" style="cursor:pointer;opacity:0.5;font-size:0.7rem;margin-right:3px;" title="Collapse">&blacktriangledown;</span>&Delta;T (acceleration)</div>
         <canvas id="dtChart" height="80" class="sub-canvas"></canvas>
       </div>
     </div>
@@ -1494,17 +1499,16 @@ function renderChart(candles, a) {
   var tSigR = Math.max(sigR - 2, 4);
 
   // Build overlay datasets for main chart (must be included at creation time)
+  // Build overlay datasets for main chart (included at creation time — never modify after)
   var mainOverlayDatasets = [];
   var needsOverlayAxis = false;
   if (activeOverlays['mainChart']) {
     activeOverlays['mainChart'].forEach(function(overlay) {
       var od = getOverlayData(overlay.sourceId, candles, a);
       if (!od) return;
-      mainOverlayDatasets.push({ data: od.values, borderColor: od.color, borderWidth: 1.5, pointRadius: 0, tension: 0.3, fill: false, yAxisID: 'yOverlay', order: 7 });
+      var srcName = overlay.sourceId.replace('Chart', '').replace('rsi', 'RSI').replace('temp', 'Temp').replace('dt', '\u0394T');
+      mainOverlayDatasets.push({ label: 'Overlay: ' + srcName, data: od.values, borderColor: od.color, borderWidth: 1.5, pointRadius: 0, tension: 0.3, fill: false, yAxisID: 'yOverlay', order: 7 });
       needsOverlayAxis = true;
-      // Hide source panel
-      var src = document.getElementById(overlay.sourceId);
-      if (src) { var w = src.closest('.sub-chart-wrap'); if (w) w.style.display = 'none'; }
     });
   }
 
@@ -1655,9 +1659,7 @@ function renderChart(candles, a) {
     });
     rsiChartInstance.update('none');
   }
-  // Show/hide temperature panel based on stack mode
-  var tempWrap = document.getElementById('tempChart') ? document.getElementById('tempChart').closest('.sub-chart-wrap') : null;
-  if (tempWrap) tempWrap.style.display = stackMode ? 'none' : 'block';
+  // (Panel visibility handled at end of renderChart by updatePanelVisibility)
 
   // Temperature + delta-T sub-chart
   const tempCtx = document.getElementById('tempChart').getContext('2d');
@@ -1764,6 +1766,24 @@ function renderChart(candles, a) {
       addLongPress(el, function(t) { showOverlayMenu({ preventDefault: function(){}, clientX: t.clientX, clientY: t.clientY }, id); });
     }
   });
+
+  // ── Panel visibility — handles overlays, stack mode, never hides before chart creation ──
+  (function updatePanelVisibility() {
+    // Show all panels first
+    document.querySelectorAll('.sub-chart-wrap').forEach(function(w) { w.style.display = ''; });
+    // Hide panels that are overlaid onto other charts
+    Object.keys(activeOverlays).forEach(function(targetId) {
+      (activeOverlays[targetId] || []).forEach(function(overlay) {
+        var src = document.getElementById(overlay.sourceId);
+        if (src) { var w = src.closest('.sub-chart-wrap'); if (w) w.style.display = 'none'; }
+      });
+    });
+    // Handle stack mode
+    if (document.getElementById('stackToggle') && document.getElementById('stackToggle').checked) {
+      var tw = document.getElementById('tempChart');
+      if (tw) { var w = tw.closest('.sub-chart-wrap'); if (w) w.style.display = 'none'; }
+    }
+  })();
 }
 
 // ── Zoom/Pan sync across all charts ──
