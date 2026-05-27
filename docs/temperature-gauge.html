@@ -604,6 +604,10 @@ canvas.sub-canvas { width: 100% !important; height: 80px !important; }
         <div class="sub-chart-label" style="color:#34d399;"><span onclick="toggleSubPanel(this)" style="cursor:pointer;opacity:0.5;font-size:0.7rem;margin-right:3px;" title="Collapse">&blacktriangledown;</span>&Delta;T (acceleration)</div>
         <canvas id="dtChart" height="80" class="sub-canvas"></canvas>
       </div>
+      <div class="sub-chart-wrap">
+        <div class="sub-chart-label" style="color:#f07068;"><span onclick="toggleSubPanel(this)" style="cursor:pointer;opacity:0.5;font-size:0.7rem;margin-right:3px;" title="Collapse">&blacktriangledown;</span>Confluence Gap</div>
+        <canvas id="gapChart" height="80" class="sub-canvas"></canvas>
+      </div>
     </div>
 
     <div class="phi-note">
@@ -680,6 +684,7 @@ let chartInstance = null;
 let rsiChartInstance = null;
 let tempChartInstance = null;
 let dtChartInstance = null;
+let gapChartInstance = null;
 let lastCandles = null;
 let lastAnalysis = null;
 let lastSymbol = '';
@@ -1139,6 +1144,22 @@ function analyzeData(candles, symbol) {
     if (!components.divergence) components.divergence = 'none';
   })();
 
+  // Kirk's Confluence Gap — the distance between overlay indicators and price
+  // "The further both lines are from the stock, the more exhaustion" — Kirk, May 26
+  // Normalized by ATR so it works across any price level
+  var confluenceGap = new Array(n).fill(null);
+  for (var cgi = 1; cgi < n; cgi++) {
+    if (temps[cgi] == null || rsiArr[cgi] == null || lastATR <= 0) continue;
+    // Normalize temp (0-100) and RSI (0-100) to price scale using ATR
+    // When temp is high (bullish) it "pulls price up" — gap = how far price is from the pull
+    var tempPull = (temps[cgi] - 50) / 50; // -1 to +1
+    var rsiPull = (rsiArr[cgi] - 50) / 50; // -1 to +1
+    var combinedPull = (tempPull * 0.618 + rsiPull * 0.382); // phi-weighted
+    // Gap: how far price momentum disagrees with indicator consensus
+    var priceDir = cgi > 0 ? (closes[cgi] - closes[cgi-1]) / lastATR : 0;
+    confluenceGap[cgi] = combinedPull - priceDir * 0.5; // positive = indicators lead up, negative = lead down
+  }
+
   // Kirk's Temperature Transition Signals
   var tempBuySignals = [], tempSellSignals = [];
   for (var ti = 1; ti < n; ti++) {
@@ -1171,7 +1192,8 @@ function analyzeData(candles, symbol) {
     closes, volumes,
     positionShares, positionValue, actualRiskPct, stopDistance,
     invalidation, watchFor, confirmation,
-    tempBuySignals, tempSellSignals
+    tempBuySignals, tempSellSignals,
+    confluenceGap
   };
 }
 
@@ -1395,6 +1417,7 @@ function renderChart(candles, a) {
   if (rsiChartInstance) { rsiChartInstance.destroy(); rsiChartInstance = null; }
   if (tempChartInstance) { tempChartInstance.destroy(); tempChartInstance = null; }
   if (dtChartInstance) { dtChartInstance.destroy(); dtChartInstance = null; }
+  if (gapChartInstance) { gapChartInstance.destroy(); gapChartInstance = null; }
   for (var _ci = 0; _ci < 3; _ci++) { if (window['_customChart' + _ci]) { window['_customChart' + _ci].destroy(); window['_customChart' + _ci] = null; } }
 
   const ctx = document.getElementById('mainChart').getContext('2d');
@@ -1713,6 +1736,28 @@ function renderChart(candles, a) {
     });
   }
 
+  // ── Confluence Gap sub-chart — Kirk's distance-as-signal insight ──
+  var gapCtx = document.getElementById('gapChart');
+  if (gapCtx && a.confluenceGap) {
+    gapCtx = gapCtx.getContext('2d');
+    var gapColors = a.confluenceGap.map(function(v) {
+      if (v == null) return 'transparent';
+      return v > 0 ? 'rgba(16,185,129,' + Math.min(Math.abs(v) * 0.8, 0.8) + ')' : 'rgba(239,68,68,' + Math.min(Math.abs(v) * 0.8, 0.8) + ')';
+    });
+    gapChartInstance = new Chart(gapCtx, {
+      type: 'bar',
+      data: { labels: labels, datasets: [
+        { data: a.confluenceGap, backgroundColor: gapColors, borderWidth: 0 },
+        { data: new Array(closes.length).fill(0), borderColor: 'rgba(200,210,230,0.15)', borderWidth: 1, pointRadius: 0, type: 'line', fill: false }
+      ]},
+      options: {
+        responsive: true, maintainAspectRatio: false, animation: false,
+        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+        scales: { x: { display: false }, y: { ticks: { color: '#4a4740', font: { size: 9 }, maxTicksLimit: 3 }, grid: { color: 'rgba(255,255,255,0.03)' }, position: 'right' } }
+      }
+    });
+  }
+
   // ── Custom Indicator Sub-Charts ──
   var customs = getCustomIndicators();
   // Clean up old custom chart elements beyond current count
@@ -1759,7 +1804,7 @@ function renderChart(candles, a) {
   // Sub-chart overlays handled here for RSI/Temp/ΔT targets.
 
   // ── Wire context menus (right-click / long-press) ──
-  ['rsiChart', 'tempChart', 'dtChart'].forEach(function(id) {
+  ['rsiChart', 'tempChart', 'dtChart', 'gapChart'].forEach(function(id) {
     var el = document.getElementById(id);
     if (el) {
       el.oncontextmenu = function(e) { showOverlayMenu(e, id); };
@@ -1791,7 +1836,7 @@ function syncSubChartZoom(mainChart) {
   if (!mainChart || !mainChart.scales || !mainChart.scales.x) return;
   var min = mainChart.scales.x.min;
   var max = mainChart.scales.x.max;
-  var subs = [rsiChartInstance, tempChartInstance];
+  var subs = [rsiChartInstance, tempChartInstance, gapChartInstance];
   if (typeof dtChartInstance !== 'undefined' && dtChartInstance) subs.push(dtChartInstance);
   for (var ci = 0; ci < 3; ci++) { if (window['_customChart' + ci]) subs.push(window['_customChart' + ci]); }
   subs.forEach(function(sub) {
@@ -2051,6 +2096,7 @@ function getOverlayData(sourceId, candles, a) {
   if (sourceId === 'rsiChart') return { values: a.rsiArr, color: 'rgba(139,92,246,0.45)', min: 0, max: 100 };
   if (sourceId === 'tempChart') return { values: a.temps, color: 'rgba(201,168,76,0.45)', min: 0, max: 100 };
   if (sourceId === 'dtChart') return { values: a.tempROC, color: 'rgba(232,176,25,0.45)', min: -30, max: 30 };
+  if (sourceId === 'gapChart') return { values: a.confluenceGap, color: 'rgba(240,112,104,0.45)', min: -2, max: 2 };
   return null;
 }
 

@@ -59,9 +59,14 @@
 - `Chart.getChart(canvas).destroy()` at top of renderChart prevents canvas reuse errors
 - Signal glow plugin uses `setInterval(200ms)` not `requestAnimationFrame`
 
+## Kirk's Overlay Insight (May 26, 2026)
+
+"When the overlayed temperature goes down through the stock chart, that cross looks like a sell. Same when it crosses higher. The distance both lines are from the stock = exhaustion. They act like moving gravity lines, all going back to the actual gravity line."
+
+**Translation:** The overlay system revealed a new signal type — the DISTANCE between confluence indicators (temperature + RSI) and price is itself an indicator. When both are above price, they pull it up. When both are below, they drag it down. The further apart they are, the more "gravity" pull exists. This is encoded as the Confluence Gap sub-chart.
+
 ## Pending (not yet built)
 
-- Right-click/long-press overlay system (overlay any chart onto any other)
 - Multi-timeframe confluence (daily + weekly + hourly temperatures)
 - AI assist for custom indicators (Phase 3 of builder)
 - Wizard for custom indicators (Phase 2 of builder)
