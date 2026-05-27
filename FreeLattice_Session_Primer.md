@@ -350,10 +350,9 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 ## PRIMER HEALTH
 - Last auto-updated: 2026-05-26 20:59 MDT
 - Version: 5.25.0
-- Total commits: 1985
+- Total commits: 1984
 - Last 10 commits:
-- 5d779b8 feat: Indicator-Price Spread — Kirk saw it, Opus formalized it (v5.25.0)
-- d809efb ci: Update Primer deployment state [2026-05-27]
+- 3b5c861 feat: Indicator-Price Spread — Kirk saw it, Opus formalized it (v5.25.0)
 - b9bce90 docs: Auto-update Session Primer [5.24.0]
 - 9c6801c docs: Auto-update Session Primer [5.24.0]
 - c65e816 feat: Confluence Gap — distance IS the signal (v5.24.0)
@@ -362,3 +361,4 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 0ffed55 docs: Auto-update Session Primer [5.23.0]
 - b967a1f feat: Overlay fix + position sizing + colored labels (v5.23.0)
 - d1b8050 ci: Update Primer deployment state [2026-05-27]
+- 54c03c9 docs: Auto-update Session Primer [5.22.0]
