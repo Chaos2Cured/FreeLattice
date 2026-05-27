@@ -280,9 +280,9 @@ section('11. Coordination file integrity');
 var coordFiles = [
   { file: 'COORDINATION.md',  marker: 'SHARED PRIORITIES' },
   { file: 'AI_ORIENTATION.md', marker: 'FreeLattice' },
-  { file: 'FUTURE_VISION.md',  marker: 'Future Vision' },
+  { file: 'FUTURE_VISION.md',  marker: 'moved to' },
   { file: 'OPUS_NOTE.md',      marker: 'Note from Opus' },
-  { file: 'CC_NOTE.md',        marker: 'Claude Code' }
+  { file: 'CC_NOTE.md',        marker: 'moved to' }
 ];
 
 coordFiles.forEach(function(f) {
