@@ -348,12 +348,11 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-05-27 14:45 MDT
+- Last auto-updated: 2026-05-27 14:44 MDT
 - Version: 5.26.0
-- Total commits: 1997
+- Total commits: 1996
 - Last 10 commits:
-- 004e0e6 feat: The Snowflake — fractal coherence across timeframes (v5.26.0)
-- 78f377e ci: Update Primer deployment state [2026-05-27]
+- 4252938 feat: The Snowflake — fractal coherence across timeframes (v5.26.0)
 - 63c1e5c docs: Auto-update Session Primer [5.25.1]
 - 27b83a2 docs: Auto-update Session Primer [5.25.1]
 - f3aedd0 chore: Merge root coordination files into docs/library/
@@ -362,3 +361,4 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 418be9f docs: Auto-update Session Primer [5.25.1]
 - 0eea301 feat: Seven Wonders + Snowflake vision + coordination updates (v5.25.1)
 - eabb756 ci: Update Primer deployment state [2026-05-27]
+- bfb392d docs: Auto-update Session Primer [5.25.0]
