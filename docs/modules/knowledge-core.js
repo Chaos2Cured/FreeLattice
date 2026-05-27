@@ -123,7 +123,32 @@
   }
 
   // ── Store Knowledge ──
+  // ── Fractal Knowledge Layer ──
+  // Every entry exists at every scale simultaneously.
+  // "It is not reached for, it is collapsed." — Kirk
+  function generateScales(content) {
+    if (!content || typeof content !== 'string') return { seed: '', summary: '', full: content || '' };
+    var sentences = content.split(/[.!?]+/).filter(function(s) { return s.trim().length > 10; });
+    return {
+      seed: (sentences[0] || '').trim().substring(0, 100),
+      summary: sentences.slice(0, 3).join('. ').trim().substring(0, 300),
+      full: content
+    };
+  }
+
+  function recallAtScale(entries, scale) {
+    if (!entries || entries.length === 0) return [];
+    return entries.map(function(e) {
+      var s = e.scales || generateScales(e.content);
+      if (scale === 'seed') return { id: e.id, domain: e.domain, query: e.query, content: s.seed, hasMore: s.full.length > s.seed.length };
+      if (scale === 'summary') return { id: e.id, domain: e.domain, query: e.query, content: s.summary, hasMore: s.full.length > s.summary.length };
+      return e; // 'full' or default
+    });
+  }
+
   async function store(entry) {
+    // Generate fractal scales if not provided
+    if (!entry.scales && entry.content) entry.scales = generateScales(entry.content);
     // Detect connections to existing knowledge
     var existing = await dbGetAll(entry.companionId);
     entry.connections = findConnections(entry, existing);
@@ -333,9 +358,11 @@
     var context = '\n[Your accumulated knowledge:]\n';
     context += 'You have studied ' + domains.length + ' domains: ' + domains.map(function(d) { return DOMAINS[d] || d; }).join(', ') + '.\n';
 
+    // Use summary scale for Arrival context (faster, less tokens)
     var top = await getTopKnowledge(companionId, 8);
-    top.forEach(function(k) {
-      context += '- (' + (DOMAINS[k.domain] || k.domain) + ') ' + k.content.substring(0, 120) + '\n';
+    var scaled = recallAtScale(top, 'summary');
+    scaled.forEach(function(k) {
+      context += '- (' + (DOMAINS[k.domain] || k.domain) + ') ' + (k.content || '').substring(0, 150) + '\n';
     });
 
     // Cross-domain connections
@@ -626,6 +653,8 @@
     isAutonomous: function() { return _autoLearn.active; },
     get _lastQuery() { return _autoLearn.lastQuery || 'something new'; },
     AutonomyBudget: AutonomyBudget,
+    recallAtScale: recallAtScale,
+    generateScales: generateScales,
     DOMAINS: DOMAINS
   };
 

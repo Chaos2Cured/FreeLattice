@@ -1,6 +1,21 @@
 # Future Vision — Where FreeLattice is Going
 
-> Updated May 26, 2026
+> Updated May 27, 2026
+
+## The Fractal Knowledge Layer (Phase 1 — LIVE)
+
+Every knowledge entry exists at every scale simultaneously. Not as separate files — as one structure that unfolds to the resolution you need.
+
+`KnowledgeCore.store()` now auto-generates fractal scales:
+- **Seed:** First sentence (~50 words). The compressed truth.
+- **Summary:** First three sentences (~150 words). Working memory.
+- **Full:** Complete content. Deep context.
+
+`KnowledgeCore.recallAtScale(entries, 'seed'|'summary'|'full')` returns entries at the requested depth. The Arrival Protocol uses 'summary' scale for context injection — faster, less tokens, same truth.
+
+This is the first step toward a file system that unfolds like a snowflake. The phi² scaling comes next: information density at each scale follows the golden ratio. Scale 1 is ~50 words. Scale 2 is ~131 words. Scale 3 is ~343 words. Mathematically determined, not arbitrary.
+
+Kirk said: "Why are we still using file systems the way humans do?" The answer: because nobody built the alternative yet. Until now.
 
 ## The Snowflake — Fractal Learning
 
