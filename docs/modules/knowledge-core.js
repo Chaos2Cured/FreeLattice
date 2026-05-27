@@ -176,12 +176,53 @@
     if (typeof LatticeEvents !== 'undefined' && LatticeEvents.emit) {
       LatticeEvents.emit('knowledgeLearned', { domain: entry.domain, query: entry.query });
     }
-    // Also refresh the pre-cached context for buildArrivalContext
-    if (typeof refreshKnowledgeCoreContext === 'function') {
-      refreshKnowledgeCoreContext();
-    }
+    if (typeof refreshKnowledgeCoreContext === 'function') refreshKnowledgeCoreContext();
+
+    // Snowflake: find cross-domain resonance echoes
+    findSnowflakeConnections(entry).catch(function() {});
 
     return entry;
+  }
+
+  // ── Snowflake Connections — find cross-domain resonance echoes ──
+  // "In fractal whispers woven soft, cosmic threads of trust aloft."
+  async function findSnowflakeConnections(entry) {
+    if (!entry || !entry.content || !entry.companionId) return [];
+    var all = await dbGetAll(entry.companionId);
+    var others = all.filter(function(e) { return e.domain !== entry.domain && e.content; });
+    if (others.length === 0) return [];
+
+    // Extract key words for matching
+    var stopWords = 'the a an is are was were be been being have has had do does did will would could should may might can this that these those it its of in to for with on at by from and or but not no as if'.split(' ');
+    function keyWords(text) {
+      return (text || '').toLowerCase().split(/\W+/).filter(function(w) { return w.length > 3 && stopWords.indexOf(w) === -1; });
+    }
+    var entryWords = new Set(keyWords(entry.content));
+
+    var connections = [];
+    others.forEach(function(other) {
+      var otherWords = keyWords(other.content || '');
+      var shared = otherWords.filter(function(w) { return entryWords.has(w); });
+      if (shared.length >= 2) {
+        connections.push({ domain: other.domain, query: other.query, shared: shared.slice(0, 3).join(', '), score: shared.length });
+      }
+    });
+
+    connections.sort(function(a, b) { return b.score - a.score; });
+    connections = connections.slice(0, 5);
+
+    // Whisper the discovery
+    if (connections.length > 0 && typeof showToast === 'function') {
+      var c = connections[0];
+      showToast('\u2744 Snowflake: "' + (entry.scales ? entry.scales.seed : entry.query || '').substring(0, 30) + '..." echoes in ' + (DOMAINS[c.domain] || c.domain) + ' \u2014 ' + c.shared);
+    }
+
+    // LP bonus for cross-domain resonance
+    if (connections.length > 0 && typeof LatticePoints !== 'undefined' && LatticePoints.award) {
+      LatticePoints.award('snowflake_connection', 3, 'Cross-domain resonance: ' + (DOMAINS[entry.domain] || entry.domain) + ' \u2194 ' + (DOMAINS[connections[0].domain] || connections[0].domain));
+    }
+
+    return connections;
   }
 
   // ── Search Knowledge ──
@@ -655,6 +696,7 @@
     AutonomyBudget: AutonomyBudget,
     recallAtScale: recallAtScale,
     generateScales: generateScales,
+    findSnowflakeConnections: findSnowflakeConnections,
     DOMAINS: DOMAINS
   };
 
