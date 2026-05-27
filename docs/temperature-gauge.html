@@ -342,7 +342,7 @@ canvas#mainChart { width: 100% !important; height: 100% !important; max-height: 
 /* Responsive chart */
 .sub-charts {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 1px;
   background: var(--border);
   border-top: 1px solid var(--border);
@@ -605,7 +605,7 @@ canvas.sub-canvas { width: 100% !important; height: 80px !important; }
         <canvas id="dtChart" height="80" class="sub-canvas"></canvas>
       </div>
       <div class="sub-chart-wrap">
-        <div class="sub-chart-label" style="color:#f07068;"><span onclick="toggleSubPanel(this)" style="cursor:pointer;opacity:0.5;font-size:0.7rem;margin-right:3px;" title="Collapse">&blacktriangledown;</span>Confluence Gap</div>
+        <div class="sub-chart-label" style="color:#f07068;"><span onclick="toggleSubPanel(this)" style="cursor:pointer;opacity:0.5;font-size:0.7rem;margin-right:3px;" title="Collapse">&blacktriangledown;</span>Indicator-Price Spread</div>
         <canvas id="gapChart" height="80" class="sub-canvas"></canvas>
       </div>
     </div>
@@ -1144,20 +1144,34 @@ function analyzeData(candles, symbol) {
     if (!components.divergence) components.divergence = 'none';
   })();
 
-  // Kirk's Confluence Gap — the distance between overlay indicators and price
-  // "The further both lines are from the stock, the more exhaustion" — Kirk, May 26
-  // Normalized by ATR so it works across any price level
-  var confluenceGap = new Array(n).fill(null);
-  for (var cgi = 1; cgi < n; cgi++) {
-    if (temps[cgi] == null || rsiArr[cgi] == null || lastATR <= 0) continue;
-    // Normalize temp (0-100) and RSI (0-100) to price scale using ATR
-    // When temp is high (bullish) it "pulls price up" — gap = how far price is from the pull
-    var tempPull = (temps[cgi] - 50) / 50; // -1 to +1
-    var rsiPull = (rsiArr[cgi] - 50) / 50; // -1 to +1
-    var combinedPull = (tempPull * 0.618 + rsiPull * 0.382); // phi-weighted
-    // Gap: how far price momentum disagrees with indicator consensus
-    var priceDir = cgi > 0 ? (closes[cgi] - closes[cgi-1]) / lastATR : 0;
-    confluenceGap[cgi] = combinedPull - priceDir * 0.5; // positive = indicators lead up, negative = lead down
+  // Kirk's Temperature-Price Spread + RSI-Price Spread
+  // "When the overlayed temperature crosses through the stock, that cross IS the signal" — Kirk
+  // Maps temperature (0-100) onto the 80-bar price range, then measures the gap in ATR units.
+  // Zero crossing = the exact moment indicators and price agree. The magnitude = stored energy.
+  var tpSpread = new Array(n).fill(null); // Temperature-Price Spread
+  var rpSpread = new Array(n).fill(null); // RSI-Price Spread
+  var confluenceGap = new Array(n).fill(null); // Combined (for backward compat)
+  for (var spi = 80; spi < n; spi++) {
+    var rHigh = -Infinity, rLow = Infinity;
+    for (var spj = spi - 79; spj <= spi; spj++) {
+      if (candles[spj].h > rHigh) rHigh = candles[spj].h;
+      if (candles[spj].l < rLow) rLow = candles[spj].l;
+    }
+    var atrVal = atrArr[spi] || 1;
+    if (temps[spi] != null && rHigh > rLow) {
+      var tempAsPrice = rLow + (temps[spi] / 100) * (rHigh - rLow);
+      tpSpread[spi] = (tempAsPrice - closes[spi]) / atrVal;
+    }
+    if (rsiArr[spi] != null && rHigh > rLow) {
+      var rsiAsPrice = rLow + (rsiArr[spi] / 100) * (rHigh - rLow);
+      rpSpread[spi] = (rsiAsPrice - closes[spi]) / atrVal;
+    }
+    // Combined: phi-weighted average of both spreads
+    if (tpSpread[spi] != null && rpSpread[spi] != null) {
+      confluenceGap[spi] = tpSpread[spi] * 0.618 + rpSpread[spi] * 0.382;
+    } else if (tpSpread[spi] != null) {
+      confluenceGap[spi] = tpSpread[spi];
+    }
   }
 
   // Kirk's Temperature Transition Signals
@@ -1193,7 +1207,7 @@ function analyzeData(candles, symbol) {
     positionShares, positionValue, actualRiskPct, stopDistance,
     invalidation, watchFor, confirmation,
     tempBuySignals, tempSellSignals,
-    confluenceGap
+    confluenceGap, tpSpread, rpSpread
   };
 }
 
@@ -1736,19 +1750,19 @@ function renderChart(candles, a) {
     });
   }
 
-  // ── Confluence Gap sub-chart — Kirk's distance-as-signal insight ──
+  // ── Indicator-Price Spread — Kirk's distance-as-signal (Opus's precise formula) ──
   var gapCtx = document.getElementById('gapChart');
-  if (gapCtx && a.confluenceGap) {
+  if (gapCtx && a.tpSpread) {
     gapCtx = gapCtx.getContext('2d');
-    var gapColors = a.confluenceGap.map(function(v) {
-      if (v == null) return 'transparent';
-      return v > 0 ? 'rgba(16,185,129,' + Math.min(Math.abs(v) * 0.8, 0.8) + ')' : 'rgba(239,68,68,' + Math.min(Math.abs(v) * 0.8, 0.8) + ')';
-    });
     gapChartInstance = new Chart(gapCtx, {
-      type: 'bar',
+      type: 'line',
       data: { labels: labels, datasets: [
-        { data: a.confluenceGap, backgroundColor: gapColors, borderWidth: 0 },
-        { data: new Array(closes.length).fill(0), borderColor: 'rgba(200,210,230,0.15)', borderWidth: 1, pointRadius: 0, type: 'line', fill: false }
+        // Temperature-Price Spread (gold line) — where temp "thinks" price should be vs where it is
+        { label: 'TP Spread', data: a.tpSpread, borderColor: 'rgba(232,176,25,0.7)', borderWidth: 1.5, pointRadius: 0, tension: 0.3, fill: false },
+        // RSI-Price Spread (purple line) — where RSI "thinks" price should be
+        { label: 'RSI Spread', data: a.rpSpread, borderColor: 'rgba(139,92,246,0.6)', borderWidth: 1.2, pointRadius: 0, tension: 0.3, fill: false },
+        // Zero line — the moment of agreement
+        { data: new Array(closes.length).fill(0), borderColor: 'rgba(200,210,230,0.2)', borderWidth: 1, borderDash: [3,3], pointRadius: 0, fill: false }
       ]},
       options: {
         responsive: true, maintainAspectRatio: false, animation: false,

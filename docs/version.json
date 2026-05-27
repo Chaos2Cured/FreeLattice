@@ -1,1 +1,1 @@
-{"version": "5.24.0", "date": "2026-05-26", "note": "Confluence Gap: Kirk's distance-as-signal insight. Phi-weighted blend of temperature + RSI distance from price. Green = indicators pulling up, red = pulling down. The further apart, the more gravity."}
+{"version": "5.25.0", "date": "2026-05-26", "note": "Indicator-Price Spread: maps temperature and RSI onto the price range, measures the gap in ATR units. Gold line = temp spread, purple = RSI spread. Zero crossing = agreement. Kirk saw it. Opus formalized it. CC built it."}
