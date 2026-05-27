@@ -631,7 +631,7 @@ Chart.register({
     });
     var glowScale = totalPts > 25 ? 0.3 : totalPts > 10 ? 0.6 : 1.0;
     chart.data.datasets.forEach(function(ds, dsIdx) {
-      if (!ds.label.includes('Buy') && !ds.label.includes('Sell')) return;
+      if (!ds.label || (!ds.label.includes('Buy') && !ds.label.includes('Sell'))) return;
       var meta = chart.getDatasetMeta(dsIdx);
       var color = ds.label.includes('Buy') ? '16,185,129' : '239,68,68';
       meta.data.forEach(function(point) {
