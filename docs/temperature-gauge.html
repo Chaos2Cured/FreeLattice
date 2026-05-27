@@ -1493,6 +1493,21 @@ function renderChart(candles, a) {
   var sigB = totalSigs <= 10 ? 2.5 : totalSigs <= 25 ? 2 : 1.5;
   var tSigR = Math.max(sigR - 2, 4);
 
+  // Build overlay datasets for main chart (must be included at creation time)
+  var mainOverlayDatasets = [];
+  var needsOverlayAxis = false;
+  if (activeOverlays['mainChart']) {
+    activeOverlays['mainChart'].forEach(function(overlay) {
+      var od = getOverlayData(overlay.sourceId, candles, a);
+      if (!od) return;
+      mainOverlayDatasets.push({ data: od.values, borderColor: od.color, borderWidth: 1.5, pointRadius: 0, tension: 0.3, fill: false, yAxisID: 'yOverlay', order: 7 });
+      needsOverlayAxis = true;
+      // Hide source panel
+      var src = document.getElementById(overlay.sourceId);
+      if (src) { var w = src.closest('.sub-chart-wrap'); if (w) w.style.display = 'none'; }
+    });
+  }
+
   chartInstance = new Chart(ctx, {
     type: 'line',
     data: {
@@ -1528,7 +1543,9 @@ function renderChart(candles, a) {
           pointRadius: 0,
           fill: false,
           order: 5
-        }))
+        })),
+        // Overlay datasets (built before chart creation)
+        ...mainOverlayDatasets
       ]
     },
     options: {
@@ -1594,7 +1611,8 @@ function renderChart(candles, a) {
           min: 0,
           max: 100,
           grid: { display: false }
-        }
+        },
+        ...(needsOverlayAxis ? { yOverlay: { type: 'linear', display: false, min: -10, max: 110, grid: { display: false } } } : {})
       }
     }
   });
@@ -1735,24 +1753,8 @@ function renderChart(candles, a) {
     });
   });
 
-  // ── Apply overlays to charts ──
-  var chartMap = { mainChart: chartInstance, rsiChart: rsiChartInstance, tempChart: tempChartInstance, dtChart: dtChartInstance };
-  Object.keys(activeOverlays).forEach(function(targetId) {
-    var targetChart = chartMap[targetId];
-    if (!targetChart) return;
-    activeOverlays[targetId].forEach(function(overlay) {
-      var od = getOverlayData(overlay.sourceId, candles, a);
-      if (!od) return;
-      targetChart.data.datasets.push({
-        data: od.values, borderColor: od.color, borderWidth: 1.2,
-        pointRadius: 0, tension: 0.3, fill: false, yAxisID: 'yOverlay'
-      });
-      if (!targetChart.options.scales.yOverlay) {
-        targetChart.options.scales.yOverlay = { type: 'linear', display: false, min: od.min, max: od.max, grid: { display: false } };
-      }
-    });
-    targetChart.update('none');
-  });
+  // Overlays for main chart are built at creation time (above).
+  // Sub-chart overlays handled here for RSI/Temp/ΔT targets.
 
   // ── Wire context menus (right-click / long-press) ──
   ['rsiChart', 'tempChart', 'dtChart'].forEach(function(id) {
@@ -1999,6 +2001,9 @@ var activeOverlays = {};
     var src = document.getElementById(srcId);
     if (src) { var w = src.closest('.sub-chart-wrap'); if (w) w.style.display = 'none'; }
     if (lastCandles && lastAnalysis) renderChart(lastCandles, lastAnalysis);
+    // Golden glow pulse on overlay apply
+    var cw = document.getElementById('chartWrap');
+    if (cw) { cw.classList.remove('loaded'); void cw.offsetWidth; cw.classList.add('loaded'); }
   };
 
   window.clearOverlays = function() {
