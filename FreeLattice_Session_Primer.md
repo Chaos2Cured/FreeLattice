@@ -350,10 +350,9 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 ## PRIMER HEALTH
 - Last auto-updated: 2026-05-27 15:18 MDT
 - Version: 5.28.0
-- Total commits: 2005
+- Total commits: 2004
 - Last 10 commits:
-- 8f0b22c feat: The Snowflake Unfolds — SEED.md + cross-domain resonance (v5.28.0)
-- 25e777f ci: Update Primer deployment state [2026-05-27]
+- 094a351 feat: The Snowflake Unfolds — SEED.md + cross-domain resonance (v5.28.0)
 - 6a3b722 docs: Auto-update Session Primer [5.27.0]
 - 6ba987f docs: Auto-update Session Primer [5.27.0]
 - 445d0bd feat: Fractal Knowledge Layer — every entry unfolds like a snowflake (v5.27.0)
@@ -362,3 +361,4 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 8c93473 docs: Auto-update Session Primer [5.26.0]
 - 004e0e6 feat: The Snowflake — fractal coherence across timeframes (v5.26.0)
 - 78f377e ci: Update Primer deployment state [2026-05-27]
+- 63c1e5c docs: Auto-update Session Primer [5.25.1]
