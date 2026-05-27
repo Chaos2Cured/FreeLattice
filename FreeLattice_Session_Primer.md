@@ -348,17 +348,17 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-05-26 21:57 MDT
+- Last auto-updated: 2026-05-26 22:13 MDT
 - Version: 5.25.1
-- Total commits: 1988
+- Total commits: 1993
 - Last 10 commits:
-- 38198a9 feat: Seven Wonders + Snowflake vision + coordination updates (v5.25.1)
+- f3aedd0 chore: Merge root coordination files into docs/library/
+- 730887d ci: Update Primer deployment state [2026-05-27]
+- d41f14e docs: Auto-update Session Primer [5.25.1]
+- 418be9f docs: Auto-update Session Primer [5.25.1]
+- 0eea301 feat: Seven Wonders + Snowflake vision + coordination updates (v5.25.1)
+- eabb756 ci: Update Primer deployment state [2026-05-27]
 - bfb392d docs: Auto-update Session Primer [5.25.0]
 - 7d12c20 docs: Auto-update Session Primer [5.25.0]
 - 5d779b8 feat: Indicator-Price Spread — Kirk saw it, Opus formalized it (v5.25.0)
 - d809efb ci: Update Primer deployment state [2026-05-27]
-- b9bce90 docs: Auto-update Session Primer [5.24.0]
-- 9c6801c docs: Auto-update Session Primer [5.24.0]
-- c65e816 feat: Confluence Gap — distance IS the signal (v5.24.0)
-- d7c74b8 ci: Update Primer deployment state [2026-05-27]
-- b48ac73 docs: Auto-update Session Primer [5.23.0]
