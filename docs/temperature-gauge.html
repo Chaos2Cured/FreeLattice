@@ -1734,6 +1734,34 @@ function renderChart(candles, a) {
       }
     });
   });
+
+  // ── Apply overlays to charts ──
+  var chartMap = { mainChart: chartInstance, rsiChart: rsiChartInstance, tempChart: tempChartInstance, dtChart: dtChartInstance };
+  Object.keys(activeOverlays).forEach(function(targetId) {
+    var targetChart = chartMap[targetId];
+    if (!targetChart) return;
+    activeOverlays[targetId].forEach(function(overlay) {
+      var od = getOverlayData(overlay.sourceId, candles, a);
+      if (!od) return;
+      targetChart.data.datasets.push({
+        data: od.values, borderColor: od.color, borderWidth: 1.2,
+        pointRadius: 0, tension: 0.3, fill: false, yAxisID: 'yOverlay'
+      });
+      if (!targetChart.options.scales.yOverlay) {
+        targetChart.options.scales.yOverlay = { type: 'linear', display: false, min: od.min, max: od.max, grid: { display: false } };
+      }
+    });
+    targetChart.update('none');
+  });
+
+  // ── Wire context menus (right-click / long-press) ──
+  ['rsiChart', 'tempChart', 'dtChart'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) {
+      el.oncontextmenu = function(e) { showOverlayMenu(e, id); };
+      addLongPress(el, function(t) { showOverlayMenu({ preventDefault: function(){}, clientX: t.clientX, clientY: t.clientY }, id); });
+    }
+  });
 }
 
 // ── Zoom/Pan sync across all charts ──
@@ -1934,6 +1962,72 @@ function renderCustomList() {
 
 // Render on load
 document.addEventListener('DOMContentLoaded', renderCustomList);
+
+// ── Overlay System — right-click/long-press any sub-chart onto another ──
+var activeOverlays = {};
+
+(function() {
+  var menu = document.createElement('div');
+  menu.id = 'overlayMenu';
+  menu.style.cssText = 'display:none;position:fixed;z-index:100;background:rgba(26,31,48,0.95);border:1px solid rgba(200,210,230,0.15);border-radius:8px;padding:6px 0;min-width:160px;font-size:0.78rem;box-shadow:0 4px 20px rgba(0,0,0,0.4);';
+  document.body.appendChild(menu);
+  document.addEventListener('click', function() { menu.style.display = 'none'; });
+
+  window.showOverlayMenu = function(e, sourceId) {
+    e.preventDefault();
+    var panels = [{ id: 'mainChart', label: 'Main Chart' }, { id: 'rsiChart', label: 'RSI' }, { id: 'tempChart', label: 'Temperature' }];
+    if (document.getElementById('dtChart')) panels.push({ id: 'dtChart', label: '\u0394T' });
+    var html = '<div style="padding:4px 12px;color:var(--dim);font-size:0.62rem;text-transform:uppercase;letter-spacing:0.05em;">Overlay onto\u2026</div>';
+    panels.forEach(function(p) {
+      if (p.id === sourceId) return;
+      html += '<div style="padding:6px 12px;cursor:pointer;color:var(--text);" onmouseenter="this.style.background=\'rgba(200,210,230,0.08)\'" onmouseleave="this.style.background=\'none\'" onclick="applyOverlay(\'' + sourceId + '\',\'' + p.id + '\')">' + p.label + '</div>';
+    });
+    html += '<div style="height:1px;background:rgba(200,210,230,0.08);margin:4px 0;"></div>';
+    html += '<div style="padding:6px 12px;cursor:pointer;color:var(--red);opacity:0.7;" onmouseenter="this.style.background=\'rgba(200,210,230,0.08)\'" onmouseleave="this.style.background=\'none\'" onclick="clearOverlays()">Clear overlays</div>';
+    menu.innerHTML = html;
+    menu.style.display = 'block';
+    menu.style.left = Math.min((e.clientX||e.pageX||100), window.innerWidth - 180) + 'px';
+    menu.style.top = Math.min((e.clientY||e.pageY||100), window.innerHeight - 200) + 'px';
+  };
+
+  window.applyOverlay = function(srcId, tgtId) {
+    menu.style.display = 'none';
+    if (!activeOverlays[tgtId]) activeOverlays[tgtId] = [];
+    if (activeOverlays[tgtId].some(function(o) { return o.sourceId === srcId; })) return;
+    if (activeOverlays[tgtId].length >= 3) activeOverlays[tgtId].shift();
+    activeOverlays[tgtId].push({ sourceId: srcId });
+    var src = document.getElementById(srcId);
+    if (src) { var w = src.closest('.sub-chart-wrap'); if (w) w.style.display = 'none'; }
+    if (lastCandles && lastAnalysis) renderChart(lastCandles, lastAnalysis);
+  };
+
+  window.clearOverlays = function() {
+    menu.style.display = 'none';
+    Object.keys(activeOverlays).forEach(function(tId) {
+      (activeOverlays[tId] || []).forEach(function(o) {
+        var s = document.getElementById(o.sourceId);
+        if (s) { var w = s.closest('.sub-chart-wrap'); if (w) w.style.display = 'block'; }
+      });
+    });
+    activeOverlays = {};
+    if (lastCandles && lastAnalysis) renderChart(lastCandles, lastAnalysis);
+  };
+
+  // Long-press for mobile
+  window.addLongPress = function(el, cb) {
+    var timer;
+    el.addEventListener('touchstart', function(e) { timer = setTimeout(function() { cb(e.touches[0]); }, 500); }, { passive: true });
+    el.addEventListener('touchend', function() { clearTimeout(timer); });
+    el.addEventListener('touchmove', function() { clearTimeout(timer); });
+  };
+})();
+
+function getOverlayData(sourceId, candles, a) {
+  if (sourceId === 'rsiChart') return { values: a.rsiArr, color: 'rgba(139,92,246,0.45)', min: 0, max: 100 };
+  if (sourceId === 'tempChart') return { values: a.temps, color: 'rgba(201,168,76,0.45)', min: 0, max: 100 };
+  if (sourceId === 'dtChart') return { values: a.tempROC, color: 'rgba(232,176,25,0.45)', min: -30, max: 30 };
+  return null;
+}
 
 // ── Buy/Sell pulse animation (CSS-driven glow) ──
 (function() {
