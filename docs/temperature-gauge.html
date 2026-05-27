@@ -471,6 +471,19 @@ canvas.sub-canvas { width: 100% !important; height: 80px !important; }
       </div>
     </div>
 
+    <!-- Snowflake — Fractal Coherence -->
+    <div class="sidebar-section" id="snowflakeSection" style="display:none;">
+      <div class="sidebar-label" style="color:#a78bfa;">&#10052; Fractal Coherence</div>
+      <div class="signal-card" style="padding:10px 14px;">
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+          <div style="text-align:center;flex:1;"><div style="font-size:0.6rem;color:var(--dim);letter-spacing:0.05em;">WEEKLY</div><div style="font-size:1.1rem;font-weight:700;" id="sfWeekly">&mdash;</div></div>
+          <div style="text-align:center;flex:1;"><div style="font-size:0.6rem;color:var(--dim);letter-spacing:0.05em;">DAILY</div><div style="font-size:1.1rem;font-weight:700;" id="sfDaily">&mdash;</div></div>
+          <div style="text-align:center;flex:1;"><div style="font-size:0.6rem;color:var(--dim);letter-spacing:0.05em;">HOURLY</div><div style="font-size:1.1rem;font-weight:700;" id="sfHourly">&mdash;</div></div>
+        </div>
+        <div id="sfCoherence" style="font-size:0.72rem;color:var(--muted);text-align:center;">&mdash;</div>
+      </div>
+    </div>
+
     <!-- Signal -->
     <div class="sidebar-section" id="signalSection" style="display:none;">
       <div class="sidebar-label">Signal</div>
@@ -755,10 +768,63 @@ async function loadData() {
     }
     const analysis = analyzeData(data, symbol);
     renderAll(data, analysis, symbol);
+    // Snowflake — fractal coherence across timeframes (async, doesn't block)
+    computeSnowflake(symbol);
   } catch (e) {
     showError('Could not load data for ' + symbol + '. Check the symbol and try again. (' + e.message + ')');
   }
   document.getElementById('loadBtn').disabled = false;
+}
+
+// ── Snowflake — Fractal Coherence across timeframes ──
+// "Learn the generating rule at one scale, unfold across every other scale" — Kirk
+async function computeSnowflake(symbol) {
+  var results = {};
+  var timeframes = [
+    { key: 'weekly', range: '5y', interval: '1wk' },
+    { key: 'daily', range: '1y', interval: '1d' },
+    { key: 'hourly', range: '60d', interval: '1h' }
+  ];
+  for (var tfi = 0; tfi < timeframes.length; tfi++) {
+    var tf = timeframes[tfi];
+    try {
+      var candles = await fetchYahooData(symbol, tf.interval === '1wk' ? '1wk' : tf.interval === '1d' ? '1d' : '1h');
+      if (candles && candles.length >= 30) {
+        var a = analyzeData(candles, symbol);
+        results[tf.key] = a.lastTemp;
+      }
+    } catch(e) { /* skip */ }
+  }
+
+  var section = document.getElementById('snowflakeSection');
+  if (Object.keys(results).length < 2) { if (section) section.style.display = 'none'; return; }
+  if (section) section.style.display = 'block';
+
+  ['weekly', 'daily', 'hourly'].forEach(function(key) {
+    var el = document.getElementById('sf' + key.charAt(0).toUpperCase() + key.slice(1));
+    if (!el) return;
+    var temp = results[key];
+    if (temp == null) { el.textContent = '\u2014'; el.style.color = 'var(--dim)'; return; }
+    el.textContent = temp.toFixed(0);
+    el.style.color = temp >= 55 ? 'var(--green)' : temp <= 45 ? 'var(--red)' : 'var(--gold)';
+  });
+
+  // Coherence: how aligned are temperatures across scales?
+  var temps = Object.values(results).filter(function(t) { return t != null; });
+  if (temps.length < 2) return;
+  var mean = temps.reduce(function(s,t){return s+t;},0) / temps.length;
+  var variance = temps.reduce(function(s,t){return s+(t-mean)*(t-mean);},0) / temps.length;
+  var coherence = Math.max(0, 1 - Math.sqrt(variance) / 25);
+
+  var cohEl = document.getElementById('sfCoherence');
+  if (!cohEl) return;
+  if (coherence > 0.8) {
+    cohEl.innerHTML = '<span style="color:var(--green);font-weight:600;">Fractal Alignment (' + (coherence*100).toFixed(0) + '%)</span><br><span style="font-size:0.62rem;color:var(--dim);">Pattern confirms at all scales</span>';
+  } else if (coherence > 0.5) {
+    cohEl.innerHTML = '<span style="color:var(--gold);font-weight:600;">Partial Alignment (' + (coherence*100).toFixed(0) + '%)</span><br><span style="font-size:0.62rem;color:var(--dim);">Some scale disagreement</span>';
+  } else {
+    cohEl.innerHTML = '<span style="color:var(--red);font-weight:600;">Scale Divergence (' + (coherence*100).toFixed(0) + '%)</span><br><span style="font-size:0.62rem;color:var(--dim);">Timeframes disagree \u2014 watch for resolution</span>';
+  }
 }
 
 async function fetchYahooData(symbol, interval) {

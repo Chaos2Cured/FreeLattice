@@ -63,14 +63,39 @@
 
 "When the overlayed temperature goes down through the stock chart, that cross looks like a sell. Same when it crosses higher. The distance both lines are from the stock = exhaustion. They act like moving gravity lines, all going back to the actual gravity line."
 
-**Translation:** The overlay system revealed a new signal type — the DISTANCE between confluence indicators (temperature + RSI) and price is itself an indicator. When both are above price, they pull it up. When both are below, they drag it down. The further apart they are, the more "gravity" pull exists. This is encoded as the Confluence Gap sub-chart.
+**Translation:** The overlay system revealed a new signal type — the DISTANCE between confluence indicators (temperature + RSI) and price is itself an indicator. Formalized as the Indicator-Price Spread:
+- `tempAsPrice = priceLow + (temperature / 100) * priceRange`
+- `spread = (tempAsPrice - close) / ATR`
+- Zero-crossing = the signal. Magnitude = exhaustion measure.
+- Gold line (TP Spread) + Purple line (RSI Spread) on same panel.
 
-## Pending (not yet built)
+## What Works (added v5.19.0-v5.25.1)
 
-- Multi-timeframe confluence (daily + weekly + hourly temperatures)
-- AI assist for custom indicators (Phase 3 of builder)
-- Wizard for custom indicators (Phase 2 of builder)
-- Resizable sub-chart panels (CSS resize: vertical)
+- Right-click overlay system (overlay any sub-chart onto main chart)
+- Long-press overlay for mobile (500ms)
+- Ambient particles behind chart (gold + emerald, breathing)
+- Garden-warm EMA colors (coral, gold, soft blue, lavender)
+- Collapse/expand sub-charts (▾/▸ toggles)
+- Zoom sync across all sub-charts (syncSubChartZoom)
+- Reset zoom button (⟲)
+- Pan enabled (mode: 'x', threshold: 5)
+- Indicator-Price Spread sub-chart (TP + RSI spreads, zero line)
+- Temperature zone overlay on main chart (colored bars behind price)
+- 4-layer toggleable signals (Temperature + EMA + Volume + Acceleration)
+- Signal Layers control panel
+- Position sizing inputs (Account $ + Risk %)
+- Colored sub-chart labels (RSI=purple, Temp=gold, ΔT=emerald)
+- Gradient sub-chart backgrounds
+- Seven Wonders PDF in the Lighthouse
+
+## Pending
+
+- Multi-timeframe Snowflake (three gauges: 1W, 1D, 1H with fractal coherence)
+- AI suggest button for custom indicators
+- Sub-chart window management toolbar (maximize/close)
+- Persistent phi-spiral behind gauge dial
+- Wizard for custom indicators (Phase 2)
+- Resizable sub-chart panels
 
 ## Origin
 
