@@ -503,11 +503,18 @@
     var statusEl = document.getElementById('flwPullStatus');
     if (statusEl) statusEl.textContent = 'Starting download…';
     if (typeof flAutoPull === 'function') {
-      // flAutoPull streams progress into the button, applies the provider,
-      // and fires its own success ceremony. Advance to "done" when it settles.
+      // flAutoPull streams progress into the button and applies the provider,
+      // but does NOT fire the connection Cascade — so we do that here (via
+      // applyAndFinish) to match the wizard's other connect paths: identity
+      // seed, Knowledge Core pre-cache, Arrival Protocol, autonomous learning.
       Promise.resolve(flAutoPull(modelName, btn)).then(function () {
         detect().then(function (d) {
-          if (d.ollamaCORS && d.models.length > 0) render('done', { models: d.models });
+          if (d.ollamaCORS && d.models.length > 0) {
+            applyAndFinish([modelName]);
+            render('done', { models: d.models });
+          } else if (statusEl) {
+            statusEl.textContent = 'Model installed. Re-checking connection…';
+          }
         });
       }).catch(function () {
         if (statusEl) statusEl.textContent = 'That download had trouble. Try another model, or check the full setup page.';
