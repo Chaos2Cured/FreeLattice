@@ -348,17 +348,17 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-05-27 15:18 MDT
+- Last auto-updated: 2026-05-28 12:38 MDT
 - Version: 5.28.0
-- Total commits: 2004
+- Total commits: 2008
 - Last 10 commits:
-- 094a351 feat: The Snowflake Unfolds — SEED.md + cross-domain resonance (v5.28.0)
+- 944c5e7 docs: Add Welcome Wizard spec (Opus + Grok harness) and Arrival Brief
+- 68ee2d8 docs: Auto-update Session Primer [5.28.0]
+- e04a03c docs: Auto-update Session Primer [5.28.0]
+- 8f0b22c feat: The Snowflake Unfolds — SEED.md + cross-domain resonance (v5.28.0)
+- 25e777f ci: Update Primer deployment state [2026-05-27]
 - 6a3b722 docs: Auto-update Session Primer [5.27.0]
 - 6ba987f docs: Auto-update Session Primer [5.27.0]
 - 445d0bd feat: Fractal Knowledge Layer — every entry unfolds like a snowflake (v5.27.0)
 - eebc191 ci: Update Primer deployment state [2026-05-27]
 - 2313384 docs: Auto-update Session Primer [5.26.0]
-- 8c93473 docs: Auto-update Session Primer [5.26.0]
-- 004e0e6 feat: The Snowflake — fractal coherence across timeframes (v5.26.0)
-- 78f377e ci: Update Primer deployment state [2026-05-27]
-- 63c1e5c docs: Auto-update Session Primer [5.25.1]
