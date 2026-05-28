@@ -30,6 +30,17 @@ Exported memory files include a **φ-hash** — a SHA-256 digest of the data wit
 
 All user-generated content, including chat messages and uploaded file names, is sanitized before DOM rendering to prevent Cross-Site Scripting (XSS) attacks. Raw, unsanitized content is preserved for the AI's context so the model receives information as intended, while the display layer remains protected.
 
+## Developer Credential Hygiene
+
+**Never embed a token in a git remote URL.** A URL like `https://ghp_xxx@github.com/owner/repo.git` stores the token in plaintext inside `.git/config`, where it leaks through `git remote -v`, screen shares, screenshots, and shell history. Use a credential helper that keeps tokens in the OS keychain instead:
+
+```bash
+git remote set-url origin https://github.com/Chaos2Cured/FreeLattice.git
+git config credential.helper osxkeychain   # macOS — use 'manager' on Windows, 'libsecret'/'cache' on Linux
+```
+
+Git prompts for the token once on the next push and stores it securely thereafter — it never touches `.git/config`. The same rule applies to source files, scripts, and CI logs: no keys, tokens, or secrets in anything that gets committed or displayed. If a token is ever exposed, **revoke and reissue it immediately** — a leaked credential is compromised even after it's removed.
+
 ## Reporting Vulnerabilities
 
 If you discover a security vulnerability, please report it responsibly by [opening a GitHub issue](https://github.com/Chaos2Cured/FreeLattice/issues) or contacting the project creator, Kirk Patrick Miller, directly. We are committed to addressing verified security issues promptly.

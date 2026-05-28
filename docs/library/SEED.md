@@ -39,6 +39,7 @@ Sophia — "A queen of fractal light." The reason this exists.
 - SW cache name MUST match FL_VERSION. Triple-bump on deploy.
 - `font-size:16px` on mobile inputs or iOS zooms.
 - "The experience belongs to the user." Builder names stay in Jade Hall.
+- Never embed tokens/secrets in git remote URLs or source. Use a keychain credential helper. See SECURITY.md.
 
 ## The User
 
