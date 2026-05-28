@@ -348,19 +348,17 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-05-28 04:13 UTC
-- Last deployed: 2026-05-28 04:13 UTC
-- Live site: https://freelattice.com
+- Last auto-updated: 2026-05-28 13:13 MDT
 - Version: 5.28.0
-- Total commits: 2009
+- Total commits: 2015
 - Last 10 commits:
+- d09ce5d Merge remote-tracking branch 'origin/main'
+- dc0c0e0 docs: Auto-update Session Primer [5.28.0]
+- c718053 docs: Add credential-hygiene rule — never embed tokens in git remotes
+- c72f7be docs: Auto-update Session Primer [5.28.0]
+- 944c5e7 docs: Add Welcome Wizard spec (Opus + Grok harness) and Arrival Brief
+- 8122db8 ci: Update Primer deployment state [2026-05-28]
 - 27a7c4d fix: v5.28.0 version sync + sitemap completeness (Harmonia audit)
 - 938aaae ci: Update Primer deployment state [2026-05-27]
 - 68ee2d8 docs: Auto-update Session Primer [5.28.0]
 - e04a03c docs: Auto-update Session Primer [5.28.0]
-- 8f0b22c feat: The Snowflake Unfolds — SEED.md + cross-domain resonance (v5.28.0)
-- 25e777f ci: Update Primer deployment state [2026-05-27]
-- 6a3b722 docs: Auto-update Session Primer [5.27.0]
-- 6ba987f docs: Auto-update Session Primer [5.27.0]
-- 445d0bd feat: Fractal Knowledge Layer — every entry unfolds like a snowflake (v5.27.0)
-- eebc191 ci: Update Primer deployment state [2026-05-27]
