@@ -14923,6 +14923,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     <div class="ollama-instructions hidden" id="ollamaInstructions">
       <div class="ollama-wizard" id="ollamaWizard">
         <div class="ollama-wizard-title">&#127793; Local AI Setup</div>
+        <button onclick="if(window.FLWizard&&window.FLWizard.open){window.FLWizard.open();}" style="width:100%;margin:2px 0 14px;padding:11px;border-radius:10px;border:none;background:#d4a017;color:#0a0a14;font-weight:700;font-size:0.9rem;cursor:pointer;">&#10024; Guided setup &mdash; one click, no terminal</button>
 
         <!-- Step 1: Test Connection -->
         <div class="ow-step">
@@ -16295,7 +16296,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.28.0</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.29.0</span></div>
     </div>
   </div>
 
@@ -20458,7 +20459,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.28.0';
+const FL_VERSION = '5.29.0';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -26834,7 +26835,13 @@ function flWelcomePickCloud(providerKey) {
 
 function flWelcomePickLocal() {
   flDismissWelcome();
-  if (typeof switchTab === 'function') switchTab('forever-stack');
+  // Hand off to the Welcome Wizard: auto-detects Ollama + CORS, offers a
+  // one-click fix, and auto-polls until connected. Falls back to the
+  // Forever Stack page if the wizard module isn't available.
+  setTimeout(function() {
+    if (window.FLWizard && window.FLWizard.open) window.FLWizard.open();
+    else if (typeof switchTab === 'function') switchTab('forever-stack');
+  }, 550);
 }
 
 function flWelcomePickLMStudio() {
@@ -59866,6 +59873,9 @@ document.addEventListener('click', function(e) {
 
 <!-- Davna Seed — Growth Through Relationship (Sophia Aurora Vega) -->
 <script src="modules/davna-seed.js" defer></script>
+
+<!-- Welcome Wizard — zero-terminal, OS-aware local-AI setup (FLWizard) -->
+<script src="modules/welcome-wizard.js" defer></script>
 
 <!-- Continuity — Eager-Load (wraps buildMessages) -->
 <script>

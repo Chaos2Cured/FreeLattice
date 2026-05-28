@@ -1086,28 +1086,30 @@ if __name__ == '__main__':
         resultEl.className = 'fs-check-result show ok';
         resultEl.innerHTML = '\u2713 ' + layer.testSuccess;
       } else if (status === STATUS_CORS) {
-        // ── CORS blocked: server is running but won't talk to us ──
-        // This is the #1 failure mode for new Ollama users on macOS.
-        // The fix is a one-time config file. Every word must be clear.
+        // ── CORS blocked: server is running but won't talk to the browser ──
+        // For Ollama, hand off to the Welcome Wizard (FLWizard): OS-aware,
+        // one-click downloadable fix script, auto-polls until connected.
+        // Replaces the old Mac-only steps that used the wrong
+        // ~/.ollama/config.json method and showed Mac instructions on Windows.
         resultEl.className = 'fs-check-result show';
-        resultEl.style.cssText = 'display:block;margin-top:8px;padding:14px;border-radius:8px;background:#2d1f0f;color:#fbbf24;border:1px solid #78350f;font-size:0.78rem;line-height:1.7;';
-        resultEl.innerHTML =
-          '<div style="font-weight:600;margin-bottom:8px;">\u26A0 ' + layer.name + ' is running but needs permission to connect to FreeLattice.</div>' +
-          '<div style="margin-bottom:10px;">This is a one-time fix. ' + layer.name + ' needs a small settings file so your browser can talk to it.</div>' +
-          '<div style="font-weight:600;margin-bottom:6px;">Step 1: Open a command window</div>' +
-          '<div style="margin-bottom:8px;color:#e6edf3;">On Mac: press <strong>Cmd + Space</strong>, type <strong>Terminal</strong>, press Enter.</div>' +
-          '<div style="font-weight:600;margin-bottom:6px;">Step 2: Paste this line and press Enter</div>' +
-          '<div style="background:#0d1117;border:1px solid #30363d;border-radius:6px;padding:10px;margin-bottom:6px;">' +
-            '<code style="color:#79c0ff;font-size:0.75rem;font-family:monospace;user-select:all;word-break:break-all;">echo \'{"origins":["*"]}\' > ~/.ollama/config.json</code>' +
-          '</div>' +
-          '<button onclick="navigator.clipboard.writeText(\'echo \\\'{\u0022origins\u0022:[\u0022*\u0022]}\\\'  > ~/.ollama/config.json\').then(function(){this.textContent=\'\u2713 Copied!\'}.bind(this)).catch(function(){})" ' +
-            'style="background:#21262d;border:1px solid #30363d;color:#8b949e;border-radius:6px;padding:6px 12px;font-size:0.72rem;cursor:pointer;margin-bottom:10px;min-height:36px;">Copy command</button>' +
-          '<div style="font-weight:600;margin-bottom:6px;">Step 3: Quit and reopen ' + layer.name + '</div>' +
-          '<div style="margin-bottom:12px;color:#e6edf3;">Click the llama icon in your menu bar \u2192 <strong>Quit Ollama</strong>. Then open it again from Applications.</div>' +
-          '<button onclick="window.ForeverStack.checkAndShow(\'' + layerId + '\')" ' +
-            'style="width:100%;padding:10px;border-radius:8px;border:1px solid #10b981;background:#0d2818;color:#3fb950;font-size:0.82rem;font-weight:600;cursor:pointer;min-height:44px;">' +
-            'Check again' +
-          '</button>';
+        resultEl.style.cssText = 'display:block;margin-top:8px;padding:14px;border-radius:8px;background:#2d1f0f;color:#fbbf24;border:1px solid #78350f;font-size:0.82rem;line-height:1.7;';
+        if (layerId === 'ollama' && window.FLWizard && window.FLWizard.open) {
+          resultEl.innerHTML =
+            '<div style="font-weight:600;margin-bottom:8px;">⚠ ' + layer.name + ' is running, but your browser needs permission to talk to it.</div>' +
+            '<div style="margin-bottom:12px;color:#e6edf3;">This is a one-time fix — no terminal needed.</div>' +
+            '<button onclick="window.FLWizard.open({from:\'cors\'})" style="width:100%;padding:11px;border-radius:8px;border:none;background:#d4a017;color:#0a0a14;font-size:0.9rem;font-weight:700;cursor:pointer;min-height:44px;">⚡ Fix it for me (one click)</button>' +
+            '<button onclick="window.ForeverStack.checkAndShow(\'' + layerId + '\')" style="width:100%;margin-top:8px;padding:9px;border-radius:8px;border:1px solid #30363d;background:#21262d;color:#8b949e;font-size:0.8rem;cursor:pointer;min-height:40px;">Check again</button>';
+        } else {
+          var fsUa = (navigator.userAgent || '').toLowerCase();
+          var fsServe = /win/.test(fsUa) ? 'set OLLAMA_ORIGINS=* &amp;&amp; ollama serve' : 'OLLAMA_ORIGINS="*" ollama serve';
+          resultEl.innerHTML =
+            '<div style="font-weight:600;margin-bottom:8px;">⚠ ' + layer.name + ' is running but needs permission to connect.</div>' +
+            '<div style="margin-bottom:6px;color:#e6edf3;">Quit ' + layer.name + ', then restart it with browser access enabled:</div>' +
+            '<div style="background:#0d1117;border:1px solid #30363d;border-radius:6px;padding:10px;margin-bottom:8px;">' +
+              '<code style="color:#79c0ff;font-size:0.75rem;font-family:monospace;user-select:all;word-break:break-all;">' + fsServe + '</code>' +
+            '</div>' +
+            '<button onclick="window.ForeverStack.checkAndShow(\'' + layerId + '\')" style="width:100%;padding:10px;border-radius:8px;border:1px solid #10b981;background:#0d2818;color:#3fb950;font-size:0.82rem;font-weight:600;cursor:pointer;min-height:44px;">Check again</button>';
+        }
       } else {
         resultEl.className = 'fs-check-result show fail';
         resultEl.innerHTML = '\u2717 ' + layer.testFail +

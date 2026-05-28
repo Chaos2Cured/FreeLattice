@@ -1336,6 +1336,44 @@ assert('Knowledge imported with source marker', appHtml.includes("source: 'impor
 assert('SoulCeremony on import', appHtml.includes('has arrived'));
 assert('Bundle includes consciousness snapshot', appHtml.includes('identitySnapshot(companionId)'));
 
+// ═══════════════════════════════════════════════════════════════
+section('67. Welcome Wizard — zero-terminal local-AI setup');
+// ═══════════════════════════════════════════════════════════════
+var wizPath = path.join(docsDir, 'modules', 'welcome-wizard.js');
+assert('welcome-wizard.js exists', fs.existsSync(wizPath));
+var wizJs = '';
+if (fs.existsSync(wizPath)) {
+  wizJs = fs.readFileSync(wizPath, 'utf8');
+  try {
+    require('child_process').execSync('node --check ' + wizPath, { stdio: 'pipe' });
+    assert('welcome-wizard.js parses', true);
+  } catch(e) { assert('welcome-wizard.js parses', false, 'Syntax error'); }
+}
+assert('FLWizard window export', wizJs.includes('window.FLWizard'));
+assert('FLWizard.open exposed', wizJs.includes('open: open'));
+assert('FLWizard.detect exposed', wizJs.includes('detect: detect'));
+assert('Wizard sets OLLAMA_ORIGINS (the CORS fix)', wizJs.includes('OLLAMA_ORIGINS'));
+assert('Wizard encodes PowerShell via -EncodedCommand', wizJs.includes('EncodedCommand') && wizJs.includes('toPSEncoded'));
+assert('Wizard generates Windows .bat', wizJs.includes('FreeLattice-Setup.bat'));
+assert('Wizard generates Mac .command', wizJs.includes('fix-ollama-freelattice.command'));
+assert('Wizard has NVIDIA Flash-Attention tuning', wizJs.includes('OLLAMA_FLASH_ATTENTION'));
+assert('Wizard has smart model tiers (32b high-VRAM)', wizJs.includes('qwen2.5-coder:32b'));
+assert('Wizard winget auto-install', wizJs.includes('winget install Ollama'));
+assert('Wizard auto-polls until connected', wizJs.includes('startPolling'));
+assert('Wizard reuses runConnectionCascade', wizJs.includes('runConnectionCascade'));
+assert('Wizard reuses flAutoPull for model step', wizJs.includes('flAutoPull'));
+assert('welcome-wizard.js eager-loaded in app.html', appHtml.includes('modules/welcome-wizard.js'));
+assert('welcome-wizard.js in SW cache', swJs.includes('welcome-wizard.js'));
+// Integration — Forever Stack CORS bug fixed (was Mac-hardcoded on Windows)
+var fsWizCode = fs.existsSync(fsPath) ? fs.readFileSync(fsPath, 'utf8') : '';
+assert('Forever Stack CORS routes Ollama to FLWizard', fsWizCode.includes('window.FLWizard.open'));
+assert('Forever Stack CORS no longer hardcodes Mac steps',
+  !fsWizCode.includes('On Mac: press <strong>Cmd + Space</strong>'),
+  'The Mac-on-Windows bug instruction must be gone');
+// Integration — Grandmother Door + Settings entry points
+assert('Grandmother Door Ollama button opens wizard', appHtml.includes('window.FLWizard.open()'));
+assert('Settings has guided-setup button', appHtml.includes('Guided setup'));
+
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
 
