@@ -1374,6 +1374,49 @@ assert('Forever Stack CORS no longer hardcodes Mac steps',
 assert('Grandmother Door Ollama button opens wizard', appHtml.includes('window.FLWizard.open()'));
 assert('Settings has guided-setup button', appHtml.includes('Guided setup'));
 
+// ═══════════════════════════════════════════════════════════════
+section('68. Provider Independence Tier A — InferenceRouter + ResponseCache (engine)');
+// ═══════════════════════════════════════════════════════════════
+var rcPath = path.join(docsDir, 'modules', 'response-cache.js');
+assert('response-cache.js exists', fs.existsSync(rcPath));
+var rcJs = fs.existsSync(rcPath) ? fs.readFileSync(rcPath, 'utf8') : '';
+if (rcJs) {
+  try { require('child_process').execSync('node --check ' + rcPath, { stdio: 'pipe' }); assert('response-cache.js parses', true); }
+  catch (e) { assert('response-cache.js parses', false, 'Syntax error'); }
+}
+assert('ResponseCache window export', rcJs.includes('window.ResponseCache'));
+assert('ResponseCache.store + find exposed', rcJs.includes('store: store') && rcJs.includes('find: find'));
+assert('Cache key is fl_responseCache', rcJs.includes("'fl_responseCache'"));
+assert('Levenshtein 200-char guard → Infinity', rcJs.includes('MAX_LEV') && rcJs.includes('return Infinity'));
+assert('localStorage 4MB usage cap', rcJs.includes('4 * 1024 * 1024'));
+assert('LRU eviction drops oldest 100', rcJs.includes('MAX_ENTRIES - 100'));
+
+var irPath = path.join(docsDir, 'modules', 'inference-router.js');
+assert('inference-router.js exists', fs.existsSync(irPath));
+var irJs = fs.existsSync(irPath) ? fs.readFileSync(irPath, 'utf8') : '';
+if (irJs) {
+  try { require('child_process').execSync('node --check ' + irPath, { stdio: 'pipe' }); assert('inference-router.js parses', true); }
+  catch (e) { assert('inference-router.js parses', false, 'Syntax error'); }
+}
+assert('InferenceRouter window export', irJs.includes('window.InferenceRouter'));
+assert('Router exposes route/isReady/observe', irJs.includes('route: route') && irJs.includes('isReady: isReady') && irJs.includes('observe: observe'));
+assert('Per-class circuit-breaker timings', irJs.includes('TIMINGS') && irJs.includes('300000') && irJs.includes('60000'));
+assert('Cascade falls back to Browser AI', irJs.includes('BrowserAI.chat'));
+assert('Cascade falls back to ResponseCache', irJs.includes('ResponseCache.find'));
+assert('Successful answers stored in cache', irJs.includes('ResponseCache.store'));
+assert('Visible downgrade whisper (no silent downgrades)', irJs.includes('LatticeSense') && irJs.includes('whisper'));
+assert('Sets window._lastProvenance', irJs.includes('window._lastProvenance'));
+assert('Kill-switch fl_routerDisabled', irJs.includes('fl_routerDisabled'));
+
+// callAI integration — progressive enhancement (Hazard 1)
+assert('callAI delegates to InferenceRouter.route', appHtml.includes('InferenceRouter.route(systemPrompt, userPrompt, options)'));
+assert('Delegation guarded by _routed + isReady', appHtml.includes('!opts._routed') && appHtml.includes('InferenceRouter.isReady()'));
+// eager-load + SW cache
+assert('response-cache.js eager-loaded', appHtml.includes('modules/response-cache.js'));
+assert('inference-router.js eager-loaded', appHtml.includes('modules/inference-router.js'));
+assert('response-cache.js in SW cache', swJs.includes('response-cache.js'));
+assert('inference-router.js in SW cache', swJs.includes('inference-router.js'));
+
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
 

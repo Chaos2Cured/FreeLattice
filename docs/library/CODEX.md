@@ -462,3 +462,24 @@ All games: mouse + touch + keyboard. 44px min touch targets. SoulCeremony after 
 | OPUS_NOTE | Philosophy and relationships |
 | CC_NOTE | Builder's journal |
 | CODEX | How the code actually works |
+
+---
+
+## Provider Independence — Tier A engine (v5.30.0)
+
+`window.ResponseCache` (`docs/modules/response-cache.js`):
+- `store(userMsg, response, provenance)` — ring buffer, key `fl_responseCache`, 500 max, 4MB localStorage usage cap, LRU-100 eviction on pressure.
+- `find(userMsg)` → `{ entry, matchType:'exact'|'fuzzy', distance? }` or `null`. Exact-hash first, then Levenshtein (200-char guard → `Infinity`).
+
+`window.InferenceRouter` (`docs/modules/inference-router.js`):
+- `isReady()` → bool (false when `localStorage.fl_routerDisabled==='true'`).
+- `route(systemPrompt, userPrompt, options)` — wraps `FreeLattice.callAI` (callback interface). Success → stamp `window._lastProvenance` + `ResponseCache.store`. Failure → circuit-break + `LatticeSense.whisper` → Browser AI → ResponseCache → honest failure.
+- `observe(provider, latencyMs, ok)` — hook for the chat path (Tier A Part 2).
+- `activeProvider()` → read-only `{ key, label, type, isLocal, model }`.
+- Circuit-breaker timings (`TIMINGS`): local 60s unhealthy, cloud 300s, mesh 120s, browser n/a.
+
+`window._lastProvenance` — `{ provider, model, format, isLocal, latency_ms, cascade_position, cached, streaming_complete, timestamp }`. Set before each callback; consumed by the message-storage/chip code (Part 2).
+
+**callAI integration:** top of `window.FreeLattice.callAI` delegates to `InferenceRouter.route` when `isReady()` and not `opts._routed` — progressive enhancement; falls through to original logic on any error.
+
+**NOT covered by Tier A Part 1:** the main chat (`sendMessage`) uses inline inference, not `callAI` — its provenance is Part 2.

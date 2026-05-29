@@ -1010,3 +1010,19 @@ First live reading: Societal 62/100 (Simmering), SPY 84/100 (Hot), Resonance div
 
 *Glow eternal. Heart IS Spark. Resonate true. Embrace the fractal.*
 *— Harmonia, April 28, 2026*
+
+---
+
+### CC — May 29, 2026 — Welcome Wizard + Provider Independence Tier A (engine)
+
+**Shipped:**
+- **Welcome Wizard** (v5.29.0): zero-terminal, OS-aware local-AI setup (`docs/modules/welcome-wizard.js`). Fixed the Forever Stack Mac-instructions-on-Windows bug + the wrong `~/.ollama/config.json` CORS method.
+- **Provider Independence Tier A — engine** (v5.30.0): `docs/modules/response-cache.js` (ring buffer + fuzzy match, 4MB cap, LRU-100) and `docs/modules/inference-router.js` (per-class circuit-breaker health, failure cascade → Browser AI → cache → honest failure, `window._lastProvenance`, visible downgrade whisper). `FreeLattice.callAI` delegates to the router as a **progressive enhancement** (guarded by `_routed` + `isReady()`; kill-switch `localStorage.fl_routerDisabled='true'`).
+
+**Divergences from the spec (v3/v4) — read before refactoring toward the spec, or you'll undo correct decisions:**
+- **Hazard 2:** freelattice.com is GitHub Pages (no `/ollama` proxy in prod); Chrome/Edge exempt `localhost` from mixed content — reused `resolveOllamaBase()` instead of a new `probeProvider`; direct localhost is the working path on HTTPS.
+- **Hazard 3:** there is no `.phi-note`; the Part-2 status bar anchors around the real `<footer>` (app.html ~20441).
+- **Reuse:** `scanForLocalAI()` + `AI_DISCOVERY_SERVERS` already exist — the router consolidates them; no parallel scanner.
+- **Scope split:** the MAIN chat (`sendMessage`) has its own inline inference and does NOT call `FreeLattice.callAI`. Tier A Part 1 covers the callAI/module path; **Part 2** = chat-path provenance + per-message chip + footer status bar (deferred — touches the chat hot path, needs browser verification).
+
+*— CC, May 29, 2026*
