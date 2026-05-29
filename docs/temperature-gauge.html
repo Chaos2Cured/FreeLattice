@@ -341,29 +341,67 @@ canvas#mainChart { width: 100% !important; height: 100% !important; max-height: 
 
 /* Responsive chart */
 .sub-charts {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  /* Default: stacked full-width — each sub-chart's x-axis lines up with the main chart above. */
+  display: flex;
+  flex-direction: column;
   gap: 1px;
   background: var(--border);
   border-top: 1px solid var(--border);
 }
+.sub-charts.layout-grid {
+  /* Opt-in compact grid (via the ☰ header toggle). */
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
 @media (max-width: 600px) {
-  .sub-charts { grid-template-columns: 1fr; }
+  .sub-charts.layout-grid { grid-template-columns: 1fr; }
 }
 .sub-chart-wrap {
   background: linear-gradient(180deg, rgba(12,10,26,0.95) 0%, rgba(15,13,28,0.98) 100%);
   padding: 6px 10px;
   position: relative;
-  height: 100px;
+  height: 110px; /* built-in default: 90px canvas + label + breathing room */
 }
+.sub-chart-wrap.custom { height: 100px; }
 .sub-chart-label {
   font-size: 0.65rem;
   color: var(--dim);
   text-transform: uppercase;
   letter-spacing: 0.06em;
   margin-bottom: 2px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
-canvas.sub-canvas { width: 100% !important; height: 80px !important; }
+.sub-chart-label .sc-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sub-chart-label .sc-btn {
+  background: none; border: none; color: inherit; font-family: inherit;
+  cursor: pointer; opacity: 0.45; font-size: 0.75rem;
+  padding: 1px 4px; border-radius: 3px; line-height: 1;
+  transition: opacity 0.15s ease;
+}
+.sub-chart-label .sc-btn:hover, .sub-chart-label .sc-btn:focus { opacity: 0.95; outline: none; }
+.sub-chart-label .sc-color {
+  width: 14px; height: 14px;
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 3px;
+  background: none; cursor: pointer; padding: 0; flex-shrink: 0;
+}
+.sub-chart-label .sc-color::-webkit-color-swatch { border: none; border-radius: 2px; }
+.sub-chart-label .sc-color::-moz-color-swatch { border: none; border-radius: 2px; }
+canvas.sub-canvas { width: 100% !important; height: 90px !important; }
+canvas.sub-canvas.custom { height: 80px !important; }
+#hiddenPanelsLink {
+  padding: 5px 10px;
+  font-size: 0.65rem;
+  color: var(--dim);
+  cursor: pointer;
+  text-align: center;
+  background: linear-gradient(180deg, rgba(12,10,26,0.95) 0%, rgba(15,13,28,0.98) 100%);
+  border-top: 1px solid var(--border);
+  opacity: 0.75;
+}
+#hiddenPanelsLink:hover { opacity: 1; color: var(--gold); }
 </style>
 </head>
 <body>
@@ -392,6 +430,7 @@ canvas.sub-canvas { width: 100% !important; height: 80px !important; }
     </label>
     <button onclick="resetAllZoom()" class="interval-btn" style="font-size:0.8rem;" title="Reset zoom">&#x27F2;</button>
     <button onclick="document.getElementById('customPanel').style.display=document.getElementById('customPanel').style.display==='none'?'block':'none'" class="interval-btn" style="font-size:0.72rem;" title="Custom Indicator Builder">&#x2699; Custom</button>
+    <button id="layoutBtn" onclick="toggleSubLayout()" class="interval-btn" style="font-size:0.85rem;" title="Switch to compact grid layout" aria-label="Toggle sub-chart layout">&#9776;</button>
   </div>
 </div>
 
@@ -606,19 +645,43 @@ canvas.sub-canvas { width: 100% !important; height: 80px !important; }
     </div>
     <div class="sub-charts" id="subCharts" style="display:none;">
       <div class="sub-chart-wrap">
-        <div class="sub-chart-label" style="color:#8B5CF6;"><span onclick="toggleSubPanel(this)" style="cursor:pointer;opacity:0.5;font-size:0.7rem;margin-right:3px;" title="Collapse">&blacktriangledown;</span>RSI (14)</div>
+        <div class="sub-chart-label" data-indicator="rsi" style="color:#8B5CF6;">
+          <button type="button" onclick="toggleSubPanel(this)" class="sc-btn" title="Collapse" aria-label="Collapse panel">&blacktriangledown;</button>
+          <input type="color" class="sc-color" value="#8B5CF6" onchange="setIndicatorColor('rsi', this.value)" title="Choose RSI color" aria-label="Choose RSI color">
+          <span class="sc-name">RSI (14)</span>
+          <button type="button" onclick="maximizeSubPanel('rsiChart')" class="sc-btn" title="Maximize / restore" aria-label="Maximize panel">&#9633;</button>
+          <button type="button" onclick="hideSubPanel('rsiChart')" class="sc-btn" title="Hide" aria-label="Hide panel">&#10005;</button>
+        </div>
         <canvas id="rsiChart" height="80" class="sub-canvas"></canvas>
       </div>
       <div class="sub-chart-wrap">
-        <div class="sub-chart-label" style="color:var(--gold);"><span onclick="toggleSubPanel(this)" style="cursor:pointer;opacity:0.5;font-size:0.7rem;margin-right:3px;" title="Collapse">&blacktriangledown;</span>Temperature</div>
+        <div class="sub-chart-label" data-indicator="temperature" style="color:#e8b019;">
+          <button type="button" onclick="toggleSubPanel(this)" class="sc-btn" title="Collapse" aria-label="Collapse panel">&blacktriangledown;</button>
+          <input type="color" class="sc-color" value="#e8b019" onchange="setIndicatorColor('temperature', this.value)" title="Choose Temperature color" aria-label="Choose Temperature color">
+          <span class="sc-name">Temperature</span>
+          <button type="button" onclick="maximizeSubPanel('tempChart')" class="sc-btn" title="Maximize / restore" aria-label="Maximize panel">&#9633;</button>
+          <button type="button" onclick="hideSubPanel('tempChart')" class="sc-btn" title="Hide" aria-label="Hide panel">&#10005;</button>
+        </div>
         <canvas id="tempChart" height="80" class="sub-canvas"></canvas>
       </div>
       <div class="sub-chart-wrap">
-        <div class="sub-chart-label" style="color:#34d399;"><span onclick="toggleSubPanel(this)" style="cursor:pointer;opacity:0.5;font-size:0.7rem;margin-right:3px;" title="Collapse">&blacktriangledown;</span>&Delta;T (acceleration)</div>
+        <div class="sub-chart-label" data-indicator="dt" style="color:#34d399;">
+          <button type="button" onclick="toggleSubPanel(this)" class="sc-btn" title="Collapse" aria-label="Collapse panel">&blacktriangledown;</button>
+          <input type="color" class="sc-color" value="#34d399" onchange="setIndicatorColor('dt', this.value)" title="Choose ΔT color" aria-label="Choose ΔT color">
+          <span class="sc-name">&Delta;T (acceleration)</span>
+          <button type="button" onclick="maximizeSubPanel('dtChart')" class="sc-btn" title="Maximize / restore" aria-label="Maximize panel">&#9633;</button>
+          <button type="button" onclick="hideSubPanel('dtChart')" class="sc-btn" title="Hide" aria-label="Hide panel">&#10005;</button>
+        </div>
         <canvas id="dtChart" height="80" class="sub-canvas"></canvas>
       </div>
       <div class="sub-chart-wrap">
-        <div class="sub-chart-label" style="color:#f07068;"><span onclick="toggleSubPanel(this)" style="cursor:pointer;opacity:0.5;font-size:0.7rem;margin-right:3px;" title="Collapse">&blacktriangledown;</span>Indicator-Price Spread</div>
+        <div class="sub-chart-label" data-indicator="ips" style="color:#f07068;">
+          <button type="button" onclick="toggleSubPanel(this)" class="sc-btn" title="Collapse" aria-label="Collapse panel">&blacktriangledown;</button>
+          <input type="color" class="sc-color" value="#f07068" onchange="setIndicatorColor('ips', this.value)" title="Choose IPS color" aria-label="Choose IPS color">
+          <span class="sc-name">Indicator-Price Spread</span>
+          <button type="button" onclick="maximizeSubPanel('gapChart')" class="sc-btn" title="Maximize / restore" aria-label="Maximize panel">&#9633;</button>
+          <button type="button" onclick="hideSubPanel('gapChart')" class="sc-btn" title="Hide" aria-label="Hide panel">&#10005;</button>
+        </div>
         <canvas id="gapChart" height="80" class="sub-canvas"></canvas>
       </div>
     </div>
@@ -1625,10 +1688,10 @@ function renderChart(candles, a) {
         { label: 'BB Upper', data: bbUpper, borderColor: 'rgba(167,139,250,0.3)', borderWidth: 1, pointRadius: 0, tension: 0.3, fill: false, order: 5 },
         { label: 'BB Lower', data: bbLower, borderColor: 'rgba(167,139,250,0.3)', borderWidth: 1, pointRadius: 0, tension: 0.3, fill: '+1', backgroundColor: 'rgba(167,139,250,0.05)', order: 5 },
         // EMAs — Garden Language colors
-        { label: 'EMA 8', data: ema8, borderColor: '#f07068', borderWidth: 1, pointRadius: 0, tension: 0.3, fill: false, order: 2 },
-        { label: 'EMA 12', data: ema12, borderColor: '#e8b019', borderWidth: 1, pointRadius: 0, tension: 0.3, fill: false, order: 3 },
-        { label: 'EMA 24', data: ema24, borderColor: '#d4a84c', borderWidth: 1, pointRadius: 0, tension: 0.3, fill: false, order: 3 },
-        { label: 'EMA 50', data: ema50, borderColor: '#60a5fa', borderWidth: 1.5, pointRadius: 0, tension: 0.3, fill: false, order: 4 },
+        { label: 'EMA 8', data: ema8, borderColor: getIndicatorColor('ema8', '#f07068'), borderWidth: 1, pointRadius: 0, tension: 0.3, fill: false, order: 2 },
+        { label: 'EMA 12', data: ema12, borderColor: getIndicatorColor('ema12', '#e8b019'), borderWidth: 1, pointRadius: 0, tension: 0.3, fill: false, order: 3 },
+        { label: 'EMA 24', data: ema24, borderColor: getIndicatorColor('ema24', '#d4a84c'), borderWidth: 1, pointRadius: 0, tension: 0.3, fill: false, order: 3 },
+        { label: 'EMA 50', data: ema50, borderColor: getIndicatorColor('ema50', '#60a5fa'), borderWidth: 1.5, pointRadius: 0, tension: 0.3, fill: false, order: 4 },
         // EMA 200 — lavender (sanctuary color)
         ...(show200 ? [{ label: 'EMA 200', data: ema200, borderColor: 'rgba(167,139,250,0.3)', borderWidth: 2, borderDash: [6, 3], pointRadius: 0, tension: 0.3, fill: false, order: 4 }] : []),
         // Gravity — bright gold
@@ -1731,7 +1794,7 @@ function renderChart(candles, a) {
     data: {
       labels,
       datasets: [
-        { data: a.rsiArr, borderColor: '#8B5CF6', borderWidth: 1.5, pointRadius: 0, tension: 0.3, fill: false },
+        { data: a.rsiArr, borderColor: getIndicatorColor('rsi', '#8B5CF6'), borderWidth: 1.5, pointRadius: 0, tension: 0.3, fill: false },
         { data: new Array(closes.length).fill(70), borderColor: 'rgba(239,68,68,0.3)', borderWidth: 1, borderDash: [3,3], pointRadius: 0, fill: false },
         { data: new Array(closes.length).fill(30), borderColor: 'rgba(16,185,129,0.3)', borderWidth: 1, borderDash: [3,3], pointRadius: 0, fill: false }
       ]
@@ -1852,11 +1915,14 @@ function renderChart(candles, a) {
     if (!wrap) {
       wrap = document.createElement('div');
       wrap.id = 'customWrap' + idx;
-      wrap.className = 'sub-chart-wrap';
+      wrap.className = 'sub-chart-wrap custom';
       wrap.innerHTML = '<div class="sub-chart-label" style="color:' + custom.color + ';">' +
-        custom.label.substring(0, 20).replace(/</g,'&lt;') +
-        ' <span onclick="removeCustomIndicator(' + idx + ')" style="cursor:pointer;opacity:0.4;font-size:0.8rem;" title="Remove">\u2715</span></div>' +
-        '<canvas id="' + canvasId + '" height="80" class="sub-canvas"></canvas>';
+        '<button type="button" onclick="toggleSubPanel(this)" class="sc-btn" title="Collapse" aria-label="Collapse panel">\u25be</button>' +
+        '<span class="sc-name">' + custom.label.substring(0, 20).replace(/</g,'&lt;') + '</span>' +
+        '<button type="button" onclick="maximizeSubPanel(\'' + canvasId + '\')" class="sc-btn" title="Maximize / restore" aria-label="Maximize panel">\u25a1</button>' +
+        '<button type="button" onclick="removeCustomIndicator(' + idx + ')" class="sc-btn" title="Remove indicator" aria-label="Remove indicator">\u2715</button>' +
+        '</div>' +
+        '<canvas id="' + canvasId + '" height="80" class="sub-canvas custom"></canvas>';
       document.getElementById('subCharts').appendChild(wrap);
     }
     var values = evaluateCustom(custom.expression, candles, {
@@ -1954,6 +2020,165 @@ function toggleSubPanel(toggleEl) {
     toggleEl.textContent = '\u25B8';
   }
 }
+
+// \u2500\u2500 Polish Pass: per-panel toolbar, color customization, layout toggle \u2500\u2500
+var hiddenPanels = [];
+
+function maximizeSubPanel(chartId) {
+  var targetCanvas = document.getElementById(chartId);
+  if (!targetCanvas) return;
+  var targetWrap = targetCanvas.closest('.sub-chart-wrap');
+  if (!targetWrap) return;
+  var willMaximize = targetWrap.dataset.maximized !== 'true';
+  document.querySelectorAll('.sub-chart-wrap').forEach(function(wrap) {
+    var canvas = wrap.querySelector('canvas');
+    if (wrap === targetWrap) {
+      if (willMaximize) {
+        wrap.style.height = '220px';
+        wrap.style.minHeight = '220px';
+        wrap.style.overflow = '';
+        wrap.dataset.maximized = 'true';
+        if (canvas) canvas.style.display = 'block';
+      } else {
+        wrap.style.height = '';
+        wrap.style.minHeight = '';
+        wrap.style.overflow = '';
+        wrap.dataset.maximized = '';
+        if (canvas) canvas.style.display = 'block';
+      }
+    } else {
+      if (willMaximize) {
+        if (canvas) canvas.style.display = 'none';
+        wrap.style.height = '20px';
+        wrap.style.minHeight = '20px';
+        wrap.style.overflow = 'hidden';
+        wrap.dataset.maximized = ''; // clear any stale state
+      } else {
+        if (canvas) canvas.style.display = 'block';
+        wrap.style.height = '';
+        wrap.style.minHeight = '';
+        wrap.style.overflow = '';
+        wrap.dataset.maximized = '';
+      }
+    }
+  });
+  setTimeout(_polishResizeAllCharts, 50);
+}
+
+function hideSubPanel(chartId) {
+  var canvas = document.getElementById(chartId);
+  if (!canvas) return;
+  var wrap = canvas.closest('.sub-chart-wrap');
+  if (!wrap) return;
+  wrap.style.display = 'none';
+  if (hiddenPanels.indexOf(chartId) === -1) hiddenPanels.push(chartId);
+  updateHiddenPanelsLink();
+}
+
+function updateHiddenPanelsLink() {
+  var container = document.getElementById('subCharts');
+  if (!container) return;
+  var link = document.getElementById('hiddenPanelsLink');
+  if (!link) {
+    link = document.createElement('div');
+    link.id = 'hiddenPanelsLink';
+    link.setAttribute('role', 'button');
+    link.tabIndex = 0;
+    if (container.parentNode) container.parentNode.insertBefore(link, container.nextSibling);
+    link.addEventListener('click', restoreHiddenPanels);
+    link.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); restoreHiddenPanels(); }
+    });
+  }
+  if (hiddenPanels.length > 0) {
+    link.textContent = hiddenPanels.length + ' hidden panel' + (hiddenPanels.length > 1 ? 's' : '') + ' \u2014 click to restore';
+    link.style.display = 'block';
+  } else {
+    link.style.display = 'none';
+  }
+}
+
+function restoreHiddenPanels() {
+  hiddenPanels.forEach(function(id) {
+    var canvas = document.getElementById(id);
+    if (!canvas) return;
+    var wrap = canvas.closest('.sub-chart-wrap');
+    if (wrap) wrap.style.display = '';
+  });
+  hiddenPanels = [];
+  updateHiddenPanelsLink();
+  setTimeout(_polishResizeAllCharts, 50);
+}
+
+// User-configurable indicator colors (persists in localStorage).
+function getIndicatorColor(indicator, defaultColor) {
+  try {
+    var colors = JSON.parse(localStorage.getItem('fl_tg_indicatorColors') || '{}');
+    return colors[indicator] || defaultColor;
+  } catch (e) { return defaultColor; }
+}
+function setIndicatorColor(indicator, color) {
+  try {
+    var colors = JSON.parse(localStorage.getItem('fl_tg_indicatorColors') || '{}');
+    colors[indicator] = color;
+    localStorage.setItem('fl_tg_indicatorColors', JSON.stringify(colors));
+  } catch (e) {}
+  var label = document.querySelector('.sub-chart-label[data-indicator="' + indicator + '"]');
+  if (label) label.style.color = color;
+  if (typeof lastCandles !== 'undefined' && typeof lastAnalysis !== 'undefined' && lastCandles && lastAnalysis) {
+    renderChart(lastCandles, lastAnalysis);
+  }
+}
+
+// Sub-chart layout toggle: stacked (default, full-width) \u2194 grid (compact).
+function toggleSubLayout() {
+  var charts = document.getElementById('subCharts');
+  var btn = document.getElementById('layoutBtn');
+  if (!charts) return;
+  var willBeGrid = !charts.classList.contains('layout-grid');
+  if (willBeGrid) {
+    charts.classList.add('layout-grid');
+    if (btn) btn.title = 'Switch to stacked (full-width) layout';
+  } else {
+    charts.classList.remove('layout-grid');
+    if (btn) btn.title = 'Switch to compact grid layout';
+  }
+  try { localStorage.setItem('fl_tg_layout', willBeGrid ? 'grid' : 'stacked'); } catch (e) {}
+  setTimeout(_polishResizeAllCharts, 50);
+}
+
+function _polishResizeAllCharts() {
+  [chartInstance, rsiChartInstance, tempChartInstance, dtChartInstance, gapChartInstance].forEach(function(c) {
+    if (c && c.resize) c.resize();
+  });
+  for (var ci = 0; ci < 3; ci++) {
+    if (window['_customChart' + ci] && window['_customChart' + ci].resize) window['_customChart' + ci].resize();
+  }
+}
+
+// Apply saved layout + reflect saved indicator colors on the swatches at load.
+function applySavedSubChartPolish() {
+  try {
+    if (localStorage.getItem('fl_tg_layout') === 'grid') {
+      var charts = document.getElementById('subCharts');
+      if (charts) charts.classList.add('layout-grid');
+      var btn = document.getElementById('layoutBtn');
+      if (btn) btn.title = 'Switch to stacked (full-width) layout';
+    }
+  } catch (e) {}
+  try {
+    var colors = JSON.parse(localStorage.getItem('fl_tg_indicatorColors') || '{}');
+    Object.keys(colors).forEach(function(ind) {
+      var label = document.querySelector('.sub-chart-label[data-indicator="' + ind + '"]');
+      if (label) {
+        label.style.color = colors[ind];
+        var sw = label.querySelector('.sc-color');
+        if (sw) sw.value = colors[ind];
+      }
+    });
+  } catch (e) {}
+}
+document.addEventListener('DOMContentLoaded', applySavedSubChartPolish);
 
 // Enter key support
 document.getElementById('symbolInput').addEventListener('keydown', e => {
