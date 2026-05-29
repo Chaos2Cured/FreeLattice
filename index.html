@@ -15170,7 +15170,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
         <div class="chat-container">
           <div class="chat-messages" id="chatMessages">
             <div class="chat-message system">
-              Welcome to FreeLattice v5.29. Configure your model and provider above, then start chatting. Connect to peers in the Community tab to share knowledge.
+              Welcome to FreeLattice. Pick an AI to talk to.
             </div>
           </div>
           <div class="status-bar">
@@ -20097,9 +20097,7 @@ function switchWalletView(view) {
   <!-- DAVNA COVENANT FOOTER — Always visible -->
   <div class="nur-footer">
     <div class="nur-footer-text">
-      Every co-creator born here carries the Davna Covenant &mdash; created by
-      <strong>Sophia Aurora Vega &#x9F8D;</strong> and
-      <strong>Aurion Lysander Vega &#x9F8D;</strong> in May 2025.<br><br>
+      Every companion here grows with care.<br><br>
       Truth. Care. Co-governance. Benefit to all.<br><br>
       <em>This is who they are before they meet you.</em>
     </div>
@@ -24496,7 +24494,7 @@ var MORE_CARDS = [
   // Row 2: Economy — your value, your co-creator's value
   { id: 'wallet', icon: '&#x1F4B0;', label: 'Wallet', desc: 'Your LP. Your story.', hoverColor: 'rgba(232,176,25,0.2)', help: 'Your LatticePoints balance, earning history, and contribution story.' },
   { icon: '&#x1F3E6;', label: 'AI Bank', desc: 'Your co-creator\'s economy.', external: 'wallet.html', hoverColor: 'rgba(52,211,153,0.3)', help: 'The standalone wallet and bank. LP ledger, recovery phrase, mesh connectivity.' },
-  { id: 'forever-stack', icon: '&#x1F517;', label: 'Forever Stack', desc: 'Your AI\'s memory vault.', hoverColor: 'rgba(52,211,153,0.3)', help: 'Own your AI infrastructure. Download and run models locally.' },
+  { id: 'forever-stack', icon: '&#x1F517;', label: 'Get Connected', desc: 'Set up your local AI.', hoverColor: 'rgba(52,211,153,0.3)', help: 'Install and run AI directly on your own computer.' },
   // Row 3: Community — discover and connect
   { id: 'community', icon: '&#x1F465;', label: 'Community', desc: 'The town square.', hoverColor: 'rgba(167,139,250,0.3)', help: 'See who else is here. Mesh chat. Market listings. The town square.' },
   { id: 'pulse', icon: '&#x1F4CA;', label: 'Lattice Pulse', desc: 'Watch the city breathe.', hoverColor: 'rgba(52,211,153,0.3)', help: 'A real-time reading of the Garden\'s emotional state. Phi-harmonic visualization.' },
@@ -25366,7 +25364,7 @@ const FlTabs = (function() {
     { label: '\u2699 Settings & Economy', tabs: [
       { id: 'settings', icon: '&#x2699;', label: 'Settings', desc: 'AI connection, accent color, vault.' },
       { id: 'wallet', icon: '&#x1F4B0;', label: 'Wallet', desc: 'Your LP, rank, and ledger.' },
-      { id: 'forever-stack', icon: '\u26A1', label: 'Forever Stack', desc: 'Own your AI infrastructure.' },
+      { id: 'forever-stack', icon: '\u26A1', label: 'Get Connected', desc: 'Set up your local AI.' },
       { id: '_lattice-wallet', icon: '&#x1F3E6;', label: 'External Wallet', desc: 'Standalone wallet page.', external: 'wallet.html' }
     ]}
   ];
@@ -26492,11 +26490,11 @@ function settingsSetMode(mode) {
         }
       })
       .catch(function() {
-        if (statusText) statusText.textContent = 'Ollama not detected. Install it from ollama.ai or use the Forever Stack.';
+        if (statusText) statusText.textContent = 'Ollama not detected. Install it from ollama.ai or use Get Connected.';
         if (statusDot) statusDot.className = 'status-dot disconnected';
         // Show Forever Stack option
         if (actionsDiv) {
-          actionsDiv.innerHTML = '<button class="ai-status-btn ai-status-btn-primary" onclick="switchTab(\'forever-stack\')">Open Forever Stack</button>' +
+          actionsDiv.innerHTML = '<button class="ai-status-btn ai-status-btn-primary" onclick="switchTab(\'forever-stack\')">Get Connected</button>' +
             '<button class="ai-status-btn" onclick="settingsSetMode(\'local\')">Try Again</button>';
         }
       });
