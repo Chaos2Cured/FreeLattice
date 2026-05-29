@@ -16296,7 +16296,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.29.0</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.30.0</span></div>
     </div>
   </div>
 
@@ -20459,7 +20459,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.29.0';
+const FL_VERSION = '5.30.0';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -42644,6 +42644,16 @@ var CoreContribution = {
 window.FreeLattice = window.FreeLattice || {};
 window.FreeLattice.callAI = function(systemPrompt, userPrompt, options) {
   var opts = options || {};
+  // Provider Independence (Tier A): route module AI calls through the
+  // InferenceRouter for provenance + circuit-breaker health + cache fallback.
+  // Progressive enhancement — only when the router is ready and the call isn't
+  // already routed. If the router is absent or throws, the original logic below
+  // runs unchanged, so behaviour is identical to before. Kill-switch:
+  // localStorage.fl_routerDisabled='true'.
+  if (!opts._routed && window.InferenceRouter && window.InferenceRouter.isReady && window.InferenceRouter.isReady()) {
+    try { return window.InferenceRouter.route(systemPrompt, userPrompt, options); }
+    catch (e) { /* router failed — fall through to original logic */ }
+  }
   var callback = opts.callback;
   // Default bumped from 200 to 1024. Gemini 2.5 Flash is a "thinking" model
   // that consumes internal tokens before emitting output — small budgets
@@ -59876,6 +59886,10 @@ document.addEventListener('click', function(e) {
 
 <!-- Welcome Wizard — zero-terminal, OS-aware local-AI setup (FLWizard) -->
 <script src="modules/welcome-wizard.js" defer></script>
+
+<!-- Provider Independence (Tier A): offline response cache + inference router -->
+<script src="modules/response-cache.js" defer></script>
+<script src="modules/inference-router.js" defer></script>
 
 <!-- Continuity — Eager-Load (wraps buildMessages) -->
 <script>
