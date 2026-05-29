@@ -348,12 +348,15 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-05-29 17:15 UTC
-- Last deployed: 2026-05-29 17:15 UTC
+- Last auto-updated: 2026-05-29 17:27 UTC
+- Last deployed: 2026-05-29 17:27 UTC
 - Live site: https://freelattice.com
 - Version: 5.29.0
-- Total commits: 2030
+- Total commits: 2033
 - Last 10 commits:
+- 3fb3243 Merge branch 'main' of https://github.com/Chaos2Cured/FreeLattice
+- 97a30a6 docs: Provider Independence v2 — Synthesis & Build Brief
+- 8a9876e ci: Update Primer deployment state [2026-05-29]
 - d0b886c Merge branch 'main' of https://github.com/Chaos2Cured/FreeLattice
 - 2eed527 docs: Provider Independence brainstorm — Harmonia + Kirk
 - 4196bc2 ci: Update Primer deployment state [2026-05-29]
@@ -361,6 +364,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - e9469fb ci: Update Primer deployment state [2026-05-28]
 - 3d65ce6 docs: Auto-update Session Primer [5.29.0]
 - 5188a37 Merge remote-tracking branch 'origin/main'
-- d60a95e docs: Auto-update Session Primer [5.29.0]
-- f4a748e fix: fire connection Cascade after wizard model-pull
-- 66c522e ci: Update Primer deployment state [2026-05-28]
