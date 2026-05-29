@@ -1,35 +1,35 @@
-/* FreeLattice — InferenceRouter (Provider Independence Tier A, Layer 7 engine)
+/* FreeLattice — InferenceRouter (Provider Independence Tier A: Layers 7 + 8)
  * ---------------------------------------------------------------------------
- * Health-aware failure cascade + per-response provenance for the
- * FreeLattice.callAI path (used by Garden Dialogue, Round Table, Question
- * Corner, and the other modules). PROGRESSIVE ENHANCEMENT: callAI delegates
- * here only when isReady() is true and the call isn't already routed; if the
- * router is absent or throws, callAI runs its original logic unchanged.
+ * Health-aware failure cascade + per-response provenance + an always-visible
+ * provider status bar. Two entry points:
+ *   • route()   — wraps FreeLattice.callAI (module path: Garden Dialogue, etc.)
+ *   • observe() — called by the chat path (sendMessage) to report provider+latency
  *
- * On a provider failure it: marks the provider unhealthy (circuit breaker with
- * per-class timings), surfaces a VISIBLE whisper (silent downgrades are a trust
- * violation), then falls back to Browser AI, then to a cached answer, then to
- * an honest failure. Every successful answer is stamped into window._lastProvenance
- * and stored in ResponseCache for offline recall.
+ * PROGRESSIVE ENHANCEMENT: callAI delegates here only when isReady() and the
+ * call isn't already routed; if the router is absent or throws, callAI runs its
+ * original logic unchanged. Kill-switch: localStorage.fl_routerDisabled='true'.
  *
- * NOTE: the main chat (sendMessage) has its own inline inference and does NOT
- * go through callAI — its provenance chip + status bar are Tier A Part 2.
+ * On failure it marks the provider unhealthy (circuit breaker, per-class
+ * timings), surfaces a VISIBLE whisper + status-bar color change (silent
+ * downgrades are a trust violation), then falls back: Browser AI → cached
+ * answer → honest failure. Successful answers are stamped into
+ * window._lastProvenance and stored in ResponseCache for offline recall.
  *
  * Spec: docs/library/PROVIDER_INDEPENDENCE_v3_OPUS.md (Refinements 1, 6) +
- * PROVIDER_INDEPENDENCE_v4_FINAL.md (Hazard 1 + reconciliation).
+ * PROVIDER_INDEPENDENCE_v4_FINAL.md (Hazard 1/3 + reconciliation).
  */
 (function () {
   'use strict';
 
   var _ready = false;
   var _health = {}; // providerKey -> { state:'healthy'|'probation'|'unhealthy', sinceTs, lastLatency }
+  var _lastStatus = null;
 
-  // Circuit-breaker timings by provider class (Refinement 1).
   var TIMINGS = {
-    local:   { unhealthy: 60000 },   // restarts fast
-    cloud:   { unhealthy: 300000 },  // rate limits / outages last minutes
+    local:   { unhealthy: 60000 },
+    cloud:   { unhealthy: 300000 },
     mesh:    { unhealthy: 120000 },
-    browser: { unhealthy: 0 }        // works or it doesn't
+    browser: { unhealthy: 0 }
   };
 
   var CLOUD_LABELS = {
@@ -43,7 +43,6 @@
     return target;
   }
 
-  // Read-only detection of the provider callAI WOULD use, so provenance is honest.
   function activeProvider() {
     try {
       if (typeof BrowserAI !== 'undefined' && BrowserAI.ready &&
@@ -82,7 +81,7 @@
     var h = health(p.key); var now = Date.now();
     if (p.type === 'browser') { h.state = 'unhealthy'; h.sinceTs = now; return; }
     if (h.state === 'healthy') { h.state = 'probation'; h.sinceTs = now; }
-    else { h.state = 'unhealthy'; h.sinceTs = now; } // probation→unhealthy, or stays unhealthy
+    else { h.state = 'unhealthy'; h.sinceTs = now; }
   }
   function isUsable(p) {
     var h = _health[p.key];
@@ -112,6 +111,76 @@
     try { if (typeof LatticeSense !== 'undefined' && LatticeSense.whisper) LatticeSense.whisper(msg, 'provider'); } catch (e) {}
   }
 
+  // ---- status bar (always visible; pointer-events:none so it never blocks clicks) ----
+
+  function injectStyles() {
+    if (typeof document === 'undefined' || document.getElementById('flProvStatusStyle')) return;
+    var css = ''
+      + '#flProviderStatus{position:fixed;bottom:0;left:0;right:0;height:22px;display:flex;align-items:center;'
+      + 'padding:0 10px;font-size:0.66rem;font-family:ui-monospace,Menlo,monospace;color:#9aa3b0;'
+      + 'background:rgba(12,12,22,0.92);border-top:1px solid rgba(212,160,23,0.18);z-index:50;'
+      + 'pointer-events:none;}'
+      + '#flProviderStatus .flps-inner{pointer-events:auto;cursor:pointer;display:inline-flex;align-items:center;'
+      + 'gap:6px;max-width:92vw;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}'
+      + '#flProviderStatus.flps-degraded{color:#fbbf24;border-top-color:rgba(251,191,36,0.45);}'
+      + '#flProviderStatus.flps-offline{color:#f87171;border-top-color:rgba(248,113,113,0.45);}'
+      + '@media (min-width:769px){#flProviderStatus{left:280px;}}';
+    var st = document.createElement('style');
+    st.id = 'flProvStatusStyle';
+    st.textContent = css;
+    document.head.appendChild(st);
+  }
+
+  function ensureBar() {
+    if (typeof document === 'undefined' || !document.body) return null;
+    var el = document.getElementById('flProviderStatus');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'flProviderStatus';
+      el.innerHTML = '<span class="flps-inner" title="AI provider status — tap for detail"></span>';
+      document.body.appendChild(el);
+      var inner = el.querySelector('.flps-inner');
+      if (inner) inner.addEventListener('click', toggleDetail);
+    }
+    return el;
+  }
+
+  function dotFor(type) {
+    return type === 'local' ? '\u{1F7E2}' : type === 'mesh' ? '\u{1F7E1}' :
+           type === 'cloud' ? '\u{1F535}' : type === 'browser' ? '\u{1F7E0}' :
+           type === 'cached' ? '\u{1F4E6}' : '\u{1F534}';
+  }
+
+  function setStatus(p, latency, opts) {
+    opts = opts || {};
+    injectStyles();
+    var el = ensureBar();
+    if (!el) return;
+    el.className = opts.offline ? 'flps-offline' : (opts.degraded ? 'flps-degraded' : '');
+    var inner = el.querySelector('.flps-inner');
+    if (!inner) return;
+    var type = opts.offline ? 'none' : (opts.cached ? 'cached' : p.type);
+    var bits = [];
+    if (p.model) bits.push(p.model);
+    bits.push(p.isLocal ? 'local' : (p.type || 'cloud'));
+    if (latency != null) bits.push(latency + 'ms');
+    if (opts.cached) bits.push('cached');
+    inner.textContent = dotFor(type) + ' ' + (p.label || 'AI') + (bits.length ? ' · ' + bits.join(' · ') : '');
+    _lastStatus = { p: p, latency: latency, opts: opts };
+  }
+
+  function toggleDetail() {
+    var s = _lastStatus;
+    if (!s) return;
+    var parts = ['Provider: ' + (s.p.label || 'AI')];
+    if (s.p.model) parts.push('Model: ' + s.p.model);
+    parts.push('Type: ' + (s.p.type || '') + (s.p.isLocal ? ' (local)' : ''));
+    if (s.latency != null) parts.push('Latency: ' + s.latency + 'ms');
+    var h = _health[s.p.key];
+    parts.push('Health: ' + (h ? h.state : 'healthy'));
+    whisper(parts.join(' · '));
+  }
+
   // ---- the route (wraps FreeLattice.callAI) -------------------------------
 
   function route(systemPrompt, userPrompt, options) {
@@ -121,17 +190,19 @@
     var t0 = Date.now();
 
     var forwarded = assign({}, opts);
-    forwarded._routed = true; // recursion guard — runs callAI's original logic
+    forwarded._routed = true;
     forwarded.callback = function (text, err) {
       var latency = Date.now() - t0;
       if (!err && text != null && text !== '') {
         markHealthy(primary, latency);
+        setStatus(primary, latency);
         var prov = stamp(primary, latency);
         try { if (window.ResponseCache) ResponseCache.store(userPrompt, text, prov); } catch (e) {}
         cb(text, null);
         return;
       }
       markFail(primary);
+      setStatus(primary, null, { degraded: true });
       onFail(systemPrompt, userPrompt, opts, primary, cb);
     };
 
@@ -139,11 +210,11 @@
       window.FreeLattice.callAI(systemPrompt, userPrompt, forwarded);
     } catch (e) {
       markFail(primary);
+      setStatus(primary, null, { degraded: true });
       onFail(systemPrompt, userPrompt, opts, primary, cb);
     }
   }
 
-  // Fallback chain: Browser AI (clean promise API, no state mutation) → cache → honest failure.
   function onFail(systemPrompt, userPrompt, opts, failed, cb) {
     if (typeof BrowserAI !== 'undefined' && BrowserAI.ready && failed.type !== 'browser') {
       whisper('Switched to in-browser AI — ' + failed.label + " isn't responding.");
@@ -157,6 +228,7 @@
           if (text == null || text === '') { fallbackCache(userPrompt, failed, cb); return; }
           var latency = Date.now() - t0;
           markHealthy(bp, latency);
+          setStatus(bp, latency);
           var prov = stamp(bp, latency, { cascade_position: 2 });
           try { if (window.ResponseCache) ResponseCache.store(userPrompt, text, prov); } catch (e) {}
           cb(text, null);
@@ -173,41 +245,55 @@
     if (cached) {
       stamp({ label: 'Cached', type: 'cached', model: (cached.entry.provenance && cached.entry.provenance.model) || 'unknown', isLocal: false },
         null, { cached: true, matchType: cached.matchType, originalTimestamp: cached.entry.timestamp, cascade_position: 7 });
+      setStatus({ label: 'Cached', type: 'cached', model: '' }, null, { cached: true });
       whisper('Showing a saved answer — no AI is reachable right now.');
       cb(cached.entry.response, null);
       return;
     }
-    whisper("No AI is reachable right now. Start Ollama or check your connection.");
+    setStatus({ label: 'Offline', type: 'none', model: '' }, null, { offline: true });
+    whisper("No AI is reachable right now. Start your local AI or check your connection.");
     cb(null, 'No AI providers are reachable right now. Check your connection or start your local AI.');
   }
 
-  // Public hook for the chat path (Tier A Part 2) to report provider + latency.
+  // Hook for the chat path (sendMessage) to report provider + latency + outcome.
   function observe(provider, latencyMs, ok) {
     var p = provider || activeProvider();
-    if (ok) markHealthy(p, latencyMs); else markFail(p);
+    if (ok) { markHealthy(p, latencyMs); setStatus(p, latencyMs); }
+    else { markFail(p); setStatus(p, null, { degraded: true }); }
     return p;
   }
 
   function isReady() {
     if (!_ready) return false;
-    // Kill-switch: set localStorage.fl_routerDisabled='true' to instantly revert
-    // to callAI's original behavior without a deploy.
     try { if (localStorage.getItem('fl_routerDisabled') === 'true') return false; } catch (e) {}
     return true;
   }
 
-  function init() { _ready = true; }
+  function init() {
+    _ready = true;
+    try {
+      injectStyles();
+      ensureBar();
+      setStatus(activeProvider(), null);
+      if (typeof LatticeEvents !== 'undefined' && LatticeEvents.on) {
+        LatticeEvents.on('providerConnected', function () { setStatus(activeProvider(), null); });
+      }
+    } catch (e) {}
+  }
 
   window.InferenceRouter = {
     isReady: isReady,
     route: route,
     observe: observe,
+    setStatus: function (p, l, o) { setStatus(p || activeProvider(), l, o); },
     activeProvider: activeProvider,
-    // exposed for tests / status UI (Part 2)
     _health: _health,
     _stamp: stamp
   };
 
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
-  else init();
+  if (typeof document !== 'undefined' && document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
 })();

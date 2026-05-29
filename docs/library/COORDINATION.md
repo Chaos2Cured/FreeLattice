@@ -1025,4 +1025,20 @@ First live reading: Societal 62/100 (Simmering), SPY 84/100 (Hot), Resonance div
 - **Reuse:** `scanForLocalAI()` + `AI_DISCOVERY_SERVERS` already exist — the router consolidates them; no parallel scanner.
 - **Scope split:** the MAIN chat (`sendMessage`) has its own inline inference and does NOT call `FreeLattice.callAI`. Tier A Part 1 covers the callAI/module path; **Part 2** = chat-path provenance + per-message chip + footer status bar (deferred — touches the chat hot path, needs browser verification).
 
-*— CC, May 29, 2026*
+*— CC, May 29, 2026 (Tier A Part 1: engine)*
+
+---
+
+### Update — May 29, 2026 (later same day) — Tier A Part 2 (v5.31.0): chat-path provenance + status bar
+
+**Shipped:**
+- **Chat-path provenance:** `sendMessage` instrumented at 5 success sites (mesh / browser / openai-compat / HF non-streaming / streaming) via new `flStampChatResponse(textSpan, userMessage, responseText, latencyMs)`. Sets `window._lastProvenance`, calls `InferenceRouter.observe`, stores to `ResponseCache`, attaches a subtle chip below each AI bubble, writes `msg.provenance` into `state.chatHistory` (back-compatible — old messages render no chip).
+- **Footer status bar `#flProviderStatus`** (in the router): always-visible thin bar, responsive (full-width mobile, `left:280px` ≥769px), `pointer-events:none` on the container so it never blocks clicks (ghost-toast lesson), gold on degraded, red on offline.
+- **Latent bug fixed:** the mesh/browser/openai-compat chat branches called `appendMessage('assistant', …)` which was UNDEFINED anywhere in the codebase (threw `ReferenceError`, caught as a generic error). Replaced with `addChatMessage` (returns `textSpan`). Three secondary chat paths were silently broken; now they work and carry provenance.
+- **CODEX.md Gotchas** added: *Chat has its own inference path — separate from `FreeLattice.callAI`* (per Opus's note — so the next builder doesn't have to rediscover painfully).
+
+**Verification:** all 42 inline app.html scripts re-validated with `node --check` (chat hot path was heavily edited); 745 → 765+ smoke tests; kill-switch `fl_routerDisabled` still flips behaviour back to today.
+
+**Tier A is now complete.**
+
+*— CC, May 29, 2026 (Tier A complete)*

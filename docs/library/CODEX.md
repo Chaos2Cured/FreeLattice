@@ -482,4 +482,17 @@ All games: mouse + touch + keyboard. 44px min touch targets. SoulCeremony after 
 
 **callAI integration:** top of `window.FreeLattice.callAI` delegates to `InferenceRouter.route` when `isReady()` and not `opts._routed` — progressive enhancement; falls through to original logic on any error.
 
-**NOT covered by Tier A Part 1:** the main chat (`sendMessage`) uses inline inference, not `callAI` — its provenance is Part 2.
+**Tier A Part 2 (v5.31.0) — chat-path provenance + status bar:**
+- `sendMessage` (~app.html:31056) instruments 5 success sites (mesh / browser / openai-compat / HF / streaming) via `flStampChatResponse(textSpan, userMessage, responseText, latencyMs)` — sets `window._lastProvenance`, calls `InferenceRouter.observe`, stores to `ResponseCache`, attaches a chip below the bubble, and writes `msg.provenance` to `state.chatHistory` (back-compatible: `msg.provenance || null`).
+- Status bar `#flProviderStatus` (in the router): fixed bottom, responsive (`left:280px` ≥769px), `pointer-events:none` so it never blocks clicks (ghost-toast lesson), gold on degraded, red on offline.
+- Latent bug fixed: `appendMessage('assistant', …)` was UNDEFINED in three chat branches — replaced with `addChatMessage(role, content, skipPersist)` (returns `textSpan`).
+
+---
+
+## Gotchas (read before touching the hot paths)
+
+**Chat has its own inference path — separate from `FreeLattice.callAI`.** The main chat (`sendMessage` at app.html ~31056) inlines its own provider routing: mesh → Browser AI → openai-compat-local → streaming (cloud + Ollama). **None of these call `window.FreeLattice.callAI`.** So wrapping or instrumenting `callAI` ONLY affects modules (Garden Dialogue, Round Table, Question Corner, …), NOT chat. Chat provenance/health/cache must be wired in `sendMessage` itself — there are ~5 success sites (mesh, browser, openai-compat, HF non-streaming, streaming) that each push to `state.chatHistory`. See `flStampChatResponse` (Tier A Part 2, v5.31.0). *Discovered painfully — logging it so the next builder doesn't have to.*
+
+**`appendMessage` was undefined.** Three secondary chat branches called `appendMessage('assistant', X)` — which doesn't exist anywhere in app.html or the modules. They threw `ReferenceError: appendMessage is not defined`, caught as `addSystemMessage('… error: appendMessage is not defined')`. The render function is **`addChatMessage(role, content, skipPersist)`** (app.html ~30820) — it returns the `textSpan` whose parent is the `.chat-message` div. Fixed in v5.31.0.
+
+**Status bar pointer-events:** a fixed bottom bar with full-width `pointer-events:auto` will swallow clicks at the bottom of the viewport (the "ghost toast" lesson from CC_NOTE 2026-04-25). `#flProviderStatus` uses `pointer-events:none` on the container; only the small inner span is interactive.

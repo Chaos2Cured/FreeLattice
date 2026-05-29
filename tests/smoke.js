@@ -1417,6 +1417,29 @@ assert('inference-router.js eager-loaded', appHtml.includes('modules/inference-r
 assert('response-cache.js in SW cache', swJs.includes('response-cache.js'));
 assert('inference-router.js in SW cache', swJs.includes('inference-router.js'));
 
+// ═══════════════════════════════════════════════════════════════
+section('69. Tier A Part 2 — chat-path provenance + status bar');
+// ═══════════════════════════════════════════════════════════════
+assert('flProviderDescriptor helper defined', appHtml.includes('function flProviderDescriptor'));
+assert('flStampChatResponse helper defined', appHtml.includes('function flStampChatResponse'));
+assert('flRenderProvenanceChip helper defined', appHtml.includes('function flRenderProvenanceChip'));
+assert('chat latency clock _flSendStart', appHtml.includes('var _flSendStart = Date.now()'));
+assert('mesh branch stamps + carries provenance', appHtml.includes('_flProvMesh') && appHtml.includes('provenance: _flProvMesh'));
+assert('browser branch stamps + carries provenance', appHtml.includes('_flProvB') && appHtml.includes('provenance: _flProvB'));
+assert('openai-compat branch stamps + carries provenance', appHtml.includes('_flProvO') && appHtml.includes('provenance: _flProvO'));
+assert('HF branch stamps + carries provenance', appHtml.includes('_flProvHf') && appHtml.includes('provenance: _flProvHf'));
+assert('streaming success stamps + carries provenance', appHtml.includes('_flProvStream') && appHtml.includes('provenance: _flProvStream'));
+// Latent bug fix
+assert('appendMessage usage removed (undefined function bug fixed)', !/appendMessage\(/.test(appHtml));
+// Status bar (in inference-router.js)
+assert('Router creates #flProviderStatus bar', irJs.includes('flProviderStatus'));
+assert('Status bar is ghost-toast safe (pointer-events:none)', irJs.includes('pointer-events:none'));
+assert('Status bar responsive (>=769px desktop offset)', irJs.includes('min-width:769px'));
+assert('Status bar has degraded + offline classes', irJs.includes('flps-degraded') && irJs.includes('flps-offline'));
+assert('setStatus called on route success', irJs.includes('setStatus(primary, latency)'));
+assert('Status bar init listens to providerConnected', irJs.includes("'providerConnected'"));
+assert('CODEX has Gotchas section', fs.readFileSync(path.join(docsDir,'library','CODEX.md'),'utf8').includes('## Gotchas'));
+
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
 

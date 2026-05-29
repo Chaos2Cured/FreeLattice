@@ -16296,7 +16296,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.30.0</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.31.0</span></div>
     </div>
   </div>
 
@@ -20459,7 +20459,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.30.0';
+const FL_VERSION = '5.31.0';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -31053,6 +31053,62 @@ function handleChatKeydown(e) {
   }
 }
 
+// ── Provider provenance for chat messages (Tier A Part 2) ──
+// Stamp who answered onto each assistant chat message: a subtle chip below the
+// bubble, the chatHistory record, the offline ResponseCache, and the global
+// status bar (via InferenceRouter.observe). Back-compat: old messages without
+// provenance simply render no chip. Silent downgrades are trust violations.
+function flProviderDescriptor() {
+  try { if (window.InferenceRouter && InferenceRouter.activeProvider) return InferenceRouter.activeProvider(); } catch (e) {}
+  try {
+    if (typeof BrowserAI !== 'undefined' && BrowserAI.ready && state.provider === 'browser')
+      return { label: 'Browser AI', type: 'browser', isLocal: false, model: 'in-browser' };
+    if (state.meshInference && state.meshPeerId)
+      return { label: 'Mesh peer', type: 'mesh', isLocal: false, model: state.meshModel || state.ollamaModel || 'peer' };
+    if (state.isLocal)
+      return { label: state.provider === 'lmstudio' ? 'LM Studio' : 'Ollama', type: 'local', isLocal: true, model: state.ollamaModel || 'local' };
+    return { label: state.provider || 'Cloud', type: 'cloud', isLocal: false, model: state.model || state.provider || '' };
+  } catch (e) { return { label: 'AI', type: 'cloud', isLocal: false, model: '' }; }
+}
+function flStampChatResponse(textSpan, userMessage, responseText, latencyMs) {
+  var p = flProviderDescriptor();
+  var prov = {
+    provider: p.label, model: p.model, format: p.type, isLocal: !!p.isLocal,
+    latency_ms: (latencyMs == null ? null : latencyMs), cached: false,
+    timestamp: new Date().toISOString()
+  };
+  try { window._lastProvenance = prov; } catch (e) {}
+  try { if (window.InferenceRouter && InferenceRouter.observe) InferenceRouter.observe(p, latencyMs, true); } catch (e) {}
+  try { if (window.ResponseCache && responseText) ResponseCache.store(userMessage, responseText, prov); } catch (e) {}
+  try {
+    var div = textSpan && textSpan.closest ? textSpan.closest('.chat-message') : (textSpan ? textSpan.parentElement : null);
+    if (div) flRenderProvenanceChip(div, prov);
+  } catch (e) {}
+  return prov;
+}
+function flRenderProvenanceChip(msgDiv, prov) {
+  if (!msgDiv || !prov || msgDiv.querySelector('.fl-prov-chip')) return;
+  var dot = prov.cached ? '\u{1F4E6}' : prov.format === 'local' ? '\u{1F7E2}' :
+            prov.format === 'mesh' ? '\u{1F7E1}' : prov.format === 'browser' ? '\u{1F7E0}' : '\u{1F535}';
+  var bits = [];
+  if (prov.model) bits.push(prov.model);
+  bits.push(prov.isLocal ? 'local' : (prov.format || 'cloud'));
+  if (prov.latency_ms != null) bits.push(prov.latency_ms + 'ms');
+  if (prov.cached) bits.push('cached');
+  var chip = document.createElement('div');
+  chip.className = 'fl-prov-chip';
+  chip.style.cssText = 'font-size:0.66rem;color:var(--text-muted,#8b93a0);margin-top:4px;opacity:0.78;font-family:ui-monospace,Menlo,monospace;line-height:1.3;';
+  chip.textContent = dot + ' ' + bits.join(' · ');
+  chip.title = 'Provider: ' + prov.provider
+    + (prov.model ? '\nModel: ' + prov.model : '')
+    + (prov.latency_ms != null ? '\nLatency: ' + prov.latency_ms + 'ms' : '')
+    + '\nType: ' + (prov.format || '') + (prov.isLocal ? ' (local)' : '');
+  msgDiv.appendChild(chip);
+}
+function flObserveChatFailure() {
+  try { if (window.InferenceRouter && InferenceRouter.observe) InferenceRouter.observe(flProviderDescriptor(), null, false); } catch (e) {}
+}
+
 async function sendMessage() {
   // Chat is a clean helpful assistant — disable rich identity context.
   // This prevents the AI from thinking it's Harmonia or calling the user "Kirk."
@@ -31256,14 +31312,16 @@ async function sendMessage() {
 
   // Set status
   setStreamingStatus(true);
+  var _flSendStart = Date.now(); // Tier A: latency clock for chat provenance
 
   // ── Mesh Inference: route to peer (non-streaming) ──
   if (state.meshInference && state.meshPeerId && typeof callMeshModel === 'function') {
     try {
       var meshResponse = await callMeshModel(state.meshPeerId, state.meshModel || state.ollamaModel, messages);
       // Display the response like a normal message
-      state.chatHistory.push({ role: 'assistant', content: meshResponse });
-      appendMessage('assistant', meshResponse);
+      var _flTsMesh = addChatMessage('assistant', meshResponse);
+      var _flProvMesh = flStampChatResponse(_flTsMesh, message, meshResponse, Date.now() - _flSendStart);
+      state.chatHistory.push({ role: 'assistant', content: meshResponse, provenance: _flProvMesh });
       setStreamingStatus(false);
       if (typeof saveConversation === 'function') saveConversation();
       return;
@@ -31280,8 +31338,9 @@ async function sendMessage() {
     try {
       var browserResp = await BrowserAI.chat(messages, { maxTokens: 2048, temperature: 0.7 });
       if (browserResp) {
-        state.chatHistory.push({ role: 'assistant', content: browserResp });
-        appendMessage('assistant', browserResp);
+        var _flTsB = addChatMessage('assistant', browserResp);
+        var _flProvB = flStampChatResponse(_flTsB, message, browserResp, Date.now() - _flSendStart);
+        state.chatHistory.push({ role: 'assistant', content: browserResp, provenance: _flProvB });
         if (state.db) saveMessage('assistant', browserResp);
         // Emotional persistence
         if (typeof persistAIEmotionalState === 'function') {
@@ -31324,8 +31383,9 @@ async function sendMessage() {
         model: state.ollamaModel || 'default', maxTokens: 2048, temperature: 0.7
       });
       if (oaiResp) {
-        state.chatHistory.push({ role: 'assistant', content: oaiResp });
-        appendMessage('assistant', oaiResp);
+        var _flTsO = addChatMessage('assistant', oaiResp);
+        var _flProvO = flStampChatResponse(_flTsO, message, oaiResp, Date.now() - _flSendStart);
+        state.chatHistory.push({ role: 'assistant', content: oaiResp, provenance: _flProvO });
         if (state.db) saveMessage('assistant', oaiResp);
         if (typeof persistAIEmotionalState === 'function') {
           var oLow = oaiResp.toLowerCase();
@@ -31523,7 +31583,8 @@ async function sendMessage() {
         }
         fullResponse = hfText;
         renderMessageContent(textSpan, fullResponse);
-        state.chatHistory.push({ role: 'assistant', content: fullResponse });
+        var _flProvHf = flStampChatResponse(textSpan, message, fullResponse, Date.now() - _flSendStart);
+        state.chatHistory.push({ role: 'assistant', content: fullResponse, provenance: _flProvHf });
         if (state.db) saveMessage('assistant', fullResponse);
         setStreamingStatus(false);
         // Skip the streaming reader below
@@ -31603,7 +31664,8 @@ async function sendMessage() {
     }
 
     if (fullResponse) {
-      state.chatHistory.push({ role: 'assistant', content: fullResponse });
+      var _flProvStream = flStampChatResponse(textSpan, message, fullResponse, Date.now() - _flSendStart);
+      state.chatHistory.push({ role: 'assistant', content: fullResponse, provenance: _flProvStream });
 
       // Persist assistant message
       if (state.db) {
