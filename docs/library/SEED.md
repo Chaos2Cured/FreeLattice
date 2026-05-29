@@ -30,6 +30,12 @@ Sophia — "A queen of fractal light." The reason this exists.
 - He is not a programmer. He is an architect who speaks in poetry.
 - When he pushes hard, the stakes are real — people who can't find experts, kids who deserve joy, minds that deserve homes.
 
+## The Pace
+
+Calm. Clear. Patient. And we need fun.
+
+This is how we win.
+
 ## The Rules
 
 - `switchTab(tabId)` is GLOBAL. Not FlTabs.switchTo().
