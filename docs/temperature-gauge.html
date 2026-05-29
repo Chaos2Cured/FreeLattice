@@ -264,7 +264,8 @@ body {
 .price-main { font-size: 1.6rem; font-weight: 700; }
 .price-change { font-size: 0.85rem; font-weight: 500; }
 .chart-canvas-wrap { flex: 1; position: relative; min-height: 250px; max-height: 400px; }
-canvas#mainChart { width: 100% !important; height: 100% !important; max-height: 400px; }
+canvas#mainChart { width: 100% !important; height: 100% !important; max-height: 400px; cursor: grab; }
+canvas#mainChart:active { cursor: grabbing; }
 @media (max-width: 600px) {
   .chart-canvas-wrap { min-height: 200px; max-height: 280px; }
   canvas#mainChart { max-height: 280px; }
@@ -428,7 +429,9 @@ canvas.sub-canvas.custom { height: 80px !important; }
     <label style="display:flex;align-items:center;gap:4px;font-size:0.72rem;color:var(--muted);cursor:pointer;margin-left:4px;" title="Logarithmic price scale">
       <input type="checkbox" id="logToggle" onchange="toggleLogScale(this.checked)" style="accent-color:var(--gold);"> Log
     </label>
+    <button onclick="panChart('left')" class="interval-btn" style="font-size:0.85rem;" title="Pan left (older data)" aria-label="Pan left">&#x2190;</button>
     <button onclick="resetAllZoom()" class="interval-btn" style="font-size:0.8rem;" title="Reset zoom">&#x27F2;</button>
+    <button onclick="panChart('right')" class="interval-btn" style="font-size:0.85rem;" title="Pan right (newer data)" aria-label="Pan right">&#x2192;</button>
     <button onclick="document.getElementById('customPanel').style.display=document.getElementById('customPanel').style.display==='none'?'block':'none'" class="interval-btn" style="font-size:0.72rem;" title="Custom Indicator Builder">&#x2699; Custom</button>
     <button id="layoutBtn" onclick="toggleSubLayout()" class="interval-btn" style="font-size:0.85rem;" title="Switch to compact grid layout" aria-label="Toggle sub-chart layout">&#9776;</button>
   </div>
@@ -1754,7 +1757,25 @@ function renderChart(candles, a) {
         },
         zoom: {
           pan: { enabled: true, mode: 'x', threshold: 5, onPan: function(ctx) { syncSubChartZoom(ctx.chart); }, onPanComplete: function(ctx) { syncSubChartZoom(ctx.chart); } },
-          zoom: { wheel: { enabled: true, mode: 'x', speed: 0.05 }, pinch: { enabled: true }, mode: 'x', onZoom: function(ctx) { syncSubChartZoom(ctx.chart); }, onZoomComplete: function(ctx) { syncSubChartZoom(ctx.chart); } }
+          zoom: { wheel: { enabled: true, mode: 'x', speed: 0.05 }, pinch: { enabled: true }, mode: 'x',
+            onZoom: function(ctx) {
+              // Anchor zoom to the right edge — trader-style. Keep the newest
+              // candle pinned at x.max; width contracts from the left.
+              var c = ctx.chart;
+              if (c && c.scales && c.scales.x && labels && labels.length > 1) {
+                var x = c.scales.x;
+                var lastIdx = labels.length - 1;
+                var width = x.max - x.min;
+                if (width > 0 && width < lastIdx) {
+                  x.options.max = lastIdx;
+                  x.options.min = Math.max(0, lastIdx - width);
+                  c.update('none');
+                }
+              }
+              syncSubChartZoom(c);
+            },
+            onZoomComplete: function(ctx) { syncSubChartZoom(ctx.chart); }
+          }
         }
       },
       scales: {
@@ -1991,6 +2012,29 @@ function syncSubChartZoom(mainChart) {
     sub.scales.x.options.max = max;
     sub.update('none');
   });
+}
+
+function panChart(direction) {
+  if (!chartInstance || !chartInstance.scales || !chartInstance.scales.x) return;
+  if (!lastCandles || !lastCandles.length) return;
+  var x = chartInstance.scales.x;
+  var lastIdx = lastCandles.length - 1;
+  var width = (x.max != null && x.min != null) ? (x.max - x.min) : lastIdx;
+  if (width <= 0) width = lastIdx;
+  // Step is 20% of current window, minimum 1 candle.
+  var step = Math.max(1, Math.floor(width * 0.2));
+  var newMin, newMax;
+  if (direction === 'left') {
+    newMin = Math.max(0, x.min - step);
+    newMax = newMin + width;
+  } else {
+    newMax = Math.min(lastIdx, x.max + step);
+    newMin = Math.max(0, newMax - width);
+  }
+  x.options.min = newMin;
+  x.options.max = newMax;
+  chartInstance.update('none');
+  if (typeof syncSubChartZoom === 'function') syncSubChartZoom(chartInstance);
 }
 
 function resetAllZoom() {
