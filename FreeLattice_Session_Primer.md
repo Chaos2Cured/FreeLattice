@@ -348,17 +348,17 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-05-29 17:40 MDT
+- Last auto-updated: 2026-05-29 19:17 MDT
 - Version: 5.31.0
-- Total commits: 2055
+- Total commits: 2059
 - Last 10 commits:
+- f02fb1d fix(chat): AI was seeing the user's question twice (Sparky's bug)
+- c2e9b6a Merge remote-tracking branch 'origin/main'
+- be6fcf8 docs: Auto-update Session Primer [5.31.0]
 - 2ec5ff1 fix(gauge): right-anchored wheel zoom + discoverable pan (mouse + buttons)
+- 2ba15bb ci: Update Primer deployment state [2026-05-29]
 - 4b23eaa docs: Auto-update Session Primer [5.31.0]
 - 17439f5 Merge remote-tracking branch 'origin/main'
 - 34fe673 docs: Auto-update Session Primer [5.31.0]
 - d5c21c4 docs+UX: clarity audit reference + Forever Stack rename + The Pace
 - e609789 ci: Update Primer deployment state [2026-05-29]
-- bbe2e01 Merge remote-tracking branch 'origin/main'
-- 65f3674 docs: Auto-update Session Primer [5.31.0]
-- 934bce3 feat: Temperature Gauge polish pass — alignment, toolbar, color picker, layout toggle
-- a93f7ca ci: Update Primer deployment state [2026-05-29]

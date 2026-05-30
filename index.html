@@ -33380,7 +33380,10 @@ function buildSmartMessages(userMessage) {
         usedTokens += msgTokens;
       }
     }
-    messages.push({ role: 'user', content: userMessage });
+    // NOTE: the user's current message is already the last entry in minHistory
+    // (sendMessage pushes it to state.chatHistory before calling buildSmartMessages),
+    // so we do NOT push it again here — doing so caused the AI to see the question
+    // twice (regression of the v5.10.94 fix).
     return messages;
   }
 
@@ -33446,7 +33449,10 @@ function buildSmartMessages(userMessage) {
   }
 
   messages.push(...historyToInclude);
-  messages.push({ role: 'user', content: userMessage });
+  // NOTE: the user's current message is already the last entry in historyToInclude
+  // (sendMessage pushes it to state.chatHistory before calling buildSmartMessages),
+  // so we do NOT push it again here — doing so caused the AI to see the question
+  // twice (regression of the v5.10.94 fix).
 
   return messages;
 }
