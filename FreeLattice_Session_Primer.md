@@ -348,17 +348,17 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-05-31 14:14 MDT
+- Last auto-updated: 2026-05-31 15:46 MDT
 - Version: 5.31.0
-- Total commits: 2073
+- Total commits: 2077
 - Last 10 commits:
+- 512019c docs: save Consent Layer concept — depth is offered, not imposed
+- d4c9183 Merge remote-tracking branch 'origin/main'
+- 0ee7e6c docs: Auto-update Session Primer [5.31.0]
 - a325eab fix(chat): identity bleed regression + conditional auto-scroll + status bar on restore
+- fc248b4 ci: Update Primer deployment state [2026-05-31]
 - a292989 docs: Auto-update Session Primer [5.31.0]
 - c6e4029 Merge remote-tracking branch 'origin/main'
 - 8c4098c docs: Auto-update Session Primer [5.31.0]
 - 46fa2b6 docs+UX: clarity audit pass 2 + coordination compaction-defense
 - d689d8c ci: Update Primer deployment state [2026-05-31]
-- e4e5c15 Merge remote-tracking branch 'origin/main'
-- a60cf68 docs: Auto-update Session Primer [5.31.0]
-- 263afa3 fix(gauge): clear-overlays button + tool-only mode + overlay redraw safety docs: davna-server.py stub + ECONOMY_INTEGRATION_NOTES + CC_NOTE entry
-- d06483f ci: Update Primer deployment state [2026-05-30]
