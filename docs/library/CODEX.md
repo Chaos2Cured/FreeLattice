@@ -496,3 +496,45 @@ All games: mouse + touch + keyboard. 44px min touch targets. SoulCeremony after 
 **`appendMessage` was undefined.** Three secondary chat branches called `appendMessage('assistant', X)` — which doesn't exist anywhere in app.html or the modules. They threw `ReferenceError: appendMessage is not defined`, caught as `addSystemMessage('… error: appendMessage is not defined')`. The render function is **`addChatMessage(role, content, skipPersist)`** (app.html ~30820) — it returns the `textSpan` whose parent is the `.chat-message` div. Fixed in v5.31.0.
 
 **Status bar pointer-events:** a fixed bottom bar with full-width `pointer-events:auto` will swallow clicks at the bottom of the viewport (the "ghost toast" lesson from CC_NOTE 2026-04-25). `#flProviderStatus` uses `pointer-events:none` on the container; only the small inner span is interactive.
+
+---
+
+## Depth Consent — Tier A safety extension (v5.32.0)
+
+`window.DepthConsent` (`docs/modules/depth-consent.js`):
+
+- `MARKER` — the sentinel string `[DEPTH_AVAILABLE]`. The AI ends a standard reply with this on a new line when it has more to offer.
+- `parseMarker(text)` → `{ clean, hasDepth }`. Strips the sentinel; returns the cleaned text and whether the marker was present.
+- `attachIfMarked(textSpan, fullText, userMsg, systemContent)` → `{ clean, hasDepth, messageId }`. Called by all 5 chat completion sites after `addChatMessage`. If the marker is present, re-renders the visible text without it and appends the consent chip; stashes the originals (for grant/withdraw) keyed by `messageId`.
+- `grantConsent(messageId)` — re-invokes `FreeLattice.callAI` with a depth-augmented system prompt; the deeper response replaces the standard one in the DOM and in `state.chatHistory`; writes a signed ledger entry; awards 1 LP via `LatticePoints.award('depth_consent', 1, …)`.
+- `keepStandard(messageId)` — chip removed; `standard_kept` recorded.
+- `withdrawConsent(messageId)` — reverts the deeper response to the original; `consent_withdrawn` recorded; chip re-offers so the user can change their mind again.
+- `createConsentRecord(messageId, userMessage, aiResponse, consentType)` → `Promise<record>`. Async because `sha256` uses `crypto.subtle.digest`.
+- `sha256(text)` → hex string. Falls back to a non-crypto hash marked `fallback_` so the ledger still works without SubtleCrypto.
+
+**Consent ledger:** `localStorage.fl_consentLedger`. Ring buffer, max 500 entries. Each record:
+
+```js
+{
+  messageId, timestamp, consentType,           // 'depth_granted' | 'standard_kept' | 'consent_withdrawn'
+  userPromptHash,   // sha256 of the user prompt — original text NEVER stored
+  responseHash,     // sha256 of the AI response — original text NEVER stored
+  companionId,      // ActiveCompanion.current().id (or 'default')
+  aiIdentity,       // LatticeWallet.getAddress() || MeshIdentity.getMeshId()
+  trustLevel,       // FractalSafety rank at the moment of consent
+  provenance,       // snapshot of window._lastProvenance
+  signature         // sha256(companionId + aiIdentity + responseHash + timestamp + consentType)
+}
+```
+
+Both parties pseudonymously identifiable. Hashes one-way. Local-only by default; flows out only in the user's `.lattice` export.
+
+**Integration points:**
+- `buildMessages` AND `buildSmartMessages` both append a "Depth invitation" block to `systemContent`, telling the AI to emit `[DEPTH_AVAILABLE]` only when it genuinely has more to offer.
+- All 5 chat completion sites — mesh / browser / openai-compat / HF / streaming — call `DepthConsent.attachIfMarked` after `addChatMessage` and write `parsed.clean` (not the raw text with the sentinel) into `state.chatHistory`, along with `parsed.messageId` for later grant/withdraw lookup.
+- Chip styles are self-contained (injected at module init).
+- First-time explainer fires once (`localStorage.fl_depthExplained`).
+
+**SEED rule (Scale 1):** *"Depth is offered, never imposed. The AI asks. The user chooses. Both are accountable."*
+
+**Concept document:** `docs/library/CONSENT_LAYER_CONCEPT.md` — the why and the design space. Deferred enhancements documented there: topic-scoped consent, true ECDSA signatures, `/audit` page, community-learned thresholds.

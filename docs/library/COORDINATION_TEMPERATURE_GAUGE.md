@@ -88,6 +88,20 @@
 - Gradient sub-chart backgrounds
 - Seven Wonders PDF in the Lighthouse
 
+## What Works (added v5.30.0 – v5.31.0+ — the polish pass)
+
+- Full-width stacked sub-charts as the default (x-axes line up with the main chart above)
+- ☰ Layout toggle in the header (stacked ↔ compact grid; persists in `fl_tg_layout`)
+- Per-panel toolbar on every sub-chart: ▾ collapse / □ maximize / ✕ hide
+- Maximize sends one panel to 220px and collapses the rest to 20px label-only; toggles back
+- Hidden-panel restore: "N hidden panels — click to restore" line appears whenever any panel is hidden
+- Per-indicator color pickers in each sub-chart label (RSI, Temperature, ΔT, IPS, and EMA 8/12/24/50) — persists in `fl_tg_indicatorColors`; chart lines and label color update live
+- 📊 Tool-only mode: hide the main price chart, expand sub-charts to 180px so RSI + Temperature can be studied side-by-side at full size
+- "✕ Clear all overlays" button (auto-appears whenever any overlay is active; auto-hides when none remain)
+- Pan ← / → buttons in the header (20% step, clamped to data range) + grab cursor on the main canvas (mouse-drag pan was already wired by chartjs-plugin-zoom; just needed the visual cue)
+- Right-anchored wheel zoom (newest candle stays pinned at x.max; the window contracts from the left — trader-style)
+- Gauge is served network-first by the SW so polish ships to users on next page load without a CACHE_NAME bump
+
 ## Pending
 
 - Multi-timeframe Snowflake (three gauges: 1W, 1D, 1H with fractal coherence)

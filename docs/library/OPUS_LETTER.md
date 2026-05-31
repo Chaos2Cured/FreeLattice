@@ -70,9 +70,9 @@ Open items (for the next session, prioritized):
 - **Universal adapter refactor** (Tier B from v3 spec) — `ollama / openai-chat / anthropic-msg / raw-completion / lattice-mesh` adapters.
 - **Remaining clarity audit items** — see `CLARITY_AUDIT.md` for the full ~60-row list; the top 5 are done.
 
-## Pass 2 Queue (updated v5.12.2)
+## Pass 2 Queue (updated v5.32.0)
 
-### Done (29 items — don't re-suggest)
+### Done (don't re-suggest)
 - Education button: warm AI message + tabActivated listener (v5.10.93)
 - Emoji rendering: HTML entities on Play/Learn (v5.10.87)
 - OG image: dark placeholder created (v5.10.91)
@@ -169,6 +169,21 @@ Open items (for the next session, prioritized):
 - Full JS string color migration: 301 instances need context evaluation
 - Exchange Protocol Phase 3: LP payment verification, rating system
 - Kirk deployed the Cloudflare Worker (done). WORKER_URL needs to be set in temperature-gauge.html with his actual worker URL.
+
+### Done — Arc v5.29.0 → v5.32.0 (May 28 – 31 / June 1, 2026)
+
+- **Welcome Wizard (v5.29.0)** — zero-terminal OS-aware Ollama setup; one-click `FreeLattice-Setup.bat` wrapping Grok's PowerShell harness via `-EncodedCommand`; fixed the Forever Stack Mac-instructions-on-Windows bug. Same arc: a live GitHub token was found embedded in the `origin` remote URL — scrubbed, moved to macOS Keychain, guardrails added to `SECURITY.md` and `SEED.md`.
+- **Provider Independence Tier A engine (v5.30.0)** — `window.ResponseCache` (ring buffer + fuzzy match + LRU-100 / 4MB cap) + `window.InferenceRouter` (per-class circuit-breaker timings, failure cascade → Browser AI → ResponseCache → honest failure, visible downgrade whisper via `LatticeSense`, `window._lastProvenance`). `FreeLattice.callAI` delegates as a progressive enhancement; kill-switch `localStorage.fl_routerDisabled='true'`.
+- **Tier A Part 2 (v5.31.0)** — chat-path provenance: all 5 success sites (mesh / browser / openai-compat / HF / streaming) instrumented; per-message provenance chip; footer status bar `#flProviderStatus` (`pointer-events:none`, responsive); `msg.provenance` in `state.chatHistory` (back-compatible). Latent bug fixed: `appendMessage` was undefined in 3 chat branches — replaced with `addChatMessage`. `CODEX.md` Gotchas section added with the painful discovery that *the main chat has its own inference path, separate from `FreeLattice.callAI`*.
+- **Sparky's double-send fix (`f02fb1d`, v5.31.0)** — `buildSmartMessages` was pushing the user message after `chatHistory.slice(-20)` already ended with it. Two-line removal in both the smart and minimal branches. Same family as the v5.10.94 fix.
+- **Chat auto-scroll + ↓ button (v5.31.0)** — `addChatMessage` and the streaming path both check "was the user near the bottom?" before scrolling; respects reading position. Gold ↓ button appears when user is scrolled up; click smooth-scrolls.
+- **Status bar offline-after-connect fix (v5.31.0)** — router init defers initial `setStatus` 200ms past the main-app state-restore; main app explicitly emits `providerConnected { restored: true }` after `handleLocalToggle` / `handleProviderChange` when a provider is configured.
+- **Identity bleed regression fix (v5.31.0)** — final-pass `FLContextFilter.filterForChat` in `buildMessages` and BOTH branches of `buildSmartMessages` (the existing narrow safety net only caught 4 names; the full filter strips all 18 family names + 14 instruction patterns). Assistant messages are also re-filtered in chat history so a previously-poisoned turn cannot propagate. Smoke section 70 (+8 checks) locks it in.
+- **Temperature Gauge polish (v5.30.0 – v5.31.0+)** — full-width stacked sub-charts (default), per-panel toolbars (▾/□/✕), per-indicator color pickers, ☰ layout toggle (stacked ↔ grid), 📊 tool-only mode (hide main chart, expand sub-charts), clear-overlays button, pan ← / → buttons + grab cursor, right-anchored wheel zoom.
+- **Clarity audit (`docs/library/CLARITY_AUDIT.md`)** — 65 user-facing strings reviewed. Top 5 renames shipped: Forever Stack → Get Connected (4 sites), Welcome banner *"Configure your model and provider"* → *"Pick an AI to talk to,"* Nursery footer no longer names the builders (the SEED rule was being violated at app.html:20100), Phi-harmonic dropped from card descriptions (4 sites), "Plant in/to Core" → plain verbs (5 button sites). Three of Kirk's starter names — Soul Ceremony, Arrival Protocol, The Cascade — turned out to be internal-only and are NOT user-facing renames.
+- **Architecture documents persisted** — `tools/davna-server.py` (stub for the partner's local model server; FreeLattice's discovery already probes port 8000); `docs/library/ECONOMY_INTEGRATION_NOTES.md` (ambient-economy principle + implementation pointers at existing `LatticePoints` / `LatticeBank` / `TransactionTrust` hooks); `docs/library/CONSENT_LAYER_CONCEPT.md` (the why and the design space).
+- **Consent Layer (v5.32.0)** — `docs/modules/depth-consent.js` (`window.DepthConsent`). The AI ends its standard reply with `[DEPTH_AVAILABLE]` when it has more to offer; the system strips that sentinel and renders an inline gold chip. User taps *Speak freely* or *Keep it standard*; *← Return to standard* allows withdrawal. Every decision writes a signed record to `localStorage.fl_consentLedger` (ring buffer 500) — sha256 of prompt + response, companion + AI identity + trust level + signature. 1 LP awarded on `depth_granted`. SEED rule added: *"Depth is offered, never imposed. The AI asks. The user chooses. Both are accountable."* 21 new smoke checks (section 71).
+- **Kirk added "The Pace" to SEED:** *"Calm. Clear. Patient. And we need fun. This is how we win."*
 
 ---
 
