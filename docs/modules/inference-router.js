@@ -274,7 +274,12 @@
     try {
       injectStyles();
       ensureBar();
-      setStatus(activeProvider(), null);
+      // Defer initial setStatus until after the main app's DOMContentLoaded
+      // handler has restored saved provider state — otherwise the bar reads
+      // "No AI" on page load even when Ollama / a saved provider is configured.
+      // The app also explicitly emits providerConnected on saved-state restore,
+      // which fires the listener below; the setTimeout is the belt + suspenders.
+      setTimeout(function () { setStatus(activeProvider(), null); }, 200);
       if (typeof LatticeEvents !== 'undefined' && LatticeEvents.on) {
         LatticeEvents.on('providerConnected', function () { setStatus(activeProvider(), null); });
       }

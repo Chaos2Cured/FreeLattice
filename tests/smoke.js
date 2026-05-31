@@ -1440,6 +1440,29 @@ assert('setStatus called on route success', irJs.includes('setStatus(primary, la
 assert('Status bar init listens to providerConnected', irJs.includes("'providerConnected'"));
 assert('CODEX has Gotchas section', fs.readFileSync(path.join(docsDir,'library','CODEX.md'),'utf8').includes('## Gotchas'));
 
+// ═══════════════════════════════════════════════════════════════
+section('70. Identity bleed defense + chat UX (Sparky bug fixes, May 31)');
+// ═══════════════════════════════════════════════════════════════
+// Final-pass FLContextFilter must be present in BOTH buildMessages and both
+// branches of buildSmartMessages (minimal + smart). Three occurrences min.
+assert('Final-pass identity filter in all chat message builders',
+  (appHtml.match(/Final-pass identity filter/g) || []).length >= 3,
+  'Required in buildMessages + buildSmartMessages minimal + buildSmartMessages smart');
+assert('Filter is FLContextFilter.filterForChat (full strip, not narrow)',
+  (appHtml.match(/FLContextFilter\.filterForChat\(systemContent\)/g) || []).length >= 3);
+assert('Chat history re-filters prior assistant messages',
+  appHtml.includes('Re-filter prior assistant messages') || appHtml.includes('re-filter prior assistant turns'));
+// Chat auto-scroll: conditional, with ↓ button when scrolled up.
+assert('Chat ↓ button setup wired', appHtml.includes('chatScrollBtn') && appHtml.includes('flChatNearBottom'));
+assert('addChatMessage scroll is conditional (not unconditional)',
+  appHtml.includes('_wasNearBottom') && appHtml.includes("role === 'user'"));
+assert('Streaming scroll is conditional', appHtml.includes('_flStreamWasNear'));
+// Status bar: router defers initial setStatus + app emits providerConnected on restore.
+assert('Router init defers initial setStatus past state restore',
+  irJs.includes("Defer initial setStatus") && irJs.includes('setTimeout(function () { setStatus'));
+assert('App emits providerConnected after restoring saved state',
+  appHtml.includes("restored: true") && appHtml.includes("'providerConnected'"));
+
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
 

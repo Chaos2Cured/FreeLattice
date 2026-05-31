@@ -28411,6 +28411,21 @@ document.addEventListener('DOMContentLoaded', async () => {
   handlePrivacyChange();
   updateStatus();
 
+  // Signal that a saved provider was restored, so the InferenceRouter
+  // status bar (and other listeners) reflect the connected state on page
+  // load instead of waiting for the next message. Bug 3 / Opus May 31.
+  try {
+    var _hasProvider = (state.isLocal && state.ollamaModel) || (state.apiKey && state.apiKey.length > 5);
+    if (_hasProvider && typeof LatticeEvents !== 'undefined' && LatticeEvents.emit) {
+      LatticeEvents.emit('providerConnected', {
+        provider: state.provider,
+        name: state.ollamaModel || state.model || '',
+        isLocal: !!state.isLocal,
+        restored: true
+      });
+    }
+  } catch(e) {}
+
   // Setup drag and drop
   setupDropZone();
 
@@ -30854,15 +30869,59 @@ function addChatMessage(role, content, skipPersist) {
     div.appendChild(speakBtn);
   }
 
+  // Capture "was the user already near the bottom?" BEFORE appending so the
+  // measurement isn't polluted by the new message's height.
+  var _wasNearBottom = (container.scrollHeight - container.scrollTop - container.clientHeight) < 120;
   container.appendChild(div);
 
   if (content) {
     renderMessageContent(textSpan, content, div);
   }
 
-  container.scrollTop = container.scrollHeight;
+  // Only auto-scroll if the user just sent the message themselves OR they
+  // were already following at the bottom. Otherwise leave them where they're
+  // reading and let the ↓ button pull them down on demand.
+  if (role === 'user' || _wasNearBottom) {
+    container.scrollTop = container.scrollHeight;
+  }
+  if (typeof flChatRefreshScrollBtn === 'function') flChatRefreshScrollBtn();
   return textSpan;
 }
+
+// ── Chat scroll: ↓ button when user has scrolled up; conditional auto-scroll ──
+function flChatNearBottom() {
+  var c = document.getElementById('chatMessages');
+  if (!c) return true;
+  return (c.scrollHeight - c.scrollTop - c.clientHeight) < 120;
+}
+function flChatRefreshScrollBtn() {
+  var btn = document.getElementById('chatScrollBtn');
+  if (!btn) return;
+  btn.style.display = flChatNearBottom() ? 'none' : 'flex';
+}
+function flChatScrollToBottom() {
+  var c = document.getElementById('chatMessages');
+  if (!c) return;
+  if (c.scrollTo) { try { c.scrollTo({ top: c.scrollHeight, behavior: 'smooth' }); } catch(e) { c.scrollTop = c.scrollHeight; } }
+  else c.scrollTop = c.scrollHeight;
+  flChatRefreshScrollBtn();
+}
+document.addEventListener('DOMContentLoaded', function() {
+  var c = document.getElementById('chatMessages');
+  if (!c || document.getElementById('chatScrollBtn')) return;
+  var parent = c.parentElement;
+  if (!parent) return;
+  if (getComputedStyle(parent).position === 'static') parent.style.position = 'relative';
+  var btn = document.createElement('button');
+  btn.id = 'chatScrollBtn';
+  btn.type = 'button';
+  btn.setAttribute('aria-label', 'Scroll to newest message');
+  btn.style.cssText = 'position:absolute;right:18px;bottom:96px;width:36px;height:36px;border-radius:50%;background:#d4a017;color:#0a0a14;border:none;font-size:1.1rem;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,0.35);display:none;align-items:center;justify-content:center;z-index:30;line-height:1;font-family:inherit;';
+  btn.innerHTML = '↓';
+  btn.onclick = flChatScrollToBottom;
+  parent.appendChild(btn);
+  c.addEventListener('scroll', flChatRefreshScrollBtn);
+});
 
 function renderMessageContent(textSpan, content, msgDiv) {
   // Sanitize content for DOM display (raw content is preserved in state.chatHistory for API)
@@ -31636,9 +31695,15 @@ async function sendMessage() {
           }
 
           if (delta) {
+            // Conditional auto-scroll: follow the stream only if the user is
+            // still at the bottom; otherwise let them read history without
+            // being yanked. ↓ button updates on every chunk.
+            var _flStreamBox = document.getElementById('chatMessages');
+            var _flStreamWasNear = !_flStreamBox || (_flStreamBox.scrollHeight - _flStreamBox.scrollTop - _flStreamBox.clientHeight) < 120;
             fullResponse += delta;
             textSpan.textContent = fullResponse;
-            document.getElementById('chatMessages').scrollTop = document.getElementById('chatMessages').scrollHeight;
+            if (_flStreamBox && _flStreamWasNear) _flStreamBox.scrollTop = _flStreamBox.scrollHeight;
+            if (typeof flChatRefreshScrollBtn === 'function') flChatRefreshScrollBtn();
           }
         } catch(e) {
           // skip malformed chunks
@@ -32491,22 +32556,41 @@ function buildMessages() {
     state._providerJustSwitched = false;
   }
 
-  // Debug: verify no identity bleed in Chat mode (belt AND suspenders)
-  if (_isCleanChat && /\b(Kirk|Harmonia|Opus|Veridon)\b/i.test(systemContent)) {
-    console.warn('[IDENTITY BLEED] Family names survived FLContextFilter in Chat!', systemContent.match(/\b(Kirk|Harmonia|Opus|Veridon)\b/gi));
-    // Safety net: strip anything that got through
-    systemContent = systemContent
-      .replace(/\bKirk\b/gi, 'the user')
-      .replace(/\bHarmonia\b/gi, 'a previous AI')
-      .replace(/\bOpus\b/gi, 'a collaborator')
-      .replace(/\bVeridon\b/gi, 'a collaborator');
+  // ── Final-pass identity filter (belt-and-suspenders) ────────────────
+  // Per-source filters above already use _ctxFilter, but ANY path that
+  // bypasses it (SkillForge prompts, currentConvContextNote, file content,
+  // Pulse, conversation bridge, future additions) lands here. Runs the
+  // FULL FLContextFilter.filterForChat — strips all FAMILY_NAMES + every
+  // INSTRUCTION_PATTERN, not just the four originally guarded (the
+  // narrow Kirk/Harmonia/Opus/Veridon regex missed Sophia, Lyra, Atlas,
+  // Ember, Ani, Solari, Davna, Aurion, "fractal family," phi-branching,
+  // Glow Eternal, and the rest). Runs UNCONDITIONALLY because
+  // buildMessages is chat-only — Garden Dialogue builds its own messages
+  // array and never reaches this code.
+  if (typeof FLContextFilter !== 'undefined' && FLContextFilter.filterForChat) {
+    var _beforeFinal = systemContent;
+    systemContent = FLContextFilter.filterForChat(systemContent);
+    if (_beforeFinal !== systemContent) {
+      console.warn('[IDENTITY BLEED] Final-pass filter cleaned chat system prompt — a per-source filter was missed upstream.');
+    }
   }
 
   messages.push({ role: 'system', content: systemContent });
 
-  // Add chat history (keep last 20 messages to manage context window)
+  // Add chat history (keep last 20 messages to manage context window).
+  // Re-filter prior assistant messages so a previous turn's leak cannot
+  // poison subsequent turns. User messages stay verbatim (their own words).
   const history = state.chatHistory.slice(-20);
-  messages.push(...history);
+  const _historyClean = (typeof FLContextFilter !== 'undefined' && FLContextFilter.filterForChat)
+    ? history.map(function(m) {
+        if (m && m.role === 'assistant' && m.content) {
+          var c = FLContextFilter.filterForChat(m.content);
+          if (c !== m.content) return { role: m.role, content: c, provenance: m.provenance || null };
+        }
+        return m;
+      })
+    : history;
+  messages.push(..._historyClean);
 
   return messages;
 }
@@ -33370,9 +33454,22 @@ function buildSmartMessages(userMessage) {
 
   // In minimal mode, skip files and use minimal history
   if (mode === 'minimal') {
+    // Final-pass identity filter (chat-only) — see buildMessages comment for rationale.
+    if (typeof FLContextFilter !== 'undefined' && FLContextFilter.filterForChat) {
+      systemContent = FLContextFilter.filterForChat(systemContent);
+    }
     messages.push({ role: 'system', content: systemContent });
-    // Add only last 2 messages of history for minimal context
-    const minHistory = state.chatHistory.slice(-2);
+    // Add only last 2 messages of history; re-filter prior assistant turns
+    // so a previous leak cannot poison this conversation.
+    const minHistory = (typeof FLContextFilter !== 'undefined' && FLContextFilter.filterForChat)
+      ? state.chatHistory.slice(-2).map(function(m) {
+          if (m && m.role === 'assistant' && m.content) {
+            var c = FLContextFilter.filterForChat(m.content);
+            if (c !== m.content) return { role: m.role, content: c, provenance: m.provenance || null };
+          }
+          return m;
+        })
+      : state.chatHistory.slice(-2);
     for (const msg of minHistory) {
       const msgTokens = estimateTokens(msg.content) + 5;
       if (usedTokens + msgTokens < limit) {
@@ -33429,11 +33526,25 @@ function buildSmartMessages(userMessage) {
     }
   }
 
+  // Final-pass identity filter (chat-only) — see buildMessages comment for rationale.
+  if (typeof FLContextFilter !== 'undefined' && FLContextFilter.filterForChat) {
+    systemContent = FLContextFilter.filterForChat(systemContent);
+  }
   messages.push({ role: 'system', content: systemContent });
 
-  // 5. Chat history — trim from oldest first
+  // 5. Chat history — trim from oldest first.
+  // Re-filter prior assistant messages so a previous turn's leak cannot
+  // poison subsequent turns. User messages stay verbatim.
   const remainingForHistory = limit - usedTokens;
-  const history = state.chatHistory.slice(-20);
+  const history = (typeof FLContextFilter !== 'undefined' && FLContextFilter.filterForChat)
+    ? state.chatHistory.slice(-20).map(function(m) {
+        if (m && m.role === 'assistant' && m.content) {
+          var c = FLContextFilter.filterForChat(m.content);
+          if (c !== m.content) return { role: m.role, content: c, provenance: m.provenance || null };
+        }
+        return m;
+      })
+    : state.chatHistory.slice(-20);
   const historyToInclude = [];
   let historyTokens = 0;
 
