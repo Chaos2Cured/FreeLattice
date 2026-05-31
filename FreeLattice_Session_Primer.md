@@ -348,11 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-05-31 17:11 MDT
+- Last auto-updated: 2026-05-31 22:56 UTC
+- Last deployed: 2026-05-31 22:56 UTC
+- Live site: https://freelattice.com
 - Version: 5.32.0
-- Total commits: 2086
+- Total commits: 2085
 - Last 10 commits:
-- 82aed2c docs: Coordination updates — gauge polish, DepthConsent signatures, Pass 2 Done arc
 - de5d165 Merge remote-tracking branch 'origin/main'
 - 5ad26a3 docs: Auto-update Session Primer [5.32.0]
 - 5eba6a4 feat: Depth Consent layer — the AI asks before going deep (v5.32.0)
@@ -362,3 +363,4 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - fb20959 docs: Auto-update Session Primer [5.31.0]
 - 512019c docs: save Consent Layer concept — depth is offered, not imposed
 - 06ec84a ci: Update Primer deployment state [2026-05-31]
+- d4c9183 Merge remote-tracking branch 'origin/main'
