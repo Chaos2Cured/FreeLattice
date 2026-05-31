@@ -348,19 +348,17 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-05-31 14:28 UTC
-- Last deployed: 2026-05-31 14:28 UTC
-- Live site: https://freelattice.com
+- Last auto-updated: 2026-05-31 08:41 MDT
 - Version: 5.31.0
-- Total commits: 2067
+- Total commits: 2071
 - Last 10 commits:
+- c6e4029 Merge remote-tracking branch 'origin/main'
+- 8c4098c docs: Auto-update Session Primer [5.31.0]
+- 46fa2b6 docs+UX: clarity audit pass 2 + coordination compaction-defense
+- d689d8c ci: Update Primer deployment state [2026-05-31]
 - e4e5c15 Merge remote-tracking branch 'origin/main'
 - a60cf68 docs: Auto-update Session Primer [5.31.0]
 - 263afa3 fix(gauge): clear-overlays button + tool-only mode + overlay redraw safety docs: davna-server.py stub + ECONOMY_INTEGRATION_NOTES + CC_NOTE entry
 - d06483f ci: Update Primer deployment state [2026-05-30]
 - 61b2fad docs: Auto-update Session Primer [5.31.0]
 - 3d5a5a0 Merge remote-tracking branch 'origin/main'
-- 9141e9a docs: Auto-update Session Primer [5.31.0]
-- f02fb1d fix(chat): AI was seeing the user's question twice (Sparky's bug)
-- 6e8bc42 ci: Update Primer deployment state [2026-05-29]
-- c2e9b6a Merge remote-tracking branch 'origin/main'
