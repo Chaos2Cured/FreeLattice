@@ -434,6 +434,7 @@ canvas.sub-canvas.custom { height: 80px !important; }
     <button onclick="panChart('right')" class="interval-btn" style="font-size:0.85rem;" title="Pan right (newer data)" aria-label="Pan right">&#x2192;</button>
     <button onclick="document.getElementById('customPanel').style.display=document.getElementById('customPanel').style.display==='none'?'block':'none'" class="interval-btn" style="font-size:0.72rem;" title="Custom Indicator Builder">&#x2699; Custom</button>
     <button id="layoutBtn" onclick="toggleSubLayout()" class="interval-btn" style="font-size:0.85rem;" title="Switch to compact grid layout" aria-label="Toggle sub-chart layout">&#9776;</button>
+    <button id="mainToggleBtn" onclick="toggleMainChart()" class="interval-btn" style="font-size:0.85rem;" title="Hide the main price chart (study indicators alone)" aria-label="Show or hide the main price chart">&#128202;</button>
   </div>
 </div>
 
@@ -1996,6 +1997,10 @@ function renderChart(candles, a) {
       if (tw) { var w = tw.closest('.sub-chart-wrap'); if (w) w.style.display = 'none'; }
     }
   })();
+
+  // Refresh the "Clear all overlays" button on every render so it appears
+  // whenever any overlay is active and hides itself when none remain.
+  if (typeof updateClearOverlaysButton === 'function') updateClearOverlaysButton();
 }
 
 // ── Zoom/Pan sync across all charts ──
@@ -2043,6 +2048,59 @@ function resetAllZoom() {
     if (c && c.resetZoom) c.resetZoom();
   });
   for (var ci = 0; ci < 3; ci++) { if (window['_customChart' + ci] && window['_customChart' + ci].resetZoom) window['_customChart' + ci].resetZoom(); }
+}
+
+// ── Clear-all-overlays button — appears whenever any overlay is active ──
+function updateClearOverlaysButton() {
+  var hasOverlays = (typeof activeOverlays !== 'undefined') && Object.keys(activeOverlays).some(function(k) {
+    return activeOverlays[k] && activeOverlays[k].length > 0;
+  });
+  var btn = document.getElementById('clearOverlaysBtn');
+  if (!btn) {
+    btn = document.createElement('button');
+    btn.id = 'clearOverlaysBtn';
+    btn.className = 'interval-btn';
+    btn.type = 'button';
+    btn.style.cssText = 'font-size:0.68rem;margin:4px 10px;display:none;';
+    btn.textContent = '✕ Clear all overlays';
+    btn.setAttribute('aria-label', 'Clear all overlays');
+    btn.onclick = function() { if (typeof clearOverlays === 'function') clearOverlays(); };
+    var subCharts = document.getElementById('subCharts');
+    if (subCharts && subCharts.parentNode) subCharts.parentNode.insertBefore(btn, subCharts);
+  }
+  btn.style.display = hasOverlays ? 'inline-block' : 'none';
+}
+
+// ── Tool-only mode — hide the main price chart, expand sub-charts to fill ──
+function toggleMainChart() {
+  var wrap = document.getElementById('chartWrap');
+  if (!wrap) return;
+  var isHidden = wrap.style.display === 'none';
+  wrap.style.display = isHidden ? '' : 'none';
+  var subCharts = document.getElementById('subCharts');
+  if (subCharts) {
+    subCharts.querySelectorAll('.sub-chart-wrap').forEach(function(w) {
+      var canvas = w.querySelector('canvas');
+      var collapsed = canvas && canvas.style.display === 'none';
+      if (!isHidden) {
+        // Hiding the main chart — let visible sub-charts breathe.
+        if (!collapsed && w.dataset.maximized !== 'true') w.style.height = '180px';
+      } else {
+        // Restoring the main chart — return sub-charts to defaults.
+        if (w.dataset.maximized !== 'true') w.style.height = '';
+      }
+    });
+  }
+  var btn = document.getElementById('mainToggleBtn');
+  if (btn) btn.title = isHidden ? 'Hide the main price chart' : 'Show the main price chart';
+  setTimeout(function() {
+    [chartInstance, rsiChartInstance, tempChartInstance, dtChartInstance, gapChartInstance].forEach(function(c) {
+      if (c && c.resize) c.resize();
+    });
+    for (var ci = 0; ci < 3; ci++) {
+      if (window['_customChart' + ci] && window['_customChart' + ci].resize) window['_customChart' + ci].resize();
+    }
+  }, 50);
 }
 
 // ── Collapse/Expand sub-chart panels ──
