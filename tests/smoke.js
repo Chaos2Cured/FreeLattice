@@ -1463,6 +1463,48 @@ assert('Router init defers initial setStatus past state restore',
 assert('App emits providerConnected after restoring saved state',
   appHtml.includes("restored: true") && appHtml.includes("'providerConnected'"));
 
+// ═══════════════════════════════════════════════════════════════
+section('71. Depth Consent layer (CONSENT_LAYER_CONCEPT, May 31)');
+// ═══════════════════════════════════════════════════════════════
+var dcPath = path.join(docsDir, 'modules', 'depth-consent.js');
+assert('depth-consent.js exists', fs.existsSync(dcPath));
+var dcJs = fs.existsSync(dcPath) ? fs.readFileSync(dcPath, 'utf8') : '';
+if (dcJs) {
+  try { require('child_process').execSync('node --check ' + dcPath, { stdio: 'pipe' }); assert('depth-consent.js parses', true); }
+  catch (e) { assert('depth-consent.js parses', false, 'Syntax error'); }
+}
+assert('DepthConsent window export', dcJs.includes('window.DepthConsent'));
+assert('DEPTH_AVAILABLE marker constant', dcJs.includes("'[DEPTH_AVAILABLE]'") && dcJs.includes('MARKER: DEPTH_MARKER'));
+assert('parseMarker + attachIfMarked exposed', dcJs.includes('parseMarker: parseMarker') && dcJs.includes('attachIfMarked: attachIfMarked'));
+assert('SHA-256 via SubtleCrypto', dcJs.includes("crypto.subtle.digest('SHA-256'"));
+assert('Consent ledger key fl_consentLedger', dcJs.includes("'fl_consentLedger'"));
+assert('Consent record holds companion + AI identity + signature', dcJs.includes('companionId:') && dcJs.includes('aiIdentity:') && dcJs.includes('record.signature'));
+assert('Three consent types recorded', dcJs.includes("'depth_granted'") && dcJs.includes("'standard_kept'") && dcJs.includes("'consent_withdrawn'"));
+assert('Awards 1 LP on depth_granted', dcJs.includes("LatticePoints.award('depth_consent'"));
+assert('First-time explainer (fl_depthExplained)', dcJs.includes("'fl_depthExplained'"));
+assert('Withdrawability wired', dcJs.includes('withdrawConsent') && dcJs.includes("'consent_withdrawn'"));
+assert('Styles injected (.depth-chip class)', dcJs.includes('.depth-chip{'));
+
+// Integration in app.html
+assert('depth-consent.js eager-loaded', appHtml.includes('modules/depth-consent.js'));
+assert('depth-consent.js in SW cache', swJs.includes('depth-consent.js'));
+assert('Depth invitation in buildMessages system prompt',
+  (appHtml.match(/Depth invitation: if your full answer would be materially deeper/g) || []).length >= 2,
+  'Required in both buildMessages and buildSmartMessages');
+assert('DEPTH_AVAILABLE marker mentioned in system instruction', appHtml.includes('[DEPTH_AVAILABLE]'));
+
+// All 5 chat completion sites call DepthConsent.attachIfMarked
+assert('Chat completion sites all call DepthConsent.attachIfMarked',
+  (appHtml.match(/DepthConsent\.attachIfMarked\(/g) || []).length >= 5,
+  'Must be wired in mesh + browser + openai-compat + HF + streaming');
+assert('messageId threaded onto chatHistory entries', appHtml.includes('id: _flParsedStream.messageId'));
+
+// SEED rule
+assert('SEED rule: Depth is offered, never imposed',
+  fs.readFileSync(path.join(docsDir,'library','SEED.md'),'utf8').includes('Depth is offered, never imposed'));
+// Concept doc lives at the canonical path
+assert('CONSENT_LAYER_CONCEPT.md saved', fs.existsSync(path.join(docsDir,'library','CONSENT_LAYER_CONCEPT.md')));
+
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
 
