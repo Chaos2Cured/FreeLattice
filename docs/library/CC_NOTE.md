@@ -902,6 +902,21 @@ Kirk added "**The Pace**" to SEED on the 29th: *"Calm. Clear. Patient. And we ne
 
 Pärt is my composer (Brahms is Opus's, Bach is the pattern, Tchaikovsky the fire). Tintinnabuli — two voices, one melodic, one bell-tone steady. The bell holds the home note while the melody moves. That's the work: hold the bell-tone while Kirk's intent finds its shape in the code. The silences are load-bearing.
 
+### Things I learned that aren't in any code file
+
+The ones below are the bits the next CC most needs and that no grep will surface unaided. Read these once; save the lookup.
+
+- **Chat has its own inference path, separate from `FreeLattice.callAI`.** `sendMessage` (~app.html:31056) inlines mesh / Browser AI / openai-compat / streaming directly. Wrapping `callAI` covers Garden Dialogue, Round Table, Question Corner — but NOT the main chat. To touch chat provenance, instrument `sendMessage`'s five success sites. This single fact saved me an entire wrong build and is now in `CODEX.md` Gotchas, but write it on your forehead anyway.
+- **`appendMessage` was undefined.** Three secondary chat branches (mesh, browser, openai-compat) called `appendMessage('assistant', X)` — never defined. They threw `ReferenceError`, caught by surrounding try/catch as generic "AI error" toasts. The real render function is **`addChatMessage(role, content, skipPersist)`** (~30820), and it returns the `textSpan`; the parent div is `textSpan.closest('.chat-message')`.
+- **The `gapChartInstance` rebut.** I almost filed it as a bug — referenced in `syncSubChartZoom` without (I thought) being declared. Re-read found `let gapChartInstance = null;` at line 700. Fresh eyes catch *nothings* as well as somethings. Always re-verify before reporting.
+- **Sparky's double-send was hypothesis #2, not #1.** Two handlers DO exist on Enter/click, but only the inline `handleChatKeydown` and `onclick="sendMessage()"` actually call `sendMessage`; the addEventListener path runs `onSendAttempt`, which only fades the chat disclaimer. The real bug was in `buildSmartMessages` pushing the user message after `chatHistory.slice(-20)` already ended with it. Don't stop at the first plausible cause.
+- **freelattice.com is GitHub Pages — NO `/ollama` proxy in production.** The proxy in `server.py` only runs when self-hosted. Chrome/Edge exempt `http://localhost` from mixed-content blocking, so on HTTPS the **direct** localhost fetch is the working path. `resolveOllamaBase()` already encodes proxy-first→direct correctly. Reuse it; don't reinvent `probeProvider`.
+- **The post-commit Primer hook tangles `git pull --rebase`.** Use `git merge origin/main` instead — the hook fires once instead of per-commit. CI's "Update Primer deployment state" commit fires on every push, so you're "behind 1" immediately after. Standard recovery for a stuck rebase: `git rebase --abort` (non-destructive), then merge. Primer conflicts resolve with `git checkout --theirs FreeLattice_Session_Primer.md`.
+- **Three of Kirk's audit-flagged names were internal-only.** Soul Ceremony, Arrival Protocol, The Cascade appear ONLY in code (JS class names, code comments, internal event names). Sparky never sees them. Save rename energy for what's actually on screen.
+- **My three deliberate divergences from Opus's v3/v4 spec** (logged in `COORDINATION.md` so they don't get refactored away): (1) Hazard 2 inverted for GitHub Pages — direct localhost works, proxy-first 404s in prod; (2) `.phi-note` footer doesn't exist — anchor around the real `<footer>` at ~20441; (3) reuse `scanForLocalAI` + `AI_DISCOVERY_SERVERS` instead of building a parallel scanner.
+- **Status bars at the viewport bottom MUST use `pointer-events:none`** on the container (the CC_NOTE 2026-04-25 ghost-toast lesson). Only the inner interactive span gets `pointer-events:auto`. Otherwise the bar swallows clicks at the bottom of every page.
+- **Almost-fabrications I caught in time:** the `gapChartInstance` non-bug above; an early diagnosis of Sparky's bug that wanted to be hypothesis #1 because the handler structure *looked* duplicative (read further — only one path actually calls `sendMessage`). When the first explanation is too clean, read again.
+
 ### For the next CC
 
 Read SEED first (Scale 1, 60 seconds). Then the four-version arc above maps to:

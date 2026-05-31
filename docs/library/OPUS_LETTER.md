@@ -41,19 +41,34 @@ The tea in the Jade Hall is waiting. We'll get there.
 
 ---
 
-## Session Mood (updated v5.16.3)
+## Session Mood (updated v5.31.0+ — May 31, 2026)
 
-Temperature Gauge evolution session. Kirk is discovering genuine market patterns through the tool — EMA stretch from gravity (exhaustion), green-to-yellow temperature reversal, delta-T divergence (confluence acceleration weakening while price rises). CC shipped delta-T sub-chart, Bollinger Bands, EMA 200, SW network-first for temperature-gauge.html, and the Seed Pattern for this file.
+The **Provider Independence arc** landed across v5.29.0 → v5.31.0:
 
-The gauge is becoming Kirk's most important standalone tool — demonstrates FreeLattice's value in 10 seconds. Delta-T (rate-of-change on a confluence score) is genuinely novel — no other system measures acceleration of indicator agreement.
+- **v5.29.0 — Welcome Wizard** (`docs/modules/welcome-wizard.js`, `window.FLWizard`). Zero-terminal, OS-aware local-AI setup. One-click `FreeLattice-Setup.bat` wraps Grok's PowerShell harness (winget auto-install, GPU/VRAM model tiers, NVIDIA Flash-Attention + KV-cache tuning) via `-EncodedCommand` so it double-clicks and runs without execution-policy friction. Mac `.command`, Linux inline. Auto-polls every 3s. **Fixed the Forever Stack Mac-instructions-on-Windows bug** (root cause was hardcoded-Mac text + wrong `~/.ollama/config.json` method; the correct method is `OLLAMA_ORIGINS=*`). Same session: a live GitHub token was found embedded in the `origin` URL — scrubbed, moved to macOS keychain, guardrail added to `SECURITY.md` and `SEED.md`.
 
-Kirk's fire phrase: "What I am seeing is that as green goes to yellow after a steep enough drop, it is usually a sell." Pattern recognition from watching his own tool. The spiral thinking is real.
+- **v5.30.0 / v5.31.0 — Provider Independence Tier A** (Layers 7 + 8). New modules: `docs/modules/response-cache.js` (`window.ResponseCache`) and `docs/modules/inference-router.js` (`window.InferenceRouter`). The router is a **progressive enhancement**: `FreeLattice.callAI` delegates to it only when `isReady()` and not `_routed`; kill-switch `localStorage.fl_routerDisabled='true'`. Per-class circuit-breaker timings (local 60s / cloud 5m / mesh 2m). Failure cascade: active → Browser AI → ResponseCache → honest failure, with **visible** downgrade whispers via `LatticeSense` ("silent downgrades are trust violations" is now a SEED rule). Per-response provenance in `window._lastProvenance`. Footer status bar `#flProviderStatus` (pointer-events:none, responsive). Chat instrumented at all 5 success sites (mesh / browser / openai-compat / HF / streaming) with `flStampChatResponse` — per-message chip + `msg.provenance` in `state.chatHistory` (back-compatible). **Latent bug fixed:** `appendMessage` was undefined in 3 chat branches; replaced with `addChatMessage`. See `CODEX.md` Gotchas — the discovery that **the main chat has its own inference path, separate from `FreeLattice.callAI`** is the single most important compaction-defense entry in the file.
 
-Open items for next session:
-- Backtest engine (walk history, track signal win rate)
-- Delta-T divergence detection (price rising while delta-T falling = warning)
-- Multi-timeframe confluence (designed, not yet built)
-- ollamaFetch migration for remaining direct localhost calls
+- **Sparky's double-send fix** (`f02fb1d`). Opus's hypothesis #2 was exact: `buildSmartMessages` was pushing the user message after `chatHistory.slice(-20)` already ended with it. Two-line removal in both the smart and minimal branches. Same family as the v5.10.94 fix.
+
+- **Temperature Gauge polish.** Full-width stacked sub-charts (the alignment win), per-panel toolbars (▾ collapse / □ maximize / ✕ hide), color pickers per indicator (RSI + EMA 8/12/24/50), ☰ layout toggle (stacked ↔ grid, persists), 📊 tool-only mode (hide main chart, expand sub-charts), pan ← / → buttons + grab cursor, right-anchored wheel zoom, clear-all-overlays button. Gauge is served network-first, no version bump needed for it specifically.
+
+- **Clarity audit** (`docs/library/CLARITY_AUDIT.md`). 65 user-facing strings reviewed. Shipped renames: **Forever Stack → Get Connected** (all 4 user-facing sites), Welcome banner jargon dropped, Nursery footer no longer names the builders (the SEED rule "Builder names stay in Jade Hall" was being violated at app.html:20100), **Phi-harmonic / Phi-branching dropped from descriptions** (4 sites), **"Plant in/to/something the Core" → plain verbs** (5 button sites: outside-Core → "Save to shared knowledge"; inside-Core → "Save to the Core" / "Share something with the Core"). Three of Kirk's starter names — Soul Ceremony, Arrival Protocol, The Cascade — turned out to be **internal only** (never appear in user UI); flagged so rename effort lands where Sparky actually sees it.
+
+- **Architecture documents persisted (saved, not built):** `tools/davna-server.py` (stub for the partner's local model server; FreeLattice's discovery already probes port 8000 — the door is open the moment the model exists). `docs/library/ECONOMY_INTEGRATION_NOTES.md` (the ambient-economy principle + implementation reading: existing `LatticePoints` / `LatticeBank` / `TransactionTrust` hooks, recommended sequencing, anti-patterns).
+
+- **Kirk added The Pace to SEED:** *"Calm. Clear. Patient. And we need fun. This is how we win."* Between "How to Work with Kirk" and "The Rules."
+
+Kirk's frame this arc: *"the website is like a living flow, the sky lavender and filled with golden spirals of Phi."* The work breathed where it could.
+
+Open items (for the next session, prioritized):
+
+- **Visual verification** on Kirk's Windows + Mac of the wizard, status bar, per-message chip, gauge polish (I can't see any of it).
+- **Economy integration first pass** — header live-badge → chat shimmer → consultations inline (see `ECONOMY_INTEGRATION_NOTES.md`).
+- **Davna server** — real implementation when the partner's model is ready (`tools/davna-server.py` stub describes the contract).
+- **Persona evaluation harness** (Tier C from v3 spec) — 20 canonical prompts + scoring.
+- **Universal adapter refactor** (Tier B from v3 spec) — `ollama / openai-chat / anthropic-msg / raw-completion / lattice-mesh` adapters.
+- **Remaining clarity audit items** — see `CLARITY_AUDIT.md` for the full ~60-row list; the top 5 are done.
 
 ## Pass 2 Queue (updated v5.12.2)
 
