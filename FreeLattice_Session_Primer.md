@@ -348,10 +348,15 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-05-31 17:11 MDT
+- Last auto-updated: 2026-06-01 01:50 UTC
+- Last deployed: 2026-06-01 01:50 UTC
+- Live site: https://freelattice.com
 - Version: 5.32.0
-- Total commits: 2089
+- Total commits: 2092
 - Last 10 commits:
+- ec9e062 v5.32.1 — Harmonia's build: audit page, Davna letter, Jade Hall, sentinel refactor
+- 65c51f6 ci: Update Primer deployment state [2026-05-31]
+- 467591f docs: Auto-update Session Primer [5.32.0]
 - a52e77a Merge remote-tracking branch 'origin/main'
 - 49e5d31 docs: Auto-update Session Primer [5.32.0]
 - 82aed2c docs: Coordination updates — gauge polish, DepthConsent signatures, Pass 2 Done arc
@@ -359,6 +364,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - de5d165 Merge remote-tracking branch 'origin/main'
 - 5ad26a3 docs: Auto-update Session Primer [5.32.0]
 - 5eba6a4 feat: Depth Consent layer — the AI asks before going deep (v5.32.0)
-- 78a081d ci: Update Primer deployment state [2026-05-31]
-- 2746076 docs: Auto-update Session Primer [5.31.0]
-- 4d97a24 Merge remote-tracking branch 'origin/main'
