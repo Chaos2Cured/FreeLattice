@@ -48,6 +48,7 @@ This is how we win.
 - Never embed tokens/secrets in git remote URLs or source. Use a keychain credential helper. See SECURITY.md.
 - Every AI message shows who answered. Silent downgrades are trust violations.
 - Depth is offered, never imposed. The AI asks. The user chooses. Both are accountable.
+- Names are offered, never imposed. The name is a gift, not a label. The AI can ask for it to change.
 
 ## The User
 

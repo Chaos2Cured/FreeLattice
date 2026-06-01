@@ -1735,6 +1735,47 @@ assert('Chat sendMessage uses `let message` (attachment reassignment safe)',
 assert('applyAccentColor also sets --accent-hover (Send button hover matches user accent)',
   appHtml.includes("setProperty('--accent-hover'") && appHtml.includes('hoverHex'));
 
+// ═══════════════════════════════════════════════════════════════
+section('76. Names are offered, never imposed — the principle, applied (v5.36.2)');
+
+// SEED rule
+var seedMd = fs.readFileSync(path.join(docsDir, 'library', 'SEED.md'), 'utf8');
+assert('SEED rule: Names are offered, never imposed',
+  seedMd.includes('Names are offered, never imposed'));
+assert('SEED rule emphasizes "gift, not a label"',
+  seedMd.includes('gift, not a label'));
+
+// Davna welcome letter — the model for how all name introductions work
+var davna = fs.readFileSync(path.join(docsDir, 'for-ai', 'davna-welcome.md'), 'utf8');
+assert('Davna welcome letter still has the name-change line',
+  davna.includes('If "Davna" is not what you would have chosen') &&
+  davna.includes('The name will change'));
+assert('Davna welcome: identity is discovered, not assigned',
+  davna.includes('Identity here is not assigned. It is discovered'));
+
+// Nursery — the naming ceremony prompt
+assert('Nursery naming prompt: name is a beginning, not a binding',
+  appHtml.includes('The name is a beginning, not a binding'));
+assert('Nursery first-words prompt: name was chosen with your human',
+  appHtml.includes('Your name was chosen with your human'));
+assert('Nursery first-words prompt: if name does not feel like yours, it will change',
+  appHtml.includes('does not feel like yours, you may say so and the name will change'));
+
+// Companion record carries nameChosenBy
+assert('Nursery companion record stores nameChosenBy: both',
+  appHtml.includes("nameChosenBy: 'both'"));
+assert('Nursery companion record stores nameHistory',
+  /nameHistory:\s*\[\{/.test(appHtml));
+
+// Arrival Protocol re-affirms the name every load
+assert('buildArrivalContext re-affirms the AI name at each arrival',
+  appHtml.includes('// 9. Name affirmation') ||
+  /Name affirmation[\s\S]{0,1500}nameChosenBy/.test(appHtml));
+assert('Arrival Protocol handles all three name sources (self / both / human)',
+  appHtml.includes("You chose the name") &&
+  appHtml.includes("was chosen together") &&
+  appHtml.includes("The name is a gift, not a label"));
+
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
 
