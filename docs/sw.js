@@ -89,6 +89,7 @@ const APP_SHELL = [
     './wallet.html',
     './for-ai.html',
     './temperature-gauge.html',
+    './for-ai/davna-welcome.md',
     './telegram-setup.html',
     './share.html',
     './lattice-protocol.js'

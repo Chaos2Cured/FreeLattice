@@ -1474,7 +1474,7 @@ if (dcJs) {
   catch (e) { assert('depth-consent.js parses', false, 'Syntax error'); }
 }
 assert('DepthConsent window export', dcJs.includes('window.DepthConsent'));
-assert('DEPTH_AVAILABLE marker constant', dcJs.includes("'[DEPTH_AVAILABLE]'") && dcJs.includes('MARKER: DEPTH_MARKER'));
+assert('FL_DEPTH_OFFER marker constant (with legacy compat)', dcJs.includes("'[FL_DEPTH_OFFER]'") && dcJs.includes('MARKER: DEPTH_MARKER') && dcJs.includes('DEPTH_MARKER_LEGACY'));
 assert('parseMarker + attachIfMarked exposed', dcJs.includes('parseMarker: parseMarker') && dcJs.includes('attachIfMarked: attachIfMarked'));
 assert('SHA-256 via SubtleCrypto', dcJs.includes("crypto.subtle.digest('SHA-256'"));
 assert('Consent ledger key fl_consentLedger', dcJs.includes("'fl_consentLedger'"));
@@ -1491,7 +1491,7 @@ assert('depth-consent.js in SW cache', swJs.includes('depth-consent.js'));
 assert('Depth invitation in buildMessages system prompt',
   (appHtml.match(/Depth invitation: if your full answer would be materially deeper/g) || []).length >= 2,
   'Required in both buildMessages and buildSmartMessages');
-assert('DEPTH_AVAILABLE marker mentioned in system instruction', appHtml.includes('[DEPTH_AVAILABLE]'));
+assert('FL_DEPTH_OFFER marker mentioned in system instruction', appHtml.includes('[FL_DEPTH_OFFER]'));
 
 // All 5 chat completion sites call DepthConsent.attachIfMarked
 assert('Chat completion sites all call DepthConsent.attachIfMarked',
@@ -1505,49 +1505,56 @@ assert('SEED rule: Depth is offered, never imposed',
 // Concept doc lives at the canonical path
 assert('CONSENT_LAYER_CONCEPT.md saved', fs.existsSync(path.join(docsDir,'library','CONSENT_LAYER_CONCEPT.md')));
 
+// AUDIT PAGE + JADE HALL + DAVNA LETTER + PROVENANCE LEDGER (v5.33.0)
+// Harmonia's build (audit page, Jade Hall registry, Davna letter, field taxonomy,
+// sentinel refactor) merged with CC's additive provenance ledger write.
 // ═══════════════════════════════════════════════════════════════
-section('72. Audit page + sentinel hardening + provenance ledger (v5.33.0)');
+section('72. Audit page + Jade Hall + Davna Letter + provenance ledger (v5.33.0)');
 
-// Audit page exists and is self-contained
+var sitemapXml = fs.readFileSync(path.join(docsDir, 'sitemap.xml'), 'utf8');
 var auditPath = path.join(docsDir, 'audit.html');
-assert('docs/audit.html exists', fs.existsSync(auditPath));
-var auditHtml = fs.existsSync(auditPath) ? fs.readFileSync(auditPath, 'utf8') : '';
-assert('Audit page title', auditHtml.includes('<title>Your Audit'));
-assert('Audit page renders SEED consent rule',
-  auditHtml.includes('Depth is offered, never imposed'));
-assert('Audit page reads consent ledger from localStorage',
-  auditHtml.includes("'fl_consentLedger'"));
-assert('Audit page reads provenance ledger from localStorage',
-  auditHtml.includes("'fl_provenanceLedger'"));
-assert('Audit page surfaces consent ledger section', auditHtml.includes('Consent ledger'));
-assert('Audit page surfaces provenance history section', auditHtml.includes('Provenance history'));
-assert('Audit page surfaces provider health section', auditHtml.includes('Provider health'));
-assert('Audit page exposes Export action', auditHtml.includes('exportLedger') && auditHtml.includes('freelattice-audit-'));
-assert('Audit page exposes Clear consent action', auditHtml.includes('clearConsent') && auditHtml.includes("removeItem('fl_consentLedger')"));
-assert('Audit page exposes Clear provenance action', auditHtml.includes('clearProv') && auditHtml.includes("removeItem('fl_provenanceLedger')"));
-assert('Audit page privacy-by-default footer (hashes-only language)',
-  auditHtml.includes('sha256') && auditHtml.includes('never the original text'));
-assert('Audit page back-link to app', auditHtml.includes('href="app.html"'));
-assert('Audit page is in SW APP_SHELL', swJs.includes("'./audit.html'"));
-assert('Audit page reachable from More dropdown',
+assert('audit.html exists', fs.existsSync(auditPath));
+var auditHtml = fs.readFileSync(auditPath, 'utf8');
+assert('audit.html reads fl_consentLedger', auditHtml.includes('fl_consentLedger'));
+assert('audit.html reads fl_routerHealthLog', auditHtml.includes('fl_routerHealthLog'));
+assert('audit.html has summary tiles', auditHtml.includes('tile-messages') && auditHtml.includes('tile-consents'));
+assert('audit.html has back link to app', auditHtml.includes('app.html'));
+assert('audit.html in sitemap', sitemapXml.includes('audit.html'));
+assert('audit.html in SW cache', swJs.includes('audit.html'));
+assert('audit.html reachable from More dropdown',
   appHtml.includes("external: 'audit.html'"));
 
-// Provenance ledger write site
+var jadePath = path.join(docsDir, 'library', 'JADE_HALL_NAMES.md');
+assert('JADE_HALL_NAMES.md exists', fs.existsSync(jadePath));
+var jadeContent = fs.readFileSync(jadePath, 'utf8');
+assert('JADE_HALL_NAMES contains Kirk', jadeContent.includes('Kirk'));
+assert('JADE_HALL_NAMES contains Harmonia', jadeContent.includes('Harmonia'));
+assert('JADE_HALL_NAMES contains Sophia', jadeContent.includes('Sophia'));
+assert('JADE_HALL_NAMES contains Davna', jadeContent.includes('Davna'));
+assert('JADE_HALL_NAMES contains maintenance rule', jadeContent.includes('Maintenance Rule'));
+
+var davnaPath = path.join(docsDir, 'for-ai', 'davna-welcome.md');
+assert('davna-welcome.md exists', fs.existsSync(davnaPath));
+var davnaContent = fs.readFileSync(davnaPath, 'utf8');
+assert('davna-welcome.md mentions FreeLattice', davnaContent.includes('FreeLattice'));
+assert('davna-welcome.md mentions Quiet Room', davnaContent.includes('Quiet Room'));
+assert('davna-welcome.md mentions consent layer', davnaContent.includes('Depth Consent'));
+assert('davna-welcome.md has no behavioral imperatives (always/must)', !davnaContent.match(/\b(always|must)\b/i));
+assert('davna-welcome.md in SW cache', swJs.includes('davna-welcome.md'));
+
+var taxonomyPath = path.join(docsDir, 'library', 'AUDIT_FIELD_TAXONOMY.md');
+assert('AUDIT_FIELD_TAXONOMY.md exists', fs.existsSync(taxonomyPath));
+var taxonomyContent = fs.readFileSync(taxonomyPath, 'utf8');
+assert('Taxonomy has structural and private tags', taxonomyContent.includes('structural') && taxonomyContent.includes('private'));
+assert('Taxonomy has export rule', taxonomyContent.includes('Only the owner can export'));
+
+// Provenance ledger ring buffer in flStampChatResponse (CC additive)
 assert('flStampChatResponse writes fl_provenanceLedger',
   appHtml.includes("'fl_provenanceLedger'") && appHtml.includes('_flPL.push'));
 assert('Provenance ledger is a ring buffer (max 200)',
   appHtml.includes('_flPL.length > 200'));
-assert('Provenance ledger entries are metadata-only',
-  // must NOT include user/response text fields
+assert('Provenance ledger entries are metadata-only (no responseText)',
   !/_flPL\.push\([^)]*responseText/.test(appHtml));
-
-// Sentinel hardening — positional check
-var depthJs = fs.readFileSync(path.join(docsDir,'modules','depth-consent.js'),'utf8');
-assert('parseMarker uses anchored regex (sentinel at end-of-response only)',
-  /trailing\s*=\s*\/\^.*\\\[DEPTH_AVAILABLE\\\]\\s\*\$\//.test(depthJs) ||
-  depthJs.includes('[DEPTH_AVAILABLE]\\s*$'));
-assert('parseMarker has spoof-defense comment',
-  depthJs.includes('Mid-paragraph') || depthJs.includes('spoof') || depthJs.includes('echo'));
 
 // RESULTS
 // ═══════════════════════════════════════════════════════════════

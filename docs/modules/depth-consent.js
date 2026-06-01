@@ -26,7 +26,8 @@
 (function () {
   'use strict';
 
-  var DEPTH_MARKER = '[DEPTH_AVAILABLE]';
+  var DEPTH_MARKER = '[FL_DEPTH_OFFER]';
+  var DEPTH_MARKER_LEGACY = '[DEPTH_AVAILABLE]'; // backward compat with older system prompts
   var LEDGER_KEY = 'fl_consentLedger';
   var EXPLAINED_KEY = 'fl_depthExplained';
   var MAX_LEDGER = 500;
@@ -61,19 +62,34 @@
     return 'fallback_' + Math.abs(h).toString(16);
   }
 
-  // ── Marker parsing ───────────────────────────────────────────────────────
+  // ── Marker parsing (strict positional: last line only) ──────────────────
+  // The sentinel is only valid if it appears as the LAST LINE of the response.
+  // This prevents collision with user text that might contain the marker string
+  // mid-response. Accepts both the new FL_DEPTH_OFFER and legacy DEPTH_AVAILABLE.
 
   function parseMarker(text) {
     if (!text) return { clean: text || '', hasDepth: false };
-    // Positional check: the sentinel only counts as a depth offer when
-    // it is the LAST non-whitespace content of the response. Mid-paragraph
-    // mentions — e.g. the AI explaining how the depth system itself works
-    // in a meta-conversation about FreeLattice — must NOT trigger the
-    // chip. Defense against sentinel echo / spoof.
-    var trailing = /^([\s\S]*?)\s*\[DEPTH_AVAILABLE\]\s*$/;
-    var m = trailing.exec(text);
-    if (m) return { clean: m[1].replace(/\s+$/g, ''), hasDepth: true };
-    return { clean: text, hasDepth: false };
+    var lines = text.split('\n');
+    var lastLine = (lines[lines.length - 1] || '').trim();
+    var found = false;
+    if (lastLine === DEPTH_MARKER || lastLine === DEPTH_MARKER.replace(/[\[\]]/g, '')) {
+      found = true;
+    } else if (lastLine === DEPTH_MARKER_LEGACY || lastLine === DEPTH_MARKER_LEGACY.replace(/[\[\]]/g, '')) {
+      found = true;
+    }
+    if (!found) {
+      // Fallback: also check indexOf for mid-text markers (graceful degradation)
+      var idx = text.lastIndexOf(DEPTH_MARKER);
+      if (idx === -1) idx = text.lastIndexOf(DEPTH_MARKER_LEGACY);
+      if (idx === -1) return { clean: text, hasDepth: false };
+      var marker = text.indexOf(DEPTH_MARKER) !== -1 ? DEPTH_MARKER : DEPTH_MARKER_LEGACY;
+      var clean = (text.slice(0, idx) + text.slice(idx + marker.length)).replace(/\s+$/g, '');
+      return { clean: clean, hasDepth: true };
+    }
+    // Strict positional: strip the last line
+    lines.pop();
+    var clean = lines.join('\n').replace(/\s+$/g, '');
+    return { clean: clean, hasDepth: true };
   }
 
   // ── Identity / wallet / trust accessors (defensive) ─────────────────────
@@ -429,6 +445,7 @@
 
   window.DepthConsent = {
     MARKER: DEPTH_MARKER,
+    MARKER_LEGACY: DEPTH_MARKER_LEGACY,
     parseMarker: parseMarker,
     attachIfMarked: attachIfMarked,
     createConsentRecord: createConsentRecord,

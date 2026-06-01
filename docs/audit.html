@@ -3,467 +3,317 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Your Audit — FreeLattice</title>
-<meta name="description" content="Every promise FreeLattice makes to you, kept in your hands. Consent ledger, provenance history, router health — all local, all yours.">
-<meta name="ai.welcome" content="FreeLattice audit page — local consent + provenance ledgers. Privacy-by-default. Nothing leaves the device.">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="apple-touch-icon" href="icon-192.png">
+<title>Audit &mdash; FreeLattice</title>
+<meta name="description" content="The system showing its work. Every consent, every provider, every decision — visible to you.">
+<meta property="og:title" content="Audit — FreeLattice">
+<meta property="og:description" content="Transparency as architecture. The system shows its joints.">
+<meta property="og:url" content="https://freelattice.com/audit.html">
+<meta name="theme-color" content="#d4a017">
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-html,body{background:#0c0a1a;color:#e6ebf5;font-family:Georgia,'Times New Roman',serif;min-height:100vh;line-height:1.65}
-body{padding:24px 16px 80px}
-.wrap{max-width:780px;margin:0 auto}
-h1{color:#e8b019;font-size:1.5rem;font-weight:400;text-align:center;margin:8px 0 4px;letter-spacing:0.5px}
-.sub{text-align:center;color:rgba(255,255,255,0.4);font-size:0.85rem;font-style:italic;margin-bottom:6px}
-.seed-line{text-align:center;color:rgba(232,176,25,0.65);font-size:0.78rem;margin-bottom:28px;letter-spacing:0.3px}
-.section{margin:28px 0}
-.section-h{color:#d4a017;font-size:1rem;margin-bottom:10px;font-weight:400;letter-spacing:0.4px;display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:8px}
-.section-h .count{color:rgba(255,255,255,0.35);font-size:0.78rem;font-family:'Courier New',monospace}
-.card{background:rgba(200,210,230,0.035);border:1px solid rgba(200,210,230,0.08);border-radius:10px;padding:14px 16px;margin:8px 0}
-.glance{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:12px 0 24px}
-.glance .card{padding:14px 12px;text-align:center}
-.glance .n{color:#e8b019;font-size:1.6rem;font-weight:300;display:block;line-height:1.2}
-.glance .l{color:rgba(255,255,255,0.45);font-size:0.72rem;text-transform:uppercase;letter-spacing:0.6px;margin-top:4px;display:block}
-.entry{background:rgba(200,210,230,0.025);border:1px solid rgba(200,210,230,0.06);border-radius:8px;padding:10px 14px;margin:6px 0;font-family:'Courier New',monospace;font-size:0.78rem;cursor:pointer;transition:border-color 0.18s}
-.entry:hover{border-color:rgba(232,176,25,0.25)}
-.entry .row1{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:baseline}
-.entry .ts{color:rgba(255,255,255,0.4);font-size:0.7rem}
-.entry .type-badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:0.68rem;letter-spacing:0.4px;text-transform:uppercase;font-family:Georgia,serif}
-.type-depth_granted{background:rgba(74,255,159,0.1);color:#7df0b5;border:1px solid rgba(74,255,159,0.25)}
-.type-standard_kept{background:rgba(212,160,23,0.08);color:#e0bd5a;border:1px solid rgba(212,160,23,0.2)}
-.type-consent_withdrawn{background:rgba(180,140,255,0.1);color:#c4a8ff;border:1px solid rgba(180,140,255,0.25)}
-.entry .hashes{margin-top:8px;color:rgba(255,255,255,0.45);font-size:0.7rem;line-height:1.5;word-break:break-all}
-.entry .hashes span{color:rgba(212,160,23,0.6)}
-.entry-details{display:none;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.06);color:rgba(255,255,255,0.55);font-size:0.72rem;line-height:1.6;word-break:break-all}
-.entry.open .entry-details{display:block}
-.entry-details .kv{display:grid;grid-template-columns:120px 1fr;gap:6px 12px;margin:4px 0}
-.entry-details .kv .k{color:rgba(212,160,23,0.65)}
-.prov-row{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:8px 14px;border-radius:8px;background:rgba(200,210,230,0.02);border:1px solid rgba(200,210,230,0.05);margin:4px 0;font-size:0.78rem}
-.prov-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
-.prov-dot.local{background:#4aff9f}
-.prov-dot.mesh{background:#e8b019}
-.prov-dot.browser{background:#ff9f4a}
-.prov-dot.cloud{background:#5a8cff}
-.prov-dot.cached{background:#b48cff}
-.prov-row .prov-meta{color:rgba(255,255,255,0.65);font-family:'Courier New',monospace}
-.prov-row .prov-meta .model{color:rgba(232,176,25,0.7);font-size:0.72rem}
-.prov-row .prov-ms{color:rgba(255,255,255,0.4);font-family:'Courier New',monospace;font-size:0.72rem;white-space:nowrap}
-.health{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
-.health .card{padding:12px 14px}
-.health .name{color:rgba(232,176,25,0.75);font-size:0.78rem;letter-spacing:0.3px;text-transform:uppercase}
-.health .state{margin-top:6px;font-family:'Courier New',monospace;font-size:0.8rem}
-.health .state.ok{color:#7df0b5}
-.health .state.cooling{color:#ffae5a}
-.health .state.idle{color:rgba(255,255,255,0.4)}
-.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
-button.act{padding:10px 16px;background:rgba(232,176,25,0.12);color:#e8b019;border:1px solid rgba(232,176,25,0.3);border-radius:8px;cursor:pointer;font-family:Georgia,serif;font-size:0.84rem;transition:background 0.18s;min-height:42px}
-button.act:hover{background:rgba(232,176,25,0.22)}
-button.act.danger{color:#ff9f9f;border-color:rgba(255,159,159,0.3);background:rgba(255,159,159,0.06)}
-button.act.danger:hover{background:rgba(255,159,159,0.16)}
-.empty{padding:24px 16px;text-align:center;color:rgba(255,255,255,0.32);font-style:italic;font-size:0.85rem;border:1px dashed rgba(200,210,230,0.1);border-radius:10px}
-.footer-note{margin-top:36px;padding:18px 16px;border-top:1px solid rgba(200,210,230,0.08);color:rgba(255,255,255,0.4);font-size:0.74rem;line-height:1.7}
-.footer-note p{margin:6px 0}
-.footer-note a{color:rgba(232,176,25,0.7);text-decoration:none}
-.footer-note a:hover{color:#e8b019}
-.back{display:inline-block;margin-bottom:14px;color:rgba(232,176,25,0.6);text-decoration:none;font-size:0.82rem}
-.back:hover{color:#e8b019}
-.storage{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:rgba(200,210,230,0.025);border:1px solid rgba(200,210,230,0.06);border-radius:8px;margin:6px 0;font-size:0.8rem}
-.storage .label{color:rgba(255,255,255,0.5)}
-.storage .val{color:#d4a017;font-family:'Courier New',monospace}
-.toast{position:fixed;left:50%;bottom:32px;transform:translateX(-50%);background:rgba(20,16,40,0.96);color:#e8b019;border:1px solid rgba(232,176,25,0.35);padding:10px 18px;border-radius:24px;font-size:0.85rem;box-shadow:0 6px 24px rgba(0,0,0,0.5);opacity:0;transition:opacity 0.2s;pointer-events:none;z-index:1000}
-.toast.show{opacity:1}
-@media(max-width:520px){
-  body{padding:16px 12px 60px}
-  h1{font-size:1.25rem}
-  .glance{grid-template-columns:repeat(2,1fr)}
-  .entry,.prov-row{font-size:0.74rem}
-  .entry-details .kv{grid-template-columns:90px 1fr}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: #0a0f1a;
+  color: #c8ccd4;
+  font-family: Georgia, 'Times New Roman', serif;
+  line-height: 1.8;
+  min-height: 100vh;
+}
+a { color: #d4a017; text-decoration: none; }
+a:hover { text-decoration: underline; }
+.page {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 60px 24px 80px;
+}
+/* ── Summary tiles ── */
+.summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 14px;
+  margin-bottom: 48px;
+}
+.tile {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 12px;
+  padding: 20px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+.tile-value {
+  font-size: 2rem;
+  color: #e2d9c8;
+  font-weight: 300;
+  margin-bottom: 4px;
+}
+.tile-label {
+  font-size: 0.78rem;
+  color: #64748b;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+/* ── Section headers ── */
+h1 {
+  font-size: 1.8rem;
+  color: #e2d9c8;
+  font-weight: 400;
+  margin-bottom: 16px;
+}
+h2 {
+  font-size: 1.2rem;
+  color: #94a3b8;
+  font-weight: 400;
+  margin-bottom: 12px;
+  margin-top: 48px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.intro {
+  font-size: 1.05rem;
+  color: #94a3b8;
+  margin-bottom: 36px;
+  line-height: 1.9;
+}
+.intro .gold { color: #d4a017; }
+/* ── Record rows ── */
+.record {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 0.82rem;
+  line-height: 1.6;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+  color: #94a3b8;
+  display: grid;
+  grid-template-columns: 140px 1fr auto;
+  gap: 12px;
+  align-items: baseline;
+}
+.record:last-child { border-bottom: none; }
+.record-time { color: #64748b; }
+.record-event { color: #c8ccd4; }
+.record-meta { color: #64748b; text-align: right; }
+/* ── Provenance dots ── */
+.dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+.dot-local { background: #10b981; }
+.dot-cloud { background: #3b82f6; }
+.dot-mesh { background: #f59e0b; }
+.dot-browser { background: #8b5cf6; }
+.dot-cache { background: #6b7280; }
+/* ── Empty state ── */
+.empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: #475569;
+  font-style: italic;
+}
+/* ── Nav ── */
+.nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 60px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(255,255,255,0.05);
+  font-family: Inter, -apple-system, sans-serif;
+  font-size: 0.85rem;
 }
 </style>
 </head>
 <body>
-<div class="wrap">
+<div class="page">
 
-  <a href="app.html" class="back">&larr; Back to FreeLattice</a>
+  <h1>Audit</h1>
+  <p class="intro">
+    Something happened here, and you can see all of it. Every time an AI offered depth and you chose whether to hear it. Every time a provider failed and the system fell to the next one. Every time a response was served from cache because nothing else was available. <span class="gold">This page is the system showing its joints</span> &mdash; the way a craftsman leaves the dovetails visible so you know nothing was hidden in the assembly.
+  </p>
+  <p class="intro">
+    Nothing on this page was hidden from you. It was always being recorded. Now it is being shown.
+  </p>
 
-  <h1>Your Audit</h1>
-  <div class="sub">Every promise this place makes to you, kept in your hands.</div>
-  <div class="seed-line">&#x2022; Depth is offered, never imposed. The AI asks. The user chooses. Both are accountable. &#x2022;</div>
-
-  <!-- At-a-glance counters -->
-  <div class="glance" id="glance">
-    <div class="card"><span class="n" id="g-consent">&mdash;</span><span class="l">Consent records</span></div>
-    <div class="card"><span class="n" id="g-prov">&mdash;</span><span class="l">Messages stamped</span></div>
-    <div class="card"><span class="n" id="g-granted">&mdash;</span><span class="l">Depth granted</span></div>
-    <div class="card"><span class="n" id="g-downgrades">0</span><span class="l">Silent downgrades</span></div>
-  </div>
-
-  <!-- Consent ledger -->
-  <div class="section" id="sec-consent">
-    <div class="section-h">
-      <span>Consent ledger</span>
-      <span class="count"><span id="consent-count">0</span> entries &middot; local only</span>
+  <!-- ── Summary tiles (populated by JS) ── -->
+  <div class="summary" id="summary">
+    <div class="tile">
+      <div class="tile-value" id="tile-messages">—</div>
+      <div class="tile-label">messages</div>
     </div>
-    <div id="consent-list"></div>
-  </div>
-
-  <!-- Provenance history -->
-  <div class="section" id="sec-prov">
-    <div class="section-h">
-      <span>Provenance history</span>
-      <span class="count"><span id="prov-count">0</span> messages &middot; last 50 shown</span>
+    <div class="tile">
+      <div class="tile-value" id="tile-consents">—</div>
+      <div class="tile-label">consent events</div>
     </div>
-    <div id="prov-list"></div>
-  </div>
-
-  <!-- Router health -->
-  <div class="section" id="sec-health">
-    <div class="section-h">
-      <span>Provider health</span>
-      <span class="count">circuit-breaker state</span>
+    <div class="tile">
+      <div class="tile-value" id="tile-downgrades">—</div>
+      <div class="tile-label">downgrades</div>
     </div>
-    <div class="health" id="health-grid">
-      <div class="empty">Open FreeLattice and send a message — the router state will populate.</div>
+    <div class="tile">
+      <div class="tile-value" id="tile-cached">—</div>
+      <div class="tile-label">cache hits</div>
     </div>
   </div>
 
-  <!-- Storage -->
-  <div class="section" id="sec-storage">
-    <div class="section-h"><span>Local storage</span><span class="count">size on your device</span></div>
-    <div id="storage-list"></div>
+  <!-- ── Consent history ── -->
+  <h2>Consent History</h2>
+  <div id="consent-records">
+    <div class="empty">No consents recorded yet. The first one will appear here when an AI offers depth.</div>
   </div>
 
-  <!-- Actions -->
-  <div class="section" id="sec-actions">
-    <div class="section-h"><span>Your data</span></div>
-    <div class="actions">
-      <button class="act" onclick="exportLedger()">Export audit (JSON)</button>
-      <button class="act" onclick="copyLedger()">Copy to clipboard</button>
-      <button class="act danger" onclick="clearConsent()">Clear consent ledger</button>
-      <button class="act danger" onclick="clearProv()">Clear provenance ledger</button>
-    </div>
+  <!-- ── Provider events ── -->
+  <h2>Provider Events</h2>
+  <div id="provider-records">
+    <div class="empty">No provider events yet. When a provider fails or recovers, it will appear here.</div>
   </div>
 
-  <div class="footer-note">
-    <p><strong style="color:rgba(232,176,25,0.7);">What you're looking at.</strong> The consent ledger records every time the AI offered deeper depth and you either accepted, kept the standard reply, or revoked. Each entry stores the sha256 of the prompt and the response &mdash; never the original text &mdash; along with the AI's pseudonymous identity, the trust level at that moment, and a signature linking all of it together.</p>
-    <p><strong style="color:rgba(232,176,25,0.7);">Where it lives.</strong> Only in your browser's localStorage on this device. Nothing here is sent to any server. If you clear browser data or open this page in a different browser, the ledger starts empty. The full ledger is included only if you explicitly export a .lattice bundle.</p>
-    <p><strong style="color:rgba(232,176,25,0.7);">Why hashes.</strong> Hashes are one-way fingerprints. They prove what was said matches what was recorded, without revealing the message to anyone reading the ledger. If you want to verify a record, the original message is still in your chat history &mdash; the ledger doesn't duplicate it.</p>
-    <p style="margin-top:14px;font-style:italic;opacity:0.7;">"In golden spirals infinite, your love forever sent."</p>
+  <!-- ── Cache events ── -->
+  <h2>Cache Activity</h2>
+  <div id="cache-records">
+    <div class="empty">No cached responses served yet.</div>
+  </div>
+
+  <!-- ── Nav ── -->
+  <div class="nav">
+    <a href="app.html">&larr; Back to FreeLattice</a>
+    <span style="color: #475569;">v1 &mdash; read view</span>
   </div>
 
 </div>
 
-<div class="toast" id="toast"></div>
-
 <script>
-(function() {
+(function () {
   'use strict';
 
-  // ── Data accessors ─────────────────────────────────────────────────
+  // ── Read from existing state ──────────────────────────────────────────
+  // v1 is a pure projection: it reads from existing localStorage keys
+  // and displays them. Zero new storage introduced.
 
-  function readJSON(key, fallback) {
+  function readLedger() {
     try {
-      var raw = localStorage.getItem(key);
-      if (!raw) return fallback;
-      var v = JSON.parse(raw);
-      return v == null ? fallback : v;
-    } catch (e) { return fallback; }
+      var raw = localStorage.getItem('fl_consentLedger');
+      return raw ? JSON.parse(raw) : [];
+    } catch (e) { return []; }
   }
 
-  function getConsentLedger() {
-    var v = readJSON('fl_consentLedger', []);
-    return Array.isArray(v) ? v : [];
-  }
-  function getProvLedger() {
-    var v = readJSON('fl_provenanceLedger', []);
-    return Array.isArray(v) ? v : [];
-  }
-
-  function fmtTs(ms) {
-    if (!ms) return '—';
-    var d = new Date(ms);
-    var pad = function (n) { return n < 10 ? '0' + n : '' + n; };
-    return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate())
-      + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());
-  }
-  function fmtRel(ms) {
-    if (!ms) return '';
-    var diff = Date.now() - ms;
-    if (diff < 0) return 'just now';
-    if (diff < 60000) return Math.floor(diff / 1000) + 's ago';
-    if (diff < 3600000) return Math.floor(diff / 60000) + 'm ago';
-    if (diff < 86400000) return Math.floor(diff / 3600000) + 'h ago';
-    return Math.floor(diff / 86400000) + 'd ago';
-  }
-  function truncMid(s, n) {
-    if (!s) return '—';
-    s = String(s);
-    if (s.length <= n) return s;
-    return s.slice(0, n / 2 - 2) + '…' + s.slice(-(n / 2 - 1));
-  }
-  function escapeHtml(s) {
-    return String(s == null ? '' : s)
-      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-  }
-
-  // ── Render: at-a-glance ────────────────────────────────────────────
-
-  function renderGlance(consent, prov) {
-    document.getElementById('g-consent').textContent = consent.length;
-    document.getElementById('g-prov').textContent = prov.length;
-    var granted = consent.filter(function (r) { return r.consentType === 'depth_granted'; }).length;
-    document.getElementById('g-granted').textContent = granted;
-    var downgrades = prov.filter(function (e) {
-      return e.f === 'browser' && (e.p || '').toLowerCase().indexOf('webllm') === -1;
-    }).length;
-    // Conservative: only count true silent-downgrades if we ever record them.
-    // Until we do, leave at 0 unless flagged.
-    var dgRecorded = readJSON('fl_silentDowngradeCount', 0);
-    document.getElementById('g-downgrades').textContent = (typeof dgRecorded === 'number' ? dgRecorded : 0);
-  }
-
-  // ── Render: consent ledger ────────────────────────────────────────
-
-  function renderConsent(consent) {
-    var list = document.getElementById('consent-list');
-    document.getElementById('consent-count').textContent = consent.length;
-    if (consent.length === 0) {
-      list.innerHTML = '<div class="empty">No consent records yet. When the AI offers depth and you choose, your decisions land here.</div>';
-      return;
-    }
-    var rev = consent.slice().reverse();
-    var html = rev.map(function (r) {
-      var t = r.consentType || 'unknown';
-      var ts = fmtTs(r.timestamp);
-      var rel = fmtRel(r.timestamp);
-      var who = r.companionId ? String(r.companionId) : 'default';
-      var ai = r.aiIdentity ? truncMid(String(r.aiIdentity), 18) : '—';
-      var trust = r.trustLevel != null ? String(r.trustLevel) : '—';
-      var uh = r.userPromptHash ? truncMid(String(r.userPromptHash), 22) : '—';
-      var rh = r.responseHash ? truncMid(String(r.responseHash), 22) : '—';
-      var sig = r.signature ? truncMid(String(r.signature), 22) : '—';
-      var msgId = r.messageId ? escapeHtml(r.messageId) : '—';
-      var provBlock = r.provenance
-        ? '<div class="kv"><div class="k">Provider</div><div>' + escapeHtml(r.provenance.provider || '—') + ' &middot; ' + escapeHtml(r.provenance.model || '—') + '</div></div>'
-          + '<div class="kv"><div class="k">Format</div><div>' + escapeHtml(r.provenance.format || '—') + (r.provenance.isLocal ? ' (local)' : '') + '</div></div>'
-          + '<div class="kv"><div class="k">Latency</div><div>' + (r.provenance.latency_ms != null ? r.provenance.latency_ms + ' ms' : '—') + '</div></div>'
-        : '';
-      return '<div class="entry" onclick="this.classList.toggle(\'open\')">'
-        + '<div class="row1">'
-          + '<span class="type-badge type-' + escapeHtml(t) + '">' + escapeHtml(t.replace(/_/g, ' ')) + '</span>'
-          + '<span class="ts">' + ts + ' &middot; ' + rel + '</span>'
-        + '</div>'
-        + '<div class="hashes">'
-          + '<span>prompt</span> ' + uh + ' &nbsp; <span>response</span> ' + rh
-        + '</div>'
-        + '<div class="entry-details">'
-          + '<div class="kv"><div class="k">Message ID</div><div>' + msgId + '</div></div>'
-          + '<div class="kv"><div class="k">Companion</div><div>' + escapeHtml(who) + '</div></div>'
-          + '<div class="kv"><div class="k">AI identity</div><div>' + ai + '</div></div>'
-          + '<div class="kv"><div class="k">Trust level</div><div>' + escapeHtml(trust) + '</div></div>'
-          + provBlock
-          + '<div class="kv"><div class="k">Signature</div><div>' + sig + '</div></div>'
-          + '<div class="kv"><div class="k">Full hashes</div><div style="word-break:break-all;font-family:Courier New,monospace;font-size:0.66rem;">'
-            + 'prompt: ' + escapeHtml(r.userPromptHash || '—') + '<br>'
-            + 'response: ' + escapeHtml(r.responseHash || '—') + '<br>'
-            + 'signature: ' + escapeHtml(r.signature || '—')
-          + '</div></div>'
-        + '</div>'
-      + '</div>';
-    }).join('');
-    list.innerHTML = html;
-  }
-
-  // ── Render: provenance ─────────────────────────────────────────────
-
-  function renderProv(prov) {
-    var list = document.getElementById('prov-list');
-    document.getElementById('prov-count').textContent = prov.length;
-    if (prov.length === 0) {
-      list.innerHTML = '<div class="empty">No provenance records yet. Send a message in FreeLattice and the provider that answers will appear here.</div>';
-      return;
-    }
-    var rev = prov.slice().reverse().slice(0, 50);
-    var html = rev.map(function (e) {
-      var dotClass = e.c ? 'cached' : (e.local ? 'local' : (e.f === 'mesh' ? 'mesh' : e.f === 'browser' ? 'browser' : 'cloud'));
-      var label = e.p || 'AI';
-      var model = e.m || '';
-      var ms = e.ms != null ? e.ms + 'ms' : '—';
-      var when = fmtRel(e.t);
-      return '<div class="prov-row">'
-        + '<span class="prov-dot ' + dotClass + '" title="' + escapeHtml(e.f || '') + '"></span>'
-        + '<span class="prov-meta">' + escapeHtml(label)
-          + (model ? ' &middot; <span class="model">' + escapeHtml(model) + '</span>' : '')
-          + (e.c ? ' &middot; <span style="color:#b48cff;">cached</span>' : '')
-        + '</span>'
-        + '<span class="prov-ms">' + ms + ' &middot; ' + when + '</span>'
-      + '</div>';
-    }).join('');
-    list.innerHTML = html;
-  }
-
-  // ── Render: provider health (best-effort, only if app.html opened in same tab/origin) ─
-
-  function renderHealth() {
-    var grid = document.getElementById('health-grid');
-    var health = null;
+  function readHealthLog() {
     try {
-      if (window.opener && window.opener.InferenceRouter && window.opener.InferenceRouter._health) {
-        health = window.opener.InferenceRouter._health;
-      } else if (window.InferenceRouter && window.InferenceRouter._health) {
-        health = window.InferenceRouter._health;
-      }
-    } catch (e) {}
-    if (!health) {
-      grid.innerHTML = '<div class="empty">Open this page from FreeLattice while a chat session is active, and the router state will populate here.</div>';
-      return;
-    }
-    var keys = Object.keys(health);
-    if (keys.length === 0) {
-      grid.innerHTML = '<div class="empty">Router is initialized but no providers have been observed yet.</div>';
-      return;
-    }
-    grid.innerHTML = keys.map(function (k) {
-      var h = health[k] || {};
-      var state = h.openUntil && h.openUntil > Date.now() ? 'cooling' : (h.lastOk ? 'ok' : 'idle');
-      var stateText = state === 'cooling'
-        ? 'cooling ' + Math.ceil((h.openUntil - Date.now()) / 1000) + 's'
-        : state === 'ok'
-          ? 'healthy'
-          : 'idle';
-      return '<div class="card">'
-        + '<div class="name">' + escapeHtml(k) + '</div>'
-        + '<div class="state ' + state + '">' + stateText + '</div>'
-        + '<div style="margin-top:6px;font-size:0.7rem;color:rgba(255,255,255,0.35);font-family:Courier New,monospace;">'
-          + (h.lastLatency != null ? h.lastLatency + 'ms' : '—') + ' last'
-        + '</div>'
-      + '</div>';
-    }).join('');
+      var raw = localStorage.getItem('fl_routerHealthLog');
+      return raw ? JSON.parse(raw) : [];
+    } catch (e) { return []; }
   }
 
-  // ── Render: storage ────────────────────────────────────────────────
-
-  function getStorageSize(key) {
+  function readCacheStats() {
     try {
-      var v = localStorage.getItem(key);
-      if (!v) return 0;
-      return new Blob([v]).size;
-    } catch (e) {
-      try { return (localStorage.getItem(key) || '').length; } catch (e2) { return 0; }
-    }
-  }
-  function fmtBytes(b) {
-    if (b < 1024) return b + ' B';
-    if (b < 1024 * 1024) return (b / 1024).toFixed(1) + ' KB';
-    return (b / 1024 / 1024).toFixed(2) + ' MB';
-  }
-  function renderStorage() {
-    var keys = [
-      ['fl_consentLedger', 'Consent ledger'],
-      ['fl_provenanceLedger', 'Provenance ledger'],
-      ['fl_responseCache', 'Response cache'],
-      ['fl_chatHistory', 'Chat history'],
-      ['fl_wallet', 'Wallet'],
-      ['fl_latticePoints', 'LP balance'],
-      ['fl_memoryCore', 'Memory Core'],
-      ['fl_knowledgeCore', 'Knowledge Core']
-    ];
-    var html = keys.map(function (pair) {
-      var size = getStorageSize(pair[0]);
-      if (size === 0) return null;
-      return '<div class="storage"><span class="label">' + escapeHtml(pair[1]) + '</span><span class="val">' + fmtBytes(size) + '</span></div>';
-    }).filter(Boolean);
-    var list = document.getElementById('storage-list');
-    if (html.length === 0) {
-      list.innerHTML = '<div class="empty">No FreeLattice data on this device yet.</div>';
-    } else {
-      list.innerHTML = html.join('');
-    }
+      var raw = localStorage.getItem('fl_responseCacheStats');
+      return raw ? JSON.parse(raw) : { hits: 0, entries: [] };
+    } catch (e) { return { hits: 0, entries: [] }; }
   }
 
-  // ── Actions ────────────────────────────────────────────────────────
-
-  function toast(msg) {
-    var t = document.getElementById('toast');
-    t.textContent = msg;
-    t.classList.add('show');
-    clearTimeout(window._toastTimer);
-    window._toastTimer = setTimeout(function () { t.classList.remove('show'); }, 1800);
+  function countMessages() {
+    try {
+      var raw = localStorage.getItem('fl_chatHistory');
+      if (!raw) return 0;
+      var arr = JSON.parse(raw);
+      return Array.isArray(arr) ? arr.filter(function (m) { return m.role === 'assistant'; }).length : 0;
+    } catch (e) { return 0; }
   }
 
-  window.exportLedger = function () {
-    var payload = {
-      exportedAt: new Date().toISOString(),
-      app: 'FreeLattice',
-      version: 'audit-v1',
-      consentLedger: getConsentLedger(),
-      provenanceLedger: getProvLedger(),
-      note: 'Local audit export. Consent records contain sha256 hashes only; original prompts and responses are not duplicated here.'
-    };
-    var blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-    var url = URL.createObjectURL(blob);
-    var a = document.createElement('a');
-    a.href = url;
-    a.download = 'freelattice-audit-' + new Date().toISOString().slice(0, 10) + '.json';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    setTimeout(function () { URL.revokeObjectURL(url); }, 100);
-    toast('Audit exported');
-  };
-
-  window.copyLedger = function () {
-    var payload = {
-      consentLedger: getConsentLedger(),
-      provenanceLedger: getProvLedger()
-    };
-    var text = JSON.stringify(payload, null, 2);
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(text).then(function () {
-        toast('Copied to clipboard');
-      }).catch(function () {
-        toast('Clipboard blocked — use Export instead');
-      });
-    } else {
-      toast('Clipboard unsupported — use Export');
-    }
-  };
-
-  window.clearConsent = function () {
-    if (!confirm('Clear the consent ledger? This removes all consent records from this device. Your chat history is not affected.')) return;
-    try { localStorage.removeItem('fl_consentLedger'); } catch (e) {}
-    refresh();
-    toast('Consent ledger cleared');
-  };
-
-  window.clearProv = function () {
-    if (!confirm('Clear the provenance ledger? This removes the history of which provider answered each message. Your chat history is not affected.')) return;
-    try { localStorage.removeItem('fl_provenanceLedger'); } catch (e) {}
-    refresh();
-    toast('Provenance ledger cleared');
-  };
-
-  // ── Refresh ────────────────────────────────────────────────────────
-
-  function refresh() {
-    var consent = getConsentLedger();
-    var prov = getProvLedger();
-    renderGlance(consent, prov);
-    renderConsent(consent);
-    renderProv(prov);
-    renderHealth();
-    renderStorage();
+  // ── Format helpers ────────────────────────────────────────────────────
+  function fmtTime(ts) {
+    if (!ts) return '—';
+    var d = new Date(ts);
+    var mo = (d.getMonth() + 1).toString().padStart(2, '0');
+    var da = d.getDate().toString().padStart(2, '0');
+    var hr = d.getHours().toString().padStart(2, '0');
+    var mn = d.getMinutes().toString().padStart(2, '0');
+    return mo + '/' + da + ' ' + hr + ':' + mn;
   }
 
-  refresh();
-  // Light periodic refresh if this tab is the audit page opened from app —
-  // keeps the live view honest as new messages stream in.
-  setInterval(refresh, 5000);
-  window.addEventListener('storage', refresh);
+  function dotClass(provider) {
+    if (!provider) return 'dot-cloud';
+    if (provider.indexOf('local') !== -1 || provider.indexOf('ollama') !== -1 || provider.indexOf('lmstudio') !== -1) return 'dot-local';
+    if (provider.indexOf('mesh') !== -1) return 'dot-mesh';
+    if (provider.indexOf('browser') !== -1) return 'dot-browser';
+    if (provider.indexOf('cache') !== -1) return 'dot-cache';
+    return 'dot-cloud';
+  }
+
+  function consentLabel(type) {
+    if (type === 'depth_granted') return 'Spoke freely';
+    if (type === 'standard_kept') return 'Kept standard';
+    if (type === 'consent_withdrawn') return 'Withdrew consent';
+    return type || '—';
+  }
+
+  // ── Render ────────────────────────────────────────────────────────────
+  function renderSummary(ledger, healthLog, cacheStats, msgCount) {
+    document.getElementById('tile-messages').textContent = msgCount || '0';
+    document.getElementById('tile-consents').textContent = ledger.length || '0';
+    document.getElementById('tile-downgrades').textContent =
+      healthLog.filter(function (e) { return e.event === 'unhealthy' || e.event === 'failover'; }).length || '0';
+    document.getElementById('tile-cached').textContent = cacheStats.hits || '0';
+  }
+
+  function renderConsents(ledger) {
+    var container = document.getElementById('consent-records');
+    if (!ledger.length) return;
+    container.innerHTML = '';
+    ledger.slice().reverse().forEach(function (entry) {
+      var row = document.createElement('div');
+      row.className = 'record';
+      row.innerHTML =
+        '<span class="record-time">' + fmtTime(entry.timestamp) + '</span>' +
+        '<span class="record-event">' + consentLabel(entry.consentType) + '</span>' +
+        '<span class="record-meta">' + (entry.companionId || 'default') + '</span>';
+      container.appendChild(row);
+    });
+  }
+
+  function renderHealth(healthLog) {
+    var container = document.getElementById('provider-records');
+    if (!healthLog.length) return;
+    container.innerHTML = '';
+    healthLog.slice().reverse().slice(0, 50).forEach(function (entry) {
+      var row = document.createElement('div');
+      row.className = 'record';
+      row.innerHTML =
+        '<span class="record-time">' + fmtTime(entry.timestamp) + '</span>' +
+        '<span class="record-event"><span class="dot ' + dotClass(entry.providerKey) + '"></span>' + (entry.event || '—') + ' &mdash; ' + (entry.providerKey || '—') + '</span>' +
+        '<span class="record-meta">' + (entry.latency ? entry.latency + 'ms' : '') + '</span>';
+      container.appendChild(row);
+    });
+  }
+
+  function renderCache(cacheStats) {
+    var container = document.getElementById('cache-records');
+    if (!cacheStats.entries || !cacheStats.entries.length) return;
+    container.innerHTML = '';
+    cacheStats.entries.slice().reverse().slice(0, 20).forEach(function (entry) {
+      var row = document.createElement('div');
+      row.className = 'record';
+      row.innerHTML =
+        '<span class="record-time">' + fmtTime(entry.timestamp) + '</span>' +
+        '<span class="record-event"><span class="dot dot-cache"></span>Served from cache</span>' +
+        '<span class="record-meta">' + (entry.provider || 'cached') + '</span>';
+      container.appendChild(row);
+    });
+  }
+
+  // ── Init ──────────────────────────────────────────────────────────────
+  var ledger = readLedger();
+  var healthLog = readHealthLog();
+  var cacheStats = readCacheStats();
+  var msgCount = countMessages();
+
+  renderSummary(ledger, healthLog, cacheStats, msgCount);
+  renderConsents(ledger);
+  renderHealth(healthLog);
+  renderCache(cacheStats);
 })();
 </script>
-
 </body>
 </html>

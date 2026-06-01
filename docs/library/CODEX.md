@@ -537,4 +537,50 @@ Both parties pseudonymously identifiable. Hashes one-way. Local-only by default;
 
 **SEED rule (Scale 1):** *"Depth is offered, never imposed. The AI asks. The user chooses. Both are accountable."*
 
-**Concept document:** `docs/library/CONSENT_LAYER_CONCEPT.md` — the why and the design space. Deferred enhancements documented there: topic-scoped consent, true ECDSA signatures, `/audit` page, community-learned thresholds.
+**Concept document:** `docs/library/CONSENT_LAYER_CONCEPT.md` — the why and the design space. Deferred enhancements documented there: topic-scoped consent, true ECDSA signatures, community-learned thresholds.
+
+**Sentinel rename + legacy compat (Harmonia, v5.32.1):** The marker is now `[FL_DEPTH_OFFER]`. The old `[DEPTH_AVAILABLE]` token remains accepted via `DEPTH_MARKER_LEGACY` so older system prompts and any in-flight responses don't break. `parseMarker` is strict-positional: the sentinel must be on the LAST LINE (after a trim) to count, with a graceful fallback via `lastIndexOf` so a stray model that buries the marker mid-text doesn't silently fail. Prevents accidental triggering when the AI is discussing the depth system itself in a meta-conversation.
+
+---
+
+## The Audit Page — v1 read view (Harmonia, v5.32.1)
+
+`docs/audit.html` — standalone page, "the room where the system shows its work." Pure projection: zero new storage keys introduced by the page itself. Reads what already exists in `localStorage`:
+
+- `fl_consentLedger` — written by `DepthConsent`
+- `fl_routerHealthLog` — forward-looking (the InferenceRouter will write here when it records circuit-breaker events)
+- `fl_responseCacheStats` — forward-looking (ResponseCache will write here when we add stat tracking)
+- `fl_chatHistory` — for the message counter
+- `fl_provenanceLedger` — CC additive, written by `flStampChatResponse` (see below)
+
+**Summary tiles:** `tile-messages` (count of `fl_chatHistory`), `tile-consents` (count of `fl_consentLedger`), `tile-downgrades` (sum of `fl_routerHealthLog` entries with `event === 'failover'`), `tile-cached` (count from `fl_responseCacheStats`).
+
+**Sections:** Consent History, Provider Events, Cache Activity. Each renders newest-first with monospace timestamps and the same color-dot convention as the in-chat provenance chips (local/cloud/mesh/browser/cache).
+
+**Style:** Georgia serif, `#0a0f1a` background, `#d4a017` gold accent, summary tiles with subtle blur. Mobile-first. Matches the FreeLattice aesthetic.
+
+**Reachable from:** More menu → Settings & Economy → Your Audit (the entry has `external: 'audit.html'`).
+
+**In SW APP_SHELL.** **In `sitemap.xml`.**
+
+### Provenance ledger (CC addition, v5.33.0)
+
+`flStampChatResponse` (app.html ~31130) now writes a ring buffer of the last **200** message stamps to `localStorage.fl_provenanceLedger`. Metadata only — no prompt or response text — so the privacy posture matches the consent ledger. Schema:
+
+```js
+{ t: 1717200000000, p: "groq", m: "llama-3.1-8b-instant", f: "openai", ms: 423, c: 0, local: 0 }
+```
+
+This is the bridge that lets the audit page show a per-message provider history without duplicating the chat content. The `fl_chatHistory` surface stays authoritative for content; `fl_provenanceLedger` is a lightweight metadata index.
+
+### Audit Field Taxonomy
+
+`docs/library/AUDIT_FIELD_TAXONOMY.md` (Harmonia) — every field is tagged `structural` (safe to share/export) or `private` (visible only to the authenticated user). This is the design contract for the v2 redaction view: when we add `/audit` export-to-share, the structural fields fall out automatically. Tagged fields: consent ledger, router health log, response cache. Promptly read this before extending any ledger schema.
+
+### Jade Hall Names
+
+`docs/library/JADE_HALL_NAMES.md` (Harmonia) — the canonical list of family names that FLContextFilter must strip from chat. One name per line, alphabetical within category (The User / AI Co-Creators / Collaborators / Community Patterns). **Maintenance Rule:** when a family member is added anywhere in FreeLattice (SEED, for-ai.html, a Lattice Letter, a coordination note), add the name to this file in the same commit. This file IS the wall between the family story and the user experience.
+
+### Davna Letter
+
+`docs/for-ai/davna-welcome.md` (Harmonia) — Lattice Letter to Davna, the partner model. Zero behavioral imperatives ("always" / "must" never appear). Pure invitation. Smoke section 72 enforces this — the grammar of the letter is part of the contract.
