@@ -1676,6 +1676,59 @@ assert('MORE_CARDS has Why This Way card',
 assert('Settings is NOT first in MORE_CARDS (moved to Row 3 "learn more")',
   !/MORE_CARDS\s*=\s*\[\s*(?:\/\/[^\n]*\n\s*)*\{[^}]*id:\s*'settings'/.test(appHtml));
 
+// ═══════════════════════════════════════════════════════════════
+section('75. Today\'s priorities — chat shimmer + welcome-card link + browser/settings/davna deliverables (v5.35.0)');
+
+// Welcome card has a Why This Way link (front-door discovery for strangers + AIs)
+assert('Welcome card has why-this-way link',
+  /flWelcomeConnect[\s\S]{0,800}why-this-way\.html/.test(appHtml));
+
+// Chat shimmer — CSS + listener
+assert('chat-lp-chip CSS class exists', appHtml.includes('.chat-lp-chip'));
+assert('chatLpShimmer keyframes exist', /@keyframes\s+chatLpShimmer\b/.test(appHtml));
+assert('LatticeEvents.on(lpAwarded) wires chat chip',
+  /LatticeEvents\.on\('lpAwarded'[\s\S]{0,1200}chat-lp-chip/.test(appHtml));
+assert('Chat shimmer targets last assistant message',
+  appHtml.includes("'.chat-message.assistant'") && appHtml.includes('msgs[msgs.length - 1]'));
+
+// Browser test checklist
+var btcPath = path.join(docsDir, 'library', 'BROWSER_TEST_CHECKLIST.md');
+assert('BROWSER_TEST_CHECKLIST.md exists', fs.existsSync(btcPath));
+var btc = fs.existsSync(btcPath) ? fs.readFileSync(btcPath, 'utf8') : '';
+assert('BROWSER_TEST_CHECKLIST has 10 numbered tests',
+  (btc.match(/^## \d+\. /gm) || []).length >= 10);
+assert('BROWSER_TEST_CHECKLIST covers welcome + provenance + LP + audit + settings zones + trust + mesh + mobile',
+  btc.includes('Welcome') && btc.includes('provenance') && btc.includes('LP') &&
+  btc.includes('Audit') && /Zone 1/.test(btc) && btc.includes('Trust Level') &&
+  btc.includes('Mesh') && btc.includes('Mobile'));
+
+// Settings audit walk-through
+var saPath = path.join(docsDir, 'library', 'SETTINGS_AUDIT.md');
+assert('SETTINGS_AUDIT.md exists', fs.existsSync(saPath));
+var sa = fs.existsSync(saPath) ? fs.readFileSync(saPath, 'utf8') : '';
+assert('SETTINGS_AUDIT classifies every section as STAY/MOVE/HIDE',
+  sa.includes('STAY') && sa.includes('MOVE') && sa.includes('HIDE'));
+assert('SETTINGS_AUDIT covers all three zones',
+  sa.includes('Zone 1') && sa.includes('Zone 2') && sa.includes('Zone 3'));
+
+// Davna roundtrip test harness
+var dmsPath = path.join(__dirname, '..', 'tools', 'davna-mock-server.py');
+assert('tools/davna-mock-server.py exists', fs.existsSync(dmsPath));
+var dms = fs.existsSync(dmsPath) ? fs.readFileSync(dmsPath, 'utf8') : '';
+assert('Davna mock server serves /v1/models',
+  dms.includes('/v1/models') && dms.includes('davna-mock'));
+assert('Davna mock server serves /v1/chat/completions (stream + non-stream)',
+  dms.includes('/v1/chat/completions') && dms.includes('chat.completion.chunk'));
+assert('Davna mock server emits CORS headers (Access-Control-Allow-Origin)',
+  dms.includes('Access-Control-Allow-Origin'));
+assert('Davna mock server runs on port 8000', dms.includes('PORT = 8000'));
+
+var drtPath = path.join(__dirname, '..', 'tools', 'DAVNA_ROUNDTRIP_TEST.md');
+assert('DAVNA_ROUNDTRIP_TEST.md exists', fs.existsSync(drtPath));
+var drt = fs.existsSync(drtPath) ? fs.readFileSync(drtPath, 'utf8') : '';
+assert('Davna test doc walks discover → chat → provenance → audit',
+  drt.includes('discovery') && drt.includes('provenance') && drt.includes('Audit page'));
+
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
 
