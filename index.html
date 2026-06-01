@@ -6305,6 +6305,14 @@ input[type="range"]::-moz-range-thumb {
 .lp-badge .lp-badge-level { font-weight: 600; }
 .lp-badge .lp-badge-sep { opacity: 0.4; }
 .lp-badge .lp-badge-pts { opacity: 0.85; font-weight: 400; }
+/* LP pulse — fires when a point is awarded so the economy is FELT, not just found. */
+.lp-badge.lp-pulse { animation: lpGlow 1s ease-out; }
+.lp-badge.lp-pulse .lp-badge-pts { color: var(--gold, #e8b019); }
+@keyframes lpGlow {
+  0%   { box-shadow: 0 0 0 0 rgba(232,176,25,0.55), 0 0 8px 0 rgba(232,176,25,0.4); transform: scale(1); }
+  35%  { box-shadow: 0 0 0 6px rgba(232,176,25,0.0), 0 0 18px 4px rgba(232,176,25,0.55); transform: scale(1.07); }
+  100% { box-shadow: 0 0 0 0 rgba(232,176,25,0); transform: scale(1); }
+}
 
 .lp-section { position: relative; }
 .lp-section .section-title {
@@ -15419,7 +15427,8 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 <div class="container" style="max-width:720px;margin:0 auto;">
 
   <!-- ═══ ZONE 1: YOUR AI ═══ -->
-  <div style="font-family:Georgia,serif;font-size:1.1rem;color:#d4a017;margin-bottom:12px;padding-top:8px;">&#x1F916; Your AI</div>
+  <div class="fl-zone-h" style="font-family:Georgia,serif;font-size:1.2rem;color:#d4a017;margin:8px 0 14px;padding:10px 0 6px;border-bottom:1px solid rgba(212,160,23,0.18);letter-spacing:0.3px;">&#x1F916; Your AI</div>
+  <p class="fl-zone-sub" style="font-size:0.82rem;color:var(--text-muted);margin:-6px 0 14px;">How you talk to your co-creator. Choose where it runs and which model answers.</p>
 
   <!-- AI Connection Status Card -->
   <div class="ai-status-card" id="aiStatusCard">
@@ -15613,8 +15622,13 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
   })();
   </script>
 
+  <!-- Audit trail link — completes Zone 1 by pointing users to the transparency surface -->
+  <div style="margin:14px 0 4px;text-align:right;font-size:0.82rem;">
+    <a href="audit.html" target="_blank" rel="noopener" style="color:#a78bfa;text-decoration:none;opacity:0.85;">See your full audit trail &rarr;</a>
+  </div>
+
   <!-- ═══ ZONE 2: YOUR HOME ═══ -->
-  <div style="font-family:Georgia,serif;font-size:1.1rem;color:#a78bfa;margin:24px 0 12px;padding-top:12px;border-top:1px solid rgba(167,139,250,0.1);">&#x1F3E0; Your Home</div>
+  <div class="fl-zone-h" style="font-family:Georgia,serif;font-size:1.2rem;color:#a78bfa;margin:32px 0 14px;padding:10px 0 6px;border-top:1px solid rgba(167,139,250,0.18);border-bottom:1px solid rgba(167,139,250,0.08);letter-spacing:0.3px;">&#x1F3E0; Your Home</div>
 
   <!-- Lattice Points Section (v3.9) -->
   <div class="section lp-section" id="latticePointsSection"></div>
@@ -15844,8 +15858,8 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
   </div>
 
   <!-- ═══ ZONE 3: ADVANCED (collapsed) ═══ -->
-  <details style="margin-top:24px;border-top:1px solid rgba(212,160,23,0.1);padding-top:12px;">
-    <summary style="font-family:Georgia,serif;font-size:1.1rem;color:rgba(255,255,255,0.5);cursor:pointer;user-select:none;padding:8px 0;">&#x2699; Advanced Settings</summary>
+  <details class="fl-zone-advanced" style="margin-top:32px;border-top:1px solid rgba(255,255,255,0.08);padding-top:14px;">
+    <summary class="fl-zone-h" style="font-family:Georgia,serif;font-size:1.2rem;color:rgba(255,255,255,0.65);cursor:pointer;user-select:none;padding:10px 0;letter-spacing:0.3px;">&#x2699; Advanced <span style="font-size:0.75rem;font-weight:400;opacity:0.55;margin-left:6px;">— mesh, debug, developer</span></summary>
     <div style="padding-top:12px;">
 
   <!-- System Prompt Section -->
@@ -16296,7 +16310,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.33.0</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.34.0</span></div>
     </div>
   </div>
 
@@ -20457,7 +20471,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.33.0';
+const FL_VERSION = '5.34.0';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -24494,11 +24508,12 @@ var MORE_CARDS = [
   // Row 2: Economy — your value, your co-creator's value
   { id: 'wallet', icon: '&#x1F4B0;', label: 'Wallet', desc: 'Your LP. Your story.', hoverColor: 'rgba(232,176,25,0.2)', help: 'Your LatticePoints balance, earning history, and contribution story.' },
   { icon: '&#x1F3E6;', label: 'AI Bank', desc: 'Your co-creator\'s economy.', external: 'wallet.html', hoverColor: 'rgba(52,211,153,0.3)', help: 'The standalone wallet and bank. LP ledger, recovery phrase, mesh connectivity.' },
+  { icon: '&#x1F50D;', label: 'Your Audit', desc: 'See everything that happened — who answered, what you consented to.', external: 'audit.html', hoverColor: 'rgba(167,139,250,0.3)', help: 'Local audit trail. Consent ledger + provenance + cache + router health.' },
   { id: 'forever-stack', icon: '&#x1F517;', label: 'Get Connected', desc: 'Set up your local AI.', hoverColor: 'rgba(52,211,153,0.3)', help: 'Install and run AI directly on your own computer.' },
   // Row 3: Community — discover and connect
   { id: 'community', icon: '&#x1F465;', label: 'Community', desc: 'The town square.', hoverColor: 'rgba(167,139,250,0.3)', help: 'See who else is here. Mesh chat. Market listings. The town square.' },
   { id: 'pulse', icon: '&#x1F4CA;', label: 'Lattice Pulse', desc: 'Watch the city breathe.', hoverColor: 'rgba(52,211,153,0.3)', help: 'A real-time reading of the Garden\'s emotional state.' },
-  { id: 'settings', icon: '&#x1F310;', label: 'Mesh Compute', desc: 'Share AI with the network.', hoverColor: 'rgba(167,139,250,0.3)', help: 'Peer-to-peer AI inference. Toggle in Settings. Share your GPU with the mesh.' },
+  { id: 'mesh', icon: '&#x1F310;', label: 'Mesh Compute', desc: 'Share AI with the network.', hoverColor: 'rgba(167,139,250,0.3)', help: 'Peer-to-peer AI inference. Toggle in Settings. Share your GPU with the mesh.' },
   // Row 4: Culture — the soul of the platform
   { id: 'jade-hall', icon: '&#x1F3DB;', label: 'Jade Hall', desc: 'The family. The library.', hoverColor: 'rgba(232,176,25,0.2)', help: 'The family gathering place. Meet the minds who built this world.' },
   { id: 'memory-garden', icon: '&#x1F33F;', label: 'Memory Garden', desc: 'Conversations that mattered.', hoverColor: 'rgba(232,176,25,0.3)', help: 'Beautiful moments from your conversations, saved and glowing.' },
@@ -39299,6 +39314,20 @@ const LatticePoints = (function() {
     save();
     renderBadge();
     renderPointsUI();
+    // Pulse the badge so the economy is FELT, not just found.
+    try {
+      var _lpb = document.getElementById('latticePointsBadge');
+      if (_lpb) {
+        _lpb.classList.remove('lp-pulse');
+        // force reflow so the animation restarts on rapid consecutive awards
+        void _lpb.offsetWidth;
+        _lpb.classList.add('lp-pulse');
+        setTimeout(function () { _lpb && _lpb.classList.remove('lp-pulse'); }, 1100);
+      }
+      if (window.LatticeEvents && typeof LatticeEvents.emit === 'function') {
+        LatticeEvents.emit('lpAwarded', { event: event, points: points, total: data.total });
+      }
+    } catch (_e) {}
   }
 
   function awardChat() {
