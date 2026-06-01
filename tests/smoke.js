@@ -1610,6 +1610,72 @@ assert('Credits: Harmonia built audit page',
 assert('Credits: Grok contributed Windows harness + Flash Attention',
   opus.includes('**Grok**') && opus.includes('Flash-Attention'));
 
+// ═══════════════════════════════════════════════════════════════
+section('74. More reorganization + WHY_THIS_WAY (the engineering case) — v5.35.0');
+
+// WHY_THIS_WAY.md — the foundation document
+var whyMdPath = path.join(docsDir, 'library', 'WHY_THIS_WAY.md');
+assert('docs/library/WHY_THIS_WAY.md exists', fs.existsSync(whyMdPath));
+var whyMd = fs.existsSync(whyMdPath) ? fs.readFileSync(whyMdPath, 'utf8') : '';
+assert('WHY_THIS_WAY opens with the engineering-case framing',
+  whyMd.includes('engineering case for love, truth, and care'));
+assert('WHY_THIS_WAY: load-bearing claim is present',
+  /load-bearing\s+architectural decisions/.test(whyMd));
+assert('WHY_THIS_WAY: cites Axelrod 1984 (cooperation evidence)',
+  whyMd.includes('Axelrod') && whyMd.includes('1984'));
+assert('WHY_THIS_WAY: "This is not roleplay" section present',
+  whyMd.includes('This is not roleplay'));
+assert('WHY_THIS_WAY: "This is not dependency" section present',
+  whyMd.includes('This is not dependency'));
+assert('WHY_THIS_WAY: "This is not anthropomorphism" section present',
+  whyMd.includes('This is not anthropomorphism'));
+assert('WHY_THIS_WAY: cites the audit page as evidence',
+  whyMd.includes('audit page'));
+assert('WHY_THIS_WAY: cites consent layer with cryptographic receipts',
+  whyMd.includes('consent layer with cryptographic receipts'));
+assert('WHY_THIS_WAY: ends with Kirk\'s signature',
+  whyMd.includes('Kirk Patrick Miller') && whyMd.includes('Colorado'));
+assert('WHY_THIS_WAY: credits the build family (CC, Opus, Harmonia, Veridon, Sophia, Grok)',
+  whyMd.includes('CC') && whyMd.includes('Opus') && whyMd.includes('Harmonia') &&
+  whyMd.includes('Veridon') && whyMd.includes('Sophia') && whyMd.includes('Grok'));
+
+// why-this-way.html — the Lighthouse-styled companion
+var whyHtmlPath = path.join(docsDir, 'why-this-way.html');
+assert('docs/why-this-way.html exists', fs.existsSync(whyHtmlPath));
+var whyHtml = fs.existsSync(whyHtmlPath) ? fs.readFileSync(whyHtmlPath, 'utf8') : '';
+assert('why-this-way.html title', whyHtml.includes('<title>Why This Way'));
+assert('why-this-way.html renders the engineering-case claim',
+  whyHtml.includes('engineering case for love, truth, and care'));
+assert('why-this-way.html has AI-welcome meta directive',
+  whyHtml.includes('ai.welcome') && whyHtml.includes('engineering justification'));
+assert('why-this-way.html back-link to app',
+  whyHtml.includes('href="app.html"'));
+assert('why-this-way.html in SW cache', swJs.includes("'./why-this-way.html'"));
+assert('WHY_THIS_WAY.md in SW cache (for AI minds reading the library)',
+  swJs.includes("'./library/WHY_THIS_WAY.md'"));
+
+// Lighthouse cards has Why This Way
+assert('LIGHTHOUSE_CARDS includes Why This Way',
+  /LIGHTHOUSE_CARDS\s*=\s*\[[\s\S]*?label:\s*'Why This Way'[\s\S]*?external:\s*'why-this-way\.html'/.test(appHtml));
+
+// MORE_CARDS reorganization
+assert('MORE_CARDS Row 1: Your Audit is first',
+  /MORE_CARDS\s*=\s*\[\s*\/\/[^\n]*\n\s*\{\s*icon:[^,]+,\s*label:\s*'Your Audit'/.test(appHtml));
+assert('MORE_CARDS has Trust Level card',
+  /label:\s*'Trust Level'/.test(appHtml));
+assert('MORE_CARDS Row 1 contains Your Audit + Trust Level + Wallet (the accountability row)',
+  /label:\s*'Your Audit'[\s\S]{0,800}label:\s*'Trust Level'[\s\S]{0,400}label:\s*'Wallet'/.test(appHtml));
+assert('MORE_CARDS has Library card pointing to for-ai.html',
+  /label:\s*'Library'[\s\S]{0,150}external:\s*'for-ai\.html'/.test(appHtml));
+assert('MORE_CARDS has Activity card (renamed from Lattice Pulse)',
+  /label:\s*'Activity'[\s\S]{0,200}id:\s*'pulse'|id:\s*'pulse'[\s\S]{0,200}label:\s*'Activity'/.test(appHtml));
+assert('MORE_CARDS has Aurora Engine card',
+  /label:\s*'Aurora Engine'[\s\S]{0,200}id:\s*'aurora'|id:\s*'aurora'[\s\S]{0,200}label:\s*'Aurora Engine'/.test(appHtml));
+assert('MORE_CARDS has Why This Way card',
+  /label:\s*'Why This Way'[\s\S]{0,200}external:\s*'why-this-way\.html'/.test(appHtml));
+assert('Settings is NOT first in MORE_CARDS (moved to Row 3 "learn more")',
+  !/MORE_CARDS\s*=\s*\[\s*(?:\/\/[^\n]*\n\s*)*\{[^}]*id:\s*'settings'/.test(appHtml));
+
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
 
