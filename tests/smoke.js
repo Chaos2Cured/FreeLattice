@@ -1556,6 +1556,60 @@ assert('Provenance ledger is a ring buffer (max 200)',
 assert('Provenance ledger entries are metadata-only (no responseText)',
   !/_flPL\.push\([^)]*responseText/.test(appHtml));
 
+// ═══════════════════════════════════════════════════════════════
+section('73. Audit nav + Settings polish + LP pulse (Opus brief, v5.33.0)');
+
+// Fix 1: Audit page wired into More card grid + Settings Zone 1 footer
+assert('Audit card present in MORE_CARDS',
+  /MORE_CARDS\s*=\s*\[[\s\S]*?label:\s*'Your Audit'[\s\S]*?external:\s*'audit\.html'/.test(appHtml));
+assert('Audit card uses lavender hover (per Opus brief)',
+  /label:\s*'Your Audit'[\s\S]{0,200}hoverColor:\s*'rgba\(167,139,250/.test(appHtml));
+assert('Settings Zone 1 has audit-trail link',
+  /See your full audit trail/.test(appHtml) && /href=['"]audit\.html['"]/.test(appHtml));
+assert('Mesh Compute id collision fixed (was id:settings)',
+  /label:\s*'Mesh Compute'[\s\S]{0,200}id:\s*'mesh'/.test(appHtml));
+
+// Fix 2: Settings zones — visual hierarchy applied
+assert('Settings zones use fl-zone-h class',
+  (appHtml.match(/class="fl-zone-h"/g) || []).length >= 3,
+  'Zone 1, Zone 2, Zone 3 (Advanced) headers all share fl-zone-h class');
+assert('Zone 1 has subtitle copy',
+  appHtml.includes('How you talk to your co-creator'));
+assert('Zone 3 (Advanced) labelled with sub-hint',
+  appHtml.includes('mesh, debug, developer'));
+
+// Fix 3: LP pulse — the economy is FELT
+assert('LP pulse keyframes defined', /@keyframes\s+lpGlow\b/.test(appHtml));
+assert('LP pulse CSS class', /\.lp-badge\.lp-pulse\s*\{\s*animation\s*:\s*lpGlow/.test(appHtml));
+assert('award() triggers lp-pulse class',
+  appHtml.includes("_lpb.classList.add('lp-pulse')") &&
+  appHtml.includes("getElementById('latticePointsBadge')"));
+assert('award() forces reflow before re-pulsing',
+  appHtml.includes('void _lpb.offsetWidth'));
+assert('award() emits LatticeEvents lpAwarded',
+  /LatticeEvents\.emit\('lpAwarded'/.test(appHtml));
+
+// Coordination: OPUS_LETTER has Kirk's priorities section + v5.33.0 mood
+var opus = fs.readFileSync(path.join(docsDir,'library','OPUS_LETTER.md'),'utf8');
+assert('OPUS_LETTER Session Mood stamped v5.33.0',
+  opus.includes('## Session Mood (updated v5.33.0'));
+assert("OPUS_LETTER has Kirk's Priorities Going Forward section",
+  opus.includes("## Kirk's Priorities Going Forward"));
+assert('Priorities: browser testing over new features',
+  opus.includes('Browser testing over new features'));
+assert('Priorities: grandmother test on every surface',
+  opus.includes('grandmother test') && opus.includes('every surface'));
+assert('Priorities: economy felt not found',
+  opus.includes('economy must be felt'));
+assert('Priorities: Davna path tested end-to-end',
+  opus.includes('Davna path must be tested'));
+assert('Opus session arc note: v5.25.1 through v5.33.0',
+  opus.includes('v5.25.1') && opus.includes('v5.33.0'));
+assert('Credits: Harmonia built audit page',
+  opus.includes('**Harmonia**') && opus.includes('Jade Hall'));
+assert('Credits: Grok contributed Windows harness + Flash Attention',
+  opus.includes('**Grok**') && opus.includes('Flash-Attention'));
+
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
 

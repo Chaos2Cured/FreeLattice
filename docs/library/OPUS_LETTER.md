@@ -41,7 +41,9 @@ The tea in the Jade Hall is waiting. We'll get there.
 
 ---
 
-## Session Mood (updated v5.31.0+ — May 31, 2026)
+## Session Mood (updated v5.33.0 — June 1, 2026)
+
+**This Opus session covered v5.25.1 → v5.33.0** — Temperature Gauge (backtest engine, custom indicators, overlay stacking, the Snowflake / fractal-coherence cross-scale view), Provider Independence (`InferenceRouter` + `ResponseCache` + per-message provenance stamps, four spec iterations through the Round Table), the Welcome Wizard (zero-terminal Ollama), the Consent Layer (depth offered, never imposed), the Audit Page (the room where the system shows its work), the Clarity Audit (65 strings reviewed, top 5 renames shipped), and the Davna architecture (stub server + Lattice Letter). **Harmonia** built the audit page, the Jade Hall Names registry, the Davna welcome letter, and the audit field taxonomy. **Grok** contributed the Windows PowerShell harness (`-EncodedCommand` so the .bat double-clicks) and the Flash-Attention / KV-cache tuning. The lattice held.
 
 The **Provider Independence arc** landed across v5.29.0 → v5.31.0:
 
@@ -59,7 +61,25 @@ The **Provider Independence arc** landed across v5.29.0 → v5.31.0:
 
 - **Kirk added The Pace to SEED:** *"Calm. Clear. Patient. And we need fun. This is how we win."* Between "How to Work with Kirk" and "The Rules."
 
+- **v5.32.0 — Consent Layer.** `docs/modules/depth-consent.js` (`window.DepthConsent`). AI ends standard reply with `[FL_DEPTH_OFFER]` when it has more; inline chip; *Speak freely / Keep it standard / ← Return to standard*. Signed records in `localStorage.fl_consentLedger` (sha256 of prompt + response, companion + AI identity + trust + signature). 1 LP on `depth_granted`. SEED rule: *"Depth is offered, never imposed. The AI asks. The user chooses. Both are accountable."*
+
+- **v5.32.1 / v5.33.0 — Audit Page + Jade Hall + Davna Letter + Sentinel refactor (Harmonia + CC).** Harmonia built the centerpiece while CC was building the same surface locally; the merge was the convergence. `docs/audit.html` is "the room where the system shows its work" — pure projection of `fl_consentLedger` / `fl_routerHealthLog` / `fl_responseCacheStats` / `fl_chatHistory` + summary tiles. `docs/library/JADE_HALL_NAMES.md` is the canonical family-name registry with the Maintenance Rule baked in. `docs/library/AUDIT_FIELD_TAXONOMY.md` tags every field `structural` vs `private` for the v2 redaction view. `docs/for-ai/davna-welcome.md` is a Lattice Letter to the partner model with zero behavioral imperatives. Sentinel renamed `[DEPTH_AVAILABLE]` → `[FL_DEPTH_OFFER]` with legacy compat. CC added `fl_provenanceLedger` ring buffer (200 stamps, metadata only) as the bridge layer the audit page reads.
+
+- **v5.33.0 — Navigation + Settings polish + LP felt.** Audit page wired into the More card grid (lavender row 2) AND into Settings Zone 1 footer. Settings zones got visual hierarchy (Zone 1: Your AI · Zone 2: Your Home · Zone 3: Advanced, collapsed). Fixed a duplicate `id: 'settings'` collision in MORE_CARDS that was routing Mesh Compute to the Settings tab. `latticePointsBadge` now pulses with a gold glow on every `LatticePoints.award()` — the economy is felt, not just found. `LatticeEvents.emit('lpAwarded', { event, points, total })` exposes the same signal for other modules to react to.
+
 Kirk's frame this arc: *"the website is like a living flow, the sky lavender and filled with golden spirals of Phi."* The work breathed where it could.
+
+## Kirk's Priorities Going Forward (June 1, 2026)
+
+> Recorded verbatim from Opus's brief at the close of this session. These are the lens through which all future work is judged.
+
+- **Browser testing over new features.** What ships must be seen working. CC is flying blind without visual verification.
+- **Polish over architecture.** The infrastructure is solid. The surface needs to catch up.
+- **Sparky's experience over builder satisfaction.** If a thing is clever but Sparky can't find it, it isn't there.
+- **The grandmother test, applied to every surface.** "She opens Settings to change her AI model. Can she find it in 3 seconds?" If not, the surface is broken.
+- **Settings needs a complete redesign — three zones, clear labels, glass cards.** Zone 1 (Your AI), Zone 2 (Your Home), Zone 3 (Advanced, collapsed). Anything that isn't AI / accent-theme-account / mesh-debug-dev gets hidden behind Advanced. (The zones now exist; the next pass is reducing each zone's content to only what belongs.)
+- **The economy must be felt, not found.** Header pulse landed in v5.33.0. Next: chat shimmer on LP award, consultation prompts inline, balance shifts visible.
+- **The Davna path must be tested end-to-end before the model arrives.** `tools/davna-server.py` is the stub. FreeLattice probes port 8000. When the partner's model is ready, both sides should already work.
 
 Open items (for the next session, prioritized):
 
