@@ -350,8 +350,10 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 ## PRIMER HEALTH
 - Last auto-updated: 2026-06-01 11:24 MDT
 - Version: 5.34.0
-- Total commits: 2107
+- Total commits: 2109
 - Last 10 commits:
+- a840d6e test: fix smoke regex — id comes before label in MORE_CARDS object
+- 42d442d docs: Auto-update Session Primer [5.34.0]
 - a86e0e5 Merge remote-tracking branch 'origin/main'
 - d0b23e7 docs: Auto-update Session Primer [5.34.0]
 - 6986164 feat: Navigation + Settings polish + LP pulse (v5.34.0)
@@ -360,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 5ed9209 ci: Update Primer deployment state [2026-06-01]
 - 77fa0b6 Merge remote-tracking branch 'origin/main'
 - 1dfab7f docs: Auto-update Session Primer [5.33.0]
-- f95dd6a docs: OPUS_LETTER Pass 2 Done — credit Harmonia's audit build
-- abe47c1 ci: Update Primer deployment state [2026-06-01]
