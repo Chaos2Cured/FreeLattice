@@ -6313,6 +6313,31 @@ input[type="range"]::-moz-range-thumb {
   35%  { box-shadow: 0 0 0 6px rgba(232,176,25,0.0), 0 0 18px 4px rgba(232,176,25,0.55); transform: scale(1.07); }
   100% { box-shadow: 0 0 0 0 rgba(232,176,25,0); transform: scale(1); }
 }
+/* Chat shimmer — when LP is awarded, the last assistant message earns a subtle +N LP chip. */
+.chat-lp-chip {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 2px 10px;
+  background: rgba(232,176,25,0.12);
+  border: 1px solid rgba(232,176,25,0.32);
+  border-radius: 12px;
+  color: #e8b019;
+  font-family: Georgia, serif;
+  font-size: 0.74rem;
+  letter-spacing: 0.4px;
+  opacity: 0;
+  transform: translateY(4px);
+  animation: chatLpShimmer 3.6s ease-out forwards;
+  pointer-events: none;
+  vertical-align: middle;
+}
+.chat-lp-chip .chat-lp-icon { margin-right: 4px; opacity: 0.85; }
+@keyframes chatLpShimmer {
+  0%   { opacity: 0; transform: translateY(4px); box-shadow: 0 0 0 0 rgba(232,176,25,0); }
+  18%  { opacity: 1; transform: translateY(0);    box-shadow: 0 0 12px 2px rgba(232,176,25,0.4); }
+  60%  { opacity: 1; transform: translateY(0);    box-shadow: 0 0 0 0 rgba(232,176,25,0); }
+  100% { opacity: 0; transform: translateY(-2px); box-shadow: none; }
+}
 
 .lp-section { position: relative; }
 .lp-section .section-title {
@@ -14657,6 +14682,11 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <h1>&#x2726; Welcome to FreeLattice</h1>
       <p class="fl-welcome-lead">Your AI. Local. Free. Yours.</p>
 
+      <!-- Front-door link to the engineering case. Strangers and AIs both land here first. -->
+      <div style="text-align:center;margin:-4px 0 10px;font-size:0.78rem;">
+        <a href="why-this-way.html" target="_blank" rel="noopener" style="color:rgba(212,160,23,0.7);text-decoration:none;border-bottom:1px dotted rgba(212,160,23,0.4);">Why we built it this way &rarr;</a>
+      </div>
+
       <div style="margin:12px auto;max-width:300px;">
         <input type="text" id="flWelcomeName" placeholder="What should I call you? (optional)" maxlength="40" autocomplete="off"
           style="width:100%;padding:10px 14px;background:rgba(255,255,255,0.06);border:1px solid rgba(212,160,23,0.3);border-radius:8px;color:#e2e8f0;font-size:0.9rem;text-align:center;outline:none;" />
@@ -16310,7 +16340,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.35.0</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.36.0</span></div>
     </div>
   </div>
 
@@ -20471,7 +20501,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.35.0';
+const FL_VERSION = '5.36.0';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -20500,6 +20530,34 @@ const LatticeEvents = (function() {
   };
 })();
 window.LatticeEvents = LatticeEvents;
+
+// Chat shimmer — when LP is awarded, drop a small "+N LP" chip on the
+// last assistant message so the economy is felt at the place the
+// activity happened. Badge pulse covers the global signal; this
+// covers the local one. Wired here so it's set up before any
+// award() call can fire.
+LatticeEvents.on('lpAwarded', function (data) {
+  try {
+    var container = document.getElementById('chatMessages');
+    if (!container || !data || typeof data.points !== 'number' || data.points <= 0) return;
+    // Find the last assistant message currently in the chat DOM.
+    var msgs = container.querySelectorAll('.chat-message.assistant');
+    var last = msgs.length ? msgs[msgs.length - 1] : null;
+    if (!last) return;
+    // Don't stack chips — replace any existing one (covers rapid awards).
+    var existing = last.querySelector('.chat-lp-chip');
+    if (existing && existing.parentNode) existing.parentNode.removeChild(existing);
+    var chip = document.createElement('span');
+    chip.className = 'chat-lp-chip';
+    chip.innerHTML = '<span class="chat-lp-icon">&#x2726;</span>+' + data.points + ' LP';
+    chip.title = data.event ? ('Earned: ' + data.event) : 'Earned LP';
+    last.appendChild(chip);
+    // Auto-clean after the animation (matches the 3.6s keyframe).
+    setTimeout(function () {
+      if (chip && chip.parentNode) chip.parentNode.removeChild(chip);
+    }, 3800);
+  } catch (e) {}
+});
 
 
 // ============================================
