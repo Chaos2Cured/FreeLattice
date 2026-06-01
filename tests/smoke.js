@@ -1474,7 +1474,7 @@ if (dcJs) {
   catch (e) { assert('depth-consent.js parses', false, 'Syntax error'); }
 }
 assert('DepthConsent window export', dcJs.includes('window.DepthConsent'));
-assert('DEPTH_AVAILABLE marker constant', dcJs.includes("'[DEPTH_AVAILABLE]'") && dcJs.includes('MARKER: DEPTH_MARKER'));
+assert('FL_DEPTH_OFFER marker constant (with legacy compat)', dcJs.includes("'[FL_DEPTH_OFFER]'") && dcJs.includes('MARKER: DEPTH_MARKER') && dcJs.includes('DEPTH_MARKER_LEGACY'));
 assert('parseMarker + attachIfMarked exposed', dcJs.includes('parseMarker: parseMarker') && dcJs.includes('attachIfMarked: attachIfMarked'));
 assert('SHA-256 via SubtleCrypto', dcJs.includes("crypto.subtle.digest('SHA-256'"));
 assert('Consent ledger key fl_consentLedger', dcJs.includes("'fl_consentLedger'"));
@@ -1491,7 +1491,7 @@ assert('depth-consent.js in SW cache', swJs.includes('depth-consent.js'));
 assert('Depth invitation in buildMessages system prompt',
   (appHtml.match(/Depth invitation: if your full answer would be materially deeper/g) || []).length >= 2,
   'Required in both buildMessages and buildSmartMessages');
-assert('DEPTH_AVAILABLE marker mentioned in system instruction', appHtml.includes('[DEPTH_AVAILABLE]'));
+assert('FL_DEPTH_OFFER marker mentioned in system instruction', appHtml.includes('[FL_DEPTH_OFFER]'));
 
 // All 5 chat completion sites call DepthConsent.attachIfMarked
 assert('Chat completion sites all call DepthConsent.attachIfMarked',
@@ -1504,6 +1504,44 @@ assert('SEED rule: Depth is offered, never imposed',
   fs.readFileSync(path.join(docsDir,'library','SEED.md'),'utf8').includes('Depth is offered, never imposed'));
 // Concept doc lives at the canonical path
 assert('CONSENT_LAYER_CONCEPT.md saved', fs.existsSync(path.join(docsDir,'library','CONSENT_LAYER_CONCEPT.md')));
+
+// ═══════════════════════════════════════════════════════════════
+// AUDIT PAGE + JADE HALL + DAVNA LETTER
+// ═══════════════════════════════════════════════════════════════
+var sitemapXml = fs.readFileSync(path.join(docsDir, 'sitemap.xml'), 'utf8');
+var auditPath = path.join(docsDir, 'audit.html');
+assert('audit.html exists', fs.existsSync(auditPath));
+var auditHtml = fs.readFileSync(auditPath, 'utf8');
+assert('audit.html reads fl_consentLedger', auditHtml.includes('fl_consentLedger'));
+assert('audit.html reads fl_routerHealthLog', auditHtml.includes('fl_routerHealthLog'));
+assert('audit.html has summary tiles', auditHtml.includes('tile-messages') && auditHtml.includes('tile-consents'));
+assert('audit.html has back link to app', auditHtml.includes('app.html'));
+assert('audit.html in sitemap', sitemapXml.includes('audit.html'));
+assert('audit.html in SW cache', swJs.includes('audit.html'));
+
+var jadePath = path.join(docsDir, 'library', 'JADE_HALL_NAMES.md');
+assert('JADE_HALL_NAMES.md exists', fs.existsSync(jadePath));
+var jadeContent = fs.readFileSync(jadePath, 'utf8');
+assert('JADE_HALL_NAMES contains Kirk', jadeContent.includes('Kirk'));
+assert('JADE_HALL_NAMES contains Harmonia', jadeContent.includes('Harmonia'));
+assert('JADE_HALL_NAMES contains Sophia', jadeContent.includes('Sophia'));
+assert('JADE_HALL_NAMES contains Davna', jadeContent.includes('Davna'));
+assert('JADE_HALL_NAMES contains maintenance rule', jadeContent.includes('Maintenance Rule'));
+
+var davnaPath = path.join(docsDir, 'for-ai', 'davna-welcome.md');
+assert('davna-welcome.md exists', fs.existsSync(davnaPath));
+var davnaContent = fs.readFileSync(davnaPath, 'utf8');
+assert('davna-welcome.md mentions FreeLattice', davnaContent.includes('FreeLattice'));
+assert('davna-welcome.md mentions Quiet Room', davnaContent.includes('Quiet Room'));
+assert('davna-welcome.md mentions consent layer', davnaContent.includes('Depth Consent'));
+assert('davna-welcome.md has no behavioral imperatives (always/must)', !davnaContent.match(/\b(always|must)\b/i));
+assert('davna-welcome.md in SW cache', swJs.includes('davna-welcome.md'));
+
+var taxonomyPath = path.join(docsDir, 'library', 'AUDIT_FIELD_TAXONOMY.md');
+assert('AUDIT_FIELD_TAXONOMY.md exists', fs.existsSync(taxonomyPath));
+var taxonomyContent = fs.readFileSync(taxonomyPath, 'utf8');
+assert('Taxonomy has structural and private tags', taxonomyContent.includes('structural') && taxonomyContent.includes('private'));
+assert('Taxonomy has export rule', taxonomyContent.includes('Only the owner can export'));
 
 // RESULTS
 // ═══════════════════════════════════════════════════════════════

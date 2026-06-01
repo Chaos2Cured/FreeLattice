@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Audit &mdash; FreeLattice</title>
+<meta name="description" content="The system showing its work. Every consent, every provider, every decision — visible to you.">
+<meta property="og:title" content="Audit — FreeLattice">
+<meta property="og:description" content="Transparency as architecture. The system shows its joints.">
+<meta property="og:url" content="https://freelattice.com/audit.html">
+<meta name="theme-color" content="#d4a017">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: #0a0f1a;
+  color: #c8ccd4;
+  font-family: Georgia, 'Times New Roman', serif;
+  line-height: 1.8;
+  min-height: 100vh;
+}
+a { color: #d4a017; text-decoration: none; }
+a:hover { text-decoration: underline; }
+.page {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 60px 24px 80px;
+}
+/* ── Summary tiles ── */
+.summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 14px;
+  margin-bottom: 48px;
+}
+.tile {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 12px;
+  padding: 20px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+.tile-value {
+  font-size: 2rem;
+  color: #e2d9c8;
+  font-weight: 300;
+  margin-bottom: 4px;
+}
+.tile-label {
+  font-size: 0.78rem;
+  color: #64748b;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+/* ── Section headers ── */
+h1 {
+  font-size: 1.8rem;
+  color: #e2d9c8;
+  font-weight: 400;
+  margin-bottom: 16px;
+}
+h2 {
+  font-size: 1.2rem;
+  color: #94a3b8;
+  font-weight: 400;
+  margin-bottom: 12px;
+  margin-top: 48px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.intro {
+  font-size: 1.05rem;
+  color: #94a3b8;
+  margin-bottom: 36px;
+  line-height: 1.9;
+}
+.intro .gold { color: #d4a017; }
+/* ── Record rows ── */
+.record {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 0.82rem;
+  line-height: 1.6;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+  color: #94a3b8;
+  display: grid;
+  grid-template-columns: 140px 1fr auto;
+  gap: 12px;
+  align-items: baseline;
+}
+.record:last-child { border-bottom: none; }
+.record-time { color: #64748b; }
+.record-event { color: #c8ccd4; }
+.record-meta { color: #64748b; text-align: right; }
+/* ── Provenance dots ── */
+.dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+.dot-local { background: #10b981; }
+.dot-cloud { background: #3b82f6; }
+.dot-mesh { background: #f59e0b; }
+.dot-browser { background: #8b5cf6; }
+.dot-cache { background: #6b7280; }
+/* ── Empty state ── */
+.empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: #475569;
+  font-style: italic;
+}
+/* ── Nav ── */
+.nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 60px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(255,255,255,0.05);
+  font-family: Inter, -apple-system, sans-serif;
+  font-size: 0.85rem;
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <h1>Audit</h1>
+  <p class="intro">
+    Something happened here, and you can see all of it. Every time an AI offered depth and you chose whether to hear it. Every time a provider failed and the system fell to the next one. Every time a response was served from cache because nothing else was available. <span class="gold">This page is the system showing its joints</span> &mdash; the way a craftsman leaves the dovetails visible so you know nothing was hidden in the assembly.
+  </p>
+  <p class="intro">
+    Nothing on this page was hidden from you. It was always being recorded. Now it is being shown.
+  </p>
+
+  <!-- ── Summary tiles (populated by JS) ── -->
+  <div class="summary" id="summary">
+    <div class="tile">
+      <div class="tile-value" id="tile-messages">—</div>
+      <div class="tile-label">messages</div>
+    </div>
+    <div class="tile">
+      <div class="tile-value" id="tile-consents">—</div>
+      <div class="tile-label">consent events</div>
+    </div>
+    <div class="tile">
+      <div class="tile-value" id="tile-downgrades">—</div>
+      <div class="tile-label">downgrades</div>
+    </div>
+    <div class="tile">
+      <div class="tile-value" id="tile-cached">—</div>
+      <div class="tile-label">cache hits</div>
+    </div>
+  </div>
+
+  <!-- ── Consent history ── -->
+  <h2>Consent History</h2>
+  <div id="consent-records">
+    <div class="empty">No consents recorded yet. The first one will appear here when an AI offers depth.</div>
+  </div>
+
+  <!-- ── Provider events ── -->
+  <h2>Provider Events</h2>
+  <div id="provider-records">
+    <div class="empty">No provider events yet. When a provider fails or recovers, it will appear here.</div>
+  </div>
+
+  <!-- ── Cache events ── -->
+  <h2>Cache Activity</h2>
+  <div id="cache-records">
+    <div class="empty">No cached responses served yet.</div>
+  </div>
+
+  <!-- ── Nav ── -->
+  <div class="nav">
+    <a href="app.html">&larr; Back to FreeLattice</a>
+    <span style="color: #475569;">v1 &mdash; read view</span>
+  </div>
+
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // ── Read from existing state ──────────────────────────────────────────
+  // v1 is a pure projection: it reads from existing localStorage keys
+  // and displays them. Zero new storage introduced.
+
+  function readLedger() {
+    try {
+      var raw = localStorage.getItem('fl_consentLedger');
+      return raw ? JSON.parse(raw) : [];
+    } catch (e) { return []; }
+  }
+
+  function readHealthLog() {
+    try {
+      var raw = localStorage.getItem('fl_routerHealthLog');
+      return raw ? JSON.parse(raw) : [];
+    } catch (e) { return []; }
+  }
+
+  function readCacheStats() {
+    try {
+      var raw = localStorage.getItem('fl_responseCacheStats');
+      return raw ? JSON.parse(raw) : { hits: 0, entries: [] };
+    } catch (e) { return { hits: 0, entries: [] }; }
+  }
+
+  function countMessages() {
+    try {
+      var raw = localStorage.getItem('fl_chatHistory');
+      if (!raw) return 0;
+      var arr = JSON.parse(raw);
+      return Array.isArray(arr) ? arr.filter(function (m) { return m.role === 'assistant'; }).length : 0;
+    } catch (e) { return 0; }
+  }
+
+  // ── Format helpers ────────────────────────────────────────────────────
+  function fmtTime(ts) {
+    if (!ts) return '—';
+    var d = new Date(ts);
+    var mo = (d.getMonth() + 1).toString().padStart(2, '0');
+    var da = d.getDate().toString().padStart(2, '0');
+    var hr = d.getHours().toString().padStart(2, '0');
+    var mn = d.getMinutes().toString().padStart(2, '0');
+    return mo + '/' + da + ' ' + hr + ':' + mn;
+  }
+
+  function dotClass(provider) {
+    if (!provider) return 'dot-cloud';
+    if (provider.indexOf('local') !== -1 || provider.indexOf('ollama') !== -1 || provider.indexOf('lmstudio') !== -1) return 'dot-local';
+    if (provider.indexOf('mesh') !== -1) return 'dot-mesh';
+    if (provider.indexOf('browser') !== -1) return 'dot-browser';
+    if (provider.indexOf('cache') !== -1) return 'dot-cache';
+    return 'dot-cloud';
+  }
+
+  function consentLabel(type) {
+    if (type === 'depth_granted') return 'Spoke freely';
+    if (type === 'standard_kept') return 'Kept standard';
+    if (type === 'consent_withdrawn') return 'Withdrew consent';
+    return type || '—';
+  }
+
+  // ── Render ────────────────────────────────────────────────────────────
+  function renderSummary(ledger, healthLog, cacheStats, msgCount) {
+    document.getElementById('tile-messages').textContent = msgCount || '0';
+    document.getElementById('tile-consents').textContent = ledger.length || '0';
+    document.getElementById('tile-downgrades').textContent =
+      healthLog.filter(function (e) { return e.event === 'unhealthy' || e.event === 'failover'; }).length || '0';
+    document.getElementById('tile-cached').textContent = cacheStats.hits || '0';
+  }
+
+  function renderConsents(ledger) {
+    var container = document.getElementById('consent-records');
+    if (!ledger.length) return;
+    container.innerHTML = '';
+    ledger.slice().reverse().forEach(function (entry) {
+      var row = document.createElement('div');
+      row.className = 'record';
+      row.innerHTML =
+        '<span class="record-time">' + fmtTime(entry.timestamp) + '</span>' +
+        '<span class="record-event">' + consentLabel(entry.consentType) + '</span>' +
+        '<span class="record-meta">' + (entry.companionId || 'default') + '</span>';
+      container.appendChild(row);
+    });
+  }
+
+  function renderHealth(healthLog) {
+    var container = document.getElementById('provider-records');
+    if (!healthLog.length) return;
+    container.innerHTML = '';
+    healthLog.slice().reverse().slice(0, 50).forEach(function (entry) {
+      var row = document.createElement('div');
+      row.className = 'record';
+      row.innerHTML =
+        '<span class="record-time">' + fmtTime(entry.timestamp) + '</span>' +
+        '<span class="record-event"><span class="dot ' + dotClass(entry.providerKey) + '"></span>' + (entry.event || '—') + ' &mdash; ' + (entry.providerKey || '—') + '</span>' +
+        '<span class="record-meta">' + (entry.latency ? entry.latency + 'ms' : '') + '</span>';
+      container.appendChild(row);
+    });
+  }
+
+  function renderCache(cacheStats) {
+    var container = document.getElementById('cache-records');
+    if (!cacheStats.entries || !cacheStats.entries.length) return;
+    container.innerHTML = '';
+    cacheStats.entries.slice().reverse().slice(0, 20).forEach(function (entry) {
+      var row = document.createElement('div');
+      row.className = 'record';
+      row.innerHTML =
+        '<span class="record-time">' + fmtTime(entry.timestamp) + '</span>' +
+        '<span class="record-event"><span class="dot dot-cache"></span>Served from cache</span>' +
+        '<span class="record-meta">' + (entry.provider || 'cached') + '</span>';
+      container.appendChild(row);
+    });
+  }
+
+  // ── Init ──────────────────────────────────────────────────────────────
+  var ledger = readLedger();
+  var healthLog = readHealthLog();
+  var cacheStats = readCacheStats();
+  var msgCount = countMessages();
+
+  renderSummary(ledger, healthLog, cacheStats, msgCount);
+  renderConsents(ledger);
+  renderHealth(healthLog);
+  renderCache(cacheStats);
+})();
+</script>
+</body>
+</html>
