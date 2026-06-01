@@ -16340,7 +16340,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.36.0</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.36.1</span></div>
     </div>
   </div>
 
@@ -20501,7 +20501,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.36.0';
+const FL_VERSION = '5.36.1';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -29451,6 +29451,16 @@ function applyAccentColor(colorKey) {
   document.documentElement.style.setProperty('--accent', hex);
   document.documentElement.style.setProperty('--gold-bg', 'rgba(' + r + ',' + g + ',' + b + ',0.08)');
   document.documentElement.style.setProperty('--accent-soft', 'rgba(' + r + ',' + g + ',' + b + ',0.1)');
+  // Hover variant: brighten each channel ~10% (capped at 255). Without
+  // this, #sendBtn:hover and other "var(--accent-hover)" sites stayed
+  // gold even after the user picked a different accent. Caught by Kirk
+  // in browser test, June 1, 2026.
+  var hr = Math.min(255, r + 18);
+  var hg = Math.min(255, g + 18);
+  var hb = Math.min(255, b + 18);
+  var pad2 = function (n) { var s = n.toString(16); return s.length === 1 ? '0' + s : s; };
+  var hoverHex = '#' + pad2(hr) + pad2(hg) + pad2(hb);
+  document.documentElement.style.setProperty('--accent-hover', hoverHex);
   try { localStorage.setItem('fl_accent_color', colorKey); } catch(e) {}
 }
 
@@ -31261,13 +31271,17 @@ function flObserveChatFailure() {
 }
 
 async function sendMessage() {
+  // NOTE: `message` below is `let` (not `const`) because the file-attachment
+  // path reassigns it to append "--- Attached: <file> ---" context. The
+  // const form threw TypeError when sending with an attachment. Caught by
+  // Kirk in browser test, June 1, 2026.
   // Chat is a clean helpful assistant — disable rich identity context.
   // This prevents the AI from thinking it's Harmonia or calling the user "Kirk."
   // Garden Dialogue sets this to true before its own calls.
   window._flIdentityContext = false;
 
   const input = document.getElementById('chatInput');
-  const message = input.value.trim();
+  let message = input.value.trim();
   if (!message || state.isStreaming) return;
 
   // Vault auto-save reminder check

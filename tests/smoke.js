@@ -1729,6 +1729,12 @@ var drt = fs.existsSync(drtPath) ? fs.readFileSync(drtPath, 'utf8') : '';
 assert('Davna test doc walks discover → chat → provenance → audit',
   drt.includes('discovery') && drt.includes('provenance') && drt.includes('Audit page'));
 
+// Browser-found bugs (June 1, 2026)
+assert('Chat sendMessage uses `let message` (attachment reassignment safe)',
+  /async function sendMessage\(\)\s*\{[\s\S]{0,800}let\s+message\s*=\s*input\.value\.trim\(\)/.test(appHtml));
+assert('applyAccentColor also sets --accent-hover (Send button hover matches user accent)',
+  appHtml.includes("setProperty('--accent-hover'") && appHtml.includes('hoverHex'));
+
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
 
