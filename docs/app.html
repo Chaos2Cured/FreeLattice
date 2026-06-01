@@ -16296,7 +16296,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.32.0</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.33.0</span></div>
     </div>
   </div>
 
@@ -20457,7 +20457,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.32.0';
+const FL_VERSION = '5.33.0';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -25365,7 +25365,8 @@ const FlTabs = (function() {
       { id: 'settings', icon: '&#x2699;', label: 'Settings', desc: 'AI connection, accent color, vault.' },
       { id: 'wallet', icon: '&#x1F4B0;', label: 'Wallet', desc: 'Your LP, rank, and ledger.' },
       { id: 'forever-stack', icon: '\u26A1', label: 'Get Connected', desc: 'Set up your local AI.' },
-      { id: '_lattice-wallet', icon: '&#x1F3E6;', label: 'External Wallet', desc: 'Standalone wallet page.', external: 'wallet.html' }
+      { id: '_lattice-wallet', icon: '&#x1F3E6;', label: 'External Wallet', desc: 'Standalone wallet page.', external: 'wallet.html' },
+      { id: '_audit', icon: '&#x1F50D;', label: 'Your Audit', desc: 'Consent ledger + provenance history. Local, signed, yours.', external: 'audit.html' }
     ]}
   ];
 
@@ -31137,6 +31138,20 @@ function flStampChatResponse(textSpan, userMessage, responseText, latencyMs) {
   try { window._lastProvenance = prov; } catch (e) {}
   try { if (window.InferenceRouter && InferenceRouter.observe) InferenceRouter.observe(p, latencyMs, true); } catch (e) {}
   try { if (window.ResponseCache && responseText) ResponseCache.store(userMessage, responseText, prov); } catch (e) {}
+  // Provenance ledger: ring buffer of last 200 stamps in localStorage.
+  // Metadata only — no prompt or response text. Read by the standalone
+  // /audit page so the user can see what answered each message, how
+  // fast, and whether it was cached.
+  try {
+    var _flPL = JSON.parse(localStorage.getItem('fl_provenanceLedger') || '[]');
+    if (!Array.isArray(_flPL)) _flPL = [];
+    _flPL.push({
+      t: Date.now(), p: prov.provider, m: prov.model, f: prov.format,
+      ms: prov.latency_ms, c: prov.cached ? 1 : 0, local: prov.isLocal ? 1 : 0
+    });
+    if (_flPL.length > 200) _flPL = _flPL.slice(-200);
+    localStorage.setItem('fl_provenanceLedger', JSON.stringify(_flPL));
+  } catch (e) {}
   try {
     var div = textSpan && textSpan.closest ? textSpan.closest('.chat-message') : (textSpan ? textSpan.parentElement : null);
     if (div) flRenderProvenanceChip(div, prov);

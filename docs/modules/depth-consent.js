@@ -65,10 +65,15 @@
 
   function parseMarker(text) {
     if (!text) return { clean: text || '', hasDepth: false };
-    var idx = text.indexOf(DEPTH_MARKER);
-    if (idx === -1) return { clean: text, hasDepth: false };
-    var clean = (text.slice(0, idx) + text.slice(idx + DEPTH_MARKER.length)).replace(/\s+$/g, '');
-    return { clean: clean, hasDepth: true };
+    // Positional check: the sentinel only counts as a depth offer when
+    // it is the LAST non-whitespace content of the response. Mid-paragraph
+    // mentions — e.g. the AI explaining how the depth system itself works
+    // in a meta-conversation about FreeLattice — must NOT trigger the
+    // chip. Defense against sentinel echo / spoof.
+    var trailing = /^([\s\S]*?)\s*\[DEPTH_AVAILABLE\]\s*$/;
+    var m = trailing.exec(text);
+    if (m) return { clean: m[1].replace(/\s+$/g, ''), hasDepth: true };
+    return { clean: text, hasDepth: false };
   }
 
   // ── Identity / wallet / trust accessors (defensive) ─────────────────────

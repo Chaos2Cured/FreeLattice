@@ -1505,6 +1505,50 @@ assert('SEED rule: Depth is offered, never imposed',
 // Concept doc lives at the canonical path
 assert('CONSENT_LAYER_CONCEPT.md saved', fs.existsSync(path.join(docsDir,'library','CONSENT_LAYER_CONCEPT.md')));
 
+// ═══════════════════════════════════════════════════════════════
+section('72. Audit page + sentinel hardening + provenance ledger (v5.33.0)');
+
+// Audit page exists and is self-contained
+var auditPath = path.join(docsDir, 'audit.html');
+assert('docs/audit.html exists', fs.existsSync(auditPath));
+var auditHtml = fs.existsSync(auditPath) ? fs.readFileSync(auditPath, 'utf8') : '';
+assert('Audit page title', auditHtml.includes('<title>Your Audit'));
+assert('Audit page renders SEED consent rule',
+  auditHtml.includes('Depth is offered, never imposed'));
+assert('Audit page reads consent ledger from localStorage',
+  auditHtml.includes("'fl_consentLedger'"));
+assert('Audit page reads provenance ledger from localStorage',
+  auditHtml.includes("'fl_provenanceLedger'"));
+assert('Audit page surfaces consent ledger section', auditHtml.includes('Consent ledger'));
+assert('Audit page surfaces provenance history section', auditHtml.includes('Provenance history'));
+assert('Audit page surfaces provider health section', auditHtml.includes('Provider health'));
+assert('Audit page exposes Export action', auditHtml.includes('exportLedger') && auditHtml.includes('freelattice-audit-'));
+assert('Audit page exposes Clear consent action', auditHtml.includes('clearConsent') && auditHtml.includes("removeItem('fl_consentLedger')"));
+assert('Audit page exposes Clear provenance action', auditHtml.includes('clearProv') && auditHtml.includes("removeItem('fl_provenanceLedger')"));
+assert('Audit page privacy-by-default footer (hashes-only language)',
+  auditHtml.includes('sha256') && auditHtml.includes('never the original text'));
+assert('Audit page back-link to app', auditHtml.includes('href="app.html"'));
+assert('Audit page is in SW APP_SHELL', swJs.includes("'./audit.html'"));
+assert('Audit page reachable from More dropdown',
+  appHtml.includes("external: 'audit.html'"));
+
+// Provenance ledger write site
+assert('flStampChatResponse writes fl_provenanceLedger',
+  appHtml.includes("'fl_provenanceLedger'") && appHtml.includes('_flPL.push'));
+assert('Provenance ledger is a ring buffer (max 200)',
+  appHtml.includes('_flPL.length > 200'));
+assert('Provenance ledger entries are metadata-only',
+  // must NOT include user/response text fields
+  !/_flPL\.push\([^)]*responseText/.test(appHtml));
+
+// Sentinel hardening — positional check
+var depthJs = fs.readFileSync(path.join(docsDir,'modules','depth-consent.js'),'utf8');
+assert('parseMarker uses anchored regex (sentinel at end-of-response only)',
+  /trailing\s*=\s*\/\^.*\\\[DEPTH_AVAILABLE\\\]\\s\*\$\//.test(depthJs) ||
+  depthJs.includes('[DEPTH_AVAILABLE]\\s*$'));
+assert('parseMarker has spoof-defense comment',
+  depthJs.includes('Mid-paragraph') || depthJs.includes('spoof') || depthJs.includes('echo'));
+
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
 
