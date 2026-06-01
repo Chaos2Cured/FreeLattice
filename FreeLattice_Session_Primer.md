@@ -348,10 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-06-01 12:29 MDT
-- Version: 5.36.0
-- Total commits: 2116
+- Last auto-updated: 2026-06-01 15:18 MDT
+- Version: 5.36.1
+- Total commits: 2118
 - Last 10 commits:
+- 87ab9c1 fix: chat-with-attachment + Send button hover accent (v5.36.1)
+- fb24ea4 docs: Auto-update Session Primer [5.36.0]
 - 448ee0b feat: Chat shimmer + landing link + browser/settings/Davna deliverables (v5.36.0)
 - 9551763 ci: Update Primer deployment state [2026-06-01]
 - eb8f026 Merge remote-tracking branch 'origin/main'
@@ -360,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 62bf28a ci: Update Primer deployment state [2026-06-01]
 - 749c5e5 docs: Auto-update Session Primer [5.34.0]
 - a840d6e test: fix smoke regex — id comes before label in MORE_CARDS object
-- 42d442d docs: Auto-update Session Primer [5.34.0]
-- a86e0e5 Merge remote-tracking branch 'origin/main'
