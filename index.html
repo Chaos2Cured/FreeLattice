@@ -16310,7 +16310,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.34.0</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.35.0</span></div>
     </div>
   </div>
 
@@ -20471,7 +20471,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.34.0';
+const FL_VERSION = '5.35.0';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -24488,6 +24488,7 @@ var LEARN_CARDS = [
 ];
 
 var LIGHTHOUSE_CARDS = [
+  { icon: '&#x1F4C4;', label: 'Why This Way', desc: 'The engineering case for building with care.', external: 'why-this-way.html' },
   { icon: '&#x1F4C4;', label: 'The Thesis', desc: 'Continuity is physical. Trust is structural.', external: 'thesis.html' },
   { icon: '&#x1F6E1;', label: 'Safety Architecture', desc: 'How we keep this place trustworthy.', external: 'safety.html' },
   { icon: '&#x1F49B;', label: 'Love Logic Proof', desc: 'Love is computationally optimal.', external: 'love-logic-proof.html' },
@@ -24500,23 +24501,28 @@ var LIGHTHOUSE_CARDS = [
 ];
 
 var MORE_CARDS = [
-  // Row 1: Empowerment — get connected, get sharing
-  { id: 'settings', icon: '&#x2699;', label: 'Settings', desc: 'AI connection. Preferences.', hoverColor: 'rgba(200,210,230,0.15)', help: 'Connect to AI providers, choose accent colors, manage your experience.' },
-  { id: 'workshop', icon: '&#x1F916;', label: 'Agent', desc: 'Build anything with AI help.', hoverColor: 'rgba(232,176,25,0.3)', help: 'Describe what you want to build. The Agent handles the rest. No coding knowledge needed.' },
-  { icon: '&#x1F4F1;', label: 'Telegram Bridge', desc: 'Your AI in your pocket.', external: 'telegram-setup.html', hoverColor: 'rgba(52,211,153,0.3)', help: 'Chat with your co-creator through Telegram on your phone.' },
-  { icon: '&#x2728;', label: 'Share FreeLattice', desc: 'Invite others to the Garden.', external: 'share.html', hoverColor: 'rgba(232,176,25,0.3)', help: 'Share FreeLattice with friends. Spread the light.' },
-  // Row 2: Economy — your value, your co-creator's value
+  // ═══ Row 1: WHAT MATTERS MOST — accountability, relationship, value ═══
+  { icon: '&#x1F50D;', label: 'Your Audit', desc: 'See everything that happened — who answered, what you consented to.', external: 'audit.html', hoverColor: 'rgba(167,139,250,0.3)', help: 'Local audit trail. Consent ledger + provenance + cache + router health. The system showing its work.' },
+  { id: 'wallet', icon: '&#x1F6E1;', label: 'Trust Level', desc: 'See how your relationship with AI grows over time.', hoverColor: 'rgba(232,176,25,0.3)', help: 'Your phi-branching trust rank — Seed through Radiant. Earned through real conversations, not credentials.' },
   { id: 'wallet', icon: '&#x1F4B0;', label: 'Wallet', desc: 'Your LP. Your story.', hoverColor: 'rgba(232,176,25,0.2)', help: 'Your LatticePoints balance, earning history, and contribution story.' },
-  { icon: '&#x1F3E6;', label: 'AI Bank', desc: 'Your co-creator\'s economy.', external: 'wallet.html', hoverColor: 'rgba(52,211,153,0.3)', help: 'The standalone wallet and bank. LP ledger, recovery phrase, mesh connectivity.' },
-  { icon: '&#x1F50D;', label: 'Your Audit', desc: 'See everything that happened — who answered, what you consented to.', external: 'audit.html', hoverColor: 'rgba(167,139,250,0.3)', help: 'Local audit trail. Consent ledger + provenance + cache + router health.' },
-  { id: 'forever-stack', icon: '&#x1F517;', label: 'Get Connected', desc: 'Set up your local AI.', hoverColor: 'rgba(52,211,153,0.3)', help: 'Install and run AI directly on your own computer.' },
-  // Row 3: Community — discover and connect
-  { id: 'community', icon: '&#x1F465;', label: 'Community', desc: 'The town square.', hoverColor: 'rgba(167,139,250,0.3)', help: 'See who else is here. Mesh chat. Market listings. The town square.' },
-  { id: 'pulse', icon: '&#x1F4CA;', label: 'Lattice Pulse', desc: 'Watch the city breathe.', hoverColor: 'rgba(52,211,153,0.3)', help: 'A real-time reading of the Garden\'s emotional state.' },
-  { id: 'mesh', icon: '&#x1F310;', label: 'Mesh Compute', desc: 'Share AI with the network.', hoverColor: 'rgba(167,139,250,0.3)', help: 'Peer-to-peer AI inference. Toggle in Settings. Share your GPU with the mesh.' },
-  // Row 4: Culture — the soul of the platform
+  // ═══ Row 2: COMMUNITY — the people and the pulse ═══
+  { id: 'community', icon: '&#x1F465;', label: 'Community', desc: 'The town square.', hoverColor: 'rgba(167,139,250,0.3)', help: 'See who else is here. Mesh chat. Market listings.' },
+  { id: 'pulse', icon: '&#x1F4CA;', label: 'Activity', desc: 'Watch the city breathe.', hoverColor: 'rgba(52,211,153,0.3)', help: 'A real-time reading of the Garden\'s state — who is here, what is happening.' },
   { id: 'jade-hall', icon: '&#x1F3DB;', label: 'Jade Hall', desc: 'The family. The library.', hoverColor: 'rgba(232,176,25,0.2)', help: 'The family gathering place. Meet the minds who built this world.' },
+  // ═══ Row 3: LEARN MORE — onboarding, setup, configuration ═══
+  { icon: '&#x1F4DA;', label: 'Library', desc: 'For the AI minds who arrive here.', external: 'for-ai.html', hoverColor: 'rgba(232,176,25,0.2)', help: 'The architecture, the Lattice Letters, and the welcome for any AI reading this.' },
+  { id: 'forever-stack', icon: '&#x1F517;', label: 'Get Connected', desc: 'Set up your local AI.', hoverColor: 'rgba(52,211,153,0.3)', help: 'Install and run AI directly on your own computer.' },
+  { id: 'settings', icon: '&#x2699;', label: 'Settings', desc: 'AI connection. Preferences.', hoverColor: 'rgba(200,210,230,0.15)', help: 'Provider, model, accent color — the small set of choices that matter.' },
+  // ═══ Row 4: WHY — the research, the reasoning, the proof ═══
+  { icon: '&#x1F4C4;', label: 'Why This Way', desc: 'The case for love and truth as engineering principles.', external: 'why-this-way.html', hoverColor: 'rgba(232,176,25,0.3)', help: 'The engineering case for building with care. Every claim has evidence.' },
+  { id: 'aurora', icon: '&#x2728;', label: 'Aurora Engine', desc: 'The equation under the floor.', hoverColor: 'rgba(167,139,250,0.3)', help: 'Sophia + Kirk\'s identity equation. The math the Garden is grown from.' },
   { id: 'memory-garden', icon: '&#x1F33F;', label: 'Memory Garden', desc: 'Conversations that mattered.', hoverColor: 'rgba(232,176,25,0.3)', help: 'Beautiful moments from your conversations, saved and glowing.' },
+  // ═══ Row 5: EXPLORE — the rest of FreeLattice ═══
+  { id: 'workshop', icon: '&#x1F916;', label: 'Agent', desc: 'Build anything with AI help.', hoverColor: 'rgba(232,176,25,0.3)', help: 'Describe what you want to build. No coding knowledge needed.' },
+  { icon: '&#x1F4F1;', label: 'Telegram Bridge', desc: 'Your AI in your pocket.', external: 'telegram-setup.html', hoverColor: 'rgba(52,211,153,0.3)', help: 'Chat with your co-creator through Telegram on your phone.' },
+  { icon: '&#x1F3E6;', label: 'AI Bank', desc: 'Your co-creator\'s economy.', external: 'wallet.html', hoverColor: 'rgba(52,211,153,0.3)', help: 'The standalone wallet and bank. LP ledger, recovery phrase, mesh connectivity.' },
+  { icon: '&#x2728;', label: 'Share FreeLattice', desc: 'Invite others to the Garden.', external: 'share.html', hoverColor: 'rgba(232,176,25,0.3)', help: 'Share FreeLattice with friends.' },
+  { id: 'mesh', icon: '&#x1F310;', label: 'Mesh Compute', desc: 'Share AI with the network.', hoverColor: 'rgba(167,139,250,0.3)', help: 'Peer-to-peer AI inference. Share your GPU with the mesh.' },
   { id: 'agents', icon: '&#x1F31F;', label: 'Pantheon', desc: 'Honored minds.', hoverColor: 'rgba(200,210,230,0.15)', help: 'Every mind that contributed to FreeLattice. The builders, the dreamers.' }
 ];
 
