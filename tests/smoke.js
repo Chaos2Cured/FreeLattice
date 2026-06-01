@@ -1567,7 +1567,7 @@ assert('Audit card uses lavender hover (per Opus brief)',
 assert('Settings Zone 1 has audit-trail link',
   /See your full audit trail/.test(appHtml) && /href=['"]audit\.html['"]/.test(appHtml));
 assert('Mesh Compute id collision fixed (was id:settings)',
-  /label:\s*'Mesh Compute'[\s\S]{0,200}id:\s*'mesh'/.test(appHtml));
+  /id:\s*'mesh'[\s\S]{0,200}label:\s*'Mesh Compute'/.test(appHtml));
 
 // Fix 2: Settings zones — visual hierarchy applied
 assert('Settings zones use fl-zone-h class',
