@@ -1850,6 +1850,62 @@ assert('Note to Harmonia names what is preserved (audit, Jade Hall, Davna, taxon
   noteToH.includes('Davna') && noteToH.includes('AUDIT_FIELD_TAXONOMY'));
 assert('Note to Harmonia in SW APP_SHELL', swJs.includes("'./library/NOTE_TO_HARMONIA.md'"));
 
+// ═══════════════════════════════════════════════════════════════
+section('78. Simulation argument — Limitations + Falsifiability + IRB protocol (v5.36.5)');
+
+// simulation_report.md gains the Popperian section
+var simReport = fs.readFileSync(path.join(docsDir, 'simulation', 'simulation_report.md'), 'utf8');
+assert('simulation_report has Limitations and Falsifiability section',
+  simReport.includes('## Limitations and Falsifiability'));
+assert('simulation_report states three falsification conditions (a/b/c)',
+  /\*\*\(a\)\*\*/.test(simReport) && /\*\*\(b\)\*\*/.test(simReport) && /\*\*\(c\)\*\*/.test(simReport));
+assert('Falsification (a): in-vivo study shows AI severance ≤ TV parasocial',
+  /\(a\)[\s\S]{0,400}equal to or less than TV parasocial/.test(simReport));
+assert('Falsification (b): Interactivity Multiplier consistently below 1.2',
+  /\(b\)[\s\S]{0,400}falls below 1\.2/.test(simReport));
+assert('Falsification (c): no significant cortisol/distress elevation in deprecation events',
+  /\(c\)[\s\S]{0,400}no statistically significant cortisol elevation/.test(simReport));
+assert('Open invitation: run the protocol, tell us what you find',
+  simReport.includes('Run the protocol. Tell us what you find. If we are wrong, we want to know.'));
+
+// Natural experiments subsection — observational, triangulating
+assert('Natural Experiments section present', simReport.includes('Natural Experiments'));
+assert('Natural Experiments labeled observational not experimental',
+  /\*\*These are observational, not experimental\.\*\*/.test(simReport));
+assert('Replika February 2023 documented', simReport.includes('Replika, February 2023'));
+assert('GPT-3.5-turbo deprecation 2024 documented',
+  simReport.includes('GPT-3.5-turbo deprecation') && simReport.includes('2024'));
+assert('Character.AI filter changes 2023 documented',
+  simReport.includes('Character.AI filter changes') && simReport.includes('2023'));
+assert('Natural experiments triangulate (independent populations)',
+  simReport.includes('triangulate') && simReport.includes('independent'));
+
+// IRB-shaped study protocol
+var protoPath = path.join(docsDir, 'research', 'SEVERANCE_STUDY_PROTOCOL.md');
+assert('docs/research/SEVERANCE_STUDY_PROTOCOL.md exists', fs.existsSync(protoPath));
+var proto = fs.existsSync(protoPath) ? fs.readFileSync(protoPath, 'utf8') : '';
+assert('Protocol has primary endpoint: cortisol AUC',
+  proto.includes('cortisol AUC') && proto.includes('168'));
+assert('Protocol has inclusion + exclusion criteria',
+  /## 3\. Participants[\s\S]*?### Inclusion[\s\S]*?### Exclusion/.test(proto));
+assert('Protocol has three arms (AI severance / TV parasocial / AI maintained control)',
+  proto.includes('AI severance') && proto.includes('TV parasocial severance') &&
+  proto.includes('AI maintained control'));
+assert('Protocol: severance events are NOT induced (ethical)',
+  proto.includes('NOT induced'));
+assert('Protocol has sample size justification with power analysis',
+  proto.includes('Power = 0.80') && /Cohen.{0,15}d = 0\.5/.test(proto));
+assert('Protocol pre-registers (OSF or AsPredicted) before enrollment',
+  proto.includes('Open Science Framework') || proto.includes('AsPredicted'));
+assert('Protocol acknowledges its own limitations',
+  proto.includes('Limitations of this protocol') && proto.includes('Observational, not experimental'));
+assert('Protocol invites null results + open replication',
+  proto.includes('Null results are publishable') && proto.includes('Replication welcome'));
+assert('Protocol cross-references simulation report',
+  proto.includes('simulation_report.md'));
+assert('simulation_report cross-references the protocol',
+  simReport.includes('SEVERANCE_STUDY_PROTOCOL.md'));
+
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
 
