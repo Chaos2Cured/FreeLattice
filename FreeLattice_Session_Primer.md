@@ -348,10 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-06-02 13:54 MDT
+- Last auto-updated: 2026-06-02 13:55 MDT
 - Version: 5.37.1
-- Total commits: 2156
+- Total commits: 2158
 - Last 10 commits:
+- fff9b6b test: widen togglePromote→resize regex window
+- 00f18e5 docs: Auto-update Session Primer [5.37.1]
 - 92e412f test: loosen tgClearComposed regex window
 - 036f729 Merge remote-tracking branch 'origin/main'
 - 04f8220 docs: Auto-update Session Primer [5.37.1]
@@ -360,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 3446b78 docs: Auto-update Session Primer [5.37.0]
 - a58d05c feat: Temperature Gauge composable main chart (v5.37.0)
 - f36da55 docs: Auto-update Session Primer [5.36.5]
-- 955ffc3 docs: track Kirk.md + NOTE_TO_HARMONIA.md (were created but not added)
-- ae04cac docs: Auto-update Session Primer [5.36.5]
