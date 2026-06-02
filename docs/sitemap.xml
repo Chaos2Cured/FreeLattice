@@ -146,6 +146,11 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://freelattice.com/research.html</loc>
+    <lastmod>2026-06-01</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://freelattice.com/for-ai/davna-welcome.md</loc>
     <lastmod>2026-06-01</lastmod>
     <priority>0.6</priority>
