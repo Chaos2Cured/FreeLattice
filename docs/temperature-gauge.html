@@ -267,6 +267,71 @@ body {
 canvas#mainChart { width: 100% !important; height: 100% !important; max-height: 400px; cursor: grab; }
 canvas#mainChart:active { cursor: grabbing; }
 
+/* ─── Luminos sprites (subtle ambient life — Kirk's request) ─────── */
+.tg-luminos-layer {
+  position: absolute; inset: 0;
+  pointer-events: none; overflow: hidden;
+  z-index: 1; /* below canvases but above background */
+}
+.tg-luminos {
+  position: absolute;
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: radial-gradient(circle, currentColor 0%, transparent 70%);
+  filter: blur(0.5px);
+  opacity: 0;
+}
+.tg-luminos[data-i="0"] { color: #e8b019; animation: tg-lum-1 22s linear infinite; }
+.tg-luminos[data-i="1"] { color: #a78bfa; animation: tg-lum-2 31s linear infinite 4s; }
+.tg-luminos[data-i="2"] { color: #34d399; animation: tg-lum-3 27s linear infinite 11s; }
+@keyframes tg-lum-1 {
+  0%   { left: -2%;  top: 60%; opacity: 0; transform: scale(0.6); }
+  10%  { opacity: 0.55; }
+  35%  { left: 40%; top: 18%; opacity: 0.8;  transform: scale(1.0); }
+  60%  { left: 70%; top: 70%; opacity: 0.55; transform: scale(0.8); }
+  90%  { opacity: 0.35; }
+  100% { left: 105%; top: 30%; opacity: 0; transform: scale(0.5); }
+}
+@keyframes tg-lum-2 {
+  0%   { left: 102%; top: 22%; opacity: 0; transform: scale(0.7); }
+  15%  { opacity: 0.45; }
+  45%  { left: 55%; top: 75%; opacity: 0.7;  transform: scale(1.1); }
+  75%  { left: 25%; top: 35%; opacity: 0.55; transform: scale(0.9); }
+  100% { left: -5%;  top: 60%; opacity: 0; transform: scale(0.6); }
+}
+@keyframes tg-lum-3 {
+  0%   { left: 30%; top: -5%;  opacity: 0; transform: scale(0.5); }
+  20%  { opacity: 0.5; }
+  50%  { left: 80%; top: 50%; opacity: 0.75; transform: scale(1.0); }
+  80%  { left: 15%; top: 85%; opacity: 0.45; transform: scale(0.8); }
+  100% { left: 50%; top: 105%; opacity: 0; transform: scale(0.5); }
+}
+
+/* ─── Hover shimmer on sub-chart labels + pills ───────────────────── */
+.sub-chart-label {
+  transition: background 0.25s ease, box-shadow 0.25s ease, transform 0.18s ease;
+  border-radius: 6px;
+  padding: 2px 6px;
+}
+.sub-chart-label:hover {
+  background: linear-gradient(90deg, rgba(232,176,25,0.06), rgba(167,139,250,0.06));
+  box-shadow: inset 0 0 0 1px rgba(232,176,25,0.18), 0 0 12px -2px rgba(232,176,25,0.25);
+}
+.sub-chart-label .sc-name {
+  transition: text-shadow 0.25s ease;
+}
+.sub-chart-label:hover .sc-name {
+  text-shadow: 0 0 8px currentColor;
+}
+.tg-compose-pill {
+  transition: transform 0.18s ease, box-shadow 0.25s ease, background 0.2s ease;
+}
+.tg-compose-pill:hover {
+  transform: translateY(-1px) scale(1.04);
+  box-shadow: 0 0 14px -2px currentColor;
+  background: rgba(20,18,40,0.85);
+}
+
 /* Fullscreen panel — true 100vh + fixed (Bug 5) */
 .tg-fullscreen-panel {
   position: fixed !important;
@@ -469,6 +534,9 @@ body.tg-mode-compose .sub-chart-label[data-promoted="1"] .sc-btn.sc-promote { co
 .sub-chart-label .sc-color::-moz-color-swatch { border: none; border-radius: 2px; }
 canvas.sub-canvas { width: 100% !important; height: 90px !important; }
 canvas.sub-canvas.custom { height: 80px !important; }
+/* When a wrap is maximized, the canvas inside is allowed to grow with it. */
+.sub-chart-wrap[data-maximized="true"] canvas.sub-canvas { height: calc(100% - 28px) !important; min-height: 120px !important; }
+.sub-chart-wrap.tg-fullscreen-panel canvas.sub-canvas { height: calc(100% - 60px) !important; min-height: 60vh !important; }
 #hiddenPanelsLink {
   padding: 5px 10px;
   font-size: 0.65rem;
@@ -706,6 +774,12 @@ canvas.sub-canvas.custom { height: 80px !important; }
     </div>
 
     <div class="chart-canvas-wrap" id="chartWrap">
+      <!-- Ambient luminos sprites — drift across the chart area, very subtle, never block clicks -->
+      <div class="tg-luminos-layer" aria-hidden="true">
+        <span class="tg-luminos" data-i="0"></span>
+        <span class="tg-luminos" data-i="1"></span>
+        <span class="tg-luminos" data-i="2"></span>
+      </div>
       <div class="empty-state" id="emptyState">
         <div class="empty-icon">📊</div>
         <div class="empty-title">Temperature Gauge</div>
@@ -2023,13 +2097,18 @@ function renderChart(candles, a) {
       wrap = document.createElement('div');
       wrap.id = 'customWrap' + idx;
       wrap.className = 'sub-chart-wrap custom';
-      wrap.innerHTML = '<div class="sub-chart-label" style="color:' + custom.color + ';">' +
+      wrap.innerHTML = '<div class="sub-chart-label" data-indicator="custom-' + idx + '" style="color:' + custom.color + ';">' +
         '<button type="button" onclick="toggleSubPanel(this)" class="sc-btn" title="Collapse" aria-label="Collapse panel">\u25be</button>' +
         '<span class="sc-name">' + custom.label.substring(0, 20).replace(/</g,'&lt;') + '</span>' +
+        '<button type="button" onclick="togglePromote(\'custom-' + idx + '\')" class="sc-btn sc-promote" title="Promote / demote to main canvas (compose mode)" aria-label="Promote to main canvas">\u2b06</button>' +
         '<button type="button" onclick="maximizeSubPanel(\'' + canvasId + '\')" class="sc-btn" title="Maximize / restore" aria-label="Maximize panel">\u25a1</button>' +
         '<button type="button" onclick="removeCustomIndicator(' + idx + ')" class="sc-btn" title="Remove indicator" aria-label="Remove indicator">\u2715</button>' +
         '</div>' +
         '<canvas id="' + canvasId + '" height="80" class="sub-canvas custom"></canvas>';
+      // Register this custom indicator in the compose registry so it can be promoted.
+      if (typeof window.tgRegisterCustomIndicator === 'function') {
+        window.tgRegisterCustomIndicator('custom-' + idx, custom.label, custom.color, canvasId, custom.expr);
+      }
       document.getElementById('subCharts').appendChild(wrap);
     }
     var values = evaluateCustom(custom.expression, candles, {
@@ -3506,6 +3585,59 @@ hideLoading = function() {
   window.tgGetChartMode = getMode;
   window.tgGetComposeState = getComposeState;
   window.tgGetIndicatorStyle = function (id) { return { brightness: getBrightness(id), glow: getGlow(id) }; };
+
+  // ─── Custom indicator registration ───────────────────────────────
+  // The chat / Custom Indicator UI calls this when it creates a custom
+  // sub-chart so the compose system can promote/demote it like any
+  // built-in indicator. The data is pulled live from the rendered
+  // Chart.js instance (window._customChartN) so we don't have to
+  // re-evaluate the expression.
+  window.tgRegisterCustomIndicator = function (id, label, color, canvasId, expr) {
+    if (!id) return;
+    INDICATOR_REGISTRY[id] = {
+      label: (label || 'Custom').slice(0, 24),
+      defaultColor: color || '#a78bfa',
+      canvas: canvasId || null,
+      custom: true,
+      expr: expr || '',
+      getData: function (a, c) {
+        // Pull live data from the rendered custom-chart instance if available.
+        try {
+          var inst = window.Chart && Chart.getChart && canvasId ? Chart.getChart(document.getElementById(canvasId)) : null;
+          if (inst && inst.data && inst.data.datasets && inst.data.datasets.length) {
+            return inst.data.datasets[0].data || [];
+          }
+        } catch (_e) {}
+        return [];
+      }
+    };
+    if (canvasId) CANVAS_TO_ID[canvasId] = id;
+    updateComposeUI();
+  };
+
+  // ─── After-maximize resize: chart drawing buffer must be reset ────
+  // The Chart.js canvas drawing buffer (height attribute) doesn't auto-update
+  // when the CSS height changes — we have to nudge resize() AND clear
+  // height/width attributes that Chart.js may have stamped on the element.
+  var __origMaximize = window.maximizeSubPanel;
+  if (typeof __origMaximize === 'function') {
+    window.maximizeSubPanel = function (chartId) {
+      __origMaximize.apply(this, arguments);
+      setTimeout(function () {
+        try {
+          var canvas = document.getElementById(chartId);
+          if (!canvas) return;
+          // Clear inline width/height so Chart.js redraws at the container's new size.
+          canvas.removeAttribute('width');
+          canvas.removeAttribute('height');
+          canvas.style.height = '';
+          canvas.style.width = '';
+          var inst = window.Chart && Chart.getChart ? Chart.getChart(canvas) : null;
+          if (inst && inst.resize) inst.resize();
+        } catch (e) {}
+      }, 80);
+    };
+  }
 })();
 </script>
 </body>

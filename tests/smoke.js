@@ -2034,6 +2034,50 @@ assert('Pass 2 / Fix 4: picker items include the sparkline SVG',
   /tgSparkline\(id, \d+, \d+\)/.test(gaugeHtml));
 
 // ═══════════════════════════════════════════════════════════════
+section('82. Compose mode pass 3 — canvas resize + custom indicators + luminos (v5.37.3)');
+
+// Maximize: canvas drawing buffer follows the wrap
+assert('Pass 3: maximized wrap lets the canvas grow (CSS)',
+  /\.sub-chart-wrap\[data-maximized="true"\][\s\S]{0,200}height:\s*calc/.test(gaugeHtml));
+assert('Pass 3: fullscreen wrap lets the canvas grow (CSS)',
+  /\.sub-chart-wrap\.tg-fullscreen-panel canvas\.sub-canvas[\s\S]{0,200}calc/.test(gaugeHtml));
+assert('Pass 3: maximizeSubPanel wrapper resets canvas attrs + calls resize',
+  /__origMaximize[\s\S]{0,500}removeAttribute\('width'\)[\s\S]{0,300}inst\.resize\(\)/.test(gaugeHtml));
+
+// Custom indicators are promotable
+assert('Pass 3: custom indicator label has data-indicator',
+  /sub-chart-label" data-indicator="custom-' \+ idx/.test(gaugeHtml) ||
+  gaugeHtml.includes("data-indicator=\"custom-' + idx + '\""));
+assert('Pass 3: custom indicator has Promote button',
+  /togglePromote\('custom-' \+ idx \+ '\)/.test(gaugeHtml) ||
+  /togglePromote\(\\'custom-' \+ idx \+ '\\'\)/.test(gaugeHtml) ||
+  gaugeHtml.includes("togglePromote('custom-' + idx + '')") ||
+  /togglePromote\('custom-/.test(gaugeHtml));
+assert('Pass 3: tgRegisterCustomIndicator exposed',
+  gaugeHtml.includes('window.tgRegisterCustomIndicator'));
+assert('Pass 3: custom indicator registration writes into INDICATOR_REGISTRY at runtime',
+  /INDICATOR_REGISTRY\[id\]\s*=\s*\{/.test(gaugeHtml));
+
+// Luminos sprites — the visual pop
+assert('Pass 3: luminos sprite layer in DOM',
+  gaugeHtml.includes('tg-luminos-layer'));
+assert('Pass 3: three luminos sprites present',
+  (gaugeHtml.match(/class="tg-luminos"\s+data-i="[0-2]"/g) || []).length === 3);
+assert('Pass 3: luminos drift keyframes defined (gold / lavender / emerald)',
+  gaugeHtml.includes('@keyframes tg-lum-1') && gaugeHtml.includes('@keyframes tg-lum-2') &&
+  gaugeHtml.includes('@keyframes tg-lum-3'));
+assert('Pass 3: luminos use radial-gradient with currentColor (color follows the data-i palette)',
+  /\.tg-luminos\s*\{[\s\S]{0,300}radial-gradient\(circle, currentColor/.test(gaugeHtml));
+
+// Hover shimmer
+assert('Pass 3: sub-chart label hover shimmer',
+  /\.sub-chart-label:hover[\s\S]{0,200}box-shadow:[\s\S]{0,200}rgba\(232,176,25/.test(gaugeHtml));
+assert('Pass 3: compose pill hover lift + glow',
+  /\.tg-compose-pill:hover[\s\S]{0,200}translateY\(-1px\)[\s\S]{0,200}currentColor/.test(gaugeHtml));
+assert('Pass 3: name text shadow follows hover',
+  /\.sub-chart-label:hover \.sc-name[\s\S]{0,100}text-shadow/.test(gaugeHtml));
+
+// ═══════════════════════════════════════════════════════════════
 section('80. Compose mode bug fixes — date adapter, volume/BB, tooltip, resize, clear (v5.37.1)');
 
 // Bug 1: x-axis is category labels, not Chart.js time scale (no adapter needed)
