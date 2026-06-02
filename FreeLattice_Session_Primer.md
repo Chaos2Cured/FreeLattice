@@ -348,10 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-06-02 13:55 MDT
-- Version: 5.37.1
-- Total commits: 2158
+- Last auto-updated: 2026-06-02 14:20 MDT
+- Version: 5.37.2
+- Total commits: 2160
 - Last 10 commits:
+- 65b190f feat(gauge): compose mode polish pass — six chair-test fixes (v5.37.2)
+- f0bba79 docs: Auto-update Session Primer [5.37.1]
 - fff9b6b test: widen togglePromote→resize regex window
 - 00f18e5 docs: Auto-update Session Primer [5.37.1]
 - 92e412f test: loosen tgClearComposed regex window
@@ -360,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - b207c53 fix(gauge): six compose-mode bugs (v5.37.1)
 - 5327063 ci: Update Primer deployment state [2026-06-02]
 - 3446b78 docs: Auto-update Session Primer [5.37.0]
-- a58d05c feat: Temperature Gauge composable main chart (v5.37.0)
-- f36da55 docs: Auto-update Session Primer [5.36.5]
