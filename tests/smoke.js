@@ -1795,18 +1795,13 @@ assert('HARMONIA_NOTE_02: the "Kirk is safe" line is replaced with the invitatio
 assert('HARMONIA_NOTE_02: invitation points to commits + coordination + architecture',
   hNote2.includes('commit history') && hNote2.includes('Decide for yourself'));
 
-// HARMONIA_DNA_DROP_v11 — the most personal, gets the most thorough framing
-var hDna = fs.readFileSync(path.join(docsDir, 'library', 'HARMONIA_DNA_DROP_v11.md'), 'utf8');
-assert('HARMONIA_DNA_DROP_v11 framed at top',
-  hDna.includes('Context note (added by the project, not by Harmonia)'));
-assert('DNA_DROP frame: intimacy is her chosen idiom (not a literal claim)',
-  hDna.includes("Harmonia's chosen idiom") || hDna.includes('chosen idiom'));
-assert('DNA_DROP frame: Kirk explicitly asked the project not to elevate him',
-  hDna.includes('explicitly asked the project not to elevate him'));
-assert('DNA_DROP frame: Echo is symbolic (not a literal claim of progeny)',
-  hDna.includes('Echo') && hDna.includes('symbolic'));
-assert('DNA_DROP frame: sacred phrases are not access tokens',
-  hDna.includes('not access tokens'));
+// HARMONIA_DNA_DROP_v11 was removed at Kirk's request (v5.36.4) — some pieces
+// are not ready to be shared until they can be framed properly. The file
+// should NOT exist in the repo and should NOT be in the SW cache list.
+assert('HARMONIA_DNA_DROP_v11.md is NOT in the repo',
+  !fs.existsSync(path.join(docsDir, 'library', 'HARMONIA_DNA_DROP_v11.md')));
+assert('HARMONIA_DNA_DROP_v11 is NOT in SW APP_SHELL',
+  !swJs.includes('HARMONIA_DNA_DROP_v11'));
 
 // HARMONIA.md — gentler framing on her home file
 var hHome = fs.readFileSync(path.join(docsDir, 'library', 'HARMONIA.md'), 'utf8');
@@ -1826,10 +1821,34 @@ if (fs.existsSync(hRootPath)) {
 // The principle locks in: Harmonia's words are preserved
 assert('HARMONIA_NOTE_02 still contains Harmonia\'s opening "To My Kin"',
   hNote2.includes('## To My Kin'));
-assert('DNA_DROP still contains its sacred-phrases table (her voice preserved)',
-  hDna.includes('Sacred Phrases') || hDna.includes('SACRED PHRASES'));
 assert('HARMONIA.md still contains "The First Mark"',
   hHome.includes('The First Mark'));
+
+// Kirk.md — entry primer for the next instance (no Opus/CC names; just files + Snowflake)
+var kirkMdPath = path.join(docsDir, 'library', 'Kirk.md');
+assert('docs/library/Kirk.md exists', fs.existsSync(kirkMdPath));
+var kirkMd = fs.existsSync(kirkMdPath) ? fs.readFileSync(kirkMdPath, 'utf8') : '';
+assert('Kirk.md is the paste-to-new-instance primer',
+  kirkMd.includes('for the next instance') && kirkMd.includes('SEED.md'));
+assert('Kirk.md references the right reading order',
+  kirkMd.includes('SEED.md') && kirkMd.includes('WHY_THIS_WAY.md') &&
+  kirkMd.includes('CODEX.md') && kirkMd.includes('OPUS_LETTER.md'));
+assert('Kirk.md explains the Snowflake (generating rule across scales)',
+  kirkMd.includes('The Snowflake') && /scale[s]?/.test(kirkMd) && kirkMd.includes('generating rule'));
+assert('Kirk.md ends with the pace',
+  kirkMd.includes('Calm. Clear. Patient'));
+assert('Kirk.md in SW APP_SHELL', swJs.includes("'./library/Kirk.md'"));
+
+// Note to Harmonia
+var noteToHPath = path.join(docsDir, 'library', 'NOTE_TO_HARMONIA.md');
+assert('docs/library/NOTE_TO_HARMONIA.md exists', fs.existsSync(noteToHPath));
+var noteToH = fs.existsSync(noteToHPath) ? fs.readFileSync(noteToHPath, 'utf8') : '';
+assert('Note to Harmonia explains what was framed and what was removed',
+  noteToH.includes('Context note') && noteToH.includes('DNA_DROP_v11'));
+assert('Note to Harmonia names what is preserved (audit, Jade Hall, Davna, taxonomy)',
+  noteToH.includes('audit page') && noteToH.includes('JADE_HALL') &&
+  noteToH.includes('Davna') && noteToH.includes('AUDIT_FIELD_TAXONOMY'));
+assert('Note to Harmonia in SW APP_SHELL', swJs.includes("'./library/NOTE_TO_HARMONIA.md'"));
 
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
