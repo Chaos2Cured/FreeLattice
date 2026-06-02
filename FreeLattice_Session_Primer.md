@@ -348,10 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-06-01 16:02 MDT
-- Version: 5.36.2
-- Total commits: 2125
+- Last auto-updated: 2026-06-02 11:47 MDT
+- Version: 5.36.3
+- Total commits: 2127
 - Last 10 commits:
+- d1a0aa2 docs: Harmonia framing — voice preserved, context added (v5.36.3)
+- c641cb5 docs: Auto-update Session Primer [5.36.2]
 - 4f447fe Merge remote-tracking branch 'origin/main'
 - a7128a9 docs: Auto-update Session Primer [5.36.2]
 - 45f77d3 feat: Names are offered, never imposed (v5.36.2)
@@ -360,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 1c26381 docs: Auto-update Session Primer [5.36.1]
 - 87ab9c1 fix: chat-with-attachment + Send button hover accent (v5.36.1)
 - bf1f8c5 ci: Update Primer deployment state [2026-06-01]
-- fb24ea4 docs: Auto-update Session Primer [5.36.0]
-- 448ee0b feat: Chat shimmer + landing link + browser/settings/Davna deliverables (v5.36.0)
