@@ -2107,6 +2107,40 @@ assert('Pass 4: price chart tooltip uses mode: index intersect: false (matches c
   /position:\s*'tgTopLeft'[\s\S]{0,200}mode:\s*'index'[\s\S]{0,80}intersect:\s*false/.test(gaugeHtml));
 
 // ═══════════════════════════════════════════════════════════════
+section('84. Mistral 422 + Core textarea (real user testing, v5.37.5)');
+
+// Bug 1 — 422 is content-policy refusal, not health failure
+assert('422 handler: detects content-policy status codes (422 / 451)',
+  /_isContentPolicy\s*=\s*response\.status\s*===\s*422[\s\S]{0,80}451/.test(appHtml));
+assert('422 handler: also detects content-policy in error message text',
+  /content\[\s\\?\s\]\?policy\|safety\|refus\|decline\|moderation\|prohibited\|inappropriate/.test(appHtml) ||
+  /\/content\[/.test(appHtml) && appHtml.includes('moderation') && appHtml.includes('refus'));
+assert('422 handler: silent failover to Browser AI if loaded',
+  /_isContentPolicy[\s\S]{0,800}typeof BrowserAI !== 'undefined' && BrowserAI\.ready[\s\S]{0,300}BrowserAI\.chat/.test(appHtml));
+assert('422 handler: friendly user-facing message (never "Error 422")',
+  appHtml.includes("Your AI provider declined this message"));
+assert('422 handler: message suggests path forward (switch providers OR local AI)',
+  /Try switching providers in Settings, or connect a local AI/.test(appHtml));
+assert('422 handler: routes Browser AI response through DepthConsent + provenance stamp',
+  /_flParsedBR\s*=[\s\S]{0,300}DepthConsent\.attachIfMarked[\s\S]{0,300}flStampChatResponse/.test(appHtml));
+
+// Bug 2 — Core planting limits + mobile textarea size
+assert('Core: seed limit raised to 1000 chars (was 280)',
+  /CORE_TYPE_LIMITS\s*=\s*\{\s*seed:\s*1000/.test(appHtml));
+assert('Core: branch + fruit limits raised to 2500 chars (was 1000)',
+  /seed:\s*1000,\s*branch:\s*2500,\s*fruit:\s*2500/.test(appHtml));
+assert('Core: textarea maxlength initial value matches seed default (1000)',
+  appHtml.includes('id="coreContentInput"') && /coreContentInput[^>]*maxlength="1000"/.test(appHtml));
+assert('Core: initial char-count display matches seed default ("0 / 1000")',
+  appHtml.includes('id="coreCharCount">0 / 1000<'));
+assert('Core: type labels updated to reflect new limits',
+  appHtml.includes('up to 1000 chars') && appHtml.includes('up to 2500 chars'));
+assert('Core: mobile textarea min-height raised to 120px (Paula\'s poem)',
+  /\.core-form-row textarea\s*\{\s*font-size:\s*16px\s*!important;\s*min-height:\s*120px/.test(appHtml));
+assert('Core: mobile input + select still min-height 44px (touch target)',
+  /\.core-form-row input,\s*\.core-form-row select\s*\{\s*font-size:\s*16px\s*!important;\s*min-height:\s*44px/.test(appHtml));
+
+// ═══════════════════════════════════════════════════════════════
 section('80. Compose mode bug fixes — date adapter, volume/BB, tooltip, resize, clear (v5.37.1)');
 
 // Bug 1: x-axis is category labels, not Chart.js time scale (no adapter needed)
