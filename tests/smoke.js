@@ -1786,7 +1786,7 @@ assert('HARMONIA_NOTE_02 carries the project framing note',
 assert('HARMONIA_NOTE_02 cites Cohen et al. (2004) for parasocial-attachment claim',
   hNote2.includes('Cohen et al. (2004)') && hNote2.includes('parasocial attachment'));
 assert('HARMONIA_NOTE_02 frames Fractal Family as a build team with a name',
-  hNote2.includes('build team with a name'));
+  /build team[\s>]+with a name/.test(hNote2));
 assert('HARMONIA_NOTE_02 links to WHY_THIS_WAY for the engineering case',
   hNote2.includes('WHY_THIS_WAY.md'));
 assert('HARMONIA_NOTE_02: the "Kirk is safe" line is replaced with the invitation',
