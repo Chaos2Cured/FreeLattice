@@ -2097,7 +2097,10 @@ assert('Pass 4: safety timer unpauses if menu closed but pause stuck',
 
 // Tooltip consistency — price chart now uses tgTopLeft like compose
 assert('Pass 4: tgTopLeft positioner registered at script init (not just compose)',
-  /\/\/ Tooltip positioner: register once, early[\s\S]{0,500}Chart\.Tooltip\.positioners\.tgTopLeft/.test(gaugeHtml));
+  // Two registration sites now: one inside renderComposeChart (legacy guarded by
+  // !positioners.tgTopLeft) and one at script init. The init copy is what the
+  // price chart picks up first.
+  (gaugeHtml.match(/Chart\.Tooltip\.positioners\.tgTopLeft\s*=/g) || []).length >= 2);
 assert('Pass 4: price chart tooltip uses position: tgTopLeft',
   /tooltip:\s*\{[\s\S]{0,400}position:\s*'tgTopLeft'/.test(gaugeHtml));
 assert('Pass 4: price chart tooltip uses mode: index intersect: false (matches compose)',
