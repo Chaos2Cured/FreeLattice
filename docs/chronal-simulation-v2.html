@@ -774,6 +774,12 @@ tr:hover td { background: rgba(212,168,67,0.03); }
       <div class="chart-title">Chronal Correction Magnitude vs. Altitude (φ-damped deviation from GR)</div>
       <canvas id="chronal-chart" class="chart-canvas"></canvas>
     </div>
+
+    <div class="chart-container" style="border-color: rgba(155,89,182,0.4);">
+      <div class="chart-title" style="color: #9b59b6;">Residual Deviation — CE minus GR (zoomed to deviation scale)</div>
+      <p style="color: var(--muted); font-size: 0.85rem; margin-bottom: 1rem;">This chart shows <em>only the difference</em> between the Chronal Energy prediction and the GR prediction, scaled to the deviation itself. The two lines in the chart above are identical at this zoom level — this chart reveals the hidden structure.</p>
+      <canvas id="residual-chart" class="chart-canvas"></canvas>
+    </div>
   </section>
 
   <!-- Decision Boundary -->
@@ -1589,6 +1595,192 @@ function drawChronalChart() {
   ctx.fillText('This is what the experiment would need to detect', pad.left + 10, pad.top + 32);
 }
 
+function drawResidualChart() {
+  const canvas = document.getElementById('residual-chart');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+
+  canvas.width = canvas.offsetWidth * 2;
+  canvas.height = canvas.offsetHeight * 2;
+  ctx.scale(2, 2);
+
+  const w = canvas.offsetWidth;
+  const h = canvas.offsetHeight;
+  const pad = { top: 40, right: 30, bottom: 50, left: 90 };
+
+  // Generate data — residual = CE minus GR
+  const altitudes = [];
+  for (let i = 1; i <= 200; i++) {
+    altitudes.push(Math.pow(10, i * 7.55 / 200));
+  }
+
+  const residuals = altitudes.map(a => ({
+    x: a,
+    y: chronalCorrection(a)   // CE - GR = just the correction term
+  }));
+
+  const minX = 1;
+  const maxX = 35786000;
+
+  // Find y range (signed — shows oscillation)
+  const yVals = residuals.map(d => d.y).filter(v => isFinite(v));
+  const rawMax = Math.max(...yVals.map(Math.abs));
+  const yMax = rawMax * 1.2;
+  const yMin = -yMax;
+
+  // Background
+  ctx.fillStyle = '#12121a';
+  ctx.fillRect(0, 0, w, h);
+
+  const chartW = w - pad.left - pad.right;
+  const chartH = h - pad.top - pad.bottom;
+
+  function xToPixel(x) {
+    return pad.left + (Math.log10(x) - Math.log10(minX)) / (Math.log10(maxX) - Math.log10(minX)) * chartW;
+  }
+
+  function yToPixel(y) {
+    return pad.top + chartH / 2 - (y / yMax) * (chartH / 2);
+  }
+
+  // Grid lines
+  ctx.strokeStyle = 'rgba(42, 42, 58, 0.6)';
+  ctx.lineWidth = 0.5;
+  for (let exp = 0; exp <= 7; exp++) {
+    const x = xToPixel(Math.pow(10, exp));
+    ctx.beginPath();
+    ctx.moveTo(x, pad.top);
+    ctx.lineTo(x, pad.top + chartH);
+    ctx.stroke();
+  }
+
+  // Y grid at 25%, 50%, 75%
+  [0.5, 1.0, -0.5, -1.0].forEach(frac => {
+    const y = yToPixel(frac * yMax);
+    ctx.strokeStyle = 'rgba(42, 42, 58, 0.6)';
+    ctx.beginPath();
+    ctx.moveTo(pad.left, y);
+    ctx.lineTo(pad.left + chartW, y);
+    ctx.stroke();
+    // Y label
+    ctx.fillStyle = '#666';
+    ctx.font = '9px SF Mono, monospace';
+    ctx.textAlign = 'right';
+    const labelVal = frac * yMax;
+    ctx.fillText(labelVal.toExponential(1), pad.left - 5, y + 3);
+  });
+
+  // Zero line
+  const zeroY = yToPixel(0);
+  ctx.strokeStyle = 'rgba(212, 168, 67, 0.5)';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([4, 4]);
+  ctx.beginPath();
+  ctx.moveTo(pad.left, zeroY);
+  ctx.lineTo(pad.left + chartW, zeroY);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Zero label
+  ctx.fillStyle = '#888';
+  ctx.font = '9px SF Mono, monospace';
+  ctx.textAlign = 'right';
+  ctx.fillText('0', pad.left - 5, zeroY + 3);
+
+  // Fill area under curve
+  ctx.beginPath();
+  let started = false;
+  residuals.forEach((d, i) => {
+    if (!isFinite(d.y)) return;
+    const px = xToPixel(d.x);
+    const py = yToPixel(d.y);
+    if (!started) { ctx.moveTo(px, zeroY); ctx.lineTo(px, py); started = true; }
+    else ctx.lineTo(px, py);
+  });
+  // Close back to zero line
+  const lastValid = residuals.filter(d => isFinite(d.y)).slice(-1)[0];
+  if (lastValid) ctx.lineTo(xToPixel(lastValid.x), zeroY);
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(155, 89, 182, 0.12)';
+  ctx.fill();
+
+  // Main deviation line — glow
+  ctx.beginPath();
+  ctx.strokeStyle = 'rgba(155, 89, 182, 0.25)';
+  ctx.lineWidth = 8;
+  started = false;
+  residuals.forEach(d => {
+    if (!isFinite(d.y)) return;
+    const px = xToPixel(d.x);
+    const py = yToPixel(d.y);
+    if (!started) { ctx.moveTo(px, py); started = true; }
+    else ctx.lineTo(px, py);
+  });
+  ctx.stroke();
+
+  // Main deviation line — solid
+  ctx.beginPath();
+  ctx.strokeStyle = '#9b59b6';
+  ctx.lineWidth = 2;
+  started = false;
+  residuals.forEach(d => {
+    if (!isFinite(d.y)) return;
+    const px = xToPixel(d.x);
+    const py = yToPixel(d.y);
+    if (!started) { ctx.moveTo(px, py); started = true; }
+    else ctx.lineTo(px, py);
+  });
+  ctx.stroke();
+
+  // Mark zero crossings (sign changes)
+  let prevSign = null;
+  residuals.forEach((d, i) => {
+    if (!isFinite(d.y)) return;
+    const sign = d.y >= 0 ? 1 : -1;
+    if (prevSign !== null && sign !== prevSign) {
+      const px = xToPixel(d.x);
+      ctx.strokeStyle = 'rgba(212, 168, 67, 0.8)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(px, pad.top);
+      ctx.lineTo(px, pad.top + chartH);
+      ctx.stroke();
+    }
+    prevSign = sign;
+  });
+
+  // X-axis labels
+  ctx.fillStyle = '#888';
+  ctx.font = '10px SF Mono, monospace';
+  ctx.textAlign = 'center';
+  const xLabels = [{v: 1, l: '1m'}, {v: 1000, l: '1km'}, {v: 1e5, l: '100km'}, {v: 1e7, l: '10Mm'}];
+  xLabels.forEach(({v, l}) => {
+    ctx.fillText(l, xToPixel(v), pad.top + chartH + 20);
+  });
+  ctx.fillText('Altitude (log scale)', w / 2, h - 10);
+
+  // Y-axis label
+  ctx.save();
+  ctx.translate(12, h / 2);
+  ctx.rotate(-Math.PI / 2);
+  ctx.fillStyle = '#888';
+  ctx.font = '10px SF Pro Display, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('Chronal Deviation (CE − GR)', 0, 0);
+  ctx.restore();
+
+  // Title annotation
+  ctx.fillStyle = '#9b59b6';
+  ctx.font = '11px SF Pro Display, sans-serif';
+  ctx.textAlign = 'left';
+  ctx.fillText('φ-damped oscillatory signature — this is what an experiment would need to detect', pad.left + 10, pad.top + 18);
+
+  // Scale annotation
+  ctx.fillStyle = '#666';
+  ctx.font = '10px SF Pro Display, sans-serif';
+  ctx.fillText('Y-axis scaled to deviation only (∼' + rawMax.toExponential(1) + '). Gold lines = zero crossings.', pad.left + 10, pad.top + 32);
+}
+
 // =============================================================================
 // INTERACTIVE CALCULATOR
 // =============================================================================
@@ -1650,6 +1842,7 @@ window.addEventListener('DOMContentLoaded', () => {
       drawMCChart();
       drawRiversChart();
       drawChronalChart();
+      drawResidualChart();
     });
   });
 });
@@ -1658,6 +1851,7 @@ window.addEventListener('resize', () => {
   drawMCChart();
   drawRiversChart();
   drawChronalChart();
+  drawResidualChart();
 });
 </script>
 
