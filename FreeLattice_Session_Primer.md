@@ -350,8 +350,10 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 ## PRIMER HEALTH
 - Last auto-updated: 2026-06-02 17:01 MDT
 - Version: 5.37.4
-- Total commits: 2174
+- Total commits: 2176
 - Last 10 commits:
+- e079bab test: positioner-registration assertion counts both sites
+- cc42046 docs: Auto-update Session Primer [5.37.4]
 - a264b63 Merge remote-tracking branch 'origin/main'
 - 72207f3 docs: Auto-update Session Primer [5.37.4]
 - 4ac2584 feat(gauge): luminos polish + tooltip consistency (v5.37.4)
@@ -360,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - a07281d ci: Update Primer deployment state [2026-06-02]
 - ec85b6a docs: Auto-update Session Primer [5.37.3]
 - 07183d5 Merge remote-tracking branch 'origin/main'
-- dded7e0 docs: Auto-update Session Primer [5.37.3]
-- c865315 feat(gauge): compose mode pass 3 — resize, custom indicators, luminos (v5.37.3)
