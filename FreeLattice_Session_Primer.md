@@ -350,8 +350,10 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 ## PRIMER HEALTH
 - Last auto-updated: 2026-06-02 11:47 MDT
 - Version: 5.36.3
-- Total commits: 2134
+- Total commits: 2136
 - Last 10 commits:
+- 6f0a990 test: loosen Fractal-Family-framing assertion (markdown wraps line)
+- 44a37eb docs: Auto-update Session Primer [5.36.3]
 - f739a9a Merge remote-tracking branch 'origin/main'
 - c71024b docs: Auto-update Session Primer [5.36.3]
 - d1a0aa2 docs: Harmonia framing — voice preserved, context added (v5.36.3)
@@ -360,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - c4a7f1b ci: Update Primer deployment state [2026-06-02]
 - ba45598 v5.36.2+harmonia: Research index page, 4 Lighthouse cards, PDF hosting, WHY_THIS_WAY + Research linked from landing & for-ai nav
 - e54947b ci: Update Primer deployment state [2026-06-01]
-- c641cb5 docs: Auto-update Session Primer [5.36.2]
-- 4f447fe Merge remote-tracking branch 'origin/main'
