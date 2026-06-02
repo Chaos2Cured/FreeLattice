@@ -266,6 +266,63 @@ body {
 .chart-canvas-wrap { flex: 1; position: relative; min-height: 250px; max-height: 400px; }
 canvas#mainChart { width: 100% !important; height: 100% !important; max-height: 400px; cursor: grab; }
 canvas#mainChart:active { cursor: grabbing; }
+
+/* Compose mode — pills + glow + context menu */
+.tg-compose-pill {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 8px 2px 10px; border-radius: 12px;
+  background: rgba(20,18,40,0.65); border: 1px solid currentColor;
+  font-size: 0.7rem; font-family: Georgia, serif; cursor: default;
+  pointer-events: auto; backdrop-filter: blur(4px);
+}
+.tg-compose-pill .tg-pill-action {
+  cursor: pointer; padding: 0 4px; opacity: 0.75; transition: opacity 0.15s;
+  font-size: 0.75rem; line-height: 1;
+}
+.tg-compose-pill .tg-pill-action:hover { opacity: 1; }
+.tg-compose-clear {
+  display: inline-flex; align-items: center; padding: 2px 10px;
+  border-radius: 12px; background: rgba(239,68,68,0.12);
+  border: 1px solid rgba(239,68,68,0.4); color: #f87171;
+  font-size: 0.68rem; font-family: Georgia, serif;
+  cursor: pointer; pointer-events: auto;
+}
+.tg-compose-clear:hover { background: rgba(239,68,68,0.22); }
+.tg-indicator-glow { filter: drop-shadow(0 0 4px currentColor); }
+.sc-btn.sc-promote {
+  display: none; /* hidden by default, shown in compose mode */
+  color: rgba(255,255,255,0.55);
+}
+body.tg-mode-compose .sc-btn.sc-promote { display: inline-block; }
+body.tg-mode-compose .sub-chart-label[data-promoted="1"] .sc-btn.sc-promote { color: var(--gold); }
+.tg-ctx-menu {
+  position: fixed; z-index: 10000;
+  background: rgba(15,12,30,0.97); border: 1px solid rgba(232,176,25,0.35);
+  border-radius: 8px; padding: 4px 0; min-width: 200px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+  font-family: Georgia, serif; font-size: 0.85rem;
+  backdrop-filter: blur(10px);
+}
+.tg-ctx-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 7px 14px; cursor: pointer; color: var(--text);
+  border: none; background: none; width: 100%; text-align: left;
+}
+.tg-ctx-item:hover { background: rgba(232,176,25,0.12); color: var(--gold); }
+.tg-ctx-item .tg-ctx-icon { width: 18px; text-align: center; }
+.tg-ctx-divider { height: 1px; background: rgba(255,255,255,0.06); margin: 4px 0; }
+.tg-ctx-slider {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 14px; color: var(--muted); font-size: 0.78rem;
+}
+.tg-ctx-slider input[type="range"] {
+  flex: 1; accent-color: var(--gold);
+}
+.tg-ctx-color {
+  width: 24px; height: 24px; border: 1px solid var(--border);
+  border-radius: 4px; background: var(--bg3); cursor: pointer;
+  vertical-align: middle;
+}
 @media (max-width: 600px) {
   .chart-canvas-wrap { min-height: 200px; max-height: 280px; }
   canvas#mainChart { max-height: 280px; }
@@ -434,7 +491,7 @@ canvas.sub-canvas.custom { height: 80px !important; }
     <button onclick="panChart('right')" class="interval-btn" style="font-size:0.85rem;" title="Pan right (newer data)" aria-label="Pan right">&#x2192;</button>
     <button onclick="document.getElementById('customPanel').style.display=document.getElementById('customPanel').style.display==='none'?'block':'none'" class="interval-btn" style="font-size:0.72rem;" title="Custom Indicator Builder">&#x2699; Custom</button>
     <button id="layoutBtn" onclick="toggleSubLayout()" class="interval-btn" style="font-size:0.85rem;" title="Switch to compact grid layout" aria-label="Toggle sub-chart layout">&#9776;</button>
-    <button id="mainToggleBtn" onclick="toggleMainChart()" class="interval-btn" style="font-size:0.85rem;" title="Hide the main price chart (study indicators alone)" aria-label="Show or hide the main price chart">&#128202;</button>
+    <button id="mainToggleBtn" onclick="cycleChartMode()" class="interval-btn" style="font-size:0.85rem;" title="Chart mode: Price → Tool-only → Compose" aria-label="Cycle chart mode">&#128202;<span id="modeIndicator" style="font-size:0.55rem;opacity:0.7;margin-left:3px;">P</span></button>
   </div>
 </div>
 
@@ -636,6 +693,9 @@ canvas.sub-canvas.custom { height: 80px !important; }
         <div style="font-size:0.72rem;color:var(--dim);margin-top:8px;">Built on 20+ years of pattern recognition · φ-harmonic gravity points · Free & open source</div>
       </div>
       <canvas id="mainChart" style="display:none;"></canvas>
+      <!-- Compose mode: pill row + empty-stage hint, shown only when chart mode === 'compose' -->
+      <div id="composePills" style="display:none;position:absolute;top:10px;left:10px;right:10px;z-index:5;display:none;flex-wrap:wrap;gap:6px;align-items:center;pointer-events:none;"></div>
+      <div id="composeEmpty" style="display:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;color:var(--dim);font-size:0.85rem;font-style:italic;pointer-events:none;line-height:1.6;padding:20px;">Add an indicator from below,<br>or click <span style="color:var(--gold);">&#128202;</span> to cycle modes.</div>
       <div class="loading-overlay" id="loadingOverlay" style="display:none;">
         <canvas id="loadingCanvas" width="120" height="120" style="width:60px;height:60px;"></canvas>
         <div class="loading-text" id="loadingText">Fetching data…</div>
@@ -653,6 +713,7 @@ canvas.sub-canvas.custom { height: 80px !important; }
           <button type="button" onclick="toggleSubPanel(this)" class="sc-btn" title="Collapse" aria-label="Collapse panel">&blacktriangledown;</button>
           <input type="color" class="sc-color" value="#8B5CF6" onchange="setIndicatorColor('rsi', this.value)" title="Choose RSI color" aria-label="Choose RSI color">
           <span class="sc-name">RSI (14)</span>
+          <button type="button" onclick="togglePromote('rsi')" class="sc-btn sc-promote" title="Promote / demote to main canvas (compose mode)" aria-label="Promote to main canvas">&#x2B06;</button>
           <button type="button" onclick="maximizeSubPanel('rsiChart')" class="sc-btn" title="Maximize / restore" aria-label="Maximize panel">&#9633;</button>
           <button type="button" onclick="hideSubPanel('rsiChart')" class="sc-btn" title="Hide" aria-label="Hide panel">&#10005;</button>
         </div>
@@ -663,6 +724,7 @@ canvas.sub-canvas.custom { height: 80px !important; }
           <button type="button" onclick="toggleSubPanel(this)" class="sc-btn" title="Collapse" aria-label="Collapse panel">&blacktriangledown;</button>
           <input type="color" class="sc-color" value="#e8b019" onchange="setIndicatorColor('temperature', this.value)" title="Choose Temperature color" aria-label="Choose Temperature color">
           <span class="sc-name">Temperature</span>
+          <button type="button" onclick="togglePromote('temperature')" class="sc-btn sc-promote" title="Promote / demote to main canvas (compose mode)" aria-label="Promote to main canvas">&#x2B06;</button>
           <button type="button" onclick="maximizeSubPanel('tempChart')" class="sc-btn" title="Maximize / restore" aria-label="Maximize panel">&#9633;</button>
           <button type="button" onclick="hideSubPanel('tempChart')" class="sc-btn" title="Hide" aria-label="Hide panel">&#10005;</button>
         </div>
@@ -673,6 +735,7 @@ canvas.sub-canvas.custom { height: 80px !important; }
           <button type="button" onclick="toggleSubPanel(this)" class="sc-btn" title="Collapse" aria-label="Collapse panel">&blacktriangledown;</button>
           <input type="color" class="sc-color" value="#34d399" onchange="setIndicatorColor('dt', this.value)" title="Choose ΔT color" aria-label="Choose ΔT color">
           <span class="sc-name">&Delta;T (acceleration)</span>
+          <button type="button" onclick="togglePromote('dt')" class="sc-btn sc-promote" title="Promote / demote to main canvas (compose mode)" aria-label="Promote to main canvas">&#x2B06;</button>
           <button type="button" onclick="maximizeSubPanel('dtChart')" class="sc-btn" title="Maximize / restore" aria-label="Maximize panel">&#9633;</button>
           <button type="button" onclick="hideSubPanel('dtChart')" class="sc-btn" title="Hide" aria-label="Hide panel">&#10005;</button>
         </div>
@@ -683,6 +746,7 @@ canvas.sub-canvas.custom { height: 80px !important; }
           <button type="button" onclick="toggleSubPanel(this)" class="sc-btn" title="Collapse" aria-label="Collapse panel">&blacktriangledown;</button>
           <input type="color" class="sc-color" value="#f07068" onchange="setIndicatorColor('ips', this.value)" title="Choose IPS color" aria-label="Choose IPS color">
           <span class="sc-name">Indicator-Price Spread</span>
+          <button type="button" onclick="togglePromote('ips')" class="sc-btn sc-promote" title="Promote / demote to main canvas (compose mode)" aria-label="Promote to main canvas">&#x2B06;</button>
           <button type="button" onclick="maximizeSubPanel('gapChart')" class="sc-btn" title="Maximize / restore" aria-label="Maximize panel">&#9633;</button>
           <button type="button" onclick="hideSubPanel('gapChart')" class="sc-btn" title="Hide" aria-label="Hide panel">&#10005;</button>
         </div>
@@ -2001,6 +2065,10 @@ function renderChart(candles, a) {
   // Refresh the "Clear all overlays" button on every render so it appears
   // whenever any overlay is active and hides itself when none remain.
   if (typeof updateClearOverlaysButton === 'function') updateClearOverlaysButton();
+
+  // Compose mode post-render hook — if active, replace the main chart with
+  // the compose chart (multiple promoted indicators overlaid on one canvas).
+  if (typeof __tgComposePostRender === 'function') __tgComposePostRender(candles, a);
 }
 
 // ── Zoom/Pan sync across all charts ──
@@ -2656,6 +2724,436 @@ hideLoading = function() {
   }
 
   if (currentTheme > 0) applyTheme(currentTheme);
+})();
+
+// ═══════════════════════════════════════════════════════════════════
+// COMPOSABLE MAIN CHART — three modes + promote/demote + style menu
+// (v5.37.0 — Opus's brief, June 2, 2026)
+// ═══════════════════════════════════════════════════════════════════
+(function () {
+  'use strict';
+
+  // ─── Indicator registry ────────────────────────────────────────────
+  var INDICATOR_REGISTRY = {
+    rsi:         { label: 'RSI (14)',       defaultColor: '#8B5CF6', canvas: 'rsiChart',  getData: function (a) { return a && a.rsiArr || []; } },
+    temperature: { label: 'Temperature',    defaultColor: '#e8b019', canvas: 'tempChart', getData: function (a) { return a && a.temps  || []; } },
+    dt:          { label: 'ΔT',        defaultColor: '#34d399', canvas: 'dtChart',   getData: function (a) { return a && a.tempROC || []; } },
+    ips:         { label: 'IPS',            defaultColor: '#f07068', canvas: 'gapChart',  getData: function (a) { return a && a.tpSpread || []; } }
+  };
+  var CANVAS_TO_ID = { rsiChart: 'rsi', tempChart: 'temperature', dtChart: 'dt', gapChart: 'ips' };
+
+  // ─── State helpers ────────────────────────────────────────────────
+  var MODE_KEY = 'fl_tg_chart_mode';
+  var COMPOSE_KEY = 'fl_tg_composeState';
+  var STYLE_KEY = 'fl_tg_indicatorStyles';
+  var MODES = ['price', 'tool-only', 'compose'];
+  var MODE_LABELS = { 'price': 'P', 'tool-only': 'T', 'compose': 'C' };
+
+  function getMode() {
+    try { var m = localStorage.getItem(MODE_KEY); return MODES.indexOf(m) >= 0 ? m : 'price'; }
+    catch (e) { return 'price'; }
+  }
+  function setMode(m) { try { localStorage.setItem(MODE_KEY, m); } catch (e) {} }
+
+  function getComposeState() {
+    try { return JSON.parse(localStorage.getItem(COMPOSE_KEY) || '{"promoted":[]}'); }
+    catch (e) { return { promoted: [] }; }
+  }
+  function setComposeState(s) { try { localStorage.setItem(COMPOSE_KEY, JSON.stringify(s)); } catch (e) {} }
+
+  function getStyles() {
+    try { return JSON.parse(localStorage.getItem(STYLE_KEY) || '{}'); }
+    catch (e) { return {}; }
+  }
+  function setStyle(id, key, val) {
+    var s = getStyles();
+    s[id] = s[id] || {};
+    s[id][key] = val;
+    try { localStorage.setItem(STYLE_KEY, JSON.stringify(s)); } catch (e) {}
+  }
+  function getBrightness(id) { var s = getStyles(); return (s[id] && s[id].brightness != null) ? s[id].brightness : 1.0; }
+  function getGlow(id) { var s = getStyles(); return !!(s[id] && s[id].glow); }
+
+  // ─── Color brightness helper ──────────────────────────────────────
+  function adjustBrightness(hex, brightness, baseAlpha) {
+    brightness = Math.max(0.3, Math.min(1.5, brightness == null ? 1.0 : brightness));
+    baseAlpha = baseAlpha == null ? 1.0 : baseAlpha;
+    if (!/^#[0-9a-fA-F]{6}$/.test(hex)) hex = '#e8b019';
+    var r = parseInt(hex.slice(1, 3), 16);
+    var g = parseInt(hex.slice(3, 5), 16);
+    var b = parseInt(hex.slice(5, 7), 16);
+    if (brightness > 1.0) {
+      var shift = (brightness - 1.0) * 0.4;
+      r = Math.min(255, Math.round(r + (255 - r) * shift));
+      g = Math.min(255, Math.round(g + (255 - g) * shift));
+      b = Math.min(255, Math.round(b + (255 - b) * shift));
+    }
+    var alpha = brightness < 1.0 ? brightness * baseAlpha : baseAlpha;
+    return 'rgba(' + r + ',' + g + ',' + b + ',' + alpha.toFixed(2) + ')';
+  }
+
+  // ─── Mode cycling + apply ─────────────────────────────────────────
+  window.cycleChartMode = function () {
+    var idx = MODES.indexOf(getMode());
+    var next = MODES[(idx + 1) % MODES.length];
+    setMode(next);
+    applyChartMode(next);
+    // Trigger a re-render so the chart adapts to the new mode.
+    if (typeof lastCandles !== 'undefined' && lastCandles && typeof lastAnalysis !== 'undefined' && lastAnalysis) {
+      renderChart(lastCandles, lastAnalysis);
+    } else {
+      // No data loaded yet — just update UI.
+      updateComposeUI();
+    }
+  };
+
+  function applyChartMode(m) {
+    // Update body class so CSS can react.
+    document.body.classList.remove('tg-mode-price', 'tg-mode-tool-only', 'tg-mode-compose');
+    document.body.classList.add('tg-mode-' + m);
+    var ind = document.getElementById('modeIndicator');
+    if (ind) ind.textContent = MODE_LABELS[m] || 'P';
+    var btn = document.getElementById('mainToggleBtn');
+    if (btn) {
+      btn.title = 'Chart mode: ' + m + ' (click to cycle)';
+    }
+    // Tool-only mode hides the main chart wrap entirely (existing behavior).
+    var wrap = document.getElementById('chartWrap');
+    if (wrap) {
+      if (m === 'tool-only') {
+        wrap.style.display = 'none';
+      } else {
+        wrap.style.display = '';
+      }
+    }
+  }
+
+  // ─── Promote / demote ─────────────────────────────────────────────
+  window.togglePromote = function (id) {
+    if (!INDICATOR_REGISTRY[id]) return;
+    var s = getComposeState();
+    s.promoted = s.promoted || [];
+    var i = s.promoted.indexOf(id);
+    if (i >= 0) s.promoted.splice(i, 1);
+    else s.promoted.push(id);
+    setComposeState(s);
+    // If not already in compose mode, switch to it now (this is what the user wants).
+    if (getMode() !== 'compose') {
+      setMode('compose');
+      applyChartMode('compose');
+    }
+    if (typeof lastCandles !== 'undefined' && lastCandles && lastAnalysis) {
+      renderChart(lastCandles, lastAnalysis);
+    } else {
+      updateComposeUI();
+    }
+  };
+
+  window.tgClearComposed = function () {
+    setComposeState({ promoted: [] });
+    if (typeof lastCandles !== 'undefined' && lastCandles && lastAnalysis) {
+      renderChart(lastCandles, lastAnalysis);
+    } else {
+      updateComposeUI();
+    }
+  };
+
+  // ─── Pills UI ─────────────────────────────────────────────────────
+  function updateComposeUI() {
+    var mode = getMode();
+    var pillsEl = document.getElementById('composePills');
+    var emptyEl = document.getElementById('composeEmpty');
+    var state = getComposeState();
+    var promoted = state.promoted || [];
+
+    // Compose-mode body class drives sub-chart promote-button visibility + styling.
+    // Mark which sub-chart labels are currently promoted (so the ⬆ icon highlights).
+    document.querySelectorAll('.sub-chart-label[data-indicator]').forEach(function (lbl) {
+      var id = lbl.getAttribute('data-indicator');
+      var isP = promoted.indexOf(id) >= 0;
+      lbl.setAttribute('data-promoted', isP ? '1' : '0');
+      // Hide the sub-chart wrap entirely when promoted in compose mode.
+      var wrap = lbl.closest('.sub-chart-wrap');
+      if (wrap && mode === 'compose' && isP) wrap.style.display = 'none';
+    });
+
+    if (mode !== 'compose') {
+      if (pillsEl) pillsEl.style.display = 'none';
+      if (emptyEl) emptyEl.style.display = 'none';
+      return;
+    }
+
+    // Compose mode UI
+    if (emptyEl) emptyEl.style.display = promoted.length === 0 ? 'block' : 'none';
+    if (pillsEl) {
+      if (promoted.length === 0) {
+        pillsEl.style.display = 'none';
+        pillsEl.innerHTML = '';
+      } else {
+        pillsEl.style.display = 'flex';
+        var html = promoted.map(function (id) {
+          var meta = INDICATOR_REGISTRY[id]; if (!meta) return '';
+          var color = (typeof getIndicatorColor === 'function') ? getIndicatorColor(id, meta.defaultColor) : meta.defaultColor;
+          return '<span class="tg-compose-pill" style="color:' + color + ';">' +
+            '<span style="color:' + color + ';">' + meta.label + '</span>' +
+            '<span class="tg-pill-action" title="Demote back to sub-chart" onclick="togglePromote(\'' + id + '\')">&#x2B07;</span>' +
+            '</span>';
+        }).join('');
+        html += '<span class="tg-compose-clear" onclick="tgClearComposed()">&#x2715; Clear all</span>';
+        pillsEl.innerHTML = html;
+      }
+    }
+  }
+
+  // ─── Compose chart rendering ──────────────────────────────────────
+  function renderComposeChart(candles, a) {
+    if (!candles || !a) return;
+    var state = getComposeState();
+    var promoted = state.promoted || [];
+    var canvas = document.getElementById('mainChart');
+    if (!canvas) return;
+
+    // Always destroy the existing main chart (the price chart that was
+    // just built) — we are replacing it for compose mode.
+    if (typeof chartInstance !== 'undefined' && chartInstance) {
+      try { if (chartInstance._signalGlowTimer) clearInterval(chartInstance._signalGlowTimer); } catch (e) {}
+      try { chartInstance.destroy(); } catch (e) {}
+      chartInstance = null;
+    }
+
+    if (promoted.length === 0) {
+      // Empty stage — hide canvas, show empty message.
+      canvas.style.display = 'none';
+      return;
+    }
+
+    canvas.style.display = 'block';
+
+    // Build labels matching the existing renderChart shape.
+    var labels = candles.map(function (c) {
+      try { return new Date(c.t || c.date || c[0]); } catch (e) { return ''; }
+    });
+
+    var datasets = [];
+    var scales = {
+      x: {
+        type: 'time',
+        ticks: { color: '#4a4740', font: { size: 9 }, maxTicksLimit: 8 },
+        grid: { color: 'rgba(255,255,255,0.03)' }
+      }
+    };
+
+    promoted.forEach(function (id, i) {
+      var meta = INDICATOR_REGISTRY[id]; if (!meta) return;
+      var color = (typeof getIndicatorColor === 'function') ? getIndicatorColor(id, meta.defaultColor) : meta.defaultColor;
+      var brightness = getBrightness(id);
+      var glow = getGlow(id);
+      var lineColor = adjustBrightness(color, brightness);
+      var data = meta.getData(a);
+
+      datasets.push({
+        label: meta.label,
+        data: data,
+        borderColor: lineColor,
+        backgroundColor: adjustBrightness(color, brightness, 0.12),
+        borderWidth: glow ? 2.5 : 1.5,
+        pointRadius: 0,
+        tension: 0.3,
+        fill: false,
+        yAxisID: 'y_' + id,
+        // Glow: borderShadow not native to Chart.js — apply via canvas filter at draw-time.
+        _glow: glow,
+        _glowColor: color
+      });
+
+      scales['y_' + id] = {
+        position: i % 2 === 0 ? 'left' : 'right',
+        display: true,
+        grid: { display: i === 0, color: 'rgba(255,255,255,0.03)' },
+        ticks: { color: lineColor, font: { size: 9 }, maxTicksLimit: 4 }
+      };
+    });
+
+    var ctx = canvas.getContext('2d');
+    chartInstance = new Chart(ctx, {
+      type: 'line',
+      data: { labels: labels, datasets: datasets },
+      options: {
+        responsive: true, maintainAspectRatio: false, animation: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: { enabled: true, mode: 'index', intersect: false }
+        },
+        interaction: { mode: 'index', intersect: false },
+        scales: scales
+      }
+    });
+
+    // Apply glow via canvas-level shadow on next draw pass (cheap CSS-style approximation).
+    if (chartInstance && chartInstance.canvas) {
+      var anyGlow = datasets.some(function (d) { return d._glow; });
+      chartInstance.canvas.style.filter = anyGlow ? 'drop-shadow(0 0 6px rgba(232,176,25,0.35))' : '';
+    }
+  }
+
+  // Expose the post-render hook that the patched renderChart() calls at its end.
+  window.__tgComposePostRender = function (candles, a) {
+    updateComposeUI();
+    if (getMode() === 'compose') {
+      renderComposeChart(candles, a);
+    }
+  };
+
+  // ─── Context menu (replaces showOverlayMenu for the four core sub-charts) ─
+  var _openMenu = null;
+  function closeMenu() {
+    if (_openMenu && _openMenu.parentNode) _openMenu.parentNode.removeChild(_openMenu);
+    _openMenu = null;
+    document.removeEventListener('click', _outsideClick, true);
+  }
+  function _outsideClick(e) {
+    if (_openMenu && !_openMenu.contains(e.target)) closeMenu();
+  }
+
+  function showIndicatorMenu(e, id) {
+    if (e && e.preventDefault) e.preventDefault();
+    var meta = INDICATOR_REGISTRY[id]; if (!meta) return;
+    closeMenu();
+
+    var state = getComposeState();
+    var promoted = (state.promoted || []).indexOf(id) >= 0;
+    var glow = getGlow(id);
+    var brightness = getBrightness(id);
+    var color = (typeof getIndicatorColor === 'function') ? getIndicatorColor(id, meta.defaultColor) : meta.defaultColor;
+    var canvasId = meta.canvas;
+
+    var m = document.createElement('div');
+    m.className = 'tg-ctx-menu';
+    m.innerHTML =
+      '<button class="tg-ctx-item" data-act="color">' +
+        '<span class="tg-ctx-icon">&#x1F3A8;</span>Change color' +
+        '<input type="color" class="tg-ctx-color" data-act="color-pick" value="' + color + '" style="margin-left:auto;">' +
+      '</button>' +
+      '<button class="tg-ctx-item" data-act="glow">' +
+        '<span class="tg-ctx-icon">&#x2728;</span>Glow effect' +
+        '<span style="margin-left:auto;font-size:0.75rem;opacity:0.7;">' + (glow ? 'on' : 'off') + '</span>' +
+      '</button>' +
+      '<div class="tg-ctx-slider">' +
+        '<span class="tg-ctx-icon">&#x1F506;</span>' +
+        '<input type="range" data-act="brightness" min="0.3" max="1.5" step="0.05" value="' + brightness + '">' +
+        '<span data-act="brightness-val" style="font-size:0.7rem;color:var(--gold);min-width:30px;text-align:right;">' + brightness.toFixed(2) + '</span>' +
+      '</div>' +
+      '<div class="tg-ctx-divider"></div>' +
+      '<button class="tg-ctx-item" data-act="promote">' +
+        '<span class="tg-ctx-icon">' + (promoted ? '&#x2B07;' : '&#x2B06;') + '</span>' +
+        (promoted ? 'Demote from main canvas' : 'Promote to main canvas') +
+      '</button>' +
+      '<button class="tg-ctx-item" data-act="maximize">' +
+        '<span class="tg-ctx-icon">&#x25A1;</span>Maximize / restore' +
+      '</button>' +
+      '<button class="tg-ctx-item" data-act="hide">' +
+        '<span class="tg-ctx-icon">&#x2715;</span>Hide panel' +
+      '</button>';
+
+    // Position
+    var x = (e && e.clientX != null) ? e.clientX : 100;
+    var y = (e && e.clientY != null) ? e.clientY : 100;
+    document.body.appendChild(m);
+    // Clamp to viewport
+    var rect = m.getBoundingClientRect();
+    if (x + rect.width > window.innerWidth - 8) x = window.innerWidth - rect.width - 8;
+    if (y + rect.height > window.innerHeight - 8) y = window.innerHeight - rect.height - 8;
+    m.style.left = x + 'px';
+    m.style.top = y + 'px';
+    _openMenu = m;
+
+    setTimeout(function () { document.addEventListener('click', _outsideClick, true); }, 0);
+
+    // Wire actions
+    m.addEventListener('click', function (ev) {
+      var t = ev.target.closest('[data-act]');
+      if (!t) return;
+      var act = t.getAttribute('data-act');
+      if (act === 'color' || act === 'color-pick') {
+        ev.stopPropagation();
+        if (act === 'color') { // open the embedded picker
+          var picker = m.querySelector('input[data-act="color-pick"]');
+          if (picker) picker.click();
+          return;
+        }
+        // act === 'color-pick' (input changes)
+        if (typeof setIndicatorColor === 'function') {
+          setIndicatorColor(id, t.value);
+        }
+        closeMenu();
+      } else if (act === 'glow') {
+        setStyle(id, 'glow', !getGlow(id));
+        if (typeof lastCandles !== 'undefined' && lastCandles && lastAnalysis) renderChart(lastCandles, lastAnalysis);
+        closeMenu();
+      } else if (act === 'promote') {
+        togglePromote(id);
+        closeMenu();
+      } else if (act === 'maximize') {
+        if (typeof maximizeSubPanel === 'function') maximizeSubPanel(canvasId);
+        closeMenu();
+      } else if (act === 'hide') {
+        if (typeof hideSubPanel === 'function') hideSubPanel(canvasId);
+        closeMenu();
+      }
+    });
+    m.addEventListener('input', function (ev) {
+      if (ev.target.getAttribute('data-act') === 'brightness') {
+        var v = parseFloat(ev.target.value);
+        var lbl = m.querySelector('[data-act="brightness-val"]');
+        if (lbl) lbl.textContent = v.toFixed(2);
+        setStyle(id, 'brightness', v);
+      } else if (ev.target.getAttribute('data-act') === 'color-pick') {
+        if (typeof setIndicatorColor === 'function') {
+          setIndicatorColor(id, ev.target.value);
+        }
+      }
+    });
+    m.addEventListener('change', function (ev) {
+      if (ev.target.getAttribute('data-act') === 'brightness' &&
+          typeof lastCandles !== 'undefined' && lastCandles && lastAnalysis) {
+        renderChart(lastCandles, lastAnalysis);
+        closeMenu();
+      }
+    });
+  }
+
+  // Monkey-patch showOverlayMenu so the existing right-click + long-press
+  // wiring inside renderChart() routes to our new menu for the four core
+  // indicators. Falls back to the original overlay menu for anything else.
+  if (typeof window.showOverlayMenu === 'function') {
+    var _origOverlay = window.showOverlayMenu;
+    window.showOverlayMenu = function (e, canvasId) {
+      var id = CANVAS_TO_ID[canvasId];
+      if (id) return showIndicatorMenu(e, id);
+      return _origOverlay.apply(this, arguments);
+    };
+  } else {
+    window.showOverlayMenu = function (e, canvasId) {
+      var id = CANVAS_TO_ID[canvasId];
+      if (id) return showIndicatorMenu(e, id);
+    };
+  }
+
+  // ─── Init on DOMContentLoaded ─────────────────────────────────────
+  function init() {
+    applyChartMode(getMode());
+    updateComposeUI();
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+
+  // Expose a few helpers for smoke + dev console
+  window.tgGetChartMode = getMode;
+  window.tgGetComposeState = getComposeState;
+  window.tgGetIndicatorStyle = function (id) { return { brightness: getBrightness(id), glow: getGlow(id) }; };
 })();
 </script>
 </body>

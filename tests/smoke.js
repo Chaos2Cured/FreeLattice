@@ -1906,6 +1906,93 @@ assert('Protocol cross-references simulation report',
 assert('simulation_report cross-references the protocol',
   simReport.includes('SEVERANCE_STUDY_PROTOCOL.md'));
 
+// ═══════════════════════════════════════════════════════════════
+section('79. Temperature Gauge — composable main chart (three modes, v5.37.0)');
+
+var gaugeHtml = fs.readFileSync(path.join(docsDir, 'temperature-gauge.html'), 'utf8');
+
+// Mode-cycling button
+assert('Gauge: cycleChartMode wired on the toolbar button',
+  gaugeHtml.includes("onclick=\"cycleChartMode()\""));
+assert('Gauge: mode indicator badge present',
+  gaugeHtml.includes('id="modeIndicator"'));
+assert('Gauge: three modes registered (price / tool-only / compose)',
+  /MODES\s*=\s*\['price',\s*'tool-only',\s*'compose'\]/.test(gaugeHtml));
+
+// LocalStorage keys
+assert('Gauge: chart mode persists in fl_tg_chart_mode',
+  gaugeHtml.includes("'fl_tg_chart_mode'"));
+assert('Gauge: compose state persists in fl_tg_composeState',
+  gaugeHtml.includes("'fl_tg_composeState'"));
+assert('Gauge: per-indicator styles persist in fl_tg_indicatorStyles',
+  gaugeHtml.includes("'fl_tg_indicatorStyles'"));
+
+// Indicator registry
+assert('Gauge: INDICATOR_REGISTRY exposes rsi/temperature/dt/ips',
+  gaugeHtml.includes("INDICATOR_REGISTRY = {") &&
+  /rsi:[\s\S]*?temperature:[\s\S]*?dt:[\s\S]*?ips:/.test(gaugeHtml));
+assert('Gauge: INDICATOR_REGISTRY pulls data from analysis (a.rsiArr / a.temps / a.tempROC / a.tpSpread)',
+  gaugeHtml.includes('a.rsiArr') && gaugeHtml.includes('a.temps') &&
+  gaugeHtml.includes('a.tempROC') && gaugeHtml.includes('a.tpSpread'));
+
+// Promote buttons on all four core indicator labels
+assert('Gauge: promote button on RSI label',
+  /togglePromote\('rsi'\)/.test(gaugeHtml));
+assert('Gauge: promote button on Temperature label',
+  /togglePromote\('temperature'\)/.test(gaugeHtml));
+assert('Gauge: promote button on ΔT label',
+  /togglePromote\('dt'\)/.test(gaugeHtml));
+assert('Gauge: promote button on IPS label',
+  /togglePromote\('ips'\)/.test(gaugeHtml));
+
+// Compose-mode DOM hooks
+assert('Gauge: composePills container present',
+  gaugeHtml.includes('id="composePills"'));
+assert('Gauge: composeEmpty hint present',
+  gaugeHtml.includes('id="composeEmpty"'));
+assert('Gauge: empty-stage message tells the user how to add an indicator',
+  gaugeHtml.includes('Add an indicator from below'));
+
+// CSS for compose mode
+assert('Gauge: .tg-compose-pill CSS class defined',
+  gaugeHtml.includes('.tg-compose-pill'));
+assert('Gauge: glow effect via drop-shadow filter',
+  /\.tg-indicator-glow[\s\S]{0,200}drop-shadow/.test(gaugeHtml) ||
+  /drop-shadow\(0 0 [46]px currentColor\)/.test(gaugeHtml));
+assert('Gauge: context menu CSS (.tg-ctx-menu) defined',
+  gaugeHtml.includes('.tg-ctx-menu'));
+
+// Compose chart rendering hook
+assert('Gauge: renderChart calls __tgComposePostRender at end',
+  gaugeHtml.includes('__tgComposePostRender'));
+assert('Gauge: renderComposeChart builds separate y-axes per promoted indicator',
+  gaugeHtml.includes('yAxisID:') &&
+  /position:\s*i\s*%\s*2\s*===\s*0\s*\?\s*'left'\s*:\s*'right'/.test(gaugeHtml));
+assert('Gauge: only first promoted indicator shows grid (visual clutter reduction)',
+  /grid:\s*\{\s*display:\s*i\s*===\s*0/.test(gaugeHtml));
+
+// Context menu with all 6 brief-specified actions
+assert('Gauge: indicator context menu has Change color action',
+  gaugeHtml.includes('Change color'));
+assert('Gauge: indicator context menu has Glow effect action',
+  gaugeHtml.includes('Glow effect'));
+assert('Gauge: indicator context menu has Brightness slider (range 0.3 - 1.5)',
+  /min="0\.3"\s+max="1\.5"/.test(gaugeHtml));
+assert('Gauge: indicator context menu has Promote action',
+  gaugeHtml.includes('Promote to main canvas') || gaugeHtml.includes('Demote from main canvas'));
+assert('Gauge: indicator context menu has Maximize action',
+  gaugeHtml.includes('Maximize / restore'));
+assert('Gauge: indicator context menu has Hide action',
+  gaugeHtml.includes('Hide panel'));
+
+// adjustBrightness helper exists + clamps to 0.3-1.5
+assert('Gauge: adjustBrightness clamps brightness to 0.3-1.5',
+  /Math\.max\(0\.3,\s*Math\.min\(1\.5/.test(gaugeHtml));
+
+// Pills include the Clear all option
+assert('Gauge: compose pills include "Clear all" affordance',
+  gaugeHtml.includes('Clear all'));
+
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
 
