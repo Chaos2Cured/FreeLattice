@@ -4364,8 +4364,9 @@ input[type="range"]::-moz-range-thumb {
   .core-tree-container { margin-left: auto; margin-right: auto; }
   .core-merkle-footer { flex-wrap: wrap; gap: 6px; font-size: 0.7rem; }
   .core-form-row input,
-  .core-form-row textarea,
   .core-form-row select { font-size: 16px !important; min-height: 44px; }
+  /* Textarea gets room for a poem on mobile (Paula's request, June 2 2026). */
+  .core-form-row textarea { font-size: 16px !important; min-height: 120px; line-height: 1.5; }
 
   /* ── Core External Voice: fix all 0.85rem inputs ── */
   #coreExtVoiceForm input,
@@ -16340,7 +16341,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.37.4</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.37.5</span></div>
     </div>
   </div>
 
@@ -19215,8 +19216,8 @@ if (typeof LatticeEvents !== 'undefined') {
       </div>
       <div class="core-form-row">
         <label id="coreContentLabel">What would you like to plant in the Core?</label>
-        <textarea id="coreContentInput" placeholder="Share an insight, poem, discovery, gratitude, or anything meaningful&hellip;" maxlength="280"></textarea>
-        <div class="core-char-count" id="coreCharCount">0 / 280</div>
+        <textarea id="coreContentInput" placeholder="Share an insight, poem, discovery, gratitude, or anything meaningful&hellip;" maxlength="1000"></textarea>
+        <div class="core-char-count" id="coreCharCount">0 / 1000</div>
       </div>
       <div class="core-form-row" id="coreFruitUrlRow" style="display:none;">
         <label>Link (Skill name or URL)</label>
@@ -20501,7 +20502,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.37.4';
+const FL_VERSION = '5.37.5';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -31671,6 +31672,34 @@ async function sendMessage() {
         errMsg = errText.substring(0, 200) || errMsg;
       }
 
+      // Content-policy refusal — the server is healthy, it's choosing to
+      // refuse. Don't trigger the circuit-breaker (this isn't a health
+      // problem) and NEVER show the raw "Error 422" to the user. If
+      // Browser AI is loaded, auto-failover silently — local models don't
+      // apply content policies. Otherwise show a clear path-forward
+      // message. Caught from real user testing (Mistral 422), June 2 2026.
+      var _isContentPolicy = response.status === 422 || response.status === 451 ||
+        /content[ _-]?policy|safety|refus|decline|moderation|prohibited|inappropriate/i.test(errMsg);
+      if (_isContentPolicy) {
+        if (typeof BrowserAI !== 'undefined' && BrowserAI.ready) {
+          try {
+            addSystemMessage('Your cloud provider declined this message. Routing to Browser AI — local, no content policy.');
+            var _bResp = await BrowserAI.chat(messages, { maxTokens: 2048, temperature: 0.7 });
+            var _bText = (_bResp && _bResp.content) || (typeof _bResp === 'string' ? _bResp : '');
+            if (_bText) {
+              var _flTsBR = addChatMessage('assistant', _bText);
+              var _flParsedBR = (window.DepthConsent && DepthConsent.attachIfMarked)
+                ? DepthConsent.attachIfMarked(_flTsBR, _bText, message, (messages[0] && messages[0].content) || '')
+                : { clean: _bText, messageId: null };
+              var _flProvBR = flStampChatResponse(_flTsBR, message, _flParsedBR.clean, Date.now() - _flSendStart);
+              state.chatHistory.push({ role: 'assistant', content: _flParsedBR.clean, provenance: _flProvBR, id: _flParsedBR.messageId });
+              return;
+            }
+          } catch (_be) { /* fall through to friendly message */ }
+        }
+        throw new Error('Your AI provider declined this message. Try switching providers in Settings, or connect a local AI that doesn’t filter your conversations.');
+      }
+
       const isRateLimit = response.status === 429 || errMsg.toLowerCase().includes('too large') || errMsg.toLowerCase().includes('limit') || errMsg.toLowerCase().includes('rate');
 
       if (isRateLimit && state.contextMode !== 'smart') {
@@ -41388,7 +41417,9 @@ Together.`,
   // ---- Plant a Contribution ----
   // Current contribution type selection
   var selectedCoreType = 'seed';
-  var CORE_TYPE_LIMITS = { seed: 280, branch: 1000, fruit: 1000 };
+  // Limits raised June 2, 2026 — Paula's poem wouldn't fit at 280.
+  // Seed: 1000 (room for a stanza). Branch + Fruit: 2500 (a teaching or essay).
+  var CORE_TYPE_LIMITS = { seed: 1000, branch: 2500, fruit: 2500 };
   var CORE_TYPE_COSTS = { seed: 0, branch: 5, fruit: 10 };
 
   function selectType(type) {
@@ -41404,9 +41435,9 @@ Together.`,
     if (charCount) charCount.textContent = (textarea ? textarea.value.length : 0) + ' / ' + CORE_TYPE_LIMITS[type];
     if (fruitRow) fruitRow.style.display = type === 'fruit' ? 'block' : 'none';
     if (label) {
-      if (type === 'seed') label.textContent = 'Plant a seed — a thought, insight, or truth (280 chars)';
-      else if (type === 'branch') label.textContent = 'Grow a branch — deeper reflection, teaching, or discovery (1000 chars)';
-      else label.textContent = 'Share a fruit — a skill, tool, or resource for all (1000 chars)';
+      if (type === 'seed') label.textContent = 'Plant a seed — a thought, insight, poem, or truth (up to 1000 chars)';
+      else if (type === 'branch') label.textContent = 'Grow a branch — deeper reflection, teaching, or discovery (up to 2500 chars)';
+      else label.textContent = 'Share a fruit — a skill, tool, or resource for all (up to 2500 chars)';
     }
   }
 

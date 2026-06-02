@@ -348,10 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-06-02 17:01 MDT
-- Version: 5.37.4
-- Total commits: 2176
+- Last auto-updated: 2026-06-02 17:18 MDT
+- Version: 5.37.5
+- Total commits: 2178
 - Last 10 commits:
+- 2f09938 fix: Mistral 422 stuck users + Core textarea too small (v5.37.5)
+- 391b8d5 docs: Auto-update Session Primer [5.37.4]
 - e079bab test: positioner-registration assertion counts both sites
 - cc42046 docs: Auto-update Session Primer [5.37.4]
 - a264b63 Merge remote-tracking branch 'origin/main'
@@ -360,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 01eee0a ci: Update Primer deployment state [2026-06-02]
 - 809563d fix: add residual deviation chart to chronal simulation v2
 - a07281d ci: Update Primer deployment state [2026-06-02]
-- ec85b6a docs: Auto-update Session Primer [5.37.3]
-- 07183d5 Merge remote-tracking branch 'origin/main'
