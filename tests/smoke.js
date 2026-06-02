@@ -1967,9 +1967,9 @@ assert('Gauge: renderChart calls __tgComposePostRender at end',
   gaugeHtml.includes('__tgComposePostRender'));
 assert('Gauge: renderComposeChart builds separate y-axes per promoted indicator',
   gaugeHtml.includes('yAxisID:') &&
-  /position:\s*i\s*%\s*2\s*===\s*0\s*\?\s*'left'\s*:\s*'right'/.test(gaugeHtml));
+  /position:\s*(?:i|axisIndex)\s*%\s*2\s*===\s*0\s*\?\s*'left'\s*:\s*'right'/.test(gaugeHtml));
 assert('Gauge: only first promoted indicator shows grid (visual clutter reduction)',
-  /grid:\s*\{\s*display:\s*i\s*===\s*0/.test(gaugeHtml));
+  /grid:\s*\{\s*display:\s*(?:i|axisIndex)\s*===\s*0/.test(gaugeHtml));
 
 // Context menu with all 6 brief-specified actions
 assert('Gauge: indicator context menu has Change color action',
@@ -1992,6 +1992,49 @@ assert('Gauge: adjustBrightness clamps brightness to 0.3-1.5',
 // Pills include the Clear all option
 assert('Gauge: compose pills include "Clear all" affordance',
   gaugeHtml.includes('Clear all'));
+
+// ═══════════════════════════════════════════════════════════════
+section('80. Compose mode bug fixes — date adapter, volume/BB, tooltip, resize, clear (v5.37.1)');
+
+// Bug 1: x-axis is category labels, not Chart.js time scale (no adapter needed)
+assert('Bug 1 fix: compose chart x-axis does NOT use type:"time"',
+  !/scales:\s*\{\s*x:\s*\{\s*type:\s*'time'/.test(gaugeHtml));
+assert('Bug 1 fix: compose chart uses interval-aware category labels',
+  /interval === '1d'[\s\S]{0,300}toLocaleDateString/.test(gaugeHtml));
+
+// Bug 2: Volume + Bollinger added to the registry
+assert('Bug 2 fix: Volume in INDICATOR_REGISTRY (bar chart, sourced from candles)',
+  /volume:\s*\{[\s\S]{0,300}chartType:\s*'bar'[\s\S]{0,300}k\.v/.test(gaugeHtml));
+assert('Bug 2 fix: Bollinger Bands in INDICATOR_REGISTRY with getMultiple',
+  /bollinger:\s*\{[\s\S]{0,400}getMultiple:/.test(gaugeHtml));
+assert('Bug 2 fix: Bollinger computes 20-period mean + 2σ envelope',
+  /var P = 20/.test(gaugeHtml) && /sd \* 2/.test(gaugeHtml));
+assert('Bug 2 fix: multi-line indicators emit BB Upper / BB Mid / BB Lower',
+  gaugeHtml.includes('BB Upper') && gaugeHtml.includes('BB Mid') && gaugeHtml.includes('BB Lower'));
+assert('Bug 2 fix: "+ Add" picker for indicators without sub-charts',
+  gaugeHtml.includes('tgShowAddPicker'));
+
+// Bug 3: tooltip locked to top-left via custom positioner
+assert('Bug 3 fix: custom tooltip positioner tgTopLeft registered',
+  gaugeHtml.includes('Chart.Tooltip.positioners.tgTopLeft'));
+assert('Bug 3 fix: compose tooltip uses position: tgTopLeft',
+  /position:\s*'tgTopLeft'/.test(gaugeHtml));
+
+// Bug 4: style changes rebuild compose chart directly (no full renderChart)
+assert('Bug 4 fix: glow toggle calls renderComposeChart in compose mode',
+  /getMode\(\)\s*===\s*'compose'[\s\S]{0,200}renderComposeChart\(lastCandles, lastAnalysis\)/.test(gaugeHtml));
+assert('Bug 4 fix: brightness change calls renderComposeChart in compose mode',
+  (gaugeHtml.match(/renderComposeChart\(lastCandles, lastAnalysis\)/g) || []).length >= 2);
+
+// Bug 5: sub-chart resize after promote/demote
+assert('Bug 5 fix: _polishResizeAllCharts invoked after promote/demote',
+  /togglePromote[\s\S]{0,800}_polishResizeAllCharts/.test(gaugeHtml));
+
+// Bug 6: Clear All keeps compose mode showing empty stage
+assert('Bug 6 fix: tgClearComposed shows empty stage (does NOT re-render price chart)',
+  /tgClearComposed[\s\S]{0,400}composeEmpty[\s\S]{0,200}block/.test(gaugeHtml));
+assert('Bug 6 fix: cycleChartMode uses renderAll for full re-render on mode change',
+  /cycleChartMode[\s\S]{0,800}renderAll\(lastCandles, lastAnalysis, lastSymbol\)/.test(gaugeHtml));
 
 // RESULTS
 // ═══════════════════════════════════════════════════════════════

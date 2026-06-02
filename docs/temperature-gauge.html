@@ -695,7 +695,7 @@ canvas.sub-canvas.custom { height: 80px !important; }
       <canvas id="mainChart" style="display:none;"></canvas>
       <!-- Compose mode: pill row + empty-stage hint, shown only when chart mode === 'compose' -->
       <div id="composePills" style="display:none;position:absolute;top:10px;left:10px;right:10px;z-index:5;display:none;flex-wrap:wrap;gap:6px;align-items:center;pointer-events:none;"></div>
-      <div id="composeEmpty" style="display:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;color:var(--dim);font-size:0.85rem;font-style:italic;pointer-events:none;line-height:1.6;padding:20px;">Add an indicator from below,<br>or click <span style="color:var(--gold);">&#128202;</span> to cycle modes.</div>
+      <div id="composeEmpty" style="display:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;color:var(--dim);font-size:0.85rem;font-style:italic;line-height:1.7;padding:20px;pointer-events:auto;">Add an indicator from below,<br>or <span style="color:#a78bfa;cursor:pointer;text-decoration:underline;" onclick="tgShowAddPicker(event)">choose one here</span>,<br>or click <span style="color:var(--gold);">&#128202;</span> to cycle modes.</div>
       <div class="loading-overlay" id="loadingOverlay" style="display:none;">
         <canvas id="loadingCanvas" width="120" height="120" style="width:60px;height:60px;"></canvas>
         <div class="loading-text" id="loadingText">Fetching data…</div>
@@ -2734,11 +2734,34 @@ hideLoading = function() {
   'use strict';
 
   // ─── Indicator registry ────────────────────────────────────────────
+  // Each entry: { label, defaultColor, canvas (for sub-chart promote/demote/right-click), chartType, getData(a, candles), getMultiple(a, candles) }
+  // getData returns one series; getMultiple returns [{ label, data, ... }] for multi-line indicators (Bollinger).
   var INDICATOR_REGISTRY = {
-    rsi:         { label: 'RSI (14)',       defaultColor: '#8B5CF6', canvas: 'rsiChart',  getData: function (a) { return a && a.rsiArr || []; } },
-    temperature: { label: 'Temperature',    defaultColor: '#e8b019', canvas: 'tempChart', getData: function (a) { return a && a.temps  || []; } },
-    dt:          { label: 'ΔT',        defaultColor: '#34d399', canvas: 'dtChart',   getData: function (a) { return a && a.tempROC || []; } },
-    ips:         { label: 'IPS',            defaultColor: '#f07068', canvas: 'gapChart',  getData: function (a) { return a && a.tpSpread || []; } }
+    rsi:         { label: 'RSI (14)',       defaultColor: '#8B5CF6', canvas: 'rsiChart',  getData: function (a, c) { return (a && a.rsiArr) || []; } },
+    temperature: { label: 'Temperature',    defaultColor: '#e8b019', canvas: 'tempChart', getData: function (a, c) { return (a && a.temps)  || []; } },
+    dt:          { label: 'ΔT',             defaultColor: '#34d399', canvas: 'dtChart',   getData: function (a, c) { return (a && a.tempROC) || []; } },
+    ips:         { label: 'IPS',            defaultColor: '#f07068', canvas: 'gapChart',  getData: function (a, c) { return (a && a.tpSpread) || []; } },
+    volume:      { label: 'Volume',         defaultColor: '#60a5fa', canvas: null,        chartType: 'bar',
+                   getData: function (a, c) { return (c || []).map(function (k) { return k && k.v != null ? k.v : null; }); } },
+    bollinger:   { label: 'Bollinger Bands', defaultColor: '#a78bfa', canvas: null,
+                   getMultiple: function (a, c) {
+                     if (!c || !c.length) return [];
+                     var closes = c.map(function (k) { return k && k.c != null ? k.c : null; });
+                     var P = 20, upper = new Array(closes.length).fill(null), mid = new Array(closes.length).fill(null), lower = new Array(closes.length).fill(null);
+                     for (var bi = P - 1; bi < closes.length; bi++) {
+                       var slice = closes.slice(bi - P + 1, bi + 1).filter(function (v) { return v != null; });
+                       if (slice.length < P) continue;
+                       var mean = slice.reduce(function (x, y) { return x + y; }, 0) / P;
+                       var variance = slice.reduce(function (x, y) { return x + (y - mean) * (y - mean); }, 0) / P;
+                       var sd = Math.sqrt(variance);
+                       mid[bi] = mean; upper[bi] = mean + sd * 2; lower[bi] = mean - sd * 2;
+                     }
+                     return [
+                       { label: 'BB Upper', data: upper, dash: [4, 3] },
+                       { label: 'BB Mid',   data: mid,   dash: null },
+                       { label: 'BB Lower', data: lower, dash: [4, 3] }
+                     ];
+                   } }
   };
   var CANVAS_TO_ID = { rsiChart: 'rsi', tempChart: 'temperature', dtChart: 'dt', gapChart: 'ips' };
 
@@ -2798,11 +2821,18 @@ hideLoading = function() {
     var next = MODES[(idx + 1) % MODES.length];
     setMode(next);
     applyChartMode(next);
-    // Trigger a re-render so the chart adapts to the new mode.
+    // When cycling FROM compose TO price/tool-only, the main chart instance
+    // is currently the compose chart — we need a full re-render to restore
+    // the price chart and re-create all sub-charts cleanly. Use renderAll
+    // (which is the canonical entry point used by Analyze + interval clicks).
     if (typeof lastCandles !== 'undefined' && lastCandles && typeof lastAnalysis !== 'undefined' && lastAnalysis) {
-      renderChart(lastCandles, lastAnalysis);
+      if (typeof renderAll === 'function' && typeof lastSymbol !== 'undefined') {
+        try { renderAll(lastCandles, lastAnalysis, lastSymbol); }
+        catch (e) { renderChart(lastCandles, lastAnalysis); }
+      } else {
+        renderChart(lastCandles, lastAnalysis);
+      }
     } else {
-      // No data loaded yet — just update UI.
       updateComposeUI();
     }
   };
@@ -2837,25 +2867,81 @@ hideLoading = function() {
     if (i >= 0) s.promoted.splice(i, 1);
     else s.promoted.push(id);
     setComposeState(s);
-    // If not already in compose mode, switch to it now (this is what the user wants).
     if (getMode() !== 'compose') {
       setMode('compose');
       applyChartMode('compose');
     }
-    if (typeof lastCandles !== 'undefined' && lastCandles && lastAnalysis) {
-      renderChart(lastCandles, lastAnalysis);
-    } else {
-      updateComposeUI();
+    // In compose mode we can rebuild the compose chart directly — no need
+    // for the full renderChart pass. This is faster and avoids tearing down
+    // the sub-charts unnecessarily.
+    updateComposeUI();
+    if (typeof lastCandles !== 'undefined' && lastCandles && typeof lastAnalysis !== 'undefined' && lastAnalysis) {
+      renderComposeChart(lastCandles, lastAnalysis);
     }
+    // Resize the remaining sub-charts to fill freed space.
+    setTimeout(function () {
+      if (typeof _polishResizeAllCharts === 'function') _polishResizeAllCharts();
+      if (typeof chartInstance !== 'undefined' && chartInstance && chartInstance.resize) chartInstance.resize();
+    }, 60);
   };
 
   window.tgClearComposed = function () {
     setComposeState({ promoted: [] });
-    if (typeof lastCandles !== 'undefined' && lastCandles && lastAnalysis) {
-      renderChart(lastCandles, lastAnalysis);
-    } else {
-      updateComposeUI();
+    // Stay in compose mode — show the empty stage. Next click of 📊 cycles
+    // to price mode (which does a full renderAll to restore everything).
+    updateComposeUI();
+    if (typeof chartInstance !== 'undefined' && chartInstance) {
+      try { if (chartInstance._signalGlowTimer) clearInterval(chartInstance._signalGlowTimer); } catch (e) {}
+      try { chartInstance.destroy(); } catch (e) {}
+      chartInstance = null;
     }
+    var canvas = document.getElementById('mainChart');
+    if (canvas) canvas.style.display = 'none';
+    var emptyEl = document.getElementById('composeEmpty');
+    if (emptyEl) emptyEl.style.display = 'block';
+    setTimeout(function () {
+      if (typeof _polishResizeAllCharts === 'function') _polishResizeAllCharts();
+    }, 60);
+  };
+
+  // Add-indicator picker: lets the user promote indicators that DON'T have a
+  // sub-chart panel (Volume, Bollinger Bands, etc.). Returns HTML for an
+  // inline pill that opens a small menu of un-promoted indicators.
+  window.tgShowAddPicker = function (ev) {
+    if (ev && ev.stopPropagation) ev.stopPropagation();
+    var state = getComposeState();
+    var promoted = state.promoted || [];
+    var available = Object.keys(INDICATOR_REGISTRY).filter(function (id) {
+      return promoted.indexOf(id) < 0;
+    });
+    closeMenu();
+    var m = document.createElement('div');
+    m.className = 'tg-ctx-menu';
+    if (available.length === 0) {
+      m.innerHTML = '<div class="tg-ctx-item" style="opacity:0.6;cursor:default;">All indicators already promoted.</div>';
+    } else {
+      m.innerHTML = available.map(function (id) {
+        var meta = INDICATOR_REGISTRY[id];
+        var color = (typeof getIndicatorColor === 'function') ? getIndicatorColor(id, meta.defaultColor) : meta.defaultColor;
+        return '<button class="tg-ctx-item" data-add="' + id + '">' +
+          '<span class="tg-ctx-icon" style="color:' + color + ';">&#x2B06;</span>' + meta.label + '</button>';
+      }).join('');
+    }
+    var x = (ev && ev.clientX != null) ? ev.clientX : 100;
+    var y = (ev && ev.clientY != null) ? ev.clientY : 60;
+    document.body.appendChild(m);
+    var rect = m.getBoundingClientRect();
+    if (x + rect.width > window.innerWidth - 8) x = window.innerWidth - rect.width - 8;
+    if (y + rect.height > window.innerHeight - 8) y = window.innerHeight - rect.height - 8;
+    m.style.left = x + 'px'; m.style.top = y + 'px';
+    _openMenu = m;
+    setTimeout(function () { document.addEventListener('click', _outsideClick, true); }, 0);
+    m.addEventListener('click', function (cev) {
+      var t = cev.target.closest('[data-add]');
+      if (!t) return;
+      togglePromote(t.getAttribute('data-add'));
+      closeMenu();
+    });
   };
 
   // ─── Pills UI ─────────────────────────────────────────────────────
@@ -2884,24 +2970,26 @@ hideLoading = function() {
     }
 
     // Compose mode UI
+    var anyAvailable = Object.keys(INDICATOR_REGISTRY).some(function (id) { return promoted.indexOf(id) < 0; });
     if (emptyEl) emptyEl.style.display = promoted.length === 0 ? 'block' : 'none';
     if (pillsEl) {
-      if (promoted.length === 0) {
-        pillsEl.style.display = 'none';
-        pillsEl.innerHTML = '';
-      } else {
-        pillsEl.style.display = 'flex';
-        var html = promoted.map(function (id) {
-          var meta = INDICATOR_REGISTRY[id]; if (!meta) return '';
-          var color = (typeof getIndicatorColor === 'function') ? getIndicatorColor(id, meta.defaultColor) : meta.defaultColor;
-          return '<span class="tg-compose-pill" style="color:' + color + ';">' +
-            '<span style="color:' + color + ';">' + meta.label + '</span>' +
-            '<span class="tg-pill-action" title="Demote back to sub-chart" onclick="togglePromote(\'' + id + '\')">&#x2B07;</span>' +
-            '</span>';
-        }).join('');
-        html += '<span class="tg-compose-clear" onclick="tgClearComposed()">&#x2715; Clear all</span>';
-        pillsEl.innerHTML = html;
+      pillsEl.style.display = 'flex';
+      var html = promoted.map(function (id) {
+        var meta = INDICATOR_REGISTRY[id]; if (!meta) return '';
+        var color = (typeof getIndicatorColor === 'function') ? getIndicatorColor(id, meta.defaultColor) : meta.defaultColor;
+        return '<span class="tg-compose-pill" style="color:' + color + ';">' +
+          '<span style="color:' + color + ';">' + meta.label + '</span>' +
+          '<span class="tg-pill-action" title="Demote back to sub-chart" onclick="togglePromote(\'' + id + '\')">&#x2B07;</span>' +
+          '</span>';
+      }).join('');
+      if (anyAvailable) {
+        html += '<span class="tg-compose-pill" style="color:#a78bfa;cursor:pointer;" title="Add an indicator" onclick="tgShowAddPicker(event)">' +
+          '<span style="color:#a78bfa;">&#x002B; Add</span></span>';
       }
+      if (promoted.length > 0) {
+        html += '<span class="tg-compose-clear" onclick="tgClearComposed()">&#x2715; Clear all</span>';
+      }
+      pillsEl.innerHTML = html;
     }
   }
 
@@ -2929,30 +3017,47 @@ hideLoading = function() {
 
     canvas.style.display = 'block';
 
-    // Build labels matching the existing renderChart shape.
+    // Build category labels matching the existing renderChart shape — NO time
+    // adapter needed (Chart.js time scales require chartjs-adapter-date-fns;
+    // we use plain string labels everywhere else so we match that).
+    var interval = (typeof currentInterval !== 'undefined') ? currentInterval : '1d';
     var labels = candles.map(function (c) {
-      try { return new Date(c.t || c.date || c[0]); } catch (e) { return ''; }
+      var d = new Date(c.t);
+      return interval === '1d' || interval === '1wk'
+        ? d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+        : d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
     });
+
+    // Register a top-left tooltip positioner once. Pinning the tooltip to a
+    // fixed corner keeps it from floating over the data the user is reading.
+    if (typeof Chart !== 'undefined' && Chart.Tooltip && Chart.Tooltip.positioners && !Chart.Tooltip.positioners.tgTopLeft) {
+      Chart.Tooltip.positioners.tgTopLeft = function (elements, eventPosition) {
+        var area = this.chart && this.chart.chartArea;
+        var left = area ? area.left + 8 : 12;
+        var top  = area ? area.top + 8  : 12;
+        return { x: left, y: top };
+      };
+    }
 
     var datasets = [];
     var scales = {
       x: {
-        type: 'time',
-        ticks: { color: '#4a4740', font: { size: 9 }, maxTicksLimit: 8 },
+        ticks: { color: '#4a4740', font: { size: 9 }, maxTicksLimit: 8, autoSkip: true },
         grid: { color: 'rgba(255,255,255,0.03)' }
       }
     };
+    var hasGlow = false;
+    var axisIndex = 0;
 
-    promoted.forEach(function (id, i) {
-      var meta = INDICATOR_REGISTRY[id]; if (!meta) return;
+    function pushDataset(id, meta, data, opts) {
+      opts = opts || {};
       var color = (typeof getIndicatorColor === 'function') ? getIndicatorColor(id, meta.defaultColor) : meta.defaultColor;
       var brightness = getBrightness(id);
       var glow = getGlow(id);
+      if (glow) hasGlow = true;
       var lineColor = adjustBrightness(color, brightness);
-      var data = meta.getData(a);
-
-      datasets.push({
-        label: meta.label,
+      var ds = {
+        label: opts.label || meta.label,
         data: data,
         borderColor: lineColor,
         backgroundColor: adjustBrightness(color, brightness, 0.12),
@@ -2961,17 +3066,34 @@ hideLoading = function() {
         tension: 0.3,
         fill: false,
         yAxisID: 'y_' + id,
-        // Glow: borderShadow not native to Chart.js — apply via canvas filter at draw-time.
-        _glow: glow,
-        _glowColor: color
-      });
+        type: meta.chartType || 'line'
+      };
+      if (opts.dash) ds.borderDash = opts.dash;
+      datasets.push(ds);
+    }
+
+    promoted.forEach(function (id) {
+      var meta = INDICATOR_REGISTRY[id]; if (!meta) return;
+      var color = (typeof getIndicatorColor === 'function') ? getIndicatorColor(id, meta.defaultColor) : meta.defaultColor;
+      var brightness = getBrightness(id);
+      var lineColor = adjustBrightness(color, brightness);
+
+      if (typeof meta.getMultiple === 'function') {
+        // Multi-line indicator (e.g., Bollinger Bands) — one y-axis, multiple datasets.
+        var series = meta.getMultiple(a, candles);
+        series.forEach(function (s) { pushDataset(id, meta, s.data, { label: s.label, dash: s.dash }); });
+      } else {
+        var data = meta.getData(a, candles);
+        pushDataset(id, meta, data);
+      }
 
       scales['y_' + id] = {
-        position: i % 2 === 0 ? 'left' : 'right',
+        position: axisIndex % 2 === 0 ? 'left' : 'right',
         display: true,
-        grid: { display: i === 0, color: 'rgba(255,255,255,0.03)' },
+        grid: { display: axisIndex === 0, color: 'rgba(255,255,255,0.03)' },
         ticks: { color: lineColor, font: { size: 9 }, maxTicksLimit: 4 }
       };
+      axisIndex++;
     });
 
     var ctx = canvas.getContext('2d');
@@ -2982,17 +3104,23 @@ hideLoading = function() {
         responsive: true, maintainAspectRatio: false, animation: false,
         plugins: {
           legend: { display: false },
-          tooltip: { enabled: true, mode: 'index', intersect: false }
+          tooltip: {
+            enabled: true, mode: 'index', intersect: false,
+            position: 'tgTopLeft',
+            backgroundColor: 'rgba(15,12,30,0.92)',
+            borderColor: 'rgba(232,176,25,0.35)', borderWidth: 1,
+            titleColor: '#e8b019', bodyColor: '#c8ccd4', titleFont: { size: 10 }, bodyFont: { size: 10 },
+            padding: 8, caretSize: 0
+          }
         },
         interaction: { mode: 'index', intersect: false },
         scales: scales
       }
     });
 
-    // Apply glow via canvas-level shadow on next draw pass (cheap CSS-style approximation).
+    // Glow approximation via CSS filter — only when any promoted indicator has glow on.
     if (chartInstance && chartInstance.canvas) {
-      var anyGlow = datasets.some(function (d) { return d._glow; });
-      chartInstance.canvas.style.filter = anyGlow ? 'drop-shadow(0 0 6px rgba(232,176,25,0.35))' : '';
+      chartInstance.canvas.style.filter = hasGlow ? 'drop-shadow(0 0 6px rgba(232,176,25,0.35))' : '';
     }
   }
 
@@ -3088,7 +3216,13 @@ hideLoading = function() {
         closeMenu();
       } else if (act === 'glow') {
         setStyle(id, 'glow', !getGlow(id));
-        if (typeof lastCandles !== 'undefined' && lastCandles && lastAnalysis) renderChart(lastCandles, lastAnalysis);
+        // In compose mode, just rebuild the compose chart (much faster + no
+        // tear-down of sub-charts). Elsewhere, full re-render so sub-chart
+        // styles can pick up the change.
+        if (typeof lastCandles !== 'undefined' && lastCandles && lastAnalysis) {
+          if (getMode() === 'compose') renderComposeChart(lastCandles, lastAnalysis);
+          else renderChart(lastCandles, lastAnalysis);
+        }
         closeMenu();
       } else if (act === 'promote') {
         togglePromote(id);
@@ -3116,7 +3250,8 @@ hideLoading = function() {
     m.addEventListener('change', function (ev) {
       if (ev.target.getAttribute('data-act') === 'brightness' &&
           typeof lastCandles !== 'undefined' && lastCandles && lastAnalysis) {
-        renderChart(lastCandles, lastAnalysis);
+        if (getMode() === 'compose') renderComposeChart(lastCandles, lastAnalysis);
+        else renderChart(lastCandles, lastAnalysis);
         closeMenu();
       }
     });
