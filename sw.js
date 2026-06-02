@@ -75,6 +75,7 @@ const APP_SHELL = [
     './library/OPUS_LETTER.md',
     './safetysimulation.html',
     './audit.html',
+    './research.html',
     './why-this-way.html',
     './library/WHY_THIS_WAY.md',
     './thesis.html',
