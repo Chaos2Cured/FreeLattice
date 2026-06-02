@@ -2032,7 +2032,8 @@ assert('Bug 5 fix: _polishResizeAllCharts invoked after promote/demote',
 
 // Bug 6: Clear All keeps compose mode showing empty stage
 assert('Bug 6 fix: tgClearComposed shows empty stage (does NOT re-render price chart)',
-  /tgClearComposed[\s\S]{0,400}composeEmpty[\s\S]{0,200}block/.test(gaugeHtml));
+  /tgClearComposed[\s\S]{0,900}composeEmpty[\s\S]{0,300}block/.test(gaugeHtml) &&
+  !/tgClearComposed[\s\S]{0,800}renderChart\(lastCandles, lastAnalysis\)/.test(gaugeHtml));
 assert('Bug 6 fix: cycleChartMode uses renderAll for full re-render on mode change',
   /cycleChartMode[\s\S]{0,800}renderAll\(lastCandles, lastAnalysis, lastSymbol\)/.test(gaugeHtml));
 
