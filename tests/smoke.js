@@ -2028,7 +2028,7 @@ assert('Bug 4 fix: brightness change calls renderComposeChart in compose mode',
 
 // Bug 5: sub-chart resize after promote/demote
 assert('Bug 5 fix: _polishResizeAllCharts invoked after promote/demote',
-  /togglePromote[\s\S]{0,800}_polishResizeAllCharts/.test(gaugeHtml));
+  /togglePromote\s*=\s*function[\s\S]{0,1500}_polishResizeAllCharts/.test(gaugeHtml));
 
 // Bug 6: Clear All keeps compose mode showing empty stage
 assert('Bug 6 fix: tgClearComposed shows empty stage (does NOT re-render price chart)',
