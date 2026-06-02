@@ -267,6 +267,26 @@ body {
 canvas#mainChart { width: 100% !important; height: 100% !important; max-height: 400px; cursor: grab; }
 canvas#mainChart:active { cursor: grabbing; }
 
+/* Fullscreen panel — true 100vh + fixed (Bug 5) */
+.tg-fullscreen-panel {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important; height: 100vh !important;
+  min-height: 100vh !important; max-height: 100vh !important;
+  z-index: 9999 !important;
+  background: var(--bg, #0a0e1a) !important;
+  padding: 24px !important;
+  display: flex !important; flex-direction: column;
+}
+.tg-fullscreen-panel canvas { flex: 1 !important; max-height: none !important; }
+.tg-fullscreen-exit {
+  position: absolute; top: 18px; right: 18px;
+  padding: 6px 12px; background: rgba(232,176,25,0.12);
+  border: 1px solid var(--gold, #e8b019); border-radius: 8px;
+  color: var(--gold, #e8b019); cursor: pointer;
+  font-family: Georgia, serif; font-size: 0.85rem; z-index: 10000;
+}
+
 /* Compose mode — pills + glow + context menu */
 .tg-compose-pill {
   display: inline-flex; align-items: center; gap: 4px;
@@ -695,7 +715,8 @@ canvas.sub-canvas.custom { height: 80px !important; }
       <canvas id="mainChart" style="display:none;"></canvas>
       <!-- Compose mode: pill row + empty-stage hint, shown only when chart mode === 'compose' -->
       <div id="composePills" style="display:none;position:absolute;top:10px;left:10px;right:10px;z-index:5;display:none;flex-wrap:wrap;gap:6px;align-items:center;pointer-events:none;"></div>
-      <div id="composeEmpty" style="display:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;color:var(--dim);font-size:0.85rem;font-style:italic;line-height:1.7;padding:20px;pointer-events:auto;">Add an indicator from below,<br>or <span style="color:#a78bfa;cursor:pointer;text-decoration:underline;" onclick="tgShowAddPicker(event)">choose one here</span>,<br>or click <span style="color:var(--gold);">&#128202;</span> to cycle modes.</div>
+      <!-- Empty stage: whole area is clickable to open the picker. Belt-and-suspenders so the link always responds. -->
+      <div id="composeEmpty" onclick="tgShowAddPicker(event)" style="display:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;color:var(--dim);font-size:0.88rem;font-style:italic;line-height:1.7;padding:24px 28px;pointer-events:auto;cursor:pointer;border:1px dashed rgba(167,139,250,0.25);border-radius:12px;background:rgba(20,18,40,0.4);backdrop-filter:blur(2px);">Add an indicator below,<br>or <span style="color:#a78bfa;text-decoration:underline;">choose one here &rarr;</span><br><span style="font-size:0.72rem;opacity:0.6;">or click <span style="color:var(--gold);">&#128202;</span> to cycle modes.</span></div>
       <div class="loading-overlay" id="loadingOverlay" style="display:none;">
         <canvas id="loadingCanvas" width="120" height="120" style="width:60px;height:60px;"></canvas>
         <div class="loading-text" id="loadingText">Fetching data…</div>
@@ -2200,12 +2221,16 @@ function maximizeSubPanel(chartId) {
   var targetWrap = targetCanvas.closest('.sub-chart-wrap');
   if (!targetWrap) return;
   var willMaximize = targetWrap.dataset.maximized !== 'true';
+  // In tool-only mode the price chart is hidden — the maximized sub-chart
+  // should fill the freed space, not stay at the 220px default.
+  var isToolOnly = (typeof tgGetChartMode === 'function') ? tgGetChartMode() === 'tool-only' : false;
+  var maxH = isToolOnly ? '60vh' : '220px';
   document.querySelectorAll('.sub-chart-wrap').forEach(function(wrap) {
     var canvas = wrap.querySelector('canvas');
     if (wrap === targetWrap) {
       if (willMaximize) {
-        wrap.style.height = '220px';
-        wrap.style.minHeight = '220px';
+        wrap.style.height = maxH;
+        wrap.style.minHeight = maxH;
         wrap.style.overflow = '';
         wrap.dataset.maximized = 'true';
         if (canvas) canvas.style.display = 'block';
@@ -2736,11 +2761,38 @@ hideLoading = function() {
   // ─── Indicator registry ────────────────────────────────────────────
   // Each entry: { label, defaultColor, canvas (for sub-chart promote/demote/right-click), chartType, getData(a, candles), getMultiple(a, candles) }
   // getData returns one series; getMultiple returns [{ label, data, ... }] for multi-line indicators (Bollinger).
+  // Inline EMA — used by the EMA registry entries below so we don't depend on
+  // a global ema() helper from elsewhere in the file.
+  function _tgEMA(arr, period) {
+    var n = (arr && arr.length) || 0;
+    var out = new Array(n).fill(null);
+    if (n < period) return out;
+    var k = 2 / (period + 1);
+    var sum = 0;
+    for (var i = 0; i < period; i++) sum += (arr[i] || 0);
+    out[period - 1] = sum / period;
+    for (var i = period; i < n; i++) {
+      var v = arr[i] == null ? out[i - 1] : arr[i];
+      out[i] = v * k + out[i - 1] * (1 - k);
+    }
+    return out;
+  }
+
   var INDICATOR_REGISTRY = {
     rsi:         { label: 'RSI (14)',       defaultColor: '#8B5CF6', canvas: 'rsiChart',  getData: function (a, c) { return (a && a.rsiArr) || []; } },
     temperature: { label: 'Temperature',    defaultColor: '#e8b019', canvas: 'tempChart', getData: function (a, c) { return (a && a.temps)  || []; } },
     dt:          { label: 'ΔT',             defaultColor: '#34d399', canvas: 'dtChart',   getData: function (a, c) { return (a && a.tempROC) || []; } },
     ips:         { label: 'IPS',            defaultColor: '#f07068', canvas: 'gapChart',  getData: function (a, c) { return (a && a.tpSpread) || []; } },
+    price:       { label: 'Price',          defaultColor: '#e2d9c8', canvas: null,
+                   getData: function (a, c) { return (a && a.closes) || (c || []).map(function (k) { return k && k.c != null ? k.c : null; }); } },
+    ema8:        { label: 'EMA 8',          defaultColor: '#f07068', canvas: null,
+                   getData: function (a, c) { var closes = (a && a.closes) || (c || []).map(function (k) { return k && k.c != null ? k.c : null; }); return _tgEMA(closes, 8); } },
+    ema12:       { label: 'EMA 12',         defaultColor: '#e8b019', canvas: null,
+                   getData: function (a, c) { var closes = (a && a.closes) || (c || []).map(function (k) { return k && k.c != null ? k.c : null; }); return _tgEMA(closes, 12); } },
+    ema24:       { label: 'EMA 24',         defaultColor: '#d4a84c', canvas: null,
+                   getData: function (a, c) { var closes = (a && a.closes) || (c || []).map(function (k) { return k && k.c != null ? k.c : null; }); return _tgEMA(closes, 24); } },
+    ema50:       { label: 'EMA 50',         defaultColor: '#60a5fa', canvas: null,
+                   getData: function (a, c) { var closes = (a && a.closes) || (c || []).map(function (k) { return k && k.c != null ? k.c : null; }); return _tgEMA(closes, 50); } },
     volume:      { label: 'Volume',         defaultColor: '#60a5fa', canvas: null,        chartType: 'bar',
                    getData: function (a, c) { return (c || []).map(function (k) { return k && k.v != null ? k.v : null; }); } },
     bollinger:   { label: 'Bollinger Bands', defaultColor: '#a78bfa', canvas: null,
@@ -2977,8 +3029,10 @@ hideLoading = function() {
       var html = promoted.map(function (id) {
         var meta = INDICATOR_REGISTRY[id]; if (!meta) return '';
         var color = (typeof getIndicatorColor === 'function') ? getIndicatorColor(id, meta.defaultColor) : meta.defaultColor;
+        // Pill: click the NAME to open the style menu (Bug 6 fix — color/glow/brightness
+        // for promoted indicators that no longer have a sub-chart to right-click).
         return '<span class="tg-compose-pill" style="color:' + color + ';">' +
-          '<span style="color:' + color + ';">' + meta.label + '</span>' +
+          '<span style="color:' + color + ';cursor:pointer;text-decoration:underline;text-decoration-style:dotted;text-decoration-color:rgba(255,255,255,0.25);" title="Style this indicator" onclick="tgStyleIndicator(event, \'' + id + '\')" oncontextmenu="tgStyleIndicator(event, \'' + id + '\'); return false;">' + meta.label + '</span>' +
           '<span class="tg-pill-action" title="Demote back to sub-chart" onclick="togglePromote(\'' + id + '\')">&#x2B07;</span>' +
           '</span>';
       }).join('');
@@ -3179,6 +3233,9 @@ hideLoading = function() {
       '<button class="tg-ctx-item" data-act="maximize">' +
         '<span class="tg-ctx-icon">&#x25A1;</span>Maximize / restore' +
       '</button>' +
+      '<button class="tg-ctx-item" data-act="fullscreen">' +
+        '<span class="tg-ctx-icon">&#x26F6;</span>Fullscreen panel' +
+      '</button>' +
       '<button class="tg-ctx-item" data-act="hide">' +
         '<span class="tg-ctx-icon">&#x2715;</span>Hide panel' +
       '</button>';
@@ -3230,6 +3287,9 @@ hideLoading = function() {
       } else if (act === 'maximize') {
         if (typeof maximizeSubPanel === 'function') maximizeSubPanel(canvasId);
         closeMenu();
+      } else if (act === 'fullscreen') {
+        if (canvasId && typeof window.tgFullscreenPanel === 'function') window.tgFullscreenPanel(canvasId);
+        closeMenu();
       } else if (act === 'hide') {
         if (typeof hideSubPanel === 'function') hideSubPanel(canvasId);
         closeMenu();
@@ -3273,6 +3333,163 @@ hideLoading = function() {
       if (id) return showIndicatorMenu(e, id);
     };
   }
+
+  // ─── Bug 6: open style menu for a promoted indicator (no sub-chart) ─
+  window.tgStyleIndicator = function (e, id) {
+    if (e && e.stopPropagation) e.stopPropagation();
+    if (e && e.preventDefault) e.preventDefault();
+    if (!INDICATOR_REGISTRY[id]) return;
+    showIndicatorMenu(e || { clientX: 100, clientY: 100, preventDefault: function(){} }, id);
+  };
+
+  // Right-click on the main canvas in compose mode → menu of promoted indicators
+  // (click one to open its style menu). If only one is promoted, open it directly.
+  (function wireMainCanvasContextMenu() {
+    function bind() {
+      var c = document.getElementById('mainChart');
+      if (!c) return;
+      c.oncontextmenu = function (e) {
+        if (getMode() !== 'compose') return; // let the default canvas context menu work elsewhere
+        e.preventDefault();
+        var promoted = (getComposeState().promoted || []);
+        if (promoted.length === 0) { tgShowAddPicker(e); return; }
+        if (promoted.length === 1) { showIndicatorMenu(e, promoted[0]); return; }
+        closeMenu();
+        var m = document.createElement('div');
+        m.className = 'tg-ctx-menu';
+        m.innerHTML = '<div class="tg-ctx-item" style="opacity:0.55;cursor:default;font-style:italic;">Style which indicator?</div><div class="tg-ctx-divider"></div>' +
+          promoted.map(function (id) {
+            var meta = INDICATOR_REGISTRY[id];
+            var color = (typeof getIndicatorColor === 'function') ? getIndicatorColor(id, meta.defaultColor) : meta.defaultColor;
+            return '<button class="tg-ctx-item" data-style="' + id + '">' +
+              '<span class="tg-ctx-icon" style="color:' + color + ';">&#9679;</span>' + meta.label + '</button>';
+          }).join('');
+        document.body.appendChild(m);
+        var x = e.clientX, y = e.clientY;
+        var rect = m.getBoundingClientRect();
+        if (x + rect.width > window.innerWidth - 8) x = window.innerWidth - rect.width - 8;
+        if (y + rect.height > window.innerHeight - 8) y = window.innerHeight - rect.height - 8;
+        m.style.left = x + 'px'; m.style.top = y + 'px';
+        _openMenu = m;
+        setTimeout(function () { document.addEventListener('click', _outsideClick, true); }, 0);
+        m.addEventListener('click', function (cev) {
+          var t = cev.target.closest('[data-style]');
+          if (!t) return;
+          var which = t.getAttribute('data-style');
+          closeMenu();
+          setTimeout(function () { showIndicatorMenu(e, which); }, 0);
+        });
+      };
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bind);
+    else bind();
+  })();
+
+  // ─── Bug 5: fullscreen panel ──────────────────────────────────────
+  // Toggles a 100vh / position:fixed on a sub-chart wrap. Adds an exit
+  // button. Resizes the Chart.js instance after the layout flip.
+  window.tgFullscreenPanel = function (canvasId) {
+    var canvas = document.getElementById(canvasId);
+    if (!canvas) return;
+    var wrap = canvas.closest('.sub-chart-wrap');
+    if (!wrap) return;
+    var isFull = wrap.classList.contains('tg-fullscreen-panel');
+    if (isFull) {
+      wrap.classList.remove('tg-fullscreen-panel');
+      var exit = wrap.querySelector('.tg-fullscreen-exit');
+      if (exit) exit.remove();
+    } else {
+      wrap.classList.add('tg-fullscreen-panel');
+      var btn = document.createElement('button');
+      btn.className = 'tg-fullscreen-exit';
+      btn.textContent = '✕ Exit fullscreen';
+      btn.onclick = function () { window.tgFullscreenPanel(canvasId); };
+      wrap.appendChild(btn);
+    }
+    // Resize the chart after the layout change.
+    setTimeout(function () {
+      try {
+        var inst = (window.Chart && Chart.getChart) ? Chart.getChart(canvas) : null;
+        if (inst && inst.resize) inst.resize();
+      } catch (e) {}
+    }, 100);
+  };
+
+  // ─── Sparkline (Bug 4): mini SVG preview of an indicator's data ────
+  function tgSparkline(id, width, height) {
+    var meta = INDICATOR_REGISTRY[id]; if (!meta) return '';
+    var data = [];
+    try {
+      if (typeof meta.getMultiple === 'function') {
+        var series = meta.getMultiple(typeof lastAnalysis !== 'undefined' ? lastAnalysis : null,
+                                      typeof lastCandles !== 'undefined' ? lastCandles : null);
+        data = (series[0] && series[0].data) || [];
+      } else if (typeof meta.getData === 'function') {
+        data = meta.getData(typeof lastAnalysis !== 'undefined' ? lastAnalysis : null,
+                            typeof lastCandles !== 'undefined' ? lastCandles : null) || [];
+      }
+    } catch (e) { data = []; }
+    var color = (typeof getIndicatorColor === 'function') ? getIndicatorColor(id, meta.defaultColor) : meta.defaultColor;
+    // Take the last N non-null samples (resampled to fit).
+    var samples = 32;
+    var step = Math.max(1, Math.floor(data.length / samples));
+    var pts = [];
+    for (var i = 0; i < data.length; i += step) if (data[i] != null && isFinite(data[i])) pts.push(data[i]);
+    if (pts.length < 2) return '<span style="opacity:0.5;font-size:0.65rem;color:' + color + ';"> (load data first)</span>';
+    var min = Math.min.apply(null, pts), max = Math.max.apply(null, pts);
+    var range = (max - min) || 1;
+    var w = width || 80, h = height || 20;
+    var poly = pts.map(function (v, i) {
+      var x = (i / (pts.length - 1)) * w;
+      var y = h - ((v - min) / range) * h;
+      return x.toFixed(1) + ',' + y.toFixed(1);
+    }).join(' ');
+    return '<svg width="' + w + '" height="' + h + '" viewBox="0 0 ' + w + ' ' + h + '" style="vertical-align:middle;margin-left:auto;display:inline-block;">' +
+      '<polyline points="' + poly + '" fill="none" stroke="' + color + '" stroke-width="1.4" opacity="0.85"/></svg>';
+  }
+
+  // Patch tgShowAddPicker to include sparkline previews next to each item.
+  var __origAddPicker = window.tgShowAddPicker;
+  window.tgShowAddPicker = function (ev) {
+    if (ev && ev.stopPropagation) ev.stopPropagation();
+    var state = getComposeState();
+    var promoted = state.promoted || [];
+    var available = Object.keys(INDICATOR_REGISTRY).filter(function (id) {
+      return promoted.indexOf(id) < 0;
+    });
+    closeMenu();
+    var m = document.createElement('div');
+    m.className = 'tg-ctx-menu';
+    m.style.minWidth = '260px';
+    if (available.length === 0) {
+      m.innerHTML = '<div class="tg-ctx-item" style="opacity:0.6;cursor:default;">All indicators already promoted.</div>';
+    } else {
+      m.innerHTML = available.map(function (id) {
+        var meta = INDICATOR_REGISTRY[id];
+        var color = (typeof getIndicatorColor === 'function') ? getIndicatorColor(id, meta.defaultColor) : meta.defaultColor;
+        return '<button class="tg-ctx-item" data-add="' + id + '" style="justify-content:flex-start;">' +
+          '<span class="tg-ctx-icon" style="color:' + color + ';">&#x2B06;</span>' +
+          '<span style="color:' + color + ';min-width:88px;">' + meta.label + '</span>' +
+          tgSparkline(id, 90, 22) +
+          '</button>';
+      }).join('');
+    }
+    var x = (ev && ev.clientX != null) ? ev.clientX : 100;
+    var y = (ev && ev.clientY != null) ? ev.clientY : 60;
+    document.body.appendChild(m);
+    var rect = m.getBoundingClientRect();
+    if (x + rect.width > window.innerWidth - 8) x = window.innerWidth - rect.width - 8;
+    if (y + rect.height > window.innerHeight - 8) y = window.innerHeight - rect.height - 8;
+    m.style.left = x + 'px'; m.style.top = y + 'px';
+    _openMenu = m;
+    setTimeout(function () { document.addEventListener('click', _outsideClick, true); }, 0);
+    m.addEventListener('click', function (cev) {
+      var t = cev.target.closest('[data-add]');
+      if (!t) return;
+      togglePromote(t.getAttribute('data-add'));
+      closeMenu();
+    });
+  };
 
   // ─── Init on DOMContentLoaded ─────────────────────────────────────
   function init() {

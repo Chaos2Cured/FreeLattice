@@ -1951,7 +1951,7 @@ assert('Gauge: composePills container present',
 assert('Gauge: composeEmpty hint present',
   gaugeHtml.includes('id="composeEmpty"'));
 assert('Gauge: empty-stage message tells the user how to add an indicator',
-  gaugeHtml.includes('Add an indicator from below'));
+  /Add an indicator[\s\S]{0,20}below/.test(gaugeHtml));
 
 // CSS for compose mode
 assert('Gauge: .tg-compose-pill CSS class defined',
@@ -1992,6 +1992,46 @@ assert('Gauge: adjustBrightness clamps brightness to 0.3-1.5',
 // Pills include the Clear all option
 assert('Gauge: compose pills include "Clear all" affordance',
   gaugeHtml.includes('Clear all'));
+
+// ═══════════════════════════════════════════════════════════════
+section('81. Compose mode pass 2 — six polish fixes (v5.37.2)');
+
+// Fix 1: empty stage is fully clickable
+assert('Pass 2 / Fix 1: empty stage is the click target (whole div, not just inner span)',
+  /id="composeEmpty"[^>]*onclick="tgShowAddPicker\(event\)"/.test(gaugeHtml));
+
+// Fix 3: EMAs + Price added to the registry
+assert('Pass 2 / Fix 3: Price in INDICATOR_REGISTRY',
+  /price:\s*\{[\s\S]{0,200}label:\s*'Price'/.test(gaugeHtml));
+assert('Pass 2 / Fix 3: EMA 8 / 12 / 24 / 50 in INDICATOR_REGISTRY',
+  /ema8:[\s\S]{0,500}ema12:[\s\S]{0,500}ema24:[\s\S]{0,500}ema50:/.test(gaugeHtml));
+assert('Pass 2 / Fix 3: inline _tgEMA computes EMA when needed',
+  /function _tgEMA\(arr, period\)/.test(gaugeHtml));
+
+// Fix 2: tool-only maximize uses bigger height
+assert('Pass 2 / Fix 2: maximize sizes to 60vh in tool-only mode',
+  /isToolOnly[\s\S]{0,200}60vh/.test(gaugeHtml));
+
+// Fix 5: fullscreen panel
+assert('Pass 2 / Fix 5: tgFullscreenPanel exposed',
+  gaugeHtml.includes('window.tgFullscreenPanel'));
+assert('Pass 2 / Fix 5: .tg-fullscreen-panel CSS uses 100vh + fixed',
+  /\.tg-fullscreen-panel[\s\S]{0,400}position:\s*fixed[\s\S]{0,400}100vh/.test(gaugeHtml));
+assert('Pass 2 / Fix 5: context menu has Fullscreen action',
+  gaugeHtml.includes('Fullscreen panel'));
+
+// Fix 6: pill name opens style menu (right-click no longer needed for promoted indicators)
+assert('Pass 2 / Fix 6: pill name is clickable to open style menu (tgStyleIndicator)',
+  /onclick="tgStyleIndicator\(event, \\'/.test(gaugeHtml) || gaugeHtml.includes('tgStyleIndicator(event,'));
+assert('Pass 2 / Fix 6: main canvas right-click opens promoted-indicator menu in compose mode',
+  /c\.oncontextmenu[\s\S]{0,400}getMode\(\)\s*!==\s*'compose'/.test(gaugeHtml) ||
+  /mainChart[\s\S]{0,300}oncontextmenu/.test(gaugeHtml));
+
+// Fix 4: sparkline preview in the picker
+assert('Pass 2 / Fix 4: tgSparkline function exists (SVG preview)',
+  /function tgSparkline\(id, width, height\)/.test(gaugeHtml));
+assert('Pass 2 / Fix 4: picker items include the sparkline SVG',
+  /tgSparkline\(id, \d+, \d+\)/.test(gaugeHtml));
 
 // ═══════════════════════════════════════════════════════════════
 section('80. Compose mode bug fixes — date adapter, volume/BB, tooltip, resize, clear (v5.37.1)');
