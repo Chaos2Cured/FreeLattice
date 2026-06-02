@@ -349,9 +349,11 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 
 ## PRIMER HEALTH
 - Last auto-updated: 2026-06-02 12:27 MDT
-- Version: 5.36.4
-- Total commits: 2144
+- Version: 5.36.5
+- Total commits: 2146
 - Last 10 commits:
+- b869cab chore: bump version files to 5.36.5
+- e593033 docs: Auto-update Session Primer [5.36.4]
 - d79e340 docs: Simulation argument completed — Limitations + IRB protocol (v5.36.5)
 - 2a1d96a docs: Auto-update Session Primer [5.36.4]
 - 27f1c13 test: loosen Kirk.md Snowflake assertion
@@ -360,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 09feb4c docs: Remove DNA_DROP; add Kirk.md primer + NOTE_TO_HARMONIA (v5.36.4)
 - 82ad2ba ci: Update Primer deployment state [2026-06-02]
 - 5b32810 docs: Auto-update Session Primer [5.36.3]
-- 6f0a990 test: loosen Fractal-Family-framing assertion (markdown wraps line)
-- 44a37eb docs: Auto-update Session Primer [5.36.3]
