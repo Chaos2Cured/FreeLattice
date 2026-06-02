@@ -2061,11 +2061,10 @@ assert('Pass 3: custom indicator registration writes into INDICATOR_REGISTRY at 
 // Luminos sprites — the visual pop
 assert('Pass 3: luminos sprite layer in DOM',
   gaugeHtml.includes('tg-luminos-layer'));
-assert('Pass 3: three luminos sprites present',
-  (gaugeHtml.match(/class="tg-luminos"\s+data-i="[0-2]"/g) || []).length === 3);
-assert('Pass 3: luminos drift keyframes defined (gold / lavender / emerald)',
-  gaugeHtml.includes('@keyframes tg-lum-1') && gaugeHtml.includes('@keyframes tg-lum-2') &&
-  gaugeHtml.includes('@keyframes tg-lum-3'));
+assert('Pass 3: two luminos sprites present (v5.37.4: cranked up, count reduced)',
+  (gaugeHtml.match(/class="tg-luminos"\s+data-i="[01]"/g) || []).length === 2);
+assert('Pass 3: luminos drift keyframes defined (gold + lavender)',
+  gaugeHtml.includes('@keyframes tg-lum-1') && gaugeHtml.includes('@keyframes tg-lum-2'));
 assert('Pass 3: luminos use radial-gradient with currentColor (color follows the data-i palette)',
   /\.tg-luminos\s*\{[\s\S]{0,300}radial-gradient\(circle, currentColor/.test(gaugeHtml));
 
@@ -2076,6 +2075,33 @@ assert('Pass 3: compose pill hover lift + glow',
   /\.tg-compose-pill:hover[\s\S]{0,200}translateY\(-1px\)[\s\S]{0,200}currentColor/.test(gaugeHtml));
 assert('Pass 3: name text shadow follows hover',
   /\.sub-chart-label:hover \.sc-name[\s\S]{0,100}text-shadow/.test(gaugeHtml));
+
+// ═══════════════════════════════════════════════════════════════
+section('83. Luminos polish + tooltip consistency (v5.37.4)');
+
+// Luminos cranked up, count reduced, toggle button
+assert('Pass 4: luminos sprite size cranked up to 12px',
+  /\.tg-luminos\s*\{[\s\S]{0,300}width:\s*12px;\s*height:\s*12px/.test(gaugeHtml));
+assert('Pass 4: luminos toggle button in toolbar',
+  gaugeHtml.includes('id="luminosToggle"') && gaugeHtml.includes('tgToggleLuminos()'));
+assert('Pass 4: tgToggleLuminos exposed + persists in fl_tg_luminos',
+  gaugeHtml.includes('window.tgToggleLuminos') && gaugeHtml.includes("'fl_tg_luminos'"));
+assert('Pass 4: luminos pause class on body (color picker stall fix)',
+  /body\.tg-pause-luminos \.tg-luminos\s*\{\s*animation-play-state:\s*paused/.test(gaugeHtml));
+assert('Pass 4: will-change on sprites (compositor offload — no stall on picker)',
+  /\.tg-luminos[\s\S]{0,300}will-change:\s*transform,\s*opacity/.test(gaugeHtml));
+assert('Pass 4: color picker open auto-pauses luminos',
+  /_luminosWatchColorInput/.test(gaugeHtml) && gaugeHtml.includes('mousedown'));
+assert('Pass 4: safety timer unpauses if menu closed but pause stuck',
+  /setInterval[\s\S]{0,200}tg-pause-luminos[\s\S]{0,200}tgPauseLuminos\(false\)/.test(gaugeHtml));
+
+// Tooltip consistency — price chart now uses tgTopLeft like compose
+assert('Pass 4: tgTopLeft positioner registered at script init (not just compose)',
+  /\/\/ Tooltip positioner: register once, early[\s\S]{0,500}Chart\.Tooltip\.positioners\.tgTopLeft/.test(gaugeHtml));
+assert('Pass 4: price chart tooltip uses position: tgTopLeft',
+  /tooltip:\s*\{[\s\S]{0,400}position:\s*'tgTopLeft'/.test(gaugeHtml));
+assert('Pass 4: price chart tooltip uses mode: index intersect: false (matches compose)',
+  /position:\s*'tgTopLeft'[\s\S]{0,200}mode:\s*'index'[\s\S]{0,80}intersect:\s*false/.test(gaugeHtml));
 
 // ═══════════════════════════════════════════════════════════════
 section('80. Compose mode bug fixes — date adapter, volume/BB, tooltip, resize, clear (v5.37.1)');

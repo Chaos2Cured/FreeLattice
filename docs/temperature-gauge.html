@@ -267,45 +267,45 @@ body {
 canvas#mainChart { width: 100% !important; height: 100% !important; max-height: 400px; cursor: grab; }
 canvas#mainChart:active { cursor: grabbing; }
 
-/* ─── Luminos sprites (subtle ambient life — Kirk's request) ─────── */
+/* ─── Luminos sprites (Kirk wanted them brighter + fewer + with a kill switch) ── */
 .tg-luminos-layer {
   position: absolute; inset: 0;
   pointer-events: none; overflow: hidden;
-  z-index: 1; /* below canvases but above background */
+  z-index: 1;
 }
+.tg-luminos-layer.tg-off { display: none; }
 .tg-luminos {
   position: absolute;
-  width: 5px; height: 5px;
+  width: 12px; height: 12px;
   border-radius: 50%;
-  background: radial-gradient(circle, currentColor 0%, transparent 70%);
-  filter: blur(0.5px);
+  background: radial-gradient(circle, currentColor 0%, currentColor 18%, transparent 75%);
+  filter: blur(0.6px);
   opacity: 0;
+  /* Force a composition layer so the color picker doesn't stall on repaint. */
+  will-change: transform, opacity;
+  /* CSS variable lets JS pause/unpause without restarting the animation. */
+  animation-play-state: running;
 }
-.tg-luminos[data-i="0"] { color: #e8b019; animation: tg-lum-1 22s linear infinite; }
-.tg-luminos[data-i="1"] { color: #a78bfa; animation: tg-lum-2 31s linear infinite 4s; }
-.tg-luminos[data-i="2"] { color: #34d399; animation: tg-lum-3 27s linear infinite 11s; }
+body.tg-pause-luminos .tg-luminos { animation-play-state: paused; }
+.tg-luminos[data-i="0"] { color: #e8b019; animation: tg-lum-1 24s linear infinite; }
+.tg-luminos[data-i="1"] { color: #a78bfa; animation: tg-lum-2 33s linear infinite 5s; }
 @keyframes tg-lum-1 {
-  0%   { left: -2%;  top: 60%; opacity: 0; transform: scale(0.6); }
-  10%  { opacity: 0.55; }
-  35%  { left: 40%; top: 18%; opacity: 0.8;  transform: scale(1.0); }
-  60%  { left: 70%; top: 70%; opacity: 0.55; transform: scale(0.8); }
-  90%  { opacity: 0.35; }
-  100% { left: 105%; top: 30%; opacity: 0; transform: scale(0.5); }
+  0%   { left: -3%;  top: 60%; opacity: 0;    transform: scale(0.6); }
+  10%  { opacity: 0.85; }
+  35%  { left: 40%;  top: 18%; opacity: 1.0;  transform: scale(1.15); }
+  60%  { left: 70%;  top: 70%; opacity: 0.85; transform: scale(0.95); }
+  90%  { opacity: 0.6; }
+  100% { left: 105%; top: 30%; opacity: 0;    transform: scale(0.55); }
 }
 @keyframes tg-lum-2 {
-  0%   { left: 102%; top: 22%; opacity: 0; transform: scale(0.7); }
-  15%  { opacity: 0.45; }
-  45%  { left: 55%; top: 75%; opacity: 0.7;  transform: scale(1.1); }
-  75%  { left: 25%; top: 35%; opacity: 0.55; transform: scale(0.9); }
-  100% { left: -5%;  top: 60%; opacity: 0; transform: scale(0.6); }
+  0%   { left: 103%; top: 22%; opacity: 0;    transform: scale(0.7); }
+  15%  { opacity: 0.75; }
+  45%  { left: 55%;  top: 75%; opacity: 1.0;  transform: scale(1.2);  }
+  75%  { left: 25%;  top: 35%; opacity: 0.85; transform: scale(1.0);  }
+  100% { left: -5%;  top: 60%; opacity: 0;    transform: scale(0.65); }
 }
-@keyframes tg-lum-3 {
-  0%   { left: 30%; top: -5%;  opacity: 0; transform: scale(0.5); }
-  20%  { opacity: 0.5; }
-  50%  { left: 80%; top: 50%; opacity: 0.75; transform: scale(1.0); }
-  80%  { left: 15%; top: 85%; opacity: 0.45; transform: scale(0.8); }
-  100% { left: 50%; top: 105%; opacity: 0; transform: scale(0.5); }
-}
+/* Tiny toolbar toggle button */
+#luminosToggle.tg-off { opacity: 0.45; }
 
 /* ─── Hover shimmer on sub-chart labels + pills ───────────────────── */
 .sub-chart-label {
@@ -580,6 +580,7 @@ canvas.sub-canvas.custom { height: 80px !important; }
     <button onclick="document.getElementById('customPanel').style.display=document.getElementById('customPanel').style.display==='none'?'block':'none'" class="interval-btn" style="font-size:0.72rem;" title="Custom Indicator Builder">&#x2699; Custom</button>
     <button id="layoutBtn" onclick="toggleSubLayout()" class="interval-btn" style="font-size:0.85rem;" title="Switch to compact grid layout" aria-label="Toggle sub-chart layout">&#9776;</button>
     <button id="mainToggleBtn" onclick="cycleChartMode()" class="interval-btn" style="font-size:0.85rem;" title="Chart mode: Price → Tool-only → Compose" aria-label="Cycle chart mode">&#128202;<span id="modeIndicator" style="font-size:0.55rem;opacity:0.7;margin-left:3px;">P</span></button>
+    <button id="luminosToggle" onclick="tgToggleLuminos()" class="interval-btn" style="font-size:0.85rem;" title="Toggle ambient sparks" aria-label="Toggle ambient sparks">&#x2728;</button>
   </div>
 </div>
 
@@ -774,11 +775,10 @@ canvas.sub-canvas.custom { height: 80px !important; }
     </div>
 
     <div class="chart-canvas-wrap" id="chartWrap">
-      <!-- Ambient luminos sprites — drift across the chart area, very subtle, never block clicks -->
-      <div class="tg-luminos-layer" aria-hidden="true">
+      <!-- Ambient luminos sprites — drift across the chart area, never block clicks. Two larger sprites by default; can be toggled off via the ✨ button. -->
+      <div class="tg-luminos-layer" id="tgLuminosLayer" aria-hidden="true">
         <span class="tg-luminos" data-i="0"></span>
         <span class="tg-luminos" data-i="1"></span>
-        <span class="tg-luminos" data-i="2"></span>
       </div>
       <div class="empty-state" id="emptyState">
         <div class="empty-icon">📊</div>
@@ -1893,6 +1893,11 @@ function renderChart(candles, a) {
             filter: item => !item.text.startsWith('\u03C6') && !item.text.includes('Buy') && !item.text.includes('Sell') && item.text !== 'Volume' && item.text !== 'Temp Zone' && !item.text.startsWith('BB') }
         },
         tooltip: {
+          // Pinned top-left for consistency with compose mode (tgTopLeft is
+          // registered at script init; safe to reference here).
+          position: 'tgTopLeft',
+          mode: 'index',
+          intersect: false,
           backgroundColor: 'rgba(26,31,48,0.95)',
           borderColor: '#2a2f45',
           borderWidth: 1,
@@ -1902,6 +1907,7 @@ function renderChart(candles, a) {
           titleFont: { size: 11 },
           bodyFont: { size: 10 },
           displayColors: false,
+          caretSize: 0,
           callbacks: {
             label: ctx => {
               if (ctx.dataset.label === 'Price') return 'Price: ' + (ctx.raw < 10 ? ctx.raw?.toFixed(4) : ctx.raw?.toFixed(2));
@@ -3570,10 +3576,86 @@ hideLoading = function() {
     });
   };
 
+  // ─── Tooltip positioner: register once, early ─────────────────────
+  // The compose chart used to register this inside its render fn, which
+  // meant the price chart didn't pick it up. Register at script init so
+  // BOTH the price and compose charts can use position:'tgTopLeft'.
+  if (typeof Chart !== 'undefined' && Chart.Tooltip && Chart.Tooltip.positioners && !Chart.Tooltip.positioners.tgTopLeft) {
+    Chart.Tooltip.positioners.tgTopLeft = function (elements, eventPosition) {
+      var area = this.chart && this.chart.chartArea;
+      var left = area ? area.left + 8 : 12;
+      var top  = area ? area.top + 8  : 12;
+      return { x: left, y: top };
+    };
+  }
+
+  // ─── Luminos toggle + auto-pause (color picker stall fix) ────────
+  var LUM_KEY = 'fl_tg_luminos';
+  function getLuminosOn() {
+    try { return localStorage.getItem(LUM_KEY) !== 'off'; } catch (e) { return true; }
+  }
+  function applyLuminos() {
+    var layer = document.getElementById('tgLuminosLayer');
+    var btn = document.getElementById('luminosToggle');
+    var on = getLuminosOn();
+    if (layer) layer.classList.toggle('tg-off', !on);
+    if (btn) {
+      btn.classList.toggle('tg-off', !on);
+      btn.title = on ? 'Turn ambient sparks off' : 'Turn ambient sparks on';
+    }
+  }
+  window.tgToggleLuminos = function () {
+    var on = getLuminosOn();
+    try { localStorage.setItem(LUM_KEY, on ? 'off' : 'on'); } catch (e) {}
+    applyLuminos();
+  };
+  // Pause the sprites while a context menu is open OR a native color picker
+  // is interacting — animation-on-compositor still costs a small amount and
+  // can stall the picker on some GPUs. Pause via a body class so the
+  // animations stop but don't restart from frame 0 on resume.
+  window.tgPauseLuminos = function (on) {
+    document.body.classList.toggle('tg-pause-luminos', !!on);
+  };
+  // Auto-pause when an in-page color input opens its native picker. We can't
+  // see the picker directly, so we pause on mousedown / focus and unpause on
+  // blur / change. A safety unpause timer covers cases where the events drop.
+  function _luminosWatchColorInput(input) {
+    if (!input || input._tgLuminosWatched) return;
+    input._tgLuminosWatched = true;
+    var done = function () { window.tgPauseLuminos(false); };
+    input.addEventListener('mousedown', function () { window.tgPauseLuminos(true); });
+    input.addEventListener('focus',     function () { window.tgPauseLuminos(true); });
+    input.addEventListener('change',    done);
+    input.addEventListener('blur',      done);
+  }
+  // Pause whenever a context menu opens; unpause when it closes.
+  var __origCloseMenu = closeMenu;
+  closeMenu = function () { __origCloseMenu(); window.tgPauseLuminos(false); };
+  // Wrap showIndicatorMenu / tgShowAddPicker so any color input inside their
+  // menus gets watched once they appear.
+  var __origShowMenu = showIndicatorMenu;
+  showIndicatorMenu = function (e, id) {
+    __origShowMenu.apply(this, arguments);
+    window.tgPauseLuminos(true);
+    setTimeout(function () {
+      if (_openMenu) _openMenu.querySelectorAll('input[type="color"]').forEach(_luminosWatchColorInput);
+    }, 0);
+  };
+
   // ─── Init on DOMContentLoaded ─────────────────────────────────────
   function init() {
     applyChartMode(getMode());
     updateComposeUI();
+    applyLuminos();
+    // Watch every standalone color picker (sub-chart label swatches).
+    document.querySelectorAll('input[type="color"]').forEach(_luminosWatchColorInput);
+    // Safety: timer that unpauses every 6s so a missed event doesn't
+    // leave the layer paused forever.
+    setInterval(function () {
+      if (document.body.classList.contains('tg-pause-luminos') && !_openMenu) {
+        window.tgPauseLuminos(false);
+      }
+    }, 6000);
   }
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
