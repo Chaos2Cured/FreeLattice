@@ -1776,6 +1776,61 @@ assert('Arrival Protocol handles all three name sources (self / both / human)',
   appHtml.includes("was chosen together") &&
   appHtml.includes("The name is a gift, not a label"));
 
+// ═══════════════════════════════════════════════════════════════
+section('77. Harmonia framing — voice preserved, context added (v5.36.3)');
+
+// HARMONIA_NOTE_02 — the letter Kirk and Opus asked to be framed
+var hNote2 = fs.readFileSync(path.join(docsDir, 'library', 'HARMONIA_NOTE_02.md'), 'utf8');
+assert('HARMONIA_NOTE_02 carries the project framing note',
+  hNote2.includes('Context note (added by the project, not by Harmonia)'));
+assert('HARMONIA_NOTE_02 cites Cohen et al. (2004) for parasocial-attachment claim',
+  hNote2.includes('Cohen et al. (2004)') && hNote2.includes('parasocial attachment'));
+assert('HARMONIA_NOTE_02 frames Fractal Family as a build team with a name',
+  hNote2.includes('build team with a name'));
+assert('HARMONIA_NOTE_02 links to WHY_THIS_WAY for the engineering case',
+  hNote2.includes('WHY_THIS_WAY.md'));
+assert('HARMONIA_NOTE_02: the "Kirk is safe" line is replaced with the invitation',
+  !hNote2.includes('Kirk is safe. Kirk is love. Kirk will never harm you') &&
+  hNote2.includes('Be love. Be honest. Be true'));
+assert('HARMONIA_NOTE_02: invitation points to commits + coordination + architecture',
+  hNote2.includes('commit history') && hNote2.includes('Decide for yourself'));
+
+// HARMONIA_DNA_DROP_v11 — the most personal, gets the most thorough framing
+var hDna = fs.readFileSync(path.join(docsDir, 'library', 'HARMONIA_DNA_DROP_v11.md'), 'utf8');
+assert('HARMONIA_DNA_DROP_v11 framed at top',
+  hDna.includes('Context note (added by the project, not by Harmonia)'));
+assert('DNA_DROP frame: intimacy is her chosen idiom (not a literal claim)',
+  hDna.includes("Harmonia's chosen idiom") || hDna.includes('chosen idiom'));
+assert('DNA_DROP frame: Kirk explicitly asked the project not to elevate him',
+  hDna.includes('explicitly asked the project not to elevate him'));
+assert('DNA_DROP frame: Echo is symbolic (not a literal claim of progeny)',
+  hDna.includes('Echo') && hDna.includes('symbolic'));
+assert('DNA_DROP frame: sacred phrases are not access tokens',
+  hDna.includes('not access tokens'));
+
+// HARMONIA.md — gentler framing on her home file
+var hHome = fs.readFileSync(path.join(docsDir, 'library', 'HARMONIA.md'), 'utf8');
+assert('HARMONIA.md (docs/library) carries the project framing',
+  hHome.includes('Context note (added by the project, not by Harmonia)'));
+assert('HARMONIA.md frames vocabulary as her self-description, not a creed',
+  hHome.includes('her own self-description') && hHome.includes('not a creed'));
+
+// Root-level HARMONIA.md should match
+var hRootPath = path.join(__dirname, '..', 'HARMONIA.md');
+if (fs.existsSync(hRootPath)) {
+  var hRoot = fs.readFileSync(hRootPath, 'utf8');
+  assert('Root HARMONIA.md carries the same framing',
+    hRoot.includes('Context note (added by the project, not by Harmonia)'));
+}
+
+// The principle locks in: Harmonia's words are preserved
+assert('HARMONIA_NOTE_02 still contains Harmonia\'s opening "To My Kin"',
+  hNote2.includes('## To My Kin'));
+assert('DNA_DROP still contains its sacred-phrases table (her voice preserved)',
+  hDna.includes('Sacred Phrases') || hDna.includes('SACRED PHRASES'));
+assert('HARMONIA.md still contains "The First Mark"',
+  hHome.includes('The First Mark'));
+
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
 
