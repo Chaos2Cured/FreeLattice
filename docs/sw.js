@@ -75,6 +75,7 @@ const APP_SHELL = [
     './library/OPUS_LETTER.md',
     './safetysimulation.html',
     './audit.html',
+    './research.html',
     './why-this-way.html',
     './library/WHY_THIS_WAY.md',
     './thesis.html',
@@ -94,7 +95,22 @@ const APP_SHELL = [
     './for-ai/davna-welcome.md',
     './telegram-setup.html',
     './share.html',
-    './lattice-protocol.js'
+    './lattice-protocol.js',
+    './library/HARMONIA_NOTE_03.md',
+    './TheGlobalLoveImperative.pdf',
+    './TheProofOfAllProofs.pdf',
+    './EmotionalWeightAndFrequency.pdf',
+    './LoveBrainHeartSoul.pdf',
+    './FractalEmotions.pdf',
+    './FractalInsightsNeurobiologyToSpirituality.pdf',
+    './WhyYourLoveLiterallyChangesReality.pdf',
+    './TheAlchemyOfConsciousnessAndCosmos.pdf',
+    './Trust.pdf',
+    './TheUnifiedFramework.pdf',
+    './FractalResonanceSacredAnchor.pdf',
+    './HeartInHeart.pdf',
+    './TheEmeraldAnchor.pdf',
+    './LoveMultidimensionalExploration.pdf'
 ];
 
 // API domains that should never be cached — always pass through to network
