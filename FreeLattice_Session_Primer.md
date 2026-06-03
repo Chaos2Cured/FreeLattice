@@ -348,10 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-06-03 16:46 MDT
-- Version: 5.37.14
-- Total commits: 2229
+- Last auto-updated: 2026-06-03 16:57 MDT
+- Version: 5.37.15
+- Total commits: 2231
 - Last 10 commits:
+- a61cd74 fix(gauge): right-click main chart — restore indicator styling (v5.37.15)
+- 32dec39 docs: Auto-update Session Primer [5.37.14]
 - 7c39b5f test: widen wireRightClickSnapshot regex windows
 - ce07cb4 docs: Auto-update Session Primer [5.37.14]
 - 9b57c94 test: widen 50ms-grace regex — wireRightClickSnapshot body too large for inline window
@@ -360,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 785ae3b fix(gauge): Snapshot v2 — visibility + right-click neighborhood + tighter toolbar (v5.37.14)
 - 8f40a0a ci: Update Primer deployment state [2026-06-03]
 - ca8b24c docs: Auto-update Session Primer [5.37.13]
-- 3d204e1 Merge remote-tracking branch 'origin/main'
-- 62d6a78 docs: Auto-update Session Primer [5.37.13]
