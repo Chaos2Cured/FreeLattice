@@ -2453,8 +2453,10 @@ assert('Snapshot: right-click menu item "📋 Snapshot (±5 bars around cursor)"
   /Snapshot \(±5 bars around cursor\)/.test(gaugeHtml));
 assert('Snapshot: right-click calls copySnapshot(11, centerIdx) — 11 bars centered',
   /copySnapshot\(11, centerIdx\)/.test(gaugeHtml));
-assert('Snapshot: right-click menu also shows compose-mode "Style which?" items when applicable',
-  /Style which indicator\?[\s\S]{0,300}promoted\.forEach/.test(gaugeHtml));
+assert('Right-click menu: always-available "Style indicator:" picker (not compose-only)',
+  /Style indicator:[\s\S]{0,800}addStyleItem[\s\S]{0,200}'rsi'[\s\S]{0,100}'temperature'[\s\S]{0,100}'dt'[\s\S]{0,100}'ips'/.test(gaugeHtml));
+assert('Right-click menu: promoted indicators listed FIRST (compose mode shows "on main" label)',
+  /promoted\.forEach\(addStyleItem\)/.test(gaugeHtml) && /on main/.test(gaugeHtml));
 assert('Snapshot: 50ms grace on outside-click handler (no birth-click close)',
   /setTimeout\(function \(\)\s*\{\s*document\.addEventListener\('click', outsideHandler, true\);\s*\},\s*50\)/.test(gaugeHtml));
 

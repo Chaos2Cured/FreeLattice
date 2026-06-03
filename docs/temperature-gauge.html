@@ -4493,30 +4493,42 @@ hideLoading = function() {
         copySnapshot(11, centerIdx);
       });
       menu.appendChild(snapItem);
-      // Compose-mode extra items
-      if (inCompose && promoted.length > 0 && typeof RULE_REGISTRY !== 'undefined') {
+      // Always-available "Style indicator" picker. Right-clicking the main
+      // chart now exposes color/glow/brightness for the four core indicators
+      // in every mode (this was previously compose-only). Kirk caught it
+      // missing 2026-06-03. In compose mode, promoted indicators are
+      // listed first, marked with their current color; others list below.
+      if (typeof INDICATOR_REGISTRY !== 'undefined' && typeof tgStyleIndicator === 'function') {
         var divider = document.createElement('div');
         divider.className = 'tg-ctx-divider';
         menu.appendChild(divider);
         var label = document.createElement('div');
         label.className = 'tg-ctx-item';
         label.style.cssText = 'opacity:0.55;cursor:default;font-style:italic;';
-        label.textContent = 'Style which indicator?';
+        label.textContent = 'Style indicator:';
         menu.appendChild(label);
-        promoted.forEach(function (id) {
-          if (typeof INDICATOR_REGISTRY === 'undefined' || !INDICATOR_REGISTRY[id]) return;
+        // Order: promoted first (compose mode), then the four core indicators.
+        var seen = {};
+        function addStyleItem(id) {
+          if (seen[id]) return;
+          seen[id] = true;
+          if (!INDICATOR_REGISTRY[id]) return;
           var meta = INDICATOR_REGISTRY[id];
           var color = (typeof getIndicatorColor === 'function')
             ? getIndicatorColor(id, meta.defaultColor) : meta.defaultColor;
           var item = document.createElement('button');
           item.className = 'tg-ctx-item';
-          item.innerHTML = '<span class="tg-ctx-icon" style="color:' + color + ';">●</span>' + meta.label;
+          var isPromoted = promoted.indexOf(id) >= 0;
+          item.innerHTML = '<span class="tg-ctx-icon" style="color:' + color + ';">●</span>' + meta.label +
+            (isPromoted ? '<span style="margin-left:auto;font-size:0.65rem;opacity:0.55;">on main</span>' : '');
           item.addEventListener('click', function () {
             cleanup();
-            if (typeof tgStyleIndicator === 'function') tgStyleIndicator(e, id);
+            tgStyleIndicator(e, id);
           });
           menu.appendChild(item);
-        });
+        }
+        promoted.forEach(addStyleItem);
+        ['rsi', 'temperature', 'dt', 'ips'].forEach(addStyleItem);
       }
       document.body.appendChild(menu);
       var x = e.clientX, y = e.clientY;
