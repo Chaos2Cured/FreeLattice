@@ -2445,8 +2445,14 @@ assert('Snapshot: tail mode (no center) preserved as default',
   /} else \{\s*startIdx = n - barCount;/.test(gaugeHtml));
 
 // Right-click context menu — neighborhood snapshot at cursor
-assert('Snapshot: wireRightClickSnapshot wires oncontextmenu on #mainChart',
-  /function wireRightClickSnapshot[\s\S]{0,1000}getElementById\('mainChart'\)[\s\S]{0,500}canvas\.oncontextmenu\s*=\s*function/.test(gaugeHtml));
+assert('Snapshot: wireRightClickSnapshot uses capture-phase contextmenu (so it wins over compose IIFE)',
+  /canvas\.addEventListener\('contextmenu',\s*function\s*\(e\)/.test(gaugeHtml) &&
+  /\}, true\);\s*\/\/ capture phase \+ stopImmediatePropagation above = this menu wins/.test(gaugeHtml));
+assert('Snapshot: stopImmediatePropagation called so the compose IIFE oncontextmenu does not also fire',
+  /e\.stopImmediatePropagation\(\)/.test(gaugeHtml));
+assert('Snapshot: single clipboard glyph (icon span only, no duplicate in text)',
+  !/'📋 Snapshot \(±5 bars around cursor\)'/.test(gaugeHtml) &&
+  /class="tg-ctx-icon">&#x1F4CB;<\/span>Snapshot/.test(gaugeHtml));
 assert('Snapshot: uses Chart.js getElementsAtEventForMode to find bar under cursor',
   /getElementsAtEventForMode\(e,\s*'index',\s*\{\s*intersect:\s*false\s*\}/.test(gaugeHtml));
 assert('Snapshot: right-click menu item "📋 Snapshot (±5 bars around cursor)"',

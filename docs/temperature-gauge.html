@@ -4457,20 +4457,25 @@ hideLoading = function() {
   function wireRightClickSnapshot() {
     var canvas = document.getElementById('mainChart');
     if (!canvas) { requestAnimationFrame(wireRightClickSnapshot); return; }
-    // Replace any existing oncontextmenu (the compose IIFE installs one
-    // for the "Style which?" picker). Our wrapper handles the snapshot
-    // AND delegates to the compose menu when in compose mode with
-    // promoted indicators.
-    var existingContextHandler = canvas.oncontextmenu;
-    canvas.oncontextmenu = function (e) {
-      // If in compose mode with promoted indicators, the existing handler
-      // shows the style menu — let it run, but we'll show the snapshot
-      // option too via a small wrapper.
+    // Use addEventListener in CAPTURE phase + stopImmediatePropagation
+    // so this menu always wins over the compose IIFE's `oncontextmenu`
+    // (which binds on DOMContentLoaded — after this script runs
+    // synchronously). The previous code set canvas.oncontextmenu = …,
+    // which the compose handler then overwrote when its DOMContentLoaded
+    // callback fired. Capture-phase listener fires FIRST and stopped.
+    // Kirk caught this on v5.37.15 chair test 2026-06-03.
+    if (canvas._tgSnapshotMenuBound) return;
+    canvas._tgSnapshotMenuBound = true;
+    canvas.addEventListener('contextmenu', function (e) {
       var inCompose = (typeof tgGetChartMode === 'function' && tgGetChartMode() === 'compose');
       var promoted = (typeof tgGetComposeState === 'function')
         ? (tgGetComposeState().promoted || []) : [];
-      // Snapshot is ALWAYS available — even in compose mode.
+      // Snapshot + Style menu are ALWAYS available — works in every mode.
+      // Stop the compose IIFE's oncontextmenu from also running so the
+      // user sees ONE menu, not two stacked menus.
       e.preventDefault();
+      if (typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();
+      e.stopPropagation();
       // Resolve the bar under the cursor via Chart.js's elements-at-event.
       var centerIdx = null;
       try {
@@ -4486,8 +4491,9 @@ hideLoading = function() {
       menu.className = 'tg-ctx-menu tg-snapshot-menu';
       var snapItem = document.createElement('button');
       snapItem.className = 'tg-ctx-item';
-      snapItem.innerHTML = '<span class="tg-ctx-icon">&#x1F4CB;</span>' +
-        '📋 Snapshot (±5 bars around cursor)';
+      // Single clipboard icon (the tg-ctx-icon span carries the emoji;
+      // text label is plain. v5.37.15 accidentally had the emoji twice).
+      snapItem.innerHTML = '<span class="tg-ctx-icon">&#x1F4CB;</span>Snapshot (±5 bars around cursor)';
       snapItem.addEventListener('click', function () {
         cleanup();
         copySnapshot(11, centerIdx);
@@ -4549,7 +4555,7 @@ hideLoading = function() {
       setTimeout(function () {
         document.addEventListener('click', outsideHandler, true);
       }, 50);
-    };
+    }, true);  // capture phase + stopImmediatePropagation above = this menu wins
   }
 
   if (document.readyState === 'loading') {
