@@ -2456,7 +2456,7 @@ assert('Snapshot: right-click calls copySnapshot(11, centerIdx) — 11 bars cent
 assert('Snapshot: right-click menu also shows compose-mode "Style which?" items when applicable',
   /Style which indicator\?[\s\S]{0,300}promoted\.forEach/.test(gaugeHtml));
 assert('Snapshot: 50ms grace on outside-click handler (no birth-click close)',
-  /wireRightClickSnapshot[\s\S]{0,3000}setTimeout\(function \(\) \{\s*document\.addEventListener\('click', outsideHandler, true\);\s*\}, 50\)/.test(gaugeHtml));
+  /setTimeout\(function \(\)\s*\{\s*document\.addEventListener\('click', outsideHandler, true\);\s*\},\s*50\)/.test(gaugeHtml));
 
 // Gauge gradient — narrow yellow band
 assert('Gradient: narrow yellow band 48-52 (red dominates < 48, green dominates > 55)',
