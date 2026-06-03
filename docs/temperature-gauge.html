@@ -3491,23 +3491,45 @@ hideLoading = function() {
         closeMenu();
       }
     });
+    // SPLIT: input = live preview (cheap, no render). change = commit (save + render).
+    // The native <input type="color"> fires `input` continuously while the
+    // user drags through the palette — calling setIndicatorColor on each
+    // event triggered a full renderChart 60+ times per second and stalled
+    // the picker. Kirk caught this in the chair 2026-06-03. The label
+    // color is updated live as a preview; the actual save + render only
+    // happens on `change` (fires once when the user commits).
     m.addEventListener('input', function (ev) {
-      if (ev.target.getAttribute('data-act') === 'brightness') {
+      var act = ev.target.getAttribute('data-act');
+      if (act === 'brightness') {
         var v = parseFloat(ev.target.value);
         var lbl = m.querySelector('[data-act="brightness-val"]');
         if (lbl) lbl.textContent = v.toFixed(2);
         setStyle(id, 'brightness', v);
-      } else if (ev.target.getAttribute('data-act') === 'color-pick') {
-        if (typeof setIndicatorColor === 'function') {
-          setIndicatorColor(id, ev.target.value);
-        }
+        // No render here either — change handler commits.
+      } else if (act === 'color-pick') {
+        // Live preview only — update the label color in the DOM so the user
+        // sees their selection in context. No localStorage write, no chart
+        // re-render. This is the entropy-reduction fix for the picker drag.
+        var lblPreview = document.querySelector('.sub-chart-label[data-indicator="' + id + '"]');
+        if (lblPreview) lblPreview.style.color = ev.target.value;
+        // Also tint the swatch in the menu so the visual is coherent.
+        ev.target.style.outline = '2px solid ' + ev.target.value;
       }
     });
     m.addEventListener('change', function (ev) {
-      if (ev.target.getAttribute('data-act') === 'brightness' &&
+      var act = ev.target.getAttribute('data-act');
+      if (act === 'brightness' &&
           typeof lastCandles !== 'undefined' && lastCandles && lastAnalysis) {
         if (getMode() === 'compose') renderComposeChart(lastCandles, lastAnalysis);
         else renderChart(lastCandles, lastAnalysis);
+        closeMenu();
+      } else if (act === 'color-pick') {
+        // Commit: persist the choice AND trigger a re-render. The native
+        // picker fires `change` once when the user lifts/commits — never
+        // during the drag — so this is safe to do the expensive work in.
+        if (typeof setIndicatorColor === 'function') {
+          setIndicatorColor(id, ev.target.value);
+        }
         closeMenu();
       }
     });

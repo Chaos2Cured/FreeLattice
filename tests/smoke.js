@@ -2248,6 +2248,24 @@ assert('EMA config: setEmaPeriods triggers full renderAll',
   /setEmaPeriods[\s\S]{0,500}renderAll\(lastCandles, lastAnalysis/.test(gaugeHtml));
 
 // ═══════════════════════════════════════════════════════════════
+section('87. Color-picker drag fix — preview on input, commit on change (v5.37.8)');
+
+// The real entropy-source: setIndicatorColor (full renderChart) was being
+// called on every `input` event from the native color picker while the
+// user dragged through the palette. ~60 renderCharts per second of drag.
+// Fix: preview on input (cheap label color update), commit on change.
+assert('Drag fix: input handler does NOT call setIndicatorColor (was the 60fps render storm)',
+  !/m\.addEventListener\('input'[\s\S]{0,800}color-pick'[\s\S]{0,200}setIndicatorColor/.test(gaugeHtml));
+assert('Drag fix: input handler updates label color preview (live, cheap)',
+  /input[\s\S]{0,1200}color-pick[\s\S]{0,400}lblPreview\.style\.color\s*=\s*ev\.target\.value/.test(gaugeHtml));
+assert('Drag fix: change handler is the ONLY path that calls setIndicatorColor',
+  /m\.addEventListener\('change'[\s\S]{0,800}color-pick[\s\S]{0,300}setIndicatorColor\(id, ev\.target\.value\)/.test(gaugeHtml));
+assert('Drag fix: comment explains the renderChart-per-input regression',
+  gaugeHtml.includes('continuously while the') ||
+  gaugeHtml.includes('60+ times per second') ||
+  gaugeHtml.includes('drag through the palette'));
+
+// ═══════════════════════════════════════════════════════════════
 section('80. Compose mode bug fixes — date adapter, volume/BB, tooltip, resize, clear (v5.37.1)');
 
 // Bug 1: x-axis is category labels, not Chart.js time scale (no adapter needed)
