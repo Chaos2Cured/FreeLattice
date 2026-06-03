@@ -102,6 +102,21 @@
 - Right-anchored wheel zoom (newest candle stays pinned at x.max; the window contracts from the left — trader-style)
 - Gauge is served network-first by the SW so polish ships to users on next page load without a CACHE_NAME bump
 
+## What Works (added v5.37.0 – v5.37.7 — composable + sell triad + EMA config)
+
+- **Three-mode chart**: Price · Tool-only · Compose. Cycle via the 📊 toolbar button. Mode + promoted indicators + per-indicator brightness/glow persist in `fl_tg_chart_mode` / `fl_tg_composeState` / `fl_tg_indicatorStyles`.
+- **Compose mode**: any combination of indicators can be promoted to the main canvas. Each gets its own y-axis (alternating left/right); only the first shows grid (visual clutter reduction). Tooltip pinned top-left in BOTH price and compose mode via `Chart.Tooltip.positioners.tgTopLeft` registered at script init.
+- **10 promotable indicators**: RSI, Temperature, ΔT, IPS, Volume (bar), Bollinger Bands (3-line via `getMultiple`), Price, EMA 8/12/24/50. Custom indicators self-register via `tgRegisterCustomIndicator()` so user-built ones are promotable too.
+- **"+ Add" picker** with live SVG sparkline previews per indicator (`tgSparkline(id, w, h)`). Whole empty-stage card is clickable; `touchend` wired explicitly for iOS Safari synthetic-click reliability.
+- **Right-click / long-press menu** on every sub-chart AND every compose pill: 🎨 color · ✨ glow · 🔆 brightness slider · ⬆ promote / ⬇ demote · □ maximize · ⛶ fullscreen · ✕ hide. Right-click main canvas in compose mode opens a "Style which?" picker when multiple are promoted.
+- **Maximize actually grows the chart** (CSS lets canvas escape `height: 90px !important` when `data-maximized="true"`; JS monkey-patches `maximizeSubPanel` to clear canvas width/height attrs and call `inst.resize()`). Tool-only mode uses 60vh, fullscreen uses 100vh + fixed positioning + **Escape-to-exit**.
+- **Sell trigger triad (v5.37.7 — fixes the BTC top miss):** the old single trigger (sell55 only) missed yellow→red collapses. Now three flavors: `sell55` (green→yellow) + `sell45` (yellow→red) + `collapse` (5-bar peak ≥ 55 AND temps[si] < temps[si-3] − 8). Volume **OR** Acceleration confirms — panic doesn't always have above-average volume. The exact same triad is mirrored in `backtestSignals` so on-chart and historical win rates can't drift apart. Loop starts at `si=5` (collapse trigger peeks back 5 bars). *Per Opus: if a transition matters going up, the mirror transition matters going down.*
+- **Configurable EMA periods**: `DEFAULT_EMA_PERIODS = [8, 12, 24, 50, 200]` with `getEmaPeriods()` as the single source of truth. Every `ema(closes, N)` across `computeTemperature`, `analyzeData`, `renderChart`, `backtestSignals` reads from it. UI in `#customPanel` (input + Set + Reset). Persists in `fl_tg_ema_periods`. Chart legend labels: `'EMA ' + EP[i]`. `INDICATOR_REGISTRY.ema8/12/24/50` labels are refreshed inside `updateComposeUI()` so pills + picker track changes. Variable names stay `ema8`/`ema12`/etc — labels at this point, not numbers.
+- **Signal-driven luminos**: size + color follow the live signal. 22px base, 32px on "strong" (|temp-50| >= 15), 42px + saturation on "extreme" (>= 20). Green/red dominant on buy/sell, gold-and-lavender on neutral. Jitter + faster drift via `tg-instability` body class when price is > 1.5×ATR from any gravity line. Toggle button (✨) persists in `fl_tg_luminos`.
+- **Color-picker stall fixed**: never trust the native picker's `change` event (fires repeatedly while picker is open). `_luminosWatchColorInput` listens to `mousedown`/`focus`/`blur` only; gates on `tg-color-picker-open` body class; `closeMenu` wrapper + 6s safety setInterval both check the class before unpausing. `filter:none` while picker is open (the blur is the expensive part on integrated GPUs).
+- **Mobile layout**: chart on top (`.chart-area { order: 1 }`), sidebar below (`order: 2`). Two-finger scroll works (`.chart-area { overflow-y: auto }`, was `overflow: hidden`).
+- **Inline favicon** kills the 404. **Escape** exits any stuck fullscreen panel.
+
 ## Pending
 
 - Multi-timeframe Snowflake (three gauges: 1W, 1D, 1H with fractal coherence)
