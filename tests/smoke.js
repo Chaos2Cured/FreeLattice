@@ -2313,6 +2313,56 @@ assert('Strategy doc: honest about being heuristic, not a complete system',
   strat.includes('Not a complete trading system') || strat.includes('heuristics'));
 
 // ═══════════════════════════════════════════════════════════════
+section('89. Reversion Triad + outside-click race fix (v5.37.10)');
+
+// Commit 1 — outside-click race grace period
+assert('Race fix: outside-click listener uses 50ms grace (not 0)',
+  /setTimeout\(function \(\) \{ document\.addEventListener\('click', _outsideClick, true\); \}, 50\);/.test(gaugeHtml));
+assert('Race fix: zero outside-click setTimeouts remain at 0ms',
+  !/setTimeout\(function \(\) \{ document\.addEventListener\('click', _outsideClick, true\); \}, 0\);/.test(gaugeHtml));
+assert('Race fix: at least 4 sites switched to 50ms',
+  (gaugeHtml.match(/document\.addEventListener\('click', _outsideClick, true\); \}, 50/g) || []).length >= 4);
+
+// Commit 2 — Reversion Triad in renderChart
+assert('Reversion: reversionBuyPoints + reversionSellPoints arrays defined',
+  gaugeHtml.includes('reversionBuyPoints') && gaugeHtml.includes('reversionSellPoints'));
+assert('Reversion: exhaustion gate uses tpSpread threshold ±1.2',
+  /tpSpread\[ri\] < -1\.2/.test(gaugeHtml) && /tpSpread\[ri\] > 1\.2/.test(gaugeHtml));
+assert('Reversion: confluence requires bullCount/bearCount >= 3',
+  /_bullCountAt\(ri\) >= 3/.test(gaugeHtml) && /_bearCountAt\(ri\) >= 3/.test(gaugeHtml));
+assert('Reversion: 5-component bull/bear count (EMA + RSI + MACD + tempROC + gravity)',
+  /function _bullCountAt[\s\S]{0,600}ema8\[i\] > ema12\[i\][\s\S]{0,200}rsiArr\[i\] > 50[\s\S]{0,200}macdLine[\s\S]{0,200}tempROC\[i\] > 0[\s\S]{0,200}closes\[i\] >= _rvGravity/.test(gaugeHtml));
+assert('Reversion: pullback-to-gravity check (5-bar lookback)',
+  /bPullback[\s\S]{0,300}closes\[bj\] <= _rvGravity/.test(gaugeHtml) &&
+  /sPullback[\s\S]{0,300}closes\[sj\] >= _rvGravity/.test(gaugeHtml));
+assert('Reversion: requires 2-bar tempROC consistency (not single-bar fakeout)',
+  /bAccel2[\s\S]{0,200}tempROC\[ri\] > 0 && a\.tempROC\[ri-1\] > 0/.test(gaugeHtml) &&
+  /sDecel2[\s\S]{0,200}tempROC\[ri\] < 0 && a\.tempROC\[ri-1\] < 0/.test(gaugeHtml));
+assert('Reversion: also requires today turning in the signal direction',
+  /bTurningUp\s*=\s*closes\[ri\] > closes\[ri-1\]/.test(gaugeHtml) &&
+  /sTurningDown\s*=\s*closes\[ri\] < closes\[ri-1\]/.test(gaugeHtml));
+assert('Reversion: gold-star datasets on the chart (Reversion Buy/Sell)',
+  /label:\s*'Reversion Buy'[\s\S]{0,300}pointStyle:\s*'star'[\s\S]{0,200}pointBorderColor:\s*'#ffd560'/.test(gaugeHtml));
+assert('Reversion: stars sit on top via order: -1',
+  /label:\s*'Reversion Buy'[\s\S]{0,400}order:\s*-1/.test(gaugeHtml));
+
+// Reversion backtest mirrors
+assert('Reversion backtest: rvSignals array + rvbuy/rvsell types',
+  gaugeHtml.includes('rvSignals') && /'rvbuy'/.test(gaugeHtml) && /'rvsell'/.test(gaugeHtml));
+assert('Reversion backtest: stats include rvbuy + rvsell',
+  /\['buy',\s*'sell',\s*'rvbuy',\s*'rvsell'\]/.test(gaugeHtml));
+
+// Commit 3 — Strategy doc
+assert('Strategy doc: Section 9 The Reversion Tier present',
+  strat.includes('## 9. The Reversion Tier'));
+assert('Strategy doc: explains exhaustion + confluence + pullback as the trade',
+  strat.includes('Exhaustion') && strat.includes('Confluence') && strat.includes('Pullback to gravity'));
+assert('Strategy doc: lists open questions for the Reversion Tier (1.2, bullCount, 5-bar)',
+  strat.includes('1.2 ATR') && strat.includes('bullCount') && strat.includes('5-bar pullback'));
+assert('Strategy doc: mentions the planned Recipe UI as the next layer',
+  strat.includes('Recipe UI') && strat.includes('comparator'));
+
+// ═══════════════════════════════════════════════════════════════
 section('80. Compose mode bug fixes — date adapter, volume/BB, tooltip, resize, clear (v5.37.1)');
 
 // Bug 1: x-axis is category labels, not Chart.js time scale (no adapter needed)

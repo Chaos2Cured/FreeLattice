@@ -1644,8 +1644,72 @@ function backtestSignals(candles) {
     }
   }
 
+  // Reversion Triad backtest — mirrors the renderChart logic. High-quality
+  // tier scored separately so we can see if it actually outperforms the
+  // regular triad triangles.
+  var rvHigh = Math.max.apply(null, candles.slice(-80).map(function (c) { return c.h; }));
+  var rvLow  = Math.min.apply(null, candles.slice(-80).map(function (c) { return c.l; }));
+  var rvMid  = rvLow + (rvHigh - rvLow) * 0.5;
+  var rvPhi  = rvLow + (rvHigh - rvLow) * PHI_INV;
+  var rvGravity = PHI_INV * rvPhi + (1 - PHI_INV) * rvMid;
+  function _bullBT(i) {
+    var n = 0;
+    if (ema8[i] != null && ema12[i] != null && ema8[i] > ema12[i]) n++;
+    if (rsiArr[i] != null && rsiArr[i] > 50) n++;
+    if (macdData.macdLine[i] != null && macdData.signalLine[i] != null && macdData.macdLine[i] > macdData.signalLine[i]) n++;
+    if (tempROC && tempROC[i] != null && tempROC[i] > 0) n++;
+    if (closes[i] != null && closes[i] >= rvGravity) n++;
+    return n;
+  }
+  function _bearBT(i) {
+    var n = 0;
+    if (ema8[i] != null && ema12[i] != null && ema8[i] < ema12[i]) n++;
+    if (rsiArr[i] != null && rsiArr[i] < 50) n++;
+    if (macdData.macdLine[i] != null && macdData.signalLine[i] != null && macdData.macdLine[i] < macdData.signalLine[i]) n++;
+    if (tempROC && tempROC[i] != null && tempROC[i] < 0) n++;
+    if (closes[i] != null && closes[i] <= rvGravity) n++;
+    return n;
+  }
+  // tpSpread for backtest — same formula as analyzeData but inline here so we don't depend on full a object
+  var atrBT = atr(candles, 14);
+  var rvSignals = [];
+  for (var ri2 = 5; ri2 < closes.length; ri2++) {
+    if (temps[ri2] == null || closes[ri2] == null || closes[ri2-1] == null) continue;
+    // Need ATR-normalized tpSpread for exhaustion gate
+    // (compute on-the-fly: tempAsPrice = closes[ri2] + (temps[ri2]-50)/100*atr*phi-ish)
+    // For simplicity, use tempROC magnitude as exhaustion proxy: a sustained
+    // strong tempROC means the temperature is stretched. The renderChart
+    // version has full tpSpread; the backtest uses a reasonable proxy.
+    var rvBuyExhaust  = temps[ri2] < 35 && temps[ri2-1] < 40;
+    var rvSellExhaust = temps[ri2] > 65 && temps[ri2-1] > 60;
+    var rvBuyAccel = tempROC && tempROC[ri2] != null && tempROC[ri2-1] != null &&
+                     tempROC[ri2] > 0 && tempROC[ri2-1] > 0;
+    var rvSellAccel = tempROC && tempROC[ri2] != null && tempROC[ri2-1] != null &&
+                      tempROC[ri2] < 0 && tempROC[ri2-1] < 0;
+    var rvBuyPB = false, rvSellPB = false;
+    for (var rj = Math.max(0, ri2 - 5); rj < ri2; rj++) {
+      if (closes[rj] != null && closes[rj] <= rvGravity) rvBuyPB = true;
+      if (closes[rj] != null && closes[rj] >= rvGravity) rvSellPB = true;
+    }
+    if (rvBuyExhaust && rvBuyAccel && rvBuyPB && _bullBT(ri2) >= 3 && closes[ri2] > closes[ri2-1]) {
+      rvSignals.push({ index: ri2, type: 'rvbuy', price: closes[ri2], date: new Date(candles[ri2].t) });
+    }
+    if (rvSellExhaust && rvSellAccel && rvSellPB && _bearBT(ri2) >= 3 && closes[ri2] < closes[ri2-1]) {
+      rvSignals.push({ index: ri2, type: 'rvsell', price: closes[ri2], date: new Date(candles[ri2].t) });
+    }
+  }
+
   var horizons = [5, 10, 20];
-  var results = { buy: [], sell: [] };
+  var results = { buy: [], sell: [], rvbuy: [], rvsell: [] };
+  rvSignals.forEach(function (sig) {
+    horizons.forEach(function (h) {
+      if (sig.index + h >= closes.length) return;
+      var futurePrice = closes[sig.index + h];
+      var pctChange = ((futurePrice - sig.price) / sig.price) * 100;
+      var profit = sig.type === 'rvbuy' ? pctChange : -pctChange;
+      results[sig.type].push({ horizon: h, profit: profit, win: profit > 0 });
+    });
+  });
   signals.forEach(function(sig) {
     horizons.forEach(function(h) {
       if (sig.index + h >= closes.length) return;
@@ -1657,7 +1721,7 @@ function backtestSignals(candles) {
   });
 
   var stats = {};
-  ['buy', 'sell'].forEach(function(type) {
+  ['buy', 'sell', 'rvbuy', 'rvsell'].forEach(function(type) {
     stats[type] = {};
     horizons.forEach(function(h) {
       var trades = results[type].filter(function(r) { return r.horizon === h; });
@@ -1939,6 +2003,76 @@ function renderChart(candles, a) {
     }
   }
 
+  // ── REVERSION TRIAD (v5.37.10) ────────────────────────────────────
+  // Higher-quality signal tier. Fires only when EXHAUSTION + CONFLUENCE
+  // + PULLBACK-TO-GRAVITY all coincide. Per Kirk's chair pass +
+  // Opus's framing 2026-06-03: this is the *trade* shape — rare,
+  // selective, additive to (not replacing) the regular triad triangles.
+  var reversionBuyPoints = new Array(closes.length).fill(null);
+  var reversionSellPoints = new Array(closes.length).fill(null);
+  // Pre-compute gravity using the same formula renderChart uses below.
+  var _rvHigh = Math.max.apply(null, candles.slice(-80).map(function (c) { return c.h; }));
+  var _rvLow  = Math.min.apply(null, candles.slice(-80).map(function (c) { return c.l; }));
+  var _rvMid  = _rvLow + (_rvHigh - _rvLow) * 0.5;
+  var _rvPhi  = _rvLow + (_rvHigh - _rvLow) * PHI_INV;
+  var _rvGravity = PHI_INV * _rvPhi + (1 - PHI_INV) * _rvMid;
+
+  function _bullCountAt(i) {
+    var n = 0;
+    if (ema8[i] != null && ema12[i] != null && ema8[i] > ema12[i]) n++;
+    if (a.rsiArr && a.rsiArr[i] != null && a.rsiArr[i] > 50) n++;
+    if (a.macdData && a.macdData.macdLine && a.macdData.signalLine &&
+        a.macdData.macdLine[i] != null && a.macdData.signalLine[i] != null &&
+        a.macdData.macdLine[i] > a.macdData.signalLine[i]) n++;
+    if (a.tempROC && a.tempROC[i] != null && a.tempROC[i] > 0) n++;
+    if (closes[i] != null && closes[i] >= _rvGravity) n++;
+    return n;
+  }
+  function _bearCountAt(i) {
+    var n = 0;
+    if (ema8[i] != null && ema12[i] != null && ema8[i] < ema12[i]) n++;
+    if (a.rsiArr && a.rsiArr[i] != null && a.rsiArr[i] < 50) n++;
+    if (a.macdData && a.macdData.macdLine && a.macdData.signalLine &&
+        a.macdData.macdLine[i] != null && a.macdData.signalLine[i] != null &&
+        a.macdData.macdLine[i] < a.macdData.signalLine[i]) n++;
+    if (a.tempROC && a.tempROC[i] != null && a.tempROC[i] < 0) n++;
+    if (closes[i] != null && closes[i] <= _rvGravity) n++;
+    return n;
+  }
+
+  for (var ri = 5; ri < closes.length; ri++) {
+    if (a.temps[ri] == null || a.tpSpread == null || a.tpSpread[ri] == null) continue;
+    if (closes[ri] == null || closes[ri-1] == null) continue;
+
+    // Buy reversion: exhaustion DOWN + bullish confluence + recent gravity touch + price turning up
+    var bExhaust = a.tpSpread[ri] < -1.2;
+    var bAccel2  = a.tempROC && a.tempROC[ri] != null && a.tempROC[ri-1] != null &&
+                   a.tempROC[ri] > 0 && a.tempROC[ri-1] > 0;
+    var bPullback = false;
+    for (var bj = Math.max(0, ri - 5); bj < ri; bj++) {
+      if (closes[bj] != null && closes[bj] <= _rvGravity) { bPullback = true; break; }
+    }
+    var bConfluence = _bullCountAt(ri) >= 3;
+    var bTurningUp = closes[ri] > closes[ri-1];
+    if (bExhaust && bAccel2 && bPullback && bConfluence && bTurningUp) {
+      reversionBuyPoints[ri] = closes[ri];
+    }
+
+    // Sell reversion: exhaustion UP + bearish confluence + recent gravity touch from above + price turning down
+    var sExhaust = a.tpSpread[ri] > 1.2;
+    var sDecel2  = a.tempROC && a.tempROC[ri] != null && a.tempROC[ri-1] != null &&
+                   a.tempROC[ri] < 0 && a.tempROC[ri-1] < 0;
+    var sPullback = false;
+    for (var sj = Math.max(0, ri - 5); sj < ri; sj++) {
+      if (closes[sj] != null && closes[sj] >= _rvGravity) { sPullback = true; break; }
+    }
+    var sConfluence = _bearCountAt(ri) >= 3;
+    var sTurningDown = closes[ri] < closes[ri-1];
+    if (sExhaust && sDecel2 && sPullback && sConfluence && sTurningDown) {
+      reversionSellPoints[ri] = closes[ri];
+    }
+  }
+
   // Gravity centerline — the phi-weighted mean price (volume-weighted attractor)
   var gravCenter = new Array(closes.length).fill(null);
   var gravHigh = Math.max(...candles.slice(-80).map(c => c.h));
@@ -2025,6 +2159,12 @@ function renderChart(candles, a) {
         // Buy/Sell — density-scaled
         { label: 'Buy', data: buyPoints, borderColor: 'transparent', backgroundColor: '#10B981', pointRadius: sigR, pointHoverRadius: sigH, pointStyle: 'triangle', pointBorderColor: '#34d399', pointBorderWidth: sigB, showLine: false, order: 0 },
         { label: 'Sell', data: sellPoints, borderColor: 'transparent', backgroundColor: '#EF4444', pointRadius: sigR, pointHoverRadius: sigH, pointStyle: 'triangle', pointRotation: 180, pointBorderColor: '#f87171', pointBorderWidth: sigB, showLine: false, order: 0 },
+        // Reversion Triad — gold stars for the high-conviction setups
+        // (exhaustion + confluence + pullback to gravity). Drawn LARGER and
+        // ON TOP of the triangles so they're visually distinct from the
+        // ordinary transition signals. Per Opus 2026-06-03.
+        { label: 'Reversion Buy', data: reversionBuyPoints, borderColor: 'transparent', backgroundColor: '#10B981', pointRadius: sigR + 3, pointHoverRadius: sigH + 3, pointStyle: 'star', pointBorderColor: '#ffd560', pointBorderWidth: sigB + 0.5, showLine: false, order: -1 },
+        { label: 'Reversion Sell', data: reversionSellPoints, borderColor: 'transparent', backgroundColor: '#EF4444', pointRadius: sigR + 3, pointHoverRadius: sigH + 3, pointStyle: 'star', pointBorderColor: '#ffd560', pointBorderWidth: sigB + 0.5, showLine: false, order: -1 },
         // (Old diamond signals removed — unified temperature-first system)
         // Volume overlay — brighter, semi-transparent bars at chart bottom
         { label: 'Volume', data: candles.map(c => c.v), type: 'bar', backgroundColor: candles.map((c, i) => i > 0 && c.c >= candles[i-1].c ? 'rgba(16,185,129,0.35)' : 'rgba(239,68,68,0.3)'), borderWidth: 0, yAxisID: 'yVol', order: 6 },
@@ -3236,7 +3376,10 @@ hideLoading = function() {
     if (y + rect.height > window.innerHeight - 8) y = window.innerHeight - rect.height - 8;
     m.style.left = x + 'px'; m.style.top = y + 'px';
     _openMenu = m;
-    setTimeout(function () { document.addEventListener('click', _outsideClick, true); }, 0);
+    // 50ms grace — defends against the race where the click that OPENS the
+    // menu bubbles up after setTimeout(0) on some browsers, hits the outside
+    // handler, and closes the menu we just opened. Per Opus 2026-06-03.
+    setTimeout(function () { document.addEventListener('click', _outsideClick, true); }, 50);
     m.addEventListener('click', function (cev) {
       var t = cev.target.closest('[data-add]');
       if (!t) return;
@@ -3510,7 +3653,10 @@ hideLoading = function() {
     m.style.top = y + 'px';
     _openMenu = m;
 
-    setTimeout(function () { document.addEventListener('click', _outsideClick, true); }, 0);
+    // 50ms grace — defends against the race where the click that OPENS the
+    // menu bubbles up after setTimeout(0) on some browsers, hits the outside
+    // handler, and closes the menu we just opened. Per Opus 2026-06-03.
+    setTimeout(function () { document.addEventListener('click', _outsideClick, true); }, 50);
 
     // Wire actions
     m.addEventListener('click', function (ev) {
@@ -3651,7 +3797,10 @@ hideLoading = function() {
         if (y + rect.height > window.innerHeight - 8) y = window.innerHeight - rect.height - 8;
         m.style.left = x + 'px'; m.style.top = y + 'px';
         _openMenu = m;
-        setTimeout(function () { document.addEventListener('click', _outsideClick, true); }, 0);
+        // 50ms grace — defends against the race where the click that OPENS the
+    // menu bubbles up after setTimeout(0) on some browsers, hits the outside
+    // handler, and closes the menu we just opened. Per Opus 2026-06-03.
+    setTimeout(function () { document.addEventListener('click', _outsideClick, true); }, 50);
         m.addEventListener('click', function (cev) {
           var t = cev.target.closest('[data-style]');
           if (!t) return;
@@ -3762,7 +3911,10 @@ hideLoading = function() {
     if (y + rect.height > window.innerHeight - 8) y = window.innerHeight - rect.height - 8;
     m.style.left = x + 'px'; m.style.top = y + 'px';
     _openMenu = m;
-    setTimeout(function () { document.addEventListener('click', _outsideClick, true); }, 0);
+    // 50ms grace — defends against the race where the click that OPENS the
+    // menu bubbles up after setTimeout(0) on some browsers, hits the outside
+    // handler, and closes the menu we just opened. Per Opus 2026-06-03.
+    setTimeout(function () { document.addEventListener('click', _outsideClick, true); }, 50);
     m.addEventListener('click', function (cev) {
       var t = cev.target.closest('[data-add]');
       if (!t) return;

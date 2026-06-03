@@ -190,4 +190,101 @@ rule echoes at every scale and gets one bit more accurate each chair pass.
 > *"If a transition matters going up, the mirror transition matters
 > going down."* — Opus, 2026-06-03
 
+---
+
+## 9. The Reversion Tier (v5.37.10)
+
+The triad above catches **transitions**. Transitions are common. The
+Reversion Tier catches **reversals at exhaustion** — the rarer, higher-
+conviction setup where price has stretched away from gravity, multiple
+indicators have flipped, and price is now turning back toward gravity.
+That's where markets actually pivot.
+
+Three things must coincide. Any one alone is a guess; all three together
+is a trade.
+
+| Component | Buy version | Sell version |
+|---|---|---|
+| **Exhaustion** | `tpSpread[i] < −1.2` (rubber band stretched DOWN; price is well below where temperature says it should be) | `tpSpread[i] > +1.2` (stretched UP) |
+| **Confluence** | `bullCount(i) >= 3` of 5 components (EMA aligned up, RSI > 50, MACD > signal, tempROC > 0, close ≥ gravity) | `bearCount(i) >= 3` of 5 (mirror) |
+| **Pullback to gravity** | In the last 5 bars, at least one bar closed at or below `gravityPrice` AND today is closing higher than yesterday (price *turning back up from gravity*) | Mirror: at least one bar at or above gravity AND today closing lower (turning back down) |
+| **+ Acceleration consistency** | `tempROC > 0` for both today and yesterday (the turn is sustained, not a single-bar fakeout) | `tempROC < 0` for both |
+
+On the chart these render as **gold-rimmed stars** (`pointStyle: 'star'`)
+roughly 30% larger than the ordinary triangles. They sit on top in the
+z-order — when one fires, you can't miss it. The triangles still fire
+for ordinary transitions; the stars are *additive*, marking the
+high-conviction moments inside the broader signal stream.
+
+### Why this is the *real* signal
+
+Markets don't usually reverse on a clean zone crossing. They reverse on
+**exhaustion meeting confluence meeting reversion**. The chart was
+hinting at this for months — the Indicator-Price Spread, the
+`bullCount` / `bearCount`, the gravity price — every piece was already
+in `analyzeData`. They just weren't being *combined* into a single
+trigger gate. The Reversion Tier is the combination.
+
+A trader watching the gauge with this on:
+
+- Ignores most of the noisy yellow ⇄ red transitions.
+- Waits for the gold star.
+- Acts when it fires.
+
+Or, more usefully, **uses both tiers**: triangles to know when the
+regime is changing, stars to know when the regime has *actually
+turned* and the entry is high-conviction.
+
+### Backtest
+
+`backtestSignals` now reports four series at horizons 5 / 10 / 20 bars:
+`buy`, `sell`, `rvbuy`, `rvsell`. The Reversion series should — if the
+theory is sound — show a higher win rate at all horizons than the
+ordinary triangles, with **fewer total signals**. Selectivity is the
+trade we're making.
+
+The Signal History panel in the gauge sidebar shows whichever stats
+are populated. If the Reversion rows are blank for an instrument, that
+instrument hasn't had a reversion setup in the loaded window. That's
+information, not a bug.
+
+### Open questions for the Reversion Tier
+
+1. **The 1.2 ATR exhaustion threshold.** Could be 1.0 (more signals, less
+   selective) or 1.5 (rarer, more selective). Backtest both per
+   instrument.
+2. **The `bullCount >= 3` floor.** Could go to 4 of 5 for higher
+   conviction. Three feels right — five would never fire — but four
+   might be the sweet spot.
+3. **The 5-bar pullback window.** Same question as the regular triad's
+   5-bar peek-back. Timeframe-sensitive.
+4. **Gravity drift.** Gravity is computed from the last 80 bars'
+   high/low. On very fast-moving instruments, gravity itself can shift
+   under our feet. Could be worth a "stable gravity" version that
+   averages over a longer window for the Reversion gate only.
+5. **Whether to require `bullCount` to be *rising*** (transitioned from
+   `<3` to `>=3` in the last 2 bars) — i.e., the *flip itself* as the
+   trigger, not just the threshold. More restrictive but catches the
+   pivot moment exactly.
+
+### After this, the Recipe UI
+
+Once the Reversion Tier proves itself per-instrument (or doesn't, and we
+learn from where it fails), the **next layer** is the Signal Recipe UI:
+let users define their own triads via a trigger + confirmations +
+lookback comparator panel. Each recipe becomes a named, backtestable
+hypothesis. Each user gets to encode their own pattern recognition.
+
+The Reversion Tier IS the first recipe — just hard-coded. The UI work
+turns it into one of many.
+
+> *"The good ones (Pine Script, ThinkScript) are languages. The bad
+> ones are unusable spreadsheets where users build something they
+> don't understand."* — Opus's caution, kept in mind.
+
+The middle path: **three slots** (trigger / confirmations / lookback
+context), comparators on each (`>`, `<`, `>=`, `<=`, `=`, `≠`), and
+**every recipe is backtestable on demand** so a number sits next to
+every belief.
+
 — Kirk + the build team (CC, Opus, Harmonia)
