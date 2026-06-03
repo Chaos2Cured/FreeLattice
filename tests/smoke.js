@@ -2189,6 +2189,65 @@ assert('Safety: Escape key exits fullscreen panel if one is stuck',
   /keydown[\s\S]{0,300}Escape[\s\S]{0,200}tg-fullscreen-panel/.test(gaugeHtml));
 
 // ═══════════════════════════════════════════════════════════════
+section('86. Gauge: sell triad + EMA config + mobile + luminos-during-picker (v5.37.7)');
+
+// Commit 1 — Luminos pause respects color picker state
+assert('Picker fix: _luminosWatchColorInput no longer listens to change',
+  /_luminosWatchColorInput[\s\S]{0,600}DO NOT listen to 'change'/.test(gaugeHtml) ||
+  /\/\/ NO 'change' listener/.test(gaugeHtml));
+assert('Picker fix: tg-color-picker-open body class gates the unpause',
+  gaugeHtml.includes('tg-color-picker-open') && /closePicker[\s\S]{0,200}stillOpen/.test(gaugeHtml));
+assert('Picker fix: closeMenu wrapper checks color-picker-open before unpausing',
+  /__origCloseMenu\(\);\s*if \(!document\.body\.classList\.contains\('tg-color-picker-open'\)\)/.test(gaugeHtml));
+assert('Picker fix: 6s safety timer also gated on color-picker-open',
+  /setInterval[\s\S]{0,200}tg-color-picker-open[\s\S]{0,80}tgPauseLuminos\(false\)/.test(gaugeHtml));
+assert('Picker fix: filter:none while picker or menu open (drops the expensive blur)',
+  /body\.tg-color-picker-open \.tg-luminos[\s\S]{0,200}filter:\s*none/.test(gaugeHtml));
+
+// Commit 2 — Mobile layout + tap target
+assert('Mobile: chart-area order:1 (chart on top)',
+  /@media \(max-width: 768px\)[\s\S]{0,300}\.chart-area\s*\{\s*order:\s*1/.test(gaugeHtml));
+assert('Mobile: sidebar order:2 + border-top (was border-bottom)',
+  /\.sidebar\s*\{\s*order:\s*2;\s*border-right:\s*none;\s*border-top:\s*1px/.test(gaugeHtml));
+assert('Mobile: composeEmpty wired via touchend (synthetic-click fix)',
+  /_wireEmptyStageTouch[\s\S]{0,400}touchend/.test(gaugeHtml));
+assert('Mobile: _wireEmptyStageTouch called from init',
+  /function init\(\)[\s\S]{0,400}_wireEmptyStageTouch\(\)/.test(gaugeHtml));
+
+// Commit 3 — Sell triad
+assert('Sell triad: sell55 trigger (green → yellow)',
+  /var sell55 = a\.temps\[si-1\] >= 55 && a\.temps\[si\] < 55/.test(gaugeHtml));
+assert('Sell triad: sell45 trigger (yellow → red)',
+  /var sell45 = a\.temps\[si-1\] >= 45 && a\.temps\[si\] < 45/.test(gaugeHtml));
+assert('Sell triad: collapse-from-green trigger (slow bleed)',
+  /var collapse = a\.temps\[si\] < 55[\s\S]{0,200}recentGreenPeak >= 55/.test(gaugeHtml));
+assert('Sell triad: volume OR acceleration confirms (panic does not always have volume)',
+  /var accelDown = a\.tempROC && a\.tempROC\[si\] != null && a\.tempROC\[si\] < -3/.test(gaugeHtml));
+assert('Sell triad: backtestSignals mirrors the same triad',
+  gaugeHtml.includes('var collapseBT') && /sell55 \|\| sell45 \|\| collapseBT/.test(gaugeHtml));
+assert('Sell triad: loop now starts at si=5 (needs 5 prior bars for collapse peek-back)',
+  /for \(var si = 5; si < closes\.length/.test(gaugeHtml));
+
+// Commit 4 — Configurable EMA periods
+assert('EMA config: DEFAULT_EMA_PERIODS [8,12,24,50,200] defined',
+  /DEFAULT_EMA_PERIODS\s*=\s*\[8,\s*12,\s*24,\s*50,\s*200\]/.test(gaugeHtml));
+assert('EMA config: getEmaPeriods() + setEmaPeriods() exposed',
+  /function getEmaPeriods\(\)/.test(gaugeHtml) && /function setEmaPeriods\(arr\)/.test(gaugeHtml));
+assert('EMA config: persists in fl_tg_ema_periods',
+  gaugeHtml.includes("'fl_tg_ema_periods'"));
+assert('EMA config: no hardcoded ema(closes, 8) calls remain',
+  !/ema\(closes,\s*8\)/.test(gaugeHtml));
+assert('EMA config: chart labels use EP_RC[0..4] not hardcoded numbers',
+  /label:\s*'EMA '\s*\+\s*EP_RC\[0\]/.test(gaugeHtml));
+assert('EMA config: INDICATOR_REGISTRY ema labels are updated in updateComposeUI',
+  /INDICATOR_REGISTRY\.ema8\.label\s*=\s*'EMA '\s*\+\s*EP_PILL\[0\]/.test(gaugeHtml));
+assert('EMA config: UI input + Set + Reset buttons present',
+  gaugeHtml.includes('id="emaPeriodsInput"') &&
+  /Set</.test(gaugeHtml) && /Reset</.test(gaugeHtml));
+assert('EMA config: setEmaPeriods triggers full renderAll',
+  /setEmaPeriods[\s\S]{0,500}renderAll\(lastCandles, lastAnalysis/.test(gaugeHtml));
+
+// ═══════════════════════════════════════════════════════════════
 section('80. Compose mode bug fixes — date adapter, volume/BB, tooltip, resize, clear (v5.37.1)');
 
 // Bug 1: x-axis is category labels, not Chart.js time scale (no adapter needed)

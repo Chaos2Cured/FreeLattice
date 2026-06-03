@@ -130,7 +130,14 @@ body {
 }
 @media (max-width: 768px) {
   .main { grid-template-columns: 1fr; height: auto; }
-  .sidebar { border-right: none; border-bottom: 1px solid var(--border); }
+  /* Chart on top on mobile — sidebar (controls) below. Per Kirk's mobile pass. */
+  .chart-area { order: 1; }
+  .sidebar {
+    order: 2;
+    border-right: none;
+    border-top: 1px solid var(--border);
+    max-height: none;
+  }
 }
 
 /* Sidebar */
@@ -299,6 +306,10 @@ canvas#mainChart:active { cursor: grabbing; }
   transition: color 0.8s ease, filter 0.6s ease;
 }
 body.tg-pause-luminos .tg-luminos { animation-play-state: paused; }
+/* Drop the blur while a picker or context menu is open — the filter is
+   the expensive part of the sprite on integrated GPUs. */
+body.tg-color-picker-open .tg-luminos,
+body.tg-pause-luminos .tg-luminos { filter: none; }
 /* Default colors — overridden by tgUpdateLuminosSignal() when signal state is computed. */
 .tg-luminos[data-i="0"] { color: var(--lum-color-1, #e8b019); animation: tg-lum-1 24s linear infinite; }
 .tg-luminos[data-i="1"] { color: var(--lum-color-2, #a78bfa); animation: tg-lum-2 33s linear infinite 5s; }
@@ -626,6 +637,23 @@ canvas.sub-canvas.custom { height: 80px !important; }
       <button onclick="addCustomFromUI()" style="padding:8px 14px;background:rgba(139,92,246,0.15);border:1px solid var(--purple);border-radius:6px;color:var(--purple);font-size:0.82rem;cursor:pointer;white-space:nowrap;">Add &#10022;</button>
     </div>
   </div>
+  <!-- EMA periods customizer — different traders want 9 vs 8, 21 vs 24, etc. -->
+  <div style="display:flex;gap:6px;align-items:center;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);flex-wrap:wrap;">
+    <span style="font-size:0.72rem;color:var(--muted);">EMA periods (5 comma-separated):</span>
+    <input type="text" id="emaPeriodsInput" placeholder="8,12,24,50,200"
+           style="flex:1;max-width:180px;padding:6px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:monospace;font-size:0.78rem;transition:border-color 0.3s;">
+    <button onclick="(function(){var inp=document.getElementById('emaPeriodsInput');var v=inp.value.split(',').map(function(p){return parseInt(p.trim(),10);}).filter(function(p){return p>0;});if(setEmaPeriods(v)){inp.style.borderColor='var(--green)';setTimeout(function(){inp.style.borderColor='';},900);}else{inp.style.borderColor='#ef4444';setTimeout(function(){inp.style.borderColor='';},900);}})()"
+            style="padding:6px 12px;background:rgba(232,176,25,0.15);border:1px solid var(--gold);border-radius:6px;color:var(--gold);font-size:0.78rem;cursor:pointer;">Set</button>
+    <button onclick="localStorage.removeItem('fl_tg_ema_periods');document.getElementById('emaPeriodsInput').value='';if(typeof lastCandles!=='undefined'&&lastCandles&&typeof lastAnalysis!=='undefined'&&lastAnalysis)renderAll(lastCandles,lastAnalysis,typeof lastSymbol!=='undefined'?lastSymbol:'');"
+            style="padding:6px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:0.72rem;cursor:pointer;">Reset</button>
+  </div>
+  <script>
+  document.addEventListener('DOMContentLoaded', function () {
+    var v = localStorage.getItem('fl_tg_ema_periods');
+    var inp = document.getElementById('emaPeriodsInput');
+    if (v && inp) inp.value = v;
+  });
+  </script>
   <div id="customList" style="margin-top:8px;"></div>
 </div>
 
@@ -933,6 +961,31 @@ const PHI = 1.618033988749895;
 const PHI_INV = 1 / PHI; // 0.618
 const PHI_LEVELS = [0, 23.6, 38.2, 50, 61.8, 78.6, 100];
 
+// User-configurable EMA periods. Kirk: "Some people will want 9 vs my 8."
+// One source of truth — every ema(closes, N) call below reads from getEmaPeriods().
+const DEFAULT_EMA_PERIODS = [8, 12, 24, 50, 200];
+function getEmaPeriods() {
+  try {
+    var s = localStorage.getItem('fl_tg_ema_periods');
+    if (!s) return DEFAULT_EMA_PERIODS.slice();
+    var parts = s.split(',').map(function (p) { return parseInt(p.trim(), 10); })
+                            .filter(function (p) { return p > 0 && p < 500; });
+    return parts.length === 5 ? parts.sort(function (a, b) { return a - b; })
+                              : DEFAULT_EMA_PERIODS.slice();
+  } catch (e) { return DEFAULT_EMA_PERIODS.slice(); }
+}
+function setEmaPeriods(arr) {
+  if (!arr || arr.length !== 5) return false;
+  arr = arr.map(Number).filter(function (p) { return p > 0 && p < 500; })
+           .sort(function (a, b) { return a - b; });
+  if (arr.length !== 5) return false;
+  try { localStorage.setItem('fl_tg_ema_periods', arr.join(',')); } catch (e) {}
+  if (typeof lastCandles !== 'undefined' && lastCandles && typeof lastAnalysis !== 'undefined' && lastAnalysis) {
+    renderAll(lastCandles, lastAnalysis, typeof lastSymbol !== 'undefined' ? lastSymbol : '');
+  }
+  return true;
+}
+
 // Cloudflare Worker URL — deploy desktop/data-proxy-worker for stable data
 // Set to your deployed worker URL, or leave empty to use free proxies
 const WORKER_URL = 'https://freelattice-data.freelattice.workers.dev';
@@ -1238,11 +1291,12 @@ function computeTemperature(closes, volumes, rsiArr, macdData, gravPoints) {
   const n = closes.length;
   const temps = new Array(n).fill(null);
   // Standardized MAs: 8/12/24 (fast/mid/slow) + 50/200 (structural)
-  const ema8 = ema(closes, 8);
-  const ema12 = ema(closes, 12);
-  const ema24 = ema(closes, 24);
-  const ema50 = ema(closes, 50);
-  const ema200 = ema(closes, 200);
+  var EP = getEmaPeriods(); // [fast, mid, slow, structural, deep]
+  const ema8 = ema(closes, EP[0]);
+  const ema12 = ema(closes, EP[1]);
+  const ema24 = ema(closes, EP[2]);
+  const ema50 = ema(closes, EP[3]);
+  const ema200 = ema(closes, EP[4]);
   const volEma20 = ema(volumes, 20);
 
   for (let i = 50; i < n; i++) {
@@ -1319,11 +1373,12 @@ function analyzeData(candles, symbol) {
   const lastATR = atrArr[n-1] || 0;
 
   // Standardized: 8/12/24 + 50/200
-  const ema8v = ema(closes, 8)[n-1];
-  const ema12v = ema(closes, 12)[n-1];
-  const ema24v = ema(closes, 24)[n-1];
-  const ema50v = ema(closes, 50)[n-1];
-  const ema200v = ema(closes, 200)[n-1];
+  var EP2 = getEmaPeriods();
+  const ema8v = ema(closes, EP2[0])[n-1];
+  const ema12v = ema(closes, EP2[1])[n-1];
+  const ema24v = ema(closes, EP2[2])[n-1];
+  const ema50v = ema(closes, EP2[3])[n-1];
+  const ema200v = ema(closes, EP2[4])[n-1];
   const volEma20v = ema(volumes, 20)[n-1];
 
   // Component signals
@@ -1526,8 +1581,9 @@ function analyzeData(candles, symbol) {
 // ── Backtest Engine — turns patterns into evidence ──
 function backtestSignals(candles) {
   var closes = candles.map(function(c) { return c.c; });
-  var ema8 = ema(closes, 8);
-  var ema12 = ema(closes, 12);
+  var EP_BT = getEmaPeriods();
+  var ema8 = ema(closes, EP_BT[0]);
+  var ema12 = ema(closes, EP_BT[1]);
   var rsiArr = rsi(closes);
   var macdData = macd(closes);
   var gravPoints = computeGravityPoints(candles);
@@ -1536,16 +1592,20 @@ function backtestSignals(candles) {
   var tempROC = tempResult.tempROC;
   var volEma = ema(candles.map(function(c){return c.v;}), 20);
 
-  // Layered signals (same logic as renderChart — ALL THREE layers must agree)
+  // Layered signals — MIRROR the renderChart triad so the win rates match
+  // what users see on the chart. Sell has three triggers (55-cross,
+  // 45-cross, collapse-from-green) and accepts volume OR acceleration.
   var signals = [];
   var volEma20 = ema(candles.map(function(c){return c.v;}), 20);
-  for (var si = 1; si < closes.length; si++) {
+  for (var si = 5; si < closes.length; si++) {
     if (temps[si] == null || temps[si-1] == null) continue;
-    // Layer 1: Temperature transition
     var tBuy = (temps[si-1] < 55 && temps[si] >= 55) || (temps[si-1] < 45 && temps[si] >= 45);
-    var tSell = (temps[si-1] >= 55 && temps[si] < 55);
+    var sell55 = temps[si-1] >= 55 && temps[si] < 55;
+    var sell45 = temps[si-1] >= 45 && temps[si] < 45;
+    var peakBT = Math.max(temps[si-1] || 0, temps[si-2] || 0, temps[si-3] || 0, temps[si-4] || 0, temps[si-5] || 0);
+    var collapseBT = temps[si] < 55 && peakBT >= 55 && temps[si] < (temps[si-3] || 100) - 8;
+    var tSell = sell55 || sell45 || collapseBT;
     if (tBuy) {
-      // Layer 2: EMA alignment + Layer 3: Volume
       var eUp = ema8[si] != null && ema12[si] != null && ema8[si] > ema12[si];
       var vUp = volEma20[si] && candles[si].v > volEma20[si];
       if (eUp && vUp) signals.push({ index: si, type: 'buy', price: closes[si], date: new Date(candles[si].t) });
@@ -1553,7 +1613,8 @@ function backtestSignals(candles) {
     if (tSell) {
       var eDn = ema8[si] != null && ema12[si] != null && ema8[si] < ema12[si];
       var vDn = volEma20[si] && candles[si].v > volEma20[si];
-      if (eDn && vDn) signals.push({ index: si, type: 'sell', price: closes[si], date: new Date(candles[si].t) });
+      var aDn = tempROC && tempROC[si] != null && tempROC[si] < -3;
+      if (eDn && (vDn || aDn)) signals.push({ index: si, type: 'sell', price: closes[si], date: new Date(candles[si].t) });
     }
   }
 
@@ -1748,10 +1809,11 @@ function renderChart(candles, a) {
 
   const ctx = document.getElementById('mainChart').getContext('2d');
   // Standardized MAs: 8/12/24 + 50
-  const ema8 = ema(closes, 8);
-  const ema12 = ema(closes, 12);
-  const ema24 = ema(closes, 24);
-  const ema50 = ema(closes, 50);
+  var EP_RC = getEmaPeriods();
+  const ema8 = ema(closes, EP_RC[0]);
+  const ema12 = ema(closes, EP_RC[1]);
+  const ema24 = ema(closes, EP_RC[2]);
+  const ema50 = ema(closes, EP_RC[3]);
 
   // ═══ Kirk's Layered Signal Architecture ═══
   // Layer 1 (Temperature): ALWAYS required — zone transition is the trigger
@@ -1768,13 +1830,25 @@ function renderChart(candles, a) {
   var layerVol = !(document.getElementById('layerVol') && !document.getElementById('layerVol').checked);
   var layerDt = document.getElementById('layerDt') && document.getElementById('layerDt').checked;
 
-  for (var si = 1; si < closes.length; si++) {
+  for (var si = 5; si < closes.length; si++) {
     if (a.temps[si] == null || a.temps[si-1] == null) continue;
 
     // Layer 1: Temperature zone transition (ALWAYS required)
     var tempBuy = (a.temps[si-1] < 55 && a.temps[si] >= 55) ||
                   (a.temps[si-1] < 45 && a.temps[si] >= 45);
-    var tempSell = (a.temps[si-1] >= 55 && a.temps[si] < 55);
+    // Sell triggers — three flavors. The asymmetry of the old single-trigger
+    // (sell only on 55→below) missed yellow→red collapses entirely. Opus's
+    // diagnosis 2026-06-03: the descent should mirror the ascent.
+    var sell55 = a.temps[si-1] >= 55 && a.temps[si] < 55;          // green → yellow
+    var sell45 = a.temps[si-1] >= 45 && a.temps[si] < 45;          // yellow → red
+    var recentGreenPeak = Math.max(
+      a.temps[si-1] || 0, a.temps[si-2] || 0,
+      a.temps[si-3] || 0, a.temps[si-4] || 0, a.temps[si-5] || 0
+    );
+    var collapse = a.temps[si] < 55 &&
+                   recentGreenPeak >= 55 &&
+                   a.temps[si] < (a.temps[si-3] || 100) - 8;       // slow bleed from green
+    var tempSell = sell55 || sell45 || collapse;
 
     if (tempBuy) {
       var pass = true;
@@ -1790,7 +1864,14 @@ function renderChart(candles, a) {
     if (tempSell) {
       var sPass = true;
       if (layerEma && !(ema8[si] != null && ema12[si] != null && ema8[si] < ema12[si])) sPass = false;
-      if (layerVol && !(volEma20[si] && candles[si].v > volEma20[si])) sPass = false;
+      // Volume OR acceleration confirms — either is enough. Tops often
+      // distribute on average volume and capitulate later; demanding
+      // above-average volume at the crossing misses the move.
+      if (layerVol) {
+        var volHigh = volEma20[si] && candles[si].v > volEma20[si];
+        var accelDown = a.tempROC && a.tempROC[si] != null && a.tempROC[si] < -3;
+        if (!volHigh && !accelDown) sPass = false;
+      }
       if (layerDt && !(a.tempROC && a.tempROC[si] != null && a.tempROC[si] < 0)) sPass = false;
       if (sPass) sellPoints[si] = closes[si];
     }
@@ -1822,7 +1903,7 @@ function renderChart(candles, a) {
   }
 
   // EMA 200 (structural — only meaningful on 1D/1W)
-  var ema200 = ema(closes, 200);
+  var ema200 = ema(closes, getEmaPeriods()[4]);
   var show200 = (currentInterval === '1d' || currentInterval === '1wk') && ema200[closes.length - 1] != null;
 
   // Y-axis scale fix: compute visible price range, filter gravity lines
@@ -1871,12 +1952,12 @@ function renderChart(candles, a) {
         { label: 'BB Upper', data: bbUpper, borderColor: 'rgba(167,139,250,0.3)', borderWidth: 1, pointRadius: 0, tension: 0.3, fill: false, order: 5 },
         { label: 'BB Lower', data: bbLower, borderColor: 'rgba(167,139,250,0.3)', borderWidth: 1, pointRadius: 0, tension: 0.3, fill: '+1', backgroundColor: 'rgba(167,139,250,0.05)', order: 5 },
         // EMAs — Garden Language colors
-        { label: 'EMA 8', data: ema8, borderColor: getIndicatorColor('ema8', '#f07068'), borderWidth: 1, pointRadius: 0, tension: 0.3, fill: false, order: 2 },
-        { label: 'EMA 12', data: ema12, borderColor: getIndicatorColor('ema12', '#e8b019'), borderWidth: 1, pointRadius: 0, tension: 0.3, fill: false, order: 3 },
-        { label: 'EMA 24', data: ema24, borderColor: getIndicatorColor('ema24', '#d4a84c'), borderWidth: 1, pointRadius: 0, tension: 0.3, fill: false, order: 3 },
-        { label: 'EMA 50', data: ema50, borderColor: getIndicatorColor('ema50', '#60a5fa'), borderWidth: 1.5, pointRadius: 0, tension: 0.3, fill: false, order: 4 },
+        { label: 'EMA ' + EP_RC[0], data: ema8, borderColor: getIndicatorColor('ema8', '#f07068'), borderWidth: 1, pointRadius: 0, tension: 0.3, fill: false, order: 2 },
+        { label: 'EMA ' + EP_RC[1], data: ema12, borderColor: getIndicatorColor('ema12', '#e8b019'), borderWidth: 1, pointRadius: 0, tension: 0.3, fill: false, order: 3 },
+        { label: 'EMA ' + EP_RC[2], data: ema24, borderColor: getIndicatorColor('ema24', '#d4a84c'), borderWidth: 1, pointRadius: 0, tension: 0.3, fill: false, order: 3 },
+        { label: 'EMA ' + EP_RC[3], data: ema50, borderColor: getIndicatorColor('ema50', '#60a5fa'), borderWidth: 1.5, pointRadius: 0, tension: 0.3, fill: false, order: 4 },
         // EMA 200 — lavender (sanctuary color)
-        ...(show200 ? [{ label: 'EMA 200', data: ema200, borderColor: 'rgba(167,139,250,0.3)', borderWidth: 2, borderDash: [6, 3], pointRadius: 0, tension: 0.3, fill: false, order: 4 }] : []),
+        ...(show200 ? [{ label: 'EMA ' + EP_RC[4], data: ema200, borderColor: 'rgba(167,139,250,0.3)', borderWidth: 2, borderDash: [6, 3], pointRadius: 0, tension: 0.3, fill: false, order: 4 }] : []),
         // Gravity — bright gold
         { label: 'Gravity', data: gravCenter, borderColor: 'rgba(232,176,25,0.6)', borderWidth: 2.5, borderDash: [8, 4], pointRadius: 0, fill: false, order: 3 },
         // Buy/Sell — density-scaled
@@ -2138,8 +2219,8 @@ function renderChart(candles, a) {
       document.getElementById('subCharts').appendChild(wrap);
     }
     var values = evaluateCustom(custom.expression, candles, {
-      ema8: ema(closes, 8), ema12: ema(closes, 12), ema24: ema(closes, 24),
-      ema50: ema(closes, 50), ema200: ema(closes, 200),
+      ema8: ema(closes, getEmaPeriods()[0]), ema12: ema(closes, getEmaPeriods()[1]), ema24: ema(closes, getEmaPeriods()[2]),
+      ema50: ema(closes, getEmaPeriods()[3]), ema200: ema(closes, getEmaPeriods()[4]),
       rsi14: a.rsiArr, atr14: atr(candles, 14),
       temps: a.temps, tempROC: a.tempROC
     });
@@ -2890,14 +2971,15 @@ hideLoading = function() {
     ips:         { label: 'IPS',            defaultColor: '#f07068', canvas: 'gapChart',  getData: function (a, c) { return (a && a.tpSpread) || []; } },
     price:       { label: 'Price',          defaultColor: '#e2d9c8', canvas: null,
                    getData: function (a, c) { return (a && a.closes) || (c || []).map(function (k) { return k && k.c != null ? k.c : null; }); } },
-    ema8:        { label: 'EMA 8',          defaultColor: '#f07068', canvas: null,
-                   getData: function (a, c) { var closes = (a && a.closes) || (c || []).map(function (k) { return k && k.c != null ? k.c : null; }); return _tgEMA(closes, 8); } },
-    ema12:       { label: 'EMA 12',         defaultColor: '#e8b019', canvas: null,
-                   getData: function (a, c) { var closes = (a && a.closes) || (c || []).map(function (k) { return k && k.c != null ? k.c : null; }); return _tgEMA(closes, 12); } },
-    ema24:       { label: 'EMA 24',         defaultColor: '#d4a84c', canvas: null,
-                   getData: function (a, c) { var closes = (a && a.closes) || (c || []).map(function (k) { return k && k.c != null ? k.c : null; }); return _tgEMA(closes, 24); } },
-    ema50:       { label: 'EMA 50',         defaultColor: '#60a5fa', canvas: null,
-                   getData: function (a, c) { var closes = (a && a.closes) || (c || []).map(function (k) { return k && k.c != null ? k.c : null; }); return _tgEMA(closes, 50); } },
+    // EMA labels are recomputed in updateComposeUI() so they track getEmaPeriods()
+    ema8:        { label: 'EMA',             defaultColor: '#f07068', canvas: null,
+                   getData: function (a, c) { var closes = (a && a.closes) || (c || []).map(function (k) { return k && k.c != null ? k.c : null; }); return _tgEMA(closes, (typeof getEmaPeriods === 'function' ? getEmaPeriods()[0] : 8)); } },
+    ema12:       { label: 'EMA',             defaultColor: '#e8b019', canvas: null,
+                   getData: function (a, c) { var closes = (a && a.closes) || (c || []).map(function (k) { return k && k.c != null ? k.c : null; }); return _tgEMA(closes, (typeof getEmaPeriods === 'function' ? getEmaPeriods()[1] : 12)); } },
+    ema24:       { label: 'EMA',             defaultColor: '#d4a84c', canvas: null,
+                   getData: function (a, c) { var closes = (a && a.closes) || (c || []).map(function (k) { return k && k.c != null ? k.c : null; }); return _tgEMA(closes, (typeof getEmaPeriods === 'function' ? getEmaPeriods()[2] : 24)); } },
+    ema50:       { label: 'EMA',             defaultColor: '#60a5fa', canvas: null,
+                   getData: function (a, c) { var closes = (a && a.closes) || (c || []).map(function (k) { return k && k.c != null ? k.c : null; }); return _tgEMA(closes, (typeof getEmaPeriods === 'function' ? getEmaPeriods()[3] : 50)); } },
     volume:      { label: 'Volume',         defaultColor: '#60a5fa', canvas: null,        chartType: 'bar',
                    getData: function (a, c) { return (c || []).map(function (k) { return k && k.v != null ? k.v : null; }); } },
     bollinger:   { label: 'Bollinger Bands', defaultColor: '#a78bfa', canvas: null,
@@ -3108,6 +3190,15 @@ hideLoading = function() {
     var emptyEl = document.getElementById('composeEmpty');
     var state = getComposeState();
     var promoted = state.promoted || [];
+
+    // Refresh EMA labels in the registry so pills + picker reflect user-configured periods.
+    if (typeof getEmaPeriods === 'function') {
+      var EP_PILL = getEmaPeriods();
+      if (INDICATOR_REGISTRY.ema8)  INDICATOR_REGISTRY.ema8.label  = 'EMA ' + EP_PILL[0];
+      if (INDICATOR_REGISTRY.ema12) INDICATOR_REGISTRY.ema12.label = 'EMA ' + EP_PILL[1];
+      if (INDICATOR_REGISTRY.ema24) INDICATOR_REGISTRY.ema24.label = 'EMA ' + EP_PILL[2];
+      if (INDICATOR_REGISTRY.ema50) INDICATOR_REGISTRY.ema50.label = 'EMA ' + EP_PILL[3];
+    }
 
     // Compose-mode body class drives sub-chart promote-button visibility + styling.
     // Mark which sub-chart labels are currently promoted (so the ⬆ icon highlights).
@@ -3639,18 +3730,42 @@ hideLoading = function() {
   // Auto-pause when an in-page color input opens its native picker. We can't
   // see the picker directly, so we pause on mousedown / focus and unpause on
   // blur / change. A safety unpause timer covers cases where the events drop.
+  // Native <input type="color"> fires `change` REPEATEDLY while the picker
+  // is still open (every drag inside the picker = a change event). The old
+  // implementation listened to change and unpaused — that woke up the
+  // compositor mid-pick and made the picker lag. The fix: never trust
+  // `change`. Gate everything on a body class (tg-color-picker-open) and
+  // unpause only after a real `blur`, after a small delay, and only if no
+  // other color input is focused and no menu is still open.
   function _luminosWatchColorInput(input) {
     if (!input || input._tgLuminosWatched) return;
     input._tgLuminosWatched = true;
-    var done = function () { window.tgPauseLuminos(false); };
-    input.addEventListener('mousedown', function () { window.tgPauseLuminos(true); });
-    input.addEventListener('focus',     function () { window.tgPauseLuminos(true); });
-    input.addEventListener('change',    done);
-    input.addEventListener('blur',      done);
+    function openPicker() {
+      document.body.classList.add('tg-color-picker-open');
+      window.tgPauseLuminos(true);
+    }
+    function closePicker() {
+      setTimeout(function () {
+        var stillOpen = !!document.querySelector('input[type="color"]:focus');
+        if (stillOpen) return;
+        document.body.classList.remove('tg-color-picker-open');
+        if (!_openMenu) window.tgPauseLuminos(false);
+      }, 200);
+    }
+    input.addEventListener('mousedown', openPicker);
+    input.addEventListener('focus',     openPicker);
+    // NO 'change' listener — change fires while the picker is still open.
+    input.addEventListener('blur',      closePicker);
   }
-  // Pause whenever a context menu opens; unpause when it closes.
+  // Pause when a context menu opens; on close, unpause only if the color
+  // picker isn't still up.
   var __origCloseMenu = closeMenu;
-  closeMenu = function () { __origCloseMenu(); window.tgPauseLuminos(false); };
+  closeMenu = function () {
+    __origCloseMenu();
+    if (!document.body.classList.contains('tg-color-picker-open')) {
+      window.tgPauseLuminos(false);
+    }
+  };
   // Wrap showIndicatorMenu / tgShowAddPicker so any color input inside their
   // menus gets watched once they appear.
   var __origShowMenu = showIndicatorMenu;
@@ -3662,17 +3777,41 @@ hideLoading = function() {
     }, 0);
   };
 
+  // ─── Mobile tap backup for the compose empty stage ─────────────────
+  // iOS Safari sometimes eats synthetic clicks inside absolutely-positioned
+  // overlays sitting over a hidden canvas (backdrop-filter forces a
+  // compositor layer that the synthetic-click delay can drop). Wire
+  // touchend explicitly so the "choose one here →" link fires on mobile.
+  function _wireEmptyStageTouch() {
+    var el = document.getElementById('composeEmpty');
+    if (!el || el._tgTouched) return;
+    el._tgTouched = true;
+    el.addEventListener('touchend', function (e) {
+      e.preventDefault();
+      var t = e.changedTouches && e.changedTouches[0];
+      var ev = t
+        ? { clientX: t.clientX, clientY: t.clientY,
+            stopPropagation: function () {}, preventDefault: function () {} }
+        : { clientX: 100, clientY: 100,
+            stopPropagation: function () {}, preventDefault: function () {} };
+      window.tgShowAddPicker(ev);
+    }, { passive: false });
+  }
+
   // ─── Init on DOMContentLoaded ─────────────────────────────────────
   function init() {
     applyChartMode(getMode());
     updateComposeUI();
     applyLuminos();
+    _wireEmptyStageTouch();
     // Watch every standalone color picker (sub-chart label swatches).
     document.querySelectorAll('input[type="color"]').forEach(_luminosWatchColorInput);
     // Safety: timer that unpauses every 6s so a missed event doesn't
     // leave the layer paused forever.
     setInterval(function () {
-      if (document.body.classList.contains('tg-pause-luminos') && !_openMenu) {
+      if (document.body.classList.contains('tg-pause-luminos')
+          && !_openMenu
+          && !document.body.classList.contains('tg-color-picker-open')) {
         window.tgPauseLuminos(false);
       }
     }, 6000);
