@@ -2214,11 +2214,10 @@ assert('Mobile: composeEmpty wired via touchend (synthetic-click fix)',
 assert('Mobile: _wireEmptyStageTouch called from init',
   /function init\(\)[\s\S]{0,400}_wireEmptyStageTouch\(\)/.test(gaugeHtml));
 
-// v5.37.11: Sell triad helpers removed (covered above + in section 90's
-// sequence-rule assertions). Confirm the loop now starts at si=2 (the
-// sequence rule needs 2 prior bars).
-assert('v5.37.11: signal loop starts at si=2 (sequence rule peek-back)',
-  /for \(var si = 2; si < closes\.length/.test(gaugeHtml));
+// v5.37.12: signal loops moved into RULE_REGISTRY evaluate functions.
+// Each rule owns its own loop. The Sequence rule's loop starts at i=2.
+assert('v5.37.12: Sequence Rule loop starts at i=2 (3-bar peek-back)',
+  /sequence:[\s\S]{0,1500}for \(var i = 2; i < candles\.length/.test(gaugeHtml));
 
 // Commit 4 — Configurable EMA periods
 assert('EMA config: DEFAULT_EMA_PERIODS [8,12,24,50,200] defined',
@@ -2260,29 +2259,26 @@ assert('Drag fix: comment explains the renderChart-per-input regression',
 // ═══════════════════════════════════════════════════════════════
 section('88. Buy triad + cooldown (no repeats until reset) + strategy doc (v5.37.9)');
 
-// v5.37.11: buy triad + volume/accel gates REPLACED by the Sequence Rule.
-// (See section 90 for the new assertions.) Keep guardrails that the old
-// helpers stay out.
-assert('v5.37.11: buy triad helpers (buy55, buy45, rally) removed from renderChart',
-  !/var buy55\s*=\s*a\.temps/.test(gaugeHtml) &&
-  !/var buy45\s*=\s*a\.temps/.test(gaugeHtml) &&
-  !/var rally\s*=\s*a\.temps/.test(gaugeHtml));
-assert('v5.37.11: sell triad helpers (sell55, sell45, collapse) removed from renderChart',
-  !/var sell55\s*=\s*a\.temps/.test(gaugeHtml) &&
-  !/var sell45\s*=\s*a\.temps/.test(gaugeHtml) &&
-  !/var collapse\s*=\s*a\.temps/.test(gaugeHtml));
-assert('v5.37.11: layer-gate confirmation logic gone from buy/sell evaluation',
-  !/var accelUp\s*=\s*a\.tempROC/.test(gaugeHtml) &&
-  !/var accelDown\s*=\s*a\.tempROC/.test(gaugeHtml));
+// v5.37.12: buy/sell logic moved into RULE_REGISTRY. The inline references
+// to a.temps for triad/reversion were removed from renderChart and live
+// inside evaluate(candles, a) of each rule instead. Guard that the OLD
+// inline structure stays out of renderChart specifically.
+var renderChartBlock = (function () {
+  var m = gaugeHtml.match(/^function renderChart\(candles, a\)[\s\S]*?\n}\s*$/m);
+  return m ? m[0] : gaugeHtml; // fallback: full file if matcher misses
+})();
+assert('v5.37.12: renderChart no longer has inline triad helpers',
+  !/var buy55\s*=\s*a\.temps/.test(renderChartBlock) &&
+  !/var sell55\s*=\s*a\.temps/.test(renderChartBlock));
 assert('v5.37.11: rallyBT / collapseBT triad helpers removed (replaced by sequence rule)',
   !gaugeHtml.includes('var rallyBT') && !gaugeHtml.includes('var collapseBT'));
 
-// Cooldown — state-based "saw opposite zone" trackers were REPLACED in
-// v5.37.11 by the simpler alternating cooldown (next signal must be the
-// opposite type). Assert the old trackers stay removed; the new cooldown
-// is asserted in section 90.
-assert('v5.37.11: state-reset cooldown removed (replaced by alternating cooldown)',
-  !gaugeHtml.includes('sawGreenSinceLastSell') && !gaugeHtml.includes('sawRedSinceLastBuy') &&
+// v5.37.12: state-reset cooldown (sawGreenSinceLastSell etc.) is back, but
+// only INSIDE RULE_REGISTRY.triad.evaluate — it's the preserved v5.37.9
+// hypothesis. Assert it's confined to the triad rule, not the inline
+// renderChart path or the backtest's old lastBuyBT/sawGreenBT structure.
+assert('v5.37.12: state-reset cooldown lives only inside RULE_REGISTRY.triad',
+  !/^\s*var sawGreenSinceLastSell/m.test(renderChartBlock) &&
   !gaugeHtml.includes('lastBuyBT') && !gaugeHtml.includes('sawGreenBT'));
 
 // Strategy doc — the living explanation
@@ -2316,41 +2312,59 @@ assert('Race fix: zero outside-click setTimeouts remain at 0ms',
 assert('Race fix: at least 4 sites switched to 50ms',
   (gaugeHtml.match(/document\.addEventListener\('click', _outsideClick, true\); \}, 50/g) || []).length >= 4);
 
-// Reversion Triad REMOVED in v5.37.11 (chair test on NVDA 1W showed it
-// generated 20+ stars in a single trend — gates meant to be rare were
-// routinely true in sustained trends). Assert it stays out.
-assert('v5.37.11: Reversion Triad removed from renderChart',
-  !gaugeHtml.includes('reversionBuyPoints') && !gaugeHtml.includes('reversionSellPoints') &&
-  !gaugeHtml.includes('_bullCountAt') && !gaugeHtml.includes('_bearCountAt'));
-assert('v5.37.11: gold-star "Reversion Buy/Sell" datasets removed',
+// Reversion Triad reborn inside RULE_REGISTRY (v5.37.12). Assert the OLD
+// gold-star chart-rendering and rv* backtest plumbing stay out — those
+// were the user-visible problems (20+ stars on NVDA 1W). The evaluate
+// function inside RULE_REGISTRY.reversion lives separately and is opt-in.
+assert('v5.37.12: reversion gold-star datasets stay removed from chart',
   !gaugeHtml.includes("label: 'Reversion Buy'") && !gaugeHtml.includes("label: 'Reversion Sell'"));
-assert('v5.37.11: rvSignals / rvbuy / rvsell removed from backtest',
+assert('v5.37.12: rvSignals plumbing stays removed from backtest',
   !gaugeHtml.includes('rvSignals') && !/'rvbuy'/.test(gaugeHtml) && !/'rvsell'/.test(gaugeHtml));
-assert('v5.37.11: backtest stats narrowed to buy + sell only',
+assert('v5.37.12: backtest stats remain buy + sell only',
   /\['buy',\s*'sell'\]\.forEach/.test(gaugeHtml));
 
 // ═══════════════════════════════════════════════════════════════
-section('90. Sequence Rule + alternating cooldown + sandwich + narrow yellow (v5.37.11)');
+section('90. Signal rules + sandwich + narrow yellow (v5.37.11 + v5.37.12)');
 
-// Sequence Rule — the only signal logic now
-assert('Sequence: SELL = green → yellow → red in three successive bars',
-  /sellSeq = a\.temps\[si-2\] >= 55[\s\S]{0,400}a\.temps\[si\]\s+<\s+45/.test(gaugeHtml));
-assert('Sequence: BUY = red → yellow → green in three successive bars',
-  /buySeq\s*=\s*a\.temps\[si-2\] <\s+45[\s\S]{0,400}a\.temps\[si\]\s+>=\s+55/.test(gaugeHtml));
-assert('Sequence: alternating cooldown (next signal must be opposite type)',
-  /lastSignalType !== 'buy'/.test(gaugeHtml) && /lastSignalType !== 'sell'/.test(gaugeHtml));
-assert('Sequence: loop starts at si=2 (needs 2 prior bars for the sequence)',
-  /for \(var si = 2; si < closes\.length/.test(gaugeHtml));
-assert('Sequence: NO layer gates on the trigger (no EMA / volume / accel branches inside the if)',
-  !/buySeq[\s\S]{0,100}layerEma/.test(gaugeHtml));
+// RULE_REGISTRY — buy/sell logic as named, swappable hypotheses
+assert('RULE_REGISTRY: defined with three rules (sequence, triad, reversion)',
+  gaugeHtml.includes('var RULE_REGISTRY = {') &&
+  /sequence:\s*\{/.test(gaugeHtml) &&
+  /triad:\s*\{/.test(gaugeHtml) &&
+  /reversion:\s*\{/.test(gaugeHtml));
+assert('RULE_REGISTRY: each rule has name, description, color, evaluate',
+  /sequence:\s*\{\s*name:[\s\S]{0,300}description:[\s\S]{0,300}color:[\s\S]{0,200}evaluate:\s*function/.test(gaugeHtml));
+assert('RULE_REGISTRY.sequence: red→yellow→green / green→yellow→red sequence rule',
+  /sequence:[\s\S]{0,2000}temps\[i-2\] <\s+45[\s\S]{0,200}temps\[i\]\s+>=\s+55/.test(gaugeHtml) &&
+  /sequence:[\s\S]{0,2000}temps\[i-2\] >= 55[\s\S]{0,200}temps\[i\]\s+<\s+45/.test(gaugeHtml));
+assert('RULE_REGISTRY.triad: preserved v5.37.9 triad logic (buy55/buy45/rally + sell55/sell45/collapse)',
+  /triad:[\s\S]{0,5000}buy55[\s\S]{0,200}buy45[\s\S]{0,200}rally[\s\S]{0,500}sell55[\s\S]{0,200}sell45[\s\S]{0,200}collapse/.test(gaugeHtml));
+assert('RULE_REGISTRY.triad: state-based cooldown preserved (sawGreenSinceLastSell / sawRedSinceLastBuy)',
+  /triad:[\s\S]{0,6000}sawGreenSinceLastSell[\s\S]{0,500}sawRedSinceLastBuy/.test(gaugeHtml));
+assert('RULE_REGISTRY.reversion: preserved v5.37.10 exhaustion + confluence + pullback logic',
+  /reversion:[\s\S]{0,4000}tpSpread\[ri\] < -1\.2[\s\S]{0,800}bullScoreAt\(ri\) >= 3/.test(gaugeHtml));
+assert('RULE_REGISTRY.reversion: bullScoreAt / bearScoreAt 5-component helpers',
+  /reversion:[\s\S]{0,3000}function bullScoreAt[\s\S]{0,800}function bearScoreAt/.test(gaugeHtml));
 
-// Backtest mirrors the renderChart sequence rule exactly
-assert('Backtest: mirrors the same sellSeq + buySeq + lastTypeBT alternation',
-  /lastTypeBT\s*=\s*null/.test(gaugeHtml) &&
-  /lastTypeBT\s*=\s*'buy'/.test(gaugeHtml) &&
-  /lastTypeBT\s*=\s*'sell'/.test(gaugeHtml));
-assert('Backtest: removed atrBT (was only needed for Reversion)',
-  !/var atrBT = atr\(candles, 14\)/.test(gaugeHtml));
+// Rule selection — persistence + UI
+assert('Rules: getActiveRule + setActiveRule exposed',
+  /function getActiveRule\(\)/.test(gaugeHtml) && /function setActiveRule\(id\)/.test(gaugeHtml));
+assert('Rules: active rule persists in fl_tg_activeRule',
+  gaugeHtml.includes("'fl_tg_activeRule'"));
+assert('Rules: default active rule is sequence',
+  /return \(v && RULE_REGISTRY\[v\]\) \? v : 'sequence'/.test(gaugeHtml));
+assert('Rules: sidebar dropdown #ruleSelect with three options',
+  /id="ruleSelect"[\s\S]{0,400}value="sequence"[\s\S]{0,200}value="triad"[\s\S]{0,200}value="reversion"/.test(gaugeHtml));
+assert('Rules: inline description div #ruleDescription',
+  gaugeHtml.includes('id="ruleDescription"'));
+assert('Rules: setActiveRule triggers a full renderAll',
+  /function setActiveRule\(id\)[\s\S]{0,800}renderAll\(lastCandles, lastAnalysis/.test(gaugeHtml));
+
+// renderChart + backtestSignals delegate to the active rule
+assert('renderChart: delegates buy/sell to RULE_REGISTRY[getActiveRule()].evaluate',
+  /_activeRule = RULE_REGISTRY\[getActiveRule\(\)\][\s\S]{0,200}_activeRule\.evaluate\(candles, a\)/.test(gaugeHtml));
+assert('backtestSignals: delegates to RULE_REGISTRY[getActiveRule()].evaluate (same source as chart)',
+  /btRule = RULE_REGISTRY\[getActiveRule\(\)\][\s\S]{0,200}btRule\.evaluate\(candles, btAnalysis\)/.test(gaugeHtml));
 
 // Gauge gradient — narrow yellow band
 assert('Gradient: narrow yellow band 48-52 (red dominates < 48, green dominates > 55)',

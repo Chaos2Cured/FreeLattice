@@ -679,6 +679,26 @@ canvas.sub-canvas.custom { height: 80px !important; }
   <div class="sidebar">
     <div id="errorBox" class="error-box"></div>
 
+    <!-- Signal Rule picker (v5.37.12) — switch between buy/sell hypotheses. -->
+    <div class="sidebar-section">
+      <div class="sidebar-label">Signal Rule</div>
+      <select id="ruleSelect" onchange="setActiveRule(this.value)" style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:0.85rem;cursor:pointer;font-family:inherit;">
+        <option value="sequence">Sequence Rule</option>
+        <option value="triad">Original Triad</option>
+        <option value="reversion">Reversion Tier</option>
+      </select>
+      <div id="ruleDescription" style="font-size:0.66rem;color:var(--muted);line-height:1.5;padding:6px 2px 0;"></div>
+    </div>
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      if (typeof RULE_REGISTRY === 'undefined') return;
+      var sel = document.getElementById('ruleSelect');
+      var desc = document.getElementById('ruleDescription');
+      if (sel) sel.value = getActiveRule();
+      if (desc && RULE_REGISTRY[sel.value]) desc.textContent = RULE_REGISTRY[sel.value].description;
+    });
+    </script>
+
     <!-- Temperature gauge -->
     <div class="sidebar-section">
       <div class="sidebar-label">Temperature</div>
@@ -1011,6 +1031,190 @@ function setEmaPeriods(arr) {
            .sort(function (a, b) { return a - b; });
   if (arr.length !== 5) return false;
   try { localStorage.setItem('fl_tg_ema_periods', arr.join(',')); } catch (e) {}
+  if (typeof lastCandles !== 'undefined' && lastCandles && typeof lastAnalysis !== 'undefined' && lastAnalysis) {
+    renderAll(lastCandles, lastAnalysis, typeof lastSymbol !== 'undefined' ? lastSymbol : '');
+  }
+  return true;
+}
+
+// ─── RULE_REGISTRY (v5.37.12) ─────────────────────────────────────
+// Buy/sell logic as named, swappable, individually-backtestable rules.
+// Each evaluate(candles, a) returns { buy: array, sell: array } parallel
+// to candles (null where no signal, close price where signal fires).
+// Phi-harmonic principle: every rule is a named hypothesis. Nothing
+// gets lost. Switching rules switches the chart's triangles AND the
+// backtest stats — they stay in lockstep by design.
+var RULE_REGISTRY = {
+  sequence: {
+    name: 'Sequence Rule',
+    description: 'Buy: red→yellow→green in 3 bars. Sell: green→yellow→red in 3 bars. Alternating cooldown (next signal must be the opposite type). The clean signal that survived the chair-test pass.',
+    color: '#10B981',
+    evaluate: function (candles, a) {
+      var closes = candles.map(function (c) { return c.c; });
+      var buy = new Array(candles.length).fill(null);
+      var sell = new Array(candles.length).fill(null);
+      var last = null;
+      for (var i = 2; i < candles.length; i++) {
+        if (a.temps[i] == null || a.temps[i-1] == null || a.temps[i-2] == null) continue;
+        var buySeq  = a.temps[i-2] <  45 &&
+                      a.temps[i-1] >= 45 && a.temps[i-1] < 55 &&
+                      a.temps[i]   >= 55;
+        var sellSeq = a.temps[i-2] >= 55 &&
+                      a.temps[i-1] >= 45 && a.temps[i-1] < 55 &&
+                      a.temps[i]   <  45;
+        if (buySeq && last !== 'buy')      { buy[i]  = closes[i]; last = 'buy'; }
+        else if (sellSeq && last !== 'sell') { sell[i] = closes[i]; last = 'sell'; }
+      }
+      return { buy: buy, sell: sell };
+    }
+  },
+  triad: {
+    name: 'Original Triad',
+    description: 'Three buy triggers (yellow→green, red→yellow, sustained rally) + three sell triggers (green→yellow, yellow→red, collapse from green). EMA-aligned + volume OR acceleration confirmed. State-based cooldown: a sell only repeats after a touch of green; a buy only after a touch of red. Preserved from v5.37.9 — unmodified.',
+    color: '#c9a84c',
+    evaluate: function (candles, a) {
+      var closes = candles.map(function (c) { return c.c; });
+      var buy = new Array(candles.length).fill(null);
+      var sell = new Array(candles.length).fill(null);
+      // Recompute the inputs the triad needs — each rule is self-contained.
+      var ep = (typeof getEmaPeriods === 'function') ? getEmaPeriods() : [8, 12, 24, 50, 200];
+      var ema8 = ema(closes, ep[0]);
+      var ema12 = ema(closes, ep[1]);
+      var volEma20 = ema(candles.map(function (c) { return c.v; }), 20);
+      var lastBuySi = -1, lastSellSi = -1;
+      var sawGreenSinceLastSell = false;
+      var sawRedSinceLastBuy = false;
+      for (var si = 5; si < closes.length; si++) {
+        if (a.temps[si] == null || a.temps[si-1] == null) continue;
+        if (a.temps[si] >= 55 && lastSellSi >= 0) sawGreenSinceLastSell = true;
+        if (a.temps[si] < 45 && lastBuySi >= 0)  sawRedSinceLastBuy   = true;
+        // BUY triad
+        var buy55 = a.temps[si-1] < 55 && a.temps[si] >= 55;
+        var buy45 = a.temps[si-1] < 45 && a.temps[si] >= 45;
+        var recentRedTrough = Math.min(
+          (a.temps[si-1] != null ? a.temps[si-1] : 100),
+          (a.temps[si-2] != null ? a.temps[si-2] : 100),
+          (a.temps[si-3] != null ? a.temps[si-3] : 100),
+          (a.temps[si-4] != null ? a.temps[si-4] : 100),
+          (a.temps[si-5] != null ? a.temps[si-5] : 100)
+        );
+        var rally = a.temps[si] > 45 && recentRedTrough <= 45 &&
+                    a.temps[si] > ((a.temps[si-3] != null ? a.temps[si-3] : 0) + 8);
+        var tBuy = buy55 || buy45 || rally;
+        // SELL triad
+        var sell55 = a.temps[si-1] >= 55 && a.temps[si] < 55;
+        var sell45 = a.temps[si-1] >= 45 && a.temps[si] < 45;
+        var recentGreenPeak = Math.max(
+          a.temps[si-1] || 0, a.temps[si-2] || 0,
+          a.temps[si-3] || 0, a.temps[si-4] || 0, a.temps[si-5] || 0
+        );
+        var collapse = a.temps[si] < 55 && recentGreenPeak >= 55 &&
+                       a.temps[si] < (a.temps[si-3] || 100) - 8;
+        var tSell = sell55 || sell45 || collapse;
+        if (tBuy) {
+          var emaOk = ema8[si] != null && ema12[si] != null && ema8[si] > ema12[si];
+          var volHigh = volEma20[si] && candles[si].v > volEma20[si];
+          var accelUp = a.tempROC && a.tempROC[si] != null && a.tempROC[si] > 3;
+          if (emaOk && (volHigh || accelUp) && (lastBuySi < 0 || sawRedSinceLastBuy)) {
+            buy[si] = closes[si];
+            lastBuySi = si;
+            sawRedSinceLastBuy = false;
+          }
+        }
+        if (tSell) {
+          var emaDn = ema8[si] != null && ema12[si] != null && ema8[si] < ema12[si];
+          var vHigh = volEma20[si] && candles[si].v > volEma20[si];
+          var accelDn = a.tempROC && a.tempROC[si] != null && a.tempROC[si] < -3;
+          if (emaDn && (vHigh || accelDn) && (lastSellSi < 0 || sawGreenSinceLastSell)) {
+            sell[si] = closes[si];
+            lastSellSi = si;
+            sawGreenSinceLastSell = false;
+          }
+        }
+      }
+      return { buy: buy, sell: sell };
+    }
+  },
+  reversion: {
+    name: 'Reversion Tier',
+    description: 'Exhaustion (tpSpread beyond ±1.2 ATR) + Confluence (≥3 of 5 components agree: EMA, RSI, MACD, tempROC, gravity) + Pullback to gravity in last 5 bars + sustained 2-bar acceleration + today turning in the signal direction. Rare and conviction-gated. Preserved from v5.37.10 — known to misfire in sustained trends (NVDA 1W generated 20+ in one trend). Use with care; named here as a hypothesis to test against.',
+    color: '#ffd560',
+    evaluate: function (candles, a) {
+      var closes = candles.map(function (c) { return c.c; });
+      var buy = new Array(candles.length).fill(null);
+      var sell = new Array(candles.length).fill(null);
+      var ep = (typeof getEmaPeriods === 'function') ? getEmaPeriods() : [8, 12, 24, 50, 200];
+      var rEma8 = ema(closes, ep[0]);
+      var rEma12 = ema(closes, ep[1]);
+      // Gravity (same formula renderChart uses).
+      var hi = Math.max.apply(null, candles.slice(-80).map(function (c) { return c.h; }));
+      var lo = Math.min.apply(null, candles.slice(-80).map(function (c) { return c.l; }));
+      var mid = lo + (hi - lo) * 0.5;
+      var phi = lo + (hi - lo) * PHI_INV;
+      var rvGravity = PHI_INV * phi + (1 - PHI_INV) * mid;
+      function bullScoreAt(i) {
+        var n = 0;
+        if (rEma8[i] != null && rEma12[i] != null && rEma8[i] > rEma12[i]) n++;
+        if (a.rsiArr && a.rsiArr[i] != null && a.rsiArr[i] > 50) n++;
+        if (a.macdData && a.macdData.macdLine && a.macdData.signalLine &&
+            a.macdData.macdLine[i] != null && a.macdData.signalLine[i] != null &&
+            a.macdData.macdLine[i] > a.macdData.signalLine[i]) n++;
+        if (a.tempROC && a.tempROC[i] != null && a.tempROC[i] > 0) n++;
+        if (closes[i] != null && closes[i] >= rvGravity) n++;
+        return n;
+      }
+      function bearScoreAt(i) {
+        var n = 0;
+        if (rEma8[i] != null && rEma12[i] != null && rEma8[i] < rEma12[i]) n++;
+        if (a.rsiArr && a.rsiArr[i] != null && a.rsiArr[i] < 50) n++;
+        if (a.macdData && a.macdData.macdLine && a.macdData.signalLine &&
+            a.macdData.macdLine[i] != null && a.macdData.signalLine[i] != null &&
+            a.macdData.macdLine[i] < a.macdData.signalLine[i]) n++;
+        if (a.tempROC && a.tempROC[i] != null && a.tempROC[i] < 0) n++;
+        if (closes[i] != null && closes[i] <= rvGravity) n++;
+        return n;
+      }
+      for (var ri = 5; ri < closes.length; ri++) {
+        if (a.temps[ri] == null || a.tpSpread == null || a.tpSpread[ri] == null) continue;
+        if (closes[ri] == null || closes[ri-1] == null) continue;
+        var bExhaust = a.tpSpread[ri] < -1.2;
+        var bAccel2  = a.tempROC && a.tempROC[ri] != null && a.tempROC[ri-1] != null &&
+                       a.tempROC[ri] > 0 && a.tempROC[ri-1] > 0;
+        var bPullback = false;
+        for (var bj = Math.max(0, ri - 5); bj < ri; bj++) {
+          if (closes[bj] != null && closes[bj] <= rvGravity) { bPullback = true; break; }
+        }
+        if (bExhaust && bAccel2 && bPullback && bullScoreAt(ri) >= 3 && closes[ri] > closes[ri-1]) {
+          buy[ri] = closes[ri];
+        }
+        var sExhaust = a.tpSpread[ri] > 1.2;
+        var sDecel2  = a.tempROC && a.tempROC[ri] != null && a.tempROC[ri-1] != null &&
+                       a.tempROC[ri] < 0 && a.tempROC[ri-1] < 0;
+        var sPullback = false;
+        for (var sj = Math.max(0, ri - 5); sj < ri; sj++) {
+          if (closes[sj] != null && closes[sj] >= rvGravity) { sPullback = true; break; }
+        }
+        if (sExhaust && sDecel2 && sPullback && bearScoreAt(ri) >= 3 && closes[ri] < closes[ri-1]) {
+          sell[ri] = closes[ri];
+        }
+      }
+      return { buy: buy, sell: sell };
+    }
+  }
+};
+
+function getActiveRule() {
+  try {
+    var v = localStorage.getItem('fl_tg_activeRule');
+    return (v && RULE_REGISTRY[v]) ? v : 'sequence';
+  } catch (e) { return 'sequence'; }
+}
+function setActiveRule(id) {
+  if (!RULE_REGISTRY[id]) return false;
+  try { localStorage.setItem('fl_tg_activeRule', id); } catch (e) {}
+  // Update the inline description if the dropdown is mounted.
+  var desc = document.getElementById('ruleDescription');
+  if (desc) desc.textContent = RULE_REGISTRY[id].description;
   if (typeof lastCandles !== 'undefined' && lastCandles && typeof lastAnalysis !== 'undefined' && lastAnalysis) {
     renderAll(lastCandles, lastAnalysis, typeof lastSymbol !== 'undefined' ? lastSymbol : '');
   }
@@ -1623,26 +1827,39 @@ function backtestSignals(candles) {
   var tempROC = tempResult.tempROC;
   var volEma = ema(candles.map(function(c){return c.v;}), 20);
 
-  // Sequence Rule (v5.37.11) — mirrors the renderChart logic EXACTLY so the
-  // on-chart triangles and the win-rate stats can't drift apart. Buy when
-  // red → yellow → green in three successive bars; sell when green →
-  // yellow → red. After a buy, only a sell can fire next, and vice versa.
+  // Signal logic — delegated to the active rule's evaluate() (v5.37.12).
+  // Whichever rule the user picked in the sidebar dropdown is what gets
+  // backtested. Chart and stats stay in lockstep because both call the
+  // SAME function. Build a minimal `a` object holding the inputs each
+  // evaluate function needs.
+  var btAnalysis = {
+    temps: temps,
+    tempROC: tempResult.tempROC,
+    rsiArr: rsiArr,
+    macdData: macdData,
+    tpSpread: null, // computed below only if rule needs it
+    closes: closes
+  };
+  // tpSpread is only computed in analyzeData (uses tempAsPrice). For the
+  // backtest we approximate via standardized temperature distance — rules
+  // that need it (Reversion) will tolerate null gracefully.
+  var atrArr = atr(candles, 14);
+  btAnalysis.tpSpread = new Array(closes.length).fill(null);
+  for (var bsi = 0; bsi < closes.length; bsi++) {
+    if (temps[bsi] != null && atrArr[bsi] != null && closes[bsi] != null) {
+      // Same shape as analyzeData: tempAsPrice = close + (temp-50)/50 * phi * atr
+      var tempAsPrice = closes[bsi] + (temps[bsi] - 50) / 50 * PHI * atrArr[bsi];
+      btAnalysis.tpSpread[bsi] = (tempAsPrice - closes[bsi]) / (atrArr[bsi] || 1);
+    }
+  }
+  var btRule = RULE_REGISTRY[getActiveRule()] || RULE_REGISTRY.sequence;
+  var btResult = btRule.evaluate(candles, btAnalysis);
   var signals = [];
-  var lastTypeBT = null;
-  for (var si = 2; si < closes.length; si++) {
-    if (temps[si] == null || temps[si-1] == null || temps[si-2] == null) continue;
-    var sellSeq = temps[si-2] >= 55 &&
-                  temps[si-1] >= 45 && temps[si-1] < 55 &&
-                  temps[si]   <  45;
-    var buySeq  = temps[si-2] <  45 &&
-                  temps[si-1] >= 45 && temps[si-1] < 55 &&
-                  temps[si]   >= 55;
-    if (buySeq && lastTypeBT !== 'buy') {
-      signals.push({ index: si, type: 'buy', price: closes[si], date: new Date(candles[si].t) });
-      lastTypeBT = 'buy';
-    } else if (sellSeq && lastTypeBT !== 'sell') {
-      signals.push({ index: si, type: 'sell', price: closes[si], date: new Date(candles[si].t) });
-      lastTypeBT = 'sell';
+  for (var bsi2 = 0; bsi2 < candles.length; bsi2++) {
+    if (btResult.buy[bsi2] != null) {
+      signals.push({ index: bsi2, type: 'buy', price: btResult.buy[bsi2], date: new Date(candles[bsi2].t) });
+    } else if (btResult.sell[bsi2] != null) {
+      signals.push({ index: bsi2, type: 'sell', price: btResult.sell[bsi2], date: new Date(candles[bsi2].t) });
     }
   }
 
@@ -1858,42 +2075,19 @@ function renderChart(candles, a) {
   var layerVol = !(document.getElementById('layerVol') && !document.getElementById('layerVol').checked);
   var layerDt = document.getElementById('layerDt') && document.getElementById('layerDt').checked;
 
-  // ─── SEQUENCE RULE (v5.37.11) ──────────────────────────────────────
-  // Kirk's rule, stated precisely:
-  //   Buy  when temperature moves red → yellow → green in three successive bars.
-  //   Sell when temperature moves green → yellow → red in three successive bars.
-  //   After a buy, the next signal MUST be a sell. After a sell, MUST be a buy.
-  //
-  // No layer gates. No EMA confirmation. No volume confirmation. The
-  // sequence rule replaces every previous triad/cooldown attempt.
-  // Three successive bars in the same direction is a real motion, not a
-  // flicker. The alternating cooldown eliminates the "more sells while
-  // the stock climbs" pattern Kirk caught on the chart.
-  //
-  // Previously we tried: single-trigger sell55, then sell triad
-  // (sell55/sell45/collapse), then buy triad mirror, then state-based
-  // cooldown, then Reversion Triad (exhaustion + confluence + pullback).
-  // Each iteration either missed signals or created noise. The chair
-  // test on NVDA 1W produced 20+ "high-conviction" gold stars across a
-  // single trend — the gates that were meant to identify exhaustion
-  // turned out to be routinely true in sustained trends. Strip until
-  // it sings. — 2026-06-03
-  var lastSignalType = null; // 'buy' | 'sell' | null
-  for (var si = 2; si < closes.length; si++) {
-    if (a.temps[si] == null || a.temps[si-1] == null || a.temps[si-2] == null) continue;
-    var sellSeq = a.temps[si-2] >= 55 &&
-                  a.temps[si-1] >= 45 && a.temps[si-1] < 55 &&
-                  a.temps[si]   <  45;
-    var buySeq  = a.temps[si-2] <  45 &&
-                  a.temps[si-1] >= 45 && a.temps[si-1] < 55 &&
-                  a.temps[si]   >= 55;
-    if (buySeq && lastSignalType !== 'buy') {
-      buyPoints[si] = closes[si];
-      lastSignalType = 'buy';
-    } else if (sellSeq && lastSignalType !== 'sell') {
-      sellPoints[si] = closes[si];
-      lastSignalType = 'sell';
-    }
+  // ─── Signal logic — delegated to active rule (v5.37.12) ────────────
+  // Buy/sell logic now lives in RULE_REGISTRY (top of script). The active
+  // rule is picked by the sidebar dropdown and persists in
+  // fl_tg_activeRule. Default is the Sequence Rule. Switching rules
+  // re-renders the chart AND the backtest stats from the same source.
+  var _activeRule = RULE_REGISTRY[getActiveRule()] || RULE_REGISTRY.sequence;
+  var _ruleResult = _activeRule.evaluate(candles, a);
+  // Copy into the existing buyPoints/sellPoints arrays so the rest of
+  // renderChart's downstream code (datasets, glow plugin, signal counts)
+  // keeps working without modification.
+  for (var _ri = 0; _ri < candles.length; _ri++) {
+    buyPoints[_ri] = _ruleResult.buy[_ri] != null ? _ruleResult.buy[_ri] : null;
+    sellPoints[_ri] = _ruleResult.sell[_ri] != null ? _ruleResult.sell[_ri] : null;
   }
 
   // Gravity centerline — the phi-weighted mean price (volume-weighted attractor)

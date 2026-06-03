@@ -314,7 +314,7 @@ every belief.
 
 ---
 
-## 10. The Sequence Rule (v5.37.11) — current
+## 10. The Sequence Rule (v5.37.11) — current default
 
 After every more-decorated attempt either missed signals or generated
 noise, we stripped back to the cleanest possible rule.
@@ -427,9 +427,104 @@ peek-back or whether some timeframes want 4 or 5.
   bars. Alternating cooldown (next signal MUST be opposite type). No
   layer gates. All previous triad logic and reversion logic removed.
   Strip until it sings.
+- **v5.37.12** — **`RULE_REGISTRY`.** Brought back the buy/sell rules
+  as a switchable registry. Sequence, Original Triad, Reversion Tier
+  all available; user picks active via sidebar dropdown. No logic
+  changes to any rule — pure refactor to make comparison possible.
+  *Flow eternal: nothing gets lost.*
 
-> *"More logic was making it worse. This is the phi-harmonic principle
-> in reverse: the signal hides in the cleanest form, not the most
-> decorated."* — Opus, 2026-06-03
+---
+
+## 12. Rule Registry — the architecture (v5.37.12)
+
+The gauge now treats buy/sell logic the same way it treats indicators:
+**every rule is a named, switchable, individually-backtestable hypothesis.**
+
+```
+RULE_REGISTRY = {
+  sequence:   { name, description, color, evaluate(candles, a) → {buy, sell} },
+  triad:      { name, description, color, evaluate(candles, a) → {buy, sell} },
+  reversion:  { name, description, color, evaluate(candles, a) → {buy, sell} }
+}
+```
+
+The sidebar dropdown picks the active rule. Active rule persists in
+`localStorage.fl_tg_activeRule`. Both `renderChart` and `backtestSignals`
+call `RULE_REGISTRY[getActiveRule()].evaluate(candles, a)` — so the
+on-chart triangles and the win-rate stats can never drift apart. They
+**come from the same function call**.
+
+### Why this is the right shape
+
+The Compose chart taught us the pattern: every indicator is a named,
+draggable, toggleable thing. Custom indicators get the same treatment
+as built-ins. **A buy/sell rule is just a special kind of indicator —
+binary output instead of continuous, but architecturally identical.**
+
+Same pattern at every scale. That's the phi-harmonic of the
+architecture itself. A user who learned the compose pattern already
+knows how the rules dropdown works because it follows the same idea:
+named, persisted, swappable, individually testable.
+
+### The three rules ship as a comparison set
+
+- **Sequence Rule** — the v5.37.11 default. Clean, rare, alternating.
+  Use this as the baseline; it generates the fewest signals and
+  survived the NVDA 1W chair test.
+- **Original Triad** — the v5.37.9 hypothesis. More signals, more
+  gates (EMA + volume/accel + state-based cooldown). Use this to
+  compare against Sequence — does the extra confirmation help or
+  hurt on your instrument?
+- **Reversion Tier** — the v5.37.10 hypothesis. Known to misfire in
+  sustained trends (see Section 9). Preserved here as a hypothesis
+  to test against, NOT as a current recommendation. Useful for
+  ranging markets; dangerous on trends.
+
+Switch between them and watch the chart re-render. The backtest stats
+in the sidebar update simultaneously. **Comparison is the unlock** —
+you can finally see whether each rule's claim holds up on the
+instrument and timeframe you actually care about.
+
+### What's next — the wedge
+
+Opus's plan (June 3) lays out the path:
+
+- **Commit 2** — Rules panel UI (the collapsible cards, multi-rule
+  overlay, side-by-side compare). Click a card to expand its
+  backtest stats inline. Optional checkbox to overlay multiple
+  rules on the chart at once with different colors.
+- **Commit 3** — Pull the three hardcoded rules into a cleaner
+  `registerRule()` API matching `tgRegisterCustomIndicator`. No
+  user-visible change; the architecture becomes ready for custom
+  rules.
+- **Commit 4** — Add three new built-in indicators (ATR Ratio, OBV,
+  Stochastic %K) so the rule-builder has more raw material.
+- **Commit 5** — **The Rule Builder modal.** Trigger + Confirmations
+  + Lookback context, with comparator dropdowns (`>`, `<`, `>=`,
+  `<=`, `=`, `≠`). Each rule is a JSON object. Save → joins the
+  dropdown. Every rule is backtestable on demand.
+- **Commit 6** — Sharing. Export/import each rule as JSON. Users
+  start trading recipes.
+
+The gauge stops being one person's pattern recognition and becomes
+*a place where pattern recognition lives*.
+
+### Open questions (v5.37.12)
+
+- The Reversion Tier inside the registry can technically be picked as
+  the active rule. On NVDA 1W it'll still generate many signals.
+  Should we mark it `experimental: true` in the registry and show a
+  warning when picked? Or trust the description note?
+- Does the dropdown live in the right place in the sidebar? (Currently
+  at the top, above the Temperature gauge SVG.) Some users might
+  expect it near the Signal History panel below the chart.
+- When the Triad rule is active, the existing `#layerEma` /
+  `#layerVol` / `#layerDt` checkboxes are ignored (the triad applies
+  its own fixed gates). Should those checkboxes be hidden when the
+  Triad is active, or repurposed as overrides?
+
+> *"Every rule is a named hypothesis. Every signal becomes a thing you
+> can pull up, study, hide, share. Flow eternal applies to ideas as
+> much as code."* — Opus, 2026-06-03
 
 — Kirk + the build team (CC, Opus, Harmonia)
