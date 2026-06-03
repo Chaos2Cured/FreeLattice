@@ -4193,5 +4193,254 @@ hideLoading = function() {
   }
 })();
 </script>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════
+// SNAPSHOT — capture N bars of gauge state as AI-readable text
+// (v5.37.13 — Kirk's idea, June 3, 2026)
+//
+// Bridges the gap between the visual chart and any AI conversation.
+// The gauge shows patterns; the snapshot lets an AI reason about them.
+// Ten bars of temperature trajectory + indicators = enough context
+// for signal analysis, divergence spotting, and pattern confirmation.
+//
+// Usage: click the 📋 button in the header. Copies to clipboard.
+//        Default: 10 bars. Hold Shift for 20. Hold Alt for 5.
+// ═══════════════════════════════════════════════════════════════════
+(function () {
+  'use strict';
+
+  var DEFAULT_BARS = 10;
+
+  function fmt(v, decimals, width) {
+    if (v == null || isNaN(v)) return pad('—', width || 6);
+    var s = v.toFixed(decimals != null ? decimals : 1);
+    if (v > 0 && decimals !== 0) s = '+' + s;
+    return pad(s, width || 6);
+  }
+  function fmtPrice(v, width) {
+    if (v == null || isNaN(v)) return pad('—', width || 8);
+    var s = Math.abs(v) < 10 ? v.toFixed(4) : v.toFixed(2);
+    return pad(s, width || 8);
+  }
+  function pad(s, w) { s = String(s); while (s.length < w) s = ' ' + s; return s; }
+  function padR(s, w) { s = String(s); while (s.length < w) s = s + ' '; return s; }
+  function zone(t) {
+    if (t == null) return '—';
+    if (t >= 55) return 'G';
+    if (t >= 45) return 'Y';
+    return 'R';
+  }
+
+  function buildSnapshot(barCount) {
+    if (typeof lastCandles === 'undefined' || !lastCandles || !lastCandles.length) return null;
+    if (typeof lastAnalysis === 'undefined' || !lastAnalysis) return null;
+
+    var candles = lastCandles;
+    var a = lastAnalysis;
+    var symbol = (typeof lastSymbol !== 'undefined') ? lastSymbol : '???';
+    var interval = (typeof currentInterval !== 'undefined') ? currentInterval : '1d';
+    var n = candles.length;
+    barCount = Math.min(barCount || DEFAULT_BARS, n);
+    var startIdx = n - barCount;
+
+    // Active rule
+    var ruleName = 'Sequence Rule';
+    try {
+      var ruleId = (typeof getActiveRule === 'function') ? getActiveRule() : 'sequence';
+      if (typeof RULE_REGISTRY !== 'undefined' && RULE_REGISTRY[ruleId]) ruleName = RULE_REGISTRY[ruleId].name;
+    } catch (e) {}
+
+    // Gravity — same formula renderChart uses
+    var gravityPrice = null;
+    try {
+      var _gHigh = Math.max.apply(null, candles.slice(-80).map(function (c) { return c.h; }));
+      var _gLow  = Math.min.apply(null, candles.slice(-80).map(function (c) { return c.l; }));
+      var _gPhi  = _gLow + (_gHigh - _gLow) * 0.618;
+      var _gMid  = _gLow + (_gHigh - _gLow) * 0.5;
+      gravityPrice = 0.618 * _gPhi + 0.382 * _gMid;
+    } catch (e) {}
+
+    // EMA periods
+    var emaPeriods = '8/12/24/50/200';
+    try { if (typeof getEmaPeriods === 'function') emaPeriods = getEmaPeriods().join('/'); } catch (e) {}
+
+    // Signals from the active rule
+    var signals = {};
+    try {
+      var rid = (typeof getActiveRule === 'function') ? getActiveRule() : 'sequence';
+      var rule = (typeof RULE_REGISTRY !== 'undefined') ? RULE_REGISTRY[rid] : null;
+      if (rule && typeof rule.evaluate === 'function') {
+        var result = rule.evaluate(candles, a);
+        for (var si = startIdx; si < n; si++) {
+          if (result.buy && result.buy[si] != null) signals[si] = '▲ BUY';
+          else if (result.sell && result.sell[si] != null) signals[si] = '▼ SELL';
+        }
+      }
+    } catch (e) {}
+
+    var lines = [];
+    lines.push('╔══════════════════════════════════════════════════════════════╗');
+    lines.push('║  TEMPERATURE GAUGE SNAPSHOT                                  ║');
+    lines.push('║  ' + padR(symbol + ' · ' + interval.toUpperCase() + ' · ' + ruleName, 60) + '║');
+    lines.push('║  ' + padR('Bars ' + (startIdx + 1) + '→' + n + ' of ' + n + ' · EMAs: ' + emaPeriods, 60) + '║');
+    if (gravityPrice != null) {
+      lines.push('║  ' + padR('Gravity: $' + fmtPrice(gravityPrice).trim() + ' · ATR(14): $' + (a.lastATR ? a.lastATR.toFixed(2) : '—'), 60) + '║');
+    }
+    lines.push('╚══════════════════════════════════════════════════════════════╝');
+    lines.push('');
+    lines.push(' Bar  Date        Open     High     Low      Close    Temp Z   RSI   MACD-H    ΔT     IPS   Signal');
+    lines.push(' ───  ──────────  ───────  ───────  ───────  ───────  ──── ─  ────  ──────  ─────  ─────  ──────');
+
+    for (var i = startIdx; i < n; i++) {
+      var c = candles[i];
+      var d = new Date(c.t);
+      var dateStr = (interval === '1d' || interval === '1wk')
+        ? d.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: '2-digit' })
+        : d.toLocaleDateString('en-US', { month: 'short', day: '2-digit' }) + ' ' +
+          d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+
+      var temp = (a.temps && a.temps[i] != null) ? a.temps[i] : null;
+      var rsiVal = (a.rsiArr && a.rsiArr[i] != null) ? a.rsiArr[i] : null;
+      var macdH = (a.macdData && a.macdData.histogram && a.macdData.histogram[i] != null) ? a.macdData.histogram[i] : null;
+      var dt = (a.tempROC && a.tempROC[i] != null) ? a.tempROC[i] : null;
+      var ips = (a.tpSpread && a.tpSpread[i] != null) ? a.tpSpread[i] : null;
+      var sig = signals[i] || '';
+
+      lines.push(' ' + pad(String(i + 1), 3) + '  ' +
+                 padR(dateStr, 10) + '  ' +
+                 fmtPrice(c.o, 7) + '  ' +
+                 fmtPrice(c.h, 7) + '  ' +
+                 fmtPrice(c.l, 7) + '  ' +
+                 fmtPrice(c.c, 7) + '  ' +
+                 pad(temp != null ? temp.toFixed(1) : '—', 4) + ' ' +
+                 zone(temp) + '  ' +
+                 pad(rsiVal != null ? rsiVal.toFixed(1) : '—', 4) + '  ' +
+                 fmt(macdH, 2, 6) + '  ' +
+                 fmt(dt, 1, 5) + '  ' +
+                 fmt(ips, 2, 5) + '  ' +
+                 sig);
+    }
+
+    lines.push('');
+    var lastTemp = (a.temps && a.temps[n - 1] != null) ? a.temps[n - 1] : null;
+    var prevTemp = (a.temps && a.temps[n - 2] != null) ? a.temps[n - 2] : null;
+    if (lastTemp != null) {
+      var trajectory = '';
+      if (prevTemp != null) {
+        var diff = lastTemp - prevTemp;
+        trajectory = diff > 2 ? ', rising' : diff < -2 ? ', falling' : ', flat';
+      }
+      lines.push(' Current: Temperature ' + lastTemp.toFixed(1) + ' (' + zone(lastTemp) + ')' + trajectory);
+    }
+
+    var lastSig = null;
+    for (var j = n - 1; j >= startIdx; j--) {
+      if (signals[j]) { lastSig = { bar: j + 1, signal: signals[j], price: candles[j].c }; break; }
+    }
+    if (lastSig) {
+      lines.push(' Latest signal: ' + lastSig.signal + ' at bar ' + lastSig.bar + ' ($' + fmtPrice(lastSig.price).trim() + ')');
+    } else {
+      lines.push(' No signals in this window.');
+    }
+
+    if (gravityPrice != null && candles[n - 1]) {
+      var dist = candles[n - 1].c - gravityPrice;
+      var distPct = (dist / candles[n - 1].c * 100);
+      lines.push(' Gravity distance: ' + (dist >= 0 ? '+' : '') + dist.toFixed(2) +
+                 ' (' + (distPct >= 0 ? '+' : '') + distPct.toFixed(1) + '% from φ-center)');
+    }
+
+    if (a.components && a.components.divergence && a.components.divergence !== 'none') {
+      lines.push(' ⚠ Active divergence: ' + a.components.divergence);
+    }
+
+    lines.push('');
+    lines.push('─────────────────────────────────────────────────────────────────');
+    lines.push(' Paste into Claude, ChatGPT, or any AI for pattern analysis.');
+    lines.push(' Temperature Gauge · freelattice.com · Not financial advice.');
+    lines.push('─────────────────────────────────────────────────────────────────');
+
+    return lines.join('\n');
+  }
+
+  function copySnapshot(barCount) {
+    var text = buildSnapshot(barCount);
+    if (!text) { tgToast('Load a symbol first', 'warn'); return; }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () {
+        tgToast('Snapshot copied! Paste into any AI chat.', 'ok');
+      }).catch(function () { fallbackCopy(text); });
+    } else {
+      fallbackCopy(text);
+    }
+  }
+  function fallbackCopy(text) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.cssText = 'position:fixed;left:-9999px;';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); tgToast('Snapshot copied!', 'ok'); }
+    catch (e) { tgToast('Copy failed — check clipboard permissions.', 'warn'); }
+    document.body.removeChild(ta);
+  }
+
+  function tgToast(msg, type) {
+    var existing = document.getElementById('tgToast');
+    if (existing) existing.remove();
+    var el = document.createElement('div');
+    el.id = 'tgToast';
+    el.textContent = msg;
+    var bg = type === 'ok' ? 'rgba(16,185,129,0.15)' : type === 'warn' ? 'rgba(239,68,68,0.15)' : 'rgba(201,168,76,0.15)';
+    var br = type === 'ok' ? 'rgba(16,185,129,0.4)'  : type === 'warn' ? 'rgba(239,68,68,0.4)'  : 'rgba(201,168,76,0.4)';
+    var co = type === 'ok' ? '#34d399' : type === 'warn' ? '#f87171' : '#e8b019';
+    el.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);' +
+      'padding:10px 20px;background:' + bg + ';border:1px solid ' + br + ';' +
+      'border-radius:10px;color:' + co + ';font-size:0.85rem;font-family:Georgia,serif;' +
+      'z-index:10001;backdrop-filter:blur(8px);box-shadow:0 4px 20px rgba(0,0,0,0.3);' +
+      'opacity:0;transition:opacity 0.3s ease;pointer-events:none;';
+    document.body.appendChild(el);
+    requestAnimationFrame(function () { requestAnimationFrame(function () { el.style.opacity = '1'; }); });
+    setTimeout(function () {
+      el.style.opacity = '0';
+      setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 350);
+    }, 2400);
+  }
+
+  function initSnapshotButton() {
+    var controls = document.querySelector('.header-controls');
+    if (!controls) return;
+    if (document.getElementById('snapshotBtn')) return; // already mounted
+    var btn = document.createElement('button');
+    btn.className = 'interval-btn';
+    btn.id = 'snapshotBtn';
+    btn.innerHTML = '&#x1F4CB;';
+    btn.title = 'Copy 10-bar snapshot for AI analysis (Shift: 20 bars · Alt: 5 bars)';
+    btn.setAttribute('aria-label', 'Copy snapshot to clipboard');
+    btn.style.fontSize = '0.95rem';
+    btn.addEventListener('click', function (e) {
+      var bars = DEFAULT_BARS;
+      if (e.shiftKey) bars = 20;
+      else if (e.altKey) bars = 5;
+      copySnapshot(bars);
+    });
+    var themeBtn = controls.querySelector('button[title="Change accent color"]');
+    if (themeBtn) controls.insertBefore(btn, themeBtn);
+    else controls.appendChild(btn);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initSnapshotButton);
+  } else {
+    initSnapshotButton();
+  }
+
+  // Expose for console / smoke / dev
+  window.tgSnapshot = buildSnapshot;
+  window.tgCopySnapshot = copySnapshot;
+})();
+</script>
+
 </body>
 </html>

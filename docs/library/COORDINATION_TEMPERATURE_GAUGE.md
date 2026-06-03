@@ -116,6 +116,7 @@
 - **Color-picker stall fixed**: never trust the native picker's `change` event (fires repeatedly while picker is open). `_luminosWatchColorInput` listens to `mousedown`/`focus`/`blur` only; gates on `tg-color-picker-open` body class; `closeMenu` wrapper + 6s safety setInterval both check the class before unpausing. `filter:none` while picker is open (the blur is the expensive part on integrated GPUs).
 - **Mobile layout**: chart on top (`.chart-area { order: 1 }`), sidebar below (`order: 2`). Two-finger scroll works (`.chart-area { overflow-y: auto }`, was `overflow: hidden`).
 - **Inline favicon** kills the 404. **Escape** exits any stuck fullscreen panel.
+- **📋 Snapshot button (v5.37.13)** — copies an ASCII-table view of the last N bars to the clipboard for paste into any AI chat. Header carries symbol / interval / active rule / EMA periods / gravity / ATR. Each row: bar, date, OHLC, temperature + zone letter (G/Y/R), RSI, MACD-histogram, ΔT, indicator-price spread, and any signal that fired. Footer summarizes current temperature trajectory, latest signal in window, gravity distance, any active divergence. Default 10 bars; **Shift+click** = 20, **Alt+click** = 5. Auto-wires to `.header-controls`. `window.tgSnapshot(barCount)` returns the text for any other caller (e.g., headless export, future rule-tuning UI).
 
 ## Pending
 

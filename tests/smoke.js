@@ -2366,6 +2366,53 @@ assert('renderChart: delegates buy/sell to RULE_REGISTRY[getActiveRule()].evalua
 assert('backtestSignals: delegates to RULE_REGISTRY[getActiveRule()].evaluate (same source as chart)',
   /btRule = RULE_REGISTRY\[getActiveRule\(\)\][\s\S]{0,200}btRule\.evaluate\(candles, btAnalysis\)/.test(gaugeHtml));
 
+// ═══════════════════════════════════════════════════════════════
+section('91. Snapshot — gauge state as AI-readable text (v5.37.13)');
+
+// IIFE present + self-contained
+assert('Snapshot: IIFE block present (v5.37.13)',
+  gaugeHtml.includes('SNAPSHOT — capture N bars of gauge state as AI-readable text'));
+assert('Snapshot: buildSnapshot + copySnapshot exposed on window',
+  gaugeHtml.includes('window.tgSnapshot = buildSnapshot') &&
+  gaugeHtml.includes('window.tgCopySnapshot = copySnapshot'));
+assert('Snapshot: reads from active rule (RULE_REGISTRY[getActiveRule()].evaluate)',
+  /RULE_REGISTRY\[rid\][\s\S]{0,200}rule\.evaluate\(candles, a\)/.test(gaugeHtml));
+
+// Button wires into header
+assert('Snapshot: 📋 button auto-mounts to .header-controls',
+  /initSnapshotButton[\s\S]{0,500}\.header-controls/.test(gaugeHtml));
+assert('Snapshot: button uses clipboard icon (📋 = \\u1F4CB)',
+  /innerHTML = '&#x1F4CB;'/.test(gaugeHtml));
+assert('Snapshot: bar count modifiers — Shift=20, Alt=5, default=10',
+  /shiftKey[\s\S]{0,80}bars = 20/.test(gaugeHtml) &&
+  /altKey[\s\S]{0,80}bars = 5/.test(gaugeHtml) &&
+  /DEFAULT_BARS = 10/.test(gaugeHtml));
+
+// Output structure — header / table / footer
+assert('Snapshot: ASCII box header with ╔ ╚ borders',
+  /TEMPERATURE GAUGE SNAPSHOT/.test(gaugeHtml) &&
+  /╔══════════════════════════════════════════════════════════════╗/.test(gaugeHtml));
+assert('Snapshot: per-bar columns include Open, High, Low, Close, Temp, Z, RSI, MACD-H, ΔT, IPS, Signal',
+  /Bar  Date        Open     High     Low      Close    Temp Z   RSI   MACD-H/.test(gaugeHtml));
+assert('Snapshot: zone() emits G / Y / R',
+  /function zone\(t\)[\s\S]{0,200}return 'G'[\s\S]{0,100}return 'Y'[\s\S]{0,100}return 'R'/.test(gaugeHtml));
+assert('Snapshot: footer invites AI paste (Claude, ChatGPT)',
+  gaugeHtml.includes('Paste into Claude, ChatGPT, or any AI'));
+assert('Snapshot: footer carries the not-financial-advice disclaimer',
+  /Temperature Gauge · freelattice\.com · Not financial advice/.test(gaugeHtml));
+
+// Clipboard mechanics
+assert('Snapshot: copySnapshot uses navigator.clipboard with fallback',
+  /navigator\.clipboard\.writeText/.test(gaugeHtml) &&
+  /fallbackCopy\(text\)/.test(gaugeHtml));
+assert('Snapshot: tgToast notification on copy (ok / warn variants)',
+  /function tgToast\(msg, type\)/.test(gaugeHtml) &&
+  /'Snapshot copied!/.test(gaugeHtml));
+assert('Snapshot: reads from existing globals (lastCandles, lastAnalysis, lastSymbol)',
+  gaugeHtml.includes("typeof lastCandles === 'undefined'") &&
+  gaugeHtml.includes("typeof lastAnalysis === 'undefined'") &&
+  /typeof lastSymbol !== 'undefined'/.test(gaugeHtml));
+
 // Gauge gradient — narrow yellow band
 assert('Gradient: narrow yellow band 48-52 (red dominates < 48, green dominates > 55)',
   /<stop offset="45%"\s+stop-color="#EF4444"/.test(gaugeHtml) &&
