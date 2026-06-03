@@ -348,17 +348,17 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-06-03 15:46 MDT
-- Version: 5.37.12
-- Total commits: 2214
+- Last auto-updated: 2026-06-03 16:25 MDT
+- Version: 5.37.13
+- Total commits: 2218
 - Last 10 commits:
+- 52ab3fb feat(gauge): Snapshot — gauge state as AI-readable text (v5.37.13)
+- b57f9b6 Merge remote-tracking branch 'origin/main'
+- 07561ec docs: Auto-update Session Primer [5.37.12]
 - a8094de feat(gauge): RULE_REGISTRY — switchable buy/sell hypotheses (v5.37.12)
+- 905f283 ci: Update Primer deployment state [2026-06-03]
 - 6d86789 docs: Auto-update Session Primer [5.37.11]
 - afb7b89 Merge remote-tracking branch 'origin/main'
 - cca4a88 docs: Auto-update Session Primer [5.37.11]
 - 68ea47f feat(gauge): Sequence Rule + collapsible sidebar + narrow yellow (v5.37.11)
 - b56a827 ci: Update Primer deployment state [2026-06-03]
-- 0d79982 Merge remote-tracking branch 'origin/main'
-- f87724a docs: Auto-update Session Primer [5.37.10]
-- f05046b feat(gauge): Reversion Triad + outside-click race fix (v5.37.10)
-- 6e3bef6 ci: Update Primer deployment state [2026-06-03]
