@@ -192,7 +192,32 @@ rule echoes at every scale and gets one bit more accurate each chair pass.
 
 ---
 
-## 9. The Reversion Tier (v5.37.10)
+## 9. The Reversion Tier (v5.37.10) — **DEPRECATED in v5.37.11**
+
+> **Removed after chair test.** On NVDA 1W the tier fired roughly 20+ gold
+> stars across a single uptrend. The gates that were *meant* to identify
+> exhaustion — `tpSpread < −1.2`, `bullCount ≥ 3`, 5-bar pullback to
+> gravity, two bars of tempROC > 0, today closing higher than yesterday
+> — all turn out to be routinely true *together* in a sustained trend.
+> The tier measured "normal uptrend bar," not exhaustion. Removed in
+> v5.37.11 and replaced with the cleaner Sequence Rule (§10).
+>
+> The lesson, recorded so we don't repeat it: **adding gates is not the
+> same as adding selectivity.** Five conditions that each look rare can
+> all be common together in trending markets. The signal that actually
+> works is the one that requires the temperature to *traverse* the
+> gauge across multiple bars, not the one that requires many features
+> to coincide on a single bar.
+>
+> The Reversion Tier *idea* — exhaustion meeting confluence meeting
+> reversion to gravity — is still a real shape. We didn't get the
+> *threshold* right and we didn't sanity-check against a sustained
+> trend. If we revisit it, the next attempt should require
+> instrument-specific ATR-normalized thresholds and explicitly
+> backtest against trending markets to make sure it stays rare there.
+
+The original (now-deprecated) specification is preserved below for the
+record:
 
 The triad above catches **transitions**. Transitions are common. The
 Reversion Tier catches **reversals at exhaustion** — the rarer, higher-
@@ -286,5 +311,125 @@ The middle path: **three slots** (trigger / confirmations / lookback
 context), comparators on each (`>`, `<`, `>=`, `<=`, `=`, `≠`), and
 **every recipe is backtestable on demand** so a number sits next to
 every belief.
+
+---
+
+## 10. The Sequence Rule (v5.37.11) — current
+
+After every more-decorated attempt either missed signals or generated
+noise, we stripped back to the cleanest possible rule.
+
+**Sell** when temperature moves green → yellow → red in three successive
+bars.
+**Buy** when temperature moves red → yellow → green in three successive
+bars.
+**After a buy, the next signal must be a sell. After a sell, the next
+must be a buy.**
+
+In code:
+
+```
+At bar i, sell if:
+  temps[i-2] >= 55                    (was green)
+  temps[i-1] >= 45 AND temps[i-1] < 55 (was yellow)
+  temps[i]   <  45                    (is red)
+
+At bar i, buy if:
+  temps[i-2] <  45                    (was red)
+  temps[i-1] >= 45 AND temps[i-1] < 55 (was yellow)
+  temps[i]   >= 55                    (is green)
+```
+
+### Why this is the right shape
+
+- **It requires real motion.** Three successive bars in the same
+  direction is the temperature traversing the gauge end-to-end. A
+  single bar dipping below 55 and bouncing back is not enough. A flick
+  through yellow followed by recovery is not enough. The market has to
+  *do* something across three bars.
+- **The alternating cooldown is unambiguous.** No state to track
+  beyond "what was the last signal type." No "saw green since" or
+  "saw red since" bookkeeping. The next signal can only be the
+  opposite type. This eliminates the chart pattern Kirk caught where
+  multiple sells fired in a row as the stock was climbing.
+- **No layer gates.** No EMA confirmation, no volume confirmation, no
+  acceleration check. Every previous iteration added confirmation
+  gates and every iteration either failed to trigger when it should
+  (BTC top, v5.37.6 and earlier) or fired when it shouldn't (NVDA
+  Reversion stars). The clean temperature sequence is the signal.
+
+### What this catches well
+
+- Clear regime changes where temperature actually traverses the gauge
+- Mean-reversion moves that pull through both yellow and red (or
+  yellow and green)
+- Slow distributions where the market spends a bar in yellow before
+  cracking — the previous "sell only on 55-cross" missed these
+
+### What this might miss
+
+- Single-bar dramatic moves that jump two zones (green → red in one
+  bar with no yellow bar between). If you see this happen and the
+  rule doesn't fire, that's the case. Tell us.
+- Very fast timeframes (1H, 15m) where three bars is ~45 minutes of
+  noise rather than a real regime change.
+- Choppy markets that oscillate through yellow without ever
+  *traversing* — the rule correctly stays quiet, but a user might
+  expect a signal anyway.
+
+### Backtest
+
+`backtestSignals` runs the **exact same** sequence rule and alternating
+cooldown. The Signal History sidebar reports buy/sell counts and
+5/10/20-bar forward win rates. On NVDA 1W after deploy we expect
+~2-4 alternating triangles instead of 20+ gold stars.
+
+If the count is still high on your instrument, the issue is timeframe
+not threshold — the temperature is flickering faster than the rule
+assumes is meaningful. That's data for whether 3-bar is the right
+peek-back or whether some timeframes want 4 or 5.
+
+### Open questions
+
+1. **Does the rule fire often enough on slower instruments?** SPY 1D
+   might only fire 4-6 times per year. Whether that's "right" depends
+   on your trading style. Could need an instrument-aware sensitivity
+   knob.
+2. **Does it fire too rarely on faster timeframes?** 1H / 15m might
+   need a 4-bar or 5-bar sequence rule because intra-day noise has
+   more flicker.
+3. **What about gaps?** If the temperature jumps from green to red in
+   one bar (gap-down), the sequence rule misses it. Worth a single
+   "gap fallback" — if `temps[i-1] >= 55` AND `temps[i] < 45` (skipped
+   yellow entirely), fire anyway. To be tested.
+4. **The recipe UI** is still the next layer once this rule proves
+   itself. Lets users define their own triggers with comparator
+   dropdowns. Each recipe is a named, backtestable hypothesis.
+
+---
+
+## 11. Iteration log
+
+- **v5.22.0** — Initial buy/sell signal logic (single sell trigger,
+  AND-gated volume + EMA).
+- **v5.37.7** — Sell triad (sell55 / sell45 / collapse). Volume OR
+  acceleration confirms. Diagnosed BTC top miss.
+- **v5.37.9** — Buy triad mirror (buy55 / buy45 / rally) + state-based
+  "reset" cooldown (require trip back to opposite zone before another
+  signal).
+- **v5.37.10** — Reversion Triad shipped (exhaustion + confluence +
+  pullback-to-gravity, gold stars). Chair test on NVDA 1W generated
+  20+ stars across a single trend — the gates meant to identify
+  exhaustion turned out to be routinely true in sustained trends.
+  Removed.
+- **v5.37.11** — **Sequence Rule.** Buy = red → yellow → green in three
+  successive bars. Sell = green → yellow → red in three successive
+  bars. Alternating cooldown (next signal MUST be opposite type). No
+  layer gates. All previous triad logic and reversion logic removed.
+  Strip until it sings.
+
+> *"More logic was making it worse. This is the phi-harmonic principle
+> in reverse: the signal hides in the cleanest form, not the most
+> decorated."* — Opus, 2026-06-03
 
 — Kirk + the build team (CC, Opus, Harmonia)

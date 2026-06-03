@@ -2214,19 +2214,11 @@ assert('Mobile: composeEmpty wired via touchend (synthetic-click fix)',
 assert('Mobile: _wireEmptyStageTouch called from init',
   /function init\(\)[\s\S]{0,400}_wireEmptyStageTouch\(\)/.test(gaugeHtml));
 
-// Commit 3 — Sell triad
-assert('Sell triad: sell55 trigger (green → yellow)',
-  /var sell55 = a\.temps\[si-1\] >= 55 && a\.temps\[si\] < 55/.test(gaugeHtml));
-assert('Sell triad: sell45 trigger (yellow → red)',
-  /var sell45 = a\.temps\[si-1\] >= 45 && a\.temps\[si\] < 45/.test(gaugeHtml));
-assert('Sell triad: collapse-from-green trigger (slow bleed)',
-  /var collapse = a\.temps\[si\] < 55[\s\S]{0,200}recentGreenPeak >= 55/.test(gaugeHtml));
-assert('Sell triad: volume OR acceleration confirms (panic does not always have volume)',
-  /var accelDown = a\.tempROC && a\.tempROC\[si\] != null && a\.tempROC\[si\] < -3/.test(gaugeHtml));
-assert('Sell triad: backtestSignals mirrors the same triad',
-  gaugeHtml.includes('var collapseBT') && /sell55 \|\| sell45 \|\| collapseBT/.test(gaugeHtml));
-assert('Sell triad: loop now starts at si=5 (needs 5 prior bars for collapse peek-back)',
-  /for \(var si = 5; si < closes\.length/.test(gaugeHtml));
+// v5.37.11: Sell triad helpers removed (covered above + in section 90's
+// sequence-rule assertions). Confirm the loop now starts at si=2 (the
+// sequence rule needs 2 prior bars).
+assert('v5.37.11: signal loop starts at si=2 (sequence rule peek-back)',
+  /for \(var si = 2; si < closes\.length/.test(gaugeHtml));
 
 // Commit 4 — Configurable EMA periods
 assert('EMA config: DEFAULT_EMA_PERIODS [8,12,24,50,200] defined',
@@ -2268,29 +2260,30 @@ assert('Drag fix: comment explains the renderChart-per-input regression',
 // ═══════════════════════════════════════════════════════════════
 section('88. Buy triad + cooldown (no repeats until reset) + strategy doc (v5.37.9)');
 
-// Buy triad — mirror of the sell triad
-assert('Buy triad: buy55 trigger (yellow → green)',
-  /var buy55 = a\.temps\[si-1\] < 55 && a\.temps\[si\] >= 55/.test(gaugeHtml));
-assert('Buy triad: buy45 trigger (red → yellow)',
-  /var buy45 = a\.temps\[si-1\] < 45 && a\.temps\[si\] >= 45/.test(gaugeHtml));
-assert('Buy triad: rally-from-red trigger (sustained climb, mirror of collapse)',
-  /var rally = a\.temps\[si\] > 45[\s\S]{0,300}recentRedTrough <= 45/.test(gaugeHtml));
-assert('Buy triad: volume OR acceleration on buy side (rallies start on average volume)',
-  /var accelUp\s*=\s*a\.tempROC && a\.tempROC\[si\] != null && a\.tempROC\[si\] > 3/.test(gaugeHtml));
-assert('Buy triad: backtest mirrors with rallyBT',
-  gaugeHtml.includes('var rallyBT') && /buy55 \|\| buy45 \|\| rallyBT/.test(gaugeHtml));
+// v5.37.11: buy triad + volume/accel gates REPLACED by the Sequence Rule.
+// (See section 90 for the new assertions.) Keep guardrails that the old
+// helpers stay out.
+assert('v5.37.11: buy triad helpers (buy55, buy45, rally) removed from renderChart',
+  !/var buy55\s*=\s*a\.temps/.test(gaugeHtml) &&
+  !/var buy45\s*=\s*a\.temps/.test(gaugeHtml) &&
+  !/var rally\s*=\s*a\.temps/.test(gaugeHtml));
+assert('v5.37.11: sell triad helpers (sell55, sell45, collapse) removed from renderChart',
+  !/var sell55\s*=\s*a\.temps/.test(gaugeHtml) &&
+  !/var sell45\s*=\s*a\.temps/.test(gaugeHtml) &&
+  !/var collapse\s*=\s*a\.temps/.test(gaugeHtml));
+assert('v5.37.11: layer-gate confirmation logic gone from buy/sell evaluation',
+  !/var accelUp\s*=\s*a\.tempROC/.test(gaugeHtml) &&
+  !/var accelDown\s*=\s*a\.tempROC/.test(gaugeHtml));
+assert('v5.37.11: rallyBT / collapseBT triad helpers removed (replaced by sequence rule)',
+  !gaugeHtml.includes('var rallyBT') && !gaugeHtml.includes('var collapseBT'));
 
-// Cooldown — no repeats until temperature resets
-assert('Cooldown: sell tracker (lastSellSi + sawGreenSinceLastSell)',
-  gaugeHtml.includes('lastSellSi') && gaugeHtml.includes('sawGreenSinceLastSell'));
-assert('Cooldown: buy tracker (lastBuySi + sawRedSinceLastBuy)',
-  gaugeHtml.includes('lastBuySi') && gaugeHtml.includes('sawRedSinceLastBuy'));
-assert('Cooldown: sell gated on (first sell OR saw green since last)',
-  /lastSellSi < 0 \|\| sawGreenSinceLastSell/.test(gaugeHtml));
-assert('Cooldown: buy gated on (first buy OR saw red since last)',
-  /lastBuySi < 0 \|\| sawRedSinceLastBuy/.test(gaugeHtml));
-assert('Cooldown: backtest mirrors the gate (lastBuyBT + sawGreenBT)',
-  gaugeHtml.includes('lastBuyBT') && gaugeHtml.includes('sawGreenBT'));
+// Cooldown — state-based "saw opposite zone" trackers were REPLACED in
+// v5.37.11 by the simpler alternating cooldown (next signal must be the
+// opposite type). Assert the old trackers stay removed; the new cooldown
+// is asserted in section 90.
+assert('v5.37.11: state-reset cooldown removed (replaced by alternating cooldown)',
+  !gaugeHtml.includes('sawGreenSinceLastSell') && !gaugeHtml.includes('sawRedSinceLastBuy') &&
+  !gaugeHtml.includes('lastBuyBT') && !gaugeHtml.includes('sawGreenBT'));
 
 // Strategy doc — the living explanation
 var stratPath = path.join(docsDir, 'library', 'TEMPERATURE_GAUGE_STRATEGY.md');
@@ -2323,44 +2316,77 @@ assert('Race fix: zero outside-click setTimeouts remain at 0ms',
 assert('Race fix: at least 4 sites switched to 50ms',
   (gaugeHtml.match(/document\.addEventListener\('click', _outsideClick, true\); \}, 50/g) || []).length >= 4);
 
-// Commit 2 — Reversion Triad in renderChart
-assert('Reversion: reversionBuyPoints + reversionSellPoints arrays defined',
-  gaugeHtml.includes('reversionBuyPoints') && gaugeHtml.includes('reversionSellPoints'));
-assert('Reversion: exhaustion gate uses tpSpread threshold ±1.2',
-  /tpSpread\[ri\] < -1\.2/.test(gaugeHtml) && /tpSpread\[ri\] > 1\.2/.test(gaugeHtml));
-assert('Reversion: confluence requires bullCount/bearCount >= 3',
-  /_bullCountAt\(ri\) >= 3/.test(gaugeHtml) && /_bearCountAt\(ri\) >= 3/.test(gaugeHtml));
-assert('Reversion: 5-component bull/bear count (EMA + RSI + MACD + tempROC + gravity)',
-  /function _bullCountAt[\s\S]{0,600}ema8\[i\] > ema12\[i\][\s\S]{0,200}rsiArr\[i\] > 50[\s\S]{0,200}macdLine[\s\S]{0,200}tempROC\[i\] > 0[\s\S]{0,200}closes\[i\] >= _rvGravity/.test(gaugeHtml));
-assert('Reversion: pullback-to-gravity check (5-bar lookback)',
-  /bPullback[\s\S]{0,300}closes\[bj\] <= _rvGravity/.test(gaugeHtml) &&
-  /sPullback[\s\S]{0,300}closes\[sj\] >= _rvGravity/.test(gaugeHtml));
-assert('Reversion: requires 2-bar tempROC consistency (not single-bar fakeout)',
-  /bAccel2[\s\S]{0,200}tempROC\[ri\] > 0 && a\.tempROC\[ri-1\] > 0/.test(gaugeHtml) &&
-  /sDecel2[\s\S]{0,200}tempROC\[ri\] < 0 && a\.tempROC\[ri-1\] < 0/.test(gaugeHtml));
-assert('Reversion: also requires today turning in the signal direction',
-  /bTurningUp\s*=\s*closes\[ri\] > closes\[ri-1\]/.test(gaugeHtml) &&
-  /sTurningDown\s*=\s*closes\[ri\] < closes\[ri-1\]/.test(gaugeHtml));
-assert('Reversion: gold-star datasets on the chart (Reversion Buy/Sell)',
-  /label:\s*'Reversion Buy'[\s\S]{0,300}pointStyle:\s*'star'[\s\S]{0,200}pointBorderColor:\s*'#ffd560'/.test(gaugeHtml));
-assert('Reversion: stars sit on top via order: -1',
-  /label:\s*'Reversion Buy'[\s\S]{0,400}order:\s*-1/.test(gaugeHtml));
+// Reversion Triad REMOVED in v5.37.11 (chair test on NVDA 1W showed it
+// generated 20+ stars in a single trend — gates meant to be rare were
+// routinely true in sustained trends). Assert it stays out.
+assert('v5.37.11: Reversion Triad removed from renderChart',
+  !gaugeHtml.includes('reversionBuyPoints') && !gaugeHtml.includes('reversionSellPoints') &&
+  !gaugeHtml.includes('_bullCountAt') && !gaugeHtml.includes('_bearCountAt'));
+assert('v5.37.11: gold-star "Reversion Buy/Sell" datasets removed',
+  !gaugeHtml.includes("label: 'Reversion Buy'") && !gaugeHtml.includes("label: 'Reversion Sell'"));
+assert('v5.37.11: rvSignals / rvbuy / rvsell removed from backtest',
+  !gaugeHtml.includes('rvSignals') && !/'rvbuy'/.test(gaugeHtml) && !/'rvsell'/.test(gaugeHtml));
+assert('v5.37.11: backtest stats narrowed to buy + sell only',
+  /\['buy',\s*'sell'\]\.forEach/.test(gaugeHtml));
 
-// Reversion backtest mirrors
-assert('Reversion backtest: rvSignals array + rvbuy/rvsell types',
-  gaugeHtml.includes('rvSignals') && /'rvbuy'/.test(gaugeHtml) && /'rvsell'/.test(gaugeHtml));
-assert('Reversion backtest: stats include rvbuy + rvsell',
-  /\['buy',\s*'sell',\s*'rvbuy',\s*'rvsell'\]/.test(gaugeHtml));
+// ═══════════════════════════════════════════════════════════════
+section('90. Sequence Rule + alternating cooldown + sandwich + narrow yellow (v5.37.11)');
 
-// Commit 3 — Strategy doc
-assert('Strategy doc: Section 9 The Reversion Tier present',
-  strat.includes('## 9. The Reversion Tier'));
-assert('Strategy doc: explains exhaustion + confluence + pullback as the trade',
-  strat.includes('Exhaustion') && strat.includes('Confluence') && strat.includes('Pullback to gravity'));
-assert('Strategy doc: lists open questions for the Reversion Tier (1.2, bullCount, 5-bar)',
-  strat.includes('1.2 ATR') && strat.includes('bullCount') && strat.includes('5-bar pullback'));
-assert('Strategy doc: mentions the planned Recipe UI as the next layer',
-  strat.includes('Recipe UI') && strat.includes('comparator'));
+// Sequence Rule — the only signal logic now
+assert('Sequence: SELL = green → yellow → red in three successive bars',
+  /sellSeq = a\.temps\[si-2\] >= 55[\s\S]{0,400}a\.temps\[si\]\s+<\s+45/.test(gaugeHtml));
+assert('Sequence: BUY = red → yellow → green in three successive bars',
+  /buySeq\s*=\s*a\.temps\[si-2\] <\s+45[\s\S]{0,400}a\.temps\[si\]\s+>=\s+55/.test(gaugeHtml));
+assert('Sequence: alternating cooldown (next signal must be opposite type)',
+  /lastSignalType !== 'buy'/.test(gaugeHtml) && /lastSignalType !== 'sell'/.test(gaugeHtml));
+assert('Sequence: loop starts at si=2 (needs 2 prior bars for the sequence)',
+  /for \(var si = 2; si < closes\.length/.test(gaugeHtml));
+assert('Sequence: NO layer gates on the trigger (no EMA / volume / accel branches inside the if)',
+  !/buySeq[\s\S]{0,100}layerEma/.test(gaugeHtml));
+
+// Backtest mirrors the renderChart sequence rule exactly
+assert('Backtest: mirrors the same sellSeq + buySeq + lastTypeBT alternation',
+  /lastTypeBT\s*=\s*null/.test(gaugeHtml) &&
+  /lastTypeBT\s*=\s*'buy'/.test(gaugeHtml) &&
+  /lastTypeBT\s*=\s*'sell'/.test(gaugeHtml));
+assert('Backtest: removed atrBT (was only needed for Reversion)',
+  !/var atrBT = atr\(candles, 14\)/.test(gaugeHtml));
+
+// Gauge gradient — narrow yellow band
+assert('Gradient: narrow yellow band 48-52 (red dominates < 48, green dominates > 55)',
+  /<stop offset="45%"\s+stop-color="#EF4444"/.test(gaugeHtml) &&
+  /<stop offset="48%"\s+stop-color="#F59E0B"/.test(gaugeHtml) &&
+  /<stop offset="52%"\s+stop-color="#F59E0B"/.test(gaugeHtml) &&
+  /<stop offset="55%"\s+stop-color="#10B981"/.test(gaugeHtml));
+assert('Gradient: old wide-yellow stops (38.2% / 61.8%) removed',
+  !/<stop offset="38\.2%"\s+stop-color="#F59E0B"/.test(gaugeHtml));
+
+// Sandwich button — sidebar toggle
+assert('Sidebar: sandwich button #sidebarToggleBtn in the toolbar',
+  /id="sidebarToggleBtn"[\s\S]{0,200}onclick="toggleSidebar\(\)"/.test(gaugeHtml));
+assert('Sidebar: toggleSidebar persists in fl_tg_sidebar',
+  /function toggleSidebar\(\)[\s\S]{0,400}'fl_tg_sidebar'/.test(gaugeHtml));
+assert('Sidebar: CSS hides sidebar + makes main 1fr when collapsed',
+  /body\.tg-sidebar-collapsed \.sidebar\s*\{\s*display:\s*none/.test(gaugeHtml) &&
+  /body\.tg-sidebar-collapsed \.main\s*\{\s*grid-template-columns:\s*1fr/.test(gaugeHtml));
+assert('Sidebar: state restored on DOMContentLoaded',
+  /localStorage\.getItem\('fl_tg_sidebar'\) === 'hidden'/.test(gaugeHtml));
+assert('Sidebar: chart resizes after toggle (so it actually fills the freed space)',
+  /function toggleSidebar\(\)[\s\S]{0,800}chartInstance\.resize\(\)/.test(gaugeHtml));
+
+// Strategy doc updates
+var strat11 = fs.readFileSync(path.join(docsDir, 'library', 'TEMPERATURE_GAUGE_STRATEGY.md'), 'utf8');
+assert('Strategy doc: Reversion Tier marked DEPRECATED in v5.37.11',
+  /Reversion Tier[\s\S]{0,200}DEPRECATED in v5\.37\.11/.test(strat11));
+assert('Strategy doc: Section 10 Sequence Rule present',
+  strat11.includes('## 10. The Sequence Rule'));
+assert('Strategy doc: explains alternating cooldown unambiguous',
+  strat11.includes('alternating cooldown') && strat11.includes('opposite type'));
+assert('Strategy doc: explains the NVDA 1W chair test lesson',
+  /NVDA 1W[\s\S]{0,300}routinely true \*together\*/.test(strat11) ||
+  strat11.includes('routinely true *together*'));
+assert('Strategy doc: iteration log includes v5.37.11',
+  strat11.includes('v5.37.11') && /Sequence Rule/.test(strat11));
 
 // ═══════════════════════════════════════════════════════════════
 section('80. Compose mode bug fixes — date adapter, volume/BB, tooltip, resize, clear (v5.37.1)');

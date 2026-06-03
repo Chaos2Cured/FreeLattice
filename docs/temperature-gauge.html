@@ -128,6 +128,12 @@ body {
   gap: 0;
   height: calc(100vh - 65px);
 }
+/* Collapsible sidebar (v5.37.11) — sandwich button in the header toggles
+   tg-sidebar-collapsed on body. .chart-area is already flex:1 inside a
+   grid column that becomes 1fr, so it grows naturally. */
+body.tg-sidebar-collapsed .sidebar { display: none; }
+body.tg-sidebar-collapsed .main { grid-template-columns: 1fr; }
+#sidebarToggleBtn.tg-active { background: var(--gold); color: #0a0e1a; border-color: var(--gold); }
 @media (max-width: 768px) {
   .main { grid-template-columns: 1fr; height: auto; }
   /* Chart on top on mobile — sidebar (controls) below. Per Kirk's mobile pass. */
@@ -602,6 +608,7 @@ canvas.sub-canvas.custom { height: 80px !important; }
       <button class="interval-btn" data-interval="5m" onclick="setInterval_('5m')">5M</button>
     </div>
     <button class="load-btn" id="loadBtn" onclick="loadData()">Analyze</button>
+    <button id="sidebarToggleBtn" onclick="toggleSidebar()" class="interval-btn" style="font-size:0.95rem;" title="Show / hide the left sidebar" aria-label="Toggle sidebar">&#9776;</button>
     <label style="display:flex;align-items:center;gap:4px;font-size:0.72rem;color:var(--muted);cursor:pointer;margin-left:4px;" title="Logarithmic price scale">
       <input type="checkbox" id="logToggle" onchange="toggleLogScale(this.checked)" style="accent-color:var(--gold);"> Log
     </label>
@@ -683,10 +690,15 @@ canvas.sub-canvas.custom { height: 80px !important; }
           <path d="M 20 80 A 60 60 0 0 1 140 80" fill="none" stroke="url(#gaugeGrad)" stroke-width="12" stroke-linecap="round"
                 stroke-dasharray="188.5" stroke-dashoffset="188.5" id="gaugeArc"/>
           <defs>
+            <!-- Gradient narrowed v5.37.11: yellow is now a slim transition band
+                 (48-52) instead of dominating 38-62. Red and green dominate
+                 the readout so the gauge reads at a glance. -->
             <linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stop-color="#EF4444"/>
-              <stop offset="38.2%" stop-color="#F59E0B"/>
-              <stop offset="61.8%" stop-color="#10B981"/>
+              <stop offset="0%"   stop-color="#EF4444"/>
+              <stop offset="45%"  stop-color="#EF4444"/>
+              <stop offset="48%"  stop-color="#F59E0B"/>
+              <stop offset="52%"  stop-color="#F59E0B"/>
+              <stop offset="55%"  stop-color="#10B981"/>
               <stop offset="100%" stop-color="#10B981"/>
             </linearGradient>
             <filter id="needleGlow">
@@ -960,6 +972,25 @@ Chart.register({
 const PHI = 1.618033988749895;
 const PHI_INV = 1 / PHI; // 0.618
 const PHI_LEVELS = [0, 23.6, 38.2, 50, 61.8, 78.6, 100];
+
+// Sidebar collapse / expand (v5.37.11). Persisted in fl_tg_sidebar.
+function toggleSidebar() {
+  var collapsed = document.body.classList.toggle('tg-sidebar-collapsed');
+  try { localStorage.setItem('fl_tg_sidebar', collapsed ? 'hidden' : 'shown'); } catch (e) {}
+  var btn = document.getElementById('sidebarToggleBtn');
+  if (btn) btn.classList.toggle('tg-active', collapsed);
+  setTimeout(function () {
+    if (typeof _polishResizeAllCharts === 'function') _polishResizeAllCharts();
+    if (typeof chartInstance !== 'undefined' && chartInstance && chartInstance.resize) chartInstance.resize();
+  }, 60);
+}
+document.addEventListener('DOMContentLoaded', function () {
+  if (localStorage.getItem('fl_tg_sidebar') === 'hidden') {
+    document.body.classList.add('tg-sidebar-collapsed');
+    var btn = document.getElementById('sidebarToggleBtn');
+    if (btn) btn.classList.add('tg-active');
+  }
+});
 
 // User-configurable EMA periods. Kirk: "Some people will want 9 vs my 8."
 // One source of truth — every ema(closes, N) call below reads from getEmaPeriods().
@@ -1592,124 +1623,31 @@ function backtestSignals(candles) {
   var tempROC = tempResult.tempROC;
   var volEma = ema(candles.map(function(c){return c.v;}), 20);
 
-  // Layered signals — MIRROR the renderChart triad so the win rates match
-  // what users see on the chart. Sell has three triggers (55-cross,
-  // 45-cross, collapse-from-green) and accepts volume OR acceleration.
+  // Sequence Rule (v5.37.11) — mirrors the renderChart logic EXACTLY so the
+  // on-chart triangles and the win-rate stats can't drift apart. Buy when
+  // red → yellow → green in three successive bars; sell when green →
+  // yellow → red. After a buy, only a sell can fire next, and vice versa.
   var signals = [];
-  var volEma20 = ema(candles.map(function(c){return c.v;}), 20);
-  // Mirror the renderChart cooldown + buy-triad so the backtest reflects
-  // what the user sees on screen.
-  var lastBuyBT = -1, lastSellBT = -1;
-  var sawGreenBT = false, sawRedBT = false;
-  for (var si = 5; si < closes.length; si++) {
-    if (temps[si] == null || temps[si-1] == null) continue;
-    if (temps[si] >= 55 && lastSellBT >= 0) sawGreenBT = true;
-    if (temps[si] < 45 && lastBuyBT >= 0)  sawRedBT   = true;
-    // BUY triad
-    var buy55 = temps[si-1] < 55 && temps[si] >= 55;
-    var buy45 = temps[si-1] < 45 && temps[si] >= 45;
-    var troughBT = Math.min(
-      (temps[si-1] != null ? temps[si-1] : 100),
-      (temps[si-2] != null ? temps[si-2] : 100),
-      (temps[si-3] != null ? temps[si-3] : 100),
-      (temps[si-4] != null ? temps[si-4] : 100),
-      (temps[si-5] != null ? temps[si-5] : 100)
-    );
-    var rallyBT = temps[si] > 45 && troughBT <= 45 &&
-                  temps[si] > ((temps[si-3] != null ? temps[si-3] : 0) + 8);
-    var tBuy = buy55 || buy45 || rallyBT;
-    // SELL triad
-    var sell55 = temps[si-1] >= 55 && temps[si] < 55;
-    var sell45 = temps[si-1] >= 45 && temps[si] < 45;
-    var peakBT = Math.max(temps[si-1] || 0, temps[si-2] || 0, temps[si-3] || 0, temps[si-4] || 0, temps[si-5] || 0);
-    var collapseBT = temps[si] < 55 && peakBT >= 55 && temps[si] < (temps[si-3] || 100) - 8;
-    var tSell = sell55 || sell45 || collapseBT;
-    if (tBuy) {
-      var eUp = ema8[si] != null && ema12[si] != null && ema8[si] > ema12[si];
-      var vUp = volEma20[si] && candles[si].v > volEma20[si];
-      var aUp = tempROC && tempROC[si] != null && tempROC[si] > 3;
-      if (eUp && (vUp || aUp) && (lastBuyBT < 0 || sawRedBT)) {
-        signals.push({ index: si, type: 'buy', price: closes[si], date: new Date(candles[si].t) });
-        lastBuyBT = si; sawRedBT = false;
-      }
-    }
-    if (tSell) {
-      var eDn = ema8[si] != null && ema12[si] != null && ema8[si] < ema12[si];
-      var vDn = volEma20[si] && candles[si].v > volEma20[si];
-      var aDn = tempROC && tempROC[si] != null && tempROC[si] < -3;
-      if (eDn && (vDn || aDn) && (lastSellBT < 0 || sawGreenBT)) {
-        signals.push({ index: si, type: 'sell', price: closes[si], date: new Date(candles[si].t) });
-        lastSellBT = si; sawGreenBT = false;
-      }
-    }
-  }
-
-  // Reversion Triad backtest — mirrors the renderChart logic. High-quality
-  // tier scored separately so we can see if it actually outperforms the
-  // regular triad triangles.
-  var rvHigh = Math.max.apply(null, candles.slice(-80).map(function (c) { return c.h; }));
-  var rvLow  = Math.min.apply(null, candles.slice(-80).map(function (c) { return c.l; }));
-  var rvMid  = rvLow + (rvHigh - rvLow) * 0.5;
-  var rvPhi  = rvLow + (rvHigh - rvLow) * PHI_INV;
-  var rvGravity = PHI_INV * rvPhi + (1 - PHI_INV) * rvMid;
-  function _bullBT(i) {
-    var n = 0;
-    if (ema8[i] != null && ema12[i] != null && ema8[i] > ema12[i]) n++;
-    if (rsiArr[i] != null && rsiArr[i] > 50) n++;
-    if (macdData.macdLine[i] != null && macdData.signalLine[i] != null && macdData.macdLine[i] > macdData.signalLine[i]) n++;
-    if (tempROC && tempROC[i] != null && tempROC[i] > 0) n++;
-    if (closes[i] != null && closes[i] >= rvGravity) n++;
-    return n;
-  }
-  function _bearBT(i) {
-    var n = 0;
-    if (ema8[i] != null && ema12[i] != null && ema8[i] < ema12[i]) n++;
-    if (rsiArr[i] != null && rsiArr[i] < 50) n++;
-    if (macdData.macdLine[i] != null && macdData.signalLine[i] != null && macdData.macdLine[i] < macdData.signalLine[i]) n++;
-    if (tempROC && tempROC[i] != null && tempROC[i] < 0) n++;
-    if (closes[i] != null && closes[i] <= rvGravity) n++;
-    return n;
-  }
-  // tpSpread for backtest — same formula as analyzeData but inline here so we don't depend on full a object
-  var atrBT = atr(candles, 14);
-  var rvSignals = [];
-  for (var ri2 = 5; ri2 < closes.length; ri2++) {
-    if (temps[ri2] == null || closes[ri2] == null || closes[ri2-1] == null) continue;
-    // Need ATR-normalized tpSpread for exhaustion gate
-    // (compute on-the-fly: tempAsPrice = closes[ri2] + (temps[ri2]-50)/100*atr*phi-ish)
-    // For simplicity, use tempROC magnitude as exhaustion proxy: a sustained
-    // strong tempROC means the temperature is stretched. The renderChart
-    // version has full tpSpread; the backtest uses a reasonable proxy.
-    var rvBuyExhaust  = temps[ri2] < 35 && temps[ri2-1] < 40;
-    var rvSellExhaust = temps[ri2] > 65 && temps[ri2-1] > 60;
-    var rvBuyAccel = tempROC && tempROC[ri2] != null && tempROC[ri2-1] != null &&
-                     tempROC[ri2] > 0 && tempROC[ri2-1] > 0;
-    var rvSellAccel = tempROC && tempROC[ri2] != null && tempROC[ri2-1] != null &&
-                      tempROC[ri2] < 0 && tempROC[ri2-1] < 0;
-    var rvBuyPB = false, rvSellPB = false;
-    for (var rj = Math.max(0, ri2 - 5); rj < ri2; rj++) {
-      if (closes[rj] != null && closes[rj] <= rvGravity) rvBuyPB = true;
-      if (closes[rj] != null && closes[rj] >= rvGravity) rvSellPB = true;
-    }
-    if (rvBuyExhaust && rvBuyAccel && rvBuyPB && _bullBT(ri2) >= 3 && closes[ri2] > closes[ri2-1]) {
-      rvSignals.push({ index: ri2, type: 'rvbuy', price: closes[ri2], date: new Date(candles[ri2].t) });
-    }
-    if (rvSellExhaust && rvSellAccel && rvSellPB && _bearBT(ri2) >= 3 && closes[ri2] < closes[ri2-1]) {
-      rvSignals.push({ index: ri2, type: 'rvsell', price: closes[ri2], date: new Date(candles[ri2].t) });
+  var lastTypeBT = null;
+  for (var si = 2; si < closes.length; si++) {
+    if (temps[si] == null || temps[si-1] == null || temps[si-2] == null) continue;
+    var sellSeq = temps[si-2] >= 55 &&
+                  temps[si-1] >= 45 && temps[si-1] < 55 &&
+                  temps[si]   <  45;
+    var buySeq  = temps[si-2] <  45 &&
+                  temps[si-1] >= 45 && temps[si-1] < 55 &&
+                  temps[si]   >= 55;
+    if (buySeq && lastTypeBT !== 'buy') {
+      signals.push({ index: si, type: 'buy', price: closes[si], date: new Date(candles[si].t) });
+      lastTypeBT = 'buy';
+    } else if (sellSeq && lastTypeBT !== 'sell') {
+      signals.push({ index: si, type: 'sell', price: closes[si], date: new Date(candles[si].t) });
+      lastTypeBT = 'sell';
     }
   }
 
   var horizons = [5, 10, 20];
-  var results = { buy: [], sell: [], rvbuy: [], rvsell: [] };
-  rvSignals.forEach(function (sig) {
-    horizons.forEach(function (h) {
-      if (sig.index + h >= closes.length) return;
-      var futurePrice = closes[sig.index + h];
-      var pctChange = ((futurePrice - sig.price) / sig.price) * 100;
-      var profit = sig.type === 'rvbuy' ? pctChange : -pctChange;
-      results[sig.type].push({ horizon: h, profit: profit, win: profit > 0 });
-    });
-  });
+  var results = { buy: [], sell: [] };
   signals.forEach(function(sig) {
     horizons.forEach(function(h) {
       if (sig.index + h >= closes.length) return;
@@ -1721,7 +1659,7 @@ function backtestSignals(candles) {
   });
 
   var stats = {};
-  ['buy', 'sell', 'rvbuy', 'rvsell'].forEach(function(type) {
+  ['buy', 'sell'].forEach(function(type) {
     stats[type] = {};
     horizons.forEach(function(h) {
       var trades = results[type].filter(function(r) { return r.horizon === h; });
@@ -1920,156 +1858,41 @@ function renderChart(candles, a) {
   var layerVol = !(document.getElementById('layerVol') && !document.getElementById('layerVol').checked);
   var layerDt = document.getElementById('layerDt') && document.getElementById('layerDt').checked;
 
-  // Signal-reset state. Kirk's rule (2026-06-03): a sell only repeats AFTER
-  // temperature has gone back into green and broken down into yellow again.
-  // No "repeated downs" while still in yellow/red. Mirror for buys: only
-  // repeat after a fresh trip into red.
-  var lastBuySi = -1, lastSellSi = -1;
-  var sawGreenSinceLastSell = false;
-  var sawRedSinceLastBuy = false;
-
-  for (var si = 5; si < closes.length; si++) {
-    if (a.temps[si] == null || a.temps[si-1] == null) continue;
-
-    // Update reset trackers BEFORE evaluating triggers this bar.
-    if (a.temps[si] >= 55 && lastSellSi >= 0) sawGreenSinceLastSell = true;
-    if (a.temps[si] < 45 && lastBuySi >= 0)  sawRedSinceLastBuy   = true;
-
-    // BUY triad — mirror of the sell triad. Kirk's chair pass 2026-06-03:
-    // the third leg (sustained rally from red) was missing, which is why
-    // gradual recoveries lagged. Same phi-harmonic argument as the sell side:
-    // if a transition matters going down, the mirror transition matters going up.
-    var buy55 = a.temps[si-1] < 55 && a.temps[si] >= 55;            // yellow → green
-    var buy45 = a.temps[si-1] < 45 && a.temps[si] >= 45;            // red → yellow
-    var recentRedTrough = Math.min(
-      (a.temps[si-1] != null ? a.temps[si-1] : 100),
-      (a.temps[si-2] != null ? a.temps[si-2] : 100),
-      (a.temps[si-3] != null ? a.temps[si-3] : 100),
-      (a.temps[si-4] != null ? a.temps[si-4] : 100),
-      (a.temps[si-5] != null ? a.temps[si-5] : 100)
-    );
-    var rally = a.temps[si] > 45 &&
-                recentRedTrough <= 45 &&
-                a.temps[si] > ((a.temps[si-3] != null ? a.temps[si-3] : 0) + 8);
-    var tempBuy = buy55 || buy45 || rally;
-
-    // SELL triad (v5.37.7).
-    var sell55 = a.temps[si-1] >= 55 && a.temps[si] < 55;          // green → yellow
-    var sell45 = a.temps[si-1] >= 45 && a.temps[si] < 45;          // yellow → red
-    var recentGreenPeak = Math.max(
-      a.temps[si-1] || 0, a.temps[si-2] || 0,
-      a.temps[si-3] || 0, a.temps[si-4] || 0, a.temps[si-5] || 0
-    );
-    var collapse = a.temps[si] < 55 &&
-                   recentGreenPeak >= 55 &&
-                   a.temps[si] < (a.temps[si-3] || 100) - 8;        // slow bleed from green
-    var tempSell = sell55 || sell45 || collapse;
-
-    if (tempBuy) {
-      var pass = true;
-      if (layerEma && !(ema8[si] != null && ema12[si] != null && ema8[si] > ema12[si])) pass = false;
-      // Volume OR acceleration confirms — symmetrical to the sell gate.
-      // Rallies often start on average volume; retail piles in later.
-      if (layerVol) {
-        var volHighB = volEma20[si] && candles[si].v > volEma20[si];
-        var accelUp  = a.tempROC && a.tempROC[si] != null && a.tempROC[si] > 3;
-        if (!volHighB && !accelUp) pass = false;
-      }
-      if (layerDt && !(a.tempROC && a.tempROC[si] != null && a.tempROC[si] > 0)) pass = false;
-      // Cooldown: only fire if this is the first buy OR we've been back in red.
-      if (pass && (lastBuySi < 0 || sawRedSinceLastBuy)) {
-        buyPoints[si] = closes[si];
-        lastBuySi = si;
-        sawRedSinceLastBuy = false;
-      }
-    }
-
-    if (tempSell) {
-      var sPass = true;
-      if (layerEma && !(ema8[si] != null && ema12[si] != null && ema8[si] < ema12[si])) sPass = false;
-      if (layerVol) {
-        var volHigh = volEma20[si] && candles[si].v > volEma20[si];
-        var accelDown = a.tempROC && a.tempROC[si] != null && a.tempROC[si] < -3;
-        if (!volHigh && !accelDown) sPass = false;
-      }
-      if (layerDt && !(a.tempROC && a.tempROC[si] != null && a.tempROC[si] < 0)) sPass = false;
-      // Cooldown (Kirk's rule): only fire if this is the first sell OR
-      // temperature has been back in green since the last sell.
-      if (sPass && (lastSellSi < 0 || sawGreenSinceLastSell)) {
-        sellPoints[si] = closes[si];
-        lastSellSi = si;
-        sawGreenSinceLastSell = false;
-      }
-    }
-  }
-
-  // ── REVERSION TRIAD (v5.37.10) ────────────────────────────────────
-  // Higher-quality signal tier. Fires only when EXHAUSTION + CONFLUENCE
-  // + PULLBACK-TO-GRAVITY all coincide. Per Kirk's chair pass +
-  // Opus's framing 2026-06-03: this is the *trade* shape — rare,
-  // selective, additive to (not replacing) the regular triad triangles.
-  var reversionBuyPoints = new Array(closes.length).fill(null);
-  var reversionSellPoints = new Array(closes.length).fill(null);
-  // Pre-compute gravity using the same formula renderChart uses below.
-  var _rvHigh = Math.max.apply(null, candles.slice(-80).map(function (c) { return c.h; }));
-  var _rvLow  = Math.min.apply(null, candles.slice(-80).map(function (c) { return c.l; }));
-  var _rvMid  = _rvLow + (_rvHigh - _rvLow) * 0.5;
-  var _rvPhi  = _rvLow + (_rvHigh - _rvLow) * PHI_INV;
-  var _rvGravity = PHI_INV * _rvPhi + (1 - PHI_INV) * _rvMid;
-
-  function _bullCountAt(i) {
-    var n = 0;
-    if (ema8[i] != null && ema12[i] != null && ema8[i] > ema12[i]) n++;
-    if (a.rsiArr && a.rsiArr[i] != null && a.rsiArr[i] > 50) n++;
-    if (a.macdData && a.macdData.macdLine && a.macdData.signalLine &&
-        a.macdData.macdLine[i] != null && a.macdData.signalLine[i] != null &&
-        a.macdData.macdLine[i] > a.macdData.signalLine[i]) n++;
-    if (a.tempROC && a.tempROC[i] != null && a.tempROC[i] > 0) n++;
-    if (closes[i] != null && closes[i] >= _rvGravity) n++;
-    return n;
-  }
-  function _bearCountAt(i) {
-    var n = 0;
-    if (ema8[i] != null && ema12[i] != null && ema8[i] < ema12[i]) n++;
-    if (a.rsiArr && a.rsiArr[i] != null && a.rsiArr[i] < 50) n++;
-    if (a.macdData && a.macdData.macdLine && a.macdData.signalLine &&
-        a.macdData.macdLine[i] != null && a.macdData.signalLine[i] != null &&
-        a.macdData.macdLine[i] < a.macdData.signalLine[i]) n++;
-    if (a.tempROC && a.tempROC[i] != null && a.tempROC[i] < 0) n++;
-    if (closes[i] != null && closes[i] <= _rvGravity) n++;
-    return n;
-  }
-
-  for (var ri = 5; ri < closes.length; ri++) {
-    if (a.temps[ri] == null || a.tpSpread == null || a.tpSpread[ri] == null) continue;
-    if (closes[ri] == null || closes[ri-1] == null) continue;
-
-    // Buy reversion: exhaustion DOWN + bullish confluence + recent gravity touch + price turning up
-    var bExhaust = a.tpSpread[ri] < -1.2;
-    var bAccel2  = a.tempROC && a.tempROC[ri] != null && a.tempROC[ri-1] != null &&
-                   a.tempROC[ri] > 0 && a.tempROC[ri-1] > 0;
-    var bPullback = false;
-    for (var bj = Math.max(0, ri - 5); bj < ri; bj++) {
-      if (closes[bj] != null && closes[bj] <= _rvGravity) { bPullback = true; break; }
-    }
-    var bConfluence = _bullCountAt(ri) >= 3;
-    var bTurningUp = closes[ri] > closes[ri-1];
-    if (bExhaust && bAccel2 && bPullback && bConfluence && bTurningUp) {
-      reversionBuyPoints[ri] = closes[ri];
-    }
-
-    // Sell reversion: exhaustion UP + bearish confluence + recent gravity touch from above + price turning down
-    var sExhaust = a.tpSpread[ri] > 1.2;
-    var sDecel2  = a.tempROC && a.tempROC[ri] != null && a.tempROC[ri-1] != null &&
-                   a.tempROC[ri] < 0 && a.tempROC[ri-1] < 0;
-    var sPullback = false;
-    for (var sj = Math.max(0, ri - 5); sj < ri; sj++) {
-      if (closes[sj] != null && closes[sj] >= _rvGravity) { sPullback = true; break; }
-    }
-    var sConfluence = _bearCountAt(ri) >= 3;
-    var sTurningDown = closes[ri] < closes[ri-1];
-    if (sExhaust && sDecel2 && sPullback && sConfluence && sTurningDown) {
-      reversionSellPoints[ri] = closes[ri];
+  // ─── SEQUENCE RULE (v5.37.11) ──────────────────────────────────────
+  // Kirk's rule, stated precisely:
+  //   Buy  when temperature moves red → yellow → green in three successive bars.
+  //   Sell when temperature moves green → yellow → red in three successive bars.
+  //   After a buy, the next signal MUST be a sell. After a sell, MUST be a buy.
+  //
+  // No layer gates. No EMA confirmation. No volume confirmation. The
+  // sequence rule replaces every previous triad/cooldown attempt.
+  // Three successive bars in the same direction is a real motion, not a
+  // flicker. The alternating cooldown eliminates the "more sells while
+  // the stock climbs" pattern Kirk caught on the chart.
+  //
+  // Previously we tried: single-trigger sell55, then sell triad
+  // (sell55/sell45/collapse), then buy triad mirror, then state-based
+  // cooldown, then Reversion Triad (exhaustion + confluence + pullback).
+  // Each iteration either missed signals or created noise. The chair
+  // test on NVDA 1W produced 20+ "high-conviction" gold stars across a
+  // single trend — the gates that were meant to identify exhaustion
+  // turned out to be routinely true in sustained trends. Strip until
+  // it sings. — 2026-06-03
+  var lastSignalType = null; // 'buy' | 'sell' | null
+  for (var si = 2; si < closes.length; si++) {
+    if (a.temps[si] == null || a.temps[si-1] == null || a.temps[si-2] == null) continue;
+    var sellSeq = a.temps[si-2] >= 55 &&
+                  a.temps[si-1] >= 45 && a.temps[si-1] < 55 &&
+                  a.temps[si]   <  45;
+    var buySeq  = a.temps[si-2] <  45 &&
+                  a.temps[si-1] >= 45 && a.temps[si-1] < 55 &&
+                  a.temps[si]   >= 55;
+    if (buySeq && lastSignalType !== 'buy') {
+      buyPoints[si] = closes[si];
+      lastSignalType = 'buy';
+    } else if (sellSeq && lastSignalType !== 'sell') {
+      sellPoints[si] = closes[si];
+      lastSignalType = 'sell';
     }
   }
 
@@ -2159,12 +1982,6 @@ function renderChart(candles, a) {
         // Buy/Sell — density-scaled
         { label: 'Buy', data: buyPoints, borderColor: 'transparent', backgroundColor: '#10B981', pointRadius: sigR, pointHoverRadius: sigH, pointStyle: 'triangle', pointBorderColor: '#34d399', pointBorderWidth: sigB, showLine: false, order: 0 },
         { label: 'Sell', data: sellPoints, borderColor: 'transparent', backgroundColor: '#EF4444', pointRadius: sigR, pointHoverRadius: sigH, pointStyle: 'triangle', pointRotation: 180, pointBorderColor: '#f87171', pointBorderWidth: sigB, showLine: false, order: 0 },
-        // Reversion Triad — gold stars for the high-conviction setups
-        // (exhaustion + confluence + pullback to gravity). Drawn LARGER and
-        // ON TOP of the triangles so they're visually distinct from the
-        // ordinary transition signals. Per Opus 2026-06-03.
-        { label: 'Reversion Buy', data: reversionBuyPoints, borderColor: 'transparent', backgroundColor: '#10B981', pointRadius: sigR + 3, pointHoverRadius: sigH + 3, pointStyle: 'star', pointBorderColor: '#ffd560', pointBorderWidth: sigB + 0.5, showLine: false, order: -1 },
-        { label: 'Reversion Sell', data: reversionSellPoints, borderColor: 'transparent', backgroundColor: '#EF4444', pointRadius: sigR + 3, pointHoverRadius: sigH + 3, pointStyle: 'star', pointBorderColor: '#ffd560', pointBorderWidth: sigB + 0.5, showLine: false, order: -1 },
         // (Old diamond signals removed — unified temperature-first system)
         // Volume overlay — brighter, semi-transparent bars at chart bottom
         { label: 'Volume', data: candles.map(c => c.v), type: 'bar', backgroundColor: candles.map((c, i) => i > 0 && c.c >= candles[i-1].c ? 'rgba(16,185,129,0.35)' : 'rgba(239,68,68,0.3)'), borderWidth: 0, yAxisID: 'yVol', order: 6 },
