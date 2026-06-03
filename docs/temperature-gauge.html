@@ -4384,8 +4384,13 @@ hideLoading = function() {
     return lines.join('\n');
   }
 
-  function copySnapshot(barCount) {
-    var text = buildSnapshot(barCount);
+  function copySnapshot(barCount, centerIdx) {
+    // Forward centerIdx so the right-click "±5 around cursor" actually
+    // centers on the cursor. v5.37.14 added the parameter to buildSnapshot
+    // but the call chain dropped it here, so every snapshot — toolbar
+    // button AND right-click — got the tail. Caught by Opus on the
+    // v5.37.17 chair test 2026-06-03.
+    var text = buildSnapshot(barCount, centerIdx);
     if (!text) { tgToast('Load a symbol first', 'warn'); return; }
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(text).then(function () {

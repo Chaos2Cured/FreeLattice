@@ -2459,6 +2459,14 @@ assert('Snapshot: right-click menu item "📋 Snapshot (±5 bars around cursor)"
   /Snapshot \(±5 bars around cursor\)/.test(gaugeHtml));
 assert('Snapshot: right-click calls copySnapshot(11, centerIdx) — 11 bars centered',
   /copySnapshot\(11, centerIdx\)/.test(gaugeHtml));
+// v5.37.18: lock the full call chain so centerIdx never gets dropped again.
+// The bug existed for four versions because the regression site was in the
+// middle of the chain — the caller and the callee both looked right, but
+// the function in between dropped the argument.
+assert('Snapshot: copySnapshot signature accepts centerIdx (so it can forward to buildSnapshot)',
+  /function copySnapshot\(barCount,\s*centerIdx\)/.test(gaugeHtml));
+assert('Snapshot: copySnapshot actually forwards centerIdx to buildSnapshot',
+  /function copySnapshot\(barCount,\s*centerIdx\)[\s\S]{0,400}buildSnapshot\(barCount,\s*centerIdx\)/.test(gaugeHtml));
 assert('Right-click menu: always-available "Style indicator:" picker (not compose-only)',
   gaugeHtml.includes("'Style indicator:'") &&
   /\['rsi',\s*'temperature',\s*'dt',\s*'ips'\]\.forEach\(addStyleItem\)/.test(gaugeHtml));
