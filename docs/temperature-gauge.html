@@ -3217,6 +3217,15 @@ hideLoading = function() {
                    } }
   };
   var CANVAS_TO_ID = { rsiChart: 'rsi', tempChart: 'temperature', dtChart: 'dt', gapChart: 'ips' };
+  // Expose so other top-level scripts (the snapshot IIFE in particular)
+  // can see the registry. INDICATOR_REGISTRY is declared with `var` inside
+  // this closure, which means it isn't on window without an explicit
+  // assignment. The right-click "Style indicator:" picker was silently
+  // skipping its entire render block because typeof INDICATOR_REGISTRY
+  // was 'undefined' to the outer scope. Caught by Opus on v5.37.16 chair
+  // test, 2026-06-03.
+  window.INDICATOR_REGISTRY = INDICATOR_REGISTRY;
+  window.CANVAS_TO_ID = CANVAS_TO_ID;
 
   // ─── State helpers ────────────────────────────────────────────────
   var MODE_KEY = 'fl_tg_chart_mode';

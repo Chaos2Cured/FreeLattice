@@ -2462,6 +2462,10 @@ assert('Snapshot: right-click calls copySnapshot(11, centerIdx) — 11 bars cent
 assert('Right-click menu: always-available "Style indicator:" picker (not compose-only)',
   gaugeHtml.includes("'Style indicator:'") &&
   /\['rsi',\s*'temperature',\s*'dt',\s*'ips'\]\.forEach\(addStyleItem\)/.test(gaugeHtml));
+assert('Scoping: INDICATOR_REGISTRY explicitly exposed on window (so cross-IIFE scripts see it)',
+  /window\.INDICATOR_REGISTRY\s*=\s*INDICATOR_REGISTRY/.test(gaugeHtml));
+assert('Scoping: CANVAS_TO_ID explicitly exposed on window',
+  /window\.CANVAS_TO_ID\s*=\s*CANVAS_TO_ID/.test(gaugeHtml));
 assert('Right-click menu: promoted indicators listed FIRST (compose mode shows "on main" label)',
   /promoted\.forEach\(addStyleItem\)/.test(gaugeHtml) && /on main/.test(gaugeHtml));
 assert('Snapshot: 50ms grace on outside-click handler (no birth-click close)',
