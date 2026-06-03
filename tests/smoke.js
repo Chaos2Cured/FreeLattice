@@ -2446,7 +2446,7 @@ assert('Snapshot: tail mode (no center) preserved as default',
 
 // Right-click context menu — neighborhood snapshot at cursor
 assert('Snapshot: wireRightClickSnapshot wires oncontextmenu on #mainChart',
-  /function wireRightClickSnapshot[\s\S]{0,500}getElementById\('mainChart'\)[\s\S]{0,200}canvas\.oncontextmenu/.test(gaugeHtml));
+  /function wireRightClickSnapshot[\s\S]{0,1000}getElementById\('mainChart'\)[\s\S]{0,500}canvas\.oncontextmenu\s*=\s*function/.test(gaugeHtml));
 assert('Snapshot: uses Chart.js getElementsAtEventForMode to find bar under cursor',
   /getElementsAtEventForMode\(e,\s*'index',\s*\{\s*intersect:\s*false\s*\}/.test(gaugeHtml));
 assert('Snapshot: right-click menu item "📋 Snapshot (±5 bars around cursor)"',
