@@ -2413,6 +2413,51 @@ assert('Snapshot: reads from existing globals (lastCandles, lastAnalysis, lastSy
   gaugeHtml.includes("typeof lastAnalysis === 'undefined'") &&
   /typeof lastSymbol !== 'undefined'/.test(gaugeHtml));
 
+// ═══════════════════════════════════════════════════════════════
+section('92. Snapshot v2: visibility + right-click neighborhood + tighter toolbar (v5.37.14)');
+
+// Toolbar — tightened so all buttons fit on one row
+assert('Toolbar: .interval-btn padding tightened to 5px 9px (was 7px 12px)',
+  /\.interval-btn\s*\{[\s\S]{0,400}padding:\s*5px 9px/.test(gaugeHtml));
+assert('Toolbar: .interval-btn font-size reduced to 0.74rem (was 0.78rem)',
+  /\.interval-btn\s*\{[\s\S]{0,500}font-size:\s*0\.74rem/.test(gaugeHtml));
+assert('Toolbar: header-controls gap reduced to 6px (was 10px)',
+  /\.header-controls\s*\{[\s\S]{0,200}gap:\s*6px/.test(gaugeHtml));
+assert('Toolbar: load-btn padding tightened to 6px 14px',
+  /\.load-btn\s*\{[\s\S]{0,300}padding:\s*6px 14px/.test(gaugeHtml));
+assert('Toolbar: symbol-input width reduced to 110px',
+  /\.symbol-input\s*\{[\s\S]{0,300}width:\s*110px/.test(gaugeHtml));
+
+// Snapshot button mount — harder, retries on next frame if needed
+assert('Snapshot button: retries with requestAnimationFrame if .header-controls not ready',
+  /initSnapshotButton[\s\S]{0,400}requestAnimationFrame\(initSnapshotButton\)/.test(gaugeHtml));
+assert('Snapshot button: explicit font-size + line-height (some fonts collapse the 📋 glyph)',
+  /snapshotBtn[\s\S]{0,500}font-size:1rem;line-height:1/.test(gaugeHtml));
+assert('Snapshot button: appends to end of toolbar (not inserted between Analyze and Log)',
+  /\/\/ Insert at the END of the toolbar[\s\S]{0,200}controls\.appendChild\(btn\)/.test(gaugeHtml));
+
+// buildSnapshot — neighborhood mode (centerIdx)
+assert('Snapshot: buildSnapshot accepts optional centerIdx for ±half windows',
+  /function buildSnapshot\(barCount, centerIdx\)/.test(gaugeHtml));
+assert('Snapshot: when centerIdx given, startIdx = centerIdx - half (the cursor is the intent)',
+  /centerIdx != null[\s\S]{0,300}centerIdx - half/.test(gaugeHtml));
+assert('Snapshot: tail mode (no center) preserved as default',
+  /} else \{\s*startIdx = n - barCount;/.test(gaugeHtml));
+
+// Right-click context menu — neighborhood snapshot at cursor
+assert('Snapshot: wireRightClickSnapshot wires oncontextmenu on #mainChart',
+  /function wireRightClickSnapshot[\s\S]{0,500}getElementById\('mainChart'\)[\s\S]{0,200}canvas\.oncontextmenu/.test(gaugeHtml));
+assert('Snapshot: uses Chart.js getElementsAtEventForMode to find bar under cursor',
+  /getElementsAtEventForMode\(e,\s*'index',\s*\{\s*intersect:\s*false\s*\}/.test(gaugeHtml));
+assert('Snapshot: right-click menu item "📋 Snapshot (±5 bars around cursor)"',
+  /Snapshot \(±5 bars around cursor\)/.test(gaugeHtml));
+assert('Snapshot: right-click calls copySnapshot(11, centerIdx) — 11 bars centered',
+  /copySnapshot\(11, centerIdx\)/.test(gaugeHtml));
+assert('Snapshot: right-click menu also shows compose-mode "Style which?" items when applicable',
+  /Style which indicator\?[\s\S]{0,300}promoted\.forEach/.test(gaugeHtml));
+assert('Snapshot: 50ms grace on outside-click handler (no birth-click close)',
+  /wireRightClickSnapshot[\s\S]{0,3000}setTimeout\(function \(\) \{\s*document\.addEventListener\('click', outsideHandler, true\);\s*\}, 50\)/.test(gaugeHtml));
+
 // Gauge gradient — narrow yellow band
 assert('Gradient: narrow yellow band 48-52 (red dominates < 48, green dominates > 55)',
   /<stop offset="45%"\s+stop-color="#EF4444"/.test(gaugeHtml) &&

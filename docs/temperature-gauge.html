@@ -76,33 +76,34 @@ body {
 .header-controls {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 6px;                    /* v5.37.14: was 10px — tighter so it fits one row */
   flex-wrap: wrap;
 }
 .symbol-input {
   background: var(--bg3);
   border: 1px solid var(--border);
   color: var(--text);
-  padding: 8px 14px;
-  border-radius: 8px;
-  font-size: 0.9rem;
+  padding: 6px 10px;            /* v5.37.14: was 8px 14px */
+  border-radius: 6px;
+  font-size: 0.82rem;           /* v5.37.14: was 0.9rem */
   font-family: inherit;
-  width: 130px;
+  width: 110px;                 /* v5.37.14: was 130px */
   text-transform: uppercase;
   transition: border-color 0.2s;
 }
 .symbol-input:focus { outline: none; border-color: var(--gold); }
-.interval-btns { display: flex; gap: 4px; }
+.interval-btns { display: flex; gap: 3px; }
 .interval-btn {
   background: var(--bg3);
   border: 1px solid var(--border);
   color: var(--muted);
-  padding: 7px 12px;
-  border-radius: 6px;
+  padding: 5px 9px;             /* v5.37.14: was 7px 12px — fits one row */
+  border-radius: 5px;
   cursor: pointer;
-  font-size: 0.78rem;
+  font-size: 0.74rem;           /* v5.37.14: was 0.78rem */
   font-family: inherit;
   transition: all 0.2s;
+  line-height: 1.2;             /* keeps icon buttons tight */
 }
 .interval-btn:hover { border-color: var(--gold); color: var(--gold); }
 .interval-btn.active { background: var(--gold); color: #0a0e1a; border-color: var(--gold); font-weight: 600; }
@@ -110,12 +111,12 @@ body {
   background: var(--gold);
   color: #0a0e1a;
   border: none;
-  padding: 8px 20px;
-  border-radius: 8px;
+  padding: 6px 14px;            /* v5.37.14: was 8px 20px */
+  border-radius: 6px;
   font-weight: 600;
   cursor: pointer;
   font-family: inherit;
-  font-size: 0.88rem;
+  font-size: 0.8rem;             /* v5.37.14: was 0.88rem */
   transition: background 0.2s;
 }
 .load-btn:hover { background: var(--gold2); }
@@ -4232,7 +4233,7 @@ hideLoading = function() {
     return 'R';
   }
 
-  function buildSnapshot(barCount) {
+  function buildSnapshot(barCount, centerIdx) {
     if (typeof lastCandles === 'undefined' || !lastCandles || !lastCandles.length) return null;
     if (typeof lastAnalysis === 'undefined' || !lastAnalysis) return null;
 
@@ -4242,7 +4243,17 @@ hideLoading = function() {
     var interval = (typeof currentInterval !== 'undefined') ? currentInterval : '1d';
     var n = candles.length;
     barCount = Math.min(barCount || DEFAULT_BARS, n);
-    var startIdx = n - barCount;
+    // If centerIdx is given (from right-click), take ±half around it.
+    // Otherwise take the tail (last barCount bars). The right-click path
+    // gives the AI the *neighborhood* of what the user was looking at,
+    // not just the latest tail. Kirk's insight: the cursor IS the intent.
+    var startIdx;
+    if (centerIdx != null && centerIdx >= 0 && centerIdx < n) {
+      var half = Math.floor(barCount / 2);
+      startIdx = Math.max(0, Math.min(n - barCount, centerIdx - half));
+    } else {
+      startIdx = n - barCount;
+    }
 
     // Active rule
     var ruleName = 'Sequence Rule';
@@ -4410,30 +4421,133 @@ hideLoading = function() {
 
   function initSnapshotButton() {
     var controls = document.querySelector('.header-controls');
-    if (!controls) return;
+    if (!controls) {
+      // Retry once on next frame — some browsers run end-of-body scripts
+      // before the parent flex container is fully resolved on slow loads.
+      requestAnimationFrame(initSnapshotButton);
+      return;
+    }
     if (document.getElementById('snapshotBtn')) return; // already mounted
     var btn = document.createElement('button');
     btn.className = 'interval-btn';
     btn.id = 'snapshotBtn';
     btn.innerHTML = '&#x1F4CB;';
-    btn.title = 'Copy 10-bar snapshot for AI analysis (Shift: 20 bars · Alt: 5 bars)';
+    btn.title = 'Copy 10-bar snapshot for AI analysis · Right-click chart for ±5 around cursor · Shift: 20 bars · Alt: 5 bars';
     btn.setAttribute('aria-label', 'Copy snapshot to clipboard');
-    btn.style.fontSize = '0.95rem';
+    // Explicit font + line-height so the 📋 glyph reliably renders at a
+    // visible size on every system. Some Windows fonts collapse it
+    // without an explicit size.
+    btn.style.cssText = 'font-size:1rem;line-height:1;padding:5px 8px;';
     btn.addEventListener('click', function (e) {
       var bars = DEFAULT_BARS;
       if (e.shiftKey) bars = 20;
       else if (e.altKey) bars = 5;
       copySnapshot(bars);
     });
-    var themeBtn = controls.querySelector('button[title="Change accent color"]');
-    if (themeBtn) controls.insertBefore(btn, themeBtn);
-    else controls.appendChild(btn);
+    // Insert at the END of the toolbar so it lives next to the other
+    // ambient/tool buttons (Layout, ChartMode, Luminos), not buried
+    // between Analyze and Log.
+    controls.appendChild(btn);
+  }
+
+  // ─── Right-click chart → snapshot ±5 bars around the cursor ────────
+  // Kirk's UX insight: when staring at a pattern on bar 187, the user
+  // doesn't want the last 10 bars — they want bars 182–192. The cursor
+  // position IS the intent.
+  function wireRightClickSnapshot() {
+    var canvas = document.getElementById('mainChart');
+    if (!canvas) { requestAnimationFrame(wireRightClickSnapshot); return; }
+    // Replace any existing oncontextmenu (the compose IIFE installs one
+    // for the "Style which?" picker). Our wrapper handles the snapshot
+    // AND delegates to the compose menu when in compose mode with
+    // promoted indicators.
+    var existingContextHandler = canvas.oncontextmenu;
+    canvas.oncontextmenu = function (e) {
+      // If in compose mode with promoted indicators, the existing handler
+      // shows the style menu — let it run, but we'll show the snapshot
+      // option too via a small wrapper.
+      var inCompose = (typeof tgGetChartMode === 'function' && tgGetChartMode() === 'compose');
+      var promoted = (typeof tgGetComposeState === 'function')
+        ? (tgGetComposeState().promoted || []) : [];
+      // Snapshot is ALWAYS available — even in compose mode.
+      e.preventDefault();
+      // Resolve the bar under the cursor via Chart.js's elements-at-event.
+      var centerIdx = null;
+      try {
+        var inst = (window.Chart && Chart.getChart) ? Chart.getChart(canvas) : null;
+        if (inst && inst.getElementsAtEventForMode) {
+          var elements = inst.getElementsAtEventForMode(e, 'index', { intersect: false }, false);
+          if (elements && elements.length) centerIdx = elements[0].index;
+        }
+      } catch (_e) {}
+      // Build the menu. Snapshot at top; if compose has > 0 promoted,
+      // include "Style which?" items below.
+      var menu = document.createElement('div');
+      menu.className = 'tg-ctx-menu tg-snapshot-menu';
+      var snapItem = document.createElement('button');
+      snapItem.className = 'tg-ctx-item';
+      snapItem.innerHTML = '<span class="tg-ctx-icon">&#x1F4CB;</span>' +
+        '📋 Snapshot (±5 bars around cursor)';
+      snapItem.addEventListener('click', function () {
+        cleanup();
+        copySnapshot(11, centerIdx);
+      });
+      menu.appendChild(snapItem);
+      // Compose-mode extra items
+      if (inCompose && promoted.length > 0 && typeof RULE_REGISTRY !== 'undefined') {
+        var divider = document.createElement('div');
+        divider.className = 'tg-ctx-divider';
+        menu.appendChild(divider);
+        var label = document.createElement('div');
+        label.className = 'tg-ctx-item';
+        label.style.cssText = 'opacity:0.55;cursor:default;font-style:italic;';
+        label.textContent = 'Style which indicator?';
+        menu.appendChild(label);
+        promoted.forEach(function (id) {
+          if (typeof INDICATOR_REGISTRY === 'undefined' || !INDICATOR_REGISTRY[id]) return;
+          var meta = INDICATOR_REGISTRY[id];
+          var color = (typeof getIndicatorColor === 'function')
+            ? getIndicatorColor(id, meta.defaultColor) : meta.defaultColor;
+          var item = document.createElement('button');
+          item.className = 'tg-ctx-item';
+          item.innerHTML = '<span class="tg-ctx-icon" style="color:' + color + ';">●</span>' + meta.label;
+          item.addEventListener('click', function () {
+            cleanup();
+            if (typeof tgStyleIndicator === 'function') tgStyleIndicator(e, id);
+          });
+          menu.appendChild(item);
+        });
+      }
+      document.body.appendChild(menu);
+      var x = e.clientX, y = e.clientY;
+      var rect = menu.getBoundingClientRect();
+      if (x + rect.width > window.innerWidth - 8) x = window.innerWidth - rect.width - 8;
+      if (y + rect.height > window.innerHeight - 8) y = window.innerHeight - rect.height - 8;
+      menu.style.left = x + 'px';
+      menu.style.top = y + 'px';
+
+      function cleanup() {
+        if (menu.parentNode) menu.parentNode.removeChild(menu);
+        document.removeEventListener('click', outsideHandler, true);
+      }
+      function outsideHandler(ev) {
+        if (!menu.contains(ev.target)) cleanup();
+      }
+      // 50ms grace so the right-click itself doesn't immediately close.
+      setTimeout(function () {
+        document.addEventListener('click', outsideHandler, true);
+      }, 50);
+    };
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initSnapshotButton);
+    document.addEventListener('DOMContentLoaded', function () {
+      initSnapshotButton();
+      wireRightClickSnapshot();
+    });
   } else {
     initSnapshotButton();
+    wireRightClickSnapshot();
   }
 
   // Expose for console / smoke / dev
