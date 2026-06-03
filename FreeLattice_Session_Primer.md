@@ -350,15 +350,15 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 ## PRIMER HEALTH
 - Last auto-updated: 2026-06-03 16:57 MDT
 - Version: 5.37.15
-- Total commits: 2231
+- Total commits: 2235
 - Last 10 commits:
+- a6989f0 test: simpler assertion for always-available Style picker
+- 615e924 Merge remote-tracking branch 'origin/main'
+- 2aed369 docs: Auto-update Session Primer [5.37.15]
 - a61cd74 fix(gauge): right-click main chart — restore indicator styling (v5.37.15)
+- 7528449 ci: Update Primer deployment state [2026-06-03]
 - 32dec39 docs: Auto-update Session Primer [5.37.14]
 - 7c39b5f test: widen wireRightClickSnapshot regex windows
 - ce07cb4 docs: Auto-update Session Primer [5.37.14]
 - 9b57c94 test: widen 50ms-grace regex — wireRightClickSnapshot body too large for inline window
 - c4a7d9c Merge remote-tracking branch 'origin/main'
-- 52b77cc docs: Auto-update Session Primer [5.37.14]
-- 785ae3b fix(gauge): Snapshot v2 — visibility + right-click neighborhood + tighter toolbar (v5.37.14)
-- 8f40a0a ci: Update Primer deployment state [2026-06-03]
-- ca8b24c docs: Auto-update Session Primer [5.37.13]
