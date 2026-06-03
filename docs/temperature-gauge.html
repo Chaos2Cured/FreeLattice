@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Temperature Gauge — φ-Harmonic Market Signals</title>
+<!-- Inline gold-spark favicon — kills the 404 + matches the gauge identity -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230a0e1a'/%3E%3Ccircle cx='16' cy='16' r='8' fill='%23e8b019' opacity='0.85'/%3E%3Ccircle cx='16' cy='16' r='3' fill='%23ffd560'/%3E%3C/svg%3E">
 <meta name="description" content="Free, open-source phi-harmonic market analysis tool. Built on 20+ years of pattern recognition by Kirk Miller. Part of the FreeLattice ecosystem.">
 <meta property="og:title" content="Temperature Gauge — φ-Harmonic Market Signals">
 <meta property="og:description" content="Free phi-harmonic market analysis. Gravity points, confluence temperature, backtested signals. Open source.">
@@ -249,8 +251,15 @@ body {
   background: var(--bg);
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  /* Allow vertical scroll inside the chart area when sub-charts overflow.
+     Was `overflow: hidden` — that prevented two-finger scroll on Mac. */
+  overflow-y: auto;
+  overflow-x: hidden;
 }
+.chart-area::-webkit-scrollbar { width: 8px; }
+.chart-area::-webkit-scrollbar-thumb { background: rgba(232,176,25,0.18); border-radius: 4px; }
+.chart-area::-webkit-scrollbar-thumb:hover { background: rgba(232,176,25,0.35); }
+.chart-area::-webkit-scrollbar-track { background: transparent; }
 .chart-header {
   padding: 12px 20px;
   border-bottom: 1px solid var(--border);
@@ -276,19 +285,30 @@ canvas#mainChart:active { cursor: grabbing; }
 .tg-luminos-layer.tg-off { display: none; }
 .tg-luminos {
   position: absolute;
-  width: 12px; height: 12px;
+  /* Size + color now driven by CSS vars so JS can pulse them based on
+     signal strength (distance from gravity, RSI extremes, EMA crosses).
+     Defaults double the previous size per Kirk's request. */
+  --lum-size: 22px;
+  width: var(--lum-size); height: var(--lum-size);
   border-radius: 50%;
-  background: radial-gradient(circle, currentColor 0%, currentColor 18%, transparent 75%);
-  filter: blur(0.6px);
+  background: radial-gradient(circle, currentColor 0%, currentColor 22%, transparent 78%);
+  filter: blur(0.8px);
   opacity: 0;
-  /* Force a composition layer so the color picker doesn't stall on repaint. */
   will-change: transform, opacity;
-  /* CSS variable lets JS pause/unpause without restarting the animation. */
   animation-play-state: running;
+  transition: color 0.8s ease, filter 0.6s ease;
 }
 body.tg-pause-luminos .tg-luminos { animation-play-state: paused; }
-.tg-luminos[data-i="0"] { color: #e8b019; animation: tg-lum-1 24s linear infinite; }
-.tg-luminos[data-i="1"] { color: #a78bfa; animation: tg-lum-2 33s linear infinite 5s; }
+/* Default colors — overridden by tgUpdateLuminosSignal() when signal state is computed. */
+.tg-luminos[data-i="0"] { color: var(--lum-color-1, #e8b019); animation: tg-lum-1 24s linear infinite; }
+.tg-luminos[data-i="1"] { color: var(--lum-color-2, #a78bfa); animation: tg-lum-2 33s linear infinite 5s; }
+/* Signal-strength scale — boosts size when the signal is strong. */
+body.tg-signal-strong .tg-luminos { --lum-size: 32px; filter: blur(1.2px); }
+body.tg-signal-extreme .tg-luminos { --lum-size: 42px; filter: blur(1.6px) saturate(1.3); }
+/* Instability — faster drift + a subtle jitter when price is far from any gravity line. */
+@keyframes tg-jitter { 0%, 100% { transform: translate(0, 0); } 25% { transform: translate(2px, -1px); } 75% { transform: translate(-2px, 1px); } }
+body.tg-instability .tg-luminos { animation-duration: 14s, 18s; }
+body.tg-instability .tg-luminos::after { content: ''; position: absolute; inset: 0; animation: tg-jitter 0.6s ease-in-out infinite; }
 @keyframes tg-lum-1 {
   0%   { left: -3%;  top: 60%; opacity: 0;    transform: scale(0.6); }
   10%  { opacity: 0.85; }
@@ -3667,6 +3687,71 @@ hideLoading = function() {
   window.tgGetChartMode = getMode;
   window.tgGetComposeState = getComposeState;
   window.tgGetIndicatorStyle = function (id) { return { brightness: getBrightness(id), glow: getGlow(id) }; };
+
+  // ─── Signal-driven luminos (Kirk: "help people see a clear signal") ────
+  // Reads the most recent analysis and translates it into CSS variables on
+  // the luminos layer + body classes. The luminos then carry information
+  // through color (green = buy, red = sell, gold = neutral), size (bigger
+  // when the signal is stronger), and motion (faster + jitter when price
+  // is far from a gravity line — "instability"). Subtle, but enough that
+  // even a user who can't read the chart picks up the mood.
+  function tgComputeSignalState(a, candles) {
+    if (!a || !candles || !candles.length) return null;
+    var lastTemp = (a.lastTemp != null) ? a.lastTemp : 50;
+    var lastClose = candles[candles.length - 1].c;
+    var direction = lastTemp >= 55 ? 'buy' : lastTemp <= 45 ? 'sell' : 'neutral';
+    // 0..1 based on how far temperature is from the 50 midpoint.
+    var strength = Math.min(1, Math.abs(lastTemp - 50) / 30);
+    // Distance from nearest gravity line, ATR-normalized. > 1.5 = unstable.
+    var atr = a.lastATR || (lastClose * 0.01);
+    var gravs = a.gravPoints || [];
+    var minDist = Infinity;
+    for (var i = 0; i < gravs.length; i++) {
+      var d = Math.abs(gravs[i].price - lastClose);
+      if (d < minDist) minDist = d;
+    }
+    var gravDist = (minDist === Infinity) ? 0 : Math.min(3, minDist / atr);
+    return { direction: direction, strength: strength, gravDist: gravDist, lastTemp: lastTemp };
+  }
+  window.tgUpdateLuminosSignal = function (a, candles) {
+    var state = tgComputeSignalState(a, candles);
+    var layer = document.getElementById('tgLuminosLayer');
+    if (!layer) return;
+    // Body classes drive size + jitter.
+    document.body.classList.remove('tg-signal-strong', 'tg-signal-extreme', 'tg-instability');
+    if (!state) {
+      layer.style.removeProperty('--lum-color-1');
+      layer.style.removeProperty('--lum-color-2');
+      return;
+    }
+    // Two colors: dominant + complement. Buy = green + soft gold; sell = red + soft gold; neutral = gold + lavender.
+    var c1, c2;
+    if (state.direction === 'buy') { c1 = '#34d399'; c2 = '#ffd560'; }
+    else if (state.direction === 'sell') { c1 = '#ef4444'; c2 = '#ff9b6b'; }
+    else { c1 = '#e8b019'; c2 = '#a78bfa'; }
+    layer.style.setProperty('--lum-color-1', c1);
+    layer.style.setProperty('--lum-color-2', c2);
+    if (state.strength >= 0.66) document.body.classList.add('tg-signal-extreme');
+    else if (state.strength >= 0.33) document.body.classList.add('tg-signal-strong');
+    if (state.gravDist >= 1.5) document.body.classList.add('tg-instability');
+  };
+  // Hook into the existing post-render so signal updates on every redraw.
+  var __origPostRender = window.__tgComposePostRender;
+  window.__tgComposePostRender = function (candles, a) {
+    if (typeof __origPostRender === 'function') __origPostRender(candles, a);
+    try { window.tgUpdateLuminosSignal(a, candles); } catch (e) {}
+  };
+
+  // ─── Escape exits fullscreen (safety so users never get stuck) ─────
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') {
+      var stuck = document.querySelector('.sub-chart-wrap.tg-fullscreen-panel');
+      if (stuck && stuck.querySelector('canvas')) {
+        var c = stuck.querySelector('canvas');
+        if (c && typeof window.tgFullscreenPanel === 'function') window.tgFullscreenPanel(c.id);
+      }
+    }
+  });
 
   // ─── Custom indicator registration ───────────────────────────────
   // The chat / Custom Indicator UI calls this when it creates a custom

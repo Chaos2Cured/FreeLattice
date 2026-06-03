@@ -2066,7 +2066,7 @@ assert('Pass 3: two luminos sprites present (v5.37.4: cranked up, count reduced)
 assert('Pass 3: luminos drift keyframes defined (gold + lavender)',
   gaugeHtml.includes('@keyframes tg-lum-1') && gaugeHtml.includes('@keyframes tg-lum-2'));
 assert('Pass 3: luminos use radial-gradient with currentColor (color follows the data-i palette)',
-  /\.tg-luminos\s*\{[\s\S]{0,300}radial-gradient\(circle, currentColor/.test(gaugeHtml));
+  /\.tg-luminos\s*\{[\s\S]{0,800}radial-gradient\(circle, currentColor/.test(gaugeHtml));
 
 // Hover shimmer
 assert('Pass 3: sub-chart label hover shimmer',
@@ -2080,8 +2080,8 @@ assert('Pass 3: name text shadow follows hover',
 section('83. Luminos polish + tooltip consistency (v5.37.4)');
 
 // Luminos cranked up, count reduced, toggle button
-assert('Pass 4: luminos sprite size cranked up to 12px',
-  /\.tg-luminos\s*\{[\s\S]{0,300}width:\s*12px;\s*height:\s*12px/.test(gaugeHtml));
+assert('Pass 4: luminos sprite size cranked up (now 22px+ via --lum-size)',
+  /--lum-size:\s*22px/.test(gaugeHtml) || /width:\s*12px;\s*height:\s*12px/.test(gaugeHtml));
 assert('Pass 4: luminos toggle button in toolbar',
   gaugeHtml.includes('id="luminosToggle"') && gaugeHtml.includes('tgToggleLuminos()'));
 assert('Pass 4: tgToggleLuminos exposed + persists in fl_tg_luminos',
@@ -2089,7 +2089,7 @@ assert('Pass 4: tgToggleLuminos exposed + persists in fl_tg_luminos',
 assert('Pass 4: luminos pause class on body (color picker stall fix)',
   /body\.tg-pause-luminos \.tg-luminos\s*\{\s*animation-play-state:\s*paused/.test(gaugeHtml));
 assert('Pass 4: will-change on sprites (compositor offload — no stall on picker)',
-  /\.tg-luminos[\s\S]{0,300}will-change:\s*transform,\s*opacity/.test(gaugeHtml));
+  /\.tg-luminos\s*\{[\s\S]{0,800}will-change:\s*transform,\s*opacity/.test(gaugeHtml));
 assert('Pass 4: color picker open auto-pauses luminos',
   /_luminosWatchColorInput/.test(gaugeHtml) && gaugeHtml.includes('mousedown'));
 assert('Pass 4: safety timer unpauses if menu closed but pause stuck',
@@ -2139,6 +2139,54 @@ assert('Core: mobile textarea min-height raised to 120px (Paula\'s poem)',
   /\.core-form-row textarea\s*\{\s*font-size:\s*16px\s*!important;\s*min-height:\s*120px/.test(appHtml));
 assert('Core: mobile input + select still min-height 44px (touch target)',
   /\.core-form-row input,\s*\.core-form-row select\s*\{\s*font-size:\s*16px\s*!important;\s*min-height:\s*44px/.test(appHtml));
+
+// ═══════════════════════════════════════════════════════════════
+section('85. Temperature Gauge — scroll fix + signal-driven luminos (v5.37.6)');
+
+// Scroll fix
+assert('Scroll fix: chart-area now overflow-y: auto (was overflow: hidden)',
+  /\.chart-area\s*\{[\s\S]{0,400}overflow-y:\s*auto/.test(gaugeHtml));
+assert('Scroll fix: chart-area still overflow-x: hidden (no sideways jitter)',
+  /\.chart-area\s*\{[\s\S]{0,500}overflow-x:\s*hidden/.test(gaugeHtml));
+assert('Scroll fix: custom scrollbar styling for chart-area',
+  /\.chart-area::-webkit-scrollbar/.test(gaugeHtml));
+
+// Luminos size doubled + CSS variable driven
+assert('Luminos: size 22px default (doubled from 12px, var-driven)',
+  /--lum-size:\s*22px/.test(gaugeHtml));
+assert('Luminos: signal-strong tier bumps size to 32px',
+  /body\.tg-signal-strong[\s\S]{0,200}--lum-size:\s*32px/.test(gaugeHtml));
+assert('Luminos: signal-extreme tier bumps size to 42px + saturate',
+  /body\.tg-signal-extreme[\s\S]{0,200}--lum-size:\s*42px[\s\S]{0,80}saturate/.test(gaugeHtml));
+
+// Signal-driven coloring
+assert('Luminos: tgUpdateLuminosSignal exposed on window',
+  gaugeHtml.includes('window.tgUpdateLuminosSignal'));
+assert('Luminos: signal state reads lastTemp + lastATR + gravPoints from analysis',
+  /tgComputeSignalState[\s\S]{0,600}a\.lastTemp[\s\S]{0,400}a\.gravPoints/.test(gaugeHtml) ||
+  (gaugeHtml.includes('a.lastTemp') && gaugeHtml.includes('a.gravPoints') && gaugeHtml.includes('tgComputeSignalState')));
+assert('Luminos: buy direction renders green',
+  /direction === 'buy'[\s\S]{0,200}#34d399/.test(gaugeHtml));
+assert('Luminos: sell direction renders red',
+  /direction === 'sell'[\s\S]{0,200}#ef4444/.test(gaugeHtml));
+assert('Luminos: neutral keeps the gold + lavender pair',
+  /else \{ c1 = '#e8b019'; c2 = '#a78bfa'; \}/.test(gaugeHtml));
+assert('Luminos: signal hook wired into __tgComposePostRender',
+  /__origPostRender[\s\S]{0,300}tgUpdateLuminosSignal/.test(gaugeHtml));
+
+// Instability — far from gravity → faster drift + jitter
+assert('Luminos: tg-instability class drives faster animation duration',
+  /body\.tg-instability \.tg-luminos\s*\{\s*animation-duration:/.test(gaugeHtml));
+assert('Luminos: tg-jitter keyframe defined for unstable signal',
+  /@keyframes tg-jitter/.test(gaugeHtml));
+
+// Favicon (kills the 404)
+assert('Favicon: inline gold-spark favicon link present',
+  /<link rel="icon" href="data:image\/svg\+xml/.test(gaugeHtml));
+
+// Escape exits fullscreen — safety so users never get stuck
+assert('Safety: Escape key exits fullscreen panel if one is stuck',
+  /keydown[\s\S]{0,300}Escape[\s\S]{0,200}tg-fullscreen-panel/.test(gaugeHtml));
 
 // ═══════════════════════════════════════════════════════════════
 section('80. Compose mode bug fixes — date adapter, volume/BB, tooltip, resize, clear (v5.37.1)');
