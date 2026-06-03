@@ -2266,6 +2266,53 @@ assert('Drag fix: comment explains the renderChart-per-input regression',
   gaugeHtml.includes('drag through the palette'));
 
 // ═══════════════════════════════════════════════════════════════
+section('88. Buy triad + cooldown (no repeats until reset) + strategy doc (v5.37.9)');
+
+// Buy triad — mirror of the sell triad
+assert('Buy triad: buy55 trigger (yellow → green)',
+  /var buy55 = a\.temps\[si-1\] < 55 && a\.temps\[si\] >= 55/.test(gaugeHtml));
+assert('Buy triad: buy45 trigger (red → yellow)',
+  /var buy45 = a\.temps\[si-1\] < 45 && a\.temps\[si\] >= 45/.test(gaugeHtml));
+assert('Buy triad: rally-from-red trigger (sustained climb, mirror of collapse)',
+  /var rally = a\.temps\[si\] > 45[\s\S]{0,300}recentRedTrough <= 45/.test(gaugeHtml));
+assert('Buy triad: volume OR acceleration on buy side (rallies start on average volume)',
+  /var accelUp\s*=\s*a\.tempROC && a\.tempROC\[si\] != null && a\.tempROC\[si\] > 3/.test(gaugeHtml));
+assert('Buy triad: backtest mirrors with rallyBT',
+  gaugeHtml.includes('var rallyBT') && /buy55 \|\| buy45 \|\| rallyBT/.test(gaugeHtml));
+
+// Cooldown — no repeats until temperature resets
+assert('Cooldown: sell tracker (lastSellSi + sawGreenSinceLastSell)',
+  gaugeHtml.includes('lastSellSi') && gaugeHtml.includes('sawGreenSinceLastSell'));
+assert('Cooldown: buy tracker (lastBuySi + sawRedSinceLastBuy)',
+  gaugeHtml.includes('lastBuySi') && gaugeHtml.includes('sawRedSinceLastBuy'));
+assert('Cooldown: sell gated on (first sell OR saw green since last)',
+  /lastSellSi < 0 \|\| sawGreenSinceLastSell/.test(gaugeHtml));
+assert('Cooldown: buy gated on (first buy OR saw red since last)',
+  /lastBuySi < 0 \|\| sawRedSinceLastBuy/.test(gaugeHtml));
+assert('Cooldown: backtest mirrors the gate (lastBuyBT + sawGreenBT)',
+  gaugeHtml.includes('lastBuyBT') && gaugeHtml.includes('sawGreenBT'));
+
+// Strategy doc — the living explanation
+var stratPath = path.join(docsDir, 'library', 'TEMPERATURE_GAUGE_STRATEGY.md');
+assert('Strategy doc exists at docs/library/TEMPERATURE_GAUGE_STRATEGY.md',
+  fs.existsSync(stratPath));
+var strat = fs.existsSync(stratPath) ? fs.readFileSync(stratPath, 'utf8') : '';
+assert('Strategy doc: explains the triggers-on-transitions philosophy',
+  strat.includes('signal is a *transition*') || strat.includes('transition, not a *state*'));
+assert('Strategy doc: documents the buy triad (buy55, buy45, rally)',
+  strat.includes('`buy55`') && strat.includes('`buy45`') && strat.includes('`rally`'));
+assert('Strategy doc: documents the sell triad (sell55, sell45, collapse)',
+  strat.includes('`sell55`') && strat.includes('`sell45`') && strat.includes('`collapse`'));
+assert('Strategy doc: documents the cooldown rule',
+  strat.includes('no repeated downs') || strat.includes('Cooldown'));
+assert('Strategy doc: lists open questions (what we don\'t know yet)',
+  strat.includes("What we don't know yet"));
+assert('Strategy doc: includes the iteration log',
+  strat.includes('Iteration log') && strat.includes('v5.37.7') && strat.includes('v5.37.9'));
+assert('Strategy doc: honest about being heuristic, not a complete system',
+  strat.includes('Not a complete trading system') || strat.includes('heuristics'));
+
+// ═══════════════════════════════════════════════════════════════
 section('80. Compose mode bug fixes — date adapter, volume/BB, tooltip, resize, clear (v5.37.1)');
 
 // Bug 1: x-axis is category labels, not Chart.js time scale (no adapter needed)
