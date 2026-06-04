@@ -2080,8 +2080,8 @@ assert('Pass 3: name text shadow follows hover',
 section('83. Luminos polish + tooltip consistency (v5.37.4)');
 
 // Luminos cranked up, count reduced, toggle button
-assert('Pass 4: luminos sprite size cranked up (now 22px+ via --lum-size)',
-  /--lum-size:\s*22px/.test(gaugeHtml) || /width:\s*12px;\s*height:\s*12px/.test(gaugeHtml));
+assert('Pass 4: luminos sprite size cranked up (22px+ via --lum-size or --lum-base-size)',
+  /--lum-base-size:\s*22px/.test(gaugeHtml) || /--lum-size:\s*22px/.test(gaugeHtml));
 assert('Pass 4: luminos toggle button in toolbar',
   gaugeHtml.includes('id="luminosToggle"') && gaugeHtml.includes('tgToggleLuminos()'));
 assert('Pass 4: tgToggleLuminos exposed + persists in fl_tg_luminos',
