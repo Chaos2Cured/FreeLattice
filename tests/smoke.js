@@ -2152,12 +2152,15 @@ assert('Scroll fix: custom scrollbar styling for chart-area',
   /\.chart-area::-webkit-scrollbar/.test(gaugeHtml));
 
 // Luminos size doubled + CSS variable driven
-assert('Luminos: size 22px default (doubled from 12px, var-driven)',
-  /--lum-size:\s*22px/.test(gaugeHtml));
-assert('Luminos: signal-strong tier bumps size to 32px',
-  /body\.tg-signal-strong[\s\S]{0,200}--lum-size:\s*32px/.test(gaugeHtml));
-assert('Luminos: signal-extreme tier bumps size to 42px + saturate',
-  /body\.tg-signal-extreme[\s\S]{0,200}--lum-size:\s*42px[\s\S]{0,80}saturate/.test(gaugeHtml));
+// Size = base (temperature tier) + energy (gravity distance). v5.37.19.
+assert('Luminos: size 22px default (--lum-base-size)',
+  /--lum-base-size:\s*22px/.test(gaugeHtml));
+assert('Luminos: signal-strong tier bumps base size to 32px',
+  /body\.tg-signal-strong[\s\S]{0,200}--lum-base-size:\s*32px/.test(gaugeHtml));
+assert('Luminos: signal-extreme tier bumps base size to 42px + saturate',
+  /body\.tg-signal-extreme[\s\S]{0,200}--lum-base-size:\s*42px[\s\S]{0,80}saturate/.test(gaugeHtml));
+assert('Luminos: final size = base + energy via calc()',
+  /--lum-size:\s*calc\(var\(--lum-base-size\)\s*\+\s*var\(--lum-energy-add\)\)/.test(gaugeHtml));
 
 // Signal-driven coloring
 assert('Luminos: tgUpdateLuminosSignal exposed on window',
@@ -2179,6 +2182,33 @@ assert('Luminos: tg-instability class drives faster animation duration',
   /body\.tg-instability \.tg-luminos\s*\{\s*animation-duration:/.test(gaugeHtml));
 assert('Luminos: tg-jitter keyframe defined for unstable signal',
   /@keyframes tg-jitter/.test(gaugeHtml));
+
+// ── Energy ramp (v5.37.19) — gravity-spring stored energy ─────────────
+// Per Opus on bars 120/136: IPS-near-zero = spring at rest, IPS-far = loaded.
+// gravDist is the same shape of measure, ATR-normalized. Continuous, not tiered.
+assert('Energy ramp: layer-level opacity reads --lum-energy-opacity (0.4 → 1.0)',
+  /\.tg-luminos-layer\s*\{[\s\S]{0,200}opacity:\s*var\(--lum-energy-opacity/.test(gaugeHtml));
+assert('Energy ramp: energyScale computed from gravDist / 2.5',
+  /energyScale\s*=\s*Math\.min\(1\.0,\s*state\.gravDist\s*\/\s*2\.5\)/.test(gaugeHtml));
+assert('Energy ramp: opacity formula is 0.4 + energyScale * 0.6',
+  /0\.4\s*\+\s*energyScale\s*\*\s*0\.6/.test(gaugeHtml));
+assert('Energy ramp: size add formula is energyScale * 28 (→ 22px..50px on neutral, 42px..70px on extreme)',
+  /energyScale\s*\*\s*28/.test(gaugeHtml));
+assert('Energy ramp: --lum-energy-opacity set on layer',
+  /setProperty\(['"]--lum-energy-opacity['"]/.test(gaugeHtml));
+assert('Energy ramp: --lum-energy-add set on layer',
+  /setProperty\(['"]--lum-energy-add['"]/.test(gaugeHtml));
+
+// Cross-mode consistency — the luminos layer must be visible in P, T, AND C mode.
+// Before v5.37.19 the layer lived inside #chartWrap which is display:none in
+// tool-only mode, so the signal coloring vanished in T mode. Lifted up to
+// .chart-area which is always visible.
+assert('Cross-mode: luminos layer is a child of .chart-area, not inside #chartWrap',
+  /<div class="chart-area">[\s\S]{0,2000}<div class="tg-luminos-layer" id="tgLuminosLayer"/.test(gaugeHtml));
+assert('Cross-mode: .chart-area is position:relative so the absolute layer anchors correctly',
+  /\.chart-area\s*\{[\s\S]{0,900}position:\s*relative/.test(gaugeHtml));
+assert('Cross-mode: luminos layer is NOT inside #chartWrap (would hide in tool-only mode)',
+  !/<div class="chart-canvas-wrap" id="chartWrap">[\s\S]{0,200}<div class="tg-luminos-layer"/.test(gaugeHtml));
 
 // Favicon (kills the 404)
 assert('Favicon: inline gold-spark favicon link present',

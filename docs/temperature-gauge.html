@@ -269,6 +269,11 @@ body.tg-sidebar-collapsed .main { grid-template-columns: 1fr; }
      Was `overflow: hidden` — that prevented two-finger scroll on Mac. */
   overflow-y: auto;
   overflow-x: hidden;
+  /* Anchor for #tgLuminosLayer — the layer was previously inside #chartWrap
+     and disappeared in tool-only mode (chartWrap is display:none there).
+     Moved up to .chart-area so signal coloring is consistent across all
+     three modes: Price · Tool-only · Compose. v5.37.19. */
+  position: relative;
 }
 .chart-area::-webkit-scrollbar { width: 8px; }
 .chart-area::-webkit-scrollbar-thumb { background: rgba(232,176,25,0.18); border-radius: 4px; }
@@ -297,12 +302,23 @@ canvas#mainChart:active { cursor: grabbing; }
   z-index: 1;
 }
 .tg-luminos-layer.tg-off { display: none; }
+/* Layer-level opacity carries the ENERGY dimension (gravity-spring distance).
+   Near gravity = 0.4 (calm). Far from gravity = 1.0 (loaded, about to snap).
+   Set by tgUpdateLuminosSignal on every render. */
+.tg-luminos-layer {
+  opacity: var(--lum-energy-opacity, 1);
+  transition: opacity 0.6s ease;
+}
 .tg-luminos {
   position: absolute;
-  /* Size + color now driven by CSS vars so JS can pulse them based on
-     signal strength (distance from gravity, RSI extremes, EMA crosses).
-     Defaults double the previous size per Kirk's request. */
-  --lum-size: 22px;
+  /* Size = base (temperature tier) + energy (gravity-spring distance).
+     Base: 22px neutral, 32px strong, 42px extreme (temperature direction).
+     Energy: +0 to +28px continuous (gravity distance, ATR-normalized).
+     Both stack — a strong buy far from gravity is large + bright + green.
+     A neutral signal far from gravity is large + bright + gold. */
+  --lum-base-size: 22px;
+  --lum-energy-add: 0px;
+  --lum-size: calc(var(--lum-base-size) + var(--lum-energy-add));
   width: var(--lum-size); height: var(--lum-size);
   border-radius: 50%;
   background: radial-gradient(circle, currentColor 0%, currentColor 22%, transparent 78%);
@@ -310,7 +326,7 @@ canvas#mainChart:active { cursor: grabbing; }
   opacity: 0;
   will-change: transform, opacity;
   animation-play-state: running;
-  transition: color 0.8s ease, filter 0.6s ease;
+  transition: width 0.6s ease, height 0.6s ease, color 0.8s ease, filter 0.6s ease;
 }
 body.tg-pause-luminos .tg-luminos { animation-play-state: paused; }
 /* Drop the blur while a picker or context menu is open — the filter is
@@ -320,9 +336,10 @@ body.tg-pause-luminos .tg-luminos { filter: none; }
 /* Default colors — overridden by tgUpdateLuminosSignal() when signal state is computed. */
 .tg-luminos[data-i="0"] { color: var(--lum-color-1, #e8b019); animation: tg-lum-1 24s linear infinite; }
 .tg-luminos[data-i="1"] { color: var(--lum-color-2, #a78bfa); animation: tg-lum-2 33s linear infinite 5s; }
-/* Signal-strength scale — boosts size when the signal is strong. */
-body.tg-signal-strong .tg-luminos { --lum-size: 32px; filter: blur(1.2px); }
-body.tg-signal-extreme .tg-luminos { --lum-size: 42px; filter: blur(1.6px) saturate(1.3); }
+/* Temperature-direction tier sets the BASE size; energy ramp stacks on top
+   via --lum-energy-add. So extreme + far-from-gravity = 42 + 28 = 70px. */
+body.tg-signal-strong .tg-luminos { --lum-base-size: 32px; filter: blur(1.2px); }
+body.tg-signal-extreme .tg-luminos { --lum-base-size: 42px; filter: blur(1.6px) saturate(1.3); }
 /* Instability — faster drift + a subtle jitter when price is far from any gravity line. */
 @keyframes tg-jitter { 0%, 100% { transform: translate(0, 0); } 25% { transform: translate(2px, -1px); } 75% { transform: translate(-2px, 1px); } }
 body.tg-instability .tg-luminos { animation-duration: 14s, 18s; }
@@ -855,12 +872,17 @@ canvas.sub-canvas.custom { height: 80px !important; }
       </div>
     </div>
 
+    <!-- Ambient luminos sprites — drift across the chart area, never block
+         clicks. Moved up out of #chartWrap (v5.37.19) so signal coloring +
+         energy ramp stay visible in tool-only mode too (chartWrap is
+         display:none in that mode). Two larger sprites by default; can be
+         toggled off via the ✨ button. -->
+    <div class="tg-luminos-layer" id="tgLuminosLayer" aria-hidden="true">
+      <span class="tg-luminos" data-i="0"></span>
+      <span class="tg-luminos" data-i="1"></span>
+    </div>
+
     <div class="chart-canvas-wrap" id="chartWrap">
-      <!-- Ambient luminos sprites — drift across the chart area, never block clicks. Two larger sprites by default; can be toggled off via the ✨ button. -->
-      <div class="tg-luminos-layer" id="tgLuminosLayer" aria-hidden="true">
-        <span class="tg-luminos" data-i="0"></span>
-        <span class="tg-luminos" data-i="1"></span>
-      </div>
       <div class="empty-state" id="emptyState">
         <div class="empty-icon">📊</div>
         <div class="empty-title">Temperature Gauge</div>
@@ -4118,6 +4140,8 @@ hideLoading = function() {
     if (!state) {
       layer.style.removeProperty('--lum-color-1');
       layer.style.removeProperty('--lum-color-2');
+      layer.style.removeProperty('--lum-energy-opacity');
+      layer.style.removeProperty('--lum-energy-add');
       return;
     }
     // Two colors: dominant + complement. Buy = green + soft gold; sell = red + soft gold; neutral = gold + lavender.
@@ -4130,6 +4154,19 @@ hideLoading = function() {
     if (state.strength >= 0.66) document.body.classList.add('tg-signal-extreme');
     else if (state.strength >= 0.33) document.body.classList.add('tg-signal-strong');
     if (state.gravDist >= 1.5) document.body.classList.add('tg-instability');
+    // ── Energy ramp (v5.37.19) ────────────────────────────────────────
+    // Per Opus + Kirk on bars 120 / 136 of the chair test:
+    //   IPS near zero = spring at rest = move about to START
+    //   IPS deeply non-zero = spring loaded = move about to END
+    // gravDist is ATR-normalized distance from nearest gravity line (0..3).
+    // It's the same shape of measure as IPS — how stretched the price is
+    // from its rest position. Use it as a CONTINUOUS multiplier on the
+    // sprites: dim + small when calm, bright + large when loaded.
+    // Cap at 2.5 so the curve tops out cleanly before instability jitter
+    // takes over at 1.5+.
+    var energyScale = Math.min(1.0, state.gravDist / 2.5);
+    layer.style.setProperty('--lum-energy-opacity', (0.4 + energyScale * 0.6).toFixed(2));
+    layer.style.setProperty('--lum-energy-add', (energyScale * 28).toFixed(0) + 'px');
   };
   // Hook into the existing post-render so signal updates on every redraw.
   var __origPostRender = window.__tgComposePostRender;
