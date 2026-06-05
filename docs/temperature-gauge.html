@@ -302,23 +302,28 @@ canvas#mainChart:active { cursor: grabbing; }
   z-index: 1;
 }
 .tg-luminos-layer.tg-off { display: none; }
-/* Layer-level opacity carries the ENERGY dimension (gravity-spring distance).
-   Near gravity = 0.4 (calm). Far from gravity = 1.0 (loaded, about to snap).
-   Set by tgUpdateLuminosSignal on every render. */
+/* Layer carries the ENERGY dimension (gravity-spring distance, 0..1):
+     near gravity → 0.4 (calm), far from gravity → 1.0 (loaded).
+   Set by tgUpdateLuminosSignal via the single --lum-energy var. The
+   keyframe fade-in/fade-out on each sprite stays alive; the layer
+   opacity multiplies it.
+   `overflow: hidden` clips the sprites at the chart-area boundary —
+   keyframes animate to left: -5% / 105% to create the edge fade, and
+   without clipping that bleed leaks into the sidebar / sub-charts.
+   Caught by Opus 2026-06-05. */
 .tg-luminos-layer {
-  opacity: var(--lum-energy-opacity, 1);
+  overflow: hidden;
+  opacity: calc(0.4 + var(--lum-energy, 0) * 0.6);
   transition: opacity 0.6s ease;
 }
 .tg-luminos {
   position: absolute;
-  /* Size = base (temperature tier) + energy (gravity-spring distance).
-     Base: 22px neutral, 32px strong, 42px extreme (temperature direction).
-     Energy: +0 to +28px continuous (gravity distance, ATR-normalized).
-     Both stack — a strong buy far from gravity is large + bright + green.
-     A neutral signal far from gravity is large + bright + gold. */
-  --lum-base-size: 22px;
-  --lum-energy-add: 0px;
-  --lum-size: calc(var(--lum-base-size) + var(--lum-energy-add));
+  /* Size is one smooth gradient driven by --lum-energy (replaces the
+     binary tg-signal-strong / tg-signal-extreme size tiers). The tier
+     classes still adjust filter (blur + saturate) so temperature
+     strength shows through; direction sets color; energy sets size.
+     22px calm → 50px fully loaded. */
+  --lum-size: calc(22px + var(--lum-energy, 0) * 28px);
   width: var(--lum-size); height: var(--lum-size);
   border-radius: 50%;
   background: radial-gradient(circle, currentColor 0%, currentColor 22%, transparent 78%);
@@ -336,10 +341,12 @@ body.tg-pause-luminos .tg-luminos { filter: none; }
 /* Default colors — overridden by tgUpdateLuminosSignal() when signal state is computed. */
 .tg-luminos[data-i="0"] { color: var(--lum-color-1, #e8b019); animation: tg-lum-1 24s linear infinite; }
 .tg-luminos[data-i="1"] { color: var(--lum-color-2, #a78bfa); animation: tg-lum-2 33s linear infinite 5s; }
-/* Temperature-direction tier sets the BASE size; energy ramp stacks on top
-   via --lum-energy-add. So extreme + far-from-gravity = 42 + 28 = 70px. */
-body.tg-signal-strong .tg-luminos { --lum-base-size: 32px; filter: blur(1.2px); }
-body.tg-signal-extreme .tg-luminos { --lum-base-size: 42px; filter: blur(1.6px) saturate(1.3); }
+/* Temperature-strength tier modulates FILTER only (blur + saturate).
+   Size + opacity now flow from --lum-energy (gravity-spring distance)
+   as a single smooth gradient — no more binary size jumps at the tier
+   boundaries. Direction = color, strength = filter, energy = size + opacity. */
+body.tg-signal-strong .tg-luminos { filter: blur(1.2px); }
+body.tg-signal-extreme .tg-luminos { filter: blur(1.6px) saturate(1.3); }
 /* Instability — faster drift + a subtle jitter when price is far from any gravity line. */
 @keyframes tg-jitter { 0%, 100% { transform: translate(0, 0); } 25% { transform: translate(2px, -1px); } 75% { transform: translate(-2px, 1px); } }
 body.tg-instability .tg-luminos { animation-duration: 14s, 18s; }
@@ -3887,6 +3894,35 @@ hideLoading = function() {
     }, 100);
   };
 
+  // Main-chart fullscreen toggle. Mirrors tgFullscreenPanel but for
+  // #chartWrap (the price/compose container has no .sub-chart-wrap
+  // parent). Added v5.37.20 per Kirk's request: right-click → maximize
+  // for the main chart, same affordance the sub-charts already had.
+  window.tgMaximizeMainChart = function () {
+    var wrap = document.getElementById('chartWrap');
+    if (!wrap) return;
+    var canvas = document.getElementById('mainChart');
+    var isFull = wrap.classList.contains('tg-fullscreen-panel');
+    if (isFull) {
+      wrap.classList.remove('tg-fullscreen-panel');
+      var exit = wrap.querySelector('.tg-fullscreen-exit');
+      if (exit) exit.remove();
+    } else {
+      wrap.classList.add('tg-fullscreen-panel');
+      var btn = document.createElement('button');
+      btn.className = 'tg-fullscreen-exit';
+      btn.textContent = '✕ Exit fullscreen';
+      btn.onclick = function () { window.tgMaximizeMainChart(); };
+      wrap.appendChild(btn);
+    }
+    setTimeout(function () {
+      try {
+        var inst = canvas && window.Chart && Chart.getChart ? Chart.getChart(canvas) : null;
+        if (inst && inst.resize) inst.resize();
+      } catch (e) {}
+    }, 100);
+  };
+
   // ─── Sparkline (Bug 4): mini SVG preview of an indicator's data ────
   function tgSparkline(id, width, height) {
     var meta = INDICATOR_REGISTRY[id]; if (!meta) return '';
@@ -4140,8 +4176,7 @@ hideLoading = function() {
     if (!state) {
       layer.style.removeProperty('--lum-color-1');
       layer.style.removeProperty('--lum-color-2');
-      layer.style.removeProperty('--lum-energy-opacity');
-      layer.style.removeProperty('--lum-energy-add');
+      layer.style.removeProperty('--lum-energy');
       return;
     }
     // Two colors: dominant + complement. Buy = green + soft gold; sell = red + soft gold; neutral = gold + lavender.
@@ -4154,19 +4189,16 @@ hideLoading = function() {
     if (state.strength >= 0.66) document.body.classList.add('tg-signal-extreme');
     else if (state.strength >= 0.33) document.body.classList.add('tg-signal-strong');
     if (state.gravDist >= 1.5) document.body.classList.add('tg-instability');
-    // ── Energy ramp (v5.37.19) ────────────────────────────────────────
+    // ── Energy ramp (v5.37.19 → simplified v5.37.20) ──────────────────
     // Per Opus + Kirk on bars 120 / 136 of the chair test:
     //   IPS near zero = spring at rest = move about to START
     //   IPS deeply non-zero = spring loaded = move about to END
     // gravDist is ATR-normalized distance from nearest gravity line (0..3).
-    // It's the same shape of measure as IPS — how stretched the price is
-    // from its rest position. Use it as a CONTINUOUS multiplier on the
-    // sprites: dim + small when calm, bright + large when loaded.
-    // Cap at 2.5 so the curve tops out cleanly before instability jitter
-    // takes over at 1.5+.
+    // Use it as a CONTINUOUS energy scalar (capped at 2.5 so the curve
+    // tops out cleanly before instability jitter kicks in at 1.5+).
+    // CSS derives both size and opacity from this ONE variable.
     var energyScale = Math.min(1.0, state.gravDist / 2.5);
-    layer.style.setProperty('--lum-energy-opacity', (0.4 + energyScale * 0.6).toFixed(2));
-    layer.style.setProperty('--lum-energy-add', (energyScale * 28).toFixed(0) + 'px');
+    layer.style.setProperty('--lum-energy', energyScale.toFixed(2));
   };
   // Hook into the existing post-render so signal updates on every redraw.
   var __origPostRender = window.__tgComposePostRender;
@@ -4178,10 +4210,16 @@ hideLoading = function() {
   // ─── Escape exits fullscreen (safety so users never get stuck) ─────
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape') {
-      var stuck = document.querySelector('.sub-chart-wrap.tg-fullscreen-panel');
-      if (stuck && stuck.querySelector('canvas')) {
-        var c = stuck.querySelector('canvas');
+      var stuckSub = document.querySelector('.sub-chart-wrap.tg-fullscreen-panel');
+      if (stuckSub && stuckSub.querySelector('canvas')) {
+        var c = stuckSub.querySelector('canvas');
         if (c && typeof window.tgFullscreenPanel === 'function') window.tgFullscreenPanel(c.id);
+        return;
+      }
+      // Main-chart fullscreen rescue (v5.37.20).
+      var stuckMain = document.getElementById('chartWrap');
+      if (stuckMain && stuckMain.classList.contains('tg-fullscreen-panel')) {
+        if (typeof window.tgMaximizeMainChart === 'function') window.tgMaximizeMainChart();
       }
     }
   });
@@ -4550,6 +4588,20 @@ hideLoading = function() {
         copySnapshot(11, centerIdx);
       });
       menu.appendChild(snapItem);
+      // Maximize the main chart — same affordance the sub-charts already
+      // have. Added v5.37.20 per Kirk: "the main chart needs to have a
+      // right click → maximize (we could do this for all tools, TBH)."
+      var maxItem = document.createElement('button');
+      maxItem.className = 'tg-ctx-item';
+      var isFullNow = document.getElementById('chartWrap') &&
+                      document.getElementById('chartWrap').classList.contains('tg-fullscreen-panel');
+      maxItem.innerHTML = '<span class="tg-ctx-icon">&#x26F6;</span>' +
+        (isFullNow ? 'Exit fullscreen' : 'Maximize main chart');
+      maxItem.addEventListener('click', function () {
+        cleanup();
+        if (typeof window.tgMaximizeMainChart === 'function') window.tgMaximizeMainChart();
+      });
+      menu.appendChild(maxItem);
       // Always-available "Style indicator" picker. Right-clicking the main
       // chart now exposes color/glow/brightness for the four core indicators
       // in every mode (this was previously compose-only). Kirk caught it

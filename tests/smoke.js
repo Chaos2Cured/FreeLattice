@@ -2080,8 +2080,10 @@ assert('Pass 3: name text shadow follows hover',
 section('83. Luminos polish + tooltip consistency (v5.37.4)');
 
 // Luminos cranked up, count reduced, toggle button
-assert('Pass 4: luminos sprite size cranked up (22px+ via --lum-size or --lum-base-size)',
-  /--lum-base-size:\s*22px/.test(gaugeHtml) || /--lum-size:\s*22px/.test(gaugeHtml));
+assert('Pass 4: luminos sprite size cranked up (22px+ via --lum-size calc or --lum-base-size)',
+  /--lum-size:\s*calc\(22px/.test(gaugeHtml) ||
+  /--lum-base-size:\s*22px/.test(gaugeHtml) ||
+  /--lum-size:\s*22px/.test(gaugeHtml));
 assert('Pass 4: luminos toggle button in toolbar',
   gaugeHtml.includes('id="luminosToggle"') && gaugeHtml.includes('tgToggleLuminos()'));
 assert('Pass 4: tgToggleLuminos exposed + persists in fl_tg_luminos',
@@ -2152,15 +2154,15 @@ assert('Scroll fix: custom scrollbar styling for chart-area',
   /\.chart-area::-webkit-scrollbar/.test(gaugeHtml));
 
 // Luminos size doubled + CSS variable driven
-// Size = base (temperature tier) + energy (gravity distance). v5.37.19.
-assert('Luminos: size 22px default (--lum-base-size)',
-  /--lum-base-size:\s*22px/.test(gaugeHtml));
-assert('Luminos: signal-strong tier bumps base size to 32px',
-  /body\.tg-signal-strong[\s\S]{0,200}--lum-base-size:\s*32px/.test(gaugeHtml));
-assert('Luminos: signal-extreme tier bumps base size to 42px + saturate',
-  /body\.tg-signal-extreme[\s\S]{0,200}--lum-base-size:\s*42px[\s\S]{0,80}saturate/.test(gaugeHtml));
-assert('Luminos: final size = base + energy via calc()',
-  /--lum-size:\s*calc\(var\(--lum-base-size\)\s*\+\s*var\(--lum-energy-add\)\)/.test(gaugeHtml));
+// Size + opacity are now ONE continuous energy gradient (v5.37.20).
+// Per Opus: replaces the binary tg-signal-strong / tg-signal-extreme
+// size jumps with a smooth ramp from gravity-spring distance.
+assert('Luminos: size derived from single --lum-energy var via calc()',
+  /--lum-size:\s*calc\(22px\s*\+\s*var\(--lum-energy[^)]*\)\s*\*\s*28px\)/.test(gaugeHtml));
+assert('Luminos: signal-strong tier ONLY sets filter (no size)',
+  /body\.tg-signal-strong \.tg-luminos\s*\{\s*filter:\s*blur\(1\.2px\)/.test(gaugeHtml));
+assert('Luminos: signal-extreme tier ONLY sets filter + saturate (no size)',
+  /body\.tg-signal-extreme \.tg-luminos\s*\{\s*filter:\s*blur\(1\.6px\)\s*saturate\(1\.3\)/.test(gaugeHtml));
 
 // Signal-driven coloring
 assert('Luminos: tgUpdateLuminosSignal exposed on window',
@@ -2183,21 +2185,33 @@ assert('Luminos: tg-instability class drives faster animation duration',
 assert('Luminos: tg-jitter keyframe defined for unstable signal',
   /@keyframes tg-jitter/.test(gaugeHtml));
 
-// ── Energy ramp (v5.37.19) — gravity-spring stored energy ─────────────
+// ── Energy ramp (v5.37.19 → simplified v5.37.20) ───────────────────────
 // Per Opus on bars 120/136: IPS-near-zero = spring at rest, IPS-far = loaded.
-// gravDist is the same shape of measure, ATR-normalized. Continuous, not tiered.
-assert('Energy ramp: layer-level opacity reads --lum-energy-opacity (0.4 → 1.0)',
-  /\.tg-luminos-layer\s*\{[\s\S]{0,200}opacity:\s*var\(--lum-energy-opacity/.test(gaugeHtml));
+// gravDist is the same shape of measure, ATR-normalized.
+// Simplified to ONE CSS var (--lum-energy) that drives both opacity + size.
+assert('Energy ramp: layer-level opacity reads single --lum-energy var (0.4 + energy * 0.6)',
+  /\.tg-luminos-layer\s*\{[\s\S]{0,400}opacity:\s*calc\(0\.4\s*\+\s*var\(--lum-energy[^)]*\)\s*\*\s*0\.6\)/.test(gaugeHtml));
 assert('Energy ramp: energyScale computed from gravDist / 2.5',
   /energyScale\s*=\s*Math\.min\(1\.0,\s*state\.gravDist\s*\/\s*2\.5\)/.test(gaugeHtml));
-assert('Energy ramp: opacity formula is 0.4 + energyScale * 0.6',
-  /0\.4\s*\+\s*energyScale\s*\*\s*0\.6/.test(gaugeHtml));
-assert('Energy ramp: size add formula is energyScale * 28 (→ 22px..50px on neutral, 42px..70px on extreme)',
-  /energyScale\s*\*\s*28/.test(gaugeHtml));
-assert('Energy ramp: --lum-energy-opacity set on layer',
-  /setProperty\(['"]--lum-energy-opacity['"]/.test(gaugeHtml));
-assert('Energy ramp: --lum-energy-add set on layer',
-  /setProperty\(['"]--lum-energy-add['"]/.test(gaugeHtml));
+assert('Energy ramp: --lum-energy set on layer (single source of truth)',
+  /setProperty\(['"]--lum-energy['"]/.test(gaugeHtml));
+
+// ── Containment fix (v5.37.20) ─────────────────────────────────────────
+// Sprites animate to left: -5% / 105% to create an edge fade.
+// Without overflow:hidden on the layer they leak into the sidebar.
+assert('Containment: .tg-luminos-layer has overflow:hidden so sprites clip at chart edge',
+  /\.tg-luminos-layer\s*\{[\s\S]{0,400}overflow:\s*hidden/.test(gaugeHtml));
+
+// ── Main-chart maximize (v5.37.20) ─────────────────────────────────────
+// Mirror affordance to sub-chart maximize. Right-click → "Maximize main chart".
+assert('Maximize: tgMaximizeMainChart exposed on window',
+  /window\.tgMaximizeMainChart\s*=\s*function/.test(gaugeHtml));
+assert('Maximize: function toggles .tg-fullscreen-panel on #chartWrap',
+  /tgMaximizeMainChart[\s\S]{0,500}getElementById\(['"]chartWrap['"]\)[\s\S]{0,300}tg-fullscreen-panel/.test(gaugeHtml));
+assert('Maximize: right-click menu has "Maximize main chart" entry',
+  /Maximize main chart/.test(gaugeHtml));
+assert('Maximize: Escape unsticks #chartWrap fullscreen too (not just sub-charts)',
+  /Escape[\s\S]{0,800}chartWrap[\s\S]{0,300}tgMaximizeMainChart/.test(gaugeHtml));
 
 // Cross-mode consistency — the luminos layer must be visible in P, T, AND C mode.
 // Before v5.37.19 the layer lived inside #chartWrap which is display:none in
