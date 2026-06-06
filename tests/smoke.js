@@ -1143,6 +1143,63 @@ assert('Thesis card', appHtml.includes('thesis.html'));
 assert('Safety card', appHtml.includes('safety.html'));
 assert('Love Logic card', appHtml.includes('love-logic-proof.html'));
 assert('Chronal v2 card', appHtml.includes('chronal-simulation-v2.html'));
+assert('Chronal v3 card (The Universality Seam)', appHtml.includes('chronal-simulation-v3.html'));
+
+// ── Chronal V3 page itself — The Universality Seam (v5.38.0) ──────────
+var fs_v3 = require('fs');
+var path_v3 = require('path');
+var v3Html;
+try { v3Html = fs_v3.readFileSync(path_v3.join(__dirname, '..', 'docs', 'chronal-simulation-v3.html'), 'utf8'); }
+catch (e) { v3Html = ''; }
+assert('Chronal V3: page exists and is non-empty',
+  v3Html.length > 5000);
+assert('Chronal V3: titled "The Universality Seam"',
+  /The Universality Seam/.test(v3Html) && /The First Cross-Sector Clock/.test(v3Html));
+assert('Chronal V3: Th-229 and Sr-87 both named as the two clocks',
+  /Th-229/.test(v3Html) && /Sr-87/.test(v3Html));
+assert('Chronal V3: cites the 2024 Th-229 demonstration',
+  /2024/.test(v3Html));
+assert('Chronal V3: sensitivity numbers present (κ ≤ 10⁻⁸ at ~85σ)',
+  /10<sup>-8<\/sup>/.test(v3Html) && /85&sigma;/.test(v3Html));
+assert('Chronal V3: links forward and back through the arc (V1, V2)',
+  /chronal-simulation\.html/.test(v3Html) && /chronal-simulation-v2\.html/.test(v3Html));
+assert('Chronal V3: links to the source paper + sim code + sensitivity code',
+  /THE_UNIVERSALITY_SEAM\.md/.test(v3Html) &&
+  /chronal_simulation_v3\.py/.test(v3Html) &&
+  /chronal_clock_sensitivity_v2\.py/.test(v3Html));
+assert('Chronal V3: Snowflake Connection panel links to the Temperature Gauge',
+  /Snowflake Connection/.test(v3Html) && /temperature-gauge\.html/.test(v3Html));
+assert('Chronal V3: experimental-proposal banner (not just speculative)',
+  /Experimental Proposal/.test(v3Html));
+
+// ── Discovery wiring — sitemap, research, thesis ──────────────────────
+var sitemapXml = '';
+try { sitemapXml = fs_v3.readFileSync(path_v3.join(__dirname, '..', 'docs', 'sitemap.xml'), 'utf8'); }
+catch (e) {}
+assert('Chronal V3: present in sitemap.xml',
+  sitemapXml.includes('chronal-simulation-v3.html'));
+var researchHtml = '';
+try { researchHtml = fs_v3.readFileSync(path_v3.join(__dirname, '..', 'docs', 'research.html'), 'utf8'); }
+catch (e) {}
+assert('Chronal V3: linked from research.html',
+  researchHtml.includes('chronal-simulation-v3.html'));
+var thesisHtml = '';
+try { thesisHtml = fs_v3.readFileSync(path_v3.join(__dirname, '..', 'docs', 'thesis.html'), 'utf8'); }
+catch (e) {}
+assert('Chronal V3: linked from thesis.html',
+  thesisHtml.includes('chronal-simulation-v3.html'));
+
+// ── SEAM_SEED + COORDINATION_CHRONAL_SEAM ─────────────────────────────
+var seamSeed = '';
+try { seamSeed = fs_v3.readFileSync(path_v3.join(__dirname, '..', 'docs', 'library', 'SEAM_SEED.md'), 'utf8'); }
+catch (e) {}
+assert('SEAM_SEED.md exists with the Fingerprint + Poem + Bridge format Kirk asked for',
+  /## Fingerprint/.test(seamSeed) && /## Poem/.test(seamSeed) && /## The Bridge/.test(seamSeed));
+var seamCoord = '';
+try { seamCoord = fs_v3.readFileSync(path_v3.join(__dirname, '..', 'docs', 'library', 'COORDINATION_CHRONAL_SEAM.md'), 'utf8'); }
+catch (e) {}
+assert('COORDINATION_CHRONAL_SEAM.md exists (sibling of COORDINATION_TEMPERATURE_GAUGE)',
+  /What Works \(don't touch\)/.test(seamCoord) && /chronal-simulation-v3\.html/.test(seamCoord));
 assert('Uses renderCardGrid', appHtml.includes('renderCardGrid(LIGHTHOUSE_CARDS'));
 
 // ═══════════════════════════════════════════════════════════════

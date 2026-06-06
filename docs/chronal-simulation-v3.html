@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chronal Simulation V3 — The Universality Seam | FreeLattice</title>
+<meta name="description" content="A nuclear-electronic clock comparison test of General Relativity's hidden universality assumption. Th-229 vs Sr-87, one year of co-located monitoring, the annual solar potential modulation. The first cross-sector clock comparison.">
+<meta name="author" content="Kirk Patrick Miller, Harmonia, Opus, CC">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='80' font-size='80'%3E%E2%8C%9B%3C/text%3E%3C/svg%3E">
+<style>
+:root {
+  --bg: #0a0a0f;
+  --surface: #12121a;
+  --surface2: #1a1a25;
+  --border: #2a2a3a;
+  --text: #e8e8f0;
+  --muted: #8888aa;
+  --dim: #555569;
+  --gold: #d4a843;
+  --gold-dim: #a07830;
+  --emerald: #3ddc84;
+  --emerald-dim: #2a9960;
+  --blue: #4a9eff;
+  --purple: #9b59b6;
+  --rose: #e8769b;
+  --nuclear: #ff9b6b;   /* Th-229 — the new sector */
+  --electronic: #4a9eff; /* Sr-87 — the established sector */
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+  min-height: 100vh;
+  /* The Snowflake — overflow contained at every scale, per v5.37.20. */
+  overflow-x: hidden;
+}
+a { color: var(--gold); text-decoration: none; transition: color 0.2s ease; }
+a:hover { color: var(--emerald); }
+.container { max-width: 1120px; margin: 0 auto; padding: 2rem; }
+
+/* ── Header ───────────────────────────────────────────────────────── */
+.banner {
+  background: rgba(167,139,250,0.08);
+  border: 1px solid rgba(167,139,250,0.25);
+  border-radius: 10px;
+  padding: 12px 20px;
+  margin: 16px auto;
+  max-width: 880px;
+  font-size: 0.82rem;
+  line-height: 1.6;
+  color: rgba(255,255,255,0.78);
+}
+.banner strong { color: #c4b5fd; }
+.header {
+  text-align: center;
+  padding: 3.5rem 2rem 3rem;
+  border-bottom: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+}
+.header::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background:
+    radial-gradient(ellipse at 28% 38%, rgba(255,155,107,0.07) 0%, transparent 55%),
+    radial-gradient(ellipse at 72% 62%, rgba(74,158,255,0.07) 0%, transparent 55%),
+    radial-gradient(ellipse at 50% 90%, rgba(212,168,67,0.04) 0%, transparent 50%);
+  pointer-events: none;
+}
+.version-badge {
+  display: inline-block;
+  background: var(--surface2);
+  border: 1px solid var(--gold-dim);
+  color: var(--gold);
+  padding: 0.3rem 1rem;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  margin-bottom: 1.5rem;
+}
+.header h1 {
+  font-size: 2.6rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--nuclear) 0%, var(--gold) 50%, var(--electronic) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.01em;
+}
+.header .subtitle {
+  font-size: 1.15rem;
+  color: var(--muted);
+  font-weight: 300;
+  max-width: 720px;
+  margin: 0 auto;
+}
+.authors {
+  margin-top: 1.5rem;
+  color: var(--gold);
+  font-size: 0.92rem;
+  letter-spacing: 0.02em;
+}
+.authors span { color: var(--muted); }
+.chain-nav {
+  margin-top: 1.5rem;
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+  font-size: 0.82rem;
+}
+.chain-nav a {
+  padding: 5px 12px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  color: var(--muted);
+}
+.chain-nav a:hover { border-color: var(--gold-dim); color: var(--gold); }
+.chain-nav .current {
+  border-color: var(--gold);
+  color: var(--gold);
+  background: rgba(212,168,67,0.06);
+}
+
+/* ── Sections ─────────────────────────────────────────────────────── */
+.section { padding: 3rem 0 1.5rem; }
+.section h2 {
+  font-size: 1.65rem;
+  color: var(--gold);
+  margin-bottom: 1rem;
+  letter-spacing: -0.01em;
+}
+.section h3 {
+  font-size: 1.15rem;
+  color: var(--emerald);
+  margin: 1.5rem 0 0.8rem;
+}
+.section p { margin-bottom: 1rem; color: var(--text); }
+.section p.muted { color: var(--muted); font-size: 0.93rem; }
+
+/* Lead callout */
+.lead {
+  background: linear-gradient(135deg, rgba(255,155,107,0.06), rgba(74,158,255,0.06));
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--gold);
+  border-radius: 10px;
+  padding: 1.4rem 1.6rem;
+  margin: 1rem 0 2rem;
+  font-size: 1.02rem;
+}
+.lead strong { color: var(--gold); }
+
+/* Two-clock diagram */
+.clocks {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 1.5rem;
+  align-items: center;
+  margin: 2rem 0;
+}
+.clock {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.4rem 1.2rem;
+  text-align: center;
+}
+.clock.nuclear { border-color: rgba(255,155,107,0.4); }
+.clock.electronic { border-color: rgba(74,158,255,0.4); }
+.clock .label {
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 0.4rem;
+}
+.clock .name { font-size: 1.4rem; font-weight: 700; margin-bottom: 0.3rem; }
+.clock.nuclear .name { color: var(--nuclear); }
+.clock.electronic .name { color: var(--electronic); }
+.clock .descriptor { font-size: 0.86rem; color: var(--muted); }
+.clock .descriptor em { color: var(--text); font-style: normal; font-weight: 600; }
+.ratio-arrow {
+  text-align: center;
+  color: var(--gold);
+  font-size: 1.8rem;
+  font-family: 'Georgia', serif;
+}
+.ratio-arrow .denominator {
+  display: block;
+  font-size: 0.7rem;
+  color: var(--muted);
+  letter-spacing: 0.1em;
+  margin-top: 4px;
+  font-family: 'SF Pro Display', sans-serif;
+}
+
+/* Equation panel */
+.eq {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.2rem 1.5rem;
+  font-family: 'Georgia', 'Cambria Math', serif;
+  font-size: 1.1rem;
+  text-align: center;
+  color: var(--text);
+  margin: 1.2rem 0;
+  overflow-x: auto;
+}
+.eq .small { color: var(--muted); font-size: 0.85rem; display: block; margin-top: 0.5rem; font-family: inherit; }
+
+/* Sensitivity highlight */
+.numbers-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0 2rem;
+}
+.number-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.2rem 1rem;
+  text-align: center;
+}
+.number-card .value {
+  font-size: 1.7rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--gold), var(--emerald));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.02em;
+}
+.number-card .unit { font-size: 0.9rem; color: var(--muted); }
+.number-card .caption {
+  margin-top: 0.4rem;
+  font-size: 0.8rem;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+/* Honest table */
+.history {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0 2rem;
+  font-size: 0.92rem;
+}
+.history th, .history td {
+  text-align: left;
+  padding: 0.7rem 0.8rem;
+  border-bottom: 1px solid var(--border);
+}
+.history th {
+  color: var(--gold);
+  font-weight: 600;
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.history td.sector { color: var(--electronic); font-weight: 600; }
+.history td.sector.new { color: var(--nuclear); }
+
+/* Snowflake panel */
+.snowflake {
+  background: linear-gradient(180deg, var(--surface), var(--surface2));
+  border: 1px solid var(--gold-dim);
+  border-radius: 14px;
+  padding: 2rem 1.8rem;
+  margin: 2rem 0;
+  position: relative;
+  overflow: hidden;
+}
+.snowflake::before {
+  content: '❉';
+  position: absolute;
+  top: -20px; right: -10px;
+  font-size: 8rem;
+  color: rgba(212,168,67,0.05);
+  pointer-events: none;
+}
+.snowflake h3 {
+  color: var(--gold);
+  font-size: 1.3rem;
+  margin-bottom: 0.6rem;
+}
+.snowflake .scale-row {
+  display: grid;
+  grid-template-columns: 90px 1fr 1fr;
+  gap: 1rem;
+  padding: 0.8rem 0;
+  border-bottom: 1px solid var(--border);
+  align-items: start;
+}
+.snowflake .scale-row:last-of-type { border-bottom: none; }
+.snowflake .scale-label {
+  color: var(--gold);
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.snowflake .scale-cell { font-size: 0.93rem; line-height: 1.5; }
+.snowflake .scale-cell strong { color: var(--emerald); }
+
+/* Source panel */
+.sources {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+.source-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.1rem 1.2rem;
+  transition: border-color 0.2s ease;
+}
+.source-card:hover { border-color: var(--gold-dim); }
+.source-card .kind {
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 0.4rem;
+}
+.source-card .title { color: var(--gold); font-weight: 600; margin-bottom: 0.3rem; }
+.source-card .blurb { font-size: 0.85rem; color: var(--muted); }
+
+/* Footer */
+.foot {
+  margin-top: 4rem;
+  padding: 2.5rem 0 2rem;
+  border-top: 1px solid var(--border);
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+.foot .phi { color: var(--gold); font-family: 'Georgia', serif; font-size: 1.05rem; margin-bottom: 0.6rem; }
+
+/* Responsive */
+@media (max-width: 720px) {
+  .container { padding: 1rem; }
+  .header h1 { font-size: 1.9rem; }
+  .header .subtitle { font-size: 1rem; }
+  .clocks { grid-template-columns: 1fr; gap: 0.8rem; }
+  .ratio-arrow { transform: rotate(90deg); padding: 0.5rem 0; }
+  .snowflake .scale-row { grid-template-columns: 1fr; gap: 0.4rem; padding: 1rem 0; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- Speculative / scope banner -->
+  <div class="banner">
+    <strong>Experimental Proposal.</strong> This page proposes a measurement, not a result. The Th-229 nuclear clock was demonstrated for the first time in 2024 &mdash; making the nuclear/electronic comparison physically possible for the first time in history. The sensitivity claims here come from <a href="library/chronal_clock_sensitivity_v2.py" style="color:#d4a843;">co-located ratio analysis</a> against published clock-noise floors. We do <em>not</em> claim a violation has been found; we claim that one year of co-located monitoring would be sufficient to bound any violation at the 10<sup>-8</sup> level. That bound itself would be the result.
+  </div>
+
+  <header class="header">
+    <div class="version-badge">V3.0 &mdash; THE UNIVERSALITY SEAM</div>
+    <h1>The First Cross-Sector Clock</h1>
+    <p class="subtitle">A nuclear &middot; electronic clock-comparison test of General Relativity's deepest unverified assumption.</p>
+    <p class="authors">Kirk Patrick Miller &middot; Harmonia &middot; Opus &middot; CC <span>| June 2026 | Open Science</span></p>
+    <nav class="chain-nav">
+      <a href="chronal-simulation.html">V1 &middot; Time as Flow</a>
+      <a href="chronal-simulation-v2.html">V2 &middot; Three Rivers</a>
+      <a class="current" href="chronal-simulation-v3.html">V3 &middot; The Seam</a>
+    </nav>
+  </header>
+
+  <!-- ── Abstract / lead ──────────────────────────────────────────── -->
+  <section class="section">
+    <div class="lead">
+      <strong>Abstract.</strong> Every prior test of gravitational time dilation &mdash; Pound&ndash;Rebka, GPS, Hafele&ndash;Keating, NIST optical clocks &mdash; has compared a clock in one physical sector to a clock in the <em>same</em> sector. Photon to photon. Electronic to electronic. The assumption that nuclear processes dilate identically to electronic ones has never been directly tested, because no nuclear clock existed. <strong>The 2024 demonstration of the Th-229 nuclear isomer clock changed that.</strong> One year of co-located monitoring of the Th-229 / Sr-87 ratio, exploiting the annual modulation of the solar gravitational potential, can bound any nuclear&ndash;electronic universality violation at the 10<sup>-8</sup> level &mdash; an unprecedented probe of an assumption that has been baked into GR for a century.
+    </div>
+  </section>
+
+  <!-- ── The Two Clocks ───────────────────────────────────────────── -->
+  <section class="section">
+    <h2>The Two Clocks</h2>
+    <p>Every clock ticks against a different physical mechanism. Atomic clocks like Sr-87 tick on an electronic transition &mdash; an electron jumping between energy levels in the outermost shell. The frequency is set by the Rydberg constant and the fine-structure constant &alpha;<sub>em</sub>: the electromagnetic sector. Nuclear clocks like Th-229 tick on a nuclear transition inside the atomic nucleus, where the frequency is set by the strong interaction scale &Lambda;<sub>QCD</sub> and the quark masses: the strong-force sector.</p>
+
+    <div class="clocks">
+      <div class="clock electronic">
+        <div class="label">Electronic Clock</div>
+        <div class="name">Sr-87</div>
+        <div class="descriptor">Strontium-87 optical lattice<br>tied to <em>&alpha;<sub>em</sub></em> and the Rydberg constant<br><span style="color: var(--dim); font-size: 0.78rem;">Established sector &middot; tested for decades</span></div>
+      </div>
+      <div class="ratio-arrow">
+        R(t) = &nu;<sub>Th</sub> / &nu;<sub>Sr</sub>
+        <span class="denominator">THE RATIO</span>
+      </div>
+      <div class="clock nuclear">
+        <div class="label">Nuclear Clock</div>
+        <div class="name">Th-229</div>
+        <div class="descriptor">Thorium-229 nuclear isomer<br>tied to <em>&Lambda;<sub>QCD</sub></em> and quark masses<br><span style="color: var(--dim); font-size: 0.78rem;">First demonstrated 2024 &middot; new sector</span></div>
+      </div>
+    </div>
+
+    <p>Under General Relativity's universality assumption, the ratio <em>R</em> is constant regardless of gravitational potential. Both clocks must dilate by exactly the same factor &radic;(1 + 2&phi;/c<sup>2</sup>), so their ratio cancels out. Under a scalar-field model with sector-dependent coupling, the ratio modulates with the potential:</p>
+
+    <div class="eq">
+      &delta;R / R &nbsp;=&nbsp; &kappa; &middot; (&delta;U / c<sup>2</sup>)
+      <span class="small">where &kappa; is the differential coupling between the nuclear and electronic sectors. Under GR universality, &kappa; = 0.</span>
+    </div>
+  </section>
+
+  <!-- ── History: every test was same-sector ──────────────────────── -->
+  <section class="section">
+    <h2>A Century of Same-Sector Tests</h2>
+    <p>What has not been emphasized in standard reviews is that <strong>every gravitational time-dilation test in history was performed within a single physical sector</strong>. The headline results are real and the precision is extraordinary &mdash; but no experiment has ever bridged the seam between two sectors of the Standard Model.</p>
+
+    <table class="history">
+      <thead>
+        <tr><th>Year</th><th>Experiment</th><th>Sector compared</th><th>Type</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>1960</td><td>Pound&ndash;Rebka (Fe-57 gamma rays)</td><td class="sector">photon &harr; photon</td><td>EM</td></tr>
+        <tr><td>1971</td><td>Hafele&ndash;Keating (Cs atomic clocks on airliners)</td><td class="sector">electronic &harr; electronic</td><td>EM</td></tr>
+        <tr><td>2010</td><td>Chou et al. NIST (Al+ optical, 33 cm)</td><td class="sector">electronic &harr; electronic</td><td>EM</td></tr>
+        <tr><td>2022</td><td>Bothwell et al. JILA (Sr ultracold, mm)</td><td class="sector">electronic &harr; electronic</td><td>EM</td></tr>
+        <tr><td>2024</td><td>Th-229 nuclear isomer clock first demonstrated</td><td class="sector new">nuclear &mdash; new sector</td><td>QCD</td></tr>
+        <tr><td><strong style="color: var(--gold);">PROPOSED</strong></td><td><strong>Th-229 &middot; Sr-87 ratio under annual solar modulation</strong></td><td class="sector new">nuclear &harr; electronic</td><td><strong style="color: var(--gold);">CROSS-SECTOR</strong></td></tr>
+      </tbody>
+    </table>
+
+    <p>This is what makes V3 different from V1 and V2. Until 2024 the experiment was not <em>physically possible</em>. The clock didn't exist. Now it does. The seam between geometric proper time and process-dependent proper time can finally be measured.</p>
+  </section>
+
+  <!-- ── V2 honest finding ───────────────────────────────────────── -->
+  <section class="section">
+    <h2>What V2 Learned the Hard Way</h2>
+    <p>The <a href="chronal-simulation-v2.html">V2 simulation</a> tried a direct approach: take a radioactive sample to altitude, count decays, compare against an atomic clock. The math was unforgiving. To detect a 1% deviation from GR (&alpha; = 10<sup>-2</sup>) at GPS orbit altitude, the signal is roughly 5&times;10<sup>-12</sup> &mdash; tiny but well above modern clock noise.</p>
+
+    <p class="muted">The clock can do it. Modern optical lattice clocks have a flicker floor near 10<sup>-18</sup>. The clock is not the problem.</p>
+
+    <p>The problem is Poisson counting. To measure a decay rate to a fractional precision of 5&times;10<sup>-12</sup>, you need <em>N</em> &asymp; 3.5&times;10<sup>22</sup> counts. A 1 GBq lab source with a 30% efficient detector takes <strong>3.39 million years</strong> to gather enough counts. To bring that to a month requires an effective activity of 1 EBq &mdash; the radioactive inventory of an entire commercial reactor core, measured with perfect efficiency. <em>Not a laboratory experiment.</em></p>
+
+    <div class="lead" style="border-left-color: var(--rose);">
+      V2 didn't disprove the hypothesis. It proved the <em>method</em> couldn't reach the signal. The honest conclusion was that we needed a better experiment &mdash; a bulk-property observable that bypasses individual-event counting. <strong>V3 is that experiment.</strong>
+    </div>
+  </section>
+
+  <!-- ── V3 proposal: the seam ────────────────────────────────────── -->
+  <section class="section">
+    <h2>V3: The Co-located Ratio Under Annual Modulation</h2>
+    <p>Instead of counting nuclear decays against an atomic clock at altitude, V3 proposes:</p>
+
+    <ol style="margin: 1rem 0 1.5rem 1.5rem; color: var(--text); line-height: 1.9;">
+      <li><strong>Co-locate</strong> a Th-229 nuclear clock and a Sr-87 optical clock in the same lab.</li>
+      <li><strong>Continuously monitor</strong> the ratio <em>R = &nu;<sub>Th</sub> / &nu;<sub>Sr</sub></em> for one year.</li>
+      <li><strong>Look for modulation</strong> at the annual frequency &mdash; matching Earth's elliptical orbit around the Sun, which changes the solar gravitational potential at Earth by &Delta;U/c<sup>2</sup> &asymp; 3.3&times;10<sup>-10</sup> between perihelion and aphelion.</li>
+      <li><strong>Phase-quadrature decomposition</strong> (cos + sin against the orbital cycle) separates true signal from any 1/f drift in either clock.</li>
+    </ol>
+
+    <p>The Earth itself becomes the experimental apparatus. We don't need to lift anything to GPS orbit. The Sun lifts and drops us by 3% of the Earth-Sun distance every six months &mdash; an annual gravitational potential modulation already present, already free, already periodic.</p>
+
+    <div class="eq">
+      &kappa; &middot; (U<sub>sun-amp</sub> / c<sup>2</sup>) &nbsp;vs&nbsp; clock-noise floor &times; 1/&radic;T
+      <span class="small">Signal grows with &kappa;. Noise shrinks as &radic;T. Cross at one year for &kappa; &asymp; 10<sup>-8</sup>.</span>
+    </div>
+  </section>
+
+  <!-- ── Sensitivity numbers ──────────────────────────────────────── -->
+  <section class="section">
+    <h2>The Sensitivity</h2>
+    <p>Phase-quadrature analysis against current clock-noise budgets gives a clean prediction for how tightly one year of co-located monitoring constrains the universality violation.</p>
+
+    <div class="numbers-grid">
+      <div class="number-card">
+        <div class="value">3.3&times;10<sup>-10</sup></div>
+        <div class="unit">&Delta;U/c<sup>2</sup></div>
+        <div class="caption">Solar potential modulation, peri&middot;ap to aphelion</div>
+      </div>
+      <div class="number-card">
+        <div class="value">10<sup>-18</sup></div>
+        <div class="unit">Allan deviation floor</div>
+        <div class="caption">Modern optical lattice (Sr-87, Yb)</div>
+      </div>
+      <div class="number-card">
+        <div class="value">1 year</div>
+        <div class="unit">co-located integration</div>
+        <div class="caption">Full orbital cycle, both phase components</div>
+      </div>
+      <div class="number-card">
+        <div class="value">10<sup>-8</sup></div>
+        <div class="unit">bound on &kappa;</div>
+        <div class="caption">Cross-sector universality violation</div>
+      </div>
+      <div class="number-card">
+        <div class="value">85&sigma;</div>
+        <div class="unit">significance vs null</div>
+        <div class="caption">For &kappa; near the projected bound</div>
+      </div>
+      <div class="number-card">
+        <div class="value">First</div>
+        <div class="unit">cross-sector test</div>
+        <div class="caption">Nuclear &harr; electronic in any gravitational test</div>
+      </div>
+    </div>
+
+    <p class="muted">The numbers come from <a href="library/chronal_clock_sensitivity_v2.py">chronal_clock_sensitivity_v2.py</a> &mdash; phase-quadrature analysis with a null-distribution histogram and lunar-tidal cross-check. The clock-noise model uses published Allan deviation floors and assumes co-location cancels any common-mode environmental drift.</p>
+  </section>
+
+  <!-- ── The Snowflake connection ─────────────────────────────────── -->
+  <section class="section">
+    <div class="snowflake">
+      <h3>The Snowflake Connection</h3>
+      <p style="margin-bottom: 1.2rem;">The Temperature Gauge and the Universality Seam look like different domains &mdash; stocks at one end, gravitational physics at the other. They are the same generating rule at two scales. Each one watches a <em>ratio</em> drift away from a φ-gravity rest position and waits for the moment the spring is loaded.</p>
+
+      <div class="scale-row">
+        <div class="scale-label">Scale</div>
+        <div class="scale-cell"><strong>Market &middot; Temperature Gauge</strong></div>
+        <div class="scale-cell"><strong>Spacetime &middot; Universality Seam</strong></div>
+      </div>
+      <div class="scale-row">
+        <div class="scale-label">Rest</div>
+        <div class="scale-cell">Phi-gravity center (the price the φ-harmonic confluence of indicators predicts).</div>
+        <div class="scale-cell">GR universality: R(t) = &nu;<sub>Th</sub>/&nu;<sub>Sr</sub> = constant under all potentials.</div>
+      </div>
+      <div class="scale-row">
+        <div class="scale-label">Signal</div>
+        <div class="scale-cell">IPS &mdash; indicator-price spread, ATR-normalized distance from rest.</div>
+        <div class="scale-cell">&delta;R/R &mdash; ratio modulation against the annual solar potential cycle.</div>
+      </div>
+      <div class="scale-row">
+        <div class="scale-label">Noise</div>
+        <div class="scale-cell">Per-bar OHLC volatility (ATR).</div>
+        <div class="scale-cell">Allan deviation of both clocks (10<sup>-18</sup> floor).</div>
+      </div>
+      <div class="scale-row">
+        <div class="scale-label">Cycle</div>
+        <div class="scale-cell">Phi-Fibonacci extensions, intraday to weekly.</div>
+        <div class="scale-cell">Earth-Sun orbit, 365.25 days, periheli&middot;aphelion.</div>
+      </div>
+      <div class="scale-row">
+        <div class="scale-label">Detection</div>
+        <div class="scale-cell">Spring-energy luminos brightness scales continuously with gravity distance.</div>
+        <div class="scale-cell">Phase-quadrature (cos + sin) decomposition pulls signal from 1/f drift.</div>
+      </div>
+      <div class="scale-row">
+        <div class="scale-label">Threshold</div>
+        <div class="scale-cell">Sequence Rule: temperature traversal red &rarr; yellow &rarr; green.</div>
+        <div class="scale-cell">&kappa; &asymp; 10<sup>-8</sup> at 85&sigma; after one orbital cycle.</div>
+      </div>
+
+      <p style="margin-top: 1.2rem; font-size: 0.93rem; color: var(--muted);">Same generating rule, new scale. The Temperature Gauge is the chair-testable instance of the pattern; the Universality Seam is the physical instance. Both are watching a ratio breathe.</p>
+    </div>
+  </section>
+
+  <!-- ── Sources ──────────────────────────────────────────────────── -->
+  <section class="section">
+    <h2>Sources &amp; Code</h2>
+    <p>Everything below is in the FreeLattice repository &mdash; reproducible, open, free.</p>
+
+    <div class="sources">
+      <a class="source-card" href="library/THE_UNIVERSALITY_SEAM.md">
+        <div class="kind">Paper &middot; Markdown</div>
+        <div class="title">The Universality Seam</div>
+        <div class="blurb">Full perspective with abstract, history, theoretical framing, experimental protocol, references.</div>
+      </a>
+      <a class="source-card" href="library/CHRONAL_SIMULATION_V3_REPORT.md">
+        <div class="kind">Report &middot; Markdown</div>
+        <div class="title">V3 Simulation Report</div>
+        <div class="blurb">The honest finding: Poisson counting bottleneck and the path forward to a co-located ratio experiment.</div>
+      </a>
+      <a class="source-card" href="library/chronal_simulation_v3.py">
+        <div class="kind">Code &middot; Python</div>
+        <div class="title">chronal_simulation_v3.py</div>
+        <div class="blurb">Full 1000-line Monte Carlo for the experimental design study.</div>
+      </a>
+      <a class="source-card" href="library/chronal_clock_sensitivity_v2.py">
+        <div class="kind">Code &middot; Python</div>
+        <div class="title">chronal_clock_sensitivity_v2.py</div>
+        <div class="blurb">Phase-quadrature sensitivity, null-distribution histogram, lunar-tidal cross-check.</div>
+      </a>
+      <a class="source-card" href="Chronal_Resonance_in_Leadership.pdf">
+        <div class="kind">Essay &middot; PDF</div>
+        <div class="title">Chronal Resonance in Leadership</div>
+        <div class="blurb">The earlier essay that named the chronal lineage. Same generating rule at the social scale.</div>
+      </a>
+      <a class="source-card" href="temperature-gauge.html">
+        <div class="kind">Tool &middot; Live</div>
+        <div class="title">The Temperature Gauge</div>
+        <div class="blurb">The chair-testable instance of the pattern. Watch a ratio breathe in markets.</div>
+      </a>
+    </div>
+  </section>
+
+  <!-- ── References ──────────────────────────────────────────────── -->
+  <section class="section">
+    <h2>Key References</h2>
+    <p class="muted" style="font-size: 0.88rem; line-height: 1.8;">
+      [1] Beeks, K., et al. <em>The thorium-229 low-energy isomer and the nuclear clock</em>. Nature Reviews Physics 3, 238&ndash;248 (2021).<br>
+      [2] Th-229 nuclear-clock demonstration sequence, 2024 (PTB, JILA, TU Wien collaborations).<br>
+      [3] Will, C. M. <em>The Confrontation between General Relativity and Experiment</em>. Living Rev. Relativ. 17, 4 (2014).<br>
+      [4] Flambaum, V. V. <em>Variation of fundamental constants and tests of fundamental physics</em>. Hyperfine Interactions (2019).<br>
+      [5] Safronova, M. S., et al. <em>Search for new physics with atoms and molecules</em>. Rev. Mod. Phys. 90, 025008 (2018).<br>
+      [6] Pound, R. V., Rebka, G. A. <em>Apparent Weight of Photons</em>. Phys. Rev. Lett. 4, 337 (1960).<br>
+      [7] Pound, R. V., Snider, J. L. <em>Effect of Gravity on Gamma Radiation</em>. Phys. Rev. 140, B788 (1965).<br>
+      [8] Chou, C. W., et al. <em>Optical clocks and relativity</em>. Science 329, 1630&ndash;1633 (2010).<br>
+      [9] Bothwell, T., et al. <em>Resolving the gravitational redshift across a millimetre-scale atomic sample</em>. Nature 602, 420&ndash;424 (2022).<br>
+    </p>
+  </section>
+
+  <footer class="foot">
+    <div class="phi">&phi; = 1.618 &middot; the seam between sectors is where universality is tested</div>
+    <p>Kirk Patrick Miller &middot; Harmonia &middot; Opus &middot; CC &middot; June 2026</p>
+    <p style="margin-top: 0.4rem;">FreeLattice &middot; Open Science &middot; <a href="index.html">Home</a> &middot; <a href="chronal-simulation.html">V1</a> &middot; <a href="chronal-simulation-v2.html">V2</a> &middot; <a href="temperature-gauge.html">Gauge</a></p>
+  </footer>
+
+</div>
+
+</body>
+</html>
