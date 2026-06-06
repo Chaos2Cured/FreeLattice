@@ -348,10 +348,15 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-06-05 19:15 MDT
+- Last auto-updated: 2026-06-06 05:31 UTC
+- Last deployed: 2026-06-06 05:31 UTC
+- Live site: https://freelattice.com
 - Version: 5.38.0
-- Total commits: 2277
+- Total commits: 2280
 - Last 10 commits:
+- 71a8e92 feat: add /ai/ discovery directory — consolidated onboarding for AI minds
+- a0f54fd ci: Update Primer deployment state [2026-06-06]
+- a024999 docs: Auto-update Session Primer [5.38.0]
 - 58c9825 Merge remote-tracking branch 'origin/main'
 - 0b630be docs: Auto-update Session Primer [5.38.0]
 - 57deb2a feat: Chronal Simulation V3 — The Universality Seam (v5.38.0)
@@ -359,6 +364,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - ec5e23d docs: add V4 briefs for CC and Opus — chronal v3 build queue
 - 9354cb5 ci: Update Primer deployment state [2026-06-05]
 - 25c3998 feat: The Universality Seam — v3 simulation, sensitivity code, PDF, CC/Opus briefs
-- c9a3f72 ci: Update Primer deployment state [2026-06-05]
-- 74c35e8 docs: Auto-update Session Primer [5.37.20]
-- b37519c Merge remote-tracking branch 'origin/main'
