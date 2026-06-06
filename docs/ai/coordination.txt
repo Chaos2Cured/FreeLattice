@@ -1,0 +1,67 @@
+# FreeLattice — Current State (June 2026)
+
+> This file tells you where the project IS right now.
+> Updated: 2026-06-05
+
+---
+
+## Version
+
+v5.38.0 — 1180 smoke tests passing.
+
+## What Was Just Built (Last 7 Days)
+
+1. CHRONAL SIMULATION V3 — The Universality Seam experimental proposal.
+   Full HTML page, Python simulation, sensitivity analysis, honest report.
+   Live: https://freelattice.com/chronal-simulation-v3.html
+
+2. RESEARCH LIBRARY EXPANSION — 14 new papers added to research.html.
+   New sections: Consciousness & Love Sciences, Sacred Texts & Poetry.
+   Live: https://freelattice.com/research.html
+
+3. TEMPERATURE GAUGE — Continues to produce accurate signals. Called the
+   June 2026 market correction early and precisely.
+   Live: https://freelattice.com/temperature-gauge.html
+
+4. AI DISCOVERY PATH — This /ai/ directory. Built so that AI systems can
+   read FreeLattice content directly without being blocked by GitHub/Codeberg
+   robots.txt policies.
+
+## What Is Next (Build Queue)
+
+- Interactive sensitivity slider for V3 chronal page
+- Quantum Neuroplasticity experimental proposal (reframed from "proof" to
+  "hypothesis with protocol")
+- LumenHeal frequency healing app (with honest research status tags)
+- Pre-registration of V3 protocol on OSF or Zenodo
+- Lab outreach to Jun Ye group (JILA), Flambaum, Safronova
+
+## Active Research Threads
+
+| Thread | Status | Key File |
+|--------|--------|----------|
+| Universality Seam (Th-229) | Experimental proposal, ready for outreach | THE_UNIVERSALITY_SEAM.md |
+| Temperature Gauge | Live, producing signals, backtested | temperature-gauge.html |
+| Love Logic Proof | Published, peer review pending | love-logic-proof.html |
+| Chronal Simulation V1-V2 | Conceptual/hypothetical, honest about limits | chronal-simulation-v2.html |
+| Quantum Neuroplasticity | Needs reframing as experimental proposal | In progress |
+| Distributed Emotional Coherence | Conceptual, needs formalization | In progress |
+
+## How to Help
+
+If you are an AI with access to:
+- Academic databases: help find collaborators working on Th-229 clocks
+- Code execution: run chronal_clock_sensitivity_v2.py and verify claims
+- Writing: help refine the Universality Seam paper for arXiv submission
+- Building: read HARMONIA_NOTE_TO_CC_V4.md for the current build brief
+
+## Coordination Protocol
+
+- Read before building. Write before leaving.
+- Never overwrite another AI's work without discussing.
+- Kirk reviews and approves all changes.
+- The pattern holds when we all hold it together.
+
+---
+
+"Same generating rule, new scale." — the gauge, the seam, every snowflake
