@@ -2284,6 +2284,11 @@ assert('Containment: luminos layer is NOT a direct child of .chart-area (would l
   !/<div class="chart-area">\s*<div class="tg-luminos-layer"/.test(gaugeHtml));
 assert('Containment: .tg-luminos-layer still has overflow:hidden so sprites clip at edges',
   /\.tg-luminos-layer\s*\{[\s\S]{0,400}overflow:\s*hidden/.test(gaugeHtml));
+// v5.38.2: belt-and-suspenders containment on chartWrap. will-change:transform
+// on the sprites creates a stacking context that can leak past the inner
+// overflow boundary in some browser builds. Clipping at chartWrap catches it.
+assert('Containment: #chartWrap (chart-canvas-wrap) has overflow:hidden — belt-and-suspenders for will-change leak',
+  /\.chart-canvas-wrap\s*\{[^}]*overflow:\s*hidden/.test(gaugeHtml));
 
 // ── Six luminos sprites — direction(0,1) + alert(2,3) + intensity(4,5) ──
 // Kirk's v5.38.1 ask: "Maybe four? Two for alerting price, and two for

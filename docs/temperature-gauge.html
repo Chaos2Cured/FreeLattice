@@ -300,7 +300,13 @@ body.tg-sidebar-collapsed .main { grid-template-columns: 1fr; }
 .price-display { display: flex; align-items: baseline; gap: 8px; }
 .price-main { font-size: 1.6rem; font-weight: 700; }
 .price-change { font-size: 0.85rem; font-weight: 500; }
-.chart-canvas-wrap { flex: 1; position: relative; min-height: 250px; max-height: 400px; }
+/* overflow: hidden is belt-and-suspenders containment for the luminos
+   sprites — .tg-luminos-layer already clips its own children, but the
+   sprites have `will-change: transform, opacity` which creates a
+   stacking context that can leak past the inner overflow boundary in
+   some browser builds. Clipping at the chartWrap level catches anything
+   that escapes the layer. Caught by Opus, v5.38.2. */
+.chart-canvas-wrap { flex: 1; position: relative; min-height: 250px; max-height: 400px; overflow: hidden; }
 canvas#mainChart { width: 100% !important; height: 100% !important; max-height: 400px; cursor: grab; }
 canvas#mainChart:active { cursor: grabbing; }
 
