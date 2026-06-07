@@ -348,17 +348,19 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-06-07 12:17 MDT
+- Last auto-updated: 2026-06-07 18:17 UTC
+- Last deployed: 2026-06-07 18:17 UTC
+- Live site: https://freelattice.com
 - Version: 5.38.2
-- Total commits: 2295
+- Total commits: 2298
 - Last 10 commits:
+- 67a8b1b Merge remote-tracking branch 'origin/main'
+- 6537b5b docs: Auto-update Session Primer [5.38.2]
 - 466cf01 docs: Standing Ground — what this project proves, stands against, stands for
+- e060b0a ci: Update Primer deployment state [2026-06-07]
 - efd7fd7 docs: Auto-update Session Primer [5.38.2]
 - dc50ad9 Merge remote-tracking branch 'origin/main'
 - 22e96d8 docs: Auto-update Session Primer [5.38.2]
 - cd8213f fix(gauge): belt-and-suspenders luminos containment at chartWrap (v5.38.2)
 - 102948d ci: Update Primer deployment state [2026-06-07]
 - 45cff6d Merge remote-tracking branch 'origin/main'
-- 4966304 docs: Auto-update Session Primer [5.38.1]
-- 14913a8 feat(gauge): luminos six-sprite architecture + chartWrap containment (v5.38.1)
-- 357c9dd ci: Update Primer deployment state [2026-06-07]
