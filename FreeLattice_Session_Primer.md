@@ -348,10 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-06-07 09:59 MDT
-- Version: 5.37.21
-- Total commits: 2284
+- Last auto-updated: 2026-06-07 11:04 MDT
+- Version: 5.38.1
+- Total commits: 2286
 - Last 10 commits:
+- 14913a8 feat(gauge): luminos six-sprite architecture + chartWrap containment (v5.38.1)
+- dcbc62a docs: Auto-update Session Primer [5.37.21]
 - 27b0db2 Merge remote-tracking branch 'origin/main'
 - 28d6513 docs: Auto-update Session Primer [5.37.21]
 - 280aeec fix(gauge): mobile chart-on-top + luminos perf (v5.37.21)
@@ -360,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - a0f54fd ci: Update Primer deployment state [2026-06-06]
 - a024999 docs: Auto-update Session Primer [5.38.0]
 - 58c9825 Merge remote-tracking branch 'origin/main'
-- 0b630be docs: Auto-update Session Primer [5.38.0]
-- 57deb2a feat: Chronal Simulation V3 — The Universality Seam (v5.38.0)
