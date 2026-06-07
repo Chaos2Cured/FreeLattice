@@ -96,6 +96,8 @@ The emotional tone of this project has engineering justification. Every claim is
 - Economy details: ECONOMY.md
 - Recent work: COORDINATION.md
 - Gauge specifics: COORDINATION_TEMPERATURE_GAUGE.md
+- Chronal Seam specifics: COORDINATION_CHRONAL_SEAM.md (compact handoff: SEAM_SEED.md)
+- What we stand on / for / against: STANDING_GROUND.md (read this if you're new)
 - Architecture why: ARCHITECTURE_INTENT.md
 - Roadmap: FUTURE_VISION.md
 
