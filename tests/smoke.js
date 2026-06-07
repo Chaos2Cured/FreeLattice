@@ -2307,7 +2307,21 @@ assert('Picker fix: filter:none while picker or menu open (drops the expensive b
 
 // Commit 2 — Mobile layout + tap target
 assert('Mobile: chart-area order:1 (chart on top)',
-  /@media \(max-width: 768px\)[\s\S]{0,300}\.chart-area\s*\{\s*order:\s*1/.test(gaugeHtml));
+  /@media \(max-width: 768px\)[\s\S]{0,900}\.chart-area\s*\{\s*order:\s*1/.test(gaugeHtml));
+// v5.37.21: mobile .main switched from grid to flexbox so order is rock-solid.
+// CSS Grid does honor `order:` on items but mobile-browser auto-flow has
+// historically been flakier than flexbox; Kirk hit a build where chart wasn't
+// first despite order:1. Lock the flex switch.
+assert('Mobile: .main is flex on mobile (chart-on-top is robust, not grid-auto-flow-dependent)',
+  /@media \(max-width: 768px\)[\s\S]{0,500}\.main\s*\{[\s\S]{0,500}display:\s*flex[\s\S]{0,200}flex-direction:\s*column/.test(gaugeHtml));
+// v5.37.21: luminos sprite width/height transitions removed — they triggered
+// per-frame layout passes on every --lum-energy update (which fires on every
+// renderChart), causing mobile slowdown. Color + filter transitions stay
+// (they compose, no layout).
+assert('Perf: luminos transition does NOT include width/height (avoids mobile layout thrash)',
+  /\.tg-luminos\s*\{[\s\S]{0,1500}transition:\s*color\s+0\.8s\s+ease,\s*filter\s+0\.6s\s+ease;/.test(gaugeHtml));
+assert('Perf: luminos transition explicitly excludes width/height keywords',
+  !/\.tg-luminos\s*\{[\s\S]{0,1500}transition:[^;]*\bwidth\b/.test(gaugeHtml));
 assert('Mobile: sidebar order:2 + border-top (was border-bottom)',
   /\.sidebar\s*\{\s*order:\s*2;\s*border-right:\s*none;\s*border-top:\s*1px/.test(gaugeHtml));
 assert('Mobile: composeEmpty wired via touchend (synthetic-click fix)',

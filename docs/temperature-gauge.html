@@ -136,7 +136,16 @@ body.tg-sidebar-collapsed .sidebar { display: none; }
 body.tg-sidebar-collapsed .main { grid-template-columns: 1fr; }
 #sidebarToggleBtn.tg-active { background: var(--gold); color: #0a0e1a; border-color: var(--gold); }
 @media (max-width: 768px) {
-  .main { grid-template-columns: 1fr; height: auto; }
+  /* Switch .main from CSS grid to flexbox on mobile. CSS Grid does honor
+     `order:` on its items, but the auto-flow placement is flakier across
+     mobile browsers than flexbox order — Kirk hit a build where the chart
+     wasn't first despite order:1. Flex order is rock-solid. v5.37.21. */
+  .main {
+    display: flex;
+    flex-direction: column;
+    grid-template-columns: 1fr;
+    height: auto;
+  }
   /* Chart on top on mobile — sidebar (controls) below. Per Kirk's mobile pass. */
   .chart-area { order: 1; }
   .sidebar {
@@ -331,7 +340,13 @@ canvas#mainChart:active { cursor: grabbing; }
   opacity: 0;
   will-change: transform, opacity;
   animation-play-state: running;
-  transition: width 0.6s ease, height 0.6s ease, color 0.8s ease, filter 0.6s ease;
+  /* Transitions removed for width/height — they triggered a full layout
+     pass on every frame during the 600ms ramp, and --lum-energy updates
+     on every renderChart (via __tgComposePostRender). On mobile GPUs the
+     two-sprite × 36-frame × 2-property layout thrash was visible as
+     UI slowdown. Size now updates discretely with the analysis cadence,
+     which is already gentle. v5.37.21. */
+  transition: color 0.8s ease, filter 0.6s ease;
 }
 body.tg-pause-luminos .tg-luminos { animation-play-state: paused; }
 /* Drop the blur while a picker or context menu is open — the filter is
