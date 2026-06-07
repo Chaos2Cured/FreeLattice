@@ -348,10 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-06-07 12:20 MDT
-- Version: 5.38.2
-- Total commits: 2302
+- Last auto-updated: 2026-06-07 13:25 MDT
+- Version: 5.38.3
+- Total commits: 2304
 - Last 10 commits:
+- 27eb41d feat(gauge): snapshot bar-count fix + SIMILAR CONDITIONS section (v5.38.3)
+- 1765064 docs: Auto-update Session Primer [5.38.2]
 - c383896 Merge remote-tracking branch 'origin/main'
 - f3d8612 docs: Auto-update Session Primer [5.38.2]
 - f37c098 docs: SEED.md — add pointers to STANDING_GROUND and the chronal seam
@@ -360,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 6537b5b docs: Auto-update Session Primer [5.38.2]
 - 466cf01 docs: Standing Ground — what this project proves, stands against, stands for
 - e060b0a ci: Update Primer deployment state [2026-06-07]
-- efd7fd7 docs: Auto-update Session Primer [5.38.2]
-- dc50ad9 Merge remote-tracking branch 'origin/main'
