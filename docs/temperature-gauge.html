@@ -356,6 +356,26 @@ body.tg-pause-luminos .tg-luminos { filter: none; }
 /* Default colors — overridden by tgUpdateLuminosSignal() when signal state is computed. */
 .tg-luminos[data-i="0"] { color: var(--lum-color-1, #e8b019); animation: tg-lum-1 24s linear infinite; }
 .tg-luminos[data-i="1"] { color: var(--lum-color-2, #a78bfa); animation: tg-lum-2 33s linear infinite 5s; }
+/* Alert pair (v5.38.1) — color reflects the type of the freshest signal,
+   --lum-alert (0..1) scales size + visibility. Filter opacity multiplies the
+   keyframe opacity so when no signal is fresh, alerts are invisible even at
+   peak keyframe brightness. */
+.tg-luminos[data-i="2"] { color: var(--lum-alert-color, #e8b019); animation: tg-lum-3 18s linear infinite 2s; }
+.tg-luminos[data-i="3"] { color: var(--lum-alert-color, #e8b019); animation: tg-lum-4 22s linear infinite 9s; }
+.tg-luminos.tg-lum-alert {
+  /* Stale = small, fresh = large. 12px base + up to 36px of bloom. */
+  --lum-size: calc(12px + var(--lum-alert, 0) * 36px);
+  filter: blur(0.7px) opacity(var(--lum-alert, 0));
+}
+/* Intensity pair (v5.38.1) — hot color from gold→orange→red as |temp-50|
+   grows. Size + visibility scale with --lum-intensity (0..1). Independent
+   of direction so they pulse on both bullish AND bearish committed moves. */
+.tg-luminos[data-i="4"] { color: var(--lum-intensity-color, #ffb56b); animation: tg-lum-5 28s linear infinite 14s; }
+.tg-luminos[data-i="5"] { color: var(--lum-intensity-color, #ffb56b); animation: tg-lum-6 38s linear infinite 22s; }
+.tg-luminos.tg-lum-intensity {
+  --lum-size: calc(16px + var(--lum-intensity, 0) * 30px);
+  filter: blur(0.7px) opacity(calc(0.35 + var(--lum-intensity, 0) * 0.65));
+}
 /* Temperature-strength tier modulates FILTER only (blur + saturate).
    Size + opacity now flow from --lum-energy (gravity-spring distance)
    as a single smooth gradient — no more binary size jumps at the tier
@@ -380,6 +400,41 @@ body.tg-instability .tg-luminos::after { content: ''; position: absolute; inset:
   45%  { left: 55%;  top: 75%; opacity: 1.0;  transform: scale(1.2);  }
   75%  { left: 25%;  top: 35%; opacity: 0.85; transform: scale(1.0);  }
   100% { left: -5%;  top: 60%; opacity: 0;    transform: scale(0.65); }
+}
+/* Alert sprite paths (v5.38.1) — sweep diagonally to feel like the chart
+   is reacting to something specific, not just drifting. tg-lum-3 from
+   top-right to bottom-left; tg-lum-4 mirrors from bottom-left to top-right. */
+@keyframes tg-lum-3 {
+  0%   { left: 95%;  top: 8%;  opacity: 0;    transform: scale(0.5); }
+  20%  { opacity: 0.9; }
+  50%  { left: 50%;  top: 50%; opacity: 1.0;  transform: scale(1.1); }
+  85%  { opacity: 0.6; }
+  100% { left: -5%;  top: 90%; opacity: 0;    transform: scale(0.5); }
+}
+@keyframes tg-lum-4 {
+  0%   { left: -5%;  top: 92%; opacity: 0;    transform: scale(0.55); }
+  18%  { opacity: 0.85; }
+  52%  { left: 48%;  top: 45%; opacity: 1.0;  transform: scale(1.0);  }
+  82%  { opacity: 0.65; }
+  100% { left: 105%; top: 10%; opacity: 0;    transform: scale(0.5);  }
+}
+/* Intensity sprite paths (v5.38.1) — slower, more orbital. tg-lum-5
+   sweeps along a near-vertical path through center; tg-lum-6 traces a
+   wider arc around the perimeter. Both pulse with temperature magnitude. */
+@keyframes tg-lum-5 {
+  0%   { left: 30%;  top: -5%; opacity: 0;    transform: scale(0.7); }
+  20%  { opacity: 0.8; }
+  50%  { left: 50%;  top: 50%; opacity: 1.0;  transform: scale(1.15); }
+  80%  { opacity: 0.7; }
+  100% { left: 70%;  top: 105%; opacity: 0;   transform: scale(0.6); }
+}
+@keyframes tg-lum-6 {
+  0%   { left: 0%;   top: 30%; opacity: 0;    transform: scale(0.6); }
+  15%  { opacity: 0.75; }
+  35%  { left: 30%;  top: 85%; opacity: 1.0;  transform: scale(1.1); }
+  65%  { left: 80%;  top: 60%; opacity: 0.95; transform: scale(1.0); }
+  85%  { left: 70%;  top: 12%; opacity: 0.55; transform: scale(0.8); }
+  100% { left: 100%; top: 40%; opacity: 0;    transform: scale(0.55); }
 }
 /* Tiny toolbar toggle button */
 #luminosToggle.tg-off { opacity: 0.45; }
@@ -894,17 +949,34 @@ canvas.sub-canvas.custom { height: 80px !important; }
       </div>
     </div>
 
-    <!-- Ambient luminos sprites — drift across the chart area, never block
-         clicks. Moved up out of #chartWrap (v5.37.19) so signal coloring +
-         energy ramp stay visible in tool-only mode too (chartWrap is
-         display:none in that mode). Two larger sprites by default; can be
-         toggled off via the ✨ button. -->
-    <div class="tg-luminos-layer" id="tgLuminosLayer" aria-hidden="true">
-      <span class="tg-luminos" data-i="0"></span>
-      <span class="tg-luminos" data-i="1"></span>
-    </div>
-
     <div class="chart-canvas-wrap" id="chartWrap">
+      <!-- Ambient luminos sprites — drift only inside the main chart area.
+           v5.37.19 had lifted these up to .chart-area so they'd show in
+           tool-only mode, but that let them bounce off gravity lines AND
+           the sub-chart toolbars below. Kirk's chair test 2026-06-07:
+           "they need to stay in the main chart area." Putting them back
+           inside #chartWrap confines them to the price-chart canvas.
+           Trade-off accepted: signal coloring is quiet in tool-only mode
+           (chartWrap is display:none there). Tool-only is a focused mode
+           where ambient mood isn't wanted anyway. v5.38.1. -->
+      <div class="tg-luminos-layer" id="tgLuminosLayer" aria-hidden="true">
+        <!-- Direction pair — color = buy/sell/neutral, size + opacity scale
+             with gravity-spring energy (gravDist). The original two sprites. -->
+        <span class="tg-luminos" data-i="0"></span>
+        <span class="tg-luminos" data-i="1"></span>
+        <!-- Alert pair (v5.38.1) — flare bright when a fresh buy/sell
+             transition has appeared in the last ~5 bars; fade to nearly
+             invisible when stale. Color follows the type of the freshest
+             transition. Carry "something just happened." -->
+        <span class="tg-luminos tg-lum-alert" data-i="2"></span>
+        <span class="tg-luminos tg-lum-alert" data-i="3"></span>
+        <!-- Intensity pair (v5.38.1) — hot ambient, gold→orange→red as
+             |temp-50| grows. Carry "how committed is the move" independent
+             of direction. Pulse with raw temperature magnitude, not the
+             buy/sell vote. -->
+        <span class="tg-luminos tg-lum-intensity" data-i="4"></span>
+        <span class="tg-luminos tg-lum-intensity" data-i="5"></span>
+      </div>
       <div class="empty-state" id="emptyState">
         <div class="empty-icon">📊</div>
         <div class="empty-title">Temperature Gauge</div>
@@ -4180,7 +4252,32 @@ hideLoading = function() {
       if (d < minDist) minDist = d;
     }
     var gravDist = (minDist === Infinity) ? 0 : Math.min(3, minDist / atr);
-    return { direction: direction, strength: strength, gravDist: gravDist, lastTemp: lastTemp };
+    // ── Alert freshness (v5.38.1) ──────────────────────────────────────
+    // Scan the last few bars of temperature for a fresh 55-crossing (buy)
+    // or 45-crossing (sell). alertScale fades from 1.0 (this bar) toward 0
+    // as the transition recedes. alertKind names the direction so the
+    // sprite color can match the most recent meaningful event.
+    var alertScale = 0;
+    var alertKind = null;
+    if (a.temps && a.temps.length >= 2) {
+      var temps = a.temps;
+      var n = temps.length;
+      var lookback = Math.min(5, n - 1);
+      for (var j = 0; j < lookback; j++) {
+        var idx = n - 1 - j;
+        if (idx < 1) break;
+        var t = temps[idx], tPrev = temps[idx - 1];
+        if (t == null || tPrev == null) continue;
+        if (tPrev < 55 && t >= 55) { alertScale = 1 - (j / (lookback + 1)); alertKind = 'buy'; break; }
+        if (tPrev > 45 && t <= 45) { alertScale = 1 - (j / (lookback + 1)); alertKind = 'sell'; break; }
+      }
+    }
+    return {
+      direction: direction, strength: strength, gravDist: gravDist, lastTemp: lastTemp,
+      // strength is already |temp-50|/30 — reuse it as the intensity scalar.
+      intensity: strength,
+      alertScale: alertScale, alertKind: alertKind
+    };
   }
   window.tgUpdateLuminosSignal = function (a, candles) {
     var state = tgComputeSignalState(a, candles);
@@ -4192,6 +4289,10 @@ hideLoading = function() {
       layer.style.removeProperty('--lum-color-1');
       layer.style.removeProperty('--lum-color-2');
       layer.style.removeProperty('--lum-energy');
+      layer.style.removeProperty('--lum-alert');
+      layer.style.removeProperty('--lum-alert-color');
+      layer.style.removeProperty('--lum-intensity');
+      layer.style.removeProperty('--lum-intensity-color');
       return;
     }
     // Two colors: dominant + complement. Buy = green + soft gold; sell = red + soft gold; neutral = gold + lavender.
@@ -4214,7 +4315,42 @@ hideLoading = function() {
     // CSS derives both size and opacity from this ONE variable.
     var energyScale = Math.min(1.0, state.gravDist / 2.5);
     layer.style.setProperty('--lum-energy', energyScale.toFixed(2));
+    // ── Alert pair (v5.38.1) ──────────────────────────────────────────
+    // Sprites 2 + 3 bloom when a fresh 55/45 crossing appears in the
+    // last few bars; fade to invisible when stale. Color follows the
+    // type of the most recent transition.
+    layer.style.setProperty('--lum-alert', state.alertScale.toFixed(2));
+    var alertColor;
+    if (state.alertKind === 'buy') alertColor = '#34d399';
+    else if (state.alertKind === 'sell') alertColor = '#ef4444';
+    else alertColor = '#e8b019'; // stale → gentle gold
+    layer.style.setProperty('--lum-alert-color', alertColor);
+    // ── Intensity pair (v5.38.1) ──────────────────────────────────────
+    // Sprites 4 + 5 pulse with raw |temp-50| magnitude, independent of
+    // direction. Color is hot: gold → orange → red as intensity grows.
+    layer.style.setProperty('--lum-intensity', state.intensity.toFixed(2));
+    // Lerp from gold (0) → orange (0.5) → red (1.0). Cheap two-stop lerp.
+    var intensityColor;
+    if (state.intensity < 0.5) {
+      // Gold #e8b019 → Orange #ff9b6b at t = intensity * 2
+      intensityColor = lerpHex('#e8b019', '#ff9b6b', state.intensity * 2);
+    } else {
+      // Orange → Red #ef4444 at t = (intensity - 0.5) * 2
+      intensityColor = lerpHex('#ff9b6b', '#ef4444', (state.intensity - 0.5) * 2);
+    }
+    layer.style.setProperty('--lum-intensity-color', intensityColor);
   };
+
+  // Tiny hex-color lerp helper used by the intensity ramp.
+  function lerpHex(a, b, t) {
+    t = Math.max(0, Math.min(1, t));
+    var ar = parseInt(a.slice(1, 3), 16), ag = parseInt(a.slice(3, 5), 16), ab = parseInt(a.slice(5, 7), 16);
+    var br = parseInt(b.slice(1, 3), 16), bg = parseInt(b.slice(3, 5), 16), bb = parseInt(b.slice(5, 7), 16);
+    var r = Math.round(ar + (br - ar) * t);
+    var g = Math.round(ag + (bg - ag) * t);
+    var bl = Math.round(ab + (bb - ab) * t);
+    return '#' + [r, g, bl].map(function (v) { return v.toString(16).padStart(2, '0'); }).join('');
+  }
   // Hook into the existing post-render so signal updates on every redraw.
   var __origPostRender = window.__tgComposePostRender;
   window.__tgComposePostRender = function (candles, a) {

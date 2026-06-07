@@ -2270,16 +2270,72 @@ assert('Maximize: right-click menu has "Maximize main chart" entry',
 assert('Maximize: Escape unsticks #chartWrap fullscreen too (not just sub-charts)',
   /Escape[\s\S]{0,800}chartWrap[\s\S]{0,300}tgMaximizeMainChart/.test(gaugeHtml));
 
-// Cross-mode consistency — the luminos layer must be visible in P, T, AND C mode.
-// Before v5.37.19 the layer lived inside #chartWrap which is display:none in
-// tool-only mode, so the signal coloring vanished in T mode. Lifted up to
-// .chart-area which is always visible.
-assert('Cross-mode: luminos layer is a child of .chart-area, not inside #chartWrap',
-  /<div class="chart-area">[\s\S]{0,2000}<div class="tg-luminos-layer" id="tgLuminosLayer"/.test(gaugeHtml));
-assert('Cross-mode: .chart-area is position:relative so the absolute layer anchors correctly',
-  /\.chart-area\s*\{[\s\S]{0,900}position:\s*relative/.test(gaugeHtml));
-assert('Cross-mode: luminos layer is NOT inside #chartWrap (would hide in tool-only mode)',
-  !/<div class="chart-canvas-wrap" id="chartWrap">[\s\S]{0,200}<div class="tg-luminos-layer"/.test(gaugeHtml));
+// Luminos containment (history, then current design):
+// - v5.37.19: lifted layer up to .chart-area so it'd show in tool-only mode.
+// - v5.38.1: PUT BACK inside #chartWrap because sprites were bouncing off
+//   gravity lines (correct) AND drifting into sub-charts below (wrong).
+//   Kirk's chair test 2026-06-07: "they need to stay in the main chart area."
+//   Trade-off: tool-only mode no longer shows signal coloring (chartWrap is
+//   display:none in that mode). That's accepted — tool-only is a focused
+//   sub-chart study mode where ambient mood isn't wanted anyway.
+assert('Containment: luminos layer is inside #chartWrap (confined to main chart)',
+  /<div class="chart-canvas-wrap" id="chartWrap">[\s\S]{0,2000}<div class="tg-luminos-layer" id="tgLuminosLayer"/.test(gaugeHtml));
+assert('Containment: luminos layer is NOT a direct child of .chart-area (would let sprites roam over sub-charts)',
+  !/<div class="chart-area">\s*<div class="tg-luminos-layer"/.test(gaugeHtml));
+assert('Containment: .tg-luminos-layer still has overflow:hidden so sprites clip at edges',
+  /\.tg-luminos-layer\s*\{[\s\S]{0,400}overflow:\s*hidden/.test(gaugeHtml));
+
+// ── Six luminos sprites — direction(0,1) + alert(2,3) + intensity(4,5) ──
+// Kirk's v5.38.1 ask: "Maybe four? Two for alerting price, and two for
+// intensity?" Implemented as two additional semantic pairs.
+assert('Luminos: 6 sprites in the layer (2 direction + 2 alert + 2 intensity)',
+  (gaugeHtml.match(/<span class="tg-luminos[^"]*" data-i="\d"/g) || []).length === 6);
+assert('Luminos: alert pair has tg-lum-alert class on data-i=2 and data-i=3',
+  /<span class="tg-luminos tg-lum-alert" data-i="2">/.test(gaugeHtml) &&
+  /<span class="tg-luminos tg-lum-alert" data-i="3">/.test(gaugeHtml));
+assert('Luminos: intensity pair has tg-lum-intensity class on data-i=4 and data-i=5',
+  /<span class="tg-luminos tg-lum-intensity" data-i="4">/.test(gaugeHtml) &&
+  /<span class="tg-luminos tg-lum-intensity" data-i="5">/.test(gaugeHtml));
+
+// Alert sprite CSS — bloom with --lum-alert, opacity via filter for keyframe compat.
+assert('Alert sprites: size = 12px + alert * 36px (small when stale, large on flare)',
+  /\.tg-luminos\.tg-lum-alert\s*\{[\s\S]{0,400}--lum-size:\s*calc\(12px\s*\+\s*var\(--lum-alert[^)]*\)\s*\*\s*36px\)/.test(gaugeHtml));
+assert('Alert sprites: opacity gated via filter:opacity(--lum-alert)',
+  /\.tg-luminos\.tg-lum-alert\s*\{[\s\S]{0,400}filter:[^;]*opacity\(var\(--lum-alert[^)]*\)\)/.test(gaugeHtml));
+
+// Intensity sprite CSS — pulse with --lum-intensity.
+assert('Intensity sprites: size = 16px + intensity * 30px',
+  /\.tg-luminos\.tg-lum-intensity\s*\{[\s\S]{0,400}--lum-size:\s*calc\(16px\s*\+\s*var\(--lum-intensity[^)]*\)\s*\*\s*30px\)/.test(gaugeHtml));
+assert('Intensity sprites: opacity = 0.35 + intensity * 0.65 (always at least faint)',
+  /\.tg-luminos\.tg-lum-intensity\s*\{[\s\S]{0,400}opacity\(calc\(0\.35\s*\+\s*var\(--lum-intensity[^)]*\)\s*\*\s*0\.65\)\)/.test(gaugeHtml));
+
+// Four new keyframes — alert (3, 4) + intensity (5, 6). Distinct drift paths.
+assert('Keyframes: tg-lum-3 (alert primary, top-right → bottom-left) exists',
+  /@keyframes tg-lum-3\s*\{[\s\S]{0,500}left:\s*95%[\s\S]{0,400}left:\s*-5%/.test(gaugeHtml));
+assert('Keyframes: tg-lum-4 (alert complement, bottom-left → top-right) exists',
+  /@keyframes tg-lum-4\s*\{[\s\S]{0,500}top:\s*92%[\s\S]{0,400}top:\s*10%/.test(gaugeHtml));
+assert('Keyframes: tg-lum-5 (intensity primary, near-vertical center) exists',
+  /@keyframes tg-lum-5/.test(gaugeHtml));
+assert('Keyframes: tg-lum-6 (intensity complement, orbital arc) exists',
+  /@keyframes tg-lum-6/.test(gaugeHtml));
+
+// JS state extensions
+assert('Signal state: tgComputeSignalState returns alertScale + alertKind + intensity',
+  /alertScale:\s*alertScale[\s\S]{0,200}alertKind:\s*alertKind/.test(gaugeHtml) &&
+  /intensity:\s*strength/.test(gaugeHtml));
+assert('Signal state: alert freshness scans temps for 55-crossing (buy) and 45-crossing (sell)',
+  /tPrev\s*<\s*55\s*&&\s*t\s*>=\s*55[\s\S]{0,200}alertKind\s*=\s*['"]buy['"]/.test(gaugeHtml) &&
+  /tPrev\s*>\s*45\s*&&\s*t\s*<=\s*45[\s\S]{0,200}alertKind\s*=\s*['"]sell['"]/.test(gaugeHtml));
+assert('Signal apply: setProperty for --lum-alert + --lum-alert-color',
+  /setProperty\(['"]--lum-alert['"]/.test(gaugeHtml) &&
+  /setProperty\(['"]--lum-alert-color['"]/.test(gaugeHtml));
+assert('Signal apply: setProperty for --lum-intensity + --lum-intensity-color',
+  /setProperty\(['"]--lum-intensity['"]/.test(gaugeHtml) &&
+  /setProperty\(['"]--lum-intensity-color['"]/.test(gaugeHtml));
+assert('Intensity color: hot lerp (gold → orange → red) via lerpHex helper',
+  /function lerpHex/.test(gaugeHtml) &&
+  /lerpHex\(['"]#e8b019['"],\s*['"]#ff9b6b['"]/.test(gaugeHtml) &&
+  /lerpHex\(['"]#ff9b6b['"],\s*['"]#ef4444['"]/.test(gaugeHtml));
 
 // Favicon (kills the 404)
 assert('Favicon: inline gold-spark favicon link present',
