@@ -2643,6 +2643,40 @@ assert('Snapshot: copySnapshot signature accepts centerIdx (so it can forward to
   /function copySnapshot\(barCount,\s*centerIdx\)/.test(gaugeHtml));
 assert('Snapshot: copySnapshot actually forwards centerIdx to buildSnapshot',
   /function copySnapshot\(barCount,\s*centerIdx\)[\s\S]{0,400}buildSnapshot\(barCount,\s*centerIdx\)/.test(gaugeHtml));
+
+// v5.38.3: the bar count bug. The render + signals + latest-signal loops all
+// ran to `n` (end of dataset) instead of `startIdx + barCount`. For tail
+// snapshots that looked right because startIdx was already near n; for
+// right-click neighborhoods anywhere in the middle, the window opened all
+// the way to the end of data. Kirk's symptom: "it captures more than the
+// ten bars to the left and right of the click." Fixed by introducing
+// endIdx = min(n, startIdx + barCount) and using it everywhere.
+assert('Snapshot bar-count fix: endIdx = Math.min(n, startIdx + barCount) computed',
+  /var endIdx\s*=\s*Math\.min\(n,\s*startIdx\s*\+\s*barCount\)/.test(gaugeHtml));
+assert('Snapshot bar-count fix: bar render loop uses endIdx (not n) as upper bound',
+  /for\s*\(var\s+i\s*=\s*startIdx;\s*i\s*<\s*endIdx;/.test(gaugeHtml));
+assert('Snapshot bar-count fix: signals collection loop uses endIdx',
+  /for\s*\(var\s+si\s*=\s*startIdx;\s*si\s*<\s*endIdx;/.test(gaugeHtml));
+assert('Snapshot bar-count fix: latest-signal scan walks endIdx-1 → startIdx (not n-1)',
+  /for\s*\(var\s+j\s*=\s*endIdx\s*-\s*1;\s*j\s*>=\s*startIdx;/.test(gaugeHtml));
+assert('Snapshot bar-count fix: header reads "Bars X→endIdx of N" (not "X→N of N")',
+  /'Bars '\s*\+\s*\(startIdx\s*\+\s*1\)\s*\+\s*'→'\s*\+\s*endIdx\s*\+\s*' of '\s*\+\s*n/.test(gaugeHtml));
+
+// v5.38.3: SIMILAR CONDITIONS section — Opus's research extension.
+assert('SIMILAR CONDITIONS: findSimilarConditions helper exists',
+  /function findSimilarConditions\(candles,\s*a,\s*refIdx\)/.test(gaugeHtml));
+assert('SIMILAR CONDITIONS: tolerance window is temp ±5, IPS ±1.0 (Opus brief)',
+  /TEMP_TOL\s*=\s*5/.test(gaugeHtml) && /IPS_TOL\s*=\s*1\.0/.test(gaugeHtml));
+assert('SIMILAR CONDITIONS: horizons are +5, +10, +20 bars',
+  /var horizons\s*=\s*\[5,\s*10,\s*20\]/.test(gaugeHtml));
+assert('SIMILAR CONDITIONS: builds the "SIMILAR CONDITIONS (historical frequency..." block',
+  /SIMILAR CONDITIONS \(historical frequency from this dataset\)/.test(gaugeHtml));
+assert('SIMILAR CONDITIONS: labeled as historical frequency, NOT a prediction',
+  /Historical frequency, not a prediction/.test(gaugeHtml));
+assert('SIMILAR CONDITIONS: skips immediate neighborhood (|i-refIdx| < 5)',
+  /Math\.abs\(i\s*-\s*refIdx\)\s*<\s*5/.test(gaugeHtml));
+assert('SIMILAR CONDITIONS: reference defaults to centerIdx (right-click), else last bar',
+  /var refIdx\s*=\s*\(centerIdx[^)]+\)\s*\?\s*centerIdx\s*:\s*\(n\s*-\s*1\)/.test(gaugeHtml));
 assert('Right-click menu: always-available "Style indicator:" picker (not compose-only)',
   gaugeHtml.includes("'Style indicator:'") &&
   /\['rsi',\s*'temperature',\s*'dt',\s*'ips'\]\.forEach\(addStyleItem\)/.test(gaugeHtml));

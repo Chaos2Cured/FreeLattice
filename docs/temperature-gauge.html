@@ -4474,6 +4474,76 @@ hideLoading = function() {
     return 'R';
   }
 
+  // ─── findSimilarConditions (v5.38.3) ────────────────────────────────
+  // Per Opus's brief: scan the full candle history for bars whose
+  // (temperature, ΔT-sign, IPS) match the reference bar within the
+  // tolerance windows Opus named. For each match, record what happened
+  // at +5, +10, +20 bars. Report counts + average % moves + % positive.
+  // Strictly historical frequency. Not a prediction.
+  //
+  // Reference bar = centerIdx (right-click cursor target) if provided,
+  // otherwise the most recent bar. This way the SIMILAR CONDITIONS
+  // section asks "the last N times THIS bar's setup occurred, what
+  // happened next?" — not "the last N times the present occurred."
+  function findSimilarConditions(candles, a, refIdx) {
+    if (!candles || candles.length < 25 || !a) return null;
+    if (!a.temps || !a.tempROC || !a.tpSpread) return null;
+    if (refIdx == null || refIdx < 0 || refIdx >= candles.length) return null;
+    var refTemp = a.temps[refIdx];
+    var refDt   = a.tempROC[refIdx];
+    var refIps  = a.tpSpread[refIdx];
+    if (refTemp == null || refDt == null || refIps == null) return null;
+    var refDtSign = refDt > 0 ? 1 : refDt < 0 ? -1 : 0;
+    // Tolerances per Opus: temp ±5, same ΔT sign, IPS ±1.0.
+    var TEMP_TOL = 5, IPS_TOL = 1.0;
+    var matches = [];
+    // Stop early enough that +20 bars forward exists in-sample.
+    for (var i = 0; i < candles.length - 20; i++) {
+      // Skip the immediate neighborhood of the reference bar so the
+      // setup itself doesn't count as its own match.
+      if (Math.abs(i - refIdx) < 5) continue;
+      var t = a.temps[i], dt = a.tempROC[i], ips = a.tpSpread[i];
+      if (t == null || dt == null || ips == null) continue;
+      if (Math.abs(t - refTemp) > TEMP_TOL) continue;
+      // ΔT-sign match unless the reference itself is flat (refDtSign === 0),
+      // in which case the sign filter is dropped.
+      if (refDtSign !== 0) {
+        var dtSign = dt > 0 ? 1 : dt < 0 ? -1 : 0;
+        if (dtSign !== refDtSign) continue;
+      }
+      if (Math.abs(ips - refIps) > IPS_TOL) continue;
+      matches.push(i);
+    }
+    if (matches.length === 0) return { count: 0, refTemp: refTemp, refDtSign: refDtSign, refIps: refIps };
+    var horizons = [5, 10, 20];
+    var pcts = { 5: [], 10: [], 20: [] };
+    var pos  = { 5: 0,  10: 0,  20: 0  };
+    matches.forEach(function (m) {
+      var base = candles[m].c;
+      horizons.forEach(function (h) {
+        var future = candles[m + h];
+        if (!future || base == null || base === 0) return;
+        var pct = (future.c - base) / base * 100;
+        pcts[h].push(pct);
+        if (pct > 0) pos[h]++;
+      });
+    });
+    var avg = function (arr) {
+      if (!arr.length) return null;
+      var s = 0;
+      for (var k = 0; k < arr.length; k++) s += arr[k];
+      return s / arr.length;
+    };
+    return {
+      count:    matches.length,
+      refTemp:  refTemp, refDtSign: refDtSign, refIps: refIps,
+      pct5:  avg(pcts[5]),  n5:  pcts[5].length,  posPct5:  pcts[5].length  ? (pos[5]  / pcts[5].length  * 100) : null,
+      pct10: avg(pcts[10]), n10: pcts[10].length, posPct10: pcts[10].length ? (pos[10] / pcts[10].length * 100) : null,
+      pct20: avg(pcts[20]), n20: pcts[20].length, posPct20: pcts[20].length ? (pos[20] / pcts[20].length * 100) : null
+    };
+  }
+
+
   function buildSnapshot(barCount, centerIdx) {
     if (typeof lastCandles === 'undefined' || !lastCandles || !lastCandles.length) return null;
     if (typeof lastAnalysis === 'undefined' || !lastAnalysis) return null;
@@ -4495,6 +4565,15 @@ hideLoading = function() {
     } else {
       startIdx = n - barCount;
     }
+    // v5.38.3 bug fix: bar render + signals + latest-signal scan all
+    // previously looped from startIdx to n (end of data), not to
+    // startIdx + barCount. For tail snapshots that looked right
+    // (startIdx is near n already). For right-click neighborhoods near
+    // the start or middle of the dataset, the loop ran from the cursor
+    // ALL THE WAY to the end of data — Kirk's symptom: "it captures more
+    // than the ten bars to the left and right of the click." Use
+    // endIdx (exclusive upper bound) everywhere below instead of n.
+    var endIdx = Math.min(n, startIdx + barCount);
 
     // Active rule
     var ruleName = 'Sequence Rule';
@@ -4524,7 +4603,7 @@ hideLoading = function() {
       var rule = (typeof RULE_REGISTRY !== 'undefined') ? RULE_REGISTRY[rid] : null;
       if (rule && typeof rule.evaluate === 'function') {
         var result = rule.evaluate(candles, a);
-        for (var si = startIdx; si < n; si++) {
+        for (var si = startIdx; si < endIdx; si++) {
           if (result.buy && result.buy[si] != null) signals[si] = '▲ BUY';
           else if (result.sell && result.sell[si] != null) signals[si] = '▼ SELL';
         }
@@ -4535,7 +4614,7 @@ hideLoading = function() {
     lines.push('╔══════════════════════════════════════════════════════════════╗');
     lines.push('║  TEMPERATURE GAUGE SNAPSHOT                                  ║');
     lines.push('║  ' + padR(symbol + ' · ' + interval.toUpperCase() + ' · ' + ruleName, 60) + '║');
-    lines.push('║  ' + padR('Bars ' + (startIdx + 1) + '→' + n + ' of ' + n + ' · EMAs: ' + emaPeriods, 60) + '║');
+    lines.push('║  ' + padR('Bars ' + (startIdx + 1) + '→' + endIdx + ' of ' + n + ' · EMAs: ' + emaPeriods, 60) + '║');
     if (gravityPrice != null) {
       lines.push('║  ' + padR('Gravity: $' + fmtPrice(gravityPrice).trim() + ' · ATR(14): $' + (a.lastATR ? a.lastATR.toFixed(2) : '—'), 60) + '║');
     }
@@ -4544,7 +4623,7 @@ hideLoading = function() {
     lines.push(' Bar  Date        Open     High     Low      Close    Temp Z   RSI   MACD-H    ΔT     IPS   Signal');
     lines.push(' ───  ──────────  ───────  ───────  ───────  ───────  ──── ─  ────  ──────  ─────  ─────  ──────');
 
-    for (var i = startIdx; i < n; i++) {
+    for (var i = startIdx; i < endIdx; i++) {
       var c = candles[i];
       var d = new Date(c.t);
       var dateStr = (interval === '1d' || interval === '1wk')
@@ -4587,7 +4666,7 @@ hideLoading = function() {
     }
 
     var lastSig = null;
-    for (var j = n - 1; j >= startIdx; j--) {
+    for (var j = endIdx - 1; j >= startIdx; j--) {
       if (signals[j]) { lastSig = { bar: j + 1, signal: signals[j], price: candles[j].c }; break; }
     }
     if (lastSig) {
@@ -4605,6 +4684,37 @@ hideLoading = function() {
 
     if (a.components && a.components.divergence && a.components.divergence !== 'none') {
       lines.push(' ⚠ Active divergence: ' + a.components.divergence);
+    }
+
+    // ── SIMILAR CONDITIONS (v5.38.3 — Opus's brief) ───────────────────
+    // "The last N times the spring was this loaded, here's what released."
+    // Reference bar = the cursor target (right-click) or the last bar.
+    var refIdx = (centerIdx != null && centerIdx >= 0 && centerIdx < n) ? centerIdx : (n - 1);
+    var sim = findSimilarConditions(candles, a, refIdx);
+    if (sim && sim.count > 0) {
+      lines.push('');
+      lines.push(' SIMILAR CONDITIONS (historical frequency from this dataset)');
+      lines.push(' ──────────────────────────────────────────────────────────');
+      var dtPhrase = sim.refDtSign > 0 ? 'rising' : sim.refDtSign < 0 ? 'falling' : 'flat';
+      lines.push(' Reference (bar ' + (refIdx + 1) + '): Temp ' + sim.refTemp.toFixed(1) +
+                 ' ±5, ΔT ' + dtPhrase + ', IPS ' + sim.refIps.toFixed(2) + ' ±1.0');
+      lines.push(' Matches: ' + sim.count + ' similar bars elsewhere in history');
+      lines.push('');
+      var fmtH = function (label, pct, posPct, n) {
+        if (pct == null || n === 0) return ' ' + label + '  (no data)';
+        var move = (pct >= 0 ? '+' : '') + pct.toFixed(2) + '%';
+        var pos  = posPct == null ? '' : ' · ' + posPct.toFixed(0) + '% positive';
+        return ' ' + label + '  avg ' + move + ' (n=' + n + ')' + pos;
+      };
+      lines.push(fmtH('+5  bars:', sim.pct5,  sim.posPct5,  sim.n5));
+      lines.push(fmtH('+10 bars:', sim.pct10, sim.posPct10, sim.n10));
+      lines.push(fmtH('+20 bars:', sim.pct20, sim.posPct20, sim.n20));
+      lines.push('');
+      lines.push(' ⚠ Historical frequency, not a prediction. Sample size may be small.');
+    } else if (sim && sim.count === 0) {
+      lines.push('');
+      lines.push(' SIMILAR CONDITIONS: no matches in this dataset.');
+      lines.push(' (Looking for Temp ±5, same ΔT sign, IPS ±1.0 of reference bar.)');
     }
 
     lines.push('');
