@@ -388,7 +388,7 @@ body.tg-pause-luminos .tg-luminos { filter: none; }
    Slightly smaller than their primary pair so they read as satellites
    rather than equals. */
 .tg-luminos[data-i="6"] { color: var(--lum-color-1, #6b7280); animation: tg-lum-7 27s linear infinite 6s; }
-.tg-luminos[data-i="7"] { color: var(--lum-alert-color, #06b6d4);     animation: tg-lum-8 19s linear infinite 11s; }
+.tg-luminos[data-i="7"] { color: var(--lum-alert-color, #eab308);     animation: tg-lum-8 19s linear infinite 11s; }
 .tg-luminos[data-i="8"] { color: var(--lum-intensity-color, #c4b5fd); animation: tg-lum-9 33s linear infinite 17s; }
 .tg-luminos.tg-lum-bonus-direction {
   --lum-size: calc(18px + var(--lum-energy, 0) * 22px);
@@ -4377,14 +4377,16 @@ hideLoading = function() {
     // CSS derives both size and opacity from this ONE variable.
     var energyScale = Math.min(1.0, state.gravDist / 2.5);
     layer.style.setProperty('--lum-energy', energyScale.toFixed(2));
-    // ── Alert pair (v5.38.1, recolored v5.38.4) ──────────────────────
-    // CYAN family — the alert pair signals "something just fired."
-    // Direction info lives in the direction sprites; alert sprites only
-    // carry freshness. Stale = soft cyan (barely visible via opacity
-    // gate anyway), fresh = bright electric cyan.
+    // ── Alert pair (v5.38.1 → v5.38.4 cyan → v5.38.5 amber) ───────────
+    // AMBER family — the alert pair signals "something just fired."
+    // v5.38.4 used cyan, but cyan sits visually too close to the green
+    // of the direction-buy sprites (Kirk caught it in the chair). Amber
+    // is distinct from red, green, slate gray, AND purple, and reads
+    // universally as "attention, warning, something happened." Stale =
+    // pale amber, fresh = vivid amber.
     layer.style.setProperty('--lum-alert', state.alertScale.toFixed(2));
     layer.style.setProperty('--lum-alert-color',
-      lerpHex('#67e8f9', '#06b6d4', state.alertScale));
+      lerpHex('#fde68a', '#eab308', state.alertScale));
     // ── Intensity pair (v5.38.1, recolored v5.38.4) ───────────────────
     // PURPLE family — intensity sprites pulse with |temp-50| magnitude,
     // independent of direction. Low = pale lavender. High = vivid magenta.

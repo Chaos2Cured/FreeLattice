@@ -2347,11 +2347,11 @@ assert('Signal apply: setProperty for --lum-intensity + --lum-intensity-color',
 assert('Intensity color: purple lerp (lavender → magenta) via lerpHex',
   /function lerpHex/.test(gaugeHtml) &&
   /lerpHex\(['"]#c4b5fd['"],\s*['"]#c026d3['"],\s*state\.intensity\)/.test(gaugeHtml));
-// v5.38.4: alert color lerps from soft cyan → bright electric cyan.
-// Cyan family is distinct from direction (red/green) and intensity (purple),
-// so the alert pair reads as "freshness" not "direction."
-assert('Alert color: cyan lerp (soft → electric) via lerpHex',
-  /lerpHex\(['"]#67e8f9['"],\s*['"]#06b6d4['"],\s*state\.alertScale\)/.test(gaugeHtml));
+// v5.38.5: alert recolored from cyan → amber. Cyan #06b6d4 sat too close
+// to direction-buy green #34d399 in the chair; Kirk caught it. Amber
+// (#fde68a → #eab308) is distinct from red, green, slate gray, AND purple.
+assert('Alert color: amber lerp (soft → vivid) via lerpHex',
+  /lerpHex\(['"]#fde68a['"],\s*['"]#eab308['"],\s*state\.alertScale\)/.test(gaugeHtml));
 
 // v5.38.4: three bonus sprites — one per pair — visible only when that
 // pair's scalar exceeds 0.6. "More of them the bigger the signal."
