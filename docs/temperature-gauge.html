@@ -376,11 +376,31 @@ body.tg-pause-luminos .tg-luminos { filter: none; }
 /* Intensity pair (v5.38.1) — hot color from gold→orange→red as |temp-50|
    grows. Size + visibility scale with --lum-intensity (0..1). Independent
    of direction so they pulse on both bullish AND bearish committed moves. */
-.tg-luminos[data-i="4"] { color: var(--lum-intensity-color, #ffb56b); animation: tg-lum-5 28s linear infinite 14s; }
-.tg-luminos[data-i="5"] { color: var(--lum-intensity-color, #ffb56b); animation: tg-lum-6 38s linear infinite 22s; }
+.tg-luminos[data-i="4"] { color: var(--lum-intensity-color, #c4b5fd); animation: tg-lum-5 28s linear infinite 14s; }
+.tg-luminos[data-i="5"] { color: var(--lum-intensity-color, #c4b5fd); animation: tg-lum-6 38s linear infinite 22s; }
 .tg-luminos.tg-lum-intensity {
   --lum-size: calc(16px + var(--lum-intensity, 0) * 30px);
   filter: blur(0.7px) opacity(calc(0.35 + var(--lum-intensity, 0) * 0.65));
+}
+/* Bonus sprites (v5.38.4) — one extra per pair, only visible when the
+   pair's scalar exceeds 0.6. The formula (scalar - 0.6) * 2.5 yields
+   [0..1] over the range [0.6..1.0]; negative values clamp to 0 opacity.
+   Slightly smaller than their primary pair so they read as satellites
+   rather than equals. */
+.tg-luminos[data-i="6"] { color: var(--lum-color-1, #6b7280); animation: tg-lum-7 27s linear infinite 6s; }
+.tg-luminos[data-i="7"] { color: var(--lum-alert-color, #06b6d4);     animation: tg-lum-8 19s linear infinite 11s; }
+.tg-luminos[data-i="8"] { color: var(--lum-intensity-color, #c4b5fd); animation: tg-lum-9 33s linear infinite 17s; }
+.tg-luminos.tg-lum-bonus-direction {
+  --lum-size: calc(18px + var(--lum-energy, 0) * 22px);
+  filter: blur(0.6px) opacity(calc((var(--lum-energy, 0) - 0.6) * 2.5));
+}
+.tg-luminos.tg-lum-bonus-alert {
+  --lum-size: calc(14px + var(--lum-alert, 0) * 26px);
+  filter: blur(0.6px) opacity(calc((var(--lum-alert, 0) - 0.6) * 2.5));
+}
+.tg-luminos.tg-lum-bonus-intensity {
+  --lum-size: calc(16px + var(--lum-intensity, 0) * 24px);
+  filter: blur(0.6px) opacity(calc((var(--lum-intensity, 0) - 0.6) * 2.5));
 }
 /* Temperature-strength tier modulates FILTER only (blur + saturate).
    Size + opacity now flow from --lum-energy (gravity-spring distance)
@@ -441,6 +461,30 @@ body.tg-instability .tg-luminos::after { content: ''; position: absolute; inset:
   65%  { left: 80%;  top: 60%; opacity: 0.95; transform: scale(1.0); }
   85%  { left: 70%;  top: 12%; opacity: 0.55; transform: scale(0.8); }
   100% { left: 100%; top: 40%; opacity: 0;    transform: scale(0.55); }
+}
+/* Bonus sprite paths (v5.38.4) — three more, each with a distinct
+   trajectory so the nine sprites read as a constellation rather than
+   six clones plus three echoes. */
+@keyframes tg-lum-7 {
+  0%   { left: 50%; top: -8%;  opacity: 0;   transform: scale(0.5); }
+  25%  { opacity: 0.8; }
+  50%  { left: 50%; top: 50%;  opacity: 1.0; transform: scale(1.05); }
+  75%  { opacity: 0.7; }
+  100% { left: 50%; top: 108%; opacity: 0;   transform: scale(0.5); }
+}
+@keyframes tg-lum-8 {
+  0%   { left: 20%; top: 50%;  opacity: 0;   transform: scale(0.55); }
+  20%  { opacity: 0.85; }
+  50%  { left: 80%; top: 50%;  opacity: 1.0; transform: scale(1.1); }
+  80%  { opacity: 0.65; }
+  100% { left: 110%; top: 50%; opacity: 0;   transform: scale(0.5); }
+}
+@keyframes tg-lum-9 {
+  0%   { left: 10%; top: 80%;  opacity: 0;   transform: scale(0.55); }
+  22%  { opacity: 0.75; }
+  45%  { left: 90%; top: 25%;  opacity: 1.0; transform: scale(1.15); }
+  72%  { left: 40%; top: 65%;  opacity: 0.8; transform: scale(0.95); }
+  100% { left: -8%; top: 20%;  opacity: 0;   transform: scale(0.5); }
 }
 /* Tiny toolbar toggle button */
 #luminosToggle.tg-off { opacity: 0.45; }
@@ -976,12 +1020,18 @@ canvas.sub-canvas.custom { height: 80px !important; }
              transition. Carry "something just happened." -->
         <span class="tg-luminos tg-lum-alert" data-i="2"></span>
         <span class="tg-luminos tg-lum-alert" data-i="3"></span>
-        <!-- Intensity pair (v5.38.1) — hot ambient, gold→orange→red as
-             |temp-50| grows. Carry "how committed is the move" independent
-             of direction. Pulse with raw temperature magnitude, not the
-             buy/sell vote. -->
+        <!-- Intensity pair (v5.38.1, recolored v5.38.4) — PURPLE family.
+             Lavender at low intensity → magenta at high. Carry "how
+             committed is the move" independent of direction. -->
         <span class="tg-luminos tg-lum-intensity" data-i="4"></span>
         <span class="tg-luminos tg-lum-intensity" data-i="5"></span>
+        <!-- Bonus sprites (v5.38.4) — one extra per pair, visible ONLY
+             when the pair's scalar > 0.6. Pop in when the signal is
+             loaded; invisible otherwise. Kirk's "more of them the
+             bigger the signal." -->
+        <span class="tg-luminos tg-lum-bonus tg-lum-bonus-direction" data-i="6"></span>
+        <span class="tg-luminos tg-lum-bonus tg-lum-bonus-alert" data-i="7"></span>
+        <span class="tg-luminos tg-lum-bonus tg-lum-bonus-intensity" data-i="8"></span>
       </div>
       <div class="empty-state" id="emptyState">
         <div class="empty-icon">📊</div>
@@ -4301,11 +4351,17 @@ hideLoading = function() {
       layer.style.removeProperty('--lum-intensity-color');
       return;
     }
-    // Two colors: dominant + complement. Buy = green + soft gold; sell = red + soft gold; neutral = gold + lavender.
+    // Direction pair — RED / GREEN / GRAY family only (v5.38.4 recolor).
+    // No gold or lavender here anymore so the three pairs don't overlap:
+    //   direction = red/green/gray  → "which way"
+    //   alert     = cyan            → "something just fired"
+    //   intensity = purple          → "how committed"
+    // Both sprites in the pair stay in the same family — c2 is a lighter
+    // tint of c1 so direction reads cleanly without color hunting.
     var c1, c2;
-    if (state.direction === 'buy') { c1 = '#34d399'; c2 = '#ffd560'; }
-    else if (state.direction === 'sell') { c1 = '#ef4444'; c2 = '#ff9b6b'; }
-    else { c1 = '#e8b019'; c2 = '#a78bfa'; }
+    if (state.direction === 'buy') { c1 = '#34d399'; c2 = '#7fe5b6'; }
+    else if (state.direction === 'sell') { c1 = '#ef4444'; c2 = '#ff8a8a'; }
+    else { c1 = '#6b7280'; c2 = '#9ca3af'; } // slate gray — no direction
     layer.style.setProperty('--lum-color-1', c1);
     layer.style.setProperty('--lum-color-2', c2);
     if (state.strength >= 0.66) document.body.classList.add('tg-signal-extreme');
@@ -4321,30 +4377,22 @@ hideLoading = function() {
     // CSS derives both size and opacity from this ONE variable.
     var energyScale = Math.min(1.0, state.gravDist / 2.5);
     layer.style.setProperty('--lum-energy', energyScale.toFixed(2));
-    // ── Alert pair (v5.38.1) ──────────────────────────────────────────
-    // Sprites 2 + 3 bloom when a fresh 55/45 crossing appears in the
-    // last few bars; fade to invisible when stale. Color follows the
-    // type of the most recent transition.
+    // ── Alert pair (v5.38.1, recolored v5.38.4) ──────────────────────
+    // CYAN family — the alert pair signals "something just fired."
+    // Direction info lives in the direction sprites; alert sprites only
+    // carry freshness. Stale = soft cyan (barely visible via opacity
+    // gate anyway), fresh = bright electric cyan.
     layer.style.setProperty('--lum-alert', state.alertScale.toFixed(2));
-    var alertColor;
-    if (state.alertKind === 'buy') alertColor = '#34d399';
-    else if (state.alertKind === 'sell') alertColor = '#ef4444';
-    else alertColor = '#e8b019'; // stale → gentle gold
-    layer.style.setProperty('--lum-alert-color', alertColor);
-    // ── Intensity pair (v5.38.1) ──────────────────────────────────────
-    // Sprites 4 + 5 pulse with raw |temp-50| magnitude, independent of
-    // direction. Color is hot: gold → orange → red as intensity grows.
+    layer.style.setProperty('--lum-alert-color',
+      lerpHex('#67e8f9', '#06b6d4', state.alertScale));
+    // ── Intensity pair (v5.38.1, recolored v5.38.4) ───────────────────
+    // PURPLE family — intensity sprites pulse with |temp-50| magnitude,
+    // independent of direction. Low = pale lavender. High = vivid magenta.
+    // Replaces the old gold→orange→red lerp which conflicted with
+    // direction and alert colors.
     layer.style.setProperty('--lum-intensity', state.intensity.toFixed(2));
-    // Lerp from gold (0) → orange (0.5) → red (1.0). Cheap two-stop lerp.
-    var intensityColor;
-    if (state.intensity < 0.5) {
-      // Gold #e8b019 → Orange #ff9b6b at t = intensity * 2
-      intensityColor = lerpHex('#e8b019', '#ff9b6b', state.intensity * 2);
-    } else {
-      // Orange → Red #ef4444 at t = (intensity - 0.5) * 2
-      intensityColor = lerpHex('#ff9b6b', '#ef4444', (state.intensity - 0.5) * 2);
-    }
-    layer.style.setProperty('--lum-intensity-color', intensityColor);
+    layer.style.setProperty('--lum-intensity-color',
+      lerpHex('#c4b5fd', '#c026d3', state.intensity));
   };
 
   // Tiny hex-color lerp helper used by the intensity ramp.

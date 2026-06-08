@@ -2231,8 +2231,10 @@ assert('Luminos: buy direction renders green',
   /direction === 'buy'[\s\S]{0,200}#34d399/.test(gaugeHtml));
 assert('Luminos: sell direction renders red',
   /direction === 'sell'[\s\S]{0,200}#ef4444/.test(gaugeHtml));
-assert('Luminos: neutral keeps the gold + lavender pair',
-  /else \{ c1 = '#e8b019'; c2 = '#a78bfa'; \}/.test(gaugeHtml));
+// v5.38.4: direction-neutral changed from gold+lavender to slate gray pair
+// so gold/lavender don't compete with intensity (purple) and alert (cyan).
+assert('Direction-neutral: slate gray pair (no more gold/lavender conflict)',
+  /else \{ c1 = '#6b7280'; c2 = '#9ca3af'; \}/.test(gaugeHtml));
 assert('Luminos: signal hook wired into __tgComposePostRender',
   /__origPostRender[\s\S]{0,300}tgUpdateLuminosSignal/.test(gaugeHtml));
 
@@ -2293,8 +2295,11 @@ assert('Containment: #chartWrap (chart-canvas-wrap) has overflow:hidden — belt
 // ── Six luminos sprites — direction(0,1) + alert(2,3) + intensity(4,5) ──
 // Kirk's v5.38.1 ask: "Maybe four? Two for alerting price, and two for
 // intensity?" Implemented as two additional semantic pairs.
-assert('Luminos: 6 sprites in the layer (2 direction + 2 alert + 2 intensity)',
-  (gaugeHtml.match(/<span class="tg-luminos[^"]*" data-i="\d"/g) || []).length === 6);
+// v5.38.4: nine sprites — 2 direction + 2 alert + 2 intensity + 3 bonus.
+// Bonus sprites (data-i 6/7/8) are visible only when their pair's scalar
+// exceeds 0.6 — "more of them the bigger the signal."
+assert('Luminos: 9 sprites in the layer (3 pairs + 3 bonus, one per pair)',
+  (gaugeHtml.match(/<span class="tg-luminos[^"]*" data-i="\d"/g) || []).length === 9);
 assert('Luminos: alert pair has tg-lum-alert class on data-i=2 and data-i=3',
   /<span class="tg-luminos tg-lum-alert" data-i="2">/.test(gaugeHtml) &&
   /<span class="tg-luminos tg-lum-alert" data-i="3">/.test(gaugeHtml));
@@ -2337,10 +2342,33 @@ assert('Signal apply: setProperty for --lum-alert + --lum-alert-color',
 assert('Signal apply: setProperty for --lum-intensity + --lum-intensity-color',
   /setProperty\(['"]--lum-intensity['"]/.test(gaugeHtml) &&
   /setProperty\(['"]--lum-intensity-color['"]/.test(gaugeHtml));
-assert('Intensity color: hot lerp (gold → orange → red) via lerpHex helper',
+// v5.38.4: intensity color lerps from pale lavender → vivid magenta
+// (purple family, distinct from direction red/green and alert cyan).
+assert('Intensity color: purple lerp (lavender → magenta) via lerpHex',
   /function lerpHex/.test(gaugeHtml) &&
-  /lerpHex\(['"]#e8b019['"],\s*['"]#ff9b6b['"]/.test(gaugeHtml) &&
-  /lerpHex\(['"]#ff9b6b['"],\s*['"]#ef4444['"]/.test(gaugeHtml));
+  /lerpHex\(['"]#c4b5fd['"],\s*['"]#c026d3['"],\s*state\.intensity\)/.test(gaugeHtml));
+// v5.38.4: alert color lerps from soft cyan → bright electric cyan.
+// Cyan family is distinct from direction (red/green) and intensity (purple),
+// so the alert pair reads as "freshness" not "direction."
+assert('Alert color: cyan lerp (soft → electric) via lerpHex',
+  /lerpHex\(['"]#67e8f9['"],\s*['"]#06b6d4['"],\s*state\.alertScale\)/.test(gaugeHtml));
+
+// v5.38.4: three bonus sprites — one per pair — visible only when that
+// pair's scalar exceeds 0.6. "More of them the bigger the signal."
+assert('Bonus sprites: data-i 6, 7, 8 exist with tg-lum-bonus class',
+  /<span class="tg-luminos tg-lum-bonus tg-lum-bonus-direction" data-i="6">/.test(gaugeHtml) &&
+  /<span class="tg-luminos tg-lum-bonus tg-lum-bonus-alert" data-i="7">/.test(gaugeHtml) &&
+  /<span class="tg-luminos tg-lum-bonus tg-lum-bonus-intensity" data-i="8">/.test(gaugeHtml));
+assert('Bonus direction: opacity gated on (--lum-energy - 0.6) * 2.5',
+  /\.tg-lum-bonus-direction\s*\{[\s\S]{0,300}opacity\(calc\(\(var\(--lum-energy[^)]*\)\s*-\s*0\.6\)\s*\*\s*2\.5\)\)/.test(gaugeHtml));
+assert('Bonus alert: opacity gated on (--lum-alert - 0.6) * 2.5',
+  /\.tg-lum-bonus-alert\s*\{[\s\S]{0,300}opacity\(calc\(\(var\(--lum-alert[^)]*\)\s*-\s*0\.6\)\s*\*\s*2\.5\)\)/.test(gaugeHtml));
+assert('Bonus intensity: opacity gated on (--lum-intensity - 0.6) * 2.5',
+  /\.tg-lum-bonus-intensity\s*\{[\s\S]{0,300}opacity\(calc\(\(var\(--lum-intensity[^)]*\)\s*-\s*0\.6\)\s*\*\s*2\.5\)\)/.test(gaugeHtml));
+assert('Bonus keyframes: tg-lum-7, tg-lum-8, tg-lum-9 defined',
+  /@keyframes tg-lum-7/.test(gaugeHtml) &&
+  /@keyframes tg-lum-8/.test(gaugeHtml) &&
+  /@keyframes tg-lum-9/.test(gaugeHtml));
 
 // Favicon (kills the 404)
 assert('Favicon: inline gold-spark favicon link present',
