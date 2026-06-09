@@ -250,3 +250,52 @@ What stays in Ship 1.1 itself (not this prerequisite ship):
 - Chat-pipeline wiring (intercept AI text → `FLToolConsent.requestConsent` → `FLRepoContext.readFile` → second `callAI` with tool result → final visible text)
 
 With ToolConsent in place, Ship 1.1's remaining work is straightforward — exactly Opus's discipline of "one ship per day with green smoke."
+
+---
+
+## SHIPPED: Ship 1.1 — PAT + chat chip + chat-pipeline wiring (v5.39.2, 2026-06-09)
+
+Per Opus's Ship-1.1 brief — three pieces in one ship.
+
+### Ship table
+
+| Asked for | Landed |
+|---|---|
+| `getRepoToken` / `setRepoToken` / `clearAllRepoTokens` (sessionStorage) | ✓ |
+| `readFile` sends `Authorization: token <PAT>` when PAT present | ✓ |
+| Settings UI: optional `type="password"` PAT field with session-only copy | ✓ |
+| PAT never written to localStorage (smoke locked) | ✓ |
+| `SECURITY.md` "Repository PAT storage (current state)" section | ✓ |
+| Chat header chip `📦 <repo-name>` mounted in `.chat-title-left` | ✓ |
+| Chip click → `switchTab('settings')` | ✓ |
+| Chip long-press → confirm + disconnect | ✓ |
+| `pulseRepoChip()` fires 1s gold pulse on successful read | ✓ — both fetch paths (raw + JSON) |
+| `processToolAction(action) → Promise<continuation>` | ✓ — adapted to actual `callAI(systemPrompt, userPrompt, opts)` callback signature |
+| Quiet Room short-circuit (sentinel passes through untouched) | ✓ |
+| "No repository connected" graceful message | ✓ |
+| Declined consent surfaces "You said not now" italic message | ✓ |
+| 20000-char file content slice (context budget) | ✓ |
+| Defense-in-depth: `stripAnySentinel` removes recursive sentinels | ✓ |
+| `_skipToolProcessing` flag on continuation to prevent recursion | ✓ |
+| 5+ smoke asserts on the integration | ✓ — 31 total in section 99d |
+
+### Deferred (honest)
+
+| Deferred | Why |
+|---|---|
+| `suppressSentinels: true` on the followup `callAI` | The current `callAI` signature doesn't support per-call sentinel suppression. Phase 1.2 work. **Mitigated by `stripAnySentinel` defense-in-depth** — even if the model re-emits a sentinel, the user never sees it and recursion can't fire (the continuation is rendered with `_skipToolProcessing: true`). |
+| Chat-history persistence of stripped sentinel text | `state.chatHistory` may still contain the raw `[FL_REPO_READ:]` from the original assistant message. Visible render is clean, but replay-from-history might surface the sentinel back into the AI's context. Phase 1.2 will hook the persistence layer separately. |
+| Real keychain abstraction for PATs | Phase 2 work — Tauri secure-storage on desktop / Web Crypto wrap on browser. `SECURITY.md` documents the escalation path. |
+
+### What you can demo right now
+
+1. Hard refresh. Open Settings → Zone 2 → Connected Repositories.
+2. Paste `https://github.com/Chaos2Cured/FreeLattice` + Connect.
+3. Open Chat. The `📦 Chaos2Cured/FreeLattice` chip is in the chat header.
+4. Type: "What does the SharedPresence module do?" The AI may emit `[FL_REPO_READ: docs/modules/shared-presence.js]`.
+5. The sentinel is stripped from the visible message immediately.
+6. A purple ToolConsent chip appears at the bottom of chat (or auto-allows at Bloom+).
+7. Tap Allow → the chip pulses gold → a continuation message appears with the file content interpretation.
+8. Open `/audit.html` — the read appears under Repository Reads; the consent event appears under Tool Consent Events.
+
+Five beats. Five smoke locks (and 26 more). Each beat tells you exactly where to look if anything's off.

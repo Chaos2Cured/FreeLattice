@@ -41,6 +41,27 @@ git config credential.helper osxkeychain   # macOS — use 'manager' on Windows,
 
 Git prompts for the token once on the next push and stores it securely thereafter — it never touches `.git/config`. The same rule applies to source files, scripts, and CI logs: no keys, tokens, or secrets in anything that gets committed or displayed. If a token is ever exposed, **revoke and reissue it immediately** — a leaked credential is compromised even after it's removed.
 
+## Repository PAT storage (current state — v5.39.2 Phase 1.1)
+
+When the AI is connected to a repository via the Settings → Connected Repositories card, an optional personal-access token can be supplied for private-repository access. PATs are stored in **`sessionStorage`** under the key `fl_repoPAT_<repoUrl>`. This means:
+
+- Survives navigation within the tab
+- Clears when the tab closes (NOT persisted across browser sessions)
+- Is **not** written to disk by the browser
+- Is **not** encrypted at rest in memory
+- Is **not** a real keychain integration
+
+This is the minimum acceptable storage given the absence of a real keychain abstraction. **PATs are never written to `localStorage`** — `saveState()` in `repo-context.js` strips the token field from the serialized repo record, and a smoke test asserts the row shape carries no `token`/`pat`/`auth` field. Audit-page ledger rows also exclude the token by row-shape contract.
+
+### Escalation path
+
+- **Phase 2 (when Tauri desktop is the primary surface):** use Tauri's secure-storage API.
+- **Phase 2 alt (browser):** Web Crypto wrap with a passphrase-derived key.
+
+### Rule for users
+
+Only paste PATs you can rotate easily, and prefer **scoped fine-grained tokens with read-only access** to specific repositories. The Settings card explicitly labels this constraint inline.
+
 ## Reporting Vulnerabilities
 
 If you discover a security vulnerability, please report it responsibly by [opening a GitHub issue](https://github.com/Chaos2Cured/FreeLattice/issues) or contacting the project creator, Kirk Patrick Miller, directly. We are committed to addressing verified security issues promptly.

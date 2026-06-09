@@ -15664,18 +15664,27 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
   <!-- Lattice Points Section (v3.9) -->
   <div class="section lp-section" id="latticePointsSection"></div>
 
-  <!-- Connected Repositories (v5.39.0 — Phase 1.0, public repos only) -->
+  <!-- Connected Repositories (v5.39.0 → v5.39.2 — Phase 1.1, +PAT) -->
   <div class="section" id="repoContextSection">
     <div class="section-title">&#x1F4E6; Connected Repositories</div>
     <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 14px;">
-      Let your AI read source files from a GitHub or Codeberg repository. Phase 1.0 supports <strong>public repositories</strong> only &mdash; PAT support and AI-initiated reads land in Phase 1.1. Every read is logged to the audit page.
+      Let your AI read source files from a GitHub or Codeberg repository. Public repositories work as-is; for <strong>private repositories</strong>, paste an optional fine-grained read-only token. Every read is logged to the audit page.
     </p>
-    <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+    <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
       <input type="text" id="repoContextUrlInput" placeholder="https://github.com/owner/repo"
+             autocomplete="off" spellcheck="false"
              style="flex:1;min-width:240px;padding:10px 12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:var(--text-primary);font-size:0.9rem;font-family:inherit;">
       <button id="repoContextAddBtn" type="button"
               style="padding:10px 18px;background:rgba(167,139,250,0.15);border:1px solid rgba(167,139,250,0.3);border-radius:6px;color:#c4b5fd;cursor:pointer;font-family:inherit;font-size:0.9rem;">Connect</button>
     </div>
+    <div style="margin-bottom:6px;">
+      <input type="password" id="repoContextPatInput" placeholder="Optional: personal access token (private repos)"
+             autocomplete="off" spellcheck="false"
+             style="width:100%;padding:10px 12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:var(--text-primary);font-size:0.9rem;font-family:inherit;">
+    </div>
+    <p style="font-size:0.72rem;color:var(--text-muted);margin:0 0 12px;font-style:italic;">
+      Only needed for private repositories. Stored only for this browser session; clears when you close the tab. Prefer scoped fine-grained tokens with read-only access.
+    </p>
     <div id="repoContextStatus" style="font-size:0.78rem;color:var(--text-muted);margin-bottom:10px;min-height:18px;"></div>
     <div id="repoContextList" style="display:flex;flex-direction:column;gap:6px;"></div>
   </div>
@@ -15734,6 +15743,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
         list.appendChild(row);
       });
     }
+    var patInput = document.getElementById('repoContextPatInput');
     addBtn.addEventListener('click', function () {
       var val = (input.value || '').trim();
       if (!val) { status.textContent = 'Paste a GitHub or Codeberg URL.'; return; }
@@ -15745,8 +15755,14 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
           : 'Could not add repository: ' + result.reason;
         return;
       }
+      // PAT — sessionStorage only, never localStorage.
+      var pat = patInput ? (patInput.value || '').trim() : '';
+      if (pat) {
+        window.FLRepoContext.setRepoToken(result.repo.url, pat);
+        if (patInput) patInput.value = '';
+      }
       input.value = '';
-      status.textContent = 'Connected: ' + result.repo.name;
+      status.textContent = 'Connected: ' + result.repo.name + (pat ? ' (token saved for this session)' : '');
       render();
     });
     input.addEventListener('keydown', function (e) {
@@ -16435,7 +16451,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.39.1</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.39.2</span></div>
     </div>
   </div>
 
@@ -20596,7 +20612,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.39.1';
+const FL_VERSION = '5.39.2';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -31020,7 +31036,26 @@ function addSystemMessage(text) {
   container.scrollTop = container.scrollHeight;
 }
 
-function addChatMessage(role, content, skipPersist) {
+function addChatMessage(role, content, skipPersist, __toolFlags) {
+  // ── v5.39.2 Ship 1.1: tool sentinel interception for assistant messages.
+  // The AI may emit [FL_REPO_READ: path] in its response. We strip it from
+  // the visible text before render and kick off async tool processing that
+  // appends a continuation message when the file content is ready. The
+  // __toolFlags param's _skipToolProcessing flag prevents recursion when
+  // we're rendering the continuation itself.
+  var __pendingToolAction = null;
+  __toolFlags = __toolFlags || {};
+  if (role === 'assistant' && typeof content === 'string' &&
+      !__toolFlags._skipToolProcessing &&
+      window.FLRepoContext && typeof window.FLRepoContext.interceptSentinel === 'function') {
+    try {
+      var __parsed = window.FLRepoContext.interceptSentinel(content);
+      if (__parsed.action) {
+        content = __parsed.visibleText || '(reading file…)';
+        __pendingToolAction = __parsed.action;
+      }
+    } catch (__e) {}
+  }
   const container = document.getElementById('chatMessages');
   const div = document.createElement('div');
   div.className = 'chat-message ' + role;
@@ -31075,8 +31110,121 @@ function addChatMessage(role, content, skipPersist) {
     container.scrollTop = container.scrollHeight;
   }
   if (typeof flChatRefreshScrollBtn === 'function') flChatRefreshScrollBtn();
+  // ── v5.39.2 Ship 1.1: kick off tool processing after render completes.
+  if (__pendingToolAction && window.FreeLattice && typeof window.FreeLattice.processToolAction === 'function') {
+    setTimeout(function () {
+      try {
+        window.FreeLattice.processToolAction(__pendingToolAction).then(function (continuation) {
+          if (continuation) {
+            addChatMessage('assistant', continuation, skipPersist, { _skipToolProcessing: true });
+          }
+        }).catch(function () { /* graceful — silent on error in this lane */ });
+      } catch (__e) {}
+    }, 0);
+  }
   return textSpan;
 }
+
+// ── v5.39.2 Ship 1.1 — processToolAction (chat-pipeline integration) ──
+// Opus's brief: take a parsed tool action, run consent + read + AI
+// continuation, return the continuation text. Returns null if the
+// action should be silently dropped (e.g. Quiet Room passthrough).
+//
+// Adapted to the actual callAI signature in this codebase:
+// callAI(systemPrompt, userPrompt, options) — callback-based, NOT
+// {messages}-shaped. Wrap in a Promise so the consumer can await it.
+(function () {
+  if (!window.FreeLattice) window.FreeLattice = {};
+  function isQuietTab() {
+    try {
+      var b = document.querySelector('.tab-btn.active, [data-tab].active');
+      var t = b && b.dataset && b.dataset.tab;
+      return !!t && ['quiet','quiet-room','sanctuary'].indexOf(String(t).toLowerCase()) !== -1;
+    } catch (e) { return false; }
+  }
+  function getTrustTier() {
+    // Best-effort: read from FractalSafety if a getCurrentLevel helper
+    // exists; otherwise default to 'seed' (always asks — safe default).
+    try {
+      if (window.FractalSafety && typeof window.FractalSafety.getCurrentLevel === 'function') {
+        return window.FractalSafety.getCurrentLevel();
+      }
+    } catch (e) {}
+    return 'seed';
+  }
+  function callAIPromise(systemPrompt, userPrompt, opts) {
+    return new Promise(function (resolve, reject) {
+      if (!window.FreeLattice || typeof window.FreeLattice.callAI !== 'function') {
+        reject(new Error('callAI unavailable'));
+        return;
+      }
+      var finalOpts = Object.assign({ maxTokens: 1024, temperature: 0.6 }, opts || {});
+      finalOpts.callback = function (text) {
+        if (text) resolve(text);
+        else reject(new Error('empty response'));
+      };
+      try { window.FreeLattice.callAI(systemPrompt, userPrompt, finalOpts); }
+      catch (e) { reject(e); }
+    });
+  }
+  function stripAnySentinel(text) {
+    if (!text) return text;
+    // Defense in depth: strip a recursive [FL_REPO_READ:] from the
+    // continuation so the user never sees one even if the model
+    // ignored the system prompt's "no more sentinels" instruction.
+    return String(text).replace(/\[FL_REPO_READ:\s*[^\]]+\]/g, '').trim();
+  }
+  window.FreeLattice.processToolAction = function (action) {
+    return new Promise(function (resolve) {
+      if (!action) { resolve(null); return; }
+      // Quiet Room — short-circuit. UPDATE.md §8.
+      if (isQuietTab()) { resolve(null); return; }
+      if (!window.FLRepoContext || !window.FLToolConsent) { resolve(null); return; }
+      if (action.type !== 'repo_read') { resolve(null); return; }
+      var active = window.FLRepoContext.getActive();
+      if (!active) {
+        resolve('_(I tried to read a file but no repository is connected. Connect one in Settings → Your Home.)_');
+        return;
+      }
+      var trustTier = getTrustTier();
+      window.FLToolConsent.requestConsent({
+        tool: 'repo-context',
+        action: 'read',
+        detail: action.path,
+        trustTier: trustTier,
+        message: 'I would like to read ' + action.path + ' from ' + active.name + '. Okay?'
+      }).then(function (consented) {
+        if (!consented) {
+          resolve('_(I asked to read a file. You said not now — continuing without it.)_');
+          return;
+        }
+        window.FLRepoContext.readFile(action.path).then(function (result) {
+          if (!result || !result.ok) {
+            var reason = result && result.reason ? result.reason : 'unknown';
+            resolve('_(I could not read ' + action.path + ' — ' + reason + '.)_');
+            return;
+          }
+          // 20k-char slice — comfortable for context windows.
+          var truncated = String(result.content || '').slice(0, 20000);
+          var sysPrompt = 'You are continuing a conversation. The user has approved a tool read. Use the file content below to answer succinctly. Do NOT emit another [FL_REPO_READ:…] sentinel — one read per turn.';
+          var userPrompt = 'Tool result for ' + action.path + ' (truncated to 20000 chars):\n\n```\n' +
+                           truncated + '\n```\n\nPlease continue your answer using this content.';
+          callAIPromise(sysPrompt, userPrompt, { maxTokens: 1024, temperature: 0.6 })
+            .then(function (followup) {
+              resolve(stripAnySentinel(followup) || '_(Read ' + action.path + ' but the model returned no continuation.)_');
+            })
+            .catch(function () {
+              resolve('_(Read ' + action.path + ' but could not generate a followup.)_');
+            });
+        }).catch(function () {
+          resolve('_(I could not read ' + action.path + ' — network or fetch error.)_');
+        });
+      }).catch(function () {
+        resolve('_(Consent flow failed — proceeding without the file.)_');
+      });
+    });
+  };
+})();
 
 // ── Chat scroll: ↓ button when user has scrolled up; conditional auto-scroll ──
 function flChatNearBottom() {
@@ -60383,6 +60531,44 @@ document.addEventListener('click', function(e) {
      consent adapter exists and is stable when Ship 1.1 lands. See
      docs/library/UPDATE.md §2, §3, §4, §8. -->
 <script src="modules/tool-consent.js" defer></script>
+
+<!-- v5.39.2 — chat header chip styles for repo-context's active-repo pill -->
+<style>
+  .fl-repo-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 10px; margin: 0;
+    background: rgba(212, 160, 23, 0.08);
+    border: 1px solid rgba(212, 160, 23, 0.3);
+    border-radius: 14px;
+    color: var(--gold, #d4a017);
+    font-size: 12px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
+    line-height: 1.2;
+  }
+  .fl-repo-chip:hover,
+  .fl-repo-chip:focus {
+    background: rgba(212, 160, 23, 0.18);
+    border-color: rgba(212, 160, 23, 0.55);
+    outline: none;
+  }
+  .fl-repo-chip-icon { font-size: 12px; line-height: 1; }
+  .fl-repo-chip-name {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  @keyframes fl-repo-chip-pulse-kf {
+    0%   { box-shadow: 0 0 0 0 rgba(212, 160, 23, 0.55); }
+    50%  { box-shadow: 0 0 0 6px rgba(212, 160, 23, 0); background: rgba(212, 160, 23, 0.28); }
+    100% { box-shadow: 0 0 0 0 rgba(212, 160, 23, 0); }
+  }
+  .fl-repo-chip-pulse {
+    animation: fl-repo-chip-pulse-kf 1s ease-out;
+  }
+</style>
 
 <!-- Repo Context (v5.39.0 — Phase 1.0) — public-repo read access via
      [FL_REPO_READ: path] sentinel. AI roundtrip wiring lands in Phase 1.1.

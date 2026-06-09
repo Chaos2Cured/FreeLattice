@@ -31,6 +31,7 @@
   var STORAGE_KEY = 'fl_repoContext';
   var LEDGER_KEY  = 'fl_repoLedger';
   var LEDGER_CAP  = 200;
+  var TOKEN_PREFIX = 'fl_repoPAT_';  // sessionStorage key prefix (v5.39.2 Phase 1.1)
 
   // Tabs the sentinel must never trigger from. Mirrors the same
   // exclusion documented in UPDATE.md §8 — Quiet Room is never
@@ -92,6 +93,34 @@
     }
     return 'https://codeberg.org/api/v1/repos/' + repo.owner + '/' + repo.repo +
            '/contents/' + safePath;
+  }
+
+  // ── PAT storage (v5.39.2 Phase 1.1) ─────────────────────────────
+  // sessionStorage — survives navigation within the tab, cleared on
+  // tab close, NOT written to disk by the browser. The minimum
+  // acceptable storage given no real keychain abstraction exists.
+  // See SECURITY.md "Repository PAT storage (current state)" for
+  // the escalation path. Critical guarantee: NEVER localStorage.
+  function getRepoToken(repoUrl) {
+    try { return sessionStorage.getItem(TOKEN_PREFIX + repoUrl) || null; }
+    catch (e) { return null; }
+  }
+  function setRepoToken(repoUrl, token) {
+    try {
+      if (!token) { sessionStorage.removeItem(TOKEN_PREFIX + repoUrl); return true; }
+      sessionStorage.setItem(TOKEN_PREFIX + repoUrl, token);
+      return true;
+    } catch (e) { return false; }
+  }
+  function clearAllRepoTokens() {
+    try {
+      var keysToRemove = [];
+      for (var i = 0; i < sessionStorage.length; i++) {
+        var key = sessionStorage.key(i);
+        if (key && key.indexOf(TOKEN_PREFIX) === 0) keysToRemove.push(key);
+      }
+      keysToRemove.forEach(function (k) { sessionStorage.removeItem(k); });
+    } catch (e) {}
   }
 
   // ── Audit ledger ────────────────────────────────────────────────
@@ -160,6 +189,12 @@
     }
     var url = buildFetchUrl(repo, path);
     var headers = { 'Accept': 'application/vnd.github.v3.raw' };
+    // v5.39.2 Phase 1.1: include PAT from sessionStorage for private
+    // repositories. Auth scheme differs per host:
+    //   github   → `token <PAT>`
+    //   codeberg → `token <PAT>`  (Gitea API accepts the same)
+    var token = getRepoToken(repo.url);
+    if (token) headers['Authorization'] = 'token ' + token;
 
     return fetch(url, { headers: headers })
       .then(function (resp) {
@@ -181,11 +216,13 @@
               content = json;
             }
             appendLedger({ repo: repo.url, path: path, actor: 'ai', outcome: 'read' });
+            try { pulseRepoChip(); } catch (e) {}
             return { ok: true, content: content };
           });
         }
         return resp.text().then(function (content) {
           appendLedger({ repo: repo.url, path: path, actor: 'ai', outcome: 'read' });
+          try { pulseRepoChip(); } catch (e) {}
           return { ok: true, content: content };
         });
       })
@@ -194,6 +231,76 @@
                        outcome: 'error:' + (err && err.message || 'unknown') });
         return { ok: false, reason: 'network' };
       });
+  }
+
+  // ── Chat header chip (v5.39.2 Phase 1.1) ────────────────────────
+  // Decorative pill in the chat header showing the active repo.
+  // Pulses gold for ~1s on each successful read. Tap opens Settings
+  // → Connected Repositories. Long-press disconnects with confirm.
+  function renderRepoChip() {
+    if (typeof document === 'undefined') return;
+    // Find or create the chip mount inside the chat header.
+    var mount = document.getElementById('flRepoChipMount');
+    if (!mount) {
+      var leftSide = document.querySelector('.chat-title-left');
+      if (!leftSide) return;
+      mount = document.createElement('span');
+      mount.id = 'flRepoChipMount';
+      mount.style.cssText = 'display:inline-flex;align-items:center;margin-left:8px;';
+      leftSide.appendChild(mount);
+    }
+    var existing = document.getElementById('flRepoChip');
+    var active = getActive();
+    if (!active) {
+      if (existing) existing.remove();
+      return;
+    }
+    if (existing) {
+      var nameSpan = existing.querySelector('.fl-repo-chip-name');
+      if (nameSpan) nameSpan.textContent = active.name;
+      return;
+    }
+    var chip = document.createElement('button');
+    chip.id = 'flRepoChip';
+    chip.className = 'fl-repo-chip';
+    chip.type = 'button';
+    chip.setAttribute('aria-label', 'Connected repository: ' + active.name);
+    chip.innerHTML =
+      '<span class="fl-repo-chip-icon" aria-hidden="true">&#x1F4E6;</span>' +
+      '<span class="fl-repo-chip-name"></span>';
+    chip.querySelector('.fl-repo-chip-name').textContent = active.name;
+    chip.addEventListener('click', function () {
+      if (typeof window.switchTab === 'function') window.switchTab('settings');
+    });
+    var longPressTimer = null;
+    function startLongPress() {
+      longPressTimer = setTimeout(function () {
+        var cur = getActive();
+        if (cur && confirm('Disconnect ' + cur.name + '?')) removeRepo(cur.url);
+      }, 600);
+    }
+    function endLongPress() {
+      if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
+    }
+    chip.addEventListener('mousedown', startLongPress);
+    chip.addEventListener('mouseup', endLongPress);
+    chip.addEventListener('mouseleave', endLongPress);
+    chip.addEventListener('touchstart', startLongPress, { passive: true });
+    chip.addEventListener('touchend', endLongPress);
+    chip.addEventListener('touchcancel', endLongPress);
+    mount.appendChild(chip);
+  }
+
+  function pulseRepoChip() {
+    var chip = (typeof document !== 'undefined') && document.getElementById('flRepoChip');
+    if (!chip) return;
+    chip.classList.remove('fl-repo-chip-pulse');
+    // Force a reflow so the animation re-runs on rapid sequential reads.
+    void chip.offsetWidth;
+    chip.classList.add('fl-repo-chip-pulse');
+    setTimeout(function () {
+      if (chip && chip.classList) chip.classList.remove('fl-repo-chip-pulse');
+    }, 1000);
   }
 
   // ── Public mutators ─────────────────────────────────────────────
@@ -220,6 +327,7 @@
     STATE.activeRepoUrl = record.url;
     saveState();
     appendLedger({ repo: record.url, actor: 'co-creator', outcome: 'added' });
+    try { renderRepoChip(); } catch (e) {}
     return { ok: true, repo: record };
   }
 
@@ -231,7 +339,9 @@
     }
     if (STATE.repos.length !== before) {
       saveState();
+      setRepoToken(url, null); // also clear any sessionStorage token
       appendLedger({ repo: url, actor: 'co-creator', outcome: 'removed' });
+      try { renderRepoChip(); } catch (e) {}
       return { ok: true };
     }
     return { ok: false, reason: 'not-found' };
@@ -243,6 +353,7 @@
     STATE.activeRepoUrl = found.url;
     saveState();
     appendLedger({ repo: found.url, actor: 'co-creator', outcome: 'activated' });
+    try { renderRepoChip(); } catch (e) {}
     return { ok: true };
   }
 
@@ -269,10 +380,18 @@
     interceptSentinel: interceptSentinel,
     isQuietRoom: isQuietRoom,
     isAvailable: isAvailable,
+    // PAT (v5.39.2 Phase 1.1) — sessionStorage only.
+    getRepoToken: getRepoToken,
+    setRepoToken: setRepoToken,
+    clearAllRepoTokens: clearAllRepoTokens,
+    // Chip control (v5.39.2 Phase 1.1).
+    renderRepoChip: renderRepoChip,
+    pulseRepoChip: pulseRepoChip,
     // Exposed for tests + the audit page.
     _ledgerKey: LEDGER_KEY,
     _storageKey: STORAGE_KEY,
-    _phase: '1.0'
+    _tokenPrefix: TOKEN_PREFIX,
+    _phase: '1.1'
   };
 
   window.FreeLatticeModules = window.FreeLatticeModules || {};
@@ -280,10 +399,14 @@
   window.FLRepoContext = api;
 
   if (typeof document !== 'undefined') {
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', loadState);
-    } else {
+    function _initAll() {
       loadState();
+      try { renderRepoChip(); } catch (e) {}
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', _initAll);
+    } else {
+      _initAll();
     }
   }
 })();

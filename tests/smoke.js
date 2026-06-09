@@ -2922,6 +2922,96 @@ assert('audit page: renders Tool Consent Events section',
   /function renderToolConsents/.test(auditHtml));
 
 // ═══════════════════════════════════════════════════════════════
+section('99d. Ship 1.1 — PAT + chat chip + chat-pipeline wiring (v5.39.2)');
+// ═══════════════════════════════════════════════════════════════
+// Refresh module file content so the v5.39.2 additions land in scope.
+repoCtxJs = '';
+try { repoCtxJs = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'modules', 'repo-context.js'), 'utf8'); }
+catch (e) {}
+// Piece 1 — PAT sessionStorage helpers.
+assert('PAT: TOKEN_PREFIX = "fl_repoPAT_" (sessionStorage key shape)',
+  /TOKEN_PREFIX\s*=\s*['"]fl_repoPAT_['"]/.test(repoCtxJs));
+assert('PAT: getRepoToken reads from sessionStorage, not localStorage',
+  /function getRepoToken[\s\S]{0,300}sessionStorage\.getItem\(TOKEN_PREFIX/.test(repoCtxJs) &&
+  !/function getRepoToken[\s\S]{0,300}localStorage\.getItem/.test(repoCtxJs));
+assert('PAT: setRepoToken writes to sessionStorage, not localStorage',
+  /function setRepoToken[\s\S]{0,400}sessionStorage\.setItem\(TOKEN_PREFIX/.test(repoCtxJs) &&
+  !/function setRepoToken[\s\S]{0,400}localStorage\.setItem/.test(repoCtxJs));
+assert('PAT: clearAllRepoTokens iterates sessionStorage by TOKEN_PREFIX',
+  /function clearAllRepoTokens[\s\S]{0,500}sessionStorage\.key\(i\)[\s\S]{0,200}TOKEN_PREFIX/.test(repoCtxJs));
+assert('PAT: readFile sends Authorization header when token exists',
+  /var token\s*=\s*getRepoToken\(repo\.url\)[\s\S]{0,200}Authorization['"]\s*\]\s*=\s*['"]token /.test(repoCtxJs));
+assert('PAT: removeRepo clears the sessionStorage token (setRepoToken(url, null))',
+  /STATE\.repos\.length !== before[\s\S]{0,400}setRepoToken\(url,\s*null\)/.test(repoCtxJs));
+assert('PAT: public API exposes getRepoToken + setRepoToken + clearAllRepoTokens',
+  /api\s*=\s*\{[\s\S]{0,3000}getRepoToken:\s*getRepoToken[\s\S]{0,200}setRepoToken:\s*setRepoToken[\s\S]{0,200}clearAllRepoTokens:\s*clearAllRepoTokens/.test(repoCtxJs));
+assert('PAT: saveState still does NOT serialize any token/pat/auth field',
+  !/function saveState[\s\S]{0,600}\btoken\b\s*:/.test(repoCtxJs) &&
+  !/function saveState[\s\S]{0,600}\bpat\b\s*:/.test(repoCtxJs));
+assert('PAT: Settings UI has type="password" PAT input',
+  /id="repoContextPatInput"[\s\S]{0,200}type="password"/.test(appHtml) ||
+  /type="password"[\s\S]{0,200}id="repoContextPatInput"/.test(appHtml));
+assert('PAT: Settings UI explains sessionStorage-only constraint inline',
+  /Stored only for this browser session/.test(appHtml));
+assert('PAT: Settings flow calls FLRepoContext.setRepoToken when PAT supplied',
+  /FLRepoContext\.setRepoToken\(result\.repo\.url,\s*pat\)/.test(appHtml));
+
+// Piece 2 — chat header chip.
+assert('chip: renderRepoChip + pulseRepoChip defined in repo-context.js',
+  /function renderRepoChip\(\)/.test(repoCtxJs) &&
+  /function pulseRepoChip\(\)/.test(repoCtxJs));
+assert('chip: mounts inside .chat-title-left (verified container, not Opus\'s guess)',
+  /querySelector\(['"]\.chat-title-left['"]\)/.test(repoCtxJs));
+assert('chip: long-press disconnect via confirm (600ms)',
+  /setTimeout\(function \(\) \{\s*var cur\s*=\s*getActive\(\)[\s\S]{0,300}confirm\(['"]Disconnect /.test(repoCtxJs));
+assert('chip: pulseRepoChip removes class, reflows, re-adds, removes after 1000ms',
+  /classList\.remove\(['"]fl-repo-chip-pulse['"]\)[\s\S]{0,200}offsetWidth[\s\S]{0,100}classList\.add\(['"]fl-repo-chip-pulse['"]\)[\s\S]{0,200}1000/.test(repoCtxJs));
+assert('chip: readFile pulses after BOTH json and text success paths',
+  (repoCtxJs.match(/pulseRepoChip\(\)/g) || []).length >= 2);
+assert('chip: addRepo + removeRepo + setActive all call renderRepoChip',
+  /STATE\.repos\.push\(record\)[\s\S]{0,500}renderRepoChip\(\)/.test(repoCtxJs) &&
+  /setRepoToken\(url, null\)[\s\S]{0,300}renderRepoChip\(\)/.test(repoCtxJs) &&
+  /STATE\.activeRepoUrl\s*=\s*found\.url[\s\S]{0,300}renderRepoChip\(\)/.test(repoCtxJs));
+assert('chip: CSS .fl-repo-chip defined in app.html with pulse keyframes',
+  /\.fl-repo-chip\s*\{/.test(appHtml) &&
+  /@keyframes fl-repo-chip-pulse-kf/.test(appHtml));
+
+// Piece 3 — chat-pipeline wiring.
+assert('chat-pipeline: addChatMessage intercepts sentinel for assistant messages',
+  /function addChatMessage\(role, content, skipPersist, __toolFlags\)/.test(appHtml) &&
+  /role === 'assistant'[\s\S]{0,400}interceptSentinel\(content\)/.test(appHtml));
+assert('chat-pipeline: __pendingToolAction kicks off async processToolAction after render',
+  /__pendingToolAction[\s\S]{0,500}FreeLattice\.processToolAction\(__pendingToolAction\)/.test(appHtml));
+assert('chat-pipeline: continuation uses _skipToolProcessing flag (prevents recursion)',
+  /addChatMessage\('assistant',\s*continuation,\s*skipPersist,\s*\{\s*_skipToolProcessing:\s*true\s*\}\)/.test(appHtml));
+assert('chat-pipeline: processToolAction defined on window.FreeLattice',
+  /window\.FreeLattice\.processToolAction\s*=\s*function/.test(appHtml));
+assert('chat-pipeline: Quiet Room short-circuits to null (no consent, no read)',
+  /if \(isQuietTab\(\)\)\s*\{\s*resolve\(null\);\s*return;\s*\}/.test(appHtml));
+assert('chat-pipeline: no active repo surfaces graceful "no repository connected" message',
+  /no repository is connected[\s\S]{0,200}Settings/.test(appHtml));
+assert('chat-pipeline: declined consent surfaces "You said not now" message',
+  /You said not now/.test(appHtml));
+assert('chat-pipeline: callAI wrapped in Promise (codebase uses callback-based API)',
+  /function callAIPromise\(systemPrompt, userPrompt, opts\)[\s\S]{0,500}finalOpts\.callback\s*=\s*function/.test(appHtml));
+assert('chat-pipeline: file content sliced to 20000 chars (context budget)',
+  /\.slice\(0,\s*20000\)/.test(appHtml));
+assert('chat-pipeline: stripAnySentinel defense-in-depth removes recursive [FL_REPO_READ:]',
+  /function stripAnySentinel[\s\S]{0,400}\\\[FL_REPO_READ:/.test(appHtml));
+assert('chat-pipeline: read errors surface as italic underscore message (never throws past)',
+  /could not read[\s\S]{0,200}reason/.test(appHtml));
+
+// SECURITY.md — Phase 1.1 PAT note appended.
+var securityMd = '';
+try { securityMd = fsRC.readFileSync(pathRC.join(__dirname, '..', 'SECURITY.md'), 'utf8'); }
+catch (e) {}
+assert('SECURITY.md: PAT storage section names sessionStorage explicitly',
+  /Repository PAT storage[\s\S]{0,800}sessionStorage/.test(securityMd) &&
+  /fl_repoPAT_/.test(securityMd));
+assert('SECURITY.md: PAT escalation path documented (Tauri / Web Crypto)',
+  /Tauri[\s\S]{0,200}Web Crypto/.test(securityMd));
+
+// ═══════════════════════════════════════════════════════════════
 section('100. UPDATE.md + CLARITY_AUDIT queue (v5.38.6)');
 // ═══════════════════════════════════════════════════════════════
 var updateMd = '';
