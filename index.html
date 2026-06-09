@@ -16435,7 +16435,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.39.0</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.39.1</span></div>
     </div>
   </div>
 
@@ -20596,7 +20596,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.39.0';
+const FL_VERSION = '5.39.1';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -60376,6 +60376,13 @@ document.addEventListener('click', function(e) {
 
 <!-- Depth Consent — the AI asks before going deep; both parties accountable -->
 <script src="modules/depth-consent.js" defer></script>
+
+<!-- Tool Consent (v5.39.1) — sibling of DepthConsent for the opposite
+     direction of consent: system wants to do a thing → user approves.
+     Building this BEFORE wiring repo-context's chat pipeline so the
+     consent adapter exists and is stable when Ship 1.1 lands. See
+     docs/library/UPDATE.md §2, §3, §4, §8. -->
+<script src="modules/tool-consent.js" defer></script>
 
 <!-- Repo Context (v5.39.0 — Phase 1.0) — public-repo read access via
      [FL_REPO_READ: path] sentinel. AI roundtrip wiring lands in Phase 1.1.
