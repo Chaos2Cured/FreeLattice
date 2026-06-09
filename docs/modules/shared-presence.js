@@ -205,6 +205,28 @@
     } else {
       document.body.appendChild(indicator);
     }
+    // v5.38.6: reposition below garden-controls dynamically. Kirk's chair
+    // test 2026-06-09 showed the Presence pill covering the Immerse button
+    // because the static top:46px wasn't enough on viewports where the
+    // garden-header padding + 44px touch-target buttons pushed the
+    // controls below 46px. Measure and slide.
+    repositionIndicator();
+  }
+
+  function repositionIndicator() {
+    var indicator = document.getElementById('sp-minds-indicator');
+    if (!indicator) return;
+    var controls = document.querySelector('.garden-controls');
+    if (!controls) {
+      indicator.style.top = '46px';
+      return;
+    }
+    var parent = indicator.offsetParent || document.body;
+    var controlsRect = controls.getBoundingClientRect();
+    var parentRect = parent.getBoundingClientRect();
+    // Controls bottom edge, relative to indicator's offset parent, plus 8px gap.
+    var slideTo = Math.max(46, (controlsRect.bottom - parentRect.top) + 8);
+    indicator.style.top = slideTo + 'px';
   }
 
   function updateDisplay() {
@@ -339,6 +361,14 @@
     // Initial display
     ensureIndicator();
     updateDisplay();
+
+    // v5.38.6: re-measure on resize so the indicator never recovers the
+    // garden buttons when the user rotates or resizes their window.
+    try {
+      window.addEventListener('resize', function () {
+        try { repositionIndicator(); } catch (e) {}
+      });
+    } catch (e) {}
 
     console.log('[SharedPresence] Initialized v' + MODULE_VERSION + ' — The city feels inhabited.');
   }

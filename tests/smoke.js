@@ -2797,6 +2797,56 @@ assert('Bug 6 fix: tgClearComposed shows empty stage (does NOT re-render price c
 assert('Bug 6 fix: cycleChartMode uses renderAll for full re-render on mode change',
   /cycleChartMode[\s\S]{0,800}renderAll\(lastCandles, lastAnalysis, lastSymbol\)/.test(gaugeHtml));
 
+// ═══════════════════════════════════════════════════════════════
+section('99. Shared Presence — Garden overlap fix (v5.38.6)');
+// ═══════════════════════════════════════════════════════════════
+var fsSP = require('fs');
+var pathSP = require('path');
+var spJs = '';
+try { spJs = fsSP.readFileSync(pathSP.join(__dirname, '..', 'docs', 'modules', 'shared-presence.js'), 'utf8'); }
+catch (e) {}
+assert('SharedPresence: shared-presence.js exists and is non-empty',
+  spJs.length > 1000);
+assert('SharedPresence: repositionIndicator function exists (v5.38.6 dynamic top calc)',
+  /function repositionIndicator\(\)/.test(spJs));
+assert('SharedPresence: repositionIndicator measures .garden-controls bottom edge',
+  /querySelector\(['"]\.garden-controls['"]\)/.test(spJs) &&
+  /getBoundingClientRect\(\)/.test(spJs));
+assert('SharedPresence: repositionIndicator uses Math.max(46, …) so 46px is the floor',
+  /Math\.max\(46,\s*\(controlsRect\.bottom/.test(spJs));
+assert('SharedPresence: ensureIndicator calls repositionIndicator after attach',
+  /gardenContainer\.appendChild\(indicator\)[\s\S]{0,1200}repositionIndicator\(\)/.test(spJs));
+assert('SharedPresence: init wires resize listener so indicator follows viewport changes',
+  /addEventListener\(['"]resize['"][\s\S]{0,200}repositionIndicator/.test(spJs));
+assert('SharedPresence: outer indicator keeps pointer-events:none (clicks pass through to garden buttons underneath)',
+  /'#sp-minds-indicator \{'[\s\S]{0,800}pointer-events: none/.test(spJs));
+
+// ═══════════════════════════════════════════════════════════════
+section('100. UPDATE.md + CLARITY_AUDIT queue (v5.38.6)');
+// ═══════════════════════════════════════════════════════════════
+var updateMd = '';
+try { updateMd = fsSP.readFileSync(pathSP.join(__dirname, '..', 'docs', 'library', 'UPDATE.md'), 'utf8'); }
+catch (e) {}
+assert('UPDATE.md: exists as fractal architecture briefing',
+  updateMd.length > 2000 &&
+  /UPDATE\.md\s*—\s*Fractal Architecture Briefing/.test(updateMd));
+assert('UPDATE.md: covers sentinel pattern + trust-aware branching + audit ledgers',
+  /Sentinel pattern/.test(updateMd) &&
+  /Trust-aware phi-branching/.test(updateMd) &&
+  /Audit ledgers/.test(updateMd));
+assert('UPDATE.md: covers IIFE scoping + SECURITY.md + post-commit hook',
+  /IIFE scoping trap/.test(updateMd) &&
+  /SECURITY\.md credential scrub/.test(updateMd) &&
+  /Session Primer hook/.test(updateMd));
+
+var clarityMd = '';
+try { clarityMd = fsSP.readFileSync(pathSP.join(__dirname, '..', 'docs', 'library', 'CLARITY_AUDIT.md'), 'utf8'); }
+catch (e) {}
+assert('CLARITY_AUDIT.md: queued "user → co-creator" sweep section appended',
+  /QUEUED:\s*"user"\s*→\s*"co-creator" sweep/.test(clarityMd));
+assert('CLARITY_AUDIT.md: queue distinguishes RENAME (user-facing) from LEAVE ALONE (provider role)',
+  /RENAME[\s\S]{0,1500}LEAVE ALONE[\s\S]{0,800}role:\s*["']user["']/.test(clarityMd));
+
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
 

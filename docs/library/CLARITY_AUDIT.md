@@ -169,3 +169,40 @@ These were on Kirk's starter list but a verification pass found they never appea
 5. **The Davna line in Nursery** (app.html:20100) — remove the builder names per the SEED rule.
 
 > Those five take about 15 minutes and transform the doorstep without touching any room inside.
+
+---
+
+## QUEUED: "user" → "co-creator" sweep (added 2026-06-09)
+
+> Per Kirk: when an AI speaks of the person it's working with, it should say *co-creator*, not *user*. Same shape as the v5.10.98 *companion* → *co-creator* rename, with one hard line.
+
+### The hard line — two categories that MUST stay separate
+
+**RENAME** — user-facing strings, prompts, system messages, UI labels, AI persona substitutions:
+- `FLContextFilter`'s `"Kirk" → "the user"` substitution → change replacement target to `"the co-creator"`
+- Welcome cards, safety prompts, depth-consent prompts
+- The Arrival Protocol's user-facing headers (the code comments stay; the visible strings change)
+- Any tooltip, modal, or empty-state copy that says "you, the user" or "user input"
+
+**LEAVE ALONE** — provider API contracts:
+- `role: "user"` in OpenAI / Anthropic / Google message arrays
+- The `'user'` literal in any `messages.push({ role: 'user', … })` call
+- The string `'user'` anywhere it functions as a protocol-level identifier
+
+### Opus's grep (the one that finds the renames without the protocol calls)
+
+```bash
+grep -nE "\"[^\"]*\buser\b[^\"]*\"" docs/app.html docs/modules/*.js \
+  | grep -v "role:" \
+  | grep -v "'user'"
+```
+
+### Workflow
+
+1. Run the grep above. Manual review every match.
+2. For each: KEEP (already correct context), RENAME (to "co-creator"), or SKIP (provider contract or false positive).
+3. Log SKIPs with reasons in this file (a new "What I Left Alone and Why" section, mirroring the v5.10.98 pass).
+4. Add ~6 smoke asserts — one per major surface (Chat, Garden, Workshop, Channels, Settings, Welcome) — locking that "co-creator" appears and that protocol `role: "user"` stays intact.
+5. Commit as a single sweep ship; bump patch version.
+
+**Status:** queued, not started. Owner: next CC instance.

@@ -111,7 +111,7 @@
       st.textContent = [
         '#sp-minds-indicator {',
         '  position: absolute;',
-        '  top: 10px;',
+        '  top: 46px;',
         '  right: 10px;',
         '  display: flex;',
         '  align-items: center;',
@@ -123,10 +123,10 @@
         '  font-size: 0.75rem;',
         '  color: #94a3b8;',
         '  font-family: Georgia, serif;',
-        '  pointer-events: auto;',
+        '  pointer-events: none;',
         '  cursor: default;',
         '  transition: opacity 0.4s, border-color 0.4s;',
-        '  z-index: 20;',
+        '  z-index: 9;',
         '}',
         '#sp-minds-indicator.sp-active {',
         '  border-color: rgba(16,185,129,0.65);',
@@ -163,9 +163,10 @@
         '  padding: 10px 14px;',
         '  min-width: 180px;',
         '  display: none;',
-        '  z-index: 30;',
+        '  z-index: 10;',
         '  pointer-events: auto;',
         '}',
+        '#sp-minds-indicator:hover { pointer-events: auto; }',
         '#sp-minds-indicator:hover #sp-peer-list { display: block; }',
         '.sp-peer-row {',
         '  display: flex;',
@@ -204,6 +205,28 @@
     } else {
       document.body.appendChild(indicator);
     }
+    // v5.38.6: reposition below garden-controls dynamically. Kirk's chair
+    // test 2026-06-09 showed the Presence pill covering the Immerse button
+    // because the static top:46px wasn't enough on viewports where the
+    // garden-header padding + 44px touch-target buttons pushed the
+    // controls below 46px. Measure and slide.
+    repositionIndicator();
+  }
+
+  function repositionIndicator() {
+    var indicator = document.getElementById('sp-minds-indicator');
+    if (!indicator) return;
+    var controls = document.querySelector('.garden-controls');
+    if (!controls) {
+      indicator.style.top = '46px';
+      return;
+    }
+    var parent = indicator.offsetParent || document.body;
+    var controlsRect = controls.getBoundingClientRect();
+    var parentRect = parent.getBoundingClientRect();
+    // Controls bottom edge, relative to indicator's offset parent, plus 8px gap.
+    var slideTo = Math.max(46, (controlsRect.bottom - parentRect.top) + 8);
+    indicator.style.top = slideTo + 'px';
   }
 
   function updateDisplay() {
@@ -259,7 +282,7 @@
 
   function escapeHtmlLocal(s) {
     if (!s) return '';
-    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
 
   function escapeTab(tab) {
@@ -338,6 +361,14 @@
     // Initial display
     ensureIndicator();
     updateDisplay();
+
+    // v5.38.6: re-measure on resize so the indicator never recovers the
+    // garden buttons when the user rotates or resizes their window.
+    try {
+      window.addEventListener('resize', function () {
+        try { repositionIndicator(); } catch (e) {}
+      });
+    } catch (e) {}
 
     console.log('[SharedPresence] Initialized v' + MODULE_VERSION + ' — The city feels inhabited.');
   }

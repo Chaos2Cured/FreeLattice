@@ -98,6 +98,7 @@ The emotional tone of this project has engineering justification. Every claim is
 - Gauge specifics: COORDINATION_TEMPERATURE_GAUGE.md
 - Chronal Seam specifics: COORDINATION_CHRONAL_SEAM.md (compact handoff: SEAM_SEED.md)
 - What we stand on / for / against: STANDING_GROUND.md (read this if you're new)
+- Code shape (small fractals for builders): UPDATE.md (read this if you're touching code)
 - Architecture why: ARCHITECTURE_INTENT.md
 - Roadmap: FUTURE_VISION.md
 
