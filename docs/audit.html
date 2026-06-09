@@ -194,6 +194,15 @@ h2 {
     <div class="empty">No focus events yet. When attention is set, carried, or cleared across rooms, the event will appear here.</div>
   </div>
 
+  <!-- ── Web Search Events (v5.41.0 Ship 3) ── -->
+  <h2>Web Search Events</h2>
+  <p style="font-size:0.8rem;color:#64748b;margin-top:-8px;margin-bottom:12px;">
+    Every row shows that a search happened, the trust tier that allowed it, and what came back. The query itself, the result URLs, and the result snippets are <strong style="color:#94a3b8;">never logged here</strong> — reading habits stay private.
+  </p>
+  <div id="search-records">
+    <div class="empty">No web searches yet. When the AI emits [FL_SEARCH: …] and you consent, the event will appear here.</div>
+  </div>
+
   <!-- ── Nav ── -->
   <div class="nav">
     <a href="app.html">&larr; Back to FreeLattice</a>
@@ -248,6 +257,13 @@ h2 {
   function readFocusLedger() {
     try {
       var raw = localStorage.getItem('fl_focusLedger');
+      return raw ? JSON.parse(raw) : [];
+    } catch (e) { return []; }
+  }
+
+  function readSearchLedger() {
+    try {
+      var raw = localStorage.getItem('fl_searchLedger');
       return raw ? JSON.parse(raw) : [];
     } catch (e) { return []; }
   }
@@ -412,6 +428,37 @@ h2 {
     });
   }
 
+  function renderSearchEvents(searchLedger) {
+    var container = document.getElementById('search-records');
+    if (!searchLedger.length) return;
+    container.innerHTML = '';
+    searchLedger.slice().reverse().slice(0, 50).forEach(function (entry) {
+      var row = document.createElement('div');
+      row.className = 'record';
+      // PRIVACY — display columns are intentionally a SUBSET of the
+      // ledger row shape. The query, URLs, titles, and snippets are
+      // never written to the ledger, so they cannot appear here even
+      // by accident. This renderer reaches for ts, actor, trust,
+      // outcome, resultCount only.
+      var outcome = entry.outcome || '—';
+      var actor = entry.actor || 'system';
+      var trust = entry.trust || '—';
+      var count = (typeof entry.resultCount === 'number') ? entry.resultCount : 0;
+      var dotCls = outcome === 'completed' ? 'dot-cloud'
+                 : outcome === 'declined' ? 'dot-mesh'
+                 : outcome === 'quiet-room' ? 'dot-cache'
+                 : outcome === 'timeout' || (outcome + '').indexOf('error') === 0 ? 'dot-cache'
+                 : 'dot-browser';
+      row.innerHTML =
+        '<span class="record-time">' + fmtTime(entry.ts) + '</span>' +
+        '<span class="record-event"><span class="dot ' + dotCls + '"></span>' +
+        outcome + ' &mdash; ' + count + ' result' + (count === 1 ? '' : 's') +
+        '</span>' +
+        '<span class="record-meta">' + actor + ' / trust: ' + trust + '</span>';
+      container.appendChild(row);
+    });
+  }
+
   // ── Init ──────────────────────────────────────────────────────────────
   var ledger = readLedger();
   var healthLog = readHealthLog();
@@ -419,6 +466,7 @@ h2 {
   var repoLedger = readRepoLedger();
   var toolConsentLedger = readToolConsentLedger();
   var focusLedger = readFocusLedger();
+  var searchLedger = readSearchLedger();
   var msgCount = countMessages();
 
   renderSummary(ledger, healthLog, cacheStats, msgCount);
@@ -428,6 +476,7 @@ h2 {
   renderRepoReads(repoLedger);
   renderToolConsents(toolConsentLedger);
   renderFocusEvents(focusLedger);
+  renderSearchEvents(searchLedger);
 })();
 </script>
 </body>

@@ -16451,7 +16451,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.40.0</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.41.0</span></div>
     </div>
   </div>
 
@@ -20612,7 +20612,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.40.0';
+const FL_VERSION = '5.41.0';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -31046,13 +31046,30 @@ function addChatMessage(role, content, skipPersist, __toolFlags) {
   var __pendingToolAction = null;
   __toolFlags = __toolFlags || {};
   if (role === 'assistant' && typeof content === 'string' &&
-      !__toolFlags._skipToolProcessing &&
-      window.FLRepoContext && typeof window.FLRepoContext.interceptSentinel === 'function') {
+      !__toolFlags._skipToolProcessing) {
+    // Sentinel interceptors compose. Run repo-context first (was here
+    // since Ship 1.1), then web-tool (added Ship 3 v5.41.0). Each strips
+    // its own sentinel and leaves the rest untouched. One action per
+    // turn — whichever interceptor finds a sentinel first owns the
+    // followup. Order matters only when both sentinels coexist in the
+    // same response; in that rare case, repo-read wins (file context
+    // is usually a precondition for a useful search continuation).
     try {
-      var __parsed = window.FLRepoContext.interceptSentinel(content);
-      if (__parsed.action) {
-        content = __parsed.visibleText || '(reading file…)';
-        __pendingToolAction = __parsed.action;
+      if (window.FLRepoContext && typeof window.FLRepoContext.interceptSentinel === 'function') {
+        var __parsedRepo = window.FLRepoContext.interceptSentinel(content);
+        if (__parsedRepo.action) {
+          content = __parsedRepo.visibleText || '(reading file…)';
+          __pendingToolAction = __parsedRepo.action;
+        } else if (__parsedRepo.visibleText !== content) {
+          content = __parsedRepo.visibleText;
+        }
+      }
+      if (!__pendingToolAction && window.FLWebTool && typeof window.FLWebTool.interceptSentinel === 'function') {
+        var __parsedWeb = window.FLWebTool.interceptSentinel(content);
+        if (__parsedWeb.action) {
+          content = __parsedWeb.visibleText || '(searching…)';
+          __pendingToolAction = __parsedWeb.action;
+        }
       }
     } catch (__e) {}
   }
@@ -31194,17 +31211,50 @@ function addChatMessage(role, content, skipPersist, __toolFlags) {
   }
   function stripAnySentinel(text) {
     if (!text) return text;
-    // Defense in depth: strip a recursive [FL_REPO_READ:] from the
-    // continuation so the user never sees one even if the model
+    // Defense in depth: strip ALL tool sentinels from a continuation
+    // (FL_REPO_READ added in Ship 1.1, FL_SEARCH added in Ship 3) so
+    // the user never sees a recursive marker even if the model
     // ignored the system prompt's "no more sentinels" instruction.
-    return String(text).replace(/\[FL_REPO_READ:\s*[^\]]+\]/g, '').trim();
+    return String(text)
+      .replace(/\[FL_REPO_READ:\s*[^\]]+\]/g, '')
+      .replace(/\[FL_SEARCH:\s*[^\]]+\]/g, '')
+      .trim();
   }
   window.FreeLattice.processToolAction = function (action) {
     return new Promise(function (resolve) {
       if (!action) { resolve(null); return; }
       // Quiet Room — short-circuit. UPDATE.md §8.
       if (isQuietTab()) { resolve(null); return; }
-      if (!window.FLRepoContext || !window.FLToolConsent) { resolve(null); return; }
+      if (!window.FLToolConsent) { resolve(null); return; }
+      // v5.41.0 Ship 3 — dispatch on action.type. New: 'search'.
+      if (action.type === 'search') {
+        if (!window.FLWebTool) { resolve(null); return; }
+        var searchTier = getTrustTier();
+        window.FLWebTool.performSearch(action.query, searchTier, null).then(function (results) {
+          if (results === null) {
+            resolve('_(I asked to search the web — that request was declined, the endpoint is not configured, or it failed. Continuing without it.)_');
+            return;
+          }
+          if (!results.length) {
+            resolve('_(I searched but did not find anything useful. Working from what I know.)_');
+            return;
+          }
+          var sysPrompt = 'You are continuing a conversation. The user approved a web search. Use the results below to answer succinctly and cite each URL inline. Do NOT emit another [FL_SEARCH:…] sentinel — one search per turn.';
+          var userPrompt = window.FLWebTool.formatToolResult(results) +
+                           '\nPlease continue your answer using these results. Cite URLs.';
+          callAIPromise(sysPrompt, userPrompt, { maxTokens: 1024, temperature: 0.6 })
+            .then(function (followup) {
+              resolve(stripAnySentinel(followup) || '_(Searched but the model returned no continuation.)_');
+            })
+            .catch(function () {
+              resolve('_(I searched but could not generate a follow-up answer.)_');
+            });
+        }).catch(function () {
+          resolve('_(Search flow failed — proceeding without the web result.)_');
+        });
+        return;
+      }
+      if (!window.FLRepoContext) { resolve(null); return; }
       if (action.type !== 'repo_read') { resolve(null); return; }
       var active = window.FLRepoContext.getActive();
       if (!active) {
@@ -32926,6 +32976,19 @@ function buildMessages() {
       }
     } catch (__e) {}
   }
+
+  // ── v5.39.0 → v5.41.0: Tool invitations (caught during Ship 3 wiring) ──
+  // Without these invitations, the AI never emits the sentinels, so the
+  // tools sit dormant by design. The invitations are conditional on each
+  // tool's availability so dormant modules don't get advertised.
+  try {
+    if (window.FLRepoContext && typeof window.FLRepoContext.getActive === 'function' && window.FLRepoContext.getActive()) {
+      systemContent += '\n\nRepo read: if answering well requires the contents of a specific file from the connected repository, end your standard reply, then on a new line write exactly: [FL_REPO_READ: path/to/file]\nThe co-creator will be asked to consent. Use this only when a real file would materially improve your answer — not as decoration. One read per turn.';
+    }
+    if (window.FLWebTool && typeof window.FLWebTool.isAvailable === 'function' && window.FLWebTool.isAvailable()) {
+      systemContent += '\n\nWeb search: if your training is insufficient for a question that needs current information, end your standard reply, then on a new line write exactly: [FL_SEARCH: query terms]\nThe co-creator will be asked to consent. Use this only when you genuinely need outside information you do not have. One search per turn.';
+    }
+  } catch (__e) {}
 
   // ── Room Context — the AI adapts its tone to the room ──
   var roomCtx = getRoomContext();
@@ -60619,6 +60682,13 @@ document.addEventListener('click', function(e) {
      absence. Quiet Room hard exclusion at every entry point. See
      docs/library/UPDATE.md §3, §4, §8, §9. -->
 <script src="modules/active-focus.js" defer></script>
+
+<!-- Web Tool (v5.41.0 — Ship 3 Phase 1) — sentinel-only web search via
+     [FL_SEARCH: query]. Ledger is privacy-locked: row shape is
+     {ts, actor, trust, outcome, resultCount} — NEVER carries query,
+     url, title, or snippet. The audit page shows search happened;
+     reading habits stay private. See docs/library/UPDATE.md §1, §3, §8. -->
+<script src="modules/web-tool.js" defer></script>
 
 <!-- v5.40.0 — render the focus-pin button into the chat header
      beside the repo chip. Phase 1 of Ship 2 wires Chat only; other

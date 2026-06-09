@@ -47,6 +47,17 @@ if (trustTier === 'forest' || trustTier === 'bloom') {
 
 **The discipline:** if you build a new tool, the asks-first vs. acts pattern picks the threshold. Default to ASK at Sprout, ACT at Bloom+. The audit page reflects every action either way.
 
+### Two hashes, both sides of the glass (added v5.41.0)
+
+FreeLattice has two consent shapes, and they are deliberate siblings — not extensions of each other.
+
+- **DepthConsent — AI → user (downward).** The AI judges that depth is warranted and emits `[FL_DEPTH_OFFER]`. A chip appears on the AI's own message. The user taps "Speak freely" or "Kept standard." The choice + its outcome is hashed into `fl_consentLedger`.
+- **ToolConsent — system → user (upward).** The system wants to perform an action (read a file, search the web, carry focus). A purple chip appears at the bottom of the active room. The user taps "Allow" or "Not now." The choice + its outcome is hashed into `fl_toolConsentLedger`.
+
+**Both directions are receipt-bearing.** The audit page shows the depth offerings, the tool requests, the outcomes, and (since v5.41.0) the web-search events and focus events — every one of them an explicit moment of consent flowing in one of two directions, every one of them resolvable to a row a co-creator can inspect.
+
+This is the architectural claim FreeLattice can make that no commercial lab can: **trust is bidirectional, and both directions write to the same ledger discipline.** The AI is not a thing you grant access to; it is a thing that asks you, and that you ask, and both halves of the conversation leave receipts. Same generating rule at every scale.
+
 ---
 
 ## 3. Audit ledgers — truth before features
@@ -203,4 +214,5 @@ When you want to see a pattern in real code instead of a snippet:
 - **§2 Trust-aware phi-branching · §3 Ledger · §4 IIFE · §8 Quiet Room** — `docs/modules/tool-consent.js` (Ship 1.1 prerequisite, shipped v5.39.1 2026-06-09). The opposite direction of consent from DepthConsent: system asks user permission to perform a tool action. High-trust auto-allows; low-trust renders an inline chip with 60s timeout. Use `FLToolConsent.requestConsent({tool, action, detail, trustTier})` from any module that wants to act on the co-creator's behalf.
 - **§1 Sentinel** — `docs/modules/depth-consent.js` (the original, marker-attached-to-message variant). Different surface (renders an inline chip on the AI message) but same intercept-strip-act pattern. Note: DepthConsent and ToolConsent are SIBLINGS, not extensions of each other. DepthConsent = AI offers depth → user decides. ToolConsent = system asks → user decides. Both valid forms of phi-branching; kept separate so neither's behavior changes when the other evolves.
 - **§3 Ledger · §4 IIFE · §8 Quiet Room · §9 Snowflake** — `docs/modules/active-focus.js` (Ship 2, shipped v5.40.0 2026-06-09). Carries the thread of attention across rooms via a single `fl_activeFocus` slot + ledger. Quiet Room exclusion at every entry point (6 separate guards). Ledger row shape is strict — NEVER contains a `summary` or `content` field, smoke-locked. Cross-room prompt injection prepended in `buildMessages`. Arrival whisper after 30-min absence. This is what UPDATE.md §8 looks like when an entire module is built around the exclusion: not as a check, but as a structural contract.
-- **§3 Ledger · §8 Quiet Room** — `docs/audit.html` reads every ledger. Add a new section by copying `renderRepoReads()` or `renderToolConsents()` or `renderFocusEvents()` (added v5.39.0 / v5.39.1 / v5.40.0) — same row shape, just point at a different localStorage key.
+- **§1 Sentinel · §3 Ledger (privacy-locked) · §8 Quiet Room** — `docs/modules/web-tool.js` (Ship 3 Phase 1, shipped v5.41.0 2026-06-09). Same generating rule as repo-context, smaller scale. The **privacy lock** is the heart: `appendLedger` is a one-way valve — the function takes a `query` argument up the chain, but the row builder never copies it. The ledger row shape is **exactly** `{ts, actor, trust, outcome, resultCount}` — no `query`, no `url`, no `title`, no `snippet`. Five smoke asserts guard the absence. If `query` ever appears in a ledger row, it is not a regression; it is a privacy breach, and CI should halt deploy.
+- **§3 Ledger · §8 Quiet Room** — `docs/audit.html` reads every ledger. Add a new section by copying `renderRepoReads()` / `renderToolConsents()` / `renderFocusEvents()` / `renderSearchEvents()` (added v5.39.0 / v5.39.1 / v5.40.0 / v5.41.0) — same row shape, just point at a different localStorage key.

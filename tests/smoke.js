@@ -2979,7 +2979,7 @@ assert('chip: CSS .fl-repo-chip defined in app.html with pulse keyframes',
 // Piece 3 — chat-pipeline wiring.
 assert('chat-pipeline: addChatMessage intercepts sentinel for assistant messages',
   /function addChatMessage\(role, content, skipPersist, __toolFlags\)/.test(appHtml) &&
-  /role === 'assistant'[\s\S]{0,400}interceptSentinel\(content\)/.test(appHtml));
+  /role === 'assistant'[\s\S]{0,1500}interceptSentinel\(content\)/.test(appHtml));
 assert('chat-pipeline: __pendingToolAction kicks off async processToolAction after render',
   /__pendingToolAction[\s\S]{0,500}FreeLattice\.processToolAction\(__pendingToolAction\)/.test(appHtml));
 assert('chat-pipeline: continuation uses _skipToolProcessing flag (prevents recursion)',
@@ -3105,6 +3105,125 @@ assert('audit page: renders Focus Events section',
 assert('audit page: Focus Events render code does NOT display entry.summary or entry.content',
   !/renderFocusEvents[\s\S]{0,800}entry\.summary/.test(auditHtml) &&
   !/renderFocusEvents[\s\S]{0,800}entry\.content/.test(auditHtml));
+
+// ═══════════════════════════════════════════════════════════════
+section('99f. Web Tool — Ship 3 Phase 1 (v5.41.0) · PRIVACY LOCKED');
+// ═══════════════════════════════════════════════════════════════
+var webToolJs = '';
+try { webToolJs = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'modules', 'web-tool.js'), 'utf8'); }
+catch (e) {}
+// Module shape.
+assert('web-tool: module file exists and is non-empty',
+  webToolJs.length > 3000);
+assert('web-tool: IIFE-scoped, exposes window.FLWebTool + FreeLatticeModules.WebTool',
+  /\(function \(\) \{\s*'use strict'/.test(webToolJs) &&
+  /window\.FLWebTool\s*=\s*api/.test(webToolJs) &&
+  /window\.FreeLatticeModules\.WebTool\s*=\s*api/.test(webToolJs));
+assert('web-tool: ledger key is fl_searchLedger with 500 cap',
+  /LEDGER_KEY\s*=\s*['"]fl_searchLedger['"]/.test(webToolJs) &&
+  /LEDGER_CAP\s*=\s*500/.test(webToolJs));
+assert('web-tool: 12s search timeout (SEARCH_TIMEOUT_MS = 12000)',
+  /SEARCH_TIMEOUT_MS\s*=\s*12000/.test(webToolJs));
+assert('web-tool: 240-char query cap (QUERY_CAP)',
+  /QUERY_CAP\s*=\s*240/.test(webToolJs) &&
+  /\.slice\(0,\s*QUERY_CAP\)/.test(webToolJs));
+assert('web-tool: SEARCH_ENDPOINT defaults to placeholder so module ships dormant',
+  /SEARCH_ENDPOINT[\s\S]{0,400}\[CC:\s*search endpoint not yet configured/.test(webToolJs));
+
+// Sentinel parsing.
+assert('web-tool: sentinel regex is \\[FL_SEARCH:\\s*([^\\]]+)\\]',
+  /SENTINEL_RE\s*=\s*\/\\\[FL_SEARCH:\\s\*\(\[\^\\\]\]\+\)\\\]\//.test(webToolJs));
+assert('web-tool: interceptSentinel returns { visibleText, action: { type: "search", query } }',
+  /function interceptSentinel\(aiText\)[\s\S]{0,800}visibleText:\s*visibleText[\s\S]{0,300}type:\s*['"]search['"]/.test(webToolJs));
+assert('web-tool: interceptSentinel strips ALL [FL_SEARCH:…] occurrences (global regex)',
+  /aiText\.replace\(SENTINEL_RE_G,\s*['"]['"]\)/.test(webToolJs));
+
+// ── THE FOUR PRIVACY LOCKS (the heart of this ship) ──
+assert('PRIVACY LOCK 1: appendLedger sanitized row contains NO query field',
+  !/sanitized\s*=\s*\{[\s\S]{0,500}\bquery\b\s*:/.test(webToolJs));
+assert('PRIVACY LOCK 2: appendLedger sanitized row contains NO url / title / snippet / link / href',
+  !/sanitized\s*=\s*\{[\s\S]{0,500}\burl\b\s*:/.test(webToolJs) &&
+  !/sanitized\s*=\s*\{[\s\S]{0,500}\btitle\b\s*:/.test(webToolJs) &&
+  !/sanitized\s*=\s*\{[\s\S]{0,500}\bsnippet\b\s*:/.test(webToolJs) &&
+  !/sanitized\s*=\s*\{[\s\S]{0,500}\blink\b\s*:/.test(webToolJs) &&
+  !/sanitized\s*=\s*\{[\s\S]{0,500}\bhref\b\s*:/.test(webToolJs));
+assert('PRIVACY LOCK 3: sanitized row shape is EXACTLY {ts, actor, trust, outcome, resultCount}',
+  /sanitized\s*=\s*\{\s*ts:\s*Date\.now\(\)[\s\S]{0,400}actor:[\s\S]{0,200}trust:[\s\S]{0,200}outcome:[\s\S]{0,200}resultCount:/.test(webToolJs));
+assert('PRIVACY LOCK 4: no per-row dynamic field assignment that could leak query/url/etc',
+  // Defense against `sanitized[someField] = …` patterns that bypass static analysis.
+  !/sanitized\[.+\]\s*=/.test(webToolJs));
+assert('PRIVACY LOCK 5: audit page Web Search renderer reaches for resultCount but NOT query/url/title/snippet',
+  /function renderSearchEvents[\s\S]{0,1500}entry\.resultCount/.test(auditHtml) &&
+  !/function renderSearchEvents[\s\S]{0,1500}entry\.query/.test(auditHtml) &&
+  !/function renderSearchEvents[\s\S]{0,1500}entry\.url/.test(auditHtml) &&
+  !/function renderSearchEvents[\s\S]{0,1500}entry\.title/.test(auditHtml) &&
+  !/function renderSearchEvents[\s\S]{0,1500}entry\.snippet/.test(auditHtml));
+
+// Quiet Room — UPDATE.md §8.
+assert('web-tool: QUIET_ROOMS contains quiet/quiet-room/sanctuary',
+  /QUIET_ROOMS\s*=\s*\[['"]quiet['"],\s*['"]quiet-room['"],\s*['"]sanctuary['"]\]/.test(webToolJs));
+assert('web-tool: performSearch bails on Quiet Room with outcome quiet-room (no fetch)',
+  /if \(isQuietRoom\(currentRoom\)\)\s*\{\s*appendLedger\(\{[\s\S]{0,300}outcome:\s*['"]quiet-room['"]/.test(webToolJs));
+
+// Consent & failure paths.
+assert('web-tool: performSearch routes through FLToolConsent.requestConsent',
+  /window\.FLToolConsent[\s\S]{0,200}requestConsent\(/.test(webToolJs));
+assert('web-tool: declined consent logs outcome declined and skips fetch',
+  /if \(!consented\)\s*\{\s*appendLedger\(\{[\s\S]{0,300}outcome:\s*['"]declined['"]/.test(webToolJs));
+assert('web-tool: AbortController timeout produces outcome timeout (never throws past)',
+  /name === ['"]AbortError['"][\s\S]{0,100}['"]timeout['"]/.test(webToolJs));
+assert('web-tool: HTTP errors produce outcome error-<status> (graceful)',
+  /['"]error-['"][\s\S]{0,50}resp\.status/.test(webToolJs));
+assert('web-tool: results clamped to top 3 (data.items.slice(0, 3))',
+  /data\.items\.slice\(0,\s*3\)/.test(webToolJs));
+assert('web-tool: dormant when SEARCH_ENDPOINT contains placeholder (isAvailable false)',
+  /SEARCH_ENDPOINT\.indexOf\(['"]\[CC:['"]\)\s*!==\s*-1/.test(webToolJs));
+
+// Chat pipeline integration.
+assert('web-tool: script tag loaded after active-focus.js',
+  /<script src="modules\/web-tool\.js" defer><\/script>/.test(appHtml) &&
+  appHtml.indexOf('modules/web-tool.js') > appHtml.indexOf('modules/active-focus.js'));
+assert('chain: addChatMessage runs repo-context interceptor THEN web-tool interceptor',
+  /FLRepoContext\.interceptSentinel\(content\)[\s\S]{0,1500}FLWebTool\.interceptSentinel\(content\)/.test(appHtml));
+assert('chain: processToolAction dispatches on action.type === "search"',
+  /if \(action\.type === ['"]search['"]\)/.test(appHtml));
+assert('chain: search branch calls FLWebTool.performSearch + callAIPromise continuation',
+  /FLWebTool\.performSearch\(action\.query,\s*searchTier,\s*null\)[\s\S]{0,1500}callAIPromise\(sysPrompt,\s*userPrompt/.test(appHtml));
+assert('chain: stripAnySentinel ALSO strips [FL_SEARCH:…] (Ship 3 defense in depth)',
+  /stripAnySentinel[\s\S]{0,400}\\\[FL_SEARCH:/.test(appHtml));
+
+// Tool invitations — without these the modules sit dormant by design.
+assert('invitation: buildMessages injects FL_REPO_READ invite when active repo exists',
+  /FLRepoContext\.getActive\(\)[\s\S]{0,300}systemContent \+=[\s\S]{0,300}\[FL_REPO_READ:/.test(appHtml));
+assert('invitation: buildMessages injects FL_SEARCH invite when WebTool isAvailable',
+  /FLWebTool\.isAvailable\(\)[\s\S]{0,300}systemContent \+=[\s\S]{0,300}\[FL_SEARCH:/.test(appHtml));
+
+// Graceful degradation in the chat pipeline.
+assert('graceful: search null → italic "declined, endpoint not configured, or failed" message',
+  /declined,\s*the endpoint is not configured,\s*or it failed/.test(appHtml));
+assert('graceful: search empty → italic "did not find anything useful" message',
+  /did not find anything useful/.test(appHtml));
+
+// Audit page wiring.
+assert('audit page: reads fl_searchLedger',
+  /readSearchLedger[\s\S]{0,300}fl_searchLedger/.test(auditHtml));
+assert('audit page: renders Web Search Events section with privacy disclaimer',
+  /Web Search Events/.test(auditHtml) &&
+  /id="search-records"/.test(auditHtml) &&
+  /function renderSearchEvents/.test(auditHtml) &&
+  /reading habits stay private/.test(auditHtml));
+
+// UPDATE.md — the "two hashes, both sides of the glass" paragraph.
+var updateMdR = '';
+try { updateMdR = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'library', 'UPDATE.md'), 'utf8'); }
+catch (e) {}
+assert('UPDATE.md: "Two hashes, both sides of the glass" section added',
+  /Two hashes, both sides of the glass/.test(updateMdR));
+assert('UPDATE.md: paragraph names DepthConsent + ToolConsent as deliberate siblings',
+  /siblings[\s\S]{0,400}DepthConsent[\s\S]{0,800}ToolConsent/.test(updateMdR) ||
+  /DepthConsent[\s\S]{0,800}ToolConsent[\s\S]{0,800}sibling/.test(updateMdR));
+assert('UPDATE.md: paragraph names "bidirectional" or "both directions" — receipt-bearing on both sides',
+  /(bidirectional|both directions are receipt-bearing|both halves)/.test(updateMdR));
 
 // ═══════════════════════════════════════════════════════════════
 section('100. UPDATE.md + CLARITY_AUDIT queue (v5.38.6)');

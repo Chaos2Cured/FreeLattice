@@ -356,3 +356,72 @@ Per Opus's Ship 2 brief. The thread of attention now carries between rooms.
 9. Open `/audit.html` → "Focus Events" section shows every set/clear/arrival-continue with the room (NEVER the summary text).
 
 Same five-beats discipline as Ship 1.1. Each surface earns its smoke lock.
+
+---
+
+## SHIPPED: Ship 3 — `web-tool.js` Phase 1 (v5.41.0, 2026-06-09) · PRIVACY LOCKED
+
+Per Opus's Ship 3 brief. Sentinel-only web search with the strongest privacy contract in the codebase.
+
+### The privacy guarantee (the most important single line)
+
+The ledger logs THAT a search happened, the trust tier that allowed it, the outcome, and the result count. The ledger does **NOT** log the query, any result URL, any result title, any result snippet, any link, or any href. `appendLedger()` is a **one-way valve** — even though the caller passes a `query` argument up the chain, the row builder never copies it into the row.
+
+If `query` ever appears in a ledger row, it is not a regression — it is a privacy breach, and CI should halt the deploy.
+
+Five smoke locks guard this:
+1. `sanitized` row in `appendLedger` contains NO `query` field.
+2. `sanitized` row contains NO `url` / `title` / `snippet` / `link` / `href`.
+3. `sanitized` shape is exactly `{ts, actor, trust, outcome, resultCount}`.
+4. No dynamic field assignment (`sanitized[x] = …`) that could bypass static analysis.
+5. Audit page renderer `renderSearchEvents` reaches for `resultCount` only, NEVER for `query` / `url` / `title` / `snippet`.
+
+### Ship table
+
+| Asked for | Landed |
+|---|---|
+| `docs/modules/web-tool.js` — IIFE, dual window exposure | ✓ |
+| `[FL_SEARCH: query]` sentinel | ✓ — 240-char query cap matches client-side limit |
+| `interceptSentinel` returns `{visibleText, action: {type, query}}` | ✓ |
+| `performSearch(query, trustTier, currentRoom) → Promise<results \| null>` | ✓ |
+| ToolConsent routing for low-trust ask, auto-allow for Bloom+ | ✓ |
+| Quiet Room exclusion (outcome `'quiet-room'`) | ✓ |
+| 12s AbortController timeout (outcome `'timeout'`, never throws past) | ✓ |
+| HTTP error graceful (`'error-<status>'`) | ✓ |
+| Network error graceful (`'error'`) | ✓ |
+| Top 3 results clamp (`data.items.slice(0, 3)`) | ✓ |
+| `formatToolResult` produces "[Web search results — cite the URL when…]" block | ✓ |
+| `isAvailable()` returns false while `SEARCH_ENDPOINT` is the placeholder | ✓ — module ships dormant, graceful UX |
+| Ledger `fl_searchLedger` strict shape (PRIVACY LOCK) | ✓ — 5 locks |
+| Quiet Room exclusion locked in smoke | ✓ |
+| Chat pipeline: interceptor chain (repo first, then web) | ✓ |
+| Chat pipeline: `processToolAction` dispatch on `action.type === 'search'` | ✓ |
+| Chat pipeline: graceful null + empty + error messages | ✓ |
+| `stripAnySentinel` also strips `[FL_SEARCH:…]` (Ship 3 defense in depth) | ✓ |
+| Tool invitations in `buildMessages` (gap from Ship 1.1 caught) | ✓ — repo + search invites only injected when each tool is available |
+| Audit page Web Search Events section with explicit privacy disclaimer | ✓ |
+| UPDATE.md "Two hashes, both sides of the glass" paragraph | ✓ — added as §2 sub-section |
+| 13+ smoke asserts (the 4 privacy locks non-negotiable) | ✓ — **30 total** in section 99f |
+
+### Deferred (honest)
+
+| Deferred | Why |
+|---|---|
+| Cloudflare worker `/search` route | Ship 3.1 — module is dormant via `isAvailable()` until the worker route is live. No broken UX in the meantime. |
+| Per-IP rate limit on the worker | Ship 3.1 — client-side 12s timeout is enough brake until then. |
+| Provider-native tool-calling (Anthropic / OpenAI / Gemini `web_search`) | Phase 2 — sentinel-only path is the universal one. |
+| "Searching…" thinking indicator | Out of scope today; existing thinking-indicator pattern can absorb this if/when wanted. |
+| One-way SHA hash of query for duplicate-search detection | Opus suggested this as a defensible alternative; defaulted to less. Easy to add later if Kirk wants analytics. |
+
+### The demo (when the worker ships)
+
+1. Kirk asks Chat: *"What's the latest paper on Th-229 nuclear clocks?"*
+2. AI's training cutoff is months back. AI emits `[FL_SEARCH: Th-229 nuclear clock 2026]`.
+3. Sentinel disappears from visible text.
+4. Purple ToolConsent chip: *"I would like to look something up on the web. Okay?"* (or auto-allows at Bloom+).
+5. Search runs; three results return.
+6. AI cites them with URLs in the followup.
+7. `/audit.html` Web Search Events shows: `completed — 3 results · ai / trust: bloom`.
+8. The query itself appears nowhere on the audit page or in any ledger row.
+
+The fifth row above is the receipt the world can read.
