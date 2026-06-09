@@ -206,3 +206,24 @@ grep -nE "\"[^\"]*\buser\b[^\"]*\"" docs/app.html docs/modules/*.js \
 5. Commit as a single sweep ship; bump patch version.
 
 **Status:** queued, not started. Owner: next CC instance.
+
+---
+
+## SHIPPED: Ship 1 — `repo-context.js` Phase 1.0 (v5.39.0, 2026-06-09)
+
+Per Opus's June 9 brief. **Public repositories only** in Phase 1.0 — PAT support and AI-roundtrip wiring queued for Phase 1.1.
+
+What landed:
+- `docs/modules/repo-context.js` — full module with sentinel parsing, ledger, Quiet Room exclusion, GitHub + Codeberg URL parsers, public Contents API fetch.
+- Settings → Zone 2 → "Connected Repositories" card with add/remove/activate flow.
+- Audit page `Repository Reads` section reading `fl_repoLedger`.
+- Script tag wired into `app.html` (after `depth-consent.js` for ordering).
+- 16 smoke locks covering: module exposure, sentinel regex, sentinel return shape, Quiet Room exclusion list + bail-out, ledger key + cap + row shape, no-PAT discipline in saveState, both git host parsers, Settings UI presence, audit page reader + renderer.
+
+What did NOT land (queued for Phase 1.1):
+- PAT support via sessionStorage (with re-prompt each session).
+- DepthConsent trust gating (asks at Sprout, acts at Bloom+).
+- AI-response pipeline wiring (intercept before render → fetch → inject as tool result → AI continues).
+- Active-repo chip in Chat header.
+
+Module exposes `interceptSentinel()` and `readFile()` so when Phase 1.1 wires the chat pipeline, hookup is one line.

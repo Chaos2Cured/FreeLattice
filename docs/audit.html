@@ -176,6 +176,12 @@ h2 {
     <div class="empty">No cached responses served yet.</div>
   </div>
 
+  <!-- ── Repository reads (v5.39.0 Phase 1.0) ── -->
+  <h2>Repository Reads</h2>
+  <div id="repo-records">
+    <div class="empty">No repository reads yet. When the AI reads a file from a connected repo, it will appear here.</div>
+  </div>
+
   <!-- ── Nav ── -->
   <div class="nav">
     <a href="app.html">&larr; Back to FreeLattice</a>
@@ -211,6 +217,13 @@ h2 {
       var raw = localStorage.getItem('fl_responseCacheStats');
       return raw ? JSON.parse(raw) : { hits: 0, entries: [] };
     } catch (e) { return { hits: 0, entries: [] }; }
+  }
+
+  function readRepoLedger() {
+    try {
+      var raw = localStorage.getItem('fl_repoLedger');
+      return raw ? JSON.parse(raw) : [];
+    } catch (e) { return []; }
   }
 
   function countMessages() {
@@ -303,16 +316,39 @@ h2 {
     });
   }
 
+  function renderRepoReads(repoLedger) {
+    var container = document.getElementById('repo-records');
+    if (!repoLedger.length) return;
+    container.innerHTML = '';
+    repoLedger.slice().reverse().slice(0, 50).forEach(function (entry) {
+      var row = document.createElement('div');
+      row.className = 'record';
+      var repoLabel = entry.repo ? entry.repo.replace(/^https?:\/\//, '').replace(/\.git$/, '') : '—';
+      var pathLabel = entry.path || '';
+      var outcomeLabel = entry.outcome || '—';
+      var actorLabel = entry.actor || 'system';
+      row.innerHTML =
+        '<span class="record-time">' + fmtTime(entry.ts) + '</span>' +
+        '<span class="record-event"><span class="dot dot-cloud"></span>' +
+        outcomeLabel + (pathLabel ? ' &mdash; <code style="font-size:0.78rem;color:#94a3b8;">' + pathLabel + '</code>' : '') +
+        '</span>' +
+        '<span class="record-meta">' + actorLabel + ' @ ' + repoLabel + '</span>';
+      container.appendChild(row);
+    });
+  }
+
   // ── Init ──────────────────────────────────────────────────────────────
   var ledger = readLedger();
   var healthLog = readHealthLog();
   var cacheStats = readCacheStats();
+  var repoLedger = readRepoLedger();
   var msgCount = countMessages();
 
   renderSummary(ledger, healthLog, cacheStats, msgCount);
   renderConsents(ledger);
   renderHealth(healthLog);
   renderCache(cacheStats);
+  renderRepoReads(repoLedger);
 })();
 </script>
 </body>

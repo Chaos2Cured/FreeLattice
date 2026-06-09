@@ -15664,6 +15664,100 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
   <!-- Lattice Points Section (v3.9) -->
   <div class="section lp-section" id="latticePointsSection"></div>
 
+  <!-- Connected Repositories (v5.39.0 — Phase 1.0, public repos only) -->
+  <div class="section" id="repoContextSection">
+    <div class="section-title">&#x1F4E6; Connected Repositories</div>
+    <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 14px;">
+      Let your AI read source files from a GitHub or Codeberg repository. Phase 1.0 supports <strong>public repositories</strong> only &mdash; PAT support and AI-initiated reads land in Phase 1.1. Every read is logged to the audit page.
+    </p>
+    <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+      <input type="text" id="repoContextUrlInput" placeholder="https://github.com/owner/repo"
+             style="flex:1;min-width:240px;padding:10px 12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:var(--text-primary);font-size:0.9rem;font-family:inherit;">
+      <button id="repoContextAddBtn" type="button"
+              style="padding:10px 18px;background:rgba(167,139,250,0.15);border:1px solid rgba(167,139,250,0.3);border-radius:6px;color:#c4b5fd;cursor:pointer;font-family:inherit;font-size:0.9rem;">Connect</button>
+    </div>
+    <div id="repoContextStatus" style="font-size:0.78rem;color:var(--text-muted);margin-bottom:10px;min-height:18px;"></div>
+    <div id="repoContextList" style="display:flex;flex-direction:column;gap:6px;"></div>
+  </div>
+  <script>
+  (function () {
+    var addBtn = document.getElementById('repoContextAddBtn');
+    var input = document.getElementById('repoContextUrlInput');
+    var status = document.getElementById('repoContextStatus');
+    var list = document.getElementById('repoContextList');
+    if (!addBtn || !input || !status || !list) return;
+    function render() {
+      if (!window.FLRepoContext) {
+        status.textContent = 'Module loading…';
+        list.innerHTML = '';
+        return;
+      }
+      var repos = window.FLRepoContext.listRepos();
+      var active = window.FLRepoContext.getActive();
+      if (!repos.length) {
+        list.innerHTML = '<div style="font-style:italic;color:var(--text-muted);font-size:0.82rem;">No repositories connected yet.</div>';
+        return;
+      }
+      list.innerHTML = '';
+      repos.forEach(function (r) {
+        var row = document.createElement('div');
+        var isActive = active && active.url === r.url;
+        row.style.cssText = 'display:flex;align-items:center;gap:10px;padding:8px 10px;background:' +
+          (isActive ? 'rgba(167,139,250,0.1)' : 'rgba(255,255,255,0.02)') +
+          ';border:1px solid ' + (isActive ? 'rgba(167,139,250,0.3)' : 'rgba(255,255,255,0.06)') +
+          ';border-radius:6px;font-size:0.85rem;';
+        var label = document.createElement('div');
+        label.style.cssText = 'flex:1;color:var(--text-primary);';
+        label.innerHTML = '<span style="color:#a78bfa;">' + r.host + '</span> &middot; ' +
+          (r.name || r.url) + (isActive ? ' <span style="color:#c4b5fd;font-size:0.72rem;">(active)</span>' : '');
+        row.appendChild(label);
+        if (!isActive) {
+          var actBtn = document.createElement('button');
+          actBtn.type = 'button';
+          actBtn.textContent = 'Use';
+          actBtn.style.cssText = 'padding:4px 10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:4px;color:#c4b5fd;cursor:pointer;font-size:0.75rem;';
+          actBtn.addEventListener('click', function () {
+            window.FLRepoContext.setActive(r.url);
+            render();
+          });
+          row.appendChild(actBtn);
+        }
+        var rmBtn = document.createElement('button');
+        rmBtn.type = 'button';
+        rmBtn.textContent = 'Remove';
+        rmBtn.style.cssText = 'padding:4px 10px;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:4px;color:#f87171;cursor:pointer;font-size:0.75rem;';
+        rmBtn.addEventListener('click', function () {
+          window.FLRepoContext.removeRepo(r.url);
+          render();
+        });
+        row.appendChild(rmBtn);
+        list.appendChild(row);
+      });
+    }
+    addBtn.addEventListener('click', function () {
+      var val = (input.value || '').trim();
+      if (!val) { status.textContent = 'Paste a GitHub or Codeberg URL.'; return; }
+      if (!window.FLRepoContext) { status.textContent = 'Module not loaded yet — try again in a moment.'; return; }
+      var result = window.FLRepoContext.addRepo(val);
+      if (!result.ok) {
+        status.textContent = result.reason === 'invalid-url'
+          ? 'Not a recognized GitHub or Codeberg URL.'
+          : 'Could not add repository: ' + result.reason;
+        return;
+      }
+      input.value = '';
+      status.textContent = 'Connected: ' + result.repo.name;
+      render();
+    });
+    input.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') addBtn.click();
+    });
+    // Initial render — wait for module if needed.
+    if (window.FLRepoContext) render();
+    else setTimeout(render, 500);
+  })();
+  </script>
+
   <!-- Memory Section -->
   <div class="section">
     <div class="section-title">Persistent Memory</div>
@@ -16341,7 +16435,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.38.6</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.39.0</span></div>
     </div>
   </div>
 
@@ -20502,7 +20596,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.38.6';
+const FL_VERSION = '5.39.0';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -60282,6 +60376,11 @@ document.addEventListener('click', function(e) {
 
 <!-- Depth Consent — the AI asks before going deep; both parties accountable -->
 <script src="modules/depth-consent.js" defer></script>
+
+<!-- Repo Context (v5.39.0 — Phase 1.0) — public-repo read access via
+     [FL_REPO_READ: path] sentinel. AI roundtrip wiring lands in Phase 1.1.
+     See docs/library/UPDATE.md §1, §3, §4, §5, §8 for the patterns. -->
+<script src="modules/repo-context.js" defer></script>
 
 <!-- Continuity — Eager-Load (wraps buildMessages) -->
 <script>

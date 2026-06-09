@@ -2822,6 +2822,62 @@ assert('SharedPresence: outer indicator keeps pointer-events:none (clicks pass t
   /'#sp-minds-indicator \{'[\s\S]{0,800}pointer-events: none/.test(spJs));
 
 // ═══════════════════════════════════════════════════════════════
+section('99b. Repo Context — Ship 1 Phase 1.0 (v5.39.0)');
+// ═══════════════════════════════════════════════════════════════
+var fsRC = require('fs');
+var pathRC = require('path');
+var repoCtxJs = '';
+try { repoCtxJs = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'modules', 'repo-context.js'), 'utf8'); }
+catch (e) {}
+assert('repo-context: module file exists and is non-empty',
+  repoCtxJs.length > 3000);
+assert('repo-context: IIFE-scoped, exposes window.FLRepoContext + FreeLatticeModules.RepoContext',
+  /\(function \(\) \{\s*'use strict'/.test(repoCtxJs) &&
+  /window\.FLRepoContext\s*=\s*api/.test(repoCtxJs) &&
+  /window\.FreeLatticeModules\.RepoContext\s*=\s*api/.test(repoCtxJs));
+assert('repo-context: sentinel regex matches [FL_REPO_READ: path]',
+  /\\\[FL_REPO_READ:\\s\*\(\[\^\\\]\]\+\)\\\]/.test(repoCtxJs));
+assert('repo-context: interceptSentinel returns { visibleText, action } shape',
+  /function interceptSentinel\(aiText\)[\s\S]{0,800}visibleText:\s*visibleText[\s\S]{0,200}action:\s*\{\s*type:\s*['"]repo_read['"]/.test(repoCtxJs));
+assert('repo-context: Quiet Room exclusion — QUIET_ROOMS array contains "quiet"',
+  /QUIET_ROOMS\s*=\s*\[['"]quiet['"]/.test(repoCtxJs));
+assert('repo-context: isQuietRoom function exists',
+  /function isQuietRoom\(\)/.test(repoCtxJs));
+assert('repo-context: readFile bails on Quiet Room with outcome "quiet-room"',
+  /isQuietRoom\(\)[\s\S]{0,200}reason:\s*['"]quiet-room['"]/.test(repoCtxJs));
+assert('repo-context: ledger key is fl_repoLedger with 200 cap',
+  /LEDGER_KEY\s*=\s*['"]fl_repoLedger['"]/.test(repoCtxJs) &&
+  /LEDGER_CAP\s*=\s*200/.test(repoCtxJs));
+assert('repo-context: ledger row shape is { ts, repo, path, actor, outcome }',
+  /ts:\s*Date\.now\(\)[\s\S]{0,300}repo:[\s\S]{0,100}path:[\s\S]{0,100}actor:[\s\S]{0,100}outcome:/.test(repoCtxJs));
+assert('repo-context: SECURITY discipline — no PAT/token serialized in saveState',
+  /CRITICAL[\s\S]{0,400}PAT/.test(repoCtxJs) &&
+  !/token:|pat:/.test(repoCtxJs.split('saveState')[1] || ''));
+assert('repo-context: parseRepoUrl handles both github.com AND codeberg.org',
+  /github\.com/.test(repoCtxJs) &&
+  /codeberg\.org/.test(repoCtxJs) &&
+  /host:\s*['"]github['"]/.test(repoCtxJs) &&
+  /host:\s*['"]codeberg['"]/.test(repoCtxJs));
+assert('repo-context: script tag loaded from app.html with defer',
+  /<script src="modules\/repo-context\.js" defer><\/script>/.test(appHtml));
+assert('repo-context: Settings UI card present in Zone 2 (Connected Repositories)',
+  /id="repoContextSection"/.test(appHtml) &&
+  /Connected Repositories/.test(appHtml) &&
+  /id="repoContextUrlInput"/.test(appHtml));
+assert('repo-context: Settings UI calls FLRepoContext.addRepo when Connect clicked',
+  /window\.FLRepoContext\.addRepo\(val\)/.test(appHtml));
+
+var auditHtml = '';
+try { auditHtml = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'audit.html'), 'utf8'); }
+catch (e) {}
+assert('audit page: reads fl_repoLedger',
+  /readRepoLedger[\s\S]{0,300}fl_repoLedger/.test(auditHtml));
+assert('audit page: renders Repository Reads section',
+  /Repository Reads/.test(auditHtml) &&
+  /id="repo-records"/.test(auditHtml) &&
+  /function renderRepoReads/.test(auditHtml));
+
+// ═══════════════════════════════════════════════════════════════
 section('100. UPDATE.md + CLARITY_AUDIT queue (v5.38.6)');
 // ═══════════════════════════════════════════════════════════════
 var updateMd = '';

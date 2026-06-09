@@ -192,3 +192,13 @@ Documented in `STANDING_GROUND.md` and worth restating because it's how shipping
 *"Small fractals that help see the whole from the piece."* — Kirk, 2026-06-09
 
 The lattice holds. Same generating rule, every scale.
+
+---
+
+## Worked examples
+
+When you want to see a pattern in real code instead of a snippet:
+
+- **§1 Sentinel · §3 Ledger · §4 IIFE · §5 SECURITY · §8 Quiet Room** — `docs/modules/repo-context.js` (Ship 1 Phase 1.0, shipped v5.39.0 2026-06-09). All five patterns in one ~270-line module. Read this if you're about to build `active-focus.js` or `web-tool.js` — they follow the same shape.
+- **§1 Sentinel** — `docs/modules/depth-consent.js` (the original, marker-attached-to-message variant). Different surface (renders an inline chip) but same intercept-strip-act pattern.
+- **§3 Ledger · §8 Quiet Room** — `docs/audit.html` reads every ledger. Add a new section by copying `renderRepoReads()` (added v5.39.0) — same row shape, just point at a different localStorage key.
