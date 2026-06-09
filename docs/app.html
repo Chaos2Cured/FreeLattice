@@ -15774,6 +15774,56 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
   })();
   </script>
 
+  <!-- Web Search Toggle (v5.41.1 — Ship 3.1) -->
+  <div class="section" id="webSearchToggleSection">
+    <div class="section-title">&#x1F50E; Web Search</div>
+    <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 14px;">
+      Allow the AI to look up information on the web when it needs current data. Every search is gated by consent and logged to the audit page &mdash; without the query itself. <strong>The Cloudflare worker that brokers searches keeps no logs; the FreeLattice client logs no queries.</strong>
+    </p>
+    <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:0.92rem;">
+      <input type="checkbox" id="webSearchToggle" style="width:18px;height:18px;cursor:pointer;">
+      <span>Allow the AI to search the web when it needs to</span>
+    </label>
+    <div id="webSearchToggleStatus" style="font-size:0.78rem;color:var(--text-muted);margin-top:8px;min-height:18px;"></div>
+  </div>
+  <script>
+  (function () {
+    var toggle = document.getElementById('webSearchToggle');
+    var status = document.getElementById('webSearchToggleStatus');
+    if (!toggle || !status) return;
+    function refresh() {
+      try {
+        var disabled = localStorage.getItem('fl_searchEnabled') === 'false';
+        toggle.checked = !disabled;
+      } catch (e) { toggle.checked = true; }
+      if (window.FLWebTool) {
+        var avail = window.FLWebTool.isAvailable();
+        var endpoint = window.FLWebTool.getSearchEndpoint();
+        if (endpoint && endpoint.indexOf('[CC:') !== -1) {
+          status.textContent = 'Search is dormant: no Cloudflare worker endpoint configured yet. (Ship the worker in /worker, then set localStorage.fl_searchEndpoint.)';
+        } else if (avail) {
+          status.textContent = 'Active — AI may emit [FL_SEARCH:…] when needed; you will be asked to consent.';
+        } else if (!toggle.checked) {
+          status.textContent = 'Disabled on this device. Re-enable above to allow search.';
+        } else {
+          status.textContent = 'Search currently unavailable (Quiet Room or endpoint check).';
+        }
+      } else {
+        status.textContent = 'Web Tool module loading…';
+      }
+    }
+    toggle.addEventListener('change', function () {
+      try {
+        if (toggle.checked) localStorage.removeItem('fl_searchEnabled');
+        else localStorage.setItem('fl_searchEnabled', 'false');
+      } catch (e) {}
+      refresh();
+    });
+    if (window.FLWebTool) refresh();
+    else setTimeout(refresh, 500);
+  })();
+  </script>
+
   <!-- Memory Section -->
   <div class="section">
     <div class="section-title">Persistent Memory</div>
@@ -16451,7 +16501,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.41.0</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.41.1</span></div>
     </div>
   </div>
 
@@ -20612,7 +20662,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.41.0';
+const FL_VERSION = '5.41.1';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.

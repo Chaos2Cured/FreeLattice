@@ -3176,8 +3176,12 @@ assert('web-tool: HTTP errors produce outcome error-<status> (graceful)',
   /['"]error-['"][\s\S]{0,50}resp\.status/.test(webToolJs));
 assert('web-tool: results clamped to top 3 (data.items.slice(0, 3))',
   /data\.items\.slice\(0,\s*3\)/.test(webToolJs));
-assert('web-tool: dormant when SEARCH_ENDPOINT contains placeholder (isAvailable false)',
-  /SEARCH_ENDPOINT\.indexOf\(['"]\[CC:['"]\)\s*!==\s*-1/.test(webToolJs));
+assert('web-tool: dormant when endpoint contains placeholder (isAvailable false)',
+  // Ship 3.1 — endpoint is now retrieved via getSearchEndpoint() rather
+  // than a constant, so the placeholder check moved into that function
+  // and isAvailable() composes it. Either pattern is acceptable.
+  /SEARCH_ENDPOINT\.indexOf\(['"]\[CC:['"]\)\s*!==\s*-1/.test(webToolJs) ||
+  /endpoint\.indexOf\(['"]\[CC:['"]\)\s*===\s*-1/.test(webToolJs));
 
 // Chat pipeline integration.
 assert('web-tool: script tag loaded after active-focus.js',
@@ -3224,6 +3228,86 @@ assert('UPDATE.md: paragraph names DepthConsent + ToolConsent as deliberate sibl
   /DepthConsent[\s\S]{0,800}ToolConsent[\s\S]{0,800}sibling/.test(updateMdR));
 assert('UPDATE.md: paragraph names "bidirectional" or "both directions" — receipt-bearing on both sides',
   /(bidirectional|both directions are receipt-bearing|both halves)/.test(updateMdR));
+
+// ═══════════════════════════════════════════════════════════════
+section('99g. Ship 3.1 — Cloudflare worker + endpoint config (v5.41.1)');
+// ═══════════════════════════════════════════════════════════════
+var workerJs = '';
+try { workerJs = fsRC.readFileSync(pathRC.join(__dirname, '..', 'worker', 'search.js'), 'utf8'); }
+catch (e) {}
+assert('worker: /worker/search.js exists',
+  workerJs.length > 2000);
+assert('worker: ALLOWED_ORIGINS includes freelattice.com, github.io, codeberg.page',
+  /ALLOWED_ORIGINS[\s\S]{0,400}freelattice\.com[\s\S]{0,400}chaos2cured\.github\.io[\s\S]{0,400}chaos2cured\.codeberg\.page/.test(workerJs));
+assert('worker: STRIP_URL_PARAMS includes the 14-floor of tracking params',
+  /utm_source/.test(workerJs) && /fbclid/.test(workerJs) && /gclid/.test(workerJs) &&
+  /msclkid/.test(workerJs) && /mc_cid/.test(workerJs) && /mc_eid/.test(workerJs) &&
+  /_ga/.test(workerJs) && /igshid/.test(workerJs));
+assert('worker: NEVER calls console.log or console.error (receipt depends on this)',
+  // Check for ACTUAL function calls (with opening paren), not comment text.
+  !/console\.(log|error|warn|info)\s*\(/.test(workerJs));
+assert('worker: Cache-Control no-store on successful response',
+  /['"]Cache-Control['"]\s*:\s*['"]no-store['"]/.test(workerJs));
+assert('worker: query clamped to maxQueryLength (240)',
+  /maxQueryLength:\s*240/.test(workerJs) &&
+  /clamp\(rawQuery\.trim\(\),\s*SEARCH_CONFIG\.maxQueryLength\)/.test(workerJs));
+assert('worker: 10s upstream timeout via AbortController',
+  /timeoutMs:\s*10000/.test(workerJs) &&
+  /AbortController/.test(workerJs));
+assert('worker: rate-limit graceful degradation when KV not bound',
+  /if \(!env\.RATE_LIMITS\) return \{ allowed: true \}/.test(workerJs));
+assert('worker: Brave API key never logged or returned (lives in env.BRAVE_API_KEY)',
+  /env\.BRAVE_API_KEY/.test(workerJs) &&
+  !/console.*BRAVE_API_KEY/.test(workerJs));
+
+var wranglerExample = '';
+try { wranglerExample = fsRC.readFileSync(pathRC.join(__dirname, '..', 'worker', 'wrangler.toml.example'), 'utf8'); }
+catch (e) {}
+assert('worker: wrangler.toml.example exists with KV binding placeholder',
+  /\[\[kv_namespaces\]\][\s\S]{0,400}binding\s*=\s*['"]RATE_LIMITS['"]/.test(wranglerExample));
+assert('worker: README.md exists with deploy + disable-logs instructions',
+  fsRC.existsSync(pathRC.join(__dirname, '..', 'worker', 'README.md')));
+
+// Client-side endpoint config + feature flag (web-tool.js v5.41.1).
+webToolJs = '';
+try { webToolJs = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'modules', 'web-tool.js'), 'utf8'); }
+catch (e) {}
+assert('web-tool 3.1: getSearchEndpoint reads window.FL_SEARCH_ENDPOINT then localStorage.fl_searchEndpoint',
+  /function getSearchEndpoint[\s\S]{0,400}window\.FL_SEARCH_ENDPOINT[\s\S]{0,400}localStorage\.getItem\(['"]fl_searchEndpoint['"]\)/.test(webToolJs));
+assert('web-tool 3.1: isSearchEnabled reads localStorage.fl_searchEnabled (default ON)',
+  /function isSearchEnabled[\s\S]{0,200}localStorage\.getItem\(['"]fl_searchEnabled['"]\)\s*!==\s*['"]false['"]/.test(webToolJs));
+assert('web-tool 3.1: isAvailable checks Quiet Room AND isSearchEnabled AND endpoint placeholder',
+  /function isAvailable[\s\S]{0,400}isQuietRoom\(\)[\s\S]{0,200}isSearchEnabled\(\)[\s\S]{0,200}\[CC:/.test(webToolJs));
+assert('web-tool 3.1: API exposes isSearchEnabled + getSearchEndpoint',
+  /isSearchEnabled:\s*isSearchEnabled/.test(webToolJs) &&
+  /getSearchEndpoint:\s*getSearchEndpoint/.test(webToolJs));
+assert('web-tool 3.1: phase bumped to 3.1',
+  /_phase:\s*['"]3\.1['"]/.test(webToolJs));
+
+// Settings UI toggle.
+assert('settings: Web Search toggle card present',
+  /id="webSearchToggleSection"/.test(appHtml) &&
+  /id="webSearchToggle"/.test(appHtml) &&
+  /Allow the AI to search the web/.test(appHtml));
+assert('settings: toggle writes localStorage.fl_searchEnabled = "false" when unchecked',
+  /localStorage\.setItem\(['"]fl_searchEnabled['"],\s*['"]false['"]\)/.test(appHtml));
+assert('settings: toggle removes the flag when re-enabled (default ON)',
+  /localStorage\.removeItem\(['"]fl_searchEnabled['"]\)/.test(appHtml));
+assert('settings: toggle status surfaces "dormant" message when endpoint not configured',
+  /Search is dormant/.test(appHtml));
+
+// SECURITY.md receipt.
+securityMd = '';
+try { securityMd = fsRC.readFileSync(pathRC.join(__dirname, '..', 'SECURITY.md'), 'utf8'); }
+catch (e) {}
+assert('SECURITY.md: Web search via Cloudflare worker section added',
+  /Web search via Cloudflare worker/.test(securityMd));
+assert('SECURITY.md: receipt names "Logs nothing" and "Caches nothing"',
+  /Logs nothing/.test(securityMd) && /Caches nothing/.test(securityMd));
+assert('SECURITY.md: receipt cites the worker code, ledger discipline, and smoke locks',
+  /\/worker\/search\.js/.test(securityMd) &&
+  /docs\/modules\/web-tool\.js/.test(securityMd) &&
+  /smoke/.test(securityMd));
 
 // ═══════════════════════════════════════════════════════════════
 section('100. UPDATE.md + CLARITY_AUDIT queue (v5.38.6)');

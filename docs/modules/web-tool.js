@@ -39,12 +39,24 @@
   var SEARCH_TIMEOUT_MS = 12000;
   var QUERY_CAP = 240;
 
-  // Endpoint is configurable via window.FL_SEARCH_ENDPOINT for
-  // power-users / developers / Tauri builds. Default is a placeholder
-  // so isAvailable() returns false until the Cloudflare worker route
-  // is wired in 3.1. Module ships dormant — no broken UX.
-  var SEARCH_ENDPOINT = (typeof window !== 'undefined' && window.FL_SEARCH_ENDPOINT)
-    || '[CC: search endpoint not yet configured — Phase 3.1]';
+  // Endpoint resolves in this order (Ship 3.1):
+  //   1. window.FL_SEARCH_ENDPOINT (set via app.html before this script
+  //      loads — e.g. for a Tauri build with a hard-coded URL).
+  //   2. localStorage.fl_searchEndpoint (set via console or future
+  //      Settings UI for per-device control).
+  //   3. placeholder string — module ships dormant.
+  // Re-evaluated on every isAvailable() call so live changes take
+  // effect without a page reload.
+  function getSearchEndpoint() {
+    try {
+      if (typeof window !== 'undefined' && window.FL_SEARCH_ENDPOINT) {
+        return window.FL_SEARCH_ENDPOINT;
+      }
+      var stored = localStorage.getItem('fl_searchEndpoint');
+      if (stored) return stored;
+    } catch (e) {}
+    return '[CC: search endpoint not yet configured — Phase 3.1]';
+  }
 
   var QUIET_ROOMS = ['quiet', 'quiet-room', 'sanctuary'];
 
@@ -144,9 +156,10 @@
           return;
         }
 
-        // 3. Endpoint dormant check — if SEARCH_ENDPOINT is the
-        // placeholder string, ship the module without breaking UX.
-        if (SEARCH_ENDPOINT.indexOf('[CC:') !== -1) {
+        // 3. Endpoint dormant check — if endpoint is the placeholder
+        // string, ship the module without breaking UX.
+        var endpoint = getSearchEndpoint();
+        if (endpoint.indexOf('[CC:') !== -1) {
           appendLedger({
             actor: 'system',
             trust: trustTier || 'seed',
@@ -165,7 +178,7 @@
           : null;
         var fetchOpts = controller ? { signal: controller.signal } : {};
 
-        fetch(SEARCH_ENDPOINT + '?q=' + encodeURIComponent(query), fetchOpts)
+        fetch(endpoint + '?q=' + encodeURIComponent(query), fetchOpts)
           .then(function (resp) {
             if (timeoutId) clearTimeout(timeoutId);
             if (!resp.ok) {
@@ -229,8 +242,21 @@
            lines.join('\n') + '\n';
   }
 
+  // Ship 3.1 feature flag — even with the endpoint configured, the
+  // co-creator can disable search per-device via localStorage. The
+  // Settings card exposes this as a toggle; the console can set it
+  // directly. Default ON: localStorage.fl_searchEnabled === 'false'
+  // is the only way to flip OFF.
+  function isSearchEnabled() {
+    try { return localStorage.getItem('fl_searchEnabled') !== 'false'; }
+    catch (e) { return true; }
+  }
+
   function isAvailable() {
-    return !isQuietRoom() && SEARCH_ENDPOINT.indexOf('[CC:') === -1;
+    if (isQuietRoom()) return false;
+    if (!isSearchEnabled()) return false;
+    var endpoint = getSearchEndpoint();
+    return endpoint.indexOf('[CC:') === -1;
   }
 
   // ── Public API ──────────────────────────────────────────────────
@@ -240,12 +266,14 @@
     formatToolResult: formatToolResult,
     isQuietRoom: isQuietRoom,
     isAvailable: isAvailable,
+    isSearchEnabled: isSearchEnabled,
+    getSearchEndpoint: getSearchEndpoint,
     // Exposed for tests + the audit page.
     _ledgerKey: LEDGER_KEY,
     _ledgerCap: LEDGER_CAP,
     _queryCap: QUERY_CAP,
     _timeoutMs: SEARCH_TIMEOUT_MS,
-    _phase: '3.0'
+    _phase: '3.1'
   };
 
   window.FreeLatticeModules = window.FreeLatticeModules || {};

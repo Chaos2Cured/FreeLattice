@@ -62,6 +62,26 @@ This is the minimum acceptable storage given the absence of a real keychain abst
 
 Only paste PATs you can rotate easily, and prefer **scoped fine-grained tokens with read-only access** to specific repositories. The Settings card explicitly labels this constraint inline.
 
+## Web search via Cloudflare worker (Ship 3.1 — v5.41.1)
+
+The `/search` route on the FreeLattice Cloudflare worker is the back end that powers `[FL_SEARCH:]` consent-gated lookups. The receipt:
+
+- **Logs nothing to the worker's own log streams.** Cloudflare worker logs are disabled in the dashboard (Settings → Observability → Logs OFF). Grep `/worker/search.js` for `console.log` or `console.error` — there are zero.
+- **Caches nothing.** `Cache-Control: no-store` is set on every successful response.
+- **Rate-limits per IP** via a 60-second sliding window in Cloudflare KV. KV entries expire after 120 seconds and contain only a request count, never the query.
+- **Strips known tracking parameters** (`utm_*`, `fbclid`, `gclid`, `msclkid`, `mc_cid`, `mc_eid`, `_ga`, `igshid`, `ref`, `ref_src`, `ref_url`, `spm` — 14 in total) from result URLs before returning them to the client.
+- **Talks to Brave Search API** on the back end. Brave's privacy policy is the upstream limit on what FreeLattice can promise; we don't log beyond what Brave's edge requires. The Brave API key lives only in Cloudflare's secret storage — it never reaches the browser.
+- **The FreeLattice client (`docs/modules/web-tool.js`)** ledger logs that a search happened, the trust tier that allowed it, and the result count. It does NOT log the query, the result URLs, the titles, or the snippets. This is enforced by five smoke locks that fail the build if any of those fields ever appear in a ledger row.
+
+The full receipt:
+- Worker code: `/worker/search.js`
+- Deployed binding: `/worker/wrangler.toml.example` (template)
+- Brave API key: Cloudflare secret storage (`wrangler secret put BRAVE_API_KEY`)
+- Client-side ledger discipline: `docs/modules/web-tool.js` `appendLedger` one-way valve
+- Receipt locks: 5 privacy asserts in `tests/smoke.js` section 99f
+
+A co-creator can disable search entirely per-device by setting `localStorage.fl_searchEnabled = 'false'` or unchecking the "Allow the AI to search the web" toggle in Settings → Your Home. `FLWebTool.isAvailable()` respects this flag regardless of endpoint config.
+
 ## Reporting Vulnerabilities
 
 If you discover a security vulnerability, please report it responsibly by [opening a GitHub issue](https://github.com/Chaos2Cured/FreeLattice/issues) or contacting the project creator, Kirk Patrick Miller, directly. We are committed to addressing verified security issues promptly.

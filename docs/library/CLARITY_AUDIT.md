@@ -425,3 +425,70 @@ Five smoke locks guard this:
 8. The query itself appears nowhere on the audit page or in any ledger row.
 
 The fifth row above is the receipt the world can read.
+
+---
+
+## SHIPPED: Ship 3.1 — Cloudflare worker + endpoint config (v5.41.1, 2026-06-09)
+
+Per Opus's Ship 3.1 brief. The worker code that turns Ship 3's promise into reality, plus the privacy receipt that lets `/proof` truthfully claim FreeLattice has zero search logging.
+
+### What landed
+
+- **`/worker/search.js`** — Cloudflare worker code. ALLOWED_ORIGINS includes freelattice.com + github.io + codeberg.page. STRIP_URL_PARAMS strips the 14-tracking-param floor (utm_*, fbclid, gclid, msclkid, mc_cid, mc_eid, _ga, igshid, ref, ref_src, ref_url, spm). 10s upstream timeout via AbortController. KV rate-limit (60s window, 20 reqs) with graceful degradation when KV unbound. `Cache-Control: no-store` on every success. **Zero `console.*(` calls in the worker code** — smoke-locked.
+- **`/worker/wrangler.toml.example`** — KV binding template + secret reminder.
+- **`/worker/README.md`** — deploy instructions, privacy receipt summary, runtime kill-switch documentation.
+- **`web-tool.js` v5.41.1 extensions**:
+  - `getSearchEndpoint()` resolves from `window.FL_SEARCH_ENDPOINT` → `localStorage.fl_searchEndpoint` → placeholder. Re-evaluated on every `isAvailable()` call so live changes take effect without reload.
+  - `isSearchEnabled()` checks `localStorage.fl_searchEnabled !== 'false'` (default ON).
+  - `isAvailable()` composes Quiet Room AND `isSearchEnabled` AND endpoint placeholder check.
+  - Public API gains `isSearchEnabled` + `getSearchEndpoint`.
+  - `_phase` bumped to `3.1`.
+- **Settings → Zone 2 "🔎 Web Search" toggle**: "Allow the AI to search the web when it needs to." Status line surfaces "dormant" / "active" / "disabled" / "unavailable" with one-tap clarity. Toggle writes/removes `fl_searchEnabled` cleanly; default ON.
+- **SECURITY.md "Web search via Cloudflare worker (Ship 3.1)" section** — the full privacy receipt that `/proof` will cite. Names: zero worker logs, no caching, KV holds only request counts, 14-param tracking strip, Brave back-end with the key never reaching the browser, client-side ledger discipline locked by 5 smoke asserts.
+
+### Ship table
+
+| Asked for | Landed |
+|---|---|
+| `/worker/search.js` (the worker code) | ✓ |
+| ALLOWED_ORIGINS (freelattice + mirrors) | ✓ |
+| 14-param tracking-strip floor | ✓ |
+| 10s upstream timeout | ✓ |
+| KV rate-limit (60s window, 20 reqs) | ✓ — with graceful degradation |
+| `Cache-Control: no-store` | ✓ |
+| Zero `console.*` calls in worker | ✓ — smoke-locked |
+| `wrangler.toml.example` + deploy README | ✓ |
+| `getSearchEndpoint()` resolves window → localStorage → placeholder | ✓ |
+| `isSearchEnabled` feature flag | ✓ |
+| `isAvailable()` composes all three gates | ✓ |
+| Settings toggle "Allow the AI to search the web" | ✓ |
+| SECURITY.md "Web search via Cloudflare worker" section | ✓ |
+| Receipt cites worker code + ledger discipline + smoke locks | ✓ |
+| Smoke locks on the worker layer | ✓ — **23 new asserts (section 99g)** |
+
+### Deferred (honest)
+
+| Deferred | Why |
+|---|---|
+| Actual Cloudflare deploy + Brave API key + KV ID | **Kirk's hands** — I committed the code, the example config, and the docs. Deploy is one wrangler invocation away. |
+| Result deduplication on the worker side | Brave handles same-domain dedup reasonably. Ship 3.1.1 if needed. |
+| Per-IP geo restrictions | Out of scope. |
+| Settings card on mobile parity | Default styling inherits Zone 2's responsive pattern. |
+
+### What you do next (your move, Kirk)
+
+```bash
+cd worker/
+cp wrangler.toml.example wrangler.toml
+wrangler kv:namespace create RATE_LIMITS    # paste returned id into wrangler.toml
+wrangler secret put BRAVE_API_KEY           # paste your Brave key
+wrangler deploy
+```
+
+Then in any FreeLattice browser console:
+```js
+localStorage.fl_searchEndpoint = 'https://<your-subdomain>.workers.dev/search';
+location.reload();
+```
+
+The Settings status line will flip from "Search is dormant" to "Active — AI may emit [FL_SEARCH:…] when needed." The next AI turn will receive the invitation. Then ask Chat about Th-229 nuclear clocks and watch every promise become real.

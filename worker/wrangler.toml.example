@@ -1,0 +1,21 @@
+# FreeLattice — Cloudflare worker config example
+# Copy to wrangler.toml and fill in the placeholders, then:
+#   wrangler kv:namespace create RATE_LIMITS  (paste id below)
+#   wrangler secret put BRAVE_API_KEY
+#   wrangler deploy
+
+name = "freelattice-search"
+main = "search.js"
+compatibility_date = "2025-12-01"
+
+# Per Opus + SECURITY.md "Web search via Cloudflare worker":
+# Cloudflare worker logs MUST be disabled in the dashboard
+# (Settings → Observability → Logs OFF). This file does not
+# control that; verify in the Cloudflare UI before going live.
+
+[[kv_namespaces]]
+binding = "RATE_LIMITS"
+id = "<paste-from-wrangler-kv:namespace-create>"
+
+# Secrets (do NOT add here; use `wrangler secret put`):
+#   BRAVE_API_KEY
