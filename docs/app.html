@@ -15957,7 +15957,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <label for="hfToken">HuggingFace API Token</label>
       <input type="password" id="hfToken" placeholder="hf_xxxxxxxxxxxx" onchange="saveHfToken()">
       <div class="hint">
-        &#128274; Encrypted with &phi;-salt before storage. Only sent to api-inference.huggingface.co.
+        &#128274; Encrypted with &phi;-salt before storage. Only sent to router.huggingface.co.
         <a href="https://huggingface.co/settings/tokens" target="_blank" style="color: var(--accent);">Get a free token &rarr;</a>
       </div>
       <div class="phi-indicator" id="hfTokenPhiIndicator" style="display:none;">
@@ -22850,7 +22850,7 @@ const PROVIDERS = {
   },
   huggingface: {
     name: 'Hugging Face',
-    url: 'https://api-inference.huggingface.co/models/',
+    url: 'https://router.huggingface.co/hf-inference/models/',
     keyLink: '<a href="https://huggingface.co/settings/tokens" target="_blank">Get a free Hugging Face token &rarr;</a>',
     hint: 'Free tier with thousands of models. Get a read token at huggingface.co.',
     tokenLimit: 60000,
@@ -33792,11 +33792,11 @@ function loadContextSettings() {
 const HF_MODELS = {
   'stabilityai/stable-diffusion-xl-base-1.0': {
     name: 'SDXL Base 1.0',
-    endpoint: 'https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0'
+    endpoint: 'https://router.huggingface.co/hf-inference/models/stabilityai/stable-diffusion-xl-base-1.0'
   },
   'runwayml/stable-diffusion-v1-5': {
     name: 'Stable Diffusion v1.5',
-    endpoint: 'https://api-inference.huggingface.co/models/runwayml/stable-diffusion-v1-5'
+    endpoint: 'https://router.huggingface.co/hf-inference/models/runwayml/stable-diffusion-v1-5'
   }
 };
 
