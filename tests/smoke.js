@@ -2878,6 +2878,50 @@ assert('audit page: renders Repository Reads section',
   /function renderRepoReads/.test(auditHtml));
 
 // ═══════════════════════════════════════════════════════════════
+section('99c. Tool Consent — Ship 1.1 prerequisite (v5.39.1)');
+// ═══════════════════════════════════════════════════════════════
+var toolConsentJs = '';
+try { toolConsentJs = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'modules', 'tool-consent.js'), 'utf8'); }
+catch (e) {}
+assert('tool-consent: module file exists and is non-empty',
+  toolConsentJs.length > 3000);
+assert('tool-consent: IIFE-scoped, exposes window.FLToolConsent + FreeLatticeModules.ToolConsent',
+  /\(function \(\) \{\s*'use strict'/.test(toolConsentJs) &&
+  /window\.FLToolConsent\s*=\s*api/.test(toolConsentJs) &&
+  /window\.FreeLatticeModules\.ToolConsent\s*=\s*api/.test(toolConsentJs));
+// Opus's four locks (lightly rephrased to be checkable without a DOM):
+assert('tool-consent: Bloom+ tiers auto-allow (no chip, ledger outcome auto-allowed)',
+  /HIGH_TRUST\s*=\s*\{\s*bloom:\s*1,\s*spark:\s*1,\s*flame:\s*1,\s*radiant:\s*1/.test(toolConsentJs) &&
+  /if \(isHighTrust\(trustTier\)\)[\s\S]{0,300}outcome:\s*['"]auto-allowed['"]/.test(toolConsentJs));
+assert('tool-consent: Sprout/Seed renders chip then waits',
+  /function renderConsentChip\(opts\)/.test(toolConsentJs) &&
+  /return renderConsentChip\(\{/.test(toolConsentJs));
+assert('tool-consent: 60s timeout resolves to deny (CHIP_TIMEOUT_MS = 60000, settle(false))',
+  /CHIP_TIMEOUT_MS\s*=\s*60000/.test(toolConsentJs) &&
+  /setTimeout\(function \(\) \{\s*settle\(false,\s*['"]fl-resolved-no['"]\)/.test(toolConsentJs));
+assert('tool-consent: ledger row shape is { ts, tool, action, detail, trust, outcome } — no secret fields',
+  /rows\.push\(\{[\s\S]{0,80}ts:\s*Date\.now\(\)[\s\S]{0,500}tool:[\s\S]{0,300}action:[\s\S]{0,300}detail:[\s\S]{0,300}trust:[\s\S]{0,300}outcome:/.test(toolConsentJs));
+assert('tool-consent: ledger NEVER serializes a token/pat/key/secret field',
+  !/token:|pat:|password:|secret:|apiKey:/.test(toolConsentJs.split('appendLedger')[1] || ''));
+assert('tool-consent: Quiet Room exclusion (UPDATE.md §8) — outcome quiet-room, no chip',
+  /QUIET_ROOMS\s*=\s*\[['"]quiet['"]/.test(toolConsentJs) &&
+  /if \(isQuietRoom\(\)\)[\s\S]{0,200}outcome:\s*['"]quiet-room['"]/.test(toolConsentJs));
+assert('tool-consent: chat container ID verified — uses #chatMessages (not the wrong guess)',
+  /getElementById\(['"]chatMessages['"]\)/.test(toolConsentJs));
+assert('tool-consent: high-trust threshold matches FractalSafety LEVEL_KEYS (bloom and above)',
+  /bloom:\s*1[\s\S]{0,80}spark:\s*1[\s\S]{0,80}flame:\s*1[\s\S]{0,80}radiant:\s*1/.test(toolConsentJs));
+assert('tool-consent: script tag loaded from app.html with defer',
+  /<script src="modules\/tool-consent\.js" defer><\/script>/.test(appHtml));
+assert('tool-consent: loaded AFTER depth-consent (DepthConsent is the prior pattern)',
+  appHtml.indexOf('modules/tool-consent.js') > appHtml.indexOf('modules/depth-consent.js'));
+assert('audit page: reads fl_toolConsentLedger',
+  /readToolConsentLedger[\s\S]{0,300}fl_toolConsentLedger/.test(auditHtml));
+assert('audit page: renders Tool Consent Events section',
+  /Tool Consent Events/.test(auditHtml) &&
+  /id="tool-consent-records"/.test(auditHtml) &&
+  /function renderToolConsents/.test(auditHtml));
+
+// ═══════════════════════════════════════════════════════════════
 section('100. UPDATE.md + CLARITY_AUDIT queue (v5.38.6)');
 // ═══════════════════════════════════════════════════════════════
 var updateMd = '';

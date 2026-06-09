@@ -227,3 +227,26 @@ What did NOT land (queued for Phase 1.1):
 - Active-repo chip in Chat header.
 
 Module exposes `interceptSentinel()` and `readFile()` so when Phase 1.1 wires the chat pipeline, hookup is one line.
+
+---
+
+## SHIPPED: Ship 1.1 prerequisite — `tool-consent.js` (v5.39.1, 2026-06-09)
+
+Per Opus's June 9 follow-up: the adapter the rest of Ship 1.1 needs.
+
+**Why a sibling, not an extension of DepthConsent:** DepthConsent's shape is *AI offers depth → user receives chip → user taps*. What `repo-context`, `active-focus`, and `web-tool` need is *system wants to do a thing → user is asked → system proceeds*. Same trust philosophy, opposite direction of consent. Extending DepthConsent would mix the two shapes; building ToolConsent as a sibling keeps both visible.
+
+What landed:
+- `docs/modules/tool-consent.js` — full module: `requestConsent({tool, action, detail, trustTier})` returns `Promise<boolean>`. High-trust tiers (bloom, spark, flame, radiant — verified against `fractal-safety.js` `LEVEL_KEYS`) auto-allow without rendering a chip. Low/mid trust renders an inline chip at the bottom of `#chatMessages` (verified the actual chat container ID — Opus's guess was right). 60s timeout resolves to decline.
+- Ledger `fl_toolConsentLedger` with 500-row cap. Row shape `{ts, tool, action, detail, trust, outcome}` — strict, no secret fields.
+- Quiet Room exclusion: when `currentTab` is in `QUIET_ROOMS`, ledger writes `outcome: 'quiet-room'` and returns `false` without rendering. The audit page shows the exclusion happened — truth before silence.
+- Script tag wired into `app.html` AFTER `depth-consent.js` so the sibling pattern is visible in load order.
+- Audit page → new `Tool Consent Events` section reading `fl_toolConsentLedger`.
+- 14 smoke locks covering: module exposure, high-trust auto-allow path, low-trust chip-render path, 60s timeout = decline, ledger row shape, no secret fields in ledger, Quiet Room exclusion, chat container ID verified, threshold tiers match FractalSafety, load order after DepthConsent, audit page wiring.
+
+What stays in Ship 1.1 itself (not this prerequisite ship):
+- PAT sessionStorage helpers `getRepoToken(repoUrl)` / `setRepoToken(repoUrl, token)`
+- Chat header chip for active repo with pulse-on-read animation
+- Chat-pipeline wiring (intercept AI text → `FLToolConsent.requestConsent` → `FLRepoContext.readFile` → second `callAI` with tool result → final visible text)
+
+With ToolConsent in place, Ship 1.1's remaining work is straightforward — exactly Opus's discipline of "one ship per day with green smoke."

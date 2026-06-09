@@ -182,6 +182,12 @@ h2 {
     <div class="empty">No repository reads yet. When the AI reads a file from a connected repo, it will appear here.</div>
   </div>
 
+  <!-- ── Tool Consent Events (v5.39.1) ── -->
+  <h2>Tool Consent Events</h2>
+  <div id="tool-consent-records">
+    <div class="empty">No tool consent events yet. When the system asks before performing an action (read a file, search the web, carry focus), the event will appear here.</div>
+  </div>
+
   <!-- ── Nav ── -->
   <div class="nav">
     <a href="app.html">&larr; Back to FreeLattice</a>
@@ -222,6 +228,13 @@ h2 {
   function readRepoLedger() {
     try {
       var raw = localStorage.getItem('fl_repoLedger');
+      return raw ? JSON.parse(raw) : [];
+    } catch (e) { return []; }
+  }
+
+  function readToolConsentLedger() {
+    try {
+      var raw = localStorage.getItem('fl_toolConsentLedger');
       return raw ? JSON.parse(raw) : [];
     } catch (e) { return []; }
   }
@@ -337,11 +350,38 @@ h2 {
     });
   }
 
+  function renderToolConsents(toolLedger) {
+    var container = document.getElementById('tool-consent-records');
+    if (!toolLedger.length) return;
+    container.innerHTML = '';
+    toolLedger.slice().reverse().slice(0, 50).forEach(function (entry) {
+      var row = document.createElement('div');
+      row.className = 'record';
+      var tool = entry.tool || 'unknown';
+      var action = entry.action || '—';
+      var detail = entry.detail || '';
+      var outcome = entry.outcome || '—';
+      var trust = entry.trust || '—';
+      var dotCls = outcome === 'granted' || outcome === 'auto-allowed' ? 'dot-local'
+                  : outcome === 'declined' ? 'dot-mesh'
+                  : 'dot-cache';
+      row.innerHTML =
+        '<span class="record-time">' + fmtTime(entry.ts) + '</span>' +
+        '<span class="record-event"><span class="dot ' + dotCls + '"></span>' +
+        outcome + ' &mdash; ' + tool + ' / ' + action +
+        (detail ? ' <code style="font-size:0.78rem;color:#94a3b8;">' + detail + '</code>' : '') +
+        '</span>' +
+        '<span class="record-meta">trust: ' + trust + '</span>';
+      container.appendChild(row);
+    });
+  }
+
   // ── Init ──────────────────────────────────────────────────────────────
   var ledger = readLedger();
   var healthLog = readHealthLog();
   var cacheStats = readCacheStats();
   var repoLedger = readRepoLedger();
+  var toolConsentLedger = readToolConsentLedger();
   var msgCount = countMessages();
 
   renderSummary(ledger, healthLog, cacheStats, msgCount);
@@ -349,6 +389,7 @@ h2 {
   renderHealth(healthLog);
   renderCache(cacheStats);
   renderRepoReads(repoLedger);
+  renderToolConsents(toolConsentLedger);
 })();
 </script>
 </body>
