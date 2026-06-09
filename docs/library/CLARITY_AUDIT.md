@@ -299,3 +299,60 @@ Per Opus's Ship-1.1 brief — three pieces in one ship.
 8. Open `/audit.html` — the read appears under Repository Reads; the consent event appears under Tool Consent Events.
 
 Five beats. Five smoke locks (and 26 more). Each beat tells you exactly where to look if anything's off.
+
+---
+
+## SHIPPED: Ship 2 — `active-focus.js` (v5.40.0, 2026-06-09)
+
+Per Opus's Ship 2 brief. The thread of attention now carries between rooms.
+
+### Ship table
+
+| Asked for | Landed |
+|---|---|
+| `docs/modules/active-focus.js` — IIFE, dual window exposure | ✓ |
+| `getFocus` / `setFocus` / `clearFocus` core | ✓ |
+| `pinCurrent` (no `_lastAutoSummary` cache needed — promotes existing same-room focus) | ✓ |
+| `buildPromptInjection(currentRoom)` — empty on Quiet Room / no focus / same room | ✓ |
+| Cross-room focus carries summary via "Recent focus from X: …" injection | ✓ |
+| `shouldShowArrival(currentRoom)` — null on Quiet Room / no focus / <30 min gap | ✓ |
+| `showArrivalWhisper` — Continue / Start fresh buttons, lavender accent | ✓ |
+| `summarizeExchange` — adapted to actual `callAI(systemPrompt, userPrompt, opts)` signature | ✓ |
+| `autoCarryFromExchange` — fire-and-forget after every AI response | ✓ — failures never break render |
+| Manual pins survive auto-writes | ✓ |
+| 15-minute staleness for auto-focus | ✓ |
+| 30-minute arrival gap | ✓ |
+| Pin button toggles active state | ✓ — promote-or-unpin pattern |
+| Ledger `fl_focusLedger` strict shape `{ts, action, sourceRoom, manual, reason}` | ✓ |
+| Ledger NEVER contains `summary` or `content` field — privacy guarantee | ✓ — locked in smoke |
+| Quiet Room exclusion at EVERY entry point (hard line) | ✓ — six smoke locks |
+| LatticeEvents listener on `tabChanged` (verified — NOT `tabActivated`) | ✓ |
+| `addChatMessage` integration: autoCarry + recordActivity + lastUserMsg tracking | ✓ |
+| `buildMessages` integration: prompt-injection appended after Arrival Protocol | ✓ |
+| Pin button rendered on chat header `.chat-title-left` | ✓ |
+| CSS for pin + arrival whisper (lavender = sanctuary, gold = action) | ✓ |
+| Audit page Focus Events section reading `fl_focusLedger` | ✓ — display also strips summary/content |
+| 12+ smoke asserts | ✓ — 30 total in section 99e |
+
+### Deferred (honest)
+
+| Deferred | Why |
+|---|---|
+| Pin button on Workshop / Round Table / Dojo headers | Phase 2.1 — those room headers don't yet share a unified selector pattern. Chat ships first per Opus's prediction. |
+| Arrival whisper rendering for non-Chat rooms | Phase 2.1 — `container = #{roomId}Content` fallback may not match every room's DOM. Chat-first is the right scope today. |
+| "See all focus history" link on audit page | Phase 2.1 — current section shows the latest 50 rows. |
+| `_skipToolProcessing` on `summarizeExchange`'s callAI is a hint, not a real contract yet | Phase 1.2 work — same deferral as Ship 1.1. |
+
+### What you can demo right now
+
+1. Hard refresh. Open Chat. Send any message — the AI replies.
+2. Watch the pin (📌) appear in the chat header beside the repo chip.
+3. After the AI replies, `FLFocus.getFocus()` in the console returns an auto-summary of the exchange.
+4. Switch to another tab (Workshop, Garden, anything). Switch back. Now type a new message — the AI's system prompt now includes `Recent focus from chat: …`.
+5. Tap the pin: it activates (gold border + filled). The focus is now manual.
+6. Auto-carry no longer overwrites — your pin holds.
+7. Tap the pin again: it unpins. Focus clears.
+8. Wait 30 min away (or set `fl_lastActivity` in DevTools to `Date.now() - 31*60*1000`). Switch back to a different room. Lavender arrival whisper: "Welcome back. You were working on … in chat." Continue or Start fresh.
+9. Open `/audit.html` → "Focus Events" section shows every set/clear/arrival-continue with the room (NEVER the summary text).
+
+Same five-beats discipline as Ship 1.1. Each surface earns its smoke lock.

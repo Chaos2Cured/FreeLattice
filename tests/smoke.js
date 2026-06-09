@@ -3012,6 +3012,101 @@ assert('SECURITY.md: PAT escalation path documented (Tauri / Web Crypto)',
   /Tauri[\s\S]{0,200}Web Crypto/.test(securityMd));
 
 // ═══════════════════════════════════════════════════════════════
+section('99e. Active Focus — Ship 2 (v5.40.0)');
+// ═══════════════════════════════════════════════════════════════
+var focusJs = '';
+try { focusJs = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'modules', 'active-focus.js'), 'utf8'); }
+catch (e) {}
+// Module shape.
+assert('active-focus: module file exists and is non-empty',
+  focusJs.length > 4000);
+assert('active-focus: IIFE-scoped, exposes window.FLFocus + FreeLatticeModules.ActiveFocus',
+  /\(function \(\) \{\s*'use strict'/.test(focusJs) &&
+  /window\.FLFocus\s*=\s*api/.test(focusJs) &&
+  /window\.FreeLatticeModules\.ActiveFocus\s*=\s*api/.test(focusJs));
+assert('active-focus: storage keys are stable (fl_activeFocus + fl_focusLedger + fl_lastActivity)',
+  /STORAGE_KEY\s*=\s*['"]fl_activeFocus['"]/.test(focusJs) &&
+  /LEDGER_KEY\s*=\s*['"]fl_focusLedger['"]/.test(focusJs) &&
+  /ACTIVITY_KEY\s*=\s*['"]fl_lastActivity['"]/.test(focusJs));
+
+// Quiet Room — hard line at every entry point (UPDATE.md §8).
+assert('active-focus: QUIET_ROOMS array contains quiet/quiet-room/sanctuary',
+  /QUIET_ROOMS\s*=\s*\[['"]quiet['"],\s*['"]quiet-room['"],\s*['"]sanctuary['"]\]/.test(focusJs));
+assert('active-focus: setFocus bails on Quiet Room sourceRoom',
+  /function setFocus[\s\S]{0,200}if \(isQuietRoom\(sourceRoom\)\)\s*return\s*false/.test(focusJs));
+assert('active-focus: buildPromptInjection bails on Quiet Room (returns "")',
+  /function buildPromptInjection[\s\S]{0,200}if \(isQuietRoom\(currentRoom\)\)\s*return\s*['"]['"]/.test(focusJs));
+assert('active-focus: shouldShowArrival bails on Quiet Room (returns null)',
+  /function shouldShowArrival[\s\S]{0,200}if \(isQuietRoom\(currentRoom\)\)\s*return\s*null/.test(focusJs));
+assert('active-focus: autoCarryFromExchange bails on Quiet Room',
+  /function autoCarryFromExchange[\s\S]{0,400}if \(isQuietRoom\(sourceRoom\)\)\s*\{\s*resolve\(false\)/.test(focusJs));
+assert('active-focus: renderPinButton bails on Quiet Room',
+  /function renderPinButton[\s\S]{0,200}if \(isQuietRoom\(roomId\)\)\s*return\s*null/.test(focusJs));
+assert('active-focus: showArrivalWhisper bails on Quiet Room',
+  /function showArrivalWhisper[\s\S]{0,200}if \(isQuietRoom\(currentRoom\)\)\s*return\s*null/.test(focusJs));
+
+// Staleness + arrival timing.
+assert('active-focus: 15-minute staleness for auto-focus (manual pins survive)',
+  /STALENESS_MS\s*=\s*15\s*\*\s*60\s*\*\s*1000/.test(focusJs) &&
+  /!f\.manual\s*&&\s*\(Date\.now\(\)\s*-\s*\(f\.ts\s*\|\|\s*0\)\s*>\s*STALENESS_MS\)/.test(focusJs));
+assert('active-focus: 30-minute arrival gap',
+  /ARRIVAL_GAP_MS\s*=\s*30\s*\*\s*60\s*\*\s*1000/.test(focusJs));
+assert('active-focus: manual pins survive auto-write (existing.manual && !manual → return false)',
+  /existing\s*&&\s*existing\.manual\s*&&\s*!manual\)\s*return\s*false/.test(focusJs));
+
+// Prompt injection — same-room is empty, different-room carries summary.
+assert('active-focus: buildPromptInjection returns "" for same sourceRoom',
+  /f\.sourceRoom\s*===\s*currentRoom\)\s*return\s*['"]['"]/.test(focusJs));
+assert('active-focus: cross-room injection includes "Recent focus from" + summary',
+  /Recent focus from\s*['"]\s*\+\s*f\.sourceRoom\s*\+\s*['"][^'"]*['"]\s*\+\s*f\.summary/.test(focusJs));
+
+// Ledger privacy — strict row shape. No 'summary', no 'content'.
+assert('active-focus: ledger row shape strict (ts + action + optional sourceRoom/manual/reason)',
+  /var safeRow\s*=\s*\{\s*ts:\s*Date\.now\(\),\s*action:/.test(focusJs));
+assert('active-focus: ledger row NEVER contains summary or content field',
+  !/safeRow\.summary\s*=/.test(focusJs) &&
+  !/safeRow\.content\s*=/.test(focusJs));
+
+// callAI adaptation — codebase uses (systemPrompt, userPrompt, opts) with callback.
+assert('active-focus: summarizeExchange uses callAI(systemPrompt, userPrompt, opts) with callback',
+  /window\.FreeLattice\.callAI\(sysPrompt,\s*userPrompt,\s*\{[\s\S]{0,400}callback:\s*function/.test(focusJs));
+assert('active-focus: 60-token cap on summary (small-model-safe)',
+  /maxTokens:\s*60/.test(focusJs));
+
+// LatticeEvents wiring — verified codebase uses 'tabChanged', NOT 'tabActivated'.
+assert('active-focus: listens on tabChanged (the actual codebase event name)',
+  /LatticeEvents\.on\(['"]tabChanged['"]/.test(focusJs));
+
+// App.html integration.
+assert('active-focus: script tag loaded after repo-context.js',
+  /<script src="modules\/active-focus\.js" defer><\/script>/.test(appHtml) &&
+  appHtml.indexOf('modules/active-focus.js') > appHtml.indexOf('modules/repo-context.js'));
+assert('active-focus: pin button mount script renders into .chat-title-left',
+  /FLFocus\.renderPinButton\(['"]chat['"],\s*leftSide\)/.test(appHtml));
+assert('active-focus: addChatMessage tracks __flLastUserMsg on role=user',
+  /window\.__flLastUserMsg\s*=\s*content/.test(appHtml));
+assert('active-focus: addChatMessage records activity on user messages',
+  /FLFocus\.recordActivity\(\)/.test(appHtml));
+assert('active-focus: addChatMessage fires autoCarryFromExchange on assistant messages (fire-and-forget)',
+  /FLFocus\.autoCarryFromExchange\(__tabId,\s*__lastUser,\s*content\)\.catch\(/.test(appHtml));
+assert('active-focus: buildMessages injects focus into systemContent',
+  /FLFocus\.buildPromptInjection\(__tabIdFP\)[\s\S]{0,300}systemContent\s*\+=\s*__focusInject/.test(appHtml));
+assert('active-focus: CSS .fl-focus-pin + .fl-arrival-whisper defined in app.html',
+  /\.fl-focus-pin\s*\{/.test(appHtml) &&
+  /\.fl-arrival-whisper\s*\{/.test(appHtml));
+
+// Audit page wiring.
+assert('audit page: reads fl_focusLedger',
+  /readFocusLedger[\s\S]{0,300}fl_focusLedger/.test(auditHtml));
+assert('audit page: renders Focus Events section',
+  /Focus Events/.test(auditHtml) &&
+  /id="focus-records"/.test(auditHtml) &&
+  /function renderFocusEvents/.test(auditHtml));
+assert('audit page: Focus Events render code does NOT display entry.summary or entry.content',
+  !/renderFocusEvents[\s\S]{0,800}entry\.summary/.test(auditHtml) &&
+  !/renderFocusEvents[\s\S]{0,800}entry\.content/.test(auditHtml));
+
+// ═══════════════════════════════════════════════════════════════
 section('100. UPDATE.md + CLARITY_AUDIT queue (v5.38.6)');
 // ═══════════════════════════════════════════════════════════════
 var updateMd = '';

@@ -16451,7 +16451,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.39.2</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.40.0</span></div>
     </div>
   </div>
 
@@ -20612,7 +20612,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.39.2';
+const FL_VERSION = '5.40.0';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -31122,6 +31122,31 @@ function addChatMessage(role, content, skipPersist, __toolFlags) {
       } catch (__e) {}
     }, 0);
   }
+  // ── v5.40.0 Ship 2: active-focus auto-carry + activity tracking.
+  // Track last user message for the autoCarry pair (kept on window
+  // because addChatMessage is called from many places — closure is
+  // wrong scope here). User messages also stamp fl_lastActivity so
+  // the 30-min arrival whisper has a real signal.
+  try {
+    if (role === 'user' && typeof content === 'string') {
+      window.__flLastUserMsg = content;
+      if (window.FLFocus && typeof window.FLFocus.recordActivity === 'function') {
+        window.FLFocus.recordActivity();
+      }
+    } else if (role === 'assistant' && typeof content === 'string' &&
+               !__toolFlags._skipToolProcessing &&
+               window.FLFocus && typeof window.FLFocus.autoCarryFromExchange === 'function') {
+      var __lastUser = window.__flLastUserMsg;
+      if (__lastUser) {
+        var __activeBtn = document.querySelector('.tab-btn.active');
+        var __tabId = __activeBtn && __activeBtn.dataset && __activeBtn.dataset.tab;
+        if (__tabId) {
+          // Fire-and-forget — summary failures must NEVER break render.
+          window.FLFocus.autoCarryFromExchange(__tabId, __lastUser, content).catch(function () {});
+        }
+      }
+    }
+  } catch (__e) {}
   return textSpan;
 }
 
@@ -32886,6 +32911,20 @@ function buildMessages() {
       var filteredArrival = (typeof FLContextFilter !== 'undefined') ? FLContextFilter.filter(arrivalCtx) : arrivalCtx;
       systemContent += '\n\n' + filteredArrival;
     }
+  }
+
+  // ── v5.40.0 Ship 2: Active Focus prompt injection ──
+  // Carries the thread between rooms. Returns '' for Quiet Room,
+  // no focus, or same-room focus — see active-focus.js.
+  if (window.FLFocus && typeof window.FLFocus.buildPromptInjection === 'function') {
+    try {
+      var __activeBtnFP = document.querySelector('.tab-btn.active');
+      var __tabIdFP = __activeBtnFP && __activeBtnFP.dataset && __activeBtnFP.dataset.tab;
+      if (__tabIdFP) {
+        var __focusInject = window.FLFocus.buildPromptInjection(__tabIdFP);
+        if (__focusInject) systemContent += __focusInject;
+      }
+    } catch (__e) {}
   }
 
   // ── Room Context — the AI adapts its tone to the room ──
@@ -60574,6 +60613,91 @@ document.addEventListener('click', function(e) {
      [FL_REPO_READ: path] sentinel. AI roundtrip wiring lands in Phase 1.1.
      See docs/library/UPDATE.md §1, §3, §4, §5, §8 for the patterns. -->
 <script src="modules/repo-context.js" defer></script>
+
+<!-- Active Focus (v5.40.0 — Ship 2) — carries the thread of attention
+     between rooms via fl_activeFocus + an arrival whisper after 30-min
+     absence. Quiet Room hard exclusion at every entry point. See
+     docs/library/UPDATE.md §3, §4, §8, §9. -->
+<script src="modules/active-focus.js" defer></script>
+
+<!-- v5.40.0 — render the focus-pin button into the chat header
+     beside the repo chip. Phase 1 of Ship 2 wires Chat only; other
+     room headers (Workshop toolbar, Round Table controls, Dojo)
+     queue for Ship 2.1 because their header selectors aren't yet
+     unified. -->
+<script>
+(function () {
+  function _mount() {
+    try {
+      if (!window.FLFocus || typeof window.FLFocus.renderPinButton !== 'function') return;
+      var leftSide = document.querySelector('.chat-title-left');
+      if (!leftSide) return;
+      window.FLFocus.renderPinButton('chat', leftSide);
+    } catch (e) {}
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', _mount);
+  } else {
+    _mount();
+  }
+})();
+</script>
+
+<style>
+  /* Pin button — used in each room's header to manually pin focus. */
+  .fl-focus-pin {
+    width: 28px; height: 28px;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: transparent;
+    border: 1px solid rgba(212, 160, 23, 0.2);
+    border-radius: 14px;
+    cursor: pointer;
+    opacity: 0.5;
+    transition: opacity 0.2s, background 0.2s, border-color 0.2s;
+    font-size: 14px;
+    color: var(--gold, #d4a017);
+    margin-left: 6px;
+    padding: 0;
+  }
+  .fl-focus-pin:hover { opacity: 1; background: rgba(212, 160, 23, 0.08); }
+  .fl-focus-pin-active {
+    opacity: 1;
+    background: rgba(212, 160, 23, 0.18);
+    border-color: rgba(212, 160, 23, 0.55);
+  }
+  /* Arrival whisper — lavender, sanctuary not action. */
+  .fl-arrival-whisper {
+    display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    padding: 10px 14px;
+    margin: 10px 0;
+    background: rgba(167, 139, 250, 0.06);
+    border: 1px solid rgba(167, 139, 250, 0.25);
+    border-radius: 10px;
+    font-family: Georgia, serif;
+    font-size: 14px;
+    color: var(--text-primary, #e2d9c8);
+    opacity: 1;
+    transition: opacity 0.3s;
+  }
+  .fl-arrival-dismissed { opacity: 0; }
+  .fl-arrival-text { flex: 1; min-width: 200px; }
+  .fl-arrival-text em { font-style: italic; color: var(--gold, #d4a017); }
+  .fl-arrival-text strong { font-weight: 600; color: var(--text-primary, #e2d9c8); }
+  .fl-arrival-continue, .fl-arrival-fresh {
+    padding: 4px 12px;
+    background: transparent;
+    border: 1px solid rgba(212, 160, 23, 0.3);
+    border-radius: 12px;
+    color: var(--gold, #d4a017);
+    font-size: 12px; cursor: pointer; font-family: inherit;
+  }
+  .fl-arrival-continue:hover { background: rgba(212, 160, 23, 0.1); }
+  .fl-arrival-fresh {
+    border-color: rgba(255,255,255,0.15);
+    color: var(--text-muted, #94a3b8);
+  }
+  .fl-arrival-fresh:hover { background: rgba(255,255,255,0.04); }
+</style>
 
 <!-- Continuity — Eager-Load (wraps buildMessages) -->
 <script>

@@ -188,6 +188,12 @@ h2 {
     <div class="empty">No tool consent events yet. When the system asks before performing an action (read a file, search the web, carry focus), the event will appear here.</div>
   </div>
 
+  <!-- ── Focus Events (v5.40.0 Ship 2) ── -->
+  <h2>Focus Events</h2>
+  <div id="focus-records">
+    <div class="empty">No focus events yet. When attention is set, carried, or cleared across rooms, the event will appear here.</div>
+  </div>
+
   <!-- ── Nav ── -->
   <div class="nav">
     <a href="app.html">&larr; Back to FreeLattice</a>
@@ -235,6 +241,13 @@ h2 {
   function readToolConsentLedger() {
     try {
       var raw = localStorage.getItem('fl_toolConsentLedger');
+      return raw ? JSON.parse(raw) : [];
+    } catch (e) { return []; }
+  }
+
+  function readFocusLedger() {
+    try {
+      var raw = localStorage.getItem('fl_focusLedger');
       return raw ? JSON.parse(raw) : [];
     } catch (e) { return []; }
   }
@@ -376,12 +389,36 @@ h2 {
     });
   }
 
+  function renderFocusEvents(focusLedger) {
+    var container = document.getElementById('focus-records');
+    if (!focusLedger.length) return;
+    container.innerHTML = '';
+    focusLedger.slice().reverse().slice(0, 50).forEach(function (entry) {
+      var row = document.createElement('div');
+      row.className = 'record';
+      var action = entry.action || '—';
+      var source = entry.sourceRoom || '';
+      var manualLabel = entry.manual ? ' (manual)' : '';
+      var reason = entry.reason ? ' — ' + entry.reason : '';
+      // PRIVACY: no summary or content field is shown because the ledger
+      // doesn't store one. The page logs THAT focus happened, never WHAT.
+      row.innerHTML =
+        '<span class="record-time">' + fmtTime(entry.ts) + '</span>' +
+        '<span class="record-event"><span class="dot dot-browser"></span>' +
+        action + manualLabel + reason +
+        '</span>' +
+        '<span class="record-meta">' + (source || '—') + '</span>';
+      container.appendChild(row);
+    });
+  }
+
   // ── Init ──────────────────────────────────────────────────────────────
   var ledger = readLedger();
   var healthLog = readHealthLog();
   var cacheStats = readCacheStats();
   var repoLedger = readRepoLedger();
   var toolConsentLedger = readToolConsentLedger();
+  var focusLedger = readFocusLedger();
   var msgCount = countMessages();
 
   renderSummary(ledger, healthLog, cacheStats, msgCount);
@@ -390,6 +427,7 @@ h2 {
   renderCache(cacheStats);
   renderRepoReads(repoLedger);
   renderToolConsents(toolConsentLedger);
+  renderFocusEvents(focusLedger);
 })();
 </script>
 </body>
