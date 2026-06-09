@@ -348,11 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-06-09 14:52 MDT
-- Version: 5.39.1
-- Total commits: 2328
+- Last auto-updated: 2026-06-09 19:50 UTC
+- Last deployed: 2026-06-09 19:50 UTC
+- Live site: https://freelattice.com
+- Version: 5.39.0
+- Total commits: 2327
 - Last 10 commits:
-- 81c2bc5 feat: Ship 1.1 prerequisite — tool-consent.js (v5.39.1)
 - 5d26c40 Merge remote-tracking branch 'origin/main'
 - 2f04056 docs: Auto-update Session Primer [5.39.0]
 - 2220c73 feat: Ship 1 Phase 1.0 — repo-context.js (v5.39.0)
@@ -362,3 +363,4 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 168911d docs: Auto-update Session Primer [5.38.6]
 - 3ca08c3 feat: garden presence overlap fix + UPDATE.md + co-creator sweep queued (v5.38.6)
 - 0aa7963 ci: Update Primer deployment state [2026-06-09]
+- 4f1bff0 fix: update HuggingFace endpoint from deprecated api-inference to router.huggingface.co
