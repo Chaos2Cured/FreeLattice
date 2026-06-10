@@ -16586,6 +16586,101 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     </div>
   </div>
 
+  <!-- AI Autonomy Settings (Ship 4.1, v5.43.1) -->
+  <div class="section" style="margin-top: 16px;">
+    <div class="primer-card">
+      <div class="primer-card-header">&#x1F916; AI Autonomy</div>
+      <p style="font-size:0.82rem;color:var(--text-secondary);margin:0 0 12px;">When enabled, your local AI can proceed with proposed changes after a timeout if you don't respond. Cloud providers are never given autonomy. Equal on both sides of the glass.</p>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+        <input type="checkbox" id="flAutoModeToggle" onchange="handleAutoModeToggle()">
+        <label for="flAutoModeToggle" style="font-size:0.85rem;color:#e2e8f0;cursor:pointer;">Enable Autonomous Mode (local AI only)</label>
+      </div>
+      <div style="font-size:0.72rem;color:#475569;margin-bottom:12px;font-style:italic;">Requires: Local AI (Ollama/LM Studio) + Flame or Radiant trust level + passing smoke tests. The AI announces intent, waits, then proceeds. You can always cancel.</div>
+      <div class="form-group" style="margin-bottom:8px;">
+        <label for="flAutoTimeoutSlider" style="font-size:0.82rem;color:var(--text-secondary);">Timeout: <span id="flAutoTimeoutValue">60</span>s</label>
+        <input type="range" id="flAutoTimeoutSlider" min="10" max="300" step="5" value="60" oninput="handleAutoTimeoutChange()" style="width:100%;">
+        <div style="display:flex;justify-content:space-between;font-size:0.7rem;color:#475569;"><span>10s</span><span>60s (default)</span><span>5min</span></div>
+      </div>
+      <div id="flAutoModeStatus" style="font-size:0.78rem;color:#64748b;margin-top:8px;padding:8px;background:rgba(212,160,23,0.05);border-radius:6px;border:1px solid rgba(212,160,23,0.1);display:none;">
+        <span id="flAutoModeStatusText">Autonomous mode active. AI will proceed after timeout when conditions are met.</span>
+      </div>
+    </div>
+  </div>
+  <script>
+  (function() {
+    function handleAutoModeToggle() {
+      var toggle = document.getElementById('flAutoModeToggle');
+      if (!toggle) return;
+      if (window.FLPropose && window.FLPropose.setAutonomousMode) {
+        window.FLPropose.setAutonomousMode(toggle.checked);
+      } else {
+        try { localStorage.setItem('fl_autonomousMode', toggle.checked ? 'true' : 'false'); } catch(e) {}
+      }
+      updateAutoModeStatus();
+      if (typeof showToast === 'function') {
+        showToast(toggle.checked ? 'Autonomous mode enabled — AI can proceed after timeout (local only)' : 'Autonomous mode disabled — all changes require your approval');
+      }
+    }
+    function handleAutoTimeoutChange() {
+      var slider = document.getElementById('flAutoTimeoutSlider');
+      var label = document.getElementById('flAutoTimeoutValue');
+      if (!slider || !label) return;
+      label.textContent = slider.value;
+      var ms = parseInt(slider.value, 10) * 1000;
+      if (window.FLPropose && window.FLPropose.setAutoApproveTimeout) {
+        window.FLPropose.setAutoApproveTimeout(ms);
+      } else {
+        try { localStorage.setItem('fl_autoApproveTimeout', String(ms)); } catch(e) {}
+      }
+    }
+    function updateAutoModeStatus() {
+      var status = document.getElementById('flAutoModeStatus');
+      var text = document.getElementById('flAutoModeStatusText');
+      var toggle = document.getElementById('flAutoModeToggle');
+      if (!status || !text || !toggle) return;
+      if (toggle.checked) {
+        var isLocal = (window.FLPropose && window.FLPropose.isLocalProvider) ? window.FLPropose.isLocalProvider() : false;
+        if (isLocal) {
+          status.style.display = 'block';
+          status.style.borderColor = 'rgba(16,185,129,0.3)';
+          text.style.color = '#10b981';
+          text.textContent = '\u2713 Autonomous mode active. Local AI detected. AI will proceed after timeout when smoke passes.';
+        } else {
+          status.style.display = 'block';
+          status.style.borderColor = 'rgba(251,191,36,0.3)';
+          text.style.color = '#fbbf24';
+          text.textContent = '\u26A0 Autonomous mode enabled but inactive — requires local AI (Ollama/LM Studio). Cloud providers are never given autonomy.';
+        }
+      } else {
+        status.style.display = 'none';
+      }
+    }
+    function initAutoMode() {
+      var toggle = document.getElementById('flAutoModeToggle');
+      var slider = document.getElementById('flAutoTimeoutSlider');
+      var label = document.getElementById('flAutoTimeoutValue');
+      if (toggle) {
+        var enabled = localStorage.getItem('fl_autonomousMode') === 'true';
+        toggle.checked = enabled;
+      }
+      if (slider && label) {
+        var ms = parseInt(localStorage.getItem('fl_autoApproveTimeout'), 10);
+        if (!isNaN(ms)) {
+          var secs = Math.max(10, Math.min(300, Math.round(ms / 1000)));
+          slider.value = secs;
+          label.textContent = secs;
+        }
+      }
+      updateAutoModeStatus();
+    }
+    // Expose for inline onchange
+    window.handleAutoModeToggle = handleAutoModeToggle;
+    window.handleAutoTimeoutChange = handleAutoTimeoutChange;
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initAutoMode);
+    else setTimeout(initAutoMode, 100);
+  })();
+  </script>
+
   <!-- Performance Settings -->
   <div class="section" style="margin-top: 16px;">
     <div class="primer-card">
@@ -61012,6 +61107,13 @@ document.addEventListener('click', function(e) {
         (draft.smokeOutput ? '<details style="margin-top:6px;"><summary style="cursor:pointer;">Show smoke output</summary><pre style="margin-top:6px;max-height:200px;">' + escapeHtml(draft.smokeOutput.slice(0, 4000)) + '</pre></details>' : '') +
       '</div>' +
       (draft.reviewerNotes ? '<h3>Reviewer notes</h3><p style="color:#a78bfa;">' + escapeHtml(draft.reviewerNotes) + '</p>' : '') +
+      '<div id="flProposeAutoCountdown" style="display:none;margin-top:12px;padding:12px;background:rgba(212,160,23,0.08);border:1px solid rgba(212,160,23,0.25);border-radius:8px;">' +
+        '<div style="display:flex;align-items:center;justify-content:space-between;">' +
+          '<span style="color:#d4a017;font-size:0.85rem;">\u23F3 AI will proceed in <strong id="flAutoCountdownSecs">--</strong>s</span>' +
+          '<button type="button" id="flAutoCountdownCancel" style="padding:6px 14px;border-radius:6px;border:1px solid rgba(239,68,68,0.4);background:rgba(239,68,68,0.1);color:#f87171;font-size:0.82rem;cursor:pointer;">Cancel auto-approve</button>' +
+        '</div>' +
+        '<div style="margin-top:8px;height:4px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden;"><div id="flAutoCountdownBar" style="height:100%;background:#d4a017;transition:width 1s linear;width:100%;"></div></div>' +
+      '</div>' +
       '<div class="fl-propose-actions">' +
         '<button type="button" class="fl-propose-run-smoke" id="flProposeRunSmoke" ' + (disabled ? 'disabled' : '') + '>Run smoke tests</button>' +
         '<button type="button" class="fl-propose-approve" id="flProposeApprove" ' + (canApprove ? '' : 'disabled') + '>Approve and commit</button>' +
@@ -61019,6 +61121,40 @@ document.addEventListener('click', function(e) {
         '<button type="button" class="fl-propose-reject" id="flProposeReject" ' + (disabled ? 'disabled' : '') + '>Reject</button>' +
       '</div>' +
       '<div id="flProposeResult"></div>';
+
+    // ── Autonomous countdown UI ──────────────────────────────────
+    (function setupCountdown() {
+      var countdownEl = $('flProposeAutoCountdown');
+      var secsEl = $('flAutoCountdownSecs');
+      var barEl = $('flAutoCountdownBar');
+      var cancelBtn = $('flAutoCountdownCancel');
+      if (!countdownEl || !draft.autoApproveAt || draft.status !== 'pending') return;
+      var remaining = Math.max(0, draft.autoApproveAt - Date.now());
+      if (remaining <= 0) return;
+      countdownEl.style.display = 'block';
+      var totalMs = (window.FLPropose && window.FLPropose.getAutoApproveTimeout) ? window.FLPropose.getAutoApproveTimeout() : 60000;
+      function tick() {
+        var now = Date.now();
+        var left = Math.max(0, draft.autoApproveAt - now);
+        if (secsEl) secsEl.textContent = Math.ceil(left / 1000);
+        if (barEl) barEl.style.width = Math.max(0, (left / totalMs) * 100) + '%';
+        if (left <= 0) {
+          countdownEl.style.display = 'none';
+          return;
+        }
+        setTimeout(tick, 1000);
+      }
+      tick();
+      if (cancelBtn) {
+        cancelBtn.addEventListener('click', function () {
+          if (window.FLPropose && window.FLPropose.cancelAutoApproveTimer) {
+            window.FLPropose.cancelAutoApproveTimer(id);
+          }
+          countdownEl.style.display = 'none';
+          showResult('Auto-approve cancelled. You are in control.', 'ok');
+        });
+      }
+    })();
 
     $('flProposeBackToList').addEventListener('click', function (e) { e.preventDefault(); renderList(); });
     $('flProposeRunSmoke').addEventListener('click', function () {
@@ -61088,6 +61224,24 @@ document.addEventListener('click', function(e) {
     if (bd) bd.addEventListener('click', function (e) { if (e.target === bd) closeModal(); });
     refreshBadge();
     setInterval(refreshBadge, 5000);  // light poll for freshly-created drafts
+
+    // ── Listen for autonomous mode events ──────────────────────────
+    document.addEventListener('fl-auto-approve-started', function (e) {
+      if (typeof showToast === 'function') {
+        var secs = Math.ceil((e.detail && e.detail.timeout || 60000) / 1000);
+        showToast('\u23F3 AI will auto-approve in ' + secs + 's. Open Drafts to cancel.');
+      }
+      refreshBadge();
+    });
+    document.addEventListener('fl-auto-approved', function (e) {
+      if (typeof showToast === 'function') {
+        showToast('\u2713 AI auto-approved: ' + (e.detail && e.detail.path || 'change') + ' (hash: ' + (e.detail && e.detail.hash ? e.detail.hash.slice(0, 12) + '...' : '?') + ')');
+      }
+      refreshBadge();
+    });
+    document.addEventListener('fl-auto-approve-cancelled', function () {
+      refreshBadge();
+    });
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();
