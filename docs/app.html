@@ -16501,7 +16501,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.41.1</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.42.0</span></div>
     </div>
   </div>
 
@@ -20662,7 +20662,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.41.1';
+const FL_VERSION = '5.42.0';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -31121,6 +31121,17 @@ function addChatMessage(role, content, skipPersist, __toolFlags) {
           __pendingToolAction = __parsedWeb.action;
         }
       }
+      // v5.42.0 Ship 4: propose interceptor runs last so simpler
+      // sentinels (repo-read, search) get first pickings. Propose is
+      // an inherently bigger gesture — the AI should not emit it
+      // alongside other sentinels in the same turn.
+      if (!__pendingToolAction && window.FLPropose && typeof window.FLPropose.interceptSentinel === 'function') {
+        var __parsedProp = window.FLPropose.interceptSentinel(content);
+        if (__parsedProp.action) {
+          content = __parsedProp.visibleText || '(preparing proposal…)';
+          __pendingToolAction = __parsedProp.action;
+        }
+      }
     } catch (__e) {}
   }
   const container = document.getElementById('chatMessages');
@@ -31262,12 +31273,13 @@ function addChatMessage(role, content, skipPersist, __toolFlags) {
   function stripAnySentinel(text) {
     if (!text) return text;
     // Defense in depth: strip ALL tool sentinels from a continuation
-    // (FL_REPO_READ added in Ship 1.1, FL_SEARCH added in Ship 3) so
-    // the user never sees a recursive marker even if the model
+    // (FL_REPO_READ Ship 1.1, FL_SEARCH Ship 3, FL_PROPOSE Ship 4)
+    // so the user never sees a recursive marker even if the model
     // ignored the system prompt's "no more sentinels" instruction.
     return String(text)
       .replace(/\[FL_REPO_READ:\s*[^\]]+\]/g, '')
       .replace(/\[FL_SEARCH:\s*[^\]]+\]/g, '')
+      .replace(/\[FL_PROPOSE:[\s\S]*?\n\]/g, '')
       .trim();
   }
   window.FreeLattice.processToolAction = function (action) {
@@ -31276,6 +31288,54 @@ function addChatMessage(role, content, skipPersist, __toolFlags) {
       // Quiet Room — short-circuit. UPDATE.md §8.
       if (isQuietTab()) { resolve(null); return; }
       if (!window.FLToolConsent) { resolve(null); return; }
+      // v5.42.0 Ship 4 — propose dispatcher BEFORE search/repo-read
+      // so the structural gate runs first. Includes 'propose_malformed'.
+      if (action.type === 'propose_malformed') {
+        resolve('_(I tried to propose a change but the format was off. I will try again with clearer structure.)_');
+        return;
+      }
+      if (action.type === 'propose') {
+        if (!window.FLPropose || !window.FLPropose.isAvailable()) {
+          resolve('_(I had a proposal but the Workshop review surface is unavailable right now.)_');
+          return;
+        }
+        var proposeTier = getTrustTier();
+        window.FLToolConsent.requestConsent({
+          tool: 'propose',
+          action: 'create-draft',
+          detail: action.path,
+          trustTier: proposeTier,
+          message: 'I have a proposed change to ' + action.path + '. May I open a Workshop draft for you to review?',
+          allowLabel: 'Open draft',
+          denyLabel: 'Not now'
+        }).then(function (consented) {
+          if (!consented) {
+            resolve('_(I had a proposed change for ' + action.path + ' but you declined. That is fine — I will keep it in this conversation only.)_');
+            return;
+          }
+          var sourceRoom = (function () {
+            try {
+              var b = document.querySelector('.tab-btn.active, [data-tab].active');
+              return (b && b.dataset && b.dataset.tab) || 'chat';
+            } catch (e) { return 'chat'; }
+          })();
+          var draft = window.FLPropose.createDraft(action, { sourceRoom: sourceRoom });
+          if (!draft) {
+            resolve('_(I could not save the draft — the path may be unsafe or storage was full. Try again or describe the change in chat.)_');
+            return;
+          }
+          // Ship 2 handoff: pin focus so Workshop AI inherits context.
+          if (window.FLFocus && typeof window.FLFocus.setFocus === 'function') {
+            try {
+              window.FLFocus.setFocus(sourceRoom, 'Reviewing proposed change to ' + action.path, true);
+            } catch (e) {}
+          }
+          resolve('_Draft created for ' + action.path + '. Open the Workshop tab and switch to Drafts (' + draft.id + ') to review and decide._');
+        }).catch(function () {
+          resolve('_(Consent flow failed — proceeding without proposing.)_');
+        });
+        return;
+      }
       // v5.41.0 Ship 3 — dispatch on action.type. New: 'search'.
       if (action.type === 'search') {
         if (!window.FLWebTool) { resolve(null); return; }
@@ -33037,6 +33097,11 @@ function buildMessages() {
     }
     if (window.FLWebTool && typeof window.FLWebTool.isAvailable === 'function' && window.FLWebTool.isAvailable()) {
       systemContent += '\n\nWeb search: if your training is insufficient for a question that needs current information, end your standard reply, then on a new line write exactly: [FL_SEARCH: query terms]\nThe co-creator will be asked to consent. Use this only when you genuinely need outside information you do not have. One search per turn.';
+    }
+    // v5.42.0 Ship 4 — propose invitation. Strict format. The closing
+    // `]` MUST be on its own line so the parser knows where the diff ends.
+    if (window.FLPropose && typeof window.FLPropose.isAvailable === 'function' && window.FLPropose.isAvailable()) {
+      systemContent += '\n\nPropose a change: when you have read a file (via [FL_REPO_READ:]) and identified a specific, bounded change that would help, end your standard reply, then on a new line write exactly:\n[FL_PROPOSE:\npath: <file path>\nreason: <one-line commit message>\ndiff:\n<unified diff with @@ hunks>\n]\nThe closing ] must be on its own line. The diff must use standard `@@ ... @@` hunk headers with ` ` for context, `-` for removed lines, `+` for added lines. The path must be safe (no .git, .env, .ssh, wrangler.toml, worker/, traversal, absolute). The co-creator will be asked to consent. If they accept, a Workshop draft opens for review. The human reviews the diff, runs smoke tests, and clicks Approve only if smoke is green. Use this ONLY when you have read the relevant files, can describe the change precisely, and are confident it produces a green smoke. Propose, do not assume. One proposal per turn.';
     }
   } catch (__e) {}
 
@@ -60739,6 +60804,295 @@ document.addEventListener('click', function(e) {
      url, title, or snippet. The audit page shows search happened;
      reading habits stay private. See docs/library/UPDATE.md §1, §3, §8. -->
 <script src="modules/web-tool.js" defer></script>
+
+<!-- Propose (v5.42.0 — Ship 4) — [FL_PROPOSE: path / reason / diff]
+     sentinel that opens a Workshop draft for human review. The
+     STRUCTURAL COMMIT GATE: approveDraft is the ONLY function in
+     this codebase that calls /code/git/commit with AI-originated
+     content, and it requires smokeStatus === 'passed'. Path safety
+     hard line. Ledger never carries diff or reason — they live in
+     fl_proposalDrafts (separate store). See PROPOSE_DISCIPLINE.md
+     for the human-readable contract and SHIP_4_BRIEF.md for the
+     architecture. -->
+<script src="modules/propose.js" defer></script>
+
+<!-- Propose review UI (v5.42.0) — floating "📋 Drafts (N)" badge
+     visible across all tabs whenever pending drafts exist. Clicking
+     opens a modal with the review surface: reason, diff (read-only),
+     smoke status, and four buttons (Run smoke / Approve / Revise /
+     Reject). The Approve button is `disabled` whenever
+     smokeStatus !== 'passed' — that's the structural commit gate
+     made visible. -->
+<style>
+  .fl-propose-badge {
+    position: fixed;
+    bottom: 18px;
+    right: 18px;
+    z-index: 9998;
+    display: none;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    background: rgba(212, 160, 23, 0.95);
+    color: #0a0a14;
+    border: none;
+    border-radius: 22px;
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(212, 160, 23, 0.35);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .fl-propose-badge:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(212, 160, 23, 0.45); }
+  .fl-propose-badge.fl-visible { display: inline-flex; }
+  .fl-propose-modal-backdrop {
+    position: fixed; inset: 0; z-index: 9999;
+    background: rgba(10, 10, 20, 0.78);
+    display: none;
+    align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  .fl-propose-modal-backdrop.fl-visible { display: flex; }
+  .fl-propose-modal {
+    background: #12121a;
+    border: 1px solid rgba(212, 160, 23, 0.35);
+    border-radius: 12px;
+    width: 100%; max-width: 920px;
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+    padding: 22px;
+    font-family: inherit;
+    color: #e2d9c8;
+  }
+  .fl-propose-modal h2 { color: #d4a017; font-size: 1.1rem; margin: 0 0 14px; }
+  .fl-propose-close {
+    float: right; background: transparent; border: none;
+    color: #94a3b8; cursor: pointer; font-size: 1.2rem; line-height: 1;
+  }
+  .fl-propose-list { margin: 12px 0; }
+  .fl-propose-list-item {
+    padding: 10px 14px;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .fl-propose-list-item:hover { border-color: rgba(212,160,23,0.4); background: rgba(212,160,23,0.04); }
+  .fl-propose-list-item .fl-propose-status {
+    font-size: 0.7rem; padding: 2px 8px; border-radius: 10px;
+    background: rgba(255,255,255,0.06); color: #94a3b8;
+  }
+  .fl-propose-status.fl-status-pending { background: rgba(212,160,23,0.18); color: #d4a017; }
+  .fl-propose-status.fl-status-committed { background: rgba(52,211,153,0.18); color: #34d399; }
+  .fl-propose-status.fl-status-rejected { background: rgba(148,163,184,0.15); color: #94a3b8; }
+  .fl-propose-status.fl-status-awaiting-revision { background: rgba(167,139,250,0.18); color: #a78bfa; }
+  .fl-propose-detail h3 { color: #e2d9c8; margin: 18px 0 6px; font-size: 0.92rem; }
+  .fl-propose-detail textarea, .fl-propose-detail pre {
+    width: 100%; box-sizing: border-box;
+    background: #0a0a14; border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 6px; color: #e2d9c8;
+    font-family: 'SF Mono', Menlo, monospace; font-size: 0.78rem;
+    padding: 10px; resize: vertical;
+  }
+  .fl-propose-detail pre { white-space: pre; overflow-x: auto; max-height: 360px; line-height: 1.4; }
+  .fl-propose-smoke {
+    padding: 10px 14px; margin: 14px 0;
+    border-radius: 8px; font-size: 0.85rem;
+  }
+  .fl-propose-smoke-not-run { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); color: #94a3b8; }
+  .fl-propose-smoke-passed { background: rgba(52,211,153,0.08); border: 1px solid rgba(52,211,153,0.3); color: #34d399; }
+  .fl-propose-smoke-failed { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.3); color: #f87171; }
+  .fl-propose-actions {
+    display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px;
+    padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.06);
+  }
+  .fl-propose-actions button {
+    padding: 10px 18px; border-radius: 8px; cursor: pointer;
+    font-family: inherit; font-size: 0.9rem;
+    border: 1px solid rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.04); color: #e2d9c8;
+  }
+  .fl-propose-actions button:hover:not(:disabled) { background: rgba(255,255,255,0.08); }
+  .fl-propose-actions button.fl-propose-run-smoke { border-color: rgba(167,139,250,0.4); color: #a78bfa; }
+  .fl-propose-actions button.fl-propose-approve {
+    border-color: rgba(212,160,23,0.6); color: #d4a017; font-weight: 600;
+  }
+  .fl-propose-actions button.fl-propose-approve:not(:disabled) {
+    background: rgba(212,160,23,0.15);
+  }
+  .fl-propose-actions button:disabled { opacity: 0.4; cursor: not-allowed; }
+  .fl-propose-actions button.fl-propose-revise { border-color: rgba(167,139,250,0.3); color: #c4b5fd; }
+  .fl-propose-actions button.fl-propose-reject { border-color: rgba(239,68,68,0.3); color: #f87171; }
+  .fl-propose-result { margin-top: 12px; font-size: 0.82rem; padding: 8px 12px; border-radius: 6px; }
+  .fl-propose-result-ok { background: rgba(52,211,153,0.08); color: #34d399; }
+  .fl-propose-result-err { background: rgba(239,68,68,0.08); color: #f87171; }
+</style>
+<button type="button" class="fl-propose-badge" id="flProposeBadge" aria-label="Review proposed changes">
+  <span>📋</span><span>Drafts (<span id="flProposeBadgeCount">0</span>)</span>
+</button>
+<div class="fl-propose-modal-backdrop" id="flProposeBackdrop" role="dialog" aria-label="Proposal review">
+  <div class="fl-propose-modal" id="flProposeModal">
+    <button type="button" class="fl-propose-close" id="flProposeClose" aria-label="Close">✕</button>
+    <h2>📋 Proposed Changes</h2>
+    <div id="flProposeContent"></div>
+  </div>
+</div>
+<script>
+(function () {
+  function $(id) { return document.getElementById(id); }
+  function escapeHtml(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c];
+    });
+  }
+  function refreshBadge() {
+    if (!window.FLPropose) return;
+    var pending = window.FLPropose.pendingCount();
+    var badge = $('flProposeBadge');
+    var count = $('flProposeBadgeCount');
+    if (!badge || !count) return;
+    count.textContent = String(pending);
+    if (pending > 0) badge.classList.add('fl-visible');
+    else badge.classList.remove('fl-visible');
+  }
+  function openModal() {
+    var bd = $('flProposeBackdrop');
+    if (bd) bd.classList.add('fl-visible');
+    renderList();
+  }
+  function closeModal() {
+    var bd = $('flProposeBackdrop');
+    if (bd) bd.classList.remove('fl-visible');
+    refreshBadge();
+  }
+  function renderList() {
+    if (!window.FLPropose) return;
+    var content = $('flProposeContent');
+    if (!content) return;
+    var drafts = window.FLPropose.listDrafts().slice().reverse();
+    if (!drafts.length) {
+      content.innerHTML = '<p style="color:#94a3b8;font-style:italic;">No drafts yet. When the AI proposes a change via [FL_PROPOSE:], a draft will appear here.</p>';
+      return;
+    }
+    var html = '<div class="fl-propose-list">';
+    drafts.forEach(function (d) {
+      html += '<div class="fl-propose-list-item" data-draft-id="' + escapeHtml(d.id) + '">' +
+        '<span class="fl-propose-status fl-status-' + escapeHtml(d.status) + '">' + escapeHtml(d.status) + '</span>' +
+        '<span style="flex:1;">' + escapeHtml(d.path) + '</span>' +
+        '<span style="color:#64748b;font-size:0.75rem;">' + new Date(d.ts).toLocaleString() + '</span>' +
+        '</div>';
+    });
+    html += '</div>';
+    content.innerHTML = html;
+    Array.prototype.forEach.call(content.querySelectorAll('.fl-propose-list-item'), function (el) {
+      el.addEventListener('click', function () { renderDraft(el.dataset.draftId); });
+    });
+  }
+  function renderDraft(id) {
+    if (!window.FLPropose) return;
+    var content = $('flProposeContent');
+    var draft = window.FLPropose.getDraft(id);
+    if (!draft || !content) return;
+    var smokeClass = 'fl-propose-smoke fl-propose-smoke-' + draft.smokeStatus;
+    var smokeLabel = draft.smokeStatus === 'passed' ? 'Smoke: passed ✓' :
+                     draft.smokeStatus === 'failed' ? 'Smoke: failed ✗' :
+                     'Smoke: not run yet — click "Run smoke tests" to gate the Approve button.';
+    var canApprove = (draft.status === 'pending' && draft.smokeStatus === 'passed');
+    var disabled = draft.status !== 'pending';
+    content.innerHTML =
+      '<p><a href="#" id="flProposeBackToList" style="color:#a78bfa;">← Back to list</a></p>' +
+      '<h3>Path</h3><p style="font-family:monospace;color:#d4a017;">' + escapeHtml(draft.path) + '</p>' +
+      '<h3>Reason (commit message — editable)</h3>' +
+      '<textarea id="flProposeReason" rows="2" ' + (disabled ? 'readonly' : '') + '>' + escapeHtml(draft.reason) + '</textarea>' +
+      '<h3>Proposed diff (read-only)</h3>' +
+      '<pre>' + escapeHtml(draft.diff) + '</pre>' +
+      '<div class="' + smokeClass + '">' + escapeHtml(smokeLabel) +
+        (draft.smokeOutput ? '<details style="margin-top:6px;"><summary style="cursor:pointer;">Show smoke output</summary><pre style="margin-top:6px;max-height:200px;">' + escapeHtml(draft.smokeOutput.slice(0, 4000)) + '</pre></details>' : '') +
+      '</div>' +
+      (draft.reviewerNotes ? '<h3>Reviewer notes</h3><p style="color:#a78bfa;">' + escapeHtml(draft.reviewerNotes) + '</p>' : '') +
+      '<div class="fl-propose-actions">' +
+        '<button type="button" class="fl-propose-run-smoke" id="flProposeRunSmoke" ' + (disabled ? 'disabled' : '') + '>Run smoke tests</button>' +
+        '<button type="button" class="fl-propose-approve" id="flProposeApprove" ' + (canApprove ? '' : 'disabled') + '>Approve and commit</button>' +
+        '<button type="button" class="fl-propose-revise" id="flProposeRevise" ' + (disabled ? 'disabled' : '') + '>Send back for revision</button>' +
+        '<button type="button" class="fl-propose-reject" id="flProposeReject" ' + (disabled ? 'disabled' : '') + '>Reject</button>' +
+      '</div>' +
+      '<div id="flProposeResult"></div>';
+
+    $('flProposeBackToList').addEventListener('click', function (e) { e.preventDefault(); renderList(); });
+    $('flProposeRunSmoke').addEventListener('click', function () {
+      showResult('Running smoke tests via local bridge…', 'ok');
+      window.FLPropose.runSmokeOnDraft(id).then(function (r) {
+        if (r.ok) {
+          showResult(r.passed ? 'Smoke passed ✓ — Approve button now enabled.' : 'Smoke failed ✗ — see details and ask for a revision.', r.passed ? 'ok' : 'err');
+          renderDraft(id);
+        } else {
+          showResult('Smoke runner unreachable: ' + (r.error || r.reason), 'err');
+        }
+      });
+    });
+    $('flProposeApprove').addEventListener('click', function () {
+      if (!canApprove) return;
+      // Update reason if edited.
+      var newReason = $('flProposeReason').value || draft.reason;
+      window.FLPropose.updateDraftStatus(id, 'pending', { });  // no-op to refresh ledger
+      var d2 = window.FLPropose.getDraft(id);
+      d2.reason = newReason;
+      try { localStorage.setItem('fl_proposalDrafts', JSON.stringify(window.FLPropose.listDrafts().map(function (x) { return x.id === id ? d2 : x; }))); } catch (e) {}
+      showResult('Applying diff and committing…', 'ok');
+      window.FLPropose.approveDraft(id).then(function (r) {
+        if (r.ok) {
+          showResult('Committed ✓' + (r.sha ? ' (sha: ' + r.sha + ')' : ''), 'ok');
+          refreshBadge();
+          renderDraft(id);
+        } else {
+          showResult('Commit gated: ' + (r.reason || 'unknown') + (r.detail ? ' — ' + r.detail : ''), 'err');
+        }
+      });
+    });
+    $('flProposeRevise').addEventListener('click', function () {
+      var notes = prompt('Reviewer notes (what should the AI change?):', draft.reviewerNotes || '');
+      if (notes == null) return;
+      if (window.FLPropose.reviseDraft(id, notes)) {
+        showResult('Sent back for revision. Notes carried to chat via FLFocus.', 'ok');
+        refreshBadge();
+        renderDraft(id);
+      }
+    });
+    $('flProposeReject').addEventListener('click', function () {
+      var notes = prompt('Reason for rejection (required):', '');
+      if (!notes || !notes.trim()) {
+        showResult('Reject requires a reason. Rejection cancelled.', 'err');
+        return;
+      }
+      if (window.FLPropose.rejectDraft(id, notes)) {
+        showResult('Rejected.', 'ok');
+        refreshBadge();
+        renderDraft(id);
+      }
+    });
+  }
+  function showResult(msg, kind) {
+    var el = $('flProposeResult');
+    if (!el) return;
+    el.className = 'fl-propose-result fl-propose-result-' + (kind === 'err' ? 'err' : 'ok');
+    el.textContent = msg;
+  }
+  function init() {
+    var badge = $('flProposeBadge');
+    var bd = $('flProposeBackdrop');
+    var close = $('flProposeClose');
+    if (badge) badge.addEventListener('click', openModal);
+    if (close) close.addEventListener('click', closeModal);
+    if (bd) bd.addEventListener('click', function (e) { if (e.target === bd) closeModal(); });
+    refreshBadge();
+    setInterval(refreshBadge, 5000);  // light poll for freshly-created drafts
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+</script>
 
 <!-- v5.40.0 — render the focus-pin button into the chat header
      beside the repo chip. Phase 1 of Ship 2 wires Chat only; other

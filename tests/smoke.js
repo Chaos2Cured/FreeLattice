@@ -3310,6 +3310,133 @@ assert('SECURITY.md: receipt cites the worker code, ledger discipline, and smoke
   /smoke/.test(securityMd));
 
 // ═══════════════════════════════════════════════════════════════
+section('99h. Propose — Ship 4 Phase 1 (v5.42.0) · STRUCTURAL COMMIT GATE');
+// ═══════════════════════════════════════════════════════════════
+var proposeJs = '';
+try { proposeJs = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'modules', 'propose.js'), 'utf8'); }
+catch (e) {}
+assert('propose: module file exists and is non-empty',
+  proposeJs.length > 5000);
+assert('propose: IIFE-scoped, exposes window.FLPropose + FreeLatticeModules.Propose',
+  /\(function \(\) \{\s*'use strict'/.test(proposeJs) &&
+  /window\.FLPropose\s*=\s*api/.test(proposeJs) &&
+  /window\.FreeLatticeModules\.Propose\s*=\s*api/.test(proposeJs));
+assert('propose: ledger key fl_proposalLedger; drafts key fl_proposalDrafts (separation by design)',
+  /LEDGER_KEY\s*=\s*['"]fl_proposalLedger['"]/.test(proposeJs) &&
+  /DRAFTS_KEY\s*=\s*['"]fl_proposalDrafts['"]/.test(proposeJs));
+assert('propose: diff length cap is 50000 chars',
+  /DIFF_LENGTH_CAP\s*=\s*50000/.test(proposeJs));
+assert('propose: forbidden path fragments include .git, .env, .ssh, wrangler.toml, worker/, scripts/bump-version.sh',
+  /FORBIDDEN_PATH_FRAGMENTS[\s\S]{0,800}['"]\.git\/['"]/.test(proposeJs) &&
+  /FORBIDDEN_PATH_FRAGMENTS[\s\S]{0,800}['"]\.env['"]/.test(proposeJs) &&
+  /FORBIDDEN_PATH_FRAGMENTS[\s\S]{0,800}['"]\.ssh\/['"]/.test(proposeJs) &&
+  /FORBIDDEN_PATH_FRAGMENTS[\s\S]{0,800}['"]wrangler\.toml['"]/.test(proposeJs) &&
+  /FORBIDDEN_PATH_FRAGMENTS[\s\S]{0,800}['"]worker\/['"]/.test(proposeJs) &&
+  /FORBIDDEN_PATH_FRAGMENTS[\s\S]{0,800}['"]scripts\/bump-version\.sh['"]/.test(proposeJs));
+
+// ── CRITICAL LOCK 1: No auto-commit at any trust tier ──
+// approveDraft is the ONLY function that calls commitViaBridge.
+// commitViaBridge is the ONLY function that hits /code/git/commit
+// in propose.js. Verify the count.
+assert('CRITICAL LOCK 1A: commitViaBridge is called exactly ONCE in propose.js (only from approveDraft)',
+  (proposeJs.match(/commitViaBridge\s*\(/g) || []).length === 2);  // 1 declaration + 1 call
+assert('CRITICAL LOCK 1B: no other function in propose.js calls /code/git/commit directly',
+  (proposeJs.match(/\/code\/git\/commit/g) || []).length === 1);
+assert('CRITICAL LOCK 1C: approveDraft refuses non-pending drafts',
+  /function approveDraft[\s\S]{0,800}draft\.status\s*!==\s*['"]pending['"][\s\S]{0,200}return\s*Promise\.resolve\(\{\s*ok:\s*false,\s*reason:\s*['"]not-pending['"]/.test(proposeJs));
+
+// ── CRITICAL LOCK 2: Path safety hard line ──
+assert('CRITICAL LOCK 2A: isPathSafe rejects directory traversal',
+  /function isPathSafe[\s\S]{0,400}path\.indexOf\(['"]\.\.['"]\)\s*!==\s*-1[\s\S]{0,100}return\s*false/.test(proposeJs));
+assert('CRITICAL LOCK 2B: isPathSafe rejects absolute paths (Unix and Windows)',
+  proposeJs.indexOf('/^[\\/\\\\]/') !== -1 &&
+  proposeJs.indexOf('/^[a-zA-Z]:[\\\\/]/') !== -1);
+assert('CRITICAL LOCK 2C: isPathSafe rejects null bytes',
+  /path\.indexOf\(['"]\\0['"]\)\s*!==\s*-1[\s\S]{0,100}return\s*false/.test(proposeJs));
+assert('CRITICAL LOCK 2D: isPathSafe iterates FORBIDDEN_PATH_FRAGMENTS for prefix AND /-anchored match',
+  /for \(var i = 0; i < FORBIDDEN_PATH_FRAGMENTS\.length[\s\S]{0,600}path\.indexOf\(frag\)\s*===\s*0[\s\S]{0,300}path\.indexOf\(['"]\/['"] \+ frag\)\s*!==\s*-1/.test(proposeJs));
+
+// ── CRITICAL LOCK 3: approveDraft refuses to commit without smokeStatus === 'passed' ──
+assert('CRITICAL LOCK 3: approveDraft returns smoke-not-passed when smokeStatus !== "passed"',
+  /function approveDraft[\s\S]{0,1500}draft\.smokeStatus\s*!==\s*['"]passed['"][\s\S]{0,200}return\s*Promise\.resolve\(\{\s*ok:\s*false,\s*reason:\s*['"]smoke-not-passed['"]/.test(proposeJs));
+assert('CRITICAL LOCK 3B: UI Approve button disabled when smokeStatus !== "passed"',
+  /canApprove\s*=\s*\(draft\.status\s*===\s*['"]pending['"]\s*&&\s*draft\.smokeStatus\s*===\s*['"]passed['"]\)/.test(appHtml) &&
+  /flProposeApprove[\s\S]{0,300}canApprove\s*\?\s*['"]['"]\s*:\s*['"]disabled['"]/.test(appHtml));
+
+// ── CRITICAL LOCK 4: Diff and reason never appear in the ledger ──
+assert('CRITICAL LOCK 4A: appendLedger sanitized row contains NO diff field',
+  !/sanitized\s*=\s*\{[\s\S]{0,500}\bdiff\b\s*:/.test(proposeJs));
+assert('CRITICAL LOCK 4B: appendLedger sanitized row contains NO reason field',
+  !/sanitized\s*=\s*\{[\s\S]{0,500}\breason\b\s*:/.test(proposeJs));
+assert('CRITICAL LOCK 4C: sanitized row shape is EXACTLY {ts, action, draftId, path, sourceRoom, status}',
+  /sanitized\s*=\s*\{\s*ts:\s*Date\.now\(\)[\s\S]{0,400}action:[\s\S]{0,200}draftId:[\s\S]{0,200}path:[\s\S]{0,200}sourceRoom:[\s\S]{0,200}status:/.test(proposeJs));
+assert('CRITICAL LOCK 4D: audit page renderProposalEvents does NOT display entry.diff or entry.reason',
+  /function renderProposalEvents/.test(auditHtml) &&
+  !/renderProposalEvents[\s\S]{0,1500}entry\.diff/.test(auditHtml) &&
+  !/renderProposalEvents[\s\S]{0,1500}entry\.reason/.test(auditHtml) &&
+  !/renderProposalEvents[\s\S]{0,1500}entry\.content/.test(auditHtml));
+
+// ── Other smoke (the 12 non-critical) ──
+assert('propose: sentinel regex matches multiline body with closing ] on own line',
+  /SENTINEL_RE\s*=\s*\/\\\[FL_PROPOSE:\(\[\\s\\S\]\*\?\)\\n\\\]\//.test(proposeJs));
+assert('propose: parseProposalBody requires path: + reason: + diff:',
+  /pathMatch\s*=\s*body\.match\(\/path:[\s\S]{0,200}reasonMatch\s*=\s*body\.match\(\/reason:[\s\S]{0,200}diffStart\s*=\s*body\.indexOf\(['"]diff:['"]\)/.test(proposeJs));
+assert('propose: parseProposalBody returns null when diff > DIFF_LENGTH_CAP',
+  /diff\.length\s*>\s*DIFF_LENGTH_CAP[\s\S]{0,80}return\s*null/.test(proposeJs));
+assert('propose: applyUnifiedDiff is strict — throws when hunk context not found',
+  /function applyUnifiedDiff[\s\S]{0,2000}context not found in current file/.test(proposeJs));
+assert('propose: applyUnifiedDiff parses @@ ... @@ hunk headers',
+  /\/\^@@\.\*@@\//.test(proposeJs));
+assert('propose: Quiet Room exclusion in createDraft + isAvailable',
+  /function createDraft[\s\S]{0,400}isQuietRoom\(context\s*&&\s*context\.sourceRoom\)[\s\S]{0,80}return\s*null/.test(proposeJs) &&
+  /function isAvailable[\s\S]{0,200}if \(isQuietRoom\(\)\)\s*return\s*false/.test(proposeJs));
+assert('propose: reviseDraft carries reviewerNotes to FLFocus (Ship 2 handoff)',
+  /function reviseDraft[\s\S]{0,800}FLFocus\.setFocus\(\s*draft\.sourceRoom[\s\S]{0,200}reviewerNotes,\s*true\s*\)/.test(proposeJs));
+assert('propose: rejectDraft REQUIRES non-empty reviewerNotes',
+  /function rejectDraft[\s\S]{0,400}if \(!reviewerNotes\s*\|\|\s*!String\(reviewerNotes\)\.trim\(\)\)\s*return\s*false/.test(proposeJs));
+
+// Chat pipeline + UI integration.
+assert('chain: propose interceptor runs after repo-context and web-tool',
+  appHtml.indexOf('FLPropose.interceptSentinel') > appHtml.indexOf('FLWebTool.interceptSentinel'));
+assert('chain: processToolAction has propose + propose_malformed dispatch branches',
+  /if \(action\.type === ['"]propose_malformed['"]\)/.test(appHtml) &&
+  /if \(action\.type === ['"]propose['"]\)/.test(appHtml));
+assert('chain: propose dispatch routes through FLToolConsent.requestConsent',
+  /FLToolConsent\.requestConsent\(\{\s*tool:\s*['"]propose['"]/.test(appHtml));
+assert('chain: propose flow pins focus via FLFocus.setFocus when draft is created',
+  /FLFocus\.setFocus\(sourceRoom,\s*['"]Reviewing proposed change to/.test(appHtml));
+assert('chain: stripAnySentinel ALSO strips [FL_PROPOSE: ... \\n]',
+  /stripAnySentinel[\s\S]{0,500}\\\[FL_PROPOSE:/.test(appHtml));
+assert('invitation: buildMessages injects FL_PROPOSE invite when FLPropose.isAvailable',
+  /FLPropose\.isAvailable\(\)[\s\S]{0,300}systemContent \+=[\s\S]{0,800}\[FL_PROPOSE:/.test(appHtml));
+assert('UI: floating "Drafts (N)" badge present + opens modal',
+  /id="flProposeBadge"/.test(appHtml) &&
+  /id="flProposeBackdrop"/.test(appHtml) &&
+  /Drafts \(<span id="flProposeBadgeCount"/.test(appHtml));
+assert('UI: modal renders four action buttons',
+  /flProposeRunSmoke/.test(appHtml) &&
+  /flProposeApprove/.test(appHtml) &&
+  /flProposeRevise/.test(appHtml) &&
+  /flProposeReject/.test(appHtml));
+assert('audit page: reads fl_proposalLedger + renders Proposal Events section + privacy disclaimer',
+  /readProposalLedger[\s\S]{0,300}fl_proposalLedger/.test(auditHtml) &&
+  /Proposal Events/.test(auditHtml) &&
+  /id="proposal-records"/.test(auditHtml) &&
+  /never logged here/.test(auditHtml));
+
+// Documents.
+var shipBriefMd = '';
+try { shipBriefMd = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'library', 'SHIP_4_BRIEF.md'), 'utf8'); }
+catch (e) {}
+var proposeDiscMd = '';
+try { proposeDiscMd = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'library', 'PROPOSE_DISCIPLINE.md'), 'utf8'); }
+catch (e) {}
+assert('docs: SHIP_4_BRIEF.md preserved + PROPOSE_DISCIPLINE.md added',
+  shipBriefMd.length > 3000 && proposeDiscMd.length > 1500 &&
+  /four locks/.test(proposeDiscMd) &&
+  /STRUCTURAL COMMIT GATE/.test(proposeJs));
+
+// ═══════════════════════════════════════════════════════════════
 section('100. UPDATE.md + CLARITY_AUDIT queue (v5.38.6)');
 // ═══════════════════════════════════════════════════════════════
 var updateMd = '';

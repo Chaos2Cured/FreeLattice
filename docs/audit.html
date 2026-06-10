@@ -194,6 +194,15 @@ h2 {
     <div class="empty">No focus events yet. When attention is set, carried, or cleared across rooms, the event will appear here.</div>
   </div>
 
+  <!-- ── Proposal Events (v5.42.0 Ship 4) ── -->
+  <h2>Proposal Events</h2>
+  <p style="font-size:0.8rem;color:#64748b;margin-top:-8px;margin-bottom:12px;">
+    Every row shows that a proposal happened, its trajectory through pending → committed | rejected | awaiting-revision, and the path. The diff and the reason are <strong style="color:#94a3b8;">never logged here</strong> — they live in the Workshop draft list, accessible from the 📋 Drafts badge. The audit page tracks governance events; Workshop is where the content lives.
+  </p>
+  <div id="proposal-records">
+    <div class="empty">No proposals yet. When the AI emits [FL_PROPOSE: …] and you consent, the event will appear here.</div>
+  </div>
+
   <!-- ── Web Search Events (v5.41.0 Ship 3) ── -->
   <h2>Web Search Events</h2>
   <p style="font-size:0.8rem;color:#64748b;margin-top:-8px;margin-bottom:12px;">
@@ -264,6 +273,13 @@ h2 {
   function readSearchLedger() {
     try {
       var raw = localStorage.getItem('fl_searchLedger');
+      return raw ? JSON.parse(raw) : [];
+    } catch (e) { return []; }
+  }
+
+  function readProposalLedger() {
+    try {
+      var raw = localStorage.getItem('fl_proposalLedger');
       return raw ? JSON.parse(raw) : [];
     } catch (e) { return []; }
   }
@@ -459,6 +475,34 @@ h2 {
     });
   }
 
+  function renderProposalEvents(proposalLedger) {
+    var container = document.getElementById('proposal-records');
+    if (!proposalLedger.length) return;
+    container.innerHTML = '';
+    proposalLedger.slice().reverse().slice(0, 50).forEach(function (entry) {
+      var row = document.createElement('div');
+      row.className = 'record';
+      // PRIVACY — display reads ts, action, path, sourceRoom, status only.
+      // The diff and the commit message live in the drafts store, never here.
+      var action = entry.action || '—';
+      var status = entry.status || '';
+      var path = entry.path || '';
+      var room = entry.sourceRoom || '';
+      var dotCls = status === 'committed' ? 'dot-local'
+                 : status === 'rejected' ? 'dot-mesh'
+                 : status === 'awaiting-revision' ? 'dot-browser'
+                 : 'dot-cache';
+      row.innerHTML =
+        '<span class="record-time">' + fmtTime(entry.ts) + '</span>' +
+        '<span class="record-event"><span class="dot ' + dotCls + '"></span>' +
+        action + (status ? ' → ' + status : '') +
+        (path ? ' <code style="font-size:0.78rem;color:#94a3b8;">' + path + '</code>' : '') +
+        '</span>' +
+        '<span class="record-meta">' + room + '</span>';
+      container.appendChild(row);
+    });
+  }
+
   // ── Init ──────────────────────────────────────────────────────────────
   var ledger = readLedger();
   var healthLog = readHealthLog();
@@ -467,6 +511,7 @@ h2 {
   var toolConsentLedger = readToolConsentLedger();
   var focusLedger = readFocusLedger();
   var searchLedger = readSearchLedger();
+  var proposalLedger = readProposalLedger();
   var msgCount = countMessages();
 
   renderSummary(ledger, healthLog, cacheStats, msgCount);
@@ -477,6 +522,7 @@ h2 {
   renderToolConsents(toolConsentLedger);
   renderFocusEvents(focusLedger);
   renderSearchEvents(searchLedger);
+  renderProposalEvents(proposalLedger);
 })();
 </script>
 </body>

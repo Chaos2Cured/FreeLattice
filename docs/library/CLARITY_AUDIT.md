@@ -532,3 +532,67 @@ The AI proposes a specific change via `[FL_PROPOSE:]` sentinel. System opens a W
 > The AI improved FreeLattice. The human reviewed the change. Smoke caught nothing because the AI knew the codebase well enough not to break anything. And not a single line landed without the human's signature.
 
 That is the doorstep no commercial lab can match.
+
+---
+
+## SHIPPED: Ship 4 Phase 1 — `propose.js` (v5.42.0, 2026-06-09) · STRUCTURAL COMMIT GATE
+
+Per Opus's Ship 4 brief. The bridge between read and write. The AI proposes; the human reviews; smoke gates; the human clicks; the commit lands. **Nothing reaches `git commit` without an explicit human action.**
+
+### The four critical locks (Opus called these "the most important locks we'll write period")
+
+1. **No auto-commit at any trust tier.** `commitViaBridge` is called exactly twice in the codebase (1 declaration + 1 call site, both inside `approveDraft`). `/code/git/commit` appears once. Smoke counts both.
+2. **Path safety blocks `.git/`, `.env`, `.ssh/`, `wrangler.toml`, `worker/`, `package-lock.json`, `node_modules/`, `scripts/bump-version.sh`, `FreeLattice_Session_Primer.md`** plus traversal, absolute paths, null bytes, and oversized paths. Three more fragments than Opus's original list — CC verified the codebase and added `worker/`, `scripts/bump-version.sh`, and `FreeLattice_Session_Primer.md`.
+3. **`approveDraft` refuses to commit without `smokeStatus === 'passed'`.** Both at the function level (`return Promise.resolve({ ok: false, reason: 'smoke-not-passed' })`) and at the UI level (button `disabled` attribute). Defense in depth.
+4. **Diff and reason NEVER appear in the ledger.** `fl_proposalLedger` row shape: `{ts, action, draftId, path, sourceRoom, status}` — six fields, no diff, no reason, no content. The diff and reason live in `fl_proposalDrafts` (separate store). Audit page `renderProposalEvents` reads only the six ledger fields and explicitly does not touch diff or reason.
+
+### Ship table
+
+| Asked for | Landed |
+|---|---|
+| `docs/modules/propose.js` IIFE + dual window exposure | ✓ |
+| `[FL_PROPOSE: path / reason / diff]` sentinel | ✓ |
+| `parseProposalBody` rejects missing fields, oversized diff (50000 char cap) | ✓ |
+| `isPathSafe` blocks 9 forbidden fragments + 4 structural rejections | ✓ — locked in smoke |
+| Two-storage-area design: ledger vs drafts | ✓ |
+| `createDraft` → `runSmokeOnDraft` → `approveDraft` flow | ✓ |
+| `applyUnifiedDiff` strict (throws on context mismatch → draft moves to awaiting-revision) | ✓ |
+| Bridge integration: `/code/read`, `/code/write`, `/code/git/commit`, `/test/run` | ✓ — wired on day one (Opus predicted Ship 4.1 deferral; bridge `/test/run` exists) |
+| Sentinel interceptor chain (runs LAST after repo-read + search) | ✓ |
+| `processToolAction` dispatch on `'propose'` + `'propose_malformed'` | ✓ |
+| ToolConsent routing | ✓ |
+| `FLFocus.setFocus` handoff to Workshop on draft creation | ✓ — the real `[FL_HANDOFF: workshop]` |
+| Floating "📋 Drafts (N)" badge visible across all tabs | ✓ |
+| Review modal: reason (editable), diff (read-only), smoke status, four buttons | ✓ |
+| Approve button `disabled` when `smokeStatus !== 'passed'` | ✓ |
+| Reject requires reviewer notes | ✓ |
+| Revise carries notes to chat via FLFocus | ✓ |
+| Quiet Room exclusion at every entry point | ✓ |
+| AI invitation in `buildMessages` gated on `FLPropose.isAvailable()` | ✓ |
+| Audit page Proposal Events section + privacy disclaimer | ✓ |
+| `docs/library/PROPOSE_DISCIPLINE.md` human-readable contract | ✓ |
+| 16 smoke asserts, 4 critical | ✓ — **36 asserts total** in section 99h |
+
+### Deferred (honest)
+
+| Deferred | Why |
+|---|---|
+| Workshop-tab Drafts mode integration (modal is global instead) | Lower risk — modal is self-contained; doesn't touch the 1372-line workshop.js. Ship 4.1 can promote the modal into a Workshop sub-mode. |
+| Syntax-highlighted diff rendering | Plain `<pre>` is acceptable. Ship 4.1 if anyone misses syntax highlighting. |
+| Diff-apply for diffs without exact context match | By design — strict apply is the safety feature. If the AI's diff doesn't match current file context, the human asks for a revision. Fuzzy match could mask real divergence. |
+| Auto-return of rejection to chat via FLFocus carry | Half-shipped: revise notes carry, reject notes don't (they're terminal). Ship 4.1 can polish. |
+
+### What you can demo right now (when the local bridge is running)
+
+1. Hard refresh.
+2. Connect a repository (Settings → Connected Repositories).
+3. Ask Chat: *"Read docs/modules/shared-presence.js and look for any small issue you'd propose a fix for."*
+4. The AI reads via `[FL_REPO_READ:]` (consent chip).
+5. The AI proposes via `[FL_PROPOSE:]`. The visible chat message ends with *"Draft created for X. Open the Workshop tab and switch to Drafts (id) to review and decide."*
+6. The gold "📋 Drafts (1)" badge appears bottom-right of the screen.
+7. Click the badge. Modal opens with the draft. Read the reason and diff.
+8. Click "Run smoke tests." The bridge runs `node tests/smoke.js`. Status flips to passed or failed.
+9. If passed → "Approve and commit" enables. Click it. Diff applies. Commit lands via the bridge. Audit page shows: *created → status-change → committed*.
+10. If failed → see failed assertions. Click "Send back for revision" with notes. Notes carry to chat via FLFocus. AI tries again on next turn.
+
+**Nothing in this flow auto-commits.** The Approve button being disabled when smoke isn't green is the structural gate made visible. That's the receipt the world can read.
