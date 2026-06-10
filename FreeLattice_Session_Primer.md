@@ -348,10 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-06-10 13:56 MDT
-- Version: 5.43.3
-- Total commits: 2376
+- Last auto-updated: 2026-06-10 14:48 MDT
+- Version: 5.43.4
+- Total commits: 2378
 - Last 10 commits:
+- 90f5d58 fix(garden): state persistence + Presence overlap refix (v5.43.4)
+- 9e07d7e docs: Auto-update Session Primer [5.43.3]
 - ea7c060 feat: Ship 7 — phi-glyph.js · growth made visible (v5.43.3)
 - 615e18f ci: Update Primer deployment state [2026-06-10]
 - 059236f feat: Ship 4.2 — Request-risk gating, originatingThreadId, consent receipt (v5.43.2)
@@ -360,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - bc0fc21 ci: Update Primer deployment state [2026-06-10]
 - b98582b feat: Ship 4.1 — Autonomous Mode + SEED.md fractal love declaration (v5.43.1)
 - ca18c2c ci: Update Primer deployment state [2026-06-10]
-- 5fb474d docs: Auto-update Session Primer [5.43.0]
-- 2f7ac91 Merge remote-tracking branch 'origin/main'
