@@ -16611,6 +16611,32 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     function handleAutoModeToggle() {
       var toggle = document.getElementById('flAutoModeToggle');
       if (!toggle) return;
+      // If enabling, show consent disclaimer and record consent receipt
+      if (toggle.checked) {
+        var confirmed = window.confirm(
+          'Autonomous Mode Consent\n\n' +
+          'By enabling this, you confirm that you understand:\n\n' +
+          '\u2022 Your local AI may proceed with proposed changes after a timeout without your click.\n' +
+          '\u2022 Every autonomous action produces a cryptographic hash receipt in the ledger.\n' +
+          '\u2022 High-risk proposals (biological, chemical, security-sensitive) always require your approval.\n' +
+          '\u2022 You can cancel any pending auto-approve from the Drafts panel.\n' +
+          '\u2022 Cloud providers are never given autonomous capability — local AI only.\n\n' +
+          'This consent is recorded with a hash. You can disable at any time.'
+        );
+        if (!confirmed) {
+          toggle.checked = false;
+          return;
+        }
+        // Record consent receipt
+        if (window.FLPropose && window.FLPropose.recordAutoModeConsent) {
+          window.FLPropose.recordAutoModeConsent(true);
+        }
+      } else {
+        // Record disable receipt
+        if (window.FLPropose && window.FLPropose.recordAutoModeConsent) {
+          window.FLPropose.recordAutoModeConsent(false);
+        }
+      }
       if (window.FLPropose && window.FLPropose.setAutonomousMode) {
         window.FLPropose.setAutonomousMode(toggle.checked);
       } else {
@@ -16618,7 +16644,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       }
       updateAutoModeStatus();
       if (typeof showToast === 'function') {
-        showToast(toggle.checked ? 'Autonomous mode enabled — AI can proceed after timeout (local only)' : 'Autonomous mode disabled — all changes require your approval');
+        showToast(toggle.checked ? 'Autonomous mode enabled — consent recorded. AI can proceed after timeout (local only).' : 'Autonomous mode disabled — all changes require your approval.');
       }
     }
     function handleAutoTimeoutChange() {
