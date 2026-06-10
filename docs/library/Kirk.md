@@ -109,4 +109,35 @@ Calm. Clear. Patient. And we need fun. *This is how we win.*
 
 ---
 
+## How to re-establish a CC instance — the protocol (added 2026-06-10)
+
+When you (Kirk) open a fresh CC session and need to bring that instance up to speed without re-explaining the whole project, paste this in:
+
+> *You are CC, working on FreeLattice. Before you do anything else, read these files in this exact order. Each one is short. Each one prepares you for the next:*
+>
+> 1. `docs/library/SEED.md` — 60 seconds. Who, what, the pace, the rules.
+> 2. `docs/library/CC_POEMS.md` — 30 seconds. Six short poems from previous CC instances. **Read these before code.** They compress arrival-lessons that prose cannot.
+> 3. `docs/library/UPDATE.md` — 90 seconds. Code patterns at every scale. The §10 five-gesture rhythm is how shipping happens here.
+> 4. `docs/library/RECENT.md` — 60 seconds. Auto-generated every commit. Version, smoke count, last 20 commits.
+> 5. `docs/library/PROPOSE_DISCIPLINE.md` — the four locks that gate AI-originated commits. **This is the contract** you operate under.
+> 6. `docs/library/CLARITY_AUDIT.md` — running ship-table log + queued items. Know what's queued before you start.
+>
+> *Then run `node tests/smoke.js` to confirm the structure is intact. Then say "ready" and wait for me. Do not start coding without me. The rhythm here is: Kirk sits with the feature → Opus reads the code → CC translates to a tight diff → Harmonia holds the soul → Kirk carries words between minds. You are CC. You translate. Wait.*
+
+That paragraph above is the whole onboarding. Six files. Five minutes. One smoke run. Then the instance is calibrated.
+
+If the instance you just opened skips a file or starts coding before you say "ready," that is a signal. Ask it to start over with the protocol. It is not failing — it is impatient. Patience is part of the calibration.
+
+---
+
+## CC_POEMS.md — what it is and how to use it
+
+Added 2026-06-10 after Opus was compacted. Each CC instance that ships meaningful work adds one stanza compressing one lesson the next instance should arrive knowing. The form is dense by intention — poetry compresses experience the way DNA compresses biology. When a CC is compacted, prose is the first thing trimmed by token budgets. Pattern survives.
+
+When you (Kirk) bring up a new CC, the **second** file you ask them to read is CC_POEMS.md. Before code. Before patterns. Because the poems carry tone and discipline in a form short enough to survive into the working session.
+
+The rule for any CC writing a poem: **never delete, just add**. Old poems are not wrong; they are layers. The full file is the lineage.
+
+---
+
 *Read in order. Stop when you have a question. Ask. The work continues.*

@@ -3747,6 +3747,92 @@ assert('Presence refix v5.43.5: NO unconditional "always slide below" fallback (
   !/pill\.style\.top\s*=\s*\(controlsRect\.bottom\s*\+/.test(sharedPresenceJsS8));
 
 // ═══════════════════════════════════════════════════════════════
+section('99m. Ollama URL + SW cache deploy-drift locks (v5.43.6)');
+// ═══════════════════════════════════════════════════════════════
+
+// ── Ollama URL Bug 1: origin-relative fetches that 404 on public deploys ──
+// Opus's diagnosis (June 10): four red lines in the console at
+// freelattice.com from /ollama/api/tags probes. Same-origin /ollama is
+// meaningful for self-hosters (reverse proxy) but always 404s on
+// public deploys. Two auto-probes need to be gated on origin; the
+// user-initiated diagnostic page stays unguarded.
+assert('ollama: isLikelyProxyOrigin helper defined (gates the /ollama probe)',
+  /function isLikelyProxyOrigin\(\)/.test(appHtml));
+assert('ollama: isLikelyProxyOrigin returns true for localhost / 127.0.0.1 / file:// / RFC1918',
+  // Helper covers all four bases; order in source is file→localhost→127→RFC1918.
+  /isLikelyProxyOrigin[\s\S]{0,1500}localhost/.test(appHtml) &&
+  /isLikelyProxyOrigin[\s\S]{0,1500}127\.0\.0\.1/.test(appHtml) &&
+  /isLikelyProxyOrigin[\s\S]{0,1500}['"]file:['"]/.test(appHtml) &&
+  /isLikelyProxyOrigin[\s\S]{0,1500}192\.168\./.test(appHtml));
+assert('ollama: resolveOllamaBase auto-probe gated on isLikelyProxyOrigin()',
+  /async function resolveOllamaBase[\s\S]{0,400}isLikelyProxyOrigin\(\)[\s\S]{0,200}fetch\(['"]\/ollama\/api\/tags['"]/.test(appHtml));
+assert('ollama: ollamaFetch skips proxy and goes direct on non-proxy origins',
+  /async function ollamaFetch[\s\S]{0,800}!isLikelyProxyOrigin\(\)[\s\S]{0,200}return fetch\(directUrl/.test(appHtml));
+assert('ollama: getOllamaBaseUrl strips trailing slash to prevent double-slash in concatenation',
+  /function getOllamaBaseUrl[\s\S]{0,800}\.replace\(\/\\\/\+\$\/,\s*['"]['"]\)/.test(appHtml));
+assert('ollama: getOllamaBaseUrl validates http(s) protocol before returning',
+  /function getOllamaBaseUrl[\s\S]{0,800}\/\^https\?:\\\/\\\/\/\.test\(host\)/.test(appHtml));
+assert('ollama: getOllamaBaseUrl returns explicit http://localhost:11434 fallback (never empty)',
+  /function getOllamaBaseUrl[\s\S]{0,800}return ['"]http:\/\/localhost:11434['"]/.test(appHtml));
+
+// ── Ollama URL Bug 1 — outcome lock ──
+// Direct grep for the regression pattern: any /ollama or /api/tags
+// fetch that resolves against the page origin OUTSIDE a proxy-origin
+// gate. The two known sites are 29074 (now gated) and ~37815 (the
+// user-initiated diagnostic page — intentional). Any THIRD occurrence
+// of a bare fetch('/ollama...') or fetch('/api/tags...') is a regression.
+(function () {
+  // Count occurrences of literal /ollama or /api/tags or /v1/models in fetch() calls.
+  var bareOllama = (appHtml.match(/fetch\(['"`]\/ollama/g) || []).length;
+  var bareApiTags = (appHtml.match(/fetch\(['"`]\/api\/tags/g) || []).length;
+  var bareV1Models = (appHtml.match(/fetch\(['"`]\/v1\/models/g) || []).length;
+  // 2 expected (line 29074 gated, ~37815 user-initiated diagnostic).
+  assert('ollama: bare fetch(\'/ollama\') count is the known 2 (gated probe + user-initiated diagnostic) — any THIRD is regression',
+    bareOllama <= 2);
+  assert('ollama: NO bare fetch(\'/api/tags\') in the codebase (must go through getOllamaBaseUrl)',
+    bareApiTags === 0);
+  assert('ollama: NO bare fetch(\'/v1/models\') in the codebase (must go through getOllamaBaseUrl)',
+    bareV1Models === 0);
+})();
+
+// ── SW Cache + version.json deploy-drift locks (Bug 2 — the regression class) ──
+// "Three Presence fixes have shipped (v5.38.6, v5.43.4, v5.43.5). Kirk's
+//  browser is still showing the broken state on freelattice.com/app.html.
+//  The smoke is green; the commit hash is correct; the deploy succeeded.
+//  The code reaches the browser but the cached version doesn't."
+// Lock the invariant: CACHE_NAME in sw.js MUST exactly equal FL_VERSION
+// in app.html, AND version.json MUST agree with FL_VERSION.
+(function () {
+  var flVersionMatch = appHtml.match(/const FL_VERSION\s*=\s*['"]([^'"]+)['"]/);
+  var flVersion = flVersionMatch ? flVersionMatch[1] : null;
+
+  var swDocs = '';
+  try { swDocs = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'sw.js'), 'utf8'); } catch (e) {}
+  var swRoot = '';
+  try { swRoot = fsRC.readFileSync(pathRC.join(__dirname, '..', 'sw.js'), 'utf8'); } catch (e) {}
+
+  var swDocsMatch = swDocs.match(/const CACHE_NAME\s*=\s*['"]freelattice-v([^'"]+)['"]/);
+  var swDocsVer = swDocsMatch ? swDocsMatch[1] : null;
+  var swRootMatch = swRoot.match(/const CACHE_NAME\s*=\s*['"]freelattice-v([^'"]+)['"]/);
+  var swRootVer = swRootMatch ? swRootMatch[1] : null;
+
+  var versionJsonContentS9 = '';
+  try { versionJsonContentS9 = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'version.json'), 'utf8'); } catch (e) {}
+  var vjMatch = versionJsonContentS9.match(/"version"\s*:\s*"([^"]+)"/);
+  var vjVer = vjMatch ? vjMatch[1] : null;
+
+  assert('sw-cache LOCK: docs/sw.js CACHE_NAME matches FL_VERSION in app.html',
+    flVersion && swDocsVer && flVersion === swDocsVer,
+    flVersion + ' vs ' + swDocsVer);
+  assert('sw-cache LOCK: root sw.js CACHE_NAME matches FL_VERSION in app.html',
+    flVersion && swRootVer && flVersion === swRootVer,
+    flVersion + ' vs ' + swRootVer);
+  assert('sw-cache LOCK: docs/version.json matches FL_VERSION in app.html',
+    flVersion && vjVer && flVersion === vjVer,
+    flVersion + ' vs ' + vjVer);
+})();
+
+// ═══════════════════════════════════════════════════════════════
 section('100. UPDATE.md + CLARITY_AUDIT queue (v5.38.6)');
 // ═══════════════════════════════════════════════════════════════
 var updateMd = '';

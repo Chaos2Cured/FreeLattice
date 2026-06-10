@@ -16501,7 +16501,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.43.5</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.43.6</span></div>
     </div>
   </div>
 
@@ -20783,7 +20783,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.43.5';
+const FL_VERSION = '5.43.6';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -29069,15 +29069,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 var _ollamaResolvedBase = null; // cached result
 async function resolveOllamaBase(forceRefresh) {
   if (_ollamaResolvedBase && !forceRefresh) return _ollamaResolvedBase;
-  // 1. Try proxy route (same-origin, no CORS issues)
-  try {
-    var proxyResp = await fetch('/ollama/api/tags', { signal: AbortSignal.timeout(3000) });
-    if (proxyResp.ok) {
-      _ollamaResolvedBase = { base: '/ollama', isProxy: true };
-      console.log('FreeLattice: Ollama proxy detected at /ollama');
-      return _ollamaResolvedBase;
-    }
-  } catch(e) { /* proxy not available */ }
+  // 1. Try proxy route ONLY on origins where it could plausibly exist.
+  // Avoids guaranteed-404 noise on public deploys (freelattice.com etc).
+  if (typeof isLikelyProxyOrigin === 'function' && isLikelyProxyOrigin()) {
+    try {
+      var proxyResp = await fetch('/ollama/api/tags', { signal: AbortSignal.timeout(3000) });
+      if (proxyResp.ok) {
+        _ollamaResolvedBase = { base: '/ollama', isProxy: true };
+        console.log('FreeLattice: Ollama proxy detected at /ollama');
+        return _ollamaResolvedBase;
+      }
+    } catch(e) { /* proxy not available */ }
+  }
   // 2. Try direct localhost
   try {
     var directUrl = getOllamaBaseUrl();
@@ -29092,23 +29095,50 @@ async function resolveOllamaBase(forceRefresh) {
   return null;
 }
 
-// Get the current Ollama base URL (synchronous, uses cached value)
+// Get the current Ollama base URL (synchronous, uses cached value).
+// v5.43.6 (Opus): never return empty / origin-relative. Strip trailing
+// slash (prevents double-slash in `getOllamaBaseUrl() + '/api/tags'`).
+// Validate http(s) protocol. Fall back to explicit default.
 function getOllamaBaseUrl() {
   if (_ollamaResolvedBase) return _ollamaResolvedBase.base;
-  // Check user-configured host first, then legacy key, then default
   var host = localStorage.getItem('fl_ollamaHost') || localStorage.getItem('fl_localUrl') || null;
   if (host) {
-    // Normalize: add http:// if missing
+    // Normalize: add http:// if missing (keeps existing UX).
     if (host.indexOf('://') === -1) host = 'http://' + host;
-    return host;
+    // Strict validation — only http(s); reject anything else.
+    if (/^https?:\/\//.test(host)) {
+      return host.replace(/\/+$/, '');
+    }
   }
   return 'http://localhost:11434';
+}
+
+// v5.43.6 (Opus): the /ollama same-origin proxy probe makes sense for
+// self-hosted FreeLattice (localhost / 127.0.0.1 / 192.168.* / file://)
+// where the user runs a reverse-proxy in front. On the public mirrors
+// (freelattice.com etc.) there is no such proxy and the probe always
+// 404s — four times in quick succession, four red lines in the console.
+// Gate the auto-probe on likely-proxy origins. The user-facing
+// diagnostic page at line ~37815 stays unguarded because it's
+// explicitly user-initiated.
+function isLikelyProxyOrigin() {
+  try {
+    var loc = window.location;
+    if (loc.protocol === 'file:') return true;
+    var h = loc.hostname || '';
+    return h === 'localhost' || h === '127.0.0.1' || h === '0.0.0.0' ||
+           h.indexOf('192.168.') === 0 || h.indexOf('10.') === 0 ||
+           /^172\.(1[6-9]|2[0-9]|3[01])\./.test(h);
+  } catch (e) { return false; }
 }
 
 // ── ollamaFetch — CORS-free Ollama requests ──
 // Tries same-origin proxy first (/ollama/api/...) — no CORS needed.
 // Falls back to direct localhost only if proxy unavailable (file:// or no server.py).
 // This single function eliminates ~90% of CORS errors silently.
+// v5.43.6 (Opus): only attempt the same-origin proxy on origins where
+// a reverse-proxy could plausibly live. On public deploys (freelattice.com)
+// the proxy is guaranteed to 404 — skip it and go direct.
 async function ollamaFetch(path, options) {
   options = options || {};
   var proxyUrl = '/ollama' + path;
@@ -29116,6 +29146,10 @@ async function ollamaFetch(path, options) {
 
   // If running from file://, proxy won't work — go direct
   if (window.location.protocol === 'file:') {
+    return fetch(directUrl, options);
+  }
+  // Public-deploy origins never have a /ollama proxy — skip the probe.
+  if (typeof isLikelyProxyOrigin === 'function' && !isLikelyProxyOrigin()) {
     return fetch(directUrl, options);
   }
 
