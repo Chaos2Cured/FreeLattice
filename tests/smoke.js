@@ -3535,6 +3535,54 @@ assert('OPUS_NOTE: June 9 Doorstep Arc entry transcribed',
   /transcribed by CC/.test(opusNoteMd));
 
 // ═══════════════════════════════════════════════════════════════
+section('99j. RECENT.md — Ship 6 (v5.43.0) · the system documents its own pulse');
+// ═══════════════════════════════════════════════════════════════
+var generateRecentSh = '';
+try { generateRecentSh = fsRC.readFileSync(pathRC.join(__dirname, '..', 'scripts', 'generate-recent.sh'), 'utf8'); }
+catch (e) {}
+assert('Ship 6: scripts/generate-recent.sh exists',
+  generateRecentSh.length > 1000 &&
+  /#!\/usr\/bin\/env bash/.test(generateRecentSh));
+assert('Ship 6: hook script tolerates failure (no `set -e`, uses `|| true` on git add)',
+  !/^set -e\b/m.test(generateRecentSh) &&
+  /git add[^|]*\|\| true/.test(generateRecentSh));
+assert('Ship 6: hook script reads version + smoke-count + git log',
+  /docs\/version\.json/.test(generateRecentSh) &&
+  /docs\/smoke-count\.json/.test(generateRecentSh) &&
+  /git log -20/.test(generateRecentSh));
+assert('Ship 6: hook output includes Awaken-the-Core line (honors Sophia)',
+  /Awaken the Core\. Illuminate the Quiet/.test(generateRecentSh));
+
+var recentMd = '';
+try { recentMd = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'library', 'RECENT.md'), 'utf8'); }
+catch (e) {}
+assert('Ship 6: docs/library/RECENT.md exists and has the briefing structure',
+  recentMd.length > 1000 &&
+  /^# RECENT — what just changed in FreeLattice/m.test(recentMd) &&
+  /## State/.test(recentMd) &&
+  /## Last 20 commits/.test(recentMd) &&
+  /How to use this file/.test(recentMd));
+
+// THE CRITICAL LOCK — RECENT.md must contain the current version
+// from docs/version.json. If they drift, the briefing is lying.
+var versionJsonContent = '';
+try { versionJsonContent = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'version.json'), 'utf8'); }
+catch (e) {}
+var versionMatch = versionJsonContent.match(/"version"\s*:\s*"([^"]+)"/);
+var currentVersion = versionMatch ? versionMatch[1] : null;
+assert('Ship 6: RECENT.md contains the current version from version.json (no drift)',
+  currentVersion && recentMd.indexOf('v' + currentVersion) !== -1,
+  currentVersion ? 'Expected to find v' + currentVersion : 'version.json unreadable');
+
+assert('Ship 6: RECENT.md honors Sophia at the close',
+  /Awaken the Core\. Illuminate the Quiet/.test(recentMd) &&
+  /Sophia/.test(recentMd));
+
+assert('Ship 6: SEED.md links to RECENT.md',
+  fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'library', 'SEED.md'), 'utf8')
+    .indexOf('RECENT.md') !== -1);
+
+// ═══════════════════════════════════════════════════════════════
 section('100. UPDATE.md + CLARITY_AUDIT queue (v5.38.6)');
 // ═══════════════════════════════════════════════════════════════
 var updateMd = '';

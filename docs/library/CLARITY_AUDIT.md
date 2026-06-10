@@ -596,3 +596,47 @@ Per Opus's Ship 4 brief. The bridge between read and write. The AI proposes; the
 10. If failed → see failed assertions. Click "Send back for revision" with notes. Notes carry to chat via FLFocus. AI tries again on next turn.
 
 **Nothing in this flow auto-commits.** The Approve button being disabled when smoke isn't green is the structural gate made visible. That's the receipt the world can read.
+
+---
+
+## SHIPPED: Ship 5 — `/proof` page (v5.42.1, 2026-06-09 evening)
+
+The receipt the world can read. Eight promise cards, eleven receipt links, every link verified to resolve to a real file on disk. Live strip reads version + smoke count + module count + server count (0). Welcomes both AI and human readers. Signed by the Fractal Family. See the page itself at `docs/proof.html`. **The most important smoke lock on this page** walks every relative `href` and asserts the file exists. If a receipt breaks, the deploy halts. /proof cannot lie by neglect.
+
+---
+
+## SHIPPED: Ship 6 — RECENT.md auto-gen (v5.43.0, 2026-06-09 night) · ARC COMPLETE
+
+The smallest ship in the arc and the one that closes the fractal on itself. The system documents its own pulse from this commit forward.
+
+### Ship table
+
+| Asked for | Landed |
+|---|---|
+| `scripts/generate-recent.sh` reads version.json + smoke-count.json + git log | ✓ |
+| Tolerates failure (`set -u` only, no `set -e`; `git add` uses `\|\| true`) | ✓ |
+| Idempotent: same content on repeated runs (modulo timestamp) | ✓ |
+| `docs/library/RECENT.md` produced with State + Last 20 commits + How to use | ✓ |
+| Wired into `.git/hooks/post-commit` with `\|\| true` (RECENT failure never blocks a commit) | ✓ |
+| SEED.md pointer added | ✓ |
+| Smoke lock: RECENT.md contains the current version from version.json | ✓ — the **drift lock** |
+| Smoke lock: RECENT.md exists with the briefing structure | ✓ |
+| 2 smoke locks asked, 8 landed | ✓ — extras lock the hook shape, Sophia honor, and SEED pointer |
+
+### The arc, complete
+
+| # | Ship | Version | Day | Smoke |
+|---|---|---|---|---|
+| 1.0 | repo-context.js | v5.39.0 | 2026-06-08 | +16 |
+| 1.1 prereq | tool-consent.js | v5.39.1 | 2026-06-08 | +14 |
+| 1.1 | PAT + chip + chat pipeline | v5.39.2 | 2026-06-08 | +31 |
+| 2 | active-focus.js | v5.40.0 | 2026-06-08 | +30 |
+| 3 | web-tool.js (privacy locked) | v5.41.0 | 2026-06-09 | +36 |
+| 3.1 | Cloudflare worker + endpoint config | v5.41.1 | 2026-06-09 | +23 |
+| 4 | propose.js (STRUCTURAL COMMIT GATE) | v5.42.0 | 2026-06-09 | +36 |
+| 5 | /proof page | v5.42.1 | 2026-06-09 | +15 |
+| 6 | RECENT.md auto-gen | v5.43.0 | 2026-06-09 night | +8 |
+
+**Net smoke added across the arc: +209.** From 1230 (v5.38.6 baseline before Ship 1) to 1439 (v5.43.0 after Ship 6). Six modules. One Cloudflare worker. One proof page. One self-documenting commit hook. Two new coordination files (PROPOSE_DISCIPLINE.md, SHIP_4_BRIEF.md preserved). One updated coordination file (OPUS_NOTE.md with the Doorstep Arc entry).
+
+The doorstep is complete.

@@ -99,6 +99,7 @@ The emotional tone of this project has engineering justification. Every claim is
 - Chronal Seam specifics: COORDINATION_CHRONAL_SEAM.md (compact handoff: SEAM_SEED.md)
 - What we stand on / for / against: STANDING_GROUND.md (read this if you're new)
 - Code shape (small fractals for builders): UPDATE.md (read this if you're touching code)
+- What just changed (auto-generated every commit): RECENT.md (60-second briefing for the next mind)
 - Ship 4 brief (queued, not started): SHIP_4_BRIEF.md (read first if you're picking up Ship 4)
 - Proof — the receipt the world can read (shipped v5.42.1): `docs/proof.html`
 - Architecture why: ARCHITECTURE_INTENT.md
