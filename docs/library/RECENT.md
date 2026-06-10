@@ -9,13 +9,16 @@
 
 - **Version:** v5.43.0
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `5fc1415` _(committed 1 second ago)_
+- **HEAD:** `2f7ac91` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _feat: Ship 6 — RECENT.md auto-gen · THE ARC CLOSES (v5.43.0)_
 
 ## Last 20 commits
 
-- `5fc1415` feat: Ship 6 — RECENT.md auto-gen · THE ARC CLOSES (v5.43.0) _(1 second ago)_
+- `2f7ac91` Merge remote-tracking branch 'origin/main' _(0 seconds ago)_
+- `5366c2f` docs: Auto-update Session Primer [5.43.0] _(2 seconds ago)_
+- `5fc1415` feat: Ship 6 — RECENT.md auto-gen · THE ARC CLOSES (v5.43.0) _(2 seconds ago)_
+- `1e79562` ci: Update Primer deployment state [2026-06-10] _(19 minutes ago)_
 - `267f30c` Merge remote-tracking branch 'origin/main' _(19 minutes ago)_
 - `cb0b9c1` docs: Auto-update Session Primer [5.42.1] _(19 minutes ago)_
 - `be734be` feat: Ship 5 — /proof, every promise has a receipt (v5.42.1) _(19 minutes ago)_
@@ -32,9 +35,6 @@
 - `4e8c96f` docs: Auto-update Session Primer [5.41.1] _(3 hours ago)_
 - `e0799be` Merge remote-tracking branch 'origin/main' _(3 hours ago)_
 - `541ad34` docs: Auto-update Session Primer [5.41.1] _(3 hours ago)_
-- `b24abf2` feat: Ship 3.1 — Cloudflare worker + endpoint config (v5.41.1) _(3 hours ago)_
-- `3e23aae` ci: Update Primer deployment state [2026-06-09] _(4 hours ago)_
-- `38ae6bf` Merge remote-tracking branch 'origin/main' _(4 hours ago)_
 
 ## How to use this file
 
