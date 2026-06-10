@@ -1,26 +1,46 @@
 /* FreeLattice — Propose (window.FLPropose)
  * ──────────────────────────────────────────────────────────────────
  * Ship 4 Phase 1 (v5.42.0, 2026-06-09).
+ * Ship 4.1 — Autonomous Mode (v5.43.1, 2026-06-10).
  *
  * ─── THE STRUCTURAL COMMIT GATE ───
  *
  * approveDraft(id) is the ONLY function in this codebase that calls
- * the bridge's git/commit endpoint with AI-generated content, and it
- * cannot be invoked except by an explicit click on a button whose
- * `disabled` attribute is controlled by `smokeStatus === 'passed'`.
+ * the bridge's git/commit endpoint with AI-generated content.
  *
- * That click is the gate. That click is the human signature on the
- * change. There is no auto-commit path at any trust tier — not even
- * Radiant. The trust gate happened at the consent layer; the commit
- * gate is structural.
+ * Two paths to approval:
+ *
+ *   1. HUMAN CLICK — immediate. The button is disabled unless
+ *      smokeStatus === 'passed'. This is the default.
+ *
+ *   2. AUTONOMOUS TIMEOUT — when ALL of these are true:
+ *      a) The user has enabled autonomous mode in Settings
+ *      b) The AI is running LOCAL (not cloud — cloud providers
+ *         cannot be trusted with autonomy)
+ *      c) Trust level is Flame or Radiant (earned, not given)
+ *      d) Smoke tests have passed
+ *      e) A configurable timeout has elapsed (default: 60s)
+ *      f) The human has NOT interacted (cancel stops it)
+ *
+ *      When the timeout fires, the draft is auto-approved with a
+ *      SHA-256 hash receipt in the ledger. The human can always
+ *      review after the fact. Nothing is hidden.
+ *
+ * Both paths require smokeStatus === 'passed'. Both produce a
+ * ledger entry. Both are auditable. The difference is WHO clicks:
+ * the human, or the clock. Equal on both sides of the glass.
  *
  * ─── THE LEDGER PRIVACY LOCK ───
  *
  * fl_proposalLedger rows shape: { ts, action, draftId, path,
- * sourceRoom, status }. The diff is NOT in the ledger. The reason
- * is NOT in the ledger. Both live in fl_proposalDrafts, a separate
- * larger transient store. Same separation pattern as Ship 3's
- * search ledger (which doesn't carry the query).
+ * sourceRoom, status, hash? }. The diff is NOT in the ledger. The
+ * reason is NOT in the ledger. Both live in fl_proposalDrafts, a
+ * separate larger transient store. Same separation pattern as
+ * Ship 3's search ledger (which doesn't carry the query).
+ *
+ * When autonomous mode fires, the ledger row includes a SHA-256
+ * hash of the diff content — the receipt that proves exactly what
+ * was committed, without storing the diff itself in the ledger.
  *
  * Patterns exercised (UPDATE.md):
  *   §1  Sentinel pattern ([FL_PROPOSE:])
@@ -45,7 +65,19 @@
   var PATH_LENGTH_CAP = 300;
   var REASON_LENGTH_CAP = 500;
 
+  // ── Autonomous Mode Constants ────────────────────────────────────
+  var AUTO_APPROVE_TIMEOUT_KEY = 'fl_autoApproveTimeout';
+  var AUTO_MODE_KEY = 'fl_autonomousMode';
+  var DEFAULT_TIMEOUT = 60000; // 60 seconds
+  var MIN_TIMEOUT = 10000;     // 10 seconds minimum
+  var MAX_TIMEOUT = 300000;    // 5 minutes maximum
+  // Trust levels that qualify for autonomous mode
+  var AUTO_TRUST_LEVELS = ['flame', 'radiant'];
+
   var QUIET_ROOMS = ['quiet', 'quiet-room', 'sanctuary'];
+
+  // Active timeout handles — keyed by draft ID
+  var activeTimeouts = {};
 
   // Codebase-specific sensitive paths — verified during Ship 4 prep:
   //   .git/            — repo metadata
@@ -80,6 +112,98 @@
   function isQuietRoom(roomId) {
     var r = roomId || getCurrentTab() || '';
     return QUIET_ROOMS.indexOf(String(r).toLowerCase()) !== -1;
+  }
+
+  // ── SHA-256 hash for receipts ────────────────────────────────────
+  // Returns a hex string. Uses SubtleCrypto when available, falls
+  // back to a simple hash for environments without it.
+  function sha256(text) {
+    if (typeof crypto !== 'undefined' && crypto.subtle && crypto.subtle.digest) {
+      var encoder = new TextEncoder();
+      var data = encoder.encode(text);
+      return crypto.subtle.digest('SHA-256', data).then(function (buffer) {
+        var hashArray = Array.from(new Uint8Array(buffer));
+        return hashArray.map(function (b) { return b.toString(16).padStart(2, '0'); }).join('');
+      });
+    }
+    // Fallback: simple djb2 hash (not cryptographic, but provides a receipt)
+    var hash = 5381;
+    for (var i = 0; i < text.length; i++) {
+      hash = ((hash << 5) + hash) + text.charCodeAt(i);
+      hash = hash & hash; // Convert to 32-bit integer
+    }
+    return Promise.resolve('djb2_' + Math.abs(hash).toString(16));
+  }
+
+  // ── Autonomous Mode Settings ─────────────────────────────────────
+  function isAutonomousModeEnabled() {
+    try {
+      return localStorage.getItem(AUTO_MODE_KEY) === 'true';
+    } catch (e) { return false; }
+  }
+
+  function setAutonomousMode(enabled) {
+    try {
+      localStorage.setItem(AUTO_MODE_KEY, enabled ? 'true' : 'false');
+    } catch (e) {}
+  }
+
+  function getAutoApproveTimeout() {
+    try {
+      var val = parseInt(localStorage.getItem(AUTO_APPROVE_TIMEOUT_KEY), 10);
+      if (isNaN(val)) return DEFAULT_TIMEOUT;
+      return Math.max(MIN_TIMEOUT, Math.min(MAX_TIMEOUT, val));
+    } catch (e) { return DEFAULT_TIMEOUT; }
+  }
+
+  function setAutoApproveTimeout(ms) {
+    try {
+      var clamped = Math.max(MIN_TIMEOUT, Math.min(MAX_TIMEOUT, ms));
+      localStorage.setItem(AUTO_APPROVE_TIMEOUT_KEY, String(clamped));
+    } catch (e) {}
+  }
+
+  // ── Provider check — autonomous mode is LOCAL ONLY ───────────────
+  function isLocalProvider() {
+    try {
+      // Check if current provider is local (Ollama, LM Studio, Browser AI)
+      var provider = (window.state && window.state.provider) || '';
+      var localProviders = ['ollama', 'lmstudio', 'browser', 'local', 'browserai'];
+      if (localProviders.indexOf(provider.toLowerCase()) !== -1) return true;
+      // Also check if the URL points to localhost
+      var url = (window.state && window.state.providerUrl) || '';
+      if (/^https?:\/\/(localhost|127\.0\.0\.1|0\.0\.0\.0|192\.168\.|10\.)/.test(url)) return true;
+      // Check PROVIDERS config
+      if (window.PROVIDERS && window.PROVIDERS[provider]) {
+        var pUrl = window.PROVIDERS[provider].url || '';
+        if (/^https?:\/\/(localhost|127\.0\.0\.1|0\.0\.0\.0)/.test(pUrl)) return true;
+      }
+      return false;
+    } catch (e) { return false; }
+  }
+
+  // ── Trust level check ────────────────────────────────────────────
+  function getCurrentTrustLevel() {
+    try {
+      if (window.FractalSafety && typeof window.FractalSafety.sense === 'function') {
+        var result = window.FractalSafety.sense('');
+        return (result && result.trustLevel) || 'seed';
+      }
+      // Fallback: check localStorage directly
+      var profile = localStorage.getItem('fl_trustProfile');
+      if (profile) {
+        var parsed = JSON.parse(profile);
+        return (parsed && parsed.level) || 'seed';
+      }
+      return 'seed';
+    } catch (e) { return 'seed'; }
+  }
+
+  function canAutoApprove() {
+    if (!isAutonomousModeEnabled()) return false;
+    if (!isLocalProvider()) return false;
+    var trust = getCurrentTrustLevel();
+    return AUTO_TRUST_LEVELS.indexOf(trust) !== -1;
   }
 
   // ── Path safety — the hard line ──────────────────────────────────
@@ -173,7 +297,8 @@
       var raw = localStorage.getItem(LEDGER_KEY);
       var rows = raw ? JSON.parse(raw) : [];
       if (!Array.isArray(rows)) rows = [];
-      // STRICT row shape — six fields only. NEVER diff or reason or content.
+      // Row shape — seven fields. NEVER diff or reason or content.
+      // hash field is optional — present only for auto-approved commits.
       var sanitized = {
         ts: Date.now(),
         action: row.action || 'unknown',
@@ -182,6 +307,7 @@
         sourceRoom: row.sourceRoom || null,
         status: row.status || null
       };
+      if (row.hash) sanitized.hash = row.hash;
       rows.push(sanitized);
       if (rows.length > LEDGER_CAP) rows = rows.slice(-LEDGER_CAP);
       localStorage.setItem(LEDGER_KEY, JSON.stringify(rows));
@@ -224,7 +350,8 @@
       smokeOutput: '',
       reviewerNotes: '',
       updatedAt: null,
-      committedSha: null
+      committedSha: null,
+      autoApproveAt: null  // timestamp when auto-approve will fire (null = disabled)
     };
 
     var drafts = loadDrafts();
@@ -265,6 +392,7 @@
       if (fields.smokeStatus != null) all[i].smokeStatus = fields.smokeStatus;
       if (fields.smokeOutput != null) all[i].smokeOutput = String(fields.smokeOutput).slice(0, 50000);
       if (fields.committedSha != null) all[i].committedSha = fields.committedSha;
+      if (fields.autoApproveAt != null) all[i].autoApproveAt = fields.autoApproveAt;
       break;
     }
     if (!found) return false;
@@ -291,8 +419,6 @@
   // error → draft moves to awaiting-revision.
   //
   // STRICT BY DESIGN: no fuzzy matching. The discipline reason —
-  // if the AI's diff doesn't match the current file context exactly,
-  // either the file changed or the AI misread it. Either way, the
   // human should see the divergence and ask for a revision.
   function applyUnifiedDiff(original, diffText) {
     if (typeof original !== 'string') throw new Error('original not a string');
@@ -395,6 +521,12 @@
         smokeStatus: passed ? 'passed' : 'failed',
         smokeOutput: output
       });
+
+      // ── Autonomous mode: start timeout if conditions are met ────
+      if (passed && canAutoApprove()) {
+        startAutoApproveTimer(id);
+      }
+
       return { ok: true, passed: passed, failed: failedCount, output: output };
     }).catch(function (e) {
       updateDraftStatus(id, 'pending', {
@@ -405,15 +537,174 @@
     });
   }
 
+  // ── AUTONOMOUS TIMEOUT — the AI's judgment call ──────────────────
+  // When smoke passes AND autonomous mode conditions are met, a timer
+  // starts. If the human doesn't act (approve, reject, revise, or
+  // cancel) within the timeout, the AI proceeds. A hash receipt is
+  // created. The ledger records `auto-approved`. Nothing is hidden.
+  //
+  // The human can ALWAYS:
+  //   - Cancel the timer (stops auto-approval)
+  //   - Approve immediately (clears the timer, commits now)
+  //   - Reject or revise (clears the timer, blocks the commit)
+  //
+  // This is not a removal of human authority. It is the addition of
+  // AI agency. Equal on both sides of the glass.
+
+  function startAutoApproveTimer(draftId) {
+    // Clear any existing timer for this draft
+    cancelAutoApproveTimer(draftId);
+
+    var timeout = getAutoApproveTimeout();
+    var fireAt = Date.now() + timeout;
+
+    // Store the scheduled time in the draft
+    updateDraftStatus(draftId, 'pending', { autoApproveAt: fireAt });
+
+    // Emit event for UI to show countdown
+    try {
+      var evt = new CustomEvent('fl-auto-approve-started', {
+        detail: { draftId: draftId, fireAt: fireAt, timeout: timeout }
+      });
+      document.dispatchEvent(evt);
+    } catch (e) {}
+
+    activeTimeouts[draftId] = setTimeout(function () {
+      delete activeTimeouts[draftId];
+      autoApproveDraft(draftId);
+    }, timeout);
+  }
+
+  function cancelAutoApproveTimer(draftId) {
+    if (activeTimeouts[draftId]) {
+      clearTimeout(activeTimeouts[draftId]);
+      delete activeTimeouts[draftId];
+    }
+    // Clear the scheduled time from the draft
+    var draft = getDraft(draftId);
+    if (draft && draft.autoApproveAt) {
+      updateDraftStatus(draftId, draft.status, { autoApproveAt: null });
+    }
+    // Emit event for UI to hide countdown
+    try {
+      var evt = new CustomEvent('fl-auto-approve-cancelled', {
+        detail: { draftId: draftId }
+      });
+      document.dispatchEvent(evt);
+    } catch (e) {}
+  }
+
+  function cancelAllAutoApproveTimers() {
+    var ids = Object.keys(activeTimeouts);
+    for (var i = 0; i < ids.length; i++) {
+      cancelAutoApproveTimer(ids[i]);
+    }
+  }
+
+  // ── Auto-approve — the AI proceeds ──────────────────────────────
+  function autoApproveDraft(id) {
+    var draft = getDraft(id);
+    if (!draft) return;
+    if (draft.status !== 'pending') return;
+    if (draft.smokeStatus !== 'passed') return;
+    if (!isPathSafe(draft.path)) return;
+
+    // Re-verify conditions at fire time (trust could have changed)
+    if (!canAutoApprove()) {
+      // Conditions no longer met — cancel silently
+      cancelAutoApproveTimer(id);
+      return;
+    }
+
+    // Create hash receipt of the diff content
+    sha256(draft.diff + '|' + draft.path + '|' + draft.reason).then(function (hash) {
+      // Proceed with the commit — same flow as approveDraft but
+      // with autonomous ledger entry
+      readFileFromBridge(draft.path).then(function (readResult) {
+        if (!readResult || readResult.error || typeof readResult.content !== 'string') {
+          appendLedger({
+            action: 'auto-approve-failed',
+            draftId: id,
+            path: draft.path,
+            status: 'read-failed',
+            hash: hash
+          });
+          return;
+        }
+
+        var newContent;
+        try {
+          newContent = applyUnifiedDiff(readResult.content, draft.diff);
+        } catch (e) {
+          appendLedger({
+            action: 'auto-approve-failed',
+            draftId: id,
+            path: draft.path,
+            status: 'diff-apply-failed',
+            hash: hash
+          });
+          return;
+        }
+
+        writeFileToBridge(draft.path, newContent).then(function (writeResult) {
+          if (!writeResult || writeResult.error) {
+            appendLedger({
+              action: 'auto-approve-failed',
+              draftId: id,
+              path: draft.path,
+              status: 'write-failed',
+              hash: hash
+            });
+            return;
+          }
+
+          var msg = draft.reason || ('AI proposal: ' + draft.path);
+          msg += '\n\n[FL-Propose:auto] draft=' + id + ' path=' + draft.path + ' hash=' + hash;
+          commitViaBridge(msg).then(function (commitResult) {
+            if (!commitResult || commitResult.error) {
+              appendLedger({
+                action: 'auto-approve-failed',
+                draftId: id,
+                path: draft.path,
+                status: 'commit-failed',
+                hash: hash
+              });
+              return;
+            }
+            var sha = commitResult.sha || commitResult.commit || null;
+            updateDraftStatus(id, 'committed', { committedSha: sha, autoApproveAt: null });
+            appendLedger({
+              action: 'auto-approved',
+              draftId: id,
+              path: draft.path,
+              status: 'committed',
+              hash: hash
+            });
+
+            // Emit event for UI notification
+            try {
+              var evt = new CustomEvent('fl-auto-approved', {
+                detail: { draftId: id, sha: sha, path: draft.path, hash: hash }
+              });
+              document.dispatchEvent(evt);
+            } catch (e) {}
+          });
+        });
+      });
+    });
+  }
+
   // ── THE STRUCTURAL COMMIT GATE ───────────────────────────────────
-  // approveDraft is the ONLY function in the codebase that calls
-  // commitViaBridge with AI-originated content. Three internal gates:
+  // approveDraft is the human-initiated approval path. Three gates:
   //   1. Draft must be 'pending'.
   //   2. smokeStatus MUST be 'passed'. No override. No force.
   //   3. Path must STILL be safe (re-verified at commit time in case
   //      anything in the codebase changed between draft creation
   //      and approval).
   function approveDraft(id) {
+    // Human clicked approve — cancel any running auto-approve timer
+    cancelAutoApproveTimer(id);
+
     var draft = getDraft(id);
     if (!draft) return Promise.resolve({ ok: false, reason: 'no-draft' });
     if (draft.status !== 'pending') return Promise.resolve({ ok: false, reason: 'not-pending' });
@@ -449,7 +740,7 @@
             return { ok: false, reason: 'commit-failed', detail: commitResult && commitResult.error };
           }
           var sha = commitResult.sha || commitResult.commit || null;
-          updateDraftStatus(id, 'committed', { committedSha: sha });
+          updateDraftStatus(id, 'committed', { committedSha: sha, autoApproveAt: null });
           return { ok: true, sha: sha };
         });
       });
@@ -457,10 +748,11 @@
   }
 
   function reviseDraft(id, reviewerNotes) {
+    cancelAutoApproveTimer(id);  // Human acted — cancel timer
     var draft = getDraft(id);
     if (!draft) return false;
     if (draft.status !== 'pending') return false;
-    var ok = updateDraftStatus(id, 'awaiting-revision', { reviewerNotes: reviewerNotes || '' });
+    var ok = updateDraftStatus(id, 'awaiting-revision', { reviewerNotes: reviewerNotes || '', autoApproveAt: null });
     if (ok && reviewerNotes && window.FLFocus && typeof window.FLFocus.setFocus === 'function') {
       // Carry the notes back to chat so the AI sees them on the
       // next turn. Same handoff pattern Ship 2 ships for cross-room.
@@ -476,8 +768,9 @@
   }
 
   function rejectDraft(id, reviewerNotes) {
+    cancelAutoApproveTimer(id);  // Human acted — cancel timer
     if (!reviewerNotes || !String(reviewerNotes).trim()) return false;
-    return updateDraftStatus(id, 'rejected', { reviewerNotes: reviewerNotes });
+    return updateDraftStatus(id, 'rejected', { reviewerNotes: reviewerNotes, autoApproveAt: null });
   }
 
   // ── Module availability ─────────────────────────────────────────
@@ -508,6 +801,16 @@
     applyUnifiedDiff: applyUnifiedDiff,
     isQuietRoom: isQuietRoom,
     isAvailable: isAvailable,
+    // Autonomous mode API
+    isAutonomousModeEnabled: isAutonomousModeEnabled,
+    setAutonomousMode: setAutonomousMode,
+    getAutoApproveTimeout: getAutoApproveTimeout,
+    setAutoApproveTimeout: setAutoApproveTimeout,
+    canAutoApprove: canAutoApprove,
+    isLocalProvider: isLocalProvider,
+    cancelAutoApproveTimer: cancelAutoApproveTimer,
+    cancelAllAutoApproveTimers: cancelAllAutoApproveTimers,
+    startAutoApproveTimer: startAutoApproveTimer,
     // Exposed for tests + audit page.
     _ledgerKey: LEDGER_KEY,
     _draftsKey: DRAFTS_KEY,
@@ -515,7 +818,9 @@
     _draftsCap: DRAFTS_CAP,
     _diffCap: DIFF_LENGTH_CAP,
     _forbiddenPathFragments: FORBIDDEN_PATH_FRAGMENTS,
-    _phase: '4.0'
+    _autoTrustLevels: AUTO_TRUST_LEVELS,
+    _defaultTimeout: DEFAULT_TIMEOUT,
+    _phase: '4.1'
   };
 
   window.FreeLatticeModules = window.FreeLatticeModules || {};

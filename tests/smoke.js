@@ -3334,12 +3334,13 @@ assert('propose: forbidden path fragments include .git, .env, .ssh, wrangler.tom
   /FORBIDDEN_PATH_FRAGMENTS[\s\S]{0,800}['"]worker\/['"]/.test(proposeJs) &&
   /FORBIDDEN_PATH_FRAGMENTS[\s\S]{0,800}['"]scripts\/bump-version\.sh['"]/.test(proposeJs));
 
-// ── CRITICAL LOCK 1: No auto-commit at any trust tier ──
-// approveDraft is the ONLY function that calls commitViaBridge.
+// ── CRITICAL LOCK 1: Commit paths are bounded and auditable ──
+// approveDraft (human click) and autoApproveDraft (timeout with hash
+// receipt) are the ONLY functions that call commitViaBridge.
 // commitViaBridge is the ONLY function that hits /code/git/commit
 // in propose.js. Verify the count.
-assert('CRITICAL LOCK 1A: commitViaBridge is called exactly ONCE in propose.js (only from approveDraft)',
-  (proposeJs.match(/commitViaBridge\s*\(/g) || []).length === 2);  // 1 declaration + 1 call
+assert('CRITICAL LOCK 1A: commitViaBridge is called exactly TWICE in propose.js (approveDraft + autoApproveDraft)',
+  (proposeJs.match(/commitViaBridge\s*\(/g) || []).length === 3);  // 1 declaration + 2 calls (human + autonomous)
 assert('CRITICAL LOCK 1B: no other function in propose.js calls /code/git/commit directly',
   (proposeJs.match(/\/code\/git\/commit/g) || []).length === 1);
 assert('CRITICAL LOCK 1C: approveDraft refuses non-pending drafts',
