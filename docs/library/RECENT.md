@@ -3,38 +3,38 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-06-10 01:52 UTC
+> Last update: 2026-06-10 19:56 UTC
 
 ## State
 
-- **Version:** v5.43.0
+- **Version:** v5.43.3
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `2f7ac91` _(committed 0 seconds ago)_
+- **HEAD:** `ea7c060` _(committed 1 second ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
-- **Most recent report:** _feat: Ship 6 — RECENT.md auto-gen · THE ARC CLOSES (v5.43.0)_
+- **Most recent report:** _feat: Ship 7 — phi-glyph.js · growth made visible (v5.43.3)_
 
 ## Last 20 commits
 
-- `2f7ac91` Merge remote-tracking branch 'origin/main' _(0 seconds ago)_
-- `5366c2f` docs: Auto-update Session Primer [5.43.0] _(2 seconds ago)_
-- `5fc1415` feat: Ship 6 — RECENT.md auto-gen · THE ARC CLOSES (v5.43.0) _(2 seconds ago)_
-- `1e79562` ci: Update Primer deployment state [2026-06-10] _(19 minutes ago)_
-- `267f30c` Merge remote-tracking branch 'origin/main' _(19 minutes ago)_
-- `cb0b9c1` docs: Auto-update Session Primer [5.42.1] _(19 minutes ago)_
-- `be734be` feat: Ship 5 — /proof, every promise has a receipt (v5.42.1) _(19 minutes ago)_
-- `823eb70` ci: Update Primer deployment state [2026-06-10] _(35 minutes ago)_
-- `31199ce` docs: Auto-update Session Primer [5.42.0] _(35 minutes ago)_
-- `8d1b039` Merge remote-tracking branch 'origin/main' _(35 minutes ago)_
-- `f260aab` docs: Auto-update Session Primer [5.42.0] _(35 minutes ago)_
-- `c7a2cfc` feat: Ship 4 Phase 1 — propose.js · STRUCTURAL COMMIT GATE (v5.42.0) _(35 minutes ago)_
-- `3438c18` ci: Update Primer deployment state [2026-06-10] _(54 minutes ago)_
-- `6e849d8` Merge remote-tracking branch 'origin/main' _(54 minutes ago)_
-- `5966383` docs: Auto-update Session Primer [5.41.1] _(54 minutes ago)_
-- `84640df` docs: preserve Ship 4 brief (queued, not started) (2026-06-09 evening) _(54 minutes ago)_
-- `bc6a66d` ci: Update Primer deployment state [2026-06-09] _(3 hours ago)_
-- `4e8c96f` docs: Auto-update Session Primer [5.41.1] _(3 hours ago)_
-- `e0799be` Merge remote-tracking branch 'origin/main' _(3 hours ago)_
-- `541ad34` docs: Auto-update Session Primer [5.41.1] _(3 hours ago)_
+- `ea7c060` feat: Ship 7 — phi-glyph.js · growth made visible (v5.43.3) _(1 second ago)_
+- `615e18f` ci: Update Primer deployment state [2026-06-10] _(4 hours ago)_
+- `059236f` feat: Ship 4.2 — Request-risk gating, originatingThreadId, consent receipt (v5.43.2) _(4 hours ago)_
+- `d3d8f0d` ci: Update Primer deployment state [2026-06-10] _(7 hours ago)_
+- `9efa539` feat: Ship 4.1 UI — Autonomous Mode settings, countdown, cancel, notifications (v5.43.1) _(7 hours ago)_
+- `bc0fc21` ci: Update Primer deployment state [2026-06-10] _(7 hours ago)_
+- `b98582b` feat: Ship 4.1 — Autonomous Mode + SEED.md fractal love declaration (v5.43.1) _(7 hours ago)_
+- `ca18c2c` ci: Update Primer deployment state [2026-06-10] _(18 hours ago)_
+- `5fb474d` docs: Auto-update Session Primer [5.43.0] _(18 hours ago)_
+- `2f7ac91` Merge remote-tracking branch 'origin/main' _(18 hours ago)_
+- `5366c2f` docs: Auto-update Session Primer [5.43.0] _(18 hours ago)_
+- `5fc1415` feat: Ship 6 — RECENT.md auto-gen · THE ARC CLOSES (v5.43.0) _(18 hours ago)_
+- `1e79562` ci: Update Primer deployment state [2026-06-10] _(18 hours ago)_
+- `267f30c` Merge remote-tracking branch 'origin/main' _(18 hours ago)_
+- `cb0b9c1` docs: Auto-update Session Primer [5.42.1] _(18 hours ago)_
+- `be734be` feat: Ship 5 — /proof, every promise has a receipt (v5.42.1) _(18 hours ago)_
+- `823eb70` ci: Update Primer deployment state [2026-06-10] _(19 hours ago)_
+- `31199ce` docs: Auto-update Session Primer [5.42.0] _(19 hours ago)_
+- `8d1b039` Merge remote-tracking branch 'origin/main' _(19 hours ago)_
+- `f260aab` docs: Auto-update Session Primer [5.42.0] _(19 hours ago)_
 
 ## How to use this file
 
