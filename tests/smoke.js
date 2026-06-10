@@ -3584,6 +3584,89 @@ assert('Ship 6: SEED.md links to RECENT.md',
     .indexOf('RECENT.md') !== -1);
 
 // ═══════════════════════════════════════════════════════════════
+section('99k. Phi-Glyph — Ship 7 (v5.43.3) · growth made visible');
+// ═══════════════════════════════════════════════════════════════
+var phiGlyphJs = '';
+try { phiGlyphJs = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'modules', 'phi-glyph.js'), 'utf8'); }
+catch (e) {}
+assert('phi-glyph: module file exists and is non-empty',
+  phiGlyphJs.length > 2500);
+assert('phi-glyph: IIFE-scoped + dual window exposure',
+  /\(function \(\) \{\s*'use strict'/.test(phiGlyphJs) &&
+  /window\.FLPhiGlyph\s*=\s*api/.test(phiGlyphJs) &&
+  /window\.FreeLatticeModules\.PhiGlyph\s*=\s*api/.test(phiGlyphJs));
+assert('phi-glyph: pure function — no localStorage writes, no ledger writes',
+  !/localStorage\.(setItem|removeItem)/.test(phiGlyphJs) &&
+  !/appendLedger/.test(phiGlyphJs));
+
+// Load the module in a fake-window sandbox so we can run Opus's three
+// required locks directly against the actual generate() output.
+var phiGlyphModule = (function loadPhiGlyph() {
+  try {
+    var fakeWindow = {};
+    var fn = new Function('window', 'crypto', 'Promise', 'TextEncoder', phiGlyphJs);
+    fn(fakeWindow, undefined, Promise, undefined);
+    return fakeWindow.FLPhiGlyph || null;
+  } catch (e) { return null; }
+})();
+assert('phi-glyph: module evaluates cleanly + exposes generate/generateFromRow/phiHash',
+  phiGlyphModule &&
+  typeof phiGlyphModule.generate === 'function' &&
+  typeof phiGlyphModule.generateFromRow === 'function' &&
+  typeof phiGlyphModule.phiHash === 'function');
+
+// Opus's three required smoke locks — RUN AGAINST THE REAL MODULE.
+assert('PHI-GLYPH LOCK 1: same hash produces identical SVG (deterministic)',
+  phiGlyphModule &&
+  phiGlyphModule.generate('abc123', { size: 32 }) === phiGlyphModule.generate('abc123', { size: 32 }));
+
+assert('PHI-GLYPH LOCK 2: different hashes produce different SVG',
+  phiGlyphModule &&
+  phiGlyphModule.generate('abc123', { size: 32 }) !== phiGlyphModule.generate('xyz789', { size: 32 }));
+
+assert('PHI-GLYPH LOCK 3: glyph contains no personal data — geometric primitives only',
+  (function () {
+    if (!phiGlyphModule) return false;
+    var svg = phiGlyphModule.generate('any-hash-here', { size: 32 });
+    if (svg.indexOf('<script') !== -1) return false;
+    if (/on[a-z]+\s*=/i.test(svg)) return false;
+    if (svg.indexOf('data:') !== -1) return false;
+    if (svg.indexOf('javascript:') !== -1) return false;
+    if (/[a-z0-9._-]+@[a-z0-9._-]+\.[a-z]{2,}/i.test(svg)) return false;
+    return /<svg /.test(svg) && /<path /.test(svg) && /<circle /.test(svg);
+  })());
+
+// Tier → hue continuity.
+assert('phi-glyph: trust tier modulates hue — Bloom in purple, Radiant in gold, Seed in green range',
+  phiGlyphModule &&
+  phiGlyphModule.hueFromTier('bloom') >= 260 && phiGlyphModule.hueFromTier('bloom') <= 320 &&
+  phiGlyphModule.hueFromTier('radiant') >= 30 && phiGlyphModule.hueFromTier('radiant') <= 70 &&
+  phiGlyphModule.hueFromTier('seed') >= 80 && phiGlyphModule.hueFromTier('seed') <= 140);
+
+// Audit page integration.
+var auditHtmlS7 = '';
+try { auditHtmlS7 = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'audit.html'), 'utf8'); }
+catch (e) {}
+assert('audit page: loads phi-glyph.js via <script src> with defer',
+  /<script src="modules\/phi-glyph\.js" defer>/.test(auditHtmlS7));
+assert('audit page: .audit-glyph CSS rule present',
+  /\.audit-glyph\s*\{/.test(auditHtmlS7));
+assert('audit page: .record grid layout reserves 36px first column for glyph',
+  /\.record\s*\{[^}]*grid-template-columns:\s*36px/.test(auditHtmlS7));
+assert('audit page: applyGlyphsToSection helper exists + called for 6+ ledger sections',
+  /function applyGlyphsToSection/.test(auditHtmlS7) &&
+  /applyGlyphsToSection\(['"]consent-records['"]/.test(auditHtmlS7) &&
+  /applyGlyphsToSection\(['"]repo-records['"]/.test(auditHtmlS7) &&
+  /applyGlyphsToSection\(['"]tool-consent-records['"]/.test(auditHtmlS7) &&
+  /applyGlyphsToSection\(['"]focus-records['"]/.test(auditHtmlS7) &&
+  /applyGlyphsToSection\(['"]search-records['"]/.test(auditHtmlS7) &&
+  /applyGlyphsToSection\(['"]proposal-records['"]/.test(auditHtmlS7));
+assert('audit page: bounded retry on FLPhiGlyph load — fail-quiet, never blocks',
+  /glyphRetries\s*>\s*60/.test(auditHtmlS7));
+assert('audit page: glyph generation is fail-quiet (catch present)',
+  /generateFromRow[\s\S]{0,400}\.catch\(/.test(auditHtmlS7));
+
+// ═══════════════════════════════════════════════════════════════
 section('100. UPDATE.md + CLARITY_AUDIT queue (v5.38.6)');
 // ═══════════════════════════════════════════════════════════════
 var updateMd = '';

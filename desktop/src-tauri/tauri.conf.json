@@ -1,6 +1,6 @@
 {
   "productName": "FreeLattice",
-  "version": "5.43.0",
+  "version": "5.43.3",
   "identifier": "com.freelattice.app",
   "build": {
     "frontendDist": "../../docs"

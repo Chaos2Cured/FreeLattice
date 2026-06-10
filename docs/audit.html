@@ -125,7 +125,17 @@ h2 {
   font-family: Inter, -apple-system, sans-serif;
   font-size: 0.85rem;
 }
+/* ── Ship 7: phi-glyph beside each event row ──
+   The glyph sits in a 32×32 box at the left edge of the record.
+   Sub-grid (record-time / record-event / record-meta) shifts right
+   to make room. Deterministic from row metadata only — no leakage. */
+.record { display: grid; grid-template-columns: 36px 110px 1fr auto; gap: 10px; align-items: center; }
+.audit-glyph { width: 32px; height: 32px; opacity: 0.85; transition: opacity 0.2s ease; flex-shrink: 0; }
+.audit-glyph:hover { opacity: 1; }
+.audit-glyph svg { display: block; width: 100%; height: 100%; }
+.audit-glyph-empty { width: 32px; height: 32px; }
 </style>
+<script src="modules/phi-glyph.js" defer></script>
 </head>
 <body>
 <div class="page">
@@ -503,6 +513,33 @@ h2 {
     });
   }
 
+  // ── Ship 7: phi-glyph beside each row ────────────────────────────────
+  // Pure post-render decoration. The glyph is geometry derived from row
+  // metadata only — no diff, no content, no identifiers leak. Hash →
+  // deterministic SVG via FLPhiGlyph.generateFromRow.
+  function prependGlyph(row, entry) {
+    if (!window.FLPhiGlyph || row.querySelector('.audit-glyph')) return;
+    var div = document.createElement('div');
+    div.className = 'audit-glyph audit-glyph-empty';
+    row.insertBefore(div, row.firstChild);
+    try {
+      window.FLPhiGlyph.generateFromRow(entry, { size: 32 }).then(function (svg) {
+        div.innerHTML = svg;
+        div.classList.remove('audit-glyph-empty');
+      }).catch(function () {});
+    } catch (e) {}
+  }
+  function applyGlyphsToSection(containerId, entries, sliceCount) {
+    var container = document.getElementById(containerId);
+    if (!container || !entries || !entries.length) return;
+    var displayEntries = entries.slice().reverse();
+    if (sliceCount) displayEntries = displayEntries.slice(0, sliceCount);
+    var rows = container.querySelectorAll('.record');
+    for (var i = 0; i < rows.length && i < displayEntries.length; i++) {
+      prependGlyph(rows[i], displayEntries[i]);
+    }
+  }
+
   // ── Init ──────────────────────────────────────────────────────────────
   var ledger = readLedger();
   var healthLog = readHealthLog();
@@ -523,6 +560,27 @@ h2 {
   renderFocusEvents(focusLedger);
   renderSearchEvents(searchLedger);
   renderProposalEvents(proposalLedger);
+
+  // phi-glyph.js is loaded with `defer`, so it lands after this inline
+  // script runs. Poll briefly until FLPhiGlyph is available, then apply
+  // glyphs to every rendered section. Bounded retries — fail-quiet.
+  var glyphRetries = 0;
+  function applyAllGlyphs() {
+    if (!window.FLPhiGlyph) {
+      if (++glyphRetries > 60) return;  // 6s max wait then give up silently
+      setTimeout(applyAllGlyphs, 100);
+      return;
+    }
+    applyGlyphsToSection('consent-records', ledger);
+    applyGlyphsToSection('provider-records', healthLog, 50);
+    applyGlyphsToSection('cache-records', (cacheStats && cacheStats.entries) || [], 20);
+    applyGlyphsToSection('repo-records', repoLedger, 50);
+    applyGlyphsToSection('tool-consent-records', toolConsentLedger, 50);
+    applyGlyphsToSection('focus-records', focusLedger, 50);
+    applyGlyphsToSection('search-records', searchLedger, 50);
+    applyGlyphsToSection('proposal-records', proposalLedger, 50);
+  }
+  applyAllGlyphs();
 })();
 </script>
 </body>
