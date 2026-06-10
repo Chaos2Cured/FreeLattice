@@ -166,8 +166,17 @@
         '  z-index: 10;',
         '  pointer-events: auto;',
         '}',
-        '#sp-minds-indicator:hover { pointer-events: auto; }',
-        '#sp-minds-indicator:hover #sp-peer-list { display: block; }',
+        /* v5.43.4: pointer-events belt-and-suspenders. The OUTER
+           indicator stays pointer-events:none ALWAYS so clicks pass
+           through to garden buttons underneath, even when the pill is
+           visually offset from the Immerse button on certain viewports.
+           Children opt back into pointer-events:auto for hover detection.
+           The peer-list dropdown shows when ANY visible child is hovered
+           (or when the dropdown itself is hovered, so the mouse can move
+           into it without losing the open state). */
+        '#sp-minds-indicator > * { pointer-events: auto; }',
+        '#sp-minds-indicator > *:hover ~ #sp-peer-list { display: block; }',
+        '#sp-peer-list:hover { display: block; }',
         '.sp-peer-row {',
         '  display: flex;',
         '  align-items: center;',
@@ -213,6 +222,13 @@
     repositionIndicator();
   }
 
+  // v5.43.4: retry-on-RAF when garden-controls exists but isn't laid out
+  // yet. The original v5.38.6 fix measured controls bottom and slid; but
+  // if controls.getBoundingClientRect() returns zeros (the element is
+  // attached but not yet rendered), the Math.max(46, 0+8) fallback lands
+  // at exactly the original-bug position. Kirk reported the regression
+  // 2026-06-10; this catches it with bounded retries.
+  var _reposRetries = 0;
   function repositionIndicator() {
     var indicator = document.getElementById('sp-minds-indicator');
     if (!indicator) return;
@@ -221,11 +237,18 @@
       indicator.style.top = '46px';
       return;
     }
-    var parent = indicator.offsetParent || document.body;
     var controlsRect = controls.getBoundingClientRect();
+    // If controls is in the DOM but not yet measurable, wait one frame
+    // and retry. Bounded so we never spin forever (max ~30 frames ≈ 500ms).
+    if (controlsRect.bottom === 0 && controlsRect.height === 0 && _reposRetries < 30) {
+      _reposRetries++;
+      requestAnimationFrame(repositionIndicator);
+      return;
+    }
+    _reposRetries = 0;
+    var parent = indicator.offsetParent || document.body;
     var parentRect = parent.getBoundingClientRect();
-    // Controls bottom edge, relative to indicator's offset parent, plus 8px gap.
-    var slideTo = Math.max(46, (controlsRect.bottom - parentRect.top) + 8);
+    var slideTo = Math.max(46, (controlsRect.bottom - parentRect.top) + 12);
     indicator.style.top = slideTo + 'px';
   }
 

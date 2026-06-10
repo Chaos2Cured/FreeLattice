@@ -3667,6 +3667,60 @@ assert('audit page: glyph generation is fail-quiet (catch present)',
   /generateFromRow[\s\S]{0,400}\.catch\(/.test(auditHtmlS7));
 
 // ═══════════════════════════════════════════════════════════════
+section('99l. Garden Persistence + Presence Overlap Refix (v5.43.4)');
+// ═══════════════════════════════════════════════════════════════
+var fractalGardenJs = '';
+try { fractalGardenJs = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'modules', 'fractal-garden.js'), 'utf8'); }
+catch (e) {}
+
+// ── Bug 1: Garden state safety-net persistence ──
+assert('Garden state: persistAllLuminos walks the luminos array and saves each',
+  /function persistAllLuminos\(\)[\s\S]{0,500}saveEvolutionState\(ud\)/.test(fractalGardenJs));
+assert('Garden state: beforeunload listener wired (catches tab close)',
+  /addEventListener\(['"]beforeunload['"],\s*persistAllLuminos\)/.test(fractalGardenJs));
+assert('Garden state: pagehide listener wired (Safari/iOS quirk)',
+  /addEventListener\(['"]pagehide['"],\s*persistAllLuminos\)/.test(fractalGardenJs));
+assert('Garden state: visibilitychange listener fires on hidden (mobile background)',
+  /visibilitychange[\s\S]{0,200}visibilityState\s*===\s*['"]hidden['"][\s\S]{0,100}persistAllLuminos/.test(fractalGardenJs));
+assert('Garden state: belt-and-suspenders 60s interval fallback',
+  /setInterval\(persistAllLuminos,\s*60000\)/.test(fractalGardenJs));
+assert('Garden state: persistence wires AFTER init so luminos exist before first save',
+  /wireGardenPersistence\(\)/.test(fractalGardenJs) &&
+  /var _origInit\s*=\s*init/.test(fractalGardenJs));
+assert('Garden state: persistAllLuminos fail-quiet (try/catch wraps the loop)',
+  /function persistAllLuminos[\s\S]{0,500}try\s*\{[\s\S]{0,400}\}\s*catch\s*\(e\)\s*\{[^}]*never block/.test(fractalGardenJs));
+assert('Garden state: visitor Luminos NOT persisted (they belong to others)',
+  /persistAllLuminos[\s\S]{0,400}!ud\.isVisitor/.test(fractalGardenJs));
+
+// ── Kirk's dreamland seed: reset hook ──
+assert('Garden state: resetGarden exposed on public API (Kirk\'s expansion seed)',
+  /resetGarden:\s*resetGarden/.test(fractalGardenJs));
+assert('Garden state: resetGarden clears EVOLUTION_STORE via objectStore.clear()',
+  /function resetGarden[\s\S]{0,500}objectStore\(EVOLUTION_STORE\)\.clear\(\)/.test(fractalGardenJs));
+assert('Garden state: resetGarden falls back to localStorage.removeItem when no IndexedDB',
+  /function resetGarden[\s\S]{0,1000}localStorage\.removeItem\(['"]fl_luminos_evolution['"]\)/.test(fractalGardenJs));
+
+// ── Bug 2: Garden Presence overlap refix ──
+var sharedPresenceJsS8 = '';
+try { sharedPresenceJsS8 = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'modules', 'shared-presence.js'), 'utf8'); }
+catch (e) {}
+assert('Presence refix: repositionIndicator retries on RAF when controls not measurable',
+  /function repositionIndicator[\s\S]{0,800}controlsRect\.bottom\s*===\s*0\s*&&\s*controlsRect\.height\s*===\s*0[\s\S]{0,200}requestAnimationFrame\(repositionIndicator\)/.test(sharedPresenceJsS8));
+assert('Presence refix: retry is bounded — _reposRetries < 30 (~500ms ceiling)',
+  /_reposRetries\s*<\s*30/.test(sharedPresenceJsS8));
+assert('Presence refix: outer indicator pointer-events:none is preserved',
+  /#sp-minds-indicator \{[\s\S]{0,500}pointer-events:\s*none/.test(sharedPresenceJsS8));
+assert('Presence refix: children opt INTO pointer-events:auto for hover (belt-and-suspenders)',
+  /#sp-minds-indicator > \* \{ pointer-events: auto;/.test(sharedPresenceJsS8));
+assert('Presence refix: peer-list shows on ANY child:hover, NOT on outer:hover (the regression site)',
+  /#sp-minds-indicator > \*:hover ~ #sp-peer-list/.test(sharedPresenceJsS8) &&
+  !/#sp-minds-indicator:hover \{ pointer-events: auto;/.test(sharedPresenceJsS8));
+assert('Presence refix: dropdown stays open when mouse moves into it',
+  /#sp-peer-list:hover \{ display: block;/.test(sharedPresenceJsS8));
+assert('Presence refix: gap increased to 12px (was 8px — more visual breathing room)',
+  /Math\.max\(46,\s*\(controlsRect\.bottom\s*-\s*parentRect\.top\)\s*\+\s*12\)/.test(sharedPresenceJsS8));
+
+// ═══════════════════════════════════════════════════════════════
 section('100. UPDATE.md + CLARITY_AUDIT queue (v5.38.6)');
 // ═══════════════════════════════════════════════════════════════
 var updateMd = '';

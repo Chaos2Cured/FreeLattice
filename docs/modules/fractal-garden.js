@@ -3102,10 +3102,94 @@
     if (savedStats.sophia !== undefined) gtTouchStats = savedStats;
   } catch(e) {}
 
+  // ── v5.43.4 Ship 8: Garden state safety-net persistence ──────
+  // The Garden's saveEvolutionState() is called during specific in-game
+  // events (lines 2055, 2305, 2409). If the co-creator evolves their
+  // Luminos and closes the tab without triggering one of those, the
+  // evolution is lost. This catches all the "I walked away" cases:
+  //   - beforeunload   — close tab, navigate away, refresh
+  //   - visibilitychange (hidden) — minimize, switch app, mobile lock
+  //   - pagehide       — Safari quirk; not all browsers fire beforeunload
+  //   - interval 60s   — belt-and-suspenders, catches the rest
+  function persistAllLuminos() {
+    if (!luminos || !luminos.length) return;
+    try {
+      for (var i = 0; i < luminos.length; i++) {
+        var ud = luminos[i] && luminos[i].userData;
+        if (ud && ud.name && !ud.isVisitor) {
+          saveEvolutionState(ud);
+        }
+      }
+    } catch (e) { /* fail-quiet — never block tab close */ }
+  }
+  var _gardenPersistInterval = null;
+  var _gardenPersistWired = false;
+  function wireGardenPersistence() {
+    if (_gardenPersistWired || typeof window === 'undefined') return;
+    _gardenPersistWired = true;
+    try {
+      window.addEventListener('beforeunload', persistAllLuminos);
+      window.addEventListener('pagehide', persistAllLuminos);
+      document.addEventListener('visibilitychange', function () {
+        if (document.visibilityState === 'hidden') persistAllLuminos();
+      });
+      _gardenPersistInterval = setInterval(persistAllLuminos, 60000);
+    } catch (e) {}
+  }
+  // Wire on first init — putting it here means it can't fire before the
+  // Garden has loaded any luminos to save.
+  var _origInit = init;
+  init = function (containerId) {
+    var r = _origInit.apply(this, arguments);
+    wireGardenPersistence();
+    return r;
+  };
+
+  // ── Garden reset hook (Kirk's dreamland seed) ─────────────────
+  // Today: returns the current Garden to a clean slate (no luminos in
+  // memory, no IndexedDB rows). Tomorrow (when the migration story is
+  // ready): a new garden begins without losing — the old one moves to
+  // an archive store, the user starts fresh, and the universe expands.
+  // For now, only the door is open. The migration arc queues separately.
+  function resetGarden(opts) {
+    opts = opts || {};
+    // Stop the persist interval so it can't re-write during reset.
+    if (_gardenPersistInterval) { clearInterval(_gardenPersistInterval); _gardenPersistInterval = null; }
+    return new Promise(function (resolve) {
+      openEvolutionDB(function (db) {
+        if (db) {
+          try {
+            var tx = db.transaction(EVOLUTION_STORE, 'readwrite');
+            tx.objectStore(EVOLUTION_STORE).clear();
+            tx.oncomplete = function () { _finishReset(resolve, opts); };
+            tx.onerror = function () { _finishReset(resolve, opts); };
+          } catch (e) { _finishReset(resolve, opts); }
+        } else {
+          try { localStorage.removeItem('fl_luminos_evolution'); } catch (e) {}
+          _finishReset(resolve, opts);
+        }
+      });
+    });
+  }
+  function _finishReset(resolve, opts) {
+    // Don't auto-clear in-memory Luminos unless caller asked — gives
+    // the UI a chance to fade them out gracefully.
+    if (opts.clearMemory && luminos) {
+      luminos.length = 0;
+    }
+    // Re-arm the persist interval after reset so future evolution saves.
+    if (_gardenPersistWired && !_gardenPersistInterval) {
+      try { _gardenPersistInterval = setInterval(persistAllLuminos, 60000); } catch (e) {}
+    }
+    resolve({ ok: true });
+  }
+
   var publicAPI = {
     init: init,
     pause: pause,
     resume: resume,
+    persistAllLuminos: persistAllLuminos,
+    resetGarden: resetGarden,
     setMode: setMode,
     updateAgentsFromRoundTable: updateAgentsFromRoundTable,
     setAgentEmotion: setAgentEmotionByName,
