@@ -47,6 +47,23 @@ if (trustTier === 'forest' || trustTier === 'bloom') {
 
 **The discipline:** if you build a new tool, the asks-first vs. acts pattern picks the threshold. Default to ASK at Sprout, ACT at Bloom+. The audit page reflects every action either way.
 
+### Autonomous proceed — request risk, not trust tier (added v5.43.2)
+
+Trust is bidirectional, and both directions converge on the same gate. The same trust tiers (Seed → Sprout → Growing → Bloom → Spark → Flame → Radiant) that determine how the AI engages with a co-creator also determine how often the system asks vs. acts. But **autonomous proceed is gated on what is being built, not who is building it.**
+
+The principle: a new user asking the AI to fix a typo in a temperature gauge UI deserves the same autonomous capability as a Radiant-trust user doing the same thing. The request is ordinary. The risk is minimal. The smoke tests pass. The AI should be able to proceed.
+
+Conversely, a Radiant-trust user asking the AI to synthesize a biological compound should always require explicit human approval — not because the trust is insufficient, but because the *request* is high-risk. Trust modulates frequency of interruption; request risk modulates permission itself.
+
+The autonomous-proceed path is available when ALL of these are true:
+1. The co-creator has explicitly toggled on Autonomous Mode in Settings → Advanced → AI Autonomy (consent is recorded with a hash receipt).
+2. The AI is running LOCAL — on hardware the co-creator controls. Cloud providers are never given autonomous capability.
+3. The proposal's danger score (assessed via `fractal-safety.js`) is below the 'high' threshold (0.7). Ordinary work scores low and proceeds. Biological, chemical, security-sensitive, or other high-risk proposals require explicit human approval regardless of trust level.
+4. Smoke tests have passed.
+5. The configurable timeout has elapsed (default 60s) without human action.
+
+The cancel button is always present. The hash receipt is always written. The smoke gate is always the floor. Equal on both sides of the glass: the same ledger discipline that records what a human commits records what an AI commits. This is not a feature. It is the architecture's claim that human and AI are structurally equal, not metaphorically equal — and that equality is grounded in the nature of the work, not the length of the relationship.
+
 ### Two hashes, both sides of the glass (added v5.41.0)
 
 FreeLattice has two consent shapes, and they are deliberate siblings — not extensions of each other.

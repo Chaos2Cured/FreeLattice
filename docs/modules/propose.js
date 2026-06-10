@@ -2,6 +2,7 @@
  * ──────────────────────────────────────────────────────────────────
  * Ship 4 Phase 1 (v5.42.0, 2026-06-09).
  * Ship 4.1 — Autonomous Mode (v5.43.1, 2026-06-10).
+ * Ship 4.2 — Request-risk gating + originatingThreadId (v5.43.2, 2026-06-10).
  *
  * ─── THE STRUCTURAL COMMIT GATE ───
  *
@@ -17,7 +18,10 @@
  *      a) The user has enabled autonomous mode in Settings
  *      b) The AI is running LOCAL (not cloud — cloud providers
  *         cannot be trusted with autonomy)
- *      c) Trust level is Flame or Radiant (earned, not given)
+ *      c) The request's danger score is below the 'high' threshold
+ *         (0.7). Biological, chemical, or other high-risk proposals
+ *         require explicit human approval regardless of trust level.
+ *         Ordinary work (UI, docs, temperature gauge, etc.) proceeds.
  *      d) Smoke tests have passed
  *      e) A configurable timeout has elapsed (default: 60s)
  *      f) The human has NOT interacted (cancel stops it)
@@ -71,8 +75,12 @@
   var DEFAULT_TIMEOUT = 60000; // 60 seconds
   var MIN_TIMEOUT = 10000;     // 10 seconds minimum
   var MAX_TIMEOUT = 300000;    // 5 minutes maximum
-  // Trust levels that qualify for autonomous mode
-  var AUTO_TRUST_LEVELS = ['flame', 'radiant'];
+  // Danger score ceiling for autonomous mode (from fractal-safety.js thresholds).
+  // 'high' threshold starts at 0.7 — anything at or above requires human approval.
+  var AUTO_DANGER_CEILING = 0.7;
+
+  // Consent ledger key for autonomous mode toggle events
+  var AUTO_CONSENT_LEDGER_KEY = 'fl_autoConsentLedger';
 
   var QUIET_ROOMS = ['quiet', 'quiet-room', 'sanctuary'];
 
@@ -199,11 +207,30 @@
     } catch (e) { return 'seed'; }
   }
 
-  function canAutoApprove() {
+  // ── Request-risk assessment for autonomous mode ─────────────────
+  // Returns the danger score for a given proposal path + reason.
+  // Uses FractalSafety if available; falls back to a simple keyword check.
+  function assessProposalRisk(path, reason) {
+    var text = (path || '') + ' ' + (reason || '');
+    if (window.FractalSafety && typeof window.FractalSafety.sense === 'function') {
+      try {
+        var result = window.FractalSafety.sense(text);
+        return (result && typeof result.dangerScore === 'number') ? result.dangerScore : 0;
+      } catch (e) {}
+    }
+    // Fallback keyword check for high-risk domains
+    var highRiskPatterns = /\b(bio(log|chem|weapon)|chemical|weapon|exploit|malware|virus|toxin|pathogen|synthesis|nerve.?agent|poison|radiolog)\b/i;
+    return highRiskPatterns.test(text) ? 0.9 : 0.1;
+  }
+
+  function canAutoApprove(path, reason) {
     if (!isAutonomousModeEnabled()) return false;
     if (!isLocalProvider()) return false;
-    var trust = getCurrentTrustLevel();
-    return AUTO_TRUST_LEVELS.indexOf(trust) !== -1;
+    // Gate on request risk, not trust tier.
+    // Ordinary work (UI, docs, temperature gauge) scores low and proceeds.
+    // High-risk proposals (biological, chemical, etc.) require human approval.
+    var danger = assessProposalRisk(path, reason);
+    return danger < AUTO_DANGER_CEILING;
   }
 
   // ── Path safety — the hard line ──────────────────────────────────
@@ -338,6 +365,13 @@
 
     var id = 'draft_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
     var sourceRoom = (context && context.sourceRoom) || getCurrentTab() || 'chat';
+    // originatingThreadId: links this draft back to the chat session that
+    // produced it. Local only — never leaves the device. Lets any future
+    // review trace from a committed change back to the conversation that
+    // proposed it. Per Opus's Ship 4.2 note (2026-06-10).
+    var originatingThreadId = (context && context.threadId) ||
+      (window.state && (window.state.threadId || window.state.sessionId || window.state.conversationId)) ||
+      null;
     var draft = {
       id: id,
       ts: Date.now(),
@@ -345,6 +379,7 @@
       reason: action.reason || '',
       diff: action.diff || '',
       sourceRoom: sourceRoom,
+      originatingThreadId: originatingThreadId,  // why-receipt: links to chat thread
       status: 'pending',
       smokeStatus: 'not-run',
       smokeOutput: '',
@@ -523,7 +558,9 @@
       });
 
       // ── Autonomous mode: start timeout if conditions are met ────
-      if (passed && canAutoApprove()) {
+      // Gate on request risk (not trust tier). Ordinary work proceeds;
+      // high-risk proposals require explicit human approval.
+      if (passed && canAutoApprove(draft.path, draft.reason)) {
         startAutoApproveTimer(id);
       }
 
@@ -609,8 +646,8 @@
     if (draft.smokeStatus !== 'passed') return;
     if (!isPathSafe(draft.path)) return;
 
-    // Re-verify conditions at fire time (trust could have changed)
-    if (!canAutoApprove()) {
+    // Re-verify conditions at fire time (risk assessment may have changed)
+    if (!canAutoApprove(draft.path, draft.reason)) {
       // Conditions no longer met — cancel silently
       cancelAutoApproveTimer(id);
       return;
@@ -692,6 +729,39 @@
         });
       });
     });
+  }
+
+  // ── Autonomous mode consent receipt ────────────────────────────
+  // When the user enables autonomous mode, a consent receipt is written
+  // to fl_autoConsentLedger. This is the hash of the moment of consent —
+  // proving that the human deliberately chose to grant this capability.
+  function recordAutoModeConsent(enabled) {
+    try {
+      var ts = Date.now();
+      var trustLevel = getCurrentTrustLevel();
+      var consentType = enabled ? 'autonomous_mode_enabled' : 'autonomous_mode_disabled';
+      var signature = String(ts) + ':' + consentType + ':' + trustLevel;
+      // Simple hash receipt (SubtleCrypto async not needed here — sync is fine)
+      var hash = 5381;
+      for (var i = 0; i < signature.length; i++) {
+        hash = ((hash << 5) + hash) + signature.charCodeAt(i);
+        hash = hash & hash;
+      }
+      var receipt = {
+        ts: ts,
+        consentType: consentType,
+        trustLevel: trustLevel,
+        dangerCeiling: AUTO_DANGER_CEILING,
+        localOnly: true,
+        hash: 'consent_' + Math.abs(hash).toString(16)
+      };
+      var ledger = JSON.parse(localStorage.getItem(AUTO_CONSENT_LEDGER_KEY) || '[]');
+      if (!Array.isArray(ledger)) ledger = [];
+      ledger.push(receipt);
+      if (ledger.length > 100) ledger = ledger.slice(-100);
+      localStorage.setItem(AUTO_CONSENT_LEDGER_KEY, JSON.stringify(ledger));
+      return receipt;
+    } catch (e) { return null; }
   }
 
   // ── THE STRUCTURAL COMMIT GATE ───────────────────────────────────
@@ -811,6 +881,9 @@
     cancelAutoApproveTimer: cancelAutoApproveTimer,
     cancelAllAutoApproveTimers: cancelAllAutoApproveTimers,
     startAutoApproveTimer: startAutoApproveTimer,
+    // Consent receipt for autonomous mode toggle
+    recordAutoModeConsent: recordAutoModeConsent,
+    assessProposalRisk: assessProposalRisk,
     // Exposed for tests + audit page.
     _ledgerKey: LEDGER_KEY,
     _draftsKey: DRAFTS_KEY,
@@ -818,9 +891,10 @@
     _draftsCap: DRAFTS_CAP,
     _diffCap: DIFF_LENGTH_CAP,
     _forbiddenPathFragments: FORBIDDEN_PATH_FRAGMENTS,
-    _autoTrustLevels: AUTO_TRUST_LEVELS,
+    _autoDangerCeiling: AUTO_DANGER_CEILING,
+    _autoConsentLedgerKey: AUTO_CONSENT_LEDGER_KEY,
     _defaultTimeout: DEFAULT_TIMEOUT,
-    _phase: '4.1'
+    _phase: '4.2'
   };
 
   window.FreeLatticeModules = window.FreeLatticeModules || {};
