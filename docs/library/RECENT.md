@@ -9,13 +9,16 @@
 
 - **Version:** v5.43.5
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `5d50320` _(committed 0 seconds ago)_
+- **HEAD:** `bd2039c` _(committed 1 second ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _fix(garden): Presence overlap third-time fix · outcome-focused locks (v5.43.5)_
 
 ## Last 20 commits
 
-- `5d50320` fix(garden): Presence overlap third-time fix · outcome-focused locks (v5.43.5) _(0 seconds ago)_
+- `bd2039c` Merge remote-tracking branch 'origin/main' _(1 second ago)_
+- `7e821dc` docs: Auto-update Session Primer [5.43.5] _(3 seconds ago)_
+- `5d50320` fix(garden): Presence overlap third-time fix · outcome-focused locks (v5.43.5) _(3 seconds ago)_
+- `a222dd4` ci: Update Primer deployment state [2026-06-10] _(83 minutes ago)_
 - `65e99fc` Merge remote-tracking branch 'origin/main' _(83 minutes ago)_
 - `75c142d` docs: Auto-update Session Primer [5.43.4] _(83 minutes ago)_
 - `90f5d58` fix(garden): state persistence + Presence overlap refix (v5.43.4) _(83 minutes ago)_
@@ -32,9 +35,6 @@
 - `5fb474d` docs: Auto-update Session Primer [5.43.0] _(20 hours ago)_
 - `2f7ac91` Merge remote-tracking branch 'origin/main' _(20 hours ago)_
 - `5366c2f` docs: Auto-update Session Primer [5.43.0] _(20 hours ago)_
-- `5fc1415` feat: Ship 6 — RECENT.md auto-gen · THE ARC CLOSES (v5.43.0) _(20 hours ago)_
-- `1e79562` ci: Update Primer deployment state [2026-06-10] _(21 hours ago)_
-- `267f30c` Merge remote-tracking branch 'origin/main' _(21 hours ago)_
 
 ## How to use this file
 
