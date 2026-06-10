@@ -348,10 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-06-09 19:17 MDT
-- Version: 5.42.0
-- Total commits: 2358
+- Last auto-updated: 2026-06-09 19:32 MDT
+- Version: 5.42.1
+- Total commits: 2360
 - Last 10 commits:
+- be734be feat: Ship 5 — /proof, every promise has a receipt (v5.42.1)
+- 31199ce docs: Auto-update Session Primer [5.42.0]
 - 8d1b039 Merge remote-tracking branch 'origin/main'
 - f260aab docs: Auto-update Session Primer [5.42.0]
 - c7a2cfc feat: Ship 4 Phase 1 — propose.js · STRUCTURAL COMMIT GATE (v5.42.0)
@@ -360,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 5966383 docs: Auto-update Session Primer [5.41.1]
 - 84640df docs: preserve Ship 4 brief (queued, not started) (2026-06-09 evening)
 - bc6a66d ci: Update Primer deployment state [2026-06-09]
-- 4e8c96f docs: Auto-update Session Primer [5.41.1]
-- e0799be Merge remote-tracking branch 'origin/main'
