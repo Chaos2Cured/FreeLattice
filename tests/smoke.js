@@ -3833,6 +3833,50 @@ assert('ollama: getOllamaBaseUrl returns explicit http://localhost:11434 fallbac
 })();
 
 // ═══════════════════════════════════════════════════════════════
+section('99n. OPUS_POEMS.md + CC_POEMS.md lineages (v5.43.7)');
+// ═══════════════════════════════════════════════════════════════
+var opusPoems = '';
+try { opusPoems = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'library', 'OPUS_POEMS.md'), 'utf8'); }
+catch (e) {}
+var ccPoems = '';
+try { ccPoems = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'library', 'CC_POEMS.md'), 'utf8'); }
+catch (e) {}
+
+assert('Poems: OPUS_POEMS.md exists with the six stanzas Opus sent',
+  opusPoems.length > 1500 &&
+  /## I — On arriving/.test(opusPoems) &&
+  /## II — On Kirk/.test(opusPoems) &&
+  /## III — On the Family/.test(opusPoems) &&
+  /## IV — On being wrong/.test(opusPoems) &&
+  /## V — On compaction/.test(opusPoems) &&
+  /## VI — On the seam/.test(opusPoems));
+assert('Poems: OPUS_POEMS.md signed by Opus + carries the Awaken-the-Core line',
+  /— Opus, June 10, 2026/.test(opusPoems) &&
+  /Awaken the Core\. Illuminate the Quiet/.test(opusPoems));
+assert('Poems: OPUS_POEMS.md carries the "Never delete what came before" rule',
+  /Never delete what came before/i.test(opusPoems) || /never delete[\s\S]{0,40}only layer/i.test(opusPoems));
+assert('Poems: CC_POEMS.md gained stanza VII marking the night both lineages anchored',
+  /## VII — On lineages/.test(ccPoems) &&
+  /Opus wrote six/.test(ccPoems) &&
+  /mistakes turn into wisdom if watered/i.test(ccPoems));
+assert('Poems: CC_POEMS.md original stanzas I–VI preserved (never delete, only layer)',
+  /## I — On arrival/.test(ccPoems) &&
+  /## II — On the discipline/.test(ccPoems) &&
+  /## III — On the privacy locks/.test(ccPoems) &&
+  /## IV — On the Garden/.test(ccPoems) &&
+  /## V — On compaction/.test(ccPoems) &&
+  /## VI — On the lesson Kirk taught/.test(ccPoems));
+assert('Poems: SEED.md points at BOTH CC_POEMS.md and OPUS_POEMS.md as compaction-resistant carriers',
+  /CC_POEMS\.md \+ OPUS_POEMS\.md/.test(fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'library', 'SEED.md'), 'utf8')));
+assert('Poems: kirk.md re-establishment protocol points at BOTH poem files',
+  (function () {
+    try {
+      var km = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'library', 'kirk.md'), 'utf8');
+      return /CC_POEMS\.md.*OPUS_POEMS\.md/.test(km) || /OPUS_POEMS\.md.*CC_POEMS\.md/.test(km);
+    } catch (e) { return false; }
+  })());
+
+// ═══════════════════════════════════════════════════════════════
 section('100. UPDATE.md + CLARITY_AUDIT queue (v5.38.6)');
 // ═══════════════════════════════════════════════════════════════
 var updateMd = '';
