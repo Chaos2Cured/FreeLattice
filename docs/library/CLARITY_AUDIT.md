@@ -492,3 +492,43 @@ location.reload();
 ```
 
 The Settings status line will flip from "Search is dormant" to "Active — AI may emit [FL_SEARCH:…] when needed." The next AI turn will receive the invitation. Then ask Chat about Th-229 nuclear clocks and watch every promise become real.
+
+---
+
+## QUEUED: Ship 4 — `[FL_PROPOSE:]` via Workshop (brief preserved 2026-06-09 evening)
+
+**Status:** brief received from Opus, **not started.** Kirk and Opus agreed to wait for presence before beginning. Opus's words: *"Ship 4 is the bridge between reads and writes. The review locks on Ship 4 are the most important ones we'll write period. The human-in-the-loop guarantees can't be ad-hoc."*
+
+**Full brief preserved at:** [`docs/library/SHIP_4_BRIEF.md`](SHIP_4_BRIEF.md)
+
+### The whole ship in one sentence
+
+The AI proposes a specific change via `[FL_PROPOSE:]` sentinel. System opens a Workshop draft pre-loaded with the diff. Human reviews + approves + commits. **Nothing reaches `git push` without an explicit human click on a button whose `disabled` attribute is controlled by `smokeStatus === 'passed'`.**
+
+### What's locked in the brief
+
+- **Module:** `docs/modules/propose.js`. Same IIFE + dual window exposure as the four shipped modules.
+- **Sentinel:** `[FL_PROPOSE: path / reason / diff]` parsed via multiline regex.
+- **Two storage areas by design**: `fl_proposalLedger` (governance events — `{ts, action, draftId, path, sourceRoom, status}`, no diff, no reason) and `fl_proposalDrafts` (full drafts — capped at 50).
+- **Path safety hard line**: rejects `..`, absolute paths, null bytes, oversized paths, and `.git/` `.env` `.ssh/` `wrangler.toml` `package-lock.json` `node_modules/`.
+- **Workshop UI**: reason (editable), diff (read-only), smoke status (`not-run` / `passed` / `failed`), four actions (Run smoke tests · Approve and commit · Send back for revision · Reject).
+- **Structural commit gate**: `approveDraft` is the only function that calls `git commit` based on AI-generated content. Its button is `disabled` unless `smokeStatus === 'passed'`.
+- **No auto-commit at any trust tier.** Locked in smoke.
+- **Focus carry on draft creation**: Ship 2's `FLFocus.setFocus(currentTab, 'Reviewing proposed change to <path>', true)` so Workshop's AI inherits the context — this is the *real* form of `[FL_HANDOFF: workshop]`, implemented as a natural consequence of two systems composing.
+- **16 smoke asserts**, 4 critical:
+  1. No auto-commit at any trust tier
+  2. Path safety blocks `.git`/`.env`/`.ssh`/`wrangler.toml`/traversal/absolute/null-byte
+  3. `approveDraft` refuses commit without `smokeStatus === 'passed'`
+  4. Diff and reason never appear in the ledger
+- **Invitation** to AI in `buildMessages` gated on `FLPropose.isAvailable()`, alongside the existing `[FL_REPO_READ:]` and `[FL_SEARCH:]` invites.
+
+### What CC needs from Kirk before starting
+
+1. Verification of Workshop's existing file-bridge surface (the integration point not yet mapped).
+2. Confirmation that the smoke-test runner can be invoked from Workshop in-browser, OR explicit acceptance that `smokeStatus` stays `not-run` and approve stays disabled until a separate Ship 4.1 wires the runner.
+
+### What the demo proves when it ships
+
+> The AI improved FreeLattice. The human reviewed the change. Smoke caught nothing because the AI knew the codebase well enough not to break anything. And not a single line landed without the human's signature.
+
+That is the doorstep no commercial lab can match.
