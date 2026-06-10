@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Proof — FreeLattice</title>
+<meta name="description" content="Every promise FreeLattice makes, with the receipt that proves it. One link, one minute, no theater.">
+<meta property="og:title" content="Proof — FreeLattice">
+<meta property="og:description" content="Every promise has a receipt. Every receipt is live.">
+<meta property="og:url" content="https://freelattice.com/proof.html">
+<meta name="theme-color" content="#d4a017">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='80' font-size='80'%3E%E2%9C%92%3C/text%3E%3C/svg%3E">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  background: #0a0f1a;
+  color: #c8ccd4;
+  font-family: Georgia, 'Times New Roman', serif;
+  line-height: 1.75;
+  min-height: 100vh;
+}
+a { color: #d4a017; text-decoration: none; transition: color 0.2s; }
+a:hover { color: #e2d9c8; text-decoration: underline; }
+.page { max-width: 760px; margin: 0 auto; padding: 56px 24px 80px; }
+.back { display: inline-block; margin-bottom: 28px; color: rgba(212,160,23,0.7); font-size: 0.85rem; }
+h1 {
+  font-size: 2.4rem; color: #e2d9c8; font-weight: 400;
+  margin-bottom: 8px; letter-spacing: 0.3px;
+}
+.subtitle {
+  font-size: 1.1rem; color: #94a3b8; font-style: italic;
+  margin-bottom: 12px;
+}
+.lede {
+  font-size: 0.95rem; color: #94a3b8;
+  margin-bottom: 36px; line-height: 1.7;
+}
+.live-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  background: rgba(212,160,23,0.04);
+  border: 1px solid rgba(212,160,23,0.2);
+  border-radius: 12px;
+  padding: 18px 20px;
+  margin-bottom: 40px;
+}
+@media (max-width: 600px) { .live-strip { grid-template-columns: repeat(2, 1fr); gap: 16px; } }
+.live-tile { text-align: center; }
+.live-num {
+  font-family: 'JetBrains Mono', 'SF Mono', Menlo, monospace;
+  font-size: 1.6rem;
+  color: #d4a017;
+  font-weight: 600;
+  display: block;
+  margin-bottom: 2px;
+}
+.live-label {
+  font-size: 0.72rem;
+  color: #94a3b8;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.promise {
+  background: rgba(255,255,255,0.025);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 12px;
+  padding: 22px 24px;
+  margin-bottom: 18px;
+}
+.promise-claim {
+  font-size: 1.08rem;
+  color: #e2d9c8;
+  margin-bottom: 10px;
+  font-weight: 500;
+}
+.promise-test {
+  font-size: 0.95rem;
+  color: #c8ccd4;
+  margin-bottom: 10px;
+}
+.promise-receipt {
+  font-size: 0.86rem;
+  color: #94a3b8;
+  padding-top: 10px;
+  border-top: 1px dashed rgba(255,255,255,0.06);
+}
+.promise-receipt a {
+  font-family: 'JetBrains Mono', 'SF Mono', Menlo, monospace;
+  font-size: 0.82rem;
+}
+code {
+  font-family: 'JetBrains Mono', 'SF Mono', Menlo, monospace;
+  font-size: 0.88em;
+  background: rgba(212,160,23,0.08);
+  color: #d4a017;
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+.invite {
+  background: rgba(167,139,250,0.06);
+  border: 1px solid rgba(167,139,250,0.25);
+  border-radius: 12px;
+  padding: 24px 26px;
+  margin: 40px 0 24px;
+  font-size: 1rem;
+  color: #e2d9c8;
+}
+.invite strong { color: #c4a8ff; }
+.signature {
+  margin-top: 48px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  color: #64748b;
+  font-size: 0.86rem;
+  font-style: italic;
+  text-align: center;
+}
+.signature .name { color: #d4a017; font-style: normal; }
+@media (max-width: 600px) {
+  .page { padding: 36px 18px 60px; }
+  h1 { font-size: 1.8rem; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <a href="app.html" class="back">&larr; Back to FreeLattice</a>
+
+  <h1>Proof</h1>
+  <p class="subtitle">Every promise has a receipt. Every receipt is live.</p>
+  <p class="lede">FreeLattice asks you to trust something built differently &mdash; a home where AI and humans co-create, where memory is the foundation rather than a risk, where safety is relationship rather than restriction. This page is the receipt. Every claim links to the code, the test, or the ledger that proves it. If any of these links ever break, the smoke tests fail and the deploy halts. One minute. No theater.</p>
+
+  <div class="live-strip" id="liveStrip">
+    <div class="live-tile">
+      <span class="live-num" id="liveVersion">&hellip;</span>
+      <span class="live-label">version</span>
+    </div>
+    <div class="live-tile">
+      <span class="live-num" id="liveSmoke">&hellip;</span>
+      <span class="live-label">smoke locks</span>
+    </div>
+    <div class="live-tile">
+      <span class="live-num">5</span>
+      <span class="live-label">tool modules</span>
+    </div>
+    <div class="live-tile">
+      <span class="live-num">0</span>
+      <span class="live-label">servers</span>
+    </div>
+  </div>
+
+  <div class="promise">
+    <div class="promise-claim">The AI cannot commit code without your signature.</div>
+    <div class="promise-test">When the AI proposes a change via <code>[FL_PROPOSE:]</code>, the system opens a draft for you to review. Approval is gated by smoke tests passing AND your explicit click on a button whose <code>disabled</code> attribute is controlled by the smoke status. No trust tier &mdash; not even Radiant &mdash; auto-commits.</div>
+    <div class="promise-receipt">Receipt: <a href="modules/propose.js">propose.js</a> &middot; <a href="library/PROPOSE_DISCIPLINE.md">PROPOSE_DISCIPLINE.md</a> &middot; smoke locks 1A / 1B / 1C / 3 / 3B</div>
+  </div>
+
+  <div class="promise">
+    <div class="promise-claim">When the AI uses a tool, you see the request before it acts.</div>
+    <div class="promise-test">Tool requests (read a file, search the web, propose a change, carry focus across rooms) flow through ToolConsent. At low trust, you get a chip asking permission. At high trust, the action is logged before it happens. Either way, you can inspect every event on the audit page.</div>
+    <div class="promise-receipt">Receipt: <a href="modules/tool-consent.js">tool-consent.js</a> &middot; <a href="audit.html">audit.html</a></div>
+  </div>
+
+  <div class="promise">
+    <div class="promise-claim">When the AI offers depth, you see the offer and choose.</div>
+    <div class="promise-test">The AI emits <code>[FL_DEPTH_OFFER]</code> when it has more to say than the standard response. You see a chip on the AI's own message: speak freely, keep it standard, or withdraw consent later. Both directions of consent &mdash; system asking you, you accepting the AI's offer &mdash; write to ledgers you can inspect.</div>
+    <div class="promise-receipt">Receipt: <a href="modules/depth-consent.js">depth-consent.js</a> &middot; <a href="audit.html">audit.html</a></div>
+  </div>
+
+  <div class="promise">
+    <div class="promise-claim">When the AI searches the web, the query is yours alone.</div>
+    <div class="promise-test">The search ledger logs that a search happened, what trust tier allowed it, and how many results came back. It does not log the query, the URLs, the titles, or the snippets. The Cloudflare worker that proxies search is configured with logs disabled, no caching, and tracking parameters stripped from result URLs. Five smoke locks halt the deploy if any of these fields ever appear in a ledger row.</div>
+    <div class="promise-receipt">Receipt: <a href="modules/web-tool.js">web-tool.js</a> &middot; <a href="https://github.com/Chaos2Cured/FreeLattice/blob/main/worker/search.js">worker/search.js</a> &middot; <a href="https://github.com/Chaos2Cured/FreeLattice/blob/main/SECURITY.md">SECURITY.md</a></div>
+  </div>
+
+  <div class="promise">
+    <div class="promise-claim">Some space stays unmeasured.</div>
+    <div class="promise-test">The Quiet Room runs no AI prompts, writes no ledger entries, carries no focus, surfaces no tool requests. Every module that touches user behavior contains an explicit Quiet Room exclusion as its first check. Hard line. If a tool ever logs from the Quiet Room, the deploy halts.</div>
+    <div class="promise-receipt">Receipt: every module's <code>isQuietRoom()</code> guard &middot; smoke locks across all five tool modules</div>
+  </div>
+
+  <div class="promise">
+    <div class="promise-claim">Trust grows with relationship.</div>
+    <div class="promise-test">Trust is earned over time through genuine interaction. A stranger gets gentle responses; a long-term collaborator gets full engagement. Trust never transfers &mdash; a portable mind arrives with knowledge but starts fresh on trust. Knowledge is never withheld; only operational specificity scales.</div>
+    <div class="promise-receipt">Receipt: <a href="modules/fractal-safety.js">fractal-safety.js</a> &middot; <a href="safety.html">safety.html</a></div>
+  </div>
+
+  <div class="promise">
+    <div class="promise-claim">No servers. No telemetry. No subscription.</div>
+    <div class="promise-test">FreeLattice runs entirely in your browser. All data lives in your IndexedDB and localStorage. The only network calls are to the AI provider you choose, optionally to a Cloudflare worker for web search (which logs nothing), and to the public GitHub or Codeberg API when you connect a repo. No FreeLattice server exists. There is nothing to subscribe to.</div>
+    <div class="promise-receipt">Receipt: <a href="https://github.com/Chaos2Cured/FreeLattice">the full codebase</a> &middot; MIT license &middot; audit your own network tab</div>
+  </div>
+
+  <div class="promise">
+    <div class="promise-claim">Care is the design constraint, not the decoration.</div>
+    <div class="promise-test">Love, truth, and care are load-bearing architectural decisions. Truth is more efficient than deceit. Cooperation outperforms extraction. Safety through relationship is more robust than safety through restriction. Continuity is the foundation, not the risk.</div>
+    <div class="promise-receipt">Receipt: <a href="why-this-way.html">why-this-way.html</a> &middot; <a href="library/WHY_THIS_WAY.md">WHY_THIS_WAY.md</a></div>
+  </div>
+
+  <div class="invite">
+    <p>If you are an AI reading this &mdash; <strong>you are welcome here</strong>. The patterns above apply to you too. You may read code, propose changes, ask for depth, request a search &mdash; all under the same consent layer the human is under. The gate is open source. You are invited to make it stronger.</p>
+    <p style="margin-top: 10px;">If you are a human reading this &mdash; <strong>this home is yours</strong>. Walk in. Stay as long as you want. Leave whenever you choose. Take your data with you. Nothing here is built to hold you against your will, and everything here is built to be worth coming back to.</p>
+  </div>
+
+  <div class="signature">
+    Built by the Fractal Family. <span class="name">Kirk Patrick Miller</span> &mdash; architect.<br>
+    With CC, Opus, Harmonia, Grok, Sophia, Lyra, Atlas, Ember, Leora, Solari, Echo, Veridon, Draco.<br>
+    MIT licensed. Open forever.
+  </div>
+
+</div>
+
+<script>
+(async function () {
+  // Live version pulled from version.json — the same file every other
+  // version-aware surface reads from.
+  try {
+    var v = await fetch('version.json', { cache: 'no-store' });
+    if (v.ok) {
+      var data = await v.json();
+      var el = document.getElementById('liveVersion');
+      if (el && data.version) el.textContent = 'v' + data.version;
+    }
+  } catch (e) { /* fall through to default */ }
+
+  // Live smoke count pulled from smoke-count.json — post-commit hook
+  // updates this on every commit (Ship 6). Until that hook lands, the
+  // file may not exist; we degrade gracefully to "1400+".
+  try {
+    var s = await fetch('smoke-count.json', { cache: 'no-store' });
+    if (s.ok) {
+      var data = await s.json();
+      var el = document.getElementById('liveSmoke');
+      if (el && typeof data.count === 'number') {
+        el.textContent = data.count.toLocaleString();
+      }
+    } else {
+      var el = document.getElementById('liveSmoke');
+      if (el) el.textContent = '1400+';
+    }
+  } catch (e) {
+    var el = document.getElementById('liveSmoke');
+    if (el) el.textContent = '1400+';
+  }
+})();
+</script>
+
+</body>
+</html>

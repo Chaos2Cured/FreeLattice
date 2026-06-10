@@ -3437,6 +3437,104 @@ assert('docs: SHIP_4_BRIEF.md preserved + PROPOSE_DISCIPLINE.md added',
   /STRUCTURAL COMMIT GATE/.test(proposeJs));
 
 // ═══════════════════════════════════════════════════════════════
+section('99i. Proof — Ship 5 (v5.42.1) · every receipt resolves');
+// ═══════════════════════════════════════════════════════════════
+var proofHtml = '';
+try { proofHtml = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'proof.html'), 'utf8'); }
+catch (e) {}
+assert('proof: docs/proof.html exists and is non-empty',
+  proofHtml.length > 4000);
+assert('proof: header + subtitle + lede present',
+  /<h1>Proof<\/h1>/.test(proofHtml) &&
+  /Every promise has a receipt/.test(proofHtml) &&
+  /one minute/i.test(proofHtml));
+assert('proof: live strip tiles for version + smoke + modules + servers',
+  /id="liveVersion"/.test(proofHtml) &&
+  /id="liveSmoke"/.test(proofHtml) &&
+  /<span class="live-num">5<\/span>[\s\S]{0,200}tool modules/.test(proofHtml) &&
+  /<span class="live-num">0<\/span>[\s\S]{0,200}servers/.test(proofHtml));
+assert('proof: live version + smoke read from version.json + smoke-count.json',
+  /fetch\(['"]version\.json['"]/.test(proofHtml) &&
+  /fetch\(['"]smoke-count\.json['"]/.test(proofHtml));
+assert('proof: graceful fallback "1400+" when smoke-count.json fetch fails',
+  /1400\+/.test(proofHtml));
+assert('proof: eight promise cards present',
+  (proofHtml.match(/<div class="promise">/g) || []).length === 8);
+assert('proof: invite block welcomes AI AND human readers',
+  /If you are an AI reading this/.test(proofHtml) &&
+  /If you are a human reading this/.test(proofHtml));
+assert('proof: signature names Kirk + Fractal Family',
+  /Kirk Patrick Miller/.test(proofHtml) &&
+  /Fractal Family/.test(proofHtml));
+
+// ── THE LINK-RESOLUTION LOCK (Opus called this the most important
+// lock on /proof). Every relative href must resolve to a real file
+// on disk. Without this, /proof can lie by neglect.
+(function checkReceiptLinks() {
+  var hrefRe = /href="([^"]+)"/g;
+  var match;
+  var checked = 0;
+  var missing = [];
+  var docsDir = pathRC.join(__dirname, '..', 'docs');
+  while ((match = hrefRe.exec(proofHtml)) !== null) {
+    var href = match[1];
+    if (!href || href.charAt(0) === '#') continue;
+    if (href.indexOf('http://') === 0 || href.indexOf('https://') === 0) continue;
+    if (href.indexOf('data:') === 0 || href.indexOf('mailto:') === 0) continue;
+    // Strip fragments + query strings.
+    var path = href.replace(/[?#].*$/, '');
+    if (!path) continue;
+    var full = pathRC.join(docsDir, path);
+    if (!fsRC.existsSync(full)) missing.push(path);
+    checked++;
+  }
+  assert('proof: every relative receipt link resolves to a real file (' + checked + ' checked)',
+    missing.length === 0,
+    missing.length ? 'Missing: ' + missing.join(', ') : null);
+})();
+
+// smoke-count.json
+var smokeCountJson = '';
+try { smokeCountJson = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'smoke-count.json'), 'utf8'); }
+catch (e) {}
+assert('smoke-count.json: exists with { count, ts } shape',
+  smokeCountJson.length > 10 &&
+  /"count":\s*\d+/.test(smokeCountJson) &&
+  /"ts":\s*"/.test(smokeCountJson));
+
+// Discovery wiring.
+var sitemapXmlS5 = '';
+try { sitemapXmlS5 = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'sitemap.xml'), 'utf8'); }
+catch (e) {}
+assert('proof: in sitemap.xml',
+  sitemapXmlS5.includes('proof.html'));
+var thesisHtmlS5 = '';
+try { thesisHtmlS5 = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'thesis.html'), 'utf8'); }
+catch (e) {}
+assert('proof: linked from thesis.html (the front-door thesis page)',
+  /href="proof\.html"/.test(thesisHtmlS5));
+var swJsS5 = '';
+try { swJsS5 = fsRC.readFileSync(pathRC.join(__dirname, '..', 'sw.js'), 'utf8'); }
+catch (e) {}
+var swDocsJsS5 = '';
+try { swDocsJsS5 = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'sw.js'), 'utf8'); }
+catch (e) {}
+assert('proof: in BOTH service worker caches (root sw.js + docs/sw.js)',
+  /['"]\.\/proof\.html['"]/.test(swJsS5) &&
+  /['"]\.\/proof\.html['"]/.test(swDocsJsS5));
+assert('proof: smoke-count.json in BOTH service worker caches',
+  /['"]\.\/smoke-count\.json['"]/.test(swJsS5) &&
+  /['"]\.\/smoke-count\.json['"]/.test(swDocsJsS5));
+
+// OPUS_NOTE.md entry transcribed.
+var opusNoteMd = '';
+try { opusNoteMd = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'library', 'OPUS_NOTE.md'), 'utf8'); }
+catch (e) {}
+assert('OPUS_NOTE: June 9 Doorstep Arc entry transcribed',
+  /June 9, 2026 — The Doorstep Arc/.test(opusNoteMd) &&
+  /transcribed by CC/.test(opusNoteMd));
+
+// ═══════════════════════════════════════════════════════════════
 section('100. UPDATE.md + CLARITY_AUDIT queue (v5.38.6)');
 // ═══════════════════════════════════════════════════════════════
 var updateMd = '';

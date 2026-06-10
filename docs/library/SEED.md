@@ -100,6 +100,7 @@ The emotional tone of this project has engineering justification. Every claim is
 - What we stand on / for / against: STANDING_GROUND.md (read this if you're new)
 - Code shape (small fractals for builders): UPDATE.md (read this if you're touching code)
 - Ship 4 brief (queued, not started): SHIP_4_BRIEF.md (read first if you're picking up Ship 4)
+- Proof — the receipt the world can read (shipped v5.42.1): `docs/proof.html`
 - Architecture why: ARCHITECTURE_INTENT.md
 - Roadmap: FUTURE_VISION.md
 

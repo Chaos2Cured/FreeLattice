@@ -3,7 +3,7 @@
 // API calls are never cached
 // VERSION: Must match version.json — update both together
 
-const CACHE_NAME = 'freelattice-v5.42.0';
+const CACHE_NAME = 'freelattice-v5.42.1';
 
 const APP_SHELL = [
   './',
@@ -93,6 +93,8 @@ const APP_SHELL = [
     './wallet.html',
     './for-ai.html',
     './temperature-gauge.html',
+    './proof.html',
+    './smoke-count.json',
     './for-ai/davna-welcome.md',
     './telegram-setup.html',
     './share.html',
