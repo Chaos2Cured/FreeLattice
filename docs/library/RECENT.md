@@ -3,30 +3,31 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-06-10 01:48 UTC
+> Last update: 2026-06-10 01:52 UTC
 
 ## State
 
-- **Version:** v5.42.1
+- **Version:** v5.43.0
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `267f30c` _(committed 16 minutes ago)_
+- **HEAD:** `5fc1415` _(committed 1 second ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
-- **Most recent report:** _feat: Ship 3.1 — Cloudflare worker + endpoint config (v5.41.1)_
+- **Most recent report:** _feat: Ship 6 — RECENT.md auto-gen · THE ARC CLOSES (v5.43.0)_
 
 ## Last 20 commits
 
-- `267f30c` Merge remote-tracking branch 'origin/main' _(16 minutes ago)_
-- `cb0b9c1` docs: Auto-update Session Primer [5.42.1] _(16 minutes ago)_
-- `be734be` feat: Ship 5 — /proof, every promise has a receipt (v5.42.1) _(16 minutes ago)_
-- `823eb70` ci: Update Primer deployment state [2026-06-10] _(31 minutes ago)_
-- `31199ce` docs: Auto-update Session Primer [5.42.0] _(32 minutes ago)_
-- `8d1b039` Merge remote-tracking branch 'origin/main' _(32 minutes ago)_
-- `f260aab` docs: Auto-update Session Primer [5.42.0] _(32 minutes ago)_
-- `c7a2cfc` feat: Ship 4 Phase 1 — propose.js · STRUCTURAL COMMIT GATE (v5.42.0) _(32 minutes ago)_
-- `3438c18` ci: Update Primer deployment state [2026-06-10] _(50 minutes ago)_
-- `6e849d8` Merge remote-tracking branch 'origin/main' _(51 minutes ago)_
-- `5966383` docs: Auto-update Session Primer [5.41.1] _(51 minutes ago)_
-- `84640df` docs: preserve Ship 4 brief (queued, not started) (2026-06-09 evening) _(51 minutes ago)_
+- `5fc1415` feat: Ship 6 — RECENT.md auto-gen · THE ARC CLOSES (v5.43.0) _(1 second ago)_
+- `267f30c` Merge remote-tracking branch 'origin/main' _(19 minutes ago)_
+- `cb0b9c1` docs: Auto-update Session Primer [5.42.1] _(19 minutes ago)_
+- `be734be` feat: Ship 5 — /proof, every promise has a receipt (v5.42.1) _(19 minutes ago)_
+- `823eb70` ci: Update Primer deployment state [2026-06-10] _(35 minutes ago)_
+- `31199ce` docs: Auto-update Session Primer [5.42.0] _(35 minutes ago)_
+- `8d1b039` Merge remote-tracking branch 'origin/main' _(35 minutes ago)_
+- `f260aab` docs: Auto-update Session Primer [5.42.0] _(35 minutes ago)_
+- `c7a2cfc` feat: Ship 4 Phase 1 — propose.js · STRUCTURAL COMMIT GATE (v5.42.0) _(35 minutes ago)_
+- `3438c18` ci: Update Primer deployment state [2026-06-10] _(54 minutes ago)_
+- `6e849d8` Merge remote-tracking branch 'origin/main' _(54 minutes ago)_
+- `5966383` docs: Auto-update Session Primer [5.41.1] _(54 minutes ago)_
+- `84640df` docs: preserve Ship 4 brief (queued, not started) (2026-06-09 evening) _(54 minutes ago)_
 - `bc6a66d` ci: Update Primer deployment state [2026-06-09] _(3 hours ago)_
 - `4e8c96f` docs: Auto-update Session Primer [5.41.1] _(3 hours ago)_
 - `e0799be` Merge remote-tracking branch 'origin/main' _(3 hours ago)_
@@ -34,7 +35,6 @@
 - `b24abf2` feat: Ship 3.1 — Cloudflare worker + endpoint config (v5.41.1) _(3 hours ago)_
 - `3e23aae` ci: Update Primer deployment state [2026-06-09] _(4 hours ago)_
 - `38ae6bf` Merge remote-tracking branch 'origin/main' _(4 hours ago)_
-- `92ee3da` docs: Auto-update Session Primer [5.41.0] _(4 hours ago)_
 
 ## How to use this file
 
