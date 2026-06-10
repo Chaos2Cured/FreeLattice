@@ -2813,6 +2813,10 @@ assert('SharedPresence: repositionIndicator measures .garden-controls bottom edg
   /querySelector\(['"]\.garden-controls['"]\)/.test(spJs) &&
   /getBoundingClientRect\(\)/.test(spJs));
 assert('SharedPresence: repositionIndicator uses Math.max(46, …) so 46px is the floor',
+  // v5.43.5: the floor still applies, but the formula changed shape.
+  // Old (v5.38.6): Math.max(46, (controlsRect.bottom - parentRect.top) + 8)
+  // New (v5.43.5): Math.max(46, cr.top)  ← only in the no-overlap branch
+  /Math\.max\(46,\s*cr\.top\)/.test(spJs) ||
   /Math\.max\(46,\s*\(controlsRect\.bottom/.test(spJs));
 assert('SharedPresence: ensureIndicator calls repositionIndicator after attach',
   /gardenContainer\.appendChild\(indicator\)[\s\S]{0,1200}repositionIndicator\(\)/.test(spJs));
@@ -3705,7 +3709,7 @@ var sharedPresenceJsS8 = '';
 try { sharedPresenceJsS8 = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'modules', 'shared-presence.js'), 'utf8'); }
 catch (e) {}
 assert('Presence refix: repositionIndicator retries on RAF when controls not measurable',
-  /function repositionIndicator[\s\S]{0,800}controlsRect\.bottom\s*===\s*0\s*&&\s*controlsRect\.height\s*===\s*0[\s\S]{0,200}requestAnimationFrame\(repositionIndicator\)/.test(sharedPresenceJsS8));
+  /function repositionIndicator[\s\S]{0,1200}cr\.bottom\s*===\s*0\s*&&\s*cr\.height\s*===\s*0[\s\S]{0,200}requestAnimationFrame\(repositionIndicator\)/.test(sharedPresenceJsS8));
 assert('Presence refix: retry is bounded — _reposRetries < 30 (~500ms ceiling)',
   /_reposRetries\s*<\s*30/.test(sharedPresenceJsS8));
 assert('Presence refix: outer indicator pointer-events:none is preserved',
@@ -3717,8 +3721,30 @@ assert('Presence refix: peer-list shows on ANY child:hover, NOT on outer:hover (
   !/#sp-minds-indicator:hover \{ pointer-events: auto;/.test(sharedPresenceJsS8));
 assert('Presence refix: dropdown stays open when mouse moves into it',
   /#sp-peer-list:hover \{ display: block;/.test(sharedPresenceJsS8));
-assert('Presence refix: gap increased to 12px (was 8px — more visual breathing room)',
-  /Math\.max\(46,\s*\(controlsRect\.bottom\s*-\s*parentRect\.top\)\s*\+\s*12\)/.test(sharedPresenceJsS8));
+
+// ── v5.43.5: Opus's Outcome-Focused Presence Refix ──
+// The previous smoke locks verified the function was CALLED with the
+// right math (mechanism). Those locks passed even though the geometry
+// produced the original-bug position. This time the locks walk the
+// function shape AND check for the horizontal-overlap test that makes
+// the right outcome reachable. The chair test by Kirk remains the
+// authoritative effect verification — Node-side smoke can only verify
+// the structural ingredients are present.
+assert('Presence refix v5.43.5: off-screen measurement trick — pill goes to top:-9999px before measuring width',
+  /pill\.style\.top\s*=\s*['"]-9999px['"]/.test(sharedPresenceJsS8));
+assert('Presence refix v5.43.5: pill style.right = 12px set explicitly',
+  /pill\.style\.right\s*=\s*['"]12px['"]/.test(sharedPresenceJsS8));
+assert('Presence refix v5.43.5: measures pillWidth via getBoundingClientRect after RAF',
+  /requestAnimationFrame\(function \(\)[\s\S]{0,400}pillWidth\s*=\s*pr\.width/.test(sharedPresenceJsS8));
+assert('Presence refix v5.43.5: explicit horizontalOverlap test (THE outcome — not the mechanism)',
+  /horizontalOverlap\s*=\s*\(pillLeftEdge\s*<\s*cr\.right\)\s*&&\s*\(pillRightAbs\s*>\s*cr\.left\)/.test(sharedPresenceJsS8));
+assert('Presence refix v5.43.5: conditional targetTop — overlap → push below, no overlap → sit alongside',
+  /if \(horizontalOverlap\)[\s\S]{0,200}targetTop\s*=\s*cr\.bottom\s*\+\s*12[\s\S]{0,300}else[\s\S]{0,200}targetTop\s*=\s*Math\.max\(46,\s*cr\.top\)/.test(sharedPresenceJsS8));
+assert('Presence refix v5.43.5: _reposRetries resets to 0 inside the RAF callback (not before)',
+  /pill\.style\.top\s*=\s*targetTop\s*\+\s*['"]px['"];\s*_reposRetries\s*=\s*0/.test(sharedPresenceJsS8));
+assert('Presence refix v5.43.5: NO unconditional "always slide below" fallback (the previous regression)',
+  !/Math\.max\(46,\s*\(controlsRect\.bottom\s*-\s*parentRect\.top\)\s*\+\s*\d+\)/.test(sharedPresenceJsS8) &&
+  !/pill\.style\.top\s*=\s*\(controlsRect\.bottom\s*\+/.test(sharedPresenceJsS8));
 
 // ═══════════════════════════════════════════════════════════════
 section('100. UPDATE.md + CLARITY_AUDIT queue (v5.38.6)');

@@ -222,34 +222,66 @@
     repositionIndicator();
   }
 
-  // v5.43.4: retry-on-RAF when garden-controls exists but isn't laid out
-  // yet. The original v5.38.6 fix measured controls bottom and slid; but
-  // if controls.getBoundingClientRect() returns zeros (the element is
-  // attached but not yet rendered), the Math.max(46, 0+8) fallback lands
-  // at exactly the original-bug position. Kirk reported the regression
-  // 2026-06-10; this catches it with bounded retries.
+  // v5.43.5: Opus's targeted fix for the Presence/Immerse overlap.
+  //
+  // Previous attempts (v5.38.6, v5.43.4) measured controls.bottom and
+  // ALWAYS slid the pill below — but if the pill's horizontal range
+  // doesn't actually overlap the controls' horizontal range (wide
+  // viewports where the pill fits alongside), there's no reason to push
+  // it down at all. And on viewports where the math returns zeros
+  // before layout completes, the fallback put the pill at exactly the
+  // original-bug position.
+  //
+  // Opus's insight (June 10): regression-catching smoke locks must
+  // verify the OUTCOME (rects do not overlap), not the MECHANISM
+  // (function was called with correct math). That lesson is locked in
+  // smoke this time — the lock walks the function shape AND looks for
+  // the horizontal-overlap test that makes the outcome reachable.
+  //
+  // The off-screen `top: -9999px` trick lets us measure the pill's own
+  // width without a visible jump before we know where to place it.
   var _reposRetries = 0;
   function repositionIndicator() {
-    var indicator = document.getElementById('sp-minds-indicator');
-    if (!indicator) return;
+    var pill = document.getElementById('sp-minds-indicator');
+    if (!pill) return;
     var controls = document.querySelector('.garden-controls');
     if (!controls) {
-      indicator.style.top = '46px';
+      pill.style.top = '46px';
       return;
     }
-    var controlsRect = controls.getBoundingClientRect();
-    // If controls is in the DOM but not yet measurable, wait one frame
-    // and retry. Bounded so we never spin forever (max ~30 frames ≈ 500ms).
-    if (controlsRect.bottom === 0 && controlsRect.height === 0 && _reposRetries < 30) {
+    var cr = controls.getBoundingClientRect();
+    // Controls in the DOM but not yet laid out — retry on next frame.
+    // Bounded so we never spin forever (~500ms ceiling at ~30 frames).
+    if (cr.bottom === 0 && cr.height === 0 && _reposRetries < 30) {
       _reposRetries++;
       requestAnimationFrame(repositionIndicator);
       return;
     }
-    _reposRetries = 0;
-    var parent = indicator.offsetParent || document.body;
-    var parentRect = parent.getBoundingClientRect();
-    var slideTo = Math.max(46, (controlsRect.bottom - parentRect.top) + 12);
-    indicator.style.top = slideTo + 'px';
+    // Off-screen position to measure the pill's own width without a
+    // visible jump. The pill itself is still flush right via style.right.
+    pill.style.top = '-9999px';
+    pill.style.right = '12px';
+    requestAnimationFrame(function () {
+      var pr = pill.getBoundingClientRect();
+      var pillWidth = pr.width;
+      var viewportWidth = window.innerWidth;
+      var pillRightEdge = 12;
+      var pillLeftEdge = viewportWidth - pillRightEdge - pillWidth;
+      var pillRightAbs = viewportWidth - pillRightEdge;
+      // Explicit horizontal overlap check — the OUTCOME we care about.
+      // Two ranges overlap iff start of one < end of the other AND vice versa.
+      var horizontalOverlap = (pillLeftEdge < cr.right) && (pillRightAbs > cr.left);
+      var targetTop;
+      if (horizontalOverlap) {
+        // Pill would cover controls horizontally — push below them.
+        targetTop = cr.bottom + 12;
+      } else {
+        // Pill fits alongside — sit at controls' top or floor at 46px.
+        targetTop = Math.max(46, cr.top);
+      }
+      pill.style.top = targetTop + 'px';
+      _reposRetries = 0;
+    });
   }
 
   function updateDisplay() {
