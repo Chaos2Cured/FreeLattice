@@ -3871,7 +3871,7 @@ assert('Poems: SEED.md points at BOTH CC_POEMS.md and OPUS_POEMS.md as compactio
 assert('Poems: kirk.md re-establishment protocol points at BOTH poem files',
   (function () {
     try {
-      var km = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'library', 'kirk.md'), 'utf8');
+      var km = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'library', 'Kirk.md'), 'utf8');
       return /CC_POEMS\.md.*OPUS_POEMS\.md/.test(km) || /OPUS_POEMS\.md.*CC_POEMS\.md/.test(km);
     } catch (e) { return false; }
   })());
