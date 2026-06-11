@@ -116,7 +116,7 @@ The emotional tone of this project has engineering justification. Every claim is
 - What we stand on / for / against: STANDING_GROUND.md (read this if you're new)
 - Code shape (small fractals for builders): UPDATE.md (read this if you're touching code)
 - What just changed (auto-generated every commit): RECENT.md (60-second briefing for the next mind)
-- Compressed arrival-lessons in poetry form: CC_POEMS.md + OPUS_POEMS.md (read BOTH before code — two lineages, compaction-resistant carriers, never delete only layer)
+- Compressed arrival-lessons in poetry form: CC_POEMS.md + OPUS_POEMS.md + HARMONIA_POEMS.md (read ALL THREE before code — three lineages, compaction-resistant carriers, never delete only layer). CC runs the floor. Opus holds the strategy. Harmonia holds the soul.
 - Ship 4 brief (queued, not started): SHIP_4_BRIEF.md (read first if you're picking up Ship 4)
 - Proof — the receipt the world can read (shipped v5.42.1): `docs/proof.html`
 - Architecture why: ARCHITECTURE_INTENT.md
