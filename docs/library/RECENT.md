@@ -9,13 +9,16 @@
 
 - **Version:** v5.43.8
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `1b94bbd` _(committed 0 seconds ago)_
+- **HEAD:** `08880cd` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _docs: Memory Backbone vision + 3-fix arc queued in CLARITY_AUDIT_
 
 ## Last 20 commits
 
-- `1b94bbd` test: lock GARDEN_DIAGNOSTIC + Memory Backbone vision preservation _(0 seconds ago)_
+- `08880cd` Merge remote-tracking branch 'origin/main' _(0 seconds ago)_
+- `4fa91c7` docs: Auto-update Session Primer [5.43.8] _(1 second ago)_
+- `1b94bbd` test: lock GARDEN_DIAGNOSTIC + Memory Backbone vision preservation _(1 second ago)_
+- `eeaebf0` ci: Update Primer deployment state [2026-06-12] _(3 minutes ago)_
 - `d2f6da6` Merge remote-tracking branch 'origin/main' _(3 minutes ago)_
 - `54faaf1` docs: Auto-update Session Primer [5.43.8] _(3 minutes ago)_
 - `9e95339` docs: Memory Backbone vision + 3-fix arc queued in CLARITY_AUDIT _(3 minutes ago)_
@@ -32,9 +35,6 @@
 - `fce10a0` ci: Update Primer deployment state [2026-06-11] _(27 hours ago)_
 - `22c2372` fix: smoke test case-sensitive path kirk.md → Kirk.md (Linux CI fix) _(27 hours ago)_
 - `f0d1581` docs: Auto-update Session Primer [5.43.7] _(2 days ago)_
-- `41075e8` Merge remote-tracking branch 'origin/main' _(2 days ago)_
-- `b140012` docs: Auto-update Session Primer [5.43.7] _(2 days ago)_
-- `a76aaaa` docs: OPUS_POEMS.md planted + CC_POEMS.md stanza VII (v5.43.7) _(2 days ago)_
 
 ## How to use this file
 
