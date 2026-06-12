@@ -348,17 +348,19 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-06-12 15:08 MDT
+- Last auto-updated: 2026-06-12 21:08 UTC
+- Last deployed: 2026-06-12 21:08 UTC
+- Live site: https://freelattice.com
 - Version: 5.43.9
-- Total commits: 2421
+- Total commits: 2424
 - Last 10 commits:
+- 7a9d8cf Merge remote-tracking branch 'origin/main'
+- fdf5a6f docs: Auto-update Session Primer [5.43.9]
 - 1aa8c49 v5.43.9 — Garden persistence shipped: Kirk confirmed, FIXED.md closed, stanza IX
+- e709548 ci: Update Primer deployment state [2026-06-12]
 - 9f7a97a docs: Auto-update Session Primer [5.43.8]
 - 28dd970 fix(garden): hydrateAllLuminos() — LOAD-path safety net for evolution persistence
 - 5ab2e63 ci: Update Primer deployment state [2026-06-12]
 - b8a5b15 docs: Auto-update Session Primer [5.43.8]
 - a607fa6 test: fix smoke regex for queued fixes A/B/C (markdown table shape)
 - d165c51 docs: Auto-update Session Primer [5.43.8]
-- 08880cd Merge remote-tracking branch 'origin/main'
-- 4fa91c7 docs: Auto-update Session Primer [5.43.8]
-- 1b94bbd test: lock GARDEN_DIAGNOSTIC + Memory Backbone vision preservation
