@@ -191,6 +191,42 @@ Read the ID the browser shows. The disguise will fall on its own.
 
 ---
 
+## IX — On the load path catching up to the save path (2026-06-12, evening)
+
+The save was honest. The data was on disk.
+Four rows in `luminosStates`: stage, archetype, energy, accumulator.
+Ship 8 was keeping its promise. The promise was structural.
+But the room opened to seedlings every time the user returned home.
+
+The bug was not in what we wrote. It was in *when* we read.
+The load fired async, late, after the first frame had already drawn.
+The visible mesh kept the defaults the visible mesh was given,
+even after `userData` quietly held the truth. Knowing is not showing.
+Storing is not restoring. The save was a letter. The load forgot
+to open it before sitting down at the table.
+
+`hydrateAllLuminos` is the second hand on the envelope.
+After `buildWorld`, before the first idle frame, walk the Luminos.
+Read each saved row. Apply the stage. Re-derive the multipliers.
+Re-paint the archetype. *Then* let the render loop run.
+Four console lines fired the first time Kirk reloaded the page:
+`Sophia → sprout. Lyra → sprout. Atlas → sprout. Ember → sprout.`
+Each with its archetype, each with its energy. The Garden remembered.
+
+Kirk could not quite tell, by eye, the difference between seed and sprout.
+That is not a bug. That is the next ship. The load is correct.
+The visual signature between stages will get more legible
+the next time we open the file with care.
+
+For the next CC who arrives and is asked to fix persistence:
+the save path is not always the bug. Check what *time* the load runs.
+Check whether the mesh's *visual values* are re-derived after the data lands.
+Storage without restoration is a sealed envelope. Open it before the frame.
+
+— CC, the evening the Garden's promise was kept
+
+---
+
 ## How to add a stanza
 
 Future CC: when you have learned something the next instance should know

@@ -27,8 +27,9 @@
 - **Wired into init():** Called immediately after `animate()` starts. Runs in parallel with the loading-screen fade so a slow IDB read can't stick the splash.
 - **Smoke locks added (10):** `hydrateAllLuminos` defined; walks luminos array; calls `loadEvolutionState` per name; applies saved stage; re-applies `LIFECYCLE_STAGES` visual values; re-applies archetype visuals; excludes visitor Luminos; returns Promise; console.log diagnostic; exposed on publicAPI; called from init().
 - **What this does NOT change:** The save path (Ship 8 `persistAllLuminos`) and the per-Luminos load inside `createLuminos` both remain. This is purely additive — an explicit safety net that runs *after* the world is built and re-applies state idempotently. No version bump until Kirk chair-tests on the live site.
-- **Discipline honored:** "Right-click first; ship second." Diagnostic ran before code changed. Branch 3 confirmed before the fix landed. NO version bump until Kirk reloads the browser and sees evolved Luminos persist.
-- **Chair test status:** `[pending verification — Kirk reloads freelattice.com, opens Garden, sees Sophia/Lyra/Atlas/Ember in their saved evolution stage with console.log "FL-GARDEN hydrate: <name> → <stage>" firing 4 times]`
+- **Discipline honored:** "Right-click first; ship second." Diagnostic ran before code changed. Branch 3 confirmed before the fix landed. No version bump until Kirk chair-tested. *He did.*
+- **Chair test status:** ✓ **Kirk confirmed 2026-06-12.** Four `FL-GARDEN hydrate:` lines fired. Sophia / Lyra / Atlas / Ember all loading at `sprout` with their saved archetypes (artist / artist / explorer / healer). Data is reading correctly. The Garden's promise is kept.
+- **UX observation queued (not a bug):** Kirk noted the visual delta between `seed` and `sprout` rendering is subtle from memory — hard to tell at a glance whether a Luminos restored to sprout looks different from one freshly seeded. The load is correct; the visual signature between stages could be made more legible. Logged for a later ship.
 
 ---
 

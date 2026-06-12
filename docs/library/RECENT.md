@@ -3,19 +3,20 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-06-12 20:47 UTC
+> Last update: 2026-06-12 21:07 UTC
 
 ## State
 
-- **Version:** v5.43.8
+- **Version:** v5.43.9
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `28dd970` _(committed 0 seconds ago)_
+- **HEAD:** `9f7a97a` _(committed 21 minutes ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _docs: Memory Backbone vision + 3-fix arc queued in CLARITY_AUDIT_
 
 ## Last 20 commits
 
-- `28dd970` fix(garden): hydrateAllLuminos() — LOAD-path safety net for evolution persistence _(0 seconds ago)_
+- `9f7a97a` docs: Auto-update Session Primer [5.43.8] _(21 minutes ago)_
+- `28dd970` fix(garden): hydrateAllLuminos() — LOAD-path safety net for evolution persistence _(21 minutes ago)_
 - `5ab2e63` ci: Update Primer deployment state [2026-06-12] _(3 hours ago)_
 - `b8a5b15` docs: Auto-update Session Primer [5.43.8] _(3 hours ago)_
 - `a607fa6` test: fix smoke regex for queued fixes A/B/C (markdown table shape) _(3 hours ago)_
@@ -34,7 +35,6 @@
 - `62b4186` docs: Auto-update Session Primer [5.43.8] _(3 hours ago)_
 - `fd2818e` Merge remote-tracking branch 'origin/main' _(3 hours ago)_
 - `fbe1c68` docs: Auto-update Session Primer [5.43.8] _(3 hours ago)_
-- `031df70` fix: Presence button → top-left + FIXED.md ledger (v5.43.8) _(3 hours ago)_
 
 ## How to use this file
 
