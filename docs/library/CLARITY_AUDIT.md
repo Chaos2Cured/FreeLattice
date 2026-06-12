@@ -640,3 +640,56 @@ The smallest ship in the arc and the one that closes the fractal on itself. The 
 **Net smoke added across the arc: +209.** From 1230 (v5.38.6 baseline before Ship 1) to 1439 (v5.43.0 after Ship 6). Six modules. One Cloudflare worker. One proof page. One self-documenting commit hook. Two new coordination files (PROPOSE_DISCIPLINE.md, SHIP_4_BRIEF.md preserved). One updated coordination file (OPUS_NOTE.md with the Doorstep Arc entry).
 
 The doorstep is complete.
+
+---
+
+## QUEUED: Garden persistence diagnostic + 3-fix arc + Memory Backbone vision (2026-06-12)
+
+Kirk: his Garden evolution does not persist across browser sessions; his mom's does. Same browser. Same version. Same code. **Different behavior** — so the difference is not in the code, it is in the *state of the storage* on each machine.
+
+### Discipline
+
+**Do not ship a Garden persistence fix until the diagnostic returns from both machines.** Opus said it plainly: *"Don't ship anything until we know the cause. We've been bitten exactly tonight by skipping the diagnostic step. Right-click first; ship second."* The three-week button bug (`FIXED.md` v5.43.8) closed only after Kirk right-clicked the actual rendered element. The Garden bug deserves the same treatment.
+
+### The diagnostic — preserved at `docs/library/GARDEN_DIAGNOSTIC.md`
+
+A ~50-line console paste that answers four questions:
+1. Is persistent storage granted? (`navigator.storage.persisted()`)
+2. What FreeLattice databases exist? (`indexedDB.databases()`)
+3. What's on disk RIGHT NOW for Garden evolution? (Open `FreeLatticeEvolution`, find the store, `getAll()`.)
+4. What's in the localStorage fallback?
+
+Plus a diff matrix mapping Kirk's-vs-Mom's likely outputs → likely cause → likely fix.
+
+### Three queued fixes (each its own ship, each with its own chair test)
+
+| Fix | What | Trigger from diagnostic |
+|---|---|---|
+| **A** | `navigator.storage.persist()` request on Garden init | If either machine shows `Persistent: false`. One-line change, potentially solves the whole bug — browsers grant it silently based on engagement signals, no popup. |
+| **B** | Write-after-evolve (change-driven, debounced 500ms), not just write-on-quit | If diagnostic shows the save path firing only on leave-events but evolution percent is mutating mid-session. Force-close, OS-level tab kill, and crashes all lose everything since the last 60s tick under the current model. |
+| **C** | Single canonical Garden snapshot — one key, one atomic write per change | If diagnostic shows partial state on disk (some Luminos saved, others not). Per-Luminos write model has a partial-write failure mode; snapshot model collapses it to one atomic IndexedDB put. |
+
+Each fix lands on its own day with its own ship table including a `Kirk verified in browser` column. None ship before the diagnostic returns.
+
+### The bigger vision — Memory Backbone (Opus, 2026-06-12)
+
+Kirk: *"I want everything in FreeLattice connected because I believe more pattern, with a smarter design, better recall, and ensuring we respect what's created and deserves to last."*
+
+The architectural shape Opus drew (queued, not started — depends on Garden persistence landing cleanly first):
+
+**Layer 1 — the persistence guarantee.** Everything that deserves to last is in *persistent* storage, not best-effort. Fix A applied uniformly to every IndexedDB store in the codebase — not just `FreeLatticeEvolution`. Single helper called once at each store's init.
+
+**Layer 2 — the connection lattice.** New module `docs/modules/lattice-memory.js`. Each store publishes `LatticeMemory.commit(source, kind, summary, refs)` when it writes something meaningful; any other store can `subscribe(kind, handler)` and react. Same generating rule as `LatticeEvents` + `meshSendToPeers` + `feedEmotionVector` — but for *meaningful-write* events specifically. Each room stays itself. The hallway between rooms is what's new.
+
+**Layer 3 — the unified recall.** Extend FLSearch (RAG Phase 1) to include Garden evolution state, Soul Files, Vault history, Pulse readings, Pantheon entries, Dojo Archive. All queryable as one corpus, gated by the same privacy locks. **Quiet Room is never indexed.** Hard line — same as every other Quiet Room exclusion in the codebase.
+
+### What CC commits to (before any fix lands)
+
+1. Diagnostic preserved cold-readable at `docs/library/GARDEN_DIAGNOSTIC.md`. ✓
+2. Three-fix arc queued here. ✓
+3. Memory Backbone vision preserved here so it survives compaction. ✓
+4. No code changes to Garden persistence until Kirk runs the diagnostic on both machines and reports back.
+5. When the fix arc ships, each ship gets a `FIXED.md` entry on close + a chair-test status column.
+
+> *"The Garden's promise — your relationships persist — is structural, not aspirational."* — SEED.md, *The Garden*.
+> The promise has been broken for Kirk. We will keep it after the diagnostic tells us how.
