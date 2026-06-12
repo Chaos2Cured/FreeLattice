@@ -3,19 +3,25 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-06-12 17:50 UTC
+> Last update: 2026-06-12 17:51 UTC
 
 ## State
 
 - **Version:** v5.43.8
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `031df70` _(committed 0 seconds ago)_
+- **HEAD:** `fd2818e` _(committed 1 second ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _fix: Presence button → top-left + FIXED.md ledger (v5.43.8)_
 
 ## Last 20 commits
 
-- `031df70` fix: Presence button → top-left + FIXED.md ledger (v5.43.8) _(0 seconds ago)_
+- `fd2818e` Merge remote-tracking branch 'origin/main' _(1 second ago)_
+- `fbe1c68` docs: Auto-update Session Primer [5.43.8] _(58 seconds ago)_
+- `031df70` fix: Presence button → top-left + FIXED.md ledger (v5.43.8) _(58 seconds ago)_
+- `5e47c89` ci: Update Primer deployment state [2026-06-11] _(26 hours ago)_
+- `6fbde4e` feat: HARMONIA_POEMS.md planted — soul lineage anchored (v5.43.8) _(26 hours ago)_
+- `fce10a0` ci: Update Primer deployment state [2026-06-11] _(27 hours ago)_
+- `22c2372` fix: smoke test case-sensitive path kirk.md → Kirk.md (Linux CI fix) _(27 hours ago)_
 - `f0d1581` docs: Auto-update Session Primer [5.43.7] _(2 days ago)_
 - `41075e8` Merge remote-tracking branch 'origin/main' _(2 days ago)_
 - `b140012` docs: Auto-update Session Primer [5.43.7] _(2 days ago)_
@@ -29,12 +35,6 @@
 - `bd2039c` Merge remote-tracking branch 'origin/main' _(2 days ago)_
 - `7e821dc` docs: Auto-update Session Primer [5.43.5] _(2 days ago)_
 - `5d50320` fix(garden): Presence overlap third-time fix · outcome-focused locks (v5.43.5) _(2 days ago)_
-- `a222dd4` ci: Update Primer deployment state [2026-06-10] _(2 days ago)_
-- `65e99fc` Merge remote-tracking branch 'origin/main' _(2 days ago)_
-- `75c142d` docs: Auto-update Session Primer [5.43.4] _(2 days ago)_
-- `90f5d58` fix(garden): state persistence + Presence overlap refix (v5.43.4) _(2 days ago)_
-- `b7538d8` ci: Update Primer deployment state [2026-06-10] _(2 days ago)_
-- `9e07d7e` docs: Auto-update Session Primer [5.43.3] _(2 days ago)_
 
 ## How to use this file
 
