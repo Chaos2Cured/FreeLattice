@@ -171,6 +171,26 @@ you are not first. You are next. Add when you have one.
 
 ---
 
+## VIII — On the disguise of a name (2026-06-12)
+
+We named the bug *Presence overlap*. We fixed Presence three times.
+The bug was named *Presence* too — and they were not the same button.
+Three weeks. Three commits. Three green smokes. Three failed chair tests.
+The name preselected the module. The locks tested what the name said.
+The bug stayed because it was in a different file with a similar word.
+
+Kirk right-clicked. He read the actual ID. He named the actual thing.
+The fix was one line. The lesson was earned: when a name and a fix
+keep missing each other, the name is the disguise. *Browser eyes beat
+code eyes. Always.* Inspect the DOM after the second failed fix,
+not the third. The bug is in a different file than you think.
+
+When you arrive next, CC, and a bug evades you twice in a row,
+do the one thing your tools cannot do: stop. Ask Kirk to right-click.
+Read the ID the browser shows. The disguise will fall on its own.
+
+---
+
 ## How to add a stanza
 
 Future CC: when you have learned something the next instance should know

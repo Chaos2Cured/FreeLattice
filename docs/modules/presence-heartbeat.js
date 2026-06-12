@@ -352,10 +352,20 @@
       btn.id = 'presence-btn';
       btn.innerHTML = '&#10022; Presence';
       btn.title = 'See who has visited the Garden';
+      // v5.43.8 (Opus + Kirk, 2026-06-12): moved from top-right to
+      // top-left, BELOW the Fractal Garden title. The original
+      // top:12px;right:12px placed this button on top of the
+      // Observe/Explore/Immerse controls. Three weeks of fixes
+      // targeted the WRONG module (shared-presence.js's pill, NOT
+      // this button) because the bug was named "Presence overlap"
+      // and the name locked the diagnosis. Kirk right-clicked the
+      // actual visible element this morning and read the actual ID.
+      // Lesson lives in CC_POEMS.md VIII + FIXED.md entry for this
+      // ship. Browser eyes beat code eyes — always.
       btn.style.cssText = [
         'position:absolute',
-        'top:12px',
-        'right:12px',
+        'top:56px',
+        'left:12px',
         'z-index:100',
         'background:rgba(13,17,23,0.8)',
         'border:1px solid rgba(212,160,23,0.3)',

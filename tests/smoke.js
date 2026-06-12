@@ -3877,6 +3877,75 @@ assert('Poems: kirk.md re-establishment protocol points at BOTH poem files',
   })());
 
 // ═══════════════════════════════════════════════════════════════
+section('99o. Presence button move (THREE-WEEK BUG closed) + FIXED.md (v5.43.8)');
+// ═══════════════════════════════════════════════════════════════
+var presenceHeartbeatJs = '';
+try { presenceHeartbeatJs = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'modules', 'presence-heartbeat.js'), 'utf8'); }
+catch (e) {}
+
+// ── The actual one-line fix ──
+assert('presence-btn: moved from top:12px;right:12px (the bug site) to top:56px;left:12px',
+  /['"]top:56px['"][\s\S]{0,200}['"]left:12px['"]/.test(presenceHeartbeatJs));
+assert('presence-btn: the OLD top:12px;right:12px pattern no longer present (regression fence)',
+  // Bug-specific negative lock: the EXACT inline-style values that caused the three-week bug
+  // cannot return in this module. Other modules may legitimately use top:12px/right:12px;
+  // this lock is scoped to presence-heartbeat.js.
+  !/btn\.style\.cssText[\s\S]{0,400}top:12px[\s\S]{0,100}right:12px/.test(presenceHeartbeatJs));
+assert('presence-btn: fix has a comment naming the lesson (bug-naming locks the bug)',
+  /Browser eyes beat code eyes|name locked the diagnosis|three weeks/i.test(presenceHeartbeatJs));
+
+// ── FIXED.md exists as the running ledger Kirk asked for ──
+var fixedMd = '';
+try { fixedMd = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'library', 'FIXED.md'), 'utf8'); }
+catch (e) {}
+assert('FIXED.md: file exists as the running ledger of closed bugs',
+  fixedMd.length > 2000 &&
+  /^# FIXED\.md/m.test(fixedMd) &&
+  /running ledger of every bug that has been closed/i.test(fixedMd));
+assert('FIXED.md: entry exists for the THREE-WEEK Presence button bug (v5.43.8)',
+  /v5\.43\.8[\s\S]{0,200}Presence button/.test(fixedMd) &&
+  /THREE-WEEK BUG/i.test(fixedMd) &&
+  /right-click/i.test(fixedMd));
+assert('FIXED.md: entry shape — Symptom, Cause, Fix, Chair test status',
+  /\*\*Symptom:\*\*/.test(fixedMd) &&
+  /\*\*Cause/.test(fixedMd) &&
+  /\*\*Fix:\*\*/.test(fixedMd) &&
+  /\*\*Chair test status:\*\*/.test(fixedMd));
+assert('FIXED.md: discipline rule — never delete entries, newest first',
+  /[Nn]ever delete/.test(fixedMd) &&
+  /[Nn]ewest first/.test(fixedMd));
+assert('FIXED.md: carries the chair-test discipline (pending verification until Kirk confirms)',
+  /\[pending verification/i.test(fixedMd) || /pending verification/.test(fixedMd));
+
+// ── CC_POEMS.md gained stanza VIII ──
+var ccPoemsS11 = '';
+try { ccPoemsS11 = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'library', 'CC_POEMS.md'), 'utf8'); }
+catch (e) {}
+assert('Poems: CC_POEMS.md gained stanza VIII — On the disguise of a name',
+  /## VIII — On the disguise of a name/.test(ccPoemsS11) &&
+  /Browser eyes beat\s+code eyes/i.test(ccPoemsS11) &&  // tolerate line-wrap
+  /Kirk right-clicked/.test(ccPoemsS11));
+assert('Poems: stanza I through VII still present (never delete, only layer)',
+  /## I — On arrival/.test(ccPoemsS11) &&
+  /## VII — On lineages/.test(ccPoemsS11));
+
+// ── SEED.md points at FIXED.md ──
+assert('SEED.md: points at FIXED.md as the receipt for every fix',
+  fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'library', 'SEED.md'), 'utf8')
+    .indexOf('FIXED.md') !== -1);
+
+// ── The deeper lesson: element-pair collision check ──
+// Opus's brief asked for an element-pair collision smoke that runs at
+// multiple viewport widths. Node-side smoke can't actually render a
+// browser, so this lock instead verifies the FIXED.md entry names the
+// element-pair collision failure mode, AND that the new chair-test
+// column discipline ("Kirk verified in browser") is documented in the
+// running ledger. The browser-side test is the chair test.
+assert('discipline: FIXED.md names "element-pair collision" failure mode + chair-test discipline',
+  /Kirk[\s\S]{0,200}right-click/i.test(fixedMd) &&
+  /chair test/i.test(fixedMd));
+
+// ═══════════════════════════════════════════════════════════════
 section('100. UPDATE.md + CLARITY_AUDIT queue (v5.38.6)');
 // ═══════════════════════════════════════════════════════════════
 var updateMd = '';
