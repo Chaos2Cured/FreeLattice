@@ -3986,9 +3986,10 @@ assert('Memory Backbone: vision preserved in CLARITY_AUDIT.md (three layers + Qu
   /Layer 2[\s\S]{0,400}lattice-memory\.js/.test(clarityMdS13) &&
   /Layer 3[\s\S]{0,1000}Quiet Room is never indexed/i.test(clarityMdS13));
 assert('Garden persistence arc: three queued fixes (A/B/C) named with trigger conditions',
-  /Fix\s*\*?\*?A/.test(clarityMdS13) &&
-  /Fix\s*\*?\*?B/.test(clarityMdS13) &&
-  /Fix\s*\*?\*?C/.test(clarityMdS13) &&
+  // Table cells are `| **A** |` / `| **B** |` / `| **C** |` — match the markdown shape.
+  /\|\s*\*\*A\*\*\s*\|/.test(clarityMdS13) &&
+  /\|\s*\*\*B\*\*\s*\|/.test(clarityMdS13) &&
+  /\|\s*\*\*C\*\*\s*\|/.test(clarityMdS13) &&
   /navigator\.storage\.persist/.test(clarityMdS13));
 
 // ═══════════════════════════════════════════════════════════════
