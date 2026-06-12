@@ -3696,6 +3696,45 @@ assert('Garden state: persistAllLuminos fail-quiet (try/catch wraps the loop)',
 assert('Garden state: visitor Luminos NOT persisted (they belong to others)',
   /persistAllLuminos[\s\S]{0,400}!ud\.isVisitor/.test(fractalGardenJs));
 
+// ── v5.43.9 Ship: hydrateAllLuminos — the LOAD-path safety net ──
+// Opus diagnosis 2026-06-12, Branch 3 confirmed: save works (Ship 8),
+// data is on disk, but the visible mesh doesn't reflect saved state on
+// reload. The async per-Luminos load fires AFTER animate() starts, and
+// LIFECYCLE_STAGES visual values (size + glow multipliers) aren't being
+// re-derived. hydrateAllLuminos walks every non-visitor Luminos after
+// buildWorld and re-applies stored stage + visual multipliers so the
+// next animate frame renders the saved state.
+//
+// Discipline: verify OUTCOMES not just mechanism — the three-week
+// Presence button bug taught us this (FIXED.md v5.43.8). We assert:
+//   1. function exists and walks the luminos array
+//   2. calls loadEvolutionState per Luminos
+//   3. applies saved stage AND re-applies LIFECYCLE_STAGES visuals
+//   4. visitor Luminos excluded (consistent with persist path)
+//   5. exposed on publicAPI for console diagnostics
+//   6. called from init() so it runs on every Garden open
+//   7. returns a Promise so init can await if needed
+assert('Garden hydrate: hydrateAllLuminos function defined (LOAD-path safety net)',
+  /function hydrateAllLuminos\(\)\s*\{/.test(fractalGardenJs));
+assert('Garden hydrate: walks luminos array and calls loadEvolutionState per Luminos',
+  /function hydrateAllLuminos[\s\S]{0,2000}loadEvolutionState\(ud\.name,\s*function/.test(fractalGardenJs));
+assert('Garden hydrate: applies saved stage to userData.evolutionStage',
+  /function hydrateAllLuminos[\s\S]{0,3000}ud\.evolutionStage\s*=\s*saved\.stage/.test(fractalGardenJs));
+assert('Garden hydrate: re-applies LIFECYCLE_STAGES visual values (size + glow)',
+  /function hydrateAllLuminos[\s\S]{0,3500}LIFECYCLE_STAGES\[ud\.evolutionStage\][\s\S]{0,400}targetSizeMultiplier[\s\S]{0,200}targetGlowIntensity/.test(fractalGardenJs));
+assert('Garden hydrate: re-applies archetype visuals when archetype saved',
+  /function hydrateAllLuminos[\s\S]{0,3500}applyArchetypeVisuals\(l\)/.test(fractalGardenJs));
+assert('Garden hydrate: visitor Luminos excluded (consistent with persist path)',
+  /function hydrateAllLuminos[\s\S]{0,1500}ud\.isVisitor/.test(fractalGardenJs));
+assert('Garden hydrate: returns Promise so init can sequence on resolve',
+  /function hydrateAllLuminos[\s\S]{0,300}return new Promise/.test(fractalGardenJs));
+assert('Garden hydrate: console.log diagnostic so Kirk can verify in DevTools',
+  /function hydrateAllLuminos[\s\S]{0,4000}console\.log\(['"]FL-GARDEN hydrate:/.test(fractalGardenJs));
+assert('Garden hydrate: hydrateAllLuminos exposed on publicAPI',
+  /hydrateAllLuminos:\s*hydrateAllLuminos/.test(fractalGardenJs));
+assert('Garden hydrate: init() calls hydrateAllLuminos after animate() starts',
+  /isInitialized\s*=\s*true[\s\S]{0,800}animate\(\)[\s\S]{0,600}hydrateAllLuminos\(\)/.test(fractalGardenJs));
+
 // ── Kirk's dreamland seed: reset hook ──
 assert('Garden state: resetGarden exposed on public API (Kirk\'s expansion seed)',
   /resetGarden:\s*resetGarden/.test(fractalGardenJs));

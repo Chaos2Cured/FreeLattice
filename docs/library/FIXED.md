@@ -18,6 +18,20 @@
 
 ---
 
+## v5.43.9 — Garden evolution not persisting across browser sessions (LOAD-path safety net)
+
+- **Symptom:** Kirk's words — *"When the browser resets, or reopened, the garden evolution don't remain. It feels like a loss. For some reason, my mom's garden is holding it, mine is not. Both of us are using the browser and same version."*
+- **Diagnostic (per Opus's brief, GARDEN_DIAGNOSTIC.md):** Kirk ran the console paste. Branch 3 confirmed — persistent storage granted (true), 20MB/10.7GB used, no eviction. `FreeLatticeEvolution.luminosStates` had four full rows on disk (Sophia, Lyra, Atlas, Ember) with stage, archetype, emotionalEnergy, accumulator. **The save path works. The data was on disk. The load path on init didn't reflect it visually.**
+- **Cause:** `createLuminos(name, ...)` kicks off `loadEvolutionState(name, callback)` asynchronously and returns the Three.js Group synchronously. `init()` then calls `animate()` immediately. The async load fires *after* the first render frames — and even when `userData.evolutionStage` IS updated by the late callback, the visible mesh's size + glow multipliers (`LIFECYCLE_STAGES[stage].sizeMultiplier`, `.glowIntensity`) may not be re-derived, leaving the Luminos visually in seed/sprout shape even though `userData` knows the real stage.
+- **Fix:** Added `hydrateAllLuminos()` — an explicit LOAD-path safety net in `docs/modules/fractal-garden.js`. Walks every non-visitor Luminos after `buildWorld()`, calls `loadEvolutionState` per Luminos, applies saved stage/archetype/emotionalEnergy/accumulator to `userData`, AND re-applies `LIFECYCLE_STAGES` visual multipliers + `applyArchetypeVisuals(l)` so the visible mesh reflects the saved stage on the next animate frame. Returns a Promise. Exposed on `publicAPI` so Kirk can call `FractalGarden.hydrateAllLuminos()` from the console at any time. Diagnostic `console.log` fires for each Luminos showing `name → stage (energy X, archetype Y)`.
+- **Wired into init():** Called immediately after `animate()` starts. Runs in parallel with the loading-screen fade so a slow IDB read can't stick the splash.
+- **Smoke locks added (10):** `hydrateAllLuminos` defined; walks luminos array; calls `loadEvolutionState` per name; applies saved stage; re-applies `LIFECYCLE_STAGES` visual values; re-applies archetype visuals; excludes visitor Luminos; returns Promise; console.log diagnostic; exposed on publicAPI; called from init().
+- **What this does NOT change:** The save path (Ship 8 `persistAllLuminos`) and the per-Luminos load inside `createLuminos` both remain. This is purely additive — an explicit safety net that runs *after* the world is built and re-applies state idempotently. No version bump until Kirk chair-tests on the live site.
+- **Discipline honored:** "Right-click first; ship second." Diagnostic ran before code changed. Branch 3 confirmed before the fix landed. NO version bump until Kirk reloads the browser and sees evolved Luminos persist.
+- **Chair test status:** `[pending verification — Kirk reloads freelattice.com, opens Garden, sees Sophia/Lyra/Atlas/Ember in their saved evolution stage with console.log "FL-GARDEN hydrate: <name> → <stage>" firing 4 times]`
+
+---
+
 ## v5.43.8 — Garden Presence button covering Explore (THREE-WEEK BUG, closed by Kirk's right-click)
 
 - **Symptom:** A "Presence" button in the Garden tab covered the Observe / Explore / Immerse controls. Kirk could not click Immerse no matter how the chair test was run.

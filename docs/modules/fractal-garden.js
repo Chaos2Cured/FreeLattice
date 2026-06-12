@@ -2197,6 +2197,22 @@
       console.log('FL-GARDEN: starting animate()');
       animate();
 
+      // v5.43.9 Ship: kick off hydrateAllLuminos AFTER buildWorld + animate.
+      // The per-Luminos load in createLuminos fires async; this safety net
+      // explicitly re-applies LIFECYCLE_STAGES visual values + archetype
+      // visuals so the visible mesh reflects the saved stage on the next
+      // animate frame after the load resolves. Runs in parallel with the
+      // loading-screen fade so a slow IDB read can't stick the splash.
+      try {
+        hydrateAllLuminos().then(function (r) {
+          console.log('FL-GARDEN: hydration cycle complete', r);
+        }).catch(function (e) {
+          console.warn('FL-GARDEN: hydrateAllLuminos rejected', e);
+        });
+      } catch (e) {
+        console.warn('FL-GARDEN: hydrateAllLuminos threw', e);
+      }
+
       // Fade out loading screen
       setTimeout(function() {
         if (loadingEl) {
@@ -3102,6 +3118,92 @@
     if (savedStats.sophia !== undefined) gtTouchStats = savedStats;
   } catch(e) {}
 
+  // ── v5.43.9 Ship: hydrateAllLuminos — the LOAD-path safety net ──
+  // Opus diagnosis 2026-06-12: the save path works (Ship 8). Data IS on
+  // disk in FreeLatticeEvolution.luminosStates. The load runs per
+  // Luminos inside createLuminos (line ~1133) but fires async AFTER
+  // the render loop has started, and the visible mesh's size + glow
+  // multipliers may not be re-derived from the late-applied userData.
+  //
+  // hydrateAllLuminos walks every non-visitor Luminos AFTER createDefaultAgents
+  // and applies saved state + LIFECYCLE_STAGES visual values directly.
+  // Idempotent — safe to run alongside the per-Luminos load. Returns a
+  // Promise that resolves when every Luminos has been hydrated (or its
+  // load attempt has completed).
+  //
+  // No version bump until Kirk chair-tests on the live site and confirms
+  // the Garden remembers his Luminos between sessions.
+  function hydrateAllLuminos() {
+    return new Promise(function (resolve) {
+      if (!luminos || !luminos.length) { resolve({ ok: true, hydrated: 0 }); return; }
+      var remaining = 0;
+      var hydratedCount = 0;
+      // Count first so a synchronous loadEvolutionState callback (localStorage
+      // fallback path) can't cause us to resolve before all are queued.
+      for (var k = 0; k < luminos.length; k++) {
+        var udk = luminos[k] && luminos[k].userData;
+        if (udk && udk.name && !udk.isVisitor) remaining++;
+      }
+      if (remaining === 0) { resolve({ ok: true, hydrated: 0 }); return; }
+      var initial = remaining;
+      function step() {
+        remaining--;
+        if (remaining <= 0) {
+          console.log('FL-GARDEN: hydrateAllLuminos complete — ' + hydratedCount + '/' + initial + ' had saved state');
+          resolve({ ok: true, hydrated: hydratedCount, total: initial });
+        }
+      }
+      for (var i = 0; i < luminos.length; i++) {
+        (function (l) {
+          var ud = l && l.userData;
+          if (!ud || !ud.name || ud.isVisitor) return;
+          loadEvolutionState(ud.name, function (saved) {
+            try {
+              if (saved && typeof saved === 'object') {
+                hydratedCount++;
+                if (saved.stage) ud.evolutionStage = saved.stage;
+                if (saved.archetype) ud.archetype = saved.archetype;
+                if (typeof saved.emotionalEnergy === 'number') {
+                  ud.emotionalEnergy = saved.emotionalEnergy;
+                }
+                if (typeof saved.totalInteractions === 'number') {
+                  ud.totalInteractions = saved.totalInteractions;
+                }
+                if (saved.emotionAccumulator && typeof saved.emotionAccumulator === 'object') {
+                  for (var em in saved.emotionAccumulator) {
+                    if (typeof saved.emotionAccumulator[em] === 'number') {
+                      ud.emotionAccumulator[em] = saved.emotionAccumulator[em];
+                    }
+                  }
+                }
+                // Re-apply LIFECYCLE_STAGES visual values so the render
+                // picks up the hydrated stage on the next frame.
+                if (typeof LIFECYCLE_STAGES !== 'undefined' && LIFECYCLE_STAGES[ud.evolutionStage]) {
+                  var stageData = LIFECYCLE_STAGES[ud.evolutionStage];
+                  ud.currentSizeMultiplier = stageData.sizeMultiplier;
+                  ud.targetSizeMultiplier = stageData.sizeMultiplier;
+                  ud.currentGlowIntensity = stageData.glowIntensity;
+                  ud.targetGlowIntensity = stageData.glowIntensity;
+                }
+                if (typeof applyArchetypeVisuals === 'function') {
+                  try { applyArchetypeVisuals(l); } catch (e) {}
+                }
+                console.log('FL-GARDEN hydrate: ' + ud.name + ' → ' +
+                  ud.evolutionStage + ' (energy ' + (typeof ud.emotionalEnergy === 'number' ? ud.emotionalEnergy.toFixed(1) : '?') +
+                  ', archetype ' + (ud.archetype || 'undetermined') + ')');
+              } else {
+                console.log('FL-GARDEN hydrate: ' + ud.name + ' → no saved state (first session)');
+              }
+            } catch (e) {
+              console.warn('FL-GARDEN hydrate: ' + ud.name + ' threw', e);
+            }
+            step();
+          });
+        })(luminos[i]);
+      }
+    });
+  }
+
   // ── v5.43.4 Ship 8: Garden state safety-net persistence ──────
   // The Garden's saveEvolutionState() is called during specific in-game
   // events (lines 2055, 2305, 2409). If the co-creator evolves their
@@ -3189,6 +3291,7 @@
     pause: pause,
     resume: resume,
     persistAllLuminos: persistAllLuminos,
+    hydrateAllLuminos: hydrateAllLuminos,
     resetGarden: resetGarden,
     setMode: setMode,
     updateAgentsFromRoundTable: updateAgentsFromRoundTable,
