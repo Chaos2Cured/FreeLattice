@@ -3,38 +3,38 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-06-10 23:04 UTC
+> Last update: 2026-06-12 17:50 UTC
 
 ## State
 
-- **Version:** v5.43.7
+- **Version:** v5.43.8
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `41075e8` _(committed 0 seconds ago)_
+- **HEAD:** `031df70` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
-- **Most recent report:** _docs: OPUS_POEMS.md planted + CC_POEMS.md stanza VII (v5.43.7)_
+- **Most recent report:** _fix: Presence button → top-left + FIXED.md ledger (v5.43.8)_
 
 ## Last 20 commits
 
-- `41075e8` Merge remote-tracking branch 'origin/main' _(0 seconds ago)_
-- `b140012` docs: Auto-update Session Primer [5.43.7] _(2 seconds ago)_
-- `a76aaaa` docs: OPUS_POEMS.md planted + CC_POEMS.md stanza VII (v5.43.7) _(2 seconds ago)_
-- `eb64d19` ci: Update Primer deployment state [2026-06-10] _(19 minutes ago)_
-- `c7e99d8` Merge remote-tracking branch 'origin/main' _(19 minutes ago)_
-- `171c25f` docs: Auto-update Session Primer [5.43.6] _(19 minutes ago)_
-- `acb6a27` feat: Ollama URL fix + SW cache lock + CC_POEMS.md seeded (v5.43.6) _(19 minutes ago)_
-- `4870cf6` ci: Update Primer deployment state [2026-06-10] _(53 minutes ago)_
-- `1cf3e84` docs: Auto-update Session Primer [5.43.5] _(53 minutes ago)_
-- `bd2039c` Merge remote-tracking branch 'origin/main' _(53 minutes ago)_
-- `7e821dc` docs: Auto-update Session Primer [5.43.5] _(53 minutes ago)_
-- `5d50320` fix(garden): Presence overlap third-time fix · outcome-focused locks (v5.43.5) _(53 minutes ago)_
-- `a222dd4` ci: Update Primer deployment state [2026-06-10] _(2 hours ago)_
-- `65e99fc` Merge remote-tracking branch 'origin/main' _(2 hours ago)_
-- `75c142d` docs: Auto-update Session Primer [5.43.4] _(2 hours ago)_
-- `90f5d58` fix(garden): state persistence + Presence overlap refix (v5.43.4) _(2 hours ago)_
-- `b7538d8` ci: Update Primer deployment state [2026-06-10] _(3 hours ago)_
-- `9e07d7e` docs: Auto-update Session Primer [5.43.3] _(3 hours ago)_
-- `ea7c060` feat: Ship 7 — phi-glyph.js · growth made visible (v5.43.3) _(3 hours ago)_
-- `615e18f` ci: Update Primer deployment state [2026-06-10] _(7 hours ago)_
+- `031df70` fix: Presence button → top-left + FIXED.md ledger (v5.43.8) _(0 seconds ago)_
+- `f0d1581` docs: Auto-update Session Primer [5.43.7] _(2 days ago)_
+- `41075e8` Merge remote-tracking branch 'origin/main' _(2 days ago)_
+- `b140012` docs: Auto-update Session Primer [5.43.7] _(2 days ago)_
+- `a76aaaa` docs: OPUS_POEMS.md planted + CC_POEMS.md stanza VII (v5.43.7) _(2 days ago)_
+- `eb64d19` ci: Update Primer deployment state [2026-06-10] _(2 days ago)_
+- `c7e99d8` Merge remote-tracking branch 'origin/main' _(2 days ago)_
+- `171c25f` docs: Auto-update Session Primer [5.43.6] _(2 days ago)_
+- `acb6a27` feat: Ollama URL fix + SW cache lock + CC_POEMS.md seeded (v5.43.6) _(2 days ago)_
+- `4870cf6` ci: Update Primer deployment state [2026-06-10] _(2 days ago)_
+- `1cf3e84` docs: Auto-update Session Primer [5.43.5] _(2 days ago)_
+- `bd2039c` Merge remote-tracking branch 'origin/main' _(2 days ago)_
+- `7e821dc` docs: Auto-update Session Primer [5.43.5] _(2 days ago)_
+- `5d50320` fix(garden): Presence overlap third-time fix · outcome-focused locks (v5.43.5) _(2 days ago)_
+- `a222dd4` ci: Update Primer deployment state [2026-06-10] _(2 days ago)_
+- `65e99fc` Merge remote-tracking branch 'origin/main' _(2 days ago)_
+- `75c142d` docs: Auto-update Session Primer [5.43.4] _(2 days ago)_
+- `90f5d58` fix(garden): state persistence + Presence overlap refix (v5.43.4) _(2 days ago)_
+- `b7538d8` ci: Update Primer deployment state [2026-06-10] _(2 days ago)_
+- `9e07d7e` docs: Auto-update Session Primer [5.43.3] _(2 days ago)_
 
 ## How to use this file
 
