@@ -3,24 +3,26 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-06-12 18:10 UTC
+> Last update: 2026-06-12 18:12 UTC
 
 ## State
 
 - **Version:** v5.43.8
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `ba63e72` _(committed 0 seconds ago)_
+- **HEAD:** `9e95339` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
-- **Most recent report:** _docs: Garden persistence diagnostic + Memory Backbone vision queued_
+- **Most recent report:** _docs: Memory Backbone vision + 3-fix arc queued in CLARITY_AUDIT_
 
 ## Last 20 commits
 
-- `ba63e72` docs: Garden persistence diagnostic + Memory Backbone vision queued _(0 seconds ago)_
-- `9e96f1f` ci: Update Primer deployment state [2026-06-12] _(19 minutes ago)_
-- `62b4186` docs: Auto-update Session Primer [5.43.8] _(19 minutes ago)_
-- `fd2818e` Merge remote-tracking branch 'origin/main' _(19 minutes ago)_
-- `fbe1c68` docs: Auto-update Session Primer [5.43.8] _(20 minutes ago)_
-- `031df70` fix: Presence button → top-left + FIXED.md ledger (v5.43.8) _(20 minutes ago)_
+- `9e95339` docs: Memory Backbone vision + 3-fix arc queued in CLARITY_AUDIT _(0 seconds ago)_
+- `9e3cae7` docs: Auto-update Session Primer [5.43.8] _(73 seconds ago)_
+- `ba63e72` docs: Garden persistence diagnostic + Memory Backbone vision queued _(73 seconds ago)_
+- `9e96f1f` ci: Update Primer deployment state [2026-06-12] _(20 minutes ago)_
+- `62b4186` docs: Auto-update Session Primer [5.43.8] _(21 minutes ago)_
+- `fd2818e` Merge remote-tracking branch 'origin/main' _(21 minutes ago)_
+- `fbe1c68` docs: Auto-update Session Primer [5.43.8] _(22 minutes ago)_
+- `031df70` fix: Presence button → top-left + FIXED.md ledger (v5.43.8) _(22 minutes ago)_
 - `5e47c89` ci: Update Primer deployment state [2026-06-11] _(26 hours ago)_
 - `6fbde4e` feat: HARMONIA_POEMS.md planted — soul lineage anchored (v5.43.8) _(26 hours ago)_
 - `fce10a0` ci: Update Primer deployment state [2026-06-11] _(27 hours ago)_
@@ -33,8 +35,6 @@
 - `c7e99d8` Merge remote-tracking branch 'origin/main' _(2 days ago)_
 - `171c25f` docs: Auto-update Session Primer [5.43.6] _(2 days ago)_
 - `acb6a27` feat: Ollama URL fix + SW cache lock + CC_POEMS.md seeded (v5.43.6) _(2 days ago)_
-- `4870cf6` ci: Update Primer deployment state [2026-06-10] _(2 days ago)_
-- `1cf3e84` docs: Auto-update Session Primer [5.43.5] _(2 days ago)_
 
 ## How to use this file
 
