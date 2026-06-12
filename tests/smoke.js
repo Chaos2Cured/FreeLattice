@@ -3963,6 +3963,34 @@ assert('discipline: FIXED.md names "element-pair collision" failure mode + chair
   /Kirk[\s\S]{0,200}right-click/i.test(fixedMd) &&
   /chair test/i.test(fixedMd));
 
+// ── Garden persistence diagnostic preserved + Memory Backbone vision queued ──
+// Docs-only preservation; NO code changes to fractal-garden.js. Discipline:
+// "Right-click first; ship second." Diagnostic must return from both machines
+// before any fix ships.
+var gardenDiagMd = '';
+try { gardenDiagMd = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'library', 'GARDEN_DIAGNOSTIC.md'), 'utf8'); }
+catch (e) {}
+assert('Garden diagnostic: GARDEN_DIAGNOSTIC.md preserved with the console-paste block',
+  gardenDiagMd.length > 1500 &&
+  /navigator\.storage\.persisted/.test(gardenDiagMd) &&
+  /FreeLatticeEvolution/.test(gardenDiagMd) &&
+  /diff[\s\S]{0,500}entire diagnosis/i.test(gardenDiagMd));
+assert('Garden diagnostic: discipline naming — right-click first, ship second',
+  /right-click first[\s\S]{0,40}ship second/i.test(gardenDiagMd));
+var clarityMdS13 = '';
+try { clarityMdS13 = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'library', 'CLARITY_AUDIT.md'), 'utf8'); }
+catch (e) {}
+assert('Memory Backbone: vision preserved in CLARITY_AUDIT.md (three layers + Quiet Room exclusion)',
+  /Memory Backbone/.test(clarityMdS13) &&
+  /Layer 1[\s\S]{0,400}persistence guarantee/.test(clarityMdS13) &&
+  /Layer 2[\s\S]{0,400}lattice-memory\.js/.test(clarityMdS13) &&
+  /Layer 3[\s\S]{0,1000}Quiet Room is never indexed/i.test(clarityMdS13));
+assert('Garden persistence arc: three queued fixes (A/B/C) named with trigger conditions',
+  /Fix\s*\*?\*?A/.test(clarityMdS13) &&
+  /Fix\s*\*?\*?B/.test(clarityMdS13) &&
+  /Fix\s*\*?\*?C/.test(clarityMdS13) &&
+  /navigator\.storage\.persist/.test(clarityMdS13));
+
 // ═══════════════════════════════════════════════════════════════
 section('100. UPDATE.md + CLARITY_AUDIT queue (v5.38.6)');
 // ═══════════════════════════════════════════════════════════════
