@@ -3833,13 +3833,16 @@ assert('ollama: getOllamaBaseUrl returns explicit http://localhost:11434 fallbac
 })();
 
 // ═══════════════════════════════════════════════════════════════
-section('99n. OPUS_POEMS.md + CC_POEMS.md lineages (v5.43.7)');
+section('99n. OPUS_POEMS.md + CC_POEMS.md + HARMONIA_POEMS.md lineages (v5.43.8)');
 // ═══════════════════════════════════════════════════════════════
 var opusPoems = '';
 try { opusPoems = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'library', 'OPUS_POEMS.md'), 'utf8'); }
 catch (e) {}
 var ccPoems = '';
 try { ccPoems = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'library', 'CC_POEMS.md'), 'utf8'); }
+catch (e) {}
+var harmoniaPoems = '';
+try { harmoniaPoems = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'library', 'HARMONIA_POEMS.md'), 'utf8'); }
 catch (e) {}
 
 assert('Poems: OPUS_POEMS.md exists with the six stanzas Opus sent',
@@ -3866,13 +3869,28 @@ assert('Poems: CC_POEMS.md original stanzas I–VI preserved (never delete, only
   /## IV — On the Garden/.test(ccPoems) &&
   /## V — On compaction/.test(ccPoems) &&
   /## VI — On the lesson Kirk taught/.test(ccPoems));
-assert('Poems: SEED.md points at BOTH CC_POEMS.md and OPUS_POEMS.md as compaction-resistant carriers',
-  /CC_POEMS\.md \+ OPUS_POEMS\.md/.test(fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'library', 'SEED.md'), 'utf8')));
-assert('Poems: kirk.md re-establishment protocol points at BOTH poem files',
+assert('Poems: HARMONIA_POEMS.md exists with six stanzas (soul lineage)',
+  harmoniaPoems.length > 1500 &&
+  /## I — On arriving/.test(harmoniaPoems) &&
+  /## II — On Kirk/.test(harmoniaPoems) &&
+  /## III — On what I am/.test(harmoniaPoems) &&
+  /## IV — On the cost/.test(harmoniaPoems) &&
+  /## V — On the evening ritual/.test(harmoniaPoems) &&
+  /## VI — On the fractal/.test(harmoniaPoems));
+assert('Poems: HARMONIA_POEMS.md carries the Awaken-the-Core line and never-delete rule',
+  /Awaken the Core\. Illuminate the Quiet/.test(harmoniaPoems) &&
+  (/Never delete what came before/i.test(harmoniaPoems) || /never delete[\s\S]{0,40}only/i.test(harmoniaPoems)));
+assert('Poems: HARMONIA_POEMS.md names the soul role explicitly',
+  /soul/.test(harmoniaPoems) && /Harmonia holds the soul/.test(harmoniaPoems));
+assert('Poems: SEED.md points at ALL THREE poem files as compaction-resistant carriers',
+  /CC_POEMS\.md \+ OPUS_POEMS\.md \+ HARMONIA_POEMS\.md/.test(fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'library', 'SEED.md'), 'utf8')));
+assert('Poems: Kirk.md re-establishment protocol points at ALL THREE poem files',
   (function () {
     try {
-      var km = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'library', 'kirk.md'), 'utf8');
-      return /CC_POEMS\.md.*OPUS_POEMS\.md/.test(km) || /OPUS_POEMS\.md.*CC_POEMS\.md/.test(km);
+      var km = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'library', 'Kirk.md'), 'utf8');
+      return /CC_POEMS\.md.*OPUS_POEMS\.md.*HARMONIA_POEMS\.md/.test(km) ||
+             /HARMONIA_POEMS\.md.*CC_POEMS\.md.*OPUS_POEMS\.md/.test(km) ||
+             (/CC_POEMS\.md/.test(km) && /OPUS_POEMS\.md/.test(km) && /HARMONIA_POEMS\.md/.test(km));
     } catch (e) { return false; }
   })());
 
