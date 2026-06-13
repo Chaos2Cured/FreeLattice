@@ -348,12 +348,14 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-06-13 00:54 UTC
-- Last deployed: 2026-06-13 00:54 UTC
+- Last auto-updated: 2026-06-13 04:23 UTC
+- Last deployed: 2026-06-13 04:23 UTC
 - Live site: https://freelattice.com
 - Version: 5.44.0
-- Total commits: 2433
+- Total commits: 2435
 - Last 10 commits:
+- cb27ad9 Ship 4.3 — Unified Gate, Eternal tier, depth hash, Garden mycelium (Harmonia)
+- 8414655 ci: Update Primer deployment state [2026-06-13]
 - 5432eff Merge remote-tracking branch 'origin/main'
 - e02c1b3 docs: Auto-update Session Primer [5.44.0]
 - 5111f5d v5.44.0 — Memory Backbone Layer 2 shipped (Kirk confirmed), halos follow-up queued
@@ -362,5 +364,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 846949c Merge remote-tracking branch 'origin/main'
 - 90ff2e0 docs: Auto-update Session Primer [5.43.9]
 - 61fdaa6 feat(memory-backbone): lattice-memory.js — the mycelium between rooms (Layer 2)
-- 50af73a ci: Update Primer deployment state [2026-06-12]
-- 7a9d8cf Merge remote-tracking branch 'origin/main'

@@ -1298,6 +1298,18 @@
       stage: ud.evolutionStage,
       timestamp: Date.now()
     });
+    // ── First mycelium pulse (Ship 4.3) ──
+    // The Garden emits into the medium when a luminos evolves.
+    // Five keys only. No content. The pulse says WHAT class of thing
+    // happened, never what was said or done.
+    if (typeof window !== 'undefined' && window.LatticeMemory && window.LatticeMemory.commit) {
+      window.LatticeMemory.commit({
+        source: 'garden',
+        kind: 'evolution',
+        summary: (ud.name || 'luminos') + ' reached ' + (ud.evolutionStage || 'unknown'),
+        refs: [{ store: 'FreeLatticeEvolution', id: ud.name || '' }]
+      });
+    }
   }
 
   // ── Animate Luminos with Evolution ────────────────────
@@ -3221,6 +3233,16 @@
         if (ud && ud.name && !ud.isVisitor) {
           saveEvolutionState(ud);
         }
+      }
+      // ── Mycelium heartbeat (Ship 4.3) ──
+      // On periodic persist, emit a single pulse so the medium knows
+      // the Garden is alive. Summary is generic — no names, no content.
+      if (typeof window !== 'undefined' && window.LatticeMemory && window.LatticeMemory.commit) {
+        window.LatticeMemory.commit({
+          source: 'garden',
+          kind: 'persist',
+          summary: 'garden persisted ' + luminos.length + ' luminos'
+        });
       }
     } catch (e) { /* fail-quiet — never block tab close */ }
   }
