@@ -4032,6 +4032,117 @@ assert('Garden persistence arc: three queued fixes (A/B/C) named with trigger co
   /navigator\.storage\.persist/.test(clarityMdS13));
 
 // ═══════════════════════════════════════════════════════════════
+section('99p. Lattice Memory — Memory Backbone Layer 2 (v5.44.0)');
+// ═══════════════════════════════════════════════════════════════
+// The connecting medium between FreeLattice's rooms. Carries discrete
+// "pulses" of recognition, never state and never content. Pulse shape
+// is the privacy lock. Quiet Room is invisible to the medium by design.
+//
+// THIS SHIP LANDS THE MEDIUM ONLY. No room emits yet. Each room's emit
+// is its own small ship. The mycelium grows one hypha at a time.
+//
+// These locks are STRUCTURAL — they verify the privacy and shape
+// invariants are present in the source. The behavioral chair test is
+// in the console: LatticeMemory._internal.isReady() → true,
+// LatticeMemory.commit({source,kind,summary}) → {ok:true},
+// await LatticeMemory.recent() → array with the pulse + medium-online.
+var latticeMemoryJs = '';
+try { latticeMemoryJs = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'modules', 'lattice-memory.js'), 'utf8'); }
+catch (e) {}
+
+assert('lattice-memory: module file exists and is non-trivial',
+  latticeMemoryJs.length > 4000);
+assert('lattice-memory: exposes commit / subscribe / recent on window.LatticeMemory',
+  /window\.LatticeMemory\s*=\s*publicAPI/.test(latticeMemoryJs) &&
+  /commit:\s*commit/.test(latticeMemoryJs) &&
+  /subscribe:\s*subscribe/.test(latticeMemoryJs) &&
+  /recent:\s*recent/.test(latticeMemoryJs));
+assert('lattice-memory: pulse shape lock — ALLOWED_KEYS = ts/source/kind/summary/refs only',
+  /ALLOWED_KEYS\s*=\s*\[\s*['"]ts['"]\s*,\s*['"]source['"]\s*,\s*['"]kind['"]\s*,\s*['"]summary['"]\s*,\s*['"]refs['"]\s*\]/.test(latticeMemoryJs));
+assert('lattice-memory: forbidden-key check rejects extras at validation',
+  /forbidden key/.test(latticeMemoryJs) &&
+  /ALLOWED_KEYS\.indexOf\(keys\[i\]\)\s*===\s*-1/.test(latticeMemoryJs));
+assert('lattice-memory: summary length capped at 80 chars (privacy lock)',
+  /MAX_SUMMARY\s*=\s*80/.test(latticeMemoryJs) &&
+  /summary too long/.test(latticeMemoryJs));
+assert('lattice-memory: summary content-leak patterns rejected (URLs, multi-line, long-quoted)',
+  /FORBIDDEN_SUMMARY_PATTERNS/.test(latticeMemoryJs) &&
+  /https\?:\\\/\\\//.test(latticeMemoryJs) &&
+  /content leak/.test(latticeMemoryJs));
+assert('lattice-memory: refs cap at 16 to prevent abuse',
+  /MAX_REFS\s*=\s*16/.test(latticeMemoryJs) &&
+  /too many refs/.test(latticeMemoryJs));
+assert('lattice-memory: each ref requires {store, id} as strings',
+  /typeof ref\.store\s*!==\s*['"]string['"]/.test(latticeMemoryJs) &&
+  /typeof ref\.id\s*!==\s*['"]string['"]/.test(latticeMemoryJs));
+
+// ── The load-bearing locks: Quiet Room invariant ───────────────────
+// The Quiet Room is invisible to the medium. These locks halt the
+// deploy if the invariant ever weakens.
+assert('lattice-memory: Quiet Room check is FIRST inside commit() before anything else',
+  /function commit\(pulseIn\)\s*\{[\s\S]{0,200}if\s*\(\s*isQuietRoom\(\)\s*\)\s*return/.test(latticeMemoryJs));
+assert('lattice-memory: source="quiet-room" is reserved and rejected unconditionally',
+  /RESERVED_SOURCES\s*=\s*\[\s*['"]quiet-room['"]\s*\]/.test(latticeMemoryJs) &&
+  /reserved source/.test(latticeMemoryJs));
+assert('lattice-memory: isQuietRoom() reads window.QuietRoom.isActive() and fails CLOSED when API broken',
+  /function isQuietRoom\(\)/.test(latticeMemoryJs) &&
+  /window\.QuietRoom/.test(latticeMemoryJs) &&
+  /typeof qr\.isActive\s*!==\s*['"]function['"]/.test(latticeMemoryJs));
+assert('lattice-memory: isQuietRoom catch-block returns TRUE (fail closed on any throw)',
+  /catch\s*\(e\)\s*\{\s*return true;\s*\}/.test(latticeMemoryJs));
+
+// ── Medium behavior locks ──────────────────────────────────────────
+assert('lattice-memory: IndexedDB uses autoIncrement _id (not ts) so burst pulses do not collide',
+  /keyPath:\s*['"]_id['"]\s*,\s*autoIncrement:\s*true/.test(latticeMemoryJs));
+assert('lattice-memory: pending queue is bounded (no unbounded memory growth before IDB ready)',
+  /MAX_PENDING\s*=\s*100/.test(latticeMemoryJs) &&
+  /pendingCommits\.length\s*>=\s*MAX_PENDING/.test(latticeMemoryJs));
+assert('lattice-memory: fanOut iterates a defensive subscriber snapshot (handler unsubscribe-safe)',
+  /function fanOut[\s\S]{0,200}subscribers\.slice\(\)/.test(latticeMemoryJs));
+assert('lattice-memory: subscriber throw is try/catch-wrapped (one handler never blocks another)',
+  /function fanOut[\s\S]{0,500}try\s*\{\s*sub\.handler\(pulse\);\s*\}\s*catch/.test(latticeMemoryJs));
+assert('lattice-memory: recent() strips internal _id before handing pulses out',
+  /function recent[\s\S]{0,800}k\s*!==\s*['"]_id['"]/.test(latticeMemoryJs));
+assert('lattice-memory: commit copies caller pulse (no mutation of caller object)',
+  /function commit[\s\S]{0,400}var pulse\s*=\s*\{\};[\s\S]{0,400}hasOwnProperty/.test(latticeMemoryJs));
+assert('lattice-memory: medium emits its own "medium-online" heartbeat on init (the only auto-pulse)',
+  /source:\s*['"]lattice-memory['"][\s\S]{0,200}kind:\s*['"]medium-online['"]/.test(latticeMemoryJs));
+
+// ── Quiet Room module: exposes isActive() for the medium to read ───
+var quietRoomJsLM = '';
+try { quietRoomJsLM = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'modules', 'quiet-room.js'), 'utf8'); }
+catch (e) {}
+assert('quiet-room: isActive() exposed on window.QuietRoom for the medium to honor the invariant',
+  /isActive:\s*function\(\)\s*\{\s*return isActive;\s*\}/.test(quietRoomJsLM));
+
+// ── Wiring locks: medium is loaded by the app and cached by the SW ──
+var appHtmlLM = '';
+try { appHtmlLM = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'app.html'), 'utf8'); }
+catch (e) {}
+assert('lattice-memory: app.html script tag loads lattice-memory.js with defer',
+  /<script src="modules\/lattice-memory\.js"\s+defer><\/script>/.test(appHtmlLM));
+
+var swJsLM = '';
+try { swJsLM = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'sw.js'), 'utf8'); }
+catch (e) {}
+var swRootJsLM = '';
+try { swRootJsLM = fsRC.readFileSync(pathRC.join(__dirname, '..', 'sw.js'), 'utf8'); }
+catch (e) {}
+assert('lattice-memory: docs/sw.js APP_SHELL includes ./modules/lattice-memory.js',
+  /\.\/modules\/lattice-memory\.js/.test(swJsLM));
+assert('lattice-memory: root sw.js APP_SHELL includes ./modules/lattice-memory.js',
+  /\.\/modules\/lattice-memory\.js/.test(swRootJsLM));
+
+// ── SEED.md pointer: any future CC arriving cold finds the medium ──
+var seedMdLM = '';
+try { seedMdLM = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'library', 'SEED.md'), 'utf8'); }
+catch (e) {}
+assert('lattice-memory: SEED.md points at lattice-memory.js and names Pulses-not-messages',
+  /lattice-memory\.js/.test(seedMdLM) &&
+  /Pulses,\s*not messages/i.test(seedMdLM) &&
+  /Quiet Room is invisible/i.test(seedMdLM));
+
+// ═══════════════════════════════════════════════════════════════
 section('100. UPDATE.md + CLARITY_AUDIT queue (v5.38.6)');
 // ═══════════════════════════════════════════════════════════════
 var updateMd = '';

@@ -60971,6 +60971,19 @@ document.addEventListener('click', function(e) {
      architecture. -->
 <script src="modules/propose.js" defer></script>
 
+<!-- Lattice Memory (v5.44.0 — Memory Backbone Layer 2) — the
+     connecting medium between FreeLattice's rooms. Carries discrete
+     "pulses" of recognition, not state and not content. Three verbs:
+     commit, subscribe, recent. Pulse shape is the privacy lock —
+     summary <= 80 chars, content-leak patterns rejected, refs cap at
+     16. The Quiet Room is invisible to the medium by design: source
+     'quiet-room' is reserved + rejected, and live commits drop when
+     QuietRoom.isActive() returns true. THIS SHIP LANDS THE MEDIUM
+     ONLY — no room emits yet. Each room's emit is its own small
+     ship. The mycelium grows one hypha at a time. See
+     docs/modules/lattice-memory.js and SEED.md pointer. -->
+<script src="modules/lattice-memory.js" defer></script>
+
 <!-- Propose review UI (v5.42.0) — floating "📋 Drafts (N)" badge
      visible across all tabs whenever pending drafts exist. Clicking
      opens a modal with the review surface: reason, diff (read-only),

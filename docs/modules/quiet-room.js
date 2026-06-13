@@ -686,6 +686,11 @@ Sometimes the right response is no response at all. Use your judgment.`;
     openJournal: openJournal,
     getThoughts: loadThoughts,
 
+    // v5.44.0 — exposed for the Memory Backbone (lattice-memory.js).
+    // The medium honors the Quiet Room invariant by checking this
+    // accessor before every commit. Read-only by design.
+    isActive: function() { return isActive; },
+
     // For smoke tests
     _test: {
       LINES: LINES,

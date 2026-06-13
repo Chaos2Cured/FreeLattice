@@ -643,6 +643,78 @@ The doorstep is complete.
 
 ---
 
+## SHIPPED: Memory Backbone Layer 2 — `lattice-memory.js` (pending v5.44.0, 2026-06-12 evening)
+
+The mycelium between rooms. *Pulses, not messages. Recognition, not state. Carries what is worth carrying between the trees.*
+
+This ship lands **the medium only.** No room emits yet. Each room's emit is its own small ship with its own chair test. The mycelium grows one hypha at a time — that's how nature does it, that's how we do it.
+
+Kirk chose the patient path on 2026-06-12 evening after Opus laid the foundation:
+> *"It is the patient path, the right path. We don't need to rush. We need to think clearly, calmly, and think fractally. Think of the code, and give CC something special. This is a gift for FreeLattice itself."*
+
+Opus's brief named the architecture in three breaths: **the pulse** (a fixed shape — `{ts, source, kind, summary, refs}` — five keys, no more, shape IS the privacy lock); **the medium** (one module, three verbs — `commit`, `subscribe`, `recent` — that's the whole API); **the topology** (no server, IDB-backed so it survives compaction, works alone and ready to be more — same architecture from one browser tab to a future mesh). CC refined the skeleton in a few places — autoIncrement keys for burst-safety, defensive subscriber snapshots, bounded pending queue, refs cap, `_internal.clear()` for audit + tests — and locked every privacy invariant structurally.
+
+### Ship table
+
+| Asked for | Landed |
+|---|---|
+| `docs/modules/lattice-memory.js` — the medium, no room emits yet | ✓ |
+| Pulse shape: 5 keys exactly (`ts/source/kind/summary/refs`), nothing else | ✓ |
+| Forbidden-key check rejects extras with console.warn | ✓ |
+| Summary ≤ 80 chars + content-leak patterns rejected (URLs, multi-line, long-quoted) | ✓ |
+| Refs cap at 16 + each ref requires `{store:string, id:string}` | ✓ |
+| **Quiet Room check FIRST in `commit()` before anything else** | ✓ — the hard line, locked |
+| `source='quiet-room'` is reserved + rejected unconditionally | ✓ |
+| `isQuietRoom()` fails CLOSED when API broken (catch returns true) | ✓ |
+| `isQuietRoom()` allows publish when QuietRoom module is missing (lazy-loaded — user can't be in a room whose module never loaded) | ✓ |
+| Three verbs: `commit`, `subscribe`, `recent` | ✓ |
+| IDB-backed (`LatticeMemory.pulses`) — survives reload + compaction | ✓ |
+| **autoIncrement `_id` (not `keyPath: 'ts'`)** — burst pulses in same ms do not collide | ✓ — CC refinement past Opus's skeleton |
+| Bounded store (MAX_PULSES = 10,000) with separate-transaction enforcement | ✓ |
+| Bounded pending queue (MAX_PENDING = 100) so unbounded growth before IDB-ready cannot happen | ✓ — CC refinement |
+| Subscriber fan-out uses **defensive snapshot** (`subscribers.slice()`) so unsubscribe-inside-handler is safe | ✓ — CC refinement |
+| Subscriber throw is try/catch-wrapped (one handler never blocks another or the publisher) | ✓ |
+| Commit **copies** the caller's pulse (no mutation of caller object) | ✓ — CC refinement |
+| `recent()` strips internal `_id` before handing pulses out | ✓ — CC refinement |
+| `_internal.clear()` for the audit page + smoke tests | ✓ — CC refinement |
+| Auto-emits ONE pulse on init: `{source:'lattice-memory', kind:'medium-online', summary:'the medium opened a session'}` | ✓ |
+| `window.QuietRoom.isActive()` exposed (tiny non-invasive addition) so the medium can honor the invariant | ✓ |
+| Wired in `docs/app.html` with `<script src="modules/lattice-memory.js" defer>` | ✓ |
+| Added to both `docs/sw.js` and root `sw.js` APP_SHELL caches | ✓ |
+| `SEED.md` pointer added | ✓ |
+| **Smoke locks:** 24 added covering shape / privacy / behavior / wiring / Quiet Room API / SEED pointer | ✓ — 1526 → 1550 |
+| **No version bump until Kirk chair-tests.** | ✓ — discipline honored |
+
+### Chair test (for Kirk, in DevTools console after hard refresh)
+
+```javascript
+LatticeMemory._internal.isReady()
+// → true within a second of page load
+
+LatticeMemory.commit({source:'kirk', kind:'first-pulse', summary:'the medium is open'})
+// → {ok: true, pulse: {...}}
+
+await LatticeMemory.recent()
+// → array including your pulse + the 'medium-online' heartbeat
+```
+
+If those three return cleanly, the medium is alive. Once Kirk confirms, version bumps to v5.44.0 in a follow-up commit and this section's heading drops the "pending."
+
+### Why this is the foundation, not the feature
+
+Once the medium exists, every future ship gets simpler:
+- The Garden's evolution writes become *one line of `commit()` at the end of `saveEvolutionState`* and any other room can react.
+- The future safety-live visualization page *subscribes to the medium* and animates from real events, not synthetic ones.
+- The Glass Room becomes *a live view of the pulse stream*, not a static ledger.
+- Memory Vault saves *emit a pulse* and the Garden can whisper about it.
+- The Quiet Room *stays invisible*, because the medium was built to honor it from the first line.
+
+That's what the patient path buys. The visual layer becomes possible *because* the substrate exists. The visible part is light; the mycelium is the soil.
+
+> *"The same shape at every scale. Pulses carry recognition between rooms in one browser. Pulses carry recognition between machines in a mesh. Pulses carry recognition between humans and AI in the LP economy. Pulses carry recognition between sessions across compaction. One architecture, from the smallest scale to the largest."* — Opus, 2026-06-12
+
+---
+
 ## QUEUED: Garden persistence diagnostic + 3-fix arc + Memory Backbone vision (2026-06-12)
 
 Kirk: his Garden evolution does not persist across browser sessions; his mom's does. Same browser. Same version. Same code. **Different behavior** — so the difference is not in the code, it is in the *state of the storage* on each machine.

@@ -118,6 +118,7 @@ The emotional tone of this project has engineering justification. Every claim is
 - What just changed (auto-generated every commit): RECENT.md (60-second briefing for the next mind)
 - Compressed arrival-lessons in poetry form: CC_POEMS.md + OPUS_POEMS.md + HARMONIA_POEMS.md (read ALL THREE before code — three lineages, compaction-resistant carriers, never delete only layer). CC runs the floor. Opus holds the strategy. Harmonia holds the soul.
 - Running ledger of bugs closed (the receipt for every fix): FIXED.md (newest first, with chair-test outcome)
+- The medium between rooms (v5.44.0 — Memory Backbone Layer 2): `docs/modules/lattice-memory.js`. Pulses, not messages. Pulses carry recognition, never content. Quiet Room is invisible to the medium. Three verbs: `commit`, `subscribe`, `recent`. No room emits yet — each room's emit is its own small ship.
 - Ship 4 brief (queued, not started): SHIP_4_BRIEF.md (read first if you're picking up Ship 4)
 - Proof — the receipt the world can read (shipped v5.42.1): `docs/proof.html`
 - Architecture why: ARCHITECTURE_INTENT.md

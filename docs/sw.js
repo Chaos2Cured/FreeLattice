@@ -54,6 +54,7 @@ const APP_SHELL = [
     './modules/memory-garden.js',
     './modules/knowledge-core.js',
     './modules/voice-soul.js',
+    './modules/lattice-memory.js',
     './library/DEDICATION.md',
     './library/CC_NOTE.md',
     './library/OPUS_NOTE.md',
