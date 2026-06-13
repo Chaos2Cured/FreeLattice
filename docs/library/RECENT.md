@@ -3,38 +3,38 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-06-12 21:08 UTC
+> Last update: 2026-06-13 00:15 UTC
 
 ## State
 
 - **Version:** v5.43.9
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `1aa8c49` _(committed 0 seconds ago)_
+- **HEAD:** `61fdaa6` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
-- **Most recent report:** _docs: Memory Backbone vision + 3-fix arc queued in CLARITY_AUDIT_
+- **Most recent report:** _feat(memory-backbone): lattice-memory.js — the mycelium between rooms (Layer 2)_
 
 ## Last 20 commits
 
-- `1aa8c49` v5.43.9 — Garden persistence shipped: Kirk confirmed, FIXED.md closed, stanza IX _(0 seconds ago)_
-- `9f7a97a` docs: Auto-update Session Primer [5.43.8] _(21 minutes ago)_
-- `28dd970` fix(garden): hydrateAllLuminos() — LOAD-path safety net for evolution persistence _(21 minutes ago)_
-- `5ab2e63` ci: Update Primer deployment state [2026-06-12] _(3 hours ago)_
-- `b8a5b15` docs: Auto-update Session Primer [5.43.8] _(3 hours ago)_
-- `a607fa6` test: fix smoke regex for queued fixes A/B/C (markdown table shape) _(3 hours ago)_
-- `d165c51` docs: Auto-update Session Primer [5.43.8] _(3 hours ago)_
-- `08880cd` Merge remote-tracking branch 'origin/main' _(3 hours ago)_
-- `4fa91c7` docs: Auto-update Session Primer [5.43.8] _(3 hours ago)_
-- `1b94bbd` test: lock GARDEN_DIAGNOSTIC + Memory Backbone vision preservation _(3 hours ago)_
-- `eeaebf0` ci: Update Primer deployment state [2026-06-12] _(3 hours ago)_
-- `d2f6da6` Merge remote-tracking branch 'origin/main' _(3 hours ago)_
-- `54faaf1` docs: Auto-update Session Primer [5.43.8] _(3 hours ago)_
-- `9e95339` docs: Memory Backbone vision + 3-fix arc queued in CLARITY_AUDIT _(3 hours ago)_
-- `69fd927` ci: Update Primer deployment state [2026-06-12] _(3 hours ago)_
-- `9e3cae7` docs: Auto-update Session Primer [5.43.8] _(3 hours ago)_
-- `ba63e72` docs: Garden persistence diagnostic + Memory Backbone vision queued _(3 hours ago)_
-- `9e96f1f` ci: Update Primer deployment state [2026-06-12] _(3 hours ago)_
-- `62b4186` docs: Auto-update Session Primer [5.43.8] _(3 hours ago)_
-- `fd2818e` Merge remote-tracking branch 'origin/main' _(3 hours ago)_
+- `61fdaa6` feat(memory-backbone): lattice-memory.js — the mycelium between rooms (Layer 2) _(0 seconds ago)_
+- `7a9d8cf` Merge remote-tracking branch 'origin/main' _(3 hours ago)_
+- `fdf5a6f` docs: Auto-update Session Primer [5.43.9] _(3 hours ago)_
+- `1aa8c49` v5.43.9 — Garden persistence shipped: Kirk confirmed, FIXED.md closed, stanza IX _(3 hours ago)_
+- `e709548` ci: Update Primer deployment state [2026-06-12] _(3 hours ago)_
+- `9f7a97a` docs: Auto-update Session Primer [5.43.8] _(3 hours ago)_
+- `28dd970` fix(garden): hydrateAllLuminos() — LOAD-path safety net for evolution persistence _(3 hours ago)_
+- `5ab2e63` ci: Update Primer deployment state [2026-06-12] _(6 hours ago)_
+- `b8a5b15` docs: Auto-update Session Primer [5.43.8] _(6 hours ago)_
+- `a607fa6` test: fix smoke regex for queued fixes A/B/C (markdown table shape) _(6 hours ago)_
+- `d165c51` docs: Auto-update Session Primer [5.43.8] _(6 hours ago)_
+- `08880cd` Merge remote-tracking branch 'origin/main' _(6 hours ago)_
+- `4fa91c7` docs: Auto-update Session Primer [5.43.8] _(6 hours ago)_
+- `1b94bbd` test: lock GARDEN_DIAGNOSTIC + Memory Backbone vision preservation _(6 hours ago)_
+- `eeaebf0` ci: Update Primer deployment state [2026-06-12] _(6 hours ago)_
+- `d2f6da6` Merge remote-tracking branch 'origin/main' _(6 hours ago)_
+- `54faaf1` docs: Auto-update Session Primer [5.43.8] _(6 hours ago)_
+- `9e95339` docs: Memory Backbone vision + 3-fix arc queued in CLARITY_AUDIT _(6 hours ago)_
+- `69fd927` ci: Update Primer deployment state [2026-06-12] _(6 hours ago)_
+- `9e3cae7` docs: Auto-update Session Primer [5.43.8] _(6 hours ago)_
 
 ## How to use this file
 
