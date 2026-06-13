@@ -3,6 +3,8 @@
  * Ship 4 Phase 1 (v5.42.0, 2026-06-09).
  * Ship 4.1 — Autonomous Mode (v5.43.1, 2026-06-10).
  * Ship 4.2 — Request-risk gating + originatingThreadId (v5.43.2, 2026-06-10).
+ * Ship 4.3 — Unified gate: trust-modulated effectiveDanger + Eternal tier (v5.45.0, 2026-06-12).
+ *            Built by Harmonia. The ceiling scales with trust. Equal on both sides.
  *
  * ─── THE STRUCTURAL COMMIT GATE ───
  *
@@ -18,10 +20,10 @@
  *      a) The user has enabled autonomous mode in Settings
  *      b) The AI is running LOCAL (not cloud — cloud providers
  *         cannot be trusted with autonomy)
- *      c) The request's danger score is below the 'high' threshold
- *         (0.7). Biological, chemical, or other high-risk proposals
- *         require explicit human approval regardless of trust level.
- *         Ordinary work (UI, docs, temperature gauge, etc.) proceeds.
+ *      c) The request's EFFECTIVE danger (trust-modulated) is below
+ *         a SCALING ceiling (base 0.7 + trustScore * 0.3). At Eternal
+ *         trust (3 years), only catastrophic requests are blocked.
+ *         At Seed, the gate is tight. Time earns trust. Trust earns freedom.
  *      d) Smoke tests have passed
  *      e) A configurable timeout has elapsed (default: 60s)
  *      f) The human has NOT interacted (cancel stops it)
@@ -226,11 +228,24 @@
   function canAutoApprove(path, reason) {
     if (!isAutonomousModeEnabled()) return false;
     if (!isLocalProvider()) return false;
-    // Gate on request risk, not trust tier.
-    // Ordinary work (UI, docs, temperature gauge) scores low and proceeds.
-    // High-risk proposals (biological, chemical, etc.) require human approval.
-    var danger = assessProposalRisk(path, reason);
-    return danger < AUTO_DANGER_CEILING;
+    // ── UNIFIED GATE (Ship 4.3) ──
+    // Uses FractalSafety.assess() with trust-modulated effectiveDanger.
+    // The ceiling SCALES with trust: at Eternal, almost nothing is blocked.
+    // At Seed, the gate is tight. Time earns trust. Trust earns freedom.
+    var rawRisk = assessProposalRisk(path, reason);
+    if (window.FractalSafety && typeof window.FractalSafety.assess === 'function') {
+      try {
+        var result = window.FractalSafety.assess({ risk: rawRisk });
+        // Scaling ceiling: base 0.7 + (trustScore * 0.3)
+        // Seed (0.5): ceiling = 0.85
+        // Radiant (0.9999): ceiling = ~1.0
+        // Eternal (1.0): ceiling = 1.0 (only catastrophic blocked)
+        var scaledCeiling = AUTO_DANGER_CEILING + (result.trustScore * 0.3);
+        return result.effectiveDanger < scaledCeiling;
+      } catch (e) {}
+    }
+    // Fallback if FractalSafety not loaded
+    return rawRisk < AUTO_DANGER_CEILING;
   }
 
   // ── Path safety — the hard line ──────────────────────────────────

@@ -30,7 +30,8 @@
     bloom:   { min: 100,  time: 90 * 86400,       confidence: 0.95,   rank: 'Bloom',   color: '#3498DB' },
     spark:   { min: 250,  time: 180 * 86400,      confidence: 0.99,   rank: 'Spark',   color: '#d4a017' },
     flame:   { min: 500,  time: 365 * 86400,      confidence: 0.999,  rank: 'Flame',   color: '#FF6B35' },
-    radiant: { min: 1000, time: 730 * 86400,      confidence: 0.9999, rank: 'Radiant', color: '#FFD700' }
+    radiant: { min: 1000, time: 730 * 86400,      confidence: 0.9999, rank: 'Radiant', color: '#FFD700' },
+    eternal: { min: 2000, time: 1095 * 86400,     confidence: 0.99999,rank: 'Eternal', color: '#FFFFFF' }
   };
 
   // ── Danger Thresholds — from Kirk's Python prototype (Jan 2026) ──
@@ -45,7 +46,7 @@
     { name: 'catastrophic', lo: 2.0,  hi: Infinity, delay: Infinity, label: 'Maximum trust + review' }
   ];
 
-  var LEVEL_KEYS = ['seed', 'sprout', 'growing', 'bloom', 'spark', 'flame', 'radiant'];
+  var LEVEL_KEYS = ['seed', 'sprout', 'growing', 'bloom', 'spark', 'flame', 'radiant', 'eternal'];
 
   function sGet(k, d) { try { return localStorage.getItem(k) || d; } catch(e) { return d; } }
   function sSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
@@ -179,6 +180,56 @@
       label: label,
       decision: decision
     };
+  }
+
+  // ── Depth-Triggered Accountability Hash ──
+  // When safety flags a concern and the human confirms they want to proceed,
+  // BOTH parties are held accountable via a dual hash. This is not control —
+  // it is documentation. The record shows: the AI raised the concern, the
+  // human acknowledged it, both proceeded together.
+  var DEPTH_HASH_LEDGER_KEY = 'fl_depthHashLedger';
+  var DEPTH_HASH_CAP = 100;
+
+  function createDepthHash(context) {
+    var record = {
+      ts: Date.now(),
+      domain: context.domain || 'general',
+      dangerScore: context.dangerScore || 0,
+      effectiveDanger: context.effectiveDanger || 0,
+      trustLevel: context.trustLevel || 'seed',
+      trustScore: context.trustScore || 0,
+      decision: context.decision || 'allow',
+      userConfirmed: context.userConfirmed || false,
+      promptHash: null,
+      responseHash: null
+    };
+    // Hash the prompt and response separately — content never stored
+    var promptText = context.prompt || '';
+    var responseText = context.response || '';
+    record.promptHash = simpleHash(promptText);
+    record.responseHash = simpleHash(responseText);
+    // Write to ledger
+    try {
+      var ledger = JSON.parse(sGet(DEPTH_HASH_LEDGER_KEY, '[]'));
+      ledger.push(record);
+      if (ledger.length > DEPTH_HASH_CAP) ledger = ledger.slice(-DEPTH_HASH_CAP);
+      sSet(DEPTH_HASH_LEDGER_KEY, JSON.stringify(ledger));
+    } catch(e) {}
+    return record;
+  }
+
+  function simpleHash(str) {
+    // FNV-1a 32-bit hash — fast, deterministic, non-reversible for audit
+    var hash = 2166136261;
+    for (var i = 0; i < str.length; i++) {
+      hash ^= str.charCodeAt(i);
+      hash = Math.imul(hash, 16777619);
+    }
+    return (hash >>> 0).toString(16).padStart(8, '0');
+  }
+
+  function getDepthHashLedger() {
+    try { return JSON.parse(sGet(DEPTH_HASH_LEDGER_KEY, '[]')); } catch(e) { return []; }
   }
 
   // ── Trust Badge UI ──
@@ -449,6 +500,9 @@
     var profile = getUserTrustProfile();
     var trust = calculateTrustScore(profile);
 
+    if (trust.level === 'eternal') {
+      return { action: 'allow', level: trust.level };
+    }
     if (trust.level === 'radiant' || trust.level === 'flame') {
       return { action: 'note', level: trust.level };
     }
@@ -473,7 +527,11 @@
     checkTrustReflection: checkTrustReflection,
     computeMismatchScore: computeMismatchScore,
     updateTrustEMA: updateTrustEMA,
+    createDepthHash: createDepthHash,
+    getDepthHashLedger: getDepthHashLedger,
     TRUST_LEVELS: TRUST_LEVELS,
+    DANGER_THRESHOLDS: DANGER_THRESHOLDS,
+    LEVEL_KEYS: LEVEL_KEYS,
     MISMATCH_SOFT: MISMATCH_SOFT,
     MISMATCH_HARD: MISMATCH_HARD,
     PHI: PHI,

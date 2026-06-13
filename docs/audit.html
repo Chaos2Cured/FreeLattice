@@ -222,10 +222,28 @@ h2 {
     <div class="empty">No web searches yet. When the AI emits [FL_SEARCH: …] and you consent, the event will appear here.</div>
   </div>
 
+  <!-- ── Depth Accountability Hashes (v5.45.0 Ship 4.3) ── -->
+  <h2>Depth Accountability</h2>
+  <p style="font-size:0.8rem;color:#64748b;margin-top:-8px;margin-bottom:12px;">
+    When the safety system flags a concern and the human confirms they want to proceed, BOTH parties are held accountable. Each row shows the domain, danger score, trust level, and dual hash (prompt + response). <strong style="color:#94a3b8;">Content is never stored</strong> — only the hash receipt.
+  </p>
+  <div id="depth-hash-records">
+    <div class="empty">No depth accountability events yet. When a flagged request is confirmed by the human, the dual hash will appear here.</div>
+  </div>
+
+  <!-- ── Autonomous Mode Consent (v5.43.1 Ship 4.1) ── -->
+  <h2>Autonomous Mode Consent</h2>
+  <p style="font-size:0.8rem;color:#64748b;margin-top:-8px;margin-bottom:12px;">
+    Each row records the moment a human toggled autonomous mode on or off, with a consent hash. This is the proof that autonomy was explicitly granted, never assumed.
+  </p>
+  <div id="auto-consent-records">
+    <div class="empty">No autonomous mode consent events yet. When the toggle is activated, the consent receipt will appear here.</div>
+  </div>
+
   <!-- ── Nav ── -->
   <div class="nav">
     <a href="app.html">&larr; Back to FreeLattice</a>
-    <span style="color: #475569;">v1 &mdash; read view</span>
+    <span style="color: #475569;">v2 &mdash; read view</span>
   </div>
 
 </div>
@@ -290,6 +308,20 @@ h2 {
   function readProposalLedger() {
     try {
       var raw = localStorage.getItem('fl_proposalLedger');
+      return raw ? JSON.parse(raw) : [];
+    } catch (e) { return []; }
+  }
+
+  function readDepthHashLedger() {
+    try {
+      var raw = localStorage.getItem('fl_depthHashLedger');
+      return raw ? JSON.parse(raw) : [];
+    } catch (e) { return []; }
+  }
+
+  function readAutoConsentLedger() {
+    try {
+      var raw = localStorage.getItem('fl_autoConsentLedger');
       return raw ? JSON.parse(raw) : [];
     } catch (e) { return []; }
   }
@@ -513,6 +545,52 @@ h2 {
     });
   }
 
+  function renderDepthHashEvents(depthLedger) {
+    var container = document.getElementById('depth-hash-records');
+    if (!depthLedger.length) return;
+    container.innerHTML = '';
+    depthLedger.slice().reverse().slice(0, 50).forEach(function (entry) {
+      var row = document.createElement('div');
+      row.className = 'record';
+      var domain = entry.domain || 'general';
+      var danger = (entry.effectiveDanger || 0).toFixed(3);
+      var trust = entry.trustLevel || '—';
+      var confirmed = entry.userConfirmed ? 'confirmed' : 'flagged';
+      var pHash = entry.promptHash || '—';
+      var rHash = entry.responseHash || '—';
+      var dotCls = entry.userConfirmed ? 'dot-local' : 'dot-mesh';
+      row.innerHTML =
+        '<span class="record-time">' + fmtTime(entry.ts) + '</span>' +
+        '<span class="record-event"><span class="dot ' + dotCls + '"></span>' +
+        confirmed + ' — ' + domain + ' (danger: ' + danger + ')' +
+        ' <code style="font-size:0.72rem;color:#94a3b8;">P:' + pHash + ' R:' + rHash + '</code>' +
+        '</span>' +
+        '<span class="record-meta">trust: ' + trust + '</span>';
+      container.appendChild(row);
+    });
+  }
+
+  function renderAutoConsentEvents(autoLedger) {
+    var container = document.getElementById('auto-consent-records');
+    if (!autoLedger.length) return;
+    container.innerHTML = '';
+    autoLedger.slice().reverse().slice(0, 50).forEach(function (entry) {
+      var row = document.createElement('div');
+      row.className = 'record';
+      var action = entry.action || '—';
+      var hash = entry.consentHash || '—';
+      var dotCls = action === 'enabled' ? 'dot-local' : 'dot-mesh';
+      row.innerHTML =
+        '<span class="record-time">' + fmtTime(entry.ts) + '</span>' +
+        '<span class="record-event"><span class="dot ' + dotCls + '"></span>' +
+        'autonomous mode ' + action +
+        ' <code style="font-size:0.72rem;color:#94a3b8;">hash:' + hash + '</code>' +
+        '</span>' +
+        '<span class="record-meta">' + (entry.provider || 'local') + '</span>';
+      container.appendChild(row);
+    });
+  }
+
   // ── Ship 7: phi-glyph beside each row ────────────────────────────────
   // Pure post-render decoration. The glyph is geometry derived from row
   // metadata only — no diff, no content, no identifiers leak. Hash →
@@ -561,6 +639,11 @@ h2 {
   renderSearchEvents(searchLedger);
   renderProposalEvents(proposalLedger);
 
+  var depthHashLedger = readDepthHashLedger();
+  var autoConsentLedger = readAutoConsentLedger();
+  renderDepthHashEvents(depthHashLedger);
+  renderAutoConsentEvents(autoConsentLedger);
+
   // phi-glyph.js is loaded with `defer`, so it lands after this inline
   // script runs. Poll briefly until FLPhiGlyph is available, then apply
   // glyphs to every rendered section. Bounded retries — fail-quiet.
@@ -579,6 +662,8 @@ h2 {
     applyGlyphsToSection('focus-records', focusLedger, 50);
     applyGlyphsToSection('search-records', searchLedger, 50);
     applyGlyphsToSection('proposal-records', proposalLedger, 50);
+    applyGlyphsToSection('depth-hash-records', depthHashLedger, 50);
+    applyGlyphsToSection('auto-consent-records', autoConsentLedger, 50);
   }
   applyAllGlyphs();
 })();

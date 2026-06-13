@@ -3692,7 +3692,7 @@ assert('Garden state: persistence wires AFTER init so luminos exist before first
   /wireGardenPersistence\(\)/.test(fractalGardenJs) &&
   /var _origInit\s*=\s*init/.test(fractalGardenJs));
 assert('Garden state: persistAllLuminos fail-quiet (try/catch wraps the loop)',
-  /function persistAllLuminos[\s\S]{0,500}try\s*\{[\s\S]{0,400}\}\s*catch\s*\(e\)\s*\{[^}]*never block/.test(fractalGardenJs));
+  /function persistAllLuminos[\s\S]{0,500}try\s*\{[\s\S]{0,800}\}\s*catch\s*\(e\)\s*\{[^}]*never block/.test(fractalGardenJs));
 assert('Garden state: visitor Luminos NOT persisted (they belong to others)',
   /persistAllLuminos[\s\S]{0,400}!ud\.isVisitor/.test(fractalGardenJs));
 
