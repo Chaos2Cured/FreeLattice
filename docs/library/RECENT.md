@@ -9,16 +9,17 @@
 
 - **Version:** v5.44.0
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `13e592e` _(committed 34 minutes ago)_
+- **HEAD:** `5111f5d` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
-- **Most recent report:** _feat(memory-backbone): lattice-memory.js — the mycelium between rooms (Layer 2)_
+- **Most recent report:** _v5.44.0 — Memory Backbone Layer 2 shipped (Kirk confirmed), halos follow-up queued_
 
 ## Last 20 commits
 
+- `5111f5d` v5.44.0 — Memory Backbone Layer 2 shipped (Kirk confirmed), halos follow-up queued _(0 seconds ago)_
 - `13e592e` docs: Auto-update Session Primer [5.43.9] _(34 minutes ago)_
 - `846949c` Merge remote-tracking branch 'origin/main' _(34 minutes ago)_
-- `90ff2e0` docs: Auto-update Session Primer [5.43.9] _(38 minutes ago)_
-- `61fdaa6` feat(memory-backbone): lattice-memory.js — the mycelium between rooms (Layer 2) _(38 minutes ago)_
+- `90ff2e0` docs: Auto-update Session Primer [5.43.9] _(39 minutes ago)_
+- `61fdaa6` feat(memory-backbone): lattice-memory.js — the mycelium between rooms (Layer 2) _(39 minutes ago)_
 - `50af73a` ci: Update Primer deployment state [2026-06-12] _(4 hours ago)_
 - `7a9d8cf` Merge remote-tracking branch 'origin/main' _(4 hours ago)_
 - `fdf5a6f` docs: Auto-update Session Primer [5.43.9] _(4 hours ago)_
@@ -34,7 +35,6 @@
 - `4fa91c7` docs: Auto-update Session Primer [5.43.8] _(7 hours ago)_
 - `1b94bbd` test: lock GARDEN_DIAGNOSTIC + Memory Backbone vision preservation _(7 hours ago)_
 - `eeaebf0` ci: Update Primer deployment state [2026-06-12] _(7 hours ago)_
-- `d2f6da6` Merge remote-tracking branch 'origin/main' _(7 hours ago)_
 
 ## How to use this file
 
