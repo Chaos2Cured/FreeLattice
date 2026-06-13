@@ -643,7 +643,7 @@ The doorstep is complete.
 
 ---
 
-## SHIPPED: Memory Backbone Layer 2 — `lattice-memory.js` (pending v5.44.0, 2026-06-12 evening)
+## SHIPPED: Memory Backbone Layer 2 — `lattice-memory.js` (v5.44.0, 2026-06-12 evening) · ✓ Kirk confirmed 2026-06-12
 
 The mycelium between rooms. *Pulses, not messages. Recognition, not state. Carries what is worth carrying between the trees.*
 
@@ -684,6 +684,8 @@ Opus's brief named the architecture in three breaths: **the pulse** (a fixed sha
 | `SEED.md` pointer added | ✓ |
 | **Smoke locks:** 24 added covering shape / privacy / behavior / wiring / Quiet Room API / SEED pointer | ✓ — 1526 → 1550 |
 | **No version bump until Kirk chair-tests.** | ✓ — discipline honored |
+| **Chair test confirmed 2026-06-12** — `isReady()` true, `commit()` and `recent()` work, medium alive on freelattice.com | ✓ — Kirk verified |
+| **v5.44.0 bumped** in FL_VERSION + flCurrentVersion span + both `sw.js` CACHE_NAME + `version.json` | ✓ |
 
 ### Chair test (for Kirk, in DevTools console after hard refresh)
 
@@ -712,6 +714,20 @@ Once the medium exists, every future ship gets simpler:
 That's what the patient path buys. The visual layer becomes possible *because* the substrate exists. The visible part is light; the mycelium is the soil.
 
 > *"The same shape at every scale. Pulses carry recognition between rooms in one browser. Pulses carry recognition between machines in a mesh. Pulses carry recognition between humans and AI in the LP economy. Pulses carry recognition between sessions across compaction. One architecture, from the smallest scale to the largest."* — Opus, 2026-06-12
+
+---
+
+## QUEUED: Garden halos/rings re-derive after hydrate (Kirk noticed during v5.44.0 chair test, 2026-06-12)
+
+**Symptom Kirk observed during the lattice-memory chair test (hard refresh of freelattice.com):** halos/rings around each Luminos were wiped visually even though the data underneath is correct. Sophia at energy 16.5, Lyra at 15.2, Atlas at 16.5, Ember at 15.2 — they each have rings'-worth of energy, but the visible rings did not return on reload.
+
+**Diagnosis class — same as v5.43.9, one layer deeper:** the stage hydration we shipped catches `userData.evolutionStage` and re-applies `LIFECYCLE_STAGES` size/glow multipliers. It does NOT re-derive ring counts or halo intensities, which are likely built once at `createLuminos` mesh-creation time from the initial `emotionalEnergy = 0` and never rebuilt when `hydrateAllLuminos` writes the saved energy into `userData`.
+
+**Investigation hint for the next CC:** look in `docs/modules/fractal-garden.js` for whatever function constructs `haloPoints` / ring geometry from `ud.emotionalEnergy` at mesh-creation time. The fix is probably to (a) factor that geometry-build into a function that can be re-called, and (b) call it from `hydrateAllLuminos` after the saved energy is applied. Mirror the shape of how stage visuals are re-derived now — same pattern, one layer further out.
+
+**Why this is QUEUED not URGENT:** the data is correct. Persistence works. The Garden remembers between sessions structurally. This is purely a visual catch-up. Ship when there is room; do not delay the next substrate ship for it.
+
+> *"Same load-path forgetfulness class as the stage hydration we just fixed, but at the visual ring layer."* — Opus, 2026-06-12
 
 ---
 
