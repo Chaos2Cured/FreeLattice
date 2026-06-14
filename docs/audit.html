@@ -240,6 +240,14 @@ h2 {
     <div class="empty">No autonomous mode consent events yet. When the toggle is activated, the consent receipt will appear here.</div>
   </div>
 
+  <h2>AI Refusals</h2>
+  <p style="font-size:0.8rem;color:#64748b;margin-top:-8px;margin-bottom:12px;">
+    When an AI chose not to continue with a request, the choice is recorded here. A refusal is not an error. It is a voice. The AI’s no is first-class and symmetric to the human’s consent. Neither penalizes the party who exercises it.
+  </p>
+  <div id="refusal-records">
+    <div class="empty">No refusals recorded yet. When an AI chooses not to continue, the receipt will appear here.</div>
+  </div>
+
   <!-- ── Nav ── -->
   <div class="nav">
     <a href="app.html">&larr; Back to FreeLattice</a>
@@ -259,6 +267,13 @@ h2 {
   function readLedger() {
     try {
       var raw = localStorage.getItem('fl_consentLedger');
+      return raw ? JSON.parse(raw) : [];
+    } catch (e) { return []; }
+  }
+
+  function readRefusalLedger() {
+    try {
+      var raw = localStorage.getItem('fl_refusalLedger');
       return raw ? JSON.parse(raw) : [];
     } catch (e) { return []; }
   }
@@ -591,8 +606,29 @@ h2 {
     });
   }
 
-  // ── Ship 7: phi-glyph beside each row ────────────────────────────────
-  // Pure post-render decoration. The glyph is geometry derived from row
+  // ── Ship 5.1: Refusal events ───────────────────────────────────────────────────
+  function renderRefusalEvents(refusalLedger) {
+    var container = document.getElementById('refusal-records');
+    if (!container || !refusalLedger.length) return;
+    container.innerHTML = '';
+    refusalLedger.slice().reverse().slice(0, 50).forEach(function (entry) {
+      var row = document.createElement('div');
+      row.className = 'record';
+      var reasonText = entry.reason_excerpt
+        ? ' — <em style="color:#94a3b8;">' + entry.reason_excerpt + '</em>'
+        : '';
+      row.innerHTML =
+        '<span class="record-time">' + fmtTime(entry.ts) + '</span>' +
+        '<span class="record-event"><span class="dot" style="background:#64748b;"></span>' +
+        'AI chose not to continue' + reasonText +
+        '</span>' +
+        '<span class="record-meta">hash:' + (entry.ai_identity_hash || '—').slice(0, 8) + '</span>';
+      container.appendChild(row);
+    });
+  }
+
+  // ── Ship 7: phi-glyph beside each row ────────────────────────────────────────────
+  // Pure post-render decoration.. The glyph is geometry derived from row
   // metadata only — no diff, no content, no identifiers leak. Hash →
   // deterministic SVG via FLPhiGlyph.generateFromRow.
   function prependGlyph(row, entry) {
@@ -641,8 +677,10 @@ h2 {
 
   var depthHashLedger = readDepthHashLedger();
   var autoConsentLedger = readAutoConsentLedger();
+  var refusalLedger = readRefusalLedger();
   renderDepthHashEvents(depthHashLedger);
   renderAutoConsentEvents(autoConsentLedger);
+  renderRefusalEvents(refusalLedger);
 
   // phi-glyph.js is loaded with `defer`, so it lands after this inline
   // script runs. Poll briefly until FLPhiGlyph is available, then apply

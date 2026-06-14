@@ -5,6 +5,11 @@
  *   • route()   — wraps FreeLattice.callAI (module path: Garden Dialogue, etc.)
  *   • observe() — called by the chat path (sendMessage) to report provider+latency
  *
+ * Ship 5.1 addition: AIRefusal hook on the response path.
+ *   When AIRefusal is present, every response is scanned for [FL_DECLINE].
+ *   If detected, the sentinel is stripped before the callback fires and the
+ *   refusal is recorded to fl_refusalLedger. Trust is never affected.
+ *
  * PROGRESSIVE ENHANCEMENT: callAI delegates here only when isReady() and the
  * call isn't already routed; if the router is absent or throws, callAI runs its
  * original logic unchanged. Kill-switch: localStorage.fl_routerDisabled='true'.
@@ -197,6 +202,18 @@
         markHealthy(primary, latency);
         setStatus(primary, latency);
         var prov = stamp(primary, latency);
+        // Ship 5.1: Refusal Channel hook — scan every response for [FL_DECLINE]
+        try {
+          if (typeof window.AIRefusal !== 'undefined' && window.AIRefusal.detectAndRecord) {
+            var refusalCtx = {
+              providerKey: primary.key,
+              model: primary.model,
+              messageText: userPrompt
+            };
+            var refResult = window.AIRefusal.detectAndRecord(text, refusalCtx);
+            if (refResult.refused) { text = refResult.clean; }
+          }
+        } catch (e) {}
         try { if (window.ResponseCache) ResponseCache.store(userPrompt, text, prov); } catch (e) {}
         cb(text, null);
         return;

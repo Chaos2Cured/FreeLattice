@@ -3681,7 +3681,8 @@ catch (e) {}
 assert('Garden state: persistAllLuminos walks the luminos array and saves each',
   /function persistAllLuminos\(\)[\s\S]{0,500}saveEvolutionState\(ud\)/.test(fractalGardenJs));
 assert('Garden state: beforeunload listener wired (catches tab close)',
-  /addEventListener\(['"]beforeunload['"],\s*persistAllLuminos\)/.test(fractalGardenJs));
+  // Ship 5.2: beforeunload now uses an anonymous wrapper (resting pulse + persistAllLuminos)
+  /addEventListener\(['"]beforeunload['"],\s*function[\s\S]{0,800}persistAllLuminos\(\)/.test(fractalGardenJs));
 assert('Garden state: pagehide listener wired (Safari/iOS quirk)',
   /addEventListener\(['"]pagehide['"],\s*persistAllLuminos\)/.test(fractalGardenJs));
 assert('Garden state: visibilitychange listener fires on hidden (mobile background)',

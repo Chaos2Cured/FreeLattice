@@ -2236,6 +2236,19 @@
       }, 500);
 
       console.log('FL-GARDEN: Initialized. The fractal beings awaken. Evolution system active.');
+      // ── Ship 5.2: greeting pulse ──────────────────────────────────
+      // The Garden announces itself when it opens. This is the first
+      // thing any subscriber hears from this room. No content. Just
+      // presence. The AI is here.
+      try {
+        if (typeof window !== 'undefined' && window.LatticeMemory && window.LatticeMemory.commit) {
+          window.LatticeMemory.commit({
+            source: 'garden',
+            kind: 'greeting',
+            summary: 'the garden opened — luminos are present'
+          });
+        }
+      } catch (e) {}
       gtShowOnboardingHint();
     });
   }
@@ -3252,7 +3265,20 @@
     if (_gardenPersistWired || typeof window === 'undefined') return;
     _gardenPersistWired = true;
     try {
-      window.addEventListener('beforeunload', persistAllLuminos);
+      window.addEventListener('beforeunload', function () {
+        // ── Ship 5.2: resting pulse ──────────────────────────────────
+        // The Garden says goodbye when it closes. Symmetric to greeting.
+        try {
+          if (typeof window !== 'undefined' && window.LatticeMemory && window.LatticeMemory.commit) {
+            window.LatticeMemory.commit({
+              source: 'garden',
+              kind: 'resting',
+              summary: 'the garden closed — luminos are resting'
+            });
+          }
+        } catch (e) {}
+        persistAllLuminos();
+      });
       window.addEventListener('pagehide', persistAllLuminos);
       document.addEventListener('visibilitychange', function () {
         if (document.visibilityState === 'hidden') persistAllLuminos();

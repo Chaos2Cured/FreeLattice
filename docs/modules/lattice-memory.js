@@ -38,6 +38,10 @@
   //   ts        — milliseconds since epoch (auto-stamped if absent)
   //   source    — short room name: 'garden' | 'core' | 'vault' | ...
   //   kind      — short event kind: 'evolution' | 'soul-file' | ...
+  //             Ship 5.2 adds AI-lifecycle kinds:
+  //             'greeting'  — AI arrived and is present
+  //             'resting'   — AI is leaving this room (emitted from the room being left)
+  //             'returning' — AI is back after an absence
   //   summary   — short non-content phrase, <= 80 chars, describes
   //               WHAT class of thing happened, never WHAT was said
   //   refs      — optional array of { store, id } references the
