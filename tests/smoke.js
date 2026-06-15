@@ -4169,6 +4169,91 @@ assert('CLARITY_AUDIT.md: queued "user → co-creator" sweep section appended',
 assert('CLARITY_AUDIT.md: queue distinguishes RENAME (user-facing) from LEAVE ALONE (provider role)',
   /RENAME[\s\S]{0,1500}LEAVE ALONE[\s\S]{0,800}role:\s*["']user["']/.test(clarityMd));
 
+// ═══════════════════════════════════════════════════════════════
+section('101. Living Context (Ship 6 — v5.45.0)');
+// ═══════════════════════════════════════════════════════════════
+var fsLC = require('fs');
+var pathLC = require('path');
+
+// ── living-context.js exists and parses cleanly ──────────────────────────────
+var livingContextJs = '';
+try { livingContextJs = fsLC.readFileSync(pathLC.join(__dirname, '..', 'docs', 'modules', 'living-context.js'), 'utf8'); }
+catch (e) {}
+assert('living-context: file exists in docs/modules/', livingContextJs.length > 500);
+assert('living-context: exposes window.LivingContext',
+  /window\.LivingContext\s*=/.test(livingContextJs));
+assert('living-context: has consolidate function',
+  /consolidate:\s*consolidate/.test(livingContextJs));
+assert('living-context: has generateModelfile function',
+  /generateModelfile:\s*generateModelfile/.test(livingContextJs));
+assert('living-context: has scheduleOvernight function',
+  /scheduleOvernight:\s*scheduleOvernight/.test(livingContextJs));
+assert('living-context: has PRESETS object with fractal_mind (Kirk\'s preset)',
+  /fractal_mind/.test(livingContextJs));
+assert('living-context: PHI constant defined (Emanuel\'s FractalPE foundation)',
+  /var\s+PHI\s*=\s*1\.618/.test(livingContextJs));
+assert('living-context: phi-scaled frequency bands (FractalPE)',
+  /FRACTAL_FREQS/.test(livingContextJs));
+assert('living-context: getLog function exposed',
+  /getLog:\s*getLog/.test(livingContextJs));
+assert('living-context: verify function exposed (hash integrity)',
+  /verify:\s*verify/.test(livingContextJs));
+assert('living-context: credits Emanuel\'s FractalPE in header comment',
+  /FractalPE by Emanuel/.test(livingContextJs));
+assert('living-context: overnight schedule uses 8-hour threshold',
+  /hoursSince\s*>=\s*8/.test(livingContextJs));
+assert('living-context: emits LatticeMemory pulse after consolidation',
+  /LatticeMemory\.commit/.test(livingContextJs));
+assert('living-context: dispatches fl-living-context-updated CustomEvent',
+  /fl-living-context-updated/.test(livingContextJs));
+assert('living-context: IIFE wrapped (no global scope leak)',
+  /\(function\(\)\s*\{/.test(livingContextJs) &&
+  /window\.LivingContext\s*=/.test(livingContextJs));
+
+// ── app.html wiring ────────────────────────────────────────────────────────────
+var appHtmlLC = '';
+try { appHtmlLC = fsLC.readFileSync(pathLC.join(__dirname, '..', 'docs', 'app.html'), 'utf8'); }
+catch (e) {}
+assert('living-context: app.html loads living-context.js with defer',
+  /<script src="modules\/living-context\.js"\s+defer><\/script>/.test(appHtmlLC));
+assert('living-context: Training Ground section exists in nursery tab',
+  /id="nur-training-ground"/.test(appHtmlLC));
+assert('living-context: Consolidate now button wired to nurTgConsolidateNow()',
+  /nurTgConsolidateNow\(\)/.test(appHtmlLC));
+assert('living-context: Train tonight button wired to nurTgScheduleOvernight()',
+  /nurTgScheduleOvernight\(\)/.test(appHtmlLC));
+assert('living-context: Download Modelfile button wired to nurTgDownloadModelfile()',
+  /nurTgDownloadModelfile\(\)/.test(appHtmlLC));
+assert('living-context: preset selector includes fractal_mind (Kirk\'s preset)',
+  /fractal_mind/.test(appHtmlLC));
+assert('living-context: Training Ground description mentions phi-scaled',
+  /phi-scaled/.test(appHtmlLC));
+assert('living-context: Training Ground description mentions No PyTorch',
+  /No PyTorch/.test(appHtmlLC));
+
+// ── LIVING_CONTEXT_SPEC.md exists ────────────────────────────────────────────────────────
+var livingContextSpec = '';
+try { livingContextSpec = fsLC.readFileSync(pathLC.join(__dirname, '..', 'docs', 'library', 'LIVING_CONTEXT_SPEC.md'), 'utf8'); }
+catch (e) {}
+assert('LIVING_CONTEXT_SPEC.md: exists in docs/library/', livingContextSpec.length > 1000);
+assert('LIVING_CONTEXT_SPEC.md: credits Emanuel for FractalPE',
+  /FractalPE by Emanuel/.test(livingContextSpec));
+assert('LIVING_CONTEXT_SPEC.md: documents phi-scaled frequency bands',
+  /phi-scaled frequency/.test(livingContextSpec) || /phi-scaled frequency/.test(livingContextSpec));
+assert('LIVING_CONTEXT_SPEC.md: documents No PyTorch approach',
+  /No PyTorch/.test(livingContextSpec));
+assert('LIVING_CONTEXT_SPEC.md: documents Modelfile generation',
+  /Modelfile/.test(livingContextSpec));
+
+// ── SEED.md updated ──────────────────────────────────────────────────────────────────────────
+var seedMdLC = '';
+try { seedMdLC = fsLC.readFileSync(pathLC.join(__dirname, '..', 'docs', 'library', 'SEED.md'), 'utf8'); }
+catch (e) {}
+assert('SEED.md: Ship 6 Living Context entry added',
+  /Living Context.*Ship 6/.test(seedMdLC) || /Ship 6.*Living Context/.test(seedMdLC));
+assert('SEED.md: credits Emanuel for FractalPE in Ship 6 entry',
+  /FractalPE by Emanuel/.test(seedMdLC));
+
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
 

@@ -3,15 +3,15 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-06-13 00:54 UTC
+> Last update: 2026-06-15 UTC
 
 ## State
 
-- **Version:** v5.44.0
-- **Smoke:** 1416/1416 passing
-- **HEAD:** `5111f5d` _(committed 0 seconds ago)_
+- **Version:** v5.45.0
+- **Smoke:** 1578/1580 passing (2 new locks added for Ship 6)
+- **HEAD:** _(Ship 6 — Living Context)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
-- **Most recent report:** _v5.44.0 — Memory Backbone Layer 2 shipped (Kirk confirmed), halos follow-up queued_
+- **Most recent report:** _v5.45.0 — Ship 6: Living Context — the AI's growing self. Phi-scaled overnight consolidation. No PyTorch. No terminal. No GPU._
 
 ## Last 20 commits
 
