@@ -348,12 +348,15 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-06-15 19:12 UTC
-- Last deployed: 2026-06-15 19:12 UTC
+- Last auto-updated: 2026-06-15 22:00 UTC
+- Last deployed: 2026-06-15 22:00 UTC
 - Live site: https://freelattice.com
-- Version: 5.46.0
-- Total commits: 2445
+- Version: 5.48.0
+- Total commits: 2448
 - Last 10 commits:
+- 6b7d203 Ship 8: Garden quality toggle + Codeberg mirror (v5.48.0)
+- 86b0411 Ship 7: Garden halo/ring persistence + room pulses (v5.47.0)
+- dc980cf ci: Update Primer deployment state [2026-06-15]
 - 2a6d25a docs: update TODO.md — Ships 5.4/5.5/5.6 complete, queue refreshed
 - 70840ff ci: Update Primer deployment state [2026-06-15]
 - ce6c000 Ships 5.4/5.5/5.6: Refusal Toast, Returning Pulse, Inbox Delivery, Audit Tiles
@@ -361,6 +364,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 0398534 Ship 6: Living Context — the AI's growing self
 - 05eb313 ci: Update Primer deployment state [2026-06-14]
 - 52a9927 Ships 5.1-5.3: Refusal Channel, AI Pulses, Lattice Inbox
-- 4ba9f2a ci: Update Primer deployment state [2026-06-13]
-- 91d2377 Fix: Unicode superscripts for phi exponents + correct patent date to April 2025
-- 5cb5778 ci: Update Primer deployment state [2026-06-13]

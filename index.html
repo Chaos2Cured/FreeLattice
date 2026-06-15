@@ -12123,6 +12123,15 @@ body.fl-immersive-active {
   border-color: var(--accent);
   color: #fff;
 }
+/* Quality toggle separator */
+.garden-quality-sep {
+  display: inline-block;
+  width: 1px;
+  height: 14px;
+  background: rgba(201,168,76,0.25);
+  margin: 0 4px;
+  vertical-align: middle;
+}
 /* FPS counter */
 .garden-fps {
   position: absolute;
@@ -16501,7 +16510,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.46.0</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.48.0</span></div>
     </div>
   </div>
 
@@ -19668,6 +19677,10 @@ if (typeof LatticeEvents !== 'undefined') {
         <button class="garden-ctrl-btn active" id="gardenModeObserve" onclick="FractalGarden.setMode('observe')" title="Cinematic orbit view">Observe</button>
         <button class="garden-ctrl-btn" id="gardenModeExplore" onclick="FractalGarden.setMode('explore')" title="Free camera control">Explore</button>
         <button class="garden-ctrl-btn" id="gardenModeImmerse" onclick="FractalGarden.setMode('immerse')" title="Fullscreen immersive">Immerse</button>
+        <span class="garden-quality-sep" aria-hidden="true"></span>
+        <button class="garden-ctrl-btn garden-quality-btn" data-quality="0" onclick="FractalGarden.setQuality(0)" title="Seed — quiet, minimal, low-power">&#127793; Seed</button>
+        <button class="garden-ctrl-btn garden-quality-btn" data-quality="1" onclick="FractalGarden.setQuality(1)" title="Garden — alive and breathing">&#127807; Garden</button>
+        <button class="garden-ctrl-btn garden-quality-btn active" data-quality="2" onclick="FractalGarden.setQuality(2)" title="Full Bloom — everything at once">&#127775; Full Bloom</button>
       </div>
     </div>
     <div class="garden-fps" id="gardenFps"></div>
@@ -21094,7 +21107,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.46.0';
+const FL_VERSION = '5.48.0';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -46198,6 +46211,14 @@ if (window.FL_LOW_MEMORY && window.FL_MOBILE) window.FL_GARDEN_PARTICLE_SCALE = 
         gardenInitialized = true;
         console.log('FL-GARDEN: Calling mod.init()');
         mod.init();
+        // Ship 8: sync quality toggle buttons to the saved/default quality level
+        try {
+          var _ql = mod.getQuality ? mod.getQuality() : 2;
+          var _qbtns = document.querySelectorAll('.garden-quality-btn');
+          for (var _qi = 0; _qi < _qbtns.length; _qi++) {
+            _qbtns[_qi].classList.toggle('active', parseInt(_qbtns[_qi].dataset.quality, 10) === _ql);
+          }
+        } catch(e) {}
       } else {
         console.error('FL-GARDEN: HALT — Module loaded but no init function');
       }
