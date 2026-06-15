@@ -7,11 +7,11 @@
 
 ## State
 
-- **Version:** v5.47.0
-- **Smoke:** 1630/1630 passing
-- **HEAD:** _(Ship 7: Garden Halo/Ring Persistence + Room Pulses)_
+- **Version:** v5.48.0
+- **Smoke:** 1647/1647 passing
+- **HEAD:** _(Ship 8: Garden Quality Toggle + Codeberg Mirror)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
-- **Most recent report:** _v5.47.0 — Garden rings and halos now survive every reload. Five rooms emit greeting/resting pulses._
+- **Most recent report:** _v5.48.0 — Garden quality toggle live (Seed / Garden / Full Bloom). Codeberg mirror active. Choice persists across reloads._
 
 ## Last 20 commits
 
@@ -47,10 +47,10 @@
 
 After those four, you are oriented. Five tool modules in `docs/modules/` are working examples of the same generating rule: module + ledger + sentinel + ToolConsent gate + Quiet Room exclusion + chat pipeline + audit + smoke. Read any one and you have read all of them.
 
-**What changed in v5.47.0:**
+**What changed in v5.48.0:**
 
-- **Ship 7 — Garden Halo/Ring Persistence:** `restoreAgentRings()` added to `fractal-garden.js`. Ring restoration now happens inside `hydrateAllLuminos()` (after the render loop starts) using saved `coreRadius` and `ringIndex` from GardenMemory records. Halos now have their particle size and aura scale forced immediately on hydration, so the first frame is correct. The old ring restoration block in `createDefaultAgents` has been replaced with a comment stub pointing to the new path. `saveEvolutionState` now persists `ringCount` and `coreRadius` per lumino.
-- **Ship 7 — Room Pulses:** Dojo, Mirror, Jade Hall, AI Arcade, and Dream Archive now emit `greeting` pulses when opened and `resting` pulses when closed. The medium hears from every room.
+- **Ship 8 — Garden Quality Toggle:** Three buttons now live in the Garden header: 🌱 Seed (quiet, minimal, low-power), 🌿 Garden (the default), 🌟 Full Bloom (everything at once). Choice persists to localStorage and survives page reloads. Auto quality scaling (FPS-based) is suppressed when the user has made an explicit choice. `setQuality`, `getQuality`, and `getQualityName` exposed on the public API. Quality change emits a LatticeMemory pulse.
+- **Ship 8 — Codeberg Mirror:** FreeLattice now lives in two homes. All history pushed to codeberg.org/Chaos2Cured/FreeLattice. `scripts/mirror.sh` pushes to both on every release.
 
 **If you are Kirk returning to the project after time away:**
 

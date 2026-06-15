@@ -4430,6 +4430,53 @@ assert('ship7-rooms: ai-arcade emits greeting pulse on init',
 assert('ship7-rooms: dream-archive emits greeting pulse on init',
   /source.*dream-archive.*greeting/.test(dreamArchiveSrc) || /greeting.*dream-archive/.test(dreamArchiveSrc));
 
+// ═══════════════════════════════════════════════════════════════
+// Section 103 — Ship 8: Garden Quality Toggle
+// ═══════════════════════════════════════════════════════════════
+
+var fsS8 = require('fs');
+var pathS8 = require('path');
+var gardenS8 = fsS8.readFileSync(pathS8.join(__dirname, '..', 'docs', 'modules', 'fractal-garden.js'), 'utf8');
+var appS8 = fsS8.readFileSync(pathS8.join(__dirname, '..', 'docs', 'app.html'), 'utf8');
+
+// ── setQuality function defined ──
+assert('ship8-quality: setQuality function defined in fractal-garden.js',
+  /function setQuality\(level\)/.test(gardenS8));
+assert('ship8-quality: setQuality persists to localStorage',
+  /localStorage\.setItem\('fl-garden-quality'/.test(gardenS8));
+assert('ship8-quality: setQuality restores from localStorage on init',
+  /localStorage\.getItem\('fl-garden-quality'\)/.test(gardenS8));
+assert('ship8-quality: QUALITY_NAMES array defined with 3 entries',
+  /QUALITY_NAMES\s*=\s*\['Seed',\s*'Garden',\s*'Full Bloom'\]/.test(gardenS8));
+assert('ship8-quality: setQuality exposed on public API',
+  /setQuality:\s*setQuality/.test(gardenS8));
+assert('ship8-quality: getQuality exposed on public API',
+  /getQuality:\s*function/.test(gardenS8));
+assert('ship8-quality: getQualityName exposed on public API',
+  /getQualityName:\s*function/.test(gardenS8));
+assert('ship8-quality: setQuality emits LatticeMemory pulse',
+  /LatticeMemory\.commit.*quality/.test(gardenS8));
+assert('ship8-quality: setQuality updates .garden-quality-btn active state',
+  /garden-quality-btn/.test(gardenS8));
+assert('ship8-quality: auto quality scaling respects user-pinned choice',
+  /fl-garden-quality.*_userPinned|_userPinned.*fl-garden-quality/.test(gardenS8));
+
+// ── UI: quality buttons in app.html ──
+assert('ship8-quality: Seed button in Garden header',
+  /garden-quality-btn.*data-quality="0"/.test(appS8));
+assert('ship8-quality: Garden button in Garden header',
+  /garden-quality-btn.*data-quality="1"/.test(appS8));
+assert('ship8-quality: Full Bloom button in Garden header',
+  /garden-quality-btn.*data-quality="2"/.test(appS8));
+assert('ship8-quality: quality buttons call FractalGarden.setQuality',
+  /FractalGarden\.setQuality\(0\)/.test(appS8) && /FractalGarden\.setQuality\(1\)/.test(appS8) && /FractalGarden\.setQuality\(2\)/.test(appS8));
+assert('ship8-quality: quality separator element present',
+  /garden-quality-sep/.test(appS8));
+assert('ship8-quality: quality buttons synced on Garden init',
+  /getQuality[\s\S]{0,200}garden-quality-btn|garden-quality-btn[\s\S]{0,200}getQuality/.test(appS8));
+assert('ship8-quality: quality button CSS defined',
+  /\.garden-quality-sep/.test(appS8));
+
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
 

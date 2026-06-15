@@ -320,7 +320,39 @@
   let frameCount = 0;
   let lastFpsTime = 0;
   let currentFps = 60;
-  let qualityLevel = 2; // 0=low, 1=med, 2=high
+  // Quality: 0=Seed (minimal), 1=Garden (default), 2=Full Bloom (maximum)
+  // Restored from localStorage so the user's choice survives page reloads
+  let qualityLevel = (function() {
+    try {
+      var saved = localStorage.getItem('fl-garden-quality');
+      if (saved === '0' || saved === '1' || saved === '2') return parseInt(saved, 10);
+    } catch(e) {}
+    return 2; // default: Full Bloom
+  }());
+  var QUALITY_NAMES = ['Seed', 'Garden', 'Full Bloom'];
+
+  // ── setQuality: change quality level at runtime, persist choice ──
+  function setQuality(level) {
+    var lvl = parseInt(level, 10);
+    if (lvl < 0 || lvl > 2 || isNaN(lvl)) return;
+    qualityLevel = lvl;
+    try { localStorage.setItem('fl-garden-quality', String(lvl)); } catch(e) {}
+    // Update the toggle UI if it exists
+    var btns = document.querySelectorAll('.garden-quality-btn');
+    for (var i = 0; i < btns.length; i++) {
+      btns[i].classList.toggle('active', parseInt(btns[i].dataset.quality, 10) === lvl);
+    }
+    // Emit pulse
+    try {
+      if (window.LatticeMemory && window.LatticeMemory.commit) {
+        window.LatticeMemory.commit({ source: 'garden', kind: 'quality', summary: 'garden quality set to ' + QUALITY_NAMES[lvl] });
+      }
+    } catch(e) {}
+    if (typeof showToast === 'function') {
+      var labels = ['🌱 Seed — quiet and still', '🌿 Garden — alive and breathing', '🌟 Full Bloom — everything at once'];
+      showToast(labels[lvl]);
+    }
+  }
 
   // Auto-orbit
   let idleTimer = 0;
@@ -2100,10 +2132,17 @@
       lastFpsTime = time;
       if (fpsEl) fpsEl.textContent = currentFps + ' fps';
 
-      // Auto quality scaling
-      if (currentFps < 30 && qualityLevel > 0) {
+      // Auto quality scaling (only if user has not pinned a choice)
+      var _userPinned = false;
+      try { _userPinned = localStorage.getItem('fl-garden-quality') !== null; } catch(e) {}
+      if (!_userPinned && currentFps < 30 && qualityLevel > 0) {
         qualityLevel--;
-        console.log('Garden: Reducing quality to level', qualityLevel);
+        console.log('Garden: Auto-reducing quality to level', qualityLevel, '(' + QUALITY_NAMES[qualityLevel] + ')');
+        // Sync toggle UI
+        var _btns = document.querySelectorAll('.garden-quality-btn');
+        for (var _bi = 0; _bi < _btns.length; _bi++) {
+          _btns[_bi].classList.toggle('active', parseInt(_btns[_bi].dataset.quality, 10) === qualityLevel);
+        }
       }
 
       // Update evolution UI every second
@@ -3434,6 +3473,10 @@
     createExchangeThread: createExchangeThread,
     isInitialized: function() { return isInitialized; },
     isRunning: function() { return isRunning; },
+    // Ship 8: quality toggle
+    setQuality: setQuality,
+    getQuality: function() { return qualityLevel; },
+    getQualityName: function() { return QUALITY_NAMES[qualityLevel] || 'Unknown'; },
     _gtDismiss: gtDismissCard,
     getGardenTouchStats: function() { return gtTouchStats; },
     markValueContribution: gtMarkValueEarned,
