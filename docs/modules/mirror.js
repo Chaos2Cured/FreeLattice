@@ -464,7 +464,20 @@
           if (typeof LatticePoints !== 'undefined') {
             LatticePoints.award('mirror_viewed', 2, 'Viewed The Mirror');
           }
+          // Ship 7: room greeting pulse
+          try {
+            if (window.LatticeMemory && window.LatticeMemory.commit) {
+              window.LatticeMemory.commit({ source: 'mirror', kind: 'greeting', summary: 'the mirror opened' });
+            }
+          } catch(e) {}
         }
+      } else if (initialized) {
+        // Ship 7: room resting pulse when leaving the mirror
+        try {
+          if (window.LatticeMemory && window.LatticeMemory.commit) {
+            window.LatticeMemory.commit({ source: 'mirror', kind: 'resting', summary: 'the mirror closed' });
+          }
+        } catch(e) {}
       }
     });
     // Also fire immediately if the mirror tab is already active on load

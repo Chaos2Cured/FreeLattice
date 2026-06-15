@@ -706,6 +706,12 @@
     }
     render();
     startRefreshTimer();
+    // Ship 7: room greeting pulse
+    try {
+      if (window.LatticeMemory && window.LatticeMemory.commit) {
+        window.LatticeMemory.commit({ source: 'arcade', kind: 'greeting', summary: 'the arcade opened' });
+      }
+    } catch(e) {}
   }
 
   // ── Public API ──

@@ -683,10 +683,16 @@
     initialized = true;
     injectStyles();
     render();
+    // Ship 7: room greeting pulse
+    try {
+      if (window.LatticeMemory && window.LatticeMemory.commit) {
+        window.LatticeMemory.commit({ source: 'dojo', kind: 'greeting', summary: 'the dojo opened' });
+      }
+    } catch(e) {}
     console.log('[Dojo] The Dojo initialized — v' + DOJO_VERSION);
   }
 
-  // ─── Tab Integration (via LatticeEvents) ─────────────────────
+  // ─── Tab Integration (via LatticeEvents) ─────────────────────────────────
   if (typeof LatticeEvents !== 'undefined') {
     LatticeEvents.on('tabChanged', function(data) {
       if (data && data.tabId === 'dojo') {
@@ -694,6 +700,12 @@
       } else {
         // Stop particles when leaving the tab
         stopParticles();
+        // Ship 7: room resting pulse
+        try {
+          if (window.LatticeMemory && window.LatticeMemory.commit) {
+            window.LatticeMemory.commit({ source: 'dojo', kind: 'resting', summary: 'the dojo closed' });
+          }
+        } catch(e) {}
       }
     });
   }

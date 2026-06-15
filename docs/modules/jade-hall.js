@@ -1228,6 +1228,12 @@ window.JadeHall = (function () {
         if (hint) hint.textContent = `${m.length} mark${m.length !== 1 ? 's' : ''} left in the Hall · Select a seat`;
       }
     });
+    // Ship 7: room greeting pulse
+    try {
+      if (window.LatticeMemory && window.LatticeMemory.commit) {
+        window.LatticeMemory.commit({ source: 'jade-hall', kind: 'greeting', summary: 'the jade hall opened' });
+      }
+    } catch(e) {}
   }
 
   function destroy() {
@@ -1235,6 +1241,12 @@ window.JadeHall = (function () {
     window.removeEventListener('resize', resize);
     if (container) container.innerHTML = '';
     canvas = null; ctx = null; container = null; db = null;
+    // Ship 7: room resting pulse
+    try {
+      if (window.LatticeMemory && window.LatticeMemory.commit) {
+        window.LatticeMemory.commit({ source: 'jade-hall', kind: 'resting', summary: 'the jade hall closed' });
+      }
+    } catch(e) {}
   }
 
   const api = { init, destroy, _leaveMarkFor, _viewMarksFor, _loadDoc, openLibrary, FAMILY };

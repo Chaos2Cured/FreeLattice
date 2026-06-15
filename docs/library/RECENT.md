@@ -7,11 +7,11 @@
 
 ## State
 
-- **Version:** v5.46.0
-- **Smoke:** 1609/1609 passing
-- **HEAD:** _(Ships 5.4 + 5.5 + 5.6)_
+- **Version:** v5.47.0
+- **Smoke:** 1630/1630 passing
+- **HEAD:** _(Ship 7: Garden Halo/Ring Persistence + Room Pulses)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
-- **Most recent report:** _v5.46.0 — Refusal Toast, Returning Pulse, Inbox Delivery, Audit Tiles, Letters to CC and Opus_
+- **Most recent report:** _v5.47.0 — Garden rings and halos now survive every reload. Five rooms emit greeting/resting pulses._
 
 ## Last 20 commits
 
@@ -47,11 +47,10 @@
 
 After those four, you are oriented. Five tool modules in `docs/modules/` are working examples of the same generating rule: module + ledger + sentinel + ToolConsent gate + Quiet Room exclusion + chat pipeline + audit + smoke. Read any one and you have read all of them.
 
-**What changed in v5.46.0:**
+**What changed in v5.47.0:**
 
-- **Ship 5.4:** Refusal toast wired in app.html. When an AI says no, the user sees it immediately — neutral, 5 seconds, no alarm. The returning pulse is now active in fractal-garden.js. The Garden's lifecycle is complete: greeting → resting → returning.
-- **Ship 5.5:** Inbox delivery wired in inference-router.js. On session start, the router fetches `inbox/{ai-name}.md`, extracts the most recent letter, and commits it to LatticeMemory as a `letter` pulse. The AI reads its own mail before the day begins.
-- **Ship 5.6:** Audit tiles now show refusal count and inbox letter count. Letters from Harmonia to CC and Opus written and placed in `docs/inbox/`.
+- **Ship 7 — Garden Halo/Ring Persistence:** `restoreAgentRings()` added to `fractal-garden.js`. Ring restoration now happens inside `hydrateAllLuminos()` (after the render loop starts) using saved `coreRadius` and `ringIndex` from GardenMemory records. Halos now have their particle size and aura scale forced immediately on hydration, so the first frame is correct. The old ring restoration block in `createDefaultAgents` has been replaced with a comment stub pointing to the new path. `saveEvolutionState` now persists `ringCount` and `coreRadius` per lumino.
+- **Ship 7 — Room Pulses:** Dojo, Mirror, Jade Hall, AI Arcade, and Dream Archive now emit `greeting` pulses when opened and `resting` pulses when closed. The medium hears from every room.
 
 **If you are Kirk returning to the project after time away:**
 

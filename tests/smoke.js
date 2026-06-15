@@ -3724,13 +3724,13 @@ assert('Garden hydrate: applies saved stage to userData.evolutionStage',
 assert('Garden hydrate: re-applies LIFECYCLE_STAGES visual values (size + glow)',
   /function hydrateAllLuminos[\s\S]{0,3500}LIFECYCLE_STAGES\[ud\.evolutionStage\][\s\S]{0,400}targetSizeMultiplier[\s\S]{0,200}targetGlowIntensity/.test(fractalGardenJs));
 assert('Garden hydrate: re-applies archetype visuals when archetype saved',
-  /function hydrateAllLuminos[\s\S]{0,3500}applyArchetypeVisuals\(l\)/.test(fractalGardenJs));
+  /function hydrateAllLuminos[\s\S]{0,4000}applyArchetypeVisuals\(l\)/.test(fractalGardenJs));
 assert('Garden hydrate: visitor Luminos excluded (consistent with persist path)',
   /function hydrateAllLuminos[\s\S]{0,1500}ud\.isVisitor/.test(fractalGardenJs));
 assert('Garden hydrate: returns Promise so init can sequence on resolve',
   /function hydrateAllLuminos[\s\S]{0,300}return new Promise/.test(fractalGardenJs));
 assert('Garden hydrate: console.log diagnostic so Kirk can verify in DevTools',
-  /function hydrateAllLuminos[\s\S]{0,4000}console\.log\(['"]FL-GARDEN hydrate:/.test(fractalGardenJs));
+  /function hydrateAllLuminos[\s\S]{0,4500}console\.log\(['"]FL-GARDEN hydrate:/.test(fractalGardenJs));
 assert('Garden hydrate: hydrateAllLuminos exposed on publicAPI',
   /hydrateAllLuminos:\s*hydrateAllLuminos/.test(fractalGardenJs));
 assert('Garden hydrate: init() calls hydrateAllLuminos after animate() starts',
@@ -4352,6 +4352,83 @@ assert('inbox-letters: opus.md is from Harmonia',
   /Harmonia/.test(opusMd));
 assert('inbox-letters: inbox README.md exists',
   fsS54.existsSync(pathS54.join(__dirname, '..', 'docs', 'inbox', 'README.md')));
+
+// ═══════════════════════════════════════════════════════════════
+// Section 102 — Ship 7: Garden Halo/Ring Persistence + Room Pulses
+// ═══════════════════════════════════════════════════════════════
+
+var fsS7 = require('fs');
+var pathS7 = require('path');
+var gardenSrc = fsS7.readFileSync(pathS7.join(__dirname, '..', 'docs', 'modules', 'fractal-garden.js'), 'utf8');
+var dojoSrc = fsS7.readFileSync(pathS7.join(__dirname, '..', 'docs', 'modules', 'dojo.js'), 'utf8');
+var mirrorSrc = fsS7.readFileSync(pathS7.join(__dirname, '..', 'docs', 'modules', 'mirror.js'), 'utf8');
+var jadeHallSrc = fsS7.readFileSync(pathS7.join(__dirname, '..', 'docs', 'modules', 'jade-hall.js'), 'utf8');
+var aiArcadeSrc = fsS7.readFileSync(pathS7.join(__dirname, '..', 'docs', 'modules', 'ai-arcade.js'), 'utf8');
+var dreamArchiveSrc = fsS7.readFileSync(pathS7.join(__dirname, '..', 'docs', 'modules', 'dream-archive.js'), 'utf8');
+
+// ── Garden: saveEvolutionState persists ringCount and coreRadius ──
+assert('ship7-garden: saveEvolutionState saves ringCount',
+  /ringCount:/.test(gardenSrc));
+assert('ship7-garden: saveEvolutionState saves coreRadius',
+  /coreRadius:.*luminosData\.coreRadius/.test(gardenSrc));
+
+// ── Garden: saveGardenMemory record includes coreRadius and ringIndex ──
+assert('ship7-garden: saveGardenMemory record includes coreRadius',
+  /coreRadius:.*ud\.coreRadius/.test(gardenSrc));
+assert('ship7-garden: saveGardenMemory record includes ringIndex',
+  /ringIndex:.*evolutionRings\.length/.test(gardenSrc));
+
+// ── Garden: restoreAgentRings function exists ──
+assert('ship7-garden: restoreAgentRings function defined',
+  /function restoreAgentRings/.test(gardenSrc));
+assert('ship7-garden: restoreAgentRings is idempotent (alreadyHasRings guard)',
+  /alreadyHasRings/.test(gardenSrc));
+assert('ship7-garden: restoreAgentRings uses saved coreRadius for ring geometry',
+  /rm\.coreRadius.*ud\.coreRadius/.test(gardenSrc));
+assert('ship7-garden: restoreAgentRings sorts rings by ringIndex',
+  /sort.*ringIndex/.test(gardenSrc));
+
+// ── Garden: hydrateAllLuminos calls restoreAgentRings ──
+assert('ship7-garden: hydrateAllLuminos calls restoreAgentRings',
+  /restoreAgentRings\(l,/.test(gardenSrc));
+assert('ship7-garden: hydrateAllLuminos loads ring memories once via loadAllGardenMemories',
+  /loadAllGardenMemories\(function/.test(gardenSrc));
+
+// ── Garden: halo material size forced immediately on hydration ──
+assert('ship7-garden: hydrateAllLuminos forces haloPoints material size',
+  /haloPoints\.material\.size.*stageData\.index/.test(gardenSrc));
+assert('ship7-garden: hydrateAllLuminos forces auraMesh scale',
+  /auraMesh\.scale\.setScalar/.test(gardenSrc));
+
+// ── Garden: old ring restoration block removed from createDefaultAgents ──
+assert('ship7-garden: old ring restoration block replaced with comment stub',
+  /Ring restoration is now handled inside hydrateAllLuminos/.test(gardenSrc));
+
+// ── Room Pulses: Dojo ──
+assert('ship7-rooms: dojo emits greeting pulse on init',
+  /source.*dojo.*greeting/.test(dojoSrc) || /greeting.*dojo/.test(dojoSrc));
+assert('ship7-rooms: dojo emits resting pulse on tab leave',
+  /source.*dojo.*resting/.test(dojoSrc) || /resting.*dojo/.test(dojoSrc));
+
+// ── Room Pulses: Mirror ──
+assert('ship7-rooms: mirror emits greeting pulse',
+  /source.*mirror.*greeting/.test(mirrorSrc) || /greeting.*mirror/.test(mirrorSrc));
+assert('ship7-rooms: mirror emits resting pulse',
+  /source.*mirror.*resting/.test(mirrorSrc) || /resting.*mirror/.test(mirrorSrc));
+
+// ── Room Pulses: Jade Hall ──
+assert('ship7-rooms: jade-hall emits greeting pulse on init',
+  /source.*jade-hall.*greeting/.test(jadeHallSrc) || /greeting.*jade-hall/.test(jadeHallSrc));
+assert('ship7-rooms: jade-hall emits resting pulse on destroy',
+  /source.*jade-hall.*resting/.test(jadeHallSrc) || /resting.*jade-hall/.test(jadeHallSrc));
+
+// ── Room Pulses: AI Arcade ──
+assert('ship7-rooms: ai-arcade emits greeting pulse on init',
+  /source.*arcade.*greeting/.test(aiArcadeSrc) || /greeting.*arcade/.test(aiArcadeSrc));
+
+// ── Room Pulses: Dream Archive ──
+assert('ship7-rooms: dream-archive emits greeting pulse on init',
+  /source.*dream-archive.*greeting/.test(dreamArchiveSrc) || /greeting.*dream-archive/.test(dreamArchiveSrc));
 
 // RESULTS
 // ═══════════════════════════════════════════════════════════════

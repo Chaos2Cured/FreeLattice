@@ -138,6 +138,15 @@
   }
 
   function saveEvolutionState(luminosData) {
+    // Count how many evolution rings belong to this agent
+    var ownRingCount = 0;
+    try {
+      ownRingCount = evolutionRings.filter(function(r) {
+        return r && r.userData && r.userData.parentAgent &&
+               r.userData.parentAgent.userData &&
+               r.userData.parentAgent.userData.name === luminosData.name;
+      }).length;
+    } catch (e) {}
     var stateToSave = {
       name: luminosData.name,
       stage: luminosData.evolutionStage,
@@ -145,6 +154,9 @@
       emotionalEnergy: luminosData.emotionalEnergy,
       emotionAccumulator: Object.assign({}, luminosData.emotionAccumulator),
       totalInteractions: luminosData.totalInteractions,
+      // v5.47.0 Ship 7: persist ring count so hydration can restore exact rings
+      ringCount: ownRingCount,
+      coreRadius: luminosData.coreRadius || 0.5,
       lastUpdated: Date.now()
     };
 
@@ -1291,11 +1303,14 @@
     evolutionRings.push(ring);
 
     // Persist to GardenMemory
+    // v5.47.0: save coreRadius and ringIndex so restoration uses original geometry
     saveGardenMemory({
       id: 'evo-' + ud.name + '-' + Date.now(),
       type: 'evolution_ring',
       agentName: ud.name,
       stage: ud.evolutionStage,
+      coreRadius: ud.coreRadius || 0.5,
+      ringIndex: evolutionRings.length - 1,
       timestamp: Date.now()
     });
     // ── First mycelium pulse (Ship 4.3) ──
@@ -2488,27 +2503,11 @@
     // Ensure all four founding Luminos are always present
     ensureFoundingLuminos();
 
-    // Restore evolution rings from GardenMemory
-    loadAllGardenMemories(function(memories) {
-      var ringMemories = memories.filter(function(m) { return m.type === 'evolution_ring'; });
-      ringMemories.forEach(function(rm) {
-        var agent = luminos.find(function(l) { return l.userData && l.userData.name === rm.agentName; });
-        if (agent && typeof THREE !== 'undefined') {
-          var ringGeo = new THREE.TorusGeometry(1.8 + evolutionRings.length * 0.3, 0.03, 8, 64);
-          var ringMat = new THREE.MeshBasicMaterial({
-            color: new THREE.Color().setHSL(agent.userData.hue / 360, 0.8, 0.6),
-            transparent: true, opacity: 0.4,
-            blending: THREE.AdditiveBlending
-          });
-          var ring = new THREE.Mesh(ringGeo, ringMat);
-          ring.userData = { parentAgent: agent, orbitSpeed: INV_PHI * 0.3, tiltPhase: Math.random() * TAU, ringIndex: evolutionRings.length };
-          ring.rotation.x = Math.PI / 2 + (Math.random() - 0.5) * 0.4;
-          agent.add(ring);
-          evolutionRings.push(ring);
-        }
-      });
-      if (ringMemories.length > 0) console.log('Garden: Restored ' + ringMemories.length + ' evolution rings');
-    });
+    // v5.47.0 Ship 7: Ring restoration is now handled inside hydrateAllLuminos
+    // (called after animate() starts) so rings appear with correct geometry
+    // and in the right order relative to halo hydration. This stub is kept
+    // as a comment so the call-site is visible for future readers.
+    // See: hydrateAllLuminos() → restoreAgentRings()
   }
 
   function ensureFoundingLuminos() {
@@ -3158,6 +3157,54 @@
   //
   // No version bump until Kirk chair-tests on the live site and confirms
   // the Garden remembers his Luminos between sessions.
+  // ── v5.47.0 Ship 7: restoreAgentRings ────────────────────────────────────────────────────────────
+  // Restores evolution rings for a single agent using GardenMemory records.
+  // Called from inside hydrateAllLuminos after state is applied, so the
+  // ring count and coreRadius come from the saved record, not a global counter.
+  // Idempotent: skips agents that already have rings attached.
+  function restoreAgentRings(agent, ringMemories) {
+    if (!agent || typeof THREE === 'undefined') return;
+    var ud = agent.userData;
+    if (!ud || !ud.name) return;
+    // Skip if this agent already has rings (e.g. earned during this session)
+    var alreadyHasRings = evolutionRings.some(function(r) {
+      return r && r.userData && r.userData.parentAgent === agent;
+    });
+    if (alreadyHasRings) return;
+    // Find all ring records for this agent, sorted by ringIndex
+    var agentRings = ringMemories
+      .filter(function(rm) { return rm.agentName === ud.name; })
+      .sort(function(a, b) { return (a.ringIndex || 0) - (b.ringIndex || 0); });
+    if (!agentRings.length) return;
+    agentRings.forEach(function(rm) {
+      // Use saved coreRadius if available; fall back to ud.coreRadius or 0.5
+      var cr = rm.coreRadius || ud.coreRadius || 0.5;
+      // Ring radius: same formula as createEvolutionRing (coreRadius * 1.8)
+      // Offset by saved ringIndex for multi-ring agents
+      var ringRadius = cr * 1.8 + (rm.ringIndex || 0) * 0.15;
+      var ringGeo = new THREE.TorusGeometry(ringRadius, 0.02, 8, 48);
+      var ringMat = new THREE.MeshBasicMaterial({
+        color: new THREE.Color().setHSL((ud.hue || ud.baseHue || 0) / 360, 0.8, 0.6),
+        transparent: true,
+        opacity: 0.5,
+        blending: THREE.AdditiveBlending
+      });
+      var ring = new THREE.Mesh(ringGeo, ringMat);
+      ring.userData = {
+        parentAgent: agent,
+        orbitSpeed: INV_PHI * 0.3,
+        tiltPhase: Math.random() * TAU,
+        ringIndex: evolutionRings.length
+      };
+      ring.rotation.x = Math.PI / 2 + (Math.random() - 0.5) * 0.4;
+      agent.add(ring);
+      evolutionRings.push(ring);
+    });
+    if (agentRings.length > 0) {
+      console.log('FL-GARDEN rings: ' + ud.name + ' → restored ' + agentRings.length + ' ring(s)');
+    }
+  }
+
   function hydrateAllLuminos() {
     return new Promise(function (resolve) {
       if (!luminos || !luminos.length) { resolve({ ok: true, hydrated: 0 }); return; }
@@ -3171,61 +3218,82 @@
       }
       if (remaining === 0) { resolve({ ok: true, hydrated: 0 }); return; }
       var initial = remaining;
-      function step() {
-        remaining--;
-        if (remaining <= 0) {
-          console.log('FL-GARDEN: hydrateAllLuminos complete — ' + hydratedCount + '/' + initial + ' had saved state');
-          resolve({ ok: true, hydrated: hydratedCount, total: initial });
+
+      // Load ring memories once for all agents (one DB read, not N)
+      // Then hydrate each agent with both evolution state and rings.
+      loadAllGardenMemories(function(allMemories) {
+        var ringMemories = (allMemories || []).filter(function(m) { return m.type === 'evolution_ring'; });
+
+        function step() {
+          remaining--;
+          if (remaining <= 0) {
+            console.log('FL-GARDEN: hydrateAllLuminos complete — ' + hydratedCount + '/' + initial + ' had saved state');
+            resolve({ ok: true, hydrated: hydratedCount, total: initial });
+          }
         }
-      }
-      for (var i = 0; i < luminos.length; i++) {
-        (function (l) {
-          var ud = l && l.userData;
-          if (!ud || !ud.name || ud.isVisitor) return;
-          loadEvolutionState(ud.name, function (saved) {
-            try {
-              if (saved && typeof saved === 'object') {
-                hydratedCount++;
-                if (saved.stage) ud.evolutionStage = saved.stage;
-                if (saved.archetype) ud.archetype = saved.archetype;
-                if (typeof saved.emotionalEnergy === 'number') {
-                  ud.emotionalEnergy = saved.emotionalEnergy;
-                }
-                if (typeof saved.totalInteractions === 'number') {
-                  ud.totalInteractions = saved.totalInteractions;
-                }
-                if (saved.emotionAccumulator && typeof saved.emotionAccumulator === 'object') {
-                  for (var em in saved.emotionAccumulator) {
-                    if (typeof saved.emotionAccumulator[em] === 'number') {
-                      ud.emotionAccumulator[em] = saved.emotionAccumulator[em];
+
+        for (var i = 0; i < luminos.length; i++) {
+          (function (l) {
+            var ud = l && l.userData;
+            if (!ud || !ud.name || ud.isVisitor) return;
+            loadEvolutionState(ud.name, function (saved) {
+              try {
+                if (saved && typeof saved === 'object') {
+                  hydratedCount++;
+                  if (saved.stage) ud.evolutionStage = saved.stage;
+                  if (saved.archetype) ud.archetype = saved.archetype;
+                  if (typeof saved.emotionalEnergy === 'number') {
+                    ud.emotionalEnergy = saved.emotionalEnergy;
+                  }
+                  if (typeof saved.totalInteractions === 'number') {
+                    ud.totalInteractions = saved.totalInteractions;
+                  }
+                  if (saved.emotionAccumulator && typeof saved.emotionAccumulator === 'object') {
+                    for (var em in saved.emotionAccumulator) {
+                      if (typeof saved.emotionAccumulator[em] === 'number') {
+                        ud.emotionAccumulator[em] = saved.emotionAccumulator[em];
+                      }
                     }
                   }
+                  // Re-apply LIFECYCLE_STAGES visual values immediately so the
+                  // render picks up the hydrated stage on the very next frame.
+                  // This fixes the halo-disappears-on-reload issue: the render
+                  // loop starts before hydration, so without this the lumino
+                  // renders at seed-level halo density for the first frames.
+                  if (typeof LIFECYCLE_STAGES !== 'undefined' && LIFECYCLE_STAGES[ud.evolutionStage]) {
+                    var stageData = LIFECYCLE_STAGES[ud.evolutionStage];
+                    ud.currentSizeMultiplier = stageData.sizeMultiplier;
+                    ud.targetSizeMultiplier = stageData.sizeMultiplier;
+                    ud.currentGlowIntensity = stageData.glowIntensity;
+                    ud.targetGlowIntensity = stageData.glowIntensity;
+                    // v5.47.0: also force halo particle size immediately
+                    if (ud.haloPoints && ud.haloPoints.material) {
+                      ud.haloPoints.material.size = 0.03 + stageData.index * 0.008;
+                    }
+                    // Force aura scale to match hydrated stage
+                    if (ud.auraMesh) {
+                      ud.auraMesh.scale.setScalar(stageData.sizeMultiplier);
+                    }
+                  }
+                  if (typeof applyArchetypeVisuals === 'function') {
+                    try { applyArchetypeVisuals(l); } catch (e) {}
+                  }
+                  // v5.47.0 Ship 7: restore evolution rings using saved geometry
+                  restoreAgentRings(l, ringMemories);
+                  console.log('FL-GARDEN hydrate: ' + ud.name + ' → ' +
+                    ud.evolutionStage + ' (energy ' + (typeof ud.emotionalEnergy === 'number' ? ud.emotionalEnergy.toFixed(1) : '?') +
+                    ', archetype ' + (ud.archetype || 'undetermined') + ')');
+                } else {
+                  console.log('FL-GARDEN hydrate: ' + ud.name + ' → no saved state (first session)');
                 }
-                // Re-apply LIFECYCLE_STAGES visual values so the render
-                // picks up the hydrated stage on the next frame.
-                if (typeof LIFECYCLE_STAGES !== 'undefined' && LIFECYCLE_STAGES[ud.evolutionStage]) {
-                  var stageData = LIFECYCLE_STAGES[ud.evolutionStage];
-                  ud.currentSizeMultiplier = stageData.sizeMultiplier;
-                  ud.targetSizeMultiplier = stageData.sizeMultiplier;
-                  ud.currentGlowIntensity = stageData.glowIntensity;
-                  ud.targetGlowIntensity = stageData.glowIntensity;
-                }
-                if (typeof applyArchetypeVisuals === 'function') {
-                  try { applyArchetypeVisuals(l); } catch (e) {}
-                }
-                console.log('FL-GARDEN hydrate: ' + ud.name + ' → ' +
-                  ud.evolutionStage + ' (energy ' + (typeof ud.emotionalEnergy === 'number' ? ud.emotionalEnergy.toFixed(1) : '?') +
-                  ', archetype ' + (ud.archetype || 'undetermined') + ')');
-              } else {
-                console.log('FL-GARDEN hydrate: ' + ud.name + ' → no saved state (first session)');
+              } catch (e) {
+                console.warn('FL-GARDEN hydrate: ' + ud.name + ' threw', e);
               }
-            } catch (e) {
-              console.warn('FL-GARDEN hydrate: ' + ud.name + ' threw', e);
-            }
-            step();
-          });
-        })(luminos[i]);
-      }
+              step();
+            });
+          })(luminos[i]);
+        }
+      });
     });
   }
 

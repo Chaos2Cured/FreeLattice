@@ -513,6 +513,12 @@
   // ── Public API ──
   async function init() {
     await render();
+    // Ship 7: room greeting pulse
+    try {
+      if (window.LatticeMemory && window.LatticeMemory.commit) {
+        window.LatticeMemory.commit({ source: 'dream-archive', kind: 'greeting', summary: 'the dream archive opened' });
+      }
+    } catch(e) {}
   }
 
   function back() {
