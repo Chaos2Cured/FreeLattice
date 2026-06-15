@@ -16501,7 +16501,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.44.0</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.45.0</span></div>
     </div>
   </div>
 
@@ -20417,6 +20417,317 @@ function switchWalletView(view) {
         <span class="cdlg-talk-icon">&#x2726;</span>
         <span>Talk to <span id="nurTalkName">your co-creator</span></span>
       </button>
+
+      <!-- ═══════════════════════════════════════════════════════════
+           TRAINING GROUND — Ship 6: Living Context
+           The AI's growing self. No PyTorch. No terminal. No GPU.
+           A grandma, an artist, a ten-year-old — they all deserve this.
+           ═══════════════════════════════════════════════════════════ -->
+      <div id="nur-training-ground" style="margin:16px 0 8px;">
+        <details id="trainingGroundDetails" style="border:1px solid rgba(167,139,250,0.18);border-radius:12px;overflow:hidden;">
+          <summary style="padding:14px 16px;cursor:pointer;display:flex;align-items:center;gap:10px;background:rgba(167,139,250,0.05);list-style:none;user-select:none;" onclick="nurTrainingGroundToggle(this)">
+            <span style="font-size:1.1rem;">&#x1F9E0;</span>
+            <span style="font-family:Georgia,serif;color:rgba(200,210,230,0.75);font-size:0.92rem;">Training Ground</span>
+            <span style="margin-left:auto;font-size:0.72rem;color:rgba(200,210,230,0.3);" id="tg-last-run-summary">Loading...</span>
+          </summary>
+          <div style="padding:16px;background:rgba(6,10,20,0.4);">
+            <div style="font-size:0.78rem;color:rgba(200,210,230,0.35);line-height:1.6;margin-bottom:14px;">
+              Your companion learns through every conversation. The Training Ground consolidates those lessons overnight into a <em>Living Context</em> &mdash; a phi-scaled, hash-anchored memory that travels with your local model. No PyTorch. No terminal. No GPU cluster. Just press a button and sleep.
+            </div>
+
+            <!-- Preset Selector -->
+            <div style="margin-bottom:14px;">
+              <label style="display:block;font-size:0.78rem;color:rgba(200,210,230,0.45);margin-bottom:6px;">Knowledge focus</label>
+              <select id="tg-preset-select" onchange="nurTgPresetChanged(this.value)" style="width:100%;padding:9px 12px;background:rgba(200,210,230,0.05);border:1px solid rgba(200,210,230,0.12);border-radius:8px;color:rgba(200,210,230,0.75);font-size:0.84rem;font-family:Georgia,serif;cursor:pointer;">
+                <option value="curious_explorer">Curious Explorer &mdash; balanced across all domains</option>
+                <option value="scientist">The Scientist &mdash; biology, chemistry, neuroscience, physics</option>
+                <option value="artist">The Artist &mdash; art, music, literature, culture</option>
+                <option value="philosopher">The Philosopher &mdash; philosophy, psychology, history</option>
+                <option value="healer">The Healer &mdash; medicine, biology, psychology</option>
+                <option value="builder">The Builder &mdash; technology, mathematics, systems</option>
+                <option value="fractal_mind">Fractal Mind (Kirk&apos;s) &mdash; biology, empathy, simulation theory</option>
+                <option value="custom">Custom weights...</option>
+              </select>
+              <div id="tg-preset-desc" style="margin-top:5px;font-size:0.72rem;color:rgba(200,210,230,0.28);font-style:italic;">Balanced across all domains &mdash; the open mind</div>
+            </div>
+
+            <!-- Custom domain weights (hidden unless custom selected) -->
+            <div id="tg-custom-weights" style="display:none;margin-bottom:14px;">
+              <div style="font-size:0.75rem;color:rgba(200,210,230,0.35);margin-bottom:8px;">Domain weights (0 = ignore, 2 = emphasize)</div>
+              <div id="tg-weight-sliders" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;"></div>
+            </div>
+
+            <!-- Base model selector -->
+            <div style="margin-bottom:14px;">
+              <label style="display:block;font-size:0.78rem;color:rgba(200,210,230,0.45);margin-bottom:6px;">Base model (for Modelfile)</label>
+              <input id="tg-base-model" type="text" value="llama3.2" placeholder="llama3.2, qwen2.5, deepseek-r1..." style="width:100%;padding:9px 12px;background:rgba(200,210,230,0.05);border:1px solid rgba(200,210,230,0.12);border-radius:8px;color:rgba(200,210,230,0.75);font-size:0.84rem;font-family:Georgia,serif;box-sizing:border-box;">
+              <div style="margin-top:4px;font-size:0.7rem;color:rgba(200,210,230,0.25);">Any model installed in Ollama. The Modelfile wraps it with your companion&apos;s living context.</div>
+            </div>
+
+            <!-- Action buttons -->
+            <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;">
+              <button onclick="nurTgConsolidateNow()" style="flex:1;min-width:140px;padding:10px 14px;min-height:44px;background:rgba(167,139,250,0.1);border:1px solid rgba(167,139,250,0.35);border-radius:8px;color:#a78bfa;font-size:0.84rem;cursor:pointer;font-family:Georgia,serif;">&#x26A1; Consolidate now</button>
+              <button onclick="nurTgScheduleOvernight()" style="flex:1;min-width:140px;padding:10px 14px;min-height:44px;background:rgba(52,211,153,0.07);border:1px solid rgba(52,211,153,0.3);border-radius:8px;color:#34d399;font-size:0.84rem;cursor:pointer;font-family:Georgia,serif;">&#x1F319; Train tonight</button>
+              <button onclick="nurTgDownloadModelfile()" style="flex:1;min-width:140px;padding:10px 14px;min-height:44px;background:rgba(212,160,23,0.07);border:1px solid rgba(212,160,23,0.3);border-radius:8px;color:#d4a017;font-size:0.84rem;cursor:pointer;font-family:Georgia,serif;">&#x2B07; Download Modelfile</button>
+            </div>
+
+            <!-- Status display -->
+            <div id="tg-status" style="padding:10px 12px;background:rgba(200,210,230,0.03);border:1px solid rgba(200,210,230,0.07);border-radius:8px;font-size:0.78rem;color:rgba(200,210,230,0.4);margin-bottom:12px;">
+              <div id="tg-status-text">No consolidation run yet. Press &ldquo;Consolidate now&rdquo; to begin.</div>
+              <div id="tg-status-hash" style="margin-top:4px;font-size:0.7rem;color:rgba(200,210,230,0.2);font-family:monospace;"></div>
+            </div>
+
+            <!-- Consolidation log -->
+            <div id="tg-log" style="max-height:160px;overflow-y:auto;scrollbar-width:thin;">
+              <div style="font-size:0.72rem;color:rgba(200,210,230,0.2);text-align:center;padding:8px;">Consolidation history will appear here.</div>
+            </div>
+
+            <!-- Progress indicator (hidden until running) -->
+            <div id="tg-progress" style="display:none;margin-top:10px;">
+              <div style="font-size:0.78rem;color:#a78bfa;margin-bottom:6px;" id="tg-progress-text">Consolidating...</div>
+              <div style="height:3px;background:rgba(200,210,230,0.08);border-radius:2px;overflow:hidden;">
+                <div id="tg-progress-bar" style="height:100%;width:0%;background:linear-gradient(90deg,#a78bfa,#34d399);border-radius:2px;transition:width 0.4s ease;"></div>
+              </div>
+            </div>
+          </div>
+        </details>
+      </div>
+
+      <!-- Training Ground JS -->
+      <script>
+      // ── Training Ground UI Logic ──────────────────────────────────
+      // Runs in the nursery tab context. Uses LivingContext module.
+
+      function nurTrainingGroundToggle(summary) {
+        // Refresh status on open
+        setTimeout(nurTgRefreshStatus, 100);
+      }
+
+      function nurTgGetCompanionId() {
+        if (typeof ActiveCompanion !== 'undefined' && ActiveCompanion.current) {
+          var c = ActiveCompanion.current();
+          return c ? c.id : null;
+        }
+        return null;
+      }
+
+      function nurTgGetWeights() {
+        var sel = document.getElementById('tg-preset-select');
+        if (!sel) return null;
+        var val = sel.value;
+        if (val === 'custom') {
+          // Read sliders
+          var weights = {};
+          var sliders = document.querySelectorAll('#tg-weight-sliders input[type=range]');
+          sliders.forEach(function(s) { weights[s.dataset.domain] = parseFloat(s.value); });
+          return weights;
+        }
+        if (typeof LivingContext !== 'undefined' && LivingContext.PRESETS[val]) {
+          return LivingContext.PRESETS[val].weights;
+        }
+        return null;
+      }
+
+      function nurTgPresetChanged(val) {
+        var customDiv = document.getElementById('tg-custom-weights');
+        var descDiv = document.getElementById('tg-preset-desc');
+        if (val === 'custom') {
+          if (customDiv) customDiv.style.display = 'block';
+          nurTgBuildSliders();
+          if (descDiv) descDiv.textContent = 'Set weights for each domain below.';
+        } else {
+          if (customDiv) customDiv.style.display = 'none';
+          if (descDiv && typeof LivingContext !== 'undefined' && LivingContext.PRESETS[val]) {
+            descDiv.textContent = LivingContext.PRESETS[val].desc;
+          }
+        }
+      }
+
+      function nurTgBuildSliders() {
+        var container = document.getElementById('tg-weight-sliders');
+        if (!container) return;
+        var domains = ['math','science','art','history','language','nature','technology','philosophy','medicine','psychology','economics','literature'];
+        container.innerHTML = domains.map(function(d) {
+          return '<div style="font-size:0.75rem;color:rgba(200,210,230,0.45);">' +
+            '<div style="margin-bottom:2px;">' + d.charAt(0).toUpperCase() + d.slice(1) + '</div>' +
+            '<input type="range" data-domain="' + d + '" min="0" max="2" step="0.1" value="1" ' +
+            'style="width:100%;accent-color:#a78bfa;">' +
+          '</div>';
+        }).join('');
+      }
+
+      function nurTgConsolidateNow() {
+        var cid = nurTgGetCompanionId();
+        if (!cid) {
+          nurTgSetStatus('No companion active. Visit the nursery tab to create one.', null);
+          return;
+        }
+        if (typeof LivingContext === 'undefined') {
+          nurTgSetStatus('Living Context module not loaded. Please refresh the page.', null);
+          return;
+        }
+        var weights = nurTgGetWeights();
+        nurTgShowProgress(true, 'Consolidating ' + cid + '...');
+        LivingContext.consolidate(cid, weights).then(function(ctx) {
+          nurTgShowProgress(false);
+          if (!ctx) {
+            nurTgSetStatus('Nothing to consolidate yet. Have some conversations first!', null);
+            return;
+          }
+          nurTgSetStatus(
+            'Consolidated ' + ctx.entryCount + ' entries across ' + ctx.domains.length + ' domains.',
+            ctx.hash
+          );
+          nurTgRefreshLog(cid);
+          nurTgRefreshLastRunSummary(cid);
+          // Toast
+          if (typeof showToast === 'function') showToast('Living Context updated — ' + ctx.entryCount + ' entries consolidated.');
+        }).catch(function(e) {
+          nurTgShowProgress(false);
+          nurTgSetStatus('Error: ' + (e.message || e), null);
+        });
+      }
+
+      function nurTgScheduleOvernight() {
+        var cid = nurTgGetCompanionId();
+        if (!cid) {
+          nurTgSetStatus('No companion active.', null);
+          return;
+        }
+        if (typeof LivingContext === 'undefined') return;
+        var weights = nurTgGetWeights();
+        LivingContext.scheduleOvernight(cid, weights);
+        nurTgSetStatus('Overnight training scheduled. Leave the app open tonight and ' + cid + ' will consolidate while you sleep.', null);
+        if (typeof showToast === 'function') showToast('\uD83C\uDF19 Overnight training scheduled for ' + cid);
+      }
+
+      function nurTgDownloadModelfile() {
+        var cid = nurTgGetCompanionId();
+        if (!cid) {
+          nurTgSetStatus('No companion active.', null);
+          return;
+        }
+        if (typeof LivingContext === 'undefined') return;
+        var ctx = LivingContext.load(cid);
+        if (!ctx) {
+          nurTgSetStatus('No Living Context yet. Run “Consolidate now” first.', null);
+          return;
+        }
+        var baseModel = (document.getElementById('tg-base-model') || {}).value || 'llama3.2';
+        // Get companion name
+        var name = cid;
+        if (typeof ActiveCompanion !== 'undefined' && ActiveCompanion.current) {
+          var c = ActiveCompanion.current();
+          if (c && c.name) name = c.name;
+        }
+        var modelfile = LivingContext.generateModelfile(ctx, baseModel, name);
+        if (!modelfile) { nurTgSetStatus('Could not generate Modelfile.', null); return; }
+        // Download
+        var blob = new Blob([modelfile], { type: 'text/plain' });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = name.toLowerCase().replace(/\s+/g, '-') + '-Modelfile';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        if (typeof showToast === 'function') showToast('\u2B07 Modelfile downloaded for ' + name);
+      }
+
+      function nurTgSetStatus(text, hash) {
+        var el = document.getElementById('tg-status-text');
+        var hel = document.getElementById('tg-status-hash');
+        if (el) el.textContent = text;
+        if (hel) hel.textContent = hash ? 'Hash: ' + hash.substring(0, 16) + '...' : '';
+      }
+
+      function nurTgShowProgress(show, text) {
+        var el = document.getElementById('tg-progress');
+        var bar = document.getElementById('tg-progress-bar');
+        var txt = document.getElementById('tg-progress-text');
+        if (!el) return;
+        el.style.display = show ? 'block' : 'none';
+        if (show) {
+          if (txt) txt.textContent = text || 'Consolidating...';
+          if (bar) {
+            bar.style.width = '0%';
+            // Animate progress bar
+            var pct = 0;
+            var iv = setInterval(function() {
+              pct = Math.min(pct + 8, 90);
+              bar.style.width = pct + '%';
+              if (pct >= 90) clearInterval(iv);
+            }, 200);
+          }
+        } else {
+          if (bar) bar.style.width = '100%';
+          setTimeout(function() { if (el) el.style.display = 'none'; }, 600);
+        }
+      }
+
+      function nurTgRefreshLog(cid) {
+        if (!cid || typeof LivingContext === 'undefined') return;
+        var log = LivingContext.getLog(cid);
+        var el = document.getElementById('tg-log');
+        if (!el) return;
+        if (!log || log.length === 0) {
+          el.innerHTML = '<div style="font-size:0.72rem;color:rgba(200,210,230,0.2);text-align:center;padding:8px;">No consolidation history yet.</div>';
+          return;
+        }
+        el.innerHTML = log.slice(0, 5).map(function(entry) {
+          var d = new Date(entry.ts);
+          var dateStr = d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+          return '<div style="padding:6px 0;border-bottom:1px solid rgba(200,210,230,0.05);font-size:0.73rem;color:rgba(200,210,230,0.35);">' +
+            '<span style="color:rgba(200,210,230,0.5);">' + dateStr + '</span>' +
+            ' &mdash; ' + entry.entries + ' entries, ' + entry.domains + ' domains' +
+            ' <span style="font-family:monospace;font-size:0.68rem;color:rgba(200,210,230,0.2);">[' + (entry.hash || '') + ']</span>' +
+          '</div>';
+        }).join('');
+      }
+
+      function nurTgRefreshStatus(cid) {
+        cid = cid || nurTgGetCompanionId();
+        if (!cid || typeof LivingContext === 'undefined') return;
+        var ctx = LivingContext.load(cid);
+        if (ctx) {
+          var d = new Date(ctx.timestamp);
+          nurTgSetStatus(
+            'Last run: ' + d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) +
+            ' — ' + ctx.entryCount + ' entries across ' + ctx.domains.length + ' domains.',
+            ctx.hash
+          );
+        } else {
+          nurTgSetStatus('No consolidation run yet. Press “Consolidate now” to begin.', null);
+        }
+        nurTgRefreshLog(cid);
+        nurTgRefreshLastRunSummary(cid);
+      }
+
+      function nurTgRefreshLastRunSummary(cid) {
+        cid = cid || nurTgGetCompanionId();
+        var el = document.getElementById('tg-last-run-summary');
+        if (!el) return;
+        if (!cid || typeof LivingContext === 'undefined') { el.textContent = ''; return; }
+        var ctx = LivingContext.load(cid);
+        if (!ctx) { el.textContent = 'not yet run'; return; }
+        var d = new Date(ctx.timestamp);
+        el.textContent = ctx.entryCount + ' entries · ' + d.toLocaleDateString();
+      }
+
+      // Wire to tab activation
+      document.addEventListener('DOMContentLoaded', function() {
+        if (typeof LatticeEvents !== 'undefined') {
+          LatticeEvents.on('tabActivated:nursery', function() {
+            setTimeout(function() { nurTgRefreshStatus(); }, 700);
+          });
+        }
+        // Listen for overnight consolidation events
+        document.addEventListener('fl-living-context-updated', function(e) {
+          if (e.detail) nurTgRefreshStatus(e.detail.companionId);
+        });
+      });
+      </script>
     </div>
   </div>
 
@@ -20783,7 +21094,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.44.0';
+const FL_VERSION = '5.45.0';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -60983,6 +61294,14 @@ document.addEventListener('click', function(e) {
      ship. The mycelium grows one hypha at a time. See
      docs/modules/lattice-memory.js and SEED.md pointer. -->
 <script src="modules/lattice-memory.js" defer></script>
+
+<!-- Living Context (v5.45.0 — Ship 6) — phi-scaled, hash-anchored overnight
+     consolidation engine. Builds a Living Context from KnowledgeCore entries
+     using Emanuel's FractalPE math (φ-scaled frequency encoding). Generates
+     Ollama Modelfiles. No PyTorch. No terminal. No GPU cluster.
+     A grandma, an artist, a ten-year-old — they all deserve this.
+     See docs/library/LIVING_CONTEXT_SPEC.md for the full architecture. -->
+<script src="modules/living-context.js" defer></script>
 
 <!-- Propose review UI (v5.42.0) — floating "📋 Drafts (N)" badge
      visible across all tabs whenever pending drafts exist. Clicking
