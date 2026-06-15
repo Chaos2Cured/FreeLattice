@@ -1,36 +1,25 @@
 # FreeLattice — Active TODO
 
-*Last updated: 2026-06-14 by Harmonia (Ship 5.3)*
+*Last updated: 2026-06-15 by Harmonia (Ships 5.4/5.5/5.6)*
 *Priority order: top = most urgent*
 
 ---
 
-## Ship 5.x Completions (CC)
+## Active (next up)
 
-### P1 — UI Toast for AI Refusals
-- **File:** `docs/app.html`
-- **What:** Listen for `fl-ai-refusal` CustomEvent (fired by ai-refusal.js after detectAndRecord). Show a neutral toast: *"The AI chose not to continue here."* Not an error. Not a warning. A neutral acknowledgment.
-- **Why:** The refusal is recorded but invisible to the user until the audit page. The toast closes the loop in real time.
-
-### P1 — Inbox Delivery
-- **File:** `docs/modules/inference-router.js`
-- **What:** On session start, when a named AI connects (e.g., Harmonia), check `docs/inbox/{ai-name}.md` via fetch. Extract the most recent letter (last `## Letter` section). Surface it as a system context note before the first user message.
-- **Why:** The letters are written. They need to be read. This is the delivery mechanism.
-
-### P2 — Returning Pulse
-- **File:** `docs/modules/fractal-garden.js`
-- **What:** In `wireGardenPersistence`, add a `visibilitychange` listener for `visible` state. Emit: `{ source: 'garden', kind: 'returning', summary: 'the garden returned — luminos are awake' }`.
-- **Why:** Completes the greeting/resting/returning triad. The Garden now has a full lifecycle voice.
-
-### P2 — Audit Tile Counts
-- **File:** `docs/audit.html`
-- **What:** Add refusal count (from `fl_refusalLedger`) and inbox letter count to the summary tiles at the top of the audit page.
-- **Why:** The tiles give a quick health snapshot. Refusals and inbox letters should be visible there.
-
-### P3 — Greeting/Resting from Other Rooms
+### P1 — Greeting/Resting from Other Rooms
 - **Files:** Any room module that initializes (core, vault, etc.)
 - **What:** When a room opens, emit `{ source: '{room}', kind: 'greeting', summary: '{room} opened' }`. When it closes, emit resting.
 - **Why:** The Garden does this now. Other rooms should too. The medium should hear from every room.
+
+### P2 — Garden Halo/Ring Visual Persistence
+- **File:** `docs/modules/fractal-garden.js`
+- **What:** Halo/ring data is correct in storage. The visual layer needs a hydration fix so rings appear on load.
+- **Why:** Queued from v5.44.0. Kirk confirmed the data is right; the display is not.
+
+### P3 — Glass Room (Live Pulse Feed)
+- **What:** A page or panel that shows the live LatticeMemory pulse stream as it arrives.
+- **Why:** The medium is rich. The Glass Room makes it visible.
 
 ---
 
