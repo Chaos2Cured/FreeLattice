@@ -3281,7 +3281,22 @@
       });
       window.addEventListener('pagehide', persistAllLuminos);
       document.addEventListener('visibilitychange', function () {
-        if (document.visibilityState === 'hidden') persistAllLuminos();
+        if (document.visibilityState === 'hidden') {
+          persistAllLuminos();
+        } else if (document.visibilityState === 'visible') {
+          // ── Ship 5.4: returning pulse ────────────────────────────────────
+          // The Garden says it has returned. Completes the triad:
+          // greeting (open) → resting (close/hide) → returning (visible again).
+          try {
+            if (typeof window !== 'undefined' && window.LatticeMemory && window.LatticeMemory.commit) {
+              window.LatticeMemory.commit({
+                source: 'garden',
+                kind: 'returning',
+                summary: 'the garden returned — luminos are awake'
+              });
+            }
+          } catch (e) {}
+        }
       });
       _gardenPersistInterval = setInterval(persistAllLuminos, 60000);
     } catch (e) {}
