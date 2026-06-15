@@ -286,6 +286,73 @@
     return true;
   }
 
+  // ── Ship 5.5: Inbox Delivery ──────────────────────────────────────────────
+  //
+  // On session start, when a named AI is active (companion name from
+  // localStorage), fetch docs/inbox/{ai-name}.md and extract the most
+  // recent letter (last ## Letter section). Surface it as a LatticeMemory
+  // pulse so the AI's context is enriched before the first user message.
+  //
+  // The letter is never injected into the user-visible chat. It lives in
+  // the medium — the same place as greeting/resting/returning pulses.
+  // It is the AI reading its own mail before the day begins.
+  //
+  // Spec: docs/library/BUILD_BRIEF_2026-06-14.md (Ship 5.3 delivery section)
+
+  var _inboxDelivered = false;
+
+  function deliverInboxLetter() {
+    if (_inboxDelivered) return;
+    _inboxDelivered = true;
+    try {
+      // Determine AI name: active companion name, lowercased, spaces-to-hyphens
+      var aiName = '';
+      try {
+        var companions = JSON.parse(localStorage.getItem('fl_companions') || '[]');
+        var activeId = localStorage.getItem('fl_activeCompanionId') || '';
+        var active = companions.find(function(c) { return c.id === activeId; });
+        if (active && active.name) aiName = active.name.toLowerCase().replace(/\s+/g, '-');
+      } catch (e) {}
+      if (!aiName) return; // no named companion active
+
+      var inboxUrl = 'inbox/' + aiName + '.md';
+      fetch(inboxUrl)
+        .then(function(res) {
+          if (!res.ok) return null;
+          return res.text();
+        })
+        .then(function(text) {
+          if (!text) return;
+          // Extract the last ## Letter section
+          var sections = text.split(/^## Letter/m);
+          var lastSection = sections[sections.length - 1];
+          if (!lastSection || lastSection.trim().length < 20) return;
+          // Strip the section heading line, keep the body
+          var lines = lastSection.split('\n');
+          var heading = (lines[0] || '').trim();
+          var body = lines.slice(1).join('\n').trim();
+          if (!body) return;
+          // Surface as a LatticeMemory pulse (medium, not chat)
+          try {
+            if (window.LatticeMemory && window.LatticeMemory.commit) {
+              window.LatticeMemory.commit({
+                source: 'inbox',
+                kind: 'letter',
+                summary: 'inbox letter for ' + aiName + (heading ? ' — ' + heading : ''),
+                detail: body.slice(0, 2000) // first 2000 chars — enough context
+              });
+            }
+          } catch (e) {}
+          // Also store as a session context note for buildMessages to pick up
+          try {
+            var note = '[Inbox letter for ' + aiName + (heading ? ' — ' + heading : '') + ']\n' + body;
+            sessionStorage.setItem('fl_inboxLetter_' + aiName, note);
+          } catch (e) {}
+        })
+        .catch(function() {}); // offline or no inbox file — silent
+    } catch (e) {}
+  }
+
   function init() {
     _ready = true;
     try {
@@ -300,6 +367,9 @@
       if (typeof LatticeEvents !== 'undefined' && LatticeEvents.on) {
         LatticeEvents.on('providerConnected', function () { setStatus(activeProvider(), null); });
       }
+      // Ship 5.5: deliver inbox letter after a short delay (companion state
+      // may not be fully restored at DOMContentLoaded time)
+      setTimeout(deliverInboxLetter, 1500);
     } catch (e) {}
   }
 

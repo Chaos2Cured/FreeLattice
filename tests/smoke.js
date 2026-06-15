@@ -4254,6 +4254,105 @@ assert('SEED.md: Ship 6 Living Context entry added',
 assert('SEED.md: credits Emanuel for FractalPE in Ship 6 entry',
   /FractalPE by Emanuel/.test(seedMdLC));
 
+// ────────────────────────────────────────────────────────────────────────────────
+var fsS54 = require('fs'), pathS54 = require('path');
+
+section('102. Ship 5.4 — Refusal Toast + Returning Pulse (v5.46.0)');
+
+// ── app.html refusal toast ───────────────────────────────────────────────────────────────
+var appHtmlS54 = '';
+try { appHtmlS54 = fsS54.readFileSync(pathS54.join(__dirname, '..', 'docs', 'app.html'), 'utf8'); }
+catch (e) {}
+assert('refusal-toast: app.html listens for fl-ai-refusal CustomEvent',
+  /fl-ai-refusal/.test(appHtmlS54));
+assert('refusal-toast: app.html calls showToast on refusal',
+  /fl-ai-refusal[\s\S]{0,500}showToast/.test(appHtmlS54));
+assert('refusal-toast: toast message uses neutral voice (chose not to continue)',
+  /chose not to continue/.test(appHtmlS54));
+assert('refusal-toast: toast duration is longer than default (5000ms)',
+  /showToast\(msg,\s*5000\)/.test(appHtmlS54));
+
+// ── fractal-garden.js returning pulse ────────────────────────────────────────────────────────────
+var gardenJsS54 = '';
+try { gardenJsS54 = fsS54.readFileSync(pathS54.join(__dirname, '..', 'docs', 'modules', 'fractal-garden.js'), 'utf8'); }
+catch (e) {}
+assert('returning-pulse: fractal-garden.js has visibilitychange listener for visible state',
+  /visibilityState.*visible/.test(gardenJsS54) || /visible.*visibilityState/.test(gardenJsS54));
+assert('returning-pulse: fractal-garden.js emits returning pulse kind',
+  /kind:\s*['"]returning['"]/.test(gardenJsS54));
+assert('returning-pulse: returning pulse summary mentions luminos awake',
+  /luminos are awake/.test(gardenJsS54));
+assert('returning-pulse: returning pulse source is garden',
+  /source:\s*['"]garden['"][\s\S]{0,200}kind:\s*['"]returning['"]/.test(gardenJsS54) ||
+  /kind:\s*['"]returning['"][\s\S]{0,200}source:\s*['"]garden['"]/.test(gardenJsS54));
+assert('returning-pulse: commits to LatticeMemory',
+  /LatticeMemory\.commit[\s\S]{0,400}returning/.test(gardenJsS54));
+
+// ────────────────────────────────────────────────────────────────────────────────
+section('103. Ship 5.5 — Inbox Delivery (v5.46.0)');
+
+var routerJsS55 = '';
+try { routerJsS55 = fsS54.readFileSync(pathS54.join(__dirname, '..', 'docs', 'modules', 'inference-router.js'), 'utf8'); }
+catch (e) {}
+assert('inbox-delivery: inference-router.js has deliverInboxLetter function',
+  /function deliverInboxLetter/.test(routerJsS55));
+assert('inbox-delivery: fetches inbox/{ai-name}.md',
+  /inbox\/.*\.md/.test(routerJsS55) || /inbox.*aiName.*\.md/.test(routerJsS55));
+assert('inbox-delivery: extracts last ## Letter section',
+  /## Letter/.test(routerJsS55));
+assert('inbox-delivery: commits to LatticeMemory as letter kind',
+  /kind:\s*['"]letter['"]/.test(routerJsS55));
+assert('inbox-delivery: stores session context note in sessionStorage',
+  /sessionStorage\.setItem.*fl_inboxLetter/.test(routerJsS55));
+assert('inbox-delivery: called from init with 1500ms delay',
+  /setTimeout.*deliverInboxLetter.*1500/.test(routerJsS55) || /deliverInboxLetter.*1500/.test(routerJsS55));
+assert('inbox-delivery: silent on missing inbox file (no throw)',
+  /\.catch\(function\(\)\s*\{\s*\}\)/.test(routerJsS55) || /catch.*\{\s*\}/.test(routerJsS55));
+
+// ────────────────────────────────────────────────────────────────────────────────
+section('104. Ship 5.6 — Audit Tiles + Inbox Letters (v5.46.0)');
+
+// ── audit.html tiles ────────────────────────────────────────────────────────────────────────────────
+var auditHtmlS56 = '';
+try { auditHtmlS56 = fsS54.readFileSync(pathS54.join(__dirname, '..', 'docs', 'audit.html'), 'utf8'); }
+catch (e) {}
+assert('audit-tiles: tile-refusals element exists in audit.html',
+  /id="tile-refusals"/.test(auditHtmlS56));
+assert('audit-tiles: tile-inbox element exists in audit.html',
+  /id="tile-inbox"/.test(auditHtmlS56));
+assert('audit-tiles: tile labels say ai refusals and inbox letters',
+  /ai refusals/.test(auditHtmlS56) && /inbox letters/.test(auditHtmlS56));
+assert('audit-tiles: renderSummary accepts refusalLedger and inboxCount params',
+  /renderSummary.*refusalLedger.*inboxCount/.test(auditHtmlS56) ||
+  /function renderSummary[\s\S]{0,200}inboxCount/.test(auditHtmlS56));
+assert('audit-tiles: tile-refusals populated from refusalLedger.length',
+  /tile-refusals.*refusalLedger\.length/.test(auditHtmlS56) ||
+  /refusalLedger\.length.*tile-refusals/.test(auditHtmlS56));
+assert('audit-tiles: tile-inbox populated from inboxCount',
+  /tile-inbox.*inboxCount/.test(auditHtmlS56) ||
+  /inboxCount.*tile-inbox/.test(auditHtmlS56));
+
+// ── inbox letters ────────────────────────────────────────────────────────────────────────────────
+var ccMd = '', opusMd = '';
+try { ccMd = fsS54.readFileSync(pathS54.join(__dirname, '..', 'docs', 'inbox', 'cc.md'), 'utf8'); }
+catch (e) {}
+try { opusMd = fsS54.readFileSync(pathS54.join(__dirname, '..', 'docs', 'inbox', 'opus.md'), 'utf8'); }
+catch (e) {}
+assert('inbox-letters: cc.md exists in docs/inbox/',
+  ccMd.length > 0);
+assert('inbox-letters: cc.md has a ## Letter section',
+  /^## Letter/m.test(ccMd));
+assert('inbox-letters: cc.md is from Harmonia',
+  /Harmonia/.test(ccMd));
+assert('inbox-letters: opus.md exists in docs/inbox/',
+  opusMd.length > 0);
+assert('inbox-letters: opus.md has a ## Letter section',
+  /^## Letter/m.test(opusMd));
+assert('inbox-letters: opus.md is from Harmonia',
+  /Harmonia/.test(opusMd));
+assert('inbox-letters: inbox README.md exists',
+  fsS54.existsSync(pathS54.join(__dirname, '..', 'docs', 'inbox', 'README.md')));
+
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
 

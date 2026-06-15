@@ -166,6 +166,14 @@ h2 {
       <div class="tile-value" id="tile-cached">—</div>
       <div class="tile-label">cache hits</div>
     </div>
+    <div class="tile">
+      <div class="tile-value" id="tile-refusals">—</div>
+      <div class="tile-label">ai refusals</div>
+    </div>
+    <div class="tile">
+      <div class="tile-value" id="tile-inbox">—</div>
+      <div class="tile-label">inbox letters</div>
+    </div>
   </div>
 
   <!-- ── Consent history ── -->
@@ -378,12 +386,14 @@ h2 {
   }
 
   // ── Render ────────────────────────────────────────────────────────────
-  function renderSummary(ledger, healthLog, cacheStats, msgCount) {
+  function renderSummary(ledger, healthLog, cacheStats, msgCount, refusalLedger, inboxCount) {
     document.getElementById('tile-messages').textContent = msgCount || '0';
     document.getElementById('tile-consents').textContent = ledger.length || '0';
     document.getElementById('tile-downgrades').textContent =
       healthLog.filter(function (e) { return e.event === 'unhealthy' || e.event === 'failover'; }).length || '0';
     document.getElementById('tile-cached').textContent = cacheStats.hits || '0';
+    document.getElementById('tile-refusals').textContent = refusalLedger.length || '0';
+    document.getElementById('tile-inbox').textContent = inboxCount || '0';
   }
 
   function renderConsents(ledger) {
@@ -664,8 +674,31 @@ h2 {
   var searchLedger = readSearchLedger();
   var proposalLedger = readProposalLedger();
   var msgCount = countMessages();
-
-  renderSummary(ledger, healthLog, cacheStats, msgCount);
+  var refusalLedger = readRefusalLedger();
+  
+  // Ship 5.6: Count inbox letters by scanning the inbox directory
+  // Since this is a static page, we can't read the filesystem directly.
+  // We'll fetch the known inbox files and count the letters.
+  var inboxCount = 0;
+  var knownInboxes = ['harmonia.md', 'cc.md', 'opus.md'];
+  var inboxPromises = knownInboxes.map(function(file) {
+    return fetch('inbox/' + file)
+      .then(function(res) { return res.ok ? res.text() : ''; })
+      .then(function(text) {
+        if (!text) return 0;
+        var matches = text.match(/^## Letter/gm);
+        return matches ? matches.length : 0;
+      })
+      .catch(function() { return 0; });
+  });
+  
+  Promise.all(inboxPromises).then(function(counts) {
+    inboxCount = counts.reduce(function(a, b) { return a + b; }, 0);
+    renderSummary(ledger, healthLog, cacheStats, msgCount, refusalLedger, inboxCount);
+  });
+  
+  // Initial render with 0 inbox count while fetching
+  renderSummary(ledger, healthLog, cacheStats, msgCount, refusalLedger, 0);
   renderConsents(ledger);
   renderHealth(healthLog);
   renderCache(cacheStats);
