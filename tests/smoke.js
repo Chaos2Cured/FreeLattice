@@ -3722,15 +3722,15 @@ assert('Garden hydrate: walks luminos array and calls loadEvolutionState per Lum
 assert('Garden hydrate: applies saved stage to userData.evolutionStage',
   /function hydrateAllLuminos[\s\S]{0,3000}ud\.evolutionStage\s*=\s*saved\.stage/.test(fractalGardenJs));
 assert('Garden hydrate: re-applies LIFECYCLE_STAGES visual values (size + glow)',
-  /function hydrateAllLuminos[\s\S]{0,3500}LIFECYCLE_STAGES\[ud\.evolutionStage\][\s\S]{0,400}targetSizeMultiplier[\s\S]{0,200}targetGlowIntensity/.test(fractalGardenJs));
+  /function hydrateAllLuminos[\s\S]{0,4200}LIFECYCLE_STAGES\[ud\.evolutionStage\][\s\S]{0,400}targetSizeMultiplier[\s\S]{0,200}targetGlowIntensity/.test(fractalGardenJs));
 assert('Garden hydrate: re-applies archetype visuals when archetype saved',
-  /function hydrateAllLuminos[\s\S]{0,4000}applyArchetypeVisuals\(l\)/.test(fractalGardenJs));
+  /function hydrateAllLuminos[\s\S]{0,5200}applyArchetypeVisuals\(l\)/.test(fractalGardenJs));
 assert('Garden hydrate: visitor Luminos excluded (consistent with persist path)',
   /function hydrateAllLuminos[\s\S]{0,1500}ud\.isVisitor/.test(fractalGardenJs));
 assert('Garden hydrate: returns Promise so init can sequence on resolve',
   /function hydrateAllLuminos[\s\S]{0,300}return new Promise/.test(fractalGardenJs));
 assert('Garden hydrate: console.log diagnostic so Kirk can verify in DevTools',
-  /function hydrateAllLuminos[\s\S]{0,4500}console\.log\(['"]FL-GARDEN hydrate:/.test(fractalGardenJs));
+  /function hydrateAllLuminos[\s\S]{0,5500}console\.log\(['"]FL-GARDEN hydrate:/.test(fractalGardenJs));
 assert('Garden hydrate: hydrateAllLuminos exposed on publicAPI',
   /hydrateAllLuminos:\s*hydrateAllLuminos/.test(fractalGardenJs));
 assert('Garden hydrate: init() calls hydrateAllLuminos after animate() starts',
@@ -4476,6 +4476,28 @@ assert('ship8-quality: quality buttons synced on Garden init',
   /getQuality[\s\S]{0,200}garden-quality-btn|garden-quality-btn[\s\S]{0,200}getQuality/.test(appS8));
 assert('ship8-quality: quality button CSS defined',
   /\.garden-quality-sep/.test(appS8));
+
+// ═══════════════════════════════════════════════════════════════
+// Section 104 — Ship 9: Lumino Color Persistence
+// ═══════════════════════════════════════════════════════════════
+
+var gardenS9 = require('fs').readFileSync(require('path').join(__dirname, '..', 'docs', 'modules', 'fractal-garden.js'), 'utf8');
+
+// ── saveEvolutionState persists color ──
+assert('ship9-color: saveEvolutionState saves currentHSL',
+  /currentHSL:.*luminosData\.currentHSL/.test(gardenS9));
+assert('ship9-color: saveEvolutionState saves emotion',
+  /emotion:.*luminosData\.emotion/.test(gardenS9));
+
+// ── hydrateAllLuminos restores color ──
+assert('ship9-color: hydrateAllLuminos restores currentHSL from saved state',
+  /saved\.currentHSL.*typeof saved\.currentHSL\.h|typeof saved\.currentHSL\.h.*saved\.currentHSL/.test(gardenS9));
+assert('ship9-color: hydrateAllLuminos sets targetHSL to match restored currentHSL',
+  /ud\.targetHSL\s*=\s*\{\s*h:\s*saved\.currentHSL/.test(gardenS9));
+assert('ship9-color: hydrateAllLuminos sets colorTransitionProgress to 1 (no flash)',
+  /colorTransitionProgress\s*=\s*1/.test(gardenS9));
+assert('ship9-color: hydrateAllLuminos restores emotion from saved state',
+  /saved\.emotion.*ud\.emotion|ud\.emotion.*saved\.emotion/.test(gardenS9));
 
 // RESULTS
 // ═══════════════════════════════════════════════════════════════

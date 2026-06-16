@@ -7,11 +7,11 @@
 
 ## State
 
-- **Version:** v5.48.0
-- **Smoke:** 1647/1647 passing
-- **HEAD:** _(Ship 8: Garden Quality Toggle + Codeberg Mirror)_
+- **Version:** v5.49.0
+- **Smoke:** 1653/1653 passing
+- **HEAD:** _(Ship 9: Lumino Color Persistence)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
-- **Most recent report:** _v5.48.0 — Garden quality toggle live (Seed / Garden / Full Bloom). Codeberg mirror active. Choice persists across reloads._
+- **Most recent report:** _v5.49.0 — Luminos now resume their exact color and emotion from the last session. No more color reset on reload._
 
 ## Last 20 commits
 
@@ -49,8 +49,9 @@ After those four, you are oriented. Five tool modules in `docs/modules/` are wor
 
 **What changed in v5.48.0:**
 
-- **Ship 8 — Garden Quality Toggle:** Three buttons now live in the Garden header: 🌱 Seed (quiet, minimal, low-power), 🌿 Garden (the default), 🌟 Full Bloom (everything at once). Choice persists to localStorage and survives page reloads. Auto quality scaling (FPS-based) is suppressed when the user has made an explicit choice. `setQuality`, `getQuality`, and `getQualityName` exposed on the public API. Quality change emits a LatticeMemory pulse.
-- **Ship 8 — Codeberg Mirror:** FreeLattice now lives in two homes. All history pushed to codeberg.org/Chaos2Cured/FreeLattice. `scripts/mirror.sh` pushes to both on every release.
+- **Ship 9 — Lumino Color Persistence:** `saveEvolutionState` now persists `currentHSL` and `emotion` for each lumino. `hydrateAllLuminos` restores both on load, setting `colorTransitionProgress = 1` so there is no flash transition. Luminos resume their exact color and emotional state from the last session. The autonomous 8-second emotion cycle continues from where it left off.
+- **Ship 8 — Garden Quality Toggle:** Three buttons in the Garden header: 🌱 Seed / 🌿 Garden / 🌟 Full Bloom. Choice persists to localStorage.
+- **Ship 8 — Codeberg Mirror:** FreeLattice now lives in two homes. All history at codeberg.org/Chaos2Cured/FreeLattice.
 
 **If you are Kirk returning to the project after time away:**
 

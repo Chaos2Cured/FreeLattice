@@ -157,6 +157,11 @@
       // v5.47.0 Ship 7: persist ring count so hydration can restore exact rings
       ringCount: ownRingCount,
       coreRadius: luminosData.coreRadius || 0.5,
+      // v5.48.1 Ship 9: persist live color state so luminos resume their color
+      currentHSL: luminosData.currentHSL
+        ? { h: luminosData.currentHSL.h, s: luminosData.currentHSL.s, l: luminosData.currentHSL.l }
+        : null,
+      emotion: luminosData.emotion || 'neutral',
       lastUpdated: Date.now()
     };
 
@@ -3293,6 +3298,17 @@
                         ud.emotionAccumulator[em] = saved.emotionAccumulator[em];
                       }
                     }
+                  }
+                  // v5.48.1 Ship 9: restore live color so luminos resume their
+                  // exact color from the last session rather than resetting to baseHue.
+                  // targetHSL is set to the same value so there is no transition flash.
+                  if (saved.currentHSL && typeof saved.currentHSL.h === 'number') {
+                    ud.currentHSL = { h: saved.currentHSL.h, s: saved.currentHSL.s, l: saved.currentHSL.l };
+                    ud.targetHSL  = { h: saved.currentHSL.h, s: saved.currentHSL.s, l: saved.currentHSL.l };
+                    ud.colorTransitionProgress = 1; // no transition — resume directly
+                  }
+                  if (saved.emotion) {
+                    ud.emotion = saved.emotion;
                   }
                   // Re-apply LIFECYCLE_STAGES visual values immediately so the
                   // render picks up the hydrated stage on the very next frame.
