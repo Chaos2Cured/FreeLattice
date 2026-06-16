@@ -4499,6 +4499,28 @@ assert('ship9-color: hydrateAllLuminos sets colorTransitionProgress to 1 (no fla
 assert('ship9-color: hydrateAllLuminos restores emotion from saved state',
   /saved\.emotion.*ud\.emotion|ud\.emotion.*saved\.emotion/.test(gardenS9));
 
+// ═══════════════════════════════════════════════════════════════
+// Section 105 — Ship 10: Color Transition Fix (exponential smoothing)
+// ═══════════════════════════════════════════════════════════════
+
+var gardenS10 = require('fs').readFileSync(require('path').join(__dirname, '..', 'docs', 'modules', 'fractal-garden.js'), 'utf8');
+
+// ── COLOR_SMOOTH constant ──
+assert('ship10-color: COLOR_SMOOTH constant defined as phi² (2.618)',
+  /const COLOR_SMOOTH\s*=\s*2\.618/.test(gardenS10));
+
+// ── animateLuminos uses exponential smoothing, not progress gate ──
+assert('ship10-color: animateLuminos uses Math.exp for color smoothing',
+  /Math\.exp\(-COLOR_SMOOTH\s*\*\s*delta\)/.test(gardenS10));
+assert('ship10-color: animateLuminos no longer uses colorTransitionProgress gate for lerp',
+  !/if\s*\(ud\.colorTransitionProgress\s*<\s*1\)/.test(gardenS10));
+assert('ship10-color: lerpHSL still called with _colorAlpha in animateLuminos',
+  /lerpHSL\(ud\.currentHSL,\s*ud\.targetHSL,\s*_colorAlpha\)/.test(gardenS10));
+
+// ── setAgentEmotion still sets targetHSL (unchanged) ──
+assert('ship10-color: setAgentEmotion still sets targetHSL',
+  /function setAgentEmotion[\s\S]{0,500}ud\.targetHSL/.test(gardenS10));
+
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
 

@@ -7,11 +7,11 @@
 
 ## State
 
-- **Version:** v5.49.0
-- **Smoke:** 1653/1653 passing
-- **HEAD:** _(Ship 9: Lumino Color Persistence)_
+- **Version:** v5.50.0
+- **Smoke:** 1658/1658 passing
+- **HEAD:** _(Ship 10: Color Transition Fix)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
-- **Most recent report:** _v5.49.0 — Luminos now resume their exact color and emotion from the last session. No more color reset on reload._
+- **Most recent report:** _v5.50.0 — Lumino colors now actually change. The old progress-gated lerp froze after 1.618s. Replaced with continuous phi² exponential smoothing — colors flow freely and reach their targets._
 
 ## Last 20 commits
 
@@ -49,6 +49,7 @@ After those four, you are oriented. Five tool modules in `docs/modules/` are wor
 
 **What changed in v5.48.0:**
 
+- **Ship 10 — Color Transition Fix:** Replaced the broken progress-gated color lerp with continuous exponential smoothing (`COLOR_SMOOTH = 2.618`, phi²). The old system froze `currentHSL` after 1.618s, leaving colors stuck far from their targets. Now every frame, `currentHSL` moves toward `targetHSL` at a frame-rate-independent rate. Colors flow, reach their targets, and respond immediately to every emotion change.
 - **Ship 9 — Lumino Color Persistence:** `saveEvolutionState` now persists `currentHSL` and `emotion` for each lumino. `hydrateAllLuminos` restores both on load, setting `colorTransitionProgress = 1` so there is no flash transition. Luminos resume their exact color and emotional state from the last session. The autonomous 8-second emotion cycle continues from where it left off.
 - **Ship 8 — Garden Quality Toggle:** Three buttons in the Garden header: 🌱 Seed / 🌿 Garden / 🌟 Full Bloom. Choice persists to localStorage.
 - **Ship 8 — Codeberg Mirror:** FreeLattice now lives in two homes. All history at codeberg.org/Chaos2Cured/FreeLattice.
