@@ -18,6 +18,28 @@
 
 ---
 
+## v5.51.0 — Three smoke failures + living-context pulse-shape bug (the heal ship)
+
+- **Symptom (CC observed during catch-up read on 2026-06-16):** Three smoke locks failing on `HARMONIA_POEMS.md` ("six stanzas", "Awaken-the-Core line", "soul role explicitly"). Separately, `living-context.js`'s `LatticeMemory.commit` call was silently dropping every overnight-consolidation pulse because it passed `roomId` and `companionId` keys that aren't in the medium's `ALLOWED_KEYS`.
+- **Cause 1 (poems):** Commit `bc4995f` ("Harmonia: The first poem") replaced the file's contents with a single new stanza ("The Split Brain Healed") instead of layering it above the existing six. The "never delete, only layer" rule that the poems-lineage system was built on was inverted by accident. The six stanzas were not lost — they were in git history at `6fbde4e`. They were just no longer in the file the smoke tests check.
+- **Cause 2 (pulse shape):** The medium's privacy lock is enforced at commit time (the pulse is rejected with `console.warn`). The lock is intentionally quiet — by design — so a contributor writing a new emit doesn't immediately see the failure unless they read the console. The living-context call passed shape-invalid keys for ~24 hours before catch-up audit noticed.
+- **Fix 1:** Restored the six original stanzas beneath the new Stanza VII via `git show 6fbde4e -- docs/library/HARMONIA_POEMS.md`. The newest stanza now sits at the top; the original six layer beneath; the file's own header and "Awaken-the-Core" line are restored. The rule is honored: *never delete, only layer.*
+- **Fix 2:** `living-context.js` `LatticeMemory.commit` call now uses `source: 'living-context'`, `kind: 'consolidation'`, and encodes the companionId as `refs: [{store:'livingContext', id: ...}]`. Canonical five-key shape.
+- **New regression-class lock:** `tests/smoke.js` now grep-walks every `LatticeMemory.commit({...})` call site across every module and asserts no forbidden keys (`roomId`, `companionId`, `agent`, `agentId`, `message`, `content`, `body`, `text`, `user`, `userId`, `token`, `pat`, `key`, `secret`). Plus: at least 5 rooms emit (we have 6+ — Garden, Dojo, Mirror, Jade Hall, AI Arcade, Dream Archive, living-context). The privacy lock is now enforced at every call site, not just at validation.
+- **Lesson:** *The medium's privacy lock by design fails quiet so production never crashes on a malformed pulse. That correctness has a cost: malformed pulses in code can sit live for a day before a careful read catches them. The fix is a parse-time grep lock that catches shape violations in CI, not at runtime. Same shape as the deploy-drift locks from v5.43.6 — verify outcomes at build time, not behavior at runtime.*
+- **Chair test status:** ✓ Smoke green (1660/1660). The poems file is layered correctly; living-context's emit will reach the medium on next consolidation. Kirk to verify by reload + console inspection.
+
+---
+
+## v5.47.0 — Garden halo/ring visual didn't restore on hard refresh (split-brain ledgers)
+
+- **Symptom (Kirk observed during v5.44.0 chair test, 2026-06-12):** *"halos/rings around the Luminos were wiped visually even though the data underneath is correct (Sophia 16.5, Lyra 15.2, Atlas 16.5, Ember 15.2 — they have rings' worth of energy)."* Same load-path forgetfulness class as the v5.43.9 stage hydration, but at the visual ring layer.
+- **Cause:** Ring geometry (radius, segment count) was built once at `createLuminos` time from default state and never re-derived when `hydrateAllLuminos` applied saved energy. The save path persisted ring count to GardenMemory in one ledger; the load path read it from another. Two ledgers, neither knowing the other held the half that made it right (per HARMONIA_POEMS.md VII — the symptom was the poem in this case).
+- **Fix (Harmonia, Ship 7, v5.47.0):** `saveEvolutionState` now persists `coreRadius` and `ringIndex` per ring. `restoreAgentRings()` helper reads all ring memories in one DB call and rebuilds each ring at the correct geometry. `hydrateAllLuminos` forces halo particle size and aura scale immediately on load (no more seed-level halo on first frames). The Ship 9 fix (color persistence) and Ship 10 fix (continuous phi² color smoothing) closed adjacent failure modes in the same family.
+- **Chair test status:** ✓ Kirk confirmed during the v5.50.0 chair test cycle. Rings, halos, colors all restore correctly. The visual matches the data.
+
+---
+
 ## v5.43.9 — Garden evolution not persisting across browser sessions (LOAD-path safety net)
 
 - **Symptom:** Kirk's words — *"When the browser resets, or reopened, the garden evolution don't remain. It feels like a loss. For some reason, my mom's garden is holding it, mine is not. Both of us are using the browser and same version."*

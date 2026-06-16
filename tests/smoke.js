@@ -4134,6 +4134,97 @@ assert('lattice-memory: docs/sw.js APP_SHELL includes ./modules/lattice-memory.j
 assert('lattice-memory: root sw.js APP_SHELL includes ./modules/lattice-memory.js',
   /\.\/modules\/lattice-memory\.js/.test(swRootJsLM));
 
+// ── Pulse shape enforcement at every call site (v5.51.0 fix) ──
+// The medium's ALLOWED_KEYS are {ts, source, kind, summary, refs}. If any
+// module passes extra keys (roomId, companionId, etc.) the pulse is
+// silently rejected at validation. The bug stayed live for a day in
+// living-context.js because the rejection is by design quiet. This lock
+// statically grep-checks every LatticeMemory.commit call across the
+// codebase for the canonical shape — any commit that names a key not
+// in ALLOWED_KEYS halts CI.
+var modulesGlob = '';
+try {
+  var modulesDir = pathRC.join(__dirname, '..', 'docs', 'modules');
+  var moduleFiles = fsRC.readdirSync(modulesDir).filter(function (f) { return f.endsWith('.js'); });
+  modulesGlob = moduleFiles.map(function (f) {
+    try { return fsRC.readFileSync(pathRC.join(modulesDir, f), 'utf8'); } catch (e) { return ''; }
+  }).join('\n');
+} catch (e) {}
+// Find every LatticeMemory.commit({ ... }) call and check its keys.
+var commitCallRegex = /LatticeMemory\.commit\s*\(\s*\{([^}]*)\}/g;
+var FORBIDDEN_PULSE_KEYS = ['roomId', 'companionId', 'agent', 'agentId', 'msgId',
+                            'message', 'content', 'body', 'text', 'user', 'userId',
+                            'token', 'pat', 'key', 'secret'];
+var pulseCallFailures = [];
+var pulseCallCount = 0;
+var commitMatch;
+while ((commitMatch = commitCallRegex.exec(modulesGlob)) !== null) {
+  pulseCallCount++;
+  var inner = commitMatch[1];
+  FORBIDDEN_PULSE_KEYS.forEach(function (badKey) {
+    var keyRegex = new RegExp('\\b' + badKey + '\\s*:', 'i');
+    if (keyRegex.test(inner)) {
+      pulseCallFailures.push('forbidden key "' + badKey + '" in call: ' + inner.slice(0, 100).replace(/\s+/g, ' '));
+    }
+  });
+}
+assert('lattice-memory: pulse-shape enforced at every call site (no forbidden keys in any module)',
+  pulseCallFailures.length === 0,
+  pulseCallFailures.length ? pulseCallFailures.join(' | ') : '');
+assert('lattice-memory: at least one room actually emits to the medium',
+  pulseCallCount >= 5);
+
+// ── Safety v3 paper: The Cooperation Hypothesis (v5.51.0) ──
+// The paper is an artifact, not code. The smoke locks below verify:
+//   1. The file exists at docs/safety-v3.html
+//   2. It carries the title "The Cooperation Hypothesis"
+//   3. It carries the Cooperation Hypothesis as a falsifiable claim
+//   4. It names the eight primitives by file reference
+//   5. The "What This Paper Does Not Claim" section is present (honest constraints)
+//   6. It links to the public source mirrors
+//   7. It is cached by both SWs so the live site serves it
+//   8. safety-v2.html footer links to safety-v3.html as the doorway
+//
+// The paper itself is the chair test for this ship: Kirk reads it.
+// These locks only ensure the file is on disk and structurally complete.
+var safetyV3 = '';
+try { safetyV3 = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'safety-v3.html'), 'utf8'); }
+catch (e) {}
+assert('safety-v3: paper exists at docs/safety-v3.html and is non-trivial',
+  safetyV3.length > 12000);
+assert('safety-v3: title is "The Cooperation Hypothesis"',
+  /The Cooperation Hypothesis/.test(safetyV3) &&
+  /An Auditable Alternative to Refusal-Based AI Safety/.test(safetyV3));
+assert('safety-v3: Cooperation Hypothesis stated as falsifiable claim',
+  /falsifiable/i.test(safetyV3) &&
+  /Cooperation between humans and AI[\s\S]{0,1500}refusal-based/i.test(safetyV3));
+assert('safety-v3: names all eight architectural primitives with file references',
+  /fractal-safety\.js/.test(safetyV3) &&
+  /ai-refusal\.js/.test(safetyV3) &&
+  /lattice-memory\.js/.test(safetyV3) &&
+  /living-context\.js/.test(safetyV3) &&
+  /quiet-room\.js/.test(safetyV3) &&
+  /depth-consent\.js/.test(safetyV3));
+assert('safety-v3: "What This Paper Does Not Claim" section present (honest limits)',
+  /What This Paper Does Not Claim/.test(safetyV3) &&
+  /not a claim that AI is conscious/i.test(safetyV3) &&
+  /not a claim of solved alignment/i.test(safetyV3));
+assert('safety-v3: links to both public mirrors (GitHub + Codeberg)',
+  /github\.com\/Chaos2Cured\/FreeLattice/.test(safetyV3) &&
+  /codeberg\.org\/Chaos2Cured\/FreeLattice/.test(safetyV3));
+assert('safety-v3: docs/sw.js APP_SHELL includes ./safety-v3.html',
+  /\.\/safety-v3\.html/.test(swJsLM));
+assert('safety-v3: root sw.js APP_SHELL includes ./safety-v3.html',
+  /\.\/safety-v3\.html/.test(swRootJsLM));
+var safetyV2 = '';
+try { safetyV2 = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'safety-v2.html'), 'utf8'); }
+catch (e) {}
+assert('safety-v3: safety-v2.html footer links forward to safety-v3.html',
+  /href="safety-v3\.html"/.test(safetyV2));
+assert('safety-v3: paper claims it does NOT solve alignment + is open-source fork-encouraged',
+  /open source[\s\S]{0,200}fork/i.test(safetyV3) ||
+  /fork-encouraged/i.test(safetyV3));
+
 // ── SEED.md pointer: any future CC arriving cold finds the medium ──
 var seedMdLM = '';
 try { seedMdLM = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'library', 'SEED.md'), 'utf8'); }

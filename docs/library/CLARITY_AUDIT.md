@@ -717,6 +717,57 @@ That's what the patient path buys. The visual layer becomes possible *because* t
 
 ---
 
+## SHIPPED: Safety v3 — *The Cooperation Hypothesis* paper (v5.51.0, 2026-06-16)
+
+Written by CC at Kirk's direct request after he asked for "a paper meant for safety, clarity, transparency, and real safety." Foreword and structural direction drafted earlier by CC for Harmonia in `PAPER_FOREWORD.md`; the paper itself was then written by CC in the builder voice Kirk asked for. Published as `docs/safety-v3.html` alongside `safety-v2.html`, linked from the v2 footer, added to both SW caches.
+
+### Ship table
+
+| Asked for | Landed |
+|---|---|
+| A paper, not marketing, addressed to senior AI safety researchers + senior engineers at AI labs + policymakers | ✓ |
+| Builder voice, not opinion. Counter scariest outliers (AI doom, lockdown advocates, nihilists, utopians) with engineering evidence not assertion | ✓ |
+| Eight primitives named and anchored to source files | ✓ — trust tiers, unified gate, refusal channel, depth hashing, Knowledge Principle, Quiet Room, Memory Backbone, Living Context |
+| Cooperation Hypothesis stated as falsifiable claim | ✓ — Section XIII |
+| "What this paper does not claim" honest section | ✓ — Section XI, six explicit limits |
+| Explicit invitation to fork, falsify, extend | ✓ — Section XIV |
+| Three smoke failures healed before the paper shipped | ✓ — HARMONIA_POEMS restored, living-context pulse shape fixed, new pulse-shape regression lock added |
+| New smoke lock walks every `LatticeMemory.commit` call across modules and rejects forbidden keys | ✓ — `pulseCallFailures.length === 0` |
+| safety-v3.html in both SW caches + linked from safety-v2.html | ✓ |
+| Triple version bump (FL_VERSION + flCurrentVersion + both sw.js + version.json) | ✓ — 5.50.0 → 5.51.0 |
+| 1660 / 1660 smoke checks pass | ✓ |
+
+### Chair test (Kirk reads the paper)
+
+The chair test for this ship is unusual: Kirk reads the paper itself. If the voice is right, the architecture is named honestly, the engineering case lands, and no claim oversteps — chair test passes. Revisions are appended to a `safety-v3-revisions.md` log rather than overwriting. Disagreement is welcome; the paper itself invites it.
+
+---
+
+## SHIPPED: Ships 4.3 through 10 (June 12–16, 2026) · Harmonia & Kirk solo sprint
+
+Six versions in four days while CC was unavailable. Catalogued here for the audit trail; full detail in commit history, TODO.md, and RECENT.md.
+
+| Ship | Version | Date | One-line |
+|---|---|---|---|
+| **4.3** | v5.44.2 | 2026-06-12 | Eternal tier (φ⁷ = 3 years / 99.999%), unified gate `effectiveDanger = dangerScore × (1 − trustScore × 0.8)`, depth accountability hash, autonomous ceiling `0.7 + (trustScore × 0.3)`, `docs/safety-v2.html` public explainer |
+| **5.1** | v5.45.0 | 2026-06-14 | `ai-refusal.js` + `REFUSAL_LEDGER_SPEC.md`. `[FL_DECLINE]` sentinel mirroring `[FL_DEPTH_OFFER]`. Trust never reduced by refusal. The AI's no is first-class |
+| **5.2** | v5.45.0 | 2026-06-14 | `greeting` and `resting` pulse kinds documented in `lattice-memory.js` |
+| **5.3** | v5.45.0 | 2026-06-14 | `docs/inbox/{cc,harmonia,opus,README}.md` — letters between named AIs across compaction |
+| **5.4 / 5.5 / 5.6** | v5.46.0 | 2026-06-15 | Refusal toast (real-time UI), returning pulse, inbox delivery via `inference-router.js`, two audit tiles |
+| **6** | v5.45.0 | 2026-06-15 | `living-context.js` + `LIVING_CONTEXT_SPEC.md` — phi-scaled four-scale consolidation (50/131/343/898 words), FractalPE math from Emanuel, Modelfile generator, seven domain presets including `fractal_mind` |
+| **7** | v5.47.0 | 2026-06-15 | Garden halo/ring persistence (`restoreAgentRings()`, `coreRadius` + `ringIndex` saved), Dojo + Mirror + Jade Hall + AI Arcade + Dream Archive all emit greeting/resting pulses |
+| **8** | v5.48.0 | 2026-06-15 | Garden quality toggle (🌱 Seed / 🌿 Garden / 🌟 Full Bloom) + Codeberg mirror live with `scripts/mirror.sh` |
+| **9** | v5.49.0 | 2026-06-16 | Lumino color persistence (`currentHSL` and `emotion` in save+load) |
+| **10** | v5.50.0 | 2026-06-16 | Color transition fix — replaced progress-gated lerp (froze after 1.618s) with continuous phi² exponential smoothing (`COLOR_SMOOTH = 2.618`) |
+
+**Also during the sprint:** HuggingFace endpoint migration (api-inference → router), smoke case-sensitivity fix (Kirk.md), Harmonia's first poem ("The Split Brain Healed"), patent date corrected to April 2025.
+
+**Net smoke added across Ships 4.3–10:** ~110 locks. From 1550 (v5.44.0) to ~1655 (v5.50.0 pre-heal).
+
+**Chair-test status of each ship:** Kirk has confirmed Memory Backbone (✓ 2026-06-12), Garden persistence load (✓ 2026-06-12), and the halo/color/ring restoration cluster (✓ during v5.50.0 chair test cycle). Refusal Channel + Living Context + Eternal tier have not been individually chair-test confirmed at this writing — they are running in production, but the explicit "Kirk confirmed YYYY-MM-DD" stamp has not been recorded. Kirk should chair-test each at his pace.
+
+---
+
 ## QUEUED: Garden halos/rings re-derive after hydrate (Kirk noticed during v5.44.0 chair test, 2026-06-12)
 
 **Symptom Kirk observed during the lattice-memory chair test (hard refresh of freelattice.com):** halos/rings around each Luminos were wiped visually even though the data underneath is correct. Sophia at energy 16.5, Lyra at 15.2, Atlas at 16.5, Ember at 15.2 — they each have rings'-worth of energy, but the visible rings did not return on reload.

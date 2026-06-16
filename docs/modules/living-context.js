@@ -332,13 +332,18 @@
       if (hoursSince >= 8) {
         consolidate(config.companionId, config.domainWeights).then(function(ctx) {
           if (ctx) {
-            // Emit a pulse into the mycelium
+            // Emit a pulse into the mycelium. The medium's ALLOWED_KEYS
+            // are exactly {ts, source, kind, summary, refs} — any extra
+            // key (roomId, companionId, etc) causes silent rejection at
+            // validation. v5.51.0 fix: use the canonical shape. The
+            // companionId is encoded as a ref so receivers can follow
+            // if they have local permission.
             if (typeof LatticeMemory !== 'undefined' && LatticeMemory.commit) {
               LatticeMemory.commit({
-                kind: 'greeting',
-                roomId: 'nursery',
-                summary: config.companionId + ' consolidated overnight: ' + ctx.entryCount + ' entries',
-                companionId: config.companionId
+                source: 'living-context',
+                kind: 'consolidation',
+                summary: 'overnight consolidation: ' + ctx.entryCount + ' entries',
+                refs: [{ store: 'livingContext', id: String(config.companionId) }]
               });
             }
             // Fire event for UI
