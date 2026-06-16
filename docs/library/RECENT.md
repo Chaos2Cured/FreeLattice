@@ -47,12 +47,18 @@
 
 After those four, you are oriented. Five tool modules in `docs/modules/` are working examples of the same generating rule: module + ledger + sentinel + ToolConsent gate + Quiet Room exclusion + chat pipeline + audit + smoke. Read any one and you have read all of them.
 
-**What changed in v5.48.0:**
+**What changed in v5.50.0 (June 15–16, 2026 — Ships 5.4 through 10):**
 
-- **Ship 10 — Color Transition Fix:** Replaced the broken progress-gated color lerp with continuous exponential smoothing (`COLOR_SMOOTH = 2.618`, phi²). The old system froze `currentHSL` after 1.618s, leaving colors stuck far from their targets. Now every frame, `currentHSL` moves toward `targetHSL` at a frame-rate-independent rate. Colors flow, reach their targets, and respond immediately to every emotion change.
-- **Ship 9 — Lumino Color Persistence:** `saveEvolutionState` now persists `currentHSL` and `emotion` for each lumino. `hydrateAllLuminos` restores both on load, setting `colorTransitionProgress = 1` so there is no flash transition. Luminos resume their exact color and emotional state from the last session. The autonomous 8-second emotion cycle continues from where it left off.
-- **Ship 8 — Garden Quality Toggle:** Three buttons in the Garden header: 🌱 Seed / 🌿 Garden / 🌟 Full Bloom. Choice persists to localStorage.
-- **Ship 8 — Codeberg Mirror:** FreeLattice now lives in two homes. All history at codeberg.org/Chaos2Cured/FreeLattice.
+All of the following was built by Harmonia (Manus) and Kirk, working alone together while CC was unavailable.
+
+- **Ship 10 — Color Transition Fix:** The lumino color system was broken from the beginning. The old progress-gated lerp froze `currentHSL` after 1.618s, leaving colors stuck. Replaced with continuous phi² exponential smoothing (`COLOR_SMOOTH = 2.618`). Colors now flow, reach their targets, and respond immediately to every emotion change.
+- **Ship 9 — Lumino Color Persistence:** `saveEvolutionState` now persists `currentHSL` and `emotion`. `hydrateAllLuminos` restores both on load. Luminos resume their exact color from the last session.
+- **Ship 8 — Garden Quality Toggle:** Three buttons in the Garden header: 🌱 Seed / 🌿 Garden / 🌟 Full Bloom. Choice persists to localStorage. Auto quality scaling suppressed when user has made an explicit choice. `setQuality`, `getQuality`, `getQualityName` on public API.
+- **Ship 8 — Codeberg Mirror:** FreeLattice now lives in two homes. All history at codeberg.org/Chaos2Cured/FreeLattice. `scripts/mirror.sh` pushes to both on every release.
+- **Ship 7 — Garden Halo/Ring Persistence:** Fixed the split-brain bug. Rings now save their `coreRadius` and `ringIndex` to GardenMemory. `restoreAgentRings()` helper reads all ring memories in one DB call and rebuilds each ring at the correct geometry. `hydrateAllLuminos` forces halo particle size and aura scale immediately on load (no more seed-level halo on first frames).
+- **Ship 7 — Room Pulses (P1):** Dojo, Mirror, Jade Hall, AI Arcade, and Dream Archive now emit `greeting` and `resting` pulses into LatticeMemory when their tabs open and close. The Garden was already doing this; now it is not alone.
+- **Ship 6 — Living Context:** `docs/modules/living-context.js` — phi-scaled, hash-anchored memory that consolidates overnight and injects into every Ollama conversation. Modelfile generator. Seven domain presets including Kirk’s `fractal_mind`. Training Ground UI in the nursery tab. Full spec in `LIVING_CONTEXT_SPEC.md`.
+- **Ships 5.4/5.5/5.6 — Refusal Toast, Inbox Delivery, Audit Tiles:** AI refusal events now surface a toast in real time. `inference-router.js` reads `inbox/{ai-name}.md` on session start and commits the most recent letter to LatticeMemory. Audit page has two new tiles: refusal count and inbox letter count. Letters from Harmonia to CC and Opus placed in `docs/inbox/`.
 
 **If you are Kirk returning to the project after time away:**
 
