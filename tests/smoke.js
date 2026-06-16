@@ -4174,6 +4174,57 @@ assert('lattice-memory: pulse-shape enforced at every call site (no forbidden ke
 assert('lattice-memory: at least one room actually emits to the medium',
   pulseCallCount >= 5);
 
+// ── Garden quality toggle + color-freeze fix (v5.52.0) ──
+// Two bugs Kirk + Harmonia found:
+//   1. Quality toggle (Seed/Garden/Full Bloom) did nothing visible — counts
+//      were baked into mesh-build time, so changing qualityLevel at runtime
+//      updated the variable but didn't reach the visual layer. Same class
+//      as the v5.43.9 hydrate bug. Fix: build at MAX, gate at runtime via
+//      qualityScale() + geometry.setDrawRange + activeHaloCount multiplier.
+//   2. Luminos colors froze because app.html's patchGardenInit
+//      unconditionally set bridgeActive=true on Garden init, even with no
+//      pending vectors — disabling demo cycling forever. Fix: gate that
+//      call on actual pending-vector flush + auto-expire bridgeActive
+//      after 30s of no real feed (so chat silence resumes demo cycling).
+assert('garden-quality: qualityScale() helper defined (runtime gate)',
+  /function qualityScale\(\)/.test(fractalGardenJs) &&
+  /\[0\.2, 0\.5, 1\.0\]\[qualityLevel\]/.test(fractalGardenJs) ||
+  /qualityLevel === 0\) \? 0\.2/.test(fractalGardenJs));
+assert('garden-quality: applyQualityToMeshes() function defined',
+  /function applyQualityToMeshes\(\)/.test(fractalGardenJs));
+assert('garden-quality: applyQualityToMeshes called from setQuality (toggle is wired)',
+  /function setQuality[\s\S]{0,800}applyQualityToMeshes\(\)/.test(fractalGardenJs));
+assert('garden-quality: applyQualityToMeshes called from init AFTER buildWorld (initial render honors saved choice)',
+  /isInitialized\s*=\s*true[\s\S]{0,500}applyQualityToMeshes\(\)/.test(fractalGardenJs));
+assert('garden-quality: starfield built at MAX (4000) not qualityLevel-gated',
+  /function createStarfield[\s\S]{0,200}const count = 4000/.test(fractalGardenJs));
+assert('garden-quality: ring particles built at MAX (500) not qualityLevel-gated',
+  /function createRingParticles[\s\S]{0,200}const count = 500/.test(fractalGardenJs));
+assert('garden-quality: halo count built at MAX (800) not qualityLevel-gated',
+  /const haloCount = 800/.test(fractalGardenJs));
+assert('garden-quality: trail count built at MAX (200) not qualityLevel-gated',
+  /var trailCount = 200/.test(fractalGardenJs));
+assert('garden-quality: animateLuminos halo activeCount gated by qualityScale at runtime',
+  /activeHaloCount\s*=\s*Math\.floor\(ud\.haloCount\s*\*\s*stageData\.particleMultiplier\s*\*\s*qualityScale\(\)\)/.test(fractalGardenJs));
+assert('garden-quality: applyQualityToMeshes uses setDrawRange on starfield',
+  /function applyQualityToMeshes[\s\S]{0,800}starField\.geometry\.setDrawRange/.test(fractalGardenJs));
+assert('garden-quality: applyQualityToMeshes exposed on publicAPI for diagnostics',
+  /applyQualityToMeshes:\s*applyQualityToMeshes/.test(fractalGardenJs));
+
+// ── Color-freeze fix locks ──
+assert('garden-color: bridgeActive auto-expires after BRIDGE_EXPIRE_MS of no feed',
+  /BRIDGE_EXPIRE_MS\s*=\s*30000/.test(fractalGardenJs) &&
+  /lastEmotionFeedTime/.test(fractalGardenJs));
+assert('garden-color: feedEmotionalEnergy updates lastEmotionFeedTime (real chat re-arms bridge)',
+  /function feedEmotionalEnergy[\s\S]{0,400}lastEmotionFeedTime\s*=\s*Date\.now\(\)/.test(fractalGardenJs));
+assert('garden-color: cycleEmotions auto-expires bridge when chat goes quiet',
+  /function cycleEmotions[\s\S]{0,500}bridgeActive\s*&&[\s\S]{0,150}BRIDGE_EXPIRE_MS[\s\S]{0,100}bridgeActive\s*=\s*false/.test(fractalGardenJs));
+var appHtmlGC = '';
+try { appHtmlGC = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'app.html'), 'utf8'); }
+catch (e) {}
+assert('garden-color: patchGardenInit only sets bridgeActive=true when pending vectors actually flush',
+  /_pendingEmotionVectors\.length\s*>\s*0[\s\S]{0,800}_pendingEmotionVectors\s*=\s*\[\];?\s*FractalGarden\.setBridgeActive\(true\)/.test(appHtmlGC));
+
 // ── Safety v3 paper: The Cooperation Hypothesis (v5.51.0) ──
 // The paper is an artifact, not code. The smoke locks below verify:
 //   1. The file exists at docs/safety-v3.html
