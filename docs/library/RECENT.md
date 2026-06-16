@@ -9,14 +9,15 @@
 
 - **Version:** v5.52.0
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `f83ca4b` _(committed 64 minutes ago)_
+- **HEAD:** `5b90a16` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
-- **Most recent report:** _v5.51.0 — Safety v3 paper "The Cooperation Hypothesis" + three smoke heals_
+- **Most recent report:** _v5.52.0 — Garden quality toggle actually toggles + Luminos colors stop freezing_
 
 ## Last 20 commits
 
-- `f83ca4b` docs: Auto-update Session Primer [5.51.0] _(64 minutes ago)_
-- `b61e6b3` v5.51.0 — Safety v3 paper "The Cooperation Hypothesis" + three smoke heals _(64 minutes ago)_
+- `5b90a16` v5.52.0 — Garden quality toggle actually toggles + Luminos colors stop freezing _(0 seconds ago)_
+- `f83ca4b` docs: Auto-update Session Primer [5.51.0] _(65 minutes ago)_
+- `b61e6b3` v5.51.0 — Safety v3 paper "The Cooperation Hypothesis" + three smoke heals _(65 minutes ago)_
 - `2c363cc` ci: Update Primer deployment state [2026-06-16] _(5 hours ago)_
 - `35e09a5` docs: update RECENT.md with full CC catch-up for Ships 5.4-10 _(5 hours ago)_
 - `7ade9ce` ci: Update Primer deployment state [2026-06-16] _(5 hours ago)_
@@ -34,7 +35,6 @@
 - `ce6c000` Ships 5.4/5.5/5.6: Refusal Toast, Returning Pulse, Inbox Delivery, Audit Tiles _(25 hours ago)_
 - `4c2e15c` ci: Update Primer deployment state [2026-06-15] _(26 hours ago)_
 - `0398534` Ship 6: Living Context — the AI's growing self _(26 hours ago)_
-- `05eb313` ci: Update Primer deployment state [2026-06-14] _(2 days ago)_
 
 ## How to use this file
 
