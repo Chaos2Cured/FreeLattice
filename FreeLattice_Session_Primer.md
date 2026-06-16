@@ -348,12 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-06-16 15:56 UTC
-- Last deployed: 2026-06-16 15:56 UTC
-- Live site: https://freelattice.com
-- Version: 5.50.0
-- Total commits: 2456
+- Last auto-updated: 2026-06-16 13:31 MDT
+- Version: 5.51.0
+- Total commits: 2458
 - Last 10 commits:
+- b61e6b3 v5.51.0 — Safety v3 paper "The Cooperation Hypothesis" + three smoke heals
+- 2c363cc ci: Update Primer deployment state [2026-06-16]
 - 35e09a5 docs: update RECENT.md with full CC catch-up for Ships 5.4-10
 - 7ade9ce ci: Update Primer deployment state [2026-06-16]
 - 2a08e5d Ship 10: Fix lumino color cycling — exponential smoothing replaces broken lerp (v5.50.0)
@@ -362,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - a2b874d ci: Update Primer deployment state [2026-06-16]
 - 6e63cc2 Ship 9: Lumino color persistence — resume exact color on reload (v5.49.0)
 - d838dab ci: Update Primer deployment state [2026-06-15]
-- 6b7d203 Ship 8: Garden quality toggle + Codeberg mirror (v5.48.0)
-- 86b0411 Ship 7: Garden halo/ring persistence + room pulses (v5.47.0)
