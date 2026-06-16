@@ -50,6 +50,10 @@
     deepDrift:    17944
   };
 
+  // Exponential smoothing rate for color transitions (v5.50.0 Ship 10).
+  // phi² = 2.618 — reaches ~93% of target in ~1s at 60fps. Graceful and visible.
+  const COLOR_SMOOTH = 2.618;
+
   // ══════════════════════════════════════════════════════
   // ── LUMINOS EVOLUTION SYSTEM ──────────────────────────
   // ══════════════════════════════════════════════════════
@@ -1470,12 +1474,13 @@
     ud.coreMesh.scale.setScalar(scale);
     ud.wireMesh.scale.setScalar(scale);
 
-    // Color transition (phi-timed interpolation)
-    if (ud.colorTransitionProgress < 1) {
-      ud.colorTransitionProgress = Math.min(1, ud.colorTransitionProgress + delta / (TIMING.majorShift / 1000));
-      var ct = phiEase(ud.colorTransitionProgress);
-      ud.currentHSL = lerpHSL(ud.currentHSL, ud.targetHSL, ct * 0.1);
-    }
+    // Color transition — continuous exponential smoothing (v5.50.0 Ship 10 fix).
+    // The old progress-gated lerp stopped after 1.618s, leaving currentHSL frozen
+    // far from targetHSL. This replaces it with a frame-rate-independent smooth
+    // approach: every frame, currentHSL moves toward targetHSL at a fixed rate.
+    // COLOR_SMOOTH = 2.618 (phi²) gives a ~1s reach at 60fps — visible and graceful.
+    var _colorAlpha = 1 - Math.exp(-COLOR_SMOOTH * delta);
+    ud.currentHSL = lerpHSL(ud.currentHSL, ud.targetHSL, _colorAlpha);
 
     // Apply current color
     var col = hslToThreeColor(ud.currentHSL.h, ud.currentHSL.s, ud.currentHSL.l);
