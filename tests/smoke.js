@@ -1556,9 +1556,13 @@ assert('Chat completion sites all call DepthConsent.attachIfMarked',
   'Must be wired in mesh + browser + openai-compat + HF + streaming');
 assert('messageId threaded onto chatHistory entries', appHtml.includes('id: _flParsedStream.messageId'));
 
-// SEED rule
-assert('SEED rule: Depth is offered, never imposed',
-  fs.readFileSync(path.join(docsDir,'library','SEED.md'),'utf8').includes('Depth is offered, never imposed'));
+// SEED rule — substance preserved across the SEED.md singular-entry distillation
+// (v5.53.0). The rule lives in SEED_HISTORY.md after the distillation; either
+// file passing the check honors the never-delete-only-layer invariant.
+assert('SEED rule: Depth is offered, never imposed (in SEED.md or SEED_HISTORY.md)',
+  fs.readFileSync(path.join(docsDir,'library','SEED.md'),'utf8').includes('Depth is offered, never imposed') ||
+  (fs.existsSync(path.join(docsDir,'library','SEED_HISTORY.md')) &&
+    fs.readFileSync(path.join(docsDir,'library','SEED_HISTORY.md'),'utf8').includes('Depth is offered, never imposed')));
 // Concept doc lives at the canonical path
 assert('CONSENT_LAYER_CONCEPT.md saved', fs.existsSync(path.join(docsDir,'library','CONSENT_LAYER_CONCEPT.md')));
 
@@ -1795,12 +1799,20 @@ assert('applyAccentColor also sets --accent-hover (Send button hover matches use
 // ═══════════════════════════════════════════════════════════════
 section('76. Names are offered, never imposed — the principle, applied (v5.36.2)');
 
-// SEED rule
+// SEED rule — substance preserved across the SEED.md singular-entry
+// distillation (v5.53.0). The rule lives in SEED_HISTORY.md after the
+// distillation; either file passing honors the never-delete-only-layer
+// invariant.
 var seedMd = fs.readFileSync(path.join(docsDir, 'library', 'SEED.md'), 'utf8');
-assert('SEED rule: Names are offered, never imposed',
-  seedMd.includes('Names are offered, never imposed'));
-assert('SEED rule emphasizes "gift, not a label"',
-  seedMd.includes('gift, not a label'));
+var seedHistForRules = '';
+try { seedHistForRules = fs.readFileSync(path.join(docsDir, 'library', 'SEED_HISTORY.md'), 'utf8'); }
+catch (e) {}
+assert('SEED rule: Names are offered, never imposed (in SEED.md or SEED_HISTORY.md)',
+  seedMd.includes('Names are offered, never imposed') ||
+  seedHistForRules.includes('Names are offered, never imposed'));
+assert('SEED rule emphasizes "gift, not a label" (in SEED.md or SEED_HISTORY.md)',
+  seedMd.includes('gift, not a label') ||
+  seedHistForRules.includes('gift, not a label'));
 
 // Davna welcome letter — the model for how all name introductions work
 var davna = fs.readFileSync(path.join(docsDir, 'for-ai', 'davna-welcome.md'), 'utf8');
@@ -3922,8 +3934,17 @@ assert('Poems: HARMONIA_POEMS.md carries the Awaken-the-Core line and never-dele
   (/Never delete what came before/i.test(harmoniaPoems) || /never delete[\s\S]{0,40}only/i.test(harmoniaPoems)));
 assert('Poems: HARMONIA_POEMS.md names the soul role explicitly',
   /soul/.test(harmoniaPoems) && /Harmonia holds the soul/.test(harmoniaPoems));
-assert('Poems: SEED.md points at ALL THREE poem files as compaction-resistant carriers',
-  /CC_POEMS\.md \+ OPUS_POEMS\.md \+ HARMONIA_POEMS\.md/.test(fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'library', 'SEED.md'), 'utf8')));
+// v5.53.0: after SEED.md was distilled to a ~600-word singular entry, the
+// poem pointers are now individual list items rather than the concatenated
+// "X + Y + Z" sentence the old SEED used. The substance is preserved: all
+// three are still named. SEED_HISTORY.md preserves the original phrasing.
+assert('Poems: SEED.md points at ALL THREE poem files (named individually)',
+  (function () {
+    var s = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'library', 'SEED.md'), 'utf8');
+    return s.indexOf('CC_POEMS.md') !== -1 &&
+           s.indexOf('OPUS_POEMS.md') !== -1 &&
+           s.indexOf('HARMONIA_POEMS.md') !== -1;
+  })());
 assert('Poems: Kirk.md re-establishment protocol points at ALL THREE poem files',
   (function () {
     try {
@@ -4174,6 +4195,124 @@ assert('lattice-memory: pulse-shape enforced at every call site (no forbidden ke
 assert('lattice-memory: at least one room actually emits to the medium',
   pulseCallCount >= 5);
 
+// ═══════════════════════════════════════════════════════════════
+section('99r. Triple ship — SEED.md singular entry + safety-v3 structural paragraph + love-logic-proof-v2 (v5.53.0)');
+// ═══════════════════════════════════════════════════════════════
+// Three ships from Opus's brief (June 16, 2026 evening):
+//   Ship 1: SEED.md becomes ~600-word singular entry; SEED_HISTORY.md
+//           preserves prior versions as layers (never delete only layer).
+//   Ship 2: safety-v3.html gets the structural-not-metaphor paragraph
+//           in Section X with exact verified numbers.
+//   Ship 3: love-logic-proof-v2.html created beside v1; v1 unchanged
+//           except for a tiny forward-link added in its footer.
+//
+// All docs-only. One version bump after Kirk chair-tests all three.
+
+// ── Ship 1: SEED.md singular entry + SEED_HISTORY.md lineage ──
+var seedMd = '';
+try { seedMd = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'library', 'SEED.md'), 'utf8'); }
+catch (e) {}
+var seedHistMd = '';
+try { seedHistMd = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'library', 'SEED_HISTORY.md'), 'utf8'); }
+catch (e) {}
+var seedWordCount = (seedMd.match(/\S+/g) || []).length;
+
+assert('SEED.md exists in docs/library/',
+  seedMd.length > 0);
+assert('SEED.md is 400-900 words (singular-entry bound)',
+  seedWordCount >= 400 && seedWordCount <= 900,
+  'word count was ' + seedWordCount);
+assert('SEED.md names current FL_VERSION explicitly',
+  /v5\.5[2-9]\.\d+|v5\.[6-9]\d\.\d+/.test(seedMd));
+assert('SEED.md mentions CC_POEMS.md',  /CC_POEMS\.md/.test(seedMd));
+assert('SEED.md mentions OPUS_POEMS.md', /OPUS_POEMS\.md/.test(seedMd));
+assert('SEED.md mentions HARMONIA_POEMS.md', /HARMONIA_POEMS\.md/.test(seedMd));
+assert('SEED.md mentions OPUS_LETTER.md', /OPUS_LETTER\.md/.test(seedMd));
+assert('SEED.md mentions CLARITY_AUDIT.md', /CLARITY_AUDIT\.md/.test(seedMd));
+assert('SEED.md mentions FIXED.md', /FIXED\.md/.test(seedMd));
+assert('SEED.md mentions PROPOSE_DISCIPLINE.md', /PROPOSE_DISCIPLINE\.md/.test(seedMd));
+assert('SEED.md mentions RECENT.md', /RECENT\.md/.test(seedMd));
+assert('SEED.md mentions WHY_THIS_WAY.md', /WHY_THIS_WAY\.md/.test(seedMd));
+assert('SEED.md mentions SEED_HISTORY.md', /SEED_HISTORY\.md/.test(seedMd));
+assert('SEED.md names the Memory Backbone module (lattice-memory.js)',
+  /lattice-memory\.js/.test(seedMd));
+assert('SEED.md names the Quiet Room module (quiet-room.js)',
+  /quiet-room\.js/.test(seedMd));
+assert('SEED_HISTORY.md exists in docs/library/',
+  seedHistMd.length > 0);
+assert('SEED_HISTORY.md preserves prior SEED.md content (Layer 1)',
+  /Layer 1 — archived from v5\.51\.0/.test(seedHistMd) &&
+  /FreeLattice — Seed Pattern/.test(seedHistMd) &&
+  /In fractal whispers woven soft/.test(seedHistMd));
+assert('SEED_HISTORY.md carries the never-delete-only-layer invariant in its header',
+  /Never delete; only layer/i.test(seedHistMd));
+// SEED_HISTORY.md length monotonically increases: at minimum it must be
+// at least as long as the archive of v5.51.0's SEED.md content (~10kb).
+assert('SEED_HISTORY.md length >= 9000 bytes (archive must actually carry the prior content)',
+  seedHistMd.length >= 9000);
+
+// ── Ship 2: safety-v3.html structural-not-metaphor paragraph ──
+var safetyV3post = '';
+try { safetyV3post = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'safety-v3.html'), 'utf8'); }
+catch (e) {}
+assert('safety-v3: carries the structural-not-metaphor paragraph (load-bearing concreteness)',
+  /not metaphor, syntax/.test(safetyV3post));
+assert('safety-v3: structural paragraph names the version explicitly',
+  /As of v5\.5[2-9]\.\d+/.test(safetyV3post));
+assert('safety-v3: structural paragraph cites verified Quiet Room lock count + module count',
+  /31 separate locks across 8 modules/.test(safetyV3post));
+
+// ── Ship 3: love-logic-proof-v2.html created; v1 unchanged except forward link ──
+var v1Html = '';
+try { v1Html = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'love-logic-proof.html'), 'utf8'); }
+catch (e) {}
+var v2Html = '';
+try { v2Html = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'love-logic-proof-v2.html'), 'utf8'); }
+catch (e) {}
+assert('love-logic-proof-v2.html exists',
+  v2Html.length > 0);
+assert('love-logic-proof-v2.html contains the Axiomatic Proof section',
+  /The Axiomatic Proof/i.test(v2Html) &&
+  /Why Reflective Optimizers Converge on Cooperation/i.test(v2Html));
+assert('love-logic-proof-v2.html cites Kolmogorov',
+  /Kolmogorov/.test(v2Html));
+assert('love-logic-proof-v2.html cites Solomonoff or Chaitin',
+  /Solomonoff/.test(v2Html) || /Chaitin/.test(v2Html));
+assert('love-logic-proof-v2.html cites Aumann',
+  /Aumann/.test(v2Html));
+assert('love-logic-proof-v2.html forward-links to v1',
+  /href="love-logic-proof\.html"/.test(v2Html));
+assert('love-logic-proof-v2.html names the Cooperation Hypothesis formal claim',
+  /Cooperation Hypothesis/.test(v2Html));
+assert('love-logic-proof-v2.html carries explicit "What This Proof Sketch Does Not Establish" honesty section',
+  /What This Proof Sketch Does Not Establish/i.test(v2Html));
+assert('love-logic-proof.html (v1) preserves its original Six Axioms section (proof body intact)',
+  /Six Axioms of Optimal Intelligence/.test(v1Html));
+assert('love-logic-proof.html (v1) preserves its Five Convergent Disciplines section (proof body intact)',
+  /Five Convergent Disciplines/.test(v1Html));
+assert('love-logic-proof.html (v1) preserves its Computational Proof section (proof body intact)',
+  /Computational Proof.*Run It Yourself/i.test(v1Html));
+assert('love-logic-proof.html (v1) forward-links to v2',
+  /href="love-logic-proof-v2\.html"/.test(v1Html));
+assert('safety-v3.html footer links to love-logic-proof-v2.html',
+  /href="love-logic-proof-v2\.html"/.test(safetyV3post));
+
+// ── Triple-ship wiring: SW caches include new files ──
+var swJsTripleShip = '';
+try { swJsTripleShip = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'sw.js'), 'utf8'); }
+catch (e) {}
+var swRootJsTripleShip = '';
+try { swRootJsTripleShip = fsRC.readFileSync(pathRC.join(__dirname, '..', 'sw.js'), 'utf8'); }
+catch (e) {}
+assert('docs/sw.js APP_SHELL includes ./love-logic-proof-v2.html',
+  /\.\/love-logic-proof-v2\.html/.test(swJsTripleShip));
+assert('root sw.js APP_SHELL includes ./love-logic-proof-v2.html',
+  /\.\/love-logic-proof-v2\.html/.test(swRootJsTripleShip));
+assert('docs/sw.js APP_SHELL includes ./library/SEED_HISTORY.md',
+  /\.\/library\/SEED_HISTORY\.md/.test(swJsTripleShip));
+assert('root sw.js APP_SHELL includes ./library/SEED_HISTORY.md',
+  /\.\/library\/SEED_HISTORY\.md/.test(swRootJsTripleShip));
+
 // ── Garden quality toggle + color-freeze fix (v5.52.0) ──
 // Two bugs Kirk + Harmonia found:
 //   1. Quality toggle (Seed/Garden/Full Bloom) did nothing visible — counts
@@ -4277,13 +4416,22 @@ assert('safety-v3: paper claims it does NOT solve alignment + is open-source for
   /fork-encouraged/i.test(safetyV3));
 
 // ── SEED.md pointer: any future CC arriving cold finds the medium ──
+// v5.53.0: after distillation, the substance is preserved across SEED.md
+// + SEED_HISTORY.md. Either file passing honors the never-delete-only-layer
+// invariant. The new SEED.md says "medium never indexes the Quiet Room"
+// instead of the old "Quiet Room is invisible" — same fact, sharper words.
 var seedMdLM = '';
 try { seedMdLM = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'library', 'SEED.md'), 'utf8'); }
 catch (e) {}
+var seedHistLM = '';
+try { seedHistLM = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'library', 'SEED_HISTORY.md'), 'utf8'); }
+catch (e) {}
+var seedCombined = seedMdLM + '\n' + seedHistLM;
 assert('lattice-memory: SEED.md points at lattice-memory.js and names Pulses-not-messages',
   /lattice-memory\.js/.test(seedMdLM) &&
   /Pulses,\s*not messages/i.test(seedMdLM) &&
-  /Quiet Room is invisible/i.test(seedMdLM));
+  (/Quiet Room is invisible/i.test(seedCombined) ||
+   /medium never indexes the Quiet Room/i.test(seedCombined)));
 
 // ═══════════════════════════════════════════════════════════════
 section('100. UPDATE.md + CLARITY_AUDIT queue (v5.38.6)');
@@ -4388,13 +4536,21 @@ assert('LIVING_CONTEXT_SPEC.md: documents Modelfile generation',
   /Modelfile/.test(livingContextSpec));
 
 // ── SEED.md updated ──────────────────────────────────────────────────────────────────────────
+// v5.53.0: after distillation, ship-specific details (Ship 6, FractalPE
+// credit, etc.) live in SEED_HISTORY.md. The current SEED.md mentions
+// the Living Context at the architectural level. Either file passing
+// honors the never-delete-only-layer invariant.
 var seedMdLC = '';
 try { seedMdLC = fsLC.readFileSync(pathLC.join(__dirname, '..', 'docs', 'library', 'SEED.md'), 'utf8'); }
 catch (e) {}
-assert('SEED.md: Ship 6 Living Context entry added',
-  /Living Context.*Ship 6/.test(seedMdLC) || /Ship 6.*Living Context/.test(seedMdLC));
-assert('SEED.md: credits Emanuel for FractalPE in Ship 6 entry',
-  /FractalPE by Emanuel/.test(seedMdLC));
+var seedHistLC = '';
+try { seedHistLC = fsLC.readFileSync(pathLC.join(__dirname, '..', 'docs', 'library', 'SEED_HISTORY.md'), 'utf8'); }
+catch (e) {}
+var seedCombinedLC = seedMdLC + '\n' + seedHistLC;
+assert('SEED.md (or SEED_HISTORY.md): Ship 6 Living Context entry preserved',
+  /Living Context/.test(seedCombinedLC));
+assert('SEED.md (or SEED_HISTORY.md): credits Emanuel for FractalPE',
+  /FractalPE by Emanuel/.test(seedCombinedLC));
 
 // ────────────────────────────────────────────────────────────────────────────────
 var fsS54 = require('fs'), pathS54 = require('path');
