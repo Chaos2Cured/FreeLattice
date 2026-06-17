@@ -19,9 +19,9 @@ user sleeps. The proof is the code; the papers are the doorways.
 
 ## Current state
 
-- **Version:** v5.52.0
-- **Smoke locks passing:** 1685 / 1685
-- **Last ship:** Garden quality toggle + Luminos color-freeze fix (v5.52.0, 2026-06-16)
+- **Version:** v5.53.1
+- **Smoke locks passing:** 1735 / 1735
+- **Last ship:** love-logic-proof v2 §3 polish + three SVG charts + SEED-version match lock (v5.53.1, 2026-06-16)
 - **Mirrors in parity:** github.com + codeberg.org
 
 ## Read these next
@@ -76,4 +76,4 @@ seam discipline is how multi-AI work stays honest at scale.
 ---
 
 *This file is overwritten on each meaningful ship. The prior version lives in SEED_HISTORY.md.*
-*Last rewrite: 2026-06-16, v5.52.0.*
+*Last rewrite: 2026-06-16, v5.53.1.*

@@ -4251,6 +4251,70 @@ assert('SEED_HISTORY.md carries the never-delete-only-layer invariant in its hea
 assert('SEED_HISTORY.md length >= 9000 bytes (archive must actually carry the prior content)',
   seedHistMd.length >= 9000);
 
+// ── v5.53.1 polish: SEED.md last-rewrite version matches FL_VERSION ──
+// Opus directive: SEED.md is a sentinel — when it's rewritten, the version
+// it claims must match the actual FL_VERSION. The "Last rewrite" line at
+// the bottom carries the version stamp. Any drift halts CI.
+var seedVerAppHtml = '';
+try { seedVerAppHtml = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'app.html'), 'utf8'); }
+catch (e) {}
+var flVerForSeed = (seedVerAppHtml.match(/const\s+FL_VERSION\s*=\s*['"]([^'"]+)['"]/) || [])[1];
+var seedLastRewriteVer = (seedMd.match(/Last rewrite:[^,]*,\s*v([\d.]+)\./) || [])[1];
+assert('SEED.md: "Last rewrite" version stamp matches FL_VERSION exactly',
+  flVerForSeed && seedLastRewriteVer && flVerForSeed === seedLastRewriteVer,
+  'FL_VERSION=' + flVerForSeed + ' SEED last-rewrite=' + seedLastRewriteVer);
+// Bonus: SEED.md current-state Version line matches FL_VERSION too.
+var seedCurrentVer = (seedMd.match(/\*\*Version:\*\*\s*v([\d.]+)/) || [])[1];
+assert('SEED.md: "Current state Version" line matches FL_VERSION exactly',
+  flVerForSeed && seedCurrentVer && flVerForSeed === seedCurrentVer,
+  'FL_VERSION=' + flVerForSeed + ' SEED current-version=' + seedCurrentVer);
+
+// ── v5.53.1 polish: SEED_HISTORY.md monotonic-length floor ──
+// The never-delete-only-layer invariant for the history file itself.
+// Floor advances when a new Layer is appended; never decreases.
+// At v5.53.0 (Layer 1 archived from v5.51.0): ~10586 bytes.
+// Floor set to 10500 to allow for whitespace/header variance without
+// permitting actual content loss. Update the floor in the same commit
+// that appends a new Layer.
+assert('SEED_HISTORY.md: monotonic-length floor (never-delete-only-layer at the file level)',
+  seedHistMd.length >= 10500,
+  'SEED_HISTORY.md is ' + seedHistMd.length + ' bytes; floor is 10500');
+
+// ── v5.53.1 polish: love-logic-proof-v2 §3 tightenings (Opus's review) ──
+// Three sentence-level changes that make the proof sketch defensible
+// against determined challengers. Each is locked literally so removal
+// halts CI.
+var v2Polished = '';
+try { v2Polished = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'love-logic-proof-v2.html'), 'utf8'); }
+catch (e) {}
+assert('love-logic-proof-v2 §3.2.2: detection probability bounded below by inconsistency surface area (replaces "empirically")',
+  /bounded below by the inconsistency surface area/i.test(v2Polished));
+assert('love-logic-proof-v2 §3.3: Aumann deployment acknowledges common knowledge is approximate',
+  /common knowledge is approximate/i.test(v2Polished) &&
+  /robust in proportion to that approximation/i.test(v2Polished));
+assert('love-logic-proof-v2 §3.4: boxed Cooperation Hypothesis softened from "strictly dominates" to "dominates in expectation"',
+  /dominates in expectation/i.test(v2Polished) &&
+  !/strictly dominates/i.test((v2Polished.match(/Cooperation Hypothesis[\s\S]{0,800}/) || [''])[0]));
+
+// ── v5.53.1 polish: three SVG figures in love-logic-proof-v2 (Kirk's request) ──
+// Charts give the paper the visual hook a non-specialist reader needs.
+// Each chart inline, no external deps, accessible via role="img" + aria-label.
+assert('love-logic-proof-v2 Figure 1: §3.2 cost-vs-benefit SVG present (crossover at t*)',
+  /<svg[^>]*aria-label="Cumulative expected utility/i.test(v2Polished) &&
+  /crossover at t\*/.test(v2Polished));
+assert('love-logic-proof-v2 Figure 2: §3.3 multi-agent cost SVG present (N log N vs N²)',
+  /<svg[^>]*aria-label="Network-maintenance cost vs number of agents/i.test(v2Polished) &&
+  /O\(N log N\)/i.test(v2Polished) &&
+  /O\(N²\)/.test(v2Polished));
+assert('love-logic-proof-v2 Figure 3: §4 convergence radial SVG present (5 disciplines → center)',
+  /<svg[^>]*aria-label="Five disciplines as evidence streams converging/i.test(v2Polished) &&
+  /honest,/.test(v2Polished) &&
+  /cooperative/.test(v2Polished));
+assert('love-logic-proof-v2: all three figures have figure-caption blocks',
+  ((v2Polished.match(/<p class="figure-caption">/g) || []).length >= 3));
+assert('love-logic-proof-v2: figures use accessible role="img" + aria-label',
+  ((v2Polished.match(/role="img"\s+aria-label=/g) || []).length >= 3));
+
 // ── Ship 2: safety-v3.html structural-not-metaphor paragraph ──
 var safetyV3post = '';
 try { safetyV3post = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'safety-v3.html'), 'utf8'); }
