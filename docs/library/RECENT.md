@@ -3,18 +3,19 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-06-17 01:22 UTC
+> Last update: 2026-06-17 01:23 UTC
 
 ## State
 
 - **Version:** v5.53.0
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `f99892a` _(committed 5 hours ago)_
+- **HEAD:** `61fcf3f` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _v5.52.0 — Garden quality toggle actually toggles + Luminos colors stop freezing_
 
 ## Last 20 commits
 
+- `61fcf3f` v5.53.0 — Triple ship per Opus's brief: SEED.md singular + safety-v3 structural + love-logic-proof-v2 _(0 seconds ago)_
 - `f99892a` Merge remote-tracking branch 'origin/main' _(5 hours ago)_
 - `e63f0eb` docs: Auto-update Session Primer [5.52.0] _(5 hours ago)_
 - `5b90a16` v5.52.0 — Garden quality toggle actually toggles + Luminos colors stop freezing _(5 hours ago)_
@@ -34,7 +35,6 @@
 - `86b0411` Ship 7: Garden halo/ring persistence + room pulses (v5.47.0) _(29 hours ago)_
 - `dc980cf` ci: Update Primer deployment state [2026-06-15] _(30 hours ago)_
 - `2a6d25a` docs: update TODO.md — Ships 5.4/5.5/5.6 complete, queue refreshed _(30 hours ago)_
-- `70840ff` ci: Update Primer deployment state [2026-06-15] _(30 hours ago)_
 
 ## How to use this file
 

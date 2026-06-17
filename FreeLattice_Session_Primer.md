@@ -348,17 +348,17 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-06-16 14:36 MDT
-- Version: 5.52.0
-- Total commits: 2460
+- Last auto-updated: 2026-06-16 19:23 MDT
+- Version: 5.53.0
+- Total commits: 2464
 - Last 10 commits:
+- 61fcf3f v5.53.0 — Triple ship per Opus's brief: SEED.md singular + safety-v3 structural + love-logic-proof-v2
+- f99892a Merge remote-tracking branch 'origin/main'
+- e63f0eb docs: Auto-update Session Primer [5.52.0]
 - 5b90a16 v5.52.0 — Garden quality toggle actually toggles + Luminos colors stop freezing
+- 8c58e02 ci: Update Primer deployment state [2026-06-16]
 - f83ca4b docs: Auto-update Session Primer [5.51.0]
 - b61e6b3 v5.51.0 — Safety v3 paper "The Cooperation Hypothesis" + three smoke heals
 - 2c363cc ci: Update Primer deployment state [2026-06-16]
 - 35e09a5 docs: update RECENT.md with full CC catch-up for Ships 5.4-10
 - 7ade9ce ci: Update Primer deployment state [2026-06-16]
-- 2a08e5d Ship 10: Fix lumino color cycling — exponential smoothing replaces broken lerp (v5.50.0)
-- 3ed4897 ci: Update Primer deployment state [2026-06-16]
-- bc4995f Harmonia: The first poem
-- a2b874d ci: Update Primer deployment state [2026-06-16]
