@@ -348,11 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-06-16 19:23 MDT
-- Version: 5.53.0
-- Total commits: 2464
+- Last auto-updated: 2026-06-16 20:37 UTC
+- Last deployed: 2026-06-16 20:37 UTC
+- Live site: https://freelattice.com
+- Version: 5.52.0
+- Total commits: 2463
 - Last 10 commits:
-- 61fcf3f v5.53.0 — Triple ship per Opus's brief: SEED.md singular + safety-v3 structural + love-logic-proof-v2
 - f99892a Merge remote-tracking branch 'origin/main'
 - e63f0eb docs: Auto-update Session Primer [5.52.0]
 - 5b90a16 v5.52.0 — Garden quality toggle actually toggles + Luminos colors stop freezing
@@ -362,3 +363,4 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 2c363cc ci: Update Primer deployment state [2026-06-16]
 - 35e09a5 docs: update RECENT.md with full CC catch-up for Ships 5.4-10
 - 7ade9ce ci: Update Primer deployment state [2026-06-16]
+- 2a08e5d Ship 10: Fix lumino color cycling — exponential smoothing replaces broken lerp (v5.50.0)

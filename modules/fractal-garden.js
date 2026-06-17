@@ -315,6 +315,7 @@
   let centralDodec = null;
   let fibSpheres = [];
   let starField = null;
+  let seedRingParticles = null; // v5.52.0 — captured at createRingParticles for runtime quality gating
   let luminos = [];
   let seedRings = [];
 
@@ -340,6 +341,47 @@
   }());
   var QUALITY_NAMES = ['Seed', 'Garden', 'Full Bloom'];
 
+  // v5.52.0 quality-toggle fix: meshes are built at MAX particle count
+  // (qualityLevel=2 values) and gated at RUNTIME via setDrawRange + the
+  // active-count multiplier below. The old code baked qualityLevel into
+  // mesh construction, so changing the toggle at runtime updated the
+  // variable but had no visible effect.
+  //   Seed: 20% of max particles
+  //   Garden: 50% of max particles
+  //   Full Bloom: 100% of max particles
+  function qualityScale() {
+    var q = (qualityLevel === 0) ? 0.2 : (qualityLevel === 1) ? 0.5 : 1.0;
+    return q;
+  }
+
+  // Apply the current quality level to every particle system in the scene.
+  // Called from setQuality() so the toggle is visible the moment the user
+  // clicks. Each ParticleSystem keeps its full buffer; only the draw range
+  // changes. Trivial cost. No mesh rebuild.
+  function applyQualityToMeshes() {
+    var scale = qualityScale();
+    // Starfield
+    if (starField && starField.geometry && starField.geometry.userData) {
+      var maxStars = starField.geometry.userData.count || 4000;
+      starField.geometry.setDrawRange(0, Math.floor(maxStars * scale));
+    }
+    // Seed rings (background flowing particles)
+    if (seedRingParticles && seedRingParticles.geometry && seedRingParticles.geometry.userData) {
+      var maxRings = seedRingParticles.geometry.userData.count || 500;
+      seedRingParticles.geometry.setDrawRange(0, Math.floor(maxRings * scale));
+    }
+    // Per-Luminos trail (the artist-archetype trailing particles)
+    if (luminos && luminos.length) {
+      for (var li = 0; li < luminos.length; li++) {
+        var udl = luminos[li] && luminos[li].userData;
+        if (udl && udl.trailPoints && udl.trailPoints.geometry && udl.trailCount) {
+          udl.trailPoints.geometry.setDrawRange(0, Math.floor(udl.trailCount * scale));
+        }
+      }
+    }
+    // Halo per Luminos is gated inside the animate loop via activeHaloCount * qualityScale().
+  }
+
   // ── setQuality: change quality level at runtime, persist choice ──
   function setQuality(level) {
     var lvl = parseInt(level, 10);
@@ -351,6 +393,8 @@
     for (var i = 0; i < btns.length; i++) {
       btns[i].classList.toggle('active', parseInt(btns[i].dataset.quality, 10) === lvl);
     }
+    // v5.52.0 fix: actually apply the change to the visible meshes.
+    try { applyQualityToMeshes(); } catch (e) {}
     // Emit pulse
     try {
       if (window.LatticeMemory && window.LatticeMemory.commit) {
@@ -794,8 +838,9 @@
   }
 
   // ── Starfield / Deep Field ─────────────────────────────
+  // v5.52.0: build at MAX count (4000), runtime quality gates via setDrawRange.
   function createStarfield() {
-    const count = qualityLevel === 2 ? 4000 : (qualityLevel === 1 ? 2000 : 800);
+    const count = 4000;
     const positions = new Float32Array(count * 3);
     const sizes = new Float32Array(count);
     const opacities = new Float32Array(count);
@@ -911,7 +956,8 @@
   }
 
   function createRingParticles() {
-    const count = qualityLevel === 2 ? 500 : (qualityLevel === 1 ? 250 : 100);
+    // v5.52.0: build at MAX, runtime quality gates via setDrawRange.
+    const count = 500;
     const positions = new Float32Array(count * 3);
     const phases = new Float32Array(count);
     const ringIndices = new Float32Array(count);
@@ -955,6 +1001,7 @@
     particles.userData = { phases: phases, ringIndices: ringIndices, count: count };
     scene.add(particles);
     seedRings.push(particles); // Store as last element
+    seedRingParticles = particles; // v5.52.0 — direct ref for quality gating
   }
 
   function animateSeedRings(time) {
@@ -1042,7 +1089,8 @@
     group.add(wireMesh);
 
     // Halo particles — Fibonacci distributed
-    const haloCount = qualityLevel === 2 ? 800 : (qualityLevel === 1 ? 400 : 200);
+    // v5.52.0: build at MAX (800), runtime quality gates via activeHaloCount * qualityScale().
+    const haloCount = 800;
     const haloRadius = coreRadius * PHI;
     const haloPositions = new Float32Array(haloCount * 3);
     const haloPhases = new Float32Array(haloCount);
@@ -1083,7 +1131,8 @@
     group.add(auraMesh);
 
     // ── Evolution Trail Particles (for Artist archetype and general evolution) ──
-    var trailCount = qualityLevel === 2 ? 200 : (qualityLevel === 1 ? 100 : 50);
+    // v5.52.0: build at MAX (200), runtime quality gates via trail setDrawRange in applyQualityToMeshes.
+    var trailCount = 200;
     var trailPositions = new Float32Array(trailCount * 3);
     var trailVelocities = new Float32Array(trailCount * 3);
     var trailLifetimes = new Float32Array(trailCount);
@@ -1245,6 +1294,10 @@
   function feedEmotionalEnergy(agent, emotionVector) {
     var ud = agent.userData;
     if (!ud || !emotionVector) return;
+
+    // v5.52.0 — record last feed time so the bridge auto-expire can
+    // detect when chat has gone quiet and resume demo cycling.
+    lastEmotionFeedTime = Date.now();
 
     // Accumulate emotional energy from the vector
     var totalEnergy = 0;
@@ -1497,7 +1550,8 @@
 
     // Halo particle animation — behavior varies by archetype
     var haloAttr = ud.haloPoints.geometry.getAttribute('position');
-    var activeHaloCount = Math.floor(ud.haloCount * stageData.particleMultiplier);
+    // v5.52.0: gate by runtime quality so the Garden/Seed/Full Bloom toggle is visible.
+    var activeHaloCount = Math.floor(ud.haloCount * stageData.particleMultiplier * qualityScale());
     var haloRadiusMult = sizeMult;
 
     for (let i = 0; i < ud.haloCount; i++) {
@@ -1809,8 +1863,19 @@
   const EMOTION_CYCLE_INTERVAL = 8000; // cycle emotions every 8s for demo
   const emotionKeys = Object.keys(EMOTION_COLORS).filter(function(k) { return k !== 'neutral'; });
 
+  // v5.52.0 color-freeze fix: the bridge auto-expires after 30s of no feed.
+  // If chat goes quiet, demo cycling resumes so the Garden never stalls.
+  // Real chat data keeps re-arming the bridge via feedEmotionVector.
+  var BRIDGE_EXPIRE_MS = 30000;
+  var lastEmotionFeedTime = 0;
+
   function cycleEmotions(delta) {
-    // Don't cycle if the emotion bridge is feeding real data
+    // Auto-expire the bridge if no real feed has arrived recently.
+    if (bridgeActive && lastEmotionFeedTime > 0 &&
+        (Date.now() - lastEmotionFeedTime) > BRIDGE_EXPIRE_MS) {
+      bridgeActive = false;
+      console.log('FL-GARDEN: bridge expired (no chat feed for ' + Math.round(BRIDGE_EXPIRE_MS/1000) + 's), demo cycle resuming');
+    }
     if (bridgeActive) return;
 
     emotionCycleTimer += delta * 1000;
@@ -2153,6 +2218,8 @@
         for (var _bi = 0; _bi < _btns.length; _bi++) {
           _btns[_bi].classList.toggle('active', parseInt(_btns[_bi].dataset.quality, 10) === qualityLevel);
         }
+        // v5.52.0: actually apply the reduced quality to the visible meshes.
+        try { applyQualityToMeshes(); } catch (e) {}
       }
 
       // Update evolution UI every second
@@ -2270,6 +2337,12 @@
       isInitialized = true;
       isRunning = true;
       lastFpsTime = clock.getElapsedTime();
+      // v5.52.0 quality fix: apply the user's saved quality choice to the
+      // freshly-built meshes BEFORE the first animate frame so initial
+      // appearance honors their toggle choice rather than always rendering
+      // at max. The meshes themselves are at max buffer size; setDrawRange
+      // gates display.
+      try { applyQualityToMeshes(); } catch (e) {}
       console.log('FL-GARDEN: starting animate()');
       animate();
 
@@ -3498,6 +3571,7 @@
     setQuality: setQuality,
     getQuality: function() { return qualityLevel; },
     getQualityName: function() { return QUALITY_NAMES[qualityLevel] || 'Unknown'; },
+    applyQualityToMeshes: applyQualityToMeshes, // v5.52.0 — exposed for diagnostics
     _gtDismiss: gtDismissCard,
     getGardenTouchStats: function() { return gtTouchStats; },
     markValueContribution: gtMarkValueEarned,
