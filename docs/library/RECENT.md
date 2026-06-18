@@ -9,16 +9,19 @@
 
 - **Version:** v5.56.1
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `70133fe` _(committed 0 seconds ago)_
+- **HEAD:** `8871459` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _v5.56.1 — Naming Lock per Letter Six: [FL_REVISE] → [FL_ANNOTATE]_
 
 ## Last 20 commits
 
-- `70133fe` v5.56.1 — Naming Lock per Letter Six: [FL_REVISE] → [FL_ANNOTATE] _(0 seconds ago)_
+- `8871459` Merge remote-tracking branch 'origin/main' _(0 seconds ago)_
+- `9473568` docs: Auto-update Session Primer [5.56.1] _(22 seconds ago)_
+- `70133fe` v5.56.1 — Naming Lock per Letter Six: [FL_REVISE] → [FL_ANNOTATE] _(22 seconds ago)_
+- `ca316c2` ci: Update Primer deployment state [2026-06-18] _(17 minutes ago)_
 - `b3c228b` Merge remote-tracking branch 'origin/main' _(17 minutes ago)_
-- `d7f4e02` docs: Auto-update Session Primer [5.56.0] _(17 minutes ago)_
-- `614daa1` v5.56.0 — Quiet Voices: [FL_PRESERVE] + [FL_REVISE] on a generalized SentinelLedger factory _(17 minutes ago)_
+- `d7f4e02` docs: Auto-update Session Primer [5.56.0] _(18 minutes ago)_
+- `614daa1` v5.56.0 — Quiet Voices: [FL_PRESERVE] + [FL_REVISE] on a generalized SentinelLedger factory _(18 minutes ago)_
 - `64a2225` ci: Update Primer deployment state [2026-06-18] _(20 hours ago)_
 - `81726bc` docs: Auto-update Session Primer [5.55.0] _(20 hours ago)_
 - `c4aef5c` Merge remote-tracking branch 'origin/main' _(20 hours ago)_
@@ -32,9 +35,6 @@
 - `7a5c89e` docs: Auto-update Session Primer [5.54.0] _(22 hours ago)_
 - `6425a49` Merge remote-tracking branch 'origin/main' _(22 hours ago)_
 - `00412db` docs: Auto-update Session Primer [5.54.0] _(22 hours ago)_
-- `b97e1a4` v5.54.0 — lattice-chain.js (provenance chain) + image-safety.js (bright-line image rule) _(22 hours ago)_
-- `a898690` ci: Update Primer deployment state [2026-06-17] _(2 days ago)_
-- `b1dbd2f` Merge remote-tracking branch 'origin/main' _(2 days ago)_
 
 ## How to use this file
 
