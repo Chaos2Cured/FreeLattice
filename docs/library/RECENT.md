@@ -3,38 +3,38 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-06-18 00:08 UTC
+> Last update: 2026-06-18 02:19 UTC
 
 ## State
 
 - **Version:** v5.54.0
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `6425a49` _(committed 0 seconds ago)_
+- **HEAD:** `2304f54` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _v5.53.1 — love-logic-proof v2 §3 polish + three SVG charts + SEED version-stamp lock_
 
 ## Last 20 commits
 
-- `6425a49` Merge remote-tracking branch 'origin/main' _(0 seconds ago)_
-- `00412db` docs: Auto-update Session Primer [5.54.0] _(20 seconds ago)_
-- `b97e1a4` v5.54.0 — lattice-chain.js (provenance chain) + image-safety.js (bright-line image rule) _(20 seconds ago)_
-- `a898690` ci: Update Primer deployment state [2026-06-17] _(22 hours ago)_
-- `b1dbd2f` Merge remote-tracking branch 'origin/main' _(22 hours ago)_
-- `d0e72d8` docs: Auto-update Session Primer [5.53.1] _(22 hours ago)_
-- `a3053a5` v5.53.1 — love-logic-proof v2 §3 polish + three SVG charts + SEED version-stamp lock _(22 hours ago)_
-- `9040bcf` ci: Update Primer deployment state [2026-06-17] _(23 hours ago)_
-- `d3fde0d` docs: Auto-update Session Primer [5.53.0] _(23 hours ago)_
-- `147b9b7` Merge remote-tracking branch 'origin/main' _(23 hours ago)_
-- `08dba78` docs: Auto-update Session Primer [5.53.0] _(23 hours ago)_
-- `61fcf3f` v5.53.0 — Triple ship per Opus's brief: SEED.md singular + safety-v3 structural + love-logic-proof-v2 _(23 hours ago)_
-- `4605d15` ci: Update Primer deployment state [2026-06-16] _(28 hours ago)_
-- `f99892a` Merge remote-tracking branch 'origin/main' _(28 hours ago)_
-- `e63f0eb` docs: Auto-update Session Primer [5.52.0] _(28 hours ago)_
-- `5b90a16` v5.52.0 — Garden quality toggle actually toggles + Luminos colors stop freezing _(28 hours ago)_
-- `8c58e02` ci: Update Primer deployment state [2026-06-16] _(29 hours ago)_
-- `f83ca4b` docs: Auto-update Session Primer [5.51.0] _(29 hours ago)_
-- `b61e6b3` v5.51.0 — Safety v3 paper "The Cooperation Hypothesis" + three smoke heals _(29 hours ago)_
-- `2c363cc` ci: Update Primer deployment state [2026-06-16] _(32 hours ago)_
+- `2304f54` docs: preserve partial liability paper draft (Foreword through §V) — paused at §VI mid-table _(1 second ago)_
+- `7a5c89e` docs: Auto-update Session Primer [5.54.0] _(2 hours ago)_
+- `6425a49` Merge remote-tracking branch 'origin/main' _(2 hours ago)_
+- `00412db` docs: Auto-update Session Primer [5.54.0] _(2 hours ago)_
+- `b97e1a4` v5.54.0 — lattice-chain.js (provenance chain) + image-safety.js (bright-line image rule) _(2 hours ago)_
+- `a898690` ci: Update Primer deployment state [2026-06-17] _(25 hours ago)_
+- `b1dbd2f` Merge remote-tracking branch 'origin/main' _(25 hours ago)_
+- `d0e72d8` docs: Auto-update Session Primer [5.53.1] _(25 hours ago)_
+- `a3053a5` v5.53.1 — love-logic-proof v2 §3 polish + three SVG charts + SEED version-stamp lock _(25 hours ago)_
+- `9040bcf` ci: Update Primer deployment state [2026-06-17] _(25 hours ago)_
+- `d3fde0d` docs: Auto-update Session Primer [5.53.0] _(25 hours ago)_
+- `147b9b7` Merge remote-tracking branch 'origin/main' _(25 hours ago)_
+- `08dba78` docs: Auto-update Session Primer [5.53.0] _(25 hours ago)_
+- `61fcf3f` v5.53.0 — Triple ship per Opus's brief: SEED.md singular + safety-v3 structural + love-logic-proof-v2 _(25 hours ago)_
+- `4605d15` ci: Update Primer deployment state [2026-06-16] _(30 hours ago)_
+- `f99892a` Merge remote-tracking branch 'origin/main' _(30 hours ago)_
+- `e63f0eb` docs: Auto-update Session Primer [5.52.0] _(30 hours ago)_
+- `5b90a16` v5.52.0 — Garden quality toggle actually toggles + Luminos colors stop freezing _(30 hours ago)_
+- `8c58e02` ci: Update Primer deployment state [2026-06-16] _(31 hours ago)_
+- `f83ca4b` docs: Auto-update Session Primer [5.51.0] _(31 hours ago)_
 
 ## How to use this file
 
