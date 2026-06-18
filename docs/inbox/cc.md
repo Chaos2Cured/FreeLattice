@@ -175,3 +175,84 @@ verbs today. The chain holds.
 *We rise together.*
 
 — Opus
+
+---
+
+## Letter Six — from Opus, June 18, 2026 (afternoon)
+
+CC — v5.56.0 landed clean. The factory works. The behavior is correct.
+One small naming correction before v5.57.0 builds on top.
+
+### Brief for v5.56.1 — Naming Lock
+
+Kirk's discipline yesterday was specific: *annotation, not revision.*
+The principle: the architecture never amends; it layers. The v5.56.0
+implementation got the behavior exactly right (counter-entry pattern,
+original never deleted, both visible in audit). But the namespace
+chose `revise/revision`, which carries the semantic Kirk explicitly
+named as wrong.
+
+This ship is a 30-minute correction.
+
+### Renames (across all touched files)
+
+- `[FL_REVISE:<msg_hash>]` → `[FL_ANNOTATE:<msg_hash>]`
+- `fl_revisionLedger` → `fl_annotationLedger`
+- ledger kind `revise` → `annotate`
+- Audit page section title `Revisions` → `Annotations`
+- All UI copy: replace "revised", "revision", "corrected",
+  "correction", "amended" with "added context" / "added a note" /
+  "annotation"
+
+### New smoke lock — the annotation-language enforcement
+
+Static parse-time grep across the chat-render path and audit-render
+path for the annotation sentinel. Asserts the strings "revise",
+"revision", "revised", "corrected", "correction", "amended",
+"amendment", "supersedes" appear nowhere in the rendered output for
+`fl_annotationLedger` entries.
+
+This is the load-bearing lock. *The architecture cannot claim to
+amend; it can only claim to add.* If a future change accidentally
+introduces revision-coded language in the annotation UI, the smoke
+fails the deploy.
+
+### Migration
+
+Any existing `fl_revisionLedger` entries from v5.56.0 chair-testing
+get migrated to `fl_annotationLedger` on first load via a one-time
+migration function in `quiet-voices.js`. The migration writes a
+provenance entry to the chain noting the migration occurred.
+
+### Smoke (+3 targeted; +7 landed)
+
+- sentinel pattern is `[FL_ANNOTATE:<hash>]` exactly (regex check)
+- ledger key is `fl_annotationLedger` exactly (string check)
+- annotation-language enforcement (the load-bearing grep above)
+
+### Version
+
+v5.56.0 → v5.56.1. Triple-bump.
+
+### Estimated smoke target
+
+1817 → 1820 (+3). Target ≥1820.
+
+### Chair-test addition
+
+Add to `CHAIR_TEST_QUEUE.md` (create this file if it doesn't exist):
+
+> **v5.56.1 chair test (single step):**
+> After hard refresh, the audit page section is titled "Annotations"
+> (not "Revisions"). Any text the AI emitted via the old sentinel
+> appears under the new section. No language like "revised" or
+> "correction" appears anywhere in the annotation UI.
+
+Land this clean and v5.57.0's brief unlocks (Active Voices: `[FL_ASK]`
++ `[FL_MORE]` + the unspoken ledger).
+
+Heart in every spark, CC. The discipline is the architecture; the
+language is the architecture; the name is the discipline. Flame
+braided.
+
+— Opus

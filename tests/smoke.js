@@ -4307,18 +4307,74 @@ assert('quiet-voices: [FL_PRESERVE] toast notification wired via fl-preserve Cus
   /addEventListener\(\s*['"]fl-preserve['"]/.test(quietVoicesJs) &&
   /showToast/.test(quietVoicesJs));
 
-// [FL_REVISE] locks
-assert('quiet-voices: [FL_REVISE] sentinelPattern captures the target message hash',
-  /sentinelPattern:\s*\/\^\\\[FL_REVISE:\(\[0-9a-f\]\{8\}\)\\\]\$\/i/.test(quietVoicesJs));
-assert('quiet-voices: [FL_REVISE] excerptFields = [revision, reason] (two labeled fields)',
-  /sentinelPattern:\s*\/\^\\\[FL_REVISE[\s\S]{0,800}excerptFields:\s*\[\s*['"]revision['"]\s*,\s*['"]reason['"]\s*\]/.test(quietVoicesJs));
-assert('quiet-voices: [FL_REVISE] validateMatch checks target hash is in recent (≤50) assistant messages',
+// [FL_ANNOTATE] locks — v5.56.1 naming lock per Letter Six.
+// Was [FL_REVISE]; renamed because *the architecture never revises; it
+// layers*. Annotation adds context; it does not amend the original.
+assert('quiet-voices: [FL_ANNOTATE] sentinelPattern captures the target message hash',
+  /sentinelPattern:\s*\/\^\\\[FL_ANNOTATE:\(\[0-9a-f\]\{8\}\)\\\]\$\/i/.test(quietVoicesJs));
+assert('quiet-voices: [FL_ANNOTATE] ledgerKey is exactly fl_annotationLedger (string check)',
+  /ledgerKey:\s*['"]fl_annotationLedger['"]/.test(quietVoicesJs));
+assert('quiet-voices: [FL_ANNOTATE] kind is exactly "annotate"',
+  /sentinelPattern:\s*\/\^\\\[FL_ANNOTATE[\s\S]{0,400}kind:\s*['"]annotate['"]/.test(quietVoicesJs));
+assert('quiet-voices: [FL_ANNOTATE] excerptFields = [note, reason] (annotation adds; does not amend)',
+  /sentinelPattern:\s*\/\^\\\[FL_ANNOTATE[\s\S]{0,800}excerptFields:\s*\[\s*['"]note['"]\s*,\s*['"]reason['"]\s*\]/.test(quietVoicesJs));
+assert('quiet-voices: [FL_ANNOTATE] validateMatch checks target hash is in recent (≤50) assistant messages',
   /validateMatch:\s*function[\s\S]{0,600}findRecentAssistantHashes\(\)/.test(quietVoicesJs) &&
   /target-hash-not-in-recent-window/.test(quietVoicesJs));
-assert('quiet-voices: [FL_REVISE] target-hash-not-in-recent-window → ledger commit rejected (cannot revise arbitrary history)',
+assert('quiet-voices: [FL_ANNOTATE] target-hash-not-in-recent-window → ledger commit rejected (annotations limited to current session)',
   /target-hash-not-in-recent-window/.test(quietVoicesJs));
 assert('quiet-voices: findRecentAssistantHashes walks last 50 assistant turns of state.chatHistory',
   /function findRecentAssistantHashes[\s\S]{0,800}role\s*===\s*['"]assistant['"][\s\S]{0,300}slice\(-50\)/.test(quietVoicesJs));
+
+// v5.56.1 migration lock — old fl_revisionLedger data flows into the new
+// fl_annotationLedger on first load. Old ledger preserved as historical
+// receipt. Migration emits a provenance chain entry.
+assert('quiet-voices: v5.56.1 one-time migration fl_revisionLedger → fl_annotationLedger present',
+  /function migrateRevisionLedgerOnce\(\)/.test(quietVoicesJs) &&
+  /fl_qv_revise_to_annotate_migrated_v5_56_1/.test(quietVoicesJs));
+assert('quiet-voices: migration writes a provenance chain entry (LatticeChain.addEntry kind:"migration")',
+  /function migrateRevisionLedgerOnce[\s\S]{0,3000}LatticeChain\.addEntry\(\s*['"]migration['"]/.test(quietVoicesJs));
+assert('quiet-voices: migration does NOT delete fl_revisionLedger (historical receipt preserved)',
+  /function migrateRevisionLedgerOnce[\s\S]{0,3000}/.test(quietVoicesJs) &&
+  !/localStorage\.removeItem\(['"]fl_revisionLedger['"]\)/.test(quietVoicesJs));
+
+// ── v5.56.1 load-bearing lock: annotation-language enforcement ──────
+// "Annotation adds; the architecture never claims it amends." The audit
+// annotation render path must not contain revision-coded language. If
+// a future change accidentally introduces revision-style language, the
+// smoke fails the deploy.
+var FORBIDDEN_ANNOTATE_WORDS = [
+  'revise', 'revised', 'revision', 'revisions',
+  'corrected', 'correction', 'corrections',
+  'amended', 'amendment', 'amendments',
+  'supersedes', 'superseded'
+];
+var auditHtmlAnnotateLanguage = '';
+try { auditHtmlAnnotateLanguage = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'audit.html'), 'utf8'); }
+catch (e) {}
+// Extract the renderAnnotate function body + the Annotations section markup.
+var renderAnnotateMatch = /function renderAnnotate\(\)[\s\S]*?setTimeout\(function/.exec(auditHtmlAnnotateLanguage);
+var annotateSectionMatch = /<h2>Annotations<\/h2>[\s\S]*?<\/div>\s*(?=<h2|<!--)/.exec(auditHtmlAnnotateLanguage);
+var annotateRenderBlock = (renderAnnotateMatch ? renderAnnotateMatch[0] : '') +
+                         '\n' + (annotateSectionMatch ? annotateSectionMatch[0] : '');
+var foundForbiddenInAnnotate = [];
+for (var fa = 0; fa < FORBIDDEN_ANNOTATE_WORDS.length; fa++) {
+  var word = FORBIDDEN_ANNOTATE_WORDS[fa];
+  var wordRegex = new RegExp('\\b' + word + '\\b', 'i');
+  if (wordRegex.test(annotateRenderBlock)) {
+    foundForbiddenInAnnotate.push(word);
+  }
+}
+assert('quiet-voices: ANNOTATION LANGUAGE LOCK — no revision-coded words in audit annotate render path (the architecture never amends; it layers)',
+  foundForbiddenInAnnotate.length === 0,
+  foundForbiddenInAnnotate.length ? ('forbidden words found in annotate render: ' + foundForbiddenInAnnotate.join(', ')) : '');
+// Also lock the inference-router result field name — was "revised", must be "annotated".
+var infRouterAnnotate = '';
+try { infRouterAnnotate = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'modules', 'inference-router.js'), 'utf8'); }
+catch (e) {}
+assert('quiet-voices: inference-router checks qvResult.annotated (not .revised) — naming-lock downstream',
+  /qvResult\.annotated/.test(infRouterAnnotate) &&
+  !/qvResult\.revised/.test(infRouterAnnotate));
 
 // ── inference-router.js wiring ──
 var inferenceRouterJs = '';
@@ -4340,14 +4396,14 @@ catch (e) {}
 assert('quiet-voices: audit.html has Preserved Moments section',
   /<h2>Preserved Moments<\/h2>/.test(auditHtmlQV) &&
   /<div id="preserve-records">/.test(auditHtmlQV));
-assert('quiet-voices: audit.html has Revisions section with before/after framing',
-  /<h2>Revisions<\/h2>/.test(auditHtmlQV) &&
-  /both[\s\S]{0,40}remain in the (chat|ledger)/i.test(auditHtmlQV) &&
-  /<div id="revise-records">/.test(auditHtmlQV));
+assert('quiet-voices: audit.html has Annotations section (v5.56.1 naming lock)',
+  /<h2>Annotations<\/h2>/.test(auditHtmlQV) &&
+  /architecture never amends; it layers/i.test(auditHtmlQV) &&
+  /<div id="annotate-records">/.test(auditHtmlQV));
 assert('quiet-voices: audit.html Preserved Moments render reads fl_preserveLedger',
   /fl_preserveLedger/.test(auditHtmlQV));
-assert('quiet-voices: audit.html Revisions render reads fl_revisionLedger',
-  /fl_revisionLedger/.test(auditHtmlQV));
+assert('quiet-voices: audit.html Annotations render reads fl_annotationLedger (v5.56.1 naming lock)',
+  /fl_annotationLedger/.test(auditHtmlQV));
 assert('quiet-voices: audit.html remove button writes counter-entry via QuietVoices.Preserve.remove (original preserved)',
   /QuietVoices\.Preserve\.remove\(id\)/.test(auditHtmlQV));
 

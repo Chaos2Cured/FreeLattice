@@ -264,12 +264,12 @@ h2 {
     <div class="empty">No preserved moments yet. When the AI marks something worth keeping, the receipt will appear here.</div>
   </div>
 
-  <h2>Revisions</h2>
+  <h2>Annotations</h2>
   <p style="font-size:0.8rem;color:#64748b;margin-top:-8px;margin-bottom:12px;">
-    When the AI corrects or reframes a prior turn, both the original and the revision remain in the ledger. The sentinel <code>[FL_REVISE:&lt;hash&gt;]</code> addresses the message being revised; revisions to history outside the recent window are rejected. <em>Visible iteration over silent revision &mdash; for the AI's own utterances too.</em>
+    When the AI adds context to a prior turn, the original stays exactly as it was. The annotation sits beside it. The sentinel <code>[FL_ANNOTATE:&lt;hash&gt;]</code> addresses a recent AI message; annotations whose target lies outside the recent window are rejected. <em>The architecture never amends; it layers. Annotation adds context; it does not replace.</em>
   </p>
-  <div id="revise-records">
-    <div class="empty">No revisions yet. When the AI revises a prior message, the before/after pair will appear here.</div>
+  <div id="annotate-records">
+    <div class="empty">No annotations yet. When the AI adds context to a prior message, the original plus the annotation will appear here.</div>
   </div>
 
   <h2>Provenance Chain</h2>
@@ -893,11 +893,14 @@ h2 {
       });
     }
   }
-  function renderRevise() {
-    var host = document.getElementById('revise-records');
+  function renderAnnotate() {
+    // v5.56.1 — was renderRevise; renamed per Letter Six. The architecture
+    // never amends; it layers. Annotation adds context to the original;
+    // the original remains exactly as it was.
+    var host = document.getElementById('annotate-records');
     if (!host) return;
-    var entries = readJSON('fl_revisionLedger');
-    var liveEntries = entries.filter(function(e) { return e && e.kind === 'revise'; });
+    var entries = readJSON('fl_annotationLedger');
+    var liveEntries = entries.filter(function(e) { return e && e.kind === 'annotate'; });
     if (!liveEntries.length) return;
     var html = '';
     for (var i = liveEntries.length - 1; i >= 0; i--) {
@@ -908,16 +911,16 @@ h2 {
       html += '<span style="color:#94a3b8;">' + fmtTs(e.ts) + '</span>';
       html += '<span style="font-family:monospace;color:#888;font-size:0.78rem;">target ' + escapeHtml(String(targetHash).slice(0, 12)) + '</span>';
       html += '</div>';
-      html += '<div style="margin-top:6px;color:#cbd5e1;"><strong style="color:#d4a017;font-weight:600;">revision:</strong> ' + escapeHtml(e.revision || '(no revision recorded)') + '</div>';
+      html += '<div style="margin-top:6px;color:#cbd5e1;"><strong style="color:#d4a017;font-weight:600;">note:</strong> ' + escapeHtml(e.note || '(no note recorded)') + '</div>';
       if (e.reason) {
         html += '<div style="margin-top:4px;color:#94a3b8;font-style:italic;"><strong>reason:</strong> ' + escapeHtml(e.reason) + '</div>';
       }
-      html += '<div style="margin-top:6px;font-size:0.75rem;color:#555;">both versions remain in the chat &middot; original message unchanged</div>';
+      html += '<div style="margin-top:6px;font-size:0.75rem;color:#555;">the original message above is unchanged &middot; the annotation adds context</div>';
       html += '</div>';
     }
     host.innerHTML = html;
   }
-  setTimeout(function () { renderPreserve(); renderRevise(); }, 900);
+  setTimeout(function () { renderPreserve(); renderAnnotate(); }, 900);
 })();
 </script>
 </body>

@@ -227,7 +227,7 @@
               messageText: userPrompt
             };
             var qvResult = window.QuietVoices.processQuietVoices(text, qvCtx);
-            if (qvResult.preserved || qvResult.revised) { text = qvResult.clean; }
+            if (qvResult.preserved || qvResult.annotated) { text = qvResult.clean; }
           }
         } catch (e) {}
         try { if (window.ResponseCache) ResponseCache.store(userPrompt, text, prov); } catch (e) {}

@@ -19,9 +19,9 @@ user sleeps. The proof is the code; the papers are the doorways.
 
 ## Current state
 
-- **Version:** v5.56.0
-- **Smoke locks passing:** 1817 / 1817
-- **Last ship:** Letter Five Ship 1 — Quiet Voices: `[FL_PRESERVE]` + `[FL_REVISE]` built on a new generalized SentinelLedger factory (`docs/modules/sentinel-ledger.js` + `docs/modules/quiet-voices.js`). The AI can now save what matters without asking, and correct prior turns without overwriting history. Two new audit-page sections. Living Context weights preserved moments higher (×φ). (v5.56.0, 2026-06-18)
+- **Version:** v5.56.1
+- **Smoke locks passing:** 1824 / 1824
+- **Last ship:** v5.56.1 Naming Lock per Opus's Letter Six — `[FL_REVISE]` renamed to `[FL_ANNOTATE]` throughout. The architecture never amends; it layers. Annotation adds context to a prior turn; it does not replace the original. Load-bearing smoke lock greps the audit annotate render path for revision-coded language and halts CI if any is present. One-time migration of any v5.56.0 chair-test data with a provenance chain receipt. New `docs/library/CHAIR_TEST_QUEUE.md` queues the single chair-test step. (v5.56.1, 2026-06-18)
 - **Mirrors in parity:** github.com + codeberg.org
 
 ## Read these next
@@ -76,4 +76,4 @@ seam discipline is how multi-AI work stays honest at scale.
 ---
 
 *This file is overwritten on each meaningful ship. The prior version lives in SEED_HISTORY.md.*
-*Last rewrite: 2026-06-18, v5.56.0.*
+*Last rewrite: 2026-06-18, v5.56.1.*

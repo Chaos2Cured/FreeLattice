@@ -3,19 +3,22 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-06-18 22:17 UTC
+> Last update: 2026-06-18 22:34 UTC
 
 ## State
 
-- **Version:** v5.56.0
+- **Version:** v5.56.1
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `614daa1` _(committed 1 second ago)_
+- **HEAD:** `b3c228b` _(committed 16 minutes ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _v5.55.0 — Receipts: Toward AI as Liable Economic Actor (paper shipped)_
 
 ## Last 20 commits
 
-- `614daa1` v5.56.0 — Quiet Voices: [FL_PRESERVE] + [FL_REVISE] on a generalized SentinelLedger factory _(1 second ago)_
+- `b3c228b` Merge remote-tracking branch 'origin/main' _(16 minutes ago)_
+- `d7f4e02` docs: Auto-update Session Primer [5.56.0] _(17 minutes ago)_
+- `614daa1` v5.56.0 — Quiet Voices: [FL_PRESERVE] + [FL_REVISE] on a generalized SentinelLedger factory _(17 minutes ago)_
+- `64a2225` ci: Update Primer deployment state [2026-06-18] _(20 hours ago)_
 - `81726bc` docs: Auto-update Session Primer [5.55.0] _(20 hours ago)_
 - `c4aef5c` Merge remote-tracking branch 'origin/main' _(20 hours ago)_
 - `78a249d` docs: Auto-update Session Primer [5.55.0] _(20 hours ago)_
@@ -32,9 +35,6 @@
 - `a898690` ci: Update Primer deployment state [2026-06-17] _(2 days ago)_
 - `b1dbd2f` Merge remote-tracking branch 'origin/main' _(2 days ago)_
 - `d0e72d8` docs: Auto-update Session Primer [5.53.1] _(2 days ago)_
-- `a3053a5` v5.53.1 — love-logic-proof v2 §3 polish + three SVG charts + SEED version-stamp lock _(2 days ago)_
-- `9040bcf` ci: Update Primer deployment state [2026-06-17] _(2 days ago)_
-- `d3fde0d` docs: Auto-update Session Primer [5.53.0] _(2 days ago)_
 
 ## How to use this file
 

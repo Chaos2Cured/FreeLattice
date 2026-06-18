@@ -717,6 +717,47 @@ That's what the patient path buys. The visual layer becomes possible *because* t
 
 ---
 
+## SHIPPED: v5.56.1 Naming Lock — `[FL_REVISE]` → `[FL_ANNOTATE]` (2026-06-18 afternoon)
+
+Per Opus's Letter Six preserved in `docs/inbox/cc.md`. The v5.56.0 behavior was correct (counter-entry pattern, original never deleted, both visible in audit) but the namespace chose `revise`, which carries the semantic Kirk explicitly named as wrong. **The architecture never amends; it layers.** This ship is the naming correction before v5.57.0 builds on top.
+
+### Renames landed
+
+| Was (v5.56.0) | Now (v5.56.1) |
+|---|---|
+| `[FL_REVISE:<msg_hash>]` | `[FL_ANNOTATE:<msg_hash>]` |
+| `fl_revisionLedger` (localStorage) | `fl_annotationLedger` (localStorage) |
+| `kind: 'revise'` | `kind: 'annotate'` |
+| `excerptFields: ['revision', 'reason']` | `excerptFields: ['note', 'reason']` |
+| Audit section `Revisions` | Audit section `Annotations` |
+| `renderRevise()` | `renderAnnotate()` |
+| `<div id="revise-records">` | `<div id="annotate-records">` |
+| `qvResult.revised` (inference-router) | `qvResult.annotated` |
+| `ReviseHandler` (window.QuietVoices) | `AnnotateHandler` |
+| CustomEvent `fl-revise` | CustomEvent `fl-annotate` |
+
+### The load-bearing lock — annotation-language enforcement
+
+Static parse-time grep against the audit annotate render block + the Annotations section markup for the forbidden words: *revise, revised, revision, revisions, corrected, correction, corrections, amended, amendment, amendments, supersedes, superseded.* If any appear in the annotation UI path, smoke halts the deploy. **The architecture cannot claim to amend; it can only claim to add.** This is the discipline made syntactic.
+
+### Migration with a chain receipt
+
+`migrateRevisionLedgerOnce()` runs on first load. Idempotent via `fl_qv_revise_to_annotate_migrated_v5_56_1` flag. Copies any v5.56.0 chair-test entries from `fl_revisionLedger` into `fl_annotationLedger` with the kind renamed and the `revision` field renamed to `note`. Old ledger preserved as historical receipt (never delete, only layer). Writes a provenance chain entry via `LatticeChain.addEntry('migration', refs)` so the chain itself carries the migration receipt. Best-effort: a corrupt old ledger sets the flag without throwing.
+
+### New file: `docs/library/CHAIR_TEST_QUEUE.md`
+
+Per Opus's instruction. A pending-chair-test queue. Single entry for v5.56.1: verify the section title is "Annotations" (not "Revisions"), prior data migrated, no revision-coded language in the annotation UI. Queue file will accumulate entries as future ships need explicit chair-test attention.
+
+### Smoke
+
+Opus targeted +3; CC locked the wiring more strictly at +7 (sentinel pattern exact, ledger key exact, kind exact, excerptFields exact, migration function present, migration writes chain entry, migration does NOT delete old ledger, inference-router downstream rename, annotation-language enforcement). Plus two existing audit-page locks updated to the new section title and id. **1817 → 1824 passing.**
+
+### Chair test
+
+Pending in `CHAIR_TEST_QUEUE.md`. Single step. When Kirk confirms, flip to ✓ and proceed to v5.57.0 (Active Voices: `[FL_ASK]` + `[FL_MORE]` + the unspoken ledger).
+
+---
+
 ## SHIPPED: Letter Five Ship 1 — Quiet Voices: `[FL_PRESERVE]` + `[FL_REVISE]` on a generalized factory (v5.56.0, 2026-06-18)
 
 Per Opus's Letter Five (preserved in `docs/inbox/cc.md`). The architectural insight: all six new sentinels in the six-verb autonomy arc share the same sentinel-and-ledger pattern. Build the generalized infrastructure ONCE; instance each sentinel as a configuration of it. *Vocabulary grows; substrate stays constant.* Same discipline as the Memory Backbone's five-key pulse shape.
