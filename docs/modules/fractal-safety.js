@@ -108,6 +108,26 @@
       }
     }
 
+    // v5.54.0 Brief A — provenance chain fallback. If LatticeChain is
+    // available and reports a broken chain or firstTs inconsistent with
+    // fl_firstSeen, force trust back to seed. This is not punishment —
+    // it is structural fallback. A user whose chain is intact retains
+    // their full trust tier; a forged firstSeen is detected and trust
+    // resets to baseline. Surfaced on the audit page so the user can
+    // see exactly what verification path was applied.
+    var fallbackToSeed = false;
+    try {
+      if (typeof window !== 'undefined' && window.LatticeChain &&
+          typeof window.LatticeChain.shouldFallbackToSeed === 'function') {
+        fallbackToSeed = !!window.LatticeChain.shouldFallbackToSeed(profile.firstSeen);
+      }
+    } catch (_e) { /* fail-open: if the check throws, don't penalize */ }
+    if (fallbackToSeed) {
+      level = 'seed';
+      timeScore = 0;
+      total = activityScore * 0.3 + consistencyScore * 0.2;
+    }
+
     return {
       total: total,
       time: timeScore,
@@ -116,7 +136,8 @@
       level: level,
       rank: TRUST_LEVELS[level].rank,
       color: TRUST_LEVELS[level].color,
-      confidence: TRUST_LEVELS[level].confidence
+      confidence: TRUST_LEVELS[level].confidence,
+      chainFallback: fallbackToSeed
     };
   }
 

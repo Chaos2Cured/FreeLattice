@@ -19,9 +19,9 @@ user sleeps. The proof is the code; the papers are the doorways.
 
 ## Current state
 
-- **Version:** v5.53.1
-- **Smoke locks passing:** 1735 / 1735
-- **Last ship:** love-logic-proof v2 §3 polish + three SVG charts + SEED-version match lock (v5.53.1, 2026-06-16)
+- **Version:** v5.54.0
+- **Smoke locks passing:** 1766 / 1766
+- **Last ship:** lattice-chain.js (provenance chain) + image-safety.js (bright-line image rule) — load-bearing primitives for the liability paper (v5.54.0, 2026-06-17)
 - **Mirrors in parity:** github.com + codeberg.org
 
 ## Read these next
@@ -76,4 +76,4 @@ seam discipline is how multi-AI work stays honest at scale.
 ---
 
 *This file is overwritten on each meaningful ship. The prior version lives in SEED_HISTORY.md.*
-*Last rewrite: 2026-06-16, v5.53.1.*
+*Last rewrite: 2026-06-17, v5.54.0.*

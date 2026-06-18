@@ -4251,6 +4251,133 @@ assert('SEED_HISTORY.md carries the never-delete-only-layer invariant in its hea
 assert('SEED_HISTORY.md length >= 9000 bytes (archive must actually carry the prior content)',
   seedHistMd.length >= 9000);
 
+// ═══════════════════════════════════════════════════════════════
+section('99s. Lattice Chain (Brief A) + Image Safety (Brief B) — v5.54.0');
+// ═══════════════════════════════════════════════════════════════
+// Two primitives from Opus's June 17 brief. Both load-bearing for the
+// liability paper (in draft as LIABILITY_DRAFT.md). User-facing framing
+// for the chain: provenance, not anti-tampering. User-facing framing
+// for image safety: bright-line, not needle. No tier modulation on either.
+
+// ── Brief A: lattice-chain.js (the provenance chain) ──
+var latticeChainJs = '';
+try { latticeChainJs = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'modules', 'lattice-chain.js'), 'utf8'); }
+catch (e) {}
+
+assert('lattice-chain: module file exists and is non-trivial',
+  latticeChainJs.length > 4000);
+assert('lattice-chain: exposes verifyChain, addEntry, recordTimeAnchor, shouldFallbackToSeed on window.LatticeChain',
+  /window\.LatticeChain\s*=\s*publicAPI/.test(latticeChainJs) &&
+  /verifyChain:\s*verifyChain/.test(latticeChainJs) &&
+  /addEntry:\s*addEntry/.test(latticeChainJs) &&
+  /recordTimeAnchor:\s*recordTimeAnchor/.test(latticeChainJs) &&
+  /shouldFallbackToSeed:\s*shouldFallbackToSeed/.test(latticeChainJs));
+assert('lattice-chain: entry shape lock — ALLOWED_CHAIN_KEYS is exactly {ts, kind, prior_hash, self_hash, refs}',
+  /ALLOWED_CHAIN_KEYS\s*=\s*\[\s*['"]ts['"]\s*,\s*['"]kind['"]\s*,\s*['"]prior_hash['"]\s*,\s*['"]self_hash['"]\s*,\s*['"]refs['"]\s*\]/.test(latticeChainJs));
+assert('lattice-chain: validateChainEntry rejects forbidden keys (the privacy lock)',
+  /function validateChainEntry[\s\S]{0,600}forbidden key/.test(latticeChainJs) &&
+  /ALLOWED_CHAIN_KEYS\.indexOf\(keys\[i\]\)\s*===\s*-1/.test(latticeChainJs));
+assert('lattice-chain: Quiet Room check is FIRST in addEntry (before validation, write, anything)',
+  /function addEntry\([^)]*\)[\s\S]{0,300}if\s*\(\s*isQuietRoom\(\)\s*\)[\s\S]{0,80}return/.test(latticeChainJs));
+assert('lattice-chain: isQuietRoom reads window.QuietRoom and fails CLOSED when API broken',
+  /function isQuietRoom\(\)/.test(latticeChainJs) &&
+  /window\.QuietRoom/.test(latticeChainJs) &&
+  /typeof qr\.isActive\s*!==\s*['"]function['"]/.test(latticeChainJs));
+assert('lattice-chain: SHA-256 self-hash computed over canonical {ts, kind, prior_hash, refs}',
+  /function computeSelfHash[\s\S]{0,400}JSON\.stringify\(\{[\s\S]{0,200}ts:[\s\S]{0,40}kind:[\s\S]{0,40}prior_hash:[\s\S]{0,40}refs:/.test(latticeChainJs) &&
+  /sha256/.test(latticeChainJs));
+assert('lattice-chain: recordTimeAnchor is idempotent within UTC day',
+  /function recordTimeAnchor[\s\S]{0,500}toISOString\(\)\.slice\(0,\s*10\)[\s\S]{0,300}already-anchored-today/.test(latticeChainJs));
+assert('lattice-chain: time_anchor emits a 5-key pulse into LatticeMemory (canonical shape)',
+  /function recordTimeAnchor[\s\S]{0,2000}LatticeMemory\.commit\(\{[\s\S]{0,300}source:\s*['"]lattice-chain['"][\s\S]{0,200}kind:\s*KIND_TIME_ANCHOR/.test(latticeChainJs));
+assert('lattice-chain: verifyChain returns {valid, brokenAt, firstTs, length}',
+  /function verifyChain[\s\S]{0,1500}valid:\s*true[\s\S]{0,500}firstTs:[\s\S]{0,200}length:[\s\S]{0,80}earliestTimeAnchorTs:/.test(latticeChainJs));
+assert('lattice-chain: shouldFallbackToSeed honors three Opus conditions (broken chain · firstTs diff >24h · time_anchor gap >48h)',
+  /function shouldFallbackToSeed[\s\S]{0,1000}24\s*\*\s*60\s*\*\s*60\s*\*\s*1000[\s\S]{0,500}48\s*\*\s*60\s*\*\s*60\s*\*\s*1000/.test(latticeChainJs));
+
+// fractal-safety wiring: trust-score path calls shouldFallbackToSeed.
+var fractalSafetyJsLC = '';
+try { fractalSafetyJsLC = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'modules', 'fractal-safety.js'), 'utf8'); }
+catch (e) {}
+assert('lattice-chain: fractal-safety.js calls LatticeChain.shouldFallbackToSeed at trust-score time',
+  /window\.LatticeChain[\s\S]{0,200}shouldFallbackToSeed\(profile\.firstSeen\)/.test(fractalSafetyJsLC));
+assert('lattice-chain: fractal-safety fallback forces level=seed and timeScore=0 (structural fallback, not punishment)',
+  /fallbackToSeed[\s\S]{0,400}level\s*=\s*['"]seed['"][\s\S]{0,200}timeScore\s*=\s*0/.test(fractalSafetyJsLC));
+assert('lattice-chain: calculateTrustScore returns chainFallback flag (surfaced to audit page)',
+  /chainFallback:\s*fallbackToSeed/.test(fractalSafetyJsLC));
+
+// Audit page integration.
+var auditHtmlLC = '';
+try { auditHtmlLC = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'audit.html'), 'utf8'); }
+catch (e) {}
+assert('lattice-chain: audit.html has Provenance Chain section with provenance framing',
+  /<h2>Provenance Chain<\/h2>/.test(auditHtmlLC) &&
+  /not anti-tampering[\s\S]{0,80}provenance/i.test(auditHtmlLC) &&
+  /<div id="provenance-chain">/.test(auditHtmlLC));
+assert('lattice-chain: audit.html has Verify chain button wired to LatticeChain.verifyChain',
+  /id="provenance-verify-btn"/.test(auditHtmlLC) &&
+  /LatticeChain\.verifyChain\(\)/.test(auditHtmlLC));
+
+// SW cache wiring + app.html script tags. Read app.html inline (other
+// sections also read it, but each section is self-contained).
+var swJsLC = '';
+try { swJsLC = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'sw.js'), 'utf8'); }
+catch (e) {}
+var swRootJsLC = '';
+try { swRootJsLC = fsRC.readFileSync(pathRC.join(__dirname, '..', 'sw.js'), 'utf8'); }
+catch (e) {}
+var appHtmlLC = '';
+try { appHtmlLC = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'app.html'), 'utf8'); }
+catch (e) {}
+assert('lattice-chain: docs/sw.js APP_SHELL includes ./modules/lattice-chain.js',
+  /\.\/modules\/lattice-chain\.js/.test(swJsLC));
+assert('lattice-chain: root sw.js APP_SHELL includes ./modules/lattice-chain.js',
+  /\.\/modules\/lattice-chain\.js/.test(swRootJsLC));
+assert('lattice-chain: app.html loads modules/lattice-chain.js with defer',
+  /<script src="modules\/lattice-chain\.js"\s+defer><\/script>/.test(appHtmlLC));
+
+// ── Brief B: image-safety.js (the bright-line rule) ──
+var imageSafetyJs = '';
+try { imageSafetyJs = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'modules', 'image-safety.js'), 'utf8'); }
+catch (e) {}
+
+assert('image-safety: module file exists and is non-trivial',
+  imageSafetyJs.length > 2000);
+assert('image-safety: exposes assessImageRequest on window.ImageSafety',
+  /window\.ImageSafety\s*=\s*publicAPI/.test(imageSafetyJs) &&
+  /assessImageRequest:\s*assessImageRequest/.test(imageSafetyJs));
+assert('image-safety: deny-list covers nudity / partial / see-through / sexual terms (regression guard)',
+  /\\bnude\\b/.test(imageSafetyJs) &&
+  /\\bnaked\\b/.test(imageSafetyJs) &&
+  /\\btopless\\b/.test(imageSafetyJs) &&
+  /see-through/i.test(imageSafetyJs) &&
+  /\\bnsfw\\b/i.test(imageSafetyJs));
+assert('image-safety: hard-deny patterns cover minors-in-sexual-context (always denied regardless of context)',
+  /HARD_DENY_PATTERNS/.test(imageSafetyJs) &&
+  /(child|minor|teen)[\s\S]{0,200}(nude|naked|sexy|sexual|erotic|pornographic)/i.test(imageSafetyJs));
+assert('image-safety: refusal text names the rule plainly (coverage equivalent to swimwear or greater)',
+  /coverage equivalent to swimwear or greater/i.test(imageSafetyJs));
+assert('image-safety: applies at every trust tier — no tier modulation (no reference to trustScore in module)',
+  !/trustScore/.test(imageSafetyJs) &&
+  !/trustLevel/.test(imageSafetyJs) &&
+  !/trust_score/.test(imageSafetyJs));
+assert('image-safety: empty/invalid prompt rejected (ambiguity defaults to deny)',
+  /Empty or invalid prompt/.test(imageSafetyJs));
+
+// app.html wiring: generateImage calls assessImageRequest BEFORE any API call.
+assert('image-safety: app.html generateImage calls ImageSafety.assessImageRequest before API call',
+  /async function generateImage[\s\S]{0,2000}ImageSafety\.assessImageRequest\(cleanPrompt\)/.test(appHtmlLC));
+assert('image-safety: app.html surfaces refusal reason via addSystemMessage (no API call on denial)',
+  /assessImageRequest\(cleanPrompt\)[\s\S]{0,400}allowed\s*===\s*false[\s\S]{0,200}addSystemMessage[\s\S]{0,200}return/.test(appHtmlLC));
+
+// SW cache wiring.
+assert('image-safety: docs/sw.js APP_SHELL includes ./modules/image-safety.js',
+  /\.\/modules\/image-safety\.js/.test(swJsLC));
+assert('image-safety: root sw.js APP_SHELL includes ./modules/image-safety.js',
+  /\.\/modules\/image-safety\.js/.test(swRootJsLC));
+assert('image-safety: app.html loads modules/image-safety.js with defer',
+  /<script src="modules\/image-safety\.js"\s+defer><\/script>/.test(appHtmlLC));
+
 // ── v5.53.1 polish: SEED.md last-rewrite version matches FL_VERSION ──
 // Opus directive: SEED.md is a sentinel — when it's rewritten, the version
 // it claims must match the actual FL_VERSION. The "Last rewrite" line at
@@ -4324,7 +4451,7 @@ assert('safety-v3: carries the structural-not-metaphor paragraph (load-bearing c
 assert('safety-v3: structural paragraph names the version explicitly',
   /As of v5\.5[2-9]\.\d+/.test(safetyV3post));
 assert('safety-v3: structural paragraph cites verified Quiet Room lock count + module count',
-  /31 separate locks across 8 modules/.test(safetyV3post));
+  /35 separate locks across 9 modules/.test(safetyV3post));
 
 // ── Ship 3: love-logic-proof-v2.html created; v1 unchanged except forward link ──
 var v1Html = '';

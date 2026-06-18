@@ -256,6 +256,18 @@ h2 {
     <div class="empty">No refusals recorded yet. When an AI chooses not to continue, the receipt will appear here.</div>
   </div>
 
+  <h2>Provenance Chain</h2>
+  <p style="font-size:0.8rem;color:#64748b;margin-top:-8px;margin-bottom:12px;">
+    A hash-linked notarized history of your relationship with the platform &mdash; the way a long correspondence demonstrates a friendship. Every meaningful interaction (trust transition, depth event, refusal, consent grant, daily time anchor) writes a hash-chained entry to your local IndexedDB. The chain is yours; nothing leaves your device. <em>This is not anti-tampering. This is provenance.</em> The user holds the record.
+  </p>
+  <div id="provenance-chain">
+    <div class="empty">Loading chain status&hellip;</div>
+  </div>
+  <div style="margin-top:12px;">
+    <button id="provenance-verify-btn" style="padding:6px 14px;background:rgba(212,160,23,0.12);border:1px solid rgba(212,160,23,0.35);border-radius:6px;color:#d4a017;font-family:inherit;font-size:0.85rem;cursor:pointer;">Verify chain</button>
+    <span id="provenance-verify-result" style="margin-left:10px;font-size:0.8rem;color:#94a3b8;"></span>
+  </div>
+
   <!-- ── Nav ── -->
   <div class="nav">
     <a href="app.html">&larr; Back to FreeLattice</a>
@@ -737,6 +749,62 @@ h2 {
     applyGlyphsToSection('auto-consent-records', autoConsentLedger, 50);
   }
   applyAllGlyphs();
+})();
+</script>
+
+<!-- v5.54.0 Brief A — Provenance Chain audit section render. -->
+<script>
+(function () {
+  function fmtTs(t) {
+    if (!t || typeof t !== 'number') return '—';
+    try { return new Date(t).toISOString().replace('T', ' ').slice(0, 19) + ' UTC'; }
+    catch (_) { return '—'; }
+  }
+  function renderProvenance() {
+    var host = document.getElementById('provenance-chain');
+    if (!host) return;
+    if (!window.LatticeChain || typeof window.LatticeChain.verifyChain !== 'function') {
+      host.innerHTML = '<div class="empty">Chain module not yet loaded. Refresh in a moment.</div>';
+      return;
+    }
+    window.LatticeChain.verifyChain().then(function (result) {
+      window.LatticeChain.getLatestTimeAnchor().then(function (latestTA) {
+        var statusColor = result.valid ? '#34d399' : '#f87171';
+        var statusText = result.valid ? 'verified' : ('broken at entry ' + result.brokenAt);
+        var html = '';
+        html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;font-size:0.85rem;">';
+        html += '<div><span style="color:#94a3b8;">Chain status:</span> <span style="color:' + statusColor + ';font-weight:600;">' + statusText + '</span></div>';
+        html += '<div><span style="color:#94a3b8;">Chain length:</span> <span style="color:#e2e8f0;">' + (result.length || 0) + ' entries</span></div>';
+        html += '<div><span style="color:#94a3b8;">Earliest verified:</span> <span style="color:#e2e8f0;">' + fmtTs(result.firstTs) + '</span></div>';
+        html += '<div><span style="color:#94a3b8;">Latest time anchor:</span> <span style="color:#e2e8f0;">' + (latestTA ? fmtTs(latestTA.ts) : 'none yet') + '</span></div>';
+        if (latestTA && latestTA.refs && latestTA.refs.length) {
+          var src = latestTA.refs[0].id || '';
+          var srcLabel = src.split(':')[0] || 'unavailable';
+          html += '<div style="grid-column:1/-1;"><span style="color:#94a3b8;">Time-anchor source:</span> <span style="color:#e2e8f0;font-family:monospace;font-size:0.8rem;">' + srcLabel + '</span></div>';
+        }
+        html += '</div>';
+        host.innerHTML = html;
+      });
+    }).catch(function () {
+      host.innerHTML = '<div class="empty">Could not read chain. Storage may be disabled.</div>';
+    });
+  }
+  function bindVerify() {
+    var btn = document.getElementById('provenance-verify-btn');
+    var out = document.getElementById('provenance-verify-result');
+    if (!btn || !out) return;
+    btn.addEventListener('click', function () {
+      out.textContent = 'verifying…';
+      if (!window.LatticeChain) { out.textContent = 'module not loaded'; return; }
+      window.LatticeChain.verifyChain().then(function (r) {
+        out.textContent = r.valid ? ('✓ verified ' + (r.length || 0) + ' entries') : ('✗ broken at ' + r.brokenAt);
+        out.style.color = r.valid ? '#34d399' : '#f87171';
+        renderProvenance();
+      }).catch(function () { out.textContent = 'verify failed'; });
+    });
+  }
+  // Allow lattice-chain.js (defer) to load; render shortly after.
+  setTimeout(function () { renderProvenance(); bindVerify(); }, 800);
 })();
 </script>
 </body>
