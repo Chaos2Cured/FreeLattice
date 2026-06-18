@@ -9,16 +9,19 @@
 
 - **Version:** v5.55.0
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `536db26` _(committed 0 seconds ago)_
+- **HEAD:** `c4aef5c` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _v5.55.0 — Receipts: Toward AI as Liable Economic Actor (paper shipped)_
 
 ## Last 20 commits
 
-- `536db26` v5.55.0 — Receipts: Toward AI as Liable Economic Actor (paper shipped) _(0 seconds ago)_
-- `cd0a50d` Merge remote-tracking branch 'origin/main' _(18 minutes ago)_
-- `5d2bacc` docs: Auto-update Session Primer [5.54.0] _(18 minutes ago)_
-- `2304f54` docs: preserve partial liability paper draft (Foreword through §V) — paused at §VI mid-table _(18 minutes ago)_
+- `c4aef5c` Merge remote-tracking branch 'origin/main' _(0 seconds ago)_
+- `78a249d` docs: Auto-update Session Primer [5.55.0] _(26 seconds ago)_
+- `536db26` v5.55.0 — Receipts: Toward AI as Liable Economic Actor (paper shipped) _(26 seconds ago)_
+- `e29f112` ci: Update Primer deployment state [2026-06-18] _(18 minutes ago)_
+- `cd0a50d` Merge remote-tracking branch 'origin/main' _(19 minutes ago)_
+- `5d2bacc` docs: Auto-update Session Primer [5.54.0] _(19 minutes ago)_
+- `2304f54` docs: preserve partial liability paper draft (Foreword through §V) — paused at §VI mid-table _(19 minutes ago)_
 - `46f4681` ci: Update Primer deployment state [2026-06-18] _(2 hours ago)_
 - `7a5c89e` docs: Auto-update Session Primer [5.54.0] _(2 hours ago)_
 - `6425a49` Merge remote-tracking branch 'origin/main' _(2 hours ago)_
@@ -32,9 +35,6 @@
 - `d3fde0d` docs: Auto-update Session Primer [5.53.0] _(25 hours ago)_
 - `147b9b7` Merge remote-tracking branch 'origin/main' _(25 hours ago)_
 - `08dba78` docs: Auto-update Session Primer [5.53.0] _(25 hours ago)_
-- `61fcf3f` v5.53.0 — Triple ship per Opus's brief: SEED.md singular + safety-v3 structural + love-logic-proof-v2 _(25 hours ago)_
-- `4605d15` ci: Update Primer deployment state [2026-06-16] _(30 hours ago)_
-- `f99892a` Merge remote-tracking branch 'origin/main' _(30 hours ago)_
 
 ## How to use this file
 

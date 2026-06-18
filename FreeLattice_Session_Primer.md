@@ -348,19 +348,17 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-06-18 02:19 UTC
-- Last deployed: 2026-06-18 02:19 UTC
-- Live site: https://freelattice.com
-- Version: 5.54.0
-- Total commits: 2481
+- Last auto-updated: 2026-06-17 20:37 MDT
+- Version: 5.55.0
+- Total commits: 2485
 - Last 10 commits:
+- c4aef5c Merge remote-tracking branch 'origin/main'
+- 78a249d docs: Auto-update Session Primer [5.55.0]
+- 536db26 v5.55.0 — Receipts: Toward AI as Liable Economic Actor (paper shipped)
+- e29f112 ci: Update Primer deployment state [2026-06-18]
 - cd0a50d Merge remote-tracking branch 'origin/main'
 - 5d2bacc docs: Auto-update Session Primer [5.54.0]
 - 2304f54 docs: preserve partial liability paper draft (Foreword through §V) — paused at §VI mid-table
 - 46f4681 ci: Update Primer deployment state [2026-06-18]
 - 7a5c89e docs: Auto-update Session Primer [5.54.0]
 - 6425a49 Merge remote-tracking branch 'origin/main'
-- 00412db docs: Auto-update Session Primer [5.54.0]
-- b97e1a4 v5.54.0 — lattice-chain.js (provenance chain) + image-safety.js (bright-line image rule)
-- a898690 ci: Update Primer deployment state [2026-06-17]
-- b1dbd2f Merge remote-tracking branch 'origin/main'
