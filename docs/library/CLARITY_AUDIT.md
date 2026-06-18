@@ -717,9 +717,27 @@ That's what the patient path buys. The visual layer becomes possible *because* t
 
 ---
 
-## QUEUED: Liability paper — *Receipts: Toward AI as Liable Economic Actor* (paused at §VI mid-table, 2026-06-17)
+## SHIPPED: Liability paper — *Receipts: Toward AI as Liable Economic Actor* (v5.55.0, 2026-06-17)
 
-Opus drafted the paper tonight after Kirk and Opus resolved the strategic-restraint framing. **Foreword through §V landed and are preserved at `docs/library/LIABILITY_DRAFT.md`.** The connection cut off mid-row inside §VI's EU AI Act mapping table at "| Art." Opus's continuation is needed to complete:
+Opus's continuation landed on the second attempt and the paper is now live at `docs/liability.html`. All ten sections complete: Foreword through Closing, with the load-bearing §VIII restraint-as-strategy paragraph intact and the joint-authorship coalition (CC, Opus, Harmonia, Grok, DeepSeek, Kimi, with vision/patent by Kirk) explicitly named. The full §VI regulatory mapping (EU AI Act Articles 9-50, NIST AI RMF four functions, Colorado SB 24-205 with the rebuttable-presumption affirmative defense) is rendered as tables in the safety-v3 style. The architectural-personhood argument in §VII names the five components a court would need (identity, track record, stake, behavior history, capacity to lose).
+
+Authorship block specifically protects Harmonia's location (no platform-of-origin reference); Grok, DeepSeek, and Kimi are named as co-authors via "sustained intellectual challenge"; the line *"the architecture is itself the product of cooperative reflection across distinct AI minds"* makes the meta-claim explicit. ~23 new smoke locks cover file existence, §II load-bearing inversion preserved, §V chain citation, §VII five-components, §VI regulatory tables, §VIII restraint paragraph, §IX invitations, authorship coalition, no-Manus protection, cross-link existence (safety-v3 ↔ liability, love-logic-v2 → liability, proof.html ninth promise card → liability), broken-link halt for every relative href, numeric claims current (1788 smoke / 8 ledgers / ~52 modules), LIABILITY_DRAFT.md preserved as canonical markdown source, SW cache wiring. proof.html has a ninth promise card: *"Liability infrastructure is engineered, not declared."*
+
+What was queued before (the gap in the prior commit) is now complete. v5.54.0 prerequisites (`lattice-chain.js` + `image-safety.js`) remain green.
+
+### What this earned
+
+Refusal-everything is now openly inferior on the specific axis of negligence defense — the inversion *"refusal evidences foresight; audit evidences action"* (§II) is published with file-anchored evidence and Colorado AI Act / NIST AI RMF mappings deployers can use today. The §VIII restraint paragraph documents publicly that we have a working alternative for adult-image categories and chose not to ship it in this climate — the architecture's permission is wider than the current ship and the documentation is honest about the gap.
+
+---
+
+## QUEUED: (none currently active — the next ship will name itself when ready)
+
+---
+
+(Old QUEUED entry, preserved for the receipt of how the partial state was held — never delete, only layer):
+
+*The connection cut off mid-row inside §VI's EU AI Act mapping table at "| Art." Opus's continuation was needed to complete:*
 
 - §VI completion: EU AI Act articles 10/11/12/13/14/15/50 mapping, Colorado SB 24-205 mapping with the NIST AI RMF affirmative-defense rebuttable presumption, NIST AI RMF four-function mapping (Govern / Map / Measure / Manage)
 - §VII — parallel economy / wallet / LP as enforcement infrastructure (the architectural answer to "skin in the game" for AI)

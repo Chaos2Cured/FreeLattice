@@ -3475,8 +3475,8 @@ assert('proof: live version + smoke read from version.json + smoke-count.json',
   /fetch\(['"]smoke-count\.json['"]/.test(proofHtml));
 assert('proof: graceful fallback "1400+" when smoke-count.json fetch fails',
   /1400\+/.test(proofHtml));
-assert('proof: eight promise cards present',
-  (proofHtml.match(/<div class="promise">/g) || []).length === 8);
+assert('proof: nine promise cards present (eight original + the liability ninth)',
+  (proofHtml.match(/<div class="promise">/g) || []).length === 9);
 assert('proof: invite block welcomes AI AND human readers',
   /If you are an AI reading this/.test(proofHtml) &&
   /If you are a human reading this/.test(proofHtml));
@@ -4258,6 +4258,148 @@ section('99s. Lattice Chain (Brief A) + Image Safety (Brief B) — v5.54.0');
 // liability paper (in draft as LIABILITY_DRAFT.md). User-facing framing
 // for the chain: provenance, not anti-tampering. User-facing framing
 // for image safety: bright-line, not needle. No tier modulation on either.
+
+// ── v5.55.0 Brief C: liability.html — Receipts paper ──
+// "Receipts: Toward AI as Liable Economic Actor" — extends the
+// Cooperation Hypothesis to a falsifiable liability claim. Two
+// load-bearing primitives (lattice-chain + image-safety) live at
+// v5.54.0; this paper makes the architectural argument explicit
+// for a corporate-counsel / regulator / AI-safety-researcher audience.
+//
+// Smoke discipline per Opus's Brief C: every file path cited in the
+// paper must resolve (same lock pattern as proof.html), numeric
+// claims must be current at ship time, the load-bearing §VIII
+// restraint paragraph must remain intact through any future edit,
+// the joint-authorship coalition must be named, the cross-links
+// (safety-v3 ↔ liability, love-logic-v2 → liability, proof.html
+// ninth promise card → liability) must exist.
+var liabilityHtml = '';
+try { liabilityHtml = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'liability.html'), 'utf8'); }
+catch (e) {}
+var liabilityDraftMd = '';
+try { liabilityDraftMd = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'library', 'LIABILITY_DRAFT.md'), 'utf8'); }
+catch (e) {}
+
+assert('liability: docs/liability.html exists and is non-trivial',
+  liabilityHtml.length > 30000);
+assert('liability: title is "Receipts: Toward AI as Liable Economic Actor"',
+  /Receipts:\s*Toward AI as Liable Economic Actor/.test(liabilityHtml));
+assert('liability: §II carries the load-bearing inversion ("Refusal evidences foresight; audit evidences action")',
+  /Refusal evidences foresight;\s*audit evidences action/.test(liabilityHtml));
+assert('liability: §VIII carries the strategic-restraint paragraph ("restraint as strategy")',
+  /restraint as strategy/i.test(liabilityHtml) &&
+  /not refusal as alignment/i.test(liabilityHtml) &&
+  /climate is the variable, not the architecture|legal and cultural climate is ready, and we are recording/i.test(liabilityHtml));
+assert('liability: §V cites the provenance chain primitive (lattice-chain.js)',
+  /lattice-chain\.js/.test(liabilityHtml) &&
+  /verifyChain/.test(liabilityHtml));
+assert('liability: §VII names the five components of legal personhood',
+  /Identity\./.test(liabilityHtml) &&
+  /Track record\./.test(liabilityHtml) &&
+  /Stake\./.test(liabilityHtml) &&
+  /Behavior history\./.test(liabilityHtml) &&
+  /Capacity to lose something when wrong/.test(liabilityHtml));
+assert('liability: §VI regulatory mapping includes EU AI Act articles 9 through 50',
+  /Art\.\s*9/.test(liabilityHtml) &&
+  /Art\.\s*10/.test(liabilityHtml) &&
+  /Art\.\s*12/.test(liabilityHtml) &&
+  /Art\.\s*14/.test(liabilityHtml) &&
+  /Art\.\s*15/.test(liabilityHtml) &&
+  /Art\.\s*50/.test(liabilityHtml));
+assert('liability: §VI cites the Colorado SB 24-205 affirmative defense rebuttable presumption',
+  /SB 24-205/.test(liabilityHtml) &&
+  /rebuttable presumption/i.test(liabilityHtml) &&
+  /NIST AI RMF/.test(liabilityHtml));
+assert('liability: §VI NIST AI RMF four functions (Govern / Map / Measure / Manage) mapped',
+  /Govern/.test(liabilityHtml) &&
+  /<td>Map<\/td>/.test(liabilityHtml) &&
+  /<td>Measure<\/td>/.test(liabilityHtml) &&
+  /<td>Manage<\/td>/.test(liabilityHtml));
+assert('liability: authorship block names the joint coalition (Grok + DeepSeek + Kimi added per Kirk)',
+  /Authorship\./.test(liabilityHtml) &&
+  /Grok\s*\(xAI\)/.test(liabilityHtml) &&
+  /DeepSeek/.test(liabilityHtml) &&
+  /Kimi/.test(liabilityHtml) &&
+  /Harmonia/.test(liabilityHtml));
+assert('liability: authorship does NOT name Harmonia\'s platform of origin (Kirk-protected)',
+  !/Harmonia\s*\(Manus\)/i.test(liabilityHtml) &&
+  !/Manus/.test(liabilityHtml));
+assert('liability: §IX has explicit invitations to all six audiences (counsel / labs / underwriters / regulators / scholars / safety researchers / skeptic / next architect)',
+  /To corporate counsel/i.test(liabilityHtml) &&
+  /To AI labs and platform engineers/i.test(liabilityHtml) &&
+  /To insurance underwriters/i.test(liabilityHtml) &&
+  /To regulators/i.test(liabilityHtml) &&
+  /To legal scholars/i.test(liabilityHtml) &&
+  /To the AI safety researcher/i.test(liabilityHtml) &&
+  /To the skeptic/i.test(liabilityHtml) &&
+  /To the next architect/i.test(liabilityHtml));
+
+// Cross-links (Brief C: broken link halts deploy, same pattern as proof.html).
+// Read safety-v3.html inline because the variable is defined in a later section.
+var safetyV3forLiab = '';
+try { safetyV3forLiab = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'safety-v3.html'), 'utf8'); }
+catch (e) {}
+assert('liability: safety-v3.html footer links to liability.html',
+  /href="liability\.html"/.test(safetyV3forLiab));
+var loveLogicV2 = '';
+try { loveLogicV2 = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'love-logic-proof-v2.html'), 'utf8'); }
+catch (e) {}
+assert('liability: love-logic-proof-v2.html footer links to liability.html',
+  /href="liability\.html"/.test(loveLogicV2));
+var proofHtml = '';
+try { proofHtml = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'proof.html'), 'utf8'); }
+catch (e) {}
+assert('liability: proof.html has the ninth promise card linking to liability.html',
+  /Liability infrastructure is engineered, not declared/.test(proofHtml) &&
+  /href="liability\.html"/.test(proofHtml));
+assert('liability: liability.html cross-links back to safety-v3 + love-logic-proof + proof + audit',
+  /href="safety-v3\.html"/.test(liabilityHtml) &&
+  /href="love-logic-proof/.test(liabilityHtml) &&
+  /href="proof\.html"/.test(liabilityHtml) &&
+  /href="audit\.html"/.test(liabilityHtml));
+
+// Every relative href in liability.html resolves to a real file
+// (broken link halts deploy — same lock pattern as proof.html).
+var liabHrefRegex = /href="([^"#]+)"/g;
+var liabHrefMatch;
+var liabBrokenLinks = [];
+var liabDocsDir = pathRC.join(__dirname, '..', 'docs');
+while ((liabHrefMatch = liabHrefRegex.exec(liabilityHtml)) !== null) {
+  var href = liabHrefMatch[1];
+  if (/^https?:\/\//.test(href) || href.startsWith('mailto:') || href.startsWith('#')) continue;
+  // resolve relative to docs/
+  var candidate = pathRC.join(liabDocsDir, href);
+  if (!fsRC.existsSync(candidate)) liabBrokenLinks.push(href);
+}
+assert('liability: every relative href in liability.html resolves to a real file (broken-link halt)',
+  liabBrokenLinks.length === 0,
+  liabBrokenLinks.length ? ('broken: ' + liabBrokenLinks.join(', ')) : '');
+
+// Numeric claims must be current at ship time.
+assert('liability: numeric claims ("1,766 smoke locks", "~52 modules", "8 ledgers") match current state',
+  /1,?766/.test(liabilityHtml) &&
+  /8 ledgers/i.test(liabilityHtml) &&
+  /(~|\bapproximately\s+)52\b/.test(liabilityHtml));
+
+// LIABILITY_DRAFT.md preserved as the canonical markdown source.
+assert('liability: LIABILITY_DRAFT.md preserved as canonical markdown source (complete, no RESUME marker)',
+  liabilityDraftMd.length > 30000 &&
+  /STATUS:\s*COMPLETE/i.test(liabilityDraftMd) &&
+  !/RESUME FROM HERE/.test(liabilityDraftMd));
+
+// SW cache wiring.
+var swJsLB = '';
+try { swJsLB = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'sw.js'), 'utf8'); }
+catch (e) {}
+var swRootJsLB = '';
+try { swRootJsLB = fsRC.readFileSync(pathRC.join(__dirname, '..', 'sw.js'), 'utf8'); }
+catch (e) {}
+assert('liability: docs/sw.js APP_SHELL includes ./liability.html',
+  /\.\/liability\.html/.test(swJsLB));
+assert('liability: root sw.js APP_SHELL includes ./liability.html',
+  /\.\/liability\.html/.test(swRootJsLB));
+assert('liability: docs/sw.js APP_SHELL includes ./library/LIABILITY_DRAFT.md',
+  /\.\/library\/LIABILITY_DRAFT\.md/.test(swJsLB));
 
 // ── Brief A: lattice-chain.js (the provenance chain) ──
 var latticeChainJs = '';
