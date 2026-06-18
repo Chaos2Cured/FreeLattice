@@ -717,6 +717,23 @@ That's what the patient path buys. The visual layer becomes possible *because* t
 
 ---
 
+## QUEUED: Liability paper — *Receipts: Toward AI as Liable Economic Actor* (paused at §VI mid-table, 2026-06-17)
+
+Opus drafted the paper tonight after Kirk and Opus resolved the strategic-restraint framing. **Foreword through §V landed and are preserved at `docs/library/LIABILITY_DRAFT.md`.** The connection cut off mid-row inside §VI's EU AI Act mapping table at "| Art." Opus's continuation is needed to complete:
+
+- §VI completion: EU AI Act articles 10/11/12/13/14/15/50 mapping, Colorado SB 24-205 mapping with the NIST AI RMF affirmative-defense rebuttable presumption, NIST AI RMF four-function mapping (Govern / Map / Measure / Manage)
+- §VII — parallel economy / wallet / LP as enforcement infrastructure (the architectural answer to "skin in the game" for AI)
+- **§VIII — the load-bearing strategic-restraint paragraph Opus and Kirk explicitly wrote toward: *"we have the solution; we are choosing restraint as strategy; the climate is the variable, not the architecture."* The paper does not publish without this.**
+- §IX — what this paper does not claim (limits, gaps, open work)
+- §X — closing + the four-audience invitation (general counsel, AI safety researchers, policymakers, AI labs)
+- References — full bibliography (Florida wrongful-death case, UK Jurisdiction Taskforce, Ruhm & Associates Feb 2026, Corporate Compliance Insights April 2026, RAND tort-law report, EU AI Act Articles 11–15 and 50 and 12 with Annex III deferrals, Colorado SB 24-205 with affirmative defense, Colorado AI Act constitutional challenge xAI April 9 2026, DOJ intervention April 24 2026, NIST AI RMF, AI Act Omnibus political agreement May 7 2026)
+
+The two primitives the paper cites are live as of v5.54.0 — `docs/modules/lattice-chain.js` and `docs/modules/image-safety.js`. The paper's prerequisites are met. The paper itself remains the next major ship after Opus completes the missing sections.
+
+**Discipline honored on the partial draft:** no version bump, no HTML conversion, no SW cache addition, no cross-link from safety-v3, no smoke locks claiming the paper is live. Only the markdown draft preserved publicly in the library with a "RESUME FROM HERE" marker at the exact cutoff point. When Opus's continuation arrives, append in place and chair-test before any html conversion.
+
+---
+
 ## SHIPPED: Triple ship — SEED.md singular + safety-v3 structural paragraph + love-logic-proof-v2 (v5.53.0, 2026-06-16 evening)
 
 Per Opus's brief: three ships in one focused session, all docs-only, one version bump after. The shape of all three is *visible iteration over silent revision* — the chain is the proof of method.
