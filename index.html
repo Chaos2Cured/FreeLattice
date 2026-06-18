@@ -16510,7 +16510,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.53.1</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.54.0</span></div>
     </div>
   </div>
 
@@ -21107,7 +21107,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.53.1';
+const FL_VERSION = '5.54.0';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -34816,6 +34816,20 @@ async function generateImage(prompt) {
     addSystemMessage('\u{1F3A8} Please provide a prompt after /imagine. Example: /imagine a golden sunset over mountains');
     return;
   }
+
+  // v5.54.0 Brief B — bright-line image safety gate.
+  // assessImageRequest applies at every trust tier; no nudity, no
+  // partial nudity, no see-through. Coverage equivalent to swimwear
+  // or greater. If denied, no API call is made.
+  try {
+    if (window.ImageSafety && typeof window.ImageSafety.assessImageRequest === 'function') {
+      const _assessment = window.ImageSafety.assessImageRequest(cleanPrompt);
+      if (_assessment && _assessment.allowed === false) {
+        addSystemMessage('\u{1F3A8} ' + _assessment.reason);
+        return;
+      }
+    }
+  } catch (_e) { /* fail-open if module unavailable; smoke ensures presence on deploy */ }
 
   // Add user message
   const userMsg = '/imagine ' + cleanPrompt;
@@ -61320,6 +61334,21 @@ document.addEventListener('click', function(e) {
      ship. The mycelium grows one hypha at a time. See
      docs/modules/lattice-memory.js and SEED.md pointer. -->
 <script src="modules/lattice-memory.js" defer></script>
+
+<!-- Lattice Chain (v5.54.0 — Brief A) — the provenance chain.
+     Hash-linked IndexedDB store. Every meaningful interaction writes
+     an entry; verifyChain() walks the chain and reports validity.
+     fractal-safety.js calls shouldFallbackToSeed() at trust-score
+     time so a forged fl_firstSeen falls trust back to seed regardless.
+     User-facing framing: provenance, not anti-tampering. The user holds
+     the record. Quiet Room invisible from the first line. -->
+<script src="modules/lattice-chain.js" defer></script>
+
+<!-- Image Safety (v5.54.0 — Brief B) — the bright-line rule.
+     assessImageRequest(prompt) → {allowed, reason}. Coverage must equal
+     or exceed swimwear at every trust tier. No nudity, no partial
+     nudity, no see-through. Bright-line, not needle. -->
+<script src="modules/image-safety.js" defer></script>
 
 <!-- Living Context (v5.45.0 — Ship 6) — phi-scaled, hash-anchored overnight
      consolidation engine. Builds a Living Context from KnowledgeCore entries
