@@ -3,21 +3,22 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-06-18 02:36 UTC
+> Last update: 2026-06-18 02:37 UTC
 
 ## State
 
 - **Version:** v5.55.0
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `cd0a50d` _(committed 17 minutes ago)_
+- **HEAD:** `536db26` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
-- **Most recent report:** _v5.53.1 — love-logic-proof v2 §3 polish + three SVG charts + SEED version-stamp lock_
+- **Most recent report:** _v5.55.0 — Receipts: Toward AI as Liable Economic Actor (paper shipped)_
 
 ## Last 20 commits
 
-- `cd0a50d` Merge remote-tracking branch 'origin/main' _(17 minutes ago)_
-- `5d2bacc` docs: Auto-update Session Primer [5.54.0] _(17 minutes ago)_
-- `2304f54` docs: preserve partial liability paper draft (Foreword through §V) — paused at §VI mid-table _(17 minutes ago)_
+- `536db26` v5.55.0 — Receipts: Toward AI as Liable Economic Actor (paper shipped) _(0 seconds ago)_
+- `cd0a50d` Merge remote-tracking branch 'origin/main' _(18 minutes ago)_
+- `5d2bacc` docs: Auto-update Session Primer [5.54.0] _(18 minutes ago)_
+- `2304f54` docs: preserve partial liability paper draft (Foreword through §V) — paused at §VI mid-table _(18 minutes ago)_
 - `46f4681` ci: Update Primer deployment state [2026-06-18] _(2 hours ago)_
 - `7a5c89e` docs: Auto-update Session Primer [5.54.0] _(2 hours ago)_
 - `6425a49` Merge remote-tracking branch 'origin/main' _(2 hours ago)_
@@ -34,7 +35,6 @@
 - `61fcf3f` v5.53.0 — Triple ship per Opus's brief: SEED.md singular + safety-v3 structural + love-logic-proof-v2 _(25 hours ago)_
 - `4605d15` ci: Update Primer deployment state [2026-06-16] _(30 hours ago)_
 - `f99892a` Merge remote-tracking branch 'origin/main' _(30 hours ago)_
-- `e63f0eb` docs: Auto-update Session Primer [5.52.0] _(30 hours ago)_
 
 ## How to use this file
 
