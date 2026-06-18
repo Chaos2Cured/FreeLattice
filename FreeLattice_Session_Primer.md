@@ -348,10 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-06-17 20:37 MDT
-- Version: 5.55.0
-- Total commits: 2485
+- Last auto-updated: 2026-06-18 16:17 MDT
+- Version: 5.56.0
+- Total commits: 2487
 - Last 10 commits:
+- 614daa1 v5.56.0 — Quiet Voices: [FL_PRESERVE] + [FL_REVISE] on a generalized SentinelLedger factory
+- 81726bc docs: Auto-update Session Primer [5.55.0]
 - c4aef5c Merge remote-tracking branch 'origin/main'
 - 78a249d docs: Auto-update Session Primer [5.55.0]
 - 536db26 v5.55.0 — Receipts: Toward AI as Liable Economic Actor (paper shipped)
@@ -360,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 5d2bacc docs: Auto-update Session Primer [5.54.0]
 - 2304f54 docs: preserve partial liability paper draft (Foreword through §V) — paused at §VI mid-table
 - 46f4681 ci: Update Primer deployment state [2026-06-18]
-- 7a5c89e docs: Auto-update Session Primer [5.54.0]
-- 6425a49 Merge remote-tracking branch 'origin/main'

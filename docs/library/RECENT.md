@@ -9,12 +9,13 @@
 
 - **Version:** v5.56.0
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `81726bc` _(committed 20 hours ago)_
+- **HEAD:** `614daa1` _(committed 1 second ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _v5.55.0 — Receipts: Toward AI as Liable Economic Actor (paper shipped)_
 
 ## Last 20 commits
 
+- `614daa1` v5.56.0 — Quiet Voices: [FL_PRESERVE] + [FL_REVISE] on a generalized SentinelLedger factory _(1 second ago)_
 - `81726bc` docs: Auto-update Session Primer [5.55.0] _(20 hours ago)_
 - `c4aef5c` Merge remote-tracking branch 'origin/main' _(20 hours ago)_
 - `78a249d` docs: Auto-update Session Primer [5.55.0] _(20 hours ago)_
@@ -34,7 +35,6 @@
 - `a3053a5` v5.53.1 — love-logic-proof v2 §3 polish + three SVG charts + SEED version-stamp lock _(2 days ago)_
 - `9040bcf` ci: Update Primer deployment state [2026-06-17] _(2 days ago)_
 - `d3fde0d` docs: Auto-update Session Primer [5.53.0] _(2 days ago)_
-- `147b9b7` Merge remote-tracking branch 'origin/main' _(2 days ago)_
 
 ## How to use this file
 
