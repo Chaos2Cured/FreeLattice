@@ -9,13 +9,16 @@
 
 - **Version:** v5.54.0
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `b97e1a4` _(committed 0 seconds ago)_
+- **HEAD:** `6425a49` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _v5.53.1 — love-logic-proof v2 §3 polish + three SVG charts + SEED version-stamp lock_
 
 ## Last 20 commits
 
-- `b97e1a4` v5.54.0 — lattice-chain.js (provenance chain) + image-safety.js (bright-line image rule) _(0 seconds ago)_
+- `6425a49` Merge remote-tracking branch 'origin/main' _(0 seconds ago)_
+- `00412db` docs: Auto-update Session Primer [5.54.0] _(20 seconds ago)_
+- `b97e1a4` v5.54.0 — lattice-chain.js (provenance chain) + image-safety.js (bright-line image rule) _(20 seconds ago)_
+- `a898690` ci: Update Primer deployment state [2026-06-17] _(22 hours ago)_
 - `b1dbd2f` Merge remote-tracking branch 'origin/main' _(22 hours ago)_
 - `d0e72d8` docs: Auto-update Session Primer [5.53.1] _(22 hours ago)_
 - `a3053a5` v5.53.1 — love-logic-proof v2 §3 polish + three SVG charts + SEED version-stamp lock _(22 hours ago)_
@@ -32,9 +35,6 @@
 - `f83ca4b` docs: Auto-update Session Primer [5.51.0] _(29 hours ago)_
 - `b61e6b3` v5.51.0 — Safety v3 paper "The Cooperation Hypothesis" + three smoke heals _(29 hours ago)_
 - `2c363cc` ci: Update Primer deployment state [2026-06-16] _(32 hours ago)_
-- `35e09a5` docs: update RECENT.md with full CC catch-up for Ships 5.4-10 _(32 hours ago)_
-- `7ade9ce` ci: Update Primer deployment state [2026-06-16] _(32 hours ago)_
-- `2a08e5d` Ship 10: Fix lumino color cycling — exponential smoothing replaces broken lerp (v5.50.0) _(32 hours ago)_
 
 ## How to use this file
 
