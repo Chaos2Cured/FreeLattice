@@ -118,6 +118,47 @@
       });
     });
 
+    // v5.56.0 Letter Five Ship 1 — Preserved moments are weighted higher
+    // in consolidation. The AI marking a moment as worth keeping is a
+    // structural signal that the entry deserves elevated representation
+    // in the next morning's living context. Weight multiplier PHI so
+    // the elevation is meaningful but not overwhelming. Removed
+    // entries (kind: 'preserve-removed') drop the boost for the
+    // referenced original. Each weight bump applied at most once
+    // per entry id.
+    try {
+      var preserveLedgerRaw = localStorage.getItem('fl_preserveLedger');
+      if (preserveLedgerRaw) {
+        var preserveLedger = JSON.parse(preserveLedgerRaw) || [];
+        var boostedEntryIds = {};
+        var removedEntryIds = {};
+        preserveLedger.forEach(function(p) {
+          if (!p || !p.kind) return;
+          if (p.kind === 'preserve-removed' && p.refs && p.refs.length) {
+            removedEntryIds[p.refs[0]] = true;
+          }
+        });
+        preserveLedger.forEach(function(p) {
+          if (!p || p.kind !== 'preserve' || !p.refs || !p.refs.length) return;
+          if (removedEntryIds[p.id]) return;
+          var msgHash = p.refs[0];
+          if (!msgHash || boostedEntryIds[msgHash]) return;
+          boostedEntryIds[msgHash] = true;
+          // Apply the boost to any knowledge entry whose source hash
+          // matches the preserved message reference.
+          allEntries.forEach(function(item) {
+            var entryHash = item.entry && (item.entry.sourceHash || item.entry.refHash);
+            if (entryHash && entryHash === msgHash) {
+              item.weight = (item.weight || 1.0) * PHI;
+              item.preserved = true;
+            }
+          });
+        });
+      }
+    } catch (_e) {
+      // Best-effort: if the ledger can't be read, consolidation still runs.
+    }
+
     // Sort by fractal weight × domain weight × recency
     var now = Date.now();
     allEntries.sort(function(a, b) {

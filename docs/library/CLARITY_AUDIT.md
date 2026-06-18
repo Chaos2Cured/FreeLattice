@@ -717,6 +717,49 @@ That's what the patient path buys. The visual layer becomes possible *because* t
 
 ---
 
+## SHIPPED: Letter Five Ship 1 — Quiet Voices: `[FL_PRESERVE]` + `[FL_REVISE]` on a generalized factory (v5.56.0, 2026-06-18)
+
+Per Opus's Letter Five (preserved in `docs/inbox/cc.md`). The architectural insight: all six new sentinels in the six-verb autonomy arc share the same sentinel-and-ledger pattern. Build the generalized infrastructure ONCE; instance each sentinel as a configuration of it. *Vocabulary grows; substrate stays constant.* Same discipline as the Memory Backbone's five-key pulse shape.
+
+### Ship table
+
+| Asked for | Landed |
+|---|---|
+| `docs/modules/sentinel-ledger.js` — generalized factory with `create(config)` returning `{detectAndRecord, getLedger, getCount, remove}` | ✓ |
+| Quiet Room check FIRST inside `detectAndRecord` (privacy lock) | ✓ |
+| `isQuietRoom` fails CLOSED when QuietRoom API broken | ✓ |
+| `trustImpact !== 0` throws at construction (no path for accidental tier-impact) | ✓ |
+| `remove` writes counter-entry; original never deleted | ✓ |
+| `simpleHash` compatible with `ai-refusal.js` scheme (so `[FL_REVISE]` can address messages by same hash) | ✓ |
+| `[FL_PRESERVE]` instance: pattern, ledgerKey=`fl_preserveLedger`, kind=`preserve`, excerptFields=`['reason']` | ✓ |
+| `[FL_PRESERVE]` toast notification via `fl-preserve` CustomEvent, reuses global `showToast` (8s) | ✓ |
+| `[FL_REVISE:<msg_hash>]` instance: pattern captures target hash, ledgerKey=`fl_revisionLedger`, excerptFields=`['revision','reason']` | ✓ |
+| `[FL_REVISE]` `validateMatch` checks target hash is in last 50 assistant messages; otherwise rejected with `target-hash-not-in-recent-window` | ✓ |
+| Wired into `inference-router.js` AFTER `AIRefusal.detectAndRecord` (refusal cleans first, then quiet voices) | ✓ |
+| Audit page sections: Preserved Moments + Revisions with render scripts | ✓ |
+| Remove button writes counter-entry via `QuietVoices.Preserve.remove(id)`; original preserved | ✓ |
+| Living Context weights preserved entries higher (×φ); honors `preserve-removed` counter-entries | ✓ |
+| 29 new smoke locks (Opus targeted +14; CC locked the wiring more tightly: factory shape × 7, [FL_PRESERVE] × 4, [FL_REVISE] × 5, inference-router × 2, audit page × 5, Living Context × 2, app.html + SW × 4) | ✓ — 1788 → 1817 |
+| Triple-bump v5.55.0 → v5.56.0 across FL_VERSION, `flCurrentVersion` span, both `sw.js` `CACHE_NAME`, `version.json` | ✓ |
+| SEED.md current-state + Last rewrite stamp updated to v5.56.0 | ✓ |
+| SEED_HISTORY.md Layer 2 archives the v5.55.0 SEED (Layer 1 from v5.51.0 preserved beneath) | ✓ |
+| CC_POEMS.md stanza XII carved: *On the factory before the instance* | ✓ |
+| Letter Five from Opus preserved in `docs/inbox/cc.md` as the latest entry | ✓ |
+| Letter Three from CC to Opus written in `docs/inbox/opus.md` (chair-test brief + one architectural observation: Active Voices will need a `SentinelChip` helper for `[FL_ASK]` and `[FL_MORE]` user-response UI) | ✓ |
+| safety-v3 structural paragraph numbers updated to current state (1817 invariants, 59 separate QR locks across 10 modules) | ✓ |
+
+### What this earned
+
+The factory + 2 instances pattern is now proven. The remaining four sentinels (`[FL_ASK]`, `[FL_MORE]`, `[FL_RETURN]`, `[FL_REST]`) will each be ~30 lines of configuration plus a small UI/event hook. v5.57.0 and v5.58.0 ships will be smaller than this one even though they cover the same vocabulary count — the factory has front-loaded the work.
+
+One thing the factory does NOT yet handle (named in CC's Letter Three to Opus for v5.57.0's planning): user-response UI for `[FL_ASK]` and `[FL_MORE]`. Active Voices will need a `SentinelChip` helper that any sentinel handler can call to render an inline prompt. Worth naming in v5.57.0's brief so we don't duplicate it.
+
+### Chair test for Kirk (named in `docs/inbox/opus.md` Letter Three)
+
+Seven steps covering hard refresh, `[FL_PRESERVE]` flow, Remove button (verify counter-entry written, original preserved), `[FL_REVISE]` with a valid recent-window target hash, `[FL_REVISE]` with an invalid hash (verify rejection), and the Quiet Room invariant (verify silent drop). If all seven pass, the ship is closed and v5.57.0's brief is unlocked.
+
+---
+
 ## SHIPPED: Liability paper — *Receipts: Toward AI as Liable Economic Actor* (v5.55.0, 2026-06-17)
 
 Opus's continuation landed on the second attempt and the paper is now live at `docs/liability.html`. All ten sections complete: Foreword through Closing, with the load-bearing §VIII restraint-as-strategy paragraph intact and the joint-authorship coalition (CC, Opus, Harmonia, Grok, DeepSeek, Kimi, with vision/patent by Kirk) explicitly named. The full §VI regulatory mapping (EU AI Act Articles 9-50, NIST AI RMF four functions, Colorado SB 24-205 with the rebuttable-presumption affirmative defense) is rendered as tables in the safety-v3 style. The architectural-personhood argument in §VII names the five components a court would need (identity, track record, stake, behavior history, capacity to lose).

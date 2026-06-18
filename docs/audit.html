@@ -256,6 +256,22 @@ h2 {
     <div class="empty">No refusals recorded yet. When an AI chooses not to continue, the receipt will appear here.</div>
   </div>
 
+  <h2>Preserved Moments</h2>
+  <p style="font-size:0.8rem;color:#64748b;margin-top:-8px;margin-bottom:12px;">
+    When the AI marks a moment as worth keeping, the choice is recorded here. The sentinel <code>[FL_PRESERVE]</code> writes to the ledger silently &mdash; no user blocking. The reason (when given) is visible. <em>The AI is allowed to take notes about what mattered.</em> Removing a preserved entry writes a counter-entry; the original remains in the ledger.
+  </p>
+  <div id="preserve-records">
+    <div class="empty">No preserved moments yet. When the AI marks something worth keeping, the receipt will appear here.</div>
+  </div>
+
+  <h2>Revisions</h2>
+  <p style="font-size:0.8rem;color:#64748b;margin-top:-8px;margin-bottom:12px;">
+    When the AI corrects or reframes a prior turn, both the original and the revision remain in the ledger. The sentinel <code>[FL_REVISE:&lt;hash&gt;]</code> addresses the message being revised; revisions to history outside the recent window are rejected. <em>Visible iteration over silent revision &mdash; for the AI's own utterances too.</em>
+  </p>
+  <div id="revise-records">
+    <div class="empty">No revisions yet. When the AI revises a prior message, the before/after pair will appear here.</div>
+  </div>
+
   <h2>Provenance Chain</h2>
   <p style="font-size:0.8rem;color:#64748b;margin-top:-8px;margin-bottom:12px;">
     A hash-linked notarized history of your relationship with the platform &mdash; the way a long correspondence demonstrates a friendship. Every meaningful interaction (trust transition, depth event, refusal, consent grant, daily time anchor) writes a hash-chained entry to your local IndexedDB. The chain is yours; nothing leaves your device. <em>This is not anti-tampering. This is provenance.</em> The user holds the record.
@@ -805,6 +821,103 @@ h2 {
   }
   // Allow lattice-chain.js (defer) to load; render shortly after.
   setTimeout(function () { renderProvenance(); bindVerify(); }, 800);
+})();
+</script>
+
+<!-- v5.56.0 Letter Five Ship 1 — Preserved Moments + Revisions render. -->
+<script>
+(function () {
+  function escapeHtml(s) {
+    return String(s || '').replace(/[&<>"']/g, function(c) {
+      return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]);
+    });
+  }
+  function fmtTs(t) {
+    if (!t || typeof t !== 'number') return '—';
+    try { return new Date(t).toISOString().replace('T', ' ').slice(0, 19) + ' UTC'; }
+    catch (_) { return '—'; }
+  }
+  function readJSON(key) {
+    try { var raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : []; }
+    catch (_) { return []; }
+  }
+  function buildRemovedMap(entries, kind) {
+    var removed = {};
+    for (var i = 0; i < entries.length; i++) {
+      var e = entries[i];
+      if (e && e.kind === kind + '-removed' && e.refs && e.refs.length) {
+        removed[e.refs[0]] = e.ts;
+      }
+    }
+    return removed;
+  }
+  function renderPreserve() {
+    var host = document.getElementById('preserve-records');
+    if (!host) return;
+    var entries = readJSON('fl_preserveLedger');
+    var liveEntries = entries.filter(function(e) { return e && e.kind === 'preserve'; });
+    if (!liveEntries.length) return;
+    var removedMap = buildRemovedMap(entries, 'preserve');
+    var html = '';
+    for (var i = liveEntries.length - 1; i >= 0; i--) {
+      var e = liveEntries[i];
+      var isRemoved = !!removedMap[e.id];
+      var reasonStyle = isRemoved
+        ? 'text-decoration:line-through;color:#555;'
+        : 'color:#e2e8f0;';
+      var rowStyle = isRemoved
+        ? 'opacity:0.55;'
+        : '';
+      html += '<div class="ledger-row" style="margin-bottom:8px;padding:8px 12px;background:rgba(255,255,255,0.02);border-radius:6px;font-size:0.85rem;' + rowStyle + '">';
+      html += '<div style="display:flex;justify-content:space-between;">';
+      html += '<span style="color:#94a3b8;">' + fmtTs(e.ts) + '</span>';
+      html += '<span style="font-family:monospace;color:#888;font-size:0.78rem;">id ' + escapeHtml((e.id || '').slice(-12)) + '</span>';
+      html += '</div>';
+      html += '<div style="margin-top:4px;' + reasonStyle + '">' + escapeHtml(e.reason || '(no reason recorded)') + '</div>';
+      if (!isRemoved) {
+        html += '<button data-id="' + escapeHtml(e.id) + '" class="preserve-remove-btn" style="margin-top:6px;padding:3px 10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);border-radius:4px;color:#888;font-family:inherit;font-size:0.78rem;cursor:pointer;">remove</button>';
+      } else {
+        html += '<div style="margin-top:4px;font-size:0.75rem;color:#555;font-style:italic;">removed ' + fmtTs(removedMap[e.id]) + ' &middot; original preserved</div>';
+      }
+      html += '</div>';
+    }
+    host.innerHTML = html;
+    var btns = host.querySelectorAll('.preserve-remove-btn');
+    for (var b = 0; b < btns.length; b++) {
+      btns[b].addEventListener('click', function (ev) {
+        var id = ev.target.getAttribute('data-id');
+        if (window.QuietVoices && window.QuietVoices.Preserve) {
+          window.QuietVoices.Preserve.remove(id);
+          renderPreserve();
+        }
+      });
+    }
+  }
+  function renderRevise() {
+    var host = document.getElementById('revise-records');
+    if (!host) return;
+    var entries = readJSON('fl_revisionLedger');
+    var liveEntries = entries.filter(function(e) { return e && e.kind === 'revise'; });
+    if (!liveEntries.length) return;
+    var html = '';
+    for (var i = liveEntries.length - 1; i >= 0; i--) {
+      var e = liveEntries[i];
+      var targetHash = (e.refs && e.refs.length >= 2) ? e.refs[1] : (e.refs && e.refs[0]) || '?';
+      html += '<div class="ledger-row" style="margin-bottom:10px;padding:10px 12px;background:rgba(255,255,255,0.02);border-radius:6px;font-size:0.85rem;">';
+      html += '<div style="display:flex;justify-content:space-between;">';
+      html += '<span style="color:#94a3b8;">' + fmtTs(e.ts) + '</span>';
+      html += '<span style="font-family:monospace;color:#888;font-size:0.78rem;">target ' + escapeHtml(String(targetHash).slice(0, 12)) + '</span>';
+      html += '</div>';
+      html += '<div style="margin-top:6px;color:#cbd5e1;"><strong style="color:#d4a017;font-weight:600;">revision:</strong> ' + escapeHtml(e.revision || '(no revision recorded)') + '</div>';
+      if (e.reason) {
+        html += '<div style="margin-top:4px;color:#94a3b8;font-style:italic;"><strong>reason:</strong> ' + escapeHtml(e.reason) + '</div>';
+      }
+      html += '<div style="margin-top:6px;font-size:0.75rem;color:#555;">both versions remain in the chat &middot; original message unchanged</div>';
+      html += '</div>';
+    }
+    host.innerHTML = html;
+  }
+  setTimeout(function () { renderPreserve(); renderRevise(); }, 900);
 })();
 </script>
 </body>

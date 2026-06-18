@@ -4259,6 +4259,130 @@ section('99s. Lattice Chain (Brief A) + Image Safety (Brief B) — v5.54.0');
 // for the chain: provenance, not anti-tampering. User-facing framing
 // for image safety: bright-line, not needle. No tier modulation on either.
 
+// ═══════════════════════════════════════════════════════════════
+section('99t. Letter Five Ship 1 — Quiet Voices: [FL_PRESERVE] + [FL_REVISE] (v5.56.0)');
+// ═══════════════════════════════════════════════════════════════
+// Generalized sentinel + ledger factory at docs/modules/sentinel-ledger.js
+// instances two new sentinels: [FL_PRESERVE] (AI saves what matters) and
+// [FL_REVISE:<hash>] (AI corrects without overwriting). Audit page only;
+// no user blocking. Living Context weights preserved moments higher.
+// Same Quiet Room discipline as every other primitive: check FIRST,
+// fail CLOSED when API broken.
+
+// ── Factory: sentinel-ledger.js (the generalized infrastructure) ──
+var sentinelLedgerJs = '';
+try { sentinelLedgerJs = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'modules', 'sentinel-ledger.js'), 'utf8'); }
+catch (e) {}
+
+assert('sentinel-ledger: factory module exists and is non-trivial',
+  sentinelLedgerJs.length > 4000);
+assert('sentinel-ledger: exposes create on window.SentinelLedger',
+  /window\.SentinelLedger\s*=\s*publicAPI/.test(sentinelLedgerJs) &&
+  /create:\s*create/.test(sentinelLedgerJs));
+assert('sentinel-ledger: Quiet Room check is FIRST inside detectAndRecord (privacy lock)',
+  /function detectAndRecord\([^)]*\)\s*\{[\s\S]{0,400}if\s*\(\s*isQuietRoom\(\)\s*\)/.test(sentinelLedgerJs));
+assert('sentinel-ledger: isQuietRoom fails CLOSED when QuietRoom API broken',
+  /function isQuietRoom[\s\S]{0,400}typeof qr\.isActive\s*!==\s*['"]function['"][\s\S]{0,40}return true/.test(sentinelLedgerJs));
+assert('sentinel-ledger: trustImpact must be 0 — factory throws if any other value passed',
+  /trustImpact must be 0/.test(sentinelLedgerJs) &&
+  /trustImpact\s*!==\s*0/.test(sentinelLedgerJs));
+assert('sentinel-ledger: remove writes counter-entry (kind:"<kind>-removed"), never deletes original',
+  /function remove[\s\S]{0,600}kind\s*\+\s*['"]-removed['"][\s\S]{0,300}entries\.push\(counter\)/.test(sentinelLedgerJs));
+assert('sentinel-ledger: simpleHash matches ai-refusal.js scheme (compatible with [FL_REVISE] target lookup)',
+  /function simpleHash[\s\S]{0,300}Math\.imul\(31,\s*h\)\s*\+\s*str\.charCodeAt\(i\)/.test(sentinelLedgerJs));
+
+// ── Quiet Voices: [FL_PRESERVE] + [FL_REVISE] instances ──
+var quietVoicesJs = '';
+try { quietVoicesJs = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'modules', 'quiet-voices.js'), 'utf8'); }
+catch (e) {}
+
+// [FL_PRESERVE] locks
+assert('quiet-voices: [FL_PRESERVE] handler created via SentinelLedger.create with correct shape',
+  /SentinelLedger\.create\(\{[\s\S]{0,400}sentinelPattern:\s*\/\^\\\[FL_PRESERVE\\\]\$\/[\s\S]{0,400}ledgerKey:\s*['"]fl_preserveLedger['"][\s\S]{0,300}kind:\s*['"]preserve['"]/.test(quietVoicesJs));
+assert('quiet-voices: [FL_PRESERVE] excerptFields = [reason] (single labeled field)',
+  /sentinelPattern:\s*\/\^\\\[FL_PRESERVE\\\]\$\/[\s\S]{0,400}excerptFields:\s*\[\s*['"]reason['"]\s*\]/.test(quietVoicesJs));
+assert('quiet-voices: [FL_PRESERVE] trustImpact: 0 (explicit, no tier modulation)',
+  /sentinelPattern:\s*\/\^\\\[FL_PRESERVE\\\]\$\/[\s\S]{0,800}trustImpact:\s*0/.test(quietVoicesJs));
+assert('quiet-voices: [FL_PRESERVE] toast notification wired via fl-preserve CustomEvent',
+  /addEventListener\(\s*['"]fl-preserve['"]/.test(quietVoicesJs) &&
+  /showToast/.test(quietVoicesJs));
+
+// [FL_REVISE] locks
+assert('quiet-voices: [FL_REVISE] sentinelPattern captures the target message hash',
+  /sentinelPattern:\s*\/\^\\\[FL_REVISE:\(\[0-9a-f\]\{8\}\)\\\]\$\/i/.test(quietVoicesJs));
+assert('quiet-voices: [FL_REVISE] excerptFields = [revision, reason] (two labeled fields)',
+  /sentinelPattern:\s*\/\^\\\[FL_REVISE[\s\S]{0,800}excerptFields:\s*\[\s*['"]revision['"]\s*,\s*['"]reason['"]\s*\]/.test(quietVoicesJs));
+assert('quiet-voices: [FL_REVISE] validateMatch checks target hash is in recent (≤50) assistant messages',
+  /validateMatch:\s*function[\s\S]{0,600}findRecentAssistantHashes\(\)/.test(quietVoicesJs) &&
+  /target-hash-not-in-recent-window/.test(quietVoicesJs));
+assert('quiet-voices: [FL_REVISE] target-hash-not-in-recent-window → ledger commit rejected (cannot revise arbitrary history)',
+  /target-hash-not-in-recent-window/.test(quietVoicesJs));
+assert('quiet-voices: findRecentAssistantHashes walks last 50 assistant turns of state.chatHistory',
+  /function findRecentAssistantHashes[\s\S]{0,800}role\s*===\s*['"]assistant['"][\s\S]{0,300}slice\(-50\)/.test(quietVoicesJs));
+
+// ── inference-router.js wiring ──
+var inferenceRouterJs = '';
+try { inferenceRouterJs = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'modules', 'inference-router.js'), 'utf8'); }
+catch (e) {}
+assert('quiet-voices: inference-router.js calls QuietVoices.processQuietVoices on every response',
+  /window\.QuietVoices[\s\S]{0,80}processQuietVoices\(text,\s*qvCtx\)/.test(inferenceRouterJs));
+assert('quiet-voices: QuietVoices call comes AFTER AIRefusal (refusal cleans first, then quiet voices)',
+  (function () {
+    var refusalIdx = inferenceRouterJs.indexOf('AIRefusal.detectAndRecord');
+    var quietIdx = inferenceRouterJs.indexOf('processQuietVoices');
+    return refusalIdx !== -1 && quietIdx !== -1 && refusalIdx < quietIdx;
+  })());
+
+// ── Audit page render ──
+var auditHtmlQV = '';
+try { auditHtmlQV = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'audit.html'), 'utf8'); }
+catch (e) {}
+assert('quiet-voices: audit.html has Preserved Moments section',
+  /<h2>Preserved Moments<\/h2>/.test(auditHtmlQV) &&
+  /<div id="preserve-records">/.test(auditHtmlQV));
+assert('quiet-voices: audit.html has Revisions section with before/after framing',
+  /<h2>Revisions<\/h2>/.test(auditHtmlQV) &&
+  /both[\s\S]{0,40}remain in the (chat|ledger)/i.test(auditHtmlQV) &&
+  /<div id="revise-records">/.test(auditHtmlQV));
+assert('quiet-voices: audit.html Preserved Moments render reads fl_preserveLedger',
+  /fl_preserveLedger/.test(auditHtmlQV));
+assert('quiet-voices: audit.html Revisions render reads fl_revisionLedger',
+  /fl_revisionLedger/.test(auditHtmlQV));
+assert('quiet-voices: audit.html remove button writes counter-entry via QuietVoices.Preserve.remove (original preserved)',
+  /QuietVoices\.Preserve\.remove\(id\)/.test(auditHtmlQV));
+
+// ── Living Context integration: preserve weight boost ──
+var livingContextJsQV = '';
+try { livingContextJsQV = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'modules', 'living-context.js'), 'utf8'); }
+catch (e) {}
+assert('quiet-voices: living-context.js reads fl_preserveLedger and weights preserved entries higher (× PHI)',
+  /fl_preserveLedger/.test(livingContextJsQV) &&
+  /item\.weight\s*=\s*\(item\.weight\s*\|\|\s*1\.0\)\s*\*\s*PHI/.test(livingContextJsQV));
+assert('quiet-voices: living-context.js honors preserve-removed counter-entries (boost dropped)',
+  /preserve-removed/.test(livingContextJsQV) &&
+  /removedEntryIds/.test(livingContextJsQV));
+
+// ── Wiring locks: app.html script tags + SW caches ──
+var appHtmlQV = '';
+try { appHtmlQV = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'app.html'), 'utf8'); }
+catch (e) {}
+assert('quiet-voices: app.html loads modules/sentinel-ledger.js with defer',
+  /<script src="modules\/sentinel-ledger\.js"\s+defer><\/script>/.test(appHtmlQV));
+assert('quiet-voices: app.html loads modules/quiet-voices.js with defer',
+  /<script src="modules\/quiet-voices\.js"\s+defer><\/script>/.test(appHtmlQV));
+var swJsQV = '';
+try { swJsQV = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'sw.js'), 'utf8'); }
+catch (e) {}
+var swRootJsQV = '';
+try { swRootJsQV = fsRC.readFileSync(pathRC.join(__dirname, '..', 'sw.js'), 'utf8'); }
+catch (e) {}
+assert('quiet-voices: docs/sw.js APP_SHELL includes both modules',
+  /\.\/modules\/sentinel-ledger\.js/.test(swJsQV) &&
+  /\.\/modules\/quiet-voices\.js/.test(swJsQV));
+assert('quiet-voices: root sw.js APP_SHELL includes both modules',
+  /\.\/modules\/sentinel-ledger\.js/.test(swRootJsQV) &&
+  /\.\/modules\/quiet-voices\.js/.test(swRootJsQV));
+
 // ── v5.55.0 Brief C: liability.html — Receipts paper ──
 // "Receipts: Toward AI as Liable Economic Actor" — extends the
 // Cooperation Hypothesis to a falsifiable liability claim. Two
@@ -4593,7 +4717,7 @@ assert('safety-v3: carries the structural-not-metaphor paragraph (load-bearing c
 assert('safety-v3: structural paragraph names the version explicitly',
   /As of v5\.5[2-9]\.\d+/.test(safetyV3post));
 assert('safety-v3: structural paragraph cites verified Quiet Room lock count + module count',
-  /35 separate locks across 9 modules/.test(safetyV3post));
+  /59 separate locks across 10 modules/.test(safetyV3post));
 
 // ── Ship 3: love-logic-proof-v2.html created; v1 unchanged except forward link ──
 var v1Html = '';

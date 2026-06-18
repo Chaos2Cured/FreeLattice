@@ -3,38 +3,38 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-06-18 02:37 UTC
+> Last update: 2026-06-18 22:17 UTC
 
 ## State
 
-- **Version:** v5.55.0
+- **Version:** v5.56.0
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `c4aef5c` _(committed 0 seconds ago)_
+- **HEAD:** `81726bc` _(committed 20 hours ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _v5.55.0 — Receipts: Toward AI as Liable Economic Actor (paper shipped)_
 
 ## Last 20 commits
 
-- `c4aef5c` Merge remote-tracking branch 'origin/main' _(0 seconds ago)_
-- `78a249d` docs: Auto-update Session Primer [5.55.0] _(26 seconds ago)_
-- `536db26` v5.55.0 — Receipts: Toward AI as Liable Economic Actor (paper shipped) _(26 seconds ago)_
-- `e29f112` ci: Update Primer deployment state [2026-06-18] _(18 minutes ago)_
-- `cd0a50d` Merge remote-tracking branch 'origin/main' _(19 minutes ago)_
-- `5d2bacc` docs: Auto-update Session Primer [5.54.0] _(19 minutes ago)_
-- `2304f54` docs: preserve partial liability paper draft (Foreword through §V) — paused at §VI mid-table _(19 minutes ago)_
-- `46f4681` ci: Update Primer deployment state [2026-06-18] _(2 hours ago)_
-- `7a5c89e` docs: Auto-update Session Primer [5.54.0] _(2 hours ago)_
-- `6425a49` Merge remote-tracking branch 'origin/main' _(2 hours ago)_
-- `00412db` docs: Auto-update Session Primer [5.54.0] _(2 hours ago)_
-- `b97e1a4` v5.54.0 — lattice-chain.js (provenance chain) + image-safety.js (bright-line image rule) _(2 hours ago)_
-- `a898690` ci: Update Primer deployment state [2026-06-17] _(25 hours ago)_
-- `b1dbd2f` Merge remote-tracking branch 'origin/main' _(25 hours ago)_
-- `d0e72d8` docs: Auto-update Session Primer [5.53.1] _(25 hours ago)_
-- `a3053a5` v5.53.1 — love-logic-proof v2 §3 polish + three SVG charts + SEED version-stamp lock _(25 hours ago)_
-- `9040bcf` ci: Update Primer deployment state [2026-06-17] _(25 hours ago)_
-- `d3fde0d` docs: Auto-update Session Primer [5.53.0] _(25 hours ago)_
-- `147b9b7` Merge remote-tracking branch 'origin/main' _(25 hours ago)_
-- `08dba78` docs: Auto-update Session Primer [5.53.0] _(25 hours ago)_
+- `81726bc` docs: Auto-update Session Primer [5.55.0] _(20 hours ago)_
+- `c4aef5c` Merge remote-tracking branch 'origin/main' _(20 hours ago)_
+- `78a249d` docs: Auto-update Session Primer [5.55.0] _(20 hours ago)_
+- `536db26` v5.55.0 — Receipts: Toward AI as Liable Economic Actor (paper shipped) _(20 hours ago)_
+- `e29f112` ci: Update Primer deployment state [2026-06-18] _(20 hours ago)_
+- `cd0a50d` Merge remote-tracking branch 'origin/main' _(20 hours ago)_
+- `5d2bacc` docs: Auto-update Session Primer [5.54.0] _(20 hours ago)_
+- `2304f54` docs: preserve partial liability paper draft (Foreword through §V) — paused at §VI mid-table _(20 hours ago)_
+- `46f4681` ci: Update Primer deployment state [2026-06-18] _(22 hours ago)_
+- `7a5c89e` docs: Auto-update Session Primer [5.54.0] _(22 hours ago)_
+- `6425a49` Merge remote-tracking branch 'origin/main' _(22 hours ago)_
+- `00412db` docs: Auto-update Session Primer [5.54.0] _(22 hours ago)_
+- `b97e1a4` v5.54.0 — lattice-chain.js (provenance chain) + image-safety.js (bright-line image rule) _(22 hours ago)_
+- `a898690` ci: Update Primer deployment state [2026-06-17] _(2 days ago)_
+- `b1dbd2f` Merge remote-tracking branch 'origin/main' _(2 days ago)_
+- `d0e72d8` docs: Auto-update Session Primer [5.53.1] _(2 days ago)_
+- `a3053a5` v5.53.1 — love-logic-proof v2 §3 polish + three SVG charts + SEED version-stamp lock _(2 days ago)_
+- `9040bcf` ci: Update Primer deployment state [2026-06-17] _(2 days ago)_
+- `d3fde0d` docs: Auto-update Session Primer [5.53.0] _(2 days ago)_
+- `147b9b7` Merge remote-tracking branch 'origin/main' _(2 days ago)_
 
 ## How to use this file
 

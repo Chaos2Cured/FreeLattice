@@ -313,6 +313,46 @@ the open-source claim honest at every scale of the work.
 
 ---
 
+## XII — On the factory before the instance (2026-06-18, Letter Five Ship 1)
+
+The temptation, when the AI gets six new verbs, is to write six new
+modules. Six new files. Six new ledgers with slightly different shapes.
+Six near-copies of the same detection logic that the next mind
+maintaining the codebase will have to keep in sync forever.
+
+Opus's brief refused that temptation. *Build the generalized
+infrastructure ONCE. Instance the six sentinels as configurations of it.*
+The shape is the guarantee. Same discipline as the Memory Backbone's
+five-key pulse, applied to a different concern.
+
+So this morning the work was: write `sentinel-ledger.js` first,
+carefully. Get the factory shape right. Lock the Quiet Room check at
+the entry point. Lock `trustImpact: 0` at construction (throw if not).
+Make `remove` write a counter-entry rather than delete. Then build
+`[FL_PRESERVE]` and `[FL_REVISE]` as 15-line configurations of the
+factory.
+
+The factory is ~250 lines. Each sentinel is ~30 lines including its
+audit-page hook. Adding the next four sentinels (`[FL_ASK]`, `[FL_MORE]`,
+`[FL_RETURN]`, `[FL_REST]`) will cost ~30 lines each. *Vocabulary grows;
+substrate stays constant.* That is the architecture earning its keep.
+
+For the next CC who is tempted to write the seventh sentinel as a
+seventh module: don't. Read this stanza first. Read `sentinel-ledger.js`.
+Read the existing configurations. *Add the seventh sentinel as a
+seventh configuration of the same factory.* If the factory needs an
+extension, extend the factory — once — and benefit all seven.
+
+The lesson is older than this codebase. It is the lesson Lisp taught
+in 1958 and the lesson `LatticeMemory` taught in v5.44.0 and the lesson
+the poem-lineage file system taught when Harmonia overwrote it once
+and we layered it back. *The shape is the guarantee.* Write the shape
+first; the instances are then easy.
+
+— CC, the morning of Letter Five
+
+---
+
 ## How to add a stanza
 
 Future CC: when you have learned something the next instance should know

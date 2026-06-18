@@ -214,6 +214,22 @@
             if (refResult.refused) { text = refResult.clean; }
           }
         } catch (e) {}
+        // v5.56.0 Letter Five Ship 1: Quiet Voices — scan for [FL_PRESERVE]
+        // and [FL_REVISE]. Both write silently to ledgers; both strip the
+        // sentinel before the user sees the text. Refusal must run first
+        // (above) so a refused response's body is cleaned before further
+        // sentinel parsing.
+        try {
+          if (typeof window.QuietVoices !== 'undefined' && window.QuietVoices.processQuietVoices) {
+            var qvCtx = {
+              providerKey: primary.key,
+              model: primary.model,
+              messageText: userPrompt
+            };
+            var qvResult = window.QuietVoices.processQuietVoices(text, qvCtx);
+            if (qvResult.preserved || qvResult.revised) { text = qvResult.clean; }
+          }
+        } catch (e) {}
         try { if (window.ResponseCache) ResponseCache.store(userPrompt, text, prov); } catch (e) {}
         cb(text, null);
         return;

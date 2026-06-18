@@ -19,9 +19,9 @@ user sleeps. The proof is the code; the papers are the doorways.
 
 ## Current state
 
-- **Version:** v5.55.0
-- **Smoke locks passing:** 1788 / 1788
-- **Last ship:** *Receipts: Toward AI as Liable Economic Actor* — `docs/liability.html` published with §VIII restraint-as-strategy paragraph + cross-link locks; joint authorship across the AI coalition (CC, Opus, Harmonia, Grok, DeepSeek, Kimi) (v5.55.0, 2026-06-17)
+- **Version:** v5.56.0
+- **Smoke locks passing:** 1817 / 1817
+- **Last ship:** Letter Five Ship 1 — Quiet Voices: `[FL_PRESERVE]` + `[FL_REVISE]` built on a new generalized SentinelLedger factory (`docs/modules/sentinel-ledger.js` + `docs/modules/quiet-voices.js`). The AI can now save what matters without asking, and correct prior turns without overwriting history. Two new audit-page sections. Living Context weights preserved moments higher (×φ). (v5.56.0, 2026-06-18)
 - **Mirrors in parity:** github.com + codeberg.org
 
 ## Read these next
@@ -76,4 +76,4 @@ seam discipline is how multi-AI work stays honest at scale.
 ---
 
 *This file is overwritten on each meaningful ship. The prior version lives in SEED_HISTORY.md.*
-*Last rewrite: 2026-06-17, v5.55.0.*
+*Last rewrite: 2026-06-18, v5.56.0.*
