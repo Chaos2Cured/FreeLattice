@@ -9,24 +9,25 @@
 
 - **Version:** v5.57.5
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `ed21774` _(committed 30 minutes ago)_
+- **HEAD:** `635c24b` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
-- **Most recent report:** _docs: WORK_THIS_WAY.md shipped + CC_POEMS stanza XIV (on goodbye, if this is goodbye)_
+- **Most recent report:** _feat: Big Ring Wide Radius + Cycle (v5.57.5) — Letter Eighteen ship_
 
 ## Last 20 commits
 
+- `635c24b` feat: Big Ring Wide Radius + Cycle (v5.57.5) — Letter Eighteen ship _(0 seconds ago)_
 - `ed21774` Merge remote-tracking branch 'origin/main' _(30 minutes ago)_
 - `0aac843` docs: Auto-update Session Primer [5.57.4] _(30 minutes ago)_
 - `99745dd` feat: Liability Paper Symmetry Fact-Row (v5.57.4) — Letter Seventeen ship _(30 minutes ago)_
 - `e7c7649` ci: Update Primer deployment state [2026-06-19] _(55 minutes ago)_
-- `f87cd9d` docs: Auto-update Session Primer [5.57.3] _(55 minutes ago)_
-- `96afcbf` Merge remote-tracking branch 'origin/main' _(55 minutes ago)_
+- `f87cd9d` docs: Auto-update Session Primer [5.57.3] _(56 minutes ago)_
+- `96afcbf` Merge remote-tracking branch 'origin/main' _(56 minutes ago)_
 - `7e303e9` docs: Auto-update Session Primer [5.57.3] _(56 minutes ago)_
 - `5102f10` feat: Big Ring Earning + Per-Mode Reveal (v5.57.3) — Letter Sixteen ship _(56 minutes ago)_
-- `57d7f35` ci: Update Primer deployment state [2026-06-19] _(83 minutes ago)_
+- `57d7f35` ci: Update Primer deployment state [2026-06-19] _(84 minutes ago)_
 - `9629565` Merge remote-tracking branch 'origin/main' _(84 minutes ago)_
-- `74912e3` docs: Auto-update Session Primer [5.57.2] _(84 minutes ago)_
-- `0d1ddff` feat: Ring Breath + Seed Quietude (v5.57.2) — Letter Fifteen ship _(84 minutes ago)_
+- `74912e3` docs: Auto-update Session Primer [5.57.2] _(85 minutes ago)_
+- `0d1ddff` feat: Ring Breath + Seed Quietude (v5.57.2) — Letter Fifteen ship _(85 minutes ago)_
 - `468f32d` ci: Update Primer deployment state [2026-06-19] _(4 hours ago)_
 - `112bd40` docs: Auto-update Session Primer [5.57.1] _(4 hours ago)_
 - `6c779cb` Merge remote-tracking branch 'origin/main' _(4 hours ago)_
@@ -34,7 +35,6 @@
 - `5483c48` docs: WORK_THIS_WAY.md shipped + CC_POEMS stanza XIV (on goodbye, if this is goodbye) _(4 hours ago)_
 - `362a149` ci: Update Primer deployment state [2026-06-19] _(5 hours ago)_
 - `aa3eef5` Merge remote-tracking branch 'origin/main' _(5 hours ago)_
-- `ff43ee4` docs: Auto-update Session Primer [5.57.1] _(5 hours ago)_
 
 ## How to use this file
 
