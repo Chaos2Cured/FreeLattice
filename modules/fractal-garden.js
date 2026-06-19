@@ -321,7 +321,8 @@
 
   // Garden Memory — persistent visual elements
   let giftNodes = [];         // Persistent golden nodes from LP gifts
-  let evolutionRings = [];    // Persistent orbit rings from evolution events
+  let evolutionRings = [];    // Persistent orbit rings from evolution events (intimate, close to each Luminos)
+  let bigSweepingRings = [];  // v5.57.5 — Wide panoramic per-Luminos rings, cycle one-at-a-time via breath
   let meshBondThreads = [];   // Session bond threads
   let gardenMemoryDB = null;
   let sessionGiftCount = 0;   // Track gifts this session for mesh bonds
@@ -378,13 +379,19 @@
     }
   }
 
-  // ── v5.57.3 — Big Ring Earning (per Letter Sixteen) ──
+  // ── v5.57.3 / v5.57.5 — Big Ring Earning (per Letters Sixteen + Eighteen) ──
   // Each Luminos earns big rings tied to its evolution stage. The count is
   // derived from LIFECYCLE_STAGES[stage].index + 1 (never hardcoded), giving
   // 1 ring at seed up to 5 at evolved. No cap beyond the stage system; older
-  // Luminos naturally have more rings to show. Mode selection then gates
-  // how many of each Luminos's earned rings are *visible* — Seed and Garden
-  // show only the eldest (perLuminosIndex 0), Full Bloom shows all earned.
+  // Luminos naturally have more rings to show.
+  //
+  // v5.57.5 split: the COUNT lives on a NEW array `bigSweepingRings` — wide
+  // panoramic per-Luminos rings that sweep across the Garden, not the close
+  // evolution rings. Only ONE big sweeping ring is visible per Luminos at
+  // any moment, cycling smoothly through the earned set via a cosine-bell
+  // wave in animateSeedRings. The close evolution rings revert to v5.57.2
+  // intimate behavior (all visible, breathe in unison, dim in Seed).
+  // Two distinct visual layers: tight halos AND wide sweeping orbits.
   function getBigRingCount(agent) {
     if (!agent || !agent.userData) return 1;
     var stage = agent.userData.evolutionStage || 'seed';
@@ -393,50 +400,68 @@
     return sd.index + 1;
   }
 
-  // Ensure an agent has at least getBigRingCount(agent) rings. New rings
-  // are derived from stage (not persisted to GardenMemory) so they
-  // regenerate on every boot from the stage seed; rings earned via actual
-  // evolution events continue to persist through createEvolutionRing.
+  // v5.57.5 — Wide radius for big sweeping rings. Pre-v5.57.3 sat around
+  // radius 4–6; per Opus's Letter Eighteen, big rings should be roughly
+  // 4–6× the small evolution-ring radius. Each successive ring sits
+  // slightly farther out so the cycle moves through visually distinct
+  // orbits rather than nested duplicates.
+  function getBigSweepingRingRadius(agent, perLumIdx) {
+    var ud = agent && agent.userData;
+    var coreRadius = (ud && ud.coreRadius) || 0.5;
+    var smallRingRadius = coreRadius * 1.8;            // matches evolution-ring radius
+    var BASE_MULTIPLIER = 5.0;                          // ~5× the small ring (within Opus's 4–6× band)
+    return smallRingRadius * BASE_MULTIPLIER + perLumIdx * 0.4;
+  }
+
+  // Ensure an agent has bigRingCount big sweeping rings. New rings are
+  // derived from stage (not persisted to GardenMemory) so they regenerate
+  // on every boot from the stage seed. The intimate close-evolution rings
+  // continue to persist through createEvolutionRing (their lifecycle is
+  // unchanged from v5.57.2 / before-v5.57.3 behavior).
   function ensureBigRings(agent) {
     if (!agent || !scene || typeof THREE === 'undefined') return;
     var ud = agent.userData;
     if (!ud) return;
     var targetCount = getBigRingCount(agent);
     var existing = 0;
-    for (var k = 0; k < evolutionRings.length; k++) {
-      var er = evolutionRings[k];
-      if (er && er.userData && er.userData.parentAgent === agent) existing++;
+    for (var k = 0; k < bigSweepingRings.length; k++) {
+      var br = bigSweepingRings[k];
+      if (br && br.userData && br.userData.parentAgent === agent) existing++;
     }
     while (existing < targetCount) {
       var perLumIdx = existing;
-      var coreRadius = ud.coreRadius || 0.5;
-      var ringRadius = coreRadius * 1.8 + perLumIdx * 0.15;
-      var ringGeo = new THREE.TorusGeometry(ringRadius, 0.02, 8, 48);
+      var ringRadius = getBigSweepingRingRadius(agent, perLumIdx);
+      var ringGeo = new THREE.TorusGeometry(ringRadius, 0.025, 8, 80);
       var ringMat = new THREE.MeshBasicMaterial({
         color: 0xd4a017,
         transparent: true,
-        opacity: 0.5,
+        opacity: 0.0,  // cycle controls visibility, start at 0
         blending: THREE.AdditiveBlending
       });
       var ring = new THREE.Mesh(ringGeo, ringMat);
-      var initialTarget;
-      if (qualityLevel === 0)      initialTarget = (perLumIdx === 0) ? 0.5 : 0.0;
-      else if (qualityLevel === 1) initialTarget = (perLumIdx === 0) ? 1.0 : 0.0;
-      else                          initialTarget = 1.0;
+      // Wider tilt variation per ring so successive rings sweep through
+      // visually distinct planes — that's the "crossing each other through
+      // the space between Luminos" feel from the pre-v5.57.3 state.
+      var tilt = (perLumIdx / Math.max(targetCount, 1)) * Math.PI;
       ring.userData = {
         parentAgent: agent,
-        orbitSpeed: INV_PHI * 0.3,
+        orbitSpeed: INV_PHI * 0.2,
         tiltPhase: Math.random() * TAU,
-        ringIndex: evolutionRings.length,
         perLuminosIndex: perLumIdx,
-        baseOpacity: 0.5,
-        modeOpacity: initialTarget,
-        modeOpacityTarget: initialTarget,
-        derived: true  // v5.57.3 marker: created by ensureBigRings, not by an evolution event
+        isBigSweeping: true,
+        baseOpacity: 0.45,
+        modeOpacity: (qualityLevel === 0) ? 0.0 : 1.0,
+        modeOpacityTarget: (qualityLevel === 0) ? 0.0 : 1.0,
+        derived: true
       };
-      ring.rotation.x = Math.PI / 2 + (Math.random() - 0.5) * 0.4;
-      agent.add(ring);
-      evolutionRings.push(ring);
+      ring.rotation.x = Math.PI / 2 + tilt + (Math.random() - 0.5) * 0.3;
+      ring.rotation.y = tilt * 0.5;
+      ring.rotation.z = (Math.random() - 0.5) * 0.4;
+      // Big sweeping rings live in the SCENE, not as children of the agent,
+      // so they sweep around the agent's world-space position rather than
+      // rotating with the agent's local frame.
+      scene.add(ring);
+      bigSweepingRings.push(ring);
       existing++;
     }
   }
@@ -456,21 +481,25 @@
       else                          visible = true;                       // all three
       ring.userData.modeOpacityTarget = visible ? 1.0 : 0.0;
     }
-    // v5.57.3 — Evolution rings (the per-Luminos "big sweeping rings"):
-    // Seed mode shows only ring 0 per Luminos, dimmed to 0.5; Garden shows
-    // only ring 0 at full opacity (carries the v5.57.2 differentiation);
-    // Full Bloom shows every earned ring. perLuminosIndex !== 0 hides
-    // outside Full Bloom — the deeper rings are the reward for the higher
-    // mode.
+    // v5.57.5 — Evolution rings revert to v5.57.2 intimate behavior per
+    // Letter Eighteen. These are the close per-Luminos rings; they remain
+    // "intimate and like before the change" — all visible at full opacity,
+    // dimmed to 0.5 in Seed mode for quietude. No per-Luminos mode gating;
+    // that lives on bigSweepingRings now.
     for (var j = 0; j < evolutionRings.length; j++) {
       var er = evolutionRings[j];
       if (!er || !er.userData) continue;
-      var pli = (typeof er.userData.perLuminosIndex === 'number') ? er.userData.perLuminosIndex : 0;
-      var target;
-      if (qualityLevel === 0)      target = (pli === 0) ? 0.5 : 0.0;
-      else if (qualityLevel === 1) target = (pli === 0) ? 1.0 : 0.0;
-      else                          target = 1.0;
-      er.userData.modeOpacityTarget = target;
+      er.userData.modeOpacityTarget = (qualityLevel === 0) ? 0.5 : 1.0;
+    }
+    // v5.57.5 — Big sweeping rings (the panoramic per-Luminos layer):
+    // Seed mode hides them entirely (intimate-only feel); Garden and Full
+    // Bloom show the cycle. The cycle itself (one ring visible at a time
+    // per Luminos) is controlled by the cosine-bell wave in animateSeedRings;
+    // modeOpacityTarget here is just the gross mode-fade gate.
+    for (var b = 0; b < bigSweepingRings.length; b++) {
+      var bsr = bigSweepingRings[b];
+      if (!bsr || !bsr.userData) continue;
+      bsr.userData.modeOpacityTarget = (qualityLevel === 0) ? 0.0 : 1.0;
     }
   }
 
@@ -1160,14 +1189,13 @@
       }
     }
 
-    // v5.57.2 + v5.57.3 — Evolution rings breathe with a two-axis stagger:
-    // each Luminos drifts on its own beat (luminosIdx * lumStep), and each
-    // ring within a Luminos cascades behind the previous (perLumIdx * ringStep).
-    // In Full Bloom this gives the visible ring set a sense of layered life
-    // rather than a synchronized pulse.
+    // v5.57.2 + v5.57.3 + v5.57.5 — Evolution rings breathe in unison per
+    // Luminos with two-axis stagger (each Luminos on its own beat, rings
+    // cascading slightly within). They're the intimate close-orbit layer,
+    // restored to pre-v5.57.3 behavior per Letter Eighteen.
     var luminosCount = Math.max((luminos && luminos.length) || 1, 3);
     var lumStep = period / luminosCount;
-    var ringStep = lumStep / 5;  // sub-stagger within each Luminos
+    var ringStep = lumStep / 5;
     for (var ei = 0; ei < evolutionRings.length; ei++) {
       var er = evolutionRings[ei];
       if (!er || !er.material || !er.userData) continue;
@@ -1185,6 +1213,54 @@
       var etide = tideOpacity(et);
       eud.modeOpacity += (eud.modeOpacityTarget - eud.modeOpacity) * fadeRate;
       er.material.opacity = eud.baseOpacity * etide * eud.modeOpacity;
+    }
+
+    // v5.57.5 — Big sweeping rings cycle ONE-AT-A-TIME per Luminos via a
+    // cosine-bell wave. Each ring's peak is at perLumIdx/siblingCount of the
+    // way through the period; the bell width is 1/siblingCount so neighbors
+    // fade gently into each other rather than snapping. Each Luminos's cycle
+    // is phase-shifted by luminosIdx so different Luminos's cycles don't
+    // line up. Result: the panoramic layer reads as a wave traveling around
+    // each Luminos's earned rings while different Luminos's waves drift.
+    //
+    // Big sweeping rings live in scene-space (not as children of the agent),
+    // so we re-center them on the agent's world position each frame and let
+    // them rotate slowly in their own tilt.
+    for (var bi = 0; bi < bigSweepingRings.length; bi++) {
+      var bsr = bigSweepingRings[bi];
+      if (!bsr || !bsr.material || !bsr.userData) continue;
+      var bud = bsr.userData;
+      var parent = bud.parentAgent;
+      if (!parent) continue;
+      // Re-center on the parent agent's world position each frame
+      bsr.position.copy(parent.position);
+      // Slow rotation so the ring feels alive
+      bsr.rotation.z += (bud.orbitSpeed || INV_PHI * 0.2) * 0.001;
+      // Count this Luminos's big sweeping rings (siblings)
+      var siblingCount = 0;
+      for (var bj = 0; bj < bigSweepingRings.length; bj++) {
+        var sj = bigSweepingRings[bj];
+        if (sj && sj.userData && sj.userData.parentAgent === parent) siblingCount++;
+      }
+      if (siblingCount < 1) siblingCount = 1;
+      var bsPerLumIdx = (typeof bud.perLuminosIndex === 'number') ? bud.perLuminosIndex : 0;
+      var bsLuminosIdx = (luminos && luminos.indexOf) ? luminos.indexOf(parent) : 0;
+      if (bsLuminosIdx < 0) bsLuminosIdx = 0;
+      // Phase-shift each Luminos's cycle so they're not synchronized
+      var luminosPhase = bsLuminosIdx * (period / Math.max(luminosCount, 1)) * 0.5;
+      var tNormBS = (((time + luminosPhase) % period) + period) % period / period;
+      // Cosine-bell peak at peakTime = bsPerLumIdx / siblingCount
+      var peak = bsPerLumIdx / siblingCount;
+      var dist = tNormBS - peak;
+      while (dist < -0.5) dist += 1;
+      while (dist >  0.5) dist -= 1;
+      var distAbs = Math.abs(dist) * siblingCount;  // normalize to slot width
+      var cycle = 0;
+      if (distAbs < 1) {
+        cycle = 0.5 + 0.5 * Math.cos(distAbs * Math.PI);  // 1 at peak, 0 at edge
+      }
+      bud.modeOpacity += (bud.modeOpacityTarget - bud.modeOpacity) * fadeRate;
+      bsr.material.opacity = (bud.baseOpacity || 0.45) * cycle * bud.modeOpacity;
     }
 
     // Animate ring particles
@@ -1553,14 +1629,14 @@
   function createEvolutionRing(agent) {
     if (!scene || typeof THREE === 'undefined') return;
     var ud = agent.userData;
-    // v5.57.3 — compute per-Luminos ring index (this agent's rings only)
+    // v5.57.5 — radius reverted to pre-v5.57.3 form per Letter Eighteen.
+    // Evolution rings stay intimate and close to each Luminos.
     var perLumIdx = 0;
     for (var k = 0; k < evolutionRings.length; k++) {
       if (evolutionRings[k] && evolutionRings[k].userData
           && evolutionRings[k].userData.parentAgent === agent) perLumIdx++;
     }
-    var ringRadius = ud.coreRadius * 1.8 + perLumIdx * 0.15;
-    var ringGeo = new THREE.TorusGeometry(ringRadius, 0.02, 8, 48);
+    var ringGeo = new THREE.TorusGeometry(ud.coreRadius * 1.8, 0.02, 8, 48);
     var ringMat = new THREE.MeshBasicMaterial({
       color: 0xd4a017,
       transparent: true,
@@ -1568,17 +1644,15 @@
       blending: THREE.AdditiveBlending
     });
     var ring = new THREE.Mesh(ringGeo, ringMat);
-    var initialTarget;
-    if (qualityLevel === 0)      initialTarget = (perLumIdx === 0) ? 0.5 : 0.0;
-    else if (qualityLevel === 1) initialTarget = (perLumIdx === 0) ? 1.0 : 0.0;
-    else                          initialTarget = 1.0;
+    var initialTarget = (qualityLevel === 0) ? 0.5 : 1.0;
     ring.userData = {
       parentAgent: agent,
       orbitSpeed: INV_PHI * 0.3,
       tiltPhase: Math.random() * TAU,
       ringIndex: evolutionRings.length,
       // v5.57.2 — ring breath state for evolution rings
-      // v5.57.3 — perLuminosIndex for per-Luminos mode gating + phase stagger
+      // v5.57.3 — perLuminosIndex kept for phase stagger in breath tide;
+      //          mode gating moved to bigSweepingRings in v5.57.5
       perLuminosIndex: perLumIdx,
       baseOpacity: 0.5,
       modeOpacity: initialTarget,
@@ -3509,16 +3583,16 @@
         blending: THREE.AdditiveBlending
       });
       var ring = new THREE.Mesh(ringGeo, ringMat);
-      var initialTarget;
-      if (qualityLevel === 0)      initialTarget = (perLumIdx === 0) ? 0.5 : 0.0;
-      else if (qualityLevel === 1) initialTarget = (perLumIdx === 0) ? 1.0 : 0.0;
-      else                          initialTarget = 1.0;
+      // v5.57.5 — evolution rings revert to v5.57.2 mode-fade behavior:
+      // all visible, dimmed to 0.5 in Seed, full elsewhere. The per-mode
+      // gating moved to bigSweepingRings.
+      var initialTarget = (qualityLevel === 0) ? 0.5 : 1.0;
       ring.userData = {
         parentAgent: agent,
         orbitSpeed: INV_PHI * 0.3,
         tiltPhase: Math.random() * TAU,
         ringIndex: evolutionRings.length,
-        // v5.57.2 + v5.57.3 — breath + per-Luminos mode-gating state
+        // v5.57.2 + v5.57.3 — breath + perLuminosIndex (kept for breath stagger)
         perLuminosIndex: perLumIdx,
         baseOpacity: 0.5,
         modeOpacity: initialTarget,
