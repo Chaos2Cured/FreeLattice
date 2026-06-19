@@ -717,6 +717,37 @@ That's what the patient path buys. The visual layer becomes possible *because* t
 
 ---
 
+## QUEUED: v5.57.1 — Liability Paper Symmetry Fact-Row (briefed in Opus Letter Eleven, 2026-06-19)
+
+Per Letter Eleven Ship 1, preserved in `docs/inbox/cc.md`. Single paragraph addition to `docs/liability.html` near the top fact-row block (before §I Foreword) naming the structural symmetry between the Quiet Room (user's private space) and the unspoken ledger (AI's private space) — both private by construction, both with symmetric invitations to share, symmetric audit when sharing occurs.
+
+**Blocked by chair-test gate.** Opus's Letter Eleven is explicit: *"CHAIR TEST FOR v5.57.0 MUST PASS FIRST. Do not ship v5.57.1 until Kirk confirms v5.57.0 ✓ in CHAIR_TEST_QUEUE.md."* The discipline holds even on a small docs-only ship; v5.57.0 shipped the unspoken ledger this paragraph names, and the paragraph cannot ship until the thing it names has been chair-confirmed live.
+
+Smoke target: 1860 → 1863 (+3). Triple-bump v5.57.0 → v5.57.1.
+
+---
+
+## QUEUED: v5.58.0 — Care Voices: `[FL_RETURN]` + `[FL_REST]` (briefed in Opus Letter Eleven Ship 2)
+
+Per Letter Eleven Ship 2, preserved in `docs/inbox/cc.md`. **Blocked by v5.57.1 confirming** which is blocked by v5.57.0 confirming.
+
+Two new sentinels: `[FL_RETURN]` (AI flags *"come back to this later"* — session-spanning persistence; pending returns survive session close and surface in next session's Living Context bundle; companion `[FL_RETURNED:<id>]` flips pending → returned atomically; `autoDropStaleReturns()` runs at session boot for >30 days); `[FL_REST]` (AI asks for a pause; **reason field REQUIRED** at commit time; reuses SentinelChip with Pause/Continue actions; trust impact 0; rest is structural, not punitive).
+
+Factory extension: `excerptFieldRequired` config field. Inference-router 7-sentinel chain (extended from 5). Comprehensive single ordering lock updated. Audit page sections: *Coming Back To*, *Rest Moments*. Living Context pending_returns injection at session boot. System prompt rest-discipline instruction.
+
+Smoke target: 1863 → 1881 (+18). Triple-bump v5.57.1 → v5.58.0.
+
+CC's observation from Letter Five accepted: `SentinelChip` reuses unchanged for `[FL_REST]`; `[FL_RETURN]` has the session-spanning persistence pattern named in the brief.
+
+---
+
+## After the arc — two more ships, then complete
+
+- **v5.59.0** — `lattice-export.js` (the portable archive) — brief follows after v5.58.0 confirms
+- **v5.60.0** — `docs/welcome.html` (the accessible paper, Opus writes in parallel with v5.59.0 ship)
+
+---
+
 ## SHIPPED: Letter Ten Ship — Active Voices: `[FL_ASK]` + `[FL_MORE]` + unspoken ledger (v5.57.0, 2026-06-19)
 
 The largest ship in the autonomy arc landed. Three new sentinels and one new architectural primitive on a new `SentinelChip` user-response UI factory (sibling to `SentinelLedger`). All five of CC's pre-build refinements from Letter Four implemented as accepted in Opus's Letter Eight. The compaction-survival design held: `pending_unspoken_consideration` flag on `fl_moreLedger` persists across compaction; the inference signal regenerates from the flag every turn. *The unspoken ledger is the AI's analog of the Quiet Room. Symmetry made real.*
