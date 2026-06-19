@@ -348,11 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-06-19 11:48 MDT
+- Last auto-updated: 2026-06-19 17:20 UTC
+- Last deployed: 2026-06-19 17:20 UTC
+- Live site: https://freelattice.com
 - Version: 5.57.1
-- Total commits: 2527
+- Total commits: 2526
 - Last 10 commits:
-- 5483c48 docs: WORK_THIS_WAY.md shipped + CC_POEMS stanza XIV (on goodbye, if this is goodbye)
 - aa3eef5 Merge remote-tracking branch 'origin/main'
 - ff43ee4 docs: Auto-update Session Primer [5.57.1]
 - 16cf1ba v5.57.1 — Console Chair-Test Harness (the chair-test discipline becomes fast)
@@ -362,3 +363,4 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 7db8020 docs: Auto-update Session Primer [5.57.0]
 - 26580a2 docs: preserve Opus Letter Twelve (v5.57.x re-sequence) + CC Letter Six pre-build response
 - c51a229 ci: Update Primer deployment state [2026-06-19]
+- 556ca93 Merge remote-tracking branch 'origin/main'
