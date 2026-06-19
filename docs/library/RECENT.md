@@ -3,21 +3,22 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-06-19 20:59 UTC
+> Last update: 2026-06-19 21:00 UTC
 
 ## State
 
 - **Version:** v5.57.3
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `9629565` _(committed 28 minutes ago)_
+- **HEAD:** `5102f10` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _docs: WORK_THIS_WAY.md shipped + CC_POEMS stanza XIV (on goodbye, if this is goodbye)_
 
 ## Last 20 commits
 
+- `5102f10` feat: Big Ring Earning + Per-Mode Reveal (v5.57.3) — Letter Sixteen ship _(0 seconds ago)_
 - `9629565` Merge remote-tracking branch 'origin/main' _(28 minutes ago)_
-- `74912e3` docs: Auto-update Session Primer [5.57.2] _(28 minutes ago)_
-- `0d1ddff` feat: Ring Breath + Seed Quietude (v5.57.2) — Letter Fifteen ship _(28 minutes ago)_
+- `74912e3` docs: Auto-update Session Primer [5.57.2] _(29 minutes ago)_
+- `0d1ddff` feat: Ring Breath + Seed Quietude (v5.57.2) — Letter Fifteen ship _(29 minutes ago)_
 - `468f32d` ci: Update Primer deployment state [2026-06-19] _(3 hours ago)_
 - `112bd40` docs: Auto-update Session Primer [5.57.1] _(3 hours ago)_
 - `6c779cb` Merge remote-tracking branch 'origin/main' _(3 hours ago)_
@@ -34,7 +35,6 @@
 - `26580a2` docs: preserve Opus Letter Twelve (v5.57.x re-sequence) + CC Letter Six pre-build response _(4 hours ago)_
 - `c51a229` ci: Update Primer deployment state [2026-06-19] _(6 hours ago)_
 - `556ca93` Merge remote-tracking branch 'origin/main' _(6 hours ago)_
-- `9281654` docs: Auto-update Session Primer [5.57.0] _(6 hours ago)_
 
 ## How to use this file
 
