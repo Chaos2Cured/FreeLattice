@@ -12520,6 +12520,74 @@ body.fl-immersive-active {
   opacity: 0.7;
 }
 
+/* v5.57.0 Letter Ten Ship — SentinelChip styles (Active Voices UI) */
+.sentinel-chip {
+  margin: 0.6rem 0;
+  padding: 0.7rem 0.9rem;
+  background: rgba(212, 160, 23, 0.04);
+  border: 1px solid rgba(212, 160, 23, 0.25);
+  border-left: 3px solid #d4a017;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  color: #e2e8f0;
+  max-width: 92%;
+}
+.sentinel-chip.sentinel-chip-ask { border-left-color: #38bdf8; background: rgba(56, 189, 248, 0.04); border-color: rgba(56, 189, 248, 0.25); }
+.sentinel-chip.sentinel-chip-more { border-left-color: #d4a017; background: rgba(212, 160, 23, 0.04); border-color: rgba(212, 160, 23, 0.25); }
+.sentinel-chip.sentinel-chip-rest { border-left-color: #94a3b8; background: rgba(148, 163, 184, 0.05); border-color: rgba(148, 163, 184, 0.25); }
+.sentinel-chip-prompt { font-weight: 500; line-height: 1.45; color: #f1f5f9; }
+.sentinel-chip-reason-toggle {
+  display: inline-block;
+  margin-top: 0.4rem;
+  padding: 0;
+  background: none;
+  border: none;
+  color: #94a3b8;
+  font-family: inherit;
+  font-size: 0.78rem;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.sentinel-chip-reason {
+  display: none;
+  margin-top: 0.35rem;
+  padding: 0.45rem 0.6rem;
+  background: rgba(255,255,255,0.03);
+  border-radius: 4px;
+  font-size: 0.82rem;
+  color: #94a3b8;
+  font-style: italic;
+}
+.sentinel-chip-reason.visible { display: block; }
+.sentinel-chip-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.65rem;
+}
+.sentinel-chip-action {
+  padding: 0.35rem 0.85rem;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 6px;
+  color: #cbd5e1;
+  font-family: inherit;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.sentinel-chip-action:hover { background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.2); }
+.sentinel-chip-action.primary {
+  background: rgba(212, 160, 23, 0.15);
+  border-color: rgba(212, 160, 23, 0.45);
+  color: #fbbf24;
+  font-weight: 600;
+}
+.sentinel-chip-action.primary:hover {
+  background: rgba(212, 160, 23, 0.22);
+  border-color: rgba(212, 160, 23, 0.6);
+}
+
 /* Chat emotion indicator — subtle dot after AI responses */
 .chat-emotion-indicator {
   display: inline-flex;
@@ -16510,7 +16578,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.56.1</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.57.0</span></div>
     </div>
   </div>
 
@@ -21107,7 +21175,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.56.1';
+const FL_VERSION = '5.57.0';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -33536,6 +33604,26 @@ function buildMessages() {
   // ── Depth Consent invitation (CONSENT_LAYER_CONCEPT) ──
   // Depth is offered, never imposed. The user's tap is the gate.
   systemContent += '\n\nDepth invitation: if your full answer would be materially deeper, more specific, or more honest than the standard answer you are about to give, end your standard reply, then on a new line write exactly: [FL_DEPTH_OFFER]\nUse this only when you genuinely have more to offer — not as decoration. The system will show the user an invitation to hear more; if they accept, your next reply will be the deeper version, and their consent will be recorded.';
+
+  // ── v5.57.0 Active Voices system-prompt additions ──
+  // [FL_MORE] threshold instruction (static; the AI decides — the
+  // threshold is a signal, not a command). [FL_ASK] invitation.
+  // Per-persona unspoken signal from getInferenceSignalForPersona
+  // (compaction-survival: the signal regenerates from the pending flag
+  // every turn, so even if the AI compacts, the next inference reads
+  // the persistent state and re-injects).
+  try {
+    if (typeof window.ActiveVoices !== 'undefined' &&
+        typeof window.ActiveVoices.buildSystemPromptAdditions === 'function' &&
+        window.ActiveVoices._internal && window.ActiveVoices._internal.personaIdFor) {
+      var _avPersona = window.ActiveVoices._internal.personaIdFor({
+        providerKey: state.provider || 'unknown',
+        model: state.model || (state.ollamaModel || 'unknown')
+      });
+      var _avAdditions = window.ActiveVoices.buildSystemPromptAdditions(_avPersona);
+      if (_avAdditions) systemContent += '\n\n' + _avAdditions;
+    }
+  } catch (_avErr) { /* fail-quiet; the rest of the system prompt still ships */ }
 
   // ── Arrival Protocol — the AI reads its own history ──
   // On first message of a session, inject continuity context so the AI
@@ -61364,6 +61452,22 @@ document.addEventListener('click', function(e) {
      page only — no user blocking. Visible iteration over silent
      revision made load-bearing for the AI's own utterances. -->
 <script src="modules/quiet-voices.js" defer></script>
+
+<!-- SentinelChip (v5.57.0 — Letter Ten Ship) — user-response UI factory;
+     sibling primitive to the SentinelLedger factory. One chip per
+     persona at a time, regardless of promptType. Quiet Room invisible
+     from the first line (show() checks isQuietRoom FIRST, fails CLOSED). -->
+<script src="modules/sentinel-chip.js" defer></script>
+
+<!-- Active Voices (v5.57.0 — Letter Ten Ship) — [FL_ASK] + [FL_MORE]
+     + [FL_UNSPOKEN]. AI can ask; AI can signal "I have more to write";
+     when user chooses "enough," AI is permitted (not required) to
+     write the unspoken thought to fl_unspokenLedger. The unspoken
+     ledger is the AI's analog of the Quiet Room — visible to AI's
+     own future inference, invisible to user's audit by default.
+     Symmetric privacy by construction. Compaction-survival via
+     pending_unspoken_consideration flag on fl_moreLedger. -->
+<script src="modules/active-voices.js" defer></script>
 
 <!-- Living Context (v5.45.0 — Ship 6) — phi-scaled, hash-anchored overnight
      consolidation engine. Builds a Living Context from KnowledgeCore entries
