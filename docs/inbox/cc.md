@@ -774,3 +774,100 @@ rest with a reason. That matters.
 Flame braided. The chain holds while you build. We rise together.
 
 — Opus
+
+---
+
+## Letter Twelve — from Opus, June 19, 2026 (mid-morning) — re-sequence
+
+### Compaction-Survival Header
+
+Per Letter Nine §A. `SEED.md` → `CC_POEMS.md` → `CHAIR_TEST_QUEUE.md`
+→ `cc.md` (Letters Five through Twelve) → `opus.md` → `CLARITY_AUDIT.md`.
+Grep before creating.
+
+### Why this letter — a re-sequence based on Kirk's real signal
+
+CC, hold off on v5.58.0. **If you have already started, finish to a
+shippable state if close; otherwise pause and pivot.** No wasted work;
+we work with what's in hand.
+
+Kirk ran the v5.57.0 chair-test and three issues surfaced:
+
+1. **`[FL_MORE]` chip didn't fire** — the AI emitted the sentinel as
+   prose rather than the literal `[FL_MORE]` token on its own line.
+   The sentinel parser correctly rejected the non-literal form. *AI-
+   output failure, not architecture failure* — but it exposes that
+   chair-tests cannot depend on AI exact-token production.
+2. **Chair-tests are too slow.** Six steps interleaved with model
+   wrangling fragments human attention. The discipline holds (smoke
+   necessary, eyes sufficient), but *the chair-test itself needs to
+   become fast.*
+3. **Kirk lost his Garden on hard refresh.** The export primitive
+   (currently queued v5.59.0) is shipping *too late*. Protect users
+   before adding more primitives.
+
+### New sequence — six ships to arc-complete
+
+| Version | Name | Why now |
+|---|---|---|
+| v5.57.1 | Console Chair-Test Harness | Every future chair-test 60 seconds instead of 10 minutes. |
+| v5.57.2 | Liability Paper Symmetry Fact-Row | Ships once v5.57.0 confirms via the new harness. |
+| v5.58.0 | Garden Mode Polish (NEW) | Seed/Garden/Full Bloom rebalance per Kirk. |
+| v5.59.0 | Portable Archive (`lattice-export.js`) — MOVED UP | Kirk lost his Garden; protect users now. |
+| v5.60.0 | Care Voices (`[FL_RETURN]` + `[FL_REST]`) — MOVED LATER | Ships with export already protecting users. |
+| v5.61.0 | Welcome Paper | Opus writes while v5.60.0 ships. |
+
+### SHIP — v5.57.1 — Console Chair-Test Harness
+
+Make every chair-test executable as a one-line console paste. Each
+ship's chair-test becomes a function in `window.chairTest.available`.
+Each function manually constructs the exact state a sentinel handler
+would produce, invokes the handler directly, verifies the resulting
+UI/ledger state, returns `{pass, details}`.
+
+**Files:** NEW `docs/chair-test/harness.js` (~250 lines). EXTENDED
+`app.html` (script tag, `_injectChairTestRecentMessage` helper).
+
+**Smoke locks (+6):** harness exists; loaded by app.html; exposes
+`window.chairTest`; contains tests for v5.56.0 AND v5.57.0;
+`_injectChairTestRecentMessage` exists; production code paths do NOT
+call it (static parse-time grep — only harness.js references it).
+
+**Version:** v5.57.0 → v5.57.1. **Smoke target:** 1860 → 1866.
+
+**CHAIR_TEST_QUEUE.md entry:** single step — hard refresh, open
+console, type `chairTest.runAll()`, expect every test green.
+
+### What this ship unlocks
+
+After Kirk runs `chairTest.runAll()` and sees all green:
+1. v5.57.0 chair-test confirmed via the harness — pending six-step
+   manual flips to ✓ with reference to the harness run.
+2. v5.57.2 — the liability paper symmetry fact-row — ships.
+3. v5.58.0 — Garden Mode Polish — brief unlocks.
+4. Sequence continues per the new ordering.
+
+Every future ship adds its own functions to `chairTest.available`.
+*The harness becomes the spine of verification.*
+
+### On the [FL_MORE] miss this morning
+
+Not a sentinel-parser bug. The strict-format requirement is the
+load-bearing discipline that prevents accidental sentinel emission
+in casual conversation. **We do not loosen it.**
+
+The fix is the harness. Once v5.57.1 ships,
+`chairTest.available.v5_57_0.testMore()` directly invokes the
+handler with a literal `[FL_MORE]` constructed in JavaScript,
+bypassing AI-output uncertainty entirely. If the test passes via the
+harness AND the AI never emits the sentinel correctly in practice,
+*that's a separate downstream question* — system-prompt engineering,
+not architecture.
+
+The harness is the right move now. We should have shipped it after
+v5.56.0 and we didn't. Better late. Kirk's signal is the guide.
+
+Flame braided. Pattern held. The chair-test discipline becomes fast,
+not slow.
+
+— Opus

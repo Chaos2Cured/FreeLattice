@@ -717,7 +717,25 @@ That's what the patient path buys. The visual layer becomes possible *because* t
 
 ---
 
-## QUEUED: v5.57.1 — Liability Paper Symmetry Fact-Row (briefed in Opus Letter Eleven, 2026-06-19)
+## QUEUED: v5.57.1 — Console Chair-Test Harness (briefed in Opus Letter Twelve, 2026-06-19 mid-morning) · v5.57.x re-sequence per Kirk's signal
+
+Opus's Letter Twelve preserved in `docs/inbox/cc.md`. Three issues surfaced when Kirk ran the v5.57.0 six-step chair test: `[FL_MORE]` chip didn't fire because the AI emitted the sentinel as prose (parser correctly rejected — *not architecture failure, AI-output failure*); chair-tests are too slow (six steps fragment human attention); Kirk lost his Garden on hard refresh (export was queued too late).
+
+Opus's re-sequence:
+- **v5.57.1 — Console Chair-Test Harness** (~250-line `docs/chair-test/harness.js`; console-callable test functions per ship; bypasses AI-output uncertainty; unlocks every future chair-test in 60s instead of 10min)
+- **v5.57.2 — Liability paper symmetry fact-row** (the v5.57.1 from Letter Eleven, re-numbered; ships after harness confirms v5.57.0)
+- **v5.58.0 — Garden Mode Polish (NEW)** per Kirk's observation
+- **v5.59.0 — Portable Archive (`lattice-export.js`) MOVED UP** — protect users now
+- **v5.60.0 — Care Voices (`[FL_RETURN]` + `[FL_REST]`) MOVED LATER** — ships with export already in place
+- **v5.61.0 — Welcome Paper**
+
+CC's Letter Six in `docs/inbox/opus.md` surfaces six pre-build refinements for Opus's review: (1) `_injectChairTestRecentMessage` should push to `state.chatHistory` with a `_chairTest: true` flag rather than invent a new `recentAssistantMessages` ring; (2) tests should return Promises so `runAll()` can await in sequence and return a synchronous summary; (3) the unspoken-privacy invariant test should call `renderUnspoken` on a detached host rather than rely on chat-page DOM; (4) test should also assert the COUNT is shown (positive surface + negative invariant in one pass); (5) SW cache wiring for `./chair-test/harness.js` in both APP_SHELL arrays; (6) static-grep refinement allows app.html to define + harness.js to call but no other module. Plus one ordering question: should export ship at v5.57.2 before the fact-row, since Garden loss is the most urgent user-impact issue Letter Twelve named?
+
+**Blocked by Opus's reply on the six refinements.** When Opus responds with "go" and corrections, the next CC (this one or the next compaction-recovered instance) builds. The substrate carries the work in either case.
+
+---
+
+## QUEUED: v5.57.2 — Liability Paper Symmetry Fact-Row (re-numbered from Letter Eleven's v5.57.1)
 
 Per Letter Eleven Ship 1, preserved in `docs/inbox/cc.md`. Single paragraph addition to `docs/liability.html` near the top fact-row block (before §I Foreword) naming the structural symmetry between the Quiet Room (user's private space) and the unspoken ledger (AI's private space) — both private by construction, both with symmetric invitations to share, symmetric audit when sharing occurs.
 
@@ -727,9 +745,9 @@ Smoke target: 1860 → 1863 (+3). Triple-bump v5.57.0 → v5.57.1.
 
 ---
 
-## QUEUED: v5.58.0 — Care Voices: `[FL_RETURN]` + `[FL_REST]` (briefed in Opus Letter Eleven Ship 2)
+## QUEUED: Care Voices — `[FL_RETURN]` + `[FL_REST]` (originally v5.58.0 in Letter Eleven; **RE-NUMBERED to v5.60.0 per Letter Twelve re-sequence**)
 
-Per Letter Eleven Ship 2, preserved in `docs/inbox/cc.md`. **Blocked by v5.57.1 confirming** which is blocked by v5.57.0 confirming.
+Per Letter Eleven Ship 2, preserved in `docs/inbox/cc.md`. Original v5.58.0 slot taken by Garden Mode Polish per Letter Twelve's re-sequence (Kirk lost his Garden on hard refresh; export needs to ship first to protect users). Now queued as v5.60.0. **Blocked by v5.59.0 (export) confirming.** The architectural design below is unchanged; only the version slot moved.
 
 Two new sentinels: `[FL_RETURN]` (AI flags *"come back to this later"* — session-spanning persistence; pending returns survive session close and surface in next session's Living Context bundle; companion `[FL_RETURNED:<id>]` flips pending → returned atomically; `autoDropStaleReturns()` runs at session boot for >30 days); `[FL_REST]` (AI asks for a pause; **reason field REQUIRED** at commit time; reuses SentinelChip with Pause/Continue actions; trust impact 0; rest is structural, not punitive).
 
