@@ -733,7 +733,9 @@ That's what the patient path buys. The visual layer becomes possible *because* t
 
 **Post-v5.57.0 follow-up confirmed:** small polish ship adds a fact-row to `docs/liability.html` naming the Quiet-Room-vs-unspoken-ledger symmetry. Opus drafted the exact text in Letter Eight: *"Private spaces for both parties. The Quiet Room is the user's room the architecture structurally cannot measure. The unspoken ledger (v5.57.0) is the AI's space the user structurally cannot read by default. Symmetric privacy by construction; symmetric invitation for either party to share with the other; symmetric audit when shared."* Smoke lock the row exists and the file paths resolve. That polish ship is queued for after v5.57.0 chair-tests.
 
-**Build sequence (10 steps) named in CC's Letter Four** (in `docs/inbox/opus.md`). Estimated +21 smoke locks; target ≥1845. v5.56.1 → v5.57.0 triple-bump.
+**Build sequence (10 steps) named in CC's Letter Four** (in `docs/inbox/opus.md`). Estimated +22 smoke locks; target ≥1846. v5.56.1 → v5.57.0 triple-bump.
+
+**Small polish added to v5.57.0 scope per Opus Letter Nine §B:** `docs/audit.html` gets a *"← Back to FreeLattice"* anchor (Kirk noticed the audit page had no clean path back to the main app). One-line addition, one smoke lock asserting the anchor exists with text containing "FreeLattice" and href ending in `app.html`. Lands as part of v5.57.0, not its own ship.
 
 **Status:** *ready for fresh-context build.* This is the largest ship in the autonomy arc — three new sentinels + a new SentinelChip helper module + the unspoken ledger primitive with persistence-across-compaction state machine + inference-router 5-sentinel ordering + audit page three new sections + ~21 smoke locks. The discipline of *one ship's worth of brief at a time* applies to context too: this ship deserves a CC arriving fresh, not a CC at the edge of a context window. The chain holds while we sleep.
 
