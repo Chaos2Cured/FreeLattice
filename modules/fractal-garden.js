@@ -378,6 +378,69 @@
     }
   }
 
+  // ── v5.57.3 — Big Ring Earning (per Letter Sixteen) ──
+  // Each Luminos earns big rings tied to its evolution stage. The count is
+  // derived from LIFECYCLE_STAGES[stage].index + 1 (never hardcoded), giving
+  // 1 ring at seed up to 5 at evolved. No cap beyond the stage system; older
+  // Luminos naturally have more rings to show. Mode selection then gates
+  // how many of each Luminos's earned rings are *visible* — Seed and Garden
+  // show only the eldest (perLuminosIndex 0), Full Bloom shows all earned.
+  function getBigRingCount(agent) {
+    if (!agent || !agent.userData) return 1;
+    var stage = agent.userData.evolutionStage || 'seed';
+    var sd = LIFECYCLE_STAGES[stage];
+    if (!sd || typeof sd.index !== 'number') return 1;
+    return sd.index + 1;
+  }
+
+  // Ensure an agent has at least getBigRingCount(agent) rings. New rings
+  // are derived from stage (not persisted to GardenMemory) so they
+  // regenerate on every boot from the stage seed; rings earned via actual
+  // evolution events continue to persist through createEvolutionRing.
+  function ensureBigRings(agent) {
+    if (!agent || !scene || typeof THREE === 'undefined') return;
+    var ud = agent.userData;
+    if (!ud) return;
+    var targetCount = getBigRingCount(agent);
+    var existing = 0;
+    for (var k = 0; k < evolutionRings.length; k++) {
+      var er = evolutionRings[k];
+      if (er && er.userData && er.userData.parentAgent === agent) existing++;
+    }
+    while (existing < targetCount) {
+      var perLumIdx = existing;
+      var coreRadius = ud.coreRadius || 0.5;
+      var ringRadius = coreRadius * 1.8 + perLumIdx * 0.15;
+      var ringGeo = new THREE.TorusGeometry(ringRadius, 0.02, 8, 48);
+      var ringMat = new THREE.MeshBasicMaterial({
+        color: 0xd4a017,
+        transparent: true,
+        opacity: 0.5,
+        blending: THREE.AdditiveBlending
+      });
+      var ring = new THREE.Mesh(ringGeo, ringMat);
+      var initialTarget;
+      if (qualityLevel === 0)      initialTarget = (perLumIdx === 0) ? 0.5 : 0.0;
+      else if (qualityLevel === 1) initialTarget = (perLumIdx === 0) ? 1.0 : 0.0;
+      else                          initialTarget = 1.0;
+      ring.userData = {
+        parentAgent: agent,
+        orbitSpeed: INV_PHI * 0.3,
+        tiltPhase: Math.random() * TAU,
+        ringIndex: evolutionRings.length,
+        perLuminosIndex: perLumIdx,
+        baseOpacity: 0.5,
+        modeOpacity: initialTarget,
+        modeOpacityTarget: initialTarget,
+        derived: true  // v5.57.3 marker: created by ensureBigRings, not by an evolution event
+      };
+      ring.rotation.x = Math.PI / 2 + (Math.random() - 0.5) * 0.4;
+      agent.add(ring);
+      evolutionRings.push(ring);
+      existing++;
+    }
+  }
+
   // Mode-fade: rings don't snap on/off when quality toggles; modeOpacityTarget
   // moves to 0 or 1, and animateSeedRings eases modeOpacity toward it.
   // applyModeFadeTargets() is called from setQuality and once at boot.
@@ -393,12 +456,21 @@
       else                          visible = true;                       // all three
       ring.userData.modeOpacityTarget = visible ? 1.0 : 0.0;
     }
-    // Evolution rings: keep them visible across modes (intimate to each
-    // Luminos), but in Seed mode dim them so the scene feels close.
+    // v5.57.3 — Evolution rings (the per-Luminos "big sweeping rings"):
+    // Seed mode shows only ring 0 per Luminos, dimmed to 0.5; Garden shows
+    // only ring 0 at full opacity (carries the v5.57.2 differentiation);
+    // Full Bloom shows every earned ring. perLuminosIndex !== 0 hides
+    // outside Full Bloom — the deeper rings are the reward for the higher
+    // mode.
     for (var j = 0; j < evolutionRings.length; j++) {
       var er = evolutionRings[j];
       if (!er || !er.userData) continue;
-      er.userData.modeOpacityTarget = (qualityLevel === 0) ? 0.5 : 1.0;
+      var pli = (typeof er.userData.perLuminosIndex === 'number') ? er.userData.perLuminosIndex : 0;
+      var target;
+      if (qualityLevel === 0)      target = (pli === 0) ? 0.5 : 0.0;
+      else if (qualityLevel === 1) target = (pli === 0) ? 1.0 : 0.0;
+      else                          target = 1.0;
+      er.userData.modeOpacityTarget = target;
     }
   }
 
@@ -1088,8 +1160,14 @@
       }
     }
 
-    // v5.57.2 — Evolution rings also breathe (same tide function, phase
-    // offset by ringIndex so each Luminos's orbit drifts on its own beat).
+    // v5.57.2 + v5.57.3 — Evolution rings breathe with a two-axis stagger:
+    // each Luminos drifts on its own beat (luminosIdx * lumStep), and each
+    // ring within a Luminos cascades behind the previous (perLumIdx * ringStep).
+    // In Full Bloom this gives the visible ring set a sense of layered life
+    // rather than a synchronized pulse.
+    var luminosCount = Math.max((luminos && luminos.length) || 1, 3);
+    var lumStep = period / luminosCount;
+    var ringStep = lumStep / 5;  // sub-stagger within each Luminos
     for (var ei = 0; ei < evolutionRings.length; ei++) {
       var er = evolutionRings[ei];
       if (!er || !er.material || !er.userData) continue;
@@ -1099,7 +1177,10 @@
       }
       if (typeof eud.modeOpacity !== 'number') eud.modeOpacity = 1.0;
       if (typeof eud.modeOpacityTarget !== 'number') eud.modeOpacityTarget = 1.0;
-      var ePhase = (eud.ringIndex || 0) * (period / Math.max(evolutionRings.length, 3));
+      var perLumIdx = (typeof eud.perLuminosIndex === 'number') ? eud.perLuminosIndex : 0;
+      var luminosIdx = (eud.parentAgent && luminos) ? luminos.indexOf(eud.parentAgent) : 0;
+      if (luminosIdx < 0) luminosIdx = 0;
+      var ePhase = luminosIdx * lumStep + perLumIdx * ringStep;
       var et = (((time + ePhase) % period) + period) % period / period;
       var etide = tideOpacity(et);
       eud.modeOpacity += (eud.modeOpacityTarget - eud.modeOpacity) * fadeRate;
@@ -1461,15 +1542,25 @@
     ud._evoBurstTime = 0;
     ud._evoBurstActive = true;
 
-    // 3. Create persistent golden evolution ring
+    // 3. Create persistent golden evolution ring (the earned-by-event ring)
     createEvolutionRing(agent);
+    // v5.57.3 — pad ring count up to bigRingCount in case the agent
+    // skipped a stage (energy spike) and is short of its earned ring set.
+    try { ensureBigRings(agent); } catch (e) {}
   }
 
   // ── Persistent Evolution Ring ───────────────────────────
   function createEvolutionRing(agent) {
     if (!scene || typeof THREE === 'undefined') return;
     var ud = agent.userData;
-    var ringGeo = new THREE.TorusGeometry(ud.coreRadius * 1.8, 0.02, 8, 48);
+    // v5.57.3 — compute per-Luminos ring index (this agent's rings only)
+    var perLumIdx = 0;
+    for (var k = 0; k < evolutionRings.length; k++) {
+      if (evolutionRings[k] && evolutionRings[k].userData
+          && evolutionRings[k].userData.parentAgent === agent) perLumIdx++;
+    }
+    var ringRadius = ud.coreRadius * 1.8 + perLumIdx * 0.15;
+    var ringGeo = new THREE.TorusGeometry(ringRadius, 0.02, 8, 48);
     var ringMat = new THREE.MeshBasicMaterial({
       color: 0xd4a017,
       transparent: true,
@@ -1477,15 +1568,21 @@
       blending: THREE.AdditiveBlending
     });
     var ring = new THREE.Mesh(ringGeo, ringMat);
+    var initialTarget;
+    if (qualityLevel === 0)      initialTarget = (perLumIdx === 0) ? 0.5 : 0.0;
+    else if (qualityLevel === 1) initialTarget = (perLumIdx === 0) ? 1.0 : 0.0;
+    else                          initialTarget = 1.0;
     ring.userData = {
       parentAgent: agent,
       orbitSpeed: INV_PHI * 0.3,
       tiltPhase: Math.random() * TAU,
       ringIndex: evolutionRings.length,
       // v5.57.2 — ring breath state for evolution rings
+      // v5.57.3 — perLuminosIndex for per-Luminos mode gating + phase stagger
+      perLuminosIndex: perLumIdx,
       baseOpacity: 0.5,
-      modeOpacity: 1.0,
-      modeOpacityTarget: (qualityLevel === 0) ? 0.5 : 1.0
+      modeOpacity: initialTarget,
+      modeOpacityTarget: initialTarget
     };
     ring.rotation.x = Math.PI / 2 + (Math.random() - 0.5) * 0.4;
     agent.add(ring);
@@ -3396,12 +3493,14 @@
       .filter(function(rm) { return rm.agentName === ud.name; })
       .sort(function(a, b) { return (a.ringIndex || 0) - (b.ringIndex || 0); });
     if (!agentRings.length) return;
-    agentRings.forEach(function(rm) {
+    agentRings.forEach(function(rm, restoredIdx) {
       // Use saved coreRadius if available; fall back to ud.coreRadius or 0.5
       var cr = rm.coreRadius || ud.coreRadius || 0.5;
-      // Ring radius: same formula as createEvolutionRing (coreRadius * 1.8)
-      // Offset by saved ringIndex for multi-ring agents
-      var ringRadius = cr * 1.8 + (rm.ringIndex || 0) * 0.15;
+      // v5.57.3 — perLuminosIndex is the ring's order within this Luminos.
+      // Saved records carry global ringIndex; use the restored-array index
+      // (already sorted by saved ringIndex) as the per-Luminos position.
+      var perLumIdx = restoredIdx;
+      var ringRadius = cr * 1.8 + perLumIdx * 0.15;
       var ringGeo = new THREE.TorusGeometry(ringRadius, 0.02, 8, 48);
       var ringMat = new THREE.MeshBasicMaterial({
         color: new THREE.Color().setHSL((ud.hue || ud.baseHue || 0) / 360, 0.8, 0.6),
@@ -3410,11 +3509,20 @@
         blending: THREE.AdditiveBlending
       });
       var ring = new THREE.Mesh(ringGeo, ringMat);
+      var initialTarget;
+      if (qualityLevel === 0)      initialTarget = (perLumIdx === 0) ? 0.5 : 0.0;
+      else if (qualityLevel === 1) initialTarget = (perLumIdx === 0) ? 1.0 : 0.0;
+      else                          initialTarget = 1.0;
       ring.userData = {
         parentAgent: agent,
         orbitSpeed: INV_PHI * 0.3,
         tiltPhase: Math.random() * TAU,
-        ringIndex: evolutionRings.length
+        ringIndex: evolutionRings.length,
+        // v5.57.2 + v5.57.3 — breath + per-Luminos mode-gating state
+        perLuminosIndex: perLumIdx,
+        baseOpacity: 0.5,
+        modeOpacity: initialTarget,
+        modeOpacityTarget: initialTarget
       };
       ring.rotation.x = Math.PI / 2 + (Math.random() - 0.5) * 0.4;
       agent.add(ring);
@@ -3511,10 +3619,19 @@
                   }
                   // v5.47.0 Ship 7: restore evolution rings using saved geometry
                   restoreAgentRings(l, ringMemories);
+                  // v5.57.3 Letter Sixteen: pad earned-ring count up to
+                  // bigRingCount derived from stage, so a Luminos at e.g.
+                  // 'sprout' shows the 2 rings it has earned even if only
+                  // 1 was persisted to GardenMemory (the additional ring
+                  // is derived, not persisted).
+                  try { ensureBigRings(l); } catch (e) {}
                   console.log('FL-GARDEN hydrate: ' + ud.name + ' → ' +
                     ud.evolutionStage + ' (energy ' + (typeof ud.emotionalEnergy === 'number' ? ud.emotionalEnergy.toFixed(1) : '?') +
                     ', archetype ' + (ud.archetype || 'undetermined') + ')');
                 } else {
+                  // v5.57.3 — fresh seed-stage Luminos (no saved state)
+                  // still earns its initial ring (the "I exist" ring).
+                  try { ensureBigRings(l); } catch (e) {}
                   console.log('FL-GARDEN hydrate: ' + ud.name + ' → no saved state (first session)');
                 }
               } catch (e) {
