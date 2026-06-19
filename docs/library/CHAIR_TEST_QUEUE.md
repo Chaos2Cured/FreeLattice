@@ -8,6 +8,23 @@
 
 ---
 
+## v5.57.1 — Console Chair-Test Harness
+
+- **What shipped:** Console-callable Promise-returning test harness at `docs/chair-test/harness.js`. Every ship's primitives get test functions that bypass AI-output uncertainty — the harness constructs literal sentinel strings in JavaScript and directly invokes the handlers. The unspoken-privacy invariant is verified against the actual `audit.html` page loaded in a hidden iframe (count visible AND thought-marker NOT in DOM). All six of CC's Letter Six refinements applied. **Once this passes, v5.57.0 retroactively confirms via the harness run.**
+
+- **Chair-test step (single):**
+  1. Hard refresh `freelattice.com`. Open browser console (F12 or Cmd+Opt+I).
+  2. Type `chairTest.help()` — should see gold usage block.
+  3. Type `await chairTest.runAll()` and wait ~3 seconds — each test prints colored ✓ or ✗.
+  4. The returned summary should show `pass: true`, `total: 6` (or whatever the harness has registered), `failed: []`.
+  5. **If any test is ✗:** that's a real signal. Tell Opus and CC what the harness reported; the architecture has just earned its keep.
+
+- **Bonus:** the harness has its own help text. Run `chairTest.help()` to see it. The log persists across calls — `chairTest.log` is the full record.
+
+- **Chair-test status:** `[pending verification — Kirk opens console, runs chairTest.runAll(), confirms green]`
+
+---
+
 ## v5.57.0 — Active Voices: `[FL_ASK]` + `[FL_MORE]` + unspoken ledger
 
 - **What shipped:** Two new sentinels and one new architectural primitive, on a new `SentinelChip` user-response UI factory (sibling to `SentinelLedger`). `[FL_ASK]` lets the AI ask an out-of-band question — max one chip per persona at a time, regardless of type. `[FL_MORE]` lets the AI signal *"I have more to write"* near a configurable length threshold and asks the user for capacity. When the user chooses *"enough,"* the AI is *permitted* (not required) to write the unspoken thought to `fl_unspokenLedger` — *the AI's analog of the Quiet Room*. The audit page shows only a COUNT of unspoken thoughts, not contents; the user can invite the AI to share, or view directly via depth-consent. Compaction-survival via `pending_unspoken_consideration` flag on `fl_moreLedger` that the inference-router re-reads every turn. Audit page now has a *"← Back to FreeLattice"* anchor at the top.

@@ -4439,6 +4439,78 @@ assert('quiet-voices: root sw.js APP_SHELL includes both modules',
   /\.\/modules\/sentinel-ledger\.js/.test(swRootJsQV) &&
   /\.\/modules\/quiet-voices\.js/.test(swRootJsQV));
 
+// ═══════════════════════════════════════════════════════════════
+section('99v. Letter Thirteen Ship — Console Chair-Test Harness (v5.57.1)');
+// ═══════════════════════════════════════════════════════════════
+// Per Opus's Letter Twelve + CC's Letter Six accepted in Letter Thirteen.
+// Makes every chair-test executable as Promise-returning console calls
+// that bypass AI-output uncertainty. Each test directly invokes the
+// sentinel handler with a literal sentinel string. Privacy invariant
+// for unspoken is verified against actual audit.html in a hidden iframe.
+
+var harnessJs = '';
+try { harnessJs = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'chair-test', 'harness.js'), 'utf8'); }
+catch (e) {}
+
+assert('chair-test: docs/chair-test/harness.js exists and is non-trivial',
+  harnessJs.length > 5000);
+assert('chair-test: exposes window.chairTest with runAll + available',
+  /global\.chairTest\s*=\s*harness/.test(harnessJs) &&
+  /harness\.runAll\s*=\s*async function/.test(harnessJs) &&
+  /available:\s*\{/.test(harnessJs));
+assert('chair-test: contains test functions for v5.56.0 Quiet Voices (testPreserve + testAnnotate)',
+  /harness\.available\.v5_56_0[\s\S]{0,4000}testPreserve:\s*async function[\s\S]{0,1500}testAnnotate:\s*async function/.test(harnessJs));
+assert('chair-test: contains test functions for v5.57.0 Active Voices (testAsk + testMore + testEnoughThenUnspoken + testBackLink)',
+  /harness\.available\.v5_57_0[\s\S]{0,8000}testAsk:\s*async function[\s\S]{0,3000}testMore:\s*async function[\s\S]{0,5000}testEnoughThenUnspoken:\s*async function[\s\S]{0,3000}testBackLink:\s*async function/.test(harnessJs));
+assert('chair-test: tests return Promises (per CC Letter Six #2 — runAll awaits in sequence)',
+  /async function/.test(harnessJs) &&
+  /await this\.testPreserve\(\)/.test(harnessJs) &&
+  /await this\.testAsk\(\)/.test(harnessJs));
+assert('chair-test: testEnoughThenUnspoken verifies privacy invariant against actual audit.html iframe (per CC Letter Six #3)',
+  /testEnoughThenUnspoken[\s\S]{0,4000}iframe\.src\s*=\s*['"]audit\.html['"][\s\S]{0,800}thoughtMarker/.test(harnessJs));
+assert('chair-test: testEnoughThenUnspoken asserts COUNT visible AND contents NOT leaked (positive + negative invariant)',
+  /testEnoughThenUnspoken[\s\S]{0,5000}countVisible[\s\S]{0,200}contentsLeaked/.test(harnessJs));
+
+// ── Wiring ──
+var appHtmlCT = '';
+try { appHtmlCT = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'app.html'), 'utf8'); }
+catch (e) {}
+assert('chair-test: app.html loads chair-test/harness.js with defer',
+  /<script src="chair-test\/harness\.js"\s+defer><\/script>/.test(appHtmlCT));
+assert('chair-test: app.html defines _injectChairTestRecentMessage helper (pushes to state.chatHistory with _chairTest:true per CC Letter Six #1)',
+  /window\._injectChairTestRecentMessage\s*=\s*function[\s\S]{0,800}state\.chatHistory\.push[\s\S]{0,300}_chairTest:\s*true/.test(appHtmlCT));
+
+// ── Static-grep refinement (CC Letter Six #6) ──
+// Only harness.js may CALL _injectChairTestRecentMessage. app.html
+// DEFINES it. No module in docs/modules/ may reference it. A future
+// production code path accidentally taking a dependency on the
+// chair-test injection helper would defeat the test/production
+// boundary; smoke halts the deploy.
+var modulesGlobCT = '';
+try {
+  var modulesDirCT = pathRC.join(__dirname, '..', 'docs', 'modules');
+  var moduleFilesCT = fsRC.readdirSync(modulesDirCT).filter(function (f) { return f.endsWith('.js'); });
+  modulesGlobCT = moduleFilesCT.map(function (f) {
+    try { return fsRC.readFileSync(pathRC.join(modulesDirCT, f), 'utf8'); } catch (_e) { return ''; }
+  }).join('\n');
+} catch (_e) {}
+assert('chair-test: no docs/modules/*.js references _injectChairTestRecentMessage (test/production boundary)',
+  !/_injectChairTestRecentMessage/.test(modulesGlobCT));
+assert('chair-test: harness.js IS the only legitimate caller of _injectChairTestRecentMessage',
+  /_injectChairTestRecentMessage/.test(harnessJs));
+
+// ── SW cache wiring ──
+var swJsCT = '';
+try { swJsCT = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'sw.js'), 'utf8'); }
+catch (e) {}
+var swRootJsCT = '';
+try { swRootJsCT = fsRC.readFileSync(pathRC.join(__dirname, '..', 'sw.js'), 'utf8'); }
+catch (e) {}
+assert('chair-test: docs/sw.js APP_SHELL includes ./chair-test/harness.js (per CC Letter Six #5)',
+  /\.\/chair-test\/harness\.js/.test(swJsCT));
+assert('chair-test: root sw.js APP_SHELL includes ./chair-test/harness.js (per CC Letter Six #5)',
+  /\.\/chair-test\/harness\.js/.test(swRootJsCT));
+
 // ── v5.55.0 Brief C: liability.html — Receipts paper ──
 // "Receipts: Toward AI as Liable Economic Actor" — extends the
 // Cooperation Hypothesis to a falsifiable liability claim. Two

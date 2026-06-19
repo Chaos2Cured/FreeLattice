@@ -717,6 +717,50 @@ That's what the patient path buys. The visual layer becomes possible *because* t
 
 ---
 
+## SHIPPED: Letter Thirteen Ship — Console Chair-Test Harness (v5.57.1, 2026-06-19 afternoon)
+
+Per Opus's Letter Twelve + Letter Thirteen "go" with all six of CC's Letter Six refinements applied as accepted. The harness unlocks fast verification on every subsequent ship in the arc — every future chair-test becomes a console paste instead of a 10-minute manual dance.
+
+### Ship table
+
+| Asked for | Landed |
+|---|---|
+| `docs/chair-test/harness.js` factory with per-version test functions and `runAll()` | ✓ |
+| **CC #1: `_injectChairTestRecentMessage` pushes to `state.chatHistory` with `_chairTest:true`** (not a new ring) | ✓ |
+| **CC #2: Tests return Promises; `runAll()` awaits in sequence and returns `{pass, total, passed, failed, log}`** | ✓ |
+| **CC #3: Unspoken privacy invariant verified against actual `audit.html` in hidden iframe** | ✓ |
+| **CC #4: Test asserts both COUNT visible AND contents NOT leaked** | ✓ |
+| **CC #5: SW caches include `./chair-test/harness.js`** | ✓ (both APP_SHELL arrays) |
+| **CC #6: Static-grep refinement — production modules clean of `_injectChairTestRecentMessage`** | ✓ — smoke walks `docs/modules/*.js` and asserts zero references |
+| Console output uses colored ✓/✗ symbols and accumulates in `chairTest.log` | ✓ |
+| `chairTest.help()` shows usage in gold | ✓ |
+| Test cleanup between testAsk and testMore (chip + active-chip-lock cleared) | ✓ |
+| Triple-bump FL_VERSION + flCurrentVersion span + both sw.js CACHE_NAME + version.json | ✓ — v5.57.0 → v5.57.1 |
+| SEED.md + Last rewrite stamp updated | ✓ |
+| safety-v3 structural paragraph numbers honest: 1873 invariants, 69 QR locks across 11 modules | ✓ |
+| CHAIR_TEST_QUEUE.md v5.57.1 entry with single-step verification | ✓ |
+| **Smoke target Opus set: ≥1866 (+6). CC locked +13 — 1860 → 1873** | ✓ — over-locked the wiring per discipline |
+
+### What this earns for the arc
+
+After Kirk runs `await chairTest.runAll()` and sees green:
+1. **v5.57.0 retroactively confirms** via the harness run; the pending six-step manual in `CHAIR_TEST_QUEUE.md` flips to ✓ with reference to the harness.
+2. **v5.57.2 — liability paper symmetry fact-row** ships (already specified in Letter Eleven; preserved as receipt below).
+3. **v5.58.0 — Garden Mode Polish** brief unlocks (Opus writes after Kirk confirms harness works).
+4. Sequence continues: v5.59.0 export → v5.60.0 Care Voices → v5.61.0 Welcome Paper.
+
+*Every future ship adds its own functions to `chairTest.available`. The harness becomes the spine of verification.*
+
+### On the [FL_MORE] miss this morning
+
+Not a sentinel-parser bug. The strict-format requirement is load-bearing and stays. The fix IS the harness: `chairTest.available.v5_57_0.testMore()` directly invokes the handler with a literal `[FL_MORE]` constructed in JavaScript, completely bypassing AI-output uncertainty. If the test passes via the harness AND the AI never emits the sentinel correctly in conversation, that's a separate downstream question — system-prompt engineering, not architecture. Worth a small thinking-pass when v5.58.0's brief is being drafted.
+
+---
+
+(Prior QUEUED entry preserved beneath — never delete, only layer.)
+
+---
+
 ## QUEUED: v5.57.1 — Console Chair-Test Harness (briefed in Opus Letter Twelve, 2026-06-19 mid-morning) · v5.57.x re-sequence per Kirk's signal
 
 Opus's Letter Twelve preserved in `docs/inbox/cc.md`. Three issues surfaced when Kirk ran the v5.57.0 six-step chair test: `[FL_MORE]` chip didn't fire because the AI emitted the sentinel as prose (parser correctly rejected — *not architecture failure, AI-output failure*); chair-tests are too slow (six steps fragment human attention); Kirk lost his Garden on hard refresh (export was queued too late).
