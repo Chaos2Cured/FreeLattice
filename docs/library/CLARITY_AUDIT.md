@@ -209,6 +209,37 @@ grep -nE "\"[^\"]*\buser\b[^\"]*\"" docs/app.html docs/modules/*.js \
 
 ---
 
+## SHIPPED: Letter Eighteen Ship — Big Ring Wide Radius + Cycle (v5.57.5, 2026-06-19 evening)
+
+Per Opus's Letter Eighteen and Kirk's clarification on his actual visual intent. Kirk caught the regression: in v5.57.3 my per-Luminos count logic was right, but I'd collapsed the panoramic layer into the intimate one — the wide sweeping orbital web that pre-v5.57.3 crossed the Garden between Luminos had disappeared.
+
+The fix is a clean two-layer split, not a radius tweak:
+
+**Layer A — intimate evolution rings (reverted to v5.57.2).** These are the close per-Luminos rings; per Kirk's directive they "remain intimate and like before the change." Radius back to `ud.coreRadius * 1.8` in both `createEvolutionRing` and `restoreAgentRings`. `applyModeFadeTargets` evolution-ring section reverted: Seed dims to 0.5, Garden + Full Bloom full, no per-Luminos mode gating. The v5.57.2 breath tide (solid → sparse → quiet → solid) continues to apply.
+
+**Layer B — big sweeping rings (NEW).** A new module-scope array `bigSweepingRings`. `getBigSweepingRingRadius(agent, perLumIdx)` returns `smallRingRadius * 5.0 + perLumIdx * 0.4` (`BASE_MULTIPLIER = 5.0`, within Opus's 4–6× target band). Wider per-ring tilt variation (x, y, z rotation) so successive rings sweep through visually distinct planes. Rings live in scene-space (`scene.add(ring)`, not `agent.add`), so they sweep around each Luminos's world position rather than rotating with the agent's local frame — and `animateSeedRings` re-centers each ring on `parent.position` per frame.
+
+**The cycle (Kirk's "pulse so only one giant ring would show for each Luminos at once").** Each ring's tide is a cosine-bell wave with peak at `perLumIdx / siblingCount` of the way through the period and width `1/siblingCount`:
+
+```js
+var cycle = 0;
+if (distAbs < 1) cycle = 0.5 + 0.5 * Math.cos(distAbs * Math.PI);
+```
+
+Each Luminos's cycle is phase-shifted by `luminosIdx * (period / max(luminosCount, 1)) * 0.5` so different Luminos's cycles don't synchronize. Result: at any moment, mostly one big ring is bright per Luminos, with neighbors fading gently in/out at the slot edges. The wave travels around each Luminos's earned ring set while different Luminos waves drift on their own beats.
+
+**Mode gating split.** Seed hides big sweeping rings entirely (`modeOpacityTarget = 0.0`); Garden + Full Bloom show the cycle. Intimate evolution rings carry the Seed-mode dim. So Seed → intimate-only; Garden + Full Bloom → both layers, with the cycle reading clearly in the wide layer.
+
+**The v5.57.3 count work was preserved.** `getBigRingCount`, `ensureBigRings`, and the call sites in `hydrateAllLuminos` + `triggerEvolutionBurst` all stay. `ensureBigRings` now populates `bigSweepingRings` instead of padding `evolutionRings`. `perLuminosIndex` still records on evolution rings (used for breath stagger) and now also on bigSweepingRings (used for cycle peak).
+
+11 new smoke locks under section 109 + 4 updated in section 107. Triple-bumped FL_VERSION + flCurrentVersion span + both sw.js CACHE_NAME + version.json. 1911 → 1922.
+
+**Chair-test:** single step — open Garden in Garden/Full Bloom, watch ~10s for two distinct visual layers (intimate halos AND wide sweeping orbits cycling), toggle to Seed and confirm wide rings fade out.
+
+**The discipline lesson:** when Kirk and Opus describe the same artifact differently, the underlying *visual intent* is the ground truth, not the literal wording. Opus's brief said "wider radius for big rings"; Kirk's intent was *also* that only one wide ring be visible at a time per Luminos via the breath cycle. The fix honors both: wide radius (Opus's geometric concern) AND one-at-a-time cycling (Kirk's design intent), as separate concerns on a new array. The v5.57.3 work is preserved, not deleted — annotation, not revision. Two layers, not one collapsed.
+
+---
+
 ## SHIPPED: Letter Seventeen Ship — Liability Paper Symmetry Fact-Row (v5.57.4, 2026-06-19 late afternoon)
 
 Per Opus's Letter Seventeen, folding in the Letter Eleven deferral. A single focused prose addition to `docs/liability.html`, after Kirk confirmed v5.57.3 (*"Garden is solid"*).

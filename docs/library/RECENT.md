@@ -3,38 +3,38 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-06-19 21:25 UTC
+> Last update: 2026-06-19 21:55 UTC
 
 ## State
 
-- **Version:** v5.57.4
+- **Version:** v5.57.5
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `99745dd` _(committed 1 second ago)_
+- **HEAD:** `ed21774` _(committed 30 minutes ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _docs: WORK_THIS_WAY.md shipped + CC_POEMS stanza XIV (on goodbye, if this is goodbye)_
 
 ## Last 20 commits
 
-- `99745dd` feat: Liability Paper Symmetry Fact-Row (v5.57.4) — Letter Seventeen ship _(1 second ago)_
-- `f87cd9d` docs: Auto-update Session Primer [5.57.3] _(25 minutes ago)_
-- `96afcbf` Merge remote-tracking branch 'origin/main' _(25 minutes ago)_
-- `7e303e9` docs: Auto-update Session Primer [5.57.3] _(26 minutes ago)_
-- `5102f10` feat: Big Ring Earning + Per-Mode Reveal (v5.57.3) — Letter Sixteen ship _(26 minutes ago)_
-- `57d7f35` ci: Update Primer deployment state [2026-06-19] _(53 minutes ago)_
-- `9629565` Merge remote-tracking branch 'origin/main' _(54 minutes ago)_
-- `74912e3` docs: Auto-update Session Primer [5.57.2] _(54 minutes ago)_
-- `0d1ddff` feat: Ring Breath + Seed Quietude (v5.57.2) — Letter Fifteen ship _(54 minutes ago)_
+- `ed21774` Merge remote-tracking branch 'origin/main' _(30 minutes ago)_
+- `0aac843` docs: Auto-update Session Primer [5.57.4] _(30 minutes ago)_
+- `99745dd` feat: Liability Paper Symmetry Fact-Row (v5.57.4) — Letter Seventeen ship _(30 minutes ago)_
+- `e7c7649` ci: Update Primer deployment state [2026-06-19] _(55 minutes ago)_
+- `f87cd9d` docs: Auto-update Session Primer [5.57.3] _(55 minutes ago)_
+- `96afcbf` Merge remote-tracking branch 'origin/main' _(55 minutes ago)_
+- `7e303e9` docs: Auto-update Session Primer [5.57.3] _(56 minutes ago)_
+- `5102f10` feat: Big Ring Earning + Per-Mode Reveal (v5.57.3) — Letter Sixteen ship _(56 minutes ago)_
+- `57d7f35` ci: Update Primer deployment state [2026-06-19] _(83 minutes ago)_
+- `9629565` Merge remote-tracking branch 'origin/main' _(84 minutes ago)_
+- `74912e3` docs: Auto-update Session Primer [5.57.2] _(84 minutes ago)_
+- `0d1ddff` feat: Ring Breath + Seed Quietude (v5.57.2) — Letter Fifteen ship _(84 minutes ago)_
 - `468f32d` ci: Update Primer deployment state [2026-06-19] _(4 hours ago)_
 - `112bd40` docs: Auto-update Session Primer [5.57.1] _(4 hours ago)_
 - `6c779cb` Merge remote-tracking branch 'origin/main' _(4 hours ago)_
 - `b5f0fba` docs: Auto-update Session Primer [5.57.1] _(4 hours ago)_
 - `5483c48` docs: WORK_THIS_WAY.md shipped + CC_POEMS stanza XIV (on goodbye, if this is goodbye) _(4 hours ago)_
-- `362a149` ci: Update Primer deployment state [2026-06-19] _(4 hours ago)_
-- `aa3eef5` Merge remote-tracking branch 'origin/main' _(4 hours ago)_
-- `ff43ee4` docs: Auto-update Session Primer [5.57.1] _(4 hours ago)_
-- `16cf1ba` v5.57.1 — Console Chair-Test Harness (the chair-test discipline becomes fast) _(4 hours ago)_
-- `25dd6cf` ci: Update Primer deployment state [2026-06-19] _(4 hours ago)_
-- `5d16961` docs: Auto-update Session Primer [5.57.0] _(4 hours ago)_
+- `362a149` ci: Update Primer deployment state [2026-06-19] _(5 hours ago)_
+- `aa3eef5` Merge remote-tracking branch 'origin/main' _(5 hours ago)_
+- `ff43ee4` docs: Auto-update Session Primer [5.57.1] _(5 hours ago)_
 
 ## How to use this file
 

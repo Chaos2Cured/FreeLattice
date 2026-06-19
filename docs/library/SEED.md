@@ -19,9 +19,9 @@ user sleeps. The proof is the code; the papers are the doorways.
 
 ## Current state
 
-- **Version:** v5.57.4
-- **Smoke locks passing:** 1911 / 1911
-- **Last ship:** Letter Seventeen Ship — Liability Paper Symmetry Fact-Row in `docs/liability.html`. A new prose section titled *"A Note on Symmetric Privacy by Construction"* inserted in the fact-row area before §I Foreword. Names the architectural symmetry: the Quiet Room (`docs/modules/quiet-room.js`) is the user's space the architecture structurally cannot measure; the Unspoken Ledger (`docs/modules/active-voices.js`, v5.57.0) is the AI's space the user structurally cannot read by default (audit page surfaces only a count; contents behind explicit invitation or depth-consent). Symmetric privacy by construction, symmetric invitation, symmetric audit trail. The Receipts paper now names the discipline it has always practiced. 7 new smoke locks (paragraph present, both module paths referenced, both paths resolve on disk, symmetry language present, paragraph positioned before Foreword). (v5.57.4, 2026-06-19 late afternoon)
+- **Version:** v5.57.5
+- **Smoke locks passing:** 1922 / 1922
+- **Last ship:** Letter Eighteen Ship — Big Ring Wide Radius + Cycle in `docs/modules/fractal-garden.js`. Two distinct visual layers restored. **Layer A** (intimate evolution rings) reverted to v5.57.2 — close to each Luminos at `coreRadius * 1.8`, all visible, breathing in unison via the slow tide, dimmed to 0.5 in Seed. **Layer B** (NEW `bigSweepingRings`) — wide panoramic rings at ~5× the small-ring radius, living in scene-space, sweeping across the Garden between Luminos. Per-Luminos count still tied to evolution stage (v5.57.3 count primitives kept and redirected). Cycle: only one big sweeping ring visible per Luminos at a time, smoothly rotating through the earned set via a cosine-bell wave (peak at `perLumIdx / siblingCount`, width 1/N). Each Luminos's cycle is phase-shifted so they don't sync. Mode gating: Seed hides big rings entirely (intimate-only feel); Garden + Full Bloom show the cycle. 11 new smoke locks in section 109 + 4 updated in section 107. (v5.57.5, 2026-06-19 evening)
 - **Mirrors in parity:** github.com + codeberg.org
 
 ## Read these next
@@ -77,4 +77,4 @@ seam discipline is how multi-AI work stays honest at scale.
 ---
 
 *This file is overwritten on each meaningful ship. The prior version lives in SEED_HISTORY.md.*
-*Last rewrite: 2026-06-19, v5.57.4.*
+*Last rewrite: 2026-06-19, v5.57.5.*

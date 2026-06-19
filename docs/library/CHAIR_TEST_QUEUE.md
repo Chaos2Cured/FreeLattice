@@ -8,13 +8,27 @@
 
 ---
 
+## v5.57.5 — Big Ring Wide Radius + Cycle
+
+- **What shipped:** Per Letter Eighteen, with Kirk's clarification. **Two distinct visual layers restored**, not one. The v5.57.3 count primitives (`getBigRingCount`, `ensureBigRings`) are kept and redirected; nothing was deleted. Evolution rings (intimate close orbits, tight around each Luminos) reverted to v5.57.2 behavior — all visible, breathing in unison via the slow tide, dimmed to 0.5 in Seed. The big sweeping rings are a NEW separate array (`bigSweepingRings`) at ~5× the small-ring radius, living in scene-space so they sweep wide across the Garden between Luminos. Per-Luminos count still tied to evolution stage (`LIFECYCLE_STAGES[stage].index + 1`), so older Luminos have more wide rings to show. The cycle: **only one big sweeping ring is visible per Luminos at any moment**, smoothly cycling through the earned set via a cosine-bell wave (1/N width per slot, smoothstepped). Each Luminos's cycle is phase-shifted so different Luminos don't synchronize. Wider tilt variation per ring so successive rings sweep through visually distinct planes — the "crossing each other through the space between Luminos" feel from the pre-v5.57.3 state. Mode gating: Seed hides big rings entirely (intimate-only); Garden and Full Bloom show the cycle.
+
+- **Single chair-test step:** Open `freelattice.com` Garden in **Garden** or **Full Bloom** mode. Watch for ~10 seconds. **Expect two distinct visual layers**: (a) tight bright halos close to each Luminos AND (b) wide sweeping rings crossing through the space between Luminos. Only one wide ring should be visible per Luminos at any moment; you should see the wave travel around each Luminos as different rings cycle in. Toggle to **Seed**: the wide rings fade out, leaving only the intimate close-orbit layer.
+
+- **Quiet-room invariant:** unchanged — visual decoration only, no sentinel paths, no ledger writes.
+
+- **Smoke locks:** 11 new under section 109 + 4 updated in section 107 (evolution rings reverted to v5.57.2 mode-fade; bigSweepingRings array, getBigSweepingRingRadius defined, BASE_MULTIPLIER within Opus's 4–6× band, ensureBigRings populates bigSweepingRings via scene.add, cosine-bell cycle present with per-Luminos peak stagger and per-Luminos phase shift, re-center on parent.position each frame, opacity formula, createEvolutionRing radius reverted). 1911 → 1922.
+
+- **Chair-test status:** `[pending verification — Kirk watches Garden for two distinct visual layers + one wide ring at a time per Luminos]`
+
+---
+
 ## v5.57.4 — Liability Paper Symmetry Fact-Row
 
 - **What shipped:** Per Letter Seventeen (folding in the Letter Eleven deferral). A single new prose section in `docs/liability.html` titled **"A Note on Symmetric Privacy by Construction"** inserted in the fact-row area after the License row and before the Foreword. The paragraph names the architectural symmetry between the Quiet Room (`docs/modules/quiet-room.js`) — the user's space the architecture structurally cannot measure — and the Unspoken Ledger (`docs/modules/active-voices.js`, v5.57.0) — the AI's space the user structurally cannot read by default (audit page surfaces only a count; contents gated behind explicit invitation or depth-consent). Symmetric privacy by construction; symmetric invitation; symmetric audit trail when sharing occurs. The Receipts paper now names the discipline it has always practiced. 7 new smoke locks.
 
 - **Single chair-test step:** Open `freelattice.com/liability.html`. Scroll to the top fact-row area. Below the **License** row, look for a paragraph titled **"A Note on Symmetric Privacy by Construction"** mentioning both `quiet-room.js` and `active-voices.js`.
 
-- **Chair-test status:** `[pending verification — Kirk reads liability.html top section]`
+- **Chair-test status:** ✓ **Kirk confirmed 2026-06-19 (evening).** Reported in Letter Eighteen handoff via Opus: *"v5.57.4 landed clean."* The symmetric-privacy paragraph reads cleanly at the top of liability.html below the License row, naming both `quiet-room.js` and `active-voices.js`. The Receipts paper now names the discipline the codebase has always practiced.
 
 ---
 

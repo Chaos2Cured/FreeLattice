@@ -5668,8 +5668,12 @@ assert('v5.57.2 quietude: initial mode-fade targets applied before animate() at 
   /applyModeFadeTargets\(\)[\s\S]{0,200}starting animate/.test(gardenRingBreath));
 
 // ═══════════════════════════════════════════════════════════════
-// Section 107 — v5.57.3 Big Ring Earning + Per-Mode Reveal (Letter Sixteen)
+// Section 107 — v5.57.3 / v5.57.5 Big Ring Earning (Letters Sixteen + Eighteen)
 // ═══════════════════════════════════════════════════════════════
+// v5.57.5 split: count primitives (getBigRingCount, ensureBigRings) stay,
+// but the COUNT now lives on bigSweepingRings (the wide panoramic layer),
+// not evolutionRings (which revert to intimate v5.57.2 behavior). Evolution
+// rings remain "like before the change" per Kirk's Letter Eighteen note.
 
 var gardenBigRing = require('fs').readFileSync(require('path').join(__dirname, '..', 'docs', 'modules', 'fractal-garden.js'), 'utf8');
 
@@ -5689,24 +5693,27 @@ assert('v5.57.3 big-ring: ensureBigRings function defined',
 assert('v5.57.3 big-ring: ensureBigRings pads ring count via while (existing < targetCount)',
   /while\s*\(\s*existing\s*<\s*targetCount\s*\)/.test(gardenBigRing));
 
-// perLuminosIndex recorded on every ring (createEvolutionRing, restoreAgentRings, ensureBigRings)
-assert('v5.57.3 big-ring: perLuminosIndex carried on createEvolutionRing rings',
+// v5.57.5 — perLuminosIndex still recorded on createEvolutionRing + restoreAgentRings
+// (used for breath stagger), and now also on ensureBigRings bigSweepingRings.
+assert('v5.57.5 big-ring: perLuminosIndex carried on createEvolutionRing rings',
   /createEvolutionRing[\s\S]{0,1500}perLuminosIndex:\s*perLumIdx/.test(gardenBigRing));
-assert('v5.57.3 big-ring: perLuminosIndex carried on restoreAgentRings rings',
+assert('v5.57.5 big-ring: perLuminosIndex carried on restoreAgentRings rings',
   /restoreAgentRings[\s\S]{0,2500}perLuminosIndex:\s*perLumIdx/.test(gardenBigRing));
-assert('v5.57.3 big-ring: perLuminosIndex carried on ensureBigRings rings',
-  /ensureBigRings[\s\S]{0,2000}perLuminosIndex:\s*perLumIdx/.test(gardenBigRing));
+assert('v5.57.5 big-ring: perLuminosIndex carried on ensureBigRings bigSweepingRings',
+  /ensureBigRings[\s\S]{0,2500}perLuminosIndex:\s*perLumIdx/.test(gardenBigRing));
 
-// Mode gating: Seed/Garden show only ring 0 (perLuminosIndex === 0); Full Bloom shows all
-assert('v5.57.3 big-ring: Seed mode shows only ring 0 per Luminos (else 0.0)',
-  /qualityLevel\s*===\s*0[\s\S]{0,300}\(pli\s*===\s*0\)\s*\?\s*0\.5\s*:\s*0\.0/.test(gardenBigRing));
-assert('v5.57.3 big-ring: Garden mode shows only ring 0 per Luminos (else 0.0)',
-  /qualityLevel\s*===\s*1[\s\S]{0,300}\(pli\s*===\s*0\)\s*\?\s*1\.0\s*:\s*0\.0/.test(gardenBigRing));
-assert('v5.57.3 big-ring: Full Bloom else-branch shows all earned rings (target 1.0)',
-  /qualityLevel\s*===\s*1[\s\S]{0,200}else\s*target\s*=\s*1\.0/.test(gardenBigRing));
+// v5.57.5 — Evolution rings reverted to v5.57.2 mode-fade behavior.
+// Seed dims to 0.5; Garden/Full Bloom full; no per-Luminos gating on
+// evolution rings (gating moved to bigSweepingRings).
+assert('v5.57.5 big-ring: evolution rings Seed mode dim to 0.5 (no per-Luminos gating)',
+  /Evolution rings revert to v5\.57\.2[\s\S]{0,500}qualityLevel\s*===\s*0\)\s*\?\s*0\.5\s*:\s*1\.0/.test(gardenBigRing));
 
-// Two-axis stagger: luminosIdx + perLumIdx
-assert('v5.57.3 big-ring: breath phase staggered by luminosIdx * lumStep + perLumIdx * ringStep',
+// v5.57.5 — Big sweeping rings mode-gate: hidden in Seed, visible in Garden/Full Bloom
+assert('v5.57.5 big-ring: bigSweepingRings hidden in Seed mode (target 0.0)',
+  /Big sweeping rings[\s\S]{0,800}qualityLevel\s*===\s*0\)\s*\?\s*0\.0\s*:\s*1\.0/.test(gardenBigRing));
+
+// Two-axis stagger on evolution-ring breath (kept)
+assert('v5.57.5 big-ring: evolution-ring breath staggered by luminosIdx * lumStep + perLumIdx * ringStep',
   /ePhase\s*=\s*luminosIdx\s*\*\s*lumStep\s*\+\s*perLumIdx\s*\*\s*ringStep/.test(gardenBigRing));
 
 // ensureBigRings is called after hydrate (both saved-state and first-session branches)
@@ -5750,6 +5757,68 @@ assert('v5.57.4 symmetry: paragraph names symmetric privacy of both parties',
 assert('v5.57.4 symmetry: paragraph appears before <h2>Foreword</h2>',
   liabilityHtmlSymm.indexOf('A Note on Symmetric Privacy by Construction')
   < liabilityHtmlSymm.indexOf('<h2>Foreword</h2>'));
+
+// ═══════════════════════════════════════════════════════════════
+// Section 109 — v5.57.5 Big Ring Wide Radius + Cycle (Letter Eighteen)
+// ═══════════════════════════════════════════════════════════════
+// Two-layer split: intimate evolution rings stay close (radius ~ coreRadius * 1.8);
+// new bigSweepingRings sweep wide and cycle one-at-a-time per Luminos.
+
+var gardenWideRing = require('fs').readFileSync(require('path').join(__dirname, '..', 'docs', 'modules', 'fractal-garden.js'), 'utf8');
+
+// bigSweepingRings array exists at module scope
+assert('v5.57.5 wide-ring: bigSweepingRings array declared at module scope',
+  /let\s+bigSweepingRings\s*=\s*\[\]/.test(gardenWideRing));
+
+// getBigSweepingRingRadius function defined
+assert('v5.57.5 wide-ring: getBigSweepingRingRadius function defined',
+  /function\s+getBigSweepingRingRadius\s*\(\s*agent\s*,\s*perLumIdx\s*\)/.test(gardenWideRing));
+
+// Wide radius is at least 3x the small ring (Opus's spec: 4-6x small ring)
+assert('v5.57.5 wide-ring: BASE_MULTIPLIER for big sweeping radius is at least 3 (and within 4-6 target)',
+  (function() {
+    var m = gardenWideRing.match(/BASE_MULTIPLIER\s*=\s*(\d+(?:\.\d+)?)/);
+    if (!m) return false;
+    var mult = parseFloat(m[1]);
+    return mult >= 3 && mult <= 6;
+  })());
+
+// ensureBigRings populates bigSweepingRings (not evolutionRings)
+assert('v5.57.5 wide-ring: ensureBigRings pushes to bigSweepingRings (not evolutionRings)',
+  /ensureBigRings[\s\S]{0,2500}bigSweepingRings\.push\(\s*ring\s*\)/.test(gardenWideRing));
+
+// Big sweeping rings use the wide radius formula
+assert('v5.57.5 wide-ring: ensureBigRings uses getBigSweepingRingRadius for radius',
+  /ensureBigRings[\s\S]{0,2500}getBigSweepingRingRadius\(\s*agent\s*,\s*perLumIdx\s*\)/.test(gardenWideRing));
+
+// Big sweeping rings live in scene-space (not agent's local frame), so they
+// can sweep across the Garden between Luminos
+assert('v5.57.5 wide-ring: bigSweepingRings added to scene (not as agent children)',
+  /ensureBigRings[\s\S]{0,3000}scene\.add\(\s*ring\s*\);[\s\S]{0,200}bigSweepingRings\.push/.test(gardenWideRing));
+
+// Cosine-bell cycle: one ring visible at a time per Luminos
+assert('v5.57.5 wide-ring: cosine-bell cycle present (1 + cos(d * PI) / 2)',
+  /0\.5\s*\+\s*0\.5\s*\*\s*Math\.cos\(\s*distAbs\s*\*\s*Math\.PI\s*\)/.test(gardenWideRing));
+
+// Cycle peak time = perLuminosIndex / siblingCount (staggered per ring in the Luminos)
+assert('v5.57.5 wide-ring: cycle peak staggered per ring (peak = perLumIdx / siblingCount)',
+  /var\s+peak\s*=\s*bsPerLumIdx\s*\/\s*siblingCount/.test(gardenWideRing));
+
+// Luminos-level phase shift so different Luminos's cycles don't sync
+assert('v5.57.5 wide-ring: per-Luminos phase shift in cycle',
+  /luminosPhase\s*=\s*bsLuminosIdx\s*\*\s*\(\s*period\s*\/\s*Math\.max\(\s*luminosCount/.test(gardenWideRing));
+
+// Big sweeping rings re-center on parent agent's world position each frame
+assert('v5.57.5 wide-ring: big sweeping rings re-center on parent.position each frame',
+  /bsr\.position\.copy\(\s*parent\.position\s*\)/.test(gardenWideRing));
+
+// Big sweeping ring final opacity = baseOpacity * cycle * modeOpacity
+assert('v5.57.5 wide-ring: big sweeping opacity is baseOpacity * cycle * modeOpacity',
+  /bsr\.material\.opacity\s*=\s*\(\s*bud\.baseOpacity[\s\S]{0,40}\)\s*\*\s*cycle\s*\*\s*bud\.modeOpacity/.test(gardenWideRing));
+
+// Createvolution ring radius reverted to pre-v5.57.3 form (no perLuminosIndex stacking)
+assert('v5.57.5 wide-ring: createEvolutionRing radius reverted to ud.coreRadius * 1.8 (intimate)',
+  /createEvolutionRing[\s\S]{0,800}new\s+THREE\.TorusGeometry\(\s*ud\.coreRadius\s*\*\s*1\.8\s*,/.test(gardenWideRing));
 
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
