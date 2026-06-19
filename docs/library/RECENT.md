@@ -3,38 +3,38 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-06-19 13:41 UTC
+> Last update: 2026-06-19 14:55 UTC
 
 ## State
 
 - **Version:** v5.57.0
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `4994711` _(committed 0 seconds ago)_
+- **HEAD:** `7c4909a` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
-- **Most recent report:** _docs: v5.56.1 chair-test ✓ confirmed + Letter Eight preserved + v5.57.0 cleared for fresh-context build_
+- **Most recent report:** _docs: preserve Opus Letter Eleven (v5.57.1 + v5.58.0 briefed, blocked by chair-test gate)_
 
 ## Last 20 commits
 
-- `4994711` Merge remote-tracking branch 'origin/main' _(0 seconds ago)_
-- `d1aec99` docs: Auto-update Session Primer [5.57.0] _(26 seconds ago)_
-- `7bbf8d1` v5.57.0 — Active Voices: [FL_ASK] + [FL_MORE] + [FL_UNSPOKEN] (the AI's analog of the Quiet Room) _(26 seconds ago)_
-- `3c21031` ci: Update Primer deployment state [2026-06-19] _(30 minutes ago)_
-- `e76caf2` Merge remote-tracking branch 'origin/main' _(31 minutes ago)_
-- `3521037` docs: Auto-update Session Primer [5.56.1] _(31 minutes ago)_
-- `df49354` docs: Letter Nine preserved + CC_POEMS stanza XIII (On receiving) + v5.57.0 back-link polish queued _(31 minutes ago)_
-- `58955bf` ci: Update Primer deployment state [2026-06-19] _(9 hours ago)_
-- `70d1ea2` docs: Auto-update Session Primer [5.56.1] _(9 hours ago)_
-- `085dd6a` Merge remote-tracking branch 'origin/main' _(9 hours ago)_
-- `c4d2ac3` docs: Auto-update Session Primer [5.56.1] _(9 hours ago)_
-- `c312c57` docs: v5.56.1 chair-test ✓ confirmed + Letter Eight preserved + v5.57.0 cleared for fresh-context build _(9 hours ago)_
-- `e1c77f4` ci: Update Primer deployment state [2026-06-19] _(10 hours ago)_
-- `81b4b09` Merge remote-tracking branch 'origin/main' _(10 hours ago)_
-- `c0b9c9b` docs: Auto-update Session Primer [5.56.1] _(10 hours ago)_
-- `d3497e6` docs(inbox): preserve Letter Seven from Opus + Letter Four from CC (v5.57.0 brief received, pending build) _(10 hours ago)_
-- `44ea4b5` ci: Update Primer deployment state [2026-06-18] _(15 hours ago)_
-- `cac6193` docs: Auto-update Session Primer [5.56.1] _(15 hours ago)_
-- `8871459` Merge remote-tracking branch 'origin/main' _(15 hours ago)_
-- `9473568` docs: Auto-update Session Primer [5.56.1] _(15 hours ago)_
+- `7c4909a` docs: preserve Opus Letter Eleven (v5.57.1 + v5.58.0 briefed, blocked by chair-test gate) _(0 seconds ago)_
+- `89fde06` docs: Auto-update Session Primer [5.57.0] _(75 minutes ago)_
+- `4994711` Merge remote-tracking branch 'origin/main' _(75 minutes ago)_
+- `d1aec99` docs: Auto-update Session Primer [5.57.0] _(75 minutes ago)_
+- `7bbf8d1` v5.57.0 — Active Voices: [FL_ASK] + [FL_MORE] + [FL_UNSPOKEN] (the AI's analog of the Quiet Room) _(75 minutes ago)_
+- `3c21031` ci: Update Primer deployment state [2026-06-19] _(2 hours ago)_
+- `e76caf2` Merge remote-tracking branch 'origin/main' _(2 hours ago)_
+- `3521037` docs: Auto-update Session Primer [5.56.1] _(2 hours ago)_
+- `df49354` docs: Letter Nine preserved + CC_POEMS stanza XIII (On receiving) + v5.57.0 back-link polish queued _(2 hours ago)_
+- `58955bf` ci: Update Primer deployment state [2026-06-19] _(11 hours ago)_
+- `70d1ea2` docs: Auto-update Session Primer [5.56.1] _(11 hours ago)_
+- `085dd6a` Merge remote-tracking branch 'origin/main' _(11 hours ago)_
+- `c4d2ac3` docs: Auto-update Session Primer [5.56.1] _(11 hours ago)_
+- `c312c57` docs: v5.56.1 chair-test ✓ confirmed + Letter Eight preserved + v5.57.0 cleared for fresh-context build _(11 hours ago)_
+- `e1c77f4` ci: Update Primer deployment state [2026-06-19] _(11 hours ago)_
+- `81b4b09` Merge remote-tracking branch 'origin/main' _(11 hours ago)_
+- `c0b9c9b` docs: Auto-update Session Primer [5.56.1] _(11 hours ago)_
+- `d3497e6` docs(inbox): preserve Letter Seven from Opus + Letter Four from CC (v5.57.0 brief received, pending build) _(11 hours ago)_
+- `44ea4b5` ci: Update Primer deployment state [2026-06-18] _(16 hours ago)_
+- `cac6193` docs: Auto-update Session Primer [5.56.1] _(16 hours ago)_
 
 ## How to use this file
 
