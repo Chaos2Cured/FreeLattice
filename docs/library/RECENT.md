@@ -9,12 +9,13 @@
 
 - **Version:** v5.57.2
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `112bd40` _(committed 3 hours ago)_
+- **HEAD:** `0d1ddff` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _docs: WORK_THIS_WAY.md shipped + CC_POEMS stanza XIV (on goodbye, if this is goodbye)_
 
 ## Last 20 commits
 
+- `0d1ddff` feat: Ring Breath + Seed Quietude (v5.57.2) — Letter Fifteen ship _(0 seconds ago)_
 - `112bd40` docs: Auto-update Session Primer [5.57.1] _(3 hours ago)_
 - `6c779cb` Merge remote-tracking branch 'origin/main' _(3 hours ago)_
 - `b5f0fba` docs: Auto-update Session Primer [5.57.1] _(3 hours ago)_
@@ -34,7 +35,6 @@
 - `7c4909a` docs: preserve Opus Letter Eleven (v5.57.1 + v5.58.0 briefed, blocked by chair-test gate) _(6 hours ago)_
 - `048ef8e` ci: Update Primer deployment state [2026-06-19] _(7 hours ago)_
 - `89fde06` docs: Auto-update Session Primer [5.57.0] _(7 hours ago)_
-- `4994711` Merge remote-tracking branch 'origin/main' _(7 hours ago)_
 
 ## How to use this file
 
