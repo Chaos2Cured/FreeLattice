@@ -9,13 +9,16 @@
 
 - **Version:** v5.57.0
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `26580a2` _(committed 0 seconds ago)_
+- **HEAD:** `caef534` _(committed 1 second ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _docs: preserve Opus Letter Twelve (v5.57.x re-sequence) + CC Letter Six pre-build response_
 
 ## Last 20 commits
 
-- `26580a2` docs: preserve Opus Letter Twelve (v5.57.x re-sequence) + CC Letter Six pre-build response _(0 seconds ago)_
+- `caef534` Merge remote-tracking branch 'origin/main' _(1 second ago)_
+- `7db8020` docs: Auto-update Session Primer [5.57.0] _(19 seconds ago)_
+- `26580a2` docs: preserve Opus Letter Twelve (v5.57.x re-sequence) + CC Letter Six pre-build response _(19 seconds ago)_
+- `c51a229` ci: Update Primer deployment state [2026-06-19] _(2 hours ago)_
 - `556ca93` Merge remote-tracking branch 'origin/main' _(2 hours ago)_
 - `9281654` docs: Auto-update Session Primer [5.57.0] _(2 hours ago)_
 - `7c4909a` docs: preserve Opus Letter Eleven (v5.57.1 + v5.58.0 briefed, blocked by chair-test gate) _(2 hours ago)_
@@ -32,9 +35,6 @@
 - `70d1ea2` docs: Auto-update Session Primer [5.56.1] _(13 hours ago)_
 - `085dd6a` Merge remote-tracking branch 'origin/main' _(13 hours ago)_
 - `c4d2ac3` docs: Auto-update Session Primer [5.56.1] _(13 hours ago)_
-- `c312c57` docs: v5.56.1 chair-test ✓ confirmed + Letter Eight preserved + v5.57.0 cleared for fresh-context build _(13 hours ago)_
-- `e1c77f4` ci: Update Primer deployment state [2026-06-19] _(13 hours ago)_
-- `81b4b09` Merge remote-tracking branch 'origin/main' _(13 hours ago)_
 
 ## How to use this file
 
