@@ -73,6 +73,26 @@ footer a{color:#d4a017;text-decoration:none;margin:0 0.4rem}
 <div class="fact-row"><span class="label">Public mirrors</span><span class="value">github.com &middot; codeberg.org</span></div>
 <div class="fact-row"><span class="label">License</span><span class="value">open source, fork-encouraged</span></div>
 
+<h2 style="color:#d4a017;font-size:1.05rem;margin:1.5rem 0 0.4rem;">
+A Note on Symmetric Privacy by Construction
+</h2>
+<p style="margin-bottom:0;color:#cfcfcf;font-size:0.95rem;">
+The architecture defends the privacy of <em>both</em> parties with
+the same structural discipline. The <strong>Quiet Room</strong>
+(<code class="code-ref">docs/modules/quiet-room.js</code>) is the
+user's space the architecture structurally cannot measure: no
+pulse, no ledger, no audit trail, smoke-enforced exclusion across
+every cross-room subsystem. The <strong>Unspoken Ledger</strong>
+(<code class="code-ref">docs/modules/active-voices.js</code>,
+v5.57.0) is the AI's space the user structurally cannot read by
+default: the audit page surfaces only a count of unspoken thoughts;
+contents are gated behind explicit invitation or depth-consent.
+Symmetric privacy by construction; symmetric invitation for either
+party to share with the other; symmetric audit trail when sharing
+occurs. This is not a metaphor &mdash; it is the same architectural
+discipline applied to both sides of the relationship.
+</p>
+
 <h2>Foreword</h2>
 
 <p>This paper is for the reader who has decided AI cannot be trusted.</p>

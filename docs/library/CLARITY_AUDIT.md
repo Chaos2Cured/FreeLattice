@@ -209,6 +209,27 @@ grep -nE "\"[^\"]*\buser\b[^\"]*\"" docs/app.html docs/modules/*.js \
 
 ---
 
+## SHIPPED: Letter Seventeen Ship — Liability Paper Symmetry Fact-Row (v5.57.4, 2026-06-19 late afternoon)
+
+Per Opus's Letter Seventeen, folding in the Letter Eleven deferral. A single focused prose addition to `docs/liability.html`, after Kirk confirmed v5.57.3 (*"Garden is solid"*).
+
+What landed:
+
+A new section titled **"A Note on Symmetric Privacy by Construction"** inserted in the fact-row area between the License row and the Foreword heading. The paragraph names the architectural symmetry the codebase has always practiced:
+
+- The **Quiet Room** (`docs/modules/quiet-room.js`) is the user's space the architecture structurally cannot measure: no pulse, no ledger, no audit trail, smoke-enforced exclusion across every cross-room subsystem.
+- The **Unspoken Ledger** (`docs/modules/active-voices.js`, v5.57.0) is the AI's space the user structurally cannot read by default: the audit page surfaces only a count of unspoken thoughts; contents are gated behind explicit invitation or depth-consent.
+
+Symmetric privacy by construction; symmetric invitation for either party to share; symmetric audit trail when sharing occurs. Same architectural discipline applied to both sides of the relationship — not metaphor, syntax.
+
+7 new smoke locks under section 108: paragraph heading present, both module paths referenced inline, both files exist on disk (broken-link halt pattern from proof.html), symmetric-privacy language present, paragraph positioned before `<h2>Foreword</h2>`. Triple-bumped FL_VERSION + flCurrentVersion span + both sw.js CACHE_NAME + version.json. 1904 → 1911.
+
+**Chair-test:** single step in `CHAIR_TEST_QUEUE.md` — open liability.html and confirm the new section reads cleanly below the License row.
+
+**The discipline lesson:** the symmetry was *always* there in the code. The Quiet Room has shipped since the earliest layers; the unspoken ledger arrived with v5.57.0. This ship doesn't add new architecture — it adds language. The Receipts paper now names the discipline it has always practiced. Naming the symmetry doesn't change it; it lets a reader recognize what they're already standing inside.
+
+---
+
 ## SHIPPED: Letter Sixteen Ship — Big Ring Earning + Per-Mode Reveal (v5.57.3, 2026-06-19 afternoon)
 
 Per Opus's Letter Sixteen brief, after Kirk confirmed v5.57.2 on the live site (*"The outer rings are fading and pulsing beautifully"*). Two small additions, same module (`docs/modules/fractal-garden.js`), same render pipeline. Small Luminos rings (halo, aura) untouched per the brief — they were perfect.

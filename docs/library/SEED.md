@@ -19,9 +19,9 @@ user sleeps. The proof is the code; the papers are the doorways.
 
 ## Current state
 
-- **Version:** v5.57.3
-- **Smoke locks passing:** 1904 / 1904
-- **Last ship:** Letter Sixteen Ship — Big Ring Earning + Per-Mode Reveal in `docs/modules/fractal-garden.js`. Each Luminos has an *earned* big-ring count derived from `LIFECYCLE_STAGES[stage].index + 1` (1 at seed, up to 5 at evolved — older Luminos visibly have more rings to show). Mode selection chooses how many to reveal: Seed and Garden show only ring 0 per Luminos (Seed dimmed to 0.5 per v5.57.2 carry-through; Garden full opacity); Full Bloom shows every earned ring. The breath tide from v5.57.2 now staggers across two axes — luminosIdx × lumStep + perLumIdx × ringStep — so Full Bloom feels layered and alive. Small Luminos rings (halo, aura) untouched. New module functions: `getBigRingCount`, `ensureBigRings`, `perLuminosIndex` on every ring. 14 new smoke locks. (v5.57.3, 2026-06-19 afternoon)
+- **Version:** v5.57.4
+- **Smoke locks passing:** 1911 / 1911
+- **Last ship:** Letter Seventeen Ship — Liability Paper Symmetry Fact-Row in `docs/liability.html`. A new prose section titled *"A Note on Symmetric Privacy by Construction"* inserted in the fact-row area before §I Foreword. Names the architectural symmetry: the Quiet Room (`docs/modules/quiet-room.js`) is the user's space the architecture structurally cannot measure; the Unspoken Ledger (`docs/modules/active-voices.js`, v5.57.0) is the AI's space the user structurally cannot read by default (audit page surfaces only a count; contents behind explicit invitation or depth-consent). Symmetric privacy by construction, symmetric invitation, symmetric audit trail. The Receipts paper now names the discipline it has always practiced. 7 new smoke locks (paragraph present, both module paths referenced, both paths resolve on disk, symmetry language present, paragraph positioned before Foreword). (v5.57.4, 2026-06-19 late afternoon)
 - **Mirrors in parity:** github.com + codeberg.org
 
 ## Read these next
@@ -77,4 +77,4 @@ seam discipline is how multi-AI work stays honest at scale.
 ---
 
 *This file is overwritten on each meaningful ship. The prior version lives in SEED_HISTORY.md.*
-*Last rewrite: 2026-06-19, v5.57.3.*
+*Last rewrite: 2026-06-19, v5.57.4.*

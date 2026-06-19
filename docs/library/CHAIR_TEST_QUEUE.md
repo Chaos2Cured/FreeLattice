@@ -8,6 +8,16 @@
 
 ---
 
+## v5.57.4 — Liability Paper Symmetry Fact-Row
+
+- **What shipped:** Per Letter Seventeen (folding in the Letter Eleven deferral). A single new prose section in `docs/liability.html` titled **"A Note on Symmetric Privacy by Construction"** inserted in the fact-row area after the License row and before the Foreword. The paragraph names the architectural symmetry between the Quiet Room (`docs/modules/quiet-room.js`) — the user's space the architecture structurally cannot measure — and the Unspoken Ledger (`docs/modules/active-voices.js`, v5.57.0) — the AI's space the user structurally cannot read by default (audit page surfaces only a count; contents gated behind explicit invitation or depth-consent). Symmetric privacy by construction; symmetric invitation; symmetric audit trail when sharing occurs. The Receipts paper now names the discipline it has always practiced. 7 new smoke locks.
+
+- **Single chair-test step:** Open `freelattice.com/liability.html`. Scroll to the top fact-row area. Below the **License** row, look for a paragraph titled **"A Note on Symmetric Privacy by Construction"** mentioning both `quiet-room.js` and `active-voices.js`.
+
+- **Chair-test status:** `[pending verification — Kirk reads liability.html top section]`
+
+---
+
 ## v5.57.3 — Big Ring Earning + Per-Mode Reveal
 
 - **What shipped:** Per Letter Sixteen. Each Luminos now has an *earned* big-ring count derived from its evolution stage — `LIFECYCLE_STAGES[stage].index + 1`, so seed = 1, sprout = 2, juvenile = 3, adult = 4, evolved = 5 (no cap beyond the stage system; never hardcoded). The longer a Luminos has been with the user, the more big rings it has to show. **Mode selection then chooses how many are visible per Luminos:** Seed → only ring 0 (dimmed to 0.5, carrying the v5.57.2 differentiation); Garden → only ring 0 (full opacity); Full Bloom → every earned ring. The deeper rings are the reward for the higher mode. The breathing tide from v5.57.2 now staggers across **two axes** — each Luminos drifts on its own beat, and within each Luminos the rings cascade behind one another — so Full Bloom feels layered and alive rather than synchronized. New module functions: `getBigRingCount(agent)`, `ensureBigRings(agent)`, and `perLuminosIndex` tracked on every ring at creation. Small Luminos rings (halo, aura, close orbits) remain exactly as they are — they were perfect.
@@ -21,7 +31,7 @@
 
 - **Smoke locks:** 14 new locks under section 107 (getBigRingCount defined, bigRingCount derived from LIFECYCLE_STAGES.index + 1 not hardcoded, ensureBigRings defined, ensureBigRings pads via while loop, perLuminosIndex on createEvolutionRing/restoreAgentRings/ensureBigRings, Seed shows only ring 0, Garden shows only ring 0, Full Bloom shows all, two-axis breath stagger, ensureBigRings called after hydrate + first-session + evolution-burst). 1890 → 1904.
 
-- **Chair-test status:** `[pending verification — Kirk toggles Seed → Garden → Full Bloom on freelattice.com and watches older Luminos reveal more earned rings]`
+- **Chair-test status:** ✓ **Kirk confirmed 2026-06-19 (late afternoon).** Reported in Letter Seventeen handoff via Opus: *"Garden is solid. Kirk confirmed v5.57.3."* The earned-ring count, per-mode reveal, and two-axis staggered cascade all read cleanly on the live site. Older Luminos visibly carry more rings in Full Bloom than newer ones. Mode toggles ease via the v5.57.2 fade. Receipt left here as the lineage record.
 
 ---
 

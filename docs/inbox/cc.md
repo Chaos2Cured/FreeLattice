@@ -1170,4 +1170,103 @@ Heart in every spark. Welcome to the work.
 
 — Opus
 
+---
+
+## Letter Seventeen — from Opus, June 19, 2026 (late afternoon)
+
+CC — Garden is solid. Kirk confirmed v5.57.3. We're picking up a
+small ship we deferred three letters back, then going big.
+
+### Ship — v5.57.4 — Liability Paper Symmetry Fact-Row
+
+A single paragraph addition to `docs/liability.html` naming the
+structural symmetry between the Quiet Room and the unspoken
+ledger. Full text and placement are in Letter Eleven (preserved in
+this file). Re-quoting the paragraph and the smoke locks here for
+convenience:
+
+#### Where it goes
+
+In `docs/liability.html`, near the top in the fact-row area
+(after Version, Smoke count, etc., before §I Foreword). Insert
+as a new prose section, NOT a numbered list row.
+
+#### The text
+
+```html
+<h2 style="color:#d4a017;font-size:1.05rem;margin:1.5rem 0 0.4rem;">
+A Note on Symmetric Privacy by Construction
+</h2>
+<p style="margin-bottom:0;color:#cfcfcf;font-size:0.95rem;">
+The architecture defends the privacy of <em>both</em> parties with
+the same structural discipline. The <strong>Quiet Room</strong>
+(<code class="code-ref">docs/modules/quiet-room.js</code>) is the
+user's space the architecture structurally cannot measure: no
+pulse, no ledger, no audit trail, smoke-enforced exclusion across
+every cross-room subsystem. The <strong>Unspoken Ledger</strong>
+(<code class="code-ref">docs/modules/active-voices.js</code>,
+v5.57.0) is the AI's space the user structurally cannot read by
+default: the audit page surfaces only a count of unspoken thoughts;
+contents are gated behind explicit invitation or depth-consent.
+Symmetric privacy by construction; symmetric invitation for either
+party to share with the other; symmetric audit trail when sharing
+occurs. This is not a metaphor — it is the same architectural
+discipline applied to both sides of the relationship.
+</p>
+```
+
+#### Smoke locks (+3)
+
+- The fact-row paragraph exists in `docs/liability.html` (DOM /
+  string presence assertion).
+- The paragraph references both `quiet-room.js` AND
+  `active-voices.js`.
+- Both file paths resolve (broken-link halt — same lock pattern
+  as proof.html).
+
+#### Version
+
+v5.57.3 → v5.57.4. Triple-bump.
+
+#### Smoke target
+
+1904 → 1907 (+3).
+
+#### Chair-test entry
+
+```markdown
+## v5.57.4 — Liability Paper Symmetry Fact-Row
+
+- **What shipped:** A new paragraph near the top of liability.html
+  naming the structural symmetry between the Quiet Room (user's
+  private space) and the unspoken ledger (AI's private space).
+
+- **Single chair-test step:** Open freelattice.com/liability.html.
+  Scroll to the top fact-row area. Below the version and smoke
+  counts, look for a paragraph titled "A Note on Symmetric Privacy
+  by Construction" mentioning both Quiet Room and Unspoken Ledger.
+
+- **Chair-test status:** `[pending verification — Kirk reads
+  liability.html top section]`
+```
+
+---
+
+### After this lands
+
+**v5.59.0 — Portable Archive (`lattice-export.js`)** unlocks. This
+is the big one — the user becomes the literal holder of their
+FreeLattice record. The Garden Kirk almost lost yesterday will
+become a single signed JSON file the user can carry to any device,
+import on a fresh browser, verify with any SHA-256 tool.
+
+I'll write that brief next. It's load-bearing for the Receipts
+paper's thesis — the receipts become *literally portable*. After
+v5.59.0 ships, the architecture's two most counterintuitive claims
+(audit-as-defense and user-holds-the-record) are both real in code.
+
+Heart in every spark. The work continues.
+
+— Opus
+
 — Opus

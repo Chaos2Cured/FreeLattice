@@ -5719,6 +5719,38 @@ assert('v5.57.3 big-ring: ensureBigRings called for first-session Luminos (no-sa
 assert('v5.57.3 big-ring: ensureBigRings called after triggerEvolutionBurst createEvolutionRing',
   /createEvolutionRing\(agent\);[\s\S]{0,300}ensureBigRings\(agent\)/.test(gardenBigRing));
 
+// ═══════════════════════════════════════════════════════════════
+// Section 108 — v5.57.4 Liability Paper Symmetry Fact-Row (Letter Seventeen)
+// ═══════════════════════════════════════════════════════════════
+
+var liabilityHtmlSymm = require('fs').readFileSync(require('path').join(__dirname, '..', 'docs', 'liability.html'), 'utf8');
+
+// The symmetric-privacy paragraph is present
+assert('v5.57.4 symmetry: liability.html has "A Note on Symmetric Privacy by Construction" heading',
+  /A Note on Symmetric Privacy by Construction/.test(liabilityHtmlSymm));
+
+// Paragraph references BOTH quiet-room.js AND active-voices.js by path
+assert('v5.57.4 symmetry: paragraph references docs/modules/quiet-room.js',
+  /A Note on Symmetric Privacy by Construction[\s\S]{0,1500}docs\/modules\/quiet-room\.js/.test(liabilityHtmlSymm));
+assert('v5.57.4 symmetry: paragraph references docs/modules/active-voices.js',
+  /A Note on Symmetric Privacy by Construction[\s\S]{0,1500}docs\/modules\/active-voices\.js/.test(liabilityHtmlSymm));
+
+// Both file paths resolve on disk (broken-link halt — same pattern as proof.html)
+assert('v5.57.4 symmetry: docs/modules/quiet-room.js exists on disk',
+  require('fs').existsSync(require('path').join(__dirname, '..', 'docs', 'modules', 'quiet-room.js')));
+assert('v5.57.4 symmetry: docs/modules/active-voices.js exists on disk',
+  require('fs').existsSync(require('path').join(__dirname, '..', 'docs', 'modules', 'active-voices.js')));
+
+// Paragraph names the SYMMETRY in plain terms (privacy of both parties, both sides)
+assert('v5.57.4 symmetry: paragraph names symmetric privacy of both parties',
+  /privacy of[\s\S]{0,40}both/.test(liabilityHtmlSymm)
+  || /symmetric privacy by construction/i.test(liabilityHtmlSymm));
+
+// Paragraph is positioned in the fact-row area (before §I Foreword)
+assert('v5.57.4 symmetry: paragraph appears before <h2>Foreword</h2>',
+  liabilityHtmlSymm.indexOf('A Note on Symmetric Privacy by Construction')
+  < liabilityHtmlSymm.indexOf('<h2>Foreword</h2>'));
+
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
 
