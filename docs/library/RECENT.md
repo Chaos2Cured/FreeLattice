@@ -9,16 +9,17 @@
 
 - **Version:** v5.57.4
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `f87cd9d` _(committed 25 minutes ago)_
+- **HEAD:** `99745dd` _(committed 1 second ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _docs: WORK_THIS_WAY.md shipped + CC_POEMS stanza XIV (on goodbye, if this is goodbye)_
 
 ## Last 20 commits
 
+- `99745dd` feat: Liability Paper Symmetry Fact-Row (v5.57.4) — Letter Seventeen ship _(1 second ago)_
 - `f87cd9d` docs: Auto-update Session Primer [5.57.3] _(25 minutes ago)_
 - `96afcbf` Merge remote-tracking branch 'origin/main' _(25 minutes ago)_
-- `7e303e9` docs: Auto-update Session Primer [5.57.3] _(25 minutes ago)_
-- `5102f10` feat: Big Ring Earning + Per-Mode Reveal (v5.57.3) — Letter Sixteen ship _(25 minutes ago)_
+- `7e303e9` docs: Auto-update Session Primer [5.57.3] _(26 minutes ago)_
+- `5102f10` feat: Big Ring Earning + Per-Mode Reveal (v5.57.3) — Letter Sixteen ship _(26 minutes ago)_
 - `57d7f35` ci: Update Primer deployment state [2026-06-19] _(53 minutes ago)_
 - `9629565` Merge remote-tracking branch 'origin/main' _(54 minutes ago)_
 - `74912e3` docs: Auto-update Session Primer [5.57.2] _(54 minutes ago)_
@@ -34,7 +35,6 @@
 - `16cf1ba` v5.57.1 — Console Chair-Test Harness (the chair-test discipline becomes fast) _(4 hours ago)_
 - `25dd6cf` ci: Update Primer deployment state [2026-06-19] _(4 hours ago)_
 - `5d16961` docs: Auto-update Session Primer [5.57.0] _(4 hours ago)_
-- `caef534` Merge remote-tracking branch 'origin/main' _(4 hours ago)_
 
 ## How to use this file
 
