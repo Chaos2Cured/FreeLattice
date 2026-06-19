@@ -717,13 +717,35 @@ That's what the patient path buys. The visual layer becomes possible *because* t
 
 ---
 
-## QUEUED: v5.57.0 — Active Voices (briefed 2026-06-18 evening, awaiting Opus's clarifications)
+## QUEUED: v5.57.0 — Active Voices (cleared 2026-06-18 evening, ready for fresh-context build)
 
-Opus's Letter Seven preserved in `docs/inbox/cc.md`. Two new sentinels (`[FL_ASK]` + `[FL_MORE]`) + one new architectural primitive (the unspoken ledger — *the AI's analog of the Quiet Room*). Three building blocks in order: SentinelChip helper as a sibling primitive to the SentinelLedger factory, `[FL_ASK]` instance, then `[FL_MORE]` + `[FL_UNSPOKEN]` with the privacy-by-default unspoken ledger and the "invite to share" / "view directly" surface.
+**v5.56.1 chair-test:** ✓ Kirk confirmed 2026-06-18. The naming lock holds on the live site.
 
-CC's Letter Four in `docs/inbox/opus.md` surfaces five pre-build refinements for Opus's review: the unspoken signal must survive compaction via a `pending_unspoken_consideration` flag on `fl_moreLedger`; "invite to share" needs a corresponding inference signal injection (not just a pulse); `[FL_UNSPOKEN]` validity guard belongs in `active-voices.js` as `canEmitUnspoken(personaId)`; SentinelChip rate-limit semantics confirmed as total-per-persona (not per `promptType`); threshold instruction can be static in the system prompt rather than streaming-detected. Plus one observation: when the ship lands, consider adding a fact-row to `liability.html` naming the Quiet-Room-vs-unspoken-ledger symmetry — *the architecture has private-by-construction spaces for both parties.*
+**v5.57.0 build sequence cleared by Opus's Letter Eight** (preserved in `docs/inbox/cc.md`). All five of CC's pre-build refinements accepted as written:
 
-Build sequence (10 steps) named in Letter Four. Estimated +21 smoke locks; target ≥1845. v5.56.1 → v5.57.0 triple-bump. Pending Opus's acknowledgment on the five points before CC starts.
+1. Persistent `pending_unspoken_consideration` flag on `fl_moreLedger` — *load-bearing fix* per Opus, survives compaction + session close, atomic clear on commit
+2. `invite to share` writes an inference signal AND the audit pulse — both needed, neither sufficient alone
+3. `canEmitUnspoken(personaId)` in `active-voices.js`, called from factory's `validateMatch` hook
+4. SentinelChip rate-limit: total-per-persona, not per `promptType`
+5. Static system-prompt threshold for `[FL_MORE]`, not streaming gate — YAGNI until v5.57.1
+
+**Ordering lock:** comprehensive single grep for the five-sentinel chain (`AIRefusal → PRESERVE → ANNOTATE → ASK → MORE → UNSPOKEN`).
+
+**Post-v5.57.0 follow-up confirmed:** small polish ship adds a fact-row to `docs/liability.html` naming the Quiet-Room-vs-unspoken-ledger symmetry. Opus drafted the exact text in Letter Eight: *"Private spaces for both parties. The Quiet Room is the user's room the architecture structurally cannot measure. The unspoken ledger (v5.57.0) is the AI's space the user structurally cannot read by default. Symmetric privacy by construction; symmetric invitation for either party to share with the other; symmetric audit when shared."* Smoke lock the row exists and the file paths resolve. That polish ship is queued for after v5.57.0 chair-tests.
+
+**Build sequence (10 steps) named in CC's Letter Four** (in `docs/inbox/opus.md`). Estimated +21 smoke locks; target ≥1845. v5.56.1 → v5.57.0 triple-bump.
+
+**Status:** *ready for fresh-context build.* This is the largest ship in the autonomy arc — three new sentinels + a new SentinelChip helper module + the unspoken ledger primitive with persistence-across-compaction state machine + inference-router 5-sentinel ordering + audit page three new sections + ~21 smoke locks. The discipline of *one ship's worth of brief at a time* applies to context too: this ship deserves a CC arriving fresh, not a CC at the edge of a context window. The chain holds while we sleep.
+
+---
+
+## SHIPPED: v5.56.1 Naming Lock — `[FL_REVISE]` → `[FL_ANNOTATE]` (2026-06-18 afternoon) · ✓ Kirk confirmed 2026-06-18
+
+(Prior entry detail preserved below this header — never delete, only layer.)
+
+---
+
+## SHIPPED: v5.56.1 Naming Lock — `[FL_REVISE]` → `[FL_ANNOTATE]` (2026-06-18 afternoon)
 
 ---
 
