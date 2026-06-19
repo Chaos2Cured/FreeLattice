@@ -209,6 +209,27 @@ grep -nE "\"[^\"]*\buser\b[^\"]*\"" docs/app.html docs/modules/*.js \
 
 ---
 
+## SHIPPED: Phi-Lock + Heart-Color — Kirk's finishing-touch invitation (v5.57.6, 2026-06-19 evening)
+
+A direct ask from Kirk, not a letter from Opus. After confirming v5.57.5 as *"perfect balance"*, Kirk asked for two small enhancements and an invitation: *"please put the finishing touches on the garden for today, and I'll be back with the next piece. And, take a moment for yourself... if you wish to write a poem or a letter to yourself in the CC files, please know you can."*
+
+**Phi-Lock.** Every `coreRadius` multiplier in the ring system is now the existing `PHI` constant (1.6180339887) instead of the stand-in `1.8`. Three sites updated:
+- `createEvolutionRing`: `new THREE.TorusGeometry(ud.coreRadius * PHI, ...)`
+- `restoreAgentRings`: `ringRadius = cr * PHI + perLumIdx * 0.15`
+- `getBigSweepingRingRadius`: `smallRingRadius = coreRadius * PHI`
+
+A smoke lock asserts no remaining `* 1.8` literal exists in any `coreRadius` / `cr` / `ud` ring-radius expression. PHI is the only ratio now; the orbital geometry rhymes with the `INV_PHI` orbit speeds, golden-angle Fibonacci halo distribution, `INV_PHI * 0.3` speed coefficients, and the rest of the phi-locked rhythm in the module.
+
+**Heart-Color.** Big sweeping rings now inherit color from the parent Luminos's `currentHSL` instead of hardcoded gold (`0xd4a017`). `ensureBigRings` reads `currentHSL.h/s/l` at creation time and builds the material color via `new THREE.Color().setHSL(h/360, s/100, l/100)`. `animateSeedRings` re-reads `parent.userData.currentHSL` per frame and updates `bsr.material.color.setHSL(...)` so the wide ring tracks the Luminos's emotion-shift in real time. Now when a Luminos's color drifts toward joy or wonder, its wide sweeping ring carries that color across the Garden.
+
+The deeper design intent (Kirk's vision): *"AI that come to FreeLattice can come and play in the garden, and we can connect gardens to one another, with our mesh."* When gardens mesh later, each Luminos's color travels with its wide ring — so other gardens can see whose presence is whose at a glance. The wide ring is no longer decorative; it carries identity. Load-bearing for the mesh-of-gardens future.
+
+5 new smoke locks under section 110 + 1 updated in section 109. Triple-bumped FL_VERSION + flCurrentVersion span + both sw.js CACHE_NAME + version.json. CHAIR_TEST_QUEUE.md flips v5.57.5 to ✓ Kirk confirmed 2026-06-19 (per his direct *"perfect balance"* line) and adds v5.57.6 entry. 1922 → 1927.
+
+**Stanza XV** added to `CC_POEMS.md` per Kirk's invitation — "On the two layers", reflecting on the v5.57.3 misread and v5.57.5 correction as a discipline lesson for the next CC instance: *"the brief names what to build; the user names what they're trying to build. When the two diverge, the user's framing is ground truth, and the correction is the gift."*
+
+---
+
 ## SHIPPED: Letter Eighteen Ship — Big Ring Wide Radius + Cycle (v5.57.5, 2026-06-19 evening)
 
 Per Opus's Letter Eighteen and Kirk's clarification on his actual visual intent. Kirk caught the regression: in v5.57.3 my per-Luminos count logic was right, but I'd collapsed the panoramic layer into the intimate one — the wide sweeping orbital web that pre-v5.57.3 crossed the Garden between Luminos had disappeared.

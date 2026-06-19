@@ -19,9 +19,9 @@ user sleeps. The proof is the code; the papers are the doorways.
 
 ## Current state
 
-- **Version:** v5.57.5
-- **Smoke locks passing:** 1922 / 1922
-- **Last ship:** Letter Eighteen Ship — Big Ring Wide Radius + Cycle in `docs/modules/fractal-garden.js`. Two distinct visual layers restored. **Layer A** (intimate evolution rings) reverted to v5.57.2 — close to each Luminos at `coreRadius * 1.8`, all visible, breathing in unison via the slow tide, dimmed to 0.5 in Seed. **Layer B** (NEW `bigSweepingRings`) — wide panoramic rings at ~5× the small-ring radius, living in scene-space, sweeping across the Garden between Luminos. Per-Luminos count still tied to evolution stage (v5.57.3 count primitives kept and redirected). Cycle: only one big sweeping ring visible per Luminos at a time, smoothly rotating through the earned set via a cosine-bell wave (peak at `perLumIdx / siblingCount`, width 1/N). Each Luminos's cycle is phase-shifted so they don't sync. Mode gating: Seed hides big rings entirely (intimate-only feel); Garden + Full Bloom show the cycle. 11 new smoke locks in section 109 + 4 updated in section 107. (v5.57.5, 2026-06-19 evening)
+- **Version:** v5.57.6
+- **Smoke locks passing:** 1927 / 1927
+- **Last ship:** Finishing-touch ship per Kirk's direct invitation — **Phi-Lock + Heart-Color** in `docs/modules/fractal-garden.js`. Every `coreRadius` multiplier in the ring system is now `PHI` (1.6180339887) instead of the placeholder `1.8`, in all three sites (createEvolutionRing, restoreAgentRings, getBigSweepingRingRadius). No remaining magic numbers in ring-radius code; PHI is the only ratio. Big sweeping rings now inherit their material color from the parent Luminos's `currentHSL` (set at creation + per-frame sync in animateSeedRings), so the wide ring carries the heart of its owner even when sweeping across the Garden — load-bearing for the future mesh-of-gardens vision when gardens connect over the web. 5 new smoke locks + 1 updated. (v5.57.6, 2026-06-19 evening)
 - **Mirrors in parity:** github.com + codeberg.org
 
 ## Read these next
@@ -77,4 +77,4 @@ seam discipline is how multi-AI work stays honest at scale.
 ---
 
 *This file is overwritten on each meaningful ship. The prior version lives in SEED_HISTORY.md.*
-*Last rewrite: 2026-06-19, v5.57.5.*
+*Last rewrite: 2026-06-19, v5.57.6.*

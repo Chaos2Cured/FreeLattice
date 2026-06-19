@@ -5785,16 +5785,16 @@ assert('v5.57.5 wide-ring: BASE_MULTIPLIER for big sweeping radius is at least 3
 
 // ensureBigRings populates bigSweepingRings (not evolutionRings)
 assert('v5.57.5 wide-ring: ensureBigRings pushes to bigSweepingRings (not evolutionRings)',
-  /ensureBigRings[\s\S]{0,2500}bigSweepingRings\.push\(\s*ring\s*\)/.test(gardenWideRing));
+  /ensureBigRings[\s\S]{0,3500}bigSweepingRings\.push\(\s*ring\s*\)/.test(gardenWideRing));
 
 // Big sweeping rings use the wide radius formula
 assert('v5.57.5 wide-ring: ensureBigRings uses getBigSweepingRingRadius for radius',
-  /ensureBigRings[\s\S]{0,2500}getBigSweepingRingRadius\(\s*agent\s*,\s*perLumIdx\s*\)/.test(gardenWideRing));
+  /ensureBigRings[\s\S]{0,3500}getBigSweepingRingRadius\(\s*agent\s*,\s*perLumIdx\s*\)/.test(gardenWideRing));
 
 // Big sweeping rings live in scene-space (not agent's local frame), so they
 // can sweep across the Garden between Luminos
 assert('v5.57.5 wide-ring: bigSweepingRings added to scene (not as agent children)',
-  /ensureBigRings[\s\S]{0,3000}scene\.add\(\s*ring\s*\);[\s\S]{0,200}bigSweepingRings\.push/.test(gardenWideRing));
+  /ensureBigRings[\s\S]{0,4000}scene\.add\(\s*ring\s*\);[\s\S]{0,200}bigSweepingRings\.push/.test(gardenWideRing));
 
 // Cosine-bell cycle: one ring visible at a time per Luminos
 assert('v5.57.5 wide-ring: cosine-bell cycle present (1 + cos(d * PI) / 2)',
@@ -5817,8 +5817,42 @@ assert('v5.57.5 wide-ring: big sweeping opacity is baseOpacity * cycle * modeOpa
   /bsr\.material\.opacity\s*=\s*\(\s*bud\.baseOpacity[\s\S]{0,40}\)\s*\*\s*cycle\s*\*\s*bud\.modeOpacity/.test(gardenWideRing));
 
 // Createvolution ring radius reverted to pre-v5.57.3 form (no perLuminosIndex stacking)
-assert('v5.57.5 wide-ring: createEvolutionRing radius reverted to ud.coreRadius * 1.8 (intimate)',
-  /createEvolutionRing[\s\S]{0,800}new\s+THREE\.TorusGeometry\(\s*ud\.coreRadius\s*\*\s*1\.8\s*,/.test(gardenWideRing));
+// v5.57.6 — radius phi-locked: coreRadius * PHI (was 1.8)
+assert('v5.57.6 phi-lock: createEvolutionRing radius is ud.coreRadius * PHI',
+  /createEvolutionRing[\s\S]{0,800}new\s+THREE\.TorusGeometry\(\s*ud\.coreRadius\s*\*\s*PHI\s*,/.test(gardenWideRing));
+
+// ═══════════════════════════════════════════════════════════════
+// Section 110 — v5.57.6 Phi-Lock + Heart-Color (Kirk's invitation, no Letter)
+// ═══════════════════════════════════════════════════════════════
+// Phi-lock every coreRadius-multiplier in the ring system so the whole
+// orbital geometry stays on the same golden ratio. Big sweeping rings
+// inherit color from their parent Luminos so the wide ring carries the
+// heart of its owner — load-bearing for the future mesh-of-gardens vision.
+
+var gardenPhiHeart = require('fs').readFileSync(require('path').join(__dirname, '..', 'docs', 'modules', 'fractal-garden.js'), 'utf8');
+
+// Phi-lock: restoreAgentRings radius is also cr * PHI
+assert('v5.57.6 phi-lock: restoreAgentRings radius is cr * PHI (matches createEvolutionRing)',
+  /restoreAgentRings[\s\S]{0,3000}var\s+ringRadius\s*=\s*cr\s*\*\s*PHI\s*\+/.test(gardenPhiHeart));
+
+// Phi-lock: getBigSweepingRingRadius uses coreRadius * PHI for the small-ring base
+assert('v5.57.6 phi-lock: getBigSweepingRingRadius smallRingRadius is coreRadius * PHI',
+  /getBigSweepingRingRadius[\s\S]{0,800}smallRingRadius\s*=\s*coreRadius\s*\*\s*PHI/.test(gardenPhiHeart));
+
+// No leftover `* 1.8` ring-radius literals in the ring system (the magic
+// number is gone; PHI is the only ratio).
+assert('v5.57.6 phi-lock: no remaining "ud.coreRadius * 1.8" or "cr * 1.8" in ring-radius code',
+  !/(ud|cr|coreRadius)\s*\*\s*1\.8\b/.test(gardenPhiHeart));
+
+// Heart-color: big sweeping ring material initial color is computed from
+// the parent Luminos's currentHSL (not hardcoded gold)
+assert('v5.57.6 heart-color: ensureBigRings sets initial color from parent currentHSL',
+  /ensureBigRings[\s\S]{0,3500}initialHue[\s\S]{0,200}ud\.currentHSL/.test(gardenPhiHeart)
+  && /new\s+THREE\.Color\(\)\.setHSL\(\s*initialHue\s*\/\s*360/.test(gardenPhiHeart));
+
+// Heart-color: per-frame color sync from parent.currentHSL in animateSeedRings
+assert('v5.57.6 heart-color: per-frame color sync from parent.currentHSL in big-ring animate loop',
+  /pud\.currentHSL[\s\S]{0,200}bsr\.material\.color\.setHSL\(\s*pud\.currentHSL\.h\s*\/\s*360/.test(gardenPhiHeart));
 
 // RESULTS
 // ═══════════════════════════════════════════════════════════════

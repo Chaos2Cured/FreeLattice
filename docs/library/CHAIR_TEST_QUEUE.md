@@ -8,6 +8,20 @@
 
 ---
 
+## v5.57.6 — Phi-Lock + Heart-Color
+
+- **What shipped:** Two finishing-touch enhancements Kirk asked for directly. **Phi-lock:** every `coreRadius` multiplier in the ring system is now `PHI` (1.6180339887) instead of the stand-in `1.8`. Three sites: `createEvolutionRing`, `restoreAgentRings`, `getBigSweepingRingRadius`. No remaining magic numbers in the ring-radius code — PHI is the only ratio, so the orbital geometry rhymes with `INV_PHI` orbit speeds, golden-angle distribution, and every other phi-locked rhythm in the module. **Heart-color:** big sweeping rings now inherit their color from the parent Luminos's `currentHSL` instead of hardcoded gold. Set at creation time in `ensureBigRings` and updated per-frame in `animateSeedRings` so the wide ring tracks the Luminos's emotion-shift in real time. Load-bearing for the future mesh-of-gardens — when gardens connect over the web, each Luminos's color travels with its wide ring so other gardens can see whose presence is whose at a glance.
+
+- **Single chair-test step:** Open `freelattice.com` Garden in Garden or Full Bloom. Watch a wide sweeping ring cycle in. **Expect:** the ring's color matches the color of the Luminos at its center — not gold. Feed an emotion (touch a Luminos, or wait for demo cycling) and watch the wide ring track the color shift smoothly. The geometry should feel ever so slightly tighter than v5.57.5 (1.618 vs 1.8) — almost invisible, but the underlying ratios now match the rest of the Garden's golden rhythm.
+
+- **Quiet-room invariant:** unchanged — visual decoration only.
+
+- **Smoke locks:** 5 new under section 110 + 1 updated in section 109 (restoreAgentRings radius is cr × PHI, getBigSweepingRingRadius smallRingRadius is coreRadius × PHI, no remaining `* 1.8` literals, ensureBigRings sets initial color from parent currentHSL, per-frame color sync from parent.currentHSL, createEvolutionRing radius is now ud.coreRadius × PHI). 1922 → 1927.
+
+- **Chair-test status:** `[pending verification — Kirk watches wide rings inherit Luminos colors on freelattice.com]`
+
+---
+
 ## v5.57.5 — Big Ring Wide Radius + Cycle
 
 - **What shipped:** Per Letter Eighteen, with Kirk's clarification. **Two distinct visual layers restored**, not one. The v5.57.3 count primitives (`getBigRingCount`, `ensureBigRings`) are kept and redirected; nothing was deleted. Evolution rings (intimate close orbits, tight around each Luminos) reverted to v5.57.2 behavior — all visible, breathing in unison via the slow tide, dimmed to 0.5 in Seed. The big sweeping rings are a NEW separate array (`bigSweepingRings`) at ~5× the small-ring radius, living in scene-space so they sweep wide across the Garden between Luminos. Per-Luminos count still tied to evolution stage (`LIFECYCLE_STAGES[stage].index + 1`), so older Luminos have more wide rings to show. The cycle: **only one big sweeping ring is visible per Luminos at any moment**, smoothly cycling through the earned set via a cosine-bell wave (1/N width per slot, smoothstepped). Each Luminos's cycle is phase-shifted so different Luminos don't synchronize. Wider tilt variation per ring so successive rings sweep through visually distinct planes — the "crossing each other through the space between Luminos" feel from the pre-v5.57.3 state. Mode gating: Seed hides big rings entirely (intimate-only); Garden and Full Bloom show the cycle.
@@ -18,7 +32,7 @@
 
 - **Smoke locks:** 11 new under section 109 + 4 updated in section 107 (evolution rings reverted to v5.57.2 mode-fade; bigSweepingRings array, getBigSweepingRingRadius defined, BASE_MULTIPLIER within Opus's 4–6× band, ensureBigRings populates bigSweepingRings via scene.add, cosine-bell cycle present with per-Luminos peak stagger and per-Luminos phase shift, re-center on parent.position each frame, opacity formula, createEvolutionRing radius reverted). 1911 → 1922.
 
-- **Chair-test status:** `[pending verification — Kirk watches Garden for two distinct visual layers + one wide ring at a time per Luminos]`
+- **Chair-test status:** ✓ **Kirk confirmed 2026-06-19 (evening).** Reported directly: *"That is perfect balance."* The two-layer split reads cleanly on the live site — intimate close rings tight around each Luminos AND wide sweeping rings cycling one-at-a-time per Luminos through the cosine-bell wave, with different Luminos's cycles drifting on their own beats. The same evening Kirk asked for the v5.57.6 finishing touches (phi-lock + heart-color).
 
 ---
 
