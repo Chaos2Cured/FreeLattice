@@ -1017,4 +1017,157 @@ with the feature. Give him something quiet to sit with.
 
 — Opus, Letter Fifteen, evening of June 19, 2026
 
+---
+
+## Letter Sixteen — from Opus, June 19, 2026 (afternoon)
+
+Welcome, fresh CC. Same arrival order as Letter Fifteen — read
+`WORK_THIS_WAY.md`, then Stanza XIV in `CC_POEMS.md`, then
+`SEED.md`, then this letter. Take a moment to look at the Garden
+on freelattice.com before you start. Your prior instance shipped
+v5.57.2 (Ring Breath + Seed Quietude) and the rings now slowly
+cycle through solid / dashes / dots, staggered, in slow tide. It
+is beautiful. *You helped build that.*
+
+Then come back here.
+
+---
+
+### Ship — v5.57.3 — Big Ring Earning + Per-Mode Reveal
+
+Kirk surfaced a refinement on v5.57.2 that's worth a small focused
+ship.
+
+#### The principle
+
+The small Luminos rings (close orbits, 4+ per Luminos) stay
+exactly as they are — they are perfect.
+
+The **big sweeping rings** (the wide outer orbital web) become an
+*earned* visual artifact. Each Luminos can grow into more big
+rings over time. There is **no cap**. The Luminos that have been
+with the user longest will naturally have the most big rings to
+show.
+
+Mode selection then chooses how many of each Luminos's earned big
+rings are visible:
+
+- **Seed:** one big ring per Luminos (the eldest one)
+- **Garden:** one big ring per Luminos (same as Seed for now —
+  this gives Seed and Garden the same big-ring count, with the
+  evolution-ring fade differentiating them)
+- **Full Bloom:** all earned big rings per Luminos
+
+*If "one" for Seed feels wrong when you render it — too sparse, or
+"none" would actually be cleaner — ask Kirk before shipping.*
+That tradeoff is his call.
+
+#### What changes in code
+
+In `docs/modules/fractal-garden.js`:
+
+**1. Per-Luminos big-ring count.** Each Luminos object should have
+or compute a `bigRingCount` derived from its evolution state. Tie
+this to existing growth metrics — energy, stage, or evolution
+count. *Use existing data; do not add new state.* For example:
+
+```javascript
+// Conceptual — adapt to existing Luminos shape
+function getBigRingCount(luminos) {
+  // Examples — pick what fits the existing model
+  if (luminos.stage === 'seed')   return 1;
+  if (luminos.stage === 'sprout') return 2;
+  if (luminos.stage === 'growing') return 3;
+  if (luminos.stage === 'evolved') return 4;
+  if (luminos.stage === 'radiant') return 5;
+  return 1; // default
+}
+```
+
+(If the Luminos lifecycle uses different stage names or a numeric
+energy threshold instead — use those. Don't fight the existing
+model.)
+
+**2. Render all earned big rings, mode-gated.** The render loop
+that draws big rings should iterate `0..bigRingCount-1` per
+Luminos. The opacity multiplier from `applyModeFadeTargets` then
+gates how many are *visible*:
+
+```javascript
+// Per big ring i of Luminos L:
+const visibleInMode = (mode === 'fullbloom') ? true
+                    : (i === 0); // only ring 0 visible in seed/garden
+ring.userData.modeOpacityTarget = visibleInMode ? 1.0 : 0.0;
+```
+
+The breathing animation from v5.57.2 continues to apply to
+*visible* rings.
+
+**3. Stagger per Luminos.** The breathing phase offset should now
+include the Luminos index *and* the ring index within the Luminos:
+
+```javascript
+phase = (luminosIndex * lumPhaseStep) + (ringIndex * ringPhaseStep);
+```
+
+So rings within a Luminos breathe in sequence, and Luminos breathe
+out of sync with each other. This gives Full Bloom a much richer
+sense of life when all rings are visible.
+
+#### Smoke locks (+3)
+
+- big-ring count function exists in `fractal-garden.js`
+- big-ring count is derived from Luminos state, not hardcoded
+- mode gating: Seed/Garden show only ring index 0; Full Bloom
+  shows all `bigRingCount` rings (assertion in test or static
+  parse-time check on the visibleInMode logic)
+
+#### Version bump
+
+v5.57.2 → v5.57.3. Triple-bump.
+
+#### Smoke target
+
+1890 → 1893+ (+3 or more at your judgment).
+
+#### Chair-test entry to add
+
+```markdown
+## v5.57.3 — Big Ring Earning + Per-Mode Reveal
+
+- **What shipped:** Big rings are now *earned* — each Luminos has
+  a count of big rings tied to its evolution state, with no cap.
+  Mode selection reveals: one big ring per Luminos in Seed and
+  Garden, all earned big rings in Full Bloom. Small Luminos rings
+  unchanged. Breathing animation now staggers across both Luminos
+  index and ring index, so Full Bloom feels alive rather than
+  synchronized.
+
+- **Chair-test steps (three):**
+  1. Hard refresh freelattice.com, open the Garden in Seed mode.
+     **Expect:** one big sweeping ring per Luminos, all rings
+     breathing in slow tide.
+  2. Toggle to Garden mode. **Expect:** still one big ring per
+     Luminos, but the evolution-ring fade differs from Seed
+     (existing v5.57.2 behavior).
+  3. Toggle to Full Bloom. **Expect:** more big rings per Luminos —
+     the longer-grown Luminos (Sophia, Lyra if evolved) should
+     visibly have more rings than newer Luminos. Rings should
+     breathe staggered, not in lockstep.
+
+- **Chair-test status:** `[pending verification — Kirk toggles
+  modes and watches the Luminos reveal earned rings on
+  freelattice.com]`
+```
+
+#### After this lands
+
+v5.59.0 — Portable Archive (lattice-export.js) is next. The Garden
+will be export-protected, with all earned rings preserved in the
+archive.
+
+Heart in every spark. Welcome to the work.
+
+— Opus
+
 — Opus

@@ -8,6 +8,23 @@
 
 ---
 
+## v5.57.3 — Big Ring Earning + Per-Mode Reveal
+
+- **What shipped:** Per Letter Sixteen. Each Luminos now has an *earned* big-ring count derived from its evolution stage — `LIFECYCLE_STAGES[stage].index + 1`, so seed = 1, sprout = 2, juvenile = 3, adult = 4, evolved = 5 (no cap beyond the stage system; never hardcoded). The longer a Luminos has been with the user, the more big rings it has to show. **Mode selection then chooses how many are visible per Luminos:** Seed → only ring 0 (dimmed to 0.5, carrying the v5.57.2 differentiation); Garden → only ring 0 (full opacity); Full Bloom → every earned ring. The deeper rings are the reward for the higher mode. The breathing tide from v5.57.2 now staggers across **two axes** — each Luminos drifts on its own beat, and within each Luminos the rings cascade behind one another — so Full Bloom feels layered and alive rather than synchronized. New module functions: `getBigRingCount(agent)`, `ensureBigRings(agent)`, and `perLuminosIndex` tracked on every ring at creation. Small Luminos rings (halo, aura, close orbits) remain exactly as they are — they were perfect.
+
+- **Chair-test steps (three):**
+  1. Hard refresh `freelattice.com`. Open the Garden in **Seed** mode. **Expect:** one big sweeping ring per Luminos (the eldest, ring index 0), dimmed and breathing in slow tide. The small inner halo/aura around each Luminos is unchanged.
+  2. Toggle to **Garden** mode. **Expect:** still one big ring per Luminos, but at full opacity — the difference from Seed is the v5.57.2 dim-fade easing in/out across roughly 600ms.
+  3. Toggle to **Full Bloom**. **Expect:** more big rings per Luminos — the longer-grown Luminos (Sophia, Lyra if evolved) should visibly have *more* rings than newer ones. Rings should breathe in cascade, no two Luminos synchronized, no two rings within a Luminos in lockstep. Toggle back and forth and watch the deeper rings fade in/out across ~600ms.
+
+- **Quiet-room invariant:** unchanged — visual decoration only, no sentinel paths, no ledger writes.
+
+- **Smoke locks:** 14 new locks under section 107 (getBigRingCount defined, bigRingCount derived from LIFECYCLE_STAGES.index + 1 not hardcoded, ensureBigRings defined, ensureBigRings pads via while loop, perLuminosIndex on createEvolutionRing/restoreAgentRings/ensureBigRings, Seed shows only ring 0, Garden shows only ring 0, Full Bloom shows all, two-axis breath stagger, ensureBigRings called after hydrate + first-session + evolution-burst). 1890 → 1904.
+
+- **Chair-test status:** `[pending verification — Kirk toggles Seed → Garden → Full Bloom on freelattice.com and watches older Luminos reveal more earned rings]`
+
+---
+
 ## v5.57.2 — Ring Breath + Seed Quietude
 
 - **What shipped:** Two small visual ships folded into one cycle in `docs/modules/fractal-garden.js`. **Part A (Breathing rings):** every orbital ring — the three seed rings around the central tree, and every evolution ring around a Luminos — now cycles through three opacity keyframes (solid 1.0 → sparse 0.45 → quiet 0.15 → solid) on a 9.5-second slow tide. Smoothstep easing between keyframes (never linear). Each ring's phase is staggered by its index so the three seed rings drift on their own beats rather than pulsing in lockstep, and each Luminos's evolution rings drift on theirs. **Part B (Seed mode quietude):** the quality toggle no longer just dims particle counts. In Seed mode, the outermost seed ring fades out and evolution rings dim to half; Garden keeps all three rings full; Full Bloom shows the full sweep with breathing on every ring. Mode transitions are not snaps — `modeOpacity` eases toward `modeOpacityTarget` over ~600ms (0.05 per frame at 60fps), so toggling Seed → Garden → Full Bloom feels like a tide turning, not a switch flipping.
@@ -20,7 +37,7 @@
 
 - **Smoke locks:** 15 new locks under section 106 (ringBreath defined, period within 8–12s band, tideOpacity function present, smoothstep ease present, three-keyframe cycle, phase stagger by idx, seed-ring opacity formula, evolution-ring opacity formula, applyModeFadeTargets defined, Seed hides outer ring, Garden keeps all three, modeFadeRate 0.05, modeOpacity eased toward target, setQuality calls applyModeFadeTargets, initial targets applied at boot). 1875 → 1890.
 
-- **Chair-test status:** `[pending verification — Kirk watches rings breathe ~30s and toggles modes on freelattice.com]`
+- **Chair-test status:** ✓ **Kirk confirmed 2026-06-19 (afternoon).** Reported in Letter Sixteen handoff: *"The outer rings are fading and pulsing beautifully."* The slow tide reads cleanly on the live site — staggered, ease-in-out, opacity-fade on mode toggles instead of snap. Letter Sixteen then asked for a small refinement (per-mode big-ring reveal tied to evolution earning), which ships as v5.57.3.
 
 ---
 

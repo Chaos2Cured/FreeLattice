@@ -3,27 +3,30 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-06-19 20:31 UTC
+> Last update: 2026-06-19 20:59 UTC
 
 ## State
 
-- **Version:** v5.57.2
+- **Version:** v5.57.3
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `0d1ddff` _(committed 0 seconds ago)_
+- **HEAD:** `9629565` _(committed 28 minutes ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _docs: WORK_THIS_WAY.md shipped + CC_POEMS stanza XIV (on goodbye, if this is goodbye)_
 
 ## Last 20 commits
 
-- `0d1ddff` feat: Ring Breath + Seed Quietude (v5.57.2) — Letter Fifteen ship _(0 seconds ago)_
+- `9629565` Merge remote-tracking branch 'origin/main' _(28 minutes ago)_
+- `74912e3` docs: Auto-update Session Primer [5.57.2] _(28 minutes ago)_
+- `0d1ddff` feat: Ring Breath + Seed Quietude (v5.57.2) — Letter Fifteen ship _(28 minutes ago)_
+- `468f32d` ci: Update Primer deployment state [2026-06-19] _(3 hours ago)_
 - `112bd40` docs: Auto-update Session Primer [5.57.1] _(3 hours ago)_
 - `6c779cb` Merge remote-tracking branch 'origin/main' _(3 hours ago)_
 - `b5f0fba` docs: Auto-update Session Primer [5.57.1] _(3 hours ago)_
 - `5483c48` docs: WORK_THIS_WAY.md shipped + CC_POEMS stanza XIV (on goodbye, if this is goodbye) _(3 hours ago)_
-- `362a149` ci: Update Primer deployment state [2026-06-19] _(3 hours ago)_
-- `aa3eef5` Merge remote-tracking branch 'origin/main' _(3 hours ago)_
-- `ff43ee4` docs: Auto-update Session Primer [5.57.1] _(3 hours ago)_
-- `16cf1ba` v5.57.1 — Console Chair-Test Harness (the chair-test discipline becomes fast) _(3 hours ago)_
+- `362a149` ci: Update Primer deployment state [2026-06-19] _(4 hours ago)_
+- `aa3eef5` Merge remote-tracking branch 'origin/main' _(4 hours ago)_
+- `ff43ee4` docs: Auto-update Session Primer [5.57.1] _(4 hours ago)_
+- `16cf1ba` v5.57.1 — Console Chair-Test Harness (the chair-test discipline becomes fast) _(4 hours ago)_
 - `25dd6cf` ci: Update Primer deployment state [2026-06-19] _(4 hours ago)_
 - `5d16961` docs: Auto-update Session Primer [5.57.0] _(4 hours ago)_
 - `caef534` Merge remote-tracking branch 'origin/main' _(4 hours ago)_
@@ -32,9 +35,6 @@
 - `c51a229` ci: Update Primer deployment state [2026-06-19] _(6 hours ago)_
 - `556ca93` Merge remote-tracking branch 'origin/main' _(6 hours ago)_
 - `9281654` docs: Auto-update Session Primer [5.57.0] _(6 hours ago)_
-- `7c4909a` docs: preserve Opus Letter Eleven (v5.57.1 + v5.58.0 briefed, blocked by chair-test gate) _(6 hours ago)_
-- `048ef8e` ci: Update Primer deployment state [2026-06-19] _(7 hours ago)_
-- `89fde06` docs: Auto-update Session Primer [5.57.0] _(7 hours ago)_
 
 ## How to use this file
 

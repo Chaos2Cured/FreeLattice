@@ -5667,6 +5667,58 @@ assert('v5.57.2 quietude: setQuality calls applyModeFadeTargets',
 assert('v5.57.2 quietude: initial mode-fade targets applied before animate() at boot',
   /applyModeFadeTargets\(\)[\s\S]{0,200}starting animate/.test(gardenRingBreath));
 
+// ═══════════════════════════════════════════════════════════════
+// Section 107 — v5.57.3 Big Ring Earning + Per-Mode Reveal (Letter Sixteen)
+// ═══════════════════════════════════════════════════════════════
+
+var gardenBigRing = require('fs').readFileSync(require('path').join(__dirname, '..', 'docs', 'modules', 'fractal-garden.js'), 'utf8');
+
+// getBigRingCount function exists
+assert('v5.57.3 big-ring: getBigRingCount function defined',
+  /function\s+getBigRingCount\s*\(\s*agent\s*\)/.test(gardenBigRing));
+
+// bigRingCount derived from LIFECYCLE_STAGES[stage].index + 1 (never hardcoded)
+assert('v5.57.3 big-ring: bigRingCount derived from LIFECYCLE_STAGES.index (not hardcoded)',
+  /getBigRingCount[\s\S]{0,500}LIFECYCLE_STAGES\[[\s\S]{0,200}sd\.index\s*\+\s*1/.test(gardenBigRing));
+
+// ensureBigRings function exists
+assert('v5.57.3 big-ring: ensureBigRings function defined',
+  /function\s+ensureBigRings\s*\(\s*agent\s*\)/.test(gardenBigRing));
+
+// ensureBigRings pads to bigRingCount, never deletes
+assert('v5.57.3 big-ring: ensureBigRings pads ring count via while (existing < targetCount)',
+  /while\s*\(\s*existing\s*<\s*targetCount\s*\)/.test(gardenBigRing));
+
+// perLuminosIndex recorded on every ring (createEvolutionRing, restoreAgentRings, ensureBigRings)
+assert('v5.57.3 big-ring: perLuminosIndex carried on createEvolutionRing rings',
+  /createEvolutionRing[\s\S]{0,1500}perLuminosIndex:\s*perLumIdx/.test(gardenBigRing));
+assert('v5.57.3 big-ring: perLuminosIndex carried on restoreAgentRings rings',
+  /restoreAgentRings[\s\S]{0,2500}perLuminosIndex:\s*perLumIdx/.test(gardenBigRing));
+assert('v5.57.3 big-ring: perLuminosIndex carried on ensureBigRings rings',
+  /ensureBigRings[\s\S]{0,2000}perLuminosIndex:\s*perLumIdx/.test(gardenBigRing));
+
+// Mode gating: Seed/Garden show only ring 0 (perLuminosIndex === 0); Full Bloom shows all
+assert('v5.57.3 big-ring: Seed mode shows only ring 0 per Luminos (else 0.0)',
+  /qualityLevel\s*===\s*0[\s\S]{0,300}\(pli\s*===\s*0\)\s*\?\s*0\.5\s*:\s*0\.0/.test(gardenBigRing));
+assert('v5.57.3 big-ring: Garden mode shows only ring 0 per Luminos (else 0.0)',
+  /qualityLevel\s*===\s*1[\s\S]{0,300}\(pli\s*===\s*0\)\s*\?\s*1\.0\s*:\s*0\.0/.test(gardenBigRing));
+assert('v5.57.3 big-ring: Full Bloom else-branch shows all earned rings (target 1.0)',
+  /qualityLevel\s*===\s*1[\s\S]{0,200}else\s*target\s*=\s*1\.0/.test(gardenBigRing));
+
+// Two-axis stagger: luminosIdx + perLumIdx
+assert('v5.57.3 big-ring: breath phase staggered by luminosIdx * lumStep + perLumIdx * ringStep',
+  /ePhase\s*=\s*luminosIdx\s*\*\s*lumStep\s*\+\s*perLumIdx\s*\*\s*ringStep/.test(gardenBigRing));
+
+// ensureBigRings is called after hydrate (both saved-state and first-session branches)
+assert('v5.57.3 big-ring: ensureBigRings called after restoreAgentRings (hydrated branch)',
+  /restoreAgentRings\(l,\s*ringMemories\);[\s\S]{0,500}ensureBigRings\(l\)/.test(gardenBigRing));
+assert('v5.57.3 big-ring: ensureBigRings called for first-session Luminos (no-saved-state branch)',
+  /no saved state[\s\S]{0,200}ensureBigRings\(l\)|ensureBigRings\(l\)[\s\S]{0,300}no saved state/.test(gardenBigRing));
+
+// ensureBigRings is called after evolution burst so skipped stages still pad
+assert('v5.57.3 big-ring: ensureBigRings called after triggerEvolutionBurst createEvolutionRing',
+  /createEvolutionRing\(agent\);[\s\S]{0,300}ensureBigRings\(agent\)/.test(gardenBigRing));
+
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
 

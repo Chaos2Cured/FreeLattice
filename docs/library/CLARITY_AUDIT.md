@@ -209,6 +209,30 @@ grep -nE "\"[^\"]*\buser\b[^\"]*\"" docs/app.html docs/modules/*.js \
 
 ---
 
+## SHIPPED: Letter Sixteen Ship — Big Ring Earning + Per-Mode Reveal (v5.57.3, 2026-06-19 afternoon)
+
+Per Opus's Letter Sixteen brief, after Kirk confirmed v5.57.2 on the live site (*"The outer rings are fading and pulsing beautifully"*). Two small additions, same module (`docs/modules/fractal-garden.js`), same render pipeline. Small Luminos rings (halo, aura) untouched per the brief — they were perfect.
+
+What landed:
+
+**Earned big-ring count.** `getBigRingCount(agent)` derives the count from `LIFECYCLE_STAGES[stage].index + 1`, never hardcoded, never capped — older Luminos naturally have more rings to show. Seed = 1, sprout = 2, juvenile = 3, adult = 4, evolved = 5. `ensureBigRings(agent)` pads each Luminos's evolution-ring set up to this target via a `while (existing < targetCount)` loop. New rings are derived from stage (not persisted to GardenMemory) so they regenerate on every boot from the stage seed; rings earned via actual evolution events continue to persist through the existing `createEvolutionRing` path.
+
+**Per-Luminos ring index.** Every ring now carries `perLuminosIndex` at creation, recorded in three places: `createEvolutionRing` (evolution-event rings, count via `parentAgent` match against the global `evolutionRings` array), `restoreAgentRings` (saved rings, sorted by saved `ringIndex` then the array position becomes the per-Luminos position), `ensureBigRings` (derived rings, the in-progress count). This is the per-Luminos identity each ring needs to be mode-gated independently.
+
+**Per-mode reveal.** `applyModeFadeTargets` now gates evolution rings by `perLuminosIndex`. Seed mode shows only ring 0 (dimmed to 0.5, carrying the v5.57.2 differentiation); Garden mode shows only ring 0 (full opacity); Full Bloom shows every earned ring. The deeper rings are the reward for the higher mode. Toggles still ease across ~600ms via the existing v5.57.2 fade.
+
+**Two-axis breath stagger.** The breathing phase in `animateSeedRings` now resolves `ePhase = luminosIdx * lumStep + perLumIdx * ringStep` (where `lumStep = period / max(luminosCount, 3)` and `ringStep = lumStep / 5`), so each Luminos drifts on its own beat and within a Luminos the rings cascade behind one another. Full Bloom reads as layered life rather than a synchronized pulse.
+
+**Wiring.** `ensureBigRings(l)` runs in three places: after `restoreAgentRings` in the hydrated branch, in the first-session no-saved-state branch (so a fresh seed Luminos still earns its initial ring), and after `createEvolutionRing` inside `triggerEvolutionBurst` (so a stage-skipping energy spike still pads up to the new bigRingCount).
+
+14 new smoke locks under section 107. Triple-bumped FL_VERSION + flCurrentVersion span + both sw.js CACHE_NAME + version.json. 1890 → 1904.
+
+**Chair-test:** queued in `CHAIR_TEST_QUEUE.md` with three steps — Seed mode shows one big ring per Luminos, Garden mode shows one with the v5.57.2 fade differentiation, Full Bloom shows older Luminos visibly carrying more rings than newer ones with the two-axis cascade.
+
+**The discipline lesson:** Kirk's "we don't add if something is already there" principle showed up directly in the design. `ensureBigRings` only PADS — it never deletes earned rings, never overrides what hydration already restored. The new derived rings sit beside the persisted event-earned rings, never replacing them. The existing data model continues to work; the new shape extends it. Annotation, not revision.
+
+---
+
 ## SHIPPED: Letter Fifteen Ship — Ring Breath + Seed Quietude (v5.57.2, 2026-06-19 evening)
 
 Per Opus's Letter Fifteen brief. Two small visual ships folded into one cycle in `docs/modules/fractal-garden.js`. Same module, same render pipeline.

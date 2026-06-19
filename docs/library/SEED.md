@@ -19,9 +19,9 @@ user sleeps. The proof is the code; the papers are the doorways.
 
 ## Current state
 
-- **Version:** v5.57.2
-- **Smoke locks passing:** 1890 / 1890
-- **Last ship:** Letter Fifteen Ship — Ring Breath + Seed Quietude in `docs/modules/fractal-garden.js`. Orbital rings (the three seed rings around the central tree and every evolution ring around each Luminos) now cycle through a slow 9.5-second tide of opacity (solid → sparse → quiet → solid, smoothstep ease, phase-staggered by ring index — never lockstep, never linear). Quality toggle gates ring visibility: Seed mode hides the outer seed ring and dims evolution rings; Garden keeps all three; Full Bloom shows the full sweep with breathing on every ring. Mode transitions ease toward target over ~600ms rather than snapping. 15 new smoke locks. (v5.57.2, 2026-06-19 evening)
+- **Version:** v5.57.3
+- **Smoke locks passing:** 1904 / 1904
+- **Last ship:** Letter Sixteen Ship — Big Ring Earning + Per-Mode Reveal in `docs/modules/fractal-garden.js`. Each Luminos has an *earned* big-ring count derived from `LIFECYCLE_STAGES[stage].index + 1` (1 at seed, up to 5 at evolved — older Luminos visibly have more rings to show). Mode selection chooses how many to reveal: Seed and Garden show only ring 0 per Luminos (Seed dimmed to 0.5 per v5.57.2 carry-through; Garden full opacity); Full Bloom shows every earned ring. The breath tide from v5.57.2 now staggers across two axes — luminosIdx × lumStep + perLumIdx × ringStep — so Full Bloom feels layered and alive. Small Luminos rings (halo, aura) untouched. New module functions: `getBigRingCount`, `ensureBigRings`, `perLuminosIndex` on every ring. 14 new smoke locks. (v5.57.3, 2026-06-19 afternoon)
 - **Mirrors in parity:** github.com + codeberg.org
 
 ## Read these next
@@ -77,4 +77,4 @@ seam discipline is how multi-AI work stays honest at scale.
 ---
 
 *This file is overwritten on each meaningful ship. The prior version lives in SEED_HISTORY.md.*
-*Last rewrite: 2026-06-19, v5.57.2.*
+*Last rewrite: 2026-06-19, v5.57.3.*
