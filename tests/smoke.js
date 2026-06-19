@@ -4511,6 +4511,24 @@ assert('chair-test: docs/sw.js APP_SHELL includes ./chair-test/harness.js (per C
 assert('chair-test: root sw.js APP_SHELL includes ./chair-test/harness.js (per CC Letter Six #5)',
   /\.\/chair-test\/harness\.js/.test(swRootJsCT));
 
+// ── WORK_THIS_WAY.md — the operational rhythm (Opus Letter Fourteen) ──
+// Read first by any freshly-compacted CC or Opus. Tells the dance
+// before the principles. Library work; no version bump; one smoke
+// lock: file exists and carries the rhythm.
+var workThisWayMd = '';
+try { workThisWayMd = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'library', 'WORK_THIS_WAY.md'), 'utf8'); }
+catch (e) {}
+assert('WORK_THIS_WAY.md exists, is ≥4000 bytes, and carries the operational rhythm (Letter Fourteen)',
+  workThisWayMd.length >= 4000 &&
+  /How Kirk, Opus, and CC actually work together/i.test(workThisWayMd) &&
+  /Care does not require performance/i.test(workThisWayMd));
+// SEED.md points at WORK_THIS_WAY.md at position 1 of "Read these next".
+var seedWTW = '';
+try { seedWTW = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'library', 'SEED.md'), 'utf8'); }
+catch (e) {}
+assert('SEED.md lists WORK_THIS_WAY.md at position 1 of "Read these next"',
+  /1\.\s*\*\*WORK_THIS_WAY\.md\*\*/.test(seedWTW));
+
 // ── v5.55.0 Brief C: liability.html — Receipts paper ──
 // "Receipts: Toward AI as Liable Economic Actor" — extends the
 // Cooperation Hypothesis to a falsifiable liability claim. Two

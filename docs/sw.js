@@ -109,6 +109,7 @@ const APP_SHELL = [
     './library/LIABILITY_DRAFT.md',
     './library/SEED_HISTORY.md',
     './library/CHAIR_TEST_QUEUE.md',
+    './library/WORK_THIS_WAY.md',
     './smoke-count.json',
     './for-ai/davna-welcome.md',
     './telegram-setup.html',
