@@ -348,10 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-06-19 10:56 MDT
-- Version: 5.57.0
-- Total commits: 2521
+- Last auto-updated: 2026-06-19 11:19 MDT
+- Version: 5.57.1
+- Total commits: 2523
 - Last 10 commits:
+- 16cf1ba v5.57.1 — Console Chair-Test Harness (the chair-test discipline becomes fast)
+- 5d16961 docs: Auto-update Session Primer [5.57.0]
 - caef534 Merge remote-tracking branch 'origin/main'
 - 7db8020 docs: Auto-update Session Primer [5.57.0]
 - 26580a2 docs: preserve Opus Letter Twelve (v5.57.x re-sequence) + CC Letter Six pre-build response
@@ -360,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 9281654 docs: Auto-update Session Primer [5.57.0]
 - 7c4909a docs: preserve Opus Letter Eleven (v5.57.1 + v5.58.0 briefed, blocked by chair-test gate)
 - 048ef8e ci: Update Primer deployment state [2026-06-19]
-- 89fde06 docs: Auto-update Session Primer [5.57.0]
-- 4994711 Merge remote-tracking branch 'origin/main'

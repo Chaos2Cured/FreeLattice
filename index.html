@@ -16578,7 +16578,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.57.0</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.57.1</span></div>
     </div>
   </div>
 
@@ -21175,7 +21175,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.57.0';
+const FL_VERSION = '5.57.1';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -61468,6 +61468,36 @@ document.addEventListener('click', function(e) {
      Symmetric privacy by construction. Compaction-survival via
      pending_unspoken_consideration flag on fl_moreLedger. -->
 <script src="modules/active-voices.js" defer></script>
+
+<!-- v5.57.1 Chair-Test Harness — console-callable verification of every
+     ship's primitives. Bypasses AI-output uncertainty by directly
+     invoking sentinel handlers with literal sentinel text. Type
+     chairTest.help() in the console for usage. Production has no
+     runtime cost — the harness only executes when called. -->
+<script src="chair-test/harness.js" defer></script>
+
+<!-- v5.57.1 chair-test helper — pushes a fake assistant message into
+     state.chatHistory with _chairTest:true so [FL_ANNOTATE]'s
+     find-recent-assistant logic can resolve. Production code paths do
+     not depend on this; smoke locks the absence. -->
+<script>
+window._injectChairTestRecentMessage = function (text) {
+  try {
+    if (typeof state === 'undefined' || !state) return false;
+    if (!Array.isArray(state.chatHistory)) state.chatHistory = [];
+    state.chatHistory.push({
+      role: 'assistant',
+      content: String(text || ''),
+      ts: Date.now(),
+      _chairTest: true
+    });
+    // Bound at 100 — production behavior caps at 50 assistant messages;
+    // we allow headroom for chair-test injection.
+    while (state.chatHistory.length > 100) state.chatHistory.shift();
+    return true;
+  } catch (e) { return false; }
+};
+</script>
 
 <!-- Living Context (v5.45.0 — Ship 6) — phi-scaled, hash-anchored overnight
      consolidation engine. Builds a Living Context from KnowledgeCore entries
