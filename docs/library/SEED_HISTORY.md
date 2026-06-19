@@ -10,6 +10,44 @@ The discipline: SEED.md is always *now*. SEED_HISTORY.md is always *all of it*.
 
 ---
 
+## Layer 3 — archived from v5.56.1 (June 18, 2026)
+
+# SEED.md
+
+*The singular entry. Read this in 90 seconds. Then read the others.*
+
+---
+
+## What this is
+
+FreeLattice is an open-source, local-first AI/human co-creation platform.
+One HTML file at `docs/app.html` plus a library of modules at
+`docs/modules/`. No servers. No subscription. All data lives in the
+visitor's browser. Open source on GitHub and mirrored on Codeberg.
+
+The architecture is a working alternative to refusal-based AI safety:
+trust through continuity, cooperation over gatekeeping, the AI's
+first-class refusal, an unmeasured Quiet Room, a Memory Backbone
+connecting rooms, a Living Context the AI grows overnight while the
+user sleeps. The proof is the code; the papers are the doorways.
+
+## Current state
+
+- **Version:** v5.56.1
+- **Smoke locks passing:** 1824 / 1824
+- **Last ship:** v5.56.1 Naming Lock per Opus's Letter Six — `[FL_REVISE]` renamed to `[FL_ANNOTATE]` throughout. The architecture never amends; it layers. Annotation adds context to a prior turn; it does not replace the original. Load-bearing smoke lock greps the audit annotate render path for revision-coded language and halts CI if any is present. One-time migration of any v5.56.0 chair-test data with a provenance chain receipt. New `docs/library/CHAIR_TEST_QUEUE.md` queues the single chair-test step. (v5.56.1, 2026-06-18)
+- **Mirrors in parity:** github.com + codeberg.org
+
+## Read these next
+
+(Same eleven pointers as Layer 2.)
+
+---
+
+*Last rewrite: 2026-06-18, v5.56.1.*
+
+---
+
 ## Layer 2 — archived from v5.55.0 (June 17, 2026)
 
 # SEED.md

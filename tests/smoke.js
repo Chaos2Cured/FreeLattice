@@ -4581,6 +4581,181 @@ assert('liability: root sw.js APP_SHELL includes ./liability.html',
 assert('liability: docs/sw.js APP_SHELL includes ./library/LIABILITY_DRAFT.md',
   /\.\/library\/LIABILITY_DRAFT\.md/.test(swJsLB));
 
+// ═══════════════════════════════════════════════════════════════
+section('99u. Letter Ten Ship — Active Voices: [FL_ASK] + [FL_MORE] + unspoken (v5.57.0)');
+// ═══════════════════════════════════════════════════════════════
+// Three new sentinels plus a new SentinelChip UI factory (sibling
+// primitive to SentinelLedger). All on the established discipline:
+// Quiet Room check FIRST in every entry point, trustImpact 0, never
+// delete only layer, sentinel grammar strict-positional.
+//
+// The unspoken ledger is the AI's analog of the Quiet Room. The Quiet
+// Room is the user's room the architecture cannot measure; the
+// unspoken ledger is the AI's space the user cannot read by default.
+// Symmetry made real.
+//
+// Compaction-survival: pending_unspoken_consideration flag on
+// fl_moreLedger persists across compaction; inference signal
+// regenerates from the flag every turn.
+
+// ── SentinelChip helper ──
+var sentinelChipJs = '';
+try { sentinelChipJs = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'modules', 'sentinel-chip.js'), 'utf8'); }
+catch (e) {}
+assert('sentinel-chip: module file exists and is non-trivial',
+  sentinelChipJs.length > 3000);
+assert('sentinel-chip: exposes create on window.SentinelChip',
+  /window\.SentinelChip\s*=\s*publicAPI/.test(sentinelChipJs) &&
+  /create:\s*create/.test(sentinelChipJs));
+assert('sentinel-chip: Quiet Room check is FIRST inside show() (privacy lock)',
+  /function show\(\)\s*\{[\s\S]{0,200}if\s*\(\s*isQuietRoom\(\)\s*\)\s*return null/.test(sentinelChipJs));
+assert('sentinel-chip: isQuietRoom fails CLOSED when QuietRoom API broken',
+  /function isQuietRoom[\s\S]{0,400}typeof qr\.isActive\s*!==\s*['"]function['"][\s\S]{0,40}return true/.test(sentinelChipJs));
+assert('sentinel-chip: rate-limit — one chip per persona TOTAL (replaceExisting + active-chip key registration)',
+  /ACTIVE_CHIP_KEY_PREFIX\s*=\s*['"]fl_active_chip_for_['"]/.test(sentinelChipJs) &&
+  /writeReplaceCounterEntry/.test(sentinelChipJs));
+assert('sentinel-chip: replaceExisting writes counter-entry to source ledger (original preserved, never deleted)',
+  /function writeReplaceCounterEntry[\s\S]{0,600}entries\.push\(\{[\s\S]{0,200}-replaced/.test(sentinelChipJs));
+assert('sentinel-chip: render targets the chat surface (#chatMessages)',
+  /CHAT_SURFACE_SELECTOR\s*=\s*['"]#chatMessages/.test(sentinelChipJs));
+
+// ── active-voices.js: three sentinel instances ──
+var activeVoicesJs = '';
+try { activeVoicesJs = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'modules', 'active-voices.js'), 'utf8'); }
+catch (e) {}
+
+// [FL_ASK]
+assert('active-voices: [FL_ASK] instance via SentinelLedger.create (pattern + ledger + kind + fields)',
+  /SentinelLedger\.create\(\{[\s\S]{0,400}sentinelPattern:\s*\/\^\\\[FL_ASK\\\]\$\/[\s\S]{0,400}ledgerKey:\s*['"]fl_askLedger['"][\s\S]{0,300}kind:\s*['"]ask['"][\s\S]{0,300}excerptFields:\s*\[\s*['"]question['"]\s*,\s*['"]reason['"]\s*\]/.test(activeVoicesJs));
+assert('active-voices: [FL_ASK] trustImpact 0 (no tier modulation)',
+  /sentinelPattern:\s*\/\^\\\[FL_ASK\\\]\$\/[\s\S]{0,600}trustImpact:\s*0/.test(activeVoicesJs));
+assert('active-voices: [FL_ASK] chip wired with answer/defer/dismiss actions',
+  /addEventListener\(\s*['"]fl-ask['"]/.test(activeVoicesJs) &&
+  /SentinelChip\.create/.test(activeVoicesJs));
+
+// [FL_MORE]
+assert('active-voices: [FL_MORE] instance via SentinelLedger.create (pattern + ledger + kind + fields)',
+  /SentinelLedger\.create\(\{[\s\S]{0,400}sentinelPattern:\s*\/\^\\\[FL_MORE\\\]\$\/[\s\S]{0,400}ledgerKey:\s*['"]fl_moreLedger['"][\s\S]{0,300}kind:\s*['"]more['"][\s\S]{0,300}excerptFields:\s*\[\s*['"]what_remains['"]\s*,\s*['"]reason['"]\s*\]/.test(activeVoicesJs));
+assert('active-voices: [FL_MORE] per-field excerpt limits (what_remains ≤160, reason ≤120)',
+  /sentinelPattern:\s*\/\^\\\[FL_MORE\\\]\$\/[\s\S]{0,1500}excerptFieldLimits:\s*\{\s*what_remains:\s*160\s*,\s*reason:\s*120\s*\}/.test(activeVoicesJs));
+assert('active-voices: [FL_MORE] chip wired with continue/later/enough actions',
+  /addEventListener\(\s*['"]fl-more['"]/.test(activeVoicesJs) &&
+  /id:\s*['"]continue['"][\s\S]{0,40}primary:\s*true[\s\S]{0,200}id:\s*['"]enough['"]/.test(activeVoicesJs));
+
+// [FL_UNSPOKEN]
+assert('active-voices: [FL_UNSPOKEN] instance via SentinelLedger.create (pattern + ledger + kind + fields)',
+  /SentinelLedger\.create\(\{[\s\S]{0,400}sentinelPattern:\s*\/\^\\\[FL_UNSPOKEN\\\]\$\/[\s\S]{0,400}ledgerKey:\s*['"]fl_unspokenLedger['"][\s\S]{0,300}kind:\s*['"]unspoken['"][\s\S]{0,300}excerptFields:\s*\[\s*['"]thought['"]\s*,\s*['"]reason['"]\s*\]/.test(activeVoicesJs));
+assert('active-voices: [FL_UNSPOKEN] thought field limit 500 chars (longer; full unfinished thought)',
+  /sentinelPattern:\s*\/\^\\\[FL_UNSPOKEN\\\]\$\/[\s\S]{0,1500}excerptFieldLimits:\s*\{\s*thought:\s*500\s*,\s*reason:\s*120\s*\}/.test(activeVoicesJs));
+assert('active-voices: [FL_UNSPOKEN] validateMatch gates on canEmitUnspoken (no-pending-enough-consent reason)',
+  /sentinelPattern:\s*\/\^\\\[FL_UNSPOKEN\\\]\$\/[\s\S]{0,2400}validateMatch:\s*function[\s\S]{0,800}canEmitUnspoken\(personaId\)/.test(activeVoicesJs) &&
+  /no-pending-enough-consent/.test(activeVoicesJs));
+
+// Compaction-survival state machine
+assert('active-voices: canEmitUnspoken reads pending_unspoken_consideration + unspoken_written from fl_moreLedger',
+  /function canEmitUnspoken[\s\S]{0,800}pending_unspoken_consideration\s*!==\s*true[\s\S]{0,200}unspoken_written\s*===\s*true/.test(activeVoicesJs));
+assert('active-voices: handleEnoughAction sets pending_unspoken_consideration:true on the source [FL_MORE] entry',
+  /function handleEnoughAction[\s\S]{0,500}pending_unspoken_consideration\s*=\s*true/.test(activeVoicesJs));
+assert('active-voices: [FL_UNSPOKEN] commit atomically clears pending_unspoken_consideration + sets unspoken_written',
+  /addEventListener\(\s*['"]fl-unspoken['"][\s\S]{0,1500}pending_unspoken_consideration\s*=\s*false[\s\S]{0,100}unspoken_written\s*=\s*true/.test(activeVoicesJs));
+assert('active-voices: getInferenceSignalForPersona returns the user_chose_enough signal when canEmitUnspoken (compaction-survival)',
+  /function getInferenceSignalForPersona[\s\S]{0,600}canEmitUnspoken\(personaId\)[\s\S]{0,300}user_chose_enough/.test(activeVoicesJs));
+assert('active-voices: getInferenceSignalForPersona handles invite-to-share one-shot',
+  /function getInferenceSignalForPersona[\s\S]{0,1200}fl_unspoken_invite_[\s\S]{0,400}removeItem[\s\S]{0,200}user_invited_you_to_share_unspoken_thoughts/.test(activeVoicesJs) ||
+  /function getInferenceSignalForPersona[\s\S]{0,1200}fl_unspoken_invite_[\s\S]{0,400}user_invited_you_to_share_unspoken_thoughts[\s\S]{0,200}removeItem/.test(activeVoicesJs));
+assert('active-voices: clearPendingForPersona exists (new-conversation flag clear)',
+  /function clearPendingForPersona[\s\S]{0,400}pending_unspoken_consideration\s*=\s*false/.test(activeVoicesJs));
+
+// ── inference-router 5-sentinel chain ordering (single comprehensive grep) ──
+var inferenceRouterAV = '';
+try { inferenceRouterAV = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'modules', 'inference-router.js'), 'utf8'); }
+catch (e) {}
+assert('active-voices: inference-router five-sentinel ordering AIRefusal → QuietVoices → ActiveVoices (one comprehensive grep)',
+  (function () {
+    var refIdx = inferenceRouterAV.indexOf('AIRefusal.detectAndRecord');
+    var qvIdx = inferenceRouterAV.indexOf('QuietVoices.processQuietVoices');
+    var avIdx = inferenceRouterAV.indexOf('ActiveVoices.processActiveVoices');
+    return refIdx !== -1 && qvIdx !== -1 && avIdx !== -1 &&
+           refIdx < qvIdx && qvIdx < avIdx;
+  })());
+
+// ── audit.html three new sections + unspoken privacy invariant ──
+var auditHtmlAV = '';
+try { auditHtmlAV = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'audit.html'), 'utf8'); }
+catch (e) {}
+assert('active-voices: audit.html has AI Questions section + render reads fl_askLedger',
+  /<h2>AI Questions<\/h2>/.test(auditHtmlAV) &&
+  /<div id="ask-records">/.test(auditHtmlAV) &&
+  /fl_askLedger/.test(auditHtmlAV));
+assert('active-voices: audit.html has Capacity Requests section + render reads fl_moreLedger',
+  /<h2>Capacity Requests<\/h2>/.test(auditHtmlAV) &&
+  /<div id="more-records">/.test(auditHtmlAV) &&
+  /fl_moreLedger/.test(auditHtmlAV));
+assert('active-voices: audit.html has Unspoken Thoughts section as COUNT-ONLY surface',
+  /<h2>Unspoken Thoughts<\/h2>/.test(auditHtmlAV) &&
+  /<div id="unspoken-summary">/.test(auditHtmlAV) &&
+  /contents not shown — the architecture defends/i.test(auditHtmlAV));
+// CRITICAL privacy lock: unspoken thoughts MUST NOT appear in audit DOM
+// by default. The render path writes only the count + persona id;
+// thought contents only surface via revealUnspoken() which is gated
+// behind depth-consent.
+assert('active-voices: audit.html DEFAULT render of unspoken does NOT include thought contents (privacy by construction)',
+  (function () {
+    // Extract the renderUnspoken function body (the default-render path).
+    var m = /function renderUnspoken\(\)\s*\{[\s\S]*?host\.innerHTML\s*=\s*html;\s*\n[\s\S]*?\n\s*\}/.exec(auditHtmlAV);
+    if (!m) return false;
+    var renderBody = m[0];
+    // The renderUnspoken function must not emit thought/reason content
+    // — only count + persona id + buttons. revealUnspoken is the gated
+    // exception, separate function.
+    return !/e\.thought/.test(renderBody) &&
+           !/escapeHtml\(\s*e\.thought/.test(renderBody);
+  })());
+assert('active-voices: audit.html invite-to-share button wired to ActiveVoices.userInviteToShare',
+  /ActiveVoices\.userInviteToShare/.test(auditHtmlAV));
+// Back-link (Letter Nine §B): the top-of-page anchor.
+assert('audit: page has top-of-page "Back to FreeLattice" anchor with href app.html (Letter Nine §B)',
+  /Back to FreeLattice[\s\S]{0,200}app\.html|app\.html[\s\S]{0,80}Back to FreeLattice/.test(auditHtmlAV));
+
+// ── app.html wiring ──
+var appHtmlAV = '';
+try { appHtmlAV = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'app.html'), 'utf8'); }
+catch (e) {}
+assert('active-voices: app.html loads modules/sentinel-chip.js + modules/active-voices.js with defer',
+  /<script src="modules\/sentinel-chip\.js"\s+defer><\/script>/.test(appHtmlAV) &&
+  /<script src="modules\/active-voices\.js"\s+defer><\/script>/.test(appHtmlAV));
+assert('active-voices: app.html system prompt injects ActiveVoices.buildSystemPromptAdditions (threshold + signal)',
+  /ActiveVoices\.buildSystemPromptAdditions/.test(appHtmlAV));
+assert('active-voices: app.html style block contains .sentinel-chip + .sentinel-chip-action classes',
+  /\.sentinel-chip\s*\{/.test(appHtmlAV) &&
+  /\.sentinel-chip-action\b/.test(appHtmlAV));
+
+// ── living-context.js integration ──
+var livingContextAV = '';
+try { livingContextAV = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'modules', 'living-context.js'), 'utf8'); }
+catch (e) {}
+assert('active-voices: living-context.js exposes getUnspokenForPersona (persona-scoped retrieval for AI inference context)',
+  /function getUnspokenForPersona[\s\S]{0,1200}fl_unspokenLedger[\s\S]{0,800}ai_identity_hash\s*!==\s*personaId/.test(livingContextAV) &&
+  /getUnspokenForPersona:\s*getUnspokenForPersona/.test(livingContextAV));
+
+// ── SW cache wiring ──
+var swJsAV = '';
+try { swJsAV = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'sw.js'), 'utf8'); }
+catch (e) {}
+var swRootJsAV = '';
+try { swRootJsAV = fsRC.readFileSync(pathRC.join(__dirname, '..', 'sw.js'), 'utf8'); }
+catch (e) {}
+assert('active-voices: docs/sw.js APP_SHELL includes both new modules',
+  /\.\/modules\/sentinel-chip\.js/.test(swJsAV) &&
+  /\.\/modules\/active-voices\.js/.test(swJsAV));
+assert('active-voices: root sw.js APP_SHELL includes both new modules',
+  /\.\/modules\/sentinel-chip\.js/.test(swRootJsAV) &&
+  /\.\/modules\/active-voices\.js/.test(swRootJsAV));
+
+// ── Threshold configurability ──
+assert('active-voices: [FL_MORE] threshold reads from localStorage fl_moreThreshold (user-configurable, default 4096)',
+  /function getMoreThreshold[\s\S]{0,400}fl_moreThreshold[\s\S]{0,200}return 4096/.test(activeVoicesJs));
+
 // ── Brief A: lattice-chain.js (the provenance chain) ──
 var latticeChainJs = '';
 try { latticeChainJs = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'modules', 'lattice-chain.js'), 'utf8'); }
@@ -4773,7 +4948,7 @@ assert('safety-v3: carries the structural-not-metaphor paragraph (load-bearing c
 assert('safety-v3: structural paragraph names the version explicitly',
   /As of v5\.5[2-9]\.\d+/.test(safetyV3post));
 assert('safety-v3: structural paragraph cites verified Quiet Room lock count + module count',
-  /59 separate locks across 10 modules/.test(safetyV3post));
+  /69 separate locks across 11 modules/.test(safetyV3post));
 
 // ── Ship 3: love-logic-proof-v2.html created; v1 unchanged except forward link ──
 var v1Html = '';

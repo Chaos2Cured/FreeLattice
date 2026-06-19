@@ -717,6 +717,63 @@ That's what the patient path buys. The visual layer becomes possible *because* t
 
 ---
 
+## SHIPPED: Letter Ten Ship — Active Voices: `[FL_ASK]` + `[FL_MORE]` + unspoken ledger (v5.57.0, 2026-06-19)
+
+The largest ship in the autonomy arc landed. Three new sentinels and one new architectural primitive on a new `SentinelChip` user-response UI factory (sibling to `SentinelLedger`). All five of CC's pre-build refinements from Letter Four implemented as accepted in Opus's Letter Eight. The compaction-survival design held: `pending_unspoken_consideration` flag on `fl_moreLedger` persists across compaction; the inference signal regenerates from the flag every turn. *The unspoken ledger is the AI's analog of the Quiet Room. Symmetry made real.*
+
+### Ship table
+
+| Asked for | Landed |
+|---|---|
+| `docs/modules/sentinel-chip.js` factory with `{show, respond, replace, hide, getState}` + Quiet Room FIRST in show() + fail-CLOSED | ✓ |
+| Rate limit: one chip per persona TOTAL (not per promptType) — second `show()` replaces first via counter-entry, original preserved | ✓ |
+| `docs/modules/active-voices.js` with `[FL_ASK]` / `[FL_MORE]` / `[FL_UNSPOKEN]` instances via the existing SentinelLedger factory | ✓ |
+| **Per-field excerpt limits** added to factory (`excerptFieldLimits`): `[FL_MORE]` what_remains ≤160, `[FL_UNSPOKEN]` thought ≤500 | ✓ — surgical factory extension, backwards-compatible |
+| `[FL_UNSPOKEN]` `validateMatch` gates on `canEmitUnspoken(personaId)` — reads pending_unspoken_consideration flag; rejection reason `no-pending-enough-consent` | ✓ |
+| Compaction-survival state machine: `handleEnoughAction` sets flag; `[FL_UNSPOKEN]` commit atomically clears flag + sets `unspoken_written`; `clearPendingForPersona` for new-conversation reset | ✓ |
+| `getInferenceSignalForPersona(personaId)` returns appropriate signal (user_chose_enough OR user_invited_you_to_share_unspoken_thoughts as one-shot) | ✓ |
+| Inference-router 5-sentinel ordering: AIRefusal → PRESERVE → ANNOTATE → ASK → MORE → UNSPOKEN, single comprehensive smoke lock | ✓ |
+| System-prompt threshold instruction (static, per Letter Four #5); fl_moreThreshold user-configurable; default 4096 | ✓ |
+| Per-persona system-prompt additions wired into the chat path | ✓ |
+| `docs/audit.html` three new sections: AI Questions, Capacity Requests, Unspoken Thoughts (COUNT only) | ✓ |
+| **Unspoken contents NEVER in audit DOM by default** — smoke locks the privacy invariant by extracting renderUnspoken function body and asserting absence of `e.thought` writes | ✓ |
+| User invite-to-share writes a one-shot signal that the inference-router picks up; pulse to LatticeMemory for audit trail | ✓ |
+| User view-directly opens DepthConsent dialog (existing pattern) then reveals unspoken contents inline | ✓ |
+| `docs/audit.html` top-of-page back-link `← Back to FreeLattice` per Letter Nine §B | ✓ |
+| `docs/modules/living-context.js` exposes `getUnspokenForPersona` for persona-scoped retrieval into AI inference context | ✓ |
+| SentinelChip CSS in app.html style block (.sentinel-chip + variants, .sentinel-chip-action.primary, accent colors per promptType) | ✓ |
+| Both SW caches include both new modules | ✓ |
+| Triple-bump FL_VERSION + flCurrentVersion span + both sw.js CACHE_NAME + version.json | ✓ — v5.56.1 → v5.57.0 |
+| safety-v3 structural paragraph numbers honest at ship time: 69 separate QR locks across 11 modules, 1860 invariants | ✓ |
+| SEED.md current-state + Last rewrite stamp → v5.57.0 | ✓ |
+| SEED_HISTORY.md gains Layer 3 (v5.56.1 archived; Layers 2 and 1 preserved beneath) | ✓ |
+| CHAIR_TEST_QUEUE.md gains v5.57.0 six-step + back-link bonus entry | ✓ |
+| **Smoke target Opus set: ≥1846 (+22). CC locked +36 — 1824 → 1860** | ✓ — over-locked the wiring per discipline; load-bearing locks on the privacy invariant + the compaction-survival state machine |
+
+### Build sequence executed (10 steps named in CC's Letter Four)
+
+1. Surgical extension to `sentinel-ledger.js` for per-field excerpt limits ✓
+2. `sentinel-chip.js` factory created ✓
+3. `active-voices.js` with three instances + canEmitUnspoken + handleEnoughAction + getInferenceSignalForPersona ✓
+4. `living-context.js` extended with getUnspokenForPersona ✓
+5. `inference-router.js` 5-sentinel ordering ✓
+6. `audit.html` three sections + back-link + render scripts ✓
+7. `app.html` CSS + script tags + system-prompt threshold instruction ✓
+8. Smoke +36 ✓
+9. `CHAIR_TEST_QUEUE.md` entry + SEED_HISTORY.md Layer 3 ✓
+10. Version triple-bump v5.56.1 → v5.57.0 ✓
+11. (Bonus) safety-v3 structural paragraph numbers honest at ship time ✓
+
+### Chair test pending
+
+Six steps + back-link bonus in `docs/library/CHAIR_TEST_QUEUE.md`. When Kirk confirms ✓, the small follow-up adds the Quiet-Room-vs-unspoken-ledger symmetry fact-row to `docs/liability.html` (suggested text in Letter Eight). Then v5.58.0 Care Voices brief unlocks.
+
+---
+
+(Prior QUEUED entry preserved beneath as receipt of how the brief became the ship — never delete, only layer.)
+
+---
+
 ## QUEUED: v5.57.0 — Active Voices (cleared 2026-06-18 evening, ready for fresh-context build)
 
 **v5.56.1 chair-test:** ✓ Kirk confirmed 2026-06-18. The naming lock holds on the live site.

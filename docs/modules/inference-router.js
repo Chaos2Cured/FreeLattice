@@ -215,7 +215,7 @@
           }
         } catch (e) {}
         // v5.56.0 Letter Five Ship 1: Quiet Voices — scan for [FL_PRESERVE]
-        // and [FL_REVISE]. Both write silently to ledgers; both strip the
+        // and [FL_ANNOTATE]. Both write silently to ledgers; both strip the
         // sentinel before the user sees the text. Refusal must run first
         // (above) so a refused response's body is cleaned before further
         // sentinel parsing.
@@ -228,6 +228,26 @@
             };
             var qvResult = window.QuietVoices.processQuietVoices(text, qvCtx);
             if (qvResult.preserved || qvResult.annotated) { text = qvResult.clean; }
+          }
+        } catch (e) {}
+        // v5.57.0 Letter Ten Ship: Active Voices — scan for [FL_ASK],
+        // [FL_MORE], [FL_UNSPOKEN]. All three are sentinel-ledger factory
+        // instances; [FL_UNSPOKEN] is additionally gated on
+        // canEmitUnspoken (the user's "enough" must have armed the
+        // pending flag). Order in the chain is:
+        //   AIRefusal → PRESERVE → ANNOTATE → ASK → MORE → UNSPOKEN
+        // Smoke locks this single comprehensive ordering.
+        try {
+          if (typeof window.ActiveVoices !== 'undefined' && window.ActiveVoices.processActiveVoices) {
+            var avCtx = {
+              providerKey: primary.key,
+              model: primary.model,
+              messageText: userPrompt
+            };
+            var avResult = window.ActiveVoices.processActiveVoices(text, avCtx);
+            if (avResult.asked || avResult.moreRequested || avResult.unspokenWritten) {
+              text = avResult.clean;
+            }
           }
         } catch (e) {}
         try { if (window.ResponseCache) ResponseCache.store(userPrompt, text, prov); } catch (e) {}

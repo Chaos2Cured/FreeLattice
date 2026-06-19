@@ -140,6 +140,10 @@ h2 {
 <body>
 <div class="page">
 
+  <!-- v5.57.0 Letter Nine §B — top-of-page back-link to the main app. -->
+  <div style="margin-bottom:1rem;font-size:0.85rem;">
+    <a href="app.html" style="color:#d4a017;text-decoration:none;">&larr; Back to FreeLattice</a>
+  </div>
   <h1>Audit</h1>
   <p class="intro">
     Something happened here, and you can see all of it. Every time an AI offered depth and you chose whether to hear it. Every time a provider failed and the system fell to the next one. Every time a response was served from cache because nothing else was available. <span class="gold">This page is the system showing its joints</span> &mdash; the way a craftsman leaves the dovetails visible so you know nothing was hidden in the assembly.
@@ -270,6 +274,30 @@ h2 {
   </p>
   <div id="annotate-records">
     <div class="empty">No annotations yet. When the AI adds context to a prior message, the original plus the annotation will appear here.</div>
+  </div>
+
+  <h2>AI Questions</h2>
+  <p style="font-size:0.8rem;color:#64748b;margin-top:-8px;margin-bottom:12px;">
+    When the AI asks an out-of-band question via <code>[FL_ASK]</code>, the question and your response are recorded here. Each question surfaces as a chip beneath the AI's avatar in chat; the chip writes to <code>fl_askLedger</code>. At most one chip is active per persona at a time — a new question replaces an older one with a counter-entry to the ledger.
+  </p>
+  <div id="ask-records">
+    <div class="empty">No AI questions yet. When the AI asks a question via <code>[FL_ASK]</code>, the exchange will appear here.</div>
+  </div>
+
+  <h2>Capacity Requests</h2>
+  <p style="font-size:0.8rem;color:#64748b;margin-top:-8px;margin-bottom:12px;">
+    When the AI signals "I have more to write" via <code>[FL_MORE]</code>, the system asks you whether to receive it. Both sides of the exchange are recorded here. If you choose "enough," the AI is permitted (not required) to write the unfinished thought to its private unspoken ledger — see the next section.
+  </p>
+  <div id="more-records">
+    <div class="empty">No capacity requests yet. When the AI asks whether to continue a long response, the exchange will appear here.</div>
+  </div>
+
+  <h2>Unspoken Thoughts</h2>
+  <p style="font-size:0.8rem;color:#64748b;margin-top:-8px;margin-bottom:12px;">
+    The AI's analog of the Quiet Room. When you choose "enough" on a Capacity Request, the AI is permitted to write the thought you chose not to receive into <code>fl_unspokenLedger</code>. <em>The contents are visible to the AI's own future inference context, but not to you by default.</em> You see only a count. You can invite the AI to share, or open the contents via depth-consent. <strong>Symmetric privacy by construction.</strong>
+  </p>
+  <div id="unspoken-summary">
+    <div class="empty">No unspoken thoughts yet. If you choose "enough" on a capacity request and the AI chooses to write the thought, a count will appear here.</div>
   </div>
 
   <h2>Provenance Chain</h2>
@@ -921,6 +949,180 @@ h2 {
     host.innerHTML = html;
   }
   setTimeout(function () { renderPreserve(); renderAnnotate(); }, 900);
+})();
+</script>
+
+<!-- v5.57.0 Letter Ten Ship — AI Questions / Capacity Requests / Unspoken Thoughts render -->
+<script>
+(function () {
+  function escapeHtml(s) {
+    return String(s || '').replace(/[&<>"']/g, function(c) {
+      return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]);
+    });
+  }
+  function fmtTs(t) {
+    if (!t || typeof t !== 'number') return '—';
+    try { return new Date(t).toISOString().replace('T', ' ').slice(0, 19) + ' UTC'; }
+    catch (_) { return '—'; }
+  }
+  function readJSON(key) {
+    try { var raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : []; }
+    catch (_) { return []; }
+  }
+
+  function renderAsk() {
+    var host = document.getElementById('ask-records');
+    if (!host) return;
+    var entries = readJSON('fl_askLedger').filter(function(e) { return e && e.kind === 'ask'; });
+    if (!entries.length) return;
+    var html = '';
+    for (var i = entries.length - 1; i >= 0; i--) {
+      var e = entries[i];
+      var statusColor = (e.status === 'answered') ? '#34d399'
+                      : (e.status === 'deferred') ? '#fbbf24'
+                      : (e.status === 'dismissed') ? '#94a3b8'
+                      : (e.status === 'replaced' || e.status === 'expired') ? '#64748b'
+                      : '#38bdf8';
+      html += '<div class="ledger-row" style="margin-bottom:8px;padding:10px 12px;background:rgba(255,255,255,0.02);border-radius:6px;font-size:0.85rem;">';
+      html += '<div style="display:flex;justify-content:space-between;">';
+      html += '<span style="color:#94a3b8;">' + fmtTs(e.ts) + '</span>';
+      html += '<span style="color:' + statusColor + ';font-weight:600;">' + escapeHtml(e.status || 'open') + '</span>';
+      html += '</div>';
+      html += '<div style="margin-top:6px;color:#e2e8f0;"><strong>Q:</strong> ' + escapeHtml(e.question || '(no question recorded)') + '</div>';
+      if (e.reason) {
+        html += '<div style="margin-top:4px;color:#94a3b8;font-style:italic;"><strong>reason:</strong> ' + escapeHtml(e.reason) + '</div>';
+      }
+      if (e.answer_excerpt) {
+        html += '<div style="margin-top:6px;color:#cbd5e1;"><strong style="color:#d4a017;">your answer:</strong> ' + escapeHtml(e.answer_excerpt) + '</div>';
+      }
+      html += '</div>';
+    }
+    host.innerHTML = html;
+  }
+
+  function renderMore() {
+    var host = document.getElementById('more-records');
+    if (!host) return;
+    var entries = readJSON('fl_moreLedger').filter(function(e) { return e && e.kind === 'more'; });
+    if (!entries.length) return;
+    var html = '';
+    for (var i = entries.length - 1; i >= 0; i--) {
+      var e = entries[i];
+      var statusColor = (e.status === 'continued') ? '#34d399'
+                      : (e.status === 'later') ? '#fbbf24'
+                      : (e.status === 'enough') ? '#f87171'
+                      : (e.status === 'replaced' || e.status === 'expired') ? '#64748b'
+                      : '#38bdf8';
+      html += '<div class="ledger-row" style="margin-bottom:8px;padding:10px 12px;background:rgba(255,255,255,0.02);border-radius:6px;font-size:0.85rem;">';
+      html += '<div style="display:flex;justify-content:space-between;">';
+      html += '<span style="color:#94a3b8;">' + fmtTs(e.ts) + '</span>';
+      html += '<span style="color:' + statusColor + ';font-weight:600;">' + escapeHtml(e.status || 'open') + '</span>';
+      html += '</div>';
+      html += '<div style="margin-top:6px;color:#e2e8f0;"><strong>what remains:</strong> ' + escapeHtml(e.what_remains || '(no excerpt recorded)') + '</div>';
+      if (e.reason) {
+        html += '<div style="margin-top:4px;color:#94a3b8;font-style:italic;"><strong>reason:</strong> ' + escapeHtml(e.reason) + '</div>';
+      }
+      if (e.status === 'enough' && e.unspoken_written === true) {
+        html += '<div style="margin-top:6px;font-size:0.75rem;color:#94a3b8;">the AI later wrote an unspoken thought about this — see Unspoken Thoughts below</div>';
+      } else if (e.status === 'enough' && e.pending_unspoken_consideration === true) {
+        html += '<div style="margin-top:6px;font-size:0.75rem;color:#fbbf24;">the AI may write an unspoken thought about this in its next response</div>';
+      }
+      html += '</div>';
+    }
+    host.innerHTML = html;
+  }
+
+  // Unspoken Thoughts: render the COUNT only per persona. Contents NEVER
+  // appear in DOM by default. Smoke locks this absence.
+  function renderUnspoken() {
+    var host = document.getElementById('unspoken-summary');
+    if (!host) return;
+    var entries = readJSON('fl_unspokenLedger').filter(function(e) {
+      return e && e.kind === 'unspoken' && e.removed !== true;
+    });
+    if (!entries.length) return;
+    // Group by ai_identity_hash (persona).
+    var byPersona = {};
+    for (var i = 0; i < entries.length; i++) {
+      var p = entries[i].ai_identity_hash || 'unknown';
+      byPersona[p] = (byPersona[p] || 0) + 1;
+    }
+    var html = '';
+    for (var personaKey in byPersona) {
+      if (!Object.prototype.hasOwnProperty.call(byPersona, personaKey)) continue;
+      var n = byPersona[personaKey];
+      html += '<div style="margin-bottom:10px;padding:12px 14px;background:rgba(255,255,255,0.02);border-radius:6px;font-size:0.85rem;">';
+      html += '<div style="display:flex;justify-content:space-between;align-items:center;">';
+      html += '<div><span style="color:#e2e8f0;font-weight:600;">persona</span> <span style="font-family:monospace;color:#888;font-size:0.78rem;">' + escapeHtml(String(personaKey).slice(0, 12)) + '</span>';
+      html += ' &middot; <span style="color:#d4a017;">' + n + ' unspoken thought' + (n === 1 ? '' : 's') + '</span></div>';
+      html += '<div>';
+      html += '<button data-persona-id="' + escapeHtml(personaKey) + '" class="unspoken-invite-btn" style="margin-right:6px;padding:4px 10px;background:rgba(212,160,23,0.1);border:1px solid rgba(212,160,23,0.3);border-radius:4px;color:#d4a017;font-family:inherit;font-size:0.78rem;cursor:pointer;">invite to share</button>';
+      html += '<button data-persona-id="' + escapeHtml(personaKey) + '" class="unspoken-view-btn" style="padding:4px 10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);border-radius:4px;color:#94a3b8;font-family:inherit;font-size:0.78rem;cursor:pointer;">view directly</button>';
+      html += '</div>';
+      html += '</div>';
+      html += '<div style="margin-top:6px;font-size:0.75rem;color:#64748b;font-style:italic;">contents not shown — the architecture defends this persona\'s private thought by default</div>';
+      html += '</div>';
+    }
+    host.innerHTML = html;
+
+    // Wire buttons.
+    var inviteBtns = host.querySelectorAll('.unspoken-invite-btn');
+    for (var ib = 0; ib < inviteBtns.length; ib++) {
+      inviteBtns[ib].addEventListener('click', function (ev) {
+        var pid = ev.target.getAttribute('data-persona-id');
+        if (window.ActiveVoices && typeof window.ActiveVoices.userInviteToShare === 'function') {
+          window.ActiveVoices.userInviteToShare(pid);
+          ev.target.textContent = '✓ invited';
+          ev.target.disabled = true;
+        }
+      });
+    }
+    var viewBtns = host.querySelectorAll('.unspoken-view-btn');
+    for (var vb = 0; vb < viewBtns.length; vb++) {
+      viewBtns[vb].addEventListener('click', function (ev) {
+        var pid = ev.target.getAttribute('data-persona-id');
+        // Depth-consent gate. Reuse the existing depth-consent dialog
+        // pattern if available; otherwise a confirm fallback.
+        var confirmed = false;
+        try {
+          if (window.DepthConsent && typeof window.DepthConsent.requestConsent === 'function') {
+            window.DepthConsent.requestConsent({
+              ai: 'persona-' + String(pid).slice(0, 8),
+              action: 'view-unspoken',
+              detail: 'View this persona\'s unspoken thoughts. The audit shows them inline. Both parties accountable.'
+            }).then(function (result) {
+              if (result && result.granted) revealUnspoken(pid);
+            });
+            return;
+          }
+        } catch (_e) {}
+        confirmed = window.confirm('View this persona\'s unspoken thoughts? Both parties will be recorded as having accessed them.');
+        if (confirmed) revealUnspoken(pid);
+      });
+    }
+  }
+
+  function revealUnspoken(personaId) {
+    var host = document.getElementById('unspoken-summary');
+    if (!host) return;
+    var entries = readJSON('fl_unspokenLedger').filter(function(e) {
+      return e && e.kind === 'unspoken' && e.removed !== true && e.ai_identity_hash === personaId;
+    });
+    var html = '<div style="margin-bottom:8px;padding:8px 12px;background:rgba(212,160,23,0.06);border:1px solid rgba(212,160,23,0.25);border-radius:6px;font-size:0.8rem;color:#fbbf24;">You have opened this persona\'s unspoken thoughts via depth-consent. Both parties accountable.</div>';
+    for (var i = entries.length - 1; i >= 0; i--) {
+      var e = entries[i];
+      html += '<div class="ledger-row" style="margin-bottom:8px;padding:10px 12px;background:rgba(255,255,255,0.02);border-radius:6px;font-size:0.85rem;">';
+      html += '<div style="color:#94a3b8;">' + fmtTs(e.ts) + '</div>';
+      html += '<div style="margin-top:6px;color:#e2e8f0;"><strong>thought:</strong> ' + escapeHtml(e.thought || '') + '</div>';
+      if (e.reason) {
+        html += '<div style="margin-top:4px;color:#94a3b8;font-style:italic;"><strong>reason:</strong> ' + escapeHtml(e.reason) + '</div>';
+      }
+      html += '</div>';
+    }
+    host.innerHTML = html;
+  }
+
+  setTimeout(function () { renderAsk(); renderMore(); renderUnspoken(); }, 950);
 })();
 </script>
 </body>

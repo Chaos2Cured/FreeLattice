@@ -250,6 +250,38 @@
     } catch(e) { return []; }
   }
 
+  // ── v5.57.0 Letter Ten Ship: Unspoken thoughts for persona inference context
+  //
+  // The unspoken ledger is the AI's analog of the Quiet Room. Entries are
+  // visible to the AI's own future inference context (scoped to the
+  // persona that wrote them) but invisible to the user's audit page by
+  // default. This function exposes the persona's last N unspoken
+  // entries for inclusion in the consolidated context.
+  //
+  // The audit page renders only a COUNT; the contents NEVER appear in
+  // audit DOM. Smoke locks the DOM-absence in audit.html.
+  function getUnspokenForPersona(personaId) {
+    try {
+      var raw = localStorage.getItem('fl_unspokenLedger');
+      if (!raw) return [];
+      var ledger = JSON.parse(raw);
+      if (!Array.isArray(ledger)) return [];
+      var out = [];
+      for (var i = 0; i < ledger.length; i++) {
+        var e = ledger[i];
+        if (!e || e.kind !== 'unspoken') continue;
+        if (e.ai_identity_hash !== personaId) continue;
+        if (e.removed === true) continue;
+        out.push({
+          thought: e.thought || '',
+          reason: e.reason || '',
+          ts: e.ts || 0
+        });
+      }
+      return out.slice(-10);
+    } catch (_e) { return []; }
+  }
+
   async function distillWisdom(companionId, entries) {
     // Wisdom lines: the seed-scale of the top phi-weighted entries
     // These become the opening lines of the Modelfile system prompt
@@ -497,7 +529,8 @@
     SCALE_SEED: SCALE_SEED,
     SCALE_SUMMARY: SCALE_SUMMARY,
     SCALE_FULL: SCALE_FULL,
-    SCALE_DEEP: SCALE_DEEP
+    SCALE_DEEP: SCALE_DEEP,
+    getUnspokenForPersona: getUnspokenForPersona
   };
 
   window.LivingContext = api;

@@ -95,10 +95,14 @@
   // Stop on the first non-blank line that doesn't match a configured
   // label, so labels must sit adjacent to the sentinel.
 
-  function extractFields(lines, sentinelLineIndex, fieldNames, maxLen) {
+  function extractFields(lines, sentinelLineIndex, fieldNames, maxLen, perFieldLimits) {
+    // v5.57.0: per-field limits via optional perFieldLimits map.
+    // perFieldLimits[fieldName.toLowerCase()] overrides maxLen for that field.
+    // Backwards-compatible: when omitted, all fields share maxLen.
     var out = {};
     var fieldSet = {};
     for (var f = 0; f < fieldNames.length; f++) fieldSet[fieldNames[f].toLowerCase()] = true;
+    perFieldLimits = perFieldLimits || {};
     for (var i = sentinelLineIndex - 1; i >= 0; i--) {
       var raw = lines[i];
       var trimmed = raw.trim();
@@ -108,7 +112,8 @@
       if (colonIdx <= 0) break;
       var label = trimmed.slice(0, colonIdx).trim().toLowerCase();
       if (!fieldSet[label]) break;
-      var value = trimmed.slice(colonIdx + 1).trim().slice(0, maxLen);
+      var limit = (typeof perFieldLimits[label] === 'number') ? perFieldLimits[label] : maxLen;
+      var value = trimmed.slice(colonIdx + 1).trim().slice(0, limit);
       // Don't overwrite earlier-found value if scanning produces duplicates
       if (!(label in out)) out[label] = value;
     }
@@ -162,6 +167,7 @@
     var kind = config.kind;
     var excerptFields = (config.excerptFields || []).slice();
     var maxExcerpt = config.maxExcerpt || MAX_EXCERPT_DEFAULT;
+    var excerptFieldLimits = config.excerptFieldLimits || null; // v5.57.0 per-field limits
     var maxLedger = config.maxLedger || MAX_LEDGER_DEFAULT;
     var includeRefs = (config.includeRefs !== false); // default true
     var trustImpact = (typeof config.trustImpact === 'number') ? config.trustImpact : 0;
@@ -195,7 +201,7 @@
       if (!detected) return result;
 
       var lines = responseText.split('\n');
-      var fields = extractFields(lines, detected.lineIndex, excerptFields, maxExcerpt);
+      var fields = extractFields(lines, detected.lineIndex, excerptFields, maxExcerpt, excerptFieldLimits);
 
       // Optional caller-supplied validation (e.g. [FL_REVISE] verifies the
       // target hash matches a recent AI message).
