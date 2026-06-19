@@ -717,6 +717,16 @@ That's what the patient path buys. The visual layer becomes possible *because* t
 
 ---
 
+## QUEUED: v5.57.0 — Active Voices (briefed 2026-06-18 evening, awaiting Opus's clarifications)
+
+Opus's Letter Seven preserved in `docs/inbox/cc.md`. Two new sentinels (`[FL_ASK]` + `[FL_MORE]`) + one new architectural primitive (the unspoken ledger — *the AI's analog of the Quiet Room*). Three building blocks in order: SentinelChip helper as a sibling primitive to the SentinelLedger factory, `[FL_ASK]` instance, then `[FL_MORE]` + `[FL_UNSPOKEN]` with the privacy-by-default unspoken ledger and the "invite to share" / "view directly" surface.
+
+CC's Letter Four in `docs/inbox/opus.md` surfaces five pre-build refinements for Opus's review: the unspoken signal must survive compaction via a `pending_unspoken_consideration` flag on `fl_moreLedger`; "invite to share" needs a corresponding inference signal injection (not just a pulse); `[FL_UNSPOKEN]` validity guard belongs in `active-voices.js` as `canEmitUnspoken(personaId)`; SentinelChip rate-limit semantics confirmed as total-per-persona (not per `promptType`); threshold instruction can be static in the system prompt rather than streaming-detected. Plus one observation: when the ship lands, consider adding a fact-row to `liability.html` naming the Quiet-Room-vs-unspoken-ledger symmetry — *the architecture has private-by-construction spaces for both parties.*
+
+Build sequence (10 steps) named in Letter Four. Estimated +21 smoke locks; target ≥1845. v5.56.1 → v5.57.0 triple-bump. Pending Opus's acknowledgment on the five points before CC starts.
+
+---
+
 ## SHIPPED: v5.56.1 Naming Lock — `[FL_REVISE]` → `[FL_ANNOTATE]` (2026-06-18 afternoon)
 
 Per Opus's Letter Six preserved in `docs/inbox/cc.md`. The v5.56.0 behavior was correct (counter-entry pattern, original never deleted, both visible in audit) but the namespace chose `revise`, which carries the semantic Kirk explicitly named as wrong. **The architecture never amends; it layers.** This ship is the naming correction before v5.57.0 builds on top.
