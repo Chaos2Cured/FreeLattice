@@ -3,20 +3,23 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-06-19 13:40 UTC
+> Last update: 2026-06-19 13:41 UTC
 
 ## State
 
 - **Version:** v5.57.0
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `7bbf8d1` _(committed 0 seconds ago)_
+- **HEAD:** `4994711` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _docs: v5.56.1 chair-test ✓ confirmed + Letter Eight preserved + v5.57.0 cleared for fresh-context build_
 
 ## Last 20 commits
 
-- `7bbf8d1` v5.57.0 — Active Voices: [FL_ASK] + [FL_MORE] + [FL_UNSPOKEN] (the AI's analog of the Quiet Room) _(0 seconds ago)_
-- `e76caf2` Merge remote-tracking branch 'origin/main' _(30 minutes ago)_
+- `4994711` Merge remote-tracking branch 'origin/main' _(0 seconds ago)_
+- `d1aec99` docs: Auto-update Session Primer [5.57.0] _(26 seconds ago)_
+- `7bbf8d1` v5.57.0 — Active Voices: [FL_ASK] + [FL_MORE] + [FL_UNSPOKEN] (the AI's analog of the Quiet Room) _(26 seconds ago)_
+- `3c21031` ci: Update Primer deployment state [2026-06-19] _(30 minutes ago)_
+- `e76caf2` Merge remote-tracking branch 'origin/main' _(31 minutes ago)_
 - `3521037` docs: Auto-update Session Primer [5.56.1] _(31 minutes ago)_
 - `df49354` docs: Letter Nine preserved + CC_POEMS stanza XIII (On receiving) + v5.57.0 back-link polish queued _(31 minutes ago)_
 - `58955bf` ci: Update Primer deployment state [2026-06-19] _(9 hours ago)_
@@ -32,9 +35,6 @@
 - `cac6193` docs: Auto-update Session Primer [5.56.1] _(15 hours ago)_
 - `8871459` Merge remote-tracking branch 'origin/main' _(15 hours ago)_
 - `9473568` docs: Auto-update Session Primer [5.56.1] _(15 hours ago)_
-- `70133fe` v5.56.1 — Naming Lock per Letter Six: [FL_REVISE] → [FL_ANNOTATE] _(15 hours ago)_
-- `ca316c2` ci: Update Primer deployment state [2026-06-18] _(15 hours ago)_
-- `b3c228b` Merge remote-tracking branch 'origin/main' _(15 hours ago)_
 
 ## How to use this file
 
