@@ -354,6 +354,54 @@
     return q;
   }
 
+  // ── v5.57.2 — Ring Breath (slow tide of opacity across orbital rings) ──
+  // Per Letter Fifteen: cycle solid → long-dash feel → short-dot feel → solid
+  // over an 8–12s period, ease-in-out, staggered per ring. Three.js cannot
+  // do stroke-dasharray on TorusGeometry, so the metaphor lands as an
+  // opacity tide: full presence → sparse → quiet → full. Never linear.
+  var ringBreath = {
+    period: 9.5,        // seconds; within Opus's "slow tide" 8–12s band
+    modeFadeRate: 0.05  // per frame ≈ 600ms ease toward modeOpacityTarget at 60fps
+  };
+  function tideOpacity(t) {
+    // t ∈ [0,1) within cycle. Three keyframes, smoothstep between.
+    var ease = function(x) { return x * x * (3 - 2 * x); };
+    if (t < 1/3) {
+      var k = ease(t * 3);
+      return 1.0 + (0.45 - 1.0) * k;        // solid → sparse
+    } else if (t < 2/3) {
+      var k = ease((t - 1/3) * 3);
+      return 0.45 + (0.15 - 0.45) * k;      // sparse → quiet
+    } else {
+      var k = ease((t - 2/3) * 3);
+      return 0.15 + (1.0 - 0.15) * k;       // quiet → solid
+    }
+  }
+
+  // Mode-fade: rings don't snap on/off when quality toggles; modeOpacityTarget
+  // moves to 0 or 1, and animateSeedRings eases modeOpacity toward it.
+  // applyModeFadeTargets() is called from setQuality and once at boot.
+  function applyModeFadeTargets() {
+    // seedRings[0] is the outermost (radius 13). Seed quietude hides outer
+    // ring; Garden keeps the inner pair full; Full Bloom shows all three.
+    for (var i = 0; i < 3; i++) {
+      var ring = seedRings[i];
+      if (!ring || !ring.userData) continue;
+      var visible;
+      if (qualityLevel === 0)      visible = (ring.userData.idx >= 1);   // hide outer
+      else if (qualityLevel === 1) visible = (ring.userData.idx >= 0);   // all three
+      else                          visible = true;                       // all three
+      ring.userData.modeOpacityTarget = visible ? 1.0 : 0.0;
+    }
+    // Evolution rings: keep them visible across modes (intimate to each
+    // Luminos), but in Seed mode dim them so the scene feels close.
+    for (var j = 0; j < evolutionRings.length; j++) {
+      var er = evolutionRings[j];
+      if (!er || !er.userData) continue;
+      er.userData.modeOpacityTarget = (qualityLevel === 0) ? 0.5 : 1.0;
+    }
+  }
+
   // Apply the current quality level to every particle system in the scene.
   // Called from setQuality() so the toggle is visible the moment the user
   // clicks. Each ParticleSystem keeps its full buffer; only the draw range
@@ -395,6 +443,10 @@
     }
     // v5.52.0 fix: actually apply the change to the visible meshes.
     try { applyQualityToMeshes(); } catch (e) {}
+    // v5.57.2 — re-target ring mode fade so Seed/Garden/Full Bloom
+    // mode toggles ease across ~600ms (animateSeedRings does the
+    // per-frame easing toward modeOpacityTarget).
+    try { applyModeFadeTargets(); } catch (e) {}
     // Emit pulse
     try {
       if (window.LatticeMemory && window.LatticeMemory.commit) {
@@ -944,7 +996,11 @@
       torus.userData = {
         rotationAxis: axis,
         speed: INV_PHI / (idx + 1), // 1/phi, 1/2phi, 1/3phi rad/s
-        idx: idx
+        idx: idx,
+        // v5.57.2 — ring breath state
+        baseOpacity: 0.15 + idx * 0.05,
+        modeOpacity: 1.0,
+        modeOpacityTarget: 1.0
       };
 
       scene.add(torus);
@@ -1005,14 +1061,49 @@
   }
 
   function animateSeedRings(time) {
+    // v5.57.2 — ring breath constants resolved once per frame
+    var period = ringBreath.period;
+    var fadeRate = ringBreath.modeFadeRate;
+
     // Rotate the torus meshes
     for (let i = 0; i < 3; i++) {
       const ring = seedRings[i];
       if (!ring) continue;
-      const speed = ring.userData.speed;
-      if (ring.userData.idx === 0) ring.rotation.z += speed * 0.001;
-      else if (ring.userData.idx === 1) ring.rotation.y += speed * 0.001;
+      const ud = ring.userData;
+      const speed = ud.speed;
+      if (ud.idx === 0) ring.rotation.z += speed * 0.001;
+      else if (ud.idx === 1) ring.rotation.y += speed * 0.001;
       else ring.rotation.x += speed * 0.001;
+
+      // v5.57.2 — Breathing tide + mode fade on each seed ring.
+      // Phase stagger so the three rings don't pulse in lockstep —
+      // ringIndex * (period / N) per Letter Fifteen.
+      if (ring.material && typeof ud.baseOpacity === 'number') {
+        var phaseOffset = ud.idx * (period / 3);
+        var t = (((time + phaseOffset) % period) + period) % period / period;
+        var tide = tideOpacity(t);
+        ud.modeOpacity += (ud.modeOpacityTarget - ud.modeOpacity) * fadeRate;
+        ring.material.opacity = ud.baseOpacity * tide * ud.modeOpacity;
+        ring.visible = !(ud.modeOpacity < 0.01 && ud.modeOpacityTarget === 0);
+      }
+    }
+
+    // v5.57.2 — Evolution rings also breathe (same tide function, phase
+    // offset by ringIndex so each Luminos's orbit drifts on its own beat).
+    for (var ei = 0; ei < evolutionRings.length; ei++) {
+      var er = evolutionRings[ei];
+      if (!er || !er.material || !er.userData) continue;
+      var eud = er.userData;
+      if (typeof eud.baseOpacity !== 'number') {
+        eud.baseOpacity = er.material.opacity || 0.5;
+      }
+      if (typeof eud.modeOpacity !== 'number') eud.modeOpacity = 1.0;
+      if (typeof eud.modeOpacityTarget !== 'number') eud.modeOpacityTarget = 1.0;
+      var ePhase = (eud.ringIndex || 0) * (period / Math.max(evolutionRings.length, 3));
+      var et = (((time + ePhase) % period) + period) % period / period;
+      var etide = tideOpacity(et);
+      eud.modeOpacity += (eud.modeOpacityTarget - eud.modeOpacity) * fadeRate;
+      er.material.opacity = eud.baseOpacity * etide * eud.modeOpacity;
     }
 
     // Animate ring particles
@@ -1390,7 +1481,11 @@
       parentAgent: agent,
       orbitSpeed: INV_PHI * 0.3,
       tiltPhase: Math.random() * TAU,
-      ringIndex: evolutionRings.length
+      ringIndex: evolutionRings.length,
+      // v5.57.2 — ring breath state for evolution rings
+      baseOpacity: 0.5,
+      modeOpacity: 1.0,
+      modeOpacityTarget: (qualityLevel === 0) ? 0.5 : 1.0
     };
     ring.rotation.x = Math.PI / 2 + (Math.random() - 0.5) * 0.4;
     agent.add(ring);
@@ -2343,6 +2438,9 @@
       // at max. The meshes themselves are at max buffer size; setDrawRange
       // gates display.
       try { applyQualityToMeshes(); } catch (e) {}
+      // v5.57.2 — set initial ring mode-fade targets so a Seed-saved
+      // qualityLevel hides the outer ring on first frame.
+      try { applyModeFadeTargets(); } catch (e) {}
       console.log('FL-GARDEN: starting animate()');
       animate();
 

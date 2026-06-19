@@ -19,9 +19,9 @@ user sleeps. The proof is the code; the papers are the doorways.
 
 ## Current state
 
-- **Version:** v5.57.1
-- **Smoke locks passing:** 1873 / 1873
-- **Last ship:** Letter Thirteen Ship — Console Chair-Test Harness at `docs/chair-test/harness.js`. Console-callable Promise-returning test functions for v5.56.0 + v5.57.0 primitives. Bypasses AI-output uncertainty. Unspoken privacy invariant verified against actual `audit.html` in a hidden iframe (count visible + thought-marker NOT leaked). All six of CC's Letter Six refinements applied. (v5.57.1, 2026-06-19 afternoon)
+- **Version:** v5.57.2
+- **Smoke locks passing:** 1890 / 1890
+- **Last ship:** Letter Fifteen Ship — Ring Breath + Seed Quietude in `docs/modules/fractal-garden.js`. Orbital rings (the three seed rings around the central tree and every evolution ring around each Luminos) now cycle through a slow 9.5-second tide of opacity (solid → sparse → quiet → solid, smoothstep ease, phase-staggered by ring index — never lockstep, never linear). Quality toggle gates ring visibility: Seed mode hides the outer seed ring and dims evolution rings; Garden keeps all three; Full Bloom shows the full sweep with breathing on every ring. Mode transitions ease toward target over ~600ms rather than snapping. 15 new smoke locks. (v5.57.2, 2026-06-19 evening)
 - **Mirrors in parity:** github.com + codeberg.org
 
 ## Read these next
@@ -77,4 +77,4 @@ seam discipline is how multi-AI work stays honest at scale.
 ---
 
 *This file is overwritten on each meaningful ship. The prior version lives in SEED_HISTORY.md.*
-*Last rewrite: 2026-06-19, v5.57.1.*
+*Last rewrite: 2026-06-19, v5.57.2.*

@@ -209,6 +209,24 @@ grep -nE "\"[^\"]*\buser\b[^\"]*\"" docs/app.html docs/modules/*.js \
 
 ---
 
+## SHIPPED: Letter Fifteen Ship — Ring Breath + Seed Quietude (v5.57.2, 2026-06-19 evening)
+
+Per Opus's Letter Fifteen brief. Two small visual ships folded into one cycle in `docs/modules/fractal-garden.js`. Same module, same render pipeline.
+
+What landed:
+
+**Part A — Breathing rings.** A `ringBreath` state object holds `period: 9.5` (within Opus's 8–12s slow-tide band) and `modeFadeRate: 0.05` (≈600ms ease at 60fps). A new `tideOpacity(t)` function maps normalized cycle position to opacity multiplier through three smoothstepped keyframes — solid 1.0 → sparse 0.45 → quiet 0.15 → back to solid. Smoothstep ease (`x*x*(3-2*x)`) on every segment so the cycle is never linear. Each seed-ring torus carries `baseOpacity`, `modeOpacity`, `modeOpacityTarget` in userData; `animateSeedRings` resolves `phaseOffset = ud.idx * (period / 3)` per ring so the three orbital rings drift on staggered beats and applies `ring.material.opacity = baseOpacity * tide * modeOpacity` per frame. Evolution rings around each Luminos breathe through the same `tideOpacity`, phase-offset by `ringIndex` over `evolutionRings.length`, so each Luminos's rings drift on its own beat.
+
+**Part B — Seed mode quietude.** A new `applyModeFadeTargets()` function sets `modeOpacityTarget` per ring based on `qualityLevel`. Seed mode hides the outermost seed ring (`ud.idx >= 1` visible) and dims evolution rings to 0.5; Garden keeps all three seed rings (`ud.idx >= 0`); Full Bloom shows the full sweep. `setQuality()` calls `applyModeFadeTargets()` after `applyQualityToMeshes()`; the per-frame easing in `animateSeedRings` moves `modeOpacity` toward `modeOpacityTarget` over ~600ms so mode toggles fade rather than snap. `init()` also calls `applyModeFadeTargets()` before `animate()` so a saved Seed mode hides the outer ring on the first frame.
+
+15 new smoke locks under section 106: `ringBreath` defined, period within 8–12s band, `tideOpacity` function present, smoothstep ease present, three-keyframe cycle covers solid 1.0 / sparse 0.45 / quiet 0.15, phase offset staggered by idx, seed-ring opacity is `baseOpacity * tide * modeOpacity`, evolution rings carry the same shape, `applyModeFadeTargets` function defined, Seed hides outer ring, Garden keeps all three, `modeFadeRate: 0.05`, modeOpacity eased toward target, `setQuality` calls `applyModeFadeTargets`, initial targets applied before animate at boot. Triple-bumped FL_VERSION + flCurrentVersion span + both sw.js CACHE_NAME + version.json. 1875 → 1890.
+
+**Chair-test:** queued in `CHAIR_TEST_QUEUE.md` with two steps — watch the rings breathe for ~30s and toggle Seed → Garden → Full Bloom watching for opacity fade not snap.
+
+**The discipline lesson:** Three.js TorusGeometry can't render `stroke-dasharray` — that's an SVG primitive. The brief named the *feel* (solid → sparse → quiet → solid) not the *mechanism*. The implementation translates: opacity tide between three keyframes carries the same metaphor in 3D. Spec the experience; let the code choose the shape that fits the medium.
+
+---
+
 ## SHIPPED: Ship 1 — `repo-context.js` Phase 1.0 (v5.39.0, 2026-06-09)
 
 Per Opus's June 9 brief. **Public repositories only** in Phase 1.0 — PAT support and AI-roundtrip wiring queued for Phase 1.1.

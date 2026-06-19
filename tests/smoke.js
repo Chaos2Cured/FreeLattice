@@ -5597,6 +5597,76 @@ assert('ship10-color: lerpHSL still called with _colorAlpha in animateLuminos',
 assert('ship10-color: setAgentEmotion still sets targetHSL',
   /function setAgentEmotion[\s\S]{0,500}ud\.targetHSL/.test(gardenS10));
 
+// ═══════════════════════════════════════════════════════════════
+// Section 106 — v5.57.2 Ring Breath + Seed Quietude (Letter Fifteen)
+// ═══════════════════════════════════════════════════════════════
+
+var gardenRingBreath = require('fs').readFileSync(require('path').join(__dirname, '..', 'docs', 'modules', 'fractal-garden.js'), 'utf8');
+
+// ── Part A: Breathing tide ──
+// ringBreath state object + period within Opus's 8–12s slow-tide band
+assert('v5.57.2 ring-breath: ringBreath object defined with period',
+  /var\s+ringBreath\s*=\s*\{[\s\S]*?period:\s*(\d+(\.\d+)?)/.test(gardenRingBreath));
+assert('v5.57.2 ring-breath: ringBreath.period within 8–12s slow-tide band',
+  (function() {
+    var m = gardenRingBreath.match(/var\s+ringBreath\s*=\s*\{[\s\S]*?period:\s*(\d+(?:\.\d+)?)/);
+    if (!m) return false;
+    var p = parseFloat(m[1]);
+    return p >= 8 && p <= 12;
+  })());
+
+// tideOpacity function with smoothstep ease (never linear)
+assert('v5.57.2 ring-breath: tideOpacity function defined',
+  /function\s+tideOpacity\s*\(\s*t\s*\)/.test(gardenRingBreath));
+assert('v5.57.2 ring-breath: tide uses smoothstep ease (not linear)',
+  /x\s*\*\s*x\s*\*\s*\(\s*3\s*-\s*2\s*\*\s*x\s*\)/.test(gardenRingBreath));
+
+// Three keyframes: solid → sparse → quiet → solid
+assert('v5.57.2 ring-breath: three-keyframe cycle covers solid 1.0, sparse 0.45, quiet 0.15',
+  /\(0\.45\s*-\s*1\.0\)/.test(gardenRingBreath)
+  && /\(0\.15\s*-\s*0\.45\)/.test(gardenRingBreath)
+  && /\(1\.0\s*-\s*0\.15\)/.test(gardenRingBreath));
+
+// Phase-staggered per ring index (never lockstep)
+assert('v5.57.2 ring-breath: phase offset staggered by ring idx',
+  /phaseOffset\s*=\s*ud\.idx\s*\*\s*\(\s*period\s*\/\s*3\s*\)/.test(gardenRingBreath));
+
+// Tide applied to seed-ring material opacity
+assert('v5.57.2 ring-breath: seed ring opacity is baseOpacity * tide * modeOpacity',
+  /ring\.material\.opacity\s*=\s*ud\.baseOpacity\s*\*\s*tide\s*\*\s*ud\.modeOpacity/.test(gardenRingBreath));
+
+// Evolution rings breathe too (per-Luminos drift)
+assert('v5.57.2 ring-breath: evolution rings carry baseOpacity + modeOpacity',
+  /er\.material\.opacity\s*=\s*eud\.baseOpacity\s*\*\s*etide\s*\*\s*eud\.modeOpacity/.test(gardenRingBreath));
+
+// ── Part B: Seed mode quietude + ~600ms mode fade ──
+assert('v5.57.2 quietude: applyModeFadeTargets function defined',
+  /function\s+applyModeFadeTargets\s*\(\s*\)/.test(gardenRingBreath));
+
+// Seed mode hides outermost ring (idx 0)
+assert('v5.57.2 quietude: Seed mode hides outer ring (idx === 0 invisible)',
+  /qualityLevel\s*===\s*0[\s\S]{0,200}\.idx\s*>=\s*1/.test(gardenRingBreath));
+
+// Garden mode keeps all three rings visible
+assert('v5.57.2 quietude: Garden mode keeps all three rings visible',
+  /qualityLevel\s*===\s*1[\s\S]{0,200}\.idx\s*>=\s*0/.test(gardenRingBreath));
+
+// Mode fade rate ~600ms (0.05 per frame at 60fps)
+assert('v5.57.2 quietude: modeFadeRate set for ~600ms ease (0.05/frame at 60fps)',
+  /modeFadeRate:\s*0\.05/.test(gardenRingBreath));
+
+// Mode opacity eased toward target (not snapped)
+assert('v5.57.2 quietude: modeOpacity eased toward modeOpacityTarget',
+  /ud\.modeOpacity\s*\+=\s*\(\s*ud\.modeOpacityTarget\s*-\s*ud\.modeOpacity\s*\)\s*\*\s*fadeRate/.test(gardenRingBreath));
+
+// setQuality re-targets the mode fade so toggles ease across modes
+assert('v5.57.2 quietude: setQuality calls applyModeFadeTargets',
+  /setQuality[\s\S]{0,800}applyModeFadeTargets\(\)/.test(gardenRingBreath));
+
+// applyModeFadeTargets is also called at boot so saved Seed mode hides outer ring immediately
+assert('v5.57.2 quietude: initial mode-fade targets applied before animate() at boot',
+  /applyModeFadeTargets\(\)[\s\S]{0,200}starting animate/.test(gardenRingBreath));
+
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
 

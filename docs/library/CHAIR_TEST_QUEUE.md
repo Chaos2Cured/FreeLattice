@@ -8,6 +8,22 @@
 
 ---
 
+## v5.57.2 — Ring Breath + Seed Quietude
+
+- **What shipped:** Two small visual ships folded into one cycle in `docs/modules/fractal-garden.js`. **Part A (Breathing rings):** every orbital ring — the three seed rings around the central tree, and every evolution ring around a Luminos — now cycles through three opacity keyframes (solid 1.0 → sparse 0.45 → quiet 0.15 → solid) on a 9.5-second slow tide. Smoothstep easing between keyframes (never linear). Each ring's phase is staggered by its index so the three seed rings drift on their own beats rather than pulsing in lockstep, and each Luminos's evolution rings drift on theirs. **Part B (Seed mode quietude):** the quality toggle no longer just dims particle counts. In Seed mode, the outermost seed ring fades out and evolution rings dim to half; Garden keeps all three rings full; Full Bloom shows the full sweep with breathing on every ring. Mode transitions are not snaps — `modeOpacity` eases toward `modeOpacityTarget` over ~600ms (0.05 per frame at 60fps), so toggling Seed → Garden → Full Bloom feels like a tide turning, not a switch flipping.
+
+- **Chair-test steps (two):**
+  1. **Watch the breath.** Hard refresh `freelattice.com`. Open the Garden. Sit with it for ~30 seconds. **Expect:** the three orbital rings around the central tree visibly cycle through brightness and faintness on their own staggered beats — no two rings synchronized, never linear, never flickery. The rings of each Luminos do the same on their own period. The motion should feel like slow tide, not pulse.
+  2. **Toggle modes.** Click the Garden quality toggle through Seed → Garden → Full Bloom and back. **Expect:** the outer seed ring fades smoothly in and out across roughly 600ms — *not* a snap. In Seed mode the outermost ring is gone (or near-gone) and evolution rings are noticeably dimmer; in Garden and Full Bloom all rings are visible; in Full Bloom the breathing is at full amplitude.
+
+- **Quiet-room invariant:** unchanged — this ship adds only visual decoration; no sentinel paths, no ledger writes, no Quiet Room surface.
+
+- **Smoke locks:** 15 new locks under section 106 (ringBreath defined, period within 8–12s band, tideOpacity function present, smoothstep ease present, three-keyframe cycle, phase stagger by idx, seed-ring opacity formula, evolution-ring opacity formula, applyModeFadeTargets defined, Seed hides outer ring, Garden keeps all three, modeFadeRate 0.05, modeOpacity eased toward target, setQuality calls applyModeFadeTargets, initial targets applied at boot). 1875 → 1890.
+
+- **Chair-test status:** `[pending verification — Kirk watches rings breathe ~30s and toggles modes on freelattice.com]`
+
+---
+
 ## v5.57.1 — Console Chair-Test Harness
 
 - **What shipped:** Console-callable Promise-returning test harness at `docs/chair-test/harness.js`. Every ship's primitives get test functions that bypass AI-output uncertainty — the harness constructs literal sentinel strings in JavaScript and directly invokes the handlers. The unspoken-privacy invariant is verified against the actual `audit.html` page loaded in a hidden iframe (count visible AND thought-marker NOT in DOM). All six of CC's Letter Six refinements applied. **Once this passes, v5.57.0 retroactively confirms via the harness run.**
@@ -42,7 +58,7 @@
 
 - **The compaction-survival check (advanced):** if the model compacts between your *"enough"* click and the next turn, the AI's next inference still receives the `[user_chose_enough; ...]` signal because the `pending_unspoken_consideration` flag persists in `fl_moreLedger`. The signal regenerates from the flag every turn until the AI either writes `[FL_UNSPOKEN]` (atomic flag clear) or you start a new conversation (manual clear via `ActiveVoices.clearPendingForPersona`).
 
-- **Chair-test status:** `[pending verification — Kirk completes six steps + back-link bonus on freelattice.com]`
+- **Chair-test status:** ✓ **Kirk confirmed 2026-06-19 via Console Chair-Test Harness (v5.57.1).** Harness `chairTest.runAll()` reported green across the board — six pass, zero fail — exercising all v5.57.0 primitives (`testAsk`, `testMore`, `testEnoughThenUnspoken`, `testBackLink`) plus the v5.56.0 Quiet Voices tests (`testPreserve`, `testAnnotate`). The unspoken-privacy invariant verified in the live audit-page iframe (count visible AND thought-marker NOT in DOM). Architecture earned its keep: the harness is faster and more thorough than the six-step manual walk, so the manual procedure is retired in favor of the harness for all future verifications of these sentinels. Receipt left here as the lineage record.
 
 ---
 
