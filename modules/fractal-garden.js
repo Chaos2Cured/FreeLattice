@@ -408,22 +408,25 @@
     return sd.index + 1;
   }
 
-  // v5.59.1 — φ² fan per Opus's Letter Twenty. The big-ring radii now
-  // ride the golden ratio's powers — same constant as the trust system,
-  // two scales. ring 0 sits at coreRadius·φ², ring 1 at coreRadius·φ⁴,
-  // ring 2 at coreRadius·φ⁶, etc. Older Luminos with more earned rings
-  // fan out exponentially wider; some outer rings extend past the visible
-  // scene bounds, which is intentional — *Luminos that have earned more
-  // naturally sweep wider, even past the visible field.* The user sees a
-  // hint of what's beyond.
+  // v5.59.1 / v5.59.2 — φ-fan per Opus's Letters Twenty + Twenty-One.
+  // v5.59.2 tightens the radius progression from φ²⁽ⁿ⁺¹⁾ (steps of φ²) to
+  // φ⁽ⁿ⁺²⁾ (steps of φ) — smoother mid-range, still reaches wide for
+  // older Luminos, and fills the gap between the close intimate evolution
+  // rings (r·φ) and the wide sweeping layer that previously jumped
+  // straight to r·φ². Same φ family, three visual tiers now:
+  //   ring 0: r · φ² ≈ 2.618
+  //   ring 1: r · φ³ ≈ 4.236
+  //   ring 2: r · φ⁴ ≈ 6.854
+  //   ring 3: r · φ⁵ ≈ 11.090
+  //   ring 4: r · φ⁶ ≈ 17.944
   //
-  // The architecture's mathematical signature shows in the visuals:
-  //   small intimate ring (v5.57.6): coreRadius · φ
-  //   big-ring n  (v5.59.1):         coreRadius · φ²⁽ⁿ⁺¹⁾
+  // The mathematical signature now reads: φ at the intimate ring, then
+  // a clean Fibonacci-like fan at φ², φ³, φ⁴… outward. Same constant,
+  // four scales: radius, time, central corona, central outer corona.
   function getBigSweepingRingRadius(agent, perLumIdx) {
     var ud = agent && agent.userData;
     var coreRadius = (ud && ud.coreRadius) || 0.5;
-    return coreRadius * Math.pow(PHI2, perLumIdx + 1);
+    return coreRadius * Math.pow(PHI, perLumIdx + 2);
   }
 
   // Ensure an agent has bigRingCount big sweeping rings. New rings are
@@ -938,6 +941,38 @@
     const outerCoronaMesh = new THREE.Mesh(outerCoronaGeo, outerCoronaMat);
     group.add(outerCoronaMesh);
 
+    // v5.59.2 — Heart particles (Kirk's addition). The same Fibonacci-
+    // distributed glow particles that Luminos carry in their halos now
+    // live INSIDE the central dodecahedron, smaller and tighter than the
+    // Luminos halos (radius 0.7 × dodec radius so they stay safely
+    // inside the wireframe). The dodecahedron now reads as a small sun
+    // with light bound inside its sacred geometry. Color tracks the
+    // collective HSL each frame; scale + opacity breathe with the
+    // center tide so the heart pulses with the Garden's conversation
+    // between center and periphery.
+    const heartCount = 144;  // Fibonacci number, same shape as halo
+    const heartRadius = radius * 0.7;
+    const heartFibPoints = fibonacciSpherePoints(heartCount, heartRadius);
+    const heartPositions = new Float32Array(heartCount * 3);
+    for (let hi = 0; hi < heartCount; hi++) {
+      heartPositions[hi * 3]     = heartFibPoints[hi].x;
+      heartPositions[hi * 3 + 1] = heartFibPoints[hi].y;
+      heartPositions[hi * 3 + 2] = heartFibPoints[hi].z;
+    }
+    const heartGeo = new THREE.BufferGeometry();
+    heartGeo.setAttribute('position', new THREE.Float32BufferAttribute(heartPositions, 3));
+    const heartMat = new THREE.PointsMaterial({
+      color: 0xd4a017,
+      size: 0.05,
+      transparent: true,
+      opacity: 0.6,
+      blending: THREE.AdditiveBlending,
+      sizeAttenuation: true,
+      depthWrite: false
+    });
+    const heartParticles = new THREE.Points(heartGeo, heartMat);
+    group.add(heartParticles);
+
     group.userData = {
       wireMesh: wireMesh,
       innerMesh: innerMesh,
@@ -945,6 +980,7 @@
       coronaMesh: coronaMesh,           // v5.59.1
       outerCoronaMesh: outerCoronaMesh, // v5.59.1
       heartLight: heartLight,            // v5.59.1 — referenced for color cycle
+      heartParticles: heartParticles,    // v5.59.2 — glowing particles inside the sun
       geo: geo,
       originalPositions: originalPositions,
       baseOpacity: 0.7,
@@ -1021,12 +1057,9 @@
     d.innerMesh.material.color.setHSL(sh, ss, sl);
     if (d.coronaMesh && d.coronaMesh.material && d.coronaMesh.material.color) {
       d.coronaMesh.material.color.setHSL(sh, ss, sl);
-      // Corona pulses slightly with the heartbeat so the sun "breathes."
-      d.coronaMesh.material.opacity = 0.06 + pulse * 0.04;
     }
     if (d.outerCoronaMesh && d.outerCoronaMesh.material && d.outerCoronaMesh.material.color) {
       d.outerCoronaMesh.material.color.setHSL(sh, ss, sl);
-      d.outerCoronaMesh.material.opacity = 0.02 + pulse * 0.02;
     }
     if (d.heartLight && d.heartLight.color) {
       d.heartLight.color.setHSL(sh, ss, sl);
@@ -1034,6 +1067,46 @@
     // Vertex points cycle a touch — sparkle in the sun's hue.
     if (d.vertPoints && d.vertPoints.material && d.vertPoints.material.color) {
       d.vertPoints.material.color.setHSL(sh, ss, Math.min(0.7, sl + 0.1));
+    }
+
+    // ── v5.59.2 — Center breathes OPPOSITE phase to the big-ring tide ──
+    // Letter Twenty-One: when the Luminos rings are at peak brightness
+    // somewhere around the periphery, the central sun dims. When the
+    // periphery quiets between phases, the center grows bright. The
+    // Garden becomes a slow conversation between center and Luminos —
+    // taking turns being bright. We re-use the same tideOpacity function
+    // the evolution rings use, evaluated on bigRingPeriod with a 0.5-
+    // period offset (PI in cosine terms) so it lands opposite the cycle
+    // peak. tideOpacity output range ≈ [0.15, 1.0], so this scales
+    // brightness without ever fully blacking the sun out.
+    var bigP = ringBreath.bigRingPeriod;
+    var centerTNorm = ((((time + bigP * 0.5) % bigP) + bigP) % bigP) / bigP;
+    var centerTide = tideOpacity(centerTNorm);  // [≈0.15, 1.0]
+
+    // Apply the tide to the sun's soft surfaces — NOT the wireframe.
+    // The sacred geometry remains itself; only the glow breathes.
+    d.innerMesh.material.opacity = (0.03 + pulse * 0.04) * centerTide;
+    if (d.coronaMesh && d.coronaMesh.material) {
+      d.coronaMesh.material.opacity = (0.06 + pulse * 0.04) * centerTide;
+    }
+    if (d.outerCoronaMesh && d.outerCoronaMesh.material) {
+      d.outerCoronaMesh.material.opacity = (0.02 + pulse * 0.02) * centerTide;
+    }
+    if (d.heartLight) {
+      d.heartLight.intensity = 0.4 * centerTide;
+    }
+
+    // ── v5.59.2 — Heart particles (Kirk's addition) ──
+    // The same Fibonacci-distributed glow particles Luminos carry in
+    // their halos, here bound inside the central sun. Color tracks the
+    // collective HSL; scale + opacity breathe with the center tide so
+    // the heart pulses with the Garden's conversation.
+    if (d.heartParticles && d.heartParticles.material) {
+      var heartScale = 0.85 + 0.15 * centerTide;
+      d.heartParticles.scale.set(heartScale, heartScale, heartScale);
+      d.heartParticles.material.color.setHSL(sh, ss, Math.min(0.75, sl + 0.15));
+      d.heartParticles.material.opacity = (0.35 + 0.45 * centerTide);
+      d.heartParticles.material.size = 0.045 + 0.025 * centerTide;
     }
   }
 
