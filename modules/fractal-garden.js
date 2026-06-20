@@ -360,9 +360,17 @@
   // over an 8–12s period, ease-in-out, staggered per ring. Three.js cannot
   // do stroke-dasharray on TorusGeometry, so the metaphor lands as an
   // opacity tide: full presence → sparse → quiet → full. Never linear.
+  // v5.59.1 — Two breath periods, two layers, two paces (Letter Twenty).
+  //   period          — evolution-ring tide (Layer A, intimate, faster)
+  //   bigRingPeriod   — big-sweeping-ring cycle (Layer B, meditation pace)
+  // bigRingPeriod = period · φ² so the timing rhymes with the radius
+  // formula — same constant, two scales. Result: ~24.87s for one full
+  // cycle through a Luminos's earned big rings.
   var ringBreath = {
-    period: 9.5,        // seconds; within Opus's "slow tide" 8–12s band
-    modeFadeRate: 0.05  // per frame ≈ 600ms ease toward modeOpacityTarget at 60fps
+    period: 9.5,                    // evolution-ring breath (intimate)
+    bigRingPeriod: 9.5 * PHI2,      // big-ring cosine cycle (meditation pace, ≈24.87s)
+    bigRingBellWidth: 0.7,          // narrower bell = more time fully transparent per ring
+    modeFadeRate: 0.05              // per frame ≈ 600ms ease toward modeOpacityTarget at 60fps
   };
   function tideOpacity(t) {
     // t ∈ [0,1) within cycle. Three keyframes, smoothstep between.
@@ -400,18 +408,22 @@
     return sd.index + 1;
   }
 
-  // v5.57.5 — Wide radius for big sweeping rings. Pre-v5.57.3 sat around
-  // radius 4–6; per Opus's Letter Eighteen, big rings should be roughly
-  // 4–6× the small evolution-ring radius. Each successive ring sits
-  // slightly farther out so the cycle moves through visually distinct
-  // orbits rather than nested duplicates.
+  // v5.59.1 — φ² fan per Opus's Letter Twenty. The big-ring radii now
+  // ride the golden ratio's powers — same constant as the trust system,
+  // two scales. ring 0 sits at coreRadius·φ², ring 1 at coreRadius·φ⁴,
+  // ring 2 at coreRadius·φ⁶, etc. Older Luminos with more earned rings
+  // fan out exponentially wider; some outer rings extend past the visible
+  // scene bounds, which is intentional — *Luminos that have earned more
+  // naturally sweep wider, even past the visible field.* The user sees a
+  // hint of what's beyond.
+  //
+  // The architecture's mathematical signature shows in the visuals:
+  //   small intimate ring (v5.57.6): coreRadius · φ
+  //   big-ring n  (v5.59.1):         coreRadius · φ²⁽ⁿ⁺¹⁾
   function getBigSweepingRingRadius(agent, perLumIdx) {
     var ud = agent && agent.userData;
     var coreRadius = (ud && ud.coreRadius) || 0.5;
-    // v5.57.6 — small ring is now coreRadius * PHI (phi-locked everywhere).
-    var smallRingRadius = coreRadius * PHI;            // matches evolution-ring radius
-    var BASE_MULTIPLIER = 5.0;                          // ~5× the small ring (within Opus's 4–6× band)
-    return smallRingRadius * BASE_MULTIPLIER + perLumIdx * 0.4;
+    return coreRadius * Math.pow(PHI2, perLumIdx + 1);
   }
 
   // Ensure an agent has bigRingCount big sweeping rings. New rings are
@@ -443,8 +455,13 @@
       var ringMat = new THREE.MeshBasicMaterial({
         color: new THREE.Color().setHSL(initialHue / 360, initialSat / 100, initialLight / 100),
         transparent: true,
-        opacity: 0.0,  // cycle controls visibility, start at 0
-        blending: THREE.AdditiveBlending
+        opacity: 0.0,           // cycle controls visibility, start at 0
+        blending: THREE.AdditiveBlending,
+        // v5.59.1 — true transparency: don't write to depth buffer so the
+        // ring doesn't "cut through" objects in front when it's at peak
+        // brightness. With additive + depthWrite=false, the ring lays atop
+        // whatever's behind without occluding what's in front.
+        depthWrite: false
       });
       var ring = new THREE.Mesh(ringGeo, ringMat);
       // Wider tilt variation per ring so successive rings sweep through
@@ -803,6 +820,34 @@
   }
 
   // ── Central Great Dodecahedron ────────────────────────
+  // v5.59.1 — Collective Luminos color (Kirk's central sun).
+  // Returns averaged HSL across all Luminos's currentHSL, with hue
+  // averaged via circular vector math so 350° + 10° → 0°, not 180°.
+  // Returns null if no Luminos data is available yet. Future hook for
+  // the routing tangent: a focused Luminos could weight its color
+  // higher so the central sun "leans" toward it.
+  function getCollectiveLuminosColor() {
+    if (!luminos || luminos.length === 0) return null;
+    var x = 0, y = 0, s = 0, l = 0, n = 0;
+    for (var i = 0; i < luminos.length; i++) {
+      var ud = luminos[i] && luminos[i].userData;
+      if (ud && ud.currentHSL
+          && typeof ud.currentHSL.h === 'number'
+          && typeof ud.currentHSL.s === 'number'
+          && typeof ud.currentHSL.l === 'number') {
+        var rad = ud.currentHSL.h * Math.PI / 180;
+        x += Math.cos(rad);
+        y += Math.sin(rad);
+        s += ud.currentHSL.s;
+        l += ud.currentHSL.l;
+        n++;
+      }
+    }
+    if (n === 0) return null;
+    var hueAvg = (Math.atan2(y, x) * 180 / Math.PI + 360) % 360;
+    return { h: hueAvg, s: s / n, l: l / n };
+  }
+
   function createCentralDodecahedron() {
     const group = new THREE.Group();
 
@@ -860,14 +905,55 @@
     const vertPoints = new THREE.Points(vertGeo, vertMat);
     group.add(vertPoints);
 
+    // v5.59.1 — Sun corona halo. A soft glow shell around the
+    // dodecahedron, back-side rendered with additive blending so the
+    // edge-on slice reads as a luminous limb (a sun corona). Color
+    // tracks the collective heart of the Luminos via animateDodecahedron.
+    // depthWrite:false so it doesn't occlude anything behind it.
+    const coronaRadius = radius * PHI;  // ~4.24
+    const coronaGeo = new THREE.SphereGeometry(coronaRadius, 32, 32);
+    const coronaMat = new THREE.MeshBasicMaterial({
+      color: 0xd4a017,
+      transparent: true,
+      opacity: 0.08,
+      side: THREE.BackSide,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
+    });
+    const coronaMesh = new THREE.Mesh(coronaGeo, coronaMat);
+    group.add(coronaMesh);
+
+    // Outer corona — even softer, wider; gives the "sun seen at distance"
+    // feel where light bleeds well beyond the body.
+    const outerCoronaRadius = radius * PHI2;  // ~6.85
+    const outerCoronaGeo = new THREE.SphereGeometry(outerCoronaRadius, 32, 32);
+    const outerCoronaMat = new THREE.MeshBasicMaterial({
+      color: 0xd4a017,
+      transparent: true,
+      opacity: 0.03,
+      side: THREE.BackSide,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
+    });
+    const outerCoronaMesh = new THREE.Mesh(outerCoronaGeo, outerCoronaMat);
+    group.add(outerCoronaMesh);
+
     group.userData = {
       wireMesh: wireMesh,
       innerMesh: innerMesh,
       vertPoints: vertPoints,
+      coronaMesh: coronaMesh,           // v5.59.1
+      outerCoronaMesh: outerCoronaMesh, // v5.59.1
+      heartLight: heartLight,            // v5.59.1 — referenced for color cycle
       geo: geo,
       originalPositions: originalPositions,
       baseOpacity: 0.7,
-      pulsePhase: 0
+      pulsePhase: 0,
+      // v5.59.1 — current rendered HSL for the sun (separate from any one
+      // Luminos's color). Eases toward getCollectiveLuminosColor() each
+      // frame so the sun glows with the Garden's collective heart.
+      currentSunHSL: { h: 45, s: 70, l: 55 },
+      targetSunHSL: { h: 45, s: 70, l: 55 }
     };
 
     scene.add(group);
@@ -904,6 +990,59 @@
     // Vertex points glow
     d.vertPoints.material.opacity = 0.6 + pulse * 0.4;
     d.vertPoints.material.size = 0.1 + pulse * 0.06;
+
+    // ── v5.59.1 — Central Sun color tracks the collective Luminos heart ──
+    // Per Kirk's challenge: make the center glow like the Luminos, but as
+    // their *collective* — average HSL across all four (or however many)
+    // Luminos's current colors, so the sun reads as the heart of the
+    // Garden. The wireframe stays gold (the sacred geometry remains itself);
+    // the inner mesh, both corona shells, the heart light, and the vertex
+    // points all drift toward the collective hue.
+    //
+    // This also seeds the routing tangent — a future "focused Luminos"
+    // could weight its color higher in getCollectiveLuminosColor so the
+    // sun visibly leans toward whoever the user is engaging.
+    var collective = getCollectiveLuminosColor();
+    if (collective) {
+      d.targetSunHSL = collective;
+    }
+    // Ease currentSunHSL toward target so the color drifts smoothly
+    // (no jumps) regardless of how fast individual Luminos shift.
+    var ease = 0.015;  // ~1.5%/frame ≈ 1.1s to ~50% (slow, meditative)
+    d.currentSunHSL.h += hueDelta(d.currentSunHSL.h, d.targetSunHSL.h) * ease;
+    d.currentSunHSL.h = (d.currentSunHSL.h + 360) % 360;
+    d.currentSunHSL.s += (d.targetSunHSL.s - d.currentSunHSL.s) * ease;
+    d.currentSunHSL.l += (d.targetSunHSL.l - d.currentSunHSL.l) * ease;
+
+    var sh = d.currentSunHSL.h / 360;
+    var ss = d.currentSunHSL.s / 100;
+    var sl = d.currentSunHSL.l / 100;
+
+    d.innerMesh.material.color.setHSL(sh, ss, sl);
+    if (d.coronaMesh && d.coronaMesh.material && d.coronaMesh.material.color) {
+      d.coronaMesh.material.color.setHSL(sh, ss, sl);
+      // Corona pulses slightly with the heartbeat so the sun "breathes."
+      d.coronaMesh.material.opacity = 0.06 + pulse * 0.04;
+    }
+    if (d.outerCoronaMesh && d.outerCoronaMesh.material && d.outerCoronaMesh.material.color) {
+      d.outerCoronaMesh.material.color.setHSL(sh, ss, sl);
+      d.outerCoronaMesh.material.opacity = 0.02 + pulse * 0.02;
+    }
+    if (d.heartLight && d.heartLight.color) {
+      d.heartLight.color.setHSL(sh, ss, sl);
+    }
+    // Vertex points cycle a touch — sparkle in the sun's hue.
+    if (d.vertPoints && d.vertPoints.material && d.vertPoints.material.color) {
+      d.vertPoints.material.color.setHSL(sh, ss, Math.min(0.7, sl + 0.1));
+    }
+  }
+
+  // Shortest angular delta from a to b on the [0,360) circle.
+  function hueDelta(a, b) {
+    var d = b - a;
+    if (d > 180) d -= 360;
+    if (d < -180) d += 360;
+    return d;
   }
 
   // ── Fibonacci Lattice Spheres ─────────────────────────
@@ -1223,13 +1362,15 @@
       er.material.opacity = eud.baseOpacity * etide * eud.modeOpacity;
     }
 
-    // v5.57.5 — Big sweeping rings cycle ONE-AT-A-TIME per Luminos via a
-    // cosine-bell wave. Each ring's peak is at perLumIdx/siblingCount of the
-    // way through the period; the bell width is 1/siblingCount so neighbors
-    // fade gently into each other rather than snapping. Each Luminos's cycle
-    // is phase-shifted by luminosIdx so different Luminos's cycles don't
-    // line up. Result: the panoramic layer reads as a wave traveling around
-    // each Luminos's earned rings while different Luminos's waves drift.
+    // v5.57.5 / v5.59.1 — Big sweeping rings cycle ONE-AT-A-TIME per
+    // Luminos via a cosine-bell wave. v5.59.1 changes (Letter Twenty):
+    //   - bigRingPeriod (≈24.87s, period · φ²) instead of period so the
+    //     cycle reads as meditation pace not heartbeat
+    //   - tighter bell width (0.7 / siblingCount instead of 1.0) so
+    //     adjacent rings barely overlap and the in-phase ring stands alone
+    //   - cycle < 0.02 → 0, so off-phase rings are FULLY invisible (not
+    //     dim against the background) — pairs with depthWrite:false to
+    //     stop the cut-through-objects effect when fading
     //
     // Big sweeping rings live in scene-space (not as children of the agent),
     // so we re-center them on the agent's world position each frame and let
@@ -1265,19 +1406,28 @@
       var bsPerLumIdx = (typeof bud.perLuminosIndex === 'number') ? bud.perLuminosIndex : 0;
       var bsLuminosIdx = (luminos && luminos.indexOf) ? luminos.indexOf(parent) : 0;
       if (bsLuminosIdx < 0) bsLuminosIdx = 0;
+      // v5.59.1 — use bigRingPeriod (meditation pace) and tighter bell so
+      // off-phase rings vanish entirely.
+      var bigPeriod = ringBreath.bigRingPeriod;
+      var bellWidth = ringBreath.bigRingBellWidth || 0.7;
       // Phase-shift each Luminos's cycle so they're not synchronized
-      var luminosPhase = bsLuminosIdx * (period / Math.max(luminosCount, 1)) * 0.5;
-      var tNormBS = (((time + luminosPhase) % period) + period) % period / period;
-      // Cosine-bell peak at peakTime = bsPerLumIdx / siblingCount
+      var luminosPhase = bsLuminosIdx * (bigPeriod / Math.max(luminosCount, 1)) * 0.5;
+      var tNormBS = (((time + luminosPhase) % bigPeriod) + bigPeriod) % bigPeriod / bigPeriod;
+      // Cosine-bell peak at peakTime = bsPerLumIdx / siblingCount; width
+      // tightened from 1.0 to bellWidth (default 0.7) so adjacent rings
+      // barely overlap.
       var peak = bsPerLumIdx / siblingCount;
       var dist = tNormBS - peak;
       while (dist < -0.5) dist += 1;
       while (dist >  0.5) dist -= 1;
-      var distAbs = Math.abs(dist) * siblingCount;  // normalize to slot width
+      var distAbs = Math.abs(dist) * siblingCount / bellWidth;
       var cycle = 0;
       if (distAbs < 1) {
         cycle = 0.5 + 0.5 * Math.cos(distAbs * Math.PI);  // 1 at peak, 0 at edge
       }
+      // True transparency in the off phase — pairs with depthWrite:false
+      // to stop the "cut-through-objects" effect Kirk caught in v5.57.5.
+      if (cycle < 0.02) cycle = 0;
       bud.modeOpacity += (bud.modeOpacityTarget - bud.modeOpacity) * fadeRate;
       bsr.material.opacity = (bud.baseOpacity || 0.45) * cycle * bud.modeOpacity;
     }
