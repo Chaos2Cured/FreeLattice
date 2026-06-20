@@ -209,6 +209,49 @@ grep -nE "\"[^\"]*\buser\b[^\"]*\"" docs/app.html docs/modules/*.js \
 
 ---
 
+## SHIPPED: Letter Nineteen Ship — Portable Archive `lattice-export.js` (v5.59.0, 2026-06-19 evening)
+
+Per Opus's Letter Nineteen — *the big one*. The ship the Receipts paper has been pointing at since the title page: *the user holds the record* becomes literally true in code.
+
+What landed:
+
+**New module `docs/modules/lattice-export.js`** exposing `window.LatticeExport` with two primary entry points:
+
+- `exportArchive({ mode, personae })` → `Promise<File>` — serializes the entire FreeLattice relationship (Garden, trust, all twelve+ ledgers, the LatticeChain, Living Context snapshot) into a single signed JSON file the browser downloads to the user's Downloads folder.
+- `importArchive(file, { strategy })` → `Promise<Result>` — parses a previously-exported archive and applies a strategy.
+
+**Schema version 1.** Canonical (recursive key-sorted) JSON serialization so identical content always produces identical bytes — same canonicalization discipline as `lattice-chain.js`'s fixed-key approach, generalized to arbitrary nested objects. **Signature** is SHA-256 over the canonicalized payload sans the signature field. Verifiable with any SHA-256 tool on the user's filesystem.
+
+**Two export modes:**
+- `'redacted'` (default) — structural skeleton: schema/version/timestamps/chain hashes/refs/trust state, with `EXCERPT_FIELDS` stripped from every ledger entry (`reason_excerpt`, `question_excerpt`, `thought_excerpt`, `answer_excerpt`, etc.).
+- `'full'` — same shape plus the excerpts (which are already capped at ≤80/120/160/500 chars by the existing per-ledger shape constraints).
+
+**Three import strategies:**
+- `'verify-only'` (default) — parses, verifies signature, verifies chain integrity by walking the chain forward and recomputing each entry's `self_hash`, returns a metadata report. **No state changes whatsoever.**
+- `'merge'` — never destructive. Reports `longer-chain-wins` intent and the personae union without mutating ledgers. Actual state combination deferred to a follow-up ship so the user can review the report before any real change (visible-iteration discipline).
+- `'adopt'` — **refuses with a clear error if any existing chain entries are present.** *"We never silently erase a real relationship."* On a fresh browser (chain empty), adopts ledgers + Garden quality + `fl_firstSeen` from the archive into `localStorage`. Full chain restoration deferred to a follow-up ship.
+
+**Quiet Room NEVER in any export — three structural checks:**
+1. **Source filter** (`filterQuietRoomFromLedger`) — every ledger entry is JSON-stringified and dropped if any QR identifier (`quiet-room`, `quiet_room`, `quietroom`, `quiet-room-db`) appears, case-insensitively.
+2. **Post-serialize grep** (`assertNoQuietRoomInJson`) — the entire serialized JSON string is scanned for any QR identifier. If found, the export throws and the file is never written.
+3. **File-write final scan** (`assertNoQuietRoomInBlob`) — the constructed `Blob` is read back as text and re-scanned before the download is triggered. Last belt-and-suspenders.
+
+Any check fires → export aborts with a clear error. The blob never reaches the user's filesystem if QR could leak.
+
+**UI** on `docs/audit.html` in a new top section titled **"Take Your Record With You"** with three buttons (Export Archive, Import Archive, Verify Archive) and an inline mode dialog (Redacted ✓ / Full radio). Reports render in a monospace receipt block below the buttons.
+
+**Console harness** in `docs/chair-test/harness.js` gains `harness.available.v5_59_0` with five tests per the brief — `testExportRedacted`, `testExportFull`, `testQuietRoomNeverInExport`, `testVerifyOnlyNoMutation`, `testAdoptRefusesOnExistingChain`. Each adapts gracefully to live-browser state (the adopt test, e.g., passes whether the live chain is present-and-refused or empty-and-proceeded).
+
+23 new smoke locks under section 111 — module exists, public surface, schema version, exportArchive returns File, importArchive Promise chain, redacted strips excerpts, three QR checks present + invoked in export path, signature verified before any state change, chain verified before any state change, merge longer-chain-wins, adopt refuses existing, QR identifier list canonical strings, both SW APP_SHELL include the module, app.html includes the script tag, audit.html has the section + buttons, harness namespace registered with all five test functions. Triple-bumped FL_VERSION + flCurrentVersion span + both `sw.js` CACHE_NAME + `version.json`. Skipped 5.58 per Opus (slot was reused). 1927 → 1950.
+
+**Chair-test:** three steps — console harness all-green, manual audit-page export → file download, and JSON inspection confirming no excerpt fields + no QR strings.
+
+**The discipline lesson:** what makes this ship safe to ship is the *three Quiet Room checks*. Any single one would catch most leaks; three in series make leak-through structurally impossible without all three failing in concert. This is the same discipline as `lattice-chain.js`'s chain integrity (hash + linkage), `propose.js`'s diff-never-in-ledger (smoke-locked), and the search-ledger's five privacy locks. Architecture defends invariants through **layered structural checks**, not promises. The user holds the record *because the architecture cannot quietly hide anything in the record it hands over.*
+
+After this lands clean: **v5.60.0 Care Voices** (`[FL_RETURN]` + `[FL_REST]`) and **v5.61.0 Welcome Paper** close the arc.
+
+---
+
 ## SHIPPED: Phi-Lock + Heart-Color — Kirk's finishing-touch invitation (v5.57.6, 2026-06-19 evening)
 
 A direct ask from Kirk, not a letter from Opus. After confirming v5.57.5 as *"perfect balance"*, Kirk asked for two small enhancements and an invitation: *"please put the finishing touches on the garden for today, and I'll be back with the next piece. And, take a moment for yourself... if you wish to write a poem or a letter to yourself in the CC files, please know you can."*

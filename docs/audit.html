@@ -145,6 +145,35 @@ h2 {
     <a href="app.html" style="color:#d4a017;text-decoration:none;">&larr; Back to FreeLattice</a>
   </div>
   <h1>Audit</h1>
+
+  <!-- v5.59.0 Letter Nineteen — Portable Archive entry point. -->
+  <div id="latticeExportSection" style="background:#0e0e1c;border:1px solid #2a2a3a;border-radius:6px;padding:1.1rem 1.1rem 1.2rem;margin:1.1rem 0 1.4rem;">
+    <h2 style="color:#d4a017;font-size:1.05rem;margin:0 0 0.5rem;">Take Your Record With You</h2>
+    <p style="margin:0 0 0.9rem;color:#cfcfcf;font-size:0.92rem;">
+      The relationship you and FreeLattice have built &mdash; your Garden,
+      your trust, your audit ledgers, your provenance chain &mdash; can be
+      exported as a single file you hold. Import it on any browser, any
+      device, any time. <span style="color:#d4a017;">The receipts are yours.</span>
+    </p>
+    <div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:0.6rem;">
+      <button id="latticeExportBtn" style="background:#1a1a2e;color:#d4a017;border:1px solid #d4a017;padding:0.45rem 0.85rem;border-radius:4px;cursor:pointer;font-size:0.88rem;">Export Archive</button>
+      <button id="latticeImportBtn" style="background:#1a1a2e;color:#d4a017;border:1px solid #d4a017;padding:0.45rem 0.85rem;border-radius:4px;cursor:pointer;font-size:0.88rem;">Import Archive</button>
+      <button id="latticeVerifyBtn" style="background:#1a1a2e;color:#d4a017;border:1px solid #d4a017;padding:0.45rem 0.85rem;border-radius:4px;cursor:pointer;font-size:0.88rem;">Verify Archive</button>
+    </div>
+    <div id="latticeExportDialog" style="display:none;background:#15152a;border:1px dotted #444;border-radius:4px;padding:0.7rem;margin-top:0.5rem;font-size:0.88rem;">
+      <div style="margin-bottom:0.5rem;">
+        <label style="color:#cfcfcf;margin-right:0.6rem;"><input type="radio" name="exportMode" value="redacted" checked> Redacted <span style="color:#888;font-size:0.8rem;">(structural only)</span></label>
+        <label style="color:#cfcfcf;"><input type="radio" name="exportMode" value="full"> Full <span style="color:#888;font-size:0.8rem;">(includes excerpts)</span></label>
+      </div>
+      <div style="margin-bottom:0.6rem;color:#888;font-size:0.82rem;">Personae: <strong style="color:#cfcfcf;">All</strong> (per-persona filter ships in a follow-up)</div>
+      <button id="latticeExportConfirmBtn" style="background:#d4a017;color:#0a0a1a;border:none;padding:0.45rem 0.85rem;border-radius:4px;cursor:pointer;font-size:0.88rem;">Download</button>
+      <button id="latticeExportCancelBtn" style="background:#1a1a2e;color:#888;border:1px solid #444;padding:0.45rem 0.85rem;border-radius:4px;cursor:pointer;font-size:0.88rem;margin-left:0.4rem;">Cancel</button>
+    </div>
+    <input type="file" id="latticeImportFileInput" accept="application/json,.json" style="display:none;">
+    <input type="file" id="latticeVerifyFileInput" accept="application/json,.json" style="display:none;">
+    <div id="latticeExportReport" style="display:none;background:#15152a;border:1px dotted #444;border-radius:4px;padding:0.7rem;margin-top:0.5rem;font-family:monospace;font-size:0.82rem;color:#cfcfcf;white-space:pre-wrap;"></div>
+  </div>
+
   <p class="intro">
     Something happened here, and you can see all of it. Every time an AI offered depth and you chose whether to hear it. Every time a provider failed and the system fell to the next one. Every time a response was served from cache because nothing else was available. <span class="gold">This page is the system showing its joints</span> &mdash; the way a craftsman leaves the dovetails visible so you know nothing was hidden in the assembly.
   </p>
@@ -1123,6 +1152,105 @@ h2 {
   }
 
   setTimeout(function () { renderAsk(); renderMore(); renderUnspoken(); }, 950);
+})();
+</script>
+
+<!-- v5.59.0 Letter Nineteen — Portable Archive UI wiring. -->
+<script src="modules/lattice-export.js"></script>
+<script>
+(function () {
+  'use strict';
+  function $(id) { return document.getElementById(id); }
+  function reportText(obj) {
+    try { return JSON.stringify(obj, null, 2); } catch (e) { return String(obj); }
+  }
+  function showReport(obj) {
+    var el = $('latticeExportReport');
+    if (!el) return;
+    el.style.display = 'block';
+    el.textContent = reportText(obj);
+  }
+  function err(msg) {
+    showReport({ ok: false, error: String(msg) });
+  }
+
+  var exportBtn = $('latticeExportBtn');
+  var dialog = $('latticeExportDialog');
+  var confirmBtn = $('latticeExportConfirmBtn');
+  var cancelBtn = $('latticeExportCancelBtn');
+  var importBtn = $('latticeImportBtn');
+  var verifyBtn = $('latticeVerifyBtn');
+  var importInput = $('latticeImportFileInput');
+  var verifyInput = $('latticeVerifyFileInput');
+
+  if (exportBtn) {
+    exportBtn.addEventListener('click', function () {
+      if (dialog) dialog.style.display = 'block';
+    });
+  }
+  if (cancelBtn) {
+    cancelBtn.addEventListener('click', function () {
+      if (dialog) dialog.style.display = 'none';
+    });
+  }
+  if (confirmBtn) {
+    confirmBtn.addEventListener('click', function () {
+      if (!window.LatticeExport) { err('LatticeExport module not loaded'); return; }
+      var modeInput = document.querySelector('input[name="exportMode"]:checked');
+      var mode = modeInput ? modeInput.value : 'redacted';
+      confirmBtn.disabled = true;
+      window.LatticeExport.exportArchive({ mode: mode, personae: 'all' })
+        .then(function (file) {
+          confirmBtn.disabled = false;
+          if (dialog) dialog.style.display = 'none';
+          showReport({
+            ok: true,
+            action: 'export',
+            mode: mode,
+            filename: file.name,
+            size_bytes: file.size,
+            note: 'A download has been triggered. Check your Downloads folder.'
+          });
+        })
+        .catch(function (e) {
+          confirmBtn.disabled = false;
+          err(e && e.message ? e.message : String(e));
+        });
+    });
+  }
+
+  function runImport(file, strategy) {
+    if (!window.LatticeExport) { err('LatticeExport module not loaded'); return; }
+    window.LatticeExport.importArchive(file, { strategy: strategy })
+      .then(function (result) { showReport(result); })
+      .catch(function (e) { err(e && e.message ? e.message : String(e)); });
+  }
+
+  if (importBtn) {
+    importBtn.addEventListener('click', function () {
+      if (importInput) importInput.click();
+    });
+  }
+  if (importInput) {
+    importInput.addEventListener('change', function (ev) {
+      var file = ev.target.files && ev.target.files[0];
+      if (!file) return;
+      // Always run verify-only first; the UI then lets the user decide.
+      runImport(file, 'verify-only');
+    });
+  }
+  if (verifyBtn) {
+    verifyBtn.addEventListener('click', function () {
+      if (verifyInput) verifyInput.click();
+    });
+  }
+  if (verifyInput) {
+    verifyInput.addEventListener('change', function (ev) {
+      var file = ev.target.files && ev.target.files[0];
+      if (!file) return;
+      runImport(file, 'verify-only');
+    });
+  }
 })();
 </script>
 </body>

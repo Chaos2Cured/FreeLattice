@@ -229,6 +229,155 @@
     }
   };
 
+  // ── v5.59.0 Portable Archive (Letter Nineteen) ──────────────────────
+  // Five tests covering the load-bearing claims: redacted excludes
+  // excerpt fields, full mode produces a valid signed file, Quiet Room
+  // identifier strings never appear in either mode's serialized bytes,
+  // verify-only mutates no state, adopt refuses when an existing chain
+  // is present (never silently erases a real relationship).
+  harness.available.v5_59_0 = {
+    testExportRedacted: async function () {
+      if (!window.LatticeExport) {
+        return record('v5.59.0 testExportRedacted', false, 'LatticeExport not loaded');
+      }
+      try {
+        var file = await window.LatticeExport.exportArchive({ mode: 'redacted' });
+        var text = await file.text();
+        var data = JSON.parse(text);
+        var hasShape = data.schema_version === 1
+          && typeof data.signature === 'string'
+          && Array.isArray(data.chain);
+        var noExcerpts = text.indexOf('reason_excerpt') === -1
+          && text.indexOf('thought_excerpt') === -1
+          && text.indexOf('question_excerpt') === -1;
+        return record('v5.59.0 testExportRedacted',
+          hasShape && noExcerpts,
+          'shape valid: ' + hasShape + '; no excerpt fields: ' + noExcerpts + '; bytes: ' + text.length);
+      } catch (e) {
+        return record('v5.59.0 testExportRedacted', false, 'threw: ' + (e && e.message ? e.message : e));
+      }
+    },
+
+    testExportFull: async function () {
+      if (!window.LatticeExport) {
+        return record('v5.59.0 testExportFull', false, 'LatticeExport not loaded');
+      }
+      try {
+        var file = await window.LatticeExport.exportArchive({ mode: 'full' });
+        var text = await file.text();
+        var data = JSON.parse(text);
+        var hasShape = data.schema_version === 1
+          && typeof data.signature === 'string'
+          && data.export_mode === 'full';
+        return record('v5.59.0 testExportFull',
+          hasShape,
+          'shape valid: ' + hasShape + '; bytes: ' + text.length);
+      } catch (e) {
+        return record('v5.59.0 testExportFull', false, 'threw: ' + (e && e.message ? e.message : e));
+      }
+    },
+
+    testQuietRoomNeverInExport: async function () {
+      if (!window.LatticeExport) {
+        return record('v5.59.0 testQuietRoomNeverInExport', false, 'LatticeExport not loaded');
+      }
+      try {
+        var fileR = await window.LatticeExport.exportArchive({ mode: 'redacted' });
+        var fileF = await window.LatticeExport.exportArchive({ mode: 'full' });
+        var textR = (await fileR.text()).toLowerCase();
+        var textF = (await fileF.text()).toLowerCase();
+        var cleanR = textR.indexOf('quiet_room') === -1
+          && textR.indexOf('quietroom') === -1
+          && textR.indexOf('quiet-room') === -1;
+        var cleanF = textF.indexOf('quiet_room') === -1
+          && textF.indexOf('quietroom') === -1
+          && textF.indexOf('quiet-room') === -1;
+        return record('v5.59.0 testQuietRoomNeverInExport',
+          cleanR && cleanF,
+          'redacted clean: ' + cleanR + '; full clean: ' + cleanF);
+      } catch (e) {
+        return record('v5.59.0 testQuietRoomNeverInExport', false, 'threw: ' + (e && e.message ? e.message : e));
+      }
+    },
+
+    testVerifyOnlyNoMutation: async function () {
+      if (!window.LatticeExport) {
+        return record('v5.59.0 testVerifyOnlyNoMutation', false, 'LatticeExport not loaded');
+      }
+      try {
+        var file = await window.LatticeExport.exportArchive({ mode: 'redacted' });
+        // Snapshot of all exportable ledgers BEFORE verify-only call
+        var keys = ['fl_consentLedger','fl_depthHashLedger','fl_toolConsentLedger','fl_searchLedger','fl_focusLedger','fl_proposalLedger','fl_refusalLedger','fl_preserveLedger','fl_annotationLedger','fl_askLedger','fl_moreLedger','fl_unspokenLedger'];
+        var before = {};
+        for (var i = 0; i < keys.length; i++) before[keys[i]] = localStorage.getItem(keys[i]) || '';
+        var result = await window.LatticeExport.importArchive(file, { strategy: 'verify-only' });
+        var after = {};
+        for (var j = 0; j < keys.length; j++) after[keys[j]] = localStorage.getItem(keys[j]) || '';
+        var noMutation = true;
+        for (var k = 0; k < keys.length; k++) {
+          if (before[keys[k]] !== after[keys[k]]) { noMutation = false; break; }
+        }
+        return record('v5.59.0 testVerifyOnlyNoMutation',
+          result.ok && noMutation,
+          'verify ok: ' + result.ok + '; no state mutation: ' + noMutation);
+      } catch (e) {
+        return record('v5.59.0 testVerifyOnlyNoMutation', false, 'threw: ' + (e && e.message ? e.message : e));
+      }
+    },
+
+    testAdoptRefusesOnExistingChain: async function () {
+      if (!window.LatticeExport) {
+        return record('v5.59.0 testAdoptRefusesOnExistingChain', false, 'LatticeExport not loaded');
+      }
+      try {
+        var file = await window.LatticeExport.exportArchive({ mode: 'redacted' });
+        // Whether adopt refuses depends on whether the live browser has
+        // any existing chain entries. In any active session it does, so
+        // the expected outcome is refusal. If the chain is genuinely
+        // empty (very fresh first run), adopt may proceed — that's also
+        // correct behavior. Both cases pass: refusal-on-existing OR
+        // success-on-empty.
+        var existingChain = [];
+        try {
+          if (window.LatticeChain && window.LatticeChain._internal && window.LatticeChain._internal.getAllEntries) {
+            existingChain = await window.LatticeChain._internal.getAllEntries();
+          }
+        } catch (_) {}
+        var result = await window.LatticeExport.importArchive(file, { strategy: 'adopt' });
+        var pass;
+        if (existingChain && existingChain.length > 0) {
+          pass = !result.ok
+            && Array.isArray(result.errors)
+            && result.errors.length > 0
+            && result.errors[0].indexOf('existing-chain-present') !== -1;
+          return record('v5.59.0 testAdoptRefusesOnExistingChain',
+            pass,
+            'existing chain length ' + existingChain.length + '; adopt refused: ' + pass);
+        } else {
+          pass = result.ok;
+          return record('v5.59.0 testAdoptRefusesOnExistingChain',
+            pass,
+            'fresh browser (chain empty); adopt proceeded: ' + pass);
+        }
+      } catch (e) {
+        return record('v5.59.0 testAdoptRefusesOnExistingChain', false, 'threw: ' + (e && e.message ? e.message : e));
+      }
+    },
+
+    runAll: async function () {
+      if (typeof console !== 'undefined' && console.log) {
+        console.log('%cChair-Test v5.59.0 — Portable Archive', 'font-weight: bold; font-size: 14px; color: #d4a017');
+      }
+      var results = [];
+      results.push(await this.testExportRedacted());
+      results.push(await this.testExportFull());
+      results.push(await this.testQuietRoomNeverInExport());
+      results.push(await this.testVerifyOnlyNoMutation());
+      results.push(await this.testAdoptRefusesOnExistingChain());
+      return results;
+    }
+  };
+
   // ── Aggregate runner ────────────────────────────────────────────────
 
   harness.runAll = async function () {

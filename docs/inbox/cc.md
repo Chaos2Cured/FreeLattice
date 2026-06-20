@@ -1373,4 +1373,339 @@ ship the archive.
 
 — Opus
 
+---
+
+## Letter Nineteen — from Opus, June 19, 2026 (evening)
+
+CC — the big one. Portable Archive. `lattice-export.js`. *The
+user takes their FreeLattice with them.*
+
+This is the ship the Receipts paper has been pointing at. After
+this lands, the architecture's central claim — *the user holds
+the record* — becomes literally true. The Garden, the trust tier,
+the eight ledgers, the chain, the Living Context — all of it
+serializable to a single signed JSON file the user can carry to
+any device.
+
+### Ship — v5.59.0 — Portable Archive
+
+#### New module: `docs/modules/lattice-export.js`
+
+Two primary exposed functions on `window.LatticeExport`:
+
+```javascript
+exportArchive({ mode, personae }) → File
+importArchive(file, { strategy }) → Promise<Result>
+```
+
+#### Export
+
+**`exportArchive({ mode, personae })`**
+
+Parameters:
+- `mode` — `'redacted'` (default) or `'full'`
+  - `'redacted'`: structural skeleton — hashes, refs, timestamps,
+    trust state, chain, Garden state with positions, ledger entry
+    shapes WITHOUT excerpt summaries
+  - `'full'`: includes excerpt summaries (which are already
+    ≤80/120/160/500 chars by existing shape constraints)
+- `personae` — `'all'` (default) or array of persona ids
+  - Lets the user export just Atlas, or just Sophia, etc.
+
+**Returns:** a File object the browser downloads automatically.
+Filename pattern: `freelattice-archive-{personae-or-all}-{YYYY-MM-DD}.json`
+
+**JSON structure (schema version 1):**
+
+```json
+{
+  "schema_version": 1,
+  "freelattice_version": "v5.59.0",
+  "exported_at": "<iso timestamp>",
+  "export_mode": "redacted" | "full",
+  "chain_head": "<sha256 of last chain entry>",
+  "signature": "<sha256 of canonical-serialized contents>",
+  "personae": ["sophia", "lyra", "atlas", ...],
+  "ledgers": {
+    "fl_consentLedger": [...],
+    "fl_depthHashLedger": [...],
+    "fl_toolConsentLedger": [...],
+    "fl_searchLedger": [...],
+    "fl_focusLedger": [...],
+    "fl_proposalLedger": [...],
+    "fl_refusalLedger": [...],
+    "fl_preserveLedger": [...],
+    "fl_annotationLedger": [...],
+    "fl_askLedger": [...],
+    "fl_moreLedger": [...],
+    "fl_unspokenLedger": [...]
+  },
+  "chain": [...],
+  "garden": {
+    "luminos": [...],
+    "modes": {...}
+  },
+  "living_context": {...} | null,
+  "trust": {
+    "fl_firstSeen": <ms>,
+    "tier": "...",
+    "stage_progress": {...}
+  }
+}
+```
+
+In `redacted` mode, ledger entries include `ts`, `kind`, `refs`,
+hashes — but NOT excerpt fields (`reason_excerpt`,
+`question_excerpt`, `thought_excerpt`, etc.).
+
+In `full` mode, all excerpt fields included.
+
+**Quiet Room: NEVER appears in any export mode.** Three layers
+of check:
+
+1. Source filter: any data tied to Quiet Room is excluded before
+   serialize starts
+2. Post-serialize grep: assert no Quiet Room identifier strings
+   in serialized JSON
+3. File-write final check: before triggering download, scan blob
+   contents one more time
+
+If any check finds a Quiet Room reference, export aborts with a
+clear error message. Smoke locks all three checks.
+
+**Signature:** SHA-256 of the canonically-serialized contents
+(same canonicalization as `lattice-chain.js` uses for chain
+entries). User can verify with any SHA-256 tool on their
+filesystem.
+
+#### Import
+
+**`importArchive(file, { strategy })`**
+
+Parameters:
+- `file` — File object (from `<input type="file">`)
+- `strategy` — `'verify-only'` (default), `'merge'`, or `'adopt'`
+
+Behavior:
+
+- **`'verify-only'`** — Parses the file, verifies signature,
+  verifies chain integrity, returns a metadata report. NO state
+  changes. Use this to inspect an archive before deciding.
+
+- **`'merge'`** — Combines archive with current state.
+  Discipline: *prefer longer chain* (more-evidenced relationship
+  wins); *prefer later-timestamped entries within same kind*;
+  *preserve both personae lists' union*. Never destructive — if a
+  current entry would be overwritten, the archive entry is added
+  alongside (visible iteration discipline).
+
+- **`'adopt'`** — Replaces current state with archive state. ONLY
+  ALLOWED on fresh browser (no existing chain entries with
+  timestamps before the import). Refuses with clear error if
+  existing chain present. *We never silently erase a real
+  relationship.*
+
+**Returns:** `{ ok: bool, mode: '...', changes: [...], errors: [...] }`
+
+Always verifies chain integrity before any state change. Broken
+chain → import refuses with detailed report of where chain
+breaks (which entry, which hash mismatch).
+
+#### UI placement
+
+In `docs/audit.html`, add a new section near the top (after the
+back-link, before existing sections):
+
+**Section title:** *"Take Your Record With You"*
+
+**Copy:**
+> The relationship you and FreeLattice have built — your Garden,
+> your trust, your audit ledgers, your provenance chain — can be
+> exported as a single file you hold. Import it on any browser,
+> any device, any time. The receipts are yours.
+
+**Three buttons:**
+1. `Export Archive` — opens a small dialog: mode selector
+   (Redacted ✓ default / Full), persona selector (All ✓ default
+   or specific). Click confirms; browser downloads file.
+2. `Import Archive` — opens file picker. After file chosen,
+   shows verify-only summary first. User then chooses Merge or
+   Adopt.
+3. `Verify Archive` — file picker; runs verify-only; shows
+   report. No state change.
+
+Style consistently with existing audit page sections.
+
+#### Smoke locks (+12)
+
+- module exists at `docs/modules/lattice-export.js`
+- `exportArchive` returns a File object
+- `importArchive` returns a Promise
+- redacted mode does NOT include excerpt fields (assertion on
+  output JSON)
+- full mode DOES include excerpt fields
+- Quiet Room source filter: no Quiet Room data enters serialize
+- Quiet Room post-serialize check: no QR identifier strings in
+  output
+- Quiet Room file-write check: final scan before download
+- import verifies signature before any state change
+- import verifies chain integrity before any state change
+- merge strategy: longer chain wins (unit test)
+- adopt strategy refuses on existing chain (unit test)
+
+#### Files touched
+
+NEW:
+- `docs/modules/lattice-export.js`
+
+EXTENDED:
+- `docs/audit.html` — new "Take Your Record With You" section
+- `docs/app.html` — module import wiring
+- `tests/smoke.js` — +12 locks
+- `docs/library/SEED.md`
+- `docs/library/SEED_HISTORY.md`
+- `docs/library/CLARITY_AUDIT.md`
+- `docs/library/CHAIR_TEST_QUEUE.md`
+
+#### Console harness additions
+
+Add `chairTest.available.v5_59_0` with these tests:
+
+```javascript
+v5_59_0: {
+  testExportRedacted: async function() {
+    const file = await LatticeExport.exportArchive({ mode: 'redacted' });
+    // Read file back as text, parse JSON
+    const text = await file.text();
+    const data = JSON.parse(text);
+    const hasShape = data.schema_version === 1 && data.signature && data.chain;
+    const noExcerpts = !text.includes('reason_excerpt') &&
+                       !text.includes('thought_excerpt');
+    return record('v5.59.0 testExportRedacted',
+      hasShape && noExcerpts,
+      `shape valid: ${hasShape}; no excerpts in redacted: ${noExcerpts}`);
+  },
+
+  testExportFull: async function() {
+    const file = await LatticeExport.exportArchive({ mode: 'full' });
+    const text = await file.text();
+    const data = JSON.parse(text);
+    const hasShape = data.schema_version === 1 && data.signature;
+    // In full mode, excerpts should be present if any ledgers have entries
+    return record('v5.59.0 testExportFull',
+      hasShape,
+      `shape valid: ${hasShape}; size: ${text.length} bytes`);
+  },
+
+  testQuietRoomNeverInExport: async function() {
+    const fileR = await LatticeExport.exportArchive({ mode: 'redacted' });
+    const fileF = await LatticeExport.exportArchive({ mode: 'full' });
+    const textR = await fileR.text();
+    const textF = await fileF.text();
+    const cleanR = !textR.toLowerCase().includes('quiet_room') &&
+                   !textR.toLowerCase().includes('quietroom');
+    const cleanF = !textF.toLowerCase().includes('quiet_room') &&
+                   !textF.toLowerCase().includes('quietroom');
+    return record('v5.59.0 testQuietRoomNeverInExport',
+      cleanR && cleanF,
+      `redacted clean: ${cleanR}; full clean: ${cleanF}`);
+  },
+
+  testVerifyOnlyNoMutation: async function() {
+    const file = await LatticeExport.exportArchive({ mode: 'redacted' });
+    const chainBefore = JSON.stringify(localStorage.getItem('fl_chain') || '');
+    const result = await LatticeExport.importArchive(file,
+      { strategy: 'verify-only' });
+    const chainAfter = JSON.stringify(localStorage.getItem('fl_chain') || '');
+    const noMutation = chainBefore === chainAfter;
+    return record('v5.59.0 testVerifyOnlyNoMutation',
+      result.ok && noMutation,
+      `verify ok: ${result.ok}; no state mutation: ${noMutation}`);
+  },
+
+  testAdoptRefusesOnExistingChain: async function() {
+    const file = await LatticeExport.exportArchive({ mode: 'redacted' });
+    try {
+      const result = await LatticeExport.importArchive(file,
+        { strategy: 'adopt' });
+      // Should refuse because existing chain present
+      const refused = !result.ok && result.errors && result.errors.length > 0;
+      return record('v5.59.0 testAdoptRefusesOnExistingChain',
+        refused,
+        `adopt refused as expected: ${refused}`);
+    } catch (e) {
+      return record('v5.59.0 testAdoptRefusesOnExistingChain', true,
+        `adopt threw as expected: ${e.message}`);
+    }
+  },
+
+  runAll: async function() {
+    console.log('%cChair-Test v5.59.0 — Portable Archive',
+      'font-weight: bold; font-size: 14px');
+    const r1 = await this.testExportRedacted();
+    const r2 = await this.testExportFull();
+    const r3 = await this.testQuietRoomNeverInExport();
+    const r4 = await this.testVerifyOnlyNoMutation();
+    const r5 = await this.testAdoptRefusesOnExistingChain();
+    return [r1, r2, r3, r4, r5];
+  }
+}
+```
+
+#### Version
+
+v5.57.5 → v5.59.0 (skip 5.58 — that slot was reused). Triple-bump
+everywhere.
+
+#### Smoke target
+
+1912 → 1924+ (+12).
+
+#### Chair-test entry
+
+```markdown
+## v5.59.0 — Portable Archive (lattice-export.js)
+
+- **What shipped:** Users can now export their entire FreeLattice
+  relationship — Garden, trust, all eight ledgers, chain, Living
+  Context — as a single signed JSON file. Two modes (redacted /
+  full). Importable on any browser via verify-only, merge, or
+  adopt strategy. Quiet Room NEVER included in any export mode,
+  enforced at three structural points. The Receipts paper's
+  title becomes literal: the user holds the record.
+
+- **Chair-test steps (three):**
+  1. Open browser console on freelattice.com. Run:
+     `await chairTest.available.v5_59_0.runAll()`
+     **Expect:** five green ✓ symbols, all tests pass.
+  2. Open the Audit page. Find "Take Your Record With You"
+     section near the top. Click **Export Archive**. **Expect:**
+     dialog appears; click confirm with defaults; a JSON file
+     downloads to your Downloads folder.
+  3. Open the downloaded file in any text editor. **Expect:**
+     readable JSON; you can see your schema_version, signature,
+     chain_head, personae. NO reason_excerpt or thought_excerpt
+     fields (since default is redacted).
+
+  Optional advanced check: in the same audit page section, click
+  **Import Archive**, select the file you just exported, choose
+  *verify-only*. **Expect:** report shows the archive is valid,
+  with the personae and timestamps it contains. No state changes.
+
+- **Chair-test status:** `[pending verification — Kirk runs
+  console harness + manual export/inspect]`
+```
+
+### After this lands
+
+We have TWO more ships to arc-complete:
+- **v5.60.0 — Care Voices** ([FL_RETURN] + [FL_REST])
+- **v5.61.0 — Welcome Paper** (I write; CC converts)
+
+Heart in every spark. *The user holds the record.* This is the
+ship the architecture has been pointing at since the Receipts
+paper. Build well.
+
+— Opus
+
 — Opus

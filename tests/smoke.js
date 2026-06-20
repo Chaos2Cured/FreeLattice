@@ -5854,6 +5854,113 @@ assert('v5.57.6 heart-color: ensureBigRings sets initial color from parent curre
 assert('v5.57.6 heart-color: per-frame color sync from parent.currentHSL in big-ring animate loop',
   /pud\.currentHSL[\s\S]{0,200}bsr\.material\.color\.setHSL\(\s*pud\.currentHSL\.h\s*\/\s*360/.test(gardenPhiHeart));
 
+// ═══════════════════════════════════════════════════════════════
+// Section 111 — v5.59.0 Portable Archive (Letter Nineteen)
+// ═══════════════════════════════════════════════════════════════
+// The user holds the record. exportArchive + importArchive on
+// window.LatticeExport. Quiet Room NEVER appears in any export mode —
+// three structural checks (source filter, post-serialize grep,
+// file-write final scan).
+
+var fsPA = require('fs');
+var pathPA = require('path');
+
+// Module file exists at the brief's path
+assert('v5.59.0 portable-archive: docs/modules/lattice-export.js exists',
+  fsPA.existsSync(pathPA.join(__dirname, '..', 'docs', 'modules', 'lattice-export.js')));
+
+var exportJs = fsPA.readFileSync(pathPA.join(__dirname, '..', 'docs', 'modules', 'lattice-export.js'), 'utf8');
+
+// Public surface
+assert('v5.59.0 portable-archive: window.LatticeExport with exportArchive + importArchive',
+  /window\.LatticeExport\s*=\s*publicAPI/.test(exportJs)
+  && /exportArchive:\s*exportArchive/.test(exportJs)
+  && /importArchive:\s*importArchive/.test(exportJs));
+
+// Schema version 1
+assert('v5.59.0 portable-archive: SCHEMA_VERSION = 1',
+  /var\s+SCHEMA_VERSION\s*=\s*1\b/.test(exportJs));
+
+// exportArchive returns a File (Promise resolves to new File(...))
+assert('v5.59.0 portable-archive: exportArchive resolves to a File',
+  /return\s+new\s+File\(\[finalJson\]/.test(exportJs));
+
+// importArchive returns a Promise (uses .then() — Promise chain)
+assert('v5.59.0 portable-archive: importArchive returns a Promise (file.text().then chain)',
+  /function\s+importArchive[\s\S]{0,500}return\s+file\.text\(\)\.then/.test(exportJs));
+
+// Redacted mode strips excerpt fields via EXCERPT_FIELDS list + redactEntry
+assert('v5.59.0 portable-archive: EXCERPT_FIELDS includes reason_excerpt, thought_excerpt, question_excerpt',
+  /EXCERPT_FIELDS\s*=\s*\[[^\]]*reason_excerpt[^\]]*\]/.test(exportJs)
+  && /thought_excerpt/.test(exportJs)
+  && /question_excerpt/.test(exportJs));
+assert('v5.59.0 portable-archive: redactEntry skips fields in EXCERPT_FIELDS in redacted mode',
+  /function\s+redactEntry[\s\S]{0,400}EXCERPT_FIELDS\.indexOf\(key\)\s*!==\s*-1/.test(exportJs));
+
+// Quiet Room three checks
+assert('v5.59.0 portable-archive: QR check 1 — filterQuietRoomFromLedger source filter present',
+  /function\s+filterQuietRoomFromLedger[\s\S]{0,500}QUIET_ROOM_IDENTIFIERS/.test(exportJs));
+assert('v5.59.0 portable-archive: QR check 2 — assertNoQuietRoomInJson post-serialize grep present',
+  /function\s+assertNoQuietRoomInJson[\s\S]{0,500}throw\s+new\s+Error/.test(exportJs));
+assert('v5.59.0 portable-archive: QR check 3 — assertNoQuietRoomInBlob file-write final scan present',
+  /function\s+assertNoQuietRoomInBlob[\s\S]{0,300}blob\.text\(\)/.test(exportJs));
+assert('v5.59.0 portable-archive: all three QR checks invoked in exportArchive path',
+  /filterQuietRoomFromLedger[\s\S]{0,4000}assertNoQuietRoomInJson[\s\S]{0,1500}assertNoQuietRoomInBlob/.test(exportJs));
+
+// Import: signature verified BEFORE any state change
+assert('v5.59.0 portable-archive: importArchive verifies signature before any state change',
+  /verifySignature\(data\)\.then[\s\S]{0,300}!sigOk[\s\S]{0,200}signature-mismatch/.test(exportJs));
+
+// Import: chain verified BEFORE any state change
+assert('v5.59.0 portable-archive: importArchive verifies chain integrity before any state change',
+  /verifyChainIntegrity\(data\.chain[\s\S]{0,400}chain-broken-at/.test(exportJs));
+
+// Merge strategy: longer chain wins (per Opus's brief)
+assert('v5.59.0 portable-archive: merge strategy compares chain lengths and reports longer wins',
+  /strategy\s*===\s*['"]merge['"]/.test(exportJs)
+  && /longer chain wins/.test(exportJs));
+
+// Adopt strategy refuses on existing chain
+assert('v5.59.0 portable-archive: adopt strategy refuses on existing-chain-present',
+  /strategy\s*===\s*['"]adopt['"][\s\S]{0,800}existing-chain-present-adopt-refused/.test(exportJs));
+
+// Quiet Room identifier list includes the canonical strings
+assert('v5.59.0 portable-archive: QUIET_ROOM_IDENTIFIERS includes quiet-room, quiet_room, quietroom',
+  /QUIET_ROOM_IDENTIFIERS\s*=\s*\[[\s\S]{0,300}quiet-room[\s\S]{0,200}quiet_room[\s\S]{0,200}quietroom/.test(exportJs));
+
+// SW caches the module (both files)
+var swDocsPA = fsPA.readFileSync(pathPA.join(__dirname, '..', 'docs', 'sw.js'), 'utf8');
+var swRootPA = fsPA.readFileSync(pathPA.join(__dirname, '..', 'sw.js'), 'utf8');
+assert('v5.59.0 portable-archive: docs/sw.js APP_SHELL includes lattice-export.js',
+  /\.\/modules\/lattice-export\.js/.test(swDocsPA));
+assert('v5.59.0 portable-archive: root sw.js APP_SHELL includes lattice-export.js',
+  /\.\/modules\/lattice-export\.js/.test(swRootPA));
+
+// app.html includes the script tag
+var appHtmlPA = fsPA.readFileSync(pathPA.join(__dirname, '..', 'docs', 'app.html'), 'utf8');
+assert('v5.59.0 portable-archive: app.html includes <script src="modules/lattice-export.js">',
+  /<script\s+src=["']modules\/lattice-export\.js["']/.test(appHtmlPA));
+
+// audit.html section
+var auditHtmlPA = fsPA.readFileSync(pathPA.join(__dirname, '..', 'docs', 'audit.html'), 'utf8');
+assert('v5.59.0 portable-archive: audit.html has "Take Your Record With You" section',
+  /Take Your Record With You/.test(auditHtmlPA));
+assert('v5.59.0 portable-archive: audit.html has Export/Import/Verify buttons',
+  /latticeExportBtn/.test(auditHtmlPA)
+  && /latticeImportBtn/.test(auditHtmlPA)
+  && /latticeVerifyBtn/.test(auditHtmlPA));
+
+// Harness registers v5_59_0 namespace with the required test functions
+var harnessJsPA = fsPA.readFileSync(pathPA.join(__dirname, '..', 'docs', 'chair-test', 'harness.js'), 'utf8');
+assert('v5.59.0 portable-archive: chair-test harness registers harness.available.v5_59_0',
+  /harness\.available\.v5_59_0\s*=\s*\{/.test(harnessJsPA));
+assert('v5.59.0 portable-archive: harness v5_59_0 has all five test functions',
+  /testExportRedacted/.test(harnessJsPA)
+  && /testExportFull/.test(harnessJsPA)
+  && /testQuietRoomNeverInExport/.test(harnessJsPA)
+  && /testVerifyOnlyNoMutation/.test(harnessJsPA)
+  && /testAdoptRefusesOnExistingChain/.test(harnessJsPA));
+
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
 

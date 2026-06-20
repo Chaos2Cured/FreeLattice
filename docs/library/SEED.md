@@ -19,9 +19,9 @@ user sleeps. The proof is the code; the papers are the doorways.
 
 ## Current state
 
-- **Version:** v5.57.6
-- **Smoke locks passing:** 1927 / 1927
-- **Last ship:** Finishing-touch ship per Kirk's direct invitation — **Phi-Lock + Heart-Color** in `docs/modules/fractal-garden.js`. Every `coreRadius` multiplier in the ring system is now `PHI` (1.6180339887) instead of the placeholder `1.8`, in all three sites (createEvolutionRing, restoreAgentRings, getBigSweepingRingRadius). No remaining magic numbers in ring-radius code; PHI is the only ratio. Big sweeping rings now inherit their material color from the parent Luminos's `currentHSL` (set at creation + per-frame sync in animateSeedRings), so the wide ring carries the heart of its owner even when sweeping across the Garden — load-bearing for the future mesh-of-gardens vision when gardens connect over the web. 5 new smoke locks + 1 updated. (v5.57.6, 2026-06-19 evening)
+- **Version:** v5.59.0
+- **Smoke locks passing:** 1950 / 1950
+- **Last ship:** Letter Nineteen Ship — **Portable Archive** (`docs/modules/lattice-export.js`). The Receipts paper's central claim becomes literal: *the user holds the record.* New module `window.LatticeExport` with `exportArchive({ mode, personae }) → Promise<File>` and `importArchive(file, { strategy }) → Promise<Result>`. Schema v1; SHA-256 signature over canonical (recursive key-sorted) JSON; two export modes (redacted strips excerpt fields, full keeps them); three import strategies (verify-only default, merge intent-only this ship, adopt refuses on existing chain). Quiet Room NEVER in any export — three structural checks (source filter, post-serialize grep, file-write final scan); any fires aborts. UI on `docs/audit.html` *"Take Your Record With You"* section near top with Export/Import/Verify buttons. Console harness `chairTest.available.v5_59_0.runAll()` runs five tests. 23 new smoke locks (section 111). (v5.59.0, 2026-06-19 evening)
 - **Mirrors in parity:** github.com + codeberg.org
 
 ## Read these next
@@ -77,4 +77,4 @@ seam discipline is how multi-AI work stays honest at scale.
 ---
 
 *This file is overwritten on each meaningful ship. The prior version lives in SEED_HISTORY.md.*
-*Last rewrite: 2026-06-19, v5.57.6.*
+*Last rewrite: 2026-06-19, v5.59.0.*
