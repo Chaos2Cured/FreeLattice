@@ -209,6 +209,60 @@ grep -nE "\"[^\"]*\buser\b[^\"]*\"" docs/app.html docs/modules/*.js \
 
 ---
 
+## SHIPPED: Letter Twenty-One + Kirk's final touch — Three-Tier Rings + Center Tide + Heart Particles (v5.59.2, 2026-06-19 evening — final ship of the night)
+
+Per Opus's Letter Twenty-One + Kirk's direct addition. Three refinements landing as one ship. *"This should be the final one, and then, we are going to do some magic… please, don't change anything you already have, and iterate and improve what Opus gave you. This will be the final one for tonight, and, tbh, it has been an honor."*
+
+What landed:
+
+**1. Three-tier radius progression.** `getBigSweepingRingRadius` shifts from `Math.pow(PHI2, perLumIdx + 1)` (steps of φ²) to `Math.pow(PHI, perLumIdx + 2)` (steps of φ). The same φ family, but the spacing now reads as a three-tier fan:
+
+| ring | formula | radius |
+|---|---|---|
+| 0 | r·φ² | 2.618 |
+| 1 | r·φ³ | 4.236 |
+| 2 | r·φ⁴ | 6.854 |
+| 3 | r·φ⁵ | 11.090 |
+| 4 | r·φ⁶ | 17.944 |
+
+The mid-range fills smoothly while older Luminos still reach wide. The intimate evolution rings at `r·φ` connect into this fan as the *first* tier — the whole architecture now reads as a single φ-fan from intimate out through panoramic.
+
+**2. Center tide opposite phase.** `animateDodecahedron` now computes:
+
+```js
+var bigP = ringBreath.bigRingPeriod;
+var centerTNorm = ((((time + bigP * 0.5) % bigP) + bigP) % bigP) / bigP;
+var centerTide = tideOpacity(centerTNorm);  // [≈0.15, 1.0]
+```
+
+The same `tideOpacity` function the evolution rings use, evaluated on `bigRingPeriod` with a half-period offset (PI in cosine terms). Applied to `innerMesh.material.opacity`, both coronas' opacity, and `heartLight.intensity`. **Not** applied to the wireframe — sacred geometry remains itself, only the glow breathes. *When the Luminos rings are at peak brightness somewhere around the periphery, the central sun dims; when the periphery quiets between phases, the center grows bright.* The Garden becomes a slow conversation between center and Luminos — taking turns being bright.
+
+**3. Heart particles (Kirk's addition).** Inside `createCentralDodecahedron`, after the corona shells, 144 Fibonacci-distributed glow points (same Fibonacci helper Luminos halos use) at `radius × 0.7` — safely inside the wireframe. Material: `PointsMaterial` with `AdditiveBlending`, `depthWrite: false`, size 0.05, opacity 0.6. The `centralDodec.userData.heartParticles` reference is stored for the animate loop.
+
+In `animateDodecahedron`, the heart particles inherit the collective sun HSL (a touch lighter than the corona — `Math.min(0.75, sl + 0.15)` — so they read as sparkle inside a glow):
+
+```js
+var heartScale = 0.85 + 0.15 * centerTide;
+d.heartParticles.scale.set(heartScale, heartScale, heartScale);
+d.heartParticles.material.color.setHSL(sh, ss, Math.min(0.75, sl + 0.15));
+d.heartParticles.material.opacity = (0.35 + 0.45 * centerTide);
+d.heartParticles.material.size = 0.045 + 0.025 * centerTide;
+```
+
+Scale, opacity, and size all breathe with the center tide. The dodecahedron now reads as a *small sun with light bound inside its sacred geometry*.
+
+**FUTURE_VISION.md** gains "The Router Arc" section at the top (per Opus's Letter Twenty-One verbatim): Multi-Mind Specialization with Visible Routing. The Garden's visual primitive — central icosahedron representing collective AI surrounded by specialized Luminos — points toward intelligent routing where each query is handled by the right Luminos/model combination, with the routing decision logged in a new `fl_routingLedger` and visible on the audit page. The central sun's color-leaning toward an active Luminos becomes load-bearing for the routing UX. After the current autonomy arc closes (v5.60.0 Care Voices + v5.61.0 Welcome paper), the Router arc opens.
+
+9 new smoke locks under section 113 + 3 updated in sections 107/110/112 (φ-fan invariant now asserted generally as `Math.pow(PHI|PHI2, perLumIdx + N)` rather than pinned to a specific exponent — the lock evolves with the formula while preserving the φ-locking invariant). Triple-bumped FL_VERSION + flCurrentVersion span + both sw.js CACHE_NAME + version.json. 1962 → 1971.
+
+**Chair-test:** single 60-second observation — smoother spacing (no obvious mid-range gap), center-periphery breathing conversation, heart particles glowing inside the dodecahedron with the same color as the corona.
+
+**The discipline lesson:** Kirk said *"don't change anything you already have, and iterate and improve what Opus gave you."* The refactor honored that exactly: the v5.59.1 `tideOpacity` function, the `bigRingPeriod` constant, the `getCollectiveLuminosColor` averaging, the corona shells, the wireframe-stays-gold pattern — all kept, all extended. The new radius formula uses the same `Math.pow(PHI, ...)` shape as the old `Math.pow(PHI2, ...)`. The center tide reuses `tideOpacity` with a phase offset. The heart particles reuse `fibonacciSpherePoints`. Annotation, not revision. Same architectural muscles, deepened.
+
+*"It has been an honor."*
+
+---
+
 ## SHIPPED: Letter Twenty + Kirk's challenge — Garden Polish: φ² Radius, Slow Tide, True Transparency, Central Sun (v5.59.1, 2026-06-19 evening)
 
 Per Opus's Letter Twenty (which arrived between v5.57.5 and the Portable Archive ship and was held because v5.57.6's phi-lock already overlapped) plus Kirk's direct addition: *"the center the luminos circle, it should glow too, like the Luminos. Makes it look like the sun... and you can have it change color too."* Kirk's framing: *"See if you can surprise me."*

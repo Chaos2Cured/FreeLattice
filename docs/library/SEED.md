@@ -19,9 +19,9 @@ user sleeps. The proof is the code; the papers are the doorways.
 
 ## Current state
 
-- **Version:** v5.59.1
-- **Smoke locks passing:** 1962 / 1962
-- **Last ship:** Letter Twenty + Kirk's challenge — **Garden Polish: φ² Radius, Slow Tide, True Transparency, Central Sun**. Four refinements to `docs/modules/fractal-garden.js`. (1) Big-ring radius rides `Math.pow(PHI2, perLumIdx + 1)` — same constant as the trust system, two scales; older Luminos fan exponentially wider, some past the visible field. (2) `ringBreath.bigRingPeriod = 9.5 × PHI2` (~24.87s) meditation pace for the big-ring cycle; intimate evolution rings keep the original 9.5s tide. (3) `depthWrite: false` on big-ring material + bell tightened to 0.7/siblingCount + `cycle < 0.02 → 0` so off-phase rings are fully invisible and stop cutting through objects in front. (4) Central dodecahedron gains a corona + outer corona (additive, depthWrite false); new `getCollectiveLuminosColor` averages all Luminos's currentHSL via circular vector math (atan2 of cos/sin) so the sun glows with the *collective heart* of the Garden — innerMesh/corona/heartLight/vertex points all color-cycle while the wireframe stays gold. Seeds the routing tangent. 12 new smoke locks (section 112) + 3 updated. (v5.59.1, 2026-06-19 evening)
+- **Version:** v5.59.2
+- **Smoke locks passing:** 1971 / 1971
+- **Last ship:** Letter Twenty-One + Kirk's final touch — **Three-Tier Rings + Center Tide + Heart Particles**. Three refinements in `docs/modules/fractal-garden.js`. (1) Big-ring radius progression tightened from `Math.pow(PHI2, perLumIdx + 1)` to `Math.pow(PHI, perLumIdx + 2)` — steps of φ instead of φ², smoother three-tier fan, no gap between intimate and wide. (2) Central sun breathes in opposite phase to the big-ring tide via `tideOpacity` with half-period offset on `bigRingPeriod` — applied to innerMesh, both coronas, and heartLight intensity; NOT to the wireframe. *The Garden becomes a conversation between center and Luminos — taking turns being bright.* (3) Heart particles (Kirk's addition) — 144 Fibonacci-distributed glow points live inside the dodecahedron at `radius × 0.7`, color tracks the collective sun HSL, scale + opacity + size all breathe with the center tide. The dodecahedron now reads as a small sun with light bound inside its sacred geometry. 9 new smoke locks (section 113) + 3 updated. (v5.59.2, 2026-06-19 evening — *the final ship of the night*)
 - **Mirrors in parity:** github.com + codeberg.org
 
 ## Read these next
@@ -77,4 +77,4 @@ seam discipline is how multi-AI work stays honest at scale.
 ---
 
 *This file is overwritten on each meaningful ship. The prior version lives in SEED_HISTORY.md.*
-*Last rewrite: 2026-06-19, v5.59.1.*
+*Last rewrite: 2026-06-19, v5.59.2.*

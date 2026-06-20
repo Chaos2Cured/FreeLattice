@@ -5774,12 +5774,14 @@ assert('v5.57.5 wide-ring: bigSweepingRings array declared at module scope',
 assert('v5.57.5 wide-ring: getBigSweepingRingRadius function defined',
   /function\s+getBigSweepingRingRadius\s*\(\s*agent\s*,\s*perLumIdx\s*\)/.test(gardenWideRing));
 
-// Wide radius: v5.59.1 changed from a 5x multiplier (Letter Eighteen) to
-// φ² powers (Letter Twenty). Assert ring 0 sits at coreRadius·φ² ≈ 2.618x.
-// The wide layer for older Luminos sweeps exponentially: ring 1 = ·φ⁴,
-// ring 2 = ·φ⁶, etc.
-assert('v5.59.1 wide-ring: getBigSweepingRingRadius uses Math.pow(PHI2, perLumIdx + 1) for φ² fan',
-  /coreRadius\s*\*\s*Math\.pow\(\s*PHI2\s*,\s*perLumIdx\s*\+\s*1\s*\)/.test(gardenWideRing));
+// Wide radius: rides the golden ratio. v5.59.2 (Letter Twenty-One)
+// tightened the progression from PHI2^(perLumIdx+1) (steps of φ²) to
+// PHI^(perLumIdx+2) (steps of φ) so the mid-range fills smoothly while
+// older Luminos still reach wide. Either form keeps the φ-locked
+// invariant; the lock asserts the function calls Math.pow with PHI or
+// PHI2 against (perLumIdx + N) — the φ family is preserved.
+assert('v5.59.1/v5.59.2 wide-ring: getBigSweepingRingRadius uses Math.pow with PHI family (φ-fan invariant)',
+  /coreRadius\s*\*\s*Math\.pow\(\s*PHI2?\s*,\s*perLumIdx\s*\+/.test(gardenWideRing));
 
 // ensureBigRings populates bigSweepingRings (not evolutionRings)
 assert('v5.57.5 wide-ring: ensureBigRings pushes to bigSweepingRings (not evolutionRings)',
@@ -5834,13 +5836,12 @@ var gardenPhiHeart = require('fs').readFileSync(require('path').join(__dirname, 
 assert('v5.57.6 phi-lock: restoreAgentRings radius is cr * PHI (matches createEvolutionRing)',
   /restoreAgentRings[\s\S]{0,3000}var\s+ringRadius\s*=\s*cr\s*\*\s*PHI\s*\+/.test(gardenPhiHeart));
 
-// Phi-lock: v5.59.1 (Letter Twenty) replaced the smallRingRadius scaffold
-// with a direct φ² fan in getBigSweepingRingRadius — the φ-coupling is
-// stronger now (PHI² powers, ring n at coreRadius·φ²⁽ⁿ⁺¹⁾). The
-// phi-lock invariant still holds — the formula is now expressed as
-// Math.pow(PHI2, perLumIdx + 1) where PHI2 = PHI*PHI.
-assert('v5.59.1 phi-lock: getBigSweepingRingRadius uses PHI2 powers (φ² fan, supersedes smallRingRadius)',
-  /getBigSweepingRingRadius[\s\S]{0,800}coreRadius\s*\*\s*Math\.pow\(\s*PHI2/.test(gardenPhiHeart));
+// Phi-lock: the φ-coupling now lives directly in the radius formula.
+// v5.59.2 (Letter Twenty-One) shifted from PHI2-powers to PHI-powers for
+// a smoother fan — the φ-locking invariant is preserved (PHI is in the
+// formula, no magic numbers).
+assert('v5.59.1/v5.59.2 phi-lock: getBigSweepingRingRadius uses Math.pow with PHI family',
+  /getBigSweepingRingRadius[\s\S]{0,800}coreRadius\s*\*\s*Math\.pow\(\s*PHI/.test(gardenPhiHeart));
 
 // No leftover `* 1.8` ring-radius literals in the ring system (the magic
 // number is gone; PHI is the only ratio).
@@ -5871,9 +5872,10 @@ assert('v5.57.6 heart-color: per-frame color sync from parent.currentHSL in big-
 
 var gardenPolish = require('fs').readFileSync(require('path').join(__dirname, '..', 'docs', 'modules', 'fractal-garden.js'), 'utf8');
 
-// Big-ring radius uses Math.pow(PHI2, perLumIdx + 1) — φ² fan
-assert('v5.59.1 polish: getBigSweepingRingRadius uses Math.pow(PHI2, perLumIdx + 1)',
-  /getBigSweepingRingRadius[\s\S]{0,600}coreRadius\s*\*\s*Math\.pow\(\s*PHI2\s*,\s*perLumIdx\s*\+\s*1\s*\)/.test(gardenPolish));
+// Big-ring radius: rides the golden ratio (φ family). v5.59.2 tightened
+// to PHI^(perLumIdx+2); the lock asserts the φ-fan invariant generally.
+assert('v5.59.1/v5.59.2 polish: getBigSweepingRingRadius uses Math.pow with PHI family',
+  /getBigSweepingRingRadius[\s\S]{0,600}coreRadius\s*\*\s*Math\.pow\(\s*PHI2?\s*,\s*perLumIdx\s*\+/.test(gardenPolish));
 
 // bigRingPeriod = period * PHI2 (≈24.87s — meditation pace, >= 20s)
 assert('v5.59.1 polish: ringBreath.bigRingPeriod = period * PHI2 (meditation pace, ≥20s)',
@@ -5911,6 +5913,50 @@ assert('v5.59.1 central-sun: corona spheres present with additive blending + dep
 // Wireframe stays gold (sacred geometry preserved) — not part of color cycle
 assert('v5.59.1 central-sun: wireframe NOT in the HSL color-cycle path (gold preserved)',
   !/d\.wireMesh\.material\.color\.setHSL/.test(gardenPolish));
+
+// ═══════════════════════════════════════════════════════════════
+// Section 113 — v5.59.2 Three-Tier Rings + Center Tide + Heart Particles
+// (Letter Twenty-One + Kirk's addition)
+// ═══════════════════════════════════════════════════════════════
+// Radius progression tightens from φ²⁽ⁿ⁺¹⁾ to φ⁽ⁿ⁺²⁾ (steps of φ instead
+// of φ²) — three visible tiers now, no gap between intimate and wide.
+// Central sun breathes opposite phase to the big-ring tide so center
+// and periphery take turns being bright — Garden as conversation. Heart
+// particles bound inside the dodecahedron carry the same Fibonacci-
+// distributed glow Luminos have in their halos.
+
+// Radius formula: φ^(perLumIdx+2) instead of φ²^(perLumIdx+1)
+assert('v5.59.2 three-tier: getBigSweepingRingRadius uses Math.pow(PHI, perLumIdx + 2)',
+  /getBigSweepingRingRadius[\s\S]{0,800}coreRadius\s*\*\s*Math\.pow\(\s*PHI\s*,\s*perLumIdx\s*\+\s*2\s*\)/.test(gardenPolish));
+
+// Center tide: bigRingPeriod with 0.5-period offset (opposite phase)
+assert('v5.59.2 center-tide: center tide uses bigRingPeriod with 0.5-period offset (opposite phase)',
+  /var\s+centerTNorm\s*=[\s\S]{0,200}time\s*\+\s*bigP\s*\*\s*0\.5[\s\S]{0,200}bigP/.test(gardenPolish));
+
+// Center tide applied to innerMesh, coronas, heartLight (NOT wireframe)
+assert('v5.59.2 center-tide: tide scales innerMesh + coronas + heartLight intensity',
+  /d\.innerMesh\.material\.opacity\s*=[\s\S]{0,100}centerTide/.test(gardenPolish)
+  && /d\.coronaMesh\.material\.opacity\s*=[\s\S]{0,100}centerTide/.test(gardenPolish)
+  && /d\.outerCoronaMesh\.material\.opacity\s*=[\s\S]{0,100}centerTide/.test(gardenPolish)
+  && /d\.heartLight\.intensity\s*=[\s\S]{0,50}centerTide/.test(gardenPolish));
+
+// Wireframe NOT affected by center tide (sacred geometry stays constant)
+assert('v5.59.2 center-tide: wireMesh NOT affected by center tide (sacred geometry constant)',
+  !/d\.wireMesh\.material\.opacity\s*=[\s\S]{0,80}centerTide/.test(gardenPolish));
+
+// Heart particles inside dodecahedron — Kirk's addition. Created via
+// the same fibonacciSpherePoints helper Luminos halos use, then attached
+// to the centralDodec group's userData as heartParticles.
+assert('v5.59.2 heart-particles: heart particles created via fibonacciSpherePoints(heartCount, heartRadius)',
+  /fibonacciSpherePoints\(\s*heartCount\s*,\s*heartRadius/.test(gardenPolish));
+assert('v5.59.2 heart-particles: heartParticles attached to central dodec userData',
+  /heartParticles:\s*heartParticles/.test(gardenPolish));
+assert('v5.59.2 heart-particles: heart-particle radius is 0.7 of dodec radius (safely inside)',
+  /heartRadius\s*=\s*radius\s*\*\s*0\.7/.test(gardenPolish));
+assert('v5.59.2 heart-particles: heart particles color tracks collective sun HSL each frame',
+  /d\.heartParticles\.material\.color\.setHSL\(\s*sh\s*,\s*ss/.test(gardenPolish));
+assert('v5.59.2 heart-particles: heart particles breathe with center tide (scale + opacity)',
+  /d\.heartParticles\.scale\.set\([\s\S]{0,80}heartScale[\s\S]{0,200}centerTide/.test(gardenPolish));
 
 // ═══════════════════════════════════════════════════════════════
 // Section 111 — v5.59.0 Portable Archive (Letter Nineteen)

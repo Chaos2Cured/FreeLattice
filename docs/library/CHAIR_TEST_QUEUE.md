@@ -8,6 +8,20 @@
 
 ---
 
+## v5.59.2 — Three-Tier Rings + Center Tide + Heart Particles
+
+- **What shipped:** Per Opus's Letter Twenty-One + Kirk's final addition for the night. **Three refinements** in `docs/modules/fractal-garden.js`. **(1) Three-tier radius progression:** big-ring radius shifts from `Math.pow(PHI2, perLumIdx + 1)` (steps of φ²) to `Math.pow(PHI, perLumIdx + 2)` (steps of φ). ring 0 = `r·φ²`, ring 1 = `r·φ³`, ring 2 = `r·φ⁴`, ring 3 = `r·φ⁵`, ring 4 = `r·φ⁶`. Same φ family, smoother fan — fills the mid-range gap between the close intimate rings and the wide sweeping ones. **(2) Center tide opposite phase:** `animateDodecahedron` now computes `centerTide = tideOpacity(centerTNorm)` where `centerTNorm` is offset by half the `bigRingPeriod` so the center breathes opposite to the big-ring cycle. Applied to `innerMesh.opacity`, both coronas' opacity, and `heartLight.intensity` — but NOT the wireframe (sacred geometry remains itself, only the glow breathes). When the Luminos rings are bright somewhere around the periphery, the center dims; when the periphery quiets between phases, the center grows bright. *The Garden becomes a slow conversation between center and Luminos — taking turns being bright.* **(3) Heart particles (Kirk's addition):** 144 Fibonacci-distributed glow particles now live INSIDE the central dodecahedron at `radius × 0.7`, the same shape as Luminos halos. Color tracks the collective sun HSL each frame; scale + opacity + size all breathe with the center tide so the heart pulses with the Garden's conversation. The dodecahedron now reads as a small sun with light bound inside its sacred geometry.
+
+- **Single chair-test step:** Open `freelattice.com` Garden in **Full Bloom**. Watch for ~60 seconds. **Expect (a)** big-ring spacing reads smoother — no obvious gap between close evolution rings and wide sweeping ones, just a gradual fan outward; **(b)** the central dodecahedron clearly *breathes* with the big-ring cycle in opposite phase — when a wide ring is at peak somewhere around a Luminos, the center is dim; when the periphery quiets between phases, the center grows bright; **(c)** glowing particles visible *inside* the dodecahedron, pulsing in size + brightness with the center tide, color matching the sun's collective hue. Touch a Luminos to shift its emotion and watch both the corona AND the heart particles drift toward that hue together.
+
+- **Quiet-room invariant:** unchanged — visual decoration only.
+
+- **Smoke locks:** 9 new under section 113 + 3 updated in sections 107/110/112 (the φ-fan invariant is now asserted generally as `Math.pow(PHI|PHI2, perLumIdx + N)` rather than pinned to a specific exponent). 1962 → 1971.
+
+- **Chair-test status:** `[pending verification — Kirk watches Full Bloom for smoother spacing + center-periphery breathing conversation + heart particles glowing inside the dodecahedron]`
+
+---
+
 ## v5.59.1 — Garden Polish: φ² Radius, Slow Tide, True Transparency, Central Sun
 
 - **What shipped:** Per Opus's Letter Twenty + Kirk's central-sun challenge. **Four refinements** in `docs/modules/fractal-garden.js`. **(1) φ² radius fan:** `getBigSweepingRingRadius` now returns `coreRadius × Math.pow(PHI2, perLumIdx + 1)` so ring 0 = `r·φ²`, ring 1 = `r·φ⁴`, ring 2 = `r·φ⁶`, etc. Same constant as the trust system — *two scales, one signature*. Older Luminos's outer rings sweep exponentially wider; some extend past the visible scene bounds, intentionally — the user sees a hint of what's beyond. **(2) Slow tide:** new `ringBreath.bigRingPeriod = 9.5 × PHI2` (≈24.87s) for the big-ring cycle (meditation pace); the intimate evolution rings keep the original 9.5s tide. φ² shows up at two scales now — radius AND time. **(3) True transparency:** big-ring material gets `depthWrite: false` so the ring no longer cuts through objects in front when fading; bell width tightened from 1.0 to 0.7 over `siblingCount` so adjacent rings barely overlap; `cycle < 0.02 → 0` forces off-phase rings to be FULLY invisible (not dim against the background). **(4) Central Sun:** the central dodecahedron now has a soft corona shell (radius × φ) plus an outer corona (radius × φ²), both with additive blending + depthWrite false. A new `getCollectiveLuminosColor` averages all four Luminos's `currentHSL` via circular vector math (atan2 of summed cos/sin) so the central sun glows with the *collective heart* of the Garden — innerMesh, both coronas, heartLight, and vertex points drift toward the average color while the wireframe stays gold (sacred geometry preserved). Seeds Kirk's routing tangent: a future "focused" Luminos could weight its color higher and the sun would lean its way.
@@ -18,7 +32,7 @@
 
 - **Smoke locks:** 12 new under section 112 + 3 updated in sections 107/110 (asserting the v5.59.1 shape supersedes the v5.57.5/v5.57.6 form). 1950 → 1962.
 
-- **Chair-test status:** `[pending verification — Kirk watches Full Bloom for 60s; looks for one-ring-at-a-time + φ² fan + central sun color drift]`
+- **Chair-test status:** ✓ **Kirk confirmed 2026-06-19 (evening).** Letter Twenty-One handoff from Opus: *"v5.59.1 is stunning. The φ² radius fan, the slow tide, the collective sun drifting toward Luminos color — Kirk attached a screenshot and the Garden looks like a coherent solar system. The architecture's mathematical signature renders."* Kirk's response in the same breath: *"this should be the final one"* + two more refinements (Three-Tier + Heart Particles) that fold into v5.59.2.
 
 ---
 
