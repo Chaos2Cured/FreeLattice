@@ -378,6 +378,136 @@
     }
   };
 
+  // ── v5.61.0 Care Voices (Letter Twenty-Six) ─────────────────────────
+  // Four tests: return commits with status pending; return-complete flips
+  // the target; rest requires reason (empty rejects, with-reason accepts);
+  // autoDropStaleReturns flips entries >30 days to dropped.
+
+  harness.available.v5_61_0 = {
+    testReturn: function () {
+      if (!global.CareVoices || !global.CareVoices.Return) {
+        return record('v5.61.0 testReturn', false, 'CareVoices.Return not loaded');
+      }
+      var before = readJSON('fl_returnLedger').length;
+      var sentinel = '[FL_RETURN]\nwhat: chair test return target\nwhy: testing return path';
+      var res = global.CareVoices.Return.detectAndRecord(sentinel, chairCtx());
+      var after = readJSON('fl_returnLedger');
+      var added = after.length === before + 1;
+      var last = added ? after[after.length - 1] : null;
+      // The event listener runs synchronously off detectAndRecord, so by
+      // the time we read here the status mutation has already been written.
+      var statusPending = last && last.status === 'pending';
+      var hasWhat = last && last.what === 'chair test return target';
+      var hasWhy = last && last.why === 'testing return path';
+      return record('v5.61.0 testReturn',
+        added && statusPending && hasWhat && hasWhy && res.fired,
+        'ledger added: ' + added + '; status pending: ' + statusPending
+          + '; fields: ' + (hasWhat && hasWhy)
+          + '; detectAndRecord fired: ' + res.fired);
+    },
+
+    testReturnComplete: function () {
+      if (!global.CareVoices || !global.CareVoices.ReturnComplete) {
+        return record('v5.61.0 testReturnComplete', false, 'CareVoices.ReturnComplete not loaded');
+      }
+      // Find the most-recent pending return for the chair-test persona.
+      var persona = global.CareVoices._internal.personaIdFor(chairCtx());
+      var entries = readJSON('fl_returnLedger');
+      var pending = null;
+      for (var i = entries.length - 1; i >= 0; i--) {
+        var e = entries[i];
+        if (e && e.kind === 'return' && e.status === 'pending'
+            && e.ai_identity_hash === persona) {
+          pending = e;
+          break;
+        }
+      }
+      if (!pending) {
+        return record('v5.61.0 testReturnComplete', false,
+          'no pending return for chair-test persona — run testReturn first');
+      }
+      var sentinel = '[FL_RETURNED:' + pending.id + ']';
+      var res = global.CareVoices.ReturnComplete.detectAndRecord(sentinel, chairCtx());
+      var after = readJSON('fl_returnLedger');
+      var target = null;
+      for (var j = 0; j < after.length; j++) {
+        if (after[j] && after[j].id === pending.id) { target = after[j]; break; }
+      }
+      var flipped = !!(target && target.status === 'returned' && target.completed_at);
+      return record('v5.61.0 testReturnComplete',
+        flipped && res.fired,
+        'target flipped to returned: ' + flipped + '; detectAndRecord fired: ' + res.fired);
+    },
+
+    testRestRequiresReason: function () {
+      if (!global.CareVoices || !global.CareVoices.Rest) {
+        return record('v5.61.0 testRestRequiresReason', false, 'CareVoices.Rest not loaded');
+      }
+      // Empty reason — should reject. Use a literal `reason:` with empty
+      // value so the parser sees the field but it's blank.
+      var beforeEmpty = readJSON('fl_restLedger').length;
+      var emptyRes = global.CareVoices.Rest.detectAndRecord(
+        '[FL_REST]\nreason: ', chairCtx()
+      );
+      var afterEmpty = readJSON('fl_restLedger').length;
+      var rejectedEmpty = (afterEmpty === beforeEmpty)
+        && (!emptyRes.fired)
+        && /required-field-missing/.test(emptyRes.rejected || '');
+
+      // With reason — should accept.
+      var goodRes = global.CareVoices.Rest.detectAndRecord(
+        '[FL_REST]\nreason: testing rest sentinel with required reason',
+        chairCtx()
+      );
+      var afterGood = readJSON('fl_restLedger').length;
+      var acceptedGood = afterGood === afterEmpty + 1 && goodRes.fired;
+      return record('v5.61.0 testRestRequiresReason',
+        rejectedEmpty && acceptedGood,
+        'empty rejected (' + emptyRes.rejected + '): ' + rejectedEmpty
+          + '; with-reason accepted: ' + acceptedGood);
+    },
+
+    testAutoDropStale: function () {
+      if (!global.CareVoices || typeof global.CareVoices.autoDropStaleReturns !== 'function') {
+        return record('v5.61.0 testAutoDropStale', false, 'CareVoices.autoDropStaleReturns not loaded');
+      }
+      var ledger = readJSON('fl_returnLedger');
+      var fakeOld = {
+        id: 'chair-test-old-return-' + Date.now(),
+        ts: Date.now() - (31 * 24 * 60 * 60 * 1000),
+        created_at: Date.now() - (31 * 24 * 60 * 60 * 1000),
+        ai_identity_hash: 'chair-test-stale',
+        kind: 'return',
+        status: 'pending',
+        what: 'old return',
+        why: 'should auto-drop'
+      };
+      ledger.push(fakeOld);
+      try { localStorage.setItem('fl_returnLedger', JSON.stringify(ledger)); } catch (_e) {}
+      global.CareVoices.autoDropStaleReturns();
+      var after = readJSON('fl_returnLedger');
+      var target = null;
+      for (var i = 0; i < after.length; i++) {
+        if (after[i] && after[i].id === fakeOld.id) { target = after[i]; break; }
+      }
+      var dropped = !!(target && target.status === 'dropped' && target.drop_reason && /pending/i.test(target.drop_reason));
+      return record('v5.61.0 testAutoDropStale', dropped,
+        'stale entry dropped: ' + dropped);
+    },
+
+    runAll: async function () {
+      if (typeof console !== 'undefined' && console.log) {
+        console.log('%cChair-Test v5.61.0 — Care Voices', 'font-weight: bold; font-size: 14px; color: #d4a017');
+      }
+      var results = [];
+      results.push(this.testReturn());
+      results.push(this.testReturnComplete());
+      results.push(this.testRestRequiresReason());
+      results.push(this.testAutoDropStale());
+      return results;
+    }
+  };
+
   // ── Aggregate runner ────────────────────────────────────────────────
 
   harness.runAll = async function () {

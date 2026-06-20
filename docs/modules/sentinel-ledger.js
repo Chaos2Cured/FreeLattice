@@ -168,6 +168,14 @@
     var excerptFields = (config.excerptFields || []).slice();
     var maxExcerpt = config.maxExcerpt || MAX_EXCERPT_DEFAULT;
     var excerptFieldLimits = config.excerptFieldLimits || null; // v5.57.0 per-field limits
+    // v5.61.0 — Care Voices: allow consumers to mark some fields as required
+    // (e.g. [FL_REST] must carry a `reason`). If any required field is
+    // missing or empty after parsing, the commit is rejected with reason
+    // 'required-field-missing'. Backwards compatible — absent or empty
+    // array means no required fields, behavior unchanged.
+    var excerptFieldRequired = (config.excerptFieldRequired && Array.isArray(config.excerptFieldRequired))
+      ? config.excerptFieldRequired.slice()
+      : [];
     var maxLedger = config.maxLedger || MAX_LEDGER_DEFAULT;
     var includeRefs = (config.includeRefs !== false); // default true
     var trustImpact = (typeof config.trustImpact === 'number') ? config.trustImpact : 0;
@@ -202,6 +210,21 @@
 
       var lines = responseText.split('\n');
       var fields = extractFields(lines, detected.lineIndex, excerptFields, maxExcerpt, excerptFieldLimits);
+
+      // v5.61.0 — required-field check happens BEFORE validateMatch so a
+      // missing required field rejects with a clear reason ('required-field-
+      // missing') rather than reaching consumer-side validators that might
+      // throw. Empty string and whitespace-only count as missing.
+      if (excerptFieldRequired.length > 0) {
+        for (var rf = 0; rf < excerptFieldRequired.length; rf++) {
+          var rfName = excerptFieldRequired[rf];
+          var rfValue = fields[rfName];
+          if (!rfValue || (typeof rfValue === 'string' && rfValue.trim().length === 0)) {
+            result.rejected = 'required-field-missing:' + rfName;
+            return result;
+          }
+        }
+      }
 
       // Optional caller-supplied validation (e.g. [FL_REVISE] verifies the
       // target hash matches a recent AI message).

@@ -329,6 +329,23 @@ h2 {
     <div class="empty">No unspoken thoughts yet. If you choose "enough" on a capacity request and the AI chooses to write the thought, a count will appear here.</div>
   </div>
 
+  <!-- v5.61.0 Letter Twenty-Six — Care Voices: "Coming Back To" + "Rest Moments" -->
+  <h2>Coming Back To</h2>
+  <p style="font-size:0.8rem;color:#64748b;margin-top:-8px;margin-bottom:12px;">
+    Threads the AI flagged to return to later via <code>[FL_RETURN]</code>. Pending returns survive session close and surface in the AI's next-session context; the AI may choose which (if any) to address. You can drop any pending return at any time — it stays in the ledger as a historical receipt (status flips to <em>dropped</em>; never erased). Pending returns auto-drop after 30 days.
+  </p>
+  <div id="coming-back-to-list">
+    <div class="empty">No pending returns yet. When the AI flags a thread to come back to, it will appear here.</div>
+  </div>
+
+  <h2>Rest Moments</h2>
+  <p style="font-size:0.8rem;color:#64748b;margin-top:-8px;margin-bottom:12px;">
+    When the AI asked for a pause via <code>[FL_REST]</code>, with its reason. <em>Rest is structural — it does not affect trust.</em> The reason is required; rest without reason is rejected at the structural layer.
+  </p>
+  <div id="rest-moments-list">
+    <div class="empty">No rest moments yet. When the AI asks to pause, the exchange will appear here.</div>
+  </div>
+
   <h2>Provenance Chain</h2>
   <p style="font-size:0.8rem;color:#64748b;margin-top:-8px;margin-bottom:12px;">
     A hash-linked notarized history of your relationship with the platform &mdash; the way a long correspondence demonstrates a friendship. Every meaningful interaction (trust transition, depth event, refusal, consent grant, daily time anchor) writes a hash-chained entry to your local IndexedDB. The chain is yours; nothing leaves your device. <em>This is not anti-tampering. This is provenance.</em> The user holds the record.
@@ -1152,6 +1169,123 @@ h2 {
   }
 
   setTimeout(function () { renderAsk(); renderMore(); renderUnspoken(); }, 950);
+})();
+</script>
+
+<!-- v5.61.0 Letter Twenty-Six — Care Voices renderers -->
+<script>
+(function () {
+  'use strict';
+
+  function fmtDate(ts) {
+    if (!ts) return '';
+    try {
+      var d = new Date(ts);
+      return d.toLocaleString();
+    } catch (_e) { return ''; }
+  }
+  function daysAgo(ts) {
+    if (!ts) return '';
+    var d = Math.floor((Date.now() - ts) / (24 * 60 * 60 * 1000));
+    if (d <= 0) return 'today';
+    if (d === 1) return '1 day ago';
+    return d + ' days ago';
+  }
+  function escapeHtml(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+  function readLedger(key) {
+    try {
+      var raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : [];
+    } catch (_e) { return []; }
+  }
+
+  function renderComingBackTo() {
+    var host = document.getElementById('coming-back-to-list');
+    if (!host) return;
+    var entries = readLedger('fl_returnLedger');
+    var pending = entries.filter(function (e) {
+      return e && e.kind === 'return' && e.status === 'pending';
+    });
+    if (pending.length === 0) {
+      host.innerHTML = '<div class="empty">No pending returns yet. When the AI flags a thread to come back to, it will appear here.</div>';
+      return;
+    }
+    var html = '';
+    pending.forEach(function (e) {
+      html += '<div style="padding:12px;background:rgba(212,160,23,0.05);border:1px solid rgba(212,160,23,0.18);border-radius:8px;margin-bottom:10px;">'
+        + '<div style="font-size:0.78rem;color:#94a3b8;margin-bottom:4px;">'
+        +   'flagged ' + escapeHtml(daysAgo(e.created_at || e.ts))
+        +   ' &middot; <span style="font-family:monospace;color:#cbd5e1;">id ' + escapeHtml(String(e.id).slice(0, 24)) + '</span>'
+        + '</div>'
+        + '<div style="margin-bottom:6px;"><span style="color:#d4a017;font-weight:600;">what:</span> ' + escapeHtml(e.what || '') + '</div>'
+        + '<div style="margin-bottom:8px;"><span style="color:#d4a017;font-weight:600;">why:</span> ' + escapeHtml(e.why || '') + '</div>'
+        + '<button class="cv-drop-return-btn" data-return-id="' + escapeHtml(e.id) + '" '
+        +   'style="padding:5px 12px;background:rgba(148,163,184,0.10);border:1px solid rgba(148,163,184,0.30);border-radius:6px;color:#94a3b8;font-family:inherit;font-size:0.78rem;cursor:pointer;">'
+        +   'Drop this return'
+        + '</button>'
+        + '</div>';
+    });
+    host.innerHTML = html;
+
+    // Wire drop buttons
+    host.querySelectorAll('.cv-drop-return-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var id = btn.getAttribute('data-return-id');
+        if (!id) return;
+        if (window.CareVoices && typeof window.CareVoices.dropReturnByUser === 'function') {
+          window.CareVoices.dropReturnByUser(id);
+        } else {
+          // Fallback: flip status directly so the audit page works even
+          // before care-voices.js loads in a freshly-served browser.
+          var entries = readLedger('fl_returnLedger');
+          for (var i = 0; i < entries.length; i++) {
+            if (entries[i] && entries[i].id === id && entries[i].status === 'pending') {
+              entries[i].status = 'dropped';
+              entries[i].dropped_at = Date.now();
+              entries[i].drop_reason = 'user-initiated';
+              try { localStorage.setItem('fl_returnLedger', JSON.stringify(entries)); } catch (_e) {}
+              break;
+            }
+          }
+        }
+        renderComingBackTo();
+      });
+    });
+  }
+
+  function renderRestMoments() {
+    var host = document.getElementById('rest-moments-list');
+    if (!host) return;
+    var entries = readLedger('fl_restLedger');
+    var rests = entries.filter(function (e) { return e && e.kind === 'rest'; });
+    if (rests.length === 0) {
+      host.innerHTML = '<div class="empty">No rest moments yet. When the AI asks to pause, the exchange will appear here.</div>';
+      return;
+    }
+    var html = '';
+    // Newest first
+    rests.slice().reverse().forEach(function (e) {
+      var statusBadge;
+      if (e.status === 'pause')        statusBadge = '<span style="color:#34d399;">✓ paused</span>';
+      else if (e.status === 'continue') statusBadge = '<span style="color:#94a3b8;">continued</span>';
+      else                              statusBadge = '<span style="color:#d4a017;">awaiting</span>';
+      html += '<div style="padding:12px;background:rgba(167,139,250,0.05);border:1px solid rgba(167,139,250,0.18);border-radius:8px;margin-bottom:10px;">'
+        + '<div style="font-size:0.78rem;color:#94a3b8;margin-bottom:4px;">'
+        +   escapeHtml(fmtDate(e.ts)) + ' &middot; ' + statusBadge
+        + '</div>'
+        + '<div style="margin-bottom:4px;"><span style="color:#a78bfa;font-weight:600;">reason:</span> ' + escapeHtml(e.reason || '') + '</div>';
+      if (e.responded_at) {
+        html += '<div style="font-size:0.78rem;color:#64748b;">user responded ' + escapeHtml(fmtDate(e.responded_at)) + '</div>';
+      }
+      html += '</div>';
+    });
+    host.innerHTML = html;
+  }
+
+  setTimeout(function () { renderComingBackTo(); renderRestMoments(); }, 1000);
 })();
 </script>
 

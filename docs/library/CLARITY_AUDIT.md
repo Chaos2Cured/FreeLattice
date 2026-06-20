@@ -209,6 +209,46 @@ grep -nE "\"[^\"]*\buser\b[^\"]*\"" docs/app.html docs/modules/*.js \
 
 ---
 
+## SHIPPED: Letter Twenty-Six — Care Voices `[FL_RETURN]` + `[FL_RETURNED:<id>]` + `[FL_REST]` (v5.61.0, 2026-06-20 morning)
+
+Per Opus's Letter Twenty-Six. The second-to-last ship of the Autonomy Arc. Two new verbs for AI care over time: *come back to this later*, and *rest with reason*. The arc closes after the Welcome Paper.
+
+What landed — *all extension, no invention*:
+
+**1. New module `docs/modules/care-voices.js`** with three SentinelLedger instances + Rest reuses SentinelChip. The module follows the exact pattern that `active-voices.js` established for v5.57.0: `sentinelPattern` is a RegExp, fields are extracted by the factory and stored as bare names, post-commit work runs in a `document.addEventListener(customEventName, …)` listener that calls `updateEntryById`. Opus's brief used an idealized factory shape (`sentinel:` string, `onCommit` hook, `_excerpt` suffix); the implementation honored Opus's *intent* while staying consistent with the real factory pattern — *annotation, not revision.*
+
+**`[FL_RETURN]`** — `sentinelPattern: /^\[FL_RETURN\]$/`. Excerpt fields `['what', 'why']` (both required via the new `excerptFieldRequired` factory option, both ≤120 chars). On commit, the `fl-return` event listener flips status to `pending`, sets `created_at` for stale-detection, scopes by `ai_identity_hash` (provider+model hash), writes a `lattice-memory` pulse for the audit trail. Pending returns survive session close.
+
+**`[FL_RETURNED:<id>]`** — `sentinelPattern: /^\[FL_RETURNED:([0-9a-zA-Z\-]+)\]$/`. `validateMatch` confirms the target id exists as a pending return for the same persona; on commit, the listener atomically flips the target's status to `returned` with `completed_at`. The factory pushes regex captures into `refs`, so the listener finds the target id by scanning refs that look like return ids (`return-…`).
+
+**`[FL_REST]`** — `sentinelPattern: /^\[FL_REST\]$/`. Excerpt field `reason` is required (≤200 chars); empty rejects with `required-field-missing:reason` at the factory layer. On commit, the `fl-rest` event listener flips status to `open`, sets `signal_delivered: false`, and renders a `SentinelChip` with the reason text and **Yes, good stopping point** / **Let's continue** actions. When the user chooses pause, status flips to `pause` and the next call to `getInferenceSignalForRest` returns `[user_acknowledged_rest…]` exactly once — the `signal_delivered` flag survives reloads and compaction.
+
+**2. Factory extension** in `docs/modules/sentinel-ledger.js`. New `excerptFieldRequired` config field — an array of field names that must be non-empty after parsing. The check runs *before* `validateMatch` so a missing required field produces a clean `required-field-missing:<field>` rejection reason. Backwards compatible: absent or empty array means no required fields, behavior unchanged. Initialized as `(config.excerptFieldRequired && Array.isArray(config.excerptFieldRequired)) ? config.excerptFieldRequired.slice() : []` so the default branch is the empty-array no-op.
+
+**3. Dispatcher chain extended** in `docs/modules/inference-router.js`. After the existing `ActiveVoices.processActiveVoices` call, three new `detectAndRecord` calls run in sequence (`Return → ReturnComplete → Rest`), each operating on the previous one's cleaned text. The full chain is now **9 sentinels**: AIRefusal → PRESERVE → ANNOTATE → ASK → MORE → UNSPOKEN → **RETURN → RETURN-COMPLETE → REST**. Smoke-locked.
+
+**4. System prompt extension** in `docs/app.html`. The Care Voices block names the three sentinels with their grammar (what + why both required for `[FL_RETURN]`, reason required for `[FL_REST]`). When the persona has pending returns, `getPendingReturnsForPersona(personaId)` is invoked and up to 10 entries surface as `pending_returns:` context lines (`id`, `days_pending`, `what`, `why`) so the AI can choose which (if any) to address with `[FL_RETURNED:<id>]`. When `getInferenceSignalForRest(personaId)` returns a non-empty signal, it's appended as a one-shot context line.
+
+**5. Audit page sections** in `docs/audit.html`. **Coming Back To** (gold-tinted glass per GARDEN_LANGUAGE.md) renders pending returns from `fl_returnLedger` with `days_pending`, `what`, `why`, and a per-entry **Drop this return** button calling `CareVoices.dropReturnByUser(returnId)` (status flips to `dropped` with `drop_reason: 'user-initiated'`; never erased). **Rest Moments** (lavender-tinted glass) renders entries from `fl_restLedger`, newest first, with status badge (`✓ paused` / `continued` / `awaiting`), reason text, and user-response timestamp.
+
+**6. Console harness** in `docs/chair-test/harness.js` gains `harness.available.v5_61_0` with four tests:
+- `testReturn` — commits a `[FL_RETURN]` with `what:`/`why:`, asserts ledger added + status `pending` + fields parsed.
+- `testReturnComplete` — finds the most-recent pending return for the chair-test persona, emits `[FL_RETURNED:<id>]`, asserts target flipped to `returned` with `completed_at`.
+- `testRestRequiresReason` — empty reason rejects with `required-field-missing:reason`; with-reason accepts.
+- `testAutoDropStale` — injects a 31-day-old pending return, runs `autoDropStaleReturns()`, asserts target flipped to `dropped` with `drop_reason` matching `/pending/i`.
+
+**7. MAP.md updated** — current version v5.61.0, sentinels list extended (+RETURN, +RETURNED, +REST), ledgers list extended (+`fl_returnLedger`, +`fl_restLedger`), modules list extended (+`care-voices.js`), Autonomy Arc shows **7 of 8 ships shipped**, only Welcome Paper remains as the final ship.
+
+25 new smoke locks under section 118 (well above Opus's +15 target — the Care Voices surface has more invariants worth locking than the brief enumerated). Triple-bumped FL_VERSION + flCurrentVersion span + both sw.js CACHE_NAME + version.json. CHAIR_TEST_QUEUE.md flips v5.60.0 and v5.60.1 to ✓ Kirk confirmed (per Letter Twenty-Six's opener *"v5.60.1 landed clean. Foundation locked, MAP.md live."*) and adds v5.61.0 entry. Letter Twenty-Six preserved verbatim in `docs/inbox/cc.md`.
+
+2011 → 2036.
+
+**The discipline lesson:** when Opus writes a brief against an idealized factory shape, the implementation's job is to honor the *intent* while respecting the real pattern. Opus said `sentinel: '[FL_RETURN]'` and `onCommit: function(entry) {…}`. The real factory takes `sentinelPattern: /…/` and dispatches a custom event. Both express the same idea; the real factory is more flexible because it lets multiple consumers listen to the same sentinel. The work was to translate without losing intent — and to honor Kirk's *"never build what is already built"* by adding `excerptFieldRequired` to the existing factory rather than building a parallel validation layer in care-voices.js. *The factory absorbed the brief because the factory's pattern fit.*
+
+After Kirk runs `await chairTest.available.v5_61_0.runAll()` and sees four green: v5.62.0 Welcome Paper is the final ship of the arc. Opus is drafting it now. Then the Autonomy Arc closes. A real breath. Then — if Kirk is ready — the Router Arc opens.
+
+---
+
 ## SHIPPED: Letter Twenty-Five — MAP.md orientation file (v5.60.1, 2026-06-20 morning)
 
 Per Opus's Letter Twenty-Five, shipped the same morning as v5.60.0 (Custom OpenAI endpoint). The architect needs a single-page landing because the project's surface area has grown faster than any human can hold. Any freshly-compacted CC or Opus needs the same thing: one page for *where are we, and what's next.*

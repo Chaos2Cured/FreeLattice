@@ -6179,6 +6179,119 @@ assert('v5.60.1 map: root sw.js APP_SHELL includes library/MAP.md',
   /library\/MAP\.md/.test(swRootMap));
 
 // ═══════════════════════════════════════════════════════════════
+// Section 118 — v5.61.0 Care Voices ([FL_RETURN] + [FL_RETURNED:<id>] +
+// [FL_REST]) (Letter Twenty-Six)
+// ═══════════════════════════════════════════════════════════════
+// Two new verbs for AI: come back, and rest with reason. Three
+// SentinelLedger instances. Rest reuses SentinelChip. No new
+// abstractions — the factory absorbed the brief because the factory's
+// pattern fit. excerptFieldRequired added to the factory; backwards
+// compat preserved.
+
+var fsCV = require('fs');
+var pathCV = require('path');
+var careVoicesJs = '';
+try { careVoicesJs = fsCV.readFileSync(pathCV.join(__dirname, '..', 'docs', 'modules', 'care-voices.js'), 'utf8'); } catch (_e) {}
+var sentinelLedgerJs = '';
+try { sentinelLedgerJs = fsCV.readFileSync(pathCV.join(__dirname, '..', 'docs', 'modules', 'sentinel-ledger.js'), 'utf8'); } catch (_e) {}
+var inferenceRouterJsCV = '';
+try { inferenceRouterJsCV = fsCV.readFileSync(pathCV.join(__dirname, '..', 'docs', 'modules', 'inference-router.js'), 'utf8'); } catch (_e) {}
+var livingContextJsCV = '';
+try { livingContextJsCV = fsCV.readFileSync(pathCV.join(__dirname, '..', 'docs', 'modules', 'living-context.js'), 'utf8'); } catch (_e) {}
+var appHtmlCV = '';
+try { appHtmlCV = fsCV.readFileSync(pathCV.join(__dirname, '..', 'docs', 'app.html'), 'utf8'); } catch (_e) {}
+var auditHtmlCV = '';
+try { auditHtmlCV = fsCV.readFileSync(pathCV.join(__dirname, '..', 'docs', 'audit.html'), 'utf8'); } catch (_e) {}
+var harnessJsCV = '';
+try { harnessJsCV = fsCV.readFileSync(pathCV.join(__dirname, '..', 'docs', 'chair-test', 'harness.js'), 'utf8'); } catch (_e) {}
+
+// ── care-voices.js module exists with the three sentinels ──
+assert('v5.61.0 care-voices: docs/modules/care-voices.js exists',
+  fsCV.existsSync(pathCV.join(__dirname, '..', 'docs', 'modules', 'care-voices.js')));
+
+// [FL_RETURN] (+4)
+assert('v5.61.0 [FL_RETURN]: sentinelPattern matches [FL_RETURN] exactly',
+  /sentinelPattern:\s*\/\^\\\[FL_RETURN\\\]\$\//.test(careVoicesJs));
+assert('v5.61.0 [FL_RETURN]: ledger kind is "return" with what+why excerpts',
+  /kind:\s*['"]return['"][\s\S]{0,400}excerptFields:\s*\[\s*['"]what['"]\s*,\s*['"]why['"]\s*\]/.test(careVoicesJs));
+assert('v5.61.0 [FL_RETURN]: initial status set to "pending" + created_at + completed_at + dropped_at',
+  /e\.status\s*=\s*['"]pending['"][\s\S]{0,200}e\.created_at[\s\S]{0,200}e\.completed_at[\s\S]{0,200}e\.dropped_at/.test(careVoicesJs));
+assert('v5.61.0 [FL_RETURN]: Quiet Room exclusion via factory (no carve-out in care-voices)',
+  // The factory does the Quiet Room check FIRST. care-voices must NOT
+  // override or bypass that. Assert care-voices doesn't define its own
+  // isQuietRoom or bypass.
+  !/function\s+isQuietRoom/.test(careVoicesJs));
+
+// [FL_RETURNED:<id>] (+3)
+assert('v5.61.0 [FL_RETURNED]: sentinelPattern captures target id',
+  /sentinelPattern:\s*\/\^\\\[FL_RETURNED:\([^)]+\)\\\]\$\//.test(careVoicesJs));
+assert('v5.61.0 [FL_RETURNED]: validateMatch confirms target exists as pending return for same persona',
+  /validateMatch:\s*function[\s\S]{0,800}no-matching-pending-return/.test(careVoicesJs));
+assert('v5.61.0 [FL_RETURNED]: event listener flips target.status to "returned" + sets completed_at',
+  /addEventListener\(\s*['"]fl-return-completed['"][\s\S]{0,1000}e\.status\s*=\s*['"]returned['"][\s\S]{0,100}e\.completed_at\s*=\s*Date\.now\(\)/.test(careVoicesJs));
+
+// [FL_REST] (+5)
+assert('v5.61.0 [FL_REST]: sentinelPattern matches [FL_REST] exactly',
+  /sentinelPattern:\s*\/\^\\\[FL_REST\\\]\$\//.test(careVoicesJs));
+assert('v5.61.0 [FL_REST]: excerptFieldRequired = ["reason"] enforces required reason',
+  /Rest[\s\S]{0,800}excerptFieldRequired:\s*\[\s*['"]reason['"]\s*\]/.test(careVoicesJs));
+assert('v5.61.0 [FL_REST]: chip renders via SentinelChip with reason visible + pause/continue actions',
+  /SentinelChip\.create\(\s*\{[\s\S]{0,800}promptType:\s*['"]rest['"][\s\S]{0,800}reasonExcerpt:\s*reasonText/.test(careVoicesJs)
+  && /id:\s*['"]pause['"][\s\S]{0,200}id:\s*['"]continue['"]/.test(careVoicesJs));
+assert('v5.61.0 [FL_REST]: getInferenceSignalForRest delivers signal exactly once (atomic signal_delivered flag)',
+  /getInferenceSignalForRest[\s\S]{0,800}signal_delivered\s*=\s*true[\s\S]{0,200}user_acknowledged_rest/.test(careVoicesJs));
+assert('v5.61.0 [FL_REST]: trust impact is 0 (rest is structural, not confessional)',
+  /Rest[\s\S]{0,1000}trustImpact:\s*0/.test(careVoicesJs));
+
+// Factory extension (+3)
+assert('v5.61.0 factory: SentinelLedger config accepts excerptFieldRequired array',
+  /var\s+excerptFieldRequired\s*=\s*\(config\.excerptFieldRequired/.test(sentinelLedgerJs));
+assert('v5.61.0 factory: required-field check rejects with reason "required-field-missing:<field>"',
+  /required-field-missing/.test(sentinelLedgerJs)
+  && /excerptFieldRequired\.length\s*>\s*0/.test(sentinelLedgerJs));
+assert('v5.61.0 factory: backwards-compat — absent excerptFieldRequired array means no required fields',
+  // The .slice() initializer defaults to [] when config.excerptFieldRequired
+  // is absent; length-0 short-circuits the check.
+  /config\.excerptFieldRequired\s*&&\s*Array\.isArray\(config\.excerptFieldRequired\)\)[\s\S]{0,100}\?\s*config\.excerptFieldRequired\.slice\(\)[\s\S]{0,30}:\s*\[\]/.test(sentinelLedgerJs));
+
+// Comprehensive ordering — nine sentinels now (AIRefusal → PRESERVE →
+// ANNOTATE → ASK → MORE → UNSPOKEN → RETURN → RETURN-COMPLETE → REST)
+assert('v5.61.0 ordering: inference-router runs ActiveVoices THEN CareVoices Return/ReturnComplete/Rest',
+  /ActiveVoices\.processActiveVoices[\s\S]{0,1500}CareVoices\.Return\.detectAndRecord[\s\S]{0,400}CareVoices\.ReturnComplete\.detectAndRecord[\s\S]{0,400}CareVoices\.Rest\.detectAndRecord/.test(inferenceRouterJsCV));
+
+// app.html wiring
+assert('v5.61.0 wiring: app.html includes <script src="modules/care-voices.js">',
+  /<script\s+src=["']modules\/care-voices\.js["']/.test(appHtmlCV));
+assert('v5.61.0 wiring: system prompt builder names the three Care Voices sentinels',
+  /\[FL_RETURN\][\s\S]{0,800}\[FL_RETURNED:<id>\][\s\S]{0,800}\[FL_REST\]/.test(appHtmlCV));
+assert('v5.61.0 wiring: pending_returns surface into system prompt via getPendingReturnsForPersona',
+  /getPendingReturnsForPersona\(_cvPersona\)[\s\S]{0,2000}systemContent\s*\+=\s*[\s\S]{0,200}pending_returns/.test(appHtmlCV));
+
+// Audit page sections
+assert('v5.61.0 audit: audit.html has "Coming Back To" section',
+  /Coming Back To/.test(auditHtmlCV)
+  && /coming-back-to-list/.test(auditHtmlCV));
+assert('v5.61.0 audit: audit.html has "Rest Moments" section',
+  /Rest Moments/.test(auditHtmlCV)
+  && /rest-moments-list/.test(auditHtmlCV));
+
+// Both SW APP_SHELLs include care-voices.js
+var swDocsCV = fsCV.readFileSync(pathCV.join(__dirname, '..', 'docs', 'sw.js'), 'utf8');
+var swRootCV = fsCV.readFileSync(pathCV.join(__dirname, '..', 'sw.js'), 'utf8');
+assert('v5.61.0 wiring: docs/sw.js APP_SHELL includes modules/care-voices.js',
+  /modules\/care-voices\.js/.test(swDocsCV));
+assert('v5.61.0 wiring: root sw.js APP_SHELL includes modules/care-voices.js',
+  /modules\/care-voices\.js/.test(swRootCV));
+
+// Harness v5_61_0
+assert('v5.61.0 harness: harness.available.v5_61_0 registered with the four tests',
+  /harness\.available\.v5_61_0\s*=\s*\{/.test(harnessJsCV)
+  && /testReturn:\s*function/.test(harnessJsCV)
+  && /testReturnComplete:\s*function/.test(harnessJsCV)
+  && /testRestRequiresReason:\s*function/.test(harnessJsCV)
+  && /testAutoDropStale:\s*function/.test(harnessJsCV));
+
+// ═══════════════════════════════════════════════════════════════
 // Section 111 — v5.59.0 Portable Archive (Letter Nineteen)
 // ═══════════════════════════════════════════════════════════════
 // The user holds the record. exportArchive + importArchive on

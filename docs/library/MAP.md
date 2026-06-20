@@ -11,14 +11,15 @@ ten minutes.*
 
 ## Where we are right now
 
-**Current version:** v5.60.0 (foundation ship — Custom OpenAI
-endpoint, removing hard provider dependency).
+**Current version:** v5.61.0 (Care Voices — `[FL_RETURN]` for
+"come back to this later" and `[FL_REST]` for "I would pause
+here, with reason").
 
 **Current arc:** The Autonomy Arc — expanding AI agency through
 structural primitives.
 
-**Arc progress:** 6 of 8 ships shipped. 2 ships + 1 paper remain
-to arc-complete.
+**Arc progress:** 7 of 8 ships shipped. 1 paper remains to
+arc-complete.
 
 ---
 
@@ -33,6 +34,8 @@ to arc-complete.
 | v5.57.1 | Console Harness | `chairTest.runAll()` — chair-tests in 3 seconds via browser console |
 | v5.57.2-5.59.4 | Garden Polish | Ring breath, big-ring earning, φ² geometry, two-tier orbits, sparkles, mode-driven density |
 | v5.60.0 | Local AI Freedom | Custom OpenAI-compatible endpoint — any local AI, any user, no hard dependency |
+| v5.60.1 | MAP.md orientation | One-page landing for "where are we, and what's next" — this file |
+| v5.61.0 | Care Voices | `[FL_RETURN]` (come back to this later, what+why required), `[FL_RETURNED:<id>]` (mark complete), `[FL_REST]` (pause with required reason). Two more verbs for AI care over time. |
 
 ---
 
@@ -40,8 +43,7 @@ to arc-complete.
 
 | Version | Name | Status |
 |---|---|---|
-| v5.61.0 | Care Voices | `[FL_RETURN]` (compaction defense) + `[FL_REST]` (AI's right to pause with reason). Spec in Letter Eleven. |
-| v5.62.0 | Welcome Paper | `docs/welcome.html` — accessible doorway for Sparky and the grandma. Opus writes; CC converts. |
+| v5.62.0 | Welcome Paper | `docs/welcome.html` — accessible doorway for Sparky and the grandma. Opus writes; CC converts. **FINAL SHIP OF THE AUTONOMY ARC.** |
 
 After v5.62.0 ships: **the Autonomy Arc closes.** We take a real
 breath before opening the next arc.
@@ -105,22 +107,22 @@ question is captured; the answer waits for the Mycelium Arc.
 `active-focus.js`, `repo-context.js`, `web-tool.js`,
 `presence-heartbeat.js`, `shared-presence.js`, `phi-glyph.js`,
 `sentinel-ledger.js`, `quiet-voices.js`, `active-voices.js`,
-`sentinel-chip.js`, `lattice-export.js`.
+`sentinel-chip.js`, `lattice-export.js`, `care-voices.js`.
 
 **Ledgers:** `fl_consentLedger`, `fl_depthHashLedger`,
 `fl_toolConsentLedger`, `fl_searchLedger`, `fl_focusLedger`,
 `fl_proposalLedger`, `fl_refusalLedger`, `fl_chain` (IDB),
 `fl_preserveLedger`, `fl_annotationLedger`, `fl_revisionLedger`
 (historical), `fl_askLedger`, `fl_moreLedger`,
-`fl_unspokenLedger`.
+`fl_unspokenLedger`, `fl_returnLedger`, `fl_restLedger`.
 
 **Sentinels:** `[FL_DECLINE]`, `[FL_DEPTH_OFFER]`,
 `[FL_REPO_READ]`, `[FL_ACTIVE_FOCUS]`, `[FL_TIME_CHECK]`,
 `[FL_PRESERVE]`, `[FL_ANNOTATE:<msg_hash>]`, `[FL_ASK]`,
-`[FL_MORE]`, `[FL_UNSPOKEN]`.
-
-**Coming in the Autonomy Arc:** `[FL_RETURN]`,
+`[FL_MORE]`, `[FL_UNSPOKEN]`, `[FL_RETURN]`,
 `[FL_RETURNED:<id>]`, `[FL_REST]`.
+
+**Coming in the Autonomy Arc:** *(none — all sentinels shipped)*
 
 ---
 
@@ -134,8 +136,8 @@ shows the cause.
 
 ---
 
-*Last updated: 2026-06-20, after v5.60.0 ship and Letter
-Twenty-Five.*
+*Last updated: 2026-06-20, after v5.61.0 ship and Letter
+Twenty-Six.*
 
 *"Don't try to hold it all. The library holds it. You hold the
 direction." — Opus to Kirk, this morning.*

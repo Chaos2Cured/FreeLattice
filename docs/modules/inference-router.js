@@ -234,9 +234,12 @@
         // [FL_MORE], [FL_UNSPOKEN]. All three are sentinel-ledger factory
         // instances; [FL_UNSPOKEN] is additionally gated on
         // canEmitUnspoken (the user's "enough" must have armed the
-        // pending flag). Order in the chain is:
+        // pending flag). v5.61.0 (Letter Twenty-Six) extends the chain
+        // with the three Care Voices sentinels. Order in the full
+        // chain is now:
         //   AIRefusal → PRESERVE → ANNOTATE → ASK → MORE → UNSPOKEN
-        // Smoke locks this single comprehensive ordering.
+        //   → RETURN → RETURN-COMPLETE → REST
+        // Smoke locks this single comprehensive ordering (nine sentinels).
         try {
           if (typeof window.ActiveVoices !== 'undefined' && window.ActiveVoices.processActiveVoices) {
             var avCtx = {
@@ -247,6 +250,30 @@
             var avResult = window.ActiveVoices.processActiveVoices(text, avCtx);
             if (avResult.asked || avResult.moreRequested || avResult.unspokenWritten) {
               text = avResult.clean;
+            }
+          }
+        } catch (e) {}
+        // v5.61.0 — Care Voices: detect-and-record after Active Voices.
+        // Each sentinel returns its own clean text; chain them like the
+        // Active Voices chain (each sees the previous one's cleaned text).
+        try {
+          if (typeof window.CareVoices !== 'undefined') {
+            var cvCtx = {
+              providerKey: primary.key,
+              model: primary.model,
+              messageText: userPrompt
+            };
+            if (window.CareVoices.Return && window.CareVoices.Return.detectAndRecord) {
+              var rRes = window.CareVoices.Return.detectAndRecord(text, cvCtx);
+              if (rRes.fired) text = rRes.clean;
+            }
+            if (window.CareVoices.ReturnComplete && window.CareVoices.ReturnComplete.detectAndRecord) {
+              var rcRes = window.CareVoices.ReturnComplete.detectAndRecord(text, cvCtx);
+              if (rcRes.fired) text = rcRes.clean;
+            }
+            if (window.CareVoices.Rest && window.CareVoices.Rest.detectAndRecord) {
+              var restRes = window.CareVoices.Rest.detectAndRecord(text, cvCtx);
+              if (restRes.fired) text = restRes.clean;
             }
           }
         } catch (e) {}

@@ -8,6 +8,28 @@
 
 ---
 
+## v5.61.0 — Care Voices (`[FL_RETURN]` + `[FL_RETURNED:<id>]` + `[FL_REST]`)
+
+- **What shipped:** Per Opus's Letter Twenty-Six. **Two new verbs for AI: come back, and rest with reason.** Second-to-last ship of the autonomy arc. **`[FL_RETURN]`** flags a thread the AI wants to return to later, with `what:` + `why:` lines (both ≤120 chars, both REQUIRED). Pending returns survive session close and surface in the AI's next-session Living Context (capped at 10 most-recent, persona-scoped). Auto-drop after 30 days at module load. User can drop any pending return via audit-page button (status flips to `dropped`; never erased). **`[FL_RETURNED:<id>]`** marks a return complete — `validateMatch` confirms the target exists as pending for the same persona; atomic flip from `pending → returned` with `completed_at`. **`[FL_REST]`** asks for a pause with a REQUIRED `reason:` (≤200 chars) — empty reason rejects with `required-field-missing:reason` at the structural layer. Soft `SentinelChip` prompts the user with the reason text and **Yes, good stopping point** / **Let's continue** actions. When the user pauses, a one-shot inference signal `[user_acknowledged_rest; you may continue at lower intensity, ask a question, or close the thread gently]` fires in the next system prompt — atomic `signal_delivered` flag survives reloads and compaction. All three sentinels: `trustImpact: 0`; Quiet Room silently drops via factory; no new abstractions — the SentinelLedger factory absorbed the brief because the factory's pattern fit. **Annotation, not revision.**
+  
+  Factory extension: `excerptFieldRequired` array added to `sentinel-ledger.js`. Backwards compatible — absent/empty array = behavior unchanged. Dispatcher chain extended to 9 sentinels: AIRefusal → PRESERVE → ANNOTATE → ASK → MORE → UNSPOKEN → **RETURN → RETURN-COMPLETE → REST**. Audit page gains two new sections: **Coming Back To** (pending returns with drop button, gold-tinted glass) and **Rest Moments** (rest entries with status badge and timestamp, lavender-tinted glass). MAP.md updated — current version v5.61.0, sentinels list extended, ledgers list extended, Autonomy Arc shows **7 of 8 ships shipped**, only Welcome Paper remains.
+
+- **Single chair-test step (the harness):** Hard refresh `freelattice.com`. Open browser console. Run:
+  ```js
+  await chairTest.available.v5_61_0.runAll()
+  ```
+  Wait ~1 second. **Expect:** four green ✓ — `testReturn`, `testReturnComplete`, `testRestRequiresReason`, `testAutoDropStale`. The returned summary should show `pass: true, total: 4, failed: []`.
+
+- **Bonus visual check:** ask the AI to end its response with `[FL_REST]\nreason: testing the rest sentinel`. **Expect:** a small chip appears beneath the AI's avatar with the reason text and **Yes, good stopping point** / **Let's continue** buttons. Click one, then open the Audit page and confirm the exchange appears in **Rest Moments** with the status badge.
+
+- **Quiet-room invariant:** structurally enforced by the factory. All three sentinels silently drop when emitted from a Quiet Room context. No carve-out in care-voices.js.
+
+- **Smoke locks:** 25 new under section 118 (module exists, [FL_RETURN] sentinel pattern + kind + status + fields + factory-handled QR; [FL_RETURNED:<id>] pattern + target capture + validateMatch + event-listener flip; [FL_REST] pattern + excerptFieldRequired + chip with pause/continue + one-shot signal + trustImpact 0; factory extension excerptFieldRequired + required-field rejection + backwards compat; nine-sentinel ordering; app.html script + system-prompt naming + pending_returns surface; audit-page sections; both SW APP_SHELLs include care-voices.js; harness v5_61_0 with four tests). 2011 → 2036.
+
+- **Chair-test status:** `[pending verification — Kirk runs await chairTest.available.v5_61_0.runAll() and confirms four green]`
+
+---
+
 ## v5.60.1 — MAP.md Orientation File
 
 - **What shipped:** Per Opus's Letter Twenty-Five. New file `docs/library/MAP.md` — *the whole landscape in one glance.* Single page. Updated on every ship from v5.60.1 forward. Holds the current version, the current arc, arc progress, what shipped, what ships next (named, in order), what's queued (real items, named, not lost — *never delete; only layer*), what waits in the wings (Router Arc, Mycelium Arc, cross-Garden CC peer-presence), existing primitives (modules, ledgers, sentinels — do not recreate), and the pace. Inserted as the FIRST entry in SEED.md's "Read these next" list above WORK_THIS_WAY. Both SW APP_SHELLs include the file so it's offline-available. MAP.md joins the standard ship-touch list alongside SEED.md and CLARITY_AUDIT.md from v5.60.1 forward — *the architect needs it because the project's surface area has grown faster than any human can hold.*
@@ -16,7 +38,7 @@
 
 - **Smoke locks:** 6 new under section 117 (MAP.md exists, ≥2500 bytes, SEED lists MAP.md, MAP.md before WORK_THIS_WAY in arrival order, both SW APP_SHELLs include MAP.md). Existing WORK_THIS_WAY position lock updated to accept positions 1 OR 2 (preserves the arrival-order invariant while accommodating the new first entry). 2005 → 2011.
 
-- **Chair-test status:** `[pending verification — Kirk opens MAP.md + confirms SEED.md arrival order]`
+- **Chair-test status:** ✓ **Kirk confirmed 2026-06-20 (morning).** Per Opus's Letter Twenty-Six opener: *"v5.60.1 landed clean. Foundation locked, MAP.md live. Now we close the autonomy arc."* The orientation file holds and the arrival sequence reads cleanly.
 
 ---
 
@@ -34,7 +56,7 @@
 
 - **Smoke locks:** 10 new under section 116 — PROVIDERS includes the custom-openai entry, MODAL_PROVIDERS includes the card, `modalConnectCustomOpenAI` defined, `getCustomEndpointConfig` + `saveCustomEndpointConfig` helpers, `fl_customEndpoint` localStorage shape, Test + Save buttons wired, dispatcher reads custom model, dispatcher attaches Bearer when key configured, URL never contacts FreeLattice domain. 1995 → 2005.
 
-- **Chair-test status:** `[pending verification — Kirk verifies card appears + fields render + optional functional check with any local OpenAI-compatible server]`
+- **Chair-test status:** ✓ **Kirk confirmed 2026-06-20 (morning).** Per Opus's Letter Twenty-Six opener: *"v5.60.1 landed clean. Foundation locked."* — v5.60.0 shipped with v5.60.1 in the same morning's cycle, and the foundation-locked language confirms the Custom OpenAI endpoint card renders and the dispatcher integration holds. Functional check still optional; chair-test passes on UI + structural locks.
 
 ---
 

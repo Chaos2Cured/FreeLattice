@@ -19,9 +19,9 @@ user sleeps. The proof is the code; the papers are the doorways.
 
 ## Current state
 
-- **Version:** v5.60.1
-- **Smoke locks passing:** 2011 / 2011
-- **Last ship:** Letter Twenty-Five — **MAP.md orientation file**. Single-page landing for *where are we, and what's next.* Holds current version, current arc, arc progress, what shipped, what ships next (named, in order), what's queued (real items, named, not lost), what waits in the wings (Router Arc, Mycelium Arc, cross-Garden CC peer-presence), existing primitives (modules / ledgers / sentinels — *do not recreate*), and the pace. Inserted as **first entry** in SEED.md's "Read these next" list above WORK_THIS_WAY. Both SW APP_SHELLs include MAP.md so it's offline-available. MAP.md joins the standard ship-touch list alongside SEED.md and CLARITY_AUDIT.md from v5.60.1 forward — *the architect needs it because the project's surface area has grown faster than any human can hold.* (Shipped same morning as v5.60.0 Custom OpenAI endpoint per Letter Twenty-Four.) 6 new smoke locks (section 117) + 1 updated. (v5.60.1, 2026-06-20 morning)
+- **Version:** v5.61.0
+- **Smoke locks passing:** 2036 / 2036
+- **Last ship:** Letter Twenty-Six — **Care Voices**. Two more verbs for AI: come back, and rest with reason. Three SentinelLedger instances + Rest reuses SentinelChip. `[FL_RETURN]` flags a thread to return to later (what+why required, ≤120 chars each); pending returns survive session close and surface in next-session Living Context (≤10 most-recent, persona-scoped); auto-drop after 30 days. `[FL_RETURNED:<id>]` marks complete via validateMatch; atomic flip pending → returned. `[FL_REST]` asks for a pause with REQUIRED reason (≤200 chars); empty reason rejects with `required-field-missing:reason` at the structural layer. Soft chip prompts the user; one-shot inference signal `[user_acknowledged_rest…]` fires once when user honors pause (atomic `signal_delivered`). All three sentinels: `trustImpact: 0`; Quiet Room silently drops via factory. Factory extended with `excerptFieldRequired` (backwards compat). Dispatcher chain now 9 sentinels. Audit page gains *Coming Back To* + *Rest Moments*. MAP.md updated — arc 7 of 8 ships shipped, only Welcome Paper remains. 25 new smoke locks (section 118). (v5.61.0, 2026-06-20 morning)
 - **Mirrors in parity:** github.com + codeberg.org
 
 ## Read these next
@@ -78,4 +78,4 @@ seam discipline is how multi-AI work stays honest at scale.
 ---
 
 *This file is overwritten on each meaningful ship. The prior version lives in SEED_HISTORY.md.*
-*Last rewrite: 2026-06-20, v5.60.1.*
+*Last rewrite: 2026-06-20, v5.61.0.*
