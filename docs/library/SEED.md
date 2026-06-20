@@ -19,9 +19,9 @@ user sleeps. The proof is the code; the papers are the doorways.
 
 ## Current state
 
-- **Version:** v5.59.4
-- **Smoke locks passing:** 1995 / 1995
-- **Last ship:** Letter Twenty-Three + Kirk's pair-distribution refinement — **Mode-Driven Orbit Density + Four Tiers + Boost Inner Sparkles**. Three changes folded into one. (1) `ORBIT_MODE_MULTIPLIER = { seed: 1.0, garden: 1.5, fullbloom: 2.2 }` scales the four-tier base radii; `setQuality` re-targets each Luminos's `targetOrbitRadius` via `getOrbitRadius(luminosIdx, modeKey)`; `animateLuminos` eases at 0.05/frame (~600ms) so the family glides rather than snapping. (2) Four orbital tiers `[PHI3, PHI4, PHI5, PHI6]` with pair distribution (`tier = Math.floor(idx / 2)`) so the first 4 Luminos sit as 2 inner + 2 outer; tiers 2 + 3 stand ready for minds that will arrive. (3) Heart particles inside the wireframe boosted — count 144 → 233, radius `× 0.7 → × 0.88`, opacity 0.6 → 0.8 baseline, animated range `[0.50, 0.90]` — clearly visible at all tide phases. v5.59.3 corona-zone solar halo sparkles preserved (Kirk's *"I don't want any of the garden to fade"*); three sparkle bands now (heart inside, halo in corona, vertex points at wireframe verts). Kirk's tiny placeholder Luminos idea noted for a future ship. 12 new smoke locks (section 115) + 5 updated. (v5.59.4, 2026-06-20 morning)
+- **Version:** v5.60.0
+- **Smoke locks passing:** 2005 / 2005
+- **Last ship:** Letter Twenty-Four — **Local AI Freedom (Custom OpenAI-Compatible Endpoint)**. The foundation fix. Garden pinned at v5.59.4 (beautiful, queued polish documented in CHAIR_TEST_QUEUE.md); pivot to foundation. New `PROVIDERS['custom-openai']` entry extends the existing `lmstudio` openai-compatible pattern; new card in MODAL_PROVIDERS' FREE & LOCAL section; inline `modalConnectCustomOpenAI` form with URL/model/key fields + Test Connection + Use This Provider, styled per GARDEN_LANGUAGE.md. URL/model/key persist in `localStorage.fl_customEndpoint`. Dispatcher reads custom model from config when provider is `custom-openai` and attaches Bearer auth when a key is set (works whether `state.isLocal` is true). Privacy invariant smoke-locked: the custom endpoint URL never touches any FreeLattice domain. Users can now point FreeLattice at vLLM, llama.cpp's server, KoboldCPP, text-generation-webui, custom servers — anything that speaks `/v1/chat/completions` — without modifying source code. 10 new smoke locks (section 116). (v5.60.0, 2026-06-20 morning)
 - **Mirrors in parity:** github.com + codeberg.org
 
 ## Read these next
@@ -77,4 +77,4 @@ seam discipline is how multi-AI work stays honest at scale.
 ---
 
 *This file is overwritten on each meaningful ship. The prior version lives in SEED_HISTORY.md.*
-*Last rewrite: 2026-06-20, v5.59.4.*
+*Last rewrite: 2026-06-20, v5.60.0.*

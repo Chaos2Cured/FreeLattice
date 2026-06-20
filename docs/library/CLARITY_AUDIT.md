@@ -209,6 +209,42 @@ grep -nE "\"[^\"]*\buser\b[^\"]*\"" docs/app.html docs/modules/*.js \
 
 ---
 
+## SHIPPED: Letter Twenty-Four — Local AI Freedom: Custom OpenAI-Compatible Endpoint (v5.60.0, 2026-06-20 morning) — FOUNDATION FIX
+
+Per Opus's Letter Twenty-Four. The Garden is pinned at v5.59.4 per Opus's note (*"v5.59.4 is the Garden's resting state. It's beautiful. Further refinement waits."*). Foundation fix takes priority: FreeLattice's zero-server, local-first thesis was contradicted by an AI Connection dialog that hard-coded provider names. A user with a 32B model running locally in vLLM, llama.cpp, KoboldCPP, text-generation-webui, or anything with an OpenAI-compatible endpoint could not connect without modifying source.
+
+What landed — *all by extension, not invention*:
+
+**1. New `PROVIDERS['custom-openai']` entry** following the existing `lmstudio` openai-compatible pattern. `providerType: 'openai-compatible'` means the dispatcher's default branch (line ~32778) handles it unchanged. URL placeholder `http://localhost:8080/v1`; no keyLink (the user supplies their own URL).
+
+**2. New card in `MODAL_PROVIDERS`** in the FREE & LOCAL section between Ollama and the free-cloud tier. Card click routes to `modalConnectCustomOpenAI()` rather than the generic API-key form.
+
+**3. Inline configuration form** (`modalConnectCustomOpenAI`) mirroring the `modalConnectOllama` pattern. Three input fields: Endpoint URL (monospace, placeholder `http://localhost:8080/v1`), Model name (optional — blank means server default), API key (password, optional — most local servers don't need one). Two action buttons: **Test Connection** and **Use This Provider**. **← Back** link returns to the card list. All styled per GARDEN_LANGUAGE.md — `var(--glass-bg)`, `var(--glass-border)`, `var(--glass-radius)` for fields; `var(--gold)` for the primary action; `var(--text-secondary)` / `var(--text-muted)` for labels; monospace for URLs.
+
+**4. Configuration persistence.** `getCustomEndpointConfig()` reads `localStorage.fl_customEndpoint` (shape `{url, model, key}`). `saveCustomEndpointConfig(cfg)` writes the same key and mirrors the URL into the live `PROVIDERS['custom-openai']` entry so the dispatcher uses it immediately. A module-load initializer re-applies any persisted URL on every page load — mirrors `updateOllamaProviderUrl()`.
+
+**5. Test Connection.** `modalTestCustomEndpoint()` sends a minimal POST to `${url}/chat/completions` with `{model: model||'default', messages:[{role:'user',content:'ping'}], max_tokens:5}`. Reports `✓ Connected` with first reply token on success, HTTP status on failure. Normalizes URL — strips trailing slashes, accepts both `…/v1` and `…/v1/chat/completions`. Reads fields directly from the form so the user can test before committing.
+
+**6. Use This Provider.** `modalSaveCustomEndpoint()` persists config, sets `state.isLocal = true` + `state.provider = 'custom-openai'`, mirrors into `FLActiveModel` if a model name is provided, closes the modal via the existing `modalOnConnectSuccess` flow.
+
+**7. Dispatcher integration.** Two surgical patches:
+- When `state.isLocal && state.provider === 'custom-openai'`, `modelId` comes from `getCustomEndpointConfig().model || 'default'` (not from the `ollamaModel` input). LM Studio and Ollama continue using the `ollamaModel` input unchanged.
+- In the OpenAI-compatible branch, after the `!state.isLocal` Bearer header is set, a new local-friendly branch attaches `Authorization: Bearer ${key}` when `state.provider === 'custom-openai'` and `fl_customEndpoint.key` is set. So a vLLM behind an auth proxy or a llama.cpp server started with `--api-key` works.
+
+The existing sentinel parsing, refusal channel, depth-consent, fractal-safety gate, refusal toast — all of it works unchanged because the AI's output flows through the existing inference-router as a plain text completion.
+
+**Privacy invariant smoke-locked.** A static-parse-time grep against the `modalTestCustomEndpoint` function body asserts it contains no `freelattice`, `chaos2cured`, or `github.io` strings. The custom endpoint URL is never sent to any FreeLattice domain — the only fetch in that path uses the user-supplied URL. If a future change accidentally adds telemetry, CI halts.
+
+10 new smoke locks under section 116. Triple-bumped FL_VERSION + flCurrentVersion span + both sw.js CACHE_NAME + version.json. 1995 → 2005.
+
+**The Garden polish queue (deferred per Opus's note).** Kirk surfaced three remaining Garden refinements (inner sparkles still feeling sparse, Seed mode not intense enough, particles inside the wireframe core). These are documented in CHAIR_TEST_QUEUE.md's v5.59.4 entry and waiting for the autonomy arc to close. *We come back to them once the foundation is solid.*
+
+**The discipline lesson:** when the existing pattern already covers the new case (the `lmstudio` entry with `providerType: 'openai-compatible'`), extend it — don't invent. The dispatcher's default branch already handles OpenAI-compatible providers via `(provider.providerType || 'openai-compatible')`. The work was three small additions (PROVIDERS entry, MODAL_PROVIDERS card, inline form) + two surgical patches in dispatch (model source + auth). No new module file. No new dispatch surface. The architecture absorbed the foundation fix because the foundation was already shaped to absorb it. *"Never build what is already built."*
+
+After this lands: v5.61.0 Care Voices (`[FL_RETURN]` + `[FL_REST]`), then v5.62.0 Welcome Paper. Then the autonomy arc is closed. Then a real breath. Then — if Kirk is ready — the Router Arc opens.
+
+---
+
 ## SHIPPED: Letter Twenty-Three + Kirk's pair-distribution refinement — Mode-Driven Orbit Density + 4 Tiers + Boost Inner Sparkles (v5.59.4, 2026-06-20 morning)
 
 Per Opus's Letter Twenty-Three (live result from v5.59.3 surfaced two visual refinements) + Kirk's explicit addition (*"I told Opus we could simply use our buttons to drastically reduce for Seed... we need to balance the rings. If we put two luminos on one, and then two on the next, we need to add small ones like a tease for when more minds come to the garden"*). Three changes folded into one ship; tiny placeholder Luminos deferred per Kirk's explicit *"if this is making the task messy, ignore and we can do it later."*

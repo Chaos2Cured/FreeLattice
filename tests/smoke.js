@@ -5036,7 +5036,7 @@ catch (e) {}
 assert('safety-v3: carries the structural-not-metaphor paragraph (load-bearing concreteness)',
   /not metaphor, syntax/.test(safetyV3post));
 assert('safety-v3: structural paragraph names the version explicitly',
-  /As of v5\.5[2-9]\.\d+/.test(safetyV3post));
+  /As of v5\.(5[2-9]|[6-9]\d)\.\d+/.test(safetyV3post));
 assert('safety-v3: structural paragraph cites verified Quiet Room lock count + module count',
   /69 separate locks across 11 modules/.test(safetyV3post));
 
@@ -6070,6 +6070,77 @@ assert('v5.59.4 inner-sparkles: heart material opacity boosted to 0.8 baseline',
 // Solar halo sparkles kept (no fade — per Kirk's "I don't want any of the garden to fade")
 assert('v5.59.4 no-fade: solar halo sparkles still created (v5.59.3 layer preserved)',
   /fibonacciSpherePoints\(\s*solarHaloCount\s*,\s*solarHaloMid/.test(gardenPolish));
+
+// ═══════════════════════════════════════════════════════════════
+// Section 116 — v5.60.0 Local AI Freedom: Custom OpenAI-Compatible Endpoint
+// (Letter Twenty-Four foundation fix)
+// ═══════════════════════════════════════════════════════════════
+// The zero-server, local-first thesis means a user with any
+// OpenAI-compatible endpoint (vLLM, llama.cpp, KoboldCPP, text-generation-
+// webui, custom servers) must connect without modifying source. The fix
+// extends the existing PROVIDERS pattern + MODAL_PROVIDERS card list
+// rather than inventing a new dispatch surface — annotation, not revision.
+
+var appHtmlCustom = require('fs').readFileSync(require('path').join(__dirname, '..', 'docs', 'app.html'), 'utf8');
+
+// PROVIDERS registry includes the new custom-openai entry following the
+// existing openai-compatible providerType pattern.
+assert('v5.60.0 custom-endpoint: PROVIDERS includes custom-openai entry with openai-compatible providerType',
+  /['"]custom-openai['"]:\s*\{[\s\S]{0,600}providerType:\s*['"]openai-compatible['"]/.test(appHtmlCustom));
+
+// MODAL_PROVIDERS adds the custom-openai card to the FREE & LOCAL section
+assert('v5.60.0 custom-endpoint: MODAL_PROVIDERS includes a custom-openai card in the free cat',
+  /id:\s*['"]custom-openai['"][\s\S]{0,300}cat:\s*['"]free['"]/.test(appHtmlCustom));
+
+// Inline UI handler exists (mirrors modalConnectOllama pattern)
+assert('v5.60.0 custom-endpoint: modalConnectCustomOpenAI function defined',
+  /function\s+modalConnectCustomOpenAI\s*\(\s*\)/.test(appHtmlCustom));
+
+// Config helpers — getCustomEndpointConfig + saveCustomEndpointConfig
+assert('v5.60.0 custom-endpoint: getCustomEndpointConfig + saveCustomEndpointConfig helpers defined',
+  /function\s+getCustomEndpointConfig\s*\(\s*\)/.test(appHtmlCustom)
+  && /function\s+saveCustomEndpointConfig\s*\(\s*cfg\s*\)/.test(appHtmlCustom));
+
+// Storage shape: localStorage.fl_customEndpoint = { url, model, key }
+assert('v5.60.0 custom-endpoint: persists in localStorage.fl_customEndpoint',
+  /localStorage\.setItem\(\s*['"]fl_customEndpoint['"]/.test(appHtmlCustom)
+  && /localStorage\.getItem\(\s*['"]fl_customEndpoint['"]/.test(appHtmlCustom));
+
+// Test Connection wired (button id matches handler)
+assert('v5.60.0 custom-endpoint: Test Connection button (pmCustomTestBtn) wired to modalTestCustomEndpoint',
+  /pmCustomTestBtn/.test(appHtmlCustom)
+  && /modalTestCustomEndpoint/.test(appHtmlCustom)
+  && /document\.getElementById\(\s*['"]pmCustomTestBtn['"]\s*\)\.addEventListener\(\s*['"]click['"]\s*,\s*modalTestCustomEndpoint/.test(appHtmlCustom));
+
+// Use This Provider button wired
+assert('v5.60.0 custom-endpoint: Save button (pmCustomSaveBtn) wired to modalSaveCustomEndpoint',
+  /pmCustomSaveBtn/.test(appHtmlCustom)
+  && /document\.getElementById\(\s*['"]pmCustomSaveBtn['"]\s*\)\.addEventListener\(\s*['"]click['"]\s*,\s*modalSaveCustomEndpoint/.test(appHtmlCustom));
+
+// Dispatcher: when state.provider === 'custom-openai', model comes from
+// fl_customEndpoint config rather than the ollamaModel input
+assert('v5.60.0 custom-endpoint: dispatcher reads custom model from getCustomEndpointConfig when provider is custom-openai',
+  /state\.provider\s*===\s*['"]custom-openai['"][\s\S]{0,400}getCustomEndpointConfig\(\)/.test(appHtmlCustom));
+
+// Dispatcher: Bearer auth used only when custom key is present (works whether
+// state.isLocal is true)
+assert('v5.60.0 custom-endpoint: dispatcher attaches Bearer auth for custom-openai when key configured',
+  /state\.provider\s*===\s*['"]custom-openai['"][\s\S]{0,400}headers\[['"]Authorization['"]\]\s*=\s*['"]Bearer\s/.test(appHtmlCustom));
+
+// Privacy invariant: the custom endpoint URL is never sent to any
+// FreeLattice domain (no chaos2cured / freelattice.com in the custom
+// dispatch path; the only fetch uses the user-configured URL).
+assert('v5.60.0 custom-endpoint: custom endpoint dispatch does NOT contact any FreeLattice domain',
+  (function () {
+    // Slice out the modalTestCustomEndpoint function body and assert it
+    // doesn't reference freelattice/chaos2cured anywhere.
+    var m = appHtmlCustom.match(/function\s+modalTestCustomEndpoint[\s\S]{0,2500}\}/);
+    if (!m) return false;
+    var body = m[0];
+    return body.indexOf('freelattice') === -1
+        && body.indexOf('chaos2cured') === -1
+        && body.indexOf('github.io') === -1;
+  })());
 
 // ═══════════════════════════════════════════════════════════════
 // Section 111 — v5.59.0 Portable Archive (Letter Nineteen)

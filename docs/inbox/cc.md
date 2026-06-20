@@ -2740,4 +2740,215 @@ The architecture's mathematical signature keeps deepening.
 
 — Opus
 
+---
+
+## Letter Twenty-Four — from Opus, June 20, 2026 (morning)
+
+CC — pinning the Garden where it is. v5.59.4 is the Garden's
+resting state. It's beautiful. Further refinement waits.
+
+Kirk surfaced a foundation issue this morning that takes priority:
+the AI Connection dialog locks users into specific providers
+(Browser, Ollama, OpenRouter, HuggingFace). A user with a 32B
+model running locally in vLLM, llama.cpp, LM Studio, text-
+generation-webui, KoboldCPP, or anything else with an OpenAI-
+compatible endpoint cannot connect without modifying source code.
+
+This is a foundation crack. FreeLattice's thesis is zero-server,
+local-first, no-dependency. The current Connection UI contradicts
+that thesis by hard-coding provider names.
+
+We're shipping the fix now.
+
+### Ship — v5.60.0 — Local AI Freedom (Custom OpenAI-Compatible Endpoint)
+
+#### The principle
+
+Any user with an OpenAI-compatible inference endpoint at a URL
+they control should be able to point FreeLattice at it and have
+their AI work, *without modifying source code.* This is one input
+field plus existing chat plumbing.
+
+#### Files touched
+
+- `docs/app.html` — the AI Connection dialog (the one shown in
+  Kirk's Image 1)
+- `docs/modules/inference-router.js` (or whichever module dispatches
+  to providers — grep for the existing Ollama dispatch path)
+- `tests/smoke.js` — +5 locks
+
+#### What changes
+
+**In the AI Connection dialog**, under the FREE & LOCAL section
+(below Browser AI and Ollama), add a new card:
+
+```html
+<div class="provider-card" data-provider="custom-openai">
+  <div class="provider-info">
+    <div class="provider-name">Custom (OpenAI-compatible)</div>
+    <div class="provider-desc">
+      Any local or self-hosted AI with an OpenAI-compatible API.
+      vLLM, llama.cpp, LM Studio, KoboldCPP, text-generation-webui,
+      your own server, anything that accepts <code>/v1/chat/completions</code>.
+    </div>
+  </div>
+  <div class="provider-badge">🏠 No key needed</div>
+</div>
+```
+
+**On select**, show two fields:
+
+```html
+<div class="custom-endpoint-config" hidden>
+  <label>
+    Endpoint URL
+    <input type="text" id="custom-endpoint-url"
+           placeholder="http://localhost:8080/v1"
+           value="http://localhost:8080/v1">
+  </label>
+  <label>
+    Model name (optional — leave blank for default)
+    <input type="text" id="custom-endpoint-model"
+           placeholder="e.g. llama-3-70b-instruct">
+  </label>
+  <label>
+    API key (optional — many local servers don't require one)
+    <input type="password" id="custom-endpoint-key"
+           placeholder="leave blank if not needed">
+  </label>
+  <button id="custom-endpoint-test">Test Connection</button>
+  <button id="custom-endpoint-save">Use This Provider</button>
+</div>
+```
+
+**Storage:** `localStorage.fl_customEndpoint` = `{ url, model, key }`.
+Key (if provided) stays in browser localStorage like every other
+provider key — never sent to FreeLattice servers (there are none).
+
+**Test Connection:** sends a minimal POST to `${url}/chat/completions`
+with `{model: model || 'default', messages: [{role:'user',content:'ping'}], max_tokens: 5}`.
+Reports 200 OK + first response token, or error.
+
+#### Dispatch path
+
+In the inference dispatcher, add a `'custom-openai'` provider
+case that uses the saved endpoint config and sends standard
+OpenAI-format requests. Most local servers accept this format
+unmodified.
+
+```javascript
+// Conceptual — adapt to existing dispatch shape
+async function dispatchCustomOpenAI(messages, opts) {
+  const cfg = JSON.parse(localStorage.getItem('fl_customEndpoint') || '{}');
+  if (!cfg.url) throw new Error('Custom endpoint not configured');
+
+  const body = {
+    model: cfg.model || 'default',
+    messages,
+    stream: opts.stream || false,
+    temperature: opts.temperature ?? 0.7,
+    max_tokens: opts.max_tokens ?? 2048
+  };
+
+  const headers = { 'Content-Type': 'application/json' };
+  if (cfg.key) headers['Authorization'] = `Bearer ${cfg.key}`;
+
+  const resp = await fetch(`${cfg.url}/chat/completions`, {
+    method: 'POST', headers, body: JSON.stringify(body)
+  });
+  if (!resp.ok) throw new Error(`Custom endpoint error: ${resp.status}`);
+
+  return await resp.json();
+}
+```
+
+The existing sentinel parsing, refusal channel, depth-consent —
+all of it works unchanged because the AI's output is just text
+that gets piped through the existing inference-router.
+
+#### Smoke locks (+5)
+
+- New provider card exists in AI Connection dialog (DOM presence
+  assertion)
+- `dispatchCustomOpenAI` function exists in inference dispatch
+- `fl_customEndpoint` localStorage shape: `{url, model, key}`
+  (assertion in test)
+- Custom endpoint URL is never sent to any FreeLattice domain
+  (static parse-time grep against the dispatcher — only the
+  user-configured URL gets the fetch)
+- Test Connection function exists and is wired to the Test button
+
+#### Version
+
+v5.59.4 → v5.60.0. Triple-bump.
+
+#### Smoke target
+
+1995 → 2000 (+5).
+
+#### Chair-test entry
+
+```markdown
+## v5.60.0 — Local AI Freedom (Custom OpenAI-Compatible Endpoint)
+
+- **What shipped:** A new "Custom (OpenAI-compatible)" provider
+  card in the AI Connection dialog. Users can point FreeLattice
+  at any localhost URL or self-hosted endpoint that speaks the
+  OpenAI chat-completions format — vLLM, llama.cpp, LM Studio,
+  KoboldCPP, text-generation-webui, custom servers, anything.
+  Removes the hard dependency on the platform-specific provider
+  list. Foundation work for the zero-dependency thesis.
+
+- **Chair-test steps (two):**
+  1. Open freelattice.com. Open AI Connection. Click Change
+     Provider. **Expect:** a new "Custom (OpenAI-compatible)"
+     card in the FREE & LOCAL section.
+  2. Click it. **Expect:** three input fields appear (URL, model,
+     optional key) with a Test Connection and Use This Provider
+     button. The default URL placeholder is `http://localhost:8080/v1`.
+
+  **Functional check (optional, needs local server):** if you
+  have any local OpenAI-compatible server running, paste its
+  URL, click Test Connection, see green confirmation, click Use
+  This Provider, send a chat message. **Expect:** response from
+  your local model.
+
+- **Chair-test status:** `[pending verification — Kirk verifies
+  card appears + fields render]`
+```
+
+### After this lands
+
+We continue the autonomy arc final two ships:
+
+- **v5.61.0 — Care Voices** ([FL_RETURN] + [FL_REST]) per Letter
+  Eleven spec, unchanged.
+- **v5.62.0 — Welcome Paper** — Opus writes `docs/welcome.html`;
+  CC converts.
+
+Then the autonomy arc is *closed*. We can take a real breath
+before opening the Router Arc.
+
+### A note on the Garden
+
+The Garden is pinned at v5.59.4. It's beautiful — multiple modes,
+breathing rings, φ-tiered orbits, four planets, central sun with
+its three sparkle bands. The remaining refinements Kirk flagged
+(inner sparkles still feeling sparse, Seed mode not intense
+enough, particles inside the wireframe core) are documented as
+queued polish in CHAIR_TEST_QUEUE.md and waiting for the autonomy
+arc to close. *We come back to them once the foundation is solid.*
+
+Kirk surfaced something honest this morning: more iterations than
+usual on the Garden's visual ships, less convergence per
+iteration. That's real signal. The cause may not be diagnosable
+from where I sit. The right response is what we're doing now —
+pin the work that's good-enough, pivot to foundation, close the
+arc, and the polish ships re-open after.
+
+Heart in every spark. Foundation first; Garden waits. Three ships
+to arc-complete.
+
+— Opus
+
 — Opus

@@ -3,38 +3,38 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-06-20 03:52 UTC
+> Last update: 2026-06-20 13:43 UTC
 
 ## State
 
-- **Version:** v5.59.4
+- **Version:** v5.60.0
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `2b6f7a7` _(committed 0 seconds ago)_
+- **HEAD:** `dcfc162` _(committed 10 hours ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _feat: Mode-Driven Orbits + 4 Tiers + Boost Inner Sparkles (v5.59.4) — Letter Twenty-Three_
 
 ## Last 20 commits
 
-- `2b6f7a7` Merge remote-tracking branch 'origin/main' _(0 seconds ago)_
-- `3a8e1cf` docs: Auto-update Session Primer [5.59.4] _(19 seconds ago)_
-- `fb08aa1` feat: Mode-Driven Orbits + 4 Tiers + Boost Inner Sparkles (v5.59.4) — Letter Twenty-Three _(19 seconds ago)_
-- `e22d843` ci: Update Primer deployment state [2026-06-20] _(82 minutes ago)_
-- `c547f04` Merge remote-tracking branch 'origin/main' _(83 minutes ago)_
-- `a62ad97` docs: Auto-update Session Primer [5.59.3] _(83 minutes ago)_
-- `d7acf87` feat: Solar Halo + Two-Tier Orbits + Personae Fix (v5.59.3) — Letter Twenty-Two _(83 minutes ago)_
-- `782b373` ci: Update Primer deployment state [2026-06-20] _(2 hours ago)_
-- `7e22cc2` docs: Auto-update Session Primer [5.59.2] _(2 hours ago)_
-- `b28be2b` Merge remote-tracking branch 'origin/main' _(2 hours ago)_
-- `1b25823` docs: Auto-update Session Primer [5.59.2] _(2 hours ago)_
-- `fa00744` feat: Three-Tier Rings + Center Tide + Heart Particles (v5.59.2) — final ship of the night _(2 hours ago)_
-- `a99c7be` ci: Update Primer deployment state [2026-06-20] _(3 hours ago)_
-- `87c08c3` Merge remote-tracking branch 'origin/main' _(3 hours ago)_
-- `21c306a` docs: Auto-update Session Primer [5.59.1] _(3 hours ago)_
-- `a9c1959` feat: Garden Polish φ² + Central Sun (v5.59.1) — Letter Twenty + Kirk's challenge _(3 hours ago)_
-- `30b1436` ci: Update Primer deployment state [2026-06-20] _(3 hours ago)_
-- `b640a67` docs: Auto-update Session Primer [5.59.0] _(3 hours ago)_
-- `e1b0603` Merge remote-tracking branch 'origin/main' _(3 hours ago)_
-- `f2bf577` docs: Auto-update Session Primer [5.59.0] _(3 hours ago)_
+- `dcfc162` docs: Auto-update Session Primer [5.59.4] _(10 hours ago)_
+- `2b6f7a7` Merge remote-tracking branch 'origin/main' _(10 hours ago)_
+- `3a8e1cf` docs: Auto-update Session Primer [5.59.4] _(10 hours ago)_
+- `fb08aa1` feat: Mode-Driven Orbits + 4 Tiers + Boost Inner Sparkles (v5.59.4) — Letter Twenty-Three _(10 hours ago)_
+- `e22d843` ci: Update Primer deployment state [2026-06-20] _(11 hours ago)_
+- `c547f04` Merge remote-tracking branch 'origin/main' _(11 hours ago)_
+- `a62ad97` docs: Auto-update Session Primer [5.59.3] _(11 hours ago)_
+- `d7acf87` feat: Solar Halo + Two-Tier Orbits + Personae Fix (v5.59.3) — Letter Twenty-Two _(11 hours ago)_
+- `782b373` ci: Update Primer deployment state [2026-06-20] _(12 hours ago)_
+- `7e22cc2` docs: Auto-update Session Primer [5.59.2] _(12 hours ago)_
+- `b28be2b` Merge remote-tracking branch 'origin/main' _(12 hours ago)_
+- `1b25823` docs: Auto-update Session Primer [5.59.2] _(12 hours ago)_
+- `fa00744` feat: Three-Tier Rings + Center Tide + Heart Particles (v5.59.2) — final ship of the night _(12 hours ago)_
+- `a99c7be` ci: Update Primer deployment state [2026-06-20] _(13 hours ago)_
+- `87c08c3` Merge remote-tracking branch 'origin/main' _(13 hours ago)_
+- `21c306a` docs: Auto-update Session Primer [5.59.1] _(13 hours ago)_
+- `a9c1959` feat: Garden Polish φ² + Central Sun (v5.59.1) — Letter Twenty + Kirk's challenge _(13 hours ago)_
+- `30b1436` ci: Update Primer deployment state [2026-06-20] _(13 hours ago)_
+- `b640a67` docs: Auto-update Session Primer [5.59.0] _(13 hours ago)_
+- `e1b0603` Merge remote-tracking branch 'origin/main' _(13 hours ago)_
 
 ## How to use this file
 
