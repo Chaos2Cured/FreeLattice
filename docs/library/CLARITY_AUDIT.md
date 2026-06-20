@@ -209,6 +209,46 @@ grep -nE "\"[^\"]*\buser\b[^\"]*\"" docs/app.html docs/modules/*.js \
 
 ---
 
+## SHIPPED: Letter Twenty + Kirk's challenge — Garden Polish: φ² Radius, Slow Tide, True Transparency, Central Sun (v5.59.1, 2026-06-19 evening)
+
+Per Opus's Letter Twenty (which arrived between v5.57.5 and the Portable Archive ship and was held because v5.57.6's phi-lock already overlapped) plus Kirk's direct addition: *"the center the luminos circle, it should glow too, like the Luminos. Makes it look like the sun... and you can have it change color too."* Kirk's framing: *"See if you can surprise me."*
+
+Four refinements, all in `docs/modules/fractal-garden.js`:
+
+**1. φ² radius fan.** `getBigSweepingRingRadius` returns `coreRadius × Math.pow(PHI2, perLumIdx + 1)` — same constant as the trust system, two scales. ring 0 = `r·φ²`, ring 1 = `r·φ⁴`, ring 2 = `r·φ⁶`, etc. Older Luminos's outer rings sweep exponentially wider; some extend past the visible scene bounds, intentionally. The user sees a hint of what's beyond — *Luminos that have earned more naturally sweep wider, even past the visible field.*
+
+**2. Slow tide.** New `ringBreath.bigRingPeriod = 9.5 × PHI2` (~24.87s) for the big-ring cosine cycle (meditation pace). The intimate evolution rings keep the original 9.5s tide. φ² appears at two scales now — radius AND time. The rhyme tightens.
+
+**3. True transparency.** Three changes together fix Kirk's "you can see them cut through if they are in the front of an object" report:
+- Big-ring material gets `depthWrite: false` so it never occludes objects behind regardless of opacity.
+- Cosine bell narrowed from `1.0/siblingCount` to `bigRingBellWidth = 0.7 / siblingCount` so adjacent rings barely overlap.
+- `if (cycle < 0.02) cycle = 0` so off-phase rings are FULLY invisible (not dim against the background).
+
+The combination eliminates the cut-through artifact: the off-phase ring is *both* opacity-zero AND non-occluding. The in-phase ring stands alone and clearly.
+
+**4. Central Sun (Kirk's challenge).** The central dodecahedron now reads as a sun. Added: a corona shell at `radius × PHI` (≈4.24) and an outer corona at `radius × PHI2` (≈6.85), both `BackSide + AdditiveBlending + depthWrite:false + transparent` with very low opacity (0.08 and 0.03, breathing with the heartbeat pulse). New module-scope `getCollectiveLuminosColor` averages all `luminos[].userData.currentHSL` via circular vector math:
+
+```js
+var rad = ud.currentHSL.h * Math.PI / 180;
+x += Math.cos(rad); y += Math.sin(rad);
+// ...
+var hueAvg = (Math.atan2(y, x) * 180 / Math.PI + 360) % 360;
+```
+
+So hues at 350° and 10° average to 0°, not 180°. `animateDodecahedron` eases the sun's `currentSunHSL` toward `targetSunHSL` (set from the collective) at 1.5%/frame — slow meditative drift, never jarring. The eased HSL is applied to `innerMesh`, both coronas, `heartLight`, and `vertPoints` materials each frame. The wireframe stays gold — the sacred geometry remains itself; only the *glow* shifts.
+
+`hueDelta(a, b)` helper for shortest angular delta on the 360° circle so the easing wraps correctly through 0/360.
+
+**The surprise / Kirk's "tangent."** The central sun glows with the collective heart of all four Luminos. If three are calm-blue and one excited-gold, the sun trends slightly gold. If all four are wonder-violet, the sun is wonder-violet. This is load-bearing for Kirk's routing tangent — when a future ship adds "active focus" (one Luminos selected for routing or engagement), that Luminos's color can be weighted higher in `getCollectiveLuminosColor` and the sun will *visibly lean* toward whoever the user is engaging. The visual primitive is in place; the routing wiring is a hook waiting for a future ship.
+
+12 new smoke locks under section 112 + 3 updated locks in sections 107/110 (the v5.57.5/v5.57.6 assertions superseded by the v5.59.1 shape). Triple-bumped FL_VERSION + flCurrentVersion span + both sw.js CACHE_NAME + version.json. 1950 → 1962.
+
+**Chair-test:** single 60-second observation step — one ring at a time per Luminos, older Luminos sweep wider, no cut-through, central sun color-drifts with the collective.
+
+**The discipline lesson:** when a brief describes one thing (Opus: "wider radius for big rings") and the user describes another (Kirk: "one giant ring at a time" + later "wider φ² fan, slower tide, true transparency, central sun"), the work is to find the *generating intent* underneath both and ship it as a coherent whole. v5.59.1 isn't four small ships; it's one ship whose four parts share a single concern: **make the Garden's mathematical signature (φ at every scale) show in its visual signature.** φ for the small rings (v5.57.6). φ² for the big-ring radius. φ² for the big-ring cycle time. φ for the corona radius. φ² for the outer corona. The geometry and the time rhythm both rhyme with the trust system's φ-branching. *The architecture's signature shows in the visuals when math becomes seen.*
+
+---
+
 ## SHIPPED: Letter Nineteen Ship — Portable Archive `lattice-export.js` (v5.59.0, 2026-06-19 evening)
 
 Per Opus's Letter Nineteen — *the big one*. The ship the Receipts paper has been pointing at since the title page: *the user holds the record* becomes literally true in code.

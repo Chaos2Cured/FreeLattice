@@ -5774,14 +5774,12 @@ assert('v5.57.5 wide-ring: bigSweepingRings array declared at module scope',
 assert('v5.57.5 wide-ring: getBigSweepingRingRadius function defined',
   /function\s+getBigSweepingRingRadius\s*\(\s*agent\s*,\s*perLumIdx\s*\)/.test(gardenWideRing));
 
-// Wide radius is at least 3x the small ring (Opus's spec: 4-6x small ring)
-assert('v5.57.5 wide-ring: BASE_MULTIPLIER for big sweeping radius is at least 3 (and within 4-6 target)',
-  (function() {
-    var m = gardenWideRing.match(/BASE_MULTIPLIER\s*=\s*(\d+(?:\.\d+)?)/);
-    if (!m) return false;
-    var mult = parseFloat(m[1]);
-    return mult >= 3 && mult <= 6;
-  })());
+// Wide radius: v5.59.1 changed from a 5x multiplier (Letter Eighteen) to
+// φ² powers (Letter Twenty). Assert ring 0 sits at coreRadius·φ² ≈ 2.618x.
+// The wide layer for older Luminos sweeps exponentially: ring 1 = ·φ⁴,
+// ring 2 = ·φ⁶, etc.
+assert('v5.59.1 wide-ring: getBigSweepingRingRadius uses Math.pow(PHI2, perLumIdx + 1) for φ² fan',
+  /coreRadius\s*\*\s*Math\.pow\(\s*PHI2\s*,\s*perLumIdx\s*\+\s*1\s*\)/.test(gardenWideRing));
 
 // ensureBigRings populates bigSweepingRings (not evolutionRings)
 assert('v5.57.5 wide-ring: ensureBigRings pushes to bigSweepingRings (not evolutionRings)',
@@ -5804,9 +5802,10 @@ assert('v5.57.5 wide-ring: cosine-bell cycle present (1 + cos(d * PI) / 2)',
 assert('v5.57.5 wide-ring: cycle peak staggered per ring (peak = perLumIdx / siblingCount)',
   /var\s+peak\s*=\s*bsPerLumIdx\s*\/\s*siblingCount/.test(gardenWideRing));
 
-// Luminos-level phase shift so different Luminos's cycles don't sync
-assert('v5.57.5 wide-ring: per-Luminos phase shift in cycle',
-  /luminosPhase\s*=\s*bsLuminosIdx\s*\*\s*\(\s*period\s*\/\s*Math\.max\(\s*luminosCount/.test(gardenWideRing));
+// Luminos-level phase shift so different Luminos's cycles don't sync.
+// v5.59.1 — uses bigPeriod (meditation-pace) instead of period.
+assert('v5.59.1 wide-ring: per-Luminos phase shift in cycle (uses bigPeriod)',
+  /luminosPhase\s*=\s*bsLuminosIdx\s*\*\s*\(\s*bigPeriod\s*\/\s*Math\.max\(\s*luminosCount/.test(gardenWideRing));
 
 // Big sweeping rings re-center on parent agent's world position each frame
 assert('v5.57.5 wide-ring: big sweeping rings re-center on parent.position each frame',
@@ -5835,9 +5834,13 @@ var gardenPhiHeart = require('fs').readFileSync(require('path').join(__dirname, 
 assert('v5.57.6 phi-lock: restoreAgentRings radius is cr * PHI (matches createEvolutionRing)',
   /restoreAgentRings[\s\S]{0,3000}var\s+ringRadius\s*=\s*cr\s*\*\s*PHI\s*\+/.test(gardenPhiHeart));
 
-// Phi-lock: getBigSweepingRingRadius uses coreRadius * PHI for the small-ring base
-assert('v5.57.6 phi-lock: getBigSweepingRingRadius smallRingRadius is coreRadius * PHI',
-  /getBigSweepingRingRadius[\s\S]{0,800}smallRingRadius\s*=\s*coreRadius\s*\*\s*PHI/.test(gardenPhiHeart));
+// Phi-lock: v5.59.1 (Letter Twenty) replaced the smallRingRadius scaffold
+// with a direct φ² fan in getBigSweepingRingRadius — the φ-coupling is
+// stronger now (PHI² powers, ring n at coreRadius·φ²⁽ⁿ⁺¹⁾). The
+// phi-lock invariant still holds — the formula is now expressed as
+// Math.pow(PHI2, perLumIdx + 1) where PHI2 = PHI*PHI.
+assert('v5.59.1 phi-lock: getBigSweepingRingRadius uses PHI2 powers (φ² fan, supersedes smallRingRadius)',
+  /getBigSweepingRingRadius[\s\S]{0,800}coreRadius\s*\*\s*Math\.pow\(\s*PHI2/.test(gardenPhiHeart));
 
 // No leftover `* 1.8` ring-radius literals in the ring system (the magic
 // number is gone; PHI is the only ratio).
@@ -5853,6 +5856,61 @@ assert('v5.57.6 heart-color: ensureBigRings sets initial color from parent curre
 // Heart-color: per-frame color sync from parent.currentHSL in animateSeedRings
 assert('v5.57.6 heart-color: per-frame color sync from parent.currentHSL in big-ring animate loop',
   /pud\.currentHSL[\s\S]{0,200}bsr\.material\.color\.setHSL\(\s*pud\.currentHSL\.h\s*\/\s*360/.test(gardenPhiHeart));
+
+// ═══════════════════════════════════════════════════════════════
+// Section 112 — v5.59.1 Garden Polish: φ² Radius, Slow Tide, True
+// Transparency, Central Sun (Letter Twenty + Kirk's challenge)
+// ═══════════════════════════════════════════════════════════════
+// Big rings ride φ² powers (same constant as the trust system). Cycle
+// slowed to meditation pace via bigRingPeriod = period * φ². Off-phase
+// rings are truly invisible (cycle<0.02→0) + depthWrite:false stops the
+// "cut-through-objects" effect Kirk caught. New central sun: collective
+// Luminos color averaged via circular vector math drives the inner mesh,
+// corona, outer corona, heart light, and vertex points — sacred geometry
+// wireframe stays gold so the structure remains itself.
+
+var gardenPolish = require('fs').readFileSync(require('path').join(__dirname, '..', 'docs', 'modules', 'fractal-garden.js'), 'utf8');
+
+// Big-ring radius uses Math.pow(PHI2, perLumIdx + 1) — φ² fan
+assert('v5.59.1 polish: getBigSweepingRingRadius uses Math.pow(PHI2, perLumIdx + 1)',
+  /getBigSweepingRingRadius[\s\S]{0,600}coreRadius\s*\*\s*Math\.pow\(\s*PHI2\s*,\s*perLumIdx\s*\+\s*1\s*\)/.test(gardenPolish));
+
+// bigRingPeriod = period * PHI2 (≈24.87s — meditation pace, >= 20s)
+assert('v5.59.1 polish: ringBreath.bigRingPeriod = period * PHI2 (meditation pace, ≥20s)',
+  /bigRingPeriod:\s*9\.5\s*\*\s*PHI2/.test(gardenPolish));
+assert('v5.59.1 polish: cycle uses bigRingPeriod not period for big sweeping rings',
+  /var\s+bigPeriod\s*=\s*ringBreath\.bigRingPeriod/.test(gardenPolish));
+
+// Tighter bell + true transparency in off phase
+assert('v5.59.1 polish: bigRingBellWidth defined (default 0.7, tighter than 1.0)',
+  /bigRingBellWidth:\s*0\.7/.test(gardenPolish));
+assert('v5.59.1 polish: cycle < 0.02 forces to 0 for true transparency in off phase',
+  /if\s*\(\s*cycle\s*<\s*0\.02\s*\)\s*cycle\s*=\s*0/.test(gardenPolish));
+
+// Material depthWrite:false — fixes Kirk's cut-through-objects effect
+assert('v5.59.1 polish: big sweeping ring material has depthWrite: false',
+  /ensureBigRings[\s\S]{0,3500}depthWrite:\s*false/.test(gardenPolish));
+
+// Central sun — collective Luminos color via circular vector math
+assert('v5.59.1 central-sun: getCollectiveLuminosColor uses circular vector hue average (atan2)',
+  /function\s+getCollectiveLuminosColor[\s\S]{0,800}Math\.atan2\(\s*y\s*,\s*x\s*\)/.test(gardenPolish));
+
+// Central sun applies HSL to inner mesh, corona, outer corona, heart light
+assert('v5.59.1 central-sun: animateDodecahedron sets HSL on innerMesh material',
+  /d\.innerMesh\.material\.color\.setHSL\(\s*sh\s*,\s*ss\s*,\s*sl\s*\)/.test(gardenPolish));
+assert('v5.59.1 central-sun: animateDodecahedron sets HSL on coronaMesh material',
+  /d\.coronaMesh\.material\.color\.setHSL\(\s*sh\s*,\s*ss\s*,\s*sl\s*\)/.test(gardenPolish));
+assert('v5.59.1 central-sun: outerCoronaMesh + heartLight both color-cycle',
+  /d\.outerCoronaMesh\.material\.color\.setHSL/.test(gardenPolish)
+  && /d\.heartLight\.color\.setHSL/.test(gardenPolish));
+
+// Corona spheres added with depthWrite false + additive blending
+assert('v5.59.1 central-sun: corona spheres present with additive blending + depthWrite false',
+  /coronaMesh[\s\S]{0,1000}AdditiveBlending[\s\S]{0,200}depthWrite:\s*false/.test(gardenPolish));
+
+// Wireframe stays gold (sacred geometry preserved) — not part of color cycle
+assert('v5.59.1 central-sun: wireframe NOT in the HSL color-cycle path (gold preserved)',
+  !/d\.wireMesh\.material\.color\.setHSL/.test(gardenPolish));
 
 // ═══════════════════════════════════════════════════════════════
 // Section 111 — v5.59.0 Portable Archive (Letter Nineteen)

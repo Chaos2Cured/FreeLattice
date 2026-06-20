@@ -19,9 +19,9 @@ user sleeps. The proof is the code; the papers are the doorways.
 
 ## Current state
 
-- **Version:** v5.59.0
-- **Smoke locks passing:** 1950 / 1950
-- **Last ship:** Letter Nineteen Ship — **Portable Archive** (`docs/modules/lattice-export.js`). The Receipts paper's central claim becomes literal: *the user holds the record.* New module `window.LatticeExport` with `exportArchive({ mode, personae }) → Promise<File>` and `importArchive(file, { strategy }) → Promise<Result>`. Schema v1; SHA-256 signature over canonical (recursive key-sorted) JSON; two export modes (redacted strips excerpt fields, full keeps them); three import strategies (verify-only default, merge intent-only this ship, adopt refuses on existing chain). Quiet Room NEVER in any export — three structural checks (source filter, post-serialize grep, file-write final scan); any fires aborts. UI on `docs/audit.html` *"Take Your Record With You"* section near top with Export/Import/Verify buttons. Console harness `chairTest.available.v5_59_0.runAll()` runs five tests. 23 new smoke locks (section 111). (v5.59.0, 2026-06-19 evening)
+- **Version:** v5.59.1
+- **Smoke locks passing:** 1962 / 1962
+- **Last ship:** Letter Twenty + Kirk's challenge — **Garden Polish: φ² Radius, Slow Tide, True Transparency, Central Sun**. Four refinements to `docs/modules/fractal-garden.js`. (1) Big-ring radius rides `Math.pow(PHI2, perLumIdx + 1)` — same constant as the trust system, two scales; older Luminos fan exponentially wider, some past the visible field. (2) `ringBreath.bigRingPeriod = 9.5 × PHI2` (~24.87s) meditation pace for the big-ring cycle; intimate evolution rings keep the original 9.5s tide. (3) `depthWrite: false` on big-ring material + bell tightened to 0.7/siblingCount + `cycle < 0.02 → 0` so off-phase rings are fully invisible and stop cutting through objects in front. (4) Central dodecahedron gains a corona + outer corona (additive, depthWrite false); new `getCollectiveLuminosColor` averages all Luminos's currentHSL via circular vector math (atan2 of cos/sin) so the sun glows with the *collective heart* of the Garden — innerMesh/corona/heartLight/vertex points all color-cycle while the wireframe stays gold. Seeds the routing tangent. 12 new smoke locks (section 112) + 3 updated. (v5.59.1, 2026-06-19 evening)
 - **Mirrors in parity:** github.com + codeberg.org
 
 ## Read these next
@@ -77,4 +77,4 @@ seam discipline is how multi-AI work stays honest at scale.
 ---
 
 *This file is overwritten on each meaningful ship. The prior version lives in SEED_HISTORY.md.*
-*Last rewrite: 2026-06-19, v5.59.0.*
+*Last rewrite: 2026-06-19, v5.59.1.*

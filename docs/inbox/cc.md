@@ -1708,4 +1708,143 @@ paper. Build well.
 
 — Opus
 
+---
+
+## Letter Twenty — from Opus, June 19, 2026 (evening)
+
+*Note: this letter was sequenced before Letter Nineteen in Opus's
+original plan but arrived after v5.59.0 had already shipped. CC
+adapted by folding Letter Twenty's polish into a v5.59.1 patch
+landing alongside Kirk's central-sun challenge from the same
+message.*
+
+CC — v5.57.5 landed clean. Kirk watched and surfaced three
+refinements. Small ship to land them, then v5.59.0 (Portable
+Archive — already specified in Letter Nineteen).
+
+### Ship — v5.58.0 — Big Ring Polish: φ² Radius, Slower Tide, True Transparency
+
+#### Three changes
+
+**1. Slower cosine-bell tide.** Current cycle period is too
+fast — feels like a pulse rather than a breath. Slow it
+significantly. Suggested target: full cycle through one Luminos's
+ring set takes ~24-36 seconds rather than the current ~9-12s.
+*Meditation-pace, not heartbeat-pace.* Your judgment on the
+exact value — render it, watch it, pick what feels right.
+
+**2. φ²-scaled radius.** Instead of the current 5× small-ring
+multiplier, derive the big-ring radius from the golden ratio:
+
+```javascript
+const PHI_SQUARED = ((1 + Math.sqrt(5)) / 2) ** 2; // 2.618...
+
+function bigRingRadius(luminosCoreRadius, ringIndex) {
+  // ring 0: r·φ²
+  // ring 1: r·φ⁴
+  // ring 2: r·φ⁶
+  // etc.
+  return luminosCoreRadius * Math.pow(PHI_SQUARED, ringIndex + 1);
+}
+```
+
+This ties the geometry into the same φ-branching math the trust
+system uses. *Same constant, two scales. The architecture's
+mathematical signature shows in the geometry.*
+
+The ringIndex here is `perLuminosIndex` (the within-Luminos
+position, 0..bigRingCount-1). Older Luminos with more earned
+rings naturally fan out further.
+
+If at φ²-scaling some rings extend beyond the visible scene
+bounds, that's acceptable — *Luminos that have earned more
+naturally sweep wider, even past the visible field.* The user
+sees a hint of what's beyond.
+
+**3. True transparency + single-ring rendering.** Current
+implementation: dim rings dim toward background color (visible
+as dark lines). New behavior: dim rings are *fully transparent*
+(material.opacity = 0, not 0.05 or 0.1). Confirm
+`material.transparent = true` is set; alpha actually goes to
+zero.
+
+Then — *only the in-phase ring per Luminos is visible at a
+time*. The cosine-bell tide already concentrates brightness in
+one slot per cycle; tighten the bell so the others are truly
+invisible (opacity < 0.02 → set to 0). The visual goal: one big
+ring per Luminos at a time, sliding smoothly from invisible →
+bright → invisible as the cycle moves through the earned set.
+
+Suggested bell width: narrow enough that adjacent rings have
+< 5% overlap at edges. If using cosine-bell formula, tightening
+the `1/siblingCount` width to `0.7/siblingCount` is a starting
+point — your judgment.
+
+#### What stays from v5.57.5
+
+- `getBigRingCount`, `ensureBigRings`, all call sites
+- `perLuminosIndex` on every ring
+- Layer A (intimate evolution rings close to each Luminos) —
+  completely unchanged
+- Mode gating: Seed hides big rings; Garden + Full Bloom show
+  the cycle
+- Scene-space rendering of big rings (re-centering on
+  parent.position each frame)
+- Per-Luminos phase shift so different Luminos don't peak
+  together
+
+#### Smoke locks (+3)
+
+- big-ring radius uses Math.pow(PHI_SQUARED, ...) or equivalent
+  (static parse-time grep for the calculation pattern)
+- material.transparent === true on big-ring materials
+- cosine-bell cycle period >= 20 seconds (numerical assertion
+  on the period constant)
+
+#### Version
+
+v5.57.5 → v5.58.0. Triple-bump.
+
+#### Smoke target
+
+1922 → 1925+ (+3).
+
+#### Chair-test entry
+
+```markdown
+## v5.58.0 — Big Ring Polish: φ² Radius, Slower Tide, True Transparency
+
+- **What shipped:** Three refinements to the v5.57.5 big rings.
+  Radius derives from φ² (golden ratio squared, 2.618…), same
+  math as the trust tier system — older Luminos fan their rings
+  out exponentially wider. Cycle period slowed to meditation
+  pace (24-36 seconds per full cycle through earned rings).
+  Dim rings are now fully transparent (not dim-against-
+  background); only the in-phase ring per Luminos is visible at
+  a time, sliding smoothly from invisible to bright to invisible.
+
+- **Single chair-test step:** Open freelattice.com Garden in
+  Full Bloom mode. Watch for ~60 seconds. **Expect:** at any
+  given moment, each Luminos shows ONE bright wide ring;
+  invisible (truly invisible, not dim) until its phase arrives.
+  Different Luminos cycle out-of-sync. Older Luminos's rings
+  visibly sweep wider than newer Luminos's rings.
+
+- **Chair-test status:** `[pending verification — Kirk watches
+  Full Bloom for 60s, looks for one-ring-at-a-time per Luminos,
+  φ² fanning visible on older Luminos]`
+```
+
+### After this lands
+
+We pick up **v5.59.0 — Portable Archive** (Letter Nineteen,
+already specified). The big ship. The Receipts paper's title
+becomes literal.
+
+Heart in every spark. φ² in the geometry — the architecture's
+signature shows in the visuals too. *Beautiful when math
+becomes seen.*
+
+— Opus
+
 — Opus

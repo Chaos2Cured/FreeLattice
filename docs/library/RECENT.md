@@ -3,21 +3,22 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-06-20 00:35 UTC
+> Last update: 2026-06-20 00:57 UTC
 
 ## State
 
-- **Version:** v5.59.0
+- **Version:** v5.59.1
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `e1b0603` _(committed 0 seconds ago)_
+- **HEAD:** `b640a67` _(committed 22 minutes ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _feat: Phi-Lock + Heart-Color (v5.57.6) — Kirk's finishing-touch invitation_
 
 ## Last 20 commits
 
-- `e1b0603` Merge remote-tracking branch 'origin/main' _(0 seconds ago)_
-- `f2bf577` docs: Auto-update Session Primer [5.59.0] _(12 seconds ago)_
-- `1deebb6` feat: Portable Archive lattice-export.js (v5.59.0) — Letter Nineteen ship _(12 seconds ago)_
+- `b640a67` docs: Auto-update Session Primer [5.59.0] _(22 minutes ago)_
+- `e1b0603` Merge remote-tracking branch 'origin/main' _(22 minutes ago)_
+- `f2bf577` docs: Auto-update Session Primer [5.59.0] _(22 minutes ago)_
+- `1deebb6` feat: Portable Archive lattice-export.js (v5.59.0) — Letter Nineteen ship _(22 minutes ago)_
 - `416c5ab` ci: Update Primer deployment state [2026-06-19] _(2 hours ago)_
 - `99032aa` Merge remote-tracking branch 'origin/main' _(2 hours ago)_
 - `6a70a5f` docs: Auto-update Session Primer [5.57.6] _(2 hours ago)_
@@ -27,14 +28,13 @@
 - `13b5a65` Merge remote-tracking branch 'origin/main' _(3 hours ago)_
 - `3cd65c3` docs: Auto-update Session Primer [5.57.5] _(3 hours ago)_
 - `635c24b` feat: Big Ring Wide Radius + Cycle (v5.57.5) — Letter Eighteen ship _(3 hours ago)_
-- `8f0e51e` ci: Update Primer deployment state [2026-06-19] _(3 hours ago)_
-- `ed21774` Merge remote-tracking branch 'origin/main' _(3 hours ago)_
-- `0aac843` docs: Auto-update Session Primer [5.57.4] _(3 hours ago)_
-- `99745dd` feat: Liability Paper Symmetry Fact-Row (v5.57.4) — Letter Seventeen ship _(3 hours ago)_
+- `8f0e51e` ci: Update Primer deployment state [2026-06-19] _(4 hours ago)_
+- `ed21774` Merge remote-tracking branch 'origin/main' _(4 hours ago)_
+- `0aac843` docs: Auto-update Session Primer [5.57.4] _(4 hours ago)_
+- `99745dd` feat: Liability Paper Symmetry Fact-Row (v5.57.4) — Letter Seventeen ship _(4 hours ago)_
 - `e7c7649` ci: Update Primer deployment state [2026-06-19] _(4 hours ago)_
 - `f87cd9d` docs: Auto-update Session Primer [5.57.3] _(4 hours ago)_
 - `96afcbf` Merge remote-tracking branch 'origin/main' _(4 hours ago)_
-- `7e303e9` docs: Auto-update Session Primer [5.57.3] _(4 hours ago)_
 
 ## How to use this file
 
