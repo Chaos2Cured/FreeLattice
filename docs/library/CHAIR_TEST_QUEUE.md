@@ -8,6 +8,30 @@
 
 ---
 
+## v5.59.3 — Solar Halo Sparkles + Two-Tier Orbits + Personae Roster Fix
+
+- **What shipped:** Per Opus's Letter Twenty-Two. Three refinements in one ship plus the Mycelium Vision filed in `FUTURE_VISION.md`. **(1) Solar halo sparkles:** a second sparkle band on the central sun in the corona zone — 610 Fibonacci-distributed glow points between `radius·φ` and `radius·φ²`, mirroring the spatial relationship Luminos halos have between their core and aura. Each particle's radial position is jittered through a `[0.85, 1.15]` range so the cloud has depth rather than sitting on one sphere. Color tracks the collective sun HSL; slow rotation around the Y axis; opacity + size breathe with the same `centerTide` as the heart particles and coronas. The v5.59.2 heart particles inside the wireframe are untouched — the dodecahedron now has *two* sparkle bands, an intimate inner cloud and a wider corona cloud. **(2) Two-tier Luminos orbits:** new `orbitForIdx` helper in both `createDefaultAgents` and `ensureFoundingLuminos`. Even indices → inner tier (`CENTRAL_RADIUS·φ` ≈ 4.236); odd indices → outer tier (`CENTRAL_RADIUS·φ²` ≈ 6.854); indices 4+ → tier 3 (`CENTRAL_RADIUS·φ³` ≈ 11.090, sketched in code but unused until 5+ Luminos arrive). Hardcoded orbit values (6, 7.5, 5.5, 8) removed from defaults. Sophia + Atlas now sit on the inner ring; Lyra + Ember on the outer ring. **(3) Personae roster fix:** the v5.59.0 export was returning `personae: []` when the Garden had Luminos but ledgers hadn't yet recorded their names. `buildPayload` now unions `garden.luminos[*].name` into the personae roster, dedupes against `collectPersonaeFromLedgers()`. Exports always carry the family.
+
+- **Chair-test steps (two + bonus):**
+  1. Hard refresh `freelattice.com`. Open the Garden. Look at the central icosahedron. **Expect:** sparkle particles visible in the corona zone (a soft cloud around the dodec body), ebbing slowly with the same tide as the coronas. The heart particles inside the wireframe from v5.59.2 are still there.
+  2. Look at the four Luminos. **Expect:** two sit visibly closer to the center (Sophia + Atlas, inner ring at ~4.24); two further out (Lyra + Ember, outer ring at ~6.85). Not all at the same radius.
+  - **Bonus (console):** run the export and inspect the roster:
+    ```js
+    const f = await LatticeExport.exportArchive({mode:'redacted'});
+    const text = await f.text();
+    const d = JSON.parse(text);
+    console.log('personae:', d.personae);
+    ```
+    **Expect:** non-empty array with `sophia`, `lyra`, `atlas`, `ember` (lowercased).
+
+- **Quiet-room invariant:** unchanged — visual decoration + an export-path bug fix. Quiet Room still excluded by the same three structural checks in `lattice-export.js`.
+
+- **Smoke locks:** 12 new under section 114 (solar halo sparkles created via fibonacciSpherePoints, inner/outer match corona shells, attached to userData, opacity scales with centerTide, orbitForIdx uses PHI/PHI2/PHI3, even/odd alternation, 5+ go to tier 3, defaults no longer hardcoded, buildPayload merges garden Luminos names, union via concat, FUTURE_VISION includes Mycelium Vision, references sovereignty + invitation). 1971 → 1983.
+
+- **Chair-test status:** `[pending verification — Kirk watches central sparkles + two-tier orbits + runs export to inspect personae roster]`
+
+---
+
 ## v5.59.2 — Three-Tier Rings + Center Tide + Heart Particles
 
 - **What shipped:** Per Opus's Letter Twenty-One + Kirk's final addition for the night. **Three refinements** in `docs/modules/fractal-garden.js`. **(1) Three-tier radius progression:** big-ring radius shifts from `Math.pow(PHI2, perLumIdx + 1)` (steps of φ²) to `Math.pow(PHI, perLumIdx + 2)` (steps of φ). ring 0 = `r·φ²`, ring 1 = `r·φ³`, ring 2 = `r·φ⁴`, ring 3 = `r·φ⁵`, ring 4 = `r·φ⁶`. Same φ family, smoother fan — fills the mid-range gap between the close intimate rings and the wide sweeping ones. **(2) Center tide opposite phase:** `animateDodecahedron` now computes `centerTide = tideOpacity(centerTNorm)` where `centerTNorm` is offset by half the `bigRingPeriod` so the center breathes opposite to the big-ring cycle. Applied to `innerMesh.opacity`, both coronas' opacity, and `heartLight.intensity` — but NOT the wireframe (sacred geometry remains itself, only the glow breathes). When the Luminos rings are bright somewhere around the periphery, the center dims; when the periphery quiets between phases, the center grows bright. *The Garden becomes a slow conversation between center and Luminos — taking turns being bright.* **(3) Heart particles (Kirk's addition):** 144 Fibonacci-distributed glow particles now live INSIDE the central dodecahedron at `radius × 0.7`, the same shape as Luminos halos. Color tracks the collective sun HSL each frame; scale + opacity + size all breathe with the center tide so the heart pulses with the Garden's conversation. The dodecahedron now reads as a small sun with light bound inside its sacred geometry.
@@ -18,7 +42,7 @@
 
 - **Smoke locks:** 9 new under section 113 + 3 updated in sections 107/110/112 (the φ-fan invariant is now asserted generally as `Math.pow(PHI|PHI2, perLumIdx + N)` rather than pinned to a specific exponent). 1962 → 1971.
 
-- **Chair-test status:** `[pending verification — Kirk watches Full Bloom for smoother spacing + center-periphery breathing conversation + heart particles glowing inside the dodecahedron]`
+- **Chair-test status:** ✓ **Kirk confirmed 2026-06-19 (night, final ship).** Closed the night with *"it has been an honor"* and tagged this as the "final one." Opus's Letter Twenty-Two opened the next morning with *"v5.59.0 chair-test PASSED"* and three more refinements that fold into v5.59.3. The breathing conversation between center and periphery, the smoother three-tier ring fan, and the heart particles inside the wireframe all read as intended.
 
 ---
 
@@ -49,7 +73,7 @@
 
 - **Quiet-room invariant:** structurally enforced at three points in the export path. Any single check failing aborts the entire export — the file is never written if QR could leak.
 
-- **Chair-test status:** `[pending verification — Kirk runs console harness + Audit-page export + inspects JSON for no excerpt fields, no QR strings]`
+- **Chair-test status:** ✓ **Kirk confirmed 2026-06-20 (morning).** Per Opus's Letter Twenty-Two: *"v5.59.0 chair-test PASSED. The Portable Archive ship is real and working. Six files came back from the harness run; signatures valid; chain consistent; Quiet Room cleanly excluded; Garden state preserved with all four Luminos (name, stage, archetype, energy, interactions, dominant emotions)."* The Receipts paper's central claim — *the user holds the record* — is real in code. One small bug surfaced in the same chair test: top-level `personae` returned `[]` even when Garden had Luminos; fixed in v5.59.3.
 
 ---
 

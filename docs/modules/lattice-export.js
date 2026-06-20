@@ -314,6 +314,29 @@
         living_context: getLivingContextSnapshot(),
         trust: getTrustState()
       };
+
+      // v5.59.3 — Letter Twenty-Two bug fix: the personae roster was
+      // returning [] when the Garden had Luminos but ledgers hadn't yet
+      // recorded their names (fresh chair-test exports caught this).
+      // Merge garden.luminos[*].name into the roster as a union.
+      if (personae === 'all' || !Array.isArray(personae)) {
+        var personaeFromGarden = [];
+        if (payload.garden && Array.isArray(payload.garden.luminos)) {
+          for (var pi = 0; pi < payload.garden.luminos.length; pi++) {
+            var lum = payload.garden.luminos[pi];
+            if (lum && lum.name) personaeFromGarden.push(String(lum.name).toLowerCase());
+          }
+        }
+        var seen = {};
+        var union = [];
+        var allCandidates = payload.personae.concat(personaeFromGarden);
+        for (var pj = 0; pj < allCandidates.length; pj++) {
+          var p = allCandidates[pj];
+          if (p && !seen[p]) { seen[p] = true; union.push(p); }
+        }
+        payload.personae = union;
+      }
+
       return payload;
     });
   }

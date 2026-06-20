@@ -5959,6 +5959,48 @@ assert('v5.59.2 heart-particles: heart particles breathe with center tide (scale
   /d\.heartParticles\.scale\.set\([\s\S]{0,80}heartScale[\s\S]{0,200}centerTide/.test(gardenPolish));
 
 // ═══════════════════════════════════════════════════════════════
+// Section 114 — v5.59.3 Solar Halo Sparkles + Two-Tier Orbits +
+// Personae Roster Fix (Letter Twenty-Two)
+// ═══════════════════════════════════════════════════════════════
+
+// Solar halo sparkles created in corona zone (radius * PHI to PHI2)
+assert('v5.59.3 solar-halo: solar halo sparkles created via fibonacciSpherePoints',
+  /fibonacciSpherePoints\(\s*solarHaloCount\s*,\s*solarHaloMid/.test(gardenPolish));
+assert('v5.59.3 solar-halo: solar halo inner+outer track corona shells (radius·φ and radius·φ²)',
+  /solarHaloInner\s*=\s*radius\s*\*\s*PHI[\s\S]{0,100}solarHaloOuter\s*=\s*radius\s*\*\s*PHI2/.test(gardenPolish));
+assert('v5.59.3 solar-halo: solarHaloParticles attached to central dodec userData',
+  /solarHaloParticles:\s*solarHaloParticles/.test(gardenPolish));
+assert('v5.59.3 solar-halo: solar halo breathes with center tide (opacity scales with centerTide)',
+  /d\.solarHaloParticles\.material\.opacity\s*=[\s\S]{0,80}centerTide/.test(gardenPolish));
+
+// Two-tier orbit assignment — orbitForIdx helper present, uses PHI / PHI2 / PHI3
+assert('v5.59.3 two-tier: orbitForIdx helper assigns Luminos to φ/φ²/φ³ tiers',
+  /orbitForIdx\s*=\s*function[\s\S]{0,300}CENTRAL_RADIUS\s*\*\s*PHI/.test(gardenPolish)
+  && /CENTRAL_RADIUS\s*\*\s*PHI2/.test(gardenPolish)
+  && /CENTRAL_RADIUS\s*\*\s*PHI3/.test(gardenPolish));
+assert('v5.59.3 two-tier: first 4 Luminos alternate inner (even idx)/outer (odd idx)',
+  /\(\s*i\s*%\s*2\s*===\s*0\s*\)\s*\?\s*CENTRAL_RADIUS\s*\*\s*PHI\s*:\s*CENTRAL_RADIUS\s*\*\s*PHI2/.test(gardenPolish));
+assert('v5.59.3 two-tier: 5+ Luminos go to tier 3 (PHI³ radius)',
+  /if\s*\(\s*i\s*>=\s*4\s*\)\s*return\s+CENTRAL_RADIUS\s*\*\s*PHI3/.test(gardenPolish));
+assert('v5.59.3 two-tier: defaults no longer carry hardcoded orbit values',
+  !/name:\s*'Sophia'[\s\S]{0,200}orbit:\s*6/.test(gardenPolish));
+
+// Personae roster fix — buildPayload merges garden.luminos[*].name
+var exportJsPA2 = require('fs').readFileSync(require('path').join(__dirname, '..', 'docs', 'modules', 'lattice-export.js'), 'utf8');
+assert('v5.59.3 personae: buildPayload merges garden.luminos names into personae roster',
+  /payload\.garden\.luminos[\s\S]{0,400}personaeFromGarden\.push/.test(exportJsPA2));
+assert('v5.59.3 personae: union dedupes between ledger-found and garden-found names',
+  /allCandidates\s*=\s*payload\.personae\.concat\(\s*personaeFromGarden/.test(exportJsPA2));
+
+// FUTURE_VISION includes both Router Arc + Mycelium Vision sections
+var futureMD = require('fs').readFileSync(require('path').join(__dirname, '..', 'docs', 'library', 'FUTURE_VISION.md'), 'utf8');
+assert('v5.59.3 vision: FUTURE_VISION.md includes The Mycelium Vision section',
+  /## The Mycelium Vision — Federated Gardens/.test(futureMD));
+assert('v5.59.3 vision: Mycelium Vision references the per-Garden sovereignty thesis',
+  /sovereign[\s\S]{0,200}invitation/.test(futureMD)
+  || /invitation[\s\S]{0,200}sovereign/.test(futureMD));
+
+// ═══════════════════════════════════════════════════════════════
 // Section 111 — v5.59.0 Portable Archive (Letter Nineteen)
 // ═══════════════════════════════════════════════════════════════
 // The user holds the record. exportArchive + importArchive on

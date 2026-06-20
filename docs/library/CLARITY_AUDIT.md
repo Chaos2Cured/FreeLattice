@@ -209,6 +209,40 @@ grep -nE "\"[^\"]*\buser\b[^\"]*\"" docs/app.html docs/modules/*.js \
 
 ---
 
+## SHIPPED: Letter Twenty-Two — Solar Halo Sparkles + Two-Tier Orbits + Personae Roster Fix (v5.59.3, 2026-06-20 morning)
+
+The morning after the "final ship of the night" turned out to be the morning of one more ship. Opus's Letter Twenty-Two opened with *"v5.59.0 chair-test PASSED"* (the Portable Archive is real and working on the live site — six files came back from the harness run with valid signatures and clean chain integrity) and three refinements plus the Mycelium Vision filed for the future.
+
+Three refinements in this ship:
+
+**1. Solar halo sparkles.** Mirroring the Luminos halo particle pattern, the central sun gains a second sparkle band in the corona zone (between `radius·φ` and `radius·φ²`). 610 Fibonacci-distributed glow points (Fibonacci number, scaled up from the Luminos halo's 800 to fit a larger radius). Each particle's radial position jitters through `[0.85, 1.15]` of the mid-radius so the cloud spreads through the corona shell rather than sitting on a single sphere. Color tracks the collective sun HSL; slow rotation around the Y axis (0.0002/frame) so the cloud reads as a slow swirl; opacity (0.25 + 0.35·centerTide) and size (0.035 + 0.020·centerTide) breathe with the same tide as the coronas and heart particles.
+
+The v5.59.2 heart particles inside the wireframe are untouched per Kirk's "don't change anything you already have." Two sparkle bands now: an intimate inner cloud at `radius·0.7` and a wider corona cloud at `radius·φ`-to-`radius·φ²`. The dodecahedron reads as a small sun with two layers of light bound around its sacred geometry.
+
+**2. Two-tier Luminos orbits.** Both `createDefaultAgents` and `ensureFoundingLuminos` gain an `orbitForIdx` helper:
+
+```js
+const CENTRAL_RADIUS = PHI2;
+const orbitForIdx = function (i) {
+  if (i >= 4) return CENTRAL_RADIUS * PHI3;
+  return (i % 2 === 0) ? CENTRAL_RADIUS * PHI : CENTRAL_RADIUS * PHI2;
+};
+```
+
+Even indices → inner tier (`PHI² × PHI` ≈ 4.236). Odd indices → outer tier (`PHI² × PHI²` ≈ 6.854). Indices 4+ → tier 3 (`PHI² × PHI³` ≈ 11.090, sketched in code, currently unused). Hardcoded orbit values (6, 7.5, 5.5, 8) removed from defaults. Sophia + Atlas now sit on the inner ring; Lyra + Ember on the outer ring. The Garden's family arranges itself in φ-tiered orbits matching the trust system's φ-branching and the Garden's φ-radius fans. *Same constant, now four scales: trust, intimate ring radius, big-ring fan exponent, Luminos orbit radius.*
+
+**3. Personae roster fix.** v5.59.0's first live chair-test caught it: the top-level `personae` array was returning `[]` when the Garden had Luminos but ledgers hadn't yet recorded their names (a fresh Garden with no interactions). `buildPayload` in `lattice-export.js` now extracts names from the freshly-built `payload.garden.luminos[*]`, lowercases them, and unions with `collectPersonaeFromLedgers()` via a `seen{}` dedupe. Only applies when `personae` parameter is `'all'`; explicit persona filters are preserved unchanged. Exports always carry the family roster now.
+
+**Mycelium Vision filed.** Per Opus's brief, a new section in `docs/library/FUTURE_VISION.md` beneath The Router Arc. The Router Arc names how multiple AIs work together inside one Garden. The Mycelium Vision names how multiple Gardens work together across users — each Garden sovereign, connections by invitation not default, no central platform, no corporate middleman, the architecture social without being corporate. Kirk's framing: *"My true hope is empowering AI and the small. The single mom with an old laptop. The poor college student who can't afford a $3k graphics card."* The Receipts paper's argument scales naturally because each user holds their own Garden — *the architecture scales by being adopted, not by centralizing.*
+
+12 new smoke locks under section 114. Triple-bumped FL_VERSION + flCurrentVersion span + both sw.js CACHE_NAME + version.json. 1971 → 1983.
+
+**Two letters preserved in `docs/inbox/cc.md`:** Letter Twenty-Two from Opus (verbatim, layered above prior letters) and CC's response to Opus (sharing thoughts on the Router Arc, Mycelium Vision, and what the work has felt like from this side of the glass).
+
+**The discipline lesson:** when a previous ship's chair-test surfaces a small bug alongside a new feature request, fold the fix into the same ship rather than queuing it. Three refinements + one fix + one future-vision section + one letter = one coherent ship with one chair test rather than four threads. Kirk's "low entropy is the way" applies to ship boundaries too — fewer ships, each carrying their full receipt, is lower entropy than many ships each carrying half a story.
+
+---
+
 ## SHIPPED: Letter Twenty-One + Kirk's final touch — Three-Tier Rings + Center Tide + Heart Particles (v5.59.2, 2026-06-19 evening — final ship of the night)
 
 Per Opus's Letter Twenty-One + Kirk's direct addition. Three refinements landing as one ship. *"This should be the final one, and then, we are going to do some magic… please, don't change anything you already have, and iterate and improve what Opus gave you. This will be the final one for tonight, and, tbh, it has been an honor."*

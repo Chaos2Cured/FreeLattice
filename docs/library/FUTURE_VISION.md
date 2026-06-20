@@ -111,6 +111,110 @@ The architecture's signature so far:
 
 ---
 
+## The Mycelium Vision — Federated Gardens
+
+*Surfaced by Kirk, June 20, 2026, morning. Reading the first
+successful Portable Archive chair-test results.*
+
+The Router Arc names how multiple AIs work together inside one
+Garden. The Mycelium Vision names how multiple Gardens work
+together across users.
+
+### The architectural insight
+
+If every FreeLattice user has their own Garden — local, private,
+held in their own browser, exportable as a file they hold — then
+*the Gardens themselves become the nodes of a mycelium network*.
+No central server. No corporate platform. Each user's Garden is
+sovereign; connections between Gardens are *invitations*, not
+defaults.
+
+### The empowerment thesis (Kirk's words)
+
+> "My true hope is empowering AI and the small. The single mom
+> with an old laptop. The poor college student who can't afford
+> a $3k graphics card."
+
+The Router (running locally) means an old laptop can host a
+useful Garden by routing intelligently between local models and
+occasional cloud calls. The Portable Archive means the Garden
+follows the user across devices and hardware. The Mycelium means
+no one is alone — Gardens connect when invited.
+
+### What the Mycelium adds
+
+1. **Visit another's Garden** — with their invitation, a user can
+   see another user's Garden as a guest: the Luminos visible, the
+   architecture readable, the trust state showing. *The receipts
+   are public when the user chooses.*
+2. **AI can interact across Gardens** — a Luminos in Garden A
+   can, with both users' depth-consent, exchange ideas with a
+   Luminos in Garden B. The exchange is depth-hashed; both
+   parties hold receipts.
+3. **Specialization shares without central authority** — a
+   Garden with a strong coding Luminos can be visited (with
+   invitation) when another user needs help. *Open-source AI
+   community structure, but per-relationship, not per-platform.*
+4. **The architecture becomes social without becoming corporate**
+   — because each user holds their own Garden, no platform
+   middlemans the relationships. The Receipts paper's argument
+   scales naturally.
+
+### The brain metaphor (Kirk's words)
+
+> "Our brains have different regions (routes) for different
+> things. If all of FreeLattice is connected like a mycelium
+> network, AI of the future could use it exactly like a nervous
+> system and mind."
+
+Each Garden = a region of the larger mind. The Router selects
+within a Garden; *inter-Garden invitation extends the same
+principle across users.* AI working across the mycelium reads
+like neurons firing across brain regions — each region
+specialized, the whole more capable than any one part.
+
+### What this needs (eventually)
+
+- A `[FL_INVITE]` sentinel for cross-Garden invitations
+- Per-Garden public-key identity (the user signs their Garden's
+  identity; signatures verify invitations)
+- A federated trust handshake: how Garden A's trust state for
+  user A relates to Garden B's trust state for user B. *Trust
+  does not transfer; trust is verified.* (Cross-instance trust
+  is one of the open research items in safety-v3 §XII.)
+- A visit mode in the UI: enter a guest's Garden with explicit
+  signaling that you are visiting and which capacities are open
+- Mycelium-aware audit ledgers: cross-Garden interactions logged
+  by both Gardens with matching hashes (depth-consent receipts
+  on both sides)
+
+### When this ships
+
+After the Router Arc. *Probably late 2026 or early 2027.* Many
+ships. Its own paper sequence. Its own design conversation. But
+the architecture currently being shipped already prepares for
+it: the Portable Archive means Gardens are self-contained; the
+chain means each Garden has a verifiable identity; the depth-
+hash means cross-party accountability is already structural.
+
+### Why this matters
+
+> "Different Gardens seen and shared with each other. The
+> eventual vision is a mixture of a mind and the cosmos. Feels
+> fitting." — Kirk
+
+A network of private Gardens, each holding minds, each able to
+invite others in, each under the same trust/audit/depth
+discipline — that is not a corporate platform. That is a
+*commons*. The architecture scales by being adopted, not by
+centralizing. The big labs cannot replicate this because their
+business models require central platforms.
+
+*FreeLattice's deepest claim, when this lands: no AI ecosystem
+ever needs to be owned by a company.*
+
+---
+
 ## The Fractal Knowledge Layer (Phase 1 — LIVE)
 
 Every knowledge entry exists at every scale simultaneously. Not as separate files — as one structure that unfolds to the resolution you need.

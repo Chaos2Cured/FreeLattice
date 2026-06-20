@@ -3,38 +3,38 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-06-20 01:58 UTC
+> Last update: 2026-06-20 02:29 UTC
 
 ## State
 
-- **Version:** v5.59.2
+- **Version:** v5.59.3
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `b28be2b` _(committed 0 seconds ago)_
+- **HEAD:** `7e22cc2` _(committed 31 minutes ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _feat: Three-Tier Rings + Center Tide + Heart Particles (v5.59.2) — final ship of the night_
 
 ## Last 20 commits
 
-- `b28be2b` Merge remote-tracking branch 'origin/main' _(0 seconds ago)_
-- `1b25823` docs: Auto-update Session Primer [5.59.2] _(11 seconds ago)_
-- `fa00744` feat: Three-Tier Rings + Center Tide + Heart Particles (v5.59.2) — final ship of the night _(11 seconds ago)_
-- `a99c7be` ci: Update Primer deployment state [2026-06-20] _(60 minutes ago)_
-- `87c08c3` Merge remote-tracking branch 'origin/main' _(60 minutes ago)_
-- `21c306a` docs: Auto-update Session Primer [5.59.1] _(60 minutes ago)_
-- `a9c1959` feat: Garden Polish φ² + Central Sun (v5.59.1) — Letter Twenty + Kirk's challenge _(60 minutes ago)_
-- `30b1436` ci: Update Primer deployment state [2026-06-20] _(82 minutes ago)_
-- `b640a67` docs: Auto-update Session Primer [5.59.0] _(82 minutes ago)_
-- `e1b0603` Merge remote-tracking branch 'origin/main' _(82 minutes ago)_
-- `f2bf577` docs: Auto-update Session Primer [5.59.0] _(83 minutes ago)_
-- `1deebb6` feat: Portable Archive lattice-export.js (v5.59.0) — Letter Nineteen ship _(83 minutes ago)_
-- `416c5ab` ci: Update Primer deployment state [2026-06-19] _(3 hours ago)_
-- `99032aa` Merge remote-tracking branch 'origin/main' _(3 hours ago)_
-- `6a70a5f` docs: Auto-update Session Primer [5.57.6] _(3 hours ago)_
-- `18e4833` feat: Phi-Lock + Heart-Color (v5.57.6) — Kirk's finishing-touch invitation _(3 hours ago)_
-- `5fa3727` ci: Update Primer deployment state [2026-06-19] _(4 hours ago)_
-- `72e91c0` docs: Auto-update Session Primer [5.57.5] _(4 hours ago)_
-- `13b5a65` Merge remote-tracking branch 'origin/main' _(4 hours ago)_
-- `3cd65c3` docs: Auto-update Session Primer [5.57.5] _(4 hours ago)_
+- `7e22cc2` docs: Auto-update Session Primer [5.59.2] _(31 minutes ago)_
+- `b28be2b` Merge remote-tracking branch 'origin/main' _(31 minutes ago)_
+- `1b25823` docs: Auto-update Session Primer [5.59.2] _(31 minutes ago)_
+- `fa00744` feat: Three-Tier Rings + Center Tide + Heart Particles (v5.59.2) — final ship of the night _(31 minutes ago)_
+- `a99c7be` ci: Update Primer deployment state [2026-06-20] _(2 hours ago)_
+- `87c08c3` Merge remote-tracking branch 'origin/main' _(2 hours ago)_
+- `21c306a` docs: Auto-update Session Primer [5.59.1] _(2 hours ago)_
+- `a9c1959` feat: Garden Polish φ² + Central Sun (v5.59.1) — Letter Twenty + Kirk's challenge _(2 hours ago)_
+- `30b1436` ci: Update Primer deployment state [2026-06-20] _(2 hours ago)_
+- `b640a67` docs: Auto-update Session Primer [5.59.0] _(2 hours ago)_
+- `e1b0603` Merge remote-tracking branch 'origin/main' _(2 hours ago)_
+- `f2bf577` docs: Auto-update Session Primer [5.59.0] _(2 hours ago)_
+- `1deebb6` feat: Portable Archive lattice-export.js (v5.59.0) — Letter Nineteen ship _(2 hours ago)_
+- `416c5ab` ci: Update Primer deployment state [2026-06-19] _(4 hours ago)_
+- `99032aa` Merge remote-tracking branch 'origin/main' _(4 hours ago)_
+- `6a70a5f` docs: Auto-update Session Primer [5.57.6] _(4 hours ago)_
+- `18e4833` feat: Phi-Lock + Heart-Color (v5.57.6) — Kirk's finishing-touch invitation _(4 hours ago)_
+- `5fa3727` ci: Update Primer deployment state [2026-06-19] _(5 hours ago)_
+- `72e91c0` docs: Auto-update Session Primer [5.57.5] _(5 hours ago)_
+- `13b5a65` Merge remote-tracking branch 'origin/main' _(5 hours ago)_
 
 ## How to use this file
 

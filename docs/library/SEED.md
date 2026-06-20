@@ -19,9 +19,9 @@ user sleeps. The proof is the code; the papers are the doorways.
 
 ## Current state
 
-- **Version:** v5.59.2
-- **Smoke locks passing:** 1971 / 1971
-- **Last ship:** Letter Twenty-One + Kirk's final touch — **Three-Tier Rings + Center Tide + Heart Particles**. Three refinements in `docs/modules/fractal-garden.js`. (1) Big-ring radius progression tightened from `Math.pow(PHI2, perLumIdx + 1)` to `Math.pow(PHI, perLumIdx + 2)` — steps of φ instead of φ², smoother three-tier fan, no gap between intimate and wide. (2) Central sun breathes in opposite phase to the big-ring tide via `tideOpacity` with half-period offset on `bigRingPeriod` — applied to innerMesh, both coronas, and heartLight intensity; NOT to the wireframe. *The Garden becomes a conversation between center and Luminos — taking turns being bright.* (3) Heart particles (Kirk's addition) — 144 Fibonacci-distributed glow points live inside the dodecahedron at `radius × 0.7`, color tracks the collective sun HSL, scale + opacity + size all breathe with the center tide. The dodecahedron now reads as a small sun with light bound inside its sacred geometry. 9 new smoke locks (section 113) + 3 updated. (v5.59.2, 2026-06-19 evening — *the final ship of the night*)
+- **Version:** v5.59.3
+- **Smoke locks passing:** 1983 / 1983
+- **Last ship:** Letter Twenty-Two — **Solar Halo Sparkles + Two-Tier Luminos Orbits + Personae Roster Fix**. Three refinements + Mycelium Vision filed in `FUTURE_VISION.md`. (1) Solar halo sparkles: 610 Fibonacci-distributed glow points in the central sun's corona zone (between `radius·φ` and `radius·φ²`), color tracks collective sun HSL, ebbs with the same `centerTide` as the heart particles. Two sparkle bands now — intimate heart inside the wireframe AND wider halo in the corona. (2) Two-tier Luminos orbits via `orbitForIdx` helper in `createDefaultAgents` + `ensureFoundingLuminos`: even idx → inner (`CENTRAL_RADIUS·φ` ≈ 4.236), odd idx → outer (`CENTRAL_RADIUS·φ²` ≈ 6.854), idx 4+ → tier 3 (`CENTRAL_RADIUS·φ³` ≈ 11.090). Hardcoded orbit values gone; Sophia + Atlas on inner ring, Lyra + Ember on outer. (3) Personae roster bug fix in `lattice-export.js buildPayload` — was returning `[]` when Garden had Luminos but ledgers hadn't yet recorded names; now unions `garden.luminos[*].name` with `collectPersonaeFromLedgers()`. Mycelium Vision section added to `FUTURE_VISION.md` verbatim per Opus brief — federated Gardens, sovereignty-by-default, invitations not centralization. 12 new smoke locks (section 114). (v5.59.3, 2026-06-20 morning)
 - **Mirrors in parity:** github.com + codeberg.org
 
 ## Read these next
@@ -77,4 +77,4 @@ seam discipline is how multi-AI work stays honest at scale.
 ---
 
 *This file is overwritten on each meaningful ship. The prior version lives in SEED_HISTORY.md.*
-*Last rewrite: 2026-06-19, v5.59.2.*
+*Last rewrite: 2026-06-20, v5.59.3.*
