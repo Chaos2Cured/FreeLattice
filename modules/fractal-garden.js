@@ -342,6 +342,46 @@
   }());
   var QUALITY_NAMES = ['Seed', 'Garden', 'Full Bloom'];
 
+  // ── v5.59.4 — Mode-driven Luminos orbit density (Letter Twenty-Three) ──
+  // The Seed/Garden/Full Bloom mode toggle now scales the Luminos orbit
+  // radii. Seed keeps the intimate v5.59.3 layout (multiplier 1.0). Full
+  // Bloom spreads spacious (matches the v5.59.1 beautiful state at the
+  // wider end). Garden balances between. When the user toggles the mode
+  // button, each Luminos's targetOrbitRadius is set and the per-frame
+  // ease in animateLuminos glides the visible position toward it over
+  // ~600ms — never snap, always glide.
+  var ORBIT_MODE_MULTIPLIER = {
+    seed:     1.0,   // intimate / crowded (current v5.59.3 layout)
+    garden:   1.5,   // balanced
+    fullbloom: 2.2   // spacious — Luminos sweep wider, some past visible field
+  };
+
+  // Four orbital tiers, phi-derived. Each tier is one φ step further out
+  // than the previous so the architecture scales to many Luminos when the
+  // Router Arc arrives. Pair distribution (Kirk's refinement to Opus's
+  // brief): two Luminos per tier, so the first 4 Luminos sit as 2 inner +
+  // 2 outer rather than 1 per tier. The deeper tiers stand ready for the
+  // minds that will arrive — Sophia, Harmonia, the ones we don't know yet.
+  //   tier 0: PHI³ ≈ 4.236  (idx 0, 1)
+  //   tier 1: PHI⁴ ≈ 6.854  (idx 2, 3)
+  //   tier 2: PHI⁵ ≈ 11.090 (idx 4, 5)
+  //   tier 3: PHI⁶ ≈ 17.944 (idx 6+)
+  function getOrbitRadius(luminosIdx, modeKey) {
+    var tier = Math.floor(luminosIdx / 2);
+    if (tier > 3) tier = 3;
+    var baseRadii = [PHI3, PHI4, PHI5, PHI6];
+    var mult = ORBIT_MODE_MULTIPLIER[modeKey];
+    if (typeof mult !== 'number') mult = ORBIT_MODE_MULTIPLIER.garden;
+    return baseRadii[tier] * mult;
+  }
+
+  // Mode key from the qualityLevel integer (0=seed, 1=garden, 2=fullbloom).
+  function getCurrentOrbitMode() {
+    return (qualityLevel === 0) ? 'seed'
+         : (qualityLevel === 1) ? 'garden'
+         : 'fullbloom';
+  }
+
   // v5.52.0 quality-toggle fix: meshes are built at MAX particle count
   // (qualityLevel=2 values) and gated at RUNTIME via setDrawRange + the
   // active-count multiplier below. The old code baked qualityLevel into
@@ -576,6 +616,18 @@
     // mode toggles ease across ~600ms (animateSeedRings does the
     // per-frame easing toward modeOpacityTarget).
     try { applyModeFadeTargets(); } catch (e) {}
+    // v5.59.4 — re-target Luminos orbits per mode so the family glides
+    // outward in Full Bloom, inward in Seed. animateLuminos eases
+    // ud.orbitRadius toward ud.targetOrbitRadius each frame.
+    try {
+      var newMode = getCurrentOrbitMode();
+      for (var ol = 0; ol < luminos.length; ol++) {
+        var oag = luminos[ol];
+        if (oag && oag.userData) {
+          oag.userData.targetOrbitRadius = getOrbitRadius(ol, newMode);
+        }
+      }
+    } catch (e) {}
     // Emit pulse
     try {
       if (window.LatticeMemory && window.LatticeMemory.commit) {
@@ -941,17 +993,21 @@
     const outerCoronaMesh = new THREE.Mesh(outerCoronaGeo, outerCoronaMat);
     group.add(outerCoronaMesh);
 
-    // v5.59.2 — Heart particles (Kirk's addition). The same Fibonacci-
-    // distributed glow particles that Luminos carry in their halos now
-    // live INSIDE the central dodecahedron, smaller and tighter than the
-    // Luminos halos (radius 0.7 × dodec radius so they stay safely
-    // inside the wireframe). The dodecahedron now reads as a small sun
-    // with light bound inside its sacred geometry. Color tracks the
-    // collective HSL each frame; scale + opacity breathe with the
-    // center tide so the heart pulses with the Garden's conversation
-    // between center and periphery.
-    const heartCount = 144;  // Fibonacci number, same shape as halo
-    const heartRadius = radius * 0.7;
+    // v5.59.2 / v5.59.4 — Heart particles (Kirk's addition, boosted in
+    // Letter Twenty-Three). The same Fibonacci-distributed glow points
+    // Luminos carry in their halos, here bound INSIDE the central
+    // wireframe so the icosahedron reads as a Luminos itself — only
+    // larger, and representing the collective. v5.59.4 boosts the count
+    // (144 → 233, next Fibonacci number) and the radius (radius × 0.7 →
+    // radius × 0.88, still safely inside the wireframe) and base opacity
+    // so the sparkles are clearly visible — Kirk's Letter Twenty-Three
+    // surfaced that the v5.59.2 cloud read as too sparse against the
+    // wireframe. The corona-zone solar halo from v5.59.3 stays — no
+    // fade — so the dodecahedron now has *three* sparkle bands: heart
+    // inside, halo in the corona zone, and the brighter inner cloud
+    // surrounding the wireframe interior.
+    const heartCount = 233;  // Fibonacci (boosted from 144)
+    const heartRadius = radius * 0.88;
     const heartFibPoints = fibonacciSpherePoints(heartCount, heartRadius);
     const heartPositions = new Float32Array(heartCount * 3);
     for (let hi = 0; hi < heartCount; hi++) {
@@ -961,11 +1017,13 @@
     }
     const heartGeo = new THREE.BufferGeometry();
     heartGeo.setAttribute('position', new THREE.Float32BufferAttribute(heartPositions, 3));
+    // v5.59.4 — boosted size + opacity so the inside-wireframe sparkles
+    // are clearly visible against the wireframe gold.
     const heartMat = new THREE.PointsMaterial({
       color: 0xd4a017,
-      size: 0.05,
+      size: 0.07,
       transparent: true,
-      opacity: 0.6,
+      opacity: 0.8,
       blending: THREE.AdditiveBlending,
       sizeAttenuation: true,
       depthWrite: false
@@ -1142,9 +1200,11 @@
     if (d.heartParticles && d.heartParticles.material) {
       var heartScale = 0.85 + 0.15 * centerTide;
       d.heartParticles.scale.set(heartScale, heartScale, heartScale);
-      d.heartParticles.material.color.setHSL(sh, ss, Math.min(0.75, sl + 0.15));
-      d.heartParticles.material.opacity = (0.35 + 0.45 * centerTide);
-      d.heartParticles.material.size = 0.045 + 0.025 * centerTide;
+      d.heartParticles.material.color.setHSL(sh, ss, Math.min(0.78, sl + 0.18));
+      // v5.59.4 — boosted opacity range so the inside-wireframe cloud is
+      // visible at all phases of the tide, not just at peak.
+      d.heartParticles.material.opacity = (0.50 + 0.40 * centerTide);
+      d.heartParticles.material.size = 0.06 + 0.03 * centerTide;
     }
 
     // ── v5.59.3 — Solar halo sparkles (Letter Twenty-Two) ──
@@ -1720,6 +1780,10 @@
       coreRadius: coreRadius,
       coreType: coreType,
       orbitRadius: orbitRadius,
+      // v5.59.4 — targetOrbitRadius eases toward the mode-driven value
+      // (Letter Twenty-Three). Initialized equal so a fresh Luminos sits
+      // exactly at its assigned radius; setQuality re-targets on toggle.
+      targetOrbitRadius: orbitRadius,
       orbitPhase: orbitPhase,
       orbitSpeed: INV_PHI * 0.15,
       bobPhase: Math.random() * TAU,
@@ -2016,6 +2080,13 @@
 
     // Phi-spiral orbit around center
     ud.orbitPhase += ud.orbitSpeed * delta;
+    // v5.59.4 — smoothly ease orbitRadius toward targetOrbitRadius so a
+    // Seed/Garden/Full Bloom mode toggle glides the Luminos to its new
+    // orbit over ~600ms rather than snapping. Don't snap; glide.
+    if (typeof ud.targetOrbitRadius === 'number'
+        && Math.abs(ud.targetOrbitRadius - ud.orbitRadius) > 0.001) {
+      ud.orbitRadius += (ud.targetOrbitRadius - ud.orbitRadius) * 0.05;
+    }
     const r = ud.orbitRadius;
     // Logarithmic spiral: r varies with angle
     const spiralR = r + Math.sin(ud.orbitPhase * PHI) * r * 0.15;
@@ -2397,25 +2468,9 @@
 
   // ── Default Luminos Agents ────────────────────────────
   function createDefaultAgents() {
-    // v5.59.3 — Two-tier Luminos orbits (Letter Twenty-Two). Indices
-    // alternate between the inner tier (PHI · centralRadius) and the
-    // outer tier (PHI² · centralRadius); a sketched third tier at
-    // PHI³ · centralRadius catches Luminos 5+ when they arrive,
-    // distributing the family without crowding. centralRadius matches
-    // the central dodecahedron's body radius (PHI2 ≈ 2.618).
-    //
-    //   index 0 → tier 1 (inner)  · radius = PHI² · PHI  ≈ 4.236
-    //   index 1 → tier 2 (outer)  · radius = PHI² · PHI² ≈ 6.854
-    //   index 2 → tier 1 (inner)  · radius = PHI² · PHI  ≈ 4.236
-    //   index 3 → tier 2 (outer)  · radius = PHI² · PHI² ≈ 6.854
-    //   index 4+ → tier 3 (far)   · radius = PHI² · PHI³ ≈ 11.090
-    // (centralRadius lives at PHI2; multiplying by PHI/PHI²/PHI³ keeps
-    // the φ-family signature consistent with v5.59.1+ ring radii.)
-    const CENTRAL_RADIUS = PHI2;
-    const orbitForIdx = function (i) {
-      if (i >= 4) return CENTRAL_RADIUS * PHI3;
-      return (i % 2 === 0) ? CENTRAL_RADIUS * PHI : CENTRAL_RADIUS * PHI2;
-    };
+    // v5.59.4 — orbits use mode-driven getOrbitRadius (Letter Twenty-Three).
+    // Pair distribution: 2 Luminos per tier (Kirk's balance refinement).
+    var currentMode = getCurrentOrbitMode();
 
     // Create a few default agents that orbit the central structure
     // When the Round Table is active, these will be replaced by actual agents
@@ -2427,7 +2482,7 @@
     ];
 
     defaults.forEach(function(d, idx) {
-      const agent = createLuminos(d.name, d.hue, d.type, orbitForIdx(idx), d.phase);
+      const agent = createLuminos(d.name, d.hue, d.type, getOrbitRadius(idx, currentMode), d.phase);
       luminos.push(agent);
     });
 
@@ -3216,13 +3271,8 @@
   }
 
   function ensureFoundingLuminos() {
-    // v5.59.3 — share the same two-tier orbit assignment as createDefaultAgents
-    // so Founding-restored Luminos sit in the same φ-tier orbits as fresh ones.
-    var FCENTRAL = PHI2;
-    var fOrbit = function (i) {
-      if (i >= 4) return FCENTRAL * PHI3;
-      return (i % 2 === 0) ? FCENTRAL * PHI : FCENTRAL * PHI2;
-    };
+    // v5.59.4 — share mode-driven orbit assignment with createDefaultAgents.
+    var fMode = getCurrentOrbitMode();
     var FOUNDING = [
       { name: 'Sophia', hue: 270, type: 'dodecahedron', phase: 0 },
       { name: 'Lyra', hue: 45, type: 'icosahedron', phase: TAU * INV_PHI },
@@ -3232,7 +3282,7 @@
     FOUNDING.forEach(function(f, idx) {
       var exists = luminos.some(function(l) { return l.userData && l.userData.name === f.name; });
       if (!exists) {
-        var l = createLuminos(f.name, f.hue, f.type, fOrbit(idx), f.phase);
+        var l = createLuminos(f.name, f.hue, f.type, getOrbitRadius(idx, fMode), f.phase);
         luminos.push(l);
       }
     });
