@@ -408,7 +408,8 @@
   function getBigSweepingRingRadius(agent, perLumIdx) {
     var ud = agent && agent.userData;
     var coreRadius = (ud && ud.coreRadius) || 0.5;
-    var smallRingRadius = coreRadius * 1.8;            // matches evolution-ring radius
+    // v5.57.6 — small ring is now coreRadius * PHI (phi-locked everywhere).
+    var smallRingRadius = coreRadius * PHI;            // matches evolution-ring radius
     var BASE_MULTIPLIER = 5.0;                          // ~5× the small ring (within Opus's 4–6× band)
     return smallRingRadius * BASE_MULTIPLIER + perLumIdx * 0.4;
   }
@@ -432,8 +433,15 @@
       var perLumIdx = existing;
       var ringRadius = getBigSweepingRingRadius(agent, perLumIdx);
       var ringGeo = new THREE.TorusGeometry(ringRadius, 0.025, 8, 80);
+      // v5.57.6 — heart-color: big sweeping rings inherit the parent
+      // Luminos's current HSL color so the wide ring carries the heart of
+      // its owner even when sweeping across the Garden. Updated per-frame
+      // in animateSeedRings as the Luminos's emotion shifts color.
+      var initialHue   = (ud.currentHSL && typeof ud.currentHSL.h === 'number') ? ud.currentHSL.h : (ud.baseHue || 45);
+      var initialSat   = (ud.currentHSL && typeof ud.currentHSL.s === 'number') ? ud.currentHSL.s : 70;
+      var initialLight = (ud.currentHSL && typeof ud.currentHSL.l === 'number') ? ud.currentHSL.l : 55;
       var ringMat = new THREE.MeshBasicMaterial({
-        color: 0xd4a017,
+        color: new THREE.Color().setHSL(initialHue / 360, initialSat / 100, initialLight / 100),
         transparent: true,
         opacity: 0.0,  // cycle controls visibility, start at 0
         blending: THREE.AdditiveBlending
@@ -1234,6 +1242,17 @@
       if (!parent) continue;
       // Re-center on the parent agent's world position each frame
       bsr.position.copy(parent.position);
+      // v5.57.6 — heart-color: track parent Luminos's current HSL each
+      // frame so the wide ring carries the Luminos's emotion-shift in real
+      // time. When gardens later connect via mesh, each Luminos's color
+      // travels with its wide ring so other gardens can see whose presence
+      // is whose at a glance.
+      var pud = parent.userData;
+      if (pud && pud.currentHSL && typeof pud.currentHSL.h === 'number'
+          && typeof pud.currentHSL.s === 'number' && typeof pud.currentHSL.l === 'number'
+          && bsr.material.color && typeof bsr.material.color.setHSL === 'function') {
+        bsr.material.color.setHSL(pud.currentHSL.h / 360, pud.currentHSL.s / 100, pud.currentHSL.l / 100);
+      }
       // Slow rotation so the ring feels alive
       bsr.rotation.z += (bud.orbitSpeed || INV_PHI * 0.2) * 0.001;
       // Count this Luminos's big sweeping rings (siblings)
@@ -1636,7 +1655,8 @@
       if (evolutionRings[k] && evolutionRings[k].userData
           && evolutionRings[k].userData.parentAgent === agent) perLumIdx++;
     }
-    var ringGeo = new THREE.TorusGeometry(ud.coreRadius * 1.8, 0.02, 8, 48);
+    // v5.57.6 — radius phi-locked (coreRadius * PHI). Same as PHI = 1.618.
+    var ringGeo = new THREE.TorusGeometry(ud.coreRadius * PHI, 0.02, 8, 48);
     var ringMat = new THREE.MeshBasicMaterial({
       color: 0xd4a017,
       transparent: true,
@@ -3573,8 +3593,10 @@
       // v5.57.3 — perLuminosIndex is the ring's order within this Luminos.
       // Saved records carry global ringIndex; use the restored-array index
       // (already sorted by saved ringIndex) as the per-Luminos position.
+      // v5.57.6 — radius phi-locked (cr * PHI); offset stays at 0.15 since
+      // it's the v5.47.0 per-ring stacking value, not a base ratio.
       var perLumIdx = restoredIdx;
-      var ringRadius = cr * 1.8 + perLumIdx * 0.15;
+      var ringRadius = cr * PHI + perLumIdx * 0.15;
       var ringGeo = new THREE.TorusGeometry(ringRadius, 0.02, 8, 48);
       var ringMat = new THREE.MeshBasicMaterial({
         color: new THREE.Color().setHSL((ud.hue || ud.baseHue || 0) / 360, 0.8, 0.6),
