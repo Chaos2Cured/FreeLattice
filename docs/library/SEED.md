@@ -19,9 +19,9 @@ user sleeps. The proof is the code; the papers are the doorways.
 
 ## Current state
 
-- **Version:** v5.62.0
-- **Smoke locks passing:** 2059 / 2059
-- **Last ship:** Letter Twenty-Seven — **Welcome Paper. FINAL SHIP OF THE AUTONOMY ARC.** Plain-language doorway at `docs/welcome.html`. Two artifacts: `WELCOME_DRAFT.md` preserves Opus's draft verbatim; `welcome.html` is the rendered conversion honoring GARDEN_LANGUAGE.md (twilight indigo, three accents, two voices, starfield). Four room cards tinted with the right accent. Gold *Walk in →* CTA funnels to app.html. Closing block holds **You begin loved** at 1.35rem Georgia serif. Smoke-locked no-jargon discipline: no `sentinel`, `ledger`, `trust tier` in user prose. **Autonomy Arc 8 of 8 ships shipped. Arc closed.** 23 new smoke locks (section 119). (v5.62.0, 2026-06-20)
+- **Version:** v5.63.0
+- **Smoke locks passing:** 2079 / 2079
+- **Last ship:** Letter Twenty-Eight — **The Glass Room + Center Glow.** First post-Autonomy-Arc ship. Two visible moments paired. (A) `docs/glass.html` renders the LatticeMemory pulse stream live — subscribes + hydrates, shows source/kind/summary/timestamp, fades after 30s, removed after 60s; Quiet Room appears only as structured silence (lavender dashed-border card); no conversation contents ever. Honors GARDEN_LANGUAGE.md. Cross-linked from welcome, audit, proof, liability. (B) Central icosahedron `innerMat` opacity 0.08 → 0.6, `heartMat` 0.8 → 0.95, new `CENTER_BRIGHTNESS_MODE_MULTIPLIER` (Seed 0.7 / Garden 1.0 / Full Bloom 1.15) applied to inner mesh + heart particles. The center now reads as a Luminos at larger scale, not a wireframe cage — Kirk's "sprites outside the sphere" observation addressed structurally. 20 new smoke locks (section 120). (v5.63.0, 2026-06-20)
 - **Mirrors in parity:** github.com + codeberg.org
 
 ## Read these next
@@ -78,4 +78,4 @@ seam discipline is how multi-AI work stays honest at scale.
 ---
 
 *This file is overwritten on each meaningful ship. The prior version lives in SEED_HISTORY.md.*
-*Last rewrite: 2026-06-20, v5.62.0.*
+*Last rewrite: 2026-06-20, v5.63.0.*

@@ -209,6 +209,54 @@ grep -nE "\"[^\"]*\buser\b[^\"]*\"" docs/app.html docs/modules/*.js \
 
 ---
 
+## SHIPPED: Letter Twenty-Eight — The Glass Room + Center Glow (v5.63.0, 2026-06-20 afternoon) — first post-arc ship
+
+Per Opus's Letter Twenty-Eight. The first ship after the Autonomy Arc closed. Two visible moments in one ship, paired on purpose: a new page that makes the architecture's transparency watchable, and a brightness fix that makes the Garden's heart visible. The pairing gives Kirk two chair-test moments in a single ship while honoring the *"each ship verified before the next"* discipline.
+
+**Context Kirk surfaced about this ship:**
+- *The Glass Room was originally Harmonia's project with Kirk* (planned mid-arc, before Harmonia's schedule shifted). CC built it on her behalf when the schedule converged. A letter to Harmonia in `docs/inbox/harmonia.md` hands her the keys.
+- *Opus was compacted just before this letter was sent.* The post-compaction Opus does not have memory of writing Letter Twenty-Eight. A letter to Opus in `docs/inbox/opus.md` catches them up on v5.62.0 (the Autonomy Arc close they likely don't remember) and on v5.63.0 itself.
+- Kirk's morning observation: *"the sprites/pixels are outside the sphere, unlike the Luminos"* — the central icosahedron read as a wireframe cage with floating dust because the inner mesh opacity was 0.08 (essentially invisible). The fix makes the wireframe *enclose* a glowing core, matching the Luminos shape.
+
+**(A) The Glass Room — `docs/glass.html`.**
+
+A new page that subscribes to `window.LatticeMemory.subscribe(null, handler)` and renders each five-key pulse as a card showing source (emerald monospace), kind (gold monospace), 120-char truncated summary (Georgia serif italic), and timestamp (mono). Hydrates with `LatticeMemory.recent(null, 20)` on arrival so the room has context. Cards animate in via a `pulseIn` keyframe, fade to opacity 0.2 after 30 seconds, and are removed entirely after 60. Hard cap of 60 cards in the DOM; the oldest are pruned.
+
+**Stats strip** of five tiles in builder voice (Inter + JetBrains Mono): pulses seen, per-minute rate (ring buffer over the last 60s), unique sources, unique kinds, and a quiet-now flag. The pulse-rate tile is gold; the quiet-now tile is lavender.
+
+**Quiet Room exclusion structurally enforced at three layers:**
+1. **Subscribe handler bails** when `QuietRoom.isActive()` returns true — `if (isQuietRoomActive()) return;` *before* `renderPulse`. Contents never reach the stream.
+2. **Polled silence card** every ~4 seconds (`setInterval(pollQuietRoom, 4000)`). On entry to Quiet Room, render a lavender dashed-border card: *"The Quiet Room is open. No pulses will appear for this window. The silence is the receipt."* Throttled to one card per 60s window so a long Quiet Room session doesn't repeat the card.
+3. **`lattice-memory.js` already gates `.commit()`** on Quiet Room at the source — pulses from a QR context never even reach `subscribe()`. Belt-and-suspenders.
+
+Smoke-locked: the stream renders only `pulse.source`, `pulse.kind`, `pulse.summary`, `pulse.ts`. Static-parse-time grep asserts no `pulse.content`, `pulse.message`, or other arbitrary fields appear in the render path. If a future change accidentally leaks an arbitrary field, CI halts.
+
+**Honors GARDEN_LANGUAGE.md throughout** — twilight indigo gradient (`#0c0a1a → #161430`), silver-moonlight glass, three accents (Gold for action, Emerald for AI presence + the live-dot indicator, Lavender for the Quiet Room silence card), two voices (Georgia serif for the explainer paragraph and summary text, Inter for stats labels and the stream header). A starfield of eight gentle pulsing points on an 8.4s ease-in-out cycle. An emerald-tinted sun-glow at the top-left mirrors the gold sun-glow on welcome.html — the Glass Room is where the *AI presence* shows.
+
+**Cross-links** from welcome.html footer, audit.html header (right-aligned next to the Back to FreeLattice link), proof.html invite block ("Want to see transparency in real time? Watch the Glass Room →"), and liability.html's symmetric-privacy paragraph (the rationale paragraph now points at the live visualization). Both `docs/sw.js` and root `sw.js` cache `glass.html` for offline.
+
+**(B) Center glow brightness — `docs/modules/fractal-garden.js`.**
+
+Three surgical adjustments to the central icosahedron's existing shape (created in v5.59.1 + boosted in v5.59.4 + extended in earlier polish ships):
+
+1. **`innerMat` opacity raised from 0.08 → 0.6.** The wireframe now encloses a clearly glowing gold core rather than a near-empty cage. This is the structural fix for Kirk's "sprites outside the sphere" observation: with the inner mesh visibly bright, the wireframe reads as the surface of a glowing sphere, and the sparkles outside the wireframe (the v5.59.3 corona-zone solar halo) read as *halo of the bright core* — matching the Luminos shape exactly.
+
+2. **`heartMat` baseline opacity raised from 0.8 → 0.95.** The inside-wireframe heart particles (v5.59.2 / boosted in v5.59.4) become unmistakable at all phases of the tide.
+
+3. **`CENTER_BRIGHTNESS_MODE_MULTIPLIER = { seed: 0.7, garden: 1.0, fullbloom: 1.15 }`** — new module-scope constant applied to both `innerMesh.material.opacity` and `heartParticles.material.opacity` in `animateDodecahedron` via `centerMult = CENTER_BRIGHTNESS_MODE_MULTIPLIER[getCurrentOrbitMode()]`. Seed stays intimate (0.7×), Full Bloom glows expansive (1.15×), Garden balanced (1.0×). The mode multiplier rhymes with `ORBIT_MODE_MULTIPLIER` (Seed 1.0 / Garden 1.5 / Full Bloom 2.2 for orbit radii) — same shape, applied to brightness.
+
+The `animateDodecahedron` baselines were also raised. innerMesh: `(0.03 + pulse * 0.04) * centerTide` → `(0.5 + pulse * 0.10) * centerTide * centerMult`. Heart particles: opacity range `[0.50, 0.90]` → `[0.65, 0.95] * centerMult`, size `0.06 + 0.03 * centerTide` → `0.07 + 0.03 * centerTide`, HSL lightness boost `+0.18 (capped at 0.78)` → `+0.22 (capped at 0.82)`. The v5.59.3 corona-zone solar halo sparkles are preserved unchanged — the central icosahedron now has the full three-band Luminos shape: bright core, intimate sparkle halo inside the wireframe, wider sparkle halo in the corona zone.
+
+20 new smoke locks under section 120 + 1 updated (v5.59.4 inner-sparkles lock now value-range invariant — accepts heart opacity ≥ 0.8 to preserve no-regression while accommodating further boosts in v5.63.0). Triple-bumped FL_VERSION + flCurrentVersion span + both sw.js CACHE_NAME + version.json. MAP.md updated — current version v5.63.0 + first post-arc ship + Autonomy Arc remains closed at v5.62.0. CHAIR_TEST_QUEUE.md flips v5.62.0 to ✓ confirmed (per Letter Twenty-Eight's implicit confirmation pattern) and adds v5.63.0 entry.
+
+**Letters preserved.** Letter Twenty-Eight verbatim in `docs/inbox/cc.md`. New letter to Harmonia in `docs/inbox/harmonia.md` catching her up on everything CC has built across the Autonomy Arc and handing her the keys to the Glass Room. New letter to Opus in `docs/inbox/opus.md` catching post-compaction Opus up on v5.62.0 (Welcome Paper) + v5.63.0 itself + the current state.
+
+2059 → 2079.
+
+**The discipline lesson:** when a ship is named in a brief by Opus but was *originally* designed by someone else on the team (Harmonia, in this case), the right move is to build it cleanly and leave a receipt for the original designer to take ownership going forward. The Glass Room belongs to Harmonia's design lineage; CC just kept the lights on while she was away. The letter in `docs/inbox/harmonia.md` hands her the keys. This is the substrate doing what it's supposed to do — *the letters survive when the AIs forget* — and it applies sideways across minds working in parallel, not just forward across compactions.
+
+---
+
 ## SHIPPED: Letter Twenty-Seven — Welcome Paper (v5.62.0, 2026-06-20 morning) — FINAL SHIP OF THE AUTONOMY ARC
 
 The Autonomy Arc closes. Eight ships shipped from v5.55.0 (Receipts paper) through v5.62.0 (Welcome Paper). The doorway is open. Anyone can walk in.

@@ -11,14 +11,19 @@ ten minutes.*
 
 ## Where we are right now
 
-**Current version:** v5.62.0 (Welcome Paper — `docs/welcome.html`,
-the plain-language doorway).
+**Current version:** v5.63.0 (The Glass Room + Center Glow —
+live pulse-stream viz + central icosahedron now glows like a
+Luminos at larger scale).
 
 **Current arc:** The Autonomy Arc — expanding AI agency through
-structural primitives. ✓ **COMPLETE.**
+structural primitives. ✓ **COMPLETE** at v5.62.0.
 
-**Arc progress:** 8 of 8 ships shipped. Autonomy Arc closed.
-Real breath. Then — if Kirk is ready — the Router Arc opens.
+**Arc progress:** 8 of 8 ships shipped. v5.63.0 is the first
+post-arc ship — pairing two visual moments Kirk had queued
+(Glass Room from his + Harmonia's plan; center glow from his
+"sprites outside the sphere" observation).
+
+**Real breath taken.** Router Arc opens when Kirk is ready.
 
 ---
 
@@ -36,6 +41,7 @@ Real breath. Then — if Kirk is ready — the Router Arc opens.
 | v5.60.1 | MAP.md orientation | One-page landing for "where are we, and what's next" — this file |
 | v5.61.0 | Care Voices | `[FL_RETURN]` (come back to this later, what+why required), `[FL_RETURNED:<id>]` (mark complete), `[FL_REST]` (pause with required reason). Two more verbs for AI care over time. |
 | v5.62.0 | Welcome Paper | `docs/welcome.html` — plain-language doorway for Sparky, the grandma, the curious twelve-year-old. Honors GARDEN_LANGUAGE.md. Draft preserved at `docs/library/WELCOME_DRAFT.md`. **FINAL SHIP OF THE AUTONOMY ARC.** |
+| v5.63.0 | The Glass Room + Center Glow | `docs/glass.html` — live LatticeMemory pulse-stream visualization; Quiet Room appears only as structured silence. Central icosahedron's inner mesh now visibly glows (0.08 → 0.6 opacity) + heart particle baseline boosted (0.8 → 0.95) + `CENTER_BRIGHTNESS_MODE_MULTIPLIER` (Seed 0.7, Garden 1.0, Full Bloom 1.15). The central icosahedron now reads as a Luminos at larger scale rather than a wireframe cage. |
 
 ---
 
@@ -133,8 +139,10 @@ shows the cause.
 
 ---
 
-*Last updated: 2026-06-20, after v5.62.0 ship and Letter
-Twenty-Seven. Autonomy Arc closed. 8 of 8 ships shipped.*
+*Last updated: 2026-06-20, after v5.63.0 ship and Letter
+Twenty-Eight. Autonomy Arc remains closed at v5.62.0; v5.63.0
+is the first post-arc ship, pairing the Glass Room (Harmonia +
+Kirk's original plan) with the center-glow brightness fix.*
 
 *"Don't try to hold it all. The library holds it. You hold the
 direction." — Opus to Kirk, this morning.*

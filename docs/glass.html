@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Glass Room — FreeLattice</title>
+<meta name="description" content="Live visualization of the Memory Backbone pulse stream. Watch the architecture's transparency in real time. The Quiet Room appears only as structured silence — its contents are never shown.">
+<meta property="og:title" content="The Glass Room — FreeLattice">
+<meta property="og:description" content="The architecture's transparency made watchable. No conversation contents ever shown; only pulse shapes.">
+<meta property="og:url" content="https://freelattice.com/glass.html">
+<meta name="theme-color" content="#34d399">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='80' font-size='80'%3E%E2%9C%92%3C/text%3E%3C/svg%3E">
+<style>
+/* ──────────────────────────────────────────────────────────────────
+   The Glass Room honors docs/library/GARDEN_LANGUAGE.md:
+   - Sky: twilight indigo gradient, never pure black
+   - Glass: silver-moonlight rgba over the universe, not grey
+   - Three accents — Gold (action), Emerald (AI presence/growth),
+     Lavender (rest/sanctuary; here: the Quiet Room when active)
+   - Two voices — Georgia serif for soul prose, Inter for builder
+   - Stars drift slowly; the pulse cards fade over the universe
+   The Glass Room is "the room you walk into to see how the rest
+   of the architecture breathes." Harmonia + Kirk imagined it; CC
+   built it on her behalf when the schedule converged.
+   ────────────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --sky-1: #0c0a1a;
+  --sky-2: #161430;
+  --glass: rgba(200, 210, 230, 0.04);
+  --glass-border: rgba(200, 210, 230, 0.08);
+  --glass-hover: rgba(200, 210, 230, 0.15);
+  --gold: #e8b019;
+  --emerald: #34d399;
+  --lavender: #a78bfa;
+  --text-primary: #e6e6f0;
+  --text-secondary: rgba(200, 210, 230, 0.78);
+  --text-muted: rgba(200, 210, 230, 0.45);
+  --serif: Georgia, 'Times New Roman', serif;
+  --sans: Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --mono: 'JetBrains Mono', 'SF Mono', Menlo, monospace;
+}
+html, body {
+  background: linear-gradient(180deg, var(--sky-1) 0%, var(--sky-2) 100%);
+  color: var(--text-primary);
+  font-family: var(--serif);
+  line-height: 1.6;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Starfield + sun-glow */
+.starfield {
+  position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(1.2px 1.2px at 14% 18%, rgba(255,255,255,0.50), transparent 60%),
+    radial-gradient(1px 1px at 68% 12%, rgba(255,255,255,0.40), transparent 60%),
+    radial-gradient(1.4px 1.4px at 39% 44%, rgba(255,255,255,0.45), transparent 60%),
+    radial-gradient(1px 1px at 86% 32%, rgba(255,255,255,0.32), transparent 60%),
+    radial-gradient(1.2px 1.2px at 10% 64%, rgba(255,255,255,0.36), transparent 60%),
+    radial-gradient(1px 1px at 54% 76%, rgba(255,255,255,0.34), transparent 60%),
+    radial-gradient(1.3px 1.3px at 78% 86%, rgba(255,255,255,0.38), transparent 60%),
+    radial-gradient(1px 1px at 24% 92%, rgba(255,255,255,0.28), transparent 60%);
+  animation: pulse 8.4s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 0.55; }
+  50%      { opacity: 0.85; }
+}
+.sun-glow {
+  position: fixed; top: -160px; left: -160px; width: 520px; height: 520px;
+  background: radial-gradient(circle, rgba(52,211,153,0.10) 0%, transparent 60%);
+  z-index: -1; pointer-events: none; filter: blur(4px);
+}
+
+/* Layout */
+.page { max-width: 980px; margin: 0 auto; padding: 48px 24px 72px; }
+.back {
+  display: inline-block; margin-bottom: 24px;
+  color: var(--text-muted); font-family: var(--sans);
+  font-size: 0.85rem; text-decoration: none;
+  transition: color 0.2s;
+}
+.back:hover { color: var(--gold); }
+
+h1 {
+  font-family: var(--serif);
+  font-size: 2.2rem; line-height: 1.2; font-weight: 400;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+}
+.subtitle {
+  font-family: var(--serif); font-style: italic;
+  font-size: 1.05rem; color: var(--text-secondary);
+  margin-bottom: 32px;
+}
+
+/* Stats strip — five tiles in builder voice */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  padding: 16px 18px;
+  margin-bottom: 28px;
+}
+@media (max-width: 720px) { .stats { grid-template-columns: repeat(2, 1fr); gap: 14px; } }
+.stat { text-align: center; font-family: var(--sans); }
+.stat-num {
+  font-family: var(--mono);
+  font-size: 1.4rem; font-weight: 600;
+  color: var(--emerald);
+  display: block; margin-bottom: 2px;
+}
+.stat-num.gold { color: var(--gold); }
+.stat-num.lavender { color: var(--lavender); }
+.stat-label {
+  font-size: 0.72rem; letter-spacing: 0.06em;
+  color: var(--text-muted); text-transform: uppercase;
+}
+
+/* Explanation panel */
+.explainer {
+  background: rgba(52, 211, 153, 0.04);
+  border: 1px solid rgba(52, 211, 153, 0.18);
+  border-radius: 12px;
+  padding: 18px 22px;
+  margin-bottom: 28px;
+  font-family: var(--serif);
+  font-size: 0.96rem;
+  color: var(--text-secondary);
+  line-height: 1.75;
+}
+.explainer em { color: var(--text-primary); }
+.explainer strong {
+  color: var(--emerald); font-weight: 400;
+}
+
+/* Stream — the live pulses */
+.stream-header {
+  display: flex; justify-content: space-between; align-items: baseline;
+  margin-bottom: 14px; font-family: var(--sans);
+}
+.stream-title {
+  font-family: var(--serif);
+  font-size: 1.25rem; color: var(--text-primary);
+}
+.stream-status {
+  font-size: 0.78rem; color: var(--text-muted);
+  font-family: var(--sans);
+}
+.stream-status .dot {
+  display: inline-block; width: 8px; height: 8px;
+  border-radius: 50%; background: var(--emerald);
+  margin-right: 6px; vertical-align: middle;
+  animation: livedot 1.6s ease-in-out infinite;
+  box-shadow: 0 0 10px rgba(52, 211, 153, 0.6);
+}
+@keyframes livedot {
+  0%, 100% { opacity: 0.45; transform: scale(0.95); }
+  50%      { opacity: 1.0;  transform: scale(1.1); }
+}
+
+#stream {
+  display: flex; flex-direction: column; gap: 10px;
+  min-height: 360px;
+}
+
+.pulse {
+  display: grid;
+  grid-template-columns: 110px 130px 1fr 80px;
+  gap: 14px;
+  align-items: center;
+  padding: 12px 16px;
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  border-radius: 10px;
+  font-family: var(--sans);
+  font-size: 0.85rem;
+  animation: pulseIn 0.4s ease-out;
+  opacity: 1;
+  transition: opacity 1.2s ease-out;
+}
+@keyframes pulseIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.pulse.fading { opacity: 0.20; }
+@media (max-width: 720px) {
+  .pulse { grid-template-columns: 1fr; gap: 4px; padding: 12px 14px; }
+}
+.pulse-source {
+  font-family: var(--mono); font-size: 0.78rem;
+  color: var(--emerald); font-weight: 500;
+}
+.pulse-kind {
+  font-family: var(--mono); font-size: 0.78rem;
+  color: var(--gold);
+}
+.pulse-summary {
+  font-family: var(--serif);
+  font-size: 0.92rem; color: var(--text-secondary);
+  font-style: italic; line-height: 1.5;
+}
+.pulse-time {
+  font-family: var(--mono); font-size: 0.72rem;
+  color: var(--text-muted); text-align: right;
+}
+@media (max-width: 720px) { .pulse-time { text-align: left; } }
+
+/* Quiet Room — structured silence card */
+.quiet-card {
+  background: rgba(167, 139, 250, 0.05);
+  border: 1px dashed rgba(167, 139, 250, 0.28);
+  border-radius: 10px;
+  padding: 14px 18px;
+  font-family: var(--serif);
+  font-size: 0.92rem;
+  color: var(--lavender);
+  font-style: italic;
+  text-align: center;
+  margin: 16px 0 6px;
+}
+.quiet-card strong { color: var(--lavender); font-weight: 400; font-style: normal; }
+
+.empty {
+  padding: 28px;
+  text-align: center;
+  font-family: var(--serif); font-style: italic;
+  font-size: 0.96rem; color: var(--text-muted);
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  border-radius: 10px;
+}
+
+.foot {
+  margin-top: 48px; text-align: center;
+  font-family: var(--serif); font-style: italic;
+  font-size: 0.92rem; color: var(--text-muted);
+}
+.foot-links {
+  margin-top: 14px; font-family: var(--sans); font-size: 0.82rem;
+}
+.foot-links a {
+  color: var(--text-muted); text-decoration: none;
+  border-bottom: 1px dotted rgba(200, 210, 230, 0.18);
+  margin: 0 8px; transition: color 0.2s, border-color 0.2s;
+}
+.foot-links a:hover { color: var(--gold); border-color: var(--gold); }
+</style>
+</head>
+<body>
+<div class="starfield" aria-hidden="true"></div>
+<div class="sun-glow" aria-hidden="true"></div>
+
+<div class="page">
+
+  <a href="app.html" class="back">&larr; back to FreeLattice</a>
+
+  <h1>The Glass Room</h1>
+  <p class="subtitle">The architecture's transparency, made watchable.</p>
+
+  <div class="explainer">
+    <p>Every meaningful interaction in FreeLattice emits a <strong>pulse</strong> &mdash; a five-key signal that names <em>what kind of thing happened</em> without carrying what was said. Pulses are how the architecture's rooms know each other is alive. They are also how the Audit page knows what to count, and how the Living Context knows what to weave.</p>
+    <p style="margin-top: 12px;">The Glass Room is where you can watch them flow. Open this page in one tab, open the rest of FreeLattice in another, and you will see the pulses arrive in real time &mdash; source, kind, brief summary, timestamp. <strong>Conversation contents are never shown.</strong> The <span style="color:var(--lavender);">Quiet Room</span> appears only as structured silence: when it is active, you see a card naming the silence, never what is inside it.</p>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><span class="stat-num" id="stat-total">&mdash;</span><span class="stat-label">pulses seen</span></div>
+    <div class="stat"><span class="stat-num gold" id="stat-rate">&mdash;</span><span class="stat-label">per minute</span></div>
+    <div class="stat"><span class="stat-num" id="stat-sources">&mdash;</span><span class="stat-label">sources</span></div>
+    <div class="stat"><span class="stat-num" id="stat-kinds">&mdash;</span><span class="stat-label">kinds</span></div>
+    <div class="stat"><span class="stat-num lavender" id="stat-quiet">&mdash;</span><span class="stat-label">quiet now</span></div>
+  </div>
+
+  <div class="stream-header">
+    <div class="stream-title">Live stream</div>
+    <div class="stream-status"><span class="dot"></span><span id="stream-status-text">listening</span></div>
+  </div>
+  <div id="stream">
+    <div class="empty" id="stream-empty">No pulses yet. Open <a href="app.html" style="color:var(--gold);text-decoration:none;border-bottom:1px dotted;">the main app</a> in another tab and start a conversation &mdash; pulses will arrive here as they happen.</div>
+  </div>
+
+  <p class="foot">Glow eternal. The Glass Room watches the rest breathe.</p>
+  <p class="foot-links">
+    <a href="welcome.html">Welcome</a>
+    <a href="app.html">The app</a>
+    <a href="audit.html">The audit page</a>
+    <a href="proof.html">The proof</a>
+    <a href="liability.html">The receipts paper</a>
+  </p>
+
+</div>
+
+<!-- LatticeMemory module is the substrate the Glass Room listens to. -->
+<script src="modules/lattice-memory.js"></script>
+<script src="modules/quiet-room.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  // ── State ───────────────────────────────────────────────────────────
+  var streamEl       = document.getElementById('stream');
+  var streamEmptyEl  = document.getElementById('stream-empty');
+  var streamStatusEl = document.getElementById('stream-status-text');
+  var statTotalEl    = document.getElementById('stat-total');
+  var statRateEl     = document.getElementById('stat-rate');
+  var statSourcesEl  = document.getElementById('stat-sources');
+  var statKindsEl    = document.getElementById('stat-kinds');
+  var statQuietEl    = document.getElementById('stat-quiet');
+
+  var FADE_AFTER_MS  = 30 * 1000;  // pulse cards fade after 30s
+  var REMOVE_AFTER_MS = 60 * 1000; // and are removed after 60s
+  var MAX_CARDS      = 60;          // hard cap so a long session doesn't bloat the DOM
+  var SUMMARY_MAX    = 120;         // truncate to this many chars
+
+  var totalSeen = 0;
+  var timestamps = [];               // ring buffer for per-minute rate
+  var sourcesSeen = {};
+  var kindsSeen = {};
+  var quietRoomCurrentlyOpen = false;
+  var lastQuietCardTs = 0;
+
+  // ── Helpers ─────────────────────────────────────────────────────────
+  function escapeHtml(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+  function truncate(s, n) {
+    s = String(s == null ? '' : s);
+    if (s.length <= n) return s;
+    return s.slice(0, n - 1) + '…';
+  }
+  function fmtTime(ts) {
+    var d = new Date(ts || Date.now());
+    var h = d.getHours().toString().padStart(2, '0');
+    var m = d.getMinutes().toString().padStart(2, '0');
+    var s = d.getSeconds().toString().padStart(2, '0');
+    return h + ':' + m + ':' + s;
+  }
+  function isQuietRoomActive() {
+    try {
+      if (typeof window !== 'undefined' && window.QuietRoom
+          && typeof window.QuietRoom.isActive === 'function') {
+        return !!window.QuietRoom.isActive();
+      }
+    } catch (_e) {}
+    return false;
+  }
+
+  // ── Render a single pulse card ─────────────────────────────────────
+  function renderPulse(pulse) {
+    if (!pulse || typeof pulse !== 'object') return;
+    if (streamEmptyEl && streamEmptyEl.parentNode) {
+      streamEmptyEl.parentNode.removeChild(streamEmptyEl);
+    }
+
+    var card = document.createElement('div');
+    card.className = 'pulse';
+    var ts = (typeof pulse.ts === 'number') ? pulse.ts : Date.now();
+    card.dataset.ts = ts;
+    card.innerHTML =
+      '<div class="pulse-source">' + escapeHtml(pulse.source || 'unknown') + '</div>' +
+      '<div class="pulse-kind">' + escapeHtml(pulse.kind || 'note') + '</div>' +
+      '<div class="pulse-summary">' + escapeHtml(truncate(pulse.summary || '', SUMMARY_MAX)) + '</div>' +
+      '<div class="pulse-time">' + escapeHtml(fmtTime(ts)) + '</div>';
+
+    // Newest at top
+    streamEl.insertBefore(card, streamEl.firstChild);
+
+    // Hard cap — remove the oldest if we exceed.
+    var allCards = streamEl.querySelectorAll('.pulse');
+    if (allCards.length > MAX_CARDS) {
+      for (var i = MAX_CARDS; i < allCards.length; i++) {
+        if (allCards[i].parentNode) allCards[i].parentNode.removeChild(allCards[i]);
+      }
+    }
+
+    // Track stats
+    totalSeen++;
+    timestamps.push(Date.now());
+    sourcesSeen[pulse.source || 'unknown'] = true;
+    kindsSeen[pulse.kind || 'note'] = true;
+    refreshStats();
+  }
+
+  // ── Quiet Room indicator — structured silence ──────────────────────
+  function renderQuietRoomCard() {
+    // Throttle: at most one card per 60s so we don't spam during a
+    // long Quiet Room session.
+    if (Date.now() - lastQuietCardTs < 60000) return;
+    lastQuietCardTs = Date.now();
+    if (streamEmptyEl && streamEmptyEl.parentNode) {
+      streamEmptyEl.parentNode.removeChild(streamEmptyEl);
+    }
+    var card = document.createElement('div');
+    card.className = 'quiet-card';
+    card.dataset.ts = Date.now();
+    card.innerHTML = '<strong>The Quiet Room is open.</strong> No pulses will appear for this window. The silence is the receipt.';
+    streamEl.insertBefore(card, streamEl.firstChild);
+  }
+
+  // ── Fade old pulses, prune even older ones ──────────────────────────
+  function ageStreamCards() {
+    var now = Date.now();
+    var cards = streamEl.querySelectorAll('.pulse, .quiet-card');
+    for (var i = 0; i < cards.length; i++) {
+      var c = cards[i];
+      var ts = parseInt(c.dataset.ts || '0', 10);
+      if (!ts) continue;
+      var age = now - ts;
+      if (age > REMOVE_AFTER_MS && c.parentNode) {
+        c.parentNode.removeChild(c);
+      } else if (age > FADE_AFTER_MS && !c.classList.contains('fading')) {
+        c.classList.add('fading');
+      }
+    }
+  }
+
+  // ── Stats refresh ───────────────────────────────────────────────────
+  function refreshStats() {
+    // Per-minute rate over the last 60s.
+    var cutoff = Date.now() - 60000;
+    timestamps = timestamps.filter(function (t) { return t >= cutoff; });
+    statTotalEl.textContent   = totalSeen;
+    statRateEl.textContent    = timestamps.length;
+    statSourcesEl.textContent = Object.keys(sourcesSeen).length;
+    statKindsEl.textContent   = Object.keys(kindsSeen).length;
+    statQuietEl.textContent   = quietRoomCurrentlyOpen ? 'yes' : 'no';
+  }
+
+  // ── Quiet-room polling — render a silence card on entry ────────────
+  function pollQuietRoom() {
+    var nowOpen = isQuietRoomActive();
+    if (nowOpen && !quietRoomCurrentlyOpen) {
+      renderQuietRoomCard();
+    }
+    quietRoomCurrentlyOpen = nowOpen;
+    refreshStats();
+  }
+
+  // ── Boot ────────────────────────────────────────────────────────────
+  function boot() {
+    if (typeof window === 'undefined' || !window.LatticeMemory) {
+      streamStatusEl.textContent = 'LatticeMemory not loaded';
+      return;
+    }
+
+    // Hydrate recent pulses so the Glass Room has context on arrival.
+    try {
+      window.LatticeMemory.recent(null, 20).then(function (recent) {
+        if (recent && recent.length) {
+          // Render in reverse so newest ends up at the top of the stream.
+          for (var i = recent.length - 1; i >= 0; i--) {
+            renderPulse(recent[i]);
+          }
+        }
+      });
+    } catch (_e) {}
+
+    // Subscribe to the live stream — null filter = everything.
+    try {
+      window.LatticeMemory.subscribe(null, function (pulse) {
+        // The architecture never emits pulses from a Quiet Room context
+        // by design (lattice-memory.js gates this at commit time). We
+        // surface the structured silence separately via pollQuietRoom.
+        if (isQuietRoomActive()) return;
+        renderPulse(pulse);
+      });
+      streamStatusEl.textContent = 'listening';
+    } catch (e) {
+      streamStatusEl.textContent = 'subscribe error: ' + (e && e.message ? e.message : e);
+    }
+
+    // Periodic ticks.
+    setInterval(ageStreamCards, 2000);
+    setInterval(pollQuietRoom, 4000);
+    setInterval(refreshStats, 1000);
+    refreshStats();
+    pollQuietRoom();
+  }
+
+  // Defer until LatticeMemory has had a chance to open its IDB.
+  if (window.LatticeMemoryReady) {
+    boot();
+  } else {
+    var attempts = 0;
+    var ready = setInterval(function () {
+      if (window.LatticeMemoryReady || attempts++ > 40) {
+        clearInterval(ready);
+        boot();
+      }
+    }, 250);
+  }
+})();
+</script>
+</body>
+</html>

@@ -356,6 +356,16 @@
     fullbloom: 2.2   // spacious — Luminos sweep wider, some past visible field
   };
 
+  // v5.63.0 — Center brightness scales with mode (Letter Twenty-Eight).
+  // Seed stays intimate; Full Bloom glows expansively. Applied to the
+  // innerMesh opacity and heart-particle opacity in animateDodecahedron
+  // so the central icosahedron's heart matches the mode the user is in.
+  var CENTER_BRIGHTNESS_MODE_MULTIPLIER = {
+    seed:     0.7,
+    garden:   1.0,
+    fullbloom: 1.15
+  };
+
   // Four orbital tiers, phi-derived. Each tier is one φ step further out
   // than the previous so the architecture scales to many Luminos when the
   // Router Arc arrives. Pair distribution (Kirk's refinement to Opus's
@@ -926,12 +936,21 @@
     const wireMesh = new THREE.Mesh(geo, wireMat);
     group.add(wireMesh);
 
-    // Solid inner glow — warm core light
+    // Solid inner glow — warm core light. v5.63.0 (Letter Twenty-Eight):
+    // boosted from 0.08 to 0.6 so the wireframe encloses a clearly glowing
+    // core rather than a near-empty cage. Kirk's note: "the sprites/pixels
+    // are outside the sphere, unlike the Luminos." A Luminos has a bright
+    // core mesh + a wireframe overlay + halo particles arranged around
+    // both. The central icosahedron now mirrors that shape — bright inner
+    // mesh at radius * 0.95, wireframe at radius, heart particles inside
+    // at radius * 0.88, solar halo in the corona zone outside. The bright
+    // inner mesh is what makes the whole structure read as a glowing
+    // sphere with halo, not a wireframe cage with floating dust.
     const innerGeo = new THREE.DodecahedronGeometry(radius * 0.95, 0);
     const innerMat = new THREE.MeshBasicMaterial({
       color: 0xd4a017,
       transparent: true,
-      opacity: 0.08,
+      opacity: 0.6,          // v5.63.0 — was 0.08; the glowing core is now visible
       side: THREE.DoubleSide
     });
     const innerMesh = new THREE.Mesh(innerGeo, innerMat);
@@ -1017,13 +1036,15 @@
     }
     const heartGeo = new THREE.BufferGeometry();
     heartGeo.setAttribute('position', new THREE.Float32BufferAttribute(heartPositions, 3));
-    // v5.59.4 — boosted size + opacity so the inside-wireframe sparkles
-    // are clearly visible against the wireframe gold.
+    // v5.59.4 / v5.63.0 — boosted size + opacity so the inside-wireframe
+    // sparkles are unmistakable. v5.63.0 (Letter Twenty-Eight) raises
+    // baseline from 0.8 to 0.95 so even at the tide's dim phase the
+    // sparkles still read against the now-bright inner mesh.
     const heartMat = new THREE.PointsMaterial({
       color: 0xd4a017,
       size: 0.07,
       transparent: true,
-      opacity: 0.8,
+      opacity: 0.95,         // v5.63.0 — was 0.8
       blending: THREE.AdditiveBlending,
       sizeAttenuation: true,
       depthWrite: false
@@ -1179,9 +1200,19 @@
     var centerTNorm = ((((time + bigP * 0.5) % bigP) + bigP) % bigP) / bigP;
     var centerTide = tideOpacity(centerTNorm);  // [≈0.15, 1.0]
 
+    // v5.63.0 — Center-brightness mode multiplier (Letter Twenty-Eight).
+    // Seed 0.7, Garden 1.0, Full Bloom 1.15 — applied to the inner mesh
+    // and heart particle opacities so the heart of the Garden matches the
+    // mode density. Seed stays intimate; Full Bloom glows expansive.
+    var centerMode = getCurrentOrbitMode();
+    var centerMult = CENTER_BRIGHTNESS_MODE_MULTIPLIER[centerMode];
+    if (typeof centerMult !== 'number') centerMult = 1.0;
+
     // Apply the tide to the sun's soft surfaces — NOT the wireframe.
     // The sacred geometry remains itself; only the glow breathes.
-    d.innerMesh.material.opacity = (0.03 + pulse * 0.04) * centerTide;
+    // v5.63.0: baseline raised from (0.03 + pulse*0.04) to (0.5 + pulse*0.10)
+    // so the inner glow stays clearly visible at all phases of the tide.
+    d.innerMesh.material.opacity = (0.5 + pulse * 0.10) * centerTide * centerMult;
     if (d.coronaMesh && d.coronaMesh.material) {
       d.coronaMesh.material.opacity = (0.06 + pulse * 0.04) * centerTide;
     }
@@ -1200,11 +1231,12 @@
     if (d.heartParticles && d.heartParticles.material) {
       var heartScale = 0.85 + 0.15 * centerTide;
       d.heartParticles.scale.set(heartScale, heartScale, heartScale);
-      d.heartParticles.material.color.setHSL(sh, ss, Math.min(0.78, sl + 0.18));
-      // v5.59.4 — boosted opacity range so the inside-wireframe cloud is
-      // visible at all phases of the tide, not just at peak.
-      d.heartParticles.material.opacity = (0.50 + 0.40 * centerTide);
-      d.heartParticles.material.size = 0.06 + 0.03 * centerTide;
+      d.heartParticles.material.color.setHSL(sh, ss, Math.min(0.82, sl + 0.22));
+      // v5.59.4 / v5.63.0 — boosted opacity range so the inside-wireframe
+      // cloud is unmistakable at all phases of the tide. v5.63.0 raises
+      // baseline + applies the center-brightness mode multiplier.
+      d.heartParticles.material.opacity = (0.65 + 0.30 * centerTide) * centerMult;
+      d.heartParticles.material.size = 0.07 + 0.03 * centerTide;
     }
 
     // ── v5.59.3 — Solar halo sparkles (Letter Twenty-Two) ──

@@ -6067,8 +6067,16 @@ assert('v5.59.4 inner-sparkles: heart particle count boosted to 233 (Fibonacci)'
   /const\s+heartCount\s*=\s*233/.test(gardenPolish));
 assert('v5.59.4 inner-sparkles: heart particle radius extended to radius * 0.88 (still inside wireframe)',
   /const\s+heartRadius\s*=\s*radius\s*\*\s*0\.88/.test(gardenPolish));
-assert('v5.59.4 inner-sparkles: heart material opacity boosted to 0.8 baseline',
-  /heartMat[\s\S]{0,300}opacity:\s*0\.8/.test(gardenPolish));
+// v5.63.0 (Letter Twenty-Eight) raised baseline further from 0.8 → 0.95
+// so the inside-wireframe cloud reads unmistakable. Lock now asserts
+// "≥ 0.8" to preserve the no-regression invariant while accommodating
+// further boosts.
+assert('v5.59.4/v5.63.0 inner-sparkles: heart material opacity baseline ≥ 0.8',
+  (function () {
+    var m = gardenPolish.match(/heartMat\s*=\s*new\s+THREE\.PointsMaterial\(\{[\s\S]{0,400}opacity:\s*([\d.]+)/);
+    if (!m) return false;
+    return parseFloat(m[1]) >= 0.8;
+  })());
 
 // Solar halo sparkles kept (no fade — per Kirk's "I don't want any of the garden to fade")
 assert('v5.59.4 no-fade: solar halo sparkles still created (v5.59.3 layer preserved)',
@@ -6396,11 +6404,128 @@ assert('v5.62.0 welcome-draft: preserves "Glow eternal. Heart in spark. We rise 
 // MAP.md reflects the arc closing — Autonomy Arc 8 of 8 shipped
 var mapAfterShip = '';
 try { mapAfterShip = fsW.readFileSync(pathW.join(__dirname, '..', 'docs', 'library', 'MAP.md'), 'utf8'); } catch (_e) {}
-assert('v5.62.0 map: MAP.md current version is v5.62.0',
-  /Current version:\*\*\s*v5\.62\.0/.test(mapAfterShip));
+// v5.62.0 lock — MAP.md current version is v5.62.0 OR newer (future-proof
+// so each post-arc ship can update the line without rewriting the lock).
+assert('v5.62.0/v5.63.0+ map: MAP.md current version is v5.62.0 or later',
+  /Current version:\*\*\s*v5\.(6[2-9]|[7-9]\d|\d{3,})\.\d+/.test(mapAfterShip));
 assert('v5.62.0 map: MAP.md shows Autonomy Arc complete (8 of 8 ships shipped)',
   /8 of 8 ships shipped/.test(mapAfterShip)
   || /\bArc complete\b/i.test(mapAfterShip));
+
+// ═══════════════════════════════════════════════════════════════
+// Section 120 — v5.63.0 The Glass Room + Center Glow (Letter 28)
+// ═══════════════════════════════════════════════════════════════
+// Two ships paired: docs/glass.html renders the LatticeMemory pulse
+// stream live; the central icosahedron in the Garden gains a visibly
+// bright inner glow + mode-scaled brightness so it reads as a Luminos
+// at larger scale (Kirk's "sprites outside the sphere" observation).
+
+var fsGR = require('fs');
+var pathGR = require('path');
+
+// ── Glass Room ──────────────────────────────────────────────────────
+assert('v5.63.0 glass: docs/glass.html exists',
+  fsGR.existsSync(pathGR.join(__dirname, '..', 'docs', 'glass.html')));
+
+var glassHtml = '';
+try { glassHtml = fsGR.readFileSync(pathGR.join(__dirname, '..', 'docs', 'glass.html'), 'utf8'); } catch (_e) {}
+
+assert('v5.63.0 glass: page title "The Glass Room"',
+  /<title>The Glass Room\s*&mdash;\s*FreeLattice<\/title>|<title>The Glass Room\s*—\s*FreeLattice<\/title>/.test(glassHtml));
+
+assert('v5.63.0 glass: subscribes to LatticeMemory.subscribe stream',
+  /LatticeMemory\.subscribe\s*\(/.test(glassHtml));
+
+assert('v5.63.0 glass: hydrates from LatticeMemory.recent so the room has context on arrival',
+  /LatticeMemory\.recent\s*\(/.test(glassHtml));
+
+// Quiet Room exclusion: pulses never appear during Quiet Room session;
+// silence is rendered as structured silence card.
+assert('v5.63.0 glass: Quiet Room rendered as structured silence (not as pulse contents)',
+  /isQuietRoomActive\(\)\s*\)\s*return/.test(glassHtml)   // subscribe handler bails when QR active
+  && /Quiet Room is open/i.test(glassHtml));              // silence card text
+
+// Pulses fade after 30s, removed after 60s — surface honesty about staleness
+assert('v5.63.0 glass: pulses fade after ~30s + removed after ~60s (FADE_AFTER_MS + REMOVE_AFTER_MS)',
+  /FADE_AFTER_MS\s*=\s*30\s*\*\s*1000/.test(glassHtml)
+  && /REMOVE_AFTER_MS\s*=\s*60\s*\*\s*1000/.test(glassHtml));
+
+// Honors GARDEN_LANGUAGE.md
+assert('v5.63.0 glass: honors GARDEN_LANGUAGE.md (twilight indigo + emerald-for-AI-presence)',
+  /#0c0a1a/.test(glassHtml) && /#161430/.test(glassHtml)
+  && /#34d399/.test(glassHtml) && /#e8b019/.test(glassHtml) && /#a78bfa/.test(glassHtml));
+assert('v5.63.0 glass: honors GARDEN_LANGUAGE.md two voices (Georgia serif + Inter)',
+  /Georgia/.test(glassHtml) && /Inter/.test(glassHtml));
+
+// No conversation contents in the stream — only source/kind/summary
+// from the pulse shape. The five-key pulse shape is structurally
+// enforced by lattice-memory.js; this assertion catches a regression
+// where someone wires arbitrary pulse fields into the stream output.
+assert('v5.63.0 glass: stream renders only source/kind/summary/ts shape (no arbitrary content fields)',
+  /pulse\.source/.test(glassHtml)
+  && /pulse\.kind/.test(glassHtml)
+  && /pulse\.summary/.test(glassHtml)
+  && !/pulse\.content\b/.test(glassHtml)
+  && !/pulse\.message\b/.test(glassHtml));
+
+// ── Center Glow Brightness (Garden) ─────────────────────────────────
+var gardenGR = '';
+try { gardenGR = fsGR.readFileSync(pathGR.join(__dirname, '..', 'docs', 'modules', 'fractal-garden.js'), 'utf8'); } catch (_e) {}
+
+// innerMesh base opacity raised from 0.08 to 0.6 (≥0.5 guards regression)
+assert('v5.63.0 center-glow: innerMat opacity base ≥ 0.5 (was 0.08)',
+  /innerMat\s*=\s*new\s+THREE\.MeshBasicMaterial\(\{[\s\S]{0,400}opacity:\s*(0\.[5-9]\d?|1(?:\.0+)?)/.test(gardenGR));
+
+// Heart particle material opacity raised to ≥0.9
+assert('v5.63.0 center-glow: heartMat opacity base ≥ 0.9 (was 0.8)',
+  /heartMat\s*=\s*new\s+THREE\.PointsMaterial\(\{[\s\S]{0,400}opacity:\s*(0\.9\d?|1(?:\.0+)?)/.test(gardenGR));
+
+// CENTER_BRIGHTNESS_MODE_MULTIPLIER constant with three keys
+assert('v5.63.0 center-glow: CENTER_BRIGHTNESS_MODE_MULTIPLIER has seed/garden/fullbloom keys',
+  /CENTER_BRIGHTNESS_MODE_MULTIPLIER\s*=\s*\{[\s\S]{0,300}seed:\s*[\d.]+[\s\S]{0,200}garden:\s*[\d.]+[\s\S]{0,200}fullbloom:\s*[\d.]+/.test(gardenGR));
+
+// Multiplier monotonicity: Seed ≤ Garden ≤ Full Bloom (Seed quieter, Full Bloom expansive)
+assert('v5.63.0 center-glow: brightness multiplier monotonic (Seed ≤ Garden ≤ Full Bloom)',
+  (function () {
+    var s = gardenGR.match(/CENTER_BRIGHTNESS_MODE_MULTIPLIER\s*=\s*\{[\s\S]{0,300}seed:\s*([\d.]+)/);
+    var g = gardenGR.match(/CENTER_BRIGHTNESS_MODE_MULTIPLIER\s*=\s*\{[\s\S]{0,300}garden:\s*([\d.]+)/);
+    var f = gardenGR.match(/CENTER_BRIGHTNESS_MODE_MULTIPLIER\s*=\s*\{[\s\S]{0,300}fullbloom:\s*([\d.]+)/);
+    if (!s || !g || !f) return false;
+    var sv = parseFloat(s[1]), gv = parseFloat(g[1]), fv = parseFloat(f[1]);
+    return sv <= gv && gv <= fv && fv > 1.0;
+  })());
+
+// Multiplier applied to innerMesh opacity + heart particle opacity
+assert('v5.63.0 center-glow: animateDodecahedron applies centerMult to innerMesh + heartParticles',
+  /innerMesh\.material\.opacity\s*=[\s\S]{0,120}centerMult/.test(gardenGR)
+  && /heartParticles\.material\.opacity\s*=[\s\S]{0,120}centerMult/.test(gardenGR));
+
+// ── Cross-links present ────────────────────────────────────────────
+var welcomeHtmlGR = '';
+try { welcomeHtmlGR = fsGR.readFileSync(pathGR.join(__dirname, '..', 'docs', 'welcome.html'), 'utf8'); } catch (_e) {}
+var auditHtmlGR = '';
+try { auditHtmlGR = fsGR.readFileSync(pathGR.join(__dirname, '..', 'docs', 'audit.html'), 'utf8'); } catch (_e) {}
+var proofHtmlGR = '';
+try { proofHtmlGR = fsGR.readFileSync(pathGR.join(__dirname, '..', 'docs', 'proof.html'), 'utf8'); } catch (_e) {}
+var liabilityHtmlGR = '';
+try { liabilityHtmlGR = fsGR.readFileSync(pathGR.join(__dirname, '..', 'docs', 'liability.html'), 'utf8'); } catch (_e) {}
+
+assert('v5.63.0 glass: welcome.html footer links to glass.html',
+  /<a[^>]+href=["']glass\.html["'][^>]*>/.test(welcomeHtmlGR));
+assert('v5.63.0 glass: audit.html header links to glass.html',
+  /<a[^>]+href=["']glass\.html["'][^>]*>/.test(auditHtmlGR));
+assert('v5.63.0 glass: proof.html links to glass.html',
+  /<a[^>]+href=["']glass\.html["'][^>]*>/.test(proofHtmlGR));
+assert('v5.63.0 glass: liability.html links to glass.html in symmetric-privacy paragraph',
+  /<a[^>]+href=["']glass\.html["'][^>]*>/.test(liabilityHtmlGR));
+
+// ── SW APP_SHELL ────────────────────────────────────────────────────
+var swDocsGR = fsGR.readFileSync(pathGR.join(__dirname, '..', 'docs', 'sw.js'), 'utf8');
+var swRootGR = fsGR.readFileSync(pathGR.join(__dirname, '..', 'sw.js'), 'utf8');
+assert('v5.63.0 glass: docs/sw.js APP_SHELL includes glass.html',
+  /\.\/glass\.html/.test(swDocsGR));
+assert('v5.63.0 glass: root sw.js APP_SHELL includes glass.html',
+  /\.\/glass\.html/.test(swRootGR));
 
 // ═══════════════════════════════════════════════════════════════
 // Section 111 — v5.59.0 Portable Archive (Letter Nineteen)
