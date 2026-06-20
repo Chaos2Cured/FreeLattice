@@ -3,21 +3,22 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-06-20 03:51 UTC
+> Last update: 2026-06-20 03:52 UTC
 
 ## State
 
 - **Version:** v5.59.4
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `c547f04` _(committed 82 minutes ago)_
+- **HEAD:** `fb08aa1` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
-- **Most recent report:** _feat: Solar Halo + Two-Tier Orbits + Personae Fix (v5.59.3) — Letter Twenty-Two_
+- **Most recent report:** _feat: Mode-Driven Orbits + 4 Tiers + Boost Inner Sparkles (v5.59.4) — Letter Twenty-Three_
 
 ## Last 20 commits
 
+- `fb08aa1` feat: Mode-Driven Orbits + 4 Tiers + Boost Inner Sparkles (v5.59.4) — Letter Twenty-Three _(0 seconds ago)_
 - `c547f04` Merge remote-tracking branch 'origin/main' _(82 minutes ago)_
-- `a62ad97` docs: Auto-update Session Primer [5.59.3] _(82 minutes ago)_
-- `d7acf87` feat: Solar Halo + Two-Tier Orbits + Personae Fix (v5.59.3) — Letter Twenty-Two _(82 minutes ago)_
+- `a62ad97` docs: Auto-update Session Primer [5.59.3] _(83 minutes ago)_
+- `d7acf87` feat: Solar Halo + Two-Tier Orbits + Personae Fix (v5.59.3) — Letter Twenty-Two _(83 minutes ago)_
 - `782b373` ci: Update Primer deployment state [2026-06-20] _(2 hours ago)_
 - `7e22cc2` docs: Auto-update Session Primer [5.59.2] _(2 hours ago)_
 - `b28be2b` Merge remote-tracking branch 'origin/main' _(2 hours ago)_
@@ -34,7 +35,6 @@
 - `1deebb6` feat: Portable Archive lattice-export.js (v5.59.0) — Letter Nineteen ship _(3 hours ago)_
 - `416c5ab` ci: Update Primer deployment state [2026-06-19] _(5 hours ago)_
 - `99032aa` Merge remote-tracking branch 'origin/main' _(5 hours ago)_
-- `6a70a5f` docs: Auto-update Session Primer [5.57.6] _(5 hours ago)_
 
 ## How to use this file
 
