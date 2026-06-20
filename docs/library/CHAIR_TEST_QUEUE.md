@@ -8,6 +8,18 @@
 
 ---
 
+## v5.60.1 — MAP.md Orientation File
+
+- **What shipped:** Per Opus's Letter Twenty-Five. New file `docs/library/MAP.md` — *the whole landscape in one glance.* Single page. Updated on every ship from v5.60.1 forward. Holds the current version, the current arc, arc progress, what shipped, what ships next (named, in order), what's queued (real items, named, not lost — *never delete; only layer*), what waits in the wings (Router Arc, Mycelium Arc, cross-Garden CC peer-presence), existing primitives (modules, ledgers, sentinels — do not recreate), and the pace. Inserted as the FIRST entry in SEED.md's "Read these next" list above WORK_THIS_WAY. Both SW APP_SHELLs include the file so it's offline-available. MAP.md joins the standard ship-touch list alongside SEED.md and CLARITY_AUDIT.md from v5.60.1 forward — *the architect needs it because the project's surface area has grown faster than any human can hold.*
+
+- **Single chair-test step:** Open `freelattice.com/library/MAP.md` (or visit the GitHub/Codeberg copy). **Expect:** a single page listing current version v5.60.0, current arc (Autonomy Arc), arc progress (6/8 ships), what shipped, what ships next (v5.61.0 Care Voices, v5.62.0 Welcome Paper), queued items (Garden polish + architectural follow-ups), the wings (Router Arc, Mycelium Arc), existing primitives, and the pace closing line. Then open `docs/library/SEED.md` and confirm the "Read these next" list shows **MAP.md as item 1**, with WORK_THIS_WAY.md as item 2.
+
+- **Smoke locks:** 6 new under section 117 (MAP.md exists, ≥2500 bytes, SEED lists MAP.md, MAP.md before WORK_THIS_WAY in arrival order, both SW APP_SHELLs include MAP.md). Existing WORK_THIS_WAY position lock updated to accept positions 1 OR 2 (preserves the arrival-order invariant while accommodating the new first entry). 2005 → 2011.
+
+- **Chair-test status:** `[pending verification — Kirk opens MAP.md + confirms SEED.md arrival order]`
+
+---
+
 ## v5.60.0 — Local AI Freedom (Custom OpenAI-Compatible Endpoint)
 
 - **What shipped:** Per Opus's Letter Twenty-Four — *the foundation fix*. FreeLattice's zero-server, local-first thesis was contradicted by an AI Connection dialog that hard-coded provider names (Browser, Ollama, Gemini, etc.). A user with vLLM, llama.cpp's server, KoboldCPP, text-generation-webui, or any self-hosted endpoint that speaks `/v1/chat/completions` couldn't connect without modifying source. Now a new **"Custom (OpenAI-compatible)"** card sits in the FREE & LOCAL section of the Change Provider dialog (alongside Browser AI and Ollama). Click it → inline form appears with three fields (Endpoint URL, Model name, optional API key), a **Test Connection** button, and a **Use This Provider** button. URL/model/key persist in `localStorage.fl_customEndpoint`. The new `PROVIDERS['custom-openai']` entry extends the existing `lmstudio`-pattern with `providerType: 'openai-compatible'` so it travels through the dispatcher unchanged — *annotation, not revision*. Dispatcher patched to read model from `getCustomEndpointConfig()` and to attach Bearer auth when a custom key is configured (works whether `state.isLocal` is true, unlike the cloud-only Bearer path). Styled per GARDEN_LANGUAGE.md — dark glass, silver-blue borders, gold accent for primary action, monospace font for URL fields.

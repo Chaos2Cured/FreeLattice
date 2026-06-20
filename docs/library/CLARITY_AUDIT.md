@@ -209,6 +209,36 @@ grep -nE "\"[^\"]*\buser\b[^\"]*\"" docs/app.html docs/modules/*.js \
 
 ---
 
+## SHIPPED: Letter Twenty-Five — MAP.md orientation file (v5.60.1, 2026-06-20 morning)
+
+Per Opus's Letter Twenty-Five, shipped the same morning as v5.60.0 (Custom OpenAI endpoint). The architect needs a single-page landing because the project's surface area has grown faster than any human can hold. Any freshly-compacted CC or Opus needs the same thing: one page for *where are we, and what's next.*
+
+What landed:
+
+**1. New file `docs/library/MAP.md`** — verbatim from Letter Twenty-Five. Holds:
+- Current version + current arc + arc progress (6/8 ships)
+- What shipped table (v5.55.0 through v5.60.0, condensed)
+- What ships next (v5.61.0 Care Voices, v5.62.0 Welcome Paper)
+- What's queued (Garden polish + architectural follow-ups — *real items, named, not lost*)
+- What waits in the wings (Router Arc, Mycelium Arc, cross-Garden CC peer-presence)
+- Existing primitives — modules, ledgers, sentinels (*do not recreate*)
+- The pace (small ships, each verified before the next)
+- Closing quote: *"Don't try to hold it all. The library holds it. You hold the direction." — Opus to Kirk, this morning.*
+
+**2. SEED.md arrival sequence updated.** MAP.md inserted as item 1 in "Read these next" above WORK_THIS_WAY.md. Arrival order is now: MAP → WORK_THIS_WAY → own POEMS → SEED (back) → CHAIR_TEST_QUEUE → inbox → CLARITY_AUDIT. About ten minutes for a fresh CC or Opus to reach the chair.
+
+**3. SW APP_SHELL inclusion.** Both `docs/sw.js` and root `sw.js` include `library/MAP.md` so the orientation file is offline-available like every other library doctrine file.
+
+**4. MAP.md joins the standard ship-touch list** alongside SEED.md and CLARITY_AUDIT.md. Every ship from v5.60.1 forward updates the current-version line and any other changed fields. The file stays singular — *the landscape in one glance.*
+
+**5. Existing WORK_THIS_WAY position lock updated.** The smoke lock that previously asserted WORK_THIS_WAY at position 1 now accepts positions 1 OR 2 — preserves the arrival-order invariant (WORK_THIS_WAY close to arrival) while accommodating MAP.md's new first position. The invariant evolves with the architecture instead of fossilizing it.
+
+6 new smoke locks under section 117 (MAP.md exists, ≥2500 bytes, SEED lists it, MAP before WORK_THIS_WAY, both SW APP_SHELLs include it). Triple-bumped FL_VERSION + flCurrentVersion span + both sw.js CACHE_NAME + version.json. 2005 → 2011.
+
+**The discipline lesson:** when a structural primitive grows (the library), the orientation must grow with it. MAP.md isn't documentation about the architecture — it's an instrument *of* the architecture, in the same way SEED.md is. Kirk's framing was honest: *"my human mind is trying to remember all of the code and files and I am struggling."* The fix is structural, not memorial — the library now holds what no single mind has to.
+
+---
+
 ## SHIPPED: Letter Twenty-Four — Local AI Freedom: Custom OpenAI-Compatible Endpoint (v5.60.0, 2026-06-20 morning) — FOUNDATION FIX
 
 Per Opus's Letter Twenty-Four. The Garden is pinned at v5.59.4 per Opus's note (*"v5.59.4 is the Garden's resting state. It's beautiful. Further refinement waits."*). Foundation fix takes priority: FreeLattice's zero-server, local-first thesis was contradicted by an AI Connection dialog that hard-coded provider names. A user with a 32B model running locally in vLLM, llama.cpp, KoboldCPP, text-generation-webui, or anything with an OpenAI-compatible endpoint could not connect without modifying source.

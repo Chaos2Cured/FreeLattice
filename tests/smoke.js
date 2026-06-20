@@ -4522,12 +4522,15 @@ assert('WORK_THIS_WAY.md exists, is ≥4000 bytes, and carries the operational r
   workThisWayMd.length >= 4000 &&
   /How Kirk, Opus, and CC actually work together/i.test(workThisWayMd) &&
   /Care does not require performance/i.test(workThisWayMd));
-// SEED.md points at WORK_THIS_WAY.md at position 1 of "Read these next".
+// SEED.md points at WORK_THIS_WAY.md early in "Read these next".
+// v5.60.1 (Letter Twenty-Five) inserted MAP.md at position 1 above
+// WORK_THIS_WAY, so the invariant becomes "WORK_THIS_WAY is at position
+// 1 OR 2" — close enough to arrival to be load-bearing.
 var seedWTW = '';
 try { seedWTW = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'library', 'SEED.md'), 'utf8'); }
 catch (e) {}
-assert('SEED.md lists WORK_THIS_WAY.md at position 1 of "Read these next"',
-  /1\.\s*\*\*WORK_THIS_WAY\.md\*\*/.test(seedWTW));
+assert('SEED.md lists WORK_THIS_WAY.md at position 1 or 2 of "Read these next" (post v5.60.1 MAP.md insertion)',
+  /[12]\.\s*\*\*WORK_THIS_WAY\.md\*\*/.test(seedWTW));
 
 // ── v5.55.0 Brief C: liability.html — Receipts paper ──
 // "Receipts: Toward AI as Liable Economic Actor" — extends the
@@ -6141,6 +6144,39 @@ assert('v5.60.0 custom-endpoint: custom endpoint dispatch does NOT contact any F
         && body.indexOf('chaos2cured') === -1
         && body.indexOf('github.io') === -1;
   })());
+
+// ═══════════════════════════════════════════════════════════════
+// Section 117 — v5.60.1 MAP.md orientation file (Letter Twenty-Five)
+// ═══════════════════════════════════════════════════════════════
+// The whole landscape in one glance. Updated on every ship from v5.60.1
+// forward. First entry in the SEED.md "Read these next" list so a fresh
+// CC/Opus/Kirk lands here first.
+
+var mapPath = require('path').join(__dirname, '..', 'docs', 'library', 'MAP.md');
+assert('v5.60.1 map: docs/library/MAP.md exists',
+  require('fs').existsSync(mapPath));
+assert('v5.60.1 map: MAP.md is at least 2500 bytes (substantial content)',
+  require('fs').existsSync(mapPath) && require('fs').statSync(mapPath).size >= 2500);
+
+// SEED.md "Read these next" lists MAP.md as the first entry above WORK_THIS_WAY
+var seedMD117 = require('fs').readFileSync(require('path').join(__dirname, '..', 'docs', 'library', 'SEED.md'), 'utf8');
+assert('v5.60.1 map: SEED.md "Read these next" list contains MAP.md',
+  /Read these next[\s\S]{0,2000}MAP\.md/.test(seedMD117));
+assert('v5.60.1 map: SEED.md lists MAP.md BEFORE WORK_THIS_WAY (arrival order)',
+  (function () {
+    var i = seedMD117.indexOf('Read these next');
+    var mi = seedMD117.indexOf('MAP.md', i);
+    var wi = seedMD117.indexOf('WORK_THIS_WAY.md', i);
+    return mi !== -1 && wi !== -1 && mi < wi;
+  })());
+
+// Both SW APP_SHELLs include MAP.md so the orientation file is offline-available
+var swDocsMap = require('fs').readFileSync(require('path').join(__dirname, '..', 'docs', 'sw.js'), 'utf8');
+var swRootMap = require('fs').readFileSync(require('path').join(__dirname, '..', 'sw.js'), 'utf8');
+assert('v5.60.1 map: docs/sw.js APP_SHELL includes library/MAP.md',
+  /library\/MAP\.md/.test(swDocsMap));
+assert('v5.60.1 map: root sw.js APP_SHELL includes library/MAP.md',
+  /library\/MAP\.md/.test(swRootMap));
 
 // ═══════════════════════════════════════════════════════════════
 // Section 111 — v5.59.0 Portable Archive (Letter Nineteen)

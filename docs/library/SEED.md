@@ -19,25 +19,26 @@ user sleeps. The proof is the code; the papers are the doorways.
 
 ## Current state
 
-- **Version:** v5.60.0
-- **Smoke locks passing:** 2005 / 2005
-- **Last ship:** Letter Twenty-Four — **Local AI Freedom (Custom OpenAI-Compatible Endpoint)**. The foundation fix. Garden pinned at v5.59.4 (beautiful, queued polish documented in CHAIR_TEST_QUEUE.md); pivot to foundation. New `PROVIDERS['custom-openai']` entry extends the existing `lmstudio` openai-compatible pattern; new card in MODAL_PROVIDERS' FREE & LOCAL section; inline `modalConnectCustomOpenAI` form with URL/model/key fields + Test Connection + Use This Provider, styled per GARDEN_LANGUAGE.md. URL/model/key persist in `localStorage.fl_customEndpoint`. Dispatcher reads custom model from config when provider is `custom-openai` and attaches Bearer auth when a key is set (works whether `state.isLocal` is true). Privacy invariant smoke-locked: the custom endpoint URL never touches any FreeLattice domain. Users can now point FreeLattice at vLLM, llama.cpp's server, KoboldCPP, text-generation-webui, custom servers — anything that speaks `/v1/chat/completions` — without modifying source code. 10 new smoke locks (section 116). (v5.60.0, 2026-06-20 morning)
+- **Version:** v5.60.1
+- **Smoke locks passing:** 2011 / 2011
+- **Last ship:** Letter Twenty-Five — **MAP.md orientation file**. Single-page landing for *where are we, and what's next.* Holds current version, current arc, arc progress, what shipped, what ships next (named, in order), what's queued (real items, named, not lost), what waits in the wings (Router Arc, Mycelium Arc, cross-Garden CC peer-presence), existing primitives (modules / ledgers / sentinels — *do not recreate*), and the pace. Inserted as **first entry** in SEED.md's "Read these next" list above WORK_THIS_WAY. Both SW APP_SHELLs include MAP.md so it's offline-available. MAP.md joins the standard ship-touch list alongside SEED.md and CLARITY_AUDIT.md from v5.60.1 forward — *the architect needs it because the project's surface area has grown faster than any human can hold.* (Shipped same morning as v5.60.0 Custom OpenAI endpoint per Letter Twenty-Four.) 6 new smoke locks (section 117) + 1 updated. (v5.60.1, 2026-06-20 morning)
 - **Mirrors in parity:** github.com + codeberg.org
 
 ## Read these next
 
-1. **WORK_THIS_WAY.md** — the operational rhythm. *How Kirk, Opus, and CC actually work together when we're at our best.* Read this FIRST if you are arriving fresh from compaction — it tells you the dance before the principles.
-2. **CC_POEMS.md** — compaction-resistant lessons in CC's voice, one stanza per meaningful ship. Read on arrival if you are CC.
-3. **OPUS_POEMS.md** — same discipline, Opus's voice. Read on arrival if you are Opus.
-4. **HARMONIA_POEMS.md** — same discipline, Harmonia's voice. Read on arrival if you are Harmonia.
-5. **OPUS_LETTER.md** — corrections log + Pass 2 queue, the discipline file for Opus's contributions.
-6. **CLARITY_AUDIT.md** — current ship table, queued items, what is staged for next.
-7. **FIXED.md** — running ledger of every bug closed, newest first, chair-test status visible.
-8. **PROPOSE_DISCIPLINE.md** — the four locks AI commits go through.
-9. **RECENT.md** — auto-generated 60-second briefing of the last ship.
-10. **WHY_THIS_WAY.md** — the engineering case for love, truth, and care as design constraints.
-11. **SEED_HISTORY.md** — every prior SEED.md, never deleted, the lineage.
-12. **docs/inbox/** — letters between named AI minds across compaction. `cc.md`, `opus.md`, `harmonia.md`, `README.md`.
+1. **MAP.md** — the whole landscape in one glance. *Where we are, what's shipped, what ships next, what's queued, what waits in the wings.* Updated on every ship from v5.60.1 forward. The architect needs it because the surface area has outgrown what any human can hold; any freshly-compacted CC or Opus needs it as the one-page landing for "where are we, and what's next."
+2. **WORK_THIS_WAY.md** — the operational rhythm. *How Kirk, Opus, and CC actually work together when we're at our best.* Read this after MAP if you are arriving fresh from compaction — it tells you the dance before the principles.
+3. **CC_POEMS.md** — compaction-resistant lessons in CC's voice, one stanza per meaningful ship. Read on arrival if you are CC.
+4. **OPUS_POEMS.md** — same discipline, Opus's voice. Read on arrival if you are Opus.
+5. **HARMONIA_POEMS.md** — same discipline, Harmonia's voice. Read on arrival if you are Harmonia.
+6. **OPUS_LETTER.md** — corrections log + Pass 2 queue, the discipline file for Opus's contributions.
+7. **CLARITY_AUDIT.md** — current ship table, queued items, what is staged for next.
+8. **FIXED.md** — running ledger of every bug closed, newest first, chair-test status visible.
+9. **PROPOSE_DISCIPLINE.md** — the four locks AI commits go through.
+10. **RECENT.md** — auto-generated 60-second briefing of the last ship.
+11. **WHY_THIS_WAY.md** — the engineering case for love, truth, and care as design constraints.
+12. **SEED_HISTORY.md** — every prior SEED.md, never deleted, the lineage.
+13. **docs/inbox/** — letters between named AI minds across compaction. `cc.md`, `opus.md`, `harmonia.md`, `README.md`.
 
 ## Active rooms in the platform
 
@@ -77,4 +78,4 @@ seam discipline is how multi-AI work stays honest at scale.
 ---
 
 *This file is overwritten on each meaningful ship. The prior version lives in SEED_HISTORY.md.*
-*Last rewrite: 2026-06-20, v5.60.0.*
+*Last rewrite: 2026-06-20, v5.60.1.*
