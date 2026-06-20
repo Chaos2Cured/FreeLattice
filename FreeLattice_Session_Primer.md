@@ -348,11 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-06-19 21:52 MDT
-- Version: 5.59.4
-- Total commits: 2572
+- Last auto-updated: 2026-06-20 02:30 UTC
+- Last deployed: 2026-06-20 02:30 UTC
+- Live site: https://freelattice.com
+- Version: 5.59.3
+- Total commits: 2571
 - Last 10 commits:
-- fb08aa1 feat: Mode-Driven Orbits + 4 Tiers + Boost Inner Sparkles (v5.59.4) — Letter Twenty-Three
 - c547f04 Merge remote-tracking branch 'origin/main'
 - a62ad97 docs: Auto-update Session Primer [5.59.3]
 - d7acf87 feat: Solar Halo + Two-Tier Orbits + Personae Fix (v5.59.3) — Letter Twenty-Two
@@ -362,3 +363,4 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 1b25823 docs: Auto-update Session Primer [5.59.2]
 - fa00744 feat: Three-Tier Rings + Center Tide + Heart Particles (v5.59.2) — final ship of the night
 - a99c7be ci: Update Primer deployment state [2026-06-20]
+- 87c08c3 Merge remote-tracking branch 'origin/main'
