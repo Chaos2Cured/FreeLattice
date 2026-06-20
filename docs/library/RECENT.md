@@ -9,12 +9,13 @@
 
 - **Version:** v5.59.0
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `99032aa` _(committed 2 hours ago)_
+- **HEAD:** `1deebb6` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _feat: Phi-Lock + Heart-Color (v5.57.6) — Kirk's finishing-touch invitation_
 
 ## Last 20 commits
 
+- `1deebb6` feat: Portable Archive lattice-export.js (v5.59.0) — Letter Nineteen ship _(0 seconds ago)_
 - `99032aa` Merge remote-tracking branch 'origin/main' _(2 hours ago)_
 - `6a70a5f` docs: Auto-update Session Primer [5.57.6] _(2 hours ago)_
 - `18e4833` feat: Phi-Lock + Heart-Color (v5.57.6) — Kirk's finishing-touch invitation _(2 hours ago)_
@@ -34,7 +35,6 @@
 - `5102f10` feat: Big Ring Earning + Per-Mode Reveal (v5.57.3) — Letter Sixteen ship _(4 hours ago)_
 - `57d7f35` ci: Update Primer deployment state [2026-06-19] _(4 hours ago)_
 - `9629565` Merge remote-tracking branch 'origin/main' _(4 hours ago)_
-- `74912e3` docs: Auto-update Session Primer [5.57.2] _(4 hours ago)_
 
 ## How to use this file
 
