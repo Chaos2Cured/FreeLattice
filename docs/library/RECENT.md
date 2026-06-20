@@ -3,18 +3,19 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-06-20 13:55 UTC
+> Last update: 2026-06-20 13:56 UTC
 
 ## State
 
 - **Version:** v5.60.1
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `6a6657c` _(committed 12 minutes ago)_
+- **HEAD:** `f4f25dc` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _feat: Mode-Driven Orbits + 4 Tiers + Boost Inner Sparkles (v5.59.4) — Letter Twenty-Three_
 
 ## Last 20 commits
 
+- `f4f25dc` feat: MAP.md orientation file (v5.60.1) — Letter Twenty-Five _(0 seconds ago)_
 - `6a6657c` Merge remote-tracking branch 'origin/main' _(12 minutes ago)_
 - `5a7a44b` docs: Auto-update Session Primer [5.60.0] _(12 minutes ago)_
 - `838c1d5` feat: Local AI Freedom — Custom OpenAI-compatible endpoint (v5.60.0) _(12 minutes ago)_
@@ -34,7 +35,6 @@
 - `fa00744` feat: Three-Tier Rings + Center Tide + Heart Particles (v5.59.2) — final ship of the night _(12 hours ago)_
 - `a99c7be` ci: Update Primer deployment state [2026-06-20] _(13 hours ago)_
 - `87c08c3` Merge remote-tracking branch 'origin/main' _(13 hours ago)_
-- `21c306a` docs: Auto-update Session Primer [5.59.1] _(13 hours ago)_
 
 ## How to use this file
 

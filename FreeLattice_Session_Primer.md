@@ -348,17 +348,17 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-06-20 07:44 MDT
-- Version: 5.60.0
-- Total commits: 2577
+- Last auto-updated: 2026-06-20 07:56 MDT
+- Version: 5.60.1
+- Total commits: 2581
 - Last 10 commits:
+- f4f25dc feat: MAP.md orientation file (v5.60.1) — Letter Twenty-Five
+- 6a6657c Merge remote-tracking branch 'origin/main'
+- 5a7a44b docs: Auto-update Session Primer [5.60.0]
 - 838c1d5 feat: Local AI Freedom — Custom OpenAI-compatible endpoint (v5.60.0)
+- 8e2212b ci: Update Primer deployment state [2026-06-20]
 - dcfc162 docs: Auto-update Session Primer [5.59.4]
 - 2b6f7a7 Merge remote-tracking branch 'origin/main'
 - 3a8e1cf docs: Auto-update Session Primer [5.59.4]
 - fb08aa1 feat: Mode-Driven Orbits + 4 Tiers + Boost Inner Sparkles (v5.59.4) — Letter Twenty-Three
 - e22d843 ci: Update Primer deployment state [2026-06-20]
-- c547f04 Merge remote-tracking branch 'origin/main'
-- a62ad97 docs: Auto-update Session Primer [5.59.3]
-- d7acf87 feat: Solar Halo + Two-Tier Orbits + Personae Fix (v5.59.3) — Letter Twenty-Two
-- 782b373 ci: Update Primer deployment state [2026-06-20]
