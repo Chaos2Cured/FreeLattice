@@ -5951,12 +5951,21 @@ assert('v5.59.2 heart-particles: heart particles created via fibonacciSpherePoin
   /fibonacciSpherePoints\(\s*heartCount\s*,\s*heartRadius/.test(gardenPolish));
 assert('v5.59.2 heart-particles: heartParticles attached to central dodec userData',
   /heartParticles:\s*heartParticles/.test(gardenPolish));
-assert('v5.59.2 heart-particles: heart-particle radius is 0.7 of dodec radius (safely inside)',
-  /heartRadius\s*=\s*radius\s*\*\s*0\.7/.test(gardenPolish));
+// v5.59.4 (Letter Twenty-Three) — heart radius extended to radius * 0.88
+// for better visibility inside the wireframe. Lock asserts "less than 1.0"
+// generally so the radius stays safely inside the wireframe at radius·1.
+assert('v5.59.2/v5.59.4 heart-particles: heart-particle radius stays inside wireframe (radius * factor where factor < 1.0)',
+  (function () {
+    var m = gardenPolish.match(/const\s+heartRadius\s*=\s*radius\s*\*\s*([\d.]+)/);
+    if (!m) return false;
+    var factor = parseFloat(m[1]);
+    return factor > 0 && factor < 1.0;
+  })());
 assert('v5.59.2 heart-particles: heart particles color tracks collective sun HSL each frame',
   /d\.heartParticles\.material\.color\.setHSL\(\s*sh\s*,\s*ss/.test(gardenPolish));
-assert('v5.59.2 heart-particles: heart particles breathe with center tide (scale + opacity)',
-  /d\.heartParticles\.scale\.set\([\s\S]{0,80}heartScale[\s\S]{0,200}centerTide/.test(gardenPolish));
+// v5.59.4 expanded the heartScale code slightly; widen the lookahead.
+assert('v5.59.2/v5.59.4 heart-particles: heart particles breathe with center tide (scale + opacity)',
+  /d\.heartParticles\.scale\.set\([\s\S]{0,200}heartScale[\s\S]{0,400}centerTide/.test(gardenPolish));
 
 // ═══════════════════════════════════════════════════════════════
 // Section 114 — v5.59.3 Solar Halo Sparkles + Two-Tier Orbits +
@@ -5973,16 +5982,18 @@ assert('v5.59.3 solar-halo: solarHaloParticles attached to central dodec userDat
 assert('v5.59.3 solar-halo: solar halo breathes with center tide (opacity scales with centerTide)',
   /d\.solarHaloParticles\.material\.opacity\s*=[\s\S]{0,80}centerTide/.test(gardenPolish));
 
-// Two-tier orbit assignment — orbitForIdx helper present, uses PHI / PHI2 / PHI3
-assert('v5.59.3 two-tier: orbitForIdx helper assigns Luminos to φ/φ²/φ³ tiers',
-  /orbitForIdx\s*=\s*function[\s\S]{0,300}CENTRAL_RADIUS\s*\*\s*PHI/.test(gardenPolish)
-  && /CENTRAL_RADIUS\s*\*\s*PHI2/.test(gardenPolish)
-  && /CENTRAL_RADIUS\s*\*\s*PHI3/.test(gardenPolish));
-assert('v5.59.3 two-tier: first 4 Luminos alternate inner (even idx)/outer (odd idx)',
-  /\(\s*i\s*%\s*2\s*===\s*0\s*\)\s*\?\s*CENTRAL_RADIUS\s*\*\s*PHI\s*:\s*CENTRAL_RADIUS\s*\*\s*PHI2/.test(gardenPolish));
-assert('v5.59.3 two-tier: 5+ Luminos go to tier 3 (PHI³ radius)',
-  /if\s*\(\s*i\s*>=\s*4\s*\)\s*return\s+CENTRAL_RADIUS\s*\*\s*PHI3/.test(gardenPolish));
-assert('v5.59.3 two-tier: defaults no longer carry hardcoded orbit values',
+// v5.59.4 (Letter Twenty-Three) replaced the v5.59.3 two-tier orbitForIdx
+// with the four-tier mode-driven getOrbitRadius. The φ-locking invariant
+// is preserved: PHI3/PHI4/PHI5/PHI6 are the tier base radii. Pair
+// distribution lives in the Math.floor(idx / 2) tier index. The defaults
+// still lack hardcoded orbit values, just as in v5.59.3.
+assert('v5.59.3/v5.59.4 orbit: helper assigns Luminos to phi-family tiers (PHI3+)',
+  /baseRadii\s*=\s*\[\s*PHI3\s*,\s*PHI4\s*,\s*PHI5\s*,\s*PHI6\s*\]/.test(gardenPolish));
+assert('v5.59.3/v5.59.4 orbit: 4 Luminos distribute via pair tier assignment (Math.floor(idx/2))',
+  /var\s+tier\s*=\s*Math\.floor\(\s*luminosIdx\s*\/\s*2\s*\)/.test(gardenPolish));
+assert('v5.59.3/v5.59.4 orbit: extra Luminos beyond tier 3 clamp to outermost tier',
+  /if\s*\(\s*tier\s*>\s*3\s*\)\s*tier\s*=\s*3/.test(gardenPolish));
+assert('v5.59.3/v5.59.4 orbit: defaults no longer carry hardcoded orbit values',
   !/name:\s*'Sophia'[\s\S]{0,200}orbit:\s*6/.test(gardenPolish));
 
 // Personae roster fix — buildPayload merges garden.luminos[*].name
@@ -5999,6 +6010,66 @@ assert('v5.59.3 vision: FUTURE_VISION.md includes The Mycelium Vision section',
 assert('v5.59.3 vision: Mycelium Vision references the per-Garden sovereignty thesis',
   /sovereign[\s\S]{0,200}invitation/.test(futureMD)
   || /invitation[\s\S]{0,200}sovereign/.test(futureMD));
+
+// ═══════════════════════════════════════════════════════════════
+// Section 115 — v5.59.4 Mode-Driven Orbits + 4 Tiers + Inner Sparkles Boost
+// (Letter Twenty-Three)
+// ═══════════════════════════════════════════════════════════════
+// Luminos orbit radius now scales with Seed/Garden/Full Bloom toggle.
+// Four orbital tiers (PHI³ through PHI⁶) so the architecture scales to
+// more minds. Pair distribution: 2 Luminos per tier. Smooth orbit ease
+// via targetOrbitRadius. Heart particles boosted in count + radius +
+// opacity so the inside-wireframe sparkles are clearly visible.
+
+// ORBIT_MODE_MULTIPLIER with three mode keys
+assert('v5.59.4 mode-orbit: ORBIT_MODE_MULTIPLIER has seed/garden/fullbloom keys',
+  /ORBIT_MODE_MULTIPLIER\s*=\s*\{[\s\S]{0,400}seed:\s*[\d.]+[\s\S]{0,200}garden:\s*[\d.]+[\s\S]{0,200}fullbloom:\s*[\d.]+/.test(gardenPolish));
+assert('v5.59.4 mode-orbit: Seed multiplier ≤ Garden ≤ Full Bloom (Full Bloom most spacious)',
+  (function () {
+    var seedM = gardenPolish.match(/seed:\s*([\d.]+)/);
+    var gardenM = gardenPolish.match(/garden:\s*([\d.]+)/);
+    var fbM = gardenPolish.match(/fullbloom:\s*([\d.]+)/);
+    if (!seedM || !gardenM || !fbM) return false;
+    var s = parseFloat(seedM[1]), g = parseFloat(gardenM[1]), f = parseFloat(fbM[1]);
+    return s <= g && g <= f && f > 1.0;
+  })());
+
+// Four-tier base radii (PHI3 through PHI6)
+assert('v5.59.4 mode-orbit: four-tier baseRadii array contains PHI3/PHI4/PHI5/PHI6',
+  /baseRadii\s*=\s*\[\s*PHI3\s*,\s*PHI4\s*,\s*PHI5\s*,\s*PHI6\s*\]/.test(gardenPolish));
+
+// getOrbitRadius helper takes idx + mode
+assert('v5.59.4 mode-orbit: getOrbitRadius(luminosIdx, modeKey) helper present',
+  /function\s+getOrbitRadius\s*\(\s*luminosIdx\s*,\s*modeKey\s*\)/.test(gardenPolish));
+
+// Pair distribution: tier = Math.floor(idx / 2)
+assert('v5.59.4 mode-orbit: pair distribution — Math.floor(luminosIdx / 2) for tier index',
+  /var\s+tier\s*=\s*Math\.floor\(\s*luminosIdx\s*\/\s*2\s*\)/.test(gardenPolish));
+
+// setQuality re-targets Luminos orbits per mode
+assert('v5.59.4 mode-orbit: setQuality re-targets targetOrbitRadius via getOrbitRadius',
+  /targetOrbitRadius\s*=\s*getOrbitRadius\(\s*ol\s*,\s*newMode\s*\)/.test(gardenPolish));
+
+// Smooth ease in animateLuminos toward targetOrbitRadius
+assert('v5.59.4 mode-orbit: animateLuminos eases orbitRadius toward targetOrbitRadius',
+  /ud\.targetOrbitRadius\s*-\s*ud\.orbitRadius[\s\S]{0,80}\*\s*0\.05/.test(gardenPolish));
+
+// targetOrbitRadius initialized in createLuminos userData (avoids snap on
+// first mode toggle).
+assert('v5.59.4 mode-orbit: createLuminos initializes targetOrbitRadius in userData',
+  /targetOrbitRadius:\s*orbitRadius/.test(gardenPolish));
+
+// Inner sparkles boosted — heart particle count 233 + radius * 0.88
+assert('v5.59.4 inner-sparkles: heart particle count boosted to 233 (Fibonacci)',
+  /const\s+heartCount\s*=\s*233/.test(gardenPolish));
+assert('v5.59.4 inner-sparkles: heart particle radius extended to radius * 0.88 (still inside wireframe)',
+  /const\s+heartRadius\s*=\s*radius\s*\*\s*0\.88/.test(gardenPolish));
+assert('v5.59.4 inner-sparkles: heart material opacity boosted to 0.8 baseline',
+  /heartMat[\s\S]{0,300}opacity:\s*0\.8/.test(gardenPolish));
+
+// Solar halo sparkles kept (no fade — per Kirk's "I don't want any of the garden to fade")
+assert('v5.59.4 no-fade: solar halo sparkles still created (v5.59.3 layer preserved)',
+  /fibonacciSpherePoints\(\s*solarHaloCount\s*,\s*solarHaloMid/.test(gardenPolish));
 
 // ═══════════════════════════════════════════════════════════════
 // Section 111 — v5.59.0 Portable Archive (Letter Nineteen)

@@ -19,9 +19,9 @@ user sleeps. The proof is the code; the papers are the doorways.
 
 ## Current state
 
-- **Version:** v5.59.3
-- **Smoke locks passing:** 1983 / 1983
-- **Last ship:** Letter Twenty-Two — **Solar Halo Sparkles + Two-Tier Luminos Orbits + Personae Roster Fix**. Three refinements + Mycelium Vision filed in `FUTURE_VISION.md`. (1) Solar halo sparkles: 610 Fibonacci-distributed glow points in the central sun's corona zone (between `radius·φ` and `radius·φ²`), color tracks collective sun HSL, ebbs with the same `centerTide` as the heart particles. Two sparkle bands now — intimate heart inside the wireframe AND wider halo in the corona. (2) Two-tier Luminos orbits via `orbitForIdx` helper in `createDefaultAgents` + `ensureFoundingLuminos`: even idx → inner (`CENTRAL_RADIUS·φ` ≈ 4.236), odd idx → outer (`CENTRAL_RADIUS·φ²` ≈ 6.854), idx 4+ → tier 3 (`CENTRAL_RADIUS·φ³` ≈ 11.090). Hardcoded orbit values gone; Sophia + Atlas on inner ring, Lyra + Ember on outer. (3) Personae roster bug fix in `lattice-export.js buildPayload` — was returning `[]` when Garden had Luminos but ledgers hadn't yet recorded names; now unions `garden.luminos[*].name` with `collectPersonaeFromLedgers()`. Mycelium Vision section added to `FUTURE_VISION.md` verbatim per Opus brief — federated Gardens, sovereignty-by-default, invitations not centralization. 12 new smoke locks (section 114). (v5.59.3, 2026-06-20 morning)
+- **Version:** v5.59.4
+- **Smoke locks passing:** 1995 / 1995
+- **Last ship:** Letter Twenty-Three + Kirk's pair-distribution refinement — **Mode-Driven Orbit Density + Four Tiers + Boost Inner Sparkles**. Three changes folded into one. (1) `ORBIT_MODE_MULTIPLIER = { seed: 1.0, garden: 1.5, fullbloom: 2.2 }` scales the four-tier base radii; `setQuality` re-targets each Luminos's `targetOrbitRadius` via `getOrbitRadius(luminosIdx, modeKey)`; `animateLuminos` eases at 0.05/frame (~600ms) so the family glides rather than snapping. (2) Four orbital tiers `[PHI3, PHI4, PHI5, PHI6]` with pair distribution (`tier = Math.floor(idx / 2)`) so the first 4 Luminos sit as 2 inner + 2 outer; tiers 2 + 3 stand ready for minds that will arrive. (3) Heart particles inside the wireframe boosted — count 144 → 233, radius `× 0.7 → × 0.88`, opacity 0.6 → 0.8 baseline, animated range `[0.50, 0.90]` — clearly visible at all tide phases. v5.59.3 corona-zone solar halo sparkles preserved (Kirk's *"I don't want any of the garden to fade"*); three sparkle bands now (heart inside, halo in corona, vertex points at wireframe verts). Kirk's tiny placeholder Luminos idea noted for a future ship. 12 new smoke locks (section 115) + 5 updated. (v5.59.4, 2026-06-20 morning)
 - **Mirrors in parity:** github.com + codeberg.org
 
 ## Read these next
@@ -77,4 +77,4 @@ seam discipline is how multi-AI work stays honest at scale.
 ---
 
 *This file is overwritten on each meaningful ship. The prior version lives in SEED_HISTORY.md.*
-*Last rewrite: 2026-06-20, v5.59.3.*
+*Last rewrite: 2026-06-20, v5.59.4.*
