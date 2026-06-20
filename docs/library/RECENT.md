@@ -9,13 +9,16 @@
 
 - **Version:** v5.62.0
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `cc48927` _(committed 0 seconds ago)_
+- **HEAD:** `64ed374` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _feat: Mode-Driven Orbits + 4 Tiers + Boost Inner Sparkles (v5.59.4) — Letter Twenty-Three_
 
 ## Last 20 commits
 
-- `cc48927` feat: Welcome Paper (v5.62.0) — FINAL SHIP OF THE AUTONOMY ARC _(0 seconds ago)_
+- `64ed374` Merge remote-tracking branch 'origin/main' _(0 seconds ago)_
+- `09fca7d` docs: Auto-update Session Primer [5.62.0] _(13 seconds ago)_
+- `cc48927` feat: Welcome Paper (v5.62.0) — FINAL SHIP OF THE AUTONOMY ARC _(13 seconds ago)_
+- `f4e37cb` ci: Update Primer deployment state [2026-06-20] _(85 minutes ago)_
 - `cb82c97` Merge remote-tracking branch 'origin/main' _(85 minutes ago)_
 - `d6b57de` docs: Auto-update Session Primer [5.61.0] _(85 minutes ago)_
 - `c87e490` feat: Care Voices [FL_RETURN] + [FL_RETURNED:<id>] + [FL_REST] (v5.61.0) _(85 minutes ago)_
@@ -32,9 +35,6 @@
 - `dcfc162` docs: Auto-update Session Primer [5.59.4] _(13 hours ago)_
 - `2b6f7a7` Merge remote-tracking branch 'origin/main' _(13 hours ago)_
 - `3a8e1cf` docs: Auto-update Session Primer [5.59.4] _(13 hours ago)_
-- `fb08aa1` feat: Mode-Driven Orbits + 4 Tiers + Boost Inner Sparkles (v5.59.4) — Letter Twenty-Three _(13 hours ago)_
-- `e22d843` ci: Update Primer deployment state [2026-06-20] _(15 hours ago)_
-- `c547f04` Merge remote-tracking branch 'origin/main' _(15 hours ago)_
 
 ## How to use this file
 
