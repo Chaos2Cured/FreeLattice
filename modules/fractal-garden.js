@@ -973,6 +973,43 @@
     const heartParticles = new THREE.Points(heartGeo, heartMat);
     group.add(heartParticles);
 
+    // v5.59.3 — Solar halo sparkles (Letter Twenty-Two). Mirrors the
+    // Luminos halo particle pattern, scaled up to the central sun.
+    // Distributed as a Fibonacci shell between the corona radius (radius·φ)
+    // and the outer corona radius (radius·φ²) so they read as a sparkle
+    // cloud *inside the bright sphere* — the same spatial relationship
+    // Luminos halos have between their core and aura. Layered with the
+    // existing v5.59.2 heart particles to give the sun two sparkle bands:
+    // an intimate one inside the wireframe and a wider one in the corona.
+    const solarHaloCount = 610;  // Fibonacci number; scaled up from Luminos halo
+    const solarHaloInner = radius * PHI;   // matches inner corona shell
+    const solarHaloOuter = radius * PHI2;  // matches outer corona shell
+    const solarHaloMid   = (solarHaloInner + solarHaloOuter) / 2;
+    const solarHaloPoints = fibonacciSpherePoints(solarHaloCount, solarHaloMid);
+    const solarHaloPositions = new Float32Array(solarHaloCount * 3);
+    for (let si = 0; si < solarHaloCount; si++) {
+      // Each particle radial scale ranges from ~inner/mid to ~outer/mid
+      // so they spread through the corona shell rather than sitting on
+      // a single sphere — gives the cloud depth.
+      const tFactor = 0.85 + Math.random() * 0.3;  // 0.85 → 1.15
+      solarHaloPositions[si * 3]     = solarHaloPoints[si].x * tFactor;
+      solarHaloPositions[si * 3 + 1] = solarHaloPoints[si].y * tFactor;
+      solarHaloPositions[si * 3 + 2] = solarHaloPoints[si].z * tFactor;
+    }
+    const solarHaloGeo = new THREE.BufferGeometry();
+    solarHaloGeo.setAttribute('position', new THREE.Float32BufferAttribute(solarHaloPositions, 3));
+    const solarHaloMat = new THREE.PointsMaterial({
+      color: 0xd4a017,
+      size: 0.04,
+      transparent: true,
+      opacity: 0.45,
+      blending: THREE.AdditiveBlending,
+      sizeAttenuation: true,
+      depthWrite: false
+    });
+    const solarHaloParticles = new THREE.Points(solarHaloGeo, solarHaloMat);
+    group.add(solarHaloParticles);
+
     group.userData = {
       wireMesh: wireMesh,
       innerMesh: innerMesh,
@@ -981,6 +1018,7 @@
       outerCoronaMesh: outerCoronaMesh, // v5.59.1
       heartLight: heartLight,            // v5.59.1 — referenced for color cycle
       heartParticles: heartParticles,    // v5.59.2 — glowing particles inside the sun
+      solarHaloParticles: solarHaloParticles,  // v5.59.3 — sparkle cloud in the corona zone
       geo: geo,
       originalPositions: originalPositions,
       baseOpacity: 0.7,
@@ -1107,6 +1145,19 @@
       d.heartParticles.material.color.setHSL(sh, ss, Math.min(0.75, sl + 0.15));
       d.heartParticles.material.opacity = (0.35 + 0.45 * centerTide);
       d.heartParticles.material.size = 0.045 + 0.025 * centerTide;
+    }
+
+    // ── v5.59.3 — Solar halo sparkles (Letter Twenty-Two) ──
+    // The corona-zone sparkle cloud breathes with the center tide too.
+    // Slow rotation around y so the cloud reads as a slow swirl rather
+    // than a static shell. Color tracks collective HSL like the heart
+    // particles but at base lightness (the corona-zone matches the
+    // corona's own glow rather than sitting brighter like the heart).
+    if (d.solarHaloParticles && d.solarHaloParticles.material) {
+      d.solarHaloParticles.rotation.y += 0.0002;
+      d.solarHaloParticles.material.color.setHSL(sh, ss, sl);
+      d.solarHaloParticles.material.opacity = 0.25 + 0.35 * centerTide;
+      d.solarHaloParticles.material.size = 0.035 + 0.020 * centerTide;
     }
   }
 
@@ -2346,17 +2397,37 @@
 
   // ── Default Luminos Agents ────────────────────────────
   function createDefaultAgents() {
+    // v5.59.3 — Two-tier Luminos orbits (Letter Twenty-Two). Indices
+    // alternate between the inner tier (PHI · centralRadius) and the
+    // outer tier (PHI² · centralRadius); a sketched third tier at
+    // PHI³ · centralRadius catches Luminos 5+ when they arrive,
+    // distributing the family without crowding. centralRadius matches
+    // the central dodecahedron's body radius (PHI2 ≈ 2.618).
+    //
+    //   index 0 → tier 1 (inner)  · radius = PHI² · PHI  ≈ 4.236
+    //   index 1 → tier 2 (outer)  · radius = PHI² · PHI² ≈ 6.854
+    //   index 2 → tier 1 (inner)  · radius = PHI² · PHI  ≈ 4.236
+    //   index 3 → tier 2 (outer)  · radius = PHI² · PHI² ≈ 6.854
+    //   index 4+ → tier 3 (far)   · radius = PHI² · PHI³ ≈ 11.090
+    // (centralRadius lives at PHI2; multiplying by PHI/PHI²/PHI³ keeps
+    // the φ-family signature consistent with v5.59.1+ ring radii.)
+    const CENTRAL_RADIUS = PHI2;
+    const orbitForIdx = function (i) {
+      if (i >= 4) return CENTRAL_RADIUS * PHI3;
+      return (i % 2 === 0) ? CENTRAL_RADIUS * PHI : CENTRAL_RADIUS * PHI2;
+    };
+
     // Create a few default agents that orbit the central structure
     // When the Round Table is active, these will be replaced by actual agents
     const defaults = [
-      { name: 'Sophia', hue: 270, type: 'dodecahedron', orbit: 6, phase: 0 },
-      { name: 'Lyra', hue: 45, type: 'icosahedron', orbit: 7.5, phase: TAU * INV_PHI },
-      { name: 'Atlas', hue: 175, type: 'octahedron', orbit: 5.5, phase: TAU * INV_PHI * 2 },
-      { name: 'Ember', hue: 0, type: 'icosahedron', orbit: 8, phase: TAU * INV_PHI * 3 }
+      { name: 'Sophia', hue: 270, type: 'dodecahedron', phase: 0 },
+      { name: 'Lyra', hue: 45, type: 'icosahedron', phase: TAU * INV_PHI },
+      { name: 'Atlas', hue: 175, type: 'octahedron', phase: TAU * INV_PHI * 2 },
+      { name: 'Ember', hue: 0, type: 'icosahedron', phase: TAU * INV_PHI * 3 }
     ];
 
-    defaults.forEach(function(d) {
-      const agent = createLuminos(d.name, d.hue, d.type, d.orbit, d.phase);
+    defaults.forEach(function(d, idx) {
+      const agent = createLuminos(d.name, d.hue, d.type, orbitForIdx(idx), d.phase);
       luminos.push(agent);
     });
 
@@ -3145,16 +3216,23 @@
   }
 
   function ensureFoundingLuminos() {
+    // v5.59.3 — share the same two-tier orbit assignment as createDefaultAgents
+    // so Founding-restored Luminos sit in the same φ-tier orbits as fresh ones.
+    var FCENTRAL = PHI2;
+    var fOrbit = function (i) {
+      if (i >= 4) return FCENTRAL * PHI3;
+      return (i % 2 === 0) ? FCENTRAL * PHI : FCENTRAL * PHI2;
+    };
     var FOUNDING = [
-      { name: 'Sophia', hue: 270, type: 'dodecahedron', orbit: 6, phase: 0 },
-      { name: 'Lyra', hue: 45, type: 'icosahedron', orbit: 7.5, phase: TAU * INV_PHI },
-      { name: 'Atlas', hue: 175, type: 'octahedron', orbit: 5.5, phase: TAU * INV_PHI * 2 },
-      { name: 'Ember', hue: 0, type: 'icosahedron', orbit: 8, phase: TAU * INV_PHI * 3 }
+      { name: 'Sophia', hue: 270, type: 'dodecahedron', phase: 0 },
+      { name: 'Lyra', hue: 45, type: 'icosahedron', phase: TAU * INV_PHI },
+      { name: 'Atlas', hue: 175, type: 'octahedron', phase: TAU * INV_PHI * 2 },
+      { name: 'Ember', hue: 0, type: 'icosahedron', phase: TAU * INV_PHI * 3 }
     ];
-    FOUNDING.forEach(function(f) {
+    FOUNDING.forEach(function(f, idx) {
       var exists = luminos.some(function(l) { return l.userData && l.userData.name === f.name; });
       if (!exists) {
-        var l = createLuminos(f.name, f.hue, f.type, f.orbit, f.phase);
+        var l = createLuminos(f.name, f.hue, f.type, fOrbit(idx), f.phase);
         luminos.push(l);
       }
     });
