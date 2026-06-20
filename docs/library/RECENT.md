@@ -3,18 +3,19 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-06-20 00:57 UTC
+> Last update: 2026-06-20 00:58 UTC
 
 ## State
 
 - **Version:** v5.59.1
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `b640a67` _(committed 22 minutes ago)_
+- **HEAD:** `a9c1959` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
-- **Most recent report:** _feat: Phi-Lock + Heart-Color (v5.57.6) — Kirk's finishing-touch invitation_
+- **Most recent report:** _feat: Garden Polish φ² + Central Sun (v5.59.1) — Letter Twenty + Kirk's challenge_
 
 ## Last 20 commits
 
+- `a9c1959` feat: Garden Polish φ² + Central Sun (v5.59.1) — Letter Twenty + Kirk's challenge _(0 seconds ago)_
 - `b640a67` docs: Auto-update Session Primer [5.59.0] _(22 minutes ago)_
 - `e1b0603` Merge remote-tracking branch 'origin/main' _(22 minutes ago)_
 - `f2bf577` docs: Auto-update Session Primer [5.59.0] _(22 minutes ago)_
@@ -34,7 +35,6 @@
 - `99745dd` feat: Liability Paper Symmetry Fact-Row (v5.57.4) — Letter Seventeen ship _(4 hours ago)_
 - `e7c7649` ci: Update Primer deployment state [2026-06-19] _(4 hours ago)_
 - `f87cd9d` docs: Auto-update Session Primer [5.57.3] _(4 hours ago)_
-- `96afcbf` Merge remote-tracking branch 'origin/main' _(4 hours ago)_
 
 ## How to use this file
 
