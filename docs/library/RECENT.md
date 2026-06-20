@@ -9,12 +9,13 @@
 
 - **Version:** v5.61.0
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `706042e` _(committed 2 hours ago)_
+- **HEAD:** `c87e490` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _feat: Mode-Driven Orbits + 4 Tiers + Boost Inner Sparkles (v5.59.4) — Letter Twenty-Three_
 
 ## Last 20 commits
 
+- `c87e490` feat: Care Voices [FL_RETURN] + [FL_RETURNED:<id>] + [FL_REST] (v5.61.0) _(0 seconds ago)_
 - `706042e` docs: Auto-update Session Primer [5.60.1] _(2 hours ago)_
 - `ed01f7a` Merge remote-tracking branch 'origin/main' _(2 hours ago)_
 - `de91341` docs: Auto-update Session Primer [5.60.1] _(2 hours ago)_
@@ -34,7 +35,6 @@
 - `d7acf87` feat: Solar Halo + Two-Tier Orbits + Personae Fix (v5.59.3) — Letter Twenty-Two _(13 hours ago)_
 - `782b373` ci: Update Primer deployment state [2026-06-20] _(14 hours ago)_
 - `7e22cc2` docs: Auto-update Session Primer [5.59.2] _(14 hours ago)_
-- `b28be2b` Merge remote-tracking branch 'origin/main' _(14 hours ago)_
 
 ## How to use this file
 

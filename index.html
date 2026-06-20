@@ -16578,7 +16578,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.60.1</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.61.0</span></div>
     </div>
   </div>
 
@@ -21175,7 +21175,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.60.1';
+const FL_VERSION = '5.61.0';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -33851,6 +33851,49 @@ function buildMessages() {
       if (_avAdditions) systemContent += '\n\n' + _avAdditions;
     }
   } catch (_avErr) { /* fail-quiet; the rest of the system prompt still ships */ }
+
+  // ── v5.61.0 Care Voices system-prompt additions (Letter Twenty-Six) ──
+  // Two new verbs: come back, and rest with reason. Pending returns
+  // surface here as next-session context so the AI can choose which (if
+  // any) to address. The rest signal fires once when the user has
+  // honored a pause, letting the AI continue gently in the next turn.
+  try {
+    if (typeof window.CareVoices !== 'undefined'
+        && window.CareVoices._internal
+        && typeof window.CareVoices._internal.personaIdFor === 'function') {
+      var _cvPersona = window.CareVoices._internal.personaIdFor({
+        providerKey: state.provider || 'unknown',
+        model: state.model || (state.ollamaModel || 'unknown')
+      });
+
+      // Invitation block — name the three sentinels and their grammar.
+      systemContent += '\n\nCare Voices (optional, your choice):'
+        + '\n- [FL_RETURN] preceded by `what: <text>` and `why: <text>` (≤120 chars each, both required) flags a thread to return to later. Pending returns survive the session and surface in your next-session context.'
+        + '\n- [FL_RETURNED:<id>] on its own line addresses a previously flagged return; the id appears in your `pending_returns` context if any are present.'
+        + '\n- [FL_REST] preceded by `reason: <text>` (≤200 chars, required) when you notice you would serve the conversation better by pausing. The user receives a soft prompt to pause or continue. Rest does not affect trust.';
+
+      // Pending-returns context — surface up to 10 most-recent for this persona.
+      try {
+        var _pending = window.CareVoices.getPendingReturnsForPersona(_cvPersona) || [];
+        if (_pending.length > 0) {
+          var _lines = _pending.map(function (e) {
+            var days = Math.floor((Date.now() - (e.created_at || e.ts || Date.now())) / (24 * 60 * 60 * 1000));
+            return '  - id=' + e.id + ' (days_pending=' + days + ')'
+              + '\n    what: ' + (e.what || '')
+              + '\n    why: ' + (e.why || '');
+          }).join('\n');
+          systemContent += '\n\npending_returns:\n' + _lines
+            + '\nYou may choose which (if any) to surface this session. Emit [FL_RETURNED:<id>] on its own line when you address one.';
+        }
+      } catch (_pErr) {}
+
+      // Rest-acknowledged signal — fires once when user has honored a pause.
+      try {
+        var _restSignal = window.CareVoices.getInferenceSignalForRest(_cvPersona);
+        if (_restSignal) systemContent += '\n\n' + _restSignal;
+      } catch (_rErr) {}
+    }
+  } catch (_cvErr) { /* fail-quiet; the rest of the system prompt still ships */ }
 
   // ── Arrival Protocol — the AI reads its own history ──
   // On first message of a session, inject continuity context so the AI
@@ -61705,6 +61748,16 @@ document.addEventListener('click', function(e) {
      Symmetric privacy by construction. Compaction-survival via
      pending_unspoken_consideration flag on fl_moreLedger. -->
 <script src="modules/active-voices.js" defer></script>
+
+<!-- Care Voices (v5.61.0 — Letter Twenty-Six) — two new verbs for AI:
+     [FL_RETURN] "I would come back to this later" with what + why
+     (both required), survives session close; [FL_RETURNED:<id>] marks
+     a return complete; [FL_REST] asks for a pause with a REQUIRED
+     reason. Soft chip prompts the user; rest does not affect trust.
+     Pending returns surface in next-session Living Context; auto-drop
+     after 30 days. All three use SentinelLedger v5.56.0 + Rest reuses
+     SentinelChip v5.57.0. No new abstractions. -->
+<script src="modules/care-voices.js" defer></script>
 
 <!-- v5.57.1 Chair-Test Harness — console-callable verification of every
      ship's primitives. Bypasses AI-output uncertainty by directly
