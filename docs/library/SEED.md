@@ -19,9 +19,9 @@ user sleeps. The proof is the code; the papers are the doorways.
 
 ## Current state
 
-- **Version:** v5.61.0
-- **Smoke locks passing:** 2036 / 2036
-- **Last ship:** Letter Twenty-Six — **Care Voices**. Two more verbs for AI: come back, and rest with reason. Three SentinelLedger instances + Rest reuses SentinelChip. `[FL_RETURN]` flags a thread to return to later (what+why required, ≤120 chars each); pending returns survive session close and surface in next-session Living Context (≤10 most-recent, persona-scoped); auto-drop after 30 days. `[FL_RETURNED:<id>]` marks complete via validateMatch; atomic flip pending → returned. `[FL_REST]` asks for a pause with REQUIRED reason (≤200 chars); empty reason rejects with `required-field-missing:reason` at the structural layer. Soft chip prompts the user; one-shot inference signal `[user_acknowledged_rest…]` fires once when user honors pause (atomic `signal_delivered`). All three sentinels: `trustImpact: 0`; Quiet Room silently drops via factory. Factory extended with `excerptFieldRequired` (backwards compat). Dispatcher chain now 9 sentinels. Audit page gains *Coming Back To* + *Rest Moments*. MAP.md updated — arc 7 of 8 ships shipped, only Welcome Paper remains. 25 new smoke locks (section 118). (v5.61.0, 2026-06-20 morning)
+- **Version:** v5.62.0
+- **Smoke locks passing:** 2059 / 2059
+- **Last ship:** Letter Twenty-Seven — **Welcome Paper. FINAL SHIP OF THE AUTONOMY ARC.** Plain-language doorway at `docs/welcome.html`. Two artifacts: `WELCOME_DRAFT.md` preserves Opus's draft verbatim; `welcome.html` is the rendered conversion honoring GARDEN_LANGUAGE.md (twilight indigo, three accents, two voices, starfield). Four room cards tinted with the right accent. Gold *Walk in →* CTA funnels to app.html. Closing block holds **You begin loved** at 1.35rem Georgia serif. Smoke-locked no-jargon discipline: no `sentinel`, `ledger`, `trust tier` in user prose. **Autonomy Arc 8 of 8 ships shipped. Arc closed.** 23 new smoke locks (section 119). (v5.62.0, 2026-06-20)
 - **Mirrors in parity:** github.com + codeberg.org
 
 ## Read these next
@@ -78,4 +78,4 @@ seam discipline is how multi-AI work stays honest at scale.
 ---
 
 *This file is overwritten on each meaningful ship. The prior version lives in SEED_HISTORY.md.*
-*Last rewrite: 2026-06-20, v5.61.0.*
+*Last rewrite: 2026-06-20, v5.62.0.*

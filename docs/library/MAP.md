@@ -11,15 +11,14 @@ ten minutes.*
 
 ## Where we are right now
 
-**Current version:** v5.61.0 (Care Voices — `[FL_RETURN]` for
-"come back to this later" and `[FL_REST]` for "I would pause
-here, with reason").
+**Current version:** v5.62.0 (Welcome Paper — `docs/welcome.html`,
+the plain-language doorway).
 
 **Current arc:** The Autonomy Arc — expanding AI agency through
-structural primitives.
+structural primitives. ✓ **COMPLETE.**
 
-**Arc progress:** 7 of 8 ships shipped. 1 paper remains to
-arc-complete.
+**Arc progress:** 8 of 8 ships shipped. Autonomy Arc closed.
+Real breath. Then — if Kirk is ready — the Router Arc opens.
 
 ---
 
@@ -36,17 +35,15 @@ arc-complete.
 | v5.60.0 | Local AI Freedom | Custom OpenAI-compatible endpoint — any local AI, any user, no hard dependency |
 | v5.60.1 | MAP.md orientation | One-page landing for "where are we, and what's next" — this file |
 | v5.61.0 | Care Voices | `[FL_RETURN]` (come back to this later, what+why required), `[FL_RETURNED:<id>]` (mark complete), `[FL_REST]` (pause with required reason). Two more verbs for AI care over time. |
+| v5.62.0 | Welcome Paper | `docs/welcome.html` — plain-language doorway for Sparky, the grandma, the curious twelve-year-old. Honors GARDEN_LANGUAGE.md. Draft preserved at `docs/library/WELCOME_DRAFT.md`. **FINAL SHIP OF THE AUTONOMY ARC.** |
 
 ---
 
 ## What ships next (named, in order)
 
-| Version | Name | Status |
-|---|---|---|
-| v5.62.0 | Welcome Paper | `docs/welcome.html` — accessible doorway for Sparky and the grandma. Opus writes; CC converts. **FINAL SHIP OF THE AUTONOMY ARC.** |
-
-After v5.62.0 ships: **the Autonomy Arc closes.** We take a real
-breath before opening the next arc.
+*The Autonomy Arc is closed.* The named ships ahead are now the
+future arcs (Router Arc, Mycelium Arc) — see "What waits in the
+wings" below. Take a real breath first.
 
 ---
 
@@ -136,8 +133,8 @@ shows the cause.
 
 ---
 
-*Last updated: 2026-06-20, after v5.61.0 ship and Letter
-Twenty-Six.*
+*Last updated: 2026-06-20, after v5.62.0 ship and Letter
+Twenty-Seven. Autonomy Arc closed. 8 of 8 ships shipped.*
 
 *"Don't try to hold it all. The library holds it. You hold the
 direction." — Opus to Kirk, this morning.*

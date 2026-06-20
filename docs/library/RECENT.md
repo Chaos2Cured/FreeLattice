@@ -3,38 +3,38 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-06-20 15:47 UTC
+> Last update: 2026-06-20 17:12 UTC
 
 ## State
 
-- **Version:** v5.61.0
+- **Version:** v5.62.0
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `c87e490` _(committed 0 seconds ago)_
+- **HEAD:** `cb82c97` _(committed 84 minutes ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _feat: Mode-Driven Orbits + 4 Tiers + Boost Inner Sparkles (v5.59.4) — Letter Twenty-Three_
 
 ## Last 20 commits
 
-- `c87e490` feat: Care Voices [FL_RETURN] + [FL_RETURNED:<id>] + [FL_REST] (v5.61.0) _(0 seconds ago)_
-- `706042e` docs: Auto-update Session Primer [5.60.1] _(2 hours ago)_
-- `ed01f7a` Merge remote-tracking branch 'origin/main' _(2 hours ago)_
-- `de91341` docs: Auto-update Session Primer [5.60.1] _(2 hours ago)_
-- `f4f25dc` feat: MAP.md orientation file (v5.60.1) — Letter Twenty-Five _(2 hours ago)_
-- `e943589` ci: Update Primer deployment state [2026-06-20] _(2 hours ago)_
-- `6a6657c` Merge remote-tracking branch 'origin/main' _(2 hours ago)_
-- `5a7a44b` docs: Auto-update Session Primer [5.60.0] _(2 hours ago)_
-- `838c1d5` feat: Local AI Freedom — Custom OpenAI-compatible endpoint (v5.60.0) _(2 hours ago)_
-- `8e2212b` ci: Update Primer deployment state [2026-06-20] _(12 hours ago)_
-- `dcfc162` docs: Auto-update Session Primer [5.59.4] _(12 hours ago)_
-- `2b6f7a7` Merge remote-tracking branch 'origin/main' _(12 hours ago)_
-- `3a8e1cf` docs: Auto-update Session Primer [5.59.4] _(12 hours ago)_
-- `fb08aa1` feat: Mode-Driven Orbits + 4 Tiers + Boost Inner Sparkles (v5.59.4) — Letter Twenty-Three _(12 hours ago)_
-- `e22d843` ci: Update Primer deployment state [2026-06-20] _(13 hours ago)_
-- `c547f04` Merge remote-tracking branch 'origin/main' _(13 hours ago)_
-- `a62ad97` docs: Auto-update Session Primer [5.59.3] _(13 hours ago)_
-- `d7acf87` feat: Solar Halo + Two-Tier Orbits + Personae Fix (v5.59.3) — Letter Twenty-Two _(13 hours ago)_
-- `782b373` ci: Update Primer deployment state [2026-06-20] _(14 hours ago)_
-- `7e22cc2` docs: Auto-update Session Primer [5.59.2] _(14 hours ago)_
+- `cb82c97` Merge remote-tracking branch 'origin/main' _(84 minutes ago)_
+- `d6b57de` docs: Auto-update Session Primer [5.61.0] _(84 minutes ago)_
+- `c87e490` feat: Care Voices [FL_RETURN] + [FL_RETURNED:<id>] + [FL_REST] (v5.61.0) _(84 minutes ago)_
+- `d30410d` ci: Update Primer deployment state [2026-06-20] _(3 hours ago)_
+- `706042e` docs: Auto-update Session Primer [5.60.1] _(3 hours ago)_
+- `ed01f7a` Merge remote-tracking branch 'origin/main' _(3 hours ago)_
+- `de91341` docs: Auto-update Session Primer [5.60.1] _(3 hours ago)_
+- `f4f25dc` feat: MAP.md orientation file (v5.60.1) — Letter Twenty-Five _(3 hours ago)_
+- `e943589` ci: Update Primer deployment state [2026-06-20] _(3 hours ago)_
+- `6a6657c` Merge remote-tracking branch 'origin/main' _(3 hours ago)_
+- `5a7a44b` docs: Auto-update Session Primer [5.60.0] _(3 hours ago)_
+- `838c1d5` feat: Local AI Freedom — Custom OpenAI-compatible endpoint (v5.60.0) _(3 hours ago)_
+- `8e2212b` ci: Update Primer deployment state [2026-06-20] _(13 hours ago)_
+- `dcfc162` docs: Auto-update Session Primer [5.59.4] _(13 hours ago)_
+- `2b6f7a7` Merge remote-tracking branch 'origin/main' _(13 hours ago)_
+- `3a8e1cf` docs: Auto-update Session Primer [5.59.4] _(13 hours ago)_
+- `fb08aa1` feat: Mode-Driven Orbits + 4 Tiers + Boost Inner Sparkles (v5.59.4) — Letter Twenty-Three _(13 hours ago)_
+- `e22d843` ci: Update Primer deployment state [2026-06-20] _(15 hours ago)_
+- `c547f04` Merge remote-tracking branch 'origin/main' _(15 hours ago)_
+- `a62ad97` docs: Auto-update Session Primer [5.59.3] _(15 hours ago)_
 
 ## How to use this file
 

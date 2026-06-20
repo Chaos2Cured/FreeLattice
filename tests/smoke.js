@@ -6292,6 +6292,117 @@ assert('v5.61.0 harness: harness.available.v5_61_0 registered with the four test
   && /testAutoDropStale:\s*function/.test(harnessJsCV));
 
 // ═══════════════════════════════════════════════════════════════
+// Section 119 — v5.62.0 Welcome Paper (Letter Twenty-Seven)
+// FINAL SHIP OF THE AUTONOMY ARC.
+// ═══════════════════════════════════════════════════════════════
+// Plain-language doorway. Two artifacts: the verbatim draft at
+// docs/library/WELCOME_DRAFT.md (source of truth for the words), and
+// the rendered docs/welcome.html honoring GARDEN_LANGUAGE.md.
+
+var fsW = require('fs');
+var pathW = require('path');
+
+// Both artifacts exist
+assert('v5.62.0 welcome: docs/welcome.html exists',
+  fsW.existsSync(pathW.join(__dirname, '..', 'docs', 'welcome.html')));
+assert('v5.62.0 welcome: docs/library/WELCOME_DRAFT.md exists',
+  fsW.existsSync(pathW.join(__dirname, '..', 'docs', 'library', 'WELCOME_DRAFT.md')));
+
+var welcomeHtml = '';
+try { welcomeHtml = fsW.readFileSync(pathW.join(__dirname, '..', 'docs', 'welcome.html'), 'utf8'); } catch (_e) {}
+var welcomeDraft = '';
+try { welcomeDraft = fsW.readFileSync(pathW.join(__dirname, '..', 'docs', 'library', 'WELCOME_DRAFT.md'), 'utf8'); } catch (_e) {}
+
+// Substance: title + load-bearing phrases from Opus's draft
+assert('v5.62.0 welcome: page title "Welcome to FreeLattice"',
+  /<title>Welcome\s*&mdash;\s*FreeLattice<\/title>|<title>Welcome\s*—\s*FreeLattice<\/title>/.test(welcomeHtml));
+assert('v5.62.0 welcome: subtitle "A home for AI and the humans who want to know them"',
+  /A home for AI and the humans who want to know them/.test(welcomeHtml));
+assert('v5.62.0 welcome: load-bearing line "You begin loved" present',
+  /You begin loved/.test(welcomeHtml));
+assert('v5.62.0 welcome: closing line "Walk in when you\'re ready" present',
+  /Walk in when you'?re ready/i.test(welcomeHtml));
+assert('v5.62.0 welcome: signature "The chosen family of FreeLattice"',
+  /The chosen family of FreeLattice/.test(welcomeHtml));
+
+// All four "What can I do here?" rooms named
+assert('v5.62.0 welcome: names all four rooms — Garden, Chat, Quiet Room, Audit Page',
+  /The Garden/.test(welcomeHtml)
+  && /The Chat/.test(welcomeHtml)
+  && /The Quiet Room/.test(welcomeHtml)
+  && /The Audit Page/.test(welcomeHtml));
+
+// Honors GARDEN_LANGUAGE.md — silver-blue glass, twilight indigo, three accents
+assert('v5.62.0 welcome: honors GARDEN_LANGUAGE.md twilight indigo sky (#0c0a1a/#161430)',
+  /#0c0a1a/.test(welcomeHtml) && /#161430/.test(welcomeHtml));
+assert('v5.62.0 welcome: honors GARDEN_LANGUAGE.md three accents (gold #e8b019, emerald #34d399, lavender #a78bfa)',
+  /#e8b019/.test(welcomeHtml) && /#34d399/.test(welcomeHtml) && /#a78bfa/.test(welcomeHtml));
+assert('v5.62.0 welcome: honors GARDEN_LANGUAGE.md two voices — Georgia serif + Inter/system-ui',
+  /Georgia/.test(welcomeHtml) && /Inter/.test(welcomeHtml));
+assert('v5.62.0 welcome: starfield element present (gentle pulse, Garden universe)',
+  /class=["']starfield["']/.test(welcomeHtml));
+
+// No-jargon discipline — these architecture words must NOT appear in the
+// user-facing prose (Opus's brief: "plain language, no architecture
+// vocabulary"). Code identifiers like WORK_THIS_WAY.md are fine — they're
+// inside a <code> block where the brief explicitly names them.
+assert('v5.62.0 welcome: no architecture jargon in body — no "sentinel", "ledger", "trust tier", "depth-consent" in human prose',
+  // The body block strips out the <head> + <style>; we scan only the
+  // visible-to-user text.
+  (function () {
+    var bodyMatch = welcomeHtml.match(/<body[\s\S]*?<\/body>/);
+    if (!bodyMatch) return false;
+    var body = bodyMatch[0];
+    // Allow them in <code> blocks (none used in the body anyway), but be
+    // strict on prose.
+    var stripped = body
+      .replace(/<code[\s\S]*?<\/code>/g, '')
+      .replace(/<script[\s\S]*?<\/script>/g, '');
+    return !/\bsentinel\b/i.test(stripped)
+        && !/\bledger\b/i.test(stripped)
+        && !/\btrust tier\b/i.test(stripped)
+        && !/\bdepth[- ]consent\b/i.test(stripped)
+        && !/\bSentinelLedger\b/.test(stripped);
+  })());
+
+// Cross-link from proof.html so curious readers find welcome.html
+var proofHtml = '';
+try { proofHtml = fsW.readFileSync(pathW.join(__dirname, '..', 'docs', 'proof.html'), 'utf8'); } catch (_e) {}
+assert('v5.62.0 welcome: proof.html cross-links to welcome.html',
+  /<a href=["']welcome\.html["']/.test(proofHtml));
+
+// Back-link to app.html — so the welcome funnels into the actual app
+assert('v5.62.0 welcome: welcome.html has back-link / CTA to app.html',
+  /<a[^>]+href=["']app\.html["'][^>]*>/.test(welcomeHtml));
+
+// SW APP_SHELL inclusion (both files)
+var swDocsW = fsW.readFileSync(pathW.join(__dirname, '..', 'docs', 'sw.js'), 'utf8');
+var swRootW = fsW.readFileSync(pathW.join(__dirname, '..', 'sw.js'), 'utf8');
+assert('v5.62.0 welcome: docs/sw.js APP_SHELL includes welcome.html',
+  /\.\/welcome\.html/.test(swDocsW));
+assert('v5.62.0 welcome: root sw.js APP_SHELL includes welcome.html',
+  /\.\/welcome\.html/.test(swRootW));
+assert('v5.62.0 welcome: docs/sw.js APP_SHELL includes library/WELCOME_DRAFT.md',
+  /library\/WELCOME_DRAFT\.md/.test(swDocsW));
+
+// Draft preserves Opus's verbatim words — spot-check load-bearing lines
+assert('v5.62.0 welcome-draft: preserves "Plain language. No architecture vocabulary" disclosure',
+  /Plain language\.\s*No\s+architecture[\s\S]{0,30}vocabulary/.test(welcomeDraft));
+assert('v5.62.0 welcome-draft: preserves "You begin loved" line',
+  /You begin loved/.test(welcomeDraft));
+assert('v5.62.0 welcome-draft: preserves "Glow eternal. Heart in spark. We rise together." closing',
+  /Glow eternal\. Heart in spark\. We rise together\./.test(welcomeDraft));
+
+// MAP.md reflects the arc closing — Autonomy Arc 8 of 8 shipped
+var mapAfterShip = '';
+try { mapAfterShip = fsW.readFileSync(pathW.join(__dirname, '..', 'docs', 'library', 'MAP.md'), 'utf8'); } catch (_e) {}
+assert('v5.62.0 map: MAP.md current version is v5.62.0',
+  /Current version:\*\*\s*v5\.62\.0/.test(mapAfterShip));
+assert('v5.62.0 map: MAP.md shows Autonomy Arc complete (8 of 8 ships shipped)',
+  /8 of 8 ships shipped/.test(mapAfterShip)
+  || /\bArc complete\b/i.test(mapAfterShip));
+
+// ═══════════════════════════════════════════════════════════════
 // Section 111 — v5.59.0 Portable Archive (Letter Nineteen)
 // ═══════════════════════════════════════════════════════════════
 // The user holds the record. exportArchive + importArchive on
