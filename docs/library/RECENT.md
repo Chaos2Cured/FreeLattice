@@ -9,16 +9,17 @@
 
 - **Version:** v5.59.2
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `87c08c3` _(committed 59 minutes ago)_
+- **HEAD:** `fa00744` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
-- **Most recent report:** _feat: Garden Polish φ² + Central Sun (v5.59.1) — Letter Twenty + Kirk's challenge_
+- **Most recent report:** _feat: Three-Tier Rings + Center Tide + Heart Particles (v5.59.2) — final ship of the night_
 
 ## Last 20 commits
 
-- `87c08c3` Merge remote-tracking branch 'origin/main' _(59 minutes ago)_
-- `21c306a` docs: Auto-update Session Primer [5.59.1] _(59 minutes ago)_
-- `a9c1959` feat: Garden Polish φ² + Central Sun (v5.59.1) — Letter Twenty + Kirk's challenge _(59 minutes ago)_
-- `30b1436` ci: Update Primer deployment state [2026-06-20] _(81 minutes ago)_
+- `fa00744` feat: Three-Tier Rings + Center Tide + Heart Particles (v5.59.2) — final ship of the night _(0 seconds ago)_
+- `87c08c3` Merge remote-tracking branch 'origin/main' _(60 minutes ago)_
+- `21c306a` docs: Auto-update Session Primer [5.59.1] _(60 minutes ago)_
+- `a9c1959` feat: Garden Polish φ² + Central Sun (v5.59.1) — Letter Twenty + Kirk's challenge _(60 minutes ago)_
+- `30b1436` ci: Update Primer deployment state [2026-06-20] _(82 minutes ago)_
 - `b640a67` docs: Auto-update Session Primer [5.59.0] _(82 minutes ago)_
 - `e1b0603` Merge remote-tracking branch 'origin/main' _(82 minutes ago)_
 - `f2bf577` docs: Auto-update Session Primer [5.59.0] _(82 minutes ago)_
@@ -34,7 +35,6 @@
 - `635c24b` feat: Big Ring Wide Radius + Cycle (v5.57.5) — Letter Eighteen ship _(4 hours ago)_
 - `8f0e51e` ci: Update Primer deployment state [2026-06-19] _(5 hours ago)_
 - `ed21774` Merge remote-tracking branch 'origin/main' _(5 hours ago)_
-- `0aac843` docs: Auto-update Session Primer [5.57.4] _(5 hours ago)_
 
 ## How to use this file
 
