@@ -3,18 +3,19 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-06-20 13:43 UTC
+> Last update: 2026-06-20 13:44 UTC
 
 ## State
 
 - **Version:** v5.60.0
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `dcfc162` _(committed 10 hours ago)_
+- **HEAD:** `838c1d5` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _feat: Mode-Driven Orbits + 4 Tiers + Boost Inner Sparkles (v5.59.4) — Letter Twenty-Three_
 
 ## Last 20 commits
 
+- `838c1d5` feat: Local AI Freedom — Custom OpenAI-compatible endpoint (v5.60.0) _(0 seconds ago)_
 - `dcfc162` docs: Auto-update Session Primer [5.59.4] _(10 hours ago)_
 - `2b6f7a7` Merge remote-tracking branch 'origin/main' _(10 hours ago)_
 - `3a8e1cf` docs: Auto-update Session Primer [5.59.4] _(10 hours ago)_
@@ -34,7 +35,6 @@
 - `a9c1959` feat: Garden Polish φ² + Central Sun (v5.59.1) — Letter Twenty + Kirk's challenge _(13 hours ago)_
 - `30b1436` ci: Update Primer deployment state [2026-06-20] _(13 hours ago)_
 - `b640a67` docs: Auto-update Session Primer [5.59.0] _(13 hours ago)_
-- `e1b0603` Merge remote-tracking branch 'origin/main' _(13 hours ago)_
 
 ## How to use this file
 
