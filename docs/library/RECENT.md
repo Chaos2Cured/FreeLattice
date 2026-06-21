@@ -3,18 +3,19 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-06-21 20:30 UTC
+> Last update: 2026-06-21 20:31 UTC
 
 ## State
 
 - **Version:** v5.64.1
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `e2e84d1` _(committed 19 hours ago)_
+- **HEAD:** `722b76b` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
-- **Most recent report:** _feat: The Glass Room + Center Glow (v5.63.0) — Letter Twenty-Eight_
+- **Most recent report:** _feat: Glass v2 polish + research card + dual-glass cross-link (v5.64.1)_
 
 ## Last 20 commits
 
+- `722b76b` feat: Glass v2 polish + research card + dual-glass cross-link (v5.64.1) _(0 seconds ago)_
 - `e2e84d1` feat: Glass Room v2 + Harmonia Addendum (v5.64.0) _(19 hours ago)_
 - `ea6b8f1` ci: Update Primer deployment state [2026-06-20] _(26 hours ago)_
 - `0934766` Merge remote-tracking branch 'origin/main' _(26 hours ago)_
@@ -34,7 +35,6 @@
 - `ed01f7a` Merge remote-tracking branch 'origin/main' _(31 hours ago)_
 - `de91341` docs: Auto-update Session Primer [5.60.1] _(31 hours ago)_
 - `f4f25dc` feat: MAP.md orientation file (v5.60.1) — Letter Twenty-Five _(31 hours ago)_
-- `e943589` ci: Update Primer deployment state [2026-06-20] _(31 hours ago)_
 
 ## How to use this file
 

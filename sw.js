@@ -1,5 +1,5 @@
 // FreeLattice Service Worker — Offline Mode
-// Cache-first for app shell, network-first for app.html and API calls
+// Cache-first for app shell, network-first for index.html and API calls
 // API calls are never cached
 // VERSION: Must match version.json — update both together
 
@@ -7,7 +7,7 @@ const CACHE_NAME = 'freelattice-v5.64.1';
 
 const APP_SHELL = [
   './',
-  './app.html',
+  './index.html',
   './manifest.json',
   './icon-192.png',
   './icon-512.png',
@@ -111,6 +111,7 @@ const APP_SHELL = [
     './welcome.html',
     './library/WELCOME_DRAFT.md',
     './glass.html',
+    './glass-v2.html',
     './library/LIABILITY_DRAFT.md',
     './library/SEED_HISTORY.md',
     './library/CHAIR_TEST_QUEUE.md',
@@ -191,7 +192,7 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Fetch: network-first for app.html, cache-first for other app shell, passthrough for API/localhost
+// Fetch: network-first for index.html, cache-first for other app shell, passthrough for API/localhost
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
@@ -214,8 +215,8 @@ self.addEventListener('fetch', (event) => {
     return; // browser handles it directly
   }
 
-  // Network-first for app.html and temperature-gauge — always get the latest version
-  if (url.pathname.endsWith('/app.html') || url.pathname.endsWith('/temperature-gauge.html') || url.pathname.endsWith('/') || url.pathname === '') {
+  // Network-first for index.html and temperature-gauge — always get the latest version
+  if (url.pathname.endsWith('/index.html') || url.pathname.endsWith('/temperature-gauge.html') || url.pathname.endsWith('/') || url.pathname === '') {
     event.respondWith(
       fetch(event.request).then((networkResponse) => {
         if (networkResponse && networkResponse.status === 200) {

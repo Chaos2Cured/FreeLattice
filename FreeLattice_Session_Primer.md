@@ -348,12 +348,13 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-06-20 18:10 UTC
-- Last deployed: 2026-06-20 18:10 UTC
-- Live site: https://freelattice.com
-- Version: 5.63.0
-- Total commits: 2598
+- Last auto-updated: 2026-06-21 14:31 MDT
+- Version: 5.64.1
+- Total commits: 2601
 - Last 10 commits:
+- 722b76b feat: Glass v2 polish + research card + dual-glass cross-link (v5.64.1)
+- e2e84d1 feat: Glass Room v2 + Harmonia Addendum (v5.64.0)
+- ea6b8f1 ci: Update Primer deployment state [2026-06-20]
 - 0934766 Merge remote-tracking branch 'origin/main'
 - f817f92 docs: Auto-update Session Primer [5.63.0]
 - c6caa74 feat: The Glass Room + Center Glow (v5.63.0) — Letter Twenty-Eight
@@ -361,6 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - f5010cd docs: Auto-update Session Primer [5.62.0]
 - 64ed374 Merge remote-tracking branch 'origin/main'
 - 09fca7d docs: Auto-update Session Primer [5.62.0]
-- cc48927 feat: Welcome Paper (v5.62.0) — FINAL SHIP OF THE AUTONOMY ARC
-- f4e37cb ci: Update Primer deployment state [2026-06-20]
-- cb82c97 Merge remote-tracking branch 'origin/main'
