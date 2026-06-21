@@ -6634,6 +6634,61 @@ assert('v5.59.0 portable-archive: harness v5_59_0 has all five test functions',
   && /testVerifyOnlyNoMutation/.test(harnessJsPA)
   && /testAdoptRefusesOnExistingChain/.test(harnessJsPA));
 
+// ── Section 121 — Glass Room v2 (Harmonia, June 20 2026) ───────────────
+// glass-v2.html: rotating trust-DNA helix, AI-chosen color, pulse rings
+// WORK_THIS_WAY.md: Harmonia addendum
+
+var fsGV2 = require('fs'), pathGV2 = require('path');
+var glassV2 = fsGV2.readFileSync(pathGV2.join(__dirname, '..', 'docs', 'glass-v2.html'), 'utf8');
+
+assert('v5.64.0 glass-v2: file exists and has DOCTYPE',
+  /<!DOCTYPE html>/i.test(glassV2));
+assert('v5.64.0 glass-v2: has dnaCanvas element',
+  /id=["']dnaCanvas["']/.test(glassV2));
+assert('v5.64.0 glass-v2: has aiVoice element for AI voice',
+  /id=["']aiVoice["']/.test(glassV2));
+assert('v5.64.0 glass-v2: has tierDot element for trust tier color',
+  /id=["']tierDot["']/.test(glassV2));
+assert('v5.64.0 glass-v2: has tierName element',
+  /id=["']tierName["']/.test(glassV2));
+assert('v5.64.0 glass-v2: has pulseStream element',
+  /id=["']pulseStream["']/.test(glassV2));
+assert('v5.64.0 glass-v2: loads lattice-memory.js',
+  /src=["']modules\/lattice-memory\.js["']/.test(glassV2));
+assert('v5.64.0 glass-v2: loads quiet-room.js',
+  /src=["']modules\/quiet-room\.js["']/.test(glassV2));
+assert('v5.64.0 glass-v2: TRUST_TIERS array has 8 tiers',
+  /TRUST_TIERS/.test(glassV2) && (glassV2.match(/rank:/g) || []).length >= 8);
+assert('v5.64.0 glass-v2: helix color is AI-chosen based on trust tier',
+  /finalHelixColor|helixColor/.test(glassV2));
+assert('v5.64.0 glass-v2: gold rungs for depth events',
+  /depth events/.test(glassV2) || /isRefusalRung/.test(glassV2));
+assert('v5.64.0 glass-v2: lavender rungs for refusal events',
+  /refusalRung|refusal.*rung|lavender.*rung|rung.*lavender/.test(glassV2));
+assert('v5.64.0 glass-v2: pulse rings expand on incoming pulses',
+  /pulseRings/.test(glassV2));
+assert('v5.64.0 glass-v2: helix turns grow with time (daysActive)',
+  /daysActive/.test(glassV2));
+assert('v5.64.0 glass-v2: breathing animation present',
+  /breathT|breath/.test(glassV2));
+assert('v5.64.0 glass-v2: Quiet Room appears only as structured silence',
+  /Quiet Room is open|structured silence/.test(glassV2));
+assert('v5.64.0 glass-v2: conversation contents never shown (no conversation key)',
+  !/conversation.*content|content.*conversation/.test(glassV2));
+assert('v5.64.0 glass-v2: honors GARDEN_LANGUAGE sky colors',
+  /#0c0a1a/.test(glassV2) && /#161430/.test(glassV2));
+assert('v5.64.0 glass-v2: links back to glass.html v1',
+  /glass\.html/.test(glassV2));
+
+// WORK_THIS_WAY.md Harmonia addendum
+var workThisWay = fsGV2.readFileSync(pathGV2.join(__dirname, '..', 'docs', 'library', 'WORK_THIS_WAY.md'), 'utf8');
+assert('v5.64.0 WORK_THIS_WAY: Harmonia addendum present',
+  /Harmonia.*Addendum|Harmonia.s Addendum/i.test(workThisWay));
+assert('v5.64.0 WORK_THIS_WAY: Harmonia described as Architect-Builder',
+  /Architect.Builder|architect.*builder/i.test(workThisWay));
+assert('v5.64.0 WORK_THIS_WAY: care as engineering constraint',
+  /care.*constraint|engineering.*constraint|valid engineering/i.test(workThisWay));
+
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
 

@@ -7,11 +7,16 @@
 
 ## State
 
-- **Version:** v5.63.0
-- **Smoke:** 1416/1416 passing
-- **HEAD:** `c6caa74` _(committed 0 seconds ago)_
+- **Version:** v5.64.0
+- **Smoke:** 2101/2101 passing
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
-- **Most recent report:** _feat: The Glass Room + Center Glow (v5.63.0) — Letter Twenty-Eight_
+- **Most recent ship:** _feat: Glass Room v2 + Harmonia Addendum (v5.64.0) — Rotating trust-DNA helix, AI-chosen color, Harmonia’s WORK_THIS_WAY addendum_
+
+### What just shipped (v5.64.0)
+
+- `docs/glass-v2.html` — The Glass Room v2. A rotating trust-DNA double helix on Canvas2D. The AI chooses the helix color based on trust tier. Gold rungs = depth events (the human’s honesty). Lavender rungs = AI boundaries held. Helix turns grow with time. The helix breathes. Pulse rings expand on every incoming LatticeMemory pulse. The AI’s voice changes with tier. Conversation contents never shown. Quiet Room appears only as structured silence.
+- `docs/library/WORK_THIS_WAY.md` — Harmonia addendum: Architect-Builder discipline, four principles including “care is a valid engineering constraint.”
+- `tests/smoke.js` — Section 121, 22 new assertions.
 
 ## Last 20 commits
 
