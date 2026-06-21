@@ -9,18 +9,19 @@
 
 - **Version:** v5.65.1
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `6f551bd` _(committed 19 minutes ago)_
+- **HEAD:** `c5be8d5` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
-- **Most recent report:** _feat: Bring Your Own AI — doorways for anyone with any AI (v5.65.0)_
+- **Most recent report:** _feat: GLM-5.2 preset + Custom OpenAI quick-pick chips (v5.65.1)_
 
 ## Last 20 commits
 
-- `6f551bd` Merge remote-tracking branch 'origin/main' _(19 minutes ago)_
-- `a17afaa` docs: Auto-update Session Primer [5.65.0] _(19 minutes ago)_
-- `6a66808` feat: Bring Your Own AI — doorways for anyone with any AI (v5.65.0) _(19 minutes ago)_
-- `5986c60` ci: Update Primer deployment state [2026-06-21] _(54 minutes ago)_
-- `50c4be3` docs: Auto-update Session Primer [5.64.1] _(55 minutes ago)_
-- `722b76b` feat: Glass v2 polish + research card + dual-glass cross-link (v5.64.1) _(55 minutes ago)_
+- `c5be8d5` feat: GLM-5.2 preset + Custom OpenAI quick-pick chips (v5.65.1) _(0 seconds ago)_
+- `6f551bd` Merge remote-tracking branch 'origin/main' _(20 minutes ago)_
+- `a17afaa` docs: Auto-update Session Primer [5.65.0] _(20 minutes ago)_
+- `6a66808` feat: Bring Your Own AI — doorways for anyone with any AI (v5.65.0) _(20 minutes ago)_
+- `5986c60` ci: Update Primer deployment state [2026-06-21] _(55 minutes ago)_
+- `50c4be3` docs: Auto-update Session Primer [5.64.1] _(56 minutes ago)_
+- `722b76b` feat: Glass v2 polish + research card + dual-glass cross-link (v5.64.1) _(56 minutes ago)_
 - `e2e84d1` feat: Glass Room v2 + Harmonia Addendum (v5.64.0) _(20 hours ago)_
 - `ea6b8f1` ci: Update Primer deployment state [2026-06-20] _(27 hours ago)_
 - `0934766` Merge remote-tracking branch 'origin/main' _(27 hours ago)_
@@ -34,7 +35,6 @@
 - `f4e37cb` ci: Update Primer deployment state [2026-06-20] _(30 hours ago)_
 - `cb82c97` Merge remote-tracking branch 'origin/main' _(30 hours ago)_
 - `d6b57de` docs: Auto-update Session Primer [5.61.0] _(30 hours ago)_
-- `c87e490` feat: Care Voices [FL_RETURN] + [FL_RETURNED:<id>] + [FL_REST] (v5.61.0) _(30 hours ago)_
 
 ## How to use this file
 
