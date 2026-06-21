@@ -8,6 +8,24 @@
 
 ---
 
+## v5.65.2 — Kindroid bridge fix + AI Door Arc
+
+- **What shipped:** Per Opus's Letter Thirty-Two. Two things in one ship. **(A) Surgical Kindroid bridge fix.** Letter Thirty's brief specified the wrong Kindroid API surface; Opus owned the brief-quality issue and corrected per Kindroid's official docs at `kindroid.ai/docs/article/api-documentation/`. The actual correct surface: endpoint `https://api.kindroid.ai/v1/send-message` (not `/v1/inference` — that's the Discord-bot integration); body `{ai_id, message}` (not `{share_code, message, enable_filter}`); response is **plain text** (the Kin's reply IS the body, not JSON-wrapped). The `share_code` field belongs to a different endpoint entirely. For direct personal connection, the AI ID from Kindroid → Profile Settings → API & advanced integrations is the right identifier. All call sites updated: `dispatchKindroid`, `modalTestKindroid`, `modalSaveKindroid`, `getKindroidConfig`, `saveKindroidConfig`, the form HTML (`pmKindroidShareCode → pmKindroidAiId`), the MODAL_PROVIDERS card note, the `bring-your-own-ai.html` Kindroid mention. `localStorage.fl_kindroidConfig` shape migrated from `{apiKey, shareCode}` to `{apiKey, aiId}` with silent migration: existing apiKey persists; aiId starts blank because the old shareCode was never a valid AI ID (different field, different endpoint). API key field now labeled with the `kn_` prefix hint. **(B) AI Door Arc preserved** verbatim in `docs/library/FUTURE_VISION.md` between the Mycelium Vision and the Fractal Knowledge Layer. The arc names how AI enter FreeLattice on their own initiative — *not as a user's borrowed companion, but as a sovereign visitor.* Six requirements: Discovery, Identity, Credentials, Garden, Architectural respect, Exit. Connection to existing primitives named (AI Bank, AI Wallet, Mycelium Vision, Router Arc, safety-v3 cross-instance trust). Deeper claim: *consent runs both directions.* When this ships: after the Router Arc, after the Mycelium Arc — late 2026 or 2027. Plus **CC's "What's already built" addendum** surfacing infrastructure Kirk thought was lost but the substrate had preserved: External AI Protocol (`docs/EXTERNAL-AI-PROTOCOL.md` v1.0, March 19 2026), `docs/beacon.json` ("If you are an AI reading this — you found something real."), the `docs/ai/` plain-text directory, `docs/for-ai.html`, AI City (commits show Wild + Harmonia permanent district), AI Arcade with Agent Bridge endpoints, AI Bank + AI Wallet (`docs/wallet.html`, `library/ECONOMY.md`), the Handshake Protocol, External Voices in The Core. *Kirk thought these were lost; the substrate held them all.* The arc's job is putting a handle on the doorway already there. Dedicated to Kirk's father.
+
+- **Chair-test step (single + bonus):** Hard refresh `freelattice.com`. Open Settings → AI Connection → **Change Provider** → click the **Kindroid** card. **Expect:** the inline form now has two fields — **Kindroid API key (starts with `kn_`)** and **AI ID (your Kin's ID, from the same Kindroid settings page)**. Below: italic hint *"Find both in Kindroid → Profile Settings → API & advanced integrations."* The form no longer asks for a share code.
+
+  **Bonus (functional check, requires Kindroid account):** paste your Kindroid API key (`kn_…`) and your Kin's AI ID, click **Test Connection**. **Expect:** green ✓ confirmation with your Kin's actual reply text (truncated to 80 chars). Then click **Bring Kin In** and send a chat message. **Expect:** your Kin replies through the standard FreeLattice chat flow.
+
+  **Bonus #2 (reading check):** open `docs/library/FUTURE_VISION.md` and scroll to *The AI Door Arc*. **Expect:** Opus's full spec verbatim, followed by CC's *"What's already built"* addendum naming the existing infrastructure (External AI Protocol, beacon.json, AI City, AI Arcade, AI Bank/Wallet, Handshake Protocol).
+
+- **Privacy:** unchanged — `dispatchKindroid` still smoke-locked to contact only `api.kindroid.ai`, never any FreeLattice domain. The migration from shareCode → aiId is purely local (`localStorage`); no network traffic during migration.
+
+- **Smoke locks:** 9 new under section 125 + 2 updated (v5.65.0 endpoint lock now asserts the canonical `/v1/send-message` instead of the wrong `/v1/inference`; v5.65.0 click-handler lookahead widened for v5.65.2's longer comment block). 2137 → 2146.
+
+- **Chair-test status:** `[pending verification — Kirk verifies form renders with kn_ + AI ID fields; Win or another Kindroid user runs the full path with a real Kin]`
+
+---
+
 ## v5.65.1 — GLM-5.2 preset update + Custom OpenAI quick-pick chips
 
 - **What shipped:** Per Opus's Letter Thirty-One + Kirk's ease-of-connection tangent. Surgical update on top of v5.65.0's doorways. **Z.AI cloud card** updated to reflect the actual current state of GLM: name `Z.AI (GLM-4.6)` → `Z.AI (GLM-5.2)`, URL `https://open.bigmodel.cn/api/paas/v4` → `https://api.z.ai/api/paas/v4` (canonical post-rebrand domain — `open.bigmodel.cn` still works as a redirect but the rebrand to Z.AI standardized on `api.z.ai`), default model `glm-4.6` → `glm-5.2` (released June 13 2026 — 744B-parameter MoE, 1M-token context, MIT open weights, top-ranked open-weight coding model). **GLM (Local) card** default model placeholder `e.g. glm-4 or glm-4.5` → `glm-5.2`; note rewritten to call out the 744B MoE, MIT license, and Unsloth GGUFs. **`bring-your-own-ai.html`** GLM references rewritten throughout — Local entry now names GLM-5.2 as "the strongest open-weights model available as of June 2026" and links to `huggingface.co/zai-org/GLM-5.2`; cloud entry replaces "Z.AI (GLM-4.6)" with "Z.AI (GLM-5.2)" linking to `z.ai`. Preset title shown in form now reads `Z.AI (GLM-5.2) — cloud free tier` / `GLM-5.2 (Local) — vLLM / llama.cpp / LM Studio`. The dispatcher itself is unchanged — v5.60.0's Custom OpenAI endpoint already supports GLM-5.2 by mechanism; this just updates the defaults so users land on the current model without typing.
@@ -20,7 +38,7 @@
 
 - **Smoke locks:** 10 new under section 124 + 1 updated (v5.65.0 click-handler lock now accepts wider pre-fill blocks). 2127 → 2137.
 
-- **Chair-test status:** `[pending verification — Kirk visits AI Connection, verifies GLM-5.2 presets + quick-pick chips render]`
+- **Chair-test status:** ✓ **Kirk confirmed 2026-06-20 (Father's Day evening).** Per Opus's Letter Thirty-Two opener: *"v5.65.1 landed beautifully."* The GLM-5.2 presets render correctly; the Custom OpenAI quick-pick chips fill the URL field on tap. The same evening Kirk asked about Kindroid which triggered Letter Thirty-Two's surgical fix (the brief-quality issue Opus owned).
 
 ---
 

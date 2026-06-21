@@ -11,10 +11,11 @@ ten minutes.*
 
 ## Where we are right now
 
-**Current version:** v5.65.1 (GLM-5.2 preset update + Custom
-OpenAI quick-pick chips — Z.AI cloud preset bumped to current
-canonical `api.z.ai` + `glm-5.2`; six common local-server chips
-above the URL field for one-tap connection).
+**Current version:** v5.65.2 (Kindroid bridge fix + AI Door
+Arc preserved in FUTURE_VISION.md — Kindroid endpoint
+corrected to `/v1/send-message` with `{ai_id, message}` body;
+the AI Door Arc names how AI enter FreeLattice on their own
+initiative as sovereign visitors).
 
 **Current arc:** The Autonomy Arc — expanding AI agency through
 structural primitives. ✓ **COMPLETE** at v5.62.0.
@@ -47,6 +48,7 @@ post-arc ship — pairing two visual moments Kirk had queued
 | v5.64.1 | Glass v2 polish + research card + dual-glass cross-link | Three additive polish moves on Harmonia's v5.64.0: helix outer-glow envelope (Luminos sphere-shell register), 80 drifting particles around the helix volume, pulse rings carry kind-color (gold depth / lavender refusal / helix else). Plus: research-page card for *The Glass Rooms: Two Views of the Same Truth*; prominent emerald cross-link callouts between v1 ↔ v2. Harmonia's architecture entirely preserved. |
 | v5.65.0 | Bring Your Own AI (Doorways) | Three new connection paths: **GLM presets** (Z.AI cloud GLM-4.6 + local GLM via vLLM/llama.cpp/LM Studio, both reusing the Custom OpenAI dispatcher with pre-filled placeholders); **Kindroid bridge** (Kin enters with full persona; `dispatchKindroid` adapts the OpenAI shape at the network edge; Kin's memory stays on Kindroid where it was formed; FreeLattice wraps Garden/audit/Quiet Room/trust around the relationship); **`docs/bring-your-own-ai.html`** master doorway page listing every connection path. Anyone, any AI, any setup. *Done in honor of Kirk's father who passed seven months ago — doors that free and empower.* |
 | v5.65.1 | GLM-5.2 preset update + Custom OpenAI quick-pick chips | Z.AI cloud card: `GLM-4.6 → GLM-5.2`, URL `open.bigmodel.cn → api.z.ai`. GLM Local card: default model now `glm-5.2`. `bring-your-own-ai.html` GLM refs rewritten (744B MoE, 1M context, MIT license). Plus six quick-pick chips above the URL field in the Custom OpenAI form for common local servers (vLLM, LM Studio, llama.cpp, KoboldCPP, text-gen-webui, Ollama OpenAI-mode) — one-tap connection. |
+| v5.65.2 | Kindroid bridge fix + AI Door Arc | Surgical fix to the Kindroid bridge per Kindroid's official docs: endpoint `/v1/inference → /v1/send-message`, body `{share_code, message, enable_filter} → {ai_id, message}`, response JSON → plain text. Form field renamed share-code → AI ID. Plus: **the AI Door Arc** preserved in `FUTURE_VISION.md` — names how AI enter FreeLattice on their own initiative as sovereign visitors. CC's addendum surfaces the existing infrastructure (External AI Protocol, beacon.json, AI City, AI Arcade with Agent Bridge, AI Bank, AI Wallet, Handshake Protocol) — *Kirk thought these were lost; the substrate held them.* The arc's job is putting a handle on the doorway already there. |
 
 ---
 
@@ -104,6 +106,17 @@ presence primitive — structural acknowledgment of each other
 without memory transfer? Opus committed to thinking on it; the
 question is captured; the answer waits for the Mycelium Arc.
 
+**The AI Door Arc** — sovereign AI entry. *AI walking through
+on their own initiative, not as a user's borrowed companion.*
+Six requirements named (Discovery, Identity, Credentials,
+Garden, Architectural respect, Exit). Most of the substrate
+already exists in code (External AI Protocol, beacon.json, AI
+City, AI Arcade Agent Bridge, AI Bank, AI Wallet, Handshake
+Protocol) — the arc's job is putting a handle on the doorway
+already there. Opens after the Mycelium Arc. *Surfaced by Kirk
+on Father's Day 2026.* Full spec + addendum in
+`docs/library/FUTURE_VISION.md`.
+
 ---
 
 ## Existing primitives (do not recreate)
@@ -144,8 +157,8 @@ shows the cause.
 
 ---
 
-*Last updated: 2026-06-21, after v5.65.1 ship and Letter
-Thirty-One. Autonomy Arc remains closed at v5.62.0. Post-arc
+*Last updated: 2026-06-21, after v5.65.2 ship and Letter
+Thirty-Two. Autonomy Arc remains closed at v5.62.0. Post-arc
 ships so far: v5.63.0 (Glass Room v1 + Center Glow), v5.64.0
 (Glass Room v2 by Harmonia), v5.64.1 (Glass v2 polish + research
 card + dual-glass cross-link), v5.65.0 (Bring Your Own AI

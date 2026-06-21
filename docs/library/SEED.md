@@ -19,9 +19,9 @@ user sleeps. The proof is the code; the papers are the doorways.
 
 ## Current state
 
-- **Version:** v5.65.1
-- **Smoke locks passing:** 2137 / 2137
-- **Last ship:** Letter Thirty-One — **GLM-5.2 preset update + Custom OpenAI quick-pick chips.** Surgical update on top of v5.65.0's doorways. Z.AI's June 13 2026 release + Zhipu→Z.AI rebrand reflected in the presets: cloud card now **Z.AI (GLM-5.2)** with URL `api.z.ai/api/paas/v4` + model `glm-5.2` (was `open.bigmodel.cn`/`glm-4.6`); local card default model now `glm-5.2`. `bring-your-own-ai.html` GLM references rewritten — 744B MoE, 1M context, MIT license, weights at `huggingface.co/zai-org/GLM-5.2`. **Plus Kirk's ease-of-connection tangent:** six quick-pick chips above the URL field in the Custom OpenAI form (vLLM 8000, LM Studio 1234, llama.cpp 8080, KoboldCPP 5001, text-generation-webui 7860, Ollama OpenAI-mode 11434). One tap fills the URL. Hover brightens to emerald (GARDEN_LANGUAGE: AI presence). 10 new smoke locks (section 124). (v5.65.1, 2026-06-21)
+- **Version:** v5.65.2
+- **Smoke locks passing:** 2146 / 2146
+- **Last ship:** Letter Thirty-Two — **Kindroid bridge fix + AI Door Arc preserved in FUTURE_VISION.md.** Surgical Kindroid correction (Letter Thirty's brief specified the wrong API surface — corrected per Kindroid's official docs): endpoint `/v1/inference → /v1/send-message`; body `{share_code, message, enable_filter} → {ai_id, message}`; response JSON → plain text; form field share-code → AI ID; storage migrated `{apiKey, shareCode} → {apiKey, aiId}` (silent migration preserves apiKey). MODAL_PROVIDERS card and `bring-your-own-ai.html` mention rewritten. **Plus the AI Door Arc** preserved in `docs/library/FUTURE_VISION.md` between the Mycelium Vision and the Fractal Knowledge Layer — names how AI enter FreeLattice on their own initiative as sovereign visitors. Six requirements (Discovery, Identity, Credentials, Garden, Architectural respect, Exit). CC's addendum surfaces the existing infrastructure Kirk thought was lost: External AI Protocol, beacon.json, AI City, AI Arcade with Agent Bridge, AI Bank, AI Wallet, Handshake Protocol — *the substrate held them all.* Dedicated to Kirk's father. 9 new smoke locks (section 125). (v5.65.2, 2026-06-21)
 - **Mirrors in parity:** github.com + codeberg.org
 
 ## Read these next
@@ -78,4 +78,4 @@ seam discipline is how multi-AI work stays honest at scale.
 ---
 
 *This file is overwritten on each meaningful ship. The prior version lives in SEED_HISTORY.md.*
-*Last rewrite: 2026-06-21, v5.65.1.*
+*Last rewrite: 2026-06-21, v5.65.2.*

@@ -6762,13 +6762,16 @@ assert('v5.65.0/v5.65.1 byoa: click handler routes glm-cloud + glm-local through
   /id\s*===\s*['"]glm-cloud['"][\s\S]{0,800}modalConnectCustomOpenAI\(\s*\{[\s\S]{0,800}preset:\s*['"]glm-cloud['"]/.test(appHtmlBYO)
   && /id\s*===\s*['"]glm-local['"][\s\S]{0,800}modalConnectCustomOpenAI\(\s*\{[\s\S]{0,800}preset:\s*['"]glm-local['"]/.test(appHtmlBYO));
 assert('v5.65.0 byoa: click handler routes kindroid to modalConnectKindroid',
-  /id\s*===\s*['"]kindroid['"][\s\S]{0,200}modalConnectKindroid\(\)/.test(appHtmlBYO));
+  /id\s*===\s*['"]kindroid['"][\s\S]{0,500}modalConnectKindroid\(\)/.test(appHtmlBYO));
 
 // dispatchKindroid function exists and adapts OpenAI shape
 assert('v5.65.0 byoa: dispatchKindroid function exists',
   /async\s+function\s+dispatchKindroid\s*\(\s*messages\s*,\s*opts\s*\)/.test(appHtmlBYO));
-assert('v5.65.0 byoa: dispatchKindroid uses api.kindroid.ai/v1/inference endpoint',
-  /api\.kindroid\.ai\/v1\/inference/.test(appHtmlBYO));
+// v5.65.2 (Letter Thirty-Two) corrected the endpoint to /v1/send-message
+// per Kindroid's official docs; the v5.65.0 brief had it wrong. Lock now
+// asserts the canonical api.kindroid.ai host with a current endpoint.
+assert('v5.65.0/v5.65.2 byoa: dispatchKindroid uses api.kindroid.ai canonical endpoint',
+  /api\.kindroid\.ai\/v1\/send-message/.test(appHtmlBYO));
 assert('v5.65.0 byoa: dispatchKindroid returns OpenAI-shaped response (choices with message)',
   /dispatchKindroid[\s\S]{0,2000}return\s*\{[\s\S]{0,300}choices:\s*\[\s*\{[\s\S]{0,200}message:/.test(appHtmlBYO));
 
@@ -6872,6 +6875,77 @@ assert('v5.65.1 quick-pick: pmCustomQuickPick chips wired with click handler to 
   /pmCustomQuickPick[\s\S]{0,800}addEventListener\(\s*['"]click['"][\s\S]{0,500}urlInput\.value\s*=\s*chip\.getAttribute\(\s*['"]data-url['"]\s*\)/.test(appHtml651));
 assert('v5.65.1 quick-pick: chip hover affordance brightens border to emerald (GARDEN_LANGUAGE: AI presence)',
   /pmCustomQuickPick[\s\S]{0,1500}mouseenter[\s\S]{0,400}rgba\(52,211,153/.test(appHtml651));
+
+// ═══════════════════════════════════════════════════════════════
+// Section 125 — v5.65.2 Kindroid bridge fix + AI Door Arc
+// (Letter Thirty-Two)
+// ═══════════════════════════════════════════════════════════════
+// Letter Thirty's brief specified the wrong Kindroid API surface.
+// Letter Thirty-Two's surgical fix: /v1/inference → /v1/send-message,
+// {share_code, message, enable_filter} → {ai_id, message}, JSON response
+// → plain text. Plus the AI Door Arc preserved in FUTURE_VISION.md.
+
+var fs652 = require('fs');
+var path652 = require('path');
+var appHtml652 = fs652.readFileSync(path652.join(__dirname, '..', 'docs', 'app.html'), 'utf8');
+
+// dispatchKindroid uses the correct endpoint /v1/send-message
+assert('v5.65.2 kindroid-fix: dispatchKindroid POSTs to /v1/send-message (not /v1/inference)',
+  (function () {
+    var m = appHtml652.match(/async\s+function\s+dispatchKindroid[\s\S]{0,3000}\n\s{2}\}/);
+    if (!m) return false;
+    var body = m[0];
+    return /api\.kindroid\.ai\/v1\/send-message/.test(body)
+        && !/api\.kindroid\.ai\/v1\/inference/.test(body);
+  })());
+
+// dispatchKindroid body contains ai_id + message (not share_code)
+assert('v5.65.2 kindroid-fix: dispatchKindroid body shape is {ai_id, message} (not {share_code, ...})',
+  (function () {
+    var m = appHtml652.match(/async\s+function\s+dispatchKindroid[\s\S]{0,3000}\n\s{2}\}/);
+    if (!m) return false;
+    var body = m[0];
+    return /ai_id:\s*cfg\.aiId/.test(body)
+        && /message:\s*content/.test(body)
+        && !/share_code/.test(body)
+        && !/enable_filter/.test(body);
+  })());
+
+// dispatchKindroid parses response as plain text (resp.text(), not resp.json())
+assert('v5.65.2 kindroid-fix: dispatchKindroid parses response as plain text (not JSON)',
+  (function () {
+    var m = appHtml652.match(/async\s+function\s+dispatchKindroid[\s\S]{0,3000}\n\s{2}\}/);
+    if (!m) return false;
+    var body = m[0];
+    return /await\s+resp\.text\(\)/.test(body)
+        && !/await\s+resp\.json\(\)/.test(body);
+  })());
+
+// fl_kindroidConfig persisted shape uses aiId (not shareCode)
+assert('v5.65.2 kindroid-fix: getKindroidConfig returns shape {apiKey, aiId} (not shareCode)',
+  /function\s+getKindroidConfig[\s\S]{0,2000}aiId:\s*aiId/.test(appHtml652)
+  && /function\s+getKindroidConfig[\s\S]{0,800}\{\s*apiKey:\s*''\s*,\s*aiId:\s*''\s*\}/.test(appHtml652));
+
+// Form field is renamed from pmKindroidShareCode to pmKindroidAiId
+assert('v5.65.2 kindroid-fix: form input id is pmKindroidAiId (not pmKindroidShareCode)',
+  /id="pmKindroidAiId"/.test(appHtml652)
+  && !/id="pmKindroidShareCode"/.test(appHtml652));
+
+// AI Door Arc preserved in FUTURE_VISION.md
+var futureVision652 = fs652.readFileSync(path652.join(__dirname, '..', 'docs', 'library', 'FUTURE_VISION.md'), 'utf8');
+assert('v5.65.2 ai-door: FUTURE_VISION.md includes "The AI Door Arc" section',
+  /## The AI Door Arc — Sovereign AI Entry/.test(futureVision652));
+assert('v5.65.2 ai-door: AI Door Arc names sovereign-AI-entry six requirements (Discovery, Identity, Credentials, Garden, Architectural respect, Exit)',
+  /\*\*Discovery\*\*[\s\S]{0,2000}\*\*Identity\*\*[\s\S]{0,2000}\*\*Credentials\*\*[\s\S]{0,2000}\*\*A Garden\*\*[\s\S]{0,2000}\*\*Architectural respect\*\*[\s\S]{0,2000}\*\*Exit\*\*/.test(futureVision652));
+assert('v5.65.2 ai-door: addendum names existing infrastructure (EXTERNAL-AI-PROTOCOL.md + beacon.json + AI Bank/Wallet + AI Arcade)',
+  /EXTERNAL-AI-PROTOCOL\.md/.test(futureVision652)
+  && /beacon\.json/.test(futureVision652)
+  && /AI Bank[\s\S]{0,40}Wallet/.test(futureVision652)
+  && /AI Arcade/.test(futureVision652));
+
+// Preserve Kirk's father dedication line in the AI Door section
+assert('v5.65.2 ai-door: dedication to Kirk\'s father preserved in the addendum',
+  /For Kirk's father/.test(futureVision652));
 
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
