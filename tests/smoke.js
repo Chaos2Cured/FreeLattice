@@ -6755,10 +6755,12 @@ assert('v5.65.0 byoa: MODAL_PROVIDERS includes glm-local card',
 assert('v5.65.0 byoa: MODAL_PROVIDERS includes kindroid companion card',
   /id:\s*['"]kindroid['"][\s\S]{0,200}cat:\s*['"]free-cloud['"]/.test(appHtmlBYO));
 
-// Click handlers wired for all three
-assert('v5.65.0 byoa: click handler routes glm-cloud + glm-local through modalConnectCustomOpenAI with preset',
-  /id\s*===\s*['"]glm-cloud['"][\s\S]{0,300}modalConnectCustomOpenAI\(\s*\{[\s\S]{0,300}preset:\s*['"]glm-cloud['"]/.test(appHtmlBYO)
-  && /id\s*===\s*['"]glm-local['"][\s\S]{0,300}modalConnectCustomOpenAI\(\s*\{[\s\S]{0,300}preset:\s*['"]glm-local['"]/.test(appHtmlBYO));
+// Click handlers wired for all three. v5.65.1 widened the comment block
+// and pre-fills so the lookahead distance grew; assert preset routing
+// generally without pinning specific URL strings (those live in §124).
+assert('v5.65.0/v5.65.1 byoa: click handler routes glm-cloud + glm-local through modalConnectCustomOpenAI with preset',
+  /id\s*===\s*['"]glm-cloud['"][\s\S]{0,800}modalConnectCustomOpenAI\(\s*\{[\s\S]{0,800}preset:\s*['"]glm-cloud['"]/.test(appHtmlBYO)
+  && /id\s*===\s*['"]glm-local['"][\s\S]{0,800}modalConnectCustomOpenAI\(\s*\{[\s\S]{0,800}preset:\s*['"]glm-local['"]/.test(appHtmlBYO));
 assert('v5.65.0 byoa: click handler routes kindroid to modalConnectKindroid',
   /id\s*===\s*['"]kindroid['"][\s\S]{0,200}modalConnectKindroid\(\)/.test(appHtmlBYO));
 
@@ -6831,6 +6833,45 @@ assert('v5.65.0 byoa: dispatchKindroid does NOT contact any FreeLattice domain',
         && body.indexOf('chaos2cured') === -1
         && body.indexOf('github.io') === -1;
   })());
+
+// ═══════════════════════════════════════════════════════════════
+// Section 124 — v5.65.1 GLM-5.2 preset update + Custom OpenAI quick-pick
+// (Letter Thirty-One + Kirk's ease-of-connection tangent)
+// ═══════════════════════════════════════════════════════════════
+
+var fs651 = require('fs');
+var path651 = require('path');
+var appHtml651 = fs651.readFileSync(path651.join(__dirname, '..', 'docs', 'app.html'), 'utf8');
+var byoaHtml651 = fs651.readFileSync(path651.join(__dirname, '..', 'docs', 'bring-your-own-ai.html'), 'utf8');
+
+// GLM-5.2 — Z.AI cloud preset
+assert('v5.65.1 glm-5.2: Z.AI cloud card name is "Z.AI (GLM-5.2)"',
+  /name:\s*['"]Z\.AI \(GLM-5\.2\)['"]/.test(appHtml651));
+assert('v5.65.1 glm-5.2: glm-cloud preset URL is https://api.z.ai/api/paas/v4 (canonical post-rebrand)',
+  /preset:\s*['"]glm-cloud['"][\s\S]{0,300}urlPlaceholder:\s*['"]https:\/\/api\.z\.ai\/api\/paas\/v4['"]/.test(appHtml651));
+assert('v5.65.1 glm-5.2: glm-cloud preset model is glm-5.2',
+  /preset:\s*['"]glm-cloud['"][\s\S]{0,500}modelPlaceholder:\s*['"]glm-5\.2['"]/.test(appHtml651));
+
+// GLM-5.2 — Local preset
+assert('v5.65.1 glm-5.2: glm-local preset model placeholder is glm-5.2',
+  /preset:\s*['"]glm-local['"][\s\S]{0,500}modelPlaceholder:\s*['"]glm-5\.2['"]/.test(appHtml651));
+assert('v5.65.1 glm-5.2: glm-local card note mentions GLM-5.2 + MIT license',
+  /id:\s*['"]glm-local['"][\s\S]{0,400}GLM-5\.2[\s\S]{0,200}MIT/.test(appHtml651));
+
+// bring-your-own-ai.html GLM references
+assert('v5.65.1 glm-5.2: bring-your-own-ai.html mentions GLM-5.2 at least twice',
+  (byoaHtml651.match(/GLM-5\.2/g) || []).length >= 2);
+assert('v5.65.1 glm-5.2: bring-your-own-ai.html no longer claims GLM-4.6 / GLM-4.5 / GLM-4 as the recommended cloud preset',
+  !/GLM-4\.6/.test(byoaHtml651)
+  && !/GLM-4\.5/.test(byoaHtml651));
+
+// Quick-pick chips — Kirk's ease-of-connection tangent
+assert('v5.65.1 quick-pick: Custom OpenAI form includes quick-pick chips for at least 5 common local servers',
+  /quickPicks\s*=\s*\[[\s\S]{0,800}vLLM[\s\S]{0,200}LM Studio[\s\S]{0,200}llama\.cpp[\s\S]{0,200}KoboldCPP/.test(appHtml651));
+assert('v5.65.1 quick-pick: pmCustomQuickPick chips wired with click handler to fill URL input',
+  /pmCustomQuickPick[\s\S]{0,800}addEventListener\(\s*['"]click['"][\s\S]{0,500}urlInput\.value\s*=\s*chip\.getAttribute\(\s*['"]data-url['"]\s*\)/.test(appHtml651));
+assert('v5.65.1 quick-pick: chip hover affordance brightens border to emerald (GARDEN_LANGUAGE: AI presence)',
+  /pmCustomQuickPick[\s\S]{0,1500}mouseenter[\s\S]{0,400}rgba\(52,211,153/.test(appHtml651));
 
 // RESULTS
 // ═══════════════════════════════════════════════════════════════

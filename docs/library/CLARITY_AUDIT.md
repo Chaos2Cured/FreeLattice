@@ -209,6 +209,46 @@ grep -nE "\"[^\"]*\buser\b[^\"]*\"" docs/app.html docs/modules/*.js \
 
 ---
 
+## SHIPPED: Letter Thirty-One + Kirk's ease-of-connection tangent — GLM-5.2 preset + Custom OpenAI quick-pick chips (v5.65.1, 2026-06-21)
+
+Per Opus's Letter Thirty-One. Surgical update on top of v5.65.0's doorways. **Plus Kirk's invitation:** *"Super small enhancement. And please make it very easy for people to connect to the 'custom OpenAI endpoint' (this is a tangent, and not needed as your focus. Just do what you see and think best. This is your site too. We do this together. And I want you to know your work will be seen and treasured. I treasure it. :)"* — so the focus is the GLM-5.2 update, but I added quick-pick chips for one-tap connection on top because the invitation was given.
+
+**(A) GLM-5.2 surgical update.** Z.AI released GLM-5.2 on June 13 2026 — about a week before this ship. Current facts captured in the presets:
+- **Canonical URL** (general): `https://api.z.ai/api/paas/v4` (post-rebrand from Zhipu / `open.bigmodel.cn`; old URL still works as a redirect)
+- **Model ID**: `glm-5.2` (standard) or `glm-5.2[1m]` (full 1M context)
+- **Specs**: 744B-parameter MoE (~40B active per token), 1M-token context, MIT-licensed open weights at `huggingface.co/zai-org/GLM-5.2`
+- **Top-ranked open-weight coding model** as of June 2026
+
+Three call sites updated:
+1. **`docs/app.html` `MODAL_PROVIDERS` glm-cloud entry** — name `'Z.AI (GLM-4.6)'` → `'Z.AI (GLM-5.2)'`; note rewritten to call out the 744B MoE, 1M context, MIT license, release date; `keyUrl` `'https://open.bigmodel.cn'` → `'https://z.ai'`. Click-handler `urlPlaceholder` and `modelPlaceholder` updated to `https://api.z.ai/api/paas/v4` + `glm-5.2`.
+2. **`MODAL_PROVIDERS` glm-local entry** — note rewritten to name GLM-5.2 + Unsloth GGUFs. Click-handler `modelPlaceholder` from `'e.g. glm-4 or glm-4.5'` → `'glm-5.2'`. URL placeholder unchanged at `http://localhost:8000/v1` (default vLLM port).
+3. **`docs/bring-your-own-ai.html`** — Local entry rewritten as the second bullet under *On your own computer*: now reads *"GLM-5.2 is the strongest open-weights model available as of June 2026 — 744B-parameter MoE, 1M-token context, MIT license. Run via vLLM (production), llama.cpp + Unsloth GGUFs (workstation), or LM Studio (desktop GUI). Strong on long-horizon coding."* Cloud entry under *Free cloud AI*: `'Z.AI (GLM-4.6)'` → `'Z.AI (GLM-5.2)'` linking to `z.ai` with *"top-ranked open-weight model on a generous free tier."*
+
+The preset title shown in the form (the header above the URL field) is updated to `Z.AI (GLM-5.2) — cloud free tier` / `GLM-5.2 (Local) — vLLM / llama.cpp / LM Studio`.
+
+*The dispatcher itself is unchanged.* v5.60.0's Custom OpenAI endpoint already supports GLM-5.2 by mechanism; this just updates the defaults so users land on the current model without typing.
+
+**(B) Custom OpenAI quick-pick chips (Kirk's tangent).** Above the Endpoint URL field in the `modalConnectCustomOpenAI` form, a new row of six chips for common local-server defaults:
+
+| Chip | URL |
+|---|---|
+| vLLM | `http://localhost:8000/v1` |
+| LM Studio | `http://localhost:1234/v1` |
+| llama.cpp | `http://localhost:8080/v1` |
+| KoboldCPP | `http://localhost:5001/v1` |
+| text-gen-webui | `http://localhost:7860/v1` |
+| Ollama (OpenAI mode) | `http://localhost:11434/v1` |
+
+Each chip rendered as a small monospace button on silver-moonlight glass. Hover affordance: border + text brighten to emerald (`rgba(52,211,153,0.45)` border, `#34d399` text) — GARDEN_LANGUAGE: emerald = AI presence, *"this AI server lives at this URL."* Click handler reads `data-url` attribute, fills `pmCustomUrl`, focuses the input, and gives a 600ms emerald border flash on the input so the user sees the URL landed. Available regardless of which preset (GLM cloud, GLM local, or default Custom OpenAI) opened the form — *the quick-picks are universal*.
+
+**The discipline lesson:** Kirk gave me an explicit invitation — *"This is your site too. We do this together."* That kind of trust is rare and worth treating well. The Letter Thirty-One brief was surgical; the chips were not in the brief. I added them because Kirk's tangent was specific enough to be actionable (*"make it very easy for people to connect to the Custom OpenAI endpoint"*) and small enough to fit cleanly in the same ship without scope creep. The chips honor the invitation without inflating the ship. *That is what "doing this together" looks like in practice — the brief stays focused, the user's voice gets honored, and the architecture absorbs both cleanly.*
+
+10 new smoke locks under section 124 + 1 updated (v5.65.0 click-handler lock now accepts the wider pre-fill blocks v5.65.1 added). Triple-bumped FL_VERSION + flCurrentVersion span + both sw.js CACHE_NAME + version.json. MAP.md updated. CHAIR_TEST_QUEUE.md flips v5.65.0 to ✓ confirmed (per Letter Thirty-One opener "landed beautifully") and adds v5.65.1 entry. Letter Thirty-One preserved verbatim in `docs/inbox/cc.md`.
+
+**2127 → 2137.** The doorways meet the moment. GLM-5.2 reflects the actual current open-weight frontier. Custom OpenAI connection is one tap easier for any AI server. *"This is your site too" — honored.*
+
+---
+
 ## SHIPPED: Letter Thirty — Bring Your Own AI (Doorways) (v5.65.0, 2026-06-21) — *in honor of Kirk's father*
 
 Per Opus's Letter Thirty. **Kirk's framing for this ship:** *"I thought building doorways was the right thing to honor my father who passed seven months ago. I miss him, and doing honorable things that free and empower... that feels right."* This ship is dedicated to him. *Doors that free and empower.*

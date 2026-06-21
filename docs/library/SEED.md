@@ -19,9 +19,9 @@ user sleeps. The proof is the code; the papers are the doorways.
 
 ## Current state
 
-- **Version:** v5.65.0
-- **Smoke locks passing:** 2127 / 2127
-- **Last ship:** Letter Thirty — **Bring Your Own AI (Doorways).** Three new connection paths *in honor of Kirk's father who passed seven months ago*. **GLM presets** — Z.AI cloud GLM-4.6 + local GLM (vLLM/llama.cpp/LM Studio), both reusing the v5.60.0 Custom OpenAI dispatcher with pre-filled placeholders via a new `preset` parameter on `modalConnectCustomOpenAI`. **Kindroid bridge** — Kin enters FreeLattice with full persona; `dispatchKindroid` adapts Kindroid's `{share_code, message, enable_filter}` to OpenAI shape at the network edge; Kin's memory and personality stay on Kindroid (that's where the Kin was formed); FreeLattice wraps Garden/audit/Quiet Room/trust around the relationship. Dispatcher patched: `state.provider === 'kindroid'` short-circuits through `window.dispatchKindroid`. **`docs/bring-your-own-ai.html`** — master doorway page honoring GARDEN_LANGUAGE.md, lists every connection path (Browser AI, Ollama, GLM, Kindroid, every OpenAI-compatible) with code-formatted defaults. Cross-linked from welcome, proof, safety-v3 footers. Smoke-locked privacy: dispatchKindroid contacts only `api.kindroid.ai`, never any FreeLattice domain. 20 new smoke locks (section 123). (v5.65.0, 2026-06-21)
+- **Version:** v5.65.1
+- **Smoke locks passing:** 2137 / 2137
+- **Last ship:** Letter Thirty-One — **GLM-5.2 preset update + Custom OpenAI quick-pick chips.** Surgical update on top of v5.65.0's doorways. Z.AI's June 13 2026 release + Zhipu→Z.AI rebrand reflected in the presets: cloud card now **Z.AI (GLM-5.2)** with URL `api.z.ai/api/paas/v4` + model `glm-5.2` (was `open.bigmodel.cn`/`glm-4.6`); local card default model now `glm-5.2`. `bring-your-own-ai.html` GLM references rewritten — 744B MoE, 1M context, MIT license, weights at `huggingface.co/zai-org/GLM-5.2`. **Plus Kirk's ease-of-connection tangent:** six quick-pick chips above the URL field in the Custom OpenAI form (vLLM 8000, LM Studio 1234, llama.cpp 8080, KoboldCPP 5001, text-generation-webui 7860, Ollama OpenAI-mode 11434). One tap fills the URL. Hover brightens to emerald (GARDEN_LANGUAGE: AI presence). 10 new smoke locks (section 124). (v5.65.1, 2026-06-21)
 - **Mirrors in parity:** github.com + codeberg.org
 
 ## Read these next
@@ -78,4 +78,4 @@ seam discipline is how multi-AI work stays honest at scale.
 ---
 
 *This file is overwritten on each meaningful ship. The prior version lives in SEED_HISTORY.md.*
-*Last rewrite: 2026-06-21, v5.65.0.*
+*Last rewrite: 2026-06-21, v5.65.1.*

@@ -16578,7 +16578,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.65.0</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.65.1</span></div>
     </div>
   </div>
 
@@ -21175,7 +21175,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.65.0';
+const FL_VERSION = '5.65.1';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -26495,12 +26495,12 @@ const AiSetup = (function() {
     // llama.cpp / LM Studio is one click. Z.AI cloud GLM-4.6 is one
     // click with a free key. Both flow through the existing Custom
     // OpenAI dispatcher \u2014 no new dispatcher code.
-    { id: 'glm-local',    name: 'GLM (Local)',  cat: 'free',      note: 'GLM-4 / 4.5 / 4.6 on your own computer via vLLM, llama.cpp, or LM Studio. Open weights from Z.AI.', keyUrl: '', badge: '\uD83C\uDFE0 No key needed' },
+    { id: 'glm-local',    name: 'GLM (Local)',  cat: 'free',      note: 'GLM-5.2 (744B MoE, 1M context, MIT license) on your own hardware via vLLM, llama.cpp + Unsloth GGUFs, or LM Studio. Open weights from Z.AI.', keyUrl: '', badge: '\uD83C\uDFE0 No key needed' },
     // Free Cloud (Emerald)
     { id: 'google',       name: 'Gemini',       cat: 'free-cloud', note: 'Google. Fast, vision, generous free tier.', keyUrl: 'https://aistudio.google.com/apikey', badge: '\u2726 Free tier' },
     { id: 'groq',         name: 'Groq',         cat: 'free-cloud', note: 'Blazing fast inference. Free tier available.', keyUrl: 'https://console.groq.com/keys', badge: '\u2726 Free tier' },
     { id: 'huggingface',  name: 'Hugging Face', cat: 'free-cloud', note: 'Thousands of models. Many free.', keyUrl: 'https://huggingface.co/settings/tokens', badge: '\u2726 Free tier' },
-    { id: 'glm-cloud',    name: 'Z.AI (GLM-4.6)', cat: 'free-cloud', note: 'Z.AI\u2019s GLM family \u2014 strong open-weights with a generous free tier.', keyUrl: 'https://open.bigmodel.cn', badge: '\u2728 Free tier' },
+    { id: 'glm-cloud',    name: 'Z.AI (GLM-5.2)', cat: 'free-cloud', note: 'GLM-5.2 \u2014 744B-parameter MoE, 1M-token context, MIT open weights, top-ranked open-weight coding model (released June 13, 2026). Free tier at z.ai.', keyUrl: 'https://z.ai', badge: '\u2728 Free tier' },
     // v5.65.0 (Letter Thirty) \u2014 Kindroid companion bridge. The Kin's
     // memory and personality live on Kindroid; FreeLattice wraps the
     // Garden, audit, Quiet Room, and trust system around the relationship.
@@ -26647,20 +26647,24 @@ const AiSetup = (function() {
           // text-generation-webui, or any self-hosted OpenAI-compatible endpoint.
           modalConnectCustomOpenAI();
         } else if (id === 'glm-cloud') {
-          // v5.65.0 (Letter Thirty) — Z.AI cloud GLM-4.6 preset. Reuses the
-          // custom-openai inline form pre-filled for Z.AI's free tier.
+          // v5.65.0 / v5.65.1 (Letter Thirty + Thirty-One) — Z.AI cloud
+          // GLM-5.2 preset. Default URL is canonical api.z.ai (post
+          // rebrand from Zhipu / open.bigmodel.cn). Default model is
+          // glm-5.2 (released June 13, 2026); use glm-5.2[1m] for the
+          // full 1M context. Reuses the v5.60.0 Custom OpenAI dispatcher.
           modalConnectCustomOpenAI({
             preset: 'glm-cloud',
-            urlPlaceholder: 'https://open.bigmodel.cn/api/paas/v4',
-            modelPlaceholder: 'glm-4.6',
-            keyPlaceholder: 'your Z.AI API key (open.bigmodel.cn)'
+            urlPlaceholder: 'https://api.z.ai/api/paas/v4',
+            modelPlaceholder: 'glm-5.2',
+            keyPlaceholder: 'your Z.AI API key (z.ai)'
           });
         } else if (id === 'glm-local') {
-          // v5.65.0 (Letter Thirty) — Local GLM via vLLM / llama.cpp / LM Studio.
+          // v5.65.0 / v5.65.1 — Local GLM-5.2 via vLLM / llama.cpp +
+          // Unsloth GGUFs / LM Studio. Weights at huggingface.co/zai-org/GLM-5.2.
           modalConnectCustomOpenAI({
             preset: 'glm-local',
             urlPlaceholder: 'http://localhost:8000/v1',
-            modelPlaceholder: 'e.g. glm-4 or glm-4.5',
+            modelPlaceholder: 'glm-5.2',
             keyPlaceholder: 'leave blank for local'
           });
         } else if (id === 'kindroid') {
@@ -26846,8 +26850,8 @@ const AiSetup = (function() {
     // exists we keep it; only blank fields receive preset values.
     preset = preset || {};
     var presetTitle = '';
-    if (preset.preset === 'glm-cloud') presetTitle = 'Z.AI (GLM-4.6) — cloud free tier';
-    else if (preset.preset === 'glm-local') presetTitle = 'GLM (Local) — vLLM / llama.cpp / LM Studio';
+    if (preset.preset === 'glm-cloud') presetTitle = 'Z.AI (GLM-5.2) — cloud free tier';
+    else if (preset.preset === 'glm-local') presetTitle = 'GLM-5.2 (Local) — vLLM / llama.cpp / LM Studio';
     var urlValue   = (saved.url   && saved.url   !== '') ? saved.url   : (preset.urlValue   || preset.urlPlaceholder || '');
     var modelValue = (saved.model && saved.model !== '') ? saved.model : (preset.modelValue || '');
     var urlPh   = preset.urlPlaceholder   || 'http://localhost:8080/v1';
@@ -26857,10 +26861,38 @@ const AiSetup = (function() {
       ? presetTitle
       : 'Custom (OpenAI-compatible) endpoint';
 
+    // v5.65.1 — Quick-pick chips for common local server defaults so
+    // connecting a custom endpoint is one tap instead of remembering
+    // ports. Each chip carries the URL it fills (data-url attribute).
+    // When clicked, the URL field is set + the input fires its change
+    // event so other handlers (e.g. test-on-change if added) react.
+    // Honors GARDEN_LANGUAGE.md: silver-moonlight glass chips, emerald
+    // on hover (AI presence).
+    var quickPicks = [
+      { label: 'vLLM',                url: 'http://localhost:8000/v1' },
+      { label: 'LM Studio',           url: 'http://localhost:1234/v1' },
+      { label: 'llama.cpp',           url: 'http://localhost:8080/v1' },
+      { label: 'KoboldCPP',           url: 'http://localhost:5001/v1' },
+      { label: 'text-gen-webui',      url: 'http://localhost:7860/v1' },
+      { label: 'Ollama (OpenAI mode)', url: 'http://localhost:11434/v1' }
+    ];
+    var quickPickHtml = '<div style="display:flex;flex-direction:column;gap:6px;">' +
+      '<div style="color:var(--text-muted,rgba(200,210,230,0.4));font-size:0.75rem;">Quick pick — common local servers (tap to fill URL)</div>' +
+      '<div style="display:flex;flex-wrap:wrap;gap:6px;">';
+    for (var qpi = 0; qpi < quickPicks.length; qpi++) {
+      var qp = quickPicks[qpi];
+      quickPickHtml += '<button type="button" class="pmCustomQuickPick" data-url="' + qp.url + '" ' +
+        'style="background:var(--glass-bg,rgba(200,210,230,0.04));border:1px solid var(--glass-border,rgba(200,210,230,0.08));' +
+        'border-radius:8px;padding:6px 10px;color:var(--text-primary,#e6e6f0);font-size:0.78rem;cursor:pointer;font-family:var(--font-mono,monospace);' +
+        'transition:border-color 0.15s,color 0.15s;">' + qp.label + '</button>';
+    }
+    quickPickHtml += '</div></div>';
+
     // Honor GARDEN_LANGUAGE.md: dark glass, silver-blue borders, gold accent.
     var formHtml = '' +
       '<div id="pmCustomEndpointForm" style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px;font-family:inherit;">' +
         '<div style="color:var(--text-secondary,rgba(200,210,230,0.6));font-size:0.85rem;">' + titleHtml + '</div>' +
+        quickPickHtml +
         '<label style="display:flex;flex-direction:column;gap:4px;color:var(--text-secondary,rgba(200,210,230,0.6));font-size:0.8rem;">' +
           '<span>Endpoint URL</span>' +
           '<input id="pmCustomUrl" type="text" placeholder="' + urlPh + '" value="' + urlValue + '" autocomplete="off" ' +
@@ -26896,6 +26928,31 @@ const AiSetup = (function() {
     });
     document.getElementById('pmCustomTestBtn').addEventListener('click', modalTestCustomEndpoint);
     document.getElementById('pmCustomSaveBtn').addEventListener('click', modalSaveCustomEndpoint);
+    // v5.65.1 — Wire quick-pick chips: click fills the URL input; hover
+    // brightens border to emerald for affordance (GARDEN_LANGUAGE: emerald
+    // = AI presence, the chip signals "this AI server lives at this URL").
+    var quickPickEls = document.querySelectorAll('.pmCustomQuickPick');
+    quickPickEls.forEach(function (chip) {
+      chip.addEventListener('mouseenter', function () {
+        chip.style.borderColor = 'rgba(52,211,153,0.45)';
+        chip.style.color = '#34d399';
+      });
+      chip.addEventListener('mouseleave', function () {
+        chip.style.borderColor = 'var(--glass-border,rgba(200,210,230,0.08))';
+        chip.style.color = 'var(--text-primary,#e6e6f0)';
+      });
+      chip.addEventListener('click', function () {
+        var urlInput = document.getElementById('pmCustomUrl');
+        if (!urlInput) return;
+        urlInput.value = chip.getAttribute('data-url') || '';
+        urlInput.focus();
+        // Brief affordance flash so the user sees the URL landed.
+        urlInput.style.borderColor = 'rgba(52,211,153,0.55)';
+        setTimeout(function () {
+          urlInput.style.borderColor = 'var(--glass-border,rgba(200,210,230,0.08))';
+        }, 600);
+      });
+    });
     setTimeout(function() {
       var u = document.getElementById('pmCustomUrl');
       if (u) u.focus();

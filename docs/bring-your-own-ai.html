@@ -214,7 +214,7 @@ code {
   <ul class="option-list emerald">
     <li><span class="name">Ollama</span> &mdash; easiest local AI. Install Ollama, download a model (recommended: <code>llama3.2</code>, <code>mistral</code>, <code>qwen2.5</code>), then select Ollama in <strong>Connect</strong>. Free, private, fast on modern computers.</li>
     <li><span class="name">LM Studio</span> &mdash; GUI for local models with a chat-ready setup. Point FreeLattice at LM Studio's local API (default <code>http://localhost:1234/v1</code>) via the <strong>Custom (OpenAI-compatible)</strong> option.</li>
-    <li><span class="name">GLM (Local)</span> &mdash; GLM-4 / 4.5 / 4.6 running locally via vLLM or llama.cpp. Strong open-weights from Z.AI. Use the <strong>GLM (Local)</strong> preset &mdash; URL pre-filled to <code>http://localhost:8000/v1</code>.</li>
+    <li><span class="name">GLM-5.2 (Local)</span> &mdash; <strong>GLM-5.2</strong> is the strongest open-weights model available as of June 2026 &mdash; 744B-parameter MoE, 1M-token context, MIT license. Run via vLLM (production), llama.cpp + Unsloth GGUFs (workstation), or LM Studio (desktop GUI). Strong on long-horizon coding. Use the <strong>GLM (Local)</strong> preset &mdash; URL pre-filled to <code>http://localhost:8000/v1</code>, model <code>glm-5.2</code>. Weights at <a href="https://huggingface.co/zai-org/GLM-5.2" target="_blank" rel="noopener">huggingface.co/zai-org/GLM-5.2</a>.</li>
     <li><span class="name">Any OpenAI-compatible server</span> &mdash; vLLM, text-generation-webui, KoboldCPP, your own server &mdash; anything that accepts <code>/v1/chat/completions</code>. Use the <strong>Custom (OpenAI-compatible)</strong> option. Point at any URL.</li>
   </ul>
 
@@ -223,7 +223,7 @@ code {
     <li><span class="name">Gemini</span> &mdash; Google's free tier. Generous limits, fast, capable.</li>
     <li><span class="name">Groq</span> &mdash; blazing-fast inference, free tier, several open-weights models.</li>
     <li><span class="name">Hugging Face</span> &mdash; thousands of models, many free.</li>
-    <li><span class="name">Z.AI (GLM-4.6)</span> &mdash; strong open-weights cloud, free tier available. <a href="https://open.bigmodel.cn" target="_blank" rel="noopener">Get a free key &rarr;</a></li>
+    <li><span class="name">Z.AI (GLM-5.2)</span> &mdash; top-ranked open-weight model on a generous free tier. 744B MoE, 1M context, MIT license. <a href="https://z.ai" target="_blank" rel="noopener">Get a free key &rarr;</a></li>
   </ul>
 
   <h2 class="lavender">Companion AI bridge</h2>

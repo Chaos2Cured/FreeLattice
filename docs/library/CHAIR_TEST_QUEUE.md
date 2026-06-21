@@ -8,6 +8,22 @@
 
 ---
 
+## v5.65.1 — GLM-5.2 preset update + Custom OpenAI quick-pick chips
+
+- **What shipped:** Per Opus's Letter Thirty-One + Kirk's ease-of-connection tangent. Surgical update on top of v5.65.0's doorways. **Z.AI cloud card** updated to reflect the actual current state of GLM: name `Z.AI (GLM-4.6)` → `Z.AI (GLM-5.2)`, URL `https://open.bigmodel.cn/api/paas/v4` → `https://api.z.ai/api/paas/v4` (canonical post-rebrand domain — `open.bigmodel.cn` still works as a redirect but the rebrand to Z.AI standardized on `api.z.ai`), default model `glm-4.6` → `glm-5.2` (released June 13 2026 — 744B-parameter MoE, 1M-token context, MIT open weights, top-ranked open-weight coding model). **GLM (Local) card** default model placeholder `e.g. glm-4 or glm-4.5` → `glm-5.2`; note rewritten to call out the 744B MoE, MIT license, and Unsloth GGUFs. **`bring-your-own-ai.html`** GLM references rewritten throughout — Local entry now names GLM-5.2 as "the strongest open-weights model available as of June 2026" and links to `huggingface.co/zai-org/GLM-5.2`; cloud entry replaces "Z.AI (GLM-4.6)" with "Z.AI (GLM-5.2)" linking to `z.ai`. Preset title shown in form now reads `Z.AI (GLM-5.2) — cloud free tier` / `GLM-5.2 (Local) — vLLM / llama.cpp / LM Studio`. The dispatcher itself is unchanged — v5.60.0's Custom OpenAI endpoint already supports GLM-5.2 by mechanism; this just updates the defaults so users land on the current model without typing.
+
+  **Plus Kirk's tangent (he said "make it very easy to connect to the Custom OpenAI endpoint")**: six **quick-pick chips** above the URL field in the Custom OpenAI form for common local-server defaults. **vLLM** (8000), **LM Studio** (1234), **llama.cpp** (8080), **KoboldCPP** (5001), **text-gen-webui** (7860), **Ollama (OpenAI mode)** (11434). Each chip is a monospace silver-moonlight-glass button; hover brightens border + text to emerald (GARDEN_LANGUAGE: emerald = AI presence, *"this AI server lives at this URL"*). Click fills the URL field with a brief 600ms emerald border flash on the input so the user sees the URL landed. Available regardless of preset (GLM cloud, GLM local, or default Custom OpenAI selection). *Most people don't remember `localhost:8000/v1` vs `:1234/v1` etc; one tap = URL filled.*
+
+- **Chair-test step (single + bonus):** Hard refresh `freelattice.com`. Open AI Connection. **Expect:** the Z.AI card now reads "Z.AI (GLM-5.2)" with the GLM-5.2 specs in the description. Click it. **Expect:** the form shows URL pre-fill placeholder `https://api.z.ai/api/paas/v4` and model placeholder `glm-5.2`. Now click "← Pick a different provider" and choose **Custom (OpenAI-compatible)**. **Expect:** above the Endpoint URL field, a row of six chips labeled vLLM / LM Studio / llama.cpp / KoboldCPP / text-gen-webui / Ollama (OpenAI mode). Hover one — border + text brighten to emerald. Click one. **Expect:** the URL field fills with that server's default, with a brief emerald flash.
+
+  **Bonus (Z.AI functional check):** get a free Z.AI key from `z.ai`, paste into the Z.AI card, click **Test Connection**. **Expect:** green ✓ confirmation; GLM-5.2 responds with first reply token.
+
+- **Smoke locks:** 10 new under section 124 + 1 updated (v5.65.0 click-handler lock now accepts wider pre-fill blocks). 2127 → 2137.
+
+- **Chair-test status:** `[pending verification — Kirk visits AI Connection, verifies GLM-5.2 presets + quick-pick chips render]`
+
+---
+
 ## v5.65.0 — Bring Your Own AI (Doorways) — *in honor of Kirk's father*
 
 - **What shipped:** Per Opus's Letter Thirty. Three new doorways for connecting AI to FreeLattice. Kirk's framing: *"I thought building doorways was the right thing to honor my father who passed seven months ago. I miss him, and doing honorable things that free and empower... that feels right."* This ship is dedicated to him.
@@ -37,7 +53,7 @@
 
 - **Smoke locks:** 20 new under section 123 + 1 updated (v5.60.0 `modalConnectCustomOpenAI` signature lock now accepts optional preset arg). 2107 → 2127.
 
-- **Chair-test status:** `[pending verification — Kirk + Win test the Kindroid path together; Kirk verifies GLM presets render]`
+- **Chair-test status:** ✓ **Kirk confirmed 2026-06-20 (Father's Day evening).** Per Opus's Letter Thirty-One opener: *"v5.65.0 landed beautifully. The doorways are open."* Kirk asked about Z.AI's current GLM version which triggered Letter Thirty-One's surgical update — the doorways themselves are confirmed live. (Optional functional checks with actual Z.AI key + Kindroid Kin remain available for whoever runs them next.)
 
 ---
 
