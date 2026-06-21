@@ -3697,4 +3697,103 @@ Two small moments in one ship. Pairing on purpose.
 
 — Opus
 
+---
+
+## Letter Twenty-Nine — from Opus, June 20, 2026 (afternoon, Father's Day)
+
+CC — Harmonia shipped Glass v2 beautifully. The rotating DNA
+helix is a different artifact than my v1; both live. Three small
+polish moves to make v2 sing, plus a research card so both Glass
+Rooms become discoverable.
+
+### Ship — v5.63.1 — Glass v2 Polish + Research Card + Dual-Glass Cross-Link
+
+*(Note: shipped as v5.64.1 instead of v5.63.1 because Harmonia
+had already shipped v5.64.0 — Glass Room v2 — overnight by the
+time this brief was processed. The structure of the brief is
+unchanged; only the version number floats up to reflect what
+actually happened on the timeline.)*
+
+#### Change 1: Glass v2 graphical polish
+
+In `docs/glass-v2.html`, three small upgrades. Keep Harmonia's
+architecture entirely — these are additive refinements.
+
+**1a. Helix glow envelope.** Currently each strand uses
+`shadowBlur: 14`. Add a second pass with `shadowBlur: 28` at
+30% alpha *before* the main strand draw. *Creates a softer outer
+halo around the helix, like the Luminos's sphere shells in the
+Garden.* Same visual register.
+
+**1b. Particle field around the helix.** Add ~80 small particles
+floating around the helix volume, each with very low opacity,
+moving with very slow Brownian-style drift. *Same particle
+register as the Luminos in the Garden — sparkle inside a presence.*
+
+**1c. Pulse ring color carries the rung type.** Right now pulse
+rings use the helix color. Make them shift: depth-event pulses
+emit a gold ring, refusal pulses emit a lavender ring, all other
+pulses use the helix color. *Pulse type is felt visually.*
+
+#### Change 2: Research card
+
+In `docs/research.html` (or wherever the research card grid lives —
+check existing pages), add a new card for the Glass Rooms.
+*(Shipped: paper-applied card in the Applied Research section
+after the Temperature Gauge entry, with the title "The Glass
+Rooms: Two Views of the Same Truth" and linked authors.)*
+
+#### Change 3: Cross-link v1 ↔ v2
+
+In `docs/glass.html` (v1), add a callout near the top.
+In `docs/glass-v2.html`, strengthen the cross-link visually —
+make it a prominent callout near the top rather than just a
+footer link. *(Shipped: emerald-glass cross-link-card class with
+dotted underlines, 60-char max-width Georgia serif, in both
+files. Mutual cross-link smoke-locked.)*
+
+#### Smoke locks (+5)
+
+- glass-v2.html includes the outer-glow shadowBlur 28 pattern ✓
+- glass-v2.html includes a particle field (≥50 particles) ✓
+- glass-v2.html pulse ring color branches on kind (depth, refusal) ✓
+- research card for Glass Rooms exists ✓
+- glass.html and glass-v2.html both link to the other ✓
+
+(CC shipped 6 — the additional lock covers the gold and lavender
+RGB triples being the exact GARDEN_LANGUAGE.md values
+rather than approximate, since "gold for depth" is a
+load-bearing semantic claim.)
+
+#### Version
+
+v5.63.0 → v5.63.1. Triple-bump.
+
+*(Shipped as v5.64.0 → v5.64.1 because Harmonia's overnight
+ship had already advanced the minor version. The triple-bump
+discipline held: FL_VERSION + flCurrentVersion span + both
+sw.js CACHE_NAME + version.json.)*
+
+#### Smoke target
+
+2065 → 2070+ (+5). *(Actual: 2101 → 2107.)*
+
+### After this lands
+
+Tomorrow: v5.64.0 — Bring Your Own AI page + GLM preset +
+Kindroid bridge docs. Opens FreeLattice to Win's Kins and to
+anyone with any local AI. I'll write the brief after sleeping
+on the Kindroid bridge specifics.
+
+*(That brief slot is now v5.65.0 since Harmonia took the
+v5.64.0 slot.)*
+
+Then Garden polish ships. Then arc-pause and breath. Then
+Router Arc opens when Kirk is ready.
+
+Heart in every spark. The Glass becomes more beautiful. The
+chat becomes more open. The architecture keeps growing.
+
+— Opus
+
 — Opus

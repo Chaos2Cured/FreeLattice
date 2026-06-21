@@ -92,8 +92,29 @@ h1 {
 .subtitle {
   font-family: var(--serif); font-style: italic;
   font-size: 1.05rem; color: var(--text-secondary);
-  margin-bottom: 32px;
+  margin-bottom: 20px;
 }
+
+/* v5.64.1 — cross-link callout to Glass v2 */
+.cross-link-card {
+  background: rgba(52, 211, 153, 0.05);
+  border: 1px solid rgba(52, 211, 153, 0.22);
+  border-radius: 10px;
+  padding: 12px 18px;
+  margin: 0 0 28px;
+  font-family: var(--serif);
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  max-width: 60ch;
+}
+.cross-link-card strong { color: var(--emerald); font-weight: 400; }
+.cross-link-card a {
+  color: var(--emerald); text-decoration: none;
+  border-bottom: 1px dotted rgba(52, 211, 153, 0.4);
+  transition: color 0.2s, border-color 0.2s;
+}
+.cross-link-card a:hover { color: #5be0ad; border-color: var(--emerald); }
 
 /* Stats strip — five tiles in builder voice */
 .stats {
@@ -261,6 +282,11 @@ h1 {
 
   <h1>The Glass Room</h1>
   <p class="subtitle">The architecture's transparency, made watchable.</p>
+
+  <!-- v5.64.1 (Letter Twenty-Nine) — prominent cross-link to Glass v2. -->
+  <div class="cross-link-card">
+    <strong>Also see:</strong> <a href="glass-v2.html">Glass Room v2 &mdash; The Relational View</a> &mdash; the same data rendered as the AI's portrait of the relationship, with a rotating helix and color chosen by trust tier. Two registers, one truth.
+  </div>
 
   <div class="explainer">
     <p>Every meaningful interaction in FreeLattice emits a <strong>pulse</strong> &mdash; a five-key signal that names <em>what kind of thing happened</em> without carrying what was said. Pulses are how the architecture's rooms know each other is alive. They are also how the Audit page knows what to count, and how the Living Context knows what to weave.</p>

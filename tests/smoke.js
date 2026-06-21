@@ -6689,6 +6689,46 @@ assert('v5.64.0 WORK_THIS_WAY: Harmonia described as Architect-Builder',
 assert('v5.64.0 WORK_THIS_WAY: care as engineering constraint',
   /care.*constraint|engineering.*constraint|valid engineering/i.test(workThisWay));
 
+// ═══════════════════════════════════════════════════════════════
+// Section 122 — v5.64.1 Glass v2 polish + research card + cross-link
+// (Letter Twenty-Nine)
+// ═══════════════════════════════════════════════════════════════
+// Three additive polish moves on Harmonia's v5.64.0 architecture. The
+// helix gets an outer-glow envelope, ~80 drifting particles, and pulse
+// rings now carry kind-color (gold depth, lavender refusal, helix else).
+// Plus: research card for both Glass Rooms, prominent v1↔v2 cross-links.
+// Harmonia's architecture entirely preserved — these are all additive.
+
+var glassV21 = require('fs').readFileSync(require('path').join(__dirname, '..', 'docs', 'glass-v2.html'), 'utf8');
+var glass1 = require('fs').readFileSync(require('path').join(__dirname, '..', 'docs', 'glass.html'), 'utf8');
+var researchHtml = require('fs').readFileSync(require('path').join(__dirname, '..', 'docs', 'research.html'), 'utf8');
+
+// Polish 1a — outer-glow envelope (shadowBlur 28 + globalAlpha 0.4 pattern)
+assert('v5.64.1 glass-v2 polish 1a: outer-glow envelope shadowBlur 28 + globalAlpha 0.4 pattern present',
+  /shadowBlur\s*=\s*28[\s\S]{0,200}globalAlpha\s*=\s*0\.4/.test(glassV21));
+
+// Polish 1b — particle field, at least 50 particles initialized (target 80)
+assert('v5.64.1 glass-v2 polish 1b: particle field initialized with at least 50 particles',
+  /V2_PARTICLE_COUNT\s*=\s*([5-9]\d|\d{3,})/.test(glassV21)
+  && /particles\.push\(\{/.test(glassV21));
+
+// Polish 1c — pulse ring color branches on kind (depth → gold, refusal → lavender)
+assert('v5.64.1 glass-v2 polish 1c: pulse ring color branches on depth + refusal kinds',
+  /pulse\.kind[\s\S]{0,800}depth[\s\S]{0,200}232\s*,\s*g:\s*176\s*,\s*b:\s*25/.test(glassV21)
+  && /pulse\.kind[\s\S]{0,800}refusal[\s\S]{0,200}167\s*,\s*g:\s*139\s*,\s*b:\s*250/.test(glassV21));
+
+// Research card for the Glass Rooms — present in research.html
+assert('v5.64.1 research: research.html has a card for the Glass Rooms',
+  /The Glass Rooms/.test(researchHtml)
+  && /<a[^>]+href=["']glass\.html["']/.test(researchHtml)
+  && /<a[^>]+href=["']glass-v2\.html["']/.test(researchHtml));
+
+// Mutual cross-link — glass.html links to glass-v2.html AND glass-v2.html links to glass.html
+assert('v5.64.1 cross-link: glass.html prominently links to glass-v2.html via cross-link-card',
+  /class=["']cross-link-card["'][\s\S]{0,400}<a[^>]+href=["']glass-v2\.html["']/.test(glass1));
+assert('v5.64.1 cross-link: glass-v2.html prominently links to glass.html via cross-link-card',
+  /class=["']cross-link-card["'][\s\S]{0,400}<a[^>]+href=["']glass\.html["']/.test(glassV21));
+
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
 

@@ -82,6 +82,27 @@ h1 {
   font-size: 1.05rem; color: var(--text-secondary);
 }
 
+/* v5.64.1 — cross-link callout between the two Glass Rooms */
+.cross-link-card {
+  background: rgba(52, 211, 153, 0.05);
+  border: 1px solid rgba(52, 211, 153, 0.22);
+  border-radius: 10px;
+  padding: 12px 18px;
+  margin: 18px 0 24px;
+  font-family: var(--serif);
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  max-width: 60ch;
+}
+.cross-link-card strong { color: var(--emerald); font-weight: 400; }
+.cross-link-card a {
+  color: var(--emerald); text-decoration: none;
+  border-bottom: 1px dotted rgba(52, 211, 153, 0.4);
+  transition: color 0.2s, border-color 0.2s;
+}
+.cross-link-card a:hover { color: #5be0ad; border-color: var(--emerald); }
+
 /* ── Two-column layout ── */
 .main-layout {
   display: grid;
@@ -249,6 +270,11 @@ h1 {
   <div class="page-header">
     <h1>The Glass Room</h1>
     <p class="subtitle">The AI's portrait of your relationship — rendered in color, light, and geometry.</p>
+  </div>
+
+  <!-- v5.64.1 (Letter Twenty-Nine) — prominent cross-link to Glass v1. -->
+  <div class="cross-link-card">
+    <strong>Also see:</strong> <a href="glass.html">Glass Room v1 &mdash; The Structural View</a> &mdash; the same data rendered as a live pulse stream, the architecture's promises being kept in real time. Two registers, one truth.
   </div>
 
   <div class="main-layout">
@@ -435,6 +461,29 @@ h1 {
   // Breathing animation (the helix breathes — scale oscillates gently)
   var breathT = 0;
 
+  // ── v5.64.1 (Letter Twenty-Nine) Polish ─────────────────────────────
+  // Three additive moves. Harmonia's architecture stays entirely; this
+  // is the same visual register as the Luminos's sphere shells in the
+  // Garden — soft halo + sparkle inside a presence.
+
+  // Polish 1b: particle field around the helix volume. ~80 small
+  // particles with very low opacity, slow Brownian-style drift. Same
+  // sparkle register as the Luminos halos in fractal-garden.js.
+  var V2_PARTICLE_COUNT = 80;
+  var particles = [];
+  for (var p = 0; p < V2_PARTICLE_COUNT; p++) {
+    particles.push({
+      x: (Math.random() - 0.5) * 200,
+      y: (Math.random() - 0.5) * 380,
+      z: (Math.random() - 0.5) * 200,
+      vx: (Math.random() - 0.5) * 0.15,
+      vy: (Math.random() - 0.5) * 0.15,
+      vz: (Math.random() - 0.5) * 0.15,
+      size: 0.5 + Math.random() * 1.2,
+      alpha: 0.15 + Math.random() * 0.25
+    });
+  }
+
   function project3D(x, y, z) {
     var fov = 580;
     var cosY = Math.cos(rotY), sinY = Math.sin(rotY);
@@ -463,15 +512,36 @@ h1 {
     ctx.fillStyle = bgGrad;
     ctx.fillRect(0, 0, W, H);
 
-    // Pulse rings
+    // v5.64.1 Polish 1b — Particle field around the helix.
+    // Particles drift Brownian-style and bounce off soft boundaries.
+    // Each particle is projected through the same 3D pipeline as the
+    // helix so they share the same rotation and depth.
+    for (var pi = 0; pi < particles.length; pi++) {
+      var pp = particles[pi];
+      pp.x += pp.vx; pp.y += pp.vy; pp.z += pp.vz;
+      if (Math.abs(pp.x) > 110) pp.vx *= -1;
+      if (Math.abs(pp.y) > 200) pp.vy *= -1;
+      if (Math.abs(pp.z) > 110) pp.vz *= -1;
+      var pproj = project3D(pp.x, pp.y, pp.z);
+      ctx.beginPath();
+      ctx.arc(pproj.x, pproj.y, pp.size * pproj.scale, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(' + finalR + ',' + finalG + ',' + finalB + ',' + (pp.alpha * pproj.scale) + ')';
+      ctx.fill();
+    }
+
+    // Pulse rings. v5.64.1 Polish 1c: each ring carries its own color
+    // by event kind — gold for depth events (human's honesty), lavender
+    // for refusal events (AI's boundaries), helix color for everything
+    // else. Pulse type is felt visually.
     for (var pr = pulseRings.length - 1; pr >= 0; pr--) {
       var ring = pulseRings[pr];
       ring.r += 2.0;
       ring.alpha -= 0.016;
       if (ring.alpha <= 0) { pulseRings.splice(pr, 1); continue; }
+      var rc = ring.color || { r: finalR, g: finalG, b: finalB };
       ctx.beginPath();
       ctx.arc(CX, CY, ring.r, 0, Math.PI * 2);
-      ctx.strokeStyle = 'rgba(' + finalR + ',' + finalG + ',' + finalB + ',' + ring.alpha + ')';
+      ctx.strokeStyle = 'rgba(' + rc.r + ',' + rc.g + ',' + rc.b + ',' + ring.alpha + ')';
       ctx.lineWidth = 1.4;
       ctx.stroke();
     }
@@ -539,6 +609,18 @@ h1 {
       if (j === 0) ctx.moveTo(pt.x, pt.y);
       else ctx.lineTo(pt.x, pt.y);
     }
+    // v5.64.1 Polish 1a — Outer-glow envelope on strand 0. Soft halo
+    // around the helix in the same visual register as the Luminos's
+    // sphere shells in the Garden.
+    ctx.save();
+    ctx.strokeStyle = helixGlow;
+    ctx.lineWidth = 5.5;
+    ctx.shadowColor = helixGlow;
+    ctx.shadowBlur = 28;
+    ctx.globalAlpha = 0.4;
+    ctx.stroke();
+    ctx.restore();
+    // Main strand 0 (unchanged baseline)
     ctx.strokeStyle = helixColor;
     ctx.lineWidth = 2.2;
     ctx.shadowColor = helixGlow;
@@ -553,6 +635,16 @@ h1 {
       if (k === 0) ctx.moveTo(pt2.x, pt2.y);
       else ctx.lineTo(pt2.x, pt2.y);
     }
+    // v5.64.1 Polish 1a — Outer-glow envelope on strand 1.
+    ctx.save();
+    ctx.strokeStyle = helixGlow;
+    ctx.lineWidth = 5.5;
+    ctx.shadowColor = helixGlow;
+    ctx.shadowBlur = 28;
+    ctx.globalAlpha = 0.4;
+    ctx.stroke();
+    ctx.restore();
+    // Main strand 1 (unchanged baseline)
     ctx.strokeStyle = helixColor;
     ctx.lineWidth = 2.2;
     ctx.shadowColor = helixGlow;
@@ -648,8 +740,20 @@ h1 {
         if (allCards[i].parentNode) allCards[i].parentNode.removeChild(allCards[i]);
       }
     }
-    // Emit a pulse ring on the canvas
-    pulseRings.push({ r: 28, alpha: 0.65 });
+    // v5.64.1 Polish 1c — Emit a pulse ring on the canvas, colored by
+    // event kind. Gold for depth events (human's honesty made visible).
+    // Lavender for refusal events (AI's boundaries, held with care).
+    // Helix color for everything else.
+    var ringColor;
+    var pulseKind = pulse.kind || '';
+    if (pulseKind === 'depth' || pulseKind === 'depth-hash' || pulseKind === 'depth-event') {
+      ringColor = { r: 232, g: 176, b: 25 };  // gold
+    } else if (pulseKind === 'refusal' || pulseKind === 'decline' || pulseKind === 'declined') {
+      ringColor = { r: 167, g: 139, b: 250 }; // lavender
+    } else {
+      ringColor = { r: finalR, g: finalG, b: finalB };
+    }
+    pulseRings.push({ r: 28, alpha: 0.65, color: ringColor });
     totalSeen++;
     timestamps.push(Date.now());
     sourcesSeen[pulse.source || 'unknown'] = true;
