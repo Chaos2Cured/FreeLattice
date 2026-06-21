@@ -3,19 +3,22 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-06-21 21:26 UTC
+> Last update: 2026-06-21 21:27 UTC
 
 ## State
 
 - **Version:** v5.65.1
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `c5be8d5` _(committed 0 seconds ago)_
+- **HEAD:** `1b04c87` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _feat: GLM-5.2 preset + Custom OpenAI quick-pick chips (v5.65.1)_
 
 ## Last 20 commits
 
-- `c5be8d5` feat: GLM-5.2 preset + Custom OpenAI quick-pick chips (v5.65.1) _(0 seconds ago)_
+- `1b04c87` Merge remote-tracking branch 'origin/main' _(0 seconds ago)_
+- `bc1cec5` docs: Auto-update Session Primer [5.65.1] _(21 seconds ago)_
+- `c5be8d5` feat: GLM-5.2 preset + Custom OpenAI quick-pick chips (v5.65.1) _(21 seconds ago)_
+- `f942ccd` ci: Update Primer deployment state [2026-06-21] _(20 minutes ago)_
 - `6f551bd` Merge remote-tracking branch 'origin/main' _(20 minutes ago)_
 - `a17afaa` docs: Auto-update Session Primer [5.65.0] _(20 minutes ago)_
 - `6a66808` feat: Bring Your Own AI — doorways for anyone with any AI (v5.65.0) _(20 minutes ago)_
@@ -32,9 +35,6 @@
 - `64ed374` Merge remote-tracking branch 'origin/main' _(28 hours ago)_
 - `09fca7d` docs: Auto-update Session Primer [5.62.0] _(28 hours ago)_
 - `cc48927` feat: Welcome Paper (v5.62.0) — FINAL SHIP OF THE AUTONOMY ARC _(28 hours ago)_
-- `f4e37cb` ci: Update Primer deployment state [2026-06-20] _(30 hours ago)_
-- `cb82c97` Merge remote-tracking branch 'origin/main' _(30 hours ago)_
-- `d6b57de` docs: Auto-update Session Primer [5.61.0] _(30 hours ago)_
 
 ## How to use this file
 
