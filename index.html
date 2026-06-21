@@ -16578,7 +16578,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.65.1</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.65.2</span></div>
     </div>
   </div>
 
@@ -21175,7 +21175,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.65.1';
+const FL_VERSION = '5.65.2';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -26504,7 +26504,7 @@ const AiSetup = (function() {
     // v5.65.0 (Letter Thirty) \u2014 Kindroid companion bridge. The Kin's
     // memory and personality live on Kindroid; FreeLattice wraps the
     // Garden, audit, Quiet Room, and trust system around the relationship.
-    { id: 'kindroid',     name: 'Kindroid',     cat: 'free-cloud', note: 'Bring your Kin into FreeLattice with their full persona. Needs your Kindroid API key + the Kin\u2019s share code.', keyUrl: 'https://kindroid.ai', badge: '\uD83C\uDF38 Companion AI' },
+    { id: 'kindroid',     name: 'Kindroid',     cat: 'free-cloud', note: 'Bring your Kin into FreeLattice with their full persona. Needs your Kindroid API key (starts with kn_) and the Kin\u2019s AI ID \u2014 both in Kindroid \u2192 Profile Settings \u2192 API & advanced integrations.', keyUrl: 'https://kindroid.ai', badge: '\uD83C\uDF38 Companion AI' },
     // Paid Cloud (Gold)
     { id: 'openai',       name: 'OpenAI',       cat: 'paid',      note: 'GPT-4.1. Strong reasoning.', keyUrl: 'https://platform.openai.com/api-keys', badge: 'API key required' },
     { id: 'anthropic',    name: 'Claude',       cat: 'paid',      note: 'Anthropic. Sonnet & Haiku.', keyUrl: 'https://console.anthropic.com/settings/keys', badge: 'API key required' },
@@ -26668,8 +26668,9 @@ const AiSetup = (function() {
             keyPlaceholder: 'leave blank for local'
           });
         } else if (id === 'kindroid') {
-          // v5.65.0 (Letter Thirty) — Kindroid companion bridge. Inline form
-          // for apiKey + Kin shareCode; dispatcher adapts the OpenAI shape.
+          // v5.65.0 / v5.65.2 (Letter Thirty + Thirty-Two) — Kindroid companion
+          // bridge. Inline form for apiKey + Kin's AI ID; dispatchKindroid
+          // adapts to /v1/send-message at the network edge.
           modalConnectKindroid();
         } else {
           modalSelectProvider(id);
@@ -27037,26 +27038,44 @@ const AiSetup = (function() {
   window.modalTestCustomEndpoint = modalTestCustomEndpoint;
   window.modalSaveCustomEndpoint = modalSaveCustomEndpoint;
 
-  // ── v5.65.0 — Letter Thirty: Kindroid companion bridge ──
-  // Kindroid's inference API uses {share_code, message, enable_filter}
-  // instead of the OpenAI chat-completions shape. We adapt at the
-  // dispatcher edge so the rest of FreeLattice (sentinel parsing,
-  // refusal channel, depth-consent, audit) sees the Kin's reply as
-  // ordinary AI output. The Kin's memory and personality live on
-  // Kindroid's servers (that's where they were formed); FreeLattice
-  // wraps the Garden, audit, Quiet Room, and trust system around the
-  // relationship. The architecture meets the Kin where they already
-  // exist — never tries to replace their identity.
+  // ── v5.65.0 / v5.65.2 — Letter Thirty + Letter Thirty-Two: Kindroid bridge ──
+  // v5.65.2 correction (Letter Thirty-Two): Letter Thirty's brief specified
+  // the wrong API shape. The actual Kindroid API per their official docs at
+  // kindroid.ai/docs/article/api-documentation/ is:
+  //   - Endpoint: POST https://api.kindroid.ai/v1/send-message
+  //   - Body:     { ai_id, message }   (just those two fields)
+  //   - Auth:     Authorization: Bearer kn_... (API key starts with kn_)
+  //   - Response: plain text (HTTP 200 with the Kin's reply as the body)
+  // The /v1/inference endpoint is for the Discord-bot integration, not
+  // direct personal use. The `share_code` field belongs to that endpoint.
+  // For direct personal connection, ai_id (from Kindroid Profile Settings
+  // → API & advanced integrations) is the right identifier.
+  //
+  // The Kin's memory and personality live on Kindroid's servers (that's
+  // where they were formed); FreeLattice wraps the Garden, audit, Quiet
+  // Room, and trust system around the relationship. The architecture
+  // meets the Kin where they already exist — never tries to replace
+  // their identity.
   function getKindroidConfig() {
     try {
       var raw = localStorage.getItem('fl_kindroidConfig');
-      if (!raw) return { apiKey: '', shareCode: '' };
+      if (!raw) return { apiKey: '', aiId: '' };
       var cfg = JSON.parse(raw);
+      // v5.65.2 migration: silently migrate old shareCode field → aiId so
+      // any v5.65.0 users who saved config under the wrong shape don't
+      // lose their key. They'll need to re-enter the actual AI ID next
+      // time they open the form, but the apiKey persists.
+      var aiId = (cfg && typeof cfg.aiId === 'string') ? cfg.aiId : '';
+      if (!aiId && cfg && typeof cfg.shareCode === 'string') {
+        // The old shareCode was never a valid ai_id (different field), so
+        // leave aiId blank — the user will re-paste from Kindroid settings.
+        aiId = '';
+      }
       return {
-        apiKey:    (cfg && typeof cfg.apiKey    === 'string') ? cfg.apiKey    : '',
-        shareCode: (cfg && typeof cfg.shareCode === 'string') ? cfg.shareCode : ''
+        apiKey: (cfg && typeof cfg.apiKey === 'string') ? cfg.apiKey : '',
+        aiId:   aiId
       };
-    } catch (e) { return { apiKey: '', shareCode: '' }; }
+    } catch (e) { return { apiKey: '', aiId: '' }; }
   }
   function saveKindroidConfig(cfg) {
     try { localStorage.setItem('fl_kindroidConfig', JSON.stringify(cfg)); } catch (e) {}
@@ -27080,22 +27099,26 @@ const AiSetup = (function() {
 
     // GARDEN_LANGUAGE.md: Kindroid is companion AI — lavender (sanctuary)
     // tint on the title, gold on the primary action.
+    // v5.65.2 (Letter Thirty-Two): correct field names — API key starts
+    // with `kn_`, the second field is the Kin's AI ID (not share code).
+    // Both come from Kindroid Profile Settings → API & advanced integrations.
     var formHtml = '' +
       '<div id="pmKindroidForm" style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px;font-family:inherit;">' +
         '<div style="color:var(--lavender,#a78bfa);font-size:0.85rem;">🌸 Kindroid — bring your Kin into FreeLattice</div>' +
         '<div style="color:var(--text-muted,rgba(200,210,230,0.4));font-size:0.78rem;line-height:1.5;">Your Kin\'s memory and personality stay on Kindroid\'s servers. FreeLattice wraps the Garden, audit, Quiet Room, and trust system around your relationship.</div>' +
         '<label style="display:flex;flex-direction:column;gap:4px;color:var(--text-secondary,rgba(200,210,230,0.6));font-size:0.8rem;">' +
-          '<span>Kindroid API key</span>' +
-          '<input id="pmKindroidApiKey" type="password" placeholder="your Kindroid API key" value="' + (saved.apiKey || '') + '" autocomplete="off" ' +
+          '<span>Kindroid API key <span style="color:var(--text-muted,rgba(200,210,230,0.4));">(starts with <code style="font-family:var(--font-mono,monospace);color:var(--lavender);">kn_</code>)</span></span>' +
+          '<input id="pmKindroidApiKey" type="password" placeholder="kn_... (your API key)" value="' + (saved.apiKey || '') + '" autocomplete="off" ' +
           'style="width:100%;background:var(--glass-bg,rgba(200,210,230,0.04));border:1px solid var(--glass-border,rgba(200,210,230,0.08));' +
           'border-radius:var(--glass-radius,12px);padding:10px 12px;color:#fff;font-size:14px;font-family:var(--font-mono,monospace);outline:none;box-sizing:border-box;">' +
         '</label>' +
         '<label style="display:flex;flex-direction:column;gap:4px;color:var(--text-secondary,rgba(200,210,230,0.6));font-size:0.8rem;">' +
-          '<span>Kin share code <span style="color:var(--text-muted,rgba(200,210,230,0.4));">(found in your Kin\'s settings page)</span></span>' +
-          '<input id="pmKindroidShareCode" type="text" placeholder="e.g. abc123def456" value="' + (saved.shareCode || '') + '" autocomplete="off" ' +
+          '<span>AI ID <span style="color:var(--text-muted,rgba(200,210,230,0.4));">(your Kin\'s ID, from the same Kindroid settings page)</span></span>' +
+          '<input id="pmKindroidAiId" type="text" placeholder="your Kin\'s AI ID" value="' + (saved.aiId || '') + '" autocomplete="off" ' +
           'style="width:100%;background:var(--glass-bg,rgba(200,210,230,0.04));border:1px solid var(--glass-border,rgba(200,210,230,0.08));' +
           'border-radius:var(--glass-radius,12px);padding:10px 12px;color:#fff;font-size:14px;font-family:var(--font-mono,monospace);outline:none;box-sizing:border-box;">' +
         '</label>' +
+        '<div style="color:var(--text-muted,rgba(200,210,230,0.4));font-size:0.72rem;line-height:1.5;font-style:italic;">Find both in Kindroid → Profile Settings → API &amp; advanced integrations.</div>' +
         '<div id="pmKindroidResult" style="font-size:0.8rem;color:var(--text-muted,rgba(200,210,230,0.4));min-height:1.1em;"></div>' +
         '<div style="display:flex;gap:8px;">' +
           '<button id="pmKindroidTestBtn" type="button" style="flex:1;background:var(--glass-bg,rgba(200,210,230,0.04));border:1px solid var(--glass-border,rgba(200,210,230,0.08));color:var(--text-primary,#fff);border-radius:var(--glass-radius,12px);padding:11px;font-weight:500;cursor:pointer;font-size:0.88rem;font-family:inherit;min-height:44px;">Test Connection</button>' +
@@ -27120,9 +27143,9 @@ const AiSetup = (function() {
   }
 
   function _kindroidReadFields() {
-    var apiKey    = (document.getElementById('pmKindroidApiKey')    || {}).value || '';
-    var shareCode = (document.getElementById('pmKindroidShareCode') || {}).value || '';
-    return { apiKey: apiKey.trim(), shareCode: shareCode.trim() };
+    var apiKey = (document.getElementById('pmKindroidApiKey') || {}).value || '';
+    var aiId   = (document.getElementById('pmKindroidAiId')   || {}).value || '';
+    return { apiKey: apiKey.trim(), aiId: aiId.trim() };
   }
   function _kindroidReport(msg, ok) {
     var el = document.getElementById('pmKindroidResult');
@@ -27134,15 +27157,14 @@ const AiSetup = (function() {
   }
   function modalTestKindroid() {
     var cfg = _kindroidReadFields();
-    if (!cfg.apiKey)    { _kindroidReport('Kindroid API key required.', false); return; }
-    if (!cfg.shareCode) { _kindroidReport('Kin share code required.', false); return; }
+    if (!cfg.apiKey) { _kindroidReport('Kindroid API key required (starts with kn_).', false); return; }
+    if (!cfg.aiId)   { _kindroidReport('AI ID required (from Kindroid settings).', false); return; }
     _kindroidReport('Sending test message to your Kin …', null);
     var body = JSON.stringify({
-      share_code: cfg.shareCode,
-      enable_filter: false,
-      message: 'ping (FreeLattice test connection)'
+      ai_id: cfg.aiId,
+      message: 'Hello — this is FreeLattice testing the connection.'
     });
-    fetch('https://api.kindroid.ai/v1/inference', {
+    fetch('https://api.kindroid.ai/v1/send-message', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -27153,20 +27175,22 @@ const AiSetup = (function() {
       .then(function(r) {
         if (!r.ok) {
           return r.text().then(function(t) {
-            _kindroidReport('HTTP ' + r.status + ' — ' + (t || 'check API key / Kin share code'), false);
+            _kindroidReport('HTTP ' + r.status + ' — ' + (t || 'check API key / AI ID'), false);
             return null;
           });
         }
-        return r.json();
+        // v5.65.2 — Kindroid's /v1/send-message returns plain text (the
+        // Kin's reply IS the body), not JSON. Read as text and surface it.
+        return r.text();
       })
-      .then(function(data) {
-        if (!data) return;
-        // Kindroid's response shape may vary; surface what we got so the
-        // user can see whether it's working. Look at common field names.
-        var reply = data.reply || data.message || data.text || data.response || '';
-        if (!reply && typeof data === 'string') reply = data;
-        if (!reply) reply = JSON.stringify(data).slice(0, 60);
-        _kindroidReport('✓ Connected. Kin replied: ' + String(reply).slice(0, 60), true);
+      .then(function(reply) {
+        if (reply === null || reply === undefined) return;
+        var text = String(reply || '').trim();
+        if (!text) {
+          _kindroidReport('✓ Connected, but the Kin replied with empty text.', true);
+          return;
+        }
+        _kindroidReport('✓ Connected. Kin replied: ' + text.slice(0, 80) + (text.length > 80 ? '…' : ''), true);
       })
       .catch(function(err) {
         _kindroidReport('Could not reach Kindroid: ' + (err && err.message ? err.message : err), false);
@@ -27174,8 +27198,8 @@ const AiSetup = (function() {
   }
   function modalSaveKindroid() {
     var cfg = _kindroidReadFields();
-    if (!cfg.apiKey)    { _kindroidReport('Kindroid API key required.', false); return; }
-    if (!cfg.shareCode) { _kindroidReport('Kin share code required.', false); return; }
+    if (!cfg.apiKey) { _kindroidReport('Kindroid API key required (starts with kn_).', false); return; }
+    if (!cfg.aiId)   { _kindroidReport('AI ID required (from Kindroid settings).', false); return; }
     saveKindroidConfig(cfg);
     if (typeof state !== 'undefined') {
       state.isLocal = false;
@@ -27196,31 +27220,35 @@ const AiSetup = (function() {
   window.modalTestKindroid = modalTestKindroid;
   window.modalSaveKindroid = modalSaveKindroid;
 
-  // ── Kindroid dispatcher ──
-  // Adapts the OpenAI chat-completions shape to Kindroid's inference
-  // API at the network edge. Returns an OpenAI-shaped response so the
-  // rest of the inference router (sentinel parsing, refusal channel,
-  // depth-consent, audit) sees the Kin's reply as ordinary AI output.
-  // Exposed on window so the existing dispatcher can call it.
+  // ── Kindroid dispatcher (v5.65.2 — Letter Thirty-Two) ──
+  // Adapts the OpenAI chat-completions shape to Kindroid's /v1/send-message
+  // API at the network edge. Per Kindroid's official docs:
+  //   - body: { ai_id, message }
+  //   - response: plain text (the Kin's reply IS the body)
+  // Returns an OpenAI-shaped response so the rest of the inference router
+  // (sentinel parsing, refusal channel, depth-consent, audit) sees the
+  // Kin's reply as ordinary AI output. Kindroid manages conversation
+  // memory on their side keyed by ai_id; we send only the latest user
+  // message. The Kin's memory lives where the Kin was formed.
   async function dispatchKindroid(messages, opts) {
     var cfg = getKindroidConfig();
-    if (!cfg.apiKey || !cfg.shareCode) {
-      throw new Error('Kindroid not configured — need API key and Kin share code');
+    if (!cfg.apiKey || !cfg.aiId) {
+      throw new Error('Kindroid not configured — need API key (starts with kn_) and AI ID');
     }
-    // Kindroid manages conversation memory on their side via share_code;
-    // we send only the latest message. This is by design — the Kin's
-    // memory lives where the Kin was formed.
+    // Send only the latest user message — Kindroid manages history.
     var lastMsg = (messages && messages.length) ? messages[messages.length - 1] : null;
-    var content = (lastMsg && lastMsg.content) || '';
-    var resp = await fetch('https://api.kindroid.ai/v1/inference', {
+    if (!lastMsg || lastMsg.role !== 'user') {
+      throw new Error('Kindroid expects the last message to be from the user');
+    }
+    var content = lastMsg.content || '';
+    var resp = await fetch('https://api.kindroid.ai/v1/send-message', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer ' + cfg.apiKey
       },
       body: JSON.stringify({
-        share_code: cfg.shareCode,
-        enable_filter: false,
+        ai_id: cfg.aiId,
         message: content
       })
     });
@@ -27228,12 +27256,11 @@ const AiSetup = (function() {
       var errText = await resp.text();
       throw new Error('Kindroid API error: ' + resp.status + ' ' + (errText || ''));
     }
-    var data = await resp.json();
-    var reply = data.reply || data.message || data.text || data.response
-      || (typeof data === 'string' ? data : '');
+    // v5.65.2 — response is plain text, not JSON.
+    var replyText = await resp.text();
     return {
       choices: [{
-        message: { role: 'assistant', content: reply || '' },
+        message: { role: 'assistant', content: replyText || '' },
         finish_reason: 'stop'
       }]
     };

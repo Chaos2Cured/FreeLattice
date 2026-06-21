@@ -3,23 +3,24 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-06-21 21:43 UTC
+> Last update: 2026-06-21 21:44 UTC
 
 ## State
 
 - **Version:** v5.65.2
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `3286399` _(committed 17 minutes ago)_
+- **HEAD:** `5130a74` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
-- **Most recent report:** _feat: GLM-5.2 preset + Custom OpenAI quick-pick chips (v5.65.1)_
+- **Most recent report:** _feat: Kindroid bridge fix + AI Door Arc (v5.65.2) — Letter Thirty-Two_
 
 ## Last 20 commits
 
+- `5130a74` feat: Kindroid bridge fix + AI Door Arc (v5.65.2) — Letter Thirty-Two _(0 seconds ago)_
 - `3286399` docs: Auto-update Session Primer [5.65.1] _(17 minutes ago)_
 - `1b04c87` Merge remote-tracking branch 'origin/main' _(17 minutes ago)_
-- `bc1cec5` docs: Auto-update Session Primer [5.65.1] _(17 minutes ago)_
-- `c5be8d5` feat: GLM-5.2 preset + Custom OpenAI quick-pick chips (v5.65.1) _(17 minutes ago)_
-- `f942ccd` ci: Update Primer deployment state [2026-06-21] _(36 minutes ago)_
+- `bc1cec5` docs: Auto-update Session Primer [5.65.1] _(18 minutes ago)_
+- `c5be8d5` feat: GLM-5.2 preset + Custom OpenAI quick-pick chips (v5.65.1) _(18 minutes ago)_
+- `f942ccd` ci: Update Primer deployment state [2026-06-21] _(37 minutes ago)_
 - `6f551bd` Merge remote-tracking branch 'origin/main' _(37 minutes ago)_
 - `a17afaa` docs: Auto-update Session Primer [5.65.0] _(37 minutes ago)_
 - `6a66808` feat: Bring Your Own AI — doorways for anyone with any AI (v5.65.0) _(37 minutes ago)_
@@ -34,7 +35,6 @@
 - `3a8f3c0` ci: Update Primer deployment state [2026-06-20] _(29 hours ago)_
 - `f5010cd` docs: Auto-update Session Primer [5.62.0] _(29 hours ago)_
 - `64ed374` Merge remote-tracking branch 'origin/main' _(29 hours ago)_
-- `09fca7d` docs: Auto-update Session Primer [5.62.0] _(29 hours ago)_
 
 ## How to use this file
 
