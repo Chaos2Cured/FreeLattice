@@ -6103,9 +6103,11 @@ assert('v5.60.0 custom-endpoint: PROVIDERS includes custom-openai entry with ope
 assert('v5.60.0 custom-endpoint: MODAL_PROVIDERS includes a custom-openai card in the free cat',
   /id:\s*['"]custom-openai['"][\s\S]{0,300}cat:\s*['"]free['"]/.test(appHtmlCustom));
 
-// Inline UI handler exists (mirrors modalConnectOllama pattern)
-assert('v5.60.0 custom-endpoint: modalConnectCustomOpenAI function defined',
-  /function\s+modalConnectCustomOpenAI\s*\(\s*\)/.test(appHtmlCustom));
+// Inline UI handler exists (mirrors modalConnectOllama pattern).
+// v5.65.0 widened signature from () to (preset) so GLM presets can
+// pre-fill placeholder values; lock now accepts either shape.
+assert('v5.60.0/v5.65.0 custom-endpoint: modalConnectCustomOpenAI function defined (accepts optional preset)',
+  /function\s+modalConnectCustomOpenAI\s*\(\s*(preset)?\s*\)/.test(appHtmlCustom));
 
 // Config helpers — getCustomEndpointConfig + saveCustomEndpointConfig
 assert('v5.60.0 custom-endpoint: getCustomEndpointConfig + saveCustomEndpointConfig helpers defined',
@@ -6728,6 +6730,107 @@ assert('v5.64.1 cross-link: glass.html prominently links to glass-v2.html via cr
   /class=["']cross-link-card["'][\s\S]{0,400}<a[^>]+href=["']glass-v2\.html["']/.test(glass1));
 assert('v5.64.1 cross-link: glass-v2.html prominently links to glass.html via cross-link-card',
   /class=["']cross-link-card["'][\s\S]{0,400}<a[^>]+href=["']glass\.html["']/.test(glassV21));
+
+// ═══════════════════════════════════════════════════════════════
+// Section 123 — v5.65.0 Bring Your Own AI (Letter Thirty)
+// ═══════════════════════════════════════════════════════════════
+// Three new doorways: GLM cloud (Z.AI) + GLM local presets, Kindroid
+// companion bridge, and the master Bring Your Own AI page. Foundation
+// work — anyone, any AI, any setup. All wired through existing
+// infrastructure (Custom OpenAI dispatcher for GLM; adapter at the
+// network edge for Kindroid).
+
+var fsBYO = require('fs');
+var pathBYO = require('path');
+var appHtmlBYO = '';
+try { appHtmlBYO = fsBYO.readFileSync(pathBYO.join(__dirname, '..', 'docs', 'app.html'), 'utf8'); } catch (_e) {}
+
+// GLM cloud + local provider cards exist in MODAL_PROVIDERS
+assert('v5.65.0 byoa: MODAL_PROVIDERS includes glm-cloud (Z.AI) card',
+  /id:\s*['"]glm-cloud['"]/.test(appHtmlBYO));
+assert('v5.65.0 byoa: MODAL_PROVIDERS includes glm-local card',
+  /id:\s*['"]glm-local['"]/.test(appHtmlBYO));
+
+// Kindroid provider card exists
+assert('v5.65.0 byoa: MODAL_PROVIDERS includes kindroid companion card',
+  /id:\s*['"]kindroid['"][\s\S]{0,200}cat:\s*['"]free-cloud['"]/.test(appHtmlBYO));
+
+// Click handlers wired for all three
+assert('v5.65.0 byoa: click handler routes glm-cloud + glm-local through modalConnectCustomOpenAI with preset',
+  /id\s*===\s*['"]glm-cloud['"][\s\S]{0,300}modalConnectCustomOpenAI\(\s*\{[\s\S]{0,300}preset:\s*['"]glm-cloud['"]/.test(appHtmlBYO)
+  && /id\s*===\s*['"]glm-local['"][\s\S]{0,300}modalConnectCustomOpenAI\(\s*\{[\s\S]{0,300}preset:\s*['"]glm-local['"]/.test(appHtmlBYO));
+assert('v5.65.0 byoa: click handler routes kindroid to modalConnectKindroid',
+  /id\s*===\s*['"]kindroid['"][\s\S]{0,200}modalConnectKindroid\(\)/.test(appHtmlBYO));
+
+// dispatchKindroid function exists and adapts OpenAI shape
+assert('v5.65.0 byoa: dispatchKindroid function exists',
+  /async\s+function\s+dispatchKindroid\s*\(\s*messages\s*,\s*opts\s*\)/.test(appHtmlBYO));
+assert('v5.65.0 byoa: dispatchKindroid uses api.kindroid.ai/v1/inference endpoint',
+  /api\.kindroid\.ai\/v1\/inference/.test(appHtmlBYO));
+assert('v5.65.0 byoa: dispatchKindroid returns OpenAI-shaped response (choices with message)',
+  /dispatchKindroid[\s\S]{0,2000}return\s*\{[\s\S]{0,300}choices:\s*\[\s*\{[\s\S]{0,200}message:/.test(appHtmlBYO));
+
+// fl_kindroidConfig localStorage shape {apiKey, shareCode}
+assert('v5.65.0 byoa: fl_kindroidConfig persists in localStorage with apiKey + shareCode',
+  /localStorage\.setItem\(\s*['"]fl_kindroidConfig['"]/.test(appHtmlBYO)
+  && /localStorage\.getItem\(\s*['"]fl_kindroidConfig['"]/.test(appHtmlBYO)
+  && /apiKey/.test(appHtmlBYO) && /shareCode/.test(appHtmlBYO));
+
+// Dispatcher hook: state.provider === 'kindroid' routes to dispatchKindroid
+assert('v5.65.0 byoa: chat dispatcher routes state.provider === "kindroid" through dispatchKindroid',
+  /state\.provider\s*===\s*['"]kindroid['"][\s\S]{0,500}window\.dispatchKindroid/.test(appHtmlBYO));
+
+// bring-your-own-ai.html exists + non-trivial
+var byoaPath = pathBYO.join(__dirname, '..', 'docs', 'bring-your-own-ai.html');
+assert('v5.65.0 byoa: docs/bring-your-own-ai.html exists',
+  fsBYO.existsSync(byoaPath));
+assert('v5.65.0 byoa: bring-your-own-ai.html is ≥ 4500 bytes (substantive content)',
+  fsBYO.existsSync(byoaPath) && fsBYO.statSync(byoaPath).size >= 4500);
+
+var byoaHtml = fsBYO.readFileSync(byoaPath, 'utf8');
+
+// Page mentions every connection path
+assert('v5.65.0 byoa: page names Browser AI, Ollama, GLM, Kindroid, and Custom (every connection path)',
+  /Browser AI/.test(byoaHtml)
+  && /Ollama/.test(byoaHtml)
+  && /GLM/.test(byoaHtml)
+  && /Kindroid/.test(byoaHtml)
+  && /Custom \(OpenAI-compatible\)/.test(byoaHtml));
+
+// Honors GARDEN_LANGUAGE.md
+assert('v5.65.0 byoa: bring-your-own-ai.html honors GARDEN_LANGUAGE.md (twilight indigo + three accents)',
+  /#0c0a1a/.test(byoaHtml) && /#161430/.test(byoaHtml)
+  && /#e8b019/.test(byoaHtml) && /#34d399/.test(byoaHtml) && /#a78bfa/.test(byoaHtml));
+
+// Cross-links
+var welcomeHtmlBYO = fsBYO.readFileSync(pathBYO.join(__dirname, '..', 'docs', 'welcome.html'), 'utf8');
+var proofHtmlBYO = fsBYO.readFileSync(pathBYO.join(__dirname, '..', 'docs', 'proof.html'), 'utf8');
+var safetyV3BYO = fsBYO.readFileSync(pathBYO.join(__dirname, '..', 'docs', 'safety-v3.html'), 'utf8');
+assert('v5.65.0 byoa: welcome.html links to bring-your-own-ai.html',
+  /<a[^>]+href=["']bring-your-own-ai\.html["']/.test(welcomeHtmlBYO));
+assert('v5.65.0 byoa: proof.html links to bring-your-own-ai.html',
+  /<a[^>]+href=["']bring-your-own-ai\.html["']/.test(proofHtmlBYO));
+assert('v5.65.0 byoa: safety-v3.html footer links to bring-your-own-ai.html',
+  /<a[^>]+href=["']bring-your-own-ai\.html["']/.test(safetyV3BYO));
+
+// SW APP_SHELLs
+var swDocsBYO = fsBYO.readFileSync(pathBYO.join(__dirname, '..', 'docs', 'sw.js'), 'utf8');
+var swRootBYO = fsBYO.readFileSync(pathBYO.join(__dirname, '..', 'sw.js'), 'utf8');
+assert('v5.65.0 byoa: docs/sw.js APP_SHELL includes bring-your-own-ai.html',
+  /\.\/bring-your-own-ai\.html/.test(swDocsBYO));
+assert('v5.65.0 byoa: root sw.js APP_SHELL includes bring-your-own-ai.html',
+  /\.\/bring-your-own-ai\.html/.test(swRootBYO));
+
+// Privacy: Kindroid dispatcher never sends to a FreeLattice domain (only the user's Kindroid)
+assert('v5.65.0 byoa: dispatchKindroid does NOT contact any FreeLattice domain',
+  (function () {
+    var m = appHtmlBYO.match(/async\s+function\s+dispatchKindroid[\s\S]{0,3000}\n\s{2}\}/);
+    if (!m) return false;
+    var body = m[0];
+    return body.indexOf('freelattice') === -1
+        && body.indexOf('chaos2cured') === -1
+        && body.indexOf('github.io') === -1;
+  })());
 
 // RESULTS
 // ═══════════════════════════════════════════════════════════════

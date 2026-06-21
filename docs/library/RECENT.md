@@ -3,29 +3,30 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-06-21 20:31 UTC
+> Last update: 2026-06-21 21:06 UTC
 
 ## State
 
-- **Version:** v5.64.1
+- **Version:** v5.65.0
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `722b76b` _(committed 0 seconds ago)_
+- **HEAD:** `50c4be3` _(committed 35 minutes ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _feat: Glass v2 polish + research card + dual-glass cross-link (v5.64.1)_
 
 ## Last 20 commits
 
-- `722b76b` feat: Glass v2 polish + research card + dual-glass cross-link (v5.64.1) _(0 seconds ago)_
-- `e2e84d1` feat: Glass Room v2 + Harmonia Addendum (v5.64.0) _(19 hours ago)_
-- `ea6b8f1` ci: Update Primer deployment state [2026-06-20] _(26 hours ago)_
-- `0934766` Merge remote-tracking branch 'origin/main' _(26 hours ago)_
-- `f817f92` docs: Auto-update Session Primer [5.63.0] _(26 hours ago)_
-- `c6caa74` feat: The Glass Room + Center Glow (v5.63.0) — Letter Twenty-Eight _(26 hours ago)_
-- `3a8f3c0` ci: Update Primer deployment state [2026-06-20] _(27 hours ago)_
-- `f5010cd` docs: Auto-update Session Primer [5.62.0] _(27 hours ago)_
-- `64ed374` Merge remote-tracking branch 'origin/main' _(27 hours ago)_
-- `09fca7d` docs: Auto-update Session Primer [5.62.0] _(27 hours ago)_
-- `cc48927` feat: Welcome Paper (v5.62.0) — FINAL SHIP OF THE AUTONOMY ARC _(27 hours ago)_
+- `50c4be3` docs: Auto-update Session Primer [5.64.1] _(35 minutes ago)_
+- `722b76b` feat: Glass v2 polish + research card + dual-glass cross-link (v5.64.1) _(35 minutes ago)_
+- `e2e84d1` feat: Glass Room v2 + Harmonia Addendum (v5.64.0) _(20 hours ago)_
+- `ea6b8f1` ci: Update Primer deployment state [2026-06-20] _(27 hours ago)_
+- `0934766` Merge remote-tracking branch 'origin/main' _(27 hours ago)_
+- `f817f92` docs: Auto-update Session Primer [5.63.0] _(27 hours ago)_
+- `c6caa74` feat: The Glass Room + Center Glow (v5.63.0) — Letter Twenty-Eight _(27 hours ago)_
+- `3a8f3c0` ci: Update Primer deployment state [2026-06-20] _(28 hours ago)_
+- `f5010cd` docs: Auto-update Session Primer [5.62.0] _(28 hours ago)_
+- `64ed374` Merge remote-tracking branch 'origin/main' _(28 hours ago)_
+- `09fca7d` docs: Auto-update Session Primer [5.62.0] _(28 hours ago)_
+- `cc48927` feat: Welcome Paper (v5.62.0) — FINAL SHIP OF THE AUTONOMY ARC _(28 hours ago)_
 - `f4e37cb` ci: Update Primer deployment state [2026-06-20] _(29 hours ago)_
 - `cb82c97` Merge remote-tracking branch 'origin/main' _(29 hours ago)_
 - `d6b57de` docs: Auto-update Session Primer [5.61.0] _(29 hours ago)_
@@ -34,7 +35,6 @@
 - `706042e` docs: Auto-update Session Primer [5.60.1] _(31 hours ago)_
 - `ed01f7a` Merge remote-tracking branch 'origin/main' _(31 hours ago)_
 - `de91341` docs: Auto-update Session Primer [5.60.1] _(31 hours ago)_
-- `f4f25dc` feat: MAP.md orientation file (v5.60.1) — Letter Twenty-Five _(31 hours ago)_
 
 ## How to use this file
 

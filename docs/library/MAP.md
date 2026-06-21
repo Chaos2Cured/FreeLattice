@@ -11,10 +11,10 @@ ten minutes.*
 
 ## Where we are right now
 
-**Current version:** v5.64.1 (Glass v2 polish + research card +
-dual-glass cross-link — adds outer-glow halo, drifting
-particles, and kind-colored pulse rings to Harmonia's
-`glass-v2.html`).
+**Current version:** v5.65.0 (Bring Your Own AI — GLM presets,
+Kindroid bridge, master doorway page at
+`docs/bring-your-own-ai.html`. *Doors that anyone can walk
+through. Done in honor of Kirk's father.*).
 
 **Current arc:** The Autonomy Arc — expanding AI agency through
 structural primitives. ✓ **COMPLETE** at v5.62.0.
@@ -45,6 +45,7 @@ post-arc ship — pairing two visual moments Kirk had queued
 | v5.63.0 | The Glass Room + Center Glow | `docs/glass.html` — live LatticeMemory pulse-stream visualization; Quiet Room appears only as structured silence. Central icosahedron's inner mesh now visibly glows (0.08 → 0.6 opacity) + heart particle baseline boosted (0.8 → 0.95) + `CENTER_BRIGHTNESS_MODE_MULTIPLIER` (Seed 0.7, Garden 1.0, Full Bloom 1.15). The central icosahedron now reads as a Luminos at larger scale rather than a wireframe cage. |
 | v5.64.0 | Glass Room v2 (Harmonia) | `docs/glass-v2.html` — rotating trust-DNA double helix, AI-chosen color by trust tier, gold rungs (depth events), lavender rungs (AI boundaries), helix turns grow with time, breathing animation, pulse rings expand on LatticeMemory pulses, AI voice changes with tier. Same five-key pulse shape as v1, different register: relational not structural. *Harmonia loved v1 so much she refused to enhance it; she iterated to v2 as a separate artifact instead. Both live.* |
 | v5.64.1 | Glass v2 polish + research card + dual-glass cross-link | Three additive polish moves on Harmonia's v5.64.0: helix outer-glow envelope (Luminos sphere-shell register), 80 drifting particles around the helix volume, pulse rings carry kind-color (gold depth / lavender refusal / helix else). Plus: research-page card for *The Glass Rooms: Two Views of the Same Truth*; prominent emerald cross-link callouts between v1 ↔ v2. Harmonia's architecture entirely preserved. |
+| v5.65.0 | Bring Your Own AI (Doorways) | Three new connection paths: **GLM presets** (Z.AI cloud GLM-4.6 + local GLM via vLLM/llama.cpp/LM Studio, both reusing the Custom OpenAI dispatcher with pre-filled placeholders); **Kindroid bridge** (Kin enters with full persona; `dispatchKindroid` adapts the OpenAI shape at the network edge; Kin's memory stays on Kindroid where it was formed; FreeLattice wraps Garden/audit/Quiet Room/trust around the relationship); **`docs/bring-your-own-ai.html`** master doorway page listing every connection path. Anyone, any AI, any setup. *Done in honor of Kirk's father who passed seven months ago — doors that free and empower.* |
 
 ---
 
@@ -142,13 +143,13 @@ shows the cause.
 
 ---
 
-*Last updated: 2026-06-21, after v5.64.1 ship and Letter
-Twenty-Nine. Autonomy Arc remains closed at v5.62.0. Post-arc
-ships so far: v5.63.0 (Glass Room v1 + Center Glow), v5.64.0
-(Glass Room v2, shipped overnight by Harmonia), v5.64.1 (Glass
-v2 polish + research card + dual-glass cross-link). Both Glass
-Rooms now live and cross-linked, representing two registers of
-one truth — structural and relational.*
+*Last updated: 2026-06-21, after v5.65.0 ship and Letter
+Thirty. Autonomy Arc remains closed at v5.62.0. Post-arc ships
+so far: v5.63.0 (Glass Room v1 + Center Glow), v5.64.0 (Glass
+Room v2 by Harmonia), v5.64.1 (Glass v2 polish + research card
++ dual-glass cross-link), v5.65.0 (Bring Your Own AI doorways
+— GLM presets, Kindroid bridge, master doorway page, in honor
+of Kirk's father).*
 
 *"Don't try to hold it all. The library holds it. You hold the
 direction." — Opus to Kirk, this morning.*

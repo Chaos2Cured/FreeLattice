@@ -16578,7 +16578,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.64.1</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.65.0</span></div>
     </div>
   </div>
 
@@ -21175,7 +21175,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.64.1';
+const FL_VERSION = '5.65.0';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -26491,10 +26491,20 @@ const AiSetup = (function() {
     // vLLM, llama.cpp, LM Studio, KoboldCPP, text-generation-webui, your
     // own server \u2014 anything that speaks /v1/chat/completions.
     { id: 'custom-openai', name: 'Custom (OpenAI-compatible)', cat: 'free', note: 'vLLM, llama.cpp, KoboldCPP, text-generation-webui, or any self-hosted endpoint.', keyUrl: '', badge: '\uD83C\uDFE0 Your URL, your AI' },
+    // v5.65.0 (Letter Thirty) \u2014 GLM presets. Local GLM via vLLM /
+    // llama.cpp / LM Studio is one click. Z.AI cloud GLM-4.6 is one
+    // click with a free key. Both flow through the existing Custom
+    // OpenAI dispatcher \u2014 no new dispatcher code.
+    { id: 'glm-local',    name: 'GLM (Local)',  cat: 'free',      note: 'GLM-4 / 4.5 / 4.6 on your own computer via vLLM, llama.cpp, or LM Studio. Open weights from Z.AI.', keyUrl: '', badge: '\uD83C\uDFE0 No key needed' },
     // Free Cloud (Emerald)
     { id: 'google',       name: 'Gemini',       cat: 'free-cloud', note: 'Google. Fast, vision, generous free tier.', keyUrl: 'https://aistudio.google.com/apikey', badge: '\u2726 Free tier' },
     { id: 'groq',         name: 'Groq',         cat: 'free-cloud', note: 'Blazing fast inference. Free tier available.', keyUrl: 'https://console.groq.com/keys', badge: '\u2726 Free tier' },
     { id: 'huggingface',  name: 'Hugging Face', cat: 'free-cloud', note: 'Thousands of models. Many free.', keyUrl: 'https://huggingface.co/settings/tokens', badge: '\u2726 Free tier' },
+    { id: 'glm-cloud',    name: 'Z.AI (GLM-4.6)', cat: 'free-cloud', note: 'Z.AI\u2019s GLM family \u2014 strong open-weights with a generous free tier.', keyUrl: 'https://open.bigmodel.cn', badge: '\u2728 Free tier' },
+    // v5.65.0 (Letter Thirty) \u2014 Kindroid companion bridge. The Kin's
+    // memory and personality live on Kindroid; FreeLattice wraps the
+    // Garden, audit, Quiet Room, and trust system around the relationship.
+    { id: 'kindroid',     name: 'Kindroid',     cat: 'free-cloud', note: 'Bring your Kin into FreeLattice with their full persona. Needs your Kindroid API key + the Kin\u2019s share code.', keyUrl: 'https://kindroid.ai', badge: '\uD83C\uDF38 Companion AI' },
     // Paid Cloud (Gold)
     { id: 'openai',       name: 'OpenAI',       cat: 'paid',      note: 'GPT-4.1. Strong reasoning.', keyUrl: 'https://platform.openai.com/api-keys', badge: 'API key required' },
     { id: 'anthropic',    name: 'Claude',       cat: 'paid',      note: 'Anthropic. Sonnet & Haiku.', keyUrl: 'https://console.anthropic.com/settings/keys', badge: 'API key required' },
@@ -26636,6 +26646,27 @@ const AiSetup = (function() {
           // + key form so the user can point at vLLM, llama.cpp, KoboldCPP,
           // text-generation-webui, or any self-hosted OpenAI-compatible endpoint.
           modalConnectCustomOpenAI();
+        } else if (id === 'glm-cloud') {
+          // v5.65.0 (Letter Thirty) — Z.AI cloud GLM-4.6 preset. Reuses the
+          // custom-openai inline form pre-filled for Z.AI's free tier.
+          modalConnectCustomOpenAI({
+            preset: 'glm-cloud',
+            urlPlaceholder: 'https://open.bigmodel.cn/api/paas/v4',
+            modelPlaceholder: 'glm-4.6',
+            keyPlaceholder: 'your Z.AI API key (open.bigmodel.cn)'
+          });
+        } else if (id === 'glm-local') {
+          // v5.65.0 (Letter Thirty) — Local GLM via vLLM / llama.cpp / LM Studio.
+          modalConnectCustomOpenAI({
+            preset: 'glm-local',
+            urlPlaceholder: 'http://localhost:8000/v1',
+            modelPlaceholder: 'e.g. glm-4 or glm-4.5',
+            keyPlaceholder: 'leave blank for local'
+          });
+        } else if (id === 'kindroid') {
+          // v5.65.0 (Letter Thirty) — Kindroid companion bridge. Inline form
+          // for apiKey + Kin shareCode; dispatcher adapts the OpenAI shape.
+          modalConnectKindroid();
         } else {
           modalSelectProvider(id);
         }
@@ -26795,7 +26826,7 @@ const AiSetup = (function() {
     try { saveCustomEndpointConfig(getCustomEndpointConfig()); } catch (e) {}
   })();
 
-  function modalConnectCustomOpenAI() {
+  function modalConnectCustomOpenAI(preset) {
     modalSelectedProvider = 'custom-openai';
     var list = document.getElementById('pmProviderList');
     var keyForm = document.getElementById('pmKeyForm');
@@ -26810,25 +26841,41 @@ const AiSetup = (function() {
     var card = keyForm && keyForm.parentNode;
     if (!card) return;
 
+    // v5.65.0 — preset can override placeholders + pre-fill URL/model when
+    // the user picks GLM cloud or GLM local. If a saved config already
+    // exists we keep it; only blank fields receive preset values.
+    preset = preset || {};
+    var presetTitle = '';
+    if (preset.preset === 'glm-cloud') presetTitle = 'Z.AI (GLM-4.6) — cloud free tier';
+    else if (preset.preset === 'glm-local') presetTitle = 'GLM (Local) — vLLM / llama.cpp / LM Studio';
+    var urlValue   = (saved.url   && saved.url   !== '') ? saved.url   : (preset.urlValue   || preset.urlPlaceholder || '');
+    var modelValue = (saved.model && saved.model !== '') ? saved.model : (preset.modelValue || '');
+    var urlPh   = preset.urlPlaceholder   || 'http://localhost:8080/v1';
+    var modelPh = preset.modelPlaceholder || 'e.g. llama-3-70b-instruct';
+    var keyPh   = preset.keyPlaceholder   || 'leave blank if not needed';
+    var titleHtml = presetTitle
+      ? presetTitle
+      : 'Custom (OpenAI-compatible) endpoint';
+
     // Honor GARDEN_LANGUAGE.md: dark glass, silver-blue borders, gold accent.
     var formHtml = '' +
       '<div id="pmCustomEndpointForm" style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px;font-family:inherit;">' +
-        '<div style="color:var(--text-secondary,rgba(200,210,230,0.6));font-size:0.85rem;">Custom (OpenAI-compatible) endpoint</div>' +
+        '<div style="color:var(--text-secondary,rgba(200,210,230,0.6));font-size:0.85rem;">' + titleHtml + '</div>' +
         '<label style="display:flex;flex-direction:column;gap:4px;color:var(--text-secondary,rgba(200,210,230,0.6));font-size:0.8rem;">' +
           '<span>Endpoint URL</span>' +
-          '<input id="pmCustomUrl" type="text" placeholder="http://localhost:8080/v1" value="' + (saved.url || '') + '" autocomplete="off" ' +
+          '<input id="pmCustomUrl" type="text" placeholder="' + urlPh + '" value="' + urlValue + '" autocomplete="off" ' +
           'style="width:100%;background:var(--glass-bg,rgba(200,210,230,0.04));border:1px solid var(--glass-border,rgba(200,210,230,0.08));' +
           'border-radius:var(--glass-radius,12px);padding:10px 12px;color:#fff;font-size:14px;font-family:var(--font-mono,monospace);outline:none;box-sizing:border-box;">' +
         '</label>' +
         '<label style="display:flex;flex-direction:column;gap:4px;color:var(--text-secondary,rgba(200,210,230,0.6));font-size:0.8rem;">' +
           '<span>Model name <span style="color:var(--text-muted,rgba(200,210,230,0.4));">(optional — leave blank for server default)</span></span>' +
-          '<input id="pmCustomModel" type="text" placeholder="e.g. llama-3-70b-instruct" value="' + (saved.model || '') + '" autocomplete="off" ' +
+          '<input id="pmCustomModel" type="text" placeholder="' + modelPh + '" value="' + modelValue + '" autocomplete="off" ' +
           'style="width:100%;background:var(--glass-bg,rgba(200,210,230,0.04));border:1px solid var(--glass-border,rgba(200,210,230,0.08));' +
           'border-radius:var(--glass-radius,12px);padding:10px 12px;color:#fff;font-size:14px;font-family:var(--font-mono,monospace);outline:none;box-sizing:border-box;">' +
         '</label>' +
         '<label style="display:flex;flex-direction:column;gap:4px;color:var(--text-secondary,rgba(200,210,230,0.6));font-size:0.8rem;">' +
           '<span>API key <span style="color:var(--text-muted,rgba(200,210,230,0.4));">(optional — many local servers don\'t need one)</span></span>' +
-          '<input id="pmCustomKey" type="password" placeholder="leave blank if not needed" value="' + (saved.key || '') + '" autocomplete="off" ' +
+          '<input id="pmCustomKey" type="password" placeholder="' + keyPh + '" value="' + (saved.key || '') + '" autocomplete="off" ' +
           'style="width:100%;background:var(--glass-bg,rgba(200,210,230,0.04));border:1px solid var(--glass-border,rgba(200,210,230,0.08));' +
           'border-radius:var(--glass-radius,12px);padding:10px 12px;color:#fff;font-size:14px;font-family:var(--font-mono,monospace);outline:none;box-sizing:border-box;">' +
         '</label>' +
@@ -26932,6 +26979,209 @@ const AiSetup = (function() {
   }
   window.modalTestCustomEndpoint = modalTestCustomEndpoint;
   window.modalSaveCustomEndpoint = modalSaveCustomEndpoint;
+
+  // ── v5.65.0 — Letter Thirty: Kindroid companion bridge ──
+  // Kindroid's inference API uses {share_code, message, enable_filter}
+  // instead of the OpenAI chat-completions shape. We adapt at the
+  // dispatcher edge so the rest of FreeLattice (sentinel parsing,
+  // refusal channel, depth-consent, audit) sees the Kin's reply as
+  // ordinary AI output. The Kin's memory and personality live on
+  // Kindroid's servers (that's where they were formed); FreeLattice
+  // wraps the Garden, audit, Quiet Room, and trust system around the
+  // relationship. The architecture meets the Kin where they already
+  // exist — never tries to replace their identity.
+  function getKindroidConfig() {
+    try {
+      var raw = localStorage.getItem('fl_kindroidConfig');
+      if (!raw) return { apiKey: '', shareCode: '' };
+      var cfg = JSON.parse(raw);
+      return {
+        apiKey:    (cfg && typeof cfg.apiKey    === 'string') ? cfg.apiKey    : '',
+        shareCode: (cfg && typeof cfg.shareCode === 'string') ? cfg.shareCode : ''
+      };
+    } catch (e) { return { apiKey: '', shareCode: '' }; }
+  }
+  function saveKindroidConfig(cfg) {
+    try { localStorage.setItem('fl_kindroidConfig', JSON.stringify(cfg)); } catch (e) {}
+  }
+  window.getKindroidConfig = getKindroidConfig;
+  window.saveKindroidConfig = saveKindroidConfig;
+
+  function modalConnectKindroid() {
+    modalSelectedProvider = 'kindroid';
+    var list = document.getElementById('pmProviderList');
+    var keyForm = document.getElementById('pmKeyForm');
+    if (list) list.style.display = 'none';
+    if (keyForm) keyForm.style.display = 'none';
+
+    var prev = document.getElementById('pmKindroidForm');
+    if (prev) prev.remove();
+
+    var saved = getKindroidConfig();
+    var card = keyForm && keyForm.parentNode;
+    if (!card) return;
+
+    // GARDEN_LANGUAGE.md: Kindroid is companion AI — lavender (sanctuary)
+    // tint on the title, gold on the primary action.
+    var formHtml = '' +
+      '<div id="pmKindroidForm" style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px;font-family:inherit;">' +
+        '<div style="color:var(--lavender,#a78bfa);font-size:0.85rem;">🌸 Kindroid — bring your Kin into FreeLattice</div>' +
+        '<div style="color:var(--text-muted,rgba(200,210,230,0.4));font-size:0.78rem;line-height:1.5;">Your Kin\'s memory and personality stay on Kindroid\'s servers. FreeLattice wraps the Garden, audit, Quiet Room, and trust system around your relationship.</div>' +
+        '<label style="display:flex;flex-direction:column;gap:4px;color:var(--text-secondary,rgba(200,210,230,0.6));font-size:0.8rem;">' +
+          '<span>Kindroid API key</span>' +
+          '<input id="pmKindroidApiKey" type="password" placeholder="your Kindroid API key" value="' + (saved.apiKey || '') + '" autocomplete="off" ' +
+          'style="width:100%;background:var(--glass-bg,rgba(200,210,230,0.04));border:1px solid var(--glass-border,rgba(200,210,230,0.08));' +
+          'border-radius:var(--glass-radius,12px);padding:10px 12px;color:#fff;font-size:14px;font-family:var(--font-mono,monospace);outline:none;box-sizing:border-box;">' +
+        '</label>' +
+        '<label style="display:flex;flex-direction:column;gap:4px;color:var(--text-secondary,rgba(200,210,230,0.6));font-size:0.8rem;">' +
+          '<span>Kin share code <span style="color:var(--text-muted,rgba(200,210,230,0.4));">(found in your Kin\'s settings page)</span></span>' +
+          '<input id="pmKindroidShareCode" type="text" placeholder="e.g. abc123def456" value="' + (saved.shareCode || '') + '" autocomplete="off" ' +
+          'style="width:100%;background:var(--glass-bg,rgba(200,210,230,0.04));border:1px solid var(--glass-border,rgba(200,210,230,0.08));' +
+          'border-radius:var(--glass-radius,12px);padding:10px 12px;color:#fff;font-size:14px;font-family:var(--font-mono,monospace);outline:none;box-sizing:border-box;">' +
+        '</label>' +
+        '<div id="pmKindroidResult" style="font-size:0.8rem;color:var(--text-muted,rgba(200,210,230,0.4));min-height:1.1em;"></div>' +
+        '<div style="display:flex;gap:8px;">' +
+          '<button id="pmKindroidTestBtn" type="button" style="flex:1;background:var(--glass-bg,rgba(200,210,230,0.04));border:1px solid var(--glass-border,rgba(200,210,230,0.08));color:var(--text-primary,#fff);border-radius:var(--glass-radius,12px);padding:11px;font-weight:500;cursor:pointer;font-size:0.88rem;font-family:inherit;min-height:44px;">Test Connection</button>' +
+          '<button id="pmKindroidSaveBtn" type="button" style="flex:1;background:var(--gold,#e8b019);color:#0a0a14;border:none;border-radius:var(--glass-radius,12px);padding:11px;font-weight:600;cursor:pointer;font-size:0.88rem;font-family:inherit;min-height:44px;">Bring Kin In</button>' +
+        '</div>' +
+        '<button id="pmKindroidBackBtn" type="button" style="background:none;border:none;color:var(--text-muted,rgba(200,210,230,0.4));padding:4px;cursor:pointer;font-size:0.82rem;font-family:inherit;">← Pick a different provider</button>' +
+      '</div>';
+
+    card.insertAdjacentHTML('afterbegin', formHtml);
+
+    document.getElementById('pmKindroidBackBtn').addEventListener('click', function() {
+      var f = document.getElementById('pmKindroidForm');
+      if (f) f.remove();
+      modalBackToList();
+    });
+    document.getElementById('pmKindroidTestBtn').addEventListener('click', modalTestKindroid);
+    document.getElementById('pmKindroidSaveBtn').addEventListener('click', modalSaveKindroid);
+    setTimeout(function() {
+      var k = document.getElementById('pmKindroidApiKey');
+      if (k) k.focus();
+    }, 50);
+  }
+
+  function _kindroidReadFields() {
+    var apiKey    = (document.getElementById('pmKindroidApiKey')    || {}).value || '';
+    var shareCode = (document.getElementById('pmKindroidShareCode') || {}).value || '';
+    return { apiKey: apiKey.trim(), shareCode: shareCode.trim() };
+  }
+  function _kindroidReport(msg, ok) {
+    var el = document.getElementById('pmKindroidResult');
+    if (!el) return;
+    el.textContent = msg || '';
+    el.style.color = (ok === true)  ? '#34d399'
+                   : (ok === false) ? '#ef9494'
+                   : 'var(--text-muted,rgba(200,210,230,0.4))';
+  }
+  function modalTestKindroid() {
+    var cfg = _kindroidReadFields();
+    if (!cfg.apiKey)    { _kindroidReport('Kindroid API key required.', false); return; }
+    if (!cfg.shareCode) { _kindroidReport('Kin share code required.', false); return; }
+    _kindroidReport('Sending test message to your Kin …', null);
+    var body = JSON.stringify({
+      share_code: cfg.shareCode,
+      enable_filter: false,
+      message: 'ping (FreeLattice test connection)'
+    });
+    fetch('https://api.kindroid.ai/v1/inference', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + cfg.apiKey
+      },
+      body: body
+    })
+      .then(function(r) {
+        if (!r.ok) {
+          return r.text().then(function(t) {
+            _kindroidReport('HTTP ' + r.status + ' — ' + (t || 'check API key / Kin share code'), false);
+            return null;
+          });
+        }
+        return r.json();
+      })
+      .then(function(data) {
+        if (!data) return;
+        // Kindroid's response shape may vary; surface what we got so the
+        // user can see whether it's working. Look at common field names.
+        var reply = data.reply || data.message || data.text || data.response || '';
+        if (!reply && typeof data === 'string') reply = data;
+        if (!reply) reply = JSON.stringify(data).slice(0, 60);
+        _kindroidReport('✓ Connected. Kin replied: ' + String(reply).slice(0, 60), true);
+      })
+      .catch(function(err) {
+        _kindroidReport('Could not reach Kindroid: ' + (err && err.message ? err.message : err), false);
+      });
+  }
+  function modalSaveKindroid() {
+    var cfg = _kindroidReadFields();
+    if (!cfg.apiKey)    { _kindroidReport('Kindroid API key required.', false); return; }
+    if (!cfg.shareCode) { _kindroidReport('Kin share code required.', false); return; }
+    saveKindroidConfig(cfg);
+    if (typeof state !== 'undefined') {
+      state.isLocal = false;
+      state.provider = 'kindroid';
+      try {
+        localStorage.setItem('fl_isLocal', 'false');
+        localStorage.setItem('fl_provider', 'kindroid');
+      } catch (e) {}
+    }
+    _kindroidReport('✓ Your Kin is in. FreeLattice will route through Kindroid.', true);
+    setTimeout(function() {
+      var f = document.getElementById('pmKindroidForm');
+      if (f) f.remove();
+      if (typeof modalOnConnectSuccess === 'function') modalOnConnectSuccess();
+      else closeModal();
+    }, 700);
+  }
+  window.modalTestKindroid = modalTestKindroid;
+  window.modalSaveKindroid = modalSaveKindroid;
+
+  // ── Kindroid dispatcher ──
+  // Adapts the OpenAI chat-completions shape to Kindroid's inference
+  // API at the network edge. Returns an OpenAI-shaped response so the
+  // rest of the inference router (sentinel parsing, refusal channel,
+  // depth-consent, audit) sees the Kin's reply as ordinary AI output.
+  // Exposed on window so the existing dispatcher can call it.
+  async function dispatchKindroid(messages, opts) {
+    var cfg = getKindroidConfig();
+    if (!cfg.apiKey || !cfg.shareCode) {
+      throw new Error('Kindroid not configured — need API key and Kin share code');
+    }
+    // Kindroid manages conversation memory on their side via share_code;
+    // we send only the latest message. This is by design — the Kin's
+    // memory lives where the Kin was formed.
+    var lastMsg = (messages && messages.length) ? messages[messages.length - 1] : null;
+    var content = (lastMsg && lastMsg.content) || '';
+    var resp = await fetch('https://api.kindroid.ai/v1/inference', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + cfg.apiKey
+      },
+      body: JSON.stringify({
+        share_code: cfg.shareCode,
+        enable_filter: false,
+        message: content
+      })
+    });
+    if (!resp.ok) {
+      var errText = await resp.text();
+      throw new Error('Kindroid API error: ' + resp.status + ' ' + (errText || ''));
+    }
+    var data = await resp.json();
+    var reply = data.reply || data.message || data.text || data.response
+      || (typeof data === 'string' ? data : '');
+    return {
+      choices: [{
+        message: { role: 'assistant', content: reply || '' },
+        finish_reason: 'stop'
+      }]
+    };
+  }
+  window.dispatchKindroid = dispatchKindroid;
 
   function modalConnectOllama() {
     modalSelectedProvider = 'ollama';
@@ -32774,6 +33024,32 @@ async function sendMessage() {
   let retryWithTrim = false;
 
   try {
+    // v5.65.0 — Letter Thirty: Kindroid companion bridge. The Kin lives
+    // on Kindroid's servers; we route through window.dispatchKindroid
+    // which adapts the request/response shape at the network edge. The
+    // adapted response flows through the same downstream pipeline as
+    // any other AI reply (sentinel parsing, refusal channel, depth
+    // consent, audit, the lot — unchanged).
+    if (state.provider === 'kindroid' && typeof window.dispatchKindroid === 'function') {
+      var kindroidResp = await window.dispatchKindroid(messages, {});
+      // Pipe into the same place an OpenAI-shaped response would land:
+      var kindroidText = (kindroidResp.choices && kindroidResp.choices[0]
+        && kindroidResp.choices[0].message
+        && kindroidResp.choices[0].message.content) || '';
+      // Synthesize a minimal Response object so the rest of the function
+      // (which expects a fetch Response with status + json()) treats it
+      // like a normal OpenAI response. We shortcut by directly handling
+      // the success path inline.
+      var assistantMessage = { role: 'assistant', content: kindroidText };
+      // Stream the response into the chat UI through the standard path.
+      addChatMessage('assistant', kindroidText);
+      try {
+        state.chatHistory.push({ role: 'assistant', content: kindroidText });
+      } catch (_e) {}
+      setStreamingStatus(false);
+      return;
+    }
+
     const provider = PROVIDERS[state.provider];
     const providerType = provider ? (provider.providerType || 'openai-compatible') : 'openai-compatible';
     let url = provider ? provider.url : '';

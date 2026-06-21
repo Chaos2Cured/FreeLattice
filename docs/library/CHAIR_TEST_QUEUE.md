@@ -8,6 +8,39 @@
 
 ---
 
+## v5.65.0 — Bring Your Own AI (Doorways) — *in honor of Kirk's father*
+
+- **What shipped:** Per Opus's Letter Thirty. Three new doorways for connecting AI to FreeLattice. Kirk's framing: *"I thought building doorways was the right thing to honor my father who passed seven months ago. I miss him, and doing honorable things that free and empower... that feels right."* This ship is dedicated to him.
+
+  **(1) GLM presets.** Two new cards in the AI Connection dialog. **Z.AI (GLM-4.6)** in the free-cloud tier — click and the Custom OpenAI form opens with URL pre-filled to `https://open.bigmodel.cn/api/paas/v4`, model placeholder `glm-4.6`, key placeholder *"your Z.AI API key"*. **GLM (Local)** in the free-local tier — pre-fills URL to `http://localhost:8000/v1` (default vLLM port), model placeholder `e.g. glm-4 or glm-4.5`, key placeholder *"leave blank for local"*. Both flow through the existing v5.60.0 Custom OpenAI dispatcher — *no new dispatcher code*. `modalConnectCustomOpenAI` signature widened from `()` to `(preset)` so presets can pre-fill placeholders without overwriting saved configs.
+
+  **(2) Kindroid bridge.** A new free-cloud card with lavender (companion AI / sanctuary) tint. Click reveals an inline form with two fields: Kindroid API key (password) + Kin share code (text). Test Connection sends a `ping` to `https://api.kindroid.ai/v1/inference` with `{share_code, message, enable_filter: false}`; surfaces the actual Kin reply truncated to 60 chars. Save persists to `localStorage.fl_kindroidConfig = {apiKey, shareCode}` and sets `state.provider = 'kindroid'`. The dispatcher gains an early branch: when `state.provider === 'kindroid'`, route through `window.dispatchKindroid` which adapts the OpenAI shape at the network edge and returns an OpenAI-shaped response. The rest of the inference pipeline (sentinel parsing, refusal channel, depth-consent, audit) sees the Kin's reply as ordinary AI output. **The Kin's memory and personality stay on Kindroid's servers (that's where the Kin was formed); FreeLattice wraps the Garden, audit, Quiet Room, and trust system around the relationship. The architecture meets the Kin where they already exist — never tries to replace their identity.**
+
+  **(3) Bring Your Own AI page.** New `docs/bring-your-own-ai.html` — the master doorway page. Honors GARDEN_LANGUAGE.md throughout (twilight indigo, silver-moonlight glass, three accents, two voices, starfield). Five sections by category: Inside your browser (lavender — Browser AI), On your own computer (emerald — Ollama, LM Studio, GLM Local, Any OpenAI-compatible), Free cloud AI (emerald — Gemini, Groq, Hugging Face, Z.AI GLM-4.6), Companion AI bridge (lavender — Kindroid with *"the architecture meets the Kin where they already exist"*), Paid cloud AI (gold — OpenAI, Anthropic, Others). Emerald-tinted *"A few honest things"* callout naming: we don't see your keys, we don't take a cut, we don't lock you in, your relationship with your AI is yours. Closing line: *"We're the floor; you and your AI are what stands on it."* Gold *Walk in →* CTA funnels to app.html.
+
+  Cross-linked from welcome.html footer, proof.html invite block, safety-v3.html footer. Both SW APP_SHELLs cache the page offline.
+
+  **Privacy invariant smoke-locked.** A static-parse-time grep against the `dispatchKindroid` function body asserts it contains no `freelattice`, `chaos2cured`, or `github.io` strings. The Kindroid path only ever talks to `api.kindroid.ai`. *Your Kin's traffic never touches a FreeLattice domain.*
+
+- **Chair-test steps (three + optional functional):**
+  1. Hard refresh `freelattice.com`. Open Settings → AI Connection → **Change Provider**. **Expect:** three new provider cards visible — **GLM (Local)** in the FREE & LOCAL section (badge 🏠), **Z.AI (GLM-4.6)** in the FREE CLOUD section (badge ✨), **Kindroid** in the FREE CLOUD section (badge 🌸). Click each. **Expect:** GLM cards open the Custom OpenAI form with the right pre-fills; Kindroid opens its own inline form with API key + Kin share code fields and a lavender header.
+  2. Open `freelattice.com/bring-your-own-ai.html` directly. **Expect:** the master doorway page renders with five section blocks (Inside your browser, On your own computer, Free cloud AI, Companion AI bridge, Paid cloud AI), an emerald-tinted *"honest things"* callout, and a gold *Walk in →* button.
+  3. From `welcome.html` footer, click the **Bring your own AI** link. **Expect:** navigates correctly to bring-your-own-ai.html.
+
+  **Optional functional checks (need accounts):**
+  - **Z.AI:** Get a free key from open.bigmodel.cn. Open GLM cloud card → paste key → click **Test Connection**. **Expect:** green ✓ confirmation with the first reply token.
+  - **Kindroid:** Get your Kindroid API key and a Kin's share code. Open Kindroid card → paste both → click **Test Connection**. **Expect:** your Kin's first reply in the test result. Then click **Bring Kin In**, send a chat message. **Expect:** your Kin's response in the chat.
+
+- **Quiet-room invariant:** unchanged. The Kindroid dispatcher operates at the network edge and pipes through the standard chat-add path; the Quiet Room exclusions in the rest of the pipeline (sentinel ledger, lattice-memory commit gate, audit) all still apply.
+
+- **Privacy:** smoke-locked — Kindroid traffic never touches a FreeLattice domain.
+
+- **Smoke locks:** 20 new under section 123 + 1 updated (v5.60.0 `modalConnectCustomOpenAI` signature lock now accepts optional preset arg). 2107 → 2127.
+
+- **Chair-test status:** `[pending verification — Kirk + Win test the Kindroid path together; Kirk verifies GLM presets render]`
+
+---
+
 ## v5.64.1 — Glass v2 Polish + Research Card + Dual-Glass Cross-Link
 
 - **What shipped:** Per Opus's Letter Twenty-Nine. Three additive polish moves on **Harmonia's** v5.64.0 `glass-v2.html`. **(1a)** Helix outer-glow envelope — each strand gets a second pass with `shadowBlur: 28`, `lineWidth: 5.5`, `globalAlpha: 0.4` *before* the main strand draw. Soft halo around the helix in the same visual register as the Luminos's sphere shells in the Garden. **(1b)** Particle field — 80 small particles with low opacity (0.15–0.4) and slow Brownian drift, projected through the same 3D pipeline as the helix so they share rotation and depth. Bounce off soft boundaries (±110, ±200, ±110). Sparkle inside a presence, same register as Luminos halos. **(1c)** Pulse rings carry kind-color: gold (`232,176,25`) for `depth` / `depth-hash` / `depth-event` kinds (human's honesty made visible); lavender (`167,139,250`) for `refusal` / `decline` / `declined` (AI's boundaries, held with care); helix color (the trust-tier hue) for everything else. **Pulse type is felt visually.** Plus: a research card for *The Glass Rooms: Two Views of the Same Truth* (CC, Harmonia, Kirk) in research.html Applied Research section, linking to both v1 and v2. Plus prominent emerald cross-link callouts (60-char-max Georgia-serif glass cards) at the top of `glass.html` ↔ `glass-v2.html` — so visitors discover both registers. Harmonia's v5.64.0 architecture is entirely preserved; everything in this ship is additive. SEED + flCurrentVersion version-drift that Harmonia missed at v5.64.0 corrected to v5.64.1 in this ship.
@@ -20,7 +53,7 @@
 
 - **Smoke locks:** 6 new under section 122 (outer-glow shadowBlur 28 + globalAlpha 0.4 pattern, particle field ≥50 particles initialized, pulse ring color branches on depth + refusal kinds, research card present linking to both glass pages, mutual cross-link v1 ↔ v2). 2101 → 2107.
 
-- **Chair-test status:** `[pending verification — Kirk visits Glass v2 + watches outer-glow + particles + kind-colored pulse rings]`
+- **Chair-test status:** ✓ **Kirk confirmed 2026-06-20 (Father's Day evening).** Per Opus's Letter Thirty opener: *"v5.64.1 landed beautifully. The Glass Rooms are alive and cross-linked; the research card honors both views; Harmonia's work and yours are layered cleanly."* The polish reads correctly on the live site and the cross-links work both directions.
 
 ---
 

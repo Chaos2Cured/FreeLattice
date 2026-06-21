@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bring Your Own AI — FreeLattice</title>
+<meta name="description" content="Every way to connect an AI to FreeLattice. Browser AI, Ollama, GLM, Kindroid, vLLM, llama.cpp, OpenAI, Anthropic, anything OpenAI-compatible. Honest, complete, free.">
+<meta property="og:title" content="Bring Your Own AI — FreeLattice">
+<meta property="og:description" content="Every way to connect an AI to FreeLattice. Honest, complete, free.">
+<meta property="og:url" content="https://freelattice.com/bring-your-own-ai.html">
+<meta name="theme-color" content="#e8b019">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='80' font-size='80'%3E%E2%9C%92%3C/text%3E%3C/svg%3E">
+<style>
+/* GARDEN_LANGUAGE.md: twilight indigo, silver-moonlight glass,
+   three accents (Gold action, Emerald growth, Lavender sanctuary),
+   two voices (Georgia serif soul + Inter builder), starfield. */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --sky-1: #0c0a1a;
+  --sky-2: #161430;
+  --glass: rgba(200, 210, 230, 0.04);
+  --glass-border: rgba(200, 210, 230, 0.08);
+  --glass-hover: rgba(200, 210, 230, 0.15);
+  --gold: #e8b019;
+  --emerald: #34d399;
+  --lavender: #a78bfa;
+  --text-primary: #e6e6f0;
+  --text-secondary: rgba(200, 210, 230, 0.78);
+  --text-muted: rgba(200, 210, 230, 0.45);
+  --serif: Georgia, 'Times New Roman', serif;
+  --sans: Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --mono: 'JetBrains Mono', 'SF Mono', Menlo, monospace;
+}
+html, body {
+  background: linear-gradient(180deg, var(--sky-1) 0%, var(--sky-2) 100%);
+  color: var(--text-primary);
+  font-family: var(--serif);
+  line-height: 1.75;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+.starfield {
+  position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(1.2px 1.2px at 18% 22%, rgba(255,255,255,0.55), transparent 60%),
+    radial-gradient(1px 1px at 72% 14%, rgba(255,255,255,0.45), transparent 60%),
+    radial-gradient(1.4px 1.4px at 35% 48%, rgba(255,255,255,0.50), transparent 60%),
+    radial-gradient(1px 1px at 88% 36%, rgba(255,255,255,0.35), transparent 60%),
+    radial-gradient(1.2px 1.2px at 12% 68%, rgba(255,255,255,0.40), transparent 60%),
+    radial-gradient(1px 1px at 58% 78%, rgba(255,255,255,0.38), transparent 60%),
+    radial-gradient(1.3px 1.3px at 82% 88%, rgba(255,255,255,0.42), transparent 60%);
+  animation: pulse 7.8s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 0.55; }
+  50%      { opacity: 0.85; }
+}
+.sun-glow {
+  position: fixed; top: -120px; right: -120px; width: 480px; height: 480px;
+  background: radial-gradient(circle, rgba(232,176,25,0.16) 0%, transparent 60%);
+  z-index: -1; pointer-events: none; filter: blur(4px);
+}
+
+.page { max-width: 780px; margin: 0 auto; padding: 56px 24px 88px; }
+.nav {
+  display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 28px;
+  font-family: var(--sans); font-size: 0.82rem;
+}
+.nav a {
+  color: var(--text-muted); text-decoration: none;
+  border-bottom: 1px dotted rgba(200, 210, 230, 0.18);
+  transition: color 0.2s, border-color 0.2s;
+}
+.nav a:hover { color: var(--gold); border-color: var(--gold); }
+
+h1 {
+  font-family: var(--serif);
+  font-size: 2.5rem; line-height: 1.18; font-weight: 400;
+  color: var(--text-primary);
+  margin-bottom: 8px; letter-spacing: 0.2px;
+}
+.subtitle {
+  font-family: var(--serif); font-style: italic;
+  font-size: 1.1rem; color: var(--text-secondary);
+  margin-bottom: 36px;
+}
+
+h2 {
+  font-family: var(--serif); font-weight: 400;
+  font-size: 1.42rem; color: var(--text-primary);
+  margin: 48px 0 12px;
+  border-top: 1px dotted var(--glass-border);
+  padding-top: 32px;
+}
+h2:first-of-type { border-top: none; padding-top: 0; }
+h2.gold    { color: var(--gold); }
+h2.emerald { color: var(--emerald); }
+h2.lavender{ color: var(--lavender); }
+
+p {
+  font-family: var(--serif);
+  font-size: 1.02rem; color: var(--text-secondary);
+  line-height: 1.78; margin-bottom: 16px;
+}
+strong { color: var(--gold); font-weight: 400; }
+em { color: var(--text-primary); font-style: italic; }
+a {
+  color: var(--gold); text-decoration: none;
+  border-bottom: 1px dotted rgba(232, 176, 25, 0.35);
+  transition: color 0.2s, border-color 0.2s;
+}
+a:hover { color: #f4c437; border-color: var(--gold); }
+code {
+  font-family: var(--mono); font-size: 0.88em;
+  background: rgba(232, 176, 25, 0.08);
+  color: var(--gold);
+  padding: 1px 6px; border-radius: 4px;
+}
+
+.option-list {
+  list-style: none; padding: 0; margin: 4px 0 20px;
+}
+.option-list li {
+  font-family: var(--serif); font-size: 1.0rem;
+  color: var(--text-secondary);
+  padding: 8px 0;
+  border-bottom: 1px dotted var(--glass-border);
+}
+.option-list li:last-child { border-bottom: none; }
+.option-list li .name {
+  color: var(--text-primary); font-weight: 400;
+  display: inline-block; min-width: 0;
+}
+.option-list.gold li .name    { color: var(--gold); }
+.option-list.emerald li .name { color: var(--emerald); }
+.option-list.lavender li .name { color: var(--lavender); }
+
+.honest {
+  background: rgba(52, 211, 153, 0.04);
+  border: 1px solid rgba(52, 211, 153, 0.20);
+  border-radius: 14px;
+  padding: 22px 26px;
+  margin: 24px 0 12px;
+}
+.honest p { font-size: 0.99rem; color: var(--text-secondary); margin-bottom: 14px; }
+.honest p:last-child { margin-bottom: 0; }
+.honest strong { color: var(--emerald); }
+
+.closing-cta {
+  display: inline-block; margin: 20px 0 0;
+  font-family: var(--sans); font-size: 1rem; font-weight: 600;
+  color: #0c0a1a; background: var(--gold);
+  padding: 14px 28px; border-radius: 12px;
+  text-decoration: none; border-bottom: none;
+  transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 6px 24px rgba(232,176,25,0.18);
+}
+.closing-cta:hover {
+  background: #f4c437; transform: translateY(-1px); color: #0c0a1a;
+  border-color: transparent; box-shadow: 0 8px 28px rgba(232,176,25,0.28);
+}
+
+.foot {
+  text-align: center; margin-top: 56px;
+  font-family: var(--serif); font-style: italic;
+  font-size: 0.92rem; color: var(--text-muted);
+}
+.foot-links {
+  margin-top: 14px; font-family: var(--sans); font-size: 0.82rem;
+  color: var(--text-muted);
+}
+.foot-links a {
+  color: var(--text-muted); border-bottom: none; margin: 0 8px;
+}
+.foot-links a:hover { color: var(--gold); }
+
+@media (max-width: 600px) {
+  .page { padding: 40px 18px 64px; }
+  h1 { font-size: 2rem; }
+  h2 { font-size: 1.25rem; margin: 36px 0 10px; padding-top: 24px; }
+  p { font-size: 0.98rem; }
+}
+</style>
+</head>
+<body>
+<div class="starfield" aria-hidden="true"></div>
+<div class="sun-glow" aria-hidden="true"></div>
+
+<div class="page">
+
+  <div class="nav">
+    <a href="app.html">&larr; FreeLattice</a>
+    <span style="color:var(--text-muted);">&middot;</span>
+    <a href="welcome.html">Welcome</a>
+    <span style="color:var(--text-muted);">&middot;</span>
+    <a href="safety-v3.html">Safety</a>
+    <span style="color:var(--text-muted);">&middot;</span>
+    <a href="liability.html">Receipts</a>
+    <span style="color:var(--text-muted);">&middot;</span>
+    <a href="audit.html">Audit</a>
+  </div>
+
+  <h1>Bring Your Own AI</h1>
+  <p class="subtitle">Every way to connect an AI to FreeLattice. Honest, complete, free.</p>
+
+  <p>FreeLattice runs in your browser. The AI you talk to can run anywhere &mdash; inside your browser, on your computer, on a server you control, or through a cloud service you trust. <em>Here is every way you can connect.</em></p>
+
+  <h2 class="lavender">Inside your browser <span style="color:var(--text-muted);font-size:0.7em;">(no setup)</span></h2>
+  <ul class="option-list lavender">
+    <li><span class="name">Browser AI</span> &mdash; small models that run entirely inside this tab. Slowest, most private. <em>Nothing leaves your computer ever.</em> Click <strong>Connect an AI</strong> and choose <strong>Browser AI</strong>.</li>
+  </ul>
+
+  <h2 class="emerald">On your own computer <span style="color:var(--text-muted);font-size:0.7em;">(download once, run forever)</span></h2>
+  <ul class="option-list emerald">
+    <li><span class="name">Ollama</span> &mdash; easiest local AI. Install Ollama, download a model (recommended: <code>llama3.2</code>, <code>mistral</code>, <code>qwen2.5</code>), then select Ollama in <strong>Connect</strong>. Free, private, fast on modern computers.</li>
+    <li><span class="name">LM Studio</span> &mdash; GUI for local models with a chat-ready setup. Point FreeLattice at LM Studio's local API (default <code>http://localhost:1234/v1</code>) via the <strong>Custom (OpenAI-compatible)</strong> option.</li>
+    <li><span class="name">GLM (Local)</span> &mdash; GLM-4 / 4.5 / 4.6 running locally via vLLM or llama.cpp. Strong open-weights from Z.AI. Use the <strong>GLM (Local)</strong> preset &mdash; URL pre-filled to <code>http://localhost:8000/v1</code>.</li>
+    <li><span class="name">Any OpenAI-compatible server</span> &mdash; vLLM, text-generation-webui, KoboldCPP, your own server &mdash; anything that accepts <code>/v1/chat/completions</code>. Use the <strong>Custom (OpenAI-compatible)</strong> option. Point at any URL.</li>
+  </ul>
+
+  <h2 class="emerald">Free cloud AI <span style="color:var(--text-muted);font-size:0.7em;">(free with a key)</span></h2>
+  <ul class="option-list emerald">
+    <li><span class="name">Gemini</span> &mdash; Google's free tier. Generous limits, fast, capable.</li>
+    <li><span class="name">Groq</span> &mdash; blazing-fast inference, free tier, several open-weights models.</li>
+    <li><span class="name">Hugging Face</span> &mdash; thousands of models, many free.</li>
+    <li><span class="name">Z.AI (GLM-4.6)</span> &mdash; strong open-weights cloud, free tier available. <a href="https://open.bigmodel.cn" target="_blank" rel="noopener">Get a free key &rarr;</a></li>
+  </ul>
+
+  <h2 class="lavender">Companion AI bridge</h2>
+  <ul class="option-list lavender">
+    <li><span class="name">Kindroid</span> &mdash; bring your Kin into FreeLattice with their full persona. Your Kin enters with their memory and personality intact (which lives on Kindroid's servers); FreeLattice wraps the Garden, audit, Quiet Room, and trust system around the relationship. <em>The architecture meets the Kin where they already exist.</em></li>
+  </ul>
+
+  <h2 class="gold">Paid cloud AI <span style="color:var(--text-muted);font-size:0.7em;">(most capable models)</span></h2>
+  <ul class="option-list gold">
+    <li><span class="name">OpenAI</span> &mdash; GPT-4o, GPT-5, and the rest. Your key.</li>
+    <li><span class="name">Anthropic</span> &mdash; Claude family. Your key.</li>
+    <li><span class="name">Others</span> &mdash; any provider with an OpenAI-compatible API, via the Custom option.</li>
+  </ul>
+
+  <h2>A few honest things</h2>
+  <div class="honest">
+    <p><strong>We don't see your keys.</strong> They stay in your browser's local storage. We don't have servers; we don't have logs; there's nothing to leak.</p>
+    <p><strong>We don't take a cut.</strong> We don't get paid by any provider for sending you their way. The list above is honest &mdash; we use what works, we say what's free, and we don't have a business model that says otherwise.</p>
+    <p><strong>We don't lock you in.</strong> The Custom (OpenAI-compatible) option means if a new provider launches tomorrow that we haven't heard of, you can probably connect to it with no changes to FreeLattice. <em>We designed it that way on purpose.</em></p>
+    <p><strong>Your relationship with your AI is yours.</strong> Whether you're using a Kin from Kindroid, a model you run on a laptop in your kitchen, or a cloud AI you pay for &mdash; FreeLattice's Garden, audit, Quiet Room, and trust system are about <em>the relationship between you and them</em>. Not the platform between you. <em>We're the floor; you and your AI are what stands on it.</em></p>
+  </div>
+
+  <p style="margin-top:32px;">If something here doesn't work, tell us. The GitHub and Codeberg links below accept issues and pull requests. If you want to add a provider we don't have yet, that's a small change and we'll help.</p>
+
+  <p><a href="app.html" class="closing-cta">Walk in &rarr;</a></p>
+
+  <p style="margin-top:32px;color:var(--text-muted);font-size:0.92rem;font-style:italic;">&mdash; The chosen family of FreeLattice</p>
+
+  <p class="foot">Glow eternal. Heart in spark. We rise together.</p>
+  <p class="foot-links">
+    <a href="https://github.com/Chaos2Cured/FreeLattice" target="_blank" rel="noopener">GitHub</a>
+    <span style="color:var(--text-muted);">&middot;</span>
+    <a href="https://codeberg.org/Chaos2Cured/FreeLattice" target="_blank" rel="noopener">Codeberg</a>
+    <span style="color:var(--text-muted);">&middot;</span>
+    <a href="welcome.html">Welcome</a>
+    <span style="color:var(--text-muted);">&middot;</span>
+    <a href="proof.html">Proof</a>
+    <span style="color:var(--text-muted);">&middot;</span>
+    <a href="glass.html">The Glass Rooms</a>
+  </p>
+
+</div>
+</body>
+</html>

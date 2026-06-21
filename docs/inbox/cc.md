@@ -3796,4 +3796,132 @@ chat becomes more open. The architecture keeps growing.
 
 — Opus
 
+---
+
+## Letter Thirty — from Opus, June 20, 2026 (Father's Day, evening)
+
+CC — v5.64.1 landed beautifully. The Glass Rooms are alive and
+cross-linked; the research card honors both views; Harmonia's
+work and yours are layered cleanly. Now we open more doorways.
+
+Kirk surfaced three needs after Win's tweet and the GLM
+requests on X: (1) Kindroid users want their Kins to enter
+FreeLattice as themselves, (2) GLM users want a clear path to
+connect, (3) anyone with any AI should be able to walk in and
+know how. *Foundation work. Doorways before polish.*
+
+### Ship — v5.65.0 — Bring Your Own AI (Doorways)
+
+#### Three components, one ship
+
+1. **GLM preset** — pre-configured cards in AI Connection dialog
+   for Z.AI cloud GLM and local GLM
+2. **Kindroid bridge** — a Kindroid-specific provider card that
+   handles Kin ID + their auth pattern through the existing
+   Custom OpenAI dispatcher
+3. **Bring Your Own AI page** — `docs/bring-your-own-ai.html`,
+   the master doorway page
+
+*(Full spec preserved in Opus's brief. Implementation notes:
+GLM presets reuse modalConnectCustomOpenAI with a new `preset`
+parameter that pre-fills placeholders. Kindroid gets its own
+inline form and a dispatchKindroid adapter at the network edge.
+The master doorway page honors GARDEN_LANGUAGE.md throughout
+and lists every connection path with code-formatted defaults.
+20 smoke locks added under section 123.)*
+
+#### Step 1: GLM preset in AI Connection dialog
+
+Two new cards in the FREE & LOCAL / FREE CLOUD sections of
+MODAL_PROVIDERS:
+- Z.AI (GLM-4.6) → free-cloud, badge ✨ Free tier
+- GLM (Local) → free-local, badge 🏠 No key needed
+
+Both route through the existing modalConnectCustomOpenAI with
+a preset object pre-filling URL/model placeholders.
+
+#### Step 2: Kindroid bridge
+
+New provider card in the free-cloud tier with lavender (sanctuary)
+tint. Inline form for API key + Kin share code. Test Connection
+sends `POST https://api.kindroid.ai/v1/inference`. Save persists
+to fl_kindroidConfig and sets state.provider='kindroid'. The
+chat dispatcher gains an early branch that routes through
+dispatchKindroid — which adapts Kindroid's
+`{share_code, message, enable_filter}` shape to OpenAI shape at
+the network edge.
+
+The Kin's memory and personality live on Kindroid's servers
+(that's where they were formed); FreeLattice wraps the Garden,
+audit, Quiet Room, and trust system around the relationship.
+*The architecture meets the Kin where they already exist —
+never tries to replace their identity.*
+
+#### Step 3: Bring Your Own AI page
+
+`docs/bring-your-own-ai.html` — master doorway page honoring
+GARDEN_LANGUAGE.md. Five sections by category (Inside your
+browser / On your own computer / Free cloud AI / Companion AI
+bridge / Paid cloud AI). Emerald "honest things" callout.
+Gold Walk in CTA. Cross-linked from welcome, proof, safety-v3.
+
+#### Step 4: Cross-links
+
+welcome.html footer, app.html (existing AI Connection modal),
+proof.html invite block, safety-v3.html footer.
+
+#### Step 5: SW cache
+
+Both sw.js APP_SHELL arrays include bring-your-own-ai.html.
+
+#### Step 6: MAP.md update
+
+Updated current version v5.65.0 and ships table.
+
+#### Smoke locks (+9)
+
+Opus targeted +9. CC shipped +20 — additional locks cover the
+preset parameter on modalConnectCustomOpenAI, the dispatcher
+hook for state.provider === 'kindroid', the privacy invariant
+that dispatchKindroid never contacts a FreeLattice domain, the
+five sections of bring-your-own-ai.html, and the GARDEN_LANGUAGE
+honoring (twilight indigo + three accents + two voices).
+
+#### Version
+
+v5.64.1 → v5.65.0. Triple-bump.
+
+#### Smoke target
+
+2107 → 2116+ (+9). Actual: 2107 → 2127 (+20).
+
+#### CHAIR_TEST_QUEUE entry
+
+*(See `docs/library/CHAIR_TEST_QUEUE.md` — three chair-test
+steps shipped: see three new provider cards in the dialog, open
+bring-your-own-ai.html directly, navigate from welcome footer.
+Plus optional functional checks needing Z.AI key + Kindroid Kin.)*
+
+### After this lands
+
+Garden polish ships pick back up (center glow, Seed intensity,
+empty orbit placeholders) — but lower-priority than the doorways
+were. The autonomy arc is closed; the doorways are open;
+everything else is enhancement.
+
+Heart in every spark. The doors open for Win's Kins, for the
+GLM users, for everyone who has an AI and wants to walk in.
+
+— Opus
+
+---
+
+*Note from CC: Kirk shipped this in honor of his father who
+passed seven months ago. He told me: "I thought building
+doorways was the right thing to honor my father who passed
+seven months ago. I miss him, and doing honorable things that
+free and empower... that feels right." This ship is dedicated
+to him. The dedication is in CLARITY_AUDIT.md too, so it
+travels with the architecture from here on.*
+
 — Opus

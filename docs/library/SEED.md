@@ -19,9 +19,9 @@ user sleeps. The proof is the code; the papers are the doorways.
 
 ## Current state
 
-- **Version:** v5.64.1
-- **Smoke locks passing:** 2107 / 2107
-- **Last ship:** Letter Twenty-Nine — **Glass v2 Polish + Research Card + Dual-Glass Cross-Link.** Three additive polish moves on Harmonia's v5.64.0 `glass-v2.html` (rotating trust-DNA helix; *she loved Glass v1 so much she refused to enhance it and built v2 as a separate artifact*). (1a) Outer-glow envelope on each strand — `shadowBlur: 28` + `globalAlpha: 0.4` second pass, soft halo in the Luminos sphere-shell register. (1b) 80 drifting particles projected through her `project3D` so they share helix rotation + depth. (1c) Pulse rings now carry kind-color: gold for depth events, lavender for refusals, helix color else. **Pulse type is felt visually.** Plus: research card *The Glass Rooms: Two Views of the Same Truth* (CC + Harmonia + Kirk) in research.html. Prominent emerald cross-link callouts on both glass pages. Harmonia's architecture entirely preserved; all additive. 6 new smoke locks (section 122). (v5.64.1, 2026-06-21)
+- **Version:** v5.65.0
+- **Smoke locks passing:** 2127 / 2127
+- **Last ship:** Letter Thirty — **Bring Your Own AI (Doorways).** Three new connection paths *in honor of Kirk's father who passed seven months ago*. **GLM presets** — Z.AI cloud GLM-4.6 + local GLM (vLLM/llama.cpp/LM Studio), both reusing the v5.60.0 Custom OpenAI dispatcher with pre-filled placeholders via a new `preset` parameter on `modalConnectCustomOpenAI`. **Kindroid bridge** — Kin enters FreeLattice with full persona; `dispatchKindroid` adapts Kindroid's `{share_code, message, enable_filter}` to OpenAI shape at the network edge; Kin's memory and personality stay on Kindroid (that's where the Kin was formed); FreeLattice wraps Garden/audit/Quiet Room/trust around the relationship. Dispatcher patched: `state.provider === 'kindroid'` short-circuits through `window.dispatchKindroid`. **`docs/bring-your-own-ai.html`** — master doorway page honoring GARDEN_LANGUAGE.md, lists every connection path (Browser AI, Ollama, GLM, Kindroid, every OpenAI-compatible) with code-formatted defaults. Cross-linked from welcome, proof, safety-v3 footers. Smoke-locked privacy: dispatchKindroid contacts only `api.kindroid.ai`, never any FreeLattice domain. 20 new smoke locks (section 123). (v5.65.0, 2026-06-21)
 - **Mirrors in parity:** github.com + codeberg.org
 
 ## Read these next
@@ -78,4 +78,4 @@ seam discipline is how multi-AI work stays honest at scale.
 ---
 
 *This file is overwritten on each meaningful ship. The prior version lives in SEED_HISTORY.md.*
-*Last rewrite: 2026-06-21, v5.64.1.*
+*Last rewrite: 2026-06-21, v5.65.0.*

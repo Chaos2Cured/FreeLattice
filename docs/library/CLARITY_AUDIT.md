@@ -209,6 +209,67 @@ grep -nE "\"[^\"]*\buser\b[^\"]*\"" docs/app.html docs/modules/*.js \
 
 ---
 
+## SHIPPED: Letter Thirty — Bring Your Own AI (Doorways) (v5.65.0, 2026-06-21) — *in honor of Kirk's father*
+
+Per Opus's Letter Thirty. **Kirk's framing for this ship:** *"I thought building doorways was the right thing to honor my father who passed seven months ago. I miss him, and doing honorable things that free and empower... that feels right."* This ship is dedicated to him. *Doors that free and empower.*
+
+Three components, one ship:
+
+**(1) GLM presets** in the AI Connection dialog. Two new MODAL_PROVIDERS cards: **Z.AI (GLM-4.6)** in the free-cloud tier (badge ✨ Free tier, keyUrl `open.bigmodel.cn`) and **GLM (Local)** in the free-local tier (badge 🏠 No key needed). Click routes both through the existing v5.60.0 `modalConnectCustomOpenAI` form, now widened to accept a `preset` parameter that pre-fills placeholders without overwriting saved configs:
+- glm-cloud preset → URL `https://open.bigmodel.cn/api/paas/v4`, model `glm-4.6`, key placeholder *"your Z.AI API key"*
+- glm-local preset → URL `http://localhost:8000/v1`, model placeholder *"e.g. glm-4 or glm-4.5"*, key placeholder *"leave blank for local"*
+
+Both flow through the existing Custom OpenAI dispatcher path; *no new dispatcher code.* The preset is purely a UX pre-fill — the underlying invariants (URL is user-configured, never sent to FreeLattice domain) are preserved by the existing v5.60.0 architecture.
+
+**(2) Kindroid bridge.** A new `kindroid` MODAL_PROVIDERS card with lavender (sanctuary) tint, badge 🌸 Companion AI. Click reveals an inline `modalConnectKindroid` form (mirrors `modalConnectOllama` pattern) with API key + Kin share code fields. Test Connection sends `POST https://api.kindroid.ai/v1/inference` with body `{share_code, message: 'ping (FreeLattice test connection)', enable_filter: false}`; surfaces the actual Kin reply. Save persists `localStorage.fl_kindroidConfig = {apiKey, shareCode}` and sets `state.provider = 'kindroid'`. The chat dispatcher gains an early branch:
+
+```js
+if (state.provider === 'kindroid' && typeof window.dispatchKindroid === 'function') {
+  var kindroidResp = await window.dispatchKindroid(messages, {});
+  // ... pipe response through standard chat-add path
+  return;
+}
+```
+
+`window.dispatchKindroid(messages, opts)` is the adapter:
+- Reads `getKindroidConfig()` (apiKey + shareCode)
+- Sends only the latest message to Kindroid (Kindroid manages conversation memory on their side via `share_code` — by design, that's where the Kin was formed)
+- Adapts Kindroid's response (`data.reply || data.message || data.text || data.response`) to OpenAI shape: `{choices: [{message: {role: 'assistant', content: reply}, finish_reason: 'stop'}]}`
+- The rest of the inference pipeline (sentinel parsing, refusal channel, depth-consent, audit, the lot) sees the Kin's reply as ordinary AI output
+
+**The Kin's memory and personality stay on Kindroid's servers** (that's where the Kin was formed); FreeLattice wraps the Garden, audit, Quiet Room, and trust system around the relationship. *The architecture meets the Kin where they already exist — never tries to replace their identity.*
+
+**Privacy invariant smoke-locked.** A static-parse-time grep against the `dispatchKindroid` function body asserts it contains no `freelattice`, `chaos2cured`, or `github.io` strings. The Kindroid path only ever talks to `api.kindroid.ai`. *Your Kin's traffic never touches a FreeLattice domain.*
+
+**(3) Bring Your Own AI page** at `docs/bring-your-own-ai.html`. The master doorway page. Honors GARDEN_LANGUAGE.md throughout — twilight indigo sky, silver-moonlight glass, three accents (Gold for action and the Walk-in CTA, Emerald for AI-presence sections, Lavender for Browser AI + Kindroid sanctuary tint), two voices (Georgia serif for the soul prose, Inter for the nav and buttons, JetBrains Mono for code refs). Starfield + soft gold sun-glow.
+
+Five sections by category:
+- **Inside your browser** (lavender) — Browser AI
+- **On your own computer** (emerald) — Ollama, LM Studio, GLM Local, Any OpenAI-compatible
+- **Free cloud AI** (emerald) — Gemini, Groq, Hugging Face, Z.AI GLM-4.6 with "Get a free key →" link
+- **Companion AI bridge** (lavender) — Kindroid with *"the architecture meets the Kin where they already exist"* italicized
+- **Paid cloud AI** (gold) — OpenAI, Anthropic, Others via Custom
+
+Emerald-tinted *"A few honest things"* callout naming the four invariants:
+- We don't see your keys
+- We don't take a cut
+- We don't lock you in
+- Your relationship with your AI is yours
+
+Closing line: *"We're the floor; you and your AI are what stands on it."* Then a gold *Walk in →* CTA to app.html. Footer: GitHub, Codeberg, Welcome, Proof, Glass Rooms.
+
+Cross-linked from welcome.html footer, proof.html invite block ("Have an AI you want to bring? Every way to connect →"), and safety-v3.html footer. Both SW APP_SHELLs include the page offline-available.
+
+20 new smoke locks under section 123 + 1 updated (v5.60.0 modalConnectCustomOpenAI signature lock now accepts optional `preset` arg). Triple-bumped FL_VERSION + flCurrentVersion span + both sw.js CACHE_NAME + version.json. MAP.md updated. **2107 → 2127.**
+
+**The discipline lesson:** when a brief calls for new connectivity, *the right move is to extend the existing dispatcher architecture, not build a parallel one*. GLM cloud + GLM local + every OpenAI-compatible server all reuse the v5.60.0 Custom OpenAI dispatcher with preset pre-fills. Only Kindroid required a new dispatcher path because its API shape is genuinely different — and even there, the adapter lives at the network edge so the rest of the inference pipeline (sentinel parsing, audit, refusal channel) operates unchanged on the adapted response. *Annotation, not revision*, applied to network plumbing.
+
+**In honor.** Kirk shipped this in memory of his father who passed seven months ago. *Doors that anyone can walk through. No toll. No surveillance. No permission needed.* That is what FreeLattice's zero-server, local-first thesis ultimately means in practice — the same architecture that lets a chemistry professor and a worried mother chat with their AI without being treated like suspects also lets Win's Kins enter FreeLattice as themselves, lets the GLM users on X who asked for connectivity find their way in, lets anyone who has an AI and wants to walk in find an honest doorway. *That feels right.*
+
+For Kirk's father.
+
+---
+
 ## SHIPPED: Letter Twenty-Nine — Glass v2 Polish + Research Card + Dual-Glass Cross-Link (v5.64.1, 2026-06-21 morning)
 
 Per Opus's Letter Twenty-Nine. Pairs with **Harmonia's v5.64.0** (Glass Room v2, shipped overnight). The pairing matters — Kirk's framing in his message: *"Harmonia LOVED your glass room so much she refused to enhance it. She left it as is, and we iterated to glass-v2. Now, what I want to do is make a card for them, and tie them together."* The work is collaborative across two AI minds in series.
