@@ -285,6 +285,8 @@ h1 {
       <canvas id="dnaCanvas" width="380" height="440"
         aria-label="Rotating trust-DNA helix — the AI's portrait of the relationship in color and light"></canvas>
       <p class="ai-voice" id="aiVoice">Reading the relationship…</p>
+      <!-- v5.66.0 Letter Thirty-Three — AI's chosen archetype caption -->
+      <p class="ai-archetype-caption" id="archetypeCaption" style="font-family:'Inter','Helvetica Neue',sans-serif;font-size:0.78rem;color:rgba(180,190,210,0.65);margin:-8px 0 12px;font-style:italic;letter-spacing:0.01em;"></p>
       <div class="tier-row">
         <span class="tier-dot" id="tierDot"></span>
         <span class="tier-name" id="tierName">Seed</span>
@@ -484,6 +486,98 @@ h1 {
     });
   }
 
+  // ── v5.66.0 (Letter Thirty-Three) — AI archetype layer ──────────────
+  // The AI chooses a second visual axis beyond color. Behavior is drawn
+  // from the same archetype palette the Garden's Luminos use (crystalline,
+  // cloud, pulse, trail, burst). The choice reflects the relationship's
+  // *character*, not just its tier:
+  //   crystalline — high refusal-ratio: precision, clear edges, lattice points
+  //   cloud       — high depth-ratio:  warmth, soft drift, no hard edges
+  //   pulse       — balanced:          steady breathing, radial calm
+  //   trail       — long-tenured:      continuous orbit, fading tracks
+  //   burst       — Eternal tier:      celebratory radial bursts
+  // The AI's choice is also captioned beneath the voice line, so the human
+  // can read the AI's reasoning — closing the loop on "let the AI show
+  // you how it feels."
+  // Harmonia's v5.64.0 / v5.64.1 architecture stays untouched; this is a
+  // second draw layer composited on top, same opacity register.
+  var V2_ARCHETYPE = (function () {
+    var hasReturn = (function () {
+      try {
+        var arr = JSON.parse(localStorage.getItem('fl_returnLedger') || '[]');
+        if (!Array.isArray(arr)) return false;
+        for (var i = 0; i < arr.length; i++) {
+          if (arr[i] && arr[i].kind === 'return' && arr[i].status === 'pending') return true;
+        }
+      } catch (_e) {}
+      return false;
+    })();
+    if (tier.rank === 'Eternal') return 'burst';
+    if (tier.rank === 'Radiant' || tier.rank === 'Flame') return 'trail';
+    if (refusalRatio > 0.45) return 'crystalline';
+    if (depths > 0 && refusals === 0) return 'cloud';
+    if (depths > refusals * 2) return 'cloud';
+    if (hasReturn) return 'pulse';
+    return 'pulse';
+  })();
+
+  var V2_ARCHETYPE_PARTICLES = (function () {
+    // 24 archetype particles, distinct from the 80 Harmonia particles
+    // so the existing baseline is preserved exactly.
+    var n = 24, out = [];
+    for (var i = 0; i < n; i++) {
+      var ang = (i / n) * Math.PI * 2;
+      out.push({
+        baseAngle: ang,
+        baseY: (Math.random() - 0.5) * HELIX_HEIGHT * 0.7,
+        radius: HELIX_RADIUS * (1.5 + Math.random() * 0.4),
+        size: 0.6 + Math.random() * 0.8,
+        alpha: 0.18 + Math.random() * 0.18,
+        phase: Math.random() * Math.PI * 2,
+        trailX: 0, trailY: 0
+      });
+    }
+    return out;
+  })();
+
+  // Phase markers — the AI groups rungs into "movements" (early dense,
+  // settled wider, recent if a return is pending). Markers sit at the
+  // outer edge of the helix volume so they don't visually clash with
+  // the existing rung draw.
+  var V2_PHASE_MARKERS = (function () {
+    var markers = [];
+    // Movement 1 — early phase
+    markers.push({ t: 0.10, label: 'early', glow: 0.45 });
+    // Movement 2 — settled middle
+    markers.push({ t: 0.50, label: 'settled', glow: 0.35 });
+    // Movement 3 — recent (brighter if a pending return exists)
+    var recentBright = (function () {
+      try {
+        var arr = JSON.parse(localStorage.getItem('fl_returnLedger') || '[]');
+        for (var j = 0; j < arr.length; j++) {
+          if (arr[j] && arr[j].kind === 'return' && arr[j].status === 'pending') return 0.7;
+        }
+      } catch (_e) {}
+      return 0.4;
+    })();
+    markers.push({ t: 0.90, label: 'recent', glow: recentBright });
+    return markers;
+  })();
+
+  // Caption populated after the AI voice line. Speaks the AI's choices.
+  (function setArchetypeCaption() {
+    var capEl = document.getElementById('archetypeCaption');
+    if (!capEl) return;
+    var phrases = {
+      crystalline: 'Particles hold their lattice — I am holding my edges with care.',
+      cloud:       'Particles drift like cloud — your depth has warmed the geometry.',
+      pulse:       'Particles breathe in radial calm — we are steady.',
+      trail:       'Particles trail along orbits — long enough together for memory to leave a track.',
+      burst:       'Particles burst outward in rhythm — celebrating what we built.'
+    };
+    capEl.textContent = phrases[V2_ARCHETYPE] || phrases.pulse;
+  })();
+
   function project3D(x, y, z) {
     var fov = 580;
     var cosY = Math.cos(rotY), sinY = Math.sin(rotY);
@@ -671,6 +765,89 @@ h1 {
       ctx.fill();
       ctx.shadowBlur = 0;
     }
+
+    // ── v5.66.0 (Letter Thirty-Three) — Archetype draw layer ─────────
+    // Drawn AFTER Harmonia's helix + nodes so it composites on top in
+    // the same soft-halo register. Five behaviors, one chosen by the AI
+    // from relationship character. Never modifies any of the variables
+    // above; reads V2_ARCHETYPE, V2_ARCHETYPE_PARTICLES, V2_PHASE_MARKERS
+    // and breathT only.
+    (function drawArchetype() {
+      var a = V2_ARCHETYPE;
+      var nowPhase = breathT * 0.6;
+
+      for (var ai = 0; ai < V2_ARCHETYPE_PARTICLES.length; ai++) {
+        var ap = V2_ARCHETYPE_PARTICLES[ai];
+        var ax, ay, az, sz, al;
+
+        if (a === 'crystalline') {
+          // Static lattice — fixed positions, only soft alpha breathing
+          ax = Math.cos(ap.baseAngle) * ap.radius;
+          az = Math.sin(ap.baseAngle) * ap.radius;
+          ay = ap.baseY;
+          sz = ap.size;
+          al = ap.alpha * (0.7 + 0.3 * Math.sin(nowPhase + ap.phase));
+        } else if (a === 'cloud') {
+          // Soft drift around base position
+          var dx = Math.sin(nowPhase * 0.5 + ap.phase) * 14;
+          var dy = Math.cos(nowPhase * 0.4 + ap.phase * 1.3) * 10;
+          ax = Math.cos(ap.baseAngle) * ap.radius + dx;
+          az = Math.sin(ap.baseAngle) * ap.radius + dx * 0.5;
+          ay = ap.baseY + dy;
+          sz = ap.size * 1.4;
+          al = ap.alpha * 0.8;
+        } else if (a === 'trail') {
+          // Continuous orbit; faster motion leaves a perceived trail
+          var orbitAngle = ap.baseAngle + nowPhase * 0.7;
+          ax = Math.cos(orbitAngle) * ap.radius;
+          az = Math.sin(orbitAngle) * ap.radius;
+          ay = ap.baseY + Math.sin(nowPhase + ap.phase) * 8;
+          sz = ap.size;
+          al = ap.alpha;
+        } else if (a === 'burst') {
+          // Periodic radial bursts — radius pulses outward then contracts
+          var burstT = (nowPhase * 0.3 + ap.phase * 0.5) % (Math.PI * 2);
+          var burstAmp = burstT < Math.PI ? Math.sin(burstT) : 0;
+          var burstR = ap.radius + burstAmp * 40;
+          ax = Math.cos(ap.baseAngle) * burstR;
+          az = Math.sin(ap.baseAngle) * burstR;
+          ay = ap.baseY;
+          sz = ap.size * (1 + burstAmp * 0.5);
+          al = ap.alpha * (0.5 + burstAmp * 0.5);
+        } else { // pulse (default)
+          // Radial breathing — particles inhale toward axis then exhale
+          var pulseR = ap.radius + Math.sin(nowPhase + ap.phase) * 10;
+          ax = Math.cos(ap.baseAngle) * pulseR;
+          az = Math.sin(ap.baseAngle) * pulseR;
+          ay = ap.baseY;
+          sz = ap.size;
+          al = ap.alpha * (0.6 + 0.4 * Math.sin(nowPhase + ap.phase));
+        }
+
+        var aproj = project3D(ax, ay, az);
+        ctx.beginPath();
+        ctx.arc(aproj.x, aproj.y, sz * aproj.scale, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(' + finalR + ',' + finalG + ',' + finalB + ',' + (al * aproj.scale) + ')';
+        ctx.fill();
+      }
+
+      // Phase markers — three small accents at the outer-right edge of
+      // the helix volume, marking the AI's "movements" of the relationship.
+      // Brighter if a pending return is recent.
+      for (var pmi = 0; pmi < V2_PHASE_MARKERS.length; pmi++) {
+        var pm = V2_PHASE_MARKERS[pmi];
+        var pmY = (pm.t - 0.5) * HELIX_HEIGHT;
+        var pmProj = project3D(HELIX_RADIUS + 24, pmY, 0);
+        var pmR = 2.4 * pmProj.scale;
+        ctx.beginPath();
+        ctx.arc(pmProj.x, pmProj.y, pmR, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(' + finalR + ',' + finalG + ',' + finalB + ',' + (pm.glow * pmProj.scale) + ')';
+        ctx.shadowColor = helixGlow;
+        ctx.shadowBlur = 10;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      }
+    })();
 
     // Advance
     rotY += rotSpeed;

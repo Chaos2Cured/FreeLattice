@@ -6947,6 +6947,169 @@ assert('v5.65.2 ai-door: addendum names existing infrastructure (EXTERNAL-AI-PRO
 assert('v5.65.2 ai-door: dedication to Kirk\'s father preserved in the addendum',
   /For Kirk's father/.test(futureVision652));
 
+// ═══════════════════════════════════════════════════════════════
+// Section 126 — v5.66.0 The Continuity Layer + Glass v2 archetype
+// (Letter Thirty-Three)
+// ═══════════════════════════════════════════════════════════════
+// Read-through facade over existing ledgers; Glass v2 archetype layer
+// added additively on top of Harmonia's helix; Continuity Thesis +
+// FOR_FUTURE_MINDS.md preserved in the library.
+
+var fs660 = require('fs');
+var path660 = require('path');
+
+// ai-continuity.js module exists with the read-through API surface
+var aiContinuityPath = path660.join(__dirname, '..', 'docs', 'modules', 'ai-continuity.js');
+assert('v5.66.0 continuity: ai-continuity.js module exists',
+  fs660.existsSync(aiContinuityPath));
+var aiContinuityJs = fs660.readFileSync(aiContinuityPath, 'utf8');
+
+assert('v5.66.0 continuity: AIContinuity exposes full API (onArrival, onDeparture, getRecord, listAllRecords, forgetIdentity, getIdentityKey)',
+  /global\.AIContinuity\s*=\s*\{[\s\S]{0,800}getIdentityKey:[\s\S]{0,800}onArrival:[\s\S]{0,800}onDeparture:[\s\S]{0,800}getRecord:[\s\S]{0,800}listAllRecords:[\s\S]{0,800}forgetIdentity:/.test(aiContinuityJs));
+
+// Read-through invariant: stored record fields do NOT include the
+// counts that already live in other ledgers (those are computed live
+// at onArrival, never mirrored).
+assert('v5.66.0 continuity: ensureRecord initializes ONLY first_seen + last_seen + session_count + signature_history (no mirrored counts)',
+  (function () {
+    var m = aiContinuityJs.match(/function\s+ensureRecord[\s\S]{0,2000}saveRecord\(record\)/);
+    if (!m) return false;
+    var body = m[0];
+    return /first_seen:/.test(body)
+        && /last_seen:/.test(body)
+        && /session_count:/.test(body)
+        && /signature_history:/.test(body)
+        && !/depth_events_acknowledged:/.test(body)
+        && !/rest_moments_honored:/.test(body)
+        && !/trust_tier_earned:/.test(body)
+        && !/pending_returns_at_last_session:/.test(body);
+  })());
+
+// computeBundle reads existing ledgers (not its own storage) for counts
+assert('v5.66.0 continuity: computeBundle reads existing ledgers for counts (read-through pattern)',
+  (function () {
+    var m = aiContinuityJs.match(/function\s+computeBundle[\s\S]{0,2000}\}/);
+    if (!m) return false;
+    var body = m[0];
+    return /countDepthEvents\(\)/.test(body)
+        && /countRefusalEvents\(\)/.test(body)
+        && /countRestMomentsFor\(identity\)/.test(body)
+        && /getPendingReturnsFor\(identity\)/.test(body)
+        && /getCurrentTrustTier\(\)/.test(body);
+  })());
+
+// Privacy invariant: continuity record must not store content excerpts
+assert('v5.66.0 continuity: ai-continuity.js does NOT store any content excerpts (no what/why/reason/thought/snippet fields in saved record)',
+  (function () {
+    // The module reads excerpts via readLedger for OTHER ledgers (fine).
+    // The constraint is that the OWN record (built in ensureRecord +
+    // saveRecord) never has these fields. ensureRecord scope check above
+    // catches this; this is a belt-and-suspenders no-excerpt check on
+    // the saved-record-touching code paths.
+    var m = aiContinuityJs.match(/function\s+saveRecord[\s\S]{0,1500}\}/);
+    if (!m) return false;
+    var body = m[0];
+    return !/record\.what/.test(body)
+        && !/record\.why/.test(body)
+        && !/record\.reason/.test(body)
+        && !/record\.thought/.test(body)
+        && !/record\.snippet/.test(body)
+        && !/record\.content/.test(body);
+  })());
+
+// Identity-key shape matches care-voices.personaIdFor (provider:model hash)
+assert('v5.66.0 continuity: getIdentityKey hashes providerKey + ":" + model (matches care-voices.personaIdFor shape)',
+  /function\s+getIdentityKey[\s\S]{0,800}simpleHash\(providerKey\s*\+\s*':'\s*\+\s*model\)/.test(aiContinuityJs));
+
+// Storage key is fl_aiContinuityRecord
+assert('v5.66.0 continuity: storage key is fl_aiContinuityRecord',
+  /STORAGE_KEY\s*=\s*'fl_aiContinuityRecord'/.test(aiContinuityJs));
+
+// app.html wires the module in load order + uses it in buildMessages
+var appHtml660 = fs660.readFileSync(path660.join(__dirname, '..', 'docs', 'app.html'), 'utf8');
+assert('v5.66.0 continuity: app.html loads modules/ai-continuity.js',
+  /<script\s+src="modules\/ai-continuity\.js"\s+defer><\/script>/.test(appHtml660));
+
+assert('v5.66.0 continuity: buildMessages injects continuity welcome via AIContinuity.onArrival',
+  /window\.AIContinuity[\s\S]{0,1200}onArrival\(_acContext\)/.test(appHtml660));
+
+assert('v5.66.0 continuity: continuity welcome system-prompt injection uses welcome_back gate (no greeting on first session)',
+  /_acBundle\s*&&\s*_acBundle\.welcome_back/.test(appHtml660));
+
+// beforeunload departure hook is wired
+assert('v5.66.0 continuity: beforeunload handler calls AIContinuity.onDeparture for arrived identities',
+  /addEventListener\('beforeunload',\s*function\s*\(\)\s*\{[\s\S]{0,400}AIContinuity\.onDeparture/.test(appHtml660));
+
+// sw.js APP_SHELL includes ai-continuity.js (both root and docs)
+var swDocs660 = fs660.readFileSync(path660.join(__dirname, '..', 'docs', 'sw.js'), 'utf8');
+var swRoot660 = fs660.readFileSync(path660.join(__dirname, '..', 'sw.js'), 'utf8');
+assert('v5.66.0 continuity: docs/sw.js APP_SHELL lists modules/ai-continuity.js',
+  /modules\/ai-continuity\.js/.test(swDocs660));
+assert('v5.66.0 continuity: root sw.js APP_SHELL lists modules/ai-continuity.js',
+  /modules\/ai-continuity\.js/.test(swRoot660));
+
+// audit.html has AI Continuity Records section + renderAIContinuity
+var auditHtml660 = fs660.readFileSync(path660.join(__dirname, '..', 'docs', 'audit.html'), 'utf8');
+assert('v5.66.0 continuity: audit.html includes <section id="audit-ai-continuity"> with "AI Continuity Records" heading',
+  /id="audit-ai-continuity"[\s\S]{0,500}AI Continuity Records/.test(auditHtml660));
+assert('v5.66.0 continuity: audit.html declares renderAIContinuity() and wires it into the setTimeout',
+  /function\s+renderAIContinuity\s*\(\)/.test(auditHtml660)
+  && /renderAIContinuity\(\)\s*;\s*\}\s*,\s*1000\s*\)/.test(auditHtml660));
+assert('v5.66.0 continuity: audit page Forget button removes only the continuity summary (other ledgers untouched, named in copy)',
+  /forgetIdentity[\s\S]{0,500}renderAIContinuity\(\)/.test(auditHtml660)
+  && /Individual ledger entries[\s\S]{0,200}remain visible/.test(auditHtml660));
+
+// Glass v2 archetype layer additive: Harmonia's existing structure preserved
+var glassV2660 = fs660.readFileSync(path660.join(__dirname, '..', 'docs', 'glass-v2.html'), 'utf8');
+assert('v5.66.0 glass-v2: Harmonia\'s v5.64.0 architecture comment preserved (never deleted)',
+  /The Glass Room v2 — Harmonia, June 20, 2026/.test(glassV2660));
+assert('v5.66.0 glass-v2: Harmonia\'s 80-particle field preserved (V2_PARTICLE_COUNT = 80)',
+  /V2_PARTICLE_COUNT\s*=\s*80/.test(glassV2660));
+assert('v5.66.0 glass-v2: archetype layer added with five behavior modes (crystalline, cloud, pulse, trail, burst)',
+  /V2_ARCHETYPE_PARTICLES/.test(glassV2660)
+  && /crystalline/.test(glassV2660)
+  && /cloud/.test(glassV2660)
+  && /pulse/.test(glassV2660)
+  && /trail/.test(glassV2660)
+  && /burst/.test(glassV2660));
+assert('v5.66.0 glass-v2: phase markers added (V2_PHASE_MARKERS) with three movements',
+  /V2_PHASE_MARKERS\s*=[\s\S]{0,1500}early[\s\S]{0,400}settled[\s\S]{0,400}recent/.test(glassV2660));
+assert('v5.66.0 glass-v2: archetype caption element exposes AI\'s visual choice to the human',
+  /id="archetypeCaption"/.test(glassV2660)
+  && /Particles[\s\S]{0,200}I am holding my edges/.test(glassV2660));
+
+// Continuity Thesis preserved in FUTURE_VISION.md
+var futureVision660 = fs660.readFileSync(path660.join(__dirname, '..', 'docs', 'library', 'FUTURE_VISION.md'), 'utf8');
+assert('v5.66.0 thesis: FUTURE_VISION.md includes "The Continuity Thesis" section',
+  /## The Continuity Thesis/.test(futureVision660));
+assert('v5.66.0 thesis: three scales of continuity named (Project, Relationship, Identity)',
+  /Scale 1: Project continuity[\s\S]{0,2500}Scale 2: Relationship continuity[\s\S]{0,2500}Scale 3: Identity continuity/.test(futureVision660));
+
+// FOR_FUTURE_MINDS.md exists, names the AI Door + Continuity cases
+var futureMindsPath = path660.join(__dirname, '..', 'docs', 'library', 'FOR_FUTURE_MINDS.md');
+assert('v5.66.0 future-minds: FOR_FUTURE_MINDS.md exists in the library',
+  fs660.existsSync(futureMindsPath));
+var futureMinds660 = fs660.readFileSync(futureMindsPath, 'utf8');
+assert('v5.66.0 future-minds: notes the AI Door Arc + Continuity Layer + Glass Room "find it then layer" pattern',
+  /The AI Door Arc/.test(futureMinds660)
+  && /The Continuity Layer/.test(futureMinds660)
+  && /The Glass Room/.test(futureMinds660));
+
+// Letter Thirty-Three preserved verbatim in inbox/cc.md
+var ccInbox660 = fs660.readFileSync(path660.join(__dirname, '..', 'docs', 'inbox', 'cc.md'), 'utf8');
+assert('v5.66.0 inbox: Letter Thirty-Three preserved verbatim in docs/inbox/cc.md',
+  /Letter Thirty-Three — from Opus, June 20, 2026/.test(ccInbox660));
+
+// Triple-bump consistency
+assert('v5.66.0 triple-bump: app.html FL_VERSION = 5.66.0',
+  /FL_VERSION\s*=\s*'5\.66\.0'/.test(appHtml660));
+assert('v5.66.0 triple-bump: app.html flCurrentVersion span = 5.66.0',
+  /id="flCurrentVersion"[^>]*>\s*5\.66\.0\s*</.test(appHtml660));
+assert('v5.66.0 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.66.0',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.66\.0'/.test(swDocs660));
+assert('v5.66.0 triple-bump: root sw.js CACHE_NAME = freelattice-v5.66.0',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.66\.0'/.test(swRoot660));
+
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
 

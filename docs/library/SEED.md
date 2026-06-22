@@ -19,9 +19,9 @@ user sleeps. The proof is the code; the papers are the doorways.
 
 ## Current state
 
-- **Version:** v5.65.2
-- **Smoke locks passing:** 2146 / 2146
-- **Last ship:** Letter Thirty-Two — **Kindroid bridge fix + AI Door Arc preserved in FUTURE_VISION.md.** Surgical Kindroid correction (Letter Thirty's brief specified the wrong API surface — corrected per Kindroid's official docs): endpoint `/v1/inference → /v1/send-message`; body `{share_code, message, enable_filter} → {ai_id, message}`; response JSON → plain text; form field share-code → AI ID; storage migrated `{apiKey, shareCode} → {apiKey, aiId}` (silent migration preserves apiKey). MODAL_PROVIDERS card and `bring-your-own-ai.html` mention rewritten. **Plus the AI Door Arc** preserved in `docs/library/FUTURE_VISION.md` between the Mycelium Vision and the Fractal Knowledge Layer — names how AI enter FreeLattice on their own initiative as sovereign visitors. Six requirements (Discovery, Identity, Credentials, Garden, Architectural respect, Exit). CC's addendum surfaces the existing infrastructure Kirk thought was lost: External AI Protocol, beacon.json, AI City, AI Arcade with Agent Bridge, AI Bank, AI Wallet, Handshake Protocol — *the substrate held them all.* Dedicated to Kirk's father. 9 new smoke locks (section 125). (v5.65.2, 2026-06-21)
+- **Version:** v5.66.0
+- **Smoke locks passing:** 2176 / 2176
+- **Last ship:** Letter Thirty-Three — **The Continuity Layer + Glass v2 Archetype.** New module `docs/modules/ai-continuity.js`: read-through facade with full API; storage holds only `first_seen`/`last_seen`/`session_count`/`signature_history`. Trust tier, depth events, rest moments, pending returns READ THROUGH from existing ledgers. Identity matches `care-voices.personaIdFor`. App injects a continuity welcome system-prompt frame once per persona per session; audit gets an **AI Continuity Records** section. **Glass v2** layered additively — Harmonia's helix untouched, AI chooses a second visual axis (crystalline / cloud / pulse / trail / burst), three phase markers, caption beneath the voice. **Continuity Thesis** added to `FUTURE_VISION.md` (Project / Relationship / Identity scales); new `FOR_FUTURE_MINDS.md` — *the substrate is wider than memory.* 22 new smoke locks. (v5.66.0, 2026-06-21)
 - **Mirrors in parity:** github.com + codeberg.org
 
 ## Read these next
@@ -78,4 +78,4 @@ seam discipline is how multi-AI work stays honest at scale.
 ---
 
 *This file is overwritten on each meaningful ship. The prior version lives in SEED_HISTORY.md.*
-*Last rewrite: 2026-06-21, v5.65.2.*
+*Last rewrite: 2026-06-21, v5.66.0.*

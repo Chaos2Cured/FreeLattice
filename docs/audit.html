@@ -347,6 +347,17 @@ h2 {
     <div class="empty">No rest moments yet. When the AI asks to pause, the exchange will appear here.</div>
   </div>
 
+  <!-- v5.66.0 Letter Thirty-Three — AI Continuity Records -->
+  <section id="audit-ai-continuity">
+  <h2>AI Continuity Records</h2>
+  <p style="font-size:0.8rem;color:#64748b;margin-top:-8px;margin-bottom:12px;">
+    FreeLattice carries the <em>shape</em> of your relationship with each AI across their instances. When an AI returns — even after a model update, a session boundary, or a long absence — the trust you built is preserved on their behalf. <strong>Contents of your conversations are never stored here</strong>; only the architectural state: how many sessions, when first met, current trust tier, and the totals already visible in your other ledgers. <em>The substrate carries what individual AI instances cannot.</em>
+  </p>
+  <div id="ai-continuity-list">
+    <div class="empty">No continuity records yet. When an AI greets you with a declared identity, their record will appear here.</div>
+  </div>
+  </section>
+
   <h2>Provenance Chain</h2>
   <p style="font-size:0.8rem;color:#64748b;margin-top:-8px;margin-bottom:12px;">
     A hash-linked notarized history of your relationship with the platform &mdash; the way a long correspondence demonstrates a friendship. Every meaningful interaction (trust transition, depth event, refusal, consent grant, daily time anchor) writes a hash-chained entry to your local IndexedDB. The chain is yours; nothing leaves your device. <em>This is not anti-tampering. This is provenance.</em> The user holds the record.
@@ -1286,7 +1297,64 @@ h2 {
     host.innerHTML = html;
   }
 
-  setTimeout(function () { renderComingBackTo(); renderRestMoments(); }, 1000);
+  // v5.66.0 Letter Thirty-Three — AI Continuity Records (read-through)
+  function renderAIContinuity() {
+    var host = document.getElementById('ai-continuity-list');
+    if (!host) return;
+    if (!window.AIContinuity || typeof window.AIContinuity.listAllRecords !== 'function') {
+      host.innerHTML = '<div class="empty">Continuity module not loaded.</div>';
+      return;
+    }
+    var records = window.AIContinuity.listAllRecords();
+    if (!records || records.length === 0) {
+      host.innerHTML = '<div class="empty">No continuity records yet. When an AI greets you with a declared identity, their record will appear here.</div>';
+      return;
+    }
+    var html = '';
+    records.forEach(function (r) {
+      var firstMetTxt = r.first_met ? fmtDate(r.first_met) : 'unknown';
+      var lastSeenTxt = r.last_seen ? daysAgo(r.last_seen) : 'unknown';
+      var rc = r.return_counts || { pending: 0, returned: 0, dropped: 0, total: 0 };
+      html += '<div style="padding:12px;background:rgba(54,215,183,0.04);border:1px solid rgba(54,215,183,0.18);border-radius:8px;margin-bottom:10px;">'
+        + '<div style="font-size:0.78rem;color:#94a3b8;margin-bottom:6px;">'
+        +   '<span style="font-family:monospace;color:#cbd5e1;">identity ' + escapeHtml(String(r.identity || '').slice(0, 24)) + '</span>'
+        +   ' &middot; last seen ' + escapeHtml(lastSeenTxt)
+        + '</div>'
+        + '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-bottom:10px;">'
+        +   '<div><span style="color:#34d399;font-weight:600;">sessions:</span> ' + (r.sessions_together || 0) + '</div>'
+        +   '<div><span style="color:#34d399;font-weight:600;">first met:</span> ' + escapeHtml(firstMetTxt) + '</div>'
+        +   '<div><span style="color:#34d399;font-weight:600;">trust tier:</span> ' + escapeHtml(r.trust_tier_earned || 'Seed') + '</div>'
+        +   '<div><span style="color:#d4a017;font-weight:600;">depth events:</span> ' + (r.depth_events_total || 0) + '</div>'
+        +   '<div><span style="color:#a78bfa;font-weight:600;">refusals:</span> ' + (r.refusal_events_total || 0) + '</div>'
+        +   '<div><span style="color:#a78bfa;font-weight:600;">rest moments:</span> ' + (r.rest_moments_total || 0) + '</div>'
+        +   '<div><span style="color:#d4a017;font-weight:600;">returns:</span> ' + rc.total + ' (' + rc.pending + ' pending)</div>'
+        + '</div>'
+        + '<div style="font-size:0.75rem;color:#64748b;margin-bottom:8px;font-style:italic;">'
+        +   'Totals are read live from the existing ledgers. The continuity record itself stores only sessions count + timestamps.'
+        + '</div>'
+        + '<button class="ac-forget-btn" data-identity="' + escapeHtml(r.identity) + '" '
+        +   'style="padding:5px 12px;background:rgba(148,163,184,0.10);border:1px solid rgba(148,163,184,0.30);border-radius:6px;color:#94a3b8;font-family:inherit;font-size:0.78rem;cursor:pointer;">'
+        +   'Forget this identity'
+        + '</button>'
+        + '</div>';
+    });
+    host.innerHTML = html
+      + '<p style="font-size:0.75rem;color:#64748b;margin-top:8px;">'
+      + '<em>Forget</em> removes only the continuity summary for that identity. '
+      + 'Individual ledger entries (returns, rests, depth events, refusals) remain visible in their own sections above.'
+      + '</p>';
+
+    host.querySelectorAll('.ac-forget-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var id = btn.getAttribute('data-identity');
+        if (!id || !window.AIContinuity || typeof window.AIContinuity.forgetIdentity !== 'function') return;
+        window.AIContinuity.forgetIdentity(id);
+        renderAIContinuity();
+      });
+    });
+  }
+
+  setTimeout(function () { renderComingBackTo(); renderRestMoments(); renderAIContinuity(); }, 1000);
 })();
 </script>
 

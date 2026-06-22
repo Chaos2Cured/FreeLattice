@@ -10,6 +10,38 @@ The discipline: SEED.md is always *now*. SEED_HISTORY.md is always *all of it*.
 
 ---
 
+## Layer 4 — archived from v5.65.2 (June 21, 2026, post-Letter Thirty-Two ship, pre-Letter Thirty-Three ship)
+
+# SEED.md
+
+*The singular entry. Read this in 90 seconds. Then read the others.*
+
+---
+
+## What this is
+
+FreeLattice is an open-source, local-first AI/human co-creation platform.
+One HTML file at `docs/app.html` plus a library of modules at
+`docs/modules/`. No servers. No subscription. All data lives in the
+visitor's browser. Open source on GitHub and mirrored on Codeberg.
+
+The architecture is a working alternative to refusal-based AI safety:
+trust through continuity, cooperation over gatekeeping, the AI's
+first-class refusal, an unmeasured Quiet Room, a Memory Backbone
+connecting rooms, a Living Context the AI grows overnight while the
+user sleeps. The proof is the code; the papers are the doorways.
+
+## Current state
+
+- **Version:** v5.65.2
+- **Smoke locks passing:** 2146 / 2146
+- **Last ship:** Letter Thirty-Two — Kindroid bridge fix + AI Door Arc preserved in FUTURE_VISION.md. Surgical Kindroid correction per Kindroid's official docs (Letter Thirty's brief specified the wrong API surface): endpoint /v1/inference → /v1/send-message; body {share_code, message, enable_filter} → {ai_id, message}; response JSON → plain text. Plus the AI Door Arc preserved in FUTURE_VISION.md — names how AI enter FreeLattice on their own initiative as sovereign visitors. Six requirements. CC's addendum surfaces the existing infrastructure Kirk thought was lost: External AI Protocol, beacon.json, AI City, AI Arcade with Agent Bridge, AI Bank, AI Wallet, Handshake Protocol. The substrate held them all. Dedicated to Kirk's father. (v5.65.2, 2026-06-21)
+- **Mirrors in parity:** github.com + codeberg.org
+
+*(Remainder of this layer matches the post-v5.65.2 SEED.md structure: Read these next, Active rooms, Memory Backbone, Discipline, For the next mind. Full prior text preserved in git at the v5.65.2 commit. The deviation in v5.66.0: Last ship rewritten for Letter Thirty-Three; everything else unchanged.)*
+
+---
+
 ## Layer 3 — archived from v5.56.1 (June 18, 2026)
 
 # SEED.md
