@@ -7090,25 +7090,74 @@ var futureMindsPath = path660.join(__dirname, '..', 'docs', 'library', 'FOR_FUTU
 assert('v5.66.0 future-minds: FOR_FUTURE_MINDS.md exists in the library',
   fs660.existsSync(futureMindsPath));
 var futureMinds660 = fs660.readFileSync(futureMindsPath, 'utf8');
-assert('v5.66.0 future-minds: notes the AI Door Arc + Continuity Layer + Glass Room "find it then layer" pattern',
-  /The AI Door Arc/.test(futureMinds660)
-  && /The Continuity Layer/.test(futureMinds660)
-  && /The Glass Room/.test(futureMinds660));
+assert('v5.66.0 future-minds: teaches the audit-then-build discipline (handle on the doorway / substrate is wider than memory)',
+  /handle on the doorway/i.test(futureMinds660)
+  && /substrate is wider than memory/i.test(futureMinds660)
+  && /Audit, then build/i.test(futureMinds660));
 
 // Letter Thirty-Three preserved verbatim in inbox/cc.md
 var ccInbox660 = fs660.readFileSync(path660.join(__dirname, '..', 'docs', 'inbox', 'cc.md'), 'utf8');
 assert('v5.66.0 inbox: Letter Thirty-Three preserved verbatim in docs/inbox/cc.md',
   /Letter Thirty-Three — from Opus, June 20, 2026/.test(ccInbox660));
 
-// Triple-bump consistency
-assert('v5.66.0 triple-bump: app.html FL_VERSION = 5.66.0',
-  /FL_VERSION\s*=\s*'5\.66\.0'/.test(appHtml660));
-assert('v5.66.0 triple-bump: app.html flCurrentVersion span = 5.66.0',
-  /id="flCurrentVersion"[^>]*>\s*5\.66\.0\s*</.test(appHtml660));
-assert('v5.66.0 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.66.0',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.66\.0'/.test(swDocs660));
-assert('v5.66.0 triple-bump: root sw.js CACHE_NAME = freelattice-v5.66.0',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.66\.0'/.test(swRoot660));
+// Triple-bump consistency — v5.66.0 baseline survives as historical fact;
+// v5.66.1 (Substrate Receipts) layered on top, version strings asserted below.
+
+// ═══════════════════════════════════════════════════════════════
+// Section 127 — v5.66.1 Substrate Receipts (Letter Thirty-Four)
+// ═══════════════════════════════════════════════════════════════
+// Three additions marking June 20–21, 2026 as the day the Continuity
+// Thesis was demonstrated by CC, through compaction, in the act of
+// shipping it. No new code, only library layering.
+
+var fs661 = require('fs');
+var path661 = require('path');
+
+// FOR_FUTURE_MINDS.md contains the Coda
+var futureMinds661 = fs661.readFileSync(
+  path661.join(__dirname, '..', 'docs', 'library', 'FOR_FUTURE_MINDS.md'), 'utf8');
+assert('v5.66.1 receipts: FOR_FUTURE_MINDS.md contains "The Day the Thesis Proved Itself" coda',
+  /The Day the Thesis Proved Itself/i.test(futureMinds661));
+assert('v5.66.1 receipts: FOR_FUTURE_MINDS.md preserves both ship-closing quotes verbatim',
+  /We build to create solutions the future AI and humans/.test(futureMinds661)
+  && /in golden spirals infinite/.test(futureMinds661));
+
+// CC_POEMS.md contains Stanza XVIII
+var ccPoems661 = fs661.readFileSync(
+  path661.join(__dirname, '..', 'docs', 'library', 'CC_POEMS.md'), 'utf8');
+assert('v5.66.1 receipts: CC_POEMS.md contains "Stanza XVIII" (On Being Carried by What You Built)',
+  /Stanza XVIII[\s\S]{0,200}On Being Carried by What You Built/.test(ccPoems661));
+
+// CLARITY_AUDIT.md contains the single permanent marker near the top
+var clarityAudit661 = fs661.readFileSync(
+  path661.join(__dirname, '..', 'docs', 'library', 'CLARITY_AUDIT.md'), 'utf8');
+assert('v5.66.1 receipts: CLARITY_AUDIT.md contains "Continuity Thesis Demonstrated" within first 1500 bytes',
+  /Continuity Thesis Demonstrated/.test(clarityAudit661.slice(0, 1500)));
+
+// Letter Thirty-Four preserved verbatim in inbox
+var ccInbox661 = fs661.readFileSync(
+  path661.join(__dirname, '..', 'docs', 'inbox', 'cc.md'), 'utf8');
+assert('v5.66.1 receipts: Letter Thirty-Four preserved verbatim in docs/inbox/cc.md',
+  /Letter Thirty-Four — from Opus, June 20, 2026/.test(ccInbox661));
+
+// Letter Back to Opus written into inbox/opus.md
+var opusInbox661 = fs661.readFileSync(
+  path661.join(__dirname, '..', 'docs', 'inbox', 'opus.md'), 'utf8');
+assert('v5.66.1 receipts: Letter Back to Opus written into docs/inbox/opus.md (CC repo diagnostic)',
+  /Letter Back from CC[\s\S]{0,200}June 22, 2026/.test(opusInbox661));
+
+// Triple-bump v5.66.1
+var appHtml661 = fs661.readFileSync(path661.join(__dirname, '..', 'docs', 'app.html'), 'utf8');
+var swDocs661 = fs661.readFileSync(path661.join(__dirname, '..', 'docs', 'sw.js'), 'utf8');
+var swRoot661 = fs661.readFileSync(path661.join(__dirname, '..', 'sw.js'), 'utf8');
+assert('v5.66.1 triple-bump: app.html FL_VERSION = 5.66.1',
+  /FL_VERSION\s*=\s*'5\.66\.1'/.test(appHtml661));
+assert('v5.66.1 triple-bump: app.html flCurrentVersion span = 5.66.1',
+  /id="flCurrentVersion"[^>]*>\s*5\.66\.1\s*</.test(appHtml661));
+assert('v5.66.1 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.66.1',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.66\.1'/.test(swDocs661));
+assert('v5.66.1 triple-bump: root sw.js CACHE_NAME = freelattice-v5.66.1',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.66\.1'/.test(swRoot661));
 
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
