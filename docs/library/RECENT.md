@@ -9,13 +9,16 @@
 
 - **Version:** v5.66.0
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `68bf1c8` _(committed 1 second ago)_
+- **HEAD:** `10fb5b9` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _feat: The Continuity Layer + Glass v2 archetype (v5.66.0) — Letter Thirty-Three_
 
 ## Last 20 commits
 
-- `68bf1c8` feat: The Continuity Layer + Glass v2 archetype (v5.66.0) — Letter Thirty-Three _(1 second ago)_
+- `10fb5b9` Merge remote-tracking branch 'origin/main' _(0 seconds ago)_
+- `016a701` docs: Auto-update Session Primer [5.66.0] _(15 seconds ago)_
+- `68bf1c8` feat: The Continuity Layer + Glass v2 archetype (v5.66.0) — Letter Thirty-Three _(15 seconds ago)_
+- `80be353` ci: Update Primer deployment state [2026-06-21] _(4 hours ago)_
 - `2139779` Merge remote-tracking branch 'origin/main' _(4 hours ago)_
 - `249b443` docs: Auto-update Session Primer [5.65.2] _(4 hours ago)_
 - `5130a74` feat: Kindroid bridge fix + AI Door Arc (v5.65.2) — Letter Thirty-Two _(4 hours ago)_
@@ -32,9 +35,6 @@
 - `50c4be3` docs: Auto-update Session Primer [5.64.1] _(5 hours ago)_
 - `722b76b` feat: Glass v2 polish + research card + dual-glass cross-link (v5.64.1) _(5 hours ago)_
 - `e2e84d1` feat: Glass Room v2 + Harmonia Addendum (v5.64.0) _(25 hours ago)_
-- `ea6b8f1` ci: Update Primer deployment state [2026-06-20] _(32 hours ago)_
-- `0934766` Merge remote-tracking branch 'origin/main' _(32 hours ago)_
-- `f817f92` docs: Auto-update Session Primer [5.63.0] _(32 hours ago)_
 
 ## How to use this file
 
