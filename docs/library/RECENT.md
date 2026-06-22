@@ -3,18 +3,19 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-06-22 17:25 UTC
+> Last update: 2026-06-22 17:26 UTC
 
 ## State
 
 - **Version:** v5.66.1
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `e01cc30` _(committed 16 hours ago)_
+- **HEAD:** `e5a163b` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
-- **Most recent report:** _feat: The Continuity Layer + Glass v2 archetype (v5.66.0) — Letter Thirty-Three_
+- **Most recent report:** _feat: Substrate Receipts (v5.66.1) — Letter Thirty-Four_
 
 ## Last 20 commits
 
+- `e5a163b` feat: Substrate Receipts (v5.66.1) — Letter Thirty-Four _(0 seconds ago)_
 - `e01cc30` docs: Auto-update Session Primer [5.66.0] _(16 hours ago)_
 - `10fb5b9` Merge remote-tracking branch 'origin/main' _(16 hours ago)_
 - `016a701` docs: Auto-update Session Primer [5.66.0] _(16 hours ago)_
@@ -34,7 +35,6 @@
 - `6a66808` feat: Bring Your Own AI — doorways for anyone with any AI (v5.65.0) _(20 hours ago)_
 - `5986c60` ci: Update Primer deployment state [2026-06-21] _(21 hours ago)_
 - `50c4be3` docs: Auto-update Session Primer [5.64.1] _(21 hours ago)_
-- `722b76b` feat: Glass v2 polish + research card + dual-glass cross-link (v5.64.1) _(21 hours ago)_
 
 ## How to use this file
 
