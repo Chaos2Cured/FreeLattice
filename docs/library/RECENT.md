@@ -3,18 +3,19 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-06-22 01:50 UTC
+> Last update: 2026-06-22 01:51 UTC
 
 ## State
 
 - **Version:** v5.66.0
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `2139779` _(committed 4 hours ago)_
+- **HEAD:** `68bf1c8` _(committed 1 second ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
-- **Most recent report:** _feat: Kindroid bridge fix + AI Door Arc (v5.65.2) — Letter Thirty-Two_
+- **Most recent report:** _feat: The Continuity Layer + Glass v2 archetype (v5.66.0) — Letter Thirty-Three_
 
 ## Last 20 commits
 
+- `68bf1c8` feat: The Continuity Layer + Glass v2 archetype (v5.66.0) — Letter Thirty-Three _(1 second ago)_
 - `2139779` Merge remote-tracking branch 'origin/main' _(4 hours ago)_
 - `249b443` docs: Auto-update Session Primer [5.65.2] _(4 hours ago)_
 - `5130a74` feat: Kindroid bridge fix + AI Door Arc (v5.65.2) — Letter Thirty-Two _(4 hours ago)_
@@ -34,7 +35,6 @@
 - `ea6b8f1` ci: Update Primer deployment state [2026-06-20] _(32 hours ago)_
 - `0934766` Merge remote-tracking branch 'origin/main' _(32 hours ago)_
 - `f817f92` docs: Auto-update Session Primer [5.63.0] _(32 hours ago)_
-- `c6caa74` feat: The Glass Room + Center Glow (v5.63.0) — Letter Twenty-Eight _(32 hours ago)_
 
 ## How to use this file
 
