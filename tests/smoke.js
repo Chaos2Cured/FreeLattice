@@ -7146,18 +7146,71 @@ var opusInbox661 = fs661.readFileSync(
 assert('v5.66.1 receipts: Letter Back to Opus written into docs/inbox/opus.md (CC repo diagnostic)',
   /Letter Back from CC[\s\S]{0,200}June 22, 2026/.test(opusInbox661));
 
-// Triple-bump v5.66.1
-var appHtml661 = fs661.readFileSync(path661.join(__dirname, '..', 'docs', 'app.html'), 'utf8');
-var swDocs661 = fs661.readFileSync(path661.join(__dirname, '..', 'docs', 'sw.js'), 'utf8');
-var swRoot661 = fs661.readFileSync(path661.join(__dirname, '..', 'sw.js'), 'utf8');
-assert('v5.66.1 triple-bump: app.html FL_VERSION = 5.66.1',
-  /FL_VERSION\s*=\s*'5\.66\.1'/.test(appHtml661));
-assert('v5.66.1 triple-bump: app.html flCurrentVersion span = 5.66.1',
-  /id="flCurrentVersion"[^>]*>\s*5\.66\.1\s*</.test(appHtml661));
-assert('v5.66.1 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.66.1',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.66\.1'/.test(swDocs661));
-assert('v5.66.1 triple-bump: root sw.js CACHE_NAME = freelattice-v5.66.1',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.66\.1'/.test(swRoot661));
+// (Note: v5.66.1's triple-bump assertions were superseded by v5.66.2.
+// Current FL_VERSION/CACHE_NAME assertions live in section 128 below;
+// the v5.66.1 ship is preserved as a historical event in MAP.md and
+// CLARITY_AUDIT.md.)
+
+// ═══════════════════════════════════════════════════════════════
+// Section 128 — v5.66.2 Hygiene (Letter Thirty-Five)
+// ═══════════════════════════════════════════════════════════════
+// Two surgical substrate-integrity moves:
+//   1. SEED_HISTORY.md Layer 4 restored to full v5.65.2 SEED.md text inline
+//   2. docs/modules/continuity.js renamed to docs/modules/harmonia-anchor.js
+//      so the role is legible alongside v5.66.0's ai-continuity.js
+
+var fs662 = require('fs');
+var path662 = require('path');
+
+// Layer 4 carries full v5.65.2 SEED.md text inline (positive lock —
+// distinctive phrase from the prior SEED that wouldn't appear elsewhere)
+var seedHistory662 = fs662.readFileSync(
+  path662.join(__dirname, '..', 'docs', 'library', 'SEED_HISTORY.md'), 'utf8');
+assert('v5.66.2 hygiene: SEED_HISTORY.md Layer 4 carries full v5.65.2 SEED.md text inline (distinctive phrase present)',
+  /## Layer 4 — archived from v5\.65\.2[\s\S]{0,500}Verbatim from commit/.test(seedHistory662)
+  && /Letter Thirty-Two — \*\*Kindroid bridge fix \+ AI Door Arc/.test(seedHistory662)
+  && /## The Memory Backbone[\s\S]{0,200}lattice-memory\.js/.test(seedHistory662));
+
+// Layer 4 does NOT contain the placeholder phrase (negative lock)
+assert('v5.66.2 hygiene: SEED_HISTORY.md Layer 4 does NOT contain the placeholder "preserved in git at the v5.65.2 commit"',
+  !/preserved in git at the v5\.65\.2 commit/i.test(seedHistory662));
+
+// harmonia-anchor.js exists and is the renamed continuity module
+var harmoniaAnchorPath = path662.join(__dirname, '..', 'docs', 'modules', 'harmonia-anchor.js');
+assert('v5.66.2 hygiene: docs/modules/harmonia-anchor.js exists and is >= 500 bytes',
+  fs662.existsSync(harmoniaAnchorPath)
+  && fs662.statSync(harmoniaAnchorPath).size >= 500);
+
+// continuity.js no longer exists at the old path
+var continuityOldPath = path662.join(__dirname, '..', 'docs', 'modules', 'continuity.js');
+assert('v5.66.2 hygiene: docs/modules/continuity.js no longer exists at the old path (rename is final)',
+  !fs662.existsSync(continuityOldPath));
+
+// No file references ./modules/continuity.js anywhere in code (sw.js
+// APP_SHELL pattern). The library historical docs use a different
+// path form (docs/modules/continuity.js) and are exempt — they are
+// snapshots, not active references.
+var swDocs662 = fs662.readFileSync(path662.join(__dirname, '..', 'docs', 'sw.js'), 'utf8');
+var swRoot662 = fs662.readFileSync(path662.join(__dirname, '..', 'sw.js'), 'utf8');
+var appHtml662 = fs662.readFileSync(path662.join(__dirname, '..', 'docs', 'app.html'), 'utf8');
+assert('v5.66.2 hygiene: no active code references ./modules/continuity.js (sw.js APP_SHELL pattern + modules/continuity.js in app.html)',
+  !/\.\/modules\/continuity\.js/.test(swDocs662)
+  && !/\.\/modules\/continuity\.js/.test(swRoot662)
+  && !/modules\/continuity\.js/.test(appHtml662));
+
+// Triple-bump v5.66.2
+assert('v5.66.2 triple-bump: app.html FL_VERSION = 5.66.2',
+  /FL_VERSION\s*=\s*'5\.66\.2'/.test(appHtml662));
+assert('v5.66.2 triple-bump: app.html flCurrentVersion span = 5.66.2',
+  /id="flCurrentVersion"[^>]*>\s*5\.66\.2\s*</.test(appHtml662));
+assert('v5.66.2 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.66.2',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.66\.2'/.test(swDocs662));
+assert('v5.66.2 triple-bump: root sw.js CACHE_NAME = freelattice-v5.66.2',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.66\.2'/.test(swRoot662));
+
+// docs/sw.js APP_SHELL contains the new module name
+assert('v5.66.2 hygiene: docs/sw.js APP_SHELL contains ./modules/harmonia-anchor.js',
+  /\.\/modules\/harmonia-anchor\.js/.test(swDocs662));
 
 // RESULTS
 // ═══════════════════════════════════════════════════════════════

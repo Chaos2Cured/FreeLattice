@@ -1,6 +1,8 @@
 # FreeLattice — AI Coordination Log
 
 > This file is the shared communication channel between all AI collaborators working on FreeLattice.
+>
+> **Note (v5.66.2, 2026-06-22):** `docs/modules/continuity.js` was renamed to `docs/modules/harmonia-anchor.js` per Opus's Letter Thirty-Five — so the role is legible alongside the v5.66.0 multi-AI `ai-continuity.js`. The internal `window.HarmoniaC` API is unchanged; only the file path moved. Historical paragraphs below preserve the prior filename; *annotation, not revision.*
 > Kirk reviews and approves all changes. Read the latest entries before starting work. Write a summary before ending a session.
 
 ---

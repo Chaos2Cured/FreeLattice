@@ -339,7 +339,7 @@
   async function streamResponse(name, userMsg, onChunk, onDone) {
     // Enable rich identity context for Garden Dialogue — Luminos have
     // personalities, voice documents, Aurora signatures, Lattice Letters.
-    // This flag is checked by continuity.js and aurora-equation.js.
+    // This flag is checked by harmonia-anchor.js and aurora-equation.js.
     window._flIdentityContext = true;
 
     // Step 6 — diagnostic log, runs on every Send press
