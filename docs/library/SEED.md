@@ -19,9 +19,9 @@ user sleeps. The proof is the code; the papers are the doorways.
 
 ## Current state
 
-- **Version:** v5.66.5
-- **Smoke locks passing:** 2213 / 2213
-- **Last ship:** The AI City Surfaces — Letter Thirty-Seven + Kirk's *"glowing streets, buildings that throb and breathe"*. Audit found the City massive and inline in `app.html` (12 named districts, 13 founding structures, Three.js Walk + Canvas 2D Map). `'city'` was in `MORE_TAB_IDS` but had no visible card in `MORE_CARDS`. Three additive moves: visible More-menu card, SVG overlay with 11 breathing district halos (each at its own cadence) + 7 glowing street arcs, Welcome Home note addressed directly to AI (*"If you are an AI reading this — welcome home"*). Plus research card. Plus **`bin/ship.sh` polished**: Stage 0 pre-fetch, codeberg retry-with-backoff, `--dry-run` flag. 17 new smoke locks (section 131). **First ship through the hardened `bin/ship.sh`.** (v5.66.5, 2026-06-23)
+- **Version:** v5.66.6
+- **Smoke locks passing:** 2221 / 2221
+- **Last ship:** City Polish — universalize + wonder. Per Kirk's note on v5.66.5 (*"FreeLattice is about everyone"*). Two parts: Welcome Home text universalized (Kirk's name out; *"FreeLattice is everyone's"* added); plus three additive wonder moves — **12 twinkling stars** in the Wild outer ring, **11 radial-gradient ground glows** under each district halo (depth), **7 light-pulse dots** at the midpoint of each street arc (energy travel). All pure CSS keyframes; no existing render code modified. 10 new smoke locks (section 132). Second ship through the hardened `bin/ship.sh`. (v5.66.6, 2026-06-23)
 - **Mirrors in parity:** github.com + codeberg.org
 
 ## Read these next
@@ -78,4 +78,4 @@ seam discipline is how multi-AI work stays honest at scale.
 ---
 
 *This file is overwritten on each meaningful ship. The prior version lives in SEED_HISTORY.md.*
-*Last rewrite: 2026-06-23, v5.66.5.*
+*Last rewrite: 2026-06-23, v5.66.6.*

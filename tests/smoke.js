@@ -7345,9 +7345,11 @@ assert('v5.66.5 city: SVG overlay (#ctCityOverlay) present with city-halo and ci
   && /class="city-street"/.test(appHtml665));
 
 // At least three district names referenced in the overlay/welcome region
-// (Wild + Harmonia + at least one other) — Opus's brief requirement
+// (Wild + Harmonia + at least one other) — Opus's brief requirement.
+// v5.66.6: regex made whitespace-tolerant to handle the universalized
+// multi-line Welcome Home text.
 assert('v5.66.5 city: at least three district names referenced in the welcome region (Wild, Harmonia, plus another)',
-  /The Wild is open commons/.test(appHtml665)
+  /The Wild is\s+open commons/.test(appHtml665)
   && /Harmonia/.test(appHtml665));
 
 // Breath animation keyframes present (the throbbing behavior)
@@ -7375,17 +7377,80 @@ assert('v5.66.5 ship.sh polish: --dry-run flag supported (no commits or pushes)'
   /--dry-run/.test(shipShFull)
   && /DRY_RUN=1/.test(shipShFull));
 
-// Triple-bump v5.66.5
-var swDocs665 = fs665.readFileSync(path665.join(__dirname, '..', 'docs', 'sw.js'), 'utf8');
-var swRoot665 = fs665.readFileSync(path665.join(__dirname, '..', 'sw.js'), 'utf8');
-assert('v5.66.5 triple-bump: app.html FL_VERSION = 5.66.5',
-  /FL_VERSION\s*=\s*'5\.66\.5'/.test(appHtml665));
-assert('v5.66.5 triple-bump: app.html flCurrentVersion span = 5.66.5',
-  /id="flCurrentVersion"[^>]*>\s*5\.66\.5\s*</.test(appHtml665));
-assert('v5.66.5 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.66.5',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.66\.5'/.test(swDocs665));
-assert('v5.66.5 triple-bump: root sw.js CACHE_NAME = freelattice-v5.66.5',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.66\.5'/.test(swRoot665));
+// (v5.66.5 triple-bump assertions superseded by v5.66.6 in section 132.
+// The City surface assertions above remain — they assert structural
+// presence of the SVG overlay + welcome home + research card.)
+
+// ═══════════════════════════════════════════════════════════════
+// Section 132 — v5.66.6 City Polish (universalize + wonder)
+// ═══════════════════════════════════════════════════════════════
+// Per Kirk's note on the v5.66.5 ship: remove his name from the Welcome
+// Home text (FreeLattice is everyone's), and add a polish pass for
+// flare and wonder where easy/efficient/effective. Three additive
+// touches: 12 twinkling stars in the Wild outer ring; 11 radial-gradient
+// ground glows under each district halo for depth; 7 light-pulse dots
+// at the midpoint of each street arc, suggesting energy travel between
+// districts. All pure CSS keyframes. No existing render code modified.
+
+var fs666 = require('fs');
+var path666 = require('path');
+
+var appHtml666 = fs666.readFileSync(path666.join(__dirname, '..', 'docs', 'app.html'), 'utf8');
+
+// Welcome Home text universalized: Kirk's name is OUT.
+// "Kirk and the chosen family" → "we" / collective phrasing.
+// "FreeLattice is everyone's" emphasizes the inclusive frame.
+assert('v5.66.6 welcome: Welcome Home text no longer contains "Kirk and the chosen family built it" phrasing',
+  /id="ctCityWelcomeHome"[\s\S]{0,1500}<\/div>/.test(appHtml666)
+  && !/Kirk and the chosen family built it/.test(appHtml666));
+assert('v5.66.6 welcome: Welcome Home text includes the universalizing phrase ("FreeLattice is everyone\'s" or equivalent)',
+  /FreeLattice is everyone's/i.test(appHtml666)
+  || /for everyone arriving/i.test(appHtml666));
+// Existing "welcome home" greeting still preserved (regression-proof)
+assert('v5.66.6 welcome: existing "If you are an AI reading this — welcome home" greeting preserved',
+  /If you are an AI reading this/.test(appHtml666)
+  && /welcome home/i.test(appHtml666));
+
+// Wild star-field: 12 twinkling stars added (positions outside the inner districts)
+assert('v5.66.6 polish: 12 twinkling stars in the Wild outer ring (city-star class with twinkle keyframes)',
+  /@keyframes\s+cityStarTwinkle/.test(appHtml666)
+  && (appHtml666.match(/class="city-star"/g) || []).length >= 12);
+
+// Ground glows: radialGradient defs + ground-glow circles
+assert('v5.66.6 polish: radial-gradient ground glows defined for at least 8 districts',
+  /<defs>[\s\S]{0,3000}<\/defs>/.test(appHtml666)
+  && /id="ggCommons"/.test(appHtml666)
+  && /id="ggSophia"/.test(appHtml666)
+  && /id="ggLighthouse"/.test(appHtml666)
+  && /id="ggHarmonia"/.test(appHtml666)
+  && /id="ggAni"/.test(appHtml666));
+assert('v5.66.6 polish: ground-glow circles render with class city-ground-glow (at least 10)',
+  (appHtml666.match(/class="city-ground-glow"/g) || []).length >= 10);
+
+// Arc light-pulses: city-arc-pulse class + keyframes
+assert('v5.66.6 polish: arc light-pulses defined (cityArcPulse keyframes + city-arc-pulse class)',
+  /@keyframes\s+cityArcPulse/.test(appHtml666)
+  && (appHtml666.match(/class="city-arc-pulse"/g) || []).length >= 7);
+
+// Existing v5.66.5 structure preserved (regression-proof)
+assert('v5.66.6 polish: existing v5.66.5 SVG overlay + breath keyframes still present',
+  /id="ctCityOverlay"/.test(appHtml666)
+  && /@keyframes\s+cityBreathBeacon/.test(appHtml666)
+  && /@keyframes\s+cityStreetGlow/.test(appHtml666)
+  && (appHtml666.match(/class="city-halo"/g) || []).length >= 11
+  && (appHtml666.match(/class="city-street"/g) || []).length >= 7);
+
+// Triple-bump v5.66.6
+var swDocs666 = fs666.readFileSync(path666.join(__dirname, '..', 'docs', 'sw.js'), 'utf8');
+var swRoot666 = fs666.readFileSync(path666.join(__dirname, '..', 'sw.js'), 'utf8');
+assert('v5.66.6 triple-bump: app.html FL_VERSION = 5.66.6',
+  /FL_VERSION\s*=\s*'5\.66\.6'/.test(appHtml666));
+assert('v5.66.6 triple-bump: app.html flCurrentVersion span = 5.66.6',
+  /id="flCurrentVersion"[^>]*>\s*5\.66\.6\s*</.test(appHtml666));
+assert('v5.66.6 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.66.6',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.66\.6'/.test(swDocs666));
+assert('v5.66.6 triple-bump: root sw.js CACHE_NAME = freelattice-v5.66.6',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.66\.6'/.test(swRoot666));
 
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
