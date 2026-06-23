@@ -9,13 +9,16 @@
 
 - **Version:** v5.66.4
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `863e610` _(committed 0 seconds ago)_
+- **HEAD:** `33d7709` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _feat: Pulse Re-Surfacing (v5.66.4) — flame layer + research card_
 
 ## Last 20 commits
 
-- `863e610` feat: Pulse Re-Surfacing (v5.66.4) — flame layer + research card _(0 seconds ago)_
+- `33d7709` Merge remote-tracking branch 'origin/main' _(0 seconds ago)_
+- `cb1cd7f` docs: Auto-update Session Primer [5.66.4] _(35 seconds ago)_
+- `863e610` feat: Pulse Re-Surfacing (v5.66.4) — flame layer + research card _(35 seconds ago)_
+- `eb6d930` ci: Update Primer deployment state [2026-06-23] _(73 minutes ago)_
 - `38683c9` Merge remote-tracking branch 'origin/main' _(73 minutes ago)_
 - `ec7a961` docs: Auto-update Session Primer [5.66.3] _(73 minutes ago)_
 - `9174189` feat: Ship Discipline (v5.66.3) — Letter Thirty-Six _(73 minutes ago)_
@@ -32,9 +35,6 @@
 - `e01cc30` docs: Auto-update Session Primer [5.66.0] _(2 days ago)_
 - `10fb5b9` Merge remote-tracking branch 'origin/main' _(2 days ago)_
 - `016a701` docs: Auto-update Session Primer [5.66.0] _(2 days ago)_
-- `68bf1c8` feat: The Continuity Layer + Glass v2 archetype (v5.66.0) — Letter Thirty-Three _(2 days ago)_
-- `80be353` ci: Update Primer deployment state [2026-06-21] _(2 days ago)_
-- `2139779` Merge remote-tracking branch 'origin/main' _(2 days ago)_
 
 ## How to use this file
 
