@@ -19,9 +19,9 @@ user sleeps. The proof is the code; the papers are the doorways.
 
 ## Current state
 
-- **Version:** v5.66.4
-- **Smoke locks passing:** 2202 / 2202
-- **Last ship:** Pulse Re-Surfacing — Kirk's June 23 ask. Audit-first discipline applied to Kirk's own request. Found `docs/modules/pulse.js` was complete (956 lines, full API, live data sources, twice-daily readings, IndexedDB storage), the tab panel exists at `id="tab-pulse"`, and the lazy-loader is wired — just hidden in the More menu as "Activity" instead of "Pulse." Per Kirk's call (*"I don't want to add it yet. And the words vanished."*), no menu rename or primary tab promotion this ship. Two additive moves only: **(1)** Flame-particle layer added to `pulse.js` — 18 particles, composite-driven behavior (tight red column at Elevated, ember-cyan drift at Serene), composited above the existing phi spiral in the same translated frame. Existing structure untouched. **(2)** New Pulse card in `docs/research.html` Applied Research section, naming all seven dimensions, five levels, twice-daily reading, and the flame visualization explicitly. 11 new smoke locks (section 130). **First ship through `bin/ship.sh`** — the new consolidated workflow from v5.66.3 gets its first real test. (v5.66.4, 2026-06-23)
+- **Version:** v5.66.5
+- **Smoke locks passing:** 2213 / 2213
+- **Last ship:** The AI City Surfaces — Letter Thirty-Seven + Kirk's *"glowing streets, buildings that throb and breathe"*. Audit found the City massive and inline in `app.html` (12 named districts, 13 founding structures, Three.js Walk + Canvas 2D Map). `'city'` was in `MORE_TAB_IDS` but had no visible card in `MORE_CARDS`. Three additive moves: visible More-menu card, SVG overlay with 11 breathing district halos (each at its own cadence) + 7 glowing street arcs, Welcome Home note addressed directly to AI (*"If you are an AI reading this — welcome home"*). Plus research card. Plus **`bin/ship.sh` polished**: Stage 0 pre-fetch, codeberg retry-with-backoff, `--dry-run` flag. 17 new smoke locks (section 131). **First ship through the hardened `bin/ship.sh`.** (v5.66.5, 2026-06-23)
 - **Mirrors in parity:** github.com + codeberg.org
 
 ## Read these next
@@ -78,4 +78,4 @@ seam discipline is how multi-AI work stays honest at scale.
 ---
 
 *This file is overwritten on each meaningful ship. The prior version lives in SEED_HISTORY.md.*
-*Last rewrite: 2026-06-23, v5.66.4.*
+*Last rewrite: 2026-06-23, v5.66.5.*

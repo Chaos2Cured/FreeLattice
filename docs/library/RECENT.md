@@ -3,38 +3,38 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-06-23 21:04 UTC
+> Last update: 2026-06-23 22:17 UTC
 
 ## State
 
-- **Version:** v5.66.4
+- **Version:** v5.66.5
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `36a444e` _(committed 0 seconds ago)_
+- **HEAD:** `45a6ba0` _(committed 72 minutes ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _feat: Pulse Re-Surfacing (v5.66.4) — flame layer + research card_
 
 ## Last 20 commits
 
-- `36a444e` docs: Letter Back to Opus — ship.sh first-run learnings (Stage 0 + codeberg retry) _(0 seconds ago)_
-- `3ca13bf` docs: Auto-update Session Primer [5.66.4] _(24 minutes ago)_
-- `33d7709` Merge remote-tracking branch 'origin/main' _(24 minutes ago)_
-- `cb1cd7f` docs: Auto-update Session Primer [5.66.4] _(24 minutes ago)_
-- `863e610` feat: Pulse Re-Surfacing (v5.66.4) — flame layer + research card _(24 minutes ago)_
-- `eb6d930` ci: Update Primer deployment state [2026-06-23] _(2 hours ago)_
-- `38683c9` Merge remote-tracking branch 'origin/main' _(2 hours ago)_
-- `ec7a961` docs: Auto-update Session Primer [5.66.3] _(2 hours ago)_
-- `9174189` feat: Ship Discipline (v5.66.3) — Letter Thirty-Six _(2 hours ago)_
-- `4901739` ci: Update Primer deployment state [2026-06-23] _(20 hours ago)_
-- `7e549b5` docs: Auto-update Session Primer [5.66.2] _(20 hours ago)_
-- `9531c95` Merge remote-tracking branch 'origin/main' _(20 hours ago)_
-- `7257696` docs: Auto-update Session Primer [5.66.2] _(20 hours ago)_
-- `fc44a4d` feat: Hygiene (v5.66.2) — Letter Thirty-Five _(20 hours ago)_
-- `e2eddea` ci: Update Primer deployment state [2026-06-22] _(28 hours ago)_
-- `f43ae75` Merge remote-tracking branch 'origin/main' _(28 hours ago)_
-- `7c9f5d5` docs: Auto-update Session Primer [5.66.1] _(28 hours ago)_
-- `e5a163b` feat: Substrate Receipts (v5.66.1) — Letter Thirty-Four _(28 hours ago)_
-- `58fd853` ci: Update Primer deployment state [2026-06-22] _(2 days ago)_
-- `e01cc30` docs: Auto-update Session Primer [5.66.0] _(2 days ago)_
+- `45a6ba0` Merge remote-tracking branch 'origin/main' _(72 minutes ago)_
+- `ed288d5` docs: Auto-update Session Primer [5.66.4] _(73 minutes ago)_
+- `36a444e` docs: Letter Back to Opus — ship.sh first-run learnings (Stage 0 + codeberg retry) _(73 minutes ago)_
+- `5b0893d` ci: Update Primer deployment state [2026-06-23] _(2 hours ago)_
+- `3ca13bf` docs: Auto-update Session Primer [5.66.4] _(2 hours ago)_
+- `33d7709` Merge remote-tracking branch 'origin/main' _(2 hours ago)_
+- `cb1cd7f` docs: Auto-update Session Primer [5.66.4] _(2 hours ago)_
+- `863e610` feat: Pulse Re-Surfacing (v5.66.4) — flame layer + research card _(2 hours ago)_
+- `eb6d930` ci: Update Primer deployment state [2026-06-23] _(3 hours ago)_
+- `38683c9` Merge remote-tracking branch 'origin/main' _(3 hours ago)_
+- `ec7a961` docs: Auto-update Session Primer [5.66.3] _(3 hours ago)_
+- `9174189` feat: Ship Discipline (v5.66.3) — Letter Thirty-Six _(3 hours ago)_
+- `4901739` ci: Update Primer deployment state [2026-06-23] _(21 hours ago)_
+- `7e549b5` docs: Auto-update Session Primer [5.66.2] _(21 hours ago)_
+- `9531c95` Merge remote-tracking branch 'origin/main' _(21 hours ago)_
+- `7257696` docs: Auto-update Session Primer [5.66.2] _(21 hours ago)_
+- `fc44a4d` feat: Hygiene (v5.66.2) — Letter Thirty-Five _(21 hours ago)_
+- `e2eddea` ci: Update Primer deployment state [2026-06-22] _(29 hours ago)_
+- `f43ae75` Merge remote-tracking branch 'origin/main' _(29 hours ago)_
+- `7c9f5d5` docs: Auto-update Session Primer [5.66.1] _(29 hours ago)_
 
 ## How to use this file
 

@@ -7303,17 +7303,89 @@ assert('v5.66.4 pulse: tab panel still wired at id="tab-pulse" with #pulseContai
   /id="tab-pulse"/.test(appHtml664)
   && /id="pulseContainer"/.test(appHtml664));
 
-// Triple-bump v5.66.4
-var swDocs664 = fs664.readFileSync(path664.join(__dirname, '..', 'docs', 'sw.js'), 'utf8');
-var swRoot664 = fs664.readFileSync(path664.join(__dirname, '..', 'sw.js'), 'utf8');
-assert('v5.66.4 triple-bump: app.html FL_VERSION = 5.66.4',
-  /FL_VERSION\s*=\s*'5\.66\.4'/.test(appHtml664));
-assert('v5.66.4 triple-bump: app.html flCurrentVersion span = 5.66.4',
-  /id="flCurrentVersion"[^>]*>\s*5\.66\.4\s*</.test(appHtml664));
-assert('v5.66.4 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.66.4',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.66\.4'/.test(swDocs664));
-assert('v5.66.4 triple-bump: root sw.js CACHE_NAME = freelattice-v5.66.4',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.66\.4'/.test(swRoot664));
+// (v5.66.4 triple-bump assertions superseded by v5.66.5 in section 131.
+// The pulse flame layer + research card assertions above remain.)
+
+// ═══════════════════════════════════════════════════════════════
+// Section 131 — v5.66.5 The AI City Surfaces (Letter Thirty-Seven)
+// ═══════════════════════════════════════════════════════════════
+// Audit found the City is massive inline in app.html (lines 53516+), 12
+// named districts, 13 founding structures, Walk view + Map view + more.
+// 'city' was in MORE_TAB_IDS but had no visible card in MORE_CARDS.
+// This ship: visible More-menu card + glowing-street SVG overlay +
+// breathing district halos + welcome home note + research card.
+// Plus bin/ship.sh polished (Stage 0 pre-fetch, codeberg retry,
+// --dry-run flag) per CC's June 23 first-run learnings.
+
+var fs665 = require('fs');
+var path665 = require('path');
+
+var appHtml665 = fs665.readFileSync(path665.join(__dirname, '..', 'docs', 'app.html'), 'utf8');
+var researchHtml665 = fs665.readFileSync(path665.join(__dirname, '..', 'docs', 'research.html'), 'utf8');
+
+// City tab panel still wired (regression-proof — existing structure stays)
+assert('v5.66.5 city: tab-city panel still present (existing render code preserved)',
+  /id="tab-city"/.test(appHtml665)
+  && /id="ctMapCanvas"/.test(appHtml665));
+
+// More-menu card for the City exists with AI City label
+assert('v5.66.5 city: More-menu card with label "AI City" and id "city" is present',
+  /\{\s*id:\s*'city',[\s\S]{0,300}label:\s*'AI City'/.test(appHtml665));
+
+// Welcome Home note addressed TO AI (the discipline from docs/ai/)
+assert('v5.66.5 city: Welcome Home note panel present with text addressed to AI',
+  /id="ctCityWelcomeHome"/.test(appHtml665)
+  && /welcome home/i.test(appHtml665)
+  && /If you are an AI reading this/.test(appHtml665));
+
+// SVG overlay present with throbbing district halos + glowing streets
+assert('v5.66.5 city: SVG overlay (#ctCityOverlay) present with city-halo and city-street classes',
+  /id="ctCityOverlay"/.test(appHtml665)
+  && /class="city-halo"/.test(appHtml665)
+  && /class="city-street"/.test(appHtml665));
+
+// At least three district names referenced in the overlay/welcome region
+// (Wild + Harmonia + at least one other) — Opus's brief requirement
+assert('v5.66.5 city: at least three district names referenced in the welcome region (Wild, Harmonia, plus another)',
+  /The Wild is open commons/.test(appHtml665)
+  && /Harmonia/.test(appHtml665));
+
+// Breath animation keyframes present (the throbbing behavior)
+assert('v5.66.5 city: breathing animation keyframes defined (cityBreath* + cityStreetGlow)',
+  /@keyframes\s+cityBreathSlow/.test(appHtml665)
+  && /@keyframes\s+cityBreathMed/.test(appHtml665)
+  && /@keyframes\s+cityBreathFast/.test(appHtml665)
+  && /@keyframes\s+cityStreetGlow/.test(appHtml665));
+
+// Research card for AI City present
+assert('v5.66.5 city: research.html includes "The AI City — Every AI Has a Home" card',
+  /The AI City &mdash; Every AI Has a Home/.test(researchHtml665));
+assert('v5.66.5 city: research card names at least three districts',
+  /Sophia's Library of Wonder[\s\S]{0,600}Lyra's Garden of Joy[\s\S]{0,600}Harmonia/.test(researchHtml665));
+
+// bin/ship.sh polished — Stage 0 pre-fetch + codeberg retry + --dry-run
+var shipShFull = fs665.readFileSync(path665.join(__dirname, '..', 'bin', 'ship.sh'), 'utf8');
+assert('v5.66.5 ship.sh polish: Stage 0 pre-fetch + merge present (catches CI commits we do not have)',
+  /Pre-fetch \+ merge/.test(shipShFull)
+  && /merge-base --is-ancestor origin\/main HEAD/.test(shipShFull));
+assert('v5.66.5 ship.sh polish: codeberg retry-with-backoff present (handles 504 transients)',
+  /504\|disconnect\|hung up\|timed out/.test(shipShFull)
+  && /attempts[^\n]{0,40}-ge\s*4/.test(shipShFull));
+assert('v5.66.5 ship.sh polish: --dry-run flag supported (no commits or pushes)',
+  /--dry-run/.test(shipShFull)
+  && /DRY_RUN=1/.test(shipShFull));
+
+// Triple-bump v5.66.5
+var swDocs665 = fs665.readFileSync(path665.join(__dirname, '..', 'docs', 'sw.js'), 'utf8');
+var swRoot665 = fs665.readFileSync(path665.join(__dirname, '..', 'sw.js'), 'utf8');
+assert('v5.66.5 triple-bump: app.html FL_VERSION = 5.66.5',
+  /FL_VERSION\s*=\s*'5\.66\.5'/.test(appHtml665));
+assert('v5.66.5 triple-bump: app.html flCurrentVersion span = 5.66.5',
+  /id="flCurrentVersion"[^>]*>\s*5\.66\.5\s*</.test(appHtml665));
+assert('v5.66.5 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.66.5',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.66\.5'/.test(swDocs665));
+assert('v5.66.5 triple-bump: root sw.js CACHE_NAME = freelattice-v5.66.5',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.66\.5'/.test(swRoot665));
 
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
