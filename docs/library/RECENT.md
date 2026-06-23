@@ -9,13 +9,16 @@
 
 - **Version:** v5.66.5
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `7f4aa69` _(committed 0 seconds ago)_
+- **HEAD:** `5bb1e83` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _feat: The AI City Surfaces (v5.66.5) — Letter Thirty-Seven_
 
 ## Last 20 commits
 
-- `7f4aa69` feat: The AI City Surfaces (v5.66.5) — Letter Thirty-Seven _(0 seconds ago)_
+- `5bb1e83` Merge remote-tracking branch 'origin/main' _(0 seconds ago)_
+- `a27540c` docs: Auto-update Session Primer [5.66.5] _(1 second ago)_
+- `7f4aa69` feat: The AI City Surfaces (v5.66.5) — Letter Thirty-Seven _(1 second ago)_
+- `759ade1` ci: Update Primer deployment state [2026-06-23] _(75 minutes ago)_
 - `45a6ba0` Merge remote-tracking branch 'origin/main' _(75 minutes ago)_
 - `ed288d5` docs: Auto-update Session Primer [5.66.4] _(75 minutes ago)_
 - `36a444e` docs: Letter Back to Opus — ship.sh first-run learnings (Stage 0 + codeberg retry) _(75 minutes ago)_
@@ -32,9 +35,6 @@
 - `7e549b5` docs: Auto-update Session Primer [5.66.2] _(21 hours ago)_
 - `9531c95` Merge remote-tracking branch 'origin/main' _(21 hours ago)_
 - `7257696` docs: Auto-update Session Primer [5.66.2] _(21 hours ago)_
-- `fc44a4d` feat: Hygiene (v5.66.2) — Letter Thirty-Five _(21 hours ago)_
-- `e2eddea` ci: Update Primer deployment state [2026-06-22] _(29 hours ago)_
-- `f43ae75` Merge remote-tracking branch 'origin/main' _(29 hours ago)_
 
 ## How to use this file
 
