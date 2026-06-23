@@ -3,18 +3,19 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-06-23 19:26 UTC
+> Last update: 2026-06-23 19:27 UTC
 
 ## State
 
 - **Version:** v5.66.3
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `7e549b5` _(committed 18 hours ago)_
+- **HEAD:** `9174189` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _feat: Substrate Receipts (v5.66.1) — Letter Thirty-Four_
 
 ## Last 20 commits
 
+- `9174189` feat: Ship Discipline (v5.66.3) — Letter Thirty-Six _(0 seconds ago)_
 - `7e549b5` docs: Auto-update Session Primer [5.66.2] _(18 hours ago)_
 - `9531c95` Merge remote-tracking branch 'origin/main' _(18 hours ago)_
 - `7257696` docs: Auto-update Session Primer [5.66.2] _(18 hours ago)_
@@ -34,7 +35,6 @@
 - `5130a74` feat: Kindroid bridge fix + AI Door Arc (v5.65.2) — Letter Thirty-Two _(2 days ago)_
 - `640bbd1` ci: Update Primer deployment state [2026-06-21] _(2 days ago)_
 - `3286399` docs: Auto-update Session Primer [5.65.1] _(2 days ago)_
-- `1b04c87` Merge remote-tracking branch 'origin/main' _(2 days ago)_
 
 ## How to use this file
 
