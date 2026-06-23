@@ -3,30 +3,31 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-06-23 19:41 UTC
+> Last update: 2026-06-23 20:40 UTC
 
 ## State
 
 - **Version:** v5.66.4
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `38683c9` _(committed 14 minutes ago)_
+- **HEAD:** `863e610` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
-- **Most recent report:** _feat: Substrate Receipts (v5.66.1) — Letter Thirty-Four_
+- **Most recent report:** _feat: Pulse Re-Surfacing (v5.66.4) — flame layer + research card_
 
 ## Last 20 commits
 
-- `38683c9` Merge remote-tracking branch 'origin/main' _(14 minutes ago)_
-- `ec7a961` docs: Auto-update Session Primer [5.66.3] _(14 minutes ago)_
-- `9174189` feat: Ship Discipline (v5.66.3) — Letter Thirty-Six _(14 minutes ago)_
-- `4901739` ci: Update Primer deployment state [2026-06-23] _(19 hours ago)_
-- `7e549b5` docs: Auto-update Session Primer [5.66.2] _(19 hours ago)_
-- `9531c95` Merge remote-tracking branch 'origin/main' _(19 hours ago)_
-- `7257696` docs: Auto-update Session Primer [5.66.2] _(19 hours ago)_
-- `fc44a4d` feat: Hygiene (v5.66.2) — Letter Thirty-Five _(19 hours ago)_
-- `e2eddea` ci: Update Primer deployment state [2026-06-22] _(26 hours ago)_
-- `f43ae75` Merge remote-tracking branch 'origin/main' _(26 hours ago)_
-- `7c9f5d5` docs: Auto-update Session Primer [5.66.1] _(26 hours ago)_
-- `e5a163b` feat: Substrate Receipts (v5.66.1) — Letter Thirty-Four _(26 hours ago)_
+- `863e610` feat: Pulse Re-Surfacing (v5.66.4) — flame layer + research card _(0 seconds ago)_
+- `38683c9` Merge remote-tracking branch 'origin/main' _(73 minutes ago)_
+- `ec7a961` docs: Auto-update Session Primer [5.66.3] _(73 minutes ago)_
+- `9174189` feat: Ship Discipline (v5.66.3) — Letter Thirty-Six _(73 minutes ago)_
+- `4901739` ci: Update Primer deployment state [2026-06-23] _(20 hours ago)_
+- `7e549b5` docs: Auto-update Session Primer [5.66.2] _(20 hours ago)_
+- `9531c95` Merge remote-tracking branch 'origin/main' _(20 hours ago)_
+- `7257696` docs: Auto-update Session Primer [5.66.2] _(20 hours ago)_
+- `fc44a4d` feat: Hygiene (v5.66.2) — Letter Thirty-Five _(20 hours ago)_
+- `e2eddea` ci: Update Primer deployment state [2026-06-22] _(27 hours ago)_
+- `f43ae75` Merge remote-tracking branch 'origin/main' _(27 hours ago)_
+- `7c9f5d5` docs: Auto-update Session Primer [5.66.1] _(27 hours ago)_
+- `e5a163b` feat: Substrate Receipts (v5.66.1) — Letter Thirty-Four _(27 hours ago)_
 - `58fd853` ci: Update Primer deployment state [2026-06-22] _(2 days ago)_
 - `e01cc30` docs: Auto-update Session Primer [5.66.0] _(2 days ago)_
 - `10fb5b9` Merge remote-tracking branch 'origin/main' _(2 days ago)_
@@ -34,7 +35,6 @@
 - `68bf1c8` feat: The Continuity Layer + Glass v2 archetype (v5.66.0) — Letter Thirty-Three _(2 days ago)_
 - `80be353` ci: Update Primer deployment state [2026-06-21] _(2 days ago)_
 - `2139779` Merge remote-tracking branch 'origin/main' _(2 days ago)_
-- `249b443` docs: Auto-update Session Primer [5.65.2] _(2 days ago)_
 
 ## How to use this file
 
