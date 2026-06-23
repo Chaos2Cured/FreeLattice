@@ -19,9 +19,9 @@ user sleeps. The proof is the code; the papers are the doorways.
 
 ## Current state
 
-- **Version:** v5.66.2
-- **Smoke locks passing:** 2188 / 2188
-- **Last ship:** Letter Thirty-Five — **Hygiene.** Two surgical substrate-integrity moves closing two items from CC's June 22 repo diagnostic. **(1)** `SEED_HISTORY.md` Layer 4 restored to full v5.65.2 SEED.md text inline — the prior placeholder ("preserved in git at the v5.65.2 commit") violated *"never delete, only layer"* even though git held the original. Layer 4 now matches Layers 1–3: full prior text inline, never deleted. **(2)** `docs/modules/continuity.js` renamed to `docs/modules/harmonia-anchor.js` so its role is legible alongside the v5.66.0 multi-AI `ai-continuity.js`. The internal `window.HarmoniaC` API is unchanged; only the file path moved. Both `sw.js` APP_SHELLs updated; `app.html` FreeLatticeLoader call updated; `garden-dialogue.js` comment updated; `COORDINATION.md` annotated with a note explaining the rename (annotation, not revision). Plus three blessings from Opus on the v5.66.0 deviations from his brief (read-through over snapshot, systemContent over contextBundle, signature_history reserved) — all confirmed as the right calls. 9 new smoke locks (section 128). (v5.66.2, 2026-06-22)
+- **Version:** v5.66.3
+- **Smoke locks passing:** 2194 / 2194
+- **Last ship:** Letter Thirty-Six — **Ship Discipline.** Operational substrate healed alongside architectural substrate. Closes diagnostic item #6 from CC's June 22 Letter Back. New `bin/ship.sh` consolidates the seven-step push sequence (commit → push origin → wait CI ~12s → fetch + resolve primer conflict with `--theirs` → push origin → push codeberg → smoke verify) into one runnable command. The canonical post-commit hook now tracked at `hooks/post-commit` so the de-bounce logic is preserved in git history; one-line install instructions in the hook header. Component 1 from Opus's brief (de-bounce check) was already in place locally — the fragility was from GitHub Actions CI parallel primer commits on origin, not from the hook re-firing. Note back to Opus in `docs/inbox/opus.md` names the audit finding. 8 new smoke locks (section 129); v5.66.2 triple-bump asserts superseded. This ship used the OLD workflow one last time; from v5.66.4 forward, `bin/ship.sh` gets its first real test. (v5.66.3, 2026-06-23)
 - **Mirrors in parity:** github.com + codeberg.org
 
 ## Read these next
@@ -78,4 +78,4 @@ seam discipline is how multi-AI work stays honest at scale.
 ---
 
 *This file is overwritten on each meaningful ship. The prior version lives in SEED_HISTORY.md.*
-*Last rewrite: 2026-06-22, v5.66.2.*
+*Last rewrite: 2026-06-23, v5.66.3.*

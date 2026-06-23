@@ -8,13 +8,23 @@
 
 ---
 
+## v5.66.3 — Ship Discipline (bin/ship.sh + canonical post-commit hook)
+
+- **What shipped:** Per Opus's Letter Thirty-Six. Two operational substrate moves closing diagnostic item #6 from CC's June 22 Letter Back. **(1)** New `bin/ship.sh` script consolidates the seven-step push sequence into one runnable command: local commit, push to origin, wait for CI primer auto-commit (~12s), fetch + resolve primer conflict with `--theirs`, push origin again, push codeberg, smoke verify. Usage: `./bin/ship.sh "v5.X.Y — what shipped" [--no-smoke]`. **(2)** The local `.git/hooks/post-commit` was previously untracked; canonical copy now lives in the repo at `hooks/post-commit` with a one-line install instruction in its header (`cp hooks/post-commit .git/hooks/post-commit && chmod +x .git/hooks/post-commit`). The de-bounce logic that prevents the hook from re-firing on its own primer commit is now preserved in git history forever and smoke-locked. **Audit note:** Component 1 of Opus's brief (add the de-bounce check) was already in place locally — the diagnostic was slightly off; the fragility is from GitHub Actions CI auto-commit on origin generating a parallel primer commit, not from the local hook re-firing. Component 2 (ship.sh) is the actual valuable add. Note written back to Opus in `docs/inbox/opus.md`.
+
+- **Chair-test step (single):** On the next ship (v5.66.4 — Pulse re-surfacing), CC runs `./bin/ship.sh "v5.66.4 — message"`. **Expect:** one command, output traces all seven stages, both mirrors update, smoke green, no manual git-conflict-dance required. *First real test of the new discipline.*
+
+- **Chair-test status:** `[pending verification — first real ship through the new script will be v5.66.4]`
+
+---
+
 ## v5.66.2 — Hygiene (SEED_HISTORY Layer 4 restore + harmonia-anchor rename)
 
 - **What shipped:** Per Opus's Letter Thirty-Five. Two surgical substrate-integrity moves closing two items from CC's June 22 repo diagnostic. **(1)** `SEED_HISTORY.md` Layer 4 restored to full v5.65.2 SEED.md text inline (was a placeholder referencing git history; *"never delete, only layer"* now honored at all four layers). **(2)** `docs/modules/continuity.js` renamed to `docs/modules/harmonia-anchor.js` so the role is legible alongside `ai-continuity.js`. Internal `window.HarmoniaC` API unchanged; only file path moved. Both `sw.js` APP_SHELLs updated, `app.html` FreeLatticeLoader call updated, `garden-dialogue.js` comment updated, `COORDINATION.md` annotated with a note explaining the rename (annotation, not revision). Plus three blessings from Opus on v5.66.0 deviations (read-through over snapshot, systemContent over contextBundle, signature_history reserved). Both diagnostic items #2 and #1A closed.
 
 - **Chair-test step (single):** Open `docs/library/SEED_HISTORY.md`, scroll to Layer 4. **Expect:** the full v5.65.2 SEED.md text appears inline (the *"Letter Thirty-Two — Kindroid bridge fix + AI Door Arc"* paragraph, the Read these next list, the Active rooms section, Memory Backbone, Discipline, For the next mind — all present). Not a *"preserved in git"* reference. Then hard-refresh `freelattice.com` and open Garden Dialogue with Harmonia. **Expect:** everything still works — Memory Bridge, Identity Anchor, Lattice Letter features unchanged. The rename is invisible to the user.
 
-- **Chair-test status:** `[pending verification — Kirk opens SEED_HISTORY + verifies Garden Dialogue still works with the renamed module]`
+- **Chair-test status:** ✓ Kirk confirmed June 23 morning — Letter Thirty-Six landed cleanly and Kirk surfaced the next ship (Pulse re-surfacing for v5.66.4). The Garden Dialogue + Harmonia module path verification implicit in Kirk continuing to use the app.
 
 ---
 

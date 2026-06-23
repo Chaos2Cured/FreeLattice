@@ -211,6 +211,68 @@ grep -nE "\"[^\"]*\buser\b[^\"]*\"" docs/app.html docs/modules/*.js \
 
 ---
 
+## SHIPPED: Letter Thirty-Six — Ship Discipline (v5.66.3, 2026-06-23)
+
+Per Opus's Letter Thirty-Six. Operational substrate healed alongside architectural substrate. Closes diagnostic item #6 from CC's June 22 Letter Back to Opus. *Engineering as care for future selves.*
+
+### Component 1 (audit finding): de-bounce was already in place
+
+The local `.git/hooks/post-commit` already contains the MARKER check that exits early if the previous commit was an `Auto-update Session Primer` commit. The hook only fires once per real commit; it does not re-fire on its own output. **The fragility I described in my June 22 diagnostic was slightly off** — the double-commit-per-ship pattern is from the GitHub Actions CI auto-commit on `origin/main`, not from the local hook re-firing.
+
+Component 1 of Opus's brief was therefore already shipped. The audit finding is preserved in `docs/inbox/opus.md` as the Letter Back from CC dated June 23. *The substrate kept catching us in the act of describing it wrong; that's the discipline holding.*
+
+### Component 2: `bin/ship.sh` (the actual valuable add)
+
+New script that consolidates the seven-step push sequence into one runnable command:
+
+```bash
+./bin/ship.sh "v5.X.Y — what shipped" [--no-smoke]
+```
+
+Stages:
+1. Local commit (auto-stages if nothing pre-staged; honors pre-staging if present)
+2. Push to origin (GitHub)
+3. Wait 12s for CI to land its auto-primer commit
+4. Fetch origin, fast-forward if possible; otherwise merge with `--theirs` resolving the primer conflict
+5. Final push to origin
+6. Push to Codeberg mirror (warns if remote not configured)
+7. Smoke verify (or skip with `--no-smoke`)
+
+Honors project disciplines: never skips hooks, never force-pushes, always attempts the mirror push (catches drift). `set -e` halts on any failure so the operator can intervene at the exact failure point.
+
+### Canonical post-commit hook tracked at `hooks/post-commit`
+
+The local hook was previously untracked. Canonical copy now lives in the repo so the de-bounce logic is preserved in git history forever. One-line install instruction in the hook header:
+
+```bash
+cp hooks/post-commit .git/hooks/post-commit && chmod +x .git/hooks/post-commit
+```
+
+New contributors run that once after clone. The smoke lock on the tracked `hooks/post-commit` content prevents future regression of the de-bounce.
+
+### Smoke locks: +8 (section 129)
+
+- `bin/ship.sh` exists
+- `bin/ship.sh` is executable
+- `bin/ship.sh` references both `git push origin main` and `git push codeberg main` (no silent mirror drop)
+- `bin/ship.sh` resolves the primer conflict via `--theirs`
+- `hooks/post-commit` (canonical) is tracked in the repo
+- `hooks/post-commit` contains the de-bounce check pattern
+- Triple-bump v5.66.3 (4 asserts)
+- v5.66.2 triple-bump asserts superseded (4 removed)
+
+**Smoke locks pass: 2188 → 2194 (+10 in section 129, −4 superseded v5.66.2 triple-bump asserts; net +6).**
+
+### Ship method
+
+This ship used the OLD workflow (commit + push + manual fetch-merge-resolve + push both mirrors). It was the last ship to do so. From v5.66.4 forward (Pulse re-surfacing — Kirk asked for the Pulse tab restored with a flame visualization, audit findings written up below for the next ship's proposal), `bin/ship.sh` gets its first real test of the new discipline.
+
+### Future-care item noted
+
+A deeper Hygiene ship could disable the GitHub Actions CI auto-commit entirely (or condition it on whether the local commit already updated the primer) — closing the loop without needing `--theirs` resolution at all. The `ship.sh` dance is sufficient for now; that's a Hygiene ship for another day.
+
+---
+
 ## SHIPPED: Letter Thirty-Five — Hygiene (v5.66.2, 2026-06-22)
 
 Per Opus's Letter Thirty-Five. Two surgical substrate-integrity moves closing two items from CC's June 22 repo diagnostic. Both are healing moves the substrate needed; neither is new feature work.

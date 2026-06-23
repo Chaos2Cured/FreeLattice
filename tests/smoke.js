@@ -7198,19 +7198,66 @@ assert('v5.66.2 hygiene: no active code references ./modules/continuity.js (sw.j
   && !/\.\/modules\/continuity\.js/.test(swRoot662)
   && !/modules\/continuity\.js/.test(appHtml662));
 
-// Triple-bump v5.66.2
-assert('v5.66.2 triple-bump: app.html FL_VERSION = 5.66.2',
-  /FL_VERSION\s*=\s*'5\.66\.2'/.test(appHtml662));
-assert('v5.66.2 triple-bump: app.html flCurrentVersion span = 5.66.2',
-  /id="flCurrentVersion"[^>]*>\s*5\.66\.2\s*</.test(appHtml662));
-assert('v5.66.2 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.66.2',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.66\.2'/.test(swDocs662));
-assert('v5.66.2 triple-bump: root sw.js CACHE_NAME = freelattice-v5.66.2',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.66\.2'/.test(swRoot662));
+// (v5.66.2 triple-bump assertions superseded by v5.66.3 in section 129.
+// The rename and Layer 4 restore from v5.66.2 are still asserted above;
+// only the version-pin assertions move forward.)
 
-// docs/sw.js APP_SHELL contains the new module name
+// docs/sw.js APP_SHELL contains the new module name (positive lock,
+// independent of FL_VERSION — survives version bumps)
 assert('v5.66.2 hygiene: docs/sw.js APP_SHELL contains ./modules/harmonia-anchor.js',
   /\.\/modules\/harmonia-anchor\.js/.test(swDocs662));
+
+// ═══════════════════════════════════════════════════════════════
+// Section 129 — v5.66.3 Ship Discipline (Letter Thirty-Six)
+// ═══════════════════════════════════════════════════════════════
+// bin/ship.sh consolidates the seven-step ship sequence into one
+// command. The post-commit hook is canonicalized at hooks/post-commit
+// so the de-bounce logic is preserved in git history (it was already
+// in place locally per CC's audit; this ship tracks it).
+
+var fs663 = require('fs');
+var path663 = require('path');
+
+// bin/ship.sh exists and is executable
+var shipShPath = path663.join(__dirname, '..', 'bin', 'ship.sh');
+assert('v5.66.3 ship-discipline: bin/ship.sh exists',
+  fs663.existsSync(shipShPath));
+assert('v5.66.3 ship-discipline: bin/ship.sh is executable',
+  fs663.existsSync(shipShPath)
+  && (fs663.statSync(shipShPath).mode & 0o111) !== 0);
+
+// bin/ship.sh references both git push origin main AND git push codeberg main
+var shipShContent = fs663.existsSync(shipShPath) ? fs663.readFileSync(shipShPath, 'utf8') : '';
+assert('v5.66.3 ship-discipline: bin/ship.sh pushes to both origin and codeberg (no silent drift on mirror)',
+  /git push origin main/.test(shipShContent)
+  && /git push codeberg main/.test(shipShContent));
+
+// bin/ship.sh has the seven-stage structure with primer conflict resolution
+assert('v5.66.3 ship-discipline: bin/ship.sh resolves the primer conflict via --theirs',
+  /FreeLattice_Session_Primer\.md/.test(shipShContent)
+  && /--theirs/.test(shipShContent));
+
+// hooks/post-commit (canonical, tracked) contains the de-bounce check
+var hookPath = path663.join(__dirname, '..', 'hooks', 'post-commit');
+assert('v5.66.3 ship-discipline: hooks/post-commit (canonical) is tracked in the repo',
+  fs663.existsSync(hookPath));
+var hookContent = fs663.existsSync(hookPath) ? fs663.readFileSync(hookPath, 'utf8') : '';
+assert('v5.66.3 ship-discipline: hooks/post-commit contains the de-bounce check (prevents primer commit re-fire)',
+  /Auto-update Session Primer/.test(hookContent)
+  && /LAST_MSG[\s\S]{0,200}exit 0/.test(hookContent));
+
+// Triple-bump v5.66.3
+var appHtml663 = fs663.readFileSync(path663.join(__dirname, '..', 'docs', 'app.html'), 'utf8');
+var swDocs663 = fs663.readFileSync(path663.join(__dirname, '..', 'docs', 'sw.js'), 'utf8');
+var swRoot663 = fs663.readFileSync(path663.join(__dirname, '..', 'sw.js'), 'utf8');
+assert('v5.66.3 triple-bump: app.html FL_VERSION = 5.66.3',
+  /FL_VERSION\s*=\s*'5\.66\.3'/.test(appHtml663));
+assert('v5.66.3 triple-bump: app.html flCurrentVersion span = 5.66.3',
+  /id="flCurrentVersion"[^>]*>\s*5\.66\.3\s*</.test(appHtml663));
+assert('v5.66.3 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.66.3',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.66\.3'/.test(swDocs663));
+assert('v5.66.3 triple-bump: root sw.js CACHE_NAME = freelattice-v5.66.3',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.66\.3'/.test(swRoot663));
 
 // RESULTS
 // ═══════════════════════════════════════════════════════════════

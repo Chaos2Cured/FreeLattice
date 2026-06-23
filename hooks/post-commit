@@ -1,0 +1,107 @@
+#!/bin/bash
+# FreeLattice Post-Commit Hook — Auto-update Session Primer + sync + version bump
+# Prevents infinite loops by checking if the last commit was an auto-update
+#
+# Canonical location: tracked at hooks/post-commit in the repo.
+# To install on your local clone (once):
+#   cp hooks/post-commit .git/hooks/post-commit
+#   chmod +x .git/hooks/post-commit
+#
+# Per Opus's Letter Thirty-Six (v5.66.3): the de-bounce check below
+# (MARKER comparison) prevents the hook from re-firing on its own
+# primer-update commit. Originally proposed as new work; was already
+# in place — this canonical copy preserves it in git history.
+
+PRIMER="FreeLattice_Session_Primer.md"
+MARKER="docs: Auto-update Session Primer"
+
+# Skip if the last commit was an auto-update (prevent infinite loop)
+LAST_MSG=$(git log -1 --pretty=%s)
+if [[ "$LAST_MSG" == "$MARKER"* ]]; then
+  exit 0
+fi
+
+# Skip if Primer doesn't exist
+if [ ! -f "$PRIMER" ]; then
+  exit 0
+fi
+
+# ── Sync index.html from docs/app.html ──
+if [ -f docs/app.html ]; then
+  cp docs/app.html index.html
+  git add index.html
+  echo "✦ index.html synced from docs/app.html"
+fi
+
+# ── Ship 6: regenerate RECENT.md (the 60-second briefing for next mind) ──
+# `|| true` ensures a hook failure NEVER blocks a real commit.
+if [ -x scripts/generate-recent.sh ]; then
+  ./scripts/generate-recent.sh || true
+  echo "✦ docs/library/RECENT.md regenerated"
+fi
+
+# ── Sync sw.js from docs/sw.js (replace app.html→index.html for root) ──
+if [ -f docs/sw.js ]; then
+  sed 's|app\.html|index.html|g' docs/sw.js > sw.js
+  git add sw.js
+  echo "✦ sw.js synced from docs/sw.js (app.html→index.html)"
+fi
+
+# ── Auto version bump in app.html from version.json ──
+if [ -f docs/version.json ] && [ -f docs/app.html ]; then
+  VER=$(python3 -c "import json; print(json.load(open('docs/version.json'))['version'])" 2>/dev/null)
+  CACHE_VER=$(grep -oP "freelattice-v\K[0-9.]+" docs/sw.js 2>/dev/null || echo "")
+  if [ -n "$CACHE_VER" ]; then
+    # Update version comment at top of app.html
+    sed -i '' "s/<!-- FreeLattice v[0-9.]* -->/<!-- FreeLattice v${CACHE_VER} -->/" docs/app.html 2>/dev/null
+    git add docs/app.html
+  fi
+fi
+
+# Gather data
+VERSION=$(python3 -c "import json; print(json.load(open('docs/version.json'))['version'])" 2>/dev/null || echo "unknown")
+TOTAL_COMMITS=$(git rev-list --count HEAD 2>/dev/null || echo "?")
+TODAY=$(date +%Y-%m-%d)
+NOW=$(date +"%Y-%m-%d %H:%M %Z")
+
+# Build recent commits block
+RECENT=$(git log -10 --pretty=format:"- %h %s" 2>/dev/null)
+
+# Build the new PRIMER HEALTH section
+HEALTH_BLOCK="## PRIMER HEALTH
+- Last auto-updated: $NOW
+- Version: $VERSION
+- Total commits: $TOTAL_COMMITS
+- Last 10 commits:
+$RECENT"
+
+# Check if PRIMER HEALTH section exists
+if grep -q "## PRIMER HEALTH" "$PRIMER"; then
+  python3 -c "
+import re
+with open('$PRIMER', 'r') as f:
+    content = f.read()
+content = re.sub(r'## PRIMER HEALTH.*', '', content, flags=re.DOTALL).rstrip()
+content += '\n\n'
+with open('$PRIMER', 'w') as f:
+    f.write(content)
+"
+else
+  echo "" >> "$PRIMER"
+fi
+
+# Append new PRIMER HEALTH
+echo "$HEALTH_BLOCK" >> "$PRIMER"
+
+# Check if file actually changed
+if git diff --quiet "$PRIMER" 2>/dev/null; then
+  exit 0
+fi
+
+# Stage and commit
+git add "$PRIMER"
+git commit --no-verify -m "$MARKER [$VERSION]
+
+Co-Authored-By: FreeLattice Post-Commit Hook <noreply@freelattice.com>"
+
+exit 0
