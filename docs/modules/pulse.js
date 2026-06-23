@@ -128,6 +128,80 @@ window.ThePulse = (function () {
   let _phiAngle = 0;
   let _initialized = false;
 
+  // ── v5.66.4 (Pulse Re-Surfacing) — Flame particle layer ───────────────────
+  // Per Kirk's June 23 ask: "a flame that changes color with the pulse."
+  // Additive layer above the existing phi spiral. Behavior modulated by
+  // composite score:
+  //   Elevated (80+):  tight column, fast upward velocity, narrow spread
+  //   Simmering (65+): same shape, slightly softer
+  //   Unsettled (50+): moderate spread, slower rise
+  //   Calm (35+):      wide drift, soft upward, ember register
+  //   Serene (0+):     mostly stationary with gentle outward drift
+  // Color pulled from the same LEVELS palette the spiral already uses.
+  // Sparks rise as flame at high composite, drift as ember-glow at low.
+  let _flameParticles = null;
+
+  function ensureFlameParticles() {
+    if (_flameParticles) return;
+    const n = 18;
+    _flameParticles = [];
+    for (let i = 0; i < n; i++) {
+      _flameParticles.push({
+        x: 0, y: 0, vx: 0, vy: 0,
+        life: Math.random(),     // start at random life stages so they don't all reset together
+        seed: Math.random() * 1000,
+        size: 0.8 + Math.random() * 1.4
+      });
+    }
+  }
+  function resetFlameParticle(p, composite, radius) {
+    // Start near the center base, slight horizontal jitter
+    const spread = composite >= 65 ? 0.10 : (composite >= 50 ? 0.18 : (composite >= 35 ? 0.30 : 0.45));
+    p.x = (Math.random() - 0.5) * radius * spread;
+    p.y = radius * 0.10 + Math.random() * radius * 0.08;
+    // Upward velocity scales with composite (heat rises faster)
+    const heat = Math.max(0.15, Math.min(1.0, composite / 80));
+    p.vy = -(0.6 + heat * 1.6) * (0.7 + Math.random() * 0.6);
+    p.vx = (Math.random() - 0.5) * (composite >= 50 ? 0.3 : 0.6);
+    p.life = 0;
+    p.seed = Math.random() * 1000;
+    p.size = 0.8 + Math.random() * 1.4;
+  }
+  function drawFlameLayer(radius, composite) {
+    ensureFlameParticles();
+    const level = LEVELS.find(l => composite >= l.min) || LEVELS[LEVELS.length - 1];
+    // Composite-modulated curl: high heat = tight column rising; low = outward drift
+    const curlStrength = composite >= 65 ? 0.04 : (composite >= 50 ? 0.10 : (composite >= 35 ? 0.18 : 0.28));
+    const lifeStep = 0.008 + Math.max(0, (composite - 50) / 50) * 0.012;
+
+    for (let i = 0; i < _flameParticles.length; i++) {
+      const p = _flameParticles[i];
+      p.life += lifeStep;
+      if (p.life >= 1) {
+        resetFlameParticle(p, composite, radius);
+        continue;
+      }
+      // Drift + slight horizontal curl that breathes
+      p.x += p.vx + Math.sin(p.life * Math.PI * 2 + p.seed) * curlStrength;
+      p.y += p.vy;
+      // Slow horizontal damping so the column tightens as they rise (looks flame-like)
+      p.vx *= 0.985;
+      // Project into the spiral's local frame (already translated to cx, cy)
+      const fade = composite >= 50
+        ? Math.max(0, 1 - p.life) * Math.max(0, 1 - p.life)        // sharper fade up high (flame)
+        : Math.max(0, Math.sin(p.life * Math.PI));                  // soft bell at low (ember)
+      const alpha = fade * (composite >= 65 ? 0.55 : 0.40);
+      const size = p.size * (composite >= 65 ? 1.2 : 1.0) * (1 + (1 - p.life) * 0.4);
+      _ctx.beginPath();
+      _ctx.arc(p.x, p.y, size, 0, Math.PI * 2);
+      _ctx.fillStyle = level.color + Math.round(alpha * 255).toString(16).padStart(2, '0');
+      _ctx.shadowColor = level.color;
+      _ctx.shadowBlur = composite >= 65 ? 6 : 3;
+      _ctx.fill();
+      _ctx.shadowBlur = 0;
+    }
+  }
+
   // ── IndexedDB helpers ──────────────────────────────────────────────────────
   function openDB() {
     return new Promise((resolve, reject) => {
@@ -544,6 +618,11 @@ window.ThePulse = (function () {
     _ctx.arc(0, 0, 4, 0, Math.PI * 2);
     _ctx.fillStyle = level.color;
     _ctx.fill();
+
+    // v5.66.4 — Flame particle layer drawn on top of the spiral, in the
+    // same translated frame (origin = cx, cy). Composites as flame at
+    // high pulse, drifts as ember-glow at low.
+    drawFlameLayer(radius, composite);
 
     _ctx.restore();
   }

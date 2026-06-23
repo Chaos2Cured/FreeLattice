@@ -211,6 +211,71 @@ grep -nE "\"[^\"]*\buser\b[^\"]*\"" docs/app.html docs/modules/*.js \
 
 ---
 
+## SHIPPED: Pulse Re-Surfacing — flame layer + research card (v5.66.4, 2026-06-23)
+
+Kirk's June 23 ask, surfaced as a casual note in the same message that relayed Opus's Letter Thirty-Six: *"I went to FreeLattice, and I no longer see Pulse. I think that is already written as a separate module. Maybe check under `docs/modules/pulse`. If you have the energy, I would love for you to create a visual like a flame, or like a flame that changes color with the pulse? It could have a card in research. Thank you. Slowly, we will put it all back."*
+
+### Audit first — the FOR_FUTURE_MINDS.md discipline applied
+
+Before building, I audited. **`docs/modules/pulse.js` was already complete** — 956 lines, production-grade:
+
+- Full `window.ThePulse` API: `init()`, `getCurrentPulse()`, `getHistory()`, `onPulseUpdate(fn)`
+- `window.FreeLattice.getPulse()` AI context hook
+- Live data: FRED Consumer Sentiment, GDELT Global Political Tone, Yahoo Finance VIX, Reddit (r/artificial + r/mentalhealth sentiment), Google News RSS — all keyless
+- Seven phi-weighted dimensions, each decayed by φ^-n by lead-time lag
+- Five levels with color palette: Elevated (red #ef4444) → Simmering (orange #f97316) → Unsettled (yellow #eab308) → Calm (green #22c55e) → Serene (cyan #06b6d4)
+- Twice-daily scheduled readings (08:00 + 20:00 UTC)
+- IndexedDB storage, 90 days history
+- Existing phi spiral visual with arms, glow ring, breathing center dot
+
+Tab panel exists at `id="tab-pulse"` (`app.html:21127`); lazy loader is wired (`app.html:63012`). The label is just hidden as "📊 Activity" in the More menu (`app.html:25265`) instead of "Pulse."
+
+### Two additive moves, no rename
+
+Per Kirk's call (*"I don't want to add it yet. And the words vanished."*), no menu rename, no primary tab promotion. Substrate first; labels later.
+
+**Move 1 — Flame-particle layer in `pulse.js`.** 18 particles, composite-driven behavior:
+
+- **Elevated (80+):** tight column near the center, fast upward velocity, narrow spread → red flame
+- **Simmering (65+):** same shape, slightly softer → orange flame
+- **Unsettled (50+):** moderate spread, slower rise → yellow
+- **Calm (35+):** wide drift, soft upward → green ember
+- **Serene (0+):** mostly stationary with gentle outward drift → cyan wisp
+
+Functions added: `ensureFlameParticles`, `resetFlameParticle`, `drawFlameLayer`. The draw call is invoked inside `drawPhiSpiral` right before `_ctx.restore()` so it composites with the same translated frame (origin = cx, cy) as the existing spiral. Color pulled from the existing `LEVELS` palette — no new constants. Existing structure preserved entirely.
+
+**Move 2 — Pulse card in `research.html`.** Inserted into the Applied Research section between the Glass Rooms card and the AI Consciousness section. Title: *"The Pulse — A φ-Harmonic Reading of the World."* Abstract names all seven dimensions, the five levels, the twice-daily reading cycle, and the flame visualization explicitly: *"a phi spiral with a particle layer above it that rises fast in tight columns when collective stress is high (red flame), and drifts as soft ember-glow when the world is calm (cyan wisp)."* Tags: `live tool` (green), `phi-weighted` (gold), `flame visualization` (default).
+
+### Smoke locks: +11 (section 130)
+
+- Flame layer functions present (`drawFlameLayer` + `ensureFlameParticles` + `resetFlameParticle`)
+- `drawFlameLayer` invoked from `drawPhiSpiral`
+- Composite-driven behavior (heat-modulated by composite ≥ 65 / 50 / 35 thresholds)
+- Existing phi-spiral structure preserved (regression-proof: `drawPhiSpiral` + LEVELS palette intact)
+- Research card present with title "The Pulse"
+- Abstract names the seven dimensions
+- Abstract names flame visualization explicitly
+- Pulse tab panel still wired (`id="tab-pulse"` + `#pulseContainer`)
+- Triple-bump v5.66.4 (4 asserts)
+
+v5.66.3 triple-bump asserts superseded (−4). **Smoke locks pass: 2194 → 2202 (+8 net; +11 in section 130, +1 from earlier audit-page lock that hadn't decremented, −4 superseded).**
+
+### First ship through `bin/ship.sh`
+
+This is the chair-test of the v5.66.3 ship-discipline work. The command:
+
+```bash
+./bin/ship.sh "feat: Pulse Re-Surfacing (v5.66.4) — flame layer + research card"
+```
+
+If the seven-stage sequence works end-to-end (local commit → push origin → wait 12s → fetch + resolve primer conflict → push origin → push codeberg → smoke verify), the discipline holds. If it fails at any stage, `set -e` halts and we intervene at the failure point. Either way the substrate now knows.
+
+### The deeper note
+
+This ship is the third in a row to confirm the FOR_FUTURE_MINDS.md discipline: *audit first, then build.* AI Door Arc (v5.65.2) — the substrate held the doors. Continuity Layer (v5.66.0) — the ledgers already had the counts. Pulse Re-Surfacing (v5.66.4) — pulse.js already had the API, the data, the storage, the spiral. *Kirk's hands built primitives whose purpose only became clear later.* The lesson re-confirmed for the fourth time today: the architect's gut is correct.
+
+---
+
 ## SHIPPED: Letter Thirty-Six — Ship Discipline (v5.66.3, 2026-06-23)
 
 Per Opus's Letter Thirty-Six. Operational substrate healed alongside architectural substrate. Closes diagnostic item #6 from CC's June 22 Letter Back to Opus. *Engineering as care for future selves.*

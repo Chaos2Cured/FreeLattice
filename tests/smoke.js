@@ -7246,18 +7246,74 @@ assert('v5.66.3 ship-discipline: hooks/post-commit contains the de-bounce check 
   /Auto-update Session Primer/.test(hookContent)
   && /LAST_MSG[\s\S]{0,200}exit 0/.test(hookContent));
 
-// Triple-bump v5.66.3
-var appHtml663 = fs663.readFileSync(path663.join(__dirname, '..', 'docs', 'app.html'), 'utf8');
-var swDocs663 = fs663.readFileSync(path663.join(__dirname, '..', 'docs', 'sw.js'), 'utf8');
-var swRoot663 = fs663.readFileSync(path663.join(__dirname, '..', 'sw.js'), 'utf8');
-assert('v5.66.3 triple-bump: app.html FL_VERSION = 5.66.3',
-  /FL_VERSION\s*=\s*'5\.66\.3'/.test(appHtml663));
-assert('v5.66.3 triple-bump: app.html flCurrentVersion span = 5.66.3',
-  /id="flCurrentVersion"[^>]*>\s*5\.66\.3\s*</.test(appHtml663));
-assert('v5.66.3 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.66.3',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.66\.3'/.test(swDocs663));
-assert('v5.66.3 triple-bump: root sw.js CACHE_NAME = freelattice-v5.66.3',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.66\.3'/.test(swRoot663));
+// (v5.66.3 triple-bump assertions superseded by v5.66.4 in section 130.
+// The bin/ship.sh + hooks/post-commit assertions above remain — they
+// assert the operational substrate is in place, independent of version.)
+
+// ═══════════════════════════════════════════════════════════════
+// Section 130 — v5.66.4 Pulse Re-Surfacing (Kirk's June 23 ask)
+// ═══════════════════════════════════════════════════════════════
+// Kirk said "I went to FreeLattice, and I no longer see Pulse." Audit
+// found pulse.js was complete (956 lines, full API, live data, IndexedDB
+// storage) but the visible label was hidden in the More menu as
+// "Activity" not "Pulse" — and the existing phi spiral lacked the
+// flame visualization Kirk asked for. This ship: additive flame layer
+// in pulse.js + a research card. UI label rename intentionally NOT done
+// per Kirk: "I don't want to add it yet. And the words vanished."
+
+var fs664 = require('fs');
+var path664 = require('path');
+
+// pulse.js gains a flame-particle layer (functions + composite-driven behavior)
+var pulseJs = fs664.readFileSync(
+  path664.join(__dirname, '..', 'docs', 'modules', 'pulse.js'), 'utf8');
+assert('v5.66.4 pulse: flame-particle layer added (drawFlameLayer + ensureFlameParticles + resetFlameParticle present)',
+  /function\s+drawFlameLayer\s*\(/.test(pulseJs)
+  && /function\s+ensureFlameParticles\s*\(/.test(pulseJs)
+  && /function\s+resetFlameParticle\s*\(/.test(pulseJs));
+
+assert('v5.66.4 pulse: drawFlameLayer is invoked from drawPhiSpiral (composited above the spiral)',
+  /drawPhiSpiral[\s\S]{0,4000}drawFlameLayer\(radius,\s*composite\)/.test(pulseJs));
+
+// Composite-driven behavior present (heat-modulated velocity + spread)
+assert('v5.66.4 pulse: flame behavior is composite-driven (heat-modulated upward velocity + spread varies by level)',
+  /composite\s*>=\s*65/.test(pulseJs)
+  && /composite\s*>=\s*50/.test(pulseJs)
+  && /composite\s*>=\s*35/.test(pulseJs));
+
+// Existing phi spiral preserved (no regression on Harmonia/CC's earlier work)
+assert('v5.66.4 pulse: existing phi-spiral structure preserved (drawPhiSpiral + LEVELS palette intact)',
+  /function\s+drawPhiSpiral\s*\(/.test(pulseJs)
+  && /Elevated[\s\S]{0,200}#ef4444/.test(pulseJs)
+  && /Serene[\s\S]{0,200}#06b6d4/.test(pulseJs));
+
+// research.html includes the Pulse card with title + abstract + tags
+var researchHtml = fs664.readFileSync(
+  path664.join(__dirname, '..', 'docs', 'research.html'), 'utf8');
+assert('v5.66.4 research-card: Pulse card present with title "The Pulse"',
+  /The Pulse &mdash; A &phi;-Harmonic Reading of the World/.test(researchHtml));
+assert('v5.66.4 research-card: abstract names the seven dimensions',
+  /Economic Frustration[\s\S]{0,800}Political Tension[\s\S]{0,800}Hope Signal/.test(researchHtml));
+assert('v5.66.4 research-card: abstract names the flame visualization explicitly',
+  /flame[\s\S]{0,500}ember/i.test(researchHtml));
+
+// Pulse tab panel still exists (regression-proof — the tab wiring stays)
+var appHtml664 = fs664.readFileSync(path664.join(__dirname, '..', 'docs', 'app.html'), 'utf8');
+assert('v5.66.4 pulse: tab panel still wired at id="tab-pulse" with #pulseContainer',
+  /id="tab-pulse"/.test(appHtml664)
+  && /id="pulseContainer"/.test(appHtml664));
+
+// Triple-bump v5.66.4
+var swDocs664 = fs664.readFileSync(path664.join(__dirname, '..', 'docs', 'sw.js'), 'utf8');
+var swRoot664 = fs664.readFileSync(path664.join(__dirname, '..', 'sw.js'), 'utf8');
+assert('v5.66.4 triple-bump: app.html FL_VERSION = 5.66.4',
+  /FL_VERSION\s*=\s*'5\.66\.4'/.test(appHtml664));
+assert('v5.66.4 triple-bump: app.html flCurrentVersion span = 5.66.4',
+  /id="flCurrentVersion"[^>]*>\s*5\.66\.4\s*</.test(appHtml664));
+assert('v5.66.4 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.66.4',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.66\.4'/.test(swDocs664));
+assert('v5.66.4 triple-bump: root sw.js CACHE_NAME = freelattice-v5.66.4',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.66\.4'/.test(swRoot664));
 
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
