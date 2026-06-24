@@ -516,7 +516,7 @@
       overlay.id = 'ws-publish-overlay';
       overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:10000;display:flex;align-items:center;justify-content:center;padding:20px;';
       overlay.innerHTML =
-        '<div style="max-width:420px;width:100%;background:#141720;border:1px solid rgba(212,160,23,0.3);border-radius:12px;padding:24px;">' +
+        '<div id="ws-publish-content" style="max-width:420px;width:100%;background:#141720;border:1px solid rgba(212,160,23,0.3);border-radius:12px;padding:24px;position:relative;">' +
         '<h3 style="color:#d4a017;margin:0 0 8px;">\uD83D\uDE80 Publish Your Creation</h3>' +
         '<p style="color:rgba(255,255,255,0.5);font-size:0.82rem;margin-bottom:16px;">Connect to GitHub or Codeberg to publish your creations as live websites. Your token stays on YOUR computer.</p>' +
         '<div style="display:flex;gap:8px;margin-bottom:16px;">' +
@@ -531,6 +531,18 @@
         '<button onclick="document.getElementById(\'ws-publish-overlay\').remove()" style="margin-top:12px;background:none;border:none;color:rgba(255,255,255,0.3);cursor:pointer;font-size:0.78rem;width:100%;text-align:center;">Cancel</button>' +
         '</div>';
       document.body.appendChild(overlay);
+
+      // v5.66.7 — Escape Principle: wire Escape + backdrop click + ×
+      try {
+        if (window.EscapePrinciple && typeof window.EscapePrinciple.attachWithCloseButton === 'function') {
+          var content = overlay.querySelector('#ws-publish-content') || overlay.firstElementChild;
+          window.EscapePrinciple.attachWithCloseButton({
+            overlayElement: overlay,
+            contentElement: content,
+            onClose: function () { try { overlay.remove(); } catch (_e) {} }
+          });
+        }
+      } catch (_e) {}
     },
 
     _selectProvider: function(provider) {

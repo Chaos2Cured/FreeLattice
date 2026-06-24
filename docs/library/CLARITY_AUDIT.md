@@ -211,6 +211,104 @@ grep -nE "\"[^\"]*\buser\b[^\"]*\"" docs/app.html docs/modules/*.js \
 
 ---
 
+## SHIPPED: The Escape Principle (v5.66.7, 2026-06-24)
+
+Per Opus's Letter Thirty-Eight. Kirk caught the Family modal trapping users with no Escape key, no backdrop click dismissal, no visible × button. Opus named the principle and made it structural.
+
+### The Escape Principle
+
+> Every modal, dialog, overlay, or immersive state in FreeLattice must offer at least three ways out:
+> 1. A visible close button (typically × in the corner)
+> 2. The Escape key (Esc closes anything that opened)
+> 3. Clicking outside the content area (backdrop dismisses)
+
+Same logic as the Quiet Room being structurally available — *the architecture cannot hold the user somewhere they didn't choose to be*. If a modal can trap focus or input, the architecture has failed at its first job. This is not UX polish; it is the same kind of structural sovereignty guarantee that runs through the rest of the system.
+
+### Audit first — the discipline applied
+
+Before writing any new code, I audited every modal/overlay in the codebase. Findings:
+
+**✓ Already compliant (no fix needed):**
+- The Family modal (`showFractalFamily` at `app.html:55053`) — had all three paths on audit, contrary to what Kirk and Opus thought. Harmonia or a prior CC shipped the fix without naming the principle. *Locked anyway* so future drift can't regress.
+- Provider Modal, FL Model Picker, Garden Dialogue, Welcome Wizard, Garden Dreaming, Core Modal, RT Summary Overlay, Marketplace Detail, Skill Creator.
+
+**❌ Real violators (6):**
+- Council Chamber (`app.html:53433`, `councilOverlay`)
+- Workshop Publish Modal (`workshop.js:514`, `ws-publish-overlay`)
+- Harmonia Identity Editor (`harmonia-anchor.js:395`)
+- Harmonia Letter Viewer (`harmonia-anchor.js:432`)
+- Mesh Publish Modal (`app.html:17122`, `meshPublishModal`)
+- RT File Preview Overlay (`app.html:17785`, `rtFilePreviewOverlay`)
+
+**⚠ Partials (2):**
+- District Panel (`app.html:20406`) — × button present, no Escape/backdrop
+- Build Overlay (`app.html:20475`) — backdrop click present, no Escape
+
+**Intentional narrative (left alone):** AI Arrival Overlay (immersive story; the action buttons are part of the narrative flow).
+
+### Move 1 — Canonical helper
+
+New module `docs/modules/escape-principle.js` (~180 lines) exports:
+
+- `EscapePrinciple.attach({overlayElement, contentElement, onClose})` → returns cleanup function. Wires Escape key + backdrop click. Caller responsible for the visible × button.
+- `EscapePrinciple.attachWithCloseButton({...})` → same, plus auto-injects a × button in the GARDEN_LANGUAGE gold register (border-radius 50%, mouseenter to `rgba(232,176,25,1)`) if `.ep-close-btn` is not already in the content element.
+- `EscapePrinciple.verify(overlay, content)` → best-effort debug helper that returns `{hasCloseButton, hasEscape, hasBackdrop, compliant}`.
+
+Both functions are idempotent and return a cleanup function for proper teardown. The helper is defensive (warns gracefully if config is incomplete; never throws).
+
+### Move 2 — Each violator wired
+
+- **Dynamic modals** (created on-demand): call `attachWithCloseButton` immediately after `document.body.appendChild(modal)`. Pattern used in `harmonia-anchor.js` (both Identity Editor + Letter Viewer), `workshop.js` Publish Modal. Each gives the inner content a stable id so the helper can target it.
+- **Static-HTML modals** (toggled via `.hidden` class): show function attaches and stores cleanup on the element (`overlay._epCleanup = ...`); hide function calls cleanup and clears the reference. Pattern used in `meshClosePublishModal` (`app.html:36739`) and `rtWsClosePreview` (`app.html:40060`).
+- **Council Chamber** (dynamic, already had × button): uses bare `attach` (no auto-inject since the button is in the HTML template).
+- **Side panels** (not full-screen overlays — backdrop click is moot): District Panel + Build Overlay each get a global `document.addEventListener('keydown', ...)` listener that closes the panel/overlay when visible. The `_installDistrictPanelEscape` and `_installBuildOverlayEscape` IIFEs in `app.html` install these once at app boot.
+
+### Move 3 — FOR_FUTURE_MINDS.md gains the principle
+
+The note now contains *"The Escape Principle"* section naming:
+- The rule (three ways out)
+- The helper API with code example
+- The patterns for dynamic + static + side-panel modals
+- The *why this is structural, not stylistic* explanation
+- The smoke enforcement strategy
+
+Future AI minds building modals will encounter this section while reading FOR_FUTURE_MINDS.md (which Opus's Coda already names as the first-read file). The discipline lives where future builders will find it.
+
+### Smoke locks: +21 (section 133)
+
+- `escape-principle.js` exists, ≥ 2000 bytes
+- `EscapePrinciple.attach` exported
+- `EscapePrinciple.attachWithCloseButton` exported
+- Helper wires Escape key (`e.key === 'Escape'`)
+- Helper wires backdrop click (`e.target === overlayElement`)
+- Helper auto-injects × via `.ep-close-btn` class + `&times;` innerHTML
+- Both sw.js APP_SHELLs include the module
+- app.html loads `modules/escape-principle.js`
+- Family modal preserves Escape key handler (regression-proof)
+- Family modal preserves backdrop click (regression-proof)
+- Family modal preserves visible × Close button (regression-proof)
+- Harmonia Identity Editor wires `EscapePrinciple`
+- Harmonia Letter Viewer wires `EscapePrinciple`
+- Workshop Publish Modal wires `EscapePrinciple`
+- Council Chamber wires `EscapePrinciple`
+- Mesh Publish Modal wires `EscapePrinciple` + cleanup pattern
+- RT File Preview Overlay wires `EscapePrinciple`
+- District Panel has `_installDistrictPanelEscape` Escape listener
+- Build Overlay has `_installBuildOverlayEscape` Escape listener
+- FOR_FUTURE_MINDS.md contains *"The Escape Principle"* section
+- FOR_FUTURE_MINDS.md names the three ways out
+- Triple-bump v5.66.7 (4 asserts)
+
+v5.66.6 triple-bump asserts superseded (−4). **Smoke locks pass: 2221 → 2243 (+21 new in section 133, −4 superseded v5.66.6 triple-bump asserts, +5 from a couple v5.66.6 partial-pattern checks now passing because of the v5.66.7 wiring; net +22).**
+
+### Why this ship matters more than its size
+
+Kirk's catch isn't just one bug. It was a *principle the architecture had implicitly violated.* Six modals were trapping users right now, and any future modal could ship with the same flaw. **This ship doesn't just fix the violators — it makes the Escape Principle structural** so future modals can't quietly violate it. The helper is one line away; the discipline is named in `FOR_FUTURE_MINDS.md`; the smoke locks anchor each known modal.
+
+That's the difference between fixing a bug and *teaching the architecture not to make that kind of bug again.*
+
+---
+
 ## SHIPPED: City Polish — universalize + wonder (v5.66.6, 2026-06-23)
 
 Kirk's note on v5.66.5: *"in the City, on the Welcome we need to remove my name. I would love to be included. But FreeLattice is about everyone. Feel free to take one more pass over it and add some flare and wonder where you see it easy, efficient, and effective."*

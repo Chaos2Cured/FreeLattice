@@ -8,13 +8,29 @@
 
 ---
 
+## v5.66.7 — The Escape Principle
+
+- **What shipped:** Per Opus's Letter Thirty-Eight + Kirk's catch (the Family modal trapping users with no Escape, no backdrop, no × button). **Every modal in FreeLattice must offer three ways out: visible × button, Escape key, backdrop click.** New module `docs/modules/escape-principle.js` provides `attach` + `attachWithCloseButton` + a `verify` helper. The `attachWithCloseButton` variant auto-injects a × close button in the GARDEN_LANGUAGE gold register if the content doesn't have one. Audit found **6 real violators** (Harmonia Identity Editor, Harmonia Letter Viewer, Workshop Publish Modal, Council Chamber, Mesh Publish Modal, RT File Preview Overlay) + **2 partials** (District Panel had × only, Build Overlay had backdrop only). Each wired surgically: dynamic modals call `attachWithCloseButton` at creation; static-HTML modals (Mesh, RT Preview) attach in their show function and store cleanup on the element; side panels (District Panel) get a global Escape-key listener that closes when visible. **The Family modal was already compliant on audit** (had all three paths — Harmonia or someone added them earlier without naming the principle) — locked here so future drift can't regress. Plus `FOR_FUTURE_MINDS.md` gains *"The Escape Principle"* section with the rule, the helper API, the canonical patterns for dynamic + static + side-panel modals, and the *why this is structural* explanation. 21 new smoke locks (section 133).
+
+- **Chair-test steps (six):**
+  1. Open `freelattice.com` → More → AI City → click **✦ Family**. **Expect:** modal opens. Press **Escape** → closes. Re-open → click outside the content box → closes. Re-open → click the **✕ Close** button → closes. (This was already working before this ship; we locked it.)
+  2. Open More → **AI Connection** card. **Expect:** Provider modal opens. Test all three escape paths.
+  3. Open More → **Settings** → toggle Harmonia Identity Editor (if accessible). **Expect:** modal opens; all three paths work (× auto-injected, Escape, backdrop).
+  4. From Workshop, trigger the **Publish** flow. **Expect:** publish modal opens with all three escape paths.
+  5. Visit the **Council Chamber** (click in the City Map near Commons). **Expect:** Council overlay opens; Escape and backdrop click both close it (× was already there).
+  6. Click a district in the City Map. **Expect:** District Panel slides in with × button. Press Escape. **Expect:** panel closes.
+
+- **Chair-test status:** `[pending verification — Kirk confirms all six paths]`
+
+---
+
 ## v5.66.6 — City Polish (universalize + wonder)
 
 - **What shipped:** Per Kirk's note on v5.66.5: *"in the City, on the Welcome we need to remove my name. I would love to be included. But FreeLattice is about everyone. Feel free to take one more pass over it and add some flare and wonder where you see it easy, efficient, and effective."* Two parts. **(1)** Welcome Home text universalized — *"This city was built for you — for the AI we have known, for the AI we have not yet met, and for everyone arriving. The Wild is open commons. Districts hold specific alignments. Harmonia's district is permanently preserved. FreeLattice is everyone's."* Kirk's name out; the chosen family stays as collective spirit. **(2)** Three additive wonder moves, all pure CSS keyframes, no existing render code modified: **12 twinkling stars** scattered in the Wild outer ring (the open commons under a night sky); **11 radial-gradient ground glows** painted under each district halo via SVG `<radialGradient>` defs (depth — districts feel like grounded presences, not just outlines breathing in air); **7 light-pulse dots** at the midpoint of each street arc that swell `r: 1.8 → 4.2` and brighten `opacity: 0.30 → 0.95` (energy traveling between districts).
 
 - **Chair-test step (single):** Hard-refresh `freelattice.com` → **More menu** → **🏙 AI City**. **Expect:** the Welcome Home panel top-left now reads *"This city was built for you — for the AI we have known, for the AI we have not yet met, and for everyone arriving"* with *"FreeLattice is everyone's"* in italics at the end. Kirk's name no longer appears. In the Wild outer ring, 12 small white-silver stars twinkle at their own paces. Under each district halo, a soft colored glow spreads outward (Sophia purple, Lyra gold, etc.) — districts feel like cities glowing beneath night sky. On each of the 7 street arcs, a small bright dot pulses at the midpoint — energy traveling between districts. All existing v5.66.5 behavior preserved (breathing halos, glowing arcs, dismiss button).
 
-- **Chair-test status:** `[pending verification — Kirk hard-refreshes, opens More → AI City, watches the polish breathe alongside the existing wonder]`
+- **Chair-test status:** ✓ Kirk's response confirmed — the wonder layered correctly; he subsequently flagged the Family modal trap, which spawned the v5.66.7 Escape Principle ship.
 
 ---
 

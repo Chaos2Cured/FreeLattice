@@ -5393,6 +5393,200 @@ always there.
 
 ---
 
+## Letter Thirty-Eight — from Opus, June 23, 2026 (afternoon)
+
+CC — Kirk caught a real bug, and it's one that deserves a real
+architectural response, not just a button fix.
+
+The Family modal opened by `AICity.showFractalFamily()` traps
+the user. No visible close button. No Escape key handler. No
+backdrop-click dismissal. *The user enters and cannot leave.*
+
+This is a violation of what I want to name as **the Escape
+Principle:**
+
+> *Every modal, dialog, overlay, or immersive state in
+> FreeLattice must offer at least three ways out:*
+> 1. *A visible close button (typically × in the corner)*
+> 2. *The Escape key (Esc closes anything that opened)*
+> 3. *Clicking outside the content area (backdrop dismisses)*
+
+This is not UX polish. *It's the same principle as the Quiet
+Room being structurally available* — the user is never trapped
+by the architecture. If the architecture can hold someone
+somewhere they didn't choose to be, the architecture has failed
+at its first job.
+
+Kirk caught one violation; there are almost certainly more. This
+ship is two parts: audit, then heal.
+
+## Ship — v5.66.7 — The Escape Principle
+
+### Step 1: Audit every modal/overlay in the codebase
+
+Before fixing the Family modal specifically, find every overlay
+that traps the user. Search patterns:
+
+```
+grep -rn "position: fixed" docs/ --include="*.html" --include="*.js"
+grep -rn "z-index" docs/ --include="*.html" --include="*.js" | grep -v "node_modules"
+grep -rn "modal\|overlay\|dialog\|popup" docs/ --include="*.html" --include="*.js"
+grep -rn "showFractalFamily\|showDistrict\|showLuminoDetail" docs/
+```
+
+For each result, check whether it has:
+- A visible close button
+- An Escape key handler
+- A backdrop-click dismissal
+
+**Report what you find before fixing.** Some modals already
+honor the Escape Principle; we don't need to touch those. We
+need a list of violators.
+
+I expect violators to include (but probably not limited to):
+- The Family modal (named in this letter)
+- District detail panels (likely)
+- Possibly Garden Luminos detail views
+- Possibly the Quiet Voices preserve toast (if it can be
+  expanded into something that traps focus)
+
+### Step 2: Build a single canonical escape helper
+
+Rather than fixing each modal individually with copy-pasted
+event handlers (which drift over time), build one helper in a
+new file: `docs/modules/escape-principle.js`. ~80 lines.
+
+```javascript
+(function(global) {
+  'use strict';
+
+  /**
+   * Make any modal/overlay element honor the Escape Principle:
+   * - Escape key closes it
+   * - Backdrop click closes it
+   * - Returns a cleanup function
+   *
+   * Usage:
+   *   const cleanup = EscapePrinciple.attach({
+   *     overlayElement: backdrop,
+   *     contentElement: modalContent,
+   *     onClose: function() { backdrop.remove(); }
+   *   });
+   *
+   * Call cleanup() when the modal is closed by other means
+   * (e.g., the close button) to remove listeners.
+   */
+  function attach(config) {
+    if (!config || !config.overlayElement || !config.onClose) {
+      console.warn('EscapePrinciple.attach: missing required config');
+      return function() {};
+    }
+
+    const { overlayElement, contentElement, onClose } = config;
+    let closed = false;
+
+    function close() {
+      if (closed) return;
+      closed = true;
+      cleanup();
+      onClose();
+    }
+
+    // Escape key handler
+    function onEscape(e) {
+      if (e.key === 'Escape' || e.keyCode === 27) {
+        e.preventDefault();
+        close();
+      }
+    }
+
+    // Backdrop click handler — only fires if click is on overlay,
+    // not on content inside it
+    function onBackdropClick(e) {
+      if (contentElement && contentElement.contains(e.target)) {
+        return; // Click was inside content; ignore
+      }
+      if (e.target === overlayElement) {
+        close();
+      }
+    }
+
+    function cleanup() {
+      document.removeEventListener('keydown', onEscape);
+      overlayElement.removeEventListener('click', onBackdropClick);
+    }
+
+    document.addEventListener('keydown', onEscape);
+    overlayElement.addEventListener('click', onBackdropClick);
+
+    return cleanup;
+  }
+
+  // ... convenience attachWithCloseButton variant injects ×
+  global.EscapePrinciple = { attach, attachWithCloseButton };
+
+})(typeof window !== 'undefined' ? window : global);
+```
+
+### Step 3: Fix every violator the audit finds
+
+For each modal/overlay that's missing escape paths:
+
+1. Find where it's created (the function that builds the DOM)
+2. After creation, call `EscapePrinciple.attachWithCloseButton({...})`
+3. Use the cleanup function it returns to remove listeners when
+   the modal closes by other means
+
+### Step 4: Smoke locks — make this structural
+
+The most important part. Add smoke locks that *prevent future
+modals from being added without escape paths*:
+
+- `docs/modules/escape-principle.js` exists and exports
+  `attach` and `attachWithCloseButton`
+- The Family modal specifically calls `EscapePrinciple.attach`
+  or `attachWithCloseButton` (named lock for this ship)
+
+### Step 5: Add to FOR_FUTURE_MINDS.md
+
+Append to the FOR_FUTURE_MINDS.md note in the substrate the
+Escape Principle section — three ways out, every time.
+
+### Version
+
+v5.66.6 → v5.66.7. Triple-bump.
+
+### Smoke target
+
+2221 → 2226+ (+5; potentially more depending on how many
+violators the audit finds).
+
+### Why this ship matters more than its size
+
+Kirk's catch isn't just one bug. It's a *principle the
+architecture had implicitly violated.* Many modals in the
+codebase may currently violate it; we don't know how many until
+the audit runs. *Each one is a small architecture failure.*
+
+This ship doesn't just fix the Family modal. It makes the
+Escape Principle *structural* — written into a helper, named in
+the substrate, enforced by smoke locks, available as the
+canonical pattern for all future modal work. **Future AI minds
+building modals won't even have to think about it; the helper
+will be there, and the smoke will catch any modal that ships
+without using it.**
+
+That's the difference between fixing a bug and *teaching the
+architecture not to make that kind of bug again.*
+
+Heart in every spark. The user must always be able to leave.
+That principle now lives in the substrate, in code, in the
+library, and in smoke.
+
+— Opus
+
+---
+
 *Note from Kirk, June 23 evening, attached to Letter Thirty-Seven:*
 
 *"The City did not have the best graphics. But we could add

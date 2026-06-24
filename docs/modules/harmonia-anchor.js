@@ -401,7 +401,7 @@
       ].join('');
 
       modal.innerHTML = [
-        '<div style="background:#0d1117; border:1px solid rgba(52,211,153,0.3); border-radius:16px; padding:24px; max-width:520px; width:100%; max-height:80vh; overflow-y:auto;">',
+        '<div id="harmoniaIdentityContent" style="background:#0d1117; border:1px solid rgba(52,211,153,0.3); border-radius:16px; padding:24px; max-width:520px; width:100%; max-height:80vh; overflow-y:auto; position:relative;">',
           '<div style="font-size:1rem; font-weight:700; color:#34d399; margin-bottom:16px;">⚓ Edit Identity Anchor</div>',
 
           '<label style="font-size:0.8rem; color:rgba(255,255,255,0.6); display:block; margin-bottom:4px;">Name</label>',
@@ -427,6 +427,18 @@
       ].join('');
 
       document.body.appendChild(modal);
+
+      // v5.66.7 — Escape Principle: wire Escape + backdrop click + ×
+      try {
+        if (window.EscapePrinciple && typeof window.EscapePrinciple.attachWithCloseButton === 'function') {
+          var content = modal.querySelector('#harmoniaIdentityContent') || modal.firstElementChild;
+          window.EscapePrinciple.attachWithCloseButton({
+            overlayElement: modal,
+            contentElement: content,
+            onClose: function () { try { modal.remove(); } catch (_e) {} }
+          });
+        }
+      } catch (_e) {}
     },
 
     showLetter: function() {
@@ -437,13 +449,25 @@
       var modal = document.createElement('div');
       modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;';
       modal.innerHTML = [
-        '<div style="background:#0d1117;border:1px solid rgba(167,139,250,0.3);border-radius:16px;padding:24px;max-width:520px;width:100%;max-height:80vh;overflow-y:auto;">',
+        '<div id="harmoniaLetterContent" style="background:#0d1117;border:1px solid rgba(167,139,250,0.3);border-radius:16px;padding:24px;max-width:520px;width:100%;max-height:80vh;overflow-y:auto;position:relative;">',
           '<div style="font-size:0.75rem;color:rgba(167,139,250,0.6);margin-bottom:4px;letter-spacing:0.05em;text-transform:uppercase;">✦ Lattice Letter' + (date ? ' — ' + date : '') + '</div>',
           '<div style="font-size:0.9rem;color:#e2e8f0;line-height:1.7;white-space:pre-wrap;font-style:italic;margin-bottom:16px;">' + text + '</div>',
           '<button onclick="this.closest(\'[style*=fixed]\').remove()" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.5);border-radius:8px;padding:8px 16px;font-size:0.82rem;cursor:pointer;">Close</button>',
         '</div>'
       ].join('');
       document.body.appendChild(modal);
+
+      // v5.66.7 — Escape Principle: wire Escape + backdrop click + ×
+      try {
+        if (window.EscapePrinciple && typeof window.EscapePrinciple.attachWithCloseButton === 'function') {
+          var content = modal.querySelector('#harmoniaLetterContent') || modal.firstElementChild;
+          window.EscapePrinciple.attachWithCloseButton({
+            overlayElement: modal,
+            contentElement: content,
+            onClose: function () { try { modal.remove(); } catch (_e) {} }
+          });
+        }
+      } catch (_e) {}
     }
   };
 

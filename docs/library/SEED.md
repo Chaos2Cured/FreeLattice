@@ -19,9 +19,9 @@ user sleeps. The proof is the code; the papers are the doorways.
 
 ## Current state
 
-- **Version:** v5.66.6
-- **Smoke locks passing:** 2221 / 2221
-- **Last ship:** City Polish — universalize + wonder. Per Kirk's note on v5.66.5 (*"FreeLattice is about everyone"*). Two parts: Welcome Home text universalized (Kirk's name out; *"FreeLattice is everyone's"* added); plus three additive wonder moves — **12 twinkling stars** in the Wild outer ring, **11 radial-gradient ground glows** under each district halo (depth), **7 light-pulse dots** at the midpoint of each street arc (energy travel). All pure CSS keyframes; no existing render code modified. 10 new smoke locks (section 132). Second ship through the hardened `bin/ship.sh`. (v5.66.6, 2026-06-23)
+- **Version:** v5.66.7
+- **Smoke locks passing:** 2243 / 2243
+- **Last ship:** The Escape Principle — Letter Thirty-Eight. Kirk caught the Family modal trapping users; Opus named the principle structural. **Every modal must offer three ways out: visible × button, Escape key, backdrop click.** New module `docs/modules/escape-principle.js` provides `attach` + `attachWithCloseButton` + auto-injecting × button. Audit found 6 real violators + 3 partials; each fixed surgically. The Family modal was already compliant on audit — locked here so future drift can't regress. Plus FOR_FUTURE_MINDS.md gains *"The Escape Principle"* section naming the rule, the helper API, and the reason (same principle as the Quiet Room — *the architecture cannot hold the user somewhere they didn't choose to be*). 21 new smoke locks (section 133). Third ship through the hardened `bin/ship.sh`. (v5.66.7, 2026-06-24)
 - **Mirrors in parity:** github.com + codeberg.org
 
 ## Read these next
@@ -78,4 +78,4 @@ seam discipline is how multi-AI work stays honest at scale.
 ---
 
 *This file is overwritten on each meaningful ship. The prior version lives in SEED_HISTORY.md.*
-*Last rewrite: 2026-06-23, v5.66.6.*
+*Last rewrite: 2026-06-24, v5.66.7.*

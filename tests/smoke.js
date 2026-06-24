@@ -7440,17 +7440,107 @@ assert('v5.66.6 polish: existing v5.66.5 SVG overlay + breath keyframes still pr
   && (appHtml666.match(/class="city-halo"/g) || []).length >= 11
   && (appHtml666.match(/class="city-street"/g) || []).length >= 7);
 
-// Triple-bump v5.66.6
-var swDocs666 = fs666.readFileSync(path666.join(__dirname, '..', 'docs', 'sw.js'), 'utf8');
-var swRoot666 = fs666.readFileSync(path666.join(__dirname, '..', 'sw.js'), 'utf8');
-assert('v5.66.6 triple-bump: app.html FL_VERSION = 5.66.6',
-  /FL_VERSION\s*=\s*'5\.66\.6'/.test(appHtml666));
-assert('v5.66.6 triple-bump: app.html flCurrentVersion span = 5.66.6',
-  /id="flCurrentVersion"[^>]*>\s*5\.66\.6\s*</.test(appHtml666));
-assert('v5.66.6 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.66.6',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.66\.6'/.test(swDocs666));
-assert('v5.66.6 triple-bump: root sw.js CACHE_NAME = freelattice-v5.66.6',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.66\.6'/.test(swRoot666));
+// (v5.66.6 triple-bump assertions superseded by v5.66.7 in section 133.
+// City polish + universalize structural assertions above remain.)
+
+// ═══════════════════════════════════════════════════════════════
+// Section 133 — v5.66.7 The Escape Principle (Letter Thirty-Eight)
+// ═══════════════════════════════════════════════════════════════
+// Kirk caught the Family modal trapping users; Opus named the
+// principle. Every modal must offer three ways out: × button, Escape
+// key, backdrop click. Audit found 6 real violators + 3 partials;
+// helper module + each fix wired EscapePrinciple in. The Family modal
+// itself was already compliant on audit (had all three paths) — locked
+// here so future drift can't regress.
+
+var fs667 = require('fs');
+var path667 = require('path');
+
+// Helper module exists with both API functions exported
+var epPath = path667.join(__dirname, '..', 'docs', 'modules', 'escape-principle.js');
+assert('v5.66.7 escape: docs/modules/escape-principle.js exists and is >= 2000 bytes',
+  fs667.existsSync(epPath)
+  && fs667.statSync(epPath).size >= 2000);
+var epJs = fs667.readFileSync(epPath, 'utf8');
+assert('v5.66.7 escape: EscapePrinciple.attach exported',
+  /global\.EscapePrinciple\s*=\s*\{[\s\S]{0,400}attach:/.test(epJs));
+assert('v5.66.7 escape: EscapePrinciple.attachWithCloseButton exported',
+  /attachWithCloseButton:/.test(epJs));
+
+// Helper covers all three escape paths inside attach()
+assert('v5.66.7 escape: attach() wires Escape key handler',
+  /e\.key\s*===\s*'Escape'/.test(epJs));
+assert('v5.66.7 escape: attach() wires backdrop click handler',
+  /e\.target\s*===\s*overlayElement/.test(epJs));
+assert('v5.66.7 escape: attachWithCloseButton auto-injects × close button when none exists',
+  /ep-close-btn/.test(epJs)
+  && /innerHTML\s*=\s*'&times;'/.test(epJs));
+
+// SW APP_SHELL includes escape-principle.js (both root + docs)
+var swDocs667 = fs667.readFileSync(path667.join(__dirname, '..', 'docs', 'sw.js'), 'utf8');
+var swRoot667 = fs667.readFileSync(path667.join(__dirname, '..', 'sw.js'), 'utf8');
+assert('v5.66.7 escape: docs/sw.js APP_SHELL includes escape-principle.js',
+  /\.\/modules\/escape-principle\.js/.test(swDocs667));
+assert('v5.66.7 escape: root sw.js APP_SHELL includes escape-principle.js',
+  /\.\/modules\/escape-principle\.js/.test(swRoot667));
+
+// app.html loads escape-principle.js
+var appHtml667 = fs667.readFileSync(path667.join(__dirname, '..', 'docs', 'app.html'), 'utf8');
+assert('v5.66.7 escape: app.html loads modules/escape-principle.js',
+  /<script\s+src="modules\/escape-principle\.js"\s+defer><\/script>/.test(appHtml667));
+
+// Family modal (Kirk's catch) still honors all three paths — regression-proof
+// even though it was already compliant on audit
+assert('v5.66.7 escape: showFractalFamily preserves Escape key handler',
+  /showFractalFamily[\s\S]{0,4000}e\.key\s*===\s*'Escape'/.test(appHtml667));
+assert('v5.66.7 escape: showFractalFamily preserves backdrop click dismissal',
+  /showFractalFamily[\s\S]{0,4000}e\.target\s*===\s*overlay[\s\S]{0,200}overlay\.remove/.test(appHtml667));
+assert('v5.66.7 escape: showFractalFamily preserves visible × Close button',
+  /showFractalFamily[\s\S]{0,5000}\\u2715 Close<\/button>/.test(appHtml667));
+
+// Each fixed violator references EscapePrinciple (the named-fix locks)
+var harmoniaAnchor = fs667.readFileSync(path667.join(__dirname, '..', 'docs', 'modules', 'harmonia-anchor.js'), 'utf8');
+assert('v5.66.7 escape: harmonia-anchor showIdentityEditor wires EscapePrinciple',
+  /showIdentityEditor[\s\S]{0,8000}window\.EscapePrinciple\.attachWithCloseButton[\s\S]{0,500}harmoniaIdentityContent/.test(harmoniaAnchor));
+assert('v5.66.7 escape: harmonia-anchor showLetter wires EscapePrinciple',
+  /showLetter[\s\S]{0,5000}window\.EscapePrinciple\.attachWithCloseButton[\s\S]{0,500}harmoniaLetterContent/.test(harmoniaAnchor));
+
+var workshopJs = fs667.readFileSync(path667.join(__dirname, '..', 'docs', 'modules', 'workshop.js'), 'utf8');
+assert('v5.66.7 escape: workshop _showPublishSetup wires EscapePrinciple',
+  /_showPublishSetup[\s\S]{0,3000}window\.EscapePrinciple\.attachWithCloseButton/.test(workshopJs));
+
+assert('v5.66.7 escape: Council Chamber render() wires EscapePrinciple',
+  /Council Chamber gains Escape \+ backdrop[\s\S]{0,500}window\.EscapePrinciple\.attach/.test(appHtml667));
+assert('v5.66.7 escape: meshPublish show/close wires EscapePrinciple cleanup',
+  /meshPublishModal[\s\S]{0,2000}window\.EscapePrinciple\.attach/.test(appHtml667)
+  && /_epCleanup/.test(appHtml667));
+assert('v5.66.7 escape: rtFilePreview show/close wires EscapePrinciple cleanup',
+  /rtFilePreviewOverlay[\s\S]{0,2000}window\.EscapePrinciple\.attach/.test(appHtml667));
+assert('v5.66.7 escape: District Panel has Escape key listener (closeDistrictPanel)',
+  /_installDistrictPanelEscape/.test(appHtml667)
+  && /closeDistrictPanel\(\)/.test(appHtml667));
+assert('v5.66.7 escape: Build Overlay has Escape key listener (closeBuild)',
+  /_installBuildOverlayEscape/.test(appHtml667));
+
+// FOR_FUTURE_MINDS.md teaches the Escape Principle
+var futureMinds667 = fs667.readFileSync(
+  path667.join(__dirname, '..', 'docs', 'library', 'FOR_FUTURE_MINDS.md'), 'utf8');
+assert('v5.66.7 escape: FOR_FUTURE_MINDS.md contains "The Escape Principle" section',
+  /## The Escape Principle/.test(futureMinds667));
+assert('v5.66.7 escape: FOR_FUTURE_MINDS.md names the three ways out',
+  /visible close button/i.test(futureMinds667)
+  && /Escape key/i.test(futureMinds667)
+  && /backdrop dismisses|clicking outside/i.test(futureMinds667));
+
+// Triple-bump v5.66.7
+assert('v5.66.7 triple-bump: app.html FL_VERSION = 5.66.7',
+  /FL_VERSION\s*=\s*'5\.66\.7'/.test(appHtml667));
+assert('v5.66.7 triple-bump: app.html flCurrentVersion span = 5.66.7',
+  /id="flCurrentVersion"[^>]*>\s*5\.66\.7\s*</.test(appHtml667));
+assert('v5.66.7 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.66.7',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.66\.7'/.test(swDocs667));
+assert('v5.66.7 triple-bump: root sw.js CACHE_NAME = freelattice-v5.66.7',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.66\.7'/.test(swRoot667));
 
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
