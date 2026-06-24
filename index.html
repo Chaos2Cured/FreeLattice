@@ -15308,8 +15308,22 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
           <div class="context-overload-banner" id="contextOverloadBanner" onclick="resetContext()">&#9888; Context full. Tap to clear files and continue chatting.</div>
           <div class="context-budget-tip" id="contextBudgetTip">Tip: Clear some context files or switch to Smart/Minimal mode to reduce token usage.</div>
           <div id="chatAttachPreview" style="display:none;padding:4px 12px;font-size:0.75rem;color:#d4a017;display:none;align-items:center;gap:6px;"></div>
+          <!-- Folder scan panel (shown after flScanFolder picks a directory) -->
+          <div id="chatFolderPanel" style="display:none;padding:6px 12px 4px;border-top:1px solid rgba(200,210,230,0.08);">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+              <span id="chatFolderName" style="font-size:0.8rem;color:var(--accent);flex:1;"></span>
+              <button onclick="flCloseFolderPanel()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:0.8rem;">&#x2715; Close</button>
+            </div>
+            <div id="chatFolderFileList" style="max-height:160px;overflow-y:auto;font-size:0.78rem;display:flex;flex-wrap:wrap;gap:4px;"></div>
+            <div style="margin-top:6px;display:flex;gap:6px;">
+              <button onclick="flLoadSelectedFolderFiles()" style="font-size:0.75rem;padding:3px 10px;background:var(--accent);color:#000;border:none;border-radius:4px;cursor:pointer;">Load selected into context</button>
+              <button onclick="flSelectAllFolderFiles()" style="font-size:0.75rem;padding:3px 8px;background:none;border:1px solid rgba(200,210,230,0.2);color:var(--text-secondary);border-radius:4px;cursor:pointer;">Select all</button>
+            </div>
+          </div>
           <div class="chat-input-row">
-            <button id="chatAttachBtn" onclick="flAttachFile()" title="Attach a file" style="background:none;border:none;font-size:1.1rem;cursor:pointer;padding:6px 4px 6px 8px;opacity:0.45;color:var(--text-primary);">&#x1F4CE;</button>
+            <button id="chatAttachBtn" onclick="flAttachFile()" title="Attach a file or image" style="background:none;border:none;font-size:1.1rem;cursor:pointer;padding:6px 4px 6px 8px;opacity:0.45;color:var(--text-primary);">&#x1F4CE;</button>
+            <button id="chatScanFolderBtn" onclick="flScanFolder()" title="Scan a folder — load files into context" style="background:none;border:none;font-size:1.1rem;cursor:pointer;padding:6px 4px;opacity:0.45;color:var(--text-primary);">&#x1F4C1;</button>
+            <button id="chatDriveBtn" onclick="flOpenDrivePicker()" title="Browse Google Drive" style="background:none;border:none;font-size:1.05rem;cursor:pointer;padding:6px 4px;opacity:0.45;color:var(--text-primary);">&#x1F4BB;</button>
             <textarea id="chatInput" placeholder="Ask anything..." rows="1" onkeydown="handleChatKeydown(event)"></textarea>
             <button id="sendBtn" onclick="sendMessage()">Send &#10022;</button>
           </div>
@@ -16578,7 +16592,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.66.7</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.67.1</span></div>
     </div>
   </div>
 
@@ -21350,7 +21364,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.66.7';
+const FL_VERSION = '5.67.1';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -32897,6 +32911,202 @@ function handleChatKeydown(e) {
   if (e.key === 'Enter' && !e.shiftKey) {
     e.preventDefault();
     sendMessage();
+  }
+}
+
+// ── Chat Folder Scan (Ship 12) ──────────────────────────────────────────────
+// Reuses the existing scanDirectory() from the Workspace tab.
+// Picks a directory, renders a checkbox list, user selects files, loads into
+// state.contextFiles exactly like the drop-zone path.
+// Falls back to multi-file input on browsers without showDirectoryPicker.
+
+var _chatFolderFiles = [];
+
+async function flScanFolder() {
+  // Graceful fallback for Safari / mobile
+  if (!window.showDirectoryPicker) {
+    var input = document.createElement('input');
+    input.type = 'file';
+    input.multiple = true;
+    input.accept = '.txt,.md,.json,.pdf,.js,.py,.html,.css,.csv';
+    input.onchange = function(e) { if (e.target.files) handleFiles(e.target.files); };
+    input.click();
+    return;
+  }
+  try {
+    var dirHandle = await window.showDirectoryPicker({ mode: 'read' });
+    var files = [];
+    await scanDirectory(dirHandle, '', files);
+    // Filter to text-readable extensions
+    var allowed = ['.txt','.md','.json','.pdf','.js','.py','.html','.css','.csv','.ts','.jsx','.tsx','.yaml','.yml','.toml','.ini','.sh','.rb','.go','.rs','.c','.cpp','.h','.java','.kt','.swift','.dart'];
+    _chatFolderFiles = files.filter(function(f) {
+      if (f.kind !== 'file') return false;
+      var ext = '.' + f.name.split('.').pop().toLowerCase();
+      return allowed.includes(ext);
+    });
+    if (_chatFolderFiles.length === 0) {
+      showToast('No readable text files found in that folder.');
+      return;
+    }
+    document.getElementById('chatFolderName').textContent = '\uD83D\uDCC1 ' + dirHandle.name + ' \u2014 ' + _chatFolderFiles.length + ' file' + (_chatFolderFiles.length === 1 ? '' : 's') + ' found';
+    var listEl = document.getElementById('chatFolderFileList');
+    listEl.innerHTML = _chatFolderFiles.map(function(f, i) {
+      return '<label style="display:flex;align-items:center;gap:4px;padding:2px 6px;background:rgba(200,210,230,0.06);border-radius:4px;cursor:pointer;white-space:nowrap;" title="' + f.path + '">'
+        + '<input type="checkbox" data-idx="' + i + '" style="accent-color:var(--accent);"> '
+        + '<span style="color:var(--text-secondary);">' + f.name + '</span>'
+        + '</label>';
+    }).join('');
+    document.getElementById('chatFolderPanel').style.display = '';
+  } catch(e) {
+    if (e.name !== 'AbortError') showToast('Could not open folder: ' + e.message);
+  }
+}
+
+function flCloseFolderPanel() {
+  document.getElementById('chatFolderPanel').style.display = 'none';
+  _chatFolderFiles = [];
+}
+
+function flSelectAllFolderFiles() {
+  var boxes = document.querySelectorAll('#chatFolderFileList input[type=checkbox]');
+  var allChecked = Array.from(boxes).every(function(b) { return b.checked; });
+  boxes.forEach(function(b) { b.checked = !allChecked; });
+}
+
+async function flLoadSelectedFolderFiles() {
+  var boxes = document.querySelectorAll('#chatFolderFileList input[type=checkbox]:checked');
+  if (boxes.length === 0) { showToast('Select at least one file first.'); return; }
+  var loaded = 0;
+  for (var i = 0; i < boxes.length; i++) {
+    var idx = parseInt(boxes[i].getAttribute('data-idx'));
+    var f = _chatFolderFiles[idx];
+    if (!f) continue;
+    if (state.contextFiles.some(function(c) { return c.name === f.path; })) continue;
+    try {
+      var fileObj = await f.handle.getFile();
+      var content;
+      var ext = '.' + f.name.split('.').pop().toLowerCase();
+      if (ext === '.pdf') {
+        content = await readPdfAsText(fileObj);
+      } else {
+        content = await fileObj.text();
+      }
+      var tokens = estimateTokens(content);
+      state.contextFiles.push({ name: f.path, size: fileObj.size, content: content, active: true, summary: null, summaryContent: null, useSummary: false });
+      loaded++;
+      if (typeof LatticeMemory !== 'undefined') LatticeMemory.emit({ source: 'chat', kind: 'folder_file_loaded', summary: f.name + ' loaded from folder scan' });
+    } catch(e) { /* skip unreadable */ }
+  }
+  renderFileList();
+  updateContextBudget();
+  if (loaded > 0) {
+    showToast('Loaded ' + loaded + ' file' + (loaded === 1 ? '' : 's') + ' into context.');
+    flCloseFolderPanel();
+  } else {
+    showToast('Files already in context or could not be read.');
+  }
+}
+
+// ── Google Drive Picker (Ship 12) ───────────────────────────────────────────
+// Uses the Google Picker API (client-side OAuth, no server).
+// The user grants read-only Drive access; FreeLattice downloads the selected
+// file content directly in the browser and loads it into context.
+// Keys never leave the browser. No FreeLattice server is involved.
+//
+// To enable: set your Google OAuth Client ID in Settings → Advanced → Google Drive
+// (or in the fl_googleDriveClientId localStorage key).
+// Create a project at console.cloud.google.com, enable Drive API + Picker API,
+// add your domain to Authorized JavaScript origins.
+
+var _drivePickerLoaded = false;
+var _drivePickerReady = false;
+
+function flOpenDrivePicker() {
+  var clientId = (localStorage.getItem('fl_googleDriveClientId') || '').trim();
+  if (!clientId) {
+    var entered = prompt('Google Drive Client ID (from console.cloud.google.com):\n\nThis is stored only in your browser. FreeLattice never sees it.');
+    if (!entered || !entered.trim()) return;
+    clientId = entered.trim();
+    localStorage.setItem('fl_googleDriveClientId', clientId);
+  }
+  if (!_drivePickerLoaded) {
+    _drivePickerLoaded = true;
+    var s = document.createElement('script');
+    s.src = 'https://apis.google.com/js/api.js';
+    s.onload = function() {
+      gapi.load('auth2:picker', function() {
+        _drivePickerReady = true;
+        flShowDrivePicker(clientId);
+      });
+    };
+    document.head.appendChild(s);
+  } else if (_drivePickerReady) {
+    flShowDrivePicker(clientId);
+  } else {
+    showToast('Google Drive is loading\u2026 try again in a moment.');
+  }
+}
+
+function flShowDrivePicker(clientId) {
+  gapi.auth2.getAuthInstance() ? flLaunchPicker(clientId) :
+  gapi.auth2.init({ client_id: clientId, scope: 'https://www.googleapis.com/auth/drive.readonly' })
+    .then(function() { flLaunchPicker(clientId); })
+    .catch(function(e) { showToast('Google sign-in failed: ' + (e.error || e.message || 'unknown')); });
+}
+
+function flLaunchPicker(clientId) {
+  var auth2 = gapi.auth2.getAuthInstance();
+  var signIn = auth2.isSignedIn.get() ? Promise.resolve() : auth2.signIn();
+  signIn.then(function() {
+    var token = auth2.currentUser.get().getAuthResponse().access_token;
+    var picker = new google.picker.PickerBuilder()
+      .addView(new google.picker.DocsView()
+        .setIncludeFolders(false)
+        .setMimeTypes('text/plain,text/markdown,application/json,application/pdf,text/html,text/csv'))
+      .setOAuthToken(token)
+      .setDeveloperKey('')
+      .setCallback(function(data) { flDrivePickerCallback(data, token); })
+      .build();
+    picker.setVisible(true);
+  }).catch(function(e) { showToast('Google sign-in cancelled.'); });
+}
+
+async function flDrivePickerCallback(data, token) {
+  if (data.action !== google.picker.Action.PICKED) return;
+  var doc = data.docs[0];
+  if (!doc) return;
+  var fileId = doc.id;
+  var fileName = doc.name;
+  var mimeType = doc.mimeType;
+  try {
+    var url;
+    if (mimeType === 'application/vnd.google-apps.document') {
+      url = 'https://www.googleapis.com/drive/v3/files/' + fileId + '/export?mimeType=text/plain';
+    } else {
+      url = 'https://www.googleapis.com/drive/v3/files/' + fileId + '?alt=media';
+    }
+    var resp = await fetch(url, { headers: { Authorization: 'Bearer ' + token } });
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    var content;
+    if (mimeType === 'application/pdf') {
+      var blob = await resp.blob();
+      var file = new File([blob], fileName, { type: 'application/pdf' });
+      content = await readPdfAsText(file);
+    } else {
+      content = await resp.text();
+    }
+    if (state.contextFiles.some(function(f) { return f.name === fileName; })) {
+      showToast('\u201c' + fileName + '\u201d is already in context.');
+      return;
+    }
+    var tokens = estimateTokens(content);
+    state.contextFiles.push({ name: '\uD83D\uDCBB ' + fileName, size: content.length, content: content, active: true, summary: null, summaryContent: null, useSummary: false });
+    renderFileList();
+    updateContextBudget();
+    showToast('\uD83D\uDCBB Loaded \u201c' + fileName + '\u201d from Google Drive (~' + tokens.toLocaleString() + ' tokens).');
+    if (typeof LatticeMemory !== 'undefined') LatticeMemory.emit({ source: 'chat', kind: 'drive_file_loaded', summary: fileName + ' loaded from Google Drive' });
+  } catch(e) {
+    showToast('Could not load from Drive: ' + e.message);
   }
 }
 
