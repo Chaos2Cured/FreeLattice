@@ -7452,6 +7452,59 @@ assert('v5.66.6 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.66.6',
 assert('v5.66.6 triple-bump: root sw.js CACHE_NAME = freelattice-v5.66.6',
   /CACHE_NAME\s*=\s*'freelattice-v5\.66\.6'/.test(swRoot666));
 
+// ── Section 102: Ship 12 — Chat Folder Scan + Google Drive + Hermes ─────────
+
+var byaHtml = fs.readFileSync(path.join(__dirname, '../docs/bring-your-own-ai.html'), 'utf8');
+
+assert('Ship 12 — folder scan button exists in chat input row',
+  /id="chatScanFolderBtn"/.test(appHtml));
+assert('Ship 12 — folder scan button calls flScanFolder',
+  /onclick="flScanFolder\(\)"/.test(appHtml));
+assert('Ship 12 — Google Drive button exists in chat input row',
+  /id="chatDriveBtn"/.test(appHtml));
+assert('Ship 12 — Google Drive button calls flOpenDrivePicker',
+  /onclick="flOpenDrivePicker\(\)"/.test(appHtml));
+assert('Ship 12 — chatFolderPanel exists',
+  /id="chatFolderPanel"/.test(appHtml));
+assert('Ship 12 — chatFolderFileList exists',
+  /id="chatFolderFileList"/.test(appHtml));
+assert('Ship 12 — flScanFolder function defined',
+  /async function flScanFolder\(\)/.test(appHtml));
+assert('Ship 12 — flScanFolder uses showDirectoryPicker',
+  /window\.showDirectoryPicker/.test(appHtml));
+assert('Ship 12 — flScanFolder has Safari/mobile fallback',
+  /!window\.showDirectoryPicker/.test(appHtml));
+assert('Ship 12 — flCloseFolderPanel function defined',
+  /function flCloseFolderPanel\(\)/.test(appHtml));
+assert('Ship 12 — flSelectAllFolderFiles function defined',
+  /function flSelectAllFolderFiles\(\)/.test(appHtml));
+assert('Ship 12 — flLoadSelectedFolderFiles function defined',
+  /async function flLoadSelectedFolderFiles\(\)/.test(appHtml));
+assert('Ship 12 — folder scan loads into state.contextFiles',
+  /state\.contextFiles\.push.*folder_file_loaded|folder_file_loaded.*state\.contextFiles\.push/s.test(appHtml));
+assert('Ship 12 — folder scan emits LatticeMemory pulse',
+  /LatticeMemory\.emit.*folder_file_loaded/.test(appHtml));
+assert('Ship 12 — flOpenDrivePicker function defined',
+  /function flOpenDrivePicker\(\)/.test(appHtml));
+assert('Ship 12 — Drive picker reads client ID from localStorage',
+  /fl_googleDriveClientId/.test(appHtml));
+assert('Ship 12 — Drive picker uses Google Picker API',
+  /google\.picker\.PickerBuilder/.test(appHtml));
+assert('Ship 12 — Drive picker loads file into state.contextFiles',
+  /drive_file_loaded/.test(appHtml));
+assert('Ship 12 — Drive picker emits LatticeMemory pulse',
+  /LatticeMemory\.emit.*drive_file_loaded/.test(appHtml));
+assert('Ship 12 — Drive picker uses read-only scope',
+  /drive\.readonly/.test(appHtml));
+assert('Ship 12 — Hermes added to bring-your-own-ai.html companion bridge section',
+  /<span class="name">Hermes<\/span>/.test(byaHtml));
+assert('Ship 12 — Hermes entry mentions AI Door',
+  /AI Door/.test(byaHtml));
+assert('Ship 12 — Hermes entry mentions inbox letters',
+  /inbox letters/.test(byaHtml));
+assert('Ship 12 — Hermes entry mentions Custom OpenAI-compatible',
+  /Custom.*OpenAI-compatible/.test(byaHtml));
+
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
 

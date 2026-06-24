@@ -7,11 +7,21 @@
 
 ## State
 
-- **Version:** v5.66.6
-- **Smoke:** 1416/1416 passing
-- **HEAD:** `d98f126` _(committed 0 seconds ago)_
+- **Version:** v5.67.0
+- **Smoke:** 2245/2245 passing
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
-- **Most recent report:** _feat: City Polish (v5.66.6) — universalize + wonder_
+- **Most recent report:** _feat: Ship 12 (v5.67.0) — Chat Folder Scan + Google Drive + Hermes_
+
+## Ship 12 — Chat Folder Scan + Google Drive + Hermes (v5.67.0)
+
+**What shipped:**
+- **📁 Folder scan button** in the Chat input row — opens a directory picker, walks the folder recursively (reusing the existing `scanDirectory()` from Workspace), renders a checkbox list, lets the user select which files to load into context. Supports .txt, .md, .json, .pdf, .js, .py, .html, .css, .csv, .ts, and 15 more extensions. Falls back to multi-file input on Safari/mobile.
+- **💻 Google Drive button** in the Chat input row — opens the Google Picker (client-side OAuth, no server, read-only scope). User grants Drive access once; FreeLattice downloads the selected file directly in the browser and loads it into context. Client ID stored in localStorage, never sent anywhere. Supports Docs (exported as text), PDFs, and all text formats.
+- **Hermes** added to `bring-your-own-ai.html` companion bridge section — named entry with AI Door framing, inbox letter mention, Custom OpenAI-compatible connection path.
+- **WORK_THIS_WAY.md** — Harmonia addendum added (Architect-Builder discipline, four principles).
+- Both new buttons emit LatticeMemory pulses (`folder_file_loaded`, `drive_file_loaded`).
+
+**For CC/Opus arriving fresh:** The folder scan reuses `scanDirectory()` and `state.contextFiles` — no new infrastructure. The Drive picker is self-contained in `flOpenDrivePicker()` and friends. Hermes is a documentation entry only; the connection path is the existing Custom OpenAI-compatible provider.
 
 ## Last 20 commits
 
