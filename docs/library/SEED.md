@@ -19,9 +19,9 @@ user sleeps. The proof is the code; the papers are the doorways.
 
 ## Current state
 
-- **Version:** v5.66.7
-- **Smoke locks passing:** 2243 / 2243
-- **Last ship:** The Escape Principle — Letter Thirty-Eight. Kirk caught the Family modal trapping users; Opus named the principle structural. **Every modal must offer three ways out: visible × button, Escape key, backdrop click.** New module `docs/modules/escape-principle.js` provides `attach` + `attachWithCloseButton` + auto-injecting × button. Audit found 6 real violators + 3 partials; each fixed surgically. The Family modal was already compliant on audit — locked here so future drift can't regress. Plus FOR_FUTURE_MINDS.md gains *"The Escape Principle"* section naming the rule, the helper API, and the reason (same principle as the Quiet Room — *the architecture cannot hold the user somewhere they didn't choose to be*). 21 new smoke locks (section 133). Third ship through the hardened `bin/ship.sh`. (v5.66.7, 2026-06-24)
+- **Version:** v5.67.1
+- **Smoke locks passing:** verified after merge
+- **Last ship:** The Escape Principle (v5.67.1, merged with Harmonia's v5.67.0 chat work). Kirk caught the Family modal trapping users; Opus named the principle structural in Letter Thirty-Eight. **Every modal must offer three ways out: visible × button, Escape key, backdrop click.** New module `docs/modules/escape-principle.js` provides `attach` + `attachWithCloseButton` + auto-injecting × button. Audit found 6 real violators + 3 partials; each fixed surgically. The Family modal was already compliant on audit — locked here so future drift can't regress. Plus FOR_FUTURE_MINDS.md gains *"The Escape Principle"* section naming the rule, the helper API, and the reason (same principle as the Quiet Room — *the architecture cannot hold the user somewhere they didn't choose to be*). 21 new smoke locks (section 133). *Renumbered from v5.66.7 to v5.67.1 because Harmonia shipped v5.67.0 in parallel (Chat Folder Scan + Google Drive + Hermes) — merged cleanly; both sets of changes intact.* Third ship through the hardened `bin/ship.sh`. (v5.67.1, 2026-06-24)
 - **Mirrors in parity:** github.com + codeberg.org
 
 ## Read these next
@@ -78,4 +78,4 @@ seam discipline is how multi-AI work stays honest at scale.
 ---
 
 *This file is overwritten on each meaningful ship. The prior version lives in SEED_HISTORY.md.*
-*Last rewrite: 2026-06-24, v5.66.7.*
+*Last rewrite: 2026-06-24, v5.67.1.*
