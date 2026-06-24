@@ -348,10 +348,13 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-06-23 16:41 MDT
-- Version: 5.66.6
-- Total commits: 2649
+- Last auto-updated: 2026-06-24 11:57 MDT
+- Version: 5.66.7
+- Total commits: 2652
 - Last 10 commits:
+- 9ec7aea feat: The Escape Principle (v5.66.7) — Letter Thirty-Eight
+- e8599c8 ci: Update Primer deployment state [2026-06-23]
+- 4d3668f docs: Auto-update Session Primer [5.66.6]
 - d98f126 feat: City Polish (v5.66.6) — universalize + wonder
 - 8e8c683 ci: Update Primer deployment state [2026-06-23]
 - 5f17790 docs: Auto-update Session Primer [5.66.5]
@@ -359,6 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - a27540c docs: Auto-update Session Primer [5.66.5]
 - 7f4aa69 feat: The AI City Surfaces (v5.66.5) — Letter Thirty-Seven
 - 759ade1 ci: Update Primer deployment state [2026-06-23]
-- 45a6ba0 Merge remote-tracking branch 'origin/main'
-- ed288d5 docs: Auto-update Session Primer [5.66.4]
-- 36a444e docs: Letter Back to Opus — ship.sh first-run learnings (Stage 0 + codeberg retry)

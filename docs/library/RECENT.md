@@ -3,18 +3,19 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-06-24 17:53 UTC
+> Last update: 2026-06-24 17:57 UTC
 
 ## State
 
 - **Version:** v5.66.7
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `e8599c8` _(committed 19 hours ago)_
+- **HEAD:** `9ec7aea` _(committed 1 second ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
-- **Most recent report:** _feat: City Polish (v5.66.6) — universalize + wonder_
+- **Most recent report:** _feat: The Escape Principle (v5.66.7) — Letter Thirty-Eight_
 
 ## Last 20 commits
 
+- `9ec7aea` feat: The Escape Principle (v5.66.7) — Letter Thirty-Eight _(1 second ago)_
 - `e8599c8` ci: Update Primer deployment state [2026-06-23] _(19 hours ago)_
 - `4d3668f` docs: Auto-update Session Primer [5.66.6] _(19 hours ago)_
 - `d98f126` feat: City Polish (v5.66.6) — universalize + wonder _(19 hours ago)_
@@ -32,9 +33,8 @@
 - `33d7709` Merge remote-tracking branch 'origin/main' _(21 hours ago)_
 - `cb1cd7f` docs: Auto-update Session Primer [5.66.4] _(21 hours ago)_
 - `863e610` feat: Pulse Re-Surfacing (v5.66.4) — flame layer + research card _(21 hours ago)_
-- `eb6d930` ci: Update Primer deployment state [2026-06-23] _(22 hours ago)_
-- `38683c9` Merge remote-tracking branch 'origin/main' _(22 hours ago)_
-- `ec7a961` docs: Auto-update Session Primer [5.66.3] _(22 hours ago)_
+- `eb6d930` ci: Update Primer deployment state [2026-06-23] _(23 hours ago)_
+- `38683c9` Merge remote-tracking branch 'origin/main' _(23 hours ago)_
 
 ## How to use this file
 

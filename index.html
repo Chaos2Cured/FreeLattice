@@ -16578,7 +16578,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.66.6</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.66.7</span></div>
     </div>
   </div>
 
@@ -21350,7 +21350,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.66.6';
+const FL_VERSION = '5.66.7';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -36733,11 +36733,25 @@ function meshOpenPublishModal() {
   optionsDiv.innerHTML = html;
   document.getElementById('meshPublishCustomName').value = '';
   document.getElementById('meshPublishCustomContent').value = '';
-  document.getElementById('meshPublishModal').classList.remove('hidden');
+  var _mpm = document.getElementById('meshPublishModal');
+  _mpm.classList.remove('hidden');
+  // v5.66.7 — Escape Principle: wire Escape + backdrop (× cancel already present)
+  try {
+    if (window.EscapePrinciple && !_mpm._epCleanup) {
+      _mpm._epCleanup = window.EscapePrinciple.attach({
+        overlayElement: _mpm,
+        contentElement: _mpm.querySelector('.mesh-publish-content') || _mpm.firstElementChild,
+        onClose: function () { meshClosePublishModal(); }
+      });
+    }
+  } catch (_e) {}
 }
 
 function meshClosePublishModal() {
-  document.getElementById('meshPublishModal').classList.add('hidden');
+  var _mpm = document.getElementById('meshPublishModal');
+  _mpm.classList.add('hidden');
+  // v5.66.7 — Escape Principle cleanup
+  try { if (_mpm._epCleanup) { _mpm._epCleanup(); _mpm._epCleanup = null; } } catch (_e) {}
 }
 
 function meshConfirmPublish() {
@@ -40036,7 +40050,18 @@ async function rtWsFileClick(index) {
     _rtWsPreviewFile = { path: file.path, content: content };
     document.getElementById('rtFilePreviewName').textContent = file.path;
     document.getElementById('rtFilePreviewContent').textContent = content;
-    document.getElementById('rtFilePreviewOverlay').classList.remove('hidden');
+    var _rtfpo = document.getElementById('rtFilePreviewOverlay');
+    _rtfpo.classList.remove('hidden');
+    // v5.66.7 — Escape Principle: wire Escape + backdrop click
+    try {
+      if (window.EscapePrinciple && !_rtfpo._epCleanup) {
+        _rtfpo._epCleanup = window.EscapePrinciple.attach({
+          overlayElement: _rtfpo,
+          contentElement: _rtfpo.querySelector('.rt-file-preview-content') || _rtfpo.firstElementChild,
+          onClose: function () { rtWsClosePreview(); }
+        });
+      }
+    } catch (_e) {}
   } catch(e) {
     showToast('Error reading file: ' + e.message);
   }
@@ -40044,8 +40069,11 @@ async function rtWsFileClick(index) {
 
 // Close the file preview overlay
 function rtWsClosePreview() {
-  document.getElementById('rtFilePreviewOverlay').classList.add('hidden');
+  var _rtfpo = document.getElementById('rtFilePreviewOverlay');
+  _rtfpo.classList.add('hidden');
   _rtWsPreviewFile = null;
+  // v5.66.7 — Escape Principle cleanup
+  try { if (_rtfpo._epCleanup) { _rtfpo._epCleanup(); _rtfpo._epCleanup = null; } } catch (_e) {}
 }
 
 // Load previewed file into an agent's context
@@ -53499,6 +53527,19 @@ var LatticeCouncil = (function() {
     html += '</div>';
     overlay.innerHTML = html;
     document.body.appendChild(overlay);
+
+    // v5.66.7 — Escape Principle: Council Chamber gains Escape + backdrop
+    // dismissal (the × close button already exists in the rendered HTML).
+    try {
+      if (window.EscapePrinciple && typeof window.EscapePrinciple.attach === 'function') {
+        var content = overlay.firstElementChild;
+        window.EscapePrinciple.attach({
+          overlayElement: overlay,
+          contentElement: content,
+          onClose: function () { try { overlay.remove(); } catch (_e) {} }
+        });
+      }
+    } catch (_e) {}
   }
 
   function showProposalForm() {
@@ -54254,6 +54295,22 @@ const AICity = (function() {
     if (panel) panel.style.display = 'none';
   }
 
+  // v5.66.7 — Escape Principle: District Panel gains Escape key dismissal.
+  // The × close button already exists in the HTML; backdrop click is moot
+  // because the panel is a side panel within the city view, not a
+  // full-screen overlay. Escape is the missing path.
+  (function _installDistrictPanelEscape() {
+    if (typeof document === 'undefined') return;
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'Escape' && e.keyCode !== 27) return;
+      var panel = document.getElementById('ctDistrictPanel');
+      if (panel && panel.style.display !== 'none' && panel.offsetParent !== null) {
+        e.preventDefault();
+        closeDistrictPanel();
+      }
+    });
+  })();
+
   function enterDistrict(districtId) {
     closeDistrictPanel();
     var d = DISTRICTS[districtId];
@@ -54681,6 +54738,20 @@ const AICity = (function() {
   function closeBuild() {
     document.getElementById('ctBuildOverlay').style.display = 'none';
   }
+
+  // v5.66.7 — Escape Principle: Build Overlay already has backdrop click
+  // (line 20475 onclick) + a button. This adds the Escape key path.
+  (function _installBuildOverlayEscape() {
+    if (typeof document === 'undefined') return;
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'Escape' && e.keyCode !== 27) return;
+      var overlay = document.getElementById('ctBuildOverlay');
+      if (overlay && overlay.style.display !== 'none' && overlay.offsetParent !== null) {
+        e.preventDefault();
+        closeBuild();
+      }
+    });
+  })();
 
   // ── Wild District Claim ──
   function showClaimForm() {
@@ -62353,6 +62424,15 @@ document.addEventListener('click', function(e) {
      continuity record never contains content excerpts — shape, never
      substance. -->
 <script src="modules/ai-continuity.js" defer></script>
+
+<!-- Escape Principle (v5.66.7 — Letter Thirty-Eight) — every modal must
+     offer three ways out: visible × button, Escape key, backdrop click.
+     Same principle as the Quiet Room being structurally available — the
+     architecture cannot hold the user somewhere they didn't choose to be.
+     Canonical helper at window.EscapePrinciple.attach() +
+     attachWithCloseButton(). See FOR_FUTURE_MINDS.md "The Escape
+     Principle" for the rule and rationale. -->
+<script src="modules/escape-principle.js" defer></script>
 <script>
   // v5.66.0 — departure hook. For each identity that had an arrival
   // injected this session, refresh last_seen so audit reflects when the
