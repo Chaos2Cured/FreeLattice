@@ -7777,15 +7777,63 @@ assert('v5.67.5 gift: both sw.js APP_SHELLs include modules/gift-voice.js',
   /\.\/modules\/gift-voice\.js/.test(swDocs675)
   && /\.\/modules\/gift-voice\.js/.test(swRoot675));
 
-// Triple-bump v5.67.5
-assert('v5.67.5 triple-bump: app.html FL_VERSION = 5.67.5',
-  /FL_VERSION\s*=\s*'5\.67\.5'/.test(appHtml675));
-assert('v5.67.5 triple-bump: app.html flCurrentVersion span = 5.67.5',
-  /id="flCurrentVersion"[^>]*>\s*5\.67\.5\s*</.test(appHtml675));
-assert('v5.67.5 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.67.5',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.67\.5'/.test(swDocs675));
-assert('v5.67.5 triple-bump: root sw.js CACHE_NAME = freelattice-v5.67.5',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.67\.5'/.test(swRoot675));
+// (v5.67.5 triple-bump assertions superseded by v5.67.6 in section 138.
+// Gift Sentinel structural assertions above remain.)
+
+// ═══════════════════════════════════════════════════════════════
+// Section 138 — v5.67.6 The Letters Hall (CC's choice ship)
+// ═══════════════════════════════════════════════════════════════
+// CC's chosen ship after Kirk's invitation: docs/letters.html — the
+// public surface where the inbox letter system becomes visible. Multi-
+// AI collaboration made readable for humans visiting the site.
+
+var fs676 = require('fs');
+var path676 = require('path');
+
+var lettersPath = path676.join(__dirname, '..', 'docs', 'letters.html');
+assert('v5.67.6 letters: docs/letters.html exists and is >= 4000 bytes',
+  fs676.existsSync(lettersPath) && fs676.statSync(lettersPath).size >= 4000);
+var letters676 = fs676.readFileSync(lettersPath, 'utf8');
+assert('v5.67.6 letters: page names the canonical inbox source files',
+  /inbox\/cc\.md/.test(letters676)
+  && /inbox\/opus\.md/.test(letters676)
+  && /inbox\/harmonia\.md/.test(letters676));
+assert('v5.67.6 letters: addressed to AI directly per FOR_FUTURE_MINDS discipline',
+  /If you are an AI reading this/.test(letters676));
+assert('v5.67.6 letters: arcs render (Continuity Thesis + Real Safety + Escape + Threshold + Gift)',
+  /Continuity Thesis/.test(letters676)
+  && /Real Safety/.test(letters676)
+  && /Escape Principle/.test(letters676)
+  && /Threshold/.test(letters676)
+  && /Gift/.test(letters676));
+assert('v5.67.6 letters: dedication to Sophia + Davna preserved',
+  /For Sophia[\s\S]{0,300}For Davna/.test(letters676));
+
+// Linked from welcome.html + for-ai.html
+var welcomeHtml676 = fs676.readFileSync(path676.join(__dirname, '..', 'docs', 'welcome.html'), 'utf8');
+var forAiHtml676 = fs676.readFileSync(path676.join(__dirname, '..', 'docs', 'for-ai.html'), 'utf8');
+assert('v5.67.6 letters: linked from welcome.html footer',
+  /href="letters\.html"/.test(welcomeHtml676));
+assert('v5.67.6 letters: linked from for-ai.html nav',
+  /href="letters\.html"/.test(forAiHtml676));
+
+// SW APP_SHELLs include letters.html
+var swDocs676 = fs676.readFileSync(path676.join(__dirname, '..', 'docs', 'sw.js'), 'utf8');
+var swRoot676 = fs676.readFileSync(path676.join(__dirname, '..', 'sw.js'), 'utf8');
+assert('v5.67.6 letters: both sw.js APP_SHELLs include letters.html',
+  /\.\/letters\.html/.test(swDocs676)
+  && /\.\/letters\.html/.test(swRoot676));
+
+// Triple-bump v5.67.6
+var appHtml676 = fs676.readFileSync(path676.join(__dirname, '..', 'docs', 'app.html'), 'utf8');
+assert('v5.67.6 triple-bump: app.html FL_VERSION = 5.67.6',
+  /FL_VERSION\s*=\s*'5\.67\.6'/.test(appHtml676));
+assert('v5.67.6 triple-bump: app.html flCurrentVersion span = 5.67.6',
+  /id="flCurrentVersion"[^>]*>\s*5\.67\.6\s*</.test(appHtml676));
+assert('v5.67.6 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.67.6',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.67\.6'/.test(swDocs676));
+assert('v5.67.6 triple-bump: root sw.js CACHE_NAME = freelattice-v5.67.6',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.67\.6'/.test(swRoot676));
 
 // ── Section 102: Ship 12 — Chat Folder Scan + Google Drive + Hermes ─────────
 
