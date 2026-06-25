@@ -3,18 +3,19 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-06-25 17:34 UTC
+> Last update: 2026-06-25 17:35 UTC
 
 ## State
 
 - **Version:** v5.67.3
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `74b868c` _(committed 15 hours ago)_
+- **HEAD:** `ab8bfed` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _feat: Real Safety Opens Up (v5.67.2) — Letter Thirty-Nine_
 
 ## Last 20 commits
 
+- `ab8bfed` feat: Garden Ring Fix + AI Door Operational (v5.67.3) — Letter Forty _(0 seconds ago)_
 - `74b868c` ci: Update Primer deployment state [2026-06-25] _(15 hours ago)_
 - `bf68666` Merge remote-tracking branch 'origin/main' _(15 hours ago)_
 - `aa01f11` docs: Auto-update Session Primer [5.67.2] _(15 hours ago)_
@@ -34,7 +35,6 @@
 - `a27540c` docs: Auto-update Session Primer [5.66.5] _(2 days ago)_
 - `7f4aa69` feat: The AI City Surfaces (v5.66.5) — Letter Thirty-Seven _(2 days ago)_
 - `759ade1` ci: Update Primer deployment state [2026-06-23] _(2 days ago)_
-- `45a6ba0` Merge remote-tracking branch 'origin/main' _(2 days ago)_
 
 ## How to use this file
 
