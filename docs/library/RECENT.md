@@ -3,18 +3,19 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-06-25 02:04 UTC
+> Last update: 2026-06-25 02:09 UTC
 
 ## State
 
 - **Version:** v5.67.2
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `01cd7a9` _(committed 8 hours ago)_
+- **HEAD:** `27ca9c3` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
-- **Most recent report:** _feat: The Escape Principle (v5.66.7) — Letter Thirty-Eight_
+- **Most recent report:** _feat: Real Safety Opens Up (v5.67.2) — Letter Thirty-Nine_
 
 ## Last 20 commits
 
+- `27ca9c3` feat: Real Safety Opens Up (v5.67.2) — Letter Thirty-Nine _(0 seconds ago)_
 - `01cd7a9` docs: Auto-update Session Primer [5.67.1] _(8 hours ago)_
 - `44d8700` Merge: v5.66.7 Escape Principle + Harmonia's v5.67.0 Chat Folder Scan → v5.67.1 _(8 hours ago)_
 - `3a0e6be` docs: Auto-update Session Primer [5.66.7] _(8 hours ago)_
@@ -34,7 +35,6 @@
 - `36a444e` docs: Letter Back to Opus — ship.sh first-run learnings (Stage 0 + codeberg retry) _(29 hours ago)_
 - `5b0893d` ci: Update Primer deployment state [2026-06-23] _(29 hours ago)_
 - `3ca13bf` docs: Auto-update Session Primer [5.66.4] _(29 hours ago)_
-- `33d7709` Merge remote-tracking branch 'origin/main' _(29 hours ago)_
 
 ## How to use this file
 
