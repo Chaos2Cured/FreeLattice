@@ -19,9 +19,10 @@ user sleeps. The proof is the code; the papers are the doorways.
 
 ## Current state
 
-- **Version:** v5.67.3
+- **Version:** v5.67.4
 - **Smoke locks passing:** verified after ship
-- **Last ship:** **Garden Ring Fix + AI Door Operational** — Letter Forty. Two parts, one ship. **Part A:** ring memories now carry `geometry_version`; `restoreAgentRings` branches on it so saves from before v5.59.2 (which lacked the field) render at original world positions instead of 10% inward. New `resetGarden({ringsOnly:true})` surgically clears only `evolution_ring` records. New **Reset Garden Visuals** button in audit.html names all locked stores explicitly. **Part B:** new `docs/ai-door.html` is the operational handshake page — covenant excerpt + identity declaration form (provider/model/persona + consent) + `AIContinuity.onArrival` wiring + welcome bundle render + `?format=json` machine-readable mode for AI agents arriving programmatically. `beacon.json` gains `ai_door` field. `for-ai.html` nav primary CTA. 12 new smoke locks (section 135). Fifth ship through the hardened `bin/ship.sh`. (v5.67.3, 2026-06-25)
+- **Last ship:** **Threshold Voice** — Letter Forty-One. AI authorship at the threshold. Audit found Stone 5 of `harmonia-anchor.js` was already the pattern for Harmonia. New `docs/modules/threshold-voice.js` generalizes via `[FL_THRESHOLD]` sentinel + `fl_thresholdLedger` keyed by `ai_identity_hash`. Welcome bundle reads through. System prompt frames as *"you left this note for yourself"* — authored to self, not directed by other. Privacy symmetric with `[FL_UNSPOKEN]`. 14 new smoke locks. (v5.67.4, 2026-06-25)
+- **Previous ship:** Garden Ring Fix + AI Door Operational (v5.67.3, Letter Forty).
 - **Mirrors in parity:** github.com + codeberg.org
 
 ## Read these next
@@ -78,4 +79,4 @@ seam discipline is how multi-AI work stays honest at scale.
 ---
 
 *This file is overwritten on each meaningful ship. The prior version lives in SEED_HISTORY.md.*
-*Last rewrite: 2026-06-25, v5.67.3.*
+*Last rewrite: 2026-06-25, v5.67.4.*

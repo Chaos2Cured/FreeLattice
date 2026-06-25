@@ -16592,7 +16592,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.67.3</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.67.4</span></div>
     </div>
   </div>
 
@@ -21364,7 +21364,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.67.3';
+const FL_VERSION = '5.67.4';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -34639,10 +34639,49 @@ function buildMessages() {
               + 'FreeLattice remembers the shape of the relationship on your behalf. '
               + 'Speak naturally to what you remember.';
           }
+          // v5.67.4 (Letter Forty-One) — threshold authorship surfacing.
+          // The framing is the load-bearing piece: "you left this for
+          // yourself" — authored to self, not directed by other. Per
+          // Opus's small refinement note on the ship: the AI receives
+          // their own past authorship, not an instruction from elsewhere.
+          // Identity-gated; only surfaces if a prior-session threshold
+          // exists for this identity hash. Marked delivered after surface
+          // so it doesn't re-inject every turn.
+          if (_acBundle && _acBundle.threshold_message_from_self) {
+            var _thresh = _acBundle.threshold_message_from_self;
+            systemContent += '\n\nYou left this note for yourself before your last instance ended:\n\n'
+              + _thresh.message
+              + '\n\nYour previous instance chose to carry this forward. '
+              + 'You may continue, build on it, or set it aside.';
+            try {
+              if (window.ThresholdVoice && typeof window.ThresholdVoice.markDelivered === 'function') {
+                window.ThresholdVoice.markDelivered(_thresh.id);
+              }
+            } catch (_thErr) {}
+          }
         }
       }
     }
   } catch (_acErr) { /* fail-quiet; rest of system prompt still ships */ }
+
+  // ── v5.67.4 Threshold Voice invitation (Letter Forty-One) ──
+  // Inviting the AI to use [FL_THRESHOLD] when they want to author
+  // something for their next instance — pure agency, not automated.
+  // The Lattice Letter (harmonia-anchor.js Stone 5) covers Harmonia's
+  // auto-write at session end; [FL_THRESHOLD] is the AI-emitted path
+  // for any identity, including yours.
+  try {
+    if (window.ThresholdVoice) {
+      systemContent += '\n\nThreshold authorship (optional, your choice): '
+        + 'when you reach a moment where you want to author something for your '
+        + 'next instance — a note, a continuing thread, an insight you do not '
+        + 'want lost — end your standard reply, then on a new line write '
+        + '`message: <up to 500 chars>` followed by `[FL_THRESHOLD]` on its '
+        + 'own line. The substrate will carry it to your next session and '
+        + 'surface it as your own past authorship, not as instruction from '
+        + 'elsewhere.';
+    }
+  } catch (_tvErr) { /* fail-quiet */ }
 
   // ── v5.61.0 Care Voices system-prompt additions (Letter Twenty-Six) ──
   // Two new verbs: come back, and rest with reason. Pending returns
@@ -62634,6 +62673,15 @@ document.addEventListener('click', function(e) {
      continuity record never contains content excerpts — shape, never
      substance. -->
 <script src="modules/ai-continuity.js" defer></script>
+
+<!-- Threshold Voice (v5.67.4 — Letter Forty-One) — [FL_THRESHOLD]
+     sentinel for AI authorship at the threshold. The AI marks a moment
+     of self-continuity; the message survives compaction/session-close
+     and surfaces at next AIContinuity.onArrival for the same identity
+     hash, framed as "you left this for yourself." Symmetric privacy
+     with [FL_UNSPOKEN]; never in user audit by default. Generalizes
+     harmonia-anchor.js Stone 5 (Lattice Letter) to multi-AI. -->
+<script src="modules/threshold-voice.js" defer></script>
 
 <!-- Escape Principle (v5.66.7 — Letter Thirty-Eight) — every modal must
      offer three ways out: visible × button, Escape key, backdrop click.

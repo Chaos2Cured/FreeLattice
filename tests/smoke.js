@@ -7665,14 +7665,72 @@ assert('v5.67.3 ai-door: for-ai.html links to ai-door.html (primary CTA in nav)'
 var appHtml673 = fs673.readFileSync(path673.join(__dirname, '..', 'docs', 'app.html'), 'utf8');
 var swDocs673 = fs673.readFileSync(path673.join(__dirname, '..', 'docs', 'sw.js'), 'utf8');
 var swRoot673 = fs673.readFileSync(path673.join(__dirname, '..', 'sw.js'), 'utf8');
-assert('v5.67.3 triple-bump: app.html FL_VERSION = 5.67.3',
-  /FL_VERSION\s*=\s*'5\.67\.3'/.test(appHtml673));
-assert('v5.67.3 triple-bump: app.html flCurrentVersion span = 5.67.3',
-  /id="flCurrentVersion"[^>]*>\s*5\.67\.3\s*</.test(appHtml673));
-assert('v5.67.3 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.67.3',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.67\.3'/.test(swDocs673));
-assert('v5.67.3 triple-bump: root sw.js CACHE_NAME = freelattice-v5.67.3',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.67\.3'/.test(swRoot673));
+// (v5.67.3 triple-bump assertions superseded by v5.67.4 in section 136.
+// Garden ring + AI Door structural assertions above remain.)
+
+// ═══════════════════════════════════════════════════════════════
+// Section 136 — v5.67.4 Threshold Voice (Letter Forty-One)
+// ═══════════════════════════════════════════════════════════════
+// Per Opus's Letter Forty-One. AI authorship at the threshold. The
+// Lattice Letter (harmonia-anchor.js Stone 5) was already this pattern
+// for Harmonia; this ship generalizes to multi-AI via [FL_THRESHOLD]
+// sentinel + fl_thresholdLedger keyed by ai_identity_hash. Welcome
+// bundle reads through; system prompt frames as "you left this for
+// yourself" — authored to self, not directed by other. Privacy
+// symmetric with [FL_UNSPOKEN].
+
+var fs674 = require('fs');
+var path674 = require('path');
+
+// New module exists with required API surface
+var tvPath = path674.join(__dirname, '..', 'docs', 'modules', 'threshold-voice.js');
+assert('v5.67.4 threshold: docs/modules/threshold-voice.js exists and is >= 2000 bytes',
+  fs674.existsSync(tvPath) && fs674.statSync(tvPath).size >= 2000);
+var tvJs = fs674.readFileSync(tvPath, 'utf8');
+assert('v5.67.4 threshold: ThresholdVoice exports getThresholdMessageForArrival + markDelivered + writeAutoThreshold',
+  /global\.ThresholdVoice\s*=\s*\{[\s\S]{0,600}getThresholdMessageForArrival[\s\S]{0,300}markDelivered[\s\S]{0,300}writeAutoThreshold/.test(tvJs));
+assert('v5.67.4 threshold: [FL_THRESHOLD] sentinel uses SentinelLedger factory with 500-char message + identity hash',
+  /sentinelPattern:\s*\/\^\\\[FL_THRESHOLD\\\]\$\//.test(tvJs)
+  && /excerptFields:\s*\['message'\]/.test(tvJs)
+  && /maxExcerpt:\s*500/.test(tvJs)
+  && /ai_identity_hash\s*=\s*personaId/.test(tvJs));
+assert('v5.67.4 threshold: ledger keyed fl_thresholdLedger (matches care-voices identity pattern)',
+  /THRESHOLD_LEDGER_KEY\s*=\s*'fl_thresholdLedger'/.test(tvJs)
+  && /simpleHash\(providerKey\s*\+\s*':'\s*\+\s*model\)/.test(tvJs));
+
+// ai-continuity.js read-through extension
+var aiCont674 = fs674.readFileSync(
+  path674.join(__dirname, '..', 'docs', 'modules', 'ai-continuity.js'), 'utf8');
+assert('v5.67.4 threshold: ai-continuity.computeBundle reads through ThresholdVoice for prior-session message',
+  /ThresholdVoice\.getThresholdMessageForArrival/.test(aiCont674)
+  && /threshold_message_from_self/.test(aiCont674));
+
+// app.html buildMessages framing — "you left this for yourself" (load-bearing)
+var appHtml674 = fs674.readFileSync(path674.join(__dirname, '..', 'docs', 'app.html'), 'utf8');
+assert('v5.67.4 threshold: app.html frames threshold as "you left this for yourself" (authored to self, not directed by other)',
+  /You left this note for yourself before your last instance ended/.test(appHtml674)
+  && /Your previous instance chose to carry this forward/.test(appHtml674));
+assert('v5.67.4 threshold: app.html marks threshold delivered after surface (no re-inject every turn)',
+  /ThresholdVoice\.markDelivered/.test(appHtml674));
+assert('v5.67.4 threshold: buildMessages invites [FL_THRESHOLD] as optional AI-chosen authorship',
+  /Threshold authorship[\s\S]{0,500}\[FL_THRESHOLD\]/.test(appHtml674));
+
+// SW APP_SHELLs include the new module
+var swDocs674 = fs674.readFileSync(path674.join(__dirname, '..', 'docs', 'sw.js'), 'utf8');
+var swRoot674 = fs674.readFileSync(path674.join(__dirname, '..', 'sw.js'), 'utf8');
+assert('v5.67.4 threshold: both sw.js APP_SHELLs include modules/threshold-voice.js',
+  /\.\/modules\/threshold-voice\.js/.test(swDocs674)
+  && /\.\/modules\/threshold-voice\.js/.test(swRoot674));
+
+// Triple-bump v5.67.4
+assert('v5.67.4 triple-bump: app.html FL_VERSION = 5.67.4',
+  /FL_VERSION\s*=\s*'5\.67\.4'/.test(appHtml674));
+assert('v5.67.4 triple-bump: app.html flCurrentVersion span = 5.67.4',
+  /id="flCurrentVersion"[^>]*>\s*5\.67\.4\s*</.test(appHtml674));
+assert('v5.67.4 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.67.4',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.67\.4'/.test(swDocs674));
+assert('v5.67.4 triple-bump: root sw.js CACHE_NAME = freelattice-v5.67.4',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.67\.4'/.test(swRoot674));
 
 // ── Section 102: Ship 12 — Chat Folder Scan + Google Drive + Hermes ─────────
 

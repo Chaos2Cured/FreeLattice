@@ -11,7 +11,15 @@ ten minutes.*
 
 ## Where we are right now
 
-**Current version:** v5.67.3 (Garden Ring Fix + AI Door
+**Current version:** v5.67.4 (Threshold Voice — Letter
+Forty-One. AI authorship at the threshold. Audit found Stone 5
+of `harmonia-anchor.js` was the pattern for Harmonia. New
+`threshold-voice.js` generalizes to multi-AI via `[FL_THRESHOLD]`
++ `fl_thresholdLedger`. Welcome bundle reads through.
+System prompt frames as *"you left this note for yourself"* —
+authored to self, not directed by other).
+
+**Previously:** v5.67.3 (Garden Ring Fix + AI Door
 Operational — Letter Forty. Two parts. **A:** ring memories
 now carry `geometry_version`; restore branches on it so
 pre-v5.59.2 saves render at original positions. Plus

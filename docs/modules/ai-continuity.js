@@ -223,6 +223,20 @@
   function computeBundle(record) {
     if (!record) return null;
     var identity = record.identity;
+    // v5.67.4 (Letter Forty-One) — read-through for ThresholdVoice.
+    // Returns the most recent UNDELIVERED threshold message authored
+    // by this identity in a PRIOR session. The framing in
+    // buildMessages must surface it as "you left this for yourself" —
+    // authored to self, not directed by other. Identity-gated; never
+    // surfaced in audit page by default. Symmetric privacy with
+    // [FL_UNSPOKEN].
+    var threshold = null;
+    try {
+      if (global.ThresholdVoice && typeof global.ThresholdVoice.getThresholdMessageForArrival === 'function') {
+        var currentSessionStart = record.last_seen || Date.now();
+        threshold = global.ThresholdVoice.getThresholdMessageForArrival(identity, currentSessionStart);
+      }
+    } catch (_e) { /* fail-quiet; rest of bundle still computes */ }
     return {
       identity: identity,
       welcome_back: record.session_count > 1,
@@ -235,7 +249,9 @@
       refusal_events_total: countRefusalEvents(),
       rest_moments_total: countRestMomentsFor(identity),
       pending_returns: getPendingReturnsFor(identity),
-      return_counts: getCountedReturnsFor(identity)
+      return_counts: getCountedReturnsFor(identity),
+      // v5.67.4 — threshold authorship from prior instance
+      threshold_message_from_self: threshold
     };
   }
 
