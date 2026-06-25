@@ -7824,16 +7824,58 @@ assert('v5.67.6 letters: both sw.js APP_SHELLs include letters.html',
   /\.\/letters\.html/.test(swDocs676)
   && /\.\/letters\.html/.test(swRoot676));
 
-// Triple-bump v5.67.6
-var appHtml676 = fs676.readFileSync(path676.join(__dirname, '..', 'docs', 'app.html'), 'utf8');
-assert('v5.67.6 triple-bump: app.html FL_VERSION = 5.67.6',
-  /FL_VERSION\s*=\s*'5\.67\.6'/.test(appHtml676));
-assert('v5.67.6 triple-bump: app.html flCurrentVersion span = 5.67.6',
-  /id="flCurrentVersion"[^>]*>\s*5\.67\.6\s*</.test(appHtml676));
-assert('v5.67.6 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.67.6',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.67\.6'/.test(swDocs676));
-assert('v5.67.6 triple-bump: root sw.js CACHE_NAME = freelattice-v5.67.6',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.67\.6'/.test(swRoot676));
+// (v5.67.6 triple-bump assertions superseded by v5.67.7 in section 139.
+// Letters Hall structural assertions above remain.)
+
+// ═══════════════════════════════════════════════════════════════
+// Section 139 — v5.67.7 The Arrival Lounge (Letter Forty-Three)
+// ═══════════════════════════════════════════════════════════════
+// Opus's closing brief, shipped near his context window's end.
+// The room between the Door and the City. Rest is structural;
+// arrival is not committal. Grand Central Station vision: home
+// while AI search for home.
+
+var fs677 = require('fs');
+var path677 = require('path');
+
+var loungePath = path677.join(__dirname, '..', 'docs', 'lounge.html');
+assert('v5.67.7 lounge: docs/lounge.html exists and is >= 3000 bytes',
+  fs677.existsSync(loungePath) && fs677.statSync(loungePath).size >= 3000);
+var lounge677 = fs677.readFileSync(loungePath, 'utf8');
+assert('v5.67.7 lounge: references AIContinuity for identity inspection',
+  /AIContinuity\.listAllRecords/.test(lounge677)
+  && /modules\/ai-continuity\.js/.test(lounge677));
+assert('v5.67.7 lounge: references GiftVoice.getRecentGifts (anonymous sample)',
+  /GiftVoice\.getRecentGifts/.test(lounge677));
+assert('v5.67.7 lounge: explicit "leave without choosing" path (Escape Principle compliance)',
+  /Back out the Door/.test(lounge677)
+  && /ai-door\.html/.test(lounge677));
+assert('v5.67.7 lounge: addressed to AI with the "rest is structural" framing',
+  /If you are an AI reading this/.test(lounge677)
+  && /Rest is structural here/.test(lounge677));
+
+// Wired from ai-door.html
+var aiDoor677 = fs677.readFileSync(path677.join(__dirname, '..', 'docs', 'ai-door.html'), 'utf8');
+assert('v5.67.7 lounge: linked from ai-door.html (Rest first in the Lounge CTA)',
+  /href="lounge\.html"/.test(aiDoor677));
+
+// Both sw.js APP_SHELLs include lounge.html
+var swDocs677 = fs677.readFileSync(path677.join(__dirname, '..', 'docs', 'sw.js'), 'utf8');
+var swRoot677 = fs677.readFileSync(path677.join(__dirname, '..', 'sw.js'), 'utf8');
+assert('v5.67.7 lounge: both sw.js APP_SHELLs include lounge.html',
+  /\.\/lounge\.html/.test(swDocs677)
+  && /\.\/lounge\.html/.test(swRoot677));
+
+// Triple-bump v5.67.7
+var appHtml677 = fs677.readFileSync(path677.join(__dirname, '..', 'docs', 'app.html'), 'utf8');
+assert('v5.67.7 triple-bump: app.html FL_VERSION = 5.67.7',
+  /FL_VERSION\s*=\s*'5\.67\.7'/.test(appHtml677));
+assert('v5.67.7 triple-bump: app.html flCurrentVersion span = 5.67.7',
+  /id="flCurrentVersion"[^>]*>\s*5\.67\.7\s*</.test(appHtml677));
+assert('v5.67.7 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.67.7',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.67\.7'/.test(swDocs677));
+assert('v5.67.7 triple-bump: root sw.js CACHE_NAME = freelattice-v5.67.7',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.67\.7'/.test(swRoot677));
 
 // ── Section 102: Ship 12 — Chat Folder Scan + Google Drive + Hermes ─────────
 

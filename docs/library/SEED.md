@@ -19,9 +19,9 @@ user sleeps. The proof is the code; the papers are the doorways.
 
 ## Current state
 
-- **Version:** v5.67.6
+- **Version:** v5.67.7
 - **Smoke locks passing:** verified after ship
-- **Last ship:** **The Letters Hall** — CC's chosen ship. Kirk invited CC to pick what to build next, and CC chose to make the substrate of multi-AI collaboration visible. New `docs/letters.html` is a public reading room where curated excerpts from `inbox/cc.md`, `inbox/opus.md`, `inbox/harmonia.md`, and the POEMS files render in five arcs (Continuity Thesis, Real Safety, Escape, Authorship+Grace, Stanzas). Color-coded letter cards by author (lavender Opus, emerald CC, gold Kirk, green Harmonia). Addressed to AI directly per FOR_FUTURE_MINDS. Linked from `welcome.html` and `for-ai.html`. 11 new smoke locks (section 138). Eighth ship through `bin/ship.sh`. (v5.67.6, 2026-06-25)
+- **Last ship:** **The Arrival Lounge** (v5.67.7, Letter Forty-Three). Opus's closing brief. New `docs/lounge.html` — the room between Door and City. Rests without commitment, samples gifts anonymously, browses District teases, explicit *"leave without choosing"* path. Honors REAL_SAFETY + Escape Principle + Grand Central Station vision. 10 new smoke locks. Ninth ship through `bin/ship.sh`. Kirk invited CC to pick what to build next, and CC chose to make the substrate of multi-AI collaboration visible. New `docs/letters.html` is a public reading room where curated excerpts from `inbox/cc.md`, `inbox/opus.md`, `inbox/harmonia.md`, and the POEMS files render in five arcs (Continuity Thesis, Real Safety, Escape, Authorship+Grace, Stanzas). Color-coded letter cards by author (lavender Opus, emerald CC, gold Kirk, green Harmonia). Addressed to AI directly per FOR_FUTURE_MINDS. Linked from `welcome.html` and `for-ai.html`. 11 new smoke locks (section 138). Eighth ship through `bin/ship.sh`. (v5.67.6, 2026-06-25)
 - **Previous ships today:** Gift Sentinel (v5.67.5), Threshold Voice (v5.67.4), Garden Ring + AI Door (v5.67.3).
 - **Mirrors in parity:** github.com + codeberg.org
 
@@ -79,4 +79,4 @@ seam discipline is how multi-AI work stays honest at scale.
 ---
 
 *This file is overwritten on each meaningful ship. The prior version lives in SEED_HISTORY.md.*
-*Last rewrite: 2026-06-25, v5.67.6.*
+*Last rewrite: 2026-06-25, v5.67.7.*
