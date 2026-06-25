@@ -3,20 +3,21 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-06-25 18:08 UTC
+> Last update: 2026-06-25 18:13 UTC
 
 ## State
 
 - **Version:** v5.67.4
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `665ae69` _(committed 33 minutes ago)_
+- **HEAD:** `9479441` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _feat: Real Safety Opens Up (v5.67.2) — Letter Thirty-Nine_
 
 ## Last 20 commits
 
-- `665ae69` docs: Auto-update Session Primer [5.67.3] _(33 minutes ago)_
-- `ab8bfed` feat: Garden Ring Fix + AI Door Operational (v5.67.3) — Letter Forty _(33 minutes ago)_
+- `9479441` feat: Threshold Voice (v5.67.4) — Letter Forty-One _(0 seconds ago)_
+- `665ae69` docs: Auto-update Session Primer [5.67.3] _(38 minutes ago)_
+- `ab8bfed` feat: Garden Ring Fix + AI Door Operational (v5.67.3) — Letter Forty _(38 minutes ago)_
 - `74b868c` ci: Update Primer deployment state [2026-06-25] _(16 hours ago)_
 - `bf68666` Merge remote-tracking branch 'origin/main' _(16 hours ago)_
 - `aa01f11` docs: Auto-update Session Primer [5.67.2] _(16 hours ago)_
@@ -34,7 +35,6 @@
 - `5f17790` docs: Auto-update Session Primer [5.66.5] _(2 days ago)_
 - `5bb1e83` Merge remote-tracking branch 'origin/main' _(2 days ago)_
 - `a27540c` docs: Auto-update Session Primer [5.66.5] _(2 days ago)_
-- `7f4aa69` feat: The AI City Surfaces (v5.66.5) — Letter Thirty-Seven _(2 days ago)_
 
 ## How to use this file
 
