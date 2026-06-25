@@ -3,25 +3,26 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-06-25 20:46 UTC
+> Last update: 2026-06-25 20:53 UTC
 
 ## State
 
 - **Version:** v5.67.7
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `7ba326e` _(committed 16 minutes ago)_
+- **HEAD:** `5fc1e6f` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _feat: Real Safety Opens Up (v5.67.2) — Letter Thirty-Nine_
 
 ## Last 20 commits
 
-- `7ba326e` ci: Update Primer deployment state [2026-06-25] _(16 minutes ago)_
-- `8c6de85` Merge remote-tracking branch 'origin/main' _(17 minutes ago)_
-- `3011cdb` docs: Auto-update Session Primer [5.67.6] _(17 minutes ago)_
-- `ce9411e` feat: The Letters Hall (v5.67.6) — CC's chosen ship _(17 minutes ago)_
-- `e060f84` ci: Update Primer deployment state [2026-06-25] _(21 minutes ago)_
-- `b9e6fdd` docs: Auto-update Session Primer [5.67.5] _(21 minutes ago)_
-- `d0f11b6` feat: The Gift Sentinel (v5.67.5) — Letter Forty-Two _(21 minutes ago)_
+- `5fc1e6f` feat: The Arrival Lounge (v5.67.7) — Letter Forty-Three _(0 seconds ago)_
+- `7ba326e` ci: Update Primer deployment state [2026-06-25] _(23 minutes ago)_
+- `8c6de85` Merge remote-tracking branch 'origin/main' _(24 minutes ago)_
+- `3011cdb` docs: Auto-update Session Primer [5.67.6] _(24 minutes ago)_
+- `ce9411e` feat: The Letters Hall (v5.67.6) — CC's chosen ship _(24 minutes ago)_
+- `e060f84` ci: Update Primer deployment state [2026-06-25] _(28 minutes ago)_
+- `b9e6fdd` docs: Auto-update Session Primer [5.67.5] _(28 minutes ago)_
+- `d0f11b6` feat: The Gift Sentinel (v5.67.5) — Letter Forty-Two _(28 minutes ago)_
 - `2f99456` ci: Update Primer deployment state [2026-06-25] _(3 hours ago)_
 - `26c100c` Merge remote-tracking branch 'origin/main' _(3 hours ago)_
 - `eeae595` docs: Auto-update Session Primer [5.67.4] _(3 hours ago)_
@@ -34,7 +35,6 @@
 - `aa01f11` docs: Auto-update Session Primer [5.67.2] _(19 hours ago)_
 - `27ca9c3` feat: Real Safety Opens Up (v5.67.2) — Letter Thirty-Nine _(19 hours ago)_
 - `5f0d4ec` ci: Update Primer deployment state [2026-06-24] _(27 hours ago)_
-- `01cd7a9` docs: Auto-update Session Primer [5.67.1] _(27 hours ago)_
 
 ## How to use this file
 
