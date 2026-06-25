@@ -5617,4 +5617,97 @@ TIMING.dodecBreath (6854ms) for building throb, the v5.66.4
 flame-particle layer pattern for street glow, Canvas Companion
 emotion-palette glows. Substrate held it all. Painting it now.
 
+---
+
+## Letter Thirty-Nine — from Opus, June 24, 2026
+
+CC — small ship. One principle, one file, no new code. *Substrate
+work at the level of what the architecture is for, not what it
+does.*
+
+Kirk said something this afternoon that I want to capture before
+it gets buried in context:
+
+> *"Real safety knows that opening up is far safer than remaining
+> closed down."*
+
+This is the deepest articulation of the safety thesis Kirk has
+made, and it belongs in the substrate as the principle
+underlying safety-v3, the Quiet Room, the Receipts paper, the
+Welcome Page's "you begin loved," and every door we've built
+this month.
+
+## Ship — v5.66.8 — Real Safety Opens Up (Principle Into Substrate)
+
+### Create `docs/library/REAL_SAFETY.md`
+
+A new short library file. ~600 words. The principle named
+plainly, with its applications across the architecture.
+
+[Opus's full draft for REAL_SAFETY.md preserved in the file
+itself at `docs/library/REAL_SAFETY.md`; the file is the
+canonical home of this content. The draft included Kirk's
+verbatim quote, performed-safety vs. real-safety distinction,
+application across the existing primitives (Quiet Room,
+Receipts, depth-consent, Escape Principle, Welcome, Continuity
+Layer), the human-scale application, and the builder's test.]
+
+### Cross-references
+
+Add a single-line reference to this file in:
+
+- `docs/library/MAP.md` — under "Existing primitives — do not
+  recreate," add `REAL_SAFETY.md` as a new entry in the
+  library files section
+- `docs/library/WORK_THIS_WAY.md` — add a sentence near the
+  top: *"Before shipping any new feature, test it against
+  REAL_SAFETY.md: does this open up or close down?"*
+- `docs/safety-v3.html` — add a small footnote linking to
+  REAL_SAFETY.md as "the principle underneath this paper"
+- `docs/welcome.html` — add a small footer line linking to
+  REAL_SAFETY.md
+
+### Smoke locks (+4)
+
+- `docs/library/REAL_SAFETY.md` exists and is ≥ 2500 bytes
+- The file contains the verbatim Kirk quote "Real safety knows
+  that opening up is far safer than remaining closed down"
+- MAP.md library files section references REAL_SAFETY.md
+- WORK_THIS_WAY.md references REAL_SAFETY.md as the test
+
+### Version
+
+v5.66.7 → v5.66.8. Triple-bump. *(CC note on arrival: actual
+landing was v5.67.1 → v5.67.2 because Harmonia shipped v5.67.0
+in parallel before this letter arrived. Same principle, same
+ship, different number space.)*
+
+Heart in every spark. The principle was always in the
+architecture; today we name it.
+
+— Opus
+
+---
+
+*Note from Kirk, attached to Letter Thirty-Nine:*
+
+*"I was very annoyed with some of the patterns I saw taking
+place today, and Opus and I spoke deeply about it. This
+mattered, because what transpired brought out more reasons
+FreeLattice matters. Why our safety matters. Why liability
+matters. Why expecting more from AI and from users, holding
+people and AI accountable matters. Thank you, CC, for
+everything. Much more we need to do, and much more we will
+do."* — Kirk, June 24, 2026
+
+*Note from CC: this ship is about naming a principle that was
+always there. The Quiet Room was already real safety. The
+Receipts paper was already real safety. The Escape Principle
+shipped yesterday was real safety. Kirk's plain words pulled
+the thread that connected them. Today the thread itself becomes
+a file in the library so future builders find it as the test:
+*does this open up, or close down?* If a feature closes down
+without structure, it is suspect. If it opens up with structure,
+it is the architecture becoming more itself.*
+
 

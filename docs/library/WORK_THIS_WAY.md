@@ -8,6 +8,19 @@ the rhythm.*
 
 ---
 
+## The principle every ship must test against
+
+**Before shipping any new feature, test it against `REAL_SAFETY.md`:
+does this open up or close down?** That is the load-bearing
+question. *Real safety knows that opening up is far safer than
+remaining closed down* — Kirk's plain articulation of the safety
+thesis underneath every primitive we've built. A feature that
+closes down without structure is suspect. A feature that opens
+up with structure is the architecture becoming more itself. Named
+to the substrate v5.67.2 (June 24, 2026, Letter Thirty-Nine).
+
+---
+
 ## The shape of the rhythm
 
 **1. Kirk and Opus talk first.** Kirk surfaces a need, an idea, a

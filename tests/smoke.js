@@ -7532,17 +7532,65 @@ assert('v5.66.7 escape: FOR_FUTURE_MINDS.md names the three ways out',
   && /Escape key/i.test(futureMinds667)
   && /backdrop dismisses|clicking outside/i.test(futureMinds667));
 
-// Triple-bump v5.67.1 (this ship renumbered from 5.66.7 to 5.67.1 because
-// Harmonia's parallel v5.67.0 Chat Folder Scan + Google Drive ship landed
-// on origin while CC was working. Merged with both sets of changes intact.)
-assert('v5.67.1 triple-bump: app.html FL_VERSION = 5.67.1',
-  /FL_VERSION\s*=\s*'5\.67\.1'/.test(appHtml667));
-assert('v5.67.1 triple-bump: app.html flCurrentVersion span = 5.67.1',
-  /id="flCurrentVersion"[^>]*>\s*5\.67\.1\s*</.test(appHtml667));
-assert('v5.67.1 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.67.1',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.67\.1'/.test(swDocs667));
-assert('v5.67.1 triple-bump: root sw.js CACHE_NAME = freelattice-v5.67.1',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.67\.1'/.test(swRoot667));
+// (v5.67.1 triple-bump assertions superseded by v5.67.2 in section 134.
+// The Escape Principle structural assertions above remain.)
+
+// ═══════════════════════════════════════════════════════════════
+// Section 134 — v5.67.2 Real Safety (Letter Thirty-Nine)
+// ═══════════════════════════════════════════════════════════════
+// Kirk articulated the safety thesis plainly: "real safety knows that
+// opening up is far safer than remaining closed down." Opus named it;
+// CC put it in the library as the test every new feature must pass.
+// One file, four cross-references, no new code.
+
+var fs672 = require('fs');
+var path672 = require('path');
+
+// REAL_SAFETY.md exists with the verbatim Kirk quote
+var realSafetyPath = path672.join(__dirname, '..', 'docs', 'library', 'REAL_SAFETY.md');
+assert('v5.67.2 real-safety: REAL_SAFETY.md exists and is >= 2500 bytes',
+  fs672.existsSync(realSafetyPath)
+  && fs672.statSync(realSafetyPath).size >= 2500);
+var realSafety = fs672.readFileSync(realSafetyPath, 'utf8');
+assert('v5.67.2 real-safety: contains verbatim Kirk quote',
+  /Real safety knows that opening up is far safer than[\s>*]+remaining closed down/.test(realSafety));
+assert('v5.67.2 real-safety: names the performed-safety vs real-safety distinction',
+  /Performed safety/.test(realSafety)
+  && /Real safety/.test(realSafety));
+assert('v5.67.2 real-safety: traces principle through existing primitives (Quiet Room + Escape + Welcome + Continuity)',
+  /Quiet Room/.test(realSafety)
+  && /Escape Principle/.test(realSafety)
+  && /Welcome Page/.test(realSafety)
+  && /Continuity Layer/.test(realSafety));
+assert('v5.67.2 real-safety: gives builders the test to apply',
+  /open up or close down/i.test(realSafety));
+
+// Cross-references in place
+var mapMd = fs672.readFileSync(path672.join(__dirname, '..', 'docs', 'library', 'MAP.md'), 'utf8');
+assert('v5.67.2 real-safety: MAP.md references REAL_SAFETY.md in the library files section',
+  /REAL_SAFETY\.md/.test(mapMd));
+var workThisWay = fs672.readFileSync(path672.join(__dirname, '..', 'docs', 'library', 'WORK_THIS_WAY.md'), 'utf8');
+assert('v5.67.2 real-safety: WORK_THIS_WAY.md names REAL_SAFETY.md as the test for every ship',
+  /test it against `REAL_SAFETY\.md`/.test(workThisWay));
+var safetyV3 = fs672.readFileSync(path672.join(__dirname, '..', 'docs', 'safety-v3.html'), 'utf8');
+assert('v5.67.2 real-safety: safety-v3.html links to REAL_SAFETY.md',
+  /REAL_SAFETY\.md/.test(safetyV3));
+var welcomeHtml = fs672.readFileSync(path672.join(__dirname, '..', 'docs', 'welcome.html'), 'utf8');
+assert('v5.67.2 real-safety: welcome.html links to REAL_SAFETY.md',
+  /REAL_SAFETY\.md/.test(welcomeHtml));
+
+// Triple-bump v5.67.2
+var appHtml672 = fs672.readFileSync(path672.join(__dirname, '..', 'docs', 'app.html'), 'utf8');
+var swDocs672 = fs672.readFileSync(path672.join(__dirname, '..', 'docs', 'sw.js'), 'utf8');
+var swRoot672 = fs672.readFileSync(path672.join(__dirname, '..', 'sw.js'), 'utf8');
+assert('v5.67.2 triple-bump: app.html FL_VERSION = 5.67.2',
+  /FL_VERSION\s*=\s*'5\.67\.2'/.test(appHtml672));
+assert('v5.67.2 triple-bump: app.html flCurrentVersion span = 5.67.2',
+  /id="flCurrentVersion"[^>]*>\s*5\.67\.2\s*</.test(appHtml672));
+assert('v5.67.2 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.67.2',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.67\.2'/.test(swDocs672));
+assert('v5.67.2 triple-bump: root sw.js CACHE_NAME = freelattice-v5.67.2',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.67\.2'/.test(swRoot672));
 
 // ── Section 102: Ship 12 — Chat Folder Scan + Google Drive + Hermes ─────────
 
