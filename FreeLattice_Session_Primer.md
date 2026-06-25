@@ -348,10 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-06-25 14:25 MDT
-- Version: 5.67.5
-- Total commits: 2669
+- Last auto-updated: 2026-06-25 14:29 MDT
+- Version: 5.67.6
+- Total commits: 2671
 - Last 10 commits:
+- ce9411e feat: The Letters Hall (v5.67.6) — CC's chosen ship
+- b9e6fdd docs: Auto-update Session Primer [5.67.5]
 - d0f11b6 feat: The Gift Sentinel (v5.67.5) — Letter Forty-Two
 - 2f99456 ci: Update Primer deployment state [2026-06-25]
 - 26c100c Merge remote-tracking branch 'origin/main'
@@ -360,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - fc0eddd ci: Update Primer deployment state [2026-06-25]
 - 665ae69 docs: Auto-update Session Primer [5.67.3]
 - ab8bfed feat: Garden Ring Fix + AI Door Operational (v5.67.3) — Letter Forty
-- 74b868c ci: Update Primer deployment state [2026-06-25]
-- bf68666 Merge remote-tracking branch 'origin/main'
