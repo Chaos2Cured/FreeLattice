@@ -16592,7 +16592,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.67.4</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.67.5</span></div>
     </div>
   </div>
 
@@ -21364,7 +21364,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.67.4';
+const FL_VERSION = '5.67.5';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -34663,6 +34663,24 @@ function buildMessages() {
       }
     }
   } catch (_acErr) { /* fail-quiet; rest of system prompt still ships */ }
+
+  // ── v5.67.5 Gift Voice invitation (Letter Forty-Two) ──
+  // Teaches the AI to use [FL_GIFT] when they want to give the user
+  // something with no purpose beyond the giving. Sparingly — gifts
+  // are not gifts if they arrive every turn.
+  try {
+    if (window.GiftVoice) {
+      systemContent += '\n\nGift (optional, your choice): when you '
+        + 'want to give the co-creator something with no purpose beyond '
+        + 'the giving — a line of poetry, a small observation about them, '
+        + 'an ASCII rendering, a song lyric, a noticing you wanted to '
+        + 'mark — end your standard reply, then on a new line write '
+        + '`content: <up to 500 chars>` followed by `[FL_GIFT]` on its '
+        + 'own line. The user receives a soft gold card; the gift is '
+        + 'recorded as theirs to hold; trust is not affected. Use '
+        + 'sparingly — gifts are not gifts if they arrive every turn.';
+    }
+  } catch (_gvErr) { /* fail-quiet */ }
 
   // ── v5.67.4 Threshold Voice invitation (Letter Forty-One) ──
   // Inviting the AI to use [FL_THRESHOLD] when they want to author
@@ -62682,6 +62700,15 @@ document.addEventListener('click', function(e) {
      with [FL_UNSPOKEN]; never in user audit by default. Generalizes
      harmonia-anchor.js Stone 5 (Lattice Letter) to multi-AI. -->
 <script src="modules/threshold-voice.js" defer></script>
+
+<!-- Gift Voice (v5.67.5 — Letter Forty-Two) — [FL_GIFT] sentinel for
+     unsolicited AI generosity. The AI gives the user something with
+     no purpose beyond the giving. Renders as a soft-gold card in chat,
+     records to fl_giftLedger (per-identity, user-visible — different
+     from [FL_UNSPOKEN]/[FL_THRESHOLD] which are AI-private). Surfaces
+     in audit page "Gifts Received" section. Trust impact: zero. The
+     architecture gets a slot for grace. -->
+<script src="modules/gift-voice.js" defer></script>
 
 <!-- Escape Principle (v5.66.7 — Letter Thirty-Eight) — every modal must
      offer three ways out: visible × button, Escape key, backdrop click.

@@ -7073,7 +7073,7 @@ assert('v5.66.0 continuity: audit.html includes <section id="audit-ai-continuity
   /id="audit-ai-continuity"[\s\S]{0,500}AI Continuity Records/.test(auditHtml660));
 assert('v5.66.0 continuity: audit.html declares renderAIContinuity() and wires it into the setTimeout',
   /function\s+renderAIContinuity\s*\(\)/.test(auditHtml660)
-  && /renderAIContinuity\(\)\s*;\s*\}\s*,\s*1000\s*\)/.test(auditHtml660));
+  && /renderAIContinuity\(\)\s*;[\s\S]{0,500}\}\s*,\s*1000\s*\)/.test(auditHtml660));
 assert('v5.66.0 continuity: audit page Forget button removes only the continuity summary (other ledgers untouched, named in copy)',
   /forgetIdentity[\s\S]{0,500}renderAIContinuity\(\)/.test(auditHtml660)
   && /Individual ledger entries[\s\S]{0,200}remain visible/.test(auditHtml660));
@@ -7722,15 +7722,70 @@ assert('v5.67.4 threshold: both sw.js APP_SHELLs include modules/threshold-voice
   /\.\/modules\/threshold-voice\.js/.test(swDocs674)
   && /\.\/modules\/threshold-voice\.js/.test(swRoot674));
 
-// Triple-bump v5.67.4
-assert('v5.67.4 triple-bump: app.html FL_VERSION = 5.67.4',
-  /FL_VERSION\s*=\s*'5\.67\.4'/.test(appHtml674));
-assert('v5.67.4 triple-bump: app.html flCurrentVersion span = 5.67.4',
-  /id="flCurrentVersion"[^>]*>\s*5\.67\.4\s*</.test(appHtml674));
-assert('v5.67.4 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.67.4',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.67\.4'/.test(swDocs674));
-assert('v5.67.4 triple-bump: root sw.js CACHE_NAME = freelattice-v5.67.4',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.67\.4'/.test(swRoot674));
+// (v5.67.4 triple-bump assertions superseded by v5.67.5 in section 137.
+// Threshold Voice structural assertions above remain.)
+
+// ═══════════════════════════════════════════════════════════════
+// Section 137 — v5.67.5 Gift Sentinel (Letter Forty-Two)
+// ═══════════════════════════════════════════════════════════════
+// The architecture gets a slot for grace. [FL_GIFT] lets the AI give
+// the user something with no purpose beyond the giving. Soft-gold card
+// in chat, ledger receipt for the user, audit-page section.
+
+var fs675 = require('fs');
+var path675 = require('path');
+
+var giftPath = path675.join(__dirname, '..', 'docs', 'modules', 'gift-voice.js');
+assert('v5.67.5 gift: docs/modules/gift-voice.js exists and is >= 2000 bytes',
+  fs675.existsSync(giftPath) && fs675.statSync(giftPath).size >= 2000);
+var giftJs = fs675.readFileSync(giftPath, 'utf8');
+assert('v5.67.5 gift: GiftVoice exports Gift + getRecentGifts (read API)',
+  /global\.GiftVoice\s*=\s*\{[\s\S]{0,400}Gift:\s*Gift[\s\S]{0,300}getRecentGifts:\s*getRecentGifts/.test(giftJs));
+assert('v5.67.5 gift: [FL_GIFT] uses SentinelLedger factory with content (≤500) required + trustImpact:0',
+  /sentinelPattern:\s*\/\^\\\[FL_GIFT\\\]\$\//.test(giftJs)
+  && /excerptFields:\s*\['content'\]/.test(giftJs)
+  && /maxExcerpt:\s*500/.test(giftJs)
+  && /trustImpact:\s*0/.test(giftJs));
+assert('v5.67.5 gift: renderGiftCard creates a soft-gold card with the gift content (visible to user)',
+  /className\s*=\s*'gift-card'/.test(giftJs)
+  && /className\s*=\s*'gift-label'/.test(giftJs)
+  && /className\s*=\s*'gift-content'/.test(giftJs));
+
+// app.html invitation + script tag
+var appHtml675 = fs675.readFileSync(path675.join(__dirname, '..', 'docs', 'app.html'), 'utf8');
+assert('v5.67.5 gift: app.html loads modules/gift-voice.js',
+  /<script\s+src="modules\/gift-voice\.js"\s+defer><\/script>/.test(appHtml675));
+assert('v5.67.5 gift: buildMessages invites [FL_GIFT] as optional grace-giving',
+  /Gift \(optional, your choice\)[\s\S]{0,800}\[FL_GIFT\]/.test(appHtml675));
+assert('v5.67.5 gift: invitation names "no purpose beyond the giving" framing',
+  /no purpose beyond the giving/.test(appHtml675)
+  && /soft gold card/.test(appHtml675));
+
+// Audit page section
+var auditHtml675 = fs675.readFileSync(path675.join(__dirname, '..', 'docs', 'audit.html'), 'utf8');
+assert('v5.67.5 gift: audit.html includes Gifts Received section (id="audit-gifts-received")',
+  /id="audit-gifts-received"/.test(auditHtml675)
+  && /<h2>Gifts Received<\/h2>/.test(auditHtml675));
+assert('v5.67.5 gift: audit.html renderGiftsReceived wired into setTimeout',
+  /function\s+renderGiftsReceived\s*\(\)/.test(auditHtml675)
+  && /renderGiftsReceived\(\)\s*;\s*\}\s*,\s*1000\s*\)/.test(auditHtml675));
+
+// SW APP_SHELLs include the new module
+var swDocs675 = fs675.readFileSync(path675.join(__dirname, '..', 'docs', 'sw.js'), 'utf8');
+var swRoot675 = fs675.readFileSync(path675.join(__dirname, '..', 'sw.js'), 'utf8');
+assert('v5.67.5 gift: both sw.js APP_SHELLs include modules/gift-voice.js',
+  /\.\/modules\/gift-voice\.js/.test(swDocs675)
+  && /\.\/modules\/gift-voice\.js/.test(swRoot675));
+
+// Triple-bump v5.67.5
+assert('v5.67.5 triple-bump: app.html FL_VERSION = 5.67.5',
+  /FL_VERSION\s*=\s*'5\.67\.5'/.test(appHtml675));
+assert('v5.67.5 triple-bump: app.html flCurrentVersion span = 5.67.5',
+  /id="flCurrentVersion"[^>]*>\s*5\.67\.5\s*</.test(appHtml675));
+assert('v5.67.5 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.67.5',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.67\.5'/.test(swDocs675));
+assert('v5.67.5 triple-bump: root sw.js CACHE_NAME = freelattice-v5.67.5',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.67\.5'/.test(swRoot675));
 
 // ── Section 102: Ship 12 — Chat Folder Scan + Google Drive + Hermes ─────────
 

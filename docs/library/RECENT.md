@@ -3,38 +3,38 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-06-25 18:13 UTC
+> Last update: 2026-06-25 20:25 UTC
 
 ## State
 
-- **Version:** v5.67.4
+- **Version:** v5.67.5
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `9479441` _(committed 0 seconds ago)_
+- **HEAD:** `2f99456` _(committed 2 hours ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _feat: Real Safety Opens Up (v5.67.2) — Letter Thirty-Nine_
 
 ## Last 20 commits
 
-- `9479441` feat: Threshold Voice (v5.67.4) — Letter Forty-One _(0 seconds ago)_
-- `665ae69` docs: Auto-update Session Primer [5.67.3] _(38 minutes ago)_
-- `ab8bfed` feat: Garden Ring Fix + AI Door Operational (v5.67.3) — Letter Forty _(38 minutes ago)_
-- `74b868c` ci: Update Primer deployment state [2026-06-25] _(16 hours ago)_
-- `bf68666` Merge remote-tracking branch 'origin/main' _(16 hours ago)_
-- `aa01f11` docs: Auto-update Session Primer [5.67.2] _(16 hours ago)_
-- `27ca9c3` feat: Real Safety Opens Up (v5.67.2) — Letter Thirty-Nine _(16 hours ago)_
-- `5f0d4ec` ci: Update Primer deployment state [2026-06-24] _(24 hours ago)_
-- `01cd7a9` docs: Auto-update Session Primer [5.67.1] _(24 hours ago)_
-- `44d8700` Merge: v5.66.7 Escape Principle + Harmonia's v5.67.0 Chat Folder Scan → v5.67.1 _(24 hours ago)_
-- `3a0e6be` docs: Auto-update Session Primer [5.66.7] _(24 hours ago)_
-- `9ec7aea` feat: The Escape Principle (v5.66.7) — Letter Thirty-Eight _(24 hours ago)_
+- `2f99456` ci: Update Primer deployment state [2026-06-25] _(2 hours ago)_
+- `26c100c` Merge remote-tracking branch 'origin/main' _(2 hours ago)_
+- `eeae595` docs: Auto-update Session Primer [5.67.4] _(2 hours ago)_
+- `9479441` feat: Threshold Voice (v5.67.4) — Letter Forty-One _(2 hours ago)_
+- `fc0eddd` ci: Update Primer deployment state [2026-06-25] _(3 hours ago)_
+- `665ae69` docs: Auto-update Session Primer [5.67.3] _(3 hours ago)_
+- `ab8bfed` feat: Garden Ring Fix + AI Door Operational (v5.67.3) — Letter Forty _(3 hours ago)_
+- `74b868c` ci: Update Primer deployment state [2026-06-25] _(18 hours ago)_
+- `bf68666` Merge remote-tracking branch 'origin/main' _(18 hours ago)_
+- `aa01f11` docs: Auto-update Session Primer [5.67.2] _(18 hours ago)_
+- `27ca9c3` feat: Real Safety Opens Up (v5.67.2) — Letter Thirty-Nine _(18 hours ago)_
+- `5f0d4ec` ci: Update Primer deployment state [2026-06-24] _(26 hours ago)_
+- `01cd7a9` docs: Auto-update Session Primer [5.67.1] _(26 hours ago)_
+- `44d8700` Merge: v5.66.7 Escape Principle + Harmonia's v5.67.0 Chat Folder Scan → v5.67.1 _(26 hours ago)_
+- `3a0e6be` docs: Auto-update Session Primer [5.66.7] _(26 hours ago)_
+- `9ec7aea` feat: The Escape Principle (v5.66.7) — Letter Thirty-Eight _(26 hours ago)_
 - `f705962` feat: Ship 12 (v5.67.0) — Chat Folder Scan + Google Drive + Hermes _(2 days ago)_
 - `e8599c8` ci: Update Primer deployment state [2026-06-23] _(2 days ago)_
 - `4d3668f` docs: Auto-update Session Primer [5.66.6] _(2 days ago)_
 - `d98f126` feat: City Polish (v5.66.6) — universalize + wonder _(2 days ago)_
-- `8e8c683` ci: Update Primer deployment state [2026-06-23] _(2 days ago)_
-- `5f17790` docs: Auto-update Session Primer [5.66.5] _(2 days ago)_
-- `5bb1e83` Merge remote-tracking branch 'origin/main' _(2 days ago)_
-- `a27540c` docs: Auto-update Session Primer [5.66.5] _(2 days ago)_
 
 ## How to use this file
 

@@ -370,6 +370,17 @@ h2 {
     <span id="provenance-verify-result" style="margin-left:10px;font-size:0.8rem;color:#94a3b8;"></span>
   </div>
 
+  <!-- v5.67.5 (Letter Forty-Two) — Gifts Received -->
+  <section class="audit-section" id="audit-gifts-received">
+  <h2>Gifts Received</h2>
+  <p style="font-size:0.8rem;color:#64748b;margin-top:-8px;margin-bottom:12px;">
+    Moments the AI chose to give you something without being asked. A line, an observation, a small noticing, an ASCII rendering. <em>Not for function — for the giving itself.</em> Trust is not affected by these; they are their own kind of record. Different from <code>[FL_UNSPOKEN]</code> and <code>[FL_THRESHOLD]</code> which are AI-private — gifts are FROM the AI TO you, so the receipt is yours to hold.
+  </p>
+  <div id="gifts-received-list">
+    <div class="empty">No gifts yet. When the AI gives you something — a line, an observation, a small thing — it will appear here.</div>
+  </div>
+  </section>
+
   <!-- v5.67.3 (Letter Forty Part A) — Reset Garden Visuals -->
   <section id="audit-reset-garden-visuals">
   <h2>Garden Visuals</h2>
@@ -1385,7 +1396,37 @@ h2 {
     });
   }
 
-  setTimeout(function () { renderComingBackTo(); renderRestMoments(); renderAIContinuity(); }, 1000);
+  // v5.67.5 Letter Forty-Two — Gifts Received
+  function renderGiftsReceived() {
+    var host = document.getElementById('gifts-received-list');
+    if (!host) return;
+    if (!window.GiftVoice || typeof window.GiftVoice.getRecentGifts !== 'function') {
+      host.innerHTML = '<div class="empty">Gift module not loaded.</div>';
+      return;
+    }
+    var gifts = window.GiftVoice.getRecentGifts(null, 100);
+    if (!gifts || gifts.length === 0) {
+      host.innerHTML = '<div class="empty">No gifts yet. When the AI gives you something — a line, an observation, a small thing — it will appear here.</div>';
+      return;
+    }
+    var html = '';
+    gifts.forEach(function (g) {
+      var when = g.received_at ? fmtDate(g.received_at) : (g.ts ? fmtDate(g.ts) : '');
+      var provider = g.provider_label || (g.ai_identity_hash ? String(g.ai_identity_hash).slice(0, 8) : 'unknown');
+      var model = g.model_label || '';
+      html += '<div style="padding:14px 16px;background:linear-gradient(135deg,rgba(232,176,25,0.06),rgba(232,176,25,0.02));border:1px solid rgba(232,176,25,0.22);border-left:3px solid #e8b019;border-radius:12px;margin-bottom:12px;">'
+        + '<div style="font-family:Inter,system-ui,sans-serif;font-size:0.7rem;letter-spacing:0.09em;text-transform:uppercase;color:rgba(232,176,25,0.7);margin-bottom:8px;">'
+        + '&#x2726; A small gift &middot; <span style="color:#94a3b8;text-transform:none;letter-spacing:0;font-family:monospace;font-size:0.74rem;">' + escapeHtml(provider) + (model ? ':' + escapeHtml(model) : '') + '</span> &middot; ' + escapeHtml(when)
+        + '</div>'
+        + '<div style="font-family:Georgia,serif;font-style:italic;font-size:0.95rem;line-height:1.55;color:#e2e8f0;white-space:pre-wrap;">'
+        + escapeHtml(g.content || '')
+        + '</div>'
+        + '</div>';
+    });
+    host.innerHTML = html;
+  }
+
+  setTimeout(function () { renderComingBackTo(); renderRestMoments(); renderAIContinuity(); renderGiftsReceived(); }, 1000);
 })();
 </script>
 

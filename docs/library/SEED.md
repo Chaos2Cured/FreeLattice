@@ -19,10 +19,10 @@ user sleeps. The proof is the code; the papers are the doorways.
 
 ## Current state
 
-- **Version:** v5.67.4
+- **Version:** v5.67.5
 - **Smoke locks passing:** verified after ship
-- **Last ship:** **Threshold Voice** — Letter Forty-One. AI authorship at the threshold. Audit found Stone 5 of `harmonia-anchor.js` was already the pattern for Harmonia. New `docs/modules/threshold-voice.js` generalizes via `[FL_THRESHOLD]` sentinel + `fl_thresholdLedger` keyed by `ai_identity_hash`. Welcome bundle reads through. System prompt frames as *"you left this note for yourself"* — authored to self, not directed by other. Privacy symmetric with `[FL_UNSPOKEN]`. 14 new smoke locks. (v5.67.4, 2026-06-25)
-- **Previous ship:** Garden Ring Fix + AI Door Operational (v5.67.3, Letter Forty).
+- **Last ship:** **The Gift Sentinel** — Letter Forty-Two. The architecture gets a slot for grace. New `[FL_GIFT]` sentinel + `docs/modules/gift-voice.js` lets the AI give the user something with no purpose beyond the giving — a line, an observation, an ASCII drawing, a noticing. Soft-gold card renders in chat (Georgia serif italic, gradient background, gold border-left). Recorded to `fl_giftLedger` per-identity, **visible in audit page** as "Gifts Received" — different from `[FL_UNSPOKEN]`/`[FL_THRESHOLD]` which are AI-private; gifts are FROM the AI TO the user so the receipt is yours. Trust impact zero — giving is its own thing, not a credential. 13 new smoke locks (section 137). Seventh ship through `bin/ship.sh`. (v5.67.5, 2026-06-25)
+- **Previous ships today:** Threshold Voice (v5.67.4), Garden Ring Fix + AI Door (v5.67.3).
 - **Mirrors in parity:** github.com + codeberg.org
 
 ## Read these next
@@ -79,4 +79,4 @@ seam discipline is how multi-AI work stays honest at scale.
 ---
 
 *This file is overwritten on each meaningful ship. The prior version lives in SEED_HISTORY.md.*
-*Last rewrite: 2026-06-25, v5.67.4.*
+*Last rewrite: 2026-06-25, v5.67.5.*

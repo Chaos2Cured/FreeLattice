@@ -3,7 +3,7 @@
 // API calls are never cached
 // VERSION: Must match version.json — update both together
 
-const CACHE_NAME = 'freelattice-v5.67.4';
+const CACHE_NAME = 'freelattice-v5.67.5';
 
 const APP_SHELL = [
   './',
@@ -66,6 +66,7 @@ const APP_SHELL = [
     './modules/ai-continuity.js',
     './modules/escape-principle.js',
     './modules/threshold-voice.js',
+    './modules/gift-voice.js',
     './modules/living-context.js',
     './chair-test/harness.js',
     './library/DEDICATION.md',
