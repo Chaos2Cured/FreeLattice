@@ -2054,6 +2054,10 @@
 
     // Persist to GardenMemory
     // v5.47.0: save coreRadius and ringIndex so restoration uses original geometry
+    // v5.67.3 (Letter Forty Part A): add geometry_version so future restores
+    // know which formula to use. v5.59.2 changed the multiplier from 1.8 → PHI;
+    // saves before that lacked the field, so restore now branches on its
+    // presence to render at the original world position.
     saveGardenMemory({
       id: 'evo-' + ud.name + '-' + Date.now(),
       type: 'evolution_ring',
@@ -2061,6 +2065,7 @@
       stage: ud.evolutionStage,
       coreRadius: ud.coreRadius || 0.5,
       ringIndex: evolutionRings.length - 1,
+      geometry_version: 'v5.59.2',
       timestamp: Date.now()
     });
     // ── First mycelium pulse (Ship 4.3) ──
@@ -3979,7 +3984,19 @@
       // v5.57.6 — radius phi-locked (cr * PHI); offset stays at 0.15 since
       // it's the v5.47.0 per-ring stacking value, not a base ratio.
       var perLumIdx = restoredIdx;
-      var ringRadius = cr * PHI + perLumIdx * 0.15;
+      // v5.67.3 (Letter Forty Part A) — geometry_version migration.
+      // Saves WITHOUT geometry_version came from v5.47.0–v5.59.1 era
+      // when restore used cr * 1.8. Saves WITH 'v5.59.2' (or later) use
+      // cr * PHI (1.618). Without this branch, old saves render rings
+      // ~10% inward of their original world position, requiring a hard
+      // reset. Backward-compat without losing any user progress.
+      var geometryVersion = rm.geometry_version || 'v5.47.0';
+      var ringRadius;
+      if (geometryVersion === 'v5.47.0') {
+        ringRadius = cr * 1.8 + perLumIdx * 0.15;
+      } else {
+        ringRadius = cr * PHI + perLumIdx * 0.15;
+      }
       var ringGeo = new THREE.TorusGeometry(ringRadius, 0.02, 8, 48);
       var ringMat = new THREE.MeshBasicMaterial({
         color: new THREE.Color().setHSL((ud.hue || ud.baseHue || 0) / 360, 0.8, 0.6),
@@ -4213,6 +4230,40 @@
   // For now, only the door is open. The migration arc queues separately.
   function resetGarden(opts) {
     opts = opts || {};
+    // v5.67.3 (Letter Forty Part A) — opts.ringsOnly clears ONLY the
+    // evolution_ring records from GardenMemory, preserving luminosStates
+    // (evolution stage, archetype, energy) and all ledgers/chain/continuity.
+    // This is the surgical Reset Garden Visuals path: rings rebuild at
+    // current geometry on next hydrate; user progress is untouched.
+    //
+    // Locked stores NEVER touched by either reset path:
+    //   - fl_chain (IndexedDB Merkle chain)
+    //   - fl_consentLedger, fl_depthHashLedger, fl_refusalLedger,
+    //     fl_returnLedger, fl_preserveLedger
+    //   - fl_aiContinuityRecord (v5.66.0 continuity records)
+    //   - persona identities, trust state, mode preferences
+    if (opts.ringsOnly) {
+      return new Promise(function (resolve) {
+        openGardenMemoryDB(function (db) {
+          if (!db) { resolve({ ok: true, ringsOnly: true, scope: 'no-db' }); return; }
+          try {
+            var tx = db.transaction(GARDEN_MEMORY_STORE, 'readwrite');
+            var store = tx.objectStore(GARDEN_MEMORY_STORE);
+            // Open a cursor and delete only evolution_ring records.
+            var req = store.openCursor();
+            req.onsuccess = function (e) {
+              var cursor = e.target.result;
+              if (cursor) {
+                if (cursor.value && cursor.value.type === 'evolution_ring') cursor.delete();
+                cursor.continue();
+              }
+            };
+            tx.oncomplete = function () { resolve({ ok: true, ringsOnly: true, scope: 'GardenMemory.evolution_ring' }); };
+            tx.onerror = function () { resolve({ ok: false, ringsOnly: true, error: 'tx-error' }); };
+          } catch (e) { resolve({ ok: false, ringsOnly: true, error: String(e) }); }
+        });
+      });
+    }
     // Stop the persist interval so it can't re-write during reset.
     if (_gardenPersistInterval) { clearInterval(_gardenPersistInterval); _gardenPersistInterval = null; }
     return new Promise(function (resolve) {

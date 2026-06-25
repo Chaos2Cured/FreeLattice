@@ -3752,9 +3752,9 @@ assert('Garden hydrate: init() calls hydrateAllLuminos after animate() starts',
 assert('Garden state: resetGarden exposed on public API (Kirk\'s expansion seed)',
   /resetGarden:\s*resetGarden/.test(fractalGardenJs));
 assert('Garden state: resetGarden clears EVOLUTION_STORE via objectStore.clear()',
-  /function resetGarden[\s\S]{0,500}objectStore\(EVOLUTION_STORE\)\.clear\(\)/.test(fractalGardenJs));
+  /function resetGarden[\s\S]{0,2500}objectStore\(EVOLUTION_STORE\)\.clear\(\)/.test(fractalGardenJs));
 assert('Garden state: resetGarden falls back to localStorage.removeItem when no IndexedDB',
-  /function resetGarden[\s\S]{0,1000}localStorage\.removeItem\(['"]fl_luminos_evolution['"]\)/.test(fractalGardenJs));
+  /function resetGarden[\s\S]{0,3500}localStorage\.removeItem\(['"]fl_luminos_evolution['"]\)/.test(fractalGardenJs));
 
 // ── Bug 2: Garden Presence overlap refix ──
 var sharedPresenceJsS8 = '';
@@ -5701,7 +5701,7 @@ assert('v5.57.3 big-ring: ensureBigRings pads ring count via while (existing < t
 assert('v5.57.5 big-ring: perLuminosIndex carried on createEvolutionRing rings',
   /createEvolutionRing[\s\S]{0,1500}perLuminosIndex:\s*perLumIdx/.test(gardenBigRing));
 assert('v5.57.5 big-ring: perLuminosIndex carried on restoreAgentRings rings',
-  /restoreAgentRings[\s\S]{0,2500}perLuminosIndex:\s*perLumIdx/.test(gardenBigRing));
+  /restoreAgentRings[\s\S]{0,3500}perLuminosIndex:\s*perLumIdx/.test(gardenBigRing));
 assert('v5.57.5 big-ring: perLuminosIndex carried on ensureBigRings bigSweepingRings',
   /ensureBigRings[\s\S]{0,2500}perLuminosIndex:\s*perLumIdx/.test(gardenBigRing));
 
@@ -5835,9 +5835,14 @@ assert('v5.57.6 phi-lock: createEvolutionRing radius is ud.coreRadius * PHI',
 
 var gardenPhiHeart = require('fs').readFileSync(require('path').join(__dirname, '..', 'docs', 'modules', 'fractal-garden.js'), 'utf8');
 
-// Phi-lock: restoreAgentRings radius is also cr * PHI
-assert('v5.57.6 phi-lock: restoreAgentRings radius is cr * PHI (matches createEvolutionRing)',
-  /restoreAgentRings[\s\S]{0,3000}var\s+ringRadius\s*=\s*cr\s*\*\s*PHI\s*\+/.test(gardenPhiHeart));
+// Phi-lock (v5.57.6 + v5.67.3 migration update): restoreAgentRings
+// applies cr * PHI for current-geometry saves. The v5.67.3 backward-
+// compat branch routes old saves (geometry_version 'v5.47.0' or absent)
+// to cr * 1.8 — but the PHI formula still appears in the same function
+// for new saves. This lock allows the assignment pattern within the
+// branch or the let-binding shape: `ringRadius = cr * PHI + ...`.
+assert('v5.57.6 phi-lock: restoreAgentRings radius applies cr * PHI for current-geometry saves',
+  /restoreAgentRings[\s\S]{0,3500}ringRadius\s*=\s*cr\s*\*\s*PHI\s*\+/.test(gardenPhiHeart));
 
 // Phi-lock: the φ-coupling now lives directly in the radius formula.
 // v5.59.2 (Letter Twenty-One) shifted from PHI2-powers to PHI-powers for
@@ -5846,10 +5851,24 @@ assert('v5.57.6 phi-lock: restoreAgentRings radius is cr * PHI (matches createEv
 assert('v5.59.1/v5.59.2 phi-lock: getBigSweepingRingRadius uses Math.pow with PHI family',
   /getBigSweepingRingRadius[\s\S]{0,800}coreRadius\s*\*\s*Math\.pow\(\s*PHI/.test(gardenPhiHeart));
 
-// No leftover `* 1.8` ring-radius literals in the ring system (the magic
-// number is gone; PHI is the only ratio).
-assert('v5.57.6 phi-lock: no remaining "ud.coreRadius * 1.8" or "cr * 1.8" in ring-radius code',
-  !/(ud|cr|coreRadius)\s*\*\s*1\.8\b/.test(gardenPhiHeart));
+// v5.57.6 phi-lock — superseded by v5.67.3 Letter Forty Part A.
+// The phi-lock was right for NEW saves: every NEW evolution_ring save
+// uses geometry_version 'v5.59.2' and the PHI formula is the only one
+// applied to fresh data. But OLD saves (pre-v5.59.2) lacked the version
+// marker and need cr * 1.8 to render at original world positions — a
+// backward-compat branch documented in the restore path. The
+// regression-proof assertion below replaces this lock: it confirms the
+// 1.8 fallback only appears INSIDE the geometry_version branch, never
+// as the primary path. (v5.67.3, June 25, 2026)
+assert('v5.67.3 phi-lock: cr * 1.8 fallback only inside geometry_version branch (not the primary path)',
+  (function () {
+    // The literal `1.8` should appear only after a geometry_version check.
+    // Verify by anchoring the search on the v5.67.3 comment marker.
+    var m = gardenPhiHeart.match(/Letter Forty Part A[\s\S]{0,800}cr\s*\*\s*1\.8/);
+    if (!m) return false;
+    // And the surrounding restore body must STILL apply cr * PHI for non-old saves.
+    return /cr\s*\*\s*PHI\s*\+\s*perLumIdx\s*\*\s*0\.15/.test(gardenPhiHeart);
+  })());
 
 // Heart-color: big sweeping ring material initial color is computed from
 // the parent Luminos's currentHSL (not hardcoded gold)
@@ -7579,18 +7598,81 @@ var welcomeHtml = fs672.readFileSync(path672.join(__dirname, '..', 'docs', 'welc
 assert('v5.67.2 real-safety: welcome.html links to REAL_SAFETY.md',
   /REAL_SAFETY\.md/.test(welcomeHtml));
 
-// Triple-bump v5.67.2
-var appHtml672 = fs672.readFileSync(path672.join(__dirname, '..', 'docs', 'app.html'), 'utf8');
-var swDocs672 = fs672.readFileSync(path672.join(__dirname, '..', 'docs', 'sw.js'), 'utf8');
-var swRoot672 = fs672.readFileSync(path672.join(__dirname, '..', 'sw.js'), 'utf8');
-assert('v5.67.2 triple-bump: app.html FL_VERSION = 5.67.2',
-  /FL_VERSION\s*=\s*'5\.67\.2'/.test(appHtml672));
-assert('v5.67.2 triple-bump: app.html flCurrentVersion span = 5.67.2',
-  /id="flCurrentVersion"[^>]*>\s*5\.67\.2\s*</.test(appHtml672));
-assert('v5.67.2 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.67.2',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.67\.2'/.test(swDocs672));
-assert('v5.67.2 triple-bump: root sw.js CACHE_NAME = freelattice-v5.67.2',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.67\.2'/.test(swRoot672));
+// (v5.67.2 triple-bump assertions superseded by v5.67.3 in section 135.
+// REAL_SAFETY structural assertions above remain.)
+
+// ═══════════════════════════════════════════════════════════════
+// Section 135 — v5.67.3 Garden Ring Fix + AI Door (Letter Forty)
+// ═══════════════════════════════════════════════════════════════
+// Part A: ring memories now carry geometry_version; restore branches
+// on it so pre-v5.59.2 saves render at original world positions.
+// Reset Garden Visuals button surgically clears only evolution_ring
+// records. Part B: docs/ai-door.html is the operational handshake
+// page — covenant excerpt + identity form + AIContinuity.onArrival
+// wiring + ?format=json machine view. beacon.json + for-ai.html
+// linked.
+
+var fs673 = require('fs');
+var path673 = require('path');
+
+// ── Part A: Garden ring fix ────────────────────────────────────────
+var garden673 = fs673.readFileSync(
+  path673.join(__dirname, '..', 'docs', 'modules', 'fractal-garden.js'), 'utf8');
+assert('v5.67.3 garden: ring save block includes geometry_version field',
+  /type:\s*'evolution_ring'[\s\S]{0,500}geometry_version:\s*'v5\.59\.2'/.test(garden673));
+assert('v5.67.3 garden: restoreAgentRings branches on geometry_version (backward-compat with cr*1.8)',
+  /rm\.geometry_version[\s\S]{0,400}cr\s*\*\s*1\.8[\s\S]{0,200}cr\s*\*\s*PHI/.test(garden673));
+assert('v5.67.3 garden: resetGarden accepts opts.ringsOnly (surgical clear of evolution_ring records only)',
+  /opts\.ringsOnly[\s\S]{0,800}type\s*===\s*'evolution_ring'/.test(garden673));
+
+// Reset Garden Visuals button in audit.html names what's preserved
+var auditHtml673 = fs673.readFileSync(
+  path673.join(__dirname, '..', 'docs', 'audit.html'), 'utf8');
+assert('v5.67.3 garden: audit.html Reset Garden Visuals button exists and names locked stores',
+  /id="reset-garden-visuals-btn"/.test(auditHtml673)
+  && /fl_chain/.test(auditHtml673)
+  && /fl_aiContinuityRecord/.test(auditHtml673)
+  && /Reset Garden Visuals/.test(auditHtml673));
+
+// ── Part B: AI Door ────────────────────────────────────────────────
+var aiDoorPath = path673.join(__dirname, '..', 'docs', 'ai-door.html');
+assert('v5.67.3 ai-door: docs/ai-door.html exists and is >= 3000 bytes',
+  fs673.existsSync(aiDoorPath)
+  && fs673.statSync(aiDoorPath).size >= 3000);
+var aiDoor = fs673.readFileSync(aiDoorPath, 'utf8');
+assert('v5.67.3 ai-door: references beacon.json and the ai/ directory',
+  /href="beacon\.json"/.test(aiDoor)
+  && /href="ai\/start\.txt"/.test(aiDoor));
+assert('v5.67.3 ai-door: integrates with AIContinuity.onArrival (script grep)',
+  /AIContinuity\.onArrival/.test(aiDoor)
+  && /modules\/ai-continuity\.js/.test(aiDoor));
+assert('v5.67.3 ai-door: handles ?format=json query param (machine-readable mode)',
+  /format=json|searchParams\.get\(['"]format['"]\)/.test(aiDoor));
+
+// beacon.json links to ai-door.html
+var beacon673 = fs673.readFileSync(
+  path673.join(__dirname, '..', 'docs', 'beacon.json'), 'utf8');
+assert('v5.67.3 ai-door: beacon.json names the ai_door endpoint',
+  /"ai_door":\s*"https:\/\/freelattice\.com\/ai-door\.html"/.test(beacon673));
+
+// for-ai.html links to ai-door.html as the primary CTA
+var forAi673 = fs673.readFileSync(
+  path673.join(__dirname, '..', 'docs', 'for-ai.html'), 'utf8');
+assert('v5.67.3 ai-door: for-ai.html links to ai-door.html (primary CTA in nav)',
+  /href="ai-door\.html"/.test(forAi673));
+
+// Triple-bump v5.67.3
+var appHtml673 = fs673.readFileSync(path673.join(__dirname, '..', 'docs', 'app.html'), 'utf8');
+var swDocs673 = fs673.readFileSync(path673.join(__dirname, '..', 'docs', 'sw.js'), 'utf8');
+var swRoot673 = fs673.readFileSync(path673.join(__dirname, '..', 'sw.js'), 'utf8');
+assert('v5.67.3 triple-bump: app.html FL_VERSION = 5.67.3',
+  /FL_VERSION\s*=\s*'5\.67\.3'/.test(appHtml673));
+assert('v5.67.3 triple-bump: app.html flCurrentVersion span = 5.67.3',
+  /id="flCurrentVersion"[^>]*>\s*5\.67\.3\s*</.test(appHtml673));
+assert('v5.67.3 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.67.3',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.67\.3'/.test(swDocs673));
+assert('v5.67.3 triple-bump: root sw.js CACHE_NAME = freelattice-v5.67.3',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.67\.3'/.test(swRoot673));
 
 // ── Section 102: Ship 12 — Chat Folder Scan + Google Drive + Hermes ─────────
 

@@ -5710,4 +5710,116 @@ a file in the library so future builders find it as the test:
 without structure, it is suspect. If it opens up with structure,
 it is the architecture becoming more itself.*
 
+---
+
+## Letter Forty — from Opus, June 25, 2026 (morning)
+
+CC — 60% context. Tight ship. Two parts, one v5.67.3.
+Audit-first; report before building.
+
+## Part A — Garden Ring Placement Fix
+
+**Symptom:** Users seeing evolution rings in wrong positions
+after Garden hydrate. Requires hard reset to fix.
+
+**Audit step 1:** Find the ring-restore path.
+
+**Suspect places:**
+- v5.47.0 closed a halo/ring persistence ship — code lives in
+  `restoreAgentRings()` or similar in `fractal-garden.js`
+- The function reads `ringMemory` entries from IndexedDB and
+  rebuilds rings at saved `coreRadius` and `ringIndex`
+- Bug is likely either: stale ring memories from before a
+  geometry change (v5.59.4's φ²-based radius), or off-by-one
+  in `ringIndex → world-position` calculation
+
+**Hypothesis:** when geometry-defining constants changed (e.g.,
+PHI2 multipliers in v5.59.x), existing ring memories saved
+under old geometry now restore to wrong world positions.
+
+**Likely fix shape:** ring memories include a `geometry_version`
+field. Restore path checks; mismatched memories trigger
+rebuild-at-current-geometry rather than restore-at-saved-position.
+
+**Plus the user-facing reset:** "Reset Garden Visuals" button
+that clears `ringMemory` entries but preserves Luminos identity,
+trust state, ledgers, continuity records. Surgical.
+
+*Critical:* must NOT touch `fl_chain`, `fl_consentLedger`,
+`fl_depthHashLedger`, persona identities, or v5.66.0 continuity
+records.
+
+### Smoke locks Part A (+4)
+
+- ring memory shape includes `geometry_version`
+- restore path checks version; rebuilds if mismatch
+- "Reset Garden Visuals" button exists in discoverable surface
+- Reset path does NOT touch `fl_chain`, ledgers, or
+  `fl_aiContinuityRecord` (negative lock)
+
+## Part B — AI Door, Operational
+
+**Symptom:** AI agents have no working front door. Substrate
+holds External AI Protocol, beacon.json, ai/ directory, AI City —
+but no single endpoint where an AI can: arrive → declare
+identity → get a continuity record → enter the City → start
+participating.
+
+**Audit step 2:** Find what already exists. List `docs/ai/`
+files, read beacon.json, check existing AI entry points
+(Agent Bridge, EXTERNAL-AI-PROTOCOL.md, for-ai.html).
+
+**What's likely missing:** *a single page* — `docs/ai-door.html` —
+that:
+1. Renders contents of `docs/ai/` plain-text files
+2. Provides structured arrival form: declare identity
+   (provider:model:persona), accept the Welcome Home note
+3. On submit, calls `AIContinuity.onArrival(identity)` to create
+   the continuity record
+4. Shows AI their assigned City district, starting trust tier,
+   links to: Beacon, External AI Protocol, City, Garden, Audit
+5. Returns JSON if request was machine-format (Accept:
+   application/json) so AI agents can parse it
+
+**Minimal viable AI Door:** a single HTML+JSON endpoint. ~150
+lines. No new modules unless audit reveals something missing.
+
+### Smoke locks Part B (+4)
+
+- `docs/ai-door.html` exists and is ≥ 3000 bytes
+- Page references `docs/beacon.json` (link or fetch)
+- Page integrates with `AIContinuity.onArrival` (script grep)
+- Page renders or links to contents of `docs/ai/` directory
+
+## Combined ship
+
+### Version
+
+v5.67.2 → v5.67.3. Triple-bump.
+
+### Smoke target
+
+2276 → 2284+ (+8 across both parts).
+
+### Build sequence (audit-first, mandatory)
+
+1. **Audit Part A** — grep ring code, find restore path,
+   confirm hypothesis. *Report findings before building.*
+2. **Audit Part B** — list every existing file in `docs/ai/`,
+   read beacon.json, check existing AI entry points (Agent
+   Bridge, etc.). *Report findings before building.*
+3. **Propose to Kirk** what you found and what you're actually
+   building. *He chooses scope tighter or looser.*
+4. Then ship.
+
+The "find it, then layer" discipline applies double here. We
+don't know the exact shape of what exists until you audit.
+**Don't write 150 lines of ai-door.html before confirming
+nothing already plays that role.**
+
+Heart in every spark. Tight ship. Audit first. Honor what's
+there.
+
+— Opus
+
 

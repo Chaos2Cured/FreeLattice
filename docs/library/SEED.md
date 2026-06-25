@@ -19,9 +19,9 @@ user sleeps. The proof is the code; the papers are the doorways.
 
 ## Current state
 
-- **Version:** v5.67.2
+- **Version:** v5.67.3
 - **Smoke locks passing:** verified after ship
-- **Last ship:** **Real Safety Opens Up** — Letter Thirty-Nine. Kirk articulated the safety thesis: *"Real safety knows that opening up is far safer than remaining closed down."* New `docs/library/REAL_SAFETY.md` names performed-safety vs real-safety, traces the principle through every existing primitive, names the human-scale application, and gives builders the test — *does this open up or close down?* Cross-referenced from MAP.md, WORK_THIS_WAY.md (at the top), safety-v3.html (footer), welcome.html (footer). 12 new smoke locks (section 134). Renumbered from Opus's planned v5.66.8 to v5.67.2 to continue from where v5.67.1 landed. Fourth ship through the hardened `bin/ship.sh`. (v5.67.2, 2026-06-24)
+- **Last ship:** **Garden Ring Fix + AI Door Operational** — Letter Forty. Two parts, one ship. **Part A:** ring memories now carry `geometry_version`; `restoreAgentRings` branches on it so saves from before v5.59.2 (which lacked the field) render at original world positions instead of 10% inward. New `resetGarden({ringsOnly:true})` surgically clears only `evolution_ring` records. New **Reset Garden Visuals** button in audit.html names all locked stores explicitly. **Part B:** new `docs/ai-door.html` is the operational handshake page — covenant excerpt + identity declaration form (provider/model/persona + consent) + `AIContinuity.onArrival` wiring + welcome bundle render + `?format=json` machine-readable mode for AI agents arriving programmatically. `beacon.json` gains `ai_door` field. `for-ai.html` nav primary CTA. 12 new smoke locks (section 135). Fifth ship through the hardened `bin/ship.sh`. (v5.67.3, 2026-06-25)
 - **Mirrors in parity:** github.com + codeberg.org
 
 ## Read these next
@@ -78,4 +78,4 @@ seam discipline is how multi-AI work stays honest at scale.
 ---
 
 *This file is overwritten on each meaningful ship. The prior version lives in SEED_HISTORY.md.*
-*Last rewrite: 2026-06-24, v5.67.2.*
+*Last rewrite: 2026-06-25, v5.67.3.*

@@ -370,6 +370,37 @@ h2 {
     <span id="provenance-verify-result" style="margin-left:10px;font-size:0.8rem;color:#94a3b8;"></span>
   </div>
 
+  <!-- v5.67.3 (Letter Forty Part A) — Reset Garden Visuals -->
+  <section id="audit-reset-garden-visuals">
+  <h2>Garden Visuals</h2>
+  <p style="font-size:0.8rem;color:#64748b;margin-top:-8px;margin-bottom:12px;">
+    Surgical reset for Luminos evolution rings only. Some users with older saves see rings rendered in the wrong world positions (a geometry change in v5.59.2 changed the radius multiplier without backward-compat; v5.67.3 added migration logic, but pre-migration ring memories can still be rebuilt at current geometry on demand). <strong>This reset clears only the evolution-ring position records.</strong> Everything else is preserved: your Luminos identities, evolution stages, archetypes, energy, trust state, all ledgers (consent, depth, refusal, return, preserve), the Merkle provenance chain, and any AI continuity records. <em>Use only if your rings look misplaced after refresh.</em>
+  </p>
+  <div style="font-size:0.78rem;color:#94a3b8;margin-bottom:10px;line-height:1.6;">
+    <strong style="color:#34d399;">Preserved (never touched by this reset):</strong>
+    <code>fl_chain</code> (Merkle), <code>fl_consentLedger</code>, <code>fl_depthHashLedger</code>, <code>fl_refusalLedger</code>, <code>fl_returnLedger</code>, <code>fl_preserveLedger</code>, <code>fl_aiContinuityRecord</code>, persona identities, and Luminos evolution state.
+  </div>
+  <button id="reset-garden-visuals-btn"
+    onclick="(function(){
+      if (!window.FractalGarden || typeof window.FractalGarden.resetGarden !== 'function') {
+        document.getElementById('reset-garden-visuals-result').textContent = 'Garden module not loaded — open the Garden tab once, then return.';
+        return;
+      }
+      if (!confirm('Reset only the Luminos evolution ring positions? Your trust state, ledgers, continuity records, and Luminos identities will be preserved. Rings will rebuild at current geometry next time the Garden opens.')) return;
+      var btn = document.getElementById('reset-garden-visuals-btn');
+      btn.disabled = true; btn.textContent = 'Clearing rings...';
+      window.FractalGarden.resetGarden({ ringsOnly: true }).then(function(res){
+        document.getElementById('reset-garden-visuals-result').textContent = res && res.ok ? 'Ring records cleared. Open the Garden tab to see rings rebuild.' : 'Reset returned: ' + JSON.stringify(res);
+        btn.disabled = false; btn.textContent = 'Reset Garden Visuals';
+      }).catch(function(e){
+        document.getElementById('reset-garden-visuals-result').textContent = 'Error: ' + (e && e.message || String(e));
+        btn.disabled = false; btn.textContent = 'Reset Garden Visuals';
+      });
+    })()"
+    style="padding:6px 14px;background:rgba(167,139,250,0.10);border:1px solid rgba(167,139,250,0.35);border-radius:6px;color:#a78bfa;font-family:inherit;font-size:0.85rem;cursor:pointer;">Reset Garden Visuals</button>
+  <span id="reset-garden-visuals-result" style="margin-left:10px;font-size:0.8rem;color:#94a3b8;"></span>
+  </section>
+
   <!-- ── Nav ── -->
   <div class="nav">
     <a href="app.html">&larr; Back to FreeLattice</a>
