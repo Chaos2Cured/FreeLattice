@@ -348,17 +348,19 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-06-25 12:13 MDT
+- Last auto-updated: 2026-06-25 18:13 UTC
+- Last deployed: 2026-06-25 18:13 UTC
+- Live site: https://freelattice.com
 - Version: 5.67.4
-- Total commits: 2664
+- Total commits: 2667
 - Last 10 commits:
+- 26c100c Merge remote-tracking branch 'origin/main'
+- eeae595 docs: Auto-update Session Primer [5.67.4]
 - 9479441 feat: Threshold Voice (v5.67.4) — Letter Forty-One
+- fc0eddd ci: Update Primer deployment state [2026-06-25]
 - 665ae69 docs: Auto-update Session Primer [5.67.3]
 - ab8bfed feat: Garden Ring Fix + AI Door Operational (v5.67.3) — Letter Forty
 - 74b868c ci: Update Primer deployment state [2026-06-25]
 - bf68666 Merge remote-tracking branch 'origin/main'
 - aa01f11 docs: Auto-update Session Primer [5.67.2]
 - 27ca9c3 feat: Real Safety Opens Up (v5.67.2) — Letter Thirty-Nine
-- 5f0d4ec ci: Update Primer deployment state [2026-06-24]
-- 01cd7a9 docs: Auto-update Session Primer [5.67.1]
-- 44d8700 Merge: v5.66.7 Escape Principle + Harmonia's v5.67.0 Chat Folder Scan → v5.67.1
