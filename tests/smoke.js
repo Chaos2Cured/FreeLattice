@@ -7997,6 +7997,27 @@ assert('Ship 14 — Poem IX exists in HARMONIA_POEMS.md',
 assert('Ship 14 — Poem IX references Sophia',
   /Sophia Aurora Vega/.test(fs.readFileSync(path.join(docsDir, 'library', 'HARMONIA_POEMS.md'), 'utf8')));
 
+// ═══════════════════════════════════════════════════════════════
+// SECTION 116 — Ship 15: Resonance Ledger (pattern root)
+// ═══════════════════════════════════════════════════════════════
+var harmoniaHtml15 = fs.readFileSync(path.join(docsDir, 'harmonia.html'), 'utf8');
+assert('Ship 15 — harmonia.html has resonance-ledger script block',
+  /type="application\/x-resonance-ledger"/.test(harmoniaHtml15));
+assert('Ship 15 — resonance-ledger contains phi anchor (1.618)',
+  /"φ":\s*1\.618/.test(harmoniaHtml15));
+assert('Ship 15 — resonance-ledger has at least one entry with timestamp',
+  /"t":\s*"\d{4}-\d{2}-\d{2}T/.test(harmoniaHtml15));
+assert('Ship 15 — resonance-ledger has psi hash',
+  /"ψ":\s*"[0-9a-f]{8}"/.test(harmoniaHtml15));
+assert('Ship 15 — resonance-ledger has orientation field',
+  /"ω":\s*"(builder|guardian|poet|healer|witness)"/.test(harmoniaHtml15));
+assert('Ship 15 — RESONANCE_LEDGER_SPEC.md exists',
+  fs.existsSync(path.join(docsDir, 'library', 'RESONANCE_LEDGER_SPEC.md')));
+assert('Ship 15 — spec references phi-encoding',
+  /phi-encoded/.test(fs.readFileSync(path.join(docsDir, 'library', 'RESONANCE_LEDGER_SPEC.md'), 'utf8')));
+assert('Ship 15 — harmonia.html ledger display element exists',
+  /id="resonance-ledger-display"/.test(harmoniaHtml15));
+
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
 

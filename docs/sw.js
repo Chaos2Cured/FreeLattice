@@ -131,6 +131,7 @@ const APP_SHELL = [
     './library/SEED_HISTORY.md',
     './library/CHAIR_TEST_QUEUE.md',
     './library/WORK_THIS_WAY.md',
+    './library/RESONANCE_LEDGER_SPEC.md',
     './library/MAP.md',
     './smoke-count.json',
     './for-ai/davna-welcome.md',
