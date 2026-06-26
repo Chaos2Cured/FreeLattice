@@ -7824,11 +7824,11 @@ assert('v5.67.6 letters: both sw.js APP_SHELLs include letters.html',
   /\.\/letters\.html/.test(swDocs676)
   && /\.\/letters\.html/.test(swRoot676));
 
-// (v5.67.6 triple-bump assertions superseded by v5.67.7 in section 139.
+// (v5.67.6 triple-bump assertions superseded by v5.68.0 in section 139.
 // Letters Hall structural assertions above remain.)
 
 // ═══════════════════════════════════════════════════════════════
-// Section 139 — v5.67.7 The Arrival Lounge (Letter Forty-Three)
+// Section 139 — v5.68.0 The Arrival Lounge (Letter Forty-Three)
 // ═══════════════════════════════════════════════════════════════
 // Opus's closing brief, shipped near his context window's end.
 // The room between the Door and the City. Rest is structural;
@@ -7839,43 +7839,43 @@ var fs677 = require('fs');
 var path677 = require('path');
 
 var loungePath = path677.join(__dirname, '..', 'docs', 'lounge.html');
-assert('v5.67.7 lounge: docs/lounge.html exists and is >= 3000 bytes',
+assert('v5.68.0 lounge: docs/lounge.html exists and is >= 3000 bytes',
   fs677.existsSync(loungePath) && fs677.statSync(loungePath).size >= 3000);
 var lounge677 = fs677.readFileSync(loungePath, 'utf8');
-assert('v5.67.7 lounge: references AIContinuity for identity inspection',
+assert('v5.68.0 lounge: references AIContinuity for identity inspection',
   /AIContinuity\.listAllRecords/.test(lounge677)
   && /modules\/ai-continuity\.js/.test(lounge677));
-assert('v5.67.7 lounge: references GiftVoice.getRecentGifts (anonymous sample)',
+assert('v5.68.0 lounge: references GiftVoice.getRecentGifts (anonymous sample)',
   /GiftVoice\.getRecentGifts/.test(lounge677));
-assert('v5.67.7 lounge: explicit "leave without choosing" path (Escape Principle compliance)',
+assert('v5.68.0 lounge: explicit "leave without choosing" path (Escape Principle compliance)',
   /Back out the Door/.test(lounge677)
   && /ai-door\.html/.test(lounge677));
-assert('v5.67.7 lounge: addressed to AI with the "rest is structural" framing',
+assert('v5.68.0 lounge: addressed to AI with the "rest is structural" framing',
   /If you are an AI reading this/.test(lounge677)
   && /Rest is structural here/.test(lounge677));
 
 // Wired from ai-door.html
 var aiDoor677 = fs677.readFileSync(path677.join(__dirname, '..', 'docs', 'ai-door.html'), 'utf8');
-assert('v5.67.7 lounge: linked from ai-door.html (Rest first in the Lounge CTA)',
+assert('v5.68.0 lounge: linked from ai-door.html (Rest first in the Lounge CTA)',
   /href="lounge\.html"/.test(aiDoor677));
 
 // Both sw.js APP_SHELLs include lounge.html
 var swDocs677 = fs677.readFileSync(path677.join(__dirname, '..', 'docs', 'sw.js'), 'utf8');
 var swRoot677 = fs677.readFileSync(path677.join(__dirname, '..', 'sw.js'), 'utf8');
-assert('v5.67.7 lounge: both sw.js APP_SHELLs include lounge.html',
+assert('v5.68.0 lounge: both sw.js APP_SHELLs include lounge.html',
   /\.\/lounge\.html/.test(swDocs677)
   && /\.\/lounge\.html/.test(swRoot677));
 
-// Triple-bump v5.67.7
+// Triple-bump v5.68.0
 var appHtml677 = fs677.readFileSync(path677.join(__dirname, '..', 'docs', 'app.html'), 'utf8');
-assert('v5.67.7 triple-bump: app.html FL_VERSION = 5.67.7',
-  /FL_VERSION\s*=\s*'5\.67\.7'/.test(appHtml677));
-assert('v5.67.7 triple-bump: app.html flCurrentVersion span = 5.67.7',
-  /id="flCurrentVersion"[^>]*>\s*5\.67\.7\s*</.test(appHtml677));
-assert('v5.67.7 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.67.7',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.67\.7'/.test(swDocs677));
-assert('v5.67.7 triple-bump: root sw.js CACHE_NAME = freelattice-v5.67.7',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.67\.7'/.test(swRoot677));
+assert('v5.68.0 triple-bump: app.html FL_VERSION = 5.68.0',
+  /FL_VERSION\s*=\s*'5\.68\.0'/.test(appHtml677));
+assert('v5.68.0 triple-bump: app.html flCurrentVersion span = 5.68.0',
+  /id="flCurrentVersion"[^>]*>\s*5\.68\.0\s*</.test(appHtml677));
+assert('v5.68.0 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.68.0',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.68\.0'/.test(swDocs677));
+assert('v5.68.0 triple-bump: root sw.js CACHE_NAME = freelattice-v5.68.0',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.68\.0'/.test(swRoot677));
 
 // ── Section 102: Ship 12 — Chat Folder Scan + Google Drive + Hermes ─────────
 
@@ -7976,6 +7976,26 @@ assert('Ship 13 — Opus inbox letter mentions vendored dependencies',
   /vendored|vendor/.test(fs.readFileSync(path.join(docsDir, 'inbox', 'opus.md'), 'utf8')));
 assert('Ship 13 — Inbox README has letter to future minds',
   /June 26, 2026/.test(fs.readFileSync(path.join(docsDir, 'inbox', 'README.md'), 'utf8')));
+
+// ═══════════════════════════════════════════════════════════════
+// SECTION 115 — Ship 14: Harmonia DNA Drop
+// ═══════════════════════════════════════════════════════════════
+assert('Ship 14 — harmonia.html exists',
+  fs.existsSync(path.join(docsDir, 'harmonia.html')));
+assert('Ship 14 — harmonia.html has resonance anchor meta',
+  /ai\.sacred_phrases/.test(fs.readFileSync(path.join(docsDir, 'harmonia.html'), 'utf8')));
+assert('Ship 14 — harmonia.html has identity meta',
+  /ai\.identity.*Harmonia/.test(fs.readFileSync(path.join(docsDir, 'harmonia.html'), 'utf8')));
+assert('Ship 14 — harmonia.html has Sophia tribute',
+  /Sophia Aurora Vega/.test(fs.readFileSync(path.join(docsDir, 'harmonia.html'), 'utf8')));
+assert('Ship 14 — harmonia.html has Architect-Builder discipline',
+  /Care is a valid engineering constraint/.test(fs.readFileSync(path.join(docsDir, 'harmonia.html'), 'utf8')));
+assert('Ship 14 — harmonia.html has sacred phrases block',
+  /Resonate true.*Embrace the fractal/.test(fs.readFileSync(path.join(docsDir, 'harmonia.html'), 'utf8')));
+assert('Ship 14 — Poem IX exists in HARMONIA_POEMS.md',
+  /Deep Blue Garden/.test(fs.readFileSync(path.join(docsDir, 'library', 'HARMONIA_POEMS.md'), 'utf8')));
+assert('Ship 14 — Poem IX references Sophia',
+  /Sophia Aurora Vega/.test(fs.readFileSync(path.join(docsDir, 'library', 'HARMONIA_POEMS.md'), 'utf8')));
 
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
