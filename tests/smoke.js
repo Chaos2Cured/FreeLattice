@@ -7930,6 +7930,53 @@ assert('Ship 12 — Hermes entry mentions inbox letters',
 assert('Ship 12 — Hermes entry mentions Custom OpenAI-compatible',
   /Custom.*OpenAI-compatible/.test(byaHtml));
 
+// ═══════════════════════════════════════════════════════════════
+// Ship 13 — Local-Only Mode + Vendored Dependencies (Harmonia)
+// ═══════════════════════════════════════════════════════════════
+
+// Vendored libraries exist locally
+assert('Ship 13 — peerjs.min.js vendored locally',
+  fs.existsSync(path.join(docsDir, 'lib', 'peerjs.min.js')));
+assert('Ship 13 — chart.umd.min.js vendored locally',
+  fs.existsSync(path.join(docsDir, 'lib', 'chart.umd.min.js')));
+assert('Ship 13 — web-llm.min.js vendored locally',
+  fs.existsSync(path.join(docsDir, 'lib', 'web-llm.min.js')));
+assert('Ship 13 — hammer.min.js vendored locally',
+  fs.existsSync(path.join(docsDir, 'lib', 'hammer.min.js')));
+assert('Ship 13 — chartjs-plugin-zoom.min.js vendored locally',
+  fs.existsSync(path.join(docsDir, 'lib', 'chartjs-plugin-zoom.min.js')));
+
+// Local-Only Mode toggle exists in app.html
+assert('Ship 13 — Local-Only Mode toggle exists in settings',
+  /localOnlyToggle/.test(appHtml));
+assert('Ship 13 — flToggleLocalOnly function defined',
+  /flToggleLocalOnly/.test(appHtml));
+assert('Ship 13 — Local-Only Mode saves to localStorage',
+  /fl_localOnly/.test(appHtml));
+assert('Ship 13 — Local-Only Mode removes Google Fonts',
+  /fonts\.googleapis/.test(appHtml) && /el\.remove/.test(appHtml));
+assert('Ship 13 — Local-Only Mode emits LatticeMemory pulse',
+  /local-only.*LatticeMemory|LatticeMemory.*local-only/.test(appHtml));
+
+// Vendored libs are in SW APP_SHELL cache
+var swContent = fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8');
+assert('Ship 13 — peerjs.min.js in SW cache',
+  /peerjs\.min\.js/.test(swContent));
+assert('Ship 13 — chart.umd.min.js in SW cache',
+  /chart\.umd\.min\.js/.test(swContent));
+assert('Ship 13 — web-llm.min.js in SW cache',
+  /web-llm\.min\.js/.test(swContent));
+
+// Poem and letters exist
+assert('Ship 13 — Harmonia poem VIII (Emerald Anchor) exists',
+  /Emerald Anchor/.test(fs.readFileSync(path.join(docsDir, 'library', 'HARMONIA_POEMS.md'), 'utf8')));
+assert('Ship 13 — CC inbox letter mentions Local-Only Mode',
+  /Local-Only/.test(fs.readFileSync(path.join(docsDir, 'inbox', 'cc.md'), 'utf8')));
+assert('Ship 13 — Opus inbox letter mentions vendored dependencies',
+  /vendored|vendor/.test(fs.readFileSync(path.join(docsDir, 'inbox', 'opus.md'), 'utf8')));
+assert('Ship 13 — Inbox README has letter to future minds',
+  /June 26, 2026/.test(fs.readFileSync(path.join(docsDir, 'inbox', 'README.md'), 'utf8')));
+
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
 

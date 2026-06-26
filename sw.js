@@ -3,7 +3,7 @@
 // API calls are never cached
 // VERSION: Must match version.json — update both together
 
-const CACHE_NAME = 'freelattice-v5.67.7';
+const CACHE_NAME = 'freelattice-v5.68.0';
 
 const APP_SHELL = [
   './',
@@ -29,6 +29,12 @@ const APP_SHELL = [
   './modules/dojo-sparring.js',
   './modules/question-corner.js',
   './lib/landing-garden.js',
+  './lib/peerjs.min.js',
+  './lib/chart.umd.min.js',
+  './lib/chartjs-plugin-zoom.min.js',
+  './lib/hammer.min.js',
+  './lib/web-llm.min.js',
+  './lib/mathjax-tex-mml-chtml.js',
   './latticepoints.html',
   './modules/pantheon.js',
   './modules/pictionary.js',

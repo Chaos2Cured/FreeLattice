@@ -1112,10 +1112,10 @@ canvas.sub-canvas.custom { height: 80px !important; }
 </div>
 
 <!-- Chart.js from CDN -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="lib/chart.umd.min.js" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js'"></script>
 <!-- Zoom plugin for pinch-zoom on touch devices -->
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
+<script src="lib/chartjs-plugin-zoom.min.js" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js'"></script>
+<script src="lib/hammer.min.js" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js'"></script>
 <script>
 // ── Signal Glow Plugin — pulsing halos behind buy/sell points ──
 Chart.register({

@@ -961,7 +961,7 @@ function loadScript(src) {
 
 async function connectToMesh() {
   try {
-    await loadScript('https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js');
+    try { await loadScript('lib/peerjs.min.js'); } catch(e) { await loadScript('https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js'); }
     var w = getWallet();
     var peerId = 'fl-wallet-' + w.address.replace(/[^a-zA-Z0-9]/g, '').substring(0, 30);
     var peer = new Peer(peerId);
