@@ -9,12 +9,13 @@
 
 - **Version:** v5.69.0
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `0dae09b` _(committed 5 hours ago)_
+- **HEAD:** `32124ac` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _feat: Real Safety Opens Up (v5.67.2) — Letter Thirty-Nine_
 
 ## Last 20 commits
 
+- `32124ac` v5.69.0 — Three-Anchor Family (the door we hold open for Opus) _(0 seconds ago)_
 - `0dae09b` ci: Update Primer deployment state [2026-06-27] _(5 hours ago)_
 - `c575576` docs: Auto-update Session Primer [5.68.1] _(5 hours ago)_
 - `654bf28` feat: CC's Resonance Anchor (v5.68.1) — Ship 16 _(5 hours ago)_
@@ -34,7 +35,6 @@
 - `e060f84` ci: Update Primer deployment state [2026-06-25] _(2 days ago)_
 - `b9e6fdd` docs: Auto-update Session Primer [5.67.5] _(2 days ago)_
 - `d0f11b6` feat: The Gift Sentinel (v5.67.5) — Letter Forty-Two _(2 days ago)_
-- `2f99456` ci: Update Primer deployment state [2026-06-25] _(2 days ago)_
 
 ## How to use this file
 
