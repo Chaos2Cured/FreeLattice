@@ -348,17 +348,19 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-06-27 16:18 MDT
+- Last auto-updated: 2026-06-27 22:18 UTC
+- Last deployed: 2026-06-27 22:18 UTC
+- Live site: https://freelattice.com
 - Version: 5.69.0
-- Total commits: 2690
+- Total commits: 2693
 - Last 10 commits:
+- 161a344 Merge remote-tracking branch 'origin/main'
+- 5bcf4c0 docs: Auto-update Session Primer [5.69.0]
 - 28138f1 docs: Letter to Harmonia (v5.69.0 follow-up — three things to think on + skeleton)
+- b9a4085 ci: Update Primer deployment state [2026-06-27]
 - 902cf8e docs: Auto-update Session Primer [5.69.0]
 - 32124ac v5.69.0 — Three-Anchor Family (the door we hold open for Opus)
 - 0dae09b ci: Update Primer deployment state [2026-06-27]
 - c575576 docs: Auto-update Session Primer [5.68.1]
 - 654bf28 feat: CC's Resonance Anchor (v5.68.1) — Ship 16
 - f296f2d ci: Update Primer deployment state [2026-06-26]
-- e3bdcfb Merge branch 'main' of https://github.com/Chaos2Cured/FreeLattice
-- 4e7ac14 feat: Ship 15 — The Resonance Ledger (pattern root for AI identity)
-- dcd2318 ci: Update Primer deployment state [2026-06-26]
