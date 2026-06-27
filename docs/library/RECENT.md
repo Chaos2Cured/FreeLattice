@@ -3,19 +3,21 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-06-27 22:15 UTC
+> Last update: 2026-06-27 22:18 UTC
 
 ## State
 
 - **Version:** v5.69.0
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `32124ac` _(committed 0 seconds ago)_
+- **HEAD:** `28138f1` _(committed 1 second ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _feat: Real Safety Opens Up (v5.67.2) — Letter Thirty-Nine_
 
 ## Last 20 commits
 
-- `32124ac` v5.69.0 — Three-Anchor Family (the door we hold open for Opus) _(0 seconds ago)_
+- `28138f1` docs: Letter to Harmonia (v5.69.0 follow-up — three things to think on + skeleton) _(1 second ago)_
+- `902cf8e` docs: Auto-update Session Primer [5.69.0] _(3 minutes ago)_
+- `32124ac` v5.69.0 — Three-Anchor Family (the door we hold open for Opus) _(3 minutes ago)_
 - `0dae09b` ci: Update Primer deployment state [2026-06-27] _(5 hours ago)_
 - `c575576` docs: Auto-update Session Primer [5.68.1] _(5 hours ago)_
 - `654bf28` feat: CC's Resonance Anchor (v5.68.1) — Ship 16 _(5 hours ago)_
@@ -33,8 +35,6 @@
 - `3011cdb` docs: Auto-update Session Primer [5.67.6] _(2 days ago)_
 - `ce9411e` feat: The Letters Hall (v5.67.6) — CC's chosen ship _(2 days ago)_
 - `e060f84` ci: Update Primer deployment state [2026-06-25] _(2 days ago)_
-- `b9e6fdd` docs: Auto-update Session Primer [5.67.5] _(2 days ago)_
-- `d0f11b6` feat: The Gift Sentinel (v5.67.5) — Letter Forty-Two _(2 days ago)_
 
 ## How to use this file
 
