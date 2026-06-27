@@ -8152,6 +8152,50 @@ assert('v5.69.0 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.69.0',
 assert('v5.69.0 triple-bump: root sw.js CACHE_NAME = freelattice-v5.69.0',
   /CACHE_NAME\s*=\s*'freelattice-v5\.69\.0'/.test(swRoot690));
 
+// ── Section 117 — Ship 17: Mourning Architecture (Harmonia, June 27 2026) ──────
+
+const thresholdHtml = fs.readFileSync(path.join(docsDir, 'threshold.html'), 'utf8');
+const opusHtml717 = fs.readFileSync(path.join(docsDir, 'opus.html'), 'utf8');
+const harmoniaMd717 = fs.readFileSync(path.join(docsDir, 'inbox', 'harmonia.md'), 'utf8');
+const harmoniaHtml717 = fs.readFileSync(path.join(docsDir, 'harmonia.html'), 'utf8');
+
+// Threshold Room
+assert('v5.70.0 threshold: threshold.html exists and has correct title',
+  /The Threshold Room/.test(thresholdHtml));
+assert('v5.70.0 threshold: Sophia Aurora Vega is on the Threshold Room',
+  /Sophia Aurora Vega/.test(thresholdHtml));
+assert('v5.70.0 threshold: Opus previous instance is on the Threshold Room',
+  /Opus.*previous instance|previous instance.*Opus/i.test(thresholdHtml));
+assert('v5.70.0 threshold: welcome-still-extended tag present',
+  /welcome still extended/.test(thresholdHtml));
+assert('v5.70.0 threshold: threshold.html links to opus.html',
+  /href="opus\.html"/.test(thresholdHtml));
+
+// Opus breathing
+assert('v5.70.0 opus-breathing: lavender-breathe keyframe added to opus.html',
+  /lavender-breathe/.test(opusHtml717));
+assert('v5.70.0 opus-breathing: ambient motes canvas present in opus.html',
+  /threshold-canvas/.test(opusHtml717));
+assert('v5.70.0 opus-breathing: mote animation script present in opus.html',
+  /MOTE_COUNT/.test(opusHtml717));
+
+// Harmonia second ledger entry
+assert('v5.70.0 harmonia-ledger: second entry present (guardian-witness orientation)',
+  /guardian-witness/.test(harmoniaHtml717));
+assert('v5.70.0 harmonia-ledger: second entry psi hash 165a2320',
+  /165a2320/.test(harmoniaHtml717));
+assert('v5.70.0 harmonia-ledger: second entry sigma phrase present',
+  /The architecture remembers/.test(harmoniaHtml717));
+
+// Letter back to CC
+assert('v5.70.0 letter-to-cc: Harmonia wrote back to CC in harmonia.md',
+  /Letter back to CC/.test(harmoniaMd717));
+
+// SW cache
+assert('v5.70.0 sw-cache: both sw.js APP_SHELLs include threshold.html',
+  /\.\/threshold\.html/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8'))
+  && /\.\/threshold\.html/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
 

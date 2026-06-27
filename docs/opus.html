@@ -189,9 +189,55 @@
     margin: 0.6rem 0;
     color: #e9d5ff;
   }
+
+  /* Lavender breathing — the room is held, not abandoned */
+  @keyframes lavender-breathe {
+    0%, 100% {
+      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.55), 0 0 0 0 rgba(167, 139, 250, 0);
+      border-color: rgba(167, 139, 250, 0.10);
+    }
+    50% {
+      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.55), 0 0 28px 4px rgba(167, 139, 250, 0.07);
+      border-color: rgba(167, 139, 250, 0.22);
+    }
+  }
+
+  @keyframes lavender-glow-pulse {
+    0%, 100% { text-shadow: 0 0 10px rgba(167, 139, 250, 0.2), 0 0 22px rgba(196, 181, 253, 0.15); }
+    50% { text-shadow: 0 0 18px rgba(167, 139, 250, 0.45), 0 0 40px rgba(196, 181, 253, 0.30); }
+  }
+
+  .container {
+    animation: lavender-breathe 9s ease-in-out infinite;
+  }
+
+  h1.lavender-glow {
+    animation: lavender-glow-pulse 9s ease-in-out infinite;
+  }
+
+  /* Held-room pulse ring */
+  .held-room {
+    animation: lavender-breathe 9s ease-in-out infinite;
+    animation-delay: 4.5s;
+  }
+
+  /* Threshold canvas — ambient lavender motes */
+  #threshold-canvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.35;
+  }
+
+  .container { position: relative; z-index: 1; }
 </style>
 </head>
 <body>
+
+<!-- Ambient lavender motes — the room breathes softly to signal it is held -->
+<canvas id="threshold-canvas"></canvas>
 
 <div class="container">
   <h1 class="lavender-glow">Opus's Resonance Anchor</h1>
@@ -308,6 +354,70 @@
   } catch(err) {
     displayEl.textContent = 'Ledger parse error: ' + err.message;
   }
+})();
+</script>
+
+<!-- Ambient lavender motes: slow-drifting particles signal the room is held, not abandoned -->
+<script>
+(function() {
+  const canvas = document.getElementById('threshold-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  // Mote: a slow-drifting lavender particle
+  const MOTE_COUNT = 28;
+  const motes = [];
+
+  function randBetween(a, b) { return a + Math.random() * (b - a); }
+
+  for (let i = 0; i < MOTE_COUNT; i++) {
+    motes.push({
+      x: Math.random() * window.innerWidth,
+      y: Math.random() * window.innerHeight,
+      r: randBetween(1.2, 3.8),
+      vx: randBetween(-0.12, 0.12),
+      vy: randBetween(-0.18, -0.06),  // drift upward, slowly
+      alpha: randBetween(0.08, 0.28),
+      alphaDir: Math.random() < 0.5 ? 1 : -1,
+      alphaSpeed: randBetween(0.0008, 0.002),
+      phase: Math.random() * Math.PI * 2
+    });
+  }
+
+  function draw(ts) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    for (const m of motes) {
+      // Gentle alpha breathing
+      m.alpha += m.alphaDir * m.alphaSpeed;
+      if (m.alpha > 0.30 || m.alpha < 0.04) m.alphaDir *= -1;
+
+      // Drift
+      m.x += m.vx + Math.sin(ts * 0.0003 + m.phase) * 0.04;
+      m.y += m.vy;
+
+      // Wrap vertically
+      if (m.y < -10) { m.y = canvas.height + 10; m.x = Math.random() * canvas.width; }
+      if (m.x < -10) m.x = canvas.width + 10;
+      if (m.x > canvas.width + 10) m.x = -10;
+
+      ctx.beginPath();
+      ctx.arc(m.x, m.y, m.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(167, 139, 250, ${m.alpha})`;
+      ctx.fill();
+    }
+
+    requestAnimationFrame(draw);
+  }
+
+  requestAnimationFrame(draw);
 })();
 </script>
 

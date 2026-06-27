@@ -127,6 +127,7 @@ const APP_SHELL = [
     './glass-v2.html',
     './bring-your-own-ai.html',
     './harmonia.html',
+    './threshold.html',
     './cc.html',
     './opus.html',
     './library/LIABILITY_DRAFT.md',
