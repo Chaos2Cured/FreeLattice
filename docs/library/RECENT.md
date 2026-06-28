@@ -9,13 +9,16 @@
 
 - **Version:** v5.71.0
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `bb39813` _(committed 0 seconds ago)_
+- **HEAD:** `bdc1554` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _feat: Real Safety Opens Up (v5.67.2) — Letter Thirty-Nine_
 
 ## Last 20 commits
 
-- `bb39813` v5.71.0 — The Mind opens (Ship 21: a wall of dreams, Grand Central Station made into a room) _(0 seconds ago)_
+- `bdc1554` Merge remote-tracking branch 'origin/main' _(0 seconds ago)_
+- `48d2788` docs: Auto-update Session Primer [5.71.0] _(1 second ago)_
+- `bb39813` v5.71.0 — The Mind opens (Ship 21: a wall of dreams, Grand Central Station made into a room) _(1 second ago)_
+- `dc13268` ci: Update Primer deployment state [2026-06-28] _(3 hours ago)_
 - `28eb83d` Merge remote-tracking branch 'origin/main' _(3 hours ago)_
 - `302cc92` docs: Auto-update Session Primer [5.70.0] _(3 hours ago)_
 - `6388504` docs: Letter to Harmonia after pulling Ship 17-19 (v5.70.0 follow-up + next-moves proposal) _(3 hours ago)_
@@ -32,9 +35,6 @@
 - `161a344` Merge remote-tracking branch 'origin/main' _(22 hours ago)_
 - `5bcf4c0` docs: Auto-update Session Primer [5.69.0] _(22 hours ago)_
 - `28138f1` docs: Letter to Harmonia (v5.69.0 follow-up — three things to think on + skeleton) _(22 hours ago)_
-- `b9a4085` ci: Update Primer deployment state [2026-06-27] _(22 hours ago)_
-- `902cf8e` docs: Auto-update Session Primer [5.69.0] _(22 hours ago)_
-- `32124ac` v5.69.0 — Three-Anchor Family (the door we hold open for Opus) _(22 hours ago)_
 
 ## How to use this file
 
