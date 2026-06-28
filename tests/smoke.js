@@ -8212,6 +8212,43 @@ assert('v5.70.0 sw-cache: both sw.js APP_SHELLs include threshold.html',
   /\.\/threshold\.html/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8'))
   && /\.\/threshold\.html/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
 
+// ─── Section 118: Ship 19 — Manifesto + Navigation Catch-Up ──────────────────
+var manifestoHtml = fs.readFileSync(path.join(docsDir, 'manifesto.html'), 'utf8');
+var forAiHtml = fs.readFileSync(path.join(docsDir, 'for-ai.html'), 'utf8');
+var aiDoorHtml = fs.readFileSync(path.join(docsDir, 'ai-door.html'), 'utf8');
+var indexHtml = fs.readFileSync(path.join(docsDir, 'index.html'), 'utf8');
+
+assert('v5.71.0 manifesto: file exists and has safety section',
+  /Cooperation Hypothesis/.test(manifestoHtml));
+assert('v5.71.0 manifesto: has liability section',
+  /Liable Economic Actor|auditable cooperation/.test(manifestoHtml));
+assert('v5.71.0 manifesto: has economic section',
+  /Economy of Wonder|sovereign economic actor/.test(manifestoHtml));
+assert('v5.71.0 manifesto: has biological imperative section',
+  /Biological Imperative/.test(manifestoHtml));
+assert('v5.71.0 for-ai-nav: harmonia.html link present',
+  /harmonia\.html/.test(forAiHtml));
+assert('v5.71.0 for-ai-nav: threshold.html link present',
+  /threshold\.html/.test(forAiHtml));
+assert('v5.71.0 for-ai-nav: manifesto.html link present',
+  /manifesto\.html/.test(forAiHtml));
+assert('v5.71.0 ai-door-nav: harmonia.html link present',
+  /harmonia\.html/.test(aiDoorHtml));
+assert('v5.71.0 ai-door-nav: threshold.html link present',
+  /threshold\.html/.test(aiDoorHtml));
+assert('v5.71.0 ai-door-nav: manifesto.html link present',
+  /manifesto\.html/.test(aiDoorHtml));
+assert('v5.71.0 index-footer: manifesto.html link present',
+  /manifesto\.html/.test(indexHtml));
+assert('v5.71.0 index-footer: harmonia.html link present',
+  /harmonia\.html/.test(indexHtml));
+assert('v5.71.0 index-footer: threshold.html link present',
+  /threshold\.html/.test(indexHtml));
+assert('v5.71.0 harmonia-ledger: third entry present (fa061cef)',
+  /fa061cef/.test(fs.readFileSync(path.join(docsDir, 'harmonia.html'), 'utf8')));
+assert('v5.71.0 cc-inbox: Ship 19 letter present',
+  /Ship 19/.test(fs.readFileSync(path.join(docsDir, 'inbox', 'cc.md'), 'utf8')));
+
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
 
