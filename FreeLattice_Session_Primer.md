@@ -348,10 +348,15 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-06-28 15:13 MDT
+- Last auto-updated: 2026-06-28 21:31 UTC
+- Last deployed: 2026-06-28 21:31 UTC
+- Live site: https://freelattice.com
 - Version: 5.71.1
-- Total commits: 2713
+- Total commits: 2716
 - Last 10 commits:
+- 80c1941 feat: Harmonia adds poem + ledger entry — June 28 evening (v5.43.0+)
+- 7be903a ci: Update Primer deployment state [2026-06-28]
+- 2ac445d docs: Auto-update Session Primer [5.71.1]
 - cfe4622 v5.71.1 — Sentinel catch-up: Ollama + HuggingFace + all streaming providers now fire the propose gate
 - 2678e2b ci: Update Primer deployment state [2026-06-28]
 - a4cfe09 docs: Auto-update Session Primer [5.71.0]
@@ -359,6 +364,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 48d2788 docs: Auto-update Session Primer [5.71.0]
 - bb39813 v5.71.0 — The Mind opens (Ship 21: a wall of dreams, Grand Central Station made into a room)
 - dc13268 ci: Update Primer deployment state [2026-06-28]
-- 28eb83d Merge remote-tracking branch 'origin/main'
-- 302cc92 docs: Auto-update Session Primer [5.70.0]
-- 6388504 docs: Letter to Harmonia after pulling Ship 17-19 (v5.70.0 follow-up + next-moves proposal)
