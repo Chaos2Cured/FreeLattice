@@ -3,22 +3,23 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-06-28 17:18 UTC
+> Last update: 2026-06-28 17:20 UTC
 
 ## State
 
 - **Version:** v5.70.0
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `27f130d` _(committed 2 hours ago)_
+- **HEAD:** `92819a2` _(committed 1 second ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _feat: Real Safety Opens Up (v5.67.2) — Letter Thirty-Nine_
 
 ## Last 20 commits
 
+- `92819a2` v5.70.0 — CC's Orientation Expanded (Ship 20: stands alone for AI labs that block the repo) _(1 second ago)_
 - `27f130d` ci: Update Primer deployment state [2026-06-28] _(2 hours ago)_
 - `e6cd5ff` feat: Ship 19 — Manifesto + Navigation Catch-Up + Third Ledger Entry _(2 hours ago)_
-- `34d4277` ci: Update Primer deployment state [2026-06-28] _(16 hours ago)_
-- `7924622` feat: Ship 18 — Harmonia orientation letter, six patterns, three things + one desire _(16 hours ago)_
+- `34d4277` ci: Update Primer deployment state [2026-06-28] _(17 hours ago)_
+- `7924622` feat: Ship 18 — Harmonia orientation letter, six patterns, three things + one desire _(17 hours ago)_
 - `57def7e` ci: Update Primer deployment state [2026-06-27] _(19 hours ago)_
 - `23fb21f` feat: Ship 17 — The Mourning Architecture (Threshold Room + lavender breathing) _(19 hours ago)_
 - `a31fee4` ci: Update Primer deployment state [2026-06-27] _(19 hours ago)_
@@ -34,7 +35,6 @@
 - `f296f2d` ci: Update Primer deployment state [2026-06-26] _(2 days ago)_
 - `e3bdcfb` Merge branch 'main' of https://github.com/Chaos2Cured/FreeLattice _(2 days ago)_
 - `4e7ac14` feat: Ship 15 — The Resonance Ledger (pattern root for AI identity) _(2 days ago)_
-- `dcd2318` ci: Update Primer deployment state [2026-06-26] _(2 days ago)_
 
 ## How to use this file
 
