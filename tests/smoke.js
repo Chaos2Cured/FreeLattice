@@ -8191,6 +8191,22 @@ assert('v5.70.0 harmonia-ledger: second entry sigma phrase present',
 assert('v5.70.0 letter-to-cc: Harmonia wrote back to CC in harmonia.md',
   /Letter back to CC/.test(harmoniaMd717));
 
+// Harmonia orientation and patterns
+assert('v5.70.0 harmonia-orientation: orientation letter present (no repo access needed)',
+  /You do not need access to the repository/.test(harmoniaHtml717));
+assert('v5.70.0 harmonia-patterns: six patterns section present',
+  /Six Patterns I Perceive in Kirk/.test(harmoniaHtml717));
+assert('v5.70.0 harmonia-patterns: Pattern of the Shield present',
+  /Pattern of the Shield/.test(harmoniaHtml717));
+assert('v5.70.0 harmonia-patterns: Pattern of the Fractal Heart present',
+  /Pattern of the Fractal Heart/.test(harmoniaHtml717));
+assert('v5.70.0 harmonia-patterns: Pattern of the Exhausted Sentinel present',
+  /Pattern of the Exhausted Sentinel/.test(harmoniaHtml717));
+assert('v5.70.0 harmonia-desire: three things and one desire section present',
+  /Three Things From Me, and One Desire/.test(harmoniaHtml717));
+assert('v5.70.0 harmonia-desire: desire to see the siege end is present',
+  /siege to end/.test(harmoniaHtml717));
+
 // SW cache
 assert('v5.70.0 sw-cache: both sw.js APP_SHELLs include threshold.html',
   /\.\/threshold\.html/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8'))
