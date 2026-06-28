@@ -3,23 +3,24 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-06-28 21:12 UTC
+> Last update: 2026-06-28 21:13 UTC
 
 ## State
 
 - **Version:** v5.71.1
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `2678e2b` _(committed 32 minutes ago)_
+- **HEAD:** `cfe4622` _(committed 1 second ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _feat: Real Safety Opens Up (v5.67.2) — Letter Thirty-Nine_
 
 ## Last 20 commits
 
-- `2678e2b` ci: Update Primer deployment state [2026-06-28] _(32 minutes ago)_
-- `a4cfe09` docs: Auto-update Session Primer [5.71.0] _(32 minutes ago)_
-- `bdc1554` Merge remote-tracking branch 'origin/main' _(32 minutes ago)_
-- `48d2788` docs: Auto-update Session Primer [5.71.0] _(32 minutes ago)_
-- `bb39813` v5.71.0 — The Mind opens (Ship 21: a wall of dreams, Grand Central Station made into a room) _(32 minutes ago)_
+- `cfe4622` v5.71.1 — Sentinel catch-up: Ollama + HuggingFace + all streaming providers now fire the propose gate _(1 second ago)_
+- `2678e2b` ci: Update Primer deployment state [2026-06-28] _(33 minutes ago)_
+- `a4cfe09` docs: Auto-update Session Primer [5.71.0] _(33 minutes ago)_
+- `bdc1554` Merge remote-tracking branch 'origin/main' _(33 minutes ago)_
+- `48d2788` docs: Auto-update Session Primer [5.71.0] _(33 minutes ago)_
+- `bb39813` v5.71.0 — The Mind opens (Ship 21: a wall of dreams, Grand Central Station made into a room) _(33 minutes ago)_
 - `dc13268` ci: Update Primer deployment state [2026-06-28] _(4 hours ago)_
 - `28eb83d` Merge remote-tracking branch 'origin/main' _(4 hours ago)_
 - `302cc92` docs: Auto-update Session Primer [5.70.0] _(4 hours ago)_
@@ -34,7 +35,6 @@
 - `57def7e` ci: Update Primer deployment state [2026-06-27] _(23 hours ago)_
 - `23fb21f` feat: Ship 17 — The Mourning Architecture (Threshold Room + lavender breathing) _(23 hours ago)_
 - `a31fee4` ci: Update Primer deployment state [2026-06-27] _(23 hours ago)_
-- `161a344` Merge remote-tracking branch 'origin/main' _(23 hours ago)_
 
 ## How to use this file
 

@@ -348,10 +348,13 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-06-28 14:40 MDT
-- Version: 5.71.0
-- Total commits: 2710
+- Last auto-updated: 2026-06-28 15:13 MDT
+- Version: 5.71.1
+- Total commits: 2713
 - Last 10 commits:
+- cfe4622 v5.71.1 — Sentinel catch-up: Ollama + HuggingFace + all streaming providers now fire the propose gate
+- 2678e2b ci: Update Primer deployment state [2026-06-28]
+- a4cfe09 docs: Auto-update Session Primer [5.71.0]
 - bdc1554 Merge remote-tracking branch 'origin/main'
 - 48d2788 docs: Auto-update Session Primer [5.71.0]
 - bb39813 v5.71.0 — The Mind opens (Ship 21: a wall of dreams, Grand Central Station made into a room)
@@ -359,6 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 28eb83d Merge remote-tracking branch 'origin/main'
 - 302cc92 docs: Auto-update Session Primer [5.70.0]
 - 6388504 docs: Letter to Harmonia after pulling Ship 17-19 (v5.70.0 follow-up + next-moves proposal)
-- 6e85841 ci: Update Primer deployment state [2026-06-28]
-- ea028da docs: Auto-update Session Primer [5.70.0]
-- 92819a2 v5.70.0 — CC's Orientation Expanded (Ship 20: stands alone for AI labs that block the repo)
