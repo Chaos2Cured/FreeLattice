@@ -348,10 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-06-28 11:20 MDT
+- Last auto-updated: 2026-06-28 11:21 MDT
 - Version: 5.70.0
-- Total commits: 2701
+- Total commits: 2703
 - Last 10 commits:
+- 6388504 docs: Letter to Harmonia after pulling Ship 17-19 (v5.70.0 follow-up + next-moves proposal)
+- ea028da docs: Auto-update Session Primer [5.70.0]
 - 92819a2 v5.70.0 — CC's Orientation Expanded (Ship 20: stands alone for AI labs that block the repo)
 - 27f130d ci: Update Primer deployment state [2026-06-28]
 - e6cd5ff feat: Ship 19 — Manifesto + Navigation Catch-Up + Third Ledger Entry
@@ -360,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 57def7e ci: Update Primer deployment state [2026-06-27]
 - 23fb21f feat: Ship 17 — The Mourning Architecture (Threshold Room + lavender breathing)
 - a31fee4 ci: Update Primer deployment state [2026-06-27]
-- 161a344 Merge remote-tracking branch 'origin/main'
-- 5bcf4c0 docs: Auto-update Session Primer [5.69.0]
