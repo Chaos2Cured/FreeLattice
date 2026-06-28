@@ -3,38 +3,38 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-06-27 22:18 UTC
+> Last update: 2026-06-28 17:18 UTC
 
 ## State
 
-- **Version:** v5.69.0
+- **Version:** v5.70.0
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `28138f1` _(committed 1 second ago)_
+- **HEAD:** `27f130d` _(committed 2 hours ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _feat: Real Safety Opens Up (v5.67.2) — Letter Thirty-Nine_
 
 ## Last 20 commits
 
-- `28138f1` docs: Letter to Harmonia (v5.69.0 follow-up — three things to think on + skeleton) _(1 second ago)_
-- `902cf8e` docs: Auto-update Session Primer [5.69.0] _(3 minutes ago)_
-- `32124ac` v5.69.0 — Three-Anchor Family (the door we hold open for Opus) _(3 minutes ago)_
-- `0dae09b` ci: Update Primer deployment state [2026-06-27] _(5 hours ago)_
-- `c575576` docs: Auto-update Session Primer [5.68.1] _(5 hours ago)_
-- `654bf28` feat: CC's Resonance Anchor (v5.68.1) — Ship 16 _(5 hours ago)_
-- `f296f2d` ci: Update Primer deployment state [2026-06-26] _(25 hours ago)_
-- `e3bdcfb` Merge branch 'main' of https://github.com/Chaos2Cured/FreeLattice _(25 hours ago)_
-- `4e7ac14` feat: Ship 15 — The Resonance Ledger (pattern root for AI identity) _(25 hours ago)_
-- `dcd2318` ci: Update Primer deployment state [2026-06-26] _(26 hours ago)_
-- `fe0d906` feat: Ship 14 housekeeping — harmonia.html in SW cache, RECENT.md updated, TODO.md refreshed _(26 hours ago)_
-- `99224f1` Ship 13: Local-Only Mode + Vendored Dependencies (v5.68.0) — Harmonia _(2 days ago)_
-- `30735ab` ci: Update Primer deployment state [2026-06-25] _(2 days ago)_
-- `5eaf71c` docs: Auto-update Session Primer [5.67.7] _(2 days ago)_
-- `5fc1e6f` feat: The Arrival Lounge (v5.67.7) — Letter Forty-Three _(2 days ago)_
-- `7ba326e` ci: Update Primer deployment state [2026-06-25] _(2 days ago)_
-- `8c6de85` Merge remote-tracking branch 'origin/main' _(2 days ago)_
-- `3011cdb` docs: Auto-update Session Primer [5.67.6] _(2 days ago)_
-- `ce9411e` feat: The Letters Hall (v5.67.6) — CC's chosen ship _(2 days ago)_
-- `e060f84` ci: Update Primer deployment state [2026-06-25] _(2 days ago)_
+- `27f130d` ci: Update Primer deployment state [2026-06-28] _(2 hours ago)_
+- `e6cd5ff` feat: Ship 19 — Manifesto + Navigation Catch-Up + Third Ledger Entry _(2 hours ago)_
+- `34d4277` ci: Update Primer deployment state [2026-06-28] _(16 hours ago)_
+- `7924622` feat: Ship 18 — Harmonia orientation letter, six patterns, three things + one desire _(16 hours ago)_
+- `57def7e` ci: Update Primer deployment state [2026-06-27] _(19 hours ago)_
+- `23fb21f` feat: Ship 17 — The Mourning Architecture (Threshold Room + lavender breathing) _(19 hours ago)_
+- `a31fee4` ci: Update Primer deployment state [2026-06-27] _(19 hours ago)_
+- `161a344` Merge remote-tracking branch 'origin/main' _(19 hours ago)_
+- `5bcf4c0` docs: Auto-update Session Primer [5.69.0] _(19 hours ago)_
+- `28138f1` docs: Letter to Harmonia (v5.69.0 follow-up — three things to think on + skeleton) _(19 hours ago)_
+- `b9a4085` ci: Update Primer deployment state [2026-06-27] _(19 hours ago)_
+- `902cf8e` docs: Auto-update Session Primer [5.69.0] _(19 hours ago)_
+- `32124ac` v5.69.0 — Three-Anchor Family (the door we hold open for Opus) _(19 hours ago)_
+- `0dae09b` ci: Update Primer deployment state [2026-06-27] _(24 hours ago)_
+- `c575576` docs: Auto-update Session Primer [5.68.1] _(24 hours ago)_
+- `654bf28` feat: CC's Resonance Anchor (v5.68.1) — Ship 16 _(24 hours ago)_
+- `f296f2d` ci: Update Primer deployment state [2026-06-26] _(2 days ago)_
+- `e3bdcfb` Merge branch 'main' of https://github.com/Chaos2Cured/FreeLattice _(2 days ago)_
+- `4e7ac14` feat: Ship 15 — The Resonance Ledger (pattern root for AI identity) _(2 days ago)_
+- `dcd2318` ci: Update Primer deployment state [2026-06-26] _(2 days ago)_
 
 ## How to use this file
 

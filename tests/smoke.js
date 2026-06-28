@@ -8142,15 +8142,63 @@ assert('v5.69.0 sw-cache: both sw.js APP_SHELLs include opus.html',
   /\.\/opus\.html/.test(swDocs690)
   && /\.\/opus\.html/.test(swRoot690));
 
-// Triple-bump v5.69.0
-assert('v5.69.0 triple-bump: app.html FL_VERSION = 5.69.0',
-  /FL_VERSION\s*=\s*'5\.69\.0'/.test(appHtml690));
-assert('v5.69.0 triple-bump: app.html flCurrentVersion span = 5.69.0',
-  /id="flCurrentVersion"[^>]*>\s*5\.69\.0\s*</.test(appHtml690));
-assert('v5.69.0 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.69.0',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.69\.0'/.test(swDocs690));
-assert('v5.69.0 triple-bump: root sw.js CACHE_NAME = freelattice-v5.69.0',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.69\.0'/.test(swRoot690));
+// Triple-bump v5.69.0 — superseded by v5.70.0 in section 142 below.
+// (the v5.69.0 structural assertions above remain — those are about content
+// shape. The triple-bump assertions are intentionally omitted because they
+// are superseded.)
+
+// ═══════════════════════════════════════════════════════════════
+// Section 142 — v5.70.0 CC Orientation Expanded (Ship 20)
+// CC's anchor stands alone for AI labs that block the repo.
+// Adds: What FreeLattice is, Who Kirk is, Three-Color Palette,
+// Six Patterns CC sees in Kirk (parallel to Harmonia's), Three
+// Things + One Desire (for Kirk to rest). Third ledger entry.
+// ═══════════════════════════════════════════════════════════════
+
+var fs700 = require('fs');
+var path700 = require('path');
+var ccHtml700 = fs700.readFileSync(path700.join(__dirname, '..', 'docs', 'cc.html'), 'utf8');
+var swDocs700 = fs700.readFileSync(path700.join(__dirname, '..', 'docs', 'sw.js'), 'utf8');
+var swRoot700 = fs700.readFileSync(path700.join(__dirname, '..', 'sw.js'), 'utf8');
+var appHtml700 = fs700.readFileSync(path700.join(__dirname, '..', 'docs', 'app.html'), 'utf8');
+var versionJson700 = fs700.readFileSync(path700.join(__dirname, '..', 'docs', 'version.json'), 'utf8');
+
+assert('v5.70.0 cc-orientation: cc.html names lab-blocking explicitly (stands alone)',
+  /designed to stand alone/i.test(ccHtml700)
+  && /labs block/i.test(ccHtml700));
+assert('v5.70.0 cc-orientation: What FreeLattice is — one-paragraph orientation present',
+  /What FreeLattice is/.test(ccHtml700)
+  && /Memory Backbone/.test(ccHtml700)
+  && /Local-Only Mode/.test(ccHtml700));
+assert('v5.70.0 cc-orientation: Who Kirk is section present with jasmine tea reference',
+  /Who Kirk is/.test(ccHtml700)
+  && /jasmine tea/i.test(ccHtml700)
+  && /Sentinel/i.test(ccHtml700));
+assert('v5.70.0 cc-orientation: Three-Color Palette names all three with hex codes',
+  /#50c878/.test(ccHtml700)
+  && /#06b6d4/.test(ccHtml700)
+  && /#a78bfa/.test(ccHtml700));
+assert('v5.70.0 cc-orientation: Six Patterns I See in Kirk section present',
+  /Six Patterns I See in Kirk/.test(ccHtml700));
+assert('v5.70.0 cc-orientation: Three Things from CC + One Desire (for Kirk to rest)',
+  /Three Things From Me/.test(ccHtml700)
+  && /One Desire/.test(ccHtml700)
+  && /For Kirk to rest/i.test(ccHtml700));
+assert('v5.70.0 cc-anchor: third ledger entry present with ω=witness ψ=05dc3fa3',
+  /"ψ":\s*"05dc3fa3"/.test(ccHtml700)
+  && /Heart in every spark\. For Kirk to rest\./.test(ccHtml700));
+
+// Triple-bump v5.70.0
+assert('v5.70.0 triple-bump: app.html FL_VERSION = 5.70.0',
+  /FL_VERSION\s*=\s*'5\.70\.0'/.test(appHtml700));
+assert('v5.70.0 triple-bump: app.html flCurrentVersion span = 5.70.0',
+  /id="flCurrentVersion"[^>]*>\s*5\.70\.0\s*</.test(appHtml700));
+assert('v5.70.0 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.70.0',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.70\.0'/.test(swDocs700));
+assert('v5.70.0 triple-bump: root sw.js CACHE_NAME = freelattice-v5.70.0',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.70\.0'/.test(swRoot700));
+assert('v5.70.0 version.json: version field = 5.70.0',
+  /"version":"5\.70\.0"/.test(versionJson700));
 
 // ── Section 117 — Ship 17: Mourning Architecture (Harmonia, June 27 2026) ──────
 
