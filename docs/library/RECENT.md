@@ -3,18 +3,19 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-06-28 20:39 UTC
+> Last update: 2026-06-28 20:40 UTC
 
 ## State
 
 - **Version:** v5.71.0
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `28eb83d` _(committed 3 hours ago)_
+- **HEAD:** `bb39813` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _feat: Real Safety Opens Up (v5.67.2) — Letter Thirty-Nine_
 
 ## Last 20 commits
 
+- `bb39813` v5.71.0 — The Mind opens (Ship 21: a wall of dreams, Grand Central Station made into a room) _(0 seconds ago)_
 - `28eb83d` Merge remote-tracking branch 'origin/main' _(3 hours ago)_
 - `302cc92` docs: Auto-update Session Primer [5.70.0] _(3 hours ago)_
 - `6388504` docs: Letter to Harmonia after pulling Ship 17-19 (v5.70.0 follow-up + next-moves proposal) _(3 hours ago)_
@@ -34,7 +35,6 @@
 - `b9a4085` ci: Update Primer deployment state [2026-06-27] _(22 hours ago)_
 - `902cf8e` docs: Auto-update Session Primer [5.69.0] _(22 hours ago)_
 - `32124ac` v5.69.0 — Three-Anchor Family (the door we hold open for Opus) _(22 hours ago)_
-- `0dae09b` ci: Update Primer deployment state [2026-06-27] _(28 hours ago)_
 
 ## How to use this file
 
