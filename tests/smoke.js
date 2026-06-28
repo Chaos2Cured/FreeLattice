@@ -8188,17 +8188,17 @@ assert('v5.70.0 cc-anchor: third ledger entry present with ω=witness ψ=05dc3fa
   /"ψ":\s*"05dc3fa3"/.test(ccHtml700)
   && /Heart in every spark\. For Kirk to rest\./.test(ccHtml700));
 
-// Triple-bump v5.70.0 (superseded by v5.71.0 in section 143)
-assert('v5.70.0 triple-bump: app.html FL_VERSION = 5.70.0 (superseded by 5.71.0)',
-  /FL_VERSION\s*=\s*'5\.7[01]\.0'/.test(appHtml700));
-assert('v5.70.0 triple-bump: app.html flCurrentVersion span = 5.70.0 (superseded by 5.71.0)',
-  /id="flCurrentVersion"[^>]*>\s*5\.7[01]\.0\s*</.test(appHtml700));
-assert('v5.70.0 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.70.0 (superseded by 5.71.0)',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.7[01]\.0'/.test(swDocs700));
-assert('v5.70.0 triple-bump: root sw.js CACHE_NAME = freelattice-v5.70.0 (superseded by 5.71.0)',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.7[01]\.0'/.test(swRoot700));
-assert('v5.70.0 version.json: version field 5.70.0 (superseded by 5.71.0)',
-  /"version":"5\.7[01]\.0"/.test(versionJson700));
+// Triple-bump v5.70.0 (superseded by v5.71.x in section 143/144)
+assert('v5.70.0 triple-bump: app.html FL_VERSION = 5.70.0 (superseded)',
+  /FL_VERSION\s*=\s*'5\.7\d\.\d+'/.test(appHtml700));
+assert('v5.70.0 triple-bump: app.html flCurrentVersion span = 5.70.0 (superseded)',
+  /id="flCurrentVersion"[^>]*>\s*5\.7\d\.\d+\s*</.test(appHtml700));
+assert('v5.70.0 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.70.0 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.7\d\.\d+'/.test(swDocs700));
+assert('v5.70.0 triple-bump: root sw.js CACHE_NAME = freelattice-v5.70.0 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.7\d\.\d+'/.test(swRoot700));
+assert('v5.70.0 version.json: version field 5.70.0 (superseded)',
+  /"version":"5\.7\d\.\d+"/.test(versionJson700));
 
 // ═══════════════════════════════════════════════════════════════
 // Section 143 — v5.71.0 The Mind (wall of dreams) — Ship 21
@@ -8284,17 +8284,57 @@ assert('v5.71.0 sw-cache: both sw.js APP_SHELLs include mind.html and MIND_WALL_
   && /MIND_WALL_SPEC\.md/.test(swDocs710)
   && /MIND_WALL_SPEC\.md/.test(swRoot710));
 
-// Triple-bump v5.71.0
-assert('v5.71.0 triple-bump: app.html FL_VERSION = 5.71.0',
-  /FL_VERSION\s*=\s*'5\.71\.0'/.test(appHtml710));
-assert('v5.71.0 triple-bump: app.html flCurrentVersion span = 5.71.0',
-  /id="flCurrentVersion"[^>]*>\s*5\.71\.0\s*</.test(appHtml710));
-assert('v5.71.0 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.71.0',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.0'/.test(swDocs710));
-assert('v5.71.0 triple-bump: root sw.js CACHE_NAME = freelattice-v5.71.0',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.0'/.test(swRoot710));
-assert('v5.71.0 version.json: version field = 5.71.0',
-  /"version":"5\.71\.0"/.test(versionJson710));
+// Triple-bump v5.71.0 (superseded by v5.71.1 in section 144)
+assert('v5.71.0 triple-bump: app.html FL_VERSION = 5.71.0 (superseded by 5.71.1)',
+  /FL_VERSION\s*=\s*'5\.71\.[01]'/.test(appHtml710));
+assert('v5.71.0 triple-bump: app.html flCurrentVersion span = 5.71.0 (superseded by 5.71.1)',
+  /id="flCurrentVersion"[^>]*>\s*5\.71\.[01]\s*</.test(appHtml710));
+assert('v5.71.0 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.71.0 (superseded by 5.71.1)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.[01]'/.test(swDocs710));
+assert('v5.71.0 triple-bump: root sw.js CACHE_NAME = freelattice-v5.71.0 (superseded by 5.71.1)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.[01]'/.test(swRoot710));
+assert('v5.71.0 version.json: version field 5.71.0 (superseded by 5.71.1)',
+  /"version":"5\.71\.(0|1)"/.test(versionJson710));
+
+// ═══════════════════════════════════════════════════════════════
+// Section 144 — v5.71.1 Sentinel catch-up (Ollama + HF autonomous)
+// The propose sentinel never fired for streaming providers or HF.
+// flProcessAssistantSentinels closes the gap. Wired into both branches.
+// ═══════════════════════════════════════════════════════════════
+
+var fs711 = require('fs');
+var path711 = require('path');
+var appHtml711 = fs711.readFileSync(path711.join(__dirname, '..', 'docs', 'app.html'), 'utf8');
+var ccHtml711 = fs711.readFileSync(path711.join(__dirname, '..', 'docs', 'cc.html'), 'utf8');
+var swDocs711 = fs711.readFileSync(path711.join(__dirname, '..', 'docs', 'sw.js'), 'utf8');
+var swRoot711 = fs711.readFileSync(path711.join(__dirname, '..', 'sw.js'), 'utf8');
+var versionJson711 = fs711.readFileSync(path711.join(__dirname, '..', 'docs', 'version.json'), 'utf8');
+
+assert('v5.71.1 sentinel-catchup: flProcessAssistantSentinels helper defined in app.html',
+  /function\s+flProcessAssistantSentinels\s*\(/.test(appHtml711));
+assert('v5.71.1 sentinel-catchup: helper runs FLRepoContext, FLWebTool, and FLPropose interceptors',
+  /flProcessAssistantSentinels[\s\S]{0,3000}FLRepoContext[\s\S]{0,2000}FLWebTool[\s\S]{0,2000}FLPropose/.test(appHtml711));
+assert('v5.71.1 sentinel-catchup: helper fires processToolAction via FreeLattice dispatcher',
+  /flProcessAssistantSentinels[\s\S]{0,4000}FreeLattice\.processToolAction/.test(appHtml711));
+assert('v5.71.1 sentinel-catchup: HuggingFace branch invokes the helper before render',
+  /fullResponse\s*=\s*hfText;\s*\n[\s\S]{0,400}flProcessAssistantSentinels\(fullResponse,\s*textSpan\)/.test(appHtml711));
+assert('v5.71.1 sentinel-catchup: streaming completion branch invokes the helper',
+  /if\s*\(fullResponse\)\s*\{\s*\n[\s\S]{0,500}flProcessAssistantSentinels\(fullResponse,\s*textSpan\)/.test(appHtml711));
+assert('v5.71.1 cc-anchor: fifth ledger entry appended ω=healer ψ=95ee6019',
+  /"ω":\s*"healer"/.test(ccHtml711)
+  && /Propose now fires for every provider\./.test(ccHtml711)
+  && /"ψ":\s*"95ee6019"/.test(ccHtml711));
+
+assert('v5.71.1 triple-bump: app.html FL_VERSION = 5.71.1',
+  /FL_VERSION\s*=\s*'5\.71\.1'/.test(appHtml711));
+assert('v5.71.1 triple-bump: app.html flCurrentVersion span = 5.71.1',
+  /id="flCurrentVersion"[^>]*>\s*5\.71\.1\s*</.test(appHtml711));
+assert('v5.71.1 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.71.1',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.1'/.test(swDocs711));
+assert('v5.71.1 triple-bump: root sw.js CACHE_NAME = freelattice-v5.71.1',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.1'/.test(swRoot711));
+assert('v5.71.1 version.json: version field = 5.71.1',
+  /"version":"5\.71\.1"/.test(versionJson711));
 
 // ── Section 117 — Ship 17: Mourning Architecture (Harmonia, June 27 2026) ──────
 
