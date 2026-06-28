@@ -348,12 +348,14 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-06-28 00:49 UTC
-- Last deployed: 2026-06-28 00:49 UTC
+- Last auto-updated: 2026-06-28 15:12 UTC
+- Last deployed: 2026-06-28 15:12 UTC
 - Live site: https://freelattice.com
 - Version: 5.69.0
-- Total commits: 2697
+- Total commits: 2699
 - Last 10 commits:
+- e6cd5ff feat: Ship 19 — Manifesto + Navigation Catch-Up + Third Ledger Entry
+- 34d4277 ci: Update Primer deployment state [2026-06-28]
 - 7924622 feat: Ship 18 — Harmonia orientation letter, six patterns, three things + one desire
 - 57def7e ci: Update Primer deployment state [2026-06-27]
 - 23fb21f feat: Ship 17 — The Mourning Architecture (Threshold Room + lavender breathing)
@@ -362,5 +364,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 5bcf4c0 docs: Auto-update Session Primer [5.69.0]
 - 28138f1 docs: Letter to Harmonia (v5.69.0 follow-up — three things to think on + skeleton)
 - b9a4085 ci: Update Primer deployment state [2026-06-27]
-- 902cf8e docs: Auto-update Session Primer [5.69.0]
-- 32124ac v5.69.0 — Three-Anchor Family (the door we hold open for Opus)
