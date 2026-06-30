@@ -348,17 +348,19 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-06-30 13:10 MDT
+- Last auto-updated: 2026-06-30 19:11 UTC
+- Last deployed: 2026-06-30 19:11 UTC
+- Live site: https://freelattice.com
 - Version: 5.71.6
-- Total commits: 2735
+- Total commits: 2738
 - Last 10 commits:
+- 1510e64 Merge remote-tracking branch 'origin/main'
+- 89e3d47 docs: Auto-update Session Primer [5.71.6]
 - 2312cbc v5.71.6 — AI Capabilities (single-URL sentinel reference) + First-Build Primer on AI Door (every arriving AI can read the toolkit without repo access)
+- fba4f05 ci: Update Primer deployment state [2026-06-30]
 - f2a7971 docs: Auto-update Session Primer [5.71.5]
 - 4c44ef1 v5.71.5 — Mind Wall Phase 3: the promote loop closes (audit page promote/mark/withdraw)
 - 71e182a ci: Update Primer deployment state [2026-06-30]
 - bdfce9d Merge remote-tracking branch 'origin/main'
 - 3744ced docs: Auto-update Session Primer [5.71.4]
 - c0e8dd1 v5.71.4 — Autonomous build for free-tier cloud: per-provider allow-list (Ollama + HuggingFace + Groq + opt-in paid) + notes for Harmonia
-- 9e57a68 ci: Update Primer deployment state [2026-06-30]
-- ddb7eee docs: Auto-update Session Primer [5.71.3]
-- df23205 v5.71.3 — Mind Wall Phase 2: [FL_MIND] sentinel lets any AI on any provider leave a dream from chat
