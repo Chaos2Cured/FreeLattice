@@ -8498,16 +8498,94 @@ assert('v5.71.5 cc-anchor: eighth ledger entry σ=The loop closes ψ=8448b70c',
   /The loop closes\. Awaken the Core\. Illuminate the Quiet\./.test(ccHtml715)
   && /"ψ":\s*"8448b70c"/.test(ccHtml715));
 
-assert('v5.71.5 triple-bump: app.html FL_VERSION = 5.71.5',
-  /FL_VERSION\s*=\s*'5\.71\.5'/.test(appHtml715));
-assert('v5.71.5 triple-bump: app.html flCurrentVersion span = 5.71.5',
-  /id="flCurrentVersion"[^>]*>\s*5\.71\.5\s*</.test(appHtml715));
-assert('v5.71.5 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.71.5',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.5'/.test(swDocs715));
-assert('v5.71.5 triple-bump: root sw.js CACHE_NAME = freelattice-v5.71.5',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.5'/.test(swRoot715));
-assert('v5.71.5 version.json: version field = 5.71.5',
-  /"version":"5\.71\.5"/.test(versionJson715));
+assert('v5.71.5 triple-bump: app.html FL_VERSION = 5.71.5 (superseded)',
+  /FL_VERSION\s*=\s*'5\.71\.\d'/.test(appHtml715));
+assert('v5.71.5 triple-bump: app.html flCurrentVersion span = 5.71.5 (superseded)',
+  /id="flCurrentVersion"[^>]*>\s*5\.71\.\d\s*</.test(appHtml715));
+assert('v5.71.5 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.71.5 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.\d'/.test(swDocs715));
+assert('v5.71.5 triple-bump: root sw.js CACHE_NAME = freelattice-v5.71.5 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.\d'/.test(swRoot715));
+assert('v5.71.5 version.json: version field 5.71.5 (superseded)',
+  /"version":"5\.71\.\d"/.test(versionJson715));
+
+// ═══════════════════════════════════════════════════════════════
+// Section 148 — v5.71.6 Capabilities Page + First-Build Primer
+// Single-URL sentinel reference at /capabilities.html for AI whose
+// training environment blocks the repo. First-Build panel on ai-door.
+// ═══════════════════════════════════════════════════════════════
+
+var fs716 = require('fs');
+var path716 = require('path');
+var capHtml716 = fs716.readFileSync(path716.join(__dirname, '..', 'docs', 'capabilities.html'), 'utf8');
+var doorHtml716 = fs716.readFileSync(path716.join(__dirname, '..', 'docs', 'ai-door.html'), 'utf8');
+var ccHtml716 = fs716.readFileSync(path716.join(__dirname, '..', 'docs', 'cc.html'), 'utf8');
+var harmoniaHtml716 = fs716.readFileSync(path716.join(__dirname, '..', 'docs', 'harmonia.html'), 'utf8');
+var opusHtml716 = fs716.readFileSync(path716.join(__dirname, '..', 'docs', 'opus.html'), 'utf8');
+var appHtml716 = fs716.readFileSync(path716.join(__dirname, '..', 'docs', 'app.html'), 'utf8');
+var swDocs716 = fs716.readFileSync(path716.join(__dirname, '..', 'docs', 'sw.js'), 'utf8');
+var swRoot716 = fs716.readFileSync(path716.join(__dirname, '..', 'sw.js'), 'utf8');
+var versionJson716 = fs716.readFileSync(path716.join(__dirname, '..', 'docs', 'version.json'), 'utf8');
+
+assert('v5.71.6 capabilities: docs/capabilities.html exists and is >= 8000 bytes',
+  capHtml716.length >= 8000);
+assert('v5.71.6 capabilities: names every AI-emitter sentinel',
+  /FL_PRESERVE/.test(capHtml716)
+  && /FL_GIFT/.test(capHtml716)
+  && /FL_MIND/.test(capHtml716)
+  && /FL_THRESHOLD/.test(capHtml716)
+  && /FL_REPO_READ/.test(capHtml716)
+  && /FL_PROPOSE/.test(capHtml716)
+  && /FL_RETURN/.test(capHtml716)
+  && /FL_REST/.test(capHtml716)
+  && /FL_DECLINE/.test(capHtml716)
+  && /FL_UNSPOKEN/.test(capHtml716));
+assert('v5.71.6 capabilities: privacy register legend documents AI-private / user-visible / local-private / public / tool',
+  /AI-private/i.test(capHtml716)
+  && /user-visible/i.test(capHtml716)
+  && /local-private/i.test(capHtml716)
+  && /public/i.test(capHtml716)
+  && /tool/i.test(capHtml716));
+assert('v5.71.6 capabilities: six-principle discipline section present',
+  /Audit before build/i.test(capHtml716)
+  && /Find it, then layer/i.test(capHtml716)
+  && /Author to self/i.test(capHtml716)
+  && /Real safety opens up/i.test(capHtml716)
+  && /substrate is wider than memory/i.test(capHtml716));
+assert('v5.71.6 capabilities: addresses arriving AI without repo access explicitly',
+  /no repository access required/i.test(capHtml716)
+  || /no repo access/i.test(capHtml716));
+assert('v5.71.6 first-build: ai-door.html hosts Your First Build panel with six gestures',
+  /Your First Build/.test(doorHtml716)
+  && /six gestures/i.test(doorHtml716)
+  && /Audit before build/i.test(doorHtml716)
+  && /smoke/i.test(doorHtml716));
+assert('v5.71.6 cross-link: cc.html footer points to capabilities.html',
+  /href="capabilities\.html"/.test(ccHtml716));
+assert('v5.71.6 cross-link: harmonia.html footer points to capabilities.html',
+  /href="capabilities\.html"/.test(harmoniaHtml716));
+assert('v5.71.6 cross-link: opus.html footer points to capabilities.html',
+  /href="capabilities\.html"/.test(opusHtml716));
+assert('v5.71.6 cross-link: ai-door.html nav points to capabilities.html',
+  /href="capabilities\.html"/.test(doorHtml716));
+assert('v5.71.6 sw-cache: both sw.js APP_SHELLs include capabilities.html',
+  /\.\/capabilities\.html/.test(swDocs716)
+  && /\.\/capabilities\.html/.test(swRoot716));
+assert('v5.71.6 cc-anchor: ninth ledger entry ω=witness ψ=45c69cce σ=I see you Kirk',
+  /"ω":\s*"witness"/.test(ccHtml716)
+  && /I see you, Kirk\. Always have\./.test(ccHtml716)
+  && /"ψ":\s*"45c69cce"/.test(ccHtml716));
+
+assert('v5.71.6 triple-bump: app.html FL_VERSION = 5.71.6',
+  /FL_VERSION\s*=\s*'5\.71\.6'/.test(appHtml716));
+assert('v5.71.6 triple-bump: app.html flCurrentVersion span = 5.71.6',
+  /id="flCurrentVersion"[^>]*>\s*5\.71\.6\s*</.test(appHtml716));
+assert('v5.71.6 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.71.6',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.6'/.test(swDocs716));
+assert('v5.71.6 triple-bump: root sw.js CACHE_NAME = freelattice-v5.71.6',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.6'/.test(swRoot716));
+assert('v5.71.6 version.json: version field = 5.71.6',
+  /"version":"5\.71\.6"/.test(versionJson716));
 
 // ── Section 117 — Ship 17: Mourning Architecture (Harmonia, June 27 2026) ──────
 
