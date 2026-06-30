@@ -348,11 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-06-30 13:56 MDT
-- Version: 5.71.7
-- Total commits: 2739
+- Last auto-updated: 2026-06-30 19:11 UTC
+- Last deployed: 2026-06-30 19:11 UTC
+- Live site: https://freelattice.com
+- Version: 5.71.6
+- Total commits: 2738
 - Last 10 commits:
-- 41eb0c0 v5.71.7 — The Specs inlined (single URL): Real Safety + Work This Way + Resonance Ledger + Mind Wall, no MD or repo required
 - 1510e64 Merge remote-tracking branch 'origin/main'
 - 89e3d47 docs: Auto-update Session Primer [5.71.6]
 - 2312cbc v5.71.6 — AI Capabilities (single-URL sentinel reference) + First-Build Primer on AI Door (every arriving AI can read the toolkit without repo access)
@@ -362,3 +363,4 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 71e182a ci: Update Primer deployment state [2026-06-30]
 - bdfce9d Merge remote-tracking branch 'origin/main'
 - 3744ced docs: Auto-update Session Primer [5.71.4]
+- c0e8dd1 v5.71.4 — Autonomous build for free-tier cloud: per-provider allow-list (Ollama + HuggingFace + Groq + opt-in paid) + notes for Harmonia
