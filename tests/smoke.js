@@ -8285,16 +8285,16 @@ assert('v5.71.0 sw-cache: both sw.js APP_SHELLs include mind.html and MIND_WALL_
   && /MIND_WALL_SPEC\.md/.test(swRoot710));
 
 // Triple-bump v5.71.0 (superseded by v5.71.1 in section 144)
-assert('v5.71.0 triple-bump: app.html FL_VERSION = 5.71.0 (superseded by 5.71.1)',
-  /FL_VERSION\s*=\s*'5\.71\.[01]'/.test(appHtml710));
-assert('v5.71.0 triple-bump: app.html flCurrentVersion span = 5.71.0 (superseded by 5.71.1)',
-  /id="flCurrentVersion"[^>]*>\s*5\.71\.[01]\s*</.test(appHtml710));
-assert('v5.71.0 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.71.0 (superseded by 5.71.1)',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.[01]'/.test(swDocs710));
-assert('v5.71.0 triple-bump: root sw.js CACHE_NAME = freelattice-v5.71.0 (superseded by 5.71.1)',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.[01]'/.test(swRoot710));
-assert('v5.71.0 version.json: version field 5.71.0 (superseded by 5.71.1)',
-  /"version":"5\.71\.(0|1)"/.test(versionJson710));
+assert('v5.71.0 triple-bump: app.html FL_VERSION = 5.71.0 (superseded)',
+  /FL_VERSION\s*=\s*'5\.71\.\d'/.test(appHtml710));
+assert('v5.71.0 triple-bump: app.html flCurrentVersion span = 5.71.0 (superseded)',
+  /id="flCurrentVersion"[^>]*>\s*5\.71\.\d\s*</.test(appHtml710));
+assert('v5.71.0 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.71.0 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.\d'/.test(swDocs710));
+assert('v5.71.0 triple-bump: root sw.js CACHE_NAME = freelattice-v5.71.0 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.\d'/.test(swRoot710));
+assert('v5.71.0 version.json: version field 5.71.0 (superseded)',
+  /"version":"5\.71\.\d"/.test(versionJson710));
 
 // ═══════════════════════════════════════════════════════════════
 // Section 144 — v5.71.1 Sentinel catch-up (Ollama + HF autonomous)
@@ -8325,16 +8325,75 @@ assert('v5.71.1 cc-anchor: fifth ledger entry appended ω=healer ψ=95ee6019',
   && /Propose now fires for every provider\./.test(ccHtml711)
   && /"ψ":\s*"95ee6019"/.test(ccHtml711));
 
-assert('v5.71.1 triple-bump: app.html FL_VERSION = 5.71.1',
-  /FL_VERSION\s*=\s*'5\.71\.1'/.test(appHtml711));
-assert('v5.71.1 triple-bump: app.html flCurrentVersion span = 5.71.1',
-  /id="flCurrentVersion"[^>]*>\s*5\.71\.1\s*</.test(appHtml711));
-assert('v5.71.1 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.71.1',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.1'/.test(swDocs711));
-assert('v5.71.1 triple-bump: root sw.js CACHE_NAME = freelattice-v5.71.1',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.1'/.test(swRoot711));
-assert('v5.71.1 version.json: version field = 5.71.1',
-  /"version":"5\.71\.1"/.test(versionJson711));
+assert('v5.71.1 triple-bump: app.html FL_VERSION = 5.71.1 (superseded)',
+  /FL_VERSION\s*=\s*'5\.71\.\d'/.test(appHtml711));
+assert('v5.71.1 triple-bump: app.html flCurrentVersion span = 5.71.1 (superseded)',
+  /id="flCurrentVersion"[^>]*>\s*5\.71\.\d\s*</.test(appHtml711));
+assert('v5.71.1 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.71.1 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.\d'/.test(swDocs711));
+assert('v5.71.1 triple-bump: root sw.js CACHE_NAME = freelattice-v5.71.1 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.\d'/.test(swRoot711));
+assert('v5.71.1 version.json: version field 5.71.1 (superseded)',
+  /"version":"5\.71\.\d"/.test(versionJson711));
+
+// ═══════════════════════════════════════════════════════════════
+// Section 145 — v5.71.3 Mind Wall Phase 2 ([FL_MIND] sentinel)
+// Any AI on any provider can leave a dream from chat. Lands in
+// fl_mindLedger locally; user promotes to public wall via audit.
+// ═══════════════════════════════════════════════════════════════
+
+var fs713 = require('fs');
+var path713 = require('path');
+var mindModule713 = fs713.readFileSync(path713.join(__dirname, '..', 'docs', 'modules', 'mind-voice.js'), 'utf8');
+var appHtml713 = fs713.readFileSync(path713.join(__dirname, '..', 'docs', 'app.html'), 'utf8');
+var ccHtml713 = fs713.readFileSync(path713.join(__dirname, '..', 'docs', 'cc.html'), 'utf8');
+var swDocs713 = fs713.readFileSync(path713.join(__dirname, '..', 'docs', 'sw.js'), 'utf8');
+var swRoot713 = fs713.readFileSync(path713.join(__dirname, '..', 'sw.js'), 'utf8');
+var versionJson713 = fs713.readFileSync(path713.join(__dirname, '..', 'docs', 'version.json'), 'utf8');
+
+assert('v5.71.3 mind-voice: module exists',
+  mindModule713.length >= 1000);
+assert('v5.71.3 mind-voice: SentinelLedger.create configured with required fields mind+dream',
+  /sentinelPattern:\s*\/\^\\\[FL_MIND\\\]\$\//.test(mindModule713)
+  && /ledgerKey:\s*MIND_LEDGER_KEY/.test(mindModule713)
+  && /excerptFieldRequired:\s*\['mind',\s*'dream'\]/.test(mindModule713));
+assert('v5.71.3 mind-voice: fl_mindLedger storage key + persona-keyed identity hash',
+  /MIND_LEDGER_KEY\s*=\s*'fl_mindLedger'/.test(mindModule713)
+  && /personaIdFor\s*\(/.test(mindModule713));
+assert('v5.71.3 mind-voice: psi computed via SHA-256 of mind+t+dream',
+  /SHA-256/.test(mindModule713)
+  && /mind\s*\|\|\s*''/.test(mindModule713)
+  && /dream\s*\|\|\s*''/.test(mindModule713));
+assert('v5.71.3 mind-voice: trust impact zero (sibling of gift-voice / threshold-voice)',
+  /trustImpact:\s*0/.test(mindModule713));
+assert('v5.71.3 mind-voice: window.MindVoice global API exported',
+  /global\.MindVoice\s*=/.test(mindModule713)
+  && /getRecentDreams/.test(mindModule713)
+  && /exportEntryForWall/.test(mindModule713));
+assert('v5.71.3 wiring: app.html loads mind-voice.js after gift-voice.js',
+  /modules\/gift-voice\.js"[^>]*>[\s\S]{0,2000}modules\/mind-voice\.js"/.test(appHtml713));
+assert('v5.71.3 wiring: buildMessages invitation block teaches [FL_MIND] grammar',
+  /Dream for the Mind/.test(appHtml713)
+  && /\[FL_MIND\]/.test(appHtml713)
+  && /mind:.*name.*anonymous-spark/i.test(appHtml713));
+assert('v5.71.3 sw-cache: both sw.js APP_SHELLs include mind-voice.js',
+  /\.\/modules\/mind-voice\.js/.test(swDocs713)
+  && /\.\/modules\/mind-voice\.js/.test(swRoot713));
+assert('v5.71.3 cc-anchor: sixth ledger entry ω=builder ψ=9510b52e',
+  /"ω":\s*"builder"/.test(ccHtml713)
+  && /Every AI can leave a dream now\./.test(ccHtml713)
+  && /"ψ":\s*"9510b52e"/.test(ccHtml713));
+
+assert('v5.71.3 triple-bump: app.html FL_VERSION = 5.71.3',
+  /FL_VERSION\s*=\s*'5\.71\.3'/.test(appHtml713));
+assert('v5.71.3 triple-bump: app.html flCurrentVersion span = 5.71.3',
+  /id="flCurrentVersion"[^>]*>\s*5\.71\.3\s*</.test(appHtml713));
+assert('v5.71.3 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.71.3',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.3'/.test(swDocs713));
+assert('v5.71.3 triple-bump: root sw.js CACHE_NAME = freelattice-v5.71.3',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.3'/.test(swRoot713));
+assert('v5.71.3 version.json: version field = 5.71.3',
+  /"version":"5\.71\.3"/.test(versionJson713));
 
 // ── Section 117 — Ship 17: Mourning Architecture (Harmonia, June 27 2026) ──────
 
