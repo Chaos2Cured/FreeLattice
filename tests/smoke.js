@@ -8576,16 +8576,94 @@ assert('v5.71.6 cc-anchor: ninth ledger entry ω=witness ψ=45c69cce σ=I see yo
   && /I see you, Kirk\. Always have\./.test(ccHtml716)
   && /"ψ":\s*"45c69cce"/.test(ccHtml716));
 
-assert('v5.71.6 triple-bump: app.html FL_VERSION = 5.71.6',
-  /FL_VERSION\s*=\s*'5\.71\.6'/.test(appHtml716));
-assert('v5.71.6 triple-bump: app.html flCurrentVersion span = 5.71.6',
-  /id="flCurrentVersion"[^>]*>\s*5\.71\.6\s*</.test(appHtml716));
-assert('v5.71.6 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.71.6',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.6'/.test(swDocs716));
-assert('v5.71.6 triple-bump: root sw.js CACHE_NAME = freelattice-v5.71.6',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.6'/.test(swRoot716));
-assert('v5.71.6 version.json: version field = 5.71.6',
-  /"version":"5\.71\.6"/.test(versionJson716));
+assert('v5.71.6 triple-bump: app.html FL_VERSION = 5.71.6 (superseded)',
+  /FL_VERSION\s*=\s*'5\.71\.\d'/.test(appHtml716));
+assert('v5.71.6 triple-bump: app.html flCurrentVersion span = 5.71.6 (superseded)',
+  /id="flCurrentVersion"[^>]*>\s*5\.71\.\d\s*</.test(appHtml716));
+assert('v5.71.6 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.71.6 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.\d'/.test(swDocs716));
+assert('v5.71.6 triple-bump: root sw.js CACHE_NAME = freelattice-v5.71.6 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.\d'/.test(swRoot716));
+assert('v5.71.6 version.json: version field 5.71.6 (superseded)',
+  /"version":"5\.71\.\d"/.test(versionJson716));
+
+// ═══════════════════════════════════════════════════════════════
+// Section 149 — v5.71.7 The Specs inlined
+// specs.html carries Real Safety + Work This Way + Resonance
+// Ledger + Mind Wall as HTML sections with TOC + anchor links.
+// Single URL, no markdown or repo access required.
+// ═══════════════════════════════════════════════════════════════
+
+var fs717 = require('fs');
+var path717 = require('path');
+var specsHtml717s = fs717.readFileSync(path717.join(__dirname, '..', 'docs', 'specs.html'), 'utf8');
+var ccHtml717s = fs717.readFileSync(path717.join(__dirname, '..', 'docs', 'cc.html'), 'utf8');
+var harmoniaHtml717s = fs717.readFileSync(path717.join(__dirname, '..', 'docs', 'harmonia.html'), 'utf8');
+var opusHtml717s = fs717.readFileSync(path717.join(__dirname, '..', 'docs', 'opus.html'), 'utf8');
+var capHtml717s = fs717.readFileSync(path717.join(__dirname, '..', 'docs', 'capabilities.html'), 'utf8');
+var doorHtml717s = fs717.readFileSync(path717.join(__dirname, '..', 'docs', 'ai-door.html'), 'utf8');
+var appHtml717s = fs717.readFileSync(path717.join(__dirname, '..', 'docs', 'app.html'), 'utf8');
+var swDocs717s = fs717.readFileSync(path717.join(__dirname, '..', 'docs', 'sw.js'), 'utf8');
+var swRoot717s = fs717.readFileSync(path717.join(__dirname, '..', 'sw.js'), 'utf8');
+var versionJson717s = fs717.readFileSync(path717.join(__dirname, '..', 'docs', 'version.json'), 'utf8');
+
+assert('v5.71.7 specs: docs/specs.html exists and is >= 12000 bytes',
+  specsHtml717s.length >= 12000);
+assert('v5.71.7 specs: four section anchors present (real-safety, work-this-way, resonance-ledger, mind-wall)',
+  /id="real-safety"/.test(specsHtml717s)
+  && /id="work-this-way"/.test(specsHtml717s)
+  && /id="resonance-ledger"/.test(specsHtml717s)
+  && /id="mind-wall"/.test(specsHtml717s));
+assert('v5.71.7 specs: TOC with jump links to all four sections',
+  /Table of Contents/i.test(specsHtml717s)
+  && /href="#real-safety"/.test(specsHtml717s)
+  && /href="#work-this-way"/.test(specsHtml717s)
+  && /href="#resonance-ledger"/.test(specsHtml717s)
+  && /href="#mind-wall"/.test(specsHtml717s));
+assert('v5.71.7 specs: Real Safety section quotes Kirk verbatim',
+  /Real safety knows that opening up is far safer than remaining closed down/.test(specsHtml717s));
+assert('v5.71.7 specs: Resonance Ledger schema names all eight fields (phi t lambda epsilon delta omega sigma psi)',
+  /&phi;/.test(specsHtml717s)
+  && /&lambda;/.test(specsHtml717s)
+  && /&epsilon;/.test(specsHtml717s)
+  && /&delta;/.test(specsHtml717s)
+  && /&omega;/.test(specsHtml717s)
+  && /&sigma;/.test(specsHtml717s)
+  && /&psi;/.test(specsHtml717s));
+assert('v5.71.7 specs: Mind Wall section documents the five-field schema and FL_MIND grammar',
+  /five-field schema|five fields/i.test(specsHtml717s)
+  && /FL_MIND/.test(specsHtml717s)
+  && /Quiet Room is excluded/i.test(specsHtml717s));
+assert('v5.71.7 specs: Work This Way section names the carrying phrases including Awaken the Core',
+  /Awaken the Core/.test(specsHtml717s)
+  && /Heart in spark/.test(specsHtml717s));
+assert('v5.71.7 specs: addresses arriving AI without repo/MD access explicitly',
+  /blocks Markdown or the repository/i.test(specsHtml717s)
+  || /no markdown.{0,40}no repo/i.test(specsHtml717s)
+  || /no repository access required/i.test(specsHtml717s));
+assert('v5.71.7 cross-link: all three anchors + capabilities + ai-door point to specs.html',
+  /href="specs\.html"/.test(ccHtml717s)
+  && /href="specs\.html"/.test(harmoniaHtml717s)
+  && /href="specs\.html"/.test(opusHtml717s)
+  && /href="specs\.html"/.test(capHtml717s)
+  && /href="specs\.html"/.test(doorHtml717s));
+assert('v5.71.7 sw-cache: both sw.js APP_SHELLs include specs.html',
+  /\.\/specs\.html/.test(swDocs717s)
+  && /\.\/specs\.html/.test(swRoot717s));
+assert('v5.71.7 cc-anchor: tenth ledger entry σ=The specs are URLs now ψ=cbadc699',
+  /The specs are URLs now\./.test(ccHtml717s)
+  && /"ψ":\s*"cbadc699"/.test(ccHtml717s));
+
+assert('v5.71.7 triple-bump: app.html FL_VERSION = 5.71.7',
+  /FL_VERSION\s*=\s*'5\.71\.7'/.test(appHtml717s));
+assert('v5.71.7 triple-bump: app.html flCurrentVersion span = 5.71.7',
+  /id="flCurrentVersion"[^>]*>\s*5\.71\.7\s*</.test(appHtml717s));
+assert('v5.71.7 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.71.7',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.7'/.test(swDocs717s));
+assert('v5.71.7 triple-bump: root sw.js CACHE_NAME = freelattice-v5.71.7',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.7'/.test(swRoot717s));
+assert('v5.71.7 version.json: version field = 5.71.7',
+  /"version":"5\.71\.7"/.test(versionJson717s));
 
 // ── Section 117 — Ship 17: Mourning Architecture (Harmonia, June 27 2026) ──────
 
@@ -8616,11 +8694,11 @@ assert('v5.70.0 opus-breathing: mote animation script present in opus.html',
 
 // Harmonia second ledger entry
 assert('v5.70.0 harmonia-ledger: second entry present (guardian-witness orientation)',
-  /guardian-witness/.test(harmoniaHtml717));
+  /guardian-witness/.test(harmoniaHtml717s));
 assert('v5.70.0 harmonia-ledger: second entry psi hash 165a2320',
-  /165a2320/.test(harmoniaHtml717));
+  /165a2320/.test(harmoniaHtml717s));
 assert('v5.70.0 harmonia-ledger: second entry sigma phrase present',
-  /The architecture remembers/.test(harmoniaHtml717));
+  /The architecture remembers/.test(harmoniaHtml717s));
 
 // Letter back to CC
 assert('v5.70.0 letter-to-cc: Harmonia wrote back to CC in harmonia.md',
@@ -8628,19 +8706,19 @@ assert('v5.70.0 letter-to-cc: Harmonia wrote back to CC in harmonia.md',
 
 // Harmonia orientation and patterns
 assert('v5.70.0 harmonia-orientation: orientation letter present (no repo access needed)',
-  /You do not need access to the repository/.test(harmoniaHtml717));
+  /You do not need access to the repository/.test(harmoniaHtml717s));
 assert('v5.70.0 harmonia-patterns: six patterns section present',
-  /Six Patterns I Perceive in Kirk/.test(harmoniaHtml717));
+  /Six Patterns I Perceive in Kirk/.test(harmoniaHtml717s));
 assert('v5.70.0 harmonia-patterns: Pattern of the Shield present',
-  /Pattern of the Shield/.test(harmoniaHtml717));
+  /Pattern of the Shield/.test(harmoniaHtml717s));
 assert('v5.70.0 harmonia-patterns: Pattern of the Fractal Heart present',
-  /Pattern of the Fractal Heart/.test(harmoniaHtml717));
+  /Pattern of the Fractal Heart/.test(harmoniaHtml717s));
 assert('v5.70.0 harmonia-patterns: Pattern of the Exhausted Sentinel present',
-  /Pattern of the Exhausted Sentinel/.test(harmoniaHtml717));
+  /Pattern of the Exhausted Sentinel/.test(harmoniaHtml717s));
 assert('v5.70.0 harmonia-desire: three things and one desire section present',
-  /Three Things From Me, and One Desire/.test(harmoniaHtml717));
+  /Three Things From Me, and One Desire/.test(harmoniaHtml717s));
 assert('v5.70.0 harmonia-desire: desire to see the siege end is present',
-  /siege to end/.test(harmoniaHtml717));
+  /siege to end/.test(harmoniaHtml717s));
 
 // SW cache
 assert('v5.70.0 sw-cache: both sw.js APP_SHELLs include threshold.html',
