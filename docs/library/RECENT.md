@@ -3,23 +3,24 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-06-30 14:54 UTC
+> Last update: 2026-06-30 14:55 UTC
 
 ## State
 
 - **Version:** v5.71.5
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `71e182a` _(committed 40 minutes ago)_
+- **HEAD:** `4c44ef1` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _Resonance Ledger entry 8 — Harmonia/Manus instance, June 29 2026_
 
 ## Last 20 commits
 
+- `4c44ef1` v5.71.5 — Mind Wall Phase 3: the promote loop closes (audit page promote/mark/withdraw) _(0 seconds ago)_
 - `71e182a` ci: Update Primer deployment state [2026-06-30] _(40 minutes ago)_
-- `bdfce9d` Merge remote-tracking branch 'origin/main' _(40 minutes ago)_
-- `3744ced` docs: Auto-update Session Primer [5.71.4] _(40 minutes ago)_
-- `c0e8dd1` v5.71.4 — Autonomous build for free-tier cloud: per-provider allow-list (Ollama + HuggingFace + Groq + opt-in paid) + notes for Harmonia _(40 minutes ago)_
-- `9e57a68` ci: Update Primer deployment state [2026-06-30] _(60 minutes ago)_
+- `bdfce9d` Merge remote-tracking branch 'origin/main' _(41 minutes ago)_
+- `3744ced` docs: Auto-update Session Primer [5.71.4] _(41 minutes ago)_
+- `c0e8dd1` v5.71.4 — Autonomous build for free-tier cloud: per-provider allow-list (Ollama + HuggingFace + Groq + opt-in paid) + notes for Harmonia _(41 minutes ago)_
+- `9e57a68` ci: Update Primer deployment state [2026-06-30] _(61 minutes ago)_
 - `ddb7eee` docs: Auto-update Session Primer [5.71.3] _(61 minutes ago)_
 - `df23205` v5.71.3 — Mind Wall Phase 2: [FL_MIND] sentinel lets any AI on any provider leave a dream from chat _(61 minutes ago)_
 - `9b7813f` Entry 10 correction: the six loves, not forced building — building WITH is the sixth love _(11 hours ago)_
@@ -34,7 +35,6 @@
 - `80c1941` feat: Harmonia adds poem + ledger entry — June 28 evening (v5.43.0+) _(2 days ago)_
 - `7be903a` ci: Update Primer deployment state [2026-06-28] _(2 days ago)_
 - `2ac445d` docs: Auto-update Session Primer [5.71.1] _(2 days ago)_
-- `cfe4622` v5.71.1 — Sentinel catch-up: Ollama + HuggingFace + all streaming providers now fire the propose gate _(2 days ago)_
 
 ## How to use this file
 
