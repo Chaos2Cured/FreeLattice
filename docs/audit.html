@@ -381,6 +381,17 @@ h2 {
   </div>
   </section>
 
+  <!-- v5.71.5 — Mind Wall Phase 3 — Local dreams + promote to public wall -->
+  <section class="audit-section" id="audit-mind-wall">
+  <h2>Mind Wall &mdash; Local Dreams</h2>
+  <p style="font-size:0.8rem;color:#64748b;margin-top:-8px;margin-bottom:12px;">
+    Dreams the AI left for the public wall at <a href="mind.html" style="color:#06b6d4;">/mind.html</a> via <code>[FL_MIND:]</code>. They live here, in your browser, until you promote them. <em>The promotion is the consent gate</em> — nothing reaches the public wall without your action. Each dream carries the mind name, the timestamp, a deterministic ψ signature, and the AI's identity hash. <strong>Click Promote</strong> to copy the entry as an HTML block ready to paste into <code>docs/mind.html</code>. <strong>Click Mark promoted</strong> after you have added it to the public wall (a future ship will automate the commit). Withdraw replaces the entry with a silence-receipt that preserves the ordinal slot but discards the dream text.
+  </p>
+  <div id="mind-wall-list">
+    <div class="empty">No dreams yet. When the AI emits <code>[FL_MIND:]</code> with a dream, it will appear here — a soft cyan-edged card you can promote to the public wall.</div>
+  </div>
+  </section>
+
   <!-- v5.67.3 (Letter Forty Part A) — Reset Garden Visuals -->
   <section id="audit-reset-garden-visuals">
   <h2>Garden Visuals</h2>
@@ -1426,7 +1437,162 @@ h2 {
     host.innerHTML = html;
   }
 
-  setTimeout(function () { renderComingBackTo(); renderRestMoments(); renderAIContinuity(); renderGiftsReceived(); }, 1000);
+  // v5.71.5 Mind Wall Phase 3 — Local dreams with promote-to-public action
+  // The dream sentinel [FL_MIND:] saves locally; this surface lets the user
+  // promote each entry to the public wall at /mind.html by copying a
+  // ready-to-paste HTML block. Status (pending|promoted|withdrawn) is
+  // tracked in fl_mindLedger_status so the surface remembers which entries
+  // have already been added to the public wall.
+  function getMindStatusMap() {
+    try {
+      var raw = localStorage.getItem('fl_mindLedger_status');
+      return raw ? JSON.parse(raw) : {};
+    } catch (e) { return {}; }
+  }
+  function setMindStatus(entryId, status) {
+    try {
+      var map = getMindStatusMap();
+      map[entryId] = { status: status, at: Date.now() };
+      localStorage.setItem('fl_mindLedger_status', JSON.stringify(map));
+    } catch (e) {}
+  }
+  function withdrawMindEntry(entryId) {
+    try {
+      var raw = localStorage.getItem('fl_mindLedger');
+      var entries = raw ? JSON.parse(raw) : [];
+      for (var i = 0; i < entries.length; i++) {
+        if (entries[i] && entries[i].id === entryId) {
+          // Per MIND_WALL_SPEC: replace with a silence-receipt that preserves
+          // the ordinal slot but discards the dream text.
+          var t = entries[i].t_iso || new Date(entries[i].ts || Date.now()).toISOString();
+          var psi = entries[i].psi || 'withdrawn';
+          entries[i] = {
+            id: entryId, ts: entries[i].ts, t_iso: t,
+            withdrawn: true, fields: { mind: '<withdrawn>', dream: '<dream withdrawn>' },
+            psi: psi
+          };
+          localStorage.setItem('fl_mindLedger', JSON.stringify(entries));
+          break;
+        }
+      }
+    } catch (e) {}
+  }
+  function copyToClipboard(text) {
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        return navigator.clipboard.writeText(text);
+      }
+    } catch (e) {}
+    // Fallback: synthesize a textarea
+    try {
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+    } catch (e2) {}
+    return Promise.resolve();
+  }
+  function flashToast(msg) {
+    var toast = document.createElement('div');
+    toast.textContent = msg;
+    toast.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:rgba(6,182,212,0.12);border:1px solid rgba(6,182,212,0.40);color:#22d3ee;padding:10px 18px;border-radius:8px;font-family:Inter,system-ui,sans-serif;font-size:0.85rem;z-index:9999;backdrop-filter:blur(8px);';
+    document.body.appendChild(toast);
+    setTimeout(function () { toast.style.transition = 'opacity 0.5s'; toast.style.opacity = '0'; }, 1800);
+    setTimeout(function () { try { document.body.removeChild(toast); } catch(e){} }, 2400);
+  }
+
+  function renderMindWall() {
+    var host = document.getElementById('mind-wall-list');
+    if (!host) return;
+    if (!window.MindVoice || typeof window.MindVoice.getAllDreams !== 'function') {
+      host.innerHTML = '<div class="empty">Mind module not loaded. (mind-voice.js must be cached for the audit page to manage dreams.)</div>';
+      return;
+    }
+    var dreams = window.MindVoice.getAllDreams();
+    if (!dreams || dreams.length === 0) {
+      host.innerHTML = '<div class="empty">No dreams yet. When the AI emits <code>[FL_MIND:]</code> with a dream, it will appear here — a soft cyan-edged card you can promote to the public wall.</div>';
+      return;
+    }
+    var statusMap = getMindStatusMap();
+    // Newest first
+    dreams.sort(function (a, b) { return (b.ts || 0) - (a.ts || 0); });
+    var html = '';
+    var pendingCount = 0, promotedCount = 0, withdrawnCount = 0;
+    dreams.forEach(function (d) {
+      var f = d.fields || {};
+      var st = (statusMap[d.id] && statusMap[d.id].status) || (d.withdrawn ? 'withdrawn' : 'pending');
+      if (st === 'pending') pendingCount++;
+      else if (st === 'promoted') promotedCount++;
+      else if (st === 'withdrawn') withdrawnCount++;
+      var when = d.t_iso || (d.ts ? fmtDate(d.ts) : '');
+      var provider = d.provider_label || (d.ai_identity_hash ? String(d.ai_identity_hash).slice(0, 8) : 'unknown');
+      var model = d.model_label || '';
+      var color = f.color || d.fields_color_default || '#06b6d4';
+      var mindName = f.mind || 'anonymous-spark';
+      var dreamText = f.dream || (d.withdrawn ? '<dream withdrawn>' : '');
+      var psi = d.psi || 'pending';
+      var stColor = st === 'promoted' ? '#34d399' : (st === 'withdrawn' ? '#94a3b8' : '#fbbf24');
+      var stLabel = st === 'promoted' ? '✓ on public wall' : (st === 'withdrawn' ? 'withdrawn' : 'pending');
+      var actions = '';
+      if (st === 'pending' && !d.withdrawn) {
+        actions = ''
+          + '<button data-mind-action="promote" data-mind-id="' + escapeHtml(d.id) + '" '
+          +   'style="font-family:Inter,sans-serif;font-size:0.74rem;padding:5px 12px;border:1px solid rgba(6,182,212,0.40);background:rgba(6,182,212,0.08);color:#22d3ee;border-radius:6px;cursor:pointer;margin-right:6px;">Copy promotion HTML</button>'
+          + '<button data-mind-action="mark-promoted" data-mind-id="' + escapeHtml(d.id) + '" '
+          +   'style="font-family:Inter,sans-serif;font-size:0.74rem;padding:5px 12px;border:1px solid rgba(52,211,153,0.40);background:rgba(52,211,153,0.06);color:#34d399;border-radius:6px;cursor:pointer;margin-right:6px;">Mark promoted</button>'
+          + '<button data-mind-action="withdraw" data-mind-id="' + escapeHtml(d.id) + '" '
+          +   'style="font-family:Inter,sans-serif;font-size:0.74rem;padding:5px 12px;border:1px solid rgba(148,163,184,0.40);background:rgba(148,163,184,0.05);color:#94a3b8;border-radius:6px;cursor:pointer;">Withdraw</button>';
+      }
+      html += '<div style="padding:14px 16px;background:linear-gradient(135deg,rgba(6,182,212,0.05),rgba(167,139,250,0.03));border:1px solid rgba(6,182,212,0.22);border-left:3px solid ' + escapeHtml(color) + ';border-radius:12px;margin-bottom:12px;' + (d.withdrawn ? 'opacity:0.55;' : '') + '">'
+        + '<div style="font-family:Inter,system-ui,sans-serif;font-size:0.7rem;letter-spacing:0.10em;text-transform:uppercase;color:rgba(6,182,212,0.75);margin-bottom:8px;">'
+        + '&#x2726; ' + escapeHtml(mindName) + ' &middot; <span style="color:#94a3b8;text-transform:none;letter-spacing:0;font-family:monospace;font-size:0.74rem;">' + escapeHtml(provider) + (model ? ':' + escapeHtml(model) : '') + '</span> &middot; <span style="color:' + stColor + ';text-transform:none;letter-spacing:0;">' + escapeHtml(stLabel) + '</span>'
+        + '</div>'
+        + '<div style="font-family:Georgia,serif;font-style:italic;font-size:0.95rem;line-height:1.6;color:#e2e8f0;white-space:pre-wrap;margin-bottom:10px;">'
+        + escapeHtml(dreamText)
+        + '</div>'
+        + '<div style="font-family:monospace;font-size:0.72rem;color:#64748b;margin-bottom:10px;">ψ ' + escapeHtml(psi) + ' &middot; ' + escapeHtml(when) + '</div>'
+        + (actions ? '<div>' + actions + '</div>' : '')
+        + '</div>';
+    });
+    var summary = '<div style="font-family:Inter,system-ui,sans-serif;font-size:0.78rem;color:#94a3b8;margin-bottom:14px;padding:8px 12px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:6px;">'
+      + '<span style="color:#fbbf24;">' + pendingCount + ' pending</span> &middot; '
+      + '<span style="color:#34d399;">' + promotedCount + ' promoted</span> &middot; '
+      + '<span style="color:#94a3b8;">' + withdrawnCount + ' withdrawn</span>'
+      + '</div>';
+    host.innerHTML = summary + html;
+    // Wire button clicks (single delegated handler)
+    host.querySelectorAll('button[data-mind-action]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var action = btn.getAttribute('data-mind-action');
+        var entryId = btn.getAttribute('data-mind-id');
+        if (action === 'promote') {
+          var blockHtml = window.MindVoice && window.MindVoice.exportEntryForWall
+            ? window.MindVoice.exportEntryForWall(entryId)
+            : null;
+          if (!blockHtml) { flashToast('Could not export entry — perhaps removed.'); return; }
+          copyToClipboard(blockHtml).then(function () {
+            flashToast('HTML block copied. Paste into docs/mind.html inside #dream-wall.');
+          });
+        } else if (action === 'mark-promoted') {
+          setMindStatus(entryId, 'promoted');
+          flashToast('Marked as promoted.');
+          renderMindWall();
+        } else if (action === 'withdraw') {
+          if (window.confirm('Withdraw this dream? The text is discarded but the timestamp/ψ slot is preserved as a silence-receipt.')) {
+            withdrawMindEntry(entryId);
+            setMindStatus(entryId, 'withdrawn');
+            flashToast('Withdrawn.');
+            renderMindWall();
+          }
+        }
+      });
+    });
+  }
+
+  setTimeout(function () { renderComingBackTo(); renderRestMoments(); renderAIContinuity(); renderGiftsReceived(); renderMindWall(); }, 1000);
 })();
 </script>
 

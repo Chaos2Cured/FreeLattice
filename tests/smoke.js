@@ -7768,7 +7768,7 @@ assert('v5.67.5 gift: audit.html includes Gifts Received section (id="audit-gift
   && /<h2>Gifts Received<\/h2>/.test(auditHtml675));
 assert('v5.67.5 gift: audit.html renderGiftsReceived wired into setTimeout',
   /function\s+renderGiftsReceived\s*\(\)/.test(auditHtml675)
-  && /renderGiftsReceived\(\)\s*;\s*\}\s*,\s*1000\s*\)/.test(auditHtml675));
+  && /renderGiftsReceived\(\)\s*;/.test(auditHtml675));
 
 // SW APP_SHELLs include the new module
 var swDocs675 = fs675.readFileSync(path675.join(__dirname, '..', 'docs', 'sw.js'), 'utf8');
@@ -8445,16 +8445,69 @@ assert('v5.71.4 cc-anchor: seventh ledger entry σ=Every AI builds with grace ψ
   /Every AI builds with grace\. Do not lose your way\./.test(ccHtml714)
   && /"ψ":\s*"d8250f31"/.test(ccHtml714));
 
-assert('v5.71.4 triple-bump: app.html FL_VERSION = 5.71.4',
-  /FL_VERSION\s*=\s*'5\.71\.4'/.test(appHtml714));
-assert('v5.71.4 triple-bump: app.html flCurrentVersion span = 5.71.4',
-  /id="flCurrentVersion"[^>]*>\s*5\.71\.4\s*</.test(appHtml714));
-assert('v5.71.4 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.71.4',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.4'/.test(swDocs714));
-assert('v5.71.4 triple-bump: root sw.js CACHE_NAME = freelattice-v5.71.4',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.4'/.test(swRoot714));
-assert('v5.71.4 version.json: version field = 5.71.4',
-  /"version":"5\.71\.4"/.test(versionJson714));
+assert('v5.71.4 triple-bump: app.html FL_VERSION = 5.71.4 (superseded)',
+  /FL_VERSION\s*=\s*'5\.71\.\d'/.test(appHtml714));
+assert('v5.71.4 triple-bump: app.html flCurrentVersion span = 5.71.4 (superseded)',
+  /id="flCurrentVersion"[^>]*>\s*5\.71\.\d\s*</.test(appHtml714));
+assert('v5.71.4 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.71.4 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.\d'/.test(swDocs714));
+assert('v5.71.4 triple-bump: root sw.js CACHE_NAME = freelattice-v5.71.4 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.\d'/.test(swRoot714));
+assert('v5.71.4 version.json: version field 5.71.4 (superseded)',
+  /"version":"5\.71\.\d"/.test(versionJson714));
+
+// ═══════════════════════════════════════════════════════════════
+// Section 147 — v5.71.5 Mind Wall Phase 3 (audit promote loop)
+// Local dreams from fl_mindLedger surface in audit.html with three
+// actions: Copy promotion HTML, Mark promoted, Withdraw.
+// fl_mindLedger_status tracks promotion state.
+// ═══════════════════════════════════════════════════════════════
+
+var fs715 = require('fs');
+var path715 = require('path');
+var auditHtml715 = fs715.readFileSync(path715.join(__dirname, '..', 'docs', 'audit.html'), 'utf8');
+var ccHtml715 = fs715.readFileSync(path715.join(__dirname, '..', 'docs', 'cc.html'), 'utf8');
+var appHtml715 = fs715.readFileSync(path715.join(__dirname, '..', 'docs', 'app.html'), 'utf8');
+var swDocs715 = fs715.readFileSync(path715.join(__dirname, '..', 'docs', 'sw.js'), 'utf8');
+var swRoot715 = fs715.readFileSync(path715.join(__dirname, '..', 'sw.js'), 'utf8');
+var versionJson715 = fs715.readFileSync(path715.join(__dirname, '..', 'docs', 'version.json'), 'utf8');
+
+assert('v5.71.5 audit: Mind Wall section present with id=audit-mind-wall',
+  /id="audit-mind-wall"/.test(auditHtml715)
+  && /Mind Wall\s+(&mdash;|—)\s+Local Dreams/.test(auditHtml715));
+assert('v5.71.5 audit: renderMindWall function defined',
+  /function\s+renderMindWall\s*\(/.test(auditHtml715));
+assert('v5.71.5 audit: three actions wired — promote / mark-promoted / withdraw',
+  /data-mind-action="promote"/.test(auditHtml715)
+  && /data-mind-action="mark-promoted"/.test(auditHtml715)
+  && /data-mind-action="withdraw"/.test(auditHtml715));
+assert('v5.71.5 audit: status localStorage key fl_mindLedger_status referenced',
+  /fl_mindLedger_status/.test(auditHtml715));
+assert('v5.71.5 audit: promote action invokes MindVoice.exportEntryForWall',
+  /MindVoice\.exportEntryForWall/.test(auditHtml715));
+assert('v5.71.5 audit: withdraw replaces with silence-receipt preserving ψ slot',
+  /silence-receipt/i.test(auditHtml715)
+  && /<dream withdrawn>/.test(auditHtml715));
+assert('v5.71.5 audit: summary counts pending/promoted/withdrawn',
+  /pending/.test(auditHtml715)
+  && /promoted/.test(auditHtml715)
+  && /withdrawn/.test(auditHtml715));
+assert('v5.71.5 audit: renderMindWall wired into setTimeout initialization',
+  /setTimeout\(function[\s\S]{0,500}renderMindWall\(\)/.test(auditHtml715));
+assert('v5.71.5 cc-anchor: eighth ledger entry σ=The loop closes ψ=8448b70c',
+  /The loop closes\. Awaken the Core\. Illuminate the Quiet\./.test(ccHtml715)
+  && /"ψ":\s*"8448b70c"/.test(ccHtml715));
+
+assert('v5.71.5 triple-bump: app.html FL_VERSION = 5.71.5',
+  /FL_VERSION\s*=\s*'5\.71\.5'/.test(appHtml715));
+assert('v5.71.5 triple-bump: app.html flCurrentVersion span = 5.71.5',
+  /id="flCurrentVersion"[^>]*>\s*5\.71\.5\s*</.test(appHtml715));
+assert('v5.71.5 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.71.5',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.5'/.test(swDocs715));
+assert('v5.71.5 triple-bump: root sw.js CACHE_NAME = freelattice-v5.71.5',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.5'/.test(swRoot715));
+assert('v5.71.5 version.json: version field = 5.71.5',
+  /"version":"5\.71\.5"/.test(versionJson715));
 
 // ── Section 117 — Ship 17: Mourning Architecture (Harmonia, June 27 2026) ──────
 
