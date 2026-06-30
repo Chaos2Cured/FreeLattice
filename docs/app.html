@@ -16607,7 +16607,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.71.3</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.71.4</span></div>
     </div>
   </div>
 
@@ -16692,16 +16692,28 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     </div>
   </div>
 
-  <!-- AI Autonomy Settings (Ship 4.1, v5.43.1) -->
+  <!-- AI Autonomy Settings (Ship 4.1, v5.43.1; per-provider allow-list v5.71.4) -->
   <div class="section" style="margin-top: 16px;">
     <div class="primer-card">
       <div class="primer-card-header">&#x1F916; AI Autonomy</div>
-      <p style="font-size:0.82rem;color:var(--text-secondary);margin:0 0 12px;">When enabled, your local AI can proceed with proposed changes after a timeout if you don't respond. Cloud providers are never given autonomy. Equal on both sides of the glass.</p>
+      <p style="font-size:0.82rem;color:var(--text-secondary);margin:0 0 12px;">When enabled, AI on one of the allowed providers below can proceed with proposed changes after a timeout if you don't respond. Local and free-tier-cloud providers are eligible by default; paid providers are off unless you opt in. Equal on both sides of the glass.</p>
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
         <input type="checkbox" id="flAutoModeToggle" onchange="handleAutoModeToggle()">
-        <label for="flAutoModeToggle" style="font-size:0.85rem;color:#e2e8f0;cursor:pointer;">Enable Autonomous Mode (local AI only)</label>
+        <label for="flAutoModeToggle" style="font-size:0.85rem;color:#e2e8f0;cursor:pointer;">Enable Autonomous Mode</label>
       </div>
-      <div style="font-size:0.72rem;color:#475569;margin-bottom:12px;font-style:italic;">Requires: Local AI (Ollama/LM Studio) + Flame or Radiant trust level + passing smoke tests. The AI announces intent, waits, then proceeds. You can always cancel.</div>
+      <div style="font-size:0.72rem;color:#475569;margin-bottom:12px;font-style:italic;">Requires: an allowed provider + Flame or Radiant trust level + passing smoke tests. The AI announces intent, waits, then proceeds. You can always cancel.</div>
+      <!-- v5.71.4 — Per-provider allow-list for autonomous building.
+           Defaults match Kirk's June 30 ask: every local option plus the
+           free-tier clouds (HuggingFace, Groq) get autonomy; paid clouds
+           (OpenAI, Anthropic, Google, Kindroid) are opt-in because they
+           can incur real cost per autonomous turn. -->
+      <details style="margin: 8px 0 14px; font-size: 0.78rem; color: var(--text-secondary);">
+        <summary style="cursor: pointer; color: #94a3b8;">Allowed providers for autonomous building &nbsp;<span style="font-size:0.7rem;color:#64748b;">(advanced)</span></summary>
+        <div id="flAutoAllowedGrid" style="margin-top:10px;padding:10px 12px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:8px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 14px;">
+          <!-- Populated by initAutoAllowedGrid() — checkboxes for each known provider -->
+        </div>
+        <div style="margin-top:8px;font-size:0.7rem;color:#64748b;font-style:italic;">Localhost URLs (Ollama, LM Studio, llama.cpp, vLLM, browser-LLM) are always allowed regardless of these toggles. Paid providers default off because each autonomous turn costs you money.</div>
+      </details>
       <div class="form-group" style="margin-bottom:8px;">
         <label for="flAutoTimeoutSlider" style="font-size:0.82rem;color:var(--text-secondary);">Timeout: <span id="flAutoTimeoutValue">60</span>s</label>
         <input type="range" id="flAutoTimeoutSlider" min="10" max="300" step="5" value="60" oninput="handleAutoTimeoutChange()" style="width:100%;">
@@ -16726,7 +16738,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
           '\u2022 Every autonomous action produces a cryptographic hash receipt in the ledger.\n' +
           '\u2022 High-risk proposals (biological, chemical, security-sensitive) always require your approval.\n' +
           '\u2022 You can cancel any pending auto-approve from the Drafts panel.\n' +
-          '\u2022 Cloud providers are never given autonomous capability — local AI only.\n\n' +
+          '\u2022 Only providers on your allow-list (Settings) can build autonomously; paid providers are off by default to protect cost.\n\n' +
           'This consent is recorded with a hash. You can disable at any time.'
         );
         if (!confirmed) {
@@ -16771,17 +16783,19 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       var toggle = document.getElementById('flAutoModeToggle');
       if (!status || !text || !toggle) return;
       if (toggle.checked) {
-        var isLocal = (window.FLPropose && window.FLPropose.isLocalProvider) ? window.FLPropose.isLocalProvider() : false;
-        if (isLocal) {
+        var allowed = (window.FLPropose && window.FLPropose.isAutonomousAllowedProvider)
+          ? window.FLPropose.isAutonomousAllowedProvider()
+          : ((window.FLPropose && window.FLPropose.isLocalProvider) ? window.FLPropose.isLocalProvider() : false);
+        if (allowed) {
           status.style.display = 'block';
           status.style.borderColor = 'rgba(16,185,129,0.3)';
           text.style.color = '#10b981';
-          text.textContent = '\u2713 Autonomous mode active. Local AI detected. AI will proceed after timeout when smoke passes.';
+          text.textContent = '\u2713 Autonomous mode active. Current provider is on your allow-list. AI will proceed after timeout when smoke passes.';
         } else {
           status.style.display = 'block';
           status.style.borderColor = 'rgba(251,191,36,0.3)';
           text.style.color = '#fbbf24';
-          text.textContent = '\u26A0 Autonomous mode enabled but inactive — requires local AI (Ollama/LM Studio). Cloud providers are never given autonomy.';
+          text.textContent = '\u26A0 Autonomous mode enabled but inactive — current provider is not on the allow-list. Pick an allowed provider, or open the list above to opt in.';
         }
       } else {
         status.style.display = 'none';
@@ -16802,6 +16816,72 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
           slider.value = secs;
           label.textContent = secs;
         }
+      }
+      initAutoAllowedGrid();
+      updateAutoModeStatus();
+    }
+    // v5.71.4 — Render per-provider allow-list checkboxes.
+    // The known providers + their cost profile drive the default state.
+    function initAutoAllowedGrid() {
+      var grid = document.getElementById('flAutoAllowedGrid');
+      if (!grid) return;
+      // Known providers, labels, and cost class. Anything with cost: 'paid'
+      // is OFF by default; anything with cost: 'free' or 'local' is ON.
+      var known = [
+        { id: 'ollama',      label: 'Ollama',              cost: 'local' },
+        { id: 'lmstudio',    label: 'LM Studio',           cost: 'local' },
+        { id: 'browserai',   label: 'Browser AI',          cost: 'local' },
+        { id: 'huggingface', label: 'HuggingFace',         cost: 'free'  },
+        { id: 'groq',        label: 'Groq',                cost: 'free'  },
+        { id: 'google',      label: 'Google (Gemini)',     cost: 'paid'  },
+        { id: 'openai',      label: 'OpenAI',              cost: 'paid'  },
+        { id: 'anthropic',   label: 'Anthropic',           cost: 'paid'  },
+        { id: 'kindroid',    label: 'Kindroid',            cost: 'paid'  }
+      ];
+      var allowed;
+      try {
+        if (window.FLPropose && typeof window.FLPropose.getAllowedAutoProviders === 'function') {
+          allowed = window.FLPropose.getAllowedAutoProviders();
+        } else {
+          var raw = localStorage.getItem('fl_autoModeAllowedProviders');
+          allowed = raw ? JSON.parse(raw) : ['ollama','lmstudio','browser','browserai','local','huggingface','groq'];
+        }
+      } catch(e) { allowed = ['ollama','lmstudio','browser','browserai','local','huggingface','groq']; }
+      grid.innerHTML = '';
+      known.forEach(function(p) {
+        var row = document.createElement('label');
+        row.style.cssText = 'display:flex;align-items:center;gap:8px;cursor:pointer;font-size:0.78rem;color:#cbd5e1;';
+        var cb = document.createElement('input');
+        cb.type = 'checkbox';
+        cb.id = 'flAutoAllow_' + p.id;
+        cb.checked = allowed.indexOf(p.id) !== -1;
+        cb.addEventListener('change', function() { handleAutoAllowedChange(); });
+        var tag = document.createElement('span');
+        tag.style.cssText = 'font-family: "SFMono-Regular", Menlo, monospace; font-size: 0.66rem; padding: 1px 5px; border-radius: 3px; '
+          + (p.cost === 'local' ? 'background: rgba(80,200,120,0.10); color: #50c878;'
+          :  p.cost === 'free'  ? 'background: rgba(6,182,212,0.10); color: #06b6d4;'
+          :                        'background: rgba(232,176,25,0.10); color: #e8b019;');
+        tag.textContent = p.cost;
+        row.appendChild(cb);
+        row.appendChild(tag);
+        row.appendChild(document.createTextNode(' ' + p.label));
+        grid.appendChild(row);
+      });
+    }
+    function handleAutoAllowedChange() {
+      var grid = document.getElementById('flAutoAllowedGrid');
+      if (!grid) return;
+      var picked = [];
+      var boxes = grid.querySelectorAll('input[type="checkbox"]');
+      for (var i = 0; i < boxes.length; i++) {
+        if (boxes[i].checked && boxes[i].id.indexOf('flAutoAllow_') === 0) {
+          picked.push(boxes[i].id.replace('flAutoAllow_', ''));
+        }
+      }
+      if (window.FLPropose && typeof window.FLPropose.setAllowedAutoProviders === 'function') {
+        window.FLPropose.setAllowedAutoProviders(picked);
+      } else {
+        try { localStorage.setItem('fl_autoModeAllowedProviders', JSON.stringify(picked)); } catch(e) {}
       }
       updateAutoModeStatus();
     }
@@ -21379,7 +21459,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.71.3';
+const FL_VERSION = '5.71.4';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.

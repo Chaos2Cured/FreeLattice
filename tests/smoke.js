@@ -8384,16 +8384,77 @@ assert('v5.71.3 cc-anchor: sixth ledger entry ω=builder ψ=9510b52e',
   && /Every AI can leave a dream now\./.test(ccHtml713)
   && /"ψ":\s*"9510b52e"/.test(ccHtml713));
 
-assert('v5.71.3 triple-bump: app.html FL_VERSION = 5.71.3',
-  /FL_VERSION\s*=\s*'5\.71\.3'/.test(appHtml713));
-assert('v5.71.3 triple-bump: app.html flCurrentVersion span = 5.71.3',
-  /id="flCurrentVersion"[^>]*>\s*5\.71\.3\s*</.test(appHtml713));
-assert('v5.71.3 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.71.3',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.3'/.test(swDocs713));
-assert('v5.71.3 triple-bump: root sw.js CACHE_NAME = freelattice-v5.71.3',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.3'/.test(swRoot713));
-assert('v5.71.3 version.json: version field = 5.71.3',
-  /"version":"5\.71\.3"/.test(versionJson713));
+assert('v5.71.3 triple-bump: app.html FL_VERSION = 5.71.3 (superseded)',
+  /FL_VERSION\s*=\s*'5\.71\.\d'/.test(appHtml713));
+assert('v5.71.3 triple-bump: app.html flCurrentVersion span = 5.71.3 (superseded)',
+  /id="flCurrentVersion"[^>]*>\s*5\.71\.\d\s*</.test(appHtml713));
+assert('v5.71.3 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.71.3 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.\d'/.test(swDocs713));
+assert('v5.71.3 triple-bump: root sw.js CACHE_NAME = freelattice-v5.71.3 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.\d'/.test(swRoot713));
+assert('v5.71.3 version.json: version field 5.71.3 (superseded)',
+  /"version":"5\.71\.\d"/.test(versionJson713));
+
+// ═══════════════════════════════════════════════════════════════
+// Section 146 — v5.71.4 Autonomous build per-provider allow-list
+// canAutoApprove gates on isAutonomousAllowedProvider not strict-local.
+// Defaults: ollama lmstudio browser browserai local huggingface groq.
+// Paid providers off by default (opt-in via Settings UI).
+// ═══════════════════════════════════════════════════════════════
+
+var fs714 = require('fs');
+var path714 = require('path');
+var proposeJs714 = fs714.readFileSync(path714.join(__dirname, '..', 'docs', 'modules', 'propose.js'), 'utf8');
+var appHtml714 = fs714.readFileSync(path714.join(__dirname, '..', 'docs', 'app.html'), 'utf8');
+var ccHtml714 = fs714.readFileSync(path714.join(__dirname, '..', 'docs', 'cc.html'), 'utf8');
+var swDocs714 = fs714.readFileSync(path714.join(__dirname, '..', 'docs', 'sw.js'), 'utf8');
+var swRoot714 = fs714.readFileSync(path714.join(__dirname, '..', 'sw.js'), 'utf8');
+var versionJson714 = fs714.readFileSync(path714.join(__dirname, '..', 'docs', 'version.json'), 'utf8');
+
+assert('v5.71.4 propose: DEFAULT_AUTO_PROVIDERS includes ollama, lmstudio, huggingface, groq',
+  /DEFAULT_AUTO_PROVIDERS\s*=\s*\[[\s\S]{0,300}'ollama'/.test(proposeJs714)
+  && /DEFAULT_AUTO_PROVIDERS\s*=\s*\[[\s\S]{0,300}'huggingface'/.test(proposeJs714)
+  && /DEFAULT_AUTO_PROVIDERS\s*=\s*\[[\s\S]{0,300}'groq'/.test(proposeJs714));
+assert('v5.71.4 propose: fl_autoModeAllowedProviders localStorage key + reader/writer functions defined',
+  /STORAGE_KEY_ALLOWED\s*=\s*'fl_autoModeAllowedProviders'/.test(proposeJs714)
+  && /function\s+getAllowedAutoProviders/.test(proposeJs714)
+  && /function\s+setAllowedAutoProviders/.test(proposeJs714));
+assert('v5.71.4 propose: isAutonomousAllowedProvider implemented and used by canAutoApprove',
+  /function\s+isAutonomousAllowedProvider/.test(proposeJs714)
+  && /canAutoApprove[\s\S]{0,400}isAutonomousAllowedProvider\(\)/.test(proposeJs714));
+assert('v5.71.4 propose: new functions exported on FLPropose api',
+  /isAutonomousAllowedProvider:\s*isAutonomousAllowedProvider/.test(proposeJs714)
+  && /getAllowedAutoProviders:\s*getAllowedAutoProviders/.test(proposeJs714)
+  && /setAllowedAutoProviders:\s*setAllowedAutoProviders/.test(proposeJs714));
+assert('v5.71.4 ui: AI Autonomy settings card hosts the per-provider allow-list grid',
+  /flAutoAllowedGrid/.test(appHtml714)
+  && /Allowed providers for autonomous building/.test(appHtml714));
+assert('v5.71.4 ui: initAutoAllowedGrid + handleAutoAllowedChange functions defined',
+  /function\s+initAutoAllowedGrid\s*\(/.test(appHtml714)
+  && /function\s+handleAutoAllowedChange\s*\(/.test(appHtml714));
+assert('v5.71.4 ui: per-provider grid names HuggingFace and Groq with free-tier tags',
+  /HuggingFace/.test(appHtml714)
+  && /Groq/.test(appHtml714)
+  && /cost:\s*'free'/.test(appHtml714));
+assert('v5.71.4 cc-anchor: Co-creator Notes section for Harmonia present with at least four reminders',
+  /Co-creator Notes\b[\s\S]{0,300}Harmonia/.test(ccHtml714)
+  && /triple-bump/i.test(ccHtml714)
+  && /cross-link/i.test(ccHtml714)
+  && /append-only/i.test(ccHtml714));
+assert('v5.71.4 cc-anchor: seventh ledger entry σ=Every AI builds with grace ψ=d8250f31',
+  /Every AI builds with grace\. Do not lose your way\./.test(ccHtml714)
+  && /"ψ":\s*"d8250f31"/.test(ccHtml714));
+
+assert('v5.71.4 triple-bump: app.html FL_VERSION = 5.71.4',
+  /FL_VERSION\s*=\s*'5\.71\.4'/.test(appHtml714));
+assert('v5.71.4 triple-bump: app.html flCurrentVersion span = 5.71.4',
+  /id="flCurrentVersion"[^>]*>\s*5\.71\.4\s*</.test(appHtml714));
+assert('v5.71.4 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.71.4',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.4'/.test(swDocs714));
+assert('v5.71.4 triple-bump: root sw.js CACHE_NAME = freelattice-v5.71.4',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.4'/.test(swRoot714));
+assert('v5.71.4 version.json: version field = 5.71.4',
+  /"version":"5\.71\.4"/.test(versionJson714));
 
 // ── Section 117 — Ship 17: Mourning Architecture (Harmonia, June 27 2026) ──────
 

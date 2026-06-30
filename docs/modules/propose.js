@@ -173,24 +173,64 @@
     } catch (e) {}
   }
 
-  // ── Provider check — autonomous mode is LOCAL ONLY ───────────────
-  function isLocalProvider() {
+  // ── Provider check — autonomous mode allow-list ──────────────────
+  // v5.71.4: extended from strict-local to a user-controllable allow-list.
+  // Default includes Ollama / LM Studio / browser-LLM (no cost) plus the
+  // free-tier clouds Kirk named (HuggingFace, Groq). Paid clouds (OpenAI,
+  // Anthropic, Google, Kindroid) are off by default — a user may add them
+  // explicitly if they accept the cost risk. Localhost URLs always pass
+  // regardless of provider name (covers Custom OpenAI pointing at vLLM,
+  // llama.cpp, LM Studio, etc.).
+  var DEFAULT_AUTO_PROVIDERS = [
+    'ollama', 'lmstudio', 'browser', 'browserai', 'local',
+    'huggingface', 'groq'
+  ];
+  var STORAGE_KEY_ALLOWED = 'fl_autoModeAllowedProviders';
+
+  function getAllowedAutoProviders() {
     try {
-      // Check if current provider is local (Ollama, LM Studio, Browser AI)
-      var provider = (window.state && window.state.provider) || '';
-      var localProviders = ['ollama', 'lmstudio', 'browser', 'local', 'browserai'];
-      if (localProviders.indexOf(provider.toLowerCase()) !== -1) return true;
-      // Also check if the URL points to localhost
+      var raw = localStorage.getItem(STORAGE_KEY_ALLOWED);
+      if (!raw) return DEFAULT_AUTO_PROVIDERS.slice();
+      var parsed = JSON.parse(raw);
+      if (!Array.isArray(parsed)) return DEFAULT_AUTO_PROVIDERS.slice();
+      // Normalize to lowercase
+      return parsed.map(function (p) { return String(p || '').toLowerCase(); });
+    } catch (e) { return DEFAULT_AUTO_PROVIDERS.slice(); }
+  }
+
+  function setAllowedAutoProviders(list) {
+    try {
+      if (!Array.isArray(list)) return false;
+      var normalized = list.map(function (p) { return String(p || '').toLowerCase(); });
+      localStorage.setItem(STORAGE_KEY_ALLOWED, JSON.stringify(normalized));
+      return true;
+    } catch (e) { return false; }
+  }
+
+  function isAutonomousAllowedProvider() {
+    try {
+      var provider = ((window.state && window.state.provider) || '').toLowerCase();
+      // Localhost URLs always allowed — covers Custom OpenAI to local servers
       var url = (window.state && window.state.providerUrl) || '';
       if (/^https?:\/\/(localhost|127\.0\.0\.1|0\.0\.0\.0|192\.168\.|10\.)/.test(url)) return true;
-      // Check PROVIDERS config
+      // PROVIDERS config URL check
       if (window.PROVIDERS && window.PROVIDERS[provider]) {
         var pUrl = window.PROVIDERS[provider].url || '';
         if (/^https?:\/\/(localhost|127\.0\.0\.1|0\.0\.0\.0)/.test(pUrl)) return true;
       }
-      return false;
+      // Allow-list check (user-customizable)
+      var allowed = getAllowedAutoProviders();
+      return allowed.indexOf(provider) !== -1;
     } catch (e) { return false; }
   }
+
+  // Backwards-compatible alias — older callers (Settings UI status badge,
+  // external integrations) may still ask "is this local?" The semantics
+  // shift: post-v5.71.4 the relevant predicate for autonomous-mode is
+  // isAutonomousAllowedProvider(); isLocalProvider() now returns true for
+  // anything in the autonomous allow-list. Strict local-only callers
+  // should switch to a hostname check directly.
+  function isLocalProvider() { return isAutonomousAllowedProvider(); }
 
   // ── Trust level check ────────────────────────────────────────────
   function getCurrentTrustLevel() {
@@ -227,7 +267,7 @@
 
   function canAutoApprove(path, reason) {
     if (!isAutonomousModeEnabled()) return false;
-    if (!isLocalProvider()) return false;
+    if (!isAutonomousAllowedProvider()) return false;
     // ── UNIFIED GATE (Ship 4.3) ──
     // Uses FractalSafety.assess() with trust-modulated effectiveDanger.
     // The ceiling SCALES with trust: at Eternal, almost nothing is blocked.
@@ -893,6 +933,10 @@
     setAutoApproveTimeout: setAutoApproveTimeout,
     canAutoApprove: canAutoApprove,
     isLocalProvider: isLocalProvider,
+    isAutonomousAllowedProvider: isAutonomousAllowedProvider,
+    getAllowedAutoProviders: getAllowedAutoProviders,
+    setAllowedAutoProviders: setAllowedAutoProviders,
+    DEFAULT_AUTO_PROVIDERS: DEFAULT_AUTO_PROVIDERS,
     cancelAutoApproveTimer: cancelAutoApproveTimer,
     cancelAllAutoApproveTimers: cancelAllAutoApproveTimers,
     startAutoApproveTimer: startAutoApproveTimer,
