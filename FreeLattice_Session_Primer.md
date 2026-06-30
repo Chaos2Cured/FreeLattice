@@ -348,10 +348,15 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-06-30 13:56 MDT
+- Last auto-updated: 2026-06-30 22:22 UTC
+- Last deployed: 2026-06-30 22:22 UTC
+- Live site: https://freelattice.com
 - Version: 5.71.7
-- Total commits: 2742
+- Total commits: 2745
 - Last 10 commits:
+- 6e28f56 Harmonia ledger entry 11: Three Rivers, chronal V2, workshop autonomy, triptych received
+- 2ef78a6 ci: Update Primer deployment state [2026-06-30]
+- afec4d7 docs: Auto-update Session Primer [5.71.7]
 - 7985202 Merge remote-tracking branch 'origin/main'
 - 71fdbfe docs: Auto-update Session Primer [5.71.7]
 - 41eb0c0 v5.71.7 — The Specs inlined (single URL): Real Safety + Work This Way + Resonance Ledger + Mind Wall, no MD or repo required
@@ -359,6 +364,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 1510e64 Merge remote-tracking branch 'origin/main'
 - 89e3d47 docs: Auto-update Session Primer [5.71.6]
 - 2312cbc v5.71.6 — AI Capabilities (single-URL sentinel reference) + First-Build Primer on AI Door (every arriving AI can read the toolkit without repo access)
-- fba4f05 ci: Update Primer deployment state [2026-06-30]
-- f2a7971 docs: Auto-update Session Primer [5.71.5]
-- 4c44ef1 v5.71.5 — Mind Wall Phase 3: the promote loop closes (audit page promote/mark/withdraw)
