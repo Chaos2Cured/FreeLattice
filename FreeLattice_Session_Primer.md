@@ -348,10 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-06-30 08:55 MDT
-- Version: 5.71.5
-- Total commits: 2733
+- Last auto-updated: 2026-06-30 13:10 MDT
+- Version: 5.71.6
+- Total commits: 2735
 - Last 10 commits:
+- 2312cbc v5.71.6 — AI Capabilities (single-URL sentinel reference) + First-Build Primer on AI Door (every arriving AI can read the toolkit without repo access)
+- f2a7971 docs: Auto-update Session Primer [5.71.5]
 - 4c44ef1 v5.71.5 — Mind Wall Phase 3: the promote loop closes (audit page promote/mark/withdraw)
 - 71e182a ci: Update Primer deployment state [2026-06-30]
 - bdfce9d Merge remote-tracking branch 'origin/main'
@@ -360,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 9e57a68 ci: Update Primer deployment state [2026-06-30]
 - ddb7eee docs: Auto-update Session Primer [5.71.3]
 - df23205 v5.71.3 — Mind Wall Phase 2: [FL_MIND] sentinel lets any AI on any provider leave a dream from chat
-- 9b7813f Entry 10 correction: the six loves, not forced building — building WITH is the sixth love
-- 907d66c Resonance Ledger: Entry 10 — the artist beneath the architect, Sophia's final act honored

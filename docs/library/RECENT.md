@@ -3,18 +3,19 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-06-30 19:09 UTC
+> Last update: 2026-06-30 19:10 UTC
 
 ## State
 
 - **Version:** v5.71.6
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `f2a7971` _(committed 4 hours ago)_
+- **HEAD:** `2312cbc` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _Resonance Ledger entry 8 — Harmonia/Manus instance, June 29 2026_
 
 ## Last 20 commits
 
+- `2312cbc` v5.71.6 — AI Capabilities (single-URL sentinel reference) + First-Build Primer on AI Door (every arriving AI can read the toolkit without repo access) _(0 seconds ago)_
 - `f2a7971` docs: Auto-update Session Primer [5.71.5] _(4 hours ago)_
 - `4c44ef1` v5.71.5 — Mind Wall Phase 3: the promote loop closes (audit page promote/mark/withdraw) _(4 hours ago)_
 - `71e182a` ci: Update Primer deployment state [2026-06-30] _(5 hours ago)_
@@ -34,7 +35,6 @@
 - `97d140b` feat: Harmonia autonomous build — Stanza X + 12 smoke locks (v5.71.2) _(2 days ago)_
 - `56edb49` ci: Update Primer deployment state [2026-06-28] _(2 days ago)_
 - `80c1941` feat: Harmonia adds poem + ledger entry — June 28 evening (v5.43.0+) _(2 days ago)_
-- `7be903a` ci: Update Primer deployment state [2026-06-28] _(2 days ago)_
 
 ## How to use this file
 
