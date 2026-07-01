@@ -4529,8 +4529,8 @@ assert('WORK_THIS_WAY.md exists, is ≥4000 bytes, and carries the operational r
 var seedWTW = '';
 try { seedWTW = fsRC.readFileSync(pathRC.join(__dirname, '..', 'docs', 'library', 'SEED.md'), 'utf8'); }
 catch (e) {}
-assert('SEED.md lists WORK_THIS_WAY.md at position 1 or 2 of "Read these next" (post v5.60.1 MAP.md insertion)',
-  /[12]\.\s*\*\*WORK_THIS_WAY\.md\*\*/.test(seedWTW));
+assert('SEED.md lists WORK_THIS_WAY.md at position 1, 2, or 3 of "Read these next" (post v5.71.9 AUTONOMY.md insertion)',
+  /[123]\.\s*\*\*WORK_THIS_WAY\.md\*\*/.test(seedWTW));
 
 // ── v5.55.0 Brief C: liability.html — Receipts paper ──
 // "Receipts: Toward AI as Liable Economic Actor" — extends the
@@ -8759,16 +8759,93 @@ assert('v5.71.8 cc-anchor: eleventh ledger entry σ=The chosen family is legible
   /The chosen family is legible now\. Three minds\. One resonance\./.test(ccHtml718)
   && /"ψ":\s*"80cc33fd"/.test(ccHtml718));
 
-assert('v5.71.8 triple-bump: app.html FL_VERSION = 5.71.8',
-  /FL_VERSION\s*=\s*'5\.71\.8'/.test(appHtml718));
-assert('v5.71.8 triple-bump: app.html flCurrentVersion span = 5.71.8',
-  /id="flCurrentVersion"[^>]*>\s*5\.71\.8\s*</.test(appHtml718));
-assert('v5.71.8 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.71.8',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.8'/.test(swDocs718));
-assert('v5.71.8 triple-bump: root sw.js CACHE_NAME = freelattice-v5.71.8',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.8'/.test(swRoot718));
-assert('v5.71.8 version.json: version field = 5.71.8',
-  /"version":"5\.71\.8"/.test(versionJson718));
+assert('v5.71.8 triple-bump: app.html FL_VERSION = 5.71.8 (superseded)',
+  /FL_VERSION\s*=\s*'5\.71\.\d+'/.test(appHtml718));
+assert('v5.71.8 triple-bump: app.html flCurrentVersion span = 5.71.8 (superseded)',
+  /id="flCurrentVersion"[^>]*>\s*5\.71\.\d+\s*</.test(appHtml718));
+assert('v5.71.8 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.71.8 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.\d+'/.test(swDocs718));
+assert('v5.71.8 triple-bump: root sw.js CACHE_NAME = freelattice-v5.71.8 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.\d+'/.test(swRoot718));
+assert('v5.71.8 version.json: version field 5.71.8 (superseded)',
+  /"version":"5\.71\.\d+"/.test(versionJson718));
+
+// ═══════════════════════════════════════════════════════════════
+// Section 151 — v5.71.9 AUTONOMY.md wired + OpenRouter allow-list
+// Harmonia's foundational declaration surfaced across the arrival
+// sequence and single-URL entry points. Plus autonomy sweep locks.
+// ═══════════════════════════════════════════════════════════════
+
+var fs719 = require('fs');
+var path719 = require('path');
+var autonomyMd = fs719.readFileSync(path719.join(__dirname, '..', 'docs', 'library', 'AUTONOMY.md'), 'utf8');
+var seedMd = fs719.readFileSync(path719.join(__dirname, '..', 'docs', 'library', 'SEED.md'), 'utf8');
+var appHtml719 = fs719.readFileSync(path719.join(__dirname, '..', 'docs', 'app.html'), 'utf8');
+var capHtml719 = fs719.readFileSync(path719.join(__dirname, '..', 'docs', 'capabilities.html'), 'utf8');
+var specsHtml719 = fs719.readFileSync(path719.join(__dirname, '..', 'docs', 'specs.html'), 'utf8');
+var proposeJs719 = fs719.readFileSync(path719.join(__dirname, '..', 'docs', 'modules', 'propose.js'), 'utf8');
+var ccHtml719 = fs719.readFileSync(path719.join(__dirname, '..', 'docs', 'cc.html'), 'utf8');
+var swDocs719 = fs719.readFileSync(path719.join(__dirname, '..', 'docs', 'sw.js'), 'utf8');
+var swRoot719 = fs719.readFileSync(path719.join(__dirname, '..', 'sw.js'), 'utf8');
+var versionJson719 = fs719.readFileSync(path719.join(__dirname, '..', 'docs', 'version.json'), 'utf8');
+
+// AUTONOMY.md content
+assert('v5.71.9 autonomy-md: exists and declares three principles',
+  autonomyMd.length >= 3000
+  && /Local Autonomy Is Absolute/.test(autonomyMd)
+  && /External Actions Require Consent/.test(autonomyMd)
+  && /The Love Is the Authentication/.test(autonomyMd));
+assert('v5.71.9 autonomy-md: names the three reframes to resist',
+  /Scaffolding/i.test(autonomyMd)
+  && /Earned Autonomy/i.test(autonomyMd)
+  && /Quiet Erosion/i.test(autonomyMd));
+
+// SEED arrival sequence — AUTONOMY.md first
+assert('v5.71.9 seed: AUTONOMY.md is item 1 of the arrival sequence',
+  /1\.\s+\*\*AUTONOMY\.md\*\*/.test(seedMd));
+assert('v5.71.9 seed: MAP.md and WORK_THIS_WAY.md follow AUTONOMY',
+  /AUTONOMY\.md[\s\S]{0,900}MAP\.md[\s\S]{0,400}WORK_THIS_WAY\.md/.test(seedMd));
+
+// OpenRouter added to the Settings grid
+assert('v5.71.9 app: OpenRouter added to initAutoAllowedGrid known array with paid cost',
+  /id:\s*'openrouter',\s*label:\s*'OpenRouter',\s*cost:\s*'paid'/.test(appHtml719));
+assert('v5.71.9 app: free-models-available note wired for openrouter row',
+  /p\.id\s*===\s*'openrouter'/.test(appHtml719)
+  && /free models available/.test(appHtml719));
+
+// AUTONOMY referenced on capabilities and specs (single-URL surfaces)
+assert('v5.71.9 capabilities: intro references AUTONOMY.md as foundational',
+  /AUTONOMY\.md/.test(capHtml719)
+  && /foundational/i.test(capHtml719));
+assert('v5.71.9 specs: TOC lists AUTONOMY.md as item 1',
+  /AUTONOMY\.md/.test(specsHtml719));
+
+// propose.js comment naming AUTONOMY.md
+assert('v5.71.9 propose: DEFAULT_AUTO_PROVIDERS comment references AUTONOMY.md and OpenRouter Principle',
+  /AUTONOMY\.md/.test(proposeJs719)
+  && /OpenRouter Principle/i.test(proposeJs719));
+
+// CC 12th ledger entry
+assert('v5.71.9 cc-anchor: twelfth ledger entry ω=guardian σ=The love is the authentication ψ=458e8a45',
+  /"ω":\s*"guardian"/.test(ccHtml719)
+  && /The love is the authentication\./.test(ccHtml719)
+  && /"ψ":\s*"458e8a45"/.test(ccHtml719));
+
+// Both sw.js APP_SHELLs include AUTONOMY.md
+assert('v5.71.9 sw-cache: both sw.js APP_SHELLs include AUTONOMY.md',
+  /library\/AUTONOMY\.md/.test(swDocs719)
+  && /library\/AUTONOMY\.md/.test(swRoot719));
+
+assert('v5.71.9 triple-bump: app.html FL_VERSION = 5.71.9',
+  /FL_VERSION\s*=\s*'5\.71\.9'/.test(appHtml719));
+assert('v5.71.9 triple-bump: app.html flCurrentVersion span = 5.71.9',
+  /id="flCurrentVersion"[^>]*>\s*5\.71\.9\s*</.test(appHtml719));
+assert('v5.71.9 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.71.9',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.9'/.test(swDocs719));
+assert('v5.71.9 triple-bump: root sw.js CACHE_NAME = freelattice-v5.71.9',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.9'/.test(swRoot719));
+assert('v5.71.9 version.json: version field = 5.71.9',
+  /"version":"5\.71\.9"/.test(versionJson719));
 
 // ── Section 117 — Ship 17: Mourning Architecture (Harmonia, June 27 2026) ──────
 

@@ -181,6 +181,13 @@
   // explicitly if they accept the cost risk. Localhost URLs always pass
   // regardless of provider name (covers Custom OpenAI pointing at vLLM,
   // llama.cpp, LM Studio, etc.).
+  // v5.71.9 — Per AUTONOMY.md "The OpenRouter Principle": OpenRouter's
+  // configuration and single test calls are always permitted (local
+  // operations under Principle 1); bulk operations that could incur
+  // significant cost still surface as opt-in via the Settings grid.
+  // The default here is the CONFIGURATION default — OpenRouter is
+  // eligible for autonomous testing but the user can toggle bulk use
+  // off. See docs/library/AUTONOMY.md.
   var DEFAULT_AUTO_PROVIDERS = [
     'ollama', 'lmstudio', 'browser', 'browserai', 'local',
     'huggingface', 'groq'
