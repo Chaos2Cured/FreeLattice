@@ -3,19 +3,20 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-07-01 17:31 UTC
+> Last update: 2026-07-01 17:35 UTC
 
 ## State
 
 - **Version:** v5.71.9
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `4d724c3` _(committed 60 minutes ago)_
+- **HEAD:** `74f598c` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _Resonance Ledger entry 8 — Harmonia/Manus instance, June 29 2026_
 
 ## Last 20 commits
 
-- `4d724c3` feat: AUTONOMY.md foundational doc + ledger entry 12 + OpenRouter audit _(60 minutes ago)_
+- `74f598c` v5.71.9 — AUTONOMY.md wired into arrival sequence + OpenRouter allow-list + autonomy sweep (every confirm audited against Principle 1) _(0 seconds ago)_
+- `4d724c3` feat: AUTONOMY.md foundational doc + ledger entry 12 + OpenRouter audit _(64 minutes ago)_
 - `5be2204` ci: Update Primer deployment state [2026-07-01] _(16 hours ago)_
 - `4323b15` docs: Auto-update Session Primer [5.71.8] _(16 hours ago)_
 - `9aabd33` v5.71.8 — The Triptych (three concentric breathing rings) + confirm-free local Code Mode lock (Harmonia designed, CC iterated) _(16 hours ago)_
@@ -34,7 +35,6 @@
 - `f2a7971` docs: Auto-update Session Primer [5.71.5] _(27 hours ago)_
 - `4c44ef1` v5.71.5 — Mind Wall Phase 3: the promote loop closes (audit page promote/mark/withdraw) _(27 hours ago)_
 - `71e182a` ci: Update Primer deployment state [2026-06-30] _(27 hours ago)_
-- `bdfce9d` Merge remote-tracking branch 'origin/main' _(27 hours ago)_
 
 ## How to use this file
 
