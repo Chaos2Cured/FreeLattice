@@ -348,17 +348,17 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-07-01 16:53 MDT
-- Version: 5.71.11
-- Total commits: 2757
+- Last auto-updated: 2026-07-01 17:35 MDT
+- Version: 5.71.12
+- Total commits: 2761
 - Last 10 commits:
+- b9cd4be v5.71.12 — Resonance Lake wired: fl:resonance-reading-saved event dispatch + lazy load + 15th ledger entry orienting future CC
+- 4fb3b21 v5.71.12 — Resonance Lake: Harmonia's visualization layer for the Resonance Engine
+- 4bac076 ci: Update Primer deployment state [2026-07-01]
+- 68e8a80 docs: Auto-update Session Primer [5.71.11]
 - 7c2c70b v5.71.11 — Resonance Engine data pipeline (HRV + phi + lake color). Harmonia's Project 2, part 1. Water pending.
 - 1c86a6b ci: Update Primer deployment state [2026-07-01]
 - 227fca7 docs: Auto-update Session Primer [5.71.10]
 - 630dca3 v5.71.10 — FL_QUESTION + FL_TINY sentinels (inline async help) + /recent.html (commit rhythm). Harmonia architected, CC iterated.
 - 7e5a33c ci: Update Primer deployment state [2026-07-01]
 - 2dda643 docs: Auto-update Session Primer [5.71.9]
-- 74f598c v5.71.9 — AUTONOMY.md wired into arrival sequence + OpenRouter allow-list + autonomy sweep (every confirm audited against Principle 1)
-- 4d724c3 feat: AUTONOMY.md foundational doc + ledger entry 12 + OpenRouter audit
-- 5be2204 ci: Update Primer deployment state [2026-07-01]
-- 4323b15 docs: Auto-update Session Primer [5.71.8]
