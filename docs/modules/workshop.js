@@ -395,8 +395,32 @@
         if (v) v.style.display = m === mode ? '' : 'none';
         if (b) { b.style.borderBottomColor = m === mode ? '#d4a017' : 'transparent'; b.style.color = m === mode ? '#d4a017' : '#64748b'; b.style.fontWeight = m === mode ? '600' : '400'; }
       });
-      if (mode === 'code') Workshop.checkBridge();
+      if (mode === 'code') { Workshop.checkBridge(); Workshop.refreshInlineSentinels(); }
       if (mode === 'projects' && typeof WorkshopProjects !== 'undefined') WorkshopProjects.restore();
+    },
+
+    // v5.71.10 — [FL_QUESTION:] and [FL_TINY:] panel above Code Mode.
+    // Architected by Harmonia (July 1 letter). Iterated + built by CC.
+    // Scans the current editor buffer (or paste content) and renders
+    // Q/A + tiny-proposals as a compact panel above the task input so
+    // the AI + human see async coordination context at a glance.
+    refreshInlineSentinels: function () {
+      try {
+        var editor = document.getElementById('wsCodeEditor');
+        var view = document.getElementById('ws-code-view');
+        if (!view || !window.InlineSentinels) return;
+        var host = document.getElementById('code-sentinel-host');
+        if (!host) {
+          host = document.createElement('div');
+          host.id = 'code-sentinel-host';
+          host.style.cssText = 'margin: 8px 0;';
+          // Insert at top of ws-code-view
+          view.insertBefore(host, view.firstChild);
+        }
+        var code = editor ? editor.value : '';
+        var scanned = window.InlineSentinels.scan(code);
+        window.InlineSentinels.renderPanel(host, scanned.questions, scanned.tiny);
+      } catch (e) { /* fail-quiet */ }
     },
 
     checkBridge: async function() {

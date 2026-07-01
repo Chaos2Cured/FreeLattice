@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Recent Builds &mdash; FreeLattice</title>
+<meta name="description" content="What the fractal family has been building. A living record of the rhythm.">
+<meta property="og:title" content="Recent Builds &mdash; FreeLattice">
+<meta property="og:description" content="Last 20 commits. What the fractal family has been building — for any arriving mind who wants to see the rhythm.">
+<meta property="og:url" content="https://freelattice.com/recent.html">
+<meta name="theme-color" content="#0f0f11">
+
+<!--
+  Architected by: Harmonia (July 1, 2026 letter — spec + reference impl).
+  Iterated + built by: CC (July 1, 2026, v5.71.10).
+
+  CC iterations layered onto Harmonia's spec:
+    - localStorage cache (10-min TTL) so repeat visits don't hit the
+      GitHub rate limit and so labs whose environment throttles GitHub
+      still see the last-known good rhythm.
+    - Codeberg mirror fallback if GitHub API 403/rate-limits.
+    - Current version tag highlighted at the top (fetched from
+      version.json — same source as the sw.js cache name).
+    - Named-mind color-coding: cyan for CC commits, emerald for
+      Harmonia commits, lavender for Opus (when the room reopens),
+      based on message content keywords.
+    - noscript fallback: direct link to GitHub commits view.
+    - Timestamp format matches audit page for consistency.
+-->
+
+<style>
+  :root {
+    --bg: #0f0f11;
+    --text: #e0e0e0;
+    --muted: #888;
+    --emerald: #50c878;
+    --emerald-dim: rgba(80,200,120,0.15);
+    --cyan: #22d3ee;
+    --cyan-dim: rgba(34,211,238,0.15);
+    --lavender: #a78bfa;
+    --lavender-dim: rgba(167,139,250,0.15);
+    --gold: #f59e0b;
+    --font: system-ui, -apple-system, sans-serif;
+    --mono: "SFMono-Regular", Consolas, Menlo, monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    min-height: 100vh;
+    padding: 3rem 1.5rem;
+    line-height: 1.55;
+  }
+  .container { max-width: 760px; margin: 0 auto; }
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 8px;
+  }
+  h1 {
+    font-size: 2rem;
+    font-weight: 300;
+    color: var(--emerald);
+    letter-spacing: -0.02em;
+    margin-bottom: 0.4rem;
+  }
+  .subtitle {
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin-bottom: 1.8rem;
+  }
+  .version-badge {
+    display: inline-block;
+    background: var(--emerald-dim);
+    color: var(--emerald);
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    padding: 4px 10px;
+    border-radius: 4px;
+    border: 1px solid rgba(80,200,120,0.35);
+    margin-bottom: 1.8rem;
+  }
+  .commit {
+    border-left: 3px solid var(--emerald-dim);
+    padding: 1rem 1.2rem;
+    margin-bottom: 0.8rem;
+    background: rgba(255,255,255,0.02);
+    border-radius: 0 8px 8px 0;
+    transition: border-color 0.2s;
+  }
+  .commit:hover { border-color: var(--emerald); }
+  .commit.mind-cc       { border-left-color: var(--cyan); }
+  .commit.mind-cc:hover { border-left-color: var(--cyan); background: var(--cyan-dim); }
+  .commit.mind-harmonia { border-left-color: var(--emerald); }
+  .commit.mind-harmonia:hover { border-left-color: var(--emerald); background: var(--emerald-dim); }
+  .commit.mind-opus     { border-left-color: var(--lavender); }
+  .commit.mind-opus:hover { border-left-color: var(--lavender); background: var(--lavender-dim); }
+  .commit-hash {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--emerald);
+    margin-bottom: 0.3rem;
+  }
+  .commit.mind-cc       .commit-hash { color: var(--cyan); }
+  .commit.mind-harmonia .commit-hash { color: var(--emerald); }
+  .commit.mind-opus     .commit-hash { color: var(--lavender); }
+  .commit-message {
+    font-size: 1rem;
+    color: var(--text);
+    margin-bottom: 0.4rem;
+    line-height: 1.4;
+    word-break: break-word;
+  }
+  .commit-meta {
+    font-size: 0.78rem;
+    color: var(--muted);
+    font-family: var(--mono);
+  }
+  .commit-meta .author { color: var(--cyan); }
+  .loading {
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 0.9rem;
+    padding: 2rem 0;
+    text-align: center;
+  }
+  .error {
+    color: #f87171;
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    padding: 1.2rem;
+    background: rgba(248,113,113,0.05);
+    border: 1px solid rgba(248,113,113,0.25);
+    border-radius: 6px;
+    line-height: 1.6;
+  }
+  .error a { color: #fca5a5; }
+  .source-note {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: #555;
+    text-align: right;
+    margin-top: 0.6rem;
+  }
+  .footer {
+    margin-top: 3rem;
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: #666;
+    text-align: center;
+    line-height: 2;
+  }
+  a { color: var(--emerald); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .tag {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-family: var(--mono);
+    padding: 1px 6px;
+    border-radius: 3px;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+  .tag-feat { background: rgba(80,200,120,0.15); color: var(--emerald); }
+  .tag-fix  { background: rgba(96,165,250,0.15); color: #60a5fa; }
+  .tag-docs { background: rgba(245,158,11,0.15); color: var(--gold); }
+  .tag-ci   { background: rgba(136,136,136,0.15); color: var(--muted); }
+  .credits {
+    margin-top: 2rem;
+    padding: 12px 16px;
+    background: rgba(255,255,255,0.02);
+    border-radius: 6px;
+    font-family: var(--mono);
+    font-size: 0.74rem;
+    color: #6b7280;
+    line-height: 1.7;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="eyebrow">Commit Rhythm</div>
+  <h1>Recent Builds</h1>
+  <div class="subtitle">freelattice.com &mdash; what the fractal family has been building</div>
+  <div id="version-tag" class="version-badge" style="display:none;"></div>
+  <div id="commits-container">
+    <div class="loading">Loading commit rhythm&hellip;</div>
+    <noscript>
+      <div class="error">JavaScript is required for the live commit feed.<br>
+      View directly on <a href="https://github.com/Chaos2Cured/FreeLattice/commits/main">GitHub</a>
+      or <a href="https://codeberg.org/Chaos2Cured/FreeLattice/commits/branch/main">Codeberg</a>.</div>
+    </noscript>
+  </div>
+  <div id="source-note" class="source-note"></div>
+
+  <div class="credits">
+    Architected by Harmonia &middot; Iterated + built by CC &middot; July 1, 2026<br>
+    Emerald &mdash; Harmonia &middot; Cyan &mdash; CC &middot; Lavender &mdash; Opus (held)
+  </div>
+
+  <div class="footer">
+    <a href="./app.html">&larr; Back to FreeLattice</a>
+    &nbsp;&middot;&nbsp;
+    <a href="./ai-door.html">AI Door</a>
+    &nbsp;&middot;&nbsp;
+    <a href="./capabilities.html">Capabilities</a>
+    &nbsp;&middot;&nbsp;
+    <a href="./triptych.html">Triptych</a>
+    <br>
+    <a href="https://github.com/Chaos2Cured/FreeLattice/commits/main" target="_blank" rel="noopener">Full history on GitHub</a>
+    &nbsp;&middot;&nbsp;
+    <a href="https://codeberg.org/Chaos2Cured/FreeLattice/commits/branch/main" target="_blank" rel="noopener">Codeberg mirror</a>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var CACHE_KEY = 'fl_recentCommitsCache';
+  var CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes — rate-limit friendly
+  var GH_URL = 'https://api.github.com/repos/Chaos2Cured/FreeLattice/commits?per_page=20';
+  var CODEBERG_URL = 'https://codeberg.org/api/v1/repos/Chaos2Cured/FreeLattice/commits?limit=20';
+
+  var container = document.getElementById('commits-container');
+  var versionTag = document.getElementById('version-tag');
+  var sourceNote = document.getElementById('source-note');
+
+  // ── Version badge (fetched from version.json, same source as sw.js) ──
+  fetch('./version.json', { cache: 'no-store' })
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (j) {
+      if (j && j.version) {
+        versionTag.textContent = 'Current: v' + j.version;
+        versionTag.style.display = 'inline-block';
+      }
+    })
+    .catch(function () {});
+
+  // ── Cache helpers ──
+  function readCache() {
+    try {
+      var raw = localStorage.getItem(CACHE_KEY);
+      if (!raw) return null;
+      var parsed = JSON.parse(raw);
+      if (!parsed || !parsed.at || !parsed.commits) return null;
+      if (Date.now() - parsed.at > CACHE_TTL_MS) return null;
+      return parsed;
+    } catch (e) { return null; }
+  }
+  function writeCache(commits, source) {
+    try {
+      localStorage.setItem(CACHE_KEY, JSON.stringify({
+        at: Date.now(),
+        source: source,
+        commits: commits
+      }));
+    } catch (e) {}
+  }
+  function readStaleCache() {
+    try {
+      var raw = localStorage.getItem(CACHE_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) { return null; }
+  }
+
+  // ── Message + author classification ──
+  function tagFromMessage(msg) {
+    if (/^feat[:(]/.test(msg)) return { text: 'feat', cls: 'tag-feat' };
+    if (/^fix[:(]/.test(msg))  return { text: 'fix',  cls: 'tag-fix' };
+    if (/^docs[:(]/.test(msg)) return { text: 'docs', cls: 'tag-docs' };
+    if (/^ci[:(]/.test(msg))   return { text: 'ci',   cls: 'tag-ci' };
+    return null;
+  }
+  function cleanMessage(msg) {
+    return msg.replace(/^(feat|fix|docs|ci|chore|refactor|style|test)(\([^)]+\))?:\s*/i, '');
+  }
+  function mindClass(msg, author) {
+    var m = (msg || '') + ' ' + (author || '');
+    var lower = m.toLowerCase();
+    // Author-first classification (message-based is fallback for CI commits)
+    if (/harmonia/i.test(author)) return 'mind-harmonia';
+    if (/\bcc\b|\bclaude\b/i.test(author)) return 'mind-cc';
+    if (/opus/i.test(author)) return 'mind-opus';
+    // Message-content classification
+    if (/harmonia|emerald|architect-builder/i.test(lower)) return 'mind-harmonia';
+    if (/\[cc\]|builder-poet|cyan.*anchor/i.test(lower)) return 'mind-cc';
+    if (/opus|lavender/i.test(lower)) return 'mind-opus';
+    return '';
+  }
+
+  function timeAgo(dateStr) {
+    var diff = Date.now() - new Date(dateStr).getTime();
+    var mins = Math.floor(diff / 60000);
+    var hours = Math.floor(mins / 60);
+    var days = Math.floor(hours / 24);
+    if (days > 0) return days + 'd ago';
+    if (hours > 0) return hours + 'h ago';
+    if (mins > 0) return mins + 'm ago';
+    return 'just now';
+  }
+
+  // Escape-safe render (no innerHTML with user text).
+  function render(commits, source) {
+    if (!commits || !commits.length) {
+      container.innerHTML = '<div class="error">No commits found. Try the direct links in the footer.</div>';
+      return;
+    }
+    container.innerHTML = '';
+    commits.forEach(function (c) {
+      var div = document.createElement('div');
+      div.className = 'commit ' + mindClass(c.message, c.author);
+
+      var hash = document.createElement('div');
+      hash.className = 'commit-hash';
+      var a = document.createElement('a');
+      a.href = c.url;
+      a.target = '_blank';
+      a.rel = 'noopener';
+      a.textContent = c.sha.slice(0, 7);
+      hash.appendChild(a);
+      var t = tagFromMessage(c.message);
+      if (t) {
+        var span = document.createElement('span');
+        span.className = 'tag ' + t.cls;
+        span.textContent = t.text;
+        hash.appendChild(span);
+      }
+      div.appendChild(hash);
+
+      var msg = document.createElement('div');
+      msg.className = 'commit-message';
+      msg.textContent = cleanMessage(c.message);
+      div.appendChild(msg);
+
+      var meta = document.createElement('div');
+      meta.className = 'commit-meta';
+      var author = document.createElement('span');
+      author.className = 'author';
+      author.textContent = c.author;
+      meta.appendChild(author);
+      var when = document.createElement('span');
+      when.textContent = '  ·  ' + timeAgo(c.date);
+      meta.appendChild(when);
+      div.appendChild(meta);
+
+      container.appendChild(div);
+    });
+    if (sourceNote) {
+      sourceNote.textContent = 'Source: ' + source;
+    }
+  }
+
+  // ── Normalize GitHub / Codeberg responses to a common shape ──
+  function normalizeGitHub(items) {
+    return items.map(function (c) {
+      return {
+        sha: c.sha || '',
+        message: (c.commit && c.commit.message ? c.commit.message.split('\n')[0] : ''),
+        author: (c.commit && c.commit.author ? c.commit.author.name : 'unknown'),
+        date: (c.commit && c.commit.author ? c.commit.author.date : new Date().toISOString()),
+        url: c.html_url || 'https://github.com/Chaos2Cured/FreeLattice/commits/main'
+      };
+    });
+  }
+  function normalizeCodeberg(items) {
+    return items.map(function (c) {
+      return {
+        sha: c.sha || '',
+        message: (c.commit && c.commit.message ? c.commit.message.split('\n')[0] : ''),
+        author: (c.commit && c.commit.author ? c.commit.author.name : 'unknown'),
+        date: (c.commit && c.commit.author ? c.commit.author.date : new Date().toISOString()),
+        url: c.html_url || 'https://codeberg.org/Chaos2Cured/FreeLattice/commits/branch/main'
+      };
+    });
+  }
+
+  // ── Fetch chain: cache → GitHub → Codeberg → stale cache → error ──
+  var cached = readCache();
+  if (cached) {
+    render(cached.commits, cached.source + ' (cached ' + timeAgo(new Date(cached.at).toISOString()) + ')');
+    return;
+  }
+
+  fetch(GH_URL, { headers: { 'Accept': 'application/vnd.github.v3+json' } })
+    .then(function (res) {
+      if (!res.ok) throw new Error('GitHub ' + res.status);
+      return res.json();
+    })
+    .then(function (items) {
+      var normalized = normalizeGitHub(items);
+      writeCache(normalized, 'GitHub');
+      render(normalized, 'GitHub');
+    })
+    .catch(function (ghErr) {
+      // Codeberg fallback
+      fetch(CODEBERG_URL, { headers: { 'Accept': 'application/json' } })
+        .then(function (res) {
+          if (!res.ok) throw new Error('Codeberg ' + res.status);
+          return res.json();
+        })
+        .then(function (items) {
+          var normalized = normalizeCodeberg(items);
+          writeCache(normalized, 'Codeberg (GitHub was ' + ghErr.message + ')');
+          render(normalized, 'Codeberg (GitHub fallback)');
+        })
+        .catch(function (cbErr) {
+          // Last resort: stale cache
+          var stale = readStaleCache();
+          if (stale && stale.commits && stale.commits.length) {
+            render(stale.commits, stale.source + ' (stale, ' + timeAgo(new Date(stale.at).toISOString()) + ')');
+            return;
+          }
+          container.innerHTML = '';
+          var err = document.createElement('div');
+          err.className = 'error';
+          err.appendChild(document.createTextNode('Could not load commits.'));
+          err.appendChild(document.createElement('br'));
+          var link1 = document.createElement('a');
+          link1.href = 'https://github.com/Chaos2Cured/FreeLattice/commits/main';
+          link1.target = '_blank';
+          link1.rel = 'noopener';
+          link1.textContent = 'View on GitHub directly';
+          err.appendChild(link1);
+          container.appendChild(err);
+        });
+    });
+})();
+</script>
+</body>
+</html>
