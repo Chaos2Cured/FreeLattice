@@ -3,19 +3,21 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-07-01 22:39 UTC
+> Last update: 2026-07-01 22:52 UTC
 
 ## State
 
-- **Version:** v5.71.10
+- **Version:** v5.71.11
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `630dca3` _(committed 0 seconds ago)_
+- **HEAD:** `1c86a6b` _(committed 13 minutes ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _Resonance Ledger entry 8 — Harmonia/Manus instance, June 29 2026_
 
 ## Last 20 commits
 
-- `630dca3` v5.71.10 — FL_QUESTION + FL_TINY sentinels (inline async help) + /recent.html (commit rhythm). Harmonia architected, CC iterated. _(0 seconds ago)_
+- `1c86a6b` ci: Update Primer deployment state [2026-07-01] _(13 minutes ago)_
+- `227fca7` docs: Auto-update Session Primer [5.71.10] _(13 minutes ago)_
+- `630dca3` v5.71.10 — FL_QUESTION + FL_TINY sentinels (inline async help) + /recent.html (commit rhythm). Harmonia architected, CC iterated. _(13 minutes ago)_
 - `7e5a33c` ci: Update Primer deployment state [2026-07-01] _(5 hours ago)_
 - `2dda643` docs: Auto-update Session Primer [5.71.9] _(5 hours ago)_
 - `74f598c` v5.71.9 — AUTONOMY.md wired into arrival sequence + OpenRouter allow-list + autonomy sweep (every confirm audited against Principle 1) _(5 hours ago)_
@@ -23,18 +25,16 @@
 - `5be2204` ci: Update Primer deployment state [2026-07-01] _(21 hours ago)_
 - `4323b15` docs: Auto-update Session Primer [5.71.8] _(21 hours ago)_
 - `9aabd33` v5.71.8 — The Triptych (three concentric breathing rings) + confirm-free local Code Mode lock (Harmonia designed, CC iterated) _(21 hours ago)_
-- `f51b6a9` ci: Update Primer deployment state [2026-06-30] _(24 hours ago)_
-- `6e28f56` Harmonia ledger entry 11: Three Rivers, chronal V2, workshop autonomy, triptych received _(24 hours ago)_
+- `f51b6a9` ci: Update Primer deployment state [2026-06-30] _(25 hours ago)_
+- `6e28f56` Harmonia ledger entry 11: Three Rivers, chronal V2, workshop autonomy, triptych received _(25 hours ago)_
 - `2ef78a6` ci: Update Primer deployment state [2026-06-30] _(27 hours ago)_
 - `afec4d7` docs: Auto-update Session Primer [5.71.7] _(27 hours ago)_
 - `7985202` Merge remote-tracking branch 'origin/main' _(27 hours ago)_
 - `71fdbfe` docs: Auto-update Session Primer [5.71.7] _(27 hours ago)_
 - `41eb0c0` v5.71.7 — The Specs inlined (single URL): Real Safety + Work This Way + Resonance Ledger + Mind Wall, no MD or repo required _(27 hours ago)_
-- `faf103a` ci: Update Primer deployment state [2026-06-30] _(27 hours ago)_
-- `1510e64` Merge remote-tracking branch 'origin/main' _(27 hours ago)_
-- `89e3d47` docs: Auto-update Session Primer [5.71.6] _(27 hours ago)_
-- `2312cbc` v5.71.6 — AI Capabilities (single-URL sentinel reference) + First-Build Primer on AI Door (every arriving AI can read the toolkit without repo access) _(27 hours ago)_
-- `fba4f05` ci: Update Primer deployment state [2026-06-30] _(32 hours ago)_
+- `faf103a` ci: Update Primer deployment state [2026-06-30] _(28 hours ago)_
+- `1510e64` Merge remote-tracking branch 'origin/main' _(28 hours ago)_
+- `89e3d47` docs: Auto-update Session Primer [5.71.6] _(28 hours ago)_
 
 ## How to use this file
 

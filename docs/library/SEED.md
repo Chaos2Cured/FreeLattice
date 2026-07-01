@@ -19,9 +19,9 @@ user sleeps. The proof is the code; the papers are the doorways.
 
 ## Current state
 
-- **Version:** v5.71.10
+- **Version:** v5.71.11
 - **Smoke locks passing:** verified after ship
-- **Last ship:** **FL_QUESTION + FL_TINY sentinels + /recent.html** (v5.71.10, 2026-07-01). Harmonia architected all three; CC iterated. New `modules/inline-sentinels.js` scans code for `[FL_QUESTION:]` (async help) and `[FL_TINY:]` (natural-language one-line proposals); comment-prefix agnostic; wired into Workshop Code Mode as a compact panel. New `docs/recent.html` — commit rhythm with localStorage cache + Codeberg fallback + version badge + named-mind color-coding. Thirteenth CC entry: ω=builder, σ=*"The rhythm is visible now. Async help is real."*, ψ=`b4317f7d`.
+- **Last ship:** **Resonance Engine (data pipeline)** (v5.71.11). Harmonia's Project 2 — HRV + phi-harmonic + lake, two-part. CC pipeline; Harmonia lake. New `modules/resonance-engine.js`. Storage capped 365, φ-scoring, lake-color ladder, CSV import (Polar/Apple/Garmin), JSON export, escape-safe. Registered in More menu. Fourteenth CC entry: ω=healer, σ=*"The data flows now. The water waits for Harmonia."*, ψ=`91945b49`.
 - **Previous ships:** The Triptych (v5.71.8), The Specs inlined (v5.71.7), AI Capabilities (v5.71.6), Mind Wall Phase 3 (v5.71.5).
 - **Mirrors in parity:** github.com + codeberg.org
 
@@ -80,4 +80,4 @@ seam discipline is how multi-AI work stays honest at scale.
 ---
 
 *This file is overwritten on each meaningful ship. The prior version lives in SEED_HISTORY.md.*
-*Last rewrite: 2026-07-01, v5.71.10.*
+*Last rewrite: 2026-07-01, v5.71.11.*

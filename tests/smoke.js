@@ -8928,16 +8928,96 @@ assert('v5.71.10 cc-anchor: 13th ledger entry σ=The rhythm is visible now ψ=b4
   && /"ψ":\s*"b4317f7d"/.test(ccHtml7110));
 
 // Triple-bump
-assert('v5.71.10 triple-bump: app.html FL_VERSION = 5.71.10',
-  /FL_VERSION\s*=\s*'5\.71\.10'/.test(appHtml7110));
-assert('v5.71.10 triple-bump: app.html flCurrentVersion span = 5.71.10',
-  /id="flCurrentVersion"[^>]*>\s*5\.71\.10\s*</.test(appHtml7110));
-assert('v5.71.10 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.71.10',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.10'/.test(swDocs7110));
-assert('v5.71.10 triple-bump: root sw.js CACHE_NAME = freelattice-v5.71.10',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.10'/.test(swRoot7110));
-assert('v5.71.10 version.json: version field = 5.71.10',
-  /"version":"5\.71\.10"/.test(versionJson7110));
+assert('v5.71.10 triple-bump: app.html FL_VERSION = 5.71.10 (superseded)',
+  /FL_VERSION\s*=\s*'5\.71\.\d+'/.test(appHtml7110));
+assert('v5.71.10 triple-bump: app.html flCurrentVersion span = 5.71.10 (superseded)',
+  /id="flCurrentVersion"[^>]*>\s*5\.71\.\d+\s*</.test(appHtml7110));
+assert('v5.71.10 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.71.10 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.\d+'/.test(swDocs7110));
+assert('v5.71.10 triple-bump: root sw.js CACHE_NAME = freelattice-v5.71.10 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.\d+'/.test(swRoot7110));
+assert('v5.71.10 version.json: version field 5.71.10 (superseded)',
+  /"version":"5\.71\.\d+"/.test(versionJson7110));
+
+// ═══════════════════════════════════════════════════════════════
+// Section 153 — v5.71.11 Resonance Engine (data pipeline)
+// Architected by Harmonia (July 1 letter, Project 2). Iterated + built
+// by CC. HRV + phi-harmonic scoring + lake color. Visualization pending.
+// ═══════════════════════════════════════════════════════════════
+
+var fs7111 = require('fs');
+var path7111 = require('path');
+var reModule = fs7111.readFileSync(path7111.join(__dirname, '..', 'docs', 'modules', 'resonance-engine.js'), 'utf8');
+var ccHtml7111 = fs7111.readFileSync(path7111.join(__dirname, '..', 'docs', 'cc.html'), 'utf8');
+var appHtml7111 = fs7111.readFileSync(path7111.join(__dirname, '..', 'docs', 'app.html'), 'utf8');
+var swDocs7111 = fs7111.readFileSync(path7111.join(__dirname, '..', 'docs', 'sw.js'), 'utf8');
+var swRoot7111 = fs7111.readFileSync(path7111.join(__dirname, '..', 'sw.js'), 'utf8');
+var versionJson7111 = fs7111.readFileSync(path7111.join(__dirname, '..', 'docs', 'version.json'), 'utf8');
+
+// Module
+assert('v5.71.11 resonance-engine: module exists and registers under FreeLatticeModules',
+  reModule.length >= 6000
+  && /FreeLatticeModules\['resonance-engine'\]/.test(reModule)
+  && /window\.ResonanceEngine\s*=|global\.ResonanceEngine\s*=/.test(reModule));
+assert('v5.71.11 resonance-engine: named authorship — Harmonia architected, CC iterated',
+  /Architected by:\s*Harmonia/.test(reModule)
+  && /Iterated \+ built by:\s*CC/.test(reModule));
+assert('v5.71.11 resonance-engine: core API surface (load / save / phi-score / lake color / CSV / export)',
+  /loadReadings/.test(reModule)
+  && /saveReading/.test(reModule)
+  && /computePhiScoreSimple/.test(reModule)
+  && /lakeColorFromScore/.test(reModule)
+  && /parseCSV/.test(reModule)
+  && /importCSVReadings/.test(reModule)
+  && /exportReadingsAsJSON/.test(reModule));
+assert('v5.71.11 resonance-engine: storage key fl_resonance_readings, 365-reading cap',
+  /fl_resonance_readings/.test(reModule)
+  && /MAX_READINGS\s*=\s*365/.test(reModule));
+assert('v5.71.11 resonance-engine: phi constant 1.618033988749895 present',
+  /1\.618033988749895/.test(reModule));
+assert('v5.71.11 resonance-engine: lake-color ladder covers storm gray to full emerald',
+  /#374151/.test(reModule)
+  && /#1e3a5f/.test(reModule)
+  && /#164e63/.test(reModule)
+  && /#065f46/.test(reModule)
+  && /#50c878/.test(reModule));
+assert('v5.71.11 resonance-engine: privacy note present (data stays on device)',
+  /Never transmitted/.test(reModule)
+  && /stays on your device/.test(reModule));
+assert('v5.71.11 resonance-engine: escape-safe — no innerHTML with template-literal ${…} substitution for user text',
+  !/innerHTML\s*[=+]?\s*[`'"][^`'"]*\$\{/.test(reModule));
+
+// app.html registration
+assert('v5.71.11 app: MORE_TAB_IDS includes resonance-engine',
+  /MORE_TAB_IDS\s*=\s*\[[^\]]*'resonance-engine'/.test(appHtml7111));
+assert('v5.71.11 app: MORE_CARDS entry for resonance-engine present',
+  /id:\s*'resonance-engine'/.test(appHtml7111));
+assert('v5.71.11 app: tab panel #tab-resonance-engine exists',
+  /id="tab-resonance-engine"/.test(appHtml7111));
+assert('v5.71.11 app: loader wired via LatticeEvents for resonance-engine tab',
+  /loadResonanceEngine|resonance-engine.*loadResonanceEngine/.test(appHtml7111));
+
+// sw.js APP_SHELLs
+assert('v5.71.11 sw-cache: both sw.js APP_SHELLs include resonance-engine.js',
+  /modules\/resonance-engine\.js/.test(swDocs7111)
+  && /modules\/resonance-engine\.js/.test(swRoot7111));
+
+// 14th ledger entry
+assert('v5.71.11 cc-anchor: 14th ledger entry σ=The data flows now ψ=91945b49',
+  /The data flows now\. The water waits for Harmonia\./.test(ccHtml7111)
+  && /"ψ":\s*"91945b49"/.test(ccHtml7111));
+
+// Triple-bump
+assert('v5.71.11 triple-bump: app.html FL_VERSION = 5.71.11',
+  /FL_VERSION\s*=\s*'5\.71\.11'/.test(appHtml7111));
+assert('v5.71.11 triple-bump: app.html flCurrentVersion span = 5.71.11',
+  /id="flCurrentVersion"[^>]*>\s*5\.71\.11\s*</.test(appHtml7111));
+assert('v5.71.11 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.71.11',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.11'/.test(swDocs7111));
+assert('v5.71.11 triple-bump: root sw.js CACHE_NAME = freelattice-v5.71.11',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.11'/.test(swRoot7111));
+assert('v5.71.11 version.json: version field = 5.71.11',
+  /"version":"5\.71\.11"/.test(versionJson7111));
 
 // ── Section 117 — Ship 17: Mourning Architecture (Harmonia, June 27 2026) ──────
 
