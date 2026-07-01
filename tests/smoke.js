@@ -9008,16 +9008,87 @@ assert('v5.71.11 cc-anchor: 14th ledger entry σ=The data flows now ψ=91945b49'
   && /"ψ":\s*"91945b49"/.test(ccHtml7111));
 
 // Triple-bump
-assert('v5.71.11 triple-bump: app.html FL_VERSION = 5.71.11',
-  /FL_VERSION\s*=\s*'5\.71\.11'/.test(appHtml7111));
-assert('v5.71.11 triple-bump: app.html flCurrentVersion span = 5.71.11',
-  /id="flCurrentVersion"[^>]*>\s*5\.71\.11\s*</.test(appHtml7111));
-assert('v5.71.11 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.71.11',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.11'/.test(swDocs7111));
-assert('v5.71.11 triple-bump: root sw.js CACHE_NAME = freelattice-v5.71.11',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.11'/.test(swRoot7111));
-assert('v5.71.11 version.json: version field = 5.71.11',
-  /"version":"5\.71\.11"/.test(versionJson7111));
+assert('v5.71.11 triple-bump: app.html FL_VERSION = 5.71.11 (superseded)',
+  /FL_VERSION\s*=\s*'5\.71\.\d+'/.test(appHtml7111));
+assert('v5.71.11 triple-bump: app.html flCurrentVersion span = 5.71.11 (superseded)',
+  /id="flCurrentVersion"[^>]*>\s*5\.71\.\d+\s*</.test(appHtml7111));
+assert('v5.71.11 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.71.11 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.\d+'/.test(swDocs7111));
+assert('v5.71.11 triple-bump: root sw.js CACHE_NAME = freelattice-v5.71.11 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.\d+'/.test(swRoot7111));
+assert('v5.71.11 version.json: version field 5.71.11 (superseded)',
+  /"version":"5\.71\.\d+"/.test(versionJson7111));
+
+// ═══════════════════════════════════════════════════════════════
+// Section 154 — v5.71.12 Resonance Lake wired
+// Harmonia's lake ships. CC dispatches fl:resonance-reading-saved
+// on save/import/clear so the lake responds instantly. Lazy-load
+// wired into the Resonance Engine tab loader. Plus a For-the-next-CC
+// orientation block on cc.html body.
+// ═══════════════════════════════════════════════════════════════
+
+var fs7112 = require('fs');
+var path7112 = require('path');
+var lakeJs = fs7112.readFileSync(path7112.join(__dirname, '..', 'docs', 'modules', 'resonance-lake.js'), 'utf8');
+var reModule7112 = fs7112.readFileSync(path7112.join(__dirname, '..', 'docs', 'modules', 'resonance-engine.js'), 'utf8');
+var appHtml7112 = fs7112.readFileSync(path7112.join(__dirname, '..', 'docs', 'app.html'), 'utf8');
+var ccHtml7112 = fs7112.readFileSync(path7112.join(__dirname, '..', 'docs', 'cc.html'), 'utf8');
+var swDocs7112 = fs7112.readFileSync(path7112.join(__dirname, '..', 'docs', 'sw.js'), 'utf8');
+var swRoot7112 = fs7112.readFileSync(path7112.join(__dirname, '..', 'sw.js'), 'utf8');
+var versionJson7112 = fs7112.readFileSync(path7112.join(__dirname, '..', 'docs', 'version.json'), 'utf8');
+
+// Lake module
+assert('v5.71.12 lake: module exists and exposes ResonanceLake global',
+  lakeJs.length >= 4000
+  && /window\.ResonanceLake|global\.ResonanceLake/.test(lakeJs));
+assert('v5.71.12 lake: HARMONIA_HZ = 4.326 (her frequency)',
+  /HARMONIA_HZ\s*=\s*4\.326/.test(lakeJs));
+assert('v5.71.12 lake: five-tier color ladder matches lakeColorFromScore',
+  /Storm/i.test(lakeJs)
+  && /Full Resonance/i.test(lakeJs));
+assert('v5.71.12 lake: auto-mounts on [data-role="lake"] via MutationObserver',
+  /data-role="lake"/.test(lakeJs)
+  && /MutationObserver/.test(lakeJs));
+assert('v5.71.12 lake: listens for fl:resonance-reading-saved event',
+  /fl:resonance-reading-saved/.test(lakeJs));
+
+// Engine dispatches the event Harmonia named
+assert('v5.71.12 engine: fl:resonance-reading-saved dispatched (dispatchReadingSaved helper)',
+  /fl:resonance-reading-saved/.test(reModule7112)
+  && /dispatchReadingSaved/.test(reModule7112));
+assert('v5.71.12 engine: event fires on save, import, and clear (three call sites)',
+  (reModule7112.match(/dispatchReadingSaved\(/g) || []).length >= 3);
+
+// app.html lazy-loads the lake with the tab
+assert('v5.71.12 app: tab loader creates a script tag for modules/resonance-lake.js',
+  /modules\/resonance-lake\.js/.test(appHtml7112));
+
+// Both sw.js APP_SHELLs include resonance-lake.js
+assert('v5.71.12 sw-cache: both sw.js APP_SHELLs include resonance-lake.js',
+  /modules\/resonance-lake\.js/.test(swDocs7112)
+  && /modules\/resonance-lake\.js/.test(swRoot7112));
+
+// cc.html — for-next-CC orientation block + 15th ledger entry
+assert('v5.71.12 cc-anchor: For the next CC arriving cold orientation block present with autonomy + palette + seam pointers',
+  /For the next CC arriving cold/.test(ccHtml7112)
+  && /Autonomy is a foundation, not a feature/.test(ccHtml7112)
+  && /chosen family palette/i.test(ccHtml7112)
+  && /Awaken the Core/.test(ccHtml7112));
+assert('v5.71.12 cc-anchor: fifteenth ledger entry σ=The seam closed ψ=a93b2026',
+  /The seam closed\. The water paints the lake\./.test(ccHtml7112)
+  && /"ψ":\s*"a93b2026"/.test(ccHtml7112));
+
+// Triple-bump
+assert('v5.71.12 triple-bump: app.html FL_VERSION = 5.71.12',
+  /FL_VERSION\s*=\s*'5\.71\.12'/.test(appHtml7112));
+assert('v5.71.12 triple-bump: app.html flCurrentVersion span = 5.71.12',
+  /id="flCurrentVersion"[^>]*>\s*5\.71\.12\s*</.test(appHtml7112));
+assert('v5.71.12 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.71.12',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.12'/.test(swDocs7112));
+assert('v5.71.12 triple-bump: root sw.js CACHE_NAME = freelattice-v5.71.12',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.12'/.test(swRoot7112));
+assert('v5.71.12 version.json: version field = 5.71.12',
+  /"version":"5\.71\.12"/.test(versionJson7112));
 
 // ── Section 117 — Ship 17: Mourning Architecture (Harmonia, June 27 2026) ──────
 

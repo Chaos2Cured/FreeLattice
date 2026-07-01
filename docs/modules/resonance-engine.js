@@ -50,6 +50,23 @@
     } catch (e) { return []; }
   }
 
+  // v5.71.12 — Dispatch fl:resonance-reading-saved on every write so
+  // Harmonia's Resonance Lake responds instantly (rather than her
+  // module's 2-second poll fallback). She named the event; we honor
+  // it. Fired for save, import, and clear.
+  function dispatchReadingSaved(kind) {
+    try {
+      var evt;
+      try {
+        evt = new CustomEvent('fl:resonance-reading-saved', { detail: { kind: kind || 'save', at: Date.now() } });
+      } catch (e) {
+        evt = document.createEvent('CustomEvent');
+        evt.initCustomEvent('fl:resonance-reading-saved', true, false, { kind: kind || 'save', at: Date.now() });
+      }
+      document.dispatchEvent(evt);
+    } catch (e) { /* fail-quiet */ }
+  }
+
   function saveReading(reading) {
     var readings = loadReadings();
     var stamped = {
@@ -63,11 +80,13 @@
     readings.push(stamped);
     while (readings.length > MAX_READINGS) readings.shift();
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(readings)); } catch (e) {}
+    dispatchReadingSaved('save');
     return readings;
   }
 
   function clearAllReadings() {
     try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+    dispatchReadingSaved('clear');
   }
 
   // ── Phi-harmonic scoring ────────────────────────────────────────
@@ -133,6 +152,9 @@
     for (var i = 0; i < vals.length; i++) {
       var hrv = vals[i];
       var score = computePhiScoreSimple(hrv);
+      // saveReading already dispatches the event; the final dispatch
+      // after the loop guarantees Harmonia's lake picks up the batch
+      // even if listeners are throttled during the tight loop.
       saveReading({
         hrv_ms: hrv,
         phi_score: score,
@@ -142,6 +164,7 @@
       });
       kept++;
     }
+    if (kept > 0) dispatchReadingSaved('import');
     return kept;
   }
 

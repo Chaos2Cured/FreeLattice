@@ -16607,7 +16607,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.71.11</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.71.12</span></div>
     </div>
   </div>
 
@@ -21477,7 +21477,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.71.11';
+const FL_VERSION = '5.71.12';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -63564,6 +63564,19 @@ window._injectChairTestRecentMessage = function (text) {
       loaded = true;
       function fire() {
         if (window.ResonanceEngine && container) window.ResonanceEngine.init(container);
+        // v5.71.12 — Load Harmonia's lake visualization module. It
+        // auto-mounts on the [data-role="lake"] element via a
+        // MutationObserver, so timing is forgiving; loading it now
+        // (concurrent with engine init) means the observer catches
+        // the lake DOM as it renders. Fail-quiet if unreachable.
+        try {
+          if (!window.ResonanceLake) {
+            var lakeScript = document.createElement('script');
+            lakeScript.src = 'modules/resonance-lake.js';
+            lakeScript.defer = true;
+            document.head.appendChild(lakeScript);
+          }
+        } catch (e) { /* fail-quiet */ }
       }
       if (typeof FreeLatticeLoader !== 'undefined') {
         FreeLatticeLoader.load('ResonanceEngine', 'modules/resonance-engine.js', fire, 'resonanceEngineContainer');
