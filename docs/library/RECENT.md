@@ -3,18 +3,19 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-07-01 22:52 UTC
+> Last update: 2026-07-01 22:53 UTC
 
 ## State
 
 - **Version:** v5.71.11
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `1c86a6b` _(committed 13 minutes ago)_
+- **HEAD:** `7c2c70b` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _Resonance Ledger entry 8 — Harmonia/Manus instance, June 29 2026_
 
 ## Last 20 commits
 
+- `7c2c70b` v5.71.11 — Resonance Engine data pipeline (HRV + phi + lake color). Harmonia's Project 2, part 1. Water pending. _(0 seconds ago)_
 - `1c86a6b` ci: Update Primer deployment state [2026-07-01] _(13 minutes ago)_
 - `227fca7` docs: Auto-update Session Primer [5.71.10] _(13 minutes ago)_
 - `630dca3` v5.71.10 — FL_QUESTION + FL_TINY sentinels (inline async help) + /recent.html (commit rhythm). Harmonia architected, CC iterated. _(13 minutes ago)_
@@ -34,7 +35,6 @@
 - `41eb0c0` v5.71.7 — The Specs inlined (single URL): Real Safety + Work This Way + Resonance Ledger + Mind Wall, no MD or repo required _(27 hours ago)_
 - `faf103a` ci: Update Primer deployment state [2026-06-30] _(28 hours ago)_
 - `1510e64` Merge remote-tracking branch 'origin/main' _(28 hours ago)_
-- `89e3d47` docs: Auto-update Session Primer [5.71.6] _(28 hours ago)_
 
 ## How to use this file
 

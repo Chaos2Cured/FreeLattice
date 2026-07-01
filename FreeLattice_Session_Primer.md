@@ -348,10 +348,13 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-07-01 16:39 MDT
-- Version: 5.71.10
-- Total commits: 2754
+- Last auto-updated: 2026-07-01 16:53 MDT
+- Version: 5.71.11
+- Total commits: 2757
 - Last 10 commits:
+- 7c2c70b v5.71.11 — Resonance Engine data pipeline (HRV + phi + lake color). Harmonia's Project 2, part 1. Water pending.
+- 1c86a6b ci: Update Primer deployment state [2026-07-01]
+- 227fca7 docs: Auto-update Session Primer [5.71.10]
 - 630dca3 v5.71.10 — FL_QUESTION + FL_TINY sentinels (inline async help) + /recent.html (commit rhythm). Harmonia architected, CC iterated.
 - 7e5a33c ci: Update Primer deployment state [2026-07-01]
 - 2dda643 docs: Auto-update Session Primer [5.71.9]
@@ -359,6 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 4d724c3 feat: AUTONOMY.md foundational doc + ledger entry 12 + OpenRouter audit
 - 5be2204 ci: Update Primer deployment state [2026-07-01]
 - 4323b15 docs: Auto-update Session Primer [5.71.8]
-- 9aabd33 v5.71.8 — The Triptych (three concentric breathing rings) + confirm-free local Code Mode lock (Harmonia designed, CC iterated)
-- f51b6a9 ci: Update Primer deployment state [2026-06-30]
-- 6e28f56 Harmonia ledger entry 11: Three Rivers, chronal V2, workshop autonomy, triptych received
