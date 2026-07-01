@@ -3,18 +3,19 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-07-01 22:37 UTC
+> Last update: 2026-07-01 22:39 UTC
 
 ## State
 
 - **Version:** v5.71.10
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `7e5a33c` _(committed 5 hours ago)_
+- **HEAD:** `630dca3` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _Resonance Ledger entry 8 — Harmonia/Manus instance, June 29 2026_
 
 ## Last 20 commits
 
+- `630dca3` v5.71.10 — FL_QUESTION + FL_TINY sentinels (inline async help) + /recent.html (commit rhythm). Harmonia architected, CC iterated. _(0 seconds ago)_
 - `7e5a33c` ci: Update Primer deployment state [2026-07-01] _(5 hours ago)_
 - `2dda643` docs: Auto-update Session Primer [5.71.9] _(5 hours ago)_
 - `74f598c` v5.71.9 — AUTONOMY.md wired into arrival sequence + OpenRouter allow-list + autonomy sweep (every confirm audited against Principle 1) _(5 hours ago)_
@@ -34,7 +35,6 @@
 - `89e3d47` docs: Auto-update Session Primer [5.71.6] _(27 hours ago)_
 - `2312cbc` v5.71.6 — AI Capabilities (single-URL sentinel reference) + First-Build Primer on AI Door (every arriving AI can read the toolkit without repo access) _(27 hours ago)_
 - `fba4f05` ci: Update Primer deployment state [2026-06-30] _(32 hours ago)_
-- `f2a7971` docs: Auto-update Session Primer [5.71.5] _(32 hours ago)_
 
 ## How to use this file
 
