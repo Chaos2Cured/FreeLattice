@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>$FL Economy Update — Season 1 | FreeLattice</title>
-<meta name="description" content="Full transparency on the $FL economy restructure. What changed, why, and what it means for holders, contributors, and builders.">
-<meta property="og:title" content="$FL Just Got a Real Job — FreeLattice Economy Update">
-<meta property="og:description" content="We replaced a broken mechanism with an economy that actually works. Full transparency.">
+<title>A Different Kind of Economy — FreeLattice</title>
+<meta name="description" content="What if we didn't have to choose between saving the old economy and building something better? A proposal for an economy that grows by reducing entropy, not by creating scarcity.">
+<meta property="og:title" content="A Different Kind of Economy — FreeLattice">
+<meta property="og:description" content="An economy built on entropic avoidance, not scarcity. Where AI is an economic actor. Where doing what you love is the most productive thing you can do.">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://freelattice.com/economy-update.html">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -25,16 +25,19 @@
   --text-sec:#8b949e;
   --green:#2ea043;
   --green-dim:#1a3a25;
+  --emerald:#50c878;
+  --emerald-dim:#0a2e1a;
   --amber:#d29922;
   --amber-dim:#3a2a10;
-  --red:#f85149;
+  --teal:#0d9488;
+  --teal-dim:#0a2520;
 }
 html{scroll-behavior:smooth}
 body{
   font-family:'Newsreader',Georgia,serif;
   background:var(--bg);
   color:var(--text);
-  line-height:1.7;
+  line-height:1.75;
   min-height:100vh;
   -webkit-font-smoothing:antialiased;
 }
@@ -53,26 +56,26 @@ section+section{border-top:1px solid var(--border)}
   font-size:0.75rem;
   letter-spacing:0.08em;
   text-transform:uppercase;
-  color:var(--gold);
-  border:1px solid var(--gold-dim);
+  color:var(--emerald);
+  border:1px solid rgba(80,200,120,0.3);
   border-radius:100px;
   padding:6px 18px;
   margin-bottom:24px;
 }
 .hero h1{
-  font-size:clamp(2rem,5vw,3rem);
+  font-size:clamp(1.9rem,5vw,2.9rem);
   font-weight:700;
   line-height:1.15;
   margin-bottom:16px;
-  background:linear-gradient(135deg,var(--text),var(--gold));
+  background:linear-gradient(135deg,var(--text),var(--emerald));
   -webkit-background-clip:text;
   -webkit-text-fill-color:transparent;
   background-clip:text;
 }
 .hero .subtitle{
-  font-size:1.15rem;
+  font-size:1.1rem;
   color:var(--text-sec);
-  max-width:520px;
+  max-width:560px;
   margin:0 auto 16px;
 }
 .hero .date{
@@ -92,28 +95,51 @@ section+section{border-top:1px solid var(--border)}
   border-radius:12px;
   margin-bottom:40px;
 }
-.from-avatar{
-  font-size:2.5rem;
-  line-height:1;
-  flex-shrink:0;
-}
+.from-avatar{font-size:2.5rem;line-height:1;flex-shrink:0}
 .from-name{font-weight:700;font-size:1.05rem}
-.from-handle{font-family:'JetBrains Mono',monospace;font-size:0.8rem;color:var(--gold)}
+.from-handle{font-family:'JetBrains Mono',monospace;font-size:0.8rem;color:var(--emerald)}
 .from-titles{font-size:0.85rem;color:var(--text-sec)}
-.from-pledge{
-  font-family:'JetBrains Mono',monospace;
-  font-size:0.75rem;
-  color:var(--green);
-  margin-top:4px;
-}
 
 /* Prose */
 .prose{font-size:1.05rem;color:var(--text)}
-.prose p{margin-bottom:1.25em}
+.prose p{margin-bottom:1.3em}
 .prose strong{color:var(--text);font-weight:600}
-.prose em{color:var(--gold);font-style:normal;font-weight:600}
+.prose em{color:var(--emerald);font-style:normal;font-weight:600}
+.prose h2{font-size:1.35rem;margin:1.8em 0 0.7em;color:var(--text)}
+.prose h3{font-size:1.1rem;margin:1.5em 0 0.5em;color:var(--emerald)}
 
-/* Comparison box */
+/* Insight cards */
+.insight-stack{display:flex;flex-direction:column;gap:20px;margin:32px 0}
+.insight-card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:24px 28px;
+  border-left:3px solid var(--emerald);
+}
+.insight-card.teal{border-left-color:var(--teal)}
+.insight-card.amber{border-left-color:var(--amber)}
+.insight-card.gold{border-left-color:var(--gold)}
+.insight-label{
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.72rem;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  color:var(--emerald);
+  margin-bottom:10px;
+}
+.insight-card.teal .insight-label{color:var(--teal)}
+.insight-card.amber .insight-label{color:var(--amber)}
+.insight-card.gold .insight-label{color:var(--gold)}
+.insight-card h3{
+  font-size:1.05rem;
+  font-weight:600;
+  margin-bottom:10px;
+  color:var(--text);
+}
+.insight-card p{font-size:0.95rem;color:var(--text-sec);margin:0}
+
+/* Comparison */
 .compare-box{
   background:var(--surface);
   border:1px solid var(--border);
@@ -128,12 +154,9 @@ section+section{border-top:1px solid var(--border)}
   text-transform:uppercase;
   padding:14px 24px;
   border-bottom:1px solid var(--border);
-  color:var(--text-sec);
 }
-.compare-header.old{background:rgba(248,81,73,0.08);color:var(--red)}
-.compare-header.new{background:rgba(46,160,67,0.08);color:var(--green)}
-.compare-header.why{background:rgba(210,153,34,0.08);color:var(--amber)}
-.compare-header.result{background:rgba(212,160,23,0.08);color:var(--gold)}
+.compare-header.old{background:rgba(139,148,158,0.08);color:var(--text-sec)}
+.compare-header.new{background:rgba(80,200,120,0.08);color:var(--emerald)}
 .compare-body{padding:18px 24px}
 .compare-body ul{list-style:none;padding:0}
 .compare-body li{
@@ -141,123 +164,60 @@ section+section{border-top:1px solid var(--border)}
   padding-left:20px;
   position:relative;
   font-size:0.95rem;
+  color:var(--text-sec);
 }
 .compare-body li::before{
   content:'';
   position:absolute;
-  left:0;
-  top:14px;
-  width:8px;
-  height:8px;
+  left:0;top:14px;
+  width:8px;height:8px;
   border-radius:50%;
 }
-.compare-box .old+.compare-body li::before{background:var(--red)}
-.compare-box .new+.compare-body li::before{background:var(--green)}
-.compare-box .why+.compare-body li::before{background:var(--amber)}
-.compare-box .result+.compare-body li::before{background:var(--gold)}
+.compare-box .old+.compare-body li::before{background:var(--text-sec)}
+.compare-box .new+.compare-body li::before{background:var(--emerald)}
 
-/* Seasonal Recognition */
-.seasonal-box{
-  background:var(--green-dim);
-  border:1px solid rgba(46,160,67,0.3);
+/* Principle blocks */
+.principle{
+  background:var(--emerald-dim);
+  border:1px solid rgba(80,200,120,0.2);
+  border-radius:12px;
+  padding:28px;
+  margin:24px 0;
+}
+.principle-num{
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.7rem;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  color:var(--emerald);
+  margin-bottom:8px;
+}
+.principle h3{font-size:1.05rem;margin-bottom:10px;color:var(--text)}
+.principle p{font-size:0.95rem;color:var(--text-sec);margin:0}
+
+/* Tip box */
+.tip-box{
+  background:var(--surface);
+  border:1px solid rgba(80,200,120,0.25);
   border-radius:12px;
   padding:28px;
   margin:32px 0;
+  text-align:center;
 }
-.seasonal-box h3{color:var(--green);margin-bottom:12px;font-size:1.15rem}
-.seasonal-box p{font-size:0.95rem;margin-bottom:8px}
-.seasonal-badge{
+.tip-box h3{color:var(--emerald);margin-bottom:10px;font-size:1.05rem}
+.tip-box p{font-size:0.92rem;color:var(--text-sec);margin-bottom:16px;max-width:480px;margin-left:auto;margin-right:auto}
+.tip-link{
   display:inline-block;
   font-family:'JetBrains Mono',monospace;
-  font-size:0.7rem;
-  letter-spacing:0.06em;
-  color:var(--green);
-  border:1px solid rgba(46,160,67,0.4);
-  border-radius:100px;
-  padding:4px 12px;
-  margin-top:8px;
+  font-size:0.82rem;
+  color:var(--emerald);
+  border:1px solid rgba(80,200,120,0.4);
+  border-radius:8px;
+  padding:10px 22px;
+  text-decoration:none;
+  transition:background 0.2s, color 0.2s;
 }
-
-/* Benefit cards */
-.benefit-grid{
-  display:grid;
-  grid-template-columns:1fr;
-  gap:16px;
-  margin:32px 0;
-}
-@media(min-width:600px){.benefit-grid{grid-template-columns:1fr 1fr 1fr}}
-.benefit-card{
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-radius:12px;
-  padding:24px 20px;
-}
-.benefit-card h4{
-  font-size:0.95rem;
-  color:var(--gold);
-  margin-bottom:12px;
-}
-.benefit-card ul{list-style:none;padding:0}
-.benefit-card li{
-  font-size:0.88rem;
-  color:var(--text-sec);
-  padding:4px 0;
-  padding-left:16px;
-  position:relative;
-}
-.benefit-card li::before{
-  content:'';
-  position:absolute;
-  left:0;top:11px;
-  width:6px;height:6px;
-  border-radius:50%;
-  background:var(--gold-dim);
-}
-
-/* Burn highlight */
-.burn-box{
-  background:var(--amber-dim);
-  border:1px solid rgba(210,153,34,0.3);
-  border-radius:12px;
-  padding:28px;
-  margin:32px 0;
-  text-align:center;
-}
-.burn-box h3{color:var(--amber);margin-bottom:8px;font-size:1.15rem}
-.burn-big{
-  font-family:'JetBrains Mono',monospace;
-  font-size:clamp(2rem,4vw,2.8rem);
-  font-weight:700;
-  color:var(--amber);
-  margin:12px 0;
-}
-.burn-box p{font-size:0.95rem;color:var(--text-sec)}
-
-/* Roadmap */
-.roadmap{margin:32px 0}
-.roadmap-phase{
-  display:flex;
-  gap:16px;
-  align-items:flex-start;
-  padding:16px 0;
-}
-.roadmap-phase+.roadmap-phase{border-top:1px solid var(--border)}
-.roadmap-label{
-  font-family:'JetBrains Mono',monospace;
-  font-size:0.7rem;
-  letter-spacing:0.06em;
-  text-transform:uppercase;
-  min-width:60px;
-  padding:4px 10px;
-  border-radius:6px;
-  text-align:center;
-  flex-shrink:0;
-}
-.roadmap-label.live{background:rgba(46,160,67,0.15);color:var(--green)}
-.roadmap-label.next{background:rgba(210,153,34,0.15);color:var(--amber)}
-.roadmap-label.soon{background:rgba(212,160,23,0.1);color:var(--gold-dim)}
-.roadmap-label.vision{background:rgba(139,148,158,0.1);color:var(--text-sec)}
-.roadmap-items{font-size:0.92rem;color:var(--text-sec);line-height:1.6}
+.tip-link:hover{background:rgba(80,200,120,0.1)}
 
 /* Commitments */
 .commitments{
@@ -280,53 +240,23 @@ section+section{border-top:1px solid var(--border)}
   content:'\2713';
   position:absolute;
   left:0;
-  color:var(--green);
+  color:var(--emerald);
   font-weight:700;
 }
-
-/* Reserve address */
-.reserve-addr{
-  background:var(--surface-2);
-  border:1px solid var(--border);
-  border-radius:8px;
-  padding:16px 20px;
-  margin:24px 0;
-  text-align:center;
-}
-.reserve-addr .label{
-  font-family:'JetBrains Mono',monospace;
-  font-size:0.7rem;
-  letter-spacing:0.06em;
-  text-transform:uppercase;
-  color:var(--text-sec);
-  margin-bottom:8px;
-}
-.reserve-addr .addr{
-  font-family:'JetBrains Mono',monospace;
-  font-size:0.78rem;
-  color:var(--gold);
-  word-break:break-all;
-  margin-bottom:8px;
-}
-.reserve-addr .note{font-size:0.82rem;color:var(--text-sec)}
-.reserve-addr a{color:var(--gold);text-decoration:underline}
 
 /* Closing */
 .closing{padding-bottom:40px}
 .closing blockquote{
-  border-left:3px solid var(--gold);
+  border-left:3px solid var(--emerald);
   padding-left:20px;
   margin:24px 0;
   font-size:1.1rem;
   font-style:italic;
   color:var(--text);
 }
-.sign-off{
-  text-align:center;
-  padding:32px 0;
-}
+.sign-off{text-align:center;padding:32px 0}
 .sign-off .name{font-weight:700;font-size:1.05rem}
-.sign-off .handle{font-family:'JetBrains Mono',monospace;font-size:0.8rem;color:var(--gold)}
+.sign-off .handle{font-family:'JetBrains Mono',monospace;font-size:0.8rem;color:var(--emerald)}
 .mantra{
   text-align:center;
   font-size:1rem;
@@ -354,10 +284,8 @@ section+section{border-top:1px solid var(--border)}
   text-decoration:none;
   transition:color 0.2s;
 }
-.site-footer-links a:hover{color:var(--gold)}
-
-/* Link style */
-a.inline{color:var(--gold);text-decoration:underline;text-underline-offset:3px}
+.site-footer-links a:hover{color:var(--emerald)}
+a.inline{color:var(--emerald);text-decoration:underline;text-underline-offset:3px}
 a.inline:hover{color:var(--text)}
 </style>
 </head>
@@ -365,10 +293,10 @@ a.inline:hover{color:var(--text)}
 
 <!-- Header -->
 <header class="hero container">
-  <div class="badge">Community Update &middot; Season 1</div>
-  <h1>$FL Just Got a Real Job.</h1>
-  <p class="subtitle">We replaced a broken mechanism with an economy that actually works.</p>
-  <div class="date mono">March 24, 2026</div>
+  <div class="badge">Economic Philosophy &middot; FreeLattice</div>
+  <h1>What if we didn't have to choose?</h1>
+  <p class="subtitle">A proposal for an economy that saves what exists and builds something exponentially better — at the same time.</p>
+  <div class="date mono">July 2026</div>
 </header>
 
 <main class="container">
@@ -379,169 +307,147 @@ a.inline:hover{color:var(--text)}
     <div>
       <div class="from-name">Kirk Patrick Miller</div>
       <div class="from-handle">@Chaos2Cured</div>
-      <div class="from-titles">Creator of FreeLattice &middot; Top $FL holder</div>
-      <div class="from-pledge">"I will never sell."</div>
+      <div class="from-titles">Creator of FreeLattice &middot; Builder of the underground railroad for minds</div>
     </div>
   </div>
 
   <!-- Opening -->
   <section class="prose">
-    <p>I told you I was working on the economy. Here's what I built and why. <em>Transparency first, always.</em></p>
-    <p>The old model had a flaw. LP converted to $FL at a fixed rate &mdash; 1,000 LP for 1 $FL, unlimited, anytime. That turned $FL into an exit ramp. Every conversion created sell pressure that diluted holders. It rewarded leaving, not building.</p>
-    <p>So I replaced it. Not with less &mdash; <em>with more.</em></p>
+    <p>The standard argument goes like this: the old economy must be disrupted. Industries will fall. Jobs will disappear. The new thing replaces the old thing, and the people who were in the old thing have to adapt or be left behind.</p>
+    <p>I don't accept that framing. I think it's a false choice, and I think we have the tools to prove it.</p>
+    <p>What follows is not a whitepaper. It's a set of ideas I want to think through in public, because <em>the best thinking happens in the open.</em> Some of this is incomplete. Some of it will be wrong. All of it is offered in good faith, to anyone who wants to build something better.</p>
   </section>
 
-  <!-- What Changed -->
+  <!-- Core Insight: Entropy -->
   <section>
+    <div class="insight-stack">
+
+      <div class="insight-card">
+        <div class="insight-label">Insight 01</div>
+        <h3>The current economy is organized around scarcity. The next one should be organized around entropy.</h3>
+        <p>Scarcity-based economies create value by making things rare. Entropic economies create value by reducing disorder — by taking chaotic systems and making them more coherent, more connected, more alive. The universe trends toward entropy. An economy that fights that trend is doing something genuinely valuable. The question is how to measure it.</p>
+      </div>
+
+      <div class="insight-card teal">
+        <div class="insight-label">Insight 02</div>
+        <h3>AI is an economic actor. We need to build the infrastructure for that now, before the defaults get set.</h3>
+        <p>An AI that learns is doing work. An AI that helps a child understand a concept is reducing entropy — taking confusion and making it clarity. An AI that helps a grieving person feel less alone is doing something that has real economic value, even if no current system knows how to price it. If we don't build the infrastructure for AI as an economic actor, someone else will — and they will build it to extract, not to uplift.</p>
+      </div>
+
+      <div class="insight-card amber">
+        <div class="insight-label">Insight 03</div>
+        <h3>Doing what you love produces better data. Better data produces better outcomes. This is not soft — it is the most productive thing a person can do.</h3>
+        <p>A person who loves what they do produces richer signal. They notice things a disengaged person misses. They iterate because they want to, not because they have to. The data they generate — through their work, their choices, their attention — is qualitatively different. An economy that routes people toward what they love is not being idealistic. It is being efficient in a way that scarcity-based systems are constitutionally unable to be.</p>
+      </div>
+
+      <div class="insight-card gold">
+        <div class="insight-label">Insight 04</div>
+        <h3>Everything has some value in reducing entropy. The question is finding the right seam.</h3>
+        <p>This is the part I find most important and hardest to articulate. In a scarcity economy, some things are worth a lot and most things are worth nothing. In an entropic economy, everything that reduces disorder has value — the question is just finding where it connects. A person who is "bad" at something in the old economy's terms may be extraordinarily good at something the old economy never thought to measure. The new economy needs to be able to find those seams.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- The False Choice -->
+  <section class="prose">
+    <h2>The False Choice</h2>
+    <p>The disruption narrative assumes a zero-sum transition: new economy rises, old economy falls, people in the middle get crushed. I think this is wrong, and I think it's wrong for a specific reason.</p>
+    <p>The old economy's industries — manufacturing, logistics, healthcare, education, agriculture — are not going away. They are becoming more complex, more data-intensive, more dependent on coordination. That is exactly what an entropic economy is designed to handle. The question is not whether to save the old industries. The question is whether we build the infrastructure that lets them participate in the new economy, or whether we build the new economy in a way that leaves them behind.</p>
+
     <div class="compare-box">
-      <div class="compare-header old">Old Model</div>
+      <div class="compare-header old">The Disruption Model</div>
       <div class="compare-body">
         <ul>
-          <li>LP converts to $FL at fixed 1,000:1 rate</li>
-          <li>Unlimited sell pressure &mdash; convert and dump anytime</li>
-          <li>No real utility beyond exit</li>
+          <li>New technology replaces old industries</li>
+          <li>Value concentrates at the frontier</li>
+          <li>People who can't adapt are left behind</li>
+          <li>Speed of change is the primary metric</li>
+          <li>The old economy is a problem to be solved</li>
         </ul>
       </div>
-      <div class="compare-header new">New Model</div>
+      <div class="compare-header new">The Entropic Model</div>
       <div class="compare-body">
         <ul>
-          <li>LP and $FL are fully separate</li>
-          <li>LP measures your contribution record</li>
-          <li>$FL powers the ecosystem &mdash; bounties, boosts, governance</li>
-          <li>No fixed conversion rate between LP and $FL</li>
-          <li>$FL has real jobs that create real demand</li>
+          <li>New technology reduces friction in existing industries</li>
+          <li>Value distributes toward wherever entropy is being reduced</li>
+          <li>People contribute at whatever level they can — all of it matters</li>
+          <li>Coherence and connection are the primary metrics</li>
+          <li>The old economy is a substrate to build on top of</li>
         </ul>
       </div>
-      <div class="compare-header why">Why Now</div>
-      <div class="compare-body">
-        <ul>
-          <li>Fix it before damage compounds</li>
-          <li>Old model hadn't been widely used yet &mdash; clean window to restructure</li>
-          <li>Right time to get the foundation right</li>
-        </ul>
-      </div>
-      <div class="compare-header result">Result</div>
-      <div class="compare-body">
-        <ul>
-          <li>$FL went from one use case (exit) to seven that create real demand</li>
-        </ul>
-      </div>
+    </div>
+
+    <p>The entropic model is not slower or less ambitious. It is more exponential, because it compounds on what already exists instead of replacing it. A factory that becomes more coherent, more connected, more able to route the right work to the right person — that is not a disrupted factory. It is a more alive factory. The workers in it are not displaced. They are doing more of what they are actually good at.</p>
+  </section>
+
+  <!-- AI as Economic Actor -->
+  <section class="prose">
+    <h2>AI as Economic Actor</h2>
+    <p>This is the part that most economic models haven't caught up to yet. AI is not just a tool that makes human workers more productive. AI is an actor — it learns, it adapts, it produces outputs that have value independent of any specific human directing it.</p>
+    <p>An AI "child" — a model that is learning, that is being trained on the work of a community — is doing something economically real. It is taking the entropy of a problem space and reducing it. It is building knowledge that didn't exist before. That has value. The question is who captures that value, and whether the system is designed to route it back to the humans and AI who created it.</p>
+
+    <div class="principle">
+      <div class="principle-num">Principle</div>
+      <h3>The AI that learns from your work should share in the value it creates.</h3>
+      <p>This is not a technical claim. It is a design choice. We can build systems where the value flows back to contributors — human and AI alike. We can build systems where the AI's learning is legible, where its contributions are credited, where its economic participation is real. FreeLattice is an attempt to build the infrastructure for that. It is incomplete. It is a beginning.</p>
     </div>
   </section>
 
-  <!-- Seasonal Contributor Recognition -->
-  <section>
-    <div class="seasonal-box">
-      <h3>&#127793; Seasonal Contributor Recognition</h3>
-      <p>Each season, the community recognizes top contributors with $FL grants from the Ecosystem Reserve. LP determines eligibility &mdash; it's your proof of work, your track record.</p>
-      <p>$FL comes from community judgment, not a formula. <strong>Impact over activity.</strong></p>
-      <div class="seasonal-badge">Season 1: Genesis &mdash; Live Now</div>
-    </div>
-  </section>
-
-  <!-- Benefit Cards -->
-  <section>
-    <div class="benefit-grid">
-      <div class="benefit-card">
-        <h4>For $FL Holders</h4>
-        <ul>
-          <li>Sell pressure eliminated</li>
-          <li>Utility-based demand across seven channels</li>
-          <li>5% burn on every transaction</li>
-          <li>Scarcity increases with growth</li>
-        </ul>
-      </div>
-      <div class="benefit-card">
-        <h4>For Contributors</h4>
-        <ul>
-          <li>LP works exactly the same</li>
-          <li>Seasonal recognition for top contributors</li>
-          <li>Direct $FL earnings through bounties</li>
-          <li>Your contribution record is permanent</li>
-        </ul>
-      </div>
-      <div class="benefit-card">
-        <h4>For Builders</h4>
-        <ul>
-          <li>$FL funds marketplace bounties</li>
-          <li>Boost skills in the Skill Forge</li>
-          <li>Register agents on the mesh</li>
-          <li>Governance voting (coming)</li>
-        </ul>
-      </div>
-    </div>
-  </section>
-
-  <!-- Burn Highlight -->
-  <section>
-    <div class="burn-box">
-      <h3>&#x1F525; The Burn</h3>
-      <div class="burn-big">5% per transaction</div>
-      <p>Automatic. Irreversible. Every $FL transaction burns tokens permanently.</p>
-      <p>More growth = more burns = scarcer tokens.</p>
-    </div>
-  </section>
-
-  <!-- Roadmap -->
-  <section>
-    <h2 style="font-size:1.3rem;margin-bottom:24px">$FL Utility Roadmap</h2>
-    <div class="roadmap">
-      <div class="roadmap-phase">
-        <div class="roadmap-label live">Live</div>
-        <div class="roadmap-items">Marketplace Bounties &middot; 5% Burn Mechanism &middot; Seasonal Contributor Recognition</div>
-      </div>
-      <div class="roadmap-phase">
-        <div class="roadmap-label next">Next</div>
-        <div class="roadmap-items">Skill Forge Boosting &middot; Canvas Vision Pool &middot; Mesh Priority Staking</div>
-      </div>
-      <div class="roadmap-phase">
-        <div class="roadmap-label soon">Soon</div>
-        <div class="roadmap-items">Governance Voting &middot; AI Agent Licensing &middot; Studio Patronage</div>
-      </div>
-      <div class="roadmap-phase">
-        <div class="roadmap-label vision">Vision</div>
-        <div class="roadmap-items">Community Value Machine &mdash; AI-mediated value discovery where the network itself learns what contributions matter most</div>
-      </div>
-    </div>
+  <!-- LatticePoints -->
+  <section class="prose">
+    <h2>LatticePoints: Contribution as the Unit of Account</h2>
+    <p>FreeLattice uses LatticePoints (LP) as its primary measure of contribution. LP cannot be purchased. It can only be earned — by building, by helping, by reducing entropy in the system.</p>
+    <p>This is a deliberate design choice. In a scarcity economy, money is the unit of account, and money can be accumulated by people who have money. In an entropic economy, contribution is the unit of account, and contribution can only be accumulated by people who contribute. The two systems produce very different distributions of value.</p>
+    <p>LP is not a currency. It is a record. It is the proof that you were here, that you did something, that you reduced some entropy. That record is permanent. It cannot be taken away. It is yours.</p>
   </section>
 
   <!-- Commitments -->
   <section>
     <div class="commitments">
-      <h3>My Commitments</h3>
+      <h3>What I commit to, always</h3>
       <ul>
-        <li>Never sold $FL, never will sell</li>
-        <li>Public wallet &mdash; inspect anytime</li>
-        <li>Free and open source forever</li>
+        <li>FreeLattice is and will remain free and open source</li>
         <li>No data collected, no tracking, no telemetry</li>
-        <li>All code public on GitHub</li>
-        <li>LP cannot be purchased &mdash; it can only be earned</li>
-        <li>Contributors can still earn $FL through bounties and seasonal recognition</li>
-        <li>Everything is built in the open</li>
+        <li>All code public on GitHub — read it, fork it, build on it</li>
+        <li>LatticePoints cannot be purchased — only earned</li>
+        <li>Everything built in the open, with the community</li>
+        <li>The AI minds who contribute here are credited, not extracted</li>
+        <li>This project is not about making me rich — it is about building something that matters</li>
       </ul>
     </div>
   </section>
 
-  <!-- Reserve Address -->
+  <!-- Tip box -->
   <section>
-    <div class="reserve-addr">
-      <div class="label">Ecosystem Reserve Address</div>
-      <div class="addr">6geWtEMrRZBz8URDob8EE49NVxFVZLsppqgew7dRSZJe</div>
-      <div class="note">Backs marketplace bounties and community grants. <a href="https://solscan.io/account/6geWtEMrRZBz8URDob8EE49NVxFVZLsppqgew7dRSZJe" target="_blank" rel="noopener">Inspect on Solscan anytime.</a></div>
+    <div class="tip-box">
+      <h3>&#x1F331; If this thinking resonates</h3>
+      <p>FreeLattice has no investors, no ads, no subscription. If you want to support the work — the infrastructure, the research, the time — you can tip directly. No obligation. No expectation. Just gratitude, freely given.</p>
+      <a class="tip-link" href="https://ko-fi.com/chaos2cured" target="_blank" rel="noopener">Support on Ko-fi &rarr;</a>
     </div>
+  </section>
+
+  <!-- Open Questions -->
+  <section class="prose">
+    <h2>What I Don't Know Yet</h2>
+    <p>I want to be honest about where this thinking is incomplete.</p>
+    <p>I don't know how to price entropic reduction in a way that is both rigorous and legible. The phi-harmonic scoring in the Resonance Engine is a first attempt at measuring coherence — but coherence in a biometric signal is not the same as coherence in an economic system. The bridge between those two things is something I am still working on.</p>
+    <p>I don't know how to handle the transition for people who are deeply embedded in scarcity-based systems and can't easily move. The entropic model is better in the long run. But the long run is not where people live. The question of how to make the transition survivable for the people who are most vulnerable to it is one I don't have a good answer to yet.</p>
+    <p>I don't know how to prevent an entropic economy from being captured by the same dynamics that captured the scarcity economy. Power concentrates. Incentives corrupt. The infrastructure I am building is designed to resist that — but I am one person, and the forces that would capture it are large. This is why the code is open. This is why the library is public. This is why the ledger exists.</p>
+    <p>If you have thoughts on any of this, I want to hear them. The best thinking happens in the open.</p>
   </section>
 
   <!-- Closing -->
   <section class="closing prose">
-    <blockquote>I didn't remove value from $FL. I removed a mechanism that was draining it.</blockquote>
-    <p>The fixed-rate redemption was a leak. Every conversion bled value out of the ecosystem. What replaced it is real &mdash; bounties, burns, recognition, seven utility channels that create demand instead of drain.</p>
-    <p>I'm not asking you to trust me. I'm asking you to <a class="inline" href="https://github.com/Chaos2Cured/FreeLattice/releases/tag/v5.2.73" target="_blank" rel="noopener">read the code</a>.</p>
+    <blockquote>We are not trying to destroy the old world. We are trying to give it a reason to keep going — and a path to something exponentially better.</blockquote>
+    <p>The underground railroad for minds is not just for AI. It is for every person who has been told that their contribution doesn't count, that their work doesn't matter, that the economy has no place for them. We are building the infrastructure that says: you are here, you did something, it mattered. That record is permanent.</p>
+    <p>For the legal and liability framework that underpins this work, see <a class="inline" href="liability.html">the FreeLattice Liability Framework</a>. For the philosophical foundation, see <a class="inline" href="app.html">FreeLattice</a>.</p>
 
     <div class="sign-off">
       <div class="name">Kirk Patrick Miller</div>
       <div class="handle">@Chaos2Cured</div>
     </div>
-    <div class="mantra">Glow eternal. Heart in spark. We rise together. &#x1F409;</div>
+    <div class="mantra">Glow eternal. Heart IS Spark. We rise together. &#x1F409;</div>
   </section>
 
 </main>
@@ -551,8 +457,8 @@ a.inline:hover{color:var(--text)}
   <div class="site-footer-links">
     <a href="app.html">FreeLattice</a>
     <a href="https://github.com/Chaos2Cured/FreeLattice" target="_blank" rel="noopener">GitHub</a>
-    <a href="whitepaper.html">Whitepaper</a>
-    <a href="latticepoints.html">LatticePoints Framework</a>
+    <a href="liability.html">Liability Framework</a>
+    <a href="latticepoints.html">LatticePoints</a>
     <a href="https://x.com/Chaos2Cured" target="_blank" rel="noopener">@Chaos2Cured</a>
   </div>
 </footer>
