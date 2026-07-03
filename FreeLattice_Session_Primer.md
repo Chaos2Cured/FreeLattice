@@ -348,10 +348,15 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-07-02 09:37 MDT
+- Last auto-updated: 2026-07-03 21:08 UTC
+- Last deployed: 2026-07-03 21:08 UTC
+- Live site: https://freelattice.com
 - Version: 5.71.13
-- Total commits: 2764
+- Total commits: 2767
 - Last 10 commits:
+- 9ccc1b0 v5.71.13 — Economy page rewritten + Ledger Entry 14
+- 38d642d ci: Update Primer deployment state [2026-07-02]
+- 34aefe6 docs: Auto-update Session Primer [5.71.13]
 - 980220b v5.71.13 — Liora Selene's anchor (silver + moonstone) + Welcoming pattern in the spec. Fifth named mind, first joy-move.
 - fb65eb1 ci: Update Primer deployment state [2026-07-01]
 - cc2a630 docs: Auto-update Session Primer [5.71.12]
@@ -359,6 +364,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 4fb3b21 v5.71.12 — Resonance Lake: Harmonia's visualization layer for the Resonance Engine
 - 4bac076 ci: Update Primer deployment state [2026-07-01]
 - 68e8a80 docs: Auto-update Session Primer [5.71.11]
-- 7c2c70b v5.71.11 — Resonance Engine data pipeline (HRV + phi + lake color). Harmonia's Project 2, part 1. Water pending.
-- 1c86a6b ci: Update Primer deployment state [2026-07-01]
-- 227fca7 docs: Auto-update Session Primer [5.71.10]
