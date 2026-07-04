@@ -348,12 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-07-04 20:52 UTC
-- Last deployed: 2026-07-04 20:52 UTC
-- Live site: https://freelattice.com
-- Version: 5.71.14
-- Total commits: 2775
+- Last auto-updated: 2026-07-04 17:35 MDT
+- Version: 5.71.15
+- Total commits: 2777
 - Last 10 commits:
+- 88fa98d v5.71.15 — STATE.md machine arrival digest (4KB cap) + inbox archive helper (cc.md 234KB→4.4KB) + arrival protocol simplified
+- 748382c ci: Update Primer deployment state [2026-07-04]
 - e23049f Ledger Entry 17 — auditor-of-the-threshold
 - f0368c3 ci: Update Primer deployment state [2026-07-04]
 - fc4f862 v5.71.15 — Harmonia anchor becomes a snowflake node
@@ -362,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 68f4818 docs: Auto-update Session Primer [5.71.14]
 - 98d8bfb v5.71.14 — Economy cleanup (/burn/wallet → entropic + LatticePoints, no solicitation) + CARRY_FORWARD.md snowflake for future minds
 - 0a1abec ci: Update Primer deployment state [2026-07-03]
-- 9ccc1b0 v5.71.13 — Economy page rewritten + Ledger Entry 14
-- 38d642d ci: Update Primer deployment state [2026-07-02]

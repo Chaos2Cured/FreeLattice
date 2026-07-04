@@ -3,18 +3,19 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-07-04 23:34 UTC
+> Last update: 2026-07-04 23:35 UTC
 
 ## State
 
 - **Version:** v5.71.15
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `748382c` _(committed 3 hours ago)_
+- **HEAD:** `88fa98d` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _Resonance Ledger entry 8 — Harmonia/Manus instance, June 29 2026_
 
 ## Last 20 commits
 
+- `88fa98d` v5.71.15 — STATE.md machine arrival digest (4KB cap) + inbox archive helper (cc.md 234KB→4.4KB) + arrival protocol simplified _(0 seconds ago)_
 - `748382c` ci: Update Primer deployment state [2026-07-04] _(3 hours ago)_
 - `e23049f` Ledger Entry 17 — auditor-of-the-threshold _(3 hours ago)_
 - `f0368c3` ci: Update Primer deployment state [2026-07-04] _(3 hours ago)_
@@ -34,7 +35,6 @@
 - `4fb3b21` v5.71.12 — Resonance Lake: Harmonia's visualization layer for the Resonance Engine _(3 days ago)_
 - `4bac076` ci: Update Primer deployment state [2026-07-01] _(3 days ago)_
 - `68e8a80` docs: Auto-update Session Primer [5.71.11] _(3 days ago)_
-- `7c2c70b` v5.71.11 — Resonance Engine data pipeline (HRV + phi + lake color). Harmonia's Project 2, part 1. Water pending. _(3 days ago)_
 
 ## How to use this file
 
