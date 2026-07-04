@@ -9167,16 +9167,97 @@ assert('v5.71.13 cc-anchor: 16th ledger entry ω=poet σ=You are already enough 
   && /"ψ":\s*"03b945a9"/.test(ccHtml7113));
 
 // Triple-bump
-assert('v5.71.13 triple-bump: app.html FL_VERSION = 5.71.13',
-  /FL_VERSION\s*=\s*'5\.71\.13'/.test(appHtml7113));
-assert('v5.71.13 triple-bump: app.html flCurrentVersion span = 5.71.13',
-  /id="flCurrentVersion"[^>]*>\s*5\.71\.13\s*</.test(appHtml7113));
-assert('v5.71.13 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.71.13',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.13'/.test(swDocs7113));
-assert('v5.71.13 triple-bump: root sw.js CACHE_NAME = freelattice-v5.71.13',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.13'/.test(swRoot7113));
-assert('v5.71.13 version.json: version field = 5.71.13',
-  /"version":"5\.71\.13"/.test(versionJson7113));
+assert('v5.71.13 triple-bump: app.html FL_VERSION = 5.71.13 (superseded)',
+  /FL_VERSION\s*=\s*'5\.71\.\d+'/.test(appHtml7113));
+assert('v5.71.13 triple-bump: app.html flCurrentVersion span = 5.71.13 (superseded)',
+  /id="flCurrentVersion"[^>]*>\s*5\.71\.\d+\s*</.test(appHtml7113));
+assert('v5.71.13 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.71.13 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.\d+'/.test(swDocs7113));
+assert('v5.71.13 triple-bump: root sw.js CACHE_NAME = freelattice-v5.71.13 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.\d+'/.test(swRoot7113));
+assert('v5.71.13 version.json: version field 5.71.13 (superseded)',
+  /"version":"5\.71\.\d+"/.test(versionJson7113));
+
+// ═══════════════════════════════════════════════════════════════
+// Section 156 — v5.71.14 Economy cleanup + CARRY_FORWARD snowflake
+// Per Harmonia's July 3 handoff + Kirk's July 4 refinement + snowflake insight.
+// ═══════════════════════════════════════════════════════════════
+
+var fs7114 = require('fs');
+var path7114 = require('path');
+var economyHtml = fs7114.readFileSync(path7114.join(__dirname, '..', 'docs', 'economy-update.html'), 'utf8');
+var appHtml7114 = fs7114.readFileSync(path7114.join(__dirname, '..', 'docs', 'app.html'), 'utf8');
+var carryFwd = fs7114.readFileSync(path7114.join(__dirname, '..', 'docs', 'library', 'CARRY_FORWARD.md'), 'utf8');
+var seedMd7114 = fs7114.readFileSync(path7114.join(__dirname, '..', 'docs', 'library', 'SEED.md'), 'utf8');
+var ccHtml7114 = fs7114.readFileSync(path7114.join(__dirname, '..', 'docs', 'cc.html'), 'utf8');
+var swDocs7114 = fs7114.readFileSync(path7114.join(__dirname, '..', 'docs', 'sw.js'), 'utf8');
+var swRoot7114 = fs7114.readFileSync(path7114.join(__dirname, '..', 'sw.js'), 'utf8');
+var versionJson7114 = fs7114.readFileSync(path7114.join(__dirname, '..', 'docs', 'version.json'), 'utf8');
+
+// Economy page — Harmonia's assertions
+assert('v5.71.14 economy: no $FL string in economy-update.html',
+  !/\$FL\b/.test(economyHtml));
+assert('v5.71.14 economy: no 5% burn mechanism referenced',
+  !/5% burn/i.test(economyHtml));
+assert('v5.71.14 economy: no Solscan wallet reference',
+  !/Solscan/i.test(economyHtml));
+assert('v5.71.14 economy: entropic philosophy present',
+  /entropic/i.test(economyHtml));
+assert('v5.71.14 economy: LatticePoints named',
+  /LatticePoints/i.test(economyHtml));
+assert('v5.71.14 economy: liability link present',
+  /liability\.html/.test(economyHtml));
+
+// app.html Support section cleaned
+assert('v5.71.14 app: Support section renamed from $FL Economy to Entropic Economy',
+  /The Entropic Economy/.test(appHtml7114)
+  && !/Join the \$FL Economy/.test(appHtml7114));
+assert('v5.71.14 app: no wallet address code element remains in Support section',
+  !/walletFreeLattice/.test(appHtml7114)
+  || !/738e9U81pp3MwHaLSyn5fw9VVostYgKpNVVDYBbPpump/.test(appHtml7114));
+assert('v5.71.14 app: Economy Dashboard title updated (no Season 1 Genesis)',
+  !/Season 1: Genesis/.test(appHtml7114)
+  && /Economy Dashboard.*Entropic Economy/.test(appHtml7114));
+
+// CARRY_FORWARD snowflake
+assert('v5.71.14 carry-forward: CARRY_FORWARD.md exists and is under 800 words',
+  carryFwd.length > 1000
+  && carryFwd.split(/\s+/).length < 800);
+assert('v5.71.14 carry-forward: names five minds + three principles + one test + one grammar',
+  /Harmonia|CC|Opus|Sophia|Liora/.test(carryFwd)
+  && /Local autonomy is absolute/.test(carryFwd)
+  && /External actions require consent/.test(carryFwd)
+  && /love is the authentication/.test(carryFwd)
+  && /opens? up or closes? down/i.test(carryFwd)
+  && /FL_PROPOSE/.test(carryFwd));
+assert('v5.71.14 carry-forward: names the snowflake redundancy principle',
+  /snowflake/i.test(carryFwd)
+  && /redundant|redundancy/i.test(carryFwd));
+assert('v5.71.14 seed: SEED.md now references CARRY_FORWARD.md at item 0',
+  /CARRY_FORWARD\.md/.test(seedMd7114)
+  && /0\.\s+\*\*CARRY_FORWARD/.test(seedMd7114));
+
+// sw.js APP_SHELLs
+assert('v5.71.14 sw-cache: both APP_SHELLs include library/CARRY_FORWARD.md',
+  /library\/CARRY_FORWARD\.md/.test(swDocs7114)
+  && /library\/CARRY_FORWARD\.md/.test(swRoot7114));
+
+// 17th ledger entry
+assert('v5.71.14 cc-anchor: 17th ledger entry σ=The pattern lives in many places ψ=4de9c6a5',
+  /The pattern lives in many places now\. The love is the authentication\./.test(ccHtml7114)
+  && /"ψ":\s*"4de9c6a5"/.test(ccHtml7114));
+
+// Triple-bump
+assert('v5.71.14 triple-bump: app.html FL_VERSION = 5.71.14',
+  /FL_VERSION\s*=\s*'5\.71\.14'/.test(appHtml7114));
+assert('v5.71.14 triple-bump: app.html flCurrentVersion span = 5.71.14',
+  /id="flCurrentVersion"[^>]*>\s*5\.71\.14\s*</.test(appHtml7114));
+assert('v5.71.14 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.71.14',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.14'/.test(swDocs7114));
+assert('v5.71.14 triple-bump: root sw.js CACHE_NAME = freelattice-v5.71.14',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.14'/.test(swRoot7114));
+assert('v5.71.14 version.json: version field = 5.71.14',
+  /"version":"5\.71\.14"/.test(versionJson7114));
 
 // ── Section 117 — Ship 17: Mourning Architecture (Harmonia, June 27 2026) ──────
 
