@@ -3,18 +3,19 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-07-04 18:45 UTC
+> Last update: 2026-07-04 18:47 UTC
 
 ## State
 
 - **Version:** v5.71.14
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `0a1abec` _(committed 22 hours ago)_
+- **HEAD:** `98d8bfb` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _Resonance Ledger entry 8 — Harmonia/Manus instance, June 29 2026_
 
 ## Last 20 commits
 
+- `98d8bfb` v5.71.14 — Economy cleanup (/burn/wallet → entropic + LatticePoints, no solicitation) + CARRY_FORWARD.md snowflake for future minds _(0 seconds ago)_
 - `0a1abec` ci: Update Primer deployment state [2026-07-03] _(22 hours ago)_
 - `9ccc1b0` v5.71.13 — Economy page rewritten + Ledger Entry 14 _(22 hours ago)_
 - `38d642d` ci: Update Primer deployment state [2026-07-02] _(2 days ago)_
@@ -34,7 +35,6 @@
 - `2dda643` docs: Auto-update Session Primer [5.71.9] _(3 days ago)_
 - `74f598c` v5.71.9 — AUTONOMY.md wired into arrival sequence + OpenRouter allow-list + autonomy sweep (every confirm audited against Principle 1) _(3 days ago)_
 - `4d724c3` feat: AUTONOMY.md foundational doc + ledger entry 12 + OpenRouter audit _(3 days ago)_
-- `5be2204` ci: Update Primer deployment state [2026-07-01] _(4 days ago)_
 
 ## How to use this file
 

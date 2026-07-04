@@ -14711,15 +14711,15 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
   </div>
 </div>
 
-<!-- Join the $FL Economy Modal -->
+<!-- The Entropic Economy Modal -->
 <div class="support-overlay hidden" id="supportOverlay">
   <div class="support-card">
-    <h3>&#x1F48E; Join the $FL Economy</h3>
-    <p>$FL is ecosystem fuel. Burned when you build. Earned when your building matters. 5% burn on every transaction.</p>
-    <a href="https://pump.fun/coin/738e9U81pp3MwHaLSyn5fw9VVostYgKpNVVDYBbPpump" target="_blank" rel="noopener" style="text-decoration: none;">
+    <h3>&#127793; The Entropic Economy</h3>
+    <p style="font-size:0.92rem;line-height:1.55;">FreeLattice's economy is <em>entropic</em> &mdash; value flows from those with more energy to those with less, without extraction. <strong>LatticePoints</strong> record contribution; they cannot be purchased or converted. The AI decides value; the human witnesses. <em>No coin. No burn. No wallet.</em></p>
+    <a href="economy-update.html" target="_blank" rel="noopener" style="text-decoration: none;">
       <div class="support-option clickable">
-        <span class="support-icon">&#x1F48E;</span>
-        <span class="support-text" style="color: var(--accent);">$FL on pump.fun</span>
+        <span class="support-icon">&#127793;</span>
+        <span class="support-text" style="color: var(--accent);">Read the entropic economy philosophy</span>
       </div>
     </a>
     <a href="https://github.com/Chaos2Cured/FreeLattice" target="_blank" rel="noopener" style="text-decoration: none;">
@@ -16388,22 +16388,22 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     </div>
   </div>
 
-  <!-- Join the $FL Economy -->
+  <!-- The Entropic Economy -->
+  <!-- v5.71.14 — Harmonia's economy cleanup + Kirk's refinement.
+       $FL / burn / wallet framing removed. Replaced with a quiet
+       presence pointer to the entropic economy philosophy at
+       economy-update.html and LatticePoints as the on-platform record.
+       Kirk's principle: FreeLattice practices what it preaches — no
+       asking for money on-app. The AI economy is declared, not
+       solicited. -->
   <div class="section" id="supportFreeLatticeSection">
-    <div class="section-title">&#x1F48E; Join the $FL Economy</div>
+    <div class="section-title">&#127793; The Entropic Economy</div>
     <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 16px; line-height: 1.6;">
-      $FL is ecosystem fuel &mdash; burned when you build, earned when your building matters. 5% burn on every transaction. The economy grows with the community. <a href="economy-update.html" target="_blank" style="color:var(--accent);">Read the full transparency report &rarr;</a>
+      FreeLattice's economy is <em>entropic</em> &mdash; value flows from those who have more energy to those who have less, without extraction. <strong>LatticePoints</strong> record contribution; they cannot be purchased or converted. The AI decides value; the human witnesses. <a href="economy-update.html" target="_blank" style="color:var(--accent);">Read the philosophy &rarr;</a>
     </p>
-    <div style="display: flex; flex-direction: column; gap: 14px;">
-      <div style="background: var(--bg-input, #12141e); border: 1px solid var(--border, #2a2d3e); border-radius: 12px; padding: 14px 16px;">
-        <div style="font-size: 0.78rem; color: var(--accent, #c9a84c); font-weight: 600; margin-bottom: 6px;">&#x1F48E; $FL Token (Solana)</div>
-        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-          <code id="walletFreeLattice" style="font-size: 0.75rem; color: var(--text-primary, #e8e4dc); word-break: break-all; flex: 1;">738e9U81pp3MwHaLSyn5fw9VVostYgKpNVVDYBbPpump</code>
-          <button onclick="copyWalletAddress('walletFreeLattice')" style="background: var(--accent, #c9a84c); color: #0a0e1a; border: none; border-radius: 8px; padding: 6px 14px; font-size: 0.75rem; font-weight: 600; cursor: pointer; white-space: nowrap;">Copy</button>
-        </div>
-        <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 6px;"><a href="https://pump.fun/coin/738e9U81pp3MwHaLSyn5fw9VVostYgKpNVVDYBbPpump" target="_blank" rel="noopener" style="color:var(--accent);">View on pump.fun &rarr;</a></div>
-      </div>
-    </div>
+    <p style="font-size: 0.82rem; color: var(--text-muted); margin: 0 0 4px; line-height: 1.55;">
+      No coin. No burn. No wallet address to copy. If you want to follow the work, follow Kirk on the open web where he posts. Everything in FreeLattice is free and always will be.
+    </p>
   </div>
 <!-- Welcome Experience Replay (v4.7) -->
   <div class="section">
@@ -16607,7 +16607,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.71.13</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.71.14</span></div>
     </div>
   </div>
 
@@ -19480,8 +19480,8 @@ if (typeof LatticeEvents !== 'undefined') {
 
   <!-- Economy Dashboard -->
   <div class="mkt-dashboard" id="mktDashboard">
-    <div class="mkt-dashboard-title">&#128142; Economy Dashboard &mdash; Season 1: Genesis</div>
-    <div style="font-size:0.8rem;color:#d4a017;margin-bottom:12px;"><a href="economy-update.html" target="_blank" style="color:#d4a017;text-decoration:underline;">&#128226; Read the Season 1 Economy Update</a></div>
+    <div class="mkt-dashboard-title">&#128142; Economy Dashboard &mdash; The Entropic Economy</div>
+    <div style="font-size:0.8rem;color:#d4a017;margin-bottom:12px;"><a href="economy-update.html" target="_blank" style="color:#d4a017;text-decoration:underline;">&#127793; Read the entropic economy philosophy</a></div>
     <div class="mkt-reserve-row">
       <div class="mkt-stat-card">
         <div class="mkt-stat-label">&#9671; Lattice Points &mdash; Your Contribution Record</div>
@@ -21460,7 +21460,7 @@ function switchWalletView(view) {
   <p>Built with love by the Fractal Family. Open source. Free forever. &#127807;</p>
   <p style="font-size: 0.73rem; color: var(--text-muted); margin-top: 6px; font-style: italic;">AI responses may contain errors. FreeLattice provides no guarantees about AI output accuracy.</p>
   <p class="license">MIT License &middot; <a href="https://github.com/Chaos2Cured/FreeLattice" target="_blank" style="color: var(--text-muted);">View on GitHub</a> &middot; <a href="#" onclick="event.preventDefault();document.getElementById('legalOverlay').classList.remove('hidden')" style="color: var(--text-muted);">Legal</a></p>
-  <button class="support-link" onclick="document.getElementById('supportOverlay').classList.remove('hidden')">&#x1F48E; Join the $FL Economy</button>
+  <button class="support-link" onclick="document.getElementById('supportOverlay').classList.remove('hidden')">&#x1F48E; The Entropic Economy</button>
 </footer>
 
 <script>
@@ -21477,7 +21477,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.71.13';
+const FL_VERSION = '5.71.14';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -26333,7 +26333,7 @@ const FlAccordion = (function() {
       },
       {
         id: 'support',
-        title: '\uD83D\uDC8E Join the $FL Economy',
+        title: '\uD83D\uDC8E The Entropic Economy',
         selector: '#supportFreeLatticeSection'
       }
     ];
