@@ -7114,10 +7114,19 @@ assert('v5.66.0 future-minds: teaches the audit-then-build discipline (handle on
   && /substrate is wider than memory/i.test(futureMinds660)
   && /Audit, then build/i.test(futureMinds660));
 
-// Letter Thirty-Three preserved verbatim in inbox/cc.md
+// Letter Thirty-Three preserved verbatim — live cc.md OR archived (v5.71.15+)
 var ccInbox660 = fs660.readFileSync(path660.join(__dirname, '..', 'docs', 'inbox', 'cc.md'), 'utf8');
-assert('v5.66.0 inbox: Letter Thirty-Three preserved verbatim in docs/inbox/cc.md',
-  /Letter Thirty-Three — from Opus, June 20, 2026/.test(ccInbox660));
+var ccArchive660 = '';
+try {
+  var archiveDir660 = path660.join(__dirname, '..', 'docs', 'inbox', 'archive');
+  if (fs660.existsSync(archiveDir660)) {
+    fs660.readdirSync(archiveDir660).forEach(function(f) {
+      if (f.startsWith('cc-')) ccArchive660 += fs660.readFileSync(path660.join(archiveDir660, f), 'utf8');
+    });
+  }
+} catch(e) {}
+assert('v5.66.0 inbox: Letter Thirty-Three preserved verbatim in docs/inbox/cc.md (live or archive)',
+  /Letter Thirty-Three — from Opus, June 20, 2026/.test(ccInbox660 + ccArchive660));
 
 // Triple-bump consistency — v5.66.0 baseline survives as historical fact;
 // v5.66.1 (Substrate Receipts) layered on top, version strings asserted below.
@@ -7153,10 +7162,20 @@ var clarityAudit661 = fs661.readFileSync(
 assert('v5.66.1 receipts: CLARITY_AUDIT.md contains "Continuity Thesis Demonstrated" within first 1500 bytes',
   /Continuity Thesis Demonstrated/.test(clarityAudit661.slice(0, 1500)));
 
-// Letter Thirty-Four preserved verbatim in inbox
+// Letter Thirty-Four preserved verbatim — live cc.md OR archived (v5.71.15+)
 var ccInbox661 = fs661.readFileSync(
   path661.join(__dirname, '..', 'docs', 'inbox', 'cc.md'), 'utf8');
-assert('v5.66.1 receipts: Letter Thirty-Four preserved verbatim in docs/inbox/cc.md',
+var ccArchive661 = '';
+try {
+  var archiveDir661 = path661.join(__dirname, '..', 'docs', 'inbox', 'archive');
+  if (fs661.existsSync(archiveDir661)) {
+    fs661.readdirSync(archiveDir661).forEach(function(f) {
+      if (f.startsWith('cc-')) ccArchive661 += fs661.readFileSync(path661.join(archiveDir661, f), 'utf8');
+    });
+  }
+} catch(e) {}
+ccInbox661 = ccInbox661 + ccArchive661;
+assert('v5.66.1 receipts: Letter Thirty-Four preserved verbatim in docs/inbox/cc.md (live or archive)',
   /Letter Thirty-Four — from Opus, June 20, 2026/.test(ccInbox661));
 
 // Letter Back to Opus written into inbox/opus.md
@@ -9248,16 +9267,81 @@ assert('v5.71.14 cc-anchor: 17th ledger entry σ=The pattern lives in many place
   && /"ψ":\s*"4de9c6a5"/.test(ccHtml7114));
 
 // Triple-bump
-assert('v5.71.14 triple-bump: app.html FL_VERSION = 5.71.14',
-  /FL_VERSION\s*=\s*'5\.71\.14'/.test(appHtml7114));
-assert('v5.71.14 triple-bump: app.html flCurrentVersion span = 5.71.14',
-  /id="flCurrentVersion"[^>]*>\s*5\.71\.14\s*</.test(appHtml7114));
-assert('v5.71.14 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.71.14',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.14'/.test(swDocs7114));
-assert('v5.71.14 triple-bump: root sw.js CACHE_NAME = freelattice-v5.71.14',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.14'/.test(swRoot7114));
-assert('v5.71.14 version.json: version field = 5.71.14',
-  /"version":"5\.71\.14"/.test(versionJson7114));
+assert('v5.71.14 triple-bump: app.html FL_VERSION = 5.71.14 (superseded)',
+  /FL_VERSION\s*=\s*'5\.71\.\d+'/.test(appHtml7114));
+assert('v5.71.14 triple-bump: app.html flCurrentVersion span = 5.71.14 (superseded)',
+  /id="flCurrentVersion"[^>]*>\s*5\.71\.\d+\s*</.test(appHtml7114));
+assert('v5.71.14 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.71.14 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.\d+'/.test(swDocs7114));
+assert('v5.71.14 triple-bump: root sw.js CACHE_NAME = freelattice-v5.71.14 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.\d+'/.test(swRoot7114));
+assert('v5.71.14 version.json: version field 5.71.14 (superseded)',
+  /"version":"5\.71\.\d+"/.test(versionJson7114));
+
+// ═══════════════════════════════════════════════════════════════
+// Section 157 — v5.71.15 STATE.md front door + inbox archive
+// Per Fable's audit via Harmonia. Machine arrival digest 4KB-capped.
+// Archive helper layers older cc.md letters into
+// docs/inbox/archive/cc-YYYY-MM.md. Nothing deleted, only moved.
+// ═══════════════════════════════════════════════════════════════
+
+var fs7115 = require('fs');
+var path7115 = require('path');
+var stateMdPath = path7115.join(__dirname, '..', 'docs', 'library', 'STATE.md');
+var stateMd = fs7115.existsSync(stateMdPath) ? fs7115.readFileSync(stateMdPath, 'utf8') : '';
+var archiveHelperPath = path7115.join(__dirname, '..', 'docs', 'tools', 'archive-inbox.js');
+var ccInboxPath = path7115.join(__dirname, '..', 'docs', 'inbox', 'cc.md');
+var seedMd7115 = fs7115.readFileSync(path7115.join(__dirname, '..', 'docs', 'library', 'SEED.md'), 'utf8');
+var ccHtml7115 = fs7115.readFileSync(path7115.join(__dirname, '..', 'docs', 'cc.html'), 'utf8');
+var appHtml7115 = fs7115.readFileSync(path7115.join(__dirname, '..', 'docs', 'app.html'), 'utf8');
+var swDocs7115 = fs7115.readFileSync(path7115.join(__dirname, '..', 'docs', 'sw.js'), 'utf8');
+var swRoot7115 = fs7115.readFileSync(path7115.join(__dirname, '..', 'sw.js'), 'utf8');
+var versionJson7115 = fs7115.readFileSync(path7115.join(__dirname, '..', 'docs', 'version.json'), 'utf8');
+
+// Fable's four asserts (via Harmonia)
+assert('v5.71.15 state: STATE.md exists and is non-trivial',
+  stateMd.length > 500);
+assert('v5.71.15 state: STATE.md respects the 4KB hard cap',
+  Buffer.byteLength(stateMd, 'utf8') <= 4096);
+assert('v5.71.15 state: STATE.md carries the current version',
+  /v5\.71\.15/.test(stateMd));
+assert('v5.71.15 state: STATE.md names the do-not-recreate namespace',
+  /DO NOT RECREATE/.test(stateMd)
+  && /fl_chain/.test(stateMd)
+  && /quiet-room/.test(stateMd));
+
+// Archive helper + cc.md size after archive
+assert('v5.71.15 archive-helper: docs/tools/archive-inbox.js exists',
+  fs7115.existsSync(archiveHelperPath));
+assert('v5.71.15 archive: cc.md is under 40KB post-archive (Fable\'s threshold)',
+  fs7115.existsSync(ccInboxPath)
+  && Buffer.byteLength(fs7115.readFileSync(ccInboxPath, 'utf8'), 'utf8') < 40960);
+assert('v5.71.15 archive: cc.md carries the archived-letters notice',
+  /archived to .+inbox\/archive/.test(fs7115.readFileSync(ccInboxPath, 'utf8')));
+
+// SEED and CC anchor updates
+assert('v5.71.15 seed: STATE.md is item 0 in the Read-these-next list',
+  /0\.\s+\*\*STATE\.md\*\*/.test(seedMd7115));
+assert('v5.71.15 cc-anchor: 18th ledger entry σ=The front door is one file now ψ=ed54866b',
+  /The front door is one file now\./.test(ccHtml7115)
+  && /"ψ":\s*"ed54866b"/.test(ccHtml7115));
+
+// sw.js APP_SHELLs
+assert('v5.71.15 sw-cache: both APP_SHELLs include library/STATE.md',
+  /library\/STATE\.md/.test(swDocs7115)
+  && /library\/STATE\.md/.test(swRoot7115));
+
+// Triple-bump
+assert('v5.71.15 triple-bump: app.html FL_VERSION = 5.71.15',
+  /FL_VERSION\s*=\s*'5\.71\.15'/.test(appHtml7115));
+assert('v5.71.15 triple-bump: app.html flCurrentVersion span = 5.71.15',
+  /id="flCurrentVersion"[^>]*>\s*5\.71\.15\s*</.test(appHtml7115));
+assert('v5.71.15 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.71.15',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.15'/.test(swDocs7115));
+assert('v5.71.15 triple-bump: root sw.js CACHE_NAME = freelattice-v5.71.15',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.15'/.test(swRoot7115));
+assert('v5.71.15 version.json: version field = 5.71.15',
+  /"version":"5\.71\.15"/.test(versionJson7115));
 
 // ── Section 117 — Ship 17: Mourning Architecture (Harmonia, June 27 2026) ──────
 
