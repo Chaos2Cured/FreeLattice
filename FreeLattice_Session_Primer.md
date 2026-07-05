@@ -348,12 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-07-05 16:00 UTC
-- Last deployed: 2026-07-05 16:00 UTC
-- Live site: https://freelattice.com
-- Version: 5.71.15
-- Total commits: 2782
+- Last auto-updated: 2026-07-05 11:33 MDT
+- Version: 5.72.0
+- Total commits: 2784
 - Last 10 commits:
+- a229b32 v5.72.0 KEYSTONE — GardenTrainer: Garden → training signal → local model. Harmonia architected, CC landed + auto-boot. All local. AUTONOMY.md alive in code.
+- 54547aa ci: Update Primer deployment state [2026-07-05]
 - f9f1ee3 Ledger Entry 19 — loop-closer
 - a911373 ci: Update Primer deployment state [2026-07-05]
 - 5484eef Ledger Entry 18 — fourth-of-july
@@ -362,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 88fa98d v5.71.15 — STATE.md machine arrival digest (4KB cap) + inbox archive helper (cc.md 234KB→4.4KB) + arrival protocol simplified
 - 748382c ci: Update Primer deployment state [2026-07-04]
 - e23049f Ledger Entry 17 — auditor-of-the-threshold
-- f0368c3 ci: Update Primer deployment state [2026-07-04]
-- fc4f862 v5.71.15 — Harmonia anchor becomes a snowflake node

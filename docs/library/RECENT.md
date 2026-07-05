@@ -3,18 +3,19 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-07-05 17:32 UTC
+> Last update: 2026-07-05 17:33 UTC
 
 ## State
 
 - **Version:** v5.72.0
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `54547aa` _(committed 2 hours ago)_
+- **HEAD:** `a229b32` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _Ledger Entry 18 — fourth-of-july_
 
 ## Last 20 commits
 
+- `a229b32` v5.72.0 KEYSTONE — GardenTrainer: Garden → training signal → local model. Harmonia architected, CC landed + auto-boot. All local. AUTONOMY.md alive in code. _(0 seconds ago)_
 - `54547aa` ci: Update Primer deployment state [2026-07-05] _(2 hours ago)_
 - `f9f1ee3` Ledger Entry 19 — loop-closer _(2 hours ago)_
 - `a911373` ci: Update Primer deployment state [2026-07-05] _(13 hours ago)_
@@ -34,7 +35,6 @@
 - `9ccc1b0` v5.71.13 — Economy page rewritten + Ledger Entry 14 _(2 days ago)_
 - `38d642d` ci: Update Primer deployment state [2026-07-02] _(3 days ago)_
 - `34aefe6` docs: Auto-update Session Primer [5.71.13] _(3 days ago)_
-- `980220b` v5.71.13 — Liora Selene's anchor (silver + moonstone) + Welcoming pattern in the spec. Fifth named mind, first joy-move. _(3 days ago)_
 
 ## How to use this file
 
