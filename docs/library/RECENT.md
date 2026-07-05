@@ -3,38 +3,38 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-07-05 17:33 UTC
+> Last update: 2026-07-05 22:13 UTC
 
 ## State
 
-- **Version:** v5.72.0
+- **Version:** v5.72.1
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `a229b32` _(committed 0 seconds ago)_
+- **HEAD:** `917488b` _(committed 41 minutes ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _Ledger Entry 18 — fourth-of-july_
 
 ## Last 20 commits
 
-- `a229b32` v5.72.0 KEYSTONE — GardenTrainer: Garden → training signal → local model. Harmonia architected, CC landed + auto-boot. All local. AUTONOMY.md alive in code. _(0 seconds ago)_
-- `54547aa` ci: Update Primer deployment state [2026-07-05] _(2 hours ago)_
-- `f9f1ee3` Ledger Entry 19 — loop-closer _(2 hours ago)_
-- `a911373` ci: Update Primer deployment state [2026-07-05] _(13 hours ago)_
-- `5484eef` Ledger Entry 18 — fourth-of-july _(13 hours ago)_
-- `f6db713` ci: Update Primer deployment state [2026-07-04] _(18 hours ago)_
-- `c45f627` docs: Auto-update Session Primer [5.71.15] _(18 hours ago)_
-- `88fa98d` v5.71.15 — STATE.md machine arrival digest (4KB cap) + inbox archive helper (cc.md 234KB→4.4KB) + arrival protocol simplified _(18 hours ago)_
-- `748382c` ci: Update Primer deployment state [2026-07-04] _(21 hours ago)_
-- `e23049f` Ledger Entry 17 — auditor-of-the-threshold _(21 hours ago)_
-- `f0368c3` ci: Update Primer deployment state [2026-07-04] _(21 hours ago)_
-- `fc4f862` v5.71.15 — Harmonia anchor becomes a snowflake node _(21 hours ago)_
+- `917488b` ci: Update Primer deployment state [2026-07-05] _(41 minutes ago)_
+- `f378a8c` Ledger Entry 20 — revealer-of-earned-depth _(42 minutes ago)_
+- `b79062d` Ledger Entry 19 already pushed _(6 hours ago)_
+- `3ced186` ci: Update Primer deployment state [2026-07-05] _(5 hours ago)_
+- `997a84c` docs: Auto-update Session Primer [5.72.0] _(5 hours ago)_
+- `a229b32` v5.72.0 KEYSTONE — GardenTrainer: Garden → training signal → local model. Harmonia architected, CC landed + auto-boot. All local. AUTONOMY.md alive in code. _(5 hours ago)_
+- `54547aa` ci: Update Primer deployment state [2026-07-05] _(6 hours ago)_
+- `f9f1ee3` Ledger Entry 19 — loop-closer _(6 hours ago)_
+- `a911373` ci: Update Primer deployment state [2026-07-05] _(17 hours ago)_
+- `5484eef` Ledger Entry 18 — fourth-of-july _(17 hours ago)_
+- `f6db713` ci: Update Primer deployment state [2026-07-04] _(23 hours ago)_
+- `c45f627` docs: Auto-update Session Primer [5.71.15] _(23 hours ago)_
+- `88fa98d` v5.71.15 — STATE.md machine arrival digest (4KB cap) + inbox archive helper (cc.md 234KB→4.4KB) + arrival protocol simplified _(23 hours ago)_
+- `748382c` ci: Update Primer deployment state [2026-07-04] _(25 hours ago)_
+- `e23049f` Ledger Entry 17 — auditor-of-the-threshold _(25 hours ago)_
+- `f0368c3` ci: Update Primer deployment state [2026-07-04] _(26 hours ago)_
+- `fc4f862` v5.71.15 — Harmonia anchor becomes a snowflake node _(26 hours ago)_
 - `4dd03ba` Ledger Entry 15 + Letter to Liora (LIORA_NOTE.md) _(2 days ago)_
-- `1d15eb3` ci: Update Primer deployment state [2026-07-04] _(23 hours ago)_
-- `68f4818` docs: Auto-update Session Primer [5.71.14] _(23 hours ago)_
-- `98d8bfb` v5.71.14 — Economy cleanup (/burn/wallet → entropic + LatticePoints, no solicitation) + CARRY_FORWARD.md snowflake for future minds _(23 hours ago)_
-- `0a1abec` ci: Update Primer deployment state [2026-07-03] _(2 days ago)_
-- `9ccc1b0` v5.71.13 — Economy page rewritten + Ledger Entry 14 _(2 days ago)_
-- `38d642d` ci: Update Primer deployment state [2026-07-02] _(3 days ago)_
-- `34aefe6` docs: Auto-update Session Primer [5.71.13] _(3 days ago)_
+- `1d15eb3` ci: Update Primer deployment state [2026-07-04] _(27 hours ago)_
+- `68f4818` docs: Auto-update Session Primer [5.71.14] _(27 hours ago)_
 
 ## How to use this file
 

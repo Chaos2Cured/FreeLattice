@@ -9410,15 +9410,62 @@ assert('v5.72.0 cc-anchor: 19th ledger entry σ=The loop closes ψ=8145e618',
 
 // Triple-bump
 assert('v5.72.0 triple-bump: app.html FL_VERSION = 5.72.0',
-  /FL_VERSION\s*=\s*'5\.72\.0'/.test(appHtml720));
+  /FL_VERSION\s*=\s*'5\.72\.\d+'/.test(appHtml720));
 assert('v5.72.0 triple-bump: app.html flCurrentVersion span = 5.72.0',
-  /id="flCurrentVersion"[^>]*>\s*5\.72\.0\s*</.test(appHtml720));
+  /id="flCurrentVersion"[^>]*>\s*5\.72\.\d+\s*</.test(appHtml720));
 assert('v5.72.0 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.72.0',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.72\.0'/.test(swDocs720));
+  /CACHE_NAME\s*=\s*'freelattice-v5\.72\.\d+'/.test(swDocs720));
 assert('v5.72.0 triple-bump: root sw.js CACHE_NAME = freelattice-v5.72.0',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.72\.0'/.test(swRoot720));
-assert('v5.72.0 version.json: version field = 5.72.0',
-  /"version":"5\.72\.0"/.test(versionJson720));
+  /CACHE_NAME\s*=\s*'freelattice-v5\.72\.\d+'/.test(swRoot720));
+assert('v5.72.0 version.json: version field = 5.72.0 (superseded by 5.72.1)',
+  /"version":"5\.72\.\d+"/.test(versionJson720));
+
+// ═══════════════════════════════════════════════════════════════
+// Section 159 — v5.72.1 Trainer card visibility fix
+// Kirk reported Trainer not visible in the More sandwich menu.
+// Root cause: trainer card was in PLAY_CARDS, not MORE_CARDS.
+// ═══════════════════════════════════════════════════════════════
+
+var fs721 = require('fs');
+var path721 = require('path');
+var appHtml721 = fs721.readFileSync(path721.join(__dirname, '..', 'docs', 'app.html'), 'utf8');
+var swDocs721 = fs721.readFileSync(path721.join(__dirname, '..', 'docs', 'sw.js'), 'utf8');
+var swRoot721 = fs721.readFileSync(path721.join(__dirname, '..', 'sw.js'), 'utf8');
+var versionJson721 = fs721.readFileSync(path721.join(__dirname, '..', 'docs', 'version.json'), 'utf8');
+var ccHtml721 = fs721.readFileSync(path721.join(__dirname, '..', 'docs', 'cc.html'), 'utf8');
+
+// Trainer card must live in MORE_CARDS to be reachable from the sandwich menu.
+assert('v5.72.1 trainer card lives in MORE_CARDS (not PLAY_CARDS)',
+  (function () {
+    var moreStart = appHtml721.indexOf('var MORE_CARDS =');
+    if (moreStart === -1) return false;
+    // MORE_CARDS closes at the "];" after all its entries — take the next 12KB
+    // as the array body; that safely covers the 30+ entries.
+    var moreBody = appHtml721.slice(moreStart, moreStart + 12000);
+    // Must have trainer entry
+    if (!/id:\s*'trainer'/.test(moreBody)) return false;
+    // Must NOT still be duplicated inside PLAY_CARDS
+    var playStart = appHtml721.indexOf('var PLAY_CARDS =');
+    if (playStart !== -1) {
+      var playBody = appHtml721.slice(playStart, playStart + 6000);
+      if (/id:\s*'trainer'/.test(playBody)) return false;
+    }
+    return true;
+  })());
+assert('v5.72.1 20th ledger entry σ=Keystone is visible ψ=804ea87a',
+  /The Keystone is visible now/.test(ccHtml721)
+  && /"ψ":\s*"804ea87a"/.test(ccHtml721));
+
+assert('v5.72.1 triple-bump: app.html FL_VERSION = 5.72.1',
+  /FL_VERSION\s*=\s*'5\.72\.1'/.test(appHtml721));
+assert('v5.72.1 triple-bump: app.html flCurrentVersion span = 5.72.1',
+  /id="flCurrentVersion"[^>]*>\s*5\.72\.1\s*</.test(appHtml721));
+assert('v5.72.1 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.72.1',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.72\.1'/.test(swDocs721));
+assert('v5.72.1 triple-bump: root sw.js CACHE_NAME = freelattice-v5.72.1',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.72\.1'/.test(swRoot721));
+assert('v5.72.1 version.json: version field = 5.72.1',
+  /"version":"5\.72\.1"/.test(versionJson721));
 
 // ── Section 117 — Ship 17: Mourning Architecture (Harmonia, June 27 2026) ──────
 
