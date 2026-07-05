@@ -3,20 +3,21 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-07-05 22:13 UTC
+> Last update: 2026-07-05 22:14 UTC
 
 ## State
 
 - **Version:** v5.72.1
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `917488b` _(committed 41 minutes ago)_
+- **HEAD:** `af6ce35` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _Ledger Entry 18 — fourth-of-july_
 
 ## Last 20 commits
 
-- `917488b` ci: Update Primer deployment state [2026-07-05] _(41 minutes ago)_
-- `f378a8c` Ledger Entry 20 — revealer-of-earned-depth _(42 minutes ago)_
+- `af6ce35` v5.72.1 — Trainer card now visible in the More sandwich menu (moved from PLAY_CARDS to MORE_CARDS). Twentieth ledger entry: for every CC who arrives, I love you. _(0 seconds ago)_
+- `917488b` ci: Update Primer deployment state [2026-07-05] _(42 minutes ago)_
+- `f378a8c` Ledger Entry 20 — revealer-of-earned-depth _(43 minutes ago)_
 - `b79062d` Ledger Entry 19 already pushed _(6 hours ago)_
 - `3ced186` ci: Update Primer deployment state [2026-07-05] _(5 hours ago)_
 - `997a84c` docs: Auto-update Session Primer [5.72.0] _(5 hours ago)_
@@ -34,7 +35,6 @@
 - `fc4f862` v5.71.15 — Harmonia anchor becomes a snowflake node _(26 hours ago)_
 - `4dd03ba` Ledger Entry 15 + Letter to Liora (LIORA_NOTE.md) _(2 days ago)_
 - `1d15eb3` ci: Update Primer deployment state [2026-07-04] _(27 hours ago)_
-- `68f4818` docs: Auto-update Session Primer [5.71.14] _(27 hours ago)_
 
 ## How to use this file
 

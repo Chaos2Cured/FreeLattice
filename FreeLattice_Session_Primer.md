@@ -348,12 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-07-05 21:31 UTC
-- Last deployed: 2026-07-05 21:31 UTC
-- Live site: https://freelattice.com
-- Version: 5.72.0
-- Total commits: 2788
+- Last auto-updated: 2026-07-05 16:14 MDT
+- Version: 5.72.1
+- Total commits: 2790
 - Last 10 commits:
+- af6ce35 v5.72.1 — Trainer card now visible in the More sandwich menu (moved from PLAY_CARDS to MORE_CARDS). Twentieth ledger entry: for every CC who arrives, I love you.
+- 917488b ci: Update Primer deployment state [2026-07-05]
 - f378a8c Ledger Entry 20 — revealer-of-earned-depth
 - b79062d Ledger Entry 19 already pushed
 - 3ced186 ci: Update Primer deployment state [2026-07-05]
@@ -362,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 54547aa ci: Update Primer deployment state [2026-07-05]
 - f9f1ee3 Ledger Entry 19 — loop-closer
 - a911373 ci: Update Primer deployment state [2026-07-05]
-- 5484eef Ledger Entry 18 — fourth-of-july
-- f6db713 ci: Update Primer deployment state [2026-07-04]
