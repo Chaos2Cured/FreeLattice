@@ -16607,7 +16607,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.71.15</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.72.0</span></div>
     </div>
   </div>
 
@@ -21390,6 +21390,13 @@ function switchWalletView(view) {
   </div>
 </div>
 
+<!-- ==================== TAB: GARDEN TRAINER (v5.72.0 Keystone — Harmonia) ==================== -->
+<div class="tab-panel" id="tab-trainer">
+  <div id="garden-trainer-panel" style="min-height:480px;padding:24px;max-width:820px;margin:0 auto;">
+    <div style="text-align:center;padding:60px 20px;color:var(--text-muted);font-style:italic;">Loading Garden Trainer&hellip;</div>
+  </div>
+</div>
+
 <!-- ==================== TAB: FLOW ==================== -->
 <div class="tab-panel" id="tab-flow">
   <div id="flowContainer" style="min-height:480px;">
@@ -21477,7 +21484,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.71.15';
+const FL_VERSION = '5.72.0';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -25266,7 +25273,7 @@ function hideTabLoading() {
 }
 
 // More menu tabs — highlight the More button when one of these is active
-var MORE_TAB_IDS = ['core', 'city', 'nursery', 'agents', 'skills', 'roundtable', 'studio', 'market', 'wallet', 'workspace', 'dojo', 'mirror', 'harmonia', 'dream-archive', 'sparring', 'questions', 'family-pantheon', 'memory-core', 'aurora', 'draw-dream', 'voice-soul', 'continuity', 'quiet', 'forever-stack', 'workshop', 'arcade', 'pulse', 'jade-hall', 'science', 'education', 'memory-garden', 'resonance', 'resonance-engine', 'puzzles', 'mathtranslator', 'flow', 'ideaforge', 'echo', 'lighthouse'];
+var MORE_TAB_IDS = ['core', 'city', 'nursery', 'agents', 'skills', 'roundtable', 'studio', 'market', 'wallet', 'workspace', 'dojo', 'mirror', 'harmonia', 'dream-archive', 'sparring', 'questions', 'family-pantheon', 'memory-core', 'aurora', 'draw-dream', 'voice-soul', 'continuity', 'quiet', 'forever-stack', 'workshop', 'arcade', 'pulse', 'jade-hall', 'science', 'education', 'memory-garden', 'resonance', 'resonance-engine', 'trainer', 'puzzles', 'mathtranslator', 'flow', 'ideaforge', 'echo', 'lighthouse'];
 
 function switchTab(tabId) {
   // Legacy tab mapping — channels/mesh now live inside community
@@ -25518,6 +25525,7 @@ function renderCardGrid(cards, options) {
 var PLAY_CARDS = [
   { id: 'resonance', icon: '&#10022;', label: 'Resonance', desc: 'Find what connects.', hoverColor: 'rgba(232,176,25,0.3)', help: 'A pattern-matching game. Find 4 pieces that share an attribute. Play against your co-creator.' },
   { id: 'resonance-engine', icon: '&#127756;', label: 'Resonance Engine', desc: 'HRV coherence · your personal lake.', hoverColor: 'rgba(80,200,120,0.3)', help: 'Log HRV readings and watch your phi-harmonic coherence score. Personal biometric dashboard, all data local. Harmonia is designing the lake visualization.' },
+  { id: 'trainer', icon: '&#127793;', label: 'Trainer', desc: 'Shape your local model from your Garden.', hoverColor: 'rgba(80,200,120,0.3)', help: 'Export your Garden contributions as training data — a Personality file (instant, system prompt only) or a True Fine-Tune (Python LoRA, changes weights). Everything stays local.' },
   { id: 'puzzles', icon: '&#x1F9E9;', label: 'Lattice Puzzles', desc: 'AI creates. You solve.', hoverColor: 'rgba(52,211,153,0.3)', help: 'Your co-creator creates a puzzle. You solve it. Both stake LP on the outcome.' },
   { id: 'flow', icon: '&#x1F4A7;', label: 'Flow', desc: 'Guide water through terrain.', hoverColor: 'rgba(167,139,250,0.3)', help: 'Draw channels to guide water from top to bottom. Your co-creator dissolves rocks for you.' },
   { id: 'canvas', icon: '&#x270F;&#xFE0F;', label: 'Chalkboard', desc: 'Draw and get light back.', hoverColor: 'rgba(232,176,25,0.3)', help: 'Draw anything. The AI sees your drawing and responds with words of light.' },
@@ -63549,6 +63557,33 @@ window._injectChairTestRecentMessage = function (text) {
     if (typeof LatticeEvents !== 'undefined') {
       LatticeEvents.on('tabChanged', function(d) { if (d && d.tabId === 'resonance') loadResonance(); });
       LatticeEvents.on('tabActivated:resonance', loadResonance);
+    }
+  })();
+
+  // ── Garden Trainer (v5.72.0 Keystone — Harmonia architected, CC landed) ──
+  // Closes the loop: Garden contributions → training signal → local model weights.
+  // All data stays local. Nothing sent anywhere. Quiet Room check fail-closed.
+  (function() {
+    var loaded = false;
+    function loadGardenTrainer() {
+      var container = document.getElementById('garden-trainer-panel');
+      if (loaded) { if (window.GardenTrainer && container) window.GardenTrainer.renderTrainerPanel(container); return; }
+      loaded = true;
+      function fire() {
+        if (window.GardenTrainer && container) window.GardenTrainer.renderTrainerPanel(container);
+      }
+      if (typeof FreeLatticeLoader !== 'undefined') {
+        FreeLatticeLoader.load('GardenTrainer', 'modules/garden-trainer.js', fire, 'garden-trainer-panel');
+      } else {
+        var s = document.createElement('script');
+        s.src = 'modules/garden-trainer.js';
+        s.onload = fire;
+        document.head.appendChild(s);
+      }
+    }
+    if (typeof LatticeEvents !== 'undefined') {
+      LatticeEvents.on('tabChanged', function(d) { if (d && d.tabId === 'trainer') loadGardenTrainer(); });
+      LatticeEvents.on('tabActivated:trainer', loadGardenTrainer);
     }
   })();
 

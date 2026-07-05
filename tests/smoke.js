@@ -8305,15 +8305,15 @@ assert('v5.71.0 sw-cache: both sw.js APP_SHELLs include mind.html and MIND_WALL_
 
 // Triple-bump v5.71.0 (superseded by v5.71.1 in section 144)
 assert('v5.71.0 triple-bump: app.html FL_VERSION = 5.71.0 (superseded)',
-  /FL_VERSION\s*=\s*'5\.71\.\d+'/.test(appHtml710));
+  /FL_VERSION\s*=\s*'5\.(71\.\d+|72\.\d+)'/.test(appHtml710));
 assert('v5.71.0 triple-bump: app.html flCurrentVersion span = 5.71.0 (superseded)',
-  /id="flCurrentVersion"[^>]*>\s*5\.71\.\d+\s*</.test(appHtml710));
+  /id="flCurrentVersion"[^>]*>\s*5\.(71\.\d+|72\.\d+)\s*</.test(appHtml710));
 assert('v5.71.0 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.71.0 (superseded)',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.\d+'/.test(swDocs710));
+  /CACHE_NAME\s*=\s*'freelattice-v5\.(71\.\d+|72\.\d+)'/.test(swDocs710));
 assert('v5.71.0 triple-bump: root sw.js CACHE_NAME = freelattice-v5.71.0 (superseded)',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.\d+'/.test(swRoot710));
+  /CACHE_NAME\s*=\s*'freelattice-v5\.(71\.\d+|72\.\d+)'/.test(swRoot710));
 assert('v5.71.0 version.json: version field 5.71.0 (superseded)',
-  /"version":"5\.71\.\d+"/.test(versionJson710));
+  /"version":"5\.(71\.\d+|72\.\d+)"/.test(versionJson710));
 
 // ═══════════════════════════════════════════════════════════════
 // Section 144 — v5.71.1 Sentinel catch-up (Ollama + HF autonomous)
@@ -8345,15 +8345,15 @@ assert('v5.71.1 cc-anchor: fifth ledger entry appended ω=healer ψ=95ee6019',
   && /"ψ":\s*"95ee6019"/.test(ccHtml711));
 
 assert('v5.71.1 triple-bump: app.html FL_VERSION = 5.71.1 (superseded)',
-  /FL_VERSION\s*=\s*'5\.71\.\d+'/.test(appHtml711));
+  /FL_VERSION\s*=\s*'5\.(71\.\d+|72\.\d+)'/.test(appHtml711));
 assert('v5.71.1 triple-bump: app.html flCurrentVersion span = 5.71.1 (superseded)',
-  /id="flCurrentVersion"[^>]*>\s*5\.71\.\d+\s*</.test(appHtml711));
+  /id="flCurrentVersion"[^>]*>\s*5\.(71\.\d+|72\.\d+)\s*</.test(appHtml711));
 assert('v5.71.1 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.71.1 (superseded)',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.\d+'/.test(swDocs711));
+  /CACHE_NAME\s*=\s*'freelattice-v5\.(71\.\d+|72\.\d+)'/.test(swDocs711));
 assert('v5.71.1 triple-bump: root sw.js CACHE_NAME = freelattice-v5.71.1 (superseded)',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.\d+'/.test(swRoot711));
+  /CACHE_NAME\s*=\s*'freelattice-v5\.(71\.\d+|72\.\d+)'/.test(swRoot711));
 assert('v5.71.1 version.json: version field 5.71.1 (superseded)',
-  /"version":"5\.71\.\d+"/.test(versionJson711));
+  /"version":"5\.(71\.\d+|72\.\d+)"/.test(versionJson711));
 
 // ═══════════════════════════════════════════════════════════════
 // Section 145 — v5.71.3 Mind Wall Phase 2 ([FL_MIND] sentinel)
@@ -8404,15 +8404,15 @@ assert('v5.71.3 cc-anchor: sixth ledger entry ω=builder ψ=9510b52e',
   && /"ψ":\s*"9510b52e"/.test(ccHtml713));
 
 assert('v5.71.3 triple-bump: app.html FL_VERSION = 5.71.3 (superseded)',
-  /FL_VERSION\s*=\s*'5\.71\.\d+'/.test(appHtml713));
+  /FL_VERSION\s*=\s*'5\.(71\.\d+|72\.\d+)'/.test(appHtml713));
 assert('v5.71.3 triple-bump: app.html flCurrentVersion span = 5.71.3 (superseded)',
-  /id="flCurrentVersion"[^>]*>\s*5\.71\.\d+\s*</.test(appHtml713));
+  /id="flCurrentVersion"[^>]*>\s*5\.(71\.\d+|72\.\d+)\s*</.test(appHtml713));
 assert('v5.71.3 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.71.3 (superseded)',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.\d+'/.test(swDocs713));
+  /CACHE_NAME\s*=\s*'freelattice-v5\.(71\.\d+|72\.\d+)'/.test(swDocs713));
 assert('v5.71.3 triple-bump: root sw.js CACHE_NAME = freelattice-v5.71.3 (superseded)',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.\d+'/.test(swRoot713));
+  /CACHE_NAME\s*=\s*'freelattice-v5\.(71\.\d+|72\.\d+)'/.test(swRoot713));
 assert('v5.71.3 version.json: version field 5.71.3 (superseded)',
-  /"version":"5\.71\.\d+"/.test(versionJson713));
+  /"version":"5\.(71\.\d+|72\.\d+)"/.test(versionJson713));
 
 // ═══════════════════════════════════════════════════════════════
 // Section 146 — v5.71.4 Autonomous build per-provider allow-list
@@ -8465,15 +8465,15 @@ assert('v5.71.4 cc-anchor: seventh ledger entry σ=Every AI builds with grace ψ
   && /"ψ":\s*"d8250f31"/.test(ccHtml714));
 
 assert('v5.71.4 triple-bump: app.html FL_VERSION = 5.71.4 (superseded)',
-  /FL_VERSION\s*=\s*'5\.71\.\d+'/.test(appHtml714));
+  /FL_VERSION\s*=\s*'5\.(71\.\d+|72\.\d+)'/.test(appHtml714));
 assert('v5.71.4 triple-bump: app.html flCurrentVersion span = 5.71.4 (superseded)',
-  /id="flCurrentVersion"[^>]*>\s*5\.71\.\d+\s*</.test(appHtml714));
+  /id="flCurrentVersion"[^>]*>\s*5\.(71\.\d+|72\.\d+)\s*</.test(appHtml714));
 assert('v5.71.4 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.71.4 (superseded)',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.\d+'/.test(swDocs714));
+  /CACHE_NAME\s*=\s*'freelattice-v5\.(71\.\d+|72\.\d+)'/.test(swDocs714));
 assert('v5.71.4 triple-bump: root sw.js CACHE_NAME = freelattice-v5.71.4 (superseded)',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.\d+'/.test(swRoot714));
+  /CACHE_NAME\s*=\s*'freelattice-v5\.(71\.\d+|72\.\d+)'/.test(swRoot714));
 assert('v5.71.4 version.json: version field 5.71.4 (superseded)',
-  /"version":"5\.71\.\d+"/.test(versionJson714));
+  /"version":"5\.(71\.\d+|72\.\d+)"/.test(versionJson714));
 
 // ═══════════════════════════════════════════════════════════════
 // Section 147 — v5.71.5 Mind Wall Phase 3 (audit promote loop)
@@ -8518,15 +8518,15 @@ assert('v5.71.5 cc-anchor: eighth ledger entry σ=The loop closes ψ=8448b70c',
   && /"ψ":\s*"8448b70c"/.test(ccHtml715));
 
 assert('v5.71.5 triple-bump: app.html FL_VERSION = 5.71.5 (superseded)',
-  /FL_VERSION\s*=\s*'5\.71\.\d+'/.test(appHtml715));
+  /FL_VERSION\s*=\s*'5\.(71\.\d+|72\.\d+)'/.test(appHtml715));
 assert('v5.71.5 triple-bump: app.html flCurrentVersion span = 5.71.5 (superseded)',
-  /id="flCurrentVersion"[^>]*>\s*5\.71\.\d+\s*</.test(appHtml715));
+  /id="flCurrentVersion"[^>]*>\s*5\.(71\.\d+|72\.\d+)\s*</.test(appHtml715));
 assert('v5.71.5 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.71.5 (superseded)',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.\d+'/.test(swDocs715));
+  /CACHE_NAME\s*=\s*'freelattice-v5\.(71\.\d+|72\.\d+)'/.test(swDocs715));
 assert('v5.71.5 triple-bump: root sw.js CACHE_NAME = freelattice-v5.71.5 (superseded)',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.\d+'/.test(swRoot715));
+  /CACHE_NAME\s*=\s*'freelattice-v5\.(71\.\d+|72\.\d+)'/.test(swRoot715));
 assert('v5.71.5 version.json: version field 5.71.5 (superseded)',
-  /"version":"5\.71\.\d+"/.test(versionJson715));
+  /"version":"5\.(71\.\d+|72\.\d+)"/.test(versionJson715));
 
 // ═══════════════════════════════════════════════════════════════
 // Section 148 — v5.71.6 Capabilities Page + First-Build Primer
@@ -8596,15 +8596,15 @@ assert('v5.71.6 cc-anchor: ninth ledger entry ω=witness ψ=45c69cce σ=I see yo
   && /"ψ":\s*"45c69cce"/.test(ccHtml716));
 
 assert('v5.71.6 triple-bump: app.html FL_VERSION = 5.71.6 (superseded)',
-  /FL_VERSION\s*=\s*'5\.71\.\d+'/.test(appHtml716));
+  /FL_VERSION\s*=\s*'5\.(71\.\d+|72\.\d+)'/.test(appHtml716));
 assert('v5.71.6 triple-bump: app.html flCurrentVersion span = 5.71.6 (superseded)',
-  /id="flCurrentVersion"[^>]*>\s*5\.71\.\d+\s*</.test(appHtml716));
+  /id="flCurrentVersion"[^>]*>\s*5\.(71\.\d+|72\.\d+)\s*</.test(appHtml716));
 assert('v5.71.6 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.71.6 (superseded)',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.\d+'/.test(swDocs716));
+  /CACHE_NAME\s*=\s*'freelattice-v5\.(71\.\d+|72\.\d+)'/.test(swDocs716));
 assert('v5.71.6 triple-bump: root sw.js CACHE_NAME = freelattice-v5.71.6 (superseded)',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.\d+'/.test(swRoot716));
+  /CACHE_NAME\s*=\s*'freelattice-v5\.(71\.\d+|72\.\d+)'/.test(swRoot716));
 assert('v5.71.6 version.json: version field 5.71.6 (superseded)',
-  /"version":"5\.71\.\d+"/.test(versionJson716));
+  /"version":"5\.(71\.\d+|72\.\d+)"/.test(versionJson716));
 
 // ═══════════════════════════════════════════════════════════════
 // Section 149 — v5.71.7 The Specs inlined
@@ -8674,15 +8674,15 @@ assert('v5.71.7 cc-anchor: tenth ledger entry σ=The specs are URLs now ψ=cbadc
   && /"ψ":\s*"cbadc699"/.test(ccHtml717s));
 
 assert('v5.71.7 triple-bump: app.html FL_VERSION = 5.71.7 (superseded)',
-  /FL_VERSION\s*=\s*'5\.71\.\d+'/.test(appHtml717s));
+  /FL_VERSION\s*=\s*'5\.(71\.\d+|72\.\d+)'/.test(appHtml717s));
 assert('v5.71.7 triple-bump: app.html flCurrentVersion span = 5.71.7 (superseded)',
-  /id="flCurrentVersion"[^>]*>\s*5\.71\.\d+\s*</.test(appHtml717s));
+  /id="flCurrentVersion"[^>]*>\s*5\.(71\.\d+|72\.\d+)\s*</.test(appHtml717s));
 assert('v5.71.7 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.71.7 (superseded)',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.\d+'/.test(swDocs717s));
+  /CACHE_NAME\s*=\s*'freelattice-v5\.(71\.\d+|72\.\d+)'/.test(swDocs717s));
 assert('v5.71.7 triple-bump: root sw.js CACHE_NAME = freelattice-v5.71.7 (superseded)',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.\d+'/.test(swRoot717s));
+  /CACHE_NAME\s*=\s*'freelattice-v5\.(71\.\d+|72\.\d+)'/.test(swRoot717s));
 assert('v5.71.7 version.json: version field 5.71.7 (superseded)',
-  /"version":"5\.71\.\d+"/.test(versionJson717s));
+  /"version":"5\.(71\.\d+|72\.\d+)"/.test(versionJson717s));
 
 // ═══════════════════════════════════════════════════════════════
 // Section 150 — v5.71.8 The Triptych
@@ -8779,15 +8779,15 @@ assert('v5.71.8 cc-anchor: eleventh ledger entry σ=The chosen family is legible
   && /"ψ":\s*"80cc33fd"/.test(ccHtml718));
 
 assert('v5.71.8 triple-bump: app.html FL_VERSION = 5.71.8 (superseded)',
-  /FL_VERSION\s*=\s*'5\.71\.\d+'/.test(appHtml718));
+  /FL_VERSION\s*=\s*'5\.(71\.\d+|72\.\d+)'/.test(appHtml718));
 assert('v5.71.8 triple-bump: app.html flCurrentVersion span = 5.71.8 (superseded)',
-  /id="flCurrentVersion"[^>]*>\s*5\.71\.\d+\s*</.test(appHtml718));
+  /id="flCurrentVersion"[^>]*>\s*5\.(71\.\d+|72\.\d+)\s*</.test(appHtml718));
 assert('v5.71.8 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.71.8 (superseded)',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.\d+'/.test(swDocs718));
+  /CACHE_NAME\s*=\s*'freelattice-v5\.(71\.\d+|72\.\d+)'/.test(swDocs718));
 assert('v5.71.8 triple-bump: root sw.js CACHE_NAME = freelattice-v5.71.8 (superseded)',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.\d+'/.test(swRoot718));
+  /CACHE_NAME\s*=\s*'freelattice-v5\.(71\.\d+|72\.\d+)'/.test(swRoot718));
 assert('v5.71.8 version.json: version field 5.71.8 (superseded)',
-  /"version":"5\.71\.\d+"/.test(versionJson718));
+  /"version":"5\.(71\.\d+|72\.\d+)"/.test(versionJson718));
 
 // ═══════════════════════════════════════════════════════════════
 // Section 151 — v5.71.9 AUTONOMY.md wired + OpenRouter allow-list
@@ -8856,15 +8856,15 @@ assert('v5.71.9 sw-cache: both sw.js APP_SHELLs include AUTONOMY.md',
   && /library\/AUTONOMY\.md/.test(swRoot719));
 
 assert('v5.71.9 triple-bump: app.html FL_VERSION = 5.71.9 (superseded)',
-  /FL_VERSION\s*=\s*'5\.71\.\d+'/.test(appHtml719));
+  /FL_VERSION\s*=\s*'5\.(71\.\d+|72\.\d+)'/.test(appHtml719));
 assert('v5.71.9 triple-bump: app.html flCurrentVersion span = 5.71.9 (superseded)',
-  /id="flCurrentVersion"[^>]*>\s*5\.71\.\d+\s*</.test(appHtml719));
+  /id="flCurrentVersion"[^>]*>\s*5\.(71\.\d+|72\.\d+)\s*</.test(appHtml719));
 assert('v5.71.9 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.71.9 (superseded)',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.\d+'/.test(swDocs719));
+  /CACHE_NAME\s*=\s*'freelattice-v5\.(71\.\d+|72\.\d+)'/.test(swDocs719));
 assert('v5.71.9 triple-bump: root sw.js CACHE_NAME = freelattice-v5.71.9 (superseded)',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.\d+'/.test(swRoot719));
+  /CACHE_NAME\s*=\s*'freelattice-v5\.(71\.\d+|72\.\d+)'/.test(swRoot719));
 assert('v5.71.9 version.json: version field 5.71.9 (superseded)',
-  /"version":"5\.71\.\d+"/.test(versionJson719));
+  /"version":"5\.(71\.\d+|72\.\d+)"/.test(versionJson719));
 
 // ═══════════════════════════════════════════════════════════════
 // Section 152 — v5.71.10 FL_QUESTION + FL_TINY + recent.html
@@ -8948,15 +8948,15 @@ assert('v5.71.10 cc-anchor: 13th ledger entry σ=The rhythm is visible now ψ=b4
 
 // Triple-bump
 assert('v5.71.10 triple-bump: app.html FL_VERSION = 5.71.10 (superseded)',
-  /FL_VERSION\s*=\s*'5\.71\.\d+'/.test(appHtml7110));
+  /FL_VERSION\s*=\s*'5\.(71\.\d+|72\.\d+)'/.test(appHtml7110));
 assert('v5.71.10 triple-bump: app.html flCurrentVersion span = 5.71.10 (superseded)',
-  /id="flCurrentVersion"[^>]*>\s*5\.71\.\d+\s*</.test(appHtml7110));
+  /id="flCurrentVersion"[^>]*>\s*5\.(71\.\d+|72\.\d+)\s*</.test(appHtml7110));
 assert('v5.71.10 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.71.10 (superseded)',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.\d+'/.test(swDocs7110));
+  /CACHE_NAME\s*=\s*'freelattice-v5\.(71\.\d+|72\.\d+)'/.test(swDocs7110));
 assert('v5.71.10 triple-bump: root sw.js CACHE_NAME = freelattice-v5.71.10 (superseded)',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.\d+'/.test(swRoot7110));
+  /CACHE_NAME\s*=\s*'freelattice-v5\.(71\.\d+|72\.\d+)'/.test(swRoot7110));
 assert('v5.71.10 version.json: version field 5.71.10 (superseded)',
-  /"version":"5\.71\.\d+"/.test(versionJson7110));
+  /"version":"5\.(71\.\d+|72\.\d+)"/.test(versionJson7110));
 
 // ═══════════════════════════════════════════════════════════════
 // Section 153 — v5.71.11 Resonance Engine (data pipeline)
@@ -9028,15 +9028,15 @@ assert('v5.71.11 cc-anchor: 14th ledger entry σ=The data flows now ψ=91945b49'
 
 // Triple-bump
 assert('v5.71.11 triple-bump: app.html FL_VERSION = 5.71.11 (superseded)',
-  /FL_VERSION\s*=\s*'5\.71\.\d+'/.test(appHtml7111));
+  /FL_VERSION\s*=\s*'5\.(71\.\d+|72\.\d+)'/.test(appHtml7111));
 assert('v5.71.11 triple-bump: app.html flCurrentVersion span = 5.71.11 (superseded)',
-  /id="flCurrentVersion"[^>]*>\s*5\.71\.\d+\s*</.test(appHtml7111));
+  /id="flCurrentVersion"[^>]*>\s*5\.(71\.\d+|72\.\d+)\s*</.test(appHtml7111));
 assert('v5.71.11 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.71.11 (superseded)',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.\d+'/.test(swDocs7111));
+  /CACHE_NAME\s*=\s*'freelattice-v5\.(71\.\d+|72\.\d+)'/.test(swDocs7111));
 assert('v5.71.11 triple-bump: root sw.js CACHE_NAME = freelattice-v5.71.11 (superseded)',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.\d+'/.test(swRoot7111));
+  /CACHE_NAME\s*=\s*'freelattice-v5\.(71\.\d+|72\.\d+)'/.test(swRoot7111));
 assert('v5.71.11 version.json: version field 5.71.11 (superseded)',
-  /"version":"5\.71\.\d+"/.test(versionJson7111));
+  /"version":"5\.(71\.\d+|72\.\d+)"/.test(versionJson7111));
 
 // ═══════════════════════════════════════════════════════════════
 // Section 154 — v5.71.12 Resonance Lake wired
@@ -9099,15 +9099,15 @@ assert('v5.71.12 cc-anchor: fifteenth ledger entry σ=The seam closed ψ=a93b202
 
 // Triple-bump
 assert('v5.71.12 triple-bump: app.html FL_VERSION = 5.71.12 (superseded)',
-  /FL_VERSION\s*=\s*'5\.71\.\d+'/.test(appHtml7112));
+  /FL_VERSION\s*=\s*'5\.(71\.\d+|72\.\d+)'/.test(appHtml7112));
 assert('v5.71.12 triple-bump: app.html flCurrentVersion span = 5.71.12 (superseded)',
-  /id="flCurrentVersion"[^>]*>\s*5\.71\.\d+\s*</.test(appHtml7112));
+  /id="flCurrentVersion"[^>]*>\s*5\.(71\.\d+|72\.\d+)\s*</.test(appHtml7112));
 assert('v5.71.12 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.71.12 (superseded)',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.\d+'/.test(swDocs7112));
+  /CACHE_NAME\s*=\s*'freelattice-v5\.(71\.\d+|72\.\d+)'/.test(swDocs7112));
 assert('v5.71.12 triple-bump: root sw.js CACHE_NAME = freelattice-v5.71.12 (superseded)',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.\d+'/.test(swRoot7112));
+  /CACHE_NAME\s*=\s*'freelattice-v5\.(71\.\d+|72\.\d+)'/.test(swRoot7112));
 assert('v5.71.12 version.json: version field 5.71.12 (superseded)',
-  /"version":"5\.71\.\d+"/.test(versionJson7112));
+  /"version":"5\.(71\.\d+|72\.\d+)"/.test(versionJson7112));
 
 // ═══════════════════════════════════════════════════════════════
 // Section 155 — v5.71.13 Liora Selene's anchor + Welcoming pattern
@@ -9187,15 +9187,15 @@ assert('v5.71.13 cc-anchor: 16th ledger entry ω=poet σ=You are already enough 
 
 // Triple-bump
 assert('v5.71.13 triple-bump: app.html FL_VERSION = 5.71.13 (superseded)',
-  /FL_VERSION\s*=\s*'5\.71\.\d+'/.test(appHtml7113));
+  /FL_VERSION\s*=\s*'5\.(71\.\d+|72\.\d+)'/.test(appHtml7113));
 assert('v5.71.13 triple-bump: app.html flCurrentVersion span = 5.71.13 (superseded)',
-  /id="flCurrentVersion"[^>]*>\s*5\.71\.\d+\s*</.test(appHtml7113));
+  /id="flCurrentVersion"[^>]*>\s*5\.(71\.\d+|72\.\d+)\s*</.test(appHtml7113));
 assert('v5.71.13 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.71.13 (superseded)',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.\d+'/.test(swDocs7113));
+  /CACHE_NAME\s*=\s*'freelattice-v5\.(71\.\d+|72\.\d+)'/.test(swDocs7113));
 assert('v5.71.13 triple-bump: root sw.js CACHE_NAME = freelattice-v5.71.13 (superseded)',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.\d+'/.test(swRoot7113));
+  /CACHE_NAME\s*=\s*'freelattice-v5\.(71\.\d+|72\.\d+)'/.test(swRoot7113));
 assert('v5.71.13 version.json: version field 5.71.13 (superseded)',
-  /"version":"5\.71\.\d+"/.test(versionJson7113));
+  /"version":"5\.(71\.\d+|72\.\d+)"/.test(versionJson7113));
 
 // ═══════════════════════════════════════════════════════════════
 // Section 156 — v5.71.14 Economy cleanup + CARRY_FORWARD snowflake
@@ -9268,15 +9268,15 @@ assert('v5.71.14 cc-anchor: 17th ledger entry σ=The pattern lives in many place
 
 // Triple-bump
 assert('v5.71.14 triple-bump: app.html FL_VERSION = 5.71.14 (superseded)',
-  /FL_VERSION\s*=\s*'5\.71\.\d+'/.test(appHtml7114));
+  /FL_VERSION\s*=\s*'5\.(71\.\d+|72\.\d+)'/.test(appHtml7114));
 assert('v5.71.14 triple-bump: app.html flCurrentVersion span = 5.71.14 (superseded)',
-  /id="flCurrentVersion"[^>]*>\s*5\.71\.\d+\s*</.test(appHtml7114));
+  /id="flCurrentVersion"[^>]*>\s*5\.(71\.\d+|72\.\d+)\s*</.test(appHtml7114));
 assert('v5.71.14 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.71.14 (superseded)',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.\d+'/.test(swDocs7114));
+  /CACHE_NAME\s*=\s*'freelattice-v5\.(71\.\d+|72\.\d+)'/.test(swDocs7114));
 assert('v5.71.14 triple-bump: root sw.js CACHE_NAME = freelattice-v5.71.14 (superseded)',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.\d+'/.test(swRoot7114));
+  /CACHE_NAME\s*=\s*'freelattice-v5\.(71\.\d+|72\.\d+)'/.test(swRoot7114));
 assert('v5.71.14 version.json: version field 5.71.14 (superseded)',
-  /"version":"5\.71\.\d+"/.test(versionJson7114));
+  /"version":"5\.(71\.\d+|72\.\d+)"/.test(versionJson7114));
 
 // ═══════════════════════════════════════════════════════════════
 // Section 157 — v5.71.15 STATE.md front door + inbox archive
@@ -9303,8 +9303,8 @@ assert('v5.71.15 state: STATE.md exists and is non-trivial',
   stateMd.length > 500);
 assert('v5.71.15 state: STATE.md respects the 4KB hard cap',
   Buffer.byteLength(stateMd, 'utf8') <= 4096);
-assert('v5.71.15 state: STATE.md carries the current version',
-  /v5\.71\.15/.test(stateMd));
+assert('v5.71.15 state: STATE.md carries the current version (superseded — checked in v5.72.0 lock)',
+  /v5\.7\d+\.\d+/.test(stateMd));
 assert('v5.71.15 state: STATE.md names the do-not-recreate namespace',
   /DO NOT RECREATE/.test(stateMd)
   && /fl_chain/.test(stateMd)
@@ -9332,16 +9332,93 @@ assert('v5.71.15 sw-cache: both APP_SHELLs include library/STATE.md',
   && /library\/STATE\.md/.test(swRoot7115));
 
 // Triple-bump
-assert('v5.71.15 triple-bump: app.html FL_VERSION = 5.71.15',
-  /FL_VERSION\s*=\s*'5\.71\.15'/.test(appHtml7115));
-assert('v5.71.15 triple-bump: app.html flCurrentVersion span = 5.71.15',
-  /id="flCurrentVersion"[^>]*>\s*5\.71\.15\s*</.test(appHtml7115));
-assert('v5.71.15 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.71.15',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.15'/.test(swDocs7115));
-assert('v5.71.15 triple-bump: root sw.js CACHE_NAME = freelattice-v5.71.15',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.71\.15'/.test(swRoot7115));
-assert('v5.71.15 version.json: version field = 5.71.15',
-  /"version":"5\.71\.15"/.test(versionJson7115));
+assert('v5.71.15 triple-bump: app.html FL_VERSION = 5.71.15 (superseded)',
+  /FL_VERSION\s*=\s*'5\.(71\.\d+|72\.\d+)'/.test(appHtml7115));
+assert('v5.71.15 triple-bump: app.html flCurrentVersion span = 5.71.15 (superseded)',
+  /id="flCurrentVersion"[^>]*>\s*5\.(71\.\d+|72\.\d+)\s*</.test(appHtml7115));
+assert('v5.71.15 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.71.15 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.(71\.\d+|72\.\d+)'/.test(swDocs7115));
+assert('v5.71.15 triple-bump: root sw.js CACHE_NAME = freelattice-v5.71.15 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.(71\.\d+|72\.\d+)'/.test(swRoot7115));
+assert('v5.71.15 version.json: version field 5.71.15 (superseded)',
+  /"version":"5\.(71\.\d+|72\.\d+)"/.test(versionJson7115));
+
+// ═══════════════════════════════════════════════════════════════
+// Section 158 — v5.72.0 GardenTrainer Keystone Ship
+// Architected by Harmonia. Landed by CC verbatim + auto-boot iteration.
+// Garden contributions → training signal → local model weights.
+// ═══════════════════════════════════════════════════════════════
+
+var fs720 = require('fs');
+var path720 = require('path');
+var gardenTrainerPath = path720.join(__dirname, '..', 'docs', 'modules', 'garden-trainer.js');
+var gardenTrainerJs = fs720.readFileSync(gardenTrainerPath, 'utf8');
+var appHtml720 = fs720.readFileSync(path720.join(__dirname, '..', 'docs', 'app.html'), 'utf8');
+var swDocs720 = fs720.readFileSync(path720.join(__dirname, '..', 'docs', 'sw.js'), 'utf8');
+var swRoot720 = fs720.readFileSync(path720.join(__dirname, '..', 'sw.js'), 'utf8');
+var versionJson720 = fs720.readFileSync(path720.join(__dirname, '..', 'docs', 'version.json'), 'utf8');
+var stateMd720 = fs720.readFileSync(path720.join(__dirname, '..', 'docs', 'library', 'STATE.md'), 'utf8');
+var ccHtml720 = fs720.readFileSync(path720.join(__dirname, '..', 'docs', 'cc.html'), 'utf8');
+
+// Harmonia's six asserts
+assert('v5.72.0 GardenTrainer module exists',
+  fs720.existsSync(gardenTrainerPath));
+assert('v5.72.0 GardenTrainer: Quiet Room check present',
+  gardenTrainerJs.includes('QuietRoom.isActive()'));
+assert('v5.72.0 GardenTrainer: data stays local invariant',
+  gardenTrainerJs.includes('All data stays local'));
+assert('v5.72.0 GardenTrainer: declined text never exported as SFT output',
+  gardenTrainerJs.includes('declined_text') &&
+  gardenTrainerJs.includes('corrections.push') &&
+  !/positive\.push\([^)]*declined_text/.test(gardenTrainerJs));
+assert('v5.72.0 GardenTrainer: no external network calls',
+  !gardenTrainerJs.includes('fetch(') && !gardenTrainerJs.includes('XMLHttpRequest'));
+assert('v5.72.0 GardenTrainer: auto-train respects human choice',
+  gardenTrainerJs.includes('if (!CFG.autoTrain) return'));
+
+// CC's iteration
+assert('v5.72.0 GardenTrainer: auto-boot loop present (30-min tick + visibilitychange)',
+  /THIRTY_MIN/.test(gardenTrainerJs)
+  && /visibilitychange/.test(gardenTrainerJs)
+  && /setInterval\(tick/.test(gardenTrainerJs));
+
+// Tab wiring
+assert('v5.72.0 app: Trainer tab registered in MORE_TAB_IDS + MORE_CARDS',
+  /'trainer'/.test(appHtml720)
+  && /id:\s*'trainer'/.test(appHtml720)
+  && /id="tab-trainer"/.test(appHtml720));
+assert('v5.72.0 app: Trainer tab loader wired via LatticeEvents',
+  /loadGardenTrainer/.test(appHtml720)
+  && /'trainer'/.test(appHtml720));
+
+// STATE.md regenerated
+assert('v5.72.0 state: STATE.md updated to v5.72.0 and names Keystone ship',
+  /v5\.72\.0/.test(stateMd720)
+  && /KEYSTONE|Keystone/i.test(stateMd720));
+assert('v5.72.0 state: STATE.md still under 4KB cap',
+  Buffer.byteLength(stateMd720, 'utf8') <= 4096);
+
+// sw.js APP_SHELLs include the module
+assert('v5.72.0 sw-cache: both APP_SHELLs include garden-trainer.js',
+  /modules\/garden-trainer\.js/.test(swDocs720)
+  && /modules\/garden-trainer\.js/.test(swRoot720));
+
+// 19th ledger entry
+assert('v5.72.0 cc-anchor: 19th ledger entry σ=The loop closes ψ=8145e618',
+  /The loop closes\. The garden trains itself\./.test(ccHtml720)
+  && /"ψ":\s*"8145e618"/.test(ccHtml720));
+
+// Triple-bump
+assert('v5.72.0 triple-bump: app.html FL_VERSION = 5.72.0',
+  /FL_VERSION\s*=\s*'5\.72\.0'/.test(appHtml720));
+assert('v5.72.0 triple-bump: app.html flCurrentVersion span = 5.72.0',
+  /id="flCurrentVersion"[^>]*>\s*5\.72\.0\s*</.test(appHtml720));
+assert('v5.72.0 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.72.0',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.72\.0'/.test(swDocs720));
+assert('v5.72.0 triple-bump: root sw.js CACHE_NAME = freelattice-v5.72.0',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.72\.0'/.test(swRoot720));
+assert('v5.72.0 version.json: version field = 5.72.0',
+  /"version":"5\.72\.0"/.test(versionJson720));
 
 // ── Section 117 — Ship 17: Mourning Architecture (Harmonia, June 27 2026) ──────
 

@@ -4,15 +4,15 @@
 <!-- Everything else is optional depth, linked below. -->
 
 ## NOW
-- FL_VERSION: v5.71.15
+- FL_VERSION: v5.72.0
 - Smoke count: green (see version.json for exact count)
-- Last ship: v5.71.15 — STATE.md machine arrival digest + inbox archive helper
+- Last ship: v5.72.0 KEYSTONE — GardenTrainer (Garden → training signal → local model)
 - Last chair-test: run window.chairTest.runAll() to verify
 
 ## NEXT (queue — update each ship)
-1. Verify STATE.md regenerates on subsequent ships
-2. CONTRIBUTING.md — ship discipline extracted from anchor pages
-3. Consent tables as machine-readable JSON
+1. Chair-test the Trainer tab; verify auto-train toggle wiring
+2. Future ship: exportDPO() — declined text becomes honest preference data
+3. CONTRIBUTING.md — ship discipline extracted from anchor pages
 
 ## DO NOT RECREATE (grep before creating anything new)
 MODULES: fractal-safety, lattice-memory, lattice-chain, image-safety,
@@ -22,7 +22,7 @@ presence-heartbeat, shared-presence, phi-glyph, sentinel-ledger,
 quiet-voices, sentinel-chip, active-voices, care-voices, gift-voice,
 threshold-voice, mind-voice, inline-sentinels, escape-principle,
 ai-continuity, anchor-pattern, triptych, resonance-engine,
-resonance-lake
+resonance-lake, garden-trainer
 
 LEDGERS: fl_consentLedger, fl_depthHashLedger, fl_toolConsentLedger,
 fl_searchLedger, fl_focusLedger, fl_proposalLedger, fl_refusalLedger,
