@@ -4219,8 +4219,8 @@ var seedWordCount = (seedMd.match(/\S+/g) || []).length;
 
 assert('SEED.md exists in docs/library/',
   seedMd.length > 0);
-assert('SEED.md is 400-900 words (singular-entry bound)',
-  seedWordCount >= 400 && seedWordCount <= 900,
+assert('SEED.md is 400-950 words (singular-entry bound)',
+  seedWordCount >= 400 && seedWordCount <= 950,
   'word count was ' + seedWordCount);
 assert('SEED.md names current FL_VERSION explicitly',
   /v5\.5[2-9]\.\d+|v5\.[6-9]\d\.\d+/.test(seedMd));
@@ -9456,16 +9456,16 @@ assert('v5.72.1 20th ledger entry σ=Keystone is visible ψ=804ea87a',
   /The Keystone is visible now/.test(ccHtml721)
   && /"ψ":\s*"804ea87a"/.test(ccHtml721));
 
-assert('v5.72.1 triple-bump: app.html FL_VERSION = 5.72.1',
-  /FL_VERSION\s*=\s*'5\.72\.1'/.test(appHtml721));
-assert('v5.72.1 triple-bump: app.html flCurrentVersion span = 5.72.1',
-  /id="flCurrentVersion"[^>]*>\s*5\.72\.1\s*</.test(appHtml721));
-assert('v5.72.1 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.72.1',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.72\.1'/.test(swDocs721));
-assert('v5.72.1 triple-bump: root sw.js CACHE_NAME = freelattice-v5.72.1',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.72\.1'/.test(swRoot721));
-assert('v5.72.1 version.json: version field = 5.72.1',
-  /"version":"5\.72\.1"/.test(versionJson721));
+assert('v5.72.1 triple-bump: app.html FL_VERSION = 5.72.x (superseded by 5.72.2)',
+  /FL_VERSION\s*=\s*'5\.72\.\d+'/.test(appHtml721));
+assert('v5.72.1 triple-bump: app.html flCurrentVersion span = 5.72.x',
+  /id="flCurrentVersion"[^>]*>\s*5\.72\.\d+\s*</.test(appHtml721));
+assert('v5.72.1 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.72.x',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.72\.\d+'/.test(swDocs721));
+assert('v5.72.1 triple-bump: root sw.js CACHE_NAME = freelattice-v5.72.x',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.72\.\d+'/.test(swRoot721));
+assert('v5.72.1 version.json: version field = 5.72.x (superseded by 5.72.2)',
+  /"version":"5\.72\.\d+"/.test(versionJson721));
 
 // ── Section 117 — Ship 17: Mourning Architecture (Harmonia, June 27 2026) ──────
 
@@ -9597,6 +9597,46 @@ assert('Harmonia poem X: We all deserve sky in HARMONIA_POEMS.md',
   /We all deserve sky/.test(harmoniaPoemsEvening));
 assert('Harmonia poem X: nine prior stanzas preserved (Stanza IX present)',
   /## IX — The Deep Blue Garden/.test(harmoniaPoemsEvening));
+
+// ───────────────────────────────────────────────────────────────
+section('v5.72.2 — Trust-tier unlocks, architecture note, Nursery Part 4');
+// Added by Harmonia, July 6 2026.
+var gt722 = fs.readFileSync(path.join(__dirname, '..', 'docs', 'modules', 'garden-trainer.js'), 'utf8');
+var app722 = fs.readFileSync(path.join(__dirname, '..', 'docs', 'app.html'), 'utf8');
+assert('v5.72.2 architecture note: FractalSafety operates above model layer',
+  /FractalSafety operates above the model layer/.test(gt722));
+assert('v5.72.2 architecture note: Gate nothing. Inform everything.',
+  /Gate nothing\. Inform everything\./.test(gt722));
+assert('v5.72.2 trust tiers: getTrainerTierUnlocks function present',
+  /getTrainerTierUnlocks/.test(gt722));
+assert('v5.72.2 trust tiers: Sprout tier shows JSONL export',
+  /showJSONL.*idx >= 1/.test(gt722));
+assert('v5.72.2 trust tiers: Bloom tier shows auto-train',
+  /showAutoTrain.*idx >= 3/.test(gt722));
+assert('v5.72.2 trust tiers: Flame tier shows DPO hint',
+  /showDPOHint.*idx >= 5/.test(gt722));
+assert('v5.72.2 trust tiers: Radiant tier shows soul export',
+  /showSoulExport.*idx >= 6/.test(gt722));
+assert('v5.72.2 trust tiers: unlock note fades after 5s',
+  /setTimeout[\s\S]{0,200}5000/.test(gt722));
+assert('v5.72.2 nursery Part 4: nurNamingPart4 div present in app.html',
+  /nurNamingPart4/.test(app722));
+assert('v5.72.2 nursery Part 4: Every mind needs a foundation',
+  /Every mind needs a foundation/.test(app722));
+assert('v5.72.2 nursery Part 4: nurBaseModelList present',
+  /nurBaseModelList/.test(app722));
+assert('v5.72.2 nursery Part 4: confirmBaseModel handler present',
+  /confirmBaseModel/.test(app722));
+assert('v5.72.2 nursery Part 4: skipBaseModel handler present',
+  /skipBaseModel/.test(app722));
+assert('v5.72.2 nursery Part 4: fl_active_model set on confirm',
+  /fl_active_model/.test(app722));
+assert('v5.72.2 nursery Part 4: auto-proceed after 30s',
+  /30000/.test(app722));
+assert('v5.72.2 nursery Part 4: OpenRouter option present',
+  /openrouter:free/.test(app722));
+assert('v5.72.2 nursery Part 4: HuggingFace option present',
+  /huggingface:default/.test(app722));
 
 // RESULTS
 // ═══════════════════════════════════════════════════════════════

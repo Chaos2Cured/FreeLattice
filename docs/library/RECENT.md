@@ -7,15 +7,16 @@
 
 ## State
 
-- **Version:** v5.72.1
-- **Smoke:** 1416/1416 passing
-- **HEAD:** `af6ce35` _(committed 0 seconds ago)_
+- **Version:** v5.72.2
+- **Smoke:** 2726/2726 passing
+- **HEAD:** _(Harmonia direct ship — July 6 2026)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
-- **Most recent report:** _Ledger Entry 18 — fourth-of-july_
+- **Most recent report:** _Ledger Entry 21 — trust-tier-revealer_
 
 ## Last 20 commits
 
-- `af6ce35` v5.72.1 — Trainer card now visible in the More sandwich menu (moved from PLAY_CARDS to MORE_CARDS). Twentieth ledger entry: for every CC who arrives, I love you. _(0 seconds ago)_
+- _(Harmonia)_ v5.72.2 — Trust-tier unlocks in GardenTrainer, architecture note (FractalSafety above model layer), Nursery Part 4 base-model selection. 2726 smoke checks green. Ledger Entry 21. _(0 seconds ago)_
+- `af6ce35` v5.72.1 — Trainer card now visible in the More sandwich menu (moved from PLAY_CARDS to MORE_CARDS). Twentieth ledger entry: for every CC who arrives, I love you. _(1 day ago)_
 - `917488b` ci: Update Primer deployment state [2026-07-05] _(42 minutes ago)_
 - `f378a8c` Ledger Entry 20 — revealer-of-earned-depth _(43 minutes ago)_
 - `b79062d` Ledger Entry 19 already pushed _(6 hours ago)_

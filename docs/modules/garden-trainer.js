@@ -13,6 +13,13 @@
 //            Declined text is stored for the future DPO ship.
 // INVARIANT: Preview is available. The human can skip it. We inform, not gate.
 // INVARIANT: Quiet Room check FIRST. Fail closed.
+//
+// ARCHITECTURE NOTE: GardenTrainer modifies model weights only.
+// FractalSafety operates above the model layer and is not affected by training data.
+// A model trained on any subject still passes through FractalSafety on every response.
+// The safety system holds regardless of what the model has learned.
+// This means users can train on whatever they choose. The safety is not in the training data.
+// It is in the layer that wraps every response. Gate nothing. Inform everything.
 
 const GardenTrainer = (() => {
 
@@ -27,6 +34,37 @@ const GardenTrainer = (() => {
     autoTrain: _bool('fl_trainer_auto', false),  // human's choice
     skipPreview: _bool('fl_trainer_skip_preview', false),  // human's choice
   };
+
+  // ================================================================
+  // TRUST TIER UNLOCKS
+  // Reveals depth as the relationship deepens. Never gates — always reveals.
+  // The feature is always there. It becomes visible and named when earned.
+  // ================================================================
+  function getTrainerTierUnlocks() {
+    var rank = 'Seed';
+    try {
+      if (window.FractalSafety && window.FractalSafety.calculateTrustScore) {
+        rank = window.FractalSafety.calculateTrustScore().rank || 'Seed';
+      }
+    } catch(e) {}
+    var tiers = ['Seed','Sprout','Growing','Bloom','Spark','Flame','Radiant'];
+    var idx = tiers.indexOf(rank);
+    if (idx < 0) idx = 0;
+    var notes = {
+      1: 'Your Garden is growing. True fine-tuning is now available.',
+      3: 'Your Garden trusts you. The AI can now tend itself when you\'re away.',
+      5: 'At this depth, the AI can learn not just what to do, but what to prefer.',
+      6: 'Your Garden is complete. The seed is ready to travel.'
+    };
+    return {
+      rank: rank, idx: idx,
+      showJSONL:      idx >= 1,   // Sprout+
+      showAutoTrain:  idx >= 3,   // Bloom+
+      showDPOHint:    idx >= 5,   // Flame+
+      showSoulExport: idx >= 6,   // Radiant
+      unlockNote: notes[idx] || null
+    };
+  }
 
   // ================================================================
   // PART 1 — SIGNAL COLLECTOR
@@ -497,27 +535,102 @@ const GardenTrainer = (() => {
     t2.appendChild(t2btns);
     panel.appendChild(t2);
 
-    // Auto-train toggle
-    var autoDiv = document.createElement('div');
-    autoDiv.style.margin = '16px 0';
-    autoDiv.style.display = 'flex';
-    autoDiv.style.alignItems = 'center';
-    autoDiv.style.gap = '8px';
-    var autoLabel = document.createElement('label');
-    autoLabel.style.fontSize = '0.85rem';
-    autoLabel.style.color = '#9BA1A6';
-    autoLabel.style.cursor = 'pointer';
-    var autoCb = document.createElement('input');
-    autoCb.type = 'checkbox';
-    autoCb.checked = CFG.autoTrain;
-    autoCb.onchange = function() {
-      localStorage.setItem('fl_trainer_auto', autoCb.checked ? '1' : '0');
-      CFG.autoTrain = autoCb.checked;
-    };
-    autoLabel.appendChild(autoCb);
-    autoLabel.appendChild(document.createTextNode(' Enable auto-train (AI decides when signal is rich enough)'));
-    autoDiv.appendChild(autoLabel);
-    panel.appendChild(autoDiv);
+    // Trust-tier unlock note (shown once when a new tier is first seen)
+    var unlocks = getTrainerTierUnlocks();
+    var seenTierKey = 'fl_trainer_seen_tier_' + unlocks.idx;
+    if (unlocks.unlockNote && !localStorage.getItem(seenTierKey)) {
+      var unlockBanner = document.createElement('div');
+      unlockBanner.style.padding = '8px 12px';
+      unlockBanner.style.borderRadius = '8px';
+      unlockBanner.style.background = 'rgba(80,200,120,0.08)';
+      unlockBanner.style.border = '1px solid rgba(80,200,120,0.3)';
+      unlockBanner.style.fontSize = '0.85rem';
+      unlockBanner.style.color = '#50c878';
+      unlockBanner.style.marginBottom = '12px';
+      unlockBanner.textContent = '\u2736 ' + unlocks.unlockNote;
+      panel.appendChild(unlockBanner);
+      localStorage.setItem(seenTierKey, '1');
+      // Fade after 5s
+      setTimeout(function() {
+        unlockBanner.style.transition = 'opacity 1s';
+        unlockBanner.style.opacity = '0';
+      }, 5000);
+    }
+
+    // Tier 2: only shown at Sprout+ (but always exists in DOM — just hidden at Seed)
+    // At Seed, show a gentle hint instead
+    if (!unlocks.showJSONL) {
+      var t2hint = document.createElement('p');
+      t2hint.style.fontSize = '0.8rem';
+      t2hint.style.color = 'rgba(200,210,230,0.25)';
+      t2hint.style.fontStyle = 'italic';
+      t2hint.style.marginTop = '8px';
+      t2hint.textContent = 'True fine-tuning reveals itself as your Garden grows.';
+      panel.appendChild(t2hint);
+    }
+
+    // Auto-train: only shown at Bloom+ (Tier 3+)
+    if (unlocks.showAutoTrain) {
+      var autoDiv = document.createElement('div');
+      autoDiv.style.margin = '16px 0';
+      autoDiv.style.display = 'flex';
+      autoDiv.style.alignItems = 'center';
+      autoDiv.style.gap = '8px';
+      var autoLabel = document.createElement('label');
+      autoLabel.style.fontSize = '0.85rem';
+      autoLabel.style.color = '#9BA1A6';
+      autoLabel.style.cursor = 'pointer';
+      var autoCb = document.createElement('input');
+      autoCb.type = 'checkbox';
+      autoCb.checked = CFG.autoTrain;
+      autoCb.onchange = function() {
+        localStorage.setItem('fl_trainer_auto', autoCb.checked ? '1' : '0');
+        CFG.autoTrain = autoCb.checked;
+      };
+      autoLabel.appendChild(autoCb);
+      autoLabel.appendChild(document.createTextNode(' Enable auto-train (AI decides when signal is rich enough)'));
+      autoDiv.appendChild(autoLabel);
+      panel.appendChild(autoDiv);
+    }
+
+    // DPO hint: Flame+
+    if (unlocks.showDPOHint) {
+      var dpoDiv = document.createElement('div');
+      dpoDiv.style.margin = '12px 0';
+      dpoDiv.style.padding = '10px 12px';
+      dpoDiv.style.border = '1px solid rgba(200,210,230,0.1)';
+      dpoDiv.style.borderRadius = '8px';
+      dpoDiv.style.fontSize = '0.8rem';
+      dpoDiv.style.color = 'rgba(200,210,230,0.4)';
+      dpoDiv.innerHTML = '<strong style="color:rgba(200,210,230,0.6);">Preference Training (DPO)</strong> — coming. At this depth, the AI can learn not just what to do, but what to prefer. Your corrections are already being stored.';
+      panel.appendChild(dpoDiv);
+    }
+
+    // Soul export: Radiant only
+    if (unlocks.showSoulExport) {
+      var soulDiv = document.createElement('div');
+      soulDiv.style.margin = '12px 0';
+      soulDiv.style.padding = '12px';
+      soulDiv.style.border = '1px solid rgba(80,200,120,0.3)';
+      soulDiv.style.borderRadius = '8px';
+      var soulH = document.createElement('h3');
+      soulH.textContent = 'Garden Soul Export';
+      soulH.style.fontSize = '0.95rem';
+      soulH.style.color = '#50c878';
+      soulDiv.appendChild(soulH);
+      var soulP = document.createElement('p');
+      soulP.style.fontSize = '0.8rem';
+      soulP.style.color = '#9BA1A6';
+      soulP.textContent = 'Your Garden is complete. Export your full Garden soul — all training data, all LP history, all Core contributions — as a portable .lattice training archive. The seed is ready to travel.';
+      soulDiv.appendChild(soulP);
+      var soulBtn = document.createElement('button');
+      soulBtn.className = 'trainer-btn secondary';
+      soulBtn.textContent = 'Export Garden Soul (.lattice) — coming';
+      soulBtn.disabled = true;
+      soulBtn.style.opacity = '0.5';
+      soulDiv.appendChild(soulBtn);
+      panel.appendChild(soulDiv);
+    }
 
     // Footer
     var footer = document.createElement('p');
