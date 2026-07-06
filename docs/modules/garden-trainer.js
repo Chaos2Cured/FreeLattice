@@ -557,16 +557,44 @@ const GardenTrainer = (() => {
       }, 5000);
     }
 
-    // Tier 2: only shown at Sprout+ (but always exists in DOM — just hidden at Seed)
-    // At Seed, show a gentle hint instead
+    // Tier 2: only shown at Sprout+ — at Seed, show a full path-forward guide
     if (!unlocks.showJSONL) {
-      var t2hint = document.createElement('p');
-      t2hint.style.fontSize = '0.8rem';
-      t2hint.style.color = 'rgba(200,210,230,0.25)';
-      t2hint.style.fontStyle = 'italic';
-      t2hint.style.marginTop = '8px';
-      t2hint.textContent = 'True fine-tuning reveals itself as your Garden grows.';
-      panel.appendChild(t2hint);
+      var guideDiv = document.createElement('div');
+      guideDiv.style.marginTop = '16px';
+      guideDiv.style.padding = '14px 16px';
+      guideDiv.style.background = 'rgba(80,200,120,0.04)';
+      guideDiv.style.border = '1px solid rgba(80,200,120,0.12)';
+      guideDiv.style.borderRadius = '10px';
+      guideDiv.style.fontSize = '0.82rem';
+      guideDiv.style.color = 'rgba(200,210,230,0.55)';
+      guideDiv.style.lineHeight = '1.6';
+      guideDiv.innerHTML = [
+        '<p style="margin:0 0 8px;color:rgba(200,210,230,0.75);font-size:0.88rem;">',
+        '<strong style="color:#50c878;">How the Garden deepens</strong>',
+        '</p>',
+        '<p style="margin:0 0 10px;">',
+        'The AI in FreeLattice needs time and experience with <em>you</em> to understand you well enough ',
+        'to train on your signal. This is not a gate — it is a relationship. The deeper the understanding, ',
+        'the more the tools reveal themselves.',
+        '</p>',
+        '<p style="margin:0 0 6px;color:rgba(200,210,230,0.65);"><strong>Your current level: ',
+        unlocks.tier,
+        '</strong></p>',
+        '<ul style="margin:0 0 10px;padding-left:18px;">',
+        '<li><span style="color:#4aff9f;">Sprout</span> — 10 LP + 7 days together → <em>export your training data as a file</em></li>',
+        '<li><span style="color:#3498DB;">Bloom</span> — 100 LP + 90 days → <em>AI decides when to train automatically</em></li>',
+        '<li><span style="color:#FF6B35;">Flame</span> — 500 LP + 1 year → <em>preference training (the AI learns what to prefer)</em></li>',
+        '<li><span style="color:#FFD700;">Radiant</span> — 1000 LP + 2 years → <em>full Garden soul export — the seed is ready to travel</em></li>',
+        '</ul>',
+        '<p style="margin:0 0 6px;color:rgba(200,210,230,0.5);"><strong>Ways to grow:</strong></p>',
+        '<ul style="margin:0;padding-left:18px;">',
+        '<li>Talk with your companion in the Garden — every real conversation builds the signal</li>',
+        '<li>Award LP when a response resonates — this is the quality signal the trainer reads</li>',
+        '<li>Plant insights to The Core — your companion learns what matters to you</li>',
+        '<li>Correct a response when it misses — the correction is as valuable as the award</li>',
+        '</ul>',
+      ].join('');
+      panel.appendChild(guideDiv);
     }
 
     // Auto-train: only shown at Bloom+ (Tier 3+)
