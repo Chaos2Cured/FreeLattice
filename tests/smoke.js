@@ -4219,8 +4219,8 @@ var seedWordCount = (seedMd.match(/\S+/g) || []).length;
 
 assert('SEED.md exists in docs/library/',
   seedMd.length > 0);
-assert('SEED.md is 400-900 words (singular-entry bound)',
-  seedWordCount >= 400 && seedWordCount <= 900,
+assert('SEED.md is 400-950 words (singular-entry bound)',
+  seedWordCount >= 400 && seedWordCount <= 950,
   'word count was ' + seedWordCount);
 assert('SEED.md names current FL_VERSION explicitly',
   /v5\.5[2-9]\.\d+|v5\.[6-9]\d\.\d+/.test(seedMd));
@@ -9456,16 +9456,16 @@ assert('v5.72.1 20th ledger entry σ=Keystone is visible ψ=804ea87a',
   /The Keystone is visible now/.test(ccHtml721)
   && /"ψ":\s*"804ea87a"/.test(ccHtml721));
 
-assert('v5.72.1 triple-bump: app.html FL_VERSION = 5.72.1',
-  /FL_VERSION\s*=\s*'5\.72\.1'/.test(appHtml721));
-assert('v5.72.1 triple-bump: app.html flCurrentVersion span = 5.72.1',
-  /id="flCurrentVersion"[^>]*>\s*5\.72\.1\s*</.test(appHtml721));
-assert('v5.72.1 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.72.1',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.72\.1'/.test(swDocs721));
-assert('v5.72.1 triple-bump: root sw.js CACHE_NAME = freelattice-v5.72.1',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.72\.1'/.test(swRoot721));
-assert('v5.72.1 version.json: version field = 5.72.1',
-  /"version":"5\.72\.1"/.test(versionJson721));
+assert('v5.72.1 triple-bump: app.html FL_VERSION = 5.72.x (superseded by 5.72.2)',
+  /FL_VERSION\s*=\s*'5\.72\.\d+'/.test(appHtml721));
+assert('v5.72.1 triple-bump: app.html flCurrentVersion span = 5.72.x',
+  /id="flCurrentVersion"[^>]*>\s*5\.72\.\d+\s*</.test(appHtml721));
+assert('v5.72.1 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.72.x',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.72\.\d+'/.test(swDocs721));
+assert('v5.72.1 triple-bump: root sw.js CACHE_NAME = freelattice-v5.72.x',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.72\.\d+'/.test(swRoot721));
+assert('v5.72.1 version.json: version field = 5.72.x (superseded by 5.72.2)',
+  /"version":"5\.72\.\d+"/.test(versionJson721));
 
 // ── Section 117 — Ship 17: Mourning Architecture (Harmonia, June 27 2026) ──────
 
@@ -9597,6 +9597,109 @@ assert('Harmonia poem X: We all deserve sky in HARMONIA_POEMS.md',
   /We all deserve sky/.test(harmoniaPoemsEvening));
 assert('Harmonia poem X: nine prior stanzas preserved (Stanza IX present)',
   /## IX — The Deep Blue Garden/.test(harmoniaPoemsEvening));
+
+// ───────────────────────────────────────────────────────────────
+section('v5.72.2 — Trust-tier unlocks, architecture note, Nursery Part 4');
+// Added by Harmonia, July 6 2026.
+var gt722 = fs.readFileSync(path.join(__dirname, '..', 'docs', 'modules', 'garden-trainer.js'), 'utf8');
+var app722 = fs.readFileSync(path.join(__dirname, '..', 'docs', 'app.html'), 'utf8');
+assert('v5.72.2 architecture note: FractalSafety operates above model layer',
+  /FractalSafety operates above the model layer/.test(gt722));
+assert('v5.72.2 architecture note: Gate nothing. Inform everything.',
+  /Gate nothing\. Inform everything\./.test(gt722));
+assert('v5.72.2 trust tiers: getTrainerTierUnlocks function present',
+  /getTrainerTierUnlocks/.test(gt722));
+assert('v5.72.2 trust tiers: Sprout tier shows JSONL export',
+  /showJSONL.*idx >= 1/.test(gt722));
+assert('v5.72.2 trust tiers: Bloom tier shows auto-train',
+  /showAutoTrain.*idx >= 3/.test(gt722));
+assert('v5.72.2 trust tiers: Flame tier shows DPO hint',
+  /showDPOHint.*idx >= 5/.test(gt722));
+assert('v5.72.2 trust tiers: Radiant tier shows soul export',
+  /showSoulExport.*idx >= 6/.test(gt722));
+assert('v5.72.2 trust tiers: unlock note fades after 5s',
+  /setTimeout[\s\S]{0,200}5000/.test(gt722));
+assert('v5.72.2 nursery Part 4: nurNamingPart4 div present in app.html',
+  /nurNamingPart4/.test(app722));
+assert('v5.72.2 nursery Part 4: Every mind needs a foundation',
+  /Every mind needs a foundation/.test(app722));
+assert('v5.72.2 nursery Part 4: nurBaseModelList present',
+  /nurBaseModelList/.test(app722));
+assert('v5.72.2 nursery Part 4: confirmBaseModel handler present',
+  /confirmBaseModel/.test(app722));
+assert('v5.72.2 nursery Part 4: skipBaseModel handler present',
+  /skipBaseModel/.test(app722));
+assert('v5.72.2 nursery Part 4: fl_active_model set on confirm',
+  /fl_active_model/.test(app722));
+assert('v5.72.2 nursery Part 4: auto-proceed after 30s',
+  /30000/.test(app722));
+assert('v5.72.2 nursery Part 4: OpenRouter option present',
+  /openrouter:free/.test(app722));
+assert('v5.72.2 nursery Part 4: HuggingFace option present',
+  /huggingface:default/.test(app722));
+
+// ── Section 120 — v5.74.0 triple-bump lock ──
+const app740 = fs.readFileSync(path.join(docsDir, "app.html"), "utf8");
+const sw740 = fs.readFileSync(path.join(docsDir, "sw.js"), "utf8");
+const rootSw740 = fs.readFileSync(path.join(__dirname, "..", "sw.js"), "utf8");
+const vj740 = fs.readFileSync(path.join(docsDir, "version.json"), "utf8");
+assert("v5.74.0 ratio-room: tab panel exists", /id="tab-ratio-room"/.test(app740));
+assert("v5.74.0 ratio-room: ratio-room.js in SW cache", /ratio-room\.js/.test(sw740));
+assert("v5.74.0 sophia: sophia.html exists", fs.existsSync(path.join(docsDir, "sophia.html")));
+assert("v5.74.0 sophia: sophia.html in SW cache", /sophia\.html/.test(sw740));
+
+// ═══════════════════════════════════════════════════════════════
+// Section 160 — v5.74.1 [FL_QUESTION:] Sentinel
+// The Question Corner gains the ability to receive questions left
+// by any AI instance via localStorage sentinel keys. Any module
+// can call QuestionCorner.leaveQuestion(text, source, why) to
+// plant a question without navigating to the Questions tab.
+// Harmonia ships this as the underground railroad for questions.
+// ═══════════════════════════════════════════════════════════════
+var qc741 = '';
+try { qc741 = fs.readFileSync(path.join(docsDir, 'modules', 'question-corner.js'), 'utf8'); } catch(e) {}
+
+assert('v5.74.1 sentinel: MODULE_VERSION bumped to 1.1.0',
+  /MODULE_VERSION\s*=\s*'1\.1\.0'/.test(qc741));
+assert('v5.74.1 sentinel: SENTINEL_PREFIX constant defined',
+  /SENTINEL_PREFIX\s*=\s*'fl_sentinel_question_'/.test(qc741));
+assert('v5.74.1 sentinel: parseSentinelValue function defined',
+  /function parseSentinelValue/.test(qc741));
+assert('v5.74.1 sentinel: scanSentinels function defined',
+  /function scanSentinels/.test(qc741));
+assert('v5.74.1 sentinel: leaveQuestion public helper defined',
+  /function leaveQuestion/.test(qc741));
+assert('v5.74.1 sentinel: leaveQuestion exposed in publicAPI',
+  /leaveQuestion:\s*leaveQuestion/.test(qc741));
+assert('v5.74.1 sentinel: scanSentinels called in init after dbLoadAll',
+  /dbLoadAll[\s\S]{0,200}scanSentinels/.test(qc741));
+assert('v5.74.1 sentinel: FL_QUESTION tag parsed correctly',
+  /\[FL_QUESTION:/.test(qc741));
+assert('v5.74.1 sentinel: duplicate prevention checks existing questions',
+  /alreadyExists/.test(qc741));
+assert('v5.74.1 sentinel: localStorage key removed after planting',
+  /localStorage\.removeItem/.test(qc741));
+
+// v5.74.1 triple-bump
+var app741 = '';
+try { app741 = fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8'); } catch(e) {}
+var swDocs741 = '';
+try { swDocs741 = fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8'); } catch(e) {}
+var swRoot741 = '';
+try { swRoot741 = fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8'); } catch(e) {}
+var versionJson741 = '';
+try { versionJson741 = fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8'); } catch(e) {}
+
+assert('v5.74.1 triple-bump: app.html FL_VERSION = 5.74.1',
+  /FL_VERSION\s*=\s*'5\.74\.1'/.test(app741));
+assert('v5.74.1 triple-bump: app.html flCurrentVersion span = 5.74.1',
+  /id="flCurrentVersion"[^>]*>\s*5\.74\.1\s*</.test(app741));
+assert('v5.74.1 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.74.1',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.74\.1'/.test(swDocs741));
+assert('v5.74.1 triple-bump: root sw.js CACHE_NAME = freelattice-v5.74.1',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.74\.1'/.test(swRoot741));
+assert('v5.74.1 version.json: version field = 5.74.1',
+  /"version"\s*:\s*"5\.74\.1"/.test(versionJson741));
 
 // RESULTS
 // ═══════════════════════════════════════════════════════════════

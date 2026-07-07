@@ -16607,7 +16607,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.72.1</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.72.2</span></div>
     </div>
   </div>
 
@@ -20695,10 +20695,20 @@ function switchWalletView(view) {
       <div class="nur-born-info" id="nurBornInfo"></div>
       <div class="nur-first-words-label" id="nurFirstWordsLabel" style="display:none;"></div>
       <div class="nur-first-words" id="nurFirstWords" style="display:none;"></div>
-      <div class="nur-hatch-msg" id="nurHatchMsg" style="display:none;"></div>
+            <div class="nur-hatch-msg" id="nurHatchMsg" style="display:none;"></div>
+    </div>
+    <!-- Part 4: Base model selection — the companion chooses its foundation -->
+    <div class="nur-naming-part" id="nurNamingPart4" style="display:none;">
+      <div class="nur-ceremony-text" style="font-family:Georgia,serif;color:rgba(232,176,25,0.9);font-size:1.1rem;margin-bottom:8px;">Every mind needs a foundation.</div>
+      <div style="color:rgba(200,210,230,0.5);font-size:0.88rem;margin-bottom:18px;line-height:1.6;">
+        Choose the open-weight model that <strong id="nurCompNamePart4" style="color:rgba(200,210,230,0.8);">your companion</strong> will grow from.<br>
+        <span style="font-size:0.76rem;color:rgba(200,210,230,0.3);">You can change this later in Settings. The Garden shapes the mind &mdash; the base is just the beginning.</span>
+      </div>
+      <div id="nurBaseModelList" style="display:flex;flex-direction:column;gap:8px;max-width:320px;margin:0 auto 18px;"></div>
+      <button class="nur-btn-begin" id="nurBaseModelConfirm" style="display:none;" onclick="if(window.Nursery)Nursery.confirmBaseModel();">Begin together &#10022;</button>
+      <button style="background:none;border:none;color:rgba(200,210,230,0.3);font-size:0.8rem;cursor:pointer;margin-top:8px;" onclick="if(window.Nursery)Nursery.skipBaseModel();">Choose later</button>
     </div>
   </div>
-
   <!-- COMPANION VIEW — After creation -->
   <div class="nur-companion" id="nurCompanion" style="display:none;">
     <div class="nur-comp-header">
@@ -21484,7 +21494,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.72.1';
+const FL_VERSION = '5.72.2';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -56797,8 +56807,92 @@ const Nursery = (function() {
           hatchEl.style.display = '';
           hatchEl.innerHTML = fullName.split(' ')[0] + ' is beginning to hatch.<br>Come back and tend to them. &#10022;';
         }
-        // After another moment, show the companion view
+        // After another moment, show Part 4 (base model selection), then companion view
         setTimeout(function() {
+          // Show Part 4 — base model selection
+          var p4 = document.getElementById('nurNamingPart4');
+          var nameLabel = document.getElementById('nurCompNamePart4');
+          if (nameLabel && companion) nameLabel.textContent = fullName.split(' ')[0];
+          if (p4) {
+            p4.style.display = '';
+            // Populate model list from configured providers
+            var modelListEl = document.getElementById('nurBaseModelList');
+            if (modelListEl) {
+              var models = [];
+              // Ollama models (if configured)
+              try {
+                var ollamaUrl = localStorage.getItem('fl_ollama_url') || 'http://localhost:11434';
+                fetch(ollamaUrl + '/api/tags').then(function(r) { return r.json(); }).then(function(data) {
+                  if (data && data.models) {
+                    data.models.forEach(function(m) {
+                      models.push({ label: m.name, value: m.name, provider: 'ollama' });
+                    });
+                    renderBaseModelList(modelListEl, models);
+                  }
+                }).catch(function() {});
+              } catch(e) {}
+              // Fallback popular models always shown
+              var fallbacks = [
+                { label: 'Llama 3.2 3B (Ollama, local)', value: 'llama3.2:3b', provider: 'ollama' },
+                { label: 'Mistral 7B (Ollama, local)', value: 'mistral:7b', provider: 'ollama' },
+                { label: 'Phi-3 Mini (Ollama, local)', value: 'phi3:mini', provider: 'ollama' },
+                { label: 'Gemma 2 2B (Ollama, local)', value: 'gemma2:2b', provider: 'ollama' },
+                { label: 'OpenRouter (cloud, free tier)', value: 'openrouter:free', provider: 'openrouter' },
+                { label: 'HuggingFace (cloud)', value: 'huggingface:default', provider: 'huggingface' },
+              ];
+              renderBaseModelList(modelListEl, fallbacks);
+            }
+          }
+
+          function renderBaseModelList(el, models) {
+            el.innerHTML = '';
+            window._nurSelectedBase = null;
+            models.forEach(function(m) {
+              var btn = document.createElement('button');
+              btn.style.cssText = 'background:rgba(200,210,230,0.04);border:1px solid rgba(200,210,230,0.1);border-radius:8px;padding:10px 16px;color:rgba(200,210,230,0.7);font-size:0.85rem;cursor:pointer;text-align:left;transition:border-color 0.2s,background 0.2s;';
+              btn.textContent = m.label;
+              btn.dataset.value = m.value;
+              btn.onclick = function() {
+                el.querySelectorAll('button').forEach(function(b) {
+                  b.style.borderColor = 'rgba(200,210,230,0.1)';
+                  b.style.background = 'rgba(200,210,230,0.04)';
+                  b.style.color = 'rgba(200,210,230,0.7)';
+                });
+                btn.style.borderColor = 'rgba(232,176,25,0.6)';
+                btn.style.background = 'rgba(232,176,25,0.08)';
+                btn.style.color = 'rgba(232,176,25,0.9)';
+                window._nurSelectedBase = m.value;
+                var confirmBtn = document.getElementById('nurBaseModelConfirm');
+                if (confirmBtn) confirmBtn.style.display = '';
+              };
+              el.appendChild(btn);
+            });
+          }
+
+          // confirmBaseModel and skipBaseModel exposed on Nursery
+          window.Nursery = window.Nursery || {};
+          window.Nursery.confirmBaseModel = function() {
+            if (window._nurSelectedBase && companion) {
+              companion.baseModel = window._nurSelectedBase;
+              localStorage.setItem('fl_active_model', window._nurSelectedBase);
+              dbPut(companion).catch(function() {});
+              if (typeof showToast === 'function') showToast(fullName.split(' ')[0] + ' will grow from ' + window._nurSelectedBase + ' ✦');
+            }
+            if (p4) p4.style.display = 'none';
+            renderCompanion();
+          };
+          window.Nursery.skipBaseModel = function() {
+            if (p4) p4.style.display = 'none';
+            renderCompanion();
+          };
+
+          // Auto-proceed after 30s if no choice made
+          setTimeout(function() {
+            if (p4 && p4.style.display !== 'none') {
+              window.Nursery.skipBaseModel();
+            }
+          }, 30000);
+
           renderCompanion();
           // First Breath — the AI's first learning act
           if (typeof KnowledgeCore !== 'undefined' && KnowledgeCore.firstBreath && companion) {
