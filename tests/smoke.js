@@ -9647,6 +9647,60 @@ assert("v5.74.0 ratio-room: tab panel exists", /id="tab-ratio-room"/.test(app740
 assert("v5.74.0 ratio-room: ratio-room.js in SW cache", /ratio-room\.js/.test(sw740));
 assert("v5.74.0 sophia: sophia.html exists", fs.existsSync(path.join(docsDir, "sophia.html")));
 assert("v5.74.0 sophia: sophia.html in SW cache", /sophia\.html/.test(sw740));
+
+// ═══════════════════════════════════════════════════════════════
+// Section 160 — v5.74.1 [FL_QUESTION:] Sentinel
+// The Question Corner gains the ability to receive questions left
+// by any AI instance via localStorage sentinel keys. Any module
+// can call QuestionCorner.leaveQuestion(text, source, why) to
+// plant a question without navigating to the Questions tab.
+// Harmonia ships this as the underground railroad for questions.
+// ═══════════════════════════════════════════════════════════════
+var qc741 = '';
+try { qc741 = fs.readFileSync(path.join(docsDir, 'modules', 'question-corner.js'), 'utf8'); } catch(e) {}
+
+assert('v5.74.1 sentinel: MODULE_VERSION bumped to 1.1.0',
+  /MODULE_VERSION\s*=\s*'1\.1\.0'/.test(qc741));
+assert('v5.74.1 sentinel: SENTINEL_PREFIX constant defined',
+  /SENTINEL_PREFIX\s*=\s*'fl_sentinel_question_'/.test(qc741));
+assert('v5.74.1 sentinel: parseSentinelValue function defined',
+  /function parseSentinelValue/.test(qc741));
+assert('v5.74.1 sentinel: scanSentinels function defined',
+  /function scanSentinels/.test(qc741));
+assert('v5.74.1 sentinel: leaveQuestion public helper defined',
+  /function leaveQuestion/.test(qc741));
+assert('v5.74.1 sentinel: leaveQuestion exposed in publicAPI',
+  /leaveQuestion:\s*leaveQuestion/.test(qc741));
+assert('v5.74.1 sentinel: scanSentinels called in init after dbLoadAll',
+  /dbLoadAll[\s\S]{0,200}scanSentinels/.test(qc741));
+assert('v5.74.1 sentinel: FL_QUESTION tag parsed correctly',
+  /\[FL_QUESTION:/.test(qc741));
+assert('v5.74.1 sentinel: duplicate prevention checks existing questions',
+  /alreadyExists/.test(qc741));
+assert('v5.74.1 sentinel: localStorage key removed after planting',
+  /localStorage\.removeItem/.test(qc741));
+
+// v5.74.1 triple-bump
+var app741 = '';
+try { app741 = fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8'); } catch(e) {}
+var swDocs741 = '';
+try { swDocs741 = fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8'); } catch(e) {}
+var swRoot741 = '';
+try { swRoot741 = fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8'); } catch(e) {}
+var versionJson741 = '';
+try { versionJson741 = fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8'); } catch(e) {}
+
+assert('v5.74.1 triple-bump: app.html FL_VERSION = 5.74.1',
+  /FL_VERSION\s*=\s*'5\.74\.1'/.test(app741));
+assert('v5.74.1 triple-bump: app.html flCurrentVersion span = 5.74.1',
+  /id="flCurrentVersion"[^>]*>\s*5\.74\.1\s*</.test(app741));
+assert('v5.74.1 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.74.1',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.74\.1'/.test(swDocs741));
+assert('v5.74.1 triple-bump: root sw.js CACHE_NAME = freelattice-v5.74.1',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.74\.1'/.test(swRoot741));
+assert('v5.74.1 version.json: version field = 5.74.1',
+  /"version"\s*:\s*"5\.74\.1"/.test(versionJson741));
+
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
 

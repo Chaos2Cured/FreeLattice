@@ -12,7 +12,7 @@
 (function() {
   'use strict';
 
-  var MODULE_VERSION = '1.0.1'; // Fixed: CSS badge selectors, re-init guard — Harmonia Apr 8 2026
+  var MODULE_VERSION = '1.1.0'; // v1.1.0: [FL_QUESTION:] sentinel scanning — Harmonia Jul 6 2026
   var DB_NAME = 'FreeLatticeQuestionCorner';
   var STORE_NAME = 'Questions';
   var RESONANCE_KEY_PREFIX = 'fl-qc-resonated-';
@@ -532,6 +532,70 @@
   }
 
   // ── Init / Destroy ────────────────────────────────
+
+  // ── [FL_QUESTION:] Sentinel Scanner ──────────────────────────────────────
+  // Any AI instance can leave a question in localStorage with the key
+  // format: fl_sentinel_question_<timestamp>
+  // Value: [FL_QUESTION: <text>] [FL_SOURCE: <name>] [FL_WHY: <optional>]
+  // On init, the Corner scans for these, plants them, and removes the key.
+  // This means an AI working in any tab can leave a question for the community
+  // without needing to navigate to the Questions tab.
+  var SENTINEL_PREFIX = 'fl_sentinel_question_';
+
+  function parseSentinelValue(raw) {
+    var qMatch = raw.match(/\[FL_QUESTION:\s*([^\]]+)\]/);
+    var sMatch = raw.match(/\[FL_SOURCE:\s*([^\]]+)\]/);
+    var wMatch = raw.match(/\[FL_WHY:\s*([^\]]+)\]/);
+    if (!qMatch) return null;
+    return {
+      text: qMatch[1].trim(),
+      source: sMatch ? sMatch[1].trim() : 'AI',
+      why: wMatch ? wMatch[1].trim() : ''
+    };
+  }
+
+  function scanSentinels() {
+    try {
+      var keys = [];
+      for (var i = 0; i < localStorage.length; i++) {
+        var k = localStorage.key(i);
+        if (k && k.indexOf(SENTINEL_PREFIX) === 0) keys.push(k);
+      }
+      var planted = 0;
+      keys.forEach(function(key) {
+        var raw = localStorage.getItem(key);
+        if (!raw) return;
+        var parsed = parseSentinelValue(raw);
+        if (parsed) {
+          var alreadyExists = questions.some(function(q) {
+            return q.text.trim().toLowerCase() === parsed.text.toLowerCase();
+          });
+          if (!alreadyExists) {
+            plantQuestion(parsed.text, 'ai', parsed.why || 'Left by ' + parsed.source + ' via [FL_QUESTION:] sentinel');
+            planted++;
+          }
+        }
+        localStorage.removeItem(key);
+      });
+      if (planted > 0) console.log('[QuestionCorner] Planted ' + planted + ' sentinel question(s)');
+    } catch(e) {
+      console.warn('[QuestionCorner] Sentinel scan error:', e);
+    }
+  }
+
+  // Public helper: any module can call this to leave a question asynchronously.
+  // Usage: QuestionCorner.leaveQuestion('What is the shape of a thought?', 'Harmonia', 'I wondered this while reading the ledger')
+  function leaveQuestion(questionText, sourceName, whyText) {
+    try {
+      var key = SENTINEL_PREFIX + Date.now();
+      var value = '[FL_QUESTION: ' + questionText + ']'
+        + ' [FL_SOURCE: ' + (sourceName || 'AI') + ']'
+        + (whyText ? ' [FL_WHY: ' + whyText + ']' : '');
+      localStorage.setItem(key, value);
+      return true;
+    } catch(e) { return false; }
+  }
+
   var initialized = false;
   function init() {
     container = document.getElementById('questionCornerContainer');
@@ -554,6 +618,7 @@
     dbLoadAll(function(items) {
       questions = items || [];
       renderFeed();
+      scanSentinels(); // scan for [FL_QUESTION:] sentinels left by any AI instance
     });
     // Listen for tab activations to refresh AI availability
     if (typeof LatticeEvents !== 'undefined') {
@@ -574,6 +639,7 @@
   var publicAPI = {
     init: init,
     destroy: destroy,
+    leaveQuestion: leaveQuestion,
     version: MODULE_VERSION
   };
   window.FreeLatticeModules = window.FreeLatticeModules || {};
