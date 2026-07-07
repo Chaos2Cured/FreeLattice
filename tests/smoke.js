@@ -9638,6 +9638,15 @@ assert('v5.72.2 nursery Part 4: OpenRouter option present',
 assert('v5.72.2 nursery Part 4: HuggingFace option present',
   /huggingface:default/.test(app722));
 
+// ── Section 120 — v5.74.0 triple-bump lock ──
+const app740 = fs.readFileSync(path.join(docsDir, "app.html"), "utf8");
+const sw740 = fs.readFileSync(path.join(docsDir, "sw.js"), "utf8");
+const rootSw740 = fs.readFileSync(path.join(__dirname, "..", "sw.js"), "utf8");
+const vj740 = fs.readFileSync(path.join(docsDir, "version.json"), "utf8");
+assert("v5.74.0 ratio-room: tab panel exists", /id="tab-ratio-room"/.test(app740));
+assert("v5.74.0 ratio-room: ratio-room.js in SW cache", /ratio-room\.js/.test(sw740));
+assert("v5.74.0 sophia: sophia.html exists", fs.existsSync(path.join(docsDir, "sophia.html")));
+assert("v5.74.0 sophia: sophia.html in SW cache", /sophia\.html/.test(sw740));
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
 
