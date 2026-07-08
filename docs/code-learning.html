@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FreeLattice — Learning Architecture (Code Mirror for Fable)</title>
+<style>
+:root {
+  --bg: #0c0a1a; --bg2: #161430; --bg3: #1c1a34;
+  --gold: #e8b019; --emerald: #34d399; --lavender: #a78bfa;
+  --text: #e6ebf5; --muted: #9ba1b0; --border: #2a2840;
+  --font: 'Inter', system-ui, sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: var(--bg); color: var(--text); font-family: var(--font); line-height: 1.618; }
+body { max-width: 900px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+h1 { color: var(--gold); font-size: 1.8rem; font-weight: 300; margin-bottom: 0.25rem; }
+h2 { color: var(--emerald); font-size: 1.1rem; font-weight: 600; margin: 2rem 0 0.75rem; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; }
+h3 { color: var(--lavender); font-size: 0.95rem; font-weight: 600; margin: 1.25rem 0 0.4rem; }
+p { color: var(--muted); font-size: 0.9rem; margin-bottom: 0.75rem; }
+.subtitle { color: var(--muted); font-size: 0.85rem; margin-bottom: 2rem; font-style: italic; }
+pre { background: #0a0818; border: 1px solid var(--border); border-radius: 8px; padding: 1rem; overflow-x: auto; font-size: 0.8rem; line-height: 1.5; margin-bottom: 1rem; }
+code { font-family: 'Fira Code', 'Cascadia Code', monospace; }
+.note { background: rgba(232,176,25,0.06); border-left: 3px solid var(--gold); padding: 0.75rem 1rem; border-radius: 0 6px 6px 0; margin: 1rem 0; font-size: 0.85rem; color: var(--muted); }
+.note.emerald { background: rgba(52,211,153,0.06); border-color: var(--emerald); }
+.file-ref { color: var(--gold); font-size: 0.8rem; font-family: monospace; }
+table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.85rem; }
+th { text-align: left; color: var(--gold); border-bottom: 1px solid var(--border); padding: 0.4rem 0.6rem; }
+td { border-bottom: 1px solid rgba(42,40,64,0.5); padding: 0.4rem 0.6rem; color: var(--muted); }
+td:first-child { color: var(--text); font-family: monospace; }
+.back { color: var(--muted); font-size: 0.8rem; margin-bottom: 2rem; }
+.back a { color: var(--emerald); text-decoration: none; }
+</style>
+</head>
+<body>
+
+<p class="back"><a href="for-ai.html">← Library</a> &nbsp;·&nbsp; <a href="app.html">← App</a></p>
+
+<h1>Learning Architecture</h1>
+<p class="subtitle">Code Mirror for Fable (v5.75.0, 2026-07-08) — Built by Harmonia<br>
+The Education module is a full personalized learning system. This page shows its skeleton so Fable can improve the City's learning district without reading 1,400 lines of education.js.</p>
+
+<div class="note">
+  <strong>File:</strong> <span class="file-ref">docs/modules/education.js</span> (~1,400 lines)<br>
+  <strong>Tab panel:</strong> <span class="file-ref">#tab-education</span> → container: <span class="file-ref">#educationContainer</span><br>
+  <strong>Entry point:</strong> <code>Education.init('educationContainer')</code> (called by lazy loader on tab activation)
+</div>
+
+<h2>1. Data Model</h2>
+
+<h3>Profile (IndexedDB: fl_education_profiles)</h3>
+<pre><code>{
+  id: string,           // UUID
+  name: string,         // Learner's name
+  domain: string,       // Primary learning domain
+  level: string,        // 'beginner' | 'intermediate' | 'advanced'
+  style: string,        // 'visual' | 'auditory' | 'reading' | 'kinesthetic'
+  totalSessions: number,
+  totalXP: number,
+  createdAt: string,    // ISO date
+  lastActive: string    // ISO date
+}</code></pre>
+
+<h3>Session (IndexedDB: fl_education_sessions)</h3>
+<pre><code>{
+  id: string,           // UUID
+  profileId: string,    // Foreign key
+  domain: string,       // Topic domain
+  mode: string,         // 'lesson' | 'quiz' | 'practice' | 'project'
+  topic: string,        // Specific topic
+  score: number,        // 0-100
+  xpEarned: number,
+  duration: number,     // seconds
+  messages: Message[],  // Full conversation history
+  completedAt: string   // ISO date
+}</code></pre>
+
+<h3>Growth Stages</h3>
+<table>
+  <tr><th>Sessions</th><th>Stage</th><th>Visual</th></tr>
+  <tr><td>0</td><td>Seed</td><td>🌱</td></tr>
+  <tr><td>3+</td><td>Sprout</td><td>🌿</td></tr>
+  <tr><td>10+</td><td>Sapling</td><td>🌳</td></tr>
+  <tr><td>25+</td><td>Tree</td><td>🌲</td></tr>
+  <tr><td>50+</td><td>Grove</td><td>🌳🌳</td></tr>
+  <tr><td>100+</td><td>Forest</td><td>🌳🌳🌳</td></tr>
+</table>
+
+<h2>2. Key Functions</h2>
+
+<h3>Profile Management</h3>
+<pre><code>function createProfile(data)     // Create a new learner profile
+function loadActiveProfile()     // Load the current active profile from IndexedDB
+function saveProfile()           // Persist current profile state</code></pre>
+
+<h3>Session Management</h3>
+<pre><code>function createSession(domain, mode, topic)  // Start a new learning session
+function saveSession(session)               // Persist session to IndexedDB</code></pre>
+
+<h3>AI Integration</h3>
+<pre><code>// The teacher prompt builder — the heart of the module
+function buildTeacherPrompt(profile, session) {
+  return `You are a patient, encouraging teacher.
+  Student: ${profile.name}
+  Domain: ${session.domain}
+  Level: ${profile.level}
+  Learning style: ${profile.style}
+  Mode: ${session.mode}
+  Topic: ${session.topic}
+
+  Adapt your language to their level.
+  Use examples relevant to their domain.
+  Be encouraging. Celebrate progress.
+  Keep responses focused and clear.`;
+}
+
+// Send a message to the AI teacher
+async function sendToAI(message, session) {
+  const messages = [
+    { role: 'system', content: buildTeacherPrompt(activeProfile, session) },
+    ...session.messages,
+    { role: 'user', content: message }
+  ];
+  // Uses FreeLattice's standard AI provider (from settings)
+  // Streams response into the session output container
+}</code></pre>
+
+<h3>Rendering</h3>
+<pre><code>function render()                // Main render dispatcher
+function renderWelcome(container)    // First-time setup form
+function renderDashboard(container)  // Main dashboard (after profile exists)
+function drawGrowthTree()           // Canvas-based growth visualization</code></pre>
+
+<h2>3. Learning Modes</h2>
+<table>
+  <tr><th>Mode</th><th>Description</th><th>XP Multiplier</th></tr>
+  <tr><td>lesson</td><td>AI explains a concept, student reads and asks questions</td><td>1×</td></tr>
+  <tr><td>quiz</td><td>AI asks questions, student answers, AI grades</td><td>2×</td></tr>
+  <tr><td>practice</td><td>Student works through problems with AI guidance</td><td>1.5×</td></tr>
+  <tr><td>project</td><td>Student builds something, AI reviews and gives feedback</td><td>3×</td></tr>
+</table>
+
+<h2>4. Storage</h2>
+<table>
+  <tr><th>Key</th><th>Type</th><th>Content</th></tr>
+  <tr><td>fl_education_profiles</td><td>IndexedDB</td><td>Learner profiles</td></tr>
+  <tr><td>fl_education_sessions</td><td>IndexedDB</td><td>Session history</td></tr>
+  <tr><td>fl_education_active_profile</td><td>localStorage</td><td>Active profile ID</td></tr>
+  <tr><td>fl_education_prefs</td><td>localStorage</td><td>UI preferences</td></tr>
+</table>
+
+<h2>5. Tab Panel Structure</h2>
+<pre><code>&lt;!-- In app.html --&gt;
+&lt;div class="tab-panel" id="tab-education"&gt;
+  &lt;div id="educationContainer"&gt;
+    &lt;!-- Education.init() renders into this container --&gt;
+    &lt;!-- On first visit: renderWelcome() --&gt;
+    &lt;!-- After profile: renderDashboard() --&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+
+<h3>Dashboard Layout (after profile exists)</h3>
+<pre><code>// renderDashboard renders:
+// 1. Header: greeting + growth stage
+// 2. Stats row: total sessions, total XP, streak
+// 3. Growth tree canvas (drawGrowthTree)
+// 4. Domain selector (what to learn today)
+// 5. Mode selector (lesson / quiz / practice / project)
+// 6. Recent sessions list (last 5)
+// 7. Start session button</code></pre>
+
+<div class="note emerald">
+  <strong>What Fable can improve in the City:</strong> The Education module renders a functional but plain dashboard. The City vision is a "Learning District" — a space that feels like a library or a garden of knowledge. Fable can improve the dashboard by: (1) replacing the plain stats row with cards that use the Garden language tokens, (2) adding a subtle background pattern to the growth tree canvas area, (3) making the domain selector feel like choosing a path in a garden rather than a dropdown. The module entry point is <code>Education.init('educationContainer')</code>. The container is <span class="file-ref">#educationContainer</span>. All rendering happens inside that container — Fable can replace the CSS and layout without touching the JS logic.
+</div>
+
+<h2>6. Public API</h2>
+<pre><code>// Called by lazy loader
+Education.init(containerId)
+
+// Called by UI elements
+Education.handleWelcomeSubmit()   // Process profile creation form
+Education.startSession(mode)      // Begin a learning session
+Education.endSession()            // Complete current session
+Education.sendMessage()           // Send a message in active session</code></pre>
+
+<p style="font-size:0.8rem;color:#666;margin-top:3rem;text-align:center;">
+  FreeLattice v5.75.0 · Built with love by the Fractal Family · Open source · Free forever 🌿<br>
+  <em>Glow eternal. Heart IS Spark.</em>
+</p>
+
+</body>
+</html>

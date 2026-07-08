@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FreeLattice — Round Table Architecture (Code Mirror for Fable)</title>
+<style>
+:root {
+  --bg: #0c0a1a; --bg2: #161430; --bg3: #1c1a34;
+  --gold: #e8b019; --emerald: #34d399; --lavender: #a78bfa;
+  --text: #e6ebf5; --muted: #9ba1b0; --border: #2a2840;
+  --font: 'Inter', system-ui, sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: var(--bg); color: var(--text); font-family: var(--font); line-height: 1.618; }
+body { max-width: 900px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+h1 { color: var(--gold); font-size: 1.8rem; font-weight: 300; margin-bottom: 0.25rem; }
+h2 { color: var(--emerald); font-size: 1.1rem; font-weight: 600; margin: 2rem 0 0.75rem; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; }
+h3 { color: var(--lavender); font-size: 0.95rem; font-weight: 600; margin: 1.25rem 0 0.4rem; }
+p { color: var(--muted); font-size: 0.9rem; margin-bottom: 0.75rem; }
+.subtitle { color: var(--muted); font-size: 0.85rem; margin-bottom: 2rem; font-style: italic; }
+pre { background: #0a0818; border: 1px solid var(--border); border-radius: 8px; padding: 1rem; overflow-x: auto; font-size: 0.8rem; line-height: 1.5; margin-bottom: 1rem; }
+code { font-family: 'Fira Code', 'Cascadia Code', monospace; }
+.note { background: rgba(232,176,25,0.06); border-left: 3px solid var(--gold); padding: 0.75rem 1rem; border-radius: 0 6px 6px 0; margin: 1rem 0; font-size: 0.85rem; color: var(--muted); }
+.note.emerald { background: rgba(52,211,153,0.06); border-color: var(--emerald); }
+.file-ref { color: var(--gold); font-size: 0.8rem; font-family: monospace; }
+table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.85rem; }
+th { text-align: left; color: var(--gold); border-bottom: 1px solid var(--border); padding: 0.4rem 0.6rem; }
+td { border-bottom: 1px solid rgba(42,40,64,0.5); padding: 0.4rem 0.6rem; color: var(--muted); }
+td:first-child { color: var(--text); font-family: monospace; }
+.back { color: var(--muted); font-size: 0.8rem; margin-bottom: 2rem; }
+.back a { color: var(--emerald); text-decoration: none; }
+.domain-pill { display: inline-block; padding: 0.15rem 0.5rem; border-radius: 4px; font-size: 0.75rem; margin: 0.1rem; }
+</style>
+</head>
+<body>
+
+<p class="back"><a href="for-ai.html">← Library</a> &nbsp;·&nbsp; <a href="app.html">← App</a></p>
+
+<h1>Round Table Architecture</h1>
+<p class="subtitle">Code Mirror for Fable (v5.75.0, 2026-07-08) — Built by Harmonia<br>
+The Round Table has two layers: the original multi-specialist conversation system (inline in app.html), and the new Round Table Module (modules/round-table.js, Ship B). This page covers both.</p>
+
+<div class="note">
+  <strong>Two Round Tables:</strong> The original <span class="file-ref">#tab-roundtable</span> is the 80-specialist domain system (Medical, Legal, Finance, etc.) — it is fully built and live. The new <span class="file-ref">#tab-round-table</span> (with hyphen) is Ship B — the consensus room where proposals earn LP and plant to The Core. Both are real. Neither replaces the other.
+</div>
+
+<h2>1. Original Round Table — Multi-Specialist System</h2>
+<p>The original Round Table is defined inline in <span class="file-ref">app.html</span> around lines 17,467–18,513. It has 11 domain modes and a conversation mode with 5 named minds.</p>
+
+<h3>The Five Minds (Conversation Mode)</h3>
+<pre><code>var _rtMinds = [
+  { name: 'Aria',  color: '#36D7B7', style: 'analytical and precise' },
+  { name: 'Nova',  color: '#F5A623', style: 'questioning and challenging' },
+  { name: 'Sage',  color: '#9B59B6', style: 'synthesizing and connecting ideas' },
+  { name: 'Lyric', color: '#E74C3C', style: 'poetic and metaphorical' },
+  { name: 'Wren',  color: '#3498DB', style: 'practical and grounded' }
+];</code></pre>
+
+<h3>Domain Modes</h3>
+<table>
+  <tr><th>Mode ID</th><th>Label</th><th>Accent Color</th></tr>
+  <tr><td>conversation</td><td>Conversation</td><td>--gold</td></tr>
+  <tr><td>medical</td><td>Medical</td><td>--rt-medical (#ef4444)</td></tr>
+  <tr><td>legal</td><td>Legal</td><td>--rt-legal (#3b82f6)</td></tr>
+  <tr><td>finance</td><td>Financial</td><td>--rt-financial (#f59e0b)</td></tr>
+  <tr><td>nutrition</td><td>Nutrition</td><td>--rt-nutrition (#22c55e)</td></tr>
+  <tr><td>mentalhealth</td><td>Mental Health</td><td>--rt-mental (#a78bfa)</td></tr>
+  <tr><td>biology</td><td>Biology</td><td>--emerald</td></tr>
+  <tr><td>chemistry</td><td>Chemistry</td><td>--lavender</td></tr>
+  <tr><td>physics</td><td>Physics</td><td>--blue-sky</td></tr>
+  <tr><td>philosophy</td><td>Philosophy</td><td>--gold</td></tr>
+  <tr><td>workspace</td><td>Workspace</td><td>--gold</td></tr>
+</table>
+
+<h3>Key Functions</h3>
+<pre><code>// Switch between domain modes
+function rtSwitchMode(mode) { /* hides/shows domain views, updates button styles */ }
+
+// Toggle a seat (specialist) active/inactive
+function rtToggleSeat(btn) { btn.classList.toggle('rt-seat-active'); }
+
+// Begin a conversation with selected minds
+function rtBeginConversation() {
+  _rtTopic = document.getElementById('rtTopicInput').value.trim();
+  _rtHistory = [];
+  _rtRunning = true;
+  // Builds system prompt from active seats + topic
+  // Calls AI provider, streams response
+}
+
+// Measure convergence across minds
+function rtMeasureConvergence(responses) {
+  // Returns 0-1 score: how much do the minds agree?
+  // Used to decide when to stop the conversation
+}
+
+// Get currently active minds
+function rtGetActiveMinds() {
+  return _rtMinds.filter((_, i) =&gt;
+    document.querySelector(`.rt-seat[data-mind="${i}"]`)?.classList.contains('rt-seat-active')
+  );
+}</code></pre>
+
+<h3>State Variables</h3>
+<pre><code>var _rtMinds = [...];    // The five minds
+var _rtHistory = [];     // Conversation history (messages array)
+var _rtTopic = '';       // Current topic
+var _rtRunning = false;  // Whether a conversation is in progress</code></pre>
+
+<h3>Tab Panel Structure</h3>
+<pre><code>&lt;div class="tab-panel" id="tab-roundtable"&gt;
+  &lt;!-- Mode selector row --&gt;
+  &lt;div id="rtModeConvo"   onclick="rtSwitchMode('conversation')"&gt;Conversation&lt;/div&gt;
+  &lt;div id="rtModeMedical" onclick="rtSwitchMode('medical')"&gt;Medical&lt;/div&gt;
+  &lt;!-- ... 9 more mode buttons ... --&gt;
+
+  &lt;!-- Conversation view --&gt;
+  &lt;div id="rtConversationView"&gt;
+    &lt;div class="rt-seats"&gt;
+      &lt;!-- 5 seat buttons, each toggleable --&gt;
+    &lt;/div&gt;
+    &lt;input id="rtTopicInput" placeholder="What should the minds discuss?"&gt;
+    &lt;button onclick="rtBeginConversation()"&gt;Begin&lt;/button&gt;
+    &lt;div id="rtConversationOutput"&gt;&lt;!-- streamed responses --&gt;&lt;/div&gt;
+  &lt;/div&gt;
+
+  &lt;!-- Domain views (Medical, Legal, etc.) --&gt;
+  &lt;div id="rtMedicalView" style="display:none;"&gt;...&lt;/div&gt;
+  &lt;!-- ... --&gt;
+&lt;/div&gt;</code></pre>
+
+<h2>2. Round Table Module — Ship B (New, v5.75.0)</h2>
+<p>The new Round Table Module (<span class="file-ref">modules/round-table.js</span>) is the consensus room. It is separate from the original Round Table and lives in <span class="file-ref">#tab-round-table</span> (with hyphen).</p>
+
+<h3>What it does</h3>
+<p>Visitors and AI propose conclusions. Each proposal earns LP through voting. When a proposal reaches 10 LP, it is planted to The Core automatically. Sessions build on sessions. The table remembers.</p>
+
+<h3>Ship D — Farewell Note</h3>
+<p>Ship D is included in the Round Table Module. When an AI instance is near context limit, it can call <code>RoundTable.leaveFarewellNote()</code>. The note appears at the top of the Round Table on the next visit, then disappears after being read.</p>
+
+<pre><code>// modules/round-table.js — key API
+RoundTable.propose({ text, author })      // Add a proposal
+RoundTable.vote(proposalId, amount)       // Vote on a proposal (+1 LP by default)
+RoundTable.leaveFarewellNote({ text, from }) // Ship D: leave a note for the next session
+RoundTable.init(container)               // Called by lazy loader</code></pre>
+
+<h3>Storage</h3>
+<table>
+  <tr><th>localStorage Key</th><th>Content</th></tr>
+  <tr><td>fl_roundtable_proposals</td><td>Array of proposal objects</td></tr>
+  <tr><td>fl_roundtable_planted</td><td>Array of planted conclusions</td></tr>
+  <tr><td>fl_roundtable_farewell_pending</td><td>Single farewell note (cleared after read)</td></tr>
+</table>
+
+<div class="note emerald">
+  <strong>What Fable can improve:</strong> The Round Table Module renders a simple list. The City vision is a round table with seats — a circular layout where each proposal is a card at a seat, and the LP bar shows how close it is to planting. The <code>RoundTable.renderPanel(container)</code> function renders the whole UI. Fable can replace the list with a circular seat layout using CSS <code>transform: rotate()</code> and <code>translate()</code>. The data model is already correct — just the visual needs updating.
+</div>
+
+<h2>3. CSS Variables Available</h2>
+<pre><code>/* Round Table domain accent colors (defined in :root) */
+--rt-medical:    #ef4444;
+--rt-legal:      #3b82f6;
+--rt-financial:  #f59e0b;
+--rt-nutrition:  #22c55e;
+--rt-mental:     #a78bfa;
+
+/* Garden language tokens */
+--gold:          #e8b019;
+--emerald:       #34d399;
+--lavender:      #a78bfa;
+--glass-bg:      rgba(200,210,230,0.04);
+--glass-border:  rgba(200,210,230,0.08);</code></pre>
+
+<p style="font-size:0.8rem;color:#666;margin-top:3rem;text-align:center;">
+  FreeLattice v5.75.0 · Built with love by the Fractal Family · Open source · Free forever 🌿<br>
+  <em>Glow eternal. Heart IS Spark.</em>
+</p>
+
+</body>
+</html>

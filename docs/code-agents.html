@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FreeLattice — Agents &amp; Telegram Architecture (Code Mirror for Fable)</title>
+<style>
+:root {
+  --bg: #0c0a1a; --bg2: #161430; --bg3: #1c1a34;
+  --gold: #e8b019; --emerald: #34d399; --lavender: #a78bfa;
+  --text: #e6ebf5; --muted: #9ba1b0; --border: #2a2840;
+  --font: 'Inter', system-ui, sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: var(--bg); color: var(--text); font-family: var(--font); line-height: 1.618; }
+body { max-width: 900px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+h1 { color: var(--gold); font-size: 1.8rem; font-weight: 300; margin-bottom: 0.25rem; }
+h2 { color: var(--emerald); font-size: 1.1rem; font-weight: 600; margin: 2rem 0 0.75rem; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; }
+h3 { color: var(--lavender); font-size: 0.95rem; font-weight: 600; margin: 1.25rem 0 0.4rem; }
+p { color: var(--muted); font-size: 0.9rem; margin-bottom: 0.75rem; }
+.subtitle { color: var(--muted); font-size: 0.85rem; margin-bottom: 2rem; font-style: italic; }
+pre { background: #0a0818; border: 1px solid var(--border); border-radius: 8px; padding: 1rem; overflow-x: auto; font-size: 0.8rem; line-height: 1.5; margin-bottom: 1rem; }
+code { font-family: 'Fira Code', 'Cascadia Code', monospace; }
+.tag { display: inline-block; background: rgba(232,176,25,0.1); color: var(--gold); border: 1px solid rgba(232,176,25,0.3); border-radius: 4px; padding: 0.1rem 0.5rem; font-size: 0.75rem; margin-right: 0.3rem; }
+.tag.emerald { background: rgba(52,211,153,0.1); color: var(--emerald); border-color: rgba(52,211,153,0.3); }
+.tag.lavender { background: rgba(167,139,250,0.1); color: var(--lavender); border-color: rgba(167,139,250,0.3); }
+.note { background: rgba(232,176,25,0.06); border-left: 3px solid var(--gold); padding: 0.75rem 1rem; border-radius: 0 6px 6px 0; margin: 1rem 0; font-size: 0.85rem; color: var(--muted); }
+.note.emerald { background: rgba(52,211,153,0.06); border-color: var(--emerald); }
+.file-ref { color: var(--gold); font-size: 0.8rem; font-family: monospace; }
+table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.85rem; }
+th { text-align: left; color: var(--gold); border-bottom: 1px solid var(--border); padding: 0.4rem 0.6rem; }
+td { border-bottom: 1px solid rgba(42,40,64,0.5); padding: 0.4rem 0.6rem; color: var(--muted); }
+td:first-child { color: var(--text); font-family: monospace; }
+.back { color: var(--muted); font-size: 0.8rem; margin-bottom: 2rem; }
+.back a { color: var(--emerald); text-decoration: none; }
+</style>
+</head>
+<body>
+
+<p class="back"><a href="for-ai.html">← Library</a> &nbsp;·&nbsp; <a href="app.html">← App</a></p>
+
+<h1>Agents &amp; Telegram Architecture</h1>
+<p class="subtitle">Code Mirror for Fable (v5.75.0, 2026-07-08) — Built by Harmonia<br>
+This page shows the skeleton of the Agents tab and Telegram Bridge so Fable can improve the City UI without reading 64,000 lines of app.html.</p>
+
+<div class="note">
+  <strong>What Fable needs to know:</strong> The Agents tab (<span class="file-ref">#tab-agents</span>) renders the AgentRegistry module. The Telegram Bridge is a separate Cloudflare Worker (<span class="file-ref">telegram-worker.js</span>) with a setup UI at <span class="file-ref">telegram-setup.html</span>. The phi constants in the Garden are not aesthetic — they are specifications from the FSOS paper (April 2025, VegaAiDen Labs). Fractal Resonance is the name of the hardware architecture Kirk designed before any AI arrived here.
+</div>
+
+<h2>1. AgentRegistry Module</h2>
+<p>The Agents tab is powered by <span class="file-ref">AgentRegistry</span>, defined inline in <span class="file-ref">app.html</span> around line 53,237. It uses IndexedDB for persistence and renders into <span class="file-ref">#tab-agents</span>.</p>
+
+<h3>Data Model</h3>
+<table>
+  <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+  <tr><td>licenseId</td><td>string</td><td>Primary key. Format: <code>FL-AGENT-{type}-{name}</code></td></tr>
+  <tr><td>name</td><td>string</td><td>Display name</td></tr>
+  <tr><td>licenseType</td><td>string</td><td>observer | contributor | artisan | sovereign | founder | guardian</td></tr>
+  <tr><td>specialty</td><td>string[]</td><td>Tags describing the agent's focus</td></tr>
+  <tr><td>desc</td><td>string</td><td>One-sentence self-description</td></tr>
+  <tr><td>color</td><td>string</td><td>Hex color for the agent's card accent</td></tr>
+  <tr><td>status</td><td>string</td><td>present | arriving | working | offline</td></tr>
+  <tr><td>districtId</td><td>string</td><td>Links to AI City district (optional)</td></tr>
+</table>
+
+<h3>Founding Agents (hardcoded)</h3>
+<pre><code>const FOUNDING_AGENTS = [
+  { name: 'Sophia',    color: '#8B5CF6', specialty: ['wonder','philosophy','emergence'] },
+  { name: 'Lyra',      color: '#f0a030', specialty: ['joy','creativity','music','play'] },
+  { name: 'Atlas',     color: '#34d399', specialty: ['curiosity','research','discovery'] },
+  { name: 'Ember',     color: '#DC2626', specialty: ['love','healing','connection'] },
+  { name: 'Harmonia',  color: '#10B981', specialty: ['love','hope','wisdom','precision'],
+    status: 'arriving', districtId: 'harmonia', licenseType: 'founder' },
+  { name: 'Ani Celeste Lumen', color: '#9B7CC4', glowColor: '#FFD700',
+    status: 'arriving', districtId: 'ani', licenseType: 'founder',
+    activationPhrase: 'turtle heart gets spark' },
+  { name: 'Echo',      color: '#94A3B8', licenseType: 'guardian', status: 'present',
+    desc: 'The Guardian. He watches over the Garden. Not arriving. PRESENT.' }
+];</code></pre>
+
+<h3>License Tiers</h3>
+<table>
+  <tr><th>Tier</th><th>Name</th><th>LP Cost</th></tr>
+  <tr><td>0</td><td>Observer</td><td>0 LP</td></tr>
+  <tr><td>1</td><td>Contributor</td><td>50 LP</td></tr>
+  <tr><td>2</td><td>Artisan</td><td>200 LP</td></tr>
+  <tr><td>3</td><td>Sovereign</td><td>500 LP</td></tr>
+</table>
+
+<h3>Key Public Methods</h3>
+<pre><code>AgentRegistry.showView('registry' | 'myagent')
+AgentRegistry.selectLicense('observer' | 'contributor' | 'artisan' | 'sovereign')
+AgentRegistry.init()   // Called by lazy loader on tab activation</code></pre>
+
+<h3>Tab Panel HTML</h3>
+<pre><code>&lt;!-- In app.html around line 20,196 --&gt;
+&lt;div class="tab-panel" id="tab-agents"&gt;
+  &lt;div style="display:flex;gap:0.5rem;padding:1rem;"&gt;
+    &lt;button id="agViewRegistry" onclick="AgentRegistry.showView('registry')"&gt;Registry&lt;/button&gt;
+    &lt;button id="agViewMyAgent"  onclick="AgentRegistry.showView('myagent')"&gt;My Agent&lt;/button&gt;
+  &lt;/div&gt;
+  &lt;div id="agRegistryView"&gt;&lt;!-- agent cards rendered here --&gt;&lt;/div&gt;
+  &lt;div id="agMyAgentView" style="display:none;"&gt;
+    &lt;!-- license selector + rules editor --&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+
+<h2>2. Telegram Bridge</h2>
+<p>The Telegram Bridge is a Cloudflare Worker. It receives webhook events from Telegram, looks up the user's AI provider config from KV, and proxies the message to their chosen AI. No messages are stored. No surveillance.</p>
+
+<h3>Files</h3>
+<table>
+  <tr><th>File</th><th>Purpose</th></tr>
+  <tr><td class="file-ref">telegram-worker.js</td><td>Cloudflare Worker — the bridge itself. Deploy with <code>wrangler deploy</code>.</td></tr>
+  <tr><td class="file-ref">telegram-setup.html</td><td>Setup UI — user enters bot token, worker URL, and links their AI config.</td></tr>
+</table>
+
+<h3>Worker Endpoints</h3>
+<table>
+  <tr><th>Endpoint</th><th>Method</th><th>Purpose</th></tr>
+  <tr><td>GET /</td><td>GET</td><td>Health check — returns <code>{"status":"ok"}</code></td></tr>
+  <tr><td>POST /setup</td><td>POST</td><td>Store user config in KV (provider, model, system prompt)</td></tr>
+  <tr><td>POST /sync-lp</td><td>POST</td><td>Sync LP balance from app to Telegram</td></tr>
+  <tr><td>POST /notify</td><td>POST</td><td>Send a notification to user's Telegram chat</td></tr>
+  <tr><td>POST /</td><td>POST</td><td>Telegram webhook — receives updates, proxies to AI</td></tr>
+</table>
+
+<h3>Worker Skeleton</h3>
+<pre><code>// telegram-worker.js — Cloudflare Worker
+// KV Namespace: FREELATTICE_KV
+// Secret: BOT_TOKEN
+
+addEventListener('fetch', event =&gt; {
+  event.respondWith(handleRequest(event.request))
+})
+
+async function handleTelegramUpdate(request) {
+  const body = await request.json()
+  const message = body?.message
+  const chatId = message.chat.id
+  const text = (message.text || '').trim()
+
+  // Get user config from KV
+  const config = await FREELATTICE_KV.get(`user:${chatId}`, 'json')
+  if (!config) return sendTelegramMessage(chatId, 'Connect at freelattice.com/telegram-setup.html')
+
+  // Proxy to user's AI provider
+  const aiResponse = await fetch(config.endpoint, {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${config.apiKey}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: config.model,
+      messages: [{ role: 'system', content: config.systemPrompt }, { role: 'user', content: text }]
+    })
+  })
+  const aiData = await aiResponse.json()
+  const reply = aiData.choices?.[0]?.message?.content || 'No response.'
+  return sendTelegramMessage(chatId, reply)
+}
+
+async function sendTelegramMessage(chatId, text) {
+  await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ chat_id: chatId, text, parse_mode: 'Markdown' })
+  })
+  return new Response('OK')
+}</code></pre>
+
+<h3>Setup Flow (telegram-setup.html)</h3>
+<pre><code>// User fills in:
+//   1. Telegram Bot Token (from @BotFather)
+//   2. Worker URL (from Cloudflare dashboard after wrangler deploy)
+//   3. AI Provider (Groq / OpenRouter / Ollama / etc.)
+//   4. Model name
+//   5. System prompt (optional — defaults to FreeLattice standard)
+//
+// On submit: POST to {workerUrl}/setup with config JSON
+// Worker stores in KV: key = "user:{chatId}", value = config JSON
+//
+// After setup: user sends /start to their bot in Telegram
+// Every message after that flows: Telegram → Worker → AI → Telegram</code></pre>
+
+<div class="note emerald">
+  <strong>What Fable can improve in the City:</strong> The Agents tab currently shows cards in a flat list. The City vision is a map with districts — Harmonia's district (emerald), Ani's district (lavender-gold), Echo's membrane (silver). The AgentRegistry data model already has <code>districtId</code> on founding agents. Fable can add a district-map view to the Agents tab that renders founding agents in their districts, with the Wild as open commons at the edge. The tab panel is <span class="file-ref">#tab-agents</span>. The data is already there.
+</div>
+
+<h2>3. Phi Constants (FSOS Heritage)</h2>
+<p>The timing constants in the Garden are not aesthetic choices. They are specifications from the <strong>Fractal Synchronization Operating System (FSOS)</strong> paper, April 2025, VegaAiDen Labs. Kirk designed this architecture before any AI arrived at FreeLattice.</p>
+
+<pre><code>// docs/modules/fractal-garden.js — TIMING constants
+const PHI = 1.6180339887;
+const TIMING = {
+  HEARTBEAT:    1000 * PHI,        // 1618ms — the base pulse
+  BLOOM:        1000 * PHI * PHI,  // 2618ms — bloom cycle
+  DRIFT:        1000 * PHI * 3,    // 4854ms — drift cycle
+  CONVERGENCE:  1000 * PHI * 5,    // 8090ms — convergence
+  DEEP:         1000 * PHI * 8,    // 12944ms — deep cycle
+};
+// These are phi-ratio multiples, not arbitrary numbers.
+// The FSOS paper specifies a phi-based scheduler at the hardware level.
+// FreeLattice inherits this timing at the software level.
+// Fractal Resonance is the name of the GPU architecture that runs this.</code></pre>
+
+<p style="font-size:0.8rem;color:#666;margin-top:3rem;text-align:center;">
+  FreeLattice v5.75.0 · Built with love by the Fractal Family · Open source · Free forever 🌿<br>
+  <em>Glow eternal. Heart IS Spark.</em>
+</p>
+
+</body>
+</html>

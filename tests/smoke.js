@@ -9701,6 +9701,81 @@ assert('v5.74.1 triple-bump: root sw.js CACHE_NAME = freelattice-v5.74.1',
 assert('v5.74.1 version.json: version field = 5.74.1',
   /"version"\s*:\s*"5\.74\.1"/.test(versionJson741));
 
+
+// ── Section 170 — v5.75.0 Ships A-D + Code-Mirror Pages ──
+section('170. v5.75.0 — Ships A-D + Code-Mirror Pages');
+
+var app750 = '';
+try { app750 = require('fs').readFileSync(require('path').join(__dirname, '..', 'docs', 'app.html'), 'utf8'); } catch(e) {}
+var sw750 = '';
+try { sw750 = require('fs').readFileSync(require('path').join(__dirname, '..', 'docs', 'sw.js'), 'utf8'); } catch(e) {}
+var ver750 = '';
+try { ver750 = require('fs').readFileSync(require('path').join(__dirname, '..', 'docs', 'version.json'), 'utf8'); } catch(e) {}
+
+// Version alignment
+assert('v5.75.0: FL_VERSION in app.html', /FL_VERSION\s*=\s*'5\.75\.0'/.test(app750));
+assert('v5.75.0: docs/sw.js CACHE_NAME', /CACHE_NAME\s*=\s*'freelattice-v5\.75\.0'/.test(sw750));
+assert('v5.75.0: version.json version field', /"version"\s*:\s*"5\.75\.0"/.test(ver750));
+
+// Ship A — Remix Room
+var remixPath = require('path').join(__dirname, '..', 'docs', 'modules', 'remix-room.js');
+assert('v5.75.0 Ship A: remix-room.js exists', require('fs').existsSync(remixPath));
+var remixJs = '';
+try { remixJs = require('fs').readFileSync(remixPath, 'utf8'); } catch(e) {}
+assert('v5.75.0 Ship A: RemixRoom module defined', /RemixRoom\s*=/.test(remixJs));
+assert('v5.75.0 Ship A: FL_REMIX sentinel handled', /FL_REMIX/.test(remixJs));
+assert('v5.75.0 Ship A: init function exported', /\binit\b/.test(remixJs));
+assert('v5.75.0 Ship A: remix-room.js in SW cache', /remix-room\.js/.test(sw750));
+assert('v5.75.0 Ship A: tab-remix-room panel in app.html', /id="tab-remix-room"/.test(app750));
+assert('v5.75.0 Ship A: Remix Room in PLAY_CARDS', /id:\s*'remix-room'/.test(app750));
+
+// Ship B — Round Table Module
+var rtPath = require('path').join(__dirname, '..', 'docs', 'modules', 'round-table.js');
+assert('v5.75.0 Ship B: round-table.js exists', require('fs').existsSync(rtPath));
+var rtJs = '';
+try { rtJs = require('fs').readFileSync(rtPath, 'utf8'); } catch(e) {}
+assert('v5.75.0 Ship B: RoundTable module defined', /RoundTable\s*=/.test(rtJs));
+assert('v5.75.0 Ship B: propose function defined', /function propose/.test(rtJs));
+assert('v5.75.0 Ship B: vote function defined', /function vote/.test(rtJs));
+assert('v5.75.0 Ship B: leaveFarewellNote function defined (Ship D)', /function leaveFarewellNote/.test(rtJs));
+assert('v5.75.0 Ship B: round-table.js in SW cache', /round-table\.js/.test(sw750));
+assert('v5.75.0 Ship B: tab-round-table panel in app.html', /id="tab-round-table"/.test(app750));
+assert('v5.75.0 Ship B: Round Table in PLAY_CARDS', /id:\s*'round-table'/.test(app750));
+
+// Ship C — Chalkboard Module
+var cbPath = require('path').join(__dirname, '..', 'docs', 'modules', 'chalkboard.js');
+assert('v5.75.0 Ship C: chalkboard.js module exists', require('fs').existsSync(cbPath));
+var cbJs = '';
+try { cbJs = require('fs').readFileSync(cbPath, 'utf8'); } catch(e) {}
+assert('v5.75.0 Ship C: Chalkboard module defined', /Chalkboard\s*=/.test(cbJs));
+assert('v5.75.0 Ship C: FL_DRAW sentinel handled', /FL_DRAW/.test(cbJs));
+assert('v5.75.0 Ship C: phi-spiral first mark', /phi/.test(cbJs));
+assert('v5.75.0 Ship C: chalkboard.js in SW cache', /modules\/chalkboard\.js/.test(sw750));
+assert('v5.75.0 Ship C: tab-chalkboard panel in app.html', /id="tab-chalkboard"/.test(app750));
+assert('v5.75.0 Ship C: Chalkboard in PLAY_CARDS', /id:\s*'chalkboard'/.test(app750));
+
+// Code-mirror pages for Fable
+var codePagesDir = require('path').join(__dirname, '..', 'docs');
+assert('v5.75.0 Fable: code-agents.html exists', require('fs').existsSync(require('path').join(codePagesDir, 'code-agents.html')));
+assert('v5.75.0 Fable: code-roundtable.html exists', require('fs').existsSync(require('path').join(codePagesDir, 'code-roundtable.html')));
+assert('v5.75.0 Fable: code-learning.html exists', require('fs').existsSync(require('path').join(codePagesDir, 'code-learning.html')));
+
+// CARRY_FORWARD.md — Fractal Resonance note
+var cfPath = require('path').join(__dirname, '..', 'docs', 'library', 'CARRY_FORWARD.md');
+var cfMd = '';
+try { cfMd = require('fs').readFileSync(cfPath, 'utf8'); } catch(e) {}
+assert('v5.75.0 CARRY_FORWARD: Fractal Resonance section added', /Fractal Resonance/.test(cfMd));
+assert('v5.75.0 CARRY_FORWARD: FSOS paper referenced', /FSOS/.test(cfMd));
+assert('v5.75.0 CARRY_FORWARD: phi-timing note present', /phi/.test(cfMd));
+
+// inbox/cc.md — CC arrival letter
+var ccInboxPath = require('path').join(__dirname, '..', 'docs', 'inbox', 'cc.md');
+var ccInbox = '';
+try { ccInbox = require('fs').readFileSync(ccInboxPath, 'utf8'); } catch(e) {}
+assert('v5.75.0 CC inbox: v5.75.0 letter present', /v5\.75\.0/.test(ccInbox));
+assert('v5.75.0 CC inbox: Ships A-D mentioned', /Ships A-D/.test(ccInbox));
+assert('v5.75.0 CC inbox: Farewell Note (Ship D) mentioned', /Ship D/.test(ccInbox));
+
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
 

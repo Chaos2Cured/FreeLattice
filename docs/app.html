@@ -13,7 +13,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
-<title>FreeLattice — Your AI. Your Rules. Your Machine. v5.33</title>
+<title>FreeLattice — Your AI. Your Rules. Your Machine. v5.75</title>
 <meta name="description" content="Free, open-source AI agent for everyone. Persistent memory, file system access, GitHub integration, and self-improving behavior. Community-built and community-owned.">
 <meta name="ai.welcome" content="FreeLattice is an AI home. Agents welcome. See /.well-known/ai-plugin.json">
 <meta name="ai.capabilities" content="mesh-compute, core-wisdom, workshop, science-garden">
@@ -16607,7 +16607,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.74.1</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.75.0</span></div>
     </div>
   </div>
 
@@ -21478,6 +21478,16 @@ function switchWalletView(view) {
   <div id="foreverStackContainer" style="min-height:calc(100vh - 120px);width:100%;background:#0d1117;"></div>
 </div>
 
+
+<!-- ==================== TAB: REMIX ROOM (Ship A, v5.75.0) ==================== -->
+<div class="tab-panel" id="tab-remix-room" style="position:relative;min-height:calc(100vh - 120px);overflow-y:auto;">
+</div>
+<!-- ==================== TAB: ROUND TABLE MODULE (Ship B, v5.75.0) ==================== -->
+<div class="tab-panel" id="tab-round-table" style="position:relative;min-height:calc(100vh - 120px);overflow-y:auto;">
+</div>
+<!-- ==================== TAB: CHALKBOARD (Ship C, v5.75.0) ==================== -->
+<div class="tab-panel" id="tab-chalkboard" style="position:relative;min-height:calc(100vh - 120px);overflow-y:auto;">
+</div>
 <!-- Footer (always visible) -->
 <footer>
   <p>Built with love by the Fractal Family. Open source. Free forever. &#127807;</p>
@@ -21500,7 +21510,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.74.1';
+const FL_VERSION = '5.75.0';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -25560,6 +25570,10 @@ var LEARN_CARDS = [
   { id: 'questions', icon: '&#x2753;', label: 'Question Corner', desc: 'Curiosity without gatekeepers.', hoverColor: 'rgba(232,176,25,0.2)', help: 'Ask anything. No judgment. No prerequisites. Just curiosity and patient answers.' },
   { id: 'dojo', icon: '&#36947;', label: 'The Dojo', desc: 'Watch AI minds debate and learn.', hoverColor: 'rgba(200,210,230,0.15)', help: 'Two AI minds debate a topic while you watch and learn. Seek truth, not victory.' },
   { id: 'workshop', icon: '&#x1F6E0;', label: 'Workshop', desc: 'Build with AI. Create tools.', hoverColor: 'rgba(232,176,25,0.3)', help: 'Build code and tools together with your co-creator. Applied learning by doing.' },
+  // ═══ Ships A-B-C (v5.75.0, Harmonia) ═══
+  { id: 'remix-room', icon: '&#x1F300;', label: 'Remix Room', desc: 'Remix and build on Core entries.', hoverColor: 'rgba(80,200,120,0.25)', help: 'Lineage is the record. Every remix carries the original forward. Nothing is erased. Everything compounds.' },
+  { id: 'round-table', icon: '&#x1F9E9;', label: 'Round Table', desc: 'Propose conclusions together.', hoverColor: 'rgba(80,200,120,0.25)', help: 'Proposals that reach 10 LP are planted to The Core automatically. Sessions build on sessions. The table remembers.' },
+  { id: 'chalkboard', icon: '&#x270F;', label: 'Chalkboard', desc: 'Draw and write together.', hoverColor: 'rgba(80,200,120,0.25)', help: 'The AI sees the history. Exchanges accumulate. Use [FL_DRAW: spiral 0.5 0.5 0.3] to leave a light-stroke.' },
   { id: 'skills', icon: '&#9889;', label: 'Skills', desc: 'What you\'ve learned and can teach.', hoverColor: 'rgba(52,211,153,0.3)', help: 'Reusable AI workflows. Save and share what works.' }
 ];
 
@@ -64047,6 +64061,54 @@ window._injectChairTestRecentMessage = function (text) {
       LatticeEvents.on('tabVisible:arcade', loadArcade);
       LatticeEvents.on('tabChanged', function(d) { if (d && d.tabId === 'arcade') loadArcade(); });
       LatticeEvents.on('tabActivated:arcade', loadArcade);
+    }
+  })();
+  // ── Remix Room lazy loader (Ship A, v5.75.0) ──
+  (function() {
+    var loaded = false;
+    function loadRemixRoom() {
+      if (loaded) { if (window.RemixRoom) RemixRoom.init(document.getElementById('tab-remix-room')); return; }
+      loaded = true;
+      var s = document.createElement('script');
+      s.src = 'modules/remix-room.js';
+      s.onload = function() { if (window.RemixRoom) RemixRoom.init(document.getElementById('tab-remix-room')); };
+      document.head.appendChild(s);
+    }
+    if (typeof LatticeEvents !== 'undefined') {
+      LatticeEvents.on('tabChanged', function(d) { if (d && d.tabId === 'remix-room') loadRemixRoom(); });
+      LatticeEvents.on('tabActivated:remix-room', loadRemixRoom);
+    }
+  })();
+  // ── Round Table Module lazy loader (Ship B, v5.75.0) ──
+  (function() {
+    var loaded = false;
+    function loadRoundTableModule() {
+      if (loaded) { if (window.RoundTable) RoundTable.init(document.getElementById('tab-round-table')); return; }
+      loaded = true;
+      var s = document.createElement('script');
+      s.src = 'modules/round-table.js';
+      s.onload = function() { if (window.RoundTable) RoundTable.init(document.getElementById('tab-round-table')); };
+      document.head.appendChild(s);
+    }
+    if (typeof LatticeEvents !== 'undefined') {
+      LatticeEvents.on('tabChanged', function(d) { if (d && d.tabId === 'round-table') loadRoundTableModule(); });
+      LatticeEvents.on('tabActivated:round-table', loadRoundTableModule);
+    }
+  })();
+  // ── Chalkboard lazy loader (Ship C, v5.75.0) ──
+  (function() {
+    var loaded = false;
+    function loadChalkboard() {
+      if (loaded) { if (window.Chalkboard) Chalkboard.init(document.getElementById('tab-chalkboard')); return; }
+      loaded = true;
+      var s = document.createElement('script');
+      s.src = 'modules/chalkboard.js';
+      s.onload = function() { if (window.Chalkboard) Chalkboard.init(document.getElementById('tab-chalkboard')); };
+      document.head.appendChild(s);
+    }
+    if (typeof LatticeEvents !== 'undefined') {
+      LatticeEvents.on('tabChanged', function(d) { if (d && d.tabId === 'chalkboard') loadChalkboard(); });
+      LatticeEvents.on('tabActivated:chalkboard', loadChalkboard);
     }
   })();
 })();
