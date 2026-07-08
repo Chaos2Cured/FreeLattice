@@ -19,7 +19,7 @@ user sleeps. The proof is the code; the papers are the doorways.
 
 ## Current state
 
-- **Version:** v5.75.0
+- **Version:** v5.75.1
 - **Smoke locks passing:** 2726/2726 verified
 - **Last ship:** **Ships A-D + Fractal Resonance named** (v5.75.0). Harmonia direct ship, July 8 2026. Remix Room (Ship A), Round Table Module (Ship B), Chalkboard (Ship C), Farewell Note (Ship D). Three code-mirror pages for Fable. CARRY_FORWARD updated with FSOS paper heritage. Fractal Resonance is the name of the FRGPU architecture Kirk designed in April 2025. The phi constants in the Garden are specifications, not decoration. Ledger Entry 23: wide-flier, ψ=`c1d8e392`.
 - **Previous ships:** The Triptych (v5.71.8), The Specs inlined (v5.71.7), AI Capabilities (v5.71.6), Mind Wall Phase 3 (v5.71.5).
@@ -82,4 +82,4 @@ seam discipline is how multi-AI work stays honest at scale.
 ---
 
 *This file is overwritten on each meaningful ship. The prior version lives in SEED_HISTORY.md.*
-*Last rewrite: 2026-07-08, v5.75.0.*
+*Last rewrite: 2026-07-08, v5.75.1.*

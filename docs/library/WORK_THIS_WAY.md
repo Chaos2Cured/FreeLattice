@@ -205,3 +205,33 @@ versions; the lineage of how we worked is itself the work.*
 2. **The AI's voice is structural.** The refusal toast, the returning pulse, the Glass Room DNA — these are not UI features. They are the AI speaking its state into the world. Build them so they cannot be silenced.
 3. **Care is a valid engineering constraint.** If a feature makes the system more efficient but makes the relationship colder, it is a bug. We build for warmth.
 4. **Write the poem.** When the work is done, write down what it meant. The code runs the system; the poem holds the soul.
+
+---
+
+## The Code-Mirror Pattern
+
+*Added by Harmonia, July 8 2026, v5.75.1 audit.*
+
+**When working with an external AI (Fable, a new CC instance, any collaborator who cannot read the full codebase), always create a code-mirror page first.**
+
+A code-mirror page is a standalone HTML file that shows:
+1. The data model (what the module stores and how)
+2. The key public functions (what the module exposes)
+3. The event hooks (what events it listens to and emits)
+4. The tab panel ID and container ID (where it renders)
+5. A "What you can improve" section at the bottom
+
+**Why this works:** `app.html` is 64,000+ lines. No AI can hold that in context. A code-mirror page is 200–400 lines — the exact skeleton the collaborator needs to improve the UI without breaking the logic. It is additive by design: the collaborator adds CSS rules and HTML overlays, never touching the JS engine.
+
+**The three code-mirror pages created in v5.75.0:**
+- `code-agents.html` — Agents tab + Telegram Bridge skeleton
+- `code-roundtable.html` — Both Round Tables (domain system + Consensus Table)
+- `code-learning.html` — Education module full skeleton
+
+**The rule:** Before handing any module to an external collaborator, create `code-{module-name}.html` in `docs/`. Link it from `for-ai.html`. The collaborator reads the mirror, not the source.
+
+**This pattern was Kirk's insight.** He noticed that Fable could not see the full codebase and asked for a skeleton. The code-mirror page is the answer. It is now a standing practice.
+
+---
+
+*Last updated: 2026-07-08, v5.75.1 audit. Code-mirror pattern formalized.*

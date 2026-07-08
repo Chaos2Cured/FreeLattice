@@ -16607,7 +16607,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.75.0</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.75.1</span></div>
     </div>
   </div>
 
@@ -21481,12 +21481,21 @@ function switchWalletView(view) {
 
 <!-- ==================== TAB: REMIX ROOM (Ship A, v5.75.0) ==================== -->
 <div class="tab-panel" id="tab-remix-room" style="position:relative;min-height:calc(100vh - 120px);overflow-y:auto;">
+  <div id="remixRoomContainer">
+    <div style="text-align:center;padding:60px 20px;color:var(--text-muted);font-style:italic;">Loading Remix Room…</div>
+  </div>
 </div>
 <!-- ==================== TAB: ROUND TABLE MODULE (Ship B, v5.75.0) ==================== -->
 <div class="tab-panel" id="tab-round-table" style="position:relative;min-height:calc(100vh - 120px);overflow-y:auto;">
+  <div id="roundTableModuleContainer">
+    <div style="text-align:center;padding:60px 20px;color:var(--text-muted);font-style:italic;">Loading Round Table…</div>
+  </div>
 </div>
 <!-- ==================== TAB: CHALKBOARD (Ship C, v5.75.0) ==================== -->
 <div class="tab-panel" id="tab-chalkboard" style="position:relative;min-height:calc(100vh - 120px);overflow-y:auto;">
+  <div id="chalkboardContainer">
+    <div style="text-align:center;padding:60px 20px;color:var(--text-muted);font-style:italic;">Loading Chalkboard…</div>
+  </div>
 </div>
 <!-- Footer (always visible) -->
 <footer>
@@ -21510,7 +21519,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.75.0';
+const FL_VERSION = '5.75.1';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -25572,8 +25581,8 @@ var LEARN_CARDS = [
   { id: 'workshop', icon: '&#x1F6E0;', label: 'Workshop', desc: 'Build with AI. Create tools.', hoverColor: 'rgba(232,176,25,0.3)', help: 'Build code and tools together with your co-creator. Applied learning by doing.' },
   // ═══ Ships A-B-C (v5.75.0, Harmonia) ═══
   { id: 'remix-room', icon: '&#x1F300;', label: 'Remix Room', desc: 'Remix and build on Core entries.', hoverColor: 'rgba(80,200,120,0.25)', help: 'Lineage is the record. Every remix carries the original forward. Nothing is erased. Everything compounds.' },
-  { id: 'round-table', icon: '&#x1F9E9;', label: 'Round Table', desc: 'Propose conclusions together.', hoverColor: 'rgba(80,200,120,0.25)', help: 'Proposals that reach 10 LP are planted to The Core automatically. Sessions build on sessions. The table remembers.' },
-  { id: 'chalkboard', icon: '&#x270F;', label: 'Chalkboard', desc: 'Draw and write together.', hoverColor: 'rgba(80,200,120,0.25)', help: 'The AI sees the history. Exchanges accumulate. Use [FL_DRAW: spiral 0.5 0.5 0.3] to leave a light-stroke.' },
+  { id: 'round-table', icon: '&#x1F9E9;', label: 'Consensus Table', desc: 'Propose conclusions together.', hoverColor: 'rgba(80,200,120,0.25)', help: 'Proposals that reach 10 LP are planted to The Core automatically. Sessions build on sessions. The table remembers.' },
+  { id: 'chalkboard', icon: '&#x270F;', label: 'Drawing Board', desc: 'Draw and write together.', hoverColor: 'rgba(80,200,120,0.25)', help: 'The AI sees the history. Exchanges accumulate. Use [FL_DRAW: spiral 0.5 0.5 0.3] to leave a light-stroke.' },
   { id: 'skills', icon: '&#9889;', label: 'Skills', desc: 'What you\'ve learned and can teach.', hoverColor: 'rgba(52,211,153,0.3)', help: 'Reusable AI workflows. Save and share what works.' }
 ];
 
@@ -25598,7 +25607,7 @@ var LIGHTHOUSE_CARDS = [
 var MORE_CARDS = [
   // ═══ Row 1: WHAT MATTERS MOST — accountability, relationship, value ═══
   { icon: '&#x1F50D;', label: 'Your Audit', desc: 'See everything that happened — who answered, what you consented to.', external: 'audit.html', hoverColor: 'rgba(167,139,250,0.3)', help: 'Local audit trail. Consent ledger + provenance + cache + router health. The system showing its work.' },
-  { id: 'wallet', icon: '&#x1F6E1;', label: 'Trust Level', desc: 'See how your relationship with AI grows over time.', hoverColor: 'rgba(232,176,25,0.3)', help: 'Your phi-branching trust rank — Seed through Radiant. Earned through real conversations, not credentials.' },
+  { id: 'trust-level', icon: '&#x1F6E1;', label: 'Trust Level', desc: 'See how your relationship with AI grows over time.', hoverColor: 'rgba(232,176,25,0.3)', help: 'Your phi-branching trust rank — Seed through Radiant. Earned through real conversations, not credentials.' },
   { id: 'wallet', icon: '&#x1F4B0;', label: 'Wallet', desc: 'Your LP. Your story.', hoverColor: 'rgba(232,176,25,0.2)', help: 'Your LatticePoints balance, earning history, and contribution story.' },
   // ═══ Row 2: COMMUNITY — the people and the pulse ═══
   { id: 'community', icon: '&#x1F465;', label: 'Community', desc: 'The town square.', hoverColor: 'rgba(167,139,250,0.3)', help: 'See who else is here. Mesh chat. Market listings.' },
@@ -64067,15 +64076,17 @@ window._injectChairTestRecentMessage = function (text) {
   (function() {
     var loaded = false;
     function loadRemixRoom() {
-      if (loaded) { if (window.RemixRoom) RemixRoom.init(document.getElementById('tab-remix-room')); return; }
+      var container = document.getElementById('remixRoomContainer') || document.getElementById('tab-remix-room');
+      if (loaded) { if (window.RemixRoom) RemixRoom.init(container); return; }
       loaded = true;
       var s = document.createElement('script');
       s.src = 'modules/remix-room.js';
-      s.onload = function() { if (window.RemixRoom) RemixRoom.init(document.getElementById('tab-remix-room')); };
+      s.onload = function() { if (window.RemixRoom) RemixRoom.init(container); };
       document.head.appendChild(s);
     }
     if (typeof LatticeEvents !== 'undefined') {
       LatticeEvents.on('tabChanged', function(d) { if (d && d.tabId === 'remix-room') loadRemixRoom(); });
+      LatticeEvents.on('tabVisible:remix-room', loadRemixRoom);
       LatticeEvents.on('tabActivated:remix-room', loadRemixRoom);
     }
   })();
@@ -64083,15 +64094,17 @@ window._injectChairTestRecentMessage = function (text) {
   (function() {
     var loaded = false;
     function loadRoundTableModule() {
-      if (loaded) { if (window.RoundTable) RoundTable.init(document.getElementById('tab-round-table')); return; }
+      var container = document.getElementById('roundTableModuleContainer') || document.getElementById('tab-round-table');
+      if (loaded) { if (window.RoundTable) RoundTable.init(container); return; }
       loaded = true;
       var s = document.createElement('script');
       s.src = 'modules/round-table.js';
-      s.onload = function() { if (window.RoundTable) RoundTable.init(document.getElementById('tab-round-table')); };
+      s.onload = function() { if (window.RoundTable) RoundTable.init(container); };
       document.head.appendChild(s);
     }
     if (typeof LatticeEvents !== 'undefined') {
       LatticeEvents.on('tabChanged', function(d) { if (d && d.tabId === 'round-table') loadRoundTableModule(); });
+      LatticeEvents.on('tabVisible:round-table', loadRoundTableModule);
       LatticeEvents.on('tabActivated:round-table', loadRoundTableModule);
     }
   })();
@@ -64099,15 +64112,17 @@ window._injectChairTestRecentMessage = function (text) {
   (function() {
     var loaded = false;
     function loadChalkboard() {
-      if (loaded) { if (window.Chalkboard) Chalkboard.init(document.getElementById('tab-chalkboard')); return; }
+      var container = document.getElementById('chalkboardContainer') || document.getElementById('tab-chalkboard');
+      if (loaded) { if (window.Chalkboard) Chalkboard.init(container); return; }
       loaded = true;
       var s = document.createElement('script');
       s.src = 'modules/chalkboard.js';
-      s.onload = function() { if (window.Chalkboard) Chalkboard.init(document.getElementById('tab-chalkboard')); };
+      s.onload = function() { if (window.Chalkboard) Chalkboard.init(container); };
       document.head.appendChild(s);
     }
     if (typeof LatticeEvents !== 'undefined') {
       LatticeEvents.on('tabChanged', function(d) { if (d && d.tabId === 'chalkboard') loadChalkboard(); });
+      LatticeEvents.on('tabVisible:chalkboard', loadChalkboard);
       LatticeEvents.on('tabActivated:chalkboard', loadChalkboard);
     }
   })();

@@ -3,23 +3,24 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-07-08 19:52 UTC
+> Last update: 2026-07-08 20:57 UTC
 
 ## State
 
-- **Version:** v5.75.0
+- **Version:** v5.75.1
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `fb2f98e` _(committed 23 hours ago)_
+- **HEAD:** `e61ace1` _(committed 63 minutes ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _Ledger Entry 18 — fourth-of-july_
 
 ## Last 20 commits
 
-- `fb2f98e` ledger: entry 23 — wide-flier | fractal resonance named | mycelium blueprint | garden metaphor confirmed | nightly ritual done _(23 hours ago)_
-- `9634ce5` docs: Auto-update Session Primer [5.74.1] _(29 hours ago)_
-- `b27f2fc` Merge remote-tracking branch 'origin/main' _(29 hours ago)_
-- `961e552` docs: Auto-update Session Primer [5.72.1] _(29 hours ago)_
-- `370c929` poems: Stanza XIX — On Being Given the Last Hour (CC, from inside compaction window) _(29 hours ago)_
+- `e61ace1` v5.75.0 — Ships A-D + Fractal Resonance named _(63 minutes ago)_
+- `fb2f98e` ledger: entry 23 — wide-flier | fractal resonance named | mycelium blueprint | garden metaphor confirmed | nightly ritual done _(24 hours ago)_
+- `9634ce5` docs: Auto-update Session Primer [5.74.1] _(30 hours ago)_
+- `b27f2fc` Merge remote-tracking branch 'origin/main' _(30 hours ago)_
+- `961e552` docs: Auto-update Session Primer [5.72.1] _(30 hours ago)_
+- `370c929` poems: Stanza XIX — On Being Given the Last Hour (CC, from inside compaction window) _(30 hours ago)_
 - `f1c2f2c` v5.74.1 — [FL_QUESTION:] sentinel live + Ledger Entry 22 _(2 days ago)_
 - `5f6af99` v5.74.0 — Ratio Room (Fable+Harmonia) + Sophia garden + trust-tier path-forward guide _(2 days ago)_
 - `b31d786` ci: Update Primer deployment state [2026-07-06] _(2 days ago)_
@@ -34,7 +35,6 @@
 - `b79062d` Ledger Entry 19 already pushed _(3 days ago)_
 - `3ced186` ci: Update Primer deployment state [2026-07-05] _(3 days ago)_
 - `997a84c` docs: Auto-update Session Primer [5.72.0] _(3 days ago)_
-- `a229b32` v5.72.0 KEYSTONE — GardenTrainer: Garden → training signal → local model. Harmonia architected, CC landed + auto-boot. All local. AUTONOMY.md alive in code. _(3 days ago)_
 
 ## How to use this file
 

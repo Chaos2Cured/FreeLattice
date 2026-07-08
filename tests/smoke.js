@@ -9776,6 +9776,22 @@ assert('v5.75.0 CC inbox: v5.75.0 letter present', /v5\.75\.0/.test(ccInbox));
 assert('v5.75.0 CC inbox: Ships A-D mentioned', /Ships A-D/.test(ccInbox));
 assert('v5.75.0 CC inbox: Farewell Note (Ship D) mentioned', /Ship D/.test(ccInbox));
 
+
+// ── v5.75.1: The Pruning (Audit) ──────────────────────────────────────────
+var html751 = fs.readFileSync(path.join(DOCS, 'app.html'), 'utf8');
+var sw751 = fs.readFileSync(path.join(DOCS, 'sw.js'), 'utf8');
+var ver751 = JSON.parse(fs.readFileSync(path.join(DOCS, 'version.json'), 'utf8'));
+assert('v5.75.1: FL_VERSION in app.html', /FL_VERSION = '5\.75\.1'/.test(html751));
+assert('v5.75.1: docs/sw.js CACHE_NAME', sw751.includes('freelattice-v5.75.1'));
+assert('v5.75.1: version.json version field', ver751.version === '5.75.1');
+assert('v5.75.1: TRASH.md exists', fs.existsSync(path.join(DOCS, 'library', 'TRASH.md')));
+assert('v5.75.1: tab-remix-room has loading placeholder', html751.includes('remixRoomContainer') && html751.includes('Loading Remix Room'));
+assert('v5.75.1: tab-round-table has loading placeholder', html751.includes('roundTableModuleContainer') && html751.includes('Loading Round Table'));
+assert('v5.75.1: tab-chalkboard has loading placeholder', html751.includes('chalkboardContainer') && html751.includes('Loading Chalkboard'));
+assert("v5.75.1: duplicate wallet ID fixed", html751.includes("id: 'trust-level'"));
+assert("v5.75.1: Ship B renamed to Consensus Table", html751.includes("label: 'Consensus Table'"));
+assert("v5.75.1: Ship C renamed to Drawing Board", html751.includes("label: 'Drawing Board'"));
+
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
 
