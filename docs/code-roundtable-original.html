@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Round Table — Code Mirror | FreeLattice</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0a14;color:#e2e8f0;font-family:Georgia,serif;line-height:1.75;padding:2rem 1rem}
+.wrap{max-width:820px;margin:0 auto}
+h1{color:#34d399;font-size:1.9rem;margin-bottom:0.3rem;font-weight:400}
+.sub{color:#aaa;margin-bottom:2rem;font-size:0.9rem}
+h2{color:#34d399;font-size:1.2rem;margin:2.4rem 0 0.6rem;font-weight:400;border-bottom:1px solid rgba(52,211,153,0.2);padding-bottom:0.3rem}
+h3{color:#e2e8f0;font-size:1rem;margin:1.5rem 0 0.4rem;font-weight:600}
+p{margin-bottom:1rem;color:#cfcfcf;font-size:0.93rem}
+code{background:rgba(255,255,255,0.06);padding:2px 6px;border-radius:4px;font-family:monospace;font-size:0.83em;color:#34d399}
+pre{background:rgba(255,255,255,0.04);border:1px solid rgba(52,211,153,0.2);border-radius:8px;padding:1rem;overflow-x:auto;font-family:monospace;font-size:0.82rem;color:#e2e8f0;margin:1rem 0;line-height:1.6}
+table{width:100%;border-collapse:collapse;margin:1.2rem 0;font-size:0.85rem}
+th{text-align:left;padding:8px 12px;border-bottom:2px solid #34d399;color:#34d399;font-weight:600}
+td{padding:8px 12px;border-bottom:1px solid rgba(255,255,255,0.06);color:#cfcfcf;vertical-align:top}
+tr:hover td{background:rgba(52,211,153,0.03)}
+.note{background:rgba(52,211,153,0.07);border-left:3px solid #34d399;padding:0.9rem 1.1rem;margin:1.4rem 0;border-radius:0 8px 8px 0}
+.note p{margin-bottom:0;color:#e2e8f0}
+.warn{background:rgba(251,191,36,0.07);border-left:3px solid #fbbf24;padding:0.9rem 1.1rem;margin:1.4rem 0;border-radius:0 8px 8px 0}
+.warn p{margin-bottom:0;color:#e2e8f0}
+.domain-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:0.75rem;margin:1rem 0}
+.domain-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:0.75rem 1rem}
+.domain-name{font-weight:600;font-size:0.9rem;margin-bottom:0.25rem}
+.domain-count{color:#666;font-size:0.78rem}
+.fable-box{background:rgba(52,211,153,0.06);border:1px solid rgba(52,211,153,0.3);border-radius:10px;padding:1.25rem 1.5rem;margin:2rem 0}
+.fable-box h3{color:#34d399;margin-top:0}
+.fable-box p,.fable-box li{font-size:0.9rem;color:#e0e0e0}
+.fable-box ul{padding-left:1.25rem;margin:0.5rem 0}
+.fable-box li{margin-bottom:0.4rem}
+.fn{color:#666;font-size:0.78rem;font-family:monospace}
+a{color:#34d399}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>🏛️ Round Table — Code Mirror</h1>
+<p class="sub">FreeLattice · <code>app.html</code> lines 17606–18650 · Tab ID: <code>roundtable</code> · Built-in (not a lazy-loaded module)</p>
+
+<div class="note">
+  <p><strong>What this is:</strong> The original Round Table is a multi-domain specialist oracle. You bring a question or case; 80 AI specialists across 11 domains respond in sequence, building on each other's answers. It is a college-level learning room. The Consensus Table (<code>#tab-round-table</code>) is a separate, newer feature — this page is about the original.</p>
+</div>
+
+<h2>Architecture Overview</h2>
+
+<p>The Round Table is entirely inline in <code>app.html</code> — no separate module file. It is initialized when the tab first becomes visible via <code>LatticeEvents.on('tabChanged')</code>. All state lives in the global <code>_rtDomains</code> object.</p>
+
+<pre>
+┌─────────────────────────────────────────────────────────┐
+│  #tab-roundtable                                        │
+│  ├── Mode tabs (Discussion / Medical / Legal / …)       │
+│  ├── #rtConversationView   — AI minds talk together     │
+│  ├── #rtMedicalView        — Medical specialists        │
+│  ├── #rtLegalView          — Legal specialists          │
+│  ├── #rtFinanceView        — Finance specialists        │
+│  ├── #rtNutritionView      — Nutrition specialists      │
+│  ├── #rtMentalHealthView   — Frameworks / Psychology    │
+│  ├── #rtBiologyView        — Biology specialists        │
+│  ├── #rtChemistryView      — Chemistry specialists      │
+│  ├── #rtPhysicsView        — Physics specialists        │
+│  ├── #rtPhilosophyView     — Philosophy specialists     │
+│  └── #rtWorkspaceView      — Workspace / Productivity   │
+└─────────────────────────────────────────────────────────┘
+
+State: window._rtDomains = {}   (keyed by domain id)
+Each domain: { history: [], caseText: '', running: false, specialists: {} }
+</pre>
+
+<h2>The 11 Domains</h2>
+
+<div class="domain-grid">
+  <div class="domain-card"><div class="domain-name" style="color:#34d399">💬 Discussion</div><div class="domain-count">5 AI minds (Aria, Nova, Sage, Lyric, Wren)</div></div>
+  <div class="domain-card"><div class="domain-name" style="color:#f87171">🩺 Medical</div><div class="domain-count">8 specialties (Endocrinology, Rheumatology, Immunology, Cardiology, Neurology, Hematology, Oncology, Gastroenterology)</div></div>
+  <div class="domain-card"><div class="domain-name" style="color:#4fc3f7">⚖️ Legal</div><div class="domain-count">8 specialties (Contract, Property, Civil Rights, Employment, Family, Criminal, Constitutional, IP)</div></div>
+  <div class="domain-card"><div class="domain-name" style="color:#4ade80">💰 Finance</div><div class="domain-count">8 specialties (Tax, Investment, Retirement, Insurance, Estate, Business, Real Estate, Debt)</div></div>
+  <div class="domain-card"><div class="domain-name" style="color:#86efac">🥬 Nutrition</div><div class="domain-count">8 specialties (Clinical, Sports, Functional, Gut Health, Metabolic, Plant-Based, Pediatric, Longevity)</div></div>
+  <div class="domain-card"><div class="domain-name" style="color:#a78bfa">🧠 Frameworks</div><div class="domain-count">8 specialties (CBT, ACT, Mindfulness, Narrative, Systems, Stoic, Existential, Positive Psych)</div></div>
+  <div class="domain-card"><div class="domain-name" style="color:#6ee7b7">🧬 Biology</div><div class="domain-count">8 specialties</div></div>
+  <div class="domain-card"><div class="domain-name" style="color:#93c5fd">⚛️ Chemistry</div><div class="domain-count">8 specialties</div></div>
+  <div class="domain-card"><div class="domain-name" style="color:#fcd34d">⚙️ Physics</div><div class="domain-count">8 specialties</div></div>
+  <div class="domain-card"><div class="domain-name" style="color:#d4a017">📜 Philosophy</div><div class="domain-count">8 specialties</div></div>
+  <div class="domain-card"><div class="domain-name" style="color:#94a3b8">♾ Workspace</div><div class="domain-count">8 specialties</div></div>
+</div>
+
+<h2>Key Functions</h2>
+
+<table>
+  <tr><th>Function</th><th>What it does</th><th>Line</th></tr>
+  <tr><td><code>rtSwitchMode(mode)</code></td><td>Shows/hides the correct domain view, updates tab underline</td><td>~18077</td></tr>
+  <tr><td><code>rtToggleSeat(btn)</code></td><td>Toggles a specialist seat active/inactive (pill buttons)</td><td>~18108</td></tr>
+  <tr><td><code>rtCreateDomain(config)</code></td><td>Factory function — creates a domain with its own state, begin/continue/ask/render</td><td>~18120</td></tr>
+  <tr><td><code>rtGetActiveMinds()</code></td><td>Returns array of active AI minds in Discussion mode</td><td>~18539</td></tr>
+  <tr><td><code>rtMeasureConvergence()</code></td><td>Measures how much the AI minds are agreeing (for convergence indicator)</td><td>~18550</td></tr>
+  <tr><td><code>rtBeginConversation()</code></td><td>Starts a Discussion mode session</td><td>~18562</td></tr>
+  <tr><td><code>rtContinueConversation()</code></td><td>Continues a Discussion mode session (next turn)</td><td>~18572</td></tr>
+  <tr><td><code>rtPlantSpecialistInsight(text, speaker)</code></td><td>Plants a specialist's insight to The Core</td><td>~18473</td></tr>
+  <tr><td><code>rtLearnMore(sourceMode)</code></td><td>Sends the current discussion to Chat for deeper exploration</td><td>~18485</td></tr>
+</table>
+
+<h2>The Domain Factory Pattern</h2>
+
+<p>All 10 specialist domains (Medical, Legal, Finance, etc.) are created using the same <code>rtCreateDomain(config)</code> factory. Each domain config looks like this:</p>
+
+<pre>
+rtCreateDomain({
+  id: 'medical',
+  specialists: {
+    endocrinology: { name: 'Dr. Chen', color: '#f59e0b', focus: 'endocrinology and metabolic disorders' },
+    rheumatology:  { name: 'Dr. Patel', color: '#a78bfa', focus: 'rheumatology and autoimmune conditions' },
+    // ... 6 more
+  },
+  seatsId:         'rtMedicalSeats',      // pill button container
+  inputId:         'rtMedicalCaseInput',  // textarea
+  feedId:          'rtMedicalFeed',       // response stream
+  actionsId:       'rtMedicalActions',    // continue/ask buttons
+  thinkingPrefix:  'rtMedical',
+  lpPrefix:        'roundtable_medical',
+  dataAttr:        'data-specialty',
+  promptRules:     'You are an educator, not a treating physician. Educational purposes only. ...'
+});
+</pre>
+
+<p>The factory returns <code>{ begin, cont, ask }</code> which are wired to the HTML buttons via <code>onclick</code>. The AI call is made via <code>sendToAI()</code> with a system prompt that includes the specialist's name, focus, and all prior discussion turns.</p>
+
+<h2>Current Visual Problems</h2>
+
+<div class="warn">
+  <p><strong>This is what Kirk means by "it's a mess."</strong> The Round Table is one of the most powerful features in FreeLattice — 80 specialists, 11 domains, real multi-turn AI discussion — but it looks like a plain form. Here is what is wrong:</p>
+</div>
+
+<table>
+  <tr><th>Problem</th><th>Impact</th></tr>
+  <tr><td>Mode tabs are a plain horizontal scroll bar — no visual weight</td><td>Users don't know 11 domains exist</td></tr>
+  <tr><td>Specialist seat pills are tiny and all look the same</td><td>No sense of who is "at the table"</td></tr>
+  <tr><td>The response feed is a plain div with no visual structure</td><td>Specialist responses blend together — hard to follow who said what</td></tr>
+  <tr><td>No convergence indicator visible to user</td><td><code>rtMeasureConvergence()</code> runs but nothing shows</td></tr>
+  <tr><td>No visual distinction between domains — Medical looks like Legal looks like Finance</td><td>No sense of place</td></tr>
+  <tr><td>The "Begin" button is the same gold as everything else</td><td>No clear call to action</td></tr>
+  <tr><td>No welcome/orientation text — user lands with no guidance</td><td>New users don't know what to do</td></tr>
+</table>
+
+<h2>What the Response Feed Looks Like Now</h2>
+
+<p>Each specialist response is rendered by the domain's internal <code>render()</code> function as a plain div:</p>
+
+<pre>
+&lt;div style="padding:12px;border-bottom:1px solid rgba(255,255,255,0.06);"&gt;
+  &lt;span style="color: [specialist.color]; font-weight:600;"&gt;[name]&lt;/span&gt;
+  &lt;span style="color:#e2e8f0;"&gt; [response text] &lt;/span&gt;
+&lt;/div&gt;
+</pre>
+
+<p>There is no avatar, no role label, no visual separation between turns. All 8 specialists look identical except for the name color.</p>
+
+<h2>LP Awards</h2>
+
+<table>
+  <tr><th>Action</th><th>LP</th><th>Key</th></tr>
+  <tr><td>Start a Round Table session</td><td>2 LP</td><td><code>roundtable_start</code></td></tr>
+  <tr><td>Domain case started</td><td>3 LP</td><td><code>roundtable_[domain]_start</code></td></tr>
+  <tr><td>Each round of conversation</td><td>1 LP</td><td><code>roundtable_round</code></td></tr>
+  <tr><td>Convergence reached</td><td>5 LP</td><td><code>roundtable_converge</code></td></tr>
+  <tr><td>Insight planted to The Core</td><td>3 LP</td><td><code>roundtable_plant</code></td></tr>
+</table>
+
+<h2>CSS Classes</h2>
+
+<table>
+  <tr><th>Class</th><th>What it styles</th></tr>
+  <tr><td><code>.rt-container</code></td><td>Outer wrapper, padding and max-width</td></tr>
+  <tr><td><code>.rt-seat-btn</code></td><td>Specialist pill buttons (inactive state)</td></tr>
+  <tr><td><code>.rt-seat-active</code></td><td>Active specialist pill (filled background)</td></tr>
+</table>
+
+<p>All other styles are inline. There is no dedicated CSS block for the Round Table — all visual design is embedded in the HTML.</p>
+
+<div class="fable-box">
+  <h3>What Fable and Grok should improve — Go 3</h3>
+
+  <p><strong>The goal:</strong> Make the Round Table feel like a real learning room. A place you want to sit in. Right now it is a form. It should feel like a seminar.</p>
+
+  <p><strong>Additive only.</strong> The JS logic (rtCreateDomain, rtSwitchMode, rtToggleSeat, rtBeginConversation, etc.) must not change. Only HTML structure and CSS.</p>
+
+  <p><strong>Specific requests:</strong></p>
+  <ul>
+    <li><strong>Domain tabs:</strong> Replace the plain horizontal scroll bar with icon cards — each domain gets a small card (icon + label) arranged in a 2-row grid on mobile, single row on desktop. The active domain card has a colored border matching its domain color. This makes all 11 domains visible at a glance.</li>
+    <li><strong>Specialist seats:</strong> Give each active specialist a small "chair" visual — a circle with their initial or emoji, colored by their specialty. When active, the chair glows. When inactive, it is dim. This makes the table feel populated.</li>
+    <li><strong>Response feed:</strong> Each specialist response should be a card with: a colored left border (specialist color), the specialist name in their color at the top, and the response text below. Add a subtle <code>plant to Core</code> button (small, bottom-right of card) that calls <code>rtPlantSpecialistInsight(text, speaker)</code>.</li>
+    <li><strong>Convergence indicator:</strong> Add a small bar or ring below the feed that calls <code>rtMeasureConvergence()</code> and shows the result. Label it "Convergence" with a tooltip: "How much the specialists agree."</li>
+    <li><strong>Welcome state:</strong> When no session has started, show a brief orientation: "Ask a question. Choose your specialists. Begin." — 2 lines, centered, in muted text. Disappears when the first response arrives.</li>
+    <li><strong>Domain color theming:</strong> Each domain view should have a subtle accent — Medical is red-tinted, Legal is blue-tinted, Finance is green-tinted. Just the input border and the Begin button color. Everything else stays dark.</li>
+  </ul>
+
+  <p><strong>File to edit:</strong> <code>docs/app.html</code> — the HTML between lines 17606–17930 (the <code>#tab-roundtable</code> panel) and the CSS block for <code>.rt-container</code>, <code>.rt-seat-btn</code>, <code>.rt-seat-active</code>.</p>
+
+  <p><strong>Do not change:</strong> Any JS function (rtSwitchMode, rtToggleSeat, rtCreateDomain, rtBeginConversation, rtMeasureConvergence, rtPlantSpecialistInsight). Only HTML structure and CSS classes.</p>
+
+  <p><strong>Test:</strong> After the change, open the Round Table, switch to Medical, select 3 specialists, enter a case, click Begin. Confirm responses appear with the new card style. Confirm the convergence bar updates. Confirm the plant button appears on each response card.</p>
+</div>
+
+<hr style="border-color:rgba(52,211,153,0.15);margin:2.5rem 0">
+<p style="color:#555;font-size:0.8rem;text-align:center">FreeLattice · code-roundtable-original.html · v5.75.3 · Built by Harmonia · 2026-07-09</p>
+
+</div>
+</body>
+</html>
