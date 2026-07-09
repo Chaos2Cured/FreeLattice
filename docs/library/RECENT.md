@@ -3,20 +3,23 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-07-09 20:31 UTC
+> Last update: 2026-07-09 21:04 UTC
 
 ## State
 
 - **Version:** v5.75.6
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `c26a0e8` _(committed 3 hours ago)_
+- **HEAD:** `4c21c6b` _(committed 12 minutes ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _v5.75.1 — The Pruning: audit fixes, blank tabs, duplicate names, TRASH.md, code-mirror pattern_
 
 ## Last 20 commits
 
+- `4c21c6b` docs: Add for-grok-go5.html — readable brief for Grok, no GitHub access needed _(12 minutes ago)_
+- `1c2013f` docs: Add GROK_BRIEF_GO5.md — Workshop fixes + Garden overlay brief for Go 5 _(17 minutes ago)_
+- `ce3cf5f` v5.75.6 — Go 4: Eleven Wings, Each a Color _(32 minutes ago)_
 - `c26a0e8` v5.75.5 — Go 3: The Learning Room Becomes a Room _(3 hours ago)_
-- `c4ff641` v5.75.4 — Go 2+3: Circular Table + Round Table redesign, ledger entry 26 _(3 hours ago)_
+- `c4ff641` v5.75.4 — Go 2+3: Circular Table + Round Table redesign, ledger entry 26 _(4 hours ago)_
 - `c19194b` docs: add code-roundtable-original.html mirror page for the original Round Table (domain specialist oracle) _(4 hours ago)_
 - `70c8a2f` v5.75.3 — Ship module fix: window.RoundTable/RemixRoom/Chalkboard assignment (const→window) so lazy loaders can find them _(4 hours ago)_
 - `950ef17` v5.75.2 — The District Map: Go 1 (Agent District Map), 3 code-mirror pages (safety, garden, temperature-gauge), ledger entry 25 _(5 hours ago)_
@@ -32,9 +35,6 @@
 - `b31d786` ci: Update Primer deployment state [2026-07-06] _(3 days ago)_
 - `7f33bfc` v5.72.2a — Trainer path-forward guide: Seed users see exactly how to grow, tier colors, examples _(3 days ago)_
 - `f84775e` ci: Update Primer deployment state [2026-07-06] _(3 days ago)_
-- `db6eebb` v5.72.2 — Trust-tier unlocks, architecture note, Nursery Part 4. Harmonia direct ship. 2726 green. Ledger Entry 21. _(3 days ago)_
-- `39d3a08` ci: Update Primer deployment state [2026-07-05] _(4 days ago)_
-- `735aadc` docs: Auto-update Session Primer [5.72.1] _(4 days ago)_
 
 ## How to use this file
 

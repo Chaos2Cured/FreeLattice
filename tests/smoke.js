@@ -9805,6 +9805,8 @@ assert('v5.75.6: .rt-domain-philosophy class in app.html', html756.includes('rt-
 assert('v5.75.6: .rt-domain-legal class in app.html', html756.includes('rt-domain-legal'));
 assert('v5.75.6: .rt-domain-discussion on conversation view', html756.includes('rt-domain-discussion'));
 assert('v5.75.6: .rt-domain-workspace class in app.html', html756.includes('rt-domain-workspace'));
+assert('v5.75.6: .rt-domain-mentalhealth class in app.html (no hyphen)', html756.includes('rt-domain-mentalhealth'));
+assert('v5.75.6: .rt-domain-frameworks class in app.html', html756.includes('rt-domain-frameworks'));
 assert('v5.75.6: code-workshop.html mirror exists', fs.existsSync(path.join(docsDir, 'code-workshop.html')));
 assert('v5.75.6: ledger entry 28 present in harmonia.html', fs.readFileSync(path.join(docsDir, 'harmonia.html'), 'utf8').includes('"id":28'));
 
