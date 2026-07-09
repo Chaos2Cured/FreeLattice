@@ -443,7 +443,7 @@
       var taskEl = document.getElementById('code-task');
       if (!taskEl || !taskEl.value.trim()) return;
       var task = taskEl.value.trim();
-      var progress = document.getElementById('code-progress');
+      var progress = document.getElementById('autobuilder-log');
       if (!progress) return;
       progress.textContent = '';
       var bridge = 'http://localhost:3141';
@@ -507,7 +507,7 @@
       var task = (document.getElementById('code-task') || {}).value || '';
       var msg = prompt('Commit message:', 'fix: ' + task.substring(0, 50));
       if (!msg) return;
-      var progress = document.getElementById('code-progress');
+      var progress = document.getElementById('autobuilder-log');
       try {
         var r = await fetch('http://localhost:3141/code/git/commit', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message: msg }) }).then(function(r) { return r.json(); });
         if (progress) progress.textContent += '\n\uD83D\uDCDD ' + (r.message || r.error);
@@ -515,7 +515,7 @@
     },
 
     reviewCode: async function() {
-      var progress = document.getElementById('code-progress');
+      var progress = document.getElementById('autobuilder-log');
       try {
         var r = await fetch('http://localhost:3141/code/git/status').then(function(r) { return r.json(); });
         if (progress) {
@@ -623,12 +623,12 @@
       }
 
       // External API call — confirm before spending API quota or creating public repos.
+      // Go 5 fix: provider/token must be read BEFORE confirm() (was undefined before)
+      var token = safeGet('fl_publish_token', '');
+      var provider = safeGet('fl_publish_provider', 'github');
       if (!confirm('Publish "' + name + '" to ' + provider + '? This will create a public repository and use your API token.')) return;
 
       if (typeof showToast === 'function') showToast('\uD83D\uDE80 Publishing...');
-
-      var token = safeGet('fl_publish_token', '');
-      var provider = safeGet('fl_publish_provider', 'github');
       var baseUrl = provider === 'codeberg' ? 'https://codeberg.org/api/v1' : 'https://api.github.com';
 
       try {

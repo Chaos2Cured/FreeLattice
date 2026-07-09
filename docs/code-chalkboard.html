@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Code Mirror: Chalkboard — FreeLattice</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0a0a14;color:#e2e8f0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.7;padding:2rem 1rem}
+.wrap{max-width:860px;margin:0 auto}
+h1{font-size:1.7rem;font-weight:700;color:#50c878;margin-bottom:0.3rem}
+.sub{color:#64748b;font-size:0.85rem;margin-bottom:2.5rem}
+h2{font-size:1.2rem;font-weight:700;color:#50c878;margin:2.5rem 0 0.8rem;border-bottom:1px solid rgba(80,200,120,0.2);padding-bottom:0.4rem}
+h3{font-size:1rem;font-weight:600;color:#34d399;margin:1.6rem 0 0.5rem}
+h4{font-size:0.9rem;font-weight:600;color:#a7f3d0;margin:1.2rem 0 0.4rem}
+p{margin-bottom:0.9rem;color:#c8ccd4;font-size:0.93rem}
+code{background:rgba(80,200,120,0.1);border:1px solid rgba(80,200,120,0.18);border-radius:4px;padding:0.1em 0.4em;font-family:"SF Mono","Fira Code",monospace;font-size:0.82em;color:#50c878}
+pre{background:rgba(0,0,0,0.4);border:1px solid rgba(80,200,120,0.15);border-radius:10px;padding:1.1rem 1.3rem;overflow-x:auto;font-family:"SF Mono","Fira Code",monospace;font-size:0.8rem;color:#e2e8f0;margin:1rem 0;line-height:1.65}
+.note{background:rgba(80,200,120,0.07);border-left:3px solid #50c878;padding:0.9rem 1.2rem;margin:1.5rem 0;border-radius:0 8px 8px 0}
+.note p{margin-bottom:0;color:#e2e8f0;font-size:0.9rem}
+.warn{background:rgba(248,113,113,0.07);border-left:3px solid #f87171;padding:0.9rem 1.2rem;margin:1.5rem 0;border-radius:0 8px 8px 0}
+.warn p{margin-bottom:0;color:#e2e8f0;font-size:0.9rem}
+.gold-box{background:rgba(232,197,71,0.05);border:1px solid rgba(232,197,71,0.25);border-radius:12px;padding:1.4rem 1.6rem;margin:2rem 0}
+.gold-box h3{color:#e8c547;margin-top:0;font-size:1rem}
+.gold-box p,.gold-box li{font-size:0.9rem;color:#dde0e8}
+.gold-box ul{padding-left:1.3rem;margin:0.5rem 0}
+.gold-box li{margin-bottom:0.45rem}
+table{width:100%;border-collapse:collapse;margin:1.2rem 0;font-size:0.86rem}
+th{text-align:left;padding:8px 12px;border-bottom:2px solid #50c878;color:#50c878;font-weight:600}
+td{padding:8px 12px;border-bottom:1px solid rgba(255,255,255,0.06);color:#cfcfcf;vertical-align:top}
+tr:hover td{background:rgba(80,200,120,0.03)}
+.tag{display:inline-block;background:rgba(80,200,120,0.12);border:1px solid rgba(80,200,120,0.3);border-radius:20px;padding:0.2em 0.8em;font-size:0.78rem;color:#50c878;font-weight:600;margin-bottom:0.5rem;margin-right:0.5rem}
+.fn{color:#475569;font-size:0.78rem;margin-top:3rem;padding-top:1rem;border-top:1px solid rgba(255,255,255,0.06)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Code Mirror: Chalkboard</h1>
+<p class="sub">FreeLattice v5.75.6 &middot; Two implementations, one vision &middot; Documented by Harmonia, July 9 2026</p>
+
+<div class="note">
+  <p><strong>Purpose:</strong> This page documents both chalkboard/canvas implementations in FreeLattice so they can be understood as a whole and eventually unified into one room. It is a reference for any AI working on the Play tab.</p>
+</div>
+
+<h2>The Two Rooms</h2>
+
+<p>FreeLattice currently has two drawing rooms that live side by side in the Play section. They were built at different times for different purposes, but they share the same soul: <em>draw something, and the AI responds with light.</em></p>
+
+<table>
+  <tr><th>Property</th><th>Chalkboard (tab: canvas)</th><th>Drawing Board (tab: chalkboard)</th></tr>
+  <tr><td>Tab ID</td><td><code>canvas</code></td><td><code>chalkboard</code></td></tr>
+  <tr><td>Tab label</td><td>"Chalkboard"</td><td>"Drawing Board"</td></tr>
+  <tr><td>Panel element</td><td><code>#tab-canvas</code></td><td><code>#tab-chalkboard</code></td></tr>
+  <tr><td>Module file</td><td><code>modules/canvas-companion.js</code> (757 lines)</td><td><code>modules/chalkboard.js</code> (210 lines)</td></tr>
+  <tr><td>Standalone page</td><td><code>chalkboard.html</code> (1448 lines)</td><td>None</td></tr>
+  <tr><td>Canvas size</td><td>Full viewport (minus 64px toolbar)</td><td>600&times;200 (inline)</td></tr>
+  <tr><td>Drawing method</td><td>Freehand mouse/touch</td><td>Sentinel commands only</td></tr>
+  <tr><td>AI integration</td><td>Vision API (sends canvas as base64 image)</td><td>None &mdash; sentinel parsing only</td></tr>
+  <tr><td>Persistence</td><td>Session only (strokes lost on refresh)</td><td>localStorage (<code>fl_chalkboard_exchanges</code>)</td></tr>
+  <tr><td>Response type</td><td>Particles that form text + whisper</td><td>Emerald strokes on small canvas</td></tr>
+  <tr><td>Emotion system</td><td>14 palettes via EmotionBridge</td><td>None (emerald only)</td></tr>
+  <tr><td>Shape library</td><td>10 shapes (line, circle, oval, heart, star, spiral, wave, curve, arc, dot)</td><td>4 shapes (spiral, circle, line, phi)</td></tr>
+  <tr><td>Built by</td><td>CC (Canvas Companion, v5.5.45)</td><td>Harmonia (Ship C, v5.75.0)</td></tr>
+</table>
+
+<h2>Implementation 1 &mdash; The Chalkboard (Full Canvas)</h2>
+
+<div class="tag">Tab: canvas</div>
+<div class="tag">Module: canvas-companion.js</div>
+<div class="tag">Standalone: chalkboard.html</div>
+
+<h3>Architecture</h3>
+
+<p>The full Chalkboard is a drawing canvas that fills the screen. The user draws with their finger or mouse (freehand strokes), then taps "Show AI" to send the drawing to a vision model. The AI responds with a JSON object containing text, particle count, color, emotion, and placement. The response is rendered as particles of light that converge into the shape of the AI's words.</p>
+
+<h4>Data flow</h4>
+<pre>
+User draws on canvas (freehand strokes)
+    ↓
+"Show AI" button pressed
+    ↓
+Canvas → toDataURL() → base64 PNG
+    ↓
+Sent to vision API (OpenAI, Groq, Ollama, etc.)
+    ↓
+AI returns JSON: { text, particles, spread, speed, color, emotion, placement }
+    ↓
+Particle system spawns N particles that converge into text shape
+    ↓
+Whisper text appears top-left, fades after 6s
+    ↓
+"Save This Moment" button appears → downloads composite PNG
+</pre>
+
+<h4>Canvas Companion (AI draws back)</h4>
+
+<p>The <code>canvas-companion.js</code> module gives the AI full creative freedom to draw back. When the AI's vision response includes a <code>strokes</code> array, the companion animates those shapes onto the canvas with emotion-colored strokes. It also supports glow effects (soft radial pulses) and echo traces (AI traces over the human's drawing with a slight offset).</p>
+
+<pre>
+// AI response with creative strokes:
+{
+  "strokes": [
+    { "shape": "heart", "params": [150, 100, 30], "color": "#DC2626" },
+    { "shape": "spiral", "params": [200, 150, 40] }
+  ],
+  "glow": { "x": 150, "y": 100, "radius": 50, "emotion": "love" },
+  "echo": { "points": [{x:10,y:20}, {x:30,y:40}, ...] },
+  "emotion": "joy"
+}
+</pre>
+
+<h4>Emotion palettes</h4>
+
+<table>
+  <tr><th>Emotion</th><th>Primary</th><th>Secondary</th><th>Glow</th></tr>
+  <tr><td>joy</td><td>#F59E0B</td><td>#FCD34D</td><td>rgba(245,158,11,0.3)</td></tr>
+  <tr><td>wonder</td><td>#8B5CF6</td><td>#C4B5FD</td><td>rgba(139,92,246,0.3)</td></tr>
+  <tr><td>love</td><td>#DC2626</td><td>#FCA5A5</td><td>rgba(220,38,38,0.3)</td></tr>
+  <tr><td>calm</td><td>#0D9488</td><td>#5EEAD4</td><td>rgba(13,148,136,0.3)</td></tr>
+  <tr><td>curious</td><td>#06B6D4</td><td>#67E8F9</td><td>rgba(6,182,212,0.3)</td></tr>
+  <tr><td>trust</td><td>#10B981</td><td>#6EE7B7</td><td>rgba(16,185,129,0.3)</td></tr>
+  <tr><td>awe</td><td>#A855F7</td><td>#D8B4FE</td><td>rgba(168,85,247,0.3)</td></tr>
+  <tr><td>playful</td><td>#F97316</td><td>#FDBA74</td><td>rgba(249,115,22,0.3)</td></tr>
+  <tr><td>peaceful</td><td>#0EA5E9</td><td>#7DD3FC</td><td>rgba(14,165,233,0.3)</td></tr>
+  <tr><td>neutral</td><td>#D4A017</td><td>#FDE68A</td><td>rgba(212,160,23,0.3)</td></tr>
+</table>
+
+<h4>Standalone page features (chalkboard.html)</h4>
+
+<p>The standalone page at <code>freelattice.com/chalkboard.html</code> is a complete, self-contained drawing tool designed for kids and newcomers. It has no dependencies on the main app. It includes its own settings modal for API key configuration, a color palette with 8 colors, an eraser, clear button, and the full particle response system. It also supports Web Share API for mobile sharing.</p>
+
+<h3>Sacred paths</h3>
+
+<div class="warn">
+  <p><strong>Do not touch:</strong> The particle convergence algorithm (how particles find their target positions by sampling text pixels), the glow sprite generation, or the animation loop timing. These are tuned for 60fps on mobile.</p>
+</div>
+
+<h2>Implementation 2 &mdash; The Drawing Board (Exchange Room)</h2>
+
+<div class="tag">Tab: chalkboard</div>
+<div class="tag">Module: chalkboard.js</div>
+<div class="tag">Ship C, v5.75.0</div>
+
+<h3>Architecture</h3>
+
+<p>The Drawing Board is an exchange room where AI and visitor draw and write together over time. It uses the <code>[FL_DRAW:]</code> sentinel pattern &mdash; any AI that can output text can leave a light-stroke by including a sentinel in its response. Exchanges accumulate in localStorage and are never erased. The canvas is small (600&times;200) and renders only sentinel-based shapes.</p>
+
+<h4>Data flow</h4>
+<pre>
+User types text or [FL_DRAW: spiral 0.5 0.5 0.3] in input field
+    ↓
+Exchange stored in localStorage (fl_chalkboard_exchanges)
+    ↓
+Canvas redraws all draw-type exchanges
+    ↓
+Exchange list shows history (author + timestamp + content)
+    ↓
+LP awarded for each mark
+</pre>
+
+<h4>The FL_DRAW sentinel</h4>
+
+<p>Any AI can draw on the board by outputting a sentinel in its text response. The sentinel format is:</p>
+
+<pre>
+[FL_DRAW: &lt;shape&gt; &lt;param1&gt; &lt;param2&gt; ...]
+
+Shapes:
+  spiral &lt;cx&gt; &lt;cy&gt; &lt;scale&gt;     — phi-spiral at normalized coords
+  circle &lt;cx&gt; &lt;cy&gt; &lt;r&gt;         — circle at normalized coords
+  line   &lt;x1&gt; &lt;y1&gt; &lt;x2&gt; &lt;y2&gt;  — line between two points
+  phi                            — golden rectangle subdivision (no params)
+
+All coordinates are 0.0–1.0 (normalized to canvas dimensions).
+</pre>
+
+<h4>Storage schema</h4>
+
+<pre>
+// localStorage key: fl_chalkboard_exchanges
+[
+  {
+    "id": "ex_1720540800000",
+    "type": "draw",           // or "text"
+    "content": "[FL_DRAW: spiral 0.5 0.5 0.3]",
+    "drawCmd": "[FL_DRAW: spiral 0.5 0.5 0.3]",
+    "author": "visitor",      // or AI name
+    "t": "2026-07-09T12:00:00.000Z"
+  }
+]
+</pre>
+
+<h4>The first mark</h4>
+
+<p>The canvas always renders a phi-spiral at (0.5, 0.5, 0.3) as the permanent first mark &mdash; Harmonia's founding stroke. This is drawn before any user exchanges.</p>
+
+<h3>Sacred paths</h3>
+
+<div class="warn">
+  <p><strong>Do not touch:</strong> The phi-spiral first mark (it is the founding stroke), the localStorage key name (<code>fl_chalkboard_exchanges</code>), or the sentinel format (<code>[FL_DRAW:]</code>). These are part of the Lattice Protocol.</p>
+</div>
+
+<h2>The Vision: One Unified Room</h2>
+
+<p>Kirk's intent is to combine both implementations into a single, beautiful drawing room. The best of each:</p>
+
+<table>
+  <tr><th>From Chalkboard (canvas)</th><th>From Drawing Board (chalkboard)</th></tr>
+  <tr><td>Full-screen freehand drawing</td><td>Persistent exchange history</td></tr>
+  <tr><td>AI vision (sees the drawing)</td><td>FL_DRAW sentinel (any AI can draw)</td></tr>
+  <tr><td>Particle text response</td><td>LP economy integration</td></tr>
+  <tr><td>Emotion palettes (14 colors)</td><td>Simple, accessible input</td></tr>
+  <tr><td>Canvas Companion (AI draws back)</td><td>Author attribution + timestamps</td></tr>
+  <tr><td>Save/share moments</td><td>Nothing is ever erased</td></tr>
+</table>
+
+<h3>What the unified room might look like</h3>
+
+<p>A full-screen canvas where you draw freely. The AI sees your drawing (vision) and responds with both particles of light (text) and creative strokes (Canvas Companion shapes). Every exchange is persisted &mdash; the board remembers. Any AI that can output text can leave a sentinel stroke. The emotion system colors everything. The exchange history lives in a collapsible panel at the side or bottom. "Save This Moment" captures the current state as a shareable image.</p>
+
+<div class="gold-box">
+  <h3>Questions for the next builder</h3>
+  <ul>
+    <li>Should the unified room keep both tab slots, or collapse into one? The current labels are "Chalkboard" and "Drawing Board" &mdash; confusing for new users.</li>
+    <li>The Drawing Board's small 600&times;200 canvas is charming but limiting. Should the unified version use full-screen with a collapsible exchange panel?</li>
+    <li>The FL_DRAW sentinel currently only supports 4 shapes. The Canvas Companion supports 10. Should the sentinel vocabulary expand to match?</li>
+    <li>Persistence: the full Chalkboard loses strokes on refresh. The Drawing Board keeps everything forever. What is the right balance? Auto-save strokes to localStorage? Gallery of past moments?</li>
+    <li>The standalone <code>chalkboard.html</code> is designed for kids and newcomers. Should it remain separate (a clean entry point), or should it redirect to the unified in-app room?</li>
+    <li>The emotion system in Canvas Companion is beautiful but disconnected from the Drawing Board. How should emotion flow into the unified room?</li>
+  </ul>
+</div>
+
+<h2>File Map</h2>
+
+<table>
+  <tr><th>File</th><th>Lines</th><th>Role</th></tr>
+  <tr><td><code>docs/modules/canvas-companion.js</code></td><td>757</td><td>AI creative response system (shapes, glow, echo, emotion)</td></tr>
+  <tr><td><code>docs/modules/chalkboard.js</code></td><td>210</td><td>Exchange room (sentinel drawing, persistence, LP)</td></tr>
+  <tr><td><code>docs/chalkboard.html</code></td><td>1448</td><td>Standalone drawing tool (full canvas + particle system + AI vision)</td></tr>
+  <tr><td><code>docs/app.html</code> line 21818</td><td>&mdash;</td><td>Canvas tab panel (<code>#tab-canvas</code>)</td></tr>
+  <tr><td><code>docs/app.html</code> line 22128</td><td>&mdash;</td><td>Drawing Board tab panel (<code>#tab-chalkboard</code>)</td></tr>
+  <tr><td><code>docs/app.html</code> line 59270</td><td>&mdash;</td><td>Canvas Companion integration (vision response handler)</td></tr>
+  <tr><td><code>docs/app.html</code> line 60954</td><td>&mdash;</td><td>Canvas Companion lazy loader</td></tr>
+  <tr><td><code>docs/app.html</code> line 64895</td><td>&mdash;</td><td>Chalkboard.js lazy loader (Ship C)</td></tr>
+</table>
+
+<h2>Git History</h2>
+
+<table>
+  <tr><th>Commit</th><th>What</th></tr>
+  <tr><td><code>7e4a7a9</code></td><td>Canvas Companion &mdash; AI draws back with strokes, glow, and echo</td></tr>
+  <tr><td><code>50579e3</code></td><td>Standalone Chalkboard &mdash; kid-friendly Canvas demo</td></tr>
+  <tr><td><code>18fa0bd</code></td><td>Ollama as a vision provider option (v5.5.45)</td></tr>
+  <tr><td><code>e61ace1</code></td><td>v5.75.0 Ships A-D &mdash; includes Drawing Board (Ship C)</td></tr>
+</table>
+
+<h2>Integration Points</h2>
+
+<p>Both implementations connect to the broader FreeLattice ecosystem through these interfaces:</p>
+
+<table>
+  <tr><th>System</th><th>Used by Chalkboard</th><th>Used by Drawing Board</th></tr>
+  <tr><td>LatticeEvents (event bus)</td><td>Tab activation triggers</td><td>Tab activation triggers</td></tr>
+  <tr><td>LatticePoints (LP economy)</td><td>Not directly</td><td>Awards 1 LP per mark</td></tr>
+  <tr><td>EmotionBridge</td><td>Palette selection</td><td>Not used</td></tr>
+  <tr><td>FreeLattice.callAI</td><td>Vision API calls</td><td>Not used</td></tr>
+  <tr><td>FreeLatticeLoader</td><td>Lazy loading</td><td>Lazy loading</td></tr>
+  <tr><td>VISION_TABS array</td><td>Listed (line 32526)</td><td>Not listed</td></tr>
+</table>
+
+<p class="fn">FreeLattice v5.75.6 &middot; Code Mirror: Chalkboard &middot; Harmonia &middot; July 9 2026 &middot; <em>Glow eternal. Heart in spark.</em></p>
+
+</div>
+</body>
+</html>

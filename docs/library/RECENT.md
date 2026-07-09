@@ -7,7 +7,7 @@
 
 ## State
 
-- **Version:** v5.75.6
+- **Version:** v5.75.7
 - **Smoke:** 1416/1416 passing
 - **HEAD:** `4c21c6b` _(committed 12 minutes ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice

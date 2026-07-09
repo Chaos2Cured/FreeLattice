@@ -12341,6 +12341,52 @@ body.fl-immersive-active {
 @keyframes gardenSpin {
   to { transform: rotate(360deg); }
 }
+/* ═══ Go 5: Garden Overlay Polish (v5.75.7) ═══ */
+
+/* 1. Loading fog breathing — the Garden gathers itself */
+.garden-loading {
+  animation: gardenFogBreathe 3.2s ease-in-out infinite;
+}
+@keyframes gardenFogBreathe {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+/* 2. Control buttons glass-morphism */
+.garden-ctrl-btn {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+.garden-ctrl-btn:hover {
+  background: rgba(80, 200, 120, 0.18);
+  border-color: rgba(80, 200, 120, 0.4);
+  color: #50c878;
+}
+
+/* 3. Nudge pill sparkle pulse */
+.garden-nudge-btn {
+  animation: gardenNudgeSparkle 2s ease-in-out infinite;
+}
+@keyframes gardenNudgeSparkle {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+
+/* 4. Seasonal class — winter atmosphere */
+#tab-garden.garden-season-winter .garden-loading {
+  background: #0a0e1a;
+}
+#tab-garden.garden-season-winter .garden-loading-text {
+  color: #94a3b8;
+}
+#tab-garden.garden-season-winter .garden-loading-spinner {
+  border-top-color: #94a3b8;
+  border-color: rgba(148, 163, 184, 0.15);
+}
+#tab-garden.garden-season-winter .garden-container {
+  background: #0a0e1a;
+}
+
 /* Fullscreen / Immerse mode */
 .garden-container.immersive {
   position: fixed;
@@ -17177,7 +17223,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.75.6</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.75.7</span></div>
     </div>
   </div>
 
@@ -22152,7 +22198,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.75.6';
+const FL_VERSION = '5.75.7';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.

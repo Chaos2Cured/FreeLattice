@@ -245,6 +245,7 @@ All code-mirror pages for FreeLattice AI collaborators. Each page is a standalon
 | `code-garden.html` | Fractal Garden module | Fable | Phi timing specs, Go 5 overlay brief, fractal-garden.js |
 | `code-temperature-gauge.html` | Temperature Gauge tool | Fable, Grok | Kirk's standalone tool, separate repo |
 | `code-workshop.html` | Workshop module | Fable, Grok | AI code builder, AutoBuilder loop, GitHub Projects panel, known bugs |
+| `code-chalkboard.html` | Chalkboard (both implementations) | Fable, Grok | Full canvas + Drawing Board, Canvas Companion, FL_DRAW sentinel, unification vision |
 
 **What each mirror must include:**
 1. Architecture diagram (ASCII) showing the tab panel, container IDs, and key sub-elements
