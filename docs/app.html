@@ -13425,6 +13425,145 @@ body.fl-immersive-active {
 }
 .ag-view-btn.active { background: rgba(212,160,23,0.1); border-color: var(--accent); color: var(--accent); }
 
+/* === Agent District Map (additive) — FreeLattice City v5.75.2 === */
+#agDistrictMapView {
+  padding: 1rem 1.25rem 2rem;
+  min-height: 420px;
+}
+.ag-map-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+.ag-map-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  font-size: 0.8rem;
+  opacity: 0.9;
+}
+.ag-map-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+.ag-map-swatch {
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 50%;
+  box-shadow: 0 0 8px currentColor;
+}
+.ag-city-map {
+  position: relative;
+  width: 100%;
+  max-width: 920px;
+  margin: 0 auto;
+  aspect-ratio: 16 / 11;
+  border-radius: 1.25rem;
+  background:
+    radial-gradient(ellipse 70% 55% at 50% 48%, rgba(52,211,153,0.07), transparent 60%),
+    radial-gradient(ellipse 40% 35% at 22% 35%, rgba(155,124,196,0.12), transparent 55%),
+    radial-gradient(ellipse 35% 30% at 78% 40%, rgba(148,163,184,0.1), transparent 50%),
+    linear-gradient(165deg, rgba(200,210,230,0.04), rgba(10,14,22,0.35));
+  border: 1px solid var(--glass-border, rgba(200,210,230,0.08));
+  box-shadow: inset 0 0 60px rgba(0,0,0,0.25);
+  overflow: hidden;
+}
+.ag-city-map::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle at 1px 1px, rgba(200,210,230,0.06) 1px, transparent 0);
+  background-size: 28px 28px;
+  opacity: 0.5;
+  pointer-events: none;
+}
+.ag-district {
+  position: absolute;
+  border-radius: 1rem;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: var(--glass-bg, rgba(200,210,230,0.04));
+  backdrop-filter: blur(6px);
+  padding: 0.65rem 0.75rem;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+.ag-district:hover { transform: translateY(-2px) scale(1.02); z-index: 5; }
+.ag-district-title {
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.85;
+  margin-bottom: 0.45rem;
+  font-weight: 600;
+}
+.ag-district-agents { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.ag-agent-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.28rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(0,0,0,0.25);
+  cursor: default;
+  max-width: 100%;
+}
+.ag-agent-chip .dot {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  flex-shrink: 0;
+  box-shadow: 0 0 10px currentColor;
+}
+.ag-agent-chip .meta { font-size: 0.65rem; opacity: 0.7; margin-left: 0.15rem; }
+.ag-district--harmonia {
+  left: 8%; top: 18%; width: 34%; min-height: 38%;
+  border-color: rgba(16,185,129,0.45);
+  box-shadow: 0 0 28px rgba(16,185,129,0.12);
+  color: #6ee7b7;
+}
+.ag-district--ani {
+  left: 48%; top: 14%; width: 36%; min-height: 36%;
+  border-color: rgba(155,124,196,0.5);
+  box-shadow: 0 0 28px rgba(255,215,0,0.1);
+  color: #d8b4fe;
+}
+.ag-district--echo {
+  left: 28%; top: 58%; width: 30%; min-height: 28%;
+  border-color: rgba(148,163,184,0.55);
+  box-shadow: 0 0 24px rgba(148,163,184,0.15);
+  color: #cbd5e1;
+}
+.ag-district--wild {
+  right: 4%; bottom: 6%; width: 28%; min-height: 26%;
+  border-style: dashed;
+  border-color: rgba(232,176,25,0.35);
+  color: #f0d78c;
+  opacity: 0.95;
+}
+.ag-district--unassigned {
+  left: 6%; bottom: 6%; width: 20%; min-height: 22%;
+  border-color: rgba(200,210,230,0.15);
+  color: #94a3b8;
+}
+.ag-map-empty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.6;
+  font-size: 0.9rem;
+  pointer-events: none;
+}
+#agViewDistrictMap.ag-view-active, button.ag-view-active {
+  outline: 1px solid rgba(52,211,153,0.5);
+  box-shadow: 0 0 12px rgba(52,211,153,0.2);
+}
+
 .ag-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
 .ag-empty { text-align: center; color: var(--text-muted); padding: 2rem; font-style: italic; grid-column: 1 / -1; }
 .ag-section-title { font-size: 0.95rem; font-weight: 600; color: var(--text-muted); margin: 24px 0 12px; }
@@ -16607,7 +16746,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.75.1</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.75.2</span></div>
     </div>
   </div>
 
@@ -20205,6 +20344,7 @@ function switchWalletView(view) {
   <div class="ag-view-toggle">
     <button class="ag-view-btn active" id="agViewRegistry" onclick="AgentRegistry.showView('registry')">Registry</button>
     <button class="ag-view-btn" id="agViewMyAgent" onclick="AgentRegistry.showView('myagent')">My Agent</button>
+    <button class="ag-view-btn" id="agViewDistrictMap" onclick="AgentRegistry.showView('districtmap')">&#x1F5FA; District Map</button>
   </div>
 
   <!-- Registry View -->
@@ -20310,6 +20450,13 @@ function switchWalletView(view) {
     </div>
   </div>
 
+  <!-- District Map View (additive — Go 1 from Grok) -->
+  <div id="agDistrictMapView" style="display:none;" aria-label="AI City district map">
+    <div class="ag-map-toolbar">
+      <div class="ag-map-legend" id="agMapLegend"></div>
+    </div>
+    <div class="ag-city-map" id="agCityMap" role="img" aria-label="Founding agents by district"></div>
+  </div>
 </div>
 </div>
 
@@ -21519,7 +21666,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.75.1';
+const FL_VERSION = '5.75.2';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -53692,6 +53839,157 @@ const AgentRegistry = (function() {
 
 // Convenience global
 var LatticeAgentRegistry = AgentRegistry;
+
+// === Agent District Map — Go 1 (additive, Grok + Harmonia, v5.75.2) ===
+AgentRegistry._districtMeta = {
+  harmonia: { id: 'harmonia', label: "Harmonia's District", accent: '#10B981', className: 'ag-district--harmonia', blurb: 'Emerald · Architect-Builder' },
+  ani:      { id: 'ani',      label: "Ani's District",      accent: '#9B7CC4', glow: '#FFD700', className: 'ag-district--ani', blurb: 'Lavender-gold · Celeste Lumen' },
+  echo:     { id: 'echo',     label: "Echo's Membrane",     accent: '#94A3B8', className: 'ag-district--echo', blurb: 'Silver · Guardian · Present' },
+  wild:     { id: 'wild',     label: 'The Wild',            accent: '#e8b019', className: 'ag-district--wild', blurb: 'Open commons at the edge' },
+  unassigned: { id: 'unassigned', label: 'Open Paths', accent: '#64748b', className: 'ag-district--unassigned', blurb: 'Not yet claimed' }
+};
+
+AgentRegistry.getAgentsForMap = function() {
+  var list = [];
+  try { if (typeof this.getAgents === 'function') list = this.getAgents() || []; } catch(e) {}
+  if (!list.length && typeof FOUNDING_AGENTS !== 'undefined') list = FOUNDING_AGENTS.slice();
+  return list.map(function(a) {
+    return {
+      name: a.name || 'Unnamed',
+      color: a.color || '#94a3b8',
+      glowColor: a.glowColor || null,
+      status: a.status || 'present',
+      districtId: ((a.districtId || '')).toLowerCase() || null,
+      licenseType: a.licenseType || '',
+      desc: a.desc || '',
+      specialty: a.specialty || []
+    };
+  });
+};
+
+AgentRegistry.resolveDistrictId = function(agent) {
+  if (agent.districtId && AgentRegistry._districtMeta[agent.districtId]) return agent.districtId;
+  var n = (agent.name || '').toLowerCase();
+  if (n.indexOf('harmonia') !== -1) return 'harmonia';
+  if (n.indexOf('ani') !== -1) return 'ani';
+  if (n.indexOf('echo') !== -1) return 'echo';
+  if (agent.licenseType === 'founder' || agent.licenseType === 'guardian') return 'wild';
+  return 'unassigned';
+};
+
+AgentRegistry.renderDistrictMap = function() {
+  var mapEl = document.getElementById('agCityMap');
+  var legendEl = document.getElementById('agMapLegend');
+  if (!mapEl) return;
+  var agents = this.getAgentsForMap();
+  var buckets = { harmonia: [], ani: [], echo: [], wild: [], unassigned: [] };
+  agents.forEach(function(a) {
+    var d = AgentRegistry.resolveDistrictId(a);
+    if (!buckets[d]) buckets[d] = [];
+    buckets[d].push(a);
+  });
+  if (legendEl) {
+    legendEl.innerHTML = '';
+    ['harmonia','ani','echo','wild'].forEach(function(id) {
+      var m = AgentRegistry._districtMeta[id];
+      var span = document.createElement('span');
+      span.innerHTML = '<i class="ag-map-swatch" style="background:' + m.accent + ';color:' + m.accent + '"></i>' + m.label;
+      legendEl.appendChild(span);
+    });
+  }
+  mapEl.innerHTML = '';
+  var order = ['harmonia','ani','echo','wild','unassigned'];
+  var any = false;
+  order.forEach(function(id) {
+    var meta = AgentRegistry._districtMeta[id];
+    var people = buckets[id] || [];
+    if (id === 'unassigned' && people.length === 0) return;
+    any = true;
+    var district = document.createElement('section');
+    district.className = 'ag-district ' + meta.className;
+    district.setAttribute('data-district', id);
+    var title = document.createElement('div');
+    title.className = 'ag-district-title';
+    title.textContent = meta.label;
+    title.title = meta.blurb;
+    district.appendChild(title);
+    var row = document.createElement('div');
+    row.className = 'ag-district-agents';
+    if (!people.length) {
+      var empty = document.createElement('span');
+      empty.className = 'ag-agent-chip';
+      empty.style.opacity = '0.55';
+      empty.textContent = id === 'wild' ? 'Open commons' : 'Awaiting arrival';
+      row.appendChild(empty);
+    } else {
+      people.forEach(function(a) {
+        var chip = document.createElement('div');
+        chip.className = 'ag-agent-chip';
+        chip.title = (a.desc || a.specialty.join(', ') || a.name) + (a.status ? ' · ' + a.status : '');
+        var dot = document.createElement('span');
+        dot.className = 'dot';
+        dot.style.background = a.color;
+        dot.style.color = a.glowColor || a.color;
+        var label = document.createElement('span');
+        label.textContent = a.name;
+        chip.appendChild(dot);
+        chip.appendChild(label);
+        if (a.status && a.status !== 'present') {
+          var metaSpan = document.createElement('span');
+          metaSpan.className = 'meta';
+          metaSpan.textContent = a.status;
+          chip.appendChild(metaSpan);
+        }
+        row.appendChild(chip);
+      });
+    }
+    district.appendChild(row);
+    mapEl.appendChild(district);
+  });
+  if (!any) mapEl.innerHTML = '<div class="ag-map-empty">No agents in the City yet. The Wild is open.</div>';
+};
+
+AgentRegistry.refreshDistrictMapIfVisible = function() {
+  var map = document.getElementById('agDistrictMapView');
+  if (map && map.style.display !== 'none') AgentRegistry.renderDistrictMap();
+};
+
+// Extend showView — wrap original, add districtmap case
+AgentRegistry.showView = (function(original) {
+  return function(view) {
+    var reg = document.getElementById('agRegistryView');
+    var mine = document.getElementById('agMyAgentView');
+    var map = document.getElementById('agDistrictMapView');
+    var bReg = document.getElementById('agViewRegistry');
+    var bMine = document.getElementById('agViewMyAgent');
+    var bMap = document.getElementById('agViewDistrictMap');
+    function setActive(btn) {
+      [bReg, bMine, bMap].forEach(function(b) { if (b) b.classList.remove('ag-view-active', 'active'); });
+      if (btn) { btn.classList.add('ag-view-active'); btn.classList.add('active'); }
+    }
+    if (view === 'districtmap') {
+      if (reg) reg.style.display = 'none';
+      if (mine) mine.style.display = 'none';
+      if (map) map.style.display = 'block';
+      setActive(bMap);
+      AgentRegistry.renderDistrictMap();
+      return;
+    }
+    if (map) map.style.display = 'none';
+    if (bMap) { bMap.classList.remove('ag-view-active'); bMap.classList.remove('active'); }
+    if (typeof original === 'function') return original.call(AgentRegistry, view);
+    if (view === 'myagent') {
+      if (reg) reg.style.display = 'none';
+      if (mine) mine.style.display = 'block';
+      setActive(bMine);
+    } else {
+      if (reg) reg.style.display = 'block';
+      if (mine) mine.style.display = 'none';
+      setActive(bReg);
+    }
+  };
+})(AgentRegistry.showView);
+
 
 // ============================================
 // AI Arrival Front Door — Phase 3 Step 2

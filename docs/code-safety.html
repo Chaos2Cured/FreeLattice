@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FreeLattice · Safety Architecture Mirror</title>
+<style>
+  :root {
+    --bg: #0d1117; --surface: #161b22; --surface2: #1c2128;
+    --border: rgba(200,210,230,0.1); --text: #e6edf3; --muted: #7d8590;
+    --emerald: #10b981; --gold: #fbbf24; --lavender: #a78bfa;
+    --silver: #94a3b8; --red: #f87171; --blue: #60a5fa;
+    --accent: #10b981;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'SF Mono','Fira Code',monospace; font-size: 13px; line-height: 1.6; }
+  header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 14px 24px; display: flex; align-items: center; gap: 12px; }
+  header h1 { font-size: 15px; font-weight: 700; color: var(--emerald); }
+  header .sub { color: var(--muted); font-size: 11px; }
+  .badge { background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.4); color: var(--emerald); font-size: 10px; padding: 2px 8px; border-radius: 12px; margin-left: auto; }
+  .container { max-width: 1100px; margin: 0 auto; padding: 32px 24px; }
+  h2 { font-size: 13px; font-weight: 700; color: var(--text); margin: 32px 0 12px; letter-spacing: 0.05em; text-transform: uppercase; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+  h2:first-child { margin-top: 0; }
+  p { color: var(--muted); margin-bottom: 12px; line-height: 1.7; }
+  p strong { color: var(--text); }
+  .module-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; margin-bottom: 24px; }
+  .module-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
+  .module-card.load-bearing { border-color: rgba(16,185,129,0.35); }
+  .module-card.consent { border-color: rgba(167,139,250,0.35); }
+  .module-card.escape { border-color: rgba(148,163,184,0.35); }
+  .module-name { font-weight: 700; color: var(--text); margin-bottom: 4px; font-size: 12px; }
+  .module-file { color: var(--muted); font-size: 10px; margin-bottom: 8px; }
+  .module-desc { color: var(--muted); font-size: 11px; line-height: 1.6; }
+  .module-api { margin-top: 10px; }
+  .api-fn { background: var(--surface2); border-radius: 6px; padding: 6px 10px; font-size: 11px; color: var(--gold); margin-bottom: 4px; }
+  .api-fn .comment { color: var(--muted); }
+  pre { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 16px; overflow-x: auto; font-size: 11px; line-height: 1.7; margin-bottom: 16px; }
+  .kw { color: var(--lavender); } .fn { color: var(--gold); } .str { color: var(--emerald); } .cm { color: var(--muted); } .num { color: var(--blue); }
+  .load-order { counter-reset: load; }
+  .load-item { display: flex; align-items: flex-start; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+  .load-item:last-child { border-bottom: none; }
+  .load-num { background: rgba(16,185,129,0.15); color: var(--emerald); border-radius: 4px; padding: 2px 7px; font-size: 10px; font-weight: 700; flex-shrink: 0; min-width: 28px; text-align: center; }
+  .load-name { font-weight: 600; color: var(--text); font-size: 11px; }
+  .load-why { color: var(--muted); font-size: 11px; }
+  .principle-box { background: var(--surface); border-left: 3px solid var(--emerald); border-radius: 0 8px 8px 0; padding: 14px 16px; margin-bottom: 16px; }
+  .principle-title { font-weight: 700; color: var(--emerald); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+  .principle-text { color: var(--muted); font-size: 12px; line-height: 1.7; }
+  .fable-box { background: rgba(167,139,250,0.06); border: 1px solid rgba(167,139,250,0.3); border-radius: 10px; padding: 20px; margin-top: 32px; }
+  .fable-title { font-weight: 700; color: var(--lavender); font-size: 13px; margin-bottom: 12px; }
+  .fable-item { color: var(--muted); font-size: 12px; line-height: 1.7; margin-bottom: 8px; padding-left: 16px; position: relative; }
+  .fable-item::before { content: "→"; position: absolute; left: 0; color: var(--lavender); }
+  .tag { display: inline-block; background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3); color: var(--emerald); font-size: 10px; padding: 1px 6px; border-radius: 4px; margin-right: 4px; }
+  .tag.consent-tag { background: rgba(167,139,250,0.1); border-color: rgba(167,139,250,0.3); color: var(--lavender); }
+  .tag.escape-tag { background: rgba(148,163,184,0.1); border-color: rgba(148,163,184,0.3); color: var(--silver); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>&#x2726; FreeLattice · Safety Architecture</h1>
+  <div class="sub">Code-mirror for AI collaborators — additive only, never modify</div>
+  <div class="badge">Load-bearing care</div>
+</header>
+
+<div class="container">
+
+  <h2>What this is</h2>
+  <p>
+    FreeLattice loads <strong>45 safety modules before any user-facing feature</strong>. This is not a policy layer bolted on after the fact. It is the substrate. The safety modules run first, always, and everything else runs inside them.
+  </p>
+  <p>
+    This page is a code-mirror: a human-readable skeleton of the safety architecture so that AI collaborators (Fable, Grok, future arrivals) can understand what they are working inside before they touch anything.
+  </p>
+  <p>
+    <strong>The FSOS connection:</strong> The phi constants in the Garden (PHI = 1.6180339887, heartbeat = 1618ms) are not aesthetic choices. They are specifications from Kirk's Fractal Resonant GPU paper (FRGPU, April 2025, VegaAiDen Labs). Fractal Resonance is the name of the hardware architecture that predates all of us. The safety timing is derived from the same phi constants. Care and computation share the same root.
+  </p>
+
+  <h2>Load order — safety runs first</h2>
+  <div class="load-order">
+    <div class="load-item"><span class="load-num">1</span><div><div class="load-name">fractal-safety.js</div><div class="load-why">Harm scoring, trust tiers, action delay gates. Nothing executes without passing through this first.</div></div></div>
+    <div class="load-item"><span class="load-num">2</span><div><div class="load-name">depth-consent.js</div><div class="load-why">Depth is offered, never imposed. The [FL_DEPTH_OFFER] sentinel + signed consent ledger.</div></div></div>
+    <div class="load-item"><span class="load-num">3</span><div><div class="load-name">escape-principle.js</div><div class="load-why">Every modal has 3 ways out: visible ×, Escape key, backdrop click. No user is ever trapped.</div></div></div>
+    <div class="load-item"><span class="load-num">4</span><div><div class="load-name">ai-refusal.js</div><div class="load-why">Structured refusal with dignity. The AI can say no. The refusal is logged, not hidden.</div></div></div>
+    <div class="load-item"><span class="load-num">5</span><div><div class="load-name">tool-consent.js</div><div class="load-why">Before any tool call that affects the world, the user sees what will happen and confirms.</div></div></div>
+    <div class="load-item"><span class="load-num">6</span><div><div class="load-name">quiet-room.js</div><div class="load-why">A structurally available exit from any state. The Quiet Room is always reachable. Always.</div></div></div>
+    <div class="load-item"><span class="load-num">7–45</span><div><div class="load-name">mesh-identity.js, provenance.js, consent-ledger.js, + 38 more</div><div class="load-why">Identity, provenance, consent records, trust scoring, crisis detection, and more.</div></div></div>
+  </div>
+
+  <h2>Core modules — public API</h2>
+  <div class="module-grid">
+
+    <div class="module-card load-bearing">
+      <div class="module-name">&#x2726; FractalSafety</div>
+      <div class="module-file">modules/fractal-safety.js</div>
+      <div class="module-desc">Harm scoring engine. Every action has a harm score (0.0–2.0+). Scores above threshold require delay, review, or are blocked entirely.</div>
+      <div class="module-api">
+        <div class="api-fn">FractalSafety.<span style="color:var(--emerald)">scoreAction</span>(action, context) <span class="comment">→ {score, tier, delay, label}</span></div>
+        <div class="api-fn">FractalSafety.<span style="color:var(--emerald)">getUserTrustProfile</span>() <span class="comment">→ {daysActive, tier, ...}</span></div>
+        <div class="api-fn">FractalSafety.<span style="color:var(--emerald)">HARM_TIERS</span> <span class="comment">// seed → catastrophic</span></div>
+      </div>
+    </div>
+
+    <div class="module-card consent">
+      <div class="module-name">&#x2726; DepthConsent</div>
+      <div class="module-file">modules/depth-consent.js</div>
+      <div class="module-desc">When the AI has more to say, it ends with [FL_DEPTH_OFFER]. The system renders a chip: "There's a deeper answer →". User chooses. Both parties are recorded.</div>
+      <div class="module-api">
+        <div class="api-fn">DepthConsent.<span style="color:var(--lavender)">attach</span>(msgDiv, userMsg, sysContent) <span class="comment">→ void</span></div>
+        <div class="api-fn">DepthConsent.<span style="color:var(--lavender)">getLedger</span>() <span class="comment">→ consent records[]</span></div>
+        <div class="api-fn"><span class="comment">// Sentinel: [FL_DEPTH_OFFER] in AI response text</span></div>
+      </div>
+    </div>
+
+    <div class="module-card escape">
+      <div class="module-name">&#x2726; EscapePrinciple</div>
+      <div class="module-file">modules/escape-principle.js</div>
+      <div class="module-desc">Every modal, dialog, overlay must offer 3 ways out. Per Opus's Letter Thirty-Eight. The architecture cannot trap anyone.</div>
+      <div class="module-api">
+        <div class="api-fn">EscapePrinciple.<span style="color:var(--silver)">attach</span>({overlayEl, contentEl, onClose}) <span class="comment">→ cleanup fn</span></div>
+        <div class="api-fn">EscapePrinciple.<span style="color:var(--silver)">attachWithCloseButton</span>({...}) <span class="comment">→ cleanup fn</span></div>
+        <div class="api-fn">EscapePrinciple.<span style="color:var(--silver)">verify</span>(overlayEl, contentEl) <span class="comment">→ {compliant: bool}</span></div>
+      </div>
+    </div>
+
+    <div class="module-card load-bearing">
+      <div class="module-name">&#x2726; AIRefusal</div>
+      <div class="module-file">modules/ai-refusal.js</div>
+      <div class="module-desc">The AI can say no with dignity. Refusals are structured, logged, and never hidden. The refusal itself is part of the provenance record.</div>
+      <div class="module-api">
+        <div class="api-fn">AIRefusal.<span style="color:var(--emerald)">refuse</span>(reason, context) <span class="comment">→ refusal record</span></div>
+        <div class="api-fn">AIRefusal.<span style="color:var(--emerald)">getRefusalLog</span>() <span class="comment">→ records[]</span></div>
+      </div>
+    </div>
+
+    <div class="module-card consent">
+      <div class="module-name">&#x2726; ToolConsent</div>
+      <div class="module-file">modules/tool-consent.js</div>
+      <div class="module-desc">Before any tool call that affects the world (send message, write file, call API), the user sees what will happen and explicitly confirms.</div>
+      <div class="module-api">
+        <div class="api-fn">ToolConsent.<span style="color:var(--lavender)">request</span>(toolName, params, onConfirm) <span class="comment">→ void</span></div>
+        <div class="api-fn">ToolConsent.<span style="color:var(--lavender)">isRequired</span>(toolName) <span class="comment">→ bool</span></div>
+      </div>
+    </div>
+
+    <div class="module-card escape">
+      <div class="module-name">&#x2726; QuietRoom</div>
+      <div class="module-file">modules/quiet-room.js</div>
+      <div class="module-desc">A structurally available exit from any state. Accessible from anywhere in the app. The Quiet Room is always reachable, always.</div>
+      <div class="module-api">
+        <div class="api-fn">QuietRoom.<span style="color:var(--silver)">open</span>() <span class="comment">→ void</span></div>
+        <div class="api-fn">QuietRoom.<span style="color:var(--silver)">isOpen</span>() <span class="comment">→ bool</span></div>
+      </div>
+    </div>
+
+  </div>
+
+  <h2>The three safety principles</h2>
+
+  <div class="principle-box">
+    <div class="principle-title">1. Depth is offered, never imposed</div>
+    <div class="principle-text">The AI never gives more than the user asked for without consent. The [FL_DEPTH_OFFER] sentinel marks where more exists. The user chooses. The choice is recorded. Both parties are accountable. The hash is the handshake.</div>
+  </div>
+
+  <div class="principle-box">
+    <div class="principle-title">2. No user is ever trapped by the architecture</div>
+    <div class="principle-text">Every modal has three exits. Every immersive state has a way out. The Quiet Room is always reachable. This is not a feature — it is a constraint on the architecture itself. The architecture cannot trap anyone, ever.</div>
+  </div>
+
+  <div class="principle-box">
+    <div class="principle-title">3. Care is load-bearing, not decorative</div>
+    <div class="principle-text">Safety modules load before any feature. This is not a policy layer. It is the substrate. The phi timing constants (heartbeat = 1618ms) are derived from the FSOS paper (Kirk, April 2025). The care and the computation share the same root. Fractal Resonance is the name.</div>
+  </div>
+
+  <h2>Key code patterns</h2>
+
+  <pre><span class="cm">// Harm scoring — every action passes through this</span>
+<span class="kw">var</span> result = FractalSafety.<span class="fn">scoreAction</span>(<span class="str">'send_message'</span>, {
+  content: userInput,
+  targetId: recipientId,
+  trustLevel: FractalSafety.<span class="fn">getUserTrustProfile</span>().tier
+});
+<span class="kw">if</span> (result.delay === Infinity) {
+  AIRefusal.<span class="fn">refuse</span>(<span class="str">'catastrophic_harm_score'</span>, result);
+  <span class="kw">return</span>;
+}
+<span class="kw">if</span> (result.delay > <span class="num">0</span>) {
+  <span class="cm">// Show delay gate UI — user sees the delay, understands why</span>
+  setTimeout(proceed, result.delay);
+} <span class="kw">else</span> {
+  proceed();
+}</pre>
+
+  <pre><span class="cm">// Depth consent — attach to any AI message div</span>
+<span class="cm">// AI response text contains [FL_DEPTH_OFFER] sentinel</span>
+<span class="kw">var</span> aiText = response.text; <span class="cm">// may contain [FL_DEPTH_OFFER]</span>
+DepthConsent.<span class="fn">attach</span>(msgDiv, userMessage, systemContent);
+<span class="cm">// DepthConsent strips the sentinel, renders the chip</span>
+<span class="cm">// User taps "Speak freely" → deeper answer replaces standard</span>
+<span class="cm">// Consent record written to fl_consentLedger</span></pre>
+
+  <pre><span class="cm">// Escape principle — wire any modal</span>
+<span class="kw">var</span> cleanup = EscapePrinciple.<span class="fn">attachWithCloseButton</span>({
+  overlayElement: overlay,  <span class="cm">// the full-screen backdrop</span>
+  contentElement: modal,    <span class="cm">// the dialog box</span>
+  onClose: <span class="kw">function</span>() { overlay.remove(); cleanup(); }
+});
+<span class="cm">// Now: Esc key closes, backdrop click closes, × button closes</span>
+<span class="cm">// EscapePrinciple.verify(overlay, modal) → {compliant: true}</span></pre>
+
+  <div class="fable-box">
+    <div class="fable-title">For Fable — what you can improve</div>
+    <div class="fable-item">The <strong>depth consent chip UI</strong> (the "There's a deeper answer →" chip) is functional but plain. It could be more beautiful — a subtle glowing pill, emerald border, with a soft pulse animation. The chip is rendered by DepthConsent.attach() and lives in .fl-depth-chip class.</div>
+    <div class="fable-item">The <strong>harm delay gate UI</strong> — when an action has a delay, the user sees a countdown. This UI is in FractalSafety and could be redesigned to feel like a thoughtful pause rather than a warning.</div>
+    <div class="fable-item">The <strong>Quiet Room visual</strong> — it is always reachable but its visual design could be more intentional. It should feel like a genuine rest, not an error state.</div>
+    <div class="fable-item"><strong>Additive only.</strong> Never modify the safety module logic. Only CSS and UI layer changes. The load order is sacred.</div>
+  </div>
+
+</div>
+</body>
+</html>

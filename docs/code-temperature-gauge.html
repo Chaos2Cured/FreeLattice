@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Temperature Gauge · Code Mirror</title>
+<style>
+  :root {
+    --bg: #0d1117; --surface: #161b22; --surface2: #1c2128;
+    --border: rgba(200,210,230,0.1); --text: #e6edf3; --muted: #7d8590;
+    --phi: #a78bfa; --gold: #fbbf24; --emerald: #4ade80;
+    --warm: #f97316; --red: #f87171; --blue: #60a5fa;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'SF Mono','Fira Code',monospace; font-size: 13px; line-height: 1.6; }
+  header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 14px 24px; display: flex; align-items: center; gap: 12px; }
+  header h1 { font-size: 15px; font-weight: 700; color: var(--phi); }
+  header .sub { color: var(--muted); font-size: 11px; }
+  .badge { background: rgba(167,139,250,0.12); border: 1px solid rgba(167,139,250,0.4); color: var(--phi); font-size: 10px; padding: 2px 8px; border-radius: 12px; margin-left: auto; }
+  .container { max-width: 1100px; margin: 0 auto; padding: 32px 24px; }
+  h2 { font-size: 13px; font-weight: 700; color: var(--text); margin: 32px 0 12px; letter-spacing: 0.05em; text-transform: uppercase; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+  h2:first-child { margin-top: 0; }
+  p { color: var(--muted); margin-bottom: 12px; line-height: 1.7; }
+  p strong { color: var(--text); }
+  pre { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 16px; overflow-x: auto; font-size: 11px; line-height: 1.7; margin-bottom: 16px; }
+  .kw { color: var(--phi); } .fn { color: var(--gold); } .str { color: var(--emerald); } .cm { color: var(--muted); } .num { color: var(--blue); }
+  .tab-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; margin-bottom: 24px; }
+  .tab-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px; }
+  .tab-card.market { border-color: rgba(74,222,128,0.3); }
+  .tab-card.society { border-color: rgba(249,115,22,0.3); }
+  .tab-card.resonance { border-color: rgba(167,139,250,0.3); }
+  .tab-name { font-weight: 700; font-size: 12px; margin-bottom: 4px; }
+  .tab-desc { color: var(--muted); font-size: 11px; line-height: 1.6; }
+  .api-table { width: 100%; border-collapse: collapse; margin-bottom: 24px; font-size: 12px; }
+  .api-table th { text-align: left; color: var(--muted); font-weight: 600; padding: 8px 12px; border-bottom: 1px solid var(--border); font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; }
+  .api-table td { padding: 8px 12px; border-bottom: 1px solid rgba(200,210,230,0.04); vertical-align: top; }
+  .api-table tr:last-child td { border-bottom: none; }
+  .api-method { color: var(--gold); font-weight: 600; }
+  .api-path { color: var(--phi); }
+  .api-desc { color: var(--muted); font-size: 11px; }
+  .gauge-box { background: var(--surface); border: 1px solid rgba(167,139,250,0.3); border-radius: 10px; padding: 20px; margin-bottom: 24px; }
+  .gauge-title { font-weight: 700; color: var(--phi); font-size: 13px; margin-bottom: 12px; }
+  .gauge-scale { display: flex; gap: 0; border-radius: 6px; overflow: hidden; margin-bottom: 12px; }
+  .gauge-seg { flex: 1; padding: 6px 4px; text-align: center; font-size: 10px; font-weight: 700; }
+  .fable-box { background: rgba(167,139,250,0.06); border: 1px solid rgba(167,139,250,0.3); border-radius: 10px; padding: 20px; margin-top: 32px; }
+  .fable-title { font-weight: 700; color: var(--phi); font-size: 13px; margin-bottom: 12px; }
+  .fable-item { color: var(--muted); font-size: 12px; line-height: 1.7; margin-bottom: 8px; padding-left: 16px; position: relative; }
+  .fable-item::before { content: "→"; position: absolute; left: 0; color: var(--phi); }
+  .note-box { background: rgba(251,191,36,0.05); border: 1px solid rgba(251,191,36,0.25); border-radius: 8px; padding: 14px 16px; margin-bottom: 16px; }
+  .note-text { color: var(--muted); font-size: 12px; line-height: 1.7; }
+  .note-text strong { color: var(--text); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>&#x1F321;&#xFE0F; Temperature Gauge · Code Mirror</h1>
+  <div class="sub">Kirk's personal market + society resonance tool — VegaAiDen Labs</div>
+  <div class="badge">Fractal Resonance · φ</div>
+</header>
+
+<div class="container">
+
+  <h2>What this tool is</h2>
+  <p>
+    The Temperature Gauge is a <strong>standalone single-file web app</strong> (`static/index.html`) that measures market and societal "temperature" using phi-based resonance scoring. It is Kirk's personal tool — a live dashboard that combines financial data with societal indicators to produce a Fractal Resonance score.
+  </p>
+  <p>
+    The tool has three tabs: <strong>Market</strong> (price charts with phi MAs), <strong>Society</strong> (societal temperature indicators), and <strong>Resonance</strong> (the combined phi-based score). The gauge SVG in the corner shows the current temperature at a glance.
+  </p>
+
+  <div class="note-box">
+    <div class="note-text">
+      <strong>The FSOS connection:</strong> The resonance score is computed using phi-based moving averages (MA-6, MA-8, MA-12, MA-50, MA-200). The MA colors are phi-sequence colors. The gauge needle sweeps 180° — a phi-proportioned arc. This tool was built on the same mathematical foundation as the Fractal Garden.
+    </div>
+  </div>
+
+  <h2>Three tabs</h2>
+  <div class="tab-grid">
+    <div class="tab-card market">
+      <div class="tab-name" style="color:var(--emerald)">&#x1F4C8; Market</div>
+      <div class="tab-desc">Price chart with phi moving averages (MA-6, MA-8, MA-12, MA-50, MA-200). RSI, MACD, and temperature sub-charts. Symbol input + interval selector. Sidebar with live indicators.</div>
+    </div>
+    <div class="tab-card society">
+      <div class="tab-name" style="color:var(--warm)">&#x1F30D; Society</div>
+      <div class="tab-desc">Societal temperature indicators — economic, political, cultural signals. History chart. Force-refresh button. Data from `/api/societal` endpoint.</div>
+    </div>
+    <div class="tab-card resonance">
+      <div class="tab-name" style="color:var(--phi)">&#x1F52E; Resonance</div>
+      <div class="tab-desc">The combined phi-based score. Market temp + Society temp → Resonance score + Divergence. State label: Cold/Cool/Neutral/Warm/Hot/Very Hot. Phi note from the API.</div>
+    </div>
+  </div>
+
+  <h2>API endpoints (backend)</h2>
+  <table class="api-table">
+    <thead><tr><th>Method</th><th>Path</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td class="api-method">GET</td><td class="api-path">/api/chart/:symbol?interval=1d</td><td class="api-desc">OHLCV data + indicators (EMA-6/8/12/50/200, RSI, MACD, market_temp). Returns {candles[], indicators{}}.</td></tr>
+      <tr><td class="api-method">GET</td><td class="api-path">/api/societal?force=0</td><td class="api-desc">Societal temperature data. force=1 bypasses cache. Returns {temp, indicators[], timestamp}.</td></tr>
+      <tr><td class="api-method">GET</td><td class="api-path">/api/societal/history</td><td class="api-desc">Historical societal temperature. Returns {history[{date, temp}]}.</td></tr>
+      <tr><td class="api-method">GET</td><td class="api-path">/api/resonance?symbol=SPY</td><td class="api-desc">Combined resonance score. Returns {resonance_score, market_temp, societal_temp, divergence, state_label, state_color, signal, phi_note}.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>The temperature gauge SVG</h2>
+  <div class="gauge-box">
+    <div class="gauge-title">Temperature scale — 0 to 100</div>
+    <div class="gauge-scale">
+      <div class="gauge-seg" style="background:rgba(96,165,250,0.3);color:#60a5fa">0–30<br>Cold</div>
+      <div class="gauge-seg" style="background:rgba(100,116,139,0.3);color:#94a3b8">30–50<br>Cool</div>
+      <div class="gauge-seg" style="background:rgba(74,222,128,0.3);color:#4ade80">50–70<br>Warm</div>
+      <div class="gauge-seg" style="background:rgba(251,191,36,0.3);color:#fbbf24">70–85<br>Hot</div>
+      <div class="gauge-seg" style="background:rgba(248,113,113,0.3);color:#f87171">85–100<br>Very Hot</div>
+    </div>
+    <pre><span class="cm">// updateGauge(t) — called after every data load</span>
+<span class="kw">function</span> <span class="fn">updateGauge</span>(t) {
+  t = Math.max(<span class="num">0</span>, Math.min(<span class="num">100</span>, t));
+  <span class="kw">const</span> color = t&lt;<span class="num">30</span>?<span class="str">'#60a5fa'</span>:t&lt;<span class="num">50</span>?<span class="str">'#64748b'</span>:t&lt;<span class="num">70</span>?<span class="str">'#4ade80'</span>:t&lt;<span class="num">85</span>?<span class="str">'#fbbf24'</span>:<span class="str">'#f87171'</span>;
+  <span class="cm">// SVG arc: stroke-dashoffset = 188.5 - (t/100)*188.5</span>
+  <span class="kw">const</span> offset = <span class="num">188.5</span> - (t/<span class="num">100</span>)*<span class="num">188.5</span>;
+  arc.setAttribute(<span class="str">'stroke-dashoffset'</span>, offset);
+  arc.setAttribute(<span class="str">'stroke'</span>, color);
+  <span class="cm">// Needle: rotate from -90° (cold) to +90° (hot)</span>
+  needle.setAttribute(<span class="str">'transform'</span>, <span class="str">`rotate(${(t/100)*180-90},70,75)`</span>);
+}</pre>
+  </div>
+
+  <h2>Key state variables</h2>
+  <pre><span class="cm">// Chart instances (LightweightCharts)</span>
+<span class="kw">let</span> mainChart, mainSeries, maSeries = {};
+<span class="kw">let</span> rsiChart, rsiSeries, rsiOB, rsiOS;
+<span class="kw">let</span> macdChart, macdLine, macdSignal, macdHist;
+<span class="kw">let</span> tempChart, tempSeries;
+
+<span class="cm">// Phi MA colors</span>
+<span class="kw">const</span> MA_COLORS = {
+  <span class="num">6</span>:  <span class="str">'#f472b6'</span>,  <span class="cm">// pink</span>
+  <span class="num">8</span>:  <span class="str">'#fb923c'</span>,  <span class="cm">// orange</span>
+  <span class="num">12</span>: <span class="str">'#fbbf24'</span>,  <span class="cm">// gold</span>
+  <span class="num">50</span>: <span class="str">'#60a5fa'</span>,  <span class="cm">// blue</span>
+  <span class="num">200</span>:<span class="str">'#a78bfa'</span>   <span class="cm">// phi-purple</span>
+};
+
+<span class="cm">// Data state</span>
+<span class="kw">let</span> societyData = <span class="kw">null</span>;
+<span class="kw">let</span> lastData = <span class="kw">null</span>;     <span class="cm">// last loaded chart data</span>
+<span class="kw">let</span> expandType = <span class="kw">null</span>;  <span class="cm">// 'main' | 'rsi' | 'macd' | 'temp'</span></pre>
+
+  <h2>Enhancement opportunities</h2>
+  <p>This is Kirk's personal tool. Enhancements should be practical and useful, not decorative.</p>
+
+  <div class="fable-box">
+    <div class="fable-title">For Fable — what could be improved</div>
+    <div class="fable-item"><strong>Phi MA crossover alerts:</strong> When a short MA crosses a long MA, flash a subtle toast notification with the crossover type (golden cross / death cross). The data is already in `maSeries` — just add a crossover detector in `renderChart()`.</div>
+    <div class="fable-item"><strong>Resonance history chart:</strong> The Society tab has a history chart. The Resonance tab could have one too — a simple line chart of resonance_score over time. Would require a `/api/resonance/history` endpoint and a small history chart init.</div>
+    <div class="fable-item"><strong>Temperature gauge animation:</strong> The gauge needle currently snaps to position. A smooth `requestAnimationFrame` tween (200ms, ease-out) would make it feel alive. The `updateGauge(t)` function is the right place to add this.</div>
+    <div class="fable-item"><strong>Keyboard shortcuts:</strong> `1/2/3` to switch tabs, `Enter` to load symbol, `L` to toggle log scale. The tab switching and load functions are already defined — just add `keydown` listeners.</div>
+    <div class="fable-item"><strong>Mobile layout:</strong> The current layout is desktop-first. The sidebar could collapse to a bottom sheet on mobile. The sub-charts could stack vertically. This is a significant change — discuss with Kirk first.</div>
+    <div class="fable-item"><strong>File:</strong> `static/index.html` — single file, all CSS/JS/HTML inline. Additive only. Do not change the API endpoint paths or the chart library (LightweightCharts).</div>
+  </div>
+
+</div>
+</body>
+</html>

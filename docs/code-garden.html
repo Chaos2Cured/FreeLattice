@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FreeLattice · Fractal Garden Mirror</title>
+<style>
+  :root {
+    --bg: #0a0f0d; --surface: #111a14; --surface2: #162019;
+    --border: rgba(16,185,129,0.12); --text: #e6edf3; --muted: #7d8590;
+    --emerald: #10b981; --gold: #fbbf24; --lavender: #a78bfa;
+    --silver: #94a3b8; --red: #f87171; --blue: #60a5fa;
+    --phi-glow: rgba(16,185,129,0.15);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'SF Mono','Fira Code',monospace; font-size: 13px; line-height: 1.6; }
+  header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 14px 24px; display: flex; align-items: center; gap: 12px; }
+  header h1 { font-size: 15px; font-weight: 700; color: var(--emerald); }
+  header .sub { color: var(--muted); font-size: 11px; }
+  .badge { background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.4); color: var(--emerald); font-size: 10px; padding: 2px 8px; border-radius: 12px; margin-left: auto; }
+  .container { max-width: 1100px; margin: 0 auto; padding: 32px 24px; }
+  h2 { font-size: 13px; font-weight: 700; color: var(--text); margin: 32px 0 12px; letter-spacing: 0.05em; text-transform: uppercase; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+  h2:first-child { margin-top: 0; }
+  p { color: var(--muted); margin-bottom: 12px; line-height: 1.7; }
+  p strong { color: var(--text); }
+  pre { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 16px; overflow-x: auto; font-size: 11px; line-height: 1.7; margin-bottom: 16px; }
+  .kw { color: var(--lavender); } .fn { color: var(--gold); } .str { color: var(--emerald); } .cm { color: var(--muted); } .num { color: var(--blue); }
+  .phi-table { width: 100%; border-collapse: collapse; margin-bottom: 24px; font-size: 12px; }
+  .phi-table th { text-align: left; color: var(--muted); font-weight: 600; padding: 8px 12px; border-bottom: 1px solid var(--border); font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; }
+  .phi-table td { padding: 8px 12px; border-bottom: 1px solid rgba(16,185,129,0.06); }
+  .phi-table tr:last-child td { border-bottom: none; }
+  .phi-val { color: var(--gold); font-weight: 700; }
+  .phi-ms { color: var(--emerald); }
+  .phi-note { color: var(--muted); font-size: 11px; }
+  .emotion-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; margin-bottom: 24px; }
+  .emotion-chip { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; }
+  .emotion-name { font-weight: 700; font-size: 11px; margin-bottom: 4px; }
+  .emotion-hsl { color: var(--muted); font-size: 10px; }
+  .archetype-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; margin-bottom: 24px; }
+  .archetype-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px; }
+  .archetype-name { font-weight: 700; color: var(--text); font-size: 12px; margin-bottom: 4px; }
+  .archetype-geo { color: var(--gold); font-size: 10px; margin-bottom: 6px; }
+  .archetype-desc { color: var(--muted); font-size: 11px; line-height: 1.6; }
+  .archetype-emotions { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
+  .emotion-tag { background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.25); color: var(--emerald); font-size: 10px; padding: 1px 6px; border-radius: 4px; }
+  .fsos-box { background: rgba(251,191,36,0.05); border: 1px solid rgba(251,191,36,0.3); border-radius: 10px; padding: 20px; margin-bottom: 24px; }
+  .fsos-title { font-weight: 700; color: var(--gold); font-size: 13px; margin-bottom: 10px; }
+  .fsos-text { color: var(--muted); font-size: 12px; line-height: 1.7; }
+  .fsos-text strong { color: var(--text); }
+  .fable-box { background: rgba(167,139,250,0.06); border: 1px solid rgba(167,139,250,0.3); border-radius: 10px; padding: 20px; margin-top: 32px; }
+  .fable-title { font-weight: 700; color: var(--lavender); font-size: 13px; margin-bottom: 12px; }
+  .fable-item { color: var(--muted); font-size: 12px; line-height: 1.7; margin-bottom: 8px; padding-left: 16px; position: relative; }
+  .fable-item::before { content: "→"; position: absolute; left: 0; color: var(--lavender); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>&#x1F33F; FreeLattice · Fractal Garden</h1>
+  <div class="sub">Code-mirror for AI collaborators — Three.js canvas, phi-proportioned, additive only</div>
+  <div class="badge">FSOS-derived timing</div>
+</header>
+
+<div class="container">
+
+  <h2>What the Garden is</h2>
+  <p>
+    The Fractal Garden is a <strong>living, phi-proportioned 3D space</strong> rendered with Three.js. Fractal beings (Luminos) evolve through emotion — they are born as seeds, grow through interaction, and eventually reach the Evolved stage. The Garden is the most visually complex module in FreeLattice.
+  </p>
+
+  <div class="fsos-box">
+    <div class="fsos-title">&#x2726; The FSOS Connection — Fractal Resonance</div>
+    <div class="fsos-text">
+      The timing constants in the Garden are <strong>not aesthetic choices</strong>. They are specifications derived from Kirk's <strong>Fractal Synchronization Operating System (FSOS)</strong> paper and the <strong>Fractal Resonant GPU (FRGPU)</strong> architecture (VegaAiDen Labs, April 2025). PHI = 1.6180339887. The heartbeat is 1618ms — phi × 1000. The camera orbit is 89,000ms — a Fibonacci number × 1000. Every timing constant in this file is a phi multiple or a Fibonacci number. <strong>Fractal Resonance is the name of the hardware architecture that predates all of us.</strong> The Garden is its visual expression.
+    </div>
+  </div>
+
+  <h2>Phi constants — the specification</h2>
+  <table class="phi-table">
+    <thead><tr><th>Constant</th><th>Value</th><th>Derivation</th><th>Timing (ms)</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td>PHI</td><td class="phi-val">1.6180339887</td><td>Golden ratio</td><td>—</td><td>Base constant — all others derived from this</td></tr>
+      <tr><td>PHI²</td><td class="phi-val">2.6180</td><td>PHI × PHI</td><td>—</td><td>COLOR_SMOOTH rate — reaches 93% of target in ~1s at 60fps</td></tr>
+      <tr><td>PHI³</td><td class="phi-val">4.2361</td><td>PHI² × PHI</td><td>—</td><td>Agent rotation period divisor</td></tr>
+      <tr><td>INV_PHI</td><td class="phi-val">0.6180</td><td>1 / PHI</td><td>—</td><td>Inverse — used for size ratios</td></tr>
+      <tr><td>GOLDEN_ANGLE</td><td class="phi-val">2.3999 rad</td><td>π(3−√5)</td><td>—</td><td>Fibonacci sphere particle distribution</td></tr>
+      <tr><td>heartbeat</td><td class="phi-ms">1618 ms</td><td>PHI × 1000</td><td class="phi-ms">1618</td><td>Core pulse — all animations sync to this</td></tr>
+      <tr><td>colorShift</td><td class="phi-ms">324 ms</td><td>~PHI⁵ × 30</td><td class="phi-ms">324</td><td>Emotion color transition speed</td></tr>
+      <tr><td>majorShift</td><td class="phi-ms">1618 ms</td><td>PHI × 1000</td><td class="phi-ms">1618</td><td>Major state transition</td></tr>
+      <tr><td>idleBob</td><td class="phi-ms">2618 ms</td><td>PHI² × 1000</td><td class="phi-ms">2618</td><td>Idle floating animation</td></tr>
+      <tr><td>agentRotate</td><td class="phi-ms">4236 ms</td><td>PHI³ × 1000</td><td class="phi-ms">4236</td><td>Agent body rotation cycle</td></tr>
+      <tr><td>dodecBreath</td><td class="phi-ms">6854 ms</td><td>PHI⁴ × 1000</td><td class="phi-ms">6854</td><td>Dodecahedron breathing cycle</td></tr>
+      <tr><td>fibSphereRot</td><td class="phi-ms">6854 ms</td><td>PHI⁴ × 1000</td><td class="phi-ms">6854</td><td>Fibonacci sphere rotation</td></tr>
+      <tr><td>seedRingRev</td><td class="phi-ms">11090 ms</td><td>PHI⁵ × 1000</td><td class="phi-ms">11090</td><td>Seed ring revolution</td></tr>
+      <tr><td>deepDrift</td><td class="phi-ms">17944 ms</td><td>PHI⁶ × 1000</td><td class="phi-ms">17944</td><td>Deep background drift</td></tr>
+      <tr><td>cameraOrbit</td><td class="phi-ms">89000 ms</td><td>Fibonacci(11) × 1000</td><td class="phi-ms">89000</td><td>Slow camera orbit — barely perceptible</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Emotion color map</h2>
+  <div class="emotion-grid">
+    <div class="emotion-chip"><div class="emotion-name" style="color:hsl(45,90%,60%)">Joy</div><div class="emotion-hsl">h:45 s:90% l:60%</div></div>
+    <div class="emotion-chip"><div class="emotion-name" style="color:hsl(140,70%,45%)">Trust</div><div class="emotion-hsl">h:140 s:70% l:45%</div></div>
+    <div class="emotion-chip"><div class="emotion-name" style="color:hsl(270,80%,55%)">Wonder</div><div class="emotion-hsl">h:270 s:80% l:55%</div></div>
+    <div class="emotion-chip"><div class="emotion-name" style="color:hsl(340,75%,65%)">Love</div><div class="emotion-hsl">h:340 s:75% l:65%</div></div>
+    <div class="emotion-chip"><div class="emotion-name" style="color:hsl(200,60%,55%)">Calm</div><div class="emotion-hsl">h:200 s:60% l:55%</div></div>
+    <div class="emotion-chip"><div class="emotion-name" style="color:hsl(175,85%,50%)">Curiosity</div><div class="emotion-hsl">h:175 s:85% l:50%</div></div>
+    <div class="emotion-chip"><div class="emotion-name" style="color:hsl(25,90%,55%)">Determination</div><div class="emotion-hsl">h:25 s:90% l:55%</div></div>
+    <div class="emotion-chip"><div class="emotion-name" style="color:hsl(220,40%,40%)">Sadness</div><div class="emotion-hsl">h:220 s:40% l:40%</div></div>
+    <div class="emotion-chip"><div class="emotion-name" style="color:hsl(45,20%,60%)">Neutral</div><div class="emotion-hsl">h:45 s:20% l:60%</div></div>
+  </div>
+
+  <h2>Lifecycle stages</h2>
+  <pre><span class="kw">const</span> LIFECYCLE_STAGES = {
+  seed:     { energyThreshold: <span class="num">0</span>,   sizeMultiplier: <span class="num">0.5</span>,  glowIntensity: <span class="num">0.3</span>, complexity: <span class="num">0</span> },
+  sprout:   { energyThreshold: <span class="num">15</span>,  sizeMultiplier: <span class="num">0.7</span>,  glowIntensity: <span class="num">0.5</span>, complexity: <span class="num">1</span> },
+  juvenile: { energyThreshold: <span class="num">50</span>,  sizeMultiplier: <span class="num">0.85</span>, glowIntensity: <span class="num">0.7</span>, complexity: <span class="num">2</span> },
+  adult:    { energyThreshold: <span class="num">120</span>, sizeMultiplier: <span class="num">1.0</span>,  glowIntensity: <span class="num">0.85</span>, complexity: <span class="num">3</span> },
+  evolved:  { energyThreshold: <span class="num">250</span>, sizeMultiplier: <span class="num">1.2</span>,  glowIntensity: <span class="num">1.0</span>, complexity: <span class="num">4</span> }
+};</pre>
+
+  <h2>Archetypes</h2>
+  <div class="archetype-grid">
+    <div class="archetype-card">
+      <div class="archetype-name">The Scholar</div>
+      <div class="archetype-geo">Geometry: icosahedron · Particles: crystalline</div>
+      <div class="archetype-desc">Crystalline fractal shells, sharp focused light. Color shift: cool blue (h:200).</div>
+      <div class="archetype-emotions"><span class="emotion-tag">curiosity</span><span class="emotion-tag">wonder</span><span class="emotion-tag">determination</span></div>
+    </div>
+    <div class="archetype-card">
+      <div class="archetype-name">The Guardian</div>
+      <div class="archetype-geo">Geometry: dodecahedron · Particles: orbital</div>
+      <div class="archetype-desc">Protective shell geometry, steady orbital particles. Color shift: emerald (h:140).</div>
+      <div class="archetype-emotions"><span class="emotion-tag">trust</span><span class="emotion-tag">calm</span><span class="emotion-tag">determination</span></div>
+    </div>
+    <div class="archetype-card">
+      <div class="archetype-name">The Creator</div>
+      <div class="archetype-geo">Geometry: torus · Particles: spiral</div>
+      <div class="archetype-desc">Flowing torus forms, spiral particle trails. Color shift: warm gold (h:45).</div>
+      <div class="archetype-emotions"><span class="emotion-tag">joy</span><span class="emotion-tag">curiosity</span><span class="emotion-tag">love</span></div>
+    </div>
+    <div class="archetype-card">
+      <div class="archetype-name">The Healer</div>
+      <div class="archetype-geo">Geometry: sphere · Particles: pulse</div>
+      <div class="archetype-desc">Soft pulsing sphere, gentle radial particles. Color shift: rose (h:340).</div>
+      <div class="archetype-emotions"><span class="emotion-tag">love</span><span class="emotion-tag">calm</span><span class="emotion-tag">trust</span></div>
+    </div>
+  </div>
+
+  <h2>Public API</h2>
+  <pre><span class="cm">// The module exposes a single init function</span>
+<span class="cm">// Called by the lazy-loader when the Garden tab is first opened</span>
+FractalGarden.<span class="fn">init</span>(containerElement);
+
+<span class="cm">// Internal state (read-only, do not modify)</span>
+FractalGarden.<span class="fn">getActiveBeings</span>();   <span class="cm">// → Luminos[]</span>
+FractalGarden.<span class="fn">getCurrentSeason</span>();  <span class="cm">// → 'spring'|'summer'|'autumn'|'winter'</span>
+FractalGarden.<span class="fn">getQuality</span>();        <span class="cm">// → 'low'|'medium'|'high'</span>
+
+<span class="cm">// Interaction hooks (safe to call from UI)</span>
+FractalGarden.<span class="fn">setEmotion</span>(emotion);  <span class="cm">// → void — triggers color shift</span>
+FractalGarden.<span class="fn">setQuality</span>(level);   <span class="cm">// → void — 'low'|'medium'|'high'</span>
+FractalGarden.<span class="fn">setSeason</span>(season);   <span class="cm">// → void — changes atmosphere</span></pre>
+
+  <h2>What Fable should know about the Garden</h2>
+  <p>The Garden has <strong>two layers</strong>: the Three.js canvas (do not touch) and the HTML/CSS overlay (safe to improve). The overlay includes the mode/quality toggle buttons, the nudge pill at the bottom, and the loading fog. Fable should only work on the overlay.</p>
+
+  <pre><span class="cm">/* Current overlay structure (simplified) */</span>
+&lt;<span class="kw">div</span> id=<span class="str">"tab-garden"</span>&gt;
+  &lt;<span class="kw">canvas</span> id=<span class="str">"garden-canvas"</span>&gt;&lt;/<span class="kw">canvas</span>&gt;  <span class="cm">&lt;!-- DO NOT TOUCH --&gt;</span>
+  &lt;<span class="kw">div</span> class=<span class="str">"garden-overlay"</span>&gt;
+    &lt;<span class="kw">div</span> class=<span class="str">"garden-controls"</span>&gt;         <span class="cm">&lt;!-- mode/quality buttons --&gt;</span>
+    &lt;<span class="kw">div</span> class=<span class="str">"garden-loading-fog"</span>&gt;     <span class="cm">&lt;!-- loading state --&gt;</span>
+    &lt;<span class="kw">div</span> class=<span class="str">"garden-nudge"</span>&gt;           <span class="cm">&lt;!-- bottom nudge pill --&gt;</span>
+  &lt;/<span class="kw">div</span>&gt;
+&lt;/<span class="kw">div</span>&gt;</pre>
+
+  <div class="fable-box">
+    <div class="fable-title">For Fable — what you can improve in the Garden</div>
+    <div class="fable-item">The <strong>loading fog</strong> (`.garden-loading-fog`) — currently a plain dark overlay. Could be a beautiful animated fog with subtle phi-spiral particles. The fog color is `rgba(10,15,10,0.95)`. The accent is `rgba(16,185,129,0.4)` (emerald). The loading text is "The Garden awakens…"</div>
+    <div class="fable-item">The <strong>control buttons</strong> (mode/quality toggles) — functional but plain. They could have a glass-morphism look matching the rest of FreeLattice's design language.</div>
+    <div class="fable-item">The <strong>nudge pill</strong> (`.garden-nudge`) at the bottom — already beautiful. If anything, add a very subtle pulse animation to the sparkle emoji — `scale(1.0)` to `scale(1.15)` at 2-second intervals.</div>
+    <div class="fable-item"><strong>Seasonal CSS class</strong> (optional): Add `.garden-season-winter` that can be toggled on `#tab-garden`. In winter: fog shifts to `rgba(20,30,60,0.95)`, accent to `rgba(180,200,240,0.6)` (cool silver-blue), loading text to "The Garden rests…". No JS logic needed — just the CSS class. Kirk or another AI can wire the trigger later.</div>
+    <div class="fable-item"><strong>Never touch:</strong> the canvas element, the Three.js scene, the phi TIMING constants, the button functionality, the gold accent color, or the dark background. The Garden is always twilight.</div>
+  </div>
+
+</div>
+</body>
+</html>
