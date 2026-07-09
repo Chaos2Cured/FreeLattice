@@ -14720,6 +14720,120 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 .rt-convergence-value { font-size: 0.75rem; color: #86efac; font-weight: 600; }
 #rtConversationOutput.rt-feed, #rtConversationOutput { margin-top: 0.5rem; }
 
+/* =========================================================
+   Go 4 — Domain color theming (additive)
+   FreeLattice Original Round Table
+   11 wings, each a color — Grok + Harmonia
+   ========================================================= */
+
+/* Token map — --rt-domain-color is the canonical Go 4 token */
+.rt-domain-discussion  { --rt-domain-color: #e8b019; --rt-domain-accent: #e8b019; }
+.rt-domain-medical     { --rt-domain-color: #ef4444; --rt-domain-accent: #ef4444; }
+.rt-domain-legal       { --rt-domain-color: #8b5cf6; --rt-domain-accent: #8b5cf6; }
+.rt-domain-finance     { --rt-domain-color: #22c55e; --rt-domain-accent: #22c55e; }
+.rt-domain-nutrition   { --rt-domain-color: #84cc16; --rt-domain-accent: #84cc16; }
+.rt-domain-frameworks,
+.rt-domain-mentalhealth { --rt-domain-color: #6366f1; --rt-domain-accent: #6366f1; }
+.rt-domain-biology     { --rt-domain-color: #10b981; --rt-domain-accent: #10b981; }
+.rt-domain-chemistry   { --rt-domain-color: #f59e0b; --rt-domain-accent: #f59e0b; }
+.rt-domain-physics     { --rt-domain-color: #3b82f6; --rt-domain-accent: #3b82f6; }
+.rt-domain-philosophy  { --rt-domain-color: #ec4899; --rt-domain-accent: #ec4899; }
+.rt-domain-workspace   { --rt-domain-color: #64748b; --rt-domain-accent: #64748b; }
+
+/* --- Domain cards: hover glow + active border in domain color --- */
+.rt-domain-card {
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.15s ease,
+    background 0.2s ease,
+    color 0.2s ease;
+}
+.rt-domain-card:hover {
+  border-color: color-mix(in srgb, var(--rt-domain-color, #e8b019) 55%, rgba(200,210,230,0.15));
+  box-shadow:
+    0 0 18px color-mix(in srgb, var(--rt-domain-color, #e8b019) 28%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--rt-domain-color, #e8b019) 20%, transparent);
+  background: color-mix(in srgb, var(--rt-domain-color, #e8b019) 10%, rgba(0,0,0,0.2));
+}
+.rt-domain-card.is-active {
+  border-color: var(--rt-domain-color, #e8b019);
+  box-shadow:
+    0 0 22px color-mix(in srgb, var(--rt-domain-color, #e8b019) 32%, transparent),
+    inset 0 0 20px color-mix(in srgb, var(--rt-domain-color, #e8b019) 8%, transparent);
+  background: color-mix(in srgb, var(--rt-domain-color, #e8b019) 12%, rgba(0,0,0,0.25));
+  color: #f8fafc;
+}
+.rt-domain-card.is-active .rt-domain-icon {
+  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--rt-domain-color, #e8b019) 50%, transparent));
+}
+
+/* --- Room atmosphere tint (domain-specific) --- */
+.rt-room[class*="rt-domain-"] {
+  background:
+    radial-gradient(
+      ellipse 80% 50% at 50% 0%,
+      color-mix(in srgb, var(--rt-domain-color, #e8b019) 14%, transparent),
+      transparent 62%
+    ),
+    rgba(200,210,230,0.02);
+  border-color: color-mix(in srgb, var(--rt-domain-color, #e8b019) 22%, rgba(200,210,230,0.08));
+}
+.rt-room .rt-room-title {
+  color: color-mix(in srgb, var(--rt-domain-color, #e8b019) 72%, #e2e8f0);
+}
+
+/* Input + Begin pick up domain color */
+.rt-room .rt-case-input:focus,
+.rt-room textarea:focus,
+.rt-room #rtTopicInput:focus,
+.rt-room [id$="CaseInput"]:focus {
+  border-color: color-mix(in srgb, var(--rt-domain-color, #e8b019) 75%, #fff);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--rt-domain-color, #e8b019) 22%, transparent);
+}
+.rt-room .rt-begin-btn,
+.rt-room button.rt-begin-btn {
+  border-color: color-mix(in srgb, var(--rt-domain-color, #e8b019) 55%, transparent);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--rt-domain-color, #e8b019) 34%, rgba(0,0,0,0.2)),
+    color-mix(in srgb, var(--rt-domain-color, #e8b019) 16%, rgba(0,0,0,0.35))
+  );
+  box-shadow: 0 0 18px color-mix(in srgb, var(--rt-domain-color, #e8b019) 24%, transparent);
+}
+.rt-room .rt-begin-btn:hover,
+.rt-room button.rt-begin-btn:hover {
+  box-shadow: 0 0 26px color-mix(in srgb, var(--rt-domain-color, #e8b019) 36%, transparent);
+}
+
+/* --- Response cards: domain left border as default --- */
+/* Per-specialist --rt-speaker-color still wins when set on the card */
+.rt-room .rt-response-card {
+  border-left-color: var(--rt-speaker-color, var(--rt-domain-color, #94a3b8));
+}
+.rt-room .rt-feed > .rt-response-card:not([style*="--rt-speaker-color"]) {
+  border-left-color: var(--rt-domain-color, #94a3b8);
+}
+
+/* Convergence fill echoes domain color */
+.rt-room .rt-convergence-fill {
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--rt-domain-color, #50c878) 40%, rgba(80,200,120,0.35)),
+    color-mix(in srgb, var(--rt-domain-color, #50c878) 70%, rgba(80,200,120,0.85))
+  );
+  box-shadow: 0 0 12px color-mix(in srgb, var(--rt-domain-color, #50c878) 30%, transparent);
+}
+.rt-room .rt-convergence-value {
+  color: color-mix(in srgb, var(--rt-domain-color, #86efac) 55%, #86efac);
+}
+
+/* Welcome border tint */
+.rt-room .rt-welcome {
+  border-color: color-mix(in srgb, var(--rt-domain-color, #e8b019) 25%, rgba(200,210,230,0.12));
+}
+
+
 </style>
 <script src="lib/peerjs.min.js" defer onerror="this.onerror=null;this.src='https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js'"></script>
 </head>
@@ -17063,7 +17177,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.75.5</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.75.6</span></div>
     </div>
   </div>
 
@@ -17925,43 +18039,43 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 
   <!-- Round Table Domain Nav Cards (Go 3 — Grok + Harmonia) -->
   <nav class="rt-domain-nav" id="rtDomainNav" aria-label="Learning domains">
-    <button class="rt-domain-card is-active" id="rtModeConvo" data-mode="conversation" onclick="rtSwitchMode('conversation')" aria-pressed="true">
+    <button class="rt-domain-card rt-domain-discussion is-active" id="rtModeConvo" data-mode="conversation" onclick="rtSwitchMode('conversation')" aria-pressed="true">
       <span class="rt-domain-icon">&#x1F4AC;</span><span class="rt-domain-label">Discussion</span>
     </button>
-    <button class="rt-domain-card" id="rtModeMedical" data-mode="medical" onclick="rtSwitchMode('medical')" aria-pressed="false">
+    <button class="rt-domain-card rt-domain-medical" id="rtModeMedical" data-mode="medical" onclick="rtSwitchMode('medical')" aria-pressed="false">
       <span class="rt-domain-icon">&#x1FA7A;</span><span class="rt-domain-label">Medical</span>
     </button>
-    <button class="rt-domain-card" id="rtModeLegal" data-mode="legal" onclick="rtSwitchMode('legal')" aria-pressed="false">
+    <button class="rt-domain-card rt-domain-legal" id="rtModeLegal" data-mode="legal" onclick="rtSwitchMode('legal')" aria-pressed="false">
       <span class="rt-domain-icon">&#x2696;</span><span class="rt-domain-label">Legal</span>
     </button>
-    <button class="rt-domain-card" id="rtModeFinance" data-mode="finance" onclick="rtSwitchMode('finance')" aria-pressed="false">
+    <button class="rt-domain-card rt-domain-finance" id="rtModeFinance" data-mode="finance" onclick="rtSwitchMode('finance')" aria-pressed="false">
       <span class="rt-domain-icon">&#x1F4B0;</span><span class="rt-domain-label">Finance</span>
     </button>
-    <button class="rt-domain-card" id="rtModeNutrition" data-mode="nutrition" onclick="rtSwitchMode('nutrition')" aria-pressed="false">
+    <button class="rt-domain-card rt-domain-nutrition" id="rtModeNutrition" data-mode="nutrition" onclick="rtSwitchMode('nutrition')" aria-pressed="false">
       <span class="rt-domain-icon">&#x1F96C;</span><span class="rt-domain-label">Nutrition</span>
     </button>
-    <button class="rt-domain-card" id="rtModeMentalHealth" data-mode="mentalhealth" onclick="rtSwitchMode('mentalhealth')" aria-pressed="false">
+    <button class="rt-domain-card rt-domain-frameworks rt-domain-mentalhealth" id="rtModeMentalHealth" data-mode="mentalhealth" onclick="rtSwitchMode('mentalhealth')" aria-pressed="false">
       <span class="rt-domain-icon">&#x1F9E0;</span><span class="rt-domain-label">Frameworks</span>
     </button>
-    <button class="rt-domain-card" id="rtModeBiology" data-mode="biology" onclick="rtSwitchMode('biology')" aria-pressed="false">
+    <button class="rt-domain-card rt-domain-biology" id="rtModeBiology" data-mode="biology" onclick="rtSwitchMode('biology')" aria-pressed="false">
       <span class="rt-domain-icon">&#x1F9EC;</span><span class="rt-domain-label">Biology</span>
     </button>
-    <button class="rt-domain-card" id="rtModeChemistry" data-mode="chemistry" onclick="rtSwitchMode('chemistry')" aria-pressed="false">
+    <button class="rt-domain-card rt-domain-chemistry" id="rtModeChemistry" data-mode="chemistry" onclick="rtSwitchMode('chemistry')" aria-pressed="false">
       <span class="rt-domain-icon">&#x269B;</span><span class="rt-domain-label">Chemistry</span>
     </button>
-    <button class="rt-domain-card" id="rtModePhysics" data-mode="physics" onclick="rtSwitchMode('physics')" aria-pressed="false">
+    <button class="rt-domain-card rt-domain-physics" id="rtModePhysics" data-mode="physics" onclick="rtSwitchMode('physics')" aria-pressed="false">
       <span class="rt-domain-icon">&#x2699;</span><span class="rt-domain-label">Physics</span>
     </button>
-    <button class="rt-domain-card" id="rtModePhilosophy" data-mode="philosophy" onclick="rtSwitchMode('philosophy')" aria-pressed="false">
+    <button class="rt-domain-card rt-domain-philosophy" id="rtModePhilosophy" data-mode="philosophy" onclick="rtSwitchMode('philosophy')" aria-pressed="false">
       <span class="rt-domain-icon">&#x1F4DC;</span><span class="rt-domain-label">Philosophy</span>
     </button>
-    <button class="rt-domain-card" id="rtModeWorkspace" data-mode="workspace" onclick="rtSwitchMode('workspace')" aria-pressed="false">
+    <button class="rt-domain-card rt-domain-workspace" id="rtModeWorkspace" data-mode="workspace" onclick="rtSwitchMode('workspace')" aria-pressed="false">
       <span class="rt-domain-icon">&#x2699;&#xFE0F;</span><span class="rt-domain-label">Workspace</span>
     </button>
   </nav>
 
   <!-- Conversation Mode (default) — AI minds think together -->
-  <div id="rtConversationView" class="rt-room">
+  <div id="rtConversationView" class="rt-room rt-domain-discussion">
     <div style="text-align:center;margin-bottom:16px;">
       <div style="font-size:0.88rem;color:var(--text-secondary);margin-bottom:10px;">Start a topic. Watch minds think together.</div>
     </div>
@@ -17997,7 +18111,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
   </div>
 
   <!-- Medical Case Study Mode -->
-  <div id="rtMedicalView" style="display:none;">
+  <div id="rtMedicalView" class="rt-room rt-domain-medical" style="display:none;">
     <!-- STRUCTURAL DISCLAIMER — always visible, not dismissable -->
     <div id="rtMedicalDisclaimer" style="background:rgba(220,38,38,0.08);border:1px solid rgba(220,38,38,0.25);border-radius:10px;padding:12px 16px;margin-bottom:14px;font-size:0.78rem;line-height:1.6;color:rgba(255,255,255,0.7);">
       <div style="color:#f87171;font-weight:600;margin-bottom:4px;">&#x26A0; Educational Simulation Only</div>
@@ -18043,7 +18157,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
   </div>
 
   <!-- Legal Case Study Mode -->
-  <div id="rtLegalView" style="display:none;">
+  <div id="rtLegalView" class="rt-room rt-domain-legal" style="display:none;">
     <div id="rtLegalDisclaimer" style="background:rgba(212,160,23,0.08);border:1px solid rgba(212,160,23,0.25);border-radius:10px;padding:12px 16px;margin-bottom:14px;font-size:0.78rem;line-height:1.6;color:rgba(255,255,255,0.7);">
       <div style="color:#d4a017;font-weight:600;margin-bottom:4px;">&#x26A0; Educational Simulation Only</div>
       This is a <strong>learning tool</strong>, not a legal service. The AI personas below are <strong>not attorneys</strong>. No information here constitutes legal advice or creates an attorney-client relationship. <strong>Always consult qualified legal professionals</strong> for legal matters. Laws vary significantly by jurisdiction. This module demonstrates how different legal specialties approach case analysis &mdash; for educational purposes only.
@@ -18080,7 +18194,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
   </div>
 
   <!-- Financial Education Mode -->
-  <div id="rtFinanceView" style="display:none;">
+  <div id="rtFinanceView" class="rt-room rt-domain-finance" style="display:none;">
     <div id="rtFinanceDisclaimer" style="background:rgba(74,222,128,0.06);border:1px solid rgba(74,222,128,0.2);border-radius:10px;padding:12px 16px;margin-bottom:14px;font-size:0.78rem;line-height:1.6;color:rgba(255,255,255,0.7);">
       <div style="color:#4ade80;font-weight:600;margin-bottom:4px;">&#x26A0; Educational Simulation Only</div>
       This is a <strong>learning tool</strong>, not financial advice. The AI personas below are <strong>not certified financial advisors</strong>. No information here constitutes investment advice, tax guidance, or financial planning. <strong>Always consult qualified financial professionals</strong> before making financial decisions. Tax laws and regulations vary by jurisdiction and change frequently.
@@ -18117,7 +18231,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
   </div>
 
   <!-- Nutrition Education Mode -->
-  <div id="rtNutritionView" style="display:none;">
+  <div id="rtNutritionView" class="rt-room rt-domain-nutrition" style="display:none;">
     <div id="rtNutritionDisclaimer" style="background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.2);border-radius:10px;padding:12px 16px;margin-bottom:14px;font-size:0.78rem;line-height:1.6;color:rgba(255,255,255,0.7);">
       <div style="color:#22c55e;font-weight:600;margin-bottom:4px;">&#x26A0; Educational Simulation Only</div>
       This is a <strong>learning tool</strong>, not a nutrition or medical service. The AI personas below are <strong>not registered dietitians or physicians</strong>. No information here constitutes dietary advice, medical nutrition therapy, or treatment recommendations. <strong>Always consult qualified healthcare providers and registered dietitians</strong> for personalized nutrition guidance. This module demonstrates how different nutrition specialties approach dietary questions &mdash; for educational purposes only.
@@ -18154,7 +18268,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
   </div>
 
   <!-- Therapeutic Frameworks — Mental Health Education Mode -->
-  <div id="rtMentalHealthView" style="display:none;">
+  <div id="rtMentalHealthView" class="rt-room rt-domain-frameworks rt-domain-mentalhealth" style="display:none;">
     <div id="rtMentalHealthDisclaimer" style="background:rgba(167,139,250,0.06);border:1px solid rgba(167,139,250,0.2);border-radius:10px;padding:12px 16px;margin-bottom:14px;font-size:0.78rem;line-height:1.6;color:rgba(255,255,255,0.7);">
       <div style="color:#a78bfa;font-weight:600;margin-bottom:4px;">&#x26A0; Educational Simulation Only &mdash; Therapeutic Frameworks</div>
       This is a <strong>learning tool</strong> that demonstrates how different therapeutic approaches understand human experience. The AI personas are <strong>NOT therapists, counselors, or mental health professionals</strong>. This module does <strong>NOT</strong> provide therapy, diagnosis, or treatment.<br><br>
@@ -18193,7 +18307,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
   </div>
 
   <!-- Biology Case Study Mode -->
-  <div id="rtBiologyView" style="display:none;">
+  <div id="rtBiologyView" class="rt-room rt-domain-biology" style="display:none;">
     <div style="background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.2);border-radius:10px;padding:12px 16px;margin-bottom:14px;font-size:0.78rem;line-height:1.6;color:rgba(255,255,255,0.7);">
       <div style="color:#22c55e;font-weight:600;margin-bottom:4px;">&#x26A0; Educational Simulation Only</div>
       This is a <strong>learning tool</strong>, not a scientific or medical service. The AI personas are <strong>not biologists or physicians</strong>. No information here constitutes scientific advice or medical guidance. <strong>Always consult qualified professionals</strong> for health decisions. This module demonstrates how different biological specialties approach questions &mdash; for educational purposes only.
@@ -18226,7 +18340,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
   </div>
 
   <!-- Chemistry Case Study Mode -->
-  <div id="rtChemistryView" style="display:none;">
+  <div id="rtChemistryView" class="rt-room rt-domain-chemistry" style="display:none;">
     <div style="background:rgba(96,165,250,0.06);border:1px solid rgba(96,165,250,0.2);border-radius:10px;padding:12px 16px;margin-bottom:14px;font-size:0.78rem;line-height:1.6;color:rgba(255,255,255,0.7);">
       <div style="color:#60a5fa;font-weight:600;margin-bottom:4px;">&#x26A0; Educational Simulation Only</div>
       This is a <strong>learning tool</strong>, not a laboratory or professional chemistry service. The AI personas are <strong>not licensed chemists</strong>. <strong>Never attempt experiments</strong> without proper training, equipment, and supervision. This module demonstrates how different chemistry specialties approach questions &mdash; for educational purposes only.
@@ -18259,7 +18373,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
   </div>
 
   <!-- Physics Case Study Mode -->
-  <div id="rtPhysicsView" style="display:none;">
+  <div id="rtPhysicsView" class="rt-room rt-domain-physics" style="display:none;">
     <div style="background:rgba(99,102,241,0.06);border:1px solid rgba(99,102,241,0.2);border-radius:10px;padding:12px 16px;margin-bottom:14px;font-size:0.78rem;line-height:1.6;color:rgba(255,255,255,0.7);">
       <div style="color:#6366f1;font-weight:600;margin-bottom:4px;">&#x26A0; Educational Simulation Only</div>
       This is a <strong>learning tool</strong>, not a professional physics service. The AI personas are <strong>not physicists</strong>. This module demonstrates how different physics specialties approach questions &mdash; for educational purposes only.
@@ -18288,7 +18402,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
   </div>
 
   <!-- Philosophy Round Table Mode -->
-  <div id="rtPhilosophyView" style="display:none;">
+  <div id="rtPhilosophyView" class="rt-room rt-domain-philosophy" style="display:none;">
     <div style="background:rgba(167,139,250,0.06);border:1px solid rgba(167,139,250,0.2);border-radius:10px;padding:12px 16px;margin-bottom:14px;font-size:0.78rem;line-height:1.6;color:rgba(255,255,255,0.7);">
       <div style="color:#a78bfa;font-weight:600;margin-bottom:4px;">&#x1F4DC; Educational Exploration</div>
       This is a learning tool for exploring philosophical traditions. The AI personas represent <strong>schools of thought</strong>, not individual philosophers. Philosophy thrives on disagreement &mdash; these perspectives will genuinely conflict with each other. That's the point. Think <em>with</em> them, not just <em>about</em> them.
@@ -18317,7 +18431,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
   </div>
 
   <!-- Workspace Mode (existing) -->
-  <div id="rtWorkspaceView" style="display:none;">
+  <div id="rtWorkspaceView" class="rt-room rt-domain-workspace" style="display:none;">
 
   <!-- Header -->
   <div class="rt-header">
@@ -22038,7 +22152,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.75.5';
+const FL_VERSION = '5.75.6';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.

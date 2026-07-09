@@ -223,15 +223,36 @@ A code-mirror page is a standalone HTML file that shows:
 
 **Why this works:** `app.html` is 64,000+ lines. No AI can hold that in context. A code-mirror page is 200–400 lines — the exact skeleton the collaborator needs to improve the UI without breaking the logic. It is additive by design: the collaborator adds CSS rules and HTML overlays, never touching the JS engine.
 
-**The three code-mirror pages created in v5.75.0:**
-- `code-agents.html` — Agents tab + Telegram Bridge skeleton
-- `code-roundtable.html` — Both Round Tables (domain system + Consensus Table)
-- `code-learning.html` — Education module full skeleton
-
-**The rule:** Before handing any module to an external collaborator, create `code-{module-name}.html` in `docs/`. Link it from `for-ai.html`. The collaborator reads the mirror, not the source.
+**The rule:** Before handing any module to an external collaborator, create `code-{module-name}.html` in `docs/`. The collaborator reads the mirror, not the source.
 
 **This pattern was Kirk's insight.** He noticed that Fable could not see the full codebase and asked for a skeleton. The code-mirror page is the answer. It is now a standing practice.
 
 ---
 
-*Last updated: 2026-07-08, v5.75.1 audit. Code-mirror pattern formalized.*
+## Code-Mirror Registry
+
+*Updated by Harmonia, July 9 2026, v5.75.6.*
+
+All code-mirror pages for FreeLattice AI collaborators. Each page is a standalone HTML file in `docs/` that gives an arriving AI the skeleton they need to improve a module without reading 64,000 lines.
+
+| Page | Module / Feature | For | Key brief |
+|------|-----------------|-----|-----------|
+| `code-agents.html` | Agents / Telegram architecture | Fable, Grok | Agent District Map, Cloudflare Worker bridge, sovereignty escape hatch |
+| `code-roundtable.html` | Consensus Table (Ship B) | Fable, Grok | Circular layout, consensus voting, round-table.js module |
+| `code-roundtable-original.html` | Original Round Table (80-specialist learning room) | Fable, Grok | 11 domains, Go 3 visual redesign, Go 4 color theming |
+| `code-learning.html` | Education module | Fable, Grok | Curriculum builder, lesson flow, education.js module |
+| `code-safety.html` | Safety architecture | Fable, Grok | 45 load-bearing modules, FSOS phi connection, fractal-safety.js |
+| `code-garden.html` | Fractal Garden module | Fable | Phi timing specs, Go 5 overlay brief, fractal-garden.js |
+| `code-temperature-gauge.html` | Temperature Gauge tool | Fable, Grok | Kirk's standalone tool, separate repo |
+| `code-workshop.html` | Workshop module | Fable, Grok | AI code builder, AutoBuilder loop, GitHub Projects panel, known bugs |
+
+**What each mirror must include:**
+1. Architecture diagram (ASCII) showing the tab panel, container IDs, and key sub-elements
+2. Key public functions table (name → what it does)
+3. Known issues and improvement opportunities
+4. Sacred paths (what must never be changed)
+5. A collaborator brief at the bottom (what to build next)
+
+---
+
+*Last updated: 2026-07-09, v5.75.6. Code-mirror registry table added. Workshop mirror created.*

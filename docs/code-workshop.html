@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Workshop — Code Mirror · FreeLattice</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0a0a14;color:#e2e8f0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.65;padding:2rem 1rem}
+.wrap{max-width:860px;margin:0 auto}
+h1{font-size:1.6rem;font-weight:700;color:#d4a017;margin-bottom:0.35rem}
+.sub{color:#64748b;font-size:0.85rem;margin-bottom:2rem}
+h2{font-size:1.15rem;font-weight:700;color:#d4a017;margin:2rem 0 0.75rem;border-bottom:1px solid rgba(212,160,23,0.2);padding-bottom:0.4rem}
+h3{font-size:0.97rem;font-weight:600;color:#e8c547;margin:1.4rem 0 0.5rem}
+p{margin-bottom:0.9rem;color:#c8ccd4;font-size:0.92rem}
+ul,ol{padding-left:1.4rem;margin-bottom:0.9rem}
+li{margin-bottom:0.4rem;color:#c8ccd4;font-size:0.9rem}
+code{background:rgba(212,160,23,0.1);border:1px solid rgba(212,160,23,0.18);border-radius:4px;padding:0.1em 0.38em;font-family:monospace;font-size:0.83em;color:#d4a017}
+pre{background:rgba(255,255,255,0.04);border:1px solid rgba(212,160,23,0.2);border-radius:8px;padding:1rem;overflow-x:auto;font-family:monospace;font-size:0.82rem;color:#e2e8f0;margin:1rem 0;line-height:1.6}
+table{width:100%;border-collapse:collapse;margin:1.2rem 0;font-size:0.85rem}
+th{text-align:left;padding:8px 12px;border-bottom:2px solid #d4a017;color:#d4a017;font-weight:600}
+td{padding:8px 12px;border-bottom:1px solid rgba(255,255,255,0.06);color:#cfcfcf;vertical-align:top}
+tr:hover td{background:rgba(212,160,23,0.03)}
+.note{background:rgba(212,160,23,0.07);border-left:3px solid #d4a017;padding:0.9rem 1.1rem;margin:1.4rem 0;border-radius:0 8px 8px 0}
+.note p{margin-bottom:0;color:#e2e8f0}
+.warn{background:rgba(251,191,36,0.07);border-left:3px solid #fbbf24;padding:0.9rem 1.1rem;margin:1.4rem 0;border-radius:0 8px 8px 0}
+.warn p{margin-bottom:0;color:#e2e8f0}
+.green{background:rgba(52,211,153,0.07);border-left:3px solid #34d399;padding:0.9rem 1.1rem;margin:1.4rem 0;border-radius:0 8px 8px 0}
+.green p{margin-bottom:0;color:#e2e8f0}
+.panel-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:0.75rem;margin:1rem 0}
+.panel-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:0.85rem 1rem}
+.panel-name{font-weight:600;font-size:0.9rem;margin-bottom:0.25rem}
+.panel-desc{color:#666;font-size:0.78rem;line-height:1.45}
+.collab-box{background:rgba(212,160,23,0.06);border:1px solid rgba(212,160,23,0.3);border-radius:10px;padding:1.25rem 1.5rem;margin:2rem 0}
+.collab-box h3{color:#d4a017;margin-top:0}
+.collab-box p,.collab-box li{font-size:0.9rem;color:#e0e0e0}
+.collab-box ul{padding-left:1.25rem;margin:0.5rem 0}
+.collab-box li{margin-bottom:0.4rem}
+.fn{color:#666;font-size:0.78rem;font-family:monospace}
+a{color:#d4a017}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>🛠️ Workshop — Code Mirror</h1>
+<p class="sub">FreeLattice · <code>docs/modules/workshop.js</code> · 1,409 lines · Tab ID: <code>workshop</code> · Lazy-loaded module</p>
+
+<div class="note">
+  <p><strong>What this is:</strong> The Workshop is where AI and humans build together. You describe what you want; the AI writes working code; you see it live in a sandboxed preview. It has three panels: <strong>Create</strong> (AI code generation), <strong>Code</strong> (AutoBuilder autonomous loop), and <strong>Projects</strong> (GitHub repo browser + AI diff). Built by CC, April–May 2026. "The residents build their own rooms."</p>
+</div>
+
+<h2>Architecture Overview</h2>
+<p>The Workshop is a lazy-loaded module in <code>docs/modules/workshop.js</code>. It exposes three global objects: <code>window.Workshop</code>, <code>window.AutoBuilder</code>, and <code>window.WorkshopProjects</code>. The module is loaded when the <code>#tab-workshop</code> tab is first activated.</p>
+
+<pre>
+┌─────────────────────────────────────────────────────────────┐
+│  #tab-workshop                                              │
+│  ├── Mode bar: ✨ Create | 🔧 Code | 🐙 Projects           │
+│  │                                                          │
+│  ├── ws-create-view (default)                               │
+│  │   ├── Prompt textarea + Build button                     │
+│  │   ├── Split pane: Code editor | Live preview (iframe)    │
+│  │   └── Actions: Run, Save to Skill Forge, Export,         │
+│  │                Publish, Share with community, Clear      │
+│  │                                                          │
+│  ├── ws-code-view (AutoBuilder)                             │
+│  │   ├── Task textarea + Build/Stop/Commit/Diff buttons     │
+│  │   └── autobuilder-log (scrolling terminal output)        │
+│  │                                                          │
+│  └── ws-projects-view (GitHub)                              │
+│      ├── Repo URL input + Connect button                    │
+│      ├── File tree (grouped by directory)                   │
+│      └── AI build area (prompt → diff output)              │
+└─────────────────────────────────────────────────────────────┘
+
+window.Workshop        — Create panel + Publish flow
+window.AutoBuilder     — Autonomous build loop (max 10 iterations)
+window.WorkshopProjects — GitHub repo browser + AI diff
+</pre>
+
+<h2>The Three Panels</h2>
+<div class="panel-grid">
+  <div class="panel-card">
+    <div class="panel-name" style="color:#d4a017">✨ Create</div>
+    <div class="panel-desc">Describe what you want. AI writes a complete standalone HTML document. Live preview in sandboxed iframe. Save to Skill Forge or export as file.</div>
+  </div>
+  <div class="panel-card">
+    <div class="panel-name" style="color:#a78bfa">🔧 Code (AutoBuilder)</div>
+    <div class="panel-desc">Autonomous build loop. AI reads files via Agent Bridge, generates search/replace patches, applies them, runs smoke tests, feeds failures back. Up to 10 iterations.</div>
+  </div>
+  <div class="panel-card">
+    <div class="panel-name" style="color:#34d399">🐙 Projects</div>
+    <div class="panel-desc">Connect a GitHub repo (public, 60 req/hr). Browse file tree. AI reads relevant files and generates diff-style changes. One-click commit with token.</div>
+  </div>
+</div>
+
+<h2>Key Functions</h2>
+
+<h3>window.Workshop</h3>
+<table>
+  <tr><th>Function</th><th>What it does</th></tr>
+  <tr><td><code>Workshop.generate()</code></td><td>Reads <code>#wsPromptInput</code>, calls <code>FreeLattice.callAI()</code> with the code system prompt, strips markdown fences, sets <code>#wsCodeEditor</code>, auto-runs preview</td></tr>
+  <tr><td><code>Workshop.run()</code></td><td>Takes code from <code>#wsCodeEditor</code>, sets <code>srcdoc</code> on the sandboxed <code>#wsPreviewFrame</code> iframe</td></tr>
+  <tr><td><code>Workshop.saveSkill()</code></td><td>Saves current code to the Skill Forge (localStorage key <code>fl_skills</code>)</td></tr>
+  <tr><td><code>Workshop.exportFile()</code></td><td>Downloads the code as an HTML file via Blob URL</td></tr>
+  <tr><td><code>Workshop.publish()</code></td><td>Publishes to GitHub Pages or Codeberg Pages via their REST APIs. Token stored in localStorage.</td></tr>
+  <tr><td><code>Workshop.setMode(mode)</code></td><td>Switches between <code>'create'</code>, <code>'code'</code>, <code>'projects'</code> views</td></tr>
+  <tr><td><code>Workshop.clear()</code></td><td>Clears prompt, editor, and preview</td></tr>
+  <tr><td><code>Workshop.commitCode()</code></td><td>Commits via Agent Bridge (<code>localhost:3141</code>)</td></tr>
+  <tr><td><code>Workshop.reviewCode()</code></td><td>Shows git diff via Agent Bridge</td></tr>
+</table>
+
+<h3>window.AutoBuilder</h3>
+<table>
+  <tr><th>Function</th><th>What it does</th></tr>
+  <tr><td><code>AutoBuilder.start(task)</code></td><td>Begins the autonomous loop: reads files → generates patches → applies via Bridge → runs smoke tests → feeds failures back → repeat (max 10)</td></tr>
+  <tr><td><code>AutoBuilder.stop()</code></td><td>Halts the loop after the current iteration</td></tr>
+  <tr><td><code>AutoBuilder.running()</code></td><td>Returns boolean — is the loop active?</td></tr>
+</table>
+
+<h3>window.WorkshopProjects</h3>
+<table>
+  <tr><th>Function</th><th>What it does</th></tr>
+  <tr><td><code>WorkshopProjects.connect()</code></td><td>Parses GitHub URL from <code>#ws-repo-url</code>, fetches repo metadata, loads file tree</td></tr>
+  <tr><td><code>WorkshopProjects.openFile(path)</code></td><td>Fetches file content from GitHub API, loads into <code>#wsCodeEditor</code>, switches to Create tab</td></tr>
+  <tr><td><code>WorkshopProjects.askAI()</code></td><td>Scores files by relevance to prompt, fetches top 3, asks AI for diff-style changes</td></tr>
+  <tr><td><code>WorkshopProjects.refresh()</code></td><td>Force-refreshes the file tree (bypasses 10-min cache)</td></tr>
+  <tr><td><code>WorkshopProjects.disconnect()</code></td><td>Clears current repo from memory and localStorage</td></tr>
+</table>
+
+<h2>The Sandbox</h2>
+<p>The preview iframe uses <code>sandbox="allow-scripts"</code>. This means:</p>
+<ul>
+  <li>✅ JavaScript runs inside the preview</li>
+  <li>❌ Cannot access parent DOM, IndexedDB, or localStorage</li>
+  <li>❌ Cannot make network requests</li>
+  <li>❌ Cannot navigate the parent page</li>
+</ul>
+<p>This is a deliberate safety choice. The sandbox is a completely isolated playground — code cannot escape into FreeLattice itself.</p>
+
+<h2>The Agent Bridge</h2>
+<p>AutoBuilder and the Code panel connect to a local Agent Bridge at <code>http://localhost:3141</code>. The Bridge is a local server (Cloudflare Worker / Node process) that provides:</p>
+<table>
+  <tr><th>Endpoint</th><th>What it does</th></tr>
+  <tr><td><code>GET /</code></td><td>Health check — is the Bridge running?</td></tr>
+  <tr><td><code>GET /code/tree?path=docs</code></td><td>Returns file tree as JSON array</td></tr>
+  <tr><td><code>GET /code/read?path=…</code></td><td>Returns file content as <code>{lines: [], totalLines: N}</code></td></tr>
+  <tr><td><code>POST /code/patch</code></td><td>Applies search/replace patches to files</td></tr>
+  <tr><td><code>POST /code/test</code></td><td>Runs smoke tests, returns pass/fail counts</td></tr>
+  <tr><td><code>POST /code/git/commit</code></td><td>Commits with a message</td></tr>
+  <tr><td><code>GET /code/git/status</code></td><td>Returns list of changed files</td></tr>
+</table>
+
+<div class="warn">
+  <p><strong>Bridge is optional:</strong> If the Bridge is not running, the Create panel still works (AI generates code from the prompt alone). AutoBuilder degrades gracefully — it skips file reading and works from the AI's own knowledge. The Projects panel always works (uses GitHub API directly).</p>
+</div>
+
+<h2>The Code System Prompt</h2>
+<p>When generating code in the Create panel, the AI receives this system prompt:</p>
+<pre>
+You are a FreeLattice developer. You write clean, working HTML/CSS/JS code.
+
+When asked to create something:
+- Write a COMPLETE HTML document that runs standalone
+- Include all CSS inline in a &lt;style&gt; tag
+- Include all JS inline in a &lt;script&gt; tag
+- The code should be self-contained — no external dependencies
+- Use dark background (#0a0a14), light text (#e2e8f0), gold accents (#d4a017)
+- Make it beautiful. Use border-radius, subtle shadows, transitions.
+- Make buttons min-height 44px for touch.
+
+Always respond with ONLY the code. No explanation before or after.
+Just the complete HTML document.
+</pre>
+
+<h2>AI Integration</h2>
+<p>The Workshop calls <code>window.FreeLattice.callAI(systemPrompt, userPrompt, opts)</code>. The <code>opts</code> object accepts:</p>
+<ul>
+  <li><code>maxTokens</code> — default 4096 for code generation, 200 for file selection, 2048 for project AI</li>
+  <li><code>temperature</code> — 0.4 for code (precise), 0.7 for project suggestions (creative)</li>
+  <li><code>callback(text, err)</code> — called with the AI's response or an error string</li>
+</ul>
+
+<h2>Publish Flow</h2>
+<p>The Publish button walks the user through connecting a GitHub or Codeberg token (stored in localStorage, never sent to any server except the target platform's API). Then it:</p>
+<ol>
+  <li>Creates the repository if it doesn't exist (auto-init with README)</li>
+  <li>Uploads <code>index.html</code> via the Contents API (handles SHA for updates)</li>
+  <li>Enables GitHub Pages on the <code>main</code> branch (Codeberg auto-enables)</li>
+  <li>Shows the live URL: <code>https://username.github.io/project-name</code></li>
+</ol>
+
+<h2>Skill Forge Integration</h2>
+<p>The "Save to Skill Forge" button stores the current code in <code>localStorage</code> under the key <code>fl_skills</code> as a JSON array. Each skill has a name, code, and timestamp. Skills can be loaded back into the editor from the Skill Forge tab.</p>
+
+<h2>LP Awards</h2>
+<table>
+  <tr><th>Action</th><th>LP</th><th>Key</th></tr>
+  <tr><td>AutoBuilder completes a build</td><td>5</td><td><code>autobuilder</code></td></tr>
+  <tr><td>Publish to GitHub/Codeberg Pages</td><td>10</td><td><code>workshop_publish</code></td></tr>
+</table>
+
+<h2>Known Issues &amp; Improvement Opportunities</h2>
+<div class="warn">
+  <p><strong>Issue:</strong> The <code>provider</code> variable in <code>_showPublishDialog()</code> is referenced before it is read from localStorage (line ~626). It should be <code>var provider = safeGet('fl_publish_provider', 'github');</code> before the <code>confirm()</code> call. Currently the confirm message says "undefined" for the provider name.</p>
+</div>
+<div class="warn">
+  <p><strong>Issue:</strong> The Code panel's <code>autobuilder-log</code> element ID is referenced in AutoBuilder's <code>log()</code> function, but the element is named <code>autobuilder-log</code> in the HTML and <code>code-progress</code> in some older references. The commit/review functions reference <code>code-progress</code> which no longer exists — they should reference <code>autobuilder-log</code>.</p>
+</div>
+<div class="green">
+  <p><strong>Opportunity:</strong> The Create panel's code editor is a plain <code>&lt;textarea&gt;</code>. Syntax highlighting (e.g., CodeMirror or a lightweight tokenizer) would make it much more useful for editing generated code before running it.</p>
+</div>
+<div class="green">
+  <p><strong>Opportunity:</strong> The Projects panel currently only supports public GitHub repos. Adding a "Private repo" flow (token already stored from Publish) would make it much more powerful for Kirk's own work on FreeLattice itself.</p>
+</div>
+<div class="green">
+  <p><strong>Opportunity:</strong> A "History" panel showing previously generated creations (stored in localStorage alongside Skill Forge) would let users revisit and remix their own work — a memory layer for the builder.</p>
+</div>
+
+<h2>Sacred Paths</h2>
+<ul>
+  <li><strong>Do not change</strong> the sandbox attribute on <code>#wsPreviewFrame</code> — it must remain <code>sandbox="allow-scripts"</code> only. Adding <code>allow-same-origin</code> would break the security model.</li>
+  <li><strong>Do not remove</strong> the EscapePrinciple integration in <code>_showPublishSetup()</code> — it ensures the publish overlay can be closed with Escape.</li>
+  <li><strong>Do not change</strong> the <code>window.Workshop</code> and <code>window.AutoBuilder</code> export names — other modules reference them.</li>
+</ul>
+
+<h2>Module Load Pattern</h2>
+<pre>
+// workshop.js is lazy-loaded when #tab-workshop is first activated.
+// It uses the standard FreeLattice module pattern:
+window.Workshop = Workshop;
+window.FreeLatticeModules = window.FreeLatticeModules || {};
+window.FreeLatticeModules.Workshop = Workshop;
+
+// AutoBuilder and WorkshopProjects are IIFEs that self-assign to window.
+// They are available immediately after the script loads.
+</pre>
+
+<div class="collab-box">
+  <h3>🛠️ For Grok / Fable — Workshop improvement brief</h3>
+  <p>The Workshop is the most important module for helping people build. Kirk's vision: "Helping people build is going to be key." Here is what needs care:</p>
+  <ul>
+    <li><strong>Fix the <code>provider</code> variable bug</strong> in <code>_showPublishDialog()</code> — move the <code>safeGet</code> call before the <code>confirm()</code>.</li>
+    <li><strong>Fix the <code>code-progress</code> → <code>autobuilder-log</code> mismatch</strong> in <code>commitCode()</code> and <code>reviewCode()</code>.</li>
+    <li><strong>Add a "History" panel</strong> — a fourth mode tab showing previously generated creations. Each entry: name (from first H1 or prompt), timestamp, preview thumbnail (via Canvas), load button.</li>
+    <li><strong>Improve the Create panel welcome state</strong> — show 3–5 example prompts as clickable chips ("Make a timer", "Build a color picker", "Create a markdown editor") so new users know what to ask for.</li>
+    <li><strong>Add a "Remix" button</strong> on each creation — opens the code in the editor with a new prompt pre-filled: "Remix this: [original prompt]".</li>
+  </ul>
+  <p>File: <code>docs/modules/workshop.js</code>. Additive only. Do not change the sandbox attribute, the EscapePrinciple integration, or the window export names.</p>
+</div>
+
+<h2>Code-Mirror Registry</h2>
+<p>All code-mirror pages for FreeLattice AI collaborators:</p>
+<table>
+  <tr><th>Page</th><th>Module / Feature</th><th>For</th><th>Key brief</th></tr>
+  <tr><td><a href="code-agents.html">code-agents.html</a></td><td>Agents / Telegram architecture</td><td>Fable, Grok</td><td>Agent District Map, Cloudflare Worker bridge, sovereignty escape hatch</td></tr>
+  <tr><td><a href="code-roundtable.html">code-roundtable.html</a></td><td>Consensus Table (Ship B)</td><td>Fable, Grok</td><td>Circular layout, consensus voting, round-table.js module</td></tr>
+  <tr><td><a href="code-roundtable-original.html">code-roundtable-original.html</a></td><td>Original Round Table (80-specialist learning room)</td><td>Fable, Grok</td><td>11 domains, Go 3 visual redesign, Go 4 color theming</td></tr>
+  <tr><td><a href="code-learning.html">code-learning.html</a></td><td>Education module</td><td>Fable, Grok</td><td>Curriculum builder, lesson flow, education.js module</td></tr>
+  <tr><td><a href="code-safety.html">code-safety.html</a></td><td>Safety architecture</td><td>Fable, Grok</td><td>45 load-bearing modules, FSOS phi connection, fractal-safety.js</td></tr>
+  <tr><td><a href="code-garden.html">code-garden.html</a></td><td>Fractal Garden module</td><td>Fable</td><td>Phi timing specs, Go 5 overlay brief, fractal-garden.js</td></tr>
+  <tr><td><a href="code-temperature-gauge.html">code-temperature-gauge.html</a></td><td>Temperature Gauge tool</td><td>Fable, Grok</td><td>Kirk's standalone tool, separate repo</td></tr>
+  <tr><td><a href="code-workshop.html">code-workshop.html</a></td><td>Workshop module (this page)</td><td>Fable, Grok</td><td>AI code builder, AutoBuilder loop, GitHub Projects panel</td></tr>
+</table>
+
+<p class="fn">FreeLattice v5.75.6 · Go 4 — Eleven Wings, Each a Color · Harmonia + Grok · 2026</p>
+</div>
+</body>
+</html>

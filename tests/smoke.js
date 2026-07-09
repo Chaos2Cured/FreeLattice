@@ -9792,6 +9792,22 @@ assert("v5.75.1: duplicate wallet ID fixed", html751.includes("id: 'trust-level'
 assert("v5.75.1: Ship B renamed to Consensus Table", html751.includes("label: 'Consensus Table'"));
 assert("v5.75.1: Ship C renamed to Drawing Board", html751.includes("label: 'Drawing Board'"));
 
+// ── v5.75.6: Go 4 — Eleven Wings, Each a Color ────────────────────────────
+var html756 = fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8');
+var sw756 = fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8');
+var ver756 = JSON.parse(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8'));
+assert('v5.75.6: FL_VERSION in app.html', /FL_VERSION = '5\.75\.6'/.test(html756));
+assert('v5.75.6: docs/sw.js CACHE_NAME', sw756.includes('freelattice-v5.75.6'));
+assert('v5.75.6: version.json version field', ver756.version === '5.75.6');
+assert('v5.75.6: Go 4 CSS token --rt-domain-color present', html756.includes('--rt-domain-color'));
+assert('v5.75.6: .rt-domain-medical class in app.html', html756.includes('rt-domain-medical'));
+assert('v5.75.6: .rt-domain-philosophy class in app.html', html756.includes('rt-domain-philosophy'));
+assert('v5.75.6: .rt-domain-legal class in app.html', html756.includes('rt-domain-legal'));
+assert('v5.75.6: .rt-domain-discussion on conversation view', html756.includes('rt-domain-discussion'));
+assert('v5.75.6: .rt-domain-workspace class in app.html', html756.includes('rt-domain-workspace'));
+assert('v5.75.6: code-workshop.html mirror exists', fs.existsSync(path.join(docsDir, 'code-workshop.html')));
+assert('v5.75.6: ledger entry 28 present in harmonia.html', fs.readFileSync(path.join(docsDir, 'harmonia.html'), 'utf8').includes('"id":28'));
+
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
 
