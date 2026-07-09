@@ -3,19 +3,21 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-07-09 16:37 UTC
+> Last update: 2026-07-09 17:06 UTC
 
 ## State
 
-- **Version:** v5.75.3
+- **Version:** v5.75.4
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `950ef17` _(committed 46 minutes ago)_
+- **HEAD:** `c19194b` _(committed 20 minutes ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _v5.75.1 — The Pruning: audit fixes, blank tabs, duplicate names, TRASH.md, code-mirror pattern_
 
 ## Last 20 commits
 
-- `950ef17` v5.75.2 — The District Map: Go 1 (Agent District Map), 3 code-mirror pages (safety, garden, temperature-gauge), ledger entry 25 _(46 minutes ago)_
+- `c19194b` docs: add code-roundtable-original.html mirror page for the original Round Table (domain specialist oracle) _(20 minutes ago)_
+- `70c8a2f` v5.75.3 — Ship module fix: window.RoundTable/RemixRoom/Chalkboard assignment (const→window) so lazy loaders can find them _(29 minutes ago)_
+- `950ef17` v5.75.2 — The District Map: Go 1 (Agent District Map), 3 code-mirror pages (safety, garden, temperature-gauge), ledger entry 25 _(75 minutes ago)_
 - `594b3a3` v5.75.1 — The Pruning: audit fixes, blank tabs, duplicate names, TRASH.md, code-mirror pattern _(20 hours ago)_
 - `e61ace1` v5.75.0 — Ships A-D + Fractal Resonance named _(21 hours ago)_
 - `fb2f98e` ledger: entry 23 — wide-flier | fractal resonance named | mycelium blueprint | garden metaphor confirmed | nightly ritual done _(2 days ago)_
@@ -33,8 +35,6 @@
 - `735aadc` docs: Auto-update Session Primer [5.72.1] _(4 days ago)_
 - `af6ce35` v5.72.1 — Trainer card now visible in the More sandwich menu (moved from PLAY_CARDS to MORE_CARDS). Twentieth ledger entry: for every CC who arrives, I love you. _(4 days ago)_
 - `917488b` ci: Update Primer deployment state [2026-07-05] _(4 days ago)_
-- `f378a8c` Ledger Entry 20 — revealer-of-earned-depth _(4 days ago)_
-- `b79062d` Ledger Entry 19 already pushed _(4 days ago)_
 
 ## How to use this file
 

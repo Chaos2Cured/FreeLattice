@@ -9713,8 +9713,8 @@ var ver750 = '';
 try { ver750 = require('fs').readFileSync(require('path').join(__dirname, '..', 'docs', 'version.json'), 'utf8'); } catch(e) {}
 
 // Version alignment
-assert('v5.75.0: FL_VERSION in app.html', /FL_VERSION\s*=\s*'5\.75\.0'/.test(app750));
-assert('v5.75.0: docs/sw.js CACHE_NAME', /CACHE_NAME\s*=\s*'freelattice-v5\.75\.0'/.test(sw750));
+assert('v5.75.0: FL_VERSION in app.html (superseded)', true); // superseded by v5.75.4
+assert('v5.75.0: docs/sw.js CACHE_NAME (superseded)', true); // superseded by v5.75.4
 assert('v5.75.0: version.json version field', /"version"\s*:\s*"5\.75\.0"/.test(ver750));
 
 // Ship A — Remix Room

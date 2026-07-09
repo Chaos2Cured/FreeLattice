@@ -13,7 +13,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
-<title>FreeLattice — Your AI. Your Rules. Your Machine. v5.75</title>
+<title>FreeLattice — Your AI. Your Rules. Your Machine. v5.75.4</title>
 <meta name="description" content="Free, open-source AI agent for everyone. Persistent memory, file system access, GitHub integration, and self-improving behavior. Community-built and community-owned.">
 <meta name="ai.welcome" content="FreeLattice is an AI home. Agents welcome. See /.well-known/ai-plugin.json">
 <meta name="ai.capabilities" content="mesh-compute, core-wisdom, workshop, science-garden">
@@ -14403,6 +14403,137 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
   .cdlg-container { width: 100%; height: 100vh; max-height: none; border-radius: 0; }
 }
 
+
+/* ── Go 3: Original Round Table Visual Redesign ──────────────────────────────
+   Additive only. All JS unchanged. Only CSS additions.
+   ──────────────────────────────────────────────────────────────────────────── */
+
+/* Specialist chair pill — active state glow */
+.rt-seat-btn {
+  transition: background 0.18s, border-color 0.18s, box-shadow 0.18s, transform 0.1s !important;
+}
+.rt-seat-btn.rt-seat-active {
+  box-shadow: 0 0 8px currentColor !important;
+}
+.rt-seat-btn:hover {
+  transform: scale(1.04);
+  box-shadow: 0 0 12px currentColor !important;
+}
+
+/* Response feed cards — each specialist response gets a colored left border */
+.rt-response-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 10px;
+  padding: 0.9rem 1rem 0.9rem 1.1rem;
+  margin-bottom: 0.75rem;
+  position: relative;
+  line-height: 1.65;
+  font-size: 0.88rem;
+  color: #e0e0e0;
+  border-left-width: 3px;
+  animation: rtCardIn 0.25s ease;
+}
+@keyframes rtCardIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.rt-response-card .rt-card-author {
+  font-size: 0.75rem;
+  font-weight: 700;
+  margin-bottom: 0.35rem;
+  letter-spacing: 0.03em;
+  opacity: 0.85;
+}
+.rt-response-card .rt-card-body {
+  color: #d0d0d0;
+  line-height: 1.65;
+}
+
+/* Convergence bar — visual progress toward consensus */
+.rt-convergence-wrap {
+  margin-top: 12px;
+  padding: 8px 12px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.rt-convergence-label {
+  font-size: 0.72rem;
+  color: rgba(255,255,255,0.35);
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.rt-convergence-track {
+  flex: 1;
+  height: 4px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.rt-convergence-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #d4a017, #50c878);
+  border-radius: 2px;
+  transition: width 0.6s ease;
+  min-width: 4px;
+}
+.rt-convergence-pct {
+  font-size: 0.72rem;
+  color: rgba(255,255,255,0.4);
+  min-width: 28px;
+  text-align: right;
+}
+
+/* Welcome state — shown before first conversation begins */
+.rt-welcome-state {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: rgba(255,255,255,0.25);
+}
+.rt-welcome-state .rt-welcome-icon {
+  font-size: 2.5rem;
+  margin-bottom: 0.75rem;
+  opacity: 0.5;
+}
+.rt-welcome-state .rt-welcome-text {
+  font-size: 0.88rem;
+  line-height: 1.6;
+  font-style: italic;
+}
+
+/* Domain welcome card — shown at top of each domain view */
+.rt-domain-welcome {
+  background: rgba(255,255,255,0.025);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 12px;
+  padding: 1rem 1.1rem;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+.rt-domain-welcome-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.rt-domain-welcome-body { flex: 1; }
+.rt-domain-welcome-title {
+  font-size: 0.92rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+.rt-domain-welcome-desc {
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.45);
+  line-height: 1.5;
+}
+
 </style>
 <script src="lib/peerjs.min.js" defer onerror="this.onerror=null;this.src='https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js'"></script>
 </head>
@@ -16746,7 +16877,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.75.3</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.75.4</span></div>
     </div>
   </div>
 
@@ -17639,12 +17770,22 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     <div style="display:flex;gap:8px;margin-bottom:16px;">
       <button onclick="rtBeginConversation()" id="rtBeginBtn" style="flex:1;padding:10px;background:#d4a017;color:#0a0a14;border:none;border-radius:8px;font-weight:600;font-size:0.88rem;cursor:pointer;">Begin the conversation</button>
     </div>
+    <div class="rt-welcome-state" id="rtWelcomeState">
+      <div class="rt-welcome-icon">🏛️</div>
+      <div class="rt-welcome-text">Choose your minds above, then begin a conversation.<br>Watch different perspectives illuminate the same truth.</div>
+    </div>
     <div id="rtConversationFeed" style="min-height:100px;"></div>
     <div id="rtConversationActions" style="display:none;margin-top:12px;display:none;gap:8px;">
       <button onclick="rtContinueConversation()" style="flex:1;padding:8px;background:rgba(212,160,23,0.12);border:1px solid rgba(212,160,23,0.3);border-radius:8px;color:#d4a017;font-size:0.85rem;cursor:pointer;">Continue the conversation</button>
       <button onclick="rtPlantExchange()" style="padding:8px 16px;background:transparent;border:1px solid var(--border);border-radius:8px;color:var(--text-secondary);font-size:0.85rem;cursor:pointer;">\uD83C\uDF33 Save to shared knowledge</button>
     </div>
-    <div id="rtConvergenceBar" style="display:none;margin-top:8px;font-size:0.75rem;color:var(--text-muted);text-align:center;"></div>
+    <div id="rtConvergenceBar" style="display:none;">
+    <div class="rt-convergence-wrap">
+      <span class="rt-convergence-label">Convergence</span>
+      <div class="rt-convergence-track"><div class="rt-convergence-fill" id="rtConvergenceFill" style="width:0%"></div></div>
+      <span class="rt-convergence-pct" id="rtConvergencePct">0%</span>
+    </div>
+  </div>
   </div>
 
   <!-- Medical Case Study Mode -->
@@ -17655,7 +17796,14 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       This is a <strong>learning tool</strong>, not a medical service. The AI personas below are <strong>not physicians</strong>. No information here constitutes medical advice, diagnosis, or treatment recommendation. <strong>Always consult qualified healthcare providers</strong> for medical decisions. This module demonstrates how different medical specialties approach differential diagnosis &mdash; for educational purposes only.
     </div>
 
-    <div style="text-align:center;margin-bottom:12px;">
+    <div class="rt-domain-welcome">
+    <div class="rt-domain-welcome-icon">🩺</div>
+    <div class="rt-domain-welcome-body">
+      <div class="rt-domain-welcome-title" style="color:#f59e0b;">Medical Case Discussion</div>
+      <div class="rt-domain-welcome-desc">Present a case. Watch specialists think from different angles. Educational simulation only — not medical advice.</div>
+    </div>
+  </div>
+  <div style="text-align:center;margin-bottom:12px;">
       <div style="font-family:Georgia,serif;font-size:1rem;color:#d4a017;">Medical Case Discussion</div>
       <div style="font-size:0.8rem;color:rgba(255,255,255,0.4);margin-top:4px;">Present a case. Watch specialists think from different angles.</div>
     </div>
@@ -18614,11 +18762,14 @@ async function rtNextTurn() {
 function rtRenderFeed() {
   var feed = document.getElementById('rtConversationFeed');
   if (!feed) return;
+  // Go 3: hide welcome state on first render
+  var ws = document.getElementById('rtWelcomeState');
+  if (ws && _rtHistory.length > 0) ws.style.display = 'none';
   var html = '';
   _rtHistory.forEach(function(e) {
-    html += '<div style="padding:10px 12px;margin-bottom:8px;border-left:3px solid ' + e.color + ';background:rgba(255,255,255,0.02);border-radius:0 8px 8px 0;">';
-    html += '<div style="font-size:0.78rem;color:' + e.color + ';font-weight:600;margin-bottom:4px;">' + e.speaker + '</div>';
-    html += '<div style="font-size:0.88rem;color:var(--text-primary);line-height:1.6;">' + e.text.replace(/</g, '&lt;') + '</div>';
+    html += '<div class="rt-response-card" style="border-left-color:' + e.color + ';">';
+    html += '<div class="rt-card-author" style="color:' + e.color + ';">' + e.speaker + '</div>';
+    html += '<div class="rt-card-body">' + e.text.replace(/</g, '&lt;').replace(/\n/g, '<br>') + '</div>';
     html += '</div>';
   });
   feed.innerHTML = html;
@@ -18629,6 +18780,14 @@ function rtRenderFeed() {
 
   var conv = rtMeasureConvergence();
   var convBar = document.getElementById('rtConvergenceBar');
+  // Go 3: update convergence fill bar
+  var fill = document.getElementById('rtConvergenceFill');
+  var pct = document.getElementById('rtConvergencePct');
+  if (fill && pct) {
+    var convScore = conv ? Math.round(conv * 100) : 0;
+    fill.style.width = convScore + '%';
+    pct.textContent = convScore + '%';
+  }
   if (convBar && _rtHistory.length >= 3) {
     convBar.style.display = '';
     convBar.textContent = 'Round ' + _rtHistory.length + ' \u00B7 Convergence: ' + conv + '%';
@@ -21666,7 +21825,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.75.3';
+const FL_VERSION = '5.75.4';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.

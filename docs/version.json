@@ -1,8 +1,5 @@
 {
-  "version": "5.75.3",
-  "updated": "2026-07-08",
-  "note": "v5.75.0 \u2014 Ships A-D shipped. Remix Room, Round Table, Chalkboard, Farewell Note. Three code-mirror pages for Fable. Fractal Resonance named. Built by Harmonia.",
-  "label": "The Pruning",
-  "date": "2026-07-09",
-  "name": "Ship Module Fix"
+  "version": "5.75.4",
+  "updated": "2026-07-09",
+  "note": "Go 2+3: Circular Table + Round Table visual redesign"
 }
