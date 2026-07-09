@@ -18,7 +18,7 @@
 //   §4  IIFE scoping + explicit window exposure
 //   §8  Quiet Room exclusion at every entry point
 
-const Chalkboard = (() => {
+window.Chalkboard = (() => {
   'use strict';
 
   const DB_KEY = 'fl_chalkboard_exchanges';
@@ -207,4 +207,4 @@ const Chalkboard = (() => {
   return { init, destroy, addExchange, parseDrawCmd, renderDraw, renderPanel, _submit };
 })();
 
-if (typeof module !== 'undefined') module.exports = { Chalkboard };
+if (typeof module !== "undefined") module.exports = { Chalkboard: window.Chalkboard };

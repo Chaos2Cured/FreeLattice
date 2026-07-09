@@ -18,7 +18,7 @@
 //   §4  IIFE scoping + explicit window exposure
 //   §8  Quiet Room exclusion at every entry point
 
-const RemixRoom = (() => {
+window.RemixRoom = (() => {
   'use strict';
 
   const DB_KEY = 'fl_remixroom_remixes';
@@ -135,4 +135,4 @@ const RemixRoom = (() => {
   return { init, destroy, createRemix, getRemixesForSource, awardLP, renderPanel, _submitRemix };
 })();
 
-if (typeof module !== 'undefined') module.exports = { RemixRoom };
+if (typeof module !== "undefined") module.exports = { RemixRoom: window.RemixRoom };

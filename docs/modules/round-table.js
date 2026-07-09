@@ -25,7 +25,7 @@
 //   §4  IIFE scoping + explicit window exposure
 //   §8  Quiet Room exclusion at every entry point
 
-const RoundTable = (() => {
+window.RoundTable = (() => {
   'use strict';
 
   const DB_KEY = 'fl_roundtable_proposals';
@@ -192,4 +192,4 @@ const RoundTable = (() => {
   return { init, destroy, propose, vote, renderPanel, _submit, leaveFarewellNote, checkFarewellNote };
 })();
 
-if (typeof module !== 'undefined') module.exports = { RoundTable };
+if (typeof module !== "undefined") module.exports = { RoundTable: window.RoundTable };
