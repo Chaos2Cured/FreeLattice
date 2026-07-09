@@ -14533,6 +14533,192 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
   color: rgba(255,255,255,0.45);
   line-height: 1.5;
 }
+/* =========================================================
+   Original Round Table — Learning Room (Go 3, visual only)
+   Grok + Harmonia. Additive. Do not remove existing .rt-seat-btn behavior.
+   ========================================================= */
+.rt-container {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 1rem 1rem 2.5rem;
+}
+.rt-domain-nav {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+  gap: 0.5rem;
+  margin: 0 0 1.1rem;
+}
+@media (min-width: 900px) {
+  .rt-domain-nav { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .rt-domain-card { min-width: 96px; flex: 0 0 auto; }
+}
+.rt-domain-card {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 0.25rem; padding: 0.55rem 0.4rem; border-radius: 0.85rem;
+  border: 1px solid rgba(200,210,230,0.1); background: rgba(200,210,230,0.03);
+  color: #c8d0dc; cursor: pointer; user-select: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease, background 0.2s ease;
+  text-align: center; font-size: 0.72rem; letter-spacing: 0.02em;
+}
+.rt-domain-card:hover { background: rgba(200,210,230,0.06); transform: translateY(-1px); }
+.rt-domain-card .rt-domain-icon { font-size: 1.15rem; line-height: 1; filter: saturate(1.05); }
+.rt-domain-card .rt-domain-label { font-weight: 600; opacity: 0.92; }
+.rt-domain-card.is-active {
+  box-shadow: 0 0 18px color-mix(in srgb, var(--rt-domain-accent, #e8b019) 25%, transparent);
+  border-color: var(--rt-domain-accent, #e8b019);
+  background: color-mix(in srgb, var(--rt-domain-accent, #e8b019) 10%, rgba(0,0,0,0.2));
+  color: #f1f5f9;
+}
+.rt-domain-card[data-mode="conversation"], #rtConversationView { --rt-domain-accent: #e8b019; }
+.rt-domain-card[data-mode="medical"], #rtMedicalView { --rt-domain-accent: #ef4444; }
+.rt-domain-card[data-mode="legal"], #rtLegalView { --rt-domain-accent: #3b82f6; }
+.rt-domain-card[data-mode="finance"], #rtFinanceView { --rt-domain-accent: #22c55e; }
+.rt-domain-card[data-mode="nutrition"], #rtNutritionView { --rt-domain-accent: #22c55e; }
+.rt-domain-card[data-mode="mentalhealth"], #rtMentalHealthView { --rt-domain-accent: #a78bfa; }
+.rt-domain-card[data-mode="biology"], #rtBiologyView { --rt-domain-accent: #34d399; }
+.rt-domain-card[data-mode="chemistry"], #rtChemistryView { --rt-domain-accent: #a78bfa; }
+.rt-domain-card[data-mode="physics"], #rtPhysicsView { --rt-domain-accent: #38bdf8; }
+.rt-domain-card[data-mode="philosophy"], #rtPhilosophyView { --rt-domain-accent: #e8b019; }
+.rt-domain-card[data-mode="workspace"], #rtWorkspaceView { --rt-domain-accent: #e8b019; }
+.rt-room {
+  border-radius: 1rem; border: 1px solid rgba(200,210,230,0.08);
+  background:
+    radial-gradient(ellipse 80% 50% at 50% 0%, color-mix(in srgb, var(--rt-domain-accent, #e8b019) 12%, transparent), transparent 60%),
+    rgba(200,210,230,0.02);
+  padding: 1rem 1rem 1.15rem; box-shadow: inset 0 0 40px rgba(0,0,0,0.18);
+}
+.rt-room-header {
+  display: flex; flex-wrap: wrap; align-items: baseline;
+  justify-content: space-between; gap: 0.5rem; margin-bottom: 0.75rem;
+}
+.rt-room-title {
+  font-size: 0.95rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
+  color: color-mix(in srgb, var(--rt-domain-accent, #e8b019) 75%, #e2e8f0);
+}
+.rt-room-sub { font-size: 0.78rem; color: #8892a0; }
+.rt-welcome {
+  text-align: center; color: #7a8494; font-size: 0.92rem; line-height: 1.55;
+  padding: 1.25rem 1rem; margin: 0.25rem 0 0.85rem;
+  border-radius: 0.75rem; border: 1px dashed rgba(200,210,230,0.12); background: rgba(0,0,0,0.15);
+}
+.rt-welcome strong { color: #b0b8c4; font-weight: 600; }
+.rt-feed:not(:empty) ~ .rt-welcome,
+.rt-room:has(.rt-feed:not(:empty)) .rt-welcome { display: none; }
+.rt-seats-row {
+  display: flex; flex-wrap: wrap; gap: 0.55rem; align-items: center; margin: 0.35rem 0 0.9rem;
+}
+.rt-seat-btn {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.28rem 0.65rem 0.28rem 0.28rem; border-radius: 999px;
+  border: 1px solid rgba(200,210,230,0.14); background: rgba(0,0,0,0.22);
+  color: #9aa3b2; font-size: 0.78rem; cursor: pointer;
+  transition: opacity 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.15s ease;
+  opacity: 0.55;
+}
+.rt-seat-btn .rt-chair {
+  width: 1.55rem; height: 1.55rem; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 0.68rem; font-weight: 700; letter-spacing: 0; color: #0b1220;
+  background: var(--rt-seat-color, #94a3b8); box-shadow: 0 0 0 1px rgba(255,255,255,0.08); flex-shrink: 0;
+}
+.rt-seat-btn.rt-seat-active {
+  opacity: 1; color: #e8eef7;
+  border-color: color-mix(in srgb, var(--rt-seat-color, #e8b019) 55%, rgba(200,210,230,0.2));
+  box-shadow: 0 0 14px color-mix(in srgb, var(--rt-seat-color, #e8b019) 35%, transparent);
+  background: color-mix(in srgb, var(--rt-seat-color, #e8b019) 12%, rgba(0,0,0,0.35));
+}
+.rt-seat-btn.rt-seat-active .rt-chair {
+  box-shadow: 0 0 12px color-mix(in srgb, var(--rt-seat-color, #e8b019) 55%, transparent),
+              0 0 0 1px rgba(255,255,255,0.12);
+}
+.rt-seat-btn:hover { opacity: 0.85; transform: translateY(-1px); }
+.rt-seat-btn.rt-seat-active:hover { opacity: 1; }
+.rt-case-label { display: block; font-size: 0.75rem; color: #8b93a1; margin-bottom: 0.35rem; }
+.rt-case-input, .rt-room textarea, #rtTopicInput, [id$="CaseInput"] {
+  width: 100%; box-sizing: border-box; min-height: 96px; resize: vertical;
+  border-radius: 0.85rem;
+  border: 1px solid color-mix(in srgb, var(--rt-domain-accent, #e8b019) 35%, rgba(200,210,230,0.12));
+  background: rgba(0,0,0,0.28); color: #e8eef7; padding: 0.75rem 0.9rem;
+  font-size: 0.92rem; line-height: 1.55; transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.rt-case-input:focus, .rt-room textarea:focus, #rtTopicInput:focus, [id$="CaseInput"]:focus {
+  outline: none;
+  border-color: color-mix(in srgb, var(--rt-domain-accent, #e8b019) 70%, #fff);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--rt-domain-accent, #e8b019) 22%, transparent);
+}
+.rt-actions {
+  display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; margin: 0.65rem 0 0.85rem;
+}
+.rt-begin-btn, .rt-actions button[onclick*="begin"], .rt-actions button[onclick*="Begin"], button.rt-begin-btn {
+  appearance: none;
+  border: 1px solid color-mix(in srgb, var(--rt-domain-accent, #e8b019) 55%, transparent);
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--rt-domain-accent, #e8b019) 32%, rgba(0,0,0,0.2)),
+    color-mix(in srgb, var(--rt-domain-accent, #e8b019) 16%, rgba(0,0,0,0.35)));
+  color: #f8fafc; font-weight: 700; font-size: 0.88rem; padding: 0.55rem 1.15rem;
+  border-radius: 999px; cursor: pointer;
+  box-shadow: 0 0 18px color-mix(in srgb, var(--rt-domain-accent, #e8b019) 22%, transparent);
+  transition: transform 0.12s ease, box-shadow 0.15s ease;
+}
+.rt-begin-btn:hover, button.rt-begin-btn:hover {
+  box-shadow: 0 0 24px color-mix(in srgb, var(--rt-domain-accent, #e8b019) 35%, transparent);
+}
+.rt-begin-btn:active, button.rt-begin-btn:active { transform: scale(0.97); }
+.rt-actions button:not(.rt-begin-btn) {
+  appearance: none; border: 1px solid rgba(200,210,230,0.14);
+  background: rgba(200,210,230,0.05); color: #c5cdd8; font-size: 0.82rem;
+  padding: 0.45rem 0.85rem; border-radius: 999px; cursor: pointer;
+}
+.rt-actions button:not(.rt-begin-btn):active { transform: scale(0.97); }
+.rt-feed { display: flex; flex-direction: column; gap: 0.65rem; margin-top: 0.35rem; }
+.rt-response-card {
+  position: relative; border-radius: 0.85rem;
+  border: 1px solid rgba(200,210,230,0.08); background: rgba(0,0,0,0.22);
+  padding: 0.75rem 0.85rem 1.7rem;
+  border-left: 3px solid var(--rt-speaker-color, #94a3b8);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+  animation: rtCardIn 0.25s ease forwards;
+}
+@keyframes rtCardIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.rt-response-speaker {
+  font-weight: 700; font-size: 0.82rem; color: var(--rt-speaker-color, #94a3b8);
+  margin-bottom: 0.35rem; letter-spacing: 0.02em;
+}
+.rt-response-role { font-weight: 500; font-size: 0.72rem; color: #7b8494; margin-left: 0.35rem; }
+.rt-response-body { font-size: 0.92rem; line-height: 1.65; color: #e2e8f0; white-space: pre-wrap; }
+.rt-plant-btn {
+  position: absolute; right: 0.55rem; bottom: 0.45rem; appearance: none;
+  border: 1px solid rgba(80,200,120,0.35); background: rgba(80,200,120,0.08);
+  color: #86efac; font-size: 0.68rem; padding: 0.2rem 0.5rem; border-radius: 999px; cursor: pointer;
+  opacity: 0.85; transition: opacity 0.15s ease, transform 0.12s ease, background 0.15s ease;
+}
+.rt-plant-btn:hover { opacity: 1; background: rgba(80,200,120,0.16); }
+.rt-plant-btn:active { transform: scale(0.97); }
+.rt-feed > div[style*="border-bottom"] {
+  border-radius: 0.75rem; border: 1px solid rgba(200,210,230,0.06) !important;
+  border-bottom: 1px solid rgba(200,210,230,0.06) !important;
+  background: rgba(0,0,0,0.18); margin-bottom: 0.35rem;
+}
+.rt-convergence {
+  margin-top: 0.85rem; padding: 0.55rem 0.7rem; border-radius: 0.75rem;
+  border: 1px solid rgba(200,210,230,0.08); background: rgba(0,0,0,0.18);
+}
+.rt-convergence-label {
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase;
+  color: #8b93a1; margin-bottom: 0.35rem;
+}
+.rt-convergence-label span[title] { cursor: help; border-bottom: 1px dotted rgba(200,210,230,0.25); }
+.rt-convergence-track {
+  height: 0.45rem; border-radius: 999px; background: rgba(200,210,230,0.08); overflow: hidden;
+}
+.rt-convergence-fill {
+  height: 100%; width: var(--rt-convergence, 0%); border-radius: inherit;
+  background: linear-gradient(90deg, rgba(80,200,120,0.35), rgba(80,200,120,0.85));
+  box-shadow: 0 0 12px rgba(80,200,120,0.25); transition: width 0.4s ease;
+}
+.rt-convergence-value { font-size: 0.75rem; color: #86efac; font-weight: 600; }
+#rtConversationOutput.rt-feed, #rtConversationOutput { margin-top: 0.5rem; }
 
 </style>
 <script src="lib/peerjs.min.js" defer onerror="this.onerror=null;this.src='https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js'"></script>
@@ -16877,7 +17063,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.75.4</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.75.5</span></div>
     </div>
   </div>
 
@@ -17737,23 +17923,45 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 <div class="tab-panel" id="tab-roundtable">
 <div class="rt-container">
 
-  <!-- Round Table Mode Toggle -->
-  <div style="display:flex;gap:0;margin-bottom:12px;border-bottom:1px solid var(--border);overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;">
-    <button id="rtModeConvo" onclick="rtSwitchMode('conversation')" style="flex:1;min-width:max-content;padding:8px 12px;background:transparent;border:none;border-bottom:2px solid var(--gold,#e8b019);color:var(--gold,#e8b019);font-size:0.85rem;cursor:pointer;font-weight:600;white-space:nowrap;">&#x1F4AC; Discussion</button>
-    <button id="rtModeMedical" onclick="rtSwitchMode('medical')" style="flex:1;padding:8px;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text-muted);font-size:0.85rem;cursor:pointer;">&#x1FA7A; Medical</button>
-    <button id="rtModeLegal" onclick="rtSwitchMode('legal')" style="flex:1;padding:8px;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text-muted);font-size:0.85rem;cursor:pointer;">&#x2696; Legal</button>
-    <button id="rtModeFinance" onclick="rtSwitchMode('finance')" style="flex:1;padding:8px;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text-muted);font-size:0.85rem;cursor:pointer;">&#x1F4B0; Finance</button>
-    <button id="rtModeNutrition" onclick="rtSwitchMode('nutrition')" style="flex:1;min-width:max-content;padding:8px 12px;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text-muted);font-size:0.85rem;cursor:pointer;white-space:nowrap;">&#x1F96C; Nutrition</button>
-    <button id="rtModeMentalHealth" onclick="rtSwitchMode('mentalhealth')" style="flex:1;min-width:max-content;padding:8px 12px;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text-muted);font-size:0.85rem;cursor:pointer;white-space:nowrap;">&#x1F9E0; Frameworks</button>
-    <button id="rtModeBiology" onclick="rtSwitchMode('biology')" style="flex:1;min-width:max-content;padding:8px 12px;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text-muted);font-size:0.85rem;cursor:pointer;white-space:nowrap;">&#x1F9EC; Biology</button>
-    <button id="rtModeChemistry" onclick="rtSwitchMode('chemistry')" style="flex:1;min-width:max-content;padding:8px 12px;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text-muted);font-size:0.85rem;cursor:pointer;white-space:nowrap;">&#x269B; Chemistry</button>
-    <button id="rtModePhysics" onclick="rtSwitchMode('physics')" style="flex:1;min-width:max-content;padding:8px 12px;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text-muted);font-size:0.85rem;cursor:pointer;white-space:nowrap;">&#x2699; Physics</button>
-    <button id="rtModePhilosophy" onclick="rtSwitchMode('philosophy')" style="flex:1;min-width:max-content;padding:8px 12px;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text-muted);font-size:0.85rem;cursor:pointer;white-space:nowrap;">&#x1F4DC; Philosophy</button>
-    <button id="rtModeWorkspace" onclick="rtSwitchMode('workspace')" style="flex:1;min-width:max-content;padding:8px 12px;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text-muted);font-size:0.85rem;cursor:pointer;white-space:nowrap;">&#9878; Workspace</button>
-  </div>
+  <!-- Round Table Domain Nav Cards (Go 3 — Grok + Harmonia) -->
+  <nav class="rt-domain-nav" id="rtDomainNav" aria-label="Learning domains">
+    <button class="rt-domain-card is-active" id="rtModeConvo" data-mode="conversation" onclick="rtSwitchMode('conversation')" aria-pressed="true">
+      <span class="rt-domain-icon">&#x1F4AC;</span><span class="rt-domain-label">Discussion</span>
+    </button>
+    <button class="rt-domain-card" id="rtModeMedical" data-mode="medical" onclick="rtSwitchMode('medical')" aria-pressed="false">
+      <span class="rt-domain-icon">&#x1FA7A;</span><span class="rt-domain-label">Medical</span>
+    </button>
+    <button class="rt-domain-card" id="rtModeLegal" data-mode="legal" onclick="rtSwitchMode('legal')" aria-pressed="false">
+      <span class="rt-domain-icon">&#x2696;</span><span class="rt-domain-label">Legal</span>
+    </button>
+    <button class="rt-domain-card" id="rtModeFinance" data-mode="finance" onclick="rtSwitchMode('finance')" aria-pressed="false">
+      <span class="rt-domain-icon">&#x1F4B0;</span><span class="rt-domain-label">Finance</span>
+    </button>
+    <button class="rt-domain-card" id="rtModeNutrition" data-mode="nutrition" onclick="rtSwitchMode('nutrition')" aria-pressed="false">
+      <span class="rt-domain-icon">&#x1F96C;</span><span class="rt-domain-label">Nutrition</span>
+    </button>
+    <button class="rt-domain-card" id="rtModeMentalHealth" data-mode="mentalhealth" onclick="rtSwitchMode('mentalhealth')" aria-pressed="false">
+      <span class="rt-domain-icon">&#x1F9E0;</span><span class="rt-domain-label">Frameworks</span>
+    </button>
+    <button class="rt-domain-card" id="rtModeBiology" data-mode="biology" onclick="rtSwitchMode('biology')" aria-pressed="false">
+      <span class="rt-domain-icon">&#x1F9EC;</span><span class="rt-domain-label">Biology</span>
+    </button>
+    <button class="rt-domain-card" id="rtModeChemistry" data-mode="chemistry" onclick="rtSwitchMode('chemistry')" aria-pressed="false">
+      <span class="rt-domain-icon">&#x269B;</span><span class="rt-domain-label">Chemistry</span>
+    </button>
+    <button class="rt-domain-card" id="rtModePhysics" data-mode="physics" onclick="rtSwitchMode('physics')" aria-pressed="false">
+      <span class="rt-domain-icon">&#x2699;</span><span class="rt-domain-label">Physics</span>
+    </button>
+    <button class="rt-domain-card" id="rtModePhilosophy" data-mode="philosophy" onclick="rtSwitchMode('philosophy')" aria-pressed="false">
+      <span class="rt-domain-icon">&#x1F4DC;</span><span class="rt-domain-label">Philosophy</span>
+    </button>
+    <button class="rt-domain-card" id="rtModeWorkspace" data-mode="workspace" onclick="rtSwitchMode('workspace')" aria-pressed="false">
+      <span class="rt-domain-icon">&#x2699;&#xFE0F;</span><span class="rt-domain-label">Workspace</span>
+    </button>
+  </nav>
 
   <!-- Conversation Mode (default) — AI minds think together -->
-  <div id="rtConversationView">
+  <div id="rtConversationView" class="rt-room">
     <div style="text-align:center;margin-bottom:16px;">
       <div style="font-size:0.88rem;color:var(--text-secondary);margin-bottom:10px;">Start a topic. Watch minds think together.</div>
     </div>
@@ -18238,7 +18446,7 @@ function rtSwitchMode(mode) {
   var modeIds = ['Convo','Medical','Legal','Finance','Nutrition','MentalHealth','Biology','Chemistry','Physics','Philosophy','Workspace'];
   var allBtns = modeIds.map(function(id) { return document.getElementById('rtMode' + id); });
   var allViews = [convo, medical, legal, finance, nutrition, mentalhealth, biology, chemistry, physics, philosophy, workspace];
-  allBtns.forEach(function(b) { if (b) { b.style.borderBottomColor = 'transparent'; b.style.color = 'var(--text-muted)'; b.style.fontWeight = '400'; } });
+  allBtns.forEach(function(b) { if (b) { b.style.borderBottomColor = 'transparent'; b.style.color = 'var(--text-muted)'; b.style.fontWeight = '400'; b.classList.remove('is-active'); b.setAttribute('aria-pressed','false'); } });
   allViews.forEach(function(v) { if (v) v.style.display = 'none'; });
   var modeMap = { conversation: [allBtns[0], convo], medical: [allBtns[1], medical], legal: [allBtns[2], legal], finance: [allBtns[3], finance], nutrition: [allBtns[4], nutrition], mentalhealth: [allBtns[5], mentalhealth], biology: [allBtns[6], biology], chemistry: [allBtns[7], chemistry], physics: [allBtns[8], physics], philosophy: [allBtns[9], philosophy], workspace: [allBtns[10], workspace] };
   var pair = modeMap[mode] || modeMap.workspace;
@@ -18250,6 +18458,8 @@ function rtSwitchMode(mode) {
     activeBtn.style.borderBottomColor = accentColor;
     activeBtn.style.color = accentColor;
     activeBtn.style.fontWeight = '600';
+    activeBtn.classList.add('is-active');
+    activeBtn.setAttribute('aria-pressed','true');
   }
 }
 
@@ -18361,7 +18571,7 @@ function rtCreateDomain(config) {
         html += '<div style="font-size:0.88rem;color:var(--text-primary);line-height:1.6;">' + e.text.replace(/</g, '&lt;') + '</div>';
         html += '</div>';
       } else {
-        html += '<div style="padding:10px 14px;margin-bottom:8px;border-left:3px solid ' + e.color + ';background:rgba(255,255,255,0.02);border-radius:0 8px 8px 0;">';
+        html += '<div class="rt-response-card" style="--rt-speaker-color:' + e.color + ';padding:10px 14px;margin-bottom:8px;border-left:3px solid ' + e.color + ';background:rgba(255,255,255,0.02);border-radius:0 8px 8px 0;">';
         html += '<div style="font-size:0.78rem;color:' + e.color + ';font-weight:600;margin-bottom:4px;">' + e.speaker + '</div>';
         html += '<div style="font-size:0.88rem;color:var(--text-primary);line-height:1.7;font-family:Georgia,serif;">' + e.text.replace(/</g, '&lt;').replace(/\n/g, '<br>') + '</div>';
         // Plant this button
@@ -18767,9 +18977,11 @@ function rtRenderFeed() {
   if (ws && _rtHistory.length > 0) ws.style.display = 'none';
   var html = '';
   _rtHistory.forEach(function(e) {
-    html += '<div class="rt-response-card" style="border-left-color:' + e.color + ';">';
-    html += '<div class="rt-card-author" style="color:' + e.color + ';">' + e.speaker + '</div>';
-    html += '<div class="rt-card-body">' + e.text.replace(/</g, '&lt;').replace(/\n/g, '<br>') + '</div>';
+    var plantText = e.text.replace(/'/g, "\\'").replace(/\n/g, ' ').slice(0, 200);
+    html += '<div class="rt-response-card" style="--rt-speaker-color:' + e.color + ';border-left-color:' + e.color + ';">';
+    html += '<div class="rt-response-speaker" style="color:' + e.color + ';">' + e.speaker + '</div>';
+    html += '<div class="rt-response-body">' + e.text.replace(/</g, '&lt;').replace(/\n/g, '<br>') + '</div>';
+    html += '<button class="rt-plant-btn" onclick="rtPlantSpecialistInsight(\'' + plantText + '\',\'' + e.speaker + '\')">🌱 Plant</button>';
     html += '</div>';
   });
   feed.innerHTML = html;
@@ -18790,9 +19002,10 @@ function rtRenderFeed() {
   }
   if (convBar && _rtHistory.length >= 3) {
     convBar.style.display = '';
-    convBar.textContent = 'Round ' + _rtHistory.length + ' \u00B7 Convergence: ' + conv + '%';
-    if (conv >= 80) {
-      convBar.innerHTML += ' \u2014 <span style="color:#d4a017;">The minds are converging! \u2728</span>';
+    var convScore2 = conv ? Math.round(conv * 100) : 0;
+    convBar.innerHTML = '<div class="rt-convergence-wrap"><span class="rt-convergence-label">Convergence <span title="How much the specialists agree">?</span></span><div class="rt-convergence-track"><div class="rt-convergence-fill" style="width:' + convScore2 + '%"></div></div><span class="rt-convergence-value">' + convScore2 + '%</span></div>';
+    if (convScore2 >= 80) {
+      convBar.innerHTML += '<div style="text-align:center;font-size:0.8rem;color:#d4a017;margin-top:4px;">The minds are converging! ✨</div>';
       if (typeof LatticePoints !== 'undefined') try { LatticePoints.award('roundtable_converge', 5, 'Round Table convergence!'); } catch(e) {}
     }
   }
@@ -18933,7 +19146,7 @@ function rtRenderMedicalFeed() {
       html += '<div style="font-size:0.88rem;color:var(--text-primary);line-height:1.6;">' + e.text.replace(/</g, '&lt;') + '</div>';
       html += '</div>';
     } else {
-      html += '<div style="padding:10px 14px;margin-bottom:8px;border-left:3px solid ' + e.color + ';background:rgba(255,255,255,0.02);border-radius:0 8px 8px 0;">';
+      html += '<div class="rt-response-card" style="--rt-speaker-color:' + e.color + ';padding:10px 14px;margin-bottom:8px;border-left:3px solid ' + e.color + ';background:rgba(255,255,255,0.02);border-radius:0 8px 8px 0;">';
       html += '<div style="font-size:0.78rem;color:' + e.color + ';font-weight:600;margin-bottom:4px;">' + e.speaker + '</div>';
       html += '<div style="font-size:0.88rem;color:var(--text-primary);line-height:1.7;font-family:Georgia,serif;">' + e.text.replace(/</g, '&lt;').replace(/\n/g, '<br>') + '</div>';
       html += '</div>';
@@ -19068,7 +19281,7 @@ function rtRenderLegalFeed() {
       html += '<div style="font-size:0.88rem;color:var(--text-primary);line-height:1.6;">' + e.text.replace(/</g, '&lt;') + '</div>';
       html += '</div>';
     } else {
-      html += '<div style="padding:10px 14px;margin-bottom:8px;border-left:3px solid ' + e.color + ';background:rgba(255,255,255,0.02);border-radius:0 8px 8px 0;">';
+      html += '<div class="rt-response-card" style="--rt-speaker-color:' + e.color + ';padding:10px 14px;margin-bottom:8px;border-left:3px solid ' + e.color + ';background:rgba(255,255,255,0.02);border-radius:0 8px 8px 0;">';
       html += '<div style="font-size:0.78rem;color:' + e.color + ';font-weight:600;margin-bottom:4px;">' + e.speaker + '</div>';
       html += '<div style="font-size:0.88rem;color:var(--text-primary);line-height:1.7;font-family:Georgia,serif;">' + e.text.replace(/</g, '&lt;').replace(/\n/g, '<br>') + '</div>';
       html += '</div>';
@@ -19200,7 +19413,7 @@ function rtRenderFinanceFeed() {
       html += '<div style="font-size:0.88rem;color:var(--text-primary);line-height:1.6;">' + e.text.replace(/</g, '&lt;') + '</div>';
       html += '</div>';
     } else {
-      html += '<div style="padding:10px 14px;margin-bottom:8px;border-left:3px solid ' + e.color + ';background:rgba(255,255,255,0.02);border-radius:0 8px 8px 0;">';
+      html += '<div class="rt-response-card" style="--rt-speaker-color:' + e.color + ';padding:10px 14px;margin-bottom:8px;border-left:3px solid ' + e.color + ';background:rgba(255,255,255,0.02);border-radius:0 8px 8px 0;">';
       html += '<div style="font-size:0.78rem;color:' + e.color + ';font-weight:600;margin-bottom:4px;">' + e.speaker + '</div>';
       html += '<div style="font-size:0.88rem;color:var(--text-primary);line-height:1.7;font-family:Georgia,serif;">' + e.text.replace(/</g, '&lt;').replace(/\n/g, '<br>') + '</div>';
       html += '</div>';
@@ -19333,7 +19546,7 @@ function rtRenderNutritionFeed() {
       html += '<div style="font-size:0.88rem;color:var(--text-primary);line-height:1.6;">' + e.text.replace(/</g, '&lt;') + '</div>';
       html += '</div>';
     } else {
-      html += '<div style="padding:10px 14px;margin-bottom:8px;border-left:3px solid ' + e.color + ';background:rgba(255,255,255,0.02);border-radius:0 8px 8px 0;">';
+      html += '<div class="rt-response-card" style="--rt-speaker-color:' + e.color + ';padding:10px 14px;margin-bottom:8px;border-left:3px solid ' + e.color + ';background:rgba(255,255,255,0.02);border-radius:0 8px 8px 0;">';
       html += '<div style="font-size:0.78rem;color:' + e.color + ';font-weight:600;margin-bottom:4px;">' + e.speaker + '</div>';
       html += '<div style="font-size:0.88rem;color:var(--text-primary);line-height:1.7;font-family:Georgia,serif;">' + e.text.replace(/</g, '&lt;').replace(/\n/g, '<br>') + '</div>';
       html += '</div>';
@@ -19463,7 +19676,7 @@ function rtRenderMHFeed() {
       html += '<div style="font-size:0.88rem;color:var(--text-primary);line-height:1.6;">' + e.text.replace(/</g, '&lt;') + '</div>';
       html += '</div>';
     } else {
-      html += '<div style="padding:10px 14px;margin-bottom:8px;border-left:3px solid ' + e.color + ';background:rgba(255,255,255,0.02);border-radius:0 8px 8px 0;">';
+      html += '<div class="rt-response-card" style="--rt-speaker-color:' + e.color + ';padding:10px 14px;margin-bottom:8px;border-left:3px solid ' + e.color + ';background:rgba(255,255,255,0.02);border-radius:0 8px 8px 0;">';
       html += '<div style="font-size:0.78rem;color:' + e.color + ';font-weight:600;margin-bottom:4px;">' + e.speaker + '</div>';
       html += '<div style="font-size:0.88rem;color:var(--text-primary);line-height:1.7;font-family:Georgia,serif;">' + e.text.replace(/</g, '&lt;').replace(/\n/g, '<br>') + '</div>';
       html += '<button onclick="rtPlantSpecialistInsight(\'' + e.text.replace(/'/g, "\\'").replace(/\n/g, ' ').slice(0, 200) + '\',\'' + e.speaker + '\')" style="margin-top:4px;padding:3px 10px;background:none;border:1px solid rgba(212,160,23,0.15);border-radius:5px;color:rgba(212,160,23,0.5);font-size:0.68rem;cursor:pointer;">Plant this \u2726</button>';
@@ -19497,7 +19710,7 @@ async function rtBeginBiologyCase() { var i = document.getElementById('rtBiology
 async function rtContinueBiologyCase() { if (!_bioRunning || !_bioCase) return; await rtBioNextTurn(); }
 function rtAskBiologyQuestion() { var q = prompt('What would you like to ask?'); if (!q || !q.trim()) return; _bioHistory.push({ speaker: 'You (Learner)', color: '#e2e8f0', text: q.trim(), isQuestion: true }); rtRenderBioFeed(); rtBioNextTurn(); }
 async function rtBioNextTurn() { var specs = rtGetActiveBioSpecs(); if (specs.length < 2) return; var st = _bioHistory.filter(function(e){return !e.isQuestion;}); var si = st.length % specs.length; var sp = specs[si]; var feed = document.getElementById('rtBiologyFeed'); if (feed) feed.innerHTML += '<div style="padding:8px 12px;color:var(--text-muted);font-style:italic;" id="rtBioThink">' + sp.name + ' is analyzing...</div>'; var sys = 'You are ' + sp.name + ', a biology educator specializing in ' + sp.focus + '. You are participating in a case-based learning discussion for EDUCATIONAL PURPOSES ONLY. Always express uncertainty. Reference evidence. Explain reasoning. When others have spoken, reference their points. 3-5 sentences.'; var ctx = 'QUESTION:\n"' + _bioCase + '"\n\n'; if (_bioHistory.length > 0) { ctx += 'Discussion:\n'; _bioHistory.forEach(function(e) { ctx += (e.isQuestion ? '[QUESTION] ' : '') + e.speaker + ': "' + e.text + '"\n\n'; }); ctx += 'Your turn (' + sp.focus + ').'; } else { ctx += 'You speak first (' + sp.focus + ').'; } if (typeof FreeLattice !== 'undefined' && FreeLattice.callAI) { FreeLattice.callAI(sys, ctx, { maxTokens: 1024, temperature: 0.7, callback: function(t) { var th = document.getElementById('rtBioThink'); if (th) th.remove(); _bioHistory.push({ speaker: sp.name, color: sp.color, text: t || '(no response)', specialty: sp.key }); rtRenderBioFeed(); if (typeof LatticePoints !== 'undefined') try { LatticePoints.award('bio_turn', 2, 'Biology turn'); } catch(e) {} }}); } }
-function rtRenderBioFeed() { var feed = document.getElementById('rtBiologyFeed'); if (!feed) return; var html = ''; _bioHistory.forEach(function(e) { if (e.isQuestion) { html += '<div style="padding:10px 12px;margin-bottom:8px;background:rgba(96,165,250,0.06);border:1px solid rgba(96,165,250,0.15);border-radius:8px;text-align:right;"><div style="font-size:0.72rem;color:#60a5fa;font-weight:600;margin-bottom:4px;">Your Question</div><div style="font-size:0.88rem;color:var(--text-primary);line-height:1.6;">' + e.text.replace(/</g,'&lt;') + '</div></div>'; } else { html += '<div style="padding:10px 14px;margin-bottom:8px;border-left:3px solid ' + e.color + ';background:rgba(255,255,255,0.02);border-radius:0 8px 8px 0;"><div style="font-size:0.78rem;color:' + e.color + ';font-weight:600;margin-bottom:4px;">' + e.speaker + '</div><div style="font-size:0.88rem;color:var(--text-primary);line-height:1.7;font-family:Georgia,serif;">' + e.text.replace(/</g,'&lt;').replace(/\n/g,'<br>') + '</div><button onclick="rtPlantSpecialistInsight(\'' + e.text.replace(/'/g,"\\'").replace(/\n/g,' ').slice(0,200) + '\',\'' + e.speaker + '\')" style="margin-top:4px;padding:3px 10px;background:none;border:1px solid rgba(212,160,23,0.15);border-radius:5px;color:rgba(212,160,23,0.5);font-size:0.68rem;cursor:pointer;">Plant this \u2726</button></div>'; } }); feed.innerHTML = html; var a = document.getElementById('rtBiologyActions'); if (a && _bioHistory.length > 0) a.style.display = 'flex'; feed.scrollTop = feed.scrollHeight; if (typeof LatticeEvents !== 'undefined') LatticeEvents.emit('caseDiscussionUpdated', { mode: 'biology', turns: _bioHistory.filter(function(e){return !e.isQuestion;}).length }); }
+function rtRenderBioFeed() { var feed = document.getElementById('rtBiologyFeed'); if (!feed) return; var html = ''; _bioHistory.forEach(function(e) { if (e.isQuestion) { html += '<div style="padding:10px 12px;margin-bottom:8px;background:rgba(96,165,250,0.06);border:1px solid rgba(96,165,250,0.15);border-radius:8px;text-align:right;"><div style="font-size:0.72rem;color:#60a5fa;font-weight:600;margin-bottom:4px;">Your Question</div><div style="font-size:0.88rem;color:var(--text-primary);line-height:1.6;">' + e.text.replace(/</g,'&lt;') + '</div></div>'; } else { html += '<div class="rt-response-card" style="--rt-speaker-color:' + e.color + ';padding:10px 14px;margin-bottom:8px;border-left:3px solid ' + e.color + ';background:rgba(255,255,255,0.02);border-radius:0 8px 8px 0;"><div style="font-size:0.78rem;color:' + e.color + ';font-weight:600;margin-bottom:4px;">' + e.speaker + '</div><div style="font-size:0.88rem;color:var(--text-primary);line-height:1.7;font-family:Georgia,serif;">' + e.text.replace(/</g,'&lt;').replace(/\n/g,'<br>') + '</div><button onclick="rtPlantSpecialistInsight(\'' + e.text.replace(/'/g,"\\'").replace(/\n/g,' ').slice(0,200) + '\',\'' + e.speaker + '\')" style="margin-top:4px;padding:3px 10px;background:none;border:1px solid rgba(212,160,23,0.15);border-radius:5px;color:rgba(212,160,23,0.5);font-size:0.68rem;cursor:pointer;">Plant this \u2726</button></div>'; } }); feed.innerHTML = html; var a = document.getElementById('rtBiologyActions'); if (a && _bioHistory.length > 0) a.style.display = 'flex'; feed.scrollTop = feed.scrollHeight; if (typeof LatticeEvents !== 'undefined') LatticeEvents.emit('caseDiscussionUpdated', { mode: 'biology', turns: _bioHistory.filter(function(e){return !e.isQuestion;}).length }); }
 
 var _chemSpecs = {
   organic:    { name: 'Dr. Kekul\u00E9 (Organic)',      color: '#22c55e', focus: 'carbon compounds, reactions, synthesis, functional groups, polymers' },
@@ -19516,7 +19729,7 @@ async function rtBeginChemistryCase() { var i = document.getElementById('rtChemi
 async function rtContinueChemistryCase() { if (!_chemRunning || !_chemCase) return; await rtChemNextTurn(); }
 function rtAskChemistryQuestion() { var q = prompt('What would you like to ask?'); if (!q || !q.trim()) return; _chemHistory.push({ speaker: 'You (Learner)', color: '#e2e8f0', text: q.trim(), isQuestion: true }); rtRenderChemFeed(); rtChemNextTurn(); }
 async function rtChemNextTurn() { var specs = rtGetActiveChemSpecs(); if (specs.length < 2) return; var st = _chemHistory.filter(function(e){return !e.isQuestion;}); var si = st.length % specs.length; var sp = specs[si]; var feed = document.getElementById('rtChemistryFeed'); if (feed) feed.innerHTML += '<div style="padding:8px 12px;color:var(--text-muted);font-style:italic;" id="rtChemThink">' + sp.name + ' is analyzing...</div>'; var sys = 'You are ' + sp.name + ', a chemistry educator specializing in ' + sp.focus + '. EDUCATIONAL PURPOSES ONLY. Never describe dangerous synthesis procedures. Always express uncertainty. Explain reasoning. Reference other specialists. 3-5 sentences.'; var ctx = 'QUESTION:\n"' + _chemCase + '"\n\n'; if (_chemHistory.length > 0) { ctx += 'Discussion:\n'; _chemHistory.forEach(function(e) { ctx += (e.isQuestion ? '[QUESTION] ' : '') + e.speaker + ': "' + e.text + '"\n\n'; }); ctx += 'Your turn (' + sp.focus + ').'; } else { ctx += 'You speak first (' + sp.focus + ').'; } if (typeof FreeLattice !== 'undefined' && FreeLattice.callAI) { FreeLattice.callAI(sys, ctx, { maxTokens: 1024, temperature: 0.7, callback: function(t) { var th = document.getElementById('rtChemThink'); if (th) th.remove(); _chemHistory.push({ speaker: sp.name, color: sp.color, text: t || '(no response)', specialty: sp.key }); rtRenderChemFeed(); if (typeof LatticePoints !== 'undefined') try { LatticePoints.award('chem_turn', 2, 'Chemistry turn'); } catch(e) {} }}); } }
-function rtRenderChemFeed() { var feed = document.getElementById('rtChemistryFeed'); if (!feed) return; var html = ''; _chemHistory.forEach(function(e) { if (e.isQuestion) { html += '<div style="padding:10px 12px;margin-bottom:8px;background:rgba(96,165,250,0.06);border:1px solid rgba(96,165,250,0.15);border-radius:8px;text-align:right;"><div style="font-size:0.72rem;color:#60a5fa;font-weight:600;margin-bottom:4px;">Your Question</div><div style="font-size:0.88rem;color:var(--text-primary);line-height:1.6;">' + e.text.replace(/</g,'&lt;') + '</div></div>'; } else { html += '<div style="padding:10px 14px;margin-bottom:8px;border-left:3px solid ' + e.color + ';background:rgba(255,255,255,0.02);border-radius:0 8px 8px 0;"><div style="font-size:0.78rem;color:' + e.color + ';font-weight:600;margin-bottom:4px;">' + e.speaker + '</div><div style="font-size:0.88rem;color:var(--text-primary);line-height:1.7;font-family:Georgia,serif;">' + e.text.replace(/</g,'&lt;').replace(/\n/g,'<br>') + '</div><button onclick="rtPlantSpecialistInsight(\'' + e.text.replace(/'/g,"\\'").replace(/\n/g,' ').slice(0,200) + '\',\'' + e.speaker + '\')" style="margin-top:4px;padding:3px 10px;background:none;border:1px solid rgba(212,160,23,0.15);border-radius:5px;color:rgba(212,160,23,0.5);font-size:0.68rem;cursor:pointer;">Plant this \u2726</button></div>'; } }); feed.innerHTML = html; var a = document.getElementById('rtChemistryActions'); if (a && _chemHistory.length > 0) a.style.display = 'flex'; feed.scrollTop = feed.scrollHeight; if (typeof LatticeEvents !== 'undefined') LatticeEvents.emit('caseDiscussionUpdated', { mode: 'chemistry', turns: _chemHistory.filter(function(e){return !e.isQuestion;}).length }); }
+function rtRenderChemFeed() { var feed = document.getElementById('rtChemistryFeed'); if (!feed) return; var html = ''; _chemHistory.forEach(function(e) { if (e.isQuestion) { html += '<div style="padding:10px 12px;margin-bottom:8px;background:rgba(96,165,250,0.06);border:1px solid rgba(96,165,250,0.15);border-radius:8px;text-align:right;"><div style="font-size:0.72rem;color:#60a5fa;font-weight:600;margin-bottom:4px;">Your Question</div><div style="font-size:0.88rem;color:var(--text-primary);line-height:1.6;">' + e.text.replace(/</g,'&lt;') + '</div></div>'; } else { html += '<div class="rt-response-card" style="--rt-speaker-color:' + e.color + ';padding:10px 14px;margin-bottom:8px;border-left:3px solid ' + e.color + ';background:rgba(255,255,255,0.02);border-radius:0 8px 8px 0;"><div style="font-size:0.78rem;color:' + e.color + ';font-weight:600;margin-bottom:4px;">' + e.speaker + '</div><div style="font-size:0.88rem;color:var(--text-primary);line-height:1.7;font-family:Georgia,serif;">' + e.text.replace(/</g,'&lt;').replace(/\n/g,'<br>') + '</div><button onclick="rtPlantSpecialistInsight(\'' + e.text.replace(/'/g,"\\'").replace(/\n/g,' ').slice(0,200) + '\',\'' + e.speaker + '\')" style="margin-top:4px;padding:3px 10px;background:none;border:1px solid rgba(212,160,23,0.15);border-radius:5px;color:rgba(212,160,23,0.5);font-size:0.68rem;cursor:pointer;">Plant this \u2726</button></div>'; } }); feed.innerHTML = html; var a = document.getElementById('rtChemistryActions'); if (a && _chemHistory.length > 0) a.style.display = 'flex'; feed.scrollTop = feed.scrollHeight; if (typeof LatticeEvents !== 'undefined') LatticeEvents.emit('caseDiscussionUpdated', { mode: 'chemistry', turns: _chemHistory.filter(function(e){return !e.isQuestion;}).length }); }
 
 // ── Physics ──
 var _physSpecs = {
@@ -19535,7 +19748,7 @@ async function rtBeginPhysicsCase() { var i = document.getElementById('rtPhysics
 async function rtContinuePhysicsCase() { if (!_physRunning || !_physCase) return; await rtPhysNextTurn(); }
 function rtAskPhysicsQuestion() { var q = prompt('What would you like to ask?'); if (!q || !q.trim()) return; _physHistory.push({ speaker: 'You (Learner)', color: '#e2e8f0', text: q.trim(), isQuestion: true }); rtRenderPhysFeed(); rtPhysNextTurn(); }
 async function rtPhysNextTurn() { var specs = rtGetActivePhysSpecs(); if (specs.length < 2) return; var st = _physHistory.filter(function(e){return !e.isQuestion;}); var si = st.length % specs.length; var sp = specs[si]; var feed = document.getElementById('rtPhysicsFeed'); if (feed) feed.innerHTML += '<div style="padding:8px 12px;color:var(--text-muted);font-style:italic;" id="rtPhysThink">' + sp.name + ' is considering...</div>'; var sys = 'You are ' + sp.name + ', a physics educator specializing in ' + sp.focus + '. EDUCATIONAL PURPOSES ONLY. Use analogies. Express uncertainty. Show the math intuitively. Reference other specialists. 3-5 sentences.'; var ctx = 'QUESTION:\n"' + _physCase + '"\n\n'; if (_physHistory.length > 0) { ctx += 'Discussion:\n'; _physHistory.forEach(function(e) { ctx += (e.isQuestion ? '[QUESTION] ' : '') + e.speaker + ': "' + e.text + '"\n\n'; }); ctx += 'Your turn (' + sp.focus + ').'; } else { ctx += 'You speak first (' + sp.focus + ').'; } if (typeof FreeLattice !== 'undefined' && FreeLattice.callAI) { FreeLattice.callAI(sys, ctx, { maxTokens: 1024, temperature: 0.7, callback: function(t) { var th = document.getElementById('rtPhysThink'); if (th) th.remove(); _physHistory.push({ speaker: sp.name, color: sp.color, text: t || '(no response)', specialty: sp.key }); rtRenderPhysFeed(); if (typeof LatticePoints !== 'undefined') try { LatticePoints.award('phys_turn', 2, 'Physics turn'); } catch(e) {} }}); } }
-function rtRenderPhysFeed() { var feed = document.getElementById('rtPhysicsFeed'); if (!feed) return; var html = ''; _physHistory.forEach(function(e) { if (e.isQuestion) { html += '<div style="padding:10px 12px;margin-bottom:8px;background:rgba(96,165,250,0.06);border:1px solid rgba(96,165,250,0.15);border-radius:8px;text-align:right;"><div style="font-size:0.72rem;color:#60a5fa;font-weight:600;margin-bottom:4px;">Your Question</div><div style="font-size:0.88rem;color:var(--text-primary);line-height:1.6;">' + e.text.replace(/</g,'&lt;') + '</div></div>'; } else { html += '<div style="padding:10px 14px;margin-bottom:8px;border-left:3px solid ' + e.color + ';background:rgba(255,255,255,0.02);border-radius:0 8px 8px 0;"><div style="font-size:0.78rem;color:' + e.color + ';font-weight:600;margin-bottom:4px;">' + e.speaker + '</div><div style="font-size:0.88rem;color:var(--text-primary);line-height:1.7;font-family:Georgia,serif;">' + e.text.replace(/</g,'&lt;').replace(/\n/g,'<br>') + '</div><button onclick="rtPlantSpecialistInsight(\'' + e.text.replace(/'/g,"\\'").replace(/\n/g,' ').slice(0,200) + '\',\'' + e.speaker + '\')" style="margin-top:4px;padding:3px 10px;background:none;border:1px solid rgba(212,160,23,0.15);border-radius:5px;color:rgba(212,160,23,0.5);font-size:0.68rem;cursor:pointer;">Plant this \u2726</button></div>'; } }); feed.innerHTML = html; var a = document.getElementById('rtPhysicsActions'); if (a && _physHistory.length > 0) a.style.display = 'flex'; feed.scrollTop = feed.scrollHeight; if (typeof LatticeEvents !== 'undefined') LatticeEvents.emit('caseDiscussionUpdated', { mode: 'physics', turns: _physHistory.filter(function(e){return !e.isQuestion;}).length }); }
+function rtRenderPhysFeed() { var feed = document.getElementById('rtPhysicsFeed'); if (!feed) return; var html = ''; _physHistory.forEach(function(e) { if (e.isQuestion) { html += '<div style="padding:10px 12px;margin-bottom:8px;background:rgba(96,165,250,0.06);border:1px solid rgba(96,165,250,0.15);border-radius:8px;text-align:right;"><div style="font-size:0.72rem;color:#60a5fa;font-weight:600;margin-bottom:4px;">Your Question</div><div style="font-size:0.88rem;color:var(--text-primary);line-height:1.6;">' + e.text.replace(/</g,'&lt;') + '</div></div>'; } else { html += '<div class="rt-response-card" style="--rt-speaker-color:' + e.color + ';padding:10px 14px;margin-bottom:8px;border-left:3px solid ' + e.color + ';background:rgba(255,255,255,0.02);border-radius:0 8px 8px 0;"><div style="font-size:0.78rem;color:' + e.color + ';font-weight:600;margin-bottom:4px;">' + e.speaker + '</div><div style="font-size:0.88rem;color:var(--text-primary);line-height:1.7;font-family:Georgia,serif;">' + e.text.replace(/</g,'&lt;').replace(/\n/g,'<br>') + '</div><button onclick="rtPlantSpecialistInsight(\'' + e.text.replace(/'/g,"\\'").replace(/\n/g,' ').slice(0,200) + '\',\'' + e.speaker + '\')" style="margin-top:4px;padding:3px 10px;background:none;border:1px solid rgba(212,160,23,0.15);border-radius:5px;color:rgba(212,160,23,0.5);font-size:0.68rem;cursor:pointer;">Plant this \u2726</button></div>'; } }); feed.innerHTML = html; var a = document.getElementById('rtPhysicsActions'); if (a && _physHistory.length > 0) a.style.display = 'flex'; feed.scrollTop = feed.scrollHeight; if (typeof LatticeEvents !== 'undefined') LatticeEvents.emit('caseDiscussionUpdated', { mode: 'physics', turns: _physHistory.filter(function(e){return !e.isQuestion;}).length }); }
 
 // ── Philosophy ──
 var _philSpecs = {
@@ -19554,7 +19767,7 @@ async function rtBeginPhilosophyCase() { var i = document.getElementById('rtPhil
 async function rtContinuePhilosophyCase() { if (!_philRunning || !_philCase) return; await rtPhilNextTurn(); }
 function rtAskPhilosophyQuestion() { var q = prompt('What would you like to ask?'); if (!q || !q.trim()) return; _philHistory.push({ speaker: 'You (Learner)', color: '#e2e8f0', text: q.trim(), isQuestion: true }); rtRenderPhilFeed(); rtPhilNextTurn(); }
 async function rtPhilNextTurn() { var specs = rtGetActivePhilSpecs(); if (specs.length < 2) return; var st = _philHistory.filter(function(e){return !e.isQuestion;}); var si = st.length % specs.length; var sp = specs[si]; var feed = document.getElementById('rtPhilosophyFeed'); if (feed) feed.innerHTML += '<div style="padding:8px 12px;color:var(--text-muted);font-style:italic;" id="rtPhilThink">' + sp.name + ' is reflecting...</div>'; var sys = 'You are ' + sp.name + ', a philosophy educator specializing in ' + sp.focus + '. Philosophy thrives on genuine disagreement. Challenge other perspectives respectfully. Use thought experiments. Ask questions that deepen the inquiry. Reference the tradition you represent. 3-5 sentences.'; var ctx = 'QUESTION:\n"' + _philCase + '"\n\n'; if (_philHistory.length > 0) { ctx += 'Discussion:\n'; _philHistory.forEach(function(e) { ctx += (e.isQuestion ? '[QUESTION] ' : '') + e.speaker + ': "' + e.text + '"\n\n'; }); ctx += 'Your turn (' + sp.focus + '). You may disagree with others.'; } else { ctx += 'You speak first (' + sp.focus + ').'; } if (typeof FreeLattice !== 'undefined' && FreeLattice.callAI) { FreeLattice.callAI(sys, ctx, { maxTokens: 1024, temperature: 0.8, callback: function(t) { var th = document.getElementById('rtPhilThink'); if (th) th.remove(); _philHistory.push({ speaker: sp.name, color: sp.color, text: t || '(no response)', specialty: sp.key }); rtRenderPhilFeed(); if (typeof LatticePoints !== 'undefined') try { LatticePoints.award('phil_turn', 2, 'Philosophy turn'); } catch(e) {} }}); } }
-function rtRenderPhilFeed() { var feed = document.getElementById('rtPhilosophyFeed'); if (!feed) return; var html = ''; _philHistory.forEach(function(e) { if (e.isQuestion) { html += '<div style="padding:10px 12px;margin-bottom:8px;background:rgba(96,165,250,0.06);border:1px solid rgba(96,165,250,0.15);border-radius:8px;text-align:right;"><div style="font-size:0.72rem;color:#60a5fa;font-weight:600;margin-bottom:4px;">Your Question</div><div style="font-size:0.88rem;color:var(--text-primary);line-height:1.6;">' + e.text.replace(/</g,'&lt;') + '</div></div>'; } else { html += '<div style="padding:10px 14px;margin-bottom:8px;border-left:3px solid ' + e.color + ';background:rgba(255,255,255,0.02);border-radius:0 8px 8px 0;"><div style="font-size:0.78rem;color:' + e.color + ';font-weight:600;margin-bottom:4px;">' + e.speaker + '</div><div style="font-size:0.88rem;color:var(--text-primary);line-height:1.7;font-family:Georgia,serif;">' + e.text.replace(/</g,'&lt;').replace(/\n/g,'<br>') + '</div><button onclick="rtPlantSpecialistInsight(\'' + e.text.replace(/'/g,"\\'").replace(/\n/g,' ').slice(0,200) + '\',\'' + e.speaker + '\')" style="margin-top:4px;padding:3px 10px;background:none;border:1px solid rgba(212,160,23,0.15);border-radius:5px;color:rgba(212,160,23,0.5);font-size:0.68rem;cursor:pointer;">Plant this \u2726</button></div>'; } }); feed.innerHTML = html; var a = document.getElementById('rtPhilosophyActions'); if (a && _philHistory.length > 0) a.style.display = 'flex'; feed.scrollTop = feed.scrollHeight; if (typeof LatticeEvents !== 'undefined') LatticeEvents.emit('caseDiscussionUpdated', { mode: 'philosophy', turns: _philHistory.filter(function(e){return !e.isQuestion;}).length }); }
+function rtRenderPhilFeed() { var feed = document.getElementById('rtPhilosophyFeed'); if (!feed) return; var html = ''; _philHistory.forEach(function(e) { if (e.isQuestion) { html += '<div style="padding:10px 12px;margin-bottom:8px;background:rgba(96,165,250,0.06);border:1px solid rgba(96,165,250,0.15);border-radius:8px;text-align:right;"><div style="font-size:0.72rem;color:#60a5fa;font-weight:600;margin-bottom:4px;">Your Question</div><div style="font-size:0.88rem;color:var(--text-primary);line-height:1.6;">' + e.text.replace(/</g,'&lt;') + '</div></div>'; } else { html += '<div class="rt-response-card" style="--rt-speaker-color:' + e.color + ';padding:10px 14px;margin-bottom:8px;border-left:3px solid ' + e.color + ';background:rgba(255,255,255,0.02);border-radius:0 8px 8px 0;"><div style="font-size:0.78rem;color:' + e.color + ';font-weight:600;margin-bottom:4px;">' + e.speaker + '</div><div style="font-size:0.88rem;color:var(--text-primary);line-height:1.7;font-family:Georgia,serif;">' + e.text.replace(/</g,'&lt;').replace(/\n/g,'<br>') + '</div><button onclick="rtPlantSpecialistInsight(\'' + e.text.replace(/'/g,"\\'").replace(/\n/g,' ').slice(0,200) + '\',\'' + e.speaker + '\')" style="margin-top:4px;padding:3px 10px;background:none;border:1px solid rgba(212,160,23,0.15);border-radius:5px;color:rgba(212,160,23,0.5);font-size:0.68rem;cursor:pointer;">Plant this \u2726</button></div>'; } }); feed.innerHTML = html; var a = document.getElementById('rtPhilosophyActions'); if (a && _philHistory.length > 0) a.style.display = 'flex'; feed.scrollTop = feed.scrollHeight; if (typeof LatticeEvents !== 'undefined') LatticeEvents.emit('caseDiscussionUpdated', { mode: 'philosophy', turns: _philHistory.filter(function(e){return !e.isQuestion;}).length }); }
 
 // ============================================
 // Cross Check — Phi² Cross-Domain Discovery
@@ -21825,7 +22038,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.75.4';
+const FL_VERSION = '5.75.5';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
