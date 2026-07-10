@@ -808,7 +808,8 @@
       '.cv-xinput{flex:1;background:rgba(255,255,255,0.05);border:1px solid rgba(80,200,120,0.25);border-radius:6px;padding:6px 10px;color:#ecedee;font-size:0.82rem;outline:none;}',
       '.cv-xinput:focus{border-color:rgba(80,200,120,0.6);}',
       '.cv-xsubmit{background:rgba(80,200,120,0.15);border:1px solid rgba(80,200,120,0.4);color:#50c878;border-radius:6px;padding:6px 14px;cursor:pointer;font-size:0.82rem;}',
-      '.cv-xsubmit:hover{background:rgba(80,200,120,0.25);}'
+      '.cv-xsubmit:hover{background:rgba(80,200,120,0.25);}',
+      '@media(max-width:600px){.cv-xinput{font-size:16px!important;min-height:44px;padding:10px 12px;}.cv-xsubmit{min-height:44px;padding:10px 18px;font-size:0.9rem;}.cv-xheader{min-height:44px;padding:10px 14px;}.cv-xlist{max-height:200px;}}'
     ].join('');
     document.head.appendChild(style);
   }

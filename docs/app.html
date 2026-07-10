@@ -12341,7 +12341,7 @@ body.fl-immersive-active {
 @keyframes gardenSpin {
   to { transform: rotate(360deg); }
 }
-/* ═══ Go 5: Garden Overlay Polish (v5.75.9) ═══ */
+/* ═══ Go 5: Garden Overlay Polish (v5.76.0) ═══ */
 
 /* 1. Loading fog breathing — the Garden gathers itself */
 .garden-loading {
@@ -26920,6 +26920,10 @@ const FlAccordion = (function() {
     if (!el) return;
     if (openSections[sectionId]) {
       el.classList.add('fl-accordion-open');
+      // Mobile UX: scroll the opened section into view after the animation settles
+      setTimeout(function() {
+        el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 120);
     } else {
       el.classList.remove('fl-accordion-open');
     }

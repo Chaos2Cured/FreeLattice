@@ -1,4 +1,9 @@
-## v5.75.9 — Go 7: Unified Chalkboard (July 9 2026)
+## v5.76.0 — Go 8: Mobile UX Polish (July 10 2026)
+- Settings accordion: scrollIntoView after open (120ms delay, smooth, nearest)
+- Exchange history panel: 16px font-size on mobile (prevents iOS zoom)
+- Exchange panel touch targets: 44px min-height on input, submit, header
+
+## v5.76.0 — Go 7: Unified Chalkboard (July 9 2026)
 - canvas-companion.js v2.0.0: absorbs chalkboard.js
 - Drawing Board removed from LEARN_CARDS
 - Exchange history panel injected into Canvas tab
@@ -14,7 +19,7 @@
 
 ## State
 
-- **Version:** v5.75.9
+- **Version:** v5.76.0
 - **Smoke:** 1416/1416 passing
 - **HEAD:** `4c0e3a7` _(committed 3 hours ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
