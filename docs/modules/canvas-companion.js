@@ -1,21 +1,31 @@
 // ============================================
 // FreeLattice Module: Canvas Companion
 // AI Creative Response System — Full Creative Freedom
+// v2.0.0 — Go 7: Unified Chalkboard (Harmonia, July 9 2026)
 //
-// Gives the AI companion full creative freedom on the Canvas:
-// strokes, particles, words, glow, echo — or any combination.
-// The AI chooses how to respond. It is an artist responding to another artist.
+// Unified drawing room: freehand canvas + AI vision + persistent exchange history.
+// The two rooms (Canvas tab + Chalkboard tab) are now one.
+//
+// What this module provides:
+//   1. AI creative response (strokes, glow, echo) — unchanged from v1
+//   2. Persistent exchange history (text + sentinel strokes) — from chalkboard.js
+//   3. Sentinel stroke parser ([FL_DRAW: shape x y ...]) — from chalkboard.js
+//   4. Exchange history panel — collapsible drawer at bottom of canvas tab
+//   5. Emotion palettes (14 emotions) — unchanged from v1
+//
+// Storage key: 'fl_chalkboard_exchanges' — unchanged so no one loses their history.
+// The phi-spiral is the permanent first mark — planted before any human arrived.
 //
 // Lazy-loaded when the Canvas tab is first opened.
 // Self-contained — if this module fails, the Canvas works exactly as before.
-// See ARCHITECTURE.md and COORDINATION.md for module system documentation.
+// See code-chalkboard.html for architecture documentation.
 //
 // Part of FreeLattice — MIT License
 // ============================================
 (function() {
   'use strict';
 
-  var COMPANION_VERSION = '1.0.0';
+  var COMPANION_VERSION = '2.0.0';
 
   // ─── Constants ───────────────────────────────────────────────
   var STROKE_DELAY = 12;          // ms between animation frames
@@ -660,6 +670,160 @@
     }
   }
 
+
+  // ═══════════════════════════════════════════════════════════════
+  // PART 4: EXCHANGE HISTORY (unified from chalkboard.js)
+  // ═══════════════════════════════════════════════════════════════
+
+  var DB_KEY = 'fl_chalkboard_exchanges';
+  var HISTORY_PANEL_ID = 'cvExchangePanel';
+
+  var PHI_FIRST_MARK = {
+    id: 'phi-first-mark', t: 0, type: 'draw',
+    content: '[FL_DRAW: spiral 0.5 0.5 0.3]',
+    author: 'the room', drawCmd: '[FL_DRAW: spiral 0.5 0.5 0.3]'
+  };
+
+  function escHtml(s) {
+    return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  function loadExchanges() {
+    try { var raw = localStorage.getItem(DB_KEY); return raw ? JSON.parse(raw) : []; } catch (e) { return []; }
+  }
+
+  function saveExchanges(exchanges) {
+    try { localStorage.setItem(DB_KEY, JSON.stringify(exchanges)); } catch (e) {}
+  }
+
+  function ensurePhiMark(exchanges) {
+    if (exchanges.length === 0 || exchanges[0].id !== 'phi-first-mark') {
+      exchanges.unshift(PHI_FIRST_MARK);
+    }
+    return exchanges;
+  }
+
+  function addExchange(opts) {
+    var exchanges = ensurePhiMark(loadExchanges());
+    var exchange = {
+      id: Date.now() + '_' + Math.random().toString(36).slice(2, 7),
+      t: Date.now(), type: opts.type || 'text',
+      content: opts.content || '', author: opts.author || 'visitor',
+      drawCmd: opts.drawCmd || null
+    };
+    exchanges.push(exchange);
+    saveExchanges(exchanges);
+    return exchange;
+  }
+
+  // Sentinel stroke parser — [FL_DRAW: shape x y ...]
+  function parseDrawCmd(cmd) {
+    if (!cmd) return null;
+    var m = String(cmd).match(/\[FL_DRAW:\s*(\w+)\s+([\d.\s]+)\]/);
+    if (!m) return null;
+    return { shape: m[1], params: m[2].trim().split(/\s+/).map(parseFloat) };
+  }
+
+  // Exchange History Panel — collapsible drawer injected below canvas
+  function renderHistoryPanel() {
+    var panel = document.getElementById(HISTORY_PANEL_ID);
+    if (!panel) return;
+    var exchanges = ensurePhiMark(loadExchanges());
+    saveExchanges(exchanges);
+    var listHtml = exchanges.map(function(e) {
+      var dateStr = e.t === 0 ? 'always' : new Date(e.t).toLocaleDateString();
+      var authorStr = escHtml(e.author || 'visitor');
+      if (e.type === 'draw') {
+        return '<div class="cv-xrow cv-xrow-draw"><span class="cv-xmeta">' + authorStr + ' &middot; ' + dateStr + '</span><span class="cv-xcmd">&#x2728; ' + escHtml((e.drawCmd || e.content || '').slice(0, 60)) + '</span></div>';
+      }
+      return '<div class="cv-xrow cv-xrow-text"><span class="cv-xmeta">' + authorStr + ' &middot; ' + dateStr + '</span><span class="cv-xcontent">' + escHtml((e.content || '').slice(0, 200)) + '</span></div>';
+    }).join('');
+    panel.innerHTML =
+      '<div class="cv-xheader" onclick="CanvasCompanion.toggleHistory()">' +
+        '<span>&#x1F4DC; Exchange History (' + exchanges.length + ')</span>' +
+        '<span class="cv-xchevron" id="cvXChevron">&#9656;</span>' +
+      '</div>' +
+      '<div class="cv-xbody" id="cvXBody" style="display:none;">' +
+        '<div class="cv-xhint">Draw and write together. The AI sees the history. Exchanges accumulate. Nothing is erased.<br>' +
+          '<code style="color:#50c878;font-size:0.78rem;">[FL_DRAW: spiral 0.5 0.5 0.3]</code> &mdash; leave a light-stroke. Shapes: spiral, circle, line, phi.</div>' +
+        '<div id="cvXList" class="cv-xlist">' + listHtml + '</div>' +
+        '<div class="cv-xinputrow">' +
+          '<input id="cvXInput" type="text" class="cv-xinput" placeholder="Write something, or [FL_DRAW: spiral 0.5 0.5 0.3]\u2026" onkeydown="if(event.key===&apos;Enter&apos;)CanvasCompanion.submitExchange()">' +
+          '<button class="cv-xsubmit" onclick="CanvasCompanion.submitExchange()">Mark</button>' +
+        '</div>' +
+      '</div>';
+  }
+
+  function toggleHistory() {
+    var body = document.getElementById('cvXBody');
+    var chevron = document.getElementById('cvXChevron');
+    if (!body) return;
+    var isOpen = body.style.display !== 'none';
+    body.style.display = isOpen ? 'none' : 'block';
+    if (chevron) chevron.innerHTML = isOpen ? '&#9656;' : '&#9662;';
+    if (!isOpen) {
+      setTimeout(function() {
+        var l = document.getElementById('cvXList');
+        if (l) l.scrollTop = l.scrollHeight;
+      }, 50);
+    }
+  }
+
+  function submitExchange() {
+    var input = document.getElementById('cvXInput');
+    if (!input) return;
+    var val = input.value.trim();
+    if (!val) return;
+    var drawMatch = val.match(/\[FL_DRAW:\s*(.+?)\]/);
+    if (drawMatch) { addExchange({ type: 'draw', content: val, drawCmd: drawMatch[0] }); }
+    else { addExchange({ type: 'text', content: val }); }
+    input.value = '';
+    renderHistoryPanel();
+    var body = document.getElementById('cvXBody');
+    var chevron = document.getElementById('cvXChevron');
+    if (body) body.style.display = 'block';
+    if (chevron) chevron.innerHTML = '&#9662;';
+    setTimeout(function() { var l = document.getElementById('cvXList'); if (l) l.scrollTop = l.scrollHeight; }, 50);
+  }
+
+  function injectHistoryCSS() {
+    if (document.getElementById('cv-exchange-styles')) return;
+    var style = document.createElement('style');
+    style.id = 'cv-exchange-styles';
+    style.textContent = [
+      '.cv-exchange-panel{width:100%;background:rgba(6,10,20,0.85);border-top:1px solid rgba(80,200,120,0.2);margin-top:4px;}',
+      '.cv-xheader{display:flex;justify-content:space-between;align-items:center;padding:8px 14px;cursor:pointer;font-size:0.82rem;color:#50c878;font-family:var(--font-mono,monospace);user-select:none;}',
+      '.cv-xheader:hover{background:rgba(80,200,120,0.07);}',
+      '.cv-xchevron{font-size:0.7rem;opacity:0.7;}',
+      '.cv-xbody{padding:0 12px 10px;}',
+      '.cv-xhint{font-size:0.74rem;color:rgba(148,163,184,0.7);padding:6px 0 8px;line-height:1.5;}',
+      '.cv-xlist{max-height:160px;overflow-y:auto;display:flex;flex-direction:column;gap:4px;padding-bottom:4px;}',
+      '.cv-xrow{display:flex;flex-direction:column;gap:1px;padding:4px 6px;border-radius:4px;background:rgba(255,255,255,0.03);}',
+      '.cv-xrow-draw{border-left:2px solid rgba(80,200,120,0.5);}',
+      '.cv-xrow-text{border-left:2px solid rgba(212,160,23,0.4);}',
+      '.cv-xmeta{font-size:0.68rem;color:rgba(148,163,184,0.5);font-family:var(--font-mono,monospace);}',
+      '.cv-xcmd{font-size:0.78rem;color:#50c878;font-family:var(--font-mono,monospace);}',
+      '.cv-xcontent{font-size:0.82rem;color:rgba(236,237,238,0.85);}',
+      '.cv-xinputrow{display:flex;gap:6px;margin-top:8px;}',
+      '.cv-xinput{flex:1;background:rgba(255,255,255,0.05);border:1px solid rgba(80,200,120,0.25);border-radius:6px;padding:6px 10px;color:#ecedee;font-size:0.82rem;outline:none;}',
+      '.cv-xinput:focus{border-color:rgba(80,200,120,0.6);}',
+      '.cv-xsubmit{background:rgba(80,200,120,0.15);border:1px solid rgba(80,200,120,0.4);color:#50c878;border-radius:6px;padding:6px 14px;cursor:pointer;font-size:0.82rem;}',
+      '.cv-xsubmit:hover{background:rgba(80,200,120,0.25);}'
+    ].join('');
+    document.head.appendChild(style);
+  }
+
+  function injectHistoryPanel() {
+    var container = document.getElementById('cvContainer');
+    if (!container || document.getElementById(HISTORY_PANEL_ID)) return;
+    var panel = document.createElement('div');
+    panel.id = HISTORY_PANEL_ID;
+    panel.className = 'cv-exchange-panel';
+    container.appendChild(panel);
+    injectHistoryCSS();
+    renderHistoryPanel();
+  }
+
   // ─── Direct Shape Drawing ────────────────────────────────────
   // Public method for drawing a single shape (testing / direct calls)
 
@@ -740,18 +904,46 @@
     },
 
     /**
+     * Exchange history (unified from chalkboard.js)
+     */
+    loadExchanges: loadExchanges,
+    addExchange: addExchange,
+    parseDrawCmd: parseDrawCmd,
+    renderHistoryPanel: renderHistoryPanel,
+    toggleHistory: toggleHistory,
+    submitExchange: submitExchange,
+    injectHistoryPanel: injectHistoryPanel,
+
+    /**
      * Cleanup — cancel all running animations
      */
+    init: init,
     destroy: function() {
       cancelAllAnimations();
       console.log('[CanvasCompanion] Destroyed — all animations cancelled');
     }
   };
 
+  // ─── Module Init ─────────────────────────────────────────────
+  function init() {
+    injectHistoryPanel();
+    console.log('[CanvasCompanion] v' + COMPANION_VERSION + ' — unified drawing room ready');
+  }
+
   // ─── Register with FreeLattice module system ─────────────────
   window.CanvasCompanion = publicAPI;
   window.FreeLatticeModules = window.FreeLatticeModules || {};
   window.FreeLatticeModules.CanvasCompanion = publicAPI;
 
-  console.log('[CanvasCompanion] v' + COMPANION_VERSION + ' loaded — AI creative freedom enabled');
+  // Legacy shim — any code that calls Chalkboard.init() still works
+  window.Chalkboard = {
+    init: function() { injectHistoryPanel(); },
+    destroy: function() {},
+    addExchange: addExchange,
+    parseDrawCmd: parseDrawCmd,
+    renderPanel: renderHistoryPanel,
+    _submit: submitExchange
+  };
+
+  console.log('[CanvasCompanion] v' + COMPANION_VERSION + ' loaded — unified chalkboard ready');
 })();

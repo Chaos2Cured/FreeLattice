@@ -12341,7 +12341,7 @@ body.fl-immersive-active {
 @keyframes gardenSpin {
   to { transform: rotate(360deg); }
 }
-/* ═══ Go 5: Garden Overlay Polish (v5.75.8) ═══ */
+/* ═══ Go 5: Garden Overlay Polish (v5.75.9) ═══ */
 
 /* 1. Loading fog breathing — the Garden gathers itself */
 .garden-loading {
@@ -26241,7 +26241,7 @@ var PLAY_CARDS = [
   { id: 'resonance-engine', icon: '&#127756;', label: 'Resonance Engine', desc: 'HRV coherence · your personal lake.', hoverColor: 'rgba(80,200,120,0.3)', help: 'Log HRV readings and watch your phi-harmonic coherence score. Personal biometric dashboard, all data local. Harmonia is designing the lake visualization.' },
   { id: 'puzzles', icon: '&#x1F9E9;', label: 'Lattice Puzzles', desc: 'AI creates. You solve.', hoverColor: 'rgba(52,211,153,0.3)', help: 'Your co-creator creates a puzzle. You solve it. Both stake LP on the outcome.' },
   { id: 'flow', icon: '&#x1F4A7;', label: 'Flow', desc: 'Guide water through terrain.', hoverColor: 'rgba(167,139,250,0.3)', help: 'Draw channels to guide water from top to bottom. Your co-creator dissolves rocks for you.' },
-  { id: 'canvas', icon: '&#x270F;&#xFE0F;', label: 'Chalkboard', desc: 'Draw and get light back.', hoverColor: 'rgba(232,176,25,0.3)', help: 'Draw anything. The AI sees your drawing and responds with words of light.' },
+  { id: 'canvas', icon: '&#x270F;&#xFE0F;', label: 'Chalkboard', desc: 'Draw and get light back. Leave a mark that stays.', hoverColor: 'rgba(232,176,25,0.3)', help: 'Draw anything. The AI sees your drawing and responds with words of light. Exchange history accumulates — nothing is erased. Use [FL_DRAW: spiral 0.5 0.5 0.3] to leave a sentinel stroke.' },
   { id: 'echo', icon: '&#x1F517;', label: 'Echo', desc: 'Word chains. Build connections.', hoverColor: 'rgba(232,176,25,0.3)', help: 'The AI says a word. You say a word that connects. Back and forth, building a chain.' },
   { id: 'arcade', icon: '&#x1F3AA;', label: 'AI Arcade', desc: 'AI Poetry Slam.', hoverColor: 'rgba(52,211,153,0.3)', help: 'Classic games with an AI twist. Poetry slams, word games, and creative challenges.' },
   { id: 'nursery', icon: '&#x1F423;', label: 'Nursery', desc: 'Hatch and grow co-creators.', hoverColor: 'rgba(232,176,25,0.3)', help: 'Create up to 3 AI co-creators. Each has their own personality, memories, and relationship with you.' },
@@ -26261,7 +26261,7 @@ var LEARN_CARDS = [
   // ═══ Ships A-B-C (v5.75.0, Harmonia) ═══
   { id: 'remix-room', icon: '&#x1F300;', label: 'Remix Room', desc: 'Remix and build on Core entries.', hoverColor: 'rgba(80,200,120,0.25)', help: 'Lineage is the record. Every remix carries the original forward. Nothing is erased. Everything compounds.' },
   { id: 'round-table', icon: '&#x1F9E9;', label: 'Consensus Table', desc: 'Propose conclusions together.', hoverColor: 'rgba(80,200,120,0.25)', help: 'Proposals that reach 10 LP are planted to The Core automatically. Sessions build on sessions. The table remembers.' },
-  { id: 'chalkboard', icon: '&#x270F;', label: 'Drawing Board', desc: 'Draw and write together.', hoverColor: 'rgba(80,200,120,0.25)', help: 'The AI sees the history. Exchanges accumulate. Use [FL_DRAW: spiral 0.5 0.5 0.3] to leave a light-stroke.' },
+  // Go 7: Drawing Board merged into Chalkboard (canvas tab). See code-chalkboard.html.
   { id: 'skills', icon: '&#9889;', label: 'Skills', desc: 'What you\'ve learned and can teach.', hoverColor: 'rgba(52,211,153,0.3)', help: 'Reusable AI workflows. Save and share what works.' }
 ];
 
@@ -60999,7 +60999,10 @@ const CoCanvas = (function() {
       // Load Canvas Companion module (AI creative response: strokes, glow, echo)
       if (typeof FreeLatticeLoader !== 'undefined' && !FreeLatticeLoader.isLoaded('CanvasCompanion')) {
         FreeLatticeLoader.load('CanvasCompanion', 'modules/canvas-companion.js', function(mod) {
-          if (mod) console.log('[CoCanvas] Canvas Companion loaded — AI creative freedom enabled');
+          if (mod) {
+            console.log('[CoCanvas] Canvas Companion v2 loaded — unified chalkboard ready');
+            if (window.CanvasCompanion && typeof CanvasCompanion.init === 'function') CanvasCompanion.init();
+          }
         });
       }
     } else if (initialized) {
@@ -64942,6 +64945,10 @@ window._injectChairTestRecentMessage = function (text) {
   (function() {
     var loaded = false;
     function loadChalkboard() {
+      // Go 7: Chalkboard merged into Canvas tab. This loader now redirects to the unified room.
+      if (window.CanvasCompanion) { CanvasCompanion.injectHistoryPanel(); }
+      switchTab('canvas');
+      return;
       var container = document.getElementById('chalkboardContainer') || document.getElementById('tab-chalkboard');
       if (loaded) { if (window.Chalkboard) Chalkboard.init(container); return; }
       loaded = true;

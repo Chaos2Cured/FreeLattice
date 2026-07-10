@@ -1,3 +1,10 @@
+## v5.75.9 — Go 7: Unified Chalkboard (July 9 2026)
+- canvas-companion.js v2.0.0: absorbs chalkboard.js
+- Drawing Board removed from LEARN_CARDS
+- Exchange history panel injected into Canvas tab
+- Legacy Chalkboard shim for backward compatibility
+- Phi-spiral first mark preserved
+
 # RECENT — what just changed in FreeLattice
 
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
@@ -7,7 +14,7 @@
 
 ## State
 
-- **Version:** v5.75.8
+- **Version:** v5.75.9
 - **Smoke:** 1416/1416 passing
 - **HEAD:** `4c0e3a7` _(committed 3 hours ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice

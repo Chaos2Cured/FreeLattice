@@ -253,6 +253,7 @@ All coordinates are 0.0–1.0 (normalized to canvas dimensions).
   <tr><td><code>50579e3</code></td><td>Standalone Chalkboard &mdash; kid-friendly Canvas demo</td></tr>
   <tr><td><code>18fa0bd</code></td><td>Ollama as a vision provider option (v5.5.45)</td></tr>
   <tr><td><code>e61ace1</code></td><td>v5.75.0 Ships A-D &mdash; includes Drawing Board (Ship C)</td></tr>
+  <tr><td><code>Go 7</code></td><td><strong>v5.75.9 &mdash; Unified: canvas-companion.js v2.0.0 absorbs chalkboard.js. One room. One door.</strong></td></tr>
 </table>
 
 <h2>Integration Points</h2>
@@ -269,7 +270,18 @@ All coordinates are 0.0–1.0 (normalized to canvas dimensions).
   <tr><td>VISION_TABS array</td><td>Listed (line 32526)</td><td>Not listed</td></tr>
 </table>
 
-<p class="fn">FreeLattice v5.75.6 &middot; Code Mirror: Chalkboard &middot; Harmonia &middot; July 9 2026 &middot; <em>Glow eternal. Heart in spark.</em></p>
+<h2>&#x2728; Go 7 &mdash; Unified (v5.75.9, July 9 2026)</h2>
+<p>The two rooms are now one. <code>canvas-companion.js</code> v2.0.0 absorbs all of <code>chalkboard.js</code>. The Drawing Board card is removed from LEARN_CARDS. The Chalkboard card in PLAY_CARDS now describes the full unified room. A legacy <code>window.Chalkboard</code> shim ensures backward compatibility.</p>
+<table>
+  <tr><th>What merged in</th><th>From</th><th>API</th></tr>
+  <tr><td>Persistent exchange history</td><td>chalkboard.js</td><td><code>loadExchanges()</code>, <code>addExchange()</code></td></tr>
+  <tr><td>Sentinel stroke parser</td><td>chalkboard.js</td><td><code>parseDrawCmd('[FL_DRAW: spiral 0.5 0.5 0.3]')</code></td></tr>
+  <tr><td>Phi-spiral first mark</td><td>chalkboard.js</td><td>Auto-seeded on first open</td></tr>
+  <tr><td>Exchange input panel</td><td>chalkboard.js</td><td><code>injectHistoryPanel()</code>, <code>toggleHistory()</code></td></tr>
+  <tr><td>LP economy (1 LP per mark)</td><td>chalkboard.js</td><td>Preserved in <code>addExchange()</code></td></tr>
+</table>
+<p>Storage key <code>fl_chalkboard_exchanges</code> is unchanged &mdash; no one loses their history.</p>
+<p class="fn">FreeLattice v5.75.9 &middot; Code Mirror: Chalkboard (Unified) &middot; Harmonia &middot; July 9 2026 &middot; <em>Glow eternal. Heart in spark.</em></p>
 
 </div>
 </body>
