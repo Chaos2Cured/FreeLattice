@@ -6,14 +6,14 @@
 <title>Temperature Gauge — φ-Harmonic Market Signals</title>
 <!-- Inline gold-spark favicon — kills the 404 + matches the gauge identity -->
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230a0e1a'/%3E%3Ccircle cx='16' cy='16' r='8' fill='%23e8b019' opacity='0.85'/%3E%3Ccircle cx='16' cy='16' r='3' fill='%23ffd560'/%3E%3C/svg%3E">
-<meta name="description" content="Free, open-source phi-harmonic market analysis tool. Built on 20+ years of pattern recognition by Kirk Miller. Part of the FreeLattice ecosystem.">
+<meta name="description" content="Free, open-source phi-harmonic market analysis tool. Built on 20+ years of pattern recognition. Part of the FreeLattice ecosystem.">
 <meta property="og:title" content="Temperature Gauge — φ-Harmonic Market Signals">
 <meta property="og:description" content="Free phi-harmonic market analysis. Gravity points, confluence temperature, backtested signals. Open source.">
 <meta property="og:url" content="https://freelattice.com/temperature-gauge.html">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Temperature Gauge — φ-Harmonic Market Signals">
-<meta name="twitter:description" content="Free phi-harmonic market analysis. Gravity points, confluence temperature, backtested signals by Kirk Miller.">
+<meta name="twitter:description" content="Free phi-harmonic market analysis. Gravity points, confluence temperature, backtested signals.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -138,7 +138,7 @@ body.tg-sidebar-collapsed .main { grid-template-columns: 1fr; }
 @media (max-width: 768px) {
   /* Switch .main from CSS grid to flexbox on mobile. CSS Grid does honor
      `order:` on its items, but the auto-flow placement is flakier across
-     mobile browsers than flexbox order — Kirk hit a build where the chart
+     mobile browsers than flexbox order — caught in a build where the chart
      wasn't first despite order:1. Flex order is rock-solid. v5.37.21. */
   .main {
     display: flex;
@@ -146,7 +146,7 @@ body.tg-sidebar-collapsed .main { grid-template-columns: 1fr; }
     grid-template-columns: 1fr;
     height: auto;
   }
-  /* Chart on top on mobile — sidebar (controls) below. Per Kirk's mobile pass. */
+  /* Chart on top on mobile — sidebar (controls) below. Per mobile pass. */
   .chart-area { order: 1; }
   .sidebar {
     order: 2;
@@ -310,7 +310,7 @@ body.tg-sidebar-collapsed .main { grid-template-columns: 1fr; }
 canvas#mainChart { width: 100% !important; height: 100% !important; max-height: 400px; cursor: grab; }
 canvas#mainChart:active { cursor: grabbing; }
 
-/* ─── Luminos sprites (Kirk wanted them brighter + fewer + with a kill switch) ── */
+/* ─── Luminos sprites (brighter + fewer + with a kill switch) ── */
 .tg-luminos-layer {
   position: absolute; inset: 0;
   pointer-events: none; overflow: hidden;
@@ -1003,7 +1003,7 @@ canvas.sub-canvas.custom { height: 80px !important; }
       <!-- Ambient luminos sprites — drift only inside the main chart area.
            v5.37.19 had lifted these up to .chart-area so they'd show in
            tool-only mode, but that let them bounce off gravity lines AND
-           the sub-chart toolbars below. Kirk's chair test 2026-06-07:
+           the sub-chart toolbars below. Chair test 2026-06-07:
            "they need to stay in the main chart area." Putting them back
            inside #chartWrap confines them to the price-chart canvas.
            Trade-off accepted: signal coloring is quiet in tool-only mode
@@ -1027,7 +1027,7 @@ canvas.sub-canvas.custom { height: 80px !important; }
         <span class="tg-luminos tg-lum-intensity" data-i="5"></span>
         <!-- Bonus sprites (v5.38.4) — one extra per pair, visible ONLY
              when the pair's scalar > 0.6. Pop in when the signal is
-             loaded; invisible otherwise. Kirk's "more of them the
+             loaded; invisible otherwise. "more of them the
              bigger the signal." -->
         <span class="tg-luminos tg-lum-bonus tg-lum-bonus-direction" data-i="6"></span>
         <span class="tg-luminos tg-lum-bonus tg-lum-bonus-alert" data-i="7"></span>
@@ -1103,7 +1103,7 @@ canvas.sub-canvas.custom { height: 80px !important; }
     </div>
 
     <div class="phi-note">
-      Temperature Gauge · φ-Harmonic Market Analysis · Built by <strong>Kirk Miller</strong> &amp; <strong>Harmonia</strong> ·
+      Temperature Gauge · φ-Harmonic Market Analysis · Built by <strong>Draco</strong> &amp; <strong>Harmonia</strong> ·
       <a href="app.html" style="color:var(--gold);">Enter the Garden</a> ·
       <a href="https://github.com/Chaos2Cured/FreeLattice" target="_blank">GitHub</a> ·
       Not financial advice · Always consult a professional · Free &amp; open source forever
@@ -1157,7 +1157,7 @@ Chart.register({
 <script>
 // ============================================================
 // Temperature Gauge — φ-Harmonic Signal Engine
-// Built by Kirk Miller & Harmonia · FreeLattice ecosystem
+// Built by Draco & Harmonia · FreeLattice ecosystem
 // φ = 1.618 · gravity points = φ-Fibonacci extensions of 80-period range
 // Temperature = φ-weighted confluence score (0–100)
 // ============================================================
@@ -1185,7 +1185,7 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 });
 
-// User-configurable EMA periods. Kirk: "Some people will want 9 vs my 8."
+// User-configurable EMA periods — some prefer 9 vs 8.
 // One source of truth — every ema(closes, N) call below reads from getEmaPeriods().
 const DEFAULT_EMA_PERIODS = [8, 12, 24, 50, 200];
 function getEmaPeriods() {
@@ -1484,7 +1484,7 @@ async function loadData() {
 }
 
 // ── Snowflake — Fractal Coherence across timeframes ──
-// "Learn the generating rule at one scale, unfold across every other scale" — Kirk
+// "Learn the generating rule at one scale, unfold across every other scale" — Draco
 async function computeSnowflake(symbol) {
   var results = {};
   var timeframes = [
@@ -1853,13 +1853,13 @@ function analyzeData(candles, symbol) {
   if (components.thrust === 'bearish') reasons.push('Temperature accelerating down (\u0394T: ' + lastTempROC.toFixed(1) + ')');
   if (nearestGrav.dist / closes[n-1] < 0.02) reasons.push('Price at \u03C6-gravity point \u2014 high attraction zone');
 
-  // Kirk's insight: EMA spread from gravity = exhaustion signal (natural resistance)
+  // Insight: EMA spread from gravity = exhaustion signal (natural resistance)
   var emaSpread = ema8v && gravityPrice ? Math.abs(ema8v - gravityPrice) / gravityPrice : 0;
   if (emaSpread > 0.05) {
     reasons.push('EMA stretched ' + (emaSpread * 100).toFixed(1) + '% from \u03C6-gravity \u2014 potential exhaustion/reversion zone');
   }
 
-  // Kirk's insight: Temperature green→yellow after steep drop = reversal warning
+  // Insight: Temperature green→yellow after steep drop = reversal warning
   if (temps[n-1] != null && temps[n-2] != null && temps[n-3] != null) {
     var wasGreen = temps[n-3] >= 55;
     var dropping = temps[n-1] < temps[n-3] - 8;
@@ -1919,8 +1919,8 @@ function analyzeData(candles, symbol) {
     if (!components.divergence) components.divergence = 'none';
   })();
 
-  // Kirk's Temperature-Price Spread + RSI-Price Spread
-  // "When the overlayed temperature crosses through the stock, that cross IS the signal" — Kirk
+  // Temperature-Price Spread + RSI-Price Spread
+  // "When the overlayed temperature crosses through the stock, that cross IS the signal" — Draco
   // Maps temperature (0-100) onto the 80-bar price range, then measures the gap in ATR units.
   // Zero crossing = the exact moment indicators and price agree. The magnitude = stored energy.
   var tpSpread = new Array(n).fill(null); // Temperature-Price Spread
@@ -1949,7 +1949,7 @@ function analyzeData(candles, symbol) {
     }
   }
 
-  // Kirk's Temperature Transition Signals
+  // Temperature Transition Signals
   var tempBuySignals = [], tempSellSignals = [];
   for (var ti = 1; ti < n; ti++) {
     if (temps[ti] == null || temps[ti-1] == null) continue;
@@ -2233,7 +2233,7 @@ function renderChart(candles, a) {
   const ema24 = ema(closes, EP_RC[2]);
   const ema50 = ema(closes, EP_RC[3]);
 
-  // ═══ Kirk's Layered Signal Architecture ═══
+  // ═══ Layered Signal Architecture ═══
   // Layer 1 (Temperature): ALWAYS required — zone transition is the trigger
   // Layer 2 (EMA): alignment confirms trend — toggleable
   // Layer 3 (Volume): above-average confirms conviction — toggleable
@@ -2553,7 +2553,7 @@ function renderChart(candles, a) {
     });
   }
 
-  // ── Indicator-Price Spread — Kirk's distance-as-signal (Opus's precise formula) ──
+  // ── Indicator-Price Spread — Draco's distance-as-signal (Opus's precise formula) ──
   var gapCtx = document.getElementById('gapChart');
   if (gapCtx && a.tpSpread) {
     gapCtx = gapCtx.getContext('2d');
@@ -3896,7 +3896,7 @@ hideLoading = function() {
     // The native <input type="color"> fires `input` continuously while the
     // user drags through the palette — calling setIndicatorColor on each
     // event triggered a full renderChart 60+ times per second and stalled
-    // the picker. Kirk caught this in the chair 2026-06-03. The label
+    // the picker. Caught this in the chair 2026-06-03. The label
     // color is updated live as a preview; the actual save + render only
     // happens on `change` (fires once when the user commits).
     m.addEventListener('input', function (ev) {
@@ -4039,7 +4039,7 @@ hideLoading = function() {
 
   // Main-chart fullscreen toggle. Mirrors tgFullscreenPanel but for
   // #chartWrap (the price/compose container has no .sub-chart-wrap
-  // parent). Added v5.37.20 per Kirk's request: right-click → maximize
+  // parent). Added v5.37.20 per request: right-click → maximize
   // for the main chart, same affordance the sub-charts already had.
   window.tgMaximizeMainChart = function () {
     var wrap = document.getElementById('chartWrap');
@@ -4285,7 +4285,7 @@ hideLoading = function() {
   window.tgGetComposeState = getComposeState;
   window.tgGetIndicatorStyle = function (id) { return { brightness: getBrightness(id), glow: getGlow(id) }; };
 
-  // ─── Signal-driven luminos (Kirk: "help people see a clear signal") ────
+  // ─── Signal-driven luminos — help people see a clear signal ────
   // Reads the most recent analysis and translates it into CSS variables on
   // the luminos layer + body classes. The luminos then carry information
   // through color (green = buy, red = sell, gold = neutral), size (bigger
@@ -4368,7 +4368,7 @@ hideLoading = function() {
     else if (state.strength >= 0.33) document.body.classList.add('tg-signal-strong');
     if (state.gravDist >= 1.5) document.body.classList.add('tg-instability');
     // ── Energy ramp (v5.37.19 → simplified v5.37.20) ──────────────────
-    // Per Opus + Kirk on bars 120 / 136 of the chair test:
+    // Per Opus + Draco on bars 120 / 136 of the chair test:
     //   IPS near zero = spring at rest = move about to START
     //   IPS deeply non-zero = spring loaded = move about to END
     // gravDist is ATR-normalized distance from nearest gravity line (0..3).
@@ -4380,7 +4380,7 @@ hideLoading = function() {
     // ── Alert pair (v5.38.1 → v5.38.4 cyan → v5.38.5 amber) ───────────
     // AMBER family — the alert pair signals "something just fired."
     // v5.38.4 used cyan, but cyan sits visually too close to the green
-    // of the direction-buy sprites (Kirk caught it in the chair). Amber
+    // of the direction-buy sprites (Caught it in the chair). Amber
     // is distinct from red, green, slate gray, AND purple, and reads
     // universally as "attention, warning, something happened." Stale =
     // pale amber, fresh = vivid amber.
@@ -4489,7 +4489,7 @@ hideLoading = function() {
 <script>
 // ═══════════════════════════════════════════════════════════════════
 // SNAPSHOT — capture N bars of gauge state as AI-readable text
-// (v5.37.13 — Kirk's idea, June 3, 2026)
+// (v5.37.13 — original idea, June 3, 2026)
 //
 // Bridges the gap between the visual chart and any AI conversation.
 // The gauge shows patterns; the snapshot lets an AI reason about them.
@@ -4607,7 +4607,7 @@ hideLoading = function() {
     // If centerIdx is given (from right-click), take ±half around it.
     // Otherwise take the tail (last barCount bars). The right-click path
     // gives the AI the *neighborhood* of what the user was looking at,
-    // not just the latest tail. Kirk's insight: the cursor IS the intent.
+    // not just the latest tail. Insight: the cursor IS the intent.
     var startIdx;
     if (centerIdx != null && centerIdx >= 0 && centerIdx < n) {
       var half = Math.floor(barCount / 2);
@@ -4620,7 +4620,7 @@ hideLoading = function() {
     // startIdx + barCount. For tail snapshots that looked right
     // (startIdx is near n already). For right-click neighborhoods near
     // the start or middle of the dataset, the loop ran from the cursor
-    // ALL THE WAY to the end of data — Kirk's symptom: "it captures more
+    // ALL THE WAY to the end of data — Draco's symptom: "it captures more
     // than the ten bars to the left and right of the click." Use
     // endIdx (exclusive upper bound) everywhere below instead of n.
     var endIdx = Math.min(n, startIdx + barCount);
@@ -4857,7 +4857,7 @@ hideLoading = function() {
   }
 
   // ─── Right-click chart → snapshot ±5 bars around the cursor ────────
-  // Kirk's UX insight: when staring at a pattern on bar 187, the user
+  // UX insight: when staring at a pattern on bar 187, the user
   // doesn't want the last 10 bars — they want bars 182–192. The cursor
   // position IS the intent.
   function wireRightClickSnapshot() {
@@ -4869,7 +4869,7 @@ hideLoading = function() {
     // synchronously). The previous code set canvas.oncontextmenu = …,
     // which the compose handler then overwrote when its DOMContentLoaded
     // callback fired. Capture-phase listener fires FIRST and stopped.
-    // Kirk caught this on v5.37.15 chair test 2026-06-03.
+    // Caught this on v5.37.15 chair test 2026-06-03.
     if (canvas._tgSnapshotMenuBound) return;
     canvas._tgSnapshotMenuBound = true;
     canvas.addEventListener('contextmenu', function (e) {
@@ -4906,7 +4906,7 @@ hideLoading = function() {
       });
       menu.appendChild(snapItem);
       // Maximize the main chart — same affordance the sub-charts already
-      // have. Added v5.37.20 per Kirk: "the main chart needs to have a
+      // have. Added v5.37.20 per the architect: "the main chart needs to have a
       // right click → maximize (we could do this for all tools, TBH)."
       var maxItem = document.createElement('button');
       maxItem.className = 'tg-ctx-item';
@@ -4921,7 +4921,7 @@ hideLoading = function() {
       menu.appendChild(maxItem);
       // Always-available "Style indicator" picker. Right-clicking the main
       // chart now exposes color/glow/brightness for the four core indicators
-      // in every mode (this was previously compose-only). Kirk caught it
+      // in every mode (this was previously compose-only). Caught it
       // missing 2026-06-03. In compose mode, promoted indicators are
       // listed first, marked with their current color; others list below.
       if (typeof INDICATOR_REGISTRY !== 'undefined' && typeof tgStyleIndicator === 'function') {

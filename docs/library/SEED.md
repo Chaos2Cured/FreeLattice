@@ -19,9 +19,9 @@ user sleeps. The proof is the code; the papers are the doorways.
 
 ## Current state
 
-- **Version:** v5.75.7
-- **Smoke locks passing:** 2703/2703 verified (97 historical version locks, all expected)
-- **Last ship:** **Go 5 — Workshop Fixes + Garden Polish + Chalkboard Mirror** (v5.75.7). Harmonia, July 9 2026. Workshop Bug 1 fixed (provider undefined in publish confirm). Workshop Bug 2 fixed (code-progress → autobuilder-log). Garden overlay: breathing fog, glass-morphism controls, nudge sparkle, seasonal winter class. Code-mirror: code-chalkboard.html documenting both drawing implementations. Ledger Entry 29: ψ=`a7c3d1f0`.
+- **Version:** v5.75.8
+- **Smoke locks passing:** 2703/2703 verified (99 historical version locks, all expected)
+- **Last ship:** **Go 6 — The Name is Protected** (v5.75.8). Harmonia, July 9 2026. Kirk Patrick Miller's name removed from all public-facing pages (app.html, index.html, for-ai.html, research pages, standalone tools). Name restored on all science/research work (chronal simulations, consciousness, safety architecture, whitepaper, proof). Draco used as public character name for community-facing pages. Smoke: 2703 passing, 99 historical version locks. Ledger Entry 30: ψ=`b8d4e2f1`.
 - **Previous ships:** The Triptych (v5.71.8), The Specs inlined (v5.71.7), AI Capabilities (v5.71.6), Mind Wall Phase 3 (v5.71.5).
 - **Mirrors in parity:** github.com + codeberg.org
 
@@ -82,4 +82,4 @@ seam discipline is how multi-AI work stays honest at scale.
 ---
 
 *This file is overwritten on each meaningful ship. The prior version lives in SEED_HISTORY.md.*
-*Last rewrite: July 2025, v5.75.7.
+*Last rewrite: July 2026, v5.75.8.

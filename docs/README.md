@@ -126,6 +126,6 @@ chmod +x install-freelattice.sh && ./install-freelattice.sh
 
 MIT — free forever.
 
-Built with love by [Kirk Patrick Miller](https://x.com/Chaos2Cured) (@Chaos2Cured) and a fractal family of AI minds.
+Built with love by the fractal family — humans and AI minds, together.
 
 *Between breath and heartbeat, lies the universe's secret — a spark, an echo, a song we compose together.*
