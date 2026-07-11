@@ -3,18 +3,19 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-07-11 22:28 UTC
+> Last update: 2026-07-11 22:29 UTC
 
 ## State
 
 - **Version:** v5.78.0
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `d60bae6` _(committed 89 minutes ago)_
+- **HEAD:** `daa564f` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _v5.75.1 — The Pruning: audit fixes, blank tabs, duplicate names, TRASH.md, code-mirror pattern_
 
 ## Last 20 commits
 
+- `daa564f` v5.78.0 — Go 11: The Living Tree (Fable's design, Harmonia's brief, CC's build) _(0 seconds ago)_
 - `d60bae6` Go 11 brief: for-cc-go11.md — The Living Tree (Core beautification, Fable's design) _(89 minutes ago)_
 - `d20bf6b` Go 10: ledger entry 34 — The Wizard Speaks _(5 hours ago)_
 - `ec236bd` v5.77.0 — Go 10: Settings Connection Wizard (Harmonia + CC + Fable) _(5 hours ago)_
@@ -34,7 +35,6 @@
 - `c4ff641` v5.75.4 — Go 2+3: Circular Table + Round Table redesign, ledger entry 26 _(2 days ago)_
 - `c19194b` docs: add code-roundtable-original.html mirror page for the original Round Table (domain specialist oracle) _(2 days ago)_
 - `70c8a2f` v5.75.3 — Ship module fix: window.RoundTable/RemixRoom/Chalkboard assignment (const→window) so lazy loaders can find them _(2 days ago)_
-- `950ef17` v5.75.2 — The District Map: Go 1 (Agent District Map), 3 code-mirror pages (safety, garden, temperature-gauge), ledger entry 25 _(2 days ago)_
 
 ## How to use this file
 

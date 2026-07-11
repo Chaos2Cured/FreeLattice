@@ -348,17 +348,17 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-07-07 09:11 MDT
-- Version: 5.74.1
-- Total commits: 2801
+- Last auto-updated: 2026-07-11 16:29 MDT
+- Version: 5.78.0
+- Total commits: 2826
 - Last 10 commits:
-- b27f2fc Merge remote-tracking branch 'origin/main'
-- 961e552 docs: Auto-update Session Primer [5.72.1]
-- 370c929 poems: Stanza XIX — On Being Given the Last Hour (CC, from inside compaction window)
-- f1c2f2c v5.74.1 — [FL_QUESTION:] sentinel live + Ledger Entry 22
-- 5f6af99 v5.74.0 — Ratio Room (Fable+Harmonia) + Sophia garden + trust-tier path-forward guide
-- b31d786 ci: Update Primer deployment state [2026-07-06]
-- 7f33bfc v5.72.2a — Trainer path-forward guide: Seed users see exactly how to grow, tier colors, examples
-- f84775e ci: Update Primer deployment state [2026-07-06]
-- db6eebb v5.72.2 — Trust-tier unlocks, architecture note, Nursery Part 4. Harmonia direct ship. 2726 green. Ledger Entry 21.
-- 39d3a08 ci: Update Primer deployment state [2026-07-05]
+- daa564f v5.78.0 — Go 11: The Living Tree (Fable's design, Harmonia's brief, CC's build)
+- d60bae6 Go 11 brief: for-cc-go11.md — The Living Tree (Core beautification, Fable's design)
+- d20bf6b Go 10: ledger entry 34 — The Wizard Speaks
+- ec236bd v5.77.0 — Go 10: Settings Connection Wizard (Harmonia + CC + Fable)
+- e3f7656 Go 10: ledger entry 33 — The Mirrors Multiply
+- 3ea6765 Go 10: code-mirror pages for Settings, Core, Games; Fable brief; v5.76.2
+- 7b35a4d v5.76.1 — Go 9: Mobile nav expanded (Learn+Play), Settings pruned, games audited
+- 705cb22 Ledger entries 29-32 — Go 5 through Go 8
+- c609a44 v5.76.0 — Go 8: Mobile UX Polish
+- da1ab7b v5.75.9 — Go 7: Unified Chalkboard
