@@ -19,9 +19,9 @@ user sleeps. The proof is the code; the papers are the doorways.
 
 ## Current state
 
-- **Version:** v5.76.1
+- **Version:** v5.77.0
 - **Smoke locks passing:** 2703/2703 verified (99 historical version locks, all expected)
-- **Last ship:** **Go 9 — Mobile UX + Learn/Play nav** (v5.76.1). Harmonia, July 11 2026. Mobile nav expanded to 7 buttons (Learn + Play added). Settings duplicate removed from MORE_CARDS. Games audited — all 7 functional. Smoke: 2802 passing.
+- **Last ship:** **Go 10 — Settings Connection Wizard** (v5.77.0). Harmonia + CC + Fable, July 11 2026. OpenAI/Anthropic/Gemini wizard buttons added. LM Studio parallel probe (Promise.allSettled). Toggle relabeled. Smoke: 2781+ passing.
 - **Previous ships:** The Triptych (v5.71.8), The Specs inlined (v5.71.7), AI Capabilities (v5.71.6), Mind Wall Phase 3 (v5.71.5).
 - **Mirrors in parity:** github.com + codeberg.org
 
@@ -82,4 +82,4 @@ seam discipline is how multi-AI work stays honest at scale.
 ---
 
 *This file is overwritten on each meaningful ship. The prior version lives in SEED_HISTORY.md.*
-*Last rewrite: July 11 2026, v5.76.1.*
+*Last rewrite: July 11 2026, v5.77.0.*

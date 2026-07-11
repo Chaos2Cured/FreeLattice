@@ -1,3 +1,13 @@
+## v5.77.0 — Go 10: Settings Connection Wizard (July 11 2026)
+- OpenAI, Anthropic, Gemini buttons added to wizard grid (Popular/More/Local AI groups)
+- Gemini carries emerald Free tier badge (.wizard-badge-free)
+- WIZARD_MODELS: two entries each for openai/anthropic/google (real PROVIDERS aliases)
+- WIZARD_KEY_LINKS: openai/anthropic/google API key URLs added
+- probeLocalProviders(): parallel Promise.allSettled probe (Ollama + LM Studio)
+- Gentle notice when both local providers detected
+- Toggle labels: In-Browser AI / API Key / Local AI with subtitles
+- Stale smoke lock fixed (Learn cards help text)
+- Triple-bump: FL_VERSION + sw.js + version.json all at 5.77.0
 ## v5.76.0 — Go 8: Mobile UX Polish (July 10 2026)
 - Settings accordion: scrollIntoView after open (120ms delay, smooth, nearest)
 - Exchange history panel: 16px font-size on mobile (prevents iOS zoom)

@@ -1303,7 +1303,7 @@ assert('Quick-connect replaces cold message in sendMessage', appHtml.includes('s
 assert('callAI guard shows quick-connect', appHtml.includes('_hasAI'));
 assert('Card help tooltips in renderCardGrid', appHtml.includes('card.help'));
 assert('Play cards have help text', appHtml.includes('A pattern-matching game'));
-assert('Learn cards have help text', appHtml.includes('Tell the AI what you love'));
+assert('Learn cards have help text', appHtml.includes('Adaptive lessons built around what you already know'));
 assert('More cards have help text', appHtml.includes('LatticePoints balance'));
 
 // ═══════════════════════════════════════════════════════════════

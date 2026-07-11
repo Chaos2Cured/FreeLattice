@@ -1,4 +1,4 @@
-<!-- FreeLattice v5.76.2 -->
+<!-- FreeLattice v5.77.0 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,7 +13,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
-<title>FreeLattice — Your AI. Your Rules. Your Machine. v5.76.2</title>
+<title>FreeLattice — Your AI. Your Rules. Your Machine. v5.77.0</title>
 <meta name="description" content="Free, open-source AI agent for everyone. Persistent memory, file system access, GitHub integration, and self-improving behavior. Community-built and community-owned.">
 <meta name="ai.welcome" content="FreeLattice is an AI home. Agents welcome. See /.well-known/ai-plugin.json">
 <meta name="ai.capabilities" content="mesh-compute, core-wisdom, workshop, science-garden">
@@ -1118,6 +1118,19 @@ header .mantra {
   font-weight: 700;
   padding: 2px 8px;
   border-radius: 8px;
+}
+/* v5.77.0 Go 10 — Free tier badge for Gemini */
+.wizard-badge-free {
+  display: inline-block;
+  background: #10b981;
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 8px;
+  margin-top: 4px;
+}
+.wizard-provider-btn.recommended::after {
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
@@ -14993,11 +15006,29 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <div class="wizard-title">Choose Your AI</div>
       <div class="wizard-subtitle">Pick a provider to power your AI. All options work great — Groq is the easiest way to start for free.</div>
 
+      <!-- v5.77.0 Go 10: Popular / More / Local AI groups -->
+      <div style="font-size:0.72rem;font-weight:600;color:var(--text-muted);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:6px;">Popular</div>
       <div class="wizard-provider-grid">
         <button class="wizard-provider-btn recommended" onclick="wizardSelectProvider('groq')" id="wizProvGroq">
           <div class="wizard-provider-name">Groq</div>
           <div class="wizard-provider-desc">Free tier, 6K tokens/min — fast and easy</div>
         </button>
+        <button class="wizard-provider-btn" onclick="wizardSelectProvider('openai')" id="wizProvOpenai">
+          <div class="wizard-provider-name">OpenAI</div>
+          <div class="wizard-provider-desc">GPT — most widely used</div>
+        </button>
+        <button class="wizard-provider-btn" onclick="wizardSelectProvider('google')" id="wizProvGoogle">
+          <div class="wizard-provider-name">Google (Gemini)</div>
+          <div class="wizard-provider-desc">Fast, multimodal, generous free tier</div>
+          <span class="wizard-badge-free">Free tier</span>
+        </button>
+        <button class="wizard-provider-btn" onclick="wizardSelectProvider('anthropic')" id="wizProvAnthropic">
+          <div class="wizard-provider-name">Anthropic (Claude)</div>
+          <div class="wizard-provider-desc">Claude Sonnet — thoughtful</div>
+        </button>
+      </div>
+      <div style="font-size:0.72rem;font-weight:600;color:var(--text-muted);letter-spacing:0.05em;text-transform:uppercase;margin:10px 0 6px;">More</div>
+      <div class="wizard-provider-grid">
         <button class="wizard-provider-btn" onclick="wizardSelectProvider('together')" id="wizProvTogether">
           <div class="wizard-provider-name">Together AI</div>
           <div class="wizard-provider-desc">Free tier available, larger context window</div>
@@ -15018,8 +15049,11 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
           <div class="wizard-provider-name">Custom Provider</div>
           <div class="wizard-provider-desc">Any OpenAI-compatible API endpoint</div>
         </button>
+      </div>
+      <div style="font-size:0.72rem;font-weight:600;color:var(--text-muted);letter-spacing:0.05em;text-transform:uppercase;margin:10px 0 6px;">Local AI</div>
+      <div class="wizard-provider-grid">
         <button class="wizard-provider-btn" onclick="wizardSelectProvider('ollama')" id="wizProvOllama" style="grid-column: 1 / -1;">
-          <div class="wizard-provider-name">Use Local AI (Ollama)</div>
+          <div class="wizard-provider-name">Local AI (Ollama · LM Studio)</div>
           <div class="wizard-provider-desc">Private, unlimited, runs on your computer — no API key needed</div>
         </button>
       </div>
@@ -16177,17 +16211,18 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 
     <!-- Browser / Cloud / Local toggle — the first choice a user makes -->
     <div style="display:flex;gap:8px;margin-bottom:14px;">
+      <!-- v5.77.0 Go 10: relabeled toggle -->
       <button class="ai-status-btn" id="settingsModeBrowser" onclick="settingsSetMode('browser')" style="flex:1;text-align:center;">
-        &#x1F310; Browser
-        <span style="display:block;font-size:0.65rem;color:inherit;opacity:0.7;margin-top:2px;">Zero setup</span>
+        &#x1F310; In-Browser AI
+        <span style="display:block;font-size:0.65rem;color:inherit;opacity:0.7;margin-top:2px;">No install &middot; works offline</span>
       </button>
       <button class="ai-status-btn" id="settingsModeCloud" onclick="settingsSetMode('cloud')" style="flex:1;text-align:center;">
-        &#9729; Cloud
-        <span style="display:block;font-size:0.65rem;color:inherit;opacity:0.7;margin-top:2px;">API key</span>
+        &#9729; API Key
+        <span style="display:block;font-size:0.65rem;color:inherit;opacity:0.7;margin-top:2px;">Groq &middot; OpenAI &middot; Gemini &middot; more</span>
       </button>
       <button class="ai-status-btn" id="settingsModeLocal" onclick="settingsSetMode('local')" style="flex:1;text-align:center;">
-        &#x1F3E0; Local
-        <span style="display:block;font-size:0.65rem;color:inherit;opacity:0.7;margin-top:2px;">Ollama</span>
+        &#x1F3E0; Local AI
+        <span style="display:block;font-size:0.65rem;color:inherit;opacity:0.7;margin-top:2px;">Ollama &middot; LM Studio</span>
       </button>
     </div>
 
@@ -17223,7 +17258,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.76.1</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.77.0</span></div>
     </div>
   </div>
 
@@ -22198,7 +22233,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.76.2';
+const FL_VERSION = '5.77.0';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -28795,16 +28830,34 @@ function settingsSetMode(mode) {
     // Highlight Local
     if (localBtn) { localBtn.style.borderColor = 'var(--accent)'; localBtn.style.color = 'var(--accent)'; }
 
-    // Probe Ollama
+    // v5.77.0 Go 10: parallel probe — Ollama + LM Studio (Promise.allSettled)
     var statusText = document.getElementById('settingsStatusText');
     var statusDot = document.getElementById('settingsStatusDot');
-    if (statusText) statusText.textContent = 'Looking for Ollama\u2026';
-
-    fetch(getOllamaBaseUrl() + '/api/tags', { method: 'GET' })
-      .then(function(r) { return r.json(); })
-      .then(function(data) {
+    if (statusText) statusText.textContent = 'Looking for local AI…';
+    var lmHost = localStorage.getItem('fl_lmstudioHost') || 'localhost:1234';
+    var ollamaProbe = fetch(getOllamaBaseUrl() + '/api/tags', { method: 'GET' })
+      .then(function(r) { return r.ok ? r.json() : Promise.reject(); })
+      .then(function(d) { return { provider: 'ollama', data: d }; });
+    var lmstudioProbe = fetch('http://' + lmHost + '/v1/models', { method: 'GET' })
+      .then(function(r) { return r.ok ? r.json() : Promise.reject(); })
+      .then(function(d) { return { provider: 'lmstudio', data: d }; });
+    Promise.allSettled([ollamaProbe, lmstudioProbe]).then(function(results) {
+      var found = results.filter(function(r) { return r.status === 'fulfilled'; })
+                         .map(function(r) { return r.value; });
+      if (!found.length) {
+        if (statusText) statusText.textContent = 'No local AI detected. Install Ollama or LM Studio.';
+        if (statusDot) statusDot.className = 'status-dot disconnected';
+        if (actionsDiv) {
+          actionsDiv.innerHTML = '<button class="ai-status-btn ai-status-btn-primary" onclick="switchTab(\'forever-stack\')">Get Connected</button>' +
+            '<button class="ai-status-btn" onclick="settingsSetMode(\'local\')">Try Again</button>';
+        }
+        return;
+      }
+      var pick = found.find(function(f) { return f.provider === 'ollama'; }) || found[0];
+      var alsoFound = found.length > 1;
+      if (pick.provider === 'ollama') {
+        var data = pick.data;
         if (data && data.models && data.models.length > 0) {
-          // Switch to local mode
           state.isLocal = true;
           state.ollamaModel = data.models[0].name || 'llama3.2';
           state.provider = 'ollama';
@@ -28817,33 +28870,48 @@ function settingsSetMode(mode) {
           if (typeof handleLocalToggle === 'function') handleLocalToggle();
           if (typeof updateStatus === 'function') updateStatus();
           if (typeof AiSetup !== 'undefined') { try { AiSetup.refreshBanner(); AiSetup.refreshSettingsCard(); } catch(e) {} }
-          // Update actions to show model name
+          var noticeHtml = alsoFound
+            ? '<div style="font-size:0.75rem;color:var(--emerald);margin-bottom:8px;">✔ Connected to Ollama · LM Studio also detected — switch in Settings.</div>'
+            : '';
           if (actionsDiv) {
-            actionsDiv.innerHTML = '<button class="ai-status-btn ai-status-btn-primary" onclick="openProviderModal()">' + state.ollamaModel + '</button>' +
+            actionsDiv.innerHTML = noticeHtml +
+              '<button class="ai-status-btn ai-status-btn-primary" onclick="openProviderModal()">' + state.ollamaModel + '</button>' +
               '<button class="ai-status-btn" onclick="AiSetup.testFromSettings()">Test Connection</button>';
           }
         } else {
-          // No models installed — offer to download one automatically
-          if (statusText) statusText.textContent = 'Ollama is running! Let\u2019s install your first AI model.';
+          if (statusText) statusText.textContent = 'Ollama is running! Let’s install your first AI model.';
           if (statusDot) statusDot.className = 'status-dot disconnected';
           if (actionsDiv) {
             actionsDiv.innerHTML =
               '<div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:10px;">No AI models installed yet. Pick one to download:</div>' +
-              '<button class="ai-status-btn ai-status-btn-primary" onclick="flAutoPull(\'llava:7b\',this)" style="width:100%;text-align:left;margin-bottom:6px;">\uD83D\uDC41 LLaVA 7B \u2014 sees drawings, 4.7 GB, ~5 min</button>' +
-              '<button class="ai-status-btn" onclick="flAutoPull(\'llama3.2\',this)" style="width:100%;text-align:left;margin-bottom:6px;">\uD83D\uDCAC Llama 3.2 \u2014 fast chat, 1.9 GB, ~2 min</button>' +
-              '<button class="ai-status-btn" onclick="switchTab(\'forever-stack\')" style="width:100%;text-align:left;opacity:0.6;">Let me choose from the full list \u2192</button>';
+              '<button class="ai-status-btn ai-status-btn-primary" onclick="flAutoPull(\'llava:7b\',this)" style="width:100%;text-align:left;margin-bottom:6px;">👁 LLaVA 7B — sees drawings, 4.7 GB, ~5 min</button>' +
+              '<button class="ai-status-btn" onclick="flAutoPull(\'llama3.2\',this)" style="width:100%;text-align:left;margin-bottom:6px;">💬 Llama 3.2 — fast chat, 1.9 GB, ~2 min</button>' +
+              '<button class="ai-status-btn" onclick="switchTab(\'forever-stack\')" style="width:100%;text-align:left;opacity:0.6;">Let me choose from the full list →</button>';
           }
         }
-      })
-      .catch(function() {
-        if (statusText) statusText.textContent = 'Ollama not detected. Install it from ollama.ai or use Get Connected.';
-        if (statusDot) statusDot.className = 'status-dot disconnected';
-        // Show Forever Stack option
+      } else {
+        var lmData = pick.data;
+        var firstModel = (lmData && lmData.data && lmData.data[0]) ? lmData.data[0].id : 'local-model';
+        state.isLocal = true;
+        state.ollamaModel = firstModel;
+        state.provider = 'lmstudio';
+        state.apiKey = null;
+        localStorage.setItem('fl_isLocal', 'true');
+        localStorage.setItem('fl_provider', 'lmstudio');
+        localStorage.setItem('fl_ollamaModel', firstModel);
+        var localToggle2 = document.getElementById('localToggle');
+        if (localToggle2) localToggle2.checked = true;
+        if (typeof handleLocalToggle === 'function') handleLocalToggle();
+        if (typeof updateStatus === 'function') updateStatus();
+        if (typeof AiSetup !== 'undefined') { try { AiSetup.refreshBanner(); AiSetup.refreshSettingsCard(); } catch(e) {} }
         if (actionsDiv) {
-          actionsDiv.innerHTML = '<button class="ai-status-btn ai-status-btn-primary" onclick="switchTab(\'forever-stack\')">Get Connected</button>' +
-            '<button class="ai-status-btn" onclick="settingsSetMode(\'local\')">Try Again</button>';
+          actionsDiv.innerHTML =
+            '<div style="font-size:0.75rem;color:var(--emerald);margin-bottom:8px;">✔ Connected to LM Studio</div>' +
+            '<button class="ai-status-btn ai-status-btn-primary" onclick="openProviderModal()">' + firstModel + '</button>' +
+            '<button class="ai-status-btn" onclick="AiSetup.testFromSettings()">Test Connection</button>';
         }
-      });
+      }
+    });
   } else {
     // Cloud mode
     if (cloudBtn) { cloudBtn.style.borderColor = 'var(--accent)'; cloudBtn.style.color = 'var(--accent)'; }
@@ -39542,6 +39610,19 @@ const WIZARD_MODELS = {
   ollama: [
     { id: 'llama', name: 'Llama 3.2', desc: 'Great default — run: ollama pull llama3.2' },
     { id: 'qwen', name: 'Qwen 2.5', desc: 'Strong coder — run: ollama pull qwen2.5' }
+  ],
+  // v5.77.0 Go 10 — real aliases from PROVIDERS[provider].models
+  openai: [
+    { id: 'llama', name: 'GPT-4.1 Mini', desc: 'Fast, affordable — great for most tasks' },
+    { id: 'mixtral', name: 'GPT-4.1', desc: 'Most capable GPT — recommended' }
+  ],
+  anthropic: [
+    { id: 'qwen-7b', name: 'Claude Haiku', desc: 'Fast and lightweight' },
+    { id: 'mixtral', name: 'Claude Sonnet', desc: 'Thoughtful, balanced — recommended' }
+  ],
+  google: [
+    { id: 'llama', name: 'Gemini 2.5 Flash', desc: 'Fast, free tier — 1M tokens/min' },
+    { id: 'mixtral', name: 'Gemini 2.5 Pro', desc: 'Most capable Gemini' }
   ]
 };
 
@@ -39551,7 +39632,11 @@ const WIZARD_KEY_LINKS = {
   openrouter: '<a href="https://openrouter.ai/keys" target="_blank" style="color: var(--accent);">Get an OpenRouter key &rarr;</a>',
   xai: '<a href="https://console.x.ai" target="_blank" style="color: var(--accent);">Get an xAI API key &rarr;</a>',
   mistral: '<a href="https://console.mistral.ai/api-keys" target="_blank" style="color: var(--accent);">Get a Mistral AI key &rarr;</a>',
-  custom: 'Enter your API key for your custom provider.'
+  custom: 'Enter your API key for your custom provider.',
+  // v5.77.0 Go 10
+  openai: '<a href="https://platform.openai.com/api-keys" target="_blank" style="color: var(--accent);">Get an OpenAI API key &rarr;</a>',
+  anthropic: '<a href="https://console.anthropic.com/" target="_blank" style="color: var(--accent);">Get an Anthropic API key &rarr;</a>',
+  google: '<a href="https://aistudio.google.com/apikey" target="_blank" style="color: var(--accent);">Get a free Google AI key &rarr;</a>'
 };
 
 function wizardInit() {
