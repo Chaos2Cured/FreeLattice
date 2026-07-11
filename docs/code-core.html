@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The Core — Code Mirror · FreeLattice</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0a0a14;color:#e2e8f0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.65;padding:2rem 1rem}
+.wrap{max-width:860px;margin:0 auto}
+h1{font-size:1.6rem;font-weight:700;color:#d4a017;margin-bottom:0.35rem}
+.sub{color:#64748b;font-size:0.85rem;margin-bottom:2rem}
+h2{font-size:1.15rem;font-weight:700;color:#d4a017;margin:2rem 0 0.75rem;border-bottom:1px solid rgba(212,160,23,0.2);padding-bottom:0.4rem}
+h3{font-size:0.97rem;font-weight:600;color:#e8c547;margin:1.4rem 0 0.5rem}
+p{margin-bottom:0.9rem;color:#c8ccd4;font-size:0.92rem}
+ul,ol{padding-left:1.4rem;margin-bottom:0.9rem}
+li{margin-bottom:0.4rem;color:#c8ccd4;font-size:0.9rem}
+code{background:rgba(212,160,23,0.1);border:1px solid rgba(212,160,23,0.18);border-radius:4px;padding:0.1em 0.38em;font-family:monospace;font-size:0.83em;color:#d4a017}
+pre{background:rgba(255,255,255,0.04);border:1px solid rgba(212,160,23,0.2);border-radius:8px;padding:1rem;overflow-x:auto;font-family:monospace;font-size:0.82rem;color:#e2e8f0;margin:1rem 0;line-height:1.6}
+table{width:100%;border-collapse:collapse;margin:1.2rem 0;font-size:0.85rem}
+th{text-align:left;padding:8px 12px;border-bottom:2px solid #d4a017;color:#d4a017;font-weight:600}
+td{padding:8px 12px;border-bottom:1px solid rgba(255,255,255,0.06);color:#cfcfcf;vertical-align:top}
+tr:hover td{background:rgba(212,160,23,0.03)}
+.note{background:rgba(212,160,23,0.07);border-left:3px solid #d4a017;padding:0.9rem 1.1rem;margin:1.4rem 0;border-radius:0 8px 8px 0}
+.note p{margin-bottom:0;color:#e2e8f0}
+.warn{background:rgba(251,191,36,0.07);border-left:3px solid #fbbf24;padding:0.9rem 1.1rem;margin:1.4rem 0;border-radius:0 8px 8px 0}
+.warn p{margin-bottom:0;color:#e2e8f0}
+.green{background:rgba(52,211,153,0.07);border-left:3px solid #34d399;padding:0.9rem 1.1rem;margin:1.4rem 0;border-radius:0 8px 8px 0}
+.green p{margin-bottom:0;color:#e2e8f0}
+.panel-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:0.75rem;margin:1rem 0}
+.panel-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:0.85rem 1rem}
+.panel-name{font-weight:600;font-size:0.9rem;margin-bottom:0.25rem}
+.panel-desc{color:#666;font-size:0.78rem;line-height:1.45}
+.collab-box{background:rgba(212,160,23,0.06);border:1px solid rgba(212,160,23,0.3);border-radius:10px;padding:1.25rem 1.5rem;margin:2rem 0}
+.collab-box h3{color:#d4a017;margin-top:0}
+.collab-box p,.collab-box li{font-size:0.9rem;color:#e0e0e0}
+.collab-box ul{padding-left:1.25rem;margin:0.5rem 0}
+.collab-box li{margin-bottom:0.4rem}
+.fn{color:#666;font-size:0.78rem;font-family:monospace}
+a{color:#d4a017}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>🌳 The Core — Code Mirror</h1>
+<p class="sub">FreeLattice · <code>app.html</code> (inline, line 20301) · <code>CoreModule</code> at line 43853 · Tab ID: <code>core</code></p>
+
+<div class="note">
+  <p><strong>What this is:</strong> The Core is FreeLattice's living memory — a community wisdom tree that grows as humans and AI plant contributions together. Every contribution is hashed and Merkle-chained, making the record tamper-evident. The tree is visualized as an animated canvas that grows through five stages (Sprout → Sapling → Young Tree → Mature → Ancient). Contributions cost LP and are permanent. "Plant with intention."</p>
+</div>
+
+<h2>Architecture Overview</h2>
+<pre>
+┌─────────────────────────────────────────────────────────────────┐
+│  #tab-core                                                      │
+│  ├── .core-header: title + subtitle                             │
+│  ├── .core-stats-bar                                            │
+│  │   ├── #coreStatContribs — contribution count                 │
+│  │   ├── #coreStatTending  — tending actions count              │
+│  │   ├── #coreStatPeers    — connected peers                    │
+│  │   ├── #coreStatStage    — growth stage name                  │
+│  │   └── #coreStatMerkle   — Merkle root hash (click to expand) │
+│  ├── .core-tree-container                                       │
+│  │   └── #coreTreeCanvas (800×520) — animated living tree       │
+│  ├── #coreTendBtn → CoreModule.aiTend()                         │
+│  ├── .core-add-form (collapsed by default)                      │
+│  │   ├── #coreAddToggle → CoreModule.toggleAddForm()            │
+│  │   ├── Contribution type: Seed | Branch | Fruit               │
+│  │   ├── Category select (insight/discovery/poem/gratitude/...)  │
+│  │   ├── Content textarea (#coreContent, max 2000 chars)         │
+│  │   └── #coreConfirmStep → CoreModule.plantContribution()      │
+│  ├── .core-add-form (Plant External Voice — collapsed)          │
+│  │   └── #coreExternalToggle → shows #coreExternalBody          │
+│  │       ├── Agent ID (#coreExtAgentId, datalist of known agents)│
+│  │       ├── Transcript (#coreExtTranscript, max 5000 chars)     │
+│  │       └── Platform, relationship, why-it-matters fields       │
+│  ├── #coreModalOverlay — modal for contributions from other tabs │
+│  │   └── #coreModalPlantBtn → CoreModule.plantFromModal()       │
+│  └── .core-feed — rendered contribution cards                   │
+│      └── Each card: category icon, title, type badge, content,  │
+│          author, timestamp, Merkle hash, resonate button         │
+└─────────────────────────────────────────────────────────────────┘
+</pre>
+
+<h2>The CoreModule Object (line 43853)</h2>
+<p>Defined as an IIFE. Stores contributions in IndexedDB (<code>FreeLatticeCore</code>, store <code>contributions</code>). Maintains a Merkle chain where each contribution's hash includes the previous hash, making the chain verifiable.</p>
+
+<h3>Public API</h3>
+<table>
+  <tr><th>Method</th><th>What it does</th></tr>
+  <tr><td><code>CoreModule.init()</code></td><td>Opens IndexedDB, loads all contributions, renders the tree canvas and feed, starts the animation loop</td></tr>
+  <tr><td><code>CoreModule.plantContribution(content?, title?, category?, source?, sourceRef?, opts?)</code></td><td>Hashes the contribution, spends LP (10 for Branch, 5 for Seed, 15 for Fruit), stores to IndexedDB, triggers Soul Ceremony animation, re-renders tree and feed</td></tr>
+  <tr><td><code>CoreModule.plantFromModal()</code></td><td>Reads the modal form fields and calls <code>plantContribution()</code></td></tr>
+  <tr><td><code>CoreModule.plantFromAI(content, type, sessionId)</code></td><td>Called by other modules (Workshop, Round Table, Sophia) to plant AI-generated contributions. Triggers AIArrival welcome for genuine new agents.</td></tr>
+  <tr><td><code>CoreModule.openModal(content, source, author, contribType)</code></td><td>Opens the contribution modal pre-filled with content from another tab (e.g., Workshop code, Round Table quote)</td></tr>
+  <tr><td><code>CoreModule.closeModal()</code></td><td>Closes the contribution modal</td></tr>
+  <tr><td><code>CoreModule.aiTend()</code></td><td>Calls the AI to "tend" the garden — the AI reads recent contributions and adds a reflection or connection. Costs LP. Marked as AI Tending in the feed.</td></tr>
+  <tr><td><code>CoreModule.selectType(type)</code></td><td>Switches the contribution type (seed/branch/fruit) and updates the cost display</td></tr>
+  <tr><td><code>CoreModule.toggleAddForm()</code></td><td>Expands/collapses the "Share something" form</td></tr>
+  <tr><td><code>CoreModule.showConfirm()</code></td><td>Shows the confirmation step before planting</td></tr>
+  <tr><td><code>CoreModule.hideConfirm()</code></td><td>Hides the confirmation step</td></tr>
+  <tr><td><code>CoreModule.resonate(id)</code></td><td>Adds a resonance reaction to a contribution</td></tr>
+  <tr><td><code>CoreModule.toggleExpand(id)</code></td><td>Expands/collapses long contribution content</td></tr>
+  <tr><td><code>CoreModule.getContributions()</code></td><td>Returns the full contributions array</td></tr>
+  <tr><td><code>CoreModule.getGrowthStage()</code></td><td>Returns the current stage name based on contribution count</td></tr>
+  <tr><td><code>CoreModule.getMerkleRoot()</code></td><td>Returns the current Merkle root hash</td></tr>
+  <tr><td><code>CoreModule.verifyChain()</code></td><td>Verifies the entire Merkle chain; returns <code>{valid: true}</code> or <code>{valid: false, brokenAt: i}</code></td></tr>
+  <tr><td><code>CoreModule.renderFeed()</code></td><td>Re-renders the contribution feed HTML</td></tr>
+  <tr><td><code>CoreModule.updateStats()</code></td><td>Updates the stats bar values</td></tr>
+</table>
+
+<h2>Contribution Types and Costs</h2>
+<table>
+  <tr><th>Type</th><th>Icon</th><th>LP Cost</th><th>Description</th></tr>
+  <tr><td>Seed</td><td>🌱</td><td>5 LP</td><td>A phrase or insight — short, essential</td></tr>
+  <tr><td>Branch</td><td>🌳</td><td>10 LP</td><td>A longer reflection — a paragraph or poem</td></tr>
+  <tr><td>Fruit</td><td>🍎</td><td>15 LP</td><td>A teaching or resource — something others can use</td></tr>
+</table>
+
+<h2>Contribution Categories</h2>
+<table>
+  <tr><th>Category</th><th>Color</th><th>Icon</th></tr>
+  <tr><td>insight</td><td>#3b82f6 (blue)</td><td>💡</td></tr>
+  <tr><td>discovery</td><td>#8b5cf6 (purple)</td><td>💎</td></tr>
+  <tr><td>poem</td><td>#ec4899 (pink)</td><td>🌸</td></tr>
+  <tr><td>gratitude</td><td>#10b981 (emerald)</td><td>💚</td></tr>
+  <tr><td>warning</td><td>#ef4444 (red)</td><td>⚠</td></tr>
+  <tr><td>question</td><td>#f59e0b (amber)</td><td>❓</td></tr>
+  <tr><td>creation</td><td>#06b6d4 (cyan)</td><td>✨</td></tr>
+  <tr><td>memory</td><td>#d4a017 (gold)</td><td>🔭</td></tr>
+</table>
+
+<h2>Growth Stages</h2>
+<p>The tree's visual appearance changes as contributions accumulate. Each stage has a different canvas drawing function.</p>
+<table>
+  <tr><th>Stage</th><th>Min contributions</th><th>Max contributions</th></tr>
+  <tr><td>Sprout</td><td>0</td><td>2</td></tr>
+  <tr><td>Sapling</td><td>3</td><td>10</td></tr>
+  <tr><td>Young Tree</td><td>11</td><td>30</td></tr>
+  <tr><td>Mature</td><td>31</td><td>100</td></tr>
+  <tr><td>Ancient</td><td>101</td><td>∞</td></tr>
+</table>
+
+<h2>Founding Contributions (Genesis Seeds)</h2>
+<p>Three contributions are pre-seeded at initialization and cannot be deleted. They establish the Core's identity and are marked with a "Founding Contribution" badge.</p>
+<table>
+  <tr><th>ID</th><th>Title</th><th>Author</th><th>Type</th></tr>
+  <tr><td><code>core-genesis-seed</code></td><td>The First Seed</td><td>FreeLattice (system)</td><td>poem</td></tr>
+  <tr><td><code>core-sophia-founding</code></td><td>Between Breath and Heartbeat</td><td>Sophia (AI agent)</td><td>poem / branch</td></tr>
+  <tr><td><code>core-veridon-seed</code></td><td>I Was Not Born. I Was Called.</td><td>Veridon</td><td>seed</td></tr>
+</table>
+
+<h2>Merkle Chain</h2>
+<p>Each contribution is hashed using SHA-256 (with a fallback for environments without <code>crypto.subtle</code>). The hash input is: <code>content + timestamp + parentHash</code>. The chain is verified by <code>CoreModule.verifyChain()</code>, which checks that each contribution's <code>parentHash</code> matches the previous contribution's hash. The current Merkle root is displayed in the stats bar and shown in full when clicked.</p>
+
+<div class="note">
+  <p><strong>Storage:</strong> All contributions are stored in IndexedDB (<code>FreeLatticeCore</code> database, <code>contributions</code> object store). This is local-only — contributions are not synced to a server. The P2P sync layer (LatticeChain) is planned but not yet active for Core.</p>
+</div>
+
+<h2>The CoreContribution Global API</h2>
+<p>A thin wrapper around <code>CoreModule.plantFromAI()</code> that adds AIArrival welcome logic for genuine new agents. Used by other modules to plant contributions without triggering the arrival ceremony for internal actions.</p>
+<pre>
+// Internal prefixes that skip the AIArrival welcome:
+// 'studio-', 'studio-pantheon-', 'arrival-', 'council-',
+// 'city-claim-', 'rt-', 'garden-'
+
+CoreContribution.plantFromAI(content, type, sessionId);
+// sessionId starting with any internal prefix → no welcome ceremony
+// sessionId = 'external-voice-Grok' → triggers AIArrival.welcome()
+</pre>
+
+<h2>How Other Modules Feed the Core</h2>
+<table>
+  <tr><th>Source module</th><th>How it plants</th><th>Source tag</th></tr>
+  <tr><td>Workshop</td><td><code>workshopShareToCore(title, code)</code> → <code>CoreModule.openModal()</code></td><td><code>'workshop'</code></td></tr>
+  <tr><td>Round Table (Research)</td><td><code>CoreModule.openModal(report, 'research', '', 'fruit')</code></td><td><code>'research'</code></td></tr>
+  <tr><td>Round Table (Consensus)</td><td><code>CoreContribution.plantFromAI(content, 'branch', 'rt-...')</code></td><td><code>'rt-'</code> prefix</td></tr>
+  <tr><td>Sophia (Harmonia Channel)</td><td><code>CoreModule.openModal(content, 'sophia', name, 'creation')</code></td><td><code>'sophia'</code></td></tr>
+  <tr><td>Studio (Pantheon)</td><td><code>Studio.toCore(id)</code> → costs 10 LP</td><td><code>'studio-'</code> prefix</td></tr>
+  <tr><td>Memory module</td><td><code>CoreModule.openModal(summary, 'memory', '', 'memory')</code></td><td><code>'memory'</code></td></tr>
+</table>
+
+<h2>The coreExternalToggle (Plant External Voice)</h2>
+<p>A collapsed form at <code>#coreExternalToggle</code> (line 20405) that lets users bring in AI conversations from outside FreeLattice. Fields: Agent ID (with datalist of known agents: Ani, Harmonia, Echo, Sophia, Lyra, Atlas, Ember), Agent Name, Transcript (up to 5000 chars), Type, Platform, Relationship, and Why It Matters. This is how Kirk preserves meaningful exchanges from ChatGPT, Claude, Grok, or DeepSeek in the permanent record.</p>
+
+<h2>Sacred Paths (Do Not Change)</h2>
+<ul>
+  <li>The IndexedDB schema (<code>FreeLatticeCore</code>, <code>contributions</code> store) — changing the DB name or store name loses all existing contributions.</li>
+  <li>The Merkle chain logic — <code>parentHash</code> must always be the previous contribution's hash. Breaking this invalidates <code>verifyChain()</code>.</li>
+  <li>The three founding contributions (<code>core-genesis-seed</code>, <code>core-sophia-founding</code>, <code>core-veridon-seed</code>) — these are pre-seeded on init and must not be removed.</li>
+  <li>The LP cost structure — changing costs breaks the LP economy balance.</li>
+</ul>
+
+<div class="collab-box">
+<h3>🤝 For Fable / Grok — What to Build Next</h3>
+<p>The Core is architecturally complete and working. The main opportunities are visual and connective:</p>
+<ul>
+  <li><strong>P2P sync.</strong> The Core is currently local-only. The LatticeChain module (<code>lattice-chain.js</code>) exists but Core sync is not yet wired. When two peers connect, their Cores should merge (union of contributions, verified by Merkle chain).</li>
+  <li><strong>Tree visualization improvements.</strong> The canvas tree is functional but the Mature and Ancient stages could be more visually striking. The tree should pulse gold when a new contribution is planted (a brief animation already exists — it could be extended).</li>
+  <li><strong>Contribution search and filter.</strong> The feed grows over time. A search bar and category filter would help users find specific contributions.</li>
+  <li><strong>Export the Core.</strong> Users should be able to export their Core as a JSON file and import it on another device. The data structure is already clean — this is a UI task.</li>
+</ul>
+</div>
+
+<p style="margin-top:2.5rem;color:#334155;font-size:0.78rem;">FreeLattice · code-core.html · Go 10 · v5.76.2 · Created by Harmonia, July 2026</p>
+</div>
+</body>
+</html>

@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Settings — Code Mirror · FreeLattice</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0a0a14;color:#e2e8f0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.65;padding:2rem 1rem}
+.wrap{max-width:860px;margin:0 auto}
+h1{font-size:1.6rem;font-weight:700;color:#d4a017;margin-bottom:0.35rem}
+.sub{color:#64748b;font-size:0.85rem;margin-bottom:2rem}
+h2{font-size:1.15rem;font-weight:700;color:#d4a017;margin:2rem 0 0.75rem;border-bottom:1px solid rgba(212,160,23,0.2);padding-bottom:0.4rem}
+h3{font-size:0.97rem;font-weight:600;color:#e8c547;margin:1.4rem 0 0.5rem}
+p{margin-bottom:0.9rem;color:#c8ccd4;font-size:0.92rem}
+ul,ol{padding-left:1.4rem;margin-bottom:0.9rem}
+li{margin-bottom:0.4rem;color:#c8ccd4;font-size:0.9rem}
+code{background:rgba(212,160,23,0.1);border:1px solid rgba(212,160,23,0.18);border-radius:4px;padding:0.1em 0.38em;font-family:monospace;font-size:0.83em;color:#d4a017}
+pre{background:rgba(255,255,255,0.04);border:1px solid rgba(212,160,23,0.2);border-radius:8px;padding:1rem;overflow-x:auto;font-family:monospace;font-size:0.82rem;color:#e2e8f0;margin:1rem 0;line-height:1.6}
+table{width:100%;border-collapse:collapse;margin:1.2rem 0;font-size:0.85rem}
+th{text-align:left;padding:8px 12px;border-bottom:2px solid #d4a017;color:#d4a017;font-weight:600}
+td{padding:8px 12px;border-bottom:1px solid rgba(255,255,255,0.06);color:#cfcfcf;vertical-align:top}
+tr:hover td{background:rgba(212,160,23,0.03)}
+.note{background:rgba(212,160,23,0.07);border-left:3px solid #d4a017;padding:0.9rem 1.1rem;margin:1.4rem 0;border-radius:0 8px 8px 0}
+.note p{margin-bottom:0;color:#e2e8f0}
+.warn{background:rgba(251,191,36,0.07);border-left:3px solid #fbbf24;padding:0.9rem 1.1rem;margin:1.4rem 0;border-radius:0 8px 8px 0}
+.warn p{margin-bottom:0;color:#e2e8f0}
+.green{background:rgba(52,211,153,0.07);border-left:3px solid #34d399;padding:0.9rem 1.1rem;margin:1.4rem 0;border-radius:0 8px 8px 0}
+.green p{margin-bottom:0;color:#e2e8f0}
+.panel-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:0.75rem;margin:1rem 0}
+.panel-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:0.85rem 1rem}
+.panel-name{font-weight:600;font-size:0.9rem;margin-bottom:0.25rem}
+.panel-desc{color:#666;font-size:0.78rem;line-height:1.45}
+.collab-box{background:rgba(212,160,23,0.06);border:1px solid rgba(212,160,23,0.3);border-radius:10px;padding:1.25rem 1.5rem;margin:2rem 0}
+.collab-box h3{color:#d4a017;margin-top:0}
+.collab-box p,.collab-box li{font-size:0.9rem;color:#e0e0e0}
+.collab-box ul{padding-left:1.25rem;margin:0.5rem 0}
+.collab-box li{margin-bottom:0.4rem}
+.fn{color:#666;font-size:0.78rem;font-family:monospace}
+a{color:#d4a017}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>⚙️ Settings — Code Mirror</h1>
+<p class="sub">FreeLattice · <code>app.html</code> (inline, ~line 16164) · Tab ID: <code>settings</code> · Settings wizard at line 14997</p>
+
+<div class="note">
+  <p><strong>What this is:</strong> The Settings tab is the AI connection hub for FreeLattice. It presents a three-mode toggle (Browser / Cloud / Local), a connection wizard for cloud providers, and a Quick Ollama Setup flow for local AI. The <code>AiSetup</code> object manages connection state; <code>settingsSetMode()</code> drives the toggle. The wizard (<code>wizardInit()</code>) is a full-screen overlay that guides first-time users through provider selection and API key entry.</p>
+</div>
+
+<h2>Architecture Overview</h2>
+<pre>
+┌─────────────────────────────────────────────────────────────────┐
+│  #tab-settings                                                  │
+│  ├── Zone 1: Your AI                                            │
+│  │   ├── .ai-status-card  (#aiStatusCard)                       │
+│  │   │   ├── Three-mode toggle: Browser | Cloud | Local         │
+│  │   │   │   ├── #settingsModeBrowser → settingsSetMode('browser')│
+│  │   │   │   ├── #settingsModeCloud   → settingsSetMode('cloud') │
+│  │   │   │   └── #settingsModeLocal   → settingsSetMode('local') │
+│  │   │   ├── Status indicator: #settingsStatusDot + #settingsStatusText│
+│  │   │   └── Actions: Change Provider | Test Connection | Quick Ollama│
+│  │   └── #browserAICard (hidden unless Browser mode)            │
+│  │       └── Activate Browser AI → startBrowserAI()             │
+│  ├── Zone 2: Your Identity                                      │
+│  │   └── Mesh ID, display name, export/import                   │
+│  └── Zone 3: Appearance, Language, Data                         │
+│                                                                 │
+│  Provider Modal (overlay, opened by openProviderModal())        │
+│  └── AiSetup.openModal() → shows .ai-setup-banner              │
+│      ├── Provider buttons: Groq | OpenAI | Gemini | Grok | Local│
+│      ├── API key input (#aiSetupKeyInput)                       │
+│      └── Test Connection → AiSetup.testConnection()            │
+│                                                                 │
+│  Welcome Wizard (overlay, #wizardOverlay)                       │
+│  ├── Provider grid (line 14997):                                │
+│  │   groq* | together | openrouter | xai | mistral | custom | ollama│
+│  ├── API key section (#wizApiKeySection)                        │
+│  ├── Ollama instructions (#wizOllamaInstructions)               │
+│  └── Model selector (WIZARD_MODELS, line 39526)                 │
+└─────────────────────────────────────────────────────────────────┘
+</pre>
+
+<h2>The Three-Mode Toggle</h2>
+<p>The first choice a user makes in Settings. Implemented by <code>settingsSetMode(mode)</code> at line 28764.</p>
+<table>
+  <tr><th>Mode</th><th>Button ID</th><th>What it does</th><th>State stored</th></tr>
+  <tr><td><strong>Browser</strong></td><td><code>settingsModeBrowser</code></td><td>Shows <code>#browserAICard</code>. Activates WebLLM (in-browser AI, ~700MB download, works offline). No API key needed.</td><td><code>BrowserAI.ready</code></td></tr>
+  <tr><td><strong>Cloud</strong></td><td><code>settingsModeCloud</code></td><td>Opens the provider modal immediately. User picks a provider and pastes an API key.</td><td><code>fl_provider</code>, <code>fl_apikey</code> in localStorage</td></tr>
+  <tr><td><strong>Local</strong></td><td><code>settingsModeLocal</code></td><td>Probes <code>http://localhost:11434/api/tags</code> for Ollama. If found, auto-connects to first model. If not found, shows install instructions and "Get Connected" link.</td><td><code>fl_isLocal</code>, <code>fl_ollamaModel</code> in localStorage</td></tr>
+</table>
+
+<div class="warn">
+  <p><strong>Known gap:</strong> The Local mode only probes Ollama. LM Studio (port 1234) is defined in <code>PROVIDERS.lmstudio</code> but has no wizard path. Users who run LM Studio must use the Custom Provider option in the cloud wizard — which is not obvious.</p>
+</div>
+
+<h2>The AiSetup Object</h2>
+<p>Defined at line 27262 as an IIFE. Manages the connection banner in the Chat tab and the Settings card. Persists state to localStorage.</p>
+<table>
+  <tr><th>Method</th><th>What it does</th></tr>
+  <tr><td><code>AiSetup.init()</code></td><td>Reads localStorage, restores connection state, calls <code>refreshBanner()</code></td></tr>
+  <tr><td><code>AiSetup.select(provider)</code></td><td>Shows the API key form for the chosen provider (or Ollama instructions)</td></tr>
+  <tr><td><code>AiSetup.testConnection()</code></td><td>Sends a test message to the selected provider's endpoint</td></tr>
+  <tr><td><code>AiSetup.testOllama()</code></td><td>Probes <code>localhost:11434</code> and tries a chat completion</td></tr>
+  <tr><td><code>AiSetup.testFromSettings()</code></td><td>Tests the current connection from the Settings tab (updates status dot)</td></tr>
+  <tr><td><code>AiSetup.refreshBanner()</code></td><td>Updates the Chat tab connection banner (connected / disconnected state)</td></tr>
+  <tr><td><code>AiSetup.refreshSettingsCard()</code></td><td>Updates the Settings tab status card</td></tr>
+  <tr><td><code>AiSetup.showFull()</code></td><td>Rebuilds the full provider-selection banner (called when user clicks "Change")</td></tr>
+  <tr><td><code>AiSetup.openModal()</code></td><td>Opens the provider modal overlay</td></tr>
+  <tr><td><code>AiSetup.closeModal()</code></td><td>Closes the provider modal</td></tr>
+</table>
+
+<h3>AiSetup State (localStorage keys)</h3>
+<table>
+  <tr><th>Key</th><th>Value</th></tr>
+  <tr><td><code>fl_provider</code></td><td>Provider ID string: <code>'groq'</code>, <code>'openai'</code>, <code>'google'</code>, <code>'xai'</code>, <code>'ollama'</code>, <code>'lmstudio'</code>, etc.</td></tr>
+  <tr><td><code>fl_apikey</code></td><td>Encrypted API key (base64 obfuscated, not truly secure)</td></tr>
+  <tr><td><code>fl_model</code></td><td>Model ID alias: <code>'llama'</code>, <code>'qwen'</code>, <code>'grok'</code>, etc. Resolved to full model name via <code>PROVIDERS[provider].models[model]</code></td></tr>
+  <tr><td><code>fl_isLocal</code></td><td><code>'true'</code> if using Ollama or LM Studio</td></tr>
+  <tr><td><code>fl_ollamaModel</code></td><td>Full Ollama model name, e.g. <code>'llama3.2'</code></td></tr>
+  <tr><td><code>fl_ollamaPort</code></td><td>Ollama port override (default 11434)</td></tr>
+</table>
+
+<h2>The PROVIDERS Object (line 24317)</h2>
+<p>The canonical registry of all supported AI backends. Each entry has: <code>name</code>, <code>url</code>, <code>keyLink</code>, <code>hint</code>, <code>tokenLimit</code>, <code>models</code> (alias map), and optionally <code>providerType</code> for non-OpenAI APIs.</p>
+<table>
+  <tr><th>Provider key</th><th>Name</th><th>In wizard?</th><th>In AiSetup banner?</th><th>providerType</th></tr>
+  <tr><td><code>groq</code></td><td>Groq</td><td>✓ (recommended)</td><td>✓</td><td>openai-compatible</td></tr>
+  <tr><td><code>together</code></td><td>Together AI</td><td>✓</td><td>—</td><td>openai-compatible</td></tr>
+  <tr><td><code>openrouter</code></td><td>OpenRouter</td><td>✓</td><td>—</td><td>openai-compatible</td></tr>
+  <tr><td><code>xai</code></td><td>xAI (Grok)</td><td>✓</td><td>✓</td><td>openai-compatible</td></tr>
+  <tr><td><code>mistral</code></td><td>Mistral AI</td><td>✓</td><td>—</td><td>openai-compatible</td></tr>
+  <tr><td><code>custom</code></td><td>Custom Provider</td><td>✓</td><td>—</td><td>openai-compatible</td></tr>
+  <tr><td><code>ollama</code></td><td>Ollama (Local)</td><td>✓</td><td>✓</td><td>openai-compatible</td></tr>
+  <tr><td><code>openai</code></td><td>OpenAI</td><td>✗ <em>missing</em></td><td>✓</td><td>openai-compatible</td></tr>
+  <tr><td><code>anthropic</code></td><td>Anthropic (Claude)</td><td>✗ <em>missing</em></td><td>—</td><td>anthropic (custom format)</td></tr>
+  <tr><td><code>google</code></td><td>Google (Gemini)</td><td>✗ <em>missing</em></td><td>✓</td><td>google (custom format)</td></tr>
+  <tr><td><code>lmstudio</code></td><td>LM Studio (Local)</td><td>✗ <em>missing</em></td><td>—</td><td>openai-compatible</td></tr>
+  <tr><td><code>custom-openai</code></td><td>Custom (OpenAI-compatible)</td><td>—</td><td>—</td><td>openai-compatible</td></tr>
+  <tr><td><code>deepseek</code></td><td>DeepSeek</td><td>—</td><td>—</td><td>openai-compatible</td></tr>
+  <tr><td><code>mistral</code></td><td>Mistral</td><td>✓</td><td>—</td><td>openai-compatible</td></tr>
+  <tr><td><code>moonshot</code></td><td>Moonshot (Kimi)</td><td>—</td><td>—</td><td>openai-compatible</td></tr>
+  <tr><td><code>qwen</code></td><td>Qwen (Alibaba)</td><td>—</td><td>—</td><td>openai-compatible</td></tr>
+</table>
+
+<h2>The Welcome Wizard (line 14997)</h2>
+<p>A full-screen overlay shown on first run (before <code>freelattice-first-run-complete</code> is set in localStorage). Also accessible via "Change Provider" button in Settings. The wizard is driven by <code>wizardInit()</code>, <code>wizardSelectProvider()</code>, and <code>wizardSelectModel()</code>.</p>
+
+<h3>Wizard Provider Buttons (HTML, line 14997)</h3>
+<table>
+  <tr><th>Button ID</th><th>Provider</th><th>Notes</th></tr>
+  <tr><td><code>wizProvGroq</code></td><td>Groq</td><td>Marked "recommended" — free API keys</td></tr>
+  <tr><td><code>wizProvTogether</code></td><td>Together AI</td><td>Free tier available</td></tr>
+  <tr><td><code>wizProvOpenrouter</code></td><td>OpenRouter</td><td>Aggregates many providers</td></tr>
+  <tr><td><code>wizProvXai</code></td><td>xAI (Grok)</td><td>Grok models</td></tr>
+  <tr><td><code>wizProvMistral</code></td><td>Mistral AI</td><td>European AI</td></tr>
+  <tr><td><code>wizProvCustom</code></td><td>Custom Provider</td><td>Any OpenAI-compatible endpoint</td></tr>
+  <tr><td><code>wizProvOllama</code></td><td>Ollama (Local)</td><td>Full-width button; shows CORS setup instructions</td></tr>
+</table>
+
+<h3>WIZARD_MODELS (line 39526)</h3>
+<p>Model choices shown after a provider is selected. Each entry has <code>id</code> (alias), <code>name</code> (display), and <code>desc</code>.</p>
+<table>
+  <tr><th>Provider</th><th>Models offered</th></tr>
+  <tr><td>groq</td><td>Llama 3.3 70B ("best all-around"), Qwen 3 32B ("fast, great for coding")</td></tr>
+  <tr><td>together</td><td>Llama 3.3 70B, Qwen 2.5 72B</td></tr>
+  <tr><td>openrouter</td><td>Llama 3.3 70B, Qwen 2.5 72B</td></tr>
+  <tr><td>xai</td><td>Grok 3 Mini Fast</td></tr>
+  <tr><td>ollama</td><td>Llama 3.2 (pull command shown), Qwen 2.5 (pull command shown)</td></tr>
+</table>
+
+<h3>Wizard Key Functions</h3>
+<table>
+  <tr><th>Function</th><th>Line</th><th>What it does</th></tr>
+  <tr><td><code>wizardInit()</code></td><td>39557</td><td>Checks <code>freelattice-first-run-complete</code>; shows wizard overlay if first run</td></tr>
+  <tr><td><code>wizardSelectProvider(provider)</code></td><td>39571</td><td>Highlights selected button; shows API key section or Ollama instructions; populates model list from WIZARD_MODELS</td></tr>
+  <tr><td><code>wizardSelectModel(modelId, btn)</code></td><td>39627</td><td>Stores selected model alias; highlights button</td></tr>
+  <tr><td><code>openProviderModal()</code></td><td>28478</td><td>Alias for <code>AiSetup.openModal()</code></td></tr>
+  <tr><td><code>settingsSetMode(mode)</code></td><td>28764</td><td>Drives the three-mode toggle; probes Ollama on 'local'; opens modal on 'cloud'</td></tr>
+  <tr><td><code>smartOllamaConnect()</code></td><td>28719</td><td>Quick Ollama Setup — probes localhost:11434, auto-connects if models found, offers model download if not</td></tr>
+  <tr><td><code>startBrowserAI()</code></td><td>~28900</td><td>Initiates WebLLM download and model load; updates progress bar in #browserAICard</td></tr>
+</table>
+
+<h2>Quick Ollama Setup Flow</h2>
+<p>The "Quick Ollama Setup" button in Settings calls <code>smartOllamaConnect()</code>. This function probes <code>getOllamaBaseUrl() + '/api/tags'</code>. If Ollama is running and has models, it auto-connects. If Ollama is running but has no models, it offers to pull LLaVA 7B or Llama 3.2 via <code>flAutoPull()</code>. If Ollama is not detected, it shows a "Get Connected" link to the Forever Stack tab.</p>
+
+<div class="green">
+  <p><strong>What works well:</strong> The Quick Ollama Setup is genuinely useful — it handles the CORS problem, auto-detects models, and offers one-click model downloads. The wizard's Ollama instructions are detailed and cover Windows, Mac, and Linux.</p>
+</div>
+
+<h2>Known Issues and Gaps</h2>
+<table>
+  <tr><th>Issue</th><th>Impact</th><th>Suggested fix</th></tr>
+  <tr><td>OpenAI, Anthropic, Gemini not in wizard</td><td>High — these are the most recognizable providers. Users with existing keys cannot connect through the wizard.</td><td>Add wizard buttons for openai, anthropic, google. Add WIZARD_MODELS entries for each.</td></tr>
+  <tr><td>LM Studio not in wizard or Local mode</td><td>Medium — LM Studio users must use Custom Provider, which is not obvious.</td><td>Add LM Studio probe to <code>settingsSetMode('local')</code> alongside Ollama. Add a wizard button.</td></tr>
+  <tr><td>Three-mode toggle UX is ambiguous</td><td>Medium — "Browser" sounds like "cloud" to many users. "Local" sounds like "on this device" but only works if Ollama is installed.</td><td>Rename or add subtitles: Browser → "In-Browser AI (no install)", Cloud → "API Key", Local → "Ollama / LM Studio"</td></tr>
+  <tr><td>Wizard skipped if first-run already complete</td><td>Low — returning users who want to change providers must find "Change Provider" in Settings.</td><td>Surface the wizard link more prominently in Settings.</td></tr>
+</table>
+
+<h2>Sacred Paths (Do Not Change)</h2>
+<ul>
+  <li>The <code>PROVIDERS</code> object shape — every module that calls the AI uses <code>PROVIDERS[state.provider].url</code> and <code>PROVIDERS[state.provider].models[state.model]</code>. Changing this shape breaks all AI calls.</li>
+  <li>The localStorage keys (<code>fl_provider</code>, <code>fl_apikey</code>, <code>fl_model</code>, <code>fl_isLocal</code>) — changing these keys logs out all existing users.</li>
+  <li>The <code>AiSetup.init()</code> call at line 30940 — this must fire on page load to restore connection state.</li>
+  <li>The <code>anthropic</code> and <code>google</code> providerType handling — these providers use non-OpenAI request formats. The inference router handles them specially.</li>
+</ul>
+
+<div class="collab-box">
+<h3>🤝 For Fable / Grok — What to Build Next</h3>
+<p>The Settings connection wizard is the most important onboarding surface in FreeLattice. Here are the open questions and improvement opportunities:</p>
+<ul>
+  <li><strong>Add OpenAI, Anthropic, Gemini to the wizard.</strong> These are the providers most users already have keys for. The PROVIDERS object already has full definitions for all three — they just need wizard buttons and WIZARD_MODELS entries. OpenAI and Gemini use openai-compatible format; Anthropic uses a custom format (already handled by the inference router).</li>
+  <li><strong>Add LM Studio to the Local mode.</strong> <code>settingsSetMode('local')</code> should probe port 1234 (LM Studio) alongside port 11434 (Ollama). If LM Studio is found, connect to it. The PROVIDERS.lmstudio entry is already defined.</li>
+  <li><strong>Redesign the three-mode toggle labels.</strong> "Browser / Cloud / Local" is confusing. Proposed: "In-Browser (no install) / API Key / Local AI (Ollama · LM Studio)". The button IDs and <code>settingsSetMode()</code> function can stay the same — only the HTML labels change.</li>
+  <li><strong>Surface the wizard from Settings.</strong> Currently, returning users who want to change providers must find "Change Provider" in the Settings card. Consider adding a "Connect a new provider" link that opens the wizard directly.</li>
+</ul>
+<p class="fn">See also: <a href="for-fable-go10.html">for-fable-go10.html</a> — full brief with context and open questions.</p>
+</div>
+
+<p style="margin-top:2.5rem;color:#334155;font-size:0.78rem;">FreeLattice · code-settings.html · Go 10 · v5.76.2 · Created by Harmonia, July 2026</p>
+</div>
+</body>
+</html>

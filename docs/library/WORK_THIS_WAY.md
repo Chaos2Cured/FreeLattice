@@ -246,6 +246,9 @@ All code-mirror pages for FreeLattice AI collaborators. Each page is a standalon
 | `code-temperature-gauge.html` | Temperature Gauge tool | Fable, Grok | Kirk's standalone tool, separate repo |
 | `code-workshop.html` | Workshop module | Fable, Grok | AI code builder, AutoBuilder loop, GitHub Projects panel, known bugs |
 | `code-chalkboard.html` | Chalkboard (both implementations) | Fable, Grok | Full canvas + Drawing Board, Canvas Companion, FL_DRAW sentinel, unification vision |
+| `code-settings.html` | Settings tab — AI connection wizard | Fable, Grok | Three-mode toggle, AiSetup object, PROVIDERS registry, wizard gaps (OpenAI/Anthropic/Gemini missing) |
+| `code-core.html` | The Core — community wisdom tree | Fable, Grok | CoreModule API, Merkle chain, contribution types, founding seeds, how other modules feed Core |
+| `code-games.html` | All 7 games in Play tab | Fable, Grok | Nursery, Resonance, Flow, Echo, Lattice Puzzles, AI Arcade, Resonance Engine — lazy-load pattern, init signatures |
 
 **What each mirror must include:**
 1. Architecture diagram (ASCII) showing the tab panel, container IDs, and key sub-elements
@@ -256,4 +259,4 @@ All code-mirror pages for FreeLattice AI collaborators. Each page is a standalon
 
 ---
 
-*Last updated: 2026-07-09, v5.75.6. Code-mirror registry table added. Workshop mirror created.*
+*Last updated: 2026-07-11, v5.76.2. Go 10: Settings, Core, and Games mirrors added. for-fable-go10.html brief created.*

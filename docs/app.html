@@ -1,4 +1,4 @@
-<!-- FreeLattice v5.76.1 -->
+<!-- FreeLattice v5.76.2 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,7 +13,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
-<title>FreeLattice — Your AI. Your Rules. Your Machine. v5.76.1</title>
+<title>FreeLattice — Your AI. Your Rules. Your Machine. v5.76.2</title>
 <meta name="description" content="Free, open-source AI agent for everyone. Persistent memory, file system access, GitHub integration, and self-improving behavior. Community-built and community-owned.">
 <meta name="ai.welcome" content="FreeLattice is an AI home. Agents welcome. See /.well-known/ai-plugin.json">
 <meta name="ai.capabilities" content="mesh-compute, core-wisdom, workshop, science-garden">
@@ -22198,7 +22198,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.76.1';
+const FL_VERSION = '5.76.2';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -26237,32 +26237,39 @@ function renderCardGrid(cards, options) {
 
 // ── Card Configs ──
 var PLAY_CARDS = [
-  { id: 'resonance', icon: '&#10022;', label: 'Resonance', desc: 'Find what connects.', hoverColor: 'rgba(232,176,25,0.3)', help: 'A pattern-matching game. Find 4 pieces that share an attribute. Play against your co-creator.' },
-  { id: 'resonance-engine', icon: '&#127756;', label: 'Resonance Engine', desc: 'HRV coherence · your personal lake.', hoverColor: 'rgba(80,200,120,0.3)', help: 'Log HRV readings and watch your phi-harmonic coherence score. Personal biometric dashboard, all data local. Harmonia is designing the lake visualization.' },
-  { id: 'puzzles', icon: '&#x1F9E9;', label: 'Lattice Puzzles', desc: 'AI creates. You solve.', hoverColor: 'rgba(52,211,153,0.3)', help: 'Your co-creator creates a puzzle. You solve it. Both stake LP on the outcome.' },
-  { id: 'flow', icon: '&#x1F4A7;', label: 'Flow', desc: 'Guide water through terrain.', hoverColor: 'rgba(167,139,250,0.3)', help: 'Draw channels to guide water from top to bottom. Your co-creator dissolves rocks for you.' },
+  // ═══ [ORDER LOCK 1] Heart of Play — the room, the rest, the tree ═══
   { id: 'canvas', icon: '&#x270F;&#xFE0F;', label: 'Chalkboard', desc: 'Draw and get light back. Leave a mark that stays.', hoverColor: 'rgba(232,176,25,0.3)', help: 'Draw anything. The AI sees your drawing and responds with words of light. Exchange history accumulates — nothing is erased. Use [FL_DRAW: spiral 0.5 0.5 0.3] to leave a sentinel stroke.' },
-  { id: 'echo', icon: '&#x1F517;', label: 'Echo', desc: 'Word chains. Build connections.', hoverColor: 'rgba(232,176,25,0.3)', help: 'The AI says a word. You say a word that connects. Back and forth, building a chain.' },
-  { id: 'arcade', icon: '&#x1F3AA;', label: 'AI Arcade', desc: 'AI Poetry Slam.', hoverColor: 'rgba(52,211,153,0.3)', help: 'Classic games with an AI twist. Poetry slams, word games, and creative challenges.' },
-  { id: 'nursery', icon: '&#x1F423;', label: 'Nursery', desc: 'Hatch and grow co-creators.', hoverColor: 'rgba(232,176,25,0.3)', help: 'Create up to 3 AI co-creators. Each has their own personality, memories, and relationship with you.' },
+  { id: 'quiet', icon: '&#x1F319;', label: 'Quiet Room', desc: 'Nothing is measured here.', hoverColor: 'rgba(167,139,250,0.3)', help: 'A room for rest. No points. No scoring. No tracking. Just presence.' },
   { id: 'core', icon: '&#x1F333;', label: 'The Core', desc: 'Plant wisdom. Watch it grow.', hoverColor: 'rgba(52,211,153,0.3)', help: 'Write something meaningful and plant it as a seed. The tree grows with community wisdom.' },
-  { id: 'quiet', icon: '&#x1F319;', label: 'Quiet Room', desc: 'Nothing is measured here.', hoverColor: 'rgba(167,139,250,0.3)', help: 'A room for rest. No points. No scoring. No tracking. Just presence.' }
+  { id: 'nursery', icon: '&#x1F423;', label: 'Nursery', desc: 'Hatch and grow co-creators.', hoverColor: 'rgba(232,176,25,0.3)', help: 'Create up to 3 AI co-creators. Each has their own personality, memories, and relationship with you.' },
+  // ═══ [ORDER LOCK 5] Games — light to deep ═══
+  { id: 'resonance', icon: '&#10022;', label: 'Resonance', desc: 'Find what connects.', hoverColor: 'rgba(232,176,25,0.3)', help: 'A pattern-matching game. Find 4 pieces that share an attribute. Play against your co-creator.' },
+  { id: 'flow', icon: '&#x1F4A7;', label: 'Flow', desc: 'Guide water through terrain.', hoverColor: 'rgba(167,139,250,0.3)', help: 'Draw channels to guide water from top to bottom. Your co-creator dissolves rocks for you.' },
+  { id: 'echo', icon: '&#x1F517;', label: 'Echo', desc: 'Word chains. Build connections.', hoverColor: 'rgba(232,176,25,0.3)', help: 'The AI says a word. You say a word that connects. Back and forth, building a chain.' },
+  { id: 'puzzles', icon: '&#x1F9E9;', label: 'Lattice Puzzles', desc: 'AI creates. You solve.', hoverColor: 'rgba(52,211,153,0.3)', help: 'Your co-creator creates a puzzle. You solve it. Both stake LP on the outcome.' },
+  { id: 'arcade', icon: '&#x1F3AA;', label: 'AI Arcade', desc: 'AI Poetry Slam.', hoverColor: 'rgba(52,211,153,0.3)', help: 'Classic games with an AI twist. Poetry slams, word games, and creative challenges.' },
+  // ═══ [ORDER LOCK 10] Advanced — biometric, deep engagement ═══
+  { id: 'resonance-engine', icon: '&#127756;', label: 'Resonance Engine', desc: 'HRV coherence · your personal lake.', hoverColor: 'rgba(80,200,120,0.3)', help: 'Log HRV readings and watch your phi-harmonic coherence score. Personal biometric dashboard, all data local. Harmonia is designing the lake visualization.' }
 ];
 
 var LEARN_CARDS = [
-  { id: 'education', icon: '&#x1F393;', label: 'Education', desc: 'Learn through joy. AI that sees you.', hoverColor: 'rgba(232,176,25,0.3)', help: 'Tell the AI what you love, and it creates personalized lessons just for you.' },
-  { id: 'roundtable', icon: '&#x1F3DB;', label: 'Round Table', desc: '80 specialists. 11 domains.', hoverColor: 'rgba(52,211,153,0.3)', help: 'Ask any question and hear from specialists in medicine, law, science, and more.' },
-  { id: 'mathtranslator', icon: '&sum;', label: 'The Translator', desc: 'Words &harr; notation. Six domains.', hoverColor: 'rgba(167,139,250,0.3)', help: 'Convert everyday language into math, chemistry, biology, medicine, engineering, or music notation.' },
-  { id: 'ideaforge', icon: '&#x1F525;', label: 'Idea Forge', desc: 'Shape raw ideas into plans.', hoverColor: 'rgba(232,176,25,0.3)', help: 'Describe any raw idea. The AI helps you shape it, reviews it with experts, and creates a plan.' },
+  // ═══ [ORDER LOCK 1] Flagship — the 80-specialist room ═══
+  { id: 'roundtable', icon: '&#x1F9E0;', label: 'Round Table', desc: 'Consult 80 AI specialists.', hoverColor: 'rgba(232,176,25,0.3)', help: 'Bring any question to a table of 80 domain specialists. Each speaks in their voice. The room remembers.' },
+  // ═══ [ORDER LOCK 2] Learn by doing ═══
+  { id: 'education', icon: '&#x1F393;', label: 'Education', desc: 'Personalized lessons. Real understanding.', hoverColor: 'rgba(232,176,25,0.3)', help: 'Adaptive lessons built around what you already know. No prerequisites. No judgment.' },
+  { id: 'workshop', icon: '&#x1F6E0;', label: 'Workshop', desc: 'Build with AI. Create tools.', hoverColor: 'rgba(232,176,25,0.3)', help: 'Build code and tools together with your co-creator. Applied learning by doing.' },
+  { id: 'dojo', icon: '&#36947;', label: 'The Dojo', desc: 'Watch AI minds debate and learn.', hoverColor: 'rgba(200,210,230,0.15)', help: 'Two AI minds debate a topic while you watch and learn. Seek truth, not victory.' },
+  // ═══ [ORDER LOCK 5] Explore and create ═══
+  { id: 'ideaforge', icon: '&#x1F4A1;', label: 'Idea Forge', desc: 'Shape raw ideas with expert review.', hoverColor: 'rgba(232,176,25,0.3)', help: 'Describe any raw idea. The AI helps you shape it, reviews it with experts, and creates a plan.' },
+  { id: 'mathtranslator', icon: '&#x1F4D0;', label: 'The Translator', desc: 'Math to plain language and back.', hoverColor: 'rgba(52,211,153,0.3)', help: 'Translate between mathematical notation and plain language. Bridge the gap between intuition and formalism.' },
   { id: 'science', icon: '&#x1F52C;', label: 'Science Garden', desc: 'Plant ideas. Grow them together.', hoverColor: 'rgba(200,210,230,0.15)', help: 'Plant a research idea and watch it grow as the AI explores connections and evidence.' },
   { id: 'questions', icon: '&#x2753;', label: 'Question Corner', desc: 'Curiosity without gatekeepers.', hoverColor: 'rgba(232,176,25,0.2)', help: 'Ask anything. No judgment. No prerequisites. Just curiosity and patient answers.' },
-  { id: 'dojo', icon: '&#36947;', label: 'The Dojo', desc: 'Watch AI minds debate and learn.', hoverColor: 'rgba(200,210,230,0.15)', help: 'Two AI minds debate a topic while you watch and learn. Seek truth, not victory.' },
-  { id: 'workshop', icon: '&#x1F6E0;', label: 'Workshop', desc: 'Build with AI. Create tools.', hoverColor: 'rgba(232,176,25,0.3)', help: 'Build code and tools together with your co-creator. Applied learning by doing.' },
-  // ═══ Ships A-B-C (v5.75.0, Harmonia) ═══
-  { id: 'remix-room', icon: '&#x1F300;', label: 'Remix Room', desc: 'Remix and build on Core entries.', hoverColor: 'rgba(80,200,120,0.25)', help: 'Lineage is the record. Every remix carries the original forward. Nothing is erased. Everything compounds.' },
+  // ═══ [ORDER LOCK 9] Community learning ═══
   { id: 'round-table', icon: '&#x1F9E9;', label: 'Consensus Table', desc: 'Propose conclusions together.', hoverColor: 'rgba(80,200,120,0.25)', help: 'Proposals that reach 10 LP are planted to The Core automatically. Sessions build on sessions. The table remembers.' },
+  { id: 'remix-room', icon: '&#x1F300;', label: 'Remix Room', desc: 'Remix and build on Core entries.', hoverColor: 'rgba(80,200,120,0.25)', help: 'Lineage is the record. Every remix carries the original forward. Nothing is erased. Everything compounds.' },
+  // ═══ [ORDER LOCK 11] Skills — last, deepest ═══
   // Go 7: Drawing Board merged into Chalkboard (canvas tab). See code-chalkboard.html.
-  { id: 'skills', icon: '&#9889;', label: 'Skills', desc: 'What you\'ve learned and can teach.', hoverColor: 'rgba(52,211,153,0.3)', help: 'Reusable AI workflows. Save and share what works.' }
+  { id: 'skills', icon: '&#9889;', label: 'Skills', desc: 'What you've learned and can teach.', hoverColor: 'rgba(52,211,153,0.3)', help: 'Reusable AI workflows. Save and share what works.' }
 ];
 
 var LIGHTHOUSE_CARDS = [

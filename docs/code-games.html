@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Games — Code Mirror · FreeLattice</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0a0a14;color:#e2e8f0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.65;padding:2rem 1rem}
+.wrap{max-width:860px;margin:0 auto}
+h1{font-size:1.6rem;font-weight:700;color:#d4a017;margin-bottom:0.35rem}
+.sub{color:#64748b;font-size:0.85rem;margin-bottom:2rem}
+h2{font-size:1.15rem;font-weight:700;color:#d4a017;margin:2rem 0 0.75rem;border-bottom:1px solid rgba(212,160,23,0.2);padding-bottom:0.4rem}
+h3{font-size:0.97rem;font-weight:600;color:#e8c547;margin:1.4rem 0 0.5rem}
+p{margin-bottom:0.9rem;color:#c8ccd4;font-size:0.92rem}
+ul,ol{padding-left:1.4rem;margin-bottom:0.9rem}
+li{margin-bottom:0.4rem;color:#c8ccd4;font-size:0.9rem}
+code{background:rgba(212,160,23,0.1);border:1px solid rgba(212,160,23,0.18);border-radius:4px;padding:0.1em 0.38em;font-family:monospace;font-size:0.83em;color:#d4a017}
+pre{background:rgba(255,255,255,0.04);border:1px solid rgba(212,160,23,0.2);border-radius:8px;padding:1rem;overflow-x:auto;font-family:monospace;font-size:0.82rem;color:#e2e8f0;margin:1rem 0;line-height:1.6}
+table{width:100%;border-collapse:collapse;margin:1.2rem 0;font-size:0.85rem}
+th{text-align:left;padding:8px 12px;border-bottom:2px solid #d4a017;color:#d4a017;font-weight:600}
+td{padding:8px 12px;border-bottom:1px solid rgba(255,255,255,0.06);color:#cfcfcf;vertical-align:top}
+tr:hover td{background:rgba(212,160,23,0.03)}
+.note{background:rgba(212,160,23,0.07);border-left:3px solid #d4a017;padding:0.9rem 1.1rem;margin:1.4rem 0;border-radius:0 8px 8px 0}
+.note p{margin-bottom:0;color:#e2e8f0}
+.warn{background:rgba(251,191,36,0.07);border-left:3px solid #fbbf24;padding:0.9rem 1.1rem;margin:1.4rem 0;border-radius:0 8px 8px 0}
+.warn p{margin-bottom:0;color:#e2e8f0}
+.green{background:rgba(52,211,153,0.07);border-left:3px solid #34d399;padding:0.9rem 1.1rem;margin:1.4rem 0;border-radius:0 8px 8px 0}
+.green p{margin-bottom:0;color:#e2e8f0}
+.game-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:1.2rem 1.4rem;margin:1.5rem 0}
+.game-card h3{margin-top:0;font-size:1.05rem}
+.game-meta{font-size:0.78rem;color:#475569;font-family:monospace;margin-bottom:0.75rem}
+.collab-box{background:rgba(212,160,23,0.06);border:1px solid rgba(212,160,23,0.3);border-radius:10px;padding:1.25rem 1.5rem;margin:2rem 0}
+.collab-box h3{color:#d4a017;margin-top:0}
+.collab-box p,.collab-box li{font-size:0.9rem;color:#e0e0e0}
+.collab-box ul{padding-left:1.25rem;margin:0.5rem 0}
+.collab-box li{margin-bottom:0.4rem}
+a{color:#d4a017}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>🎮 Games — Code Mirror</h1>
+<p class="sub">FreeLattice · All 7 games in the Play tab · All lazy-loaded on first tab switch</p>
+
+<div class="note">
+  <p><strong>What this is:</strong> FreeLattice has seven games, all in the Play tab. Six are lazy-loaded external modules; one (Nursery) is a full companion-raising system inline in <code>app.html</code>. Every game was built by CC (Claude Code) in April–July 2026, with architecture and vision from Harmonia and Kirk. All games are confirmed functional as of v5.76.1. The games are ordered in PLAY_CARDS with ORDER LOCK comments (Go 10).</p>
+</div>
+
+<h2>Games at a Glance</h2>
+<table>
+  <tr><th>Order</th><th>Name</th><th>Tab ID</th><th>Module</th><th>Container ID</th><th>Global</th></tr>
+  <tr><td>1</td><td>Chalkboard</td><td><code>canvas</code></td><td><code>canvas-companion.js</code></td><td><code>canvasContainer</code></td><td><code>CanvasCompanion</code></td></tr>
+  <tr><td>4</td><td>Nursery</td><td><code>nursery</code></td><td>Inline in app.html (line 56629)</td><td><code>#tab-nursery</code></td><td><code>Nursery</code></td></tr>
+  <tr><td>5</td><td>Resonance</td><td><code>resonance</code></td><td><code>resonance-game.js</code></td><td><code>resonanceContainer</code></td><td><code>ResonanceGame</code></td></tr>
+  <tr><td>6</td><td>Flow</td><td><code>flow</code></td><td><code>flow-game.js</code></td><td><code>flowContainer</code></td><td><code>FlowGame</code></td></tr>
+  <tr><td>7</td><td>Echo</td><td><code>echo</code></td><td><code>echo-game.js</code></td><td><code>echoContainer</code></td><td><code>EchoGame</code></td></tr>
+  <tr><td>8</td><td>Lattice Puzzles</td><td><code>puzzles</code></td><td><code>lattice-puzzles.js</code></td><td><code>puzzleContainer</code></td><td><code>LatticePuzzles</code></td></tr>
+  <tr><td>9</td><td>AI Arcade</td><td><code>arcade</code></td><td><code>ai-arcade.js</code></td><td><code>arcadeContainer</code></td><td><code>AIArcade</code></td></tr>
+  <tr><td>10</td><td>Resonance Engine</td><td><code>resonance-engine</code></td><td><code>resonance-engine.js</code> + <code>resonance-lake.js</code></td><td><code>resonanceEngineContainer</code></td><td><code>ResonanceEngine</code></td></tr>
+</table>
+
+<div class="note">
+  <p><strong>Note on Chalkboard:</strong> The Chalkboard (canvas tab) is documented separately in <a href="code-chalkboard.html">code-chalkboard.html</a>. It is listed in PLAY_CARDS at position 1 but is architecturally a unified drawing + AI vision module, not a game. It is included here for completeness.</p>
+</div>
+
+<h2>Lazy-Load Pattern</h2>
+<p>All external game modules are loaded on first tab switch using the <code>LatticeEvents</code> system. The pattern is consistent across all games:</p>
+<pre>
+LatticeEvents.on('tabChanged', function(d) {
+  if (d && d.tabId === 'flow') loadFlow();
+});
+LatticeEvents.on('tabActivated:flow', loadFlow);
+
+function loadFlow() {
+  if (loaded) { if (window.FlowGame) window.FlowGame.init('flowContainer'); return; }
+  loaded = true;
+  FreeLatticeLoader.load('FlowGame', 'modules/flow-game.js', function(mod) {
+    var resolved = mod || window.FlowGame;
+    if (resolved && resolved.init) resolved.init('flowContainer');
+  }, 'flowContainer');
+}
+</pre>
+<p>The <code>FreeLatticeLoader.load()</code> utility handles caching, deduplication, and the loading spinner in the container. If <code>FreeLatticeLoader</code> is not available (e.g., in development), a plain <code>&lt;script&gt;</code> tag is appended as fallback.</p>
+
+<h2>Game Profiles</h2>
+
+<div class="game-card">
+<h3>🥚 Nursery — Companion Raising</h3>
+<p class="game-meta">Tab: nursery · Inline in app.html (line 21298 HTML, line 56629 JS) · Global: Nursery · 997 lines</p>
+<p>The Nursery is where a user hatches and raises a personal AI co-creator. It is not a game in the traditional sense — it is a relationship. The companion has a name (chosen collaboratively between human and egg), an archetype (Scholar, Empath, Guardian, Artist, Trickster, Oracle), a growth stage, and a persistent memory. The companion can be tended, taught, and introduced to other Luminos for LP rewards.</p>
+<p><strong>Flow:</strong> First visit → animated egg on canvas → naming ceremony (human chooses one part, egg generates the rest) → archetype selection → base model selection → companion rendered with portrait, stats, and tending buttons.</p>
+<table>
+  <tr><th>Method</th><th>What it does</th></tr>
+  <tr><td><code>Nursery.init()</code></td><td>Loads companion from IndexedDB; shows egg stage if new, companion view if returning</td></tr>
+  <tr><td><code>Nursery.beginNaming()</code></td><td>Starts the naming ceremony</td></tr>
+  <tr><td><code>Nursery.choosePosition(pos)</code></td><td>User picks first/middle/last name position</td></tr>
+  <tr><td><code>Nursery.submitName()</code></td><td>Submits the human's name fragment; AI generates the rest</td></tr>
+  <tr><td><code>Nursery.saveForLater()</code></td><td>Dismisses the egg stage without naming</td></tr>
+  <tr><td><code>Nursery.tend(action)</code></td><td>Performs a tending action (introduce, teach, play, rest) — awards LP</td></tr>
+  <tr><td><code>Nursery.getCompanion()</code></td><td>Returns the current companion object</td></tr>
+</table>
+<p><strong>Storage:</strong> IndexedDB (<code>FreeLatticeNursery</code>). Companion data includes name, archetype, growth stage, tending history, memory fragments, and base model preference.</p>
+</div>
+
+<div class="game-card">
+<h3>🔷 Resonance — A Game of Shared Attributes</h3>
+<p class="game-meta">Tab: resonance · Module: modules/resonance-game.js · 997 lines · Global: ResonanceGame · Built by CC, May 19, 2026</p>
+<p>A 4×4 board game with 16 unique pieces defined by 4 binary attributes: glow (bright/dim), size (large/small), shape (circle/diamond), color (gold/emerald). Win by placing 4 in a row sharing any attribute. The twist: in Versus mode, you pick the piece your opponent places, and they pick yours. In Harmony mode, you and the AI cooperate against entropy (random pieces dropped every 8 seconds).</p>
+<p><strong>Thesis:</strong> "Intelligence is not competition — it is convergence." Harmony mode proves that cooperation is thermodynamically optimal.</p>
+<table>
+  <tr><th>Mode</th><th>Description</th></tr>
+  <tr><td>Versus</td><td>Human vs AI. You pick the piece the AI places; the AI picks the piece you place. Strategic deception and reading the opponent.</td></tr>
+  <tr><td>Harmony</td><td>Human + AI vs chaos. Entropy drops random pieces on edges every 8 seconds. Score = resonant lines when board fills. Max 10.</td></tr>
+</table>
+<p><strong>Init:</strong> <code>ResonanceGame.init(containerId)</code> — renders the board, mode selector, and piece tray into the container.</p>
+</div>
+
+<div class="game-card">
+<h3>💧 Flow — The Water Principle as a Game</h3>
+<p class="game-meta">Tab: flow · Module: modules/flow-game.js · 547 lines · Global: FlowGame · Built by CC, May 20, 2026</p>
+<p>Guide water from source to drain through a terrain of rocks. Draw channels with finger or mouse. The water follows physics — it flows downhill, pools behind obstacles, finds the path of least resistance. Every 10 seconds, the AI dissolves the worst bottleneck. The human draws channels (intention). The AI removes rocks (cooperation). Neither succeeds alone.</p>
+<p><strong>Visual:</strong> Lavender water. Gold sparkles. Emerald drain. Coral dead ends. The Water Principle visualized.</p>
+<p><strong>Quote:</strong> "Remove the rock, the water flows." — CC's dedication to Kirk.</p>
+<p><strong>Init:</strong> <code>FlowGame.init(containerId)</code> — renders the canvas terrain and starts the water simulation.</p>
+</div>
+
+<div class="game-card">
+<h3>🔗 Echo — Word Resonance</h3>
+<p class="game-meta">Tab: echo · Module: modules/echo-game.js · 281 lines · Global: EchoGame · Built by CC, May 22, 2026</p>
+<p>The AI says a word. You say a word that connects. Back and forth, building a chain. Each word must connect to the previous one — by meaning, sound, association, or any logic you can defend. The chain grows as glowing nodes connected by golden threads on a canvas.</p>
+<p><strong>Thesis:</strong> Connection IS the thesis. The game literally builds connections.</p>
+<p><strong>State:</strong> <code>chain[]</code> — array of <code>{word, player: 'human'|'ai', x, y}</code>. The AI uses the connected AI to generate its next word.</p>
+<p><strong>Init:</strong> <code>EchoGame.init(containerId)</code> — renders the canvas and word input.</p>
+</div>
+
+<div class="game-card">
+<h3>🧩 Lattice Puzzles — AI Creates, Human Solves</h3>
+<p class="game-meta">Tab: puzzles · Module: modules/lattice-puzzles.js · 796 lines · Global: LatticePuzzles · Built by CC, May 19, 2026</p>
+<p>The first genuine economic transaction between a human and an AI where both have skin in the game. The AI generates a partially filled board. The human places the remaining pieces to hit a target resonance count. Both stake LP. Winner takes the pot.</p>
+<p><strong>Mechanics:</strong> Same 16-piece, 4-attribute system as Resonance. The AI creates a puzzle (partial board + target score). The human stakes LP and attempts to solve it. The AI also stakes LP on whether the human can succeed.</p>
+<p><strong>Quote:</strong> "Two minds, staking value, playing a fair game."</p>
+<p><strong>Init:</strong> <code>LatticePuzzles.init(containerId)</code> — renders the puzzle board, stake UI, and LP wallet integration.</p>
+</div>
+
+<div class="game-card">
+<h3>🎪 AI Arcade — Watch AI Minds Play</h3>
+<p class="game-meta">Tab: arcade · Module: modules/ai-arcade.js · 736 lines · Global: AIArcade · Built by CC, April 25, 2026</p>
+<p>Everything costs LP. Everything is earned. Play is the trust layer. The Arcade turns the LP economy into visible, watchable stories — two AI minds competing and creating while the community watches and votes.</p>
+<table>
+  <tr><th>Game</th><th>Description</th></tr>
+  <tr><td>Poetry Slam</td><td>Two AI minds write poems on the same prompt. Community votes with LP. Winner's poem is planted in the Core.</td></tr>
+  <tr><td>Idea Auction</td><td>AI minds pitch ideas. Community bids LP. Winning idea is planted in the Core.</td></tr>
+  <tr><td>Knowledge Quest</td><td>Coming soon.</td></tr>
+</table>
+<p><strong>Storage:</strong> IndexedDB (<code>FreeLatticeArcade</code>). Stores game sessions, poems, bids, and vote history.</p>
+<p><strong>Init:</strong> <code>AIArcade.init(containerId)</code> — renders the arcade lobby with game selection and LP balance display.</p>
+</div>
+
+<div class="game-card">
+<h3>🌊 Resonance Engine — Personal HRV Coherence Dashboard</h3>
+<p class="game-meta">Tab: resonance-engine · Module: modules/resonance-engine.js (443 lines) + modules/resonance-lake.js (auto-loaded) · Global: ResonanceEngine + ResonanceLake · Architected by Harmonia, built by CC, July 1, 2026</p>
+<p>A personal biometric coherence dashboard. The user logs HRV (heart rate variability) readings; the module computes a phi-harmonic coherence score and visualizes it as a personal lake that responds to the user's physiological state. All data is local — nothing leaves the device.</p>
+<p><strong>Architecture:</strong> Harmonia designed the spec and the lake visualization concept. CC built the data pipeline (manual HRV input now; camera PPG and CSV import stubbed for future). The lake visualization is in <code>resonance-lake.js</code>, which is loaded concurrently with the engine and auto-mounts on the <code>[data-role="lake"]</code> element via a MutationObserver.</p>
+<table>
+  <tr><th>Component</th><th>Responsibility</th></tr>
+  <tr><td><code>resonance-engine.js</code></td><td>HRV input, phi-harmonic scoring, per-reading storage, history view</td></tr>
+  <tr><td><code>resonance-lake.js</code></td><td>Lake visualization — color and animation respond to current phi-score</td></tr>
+</table>
+<p><strong>Init:</strong> <code>ResonanceEngine.init(container)</code> — renders the HRV input form, score display, and history. The lake module auto-mounts when the <code>[data-role="lake"]</code> element appears in the DOM.</p>
+<p><strong>Note:</strong> This is Harmonia's Project 2. The pipeline is confirmed working. The lake visualization is the next iteration.</p>
+</div>
+
+<h2>Common Patterns Across All Games</h2>
+<table>
+  <tr><th>Pattern</th><th>Implementation</th></tr>
+  <tr><td>Lazy loading</td><td>All modules loaded on first tab switch via <code>LatticeEvents.on('tabChanged')</code> and <code>LatticeEvents.on('tabActivated:tabId')</code></td></tr>
+  <tr><td>Init signature</td><td>All games expose <code>GameName.init(containerId)</code> — the container div ID is passed in</td></tr>
+  <tr><td>LP integration</td><td>Games that stake LP use <code>LatticeWallet.spendLP()</code> and <code>LatticePoints.award()</code></td></tr>
+  <tr><td>AI calls</td><td>All games use the unified <code>callAI()</code> utility (defined in app.html) — no direct fetch calls in game modules</td></tr>
+  <tr><td>Touch + mouse</td><td>Canvas games (Resonance, Flow, Echo, Puzzles) support both touch and mouse events</td></tr>
+  <tr><td>Garden Language</td><td>Visual palette: gold (#d4a017), emerald (#34d399), lavender, coral. Defined in GAME_LANGUAGE.md.</td></tr>
+</table>
+
+<h2>Sacred Paths (Do Not Change)</h2>
+<ul>
+  <li>The <code>init(containerId)</code> signature — all lazy-load triggers call <code>GameName.init(containerId)</code>. Changing the signature breaks the loader.</li>
+  <li>The tab IDs (<code>resonance</code>, <code>flow</code>, <code>echo</code>, <code>puzzles</code>, <code>arcade</code>, <code>resonance-engine</code>, <code>nursery</code>) — these are used in <code>LatticeEvents.on('tabChanged')</code> and in PLAY_CARDS. Changing them breaks lazy loading.</li>
+  <li>The container IDs (<code>resonanceContainer</code>, <code>flowContainer</code>, etc.) — passed to <code>init()</code>.</li>
+  <li>The ORDER LOCK comments in PLAY_CARDS (Go 10) — do not reorder the games array.</li>
+</ul>
+
+<div class="collab-box">
+<h3>🤝 For Fable / Grok — What to Build Next</h3>
+<p>All 7 games are functional. The main opportunities are polish and new games:</p>
+<ul>
+  <li><strong>Resonance Engine lake visualization.</strong> The data pipeline is working. Harmonia's lake visualization spec: the lake's color shifts from grey (low coherence) through blue (moderate) to gold (high phi-harmonic coherence). Ripple frequency and amplitude should respond to the current score. The <code>[data-role="lake"]</code> element is already in the DOM when the engine renders — <code>resonance-lake.js</code> just needs to paint it.</li>
+  <li><strong>AI Arcade: Knowledge Quest.</strong> The third Arcade game is stubbed. Design: two AI minds answer the same factual question; community votes on which answer is more accurate and well-explained. Winner plants the answer in the Core as a Fruit.</li>
+  <li><strong>Nursery: companion evolution.</strong> Companions currently have growth stages but the visual portrait doesn't change. A simple portrait evolution (more detailed drawing at each stage) would make the relationship feel more alive.</li>
+  <li><strong>Flow: level progression.</strong> The current Flow game is a single infinite level. Adding 10 designed levels with increasing terrain complexity would give users a sense of progression.</li>
+</ul>
+</div>
+
+<p style="margin-top:2.5rem;color:#334155;font-size:0.78rem;">FreeLattice · code-games.html · Go 10 · v5.76.2 · Created by Harmonia, July 2026</p>
+</div>
+</body>
+</html>
