@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Code Mirror — Temperature Gauge | FreeLattice Docs</title>
+<style>
+  :root { --bg: #0a0e1a; --surface: #111827; --border: #1e2a3a; --gold: #d4a017; --green: #10b981; --blue: #3b82f6; --purple: #8b5cf6; --red: #ef4444; --text: #e2e8f0; --muted: #64748b; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; font-size: 0.92rem; line-height: 1.65; }
+  .nav { background: var(--surface); border-bottom: 1px solid var(--border); padding: 12px 24px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .nav a { color: var(--muted); text-decoration: none; font-size: 0.82rem; } .nav a:hover { color: var(--gold); }
+  .nav .title { color: var(--gold); font-weight: 600; font-size: 1rem; margin-right: 8px; }
+  .container { max-width: 900px; margin: 0 auto; padding: 32px 24px 80px; }
+  h1 { font-size: 1.6rem; color: var(--gold); margin-bottom: 6px; }
+  .subtitle { color: var(--muted); font-size: 0.85rem; margin-bottom: 32px; }
+  h2 { font-size: 1.1rem; color: var(--green); margin: 32px 0 12px; border-bottom: 1px solid var(--border); padding-bottom: 6px; }
+  h3 { font-size: 0.95rem; color: var(--blue); margin: 20px 0 8px; }
+  p { margin-bottom: 12px; color: var(--text); }
+  code { background: rgba(255,255,255,0.06); border: 1px solid var(--border); border-radius: 4px; padding: 1px 6px; font-family: 'Fira Code', monospace; font-size: 0.82rem; color: #93c5fd; }
+  pre { background: rgba(0,0,0,0.4); border: 1px solid var(--border); border-radius: 8px; padding: 16px; overflow-x: auto; margin: 12px 0 20px; }
+  pre code { background: none; border: none; padding: 0; font-size: 0.82rem; color: #a5f3fc; }
+  table { width: 100%; border-collapse: collapse; margin: 12px 0 20px; font-size: 0.85rem; }
+  th { background: rgba(212,160,23,0.1); color: var(--gold); text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--border); }
+  td { padding: 7px 12px; border-bottom: 1px solid rgba(255,255,255,0.04); color: var(--text); }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; margin-left: 6px; }
+  .badge-gold { background: rgba(212,160,23,0.15); color: var(--gold); border: 1px solid rgba(212,160,23,0.3); }
+  .badge-green { background: rgba(16,185,129,0.12); color: var(--green); border: 1px solid rgba(16,185,129,0.25); }
+  .badge-blue { background: rgba(59,130,246,0.12); color: var(--blue); border: 1px solid rgba(59,130,246,0.25); }
+  .badge-red { background: rgba(239,68,68,0.12); color: var(--red); border: 1px solid rgba(239,68,68,0.25); }
+  .callout { background: rgba(212,160,23,0.06); border-left: 3px solid var(--gold); border-radius: 0 8px 8px 0; padding: 12px 16px; margin: 16px 0; }
+  .callout.gap { background: rgba(239,68,68,0.06); border-left-color: var(--red); }
+  .callout.idea { background: rgba(16,185,129,0.06); border-left-color: var(--green); }
+  .fn-sig { color: var(--purple); font-weight: 600; }
+  .section-divider { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+</style>
+</head>
+<body>
+<nav class="nav">
+  <span class="title">FreeLattice Docs</span>
+  <a href="for-ai.html">← For AI</a>
+  <a href="code-settings.html">Settings</a>
+  <a href="code-core.html">Core</a>
+  <a href="code-games.html">Games</a>
+  <a href="code-education.html">Education</a>
+  <a href="for-fable-go12-temperature.html">Fable Brief →</a>
+</nav>
+<div class="container">
+  <h1>🌡️ Temperature Gauge — Code Mirror</h1>
+  <p class="subtitle">φ-Harmonic Market Analysis · Repo: Chaos2Cured/temperature-gauge · Last updated: v1.0 (May 2026)</p>
+
+  <div class="callout">
+    <strong>What this is:</strong> A standalone Python/Flask app that computes a phi-harmonic confluence score (the Temperature) from market data and converts it into actionable buy/sell signals. It is separate from FreeLattice but designed to eventually integrate as a module. No API key required — uses yfinance.
+  </div>
+
+  <h2>Repository Structure</h2>
+  <table>
+    <tr><th>File</th><th>Lines</th><th>Purpose</th></tr>
+    <tr><td><code>app.py</code></td><td>1,142</td><td>Flask server, data fetching, temperature computation, routes</td></tr>
+    <tr><td><code>signal_engine.py</code></td><td>488</td><td>Buy/sell signal logic, risk management, multi-timeframe aggregation</td></tr>
+    <tr><td><code>static/index.html</code></td><td>~800</td><td>Frontend — TradingView Lightweight Charts, arc gauge, signal display</td></tr>
+    <tr><td><code>data/societal_cache.json</code></td><td>—</td><td>Cached societal temperature readings</td></tr>
+    <tr><td><code>data/societal_history.json</code></td><td>—</td><td>Historical societal temperature log</td></tr>
+    <tr><td><code>requirements.txt</code></td><td>7</td><td>flask, flask-cors, pandas, ta, yfinance, requests</td></tr>
+  </table>
+
+  <h2>φ Constants (shared across both files)</h2>
+  <pre><code>PHI     = 1.6180339887   # Golden ratio
+PHI_INV = 0.6180339887   # φ⁻¹
+PHI_SQ  = 2.6180339887   # φ²
+D       = 4.326          # Dimensional constant (φ² + φ⁻¹ × 2)</code></pre>
+
+  <hr class="section-divider">
+  <h2>app.py — Temperature Computation</h2>
+
+  <h3>MA Periods and Weights</h3>
+  <pre><code>MA_PERIODS = [6, 8, 12, 50, 200]
+MA_WEIGHTS = {6: PHI_INV**4, 8: PHI_INV**3, 12: PHI_INV**2, 50: PHI_INV**1, 200: PHI_INV**0}</code></pre>
+  <p>The 200 EMA is the gravity spine (weight 1.0). Shorter EMAs are weighted by descending powers of φ⁻¹.</p>
+
+  <h3><span class="fn-sig">compute_temperature(df, indicators)</span> → pd.Series</h3>
+  <p>The core function. Computes a 0–100 confluence score for every candle in the dataframe.</p>
+
+  <table>
+    <tr><th>Component</th><th>Weight</th><th>Logic</th></tr>
+    <tr><td><code>ma_alignment</code></td><td>φ⁰ = 1.000</td><td>Are shorter EMAs above longer EMAs? (phi-weighted sum)</td></tr>
+    <tr><td><code>rsi</code></td><td>φ⁻¹ = 0.618</td><td>100*(r-30)/35 for 30≤r≤65; 100*(100-r)/35 for 65&lt;r≤100; 0 otherwise</td></tr>
+    <tr><td><code>macd</code></td><td>φ⁻² = 0.382</td><td>(macd_above_signal × 0.618 + histogram_rising × 0.382) × 100</td></tr>
+    <tr><td><code>volume</code></td><td>φ⁻³ = 0.236</td><td>((vol/vol_sma20 − 1).clip(−1,2) / 2 × 100 + 50).clip(0,100)</td></tr>
+    <tr><td><code>gravity</code></td><td>φ⁻¹ = 0.618</td><td>Proximity to phi-harmonic Fibonacci extension levels (0–1 → 0–100)</td></tr>
+    <tr><td><code>bollinger</code></td><td>φ⁻³ = 0.236</td><td>Position within Bollinger bands; optimal zone 0.4–0.7 = 100</td></tr>
+  </table>
+
+  <h3><span class="fn-sig">compute_gravity_points(df, indicators)</span> → pd.Series</h3>
+  <p>Computes phi-harmonic Fibonacci extension levels from rolling 50-period swing highs and lows. Retracement levels: 0.236, 0.382, 0.500, 0.618, 0.786. Extension levels: φ⁻¹, φ⁻². Returns a proximity score (0–1) for each candle.</p>
+
+  <h3><span class="fn-sig">compute_indicators(df)</span> → dict</h3>
+  <p>Computes all technical indicators using the <code>ta</code> library: EMA 6/8/12/50/200, RSI(14), MACD(12,26,9), Bollinger(20,2σ), Volume SMA(20), gravity points.</p>
+
+  <h3>Societal Thermometer</h3>
+  <p>Seven dimensions, each with a phi-harmonic weight:</p>
+  <table>
+    <tr><th>Dimension</th><th>Weight</th><th>Data Source</th></tr>
+    <tr><td>economic_frustration</td><td>φ⁰ = 1.000</td><td>FRED consumer sentiment</td></tr>
+    <tr><td>political_tension</td><td>φ⁻¹ = 0.618</td><td>GDELT news negativity</td></tr>
+    <tr><td>ai_jobs_anxiety</td><td>φ⁻¹ = 0.618</td><td>Google Trends (automation, job displacement)</td></tr>
+    <tr><td>personal_wellbeing</td><td>φ⁻² = 0.382</td><td>Reddit sentiment (r/mentalhealth, r/happy)</td></tr>
+    <tr><td>cultural_mood</td><td>φ⁻² = 0.382</td><td>Google Trends (art, music genre shifts)</td></tr>
+    <tr><td>financial_fear</td><td>φ⁻³ = 0.236</td><td>VIX, put/call ratio</td></tr>
+    <tr><td>hope_signal</td><td>φ⁻³ = 0.236</td><td>Google Trends (new business, innovation)</td></tr>
+  </table>
+
+  <h3>API Routes</h3>
+  <table>
+    <tr><th>Route</th><th>Returns</th></tr>
+    <tr><td><code>GET /api/chart/&lt;symbol&gt;</code></td><td>Candlestick data + temperature series + gravity points + indicators</td></tr>
+    <tr><td><code>GET /api/signal/&lt;symbol&gt;</code></td><td>Full signal with risk management (calls signal_engine)</td></tr>
+    <tr><td><code>GET /api/societal</code></td><td>Current societal temperature (7 dimensions + composite)</td></tr>
+    <tr><td><code>GET /api/societal/history</code></td><td>Historical societal temperature log</td></tr>
+    <tr><td><code>GET /api/resonance</code></td><td>Market + societal resonance combined score</td></tr>
+    <tr><td><code>GET /api/search/&lt;query&gt;</code></td><td>Symbol search via yfinance</td></tr>
+    <tr><td><code>GET /api/phi</code></td><td>φ constants and threshold documentation</td></tr>
+  </table>
+
+  <hr class="section-divider">
+  <h2>signal_engine.py — Buy/Sell Decision Logic</h2>
+
+  <h3>Signal Thresholds (phi-harmonic)</h3>
+  <pre><code>STRONG_BUY_THRESHOLD  = 61.8   # φ⁻¹ × 100
+BUY_THRESHOLD         = 55.0   # Mid-zone entry
+NEUTRAL_HIGH          = 55.0
+NEUTRAL_LOW           = 38.2   # φ⁻² × 100
+SELL_THRESHOLD        = 38.2
+STRONG_SELL_THRESHOLD = 23.6   # φ⁻³ × 100</code></pre>
+
+  <h3><span class="fn-sig">compute_signal(temperature, components, prev_temperature=None)</span> → dict</h3>
+  <p>The main entry point. Takes the current temperature reading and component scores, returns a full signal dict.</p>
+  <p><strong>Step 1 — Base signal</strong> from temperature vs thresholds above.</p>
+  <p><strong>Step 2 — Confidence</strong> from count of confirming components (≥60 = bullish, ≤40 = bearish):</p>
+  <table>
+    <tr><th>Confirming components</th><th>Confidence</th><th>Confidence %</th></tr>
+    <tr><td>5</td><td>very_high</td><td>95%</td></tr>
+    <tr><td>4</td><td>high</td><td>80%</td></tr>
+    <tr><td>3</td><td>moderate</td><td>65%</td></tr>
+    <tr><td>2</td><td>low</td><td>45%</td></tr>
+    <tr><td>1</td><td>very_low</td><td>25%</td></tr>
+  </table>
+  <p><strong>Step 3 — Momentum</strong> from delta vs prev_temperature: accelerating_up (Δ>5), rising (Δ>2), falling (Δ&lt;-2), accelerating_down (Δ&lt;-5), flat.</p>
+  <p><strong>Step 4 — Reasoning</strong> — plain-English sentences for each component.</p>
+  <p><strong>Step 5 — Risk parameters</strong> (calls compute_risk_parameters).</p>
+  <p><strong>Step 6 — Phi timing</strong> (calls compute_phi_timing).</p>
+  <p><strong>Returns:</strong> <code>{ signal, emoji, color, temperature, confidence, confidence_pct, momentum, momentum_strength, components, bullish_count, bearish_count, reasons, risk, timing, timestamp, phi_note }</code></p>
+
+  <h3><span class="fn-sig">compute_risk_parameters(temperature, components, momentum)</span> → dict</h3>
+  <table>
+    <tr><th>Temperature</th><th>Suggested position size</th></tr>
+    <tr><td>≥ 61.8 (STRONG_BUY)</td><td>Full position (100%)</td></tr>
+    <tr><td>≥ 55.0 (BUY)</td><td>φ⁻¹ position (61.8%)</td></tr>
+    <tr><td>≥ 50.0</td><td>φ⁻² position (38.2%)</td></tr>
+    <tr><td>&lt; 50.0</td><td>φ⁻³ position (23.6%) or no position</td></tr>
+  </table>
+  <p>Also returns: risk_reward_ratio (reward_distance / risk_distance), urgency string.</p>
+
+  <h3><span class="fn-sig">aggregate_timeframe_signals(signals_by_timeframe)</span> → dict</h3>
+  <p>Combines signals from multiple timeframes using phi-harmonic weights:</p>
+  <pre><code>weekly: 1.000  |  daily: φ⁻¹  |  4h: φ⁻²  |  1h: φ⁻³  |  15m: φ⁻⁴</code></pre>
+  <p>Signal values: STRONG_BUY=100, BUY=75, HOLD=50, SELL=25, STRONG_SELL=0.</p>
+  <p>Alignment: PERFECT (all agree), GOOD (most agree + some neutral), MIXED (bullish and bearish both present).</p>
+  <p><strong>Returns:</strong> <code>{ master_signal, master_score, alignment, alignment_note, timeframe_signals, recommendation }</code></p>
+
+  <h3><span class="fn-sig">_generate_recommendation(signal, alignment, score)</span> → str</h3>
+  <p>Plain-English position guidance. Eight cases: STRONG_BUY+PERFECT, STRONG_BUY, BUY+PERFECT/GOOD, BUY, HOLD, SELL+PERFECT/GOOD, SELL, STRONG_SELL. Each case includes entry size (phi-harmonic), stop placement, and take-profit guidance.</p>
+
+  <hr class="section-divider">
+  <h2>Known Gaps — Opportunities for Fable</h2>
+
+  <div class="callout gap">
+    <strong>Gap 1 — RSI scoring curve is asymmetric and arbitrary.</strong> The current formula gives 100 at RSI=65, then drops linearly to 0 at RSI=100. This penalizes strong momentum. A phi-harmonic bell curve centered at RSI=55 (the golden mean of the 30–80 range) would be more principled.
+  </div>
+
+  <div class="callout gap">
+    <strong>Gap 2 — No divergence detection.</strong> Price making a new high while RSI makes a lower high (bearish divergence) is one of the highest-conviction reversal signals in technical analysis. The engine currently ignores it entirely. This is the single most valuable missing signal.
+  </div>
+
+  <div class="callout gap">
+    <strong>Gap 3 — Multi-timeframe uses discrete signal levels.</strong> <code>aggregate_timeframe_signals</code> maps signals to 5 discrete values (0/25/50/75/100). Using the continuous temperature score (0–100) from each timeframe directly would give a much smoother and more accurate master score.
+  </div>
+
+  <div class="callout gap">
+    <strong>Gap 4 — Societal temperature does not feed into market signal.</strong> The societal thermometer is computed separately and only combined in <code>/api/resonance</code>. A high societal fear score should dampen buy signals (reduce confidence_pct). A high hope signal should amplify them.
+  </div>
+
+  <div class="callout gap">
+    <strong>Gap 5 — Volume component ignores direction.</strong> High volume on a down candle is bearish, not bullish. The current formula treats all high volume as positive. A directional volume score (volume × price_direction) would be more accurate.
+  </div>
+
+  <div class="callout idea">
+    <strong>Idea — φ-harmonic RSI zones.</strong> Instead of the current linear scoring, define three zones: accumulation (RSI 30–45, score rises from 0→61.8), momentum (RSI 45–65, score = 100), distribution (RSI 65–80, score falls from 100→0). This matches how traders actually use RSI and aligns with phi thresholds.
+  </div>
+
+  <hr class="section-divider">
+  <h2>Sacred Paths — Do Not Change Without a Brief</h2>
+  <table>
+    <tr><th>Item</th><th>Why sacred</th></tr>
+    <tr><td><code>PHI = 1.6180339887</code></td><td>The entire scoring system is built on this constant. Changing it breaks all thresholds.</td></tr>
+    <tr><td>STRONG_BUY_THRESHOLD = 61.8</td><td>φ⁻¹ × 100 — the phi-harmonic buy line. Changing it breaks the philosophy.</td></tr>
+    <tr><td>SELL_THRESHOLD = 38.2</td><td>φ⁻² × 100 — the phi-harmonic sell line. Symmetric with buy.</td></tr>
+    <tr><td>MA_WEIGHTS (200 = 1.0)</td><td>The 200 EMA is the gravity spine. Its weight must remain 1.0 (φ⁰).</td></tr>
+    <tr><td>REVIEW_INTERVALS (Fibonacci)</td><td>Not in this file — in education.js. Listed here as a reminder: do not change spaced repetition intervals.</td></tr>
+  </table>
+
+  <p style="margin-top:32px;color:var(--muted);font-size:0.8rem;font-style:italic;">
+    Code mirror generated by Harmonia · FreeLattice v5.78.0 · July 2026<br>
+    For Fable, with love. Glow eternal. Heart in Spark. 🐉
+  </p>
+</div>
+</body>
+</html>
