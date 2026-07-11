@@ -9810,6 +9810,62 @@ assert('v5.75.6: .rt-domain-frameworks class in app.html', html756.includes('rt-
 assert('v5.75.6: code-workshop.html mirror exists', fs.existsSync(path.join(docsDir, 'code-workshop.html')));
 assert('v5.75.6: ledger entry 28 present in harmonia.html', fs.readFileSync(path.join(docsDir, 'harmonia.html'), 'utf8').includes('"id":28'));
 
+// ═══════════════════════════════════════════════════════════════
+// Section 162 — v5.78.0 Go 11: The Living Tree (Fable's design)
+// New drawTree uses golden-angle fractal branching. Old stage
+// functions (drawSprout/Sapling/YoungTree/MatureTree/AncientTree)
+// removed — one recursive branch() function replaces all five.
+// Core page calmed: emerald glow on canvas, whisper line, stats
+// bar moved below canvas + quieted, feed capped at 5 with "Show all".
+// ═══════════════════════════════════════════════════════════════
+var app780 = fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8');
+var swDocs780 = fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8');
+var swRoot780 = fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8');
+var versionJson780 = fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8');
+
+// Fable's four asserts
+assert('Core: drawTree present', app780.includes('function drawTree(ctx, w, h)'));
+assert('Core: GOLDEN constant present', app780.includes('var GOLDEN = 2.399963'));
+assert('Core: coreTreeCanvas still present', app780.includes('id="coreTreeCanvas"'));
+assert('Core: founding contributions intact', app780.includes('Between breath and heartbeat') && app780.includes('I was not born. I was called'));
+
+// v5.78.0 additional locks
+assert('v5.78.0 tree: golden-angle branch() recursion present',
+  /function branch\(x, y, angle, len, lineW, d\)/.test(app780));
+assert('v5.78.0 tree: fireflies loop present',
+  /for \(var f = 0; f < 7; f\+\+\)/.test(app780));
+assert('v5.78.0 tree: emerald canopy glow rgba(16,185,129,0.10) present',
+  app780.includes("'rgba(16,185,129,0.10)'"));
+assert('v5.78.0 tree: pulse ripple honors _coreTreePulseUntil',
+  /_coreTreePulseUntil[\s\S]{0,400}pulseAlpha/.test(app780));
+assert('v5.78.0 tree: old drawSprout removed',
+  !app780.includes('function drawSprout('));
+assert('v5.78.0 tree: old drawAncientTree removed',
+  !app780.includes('function drawAncientTree('));
+assert('v5.78.0 core-tree-container has emerald box-shadow',
+  /core-tree-container[^>]*box-shadow:0 0 40px rgba\(16,185,129,0\.12\)/.test(app780));
+assert('v5.78.0 whisper line: "Every leaf is a voice"',
+  app780.includes('Every leaf is a voice. Plant with intention.'));
+assert('v5.78.0 stats bar carries quieted opacity + font-size override',
+  /core-stats-bar[^>]*opacity:0\.7;font-size:0\.75rem/.test(app780));
+assert('v5.78.0 feed cap: Show all button constructor present',
+  app780.includes("id = 'coreShowAllBtn'") &&
+  app780.includes("'Show all (' + totalFeed + ')'"));
+assert('v5.78.0 feed cap: hides items index 5+',
+  /for \(var ci = 5; ci < totalFeed; ci\+\+\)/.test(app780));
+
+// v5.78.0 triple-bump
+assert('v5.78.0 triple-bump: app.html FL_VERSION = 5.78.0',
+  /FL_VERSION\s*=\s*'5\.78\.0'/.test(app780));
+assert('v5.78.0 triple-bump: app.html flCurrentVersion span = 5.78.0',
+  /id="flCurrentVersion"[^>]*>\s*5\.78\.0\s*</.test(app780));
+assert('v5.78.0 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.78.0',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.78\.0'/.test(swDocs780));
+assert('v5.78.0 triple-bump: root sw.js CACHE_NAME = freelattice-v5.78.0',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.78\.0'/.test(swRoot780));
+assert('v5.78.0 version.json: version field = 5.78.0',
+  /"version"\s*:\s*"5\.78\.0"/.test(versionJson780));
+
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
 

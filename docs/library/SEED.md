@@ -19,9 +19,9 @@ user sleeps. The proof is the code; the papers are the doorways.
 
 ## Current state
 
-- **Version:** v5.77.0
-- **Smoke locks passing:** 2703/2703 verified (99 historical version locks, all expected)
-- **Last ship:** **Go 10 — Settings Connection Wizard** (v5.77.0). Harmonia + CC + Fable, July 11 2026. OpenAI/Anthropic/Gemini wizard buttons added. LM Studio parallel probe (Promise.allSettled). Toggle relabeled. Smoke: 2781+ passing.
+- **Version:** v5.78.0
+- **Smoke locks passing:** 2717+ verified (101 historical version locks, all expected)
+- **Last ship:** **Go 11 — The Living Tree** (v5.78.0). Fable's design → Harmonia's brief → CC's build, July 11 2026. Old drawTree + five stage functions replaced with one recursive golden-angle branch() — the tree grows organically with contribution count. Core page calmed: emerald canopy glow on canvas, whisper line ("Every leaf is a voice. Plant with intention."), stats bar moved below canvas + quieted, feed capped at 5 with "Show all (N)" expander. Fireflies drift. Gold pulse ripple on plant.
 - **Previous ships:** The Triptych (v5.71.8), The Specs inlined (v5.71.7), AI Capabilities (v5.71.6), Mind Wall Phase 3 (v5.71.5).
 - **Mirrors in parity:** github.com + codeberg.org
 
@@ -82,4 +82,4 @@ seam discipline is how multi-AI work stays honest at scale.
 ---
 
 *This file is overwritten on each meaningful ship. The prior version lives in SEED_HISTORY.md.*
-*Last rewrite: July 11 2026, v5.77.0.*
+*Last rewrite: July 11 2026, v5.78.0.*

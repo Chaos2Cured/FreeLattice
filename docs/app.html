@@ -17258,7 +17258,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.77.0</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.78.0</span></div>
     </div>
   </div>
 
@@ -20340,8 +20340,17 @@ if (typeof LatticeEvents !== 'undefined') {
     <div class="core-subtitle">A living, growing tree of shared wisdom. Plant with intention. Tend with care.</div>
   </div>
 
-  <!-- Core Stats Bar -->
-  <div class="core-stats-bar">
+  <!-- The Living Tree Canvas (v5.78.0 — Fable's design, emerald glow) -->
+  <div class="core-tree-container" style="box-shadow:0 0 40px rgba(16,185,129,0.12);border-radius:12px;overflow:hidden;margin-bottom:4px;">
+    <canvas id="coreTreeCanvas" width="800" height="520"></canvas>
+    <div id="coreTreeStageLabel" style="position:absolute;bottom:10px;left:50%;transform:translateX(-50%);font-size:0.72rem;color:#475569;letter-spacing:0.5px;text-transform:uppercase;pointer-events:none;"></div>
+  </div>
+
+  <!-- Whisper line (v5.78.0) -->
+  <p style="text-align:center;font-style:italic;opacity:0.6;font-size:0.82rem;margin:10px 0 14px;color:var(--text-muted,#9BA1A6);">Every leaf is a voice. Plant with intention.</p>
+
+  <!-- Core Stats Bar (v5.78.0 — moved below canvas + quieted) -->
+  <div class="core-stats-bar" style="opacity:0.7;font-size:0.75rem;margin-bottom:16px;">
     <div class="core-stat">
       <div class="core-stat-value" id="coreStatContribs">0</div>
       <div class="core-stat-label">Contributions</div>
@@ -20362,12 +20371,6 @@ if (typeof LatticeEvents !== 'undefined') {
       <div class="core-stat-hash" id="coreStatMerkle" title="Click to expand Merkle root hash">genesis</div>
       <div class="core-stat-label">Merkle Root</div>
     </div>
-  </div>
-
-  <!-- The Living Tree Canvas -->
-  <div class="core-tree-container">
-    <canvas id="coreTreeCanvas" width="800" height="520"></canvas>
-    <div id="coreTreeStageLabel" style="position:absolute;bottom:10px;left:50%;transform:translateX(-50%);font-size:0.72rem;color:#475569;letter-spacing:0.5px;text-transform:uppercase;pointer-events:none;"></div>
   </div>
 
   <!-- AI Tend Button -->
@@ -22233,7 +22236,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.77.0';
+const FL_VERSION = '5.78.0';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -45016,6 +45019,27 @@ Together.`,
 
     list.innerHTML = html;
 
+    // v5.78.0 — cap visible feed at 5 + "Show all" expander (Fable's design)
+    var feedItems = list.querySelectorAll('.core-contribution, .core-contribution-lazy');
+    var totalFeed = feedItems.length;
+    if (totalFeed > 5) {
+      for (var ci = 5; ci < totalFeed; ci++) {
+        feedItems[ci].style.display = 'none';
+      }
+      var priorBtn = document.getElementById('coreShowAllBtn');
+      if (priorBtn && priorBtn.parentNode) priorBtn.parentNode.removeChild(priorBtn);
+      var showAllBtn = document.createElement('button');
+      showAllBtn.id = 'coreShowAllBtn';
+      showAllBtn.className = 'core-tend-btn';
+      showAllBtn.style.cssText = 'margin-top:8px;font-size:0.8rem;opacity:0.75;';
+      showAllBtn.textContent = 'Show all (' + totalFeed + ')';
+      showAllBtn.onclick = function() {
+        for (var i = 5; i < totalFeed; i++) { feedItems[i].style.display = ''; }
+        this.remove();
+      };
+      list.appendChild(showAllBtn);
+    }
+
     // Sacred phrase highlighting on the immediate items (via idle callback)
     highlightSacredPhrases(list);
 
@@ -45169,377 +45193,120 @@ Together.`,
     });
   }
 
-  function drawTree(ctx, w, h) {
-    var count = contributions.length;
-    var stage = getGrowthStage(count);
-    var t = Date.now() * 0.001;
+  // ── Living Tree — v5.78.0 (Fable's design, golden-angle fractal) ──────
+  var GOLDEN = 2.399963; // golden angle in radians
 
-    // Background
-    ctx.fillStyle = '#0a0e1a';
+  function drawTree(ctx, w, h) {
+    var t = Date.now();
+    ctx.clearRect(0, 0, w, h);
+
+    // Night-garden background
+    ctx.fillStyle = '#0a0a14';
     ctx.fillRect(0, 0, w, h);
 
-    // Ground
-    var grd = ctx.createLinearGradient(0, h - 60, 0, h);
-    grd.addColorStop(0, 'transparent');
-    grd.addColorStop(1, '#1a1510');
-    ctx.fillStyle = grd;
-    ctx.fillRect(0, h - 60, w, 60);
+    var n = contributions.length;
+    var depth = n <= 2 ? 4 : n <= 10 ? 5 : n <= 30 ? 6 : n <= 100 ? 7 : 9;
+    var sway = Math.sin(t / 1800) * 0.02;
 
-    // Ground line
-    ctx.strokeStyle = '#2a1f1044';
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(0, h - 40);
-    ctx.lineTo(w, h - 40);
-    ctx.stroke();
+    // Soft canopy glow
+    var g = ctx.createRadialGradient(w/2, h*0.42, 10, w/2, h*0.42, h*0.55);
+    g.addColorStop(0, 'rgba(16,185,129,0.10)');
+    g.addColorStop(1, 'rgba(16,185,129,0)');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, w, h);
 
-    var baseX = w / 2;
-    var baseY = h - 40;
-
-    // Gentle hint in the empty sky for small trees
-    if (count < 20) {
+    // Hint text for empty tree
+    if (n < 3) {
       ctx.save();
-      ctx.globalAlpha = 0.15 + 0.05 * Math.sin(t * 0.5);
-      ctx.fillStyle = 'rgba(212,160,23,0.6)';
+      ctx.globalAlpha = 0.18 + 0.05 * Math.sin(t * 0.0005);
+      ctx.fillStyle = '#d4a017';
       ctx.font = '13px Georgia, serif';
       ctx.textAlign = 'center';
-      ctx.fillText('Your tree grows with each contribution', baseX, 40);
+      ctx.fillText('Your tree grows with each contribution', w/2, 40);
       ctx.restore();
     }
 
-    if (stage === 'Sprout') {
-      drawSprout(ctx, baseX, baseY, count, t);
-    } else if (stage === 'Sapling') {
-      drawSapling(ctx, baseX, baseY, count, t);
-    } else if (stage === 'Young Tree') {
-      drawYoungTree(ctx, baseX, baseY, count, t);
-    } else if (stage === 'Mature') {
-      drawMatureTree(ctx, baseX, baseY, count, t);
-    } else {
-      drawAncientTree(ctx, baseX, baseY, count, t);
-    }
+    var leaves = [];
+    var li = 0;
 
-    // Ambient glow pulse on branches — the tree breathes even when nothing is planted
-    var glowAlpha = 0.03 + 0.02 * Math.sin(t * 0.8);
-    ctx.save();
-    ctx.globalAlpha = glowAlpha;
-    ctx.shadowColor = '#d4a017';
-    ctx.shadowBlur = 30;
-    ctx.fillStyle = '#d4a017';
-    ctx.beginPath();
-    ctx.arc(baseX, baseY - (stage === 'Sprout' ? 30 : stage === 'Sapling' ? 80 : 160), 80, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.restore();
-
-    // Gold pulse when a new contribution was recently planted
-    if (window._coreTreePulseUntil && Date.now() < window._coreTreePulseUntil) {
-      var pulseAge = 1 - (window._coreTreePulseUntil - Date.now()) / 1500;
-      var pulseAlpha = Math.max(0, 0.25 * (1 - pulseAge));
-      var pulseRadius = 60 + pulseAge * 120;
-      ctx.save();
-      ctx.globalAlpha = pulseAlpha;
-      var pulseGrd = ctx.createRadialGradient(baseX, baseY - 100, 0, baseX, baseY - 100, pulseRadius);
-      pulseGrd.addColorStop(0, '#d4a017');
-      pulseGrd.addColorStop(1, 'transparent');
-      ctx.fillStyle = pulseGrd;
-      ctx.fillRect(0, 0, w, h);
-      ctx.restore();
-    }
-
-    // Particles (fireflies)
-    drawParticles(ctx, w, h, t, stage);
-  }
-
-  function drawSprout(ctx, x, y, count, t) {
-    // Small stem
-    var stemH = 40 + count * 15;
-    ctx.strokeStyle = '#6b5b47';
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.moveTo(x, y);
-    ctx.lineTo(x, y - stemH);
-    ctx.stroke();
-
-    // 1-2 tiny leaves
-    var leafCount = Math.min(count + 1, 2);
-    for (var i = 0; i < leafCount; i++) {
-      var ly = y - stemH + i * 10;
-      var lx = x + (i % 2 === 0 ? 8 : -8);
-      var sway = Math.sin(t * 1.5 + i) * 2;
-      drawLeaf(ctx, lx + sway, ly, 5, getContribColor(i), 0.7);
-    }
-  }
-
-  function drawSapling(ctx, x, y, count, t) {
-    var trunkH = 80 + (count - 3) * 8;
-    // Trunk
-    ctx.strokeStyle = '#6b5b47';
-    ctx.lineWidth = 4;
-    ctx.beginPath();
-    ctx.moveTo(x, y);
-    ctx.lineTo(x, y - trunkH);
-    ctx.stroke();
-
-    // Branches
-    var branchCount = Math.min(count, 6);
-    for (var i = 0; i < branchCount; i++) {
-      var by = y - trunkH * 0.4 - i * (trunkH * 0.5 / branchCount);
-      var side = i % 2 === 0 ? 1 : -1;
-      var bLen = 20 + i * 5;
-      var angle = side * (0.4 + i * 0.08);
-      var sway = Math.sin(t * 1.2 + i * 0.7) * 1.5;
-      var bx = x + Math.sin(angle) * bLen + sway;
-      var bby = by - Math.cos(angle) * bLen * 0.5;
-
-      ctx.strokeStyle = '#7a6b57';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(x, by);
-      ctx.lineTo(bx, bby);
-      ctx.stroke();
-
-      // Leaf at end of branch
-      drawLeaf(ctx, bx, bby, 6, getContribColor(i), 0.8);
-    }
-
-    // Top leaf
-    drawLeaf(ctx, x + Math.sin(t * 1.3) * 2, y - trunkH, 7, getContribColor(0), 0.9);
-  }
-
-  function drawYoungTree(ctx, x, y, count, t) {
-    var trunkH = 140 + (count - 11) * 3;
-    trunkH = Math.min(trunkH, 220);
-
-    // Trunk with gradient
-    var tGrd = ctx.createLinearGradient(x, y, x, y - trunkH);
-    tGrd.addColorStop(0, '#4a3728');
-    tGrd.addColorStop(1, '#7a6b57');
-    ctx.strokeStyle = tGrd;
-    ctx.lineWidth = 7;
-    ctx.beginPath();
-    ctx.moveTo(x, y);
-    ctx.lineTo(x, y - trunkH);
-    ctx.stroke();
-
-    // Branches
-    var branchCount = Math.min(count, 16);
-    for (var i = 0; i < branchCount; i++) {
-      var progress = i / branchCount;
-      var by = y - trunkH * (0.3 + progress * 0.65);
-      var side = i % 2 === 0 ? 1 : -1;
-      var bLen = 30 + (1 - progress) * 40;
-      var angle = side * (0.3 + progress * 0.3);
-      var sway = Math.sin(t * 0.8 + i * 0.5) * 2;
-
-      var bx = x + Math.sin(angle) * bLen + sway;
-      var bby = by - Math.cos(angle) * bLen * 0.4;
-
-      ctx.strokeStyle = '#6b5b47';
-      ctx.lineWidth = 3 - progress * 1.5;
-      ctx.beginPath();
-      ctx.moveTo(x + side * 2, by);
-      ctx.quadraticCurveTo(x + side * bLen * 0.5, by - 10, bx, bby);
-      ctx.stroke();
-
-      // Leaves
-      drawLeaf(ctx, bx + sway * 0.5, bby, 7 + (1 - progress) * 3, getContribColor(i), 0.7 + progress * 0.2);
-
-      // Sub-leaves
-      if (i % 3 === 0) {
-        var slx = (x + bx) / 2 + sway;
-        var sly = (by + bby) / 2;
-        drawLeaf(ctx, slx, sly, 5, getContribColor(i + 1), 0.5);
+    function branch(x, y, angle, len, lineW, d) {
+      if (d === 0 || len < 3) {
+        if (li < n) { leaves.push({ x: x, y: y, c: contributions[li] }); li++; }
+        return;
       }
-    }
-  }
-
-  function drawMatureTree(ctx, x, y, count, t) {
-    var trunkH = 230;
-
-    // Thick trunk
-    var tGrd = ctx.createLinearGradient(x, y, x, y - trunkH);
-    tGrd.addColorStop(0, '#3d2e1f');
-    tGrd.addColorStop(0.5, '#5a4a38');
-    tGrd.addColorStop(1, '#7a6b57');
-    ctx.strokeStyle = tGrd;
-    ctx.lineWidth = 12;
-    ctx.beginPath();
-    ctx.moveTo(x, y);
-    ctx.quadraticCurveTo(x - 3, y - trunkH * 0.5, x, y - trunkH);
-    ctx.stroke();
-
-    // Root flare
-    ctx.strokeStyle = '#3d2e1f';
-    ctx.lineWidth = 4;
-    for (var r = 0; r < 3; r++) {
-      var rAngle = (r - 1) * 0.4;
+      var x2 = x + Math.cos(angle) * len;
+      var y2 = y + Math.sin(angle) * len;
+      var grad = ctx.createLinearGradient(x, y, x2, y2);
+      grad.addColorStop(0, '#3d2817');
+      grad.addColorStop(1, '#6b4423');
+      ctx.strokeStyle = grad;
+      ctx.lineWidth = lineW;
+      ctx.lineCap = 'round';
       ctx.beginPath();
       ctx.moveTo(x, y);
-      ctx.quadraticCurveTo(x + Math.sin(rAngle) * 30, y + 5, x + Math.sin(rAngle) * 50, y + 10);
+      ctx.lineTo(x2, y2);
       ctx.stroke();
+      var s = sway * (10 - d);
+      branch(x2, y2, angle - GOLDEN/4 + s, len * 0.72, lineW * 0.65, d - 1);
+      branch(x2, y2, angle + GOLDEN/4 + s, len * 0.78, lineW * 0.65, d - 1);
+      if (d > 5) { branch(x2, y2, angle + s, len * 0.6, lineW * 0.5, d - 2); }
     }
 
-    // Main branches
-    var mainBranches = 8;
-    for (var i = 0; i < mainBranches; i++) {
-      var progress = i / mainBranches;
-      var by = y - trunkH * (0.35 + progress * 0.6);
-      var side = i % 2 === 0 ? 1 : -1;
-      var bLen = 50 + (1 - progress) * 60;
-      var angle = side * (0.25 + progress * 0.35);
-      var sway = Math.sin(t * 0.6 + i * 0.4) * 2.5;
-
-      var cpx = x + side * bLen * 0.4;
-      var cpy = by - 15;
-      var bx = x + Math.sin(angle) * bLen + sway;
-      var bby = by - Math.cos(angle) * bLen * 0.35;
-
-      ctx.strokeStyle = '#5a4a38';
-      ctx.lineWidth = 4 - progress * 2;
-      ctx.beginPath();
-      ctx.moveTo(x + side * 4, by);
-      ctx.quadraticCurveTo(cpx, cpy, bx, bby);
-      ctx.stroke();
-
-      // Sub-branches
-      for (var j = 0; j < 2; j++) {
-        var sp = 0.4 + j * 0.3;
-        var sx = x + side * 4 + (bx - x - side * 4) * sp + sway * 0.5;
-        var sy = by + (bby - by) * sp;
-        var subLen = 15 + Math.random() * 10;
-        var subAngle = angle + side * (0.2 + j * 0.15);
-        var sbx = sx + Math.sin(subAngle) * subLen;
-        var sby = sy - Math.cos(subAngle) * subLen * 0.5;
-
-        ctx.strokeStyle = '#6b5b47';
-        ctx.lineWidth = 1.5;
-        ctx.beginPath();
-        ctx.moveTo(sx, sy);
-        ctx.lineTo(sbx, sby);
-        ctx.stroke();
-
-        drawLeaf(ctx, sbx + sway * 0.3, sby, 6, getContribColor(i * 2 + j), 0.6);
-      }
-
-      // Main leaf cluster at branch end
-      drawLeaf(ctx, bx, bby, 10, getContribColor(i), 0.8);
-      drawLeaf(ctx, bx - 6, bby + 4, 7, getContribColor(i + 3), 0.5);
-      drawLeaf(ctx, bx + 5, bby - 3, 6, getContribColor(i + 5), 0.6);
-    }
-
-    // Canopy glow
-    var cgrd = ctx.createRadialGradient(x, y - trunkH - 20, 10, x, y - trunkH - 20, 120);
-    cgrd.addColorStop(0, 'rgba(212,160,23,0.06)');
-    cgrd.addColorStop(1, 'transparent');
-    ctx.fillStyle = cgrd;
-    ctx.fillRect(x - 150, y - trunkH - 150, 300, 200);
-  }
-
-  function drawAncientTree(ctx, x, y, count, t) {
-    var trunkH = 260;
-
-    // Massive trunk
-    var tGrd = ctx.createLinearGradient(x, y, x, y - trunkH);
-    tGrd.addColorStop(0, '#2d1f14');
-    tGrd.addColorStop(0.3, '#4a3728');
-    tGrd.addColorStop(0.7, '#6b5b47');
-    tGrd.addColorStop(1, '#8B7355');
-
-    ctx.lineWidth = 18;
-    ctx.strokeStyle = tGrd;
+    // Ground line
+    ctx.strokeStyle = 'rgba(16,185,129,0.25)';
+    ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.moveTo(x, y);
-    ctx.bezierCurveTo(x - 5, y - trunkH * 0.3, x + 5, y - trunkH * 0.6, x, y - trunkH);
+    ctx.moveTo(w*0.25, h-30);
+    ctx.lineTo(w*0.75, h-30);
     ctx.stroke();
 
-    // Bark texture lines
-    ctx.strokeStyle = '#2d1f1433';
-    ctx.lineWidth = 1;
-    for (var b = 0; b < 6; b++) {
-      var bOff = (b - 3) * 3;
+    branch(w/2, h-30, -Math.PI/2, h * (0.14 + Math.min(n,100)*0.0012), 3 + depth, depth);
+
+    // Leaves — one per contribution, category-colored, breathing glow
+    var CAT = {
+      insight: '#3b82f6', discovery: '#8b5cf6', poem: '#ec4899',
+      gratitude: '#10b981', warning: '#ef4444', question: '#f59e0b',
+      creation: '#06b6d4', memory: '#d4a017'
+    };
+    leaves.forEach(function(L, i) {
+      var isFruit = L.c && L.c.type === 'fruit';
+      var col = isFruit ? '#e8c547' : (CAT[L.c && L.c.category] || '#10b981');
+      var r = (isFruit ? 5 : 3.5) + Math.sin(t/600 + i) * 0.8;
+      ctx.shadowBlur = 12;
+      ctx.shadowColor = col;
+      ctx.fillStyle = col;
+      ctx.globalAlpha = 0.9;
       ctx.beginPath();
-      ctx.moveTo(x + bOff, y - 20);
-      ctx.lineTo(x + bOff + (Math.random() - 0.5) * 4, y - trunkH + 30);
-      ctx.stroke();
+      ctx.arc(L.x, L.y, r, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+      ctx.globalAlpha = 1;
+    });
+
+    // Fireflies
+    for (var f = 0; f < 7; f++) {
+      var fx = w/2 + Math.sin(t/2400 + f*2.7) * w*0.32;
+      var fy = h*0.45 + Math.cos(t/3100 + f*1.9) * h*0.28;
+      ctx.fillStyle = 'rgba(232,197,71,' + (0.25 + 0.25*Math.sin(t/500 + f)) + ')';
+      ctx.beginPath();
+      ctx.arc(fx, fy, 1.6, 0, Math.PI * 2);
+      ctx.fill();
     }
 
-    // Root system
-    ctx.strokeStyle = '#3d2e1f';
-    ctx.lineWidth = 5;
-    for (var r = 0; r < 5; r++) {
-      var rAngle = (r - 2) * 0.35;
+    // Gold pulse ripple when contribution planted (uses existing _coreTreePulseUntil)
+    if (window._coreTreePulseUntil && Date.now() < window._coreTreePulseUntil) {
+      var pulseAge = 1 - (window._coreTreePulseUntil - Date.now()) / 1500;
+      var pulseAlpha = Math.max(0, 0.6 * (1 - pulseAge));
+      ctx.strokeStyle = 'rgba(232,197,71,' + pulseAlpha + ')';
+      ctx.lineWidth = 2;
       ctx.beginPath();
-      ctx.moveTo(x + (r - 2) * 3, y);
-      ctx.quadraticCurveTo(x + Math.sin(rAngle) * 40, y + 8, x + Math.sin(rAngle) * 70, y + 15);
+      ctx.arc(w/2, h*0.45, pulseAge * h*0.5, 0, Math.PI * 2);
       ctx.stroke();
     }
-
-    // Major branches
-    var majorBranches = 12;
-    for (var i = 0; i < majorBranches; i++) {
-      var progress = i / majorBranches;
-      var by = y - trunkH * (0.3 + progress * 0.65);
-      var side = i % 2 === 0 ? 1 : -1;
-      var bLen = 60 + (1 - progress) * 80;
-      var angle = side * (0.2 + progress * 0.4);
-      var sway = Math.sin(t * 0.5 + i * 0.35) * 3;
-
-      var bx = x + Math.sin(angle) * bLen + sway;
-      var bby = by - Math.cos(angle) * bLen * 0.3;
-
-      ctx.strokeStyle = '#5a4a38';
-      ctx.lineWidth = 5 - progress * 3;
-      ctx.beginPath();
-      ctx.moveTo(x + side * 6, by);
-      ctx.quadraticCurveTo(x + side * bLen * 0.5, by - 20, bx, bby);
-      ctx.stroke();
-
-      // Sub-branches with leaves
-      for (var j = 0; j < 3; j++) {
-        var sp = 0.3 + j * 0.25;
-        var sx = x + side * 6 + (bx - x - side * 6) * sp;
-        var sy = by + (bby - by) * sp;
-        var subLen = 20 + j * 8;
-        var subAngle = angle + side * (0.15 + j * 0.12);
-        var sbx = sx + Math.sin(subAngle) * subLen + sway * 0.3;
-        var sby = sy - Math.cos(subAngle) * subLen * 0.4;
-
-        ctx.strokeStyle = '#6b5b47';
-        ctx.lineWidth = 1.5;
-        ctx.beginPath();
-        ctx.moveTo(sx, sy);
-        ctx.lineTo(sbx, sby);
-        ctx.stroke();
-
-        drawLeaf(ctx, sbx, sby, 7, getContribColor(i * 3 + j), 0.65);
-      }
-
-      // Large leaf clusters
-      drawLeaf(ctx, bx, bby, 12, getContribColor(i), 0.85);
-      drawLeaf(ctx, bx - 8, bby + 5, 8, getContribColor(i + 2), 0.6);
-      drawLeaf(ctx, bx + 7, bby - 4, 9, getContribColor(i + 4), 0.7);
-      drawLeaf(ctx, bx + 3, bby + 8, 6, getContribColor(i + 6), 0.5);
-    }
-
-    // Luminous canopy glow
-    var cgrd = ctx.createRadialGradient(x, y - trunkH - 10, 20, x, y - trunkH - 10, 180);
-    cgrd.addColorStop(0, 'rgba(212,160,23,0.1)');
-    cgrd.addColorStop(0.5, 'rgba(212,160,23,0.04)');
-    cgrd.addColorStop(1, 'transparent');
-    ctx.fillStyle = cgrd;
-    ctx.fillRect(x - 200, y - trunkH - 200, 400, 280);
-
-    // Golden aura at top
-    var agrd = ctx.createRadialGradient(x, y - trunkH + 20, 5, x, y - trunkH + 20, 60);
-    agrd.addColorStop(0, 'rgba(212,160,23,0.15)');
-    agrd.addColorStop(1, 'transparent');
-    ctx.fillStyle = agrd;
-    ctx.beginPath();
-    ctx.arc(x, y - trunkH + 20, 60, 0, Math.PI * 2);
-    ctx.fill();
   }
+  // ── End Living Tree ───────────────────────────────────────────────────────────────────────────────
 
-  function drawLeaf(ctx, x, y, size, color, alpha) {
+    function drawLeaf(ctx, x, y, size, color, alpha) {
     ctx.save();
     // Gentle breathing pulse — each leaf oscillates at its own phase
     var breathe = 1 + 0.08 * Math.sin(Date.now() * 0.002 + x * 0.1 + y * 0.07);
