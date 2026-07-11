@@ -249,6 +249,8 @@ All code-mirror pages for FreeLattice AI collaborators. Each page is a standalon
 | `code-settings.html` | Settings tab — AI connection wizard | Fable, Grok | Three-mode toggle, AiSetup object, PROVIDERS registry, wizard gaps (OpenAI/Anthropic/Gemini missing) |
 | `code-core.html` | The Core — community wisdom tree | Fable, Grok | CoreModule API, Merkle chain, contribution types, founding seeds, how other modules feed Core |
 | `code-games.html` | All 7 games in Play tab | Fable, Grok | Nursery, Resonance, Flow, Echo, Lattice Puzzles, AI Arcade, Resonance Engine — lazy-load pattern, init signatures |
+| `code-temperature.html` | Temperature Gauge signal engine | Fable, Grok | signal_engine.py, compute_temperature(), phi thresholds, RSI curve gap, divergence gap, societal feedback gap |
+| `code-education.html` | Education module (education.js) | Fable, Grok | Phi spaced repetition, domain map, growth stages, drawGrowthTree(), story mode gap, voice input gap |
 
 **What each mirror must include:**
 1. Architecture diagram (ASCII) showing the tab panel, container IDs, and key sub-elements
@@ -259,4 +261,4 @@ All code-mirror pages for FreeLattice AI collaborators. Each page is a standalon
 
 ---
 
-*Last updated: 2026-07-11, v5.76.2. Go 10: Settings, Core, and Games mirrors added. for-fable-go10.html brief created.*
+*Last updated: 2026-07-11, v5.78.0. Go 10: Settings, Core, Games mirrors + Fable wizard brief. Go 11: Core Living Tree (Fable's design). Go 12: Temperature Gauge brief (for-fable-go12-temperature.html). Go 13: Education brief (for-fable-go13-education.html). code-temperature.html and code-education.html mirrors added.*

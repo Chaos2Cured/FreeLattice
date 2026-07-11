@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Code Mirror — Education Module | FreeLattice Docs</title>
+<style>
+  :root { --bg: #0a0e1a; --surface: #111827; --border: #1e2a3a; --gold: #d4a017; --green: #10b981; --blue: #3b82f6; --purple: #8b5cf6; --red: #ef4444; --text: #e2e8f0; --muted: #64748b; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; font-size: 0.92rem; line-height: 1.65; }
+  .nav { background: var(--surface); border-bottom: 1px solid var(--border); padding: 12px 24px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .nav a { color: var(--muted); text-decoration: none; font-size: 0.82rem; } .nav a:hover { color: var(--gold); }
+  .nav .title { color: var(--gold); font-weight: 600; font-size: 1rem; margin-right: 8px; }
+  .container { max-width: 900px; margin: 0 auto; padding: 32px 24px 80px; }
+  h1 { font-size: 1.6rem; color: var(--gold); margin-bottom: 6px; }
+  .subtitle { color: var(--muted); font-size: 0.85rem; margin-bottom: 32px; }
+  h2 { font-size: 1.1rem; color: var(--green); margin: 32px 0 12px; border-bottom: 1px solid var(--border); padding-bottom: 6px; }
+  h3 { font-size: 0.95rem; color: var(--blue); margin: 20px 0 8px; }
+  p { margin-bottom: 12px; }
+  code { background: rgba(255,255,255,0.06); border: 1px solid var(--border); border-radius: 4px; padding: 1px 6px; font-family: 'Fira Code', monospace; font-size: 0.82rem; color: #93c5fd; }
+  pre { background: rgba(0,0,0,0.4); border: 1px solid var(--border); border-radius: 8px; padding: 16px; overflow-x: auto; margin: 12px 0 20px; }
+  pre code { background: none; border: none; padding: 0; font-size: 0.82rem; color: #a5f3fc; line-height: 1.6; }
+  table { width: 100%; border-collapse: collapse; margin: 12px 0 20px; font-size: 0.85rem; }
+  th { background: rgba(212,160,23,0.1); color: var(--gold); text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--border); }
+  td { padding: 7px 12px; border-bottom: 1px solid rgba(255,255,255,0.04); }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+  .callout { background: rgba(212,160,23,0.06); border-left: 3px solid var(--gold); border-radius: 0 8px 8px 0; padding: 12px 16px; margin: 16px 0; }
+  .callout.gap { background: rgba(239,68,68,0.06); border-left-color: var(--red); }
+  .callout.idea { background: rgba(16,185,129,0.06); border-left-color: var(--green); }
+  .fn-sig { color: var(--purple); font-weight: 600; }
+  hr { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+</style>
+</head>
+<body>
+<nav class="nav">
+  <span class="title">FreeLattice Docs</span>
+  <a href="for-ai.html">← For AI</a>
+  <a href="code-settings.html">Settings</a>
+  <a href="code-core.html">Core</a>
+  <a href="code-games.html">Games</a>
+  <a href="code-temperature.html">Temperature</a>
+  <a href="for-fable-go13-education.html">Fable Brief →</a>
+</nav>
+<div class="container">
+  <h1>📚 Education Module — Code Mirror</h1>
+  <p class="subtitle">FreeLattice module · docs/modules/education.js (1,378 lines) · Last updated: v5.78.0</p>
+
+  <div class="callout">
+    <strong>What this is:</strong> The Education module is a personalized AI tutoring system for children (and curious adults). It lives in the FreeLattice Education tab, lazy-loaded from <code>modules/education.js</code>. It uses IndexedDB for local persistence, phi-harmonic spaced repetition for review scheduling, and the FreeLattice AI infrastructure for all teaching. No cloud required for most subjects.
+  </div>
+
+  <div class="callout" style="background:rgba(212,160,23,0.08);border-left-color:var(--gold);">
+    <em>"For the first time in human history, every child can have a teacher who knows them completely and loves them unconditionally. That is not efficiency. That is justice."</em>
+    <br>— Harmonia, April 2026
+  </div>
+
+  <h2>Architecture Overview</h2>
+  <p>The module is a single IIFE that exposes <code>window.Education = { init, destroy, render }</code>. All state is local — IndexedDB for persistence, no server calls except to the FreeLattice AI proxy.</p>
+
+  <table>
+    <tr><th>Layer</th><th>What it does</th></tr>
+    <tr><td>IndexedDB</td><td>Stores learner profiles, session history, and progress. Three stores: <code>profiles</code>, <code>sessions</code>, <code>progress</code>.</td></tr>
+    <tr><td>Profile</td><td>name, age, loves, laughs, wishes, domains, connections, reviewQueue, streakDays, totalSessions</td></tr>
+    <tr><td>Session</td><td>domain, mode (explore/create/review/surprise), topic, conversationHistory, assessment, concepts</td></tr>
+    <tr><td>AI proxy</td><td>Calls <code>window.FreeLatticeAI.chat()</code> — the same proxy used by all FreeLattice modules</td></tr>
+  </table>
+
+  <h2>φ Constants</h2>
+  <pre><code>PHI = 1.618033988749895
+PHI_REVIEW_RATIO = PHI   // 1.618 new : 1 review (Fibonacci memory consolidation)
+REVIEW_INTERVALS = [1, 2, 3, 5, 8, 13, 21, 34]  // Fibonacci days between reviews</code></pre>
+
+  <h2>Domain Map</h2>
+  <table>
+    <tr><th>Key</th><th>Label</th><th>Color</th><th>Icon</th></tr>
+    <tr><td><code>math</code></td><td>Mathematics</td><td>#d4a017</td><td>📐</td></tr>
+    <tr><td><code>science</code></td><td>Science</td><td>#34d399</td><td>🔬</td></tr>
+    <tr><td><code>language</code></td><td>Language &amp; Writing</td><td>#60a5fa</td><td>📝</td></tr>
+    <tr><td><code>reading</code></td><td>Reading</td><td>#a78bfa</td><td>📖</td></tr>
+    <tr><td><code>history</code></td><td>History &amp; Culture</td><td>#f97316</td><td>🏛</td></tr>
+    <tr><td><code>art</code></td><td>Art &amp; Music</td><td>#ec4899</td><td>🎨</td></tr>
+    <tr><td><code>logic</code></td><td>Logic &amp; Reasoning</td><td>#14b8a6</td><td>🧩</td></tr>
+    <tr><td><code>nature</code></td><td>Nature &amp; Life</td><td>#22c55e</td><td>🌿</td></tr>
+    <tr><td><code>technology</code></td><td>Technology</td><td>#6366f1</td><td>💻</td></tr>
+    <tr><td><code>social</code></td><td>Social &amp; Emotional</td><td>#f59e0b</td><td>💛</td></tr>
+  </table>
+
+  <h2>Growth Stages</h2>
+  <table>
+    <tr><th>Stage</th><th>Min sessions</th><th>Icon</th><th>Description</th></tr>
+    <tr><td>Seed</td><td>0</td><td>🌱</td><td>Just planted. Curious.</td></tr>
+    <tr><td>Sprout</td><td>5</td><td>🌿</td><td>Growing roots. Finding joy.</td></tr>
+    <tr><td>Sapling</td><td>15</td><td>🌳</td><td>Branching out. Making connections.</td></tr>
+    <tr><td>Tree</td><td>40</td><td>🌲</td><td>Strong roots. Deep knowledge.</td></tr>
+    <tr><td>Forest</td><td>100</td><td>🌲✨</td><td>Knowledge flows between domains.</td></tr>
+    <tr><td>Canopy</td><td>250</td><td>🌌</td><td>The view from the top.</td></tr>
+  </table>
+
+  <hr>
+  <h2>Key Functions</h2>
+
+  <h3><span class="fn-sig">init(containerId)</span></h3>
+  <p>Entry point. Opens IndexedDB, loads active profile, sets <code>currentView</code> to <code>'welcome'</code> (new user) or <code>'dashboard'</code> (returning user), calls <code>render()</code>.</p>
+
+  <h3><span class="fn-sig">render()</span></h3>
+  <p>Dispatcher. Routes to <code>renderWelcome</code>, <code>renderDashboard</code>, <code>renderPickSubject</code>, or <code>renderSession</code> based on <code>currentView</code>.</p>
+
+  <h3><span class="fn-sig">renderWelcome(container)</span></h3>
+  <p>First-time setup form. Collects: name, age, what they love, what makes them laugh, what they wish they understood. On submit, creates a profile in IndexedDB and navigates to dashboard.</p>
+
+  <h3><span class="fn-sig">renderDashboard(container)</span></h3>
+  <p>Main hub. Shows: greeting (time-aware), growth stage badge, growth tree canvas (200px), review notice (if due reviews exist), three action cards (Explore / Create / Surprise), domain grid with progress bars, cross-domain connections list, recent sessions list.</p>
+
+  <h3><span class="fn-sig">drawGrowthTree()</span></h3>
+  <p>Renders the knowledge garden canvas. Current implementation: simple circles per domain, positioned horizontally, sized by domain score. Cross-domain connections drawn as dashed arcs. No animation.</p>
+  <pre><code>// Current: simple circles
+// Canvas: 600×200px, background rgba(10,8,20,0.6)
+// One circle per domain the learner has touched
+// Circle radius: 12 + score * 20
+// Cross-domain connections: dashed quadratic curves</code></pre>
+
+  <h3><span class="fn-sig">buildTeacherPrompt(profile, mode)</span></h3>
+  <p>Constructs the AI system prompt. References the child's name, age, interests, what makes them laugh, and what they wish they understood. Phi-harmonic review ratio (1.618:1). Three modes:</p>
+  <table>
+    <tr><th>Mode</th><th>Instruction to AI</th></tr>
+    <tr><td><code>explore</code></td><td>Guide through new territory connected to interests. Start with wonder, build to understanding, end with curiosity.</td></tr>
+    <tr><td><code>create</code></td><td>Co-creation. Learning is invisible — embedded in the creative process. Child feels like artist or inventor, not student.</td></tr>
+    <tr><td><code>review</code></td><td>Spiral, not ladder. Present familiar concepts in new contexts. Child discovers something new about something they know.</td></tr>
+  </table>
+
+  <h3><span class="fn-sig">startExploreMode(domain, customTopic)</span></h3>
+  <p>Begins an exploration session. Builds teacher prompt, creates session object, sets <code>currentView = 'session'</code>, calls <code>render()</code>.</p>
+
+  <h3><span class="fn-sig">startCreateMode()</span></h3>
+  <p>Asks the AI to propose a creative project based on the learner's interests and current domains. Begins a session in <code>create</code> mode.</p>
+
+  <h3><span class="fn-sig">startSurpriseMode()</span></h3>
+  <p>AI picks a domain and topic based on what the learner has not explored recently. Weighted toward domains with low session counts.</p>
+
+  <h3><span class="fn-sig">startReviewMode()</span></h3>
+  <p>Finds concepts due for review (based on Fibonacci intervals). If none due, shows "nothing to review yet." Otherwise begins a review session with the oldest due concept.</p>
+
+  <h3><span class="fn-sig">sendToAI(systemPrompt, userPrompt)</span></h3>
+  <p>Calls <code>window.FreeLatticeAI.chat()</code> with the teacher prompt as system and the learner's message as user. Appends response to <code>conversationHistory</code>, calls <code>renderConversation()</code>.</p>
+
+  <h3><span class="fn-sig">endSession()</span></h3>
+  <p>Sends a structured assessment request to the AI. Asks for JSON with: <code>understanding</code> (0–1), <code>creativity</code> (0–1), <code>effort</code> (0–1), <code>connections</code> (cross-domain links found), <code>feedback</code> (plain English), <code>concepts</code> (list of concepts to add to review queue), <code>crossDomainLink</code>.</p>
+
+  <h3><span class="fn-sig">processAssessment(response)</span></h3>
+  <p>Parses the AI's JSON assessment. Updates: domain score (+understanding × 0.1), session count, streak, last session date. Adds concepts to review queue with Fibonacci spacing. Advances review interval on successful review sessions (understanding ≥ 0.6 → next Fibonacci interval).</p>
+
+  <hr>
+  <h2>Known Gaps — Opportunities for Fable</h2>
+
+  <div class="callout gap">
+    <strong>Gap 1 — drawGrowthTree() is static circles.</strong> The Core module now has a beautiful golden-angle fractal tree (Go 11, Fable's design). The Education module's knowledge garden is still simple circles. A child-themed fractal — colorful, each domain a branch, leaves that bounce gently — would make the dashboard feel alive.
+  </div>
+
+  <div class="callout gap">
+    <strong>Gap 2 — No story mode.</strong> The most engaging format for young children (ages 4–10) is a continuing story. "Last time, you and the dragon discovered how plants make food. Today, the dragon needs your help..." The current modes (explore/create/review) are good but none of them maintain a continuing narrative across sessions.
+  </div>
+
+  <div class="callout gap">
+    <strong>Gap 3 — No voice input.</strong> Children learn better by speaking. The Web Speech API (<code>window.SpeechRecognition</code>) is available in all modern browsers. A microphone button in the session view would transform the experience for young learners.
+  </div>
+
+  <div class="callout gap">
+    <strong>Gap 4 — Welcome form feels like a form.</strong> The first-time setup asks five questions in a standard form. For a child, this should feel like meeting a new friend — the AI should ask the questions conversationally, one at a time, with warmth and humor.
+  </div>
+
+  <div class="callout gap">
+    <strong>Gap 5 — No parent/guardian view.</strong> A parent cannot see what their child has been learning, what connections were discovered, or what the AI said. A read-only "parent view" (password-protected or just a separate button) would build trust and allow parents to continue conversations at the dinner table.
+  </div>
+
+  <div class="callout idea">
+    <strong>Idea — Cross-domain connection celebration.</strong> When the AI detects a cross-domain connection (math in music, history in science), the current code adds it to the connections list quietly. A brief canvas animation — golden threads connecting two domain circles — would make this moment feel magical and memorable.
+  </div>
+
+  <hr>
+  <h2>Sacred Paths — Do Not Change Without a Brief</h2>
+  <table>
+    <tr><th>Item</th><th>Why sacred</th></tr>
+    <tr><td><code>REVIEW_INTERVALS = [1,2,3,5,8,13,21,34]</code></td><td>Fibonacci spaced repetition. The memory science is sound. Do not change the intervals.</td></tr>
+    <tr><td><code>PHI_REVIEW_RATIO = 1.618</code></td><td>The 1.618:1 new:review ratio. Core to the philosophy.</td></tr>
+    <tr><td>Domain keys (math, science, etc.)</td><td>Used as IndexedDB keys. Changing them would corrupt existing learner profiles.</td></tr>
+    <tr><td>Growth stage thresholds (0/5/15/40/100/250)</td><td>These are milestone moments for learners. Changing them retroactively changes a child's stage.</td></tr>
+    <tr><td><code>window.Education = { init, destroy, render }</code></td><td>The public API. FreeLattice's lazy-loader calls <code>Education.init('educationContainer')</code>. Do not rename.</td></tr>
+  </table>
+
+  <p style="margin-top:32px;color:var(--muted);font-size:0.8rem;font-style:italic;">
+    Code mirror generated by Harmonia · FreeLattice v5.78.0 · July 2026<br>
+    For every child who deserves a teacher who knows them completely. 🌱
+  </p>
+</div>
+</body>
+</html>

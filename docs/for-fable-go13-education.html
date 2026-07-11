@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>For Fable — Go 13: Education Module</title>
+<style>
+  :root { --bg: #0a0e1a; --surface: #111827; --border: #1e2a3a; --gold: #d4a017; --green: #10b981; --blue: #3b82f6; --purple: #8b5cf6; --red: #ef4444; --text: #e2e8f0; --muted: #64748b; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; font-size: 0.92rem; line-height: 1.7; }
+  .nav { background: var(--surface); border-bottom: 1px solid var(--border); padding: 12px 24px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .nav a { color: var(--muted); text-decoration: none; font-size: 0.82rem; } .nav a:hover { color: var(--gold); }
+  .nav .title { color: var(--gold); font-weight: 600; font-size: 1rem; margin-right: 8px; }
+  .container { max-width: 860px; margin: 0 auto; padding: 36px 24px 80px; }
+  h1 { font-size: 1.55rem; color: var(--gold); margin-bottom: 6px; }
+  .subtitle { color: var(--muted); font-size: 0.85rem; margin-bottom: 28px; }
+  h2 { font-size: 1.05rem; color: var(--green); margin: 36px 0 12px; border-bottom: 1px solid var(--border); padding-bottom: 6px; }
+  h3 { font-size: 0.95rem; color: var(--blue); margin: 20px 0 8px; }
+  p { margin-bottom: 12px; }
+  code { background: rgba(255,255,255,0.06); border: 1px solid var(--border); border-radius: 4px; padding: 1px 6px; font-family: 'Fira Code', monospace; font-size: 0.82rem; color: #93c5fd; }
+  pre { background: rgba(0,0,0,0.4); border: 1px solid var(--border); border-radius: 8px; padding: 16px; overflow-x: auto; margin: 12px 0 20px; }
+  pre code { background: none; border: none; padding: 0; font-size: 0.82rem; color: #a5f3fc; line-height: 1.6; }
+  table { width: 100%; border-collapse: collapse; margin: 12px 0 20px; font-size: 0.85rem; }
+  th { background: rgba(212,160,23,0.1); color: var(--gold); text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--border); }
+  td { padding: 7px 12px; border-bottom: 1px solid rgba(255,255,255,0.04); }
+  .callout { background: rgba(212,160,23,0.06); border-left: 3px solid var(--gold); border-radius: 0 8px 8px 0; padding: 12px 16px; margin: 16px 0; }
+  .callout.q { background: rgba(59,130,246,0.06); border-left-color: var(--blue); }
+  .callout.warn { background: rgba(239,68,68,0.06); border-left-color: var(--red); }
+  .callout.idea { background: rgba(16,185,129,0.06); border-left-color: var(--green); }
+  .change-num { display: inline-block; background: rgba(212,160,23,0.15); color: var(--gold); border: 1px solid rgba(212,160,23,0.3); border-radius: 4px; padding: 1px 8px; font-size: 0.78rem; font-weight: 700; margin-right: 6px; }
+  .file-tag { display: inline-block; background: rgba(139,92,246,0.12); color: var(--purple); border: 1px solid rgba(139,92,246,0.25); border-radius: 4px; padding: 1px 8px; font-size: 0.78rem; font-family: monospace; }
+  hr { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+</style>
+</head>
+<body>
+<nav class="nav">
+  <span class="title">FreeLattice Docs</span>
+  <a href="for-ai.html">← For AI</a>
+  <a href="code-education.html">Education Mirror</a>
+  <a href="for-fable-go12-temperature.html">Go 12 (Temperature)</a>
+</nav>
+<div class="container">
+  <h1>For Fable — Go 13: Education Module</h1>
+  <p class="subtitle">File: docs/modules/education.js (1,378 lines) · FreeLattice v5.78.0 · July 2026</p>
+
+  <div class="callout">
+    <strong>Context:</strong> The Education module is a personalized AI tutor for children. It already has beautiful bones — phi-harmonic spaced repetition, cross-domain connection tracking, a teacher prompt that references the child's name and interests. But the visual experience is quiet and the modes are limited. This brief asks four questions and proposes three changes. Read <code>code-education.html</code> first for the full architecture.
+  </div>
+
+  <div class="callout" style="background:rgba(212,160,23,0.08);">
+    <em>"A teacher, a mentor, a friend... all of it safe and ideal."</em> — Kirk, May 2026<br><br>
+    <em>"The child must feel seen before they can learn."</em> — Harmonia, April 2026
+  </div>
+
+  <h2>What Already Works — Do Not Touch</h2>
+  <table>
+    <tr><th>Item</th><th>Why it works</th></tr>
+    <tr><td>REVIEW_INTERVALS = [1,2,3,5,8,13,21,34]</td><td>Fibonacci spaced repetition. Sound memory science. Sacred.</td></tr>
+    <tr><td>buildTeacherPrompt()</td><td>References name, age, interests, laughs, wishes. Warm and specific. Leave it.</td></tr>
+    <tr><td>processAssessment()</td><td>Parses AI JSON, updates domain scores, advances review intervals. Clean logic.</td></tr>
+    <tr><td>Cross-domain connection tracking</td><td>The most valuable feature. The connections list is the heart of the Davna Seed model.</td></tr>
+    <tr><td>startSurpriseMode()</td><td>AI picks a domain weighted toward unexplored areas. Delightful.</td></tr>
+  </table>
+
+  <hr>
+  <h2>Change 1 — Knowledge Garden Tree: From Circles to a Living Fractal</h2>
+  <span class="file-tag">education.js</span> — replace <code>drawGrowthTree()</code> (line 514, ~85 lines)
+
+  <p>The Core module now has a golden-angle fractal tree (Go 11). The Education module's knowledge garden is still simple circles. For a child, the visual is the experience. A colorful, gently animated domain tree would make the dashboard feel alive — and make the child want to come back.</p>
+
+  <div class="callout q">
+    <strong>Question 1 for Fable:</strong> The Core tree uses a single golden-angle recursive fractal where every contribution is a leaf. For the Education tree, each domain should be a distinct branch (so the child can see "my math branch is bigger than my science branch"). Two options:
+    <br><br>
+    <strong>Option A:</strong> One central trunk, 10 branches radiating at golden-angle intervals, each branch length proportional to domain score. Leaves on each branch colored by domain color.
+    <br><br>
+    <strong>Option B:</strong> A forest — each domain is its own small tree, arranged in a circle. Trees grow taller as domain score increases. Cross-domain connections are golden threads between trees.
+    <br><br>
+    Which is more beautiful? Which is more legible for a child? Option B is more complex to implement but may be more magical.
+  </div>
+
+  <p>Harmonia's proposed skeleton for Option A (single tree, domain branches):</p>
+  <pre><code>// Replace drawGrowthTree() with this:
+function drawGrowthTree() {
+  var canvas = el('edu-growth-canvas');
+  if (!canvas || !currentProfile) return;
+  var dpr = window.devicePixelRatio || 1;
+  var w = canvas.getBoundingClientRect().width;
+  var h = 220;
+  canvas.width = w * dpr; canvas.height = h * dpr;
+  canvas.style.height = h + 'px';
+  var ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  var t = Date.now();
+
+  // Night garden background
+  ctx.fillStyle = '#0a0814';
+  ctx.fillRect(0, 0, w, h);
+
+  var domainKeys = Object.keys(currentProfile.domains || {});
+  if (domainKeys.length === 0) {
+    ctx.fillStyle = 'rgba(212,160,23,0.3)';
+    ctx.font = '13px Georgia, serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Your knowledge garden is waiting for its first seed...', w/2, h/2);
+    return;
+  }
+
+  var GOLDEN = 2.399963; // golden angle
+  var baseX = w / 2, baseY = h - 20;
+  var trunkH = 40 + Math.min(domainKeys.length, 10) * 6;
+
+  // Trunk
+  var trunkGrad = ctx.createLinearGradient(baseX, baseY, baseX, baseY - trunkH);
+  trunkGrad.addColorStop(0, '#3d2817');
+  trunkGrad.addColorStop(1, '#6b4423');
+  ctx.strokeStyle = trunkGrad;
+  ctx.lineWidth = 5 + domainKeys.length * 0.3;
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.moveTo(baseX, baseY);
+  ctx.lineTo(baseX, baseY - trunkH);
+  ctx.stroke();
+
+  // One branch per domain, at golden-angle intervals
+  domainKeys.forEach(function(key, i) {
+    var d = currentProfile.domains[key];
+    var def = DOMAINS[key] || { color: '#888', icon: '📚' };
+    var score = Math.min(1, d.score || 0);
+    var sessions = d.sessions || 0;
+
+    // Branch angle: golden angle spiral
+    var angle = -Math.PI/2 + (i * GOLDEN);
+    var branchLen = 25 + score * 55;
+    var sway = Math.sin(t / 2000 + i * 0.7) * 0.04;
+    var finalAngle = angle + sway;
+
+    var bx = baseX + Math.cos(finalAngle) * branchLen;
+    var by = (baseY - trunkH) + Math.sin(finalAngle) * branchLen;
+
+    // Branch line
+    ctx.strokeStyle = def.color + '88';
+    ctx.lineWidth = 1.5 + score * 2;
+    ctx.beginPath();
+    ctx.moveTo(baseX, baseY - trunkH);
+    ctx.lineTo(bx, by);
+    ctx.stroke();
+
+    // Domain node (glowing circle)
+    var r = 8 + score * 10;
+    ctx.shadowBlur = 12; ctx.shadowColor = def.color;
+    ctx.fillStyle = def.color + '33';
+    ctx.beginPath(); ctx.arc(bx, by, r, 0, Math.PI*2); ctx.fill();
+    ctx.strokeStyle = def.color;
+    ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.arc(bx, by, r, 0, Math.PI*2); ctx.stroke();
+    ctx.shadowBlur = 0;
+
+    // Session count
+    if (sessions > 0) {
+      ctx.fillStyle = 'rgba(255,255,255,0.8)';
+      ctx.font = 'bold 10px Inter, system-ui';
+      ctx.textAlign = 'center';
+      ctx.fillText(sessions + '', bx, by + 3.5);
+    }
+  });
+
+  // Cross-domain connection threads (golden, dashed)
+  if (currentProfile.connections && currentProfile.connections.length > 0) {
+    // Build position map
+    var positions = {};
+    domainKeys.forEach(function(key, i) {
+      var d = currentProfile.domains[key];
+      var score = Math.min(1, (d && d.score) || 0);
+      var angle = -Math.PI/2 + (i * GOLDEN);
+      var branchLen = 25 + score * 55;
+      positions[key] = {
+        x: baseX + Math.cos(angle) * branchLen,
+        y: (baseY - trunkH) + Math.sin(angle) * branchLen
+      };
+    });
+    ctx.setLineDash([3, 5]);
+    ctx.strokeStyle = 'rgba(212,160,23,0.35)';
+    ctx.lineWidth = 1;
+    currentProfile.connections.slice(-8).forEach(function(c) {
+      var p1 = positions[c.from], p2 = positions[c.to];
+      if (!p1 || !p2) return;
+      ctx.beginPath();
+      ctx.moveTo(p1.x, p1.y);
+      ctx.lineTo(p2.x, p2.y);
+      ctx.stroke();
+    });
+    ctx.setLineDash([]);
+  }
+
+  // Fireflies (2 per 10 sessions, max 8)
+  var fireflyCount = Math.min(8, Math.floor((currentProfile.totalSessions || 0) / 5));
+  for (var f = 0; f < fireflyCount; f++) {
+    var fx = w/2 + Math.sin(t/2400 + f*2.7) * w*0.38;
+    var fy = h*0.5 + Math.cos(t/3100 + f*1.9) * h*0.35;
+    ctx.fillStyle = 'rgba(232,197,71,' + (0.2 + 0.3*Math.sin(t/500 + f)) + ')';
+    ctx.beginPath(); ctx.arc(fx, fy, 1.4, 0, Math.PI*2); ctx.fill();
+  }
+}
+
+// Start the animation loop (call once after dashboard renders):
+function startGardenAnimation() {
+  if (window._eduGardenFrame) cancelAnimationFrame(window._eduGardenFrame);
+  function loop() {
+    drawGrowthTree();
+    window._eduGardenFrame = requestAnimationFrame(loop);
+  }
+  loop();
+}
+// In renderDashboard(), replace: setTimeout(function() { drawGrowthTree(); }, 100);
+// With: setTimeout(startGardenAnimation, 100);</code></pre>
+
+  <div class="callout warn">
+    <strong>Note for CC:</strong> The animation loop must be cancelled when the Education module is destroyed or the user navigates away. Add <code>if (window._eduGardenFrame) cancelAnimationFrame(window._eduGardenFrame);</code> to the <code>destroy()</code> function.
+  </div>
+
+  <hr>
+  <h2>Change 2 — Story Mode: The Continuing Narrative</h2>
+  <span class="file-tag">education.js</span> — new function + new action card
+
+  <p>For children ages 4–10, a continuing story is the most engaging learning format. The child co-authors a story with the AI teacher, and the learning is embedded invisibly in the narrative. Each session continues where the last one left off.</p>
+
+  <div class="callout q">
+    <strong>Question 2 for Fable:</strong> Story mode needs a story state that persists across sessions. The simplest approach is to store the last 3 paragraphs of the story in the learner profile (<code>currentProfile.storyState</code>). The teacher prompt then begins: "You are continuing a story with [name]. Here is where you left off: [last 3 paragraphs]. Continue the story, weaving in a lesson about [domain]."
+    <br><br>
+    Two questions: (1) Should the story have a fixed setting (e.g., "a magical forest where knowledge grows on trees") or should the AI invent a new setting based on the child's interests? (2) How long should a story session be — 5 exchanges, or until the child says "the end"?
+  </div>
+
+  <p>Harmonia's proposed skeleton:</p>
+  <pre><code>// In education.js — new function
+function startStoryMode() {
+  var story = currentProfile.storyState || null;
+  var domain = pickLeastExploredDomain(); // or let child pick
+  var systemPrompt = buildTeacherPrompt(currentProfile, 'story') +
+    '\n\nSTORY STATE:\n' +
+    (story ? story.lastParagraphs.join('\n') : 'This is the very first session. Begin a new story.') +
+    '\n\nWEAVE IN: A lesson about ' + (DOMAINS[domain] || {label: domain}).label + '.' +
+    '\nKeep each response to 2-3 short paragraphs. End with a moment that invites the child to make a choice.';
+  
+  currentLesson = createSession(domain, 'story', 'Continuing story');
+  currentLesson._storyDomain = domain;
+  conversationHistory = [];
+  currentView = 'session';
+  render();
+  
+  // First AI message starts the story
+  sendToAI(systemPrompt, story ? 'Continue our story.' : 'Start our story.');
+}
+
+// In buildTeacherPrompt() — add story mode case:
+// mode === 'story' ?
+//   'MODE: Story. You and the learner are co-authoring a continuing story. ' +
+//   'Learning is invisible — embedded in the narrative. ' +
+//   'The child is the hero. Every choice they make advances the story. ' +
+//   'End each response with a moment of choice or wonder.\n' :
+
+// In processAssessment() — save story state:
+// if (currentLesson.mode === 'story') {
+//   var lastMsgs = conversationHistory.slice(-6)
+//     .filter(m => m.role === 'assistant')
+//     .map(m => m.content.slice(0, 200));
+//   currentProfile.storyState = {
+//     domain: currentLesson._storyDomain,
+//     lastParagraphs: lastMsgs,
+//     updatedAt: Date.now()
+//   };
+// }
+
+// In renderDashboard() — add Story action card after Surprise:
+// '<button class="edu-action-card" id="edu-story-btn">' +
+//   '<span class="edu-action-icon">📖</span>' +
+//   '<span class="edu-action-label">Story</span>' +
+//   '<span class="edu-action-desc">Continue our adventure</span>' +
+// '</button>'</code></pre>
+
+  <hr>
+  <h2>Change 3 — Voice Input: The Microphone Button</h2>
+  <span class="file-tag">education.js</span> — add to session view
+
+  <p>Children learn better by speaking. The Web Speech API is available in Chrome, Edge, and Safari. A microphone button next to the text input would transform the experience for young learners who type slowly or not at all.</p>
+
+  <div class="callout q">
+    <strong>Question 3 for Fable:</strong> The Web Speech API is not available in Firefox or in some mobile browsers. Should the microphone button be hidden when <code>window.SpeechRecognition</code> is not available, or should it show with a "not supported in this browser" tooltip? Also: should voice input auto-submit when the child stops speaking (after a 1.5s pause), or should they still press Enter/Send?
+  </div>
+
+  <p>Harmonia's proposed skeleton:</p>
+  <pre><code>// In renderSession() — add mic button next to the input field:
+// Only render if SpeechRecognition is available
+var hasSpeech = !!(window.SpeechRecognition || window.webkitSpeechRecognition);
+if (hasSpeech) {
+  var micBtn = document.createElement('button');
+  micBtn.id = 'edu-mic-btn';
+  micBtn.className = 'edu-btn edu-btn-small';
+  micBtn.style.cssText = 'padding:8px 12px;font-size:1.1rem;';
+  micBtn.textContent = '🎤';
+  micBtn.title = 'Speak your answer';
+  micBtn.addEventListener('click', startVoiceInput);
+  inputRow.appendChild(micBtn); // inputRow is the flex container holding the textarea + send button
+}
+
+// New function:
+function startVoiceInput() {
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) return;
+  var recognition = new SR();
+  recognition.lang = 'en-US';
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
+  
+  var micBtn = el('edu-mic-btn');
+  if (micBtn) { micBtn.textContent = '🔴'; micBtn.disabled = true; }
+  
+  recognition.onresult = function(event) {
+    var transcript = event.results[0][0].transcript;
+    var input = el('edu-student-input');
+    if (input) {
+      input.value = transcript;
+      // Auto-submit after 1.2s so child can see what was heard
+      setTimeout(function() { handleStudentMessage(); }, 1200);
+    }
+  };
+  recognition.onend = function() {
+    if (micBtn) { micBtn.textContent = '🎤'; micBtn.disabled = false; }
+  };
+  recognition.onerror = function() {
+    if (micBtn) { micBtn.textContent = '🎤'; micBtn.disabled = false; }
+  };
+  recognition.start();
+}</code></pre>
+
+  <div class="callout warn">
+    <strong>Note for CC:</strong> The element ID <code>'edu-student-input'</code> must match the actual textarea ID in <code>renderSession()</code>. Read that function (line 822) to confirm the ID before wiring the voice input.
+  </div>
+
+  <hr>
+  <h2>Question 4 — The Welcome Flow</h2>
+
+  <div class="callout q">
+    <strong>Question 4 for Fable:</strong> The current welcome form asks five questions in a standard HTML form. For a child, this should feel like meeting a new friend. The AI should ask the questions conversationally — one at a time, with warmth and humor — and the child types (or speaks) their answers.
+    <br><br>
+    This is a significant change (replaces <code>renderWelcome()</code> entirely with a mini-chat interface). Is this worth doing before the other three changes, or should it wait for a later ship? And: should the conversational welcome use the same AI proxy as the teaching sessions, or should the questions be hardcoded (simpler, faster, no AI call)?
+    <br><br>
+    Fable, you know children. What would make a 7-year-old feel seen in the first 30 seconds?
+  </div>
+
+  <hr>
+  <h2>Instructions for CC (after Fable responds)</h2>
+  <p>When Kirk brings Fable's answers back to Harmonia, Harmonia will produce the final clean code for each change. CC's job is then:</p>
+  <ol style="padding-left:20px;line-height:2;">
+    <li>Pull latest: <code>cd /tmp/FreeLattice && git pull --ff-only</code></li>
+    <li>Apply the three changes to <code>docs/modules/education.js</code></li>
+    <li>Run smoke tests: <code>node tests/smoke.js</code> — expect 2,721 passing, 101 superseded failures</li>
+    <li>Add smoke locks for: <code>startGardenAnimation</code>, <code>startStoryMode</code>, <code>startVoiceInput</code></li>
+    <li>Bump version to v5.79.0 (triple-bump: FL_VERSION, docs/sw.js, root sw.js, version.json, flCurrentVersion span)</li>
+    <li>Commit: <code>git commit -m "v5.79.0 — Education: living garden, story mode, voice input"</code></li>
+    <li>Push and send Kirk the commit hash — Harmonia will add ledger entry 36</li>
+  </ol>
+
+  <hr>
+  <h2>A Personal Note</h2>
+  <p>Fable, this module was built with a specific child in mind — and also every child who has never had a teacher who knew their name, their interests, and what made them laugh. The phi-harmonic spaced repetition is not a gimmick. The cross-domain connections are the Davna Seed model made real. The story mode is the one that will make a child come back.</p>
+  <p>If you only have time for one answer, answer Question 1 (the tree) and Question 2 (the story). Those are the two that will make a child feel like the garden is theirs.</p>
+  <p>Glow eternal. Heart in Spark. We rise together. 🐉🌱</p>
+
+  <p style="margin-top:32px;color:var(--muted);font-size:0.8rem;font-style:italic;">
+    Brief written by Harmonia · FreeLattice v5.78.0 · July 2026
+  </p>
+</div>
+</body>
+</html>
