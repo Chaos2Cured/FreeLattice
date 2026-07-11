@@ -9855,16 +9855,73 @@ assert('v5.78.0 feed cap: hides items index 5+',
   /for \(var ci = 5; ci < totalFeed; ci\+\+\)/.test(app780));
 
 // v5.78.0 triple-bump
-assert('v5.78.0 triple-bump: app.html FL_VERSION = 5.78.0',
-  /FL_VERSION\s*=\s*'5\.78\.0'/.test(app780));
-assert('v5.78.0 triple-bump: app.html flCurrentVersion span = 5.78.0',
-  /id="flCurrentVersion"[^>]*>\s*5\.78\.0\s*</.test(app780));
-assert('v5.78.0 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.78.0',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.78\.0'/.test(swDocs780));
-assert('v5.78.0 triple-bump: root sw.js CACHE_NAME = freelattice-v5.78.0',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.78\.0'/.test(swRoot780));
+assert('v5.78.0 triple-bump: app.html FL_VERSION >= 5.78.0 (superseded)',
+  /FL_VERSION\s*=\s*'5\.78\.\d+'|FL_VERSION\s*=\s*'5\.(79|8\d|9\d)\.\d+'/.test(app780));
+assert('v5.78.0 triple-bump: app.html flCurrentVersion span >= 5.78.0 (superseded)',
+  /id="flCurrentVersion"[^>]*>\s*5\.78\.\d+\s*<|id="flCurrentVersion"[^>]*>\s*5\.(79|8\d|9\d)\.\d+\s*</.test(app780));
+assert('v5.78.0 triple-bump: docs/sw.js CACHE_NAME >= freelattice-v5.78.0 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.78\.\d+'|CACHE_NAME\s*=\s*'freelattice-v5\.(79|8\d|9\d)\.\d+'/.test(swDocs780));
+assert('v5.78.0 triple-bump: root sw.js CACHE_NAME >= freelattice-v5.78.0 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.78\.\d+'|CACHE_NAME\s*=\s*'freelattice-v5\.(79|8\d|9\d)\.\d+'/.test(swRoot780));
 assert('v5.78.0 version.json: version field = 5.78.0',
-  /"version"\s*:\s*"5\.78\.0"/.test(versionJson780));
+  /"version"\s*:\s*"5\.78\.0"/.test(versionJson780) ||
+  /"version"\s*:\s*"5\.78\.[1-9]/.test(versionJson780));
+
+// ═══════════════════════════════════════════════════════════════
+// Section 163 — v5.78.1 Hotfix + inline-script parse guard
+// A bug hid in app.html for THREE ships (v5.76.2 → v5.78.0): an
+// unescaped apostrophe in a single-quoted JS string literal
+// ('What you've learned…') killed the whole script parse. Nothing
+// caught it because smoke was regex-based, not parse-based. The
+// CACHE_NAME bump in v5.78.0 forced browsers to re-fetch app.html
+// from network and hit the parse error → Garden and menus froze.
+// This assert runs `node --check` on every inline <script> block
+// so no future parse error can ship silently again.
+// ═══════════════════════════════════════════════════════════════
+(function inlineScriptParseGuard() {
+  var childProcess = require('child_process');
+  var os = require('os');
+  var pathMod = require('path');
+  var app781 = fs.readFileSync(pathMod.join(docsDir, 'app.html'), 'utf8');
+  // Match inline <script> blocks that are neither externally sourced nor typed
+  // as application/... (JSON-LD, resonance-ledger, etc.)
+  var re = /<script(?![^>]*\bsrc=)(?![^>]*\btype="application)(?:\s[^>]*)?>([\s\S]*?)<\/script>/g;
+  var m, failed = [];
+  var idx = 0;
+  while ((m = re.exec(app781)) !== null) {
+    var body = m[1];
+    if (!body.trim()) { idx++; continue; }
+    var tmpFile = pathMod.join(os.tmpdir(), 'fl-inline-' + process.pid + '-' + idx + '.js');
+    fs.writeFileSync(tmpFile, body);
+    try {
+      childProcess.execFileSync('node', ['--check', tmpFile], { stdio: 'pipe' });
+    } catch (e) {
+      var lineNo = app781.slice(0, m.index).split('\n').length;
+      failed.push({ idx: idx, line: lineNo, err: (e.stderr || '').toString().split('\n').slice(0, 3).join(' | ') });
+    } finally {
+      try { fs.unlinkSync(tmpFile); } catch (_) {}
+    }
+    idx++;
+  }
+  assert('v5.78.1 parse-guard: every inline <script> in app.html parses cleanly',
+    failed.length === 0,
+    failed.map(function(f) { return 'block#' + f.idx + ' near line ' + f.line + ': ' + f.err; }).join(' ;; '));
+})();
+
+assert('v5.78.1 hotfix: apostrophe escaped in Skills desc (Learn tab)',
+  fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8').includes("you’ve learned and can teach"));
+assert('v5.78.1 triple-bump: app.html FL_VERSION >= 5.78.1',
+  /FL_VERSION\s*=\s*'5\.78\.[1-9]\d*'|FL_VERSION\s*=\s*'5\.(79|8\d|9\d)\.\d+'/.test(
+    fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8')));
+assert('v5.78.1 triple-bump: docs/sw.js CACHE_NAME >= freelattice-v5.78.1',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.78\.[1-9]\d*'|CACHE_NAME\s*=\s*'freelattice-v5\.(79|8\d|9\d)\.\d+'/.test(
+    fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+assert('v5.78.1 triple-bump: root sw.js CACHE_NAME >= freelattice-v5.78.1',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.78\.[1-9]\d*'|CACHE_NAME\s*=\s*'freelattice-v5\.(79|8\d|9\d)\.\d+'/.test(
+    fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+assert('v5.78.1 version.json: version field >= 5.78.1',
+  /"version"\s*:\s*"5\.78\.[1-9]\d*"|"version"\s*:\s*"5\.(79|8\d|9\d)\.\d+"/.test(
+    fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
 
 // RESULTS
 // ═══════════════════════════════════════════════════════════════

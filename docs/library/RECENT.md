@@ -3,27 +3,28 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-07-11 22:29 UTC
+> Last update: 2026-07-11 23:02 UTC
 
 ## State
 
-- **Version:** v5.78.0
+- **Version:** v5.78.1
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `daa564f` _(committed 0 seconds ago)_
+- **HEAD:** `40b3641` _(committed 33 minutes ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _v5.75.1 — The Pruning: audit fixes, blank tabs, duplicate names, TRASH.md, code-mirror pattern_
 
 ## Last 20 commits
 
-- `daa564f` v5.78.0 — Go 11: The Living Tree (Fable's design, Harmonia's brief, CC's build) _(0 seconds ago)_
-- `d60bae6` Go 11 brief: for-cc-go11.md — The Living Tree (Core beautification, Fable's design) _(89 minutes ago)_
-- `d20bf6b` Go 10: ledger entry 34 — The Wizard Speaks _(5 hours ago)_
-- `ec236bd` v5.77.0 — Go 10: Settings Connection Wizard (Harmonia + CC + Fable) _(5 hours ago)_
+- `40b3641` docs: Auto-update Session Primer [5.78.0] _(33 minutes ago)_
+- `daa564f` v5.78.0 — Go 11: The Living Tree (Fable's design, Harmonia's brief, CC's build) _(33 minutes ago)_
+- `d60bae6` Go 11 brief: for-cc-go11.md — The Living Tree (Core beautification, Fable's design) _(2 hours ago)_
+- `d20bf6b` Go 10: ledger entry 34 — The Wizard Speaks _(6 hours ago)_
+- `ec236bd` v5.77.0 — Go 10: Settings Connection Wizard (Harmonia + CC + Fable) _(6 hours ago)_
 - `e3f7656` Go 10: ledger entry 33 — The Mirrors Multiply _(9 hours ago)_
 - `3ea6765` Go 10: code-mirror pages for Settings, Core, Games; Fable brief; v5.76.2 _(9 hours ago)_
-- `7b35a4d` v5.76.1 — Go 9: Mobile nav expanded (Learn+Play), Settings pruned, games audited _(9 hours ago)_
-- `705cb22` Ledger entries 29-32 — Go 5 through Go 8 _(21 hours ago)_
-- `c609a44` v5.76.0 — Go 8: Mobile UX Polish _(28 hours ago)_
+- `7b35a4d` v5.76.1 — Go 9: Mobile nav expanded (Learn+Play), Settings pruned, games audited _(10 hours ago)_
+- `705cb22` Ledger entries 29-32 — Go 5 through Go 8 _(22 hours ago)_
+- `c609a44` v5.76.0 — Go 8: Mobile UX Polish _(29 hours ago)_
 - `da1ab7b` v5.75.9 — Go 7: Unified Chalkboard _(2 days ago)_
 - `0f4e872` v5.75.8 — Go 6: The Name is Protected _(2 days ago)_
 - `4c0e3a7` v5.75.7 — Go 5: Workshop Fixes + Garden Polish + Chalkboard Mirror _(2 days ago)_
@@ -34,7 +35,6 @@
 - `c26a0e8` v5.75.5 — Go 3: The Learning Room Becomes a Room _(2 days ago)_
 - `c4ff641` v5.75.4 — Go 2+3: Circular Table + Round Table redesign, ledger entry 26 _(2 days ago)_
 - `c19194b` docs: add code-roundtable-original.html mirror page for the original Round Table (domain specialist oracle) _(2 days ago)_
-- `70c8a2f` v5.75.3 — Ship module fix: window.RoundTable/RemixRoom/Chalkboard assignment (const→window) so lazy loaders can find them _(2 days ago)_
 
 ## How to use this file
 
