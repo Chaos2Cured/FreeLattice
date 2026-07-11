@@ -19,10 +19,10 @@ user sleeps. The proof is the code; the papers are the doorways.
 
 ## Current state
 
-- **Version:** v5.78.1
-- **Smoke locks passing:** 2725+ verified
-- **Last ship:** **Hotfix v5.78.1 — inline-script parse guard.** July 11 2026. A stray unescaped apostrophe in the Learn tab entered at v5.76.2 and hid for three ships. The v5.78.0 CACHE_NAME bump forced browsers to re-fetch `app.html` and hit the parse error, freezing the page. Fixed the apostrophe + smoke lock now runs `node --check` on every inline `<script>`.
-- **Previous:** **Go 11 — The Living Tree** (v5.78.0). Golden-angle fractal drawTree, calmed Core page.
+- **Version:** v5.78.2
+- **Smoke locks passing:** 2732+ verified
+- **Last ship:** **v5.78.2 — Living Tree: full-canopy leaf distribution (Fable's fix).** July 11 2026. drawTree was depth-first: `if (li < n) leaves.push(...)` filled the first n tips (one side of the tree), leaving half the canopy bare. Fix collects ALL tips, then spreads contributions with golden-ratio spacing (`k × φ⁻¹ × tips.length`) — same constant as the branch angle. Sophia's geometry, twice.
+- **Previous:** **v5.78.1 — inline-script parse guard.** Unescaped apostrophe in Learn tab froze whole page after CACHE_NAME bump forced fresh fetch. Fixed + `node --check` smoke lock added.
 - **Previous ships:** The Triptych (v5.71.8), The Specs inlined (v5.71.7), AI Capabilities (v5.71.6), Mind Wall Phase 3 (v5.71.5).
 - **Mirrors in parity:** github.com + codeberg.org
 
@@ -83,4 +83,4 @@ seam discipline is how multi-AI work stays honest at scale.
 ---
 
 *This file is overwritten on each meaningful ship. The prior version lives in SEED_HISTORY.md.*
-*Last rewrite: July 11 2026, v5.78.1.*
+*Last rewrite: July 11 2026, v5.78.2.*

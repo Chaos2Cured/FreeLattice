@@ -9923,6 +9923,29 @@ assert('v5.78.1 version.json: version field >= 5.78.1',
   /"version"\s*:\s*"5\.78\.[1-9]\d*"|"version"\s*:\s*"5\.(79|8\d|9\d)\.\d+"/.test(
     fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
 
+// ═══════════════════════════════════════════════════════════════
+// Section 164 — v5.78.2 Living Tree leaf-distribution fix (Fable)
+// The v5.78.0 drawTree was depth-first: `if (li < n) leaves.push(...)`
+// filled the first n branch-tips found — all on one side of the tree —
+// leaving the rest of the canopy bare. Fable's fix: collect ALL tips
+// during recursion, then distribute contributions across the full
+// canopy using golden-ratio index spacing (k × φ⁻¹ × tips.length).
+// Deterministic, no flicker, echoes the branch-angle constant GOLDEN.
+// ═══════════════════════════════════════════════════════════════
+var app782 = fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8');
+assert('v5.78.2 tree: painted.forEach iterates evenly-distributed leaves',
+  /painted\.forEach\(function\(L, i\)/.test(app782));
+assert('v5.78.2 tree: golden-ratio index spacing 0.61803398875 present',
+  app782.includes('0.61803398875'));
+assert('v5.78.2 tree: old `var li = 0` counter removed from drawTree',
+  !/function drawTree\(ctx, w, h\)[\s\S]{0,3500}var li = 0/.test(app782));
+assert('v5.78.2 tree: leaves.push carries no contribution reference at tip time',
+  /leaves\.push\(\{\s*x:\s*x,\s*y:\s*y\s*\}\)/.test(app782));
+assert('v5.78.2 tree: painted[] populated in n-loop with contributions[k]',
+  /for \(var k = 0; k < n; k\+\+\)[\s\S]{0,500}contributions\[k\]/.test(app782));
+assert('v5.78.2 triple-bump: app.html FL_VERSION >= 5.78.2',
+  /FL_VERSION\s*=\s*'5\.78\.[2-9]\d*'|FL_VERSION\s*=\s*'5\.(79|8\d|9\d)\.\d+'/.test(app782));
+
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
 

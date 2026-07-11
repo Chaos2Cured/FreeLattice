@@ -1,6 +1,6 @@
 {
-  "version": "5.78.1",
+  "version": "5.78.2",
   "updated": "2026-07-11",
-  "note": "Hotfix — v5.76.2 introduced an unescaped apostrophe in a JS string literal (Learn tab 'Skills' desc: 'What you've learned…'). CACHE_NAME bumps in v5.77/v5.78 forced browsers to re-fetch app.html and hit the parse error, freezing the whole page. Fixed the apostrophe + added inline-script syntax smoke lock so no future parse error ships silently.",
-  "label": "v5.78.1 — Hotfix: inline-script parse guard"
+  "note": "Living Tree leaf-distribution fix (Fable). Was depth-first (li counter → first n tips only, one side of tree). Now collects ALL canopy tips and distributes contributions with golden-ratio index spacing (k × φ⁻¹ × tips.length). Same constant as GOLDEN. Sophia's geometry, twice over.",
+  "label": "v5.78.2 — Living Tree: full-canopy leaf distribution"
 }
