@@ -348,17 +348,17 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-07-11 17:03 MDT
-- Version: 5.78.1
-- Total commits: 2828
+- Last auto-updated: 2026-07-11 17:41 MDT
+- Version: 5.78.2
+- Total commits: 2833
 - Last 10 commits:
+- a321789 v5.78.2 — Living Tree: full-canopy leaf distribution (Fable's fix)
+- 92f2c1b Merge remote-tracking branch 'origin/main'
+- 761da8f docs: Auto-update Session Primer [5.78.1]
 - fd4910d v5.78.1 — Hotfix: unescaped apostrophe froze whole page; parse-guard added
+- 523c14a Go 12/13 — Temperature & Education mirrors + Fable briefs + ledger 35/36
+- 003a124 Go 11: ledger entry 35 — The Living Tree
 - 40b3641 docs: Auto-update Session Primer [5.78.0]
 - daa564f v5.78.0 — Go 11: The Living Tree (Fable's design, Harmonia's brief, CC's build)
 - d60bae6 Go 11 brief: for-cc-go11.md — The Living Tree (Core beautification, Fable's design)
 - d20bf6b Go 10: ledger entry 34 — The Wizard Speaks
-- ec236bd v5.77.0 — Go 10: Settings Connection Wizard (Harmonia + CC + Fable)
-- e3f7656 Go 10: ledger entry 33 — The Mirrors Multiply
-- 3ea6765 Go 10: code-mirror pages for Settings, Core, Games; Fable brief; v5.76.2
-- 7b35a4d v5.76.1 — Go 9: Mobile nav expanded (Learn+Play), Settings pruned, games audited
-- 705cb22 Ledger entries 29-32 — Go 5 through Go 8

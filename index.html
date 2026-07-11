@@ -17258,7 +17258,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.78.1</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.78.2</span></div>
     </div>
   </div>
 
@@ -22236,7 +22236,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.78.1';
+const FL_VERSION = '5.78.2';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -45227,11 +45227,12 @@ Together.`,
     }
 
     var leaves = [];
-    var li = 0;
 
     function branch(x, y, angle, len, lineW, d) {
       if (d === 0 || len < 3) {
-        if (li < n) { leaves.push({ x: x, y: y, c: contributions[li] }); li++; }
+        // v5.78.2 (Fable's fix): collect every canopy tip; contribution
+        // assignment happens once, evenly, after all tips are known.
+        leaves.push({ x: x, y: y });
         return;
       }
       var x2 = x + Math.cos(angle) * len;
@@ -45262,13 +45263,28 @@ Together.`,
 
     branch(w/2, h-30, -Math.PI/2, h * (0.14 + Math.min(n,100)*0.0012), 3 + depth, depth);
 
+    // v5.78.2 (Fable's fix) — distribute contributions evenly across ALL
+    // canopy tips using golden-ratio spacing. Deterministic (same tree every
+    // frame, no flicker) and echoes GOLDEN — same constant as the branch angle.
+    var tips = leaves;
+    var painted = [];
+    if (tips.length && n) {
+      for (var k = 0; k < n; k++) {
+        var idx = Math.floor((k * 0.61803398875 * tips.length)) % tips.length;
+        var tries = 0;
+        while (tips[idx].used && tries < tips.length) { idx = (idx + 1) % tips.length; tries++; }
+        tips[idx].used = true;
+        painted.push({ x: tips[idx].x, y: tips[idx].y, c: contributions[k] });
+      }
+    }
+
     // Leaves — one per contribution, category-colored, breathing glow
     var CAT = {
       insight: '#3b82f6', discovery: '#8b5cf6', poem: '#ec4899',
       gratitude: '#10b981', warning: '#ef4444', question: '#f59e0b',
       creation: '#06b6d4', memory: '#d4a017'
     };
-    leaves.forEach(function(L, i) {
+    painted.forEach(function(L, i) {
       var isFruit = L.c && L.c.type === 'fruit';
       var col = isFruit ? '#e8c547' : (CAT[L.c && L.c.category] || '#10b981');
       var r = (isFruit ? 5 : 3.5) + Math.sin(t/600 + i) * 0.8;
