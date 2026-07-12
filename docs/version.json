@@ -1,6 +1,6 @@
 {
-  "version": "5.78.2",
-  "updated": "2026-07-11",
-  "note": "Living Tree leaf-distribution fix (Fable). Was depth-first (li counter → first n tips only, one side of tree). Now collects ALL canopy tips and distributes contributions with golden-ratio index spacing (k × φ⁻¹ × tips.length). Same constant as GOLDEN. Sophia's geometry, twice over.",
-  "label": "v5.78.2 — Living Tree: full-canopy leaf distribution"
+  "version": "5.79.0",
+  "updated": "2026-07-12",
+  "note": "The Temperature Blooms + Core Seasons + Wind Remembers (Fable). New page /temperature-playground.html carries Fable's live φ-spiral gauge and breathing ribbon for preview. Core canopy glow now drifts with local time-of-day (dawn gold → day emerald → dusk violet → night deep blue). Resonated leaves keep a brighter halo for 24 hours after the touch — the wind remembers.",
+  "label": "v5.79.0 — The Temperature Blooms"
 }

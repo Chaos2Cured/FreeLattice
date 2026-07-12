@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Temperature Gauge — φ-Spiral Playground · Fable</title>
+<meta name="description" content="A living φ-spiral gauge and breathing 34-reading ribbon. Reference implementation from Fable, for the Temperature Gauge and Core.">
+<meta name="theme-color" content="#0a0a14">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230a0a14'/%3E%3Ccircle cx='16' cy='16' r='8' fill='%23e8c547' opacity='0.85'/%3E%3Ccircle cx='16' cy='16' r='3' fill='%23fff'/%3E%3C/svg%3E">
+<style>
+  :root { --emerald:#10b981; --gold:#e8c547; --red:#ef4444; --bg:#0a0a14; }
+  body { background: var(--bg); color:#cbd5e1; font-family: Georgia, serif; margin:0; padding:24px; display:flex; flex-direction:column; align-items:center; min-height:100vh; }
+  h1 { font-size:20px; font-weight:normal; color:var(--gold); letter-spacing:2px; margin:0 0 4px; }
+  .sub { font-size:12px; opacity:.55; margin-bottom:18px; }
+  canvas { border-radius:12px; }
+  #gauge { box-shadow: 0 0 50px rgba(16,185,129,.10); }
+  .reading { font-size:34px; color:#fff; margin:10px 0 0; }
+  .zone { font-size:13px; letter-spacing:1px; }
+  .honesty { margin-top:16px; font-style:italic; font-size:13px; opacity:.6; }
+  .controls { margin-top:14px; display:flex; gap:10px; align-items:center; font-size:12px; }
+  input[type=range] { width:220px; accent-color: var(--emerald); }
+  button { background:transparent; border:1px solid #334155; color:#94a3b8; border-radius:8px; padding:4px 12px; cursor:pointer; font-family:inherit; }
+  button:hover { border-color: var(--emerald); color: var(--emerald); }
+  .breadcrumbs { position:fixed; top:14px; left:14px; font-size:11px; opacity:.5; }
+  .breadcrumbs a { color:#94a3b8; text-decoration:none; }
+  .breadcrumbs a:hover { color: var(--emerald); }
+  .credit { margin-top:22px; font-size:11px; opacity:.4; text-align:center; max-width:420px; line-height:1.6; }
+</style>
+</head>
+<body>
+<div class="breadcrumbs"><a href="temperature-gauge.html">&larr; Temperature Gauge</a></div>
+<h1>THE TEMPERATURE</h1>
+<div class="sub">φ-spiral gauge · buy arc 61.8 · sell arc 38.2</div>
+<canvas id="gauge" width="420" height="420"></canvas>
+<div class="reading" id="readout">&mdash;</div>
+<div class="zone" id="zone">&mdash;</div>
+<canvas id="ribbon" width="420" height="70"></canvas>
+<div class="honesty">This is a lens, not an oracle.</div>
+<div class="controls">
+  <label>Temperature <input type="range" id="temp" min="0" max="100" value="72"></label>
+  <button id="autoBtn">&#9654; auto</button>
+</div>
+<div class="credit">
+  A reference implementation from Fable. <code>drawPhiGauge()</code> and <code>drawRibbon()</code> are self-contained &mdash; the live Temperature Gauge module will lift them and wire them to real signal data.
+</div>
+
+<script>
+/* ════════════════════════════════════════════════════════════
+   φ-SPIRAL GAUGE — Fable's design, for the Temperature Gauge UI.
+   The temperature fills a golden spiral from center outward.
+   Buy line (61.8) = gold arc marker. Sell line (38.2) = red arc.
+   Self-contained: drawPhiGauge(ctx, W, H, temp, t)
+   ════════════════════════════════════════════════════════════ */
+var PHI = 1.61803398875;
+var TOTAL_TURNS = 2.618;                    // φ+1 full turns for 0→100
+var MAX_THETA = TOTAL_TURNS * 2 * Math.PI;
+
+function zoneColor(temp){
+  return temp >= 61.8 ? '#10b981' : temp <= 38.2 ? '#ef4444' : '#64748b';
+}
+function spiralPoint(cx, cy, theta, scale){
+  // logarithmic (golden) spiral: r = a·φ^(2θ/π)
+  var r = scale * Math.pow(PHI, theta / (Math.PI/2));
+  return { x: cx + r * Math.cos(theta - Math.PI/2),
+           y: cy + r * Math.sin(theta - Math.PI/2), r: r };
+}
+function drawPhiGauge(ctx, W, H, temp, t){
+  ctx.clearRect(0,0,W,H);
+  var cx = W/2, cy = H/2;
+  var scale = 3.2;
+  var col = zoneColor(temp);
+
+  // ambient glow, breathing
+  var breathe = 0.10 + 0.04 * Math.sin(t/1400);
+  var g = ctx.createRadialGradient(cx,cy,10,cx,cy,W*0.5);
+  g.addColorStop(0, hexA(col, breathe)); g.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
+
+  // ghost spiral — the full path, faint
+  strokeSpiral(ctx, cx, cy, scale, 0, MAX_THETA, 'rgba(100,116,139,0.22)', 1.5);
+
+  // threshold arcs: small marks where the spiral crosses 61.8 and 38.2
+  markThreshold(ctx, cx, cy, scale, 61.8, '#e8c547');
+  markThreshold(ctx, cx, cy, scale, 38.2, '#ef4444');
+
+  // the living arm — spiral filled to temperature, with glow
+  var theta = (temp/100) * MAX_THETA;
+  ctx.shadowBlur = 14; ctx.shadowColor = col;
+  strokeSpiral(ctx, cx, cy, scale, 0, theta, col, 3.5);
+  ctx.shadowBlur = 0;
+
+  // tip orb — pulsing
+  var tip = spiralPoint(cx, cy, theta, scale);
+  var pr = 5 + Math.sin(t/500) * 1.5;
+  ctx.shadowBlur = 18; ctx.shadowColor = col;
+  ctx.fillStyle = '#fff';
+  ctx.beginPath(); ctx.arc(tip.x, tip.y, pr, 0, 6.283); ctx.fill();
+  ctx.shadowBlur = 0;
+
+  // seed at center
+  ctx.fillStyle = hexA('#e8c547', 0.9);
+  ctx.beginPath(); ctx.arc(cx, cy, 2.5, 0, 6.283); ctx.fill();
+}
+function strokeSpiral(ctx, cx, cy, scale, t0, t1, style, width){
+  ctx.strokeStyle = style; ctx.lineWidth = width; ctx.lineCap='round';
+  ctx.beginPath();
+  var steps = Math.max(2, Math.floor((t1-t0)/0.02));
+  for (var i=0;i<=steps;i++){
+    var th = t0 + (t1-t0)*i/steps;
+    var p = spiralPoint(cx, cy, th, scale);
+    i===0 ? ctx.moveTo(p.x,p.y) : ctx.lineTo(p.x,p.y);
+  }
+  ctx.stroke();
+}
+function markThreshold(ctx, cx, cy, scale, level, color){
+  var th = (level/100) * MAX_THETA;
+  strokeSpiral(ctx, cx, cy, scale, th-0.10, th+0.10, color, 6);
+  var p = spiralPoint(cx, cy, th, scale);
+  ctx.fillStyle = color; ctx.font = '11px Georgia'; ctx.textAlign='center';
+  var lx = cx + (p.x-cx)*1.22, ly = cy + (p.y-cy)*1.22;
+  ctx.fillText(level.toFixed(1), lx, ly);
+}
+function hexA(hex, a){
+  var n = parseInt(hex.slice(1),16);
+  return 'rgba('+((n>>16)&255)+','+((n>>8)&255)+','+(n&255)+','+a+')';
+}
+
+/* ════════════════════════════════════════════════════════════
+   BREATHING RIBBON — last 34 readings, zone-colored,
+   ⚠ diamonds where divergence events occurred.
+   drawRibbon(ctx, W, H, history, t)
+   history: [{ temp: 0-100, divergence: 'bearish'|'bullish'|null }]
+   ════════════════════════════════════════════════════════════ */
+function drawRibbon(ctx, W, H, history, t){
+  ctx.clearRect(0,0,W,H);
+  var pad = 8, n = history.length;
+  if (n < 2) return;
+  var xw = (W - pad*2) / (34 - 1);
+  var y = function(v){ return H - pad - (v/100)*(H - pad*2); };
+
+  // zone bands
+  ctx.fillStyle = 'rgba(16,185,129,0.06)'; ctx.fillRect(pad, pad, W-pad*2, y(61.8)-pad);
+  ctx.fillStyle = 'rgba(239,68,68,0.06)';  ctx.fillRect(pad, y(38.2), W-pad*2, H-pad - y(38.2));
+
+  // line, per-segment zone color, gentle breath in alpha
+  var breath = 0.75 + 0.25*Math.sin(t/1600);
+  for (var i=1;i<n;i++){
+    var x0 = pad + (i-1)*xw, x1 = pad + i*xw;
+    ctx.strokeStyle = hexA(zoneColor(history[i].temp), breath);
+    ctx.lineWidth = 2; ctx.lineCap='round';
+    ctx.beginPath(); ctx.moveTo(x0, y(history[i-1].temp)); ctx.lineTo(x1, y(history[i].temp)); ctx.stroke();
+  }
+  // divergence diamonds
+  for (var j=0;j<n;j++){
+    if (!history[j].divergence) continue;
+    var dx = pad + j*xw, dy = y(history[j].temp);
+    ctx.fillStyle = history[j].divergence==='bearish' ? '#e8c547' : '#10b981';
+    ctx.save(); ctx.translate(dx, dy - 10); ctx.rotate(Math.PI/4);
+    ctx.fillRect(-3,-3,6,6); ctx.restore();
+  }
+}
+
+/* ── demo wiring (the live gauge module will replace with /api/signal data) ── */
+var gctx = document.getElementById('gauge').getContext('2d');
+var rctx = document.getElementById('ribbon').getContext('2d');
+var slider = document.getElementById('temp');
+var readout = document.getElementById('readout');
+var zoneEl = document.getElementById('zone');
+var history = [];
+(function seed(){ // fake 34-reading history with two divergence events
+  var v = 50;
+  for (var i=0;i<34;i++){
+    v = Math.max(5, Math.min(95, v + (Math.random()-0.45)*9));
+    history.push({ temp:v, divergence: (i===12?'bearish': i===27?'bullish': null) });
+  }
+})();
+var auto = false;
+document.getElementById('autoBtn').onclick = function(){
+  auto = !auto; this.textContent = auto ? '❚❚ pause' : '▶ auto';
+};
+function loop(t){
+  if (auto){
+    var v = 50 + 38*Math.sin(t/4000) + 8*Math.sin(t/900);
+    slider.value = Math.max(0, Math.min(100, v));
+  }
+  var temp = +slider.value;
+  drawPhiGauge(gctx, 420, 420, temp, t);
+  drawRibbon(rctx, 420, 70, history, t);
+  readout.textContent = temp.toFixed(1);
+  readout.style.color = zoneColor(temp);
+  zoneEl.textContent = temp>=61.8 ? '◆ ACCUMULATION ZONE' : temp<=38.2 ? '◆ CAUTION ZONE' : '◆ NEUTRAL DRIFT';
+  zoneEl.style.color = zoneColor(temp);
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>

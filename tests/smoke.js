@@ -9946,6 +9946,80 @@ assert('v5.78.2 tree: painted[] populated in n-loop with contributions[k]',
 assert('v5.78.2 triple-bump: app.html FL_VERSION >= 5.78.2',
   /FL_VERSION\s*=\s*'5\.78\.[2-9]\d*'|FL_VERSION\s*=\s*'5\.(79|8\d|9\d)\.\d+'/.test(app782));
 
+// ═══════════════════════════════════════════════════════════════
+// Section 165 — v5.79.0 The Temperature Blooms + Core Seasons + Wind Remembers
+// Fable's brief, CC's build. Three additions in one ship:
+//   1. docs/temperature-playground.html — Fable's φ-spiral gauge + breathing
+//      ribbon, standalone preview page. drawPhiGauge() and drawRibbon() are
+//      the reference implementation for wiring into the live gauge later.
+//   2. Core canopy glow now drifts with local time-of-day (getSeasonGlow):
+//      dawn gold → day emerald → dusk violet → night deep blue.
+//   3. Resonated contributions carry lastResonatedAt; leaves glow brighter
+//      for 24h after touch — the wind remembers.
+// ═══════════════════════════════════════════════════════════════
+var app790 = fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8');
+var swDocs790 = fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8');
+var swRoot790 = fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8');
+var versionJson790 = fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8');
+var playground790 = fs.existsSync(path.join(docsDir, 'temperature-playground.html'))
+  ? fs.readFileSync(path.join(docsDir, 'temperature-playground.html'), 'utf8')
+  : '';
+var tempGauge790 = fs.readFileSync(path.join(docsDir, 'temperature-gauge.html'), 'utf8');
+
+// ── Playground page ──
+assert('v5.79.0 playground: docs/temperature-playground.html exists',
+  playground790.length > 2000);
+assert('v5.79.0 playground: drawPhiGauge function present',
+  /function drawPhiGauge\(ctx, W, H, temp, t\)/.test(playground790));
+assert('v5.79.0 playground: drawRibbon function present',
+  /function drawRibbon\(ctx, W, H, history, t\)/.test(playground790));
+assert('v5.79.0 playground: buy arc 61.8 threshold present',
+  playground790.includes('61.8'));
+assert('v5.79.0 playground: sell arc 38.2 threshold present',
+  playground790.includes('38.2'));
+assert('v5.79.0 playground: PHI constant 1.61803398875 present',
+  playground790.includes('1.61803398875'));
+assert('v5.79.0 playground: TOTAL_TURNS = 2.618 present',
+  playground790.includes('2.618'));
+assert('v5.79.0 playground: honesty line "lens, not an oracle"',
+  playground790.includes('lens, not an oracle'));
+assert('v5.79.0 playground: back link to temperature-gauge.html',
+  /href="temperature-gauge\.html"/.test(playground790));
+assert('v5.79.0 playground: registered in docs/sw.js APP_SHELL',
+  swDocs790.includes("./temperature-playground.html"));
+assert('v5.79.0 playground: registered in root sw.js APP_SHELL',
+  swRoot790.includes("./temperature-playground.html"));
+assert('v5.79.0 playground: discovery link on live temperature-gauge.html',
+  /href="temperature-playground\.html"/.test(tempGauge790));
+
+// ── Core: Seasons ──
+assert('v5.79.0 seasons: getSeasonGlow function present in app.html',
+  /function getSeasonGlow\(\)/.test(app790));
+assert('v5.79.0 seasons: SEASON_STOPS palette (dawn gold, day emerald, dusk violet, night blue)',
+  /SEASON_STOPS\s*=\s*\[[\s\S]{0,300}232,197,71[\s\S]{0,80}16,185,129[\s\S]{0,80}139,92,246[\s\S]{0,80}30,64,175/.test(app790));
+assert('v5.79.0 seasons: drawTree canopy glow uses seasonRGB (not hardcoded emerald)',
+  /var seasonRGB = getSeasonGlow\(\);[\s\S]{0,400}g\.addColorStop\(0,\s*'rgba\(' \+ seasonRGB/.test(app790));
+
+// ── Core: Wind Remembers ──
+assert('v5.79.0 wind: lastResonatedAt stamped in resonate()',
+  /c\.resonateCount = \(c\.resonateCount \|\| 0\) \+ 1;[\s\S]{0,300}c\.lastResonatedAt = Date\.now\(\);/.test(app790));
+assert('v5.79.0 wind: drawTree paint loop honors lastResonatedAt < 24h',
+  /L\.c\.lastResonatedAt && \(Date\.now\(\) - L\.c\.lastResonatedAt < 86400000\)/.test(app790));
+assert('v5.79.0 wind: warm halo raises shadowBlur to 22',
+  /warm \? 22 : 12/.test(app790));
+
+// ── Triple-bump ──
+assert('v5.79.0 triple-bump: app.html FL_VERSION = 5.79.0',
+  /FL_VERSION\s*=\s*'5\.79\.0'/.test(app790));
+assert('v5.79.0 triple-bump: app.html flCurrentVersion span = 5.79.0',
+  /id="flCurrentVersion"[^>]*>\s*5\.79\.0\s*</.test(app790));
+assert('v5.79.0 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.0',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.0'/.test(swDocs790));
+assert('v5.79.0 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.0',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.0'/.test(swRoot790));
+assert('v5.79.0 version.json: version field = 5.79.0',
+  /"version"\s*:\s*"5\.79\.0"/.test(versionJson790));
+
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
 

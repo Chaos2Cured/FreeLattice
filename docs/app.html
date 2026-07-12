@@ -17258,7 +17258,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.78.2</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.79.0</span></div>
     </div>
   </div>
 
@@ -22236,7 +22236,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.78.2';
+const FL_VERSION = '5.79.0';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -45196,6 +45196,27 @@ Together.`,
   // ── Living Tree — v5.78.0 (Fable's design, golden-angle fractal) ──────
   var GOLDEN = 2.399963; // golden angle in radians
 
+  // v5.79.0 — Seasons (Fable). Canopy glow drifts with local time-of-day.
+  // Dawn gold → day emerald → dusk violet → night deep blue.
+  var SEASON_STOPS = [
+    { h: 5,  c: [232,197,71]  },
+    { h: 11, c: [16,185,129]  },
+    { h: 18, c: [139,92,246]  },
+    { h: 23, c: [30,64,175]   }
+  ];
+  function getSeasonGlow() {
+    var d = new Date();
+    var h = d.getHours() + d.getMinutes()/60;
+    var s = SEASON_STOPS, a = s[s.length-1], b = s[0], span, f;
+    for (var i = 0; i < s.length; i++) {
+      if (h >= s[i].h) { a = s[i]; b = s[(i+1) % s.length]; }
+    }
+    span = (b.h - a.h + 24) % 24 || 24;
+    f = ((h - a.h + 24) % 24) / span;
+    var mix = a.c.map(function(v, k) { return Math.round(v + (b.c[k] - v) * f); });
+    return mix.join(',');
+  }
+
   function drawTree(ctx, w, h) {
     var t = Date.now();
     ctx.clearRect(0, 0, w, h);
@@ -45208,10 +45229,11 @@ Together.`,
     var depth = n <= 2 ? 4 : n <= 10 ? 5 : n <= 30 ? 6 : n <= 100 ? 7 : 9;
     var sway = Math.sin(t / 1800) * 0.02;
 
-    // Soft canopy glow
+    // v5.79.0 — Seasons: canopy glow follows local time (Fable's design)
+    var seasonRGB = getSeasonGlow();
     var g = ctx.createRadialGradient(w/2, h*0.42, 10, w/2, h*0.42, h*0.55);
-    g.addColorStop(0, 'rgba(16,185,129,0.10)');
-    g.addColorStop(1, 'rgba(16,185,129,0)');
+    g.addColorStop(0, 'rgba(' + seasonRGB + ',0.10)');
+    g.addColorStop(1, 'rgba(' + seasonRGB + ',0)');
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, w, h);
 
@@ -45288,10 +45310,13 @@ Together.`,
       var isFruit = L.c && L.c.type === 'fruit';
       var col = isFruit ? '#e8c547' : (CAT[L.c && L.c.category] || '#10b981');
       var r = (isFruit ? 5 : 3.5) + Math.sin(t/600 + i) * 0.8;
-      ctx.shadowBlur = 12;
+      // v5.79.0 — The Wind Remembers (Fable): resonated leaves glow brighter for 24h.
+      var warm = L.c && L.c.lastResonatedAt && (Date.now() - L.c.lastResonatedAt < 86400000);
+      ctx.shadowBlur = warm ? 22 : 12;
       ctx.shadowColor = col;
       ctx.fillStyle = col;
-      ctx.globalAlpha = 0.9;
+      ctx.globalAlpha = warm ? 1 : 0.9;
+      if (warm) r += 1.5;
       ctx.beginPath();
       ctx.arc(L.x, L.y, r, 0, Math.PI * 2);
       ctx.fill();
@@ -45879,6 +45904,8 @@ Together.`,
     }
 
     c.resonateCount = (c.resonateCount || 0) + 1;
+    // v5.79.0 — The Wind Remembers (Fable): timestamp powers the 24h warm-glow halo
+    c.lastResonatedAt = Date.now();
     await dbPut(c);
     renderFeed();
 
