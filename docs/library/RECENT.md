@@ -3,20 +3,21 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-07-12 22:30 UTC
+> Last update: 2026-07-12 22:31 UTC
 
 ## State
 
 - **Version:** v5.79.1
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `e4b1d2b` _(committed 38 minutes ago)_
+- **HEAD:** `cbf4956` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _v5.75.1 — The Pruning: audit fixes, blank tabs, duplicate names, TRASH.md, code-mirror pattern_
 
 ## Last 20 commits
 
-- `e4b1d2b` docs: Auto-update Session Primer [5.79.0] _(38 minutes ago)_
-- `42cdd5e` v5.79.0 — The Temperature Blooms + Core Seasons + Wind Remembers (Fable's designs) _(38 minutes ago)_
+- `cbf4956` v5.79.1 — Hotfix: φ-spiral drew nothing because `var history` collides with window.history _(0 seconds ago)_
+- `e4b1d2b` docs: Auto-update Session Primer [5.79.0] _(39 minutes ago)_
+- `42cdd5e` v5.79.0 — The Temperature Blooms + Core Seasons + Wind Remembers (Fable's designs) _(39 minutes ago)_
 - `d48cbbd` Ledger entry 37 — The Cards Remember _(21 hours ago)_
 - `d113b45` v5.79.0 — Card order restored and locked per Kirk (Play/Learn/More), Glass Room added, CC letter written _(21 hours ago)_
 - `f35e643` docs: Auto-update Session Primer [5.78.2] _(23 hours ago)_
@@ -34,7 +35,6 @@
 - `e3f7656` Go 10: ledger entry 33 — The Mirrors Multiply _(33 hours ago)_
 - `3ea6765` Go 10: code-mirror pages for Settings, Core, Games; Fable brief; v5.76.2 _(33 hours ago)_
 - `7b35a4d` v5.76.1 — Go 9: Mobile nav expanded (Learn+Play), Settings pruned, games audited _(33 hours ago)_
-- `705cb22` Ledger entries 29-32 — Go 5 through Go 8 _(2 days ago)_
 
 ## How to use this file
 
