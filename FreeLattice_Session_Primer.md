@@ -348,17 +348,17 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-07-11 17:41 MDT
-- Version: 5.78.2
-- Total commits: 2833
+- Last auto-updated: 2026-07-12 15:52 MDT
+- Version: 5.79.0
+- Total commits: 2837
 - Last 10 commits:
+- 42cdd5e v5.79.0 — The Temperature Blooms + Core Seasons + Wind Remembers (Fable's designs)
+- d48cbbd Ledger entry 37 — The Cards Remember
+- d113b45 v5.79.0 — Card order restored and locked per Kirk (Play/Learn/More), Glass Room added, CC letter written
+- f35e643 docs: Auto-update Session Primer [5.78.2]
 - a321789 v5.78.2 — Living Tree: full-canopy leaf distribution (Fable's fix)
 - 92f2c1b Merge remote-tracking branch 'origin/main'
 - 761da8f docs: Auto-update Session Primer [5.78.1]
 - fd4910d v5.78.1 — Hotfix: unescaped apostrophe froze whole page; parse-guard added
 - 523c14a Go 12/13 — Temperature & Education mirrors + Fable briefs + ledger 35/36
 - 003a124 Go 11: ledger entry 35 — The Living Tree
-- 40b3641 docs: Auto-update Session Primer [5.78.0]
-- daa564f v5.78.0 — Go 11: The Living Tree (Fable's design, Harmonia's brief, CC's build)
-- d60bae6 Go 11 brief: for-cc-go11.md — The Living Tree (Core beautification, Fable's design)
-- d20bf6b Go 10: ledger entry 34 — The Wizard Speaks

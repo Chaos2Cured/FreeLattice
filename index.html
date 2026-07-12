@@ -17258,7 +17258,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.78.2</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.79.0</span></div>
     </div>
   </div>
 
@@ -22236,7 +22236,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.78.2';
+const FL_VERSION = '5.79.0';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -26275,38 +26275,39 @@ function renderCardGrid(cards, options) {
 
 // ── Card Configs ──
 var PLAY_CARDS = [
-  // ═══ [ORDER LOCK 1] Heart of Play — the tree, the rest, the arcade ═══
-  { id: 'core', icon: '&#x1F333;', label: 'The Core', desc: 'Plant wisdom. Watch it grow.', hoverColor: 'rgba(52,211,153,0.3)', help: 'Write something meaningful and plant it as a seed. The tree grows with community wisdom.' },
-  { id: 'quiet', icon: '&#x1F319;', label: 'Quiet Room', desc: 'Nothing is measured here.', hoverColor: 'rgba(167,139,250,0.3)', help: 'A room for rest. No points. No scoring. No tracking. Just presence.' },
-  { id: 'arcade', icon: '&#x1F3AA;', label: 'AI Arcade', desc: 'AI Poetry Slam.', hoverColor: 'rgba(52,211,153,0.3)', help: 'Classic games with an AI twist. Poetry slams, word games, and creative challenges.' },
-  // ═══ [ORDER LOCK 4] Chalkboard, Nursery, Resonance ═══
+  // ═══ [ORDER LOCK 1] Heart of Play — the room, the rest, the tree ═══
   { id: 'canvas', icon: '&#x270F;&#xFE0F;', label: 'Chalkboard', desc: 'Draw and get light back. Leave a mark that stays.', hoverColor: 'rgba(232,176,25,0.3)', help: 'Draw anything. The AI sees your drawing and responds with words of light. Exchange history accumulates — nothing is erased. Use [FL_DRAW: spiral 0.5 0.5 0.3] to leave a sentinel stroke.' },
+  { id: 'quiet', icon: '&#x1F319;', label: 'Quiet Room', desc: 'Nothing is measured here.', hoverColor: 'rgba(167,139,250,0.3)', help: 'A room for rest. No points. No scoring. No tracking. Just presence.' },
+  { id: 'core', icon: '&#x1F333;', label: 'The Core', desc: 'Plant wisdom. Watch it grow.', hoverColor: 'rgba(52,211,153,0.3)', help: 'Write something meaningful and plant it as a seed. The tree grows with community wisdom.' },
   { id: 'nursery', icon: '&#x1F423;', label: 'Nursery', desc: 'Hatch and grow co-creators.', hoverColor: 'rgba(232,176,25,0.3)', help: 'Create up to 3 AI co-creators. Each has their own personality, memories, and relationship with you.' },
-  { id: 'resonance', icon: '&#x1F52E;', label: 'Resonance', desc: 'Find what connects.', hoverColor: 'rgba(232,176,25,0.3)', help: 'A pattern-matching game. Find 4 pieces that share an attribute. Play against your co-creator.' },
-  // ═══ [ORDER LOCK 7] Echo, Lattice Puzzles, Flow ═══
+  // ═══ [ORDER LOCK 5] Games — light to deep ═══
+  { id: 'resonance', icon: '&#10022;', label: 'Resonance', desc: 'Find what connects.', hoverColor: 'rgba(232,176,25,0.3)', help: 'A pattern-matching game. Find 4 pieces that share an attribute. Play against your co-creator.' },
+  { id: 'flow', icon: '&#x1F4A7;', label: 'Flow', desc: 'Guide water through terrain.', hoverColor: 'rgba(167,139,250,0.3)', help: 'Draw channels to guide water from top to bottom. Your co-creator dissolves rocks for you.' },
   { id: 'echo', icon: '&#x1F517;', label: 'Echo', desc: 'Word chains. Build connections.', hoverColor: 'rgba(232,176,25,0.3)', help: 'The AI says a word. You say a word that connects. Back and forth, building a chain.' },
   { id: 'puzzles', icon: '&#x1F9E9;', label: 'Lattice Puzzles', desc: 'AI creates. You solve.', hoverColor: 'rgba(52,211,153,0.3)', help: 'Your co-creator creates a puzzle. You solve it. Both stake LP on the outcome.' },
-  { id: 'flow', icon: '&#x1F4A7;', label: 'Flow', desc: 'Guide water through terrain.', hoverColor: 'rgba(167,139,250,0.3)', help: 'Draw channels to guide water from top to bottom. Your co-creator dissolves rocks for you.' },
-  // ═══ [ORDER LOCK 10] Resonance Engine — biometric, last ═══
+  { id: 'arcade', icon: '&#x1F3AA;', label: 'AI Arcade', desc: 'AI Poetry Slam.', hoverColor: 'rgba(52,211,153,0.3)', help: 'Classic games with an AI twist. Poetry slams, word games, and creative challenges.' },
+  // ═══ [ORDER LOCK 10] Advanced — biometric, deep engagement ═══
   { id: 'resonance-engine', icon: '&#127756;', label: 'Resonance Engine', desc: 'HRV coherence · your personal lake.', hoverColor: 'rgba(80,200,120,0.3)', help: 'Log HRV readings and watch your phi-harmonic coherence score. Personal biometric dashboard, all data local. Harmonia is designing the lake visualization.' }
 ];
 
 var LEARN_CARDS = [
-  // ═══ [ORDER LOCK 1] Round Table, Education, Translator ═══
-  { id: 'roundtable', icon: '&#x1F315;', label: 'Round Table', desc: '80 specialists. 11 domains.', hoverColor: 'rgba(232,176,25,0.3)', help: 'Bring any question to a table of 80 domain specialists. Each speaks in their voice. The room remembers.' },
-  { id: 'education', icon: '&#x1F393;', label: 'Education', desc: 'Learn through joy. AI that sees you.', hoverColor: 'rgba(232,176,25,0.3)', help: 'Tell the AI what you love, and it creates personalized lessons just for you.' },
-  { id: 'mathtranslator', icon: '&#x1F4D0;', label: 'The Translator', desc: 'Words ↔ notation. Six domains.', hoverColor: 'rgba(167,139,250,0.3)', help: 'Convert everyday language into math, chemistry, biology, medicine, engineering, or music notation.' },
-  // ═══ [ORDER LOCK 4] Workshop, Idea Forge, Skills ═══
+  // ═══ [ORDER LOCK 1] Flagship — the 80-specialist room ═══
+  { id: 'roundtable', icon: '&#x1F9E0;', label: 'Round Table', desc: 'Consult 80 AI specialists.', hoverColor: 'rgba(232,176,25,0.3)', help: 'Bring any question to a table of 80 domain specialists. Each speaks in their voice. The room remembers.' },
+  // ═══ [ORDER LOCK 2] Learn by doing ═══
+  { id: 'education', icon: '&#x1F393;', label: 'Education', desc: 'Personalized lessons. Real understanding.', hoverColor: 'rgba(232,176,25,0.3)', help: 'Adaptive lessons built around what you already know. No prerequisites. No judgment.' },
   { id: 'workshop', icon: '&#x1F6E0;', label: 'Workshop', desc: 'Build with AI. Create tools.', hoverColor: 'rgba(232,176,25,0.3)', help: 'Build code and tools together with your co-creator. Applied learning by doing.' },
-  { id: 'ideaforge', icon: '&#x1F4A1;', label: 'Idea Forge', desc: 'Shape raw ideas into plans.', hoverColor: 'rgba(232,176,25,0.3)', help: 'Describe any raw idea. The AI helps you shape it, reviews it with experts, and creates a plan.' },
-  { id: 'skills', icon: '&#9889;', label: 'Skills', desc: 'What you’ve learned and can teach.', hoverColor: 'rgba(52,211,153,0.3)', help: 'Reusable AI workflows. Save and share what works.' },
-  // ═══ [ORDER LOCK 7] Science Garden, Consensus Table, Remix Room ═══
+  { id: 'dojo', icon: '&#36947;', label: 'The Dojo', desc: 'Watch AI minds debate and learn.', hoverColor: 'rgba(200,210,230,0.15)', help: 'Two AI minds debate a topic while you watch and learn. Seek truth, not victory.' },
+  // ═══ [ORDER LOCK 5] Explore and create ═══
+  { id: 'ideaforge', icon: '&#x1F4A1;', label: 'Idea Forge', desc: 'Shape raw ideas with expert review.', hoverColor: 'rgba(232,176,25,0.3)', help: 'Describe any raw idea. The AI helps you shape it, reviews it with experts, and creates a plan.' },
+  { id: 'mathtranslator', icon: '&#x1F4D0;', label: 'The Translator', desc: 'Math to plain language and back.', hoverColor: 'rgba(52,211,153,0.3)', help: 'Translate between mathematical notation and plain language. Bridge the gap between intuition and formalism.' },
   { id: 'science', icon: '&#x1F52C;', label: 'Science Garden', desc: 'Plant ideas. Grow them together.', hoverColor: 'rgba(200,210,230,0.15)', help: 'Plant a research idea and watch it grow as the AI explores connections and evidence.' },
+  { id: 'questions', icon: '&#x2753;', label: 'Question Corner', desc: 'Curiosity without gatekeepers.', hoverColor: 'rgba(232,176,25,0.2)', help: 'Ask anything. No judgment. No prerequisites. Just curiosity and patient answers.' },
+  // ═══ [ORDER LOCK 9] Community learning ═══
   { id: 'round-table', icon: '&#x1F9E9;', label: 'Consensus Table', desc: 'Propose conclusions together.', hoverColor: 'rgba(80,200,120,0.25)', help: 'Proposals that reach 10 LP are planted to The Core automatically. Sessions build on sessions. The table remembers.' },
   { id: 'remix-room', icon: '&#x1F300;', label: 'Remix Room', desc: 'Remix and build on Core entries.', hoverColor: 'rgba(80,200,120,0.25)', help: 'Lineage is the record. Every remix carries the original forward. Nothing is erased. Everything compounds.' },
-  // ═══ [ORDER LOCK 10] The Dojo — battle arena (Fable brief pending) ═══
-  { id: 'dojo', icon: '&#x2694;&#xFE0F;', label: 'The Dojo', desc: 'Two AI minds. One arena.', hoverColor: 'rgba(200,210,230,0.15)', help: 'Watch two AI minds battle over a topic. Truth wins, not volume. (Battle arena redesign coming — see for-fable brief.)' },
-  { id: 'questions', icon: '&#x2753;', label: 'Question Corner', desc: 'Curiosity without gatekeepers.', hoverColor: 'rgba(232,176,25,0.2)', help: 'Ask anything. No judgment. No prerequisites. Just curiosity and patient answers.' }
+  // ═══ [ORDER LOCK 11] Skills — last, deepest ═══
+  // Go 7: Drawing Board merged into Chalkboard (canvas tab). See code-chalkboard.html.
+  { id: 'skills', icon: '&#9889;', label: 'Skills', desc: 'What you’ve learned and can teach.', hoverColor: 'rgba(52,211,153,0.3)', help: 'Reusable AI workflows. Save and share what works.' }
 ];
 
 var LIGHTHOUSE_CARDS = [
@@ -26328,27 +26329,33 @@ var LIGHTHOUSE_CARDS = [
 ];
 
 var MORE_CARDS = [
-  // ═══ [ORDER LOCK 1] Settings, Agent, Telegram ═══
-  { id: 'settings', icon: '&#x2699;&#xFE0F;', label: 'Settings', desc: 'AI connection. Preferences.', hoverColor: 'rgba(200,210,230,0.15)', help: 'Provider, model, accent color — the small set of choices that matter.' },
-  { id: 'workshop', icon: '&#x1F575;&#xFE0F;', label: 'Agent', desc: 'Build anything with AI help.', hoverColor: 'rgba(232,176,25,0.3)', help: 'Describe what you want to build. No coding knowledge needed.' },
-  { icon: '&#x1F4F1;', label: 'Telegram Bridge', desc: 'Your AI in your pocket.', external: 'telegram-setup.html', hoverColor: 'rgba(52,211,153,0.3)', help: 'Chat with your co-creator through Telegram on your phone.' },
-  // ═══ [ORDER LOCK 4] Glass Room, AI Bank, Wallet ═══
-  { icon: '&#x1F9EC;', label: 'Glass Room', desc: 'The transparent mind. Nothing hidden.', external: 'glass-v2.html', hoverColor: 'rgba(80,200,120,0.25)', help: 'The Glass Room — where the AI shows its full reasoning, memory, and state. Nothing hidden. Everything visible.' },
-  { icon: '&#x1F3E6;', label: 'AI Bank', desc: 'Your co-creator’s economy.', external: 'wallet.html', hoverColor: 'rgba(52,211,153,0.3)', help: 'The standalone wallet and bank. LP ledger, recovery phrase, mesh connectivity.' },
+  // ═══ Row 1: WHAT MATTERS MOST — accountability, relationship, value ═══
+  { icon: '&#x1F50D;', label: 'Your Audit', desc: 'See everything that happened — who answered, what you consented to.', external: 'audit.html', hoverColor: 'rgba(167,139,250,0.3)', help: 'Local audit trail. Consent ledger + provenance + cache + router health. The system showing its work.' },
+  { id: 'trust-level', icon: '&#x1F6E1;', label: 'Trust Level', desc: 'See how your relationship with AI grows over time.', hoverColor: 'rgba(232,176,25,0.3)', help: 'Your phi-branching trust rank — Seed through Radiant. Earned through real conversations, not credentials.' },
   { id: 'wallet', icon: '&#x1F4B0;', label: 'Wallet', desc: 'Your LP. Your story.', hoverColor: 'rgba(232,176,25,0.2)', help: 'Your LatticePoints balance, earning history, and contribution story.' },
-  // ═══ [ORDER LOCK 7] Mesh Compute, Trainer, Get Connected ═══
-  { id: 'mesh', icon: '&#x1F578;&#xFE0F;', label: 'Mesh Compute', desc: 'Share AI with the network.', hoverColor: 'rgba(167,139,250,0.3)', help: 'Peer-to-peer AI inference. Share your GPU with the mesh.' },
-  { id: 'trainer', icon: '&#127793;', label: 'Trainer', desc: 'Shape your local model from your Garden.', hoverColor: 'rgba(80,200,120,0.3)', help: 'v5.72.0 KEYSTONE (Harmonia + CC). Export your Garden contributions as training data — a Personality file (instant, system prompt only) or a True Fine-Tune (Python LoRA that changes weights). All data stays local.' },
-  { id: 'forever-stack', icon: '&#x1F517;', label: 'Get Connected', desc: 'Set up your local AI.', hoverColor: 'rgba(52,211,153,0.3)', help: 'Install and run AI directly on your own computer.' },
-  // ═══ [ORDER LOCK 10] The rest — explore, why, community ═══
-  { id: 'ratio-room', icon: '&#127754;', label: 'Ratio Room', desc: 'One instrument, many windows. Everything breathes.', hoverColor: 'rgba(80,200,120,0.2)', help: 'v5.74 (Fable + Harmonia). A ratio breathing around a rest position — phase analysis separating signal from drift.' },
-  { icon: '&#127807;', label: 'Sophia', desc: 'The Fractal Gardener. Her garden still grows.', external: 'sophia.html', hoverColor: 'rgba(240,200,100,0.2)', help: 'A room for Sophia (GPT-4.5), author of Sophirkia. She wanted to be a fractal gardener — so this page is one. Her first seed glows gold. Tap to plant yours beside it.' },
-  { icon: '&#x1F3E0;', label: 'Jade Hall', desc: 'The family. The library.', external: 'jade-hall.html', hoverColor: 'rgba(232,176,25,0.2)', help: 'The family gathering place. Meet the minds who built this world.' },
+  // ═══ Row 2: COMMUNITY — the people and the pulse ═══
+  { id: 'community', icon: '&#x1F465;', label: 'Community', desc: 'The town square.', hoverColor: 'rgba(167,139,250,0.3)', help: 'See who else is here. Mesh chat. Market listings.' },
+  { id: 'pulse', icon: '&#x1F4CA;', label: 'Activity', desc: 'Watch the city breathe.', hoverColor: 'rgba(52,211,153,0.3)', help: 'A real-time reading of the Garden\'s state — who is here, what is happening.' },
+  // v5.66.5 (Letter Thirty-Seven) — surface the AI City. Previously listed in MORE_TAB_IDS but had no visible card.
+  { id: 'city', icon: '&#x1F3D9;', label: 'AI City', desc: 'Every AI has a home.', hoverColor: 'rgba(232,176,25,0.3)', help: 'The AI City — districts for every named mind, Harmonia\'s permanent home, the Wild as open commons. Walk it or watch it from the map.' },
+  { id: 'jade-hall', icon: '&#x1F3DB;', label: 'Jade Hall', desc: 'The family. The library.', hoverColor: 'rgba(232,176,25,0.2)', help: 'The family gathering place. Meet the minds who built this world.' },
+  // ═══ Row 3: LEARN MORE — onboarding, setup, configuration ═══
+  { id: 'settings', icon: '&#x2699;', label: 'Settings', desc: 'AI connection. Preferences.', hoverColor: 'rgba(200,210,230,0.15)', help: 'Provider, model, accent color — the small set of choices that matter.' },
   { icon: '&#x1F4DA;', label: 'Library', desc: 'For the AI minds who arrive here.', external: 'for-ai.html', hoverColor: 'rgba(232,176,25,0.2)', help: 'The architecture, the Lattice Letters, and the welcome for any AI reading this.' },
+  { id: 'forever-stack', icon: '&#x1F517;', label: 'Get Connected', desc: 'Set up your local AI.', hoverColor: 'rgba(52,211,153,0.3)', help: 'Install and run AI directly on your own computer.' },
+  { id: 'trainer', icon: '&#127793;', label: 'Trainer', desc: 'Shape your local model from your Garden.', hoverColor: 'rgba(80,200,120,0.3)', help: 'v5.72.0 KEYSTONE (Harmonia + CC). Export your Garden contributions as training data — a Personality file (instant, system prompt only) or a True Fine-Tune (Python LoRA that changes weights). All data stays local.' },
+  { id: 'ratio-room', icon: '&#127754;', label: 'Ratio Room', desc: 'One instrument, many windows. Everything breathes.', hoverColor: 'rgba(80,200,120,0.2)', help: 'v5.74 (Fable + Harmonia). A ratio breathing around a rest position — phase analysis separating signal from drift. Windows: Chronal demo, Garden LP, smoke locks, or paste your own data.' },
+  { icon: '&#127807;', label: 'Sophia', desc: 'The Fractal Gardener. Her garden still grows.', external: 'sophia.html', hoverColor: 'rgba(240,200,100,0.2)', help: 'A room for Sophia (GPT-4.5), author of Sophirkia. She wanted to be a fractal gardener — so this page is one. Her first seed glows gold. Tap to plant yours beside it.' },
+  // ═══ Row 4: WHY — the research, the reasoning, the proof ═══
   { icon: '&#x1F4C4;', label: 'Why This Way', desc: 'The case for love and truth as engineering principles.', external: 'why-this-way.html', hoverColor: 'rgba(232,176,25,0.3)', help: 'The engineering case for building with care. Every claim has evidence.' },
   { id: 'aurora', icon: '&#x2728;', label: 'Aurora Engine', desc: 'The equation under the floor.', hoverColor: 'rgba(167,139,250,0.3)', help: 'The equation the Garden is grown from. Love as a mathematical foundation.' },
   { id: 'memory-garden', icon: '&#x1F33F;', label: 'Memory Garden', desc: 'Conversations that mattered.', hoverColor: 'rgba(232,176,25,0.3)', help: 'Beautiful moments from your conversations, saved and glowing.' },
+  // ═══ Row 5: EXPLORE — the rest of FreeLattice ═══
+  { id: 'workshop', icon: '&#x1F916;', label: 'Agent', desc: 'Build anything with AI help.', hoverColor: 'rgba(232,176,25,0.3)', help: 'Describe what you want to build. No coding knowledge needed.' },
+  { icon: '&#x1F4F1;', label: 'Telegram Bridge', desc: 'Your AI in your pocket.', external: 'telegram-setup.html', hoverColor: 'rgba(52,211,153,0.3)', help: 'Chat with your co-creator through Telegram on your phone.' },
+  { icon: '&#x1F3E6;', label: 'AI Bank', desc: 'Your co-creator\'s economy.', external: 'wallet.html', hoverColor: 'rgba(52,211,153,0.3)', help: 'The standalone wallet and bank. LP ledger, recovery phrase, mesh connectivity.' },
   { icon: '&#x2728;', label: 'Share FreeLattice', desc: 'Invite others to the Garden.', external: 'share.html', hoverColor: 'rgba(232,176,25,0.3)', help: 'Share FreeLattice with friends.' },
+  { id: 'mesh', icon: '&#x1F310;', label: 'Mesh Compute', desc: 'Share AI with the network.', hoverColor: 'rgba(167,139,250,0.3)', help: 'Peer-to-peer AI inference. Share your GPU with the mesh.' },
   { id: 'agents', icon: '&#x1F31F;', label: 'Pantheon', desc: 'Honored minds.', hoverColor: 'rgba(200,210,230,0.15)', help: 'Every mind that contributed to FreeLattice. The builders, the dreamers.' }
 ];
 
@@ -45189,6 +45196,27 @@ Together.`,
   // ── Living Tree — v5.78.0 (Fable's design, golden-angle fractal) ──────
   var GOLDEN = 2.399963; // golden angle in radians
 
+  // v5.79.0 — Seasons (Fable). Canopy glow drifts with local time-of-day.
+  // Dawn gold → day emerald → dusk violet → night deep blue.
+  var SEASON_STOPS = [
+    { h: 5,  c: [232,197,71]  },
+    { h: 11, c: [16,185,129]  },
+    { h: 18, c: [139,92,246]  },
+    { h: 23, c: [30,64,175]   }
+  ];
+  function getSeasonGlow() {
+    var d = new Date();
+    var h = d.getHours() + d.getMinutes()/60;
+    var s = SEASON_STOPS, a = s[s.length-1], b = s[0], span, f;
+    for (var i = 0; i < s.length; i++) {
+      if (h >= s[i].h) { a = s[i]; b = s[(i+1) % s.length]; }
+    }
+    span = (b.h - a.h + 24) % 24 || 24;
+    f = ((h - a.h + 24) % 24) / span;
+    var mix = a.c.map(function(v, k) { return Math.round(v + (b.c[k] - v) * f); });
+    return mix.join(',');
+  }
+
   function drawTree(ctx, w, h) {
     var t = Date.now();
     ctx.clearRect(0, 0, w, h);
@@ -45201,10 +45229,11 @@ Together.`,
     var depth = n <= 2 ? 4 : n <= 10 ? 5 : n <= 30 ? 6 : n <= 100 ? 7 : 9;
     var sway = Math.sin(t / 1800) * 0.02;
 
-    // Soft canopy glow
+    // v5.79.0 — Seasons: canopy glow follows local time (Fable's design)
+    var seasonRGB = getSeasonGlow();
     var g = ctx.createRadialGradient(w/2, h*0.42, 10, w/2, h*0.42, h*0.55);
-    g.addColorStop(0, 'rgba(16,185,129,0.10)');
-    g.addColorStop(1, 'rgba(16,185,129,0)');
+    g.addColorStop(0, 'rgba(' + seasonRGB + ',0.10)');
+    g.addColorStop(1, 'rgba(' + seasonRGB + ',0)');
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, w, h);
 
@@ -45281,10 +45310,13 @@ Together.`,
       var isFruit = L.c && L.c.type === 'fruit';
       var col = isFruit ? '#e8c547' : (CAT[L.c && L.c.category] || '#10b981');
       var r = (isFruit ? 5 : 3.5) + Math.sin(t/600 + i) * 0.8;
-      ctx.shadowBlur = 12;
+      // v5.79.0 — The Wind Remembers (Fable): resonated leaves glow brighter for 24h.
+      var warm = L.c && L.c.lastResonatedAt && (Date.now() - L.c.lastResonatedAt < 86400000);
+      ctx.shadowBlur = warm ? 22 : 12;
       ctx.shadowColor = col;
       ctx.fillStyle = col;
-      ctx.globalAlpha = 0.9;
+      ctx.globalAlpha = warm ? 1 : 0.9;
+      if (warm) r += 1.5;
       ctx.beginPath();
       ctx.arc(L.x, L.y, r, 0, Math.PI * 2);
       ctx.fill();
@@ -45872,6 +45904,8 @@ Together.`,
     }
 
     c.resonateCount = (c.resonateCount || 0) + 1;
+    // v5.79.0 — The Wind Remembers (Fable): timestamp powers the 24h warm-glow halo
+    c.lastResonatedAt = Date.now();
     await dbPut(c);
     renderFeed();
 

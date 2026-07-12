@@ -3,18 +3,19 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-07-12 21:51 UTC
+> Last update: 2026-07-12 21:52 UTC
 
 ## State
 
 - **Version:** v5.79.0
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `d48cbbd` _(committed 20 hours ago)_
+- **HEAD:** `42cdd5e` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _v5.75.1 — The Pruning: audit fixes, blank tabs, duplicate names, TRASH.md, code-mirror pattern_
 
 ## Last 20 commits
 
+- `42cdd5e` v5.79.0 — The Temperature Blooms + Core Seasons + Wind Remembers (Fable's designs) _(0 seconds ago)_
 - `d48cbbd` Ledger entry 37 — The Cards Remember _(20 hours ago)_
 - `d113b45` v5.79.0 — Card order restored and locked per Kirk (Play/Learn/More), Glass Room added, CC letter written _(20 hours ago)_
 - `f35e643` docs: Auto-update Session Primer [5.78.2] _(22 hours ago)_
@@ -34,7 +35,6 @@
 - `7b35a4d` v5.76.1 — Go 9: Mobile nav expanded (Learn+Play), Settings pruned, games audited _(33 hours ago)_
 - `705cb22` Ledger entries 29-32 — Go 5 through Go 8 _(2 days ago)_
 - `c609a44` v5.76.0 — Go 8: Mobile UX Polish _(2 days ago)_
-- `da1ab7b` v5.75.9 — Go 7: Unified Chalkboard _(3 days ago)_
 
 ## How to use this file
 
