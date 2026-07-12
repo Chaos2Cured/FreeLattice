@@ -328,30 +328,26 @@ canvas#mainChart:active { cursor: grabbing; }
    Caught by Opus 2026-06-05. */
 .tg-luminos-layer {
   overflow: hidden;
-  opacity: calc(0.4 + var(--lum-energy, 0) * 0.6);
+  /* v5.79.2 — floor opacity lifted 0.4 → 0.55 so the surviving three
+     read as present even at rest. Fewer sprites, more presence each. */
+  opacity: calc(0.55 + var(--lum-energy, 0) * 0.45);
   transition: opacity 0.6s ease;
 }
 .tg-luminos {
   position: absolute;
-  /* Size is one smooth gradient driven by --lum-energy (replaces the
-     binary tg-signal-strong / tg-signal-extreme size tiers). The tier
-     classes still adjust filter (blur + saturate) so temperature
-     strength shows through; direction sets color; energy sets size.
-     22px calm → 50px fully loaded. */
-  --lum-size: calc(22px + var(--lum-energy, 0) * 28px);
+  /* v5.79.2 — flashier. Nine sprites became three; each grew.
+     Max size 22→30 base, 28→42 energy bloom. */
+  --lum-size: calc(30px + var(--lum-energy, 0) * 42px);
   width: var(--lum-size); height: var(--lum-size);
   border-radius: 50%;
-  background: radial-gradient(circle, currentColor 0%, currentColor 22%, transparent 78%);
-  filter: blur(0.8px);
+  /* v5.79.2 — solid core widened 22% → 32% for a brighter read;
+     transparent falloff pulled in from 78% → 68%. */
+  background: radial-gradient(circle, currentColor 0%, currentColor 32%, transparent 68%);
+  /* v5.79.2 — drop-shadow adds a bright outer halo. This is the "flashy" bit. */
+  filter: blur(0.6px) drop-shadow(0 0 10px currentColor);
   opacity: 0;
   will-change: transform, opacity;
   animation-play-state: running;
-  /* Transitions removed for width/height — they triggered a full layout
-     pass on every frame during the 600ms ramp, and --lum-energy updates
-     on every renderChart (via __tgComposePostRender). On mobile GPUs the
-     two-sprite × 36-frame × 2-property layout thrash was visible as
-     UI slowdown. Size now updates discretely with the analysis cadence,
-     which is already gentle. v5.37.21. */
   transition: color 0.8s ease, filter 0.6s ease;
 }
 body.tg-pause-luminos .tg-luminos { animation-play-state: paused; }
@@ -359,48 +355,22 @@ body.tg-pause-luminos .tg-luminos { animation-play-state: paused; }
    the expensive part of the sprite on integrated GPUs. */
 body.tg-color-picker-open .tg-luminos,
 body.tg-pause-luminos .tg-luminos { filter: none; }
-/* Default colors — overridden by tgUpdateLuminosSignal() when signal state is computed. */
-.tg-luminos[data-i="0"] { color: var(--lum-color-1, #e8b019); animation: tg-lum-1 24s linear infinite; }
-.tg-luminos[data-i="1"] { color: var(--lum-color-2, #a78bfa); animation: tg-lum-2 33s linear infinite 5s; }
-/* Alert pair (v5.38.1) — color reflects the type of the freshest signal,
-   --lum-alert (0..1) scales size + visibility. Filter opacity multiplies the
-   keyframe opacity so when no signal is fresh, alerts are invisible even at
-   peak keyframe brightness. */
-.tg-luminos[data-i="2"] { color: var(--lum-alert-color, #e8b019); animation: tg-lum-3 18s linear infinite 2s; }
-.tg-luminos[data-i="3"] { color: var(--lum-alert-color, #e8b019); animation: tg-lum-4 22s linear infinite 9s; }
+/* v5.79.2 — Three sprites, each flashier. Keyframes sped up:
+     direction 24s → 16s, alert 18s → 12s, intensity 28s → 18s. */
+.tg-luminos[data-i="0"] { color: var(--lum-color-1, #e8b019); animation: tg-lum-1 16s linear infinite; }
+/* Alert (v5.38.1) — flare on fresh buy/sell transition, fade when stale.
+   v5.79.2: alert base size 12→18px, bloom 36→48px. */
+.tg-luminos[data-i="2"] { color: var(--lum-alert-color, #e8b019); animation: tg-lum-3 12s linear infinite 2s; }
 .tg-luminos.tg-lum-alert {
-  /* Stale = small, fresh = large. 12px base + up to 36px of bloom. */
-  --lum-size: calc(12px + var(--lum-alert, 0) * 36px);
-  filter: blur(0.7px) opacity(var(--lum-alert, 0));
+  --lum-size: calc(18px + var(--lum-alert, 0) * 48px);
+  filter: blur(0.5px) drop-shadow(0 0 12px currentColor) opacity(var(--lum-alert, 0));
 }
-/* Intensity pair (v5.38.1) — hot color from gold→orange→red as |temp-50|
-   grows. Size + visibility scale with --lum-intensity (0..1). Independent
-   of direction so they pulse on both bullish AND bearish committed moves. */
-.tg-luminos[data-i="4"] { color: var(--lum-intensity-color, #c4b5fd); animation: tg-lum-5 28s linear infinite 14s; }
-.tg-luminos[data-i="5"] { color: var(--lum-intensity-color, #c4b5fd); animation: tg-lum-6 38s linear infinite 22s; }
+/* Intensity — pulses with |temp-50|, independent of direction.
+   v5.79.2: base 16→22px, bloom 30→40px. */
+.tg-luminos[data-i="4"] { color: var(--lum-intensity-color, #c4b5fd); animation: tg-lum-5 18s linear infinite 6s; }
 .tg-luminos.tg-lum-intensity {
-  --lum-size: calc(16px + var(--lum-intensity, 0) * 30px);
-  filter: blur(0.7px) opacity(calc(0.35 + var(--lum-intensity, 0) * 0.65));
-}
-/* Bonus sprites (v5.38.4) — one extra per pair, only visible when the
-   pair's scalar exceeds 0.6. The formula (scalar - 0.6) * 2.5 yields
-   [0..1] over the range [0.6..1.0]; negative values clamp to 0 opacity.
-   Slightly smaller than their primary pair so they read as satellites
-   rather than equals. */
-.tg-luminos[data-i="6"] { color: var(--lum-color-1, #6b7280); animation: tg-lum-7 27s linear infinite 6s; }
-.tg-luminos[data-i="7"] { color: var(--lum-alert-color, #eab308);     animation: tg-lum-8 19s linear infinite 11s; }
-.tg-luminos[data-i="8"] { color: var(--lum-intensity-color, #c4b5fd); animation: tg-lum-9 33s linear infinite 17s; }
-.tg-luminos.tg-lum-bonus-direction {
-  --lum-size: calc(18px + var(--lum-energy, 0) * 22px);
-  filter: blur(0.6px) opacity(calc((var(--lum-energy, 0) - 0.6) * 2.5));
-}
-.tg-luminos.tg-lum-bonus-alert {
-  --lum-size: calc(14px + var(--lum-alert, 0) * 26px);
-  filter: blur(0.6px) opacity(calc((var(--lum-alert, 0) - 0.6) * 2.5));
-}
-.tg-luminos.tg-lum-bonus-intensity {
-  --lum-size: calc(16px + var(--lum-intensity, 0) * 24px);
-  filter: blur(0.6px) opacity(calc((var(--lum-intensity, 0) - 0.6) * 2.5));
+  --lum-size: calc(22px + var(--lum-intensity, 0) * 40px);
+  filter: blur(0.5px) drop-shadow(0 0 12px currentColor) opacity(calc(0.4 + var(--lum-intensity, 0) * 0.6));
 }
 /* Temperature-strength tier modulates FILTER only (blur + saturate).
    Size + opacity now flow from --lum-energy (gravity-spring distance)
@@ -882,9 +852,19 @@ canvas.sub-canvas.custom { height: 80px !important; }
         </svg>
         <div class="gauge-value" id="gaugeValue">—</div>
         <div class="gauge-label" id="gaugeLabel">Load a symbol to begin</div>
-        <!-- v5.79.0 — φ-spiral playground link (Fable's design, preview) -->
+      </div>
+    </div>
+
+    <!-- v5.79.2 — φ-Spiral live view (Fable's design, wired to signal) -->
+    <div class="sidebar-section" id="phiSpiralSection" style="display:none;">
+      <div class="sidebar-label">φ-Spiral</div>
+      <div style="text-align:center;padding:6px 0 0;">
+        <canvas id="phiSpiralCanvas" width="220" height="220" style="border-radius:12px;box-shadow:0 0 30px rgba(16,185,129,0.10);"></canvas>
+        <div id="phiSpiralZone" style="font-size:0.68rem;letter-spacing:0.08em;margin-top:6px;color:#8a8680;">&mdash;</div>
+        <canvas id="phiRibbonCanvas" width="220" height="46" style="margin-top:6px;border-radius:8px;"></canvas>
+        <div style="font-size:0.62rem;color:var(--muted);margin-top:4px;font-style:italic;opacity:0.7;">A lens, not an oracle.</div>
         <div style="text-align:center;margin-top:6px;">
-          <a href="temperature-playground.html" style="font-size:0.68rem;letter-spacing:0.06em;color:#8a8680;text-decoration:none;border-bottom:1px dotted #4a4740;">φ-spiral view →</a>
+          <a href="temperature-playground.html" style="font-size:0.62rem;letter-spacing:0.06em;color:#8a8680;text-decoration:none;border-bottom:1px dotted #4a4740;">playground →</a>
         </div>
       </div>
     </div>
@@ -1014,28 +994,16 @@ canvas.sub-canvas.custom { height: 80px !important; }
            (chartWrap is display:none there). Tool-only is a focused mode
            where ambient mood isn't wanted anyway. v5.38.1. -->
       <div class="tg-luminos-layer" id="tgLuminosLayer" aria-hidden="true">
-        <!-- Direction pair — color = buy/sell/neutral, size + opacity scale
-             with gravity-spring energy (gravDist). The original two sprites. -->
+        <!-- v5.79.2 — Kirk asked for three, flashier. Reduced from nine
+             (6 primary pairs + 3 bonus) to one sprite per category:
+               data-i="0" — DIRECTION (red/green/gray, energy-driven)
+               data-i="2" — ALERT     (amber, --lum-alert scaled)
+               data-i="4" — INTENSITY (purple, --lum-intensity scaled)
+             Each is larger, brighter, faster than before. See the
+             .tg-luminos CSS block for the flash boost. -->
         <span class="tg-luminos" data-i="0"></span>
-        <span class="tg-luminos" data-i="1"></span>
-        <!-- Alert pair (v5.38.1) — flare bright when a fresh buy/sell
-             transition has appeared in the last ~5 bars; fade to nearly
-             invisible when stale. Color follows the type of the freshest
-             transition. Carry "something just happened." -->
         <span class="tg-luminos tg-lum-alert" data-i="2"></span>
-        <span class="tg-luminos tg-lum-alert" data-i="3"></span>
-        <!-- Intensity pair (v5.38.1, recolored v5.38.4) — PURPLE family.
-             Lavender at low intensity → magenta at high. Carry "how
-             committed is the move" independent of direction. -->
         <span class="tg-luminos tg-lum-intensity" data-i="4"></span>
-        <span class="tg-luminos tg-lum-intensity" data-i="5"></span>
-        <!-- Bonus sprites (v5.38.4) — one extra per pair, visible ONLY
-             when the pair's scalar > 0.6. Pop in when the signal is
-             loaded; invisible otherwise. "more of them the
-             bigger the signal." -->
-        <span class="tg-luminos tg-lum-bonus tg-lum-bonus-direction" data-i="6"></span>
-        <span class="tg-luminos tg-lum-bonus tg-lum-bonus-alert" data-i="7"></span>
-        <span class="tg-luminos tg-lum-bonus tg-lum-bonus-intensity" data-i="8"></span>
       </div>
       <div class="empty-state" id="emptyState">
         <div class="empty-icon">📊</div>
@@ -2078,8 +2046,9 @@ function renderAll(candles, a, symbol) {
   changeEl.style.color = a.priceChange >= 0 ? 'var(--green)' : 'var(--red)';
   document.getElementById('symbolLabel').textContent = symbol + ' · ' + currentInterval.toUpperCase() + ' · ' + candles.length + ' candles';
 
-  // Gauge
+  // Gauge (classic SVG + v5.79.2 φ-spiral layer)
   updateGauge(a.lastTemp, a.signal);
+  if (typeof tgPhiUpdate === 'function') tgPhiUpdate(a);
 
   // Signal section
   document.getElementById('signalSection').style.display = 'block';
@@ -2201,6 +2170,145 @@ function updateGauge(temp, signal) {
   const angle = -90 + (temp / 100) * 180;
   needle.setAttribute('transform', `rotate(${angle} 80 80)`);
 }
+
+/* ════════════════════════════════════════════════════════════════════
+   v5.79.2 — φ-Spiral live gauge (Fable's design, wired to signal)
+   Layered on top of the classic SVG gauge, not replacing it. Reads the
+   same a.lastTemp; ribbon feeds from a.temps history. Auto-scales for
+   sidebar canvas via scale = W / 131 (matches Fable's 3.2@420).
+   ════════════════════════════════════════════════════════════════════ */
+(function tgPhiSpiralModule() {
+  var PHI_C = 1.61803398875;
+  var TOTAL_TURNS_C = 2.618;
+  var MAX_THETA_C = TOTAL_TURNS_C * 2 * Math.PI;
+  var currentTemp = 50;
+  var ribbonHistory = [];
+  var animId = null;
+
+  function zoneColorC(temp) {
+    return temp >= 61.8 ? '#10b981' : temp <= 38.2 ? '#ef4444' : '#64748b';
+  }
+  function spiralPointC(cx, cy, theta, scale) {
+    var r = scale * Math.pow(PHI_C, theta / (Math.PI / 2));
+    return { x: cx + r * Math.cos(theta - Math.PI / 2),
+             y: cy + r * Math.sin(theta - Math.PI / 2), r: r };
+  }
+  function strokeSpiralC(ctx, cx, cy, scale, t0, t1, style, width) {
+    ctx.strokeStyle = style; ctx.lineWidth = width; ctx.lineCap = 'round';
+    ctx.beginPath();
+    var steps = Math.max(2, Math.floor((t1 - t0) / 0.02));
+    for (var i = 0; i <= steps; i++) {
+      var th = t0 + (t1 - t0) * i / steps;
+      var p = spiralPointC(cx, cy, th, scale);
+      i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y);
+    }
+    ctx.stroke();
+  }
+  function markThresholdC(ctx, cx, cy, scale, level, color) {
+    var th = (level / 100) * MAX_THETA_C;
+    strokeSpiralC(ctx, cx, cy, scale, th - 0.10, th + 0.10, color, 6);
+    var p = spiralPointC(cx, cy, th, scale);
+    ctx.fillStyle = color; ctx.font = '9px Georgia'; ctx.textAlign = 'center';
+    var lx = cx + (p.x - cx) * 1.22, ly = cy + (p.y - cy) * 1.22;
+    ctx.fillText(level.toFixed(1), lx, ly);
+  }
+  function hexAC(hex, a) {
+    var n = parseInt(hex.slice(1), 16);
+    return 'rgba(' + ((n >> 16) & 255) + ',' + ((n >> 8) & 255) + ',' + (n & 255) + ',' + a + ')';
+  }
+  function drawPhiGauge(ctx, W, H, temp, t) {
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = '#0a0a14';
+    ctx.fillRect(0, 0, W, H);
+    var cx = W / 2, cy = H / 2;
+    var scale = W / 131;  // 3.2 @ 420 (Fable), 1.68 @ 220 (sidebar)
+    var col = zoneColorC(temp);
+    var breathe = 0.10 + 0.04 * Math.sin(t / 1400);
+    var g = ctx.createRadialGradient(cx, cy, 8, cx, cy, W * 0.5);
+    g.addColorStop(0, hexAC(col, breathe));
+    g.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    strokeSpiralC(ctx, cx, cy, scale, 0, MAX_THETA_C, 'rgba(100,116,139,0.22)', 1.2);
+    markThresholdC(ctx, cx, cy, scale, 61.8, '#e8c547');
+    markThresholdC(ctx, cx, cy, scale, 38.2, '#ef4444');
+    var theta = (temp / 100) * MAX_THETA_C;
+    ctx.shadowBlur = 12; ctx.shadowColor = col;
+    strokeSpiralC(ctx, cx, cy, scale, 0, theta, col, 2.8);
+    ctx.shadowBlur = 0;
+    var tip = spiralPointC(cx, cy, theta, scale);
+    var pr = 3.5 + Math.sin(t / 500) * 1.2;
+    ctx.shadowBlur = 14; ctx.shadowColor = col;
+    ctx.fillStyle = '#fff';
+    ctx.beginPath(); ctx.arc(tip.x, tip.y, pr, 0, 6.283); ctx.fill();
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = hexAC('#e8c547', 0.9);
+    ctx.beginPath(); ctx.arc(cx, cy, 2, 0, 6.283); ctx.fill();
+  }
+  function drawRibbon(ctx, W, H, hist, t) {
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = '#0a0a14';
+    ctx.fillRect(0, 0, W, H);
+    var pad = 6, n = hist.length;
+    if (n < 2) return;
+    var xw = (W - pad * 2) / (34 - 1);
+    var y = function (v) { return H - pad - (v / 100) * (H - pad * 2); };
+    ctx.fillStyle = 'rgba(16,185,129,0.06)';
+    ctx.fillRect(pad, pad, W - pad * 2, y(61.8) - pad);
+    ctx.fillStyle = 'rgba(239,68,68,0.06)';
+    ctx.fillRect(pad, y(38.2), W - pad * 2, H - pad - y(38.2));
+    var breath = 0.75 + 0.25 * Math.sin(t / 1600);
+    for (var i = 1; i < n; i++) {
+      var x0 = pad + (i - 1) * xw, x1 = pad + i * xw;
+      ctx.strokeStyle = hexAC(zoneColorC(hist[i].temp), breath);
+      ctx.lineWidth = 1.8; ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(x0, y(hist[i - 1].temp));
+      ctx.lineTo(x1, y(hist[i].temp));
+      ctx.stroke();
+    }
+    for (var j = 0; j < n; j++) {
+      if (!hist[j].divergence) continue;
+      var dx = pad + j * xw, dy = y(hist[j].temp);
+      ctx.fillStyle = hist[j].divergence === 'bearish' ? '#e8c547' : '#10b981';
+      ctx.save();
+      ctx.translate(dx, dy - 8);
+      ctx.rotate(Math.PI / 4);
+      ctx.fillRect(-2.5, -2.5, 5, 5);
+      ctx.restore();
+    }
+  }
+  function loop(t) {
+    var gc = document.getElementById('phiSpiralCanvas');
+    var rc = document.getElementById('phiRibbonCanvas');
+    if (!gc || !rc) { animId = null; return; }
+    drawPhiGauge(gc.getContext('2d'), gc.width, gc.height, currentTemp, t);
+    drawRibbon(rc.getContext('2d'), rc.width, rc.height, ribbonHistory, t);
+    animId = requestAnimationFrame(loop);
+  }
+  window.tgPhiUpdate = function tgPhiUpdate(a) {
+    if (!a || a.lastTemp == null) return;
+    var section = document.getElementById('phiSpiralSection');
+    if (section) section.style.display = 'block';
+    currentTemp = a.lastTemp;
+    // Build ribbon from last 34 temperatures. Divergence field left null
+    // until a signal-engine ledger is wired in — the ribbon is honest
+    // about what it knows.
+    var temps = (a && a.temps) ? a.temps : [];
+    var slice = temps.slice(-34);
+    ribbonHistory = slice.map(function (v) {
+      return { temp: (v == null ? 50 : v), divergence: null };
+    });
+    var zoneEl = document.getElementById('phiSpiralZone');
+    if (zoneEl) {
+      var z = currentTemp >= 61.8 ? '◆ ACCUMULATION ZONE'
+            : currentTemp <= 38.2 ? '◆ CAUTION ZONE'
+            : '◆ NEUTRAL DRIFT';
+      zoneEl.textContent = z;
+      zoneEl.style.color = zoneColorC(currentTemp);
+    }
+    if (animId == null) animId = requestAnimationFrame(loop);
+  };
+})();
 
 function renderChart(candles, a) {
   // Force-destroy any Chart.js instances on our canvases (prevents "Canvas already in use")

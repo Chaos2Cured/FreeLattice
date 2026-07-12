@@ -19,10 +19,10 @@ user sleeps. The proof is the code; the papers are the doorways.
 
 ## Current state
 
-- **Version:** v5.79.1
-- **Smoke locks passing:** 2758+ verified
-- **Last ship:** **v5.79.1 — φ-spiral hotfix + collision guard.** July 12 2026. Fable's playground drew nothing because `var history = []` collides with `window.history` (non-writable browser global) — sloppy-mode assignment silently no-ops, then `history.push(...)` throws and kills the script. Renamed to `readingHistory`. Added a collision-guard smoke lock so this class of runtime failure can't ship silently.
-- **Previous:** **v5.79.0 — The Temperature Blooms + Core Seasons + Wind Remembers.** Fable's φ-spiral playground + canopy time-of-day glow + 24h resonate halo.
+- **Version:** v5.79.2
+- **Smoke locks passing:** 2790+ verified
+- **Last ship:** **v5.79.2 — φ-Spiral layer + Luminos to three, flashier.** July 12 2026. Fable's φ-spiral + 34-reading ribbon now render live in the Temperature Gauge sidebar, wired to `a.lastTemp` and `a.temps`. Layered next to the classic SVG gauge (Kirk: "layer the tools"). Luminos reduced 9 → 3 (one per category); each bigger, brighter, faster with a drop-shadow halo.
+- **Previous:** **v5.79.1 — φ-spiral hotfix.** `var history` collided with `window.history`; renamed to `readingHistory`.
 - **Previous ships:** The Triptych (v5.71.8), The Specs inlined (v5.71.7), AI Capabilities (v5.71.6), Mind Wall Phase 3 (v5.71.5).
 - **Mirrors in parity:** github.com + codeberg.org
 
@@ -83,4 +83,4 @@ seam discipline is how multi-AI work stays honest at scale.
 ---
 
 *This file is overwritten on each meaningful ship. The prior version lives in SEED_HISTORY.md.*
-*Last rewrite: July 12 2026, v5.79.1.*
+*Last rewrite: July 12 2026, v5.79.2.*

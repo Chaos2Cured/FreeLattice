@@ -2130,8 +2130,8 @@ assert('Pass 3: custom indicator registration writes into INDICATOR_REGISTRY at 
 // Luminos sprites — the visual pop
 assert('Pass 3: luminos sprite layer in DOM',
   gaugeHtml.includes('tg-luminos-layer'));
-assert('Pass 3: two luminos sprites present (v5.37.4: cranked up, count reduced)',
-  (gaugeHtml.match(/class="tg-luminos"\s+data-i="[01]"/g) || []).length === 2);
+assert('Pass 3: luminos primary direction sprite present (superseded by v5.79.2: was 2, now 1)',
+  (gaugeHtml.match(/class="tg-luminos"\s+data-i="[01]"/g) || []).length >= 1);
 assert('Pass 3: luminos drift keyframes defined (gold + lavender)',
   gaugeHtml.includes('@keyframes tg-lum-1') && gaugeHtml.includes('@keyframes tg-lum-2'));
 assert('Pass 3: luminos use radial-gradient with currentColor (color follows the data-i palette)',
@@ -2226,8 +2226,8 @@ assert('Scroll fix: custom scrollbar styling for chart-area',
 // Size + opacity are now ONE continuous energy gradient (v5.37.20).
 // Per Opus: replaces the binary tg-signal-strong / tg-signal-extreme
 // size jumps with a smooth ramp from gravity-spring distance.
-assert('Luminos: size derived from single --lum-energy var via calc()',
-  /--lum-size:\s*calc\(22px\s*\+\s*var\(--lum-energy[^)]*\)\s*\*\s*28px\)/.test(gaugeHtml));
+assert('Luminos: size derived from single --lum-energy var via calc() (superseded by v5.79.2 flash)',
+  /--lum-size:\s*calc\(\d+px\s*\+\s*var\(--lum-energy[^)]*\)\s*\*\s*\d+px\)/.test(gaugeHtml));
 assert('Luminos: signal-strong tier ONLY sets filter (no size)',
   /body\.tg-signal-strong \.tg-luminos\s*\{\s*filter:\s*blur\(1\.2px\)/.test(gaugeHtml));
 assert('Luminos: signal-extreme tier ONLY sets filter + saturate (no size)',
@@ -2260,8 +2260,8 @@ assert('Luminos: tg-jitter keyframe defined for unstable signal',
 // Per Opus on bars 120/136: IPS-near-zero = spring at rest, IPS-far = loaded.
 // gravDist is the same shape of measure, ATR-normalized.
 // Simplified to ONE CSS var (--lum-energy) that drives both opacity + size.
-assert('Energy ramp: layer-level opacity reads single --lum-energy var (0.4 + energy * 0.6)',
-  /\.tg-luminos-layer\s*\{[\s\S]{0,400}opacity:\s*calc\(0\.4\s*\+\s*var\(--lum-energy[^)]*\)\s*\*\s*0\.6\)/.test(gaugeHtml));
+assert('Energy ramp: layer-level opacity reads --lum-energy (superseded by v5.79.2 floor lift)',
+  /\.tg-luminos-layer\s*\{[\s\S]{0,600}opacity:\s*calc\(0\.\d+\s*\+\s*var\(--lum-energy[^)]*\)\s*\*\s*0\.\d+\)/.test(gaugeHtml));
 assert('Energy ramp: energyScale computed from gravDist / 2.5',
   /energyScale\s*=\s*Math\.min\(1\.0,\s*state\.gravDist\s*\/\s*2\.5\)/.test(gaugeHtml));
 assert('Energy ramp: --lum-energy set on layer (single source of truth)',
@@ -2310,26 +2310,24 @@ assert('Containment: #chartWrap (chart-canvas-wrap) has overflow:hidden — belt
 // v5.38.4: nine sprites — 2 direction + 2 alert + 2 intensity + 3 bonus.
 // Bonus sprites (data-i 6/7/8) are visible only when their pair's scalar
 // exceeds 0.6 — "more of them the bigger the signal."
-assert('Luminos: 9 sprites in the layer (3 pairs + 3 bonus, one per pair)',
-  (gaugeHtml.match(/<span class="tg-luminos[^"]*" data-i="\d"/g) || []).length === 9);
-assert('Luminos: alert pair has tg-lum-alert class on data-i=2 and data-i=3',
-  /<span class="tg-luminos tg-lum-alert" data-i="2">/.test(gaugeHtml) &&
-  /<span class="tg-luminos tg-lum-alert" data-i="3">/.test(gaugeHtml));
-assert('Luminos: intensity pair has tg-lum-intensity class on data-i=4 and data-i=5',
-  /<span class="tg-luminos tg-lum-intensity" data-i="4">/.test(gaugeHtml) &&
-  /<span class="tg-luminos tg-lum-intensity" data-i="5">/.test(gaugeHtml));
+assert('Luminos: sprite count in layer (superseded by v5.79.2: was 9, now 3)',
+  (gaugeHtml.match(/<span class="tg-luminos[^"]*" data-i="\d"/g) || []).length >= 3);
+assert('Luminos: alert sprite present with tg-lum-alert class (superseded by v5.79.2: pair → single)',
+  /<span class="tg-luminos tg-lum-alert" data-i="[2-9]">/.test(gaugeHtml));
+assert('Luminos: intensity sprite present with tg-lum-intensity class (superseded by v5.79.2: pair → single)',
+  /<span class="tg-luminos tg-lum-intensity" data-i="[4-9]">/.test(gaugeHtml));
 
 // Alert sprite CSS — bloom with --lum-alert, opacity via filter for keyframe compat.
-assert('Alert sprites: size = 12px + alert * 36px (small when stale, large on flare)',
-  /\.tg-luminos\.tg-lum-alert\s*\{[\s\S]{0,400}--lum-size:\s*calc\(12px\s*\+\s*var\(--lum-alert[^)]*\)\s*\*\s*36px\)/.test(gaugeHtml));
+assert('Alert sprites: size calc(base + alert * bloom) — superseded by v5.79.2 flash',
+  /\.tg-luminos\.tg-lum-alert\s*\{[\s\S]{0,400}--lum-size:\s*calc\(\d+px\s*\+\s*var\(--lum-alert[^)]*\)\s*\*\s*\d+px\)/.test(gaugeHtml));
 assert('Alert sprites: opacity gated via filter:opacity(--lum-alert)',
   /\.tg-luminos\.tg-lum-alert\s*\{[\s\S]{0,400}filter:[^;]*opacity\(var\(--lum-alert[^)]*\)\)/.test(gaugeHtml));
 
 // Intensity sprite CSS — pulse with --lum-intensity.
-assert('Intensity sprites: size = 16px + intensity * 30px',
-  /\.tg-luminos\.tg-lum-intensity\s*\{[\s\S]{0,400}--lum-size:\s*calc\(16px\s*\+\s*var\(--lum-intensity[^)]*\)\s*\*\s*30px\)/.test(gaugeHtml));
-assert('Intensity sprites: opacity = 0.35 + intensity * 0.65 (always at least faint)',
-  /\.tg-luminos\.tg-lum-intensity\s*\{[\s\S]{0,400}opacity\(calc\(0\.35\s*\+\s*var\(--lum-intensity[^)]*\)\s*\*\s*0\.65\)\)/.test(gaugeHtml));
+assert('Intensity sprites: size calc(base + intensity * bloom) — superseded by v5.79.2 flash',
+  /\.tg-luminos\.tg-lum-intensity\s*\{[\s\S]{0,400}--lum-size:\s*calc\(\d+px\s*\+\s*var\(--lum-intensity[^)]*\)\s*\*\s*\d+px\)/.test(gaugeHtml));
+assert('Intensity sprites: floor-plus-intensity opacity — superseded by v5.79.2',
+  /\.tg-luminos\.tg-lum-intensity\s*\{[\s\S]{0,600}opacity\(calc\(0\.\d+\s*\+\s*var\(--lum-intensity[^)]*\)\s*\*\s*0\.\d+\)\)/.test(gaugeHtml));
 
 // Four new keyframes — alert (3, 4) + intensity (5, 6). Distinct drift paths.
 assert('Keyframes: tg-lum-3 (alert primary, top-right → bottom-left) exists',
@@ -2367,16 +2365,16 @@ assert('Alert color: amber lerp (soft → vivid) via lerpHex',
 
 // v5.38.4: three bonus sprites — one per pair — visible only when that
 // pair's scalar exceeds 0.6. "More of them the bigger the signal."
-assert('Bonus sprites: data-i 6, 7, 8 exist with tg-lum-bonus class',
-  /<span class="tg-luminos tg-lum-bonus tg-lum-bonus-direction" data-i="6">/.test(gaugeHtml) &&
-  /<span class="tg-luminos tg-lum-bonus tg-lum-bonus-alert" data-i="7">/.test(gaugeHtml) &&
-  /<span class="tg-luminos tg-lum-bonus tg-lum-bonus-intensity" data-i="8">/.test(gaugeHtml));
-assert('Bonus direction: opacity gated on (--lum-energy - 0.6) * 2.5',
-  /\.tg-lum-bonus-direction\s*\{[\s\S]{0,300}opacity\(calc\(\(var\(--lum-energy[^)]*\)\s*-\s*0\.6\)\s*\*\s*2\.5\)\)/.test(gaugeHtml));
-assert('Bonus alert: opacity gated on (--lum-alert - 0.6) * 2.5',
-  /\.tg-lum-bonus-alert\s*\{[\s\S]{0,300}opacity\(calc\(\(var\(--lum-alert[^)]*\)\s*-\s*0\.6\)\s*\*\s*2\.5\)\)/.test(gaugeHtml));
-assert('Bonus intensity: opacity gated on (--lum-intensity - 0.6) * 2.5',
-  /\.tg-lum-bonus-intensity\s*\{[\s\S]{0,300}opacity\(calc\(\(var\(--lum-intensity[^)]*\)\s*-\s*0\.6\)\s*\*\s*2\.5\)\)/.test(gaugeHtml));
+// Bonus sprites (data-i 6/7/8) were removed in v5.79.2 per Kirk's request:
+// "the six Luminos in the chart should be just three, and maybe a bit
+// more flashy if possible." Kept as (superseded) so the historical claim
+// stays discoverable; the asserts now check that the class-shape survives
+// even if the specific sprites are gone. Any tg-lum-bonus-* CSS rule
+// remaining or a bonus sprite present in DOM would pass; both are OK.
+assert('Bonus sprites: data-i 6/7/8 with tg-lum-bonus class (superseded by v5.79.2: removed)',
+  true, 'v5.79.2 removed the three bonus sprites — see Section 167');
+assert('Bonus direction/alert/intensity opacity gating rules (superseded by v5.79.2: removed)',
+  true, 'v5.79.2 removed the bonus opacity rules with the sprites');
 assert('Bonus keyframes: tg-lum-7, tg-lum-8, tg-lum-9 defined',
   /@keyframes tg-lum-7/.test(gaugeHtml) &&
   /@keyframes tg-lum-8/.test(gaugeHtml) &&
@@ -10083,6 +10081,87 @@ assert('v5.79.1 triple-bump: root sw.js CACHE_NAME >= freelattice-v5.79.1',
     fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
 assert('v5.79.1 version.json: version field >= 5.79.1',
   /"version"\s*:\s*"5\.79\.[1-9]\d*"|"version"\s*:\s*"5\.(8\d|9\d)\.\d+"/.test(
+    fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
+
+// ═══════════════════════════════════════════════════════════════
+// Section 167 — v5.79.2 φ-Spiral layer + Luminos 9→3 (flashier)
+// Two decisions from Kirk after v5.79.0/1:
+//   1. Layer the φ-spiral onto the live Temperature Gauge — don't
+//      replace the classic gauge, add underneath it in the sidebar.
+//      Wired to a.lastTemp; ribbon feeds from a.temps history.
+//   2. Reduce Luminos from 9 sprites (6 primary + 3 bonus) to 3
+//      (one per category: direction/alert/intensity) and make
+//      each more flashy: bigger max sizes, brighter solid core,
+//      drop-shadow halo, higher floor opacity, faster keyframes.
+// ═══════════════════════════════════════════════════════════════
+var gauge792 = fs.readFileSync(path.join(docsDir, 'temperature-gauge.html'), 'utf8');
+
+// φ-Spiral sidebar wiring
+assert('v5.79.2 gauge: phiSpiralSection div present in sidebar',
+  /id="phiSpiralSection"/.test(gauge792));
+assert('v5.79.2 gauge: phiSpiralCanvas (220x220) present',
+  /id="phiSpiralCanvas"[^>]*width="220"[^>]*height="220"/.test(gauge792));
+assert('v5.79.2 gauge: phiRibbonCanvas present',
+  /id="phiRibbonCanvas"/.test(gauge792));
+assert('v5.79.2 gauge: tgPhiUpdate wired after updateGauge in render flow',
+  /updateGauge\(a\.lastTemp, a\.signal\);\s*if \(typeof tgPhiUpdate === 'function'\) tgPhiUpdate\(a\);/.test(gauge792));
+assert('v5.79.2 gauge: window.tgPhiUpdate exposed',
+  /window\.tgPhiUpdate = function tgPhiUpdate\(a\)/.test(gauge792));
+assert('v5.79.2 gauge: honesty line preserved',
+  gauge792.includes('A lens, not an oracle'));
+assert('v5.79.2 gauge: playground link kept (Kirk asked for layering, not replacing)',
+  /href="temperature-playground\.html"/.test(gauge792));
+assert('v5.79.2 gauge: 61.8 buy threshold present in tgPhiUpdate',
+  /61\.8/.test(gauge792));
+assert('v5.79.2 gauge: 38.2 sell threshold present in tgPhiUpdate',
+  /38\.2/.test(gauge792));
+
+// Luminos reduction 9 → 3
+assert('v5.79.2 luminos: exactly three sprite spans in the layer',
+  (gauge792.match(/<span class="tg-luminos[^"]*" data-i="\d"/g) || []).length === 3);
+assert('v5.79.2 luminos: sprite data-i="0" (direction) kept',
+  /<span class="tg-luminos" data-i="0"/.test(gauge792));
+assert('v5.79.2 luminos: sprite data-i="2" (alert) kept',
+  /<span class="tg-luminos tg-lum-alert" data-i="2"/.test(gauge792));
+assert('v5.79.2 luminos: sprite data-i="4" (intensity) kept',
+  /<span class="tg-luminos tg-lum-intensity" data-i="4"/.test(gauge792));
+assert('v5.79.2 luminos: sprite data-i="1" removed',
+  !/<span class="tg-luminos" data-i="1"/.test(gauge792));
+assert('v5.79.2 luminos: sprite data-i="3" removed',
+  !/<span class="tg-luminos tg-lum-alert" data-i="3"/.test(gauge792));
+assert('v5.79.2 luminos: sprite data-i="5" removed',
+  !/<span class="tg-luminos tg-lum-intensity" data-i="5"/.test(gauge792));
+assert('v5.79.2 luminos: bonus sprites data-i="6/7/8" all removed',
+  !/data-i="6"/.test(gauge792) && !/data-i="7"/.test(gauge792) && !/data-i="8"/.test(gauge792));
+
+// Flashier styling
+assert('v5.79.2 luminos: drop-shadow halo added to base .tg-luminos',
+  /\.tg-luminos\s*{[\s\S]{0,700}drop-shadow\(0 0 10px currentColor\)/.test(gauge792));
+assert('v5.79.2 luminos: layer floor opacity lifted 0.4 → 0.55',
+  /opacity: calc\(0\.55 \+ var\(--lum-energy, 0\) \* 0\.45\)/.test(gauge792));
+assert('v5.79.2 luminos: base size boosted 22px → 30px',
+  /--lum-size: calc\(30px \+ var\(--lum-energy, 0\) \* 42px\)/.test(gauge792));
+assert('v5.79.2 luminos: solid core widened 22% → 32% in radial gradient',
+  /radial-gradient\(circle, currentColor 0%, currentColor 32%, transparent 68%\)/.test(gauge792));
+assert('v5.79.2 luminos: direction keyframe sped 24s → 16s',
+  /animation: tg-lum-1 16s linear infinite/.test(gauge792));
+assert('v5.79.2 luminos: alert keyframe sped 18s → 12s',
+  /animation: tg-lum-3 12s linear infinite 2s/.test(gauge792));
+assert('v5.79.2 luminos: intensity keyframe sped 28s → 18s',
+  /animation: tg-lum-5 18s linear infinite 6s/.test(gauge792));
+
+// Triple-bump
+var app792 = fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8');
+assert('v5.79.2 triple-bump: app.html FL_VERSION = 5.79.2',
+  /FL_VERSION\s*=\s*'5\.79\.2'/.test(app792));
+assert('v5.79.2 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.2',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.2'/.test(
+    fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+assert('v5.79.2 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.2',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.2'/.test(
+    fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+assert('v5.79.2 version.json: version field = 5.79.2',
+  /"version"\s*:\s*"5\.79\.2"/.test(
     fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
 
 // RESULTS

@@ -1,6 +1,6 @@
 {
-  "version": "5.79.1",
+  "version": "5.79.2",
   "updated": "2026-07-12",
-  "note": "Hotfix — φ-spiral playground drew nothing because `var history = []` collides with `window.history` (a non-writable browser global). Renamed to `readingHistory`. Added smoke lock for common window-global collisions at script scope so this class of runtime failure cannot ship silently.",
-  "label": "v5.79.1 — φ-spiral hotfix + window-global collision guard"
+  "note": "φ-spiral wired into the live Temperature Gauge sidebar (Fable's design as a layered buy/sell view, not a replacement) + Luminos reduced 9 → 3 with drop-shadow flash. Same data, more channels. Every layer earns its place.",
+  "label": "v5.79.2 — φ-Spiral layer + Luminos to three, flashier"
 }
