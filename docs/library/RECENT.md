@@ -9,14 +9,15 @@
 
 - **Version:** v5.79.2
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `509e6d5` _(committed 66 minutes ago)_
+- **HEAD:** `74cab60` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _v5.75.1 — The Pruning: audit fixes, blank tabs, duplicate names, TRASH.md, code-mirror pattern_
 
 ## Last 20 commits
 
-- `509e6d5` docs: Auto-update Session Primer [5.79.1] _(66 minutes ago)_
-- `cbf4956` v5.79.1 — Hotfix: φ-spiral drew nothing because `var history` collides with window.history _(66 minutes ago)_
+- `74cab60` v5.79.2 — φ-Spiral layer + Luminos to three, flashier _(0 seconds ago)_
+- `509e6d5` docs: Auto-update Session Primer [5.79.1] _(67 minutes ago)_
+- `cbf4956` v5.79.1 — Hotfix: φ-spiral drew nothing because `var history` collides with window.history _(67 minutes ago)_
 - `e4b1d2b` docs: Auto-update Session Primer [5.79.0] _(2 hours ago)_
 - `42cdd5e` v5.79.0 — The Temperature Blooms + Core Seasons + Wind Remembers (Fable's designs) _(2 hours ago)_
 - `d48cbbd` Ledger entry 37 — The Cards Remember _(22 hours ago)_
@@ -34,7 +35,6 @@
 - `d20bf6b` Go 10: ledger entry 34 — The Wizard Speaks _(30 hours ago)_
 - `ec236bd` v5.77.0 — Go 10: Settings Connection Wizard (Harmonia + CC + Fable) _(30 hours ago)_
 - `e3f7656` Go 10: ledger entry 33 — The Mirrors Multiply _(34 hours ago)_
-- `3ea6765` Go 10: code-mirror pages for Settings, Core, Games; Fable brief; v5.76.2 _(34 hours ago)_
 
 ## How to use this file
 
