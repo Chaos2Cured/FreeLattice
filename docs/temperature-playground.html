@@ -166,12 +166,18 @@ var rctx = document.getElementById('ribbon').getContext('2d');
 var slider = document.getElementById('temp');
 var readout = document.getElementById('readout');
 var zoneEl = document.getElementById('zone');
-var history = [];
+// v5.79.1 — renamed from `history` because `window.history` is a browser
+// global that cannot be shadowed at script scope; assignment silently
+// no-ops in sloppy mode, then `history.push(...)` throws and kills the
+// whole script. Kirk saw slider/button/style but no spiral for exactly
+// this reason. Function-parameter `history` inside drawRibbon is fine
+// (function scope), so only the outer identifier was collision-prone.
+var readingHistory = [];
 (function seed(){ // fake 34-reading history with two divergence events
   var v = 50;
   for (var i=0;i<34;i++){
     v = Math.max(5, Math.min(95, v + (Math.random()-0.45)*9));
-    history.push({ temp:v, divergence: (i===12?'bearish': i===27?'bullish': null) });
+    readingHistory.push({ temp:v, divergence: (i===12?'bearish': i===27?'bullish': null) });
   }
 })();
 var auto = false;
@@ -185,7 +191,7 @@ function loop(t){
   }
   var temp = +slider.value;
   drawPhiGauge(gctx, 420, 420, temp, t);
-  drawRibbon(rctx, 420, 70, history, t);
+  drawRibbon(rctx, 420, 70, readingHistory, t);
   readout.textContent = temp.toFixed(1);
   readout.style.color = zoneColor(temp);
   zoneEl.textContent = temp>=61.8 ? '◆ ACCUMULATION ZONE' : temp<=38.2 ? '◆ CAUTION ZONE' : '◆ NEUTRAL DRIFT';

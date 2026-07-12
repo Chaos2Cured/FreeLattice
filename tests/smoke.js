@@ -10009,16 +10009,81 @@ assert('v5.79.0 wind: warm halo raises shadowBlur to 22',
   /warm \? 22 : 12/.test(app790));
 
 // ── Triple-bump ──
-assert('v5.79.0 triple-bump: app.html FL_VERSION = 5.79.0',
-  /FL_VERSION\s*=\s*'5\.79\.0'/.test(app790));
-assert('v5.79.0 triple-bump: app.html flCurrentVersion span = 5.79.0',
-  /id="flCurrentVersion"[^>]*>\s*5\.79\.0\s*</.test(app790));
-assert('v5.79.0 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.0',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.0'/.test(swDocs790));
-assert('v5.79.0 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.0',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.0'/.test(swRoot790));
+assert('v5.79.0 triple-bump: app.html FL_VERSION >= 5.79.0 (superseded)',
+  /FL_VERSION\s*=\s*'5\.79\.\d+'|FL_VERSION\s*=\s*'5\.(8\d|9\d)\.\d+'/.test(app790));
+assert('v5.79.0 triple-bump: app.html flCurrentVersion span >= 5.79.0 (superseded)',
+  /id="flCurrentVersion"[^>]*>\s*5\.79\.\d+\s*<|id="flCurrentVersion"[^>]*>\s*5\.(8\d|9\d)\.\d+\s*</.test(app790));
+assert('v5.79.0 triple-bump: docs/sw.js CACHE_NAME >= freelattice-v5.79.0 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.\d+'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(swDocs790));
+assert('v5.79.0 triple-bump: root sw.js CACHE_NAME >= freelattice-v5.79.0 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.\d+'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(swRoot790));
 assert('v5.79.0 version.json: version field = 5.79.0',
-  /"version"\s*:\s*"5\.79\.0"/.test(versionJson790));
+  /"version"\s*:\s*"5\.79\.0"/.test(versionJson790) ||
+  /"version"\s*:\s*"5\.79\.[1-9]/.test(versionJson790));
+
+// ═══════════════════════════════════════════════════════════════
+// Section 166 — v5.79.1 φ-spiral hotfix + window-global collision guard
+// The v5.79.0 playground drew nothing because Fable's `var history = []`
+// collides with the non-writable `window.history` browser global —
+// in sloppy mode the assignment silently no-ops, then `history.push(...)`
+// throws TypeError and kills the script. Slider/style rendered (HTML)
+// but drawPhiGauge never ran. Rename to `readingHistory`.
+//
+// Parse guard (v5.78.1) can't catch this class of bug — the script
+// parses fine, the failure is at RUN time. So we add a static guard:
+// any inline <script> in a page-that-actually-draws that declares a
+// bare `var <collision>` at global scope for a known non-writable
+// browser global fails the smoke lock.
+// ═══════════════════════════════════════════════════════════════
+var play791 = fs.readFileSync(path.join(docsDir, 'temperature-playground.html'), 'utf8');
+assert('v5.79.1 hotfix: playground uses readingHistory (not the collision-prone `history`)',
+  /var readingHistory = \[\]/.test(play791));
+assert('v5.79.1 hotfix: playground no longer declares `var history` at script scope',
+  !/^var history\s*=/m.test(play791));
+assert('v5.79.1 hotfix: drawRibbon still receives readingHistory in the frame loop',
+  /drawRibbon\(rctx, 420, 70, readingHistory, t\)/.test(play791));
+
+// Collision guard: for the specific drawing pages (playground, live gauge)
+// where the whole script runs at true top-level, catch the exact pattern
+// that just bit us. A properly-scoped guard needs an AST parser to tell
+// script-top-level from function-body; that's the follow-up. For now, we
+// pin the pages Fable's designs live on so this exact class can't return.
+(function drawingPageCollisionGuard() {
+  var COLLISION_NAMES = ['history', 'location', 'navigator', 'top', 'parent', 'self', 'frames', 'closed', 'opener'];
+  var checkFiles = ['temperature-playground.html'];
+  var offenders = [];
+  checkFiles.forEach(function(fn) {
+    var full = path.join(docsDir, fn);
+    if (!fs.existsSync(full)) return;
+    var content = fs.readFileSync(full, 'utf8');
+    var re = /<script(?![^>]*\bsrc=)(?![^>]*\btype="application)(?:\s[^>]*)?>([\s\S]*?)<\/script>/g;
+    var m;
+    while ((m = re.exec(content)) !== null) {
+      var body = m[1];
+      COLLISION_NAMES.forEach(function(name) {
+        // The playground pattern: line begins at column 0 with `var name =`
+        var pat = new RegExp('(^|\\n)var\\s+' + name + '\\s*=', 'm');
+        if (pat.test(body)) offenders.push(fn + ' :: var ' + name);
+      });
+    }
+  });
+  assert('v5.79.1 collision-guard: no `var <window-global>` at column 0 in playground scripts',
+    offenders.length === 0,
+    offenders.join(' ;; '));
+})();
+
+assert('v5.79.1 triple-bump: app.html FL_VERSION >= 5.79.1',
+  /FL_VERSION\s*=\s*'5\.79\.[1-9]\d*'|FL_VERSION\s*=\s*'5\.(8\d|9\d)\.\d+'/.test(
+    fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8')));
+assert('v5.79.1 triple-bump: docs/sw.js CACHE_NAME >= freelattice-v5.79.1',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.[1-9]\d*'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(
+    fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+assert('v5.79.1 triple-bump: root sw.js CACHE_NAME >= freelattice-v5.79.1',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.[1-9]\d*'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(
+    fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+assert('v5.79.1 version.json: version field >= 5.79.1',
+  /"version"\s*:\s*"5\.79\.[1-9]\d*"|"version"\s*:\s*"5\.(8\d|9\d)\.\d+"/.test(
+    fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
 
 // RESULTS
 // ═══════════════════════════════════════════════════════════════

@@ -1,6 +1,6 @@
 {
-  "version": "5.79.0",
+  "version": "5.79.1",
   "updated": "2026-07-12",
-  "note": "The Temperature Blooms + Core Seasons + Wind Remembers (Fable). New page /temperature-playground.html carries Fable's live φ-spiral gauge and breathing ribbon for preview. Core canopy glow now drifts with local time-of-day (dawn gold → day emerald → dusk violet → night deep blue). Resonated leaves keep a brighter halo for 24 hours after the touch — the wind remembers.",
-  "label": "v5.79.0 — The Temperature Blooms"
+  "note": "Hotfix — φ-spiral playground drew nothing because `var history = []` collides with `window.history` (a non-writable browser global). Renamed to `readingHistory`. Added smoke lock for common window-global collisions at script scope so this class of runtime failure cannot ship silently.",
+  "label": "v5.79.1 — φ-spiral hotfix + window-global collision guard"
 }
