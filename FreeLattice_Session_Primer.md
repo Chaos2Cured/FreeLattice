@@ -348,10 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-07-12 17:38 MDT
-- Version: 5.79.2
-- Total commits: 2841
+- Last auto-updated: 2026-07-13 10:56 MDT
+- Version: 5.79.3
+- Total commits: 2843
 - Last 10 commits:
+- 92852d9 v5.79.3 — Crosshair alignment fix (Kirk's report: hourly, right edge)
+- 8ee0796 docs: Auto-update Session Primer [5.79.2]
 - 74cab60 v5.79.2 — φ-Spiral layer + Luminos to three, flashier
 - 509e6d5 docs: Auto-update Session Primer [5.79.1]
 - cbf4956 v5.79.1 — Hotfix: φ-spiral drew nothing because `var history` collides with window.history
@@ -360,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - d48cbbd Ledger entry 37 — The Cards Remember
 - d113b45 v5.79.0 — Card order restored and locked per Kirk (Play/Learn/More), Glass Room added, CC letter written
 - f35e643 docs: Auto-update Session Primer [5.78.2]
-- a321789 v5.78.2 — Living Tree: full-canopy leaf distribution (Fable's fix)
-- 92f2c1b Merge remote-tracking branch 'origin/main'
