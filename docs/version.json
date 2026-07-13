@@ -1,6 +1,6 @@
 {
-  "version": "5.79.3",
+  "version": "5.79.4",
   "updated": "2026-07-13",
-  "note": "Crosshair sync fix — mouse position on sub-charts now maps to the correct bar on the main price chart. The old percentage was measured against full canvas width; the plotting areas differ because the main y-axis (4-digit prices) is wider than the sub y-axis (0/50/100). Now uses each chart's chartArea. Bug most visible on the hourly, at the right edge — exactly where Kirk caught it.",
-  "label": "v5.79.3 — Crosshair alignment fix"
+  "note": "Hotfix — the v5.79.3 crosshair fix squashed pct to a near-constant (crosshair stuck in center). Cause: applied a canvas-width/rect-width scale factor to chartArea coordinates that are already in CSS pixels for responsive Chart.js charts. Correct algorithm compares e.clientX - rect.left directly against chartArea.left/right, no scale factor.",
+  "label": "v5.79.4 — Crosshair hotfix (dropped the redundant scale factor)"
 }

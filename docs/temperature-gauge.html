@@ -3067,36 +3067,35 @@ document.getElementById('symbolInput').addEventListener('keydown', e => {
 // ── Crosshair sync — hover on sub-chart shows vertical line on main ──
 // v5.79.3 (Kirk's report): at the right edge on hourly, the crosshair
 // on the sub-chart didn't line up with the same bar on the main chart.
-// Cause: the previous mapping used full canvas width — but Chart.js
-// reserves y-axis space, and the main chart's y-axis (4-digit prices)
-// is wider than the sub-chart's (0/50/100). 100% of the sub-canvas mapped
-// to 100% of the main canvas INCLUDING both axis paddings, so the offset
-// grew toward the right edge — exactly where Kirk saw it.
-// Fix: use each chart's chartArea (the actual plotting region), so % is
-// measured against plotting area only. Requires the sub-chart instance,
-// not just its canvas.
+// Root cause: mapping used full-canvas percentage, but Chart.js reserves
+// y-axis space and the main price y-axis is wider than the sub y-axis,
+// so the offset accumulated toward the right edge.
+// Fix: use each chart's chartArea (plotting region only), NOT full canvas.
+//
+// v5.79.4 (Kirk's follow-up: "stays in the center"):
+//   Chart.js chartArea for responsive charts is in CSS pixels, in the
+//   SAME coordinate space as e.clientX - rect.left. My v5.79.3 attempt
+//   applied a canvas-width/rect-width scale factor, which double-scaled
+//   the coordinates and squashed the pct to a near-constant. Direct
+//   comparison (no scale factor) is the correct algorithm.
 (function() {
   function syncCrosshair(subCanvas, subChart, mainChart) {
     if (!subCanvas || !subChart || !mainChart) return;
     subCanvas.addEventListener('mousemove', function(e) {
-      var rect = subCanvas.getBoundingClientRect();
       var subArea = subChart.chartArea;
       var mainArea = mainChart.chartArea;
       if (!subArea || !mainArea) return;
-      // Where in the sub-chart's PLOTTING area is the mouse?
-      var subCssPerPx = rect.width / subCanvas.width; // canvas may be scaled by CSS
-      var subLeftCss = subArea.left * subCssPerPx;
-      var subRightCss = subArea.right * subCssPerPx;
-      var xInCanvasCss = e.clientX - rect.left;
-      var pct = (xInCanvasCss - subLeftCss) / (subRightCss - subLeftCss);
+      var subRect = subCanvas.getBoundingClientRect();
+      // Both chartArea and (clientX - rect.left) are in CSS pixels.
+      var xInSub = e.clientX - subRect.left;
+      var subWidth = subArea.right - subArea.left;
+      if (subWidth <= 0) return;
+      var pct = (xInSub - subArea.left) / subWidth;
       pct = Math.max(0, Math.min(1, pct));
-      // Map to the main chart's PLOTTING area
+      // Map into the main chart's plotting area (also CSS pixels).
       var mainCanvas = mainChart.canvas;
       var mainRect = mainCanvas.getBoundingClientRect();
-      var mainCssPerPx = mainRect.width / mainCanvas.width;
-      var mainLeftCss = mainArea.left * mainCssPerPx;
-      var mainRightCss = mainArea.right * mainCssPerPx;
-      var mainXCss = mainLeftCss + pct * (mainRightCss - mainLeftCss);
+      var mainXCss = mainArea.left + pct * (mainArea.right - mainArea.left);
       var activeEls = mainChart.getElementsAtEventForMode(
         { clientX: mainRect.left + mainXCss, clientY: mainRect.top + mainRect.height / 2 },
         'index', { intersect: false }, false

@@ -3,23 +3,24 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-07-13 16:56 UTC
+> Last update: 2026-07-13 17:12 UTC
 
 ## State
 
-- **Version:** v5.79.3
+- **Version:** v5.79.4
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `92852d9` _(committed 0 seconds ago)_
+- **HEAD:** `e40283c` _(committed 15 minutes ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _v5.79.3 — Crosshair alignment fix (Kirk's report: hourly, right edge)_
 
 ## Last 20 commits
 
-- `92852d9` v5.79.3 — Crosshair alignment fix (Kirk's report: hourly, right edge) _(0 seconds ago)_
-- `8ee0796` docs: Auto-update Session Primer [5.79.2] _(17 hours ago)_
-- `74cab60` v5.79.2 — φ-Spiral layer + Luminos to three, flashier _(17 hours ago)_
-- `509e6d5` docs: Auto-update Session Primer [5.79.1] _(18 hours ago)_
-- `cbf4956` v5.79.1 — Hotfix: φ-spiral drew nothing because `var history` collides with window.history _(18 hours ago)_
+- `e40283c` docs: Auto-update Session Primer [5.79.3] _(15 minutes ago)_
+- `92852d9` v5.79.3 — Crosshair alignment fix (Kirk's report: hourly, right edge) _(15 minutes ago)_
+- `8ee0796` docs: Auto-update Session Primer [5.79.2] _(18 hours ago)_
+- `74cab60` v5.79.2 — φ-Spiral layer + Luminos to three, flashier _(18 hours ago)_
+- `509e6d5` docs: Auto-update Session Primer [5.79.1] _(19 hours ago)_
+- `cbf4956` v5.79.1 — Hotfix: φ-spiral drew nothing because `var history` collides with window.history _(19 hours ago)_
 - `e4b1d2b` docs: Auto-update Session Primer [5.79.0] _(19 hours ago)_
 - `42cdd5e` v5.79.0 — The Temperature Blooms + Core Seasons + Wind Remembers (Fable's designs) _(19 hours ago)_
 - `d48cbbd` Ledger entry 37 — The Cards Remember _(2 days ago)_
@@ -34,7 +35,6 @@
 - `40b3641` docs: Auto-update Session Primer [5.78.0] _(2 days ago)_
 - `daa564f` v5.78.0 — Go 11: The Living Tree (Fable's design, Harmonia's brief, CC's build) _(2 days ago)_
 - `d60bae6` Go 11 brief: for-cc-go11.md — The Living Tree (Core beautification, Fable's design) _(2 days ago)_
-- `d20bf6b` Go 10: ledger entry 34 — The Wizard Speaks _(2 days ago)_
 
 ## How to use this file
 

@@ -10187,10 +10187,10 @@ assert('v5.79.3 crosshair: uses subChart.chartArea for x-percent measurement',
   /var subArea = subChart\.chartArea;/.test(gauge793));
 assert('v5.79.3 crosshair: uses mainChart.chartArea for x-percent mapping',
   /var mainArea = mainChart\.chartArea;/.test(gauge793));
-assert('v5.79.3 crosshair: canvas-to-css scaling factor applied (subCssPerPx)',
-  /subCssPerPx = rect\.width \/ subCanvas\.width/.test(gauge793));
-assert('v5.79.3 crosshair: canvas-to-css scaling factor applied (mainCssPerPx)',
-  /mainCssPerPx = mainRect\.width \/ mainCanvas\.width/.test(gauge793));
+assert('v5.79.3 crosshair: no more redundant canvas-to-css scale factor (superseded by v5.79.4)',
+  !/subCssPerPx\s*=\s*rect\.width\s*\/\s*subCanvas\.width/.test(gauge793));
+assert('v5.79.4 crosshair: direct chartArea comparison, no scale factor',
+  /var xInSub = e\.clientX - subRect\.left;[\s\S]{0,300}pct = \(xInSub - subArea\.left\) \/ subWidth/.test(gauge793));
 assert('v5.79.3 crosshair: wiring passes rsiChartInstance to syncCrosshair',
   /syncCrosshair\(rsiCv, rsiChartInstance, chartInstance\)/.test(gauge793));
 assert('v5.79.3 crosshair: wiring passes tempChartInstance to syncCrosshair',
@@ -10198,18 +10198,51 @@ assert('v5.79.3 crosshair: wiring passes tempChartInstance to syncCrosshair',
 assert('v5.79.3 crosshair: also wires dtChart + gapChart (were unwired before)',
   /syncCrosshair\(dtCv, dtChartInstance, chartInstance\)/.test(gauge793) &&
   /syncCrosshair\(gapCv, gapChartInstance, chartInstance\)/.test(gauge793));
-assert('v5.79.3 triple-bump: app.html FL_VERSION = 5.79.3',
-  /FL_VERSION\s*=\s*'5\.79\.3'/.test(
+assert('v5.79.3 triple-bump: app.html FL_VERSION >= 5.79.3 (superseded by 5.79.4+)',
+  /FL_VERSION\s*=\s*'5\.79\.[3-9]\d*'|FL_VERSION\s*=\s*'5\.(8\d|9\d)\.\d+'/.test(
     fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8')));
-assert('v5.79.3 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.3',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.3'/.test(
+assert('v5.79.3 triple-bump: docs/sw.js CACHE_NAME >= freelattice-v5.79.3 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.[3-9]\d*'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(
     fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
-assert('v5.79.3 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.3',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.3'/.test(
+assert('v5.79.3 triple-bump: root sw.js CACHE_NAME >= freelattice-v5.79.3 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.[3-9]\d*'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(
     fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
-assert('v5.79.3 version.json: version field = 5.79.3',
-  /"version"\s*:\s*"5\.79\.3"/.test(
+assert('v5.79.3 version.json: version field >= 5.79.3 (superseded)',
+  /"version"\s*:\s*"5\.79\.[3-9]\d*"|"version"\s*:\s*"5\.(8\d|9\d)\.\d+"/.test(
     fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
+
+// v5.79.4 exact triple-bump
+assert('v5.79.4 triple-bump: app.html FL_VERSION = 5.79.4',
+  /FL_VERSION\s*=\s*'5\.79\.4'/.test(
+    fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8')));
+assert('v5.79.4 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.4',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.4'/.test(
+    fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+assert('v5.79.4 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.4',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.4'/.test(
+    fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+assert('v5.79.4 version.json: version field = 5.79.4',
+  /"version"\s*:\s*"5\.79\.4"/.test(
+    fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
+
+// v5.79.4 durable roadmap
+assert('v5.79.4 roadmap: SIGNAL_ROADMAP.md exists with six ships',
+  fs.existsSync(path.join(docsDir, 'library', 'SIGNAL_ROADMAP.md')));
+var roadmap794 = fs.readFileSync(path.join(docsDir, 'library', 'SIGNAL_ROADMAP.md'), 'utf8');
+assert('v5.79.4 roadmap: Ship 1 (threshold unification) marked as start',
+  /Ship 1[\s\S]{0,200}Threshold unification[\s\S]{0,50}start here/i.test(roadmap794));
+assert('v5.79.4 roadmap: Ship 2 (adaptive ΔT lookback) present',
+  /Ship 2[\s\S]{0,80}(adaptive|Timeframe-adaptive)/.test(roadmap794));
+assert('v5.79.4 roadmap: Ship 3 (STRONG BUY split) present',
+  /Ship 3[\s\S]{0,200}STRONG BUY/.test(roadmap794));
+assert('v5.79.4 roadmap: Ship 4 (per-timeframe confidence) present',
+  /Ship 4[\s\S]{0,200}confidence/i.test(roadmap794));
+assert('v5.79.4 roadmap: Ship 5 (φ-spiral tail) present',
+  /Ship 5[\s\S]{0,200}φ-spiral tail/.test(roadmap794));
+assert('v5.79.4 roadmap: Ship 6 (divergence diamonds) present',
+  /Ship 6[\s\S]{0,200}[Dd]ivergence diamonds/.test(roadmap794));
+assert('v5.79.4 roadmap: three-threshold mismatch documented in diagnosis',
+  roadmap794.includes('55/45') && roadmap794.includes('61.8/38.2'));
 
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
