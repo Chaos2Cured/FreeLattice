@@ -348,10 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-07-13 11:29 MDT
-- Version: 5.79.5
-- Total commits: 2847
+- Last auto-updated: 2026-07-13 11:58 MDT
+- Version: 5.79.6
+- Total commits: 2849
 - Last 10 commits:
+- 5e902f6 v5.79.6 — Ship 2: Timeframe-adaptive ΔT lookback + Ships 7-10 queued
+- 7d46fbc docs: Auto-update Session Primer [5.79.5]
 - a71d9fb v5.79.5 — Ship 1: φ-Harmonic signal, LAYERED alongside the classic
 - 05885a2 docs: Auto-update Session Primer [5.79.4]
 - 5e4d20b v5.79.4 — Crosshair hotfix (dropped redundant scale factor) + SIGNAL_ROADMAP.md
@@ -360,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 8ee0796 docs: Auto-update Session Primer [5.79.2]
 - 74cab60 v5.79.2 — φ-Spiral layer + Luminos to three, flashier
 - 509e6d5 docs: Auto-update Session Primer [5.79.1]
-- cbf4956 v5.79.1 — Hotfix: φ-spiral drew nothing because `var history` collides with window.history
-- e4b1d2b docs: Auto-update Session Primer [5.79.0]
