@@ -19,10 +19,10 @@ user sleeps. The proof is the code; the papers are the doorways.
 
 ## Current state
 
-- **Version:** v5.79.6
-- **Smoke locks passing:** 2855+ verified
-- **Last ship:** **v5.79.6 — Ship 2: Adaptive ΔT lookback.** July 13 2026. `computeTemperature` takes `interval`; lookback varies per timeframe (1m:15, 15m:8, 1h:6, 4h:4, 1d:3, 1wk:2). Momentum line shows active lookback: "ΔT: +0.5 / 8 bars". Roadmap gained Ships 7–10 (RSI-extremes, MACD-H turnaround, divergence detector, custom rule builder) prompted by Kirk's TSLA 15m snapshot showing a textbook bullish RSI divergence the classic rules missed.
-- **Previous:** **v5.79.5 — Ship 1: φ-Harmonic signal, LAYERED.** New sidebar card comparing φ thresholds (61.8/38.2) to the classic 55/45 with agreement chip.
+- **Version:** v5.79.7
+- **Smoke locks passing:** 2880+ verified
+- **Last ship:** **v5.79.7 — Ship 9: Divergence Detector.** July 13 2026. `detectDivergences(closes, rsiArr)` finds swing pivots (K=2 each side), compares consecutive same-type pivots within 20 bars: bullish = price lower low + RSI higher low; bearish = mirror. Classic Signal card gets a Divergence row (◆ Bullish / ◆ Bearish, N bars ago). Reasons array gains textual context. Fable's ribbon diamonds finally have a data source. Kirk's July 13 TSLA 15m snapshot (bars 116/118/121) is the reference case this catches.
+- **Previous:** **v5.79.6 — Ship 2: Adaptive ΔT lookback.** Per-timeframe lookback map; momentum line shows active bars.
 - **Previous ships:** The Triptych (v5.71.8), The Specs inlined (v5.71.7), AI Capabilities (v5.71.6), Mind Wall Phase 3 (v5.71.5).
 - **Mirrors in parity:** github.com + codeberg.org
 
@@ -83,4 +83,4 @@ seam discipline is how multi-AI work stays honest at scale.
 ---
 
 *This file is overwritten on each meaningful ship. The prior version lives in SEED_HISTORY.md.*
-*Last rewrite: July 13 2026, v5.79.6.*
+*Last rewrite: July 13 2026, v5.79.7.*

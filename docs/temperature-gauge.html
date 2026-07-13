@@ -903,6 +903,14 @@ canvas.sub-canvas.custom { height: 80px !important; }
           <span class="signal-row-label">Urgency</span>
           <span class="signal-row-val" id="signalUrgency">—</span>
         </div>
+        <!-- v5.79.7 — Ship 9: Divergence row. Layered onto classic Signal
+             card so pattern signals share the same visual surface as the
+             midpoint verdict. Shows most recent confirmed pivot within
+             last 10 bars, or "—" if none. -->
+        <div class="signal-row">
+          <span class="signal-row-label">Divergence</span>
+          <span class="signal-row-val" id="signalDiv">—</span>
+        </div>
       </div>
     </div>
 
@@ -1766,6 +1774,68 @@ function computeTemperature(closes, volumes, rsiArr, macdData, gravPoints, inter
   return { temps, tempROC, rocLookback };
 }
 
+// ── v5.79.7 — Ship 9: Divergence Detector ───────────────────────────────
+// The classic rule engine spoke only midpoint dialect (bullish/bearish/
+// neutral around 55/45). Pattern-based reversal has its own vocabulary,
+// and divergence is chapter one. Kirk's TSLA 15m snapshot (July 13, 2026)
+// was a textbook bullish RSI divergence — price lower lows, RSI higher
+// lows, MACD-H climbing from deep negative — and the tool fired zero
+// signals. This detector fills that gap.
+//
+// Algorithm (standard textbook):
+//   1. Find swing pivots with K=2 lookback each side (a pivot low is a
+//      bar where the low is <= all neighbors within K bars).
+//   2. For each consecutive pair of same-type pivots within `lookback`
+//      bars of each other, compare:
+//        - price[curr] < price[prev] AND rsi[curr] > rsi[prev] → BULLISH div
+//        - price[curr] > price[prev] AND rsi[curr] < rsi[prev] → BEARISH div
+//   3. Mark divergence AT the confirming pivot bar (not at current bar,
+//      since pivots need forward confirmation).
+function detectDivergences(closes, rsiArr, opts) {
+  opts = opts || {};
+  var lookback = opts.lookback || 20;
+  var pivotK = opts.pivotK || 2;
+  var n = closes.length;
+  var bullish = new Array(n).fill(false);
+  var bearish = new Array(n).fill(false);
+  if (n < lookback + pivotK * 2 + 1) return { bullish: bullish, bearish: bearish };
+
+  var pivotLows = [];
+  var pivotHighs = [];
+  for (var i = pivotK; i < n - pivotK; i++) {
+    var isLow = true, isHigh = true;
+    for (var j = i - pivotK; j <= i + pivotK; j++) {
+      if (j === i) continue;
+      if (closes[j] < closes[i]) isLow = false;
+      if (closes[j] > closes[i]) isHigh = false;
+    }
+    if (isLow) pivotLows.push(i);
+    if (isHigh) pivotHighs.push(i);
+  }
+
+  for (var kL = 1; kL < pivotLows.length; kL++) {
+    var curL = pivotLows[kL];
+    var prvL = pivotLows[kL - 1];
+    if (curL - prvL > lookback) continue;
+    if (rsiArr[curL] == null || rsiArr[prvL] == null) continue;
+    if (closes[curL] < closes[prvL] && rsiArr[curL] > rsiArr[prvL]) {
+      bullish[curL] = true;
+    }
+  }
+
+  for (var kH = 1; kH < pivotHighs.length; kH++) {
+    var curH = pivotHighs[kH];
+    var prvH = pivotHighs[kH - 1];
+    if (curH - prvH > lookback) continue;
+    if (rsiArr[curH] == null || rsiArr[prvH] == null) continue;
+    if (closes[curH] > closes[prvH] && rsiArr[curH] < rsiArr[prvH]) {
+      bearish[curH] = true;
+    }
+  }
+
+  return { bullish: bullish, bearish: bearish };
+}
+
 function analyzeData(candles, symbol) {
   const closes = candles.map(c => c.c);
   const volumes = candles.map(c => c.v);
@@ -1984,6 +2054,29 @@ function analyzeData(candles, symbol) {
   const priceChange = closes[n-1] - closes[n-2];
   const pricePct = (priceChange / closes[n-2]) * 100;
 
+  // ── v5.79.7 — Ship 9: Divergence Detector ─────────────────────────────
+  // Kirk's ask on the July 13 TSLA snapshot: the tool didn't catch a
+  // textbook bullish RSI divergence. This fills that gap.
+  const divergences = detectDivergences(closes, rsiArr, { lookback: 20, pivotK: 2 });
+  // "Latest divergence" — the most recent confirmed pivot within the last
+  // 10 bars, so the UI can show "Bullish divergence 4 bars ago" without
+  // waiting for another pivot to form.
+  let latestBullDiv = null, latestBearDiv = null;
+  for (let dIdx = n - 1; dIdx >= Math.max(0, n - 10); dIdx--) {
+    if (!latestBullDiv && divergences.bullish[dIdx]) latestBullDiv = { idx: dIdx, agoBar: n - 1 - dIdx };
+    if (!latestBearDiv && divergences.bearish[dIdx]) latestBearDiv = { idx: dIdx, agoBar: n - 1 - dIdx };
+  }
+  if (latestBullDiv) {
+    reasons.push('Bullish divergence: price lower low, RSI higher low ' +
+      (latestBullDiv.agoBar === 0 ? 'at current bar' : latestBullDiv.agoBar + ' bar' + (latestBullDiv.agoBar === 1 ? '' : 's') + ' ago') +
+      ' — watch for reversal');
+  }
+  if (latestBearDiv) {
+    reasons.push('Bearish divergence: price higher high, RSI lower high ' +
+      (latestBearDiv.agoBar === 0 ? 'at current bar' : latestBearDiv.agoBar + ' bar' + (latestBearDiv.agoBar === 1 ? '' : 's') + ' ago') +
+      ' — watch for reversal');
+  }
+
   // ── v5.79.5 — φ-Harmonic parallel signal (Ship 1 of SIGNAL_ROADMAP.md) ──
   // Layered ALONGSIDE the classic signal (not replacing it), so Kirk can
   // compare in real market conditions. Same components, same spread math,
@@ -2024,7 +2117,10 @@ function analyzeData(candles, symbol) {
     // φ-Harmonic parallel signal (v5.79.5)
     phiSignal, phiSignalClass, phiConfPct, phiConfidence, phiAgreement,
     // Ship 2 (v5.79.6) — adaptive ΔT lookback exposed for UI honesty
-    tempROCLookback
+    tempROCLookback,
+    // Ship 9 (v5.79.7) — divergence detector (bullish/bearish per bar,
+    // plus derived "latest divergence within last 10 bars" summary)
+    divergences, latestBullDiv, latestBearDiv
   };
 }
 
@@ -2135,6 +2231,24 @@ function renderAll(candles, a, symbol) {
     : '');
   document.getElementById('signalSize').textContent = a.positionShares > 0 ? a.positionShares + ' shares ($' + a.positionValue.toLocaleString() + ') \u2014 risking ' + a.actualRiskPct.toFixed(2) + '%' : 'Configure account in Risk Settings';
   document.getElementById('signalUrgency').textContent = a.urgency;
+
+  // v5.79.7 — Ship 9: Divergence row rendering. Colored by direction so
+  // the row reads at a glance without decoding the icon.
+  var divEl = document.getElementById('signalDiv');
+  if (a.latestBullDiv && a.latestBearDiv) {
+    // Very rare: both directions present in the window. Show whichever is
+    // more recent (smaller agoBar wins) plus a "+ other" note.
+    var recentDiv = a.latestBullDiv.agoBar <= a.latestBearDiv.agoBar ? a.latestBullDiv : a.latestBearDiv;
+    var kind = recentDiv === a.latestBullDiv ? 'Bullish' : 'Bearish';
+    var col = kind === 'Bullish' ? '#10b981' : '#e8c547';
+    divEl.innerHTML = '<span style="color:' + col + ';">◆ ' + kind + ' (' + recentDiv.agoBar + ' ' + (recentDiv.agoBar === 1 ? 'bar' : 'bars') + ' ago) + other</span>';
+  } else if (a.latestBullDiv) {
+    divEl.innerHTML = '<span style="color:#10b981;">◆ Bullish (' + a.latestBullDiv.agoBar + ' ' + (a.latestBullDiv.agoBar === 1 ? 'bar' : 'bars') + ' ago)</span>';
+  } else if (a.latestBearDiv) {
+    divEl.innerHTML = '<span style="color:#e8c547;">◆ Bearish (' + a.latestBearDiv.agoBar + ' ' + (a.latestBearDiv.agoBar === 1 ? 'bar' : 'bars') + ' ago)</span>';
+  } else {
+    divEl.innerHTML = '<span style="color:var(--muted);">—</span>';
+  }
 
   // v5.79.5 — φ-Harmonic parallel signal (Ship 1). Layered next to classic.
   document.getElementById('phiSignalSection').style.display = 'block';
@@ -2390,8 +2504,17 @@ function updateGauge(temp, signal) {
     // about what it knows.
     var temps = (a && a.temps) ? a.temps : [];
     var slice = temps.slice(-34);
-    ribbonHistory = slice.map(function (v) {
-      return { temp: (v == null ? 50 : v), divergence: null };
+    // v5.79.7 — Ship 9: divergence field now fed from a.divergences so
+    // the diamonds Fable designed into the ribbon finally appear. Each
+    // slice index maps to a full-history absolute index via startIdx.
+    var startIdx = temps.length - slice.length;
+    var divs = a && a.divergences ? a.divergences : { bullish: [], bearish: [] };
+    ribbonHistory = slice.map(function (v, i) {
+      var absIdx = startIdx + i;
+      var d = null;
+      if (divs.bullish && divs.bullish[absIdx]) d = 'bullish';
+      else if (divs.bearish && divs.bearish[absIdx]) d = 'bearish';
+      return { temp: (v == null ? 50 : v), divergence: d };
     });
     var zoneEl = document.getElementById('phiSpiralZone');
     if (zoneEl) {

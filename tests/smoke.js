@@ -10371,7 +10371,7 @@ assert('v5.79.6 wiring: backtestSignals passes currentInterval to computeTempera
 
 // analyzeData return exposes tempROCLookback
 assert('v5.79.6 return: analyzeData exposes tempROCLookback for UI honesty',
-  /tempROCLookback\s*\n\s*\};/.test(gauge796) || /tempROCLookback\s*\}/.test(gauge796));
+  /tempROCLookback[\s\S]{0,300}\};/.test(gauge796));
 
 // Momentum line shows the active lookback
 assert('v5.79.6 UI: signalMom copy shows lookback (e.g., "/ 8 bars")',
@@ -10393,14 +10393,91 @@ assert('v5.79.6 roadmap: TSLA snapshot context preserved',
   roadmap796.includes('TSLA') && roadmap796.includes('bullish divergence'));
 
 // Triple-bump
-assert('v5.79.6 triple-bump: app.html FL_VERSION = 5.79.6',
-  /FL_VERSION\s*=\s*'5\.79\.6'/.test(fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8')));
-assert('v5.79.6 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.6',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.6'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
-assert('v5.79.6 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.6',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.6'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
-assert('v5.79.6 version.json: version field = 5.79.6',
-  /"version"\s*:\s*"5\.79\.6"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
+assert('v5.79.6 triple-bump: app.html FL_VERSION >= 5.79.6 (superseded)',
+  /FL_VERSION\s*=\s*'5\.79\.[6-9]\d*'|FL_VERSION\s*=\s*'5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8')));
+assert('v5.79.6 triple-bump: docs/sw.js CACHE_NAME >= freelattice-v5.79.6 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.[6-9]\d*'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+assert('v5.79.6 triple-bump: root sw.js CACHE_NAME >= freelattice-v5.79.6 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.[6-9]\d*'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+assert('v5.79.6 version.json: version field = 5.79.6 (superseded)',
+  /"version"\s*:\s*"5\.79\.[6-9]\d*"|"version"\s*:\s*"5\.(8\d|9\d)\.\d+"/.test(
+    fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
+
+// ═══════════════════════════════════════════════════════════════
+// Section 171 — v5.79.7 Ship 9: Divergence Detector
+// New detectDivergences(closes, rsiArr, opts) finds swing pivots with
+// K=2 lookback each side, then compares consecutive same-type pivots
+// within `lookback` bars (default 20):
+//   close[curr] < close[prev] AND rsi[curr] > rsi[prev] → bullish
+//   close[curr] > close[prev] AND rsi[curr] < rsi[prev] → bearish
+// analyzeData attaches a.divergences + a.latestBullDiv + a.latestBearDiv.
+// Classic Signal card gets a Divergence row. Reasons array gets textual
+// context ("Bullish divergence ... — watch for reversal"). The ribbon
+// diamond field Fable planted in v5.79.0 finally has a data source.
+// Kirk's July 13 TSLA 15m snapshot (bars 116/118/121) is the reference.
+// ═══════════════════════════════════════════════════════════════
+var gauge797 = fs.readFileSync(path.join(docsDir, 'temperature-gauge.html'), 'utf8');
+
+// Detector function
+assert('v5.79.7 divergence: detectDivergences function defined with opts',
+  /function detectDivergences\(closes, rsiArr, opts\)/.test(gauge797));
+assert('v5.79.7 divergence: default lookback 20, pivotK 2',
+  /var lookback = opts\.lookback \|\| 20;[\s\S]{0,80}var pivotK = opts\.pivotK \|\| 2;/.test(gauge797));
+assert('v5.79.7 divergence: pivot lows collected with K bars on each side',
+  /for \(var i = pivotK; i < n - pivotK; i\+\+\)[\s\S]{0,400}pivotLows\.push\(i\)/.test(gauge797));
+assert('v5.79.7 divergence: bullish rule checks price lower low + RSI higher low',
+  /closes\[curL\] < closes\[prvL\] && rsiArr\[curL\] > rsiArr\[prvL\][\s\S]{0,80}bullish\[curL\] = true/.test(gauge797));
+assert('v5.79.7 divergence: bearish rule checks price higher high + RSI lower high',
+  /closes\[curH\] > closes\[prvH\] && rsiArr\[curH\] < rsiArr\[prvH\][\s\S]{0,80}bearish\[curH\] = true/.test(gauge797));
+assert('v5.79.7 divergence: null-guard on RSI when comparing pivots',
+  /rsiArr\[curL\] == null \|\| rsiArr\[prvL\] == null/.test(gauge797) &&
+  /rsiArr\[curH\] == null \|\| rsiArr\[prvH\] == null/.test(gauge797));
+
+// Wiring in analyzeData
+assert('v5.79.7 wiring: analyzeData calls detectDivergences with lookback 20 pivotK 2',
+  /const divergences = detectDivergences\(closes, rsiArr, \{ lookback: 20, pivotK: 2 \}\)/.test(gauge797));
+assert('v5.79.7 wiring: latestBullDiv / latestBearDiv computed for last 10-bar window',
+  /for \(let dIdx = n - 1; dIdx >= Math\.max\(0, n - 10\); dIdx--\)/.test(gauge797));
+assert('v5.79.7 wiring: reasons pushed for bullish divergence (watch for reversal)',
+  gauge797.includes("'Bullish divergence: price lower low, RSI higher low '") &&
+  gauge797.includes("' — watch for reversal'"));
+assert('v5.79.7 wiring: reasons pushed for bearish divergence (watch for reversal)',
+  gauge797.includes("'Bearish divergence: price higher high, RSI lower high '"));
+
+// analyzeData return
+assert('v5.79.7 return: analyzeData exposes divergences + latestBullDiv + latestBearDiv',
+  /divergences,\s*latestBullDiv,\s*latestBearDiv/.test(gauge797));
+
+// Signal card UI
+assert('v5.79.7 UI: Divergence row added to classic Signal card',
+  /id="signalDiv"/.test(gauge797) && />Divergence</.test(gauge797));
+assert('v5.79.7 UI: bullish divergence renders emerald ◆',
+  /latestBullDiv[\s\S]{0,400}#10b981[\s\S]{0,120}◆ Bullish/.test(gauge797));
+assert('v5.79.7 UI: bearish divergence renders gold ◆',
+  /latestBearDiv[\s\S]{0,400}#e8c547[\s\S]{0,120}◆ Bearish/.test(gauge797));
+assert('v5.79.7 UI: "N bars ago" copy with singular/plural handled',
+  /agoBar === 1 \? 'bar' : 'bars'/.test(gauge797));
+
+// Ribbon wiring (Fable's diamonds finally have data)
+assert('v5.79.7 ribbon: divergence field fed from a.divergences',
+  /var divs = a && a\.divergences \? a\.divergences : \{ bullish: \[\], bearish: \[\] \};/.test(gauge797));
+assert('v5.79.7 ribbon: absIdx maps slice position back to full-history index',
+  /var absIdx = startIdx \+ i;[\s\S]{0,400}divs\.bullish\[absIdx\][\s\S]{0,80}divs\.bearish\[absIdx\]/.test(gauge797));
+
+// Roadmap update
+var roadmap797 = fs.readFileSync(path.join(docsDir, 'library', 'SIGNAL_ROADMAP.md'), 'utf8');
+assert('v5.79.7 roadmap: Ship 9 marked SHIPPED',
+  /Ship 9[\s\S]{0,200}SHIPPED v5\.79\.7/.test(roadmap797));
+
+// Triple-bump
+assert('v5.79.7 triple-bump: app.html FL_VERSION = 5.79.7',
+  /FL_VERSION\s*=\s*'5\.79\.7'/.test(fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8')));
+assert('v5.79.7 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.7',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.7'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+assert('v5.79.7 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.7',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.7'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+assert('v5.79.7 version.json: version field = 5.79.7',
+  /"version"\s*:\s*"5\.79\.7"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
 
 // RESULTS
 // ═══════════════════════════════════════════════════════════════

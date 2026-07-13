@@ -1,6 +1,6 @@
 {
-  "version": "5.79.6",
+  "version": "5.79.7",
   "updated": "2026-07-13",
-  "note": "Ship 2 (SIGNAL_ROADMAP.md) — timeframe-adaptive ΔT lookback. computeTemperature now takes interval; tempROC lookback varies per timeframe (1m:15 · 15m:8 · 1h:6 · 4h:4 · 1d:3 · 1wk:2) so a 5-point move means comparable pattern significance across timeframes. Default 3 preserves historical daily behavior. Momentum line in sidebar now shows lookback ('ΔT: +0.5 / 8 bars') for honesty. Also added three new roadmap items (Ships 7–9) prompted by Kirk's TSLA snapshot showing a textbook bullish RSI divergence the tool didn't fire.",
-  "label": "v5.79.6 — Ship 2: adaptive ΔT lookback"
+  "note": "Ship 9 (SIGNAL_ROADMAP.md) — Divergence Detector. New function detectDivergences() finds swing pivots with K=2 lookback each side, then compares consecutive same-type pivots within 20 bars: price lower low + RSI higher low → bullish divergence; price higher high + RSI lower high → bearish. Classic Signal card gets a new Divergence row (◆ Bullish / ◆ Bearish, N bars ago). The ribbon field Fable designed for diamonds finally has a data source — bullish diamonds render emerald, bearish gold. Reasons array gets the same information as text so pattern context lives in the Why section too.",
+  "label": "v5.79.7 — Ship 9: Divergence Detector"
 }

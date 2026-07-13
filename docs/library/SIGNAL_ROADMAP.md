@@ -231,23 +231,47 @@ Add a "MACD-H turnaround" trigger:
 Combined with Ship 7's RSI triggers, this is the "reversal watch"
 architecture Kirk's eye already uses.
 
-### Ship 9 — Divergence detector (Ship 6 promoted from ribbon-only to signal)
+### Ship 9 — Divergence detector (Ship 6 promoted from ribbon-only to signal)  ✓ SHIPPED v5.79.7
 
-Ship 6 in the original queue was "divergence diamonds on the ribbon"
-— visual only. The TSLA snapshot shows divergence is diagnostic, not
-just decorative. Promote to a full signal trigger:
+Standard textbook divergence:
+- Find swing pivots with K=2 lookback each side (bar's low <= all
+  neighbors within 2 bars → pivot low; mirror for pivot high).
+- For each consecutive pair of same-type pivots within `lookback` bars
+  of each other, compare against RSI at those bars:
+  - `close[curr] < close[prev]` AND `rsi[curr] > rsi[prev]` → bullish
+    divergence, marked at the confirming pivot.
+  - `close[curr] > close[prev]` AND `rsi[curr] < rsi[prev]` → bearish.
+- Bars where a divergence pivot was confirmed within the last 10 bars
+  become `latestBullDiv` / `latestBearDiv` summaries with an `agoBar`
+  field so the sidebar can show "5 bars ago" instead of waiting for the
+  next pivot to form.
 
-- Bullish divergence: over the last 20 bars, price makes a lower low
-  AND RSI (or MACD line) makes a higher low → `extremes.bullishDiv = true`,
-  reason "Bullish divergence: price lower, RSI higher over last N bars."
-- Bearish divergence: mirror.
+New `Divergence` row in the classic Signal card:
+- `—` when nothing recent
+- `◆ Bullish (5 bars ago)` in emerald
+- `◆ Bearish (5 bars ago)` in gold (matches the amber alert luminos)
+- Rare both-directions case shows the more recent + "other"
 
-Divergence + RSI-extremes exit + MACD-H turnaround are the three
-signals that would have flagged TSLA's snapshot as a reversal watch
-even though the temperature was still red at 37.
+Ribbon diamonds finally have a source:
+- Fable's original ribbon spec had a `divergence` field; v5.79.0 planted
+  the field with `null` values; v5.79.7 feeds it from the same detector.
+  Bullish diamonds render emerald, bearish gold.
 
-Also: promote divergence diamonds in the ribbon to fire from this
-same detector (was pending source data in Ship 6).
+Reasons array gains the same information as text:
+- "Bullish divergence: price lower low, RSI higher low N bars ago —
+  watch for reversal"
+
+Kirk's TSLA snapshot (bars 116/118/121) is exactly the case this catches:
+price sets lower low at bar 121, RSI at 30.6 vs 28.9 at bar 118 →
+bullish divergence flagged at pivot 121 → row shows
+"◆ Bullish (X bars ago)" → ribbon shows an emerald diamond in the
+last frame.
+
+Not in this ship (kept for Ships 7 & 8):
+- RSI-30/70 extremes as first-class signals (Ship 7).
+- MACD histogram deep-negative turnaround (Ship 8).
+- MACD-line divergence (uses RSI only for now; can layer MACD-based
+  divergence later — same function, different oscillator).
 
 ### Ship 10 — Custom Rule Builder
 
