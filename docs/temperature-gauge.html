@@ -1690,7 +1690,20 @@ function atr(candles, period) {
   return result;
 }
 
-function computeTemperature(closes, volumes, rsiArr, macdData, gravPoints) {
+// v5.79.6 — Ship 2 of SIGNAL_ROADMAP.md. Timeframe-adaptive ΔT lookback.
+// The old fixed 3-bar lookback was aggressive on daily and stale on
+// hourly/lower. This map picks a lookback that captures a characteristic
+// swing for each interval — approximately similar "narrative duration"
+// across timeframes. Default 3 preserves the historical behavior when
+// interval is unknown.
+var TEMP_ROC_LOOKBACK = {
+  '1m': 15, '5m': 10, '15m': 8, '30m': 6, '1h': 6, '4h': 4, '1d': 3, '1wk': 2
+};
+function getTempROCLookback(interval) {
+  return TEMP_ROC_LOOKBACK[interval] || 3;
+}
+
+function computeTemperature(closes, volumes, rsiArr, macdData, gravPoints, interval) {
   const n = closes.length;
   const temps = new Array(n).fill(null);
   // Standardized MAs: 8/12/24 (fast/mid/slow) + 50/200 (structural)
@@ -1743,11 +1756,14 @@ function computeTemperature(closes, volumes, rsiArr, macdData, gravPoints) {
     temps[i] = Math.max(0, Math.min(100, score));
   }
   // Temperature Rate-of-Change (leading indicator — measures acceleration)
+  // v5.79.6 — Ship 2. Adaptive lookback per interval; default 3 preserves
+  // historical daily behavior for calls that didn't pass interval.
+  var rocLookback = getTempROCLookback(interval);
   var tempROC = new Array(n).fill(null);
-  for (let i = 3; i < n; i++) {
-    if (temps[i] != null && temps[i-3] != null) tempROC[i] = temps[i] - temps[i-3];
+  for (let i = rocLookback; i < n; i++) {
+    if (temps[i] != null && temps[i - rocLookback] != null) tempROC[i] = temps[i] - temps[i - rocLookback];
   }
-  return { temps, tempROC };
+  return { temps, tempROC, rocLookback };
 }
 
 function analyzeData(candles, symbol) {
@@ -1761,9 +1777,11 @@ function analyzeData(candles, symbol) {
   var _gHigh = Math.max(...candles.slice(-80).map(c => c.h));
   var _gLow = Math.min(...candles.slice(-80).map(c => c.l));
   var gravityPrice = PHI_INV * (_gLow + (_gHigh - _gLow) * 0.618) + (1 - PHI_INV) * (_gLow + (_gHigh - _gLow) * 0.5);
-  const tempResult = computeTemperature(closes, volumes, rsiArr, macdData, gravPoints);
+  // v5.79.6 — Ship 2. Pass currentInterval so tempROC uses adaptive lookback.
+  const tempResult = computeTemperature(closes, volumes, rsiArr, macdData, gravPoints, currentInterval);
   const temps = tempResult.temps;
   const tempROC = tempResult.tempROC;
+  const tempROCLookback = tempResult.rocLookback;
 
   const n = closes.length;
   const lastTemp = temps[n-1] || 50;
@@ -2004,7 +2022,9 @@ function analyzeData(candles, symbol) {
     tempBuySignals, tempSellSignals,
     confluenceGap, tpSpread, rpSpread,
     // φ-Harmonic parallel signal (v5.79.5)
-    phiSignal, phiSignalClass, phiConfPct, phiConfidence, phiAgreement
+    phiSignal, phiSignalClass, phiConfPct, phiConfidence, phiAgreement,
+    // Ship 2 (v5.79.6) — adaptive ΔT lookback exposed for UI honesty
+    tempROCLookback
   };
 }
 
@@ -2017,7 +2037,8 @@ function backtestSignals(candles) {
   var rsiArr = rsi(closes);
   var macdData = macd(closes);
   var gravPoints = computeGravityPoints(candles);
-  var tempResult = computeTemperature(closes, candles.map(function(c){return c.v;}), rsiArr, macdData, gravPoints);
+  // v5.79.6 — Ship 2. Backtest uses the same adaptive lookback as live.
+  var tempResult = computeTemperature(closes, candles.map(function(c){return c.v;}), rsiArr, macdData, gravPoints, currentInterval);
   var temps = tempResult.temps;
   var tempROC = tempResult.tempROC;
   var volEma = ema(candles.map(function(c){return c.v;}), 20);
@@ -2106,7 +2127,12 @@ function renderAll(candles, a, symbol) {
   badge.className = 'signal-badge ' + a.signalClass;
   badge.textContent = a.signal;
   document.getElementById('signalConf').textContent = a.confidence + ' (' + a.confPct + '%)';
-  document.getElementById('signalMom').textContent = a.momentum + (a.lastTempROC ? ' (\u0394T: ' + (a.lastTempROC > 0 ? '+' : '') + a.lastTempROC.toFixed(1) + ')' : '');
+  // v5.79.6 (Ship 2) \u2014 momentum line shows which lookback drove the \u0394T reading,
+  // so it's honest across timeframes. Daily still shows "3 bars"; hourly "6";
+  // 15m "8"; 1m "15" (see TEMP_ROC_LOOKBACK).
+  document.getElementById('signalMom').textContent = a.momentum + (a.lastTempROC != null && a.tempROCLookback
+    ? ' (\u0394T: ' + (a.lastTempROC > 0 ? '+' : '') + a.lastTempROC.toFixed(1) + ' / ' + a.tempROCLookback + ' bars)'
+    : '');
   document.getElementById('signalSize').textContent = a.positionShares > 0 ? a.positionShares + ' shares ($' + a.positionValue.toLocaleString() + ') \u2014 risking ' + a.actualRiskPct.toFixed(2) + '%' : 'Configure account in Risk Settings';
   document.getElementById('signalUrgency').textContent = a.urgency;
 

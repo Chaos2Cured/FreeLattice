@@ -1,6 +1,6 @@
 {
-  "version": "5.79.5",
+  "version": "5.79.6",
   "updated": "2026-07-13",
-  "note": "Ship 1 (layered) — φ-Harmonic parallel buy/sell signal added ALONGSIDE the classic. Same components, same spread, same confidence math; temperature-branch thresholds are the φ pair (BUY 61.8, STRONG 76.4; SELL 38.2, STRONG 23.6). New sidebar card 'φ Signal' shows the parallel verdict + agreement flag (✓ agrees / ◐ partial / ✗ split) so Kirk can compare in real market conditions. Two amber reference lines added to the temperature sub-chart at 61.8/38.2 without disturbing the classic 55/45 lines.",
-  "label": "v5.79.5 — Ship 1: φ-Harmonic signal, layered"
+  "note": "Ship 2 (SIGNAL_ROADMAP.md) — timeframe-adaptive ΔT lookback. computeTemperature now takes interval; tempROC lookback varies per timeframe (1m:15 · 15m:8 · 1h:6 · 4h:4 · 1d:3 · 1wk:2) so a 5-point move means comparable pattern significance across timeframes. Default 3 preserves historical daily behavior. Momentum line in sidebar now shows lookback ('ΔT: +0.5 / 8 bars') for honesty. Also added three new roadmap items (Ships 7–9) prompted by Kirk's TSLA snapshot showing a textbook bullish RSI divergence the tool didn't fire.",
+  "label": "v5.79.6 — Ship 2: adaptive ΔT lookback"
 }

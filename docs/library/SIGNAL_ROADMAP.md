@@ -97,23 +97,28 @@ comparison time):**
 - Add the option to *choose* which signal drives the position sizing
   and urgency copy (currently classic drives both).
 
-### Ship 2 — Timeframe-adaptive ΔT lookback
+### Ship 2 — Timeframe-adaptive ΔT lookback  ✓ SHIPPED v5.79.6
 
-Replace `temps[i] - temps[i-3]` with `temps[i] - temps[i-LOOKBACK]`
-where `LOOKBACK` maps by interval:
+`computeTemperature` now takes an `interval` parameter and returns
+`rocLookback` alongside `tempROC`. Lookback map:
 
 ```
-{ '1m': 15, '15m': 8, '1h': 6, '4h': 4, '1d': 3, '1w': 2 }
+1m:15 · 5m:10 · 15m:8 · 30m:6 · 1h:6 · 4h:4 · 1d:3 · 1wk:2
 ```
 
-Rationale: the *physical* rate of change should be the same across
-timeframes. Three bars on the daily is roughly a week. Three bars on the
-one-minute is under 4 minutes — nothing meaningful can change that fast
-without noise dominating.
+Default 3 preserves historical daily behavior when a caller doesn't
+pass an interval. Both `analyzeData` and `backtestSignals` now pass
+`currentInterval`, so live-view and backtest use the same lookback.
 
-Files: `docs/temperature-gauge.html` `computeTemperature` return of
-`tempROC` needs currentInterval passed in (currently just `temps` array).
-Adjust thrust classification thresholds to normalize.
+Momentum line in the sidebar shows the active lookback for honesty:
+`ΔT: +0.5 / 8 bars`. Kirk can see at a glance which lookback drove
+the reading and reason about whether the number reflects a meaningful
+swing for the timeframe.
+
+Thrust threshold (±5) kept identical — temperature is bounded 0..100
+regardless of timeframe, so "moved 5 points over the characteristic
+duration" reads consistently. Kirk can revisit if a particular
+timeframe wants a tighter/looser thrust class.
 
 ### Ship 3 — Split STRONG BUY into two firing modes
 
@@ -169,6 +174,111 @@ The ribbon has divergence field wired but the source is empty — every
 
 Look-back window: last 20 bars. Standard textbook logic. Field is
 already there in the ribbon — just needs the detector.
+
+---
+
+---
+
+## Post-v5.79.6 additions (prompted by Kirk's TSLA 15m snapshot, July 13)
+
+Kirk showed a real market snapshot on 2026-07-13: TSLA on 15m, bars
+112–122. Temperature 37.0 (Red zone). RSI 28.9–35.8 (deeply oversold
+range). MACD-H climbing from −1.08 → −0.10 (bearish but decelerating
+sharply). Price making lower lows (395.58 → 393.39) while RSI made
+higher lows (28.9 → 30.6). Classic textbook **bullish divergence**
+setup. Zero signals fired — because the classic rule engine only
+counts components as bullish/bearish/neutral around 55/45 midpoints
+and doesn't recognize pattern-of-oscillator-vs-price extremes.
+
+Three new ships added by this observation. Kirk's eye sees these
+patterns; the tool should catch them too.
+
+### Ship 7 — RSI-extremes triggers (oversold/overbought exits)
+
+Currently RSI is bullish above 55, bearish below 45. The 30/70 lines
+of classic RSI trading get no special treatment.
+
+Add three lightweight triggers to the reasons array and to a new
+`extremes` field on the signal state:
+
+- **RSI < 30** → "deeply oversold; watch for reversal" reason, and
+  `extremes.rsiOversold = true`.
+- **RSI < 30 for last N bars, now crossing back above 30** →
+  "RSI exiting oversold" reason, and `extremes.rsiOversoldExit = true`.
+- Mirror for the > 70 overbought side.
+
+New signal-badge modifier: when `extremes.rsiOversoldExit` and
+`components.thrust !== 'bearish'`, promote from HOLD/SELL to
+"WATCH — oversold reversal beginning" state. Same for overbought.
+
+Files: `analyzeData` in `temperature-gauge.html` around lines
+1817–1825 (reasons) and the signal-branch block above it.
+
+### Ship 8 — MACD-H turnaround (histogram bottoming/topping)
+
+Currently `histMom` is a binary: histogram rising or falling. Doesn't
+distinguish "MACD-H rising strongly from deep negative" (a classic
+turnaround) from "MACD-H drifting slightly up around zero."
+
+Add a "MACD-H turnaround" trigger:
+
+- If last 5 histogram values are strictly monotonic AND the earlier
+  values were deeply negative (< −0.5 · ATR-normalized), flag
+  `extremes.macdBottoming = true` and push reason
+  "MACD histogram turning up from deep negative — momentum bottoming."
+- Mirror for topping.
+
+Combined with Ship 7's RSI triggers, this is the "reversal watch"
+architecture Kirk's eye already uses.
+
+### Ship 9 — Divergence detector (Ship 6 promoted from ribbon-only to signal)
+
+Ship 6 in the original queue was "divergence diamonds on the ribbon"
+— visual only. The TSLA snapshot shows divergence is diagnostic, not
+just decorative. Promote to a full signal trigger:
+
+- Bullish divergence: over the last 20 bars, price makes a lower low
+  AND RSI (or MACD line) makes a higher low → `extremes.bullishDiv = true`,
+  reason "Bullish divergence: price lower, RSI higher over last N bars."
+- Bearish divergence: mirror.
+
+Divergence + RSI-extremes exit + MACD-H turnaround are the three
+signals that would have flagged TSLA's snapshot as a reversal watch
+even though the temperature was still red at 37.
+
+Also: promote divergence diamonds in the ribbon to fire from this
+same detector (was pending source data in Ship 6).
+
+### Ship 10 — Custom Rule Builder
+
+Kirk on 2026-07-13: *"I can't adjust the buy/sell signals to match
+specific indicator crosses or patterns I see."*
+
+Add a user-defined rule DSL (small, safe, expression-only, no eval):
+
+```
+rule "RSI cross from oversold" {
+  when: rsi < 30 in last 3 bars, rsi > 30 now
+  action: WATCH BUY
+}
+
+rule "Golden cross" {
+  when: ema12 crosses above ema24
+  action: BUY
+}
+```
+
+Ship shape: a Settings drawer with a text area (or button-driven builder),
+localStorage-persisted rules, evaluated in analyzeData after the built-in
+rules. Rule matches show up in a new "Custom" section of the reasons
+array with the rule name.
+
+Load-bearing: this is what turns Kirk's three decades of pattern
+recognition into codified signals the tool can fire without him
+watching. It's the biggest surface area of the six-ship arc originally
+planned — but it's the ship that unlocks Kirk's own edge, so it's
+probably worth ordering after Ships 7–9 land the low-hanging pattern
+signals.
 
 ---
 

@@ -10325,14 +10325,82 @@ assert('v5.79.5 roadmap: chair test list present for Ship 1',
   /Chair test:[\s\S]{0,600}sub-chart/.test(roadmap795));
 
 // Triple-bump
-assert('v5.79.5 triple-bump: app.html FL_VERSION = 5.79.5',
-  /FL_VERSION\s*=\s*'5\.79\.5'/.test(fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8')));
-assert('v5.79.5 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.5',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.5'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
-assert('v5.79.5 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.5',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.5'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
-assert('v5.79.5 version.json: version field = 5.79.5',
-  /"version"\s*:\s*"5\.79\.5"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
+assert('v5.79.5 triple-bump: app.html FL_VERSION >= 5.79.5 (superseded)',
+  /FL_VERSION\s*=\s*'5\.79\.[5-9]\d*'|FL_VERSION\s*=\s*'5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8')));
+assert('v5.79.5 triple-bump: docs/sw.js CACHE_NAME >= freelattice-v5.79.5 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.[5-9]\d*'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+assert('v5.79.5 triple-bump: root sw.js CACHE_NAME >= freelattice-v5.79.5 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.[5-9]\d*'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+assert('v5.79.5 version.json: version field = 5.79.5 (superseded by 5.79.6+)',
+  /"version"\s*:\s*"5\.79\.[5-9]\d*"|"version"\s*:\s*"5\.(8\d|9\d)\.\d+"/.test(
+    fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
+
+// ═══════════════════════════════════════════════════════════════
+// Section 170 — v5.79.6 Ship 2: Timeframe-adaptive ΔT lookback
+// The fixed 3-bar lookback was aggressive on daily, stale on hourly
+// and lower. Now `computeTemperature(closes, volumes, rsiArr, macdData,
+// gravPoints, interval)` accepts an interval and picks a lookback that
+// captures a characteristic swing for that timeframe. Default 3 kept
+// for backward compatibility. Both live analyzeData and backtestSignals
+// pass currentInterval so live and backtest match.
+//
+// Also updated docs/library/SIGNAL_ROADMAP.md: Ship 2 marked shipped,
+// added Ships 7–10 (RSI extremes, MACD-H turnaround, divergence
+// detector, custom rule builder) prompted by Kirk's TSLA 15m snapshot
+// where a textbook bullish divergence didn't fire.
+// ═══════════════════════════════════════════════════════════════
+var gauge796 = fs.readFileSync(path.join(docsDir, 'temperature-gauge.html'), 'utf8');
+
+// Adaptive lookback machinery
+assert('v5.79.6 lookback: TEMP_ROC_LOOKBACK map defined with per-interval entries',
+  /var TEMP_ROC_LOOKBACK = \{[\s\S]{0,300}'1m':\s*15[\s\S]{0,120}'15m':\s*8[\s\S]{0,120}'1h':\s*6[\s\S]{0,120}'1d':\s*3/.test(gauge796));
+assert('v5.79.6 lookback: getTempROCLookback helper defined with default 3',
+  /function getTempROCLookback\(interval\)[\s\S]{0,120}TEMP_ROC_LOOKBACK\[interval\] \|\| 3/.test(gauge796));
+assert('v5.79.6 lookback: computeTemperature signature accepts interval',
+  /function computeTemperature\(closes, volumes, rsiArr, macdData, gravPoints, interval\)/.test(gauge796));
+assert('v5.79.6 lookback: computeTemperature uses variable rocLookback (not literal 3)',
+  /var rocLookback = getTempROCLookback\(interval\);[\s\S]{0,300}temps\[i - rocLookback\]/.test(gauge796));
+assert('v5.79.6 lookback: computeTemperature returns rocLookback for UI',
+  /return \{\s*temps,\s*tempROC,\s*rocLookback\s*\}/.test(gauge796));
+
+// Callers pass currentInterval
+assert('v5.79.6 wiring: analyzeData passes currentInterval to computeTemperature',
+  /computeTemperature\(closes, volumes, rsiArr, macdData, gravPoints, currentInterval\)/.test(gauge796));
+assert('v5.79.6 wiring: backtestSignals passes currentInterval to computeTemperature',
+  /computeTemperature\(closes, candles\.map\(function\(c\)\{return c\.v;\}\), rsiArr, macdData, gravPoints, currentInterval\)/.test(gauge796));
+
+// analyzeData return exposes tempROCLookback
+assert('v5.79.6 return: analyzeData exposes tempROCLookback for UI honesty',
+  /tempROCLookback\s*\n\s*\};/.test(gauge796) || /tempROCLookback\s*\}/.test(gauge796));
+
+// Momentum line shows the active lookback
+assert('v5.79.6 UI: signalMom copy shows lookback (e.g., "/ 8 bars")',
+  /a\.tempROCLookback[\s\S]{0,200}\+ ' bars\)'/.test(gauge796));
+
+// Roadmap updates
+var roadmap796 = fs.readFileSync(path.join(docsDir, 'library', 'SIGNAL_ROADMAP.md'), 'utf8');
+assert('v5.79.6 roadmap: Ship 2 marked SHIPPED',
+  /Ship 2[\s\S]{0,120}SHIPPED v5\.79\.6/.test(roadmap796));
+assert('v5.79.6 roadmap: Ship 7 (RSI extremes) added',
+  /Ship 7[\s\S]{0,120}RSI-extremes/.test(roadmap796));
+assert('v5.79.6 roadmap: Ship 8 (MACD-H turnaround) added',
+  /Ship 8[\s\S]{0,120}MACD-H turnaround/.test(roadmap796));
+assert('v5.79.6 roadmap: Ship 9 (divergence detector) added',
+  /Ship 9[\s\S]{0,200}[Dd]ivergence detector/.test(roadmap796));
+assert('v5.79.6 roadmap: Ship 10 (custom rule builder) added',
+  /Ship 10[\s\S]{0,200}Custom Rule Builder/.test(roadmap796));
+assert('v5.79.6 roadmap: TSLA snapshot context preserved',
+  roadmap796.includes('TSLA') && roadmap796.includes('bullish divergence'));
+
+// Triple-bump
+assert('v5.79.6 triple-bump: app.html FL_VERSION = 5.79.6',
+  /FL_VERSION\s*=\s*'5\.79\.6'/.test(fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8')));
+assert('v5.79.6 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.6',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.6'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+assert('v5.79.6 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.6',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.6'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+assert('v5.79.6 version.json: version field = 5.79.6',
+  /"version"\s*:\s*"5\.79\.6"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
 
 // RESULTS
 // ═══════════════════════════════════════════════════════════════

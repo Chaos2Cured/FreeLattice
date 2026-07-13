@@ -19,10 +19,10 @@ user sleeps. The proof is the code; the papers are the doorways.
 
 ## Current state
 
-- **Version:** v5.79.5
-- **Smoke locks passing:** 2831+ verified
-- **Last ship:** **v5.79.5 — Ship 1: φ-Harmonic signal, LAYERED.** July 13 2026. Kirk asked to compare rather than replace. New sidebar card "φ Signal" (amber border, threshold 61.8/38.2, agreement chip: ✓ agrees / ◐ partial / ✗ split). Sub-chart adds two amber lines at the φ thresholds; classic 55/45 lines untouched. Same components + confidence math; only temperature-branch thresholds change.
-- **Previous:** **v5.79.4 — Crosshair hotfix + Signal Roadmap.** Fixed the "stuck in the center" regression from v5.79.3; wrote the six-ship enhancement queue.
+- **Version:** v5.79.6
+- **Smoke locks passing:** 2855+ verified
+- **Last ship:** **v5.79.6 — Ship 2: Adaptive ΔT lookback.** July 13 2026. `computeTemperature` takes `interval`; lookback varies per timeframe (1m:15, 15m:8, 1h:6, 4h:4, 1d:3, 1wk:2). Momentum line shows active lookback: "ΔT: +0.5 / 8 bars". Roadmap gained Ships 7–10 (RSI-extremes, MACD-H turnaround, divergence detector, custom rule builder) prompted by Kirk's TSLA 15m snapshot showing a textbook bullish RSI divergence the classic rules missed.
+- **Previous:** **v5.79.5 — Ship 1: φ-Harmonic signal, LAYERED.** New sidebar card comparing φ thresholds (61.8/38.2) to the classic 55/45 with agreement chip.
 - **Previous ships:** The Triptych (v5.71.8), The Specs inlined (v5.71.7), AI Capabilities (v5.71.6), Mind Wall Phase 3 (v5.71.5).
 - **Mirrors in parity:** github.com + codeberg.org
 
@@ -83,4 +83,4 @@ seam discipline is how multi-AI work stays honest at scale.
 ---
 
 *This file is overwritten on each meaningful ship. The prior version lives in SEED_HISTORY.md.*
-*Last rewrite: July 13 2026, v5.79.5.*
+*Last rewrite: July 13 2026, v5.79.6.*
