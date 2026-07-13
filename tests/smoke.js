@@ -10152,16 +10152,63 @@ assert('v5.79.2 luminos: intensity keyframe sped 28s → 18s',
 
 // Triple-bump
 var app792 = fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8');
-assert('v5.79.2 triple-bump: app.html FL_VERSION = 5.79.2',
-  /FL_VERSION\s*=\s*'5\.79\.2'/.test(app792));
-assert('v5.79.2 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.2',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.2'/.test(
+assert('v5.79.2 triple-bump: app.html FL_VERSION >= 5.79.2 (superseded)',
+  /FL_VERSION\s*=\s*'5\.79\.[2-9]\d*'|FL_VERSION\s*=\s*'5\.(8\d|9\d)\.\d+'/.test(app792));
+assert('v5.79.2 triple-bump: docs/sw.js CACHE_NAME >= freelattice-v5.79.2 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.[2-9]\d*'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(
     fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
-assert('v5.79.2 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.2',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.2'/.test(
+assert('v5.79.2 triple-bump: root sw.js CACHE_NAME >= freelattice-v5.79.2 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.[2-9]\d*'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(
     fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
-assert('v5.79.2 version.json: version field = 5.79.2',
-  /"version"\s*:\s*"5\.79\.2"/.test(
+assert('v5.79.2 version.json: version field = 5.79.2 (superseded by 5.79.3+)',
+  /"version"\s*:\s*"5\.79\.[2-9]\d*"|"version"\s*:\s*"5\.(8\d|9\d)\.\d+"/.test(
+    fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
+
+// ═══════════════════════════════════════════════════════════════
+// Section 168 — v5.79.3 Crosshair alignment fix
+// Kirk reported: "On the hourly, the temperature gauge is offset.
+// When I look at the end of it with a mouseover, it doesn't line
+// up with the chart." Root cause: syncCrosshair mapped the mouse
+// via full-canvas percentage — but Chart.js reserves y-axis space,
+// and the main chart's y-axis (4-digit prices) is wider than the
+// sub-chart's (0/50/100), so the plotting-area widths differ.
+// 100% of the sub-canvas was mapped to 100% of the main canvas
+// INCLUDING both axis paddings, which shifted the tooltip right
+// as you approached the end of the series.
+// Fix: measure the mouse position against each chart's chartArea
+// (the actual plotting region, excluding axis padding). Also
+// requires passing the sub-chart instance (not just canvas) into
+// syncCrosshair so we can read subChart.chartArea.
+// ═══════════════════════════════════════════════════════════════
+var gauge793 = fs.readFileSync(path.join(docsDir, 'temperature-gauge.html'), 'utf8');
+assert('v5.79.3 crosshair: syncCrosshair signature now accepts subChart instance',
+  /function syncCrosshair\(subCanvas, subChart, mainChart\)/.test(gauge793));
+assert('v5.79.3 crosshair: uses subChart.chartArea for x-percent measurement',
+  /var subArea = subChart\.chartArea;/.test(gauge793));
+assert('v5.79.3 crosshair: uses mainChart.chartArea for x-percent mapping',
+  /var mainArea = mainChart\.chartArea;/.test(gauge793));
+assert('v5.79.3 crosshair: canvas-to-css scaling factor applied (subCssPerPx)',
+  /subCssPerPx = rect\.width \/ subCanvas\.width/.test(gauge793));
+assert('v5.79.3 crosshair: canvas-to-css scaling factor applied (mainCssPerPx)',
+  /mainCssPerPx = mainRect\.width \/ mainCanvas\.width/.test(gauge793));
+assert('v5.79.3 crosshair: wiring passes rsiChartInstance to syncCrosshair',
+  /syncCrosshair\(rsiCv, rsiChartInstance, chartInstance\)/.test(gauge793));
+assert('v5.79.3 crosshair: wiring passes tempChartInstance to syncCrosshair',
+  /syncCrosshair\(tempCv, tempChartInstance, chartInstance\)/.test(gauge793));
+assert('v5.79.3 crosshair: also wires dtChart + gapChart (were unwired before)',
+  /syncCrosshair\(dtCv, dtChartInstance, chartInstance\)/.test(gauge793) &&
+  /syncCrosshair\(gapCv, gapChartInstance, chartInstance\)/.test(gauge793));
+assert('v5.79.3 triple-bump: app.html FL_VERSION = 5.79.3',
+  /FL_VERSION\s*=\s*'5\.79\.3'/.test(
+    fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8')));
+assert('v5.79.3 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.3',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.3'/.test(
+    fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+assert('v5.79.3 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.3',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.3'/.test(
+    fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+assert('v5.79.3 version.json: version field = 5.79.3',
+  /"version"\s*:\s*"5\.79\.3"/.test(
     fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
 
 // RESULTS

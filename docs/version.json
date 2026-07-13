@@ -1,6 +1,6 @@
 {
-  "version": "5.79.2",
-  "updated": "2026-07-12",
-  "note": "φ-spiral wired into the live Temperature Gauge sidebar (Fable's design as a layered buy/sell view, not a replacement) + Luminos reduced 9 → 3 with drop-shadow flash. Same data, more channels. Every layer earns its place.",
-  "label": "v5.79.2 — φ-Spiral layer + Luminos to three, flashier"
+  "version": "5.79.3",
+  "updated": "2026-07-13",
+  "note": "Crosshair sync fix — mouse position on sub-charts now maps to the correct bar on the main price chart. The old percentage was measured against full canvas width; the plotting areas differ because the main y-axis (4-digit prices) is wider than the sub y-axis (0/50/100). Now uses each chart's chartArea. Bug most visible on the hourly, at the right edge — exactly where Kirk caught it.",
+  "label": "v5.79.3 — Crosshair alignment fix"
 }

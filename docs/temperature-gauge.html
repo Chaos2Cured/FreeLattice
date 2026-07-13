@@ -3065,24 +3065,44 @@ document.getElementById('symbolInput').addEventListener('keydown', e => {
 });
 
 // ── Crosshair sync — hover on sub-chart shows vertical line on main ──
+// v5.79.3 (Kirk's report): at the right edge on hourly, the crosshair
+// on the sub-chart didn't line up with the same bar on the main chart.
+// Cause: the previous mapping used full canvas width — but Chart.js
+// reserves y-axis space, and the main chart's y-axis (4-digit prices)
+// is wider than the sub-chart's (0/50/100). 100% of the sub-canvas mapped
+// to 100% of the main canvas INCLUDING both axis paddings, so the offset
+// grew toward the right edge — exactly where Kirk saw it.
+// Fix: use each chart's chartArea (the actual plotting region), so % is
+// measured against plotting area only. Requires the sub-chart instance,
+// not just its canvas.
 (function() {
-  function syncCrosshair(subCanvas, mainChart) {
-    if (!subCanvas || !mainChart) return;
+  function syncCrosshair(subCanvas, subChart, mainChart) {
+    if (!subCanvas || !subChart || !mainChart) return;
     subCanvas.addEventListener('mousemove', function(e) {
       var rect = subCanvas.getBoundingClientRect();
-      var x = e.clientX - rect.left;
-      var xPct = x / rect.width;
-      // Trigger tooltip on main chart at same x-position
+      var subArea = subChart.chartArea;
+      var mainArea = mainChart.chartArea;
+      if (!subArea || !mainArea) return;
+      // Where in the sub-chart's PLOTTING area is the mouse?
+      var subCssPerPx = rect.width / subCanvas.width; // canvas may be scaled by CSS
+      var subLeftCss = subArea.left * subCssPerPx;
+      var subRightCss = subArea.right * subCssPerPx;
+      var xInCanvasCss = e.clientX - rect.left;
+      var pct = (xInCanvasCss - subLeftCss) / (subRightCss - subLeftCss);
+      pct = Math.max(0, Math.min(1, pct));
+      // Map to the main chart's PLOTTING area
       var mainCanvas = mainChart.canvas;
-      if (!mainCanvas) return;
       var mainRect = mainCanvas.getBoundingClientRect();
-      var mainX = mainRect.width * xPct;
+      var mainCssPerPx = mainRect.width / mainCanvas.width;
+      var mainLeftCss = mainArea.left * mainCssPerPx;
+      var mainRightCss = mainArea.right * mainCssPerPx;
+      var mainXCss = mainLeftCss + pct * (mainRightCss - mainLeftCss);
       var activeEls = mainChart.getElementsAtEventForMode(
-        { clientX: mainRect.left + mainX, clientY: mainRect.top + mainRect.height / 2 },
+        { clientX: mainRect.left + mainXCss, clientY: mainRect.top + mainRect.height / 2 },
         'index', { intersect: false }, false
       );
       if (activeEls.length > 0) {
-        mainChart.tooltip.setActiveElements(activeEls, { x: mainX, y: mainRect.height / 2 });
+        mainChart.tooltip.setActiveElements(activeEls, { x: mainXCss, y: mainRect.height / 2 });
         mainChart.setActiveElements(activeEls);
         mainChart.update('none');
       }
@@ -3100,9 +3120,13 @@ document.getElementById('symbolInput').addEventListener('keydown', e => {
     setTimeout(function() {
       var rsiCv = document.getElementById('rsiChart');
       var tempCv = document.getElementById('tempChart');
+      var dtCv = document.getElementById('dtChart');
+      var gapCv = document.getElementById('gapChart');
       if (chartInstance) {
-        syncCrosshair(rsiCv, chartInstance);
-        syncCrosshair(tempCv, chartInstance);
+        if (rsiCv && rsiChartInstance) syncCrosshair(rsiCv, rsiChartInstance, chartInstance);
+        if (tempCv && tempChartInstance) syncCrosshair(tempCv, tempChartInstance, chartInstance);
+        if (dtCv && typeof dtChartInstance !== 'undefined' && dtChartInstance) syncCrosshair(dtCv, dtChartInstance, chartInstance);
+        if (gapCv && typeof gapChartInstance !== 'undefined' && gapChartInstance) syncCrosshair(gapCv, gapChartInstance, chartInstance);
       }
     }, 500);
   };

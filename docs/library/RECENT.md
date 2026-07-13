@@ -3,38 +3,38 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-07-12 23:38 UTC
+> Last update: 2026-07-13 16:55 UTC
 
 ## State
 
-- **Version:** v5.79.2
+- **Version:** v5.79.3
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `74cab60` _(committed 0 seconds ago)_
+- **HEAD:** `8ee0796` _(committed 17 hours ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _v5.75.1 — The Pruning: audit fixes, blank tabs, duplicate names, TRASH.md, code-mirror pattern_
 
 ## Last 20 commits
 
-- `74cab60` v5.79.2 — φ-Spiral layer + Luminos to three, flashier _(0 seconds ago)_
-- `509e6d5` docs: Auto-update Session Primer [5.79.1] _(67 minutes ago)_
-- `cbf4956` v5.79.1 — Hotfix: φ-spiral drew nothing because `var history` collides with window.history _(67 minutes ago)_
-- `e4b1d2b` docs: Auto-update Session Primer [5.79.0] _(2 hours ago)_
-- `42cdd5e` v5.79.0 — The Temperature Blooms + Core Seasons + Wind Remembers (Fable's designs) _(2 hours ago)_
-- `d48cbbd` Ledger entry 37 — The Cards Remember _(22 hours ago)_
-- `d113b45` v5.79.0 — Card order restored and locked per Kirk (Play/Learn/More), Glass Room added, CC letter written _(22 hours ago)_
-- `f35e643` docs: Auto-update Session Primer [5.78.2] _(24 hours ago)_
-- `a321789` v5.78.2 — Living Tree: full-canopy leaf distribution (Fable's fix) _(24 hours ago)_
-- `92f2c1b` Merge remote-tracking branch 'origin/main' _(25 hours ago)_
-- `761da8f` docs: Auto-update Session Primer [5.78.1] _(25 hours ago)_
-- `fd4910d` v5.78.1 — Hotfix: unescaped apostrophe froze whole page; parse-guard added _(25 hours ago)_
-- `523c14a` Go 12/13 — Temperature & Education mirrors + Fable briefs + ledger 35/36 _(25 hours ago)_
-- `003a124` Go 11: ledger entry 35 — The Living Tree _(25 hours ago)_
-- `40b3641` docs: Auto-update Session Primer [5.78.0] _(25 hours ago)_
-- `daa564f` v5.78.0 — Go 11: The Living Tree (Fable's design, Harmonia's brief, CC's build) _(25 hours ago)_
-- `d60bae6` Go 11 brief: for-cc-go11.md — The Living Tree (Core beautification, Fable's design) _(27 hours ago)_
-- `d20bf6b` Go 10: ledger entry 34 — The Wizard Speaks _(30 hours ago)_
-- `ec236bd` v5.77.0 — Go 10: Settings Connection Wizard (Harmonia + CC + Fable) _(30 hours ago)_
-- `e3f7656` Go 10: ledger entry 33 — The Mirrors Multiply _(34 hours ago)_
+- `8ee0796` docs: Auto-update Session Primer [5.79.2] _(17 hours ago)_
+- `74cab60` v5.79.2 — φ-Spiral layer + Luminos to three, flashier _(17 hours ago)_
+- `509e6d5` docs: Auto-update Session Primer [5.79.1] _(18 hours ago)_
+- `cbf4956` v5.79.1 — Hotfix: φ-spiral drew nothing because `var history` collides with window.history _(18 hours ago)_
+- `e4b1d2b` docs: Auto-update Session Primer [5.79.0] _(19 hours ago)_
+- `42cdd5e` v5.79.0 — The Temperature Blooms + Core Seasons + Wind Remembers (Fable's designs) _(19 hours ago)_
+- `d48cbbd` Ledger entry 37 — The Cards Remember _(2 days ago)_
+- `d113b45` v5.79.0 — Card order restored and locked per Kirk (Play/Learn/More), Glass Room added, CC letter written _(2 days ago)_
+- `f35e643` docs: Auto-update Session Primer [5.78.2] _(2 days ago)_
+- `a321789` v5.78.2 — Living Tree: full-canopy leaf distribution (Fable's fix) _(2 days ago)_
+- `92f2c1b` Merge remote-tracking branch 'origin/main' _(2 days ago)_
+- `761da8f` docs: Auto-update Session Primer [5.78.1] _(2 days ago)_
+- `fd4910d` v5.78.1 — Hotfix: unescaped apostrophe froze whole page; parse-guard added _(2 days ago)_
+- `523c14a` Go 12/13 — Temperature & Education mirrors + Fable briefs + ledger 35/36 _(2 days ago)_
+- `003a124` Go 11: ledger entry 35 — The Living Tree _(2 days ago)_
+- `40b3641` docs: Auto-update Session Primer [5.78.0] _(2 days ago)_
+- `daa564f` v5.78.0 — Go 11: The Living Tree (Fable's design, Harmonia's brief, CC's build) _(2 days ago)_
+- `d60bae6` Go 11 brief: for-cc-go11.md — The Living Tree (Core beautification, Fable's design) _(2 days ago)_
+- `d20bf6b` Go 10: ledger entry 34 — The Wizard Speaks _(2 days ago)_
+- `ec236bd` v5.77.0 — Go 10: Settings Connection Wizard (Harmonia + CC + Fable) _(2 days ago)_
 
 ## How to use this file
 

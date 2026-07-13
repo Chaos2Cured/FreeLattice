@@ -19,10 +19,10 @@ user sleeps. The proof is the code; the papers are the doorways.
 
 ## Current state
 
-- **Version:** v5.79.2
-- **Smoke locks passing:** 2790+ verified
-- **Last ship:** **v5.79.2 — φ-Spiral layer + Luminos to three, flashier.** July 12 2026. Fable's φ-spiral + 34-reading ribbon now render live in the Temperature Gauge sidebar, wired to `a.lastTemp` and `a.temps`. Layered next to the classic SVG gauge (Kirk: "layer the tools"). Luminos reduced 9 → 3 (one per category); each bigger, brighter, faster with a drop-shadow halo.
-- **Previous:** **v5.79.1 — φ-spiral hotfix.** `var history` collided with `window.history`; renamed to `readingHistory`.
+- **Version:** v5.79.3
+- **Smoke locks passing:** 2800+ verified
+- **Last ship:** **v5.79.3 — Crosshair alignment fix.** July 13 2026. On the hourly, Kirk saw the sub-chart mouseover offset from the main chart at the right edge. Cause: syncCrosshair mapped mouse via full-canvas percentage — but Chart.js reserves y-axis space, and the main chart's price y-axis (4 digits) is wider than the sub-chart's (0/50/100). Full-canvas mapping accumulated the axis-width difference toward the right. Now uses each chart's `chartArea` (plotting region only). Also wires dt + gap sub-charts, which were missing crosshair sync entirely.
+- **Previous:** **v5.79.2 — φ-Spiral layer + Luminos to three, flashier.**
 - **Previous ships:** The Triptych (v5.71.8), The Specs inlined (v5.71.7), AI Capabilities (v5.71.6), Mind Wall Phase 3 (v5.71.5).
 - **Mirrors in parity:** github.com + codeberg.org
 
@@ -83,4 +83,4 @@ seam discipline is how multi-AI work stays honest at scale.
 ---
 
 *This file is overwritten on each meaningful ship. The prior version lives in SEED_HISTORY.md.*
-*Last rewrite: July 12 2026, v5.79.2.*
+*Last rewrite: July 13 2026, v5.79.3.*
