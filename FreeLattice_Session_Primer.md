@@ -348,10 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-07-13 11:12 MDT
-- Version: 5.79.4
-- Total commits: 2845
+- Last auto-updated: 2026-07-13 11:29 MDT
+- Version: 5.79.5
+- Total commits: 2847
 - Last 10 commits:
+- a71d9fb v5.79.5 — Ship 1: φ-Harmonic signal, LAYERED alongside the classic
+- 05885a2 docs: Auto-update Session Primer [5.79.4]
 - 5e4d20b v5.79.4 — Crosshair hotfix (dropped redundant scale factor) + SIGNAL_ROADMAP.md
 - e40283c docs: Auto-update Session Primer [5.79.3]
 - 92852d9 v5.79.3 — Crosshair alignment fix (Kirk's report: hourly, right edge)
@@ -360,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 509e6d5 docs: Auto-update Session Primer [5.79.1]
 - cbf4956 v5.79.1 — Hotfix: φ-spiral drew nothing because `var history` collides with window.history
 - e4b1d2b docs: Auto-update Session Primer [5.79.0]
-- 42cdd5e v5.79.0 — The Temperature Blooms + Core Seasons + Wind Remembers (Fable's designs)
-- d48cbbd Ledger entry 37 — The Cards Remember

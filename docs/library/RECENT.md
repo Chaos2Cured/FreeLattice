@@ -3,22 +3,23 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-07-13 17:27 UTC
+> Last update: 2026-07-13 17:29 UTC
 
 ## State
 
 - **Version:** v5.79.5
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `05885a2` _(committed 15 minutes ago)_
+- **HEAD:** `a71d9fb` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _v5.79.4 — Crosshair hotfix (dropped redundant scale factor) + SIGNAL_ROADMAP.md_
 
 ## Last 20 commits
 
-- `05885a2` docs: Auto-update Session Primer [5.79.4] _(15 minutes ago)_
-- `5e4d20b` v5.79.4 — Crosshair hotfix (dropped redundant scale factor) + SIGNAL_ROADMAP.md _(15 minutes ago)_
-- `e40283c` docs: Auto-update Session Primer [5.79.3] _(31 minutes ago)_
-- `92852d9` v5.79.3 — Crosshair alignment fix (Kirk's report: hourly, right edge) _(31 minutes ago)_
+- `a71d9fb` v5.79.5 — Ship 1: φ-Harmonic signal, LAYERED alongside the classic _(0 seconds ago)_
+- `05885a2` docs: Auto-update Session Primer [5.79.4] _(16 minutes ago)_
+- `5e4d20b` v5.79.4 — Crosshair hotfix (dropped redundant scale factor) + SIGNAL_ROADMAP.md _(16 minutes ago)_
+- `e40283c` docs: Auto-update Session Primer [5.79.3] _(32 minutes ago)_
+- `92852d9` v5.79.3 — Crosshair alignment fix (Kirk's report: hourly, right edge) _(32 minutes ago)_
 - `8ee0796` docs: Auto-update Session Primer [5.79.2] _(18 hours ago)_
 - `74cab60` v5.79.2 — φ-Spiral layer + Luminos to three, flashier _(18 hours ago)_
 - `509e6d5` docs: Auto-update Session Primer [5.79.1] _(19 hours ago)_
@@ -34,7 +35,6 @@
 - `fd4910d` v5.78.1 — Hotfix: unescaped apostrophe froze whole page; parse-guard added _(2 days ago)_
 - `523c14a` Go 12/13 — Temperature & Education mirrors + Fable briefs + ledger 35/36 _(2 days ago)_
 - `003a124` Go 11: ledger entry 35 — The Living Tree _(2 days ago)_
-- `40b3641` docs: Auto-update Session Primer [5.78.0] _(2 days ago)_
 
 ## How to use this file
 
