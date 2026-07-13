@@ -906,6 +906,29 @@ canvas.sub-canvas.custom { height: 80px !important; }
       </div>
     </div>
 
+    <!-- v5.79.5 — φ-Harmonic parallel signal (Ship 1 of SIGNAL_ROADMAP.md).
+         Layered ALONGSIDE the classic signal so Kirk can compare. Same math,
+         thresholds are the φ pair (61.8/38.2 for BUY/SELL, 76.4/23.6 for STRONG).
+         The classic signal above stays untouched — this is an extra lens. -->
+    <div class="sidebar-section" id="phiSignalSection" style="display:none;">
+      <div class="sidebar-label" style="color:#c9a84c;">φ Signal <span id="phiSignalAgree" style="float:right;font-size:0.7rem;font-weight:400;letter-spacing:0.04em;">—</span></div>
+      <div class="signal-card" style="border-left:2px solid rgba(201,168,76,0.4);">
+        <div id="phiSignalBadge" class="signal-badge">— —</div>
+        <div class="signal-row">
+          <span class="signal-row-label">Confidence</span>
+          <span class="signal-row-val" id="phiSignalConf">—</span>
+        </div>
+        <div class="signal-row">
+          <span class="signal-row-label">Threshold</span>
+          <span class="signal-row-val" style="font-family:var(--font-mono,monospace);font-size:0.75rem;">61.8 / 38.2</span>
+        </div>
+        <div class="signal-row">
+          <span class="signal-row-label">vs Classic</span>
+          <span class="signal-row-val" id="phiSignalVsClassic" style="font-size:0.8rem;">—</span>
+        </div>
+      </div>
+    </div>
+
     <!-- Indicators -->
     <div class="sidebar-section" id="indicatorSection" style="display:none;">
       <div class="sidebar-label">Indicators</div>
@@ -1943,6 +1966,31 @@ function analyzeData(candles, symbol) {
   const priceChange = closes[n-1] - closes[n-2];
   const pricePct = (priceChange / closes[n-2]) * 100;
 
+  // ── v5.79.5 — φ-Harmonic parallel signal (Ship 1 of SIGNAL_ROADMAP.md) ──
+  // Layered ALONGSIDE the classic signal (not replacing it), so Kirk can
+  // compare in real market conditions. Same components, same spread math,
+  // same confidence shape — only the temperature-branch thresholds change:
+  //   BUY at 61.8 (φ⁻¹ · 100), STRONG BUY at 76.4 (50 + 50·φ⁻¹)
+  //   SELL at 38.2 (100 − φ⁻¹·100), STRONG SELL at 23.6 (50 − 50·φ⁻¹)
+  // The 38.2–61.8 band is the true φ "neutral" region.
+  let phiSignal, phiSignalClass;
+  if (lastTemp >= 76.4 && bullCount >= 4 && components.thrust === 'bullish') { phiSignal = 'STRONG BUY'; phiSignalClass = 'signal-strong-buy'; }
+  else if (lastTemp >= 61.8) { phiSignal = 'BUY'; phiSignalClass = 'signal-buy'; }
+  else if (lastTemp <= 23.6 && bearCount >= 4 && components.thrust === 'bearish') { phiSignal = 'STRONG SELL'; phiSignalClass = 'signal-strong-sell'; }
+  else if (lastTemp <= 38.2) { phiSignal = 'SELL'; phiSignalClass = 'signal-sell'; }
+  else { phiSignal = 'HOLD'; phiSignalClass = 'signal-hold'; }
+  const phiConfPct = Math.min(95, Math.round(50 + Math.abs(spread) * 8 + Math.abs(lastTemp - 50) * 0.4));
+  const phiConfidence = confidence; // component-spread confidence stays identical for direct A/B
+  // Agreement flag — the whole point of layering is that Kirk can see when
+  // classic and φ disagree. HOLD-vs-HOLD is trivially agree; opposite sides
+  // are hard disagree; partial (one HOLD, one directional) is a soft signal.
+  function _sideOf(s) { return /BUY/.test(s) ? 'buy' : /SELL/.test(s) ? 'sell' : 'hold'; }
+  const _classicSide = _sideOf(signal);
+  const _phiSide = _sideOf(phiSignal);
+  const phiAgreement = _classicSide === _phiSide ? 'agree'
+    : (_classicSide === 'hold' || _phiSide === 'hold') ? 'partial'
+    : 'disagree';
+
   return {
     lastTemp, lastTempROC, signal, signalClass, confidence, confPct, confMultiplier, momentum,
     urgency, components, bullCount, bearCount, reasons,
@@ -1954,7 +2002,9 @@ function analyzeData(candles, symbol) {
     positionShares, positionValue, actualRiskPct, stopDistance,
     invalidation, watchFor, confirmation,
     tempBuySignals, tempSellSignals,
-    confluenceGap, tpSpread, rpSpread
+    confluenceGap, tpSpread, rpSpread,
+    // φ-Harmonic parallel signal (v5.79.5)
+    phiSignal, phiSignalClass, phiConfPct, phiConfidence, phiAgreement
   };
 }
 
@@ -2059,6 +2109,25 @@ function renderAll(candles, a, symbol) {
   document.getElementById('signalMom').textContent = a.momentum + (a.lastTempROC ? ' (\u0394T: ' + (a.lastTempROC > 0 ? '+' : '') + a.lastTempROC.toFixed(1) + ')' : '');
   document.getElementById('signalSize').textContent = a.positionShares > 0 ? a.positionShares + ' shares ($' + a.positionValue.toLocaleString() + ') \u2014 risking ' + a.actualRiskPct.toFixed(2) + '%' : 'Configure account in Risk Settings';
   document.getElementById('signalUrgency').textContent = a.urgency;
+
+  // v5.79.5 — φ-Harmonic parallel signal (Ship 1). Layered next to classic.
+  document.getElementById('phiSignalSection').style.display = 'block';
+  var phiBadge = document.getElementById('phiSignalBadge');
+  phiBadge.className = 'signal-badge ' + a.phiSignalClass;
+  phiBadge.textContent = a.phiSignal;
+  document.getElementById('phiSignalConf').textContent = a.phiConfidence + ' (' + a.phiConfPct + '%)';
+  var vsEl = document.getElementById('phiSignalVsClassic');
+  var agreeEl = document.getElementById('phiSignalAgree');
+  if (a.phiAgreement === 'agree') {
+    vsEl.innerHTML = '<span style="color:#10b981;">✓ agrees with classic</span>';
+    agreeEl.innerHTML = '<span style="color:#10b981;">✓ agree</span>';
+  } else if (a.phiAgreement === 'partial') {
+    vsEl.innerHTML = '<span style="color:#c9a84c;">◐ one side leaning</span>';
+    agreeEl.innerHTML = '<span style="color:#c9a84c;">◐ partial</span>';
+  } else {
+    vsEl.innerHTML = '<span style="color:#ef4444;">✗ disagrees with classic</span>';
+    agreeEl.innerHTML = '<span style="color:#ef4444;">✗ split</span>';
+  }
 
   // Indicators
   document.getElementById('indicatorSection').style.display = 'block';
@@ -2622,8 +2691,14 @@ function renderChart(candles, a) {
       labels,
       datasets: [
         { data: a.temps, backgroundColor: tempColors, borderWidth: 0, order: 2 },
+        // Classic thresholds (55/45) — untouched
         { data: new Array(closes.length).fill(55), borderColor: 'rgba(16,185,129,0.2)', borderWidth: 1, borderDash: [2,2], pointRadius: 0, type: 'line', fill: false, order: 1 },
-        { data: new Array(closes.length).fill(45), borderColor: 'rgba(239,68,68,0.2)', borderWidth: 1, borderDash: [2,2], pointRadius: 0, type: 'line', fill: false, order: 1 }
+        { data: new Array(closes.length).fill(45), borderColor: 'rgba(239,68,68,0.2)', borderWidth: 1, borderDash: [2,2], pointRadius: 0, type: 'line', fill: false, order: 1 },
+        // v5.79.5 — φ-Harmonic thresholds (61.8/38.2) as amber tick lines,
+        // fainter dash so they read as "the golden mean" region without
+        // competing with the classic emerald/red reference lines.
+        { data: new Array(closes.length).fill(61.8), borderColor: 'rgba(232,197,71,0.28)', borderWidth: 1, borderDash: [1,4], pointRadius: 0, type: 'line', fill: false, order: 1 },
+        { data: new Array(closes.length).fill(38.2), borderColor: 'rgba(232,197,71,0.28)', borderWidth: 1, borderDash: [1,4], pointRadius: 0, type: 'line', fill: false, order: 1 }
       ]
     },
     options: {

@@ -10212,25 +10212,25 @@ assert('v5.79.3 version.json: version field >= 5.79.3 (superseded)',
     fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
 
 // v5.79.4 exact triple-bump
-assert('v5.79.4 triple-bump: app.html FL_VERSION = 5.79.4',
-  /FL_VERSION\s*=\s*'5\.79\.4'/.test(
+assert('v5.79.4 triple-bump: app.html FL_VERSION >= 5.79.4 (superseded)',
+  /FL_VERSION\s*=\s*'5\.79\.[4-9]\d*'|FL_VERSION\s*=\s*'5\.(8\d|9\d)\.\d+'/.test(
     fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8')));
-assert('v5.79.4 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.4',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.4'/.test(
+assert('v5.79.4 triple-bump: docs/sw.js CACHE_NAME >= freelattice-v5.79.4 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.[4-9]\d*'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(
     fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
-assert('v5.79.4 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.4',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.4'/.test(
+assert('v5.79.4 triple-bump: root sw.js CACHE_NAME >= freelattice-v5.79.4 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.[4-9]\d*'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(
     fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
-assert('v5.79.4 version.json: version field = 5.79.4',
-  /"version"\s*:\s*"5\.79\.4"/.test(
+assert('v5.79.4 version.json: version field >= 5.79.4 (superseded)',
+  /"version"\s*:\s*"5\.79\.[4-9]\d*"|"version"\s*:\s*"5\.(8\d|9\d)\.\d+"/.test(
     fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
 
 // v5.79.4 durable roadmap
 assert('v5.79.4 roadmap: SIGNAL_ROADMAP.md exists with six ships',
   fs.existsSync(path.join(docsDir, 'library', 'SIGNAL_ROADMAP.md')));
 var roadmap794 = fs.readFileSync(path.join(docsDir, 'library', 'SIGNAL_ROADMAP.md'), 'utf8');
-assert('v5.79.4 roadmap: Ship 1 (threshold unification) marked as start',
-  /Ship 1[\s\S]{0,200}Threshold unification[\s\S]{0,50}start here/i.test(roadmap794));
+assert('v5.79.4 roadmap: Ship 1 (threshold unification) present (start-here or shipped)',
+  /Ship 1[\s\S]{0,200}Threshold unification[\s\S]{0,80}(start here|SHIPPED)/i.test(roadmap794));
 assert('v5.79.4 roadmap: Ship 2 (adaptive ΔT lookback) present',
   /Ship 2[\s\S]{0,80}(adaptive|Timeframe-adaptive)/.test(roadmap794));
 assert('v5.79.4 roadmap: Ship 3 (STRONG BUY split) present',
@@ -10243,6 +10243,96 @@ assert('v5.79.4 roadmap: Ship 6 (divergence diamonds) present',
   /Ship 6[\s\S]{0,200}[Dd]ivergence diamonds/.test(roadmap794));
 assert('v5.79.4 roadmap: three-threshold mismatch documented in diagnosis',
   roadmap794.includes('55/45') && roadmap794.includes('61.8/38.2'));
+
+// ═══════════════════════════════════════════════════════════════
+// Section 169 — v5.79.5 Ship 1: φ-Harmonic parallel signal (LAYERED)
+// Kirk's ask after CC proposed threshold unification:
+//   "Can you add a new one instead of overwriting the original triad?
+//    I would like to be able to compare."
+// So Ship 1 lands as an ADDITIONAL signal (a.phiSignal, a.phiSignalClass,
+// a.phiConfPct, a.phiConfidence, a.phiAgreement) alongside the untouched
+// classic. New sidebar card #phiSignalSection shows the parallel verdict
+// + agreement flag (✓ agrees / ◐ partial / ✗ split). Sub-chart adds two
+// amber reference lines at 61.8/38.2 without disturbing the classic
+// 55/45 lines. Same components, same confidence math — only the
+// temperature-branch thresholds change to the φ pair.
+// ═══════════════════════════════════════════════════════════════
+var gauge795 = fs.readFileSync(path.join(docsDir, 'temperature-gauge.html'), 'utf8');
+
+// φ-Signal computation
+assert('v5.79.5 phi-signal: computation uses BUY threshold 61.8',
+  /lastTemp >= 61\.8[\s\S]{0,60}phiSignal = 'BUY'/.test(gauge795));
+assert('v5.79.5 phi-signal: computation uses STRONG BUY threshold 76.4',
+  /lastTemp >= 76\.4 && bullCount >= 4 && components\.thrust === 'bullish'/.test(gauge795));
+assert('v5.79.5 phi-signal: computation uses SELL threshold 38.2',
+  /lastTemp <= 38\.2[\s\S]{0,60}phiSignal = 'SELL'/.test(gauge795));
+assert('v5.79.5 phi-signal: computation uses STRONG SELL threshold 23.6',
+  /lastTemp <= 23\.6 && bearCount >= 4 && components\.thrust === 'bearish'/.test(gauge795));
+assert('v5.79.5 phi-signal: agreement flag has three states (agree/partial/disagree)',
+  /phiAgreement = _classicSide === _phiSide \? 'agree'[\s\S]{0,300}'partial'[\s\S]{0,80}'disagree'/.test(gauge795));
+
+// Classic signal preserved unchanged
+assert('v5.79.5 preserved: classic signal branch still uses 55/45 (Kirk asked, do not overwrite)',
+  /lastTemp >= 55[\s\S]{0,60}signal = 'BUY'/.test(gauge795) &&
+  /lastTemp <= 45[\s\S]{0,60}signal = 'SELL'/.test(gauge795));
+assert('v5.79.5 preserved: classic STRONG BUY branch still uses 65',
+  /lastTemp >= 65 && bullCount >= 4 && components\.thrust === 'bullish'/.test(gauge795));
+assert('v5.79.5 preserved: classic STRONG SELL branch still uses 35',
+  /lastTemp <= 35 && bearCount >= 4 && components\.thrust === 'bearish'/.test(gauge795));
+
+// Return object exposes the new fields
+assert('v5.79.5 return: analyzeData exposes phiSignal + phiSignalClass',
+  /phiSignal,\s*phiSignalClass/.test(gauge795));
+assert('v5.79.5 return: analyzeData exposes phiConfPct + phiConfidence + phiAgreement',
+  /phiConfPct,\s*phiConfidence,\s*phiAgreement/.test(gauge795));
+
+// Sidebar card DOM
+assert('v5.79.5 UI: phiSignalSection sidebar card present',
+  /id="phiSignalSection"/.test(gauge795));
+assert('v5.79.5 UI: phiSignalBadge element present',
+  /id="phiSignalBadge"/.test(gauge795));
+assert('v5.79.5 UI: threshold label shows "61.8 / 38.2" in the card',
+  />61\.8 \/ 38\.2</.test(gauge795));
+assert('v5.79.5 UI: card carries amber left border for visual distinction',
+  /border-left:2px solid rgba\(201,168,76,0\.4\)/.test(gauge795));
+assert('v5.79.5 UI: phiSignalAgree chip present in section label',
+  /id="phiSignalAgree"/.test(gauge795));
+
+// UI wiring in renderAll
+assert('v5.79.5 wiring: phiSignalSection is shown after analyze',
+  /getElementById\('phiSignalSection'\)\.style\.display = 'block'/.test(gauge795));
+assert('v5.79.5 wiring: phiSignalBadge fed from a.phiSignal + a.phiSignalClass',
+  /phiBadge\.className = 'signal-badge ' \+ a\.phiSignalClass;[\s\S]{0,120}phiBadge\.textContent = a\.phiSignal/.test(gauge795));
+assert('v5.79.5 wiring: agreement branch has agree / partial / disagree copy',
+  gauge795.includes('agrees with classic') &&
+  gauge795.includes('one side leaning') &&
+  gauge795.includes('disagrees with classic'));
+
+// Sub-chart reference lines (both classic AND phi)
+assert('v5.79.5 chart: classic 55/45 reference lines preserved',
+  /new Array\(closes\.length\)\.fill\(55\)/.test(gauge795) &&
+  /new Array\(closes\.length\)\.fill\(45\)/.test(gauge795));
+assert('v5.79.5 chart: amber 61.8 reference line added',
+  /new Array\(closes\.length\)\.fill\(61\.8\)[\s\S]{0,120}rgba\(232,197,71/.test(gauge795));
+assert('v5.79.5 chart: amber 38.2 reference line added',
+  /new Array\(closes\.length\)\.fill\(38\.2\)[\s\S]{0,120}rgba\(232,197,71/.test(gauge795));
+
+// Roadmap update
+var roadmap795 = fs.readFileSync(path.join(docsDir, 'library', 'SIGNAL_ROADMAP.md'), 'utf8');
+assert('v5.79.5 roadmap: Ship 1 marked SHIPPED',
+  /Ship 1[\s\S]{0,120}SHIPPED v5\.79\.5/.test(roadmap795));
+assert('v5.79.5 roadmap: chair test list present for Ship 1',
+  /Chair test:[\s\S]{0,600}sub-chart/.test(roadmap795));
+
+// Triple-bump
+assert('v5.79.5 triple-bump: app.html FL_VERSION = 5.79.5',
+  /FL_VERSION\s*=\s*'5\.79\.5'/.test(fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8')));
+assert('v5.79.5 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.5',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.5'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+assert('v5.79.5 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.5',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.5'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+assert('v5.79.5 version.json: version field = 5.79.5',
+  /"version"\s*:\s*"5\.79\.5"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
 
 // RESULTS
 // ═══════════════════════════════════════════════════════════════

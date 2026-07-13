@@ -1,6 +1,6 @@
 {
-  "version": "5.79.4",
+  "version": "5.79.5",
   "updated": "2026-07-13",
-  "note": "Hotfix — the v5.79.3 crosshair fix squashed pct to a near-constant (crosshair stuck in center). Cause: applied a canvas-width/rect-width scale factor to chartArea coordinates that are already in CSS pixels for responsive Chart.js charts. Correct algorithm compares e.clientX - rect.left directly against chartArea.left/right, no scale factor.",
-  "label": "v5.79.4 — Crosshair hotfix (dropped the redundant scale factor)"
+  "note": "Ship 1 (layered) — φ-Harmonic parallel buy/sell signal added ALONGSIDE the classic. Same components, same spread, same confidence math; temperature-branch thresholds are the φ pair (BUY 61.8, STRONG 76.4; SELL 38.2, STRONG 23.6). New sidebar card 'φ Signal' shows the parallel verdict + agreement flag (✓ agrees / ◐ partial / ✗ split) so Kirk can compare in real market conditions. Two amber reference lines added to the temperature sub-chart at 61.8/38.2 without disturbing the classic 55/45 lines.",
+  "label": "v5.79.5 — Ship 1: φ-Harmonic signal, layered"
 }

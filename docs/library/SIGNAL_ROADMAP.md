@@ -45,32 +45,57 @@ signals are still off" and asked for enhancement ideas).
 
 ## The six ships, in the order that gives the most truth for the least surface area
 
-### Ship 1 — Threshold unification to φ (61.8 / 38.2)  ★ start here
+### Ship 1 — Threshold unification to φ (61.8 / 38.2)  ✓ SHIPPED v5.79.5
 
-**The single truth fix.** Everything else builds better after this.
+**Landed as a LAYER, not an overwrite** — Kirk's ask:
+*"Can you add a new one instead of overwriting the original triad?
+I would like to be able to compare."* Wise: comparison in real markets
+is the only real test.
 
-Change signal generator + sub-chart reference lines + classic gauge
-gradient to speak the same φ-harmonic language as the rest of the tool:
+What shipped in v5.79.5 (commit tracked in RECENT.md):
 
-- Signal transitions:
-  - `lastTemp >= 76.4` (φ² above 50) → STRONG BUY
-  - `lastTemp >= 61.8` → BUY
-  - `lastTemp <= 38.2` → SELL
-  - `lastTemp <= 23.6` (1 − φ⁻¹²) → STRONG SELL
-- Sub-chart reference lines: 61.8 emerald, 38.2 red (was 55/45).
-- Classic gauge gradient: neutral band 45–55 → **38.2–61.8**
-  (yellow transition band widens to the true φ neutral zone).
+- New parallel signal computed in `analyzeData` return: `phiSignal`,
+  `phiSignalClass`, `phiConfPct`, `phiConfidence`, `phiAgreement`.
+  Same components, same spread math, same confidence shape — only the
+  temperature-branch thresholds change:
+  - `lastTemp >= 76.4` → STRONG BUY (φ)
+  - `lastTemp >= 61.8` → BUY (φ)
+  - `lastTemp <= 38.2` → SELL (φ)
+  - `lastTemp <= 23.6` → STRONG SELL (φ)
+- New sidebar card `#phiSignalSection` "φ Signal" with amber-gold left
+  border, positioned directly under the classic Signal card. Fields:
+  badge, confidence, threshold label (61.8 / 38.2), and a
+  "vs Classic" row showing agreement:
+  - ✓ agrees with classic
+  - ◐ one side leaning (one HOLD, one directional)
+  - ✗ disagrees with classic (opposite sides)
+- Section-label agreement chip mirrors the same flag for quick scan.
+- Sub-chart adds two amber dashed reference lines at 61.8 and 38.2.
+  Classic 55/45 lines stay exactly as they were. Amber uses a finer
+  dash pattern `[1,4]` at 0.28 alpha so it reads as "the golden mean
+  region" without competing.
+- Classic signal, classic gauge, classic gauge gradient — all
+  UNCHANGED. Kirk's daily view is intact.
 
-Files: `docs/temperature-gauge.html` (lines ~1815–1830 signal branch,
-~2624–2626 sub-chart reference lines, ~861–867 gauge gradient stops).
+**Chair test:**
+1. Load a symbol you know well.
+2. Confirm two sidebar cards appear: `Signal` (unchanged) and
+   `φ Signal` (new, amber-bordered).
+3. Look at the sub-chart temperature panel — you should see FOUR
+   horizontal dashed lines: classic emerald at 55, classic red at 45,
+   amber at 61.8, amber at 38.2.
+4. Try a symbol where the reading sits between 55 and 61.8: classic
+   should say BUY, φ should say HOLD, agreement should show
+   "◐ one side leaning".
+5. Try a symbol clearly bullish (temp > 65): both should say BUY,
+   agreement should show "✓ agrees".
 
-Smoke locks: signal generator uses 61.8/38.2 constants; sub-chart
-reference lines fill(61.8) / fill(38.2); gauge linearGradient stops at
-38.2% and 61.8%.
-
-Chair test: load a symbol, confirm the signal box, gauge needle, gauge
-zone color, φ-spiral tip color, and sub-chart reference lines all agree
-about "am I above the buy line" for the SAME reading.
+**Later iteration surface (kept as a follow-up if Kirk wants after
+comparison time):**
+- Widen the classic gauge's yellow neutral band to 38.2–61.8 so the
+  visual gradient matches the φ view.
+- Add the option to *choose* which signal drives the position sizing
+  and urgency copy (currently classic drives both).
 
 ### Ship 2 — Timeframe-adaptive ΔT lookback
 
