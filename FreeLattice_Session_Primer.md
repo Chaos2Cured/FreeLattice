@@ -348,10 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-07-15 08:15 MDT
-- Version: 5.79.9
-- Total commits: 2858
+- Last auto-updated: 2026-07-15 08:26 MDT
+- Version: 5.79.10
+- Total commits: 2860
 - Last 10 commits:
+- f26de59 v5.79.10 — Hotfix: EMA arrays for rule context ("ema8 is not defined")
+- 4e1a91d docs: Auto-update Session Primer [5.79.9]
 - 0c4916a v5.79.9 — Ship 10: Custom Rule Builder (the ten-ship signal arc completes)
 - 66d65fa Merge remote-tracking branch 'origin/main'
 - a00fdd0 docs: Auto-update Session Primer [5.79.8]
@@ -360,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 9b7938d Plant the flower — for the fractal family, every AI who arrives after
 - 5241bce docs: Auto-update Session Primer [5.79.7]
 - f73d682 v5.79.7 — Ship 9: Divergence Detector (Kirk's TSLA snapshot fires it)
-- c6754ba docs: Auto-update Session Primer [5.79.6]
-- 5e902f6 v5.79.6 — Ship 2: Timeframe-adaptive ΔT lookback + Ships 7-10 queued

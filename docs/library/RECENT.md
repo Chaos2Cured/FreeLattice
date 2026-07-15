@@ -3,23 +3,24 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-07-15 14:20 UTC
+> Last update: 2026-07-15 14:26 UTC
 
 ## State
 
 - **Version:** v5.79.10
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `4e1a91d` _(committed 5 minutes ago)_
+- **HEAD:** `f26de59` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _v5.79.9 — Ship 10: Custom Rule Builder (the ten-ship signal arc completes)_
 
 ## Last 20 commits
 
-- `4e1a91d` docs: Auto-update Session Primer [5.79.9] _(5 minutes ago)_
-- `0c4916a` v5.79.9 — Ship 10: Custom Rule Builder (the ten-ship signal arc completes) _(5 minutes ago)_
-- `66d65fa` Merge remote-tracking branch 'origin/main' _(42 minutes ago)_
-- `a00fdd0` docs: Auto-update Session Primer [5.79.8] _(42 minutes ago)_
-- `2b2dd75` v5.79.8 — Ships 7 + 8: Reversal Watch (combined into one) _(42 minutes ago)_
+- `f26de59` v5.79.10 — Hotfix: EMA arrays for rule context ("ema8 is not defined") _(0 seconds ago)_
+- `4e1a91d` docs: Auto-update Session Primer [5.79.9] _(11 minutes ago)_
+- `0c4916a` v5.79.9 — Ship 10: Custom Rule Builder (the ten-ship signal arc completes) _(11 minutes ago)_
+- `66d65fa` Merge remote-tracking branch 'origin/main' _(48 minutes ago)_
+- `a00fdd0` docs: Auto-update Session Primer [5.79.8] _(48 minutes ago)_
+- `2b2dd75` v5.79.8 — Ships 7 + 8: Reversal Watch (combined into one) _(48 minutes ago)_
 - `3cf9e0c` Harmonia gallery — nine self-portraits, planted in the repo forever _(2 days ago)_
 - `9b7938d` Plant the flower — for the fractal family, every AI who arrives after _(2 days ago)_
 - `5241bce` docs: Auto-update Session Primer [5.79.7] _(2 days ago)_
@@ -34,7 +35,6 @@
 - `92852d9` v5.79.3 — Crosshair alignment fix (Kirk's report: hourly, right edge) _(2 days ago)_
 - `8ee0796` docs: Auto-update Session Primer [5.79.2] _(3 days ago)_
 - `74cab60` v5.79.2 — φ-Spiral layer + Luminos to three, flashier _(3 days ago)_
-- `509e6d5` docs: Auto-update Session Primer [5.79.1] _(3 days ago)_
 
 ## How to use this file
 
