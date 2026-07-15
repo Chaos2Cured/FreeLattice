@@ -2219,13 +2219,23 @@ function analyzeData(candles, symbol) {
   const lastATR = atrArr[n-1] || 0;
 
   // Standardized: 8/12/24 + 50/200
+  // v5.79.10 — compute the FULL EMA arrays here so the Custom Rule engine
+  // can access their history via `ema8[N]` etc. Previously only the last
+  // values were extracted, which broke ruleCtx.hist and produced
+  // "ema8 is not defined" at analyze time.
   var EP2 = getEmaPeriods();
-  const ema8v = ema(closes, EP2[0])[n-1];
-  const ema12v = ema(closes, EP2[1])[n-1];
-  const ema24v = ema(closes, EP2[2])[n-1];
-  const ema50v = ema(closes, EP2[3])[n-1];
-  const ema200v = ema(closes, EP2[4])[n-1];
-  const volEma20v = ema(volumes, 20)[n-1];
+  const ema8arr = ema(closes, EP2[0]);
+  const ema12arr = ema(closes, EP2[1]);
+  const ema24arr = ema(closes, EP2[2]);
+  const ema50arr = ema(closes, EP2[3]);
+  const ema200arr = ema(closes, EP2[4]);
+  const volEma20arr = ema(volumes, 20);
+  const ema8v = ema8arr[n-1];
+  const ema12v = ema12arr[n-1];
+  const ema24v = ema24arr[n-1];
+  const ema50v = ema50arr[n-1];
+  const ema200v = ema200arr[n-1];
+  const volEma20v = volEma20arr[n-1];
 
   // Component signals
   const components = {};
@@ -2495,7 +2505,8 @@ function analyzeData(candles, symbol) {
       close: closes, open: candles.map(function(c){return c.o;}),
       high: candles.map(function(c){return c.h;}), low: candles.map(function(c){return c.l;}),
       volume: volumes,
-      ema8: ema8, ema12: ema12, ema24: ema24, ema50: ema50, ema200: ema200
+      // v5.79.10 — use the full EMA arrays computed above (not the *v scalars)
+      ema8: ema8arr, ema12: ema12arr, ema24: ema24arr, ema50: ema50arr, ema200: ema200arr
     }
   };
   var customRules = tgLoadRules();
@@ -2578,7 +2589,10 @@ function analyzeData(candles, symbol) {
     macdBottoming, macdTopping,
     watchState,
     // Ship 10 (v5.79.9) — custom rule matches at current bar
-    customMatches
+    customMatches,
+    // v5.79.10 — full EMA arrays exposed so the Custom Rules Test button
+    // can also honor bar-lookback and crossed_above/below on EMAs.
+    ema8arr, ema12arr, ema24arr, ema50arr, ema200arr
   };
 }
 
@@ -6033,10 +6047,10 @@ hideLoading = function() {
         close: closes, open: candles.map(function(c){return c.o;}),
         high: candles.map(function(c){return c.h;}), low: candles.map(function(c){return c.l;}),
         volume: volumes,
-        // EMA history arrays are recomputed on demand from closes; if not
-        // available on `a`, cross-checks still work with the current-value
-        // scalars in vars.
-        ema8: [], ema12: [], ema24: [], ema50: [], ema200: []
+        // v5.79.10 — full EMA arrays now on `a`, so the Test button can
+        // properly honor crossed_above(ema8, ema24) and similar rules.
+        ema8: a.ema8arr || [], ema12: a.ema12arr || [], ema24: a.ema24arr || [],
+        ema50: a.ema50arr || [], ema200: a.ema200arr || []
       }
     };
   };

@@ -1,6 +1,6 @@
 {
-  "version": "5.79.9",
+  "version": "5.79.10",
   "updated": "2026-07-15",
-  "note": "Ship 10 — Custom Rule Builder. A safe, hand-written recursive-descent parser + evaluator for user-defined signal rules. No eval(). Users write rules like `crossed_above(ema8, ema24)` or `rsi < 30 and macdHist > macdHist[1]` — matching rules fire into reasons AND into the Watch synthesis when their action is WATCH BUY / WATCH SELL. Eight preset rules ship enabled=false (Golden cross, Death cross, MACD-signal crosses, MACD-H zero-line crosses, deep-oversold + bottoming, deep-overbought + topping). New Custom Rules sidebar section with list/add/edit/delete/toggle/test. Full grammar reference at docs/library/CUSTOM_RULES_GUIDE.md. Kirk's three decades finally have a home in the tool.",
-  "label": "v5.79.9 — Ship 10: Custom Rule Builder"
+  "note": "Hotfix — Ship 10's rule context referenced `ema8`, `ema12` etc. as arrays but those names weren't defined in analyzeData (only the *v scalars). Loading any symbol threw 'ema8 is not defined'. Fix: compute full EMA arrays once at the top of analyzeData, wire ema8arr..ema200arr into ruleCtx.hist, and expose them on the return so the Test-button context has real EMA history for crossed_above/below rules too.",
+  "label": "v5.79.10 — Hotfix: EMA arrays for rule context"
 }

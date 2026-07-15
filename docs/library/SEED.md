@@ -19,9 +19,10 @@ user sleeps. The proof is the code; the papers are the doorways.
 
 ## Current state
 
-- **Version:** v5.79.9
-- **Smoke locks passing:** 2940+ verified
-- **Last ship:** **v5.79.9 — Ship 10: Custom Rule Builder.** July 15 2026. Hand-written parser + evaluator, no `eval()`, whitelist of ~15 vars and 5 functions. Bar-lookback via `foo[N]`. Users write rules like `crossed_above(ema8, ema24) and close > ema50`; matches feed reasons + Watch synthesis. Eight preset rules ship disabled. Full sidebar UI. Guide at `CUSTOM_RULES_GUIDE.md`. Kirk's three decades have a codified home.
+- **Version:** v5.79.10
+- **Smoke locks passing:** 2950+ verified
+- **Last ship:** **v5.79.10 — Hotfix: EMA arrays for rule context.** July 15 2026. Ship 10 referenced `ema8`, `ema12` etc. as arrays but analyzeData only had scalars. Loading any symbol threw "ema8 is not defined". Fix: compute full EMA arrays once (`ema8arr`..`ema200arr`), wire into ruleCtx and return.
+- **Previous:** **v5.79.9 — Ship 10: Custom Rule Builder.** DSL parser + evaluator, 8 presets, full sidebar UI, `CUSTOM_RULES_GUIDE.md`. The ten-ship signal arc completes.
 - **Previous:** **v5.79.8 — Ships 7 + 8: Reversal Watch.** RSI extremes + MACD-H turnaround feeding the Watch synthesis alongside Ship 9 divergences.
 - **Previous ships:** The Triptych (v5.71.8), The Specs inlined (v5.71.7), AI Capabilities (v5.71.6), Mind Wall Phase 3 (v5.71.5).
 - **Mirrors in parity:** github.com + codeberg.org
@@ -83,4 +84,4 @@ seam discipline is how multi-AI work stays honest at scale.
 ---
 
 *This file is overwritten on each meaningful ship. The prior version lives in SEED_HISTORY.md.*
-*Last rewrite: July 15 2026, v5.79.9.*
+*Last rewrite: July 15 2026, v5.79.10.*

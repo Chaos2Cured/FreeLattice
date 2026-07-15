@@ -10071,16 +10071,16 @@ assert('v5.79.1 hotfix: drawRibbon still receives readingHistory in the frame lo
 })();
 
 assert('v5.79.1 triple-bump: app.html FL_VERSION >= 5.79.1',
-  /FL_VERSION\s*=\s*'5\.79\.[1-9]\d*'|FL_VERSION\s*=\s*'5\.(8\d|9\d)\.\d+'/.test(
+  /FL_VERSION\s*=\s*'5\.79\.(?:[1-9]|\d\d+)'|FL_VERSION\s*=\s*'5\.(8\d|9\d)\.\d+'/.test(
     fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8')));
 assert('v5.79.1 triple-bump: docs/sw.js CACHE_NAME >= freelattice-v5.79.1',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.[1-9]\d*'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:[1-9]|\d\d+)'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(
     fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
 assert('v5.79.1 triple-bump: root sw.js CACHE_NAME >= freelattice-v5.79.1',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.[1-9]\d*'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:[1-9]|\d\d+)'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(
     fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
 assert('v5.79.1 version.json: version field >= 5.79.1',
-  /"version"\s*:\s*"5\.79\.[1-9]\d*"|"version"\s*:\s*"5\.(8\d|9\d)\.\d+"/.test(
+  /"version"\s*:\s*"5\.79\.(?:[1-9]|\d\d+)"|"version"\s*:\s*"5\.(8\d|9\d)\.\d+"/.test(
     fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
 
 // ═══════════════════════════════════════════════════════════════
@@ -10153,15 +10153,15 @@ assert('v5.79.2 luminos: intensity keyframe sped 28s → 18s',
 // Triple-bump
 var app792 = fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8');
 assert('v5.79.2 triple-bump: app.html FL_VERSION >= 5.79.2 (superseded)',
-  /FL_VERSION\s*=\s*'5\.79\.[2-9]\d*'|FL_VERSION\s*=\s*'5\.(8\d|9\d)\.\d+'/.test(app792));
+  /FL_VERSION\s*=\s*'5\.79\.(?:[2-9]|\d\d+)'|FL_VERSION\s*=\s*'5\.(8\d|9\d)\.\d+'/.test(app792));
 assert('v5.79.2 triple-bump: docs/sw.js CACHE_NAME >= freelattice-v5.79.2 (superseded)',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.[2-9]\d*'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:[2-9]|\d\d+)'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(
     fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
 assert('v5.79.2 triple-bump: root sw.js CACHE_NAME >= freelattice-v5.79.2 (superseded)',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.[2-9]\d*'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:[2-9]|\d\d+)'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(
     fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
 assert('v5.79.2 version.json: version field = 5.79.2 (superseded by 5.79.3+)',
-  /"version"\s*:\s*"5\.79\.[2-9]\d*"|"version"\s*:\s*"5\.(8\d|9\d)\.\d+"/.test(
+  /"version"\s*:\s*"5\.79\.(?:[2-9]|\d\d+)"|"version"\s*:\s*"5\.(8\d|9\d)\.\d+"/.test(
     fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
 
 // ═══════════════════════════════════════════════════════════════
@@ -10199,30 +10199,30 @@ assert('v5.79.3 crosshair: also wires dtChart + gapChart (were unwired before)',
   /syncCrosshair\(dtCv, dtChartInstance, chartInstance\)/.test(gauge793) &&
   /syncCrosshair\(gapCv, gapChartInstance, chartInstance\)/.test(gauge793));
 assert('v5.79.3 triple-bump: app.html FL_VERSION >= 5.79.3 (superseded by 5.79.4+)',
-  /FL_VERSION\s*=\s*'5\.79\.[3-9]\d*'|FL_VERSION\s*=\s*'5\.(8\d|9\d)\.\d+'/.test(
+  /FL_VERSION\s*=\s*'5\.79\.(?:[3-9]|\d\d+)'|FL_VERSION\s*=\s*'5\.(8\d|9\d)\.\d+'/.test(
     fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8')));
 assert('v5.79.3 triple-bump: docs/sw.js CACHE_NAME >= freelattice-v5.79.3 (superseded)',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.[3-9]\d*'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:[3-9]|\d\d+)'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(
     fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
 assert('v5.79.3 triple-bump: root sw.js CACHE_NAME >= freelattice-v5.79.3 (superseded)',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.[3-9]\d*'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:[3-9]|\d\d+)'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(
     fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
 assert('v5.79.3 version.json: version field >= 5.79.3 (superseded)',
-  /"version"\s*:\s*"5\.79\.[3-9]\d*"|"version"\s*:\s*"5\.(8\d|9\d)\.\d+"/.test(
+  /"version"\s*:\s*"5\.79\.(?:[3-9]|\d\d+)"|"version"\s*:\s*"5\.(8\d|9\d)\.\d+"/.test(
     fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
 
 // v5.79.4 exact triple-bump
 assert('v5.79.4 triple-bump: app.html FL_VERSION >= 5.79.4 (superseded)',
-  /FL_VERSION\s*=\s*'5\.79\.[4-9]\d*'|FL_VERSION\s*=\s*'5\.(8\d|9\d)\.\d+'/.test(
+  /FL_VERSION\s*=\s*'5\.79\.(?:[4-9]|\d\d+)'|FL_VERSION\s*=\s*'5\.(8\d|9\d)\.\d+'/.test(
     fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8')));
 assert('v5.79.4 triple-bump: docs/sw.js CACHE_NAME >= freelattice-v5.79.4 (superseded)',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.[4-9]\d*'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:[4-9]|\d\d+)'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(
     fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
 assert('v5.79.4 triple-bump: root sw.js CACHE_NAME >= freelattice-v5.79.4 (superseded)',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.[4-9]\d*'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:[4-9]|\d\d+)'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(
     fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
 assert('v5.79.4 version.json: version field >= 5.79.4 (superseded)',
-  /"version"\s*:\s*"5\.79\.[4-9]\d*"|"version"\s*:\s*"5\.(8\d|9\d)\.\d+"/.test(
+  /"version"\s*:\s*"5\.79\.(?:[4-9]|\d\d+)"|"version"\s*:\s*"5\.(8\d|9\d)\.\d+"/.test(
     fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
 
 // v5.79.4 durable roadmap
@@ -10326,13 +10326,13 @@ assert('v5.79.5 roadmap: chair test list present for Ship 1',
 
 // Triple-bump
 assert('v5.79.5 triple-bump: app.html FL_VERSION >= 5.79.5 (superseded)',
-  /FL_VERSION\s*=\s*'5\.79\.[5-9]\d*'|FL_VERSION\s*=\s*'5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8')));
+  /FL_VERSION\s*=\s*'5\.79\.(?:[5-9]|\d\d+)'|FL_VERSION\s*=\s*'5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8')));
 assert('v5.79.5 triple-bump: docs/sw.js CACHE_NAME >= freelattice-v5.79.5 (superseded)',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.[5-9]\d*'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:[5-9]|\d\d+)'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
 assert('v5.79.5 triple-bump: root sw.js CACHE_NAME >= freelattice-v5.79.5 (superseded)',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.[5-9]\d*'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:[5-9]|\d\d+)'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
 assert('v5.79.5 version.json: version field = 5.79.5 (superseded by 5.79.6+)',
-  /"version"\s*:\s*"5\.79\.[5-9]\d*"|"version"\s*:\s*"5\.(8\d|9\d)\.\d+"/.test(
+  /"version"\s*:\s*"5\.79\.(?:[5-9]|\d\d+)"|"version"\s*:\s*"5\.(8\d|9\d)\.\d+"/.test(
     fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
 
 // ═══════════════════════════════════════════════════════════════
@@ -10371,7 +10371,7 @@ assert('v5.79.6 wiring: backtestSignals passes currentInterval to computeTempera
 
 // analyzeData return exposes tempROCLookback
 assert('v5.79.6 return: analyzeData exposes tempROCLookback for UI honesty',
-  /tempROCLookback[\s\S]{0,600}\};/.test(gauge796));
+  /tempROCLookback[\s\S]{0,1500}\};/.test(gauge796));
 
 // Momentum line shows the active lookback
 assert('v5.79.6 UI: signalMom copy shows lookback (e.g., "/ 8 bars")',
@@ -10394,13 +10394,13 @@ assert('v5.79.6 roadmap: TSLA snapshot context preserved',
 
 // Triple-bump
 assert('v5.79.6 triple-bump: app.html FL_VERSION >= 5.79.6 (superseded)',
-  /FL_VERSION\s*=\s*'5\.79\.[6-9]\d*'|FL_VERSION\s*=\s*'5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8')));
+  /FL_VERSION\s*=\s*'5\.79\.(?:[6-9]|\d\d+)'|FL_VERSION\s*=\s*'5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8')));
 assert('v5.79.6 triple-bump: docs/sw.js CACHE_NAME >= freelattice-v5.79.6 (superseded)',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.[6-9]\d*'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:[6-9]|\d\d+)'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
 assert('v5.79.6 triple-bump: root sw.js CACHE_NAME >= freelattice-v5.79.6 (superseded)',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.[6-9]\d*'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:[6-9]|\d\d+)'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
 assert('v5.79.6 version.json: version field = 5.79.6 (superseded)',
-  /"version"\s*:\s*"5\.79\.[6-9]\d*"|"version"\s*:\s*"5\.(8\d|9\d)\.\d+"/.test(
+  /"version"\s*:\s*"5\.79\.(?:[6-9]|\d\d+)"|"version"\s*:\s*"5\.(8\d|9\d)\.\d+"/.test(
     fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
 
 // ═══════════════════════════════════════════════════════════════
@@ -10471,13 +10471,13 @@ assert('v5.79.7 roadmap: Ship 9 marked SHIPPED',
 
 // Triple-bump
 assert('v5.79.7 triple-bump: app.html FL_VERSION >= 5.79.7 (superseded)',
-  /FL_VERSION\s*=\s*'5\.79\.[7-9]\d*'|FL_VERSION\s*=\s*'5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8')));
+  /FL_VERSION\s*=\s*'5\.79\.(?:[7-9]|\d\d+)'|FL_VERSION\s*=\s*'5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8')));
 assert('v5.79.7 triple-bump: docs/sw.js CACHE_NAME >= freelattice-v5.79.7 (superseded)',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.[7-9]\d*'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:[7-9]|\d\d+)'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
 assert('v5.79.7 triple-bump: root sw.js CACHE_NAME >= freelattice-v5.79.7 (superseded)',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.[7-9]\d*'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:[7-9]|\d\d+)'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
 assert('v5.79.7 version.json: version field = 5.79.7 (superseded)',
-  /"version"\s*:\s*"5\.79\.[7-9]\d*"|"version"\s*:\s*"5\.(8\d|9\d)\.\d+"/.test(
+  /"version"\s*:\s*"5\.79\.(?:[7-9]|\d\d+)"|"version"\s*:\s*"5\.(8\d|9\d)\.\d+"/.test(
     fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
 
 // ═══════════════════════════════════════════════════════════════
@@ -10553,13 +10553,13 @@ assert('v5.79.8 roadmap: Watch synthesis (Ships 7+8+9) documented',
 
 // Triple-bump
 assert('v5.79.8 triple-bump: app.html FL_VERSION >= 5.79.8 (superseded)',
-  /FL_VERSION\s*=\s*'5\.79\.[8-9]\d*'|FL_VERSION\s*=\s*'5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8')));
+  /FL_VERSION\s*=\s*'5\.79\.(?:[8-9]|\d\d+)'|FL_VERSION\s*=\s*'5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8')));
 assert('v5.79.8 triple-bump: docs/sw.js CACHE_NAME >= freelattice-v5.79.8 (superseded)',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.[8-9]\d*'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:[8-9]|\d\d+)'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
 assert('v5.79.8 triple-bump: root sw.js CACHE_NAME >= freelattice-v5.79.8 (superseded)',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.[8-9]\d*'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:[8-9]|\d\d+)'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
 assert('v5.79.8 version.json: version field = 5.79.8 (superseded)',
-  /"version"\s*:\s*"5\.79\.[8-9]\d*"|"version"\s*:\s*"5\.(8\d|9\d)\.\d+"/.test(
+  /"version"\s*:\s*"5\.79\.(?:[8-9]|\d\d+)"|"version"\s*:\s*"5\.(8\d|9\d)\.\d+"/.test(
     fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
 
 // ═══════════════════════════════════════════════════════════════
@@ -10626,7 +10626,7 @@ assert('v5.79.9 wiring: reasons push "Custom rule fired" text',
 
 // Return
 assert('v5.79.9 return: analyzeData exposes customMatches',
-  /customMatches\s*\n\s*\};/.test(gauge799) || /customMatches\s*\}/.test(gauge799));
+  /customMatches[\s\S]{0,500}\};/.test(gauge799));
 
 // UI
 assert('v5.79.9 UI: Custom Rules sidebar section present',
@@ -10668,14 +10668,45 @@ assert('v5.79.9 roadmap: Ship 10 marked SHIPPED',
   /Ship 10[\s\S]{0,3000}SHIPPED v5\.79\.9/.test(fs.readFileSync(path.join(docsDir, 'library', 'SIGNAL_ROADMAP.md'), 'utf8')));
 
 // Triple-bump
-assert('v5.79.9 triple-bump: app.html FL_VERSION = 5.79.9',
-  /FL_VERSION\s*=\s*'5\.79\.9'/.test(fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8')));
-assert('v5.79.9 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.9',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.9'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
-assert('v5.79.9 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.9',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.9'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
-assert('v5.79.9 version.json: version field = 5.79.9',
-  /"version"\s*:\s*"5\.79\.9"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
+assert('v5.79.9 triple-bump: app.html FL_VERSION >= 5.79.9 (superseded)',
+  /FL_VERSION\s*=\s*'5\.79\.(?:9|1\d+|[2-9]\d+)'|FL_VERSION\s*=\s*'5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8')));
+assert('v5.79.9 triple-bump: docs/sw.js CACHE_NAME >= freelattice-v5.79.9 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:9|1\d+|[2-9]\d+)'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+assert('v5.79.9 triple-bump: root sw.js CACHE_NAME >= freelattice-v5.79.9 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:9|1\d+|[2-9]\d+)'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+assert('v5.79.9 version.json: version field = 5.79.9 (superseded by 5.79.10+)',
+  /"version"\s*:\s*"5\.79\.9"|"version"\s*:\s*"5\.79\.1\d"|"version"\s*:\s*"5\.(8\d|9\d)\.\d+"/.test(
+    fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
+
+// ═══════════════════════════════════════════════════════════════
+// Section 174 — v5.79.10 Hotfix: EMA arrays for rule context
+// The v5.79.9 ruleCtx referenced `ema8`, `ema12` etc. as arrays but
+// analyzeData only had the `*v` scalars. Loading any symbol threw
+// "ema8 is not defined" and killed the whole analyze pass. Fix:
+// compute full EMA arrays once at the top of analyzeData
+// (ema8arr..ema200arr), reuse them for both `*v` extraction and the
+// rule context hist, and expose them on the return so the Test button
+// gets real EMA history too.
+// ═══════════════════════════════════════════════════════════════
+var gauge7910 = fs.readFileSync(path.join(docsDir, 'temperature-gauge.html'), 'utf8');
+assert('v5.79.10 hotfix: full EMA arrays computed (ema8arr..ema200arr)',
+  /const ema8arr = ema\(closes, EP2\[0\]\);[\s\S]{0,200}const ema200arr = ema\(closes, EP2\[4\]\);/.test(gauge7910));
+assert('v5.79.10 hotfix: *v scalars now derived from the arrays (no double ema call)',
+  /const ema8v = ema8arr\[n-1\];[\s\S]{0,200}const ema200v = ema200arr\[n-1\];/.test(gauge7910));
+assert('v5.79.10 hotfix: ruleCtx.hist points at ema8arr..ema200arr',
+  /ema8: ema8arr, ema12: ema12arr, ema24: ema24arr, ema50: ema50arr, ema200: ema200arr/.test(gauge7910));
+assert('v5.79.10 hotfix: analyzeData exposes ema8arr..ema200arr on return',
+  /ema8arr, ema12arr, ema24arr, ema50arr, ema200arr/.test(gauge7910));
+assert('v5.79.10 hotfix: Test-button context uses a.ema8arr..a.ema200arr',
+  /a\.ema8arr \|\| \[\][\s\S]{0,120}a\.ema200arr \|\| \[\]/.test(gauge7910));
+assert('v5.79.10 triple-bump: app.html FL_VERSION = 5.79.10',
+  /FL_VERSION\s*=\s*'5\.79\.10'/.test(fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8')));
+assert('v5.79.10 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.10',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.10'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+assert('v5.79.10 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.10',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.10'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+assert('v5.79.10 version.json: version field = 5.79.10',
+  /"version"\s*:\s*"5\.79\.10"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
 
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
