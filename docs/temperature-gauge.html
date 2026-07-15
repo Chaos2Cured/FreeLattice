@@ -903,6 +903,15 @@ canvas.sub-canvas.custom { height: 80px !important; }
           <span class="signal-row-label">Urgency</span>
           <span class="signal-row-val" id="signalUrgency">—</span>
         </div>
+        <!-- v5.79.8 — Ships 7+8 synthesis: the Reversal Watch row.
+             Combines RSI extremes exits, MACD-H turnarounds, and Ship 9
+             divergences into one actionable state: ▲ WATCH BUY /
+             ▼ WATCH SELL when the reversal setup is forming.
+             Layered — classic signal badge above stays untouched. -->
+        <div class="signal-row">
+          <span class="signal-row-label">Watch</span>
+          <span class="signal-row-val" id="signalWatch">—</span>
+        </div>
         <!-- v5.79.7 — Ship 9: Divergence row. Layered onto classic Signal
              card so pattern signals share the same visual surface as the
              midpoint verdict. Shows most recent confirmed pivot within
@@ -2054,6 +2063,39 @@ function analyzeData(candles, symbol) {
   const priceChange = closes[n-1] - closes[n-2];
   const pricePct = (priceChange / closes[n-2]) * 100;
 
+  // ── v5.79.8 — Ships 7 + 8: RSI extremes + MACD-H turnaround ──────────
+  // Reversal-dialect vocabulary. The classic engine spoke only midpoint;
+  // pattern traders speak extremes + turnarounds + divergences. These
+  // primitives are computed as booleans + a synthesized "Watch" state
+  // that combines them with Ship 9's divergence detector to elevate
+  // reversal setups from "one row of reasons" to an actionable state.
+  let rsiOversold = false, rsiOverbought = false;
+  let rsiOversoldExit = false, rsiOverboughtExit = false;
+  if (lastRsi != null) {
+    rsiOversold = lastRsi < 30;
+    rsiOverbought = lastRsi > 70;
+    var recentRsi5 = rsiArr.slice(Math.max(0, rsiArr.length - 6), rsiArr.length - 1);
+    if (lastRsi >= 30 && recentRsi5.some(function(r) { return r != null && r < 30; })) rsiOversoldExit = true;
+    if (lastRsi <= 70 && recentRsi5.some(function(r) { return r != null && r > 70; })) rsiOverboughtExit = true;
+  }
+  if (rsiOversold) reasons.push('RSI ' + lastRsi.toFixed(1) + ' — deeply oversold; watch for reversal');
+  if (rsiOverbought) reasons.push('RSI ' + lastRsi.toFixed(1) + ' — deeply overbought; watch for reversal');
+  if (rsiOversoldExit) reasons.push('RSI exiting oversold — reversal beginning');
+  if (rsiOverboughtExit) reasons.push('RSI exiting overbought — reversal beginning');
+
+  let macdBottoming = false, macdTopping = false;
+  if (macdData && macdData.histogram && macdData.histogram.length >= 5) {
+    var hist = macdData.histogram;
+    var hIdx = hist.length - 1;
+    var h0 = hist[hIdx], h1 = hist[hIdx-1], h2 = hist[hIdx-2], h3 = hist[hIdx-3], h4 = hist[hIdx-4];
+    if (h0 != null && h1 != null && h2 != null && h3 != null && h4 != null) {
+      if (h0 > h1 && h1 > h2 && h2 > h3 && h3 > h4 && h4 < -0.3) macdBottoming = true;
+      if (h0 < h1 && h1 < h2 && h2 < h3 && h3 < h4 && h4 > 0.3) macdTopping = true;
+    }
+  }
+  if (macdBottoming) reasons.push('MACD histogram turning up from deep negative — momentum bottoming');
+  if (macdTopping) reasons.push('MACD histogram turning down from deep positive — momentum topping');
+
   // ── v5.79.7 — Ship 9: Divergence Detector ─────────────────────────────
   // Kirk's ask on the July 13 TSLA snapshot: the tool didn't catch a
   // textbook bullish RSI divergence. This fills that gap.
@@ -2075,6 +2117,25 @@ function analyzeData(candles, symbol) {
     reasons.push('Bearish divergence: price higher high, RSI lower high ' +
       (latestBearDiv.agoBar === 0 ? 'at current bar' : latestBearDiv.agoBar + ' bar' + (latestBearDiv.agoBar === 1 ? '' : 's') + ' ago') +
       ' — watch for reversal');
+  }
+
+  // ── v5.79.8 — Reversal Watch synthesis (Ships 7 + 8 + 9 combined) ─────
+  // "Watch" is elevated pattern language: when multiple reversal signs
+  // point the same direction, the badge-adjacent Watch row announces it.
+  // Layered next to the classic verdict — never overwrites it.
+  let watchState = null; // null | { direction, signs, reasons: [] }
+  var bullSigns = [];
+  if (rsiOversoldExit) bullSigns.push('RSI exit oversold');
+  if (macdBottoming) bullSigns.push('MACD-H bottoming');
+  if (latestBullDiv) bullSigns.push('bullish divergence');
+  var bearSigns = [];
+  if (rsiOverboughtExit) bearSigns.push('RSI exit overbought');
+  if (macdTopping) bearSigns.push('MACD-H topping');
+  if (latestBearDiv) bearSigns.push('bearish divergence');
+  if (bullSigns.length >= 1 && bearSigns.length === 0) {
+    watchState = { direction: 'BUY', signs: bullSigns.length, reasons: bullSigns };
+  } else if (bearSigns.length >= 1 && bullSigns.length === 0) {
+    watchState = { direction: 'SELL', signs: bearSigns.length, reasons: bearSigns };
   }
 
   // ── v5.79.5 — φ-Harmonic parallel signal (Ship 1 of SIGNAL_ROADMAP.md) ──
@@ -2120,7 +2181,11 @@ function analyzeData(candles, symbol) {
     tempROCLookback,
     // Ship 9 (v5.79.7) — divergence detector (bullish/bearish per bar,
     // plus derived "latest divergence within last 10 bars" summary)
-    divergences, latestBullDiv, latestBearDiv
+    divergences, latestBullDiv, latestBearDiv,
+    // Ships 7 + 8 (v5.79.8) — RSI extremes, MACD-H turnaround, Watch synthesis
+    rsiOversold, rsiOverbought, rsiOversoldExit, rsiOverboughtExit,
+    macdBottoming, macdTopping,
+    watchState
   };
 }
 
@@ -2231,6 +2296,22 @@ function renderAll(candles, a, symbol) {
     : '');
   document.getElementById('signalSize').textContent = a.positionShares > 0 ? a.positionShares + ' shares ($' + a.positionValue.toLocaleString() + ') \u2014 risking ' + a.actualRiskPct.toFixed(2) + '%' : 'Configure account in Risk Settings';
   document.getElementById('signalUrgency').textContent = a.urgency;
+
+  // v5.79.8 — Watch row (Ships 7 + 8 synthesis). Elevated headline of
+  // the reversal setup when RSI extremes, MACD-H turnaround, or Ship 9
+  // divergences agree on a direction. Classic badge above stays classic.
+  var watchEl = document.getElementById('signalWatch');
+  if (a.watchState) {
+    var wCol = a.watchState.direction === 'BUY' ? '#10b981' : '#ef4444';
+    var wArrow = a.watchState.direction === 'BUY' ? '▲' : '▼';
+    var wCount = a.watchState.signs;
+    var wSignsText = (a.watchState.reasons || []).join(', ');
+    watchEl.innerHTML = '<span style="color:' + wCol + ';font-weight:600;">' + wArrow +
+      ' WATCH ' + a.watchState.direction + '</span> ' +
+      '<span style="color:var(--muted);font-size:0.72rem;">(' + wCount + '/3: ' + wSignsText + ')</span>';
+  } else {
+    watchEl.innerHTML = '<span style="color:var(--muted);">—</span>';
+  }
 
   // v5.79.7 — Ship 9: Divergence row rendering. Colored by direction so
   // the row reads at a glance without decoding the icon.

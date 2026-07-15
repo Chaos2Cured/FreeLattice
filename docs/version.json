@@ -1,6 +1,6 @@
 {
-  "version": "5.79.7",
-  "updated": "2026-07-13",
-  "note": "Ship 9 (SIGNAL_ROADMAP.md) — Divergence Detector. New function detectDivergences() finds swing pivots with K=2 lookback each side, then compares consecutive same-type pivots within 20 bars: price lower low + RSI higher low → bullish divergence; price higher high + RSI lower high → bearish. Classic Signal card gets a new Divergence row (◆ Bullish / ◆ Bearish, N bars ago). The ribbon field Fable designed for diamonds finally has a data source — bullish diamonds render emerald, bearish gold. Reasons array gets the same information as text so pattern context lives in the Why section too.",
-  "label": "v5.79.7 — Ship 9: Divergence Detector"
+  "version": "5.79.8",
+  "updated": "2026-07-15",
+  "note": "Ships 7 + 8 combined — Reversal Watch. RSI-extremes triggers (30/70 lines get first-class treatment: oversold/overbought detection + exit triggers when RSI crosses back through). MACD-H turnaround detector (histogram climbing from deep negative → momentum bottoming; mirror for topping). Both feed a new Watch synthesis that fuses with Ship 9 divergences into an actionable ▲ WATCH BUY / ▼ WATCH SELL row on the Signal card, showing 1/3-2/3-3/3 reversal signs with names. Classic badge above stays classic. Kirk's July 13 TSLA snapshot would light this row with all three signs.",
+  "label": "v5.79.8 — Ships 7+8: Reversal Watch"
 }

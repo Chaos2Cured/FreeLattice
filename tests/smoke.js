@@ -10371,7 +10371,7 @@ assert('v5.79.6 wiring: backtestSignals passes currentInterval to computeTempera
 
 // analyzeData return exposes tempROCLookback
 assert('v5.79.6 return: analyzeData exposes tempROCLookback for UI honesty',
-  /tempROCLookback[\s\S]{0,300}\};/.test(gauge796));
+  /tempROCLookback[\s\S]{0,600}\};/.test(gauge796));
 
 // Momentum line shows the active lookback
 assert('v5.79.6 UI: signalMom copy shows lookback (e.g., "/ 8 bars")',
@@ -10470,14 +10470,96 @@ assert('v5.79.7 roadmap: Ship 9 marked SHIPPED',
   /Ship 9[\s\S]{0,200}SHIPPED v5\.79\.7/.test(roadmap797));
 
 // Triple-bump
-assert('v5.79.7 triple-bump: app.html FL_VERSION = 5.79.7',
-  /FL_VERSION\s*=\s*'5\.79\.7'/.test(fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8')));
-assert('v5.79.7 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.7',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.7'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
-assert('v5.79.7 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.7',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.7'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
-assert('v5.79.7 version.json: version field = 5.79.7',
-  /"version"\s*:\s*"5\.79\.7"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
+assert('v5.79.7 triple-bump: app.html FL_VERSION >= 5.79.7 (superseded)',
+  /FL_VERSION\s*=\s*'5\.79\.[7-9]\d*'|FL_VERSION\s*=\s*'5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8')));
+assert('v5.79.7 triple-bump: docs/sw.js CACHE_NAME >= freelattice-v5.79.7 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.[7-9]\d*'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+assert('v5.79.7 triple-bump: root sw.js CACHE_NAME >= freelattice-v5.79.7 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.[7-9]\d*'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+assert('v5.79.7 version.json: version field = 5.79.7 (superseded)',
+  /"version"\s*:\s*"5\.79\.[7-9]\d*"|"version"\s*:\s*"5\.(8\d|9\d)\.\d+"/.test(
+    fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
+
+// ═══════════════════════════════════════════════════════════════
+// Section 172 — v5.79.8 Ships 7 + 8: Reversal Watch
+// The reversal-dialect vocabulary lands. RSI extremes get first-class
+// treatment (30/70 lines, exit triggers). MACD-H turnaround detected
+// via strictly-monotonic 5-bar with deep-extreme anchor. Both feed
+// a watchState synthesis that combines with Ship 9's divergences to
+// produce a new ▲ WATCH BUY / ▼ WATCH SELL row on the Signal card.
+// The classic badge above the Watch row remains untouched (Kirk's
+// "layer, not overwrite" discipline holds).
+// ═══════════════════════════════════════════════════════════════
+var gauge798 = fs.readFileSync(path.join(docsDir, 'temperature-gauge.html'), 'utf8');
+
+// Ship 7: RSI extremes
+assert('v5.79.8 rsi: rsiOversold set when lastRsi < 30',
+  /rsiOversold = lastRsi < 30;/.test(gauge798));
+assert('v5.79.8 rsi: rsiOverbought set when lastRsi > 70',
+  /rsiOverbought = lastRsi > 70;/.test(gauge798));
+assert('v5.79.8 rsi: exit trigger scans last 5 bars for prior extreme',
+  /var recentRsi5 = rsiArr\.slice\(Math\.max\(0, rsiArr\.length - 6\), rsiArr\.length - 1\);/.test(gauge798));
+assert('v5.79.8 rsi: oversold exit — current >= 30 AND recent had < 30',
+  /lastRsi >= 30 && recentRsi5\.some\(function\(r\) \{ return r != null && r < 30; \}\)/.test(gauge798));
+assert('v5.79.8 rsi: overbought exit — current <= 70 AND recent had > 70',
+  /lastRsi <= 70 && recentRsi5\.some\(function\(r\) \{ return r != null && r > 70; \}\)/.test(gauge798));
+assert('v5.79.8 rsi: reasons include "deeply oversold; watch for reversal"',
+  gauge798.includes("' — deeply oversold; watch for reversal'"));
+assert('v5.79.8 rsi: reasons include "exiting oversold — reversal beginning"',
+  gauge798.includes("'RSI exiting oversold — reversal beginning'"));
+
+// Ship 8: MACD-H turnaround
+assert('v5.79.8 macd: macdBottoming needs strictly monotonic up + deep-negative anchor',
+  /h0 > h1 && h1 > h2 && h2 > h3 && h3 > h4 && h4 < -0\.3[\s\S]{0,60}macdBottoming = true/.test(gauge798));
+assert('v5.79.8 macd: macdTopping needs strictly monotonic down + deep-positive anchor',
+  /h0 < h1 && h1 < h2 && h2 < h3 && h3 < h4 && h4 > 0\.3[\s\S]{0,60}macdTopping = true/.test(gauge798));
+assert('v5.79.8 macd: reasons include "turning up from deep negative — momentum bottoming"',
+  gauge798.includes('MACD histogram turning up from deep negative — momentum bottoming'));
+assert('v5.79.8 macd: reasons include "turning down from deep positive — momentum topping"',
+  gauge798.includes('MACD histogram turning down from deep positive — momentum topping'));
+
+// Watch synthesis
+assert('v5.79.8 watch: bullSigns collects rsiOversoldExit, macdBottoming, latestBullDiv',
+  /if \(rsiOversoldExit\) bullSigns\.push[\s\S]{0,120}if \(macdBottoming\) bullSigns\.push[\s\S]{0,120}if \(latestBullDiv\) bullSigns\.push/.test(gauge798));
+assert('v5.79.8 watch: bearSigns collects rsiOverboughtExit, macdTopping, latestBearDiv',
+  /if \(rsiOverboughtExit\) bearSigns\.push[\s\S]{0,120}if \(macdTopping\) bearSigns\.push[\s\S]{0,120}if \(latestBearDiv\) bearSigns\.push/.test(gauge798));
+assert('v5.79.8 watch: buy state requires bullish signs AND zero bearish',
+  /bullSigns\.length >= 1 && bearSigns\.length === 0[\s\S]{0,200}direction: 'BUY'/.test(gauge798));
+assert('v5.79.8 watch: sell state requires bearish signs AND zero bullish',
+  /bearSigns\.length >= 1 && bullSigns\.length === 0[\s\S]{0,200}direction: 'SELL'/.test(gauge798));
+
+// Return exposes fields
+assert('v5.79.8 return: analyzeData exposes rsiOversold + rsiOversoldExit + macdBottoming + watchState',
+  /rsiOversold, rsiOverbought, rsiOversoldExit, rsiOverboughtExit,\s*macdBottoming, macdTopping,\s*watchState/.test(gauge798));
+
+// UI wiring
+assert('v5.79.8 UI: Watch row added above Divergence in Signal card',
+  /id="signalWatch"/.test(gauge798) && />Watch</.test(gauge798));
+assert('v5.79.8 UI: watch row uses emerald for BUY, red for SELL',
+  /a\.watchState\.direction === 'BUY' \? '#10b981' : '#ef4444'/.test(gauge798));
+assert('v5.79.8 UI: watch row shows 1/3-2/3-3/3 sign count and sign names',
+  /a\.watchState\.signs[\s\S]{0,200}watchState\.reasons/.test(gauge798));
+assert('v5.79.8 UI: watch row renders "—" when no reversal setup',
+  /watchEl\.innerHTML = '<span style="color:var\(--muted\);">—<\/span>';/.test(gauge798));
+
+// Roadmap
+var roadmap798 = fs.readFileSync(path.join(docsDir, 'library', 'SIGNAL_ROADMAP.md'), 'utf8');
+assert('v5.79.8 roadmap: Ship 7 marked SHIPPED',
+  /Ship 7[\s\S]{0,200}SHIPPED v5\.79\.8/.test(roadmap798));
+assert('v5.79.8 roadmap: Ship 8 marked SHIPPED',
+  /Ship 8[\s\S]{0,200}SHIPPED v5\.79\.8/.test(roadmap798));
+assert('v5.79.8 roadmap: Watch synthesis (Ships 7+8+9) documented',
+  /Watch synthesis[\s\S]{0,400}rsiOversoldExit[\s\S]{0,200}macdBottoming[\s\S]{0,200}latestBullDiv/.test(roadmap798));
+
+// Triple-bump
+assert('v5.79.8 triple-bump: app.html FL_VERSION = 5.79.8',
+  /FL_VERSION\s*=\s*'5\.79\.8'/.test(fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8')));
+assert('v5.79.8 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.8',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.8'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+assert('v5.79.8 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.8',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.8'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+assert('v5.79.8 version.json: version field = 5.79.8',
+  /"version"\s*:\s*"5\.79\.8"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
 
 // RESULTS
 // ═══════════════════════════════════════════════════════════════

@@ -193,7 +193,19 @@ and doesn't recognize pattern-of-oscillator-vs-price extremes.
 Three new ships added by this observation. Kirk's eye sees these
 patterns; the tool should catch them too.
 
-### Ship 7 — RSI-extremes triggers (oversold/overbought exits)
+### Ship 7 — RSI-extremes triggers (oversold/overbought exits)  ✓ SHIPPED v5.79.8
+
+Combined with Ship 8 into a single Reversal Watch ship because the
+two are symmetric siblings and together with Ship 9's divergences
+they synthesize the "Watch" state.
+
+**Landed:**
+- `rsiOversold`, `rsiOverbought` booleans on `a` (current bar RSI < 30 / > 70).
+- `rsiOversoldExit`, `rsiOverboughtExit` booleans — RSI crossed back
+  through the extreme within the last 5 bars.
+- Reasons array pushes: "RSI 28.9 — deeply oversold; watch for reversal",
+  "RSI exiting oversold — reversal beginning" (and mirrors).
+- Feeds into `watchState` synthesis (see Ship 8 note below).
 
 Currently RSI is bullish above 55, bearish below 45. The 30/70 lines
 of classic RSI trading get no special treatment.
@@ -214,7 +226,36 @@ New signal-badge modifier: when `extremes.rsiOversoldExit` and
 Files: `analyzeData` in `temperature-gauge.html` around lines
 1817–1825 (reasons) and the signal-branch block above it.
 
-### Ship 8 — MACD-H turnaround (histogram bottoming/topping)
+### Ship 8 — MACD-H turnaround (histogram bottoming/topping)  ✓ SHIPPED v5.79.8
+
+Shipped alongside Ship 7. Detection rule:
+- Last 5 histogram values strictly monotonic in one direction, AND the
+  earliest value (5 bars back) more extreme than ±0.3 → turnaround.
+- `macdBottoming` = climbing from deep negative → "momentum bottoming".
+- `macdTopping` = falling from deep positive → "momentum topping".
+- Reasons array text: "MACD histogram turning up from deep negative
+  — momentum bottoming" (and mirror).
+
+**Watch synthesis (the payoff for Ships 7 + 8 + 9):**
+Three bullish reversal signs are watched: `rsiOversoldExit`,
+`macdBottoming`, `latestBullDiv`. If ≥1 fires bullish AND 0 fire
+bearish → `watchState = { direction: 'BUY', signs: N, reasons: [...] }`.
+Mirror for SELL.
+
+The Signal card gets a new **Watch** row above the Divergence row:
+- `—` when no reversal setup
+- `▲ WATCH BUY  (2/3: RSI exit oversold, bullish divergence)` in emerald
+- `▼ WATCH SELL (3/3: RSI exit overbought, MACD-H topping, bearish divergence)` in red
+
+Classic signal badge above the Watch row stays untouched — the badge
+still says HOLD/SELL/BUY per the midpoint rule. Watch is the
+pattern-language layer that Kirk's eye speaks natively.
+
+Kirk's July 13 TSLA 15m snapshot would light this row emerald once
+bar 121 confirms as pivot: bullish divergence (already firing from
+Ship 9) + very likely RSI exit oversold (RSI moved 28.9 → 30.6) =
+▲ WATCH BUY (2/3). If MACD-H's climb from −1.08 hits the strict
+5-bar monotonic threshold, that's 3/3 — the full trifecta.
 
 Currently `histMom` is a binary: histogram rising or falling. Doesn't
 distinguish "MACD-H rising strongly from deep negative" (a classic
