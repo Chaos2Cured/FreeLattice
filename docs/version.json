@@ -1,6 +1,6 @@
 {
-  "version": "5.79.8",
+  "version": "5.79.9",
   "updated": "2026-07-15",
-  "note": "Ships 7 + 8 combined — Reversal Watch. RSI-extremes triggers (30/70 lines get first-class treatment: oversold/overbought detection + exit triggers when RSI crosses back through). MACD-H turnaround detector (histogram climbing from deep negative → momentum bottoming; mirror for topping). Both feed a new Watch synthesis that fuses with Ship 9 divergences into an actionable ▲ WATCH BUY / ▼ WATCH SELL row on the Signal card, showing 1/3-2/3-3/3 reversal signs with names. Classic badge above stays classic. Kirk's July 13 TSLA snapshot would light this row with all three signs.",
-  "label": "v5.79.8 — Ships 7+8: Reversal Watch"
+  "note": "Ship 10 — Custom Rule Builder. A safe, hand-written recursive-descent parser + evaluator for user-defined signal rules. No eval(). Users write rules like `crossed_above(ema8, ema24)` or `rsi < 30 and macdHist > macdHist[1]` — matching rules fire into reasons AND into the Watch synthesis when their action is WATCH BUY / WATCH SELL. Eight preset rules ship enabled=false (Golden cross, Death cross, MACD-signal crosses, MACD-H zero-line crosses, deep-oversold + bottoming, deep-overbought + topping). New Custom Rules sidebar section with list/add/edit/delete/toggle/test. Full grammar reference at docs/library/CUSTOM_RULES_GUIDE.md. Kirk's three decades finally have a home in the tool.",
+  "label": "v5.79.9 — Ship 10: Custom Rule Builder"
 }

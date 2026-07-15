@@ -345,6 +345,20 @@ planned — but it's the ship that unlocks Kirk's own edge, so it's
 probably worth ordering after Ships 7–9 land the low-hanging pattern
 signals.
 
+**✓ SHIPPED v5.79.9 (2026-07-15).** Hand-written recursive-descent
+parser + evaluator, no `eval()`, whitelist of variables (temp, rsi,
+macd, macdSignal, macdHist, close/open/high/low/volume, ema8/12/24/50/200)
+and functions (`crossed_above`, `crossed_below`, `abs`, `min`, `max`).
+Bar-lookback via `foo[N]` syntax. Actions: WATCH BUY / WATCH SELL / INFO.
+Eight preset rules (Golden cross, Death cross, MACD signal crosses,
+MACD-H zero-line crosses, oversold+bottoming, overbought+topping),
+all disabled by default. Sidebar section with list/add/edit/delete/
+toggle. Modal editor with syntax quick-reference and "Test on current
+bar" button. Rule matches feed both `reasons` and — when action is
+WATCH — the Reversal Watch synthesis sign count. Storage
+`localStorage.fl_tg_customRules`. Full user guide at
+`docs/library/CUSTOM_RULES_GUIDE.md`.
+
 ---
 
 ## Discipline for this arc

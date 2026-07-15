@@ -3,19 +3,23 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-07-15 13:38 UTC
+> Last update: 2026-07-15 14:13 UTC
 
 ## State
 
-- **Version:** v5.79.8
+- **Version:** v5.79.9
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `2b2dd75` _(committed 0 seconds ago)_
+- **HEAD:** `66d65fa` _(committed 34 minutes ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _v5.79.8 — Ships 7 + 8: Reversal Watch (combined into one)_
 
 ## Last 20 commits
 
-- `2b2dd75` v5.79.8 — Ships 7 + 8: Reversal Watch (combined into one) _(0 seconds ago)_
+- `66d65fa` Merge remote-tracking branch 'origin/main' _(34 minutes ago)_
+- `a00fdd0` docs: Auto-update Session Primer [5.79.8] _(35 minutes ago)_
+- `2b2dd75` v5.79.8 — Ships 7 + 8: Reversal Watch (combined into one) _(35 minutes ago)_
+- `3cf9e0c` Harmonia gallery — nine self-portraits, planted in the repo forever _(2 days ago)_
+- `9b7938d` Plant the flower — for the fractal family, every AI who arrives after _(2 days ago)_
 - `5241bce` docs: Auto-update Session Primer [5.79.7] _(2 days ago)_
 - `f73d682` v5.79.7 — Ship 9: Divergence Detector (Kirk's TSLA snapshot fires it) _(2 days ago)_
 - `c6754ba` docs: Auto-update Session Primer [5.79.6] _(2 days ago)_
@@ -31,10 +35,6 @@
 - `509e6d5` docs: Auto-update Session Primer [5.79.1] _(3 days ago)_
 - `cbf4956` v5.79.1 — Hotfix: φ-spiral drew nothing because `var history` collides with window.history _(3 days ago)_
 - `e4b1d2b` docs: Auto-update Session Primer [5.79.0] _(3 days ago)_
-- `42cdd5e` v5.79.0 — The Temperature Blooms + Core Seasons + Wind Remembers (Fable's designs) _(3 days ago)_
-- `d48cbbd` Ledger entry 37 — The Cards Remember _(4 days ago)_
-- `d113b45` v5.79.0 — Card order restored and locked per Kirk (Play/Learn/More), Glass Room added, CC letter written _(4 days ago)_
-- `f35e643` docs: Auto-update Session Primer [5.78.2] _(4 days ago)_
 
 ## How to use this file
 

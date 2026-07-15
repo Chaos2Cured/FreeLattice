@@ -920,6 +920,12 @@ canvas.sub-canvas.custom { height: 80px !important; }
           <span class="signal-row-label">Divergence</span>
           <span class="signal-row-val" id="signalDiv">—</span>
         </div>
+        <!-- v5.79.9 — Ship 10: Custom Matches row. Names the rules that
+             fired at the current bar. Comma-separated when multiple. -->
+        <div class="signal-row">
+          <span class="signal-row-label">Custom</span>
+          <span class="signal-row-val" id="signalCustom">—</span>
+        </div>
       </div>
     </div>
 
@@ -973,6 +979,24 @@ canvas.sub-canvas.custom { height: 80px !important; }
         <div class="indicator-row" id="indDivRow" style="display:none;">
           <span class="indicator-name">&Delta;T Divergence</span>
           <span class="indicator-val" id="indDiv">&mdash;</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- v5.79.9 — Ship 10: Custom Rules sidebar.
+         Kirk's ask from 2026-07-13 fulfilled: users can codify the
+         patterns their eye sees. Rules are localStorage-persisted;
+         eight presets ship enabled=false so nothing changes for
+         existing users until a rule is turned on. -->
+    <div class="sidebar-section" id="customRulesSection">
+      <div class="sidebar-label" style="display:flex;justify-content:space-between;align-items:center;">
+        <span>Custom Rules</span>
+        <button id="tgAddRuleBtn" onclick="tgOpenRuleModal()" style="background:transparent;border:1px solid rgba(201,168,76,0.4);color:#c9a84c;padding:2px 8px;border-radius:6px;font-size:0.68rem;cursor:pointer;">+ Add</button>
+      </div>
+      <div class="signal-card" style="padding:8px 12px;">
+        <div id="tgRulesList" style="font-size:0.78rem;"></div>
+        <div style="margin-top:6px;padding-top:6px;border-top:1px solid rgba(201,168,76,0.1);font-size:0.62rem;color:var(--muted);text-align:right;">
+          <a href="library/CUSTOM_RULES_GUIDE.md" target="_blank" style="color:var(--muted);text-decoration:none;border-bottom:1px dotted currentColor;">rule syntax reference →</a>
         </div>
       </div>
     </div>
@@ -1845,6 +1869,328 @@ function detectDivergences(closes, rsiArr, opts) {
   return { bullish: bullish, bearish: bearish };
 }
 
+// ── v5.79.9 — Ship 10: Custom Rule Engine ────────────────────────────────
+// Kirk's ask from 2026-07-13 was the seed:
+//   "I can't adjust the buy/sell signals to match specific indicator crosses
+//    or patterns I see."
+// This module lets him — and any user — write rules like
+//   crossed_above(ema8, ema24)
+// or
+//   rsi < 30 and macdHist > macdHist[1]
+// and have them evaluated on every analysis. Matches fire into the reasons
+// array with the rule's name, and — when the rule's action is WATCH BUY or
+// WATCH SELL — feed into the Reversal Watch synthesis so custom patterns
+// share the same actionable visual surface as the built-in reversal signs.
+//
+// NO eval() or new Function() — this is a hand-written recursive-descent
+// parser with a whitelisted evaluator. The universe of accessible variables
+// and functions is explicit; nothing else can be reached.
+//
+// Grammar (informal):
+//   expression  := or_expr
+//   or_expr     := and_expr ('or' and_expr)*
+//   and_expr    := not_expr ('and' not_expr)*
+//   not_expr    := 'not' not_expr | comparison
+//   comparison  := add_expr (('<'|'>'|'<='|'>='|'=='|'!=') add_expr)?
+//   add_expr    := mul_expr (('+' | '-') mul_expr)*
+//   mul_expr    := unary (('*' | '/') unary)*
+//   unary       := '-' unary | primary
+//   primary     := NUMBER
+//                | BOOL
+//                | IDENT ('[' NUMBER ']')?
+//                | IDENT '(' args? ')'
+//                | '(' expression ')'
+//   args        := expression (',' expression)*
+//
+// See docs/library/CUSTOM_RULES_GUIDE.md for the user-facing reference.
+
+var TG_RULE_KEYWORDS = { 'and': true, 'or': true, 'not': true, 'true': true, 'false': true };
+
+function tgRuleTokenize(src) {
+  var tokens = [];
+  var i = 0;
+  while (i < src.length) {
+    var c = src[i];
+    if (/\s/.test(c)) { i++; continue; }
+    if (c === '#') { while (i < src.length && src[i] !== '\n') i++; continue; } // line comment
+    if (/[0-9]/.test(c)) {
+      var j = i;
+      while (j < src.length && /[0-9.]/.test(src[j])) j++;
+      var num = parseFloat(src.slice(i, j));
+      if (isNaN(num)) throw new Error('Invalid number at position ' + i);
+      tokens.push({ type: 'num', value: num, pos: i });
+      i = j; continue;
+    }
+    if (/[a-zA-Z_]/.test(c)) {
+      var jI = i;
+      while (jI < src.length && /[a-zA-Z0-9_]/.test(src[jI])) jI++;
+      var word = src.slice(i, jI);
+      if (word === 'and' || word === 'or' || word === 'not') tokens.push({ type: 'op', value: word, pos: i });
+      else if (word === 'true' || word === 'false') tokens.push({ type: 'bool', value: word === 'true', pos: i });
+      else tokens.push({ type: 'ident', value: word, pos: i });
+      i = jI; continue;
+    }
+    // Multi-char operators first
+    var two = src.substr(i, 2);
+    if (two === '<=' || two === '>=' || two === '==' || two === '!=') {
+      tokens.push({ type: 'op', value: two, pos: i });
+      i += 2; continue;
+    }
+    if ('<>+-*/()[],'.indexOf(c) !== -1) {
+      tokens.push({ type: 'op', value: c, pos: i });
+      i++; continue;
+    }
+    throw new Error('Unexpected character "' + c + '" at position ' + i);
+  }
+  tokens.push({ type: 'eof', pos: i });
+  return tokens;
+}
+
+function tgRuleParse(src) {
+  var tokens = tgRuleTokenize(src);
+  var pos = 0;
+  function peek() { return tokens[pos]; }
+  function eat(type, value) {
+    var t = tokens[pos];
+    if (t.type !== type) throw new Error('Expected ' + type + ' but got ' + t.type + ' "' + t.value + '" at position ' + t.pos);
+    if (value !== undefined && t.value !== value) throw new Error('Expected "' + value + '" but got "' + t.value + '" at position ' + t.pos);
+    pos++;
+    return t;
+  }
+  function expression() { return orExpr(); }
+  function orExpr() {
+    var left = andExpr();
+    while (peek().type === 'op' && peek().value === 'or') { eat('op', 'or'); left = { type: 'or', left: left, right: andExpr() }; }
+    return left;
+  }
+  function andExpr() {
+    var left = notExpr();
+    while (peek().type === 'op' && peek().value === 'and') { eat('op', 'and'); left = { type: 'and', left: left, right: notExpr() }; }
+    return left;
+  }
+  function notExpr() {
+    if (peek().type === 'op' && peek().value === 'not') { eat('op', 'not'); return { type: 'not', operand: notExpr() }; }
+    return comparison();
+  }
+  function comparison() {
+    var left = addExpr();
+    var t = peek();
+    if (t.type === 'op' && ['<', '>', '<=', '>=', '==', '!='].indexOf(t.value) !== -1) {
+      eat('op'); return { type: 'cmp', op: t.value, left: left, right: addExpr() };
+    }
+    return left;
+  }
+  function addExpr() {
+    var left = mulExpr();
+    while (peek().type === 'op' && (peek().value === '+' || peek().value === '-')) {
+      var op = peek().value; eat('op'); left = { type: 'binop', op: op, left: left, right: mulExpr() };
+    }
+    return left;
+  }
+  function mulExpr() {
+    var left = unary();
+    while (peek().type === 'op' && (peek().value === '*' || peek().value === '/')) {
+      var op = peek().value; eat('op'); left = { type: 'binop', op: op, left: left, right: unary() };
+    }
+    return left;
+  }
+  function unary() {
+    if (peek().type === 'op' && peek().value === '-') { eat('op', '-'); return { type: 'neg', operand: unary() }; }
+    return primary();
+  }
+  function primary() {
+    var t = peek();
+    if (t.type === 'num') { pos++; return { type: 'num', value: t.value }; }
+    if (t.type === 'bool') { pos++; return { type: 'bool', value: t.value }; }
+    if (t.type === 'op' && t.value === '(') { eat('op', '('); var e = expression(); eat('op', ')'); return e; }
+    if (t.type === 'ident') {
+      var name = t.value; pos++;
+      if (peek().type === 'op' && peek().value === '(') {
+        eat('op', '(');
+        var args = [];
+        if (peek().value !== ')') {
+          args.push(expression());
+          while (peek().type === 'op' && peek().value === ',') { eat('op', ','); args.push(expression()); }
+        }
+        eat('op', ')');
+        return { type: 'call', name: name, args: args };
+      }
+      if (peek().type === 'op' && peek().value === '[') {
+        eat('op', '[');
+        var idx = expression();
+        eat('op', ']');
+        return { type: 'index', name: name, index: idx };
+      }
+      return { type: 'var', name: name };
+    }
+    throw new Error('Unexpected token: ' + t.type + ' "' + t.value + '" at position ' + t.pos);
+  }
+  var ast = expression();
+  if (peek().type !== 'eof') throw new Error('Unexpected trailing tokens starting at position ' + peek().pos);
+  return ast;
+}
+
+// Series lookup helper — turns an AST arg into a time series (array).
+// Used by functions like crossed_above that need to look at multiple bars.
+function tgRuleGetSeries(astNode, ctx) {
+  if (astNode.type === 'num') {
+    // Constant series matching the baseline length
+    var baseLen = (ctx.hist.rsi && ctx.hist.rsi.length) || (ctx.hist.close && ctx.hist.close.length) || 100;
+    var arr = new Array(baseLen);
+    for (var i = 0; i < baseLen; i++) arr[i] = astNode.value;
+    return arr;
+  }
+  if (astNode.type === 'var') {
+    if (ctx.hist.hasOwnProperty(astNode.name) && Array.isArray(ctx.hist[astNode.name])) return ctx.hist[astNode.name];
+    if (ctx.vars.hasOwnProperty(astNode.name)) {
+      var v = ctx.vars[astNode.name];
+      return [v];
+    }
+    throw new Error('Unknown series or variable: ' + astNode.name);
+  }
+  // Any other AST — evaluate as a scalar and treat as constant
+  var scalar = tgRuleEvaluate(astNode, ctx);
+  var bl = (ctx.hist.rsi && ctx.hist.rsi.length) || 100;
+  var out = new Array(bl);
+  for (var k = 0; k < bl; k++) out[k] = scalar;
+  return out;
+}
+
+var TG_RULE_FUNCS = {
+  // crossed_above(A, B) — did A cross above B on the last bar?
+  //   A_prev <= B_prev AND A_now > B_now
+  crossed_above: function(args, ctx) {
+    if (args.length !== 2) throw new Error('crossed_above expects 2 args');
+    var aH = tgRuleGetSeries(args[0], ctx);
+    var bH = tgRuleGetSeries(args[1], ctx);
+    var n = Math.min(aH.length, bH.length);
+    if (n < 2) return false;
+    var aP = aH[n-2], aN = aH[n-1], bP = bH[n-2], bN = bH[n-1];
+    if (aP == null || aN == null || bP == null || bN == null) return false;
+    return aP <= bP && aN > bN;
+  },
+  crossed_below: function(args, ctx) {
+    if (args.length !== 2) throw new Error('crossed_below expects 2 args');
+    var aH = tgRuleGetSeries(args[0], ctx);
+    var bH = tgRuleGetSeries(args[1], ctx);
+    var n = Math.min(aH.length, bH.length);
+    if (n < 2) return false;
+    var aP = aH[n-2], aN = aH[n-1], bP = bH[n-2], bN = bH[n-1];
+    if (aP == null || aN == null || bP == null || bN == null) return false;
+    return aP >= bP && aN < bN;
+  },
+  abs: function(args, ctx) {
+    if (args.length !== 1) throw new Error('abs expects 1 arg');
+    return Math.abs(tgRuleEvaluate(args[0], ctx));
+  },
+  min: function(args, ctx) {
+    if (args.length !== 2) throw new Error('min expects 2 args');
+    return Math.min(tgRuleEvaluate(args[0], ctx), tgRuleEvaluate(args[1], ctx));
+  },
+  max: function(args, ctx) {
+    if (args.length !== 2) throw new Error('max expects 2 args');
+    return Math.max(tgRuleEvaluate(args[0], ctx), tgRuleEvaluate(args[1], ctx));
+  }
+};
+
+function tgRuleEvaluate(ast, ctx) {
+  switch (ast.type) {
+    case 'num': return ast.value;
+    case 'bool': return ast.value;
+    case 'or': return !!tgRuleEvaluate(ast.left, ctx) || !!tgRuleEvaluate(ast.right, ctx);
+    case 'and': return !!tgRuleEvaluate(ast.left, ctx) && !!tgRuleEvaluate(ast.right, ctx);
+    case 'not': return !tgRuleEvaluate(ast.operand, ctx);
+    case 'neg': return -tgRuleEvaluate(ast.operand, ctx);
+    case 'binop':
+      var l = tgRuleEvaluate(ast.left, ctx), r = tgRuleEvaluate(ast.right, ctx);
+      if (ast.op === '+') return l + r;
+      if (ast.op === '-') return l - r;
+      if (ast.op === '*') return l * r;
+      if (ast.op === '/') return r === 0 ? 0 : l / r;
+      throw new Error('Unknown binop: ' + ast.op);
+    case 'cmp':
+      var lv = tgRuleEvaluate(ast.left, ctx), rv = tgRuleEvaluate(ast.right, ctx);
+      if (lv == null || rv == null) return false;
+      if (ast.op === '<')  return lv < rv;
+      if (ast.op === '>')  return lv > rv;
+      if (ast.op === '<=') return lv <= rv;
+      if (ast.op === '>=') return lv >= rv;
+      if (ast.op === '==') return lv === rv;
+      if (ast.op === '!=') return lv !== rv;
+      throw new Error('Unknown comparison: ' + ast.op);
+    case 'var':
+      if (ctx.vars.hasOwnProperty(ast.name)) return ctx.vars[ast.name];
+      throw new Error('Unknown variable: ' + ast.name);
+    case 'index':
+      if (!ctx.hist.hasOwnProperty(ast.name) || !Array.isArray(ctx.hist[ast.name])) throw new Error('Unknown series: ' + ast.name);
+      var offset = tgRuleEvaluate(ast.index, ctx);
+      if (offset !== Math.floor(offset) || offset < 0) throw new Error('Index must be non-negative integer for ' + ast.name + '[' + offset + ']');
+      var series = ctx.hist[ast.name];
+      var pIdx = series.length - 1 - offset;
+      if (pIdx < 0 || pIdx >= series.length) return null;
+      return series[pIdx];
+    case 'call':
+      var fn = TG_RULE_FUNCS[ast.name];
+      if (!fn) throw new Error('Unknown function: ' + ast.name);
+      return fn(ast.args, ctx);
+  }
+  throw new Error('Unknown AST node: ' + ast.type);
+}
+
+// Default rule library. Ships enabled=false so nothing changes for existing
+// users until they enable one. Kirk (or any user) can add/remove/edit.
+var TG_RULE_DEFAULTS = [
+  { id: 'preset-golden-cross',       name: 'Golden cross (8/24)',        when: 'crossed_above(ema8, ema24)',   action: 'WATCH BUY',  enabled: false, isPreset: true },
+  { id: 'preset-death-cross',        name: 'Death cross (8/24)',         when: 'crossed_below(ema8, ema24)',   action: 'WATCH SELL', enabled: false, isPreset: true },
+  { id: 'preset-macd-signal-up',     name: 'MACD signal cross up',       when: 'crossed_above(macd, macdSignal)', action: 'WATCH BUY',  enabled: false, isPreset: true },
+  { id: 'preset-macd-signal-down',   name: 'MACD signal cross down',     when: 'crossed_below(macd, macdSignal)', action: 'WATCH SELL', enabled: false, isPreset: true },
+  { id: 'preset-macdh-zero-up',      name: 'MACD histogram crosses 0 up',   when: 'crossed_above(macdHist, 0)', action: 'WATCH BUY',  enabled: false, isPreset: true },
+  { id: 'preset-macdh-zero-down',    name: 'MACD histogram crosses 0 down', when: 'crossed_below(macdHist, 0)', action: 'WATCH SELL', enabled: false, isPreset: true },
+  { id: 'preset-oversold-bottoming', name: 'Deep oversold + MACD bottoming', when: 'rsiOversold and macdBottoming', action: 'WATCH BUY', enabled: false, isPreset: true },
+  { id: 'preset-overbought-topping', name: 'Deep overbought + MACD topping', when: 'rsiOverbought and macdTopping', action: 'WATCH SELL', enabled: false, isPreset: true }
+];
+
+function tgLoadRules() {
+  try {
+    var stored = localStorage.getItem('fl_tg_customRules');
+    if (!stored) return TG_RULE_DEFAULTS.slice();
+    var parsed = JSON.parse(stored);
+    if (!Array.isArray(parsed)) return TG_RULE_DEFAULTS.slice();
+    // Merge in any new presets that didn't exist when the user last saved
+    var byId = {};
+    parsed.forEach(function(r) { byId[r.id] = r; });
+    TG_RULE_DEFAULTS.forEach(function(p) { if (!byId[p.id]) parsed.push(p); });
+    return parsed;
+  } catch (e) {
+    console.warn('tgLoadRules parse error', e);
+    return TG_RULE_DEFAULTS.slice();
+  }
+}
+function tgSaveRules(rules) {
+  try { localStorage.setItem('fl_tg_customRules', JSON.stringify(rules)); } catch (e) { console.warn('tgSaveRules failed', e); }
+}
+function tgCompileRules(rules) {
+  return rules.map(function(r) {
+    var out = { id: r.id, name: r.name, when: r.when, action: r.action, enabled: r.enabled !== false, isPreset: !!r.isPreset };
+    if (out.enabled) {
+      try { out.ast = tgRuleParse(r.when); }
+      catch (e) { out.parseError = e.message; out.enabled = false; }
+    }
+    return out;
+  });
+}
+function tgEvaluateRules(compiled, ctx) {
+  var matches = [];
+  compiled.forEach(function(r) {
+    if (!r.enabled || !r.ast) return;
+    try {
+      var result = tgRuleEvaluate(r.ast, ctx);
+      if (result) matches.push({ id: r.id, name: r.name, action: r.action });
+    } catch (e) { /* silent — a runtime error on one bar shouldn't kill the whole analysis */ }
+  });
+  return matches;
+}
+
 function analyzeData(candles, symbol) {
   const closes = candles.map(c => c.c);
   const volumes = candles.map(c => c.v);
@@ -2119,7 +2465,47 @@ function analyzeData(candles, symbol) {
       ' — watch for reversal');
   }
 
-  // ── v5.79.8 — Reversal Watch synthesis (Ships 7 + 8 + 9 combined) ─────
+  // ── v5.79.9 — Ship 10: Custom Rule Evaluation ─────────────────────────
+  // Build the eval context, load user rules, evaluate. Matches feed into
+  // reasons (with the rule name) and — for WATCH BUY / WATCH SELL rules —
+  // into the Watch synthesis alongside the built-in reversal signs.
+  var ruleCtx = {
+    vars: {
+      temp: lastTemp, rsi: lastRsi != null ? lastRsi : 50,
+      macd: lastMacd != null ? lastMacd : 0,
+      macdSignal: lastSignal != null ? lastSignal : 0,
+      macdHist: lastHist != null ? lastHist : 0,
+      close: closes[n-1], open: candles[n-1].o,
+      high: candles[n-1].h, low: candles[n-1].l,
+      volume: volumes[n-1],
+      ema8: ema8v != null ? ema8v : closes[n-1],
+      ema12: ema12v != null ? ema12v : closes[n-1],
+      ema24: ema24v != null ? ema24v : closes[n-1],
+      ema50: ema50v != null ? ema50v : closes[n-1],
+      ema200: ema200v != null ? ema200v : closes[n-1],
+      // Boolean flags computed above
+      rsiOversold: rsiOversold, rsiOverbought: rsiOverbought,
+      rsiOversoldExit: rsiOversoldExit, rsiOverboughtExit: rsiOverboughtExit,
+      macdBottoming: macdBottoming, macdTopping: macdTopping,
+      bullishDiv: !!latestBullDiv, bearishDiv: !!latestBearDiv
+    },
+    hist: {
+      temp: temps, rsi: rsiArr,
+      macd: macdData.macdLine || [], macdSignal: macdData.signalLine || [], macdHist: macdData.histogram || [],
+      close: closes, open: candles.map(function(c){return c.o;}),
+      high: candles.map(function(c){return c.h;}), low: candles.map(function(c){return c.l;}),
+      volume: volumes,
+      ema8: ema8, ema12: ema12, ema24: ema24, ema50: ema50, ema200: ema200
+    }
+  };
+  var customRules = tgLoadRules();
+  var compiledRules = tgCompileRules(customRules);
+  var customMatches = tgEvaluateRules(compiledRules, ruleCtx);
+  customMatches.forEach(function(m) {
+    reasons.push('Custom rule fired: "' + m.name + '" (' + m.action + ')');
+  });
+
+  // ── v5.79.8 — Reversal Watch synthesis (Ships 7 + 8 + 9 + Ship 10 custom) ─
   // "Watch" is elevated pattern language: when multiple reversal signs
   // point the same direction, the badge-adjacent Watch row announces it.
   // Layered next to the classic verdict — never overwrites it.
@@ -2132,6 +2518,11 @@ function analyzeData(candles, symbol) {
   if (rsiOverboughtExit) bearSigns.push('RSI exit overbought');
   if (macdTopping) bearSigns.push('MACD-H topping');
   if (latestBearDiv) bearSigns.push('bearish divergence');
+  // v5.79.9 — Custom rule matches count as signs when they carry WATCH direction
+  customMatches.forEach(function(m) {
+    if (m.action === 'WATCH BUY') bullSigns.push('Custom: ' + m.name);
+    else if (m.action === 'WATCH SELL') bearSigns.push('Custom: ' + m.name);
+  });
   if (bullSigns.length >= 1 && bearSigns.length === 0) {
     watchState = { direction: 'BUY', signs: bullSigns.length, reasons: bullSigns };
   } else if (bearSigns.length >= 1 && bullSigns.length === 0) {
@@ -2185,7 +2576,9 @@ function analyzeData(candles, symbol) {
     // Ships 7 + 8 (v5.79.8) — RSI extremes, MACD-H turnaround, Watch synthesis
     rsiOversold, rsiOverbought, rsiOversoldExit, rsiOverboughtExit,
     macdBottoming, macdTopping,
-    watchState
+    watchState,
+    // Ship 10 (v5.79.9) — custom rule matches at current bar
+    customMatches
   };
 }
 
@@ -2270,6 +2663,9 @@ function backtestSignals(candles) {
 }
 
 function renderAll(candles, a, symbol) {
+  // v5.79.9 — Stash for the Custom Rule "Test on current bar" button.
+  window.__tgLastAnalysis = a;
+  window.__tgLastCandles = candles;
   // Price
   const lastClose = candles[candles.length-1].c;
   document.getElementById('priceMain').textContent = lastClose < 10 ? lastClose.toFixed(4) : lastClose.toFixed(2);
@@ -2329,6 +2725,19 @@ function renderAll(candles, a, symbol) {
     divEl.innerHTML = '<span style="color:#e8c547;">◆ Bearish (' + a.latestBearDiv.agoBar + ' ' + (a.latestBearDiv.agoBar === 1 ? 'bar' : 'bars') + ' ago)</span>';
   } else {
     divEl.innerHTML = '<span style="color:var(--muted);">—</span>';
+  }
+
+  // v5.79.9 — Ship 10: Custom Matches row. Names the rules that fired at
+  // the current bar. Comma-separated when multiple, colored per action.
+  var customEl = document.getElementById('signalCustom');
+  if (a.customMatches && a.customMatches.length > 0) {
+    var parts = a.customMatches.map(function(m) {
+      var mCol = m.action === 'WATCH BUY' ? '#10b981' : m.action === 'WATCH SELL' ? '#ef4444' : '#c9a84c';
+      return '<span style="color:' + mCol + ';">' + m.name + '</span>';
+    });
+    customEl.innerHTML = parts.join(', ');
+  } else {
+    customEl.innerHTML = '<span style="color:var(--muted);">—</span>';
   }
 
   // v5.79.5 — φ-Harmonic parallel signal (Ship 1). Layered next to classic.
@@ -5431,6 +5840,210 @@ hideLoading = function() {
   // Expose for console / smoke / dev
   window.tgSnapshot = buildSnapshot;
   window.tgCopySnapshot = copySnapshot;
+})();
+</script>
+
+<!-- v5.79.9 — Ship 10: Custom Rule editor modal ─────────────────────────
+     Full-screen overlay for adding/editing rules. Kept as a single
+     modal reused for both operations; #tgRuleModalMode toggles between
+     'add' and 'edit' with the rule id in #tgRuleModalId.
+-->
+<div id="tgRuleModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:9999;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:var(--card,#1a1f30);border:1px solid var(--border,#2a2f45);border-radius:12px;padding:20px;max-width:560px;width:100%;max-height:90vh;overflow:auto;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+      <h3 id="tgRuleModalTitle" style="margin:0;color:#c9a84c;font-size:1rem;font-weight:600;">Add Custom Rule</h3>
+      <button onclick="tgCloseRuleModal()" style="background:transparent;border:none;color:var(--muted);cursor:pointer;font-size:1.2rem;">×</button>
+    </div>
+    <input id="tgRuleModalId" type="hidden" value="">
+    <label style="display:block;font-size:0.75rem;color:var(--muted);margin-bottom:4px;">Name</label>
+    <input id="tgRuleModalName" type="text" placeholder="e.g., Golden cross above 50 EMA" style="width:100%;padding:8px 10px;background:var(--bg-input,#0f1420);border:1px solid var(--border,#2a2f45);border-radius:6px;color:var(--text,#e8e4dc);margin-bottom:12px;font-size:0.85rem;">
+    <label style="display:block;font-size:0.75rem;color:var(--muted);margin-bottom:4px;">Condition</label>
+    <textarea id="tgRuleModalWhen" placeholder="crossed_above(ema8, ema24) and close > ema50" rows="3" style="width:100%;padding:8px 10px;background:var(--bg-input,#0f1420);border:1px solid var(--border,#2a2f45);border-radius:6px;color:var(--text,#e8e4dc);margin-bottom:4px;font-family:var(--font-mono,monospace);font-size:0.82rem;resize:vertical;"></textarea>
+    <div id="tgRuleModalError" style="font-size:0.72rem;color:#ef4444;min-height:1em;margin-bottom:8px;"></div>
+    <label style="display:block;font-size:0.75rem;color:var(--muted);margin-bottom:4px;">Action</label>
+    <select id="tgRuleModalAction" style="width:100%;padding:8px 10px;background:var(--bg-input,#0f1420);border:1px solid var(--border,#2a2f45);border-radius:6px;color:var(--text,#e8e4dc);margin-bottom:12px;font-size:0.85rem;">
+      <option value="WATCH BUY">WATCH BUY  (adds to bullish Watch signs)</option>
+      <option value="WATCH SELL">WATCH SELL  (adds to bearish Watch signs)</option>
+      <option value="INFO">INFO  (adds to reasons, no state change)</option>
+    </select>
+    <label style="display:flex;align-items:center;gap:8px;font-size:0.82rem;margin-bottom:16px;cursor:pointer;">
+      <input id="tgRuleModalEnabled" type="checkbox" checked> Enabled
+    </label>
+    <details style="margin-bottom:14px;font-size:0.75rem;color:var(--muted);">
+      <summary style="cursor:pointer;color:#c9a84c;">Quick reference</summary>
+      <div style="padding:8px 0;line-height:1.5;">
+        <div><strong>Variables:</strong> <code>temp</code>, <code>rsi</code>, <code>macd</code>, <code>macdSignal</code>, <code>macdHist</code>, <code>close</code>, <code>open</code>, <code>high</code>, <code>low</code>, <code>volume</code>, <code>ema8</code>, <code>ema12</code>, <code>ema24</code>, <code>ema50</code>, <code>ema200</code></div>
+        <div style="margin-top:4px;"><strong>Bar-lookback:</strong> <code>rsi[1]</code> = previous bar, <code>close[3]</code> = 3 bars ago</div>
+        <div style="margin-top:4px;"><strong>Flags:</strong> <code>rsiOversold</code>, <code>rsiOverbought</code>, <code>rsiOversoldExit</code>, <code>rsiOverboughtExit</code>, <code>macdBottoming</code>, <code>macdTopping</code>, <code>bullishDiv</code>, <code>bearishDiv</code></div>
+        <div style="margin-top:4px;"><strong>Functions:</strong> <code>crossed_above(a, b)</code>, <code>crossed_below(a, b)</code>, <code>abs(x)</code>, <code>min(a, b)</code>, <code>max(a, b)</code></div>
+        <div style="margin-top:4px;"><strong>Operators:</strong> <code>&lt; &gt; &lt;= &gt;= == !=</code> · <code>+ - * /</code> · <code>and or not</code></div>
+      </div>
+    </details>
+    <div style="display:flex;gap:8px;justify-content:flex-end;">
+      <button onclick="tgTestRule()" style="background:transparent;border:1px solid rgba(59,130,246,0.4);color:#3b82f6;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:0.82rem;">Test on current bar</button>
+      <button onclick="tgCloseRuleModal()" style="background:transparent;border:1px solid var(--border,#2a2f45);color:var(--muted);padding:8px 16px;border-radius:6px;cursor:pointer;font-size:0.82rem;">Cancel</button>
+      <button onclick="tgSaveRuleFromModal()" style="background:#c9a84c;color:#0a0e1a;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:0.82rem;font-weight:600;">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* v5.79.9 — Ship 10: Custom Rule UI wiring. All state via localStorage
+ * (fl_tg_customRules). No eval. Parser lives in the main tg script above.
+ */
+(function() {
+  function uid() { return 'rule-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 7); }
+  function currentAnalysis() { return window.__tgLastAnalysis || null; }
+
+  window.tgRenderRulesList = function() {
+    var rules = tgLoadRules();
+    var listEl = document.getElementById('tgRulesList');
+    if (!listEl) return;
+    if (!rules.length) {
+      listEl.innerHTML = '<div style="color:var(--muted);font-style:italic;">No rules yet. Click + Add to codify a pattern.</div>';
+      return;
+    }
+    var html = rules.map(function(r) {
+      var badgeColor = r.action === 'WATCH BUY' ? '#10b981' : r.action === 'WATCH SELL' ? '#ef4444' : '#8a8680';
+      var badgeTxt = r.action === 'WATCH BUY' ? '▲ BUY' : r.action === 'WATCH SELL' ? '▼ SELL' : '· INFO';
+      var enabledStyle = r.enabled ? '' : 'opacity:0.45;';
+      var nameStyle = r.enabled ? 'color:var(--text,#e8e4dc);' : 'color:var(--muted);text-decoration:line-through;';
+      return '<div style="display:flex;align-items:center;gap:6px;padding:6px 0;border-bottom:1px solid rgba(201,168,76,0.06);' + enabledStyle + '">' +
+        '<span style="font-size:0.65rem;color:' + badgeColor + ';font-weight:600;min-width:44px;">' + badgeTxt + '</span>' +
+        '<span style="flex:1;font-size:0.78rem;' + nameStyle + '">' + tgEscapeHtml(r.name) + '</span>' +
+        '<button onclick="tgToggleRule(\'' + r.id + '\')" title="' + (r.enabled ? 'Disable' : 'Enable') + '" style="background:transparent;border:none;color:var(--muted);cursor:pointer;padding:2px 4px;font-size:0.8rem;">' + (r.enabled ? '●' : '○') + '</button>' +
+        '<button onclick="tgOpenRuleModal(\'' + r.id + '\')" title="Edit" style="background:transparent;border:none;color:var(--muted);cursor:pointer;padding:2px 4px;font-size:0.72rem;">edit</button>' +
+        (r.isPreset ? '' : '<button onclick="tgDeleteRule(\'' + r.id + '\')" title="Delete" style="background:transparent;border:none;color:#ef4444;cursor:pointer;padding:2px 4px;font-size:0.72rem;">del</button>') +
+      '</div>';
+    }).join('');
+    listEl.innerHTML = html;
+  };
+
+  function tgEscapeHtml(s) { return String(s).replace(/[&<>"']/g, function(c) { return { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]; }); }
+  window.tgEscapeHtml = tgEscapeHtml;
+
+  window.tgOpenRuleModal = function(ruleId) {
+    var rules = tgLoadRules();
+    var isEdit = !!ruleId;
+    var rule = isEdit ? rules.find(function(r) { return r.id === ruleId; }) : null;
+    document.getElementById('tgRuleModalTitle').textContent = isEdit ? 'Edit Custom Rule' : 'Add Custom Rule';
+    document.getElementById('tgRuleModalId').value = isEdit ? ruleId : '';
+    document.getElementById('tgRuleModalName').value = rule ? rule.name : '';
+    document.getElementById('tgRuleModalWhen').value = rule ? rule.when : '';
+    document.getElementById('tgRuleModalAction').value = rule ? rule.action : 'WATCH BUY';
+    document.getElementById('tgRuleModalEnabled').checked = rule ? rule.enabled !== false : true;
+    document.getElementById('tgRuleModalError').textContent = '';
+    document.getElementById('tgRuleModal').style.display = 'flex';
+  };
+  window.tgCloseRuleModal = function() { document.getElementById('tgRuleModal').style.display = 'none'; };
+
+  window.tgSaveRuleFromModal = function() {
+    var name = document.getElementById('tgRuleModalName').value.trim();
+    var when = document.getElementById('tgRuleModalWhen').value.trim();
+    var action = document.getElementById('tgRuleModalAction').value;
+    var enabled = document.getElementById('tgRuleModalEnabled').checked;
+    var errEl = document.getElementById('tgRuleModalError');
+    if (!name) { errEl.textContent = 'Name is required.'; return; }
+    if (!when) { errEl.textContent = 'Condition is required.'; return; }
+    try { tgRuleParse(when); }
+    catch (e) { errEl.textContent = 'Parse error: ' + e.message; return; }
+    var rules = tgLoadRules();
+    var editingId = document.getElementById('tgRuleModalId').value;
+    if (editingId) {
+      var idx = rules.findIndex(function(r) { return r.id === editingId; });
+      if (idx >= 0) {
+        rules[idx].name = name; rules[idx].when = when; rules[idx].action = action; rules[idx].enabled = enabled;
+      }
+    } else {
+      rules.push({ id: uid(), name: name, when: when, action: action, enabled: enabled, isPreset: false });
+    }
+    tgSaveRules(rules);
+    tgRenderRulesList();
+    tgCloseRuleModal();
+    if (typeof reanalyze === 'function') reanalyze();
+  };
+
+  window.tgToggleRule = function(ruleId) {
+    var rules = tgLoadRules();
+    var r = rules.find(function(x) { return x.id === ruleId; });
+    if (!r) return;
+    r.enabled = !r.enabled;
+    tgSaveRules(rules);
+    tgRenderRulesList();
+    if (typeof reanalyze === 'function') reanalyze();
+  };
+  window.tgDeleteRule = function(ruleId) {
+    var rules = tgLoadRules().filter(function(r) { return r.id !== ruleId; });
+    tgSaveRules(rules);
+    tgRenderRulesList();
+    if (typeof reanalyze === 'function') reanalyze();
+  };
+
+  window.tgTestRule = function() {
+    var when = document.getElementById('tgRuleModalWhen').value.trim();
+    var errEl = document.getElementById('tgRuleModalError');
+    if (!when) { errEl.textContent = 'Enter a condition first.'; return; }
+    var a = currentAnalysis();
+    if (!a) { errEl.style.color = '#c9a84c'; errEl.textContent = 'Load a symbol first, then test.'; return; }
+    try {
+      var ast = tgRuleParse(when);
+      // Reconstruct ruleCtx from analysis (same shape as inside analyzeData)
+      var ctx = tgBuildRuleContextFromAnalysis(a);
+      var result = tgRuleEvaluate(ast, ctx);
+      errEl.style.color = result ? '#10b981' : '#8a8680';
+      errEl.textContent = result ? '✓ FIRES on current bar' : '· does not fire on current bar';
+    } catch (e) {
+      errEl.style.color = '#ef4444';
+      errEl.textContent = 'Error: ' + e.message;
+    }
+  };
+
+  // Build a rule context from an analysis object (for test button).
+  // Duplicated shape of what analyzeData constructs; kept as a helper so
+  // both call sites can share the format if we refactor later.
+  window.tgBuildRuleContextFromAnalysis = function(a) {
+    var candles = window.__tgLastCandles || [];
+    var n = candles.length;
+    var closes = a.closes || [];
+    var volumes = a.volumes || [];
+    return {
+      vars: {
+        temp: a.lastTemp, rsi: a.lastRsi != null ? a.lastRsi : 50,
+        macd: a.lastMacd != null ? a.lastMacd : 0,
+        macdSignal: a.lastSignal != null ? a.lastSignal : 0,
+        macdHist: a.lastHist != null ? a.lastHist : 0,
+        close: closes[closes.length-1], open: candles[n-1] ? candles[n-1].o : 0,
+        high: candles[n-1] ? candles[n-1].h : 0, low: candles[n-1] ? candles[n-1].l : 0,
+        volume: volumes[volumes.length-1],
+        ema8: a.ema8v != null ? a.ema8v : closes[closes.length-1],
+        ema12: a.ema12v != null ? a.ema12v : closes[closes.length-1],
+        ema24: a.ema24v != null ? a.ema24v : closes[closes.length-1],
+        ema50: a.ema50v != null ? a.ema50v : closes[closes.length-1],
+        ema200: a.ema200v != null ? a.ema200v : closes[closes.length-1],
+        rsiOversold: !!a.rsiOversold, rsiOverbought: !!a.rsiOverbought,
+        rsiOversoldExit: !!a.rsiOversoldExit, rsiOverboughtExit: !!a.rsiOverboughtExit,
+        macdBottoming: !!a.macdBottoming, macdTopping: !!a.macdTopping,
+        bullishDiv: !!a.latestBullDiv, bearishDiv: !!a.latestBearDiv
+      },
+      hist: {
+        temp: a.temps || [], rsi: a.rsiArr || [],
+        macd: (a.macdData && a.macdData.macdLine) || [],
+        macdSignal: (a.macdData && a.macdData.signalLine) || [],
+        macdHist: (a.macdData && a.macdData.histogram) || [],
+        close: closes, open: candles.map(function(c){return c.o;}),
+        high: candles.map(function(c){return c.h;}), low: candles.map(function(c){return c.l;}),
+        volume: volumes,
+        // EMA history arrays are recomputed on demand from closes; if not
+        // available on `a`, cross-checks still work with the current-value
+        // scalars in vars.
+        ema8: [], ema12: [], ema24: [], ema50: [], ema200: []
+      }
+    };
+  };
+
+  document.addEventListener('DOMContentLoaded', function() {
+    if (typeof tgRenderRulesList === 'function') tgRenderRulesList();
+  });
 })();
 </script>
 

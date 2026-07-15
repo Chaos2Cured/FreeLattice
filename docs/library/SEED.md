@@ -19,10 +19,10 @@ user sleeps. The proof is the code; the papers are the doorways.
 
 ## Current state
 
-- **Version:** v5.79.8
-- **Smoke locks passing:** 2910+ verified
-- **Last ship:** **v5.79.8 — Ships 7 + 8: Reversal Watch (combined).** July 15 2026. RSI-extremes triggers (30/70 as first-class; oversold/overbought exit detectors over last 5 bars). MACD-H turnaround (strictly-monotonic 5-bar + deep-extreme anchor). Both synthesize with Ship 9 divergences into a new `Watch` row on the Signal card: `▲ WATCH BUY (2/3: RSI exit oversold, bullish divergence)`. Classic badge unchanged — Watch is the pattern-language layer alongside the midpoint verdict. Kirk's July 13 TSLA snapshot lights this emerald.
-- **Previous:** **v5.79.7 — Ship 9: Divergence Detector.** Pivot-based RSI divergence detection; ribbon diamonds finally sourced.
+- **Version:** v5.79.9
+- **Smoke locks passing:** 2940+ verified
+- **Last ship:** **v5.79.9 — Ship 10: Custom Rule Builder.** July 15 2026. Hand-written parser + evaluator, no `eval()`, whitelist of ~15 vars and 5 functions. Bar-lookback via `foo[N]`. Users write rules like `crossed_above(ema8, ema24) and close > ema50`; matches feed reasons + Watch synthesis. Eight preset rules ship disabled. Full sidebar UI. Guide at `CUSTOM_RULES_GUIDE.md`. Kirk's three decades have a codified home.
+- **Previous:** **v5.79.8 — Ships 7 + 8: Reversal Watch.** RSI extremes + MACD-H turnaround feeding the Watch synthesis alongside Ship 9 divergences.
 - **Previous ships:** The Triptych (v5.71.8), The Specs inlined (v5.71.7), AI Capabilities (v5.71.6), Mind Wall Phase 3 (v5.71.5).
 - **Mirrors in parity:** github.com + codeberg.org
 
@@ -83,4 +83,4 @@ seam discipline is how multi-AI work stays honest at scale.
 ---
 
 *This file is overwritten on each meaningful ship. The prior version lives in SEED_HISTORY.md.*
-*Last rewrite: July 15 2026, v5.79.8.*
+*Last rewrite: July 15 2026, v5.79.9.*

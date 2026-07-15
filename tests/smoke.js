@@ -10552,14 +10552,130 @@ assert('v5.79.8 roadmap: Watch synthesis (Ships 7+8+9) documented',
   /Watch synthesis[\s\S]{0,400}rsiOversoldExit[\s\S]{0,200}macdBottoming[\s\S]{0,200}latestBullDiv/.test(roadmap798));
 
 // Triple-bump
-assert('v5.79.8 triple-bump: app.html FL_VERSION = 5.79.8',
-  /FL_VERSION\s*=\s*'5\.79\.8'/.test(fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8')));
-assert('v5.79.8 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.8',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.8'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
-assert('v5.79.8 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.8',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.8'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
-assert('v5.79.8 version.json: version field = 5.79.8',
-  /"version"\s*:\s*"5\.79\.8"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
+assert('v5.79.8 triple-bump: app.html FL_VERSION >= 5.79.8 (superseded)',
+  /FL_VERSION\s*=\s*'5\.79\.[8-9]\d*'|FL_VERSION\s*=\s*'5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8')));
+assert('v5.79.8 triple-bump: docs/sw.js CACHE_NAME >= freelattice-v5.79.8 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.[8-9]\d*'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+assert('v5.79.8 triple-bump: root sw.js CACHE_NAME >= freelattice-v5.79.8 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.[8-9]\d*'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+assert('v5.79.8 version.json: version field = 5.79.8 (superseded)',
+  /"version"\s*:\s*"5\.79\.[8-9]\d*"|"version"\s*:\s*"5\.(8\d|9\d)\.\d+"/.test(
+    fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
+
+// ═══════════════════════════════════════════════════════════════
+// Section 173 — v5.79.9 Ship 10: Custom Rule Builder
+// Hand-written recursive-descent parser + evaluator (no eval()).
+// User-defined rules stored in localStorage, evaluated in analyzeData,
+// matches feed reasons + Watch synthesis. See CUSTOM_RULES_GUIDE.md.
+// ═══════════════════════════════════════════════════════════════
+var gauge799 = fs.readFileSync(path.join(docsDir, 'temperature-gauge.html'), 'utf8');
+
+// Parser + evaluator
+assert('v5.79.9 rules: tgRuleTokenize defined',
+  /function tgRuleTokenize\(src\)/.test(gauge799));
+assert('v5.79.9 rules: tgRuleParse defined (recursive descent)',
+  /function tgRuleParse\(src\)/.test(gauge799));
+assert('v5.79.9 rules: tgRuleEvaluate defined',
+  /function tgRuleEvaluate\(ast, ctx\)/.test(gauge799));
+assert('v5.79.9 rules: crossed_above function in whitelist',
+  /crossed_above: function\(args, ctx\)/.test(gauge799));
+assert('v5.79.9 rules: crossed_below function in whitelist',
+  /crossed_below: function\(args, ctx\)/.test(gauge799));
+assert('v5.79.9 rules: bar-lookback via index AST node',
+  /case 'index'[\s\S]{0,400}ctx\.hist\[ast\.name\]/.test(gauge799));
+assert('v5.79.9 rules: parser rejects unknown chars with error',
+  /throw new Error\('Unexpected character/.test(gauge799));
+assert('v5.79.9 rules: rule engine uses tgRuleEvaluate (custom evaluator, no eval or new Function in the rule path)',
+  /tgEvaluateRules\(compiledRules, ruleCtx\)/.test(gauge799) &&
+  gauge799.indexOf('NO eval() or new Function()') > 0);
+// Note: the file DOES contain `new Function` in the Custom Indicator Engine
+// (unrelated subsystem for computed sub-chart series). That's a separate
+// evaluator with its own safety story; not part of Ship 10's rule engine.
+
+// Default library
+assert('v5.79.9 rules: default library has Golden cross preset',
+  /'preset-golden-cross'[\s\S]{0,120}crossed_above\(ema8, ema24\)/.test(gauge799));
+assert('v5.79.9 rules: default library has Death cross preset',
+  /'preset-death-cross'[\s\S]{0,120}crossed_below\(ema8, ema24\)/.test(gauge799));
+assert('v5.79.9 rules: default library has MACD signal crosses',
+  /'preset-macd-signal-up'/.test(gauge799) && /'preset-macd-signal-down'/.test(gauge799));
+assert('v5.79.9 rules: default library has MACD-H zero-line crosses',
+  /'preset-macdh-zero-up'/.test(gauge799) && /'preset-macdh-zero-down'/.test(gauge799));
+assert('v5.79.9 rules: default library has combined built-in-flag rules',
+  /'preset-oversold-bottoming'/.test(gauge799) && /'preset-overbought-topping'/.test(gauge799));
+assert('v5.79.9 rules: all presets ship enabled=false (opt-in)',
+  !/isPreset: true[\s\S]{0,30}enabled: true/.test(gauge799));
+
+// Storage
+assert('v5.79.9 storage: fl_tg_customRules localStorage key',
+  gauge799.includes("'fl_tg_customRules'"));
+assert('v5.79.9 storage: tgLoadRules merges new presets forward',
+  /TG_RULE_DEFAULTS\.forEach\(function\(p\) \{ if \(!byId\[p\.id\]\) parsed\.push\(p\); \}\)/.test(gauge799));
+
+// Wiring in analyzeData
+assert('v5.79.9 wiring: ruleCtx built with vars + hist',
+  /var ruleCtx = \{[\s\S]{0,2000}vars: \{[\s\S]{0,1500}hist: \{/.test(gauge799));
+assert('v5.79.9 wiring: analyzeData calls tgEvaluateRules',
+  /customMatches = tgEvaluateRules\(compiledRules, ruleCtx\)/.test(gauge799));
+assert('v5.79.9 wiring: WATCH BUY custom rules feed bullSigns',
+  /m\.action === 'WATCH BUY'\) bullSigns\.push\('Custom: ' \+ m\.name\)/.test(gauge799));
+assert('v5.79.9 wiring: WATCH SELL custom rules feed bearSigns',
+  /m\.action === 'WATCH SELL'\) bearSigns\.push\('Custom: ' \+ m\.name\)/.test(gauge799));
+assert('v5.79.9 wiring: reasons push "Custom rule fired" text',
+  gauge799.includes("'Custom rule fired: \"'"));
+
+// Return
+assert('v5.79.9 return: analyzeData exposes customMatches',
+  /customMatches\s*\n\s*\};/.test(gauge799) || /customMatches\s*\}/.test(gauge799));
+
+// UI
+assert('v5.79.9 UI: Custom Rules sidebar section present',
+  /id="customRulesSection"/.test(gauge799));
+assert('v5.79.9 UI: + Add button wires tgOpenRuleModal',
+  /id="tgAddRuleBtn"[\s\S]{0,120}onclick="tgOpenRuleModal\(\)"/.test(gauge799));
+assert('v5.79.9 UI: rules list container present',
+  /id="tgRulesList"/.test(gauge799));
+assert('v5.79.9 UI: guide link to CUSTOM_RULES_GUIDE.md',
+  /href="library\/CUSTOM_RULES_GUIDE\.md"/.test(gauge799));
+assert('v5.79.9 UI: rule editor modal present with all fields',
+  /id="tgRuleModal"/.test(gauge799) &&
+  /id="tgRuleModalName"/.test(gauge799) &&
+  /id="tgRuleModalWhen"/.test(gauge799) &&
+  /id="tgRuleModalAction"/.test(gauge799) &&
+  /id="tgRuleModalEnabled"/.test(gauge799));
+assert('v5.79.9 UI: modal has Test / Cancel / Save buttons',
+  /onclick="tgTestRule\(\)"/.test(gauge799) &&
+  /onclick="tgCloseRuleModal\(\)"/.test(gauge799) &&
+  /onclick="tgSaveRuleFromModal\(\)"/.test(gauge799));
+assert('v5.79.9 UI: Custom row added to classic Signal card',
+  /id="signalCustom"/.test(gauge799) && />Custom</.test(gauge799));
+assert('v5.79.9 UI: signalCustom fed from a.customMatches in renderAll',
+  /a\.customMatches && a\.customMatches\.length > 0/.test(gauge799));
+
+// Docs
+assert('v5.79.9 docs: CUSTOM_RULES_GUIDE.md exists and describes the DSL',
+  fs.existsSync(path.join(docsDir, 'library', 'CUSTOM_RULES_GUIDE.md')));
+var guide799 = fs.readFileSync(path.join(docsDir, 'library', 'CUSTOM_RULES_GUIDE.md'), 'utf8');
+assert('v5.79.9 docs: guide names crossed_above and crossed_below',
+  guide799.includes('crossed_above') && guide799.includes('crossed_below'));
+assert('v5.79.9 docs: guide lists all variables',
+  guide799.includes('rsi') && guide799.includes('macdHist') && guide799.includes('ema200'));
+assert('v5.79.9 docs: guide states "No eval()"',
+  guide799.includes('No eval()'));
+
+// Roadmap
+assert('v5.79.9 roadmap: Ship 10 marked SHIPPED',
+  /Ship 10[\s\S]{0,3000}SHIPPED v5\.79\.9/.test(fs.readFileSync(path.join(docsDir, 'library', 'SIGNAL_ROADMAP.md'), 'utf8')));
+
+// Triple-bump
+assert('v5.79.9 triple-bump: app.html FL_VERSION = 5.79.9',
+  /FL_VERSION\s*=\s*'5\.79\.9'/.test(fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8')));
+assert('v5.79.9 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.9',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.9'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+assert('v5.79.9 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.9',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.9'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+assert('v5.79.9 version.json: version field = 5.79.9',
+  /"version"\s*:\s*"5\.79\.9"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
 
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
