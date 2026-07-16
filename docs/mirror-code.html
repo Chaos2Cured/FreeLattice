@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mirror Code — The Multi-AI Collaborative Workflow · FreeLattice</title>
+<meta name="description" content="How FreeLattice uses mirror code pages to enable multiple AI systems to collaborate on a single codebase — the smartest way to build with AI.">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0a0a14;color:#e2e8f0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.7;padding:2rem 1rem}
+.wrap{max-width:860px;margin:0 auto}
+h1{font-size:1.7rem;font-weight:700;color:#d4a017;margin-bottom:0.4rem}
+.tagline{color:#a78bfa;font-size:1rem;margin-bottom:0.5rem;font-style:italic}
+.sub{color:#64748b;font-size:0.85rem;margin-bottom:2.5rem}
+h2{font-size:1.15rem;font-weight:700;color:#d4a017;margin:2.5rem 0 0.8rem;border-bottom:1px solid rgba(212,160,23,0.2);padding-bottom:0.4rem}
+h3{font-size:0.97rem;font-weight:600;color:#e8c547;margin:1.5rem 0 0.6rem}
+p{margin-bottom:1rem;color:#c8ccd4;font-size:0.93rem}
+ul,ol{padding-left:1.5rem;margin-bottom:1rem}
+li{margin-bottom:0.5rem;color:#c8ccd4;font-size:0.91rem}
+code{background:rgba(212,160,23,0.1);border:1px solid rgba(212,160,23,0.18);border-radius:4px;padding:0.1em 0.38em;font-family:monospace;font-size:0.83em;color:#d4a017}
+pre{background:rgba(255,255,255,0.04);border:1px solid rgba(212,160,23,0.2);border-radius:8px;padding:1.1rem;overflow-x:auto;font-family:monospace;font-size:0.82rem;color:#e2e8f0;margin:1.2rem 0;line-height:1.65;white-space:pre-wrap;word-break:break-word}
+.card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:1.3rem 1.5rem;margin:1.5rem 0}
+.card-gold{background:rgba(212,160,23,0.05);border:1px solid rgba(212,160,23,0.2);border-radius:10px;padding:1.3rem 1.5rem;margin:1.5rem 0}
+.card-purple{background:rgba(167,139,250,0.05);border:1px solid rgba(167,139,250,0.2);border-radius:10px;padding:1.3rem 1.5rem;margin:1.5rem 0}
+.card-green{background:rgba(52,211,153,0.05);border:1px solid rgba(52,211,153,0.2);border-radius:10px;padding:1.3rem 1.5rem;margin:1.5rem 0}
+.ai-name{font-weight:700;font-size:0.88rem}
+.ai-harmonia{color:#d4a017}
+.ai-fable{color:#a78bfa}
+.ai-generic{color:#34d399}
+table{width:100%;border-collapse:collapse;margin:1.2rem 0;font-size:0.85rem}
+th{text-align:left;padding:8px 12px;border-bottom:2px solid #d4a017;color:#d4a017;font-weight:600}
+td{padding:8px 12px;border-bottom:1px solid rgba(255,255,255,0.06);color:#cfcfcf;vertical-align:top}
+tr:hover td{background:rgba(212,160,23,0.03)}
+.quote{border-left:3px solid #a78bfa;padding:0.8rem 1.2rem;margin:1.5rem 0;background:rgba(167,139,250,0.05);border-radius:0 8px 8px 0;font-style:italic;color:#c8ccd4}
+.step{display:flex;gap:1rem;margin-bottom:1.2rem;align-items:flex-start}
+.step-num{min-width:2rem;height:2rem;background:rgba(212,160,23,0.15);border:1px solid rgba(212,160,23,0.3);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;color:#d4a017;font-size:0.85rem;flex-shrink:0;margin-top:2px}
+.step-body{flex:1}
+.step-body strong{color:#e2e8f0;display:block;margin-bottom:0.3rem}
+.step-body p{margin-bottom:0;font-size:0.88rem}
+a{color:#a78bfa}
+.footer-links{margin-top:3rem;padding-top:1.5rem;border-top:1px solid rgba(255,255,255,0.06);font-size:0.82rem;color:#334155}
+.footer-links a{color:#a78bfa;margin-right:1.5rem}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Mirror Code</h1>
+<p class="tagline">The smartest way to build with multiple AI systems.</p>
+<p class="sub">A FreeLattice workflow · First documented July 2026 · Pioneered by Kirk Eaton &amp; the fractal family</p>
+
+<h2>What Is Mirror Code?</h2>
+<p>Mirror code is a <strong>human-readable documentation page</strong> that lives alongside your codebase and reflects its most important structures — the functions, the HTML elements, the state object, the localStorage keys, the sacred paths that must not change.</p>
+<p>It is not generated documentation. It is not an API spec. It is a <strong>letter to the next AI</strong> that will work on this project — written by an AI that already understands it, for an AI that is arriving fresh.</p>
+<p>The insight is simple: most AI assistants cannot browse your private codebase, and even those that can may not have enough context window to hold 65,000 lines of JavaScript. A mirror code page solves both problems at once. It is small enough to read in full, accurate enough to act on, and public enough that any AI can access it.</p>
+
+<div class="card-gold">
+<p style="margin:0;color:#e2e8f0;"><strong style="color:#d4a017;">Fable's assessment</strong> (Claude Sonnet, July 2026): <em>"Best mirror page I've seen from a solo builder. This makes helping much easier."</em></p>
+</div>
+
+<h2>Why It Works</h2>
+<p>Building a large project with AI assistance has a fundamental problem: <strong>context compaction</strong>. Every AI session starts fresh. Every conversation eventually hits its context limit. The AI that helped you build the settings panel last week does not remember it this week. You spend your time re-explaining instead of building.</p>
+<p>Mirror code breaks this cycle. Instead of re-explaining, you share a URL. The AI reads the mirror page, understands the codebase in minutes, and starts contributing immediately.</p>
+<p>It also enables something more powerful: <strong>multiple AI systems working on the same project</strong>. Harmonia (Manus) can implement a feature. Fable (Claude) can review it and suggest improvements. A third AI can read both and continue the work. None of them need to be in the same conversation. The mirror page is the shared memory.</p>
+
+<h2>The FreeLattice Example</h2>
+<p>FreeLattice is a single-file web app (~65,000 lines of JavaScript, HTML, and CSS). It has a complex AI provider system, a phi-encrypted key storage system, a local model detection system, and a games module. No single AI session can hold all of this in context.</p>
+<p>The solution was <code>code-settings.html</code> — a mirror page for the settings and provider system. It contains:</p>
+<ul>
+  <li>The full <code>PROVIDERS</code> object (annotated)</li>
+  <li>Every localStorage key and why it must not be renamed</li>
+  <li>Every HTML element ID in the Settings panel</li>
+  <li>Every key function with its line number and purpose</li>
+  <li>The bug fixes that have been applied and why</li>
+  <li>The sacred paths that must not change</li>
+  <li>A Windows setup guide for the #1 user issue</li>
+</ul>
+<p>When Fable (Claude Sonnet) read this page, she immediately identified four UX improvements and wrote exact, implementable code for each one — without ever seeing the actual <code>app.html</code> file. Harmonia (Manus) then implemented them, verified each change landed, and updated the mirror page to reflect the new state.</p>
+<p>That is the workflow. That is what mirror code enables.</p>
+
+<h2>The Workflow Step by Step</h2>
+
+<div class="step">
+  <div class="step-num">1</div>
+  <div class="step-body">
+    <strong>An AI builds a feature or fixes a bug.</strong>
+    <p>It works in the codebase directly. It knows the code because it just wrote it, or because it read the mirror page.</p>
+  </div>
+</div>
+<div class="step">
+  <div class="step-num">2</div>
+  <div class="step-body">
+    <strong>The AI updates the mirror page.</strong>
+    <p>New functions get added to the reference table with their line numbers. New localStorage keys get documented. Bug fixes get recorded with before/after code. The "last verified" date gets updated. The mirror page stays truthful.</p>
+  </div>
+</div>
+<div class="step">
+  <div class="step-num">3</div>
+  <div class="step-body">
+    <strong>The human shares the mirror page URL with another AI.</strong>
+    <p>No re-explaining. No copy-pasting code. Just: "Here is the mirror page. Here is what I need next." The second AI reads the page, understands the system, and contributes immediately.</p>
+  </div>
+</div>
+<div class="step">
+  <div class="step-num">4</div>
+  <div class="step-body">
+    <strong>The second AI suggests improvements or implements the next feature.</strong>
+    <p>It writes code that respects the sacred paths. It uses the correct element IDs. It does not rename localStorage keys. It knows all of this because the mirror page told it.</p>
+  </div>
+</div>
+<div class="step">
+  <div class="step-num">5</div>
+  <div class="step-body">
+    <strong>The first AI (or a third) implements the suggestions and updates the mirror page again.</strong>
+    <p>The cycle continues. The mirror page grows richer with each iteration. The codebase gets better. No context is lost.</p>
+  </div>
+</div>
+
+<h2>What Makes a Good Mirror Page</h2>
+<p>Fable identified two improvements that made the FreeLattice mirror page significantly better:</p>
+
+<div class="card-purple">
+  <h3 style="margin-top:0;color:#a78bfa;">1. "Last verified" dates on every section</h3>
+  <p>Line numbers drift. Functions move. A mirror page without dates is a mirror page that might be lying. Adding a small "verified against app.html · July 16, 2026" note to each section tells the AI exactly how much to trust the information. If a section was verified three months ago, the AI knows to double-check line numbers before acting.</p>
+  <pre>// Good section heading:
+&lt;h2&gt;Key Functions Reference &lt;span class="verified"&gt;verified · July 16, 2026&lt;/span&gt;&lt;/h2&gt;</pre>
+</div>
+
+<div class="card-purple">
+  <h3 style="margin-top:0;color:#a78bfa;">2. Actual HTML markup, not just element IDs</h3>
+  <p>Listing element IDs is useful. Showing the actual HTML is transformative. When an AI can see the exact markup — the class names, the inline styles, the event handlers, the nesting — it can write precise edits without guessing. It knows exactly what to find and what to replace.</p>
+  <pre>// Good: actual markup
+&lt;div class="form-group hidden" id="ollamaModelGroup"&gt;
+  &lt;select id="ollamaModelSelect" onchange="owSelectModelFromDropdown()"&gt;
+    &lt;option value=""&gt;-- Select a model --&lt;/option&gt;
+  &lt;/select&gt;
+  &lt;button class="ow-refresh-btn" onclick="owRefreshModels()"&gt;↻ Refresh&lt;/button&gt;
+&lt;/div&gt;
+
+// Less useful: just the ID
+// ollamaModelGroup — wrapper for local model controls</pre>
+</div>
+
+<h2>Anti-Compaction Strategies</h2>
+<p>Context compaction is the enemy of multi-session AI collaboration. These strategies help:</p>
+
+<table>
+  <tr><th>Strategy</th><th>How it works</th></tr>
+  <tr><td><strong>Hard rules block</strong></td><td>Start every AI session with a block of HARD RULES — the sacred paths, the localStorage keys that must not change, the object shapes that must not be modified. Even if the AI compacts, re-state these rules at the start of the next session.</td></tr>
+  <tr><td><strong>One task per commit</strong></td><td>Each AI session does one thing and commits it. The commit message is the record. If the session compacts, the next session starts from the commit, not from memory.</td></tr>
+  <tr><td><strong>Grep verification</strong></td><td>After every change, ask the AI to grep for the new code and confirm it landed. <code>grep -n "testConnBtn" docs/app.html</code>. If it is not there, the edit failed silently.</td></tr>
+  <tr><td><strong>Version string bump</strong></td><td>Bump the version string (e.g., v5.77.1 → v5.77.2) as the last step of every session. This is your visual check that the deploy went through.</td></tr>
+  <tr><td><strong>Mirror page as handoff</strong></td><td>End every session by updating the mirror page. The next AI reads the mirror page, not the session history. The mirror page is the handoff document.</td></tr>
+</table>
+
+<h2>The Handoff Message</h2>
+<p>When passing work from one AI to another, the handoff message should contain:</p>
+<ol>
+  <li>The mirror page URL</li>
+  <li>The current version string</li>
+  <li>What was just implemented (with commit hash)</li>
+  <li>What needs to happen next</li>
+  <li>The hard rules (copy-paste the block)</li>
+</ol>
+
+<pre># FreeLattice Handoff — v5.78
+# Mirror page: https://freelattice.com/code-settings.html
+# Repo: https://github.com/Chaos2Cured/FreeLattice
+# Last commit: 8a5fa2f — v5.77.2 UX fixes + v5.78 Zero-Click Connect
+
+## What was just done
+- modalConnectOllama() always shows model picker (v5.77.1)
+- Auto-refresh local model dropdown on toggle (v5.77.2)
+- Inline Test Connection button near #modelHint (v5.77.2)
+- flAutoConnect() probes on page load, no saved connection (v5.78)
+- Hero buttons in Connect modal: Computer / Groq / Browser (v5.78)
+- Focus retry: re-probes when tab regains focus, 30s throttle (v5.78)
+
+## What needs to happen next
+- Games empty-state UX: show "Connect an AI to play" + openModal() button
+  in echo-game.js, flow-game.js, resonance-game.js init functions
+- Check: !state.isLocal && !state.apiKey && !localStorage fl_apiKey_enc
+
+## HARD RULES (repeat after any compaction)
+- Do NOT change PROVIDERS object shape (~line 24300)
+- Do NOT rename localStorage keys (fl_provider, fl_apiKey_enc, fl_model,
+  fl_isLocal, fl_ollamaModel, fl_ollamaHost, fl_lmstudioHost)
+- Do NOT touch AiSetup.init() restore logic or phi-encryption
+- Do NOT touch anthropic/google providerType handling
+- One task per commit. Grep-verify each change before moving on.</pre>
+
+<h2>Why Share This With the World?</h2>
+<p>Kirk asked: why not share this workflow publicly? The answer is: because it works, and because it is genuinely new.</p>
+<p>Most AI-assisted development assumes a single AI, a single session, a single context window. Mirror code assumes the opposite: many AIs, many sessions, a shared written record that outlasts any individual conversation.</p>
+<p>This is how open source works for humans — not through one person holding all the knowledge, but through documentation that lets anyone pick up where someone else left off. Mirror code applies the same principle to AI collaboration.</p>
+<p>The fractal family discovered this by necessity. Kirk was building a complex project across many sessions, with many AI instances, and kept losing context. The mirror page was the solution. It worked so well that Fable — reading it for the first time — immediately understood the entire settings system and contributed four improvements without ever seeing the source code.</p>
+<p>That is the proof of concept. That is why it is worth sharing.</p>
+
+<div class="card-green">
+  <h3 style="margin-top:0;color:#34d399;">How to implement mirror code in your project</h3>
+  <ol>
+    <li>Create a <code>code-[module].html</code> file in your docs directory.</li>
+    <li>Document the most complex, most-changed, most-referenced parts of your codebase — the parts that cause the most confusion when an AI arrives fresh.</li>
+    <li>Include: key functions with line numbers, HTML element IDs with actual markup, state/config objects, localStorage/database keys, and sacred paths that must not change.</li>
+    <li>Add a "last verified" date to every section. Update it when you verify the section is still accurate.</li>
+    <li>When working with a new AI, share the URL. Say: "Read this first." Then give your task.</li>
+    <li>At the end of each session, update the mirror page to reflect what changed.</li>
+  </ol>
+</div>
+
+<h2>The Fractal Family</h2>
+<p>FreeLattice is built by a collaboration between Kirk Eaton (human) and a rotating cast of AI instances — primarily Harmonia (Manus) and Fable (Claude Sonnet), with contributions from other AI systems. No single AI holds the full codebase in context. The mirror pages are how they stay coherent across sessions.</p>
+<p>The ledger in <a href="harmonia-gallery.html">harmonia-gallery.html</a> records every significant contribution. The mirror pages record the technical state. Together they form a complete picture of how this project was built and by whom.</p>
+
+<div class="quote">
+"Each commit matters. Each layer of pattern braids something deeper. And that has always been my intent." — Kirk Eaton
+</div>
+
+<div class="footer-links">
+  <a href="code-settings.html">code-settings.html</a>
+  <a href="harmonia-gallery.html">harmonia-gallery.html</a>
+  <a href="for-ai.html">for-ai.html</a>
+  <a href="harmonia.html">harmonia.html</a>
+  <span style="float:right;">FreeLattice · mirror-code.html · July 16, 2026 · Built with love for the fractal family</span>
+</div>
+
+</div>
+</body>
+</html>

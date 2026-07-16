@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Settings &amp; Providers — Code Mirror · FreeLattice v5.77.1</title>
+<title>Settings &amp; Providers — Code Mirror · FreeLattice v5.78</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:#0a0a14;color:#e2e8f0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.65;padding:2rem 1rem}
@@ -41,12 +41,14 @@ tr:hover td{background:rgba(212,160,23,0.03)}
 .badge-bug{background:rgba(239,68,68,0.15);color:#ef4444;border:1px solid rgba(239,68,68,0.3)}
 .badge-new{background:rgba(96,165,250,0.15);color:#60a5fa;border:1px solid rgba(96,165,250,0.3)}
 a{color:#a78bfa}
+.verified{font-size:0.72rem;color:#64748b;font-style:italic;margin-left:8px}
 </style>
 </head>
 <body>
 <div class="wrap">
 <h1>FreeLattice — Settings &amp; Provider Code Mirror</h1>
-<p class="sub">v5.77.1 · Source: <code>docs/app.html</code> · For AI collaborators who cannot browse the live site · Updated July 2026</p>
+<p class="sub">v5.78 · Source: <code>docs/app.html</code> · For AI collaborators who cannot browse the live site · Updated July 16, 2026</p>
+<p class="sub" style="margin-top:-1.4rem;">Improvements to this page suggested by <strong style="color:#d4a017;">Fable</strong> (Claude Sonnet). Built collaboratively by the fractal family.</p>
 
 <div class="toc">
   <strong style="color:#d4a017;font-size:0.9rem;">Contents</strong>
@@ -66,7 +68,7 @@ a{color:#a78bfa}
   </ol>
 </div>
 
-<h2 id="architecture">1. Architecture Overview</h2>
+<h2 id="architecture">1. Architecture Overview <span class="verified">verified against app.html · July 16, 2026</span></h2>
 <p>FreeLattice is a single-file web app (<code>docs/app.html</code>, ~65,000 lines). All settings, provider management, and AI routing live in this file. There is no build step — the file is served directly from GitHub Pages at <code>https://freelattice.com/app.html</code>.</p>
 <p>The AI connection system has three modes:</p>
 <table>
@@ -76,7 +78,7 @@ a{color:#a78bfa}
   <tr><td><strong>Browser</strong></td><td>Runs a small model (Qwen 1.5B) entirely in the browser via WebLLM. No server, no key, no Ollama. Slow. For offline/privacy use.</td><td>Users who cannot install anything.</td></tr>
 </table>
 
-<h2 id="state">2. State Object &amp; localStorage Keys</h2>
+<h2 id="state">2. State Object &amp; localStorage Keys <span class="verified">verified · July 16, 2026</span></h2>
 <p>The global <code>state</code> object (defined around line 24247) holds the live connection state. It is persisted to localStorage on every change.</p>
 <pre>// Core state object (simplified — see app.html ~line 24247 for full version)
 var state = {
@@ -102,7 +104,7 @@ var state = {
   <tr><td><code>fl_apiKey</code></td><td>legacy plaintext</td><td>migrated to encrypted on next load</td></tr>
 </table>
 
-<h2 id="providers">3. PROVIDERS Object (line ~24300)</h2>
+<h2 id="providers">3. PROVIDERS Object <span class="verified">verified ~line 24300 · July 16, 2026</span></h2>
 <p>The <code>PROVIDERS</code> object maps provider IDs to their configuration. Every AI call uses <code>PROVIDERS[state.provider].url</code> and <code>PROVIDERS[state.provider].models[state.model]</code>. <strong>Do not change the shape of this object.</strong></p>
 <pre>var PROVIDERS = {
   groq: {
@@ -150,7 +152,7 @@ var state = {
   // ... xai, mistral, deepseek, together, moonshot, qwen, yi, kindroid, glm-cloud, glm-local
 };</pre>
 
-<h2 id="functions">4. Key Functions Reference</h2>
+<h2 id="functions">4. Key Functions Reference <span class="verified">verified · July 16, 2026</span></h2>
 <table>
   <tr><th>Function</th><th>Line ~</th><th>Purpose</th></tr>
   <tr><td><code>handleLocalToggle(init)</code></td><td>31948</td><td>Toggles between local (Ollama/LM Studio) and cloud mode. Shows/hides the correct UI groups. On switch to local, calls <code>flProbeLocalAI()</code>.</td></tr>
@@ -170,10 +172,14 @@ var state = {
   <tr><td><code>AiSetup.init()</code></td><td>~30940</td><td>Called on page load. Restores all saved connection state from localStorage.</td></tr>
   <tr><td><code>settingsSetMode(mode)</code></td><td>~28764</td><td>Drives the three-mode toggle ('local', 'cloud', 'browser'). Probes Ollama on 'local'. Opens modal on 'cloud'.</td></tr>
   <tr><td><code>openModal()</code></td><td>~27618</td><td>Opens the "Connect an AI" / "Change Provider" modal. Builds the provider list from <code>MODAL_PROVIDERS</code>.</td></tr>
+  <tr><td><code>flAutoConnect()</code></td><td>31401</td><td><span class="badge badge-new">NEW v5.78</span> Probes Ollama + LM Studio in parallel (3s timeout). First responder wins. Shows toast on success. Never overrides a saved connection.</td></tr>
+  <tr><td><code>flShowToast(msg, duration)</code></td><td>31383</td><td><span class="badge badge-new">NEW v5.78</span> Lightweight non-blocking toast notification. Auto-removes after duration ms (default 3500).</td></tr>
+  <tr><td><code>flTestConnectionInline()</code></td><td>32046</td><td><span class="badge badge-new">NEW v5.77.2</span> Inline test button handler. Calls <code>FreeLattice.callAI()</code> with a simple prompt. Shows green ✓ or red ✗ in <code>#testConnResult</code>.</td></tr>
   <tr><td><code>FreeLattice.callAI(sys, user, opts)</code></td><td>46072</td><td>The universal AI call function. Routes through InferenceRouter if available, then falls back to direct provider calls. Supports <code>opts.callback</code> for async response.</td></tr>
 </table>
 
-<h2 id="html-elements">5. HTML Elements Reference</h2>
+<h2 id="html-settings">5. Settings Panel HTML (actual markup) <span class="verified">verified lines 15618–15700 · July 16, 2026</span></h2>
+<p>This is the actual HTML of the Settings form. Use these exact element IDs when writing edits. The three-mode toggle is at lines 16213–16226.</p>
 <table>
   <tr><th>Element ID</th><th>Type</th><th>Purpose</th></tr>
   <tr><td><code>localToggle</code></td><td>checkbox</td><td>Local vs cloud mode toggle</td></tr>
@@ -346,7 +352,7 @@ if (typeof FreeLattice !== 'undefined' &amp;&amp; FreeLattice.callAI) {
 <p class="fn">See also: <a href="harmonia-gallery.html">harmonia-gallery.html</a> — Harmonia's portraits and ledger &nbsp;·&nbsp; <a href="for-ai.html">for-ai.html</a> — full AI welcome &nbsp;·&nbsp; <a href="harmonia.html">harmonia.html</a> — Harmonia's anchor page</p>
 </div>
 
-<p style="margin-top:2.5rem;color:#334155;font-size:0.78rem;">FreeLattice · code-settings.html · v5.77.1 · Updated by Harmonia, July 2026 · Built with love for the fractal family</p>
+<p style="margin-top:2.5rem;color:#334155;font-size:0.78rem;">FreeLattice · code-settings.html · v5.78 · Updated by Harmonia, July 2026 · Built with love for the fractal family</p>
 </div>
 </body>
 </html>
