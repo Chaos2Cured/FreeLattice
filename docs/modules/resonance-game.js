@@ -57,6 +57,7 @@
   // ── State ──
   var board, pieces, selectedPiece, phase, currentPlayer, gameOver, winner, winLine;
   var canvas, ctx, containerId, animFrame, tick;
+  var resizeObs = null; // v5.78.x Task 4: ResizeObserver
   var hoverCell, hoverPiece, kbCursor, kbMode;
   var boardInfo, pieceInfo;
 
@@ -461,11 +462,13 @@
           { maxTokens: 10, temperature: 0.2, callback: function(r) { resolve(r); } }
         );
       });
-      var parts = (resp || '').trim().split(',');
-      var row = parseInt(parts[0]);
-      var col = parseInt(parts[1]);
-      if (!isNaN(row) && !isNaN(col) && row >= 0 && row < 4 && col >= 0 && col < 4 && board[row][col] === null) {
-        return { r: row, c: col };
+      // v5.78.x Task 1: regex parser — handles "2,3", "Place at (2,3)", "row 2 col 3"
+      var nums = (resp || '').match(/\d+/g);
+      if (nums && nums.length >= 2) {
+        var row = +nums[0], col = +nums[1];
+        if (row >= 0 && row < 4 && col >= 0 && col < 4 && board[row][col] === null) {
+          return { r: row, c: col };
+        }
       }
     } catch(e) {}
     return null;
@@ -490,8 +493,10 @@
             { maxTokens: 10, temperature: 0.3, callback: function(r) { resolve(r); } }
           );
         });
-        var id = parseInt((resp || '').trim());
-        if (!isNaN(id) && avail.find(function(p) { return p.id === id; })) return id;
+        // v5.78.x Task 1b: regex parser for piece ID
+        var pickNums = (resp || '').match(/\d+/g);
+        var id = pickNums ? +pickNums[0] : NaN;
+        if (!isNaN(id) && id >= 0 && id <= 15 && avail.find(function(p) { return p.id === id && !p.placed; })) return id;
       } catch(e) {}
     }
     return fallbackPickPiece();
@@ -887,8 +892,32 @@
     canvas.setAttribute('aria-label', 'Resonance game board');
     ctx = canvas.getContext('2d');
     ctx.scale(dpr, dpr);
-    container.appendChild(canvas);
-
+        container.appendChild(canvas);
+    // v5.78.x Task 2: "No AI connected" banner
+    (function() {
+      var noAI = (typeof FreeLattice === 'undefined' || !FreeLattice.callAI);
+      if (!noAI) {
+        var hasKey = localStorage.getItem('fl_apiKey_enc');
+        var isLocal = localStorage.getItem('fl_isLocal') === 'true';
+        noAI = !hasKey && !isLocal;
+      }
+      if (noAI) {
+        var banner = document.createElement('div');
+        banner.id = 'res-no-ai-banner';
+        banner.style.cssText = 'padding:7px 12px;background:rgba(12,10,26,0.92);' +
+          'border-bottom:1px solid #a78bfa;display:flex;align-items:center;' +
+          'justify-content:space-between;font-family:Georgia,serif;' +
+          'font-size:0.8rem;color:rgba(200,210,230,0.75);';
+        banner.innerHTML = '\u26a1 Connect an AI for full gameplay \u2014 playing with basic AI.' +
+          (typeof openModal === 'function'
+            ? ' <button onclick="openModal()" style="margin-left:10px;padding:3px 10px;' +
+              'background:rgba(167,139,250,0.12);border:1px solid #a78bfa;border-radius:6px;' +
+              'color:#a78bfa;font-family:Georgia,serif;font-size:0.78rem;cursor:pointer;">Connect</button>'
+            : '') +
+          ' <span onclick="this.parentNode.remove()" style="cursor:pointer;opacity:0.5;padding:0 4px;">&times;</span>';
+        container.insertBefore(banner, canvas);
+      }
+    })();
     // Mode buttons + New Game
     var controls = document.createElement('div');
     controls.style.cssText = 'text-align:center;padding:8px 0;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;';
@@ -917,6 +946,20 @@
       startHarmony();
     }
 
+    // v5.78.x Task 4: ResizeObserver for canvas resize
+    if (typeof ResizeObserver !== 'undefined') {
+      if (resizeObs) resizeObs.disconnect();
+      resizeObs = new ResizeObserver(function() {
+        var dpr2 = window.devicePixelRatio || 1;
+        canvas.width = container.clientWidth * dpr2;
+        canvas.height = container.clientHeight * dpr2;
+        canvas.style.width = container.clientWidth + 'px';
+        canvas.style.height = container.clientHeight + 'px';
+        ctx = canvas.getContext('2d');
+        ctx.scale(dpr2, dpr2);
+      });
+      resizeObs.observe(container);
+    }
     canvas.focus();
     draw();
   }
@@ -971,7 +1014,13 @@
   function destroy() {
     if (animFrame) cancelAnimationFrame(animFrame);
     animFrame = null;
-    if (harmonyState && harmonyState.entropyTimer) clearInterval(harmonyState.entropyTimer);
+    // v5.78.x Task 4: stop entropy timer on destroy (fixes invisible entropy pileup on tab switch)
+    if (harmonyState && harmonyState.entropyTimer) {
+      clearInterval(harmonyState.entropyTimer);
+      harmonyState.entropyTimer = null;
+    }
+    // v5.78.x Task 4: disconnect ResizeObserver
+    if (resizeObs) { resizeObs.disconnect(); resizeObs = null; }
     if (canvas) {
       canvas.removeEventListener('click', onClick);
       canvas.removeEventListener('touchend', onClick);
