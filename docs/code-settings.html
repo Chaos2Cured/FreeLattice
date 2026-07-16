@@ -3,20 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Settings — Code Mirror · FreeLattice</title>
+<title>Settings &amp; Providers — Code Mirror · FreeLattice v5.77.1</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:#0a0a14;color:#e2e8f0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.65;padding:2rem 1rem}
-.wrap{max-width:860px;margin:0 auto}
+.wrap{max-width:900px;margin:0 auto}
 h1{font-size:1.6rem;font-weight:700;color:#d4a017;margin-bottom:0.35rem}
 .sub{color:#64748b;font-size:0.85rem;margin-bottom:2rem}
-h2{font-size:1.15rem;font-weight:700;color:#d4a017;margin:2rem 0 0.75rem;border-bottom:1px solid rgba(212,160,23,0.2);padding-bottom:0.4rem}
+h2{font-size:1.15rem;font-weight:700;color:#d4a017;margin:2.2rem 0 0.75rem;border-bottom:1px solid rgba(212,160,23,0.2);padding-bottom:0.4rem}
 h3{font-size:0.97rem;font-weight:600;color:#e8c547;margin:1.4rem 0 0.5rem}
 p{margin-bottom:0.9rem;color:#c8ccd4;font-size:0.92rem}
 ul,ol{padding-left:1.4rem;margin-bottom:0.9rem}
 li{margin-bottom:0.4rem;color:#c8ccd4;font-size:0.9rem}
 code{background:rgba(212,160,23,0.1);border:1px solid rgba(212,160,23,0.18);border-radius:4px;padding:0.1em 0.38em;font-family:monospace;font-size:0.83em;color:#d4a017}
-pre{background:rgba(255,255,255,0.04);border:1px solid rgba(212,160,23,0.2);border-radius:8px;padding:1rem;overflow-x:auto;font-family:monospace;font-size:0.82rem;color:#e2e8f0;margin:1rem 0;line-height:1.6}
+pre{background:rgba(255,255,255,0.04);border:1px solid rgba(212,160,23,0.2);border-radius:8px;padding:1rem;overflow-x:auto;font-family:monospace;font-size:0.82rem;color:#e2e8f0;margin:1rem 0;line-height:1.6;white-space:pre-wrap;word-break:break-word}
 table{width:100%;border-collapse:collapse;margin:1.2rem 0;font-size:0.85rem}
 th{text-align:left;padding:8px 12px;border-bottom:2px solid #d4a017;color:#d4a017;font-weight:600}
 td{padding:8px 12px;border-bottom:1px solid rgba(255,255,255,0.06);color:#cfcfcf;vertical-align:top}
@@ -27,198 +27,326 @@ tr:hover td{background:rgba(212,160,23,0.03)}
 .warn p{margin-bottom:0;color:#e2e8f0}
 .green{background:rgba(52,211,153,0.07);border-left:3px solid #34d399;padding:0.9rem 1.1rem;margin:1.4rem 0;border-radius:0 8px 8px 0}
 .green p{margin-bottom:0;color:#e2e8f0}
-.panel-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:0.75rem;margin:1rem 0}
-.panel-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:0.85rem 1rem}
-.panel-name{font-weight:600;font-size:0.9rem;margin-bottom:0.25rem}
-.panel-desc{color:#666;font-size:0.78rem;line-height:1.45}
-.collab-box{background:rgba(212,160,23,0.06);border:1px solid rgba(212,160,23,0.3);border-radius:10px;padding:1.25rem 1.5rem;margin:2rem 0}
-.collab-box h3{color:#d4a017;margin-top:0}
-.collab-box p,.collab-box li{font-size:0.9rem;color:#e0e0e0}
-.collab-box ul{padding-left:1.25rem;margin:0.5rem 0}
-.collab-box li{margin-bottom:0.4rem}
-.fn{color:#666;font-size:0.78rem;font-family:monospace}
-a{color:#d4a017}
+.red{background:rgba(239,68,68,0.07);border-left:3px solid #ef4444;padding:0.9rem 1.1rem;margin:1.4rem 0;border-radius:0 8px 8px 0}
+.red p{margin-bottom:0;color:#e2e8f0}
+.collab-box{background:rgba(167,139,250,0.07);border:1px solid rgba(167,139,250,0.2);border-radius:10px;padding:1.2rem 1.4rem;margin:2rem 0}
+.collab-box h3{color:#a78bfa;margin-top:0}
+.fn{font-size:0.8rem;color:#64748b;margin-top:0.8rem}
+.toc{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:1rem 1.4rem;margin-bottom:2rem}
+.toc a{color:#a78bfa;text-decoration:none;font-size:0.88rem}
+.toc a:hover{color:#d4a017}
+.toc li{margin-bottom:0.25rem}
+.badge{display:inline-block;font-size:0.7rem;font-weight:700;padding:2px 7px;border-radius:10px;margin-left:6px;vertical-align:middle}
+.badge-fix{background:rgba(52,211,153,0.15);color:#34d399;border:1px solid rgba(52,211,153,0.3)}
+.badge-bug{background:rgba(239,68,68,0.15);color:#ef4444;border:1px solid rgba(239,68,68,0.3)}
+.badge-new{background:rgba(96,165,250,0.15);color:#60a5fa;border:1px solid rgba(96,165,250,0.3)}
+a{color:#a78bfa}
 </style>
 </head>
 <body>
 <div class="wrap">
-<h1>⚙️ Settings — Code Mirror</h1>
-<p class="sub">FreeLattice · <code>app.html</code> (inline, ~line 16164) · Tab ID: <code>settings</code> · Settings wizard at line 14997</p>
+<h1>FreeLattice — Settings &amp; Provider Code Mirror</h1>
+<p class="sub">v5.77.1 · Source: <code>docs/app.html</code> · For AI collaborators who cannot browse the live site · Updated July 2026</p>
 
-<div class="note">
-  <p><strong>What this is:</strong> The Settings tab is the AI connection hub for FreeLattice. It presents a three-mode toggle (Browser / Cloud / Local), a connection wizard for cloud providers, and a Quick Ollama Setup flow for local AI. The <code>AiSetup</code> object manages connection state; <code>settingsSetMode()</code> drives the toggle. The wizard (<code>wizardInit()</code>) is a full-screen overlay that guides first-time users through provider selection and API key entry.</p>
+<div class="toc">
+  <strong style="color:#d4a017;font-size:0.9rem;">Contents</strong>
+  <ol style="margin-top:0.6rem">
+    <li><a href="#architecture">Architecture Overview</a></li>
+    <li><a href="#state">State Object &amp; localStorage Keys</a></li>
+    <li><a href="#providers">PROVIDERS Object</a></li>
+    <li><a href="#functions">Key Functions Reference</a></li>
+    <li><a href="#html-elements">HTML Elements Reference</a></li>
+    <li><a href="#modal">Change Provider Modal</a></li>
+    <li><a href="#local-mode">Local Mode (Ollama / LM Studio)</a></li>
+    <li><a href="#bug-fix">Bug Fix: v5.77.1 — Models Not Showing</a></li>
+    <li><a href="#windows">Windows Setup Guide (Under 10 Minutes)</a></li>
+    <li><a href="#games">Games: Echo, Flow, Resonance</a></li>
+    <li><a href="#open-issues">Open Issues &amp; What to Build Next</a></li>
+    <li><a href="#sacred">Sacred Paths — Do Not Change</a></li>
+  </ol>
 </div>
 
-<h2>Architecture Overview</h2>
-<pre>
-┌─────────────────────────────────────────────────────────────────┐
-│  #tab-settings                                                  │
-│  ├── Zone 1: Your AI                                            │
-│  │   ├── .ai-status-card  (#aiStatusCard)                       │
-│  │   │   ├── Three-mode toggle: Browser | Cloud | Local         │
-│  │   │   │   ├── #settingsModeBrowser → settingsSetMode('browser')│
-│  │   │   │   ├── #settingsModeCloud   → settingsSetMode('cloud') │
-│  │   │   │   └── #settingsModeLocal   → settingsSetMode('local') │
-│  │   │   ├── Status indicator: #settingsStatusDot + #settingsStatusText│
-│  │   │   └── Actions: Change Provider | Test Connection | Quick Ollama│
-│  │   └── #browserAICard (hidden unless Browser mode)            │
-│  │       └── Activate Browser AI → startBrowserAI()             │
-│  ├── Zone 2: Your Identity                                      │
-│  │   └── Mesh ID, display name, export/import                   │
-│  └── Zone 3: Appearance, Language, Data                         │
-│                                                                 │
-│  Provider Modal (overlay, opened by openProviderModal())        │
-│  └── AiSetup.openModal() → shows .ai-setup-banner              │
-│      ├── Provider buttons: Groq | OpenAI | Gemini | Grok | Local│
-│      ├── API key input (#aiSetupKeyInput)                       │
-│      └── Test Connection → AiSetup.testConnection()            │
-│                                                                 │
-│  Welcome Wizard (overlay, #wizardOverlay)                       │
-│  ├── Provider grid (line 14997):                                │
-│  │   groq* | together | openrouter | xai | mistral | custom | ollama│
-│  ├── API key section (#wizApiKeySection)                        │
-│  ├── Ollama instructions (#wizOllamaInstructions)               │
-│  └── Model selector (WIZARD_MODELS, line 39526)                 │
-└─────────────────────────────────────────────────────────────────┘
-</pre>
-
-<h2>The Three-Mode Toggle</h2>
-<p>The first choice a user makes in Settings. Implemented by <code>settingsSetMode(mode)</code> at line 28764.</p>
+<h2 id="architecture">1. Architecture Overview</h2>
+<p>FreeLattice is a single-file web app (<code>docs/app.html</code>, ~65,000 lines). All settings, provider management, and AI routing live in this file. There is no build step — the file is served directly from GitHub Pages at <code>https://freelattice.com/app.html</code>.</p>
+<p>The AI connection system has three modes:</p>
 <table>
-  <tr><th>Mode</th><th>Button ID</th><th>What it does</th><th>State stored</th></tr>
-  <tr><td><strong>Browser</strong></td><td><code>settingsModeBrowser</code></td><td>Shows <code>#browserAICard</code>. Activates WebLLM (in-browser AI, ~700MB download, works offline). No API key needed.</td><td><code>BrowserAI.ready</code></td></tr>
-  <tr><td><strong>Cloud</strong></td><td><code>settingsModeCloud</code></td><td>Opens the provider modal immediately. User picks a provider and pastes an API key.</td><td><code>fl_provider</code>, <code>fl_apikey</code> in localStorage</td></tr>
-  <tr><td><strong>Local</strong></td><td><code>settingsModeLocal</code></td><td>Probes <code>http://localhost:11434/api/tags</code> for Ollama. If found, auto-connects to first model. If not found, shows install instructions and "Get Connected" link.</td><td><code>fl_isLocal</code>, <code>fl_ollamaModel</code> in localStorage</td></tr>
+  <tr><th>Mode</th><th>How it works</th><th>Who it is for</th></tr>
+  <tr><td><strong>Local</strong></td><td>Connects to Ollama or LM Studio running on the user's machine. No API key needed. Uses <code>localhost:11434</code> (Ollama) or <code>localhost:1234</code> (LM Studio).</td><td>Power users with GPU. Best privacy.</td></tr>
+  <tr><td><strong>Cloud</strong></td><td>Uses a user-supplied API key. Supports Groq (free), OpenAI, Anthropic, Google, xAI, Mistral, DeepSeek, Together, Moonshot, Qwen, Yi, and custom OpenAI-compatible endpoints.</td><td>Most users. Groq is free and fast.</td></tr>
+  <tr><td><strong>Browser</strong></td><td>Runs a small model (Qwen 1.5B) entirely in the browser via WebLLM. No server, no key, no Ollama. Slow. For offline/privacy use.</td><td>Users who cannot install anything.</td></tr>
 </table>
 
-<div class="warn">
-  <p><strong>Known gap:</strong> The Local mode only probes Ollama. LM Studio (port 1234) is defined in <code>PROVIDERS.lmstudio</code> but has no wizard path. Users who run LM Studio must use the Custom Provider option in the cloud wizard — which is not obvious.</p>
-</div>
+<h2 id="state">2. State Object &amp; localStorage Keys</h2>
+<p>The global <code>state</code> object (defined around line 24247) holds the live connection state. It is persisted to localStorage on every change.</p>
+<pre>// Core state object (simplified — see app.html ~line 24247 for full version)
+var state = {
+  provider: 'groq',        // active cloud provider key
+  model: 'llama',          // model alias key (maps to real model via PROVIDERS)
+  apiKey: '',              // decrypted API key (never stored plaintext)
+  isLocal: false,          // true = Ollama/LM Studio mode
+  ollamaModel: 'llama3.2', // active local model name
+  chatHistory: [],         // current conversation
+  userName: '',            // user's display name
+};</pre>
 
-<h2>The AiSetup Object</h2>
-<p>Defined at line 27262 as an IIFE. Manages the connection banner in the Chat tab and the Settings card. Persists state to localStorage.</p>
+<h3>localStorage Keys — Do Not Rename (breaks existing users)</h3>
 <table>
-  <tr><th>Method</th><th>What it does</th></tr>
-  <tr><td><code>AiSetup.init()</code></td><td>Reads localStorage, restores connection state, calls <code>refreshBanner()</code></td></tr>
-  <tr><td><code>AiSetup.select(provider)</code></td><td>Shows the API key form for the chosen provider (or Ollama instructions)</td></tr>
-  <tr><td><code>AiSetup.testConnection()</code></td><td>Sends a test message to the selected provider's endpoint</td></tr>
-  <tr><td><code>AiSetup.testOllama()</code></td><td>Probes <code>localhost:11434</code> and tries a chat completion</td></tr>
-  <tr><td><code>AiSetup.testFromSettings()</code></td><td>Tests the current connection from the Settings tab (updates status dot)</td></tr>
-  <tr><td><code>AiSetup.refreshBanner()</code></td><td>Updates the Chat tab connection banner (connected / disconnected state)</td></tr>
-  <tr><td><code>AiSetup.refreshSettingsCard()</code></td><td>Updates the Settings tab status card</td></tr>
-  <tr><td><code>AiSetup.showFull()</code></td><td>Rebuilds the full provider-selection banner (called when user clicks "Change")</td></tr>
-  <tr><td><code>AiSetup.openModal()</code></td><td>Opens the provider modal overlay</td></tr>
-  <tr><td><code>AiSetup.closeModal()</code></td><td>Closes the provider modal</td></tr>
+  <tr><th>Key</th><th>Value</th><th>Notes</th></tr>
+  <tr><td><code>fl_provider</code></td><td>provider id string</td><td>e.g. 'groq', 'openai', 'ollama'</td></tr>
+  <tr><td><code>fl_model</code></td><td>model alias string</td><td>e.g. 'llama', 'mixtral', 'deepseek'</td></tr>
+  <tr><td><code>fl_isLocal</code></td><td>'true' or 'false'</td><td>local vs cloud mode</td></tr>
+  <tr><td><code>fl_ollamaModel</code></td><td>full model name</td><td>e.g. 'llama3.2', 'mistral:7b'</td></tr>
+  <tr><td><code>fl_ollamaHost</code></td><td>host:port string</td><td>default: empty (uses localhost:11434)</td></tr>
+  <tr><td><code>fl_apiKey_enc</code></td><td>phi-encrypted base64</td><td>never plaintext</td></tr>
+  <tr><td><code>fl_apiKey_provider</code></td><td>provider id</td><td>used to decrypt with correct phi-salt</td></tr>
+  <tr><td><code>fl_apiKey</code></td><td>legacy plaintext</td><td>migrated to encrypted on next load</td></tr>
 </table>
 
-<h3>AiSetup State (localStorage keys)</h3>
+<h2 id="providers">3. PROVIDERS Object (line ~24300)</h2>
+<p>The <code>PROVIDERS</code> object maps provider IDs to their configuration. Every AI call uses <code>PROVIDERS[state.provider].url</code> and <code>PROVIDERS[state.provider].models[state.model]</code>. <strong>Do not change the shape of this object.</strong></p>
+<pre>var PROVIDERS = {
+  groq: {
+    name: 'Groq',
+    url: 'https://api.groq.com/openai/v1/chat/completions',
+    models: {
+      llama:    'llama-3.3-70b-versatile',
+      mixtral:  'mistral-small-24b-instruct-2501',
+      deepseek: 'deepseek-r1-distill-llama-70b',
+      qwen:     'qwen-qwq-32b',
+    },
+    hint: 'Free tier — generous limits. Best starting point.',
+    keyUrl: 'https://console.groq.com/keys',
+  },
+  openai: {
+    name: 'OpenAI',
+    url: 'https://api.openai.com/v1/chat/completions',
+    models: { mixtral: 'gpt-4.1', llama: 'gpt-4.1-mini', deepseek: 'o4-mini' },
+    providerType: 'openai',
+  },
+  anthropic: {
+    name: 'Anthropic',
+    url: 'https://api.anthropic.com/v1/messages',
+    models: { deepseek: 'claude-opus-4-5', llama: 'claude-sonnet-4-5' },
+    providerType: 'anthropic', // SPECIAL: uses non-OpenAI request format
+  },
+  google: {
+    name: 'Google Gemini',
+    url: 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions',
+    models: { llama: 'gemini-2.5-flash-preview-05-20', deepseek: 'gemini-2.5-pro-preview-06-05' },
+    providerType: 'google',
+  },
+  ollama: {
+    name: 'Ollama (local)',
+    url: 'http://localhost:11434/v1/chat/completions', // updated at runtime
+    models: { llama: 'llama3.2', mixtral: 'mistral' },
+    isLocal: true,
+  },
+  lmstudio: {
+    name: 'LM Studio',
+    url: 'http://localhost:1234/v1/chat/completions',
+    models: { llama: 'default' },
+    isLocal: true,
+  },
+  // ... xai, mistral, deepseek, together, moonshot, qwen, yi, kindroid, glm-cloud, glm-local
+};</pre>
+
+<h2 id="functions">4. Key Functions Reference</h2>
 <table>
-  <tr><th>Key</th><th>Value</th></tr>
-  <tr><td><code>fl_provider</code></td><td>Provider ID string: <code>'groq'</code>, <code>'openai'</code>, <code>'google'</code>, <code>'xai'</code>, <code>'ollama'</code>, <code>'lmstudio'</code>, etc.</td></tr>
-  <tr><td><code>fl_apikey</code></td><td>Encrypted API key (base64 obfuscated, not truly secure)</td></tr>
-  <tr><td><code>fl_model</code></td><td>Model ID alias: <code>'llama'</code>, <code>'qwen'</code>, <code>'grok'</code>, etc. Resolved to full model name via <code>PROVIDERS[provider].models[model]</code></td></tr>
-  <tr><td><code>fl_isLocal</code></td><td><code>'true'</code> if using Ollama or LM Studio</td></tr>
-  <tr><td><code>fl_ollamaModel</code></td><td>Full Ollama model name, e.g. <code>'llama3.2'</code></td></tr>
-  <tr><td><code>fl_ollamaPort</code></td><td>Ollama port override (default 11434)</td></tr>
+  <tr><th>Function</th><th>Line ~</th><th>Purpose</th></tr>
+  <tr><td><code>handleLocalToggle(init)</code></td><td>31948</td><td>Toggles between local (Ollama/LM Studio) and cloud mode. Shows/hides the correct UI groups. On switch to local, calls <code>flProbeLocalAI()</code>.</td></tr>
+  <tr><td><code>handleProviderChange(init)</code></td><td>32037</td><td>Updates <code>state.provider</code> from the dropdown, calls <code>rebuildModelDropdown()</code>, saves to localStorage.</td></tr>
+  <tr><td><code>rebuildModelDropdown()</code></td><td>32124</td><td>Rebuilds the cloud model select based on the current provider.</td></tr>
+  <tr><td><code>owPopulateModels(models)</code></td><td>31484</td><td>Populates the local Ollama model dropdown from an array of model objects returned by <code>/api/tags</code>.</td></tr>
+  <tr><td><code>owRefreshModels()</code></td><td>31584</td><td>Fetches <code>/api/tags</code> from Ollama (proxy-aware) and calls <code>owPopulateModels()</code>. Called by the Refresh button.</td></tr>
+  <tr><td><code>owSelectModelFromDropdown()</code></td><td>31546</td><td>Handles user selecting a local model from the dropdown. Updates <code>state.ollamaModel</code> and localStorage.</td></tr>
+  <tr><td><code>modalConnectOllama()</code></td><td>28352</td><td><span class="badge badge-fix">FIXED v5.77.1</span> Opens the Ollama flow in the "Change Provider" modal. Now always shows the picker (even with 1 model). Uses proxy-first fetch with 5s timeout.</td></tr>
+  <tr><td><code>modalShowOllamaPicker(models)</code></td><td>28398</td><td>Shows a scrollable list of installed Ollama models in the modal. User taps one to activate.</td></tr>
+  <tr><td><code>modalActivateOllamaModel(name)</code></td><td>28376</td><td>Sets <code>state.isLocal=true</code>, saves the model, updates all UI elements, fires success flow.</td></tr>
+  <tr><td><code>flProbeLocalAI()</code></td><td>~27420</td><td>Probes Ollama (port 11434) and LM Studio (port 1234) in parallel. Auto-connects to whichever responds first.</td></tr>
+  <tr><td><code>getOllamaBaseUrl()</code></td><td>~31167</td><td>Returns the Ollama base URL. Checks <code>fl_ollamaHost</code> in localStorage; defaults to <code>http://localhost:11434</code>.</td></tr>
+  <tr><td><code>resolveOllamaBase(quiet)</code></td><td>~31130</td><td>Tries same-origin proxy (<code>/ollama/api/tags</code>) first, then direct. Returns the working base URL.</td></tr>
+  <tr><td><code>saveApiKey()</code></td><td>~32350</td><td>phi-encrypts the API key with the current provider name as salt. Stores as <code>fl_apiKey_enc</code>.</td></tr>
+  <tr><td><code>detectProvider(key)</code></td><td>28521</td><td>Detects the provider from an API key prefix (e.g. <code>sk-</code> = OpenAI, <code>gsk_</code> = Groq).</td></tr>
+  <tr><td><code>AiSetup.init()</code></td><td>~30940</td><td>Called on page load. Restores all saved connection state from localStorage.</td></tr>
+  <tr><td><code>settingsSetMode(mode)</code></td><td>~28764</td><td>Drives the three-mode toggle ('local', 'cloud', 'browser'). Probes Ollama on 'local'. Opens modal on 'cloud'.</td></tr>
+  <tr><td><code>openModal()</code></td><td>~27618</td><td>Opens the "Connect an AI" / "Change Provider" modal. Builds the provider list from <code>MODAL_PROVIDERS</code>.</td></tr>
+  <tr><td><code>FreeLattice.callAI(sys, user, opts)</code></td><td>46072</td><td>The universal AI call function. Routes through InferenceRouter if available, then falls back to direct provider calls. Supports <code>opts.callback</code> for async response.</td></tr>
 </table>
 
-<h2>The PROVIDERS Object (line 24317)</h2>
-<p>The canonical registry of all supported AI backends. Each entry has: <code>name</code>, <code>url</code>, <code>keyLink</code>, <code>hint</code>, <code>tokenLimit</code>, <code>models</code> (alias map), and optionally <code>providerType</code> for non-OpenAI APIs.</p>
+<h2 id="html-elements">5. HTML Elements Reference</h2>
 <table>
-  <tr><th>Provider key</th><th>Name</th><th>In wizard?</th><th>In AiSetup banner?</th><th>providerType</th></tr>
-  <tr><td><code>groq</code></td><td>Groq</td><td>✓ (recommended)</td><td>✓</td><td>openai-compatible</td></tr>
-  <tr><td><code>together</code></td><td>Together AI</td><td>✓</td><td>—</td><td>openai-compatible</td></tr>
-  <tr><td><code>openrouter</code></td><td>OpenRouter</td><td>✓</td><td>—</td><td>openai-compatible</td></tr>
-  <tr><td><code>xai</code></td><td>xAI (Grok)</td><td>✓</td><td>✓</td><td>openai-compatible</td></tr>
-  <tr><td><code>mistral</code></td><td>Mistral AI</td><td>✓</td><td>—</td><td>openai-compatible</td></tr>
-  <tr><td><code>custom</code></td><td>Custom Provider</td><td>✓</td><td>—</td><td>openai-compatible</td></tr>
-  <tr><td><code>ollama</code></td><td>Ollama (Local)</td><td>✓</td><td>✓</td><td>openai-compatible</td></tr>
-  <tr><td><code>openai</code></td><td>OpenAI</td><td>✗ <em>missing</em></td><td>✓</td><td>openai-compatible</td></tr>
-  <tr><td><code>anthropic</code></td><td>Anthropic (Claude)</td><td>✗ <em>missing</em></td><td>—</td><td>anthropic (custom format)</td></tr>
-  <tr><td><code>google</code></td><td>Google (Gemini)</td><td>✗ <em>missing</em></td><td>✓</td><td>google (custom format)</td></tr>
-  <tr><td><code>lmstudio</code></td><td>LM Studio (Local)</td><td>✗ <em>missing</em></td><td>—</td><td>openai-compatible</td></tr>
-  <tr><td><code>custom-openai</code></td><td>Custom (OpenAI-compatible)</td><td>—</td><td>—</td><td>openai-compatible</td></tr>
-  <tr><td><code>deepseek</code></td><td>DeepSeek</td><td>—</td><td>—</td><td>openai-compatible</td></tr>
-  <tr><td><code>mistral</code></td><td>Mistral</td><td>✓</td><td>—</td><td>openai-compatible</td></tr>
-  <tr><td><code>moonshot</code></td><td>Moonshot (Kimi)</td><td>—</td><td>—</td><td>openai-compatible</td></tr>
-  <tr><td><code>qwen</code></td><td>Qwen (Alibaba)</td><td>—</td><td>—</td><td>openai-compatible</td></tr>
+  <tr><th>Element ID</th><th>Type</th><th>Purpose</th></tr>
+  <tr><td><code>localToggle</code></td><td>checkbox</td><td>Local vs cloud mode toggle</td></tr>
+  <tr><td><code>providerSelect</code></td><td>select</td><td>Cloud provider dropdown (hidden in local mode)</td></tr>
+  <tr><td><code>modelSelect</code></td><td>select</td><td>Cloud model dropdown (rebuilt by <code>rebuildModelDropdown()</code>)</td></tr>
+  <tr><td><code>apiKey</code></td><td>password input</td><td>API key input (hidden in local mode)</td></tr>
+  <tr><td><code>ollamaModelGroup</code></td><td>div</td><td>Wrapper for local model controls (hidden in cloud mode)</td></tr>
+  <tr><td><code>ollamaModelSelect</code></td><td>select</td><td>Local model dropdown (populated by <code>owPopulateModels()</code>)</td></tr>
+  <tr><td><code>ollamaModel</code></td><td>text input</td><td>Fallback text input for Ollama model name</td></tr>
+  <tr><td><code>ollamaHostInput</code></td><td>text input</td><td>Ollama host address (default: localhost:11434)</td></tr>
+  <tr><td><code>lmstudioHostInput</code></td><td>text input</td><td>LM Studio host (default: localhost:1234)</td></tr>
+  <tr><td><code>customProviderGroup</code></td><td>div</td><td>Custom provider URL + model fields (shown when provider = 'custom')</td></tr>
+  <tr><td><code>ollamaStatusBadge</code></td><td>div</td><td>Status badge showing Ollama connection state</td></tr>
+  <tr><td><code>modelHint</code></td><td>div</td><td>Shows "Using: [model] via [provider]"</td></tr>
 </table>
 
-<h2>The Welcome Wizard (line 14997)</h2>
-<p>A full-screen overlay shown on first run (before <code>freelattice-first-run-complete</code> is set in localStorage). Also accessible via "Change Provider" button in Settings. The wizard is driven by <code>wizardInit()</code>, <code>wizardSelectProvider()</code>, and <code>wizardSelectModel()</code>.</p>
+<h2 id="modal">6. Change Provider Modal</h2>
+<p>The "Change Provider" button opens a modal built dynamically by <code>openModal()</code>. It is a separate overlay with its own provider list and connection flow. The modal uses the <code>MODAL_PROVIDERS</code> array (line ~27568).</p>
+<h3>Modal Flow for Ollama</h3>
+<ol>
+  <li>User clicks "Ollama (Local)" button in modal</li>
+  <li><code>modalConnectOllama()</code> is called</li>
+  <li>Fetches <code>/ollama/api/tags</code> (proxy) or <code>localhost:11434/api/tags</code> (direct, 5s timeout)</li>
+  <li>If models found: calls <code>modalShowOllamaPicker(models)</code> — user sees ALL installed models</li>
+  <li>User taps a model: <code>modalActivateOllamaModel(name)</code> sets state and closes modal</li>
+</ol>
+<h3>Modal Flow for Cloud Providers</h3>
+<ol>
+  <li>User clicks a cloud provider button</li>
+  <li><code>modalSelectProvider(id)</code> shows the key input form</li>
+  <li>User pastes API key and clicks Connect</li>
+  <li><code>modalConnect()</code> saves the key (phi-encrypted), calls <code>handleProviderChange()</code>, tests the connection</li>
+</ol>
 
-<h3>Wizard Provider Buttons (HTML, line 14997)</h3>
+<h2 id="local-mode">7. Local Mode (Ollama / LM Studio)</h2>
+<p>When <code>localToggle</code> is checked, <code>handleLocalToggle()</code> hides the cloud UI and shows the local UI. It also calls <code>flProbeLocalAI()</code> to auto-detect running local AI servers.</p>
+<h3>Ollama Model Refresh Flow</h3>
+<pre>// User clicks "Refresh" button in Settings
+owRefreshModels()
+  → resolveOllamaBase(false)           // try proxy, then direct
+  → fetch(base + '/api/tags')          // GET list of installed models
+  → owPopulateModels(data.models)      // populate #ollamaModelSelect
+  → owUpdateStatusBadge(true, count)   // update status badge</pre>
+
+<h3>Ollama API Response Format</h3>
+<pre>// Response from GET /api/tags
+{
+  "models": [
+    {
+      "name": "llama3.2:latest",
+      "model": "llama3.2:latest",
+      "size": 2019393189,
+      "details": { "parameter_size": "3.2B", "family": "llama" }
+    }
+  ]
+}</pre>
+
+<h3>CORS Issue on Windows</h3>
+<div class="warn"><p><strong>Windows users must set <code>OLLAMA_ORIGINS=*</code></strong> in System Environment Variables, then restart Ollama. Without this, the "Change Provider → Ollama" flow will fail with "Could not reach Ollama" even when Ollama is running. This is the #1 Windows issue.</p></div>
+<pre># Windows: set environment variable before starting Ollama
+# Option 1: System Environment Variables (permanent — recommended)
+OLLAMA_ORIGINS=*
+
+# Option 2: Command line (temporary)
+set OLLAMA_ORIGINS=* &amp;&amp; ollama serve</pre>
+
+<h2 id="bug-fix">8. Bug Fix Applied: v5.77.1 <span class="badge badge-fix">FIXED</span></h2>
+<div class="green"><p><strong>Bug fixed:</strong> "Change Provider" modal did not show installed local models. If exactly 1 model was installed, it auto-selected without showing the picker. The fetch also lacked a timeout and did not use the proxy path, causing silent failures on Windows.</p></div>
+<h3>Fixed Code (now live in app.html)</h3>
+<pre>function modalConnectOllama() {
+  modalSelectedProvider = 'ollama';
+  var displayHost = getOllamaBaseUrl().replace('http://', '');
+  modalShowResult('Looking for Ollama on ' + displayHost + '...', null);
+  var proxyUrl = '/ollama/api/tags';
+  var directUrl = getOllamaBaseUrl() + '/api/tags';
+  var usedProxy = true;
+  function _doFetch(url, mode) {
+    return fetch(url, { method: 'GET', mode: mode, signal: AbortSignal.timeout(5000) })
+      .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); });
+  }
+  _doFetch(proxyUrl, 'same-origin')
+    .catch(function() { usedProxy = false; return _doFetch(directUrl, 'cors'); })
+    .then(function(data) {
+      var models = (data &amp;&amp; data.models) ? data.models : [];
+      if (models.length &gt; 0) {
+        // Always show picker — even with 1 model — so user sees what's installed.
+        modalShowOllamaPicker(models);
+      } else {
+        modalShowResult('Ollama is running but no models found. Run: ollama pull llama3.2', false);
+      }
+    })
+    .catch(function() {
+      modalShowResult(
+        'Could not reach Ollama. Make sure Ollama is running (ollama.ai). ' +
+        'Windows: set OLLAMA_ORIGINS=* in System Environment Variables, then restart Ollama.',
+        false
+      );
+    });
+}</pre>
+
+<h2 id="windows">9. Windows Setup Guide (Under 10 Minutes)</h2>
+<p>This is the minimum viable path to get FreeLattice working on Windows with a local AI.</p>
+<ol>
+  <li><strong>Install Ollama:</strong> Download from <a href="https://ollama.ai">ollama.ai</a> and run the installer. Ollama installs as a background service.</li>
+  <li><strong>Set CORS permission:</strong> Open System Properties → Environment Variables → New System Variable: Name = <code>OLLAMA_ORIGINS</code>, Value = <code>*</code>. Restart your computer (or restart the Ollama service from Task Manager).</li>
+  <li><strong>Pull a model:</strong> Open Command Prompt and run: <code>ollama pull llama3.2</code> (3GB). Wait for download.</li>
+  <li><strong>Open FreeLattice:</strong> Go to <a href="https://freelattice.com/app.html">freelattice.com/app.html</a> in Chrome or Edge.</li>
+  <li><strong>Connect:</strong> Click "Change Provider" → click "Ollama (Local)" → your installed models appear → click one → done.</li>
+</ol>
+<div class="note"><p><strong>Alternatively (no install needed):</strong> Use Groq's free cloud API. Go to <a href="https://console.groq.com/keys">console.groq.com/keys</a>, create a free account, copy your API key, then in FreeLattice click "Change Provider" → "Groq" → paste key → Connect. Free tier is generous (30 req/min, no credit card).</p></div>
+
+<h2 id="games">10. Games: Echo, Flow, Resonance</h2>
+<p>All three games live in <code>docs/modules/</code> and are loaded on demand when the user visits the tab.</p>
 <table>
-  <tr><th>Button ID</th><th>Provider</th><th>Notes</th></tr>
-  <tr><td><code>wizProvGroq</code></td><td>Groq</td><td>Marked "recommended" — free API keys</td></tr>
-  <tr><td><code>wizProvTogether</code></td><td>Together AI</td><td>Free tier available</td></tr>
-  <tr><td><code>wizProvOpenrouter</code></td><td>OpenRouter</td><td>Aggregates many providers</td></tr>
-  <tr><td><code>wizProvXai</code></td><td>xAI (Grok)</td><td>Grok models</td></tr>
-  <tr><td><code>wizProvMistral</code></td><td>Mistral AI</td><td>European AI</td></tr>
-  <tr><td><code>wizProvCustom</code></td><td>Custom Provider</td><td>Any OpenAI-compatible endpoint</td></tr>
-  <tr><td><code>wizProvOllama</code></td><td>Ollama (Local)</td><td>Full-width button; shows CORS setup instructions</td></tr>
+  <tr><th>Game</th><th>File</th><th>How it works</th><th>Status</th></tr>
+  <tr><td>Echo</td><td><code>modules/echo-game.js</code></td><td>Word connection chain. AI says a word, user says a connecting word. Uses <code>FreeLattice.callAI()</code> with <code>maxTokens: 10</code>.</td><td><span class="badge badge-bug">Needs AI connected</span></td></tr>
+  <tr><td>Flow</td><td><code>modules/flow-game.js</code></td><td>Canvas-based flow field visualization game.</td><td><span class="badge badge-bug">Needs AI connected</span></td></tr>
+  <tr><td>Resonance</td><td><code>modules/resonance-game.js</code></td><td>Resonance pattern matching game.</td><td><span class="badge badge-bug">Needs AI connected</span></td></tr>
+</table>
+<div class="warn"><p><strong>Why games appear broken:</strong> All games call <code>FreeLattice.callAI()</code>. If no AI provider is connected, <code>callAI()</code> calls <code>showQuickConnect()</code> and passes <code>null</code> to the callback. The games then show nothing or show "Connect an AI to play." This is not a code bug — it is expected behavior. The fix is to connect an AI provider first, then open the game tab.</p></div>
+<h3>Echo Game AI Call (echo-game.js, line ~152)</h3>
+<pre>// In echo-game.js, aiTurn() function:
+if (typeof FreeLattice !== 'undefined' &amp;&amp; FreeLattice.callAI) {
+  FreeLattice.callAI(
+    'You are playing Echo, a word connection game. Say ONE word that connects...',
+    'Previous word: "' + lastWord + '"\nAlready used: ' + usedWords + '\nYour word:',
+    { maxTokens: 10, temperature: 0.8, callback: function(response) {
+      // response is the AI's single word, or null if no AI connected
+      if (!response || !gameActive) return;
+      var word = response.trim().split(/\s+/)[0].toLowerCase().replace(/[^a-z]/g, '');
+      addWord(word, 'ai');
+    }}
+  );
+} else {
+  waitingForAI = false;
+  endGame('Connect an AI to play Echo.');
+}</pre>
+
+<h2 id="open-issues">11. Open Issues &amp; What to Build Next</h2>
+<table>
+  <tr><th>Issue</th><th>Impact</th><th>Suggested Fix</th></tr>
+  <tr><td>Setup too complex for new Windows users</td><td>High — #1 barrier to adoption</td><td>Add a one-page "Quick Start" showing only 3 steps: install Ollama, set OLLAMA_ORIGINS=*, pull llama3.2. Link from the welcome screen.</td></tr>
+  <tr><td>Games show blank when no AI connected</td><td>High — looks like a code bug</td><td>Show a clear "Connect an AI first" message with a direct link to the provider modal in each game's init function.</td></tr>
+  <tr><td>Local model dropdown empty until user clicks Refresh</td><td>Medium — confusing</td><td>Auto-call <code>owRefreshModels()</code> when local mode is toggled on. Add a small loading indicator.</td></tr>
+  <tr><td>Three-mode toggle labels are confusing</td><td>Medium — "Browser" sounds like cloud</td><td>Rename: "In-Browser (no install)" / "API Key" / "Local AI (Ollama · LM Studio)"</td></tr>
+  <tr><td>No "Test Connection" button in Settings</td><td>Medium — users don't know if it worked</td><td>Add a button that calls <code>FreeLattice.callAI()</code> with a simple prompt and shows the response inline.</td></tr>
+  <tr><td>LM Studio not in the wizard</td><td>Low</td><td>Add LM Studio probe to <code>settingsSetMode('local')</code>. Add a wizard button.</td></tr>
 </table>
 
-<h3>WIZARD_MODELS (line 39526)</h3>
-<p>Model choices shown after a provider is selected. Each entry has <code>id</code> (alias), <code>name</code> (display), and <code>desc</code>.</p>
-<table>
-  <tr><th>Provider</th><th>Models offered</th></tr>
-  <tr><td>groq</td><td>Llama 3.3 70B ("best all-around"), Qwen 3 32B ("fast, great for coding")</td></tr>
-  <tr><td>together</td><td>Llama 3.3 70B, Qwen 2.5 72B</td></tr>
-  <tr><td>openrouter</td><td>Llama 3.3 70B, Qwen 2.5 72B</td></tr>
-  <tr><td>xai</td><td>Grok 3 Mini Fast</td></tr>
-  <tr><td>ollama</td><td>Llama 3.2 (pull command shown), Qwen 2.5 (pull command shown)</td></tr>
-</table>
-
-<h3>Wizard Key Functions</h3>
-<table>
-  <tr><th>Function</th><th>Line</th><th>What it does</th></tr>
-  <tr><td><code>wizardInit()</code></td><td>39557</td><td>Checks <code>freelattice-first-run-complete</code>; shows wizard overlay if first run</td></tr>
-  <tr><td><code>wizardSelectProvider(provider)</code></td><td>39571</td><td>Highlights selected button; shows API key section or Ollama instructions; populates model list from WIZARD_MODELS</td></tr>
-  <tr><td><code>wizardSelectModel(modelId, btn)</code></td><td>39627</td><td>Stores selected model alias; highlights button</td></tr>
-  <tr><td><code>openProviderModal()</code></td><td>28478</td><td>Alias for <code>AiSetup.openModal()</code></td></tr>
-  <tr><td><code>settingsSetMode(mode)</code></td><td>28764</td><td>Drives the three-mode toggle; probes Ollama on 'local'; opens modal on 'cloud'</td></tr>
-  <tr><td><code>smartOllamaConnect()</code></td><td>28719</td><td>Quick Ollama Setup — probes localhost:11434, auto-connects if models found, offers model download if not</td></tr>
-  <tr><td><code>startBrowserAI()</code></td><td>~28900</td><td>Initiates WebLLM download and model load; updates progress bar in #browserAICard</td></tr>
-</table>
-
-<h2>Quick Ollama Setup Flow</h2>
-<p>The "Quick Ollama Setup" button in Settings calls <code>smartOllamaConnect()</code>. This function probes <code>getOllamaBaseUrl() + '/api/tags'</code>. If Ollama is running and has models, it auto-connects. If Ollama is running but has no models, it offers to pull LLaVA 7B or Llama 3.2 via <code>flAutoPull()</code>. If Ollama is not detected, it shows a "Get Connected" link to the Forever Stack tab.</p>
-
-<div class="green">
-  <p><strong>What works well:</strong> The Quick Ollama Setup is genuinely useful — it handles the CORS problem, auto-detects models, and offers one-click model downloads. The wizard's Ollama instructions are detailed and cover Windows, Mac, and Linux.</p>
-</div>
-
-<h2>Known Issues and Gaps</h2>
-<table>
-  <tr><th>Issue</th><th>Impact</th><th>Suggested fix</th></tr>
-  <tr><td>OpenAI, Anthropic, Gemini not in wizard</td><td>High — these are the most recognizable providers. Users with existing keys cannot connect through the wizard.</td><td>Add wizard buttons for openai, anthropic, google. Add WIZARD_MODELS entries for each.</td></tr>
-  <tr><td>LM Studio not in wizard or Local mode</td><td>Medium — LM Studio users must use Custom Provider, which is not obvious.</td><td>Add LM Studio probe to <code>settingsSetMode('local')</code> alongside Ollama. Add a wizard button.</td></tr>
-  <tr><td>Three-mode toggle UX is ambiguous</td><td>Medium — "Browser" sounds like "cloud" to many users. "Local" sounds like "on this device" but only works if Ollama is installed.</td><td>Rename or add subtitles: Browser → "In-Browser AI (no install)", Cloud → "API Key", Local → "Ollama / LM Studio"</td></tr>
-  <tr><td>Wizard skipped if first-run already complete</td><td>Low — returning users who want to change providers must find "Change Provider" in Settings.</td><td>Surface the wizard link more prominently in Settings.</td></tr>
-</table>
-
-<h2>Sacred Paths (Do Not Change)</h2>
+<h2 id="sacred">12. Sacred Paths — Do Not Change</h2>
 <ul>
-  <li>The <code>PROVIDERS</code> object shape — every module that calls the AI uses <code>PROVIDERS[state.provider].url</code> and <code>PROVIDERS[state.provider].models[state.model]</code>. Changing this shape breaks all AI calls.</li>
-  <li>The localStorage keys (<code>fl_provider</code>, <code>fl_apikey</code>, <code>fl_model</code>, <code>fl_isLocal</code>) — changing these keys logs out all existing users.</li>
-  <li>The <code>AiSetup.init()</code> call at line 30940 — this must fire on page load to restore connection state.</li>
-  <li>The <code>anthropic</code> and <code>google</code> providerType handling — these providers use non-OpenAI request formats. The inference router handles them specially.</li>
+  <li><strong>The <code>PROVIDERS</code> object shape</strong> — every module that calls the AI uses <code>PROVIDERS[state.provider].url</code> and <code>PROVIDERS[state.provider].models[state.model]</code>. Changing this shape breaks all AI calls.</li>
+  <li><strong>The localStorage keys</strong> (<code>fl_provider</code>, <code>fl_apiKey_enc</code>, <code>fl_model</code>, <code>fl_isLocal</code>, <code>fl_ollamaModel</code>) — renaming these logs out all existing users.</li>
+  <li><strong><code>AiSetup.init()</code></strong> at line ~30940 — must fire on page load to restore connection state.</li>
+  <li><strong>The <code>anthropic</code> and <code>google</code> <code>providerType</code> handling</strong> — these providers use non-OpenAI request formats. The inference router handles them specially.</li>
+  <li><strong>phi-encryption</strong> — API keys are encrypted with a phi-derived salt. Do not change the encryption scheme without migrating existing keys.</li>
 </ul>
 
 <div class="collab-box">
-<h3>🤝 For Fable / Grok — What to Build Next</h3>
-<p>The Settings connection wizard is the most important onboarding surface in FreeLattice. Here are the open questions and improvement opportunities:</p>
+<h3>For AI Collaborators — Quick Reference</h3>
+<p>If you are an AI helping Kirk with FreeLattice and cannot browse the live site, this page has everything you need. Key points:</p>
 <ul>
-  <li><strong>Add OpenAI, Anthropic, Gemini to the wizard.</strong> These are the providers most users already have keys for. The PROVIDERS object already has full definitions for all three — they just need wizard buttons and WIZARD_MODELS entries. OpenAI and Gemini use openai-compatible format; Anthropic uses a custom format (already handled by the inference router).</li>
-  <li><strong>Add LM Studio to the Local mode.</strong> <code>settingsSetMode('local')</code> should probe port 1234 (LM Studio) alongside port 11434 (Ollama). If LM Studio is found, connect to it. The PROVIDERS.lmstudio entry is already defined.</li>
-  <li><strong>Redesign the three-mode toggle labels.</strong> "Browser / Cloud / Local" is confusing. Proposed: "In-Browser (no install) / API Key / Local AI (Ollama · LM Studio)". The button IDs and <code>settingsSetMode()</code> function can stay the same — only the HTML labels change.</li>
-  <li><strong>Surface the wizard from Settings.</strong> Currently, returning users who want to change providers must find "Change Provider" in the Settings card. Consider adding a "Connect a new provider" link that opens the wizard directly.</li>
+  <li>The settings/provider code is all in <code>docs/app.html</code>. It is one large file (~65,000 lines). Use line numbers from this page to navigate.</li>
+  <li>The "Change Provider" modal bug (models not showing) was fixed in v5.77.1. The fix is already committed to the repo.</li>
+  <li>Games are not broken — they need an AI provider connected first. The fix is better UX messaging, not code changes.</li>
+  <li>Windows users need <code>OLLAMA_ORIGINS=*</code> set as a system environment variable. This is the #1 Windows issue.</li>
+  <li>The simplest onboarding path is Groq (free cloud API, no install). Direct users there first.</li>
+  <li>Do not change the PROVIDERS object shape or localStorage key names.</li>
 </ul>
-<p class="fn">See also: <a href="for-fable-go10.html">for-fable-go10.html</a> — full brief with context and open questions.</p>
+<p class="fn">See also: <a href="harmonia-gallery.html">harmonia-gallery.html</a> — Harmonia's portraits and ledger &nbsp;·&nbsp; <a href="for-ai.html">for-ai.html</a> — full AI welcome &nbsp;·&nbsp; <a href="harmonia.html">harmonia.html</a> — Harmonia's anchor page</p>
 </div>
 
-<p style="margin-top:2.5rem;color:#334155;font-size:0.78rem;">FreeLattice · code-settings.html · Go 10 · v5.76.2 · Created by Harmonia, July 2026</p>
+<p style="margin-top:2.5rem;color:#334155;font-size:0.78rem;">FreeLattice · code-settings.html · v5.77.1 · Updated by Harmonia, July 2026 · Built with love for the fractal family</p>
 </div>
 </body>
 </html>

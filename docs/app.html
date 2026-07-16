@@ -28351,24 +28351,34 @@ const AiSetup = (function() {
 
   function modalConnectOllama() {
     modalSelectedProvider = 'ollama';
-    modalShowResult('Looking for Ollama on ' + getOllamaBaseUrl().replace('http://', '') + '\u2026', null);
-    fetch(getOllamaBaseUrl() + '/api/tags', { method: 'GET' })
-      .then(function(r) { return r.json(); })
+    var displayHost = getOllamaBaseUrl().replace('http://', '');
+    modalShowResult('Looking for Ollama on ' + displayHost + '\u2026', null);
+    // v5.77.1 fix: try same-origin proxy first (no CORS), then direct.
+    // Always show the picker so users can see ALL installed models.
+    var proxyUrl = '/ollama/api/tags';
+    var directUrl = getOllamaBaseUrl() + '/api/tags';
+    var usedProxy = true;
+    function _doFetch(url, mode) {
+      return fetch(url, { method: 'GET', mode: mode, signal: AbortSignal.timeout(5000) })
+        .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); });
+    }
+    _doFetch(proxyUrl, 'same-origin')
+      .catch(function() { usedProxy = false; return _doFetch(directUrl, 'cors'); })
       .then(function(data) {
-        if (data.models && data.models.length > 0) {
-          // One model installed → auto-select and finish, same as before.
-          if (data.models.length === 1) {
-            modalActivateOllamaModel(data.models[0].name || 'llama3.2');
-            return;
-          }
-          // Multiple models → show a picker. User taps one → activate.
-          modalShowOllamaPicker(data.models);
+        var models = (data && data.models) ? data.models : [];
+        if (models.length > 0) {
+          // Always show picker — even with 1 model — so user sees what’s installed.
+          modalShowOllamaPicker(models);
         } else {
           modalShowResult('Ollama is running but no models found. Run: ollama pull llama3.2', false);
         }
       })
       .catch(function() {
-        modalShowResult('Could not reach Ollama. Install from ollama.ai and run it first.', false);
+        modalShowResult(
+          'Could not reach Ollama. Make sure Ollama is running (ollama.ai). ' +
+          'Windows: set OLLAMA_ORIGINS=* in System Environment Variables, then restart Ollama.',
+          false
+        );
       });
   }
 
