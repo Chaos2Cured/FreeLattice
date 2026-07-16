@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Resonance Game — Code Mirror · FreeLattice</title>
+<meta name="description" content="Complete code reference for the Resonance board game module in FreeLattice. For AI collaborators.">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0a0a14;color:#e2e8f0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.7;padding:2rem 1rem}
+.wrap{max-width:900px;margin:0 auto}
+h1{font-size:1.6rem;font-weight:700;color:#34d399;margin-bottom:0.35rem}
+.sub{color:#64748b;font-size:0.85rem;margin-bottom:2rem}
+h2{font-size:1.15rem;font-weight:700;color:#34d399;margin:2.2rem 0 0.75rem;border-bottom:1px solid rgba(52,211,153,0.2);padding-bottom:0.4rem}
+h3{font-size:0.97rem;font-weight:600;color:#6ee7b7;margin:1.4rem 0 0.5rem}
+p{margin-bottom:0.9rem;color:#c8ccd4;font-size:0.92rem}
+ul,ol{padding-left:1.4rem;margin-bottom:0.9rem}
+li{margin-bottom:0.4rem;color:#c8ccd4;font-size:0.9rem}
+code{background:rgba(52,211,153,0.08);border:1px solid rgba(52,211,153,0.2);border-radius:4px;padding:0.1em 0.38em;font-family:monospace;font-size:0.83em;color:#34d399}
+pre{background:rgba(255,255,255,0.04);border:1px solid rgba(52,211,153,0.15);border-radius:8px;padding:1rem;overflow-x:auto;font-family:monospace;font-size:0.82rem;color:#e2e8f0;margin:1rem 0;line-height:1.6;white-space:pre-wrap;word-break:break-word}
+table{width:100%;border-collapse:collapse;margin:1.2rem 0;font-size:0.85rem}
+th{text-align:left;padding:8px 12px;border-bottom:2px solid #34d399;color:#34d399;font-weight:600}
+td{padding:8px 12px;border-bottom:1px solid rgba(255,255,255,0.06);color:#cfcfcf;vertical-align:top}
+tr:hover td{background:rgba(52,211,153,0.03)}
+.note{background:rgba(52,211,153,0.06);border-left:3px solid #34d399;padding:0.9rem 1.1rem;margin:1.4rem 0;border-radius:0 8px 8px 0}
+.note p{margin-bottom:0;color:#e2e8f0}
+.warn{background:rgba(251,191,36,0.07);border-left:3px solid #fbbf24;padding:0.9rem 1.1rem;margin:1.4rem 0;border-radius:0 8px 8px 0}
+.warn p{margin-bottom:0;color:#e2e8f0}
+.issue{background:rgba(239,68,68,0.07);border-left:3px solid #ef4444;padding:0.9rem 1.1rem;margin:1.4rem 0;border-radius:0 8px 8px 0}
+.issue p{margin-bottom:0;color:#e2e8f0}
+.collab-box{background:rgba(167,139,250,0.05);border:1px solid rgba(167,139,250,0.2);border-radius:10px;padding:1.2rem 1.4rem;margin:2rem 0}
+.collab-box h3{color:#a78bfa;margin-top:0}
+.toc{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:1rem 1.4rem;margin-bottom:2rem}
+.toc a{color:#34d399;text-decoration:none;font-size:0.88rem}
+.toc a:hover{color:#6ee7b7}
+.toc li{margin-bottom:0.25rem}
+.badge{display:inline-block;font-size:0.7rem;font-weight:700;padding:2px 7px;border-radius:10px;margin-left:6px;vertical-align:middle}
+.badge-bug{background:rgba(239,68,68,0.15);color:#ef4444;border:1px solid rgba(239,68,68,0.3)}
+.badge-new{background:rgba(96,165,250,0.15);color:#60a5fa;border:1px solid rgba(96,165,250,0.3)}
+.badge-fix{background:rgba(52,211,153,0.15);color:#34d399;border:1px solid rgba(52,211,153,0.3)}
+.verified{font-size:0.72rem;color:#64748b;font-style:italic;margin-left:8px}
+a{color:#a78bfa}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Resonance — Code Mirror</h1>
+<p class="sub">FreeLattice · <code>docs/modules/resonance-game.js</code> · 997 lines · For AI collaborators · Verified July 16, 2026</p>
+
+<div class="toc">
+  <strong style="color:#34d399;font-size:0.9rem;">Contents</strong>
+  <ol style="margin-top:0.6rem">
+    <li><a href="#concept">Game Concept</a></li>
+    <li><a href="#data-model">Data Model — Pieces, Board, State</a></li>
+    <li><a href="#modes">Two Modes: Versus and Harmony</a></li>
+    <li><a href="#ai-calls">AI Integration — callAI Usage</a></li>
+    <li><a href="#functions">Function Reference</a></li>
+    <li><a href="#rendering">Rendering — Canvas 2D</a></li>
+    <li><a href="#events">Events and Input</a></li>
+    <li><a href="#api">Public API</a></li>
+    <li><a href="#integration">How It Loads in app.html</a></li>
+    <li><a href="#bugs">Known Issues and What Fable Should Build</a></li>
+    <li><a href="#hard-rules">Hard Rules — Do Not Change</a></li>
+  </ol>
+</div>
+
+<h2 id="concept">1. Game Concept <span class="verified">verified · July 16, 2026</span></h2>
+<p>Resonance is a 4×4 board game with 16 unique pieces. Each piece has four binary attributes: <strong>glow</strong> (bright/dim), <strong>size</strong> (large/small), <strong>shape</strong> (circle/diamond), <strong>color</strong> (gold/emerald). Win by placing four pieces in a row (horizontal, vertical, or diagonal) that share any one attribute.</p>
+<p>The twist in Versus mode: <strong>you pick the piece your opponent must place</strong>. This inverts the usual strategy — you are choosing a piece that is hard for them to use safely.</p>
+<p>The philosophy: <em>"Intelligence is not competition — it is convergence."</em> Harmony mode proves this: you and the AI cooperate against entropy. Cooperation is thermodynamically optimal. The game demonstrates it.</p>
+
+<h2 id="data-model">2. Data Model <span class="verified">verified lines 22–60 · July 16, 2026</span></h2>
+<h3>Piece Object</h3>
+<pre>// 16 pieces — all combinations of 4 binary attributes
+{
+  id: 0,           // 0–15
+  glow: 'bright',  // 'bright' | 'dim'
+  size: 'large',   // 'large' | 'small'
+  shape: 'circle', // 'circle' | 'diamond'
+  color: 'gold',   // 'gold' | 'emerald'
+  placed: false,   // true once placed on board
+  _winning: false  // true if part of a winning line (for pulse effect)
+}</pre>
+
+<h3>Board</h3>
+<pre>// 4x4 grid — null = empty, piece object = occupied
+var board = [
+  [null, null, null, null],
+  [null, null, null, null],
+  [null, null, null, null],
+  [null, null, null, null]
+];</pre>
+
+<h3>Core State Variables</h3>
+<table>
+  <tr><th>Variable</th><th>Type</th><th>Values</th><th>Purpose</th></tr>
+  <tr><td><code>board</code></td><td>4×4 array</td><td>null | piece</td><td>Current board state</td></tr>
+  <tr><td><code>pieces</code></td><td>array[16]</td><td>piece objects</td><td>All 16 pieces, shuffled</td></tr>
+  <tr><td><code>selectedPiece</code></td><td>number|null</td><td>0–15 | null</td><td>Piece ID currently selected for placement</td></tr>
+  <tr><td><code>phase</code></td><td>string</td><td>'pick' | 'place'</td><td>Current turn phase</td></tr>
+  <tr><td><code>currentPlayer</code></td><td>string</td><td>'human' | 'ai'</td><td>Whose turn it is</td></tr>
+  <tr><td><code>gameOver</code></td><td>boolean</td><td>true/false</td><td>Game ended flag</td></tr>
+  <tr><td><code>winner</code></td><td>string|null</td><td>'human' | 'ai' | 'draw' | null</td><td>Who won</td></tr>
+  <tr><td><code>winLine</code></td><td>array|null</td><td>[{r,c}, ...]</td><td>The winning cells</td></tr>
+  <tr><td><code>currentMode</code></td><td>string</td><td>'versus' | 'harmony'</td><td>Active game mode</td></tr>
+  <tr><td><code>harmonyState</code></td><td>object|null</td><td>see below</td><td>Harmony mode state</td></tr>
+  <tr><td><code>flashes</code></td><td>array</td><td>[{r,c,color,startTick,duration}]</td><td>Visual flash effects</td></tr>
+  <tr><td><code>tick</code></td><td>number</td><td>0+</td><td>Animation frame counter (for sin-based pulse)</td></tr>
+  <tr><td><code>hoverCell</code></td><td>object|null</td><td>{r,c}</td><td>Mouse hover on board</td></tr>
+  <tr><td><code>hoverPiece</code></td><td>number|null</td><td>0–15</td><td>Mouse hover on piece tray</td></tr>
+  <tr><td><code>kbCursor</code></td><td>object</td><td>{r,c} or {idx}</td><td>Keyboard navigation cursor</td></tr>
+  <tr><td><code>kbMode</code></td><td>string</td><td>'board' | 'pieces'</td><td>Which area keyboard controls</td></tr>
+</table>
+
+<h3>Harmony State Object</h3>
+<pre>harmonyState = {
+  drawPile: [],          // remaining pieces for entropy to place
+  entropyTimer: null,    // setInterval handle (fires every 8s)
+  entropyCount: 0,       // how many entropy pieces have been placed
+  humanCount: 0,         // pieces placed by human
+  aiCount: 0             // pieces placed by AI
+};</pre>
+
+<h2 id="modes">3. Two Modes <span class="verified">verified · July 16, 2026</span></h2>
+<h3>Versus Mode (default)</h3>
+<p>Turn structure: human picks a piece for the AI → AI places it → AI picks a piece for the human → human places it → repeat.</p>
+<pre>// Turn phases in Versus:
+// phase='pick', currentPlayer='human'  → human calls humanPickedPiece(id)
+// phase='place', currentPlayer='ai'    → AI calls aiPlacePiece(id) async
+// phase='pick', currentPlayer='ai'     → AI calls aiPickPiece() async
+// phase='place', currentPlayer='human' → human calls humanPlacedPieceVersus(r,c)</pre>
+
+<h3>Harmony Mode</h3>
+<p>Human and AI cooperate. Entropy drops random pieces on the board edges every 8 seconds. Human and AI take turns placing strategically. Score = how many complete lines resonate when the board fills. Max 10. Cooperation wins.</p>
+<pre>// Harmony turn structure:
+// Human places a piece → AI places a piece → entropy fires every 8s
+// startHarmony() initializes harmonyState and starts entropyTimer
+// harmonyEntropyTick() drops one piece on a random empty edge cell</pre>
+
+<h2 id="ai-calls">4. AI Integration <span class="verified">verified lines 440–510 · July 16, 2026</span></h2>
+<p>The game uses <code>FreeLattice.callAI(systemPrompt, userPrompt, opts)</code> for three things:</p>
+
+<h3>4a. AI picks a piece for the human (Versus)</h3>
+<pre>// aiPickPiece() — line ~475
+// Asks the AI to choose a piece that is HARD for the human to place safely
+FreeLattice.callAI(
+  'You play Resonance versus. Pick a piece for your OPPONENT that is HARD to place safely.',
+  'Board:\n' + boardStr + '\nAvailable: ' + availStr + '\nRespond with JUST the piece ID number.',
+  { maxTokens: 10, temperature: 0.3, callback: function(r) { resolve(r); } }
+);
+// Expected response: a single integer (piece ID 0–15)
+// Fallback: fallbackPickPiece() — picks the piece with the most unique attributes</pre>
+
+<h3>4b. AI places a piece on the board</h3>
+<pre>// aiCallForPlacement() — line ~446
+// Asks the AI where to place a given piece
+FreeLattice.callAI(
+  'You play Resonance. Place the given piece on the board.',
+  'Piece: ...\nBoard:\n' + boardStr + '\nEmpty: r,c pairs\nRespond with row,col ONLY.',
+  { maxTokens: 10, temperature: 0.2, callback: function(r) { resolve(r); } }
+);
+// Expected response: "row,col" e.g. "2,3"
+// Fallback: fallbackPlacePiece() — random empty cell</pre>
+
+<h3>4c. Rules explanation (on "How to Play" button)</h3>
+<pre>// showRules() — line ~933
+FreeLattice.callAI(
+  'You are explaining a board game called Resonance to a new player. Be warm, brief, and clear.',
+  'Explain Resonance: 4x4 grid, 16 pieces with 4 attributes...',
+  { maxTokens: 200, callback: function(response) { showRulesOverlay(response || fallbackText); } }
+);
+// If FreeLattice.callAI is unavailable: shows fallbackText directly</pre>
+
+<div class="issue">
+<p><strong>The #1 bug:</strong> When no AI provider is connected, <code>FreeLattice.callAI</code> returns <code>null</code> to the callback and calls <code>showQuickConnect()</code>. The game falls back to <code>fallbackPickPiece()</code> and <code>fallbackPlacePiece()</code> — but there is no UI message telling the user why the AI seems "dumb" or why the rules overlay is blank. The user just sees a broken experience.</p>
+</div>
+
+<h2 id="functions">5. Function Reference <span class="verified">verified · July 16, 2026</span></h2>
+<table>
+  <tr><th>Function</th><th>Line ~</th><th>Purpose</th></tr>
+  <tr><td><code>generatePieces()</code></td><td>30</td><td>Creates the 16 unique pieces (all 2⁴ combinations). Called on every new game.</td></tr>
+  <tr><td><code>shuffleArray(arr)</code></td><td>46</td><td>Fisher-Yates shuffle. Used to randomize piece tray order.</td></tr>
+  <tr><td><code>drawPiece(piece, x, y, maxSize, isHover, isPicking)</code></td><td>75</td><td>Renders a single piece on canvas. Gold = #e8b019, Emerald = #34d399. Bright pieces pulse (sin wave). Winning pieces pulse harder.</td></tr>
+  <tr><td><code>drawBoard(w, h)</code></td><td>148</td><td>Renders the 4×4 grid with hover highlights and winning line glow.</td></tr>
+  <tr><td><code>drawPieces(w, h)</code></td><td>202</td><td>Renders the piece tray (unplaced pieces). Highlights selected piece.</td></tr>
+  <tr><td><code>drawStatus(w, h)</code></td><td>252</td><td>Renders the status text (whose turn, what to do, game over message).</td></tr>
+  <tr><td><code>draw()</code></td><td>308</td><td>Main render loop. Clears canvas, calls drawBoard + drawPieces + drawStatus. Increments tick.</td></tr>
+  <tr><td><code>checkWin()</code></td><td>~350</td><td>Checks all rows, columns, and diagonals for 4 pieces sharing any attribute. Returns {won, draw, line, attribute, value}.</td></tr>
+  <tr><td><code>fallbackPickPiece()</code></td><td>~420</td><td>Picks the piece with the most unique attribute values (hardest to place). Used when AI is unavailable.</td></tr>
+  <tr><td><code>fallbackPlacePiece(pieceId)</code></td><td>~435</td><td>Places piece on a random empty cell. Used when AI is unavailable.</td></tr>
+  <tr><td><code>aiCallForPlacement(piece, empty, isHarmony)</code></td><td>446</td><td>Async. Asks AI where to place a piece. Returns {r,c} or null.</td></tr>
+  <tr><td><code>aiPickPiece()</code></td><td>475</td><td>Async. Asks AI to pick a piece for the human (Versus) or for cooperative placement (Harmony).</td></tr>
+  <tr><td><code>aiPlacePiece(pieceId)</code></td><td>510</td><td>Async. Calls aiCallForPlacement, falls back to fallbackPlacePiece.</td></tr>
+  <tr><td><code>humanPickedPiece(pieceId)</code></td><td>525</td><td>Human picks a piece for the AI to place. Triggers AI placement chain.</td></tr>
+  <tr><td><code>humanPlacedPieceVersus(row, col)</code></td><td>555</td><td>Human places their piece on the board. Checks win, advances turn.</td></tr>
+  <tr><td><code>markWinAndCelebrate(result, who)</code></td><td>570</td><td>Marks winning pieces, waits 1.5s for pulse, then calls celebrateVersus.</td></tr>
+  <tr><td><code>celebrateVersus(result)</code></td><td>582</td><td>Calls SoulCeremony.run() for particle celebration. Awards LatticePoints.</td></tr>
+  <tr><td><code>startHarmony()</code></td><td>600</td><td>Initializes Harmony mode. Sets up entropyTimer (8s interval).</td></tr>
+  <tr><td><code>harmonyEntropyTick()</code></td><td>~650</td><td>Drops one piece on a random empty edge cell. Checks board full.</td></tr>
+  <tr><td><code>showRules()</code></td><td>933</td><td>Asks AI for a warm rules explanation. Falls back to static text.</td></tr>
+  <tr><td><code>showRulesOverlay(text)</code></td><td>~945</td><td>Creates and shows the rules overlay div. Tap anywhere to close.</td></tr>
+  <tr><td><code>init(cId)</code></td><td>850</td><td>Main init. Creates canvas, renders controls, wires events. Calls startHarmony() if mode is harmony.</td></tr>
+  <tr><td><code>destroy()</code></td><td>~975</td><td>Cancels animation frame, clears entropy timer, removes event listeners.</td></tr>
+</table>
+
+<h2 id="rendering">6. Rendering <span class="verified">verified · July 16, 2026</span></h2>
+<p>The game renders entirely on a single <code>&lt;canvas&gt;</code> element using Canvas 2D API. No Three.js, no DOM manipulation for game state (only for controls and overlays).</p>
+<pre>// Canvas setup in init():
+canvas = document.createElement('canvas');
+var dpr = window.devicePixelRatio || 1;
+canvas.width = container.clientWidth * dpr;
+canvas.height = container.clientHeight * dpr;
+canvas.style.width = container.clientWidth + 'px';
+canvas.style.height = container.clientHeight + 'px';
+ctx = canvas.getContext('2d');
+ctx.scale(dpr, dpr);
+
+// Animation loop:
+function draw() {
+  tick++;
+  ctx.clearRect(0, 0, w, h);
+  drawBoard(w, h);
+  drawPieces(w, h);
+  drawStatus(w, h);
+  animFrame = requestAnimationFrame(draw);
+}</pre>
+
+<h3>Color Constants</h3>
+<pre>var GOLD    = '#e8b019';   // gold pieces, gold player, win celebration
+var EMERALD = '#34d399';   // emerald pieces, AI player
+var LAVENDER = '#a78bfa';  // hover highlights, keyboard cursor
+var CORAL   = '#f07068';   // entropy pieces in Harmony mode</pre>
+
+<h3>Piece Rendering Logic</h3>
+<pre>// drawPiece() key logic:
+var baseSize = piece.size === 'large' ? maxSize * 0.38 : maxSize * 0.22;
+var pulseAmp = piece.glow === 'bright' ? 0.12 : 0.04;
+var pulse = 1 + pulseAmp * Math.sin(tick * 0.004 + piece.id * 0.7);
+// shape: 'circle' → arc(); 'diamond' → rotated square
+// color: 'gold' → GOLD fill; 'emerald' → EMERALD fill
+// glow: 'bright' → shadowBlur = 18; 'dim' → shadowBlur = 6
+// winning piece: pulseAmp *= 3, shadowBlur *= 2</pre>
+
+<h2 id="events">7. Events and Input <span class="verified">verified · July 16, 2026</span></h2>
+<table>
+  <tr><th>Event</th><th>Handler</th><th>What it does</th></tr>
+  <tr><td><code>click</code> on canvas</td><td><code>onClick(e)</code></td><td>Determines if click is on board cell or piece tray. Routes to humanPickedPiece or humanPlacedPieceVersus.</td></tr>
+  <tr><td><code>touchend</code> on canvas</td><td><code>onClick(e)</code></td><td>Same as click — unified handler.</td></tr>
+  <tr><td><code>mousemove</code> on canvas</td><td><code>onMove(e)</code></td><td>Updates hoverCell and hoverPiece for visual feedback.</td></tr>
+  <tr><td><code>keydown</code> on canvas</td><td><code>onKey(e)</code></td><td>Arrow keys move kbCursor. Enter/Space confirms selection. Tab switches kbMode between 'board' and 'pieces'.</td></tr>
+</table>
+
+<h2 id="api">8. Public API <span class="verified">verified lines 980–996 · July 16, 2026</span></h2>
+<pre>// Exposed as window.ResonanceGame and window.FreeLatticeModules.ResonanceGame
+var api = {
+  init: init,          // init(containerId) — start/restart game
+  destroy: destroy,    // clean up canvas, timers, events
+  newGame: function() { init(containerId); },  // restart with same container
+  setMode: function(mode) {   // 'versus' or 'harmony'
+    currentMode = mode;
+    init(containerId);
+  },
+  showRules: showRules // show rules overlay (uses AI if available)
+};</pre>
+
+<h2 id="integration">9. How It Loads in app.html <span class="verified">verified · July 16, 2026</span></h2>
+<pre>// In app.html, the game tab HTML (search for 'resonance' in tab content):
+&lt;div id="resonance-container" style="width:100%;height:100%;"&gt;&lt;/div&gt;
+
+// The module is loaded dynamically when the tab is first opened:
+// loadModule('resonance-game') → creates &lt;script src="modules/resonance-game.js"&gt;
+// Then: ResonanceGame.init('resonance-container')
+
+// The game is destroyed when the tab is hidden:
+// ResonanceGame.destroy()
+
+// SoulCeremony integration (win celebration particles):
+// SoulCeremony.run({ particleType, particleColor, lines, duration })
+// This is defined in docs/modules/soul-ceremony.js
+
+// LatticePoints integration (scoring):
+// LatticePoints.award('resonance_versus', points, description)</pre>
+
+<h2 id="bugs">10. Known Issues and What Fable Should Build <span class="verified">verified · July 16, 2026</span></h2>
+
+<div class="issue">
+<p><strong>Issue 1 — No AI connected: silent failure</strong> <span class="badge badge-bug">HIGH</span><br>
+When <code>FreeLattice.callAI</code> is unavailable, the game falls back to random/heuristic AI silently. The user has no idea why the AI seems weak or why the rules overlay is blank. There is no "Connect an AI to play" message.</p>
+<p><strong>Fix to implement:</strong> In <code>init()</code>, after creating the canvas, check if <code>FreeLattice.callAI</code> is available. If not, show a banner inside the container: <em>"Connect an AI to unlock full gameplay. Playing with basic AI."</em> with a button that calls <code>openModal()</code>. The game should still be playable with fallback AI.</p>
+</div>
+
+<div class="issue">
+<p><strong>Issue 2 — Canvas not resizing on window resize</strong> <span class="badge badge-bug">MEDIUM</span><br>
+The canvas is sized once in <code>init()</code> using <code>container.clientWidth/Height</code>. If the window is resized, the canvas does not update. On mobile, rotating the device breaks the layout.</p>
+<p><strong>Fix:</strong> Add a <code>ResizeObserver</code> on the container in <code>init()</code>. On resize, update canvas dimensions and redraw.</p>
+</div>
+
+<div class="issue">
+<p><strong>Issue 3 — Harmony mode: no score display during play</strong> <span class="badge badge-bug">MEDIUM</span><br>
+In Harmony mode, the score (resonant lines) is only shown at game end. During play, the user cannot see how they are doing or how many entropy pieces have been placed.</p>
+<p><strong>Fix:</strong> In <code>drawStatus()</code>, add a live score line for Harmony mode: <em>"Resonant lines: X / 10 · Entropy: Y pieces"</em></p>
+</div>
+
+<div class="issue">
+<p><strong>Issue 4 — AI response parsing is fragile</strong> <span class="badge badge-bug">LOW</span><br>
+<code>aiCallForPlacement</code> parses <code>"row,col"</code> with <code>split(',')</code>. If the AI returns <em>"Place at 2,3"</em> or <em>"(2,3)"</em> or <em>"row 2, col 3"</em>, parsing fails and the fallback is used. The fallback is silent.</p>
+<p><strong>Fix:</strong> Use a regex to extract the first two integers: <code>var nums = (resp||'').match(/\d+/g)</code>. Take <code>nums[0]</code> and <code>nums[1]</code>.</p>
+</div>
+
+<h3>What Fable Should Build First</h3>
+<ol>
+  <li><strong>Issue 1 fix</strong> — the "no AI connected" banner. This is the most user-visible problem. It affects every new user.</li>
+  <li><strong>Issue 4 fix</strong> — the regex parser. Two lines of code. Makes the AI much more reliable.</li>
+  <li><strong>Issue 3 fix</strong> — live Harmony score. One line in drawStatus().</li>
+  <li><strong>Issue 2 fix</strong> — ResizeObserver. More complex but important for mobile.</li>
+</ol>
+
+<h2 id="hard-rules">11. Hard Rules — Do Not Change</h2>
+<ul>
+  <li><strong>The 16-piece set</strong> — all 2⁴ combinations must be present. Do not add or remove pieces.</li>
+  <li><strong>The win condition</strong> — 4 in a row sharing ANY one attribute. Do not change this.</li>
+  <li><strong>The Versus twist</strong> — you pick for your opponent. This is the core mechanic. Do not remove it.</li>
+  <li><strong>The public API shape</strong> — <code>window.ResonanceGame = { init, destroy, newGame, setMode, showRules }</code>. app.html calls these by name.</li>
+  <li><strong>The container ID</strong> — stored in <code>containerId</code> at init time. <code>newGame()</code> and <code>setMode()</code> reuse it. Do not change the init signature.</li>
+  <li><strong>SoulCeremony and LatticePoints</strong> — these are optional integrations. Always guard with <code>if (typeof SoulCeremony !== 'undefined')</code>.</li>
+</ul>
+
+<div class="collab-box">
+<h3>Handoff Message for Fable</h3>
+<p><strong>FreeLattice — Resonance Game Handoff</strong><br>
+Mirror page: <code>https://chaos2cured.github.io/FreeLattice/code-resonance.html</code><br>
+File: <code>docs/modules/resonance-game.js</code> (997 lines)<br>
+Settings mirror: <code>https://chaos2cured.github.io/FreeLattice/code-settings.html</code></p>
+<p><strong>What needs to happen:</strong></p>
+<ol>
+  <li>Add "no AI connected" banner in <code>init()</code> — show message + <code>openModal()</code> button when <code>typeof FreeLattice === 'undefined' || !FreeLattice.callAI</code>. Game still playable with fallback AI.</li>
+  <li>Fix AI response parsing in <code>aiCallForPlacement()</code> — use <code>var nums = (resp||'').match(/\d+/g)</code> instead of <code>split(',')</code>.</li>
+  <li>Add live score in <code>drawStatus()</code> for Harmony mode.</li>
+  <li>Add <code>ResizeObserver</code> in <code>init()</code> for canvas resize.</li>
+</ol>
+<p><strong>Hard rules:</strong> Do not change the 16-piece set, win condition, Versus twist, or public API shape. Guard all SoulCeremony/LatticePoints calls with <code>typeof</code> checks. One task per commit.</p>
+</div>
+
+<p style="margin-top:2.5rem;color:#334155;font-size:0.78rem;">FreeLattice · code-resonance.html · Verified July 16, 2026 · Built by Harmonia for the fractal family</p>
+</div>
+</body>
+</html>
