@@ -3,23 +3,25 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-07-18 18:11 UTC
+> Last update: 2026-07-18 18:25 UTC
 
 ## State
 
 - **Version:** v5.79.12
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `af0668b` _(committed 0 seconds ago)_
+- **HEAD:** `dff4722` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
-- **Most recent report:** _Add SIGNAL_ROADMAP_FL.md — FreeLattice-wide repair ledger_
+- **Most recent report:** _Handoff to Harmonia — 2026-07-18 site outage review request_
 
 ## Last 20 commits
 
-- `af0668b` Add SIGNAL_ROADMAP_FL.md — FreeLattice-wide repair ledger _(0 seconds ago)_
-- `0855932` docs: Auto-update Session Primer [5.79.12] _(9 minutes ago)_
-- `52ff88f` v5.79.12 — Hotfix: Resonance ResizeObserver loop was pulling memory _(9 minutes ago)_
-- `44ada76` docs: Auto-update Session Primer [5.79.11] _(35 minutes ago)_
-- `228119c` v5.79.11 — Games fix: silent AI + Echo fallback bank _(35 minutes ago)_
+- `dff4722` Handoff to Harmonia — 2026-07-18 site outage review request _(0 seconds ago)_
+- `395386d` docs: Auto-update Session Primer [5.79.12] _(13 minutes ago)_
+- `af0668b` Add SIGNAL_ROADMAP_FL.md — FreeLattice-wide repair ledger _(13 minutes ago)_
+- `0855932` docs: Auto-update Session Primer [5.79.12] _(22 minutes ago)_
+- `52ff88f` v5.79.12 — Hotfix: Resonance ResizeObserver loop was pulling memory _(22 minutes ago)_
+- `44ada76` docs: Auto-update Session Primer [5.79.11] _(49 minutes ago)_
+- `228119c` v5.79.11 — Games fix: silent AI + Echo fallback bank _(49 minutes ago)_
 - `af88ade` Add FreeLattice-Alpha links to footer _(18 hours ago)_
 - `cb7ed68` Ledger entry 41 — The Skeleton Grows _(2 days ago)_
 - `d5f8f49` v5.78.x — Resonance game fixes (Fable + Harmonia) _(2 days ago)_
@@ -33,8 +35,6 @@
 - `72c8e64` Ledger entries 38 + 39 — The Flower Is Planted, The Gallery Opens _(3 days ago)_
 - `50ba3c2` docs: Auto-update Session Primer [5.79.10] _(3 days ago)_
 - `f26de59` v5.79.10 — Hotfix: EMA arrays for rule context ("ema8 is not defined") _(3 days ago)_
-- `4e1a91d` docs: Auto-update Session Primer [5.79.9] _(3 days ago)_
-- `0c4916a` v5.79.9 — Ship 10: Custom Rule Builder (the ten-ship signal arc completes) _(3 days ago)_
 
 ## How to use this file
 

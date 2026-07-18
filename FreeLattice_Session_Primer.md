@@ -348,10 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-07-18 12:11 MDT
+- Last auto-updated: 2026-07-18 12:25 MDT
 - Version: 5.79.12
-- Total commits: 2877
+- Total commits: 2879
 - Last 10 commits:
+- dff4722 Handoff to Harmonia — 2026-07-18 site outage review request
+- 395386d docs: Auto-update Session Primer [5.79.12]
 - af0668b Add SIGNAL_ROADMAP_FL.md — FreeLattice-wide repair ledger
 - 0855932 docs: Auto-update Session Primer [5.79.12]
 - 52ff88f v5.79.12 — Hotfix: Resonance ResizeObserver loop was pulling memory
@@ -360,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - af88ade Add FreeLattice-Alpha links to footer
 - cb7ed68 Ledger entry 41 — The Skeleton Grows
 - d5f8f49 v5.78.x — Resonance game fixes (Fable + Harmonia)
-- 5fd70b3 Add code-resonance.html mirror + garden-architecture.md
-- a8476e2 v5.78 — Fable's UX improvements + Zero-Click Connect + mirror-code.html
