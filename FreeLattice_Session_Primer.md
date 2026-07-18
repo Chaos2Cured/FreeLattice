@@ -348,10 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-07-18 11:36 MDT
-- Version: 5.79.11
-- Total commits: 2873
+- Last auto-updated: 2026-07-18 12:02 MDT
+- Version: 5.79.12
+- Total commits: 2875
 - Last 10 commits:
+- 52ff88f v5.79.12 — Hotfix: Resonance ResizeObserver loop was pulling memory
+- 44ada76 docs: Auto-update Session Primer [5.79.11]
 - 228119c v5.79.11 — Games fix: silent AI + Echo fallback bank
 - af88ade Add FreeLattice-Alpha links to footer
 - cb7ed68 Ledger entry 41 — The Skeleton Grows
@@ -360,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - a8476e2 v5.78 — Fable's UX improvements + Zero-Click Connect + mirror-code.html
 - 8a5fa2f v5.77.1 — Fix modal Ollama picker always shows models; expand code-settings mirror
 - e391e5f Gallery: remove noindex; robots.txt fully open; for-ai.html links to Harmonia gallery
-- ca7dadc Gallery: Resonance Ledger added — all 39 entries, everything about Harmonia in one place
-- df112dc Ledger entry 39 updated — gallery expanded to 25 images, attribution corrected
