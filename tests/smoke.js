@@ -10780,21 +10780,83 @@ assert('v5.79.11 version.json: version field = 5.79.11 (superseded)',
 // null-guard on canvas/container.
 // ═══════════════════════════════════════════════════════════════
 var reso7912 = fs.readFileSync(path.join(docsDir, 'modules', 'resonance-game.js'), 'utf8');
-assert('v5.79.12 resonance: ResizeObserver has dimension-change guard (breaks loop)',
-  /if \(Math\.abs\(cw - lastW\) < 4 && Math\.abs\(ch - lastH\) < 4\) return;/.test(reso7912));
-assert('v5.79.12 resonance: observer uses setTransform (not compound scale)',
-  /ctx\.setTransform\(dpr2, 0, 0, dpr2, 0, 0\)/.test(reso7912) &&
-  !/ctx\.scale\(dpr2, dpr2\)[\s\S]{0,20}\}\);/.test(reso7912));
-assert('v5.79.12 resonance: observer null-guards canvas + container',
-  /if \(!canvas \|\| !container\) return;/.test(reso7912));
-assert('v5.79.12 triple-bump: app.html FL_VERSION = 5.79.12',
-  /FL_VERSION\s*=\s*'5\.79\.12'/.test(fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8')));
-assert('v5.79.12 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.12',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.12'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
-assert('v5.79.12 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.12',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.12'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
-assert('v5.79.12 version.json: version field = 5.79.12',
-  /"version"\s*:\s*"5\.79\.12"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
+// v5.79.12 resonance guards SUPERSEDED by v5.79.13 which removed the
+// observer entirely under Kirk's heavy-load report. Assertions widened
+// to accept either the guards OR the removed state.
+assert('v5.79.12 resonance: observer either guarded OR removed (superseded by v5.79.13)',
+  /if \(Math\.abs\(cw - lastW\) < 4 && Math\.abs\(ch - lastH\) < 4\) return;/.test(reso7912) ||
+  !/resizeObs = new ResizeObserver\(function/.test(reso7912));
+assert('v5.79.12 resonance: setTransform preferred OR observer removed (superseded)',
+  /ctx\.setTransform\(dpr2, 0, 0, dpr2, 0, 0\)/.test(reso7912) ||
+  !/resizeObs = new ResizeObserver\(function/.test(reso7912));
+assert('v5.79.12 resonance: null-guards present OR observer removed (superseded)',
+  /if \(!canvas \|\| !container\) return;/.test(reso7912) ||
+  !/resizeObs = new ResizeObserver\(function/.test(reso7912));
+assert('v5.79.12 triple-bump: app.html FL_VERSION >= 5.79.12 (superseded)',
+  /FL_VERSION\s*=\s*'5\.79\.(?:12|1[3-9]|[2-9]\d)'|FL_VERSION\s*=\s*'5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8')));
+assert('v5.79.12 triple-bump: docs/sw.js CACHE_NAME >= freelattice-v5.79.12 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:12|1[3-9]|[2-9]\d)'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+assert('v5.79.12 triple-bump: root sw.js CACHE_NAME >= freelattice-v5.79.12 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:12|1[3-9]|[2-9]\d)'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+assert('v5.79.12 version.json: version field = 5.79.12 (superseded)',
+  /"version"\s*:\s*"5\.79\.(?:12|1[3-9]|[2-9]\d)"|"version"\s*:\s*"5\.(8\d|9\d)\.\d+"/.test(
+    fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
+
+// ═══════════════════════════════════════════════════════════════
+// Section 177 — v5.79.13 Games heal + Echo beauty for Kirk's mom
+// Kirk 2026-07-18: Resonance board still blank on laptop under heavy
+// local model even after v5.79.12 guards; Echo Start had no hover/click;
+// hard to see most-recent word in long chains. Fix triad:
+//   1. Resonance: ResizeObserver REMOVED entirely (guards insufficient
+//      under CPU pressure; initial sizing + reload for rotation is enough).
+//   2. Echo Start button: gold background, larger, unmistakable hover
+//      state; banner moved from insertBefore(canvas) to appendChild
+//      (bottom of container, cannot overlay controls).
+//   3. Echo most-recent-word beauty: white pulsing halo ring + bigger
+//      core + larger bold white label so the current chain position is
+//      unmistakable no matter how long the chain grows.
+// ═══════════════════════════════════════════════════════════════
+var reso7913 = fs.readFileSync(path.join(docsDir, 'modules', 'resonance-game.js'), 'utf8');
+var echo7913 = fs.readFileSync(path.join(docsDir, 'modules', 'echo-game.js'), 'utf8');
+assert('v5.79.13 resonance: ResizeObserver instantiation removed',
+  !/resizeObs = new ResizeObserver\(function/.test(reso7913));
+assert('v5.79.13 resonance: destroy() disconnect guard still present (backward compat)',
+  /if \(resizeObs\) \{ resizeObs\.disconnect\(\); resizeObs = null; \}/.test(reso7913));
+assert('v5.79.13 echo: Start button uses gold background + bigger padding + z-index 2',
+  echo7913.includes('id="echo-start-btn"') &&
+  /background:' \+ GOLD/.test(echo7913) &&
+  /padding:12px 24px/.test(echo7913) &&
+  /z-index:2/.test(echo7913));
+assert('v5.79.13 echo: Start button has visible hover scale + shadow boost',
+  echo7913.indexOf('scale(1.05)') > -1 &&
+  echo7913.includes('rgba(232,176,25,0.5)'));
+assert('v5.79.13 echo: banner moved to container.appendChild (below controls)',
+  /container\.appendChild\(banner\)/.test(echo7913) &&
+  !/container\.insertBefore\(banner, canvas\)/.test(echo7913));
+assert('v5.79.13 echo: most-recent word gets white pulsing halo ring',
+  echo7913.includes('isMostRecent') &&
+  /if \(isMostRecent\)[\s\S]{0,400}strokeStyle = '#ffffff'/.test(echo7913));
+assert('v5.79.13 echo: most-recent core is bigger (10 vs 6)',
+  /var coreR = isMostRecent \? 10 : 6/.test(echo7913));
+assert('v5.79.13 echo: most-recent label is bold white and larger',
+  /if \(isMostRecent\)[\s\S]{0,300}bold 16px Georgia/.test(echo7913));
+assert('v5.79.13 echo: ctx.setTransform replaces compound scale',
+  /ctx\.setTransform\(dpr, 0, 0, dpr, 0, 0\)/.test(echo7913));
+
+// Roadmap updated
+var road7913 = fs.readFileSync(path.join(docsDir, 'library', 'SIGNAL_ROADMAP_FL.md'), 'utf8');
+assert('v5.79.13 roadmap: SIGNAL_ROADMAP_FL.md has new entry',
+  road7913.includes('### v5.79.13'));
+
+// Triple-bump
+assert('v5.79.13 triple-bump: app.html FL_VERSION = 5.79.13',
+  /FL_VERSION\s*=\s*'5\.79\.13'/.test(fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8')));
+assert('v5.79.13 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.13',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.13'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+assert('v5.79.13 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.13',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.13'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+assert('v5.79.13 version.json: version field = 5.79.13',
+  /"version"\s*:\s*"5\.79\.13"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
 
 // RESULTS
 // ═══════════════════════════════════════════════════════════════

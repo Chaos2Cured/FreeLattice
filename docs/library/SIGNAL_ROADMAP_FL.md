@@ -115,6 +115,12 @@ Prioritized loosely — top items are more useful, bottom items are
 *The layered history. Every entry preserves what was broken so future
 minds can pattern-match if it recurs.*
 
+### v5.79.13 — Games heal + Echo beauty  [pending push]
+BROKEN: Resonance board still didn't appear on Kirk's laptop under a heavy local model even after v5.79.12 guards. Echo Start button had no click/hover. Kirk asked to beautify Echo for his mom (hard to see most-recent word in a long chain).
+CAUSE: ResizeObserver still allocation-thrashed under CPU pressure. Echo banner (v5.79.11) was above controls and could steal layout. No most-recent visual marker in Echo render.
+FIX: (1) Removed ResizeObserver from Resonance entirely (reload handles rotation). (2) Echo Start = big gold button with hover scale. Banner moved below controls. (3) Echo render adds white pulsing halo ring + bigger 10px core + larger bold white label for `idx === chain.length-1`.
+FILES: docs/modules/resonance-game.js, docs/modules/echo-game.js
+
 ### v5.79.12 — Resonance canvas ResizeObserver loop  [commit 52ff88f]
 BROKEN: Site slowing; Resonance tab blank while pulling memory hard. Kirk reported 2026-07-18. "It was working two or three commits ago."
 CAUSE: v5.78.x observer had no dimension-change guard. Each fire set canvas.width/height (new backing store + forced layout) and refired. Silent:true in v5.79.11 stopped modal from masking loop.

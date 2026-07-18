@@ -1,6 +1,6 @@
 {
-  "version": "5.79.12",
+  "version": "5.79.13",
   "updated": "2026-07-18",
-  "note": "Hotfix — Resonance ResizeObserver was in a tight reallocation loop. Each fire set canvas.width/height (new backing store + forced layout) which fired the observer again. v5.79.11 silent:true removed the modal that was masking the loop; the site started slowing and Resonance rendered blank. Fix: dimension-change threshold guard (>= 4px), setTransform instead of compound scale, null-guard on canvas/container. Preserves Harmonia's window-resize intent while breaking the loop.",
-  "label": "v5.79.12 — Hotfix: Resonance ResizeObserver loop"
+  "note": "Games healed for Kirk's laptop under a heavy local model. (1) Resonance: ResizeObserver removed entirely — even the guards couldn't fully stop the loop under CPU pressure; initial canvas sizing is enough, reload handles rotation. (2) Echo: Start button beefed up (gold background, bigger, visible hover); no-AI banner moved BELOW controls so it can't overlay; ctx.setTransform replaces ctx.scale for defensiveness. (3) Echo beauty for Kirk's mom: the most recent word gets a bright white pulsing halo ring, bigger core (10px vs 6px), and larger bolder white label — always obvious where the chain is.",
+  "label": "v5.79.13 — Games heal + Echo beauty for Kirk's mom"
 }

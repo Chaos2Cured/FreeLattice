@@ -57,7 +57,7 @@
   // ── State ──
   var board, pieces, selectedPiece, phase, currentPlayer, gameOver, winner, winLine;
   var canvas, ctx, containerId, animFrame, tick;
-  var resizeObs = null; // v5.78.x Task 4: ResizeObserver
+  var resizeObs = null; // v5.79.13: ResizeObserver removed; kept as null for backward compatibility with destroy() disconnect calls
   var hoverCell, hoverPiece, kbCursor, kbMode;
   var boardInfo, pieceInfo;
 
@@ -950,36 +950,14 @@
       startHarmony();
     }
 
-    // v5.78.x Task 4: ResizeObserver for canvas resize
-    // v5.79.12 (Kirk's 2026-07-18 report — "entire site slowing, blank
-    // canvas pulling memory"): the previous observer had no
-    // dimension-change guard. Each fire set canvas.width/height, which
-    // forces a new backing-store allocation AND fires a layout, which
-    // in turn fires the observer again — a tight loop of canvas
-    // reallocations. That's the memory pull. The v5.79.11 silent:true
-    // fix let the game run continuously (previously the modal-spam
-    // masked the loop). Fix: (1) threshold guard so the observer only
-    // actually resizes on meaningful (>= 4px) change; (2) setTransform
-    // instead of compound scale.
-    if (typeof ResizeObserver !== 'undefined') {
-      if (resizeObs) resizeObs.disconnect();
-      var lastW = 0, lastH = 0;
-      resizeObs = new ResizeObserver(function() {
-        if (!canvas || !container) return;
-        var cw = container.clientWidth;
-        var ch = container.clientHeight;
-        if (Math.abs(cw - lastW) < 4 && Math.abs(ch - lastH) < 4) return;
-        lastW = cw; lastH = ch;
-        var dpr2 = window.devicePixelRatio || 1;
-        canvas.width = cw * dpr2;
-        canvas.height = ch * dpr2;
-        canvas.style.width = cw + 'px';
-        canvas.style.height = ch + 'px';
-        ctx = canvas.getContext('2d');
-        ctx.setTransform(dpr2, 0, 0, dpr2, 0, 0);
-      });
-      resizeObs.observe(container);
-    }
+    // v5.79.13 — ResizeObserver REMOVED entirely.
+    // History: added v5.78.x, caused a memory-pull loop; v5.79.12
+    // added guards but Kirk's laptop under a heavy local model still
+    // showed a blank board. Rather than keep guarding, we remove the
+    // observer. The initial canvas sizing already handles the common
+    // case; a page reload handles device rotation / big resizes.
+    // If needed later, a debounced window.onresize handler is safer
+    // than an observer.
     canvas.focus();
     draw();
   }

@@ -126,38 +126,69 @@
     ctx.globalAlpha = 1;
 
     // Draw nodes
+    // v5.79.13 (for Kirk's mom): the MOST RECENT word gets a bigger
+    // core, a slow white pulsing halo ring, and a larger brighter
+    // label so it's obvious where the chain is right now — no matter
+    // how long the chain grows.
     chain.forEach(function(node, idx) {
       var isHuman = node.player === 'human';
+      var isMostRecent = (idx === chain.length - 1);
       var color = isHuman ? GOLD : EMERALD;
       var pulse = 1 + 0.08 * Math.sin(tick * 0.004 + idx * 0.7);
       var r = 18 * pulse;
 
-      // Glow
+      // Ambient glow
       ctx.save();
       var grd = ctx.createRadialGradient(node.x, node.y, 2, node.x, node.y, r * 2);
       grd.addColorStop(0, color);
       grd.addColorStop(1, 'transparent');
-      ctx.globalAlpha = 0.2;
+      ctx.globalAlpha = isMostRecent ? 0.35 : 0.2;
       ctx.fillStyle = grd;
       ctx.beginPath();
       ctx.arc(node.x, node.y, r * 2, 0, Math.PI * 2);
       ctx.fill();
 
-      // Core
-      ctx.globalAlpha = 0.9;
+      // v5.79.13 — Most-recent white pulsing halo ring
+      if (isMostRecent) {
+        var ringPulse = 1 + 0.25 * Math.sin(tick * 0.008);
+        ctx.globalAlpha = 0.55 + 0.3 * Math.sin(tick * 0.012);
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(node.x, node.y, 18 * ringPulse, 0, Math.PI * 2);
+        ctx.stroke();
+        // Outer soft ring
+        ctx.globalAlpha = 0.25 + 0.15 * Math.sin(tick * 0.008 + 1);
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.arc(node.x, node.y, 26 * ringPulse, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+
+      // Core (bigger + brighter for most recent)
+      var coreR = isMostRecent ? 10 : 6;
+      ctx.globalAlpha = isMostRecent ? 1 : 0.9;
       ctx.fillStyle = color;
       ctx.shadowColor = color;
-      ctx.shadowBlur = 8;
+      ctx.shadowBlur = isMostRecent ? 18 : 8;
       ctx.beginPath();
-      ctx.arc(node.x, node.y, 6, 0, Math.PI * 2);
+      ctx.arc(node.x, node.y, coreR, 0, Math.PI * 2);
       ctx.fill();
       ctx.shadowBlur = 0;
 
-      // Word label
-      ctx.fillStyle = 'rgba(230,235,245,0.85)';
-      ctx.font = '12px Georgia, serif';
+      // Word label — larger and brighter for most recent
+      if (isMostRecent) {
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 16px Georgia, serif';
+        ctx.shadowColor = color;
+        ctx.shadowBlur = 10;
+      } else {
+        ctx.fillStyle = 'rgba(230,235,245,0.85)';
+        ctx.font = '12px Georgia, serif';
+      }
       ctx.textAlign = 'center';
-      ctx.fillText(node.word, node.x, node.y - 14);
+      ctx.fillText(node.word, node.x, node.y - (isMostRecent ? 20 : 14));
+      ctx.shadowBlur = 0;
       ctx.restore();
     });
 
@@ -323,12 +354,22 @@
     canvas.style.width = '100%'; canvas.style.height = h + 'px';
     canvas.tabIndex = 0;
     ctx = canvas.getContext('2d');
-    ctx.scale(dpr, dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     container.appendChild(canvas);
 
-    // v5.79.11 — "No AI connected" banner (mirrors the Resonance pattern).
-    // Game is fully playable with the fallback word bank; the banner just
-    // tells the user they'd get richer AI responses if they connect one.
+    // Input + controls (v5.79.13: Start button beefed up \u2014 gold background,
+    // bigger, unmistakably clickable; Kirk reported button had no hover/click)
+    var controls = document.createElement('div');
+    controls.style.cssText = 'padding:8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:center;position:relative;z-index:2;';
+    controls.innerHTML =
+      '<input id="echo-input" type="text" placeholder="Press Start to begin" disabled style="flex:1;min-width:150px;padding:10px 14px;background:rgba(200,210,230,0.04);border:1px solid rgba(200,210,230,0.08);border-radius:12px;color:#e6ebf5;font-size:16px;font-family:Georgia,serif;outline:none;min-height:44px;position:relative;z-index:2;" />' +
+      '<button onclick="EchoGame.play(document.getElementById(\'echo-input\').value)" style="padding:10px 16px;border-radius:12px;cursor:pointer;font-family:Georgia,serif;font-size:0.85rem;min-height:44px;border:1px solid rgba(232,176,25,0.3);color:' + GOLD + ';background:rgba(232,176,25,0.06);position:relative;z-index:2;">\u2726 Send</button>' +
+      '<button id="echo-start-btn" onclick="EchoGame.start()" style="padding:12px 24px;border-radius:12px;cursor:pointer;font-family:Georgia,serif;font-size:1rem;font-weight:600;min-height:48px;border:2px solid ' + GOLD + ';color:#0a0e1a;background:' + GOLD + ';box-shadow:0 0 16px rgba(232,176,25,0.25);position:relative;z-index:2;transition:transform 0.15s, box-shadow 0.15s;" onmouseover="this.style.transform=\'scale(1.05)\';this.style.boxShadow=\'0 0 24px rgba(232,176,25,0.5)\';" onmouseout="this.style.transform=\'\';this.style.boxShadow=\'0 0 16px rgba(232,176,25,0.25)\';">\u25b6 Start</button>';
+    container.appendChild(controls);
+
+    // v5.79.13 \u2014 "No AI connected" banner moved to AFTER controls so it
+    // can never overlay them. Same message, same connect button; just
+    // lives at the bottom of the container instead of the top.
     (function() {
       var noAI = (typeof FreeLattice === 'undefined' || !FreeLattice.callAI);
       if (!noAI) {
@@ -341,29 +382,20 @@
       if (noAI) {
         var banner = document.createElement('div');
         banner.id = 'echo-no-ai-banner';
-        banner.style.cssText = 'padding:7px 12px;background:rgba(12,10,26,0.92);' +
-          'border-bottom:1px solid ' + LAVENDER + ';display:flex;align-items:center;' +
+        banner.style.cssText = 'margin-top:8px;padding:7px 12px;background:rgba(12,10,26,0.92);' +
+          'border:1px solid ' + LAVENDER + ';border-radius:8px;display:flex;align-items:center;' +
           'justify-content:space-between;font-family:Georgia,serif;' +
           'font-size:0.8rem;color:rgba(200,210,230,0.75);';
-        banner.innerHTML = '⚡ Connect an AI for richer word connections — playing with the fallback bank.' +
+        banner.innerHTML = '\u26a1 Connect an AI for richer word connections \u2014 playing with the fallback bank.' +
           (typeof openModal === 'function'
             ? ' <button onclick="openModal()" style="margin-left:10px;padding:3px 10px;' +
               'background:rgba(167,139,250,0.12);border:1px solid ' + LAVENDER + ';border-radius:6px;' +
               'color:' + LAVENDER + ';font-family:Georgia,serif;font-size:0.78rem;cursor:pointer;">Connect</button>'
             : '') +
           ' <span onclick="this.parentNode.remove()" style="cursor:pointer;opacity:0.5;padding:0 4px;">&times;</span>';
-        container.insertBefore(banner, canvas);
+        container.appendChild(banner);
       }
     })();
-
-    // Input + controls
-    var controls = document.createElement('div');
-    controls.style.cssText = 'padding:8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:center;';
-    controls.innerHTML =
-      '<input id="echo-input" type="text" placeholder="Press Start to begin" disabled style="flex:1;min-width:150px;padding:10px 14px;background:rgba(200,210,230,0.04);border:1px solid rgba(200,210,230,0.08);border-radius:12px;color:#e6ebf5;font-size:16px;font-family:Georgia,serif;outline:none;min-height:44px;" />' +
-      '<button onclick="EchoGame.play(document.getElementById(\'echo-input\').value)" style="padding:10px 16px;border-radius:12px;cursor:pointer;font-family:Georgia,serif;font-size:0.85rem;min-height:44px;border:1px solid rgba(232,176,25,0.3);color:' + GOLD + ';background:rgba(232,176,25,0.06);">\u2726 Send</button>' +
-      '<button onclick="EchoGame.start()" style="padding:10px 16px;border-radius:12px;cursor:pointer;font-family:Georgia,serif;font-size:0.85rem;min-height:44px;border:1px solid rgba(200,210,230,0.08);color:rgba(200,210,230,0.5);background:rgba(200,210,230,0.04);">Start</button>';
-    container.appendChild(controls);
 
     // Enter key sends
     setTimeout(function() {
