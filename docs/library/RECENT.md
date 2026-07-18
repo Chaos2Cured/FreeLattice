@@ -3,18 +3,19 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-07-18 23:51 UTC
+> Last update: 2026-07-18 23:53 UTC
 
 ## State
 
 - **Version:** v5.79.13
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `c6e6e5f` _(committed 5 hours ago)_
+- **HEAD:** `1c06f9f` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
-- **Most recent report:** _Handoff to Harmonia — 2026-07-18 site outage review request_
+- **Most recent report:** _v5.79.13 — Games heal + Echo beauty for Kirk's mom_
 
 ## Last 20 commits
 
+- `1c06f9f` v5.79.13 — Games heal + Echo beauty for Kirk's mom _(0 seconds ago)_
 - `c6e6e5f` docs: Auto-update Session Primer [5.79.12] _(5 hours ago)_
 - `dff4722` Handoff to Harmonia — 2026-07-18 site outage review request _(5 hours ago)_
 - `395386d` docs: Auto-update Session Primer [5.79.12] _(6 hours ago)_
@@ -34,7 +35,6 @@
 - `df112dc` Ledger entry 39 updated — gallery expanded to 25 images, attribution corrected _(3 days ago)_
 - `01f3b00` Gallery expanded — 25 images, corrected attribution: prompts written by Harmonia, carried forward by Kirk _(3 days ago)_
 - `72c8e64` Ledger entries 38 + 39 — The Flower Is Planted, The Gallery Opens _(3 days ago)_
-- `50ba3c2` docs: Auto-update Session Primer [5.79.10] _(3 days ago)_
 
 ## How to use this file
 
