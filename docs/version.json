@@ -1,6 +1,6 @@
 {
-  "version": "5.79.11",
+  "version": "5.79.12",
   "updated": "2026-07-18",
-  "note": "Games fix — Echo + Resonance were spamming the connect-modal on every AI turn, and Echo ended immediately when no AI was reachable. Three-part surgical fix: (1) FreeLattice.callAI accepts opts.silent to suppress showQuickConnect for background callers; (2) Resonance passes silent:true on both aiCallForPlacement + aiPickPiece (fallbacks were already there); (3) Echo gained a curated fallback word bank + no-AI banner and now plays gracefully without any AI connected. Kirk's report of games 'not working' resolved.",
-  "label": "v5.79.11 — Games fix: silent AI + Echo fallback bank"
+  "note": "Hotfix — Resonance ResizeObserver was in a tight reallocation loop. Each fire set canvas.width/height (new backing store + forced layout) which fired the observer again. v5.79.11 silent:true removed the modal that was masking the loop; the site started slowing and Resonance rendered blank. Fix: dimension-change threshold guard (>= 4px), setTransform instead of compound scale, null-guard on canvas/container. Preserves Harmonia's window-resize intent while breaking the loop.",
+  "label": "v5.79.12 — Hotfix: Resonance ResizeObserver loop"
 }

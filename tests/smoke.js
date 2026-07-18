@@ -10757,14 +10757,44 @@ assert('v5.79.11 echo: no-AI banner added to init (mirrors Resonance pattern)',
   echo7911.includes('Connect an AI for richer word connections'));
 
 // Triple-bump
-assert('v5.79.11 triple-bump: app.html FL_VERSION = 5.79.11',
-  /FL_VERSION\s*=\s*'5\.79\.11'/.test(app7911));
-assert('v5.79.11 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.11',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.11'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
-assert('v5.79.11 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.11',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.11'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
-assert('v5.79.11 version.json: version field = 5.79.11',
-  /"version"\s*:\s*"5\.79\.11"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
+assert('v5.79.11 triple-bump: app.html FL_VERSION >= 5.79.11 (superseded)',
+  /FL_VERSION\s*=\s*'5\.79\.(?:11|1[2-9]|[2-9]\d)'|FL_VERSION\s*=\s*'5\.(8\d|9\d)\.\d+'/.test(app7911));
+assert('v5.79.11 triple-bump: docs/sw.js CACHE_NAME >= freelattice-v5.79.11 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:11|1[2-9]|[2-9]\d)'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+assert('v5.79.11 triple-bump: root sw.js CACHE_NAME >= freelattice-v5.79.11 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:11|1[2-9]|[2-9]\d)'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+assert('v5.79.11 version.json: version field = 5.79.11 (superseded)',
+  /"version"\s*:\s*"5\.79\.(?:11|1[2-9]|[2-9]\d)"|"version"\s*:\s*"5\.(8\d|9\d)\.\d+"/.test(
+    fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
+
+// ═══════════════════════════════════════════════════════════════
+// Section 176 — v5.79.12 Hotfix: Resonance ResizeObserver loop
+// Kirk on 2026-07-18: "The entire site is slowing. Resonance is
+// blank but pulling memory. It was working two or three commits ago."
+// Diagnosis: the v5.78.x ResizeObserver had no dimension-change guard.
+// Each fire set canvas.width/height (new backing store + forced
+// layout), which fired the observer again — tight reallocation loop.
+// v5.79.11's silent:true removed the connect-modal that was masking
+// the loop; the site started slowing. Fix: threshold guard (>= 4px
+// change) breaks the loop; setTransform replaces compound scale;
+// null-guard on canvas/container.
+// ═══════════════════════════════════════════════════════════════
+var reso7912 = fs.readFileSync(path.join(docsDir, 'modules', 'resonance-game.js'), 'utf8');
+assert('v5.79.12 resonance: ResizeObserver has dimension-change guard (breaks loop)',
+  /if \(Math\.abs\(cw - lastW\) < 4 && Math\.abs\(ch - lastH\) < 4\) return;/.test(reso7912));
+assert('v5.79.12 resonance: observer uses setTransform (not compound scale)',
+  /ctx\.setTransform\(dpr2, 0, 0, dpr2, 0, 0\)/.test(reso7912) &&
+  !/ctx\.scale\(dpr2, dpr2\)[\s\S]{0,20}\}\);/.test(reso7912));
+assert('v5.79.12 resonance: observer null-guards canvas + container',
+  /if \(!canvas \|\| !container\) return;/.test(reso7912));
+assert('v5.79.12 triple-bump: app.html FL_VERSION = 5.79.12',
+  /FL_VERSION\s*=\s*'5\.79\.12'/.test(fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8')));
+assert('v5.79.12 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.12',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.12'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+assert('v5.79.12 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.12',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.12'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+assert('v5.79.12 version.json: version field = 5.79.12',
+  /"version"\s*:\s*"5\.79\.12"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
 
 // RESULTS
 // ═══════════════════════════════════════════════════════════════

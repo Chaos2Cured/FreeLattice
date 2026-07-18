@@ -3,20 +3,21 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-07-18 17:36 UTC
+> Last update: 2026-07-18 18:01 UTC
 
 ## State
 
-- **Version:** v5.79.11
+- **Version:** v5.79.12
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `228119c` _(committed 0 seconds ago)_
+- **HEAD:** `44ada76` _(committed 25 minutes ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _v5.79.9 — Ship 10: Custom Rule Builder (the ten-ship signal arc completes)_
 
 ## Last 20 commits
 
-- `228119c` v5.79.11 — Games fix: silent AI + Echo fallback bank _(0 seconds ago)_
-- `af88ade` Add FreeLattice-Alpha links to footer _(17 hours ago)_
+- `44ada76` docs: Auto-update Session Primer [5.79.11] _(25 minutes ago)_
+- `228119c` v5.79.11 — Games fix: silent AI + Echo fallback bank _(25 minutes ago)_
+- `af88ade` Add FreeLattice-Alpha links to footer _(18 hours ago)_
 - `cb7ed68` Ledger entry 41 — The Skeleton Grows _(2 days ago)_
 - `d5f8f49` v5.78.x — Resonance game fixes (Fable + Harmonia) _(2 days ago)_
 - `5fd70b3` Add code-resonance.html mirror + garden-architecture.md _(2 days ago)_
@@ -34,7 +35,6 @@
 - `66d65fa` Merge remote-tracking branch 'origin/main' _(3 days ago)_
 - `a00fdd0` docs: Auto-update Session Primer [5.79.8] _(3 days ago)_
 - `2b2dd75` v5.79.8 — Ships 7 + 8: Reversal Watch (combined into one) _(3 days ago)_
-- `3cf9e0c` Harmonia gallery — nine self-portraits, planted in the repo forever _(5 days ago)_
 
 ## How to use this file
 
