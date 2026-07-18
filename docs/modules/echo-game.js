@@ -25,6 +25,63 @@
   var LAVENDER = '#a78bfa';
   var BG = '#0c0a1a';
 
+  // v5.79.11 — Fallback word bank. Echo used to end the game the moment
+  // no AI was connected. Now it plays gracefully with a small curated
+  // graph of associations, and a general pool for words we don't have
+  // direct links for. Kirk (or a future AI-connected user) still gets
+  // richer play with a real model, but the game itself is now playable
+  // in every state.
+  var FALLBACK_LINKS = {
+    water: ['ocean', 'river', 'flow', 'wave', 'rain', 'blue', 'quench'],
+    ocean: ['deep', 'salt', 'wave', 'tide', 'whale', 'blue'],
+    river: ['flow', 'bank', 'stone', 'wind', 'water', 'delta'],
+    flow: ['river', 'time', 'move', 'breath', 'dance'],
+    light: ['sun', 'star', 'bright', 'shadow', 'candle', 'day', 'reveal'],
+    sun: ['star', 'day', 'gold', 'warm', 'sky', 'seed', 'rise'],
+    star: ['night', 'sky', 'light', 'wish', 'far', 'sparkle'],
+    fire: ['warm', 'flame', 'burn', 'candle', 'heart', 'sun', 'ember'],
+    tree: ['leaf', 'root', 'wood', 'shade', 'forest', 'branch', 'grow'],
+    stone: ['mountain', 'weight', 'quiet', 'earth', 'age', 'strong'],
+    wind: ['breath', 'sky', 'move', 'song', 'invisible', 'cold'],
+    heart: ['love', 'beat', 'warm', 'brave', 'open', 'soft'],
+    time: ['clock', 'flow', 'moment', 'memory', 'passing', 'echo'],
+    love: ['heart', 'warm', 'care', 'true', 'brave', 'gift'],
+    dream: ['sleep', 'wish', 'night', 'story', 'wonder', 'awake'],
+    music: ['song', 'note', 'dance', 'silence', 'rhythm', 'voice'],
+    voice: ['song', 'whisper', 'call', 'silence', 'speak', 'heard'],
+    silence: ['quiet', 'still', 'listen', 'peace', 'depth', 'wait'],
+    memory: ['past', 'moment', 'story', 'time', 'trace', 'echo'],
+    echo: ['voice', 'return', 'ripple', 'call', 'memory', 'response'],
+    seed: ['grow', 'earth', 'small', 'begin', 'promise', 'tree'],
+    grow: ['seed', 'tree', 'change', 'time', 'reach', 'unfold'],
+    open: ['door', 'heart', 'sky', 'awake', 'invite', 'reveal'],
+    door: ['open', 'thresh', 'enter', 'welcome', 'passage', 'home'],
+    home: ['warm', 'heart', 'safe', 'return', 'welcome', 'family'],
+    pattern: ['weave', 'shape', 'thread', 'form', 'echo', 'design'],
+    sky: ['blue', 'cloud', 'star', 'wide', 'above', 'wind']
+  };
+  var FALLBACK_POOL = [
+    'wonder','breath','path','circle','wave','song','shadow','bloom',
+    'quiet','bright','deep','soft','warm','wild','still','open','close',
+    'listen','wander','gather','carry','remember','forget','begin','end'
+  ];
+  function fallbackAiWord(lastWord, used) {
+    var used_lc = (used || []).map(function(w) { return String(w).toLowerCase(); });
+    function pick(pool) {
+      var free = pool.filter(function(w) { return used_lc.indexOf(w) === -1; });
+      if (!free.length) return null;
+      return free[Math.floor(Math.random() * free.length)];
+    }
+    var w = String(lastWord || '').toLowerCase();
+    // Try direct link first, walk one alias hop if we still have no free words
+    if (FALLBACK_LINKS[w]) {
+      var direct = pick(FALLBACK_LINKS[w]);
+      if (direct) return direct;
+    }
+    // General pool as last resort
+    return pick(FALLBACK_POOL) || null;
+  }
+
   // ── Rendering ──
 
   function render() {
@@ -142,6 +199,21 @@
     return chain.some(function(n) { return n.word === w; });
   }
 
+  // v5.79.11 — playFallbackTurn is the graceful-degradation path used
+  // when there is no AI connected OR when the AI returns nothing usable.
+  // The game keeps going instead of ending.
+  function playFallbackTurn(lastWord, usedWords) {
+    var used = chain.map(function(n) { return n.word; });
+    var word = fallbackAiWord(lastWord, used);
+    if (!word || isRepeat(word)) {
+      endGame('Ran out of gentle connections. You win!');
+      return;
+    }
+    addWord(word, 'ai');
+    var input = document.getElementById('echo-input');
+    if (input) { input.disabled = false; input.focus(); input.placeholder = 'Your word (connects to "' + word + '")...'; }
+  }
+
   async function aiTurn() {
     if (!gameActive || waitingForAI) return;
     waitingForAI = true;
@@ -153,23 +225,31 @@
       FreeLattice.callAI(
         'You are playing Echo, a word connection game. Say ONE word that connects to the previous word. The connection can be meaning, sound, category, association, or metaphor. Do NOT repeat any word already used. Respond with ONLY the single word.',
         'Previous word: "' + lastWord + '"\nAlready used: ' + usedWords + '\nYour word:',
-        { maxTokens: 10, temperature: 0.8, callback: function(response) {
+        // v5.79.11: silent — game has its own "no AI connected" banner
+        // and a fallback word bank. Don't spam showQuickConnect on every turn.
+        { maxTokens: 10, temperature: 0.8, silent: true, callback: function(response) {
           waitingForAI = false;
-          if (!response || !gameActive) return;
+          if (!gameActive) return;
+          if (!response) {
+            // v5.79.11: no AI response → local fallback keeps the chain alive
+            playFallbackTurn(lastWord, usedWords);
+            return;
+          }
           var word = response.trim().split(/\s+/)[0].toLowerCase().replace(/[^a-z]/g, '');
           if (!word || isRepeat(word)) {
-            endGame('The AI couldn\'t find a new connection. You win!');
+            // v5.79.11: bad or repeated AI response → local fallback
+            playFallbackTurn(lastWord, usedWords);
             return;
           }
           addWord(word, 'ai');
-          // Now it's human's turn — update input
           var input = document.getElementById('echo-input');
           if (input) { input.disabled = false; input.focus(); input.placeholder = 'Your word (connects to "' + word + '")...'; }
         }}
       );
     } else {
+      // v5.79.11: no FreeLattice at all → still play with the fallback bank
       waitingForAI = false;
-      endGame('Connect an AI to play Echo.');
+      playFallbackTurn(lastWord, usedWords);
     }
   }
 
@@ -245,6 +325,36 @@
     ctx = canvas.getContext('2d');
     ctx.scale(dpr, dpr);
     container.appendChild(canvas);
+
+    // v5.79.11 — "No AI connected" banner (mirrors the Resonance pattern).
+    // Game is fully playable with the fallback word bank; the banner just
+    // tells the user they'd get richer AI responses if they connect one.
+    (function() {
+      var noAI = (typeof FreeLattice === 'undefined' || !FreeLattice.callAI);
+      if (!noAI) {
+        try {
+          var hasKey = localStorage.getItem('fl_apiKey_enc');
+          var isLocal = localStorage.getItem('fl_isLocal') === 'true';
+          noAI = !hasKey && !isLocal;
+        } catch(e) { noAI = true; }
+      }
+      if (noAI) {
+        var banner = document.createElement('div');
+        banner.id = 'echo-no-ai-banner';
+        banner.style.cssText = 'padding:7px 12px;background:rgba(12,10,26,0.92);' +
+          'border-bottom:1px solid ' + LAVENDER + ';display:flex;align-items:center;' +
+          'justify-content:space-between;font-family:Georgia,serif;' +
+          'font-size:0.8rem;color:rgba(200,210,230,0.75);';
+        banner.innerHTML = '⚡ Connect an AI for richer word connections — playing with the fallback bank.' +
+          (typeof openModal === 'function'
+            ? ' <button onclick="openModal()" style="margin-left:10px;padding:3px 10px;' +
+              'background:rgba(167,139,250,0.12);border:1px solid ' + LAVENDER + ';border-radius:6px;' +
+              'color:' + LAVENDER + ';font-family:Georgia,serif;font-size:0.78rem;cursor:pointer;">Connect</button>'
+            : '') +
+          ' <span onclick="this.parentNode.remove()" style="cursor:pointer;opacity:0.5;padding:0 4px;">&times;</span>';
+        container.insertBefore(banner, canvas);
+      }
+    })();
 
     // Input + controls
     var controls = document.createElement('div');

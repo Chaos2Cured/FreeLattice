@@ -10699,14 +10699,72 @@ assert('v5.79.10 hotfix: analyzeData exposes ema8arr..ema200arr on return',
   /ema8arr, ema12arr, ema24arr, ema50arr, ema200arr/.test(gauge7910));
 assert('v5.79.10 hotfix: Test-button context uses a.ema8arr..a.ema200arr',
   /a\.ema8arr \|\| \[\][\s\S]{0,120}a\.ema200arr \|\| \[\]/.test(gauge7910));
-assert('v5.79.10 triple-bump: app.html FL_VERSION = 5.79.10',
-  /FL_VERSION\s*=\s*'5\.79\.10'/.test(fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8')));
-assert('v5.79.10 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.10',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.10'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
-assert('v5.79.10 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.10',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.10'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
-assert('v5.79.10 version.json: version field = 5.79.10',
-  /"version"\s*:\s*"5\.79\.10"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
+assert('v5.79.10 triple-bump: app.html FL_VERSION >= 5.79.10 (superseded)',
+  /FL_VERSION\s*=\s*'5\.79\.(?:10|1[1-9]|[2-9]\d)'|FL_VERSION\s*=\s*'5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8')));
+assert('v5.79.10 triple-bump: docs/sw.js CACHE_NAME >= freelattice-v5.79.10 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:10|1[1-9]|[2-9]\d)'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+assert('v5.79.10 triple-bump: root sw.js CACHE_NAME >= freelattice-v5.79.10 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:10|1[1-9]|[2-9]\d)'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+assert('v5.79.10 version.json: version field = 5.79.10 (superseded)',
+  /"version"\s*:\s*"5\.79\.(?:10|1[1-9]|[2-9]\d)"|"version"\s*:\s*"5\.(8\d|9\d)\.\d+"/.test(
+    fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
+
+// ═══════════════════════════════════════════════════════════════
+// Section 175 — v5.79.11 Games fix: silent AI + Echo fallback bank
+// Kirk on 2026-07-18: Resonance and Echo were "not working." Root
+// cause: FreeLattice.callAI called showQuickConnect() every time
+// there was no AI — modal spam on every game turn. And Echo had no
+// fallback at all — one endGame('Connect an AI') on the first AI
+// call meant the game ended before the first move. Fix triad:
+//   1. FreeLattice.callAI honors opts.silent (skip modal, still
+//      callback(null)).
+//   2. Resonance passes silent:true on both AI call sites.
+//   3. Echo gains FALLBACK_LINKS + FALLBACK_POOL + fallbackAiWord()
+//      + playFallbackTurn() so the game keeps going without any AI;
+//      matching no-AI banner mirrors the Resonance pattern.
+// ═══════════════════════════════════════════════════════════════
+var app7911 = fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8');
+var echo7911 = fs.readFileSync(path.join(docsDir, 'modules', 'echo-game.js'), 'utf8');
+var reso7911 = fs.readFileSync(path.join(docsDir, 'modules', 'resonance-game.js'), 'utf8');
+
+// callAI silent option
+assert('v5.79.11 callAI: honors opts.silent to skip showQuickConnect',
+  /if \(!opts\.silent && typeof showQuickConnect === 'function'\) showQuickConnect\(\)/.test(app7911));
+
+// Resonance passes silent:true
+assert('v5.79.11 resonance: aiCallForPlacement passes silent:true',
+  /silent: true, callback: function\(r\) \{ resolve\(r\); \}[\s\S]{0,600}v5\.78\.x Task 1: regex parser/.test(reso7911));
+assert('v5.79.11 resonance: aiPickPiece passes silent:true',
+  (reso7911.match(/silent: true, callback: function\(r\) \{ resolve\(r\); \}/g) || []).length >= 2);
+
+// Echo fallback bank
+assert('v5.79.11 echo: FALLBACK_LINKS graph present with common words',
+  /var FALLBACK_LINKS = \{/.test(echo7911) &&
+  echo7911.includes("water: ['ocean'") &&
+  echo7911.includes("light: ['sun'"));
+assert('v5.79.11 echo: FALLBACK_POOL general-word pool present',
+  /var FALLBACK_POOL = \[/.test(echo7911));
+assert('v5.79.11 echo: fallbackAiWord() picks unused word from links then pool',
+  /function fallbackAiWord\(lastWord, used\)/.test(echo7911));
+assert('v5.79.11 echo: playFallbackTurn keeps chain alive when AI unavailable',
+  /function playFallbackTurn\(lastWord, usedWords\)/.test(echo7911));
+assert('v5.79.11 echo: aiTurn uses playFallbackTurn (multiple call sites) instead of endGame',
+  (echo7911.match(/playFallbackTurn\(lastWord, usedWords\)/g) || []).length >= 2);
+assert('v5.79.11 echo: aiTurn passes silent:true on callAI',
+  /silent: true, callback: function\(response\)/.test(echo7911));
+assert('v5.79.11 echo: no-AI banner added to init (mirrors Resonance pattern)',
+  echo7911.includes("banner.id = 'echo-no-ai-banner'") &&
+  echo7911.includes('Connect an AI for richer word connections'));
+
+// Triple-bump
+assert('v5.79.11 triple-bump: app.html FL_VERSION = 5.79.11',
+  /FL_VERSION\s*=\s*'5\.79\.11'/.test(app7911));
+assert('v5.79.11 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.11',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.11'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+assert('v5.79.11 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.11',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.11'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+assert('v5.79.11 version.json: version field = 5.79.11',
+  /"version"\s*:\s*"5\.79\.11"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
 
 // RESULTS
 // ═══════════════════════════════════════════════════════════════

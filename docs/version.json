@@ -1,6 +1,6 @@
 {
-  "version": "5.79.10",
-  "updated": "2026-07-15",
-  "note": "Hotfix — Ship 10's rule context referenced `ema8`, `ema12` etc. as arrays but those names weren't defined in analyzeData (only the *v scalars). Loading any symbol threw 'ema8 is not defined'. Fix: compute full EMA arrays once at the top of analyzeData, wire ema8arr..ema200arr into ruleCtx.hist, and expose them on the return so the Test-button context has real EMA history for crossed_above/below rules too.",
-  "label": "v5.79.10 — Hotfix: EMA arrays for rule context"
+  "version": "5.79.11",
+  "updated": "2026-07-18",
+  "note": "Games fix — Echo + Resonance were spamming the connect-modal on every AI turn, and Echo ended immediately when no AI was reachable. Three-part surgical fix: (1) FreeLattice.callAI accepts opts.silent to suppress showQuickConnect for background callers; (2) Resonance passes silent:true on both aiCallForPlacement + aiPickPiece (fallbacks were already there); (3) Echo gained a curated fallback word bank + no-AI banner and now plays gracefully without any AI connected. Kirk's report of games 'not working' resolved.",
+  "label": "v5.79.11 — Games fix: silent AI + Echo fallback bank"
 }

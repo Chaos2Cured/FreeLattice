@@ -17263,7 +17263,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.79.10</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.79.11</span></div>
     </div>
   </div>
 
@@ -22241,7 +22241,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.79.10';
+const FL_VERSION = '5.79.11';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -46271,11 +46271,14 @@ window.FreeLattice.callAI = function(systemPrompt, userPrompt, options) {
   var maxTokens = opts.maxTokens || 1024;
   var temperature = opts.temperature || 0.7;
 
-  // Guard: if no AI connected at all, guide instead of failing silently
+  // Guard: if no AI connected at all, guide instead of failing silently.
+  // v5.79.11: `opts.silent` suppresses the connect-modal side effect for
+  // background/game callers that already show their own banner + fallback
+  // logic. The callback still fires with null so the caller can react.
   var _hasAI = (typeof BrowserAI !== 'undefined' && BrowserAI.ready) ||
     state.isLocal || (state.apiKey && state.apiKey.length > 5);
   if (!_hasAI) {
-    if (typeof showQuickConnect === 'function') showQuickConnect();
+    if (!opts.silent && typeof showQuickConnect === 'function') showQuickConnect();
     if (callback) callback(null, 'No AI connected yet');
     return;
   }

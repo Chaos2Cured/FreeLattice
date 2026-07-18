@@ -459,7 +459,10 @@
           'Board:\n' + boardStr + '\nPiece: ' + piece.glow + ' ' + piece.size + ' ' + piece.shape + ' ' + piece.color +
           '\nEmpty: ' + empty.map(function(c) { return c.r+','+c.c; }).join(' ') +
           '\nRespond with row,col ONLY.',
-          { maxTokens: 10, temperature: 0.2, callback: function(r) { resolve(r); } }
+          // v5.79.11: silent — the game already shows its own "no AI"
+          // banner + falls back gracefully. Suppress the quick-connect
+          // modal that would otherwise pop up on every AI turn.
+          { maxTokens: 10, temperature: 0.2, silent: true, callback: function(r) { resolve(r); } }
         );
       });
       // v5.78.x Task 1: regex parser — handles "2,3", "Place at (2,3)", "row 2 col 3"
@@ -490,7 +493,8 @@
           FreeLattice.callAI(
             'You play Resonance versus. Pick a piece for your OPPONENT that is HARD to place safely.',
             'Board:\n' + boardStr + '\nAvailable: ' + availStr + '\nRespond with JUST the piece ID number.',
-            { maxTokens: 10, temperature: 0.3, callback: function(r) { resolve(r); } }
+            // v5.79.11: silent — see aiCallForPlacement for rationale.
+            { maxTokens: 10, temperature: 0.3, silent: true, callback: function(r) { resolve(r); } }
           );
         });
         // v5.78.x Task 1b: regex parser for piece ID
