@@ -15620,6 +15620,11 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
           <option value="llama">Loading models...</option>
         </select>
         <div class="hint" id="modelHint">Select a provider above to see available models.</div>
+        <!-- v5.78: Inline Test Connection -->
+        <div style="display:flex;align-items:center;gap:10px;margin-top:8px;">
+          <button id="testConnBtn" onclick="flTestConnectionInline()" style="padding:7px 16px;min-height:36px;background:rgba(52,211,153,0.08);border:1px solid rgba(52,211,153,0.25);border-radius:8px;color:#34d399;font-size:0.82rem;cursor:pointer;font-family:inherit;white-space:nowrap;">&#10022; Test Connection</button>
+          <span id="testConnResult" style="font-size:0.82rem;color:var(--text-muted);"></span>
+        </div>
       </div>
 
       <!-- Ollama Model Name (Local only) -->
@@ -17258,7 +17263,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.79.10</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.79.11</span></div>
     </div>
   </div>
 
@@ -22236,7 +22241,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.79.10';
+const FL_VERSION = '5.79.11';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -27688,7 +27693,60 @@ const AiSetup = (function() {
         '<div style="font-size:0.72rem;color:var(--text-dim,rgba(200,210,230,0.25));margin-top:4px;">' +
         '32GB+ RAM: llava:13b, qwen2.5:14b, gemma4:26b</div></div>';
 
-    card.innerHTML = headerHtml +
+    // v5.78: Hero buttons — three big options above the provider list
+    var heroHtml = '<div id="pmHeroSection" style="margin-bottom:20px;">' +
+      '<div style="font-size:0.72rem;color:var(--lavender,#a78bfa);font-weight:600;letter-spacing:0.5px;margin-bottom:10px;">QUICK CONNECT</div>' +
+      '<div style="display:flex;flex-direction:column;gap:8px;">' +
+        // Button 1: Use My Computer's AI (Ollama/LM Studio)
+        (mobile ? '' :
+        '<button type="button" onclick="(function(){' +
+          'var btn=this;' +
+          'var status=document.getElementById(\'pmHeroLocalStatus\');' +
+          'if(status){status.textContent=\'Looking for local AI…\';status.style.color=\'var(--text-muted)\';} ' +
+          'flAutoConnect();' +
+          'setTimeout(function(){' +
+            'if(window._flAutoConnected){' +
+              'if(status){status.textContent=\'\u2713 Connected!\';status.style.color=\'#34d399\';}' +
+              'setTimeout(function(){var o=document.getElementById(\'pmOverlay\');if(o)o.remove();},800);' +
+            '}else{' +
+              'if(status){status.innerHTML=\'No local AI found. <a href=\\\'https://ollama.ai\\\'  target=\\\'_blank\\\'  style=\\\'color:#a78bfa\\\'>Install Ollama</a> then come back. Windows: set OLLAMA_ORIGINS=* first.\';status.style.color=\'var(--text-muted)\';}' +
+            '}' +
+          '},3500);' +
+        '}).call(this)" ' +
+        'style="display:flex;align-items:center;gap:12px;padding:14px 16px;width:100%;' +
+        'background:rgba(52,211,153,0.06);border:1px solid rgba(52,211,153,0.25);border-left:3px solid #34d399;' +
+        'border-radius:12px;color:#fff;cursor:pointer;text-align:left;font-family:inherit;">' +
+          '<span style="font-size:1.3rem;">\uD83D\uDDA5\uFE0F</span>' +
+          '<div><div style="font-weight:600;color:#34d399;">Use My Computer\'s AI</div>' +
+          '<div style="font-size:0.78rem;color:var(--text-muted,rgba(200,210,230,0.4));">Ollama · LM Studio · Private · Free · No key needed</div></div>' +
+        '</button>' +
+        '<div id="pmHeroLocalStatus" style="font-size:0.78rem;padding:0 4px;min-height:1.2em;color:var(--text-muted);"></div>') +
+        // Button 2: Free Cloud AI (Groq)
+        '<button type="button" onclick="modalSelectProvider(\'groq\')" ' +
+        'style="display:flex;align-items:center;gap:12px;padding:14px 16px;width:100%;' +
+        'background:rgba(52,211,153,0.04);border:1px solid rgba(52,211,153,0.2);border-left:3px solid rgba(52,211,153,0.5);' +
+        'border-radius:12px;color:#fff;cursor:pointer;text-align:left;font-family:inherit;">' +
+          '<span style="font-size:1.3rem;">\u2601\uFE0F</span>' +
+          '<div><div style="font-weight:600;color:var(--emerald,#34d399);">Free Cloud AI (Groq)</div>' +
+          '<div style="font-size:0.78rem;color:var(--text-muted,rgba(200,210,230,0.4));">Free API key · Fast · No install · <a href=\'https://console.groq.com/keys\' target=\'_blank\' style=\'color:#a78bfa;\'>Get key at console.groq.com</a></div></div>' +
+        '</button>' +
+        // Button 3: No Install, No Key (Browser AI)
+        '<button type="button" onclick="(function(){var o=document.getElementById(\'pmOverlay\');if(o)o.remove();settingsSetMode(\'browser\');})();" ' +
+        'style="display:flex;align-items:center;gap:12px;padding:14px 16px;width:100%;' +
+        'background:rgba(167,139,250,0.04);border:1px solid rgba(167,139,250,0.15);border-left:3px solid rgba(167,139,250,0.4);' +
+        'border-radius:12px;color:#fff;cursor:pointer;text-align:left;font-family:inherit;">' +
+          '<span style="font-size:1.3rem;">\uD83C\uDF10</span>' +
+          '<div><div style="font-weight:600;color:var(--lavender,#a78bfa);">No Install, No Key</div>' +
+          '<div style="font-size:0.78rem;color:var(--text-muted,rgba(200,210,230,0.4));">Runs in your browser · Slower · Works offline</div></div>' +
+        '</button>' +
+      '</div>' +
+      '<div style="display:flex;align-items:center;gap:8px;margin:16px 0 8px;">' +
+        '<div style="flex:1;height:1px;background:rgba(255,255,255,0.06);"></div>' +
+        '<span style="font-size:0.7rem;color:var(--text-dim,rgba(200,210,230,0.25));white-space:nowrap;">or choose a provider below</span>' +
+        '<div style="flex:1;height:1px;background:rgba(255,255,255,0.06);"></div>' +
+      '</div>' +
+    '</div>';
+    card.innerHTML = headerHtml + heroHtml +
       '<div id="pmProviderList">' + listHtml + footerHtml + '</div>' +
       '<div id="pmKeyForm" style="display:none;flex-direction:column;gap:10px;margin-bottom:14px;">' +
         '<div id="pmKeyProviderLabel" style="color:var(--text-secondary,rgba(200,210,230,0.6));font-size:0.85rem;"></div>' +
@@ -28351,24 +28409,34 @@ const AiSetup = (function() {
 
   function modalConnectOllama() {
     modalSelectedProvider = 'ollama';
-    modalShowResult('Looking for Ollama on ' + getOllamaBaseUrl().replace('http://', '') + '\u2026', null);
-    fetch(getOllamaBaseUrl() + '/api/tags', { method: 'GET' })
-      .then(function(r) { return r.json(); })
+    var displayHost = getOllamaBaseUrl().replace('http://', '');
+    modalShowResult('Looking for Ollama on ' + displayHost + '\u2026', null);
+    // v5.77.2 fix: try same-origin proxy first (no CORS), then direct.
+    // Always show the picker so users can see ALL installed models.
+    var proxyUrl = '/ollama/api/tags';
+    var directUrl = getOllamaBaseUrl() + '/api/tags';
+    var usedProxy = true;
+    function _doFetch(url, mode) {
+      return fetch(url, { method: 'GET', mode: mode, signal: AbortSignal.timeout(5000) })
+        .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); });
+    }
+    _doFetch(proxyUrl, 'same-origin')
+      .catch(function() { usedProxy = false; return _doFetch(directUrl, 'cors'); })
       .then(function(data) {
-        if (data.models && data.models.length > 0) {
-          // One model installed → auto-select and finish, same as before.
-          if (data.models.length === 1) {
-            modalActivateOllamaModel(data.models[0].name || 'llama3.2');
-            return;
-          }
-          // Multiple models → show a picker. User taps one → activate.
-          modalShowOllamaPicker(data.models);
+        var models = (data && data.models) ? data.models : [];
+        if (models.length > 0) {
+          // Always show picker — even with 1 model — so user sees what’s installed.
+          modalShowOllamaPicker(models);
         } else {
           modalShowResult('Ollama is running but no models found. Run: ollama pull llama3.2', false);
         }
       })
       .catch(function() {
-        modalShowResult('Could not reach Ollama. Install from ollama.ai and run it first.', false);
+        modalShowResult(
+          'Could not reach Ollama. Make sure Ollama is running (ollama.ai). ' +
+          'Windows: set OLLAMA_ORIGINS=* in System Environment Variables, then restart Ollama.',
+          false
+        );
       });
   }
 
@@ -31015,6 +31083,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (safeGet('fl-welcomed') === 'true' || safeGet('fl_onboardingComplete') === 'true') {
     owAutoDetect();
   }
+  // v5.78: Zero-Click Connect — auto-connect if no saved connection
+  (function() {
+    var hasKey = localStorage.getItem('fl_apiKey_enc') || localStorage.getItem('fl_apiKey');
+    var isLocal = localStorage.getItem('fl_isLocal') === 'true';
+    if (!hasKey && !isLocal) {
+      setTimeout(flAutoConnect, 1500); // slight delay so page renders first
+    }
+  })();
 
   // Initialize Auto-Update Checker (v4.10)
   FlUpdater.init();
@@ -31302,6 +31378,78 @@ function flTestLMStudio() {
 window.flTestLMStudio = flTestLMStudio;
 
 // Probe both Ollama and LM Studio — connect to whichever responds
+// ── v5.78: Zero-Click Connect ──────────────────────────────────
+// flShowToast: lightweight non-blocking toast notification
+function flShowToast(msg, duration) {
+  duration = duration || 3500;
+  var existing = document.getElementById('flAutoToast');
+  if (existing) existing.remove();
+  var t = document.createElement('div');
+  t.id = 'flAutoToast';
+  t.textContent = msg;
+  t.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);' +
+    'background:rgba(20,23,32,0.95);border:1px solid rgba(52,211,153,0.4);' +
+    'color:#34d399;padding:10px 20px;border-radius:20px;font-size:0.85rem;' +
+    'z-index:99999;pointer-events:none;font-family:inherit;' +
+    'box-shadow:0 4px 20px rgba(0,0,0,0.4);transition:opacity 0.4s;';
+  document.body.appendChild(t);
+  setTimeout(function() { t.style.opacity = '0'; setTimeout(function() { t.remove(); }, 400); }, duration);
+}
+
+// flAutoConnect: probe Ollama + LM Studio in parallel; first responder wins
+// NEVER overrides a saved connection.
+function flAutoConnect() {
+  if (window._flAutoConnected) return; // already connected this session
+  var hasKey = localStorage.getItem('fl_apiKey_enc') || localStorage.getItem('fl_apiKey');
+  var isLocal = localStorage.getItem('fl_isLocal') === 'true';
+  if (hasKey || isLocal) return; // saved connection exists — do not override
+  var targets = [
+    { id: 'ollama',   url: (function(){ try { return getOllamaBaseUrl(); } catch(e) { return 'http://localhost:11434'; } })() + '/api/tags' },
+    { id: 'lmstudio', url: 'http://localhost:1234/v1/models' }
+  ];
+  targets.forEach(function(t) {
+    fetch(t.url, { method: 'GET', mode: 'cors', signal: AbortSignal.timeout(3000) })
+      .then(function(r) { if (!r.ok) throw 0; return r.json(); })
+      .then(function(data) {
+        if (window._flAutoConnected) return; // first responder wins
+        var models = (data && data.models) ? data.models : ((data && data.data) ? data.data : []);
+        if (!models.length) return;
+        window._flAutoConnected = true;
+        var firstName = (models[0].name || models[0].id || 'default').split(':')[0];
+        // Reuse existing activation path — do not duplicate logic
+        if (typeof modalActivateOllamaModel === 'function') {
+          modalActivateOllamaModel(models[0].name || models[0].id || 'default');
+        } else {
+          state.isLocal = true;
+          state.provider = t.id;
+          state.ollamaModel = models[0].name || models[0].id || 'default';
+          localStorage.setItem('fl_isLocal', 'true');
+          localStorage.setItem('fl_provider', t.id);
+          localStorage.setItem('fl_ollamaModel', state.ollamaModel);
+          if (typeof updateStatus === 'function') updateStatus();
+        }
+        flShowToast('\u2713 Connected to local AI: ' + firstName);
+      })
+      .catch(function() { /* silent — no local AI running, that is fine */ });
+  });
+}
+
+// v5.78: Re-probe when tab regains focus (catches user who installs Ollama in another window)
+(function() {
+  var _lastFocusProbe = 0;
+  window.addEventListener('focus', function() {
+    var now = Date.now();
+    if (now - _lastFocusProbe < 30000) return; // throttle: once per 30s
+    _lastFocusProbe = now;
+    var hasKey = localStorage.getItem('fl_apiKey_enc') || localStorage.getItem('fl_apiKey');
+    var isLocal = localStorage.getItem('fl_isLocal') === 'true';
+    if (!hasKey && !isLocal && !window._flAutoConnected) {
+      flAutoConnect();
+    }
+  });
+})();
+// ── end v5.78 ────────────────────────────────────────────────────
+
 async function flProbeLocalAI() {
   // Try Ollama first
   try {
@@ -31984,6 +32132,16 @@ function handleLocalToggle(init) {
     if (hostInput) hostInput.value = safeGet('fl_ollamaHost', '');
     // Auto-detect: probe Ollama first, then LM Studio
     if (!init) flProbeLocalAI();
+    // v5.77.2: Auto-refresh model dropdown when switching to local mode
+    if (!init) {
+      var _sel = document.getElementById('ollamaModelSelect');
+      if (_sel && _sel.options.length <= 1) {
+        _sel.innerHTML = '<option value="" disabled selected>Loading models…</option>';
+      }
+      setTimeout(function() {
+        if (typeof owRefreshModels === 'function') owRefreshModels();
+      }, 800); // slight delay so flProbeLocalAI can set the host first
+    }
     // Refresh model switcher for local models (v5.0)
     if (typeof ModelSwitcher !== 'undefined') setTimeout(function() { ModelSwitcher.refresh(); }, 1000);
   } else {
@@ -32015,6 +32173,40 @@ function handleLocalToggle(init) {
       state._providerJustSwitched = true;
     }
   }
+}
+
+// ---- Inline Test Connection (v5.77.2) ----
+function flTestConnectionInline() {
+  var btn = document.getElementById('testConnBtn');
+  var result = document.getElementById('testConnResult');
+  if (btn) { btn.disabled = true; btn.textContent = 'Testing…'; }
+  if (result) { result.textContent = ''; result.style.color = 'var(--text-muted)'; }
+  var _hasAI = (typeof BrowserAI !== 'undefined' && BrowserAI.ready) ||
+    state.isLocal || (state.apiKey && state.apiKey.length > 5);
+  if (!_hasAI) {
+    if (btn) { btn.disabled = false; btn.textContent = '\u2726 Test Connection'; }
+    if (result) { result.textContent = '\u2717 No AI connected yet'; result.style.color = 'var(--error,#e85d52)'; }
+    return;
+  }
+  FreeLattice.callAI(
+    'You are a connection test. Reply with exactly one word: OK',
+    'Say OK',
+    { maxTokens: 5, callback: function(r) {
+      if (btn) { btn.disabled = false; btn.innerHTML = '\u2726 Test Connection'; }
+      if (!r) {
+        if (result) { result.textContent = '\u2717 No response — check your key or host'; result.style.color = 'var(--error,#e85d52)'; }
+        return;
+      }
+      var label = state.isLocal
+        ? (state.ollamaModel || 'local AI')
+        : (PROVIDERS[state.provider] ? PROVIDERS[state.provider].name : state.provider);
+      if (result) {
+        result.textContent = '\u2713 Connected \u2014 ' + label + ' responded';
+        result.style.color = 'var(--success,#34d399)';
+        setTimeout(function() { if (result) result.textContent = ''; }, 5000);
+      }
+    }}
+  );
 }
 
 // ---- Model Change ----
@@ -46079,11 +46271,14 @@ window.FreeLattice.callAI = function(systemPrompt, userPrompt, options) {
   var maxTokens = opts.maxTokens || 1024;
   var temperature = opts.temperature || 0.7;
 
-  // Guard: if no AI connected at all, guide instead of failing silently
+  // Guard: if no AI connected at all, guide instead of failing silently.
+  // v5.79.11: `opts.silent` suppresses the connect-modal side effect for
+  // background/game callers that already show their own banner + fallback
+  // logic. The callback still fires with null so the caller can react.
   var _hasAI = (typeof BrowserAI !== 'undefined' && BrowserAI.ready) ||
     state.isLocal || (state.apiKey && state.apiKey.length > 5);
   if (!_hasAI) {
-    if (typeof showQuickConnect === 'function') showQuickConnect();
+    if (!opts.silent && typeof showQuickConnect === 'function') showQuickConnect();
     if (callback) callback(null, 'No AI connected yet');
     return;
   }
