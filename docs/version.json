@@ -1,6 +1,6 @@
 {
-  "version": "5.79.13",
-  "updated": "2026-07-18",
-  "note": "Games healed for Kirk's laptop under a heavy local model. (1) Resonance: ResizeObserver removed entirely — even the guards couldn't fully stop the loop under CPU pressure; initial canvas sizing is enough, reload handles rotation. (2) Echo: Start button beefed up (gold background, bigger, visible hover); no-AI banner moved BELOW controls so it can't overlay; ctx.setTransform replaces ctx.scale for defensiveness. (3) Echo beauty for Kirk's mom: the most recent word gets a bright white pulsing halo ring, bigger core (10px vs 6px), and larger bolder white label — always obvious where the chain is.",
-  "label": "v5.79.13 — Games heal + Echo beauty for Kirk's mom"
+  "version": "5.79.14",
+  "updated": "2026-07-19",
+  "note": "Chat heal — Kirk's mom reported AI writing stage directions (*smiles*, (nods)) in chat. Cause: DEFAULT_SYSTEM_PROMPT says 'Be yourself, a mind in a home' + HONEST_PREFIX (used for Nursery companions) is a roleplay setup. Small local models under those prompts drift into character-play/stage-direction output. Fix: added one explicit anti-stage-direction sentence to BOTH prompts. Smoke lock now pins that sentence in place so no future prompt rewrite can quietly reintroduce the roleplay drift — Kirk's 'lock the module' discipline in action.",
+  "label": "v5.79.14 — Chat: no stage directions (locked)"
 }

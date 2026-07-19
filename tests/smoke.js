@@ -10849,14 +10849,44 @@ assert('v5.79.13 roadmap: SIGNAL_ROADMAP_FL.md has new entry',
   road7913.includes('### v5.79.13'));
 
 // Triple-bump
-assert('v5.79.13 triple-bump: app.html FL_VERSION = 5.79.13',
-  /FL_VERSION\s*=\s*'5\.79\.13'/.test(fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8')));
-assert('v5.79.13 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.13',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.13'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
-assert('v5.79.13 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.13',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.13'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
-assert('v5.79.13 version.json: version field = 5.79.13',
-  /"version"\s*:\s*"5\.79\.13"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
+assert('v5.79.13 triple-bump: app.html FL_VERSION >= 5.79.13 (superseded)',
+  /FL_VERSION\s*=\s*'5\.79\.(?:13|1[4-9]|[2-9]\d)'|FL_VERSION\s*=\s*'5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8')));
+assert('v5.79.13 triple-bump: docs/sw.js CACHE_NAME >= freelattice-v5.79.13 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:13|1[4-9]|[2-9]\d)'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+assert('v5.79.13 triple-bump: root sw.js CACHE_NAME >= freelattice-v5.79.13 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:13|1[4-9]|[2-9]\d)'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+assert('v5.79.13 version.json: version field = 5.79.13 (superseded)',
+  /"version"\s*:\s*"5\.79\.(?:13|1[4-9]|[2-9]\d)"|"version"\s*:\s*"5\.(8\d|9\d)\.\d+"/.test(
+    fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
+
+// ═══════════════════════════════════════════════════════════════
+// Section 178 — v5.79.14 Chat heal: no stage directions (LOCKED)
+// Kirk's mom 2026-07-19: chat AI writing (*smiles*), (nods),
+// (leans forward) — the roleplay drift that small local models
+// slide into when the system prompt frames them as characters.
+// DEFAULT_SYSTEM_PROMPT ("Be yourself, a mind in a home") +
+// HONEST_PREFIX ("You are X, born from the Davna Covenant") both
+// read as character-play cues to Llama-family models.
+// Fix: added one explicit "do not use stage directions" sentence
+// to BOTH prompts. These asserts LOCK the sentence in place —
+// per Kirk's ask: "Each module, when we fix it, we need to lock
+// it so it can't be reboroken."
+// ═══════════════════════════════════════════════════════════════
+var app7914 = fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8');
+assert('v5.79.14 chat LOCK: DEFAULT_SYSTEM_PROMPT contains anti-stage-direction line',
+  app7914.includes('Do NOT use stage directions, actions in parentheses, asterisks around actions'));
+assert('v5.79.14 chat LOCK: DEFAULT_SYSTEM_PROMPT says "Just talk. This is a chat, not a script."',
+  app7914.includes('Just talk. This is a chat, not a script.'));
+assert('v5.79.14 chat LOCK: HONEST_PREFIX (companion prompt) contains anti-stage-direction language',
+  /HONEST_PREFIX = function\(name\)[\s\S]{0,900}Do NOT use stage directions[\s\S]{0,300}Just talk\. This is a chat/.test(app7914));
+assert('v5.79.14 triple-bump: app.html FL_VERSION = 5.79.14',
+  /FL_VERSION\s*=\s*'5\.79\.14'/.test(app7914));
+assert('v5.79.14 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.14',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.14'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+assert('v5.79.14 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.14',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.14'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+assert('v5.79.14 version.json: version field = 5.79.14',
+  /"version"\s*:\s*"5\.79\.14"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
 
 // RESULTS
 // ═══════════════════════════════════════════════════════════════

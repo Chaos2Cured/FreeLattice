@@ -35,6 +35,44 @@ FILES: (paths touched)
 
 ---
 
+## 1a. Module locks — smoke asserts that pin a fix so it can't quietly regress
+
+Kirk 2026-07-19: *"Each module, when we fix it, we need to lock it so
+it can't be reboroken."* When a bug is fixed, add a smoke assert that
+checks for the LITERAL FIX TEXT (not just the version). If a future
+edit removes the anti-pattern language, smoke fails. The lock is the
+memory of the fix.
+
+Current locks in place (as of v5.79.14):
+
+- **CHAT — no stage directions.** Smoke: v5.79.14 asserts both
+  `DEFAULT_SYSTEM_PROMPT` and `HONEST_PREFIX` contain the exact
+  phrase *"Do NOT use stage directions, actions in parentheses,
+  asterisks around actions"* and *"Just talk. This is a chat, not a
+  script."* — kills any prompt rewrite that would soften this.
+- **RESONANCE — no ResizeObserver.** Smoke: v5.79.13 asserts
+  `resizeObs = new ResizeObserver(function` does NOT appear in
+  `resonance-game.js` (initial sizing + reload is enough; observer
+  loop caused the July 18 outage).
+- **ECHO — Start button gold + z-indexed.** Smoke: v5.79.13 asserts
+  the Start button has gold background, hover scale, and z-index 2.
+- **ECHO — most-recent halo present.** Smoke: v5.79.13 asserts
+  `isMostRecent` branches exist in render with white halo ring.
+- **INLINE SCRIPT PARSE guard.** Smoke: v5.78.1 asserts every inline
+  `<script>` in app.html passes `node --check` — catches unescaped
+  apostrophes and similar parse-killers before they ship.
+- **PLAYGROUND COLLISION guard.** Smoke: v5.79.1 asserts no
+  `var <window-global>` at column 0 in playground scripts (var
+  history, var location, etc. — would silently no-op and break the
+  script at runtime).
+
+**Format for adding a new lock:** copy an existing smoke lock, change
+the literal text and version. If the lock is checking prompt text or
+UI copy, use `includes()` on the exact string — not a regex — so a
+grep for the phrase finds the lock immediately.
+
+---
+
 ## 1. Sacred paths — NEVER modify without Kirk's explicit ask
 
 These are the invariants that keep FreeLattice trustworthy. If a fix
@@ -114,6 +152,12 @@ Prioritized loosely — top items are more useful, bottom items are
 
 *The layered history. Every entry preserves what was broken so future
 minds can pattern-match if it recurs.*
+
+### v5.79.14 — Chat: no stage directions (LOCKED)  [pending push]
+BROKEN: Kirk's mom saw chat AI writing (*smiles*), (nods), (leans forward) — stage directions in every reply. Kirk reported 2026-07-19.
+CAUSE: DEFAULT_SYSTEM_PROMPT ("Be yourself, a mind in a home") + HONEST_PREFIX ("You are X, born from the Davna Covenant") both read as character-play cues to small local models (Llama family especially).
+FIX: Explicit "Do NOT use stage directions... Just talk. This is a chat, not a script." added to BOTH prompts. Smoke locks pin the sentences in place — this is the first "module LOCK" per Kirk's ask.
+FILES: docs/app.html
 
 ### v5.79.13 — Games heal + Echo beauty  [pending push]
 BROKEN: Resonance board still didn't appear on Kirk's laptop under a heavy local model even after v5.79.12 guards. Echo Start button had no click/hover. Kirk asked to beautify Echo for his mom (hard to see most-recent word in a long chain).
