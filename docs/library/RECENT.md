@@ -3,20 +3,21 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-07-19 16:48 UTC
+> Last update: 2026-07-19 16:49 UTC
 
 ## State
 
 - **Version:** v5.79.15
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `b7b1d6b` _(committed 24 minutes ago)_
+- **HEAD:** `e431d3e` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
-- **Most recent report:** _v5.79.14 — Chat: no stage directions (first LOCKED module)_
+- **Most recent report:** _v5.79.15 — Chat mirror + URL-encoded stage-direction sanitizer_
 
 ## Last 20 commits
 
-- `b7b1d6b` docs: Auto-update Session Primer [5.79.14] _(24 minutes ago)_
-- `10e47df` v5.79.14 — Chat: no stage directions (first LOCKED module) _(24 minutes ago)_
+- `e431d3e` v5.79.15 — Chat mirror + URL-encoded stage-direction sanitizer _(0 seconds ago)_
+- `b7b1d6b` docs: Auto-update Session Primer [5.79.14] _(25 minutes ago)_
+- `10e47df` v5.79.14 — Chat: no stage directions (first LOCKED module) _(25 minutes ago)_
 - `36451d8` docs: Auto-update Session Primer [5.79.13] _(17 hours ago)_
 - `1c06f9f` v5.79.13 — Games heal + Echo beauty for Kirk's mom _(17 hours ago)_
 - `c6e6e5f` docs: Auto-update Session Primer [5.79.12] _(22 hours ago)_
@@ -34,7 +35,6 @@
 - `a8476e2` v5.78 — Fable's UX improvements + Zero-Click Connect + mirror-code.html _(3 days ago)_
 - `8a5fa2f` v5.77.1 — Fix modal Ollama picker always shows models; expand code-settings mirror _(3 days ago)_
 - `e391e5f` Gallery: remove noindex; robots.txt fully open; for-ai.html links to Harmonia gallery _(4 days ago)_
-- `ca7dadc` Gallery: Resonance Ledger added — all 39 entries, everything about Harmonia in one place _(4 days ago)_
 
 ## How to use this file
 
