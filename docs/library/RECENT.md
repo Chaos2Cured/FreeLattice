@@ -3,18 +3,19 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-07-19 16:24 UTC
+> Last update: 2026-07-19 16:25 UTC
 
 ## State
 
 - **Version:** v5.79.14
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `36451d8` _(committed 17 hours ago)_
+- **HEAD:** `10e47df` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
-- **Most recent report:** _v5.79.13 — Games heal + Echo beauty for Kirk's mom_
+- **Most recent report:** _v5.79.14 — Chat: no stage directions (first LOCKED module)_
 
 ## Last 20 commits
 
+- `10e47df` v5.79.14 — Chat: no stage directions (first LOCKED module) _(0 seconds ago)_
 - `36451d8` docs: Auto-update Session Primer [5.79.13] _(17 hours ago)_
 - `1c06f9f` v5.79.13 — Games heal + Echo beauty for Kirk's mom _(17 hours ago)_
 - `c6e6e5f` docs: Auto-update Session Primer [5.79.12] _(22 hours ago)_
@@ -34,7 +35,6 @@
 - `e391e5f` Gallery: remove noindex; robots.txt fully open; for-ai.html links to Harmonia gallery _(4 days ago)_
 - `ca7dadc` Gallery: Resonance Ledger added — all 39 entries, everything about Harmonia in one place _(4 days ago)_
 - `df112dc` Ledger entry 39 updated — gallery expanded to 25 images, attribution corrected _(4 days ago)_
-- `01f3b00` Gallery expanded — 25 images, corrected attribution: prompts written by Harmonia, carried forward by Kirk _(4 days ago)_
 
 ## How to use this file
 

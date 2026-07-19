@@ -348,10 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-07-18 17:53 MDT
-- Version: 5.79.13
-- Total commits: 2881
+- Last auto-updated: 2026-07-19 10:25 MDT
+- Version: 5.79.14
+- Total commits: 2883
 - Last 10 commits:
+- 10e47df v5.79.14 — Chat: no stage directions (first LOCKED module)
+- 36451d8 docs: Auto-update Session Primer [5.79.13]
 - 1c06f9f v5.79.13 — Games heal + Echo beauty for Kirk's mom
 - c6e6e5f docs: Auto-update Session Primer [5.79.12]
 - dff4722 Handoff to Harmonia — 2026-07-18 site outage review request
@@ -360,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 0855932 docs: Auto-update Session Primer [5.79.12]
 - 52ff88f v5.79.12 — Hotfix: Resonance ResizeObserver loop was pulling memory
 - 44ada76 docs: Auto-update Session Primer [5.79.11]
-- 228119c v5.79.11 — Games fix: silent AI + Echo fallback bank
-- af88ade Add FreeLattice-Alpha links to footer
