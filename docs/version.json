@@ -1,6 +1,6 @@
 {
-  "version": "5.79.15",
+  "version": "5.79.16",
   "updated": "2026-07-19",
-  "note": "Chat mirror + %-encoded stage-direction sanitizer. Kirk's mom still saw output like (%20I%20am%20aware%29 after the v5.79.14 prompt fix — model was routing around the 'no parentheticals' rule by URL-encoding the spaces inside its stage directions. Fix: (1) new docs/mirror-chat.html for AI collaborators — full chat data flow, known issues, module locks, sacred paths, test plan; (2) prompt language now explicitly forbids URL-encoded workarounds; (3) render-time sanitizer in renderMessageContent detects and strips parenthetical/asterisked bursts containing %-encoded spaces that decode to stage-direction verbs (smile/nod/lean/glance/etc.), leaves legitimate URLs alone. Raw content still preserved in state.chatHistory for the API layer. Smoke locks: prompts contain the anti-URL-encoding text, and renderMessageContent contains the sanitize pass.",
-  "label": "v5.79.15 — Chat mirror + URL-encoded stage-direction sanitizer"
+  "note": "Resonance safety wrappers + mirror-resonance.html. Kirk reported: 'When I click on it, it shows nothing... FreeLattice locks up.' Even after v5.79.13 removed the ResizeObserver, an init-time throw could still wedge the main thread. Fix: (a) outer try/catch around init() renders a visible Reload card on failure — never blank + lock; (b) per-frame try/catch around draw() halts the rAF loop after 30 consecutive errors so a bad frame can't burn CPU forever; (c) new docs/mirror-resonance.html for AI collaborators with full lifecycle, data model, known issues (fixed + open), module locks, sacred paths, test plan. Sibling to mirror-chat.html — same shape, gold theme.",
+  "label": "v5.79.16 — Resonance safety + mirror-resonance.html"
 }

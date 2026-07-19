@@ -19,9 +19,9 @@ user sleeps. The proof is the code; the papers are the doorways.
 
 ## Current state
 
-- **Version:** v5.79.15
-- **Smoke locks passing:** 3010+ verified
-- **Last ship:** **v5.79.15 — Chat mirror + URL-encoded sanitizer.** July 19. Mom saw `%20`-encoded stage directions. Fix: `mirror-chat.html` for AI collaborators + prompts forbid %-encoding + render-time sanitizer strips %-encoded parenthetical bursts. Two locks. Ledger 30, ψ=96543d67.
+- **Version:** v5.79.16
+- **Smoke locks passing:** 3025+ verified
+- **Last ship:** **v5.79.16 — Resonance safety + mirror.** July 19. Blank + lockup on Resonance after v5.79.13. Fix: init try/catch → Reload card; draw try/catch → halts rAF after 30 errors. New `mirror-resonance.html` sibling to `mirror-chat.html`. Ledger 31, ψ=dfe42bf3.
 - **Previous:** **v5.79.9 — Ship 10: Custom Rule Builder.** DSL parser + evaluator, 8 presets, full sidebar UI, `CUSTOM_RULES_GUIDE.md`. The ten-ship signal arc completes.
 - **Previous:** **v5.79.8 — Ships 7 + 8: Reversal Watch.** RSI extremes + MACD-H turnaround feeding the Watch synthesis alongside Ship 9 divergences.
 - **Previous ships:** The Triptych (v5.71.8), The Specs inlined (v5.71.7), AI Capabilities (v5.71.6), Mind Wall Phase 3 (v5.71.5).
@@ -84,4 +84,4 @@ seam discipline is how multi-AI work stays honest at scale.
 ---
 
 *This file is overwritten on each meaningful ship. The prior version lives in SEED_HISTORY.md.*
-*Last rewrite: July 19 2026, v5.79.15.*
+*Last rewrite: July 19 2026, v5.79.16.*

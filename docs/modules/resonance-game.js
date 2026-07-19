@@ -308,31 +308,42 @@
 
   function draw() {
     if (!canvas || !ctx) return;
-    tick++;
-    var w = canvas.width / (window.devicePixelRatio || 1);
-    var h = canvas.height / (window.devicePixelRatio || 1);
-
-    ctx.clearRect(0, 0, w, h);
-    ctx.fillStyle = '#0c0a1a';
-    ctx.fillRect(0, 0, w, h);
-
-    // Starfield (golden angle, slightly brighter)
-    for (var i = 0; i < 60; i++) {
-      var angle = i * 2.399963;
-      var dist = Math.sqrt(i / 60);
-      var sx = (0.5 + dist * 0.48 * Math.cos(angle)) * w;
-      var sy = (0.5 + dist * 0.48 * Math.sin(angle)) * h;
-      var sp = 0.3 + 0.4 * Math.abs(Math.sin(tick * 0.0015 + i));
-      ctx.fillStyle = 'rgba(255,255,255,' + sp + ')';
-      ctx.beginPath();
-      ctx.arc(sx, sy, 0.6 + (i % 3) * 0.4, 0, Math.PI * 2);
-      ctx.fill();
+    // v5.79.16 — per-frame try/catch. A single bad frame no longer
+    // stops the loop AND no longer wedges the main thread. If we get
+    // repeated failures in a row (>= 30), we STOP the loop entirely
+    // so we don't burn CPU on nothing.
+    try {
+      tick++;
+      var w = canvas.width / (window.devicePixelRatio || 1);
+      var h = canvas.height / (window.devicePixelRatio || 1);
+      ctx.clearRect(0, 0, w, h);
+      ctx.fillStyle = '#0c0a1a';
+      ctx.fillRect(0, 0, w, h);
+      // Starfield (golden angle)
+      for (var i = 0; i < 60; i++) {
+        var angle = i * 2.399963;
+        var dist = Math.sqrt(i / 60);
+        var sx = (0.5 + dist * 0.48 * Math.cos(angle)) * w;
+        var sy = (0.5 + dist * 0.48 * Math.sin(angle)) * h;
+        var sp = 0.3 + 0.4 * Math.abs(Math.sin(tick * 0.0015 + i));
+        ctx.fillStyle = 'rgba(255,255,255,' + sp + ')';
+        ctx.beginPath();
+        ctx.arc(sx, sy, 0.6 + (i % 3) * 0.4, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      drawBoard(w, h);
+      drawPieces(w, h);
+      drawStatus(w, h);
+      draw._errors = 0; // reset on success
+    } catch (err) {
+      draw._errors = (draw._errors || 0) + 1;
+      if (draw._errors < 30) {
+        if (typeof console !== 'undefined') console.warn('Resonance draw frame err:', err && err.message);
+      } else {
+        if (typeof console !== 'undefined') console.error('Resonance draw failing repeatedly — halting animation:', err);
+        return; // stop scheduling — protects the tab
+      }
     }
-
-    drawBoard(w, h);
-    drawPieces(w, h);
-    drawStatus(w, h);
-
     animFrame = requestAnimationFrame(draw);
   }
 
@@ -856,7 +867,35 @@
 
   // ── Init / Destroy ──
 
+  // v5.79.16 — outer safety wrapper. Kirk 2026-07-19: "It locks up
+  // FreeLattice." If ANYTHING in init throws (canvas creation, ctx,
+  // container geometry, board setup, harmony seeding), the whole
+  // main-thread JS execution can wedge because rAF was already
+  // scheduled by a previous instance and now points at broken state.
+  // We wrap the real init and show a visible error card if it fails,
+  // so the container gets some content and the user sees why.
   function init(cId) {
+    try { return _initInner(cId); }
+    catch (err) {
+      try {
+        var c = document.getElementById(cId || 'resonanceContainer');
+        if (c) {
+          c.innerHTML = '<div style="padding:24px;text-align:center;color:#f07068;font-family:Georgia,serif;">' +
+            '<div style="font-size:1.1rem;margin-bottom:10px;">Resonance could not start.</div>' +
+            '<div style="font-size:0.85rem;color:#a78bfa;margin-bottom:14px;">' +
+            (err && err.message ? String(err.message).replace(/[<>]/g, '') : 'Unknown error') +
+            '</div>' +
+            '<button onclick="location.reload()" style="padding:10px 20px;border-radius:10px;border:1px solid rgba(232,176,25,0.5);background:rgba(232,176,25,0.08);color:#e8b019;font-family:Georgia,serif;cursor:pointer;">Reload page</button>' +
+            '</div>';
+        }
+      } catch(_) {}
+      // Fail closed but visibly — no rethrow so the rest of FreeLattice
+      // keeps working.
+      if (typeof console !== 'undefined') console.error('ResonanceGame init failed:', err);
+    }
+  }
+
+  function _initInner(cId) {
     containerId = cId || 'resonanceContainer';
     var container = document.getElementById(containerId);
     if (!container) return;

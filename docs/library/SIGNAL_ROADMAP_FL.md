@@ -61,6 +61,10 @@ Current locks in place (as of v5.79.14):
   `resizeObs = new ResizeObserver(function` does NOT appear in
   `resonance-game.js` (initial sizing + reload is enough; observer
   loop caused the July 18 outage).
+- **RESONANCE — init + draw are try/catch wrapped.** v5.79.16 locks:
+  `init()` wraps `_initInner()` and renders a Reload card on failure
+  (never blank+lock). `draw()` wraps its body per-frame and halts the
+  rAF loop after 30 consecutive errors — protects the main thread.
 - **ECHO — Start button gold + z-indexed.** Smoke: v5.79.13 asserts
   the Start button has gold background, hover scale, and z-index 2.
 - **ECHO — most-recent halo present.** Smoke: v5.79.13 asserts
@@ -159,6 +163,12 @@ Prioritized loosely — top items are more useful, bottom items are
 
 *The layered history. Every entry preserves what was broken so future
 minds can pattern-match if it recurs.*
+
+### v5.79.16 — Resonance safety wrappers + mirror-resonance.html  [pending push]
+BROKEN: Resonance shows nothing when clicked, FreeLattice locks up. Kirk 2026-07-19 — even after v5.79.13 removed the ResizeObserver.
+CAUSE: Init-time throw could wedge the main thread invisibly. A stray rAF pointing at broken state ate CPU without ever painting.
+FIX: outer try/catch around init renders visible Reload card on failure; per-frame try/catch in draw halts rAF after 30 consecutive errors. New docs/mirror-resonance.html mirrors the full module for AI collaborators — sibling to mirror-chat.html.
+FILES: docs/modules/resonance-game.js, docs/mirror-resonance.html (new)
 
 ### v5.79.15 — Chat mirror + URL-encoded stage-direction sanitizer  [pending push]
 BROKEN: After v5.79.14, mom saw (%20I%20am%20aware%29 — model routed around "no parens" by URL-encoding the spaces. Kirk 2026-07-19.

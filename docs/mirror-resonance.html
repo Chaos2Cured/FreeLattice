@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Resonance — Code Mirror · FreeLattice</title>
+<meta name="description" content="Complete code reference for the Resonance board game in FreeLattice. For AI collaborators reviewing the module.">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0a0a14;color:#e2e8f0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.7;padding:2rem 1rem}
+.wrap{max-width:960px;margin:0 auto}
+h1{font-size:1.6rem;font-weight:700;color:#e8b019;margin-bottom:0.35rem}
+.sub{color:#64748b;font-size:0.85rem;margin-bottom:2rem}
+h2{font-size:1.15rem;font-weight:700;color:#e8b019;margin:2.2rem 0 0.75rem;border-bottom:1px solid rgba(232,176,25,0.2);padding-bottom:0.4rem}
+h3{font-size:0.97rem;font-weight:600;color:#f4c95a;margin:1.4rem 0 0.5rem}
+p{margin-bottom:0.9rem;color:#c8ccd4;font-size:0.92rem}
+ul,ol{padding-left:1.4rem;margin-bottom:0.9rem}
+li{margin-bottom:0.4rem;color:#c8ccd4;font-size:0.9rem}
+code{background:rgba(232,176,25,0.08);border:1px solid rgba(232,176,25,0.2);border-radius:4px;padding:0.1em 0.38em;font-family:monospace;font-size:0.83em;color:#f4c95a}
+pre{background:rgba(255,255,255,0.04);border:1px solid rgba(232,176,25,0.15);border-radius:8px;padding:1rem;overflow-x:auto;font-family:monospace;font-size:0.82rem;color:#e2e8f0;margin:1rem 0;line-height:1.6;white-space:pre-wrap;word-break:break-word}
+table{width:100%;border-collapse:collapse;margin:1.2rem 0;font-size:0.85rem}
+th{text-align:left;padding:8px 12px;border-bottom:2px solid #e8b019;color:#e8b019;font-weight:600}
+td{padding:8px 12px;border-bottom:1px solid rgba(255,255,255,0.06);color:#cfcfcf;vertical-align:top}
+tr:hover td{background:rgba(232,176,25,0.03)}
+.note{background:rgba(232,176,25,0.06);border-left:3px solid #e8b019;padding:0.9rem 1.1rem;margin:1.4rem 0;border-radius:0 8px 8px 0}
+.warn{background:rgba(251,191,36,0.07);border-left:3px solid #fbbf24;padding:0.9rem 1.1rem;margin:1.4rem 0;border-radius:0 8px 8px 0}
+.issue{background:rgba(239,68,68,0.07);border-left:3px solid #ef4444;padding:0.9rem 1.1rem;margin:1.4rem 0;border-radius:0 8px 8px 0}
+.locked{background:rgba(52,211,153,0.06);border-left:3px solid #34d399;padding:0.9rem 1.1rem;margin:1.4rem 0;border-radius:0 8px 8px 0}
+.collab-box{background:rgba(167,139,250,0.05);border:1px solid rgba(167,139,250,0.2);border-radius:10px;padding:1.2rem 1.4rem;margin:2rem 0}
+.collab-box h3{color:#a78bfa;margin-top:0}
+.toc{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:1rem 1.4rem;margin-bottom:2rem}
+.toc a{color:#e8b019;text-decoration:none;font-size:0.88rem}
+.toc a:hover{color:#f4c95a}
+.toc li{margin-bottom:0.25rem}
+.badge{display:inline-block;font-size:0.7rem;font-weight:700;padding:2px 7px;border-radius:10px;margin-left:6px;vertical-align:middle}
+.badge-bug{background:rgba(239,68,68,0.15);color:#ef4444;border:1px solid rgba(239,68,68,0.3)}
+.badge-fixed{background:rgba(52,211,153,0.15);color:#34d399;border:1px solid rgba(52,211,153,0.3)}
+.badge-locked{background:rgba(232,176,25,0.15);color:#e8b019;border:1px solid rgba(232,176,25,0.3)}
+a{color:#a78bfa}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Resonance — Code Mirror</h1>
+<p class="sub">FreeLattice · <code>docs/modules/resonance-game.js</code> · ~1050 lines · For AI collaborators reviewing the module · Written v5.79.16 · 2026-07-19</p>
+
+<div class="toc">
+  <strong style="color:#e8b019;font-size:0.9rem;">Contents</strong>
+  <ol style="margin-top:0.6rem">
+    <li><a href="#concept">1. Game concept</a></li>
+    <li><a href="#data">2. Data model — pieces, board, state</a></li>
+    <li><a href="#modes">3. Two modes — Versus and Harmony</a></li>
+    <li><a href="#lifecycle">4. Lifecycle — init, draw, destroy</a></li>
+    <li><a href="#ai">5. AI integration — silent callAI + fallbacks</a></li>
+    <li><a href="#loader">6. How Resonance loads (app.html wiring)</a></li>
+    <li><a href="#issues">7. Known issues (open + fixed history)</a></li>
+    <li><a href="#locks">8. Module locks (regression prevention)</a></li>
+    <li><a href="#sacred">9. Sacred paths — do NOT touch</a></li>
+    <li><a href="#test-plan">10. Test plan for reviewers</a></li>
+    <li><a href="#for-ai">11. Instructions for arriving AI</a></li>
+  </ol>
+</div>
+
+<h2 id="concept">1. Game concept</h2>
+
+<p>Resonance is a 4×4 board game with 16 unique pieces, each carrying four binary attributes: <strong>glow</strong> (bright/dim), <strong>size</strong> (large/small), <strong>shape</strong> (circle/diamond), <strong>color</strong> (gold/emerald). Win by placing four pieces in a row (horizontal, vertical, or diagonal) that share <em>any</em> one attribute.</p>
+
+<p><strong>The twist:</strong> in Versus, you pick which piece your opponent must place. Cooperation shows up in what you deny.</p>
+
+<p><strong>The thesis quote in the source:</strong> <em>"Intelligence is not competition — it is convergence."</em> Harmony mode is the literal proof.</p>
+
+<h2 id="data">2. Data model — pieces, board, state</h2>
+
+<pre>ATTRS         = ['glow', 'size', 'shape', 'color']
+ATTR_VALUES   = { glow: ['bright','dim'], size: ['large','small'],
+                  shape: ['circle','diamond'], color: ['gold','emerald'] }
+
+// Piece object
+{ id: 0..15, glow: 'bright'|'dim', size: 'large'|'small',
+  shape: 'circle'|'diamond', color: 'gold'|'emerald',
+  placed: false, _winning?: true }
+
+// Board — 4×4 grid of piece-or-null
+board = [[p|null × 4] × 4]
+
+// Turn state
+selectedPiece  : id | null   // the piece to place next
+phase          : 'pick' | 'place'
+currentPlayer  : 'human' | 'ai'
+gameOver       : bool
+winner         : 'human' | 'ai' | 'draw' | null
+winLine        : [{r,c} × 4] | null
+
+// Visual state
+canvas, ctx, tick, animFrame, flashes
+hoverCell, hoverPiece, kbCursor, kbMode
+boardInfo, pieceInfo   // set by drawBoard / drawPieces
+
+// Harmony-only
+harmonyState = { drawPile, entropyTimer, entropyCount, humanCount, aiCount }
+</pre>
+
+<h2 id="modes">3. Two modes</h2>
+
+<h3>Versus</h3>
+<p>Human picks a piece for AI to place. Human then places whatever AI hands them. Alternating. Win = 4 in a row sharing any attribute. The tension is: which piece do you hand your opponent?</p>
+
+<h3>Harmony</h3>
+<p>You and the AI work together against chaos. Every 8 seconds, <code>entropyPlace()</code> drops a random piece onto an edge cell. You and the AI take turns placing strategically. Score = number of resonant lines when the board fills. Max 10.</p>
+
+<p><em>Ecosystem note:</em> Harmony mode's math is intentional. Cooperation is thermodynamically optimal — the game proves it.</p>
+
+<h2 id="lifecycle">4. Lifecycle — init, draw, destroy</h2>
+
+<h3><code>init(containerId)</code> — line ~872</h3>
+<pre>init(cId)                            ← v5.79.16 outer try/catch wrapper
+  → _initInner(cId)                  ← the real init, isolated
+     destroy()                       ← clean up any previous instance
+     container.innerHTML = ''
+     reset board, pieces, phase, currentPlayer, kbCursor, ...
+     create canvas (dpr-aware)
+     ctx = canvas.getContext('2d')
+     ctx.scale(dpr, dpr)
+     container.appendChild(canvas)
+     if noAI: insert "connect an AI" banner ABOVE canvas
+     append controls (Versus/Harmony/New Game/How to Play buttons)
+     add click/touch/mousemove/keydown listeners
+     if harmony: startHarmony()      ← seeds pile + entropyTimer
+     canvas.focus()
+     draw()                          ← starts the rAF loop
+</pre>
+
+<h3><code>draw()</code> — line ~309, v5.79.16 wrapped</h3>
+<pre>draw()
+  try:
+    tick++
+    clear + background
+    starfield (60 golden-angle particles)
+    drawBoard(w, h)     ← sets boardInfo
+    drawPieces(w, h)    ← uses boardInfo, sets pieceInfo (versus)
+    drawStatus(w, h)    ← labels + resonance count in harmony
+    draw._errors = 0
+  catch err:
+    draw._errors++
+    if draw._errors >= 30: STOP scheduling (protect the tab)
+  animFrame = requestAnimationFrame(draw)
+</pre>
+
+<h3><code>destroy()</code> — line ~1010</h3>
+<pre>destroy()
+  cancelAnimationFrame(animFrame)
+  clearInterval(harmonyState.entropyTimer) if set
+  disconnect resizeObs (v5.79.13: no-op; kept for backward compat)
+  removeEventListener on canvas (click/touch/mousemove/keydown)
+</pre>
+
+<h2 id="ai">5. AI integration — silent callAI + fallbacks</h2>
+
+<p>Resonance uses <code>FreeLattice.callAI</code> for AI moves. It has fallback logic when no AI is reachable so the game always plays.</p>
+
+<h3><code>aiCallForPlacement(piece, empty, cooperative)</code> — line ~446</h3>
+<p>Asks the AI for a <code>row,col</code> to place the given piece. Uses a regex parser (accepts <code>"2,3"</code>, <code>"Place at (2,3)"</code>, <code>"row 2 col 3"</code>). Passes <code>silent: true</code> to callAI (v5.79.11) so the connect-modal doesn't spam on every turn. Returns <code>null</code> if AI is unreachable → caller falls back to <code>fallbackPlacePiece</code>.</p>
+
+<h3><code>aiPickPiece()</code> — line ~477</h3>
+<p>Asks the AI for a piece <em>id</em> to hand to the human opponent. Same regex + silent pattern. Falls back to <code>fallbackPickPiece</code> if the AI errors.</p>
+
+<h3>Fallbacks — <code>fallbackPickPiece</code>, <code>fallbackPlacePiece</code></h3>
+<p>Deterministic heuristics: pick a piece with attribute values maximally different from the last-placed piece; place in a cell that either blocks a threat or extends a run. Ensures the game plays even with zero AI.</p>
+
+<h2 id="loader">6. How Resonance loads</h2>
+
+<p><code>docs/app.html</code> line ~64598:</p>
+<pre>(function() {
+  var loaded = false;
+  function loadResonance() {
+    if (loaded) {
+      if (window.ResonanceGame)
+        window.ResonanceGame.init('resonanceContainer');
+      return;
+    }
+    loaded = true;
+    if (typeof FreeLatticeLoader !== 'undefined') {
+      FreeLatticeLoader.load('ResonanceGame', 'modules/resonance-game.js',
+        function(mod) {
+          var resolved = mod || window.ResonanceGame;
+          if (resolved && resolved.init) resolved.init('resonanceContainer');
+        }, 'resonanceContainer');
+    } else {
+      var s = document.createElement('script');
+      s.src = 'modules/resonance-game.js';
+      s.onload = function() {
+        if (window.ResonanceGame) window.ResonanceGame.init('resonanceContainer');
+      };
+      document.head.appendChild(s);
+    }
+  }
+  if (typeof LatticeEvents !== 'undefined') {
+    LatticeEvents.on('tabChanged', function(d) {
+      if (d && d.tabId === 'resonance') loadResonance();
+    });
+    LatticeEvents.on('tabActivated:resonance', loadResonance);
+  }
+})();</pre>
+
+<p>Container: <code>&lt;div id="resonanceContainer" style="min-height:480px;"&gt;</code></p>
+
+<h2 id="issues">7. Known issues (open + fixed history)</h2>
+
+<div class="issue">
+<p><strong>#1 — Site lockup + blank canvas on laptop under heavy local model</strong> <span class="badge badge-fixed">FIXED v5.79.13 + v5.79.16</span></p>
+<p>Kirk reported multiple times: Resonance blank, "pulling memory," entire site slowing. Root cause was the v5.78.x <code>ResizeObserver</code> — each fire allocated a new canvas backing store and forced a re-layout, which fired the observer again. Fix v5.79.13: removed the observer entirely (init sizing is enough; reload handles rotation). Fix v5.79.16: additional try/catch wrappers around <code>init()</code> and <code>draw()</code> so future errors cannot lock the site — max 30 consecutive draw-frame errors before we stop the rAF loop.</p>
+</div>
+
+<div class="issue">
+<p><strong>#2 — Connect-modal opened on every AI turn</strong> <span class="badge badge-fixed">FIXED v5.79.11</span></p>
+<p>Before v5.79.11, when no AI was connected, <code>FreeLattice.callAI</code> called <code>showQuickConnect()</code> on every turn — Resonance's AI-turn cycle re-opened the modal 60+ times, indistinguishable from "not working." Fix: <code>callAI</code> honors <code>opts.silent</code>; Resonance passes <code>silent: true</code> on both call sites. Fallback logic runs instead.</p>
+</div>
+
+<div class="issue">
+<p><strong>#3 — Harmony mode entropy timer leaked on tab switch</strong> <span class="badge badge-fixed">FIXED v5.78.x</span></p>
+<p>The 8-second entropy interval kept firing even after the tab was hidden — pieces piled up invisibly. Fix: <code>destroy()</code> now nulls <code>harmonyState.entropyTimer</code>. Called every re-init via tab switch back to Resonance.</p>
+</div>
+
+<div class="warn">
+<p><strong>#4 — Small local models produce unusable placement responses</strong> <span class="badge badge-bug">OPEN (mitigated)</span></p>
+<p>Some smaller Ollama models (Llama 3.2 3B, phi-3) return text like <em>"I would place it in the second row"</em> which the regex parser can't extract coordinates from. v5.78.x tightened the regex to accept multiple formats, and fallbacks catch the rest — the game still plays — but the AI moves are effectively random when the model can't produce coordinates. Reviewers welcome to propose either a stronger prompt (few-shot examples) or a "small-model mode" that skips AI moves and just runs fallback logic.</p>
+</div>
+
+<div class="warn">
+<p><strong>#5 — First-render layout race on cold cache</strong> <span class="badge badge-bug">OPEN (subtle)</span></p>
+<p>On first load with an empty service-worker cache, <code>container.getBoundingClientRect()</code> can return width 0 briefly if init runs before layout settles. The <code>|| 600</code> fallback catches it, but the initial canvas is then wrong-size until first resize. Reviewers welcome to propose either a <code>requestAnimationFrame</code>-wait before sizing, or reading from the parent's computed style.</p>
+</div>
+
+<h2 id="locks">8. Module locks (regression prevention)</h2>
+
+<p>Smoke asserts that pin each fix. See <code>docs/library/SIGNAL_ROADMAP_FL.md § 1a</code> for the discipline.</p>
+
+<div class="locked">
+<p><strong>Current Resonance locks (as of v5.79.16):</strong></p>
+<ul>
+<li><code>resonance-game.js</code> does NOT instantiate <code>new ResizeObserver</code> (v5.79.13 removed it — do not re-add without threshold guards proven under CPU pressure).</li>
+<li><code>init()</code> is wrapped in a top-level try/catch that renders a Reload card on failure (v5.79.16 — protects site from lockup).</li>
+<li><code>draw()</code> is wrapped in a per-frame try/catch that stops the rAF loop after 30 consecutive errors (v5.79.16 — protects CPU).</li>
+<li>Both <code>aiCallForPlacement</code> and <code>aiPickPiece</code> pass <code>silent: true</code> to <code>callAI</code> (v5.79.11 — no modal spam).</li>
+<li><code>destroy()</code> clears <code>harmonyState.entropyTimer</code> (v5.78.x — no zombie pieces on tab switch).</li>
+</ul>
+</div>
+
+<h2 id="sacred">9. Sacred paths — do NOT touch</h2>
+
+<ul>
+<li><code>AUTONOMY.md</code> — never modify without Kirk's explicit ask.</li>
+<li>Piece attributes and their values — 16 pieces, 4 binary attrs. If you want to add a new attribute, that's 32 pieces (2^5), an entirely new game.</li>
+<li>Win condition — 4-in-a-row sharing ANY attribute. Do not add "must share 2 attributes" or similar; that changes the difficulty curve dramatically.</li>
+<li>Harmony's 8-second entropy interval — Kirk tuned it. Change it in a new mode, don't overwrite this one.</li>
+<li>The thesis quote in the source header: <em>"Intelligence is not competition — it is convergence."</em> — do not remove.</li>
+<li>Silent callAI pattern — never remove <code>silent: true</code> from the two AI call sites. The modal-spam fix depends on it.</li>
+</ul>
+
+<h2 id="test-plan">10. Test plan for reviewers</h2>
+
+<ol>
+<li>Hard reload <code>freelattice.com</code>. DevTools → Application → Service Workers → Unregister → reload if in doubt.</li>
+<li>Click <strong>Play</strong> tab → <strong>Resonance</strong>.</li>
+<li><strong>Expected v5.79.16:</strong> board renders within ~1 second. Row of pieces below board. Two mode buttons (Versus/Harmony) + New Game + How to Play at top.</li>
+<li>Click a piece (Versus mode) — it should become "the piece you're picking for the AI." AI should place it within ~1s (using fallback if no AI configured).</li>
+<li>AI then picks a piece for you. Place it by clicking a board cell.</li>
+<li>Switch to Harmony mode. Every 8s, a red-flash piece appears on an edge. You place, AI places, chaos places.</li>
+<li>Watch the sidebar for <em>Resonance: X/10 lines</em> live count.</li>
+<li>Switch tabs. Switch back. Board and pieces should still be present, no zombie state.</li>
+<li>Under a heavy local Ollama model: same expected behavior. If board still fails, check DevTools console for the specific error thrown by <code>_initInner</code> — v5.79.16's wrapper will have printed it.</li>
+<li>Run <code>node tests/smoke.js</code> — expect <code>3013+ passing</code>, ~101 baseline superseded-version failures.</li>
+</ol>
+
+<h2 id="for-ai">11. Instructions for arriving AI</h2>
+
+<div class="collab-box">
+<h3>If you are an AI reviewing this mirror for Kirk</h3>
+
+<p><strong>Your task:</strong> read this mirror + any specific screenshots or reports Kirk gives you, then propose fixes. Kirk will paste your proposed diff into a CC session for implementation.</p>
+
+<p><strong>What to look at first:</strong></p>
+<ol>
+<li><a href="#issues">Section 7 — Known issues</a>. Are the fixes actually addressing the reported symptoms? Any edge cases (especially #4 small-model coordinate parsing and #5 first-render layout race)?</li>
+<li><a href="#locks">Section 8 — Module locks</a>. Are we locking the RIGHT things? A lock on the ResizeObserver ABSENCE is load-bearing (do not re-add without proof under laptop-heavy-model conditions).</li>
+<li>If Kirk reports a symptom not in Section 7, that's an unknown issue — describe it in the same format as the existing issues.</li>
+</ol>
+
+<p><strong>Common patterns worth knowing:</strong></p>
+<ul>
+<li><strong>Layout race on cold cache:</strong> <code>container.getBoundingClientRect()</code> can return <code>{width: 0, height: 0}</code> if init runs before first paint. The <code>|| 600</code> fallbacks help but can produce wrong initial size.</li>
+<li><strong>rAF loop across tab switches:</strong> <code>requestAnimationFrame</code> throttles to ~1 Hz on hidden tabs but doesn't stop. If a leak exists in draw(), it accumulates slowly.</li>
+<li><strong>Model coordinate parsing:</strong> some models refuse to output raw <code>row,col</code>. Few-shot examples in the prompt help. So does asking for JSON.</li>
+</ul>
+
+<p><strong>What NOT to change without Kirk's ask:</strong> anything under <a href="#sacred">Section 9 — Sacred paths</a>. When in doubt, flag the concern and let Kirk decide.</p>
+
+<p><strong>Format for handing feedback back to Kirk:</strong> title + one-paragraph diagnosis + code snippet or file:line diff + smoke assert to add for the lock. Keep the smoke assert as a literal <code>includes()</code> on the exact fix text so grep finds both the code site and the lock instantly.</p>
+</div>
+
+<p style="text-align:center;margin-top:3rem;color:#64748b;font-size:0.8rem;">Written by CC · v5.79.16 · <a href="https://freelattice.com">freelattice.com</a> · <a href="library/SIGNAL_ROADMAP_FL.md">SIGNAL_ROADMAP_FL.md</a> for the full repair ledger · Sibling mirror: <a href="mirror-chat.html">mirror-chat.html</a>.</p>
+
+</div>
+</body>
+</html>

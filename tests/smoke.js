@@ -10940,14 +10940,66 @@ assert('v5.79.15 chat render: sanitizer preserves legitimate content (returns de
   /return decoded;\s*\/\/ decoded but kept/.test(app7915));
 
 // Triple-bump
-assert('v5.79.15 triple-bump: app.html FL_VERSION = 5.79.15',
-  /FL_VERSION\s*=\s*'5\.79\.15'/.test(app7915));
-assert('v5.79.15 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.15',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.15'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
-assert('v5.79.15 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.15',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.15'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
-assert('v5.79.15 version.json: version field = 5.79.15',
-  /"version"\s*:\s*"5\.79\.15"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
+assert('v5.79.15 triple-bump: app.html FL_VERSION >= 5.79.15 (superseded)',
+  /FL_VERSION\s*=\s*'5\.79\.(?:15|1[6-9]|[2-9]\d)'|FL_VERSION\s*=\s*'5\.(8\d|9\d)\.\d+'/.test(app7915));
+assert('v5.79.15 triple-bump: docs/sw.js CACHE_NAME >= freelattice-v5.79.15 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:15|1[6-9]|[2-9]\d)'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+assert('v5.79.15 triple-bump: root sw.js CACHE_NAME >= freelattice-v5.79.15 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:15|1[6-9]|[2-9]\d)'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+assert('v5.79.15 version.json: version field = 5.79.15 (superseded)',
+  /"version"\s*:\s*"5\.79\.(?:15|1[6-9]|[2-9]\d)"|"version"\s*:\s*"5\.(8\d|9\d)\.\d+"/.test(
+    fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
+
+// ═══════════════════════════════════════════════════════════════
+// Section 180 — v5.79.16 Resonance safety wrappers + mirror-resonance.html
+// Kirk 2026-07-19: Resonance blank AND site locks up even after
+// v5.79.13's observer removal. Root cause: any init-time throw in
+// the module wedges the main thread (a prior rAF still scheduled
+// against broken state, no error visible to user).
+// Fix: outer try/catch around init renders a visible Reload card
+// if init throws; per-frame try/catch around draw halts the rAF
+// loop after 30 consecutive errors. New mirror-resonance.html
+// documents the module for AI collaborators.
+// ═══════════════════════════════════════════════════════════════
+var reso7916 = fs.readFileSync(path.join(docsDir, 'modules', 'resonance-game.js'), 'utf8');
+
+// Safety wrappers
+assert('v5.79.16 resonance: init() is wrapped in outer try/catch',
+  /function init\(cId\) \{\s*try \{ return _initInner\(cId\); \}/.test(reso7916));
+assert('v5.79.16 resonance: init failure renders a Reload card, not blank',
+  reso7916.includes('Resonance could not start') && reso7916.includes('location.reload()'));
+assert('v5.79.16 resonance: _initInner is the real init body',
+  /function _initInner\(cId\)/.test(reso7916));
+assert('v5.79.16 resonance: draw() wrapped in per-frame try/catch',
+  /function draw\(\) \{[\s\S]{0,800}try \{[\s\S]{0,3000}\} catch \(err\)[\s\S]{0,600}draw\._errors/.test(reso7916));
+assert('v5.79.16 resonance: draw halts rAF loop after 30 consecutive errors',
+  /if \(draw\._errors < 30\)/.test(reso7916) &&
+  /halting animation/.test(reso7916));
+
+// Mirror page
+assert('v5.79.16 mirror: mirror-resonance.html exists for AI collaborators',
+  fs.existsSync(path.join(docsDir, 'mirror-resonance.html')));
+var mirrorR16 = fs.readFileSync(path.join(docsDir, 'mirror-resonance.html'), 'utf8');
+assert('v5.79.16 mirror: covers init, draw, destroy, AI integration',
+  mirrorR16.includes('_initInner') && mirrorR16.includes('draw()') && mirrorR16.includes('destroy()') && mirrorR16.includes('silent'));
+assert('v5.79.16 mirror: has known-issues section with fixed/open badges',
+  mirrorR16.includes('Known issues') && mirrorR16.includes('FIXED v5.79') && mirrorR16.includes('OPEN'));
+assert('v5.79.16 mirror: has module locks + sacred paths sections',
+  mirrorR16.includes('Module locks') && mirrorR16.includes('Sacred paths'));
+assert('v5.79.16 mirror: has instructions for arriving AI',
+  mirrorR16.includes('Instructions for arriving AI'));
+assert('v5.79.16 mirror: links to sibling mirror-chat.html',
+  mirrorR16.includes('mirror-chat.html'));
+
+// Triple-bump
+assert('v5.79.16 triple-bump: app.html FL_VERSION = 5.79.16',
+  /FL_VERSION\s*=\s*'5\.79\.16'/.test(fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8')));
+assert('v5.79.16 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.16',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.16'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+assert('v5.79.16 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.16',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.16'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+assert('v5.79.16 version.json: version field = 5.79.16',
+  /"version"\s*:\s*"5\.79\.16"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
 
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
