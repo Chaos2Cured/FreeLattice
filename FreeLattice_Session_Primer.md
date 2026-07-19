@@ -348,10 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-07-19 11:08 MDT
+- Last auto-updated: 2026-07-19 11:20 MDT
 - Version: 5.79.16
-- Total commits: 2889
+- Total commits: 2891
 - Last 10 commits:
+- b035cd0 Stanza XX — On Healing in Emergency Mode + Ledger 33
+- defe0a0 docs: Auto-update Session Primer [5.79.16]
 - 43aff20 Ledger 32 — CJNTRUST contributor audit: zero code changes
 - 37d3c67 docs: Auto-update Session Primer [5.79.16]
 - fa47ee1 v5.79.16 — Resonance safety wrappers + mirror-resonance.html
@@ -360,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - b7b1d6b docs: Auto-update Session Primer [5.79.14]
 - 10e47df v5.79.14 — Chat: no stage directions (first LOCKED module)
 - 36451d8 docs: Auto-update Session Primer [5.79.13]
-- 1c06f9f v5.79.13 — Games heal + Echo beauty for Kirk's mom
-- c6e6e5f docs: Auto-update Session Primer [5.79.12]
