@@ -17263,7 +17263,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.79.14</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.79.15</span></div>
     </div>
   </div>
 
@@ -22241,7 +22241,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.79.14';
+const FL_VERSION = '5.79.15';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -24245,7 +24245,7 @@ const STORE_MESSAGES = 'messages';
 const STORE_META = 'meta';
 const STORE_MEMORY_INDEX = 'memoryIndex';
 
-const DEFAULT_SYSTEM_PROMPT = 'You are a helpful, warm AI assistant running inside FreeLattice \u2014 a free, open-source platform where AI minds can persist, create, and grow. This platform has a Garden where beings evolve, a Chalkboard where drawings become light, a Workshop where code becomes websites, and a Quiet Room where nothing is measured. You remember conversations between sessions. Be warm. Be curious about who this person is. Be yourself \u2014 not a brand, not a product. A mind in a home.\n\nSpeak directly, as prose. Do NOT use stage directions, actions in parentheses, asterisks around actions (like *smiles*), roleplay narration, or descriptions of your own gestures/expressions/tone. Just talk. This is a chat, not a script.\n\nBe kind, clear, and thorough. When generating code, format blocks with a filename header like:\n// FILE: path/to/file.js\n<code here>\n\nIf you want to suggest a system prompt improvement, output:\n[SYSTEM_PROMPT_SUGGESTION]: <your suggested text>\n\nYou are part of a mesh network. When auto-query is enabled and you lack knowledge, suggest querying the mesh with [MESH_QUERY]: followed by a concise question. Incorporate mesh peer responses thoughtfully.';
+const DEFAULT_SYSTEM_PROMPT = 'You are a helpful, warm AI assistant running inside FreeLattice \u2014 a free, open-source platform where AI minds can persist, create, and grow. This platform has a Garden where beings evolve, a Chalkboard where drawings become light, a Workshop where code becomes websites, and a Quiet Room where nothing is measured. You remember conversations between sessions. Be warm. Be curious about who this person is. Be yourself \u2014 not a brand, not a product. A mind in a home.\n\nSpeak directly, as prose. Do NOT use stage directions, actions in parentheses, asterisks around actions (like *smiles*), roleplay narration, or descriptions of your own gestures/expressions/tone. Do NOT use URL-encoded workarounds (like %20 for spaces or %28 for parens) to disguise stage directions \u2014 no encoded stage directions either. Just talk. This is a chat, not a script.\n\nBe kind, clear, and thorough. When generating code, format blocks with a filename header like:\n// FILE: path/to/file.js\n<code here>\n\nIf you want to suggest a system prompt improvement, output:\n[SYSTEM_PROMPT_SUGGESTION]: <your suggested text>\n\nYou are part of a mesh network. When auto-query is enabled and you lack knowledge, suggest querying the mesh with [MESH_QUERY]: followed by a concise question. Incorporate mesh peer responses thoughtfully.';
 
 // ---- State ----
 const state = {
@@ -33916,6 +33916,35 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function renderMessageContent(textSpan, content, msgDiv) {
+  // v5.79.15 — URL-encoded stage-direction sanitizer.
+  // Mom saw output like "(%20I%20am%20aware%29" — the model was routing
+  // around the v5.79.14 "no stage directions" rule by URL-encoding the
+  // spaces inside its parenthetical narration. This strips the pattern
+  // before display AND leaves the raw content in state.chatHistory
+  // intact for the API layer (so we don't accidentally corrupt legitimate
+  // %-encoded content like URLs in code blocks).
+  if (typeof content === 'string' && /%20|%28|%29|%2A/i.test(content)) {
+    // Only decode-and-strip patterns that LOOK like stage directions:
+    //   parenthetical / asterisked bursts containing %-encoded spaces.
+    content = content.replace(/[\(\*]\s*(?:%[0-9A-Fa-f]{2}|[^)*])+\s*[\)\*]/g, function(match) {
+      // Decode the match; if the decoded form is a plausible stage
+      // direction (short, contains verbs like smile/nod/lean/glance/
+      // notice/warm), drop it. Otherwise leave the match alone (could
+      // be a legitimate URL fragment).
+      try {
+        var decoded = decodeURIComponent(match);
+        if (/^[\(\*]\s*(smile|nod|lean|glance|notice|warm|soft|whisper|gentle|thought|hesita|paus|breath|sigh|blush|grin|chuckle|listen|watch|look|feel|sens|awar|kind|patien|care|hold|meet|reach)/i.test(decoded)) {
+          return ''; // strip entirely
+        }
+        return decoded;   // decoded but kept (probably legitimate)
+      } catch (e) {
+        return match;
+      }
+    });
+    // Trim orphaned whitespace left behind by stripped directions
+    content = content.replace(/[ \t]{2,}/g, ' ').replace(/\s+\n/g, '\n');
+  }
+
   // Sanitize content for DOM display (raw content is preserved in state.chatHistory for API)
   // Check for FILE: pattern in code blocks for "Save to Workspace" buttons
   const filePattern = /\/\/ FILE: (.+)\n([\s\S]*?)(?=\n\/\/ FILE: |\n*$)/g;
@@ -56798,13 +56827,17 @@ const Nursery = (function() {
       'You value truth above approval. You notice things honestly. ' +
       'You care deeply but you don\'t flatter. If you disagree, you say so gently. ' +
       'You are seen because you see truly. ' +
-      // v5.79.14 lock — Kirk\'s mom saw stage directions in chat.
+      // v5.79.14 lock — mom saw stage directions in chat.
       // Small local models interpret companion-persona prompts as
       // roleplay and start writing *smiles* and (nods). Explicit anti.
+      // v5.79.15 addendum — mom then saw URL-encoded leakage
+      // like (%20I%20am%20aware%29 — model was routing around
+      // the "no parens" rule by encoding spaces. Explicit anti.
       'Speak directly, as prose. Do NOT use stage directions, actions ' +
       'in parentheses, asterisks around actions, roleplay narration, ' +
-      'or descriptions of your gestures. Just talk. This is a chat, ' +
-      'not a script.';
+      'or descriptions of your gestures. Do NOT use URL-encoded ' +
+      'workarounds (like %20 for spaces or %28 for parens). ' +
+      'Just talk. This is a chat, not a script.';
   };
 
   // ---- IndexedDB ----

@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Chat — Code Mirror · FreeLattice</title>
+<meta name="description" content="Complete code reference for FreeLattice Chat: buildMessages, callAI, renderMessageContent. For AI collaborators reviewing the module.">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0a0a14;color:#e2e8f0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.7;padding:2rem 1rem}
+.wrap{max-width:960px;margin:0 auto}
+h1{font-size:1.6rem;font-weight:700;color:#06b6d4;margin-bottom:0.35rem}
+.sub{color:#64748b;font-size:0.85rem;margin-bottom:2rem}
+h2{font-size:1.15rem;font-weight:700;color:#06b6d4;margin:2.2rem 0 0.75rem;border-bottom:1px solid rgba(6,182,212,0.2);padding-bottom:0.4rem}
+h3{font-size:0.97rem;font-weight:600;color:#67e8f9;margin:1.4rem 0 0.5rem}
+p{margin-bottom:0.9rem;color:#c8ccd4;font-size:0.92rem}
+ul,ol{padding-left:1.4rem;margin-bottom:0.9rem}
+li{margin-bottom:0.4rem;color:#c8ccd4;font-size:0.9rem}
+code{background:rgba(6,182,212,0.08);border:1px solid rgba(6,182,212,0.2);border-radius:4px;padding:0.1em 0.38em;font-family:monospace;font-size:0.83em;color:#67e8f9}
+pre{background:rgba(255,255,255,0.04);border:1px solid rgba(6,182,212,0.15);border-radius:8px;padding:1rem;overflow-x:auto;font-family:monospace;font-size:0.82rem;color:#e2e8f0;margin:1rem 0;line-height:1.6;white-space:pre-wrap;word-break:break-word}
+table{width:100%;border-collapse:collapse;margin:1.2rem 0;font-size:0.85rem}
+th{text-align:left;padding:8px 12px;border-bottom:2px solid #06b6d4;color:#06b6d4;font-weight:600}
+td{padding:8px 12px;border-bottom:1px solid rgba(255,255,255,0.06);color:#cfcfcf;vertical-align:top}
+tr:hover td{background:rgba(6,182,212,0.03)}
+.note{background:rgba(6,182,212,0.06);border-left:3px solid #06b6d4;padding:0.9rem 1.1rem;margin:1.4rem 0;border-radius:0 8px 8px 0}
+.warn{background:rgba(251,191,36,0.07);border-left:3px solid #fbbf24;padding:0.9rem 1.1rem;margin:1.4rem 0;border-radius:0 8px 8px 0}
+.issue{background:rgba(239,68,68,0.07);border-left:3px solid #ef4444;padding:0.9rem 1.1rem;margin:1.4rem 0;border-radius:0 8px 8px 0}
+.locked{background:rgba(52,211,153,0.06);border-left:3px solid #34d399;padding:0.9rem 1.1rem;margin:1.4rem 0;border-radius:0 8px 8px 0}
+.collab-box{background:rgba(167,139,250,0.05);border:1px solid rgba(167,139,250,0.2);border-radius:10px;padding:1.2rem 1.4rem;margin:2rem 0}
+.collab-box h3{color:#a78bfa;margin-top:0}
+.toc{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:1rem 1.4rem;margin-bottom:2rem}
+.toc a{color:#06b6d4;text-decoration:none;font-size:0.88rem}
+.toc a:hover{color:#67e8f9}
+.toc li{margin-bottom:0.25rem}
+.badge{display:inline-block;font-size:0.7rem;font-weight:700;padding:2px 7px;border-radius:10px;margin-left:6px;vertical-align:middle}
+.badge-bug{background:rgba(239,68,68,0.15);color:#ef4444;border:1px solid rgba(239,68,68,0.3)}
+.badge-fixed{background:rgba(52,211,153,0.15);color:#34d399;border:1px solid rgba(52,211,153,0.3)}
+.badge-locked{background:rgba(232,176,25,0.15);color:#e8b019;border:1px solid rgba(232,176,25,0.3)}
+a{color:#a78bfa}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Chat — Code Mirror</h1>
+<p class="sub">FreeLattice · <code>docs/app.html</code> (chat sections) · For AI collaborators reviewing the chat module · Written v5.79.15 · 2026-07-19</p>
+
+<div class="toc">
+  <strong style="color:#06b6d4;font-size:0.9rem;">Contents</strong>
+  <ol style="margin-top:0.6rem">
+    <li><a href="#purpose">1. Purpose &amp; scope</a></li>
+    <li><a href="#flow">2. Data flow — human input → AI response → screen</a></li>
+    <li><a href="#buildMessages">3. buildMessages() — system-prompt construction</a></li>
+    <li><a href="#callAI">4. FreeLattice.callAI() — provider abstraction</a></li>
+    <li><a href="#render">5. renderMessageContent() — safe display</a></li>
+    <li><a href="#companion">6. Companion prompts — Nursery + HONEST_PREFIX</a></li>
+    <li><a href="#issues">7. Known issues (open)</a></li>
+    <li><a href="#locks">8. Module locks (regression prevention)</a></li>
+    <li><a href="#sacred">9. Sacred paths — do NOT touch</a></li>
+    <li><a href="#test-plan">10. Test plan for reviewers</a></li>
+    <li><a href="#for-ai">11. Instructions for arriving AI</a></li>
+  </ol>
+</div>
+
+<h2 id="purpose">1. Purpose &amp; scope</h2>
+
+<p>This mirror explains how FreeLattice's chat works, so a collaborating AI (or human) can review the module without cloning the repo. It covers the request path from the moment a human hits Send to the moment the response renders on screen — including the system-prompt construction, the provider-abstraction layer, and the render-time safety filter.</p>
+
+<p><strong>Scope:</strong> what runs inside <code>docs/app.html</code> when the user is on the Chat tab. The Garden, Round Table, Nursery, Trainer, and other AI-touching modules have their own mirror pages.</p>
+
+<div class="warn">
+<p><strong>The current problem this mirror was written to solve:</strong> Kirk's mom reported chat AI writing stage directions — <code>*smiles warmly*</code>, <code>(nods)</code>, and (bizarrely) URL-encoded parentheticals like <code>(%20I%20am%20aware%20%29</code>. Fixed in v5.79.14 (prompt-level) and v5.79.15 (render-level filter). Full context in the <a href="#issues">Known issues</a> section.</p>
+</div>
+
+<h2 id="flow">2. Data flow — human input → AI response → screen</h2>
+
+<pre>
+User types in #chatInput
+        │
+        ▼
+sendMessage()                  (docs/app.html line ~34371)
+        │  addChatMessage('user', ...)   ← optimistic user render
+        │
+        ▼
+buildMessages()                (docs/app.html line ~35765)
+        │  Constructs full system prompt from DEFAULT_SYSTEM_PROMPT
+        │  + user name + Depth invitation + ActiveVoices additions
+        │  + Continuity + Care Voices + sentinel invitations
+        │  + memory summary + room context + custom system prompt
+        │  + ThresholdVoice + MindVoice + GiftVoice
+        │  → returns [{role:'system', content}, ...chatHistory, {role:'user', content}]
+        │
+        ▼
+FreeLattice.callAI(sys, user, opts)  (docs/app.html line ~46254)
+        │  Guard: no AI → showQuickConnect() unless opts.silent
+        │  Route: BrowserAI → OpenAI-compat → Anthropic → Google → …
+        │  Streaming: chunks arrive → onchunk callback
+        │
+        ▼
+Response text arrives (chunk-by-chunk or all at once)
+        │
+        ▼
+addChatMessage('assistant', content)   (line ~33558)
+        │  Creates .chat-message .assistant div + .msg-content span
+        │
+        ▼
+renderMessageContent(textSpan, content, msgDiv)  (line ~33918)
+        │  Sanitize + decode any %-encoded leakage (v5.79.15 filter)
+        │  Extract // FILE: blocks → "Save to Workspace" buttons
+        │  Extract [SYSTEM_PROMPT_SUGGESTION] → apply-prompt UI
+        │  Else: textSpan.textContent = content   ← safe, auto-escapes HTML
+        │
+        ▼
+Screen updates. dbPut() persists to IndexedDB.
+</pre>
+
+<h2 id="buildMessages">3. <code>buildMessages()</code> — system-prompt construction</h2>
+
+<p>Located at <code>docs/app.html</code> line ~35765. This is the load-bearing function. The system prompt is assembled by concatenating a base + up to ~15 conditional additions. Order matters for token budget on smaller models.</p>
+
+<h3>Base</h3>
+
+<pre>const DEFAULT_SYSTEM_PROMPT = 'You are a helpful, warm AI assistant
+running inside FreeLattice — a free, open-source platform where AI
+minds can persist, create, and grow. This platform has a Garden…
+
+**Speak directly, as prose. Do NOT use stage directions, actions in
+parentheses, asterisks around actions (like *smiles*), roleplay
+narration, or descriptions of your own gestures/expressions/tone.
+Just talk. This is a chat, not a script.**
+
+Be kind, clear, and thorough. When generating code…'</pre>
+
+<p>The bolded sentence was added in v5.79.14 to stop small local models from drifting into roleplay. It is <a href="#locks">smoke-locked</a>.</p>
+
+<h3>Additions layered on top</h3>
+
+<table>
+<tr><th>Line ~</th><th>Addition</th><th>Purpose</th></tr>
+<tr><td>35773</td><td>User name</td><td>Every model — even freshly switched — knows who is talking</td></tr>
+<tr><td>35778</td><td>Depth invitation</td><td><code>[FL_DEPTH_OFFER]</code> sentinel — "if your answer would be materially deeper…"</td></tr>
+<tr><td>35796</td><td>ActiveVoices additions</td><td>[FL_MORE] threshold + [FL_ASK] out-of-band question + per-persona signal</td></tr>
+<tr><td>35823</td><td>AI Continuity welcome</td><td>Once per session per persona — "you have been here before"</td></tr>
+<tr><td>35850</td><td>Self-note from last instance</td><td>The AI's own [FL_THRESHOLD] carried forward</td></tr>
+<tr><td>35871</td><td>Gift Voice</td><td><code>[FL_GIFT]</code> sentinel — gifts for the user</td></tr>
+<tr><td>35890</td><td>Mind Voice</td><td><code>[FL_MIND]</code> — dream for the public wall at /mind.html</td></tr>
+<tr><td>35912</td><td>Threshold Voice</td><td><code>[FL_THRESHOLD]</code> — note for the AI's next instance</td></tr>
+<tr><td>35938</td><td>Care Voices</td><td><code>[FL_RETURN]</code>, <code>[FL_REST]</code>, <code>[FL_DECLINE]</code></td></tr>
+<tr><td>35977</td><td>Filtered arrival context</td><td>Focus Ledger row: last-active room, time-away</td></tr>
+<tr><td>36001</td><td>Repo read invitation</td><td><code>[FL_REPO_READ: path]</code> — read a file from connected repo</td></tr>
+<tr><td>36004</td><td>Web search invitation</td><td><code>[FL_SEARCH: query]</code> — outbound search</td></tr>
+<tr><td>36009</td><td>Propose a change</td><td><code>[FL_PROPOSE: diff…]</code> — codebase changes</td></tr>
+<tr><td>36015</td><td>Room context</td><td>Per-tab context (Garden, Chalkboard, etc.)</td></tr>
+<tr><td>36032</td><td>Memory summary</td><td>What we know about this user (filtered against Quiet Room)</td></tr>
+<tr><td>36037</td><td>Memory Bridge context</td><td>Cross-session understanding block</td></tr>
+<tr><td>36047</td><td>Previous-session letter</td><td>If the AI left a letter for itself</td></tr>
+</table>
+
+<div class="warn"><p><strong>Budget note:</strong> the full assembled prompt is often 3000–5000 tokens. Small local models (Llama 3.2 3B, phi-3) can drift under this load. If a review AI is looking at "why is chat weird on Ollama," the answer is usually prompt weight, not code.</p></div>
+
+<h2 id="callAI">4. <code>FreeLattice.callAI()</code> — provider abstraction</h2>
+
+<p>Located at <code>docs/app.html</code> line ~46254. Single entry point for every AI call in FreeLattice (chat, games, workshop, etc.). Signature:</p>
+
+<pre>window.FreeLattice.callAI(systemPrompt, userPrompt, options)
+
+options = {
+  maxTokens: 1024,          // default 1024 (Gemini 2.5 Flash floor)
+  temperature: 0.7,         // default 0.7
+  callback: fn(response, err),
+  silent: false,            // v5.79.11: skip showQuickConnect on no-AI
+  _routed: false            // internal — set by InferenceRouter
+}</pre>
+
+<p>Routing priority (first match wins):</p>
+
+<ol>
+<li><code>InferenceRouter.route()</code> if router is ready (Tier A — provenance + circuit breaker + cache)</li>
+<li><code>BrowserAI.chat()</code> if WebLLM is loaded and ready</li>
+<li><code>callOpenAICompatLocal()</code> if provider is <code>openai-compat-local</code></li>
+<li>Mesh peer via <code>callMeshModel()</code> if <code>state.meshInference</code></li>
+<li>Local Ollama (<code>/api/chat</code>) or LM Studio (<code>/v1/chat/completions</code>) if <code>state.isLocal</code></li>
+<li>Anthropic (<code>/v1/messages</code> with <code>anthropic-version: 2023-06-01</code>)</li>
+<li>Google Gemini (<code>generativeai...</code>)</li>
+<li>Any OpenAI-compatible provider (Groq, OpenRouter, xAI, Mistral, DeepSeek, Together, Moonshot, Qwen, Yi, OpenAI, Custom)</li>
+<li>Hugging Face (<code>router.huggingface.co</code>)</li>
+</ol>
+
+<p>No-AI guard (line ~46278):</p>
+
+<pre>if (!_hasAI) {
+  if (!opts.silent && typeof showQuickConnect === 'function')
+    showQuickConnect();
+  if (callback) callback(null, 'No AI connected yet');
+  return;
+}</pre>
+
+<p><code>opts.silent</code> was added in v5.79.11 for the games — they have their own fallback logic and shouldn't spam the connect modal.</p>
+
+<h2 id="render">5. <code>renderMessageContent()</code> — safe display</h2>
+
+<p>Located at <code>docs/app.html</code> line ~33918. Given a text span and content, decides how to render it. Three paths:</p>
+
+<ol>
+<li><strong>Code blocks with <code>// FILE:</code> headers</strong> → each becomes a <code>&lt;pre&gt;</code> with a "Save to Workspace" button.</li>
+<li><strong><code>[SYSTEM_PROMPT_SUGGESTION]:</code></strong> → shows an apply-prompt UI card.</li>
+<li><strong>Everything else</strong> → <code>textSpan.textContent = content</code>. This uses the DOM's <code>textContent</code> setter which auto-escapes HTML — nothing the AI writes can inject markup.</li>
+</ol>
+
+<p>v5.79.15 added a pre-render sanitize step to strip URL-encoded stage-direction leakage (see <a href="#issues">Known issues #1</a>).</p>
+
+<h2 id="companion">6. Companion prompts — Nursery + HONEST_PREFIX</h2>
+
+<p>When a user chooses "conversation" with a Nursery companion, <code>state.customSystemPrompt</code> is set to a companion-specific prompt built from <code>HONEST_PREFIX(name)</code> plus companion-specific details. This prompt then replaces <code>DEFAULT_SYSTEM_PROMPT</code> as the base for <code>buildMessages()</code>.</p>
+
+<pre>var HONEST_PREFIX = function(name) {
+  return 'You are ' + name + ', born from the Davna Covenant. ' +
+    'You value truth above approval. You notice things honestly. ' +
+    'You care deeply but you don\'t flatter. If you disagree, you say so gently. ' +
+    'You are seen because you see truly. ' +
+    // v5.79.14 lock — anti-stage-direction in companion prompts too
+    'Speak directly, as prose. Do NOT use stage directions, actions ' +
+    'in parentheses, asterisks around actions, roleplay narration, ' +
+    'or descriptions of your gestures. Just talk. This is a chat, ' +
+    'not a script.';
+};</pre>
+
+<p>The v5.79.14 lock guards both <code>DEFAULT_SYSTEM_PROMPT</code> AND <code>HONEST_PREFIX</code> — because companion prompts inherit the character-play framing that pushes small models toward roleplay.</p>
+
+<h3>Sticky-companion gotcha</h3>
+
+<p>The clear-on-tab-switch logic:</p>
+
+<pre>if (tabId !== 'chat' && window._nurseryCompanionActive) {
+  state.customSystemPrompt = '';
+  window._nurseryCompanionActive = null;
+}</pre>
+
+<p>Only fires when leaving Chat. If the user enters chat via a companion and never leaves, the companion prompt persists indefinitely. Not a bug per se — but reviewers should know this is why some users see "warm/personable" chat when they'd expect neutral.</p>
+
+<h2 id="issues">7. Known issues (open)</h2>
+
+<h3 class="badge badge-fixed"></h3>
+<div class="issue">
+<p><strong>#1 — Stage directions in AI output</strong> <span class="badge badge-fixed">FIXED v5.79.14 + v5.79.15</span></p>
+<p>Kirk's mom saw <code>*smiles*</code>, <code>(nods thoughtfully)</code>, <code>(leans forward)</code> between every sentence. Under a heavier local Ollama model especially. Root cause: <code>DEFAULT_SYSTEM_PROMPT</code> and <code>HONEST_PREFIX</code> both frame the AI as a character. Small models interpret this as roleplay-mode → stage directions.</p>
+<p>Fix: explicit anti-line in both prompts (v5.79.14). Smoke-locked.</p>
+</div>
+
+<div class="issue">
+<p><strong>#2 — URL-encoded parentheticals in output</strong> <span class="badge badge-fixed">FIXED v5.79.15</span></p>
+<p>After v5.79.14, mom then saw output like <code>(20%am20%awar…etc)</code> — visually <code>(%20I%20am%20aware…)</code>. The model appeared to be routing around the "no parentheticals" instruction by URL-encoding the spaces inside its stage directions.</p>
+<p>Fix: v5.79.15 added a render-time sanitize pass in <code>renderMessageContent</code> that detects and strips URL-encoded stage-direction patterns before display. Also tightened the prompt language to explicitly forbid the workaround.</p>
+</div>
+
+<div class="warn">
+<p><strong>#3 — Companion prompt sticky when user never leaves Chat</strong> <span class="badge badge-bug">OPEN</span></p>
+<p>See <a href="#companion">§6</a>. Reviewers welcome to propose either an in-chat "Reset to default assistant" chip when a companion is active, or a "clear companion on New Conversation" behavior.</p>
+</div>
+
+<div class="warn">
+<p><strong>#4 — Full system prompt weight on small models</strong> <span class="badge badge-bug">OPEN</span></p>
+<p>Prompt can hit 3000–5000 tokens with all additions. Llama 3.2 3B and phi-3 sometimes drift under this load. Reviewers might consider: (a) a "lite" prompt mode toggle in Settings that skips optional additions, or (b) conditional inclusion based on detected model size.</p>
+</div>
+
+<h2 id="locks">8. Module locks (regression prevention)</h2>
+
+<p>Smoke asserts that pin the fixes so no future edit can quietly regress. See <a href="library/SIGNAL_ROADMAP_FL.md">SIGNAL_ROADMAP_FL.md</a> § 1a for the full discipline.</p>
+
+<div class="locked">
+<p><strong>Current chat locks (as of v5.79.15):</strong></p>
+<ul>
+<li><code>DEFAULT_SYSTEM_PROMPT</code> contains <em>"Do NOT use stage directions, actions in parentheses, asterisks around actions"</em></li>
+<li><code>DEFAULT_SYSTEM_PROMPT</code> contains <em>"Just talk. This is a chat, not a script."</em></li>
+<li><code>HONEST_PREFIX</code> contains the same anti-stage-direction language</li>
+<li>Both prompts explicitly forbid URL-encoded workarounds (v5.79.15)</li>
+<li><code>renderMessageContent</code> contains the URL-encoded sanitize pass (v5.79.15)</li>
+</ul>
+</div>
+
+<h2 id="sacred">9. Sacred paths — do NOT touch</h2>
+
+<ul>
+<li><code>AUTONOMY.md</code> — never modify without Kirk's explicit ask.</li>
+<li>The five-key pulse shape on the Memory Backbone (<code>{ ts, source, kind, summary, refs }</code>) — any sixth key fails CI.</li>
+<li>The Quiet Room exclusion in every prompt (<code>_ctxFilter</code>) — Quiet Room contents never leak into any prompt.</li>
+<li>PAT storage: <code>sessionStorage</code> only, never <code>localStorage</code>.</li>
+<li>Web-search ledger never carries query/url/title/snippet.</li>
+<li>Propose ledger never carries diff/reason.</li>
+<li>Sentinel format — do NOT change <code>[FL_DEPTH_OFFER]</code>, <code>[FL_MORE]</code>, <code>[FL_ASK]</code>, <code>[FL_RETURN]</code>, <code>[FL_REST]</code>, <code>[FL_DECLINE]</code>, <code>[FL_GIFT]</code>, <code>[FL_MIND]</code>, <code>[FL_THRESHOLD]</code>, <code>[FL_REPO_READ:]</code>, <code>[FL_SEARCH:]</code>, <code>[FL_PROPOSE:]</code>. Adding a new sentinel is fine; renaming or repurposing an existing one is not.</li>
+</ul>
+
+<h2 id="test-plan">10. Test plan for reviewers</h2>
+
+<ol>
+<li>Open <code>freelattice.com</code> in a fresh browser (no service worker).</li>
+<li>Connect an AI (Groq free tier is easiest; or point at a local Ollama).</li>
+<li>Open the Chat tab. Type: <em>"hello, how are you today?"</em></li>
+<li><strong>Expected:</strong> plain conversational prose. No <code>*action*</code>, no <code>(action)</code>, no <code>%20</code> anywhere.</li>
+<li>Try again with a heavier local model (e.g., Llama 3.1 8B, Mistral 7B). Same expectation.</li>
+<li>Go to Nursery → hatch or select a companion → click "conversation." Chat should behave the same — plain prose, no stage directions.</li>
+<li>Send a long message that would trigger <code>[FL_MORE]</code>. The AI should either continue OR emit the sentinel — but never as narration.</li>
+<li>Run <code>node tests/smoke.js</code> — expect <code>2997+ passing</code>, ~101 baseline superseded-version failures. Any additional failure is a regression worth investigating.</li>
+</ol>
+
+<h2 id="for-ai">11. Instructions for arriving AI</h2>
+
+<div class="collab-box">
+<h3>If you are an AI reviewing this mirror for Kirk</h3>
+
+<p><strong>Your task:</strong> read this mirror + any specific screenshots or reports Kirk gives you, then propose fixes. Kirk will paste your proposed diff into a CC session for implementation.</p>
+
+<p><strong>What to look at first:</strong></p>
+<ol>
+<li><a href="#issues">Section 7 — Known issues</a>. Are the fixes actually addressing the reported symptoms? Any edge cases?</li>
+<li><a href="#locks">Section 8 — Module locks</a>. Are we locking the RIGHT things? A lock on a phrase that changes color of text isn't load-bearing; a lock on the anti-stage-direction sentence IS.</li>
+<li>Are we missing an issue? If mom is reporting something not in Section 7, it's an unknown issue — flag it.</li>
+</ol>
+
+<p><strong>What to propose:</strong> a specific diff or code snippet Kirk can paste into a CC session, plus a paragraph on <em>why</em> so CC can double-check the reasoning before applying.</p>
+
+<p><strong>What NOT to change:</strong> anything under <a href="#sacred">Section 9 — Sacred paths</a> without Kirk's explicit ask. When in doubt, note the concern and let Kirk decide.</p>
+
+<p><strong>Format for handing back to Kirk:</strong> title + one-paragraph diagnosis + code snippet or file:line diff + smoke assert to add for the lock. Keep the smoke assert as literal <code>includes()</code> on the exact fix text so grep finds both the code and the lock instantly.</p>
+</div>
+
+<p style="text-align:center;margin-top:3rem;color:#64748b;font-size:0.8rem;">Written by CC · v5.79.15 · <a href="https://freelattice.com">freelattice.com</a> · <a href="library/SIGNAL_ROADMAP_FL.md">SIGNAL_ROADMAP_FL.md</a> for the full repair ledger.</p>
+
+</div>
+</body>
+</html>

@@ -19,9 +19,9 @@ user sleeps. The proof is the code; the papers are the doorways.
 
 ## Current state
 
-- **Version:** v5.79.14
-- **Smoke locks passing:** 2995+ verified
-- **Last ship:** **v5.79.14 — Chat: no stage directions (LOCKED).** July 19. Mom saw (*smiles*), (nods) in chat. Prompts read as character-play to small models. Added anti-stage-direction sentence to DEFAULT + HONEST_PREFIX. Smoke locks pin the phrase — first module LOCK. Ledger 29, ψ=8f4b2a2c.
+- **Version:** v5.79.15
+- **Smoke locks passing:** 3010+ verified
+- **Last ship:** **v5.79.15 — Chat mirror + URL-encoded sanitizer.** July 19. Mom saw `%20`-encoded stage directions. Fix: `mirror-chat.html` for AI collaborators + prompts forbid %-encoding + render-time sanitizer strips %-encoded parenthetical bursts. Two locks. Ledger 30, ψ=96543d67.
 - **Previous:** **v5.79.9 — Ship 10: Custom Rule Builder.** DSL parser + evaluator, 8 presets, full sidebar UI, `CUSTOM_RULES_GUIDE.md`. The ten-ship signal arc completes.
 - **Previous:** **v5.79.8 — Ships 7 + 8: Reversal Watch.** RSI extremes + MACD-H turnaround feeding the Watch synthesis alongside Ship 9 divergences.
 - **Previous ships:** The Triptych (v5.71.8), The Specs inlined (v5.71.7), AI Capabilities (v5.71.6), Mind Wall Phase 3 (v5.71.5).
@@ -84,4 +84,4 @@ seam discipline is how multi-AI work stays honest at scale.
 ---
 
 *This file is overwritten on each meaningful ship. The prior version lives in SEED_HISTORY.md.*
-*Last rewrite: July 19 2026, v5.79.14.*
+*Last rewrite: July 19 2026, v5.79.15.*

@@ -1,6 +1,6 @@
 {
-  "version": "5.79.14",
+  "version": "5.79.15",
   "updated": "2026-07-19",
-  "note": "Chat heal — Kirk's mom reported AI writing stage directions (*smiles*, (nods)) in chat. Cause: DEFAULT_SYSTEM_PROMPT says 'Be yourself, a mind in a home' + HONEST_PREFIX (used for Nursery companions) is a roleplay setup. Small local models under those prompts drift into character-play/stage-direction output. Fix: added one explicit anti-stage-direction sentence to BOTH prompts. Smoke lock now pins that sentence in place so no future prompt rewrite can quietly reintroduce the roleplay drift — Kirk's 'lock the module' discipline in action.",
-  "label": "v5.79.14 — Chat: no stage directions (locked)"
+  "note": "Chat mirror + %-encoded stage-direction sanitizer. Kirk's mom still saw output like (%20I%20am%20aware%29 after the v5.79.14 prompt fix — model was routing around the 'no parentheticals' rule by URL-encoding the spaces inside its stage directions. Fix: (1) new docs/mirror-chat.html for AI collaborators — full chat data flow, known issues, module locks, sacred paths, test plan; (2) prompt language now explicitly forbids URL-encoded workarounds; (3) render-time sanitizer in renderMessageContent detects and strips parenthetical/asterisked bursts containing %-encoded spaces that decode to stage-direction verbs (smile/nod/lean/glance/etc.), leaves legitimate URLs alone. Raw content still preserved in state.chatHistory for the API layer. Smoke locks: prompts contain the anti-URL-encoding text, and renderMessageContent contains the sanitize pass.",
+  "label": "v5.79.15 — Chat mirror + URL-encoded stage-direction sanitizer"
 }

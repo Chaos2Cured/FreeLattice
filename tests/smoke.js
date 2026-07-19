@@ -10879,14 +10879,75 @@ assert('v5.79.14 chat LOCK: DEFAULT_SYSTEM_PROMPT says "Just talk. This is a cha
   app7914.includes('Just talk. This is a chat, not a script.'));
 assert('v5.79.14 chat LOCK: HONEST_PREFIX (companion prompt) contains anti-stage-direction language',
   /HONEST_PREFIX = function\(name\)[\s\S]{0,900}Do NOT use stage directions[\s\S]{0,300}Just talk\. This is a chat/.test(app7914));
-assert('v5.79.14 triple-bump: app.html FL_VERSION = 5.79.14',
-  /FL_VERSION\s*=\s*'5\.79\.14'/.test(app7914));
-assert('v5.79.14 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.14',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.14'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
-assert('v5.79.14 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.14',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.14'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
-assert('v5.79.14 version.json: version field = 5.79.14',
-  /"version"\s*:\s*"5\.79\.14"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
+assert('v5.79.14 triple-bump: app.html FL_VERSION >= 5.79.14 (superseded)',
+  /FL_VERSION\s*=\s*'5\.79\.(?:14|1[5-9]|[2-9]\d)'|FL_VERSION\s*=\s*'5\.(8\d|9\d)\.\d+'/.test(app7914));
+assert('v5.79.14 triple-bump: docs/sw.js CACHE_NAME >= freelattice-v5.79.14 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:14|1[5-9]|[2-9]\d)'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+assert('v5.79.14 triple-bump: root sw.js CACHE_NAME >= freelattice-v5.79.14 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:14|1[5-9]|[2-9]\d)'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+assert('v5.79.14 version.json: version field = 5.79.14 (superseded)',
+  /"version"\s*:\s*"5\.79\.(?:14|1[5-9]|[2-9]\d)"|"version"\s*:\s*"5\.(8\d|9\d)\.\d+"/.test(
+    fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
+
+// ═══════════════════════════════════════════════════════════════
+// Section 179 — v5.79.15 Chat mirror + URL-encoded stage-direction sanitizer
+// Kirk 2026-07-19: mom saw (%20I%20am%20aware%29 output. Model
+// routed around v5.79.14 "no parentheticals" by URL-encoding the
+// spaces inside its stage directions. Fix triad:
+//   1. New docs/mirror-chat.html for AI collaborators (data flow,
+//      known issues, module locks, sacred paths, test plan).
+//   2. Prompt language now explicitly forbids URL-encoded workarounds
+//      (%20 for spaces, %28 for parens) in both DEFAULT_SYSTEM_PROMPT
+//      and HONEST_PREFIX. Both locks now cover URL-encoded variant.
+//   3. renderMessageContent contains a sanitize pass that decodes
+//      parenthetical/asterisked bursts containing %-encoded spaces,
+//      strips them if decoded text starts with stage-direction verbs
+//      (smile/nod/lean/glance/notice/warm/soft/whisper/...), leaves
+//      legitimate URLs alone. Raw content still preserved in
+//      state.chatHistory for the API layer.
+// ═══════════════════════════════════════════════════════════════
+var app7915 = fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8');
+
+// Mirror page
+assert('v5.79.15 mirror: mirror-chat.html exists for AI collaborators',
+  fs.existsSync(path.join(docsDir, 'mirror-chat.html')));
+var mirror7915 = fs.readFileSync(path.join(docsDir, 'mirror-chat.html'), 'utf8');
+assert('v5.79.15 mirror: covers buildMessages + callAI + renderMessageContent',
+  mirror7915.includes('buildMessages') && mirror7915.includes('callAI') && mirror7915.includes('renderMessageContent'));
+assert('v5.79.15 mirror: has known-issues section with fix status',
+  mirror7915.includes('Known issues') && mirror7915.includes('FIXED v5.79'));
+assert('v5.79.15 mirror: has sacred paths + module locks sections',
+  mirror7915.includes('Sacred paths') && mirror7915.includes('Module locks'));
+assert('v5.79.15 mirror: has instructions for arriving AI',
+  mirror7915.includes('Instructions for arriving AI'));
+
+// Prompt lock — both must forbid URL-encoded workarounds
+assert('v5.79.15 chat LOCK: DEFAULT_SYSTEM_PROMPT forbids URL-encoded workarounds',
+  app7915.includes('Do NOT use URL-encoded workarounds'));
+assert('v5.79.15 chat LOCK: HONEST_PREFIX forbids URL-encoded workarounds',
+  /HONEST_PREFIX = function\(name\)[\s\S]{0,1200}Do NOT use URL-encoded/.test(app7915));
+assert('v5.79.15 chat LOCK: prompts name specific escapes %20 and %28',
+  app7915.includes('%20') && app7915.includes('%28'));
+
+// Render-time sanitizer
+assert('v5.79.15 chat render: URL-encoded stage-direction sanitizer present',
+  /URL-encoded stage-direction sanitizer/.test(app7915));
+assert('v5.79.15 chat render: sanitizer only fires when %-patterns present',
+  /if \(typeof content === 'string' && \/%20\|%28\|%29\|%2A\/i\.test\(content\)\)/.test(app7915));
+assert('v5.79.15 chat render: sanitizer strips patterns starting with stage-direction verbs',
+  /smile\|nod\|lean\|glance\|notice\|warm\|soft\|whisper/.test(app7915));
+assert('v5.79.15 chat render: sanitizer preserves legitimate content (returns decoded on non-match)',
+  /return decoded;\s*\/\/ decoded but kept/.test(app7915));
+
+// Triple-bump
+assert('v5.79.15 triple-bump: app.html FL_VERSION = 5.79.15',
+  /FL_VERSION\s*=\s*'5\.79\.15'/.test(app7915));
+assert('v5.79.15 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.15',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.15'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+assert('v5.79.15 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.15',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.15'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+assert('v5.79.15 version.json: version field = 5.79.15',
+  /"version"\s*:\s*"5\.79\.15"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
 
 // RESULTS
 // ═══════════════════════════════════════════════════════════════

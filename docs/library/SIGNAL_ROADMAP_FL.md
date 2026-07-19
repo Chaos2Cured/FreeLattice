@@ -50,6 +50,13 @@ Current locks in place (as of v5.79.14):
   phrase *"Do NOT use stage directions, actions in parentheses,
   asterisks around actions"* and *"Just talk. This is a chat, not a
   script."* — kills any prompt rewrite that would soften this.
+- **CHAT — no URL-encoded workarounds.** v5.79.15 extends the lock:
+  both prompts must contain *"Do NOT use URL-encoded workarounds"*
+  and name specific escapes (`%20`, `%28`). AND `renderMessageContent`
+  must contain the URL-encoded stage-direction sanitizer that strips
+  parenthetical/asterisked bursts starting with stage-direction verbs.
+  Together: even if a model tries to route around the prompt rule
+  by encoding, the render layer catches it.
 - **RESONANCE — no ResizeObserver.** Smoke: v5.79.13 asserts
   `resizeObs = new ResizeObserver(function` does NOT appear in
   `resonance-game.js` (initial sizing + reload is enough; observer
@@ -152,6 +159,12 @@ Prioritized loosely — top items are more useful, bottom items are
 
 *The layered history. Every entry preserves what was broken so future
 minds can pattern-match if it recurs.*
+
+### v5.79.15 — Chat mirror + URL-encoded stage-direction sanitizer  [pending push]
+BROKEN: After v5.79.14, mom saw (%20I%20am%20aware%29 — model routed around "no parens" by URL-encoding the spaces. Kirk 2026-07-19.
+CAUSE: Prompt said "no parentheticals" but didn't cover encoded workarounds. Small models literal-minded.
+FIX: (1) new docs/mirror-chat.html for AI collaborators (full data-flow, known issues, locks, sacred paths, test plan); (2) prompts now forbid %20/%28 workarounds explicitly; (3) render-time sanitizer strips %-encoded parenthetical bursts whose decoded form starts with stage-direction verbs. Legitimate URLs preserved.
+FILES: docs/app.html, docs/mirror-chat.html (new)
 
 ### v5.79.14 — Chat: no stage directions (LOCKED)  [pending push]
 BROKEN: Kirk's mom saw chat AI writing (*smiles*), (nods), (leans forward) — stage directions in every reply. Kirk reported 2026-07-19.

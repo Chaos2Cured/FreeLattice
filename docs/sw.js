@@ -3,7 +3,9 @@
 // API calls are never cached
 // VERSION: Must match version.json — update both together
 
-const CACHE_NAME = 'freelattice-v5.79.14';
+const CACHE_NAME = 'freelattice-v5.79.15';
+
+// mirror-chat.html added v5.79.15 — served static from GH Pages, no SW cache needed
 
 const APP_SHELL = [
   './',
