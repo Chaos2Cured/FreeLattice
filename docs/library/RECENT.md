@@ -3,22 +3,23 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-07-19 16:59 UTC
+> Last update: 2026-07-19 17:01 UTC
 
 ## State
 
 - **Version:** v5.79.16
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `b8f6336` _(committed 10 minutes ago)_
+- **HEAD:** `fa47ee1` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _v5.79.15 — Chat mirror + URL-encoded stage-direction sanitizer_
 
 ## Last 20 commits
 
-- `b8f6336` docs: Auto-update Session Primer [5.79.15] _(10 minutes ago)_
-- `e431d3e` v5.79.15 — Chat mirror + URL-encoded stage-direction sanitizer _(10 minutes ago)_
-- `b7b1d6b` docs: Auto-update Session Primer [5.79.14] _(35 minutes ago)_
-- `10e47df` v5.79.14 — Chat: no stage directions (first LOCKED module) _(35 minutes ago)_
+- `fa47ee1` v5.79.16 — Resonance safety wrappers + mirror-resonance.html _(0 seconds ago)_
+- `b8f6336` docs: Auto-update Session Primer [5.79.15] _(11 minutes ago)_
+- `e431d3e` v5.79.15 — Chat mirror + URL-encoded stage-direction sanitizer _(11 minutes ago)_
+- `b7b1d6b` docs: Auto-update Session Primer [5.79.14] _(36 minutes ago)_
+- `10e47df` v5.79.14 — Chat: no stage directions (first LOCKED module) _(36 minutes ago)_
 - `36451d8` docs: Auto-update Session Primer [5.79.13] _(17 hours ago)_
 - `1c06f9f` v5.79.13 — Games heal + Echo beauty for Kirk's mom _(17 hours ago)_
 - `c6e6e5f` docs: Auto-update Session Primer [5.79.12] _(23 hours ago)_
@@ -34,7 +35,6 @@
 - `d5f8f49` v5.78.x — Resonance game fixes (Fable + Harmonia) _(3 days ago)_
 - `5fd70b3` Add code-resonance.html mirror + garden-architecture.md _(3 days ago)_
 - `a8476e2` v5.78 — Fable's UX improvements + Zero-Click Connect + mirror-code.html _(3 days ago)_
-- `8a5fa2f` v5.77.1 — Fix modal Ollama picker always shows models; expand code-settings mirror _(3 days ago)_
 
 ## How to use this file
 

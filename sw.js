@@ -5,7 +5,7 @@
 
 const CACHE_NAME = 'freelattice-v5.79.16';
 
-// mirror-chat.html added v5.79.15 — served static from GH Pages, no SW cache needed
+// mirror-chat.html + mirror-resonance.html — served static from GH Pages, no SW cache needed
 
 const APP_SHELL = [
   './',
