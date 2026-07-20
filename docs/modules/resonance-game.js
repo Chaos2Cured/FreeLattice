@@ -27,7 +27,7 @@
     glow:  ['bright', 'dim'],
     size:  ['large', 'small'],
     shape: ['circle', 'diamond'],
-    color: ['gold', 'emerald']
+    color: ['gold', 'purple']   // v5.79.18-piece-palette: lavender + gold (Kirk 2026-07-20). Prior 'emerald' collapsed toward gold for common color-vision profiles; lavender is hue-opposite from gold and matches FreeLattice's own accent.
   };
 
   function generatePieces() {
@@ -82,7 +82,7 @@
       pulse = 1 + 0.2 * Math.sin(tick * 0.008);
     }
     var r = baseSize * pulse;
-    var col = piece.color === 'gold' ? GOLD : EMERALD;
+    var col = piece.color === 'gold' ? GOLD : LAVENDER;   // v5.79.18-piece-palette
     var isBright = piece.glow === 'bright' || piece._winning;
     var alpha = isBright ? 1.0 : 0.45;
 
@@ -1027,7 +1027,7 @@
 
   function showRules() {
     var fallbackText = 'Welcome to Resonance! There are 16 unique pieces \u2014 each has a glow ' +
-      '(bright or dim), size (large or small), shape (circle or diamond), and color (gold or emerald). ' +
+      '(bright or dim), size (large or small), shape (circle or diamond), and color (gold or purple). ' +
       'Win by placing four in a row that share any one attribute. The twist: you pick which piece ' +
       'your opponent must place! In Harmony mode, you and the AI work together against chaos \u2014 ' +
       'entropy drops pieces on edges every 8 seconds. Connection wins. Have fun!';
