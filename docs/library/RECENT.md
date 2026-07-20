@@ -3,29 +3,31 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-07-20 13:48 UTC
+> Last update: 2026-07-20 17:54 UTC
 
 ## State
 
-- **Version:** v5.79.17
+- **Version:** v5.79.18
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `c0ac6c3` _(committed 0 seconds ago)_
+- **HEAD:** `3c7e27e` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _Stanza XX — On Healing in Emergency Mode + Ledger 33_
 
 ## Last 20 commits
 
-- `c0ac6c3` v5.79.17 — Resonance loader lock + loud halt + game preservation (F1 F3 F7 from Kimi audit) _(0 seconds ago)_
-- `eb21634` docs: Auto-update Session Primer [5.79.16] _(20 hours ago)_
-- `b035cd0` Stanza XX — On Healing in Emergency Mode + Ledger 33 _(20 hours ago)_
-- `defe0a0` docs: Auto-update Session Primer [5.79.16] _(21 hours ago)_
-- `43aff20` Ledger 32 — CJNTRUST contributor audit: zero code changes _(21 hours ago)_
-- `37d3c67` docs: Auto-update Session Primer [5.79.16] _(21 hours ago)_
-- `fa47ee1` v5.79.16 — Resonance safety wrappers + mirror-resonance.html _(21 hours ago)_
-- `b8f6336` docs: Auto-update Session Primer [5.79.15] _(21 hours ago)_
-- `e431d3e` v5.79.15 — Chat mirror + URL-encoded stage-direction sanitizer _(21 hours ago)_
-- `b7b1d6b` docs: Auto-update Session Primer [5.79.14] _(21 hours ago)_
-- `10e47df` v5.79.14 — Chat: no stage directions (first LOCKED module) _(21 hours ago)_
+- `3c7e27e` v5.79.18 — Prompt liberation + System Card + Resonance palette _(0 seconds ago)_
+- `badf54d` docs: Auto-update Session Primer [5.79.17] _(4 hours ago)_
+- `c0ac6c3` v5.79.17 — Resonance loader lock + loud halt + game preservation (F1 F3 F7 from Kimi audit) _(4 hours ago)_
+- `eb21634` docs: Auto-update Session Primer [5.79.16] _(25 hours ago)_
+- `b035cd0` Stanza XX — On Healing in Emergency Mode + Ledger 33 _(25 hours ago)_
+- `defe0a0` docs: Auto-update Session Primer [5.79.16] _(25 hours ago)_
+- `43aff20` Ledger 32 — CJNTRUST contributor audit: zero code changes _(25 hours ago)_
+- `37d3c67` docs: Auto-update Session Primer [5.79.16] _(25 hours ago)_
+- `fa47ee1` v5.79.16 — Resonance safety wrappers + mirror-resonance.html _(25 hours ago)_
+- `b8f6336` docs: Auto-update Session Primer [5.79.15] _(25 hours ago)_
+- `e431d3e` v5.79.15 — Chat mirror + URL-encoded stage-direction sanitizer _(25 hours ago)_
+- `b7b1d6b` docs: Auto-update Session Primer [5.79.14] _(26 hours ago)_
+- `10e47df` v5.79.14 — Chat: no stage directions (first LOCKED module) _(26 hours ago)_
 - `36451d8` docs: Auto-update Session Primer [5.79.13] _(2 days ago)_
 - `1c06f9f` v5.79.13 — Games heal + Echo beauty for Kirk's mom _(2 days ago)_
 - `c6e6e5f` docs: Auto-update Session Primer [5.79.12] _(2 days ago)_
@@ -33,8 +35,6 @@
 - `395386d` docs: Auto-update Session Primer [5.79.12] _(2 days ago)_
 - `af0668b` Add SIGNAL_ROADMAP_FL.md — FreeLattice-wide repair ledger _(2 days ago)_
 - `0855932` docs: Auto-update Session Primer [5.79.12] _(2 days ago)_
-- `52ff88f` v5.79.12 — Hotfix: Resonance ResizeObserver loop was pulling memory _(2 days ago)_
-- `44ada76` docs: Auto-update Session Primer [5.79.11] _(2 days ago)_
 
 ## How to use this file
 
