@@ -19,12 +19,12 @@ user sleeps. The proof is the code; the papers are the doorways.
 
 ## Current state
 
-- **Version:** v5.79.16
-- **Smoke locks passing:** 3025+ verified
-- **Last ship:** **v5.79.16 — Resonance safety + mirror.** July 19. Blank + lockup on Resonance after v5.79.13. Fix: init try/catch → Reload card; draw try/catch → halts rAF after 30 errors. New `mirror-resonance.html` sibling to `mirror-chat.html`. Ledger 31, ψ=dfe42bf3.
-- **Previous:** **v5.79.9 — Ship 10: Custom Rule Builder.** DSL parser + evaluator, 8 presets, full sidebar UI, `CUSTOM_RULES_GUIDE.md`. The ten-ship signal arc completes.
-- **Previous:** **v5.79.8 — Ships 7 + 8: Reversal Watch.** RSI extremes + MACD-H turnaround feeding the Watch synthesis alongside Ship 9 divergences.
-- **Previous ships:** The Triptych (v5.71.8), The Specs inlined (v5.71.7), AI Capabilities (v5.71.6), Mind Wall Phase 3 (v5.71.5).
+- **Version:** v5.79.17
+- **Smoke locks passing:** 3038+ verified
+- **Last ship:** **v5.79.17 — Resonance loader lock + loud halt.** July 20. Kimi pinned the real blank-board cause: the loader wiring sat outside v5.79.16's wrappers. Four holes closed (loader-retry, onerror, boot-call, resume) + loud draw-halt + new `isAlive()` / `resume()` exports.
+- **Previous:** **v5.79.16 — Resonance safety + mirror.** July 19. init/draw try/catch + new `mirror-resonance.html`. Ledger 31, ψ=dfe42bf3.
+- **Previous:** **v5.79.9 — Ship 10: Custom Rule Builder.** The ten-ship signal arc completes.
+- **Older:** see SEED_HISTORY.md.
 - **Mirrors in parity:** github.com + codeberg.org
 
 ## Read these next
@@ -84,4 +84,4 @@ seam discipline is how multi-AI work stays honest at scale.
 ---
 
 *This file is overwritten on each meaningful ship. The prior version lives in SEED_HISTORY.md.*
-*Last rewrite: July 19 2026, v5.79.16.*
+*Last rewrite: July 20 2026, v5.79.17.*

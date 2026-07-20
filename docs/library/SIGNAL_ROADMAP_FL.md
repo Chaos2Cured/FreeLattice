@@ -164,6 +164,12 @@ Prioritized loosely — top items are more useful, bottom items are
 *The layered history. Every entry preserves what was broken so future
 minds can pattern-match if it recurs.*
 
+### v5.79.17 — Resonance loader lock + loud halt + game preservation  [pending push]
+BROKEN: Kimi (external AI reviewer) audited mirror-resonance.html 2026-07-20 and pinned that "still blank sometimes" persisted after v5.79.16.
+CAUSE: v5.79.16 wrappers protect the module; the loader wiring in app.html sits outside them. `loaded=true` set BEFORE module confirmed → failed fetch locks state; fallback <script> had no onerror; restored active tab fires neither tabChanged nor tabActivated; every activation called init() which wipes board+pieces mid-play; 30-error draw halt was silent (blank canvas, no affordance).
+FIX: (1) loader-retry — `loaded` flips true ONLY after module resolved; (2) onerror surfaces Tap-to-retry card; (3) boot-call fires when #tab-resonance is .active at load; (4) resume() preserves live game on re-activation via new isAlive() export; (5) draw halt renders overlay + tagged [resonance] console + one-shot tap-to-reload. All five pinned by v5.79.17-* markers with a negative-lock guarding the old shape. Kimi's Finding 2 (height fallback) and part of Finding 4 (occupancy validation) were already handled — not re-implemented per "never redo" discipline.
+FILES: docs/app.html, docs/modules/resonance-game.js, tests/smoke.js, docs/library/SEED.md, docs/sw.js, sw.js, docs/version.json
+
 ### v5.79.16 — Resonance safety wrappers + mirror-resonance.html  [pending push]
 BROKEN: Resonance shows nothing when clicked, FreeLattice locks up. Kirk 2026-07-19 — even after v5.79.13 removed the ResizeObserver.
 CAUSE: Init-time throw could wedge the main thread invisibly. A stray rAF pointing at broken state ate CPU without ever painting.

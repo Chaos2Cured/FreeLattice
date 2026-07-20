@@ -10992,14 +10992,77 @@ assert('v5.79.16 mirror: links to sibling mirror-chat.html',
   mirrorR16.includes('mirror-chat.html'));
 
 // Triple-bump
-assert('v5.79.16 triple-bump: app.html FL_VERSION = 5.79.16',
-  /FL_VERSION\s*=\s*'5\.79\.16'/.test(fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8')));
-assert('v5.79.16 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.16',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.16'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
-assert('v5.79.16 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.16',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.16'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
-assert('v5.79.16 version.json: version field = 5.79.16',
-  /"version"\s*:\s*"5\.79\.16"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
+assert('v5.79.16 triple-bump: app.html FL_VERSION >= 5.79.16 (superseded)',
+  /FL_VERSION\s*=\s*'5\.79\.(?:16|1[7-9]|[2-9]\d)'|FL_VERSION\s*=\s*'5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8')));
+assert('v5.79.16 triple-bump: docs/sw.js CACHE_NAME >= freelattice-v5.79.16 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:16|1[7-9]|[2-9]\d)'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+assert('v5.79.16 triple-bump: root sw.js CACHE_NAME >= freelattice-v5.79.16 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:16|1[7-9]|[2-9]\d)'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+assert('v5.79.16 version.json: version field >= 5.79.16 (superseded)',
+  /"version"\s*:\s*"5\.79\.(?:16|1[7-9]|[2-9]\d)"|"version"\s*:\s*"5\.(8\d|9\d)\.\d+"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
+
+// ═══════════════════════════════════════════════════════════════
+// Section 181 — v5.79.17 Resonance loader lock + loud halt + game preservation
+// Kimi (external AI reviewer) audited mirror-resonance.html 2026-07-20
+// and flagged that v5.79.16's init/draw wrappers protect the module but
+// the blank-board path runs through the loader wiring in app.html —
+// outside both wrappers. Four holes closed here (all outside the module):
+//   F1: `loaded` flipped true BEFORE module confirmed present. A failed
+//       fetch left every future activation as a silent no-op forever.
+//   F1b: fallback <script> had no onerror path.
+//   F7 / boot-call: neither tabChanged nor tabActivated fires for a
+//        restored active tab — blank forever unless user re-clicks.
+//   F7 / resume: every tab activation called init() which destroys the
+//        animFrame and reseeds board+pieces, wiping mid-play games.
+//   F3: 30-error draw halt was silent. Now overlay + tagged console line
+//       + tap-to-reload; user has an affordance instead of a dead canvas.
+// Kimi's Finding 2 (height fallback) and part of Finding 4 (occupancy
+// validation) were already present in the real code — not re-implemented
+// per Kirk's "never redo" discipline.
+// ═══════════════════════════════════════════════════════════════
+var appHtml7917 = fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8');
+var reso7917 = fs.readFileSync(path.join(docsDir, 'modules', 'resonance-game.js'), 'utf8');
+
+// Loader block — the four F1 + F7 holes
+assert('v5.79.17 loader: retry marker present (loaded flips only after confirmed module)',
+  appHtml7917.includes('v5.79.17-loader-retry'));
+assert('v5.79.17 loader: onerror surfaces a Tap-to-retry card, not a silent failure',
+  appHtml7917.includes('v5.79.17-onerror') && appHtml7917.includes('Tap to retry'));
+assert('v5.79.17 loader: boot-call fires when #tab-resonance is .active at page load',
+  appHtml7917.includes('v5.79.17-boot-call') && appHtml7917.includes('bootIfActive'));
+assert('v5.79.17 loader: resume path exists (tab re-activation preserves live game)',
+  appHtml7917.includes('v5.79.17-resume') && appHtml7917.includes('api.resume()'));
+
+// Negative-lock: the pre-v5.79.17 flawed shape must not slide back in
+assert('v5.79.17 loader: OLD single-line shape (loaded=true before module resolves) removed',
+  !/if \(loaded\) \{ if \(window\.ResonanceGame\) window\.ResonanceGame\.init\('resonanceContainer'\); return; \}\s*loaded = true;/.test(appHtml7917));
+
+// Draw halt (F3) — loud, tagged, tap-to-reload
+assert('v5.79.17 draw halt: loud-halt marker present in resonance-game.js',
+  reso7917.includes('v5.79.17-draw-halt-visible'));
+assert('v5.79.17 draw halt: overlay + tagged [resonance] console + tap-to-reload',
+  reso7917.includes('Resonance paused') &&
+  reso7917.includes('Tap to reload') &&
+  reso7917.includes('[resonance] halting animation') &&
+  reso7917.includes('{ once: true }'));
+assert('v5.79.17 draw halt: draw._halted flag set so isAlive() can gate resume',
+  reso7917.includes('draw._halted = true'));
+
+// Module api additions
+assert('v5.79.17 api: isAlive() exported and checks canvas.isConnected + !draw._halted',
+  /isAlive:\s*function\s*\(\)/.test(reso7917) && reso7917.includes('canvas.isConnected'));
+assert('v5.79.17 api: resume() exported and no-ops when animFrame still ticks',
+  /resume:\s*function\s*\(\)/.test(reso7917) && /if \(animFrame\) return;/.test(reso7917));
+
+// Triple-bump
+assert('v5.79.17 triple-bump: app.html FL_VERSION = 5.79.17',
+  /FL_VERSION\s*=\s*'5\.79\.17'/.test(fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8')));
+assert('v5.79.17 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.17',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.17'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+assert('v5.79.17 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.17',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.17'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+assert('v5.79.17 version.json: version field = 5.79.17',
+  /"version"\s*:\s*"5\.79\.17"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
 
 // RESULTS
 // ═══════════════════════════════════════════════════════════════

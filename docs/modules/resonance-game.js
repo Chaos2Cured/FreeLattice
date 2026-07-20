@@ -340,7 +340,29 @@
       if (draw._errors < 30) {
         if (typeof console !== 'undefined') console.warn('Resonance draw frame err:', err && err.message);
       } else {
-        if (typeof console !== 'undefined') console.error('Resonance draw failing repeatedly — halting animation:', err);
+        // v5.79.17-draw-halt-visible — loud halt. The v5.79.16 silent return
+        // protected the tab but left a blank canvas with no affordance;
+        // indistinguishable from "the loader never ran." Now: overlay,
+        // tagged console line (single grep target: [resonance]), and a
+        // one-shot click handler to reload. Keeps 'halting animation' in
+        // the console text so the v5.79.16 lock still passes.
+        if (typeof console !== 'undefined') console.error('[resonance] halting animation after 30 consecutive errors:', err);
+        draw._halted = true;
+        try {
+          ctx.setTransform(1, 0, 0, 1, 0, 0);
+          var _w = canvas.width, _h = canvas.height;
+          ctx.fillStyle = '#1a1030';
+          ctx.fillRect(0, 0, _w, _h);
+          ctx.fillStyle = '#ffd76a';
+          ctx.font = '16px Georgia, serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText('Resonance paused', _w / 2, _h / 2 - 12);
+          ctx.font = '13px Georgia, serif';
+          ctx.fillStyle = 'rgba(255,215,106,0.75)';
+          ctx.fillText('Tap to reload', _w / 2, _h / 2 + 12);
+        } catch (_) {}
+        if (canvas) canvas.addEventListener('click', function() { location.reload(); }, { once: true });
         return; // stop scheduling — protects the tab
       }
     }
@@ -1074,7 +1096,20 @@
       currentMode = mode;
       init(containerId);
     },
-    showRules: showRules
+    showRules: showRules,
+    // v5.79.17-resume: let the app.html loader preserve game state on tab
+    // re-activation. Previously every tab switch called init() which
+    // destroys the animFrame and reseeds board+pieces — mid-play the
+    // human's game silently vanished. isAlive() gates whether we resume
+    // or reinitialize; resume() is a no-op when the rAF is still ticking.
+    isAlive: function() {
+      return !!(canvas && canvas.isConnected && !draw._halted);
+    },
+    resume: function() {
+      if (animFrame) return;      // already ticking
+      if (draw._halted) return;   // halted state needs a reload, not a re-arm
+      draw();                     // restart the loop
+    }
   };
 
   window.ResonanceGame = api;

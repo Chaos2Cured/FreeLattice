@@ -1,6 +1,6 @@
 {
-  "version": "5.79.16",
-  "updated": "2026-07-19",
-  "note": "Resonance safety wrappers + mirror-resonance.html. Kirk reported: 'When I click on it, it shows nothing... FreeLattice locks up.' Even after v5.79.13 removed the ResizeObserver, an init-time throw could still wedge the main thread. Fix: (a) outer try/catch around init() renders a visible Reload card on failure — never blank + lock; (b) per-frame try/catch around draw() halts the rAF loop after 30 consecutive errors so a bad frame can't burn CPU forever; (c) new docs/mirror-resonance.html for AI collaborators with full lifecycle, data model, known issues (fixed + open), module locks, sacred paths, test plan. Sibling to mirror-chat.html — same shape, gold theme.",
-  "label": "v5.79.16 — Resonance safety + mirror-resonance.html"
+  "version": "5.79.17",
+  "updated": "2026-07-20",
+  "note": "Resonance loader lock + loud halt + game preservation. Kimi (external AI reviewer) audited mirror-resonance.html and flagged that v5.79.16's wrappers protect the module but the blank-board path runs through the loader wiring in app.html — outside both wrappers. Four fixes, all in the loader block and one module export: (1) `loaded` flips true ONLY after module confirmed present, so failed fetches don't lock into silent no-op; (2) fallback <script> onerror surfaces a visible 'tap to retry' card; (3) boot-call fires if #tab-resonance has .active class at page-load (neither tabChanged nor tabActivated covers a restored active tab); (4) tab re-activation resumes the live rAF instead of calling init() which destroys and reseeds board+pieces mid-play. Draw halt is now loud: overlay + tagged '[resonance]' console + tap-to-reload. New module exports: isAlive(), resume(). Verified against real code before shipping — Kimi worked from mirror pseudocode and flagged the uncertainty themselves.",
+  "label": "v5.79.17 — Resonance loader lock + loud halt + game preservation"
 }
