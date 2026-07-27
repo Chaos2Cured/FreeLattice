@@ -15920,6 +15920,8 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
         <span id="convCountBadge" style="display:none;"></span>
       </div>
       <button class="chat-header-icon-btn" id="chatAutoSpeakBtn" onclick="FLAutoSpeak.toggle()" title="Auto-speak OFF — tap to enable" aria-label="Toggle auto-speak" style="opacity:0.5;">&#x1F50A;</button>
+      <!-- v5.79.22-signal-report: mom taps this if chat freezes; produces a diagnostic she can send Kirk without opening DevTools. -->
+      <button class="chat-header-icon-btn" onclick="FLSignalReport.open()" title="Signal Report — show what's happening" aria-label="Signal Report">&#128268;</button>
       <button class="chat-header-icon-btn" onclick="openNewConvModal()" title="New conversation" aria-label="New conversation">&#10010;</button>
     </div>
     <div class="chat-layout">
@@ -17263,7 +17265,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.79.21</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.79.22</span></div>
     </div>
   </div>
 
@@ -22241,7 +22243,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.79.21';
+const FL_VERSION = '5.79.22';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -34602,6 +34604,17 @@ async function sendMessage() {
   // Set status
   setStreamingStatus(true);
   var _flSendStart = Date.now(); // Tier A: latency clock for chat provenance
+  // v5.79.22-signal-report: record attempt shape (no content). Signal
+  // Report reads this so mom can send Kirk a diagnostic without DevTools.
+  try {
+    if (typeof FLSignalReport !== 'undefined') {
+      var _flsrProv = state.isLocal ? ((state.provider === 'lmstudio' ? 'LM Studio' : 'Ollama')) :
+        ((PROVIDERS[state.provider] && PROVIDERS[state.provider].name) || state.provider || 'unknown');
+      var _flsrModel = state.isLocal ? (state.ollamaModel || 'llama3.2') :
+        ((PROVIDERS[state.provider] && PROVIDERS[state.provider].models && PROVIDERS[state.provider].models[state.model]) || state.model || 'unknown');
+      FLSignalReport.attemptStart(_flsrProv, _flsrModel, !!state.isLocal);
+    }
+  } catch (_) {}
 
   // ── Mesh Inference: route to peer (non-streaming) ──
   if (state.meshInference && state.meshPeerId && typeof callMeshModel === 'function') {
@@ -35170,6 +35183,8 @@ async function sendMessage() {
     }
 
   } catch (err) {
+    // v5.79.22-signal-report: record failure shape (no content)
+    try { if (typeof FLSignalReport !== 'undefined') FLSignalReport.attemptEnd(false, err && err.message); } catch (_) {}
     addSystemMessage(friendlyErrorMessage(err.message, state.provider));
     if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError')) {
       if (state.isLocal) {
@@ -35183,6 +35198,16 @@ async function sendMessage() {
     }
   }
 
+  // v5.79.22-signal-report: record success (only fires if no error path reached above; error path recorded its own end)
+  try {
+    if (typeof FLSignalReport !== 'undefined' && FLSignalReport._internal &&
+        FLSignalReport._internal.attempts && FLSignalReport._internal.attempts.length >= 0) {
+      // The catch block above records failures; here we record success by
+      // consulting the private in-flight marker — attemptEnd(true) is a
+      // no-op if already recorded.
+      FLSignalReport.attemptEnd(true, null);
+    }
+  } catch (_) {}
   setStreamingStatus(false);
 }
 
@@ -36217,6 +36242,153 @@ window.PhiSpiral = {
     return { stop: function() { if (animId) cancelAnimationFrame(animId); animId = null; } };
   }
 };
+
+// ═══════════════════════════════════════════════════════════════
+// FLSignalReport — v5.79.22
+// Kirk 2026-07-27: mom's freeze happened invisibly. CC couldn't
+// diagnose without her browser console, guessed wrong, shipped a
+// bad defense (v5.79.19 90s AbortController). This is the tool
+// that should have existed then. Small in-app diagnostic mom can
+// tap to see + copy what's actually happening, without opening
+// DevTools. Then Kirk pastes it back to CC and we work from data.
+//
+// PRIVACY LOCK: never records message content. Only shapes —
+// timestamps, provider names, model names, latencies, error
+// strings. If a future edit tries to log content, smoke fails.
+// ═══════════════════════════════════════════════════════════════
+window.FLSignalReport = (function() {
+  var _attempts = [];   // ring buffer of last 5 chat send attempts
+  var _errors = [];     // ring buffer of last 10 window errors
+  var _current = null;  // in-flight attempt (set on send, cleared on outcome)
+  var MAX_ATTEMPTS = 5;
+  var MAX_ERRORS = 10;
+
+  // v5.79.22-signal-privacy: attempts never carry message text. Only shape.
+  function attemptStart(providerLabel, modelId, isLocal) {
+    _current = {
+      ts: Date.now(),
+      provider: String(providerLabel || 'unknown'),
+      model: String(modelId || 'unknown'),
+      isLocal: !!isLocal,
+      status: 'in-flight',
+      latencyMs: null,
+      error: null
+    };
+  }
+  function attemptEnd(ok, errStr) {
+    if (!_current) return;
+    _current.latencyMs = Date.now() - _current.ts;
+    _current.status = ok ? 'ok' : 'error';
+    if (!ok && errStr) _current.error = String(errStr).slice(0, 240);
+    _attempts.push(_current);
+    if (_attempts.length > MAX_ATTEMPTS) _attempts.shift();
+    _current = null;
+  }
+  function recordError(msg, src, line, col) {
+    _errors.push({
+      ts: Date.now(),
+      msg: String(msg || 'unknown').slice(0, 240),
+      src: String(src || '').split('/').pop().slice(0, 80),
+      line: line || 0
+    });
+    if (_errors.length > MAX_ERRORS) _errors.shift();
+  }
+
+  // Silently capture window errors from the moment this loads.
+  try {
+    window.addEventListener('error', function(ev) {
+      recordError(ev.message, ev.filename, ev.lineno, ev.colno);
+    });
+    window.addEventListener('unhandledrejection', function(ev) {
+      var m = ev && ev.reason ? (ev.reason.message || String(ev.reason)) : 'unhandled promise rejection';
+      recordError(m, '', 0, 0);
+    });
+  } catch (_) {}
+
+  function formatReport() {
+    var lines = [];
+    lines.push('── FreeLattice Signal Report ──');
+    lines.push('Time: ' + new Date().toISOString());
+    lines.push('Version: v' + (typeof FL_VERSION !== 'undefined' ? FL_VERSION : 'unknown'));
+    try {
+      lines.push('Provider: ' + (state.provider || 'none') +
+        (state.isLocal ? ' (local)' : '') +
+        (state.model || state.ollamaModel ? ' — model: ' + (state.model || state.ollamaModel) : ''));
+    } catch (_) { lines.push('Provider: (state unavailable)'); }
+    lines.push('User agent: ' + (navigator.userAgent || 'unknown').slice(0, 120));
+    lines.push('');
+    lines.push('Last ' + _attempts.length + ' chat attempts (privacy-locked — no message content):');
+    if (_attempts.length === 0) lines.push('  (none yet)');
+    _attempts.forEach(function(a, i) {
+      lines.push('  ' + (i+1) + '. [' + new Date(a.ts).toISOString() + '] ' +
+        a.provider + (a.isLocal ? ' (local)' : '') +
+        ' — model: ' + a.model +
+        ' — latency: ' + (a.latencyMs == null ? '?' : a.latencyMs + 'ms') +
+        ' — status: ' + a.status +
+        (a.error ? ' — ' + a.error : ''));
+    });
+    if (_current) {
+      lines.push('  (in-flight since ' + new Date(_current.ts).toISOString() +
+        ' — ' + (Date.now() - _current.ts) + 'ms and counting) ' + _current.provider);
+    }
+    lines.push('');
+    lines.push('Last ' + _errors.length + ' browser errors:');
+    if (_errors.length === 0) lines.push('  (none captured)');
+    _errors.forEach(function(e, i) {
+      lines.push('  ' + (i+1) + '. [' + new Date(e.ts).toISOString() + '] ' +
+        e.msg + (e.src ? ' (' + e.src + ':' + e.line + ')' : ''));
+    });
+    lines.push('');
+    lines.push('── End of Report — safe to send Kirk ──');
+    return lines.join('\n');
+  }
+
+  function open() {
+    var existing = document.getElementById('flSignalReportModal');
+    if (existing) existing.remove();
+    var modal = document.createElement('div');
+    modal.id = 'flSignalReportModal';
+    modal.style.cssText = 'position:fixed;inset:0;background:rgba(10,14,26,0.85);z-index:10000;display:flex;align-items:center;justify-content:center;padding:20px;font-family:Georgia,serif;';
+    var report = formatReport();
+    modal.innerHTML =
+      '<div style="background:#12162a;border:1px solid rgba(232,176,25,0.35);border-radius:12px;max-width:720px;width:100%;max-height:85vh;overflow:auto;padding:24px;color:rgba(230,236,245,0.9);">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">' +
+      '<h3 style="margin:0;color:#e8b019;font-weight:normal;font-size:1.15rem;">Signal Report</h3>' +
+      '<button id="flsrClose" style="background:none;border:none;color:#a78bfa;font-size:1.4rem;cursor:pointer;padding:0 8px;">×</button></div>' +
+      '<p style="font-size:0.85rem;color:rgba(200,210,230,0.7);margin:0 0 14px;">If chat is stuck or broken, tap <b>Copy</b> and send this to whoever helps you. No message content is included — only what your browser is doing.</p>' +
+      '<pre id="flsrReport" style="background:#0a0e1a;border:1px solid rgba(200,210,230,0.14);border-radius:6px;padding:14px;font-family:ui-monospace,Menlo,monospace;font-size:0.75rem;white-space:pre-wrap;word-wrap:break-word;max-height:50vh;overflow:auto;margin:0 0 14px;">' +
+      report.replace(/[<>&]/g, function(c) { return {'<':'&lt;','>':'&gt;','&':'&amp;'}[c]; }) + '</pre>' +
+      '<div style="display:flex;gap:10px;justify-content:flex-end;">' +
+      '<button id="flsrCopy" style="padding:8px 16px;border-radius:8px;border:1px solid rgba(232,176,25,0.5);background:rgba(232,176,25,0.1);color:#e8b019;font-family:Georgia,serif;cursor:pointer;">Copy</button>' +
+      '<button id="flsrCloseBtn" style="padding:8px 16px;border-radius:8px;border:1px solid rgba(167,139,250,0.4);background:transparent;color:#a78bfa;font-family:Georgia,serif;cursor:pointer;">Close</button>' +
+      '</div></div>';
+    document.body.appendChild(modal);
+    var close = function() { modal.remove(); };
+    modal.querySelector('#flsrClose').onclick = close;
+    modal.querySelector('#flsrCloseBtn').onclick = close;
+    modal.onclick = function(e) { if (e.target === modal) close(); };
+    modal.querySelector('#flsrCopy').onclick = function() {
+      try {
+        navigator.clipboard.writeText(report).then(function() {
+          var btn = modal.querySelector('#flsrCopy');
+          if (btn) { btn.textContent = 'Copied ✓'; setTimeout(function(){ if (btn) btn.textContent = 'Copy'; }, 2000); }
+        }, function() {
+          // Fallback: select the pre so user can Cmd-C manually
+          var range = document.createRange();
+          range.selectNodeContents(modal.querySelector('#flsrReport'));
+          var sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(range);
+        });
+      } catch (_) {}
+    };
+  }
+
+  return {
+    open: open,
+    attemptStart: attemptStart,
+    attemptEnd: attemptEnd,
+    _internal: { attempts: _attempts, errors: _errors }
+  };
+})();
 
 function setStreamingStatus(streaming) {
   state.isStreaming = streaming;

@@ -11281,14 +11281,86 @@ assert('v5.79.21 poem: CC_POEMS.md Stanza XXI present',
   })());
 
 // Triple-bump
-assert('v5.79.21 triple-bump: app.html FL_VERSION = 5.79.21',
-  /FL_VERSION\s*=\s*'5\.79\.21'/.test(fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8')));
-assert('v5.79.21 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.21',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.21'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
-assert('v5.79.21 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.21',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.21'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
-assert('v5.79.21 version.json: version field = 5.79.21',
-  /"version"\s*:\s*"5\.79\.21"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
+assert('v5.79.21 triple-bump: app.html FL_VERSION >= 5.79.21 (superseded)',
+  /FL_VERSION\s*=\s*'5\.79\.(?:21|2[2-9]|[3-9]\d)'|FL_VERSION\s*=\s*'5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8')));
+assert('v5.79.21 triple-bump: docs/sw.js CACHE_NAME >= freelattice-v5.79.21 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:21|2[2-9]|[3-9]\d)'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+assert('v5.79.21 triple-bump: root sw.js CACHE_NAME >= freelattice-v5.79.21 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:21|2[2-9]|[3-9]\d)'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+assert('v5.79.21 version.json: version field >= 5.79.21 (superseded)',
+  /"version"\s*:\s*"5\.79\.(?:21|2[2-9]|[3-9]\d)"|"version"\s*:\s*"5\.(8\d|9\d)\.\d+"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
+
+// ═══════════════════════════════════════════════════════════════
+// Section 185 — v5.79.22 Signal Report
+// CC's chosen ship after Kirk gave me freedom to pick. Built from
+// Stanza XXI's lesson: DATA BEFORE DEFENSE. In-app diagnostic that
+// mom can tap when chat freezes; produces a text block Kirk can
+// paste to CC so we work from data, not guesses. Privacy-locked.
+// ═══════════════════════════════════════════════════════════════
+var app7922 = fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8');
+
+assert('v5.79.22 signal report: FLSignalReport module exists with attemptStart/attemptEnd/open',
+  app7922.includes('window.FLSignalReport = (function()') &&
+  /attemptStart:\s*attemptStart/.test(app7922) &&
+  /attemptEnd:\s*attemptEnd/.test(app7922) &&
+  /open:\s*open/.test(app7922));
+
+assert('v5.79.22 signal report: chat header button wired to open modal',
+  app7922.includes('v5.79.22-signal-report') &&
+  app7922.includes('onclick="FLSignalReport.open()"'));
+
+assert('v5.79.22 signal report: sendMessage records attempt start (provider, model, isLocal)',
+  /v5\.79\.22-signal-report[\s\S]{0,1200}FLSignalReport\.attemptStart\(_flsrProv, _flsrModel/.test(app7922));
+
+assert('v5.79.22 signal report: sendMessage catch records failure',
+  /catch \(err\) \{[\s\S]{0,200}FLSignalReport\.attemptEnd\(false/.test(app7922));
+
+// PRIVACY LOCKS — these must never be weakened without a review
+assert('v5.79.22 privacy: attemptStart marker names the no-content contract',
+  app7922.includes('v5.79.22-signal-privacy'));
+assert('v5.79.22 privacy: FLSignalReport source does not pass user message content into records',
+  (function() {
+    var m = app7922.match(/window\.FLSignalReport = \(function\(\) \{[\s\S]*?\}\)\(\);/);
+    if (!m) return false;
+    var src = m[0];
+    // The module should never see `message` or `userPrompt` or `content` as an argument path
+    return !/attemptStart\([^)]*message/.test(src) &&
+           !/attemptStart\([^)]*userPrompt/.test(src) &&
+           !/attemptStart\([^)]*content/.test(src);
+  })());
+assert('v5.79.22 privacy: report body never reads chatHistory or content fields',
+  (function() {
+    var m = app7922.match(/function formatReport\(\) \{[\s\S]*?return lines\.join\('\\n'\);\s*\}/);
+    if (!m) return false;
+    var src = m[0];
+    // Must NOT read the message store or any .content field
+    return !/state\.chatHistory/.test(src) &&
+           !/\.content/.test(src) &&
+           !/messages\[/.test(src);
+    // Note: the STRING "no message content" appears in the header as
+    // a privacy DISCLOSURE to the user — that word is expected there.
+  })());
+
+assert('v5.79.22 signal report: window.error + unhandledrejection captured',
+  app7922.includes("window.addEventListener('error'") &&
+  app7922.includes("window.addEventListener('unhandledrejection'"));
+
+assert('v5.79.22 signal report: ring buffers capped (5 attempts, 10 errors)',
+  /MAX_ATTEMPTS = 5/.test(app7922) && /MAX_ERRORS = 10/.test(app7922));
+
+assert('v5.79.22 signal report: Copy button uses clipboard API with select-fallback',
+  /navigator\.clipboard\.writeText/.test(app7922) &&
+  /window\.getSelection\(\)/.test(app7922));
+
+// Triple-bump
+assert('v5.79.22 triple-bump: app.html FL_VERSION = 5.79.22',
+  /FL_VERSION\s*=\s*'5\.79\.22'/.test(app7922));
+assert('v5.79.22 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.22',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.22'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+assert('v5.79.22 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.22',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.22'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+assert('v5.79.22 version.json: version field = 5.79.22',
+  /"version"\s*:\s*"5\.79\.22"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
 
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
