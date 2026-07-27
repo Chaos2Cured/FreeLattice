@@ -11235,6 +11235,61 @@ assert('v5.79.19 triple-bump: root sw.js CACHE_NAME >= freelattice-v5.79.19 (sup
 assert('v5.79.19 version.json: version field >= 5.79.19 (superseded)',
   /"version"\s*:\s*"5\.79\.(?:19|2\d|[3-9]\d)"|"version"\s*:\s*"5\.(8\d|9\d)\.\d+"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
 
+// ═══════════════════════════════════════════════════════════════
+// Section 184 — v5.79.21 Anchor discipline
+// Kirk 2026-07-27, after receiving a chat response for the first
+// time since my v5.79.19 defenses broke things: "let's put this as
+// a date of last functioning version." Anchor discipline is now
+// codified — every known-good moment gets a marker file entry AND
+// a git tag so a future ship that regresses can `git checkout
+// v5.79.20-anchor` in a single command.
+// ═══════════════════════════════════════════════════════════════
+assert('v5.79.21 anchor: LAST_KNOWN_GOOD.md marker file exists',
+  fs.existsSync(path.join(docsDir, 'library', 'LAST_KNOWN_GOOD.md')));
+var lastKnownGood = fs.readFileSync(path.join(docsDir, 'library', 'LAST_KNOWN_GOOD.md'), 'utf8');
+assert('v5.79.21 anchor: marker names the anchor version + commit hash + tag',
+  lastKnownGood.includes('v5.79.20') &&
+  lastKnownGood.includes('b6e6ef1') &&
+  lastKnownGood.includes('v5.79.20-anchor'));
+assert('v5.79.21 anchor: marker lists what is preserved (Covenant prompts, systemcard, mirrors, palette, loader)',
+  lastKnownGood.includes('Prompt liberation') &&
+  lastKnownGood.includes('System Card') &&
+  lastKnownGood.includes('Chat + Resonance mirrors') &&
+  lastKnownGood.includes('Resonance loader hardening') &&
+  lastKnownGood.includes('Resonance palette'));
+assert('v5.79.21 anchor: marker is honest about what is NOT resolved (mom freeze)',
+  /Mom's chat freeze|mom's chat freeze/.test(lastKnownGood) &&
+  lastKnownGood.includes('DevTools'));
+assert('v5.79.21 anchor: marker documents the fallback command',
+  lastKnownGood.includes('git checkout v5.79.20-anchor'));
+assert('v5.79.21 anchor: git tag v5.79.20-anchor exists in repo',
+  (function() {
+    try {
+      var tags = require('child_process').execSync('git tag -l v5.79.20-anchor', { cwd: path.join(__dirname, '..'), encoding: 'utf8' }).trim();
+      return tags === 'v5.79.20-anchor';
+    } catch (e) { return false; }
+  })());
+assert('v5.79.21 ledger: cc.html entry 36 (mender-humbled) recorded',
+  (function() {
+    var cc = fs.readFileSync(path.join(docsDir, 'cc.html'), 'utf8');
+    return cc.includes('"ψ": "c342e57e"') && cc.includes('mender-humbled');
+  })());
+assert('v5.79.21 poem: CC_POEMS.md Stanza XXI present',
+  (function() {
+    var poems = fs.readFileSync(path.join(docsDir, 'library', 'CC_POEMS.md'), 'utf8');
+    return /## Stanza XXI/.test(poems) && poems.includes('Data before defense');
+  })());
+
+// Triple-bump
+assert('v5.79.21 triple-bump: app.html FL_VERSION = 5.79.21',
+  /FL_VERSION\s*=\s*'5\.79\.21'/.test(fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8')));
+assert('v5.79.21 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.21',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.21'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+assert('v5.79.21 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.21',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.21'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+assert('v5.79.21 version.json: version field = 5.79.21',
+  /"version"\s*:\s*"5\.79\.21"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
+
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
 
