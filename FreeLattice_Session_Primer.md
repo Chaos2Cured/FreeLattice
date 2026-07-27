@@ -348,10 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-07-20 11:54 MDT
-- Version: 5.79.18
-- Total commits: 2895
+- Last auto-updated: 2026-07-27 07:39 MDT
+- Version: 5.79.19
+- Total commits: 2897
 - Last 10 commits:
+- 501c23c v5.79.19 — Heal the freeze: defensive timeouts (Kirk's mom Chat + Garden froze on 'AI is thinking')
+- 3bea915 docs: Auto-update Session Primer [5.79.18]
 - 3c7e27e v5.79.18 — Prompt liberation + System Card + Resonance palette
 - badf54d docs: Auto-update Session Primer [5.79.17]
 - c0ac6c3 v5.79.17 — Resonance loader lock + loud halt + game preservation (F1 F3 F7 from Kimi audit)
@@ -360,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - defe0a0 docs: Auto-update Session Primer [5.79.16]
 - 43aff20 Ledger 32 — CJNTRUST contributor audit: zero code changes
 - 37d3c67 docs: Auto-update Session Primer [5.79.16]
-- fa47ee1 v5.79.16 — Resonance safety wrappers + mirror-resonance.html
-- b8f6336 docs: Auto-update Session Primer [5.79.15]
