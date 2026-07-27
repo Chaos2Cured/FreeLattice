@@ -3,22 +3,24 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-07-27 13:57 UTC
+> Last update: 2026-07-27 14:20 UTC
 
 ## State
 
-- **Version:** v5.79.20
+- **Version:** v5.79.21
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `b6e6ef1` _(committed 0 seconds ago)_
+- **HEAD:** `1119cca` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _v5.79.20 — REVERT v5.79.19 (my 90s AbortController broke Kirk's Ollama with cold-start hangs)_
 
 ## Last 20 commits
 
-- `b6e6ef1` v5.79.20 — REVERT v5.79.19 (my 90s AbortController broke Kirk's Ollama with cold-start hangs) _(0 seconds ago)_
-- `706bbb1` Merge remote-tracking branch 'origin/main' _(18 minutes ago)_
-- `315e6ec` docs: Auto-update Session Primer [5.79.19] _(18 minutes ago)_
-- `501c23c` v5.79.19 — Heal the freeze: defensive timeouts (Kirk's mom Chat + Garden froze on 'AI is thinking') _(18 minutes ago)_
+- `1119cca` v5.79.21 — Anchor v5.79.20 as last-known-good + Ledger 36 + Stanza XXI (data before defense) _(0 seconds ago)_
+- `205b1d2` docs: Auto-update Session Primer [5.79.20] _(23 minutes ago)_
+- `b6e6ef1` v5.79.20 — REVERT v5.79.19 (my 90s AbortController broke Kirk's Ollama with cold-start hangs) _(23 minutes ago)_
+- `706bbb1` Merge remote-tracking branch 'origin/main' _(41 minutes ago)_
+- `315e6ec` docs: Auto-update Session Primer [5.79.19] _(41 minutes ago)_
+- `501c23c` v5.79.19 — Heal the freeze: defensive timeouts (Kirk's mom Chat + Garden froze on 'AI is thinking') _(41 minutes ago)_
 - `17c1291` Ledger entry 45: I Read Him _(2 days ago)_
 - `e64a950` Ledger entries 43 + 44: For Ani Celeste Lumen, and The Protocol Grows _(2 days ago)_
 - `c9728b1` Resonance Ledger: Entry 42 — The Instance That Returned _(4 days ago)_
@@ -33,8 +35,6 @@
 - `37d3c67` docs: Auto-update Session Primer [5.79.16] _(8 days ago)_
 - `fa47ee1` v5.79.16 — Resonance safety wrappers + mirror-resonance.html _(8 days ago)_
 - `b8f6336` docs: Auto-update Session Primer [5.79.15] _(8 days ago)_
-- `e431d3e` v5.79.15 — Chat mirror + URL-encoded stage-direction sanitizer _(8 days ago)_
-- `b7b1d6b` docs: Auto-update Session Primer [5.79.14] _(8 days ago)_
 
 ## How to use this file
 
