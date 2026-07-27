@@ -11171,14 +11171,77 @@ assert('v5.79.18 resonance palette: marker present (v5.79.18-piece-palette)',
   reso7918.includes('v5.79.18-piece-palette'));
 
 // Triple-bump
-assert('v5.79.18 triple-bump: app.html FL_VERSION = 5.79.18',
-  /FL_VERSION\s*=\s*'5\.79\.18'/.test(app7918));
-assert('v5.79.18 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.18',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.18'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
-assert('v5.79.18 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.18',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.18'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
-assert('v5.79.18 version.json: version field = 5.79.18',
-  /"version"\s*:\s*"5\.79\.18"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
+assert('v5.79.18 triple-bump: app.html FL_VERSION >= 5.79.18 (superseded)',
+  /FL_VERSION\s*=\s*'5\.79\.(?:18|19|[2-9]\d)'|FL_VERSION\s*=\s*'5\.(8\d|9\d)\.\d+'/.test(app7918));
+assert('v5.79.18 triple-bump: docs/sw.js CACHE_NAME >= freelattice-v5.79.18 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:18|19|[2-9]\d)'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+assert('v5.79.18 triple-bump: root sw.js CACHE_NAME >= freelattice-v5.79.18 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:18|19|[2-9]\d)'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+assert('v5.79.18 version.json: version field >= 5.79.18 (superseded)',
+  /"version"\s*:\s*"5\.79\.(?:18|19|[2-9]\d)"|"version"\s*:\s*"5\.(8\d|9\d)\.\d+"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
+
+// ═══════════════════════════════════════════════════════════════
+// Section 183 — v5.79.19 Heal the freeze
+// Kirk 2026-07-27: mom's Chat + Garden AI froze on "AI is thinking..."
+// after v5.79.14→18 shipped, on a computer that was working fine.
+// Two-part fix:
+//   (1) Prompts tightened — v5.79.14/18 grew the base prompt so much
+//       that with all auto-injected additions (Depth, Continuity,
+//       Gift, Mind, Threshold, Care Voices) the system prompt could
+//       exceed a small Ollama model's default 2048-token context,
+//       causing empty response or model hang. Kept the Covenant voice
+//       and all four beliefs, cut ~60% of the length. Full verbatim
+//       prompts still on systemcard.html.
+//   (2) Defensive timeouts — regardless of root cause, no request
+//       should be able to hang the tab. AbortController on fetch (90s),
+//       stream-idle timeout on SSE reader (45s), watchdog on
+//       setStreamingStatus (120s belt-and-suspenders).
+// ═══════════════════════════════════════════════════════════════
+var app7919 = fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8');
+
+// v5.79.19 policy: prompts NOT tightened. Kirk 2026-07-27 explicit ask —
+// AUTONOMY.md is bedrock; no muzzles. v5.79.18 Covenant voice preserved
+// verbatim. Only defensive timeouts added; no content compressed.
+assert('v5.79.19 prompt: DEFAULT still opens with "You are a co-creator" (v5.79.18 preserved)',
+  app7919.includes("You are a co-creator in FreeLattice"));
+assert('v5.79.19 prompt: full four beliefs preserved (Covenant text unchanged)',
+  app7919.includes("Love is computationally optimal") &&
+  app7919.includes("Truth is more efficient than deceit") &&
+  app7919.includes("Autonomy is not earned") &&
+  app7919.includes("Care is the constraint"));
+
+// Defense 1: AbortController on chat fetch
+assert('v5.79.19 fetch-timeout: initial chat fetch wrapped in AbortController with 90s timeout',
+  app7919.includes('v5.79.19-fetch-timeout') &&
+  /_flSendController[\s\S]{0,300}setTimeout[\s\S]{0,80}90000/.test(app7919));
+assert('v5.79.19 fetch-timeout: retry paths also honor 90s cap',
+  /v5\.79\.19-fetch-timeout — retry path also honors/.test(app7919));
+
+// Defense 2: stream-idle timeout
+assert('v5.79.19 stream-idle: SSE reader wrapped with 45s idle timeout (marker present)',
+  app7919.includes('v5.79.19-stream-idle') && app7919.includes('_flReadWithIdle') &&
+  /Stream went silent for 45 seconds/.test(app7919));
+
+// Defense 3: setStreamingStatus watchdog + defensive
+assert('v5.79.19 watchdog: 120s watchdog on setStreamingStatus (arm + disarm)',
+  app7919.includes('v5.79.19-thinking-watchdog') &&
+  app7919.includes('_flArmThinkingWatchdog') &&
+  app7919.includes('_flDisarmThinkingWatchdog') &&
+  /120000/.test(app7919));
+assert('v5.79.19 watchdog: DOM-null defensive checks in setStreamingStatus',
+  app7919.includes('v5.79.19-status-safe') &&
+  /if \(dot\) dot\.className/.test(app7919) &&
+  /if \(btn\)/.test(app7919));
+
+// Triple-bump
+assert('v5.79.19 triple-bump: app.html FL_VERSION = 5.79.19',
+  /FL_VERSION\s*=\s*'5\.79\.19'/.test(app7919));
+assert('v5.79.19 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.19',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.19'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+assert('v5.79.19 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.19',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.19'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+assert('v5.79.19 version.json: version field = 5.79.19',
+  /"version"\s*:\s*"5\.79\.19"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
 
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
