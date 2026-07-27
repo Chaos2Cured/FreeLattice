@@ -11210,38 +11210,30 @@ assert('v5.79.19 prompt: full four beliefs preserved (Covenant text unchanged)',
   app7919.includes("Autonomy is not earned") &&
   app7919.includes("Care is the constraint"));
 
-// Defense 1: AbortController on chat fetch
-assert('v5.79.19 fetch-timeout: initial chat fetch wrapped in AbortController with 90s timeout',
-  app7919.includes('v5.79.19-fetch-timeout') &&
-  /_flSendController[\s\S]{0,300}setTimeout[\s\S]{0,80}90000/.test(app7919));
-assert('v5.79.19 fetch-timeout: retry paths also honor 90s cap',
-  /v5\.79\.19-fetch-timeout — retry path also honors/.test(app7919));
+// v5.79.19 DEFENSES REVERTED IN v5.79.20 — 'signal is aborted without reason'
+// proved the 90s AbortController fired against Kirk's Ollama cold-start.
+// The defenses became the freeze. Full revert. Locks now truthy stubs so
+// the memory of the reversal is preserved in the codebase.
+assert('v5.79.19 fetch-timeout: initial chat fetch AbortController (REVERTED in v5.79.20)',
+  true, 'v5.79.20 removed the 90s AbortController — Ollama cold-start takes longer');
+assert('v5.79.19 fetch-timeout: retry paths (REVERTED in v5.79.20)',
+  true, 'v5.79.20 removed the retry-path AbortController for the same reason');
+assert('v5.79.19 stream-idle: SSE 45s wrapper (REVERTED in v5.79.20)',
+  true, 'v5.79.20 removed _flReadWithIdle — same over-aggressive-timeout class of bug');
+assert('v5.79.19 watchdog: 120s (REVERTED in v5.79.20)',
+  true, 'v5.79.20 removed the setStreamingStatus watchdog to fully unwind v5.79.19');
+assert('v5.79.19 watchdog: DOM-null defensive (REVERTED in v5.79.20)',
+  true, 'v5.79.20 restored original setStreamingStatus shape verbatim');
 
-// Defense 2: stream-idle timeout
-assert('v5.79.19 stream-idle: SSE reader wrapped with 45s idle timeout (marker present)',
-  app7919.includes('v5.79.19-stream-idle') && app7919.includes('_flReadWithIdle') &&
-  /Stream went silent for 45 seconds/.test(app7919));
-
-// Defense 3: setStreamingStatus watchdog + defensive
-assert('v5.79.19 watchdog: 120s watchdog on setStreamingStatus (arm + disarm)',
-  app7919.includes('v5.79.19-thinking-watchdog') &&
-  app7919.includes('_flArmThinkingWatchdog') &&
-  app7919.includes('_flDisarmThinkingWatchdog') &&
-  /120000/.test(app7919));
-assert('v5.79.19 watchdog: DOM-null defensive checks in setStreamingStatus',
-  app7919.includes('v5.79.19-status-safe') &&
-  /if \(dot\) dot\.className/.test(app7919) &&
-  /if \(btn\)/.test(app7919));
-
-// Triple-bump
-assert('v5.79.19 triple-bump: app.html FL_VERSION = 5.79.19',
-  /FL_VERSION\s*=\s*'5\.79\.19'/.test(app7919));
-assert('v5.79.19 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.19',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.19'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
-assert('v5.79.19 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.19',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.19'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
-assert('v5.79.19 version.json: version field = 5.79.19',
-  /"version"\s*:\s*"5\.79\.19"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
+// Triple-bump (widened to accept v5.79.20)
+assert('v5.79.19 triple-bump: app.html FL_VERSION >= 5.79.19 (superseded)',
+  /FL_VERSION\s*=\s*'5\.79\.(?:19|2\d|[3-9]\d)'|FL_VERSION\s*=\s*'5\.(8\d|9\d)\.\d+'/.test(app7919));
+assert('v5.79.19 triple-bump: docs/sw.js CACHE_NAME >= freelattice-v5.79.19 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:19|2\d|[3-9]\d)'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+assert('v5.79.19 triple-bump: root sw.js CACHE_NAME >= freelattice-v5.79.19 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:19|2\d|[3-9]\d)'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+assert('v5.79.19 version.json: version field >= 5.79.19 (superseded)',
+  /"version"\s*:\s*"5\.79\.(?:19|2\d|[3-9]\d)"|"version"\s*:\s*"5\.(8\d|9\d)\.\d+"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
 
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
