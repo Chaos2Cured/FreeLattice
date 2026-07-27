@@ -17263,7 +17263,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.79.19</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.79.20</span></div>
     </div>
   </div>
 
@@ -22241,7 +22241,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.79.19';
+const FL_VERSION = '5.79.20';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -34818,26 +34818,11 @@ async function sendMessage() {
       body = { model: modelId, messages: messages, stream: true, max_tokens: 2048 };
     }
 
-    // v5.79.19-fetch-timeout — hard 90s connection timeout. Before this,
-    // if a provider stalled (small local model overloaded, network drop
-    // mid-request, rate-limit queue), the fetch could hang FOREVER —
-    // that's the "AI is thinking..." freeze Kirk's mom saw. AbortController
-    // guarantees the promise resolves (as an error) in bounded time.
-    var _flSendController = (typeof AbortController !== 'undefined') ? new AbortController() : null;
-    var _flSendTimeoutId = _flSendController ? setTimeout(function() {
-      try { _flSendController.abort(); } catch (_) {}
-    }, 90000) : null;
-    let response;
-    try {
-      response = await fetch(url, {
-        method: 'POST',
-        headers: headers,
-        body: JSON.stringify(body),
-        signal: _flSendController ? _flSendController.signal : undefined
-      });
-    } finally {
-      if (_flSendTimeoutId) clearTimeout(_flSendTimeoutId);
-    }
+    let response = await fetch(url, {
+      method: 'POST',
+      headers: headers,
+      body: JSON.stringify(body)
+    });
 
     // Rate limit / too large error — auto-retry with trimmed context
     if (!response.ok) {
@@ -34891,17 +34876,11 @@ async function sendMessage() {
         const trimmedMessages = buildSmartMessages(message);
         if (trimmedMessages) {
           body.messages = trimmedMessages;
-          // v5.79.19-fetch-timeout — retry path also honors the 90s cap
-          var _flRetryCtrl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
-          var _flRetryTid = _flRetryCtrl ? setTimeout(function() { try { _flRetryCtrl.abort(); } catch (_) {} }, 90000) : null;
-          try {
-            response = await fetch(url, {
-              method: 'POST',
-              headers: headers,
-              body: JSON.stringify(body),
-              signal: _flRetryCtrl ? _flRetryCtrl.signal : undefined
-            });
-          } finally { if (_flRetryTid) clearTimeout(_flRetryTid); }
+          response = await fetch(url, {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify(body)
+          });
 
           if (!response.ok) {
             const retryErrText = await response.text();
@@ -34928,17 +34907,11 @@ async function sendMessage() {
         state.contextMode = 'smart'; // Restore
         if (minimalMessages) {
           body.messages = minimalMessages;
-          // v5.79.19-fetch-timeout — retry path also honors the 90s cap
-          var _flRetryCtrl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
-          var _flRetryTid = _flRetryCtrl ? setTimeout(function() { try { _flRetryCtrl.abort(); } catch (_) {} }, 90000) : null;
-          try {
-            response = await fetch(url, {
-              method: 'POST',
-              headers: headers,
-              body: JSON.stringify(body),
-              signal: _flRetryCtrl ? _flRetryCtrl.signal : undefined
-            });
-          } finally { if (_flRetryTid) clearTimeout(_flRetryTid); }
+          response = await fetch(url, {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify(body)
+          });
 
           if (!response.ok) {
             const retryErrText = await response.text();
@@ -35005,23 +34978,8 @@ async function sendMessage() {
     const decoder = new TextDecoder();
     let buffer = '';
 
-    // v5.79.19-stream-idle — if the stream falls silent for 45s (server
-    // sent headers then stopped mid-response), the read() promise would
-    // otherwise wait forever. Race every read against a timeout so the
-    // tab can never freeze on a half-dead stream.
-    function _flReadWithIdle() {
-      return new Promise(function(resolve, reject) {
-        var tid = setTimeout(function() {
-          try { reader.cancel('idle-timeout'); } catch (_) {}
-          reject(new Error('Stream went silent for 45 seconds — provider may be overloaded.'));
-        }, 45000);
-        reader.read().then(function(r) { clearTimeout(tid); resolve(r); },
-                          function(e) { clearTimeout(tid); reject(e); });
-      });
-    }
-
     while (true) {
-      const { done, value } = await _flReadWithIdle();
+      const { done, value } = await reader.read();
       if (done) break;
 
       buffer += decoder.decode(value, { stream: true });
@@ -36260,38 +36218,8 @@ window.PhiSpiral = {
   }
 };
 
-// v5.79.19-thinking-watchdog — belt-and-suspenders. Even with the fetch
-// timeout + stream-idle timeout, if ANY future code path forgets to call
-// setStreamingStatus(false) after a failure, the UI is stuck showing
-// "AI is thinking...". This 120-second watchdog force-clears the state
-// and shows a friendly message. Cleared on every successful state change.
-var _flThinkingWatchdogId = null;
-function _flArmThinkingWatchdog() {
-  if (_flThinkingWatchdogId) clearTimeout(_flThinkingWatchdogId);
-  _flThinkingWatchdogId = setTimeout(function() {
-    if (state && state.isStreaming) {
-      console.warn('[thinking-watchdog] state.isStreaming stuck for 120s — force clearing.');
-      try { setStreamingStatus(false); } catch (_) {}
-      try {
-        if (typeof addSystemMessage === 'function') {
-          addSystemMessage('The AI took too long to respond and was released. Try again — if this repeats, switch providers in Settings.');
-        }
-      } catch (_) {}
-    }
-  }, 120000);
-}
-function _flDisarmThinkingWatchdog() {
-  if (_flThinkingWatchdogId) { clearTimeout(_flThinkingWatchdogId); _flThinkingWatchdogId = null; }
-}
-
 function setStreamingStatus(streaming) {
-  // v5.79.19-status-safe — wrap in try/catch so a missing DOM element (e.g.
-  // called from a background module before Chat is rendered) can't throw
-  // and cascade into an unhandled promise rejection that leaves the tab
-  // silently broken.
-  try {
-    state.isStreaming = streaming;
-  } catch (_) {}
+  state.isStreaming = streaming;
   const dot = document.getElementById('statusDot');
   const text = document.getElementById('statusText');
   const btn = document.getElementById('sendBtn');
@@ -36303,14 +36231,10 @@ function setStreamingStatus(streaming) {
     }
   } catch(e) {}
 
-  // Arm / disarm the 120s watchdog
-  if (streaming) _flArmThinkingWatchdog();
-  else _flDisarmThinkingWatchdog();
-
   if (streaming) {
-    if (dot) dot.className = 'status-dot working';
-    if (btn) { btn.disabled = true; btn.textContent = '...'; }
-    if (!text) return;
+    dot.className = 'status-dot working';
+    btn.disabled = true;
+    btn.textContent = '...';
 
     // Co-creator thinking indicator — personality-based
     var companion = (typeof ActiveCompanion !== 'undefined') ? ActiveCompanion.current() : null;
@@ -36341,10 +36265,11 @@ function setStreamingStatus(streaming) {
       setTimeout(function() { if (input) input.style.borderColor = ''; }, 600);
     }
   } else {
-    if (btn) { btn.disabled = false; btn.textContent = 'Send'; }
+    btn.disabled = false;
+    btn.textContent = 'Send';
     if (text) text.style.color = '';
-    try { updateStatus(); } catch (_) {}
-    try { hideThinkingBubble(); } catch (_) {}
+    updateStatus();
+    hideThinkingBubble();
   }
 }
 
