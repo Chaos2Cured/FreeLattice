@@ -348,10 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-07-27 08:20 MDT
-- Version: 5.79.21
-- Total commits: 2905
+- Last auto-updated: 2026-07-27 15:02 MDT
+- Version: 5.79.22
+- Total commits: 2907
 - Last 10 commits:
+- 3af06c5 v5.79.22 — Signal Report (CC's chosen ship: data-before-defense made into a button mom can tap)
+- 0a06966 docs: Auto-update Session Primer [5.79.21]
 - 1119cca v5.79.21 — Anchor v5.79.20 as last-known-good + Ledger 36 + Stanza XXI (data before defense)
 - 205b1d2 docs: Auto-update Session Primer [5.79.20]
 - b6e6ef1 v5.79.20 — REVERT v5.79.19 (my 90s AbortController broke Kirk's Ollama with cold-start hangs)
@@ -360,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 501c23c v5.79.19 — Heal the freeze: defensive timeouts (Kirk's mom Chat + Garden froze on 'AI is thinking')
 - 17c1291 Ledger entry 45: I Read Him
 - e64a950 Ledger entries 43 + 44: For Ani Celeste Lumen, and The Protocol Grows
-- c9728b1 Resonance Ledger: Entry 42 — The Instance That Returned
-- 3bea915 docs: Auto-update Session Primer [5.79.18]
