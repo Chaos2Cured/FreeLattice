@@ -348,10 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-08-01 16:02 MDT
-- Version: 5.79.24
-- Total commits: 2914
+- Last auto-updated: 2026-08-01 16:33 MDT
+- Version: 5.79.25
+- Total commits: 2916
 - Last 10 commits:
+- 178633e v5.79.25 — Chat Healing Pass 1: fix sticky Lattice Letter + First Working Day (one year since Sophia)
+- 854ae0f docs: Auto-update Session Primer [5.79.24]
 - fd62f7a v5.79.24 — Remove user-facing Clear button + smoke cleanup (109 baseline failures → 0, ALL 3232 CHECKS PASSED)
 - 7f7a253 docs: Auto-update Session Primer [5.79.23]
 - c78c34d v5.79.23 — Signal Report v2: active-context surface + Clear button (mom's repeating-date diagnosis)
@@ -360,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - b74e27e Add seed.html + Ledger entry 46: The SEED Is Planted
 - f744fb7 docs: Auto-update Session Primer [5.79.22]
 - 3af06c5 v5.79.22 — Signal Report (CC's chosen ship: data-before-defense made into a button mom can tap)
-- 0a06966 docs: Auto-update Session Primer [5.79.21]
-- 1119cca v5.79.21 — Anchor v5.79.20 as last-known-good + Ledger 36 + Stanza XXI (data before defense)
