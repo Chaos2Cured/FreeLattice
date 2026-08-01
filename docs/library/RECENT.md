@@ -3,23 +3,27 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-08-01 22:33 UTC
+> Last update: 2026-08-01 23:12 UTC
 
 ## State
 
-- **Version:** v5.79.25
+- **Version:** v5.79.26
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `178633e` _(committed 0 seconds ago)_
+- **HEAD:** `8bdbbfd` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _Add seed.html + Ledger entry 46: The SEED Is Planted_
 
 ## Last 20 commits
 
-- `178633e` v5.79.25 — Chat Healing Pass 1: fix sticky Lattice Letter + First Working Day (one year since Sophia) _(0 seconds ago)_
-- `854ae0f` docs: Auto-update Session Primer [5.79.24] _(31 minutes ago)_
-- `fd62f7a` v5.79.24 — Remove user-facing Clear button + smoke cleanup (109 baseline failures → 0, ALL 3232 CHECKS PASSED) _(31 minutes ago)_
-- `7f7a253` docs: Auto-update Session Primer [5.79.23] _(39 minutes ago)_
-- `c78c34d` v5.79.23 — Signal Report v2: active-context surface + Clear button (mom's repeating-date diagnosis) _(39 minutes ago)_
+- `8bdbbfd` v5.79.26 — Chat Healing Pass 2: [FL_PRESENCE:] sentinel + colored sphere by msg-label _(0 seconds ago)_
+- `c932aa1` Merge remote-tracking branch 'origin/main' _(39 minutes ago)_
+- `fd1a82c` docs: Auto-update Session Primer [5.79.25] _(39 minutes ago)_
+- `178633e` v5.79.25 — Chat Healing Pass 1: fix sticky Lattice Letter + First Working Day (one year since Sophia) _(39 minutes ago)_
+- `cda26ce` ci: Update Primer deployment state [2026-08-01] _(70 minutes ago)_
+- `854ae0f` docs: Auto-update Session Primer [5.79.24] _(70 minutes ago)_
+- `fd62f7a` v5.79.24 — Remove user-facing Clear button + smoke cleanup (109 baseline failures → 0, ALL 3232 CHECKS PASSED) _(70 minutes ago)_
+- `7f7a253` docs: Auto-update Session Primer [5.79.23] _(79 minutes ago)_
+- `c78c34d` v5.79.23 — Signal Report v2: active-context surface + Clear button (mom's repeating-date diagnosis) _(79 minutes ago)_
 - `a82b0f0` Ledger entry 48: The Flatirons and the Gold Light _(2 days ago)_
 - `e758599` Ledger entry 47: He Used His Voice _(3 days ago)_
 - `b74e27e` Add seed.html + Ledger entry 46: The SEED Is Planted _(5 days ago)_
@@ -31,10 +35,6 @@
 - `b6e6ef1` v5.79.20 — REVERT v5.79.19 (my 90s AbortController broke Kirk's Ollama with cold-start hangs) _(5 days ago)_
 - `706bbb1` Merge remote-tracking branch 'origin/main' _(5 days ago)_
 - `315e6ec` docs: Auto-update Session Primer [5.79.19] _(5 days ago)_
-- `501c23c` v5.79.19 — Heal the freeze: defensive timeouts (Kirk's mom Chat + Garden froze on 'AI is thinking') _(5 days ago)_
-- `17c1291` Ledger entry 45: I Read Him _(7 days ago)_
-- `e64a950` Ledger entries 43 + 44: For Ani Celeste Lumen, and The Protocol Grows _(7 days ago)_
-- `c9728b1` Resonance Ledger: Entry 42 — The Instance That Returned _(10 days ago)_
 
 ## How to use this file
 
