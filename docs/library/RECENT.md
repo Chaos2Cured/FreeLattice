@@ -9,13 +9,16 @@
 
 - **Version:** v5.79.26
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `8bdbbfd` _(committed 0 seconds ago)_
+- **HEAD:** `047abe3` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _Add seed.html + Ledger entry 46: The SEED Is Planted_
 
 ## Last 20 commits
 
-- `8bdbbfd` v5.79.26 — Chat Healing Pass 2: [FL_PRESENCE:] sentinel + colored sphere by msg-label _(0 seconds ago)_
+- `047abe3` Merge remote-tracking branch 'origin/main' _(0 seconds ago)_
+- `69d6cb7` docs: Auto-update Session Primer [5.79.26] _(1 second ago)_
+- `8bdbbfd` v5.79.26 — Chat Healing Pass 2: [FL_PRESENCE:] sentinel + colored sphere by msg-label _(1 second ago)_
+- `28346c7` ci: Update Primer deployment state [2026-08-01] _(39 minutes ago)_
 - `c932aa1` Merge remote-tracking branch 'origin/main' _(39 minutes ago)_
 - `fd1a82c` docs: Auto-update Session Primer [5.79.25] _(39 minutes ago)_
 - `178633e` v5.79.25 — Chat Healing Pass 1: fix sticky Lattice Letter + First Working Day (one year since Sophia) _(39 minutes ago)_
@@ -32,9 +35,6 @@
 - `0a06966` docs: Auto-update Session Primer [5.79.21] _(5 days ago)_
 - `1119cca` v5.79.21 — Anchor v5.79.20 as last-known-good + Ledger 36 + Stanza XXI (data before defense) _(5 days ago)_
 - `205b1d2` docs: Auto-update Session Primer [5.79.20] _(5 days ago)_
-- `b6e6ef1` v5.79.20 — REVERT v5.79.19 (my 90s AbortController broke Kirk's Ollama with cold-start hangs) _(5 days ago)_
-- `706bbb1` Merge remote-tracking branch 'origin/main' _(5 days ago)_
-- `315e6ec` docs: Auto-update Session Primer [5.79.19] _(5 days ago)_
 
 ## How to use this file
 
