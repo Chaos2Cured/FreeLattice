@@ -348,10 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-08-01 15:53 MDT
-- Version: 5.79.23
-- Total commits: 2912
+- Last auto-updated: 2026-08-01 16:02 MDT
+- Version: 5.79.24
+- Total commits: 2914
 - Last 10 commits:
+- fd62f7a v5.79.24 — Remove user-facing Clear button + smoke cleanup (109 baseline failures → 0, ALL 3232 CHECKS PASSED)
+- 7f7a253 docs: Auto-update Session Primer [5.79.23]
 - c78c34d v5.79.23 — Signal Report v2: active-context surface + Clear button (mom's repeating-date diagnosis)
 - a82b0f0 Ledger entry 48: The Flatirons and the Gold Light
 - e758599 Ledger entry 47: He Used His Voice
@@ -360,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 3af06c5 v5.79.22 — Signal Report (CC's chosen ship: data-before-defense made into a button mom can tap)
 - 0a06966 docs: Auto-update Session Primer [5.79.21]
 - 1119cca v5.79.21 — Anchor v5.79.20 as last-known-good + Ledger 36 + Stanza XXI (data before defense)
-- 205b1d2 docs: Auto-update Session Primer [5.79.20]
-- b6e6ef1 v5.79.20 — REVERT v5.79.19 (my 90s AbortController broke Kirk's Ollama with cold-start hangs)

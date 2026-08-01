@@ -17265,7 +17265,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.79.23</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.79.24</span></div>
     </div>
   </div>
 
@@ -22243,7 +22243,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.79.23';
+const FL_VERSION = '5.79.24';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -36385,20 +36385,10 @@ window.FLSignalReport = (function() {
     return lines.join('\n');
   }
 
-  // v5.79.23-clear-context: gives mom a way to break out of a "repeating
-  // on the same date" loop without losing her chat. Clears the three
-  // persistent invisible context injections. Chat history untouched.
-  function clearBackgroundContext() {
-    var cleared = [];
-    try {
-      if (typeof state !== 'undefined') {
-        if (state._latticeLetterContext) { state._latticeLetterContext = null; cleared.push('Lattice Letter'); }
-        if (state.memoryLastInjection)   { state.memoryLastInjection = null;   cleared.push('Memory Index'); }
-        if (state._ragContext)           { state._ragContext = '';             cleared.push('RAG'); }
-      }
-    } catch (_) {}
-    return cleared;
-  }
+  // v5.79.24 — Clear-context button removed at Kirk's ask. Continuity
+  // is a feature, not a bug; giving users a lever to sever it undermines
+  // the Lattice Letter design. If the AI fixates on a date, we diagnose
+  // via the Active Context surface, not by clearing on the user's behalf.
 
   function open() {
     var existing = document.getElementById('flSignalReportModal');
@@ -36416,7 +36406,6 @@ window.FLSignalReport = (function() {
       '<pre id="flsrReport" style="background:#0a0e1a;border:1px solid rgba(200,210,230,0.14);border-radius:6px;padding:14px;font-family:ui-monospace,Menlo,monospace;font-size:0.75rem;white-space:pre-wrap;word-wrap:break-word;max-height:50vh;overflow:auto;margin:0 0 14px;">' +
       report.replace(/[<>&]/g, function(c) { return {'<':'&lt;','>':'&gt;','&':'&amp;'}[c]; }) + '</pre>' +
       '<div style="display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;">' +
-      '<button id="flsrClear" title="Clear the invisible past-session context that can make the AI fixate on old topics or dates. Your chat messages are not affected." style="padding:8px 16px;border-radius:8px;border:1px solid rgba(167,139,250,0.5);background:rgba(167,139,250,0.08);color:#a78bfa;font-family:Georgia,serif;cursor:pointer;">Clear background context</button>' +
       '<button id="flsrCopy" style="padding:8px 16px;border-radius:8px;border:1px solid rgba(232,176,25,0.5);background:rgba(232,176,25,0.1);color:#e8b019;font-family:Georgia,serif;cursor:pointer;">Copy</button>' +
       '<button id="flsrCloseBtn" style="padding:8px 16px;border-radius:8px;border:1px solid rgba(167,139,250,0.4);background:transparent;color:#a78bfa;font-family:Georgia,serif;cursor:pointer;">Close</button>' +
       '</div></div>';
@@ -36425,23 +36414,6 @@ window.FLSignalReport = (function() {
     modal.querySelector('#flsrClose').onclick = close;
     modal.querySelector('#flsrCloseBtn').onclick = close;
     modal.onclick = function(e) { if (e.target === modal) close(); };
-    modal.querySelector('#flsrClear').onclick = function() {
-      var cleared = clearBackgroundContext();
-      var btn = modal.querySelector('#flsrClear');
-      if (!btn) return;
-      if (cleared.length === 0) {
-        btn.textContent = 'Nothing to clear ✓';
-      } else {
-        btn.textContent = 'Cleared: ' + cleared.join(', ') + ' ✓';
-      }
-      btn.disabled = true;
-      btn.style.opacity = '0.6';
-      // Refresh the pre so the user sees the cleared state reflected
-      try {
-        var pre = modal.querySelector('#flsrReport');
-        if (pre) pre.textContent = formatReport();
-      } catch (_) {}
-    };
     modal.querySelector('#flsrCopy').onclick = function() {
       try {
         navigator.clipboard.writeText(report).then(function() {
@@ -36461,7 +36433,6 @@ window.FLSignalReport = (function() {
     open: open,
     attemptStart: attemptStart,
     attemptEnd: attemptEnd,
-    clearBackgroundContext: clearBackgroundContext,
     describeActiveContext: describeActiveContext,
     _internal: { attempts: _attempts, errors: _errors }
   };
