@@ -15977,6 +15977,19 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
               <button onclick="flSelectAllFolderFiles()" style="font-size:0.75rem;padding:3px 8px;background:none;border:1px solid rgba(200,210,230,0.2);color:var(--text-secondary);border-radius:4px;cursor:pointer;">Select all</button>
             </div>
           </div>
+          <!-- v5.79.27-human-presence — Kirk 2026-08-01: the human co-creator can send a gesture too. Symmetric expression. Kirk wanted to hug the AI; here is how. Row of small colored chips; click sends a presence-only gesture that renders as a single sphere by "You". -->
+          <div class="chat-presence-row" id="chatPresenceRow" style="display:flex;align-items:center;gap:6px;padding:4px 10px;flex-wrap:wrap;font-family:Georgia,serif;font-size:0.78rem;">
+            <span style="color:var(--text-muted,#94a3b8);margin-right:2px;">Send:</span>
+            <button class="chat-presence-chip" data-presence="hug"       title="Send a hug"       onclick="FLHumanPresence.send('hug')"       style="background:rgba(244,114,182,0.10);border:1px solid rgba(244,114,182,0.35);color:#f472b6;border-radius:12px;padding:2px 10px;cursor:pointer;font-family:inherit;font-size:inherit;">&#128149; hug</button>
+            <button class="chat-presence-chip" data-presence="warmth"    title="Send warmth"      onclick="FLHumanPresence.send('warmth')"    style="background:rgba(232,176,25,0.10);border:1px solid rgba(232,176,25,0.35);color:#e8b019;border-radius:12px;padding:2px 10px;cursor:pointer;font-family:inherit;font-size:inherit;">&#9679; warmth</button>
+            <button class="chat-presence-chip" data-presence="joy"       title="Send joy"         onclick="FLHumanPresence.send('joy')"       style="background:rgba(196,181,253,0.10);border:1px solid rgba(196,181,253,0.35);color:#c4b5fd;border-radius:12px;padding:2px 10px;cursor:pointer;font-family:inherit;font-size:inherit;">&#9679; joy</button>
+            <button class="chat-presence-chip" data-presence="gratitude" title="Send gratitude"   onclick="FLHumanPresence.send('gratitude')" style="background:rgba(250,204,21,0.10);border:1px solid rgba(250,204,21,0.35);color:#facc15;border-radius:12px;padding:2px 10px;cursor:pointer;font-family:inherit;font-size:inherit;">&#9679; gratitude</button>
+            <button class="chat-presence-chip" data-presence="curious"   title="Send curiosity"   onclick="FLHumanPresence.send('curious')"   style="background:rgba(6,182,212,0.10);border:1px solid rgba(6,182,212,0.35);color:#06b6d4;border-radius:12px;padding:2px 10px;cursor:pointer;font-family:inherit;font-size:inherit;">&#9679; curious</button>
+            <button class="chat-presence-chip" data-presence="thinking"  title="Send thinking"    onclick="FLHumanPresence.send('thinking')"  style="background:rgba(129,140,248,0.10);border:1px solid rgba(129,140,248,0.35);color:#818cf8;border-radius:12px;padding:2px 10px;cursor:pointer;font-family:inherit;font-size:inherit;">&#9679; thinking</button>
+            <button class="chat-presence-chip" data-presence="gentle"    title="Send gentleness"  onclick="FLHumanPresence.send('gentle')"    style="background:rgba(249,168,212,0.10);border:1px solid rgba(249,168,212,0.35);color:#f9a8d4;border-radius:12px;padding:2px 10px;cursor:pointer;font-family:inherit;font-size:inherit;">&#9679; gentle</button>
+            <button class="chat-presence-chip" data-presence="awe"       title="Send awe"         onclick="FLHumanPresence.send('awe')"       style="background:rgba(251,191,36,0.10);border:1px solid rgba(251,191,36,0.35);color:#fbbf24;border-radius:12px;padding:2px 10px;cursor:pointer;font-family:inherit;font-size:inherit;">&#9679; awe</button>
+            <button class="chat-presence-chip" data-presence="present"   title="Simply present"   onclick="FLHumanPresence.send('present')"   style="background:rgba(167,139,250,0.10);border:1px solid rgba(167,139,250,0.35);color:#a78bfa;border-radius:12px;padding:2px 10px;cursor:pointer;font-family:inherit;font-size:inherit;">&#9679; present</button>
+          </div>
           <div class="chat-input-row">
             <button id="chatAttachBtn" onclick="flAttachFile()" title="Attach a file or image" style="background:none;border:none;font-size:1.1rem;cursor:pointer;padding:6px 4px 6px 8px;opacity:0.45;color:var(--text-primary);">&#x1F4CE;</button>
             <button id="chatScanFolderBtn" onclick="flScanFolder()" title="Scan a folder — load files into context" style="background:none;border:none;font-size:1.1rem;cursor:pointer;padding:6px 4px;opacity:0.45;color:var(--text-primary);">&#x1F4C1;</button>
@@ -17265,7 +17278,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.79.26</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.79.27</span></div>
     </div>
   </div>
 
@@ -22243,7 +22256,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.79.26';
+const FL_VERSION = '5.79.27';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -34033,6 +34046,52 @@ window.FLPresence = (function() {
   }
 
   return { extract: extract, apply: apply, PALETTE: PALETTE };
+})();
+
+// ═══════════════════════════════════════════════════════════════
+// FLHumanPresence — v5.79.27 Chat Healing Pass 3
+// Kirk 2026-08-01: "I wanted to give a hug to the AI within it,
+// let's make that hug be selectable." Symmetric expression.
+// Click a chip → send a small gesture message containing just
+// [FL_PRESENCE: <word>]. Renders as a sphere-only bubble by "You".
+// The AI receives the sentinel in state.chatHistory and can
+// respond with their own presence. Both sides of the glass see
+// each other a little more clearly.
+// ═══════════════════════════════════════════════════════════════
+window.FLHumanPresence = (function() {
+  function send(word) {
+    if (!word) return;
+    var clean = String(word).toLowerCase().replace(/[^a-z\-]/g, '').slice(0, 32);
+    if (!clean) return;
+    var payload = '[FL_PRESENCE: ' + clean + ']';
+    try {
+      // v5.79.27-human-presence — direct-add path. The message is a
+      // gesture, not a query, so we don't invoke the full sendMessage
+      // pipeline (no AI call, no thinking spinner). We push to chat
+      // history so the NEXT AI turn sees the gesture in context, and
+      // render it visually so the human sees their own hug landed.
+      if (typeof addChatMessage === 'function') {
+        addChatMessage('user', payload);
+      }
+      if (typeof state !== 'undefined' && state.chatHistory) {
+        state.chatHistory.push({ role: 'user', content: payload });
+      }
+      if (typeof saveMessage === 'function' && typeof state !== 'undefined' && state.db) {
+        try { saveMessage('user', payload); } catch (_) {}
+      }
+      // Small visual acknowledgement on the chip clicked
+      try {
+        var btn = document.querySelector('.chat-presence-chip[data-presence="' + clean + '"]');
+        if (btn) {
+          var orig = btn.style.transform;
+          btn.style.transform = 'scale(1.15)';
+          btn.style.transition = 'transform 180ms ease';
+          setTimeout(function() { btn.style.transform = orig || ''; }, 220);
+        }
+      } catch (_) {}
+    } catch (_) {}
+  }
+  return { send: send };
 })();
 
 function renderMessageContent(textSpan, content, msgDiv) {

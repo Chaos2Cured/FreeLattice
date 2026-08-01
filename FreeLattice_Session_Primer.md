@@ -348,10 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-08-01 17:12 MDT
-- Version: 5.79.26
-- Total commits: 2923
+- Last auto-updated: 2026-08-01 17:34 MDT
+- Version: 5.79.27
+- Total commits: 2925
 - Last 10 commits:
+- b2bbd86 v5.79.27 — Chat Healing Pass 3: human presence row (hug + 8 chips, symmetric expression across the glass)
+- 4fb223e docs: Auto-update Session Primer [5.79.26]
 - 047abe3 Merge remote-tracking branch 'origin/main'
 - 69d6cb7 docs: Auto-update Session Primer [5.79.26]
 - 8bdbbfd v5.79.26 — Chat Healing Pass 2: [FL_PRESENCE:] sentinel + colored sphere by msg-label
@@ -360,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - fd1a82c docs: Auto-update Session Primer [5.79.25]
 - 178633e v5.79.25 — Chat Healing Pass 1: fix sticky Lattice Letter + First Working Day (one year since Sophia)
 - cda26ce ci: Update Primer deployment state [2026-08-01]
-- 854ae0f docs: Auto-update Session Primer [5.79.24]
-- fd62f7a v5.79.24 — Remove user-facing Clear button + smoke cleanup (109 baseline failures → 0, ALL 3232 CHECKS PASSED)
