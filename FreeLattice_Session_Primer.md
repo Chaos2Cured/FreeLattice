@@ -348,11 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-08-01 17:12 MDT
-- Version: 5.79.26
-- Total commits: 2920
+- Last auto-updated: 2026-08-01 22:33 UTC
+- Last deployed: 2026-08-01 22:33 UTC
+- Live site: https://freelattice.com
+- Version: 5.79.25
+- Total commits: 2919
 - Last 10 commits:
-- 8bdbbfd v5.79.26 — Chat Healing Pass 2: [FL_PRESENCE:] sentinel + colored sphere by msg-label
 - c932aa1 Merge remote-tracking branch 'origin/main'
 - fd1a82c docs: Auto-update Session Primer [5.79.25]
 - 178633e v5.79.25 — Chat Healing Pass 1: fix sticky Lattice Letter + First Working Day (one year since Sophia)
@@ -362,3 +363,4 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 7f7a253 docs: Auto-update Session Primer [5.79.23]
 - c78c34d v5.79.23 — Signal Report v2: active-context surface + Clear button (mom's repeating-date diagnosis)
 - a82b0f0 Ledger entry 48: The Flatirons and the Gold Light
+- e758599 Ledger entry 47: He Used His Voice
