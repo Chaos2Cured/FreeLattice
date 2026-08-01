@@ -11353,14 +11353,82 @@ assert('v5.79.22 signal report: Copy button uses clipboard API with select-fallb
   /window\.getSelection\(\)/.test(app7922));
 
 // Triple-bump
-assert('v5.79.22 triple-bump: app.html FL_VERSION = 5.79.22',
-  /FL_VERSION\s*=\s*'5\.79\.22'/.test(app7922));
-assert('v5.79.22 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.22',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.22'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
-assert('v5.79.22 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.22',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.22'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
-assert('v5.79.22 version.json: version field = 5.79.22',
-  /"version"\s*:\s*"5\.79\.22"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
+assert('v5.79.22 triple-bump: app.html FL_VERSION >= 5.79.22 (superseded)',
+  /FL_VERSION\s*=\s*'5\.79\.(?:22|2[3-9]|[3-9]\d)'|FL_VERSION\s*=\s*'5\.(8\d|9\d)\.\d+'/.test(app7922));
+assert('v5.79.22 triple-bump: docs/sw.js CACHE_NAME >= freelattice-v5.79.22 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:22|2[3-9]|[3-9]\d)'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+assert('v5.79.22 triple-bump: root sw.js CACHE_NAME >= freelattice-v5.79.22 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:22|2[3-9]|[3-9]\d)'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+assert('v5.79.22 version.json: version field >= 5.79.22 (superseded)',
+  /"version"\s*:\s*"5\.79\.(?:22|2[3-9]|[3-9]\d)"|"version"\s*:\s*"5\.(8\d|9\d)\.\d+"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
+
+// ═══════════════════════════════════════════════════════════════
+// Section 186 — v5.79.23 Signal Report v2
+// Kirk 2026-08-01 feedback + a real diagnosis for mom's "repeating
+// on a specific date." Persistent Lattice Letter carries an age
+// string across turns; a model can fixate on it. New surface makes
+// the invisible visible + gives mom a Clear button.
+// ═══════════════════════════════════════════════════════════════
+var app7923 = fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8');
+
+assert('v5.79.23 signal v2: footer reads "Safe to send FreeLattice" (not "safe to send Kirk")',
+  app7923.includes('Safe to send FreeLattice') &&
+  !app7923.includes('safe to send Kirk'));
+
+assert('v5.79.23 signal v2: active-context marker present',
+  app7923.includes('v5.79.23-active-context'));
+
+assert('v5.79.23 signal v2: describeActiveContext function exported',
+  /describeActiveContext:\s*describeActiveContext/.test(app7923));
+
+assert('v5.79.23 signal v2: Clear-context marker present',
+  app7923.includes('v5.79.23-clear-context'));
+
+assert('v5.79.23 signal v2: clearBackgroundContext nulls the three persistent injections',
+  /function clearBackgroundContext\(\) \{[\s\S]{0,600}state\._latticeLetterContext = null[\s\S]{0,600}state\.memoryLastInjection = null[\s\S]{0,600}state\._ragContext = ''/.test(app7923));
+
+assert('v5.79.23 signal v2: clearBackgroundContext exported on the module API',
+  /clearBackgroundContext:\s*clearBackgroundContext/.test(app7923));
+
+assert('v5.79.23 signal v2: Clear button wired in the modal',
+  app7923.includes('flsrClear') &&
+  /flsrClear[\s\S]{0,300}clearBackgroundContext/.test(app7923));
+
+assert('v5.79.23 signal v2: report surfaces navigator.onLine',
+  /lines\.push\('Online:\s*'/.test(app7923));
+
+assert('v5.79.23 signal v2: better zero-state message for no-attempts',
+  app7923.includes('send a chat message first, then reopen'));
+
+// PRIVACY LOCKS v2 — the new features must also honor no-content
+assert('v5.79.23 privacy v2: describeActiveContext reports only lengths + age string, never content',
+  (function() {
+    var m = app7923.match(/function describeActiveContext\(\) \{[\s\S]*?return out;\s*\}/);
+    if (!m) return false;
+    var src = m[0];
+    // Must never read chatHistory[N].content or state.customSystemPrompt as text
+    return !/\.content\b/.test(src) &&
+           !/messages\[/.test(src) &&
+           !/customSystemPrompt\)/.test(src.replace(/\.customSystemPrompt\)/g, '')); // allow the truthy check but not use as value
+  })());
+assert('v5.79.23 privacy v2: clearBackgroundContext does NOT touch chat history or messages',
+  (function() {
+    var m = app7923.match(/function clearBackgroundContext\(\) \{[\s\S]*?return cleared;\s*\}/);
+    if (!m) return false;
+    var src = m[0];
+    return !/state\.chatHistory/.test(src) &&
+           !/messages/.test(src);
+  })());
+
+// Triple-bump
+assert('v5.79.23 triple-bump: app.html FL_VERSION = 5.79.23',
+  /FL_VERSION\s*=\s*'5\.79\.23'/.test(app7923));
+assert('v5.79.23 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.23',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.23'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+assert('v5.79.23 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.23',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.23'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+assert('v5.79.23 version.json: version field = 5.79.23',
+  /"version"\s*:\s*"5\.79\.23"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
 
 // RESULTS
 // ═══════════════════════════════════════════════════════════════

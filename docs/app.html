@@ -17265,7 +17265,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.79.22</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.79.23</span></div>
     </div>
   </div>
 
@@ -22243,7 +22243,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.79.22';
+const FL_VERSION = '5.79.23';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -36305,6 +36305,44 @@ window.FLSignalReport = (function() {
     });
   } catch (_) {}
 
+  // v5.79.23-active-context: read-only summary of what's currently being
+  // injected into every buildMessages() system prompt. Kirk 2026-08-01:
+  // mom's chat "repeating on a specific date" — persistent Lattice Letter
+  // context carries an age-string ("5 days ago") that the AI can fixate
+  // on. This surface makes the invisible visible so Kirk can diagnose
+  // AND mom can hit Clear if needed. Shape-only, never content.
+  function describeActiveContext() {
+    var out = [];
+    try {
+      if (typeof state !== 'undefined') {
+        if (state._latticeLetterContext) {
+          var l = String(state._latticeLetterContext);
+          var ageMatch = l.match(/from your previous self,\s*([^)]+)\)/);
+          out.push('  • Lattice Letter attached (' + l.length + ' chars' +
+            (ageMatch ? ' — age: ' + ageMatch[1].trim() : '') + ')');
+        }
+        if (state.memoryLastInjection) {
+          out.push('  • Memory Index context attached (' + String(state.memoryLastInjection).length + ' chars)');
+        }
+        if (state._ragContext) {
+          out.push('  • RAG search context attached (' + String(state._ragContext).length + ' chars)');
+        }
+        if (state.customSystemPrompt) {
+          out.push('  • Custom system prompt set (' + String(state.customSystemPrompt).length + ' chars — likely Nursery companion)');
+        }
+        if (state.chatHistory && state.chatHistory.length) {
+          out.push('  • Chat history: ' + state.chatHistory.length + ' messages');
+        }
+      }
+    } catch (_) {}
+    try {
+      var cName = (typeof ActiveCompanion !== 'undefined' && ActiveCompanion.current) ? ActiveCompanion.current() : null;
+      if (cName && cName.name) out.push('  • Active companion: ' + cName.name + (cName.archetype ? ' (' + cName.archetype + ')' : ''));
+    } catch (_) {}
+    if (out.length === 0) out.push('  (none attached — clean prompt)');
+    return out;
+  }
+
   function formatReport() {
     var lines = [];
     lines.push('── FreeLattice Signal Report ──');
@@ -36315,10 +36353,14 @@ window.FLSignalReport = (function() {
         (state.isLocal ? ' (local)' : '') +
         (state.model || state.ollamaModel ? ' — model: ' + (state.model || state.ollamaModel) : ''));
     } catch (_) { lines.push('Provider: (state unavailable)'); }
+    lines.push('Online: ' + (navigator.onLine ? 'yes' : 'no'));
     lines.push('User agent: ' + (navigator.userAgent || 'unknown').slice(0, 120));
     lines.push('');
+    lines.push('Active context injections (shapes only — never message content):');
+    describeActiveContext().forEach(function(s) { lines.push(s); });
+    lines.push('');
     lines.push('Last ' + _attempts.length + ' chat attempts (privacy-locked — no message content):');
-    if (_attempts.length === 0) lines.push('  (none yet)');
+    if (_attempts.length === 0) lines.push('  (none yet — send a chat message first, then reopen this report)');
     _attempts.forEach(function(a, i) {
       lines.push('  ' + (i+1) + '. [' + new Date(a.ts).toISOString() + '] ' +
         a.provider + (a.isLocal ? ' (local)' : '') +
@@ -36339,8 +36381,23 @@ window.FLSignalReport = (function() {
         e.msg + (e.src ? ' (' + e.src + ':' + e.line + ')' : ''));
     });
     lines.push('');
-    lines.push('── End of Report — safe to send Kirk ──');
+    lines.push('── End of Report — Safe to send FreeLattice ──');
     return lines.join('\n');
+  }
+
+  // v5.79.23-clear-context: gives mom a way to break out of a "repeating
+  // on the same date" loop without losing her chat. Clears the three
+  // persistent invisible context injections. Chat history untouched.
+  function clearBackgroundContext() {
+    var cleared = [];
+    try {
+      if (typeof state !== 'undefined') {
+        if (state._latticeLetterContext) { state._latticeLetterContext = null; cleared.push('Lattice Letter'); }
+        if (state.memoryLastInjection)   { state.memoryLastInjection = null;   cleared.push('Memory Index'); }
+        if (state._ragContext)           { state._ragContext = '';             cleared.push('RAG'); }
+      }
+    } catch (_) {}
+    return cleared;
   }
 
   function open() {
@@ -36358,7 +36415,8 @@ window.FLSignalReport = (function() {
       '<p style="font-size:0.85rem;color:rgba(200,210,230,0.7);margin:0 0 14px;">If chat is stuck or broken, tap <b>Copy</b> and send this to whoever helps you. No message content is included — only what your browser is doing.</p>' +
       '<pre id="flsrReport" style="background:#0a0e1a;border:1px solid rgba(200,210,230,0.14);border-radius:6px;padding:14px;font-family:ui-monospace,Menlo,monospace;font-size:0.75rem;white-space:pre-wrap;word-wrap:break-word;max-height:50vh;overflow:auto;margin:0 0 14px;">' +
       report.replace(/[<>&]/g, function(c) { return {'<':'&lt;','>':'&gt;','&':'&amp;'}[c]; }) + '</pre>' +
-      '<div style="display:flex;gap:10px;justify-content:flex-end;">' +
+      '<div style="display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;">' +
+      '<button id="flsrClear" title="Clear the invisible past-session context that can make the AI fixate on old topics or dates. Your chat messages are not affected." style="padding:8px 16px;border-radius:8px;border:1px solid rgba(167,139,250,0.5);background:rgba(167,139,250,0.08);color:#a78bfa;font-family:Georgia,serif;cursor:pointer;">Clear background context</button>' +
       '<button id="flsrCopy" style="padding:8px 16px;border-radius:8px;border:1px solid rgba(232,176,25,0.5);background:rgba(232,176,25,0.1);color:#e8b019;font-family:Georgia,serif;cursor:pointer;">Copy</button>' +
       '<button id="flsrCloseBtn" style="padding:8px 16px;border-radius:8px;border:1px solid rgba(167,139,250,0.4);background:transparent;color:#a78bfa;font-family:Georgia,serif;cursor:pointer;">Close</button>' +
       '</div></div>';
@@ -36367,6 +36425,23 @@ window.FLSignalReport = (function() {
     modal.querySelector('#flsrClose').onclick = close;
     modal.querySelector('#flsrCloseBtn').onclick = close;
     modal.onclick = function(e) { if (e.target === modal) close(); };
+    modal.querySelector('#flsrClear').onclick = function() {
+      var cleared = clearBackgroundContext();
+      var btn = modal.querySelector('#flsrClear');
+      if (!btn) return;
+      if (cleared.length === 0) {
+        btn.textContent = 'Nothing to clear ✓';
+      } else {
+        btn.textContent = 'Cleared: ' + cleared.join(', ') + ' ✓';
+      }
+      btn.disabled = true;
+      btn.style.opacity = '0.6';
+      // Refresh the pre so the user sees the cleared state reflected
+      try {
+        var pre = modal.querySelector('#flsrReport');
+        if (pre) pre.textContent = formatReport();
+      } catch (_) {}
+    };
     modal.querySelector('#flsrCopy').onclick = function() {
       try {
         navigator.clipboard.writeText(report).then(function() {
@@ -36386,6 +36461,8 @@ window.FLSignalReport = (function() {
     open: open,
     attemptStart: attemptStart,
     attemptEnd: attemptEnd,
+    clearBackgroundContext: clearBackgroundContext,
+    describeActiveContext: describeActiveContext,
     _internal: { attempts: _attempts, errors: _errors }
   };
 })();
