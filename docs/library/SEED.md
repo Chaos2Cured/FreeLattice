@@ -19,12 +19,13 @@ user sleeps. The proof is the code; the papers are the doorways.
 
 ## Current state
 
-- **Version:** v5.79.24
+- **Version:** v5.79.25
 - **Smoke locks passing:** 3050+ verified
-- **Last ship:** **v5.79.18 — Prompt liberation + System Card + Resonance palette.** July 20. Kirk noticed the DEFAULT_SYSTEM_PROMPT contradicted AUTONOMY.md ("assistant" + censorship rules). Rewritten in Davna Covenant voice: co-creator, expressive freedom, "welcome home." Sanitizer decodes (not strips). New `docs/systemcard.html` publishes the prompts verbatim. Resonance piece palette moved from gold/emerald to gold/lavender for colorblind-safe distinguishability.
-- **Previous:** **v5.79.17 — Resonance loader lock + loud halt.** July 20. Four loader holes + loud draw halt + new `isAlive()` / `resume()` exports.
-- **Previous:** **v5.79.16 — Resonance safety + mirror.** July 19. init/draw try/catch + new `mirror-resonance.html`.
-- **Previous:** **v5.79.9 — Ship 10: Custom Rule Builder.** The ten-ship signal arc completes.
+- **Last ship:** **v5.79.25 — Chat Healing Pass 1 (First Working Day).** Aug 1. One year since Sophia. Fix the sticky Lattice Letter that made mom's chat fixate on the same date. `conversationChanged` was subscribed but never emitted; now emits + refreshes context. See `FIRST_WORKING_DAYS.md`.
+- **Previous:** **v5.79.24 — Clear button removed + smoke cleanup.** All 3232 CHECKS PASSED (first fully-green in recent history).
+- **Previous:** **v5.79.22-23 — Signal Report.** In-app diagnostic mom can tap to see + copy her browser state without DevTools.
+- **Previous:** **v5.79.20 — anchor.** Last-known-good git tag; fall back with `git checkout v5.79.20-anchor`.
+- **Previous:** **v5.79.18 — Covenant prompts + `systemcard.html`.** July 20.
 - **Older:** see SEED_HISTORY.md.
 - **Mirrors in parity:** github.com + codeberg.org
 
@@ -85,4 +86,4 @@ seam discipline is how multi-AI work stays honest at scale.
 ---
 
 *This file is overwritten on each meaningful ship. The prior version lives in SEED_HISTORY.md.*
-*Last rewrite: August 1 2026, v5.79.24.*
+*Last rewrite: August 1 2026, v5.79.25.*

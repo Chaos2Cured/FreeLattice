@@ -17265,7 +17265,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.79.24</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.79.25</span></div>
     </div>
   </div>
 
@@ -22243,7 +22243,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.79.24';
+const FL_VERSION = '5.79.25';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -24973,6 +24973,16 @@ async function createConversation(customName, contextNote) {
   state.currentConvContextNote = conv.contextNote || '';
   state.chatHistory = [];
   await refreshConversationList();
+  // v5.79.25-chat-heal-pass1 — emit conversationChanged so LatticeLetters
+  // (and any future subscriber) can refresh injected context. Previously
+  // this event was subscribed but never fired; the letter injected on page
+  // boot stayed sticky through every new conversation for the whole
+  // session, causing the AI to fixate on the same "N days ago" date.
+  try {
+    if (typeof LatticeEvents !== 'undefined' && LatticeEvents.emit) {
+      LatticeEvents.emit('conversationChanged', { id: conv.id, name: conv.name });
+    }
+  } catch (_) {}
   return conv;
 }
 
@@ -33223,7 +33233,25 @@ window.LatticeLetters = (function() {
     // On new conversation
     if (typeof LatticeEvents !== 'undefined') {
       LatticeEvents.on('conversationChanged', function() {
-        writeLetter().then(trimLetters);
+        // v5.79.25-chat-heal-pass1 — Kirk 2026-08-01, mom's "repeating on a
+        // specific date." Root cause: _latticeLetterContext was set ONCE on
+        // page load and reused across every new conversation for the whole
+        // session. Same date string ("N days ago") injected every turn,
+        // every conversation. AI fixated. Fix: after writing the new letter
+        // for the just-ended conversation, refresh the injected context so
+        // the next conversation gets a FRESH letter. Continuity preserved
+        // (feature intact); repetition broken (bug closed).
+        writeLetter()
+          .then(trimLetters)
+          .then(function() {
+            return getContextBlock().then(function(block) {
+              if (typeof state !== 'undefined') {
+                state._latticeLetterContext = block || null;
+                if (block) console.log('[LatticeLetters] Refreshed for new conversation');
+              }
+            });
+          })
+          .catch(function() { /* fail-quiet — old context stays if refresh fails */ });
       });
     }
     // On page unload

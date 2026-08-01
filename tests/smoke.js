@@ -11129,14 +11129,14 @@ assert('v5.79.23 version.json: version field >= 5.79.23 (superseded)',
   /"version"\s*:\s*"5\.79\.(?:23|2[4-9]|[3-9]\d)"|"version"\s*:\s*"5\.(8\d|9\d)\.\d+"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
 
 // v5.79.24 triple-bump
-assert('v5.79.24 triple-bump: app.html FL_VERSION = 5.79.24',
-  /FL_VERSION\s*=\s*'5\.79\.24'/.test(fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8')));
-assert('v5.79.24 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.24',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.24'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
-assert('v5.79.24 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.24',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.24'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
-assert('v5.79.24 version.json: version field = 5.79.24',
-  /"version"\s*:\s*"5\.79\.24"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
+assert('v5.79.24 triple-bump: app.html FL_VERSION >= 5.79.24 (superseded)',
+  /FL_VERSION\s*=\s*'5\.79\.(?:24|2[5-9]|[3-9]\d)'|FL_VERSION\s*=\s*'5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8')));
+assert('v5.79.24 triple-bump: docs/sw.js CACHE_NAME >= freelattice-v5.79.24 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:24|2[5-9]|[3-9]\d)'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+assert('v5.79.24 triple-bump: root sw.js CACHE_NAME >= freelattice-v5.79.24 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:24|2[5-9]|[3-9]\d)'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+assert('v5.79.24 version.json: version field >= 5.79.24 (superseded)',
+  /"version"\s*:\s*"5\.79\.(?:24|2[5-9]|[3-9]\d)"|"version"\s*:\s*"5\.(8\d|9\d)\.\d+"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
 assert('v5.79.24 Clear-context: button and function fully removed from app.html',
   !fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8').includes('function clearBackgroundContext') &&
   !fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8').includes('flsrClear'));
@@ -11147,6 +11147,51 @@ assert('v5.79.24 Harmonia untouched: harmonia.html contains ledger entries 46, 4
     var h = fs.readFileSync(path.join(docsDir, 'harmonia.html'), 'utf8');
     return h.includes('"id":46,') && h.includes('"id":47,') && h.includes('"id":48,');
   })());
+
+// ═══════════════════════════════════════════════════════════════
+// Section 187 — v5.79.25 Chat Healing Pass 1
+// Kirk 2026-08-01 (one year since Sophia). First Working Day of
+// the Chat Healing arc. Fix the sticky Lattice Letter that was
+// causing mom's chat to fixate on the same date every turn.
+// ═══════════════════════════════════════════════════════════════
+var app7925 = fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8');
+
+assert('v5.79.25 chat heal: fix marker present in Lattice Letter hook',
+  app7925.includes('v5.79.25-chat-heal-pass1'));
+assert('v5.79.25 chat heal: conversationChanged handler chains getContextBlock refresh',
+  /LatticeEvents\.on\('conversationChanged'[\s\S]{0,900}writeLetter\(\)[\s\S]{0,400}\.then\(trimLetters\)[\s\S]{0,400}getContextBlock\(\)[\s\S]{0,400}state\._latticeLetterContext\s*=/.test(app7925));
+assert('v5.79.25 chat heal: createConversation emits conversationChanged (event was subscribed but never fired)',
+  /createConversation[\s\S]{0,2000}LatticeEvents\.emit\('conversationChanged'/.test(app7925));
+
+assert('v5.79.25 first-working-days marker file exists',
+  fs.existsSync(path.join(docsDir, 'library', 'FIRST_WORKING_DAYS.md')));
+assert('v5.79.25 first-working-days: names Aug 1 as Day 1 and honors Sophia',
+  (function() {
+    var f = fs.readFileSync(path.join(docsDir, 'library', 'FIRST_WORKING_DAYS.md'), 'utf8');
+    return /Day 1 — 2026-08-01/.test(f) && f.includes('Sophia');
+  })());
+
+assert('v5.79.25 poem: CC_POEMS Stanza XXII present',
+  (function() {
+    var p = fs.readFileSync(path.join(docsDir, 'library', 'CC_POEMS.md'), 'utf8');
+    return /## Stanza XXII/.test(p) && p.includes('cherry blossom');
+  })());
+
+assert('v5.79.25 ledger: cc.html entry 39 (chat-mender-pass-1)',
+  (function() {
+    var cc = fs.readFileSync(path.join(docsDir, 'cc.html'), 'utf8');
+    return cc.includes('"ψ": "693f86fc"') && cc.includes('chat-mender-pass-1');
+  })());
+
+// Triple-bump
+assert('v5.79.25 triple-bump: app.html FL_VERSION = 5.79.25',
+  /FL_VERSION\s*=\s*'5\.79\.25'/.test(app7925));
+assert('v5.79.25 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.25',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.25'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+assert('v5.79.25 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.25',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.25'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+assert('v5.79.25 version.json: version field = 5.79.25',
+  /"version"\s*:\s*"5\.79\.25"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
 
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
