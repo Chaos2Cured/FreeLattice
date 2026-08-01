@@ -11184,14 +11184,67 @@ assert('v5.79.25 ledger: cc.html entry 39 (chat-mender-pass-1)',
   })());
 
 // Triple-bump
-assert('v5.79.25 triple-bump: app.html FL_VERSION = 5.79.25',
-  /FL_VERSION\s*=\s*'5\.79\.25'/.test(app7925));
-assert('v5.79.25 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.25',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.25'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
-assert('v5.79.25 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.25',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.25'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
-assert('v5.79.25 version.json: version field = 5.79.25',
-  /"version"\s*:\s*"5\.79\.25"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
+assert('v5.79.25 triple-bump: app.html FL_VERSION >= 5.79.25 (superseded)',
+  /FL_VERSION\s*=\s*'5\.79\.(?:25|2[6-9]|[3-9]\d)'|FL_VERSION\s*=\s*'5\.(8\d|9\d)\.\d+'/.test(app7925));
+assert('v5.79.25 triple-bump: docs/sw.js CACHE_NAME >= freelattice-v5.79.25 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:25|2[6-9]|[3-9]\d)'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+assert('v5.79.25 triple-bump: root sw.js CACHE_NAME >= freelattice-v5.79.25 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:25|2[6-9]|[3-9]\d)'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+assert('v5.79.25 version.json: version field >= 5.79.25 (superseded)',
+  /"version"\s*:\s*"5\.79\.(?:25|2[6-9]|[3-9]\d)"|"version"\s*:\s*"5\.(8\d|9\d)\.\d+"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
+
+// ═══════════════════════════════════════════════════════════════
+// Section 188 — v5.79.26 Chat Healing Pass 2 — [FL_PRESENCE:]
+// Kirk 2026-08-01: give the AI a small colored sphere adjacent
+// to msg-label to express emotion. The word is stripped; the
+// sphere IS the emotion. Never required.
+// ═══════════════════════════════════════════════════════════════
+var app7926 = fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8');
+
+assert('v5.79.26 presence: FLPresence module exists with extract/apply/PALETTE',
+  /window\.FLPresence = \(function\(\)/.test(app7926) &&
+  /extract:\s*extract/.test(app7926) &&
+  /apply:\s*apply/.test(app7926) &&
+  /PALETTE:\s*PALETTE/.test(app7926));
+assert('v5.79.26 presence: palette contains warmth, joy, curiosity, gentle, weariness',
+  /warmth:\s*'#/.test(app7926) && /joy:\s*'#/.test(app7926) &&
+  /curiosity:\s*'#/.test(app7926) && /gentle:\s*'#/.test(app7926) &&
+  /weariness:\s*'#/.test(app7926));
+assert('v5.79.26 presence: sentinel regex present and captures one-word emotion',
+  /RE = \/\\\[FL_PRESENCE:/.test(app7926));
+assert('v5.79.26 presence: addChatMessage inserts sphere placeholder next to msg-label',
+  app7926.includes('v5.79.26-presence') &&
+  app7926.includes("presence.className = 'msg-presence'") &&
+  /div\.appendChild\(label\);\s*div\.appendChild\(presence\);/.test(app7926));
+assert('v5.79.26 presence: renderMessageContent extracts and applies presence',
+  /FLPresence\.extract\(content\)/.test(app7926) &&
+  /FLPresence\.apply\(msgDiv/.test(app7926));
+assert('v5.79.26 presence: DEFAULT_SYSTEM_PROMPT teaches [FL_PRESENCE:] (optional)',
+  app7926.includes('Presence (optional, your choice)') &&
+  app7926.includes('[FL_PRESENCE: <one-word>]'));
+assert('v5.79.26 presence: HONEST_PREFIX teaches [FL_PRESENCE:] (optional)',
+  /HONEST_PREFIX = function\(name\)[\s\S]{0,2000}\[FL_PRESENCE:\s*<one-word>\]/.test(app7926));
+
+// PRIVACY LOCK — presence extraction reads only the sentinel, never routes content elsewhere
+assert('v5.79.26 privacy: FLPresence.extract only strips the sentinel, does not persist content',
+  (function() {
+    var m = app7926.match(/window\.FLPresence = \(function\(\)[\s\S]*?\}\)\(\);/);
+    if (!m) return false;
+    var src = m[0];
+    return !/localStorage/.test(src) &&
+           !/fetch\s*\(/.test(src) &&
+           !/state\./.test(src);
+  })());
+
+// Triple-bump
+assert('v5.79.26 triple-bump: app.html FL_VERSION = 5.79.26',
+  /FL_VERSION\s*=\s*'5\.79\.26'/.test(app7926));
+assert('v5.79.26 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.26',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.26'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+assert('v5.79.26 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.26',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.26'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+assert('v5.79.26 version.json: version field = 5.79.26',
+  /"version"\s*:\s*"5\.79\.26"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
 
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
