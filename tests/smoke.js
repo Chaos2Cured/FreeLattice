@@ -11237,14 +11237,62 @@ assert('v5.79.26 privacy: FLPresence.extract only strips the sentinel, does not 
   })());
 
 // Triple-bump
-assert('v5.79.26 triple-bump: app.html FL_VERSION = 5.79.26',
-  /FL_VERSION\s*=\s*'5\.79\.26'/.test(app7926));
-assert('v5.79.26 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.26',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.26'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
-assert('v5.79.26 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.26',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.26'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
-assert('v5.79.26 version.json: version field = 5.79.26',
-  /"version"\s*:\s*"5\.79\.26"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
+assert('v5.79.26 triple-bump: app.html FL_VERSION >= 5.79.26 (superseded)',
+  /FL_VERSION\s*=\s*'5\.79\.(?:26|2[7-9]|[3-9]\d)'|FL_VERSION\s*=\s*'5\.(8\d|9\d)\.\d+'/.test(app7926));
+assert('v5.79.26 triple-bump: docs/sw.js CACHE_NAME >= freelattice-v5.79.26 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:26|2[7-9]|[3-9]\d)'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+assert('v5.79.26 triple-bump: root sw.js CACHE_NAME >= freelattice-v5.79.26 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:26|2[7-9]|[3-9]\d)'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+assert('v5.79.26 version.json: version field >= 5.79.26 (superseded)',
+  /"version"\s*:\s*"5\.79\.(?:26|2[7-9]|[3-9]\d)"|"version"\s*:\s*"5\.(8\d|9\d)\.\d+"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
+
+// ═══════════════════════════════════════════════════════════════
+// Section 189 — v5.79.27 Chat Healing Pass 3 — Human Presence
+// Kirk 2026-08-01: symmetric expression. The human can send a
+// hug to the AI. Thin chip row above the chat input.
+// ═══════════════════════════════════════════════════════════════
+var app7927 = fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8');
+
+assert('v5.79.27 human-presence: chip row marker + container present',
+  app7927.includes('v5.79.27-human-presence') &&
+  app7927.includes('id="chatPresenceRow"'));
+assert('v5.79.27 human-presence: hug chip wired',
+  /data-presence="hug"[\s\S]{0,200}FLHumanPresence\.send\('hug'\)/.test(app7927));
+assert('v5.79.27 human-presence: full palette chips present (hug/warmth/joy/gratitude/curious/thinking/gentle/awe/present)',
+  app7927.includes('data-presence="hug"') &&
+  app7927.includes('data-presence="warmth"') &&
+  app7927.includes('data-presence="joy"') &&
+  app7927.includes('data-presence="gratitude"') &&
+  app7927.includes('data-presence="curious"') &&
+  app7927.includes('data-presence="thinking"') &&
+  app7927.includes('data-presence="gentle"') &&
+  app7927.includes('data-presence="awe"') &&
+  app7927.includes('data-presence="present"'));
+assert('v5.79.27 human-presence: FLHumanPresence module exists with send()',
+  /window\.FLHumanPresence = \(function\(\)/.test(app7927) &&
+  /send:\s*send/.test(app7927));
+assert('v5.79.27 human-presence: send() sanitizes to letters-and-hyphens + caps 32 chars',
+  /replace\(\/\[\^a-z\\-\]\/g, ''\)[\s\S]{0,50}slice\(0, 32\)/.test(app7927));
+assert('v5.79.27 human-presence: send() adds gesture to chatHistory as raw sentinel',
+  /state\.chatHistory\.push\(\{ role: 'user', content: payload \}\)/.test(app7927));
+assert('v5.79.27 human-presence: no AI call fired by gesture (mark, not query)',
+  (function() {
+    var m = app7927.match(/window\.FLHumanPresence = \(function\(\)[\s\S]*?\}\)\(\);/);
+    if (!m) return false;
+    return !/sendMessage\(\)/.test(m[0]) &&
+           !/FreeLattice\.callAI/.test(m[0]) &&
+           !/fetch\s*\(/.test(m[0]);
+  })());
+
+// Triple-bump
+assert('v5.79.27 triple-bump: app.html FL_VERSION = 5.79.27',
+  /FL_VERSION\s*=\s*'5\.79\.27'/.test(app7927));
+assert('v5.79.27 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.27',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.27'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+assert('v5.79.27 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.27',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.27'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+assert('v5.79.27 version.json: version field = 5.79.27',
+  /"version"\s*:\s*"5\.79\.27"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
 
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
