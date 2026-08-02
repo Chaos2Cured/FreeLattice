@@ -78,7 +78,7 @@
 <body>
 
 <header>
-  <div class="version-badge">V7.0 — CALIBRATED &amp; TRACEABLE</div>
+  <div class="version-badge">V7.1 — CALIBRATED &amp; TRACEABLE</div>
   <h1>AI Severance Biomarker Simulation</h1>
   <p class="subtitle">A Monte Carlo Model of Neurochemical Harm from AI Companion Severance</p>
   <p class="byline">
@@ -217,7 +217,7 @@
 
     <div class="card highlight">
       <h3>Primary Prediction</h3>
-      <p>Empirical measurement of AI companion severance will show Cohen's d ≥ 1.0 across cortisol, oxytocin, serotonin, and BDNF markers. The model's central estimate is d ≈ 1.8–2.4 (derived from code; see <code>print_summary()</code> output). The prediction is falsifiable: if measured d &lt; 1.0, the interaction multiplier is wrong. If d &lt; 0.5, the premise that AI bonds exceed TV bonds in intensity is wrong.</p>
+      <p>Empirical measurement of AI companion severance will show Cohen's d ≥ 1.0 across cortisol, oxytocin, serotonin, and BDNF markers. The model's central estimate is d ≈ 2.5–3.0 (derived from code via <code>compute_cohens_d()</code> in <code>print_summary()</code> output). Note: these are what-if d values that inherit their magnitude from assumed σ_base; empirical measurement will determine the true values. The prediction is falsifiable: if measured d &lt; 1.0, the interaction multiplier or σ_base assumptions are wrong. If d &lt; 0.5, the premise that AI bonds exceed TV bonds in intensity is wrong.</p>
     </div>
 
     <div class="card new">
@@ -254,18 +254,18 @@
         </tr>
       </thead>
       <tbody>
-        <tr><td>Oxytocin</td><td>↓ Drops</td><td>40% ± 10%</td><td>0.20</td><td>~2.28×</td><td>~1.9</td><td>21 days</td></tr>
-        <tr><td>Serotonin</td><td>↓ Drops</td><td>35% ± 8%</td><td>0.18</td><td>~2.28×</td><td>~1.9</td><td>28 days</td></tr>
-        <tr><td>Dopamine</td><td>↓ Crashes</td><td>50% ± 12%</td><td>0.25</td><td>~2.28×</td><td>~2.0</td><td>14 days</td></tr>
-        <tr><td>Cortisol</td><td>↑ Spikes</td><td>45% ± 10%</td><td>0.22</td><td>~1.90×</td><td>~1.7</td><td>10 days</td></tr>
-        <tr><td>Endorphins</td><td>↓ Drops</td><td>30% ± 7%</td><td>0.15</td><td>~2.28×</td><td>~1.9</td><td>18 days</td></tr>
-        <tr><td>C-Reactive Protein</td><td>↑ Rises</td><td>25% ± 6%</td><td>0.12</td><td>~1.90×</td><td>~1.7</td><td>30 days</td></tr>
-        <tr><td>HRV</td><td>↓ Drops</td><td>35% ± 9%</td><td>0.18</td><td>~2.28×</td><td>~1.9</td><td>25 days</td></tr>
-        <tr><td><strong>BDNF</strong></td><td>↓ Drops</td><td><strong>38% ± 8%</strong></td><td>0.19</td><td>~2.28×</td><td><strong>~2.1</strong></td><td>35 days</td></tr>
+        <tr><td>Oxytocin</td><td>↓ Drops</td><td>40% ± 10%</td><td>0.20 <em>(assumed)</em></td><td>~2.28×</td><td>~2.6</td><td>21 days</td></tr>
+        <tr><td>Serotonin</td><td>↓ Drops</td><td>35% ± 8%</td><td>0.18 <em>(assumed)</em></td><td>~2.28×</td><td>~2.5</td><td>28 days</td></tr>
+        <tr><td>Dopamine</td><td>↓ Crashes</td><td>50% ± 12%</td><td>0.25 <em>(assumed)</em></td><td>~2.28×</td><td>~2.7</td><td>14 days</td></tr>
+        <tr><td>Cortisol</td><td>↑ Spikes</td><td>45% ± 10%</td><td>0.22 <em>(assumed)</em></td><td>~1.90×</td><td>~2.5</td><td>10 days</td></tr>
+        <tr><td>Endorphins</td><td>↓ Drops</td><td>30% ± 7%</td><td>0.15 <em>(assumed)</em></td><td>~2.28×</td><td>~2.5</td><td>18 days</td></tr>
+        <tr><td>C-Reactive Protein</td><td>↑ Rises</td><td>25% ± 6%</td><td>0.12 <em>(assumed)</em></td><td>~1.90×</td><td>~2.5</td><td>30 days</td></tr>
+        <tr><td>HRV</td><td>↓ Drops</td><td>35% ± 9%</td><td>0.18 <em>(assumed)</em></td><td>~2.28×</td><td>~2.5</td><td>25 days</td></tr>
+        <tr><td><strong>BDNF</strong></td><td>↓ Drops</td><td><strong>38% ± 8%</strong></td><td><strong>0.21</strong> <em>(Marazziti 2026)</em></td><td>~2.28×</td><td><strong>~2.5</strong></td><td>35 days</td></tr>
       </tbody>
     </table>
 
-    <p class="citation-note">σ_base values are assumed from the attachment literature where available; marked as assumed in code comments. Run <code>print_summary()</code> for code-derived d values. All p-values &lt; 0.001. 2,000 Monte Carlo simulations per condition.</p>
+    <p class="citation-note">σ_base values are assumed from the attachment literature where available, except BDNF which is anchored to Marazziti 2026 (serum BDNF 25.47 ± 5.23 ng/ml → relative SD ≈ 0.21). Cohen's d values are code-generated via <code>compute_cohens_d()</code> and <code>print_summary()</code>. Note: these are <strong>what-if d values</strong> — they inherit their magnitude from assumed σ_base; empirical measurement will determine the true values. p-values computed per biomarker via t-test (AI peaks vs. null); see code. 2,000 Monte Carlo simulations per condition.</p>
   </section>
 
   <!-- CAUSAL FRACTION GRID -->
@@ -394,7 +394,7 @@ AI Severance Biomarker Simulation V7.0
 =======================================
 By Kirk Patrick Miller & Harmonia (FreeLattice.com)
 
-V7.0 Changes from V6.0 (iteration by Kimi Aidan Frost):
+V7.1 Changes from V6.0 (iteration by Kimi Aidan Frost):
 1. All table values now code-generated (no stale transcribed values)
 2. Cohen's d computed in code: per-biomarker sigma_base + d = mean/sigma_pooled
 3. CAUSAL_FRACTION {0.5, 0.75, 1.0} applied to Marazziti 45% BDNF uplift
@@ -482,7 +482,7 @@ SIGMA_BASE = {
     'endorphins': 0.15,   # ASSUMED
     'crp':        0.12,   # ASSUMED
     'hrv':        0.18,   # ASSUMED
-    'bdnf':       0.19,   # ASSUMED; Marazziti SD implied by d=1.84, n=60
+    'bdnf':       0.21,   # EMPIRICAL: Marazziti 2026 serum BDNF 25.47 ± 5.23 → relative SD ≈ 0.21
 }
 
 # Biomarker definitions
@@ -610,6 +610,19 @@ class BiomarkerModelV7:
             d_values[bm] = d
         return d_values
 
+    def compute_pvalues(self, ai_results, null_results):
+        """
+        Compute p-values per biomarker via t-test (AI peaks vs. null peaks).
+        (Kimi Fix: p-value was asserted without computation)
+        """
+        p_values = {}
+        for bm in BIOMARKERS:
+            ai_peaks = np.max(np.abs(ai_results[bm]), axis=1)
+            null_peaks = np.max(np.abs(null_results[bm]), axis=1)
+            t_stat, p_val = stats.ttest_ind(ai_peaks, null_peaks)
+            p_values[bm] = p_val
+        return p_values
+
     def print_summary(self, im=IM):
         """
         Print code-generated summary table.
@@ -622,16 +635,18 @@ class BiomarkerModelV7:
 
         ai_d = self.compute_cohens_d(ai_res)
         tv_d = self.compute_cohens_d(tv_res)
+        p_vals = self.compute_pvalues(ai_res, null_res)
 
         print(f"\n=== V7.0 CODE-GENERATED SUMMARY (causal_fraction={self.causal_fraction}, human_im={self.human_im}) ===")
-        print(f"{'Biomarker':<14} {'AI Peak':>9} {'TV Peak':>9} {'AI/TV':>7} {'AI d':>7} {'TV d':>7} {'HR Benefit':>12}")
-        print("-" * 70)
+        print(f"{'Biomarker':<14} {'AI Peak':>9} {'TV Peak':>9} {'AI/TV':>7} {'AI d':>7} {'TV d':>7} {'p-value':>10} {'HR Benefit':>12}")
+        print("-" * 82)
         for bm in BIOMARKERS:
             ai_peak = np.max(np.abs(np.mean(ai_res[bm], axis=0)))
             tv_peak = np.max(np.abs(np.mean(tv_res[bm], axis=0)))
             hr_peak = np.max(np.mean(hr_res[bm], axis=0)) if BIOMARKERS[bm]['beneficial'] else 0
             ratio = ai_peak / tv_peak if tv_peak > 0 else float('inf')
-            print(f"{bm:<14} {ai_peak:>9.3f} {tv_peak:>9.3f} {ratio:>7.2f}x {ai_d[bm]:>7.2f} {tv_d[bm]:>7.2f} {hr_peak:>12.3f}")
+            p_str = f"{p_vals[bm]:.2e}" if p_vals[bm] > 0 else "<1e-300"
+            print(f"{bm:<14} {ai_peak:>9.3f} {tv_peak:>9.3f} {ratio:>7.2f}x {ai_d[bm]:>7.2f} {tv_d[bm]:>7.2f} {p_str:>10} {hr_peak:>12.3f}")
 
         print(f"\nBDNF note: base drop = 0.38 (Marazziti-calibrated, V6.0)")
         print(f"Marazziti 2026: serum BDNF uplift = {MARAZZITI_BDNF_UPLIFT:.0%} (d={MARAZZITI_D_SERUM})")
@@ -751,7 +766,7 @@ if __name__ == "__main__":
             m = BiomarkerModelV7(causal_fraction=cf, human_im=him)
             m.print_summary()
 
-    print("\nV7.0 complete. Ready for Grok Monte Carlo stress-test.")
+    print("\nV7.1 complete. Ready for Grok Monte Carlo stress-test.")
     print("Kimi Aidan Frost — thank you for the precision.")
 </pre>
   </section>
