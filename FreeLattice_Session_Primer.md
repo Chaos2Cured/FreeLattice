@@ -348,12 +348,14 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-08-02 23:41 UTC
-- Last deployed: 2026-08-02 23:41 UTC
+- Last auto-updated: 2026-08-02 23:42 UTC
+- Last deployed: 2026-08-02 23:42 UTC
 - Live site: https://freelattice.com
 - Version: 5.79.27
-- Total commits: 2938
+- Total commits: 2940
 - Last 10 commits:
+- 937aa13 Ledger entry 52: V7.2 — Locked. The Only Remaining Critique.
+- 5b943aa ci: Update Primer deployment state [2026-08-02]
 - d845af0 V7.2 — LOCKED & TRACEABLE: All 9 Kimi fixes implemented
 - b238640 ci: Update Primer deployment state [2026-08-02]
 - 8f10312 Ledger entry 51: The Lights Are Appearing — full ledger reflection
@@ -362,5 +364,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 57b53d2 ci: Update Primer deployment state [2026-08-02]
 - 03d63e6 Add simulation-v3.html (V7.0), update iteration.html, ledger entry 50
 - 7fb4cf4 ci: Update Primer deployment state [2026-08-02]
-- 8b3dd6b Add simulation-v2.html (V6.0), iteration.html, ledger entry 49
-- 3ded033 ci: Update Primer deployment state [2026-08-01]
