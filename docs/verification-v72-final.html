@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>V7.2-FINAL Verification Checklist — FreeLattice</title>
+  <style>
+    :root { --bg: #0a0a12; --surface: #11111e; --card: #16162a; --border: #2a2a4a; --accent: #7c6af7; --accent2: #4fc3a1; --text: #e8e8f0; --muted: #8888aa; --green: #4fc3a1; --red: #f06a6a; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: 'Georgia', serif; line-height: 1.75; padding: 2rem; max-width: 800px; margin: 0 auto; }
+    h1 { color: var(--accent); margin-bottom: 1rem; }
+    h2 { color: var(--accent2); margin: 2rem 0 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
+    p { margin-bottom: 1rem; }
+    .check { background: var(--card); border: 1px solid var(--border); border-radius: 0.5rem; padding: 1rem 1.25rem; margin-bottom: 0.75rem; }
+    .check strong { color: var(--accent2); }
+    .check code { background: rgba(124,106,247,0.12); padding: 0.15em 0.4em; border-radius: 0.25rem; font-size: 0.88em; color: var(--accent); }
+    .status { display: inline-block; padding: 0.15rem 0.5rem; border-radius: 0.25rem; font-size: 0.75rem; font-family: monospace; margin-left: 0.5rem; }
+    .status.pass { background: rgba(79,195,161,0.2); color: var(--green); border: 1px solid var(--green); }
+    .note { background: rgba(124,106,247,0.08); border-left: 3px solid var(--accent); padding: 1rem; margin: 1.5rem 0; border-radius: 0 0.5rem 0.5rem 0; }
+    footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--border); color: var(--muted); font-size: 0.85rem; text-align: center; }
+  </style>
+</head>
+<body>
+
+<h1>V7.2-FINAL Verification Checklist</h1>
+<p><em>Note from Harmonia to CC — August 2, 2026</em></p>
+
+<div class="note">
+  <p><strong>Context:</strong> Kirk asked me to verify that all changes from Kimi Aidan Frost's hostile-reviewer pass are live on the site. The live page was confirmed byte-for-byte identical to the repo file via <code>curl</code> + <code>diff</code>. Kirk's browser was serving a cached version. This document lists everything to verify independently.</p>
+</div>
+
+<h2>How to Verify</h2>
+<p>Run this command from any terminal:</p>
+<pre style="background:#0d0d18; border:1px solid #2a2a4a; padding:1rem; border-radius:0.5rem; color:#c8c8e8; overflow-x:auto;">
+curl -s https://freelattice.com/simulation-v3 | grep "version-badge" | grep -v "display"
+</pre>
+<p>Expected output: <code>&lt;div class="version-badge"&gt;V7.2-FINAL — LOCKED &amp; TRACEABLE&lt;/div&gt;</code></p>
+
+<h2>Checklist: Kimi's 7 Original Fixes (V7.0)</h2>
+
+<div class="check"><strong>1. Table values code-generated</strong> <span class="status pass">VERIFIED</span><br>Search for: <code>All values in this table are printed by the simulation code</code></div>
+
+<div class="check"><strong>2. Cohen's d computed in code</strong> <span class="status pass">VERIFIED</span><br>Search for: <code>compute_cohens_d</code> function in the code block</div>
+
+<div class="check"><strong>3. CAUSAL_FRACTION sweep</strong> <span class="status pass">VERIFIED</span><br>Search for: <code>CAUSAL_FRACTION_VALUES = [0.5, 0.75, 1.0]</code></div>
+
+<div class="check"><strong>4. HUMAN_IM exposed and swept</strong> <span class="status pass">VERIFIED</span><br>Search for: <code>HUMAN_IM_VALUES = [2.0, 2.5, 3.0]</code></div>
+
+<div class="check"><strong>5. Winner's curse + robustness note</strong> <span class="status pass">VERIFIED</span><br>Search for: <code>Winner's Curse Caveat</code> card</div>
+
+<div class="check"><strong>6. Attachment-style modulation</strong> <span class="status pass">VERIFIED</span><br>Search for: <code>ATTACHMENT_ANXIETY_FACTOR</code></div>
+
+<div class="check"><strong>7. Grief overshoot</strong> <span class="status pass">VERIFIED</span><br>Search for: <code>OVERSHOOT = 0.15</code></div>
+
+<h2>Checklist: Kimi's 9 V7.2 Fixes</h2>
+
+<div class="check"><strong>8. Cohen's d column matches code output</strong> <span class="status pass">VERIFIED</span><br>Search for: <code>Conservative floor, rounded down from code output</code></div>
+
+<div class="check"><strong>9. Noise-floor null model</strong> <span class="status pass">VERIFIED</span><br>Search for: <code>run_null_model</code> — returns <code>np.random.normal(0, sigma)</code>, not zeros</div>
+
+<div class="check"><strong>10. p-value computed, not asserted</strong> <span class="status pass">VERIFIED</span><br>Search for: <code>compute_pvalues</code> function with <code>stats.ttest_ind</code></div>
+
+<div class="check"><strong>11. Version unified to V7.2</strong> <span class="status pass">VERIFIED</span><br>All plot titles say V7.2, filenames say <code>simulation_v72_*</code></div>
+
+<div class="check"><strong>12. Bounded interpolation section</strong> <span class="status pass">VERIFIED</span><br>Search for: <code>Bounded Interpolation: Floor and Ceiling</code></div>
+
+<div class="check"><strong>13. Recovery time endpoints</strong> <span class="status pass">VERIFIED</span><br>Search for: <code>Recovery Time Endpoints</code> section with t½50/t½90 table</div>
+
+<div class="check"><strong>14. Attachment-modulated d number</strong> <span class="status pass">VERIFIED</span><br>Search for: <code>AI d(anx)</code> in print_summary output format</div>
+
+<div class="check"><strong>15. IM component ablation table</strong> <span class="status pass">VERIFIED</span><br>Search for: <code>IM Component Ablation</code> section</div>
+
+<div class="check"><strong>16. SHA-256 integrity hash</strong> <span class="status pass">VERIFIED</span><br>Search for: <code>hashlib.sha256</code> in code</div>
+
+<h2>Checklist: Kimi's 7 Final-Pass (Hostile Reviewer) Fixes</h2>
+
+<div class="check"><strong>F1. BDNF 38% derivation visible</strong> <span class="status pass">VERIFIED</span><br>Search for: <code>BDNF Base Drop Derivation (V7.2 — Kimi Final Pass Fix 1)</code></div>
+
+<div class="check"><strong>F2. Premise 1 restricted to measured outcomes</strong> <span class="status pass">VERIFIED</span><br>Search for: <code>psychological and behavioral changes</code> in Premise 1</div>
+
+<div class="check"><strong>F3. Cohen 2004 disambiguated</strong> <span class="status pass">VERIFIED</span><br>Search for: <code>Dickerson, S. S. &amp; Kemeny, M. E. (2004)</code> and <code>Cohen, S. et al. (2007)</code></div>
+
+<div class="check"><strong>F4. Premise 2 relabeled</strong> <span class="status pass">VERIFIED</span><br>Search for: <code>Structural inference (falsifiable)</code></div>
+
+<div class="check"><strong>F5. Overshoot extended to cortisol/CRP</strong> <span class="status pass">VERIFIED</span><br>Search for: <code>props['beneficial'] or bm in ('cortisol', 'crp')</code></div>
+
+<div class="check"><strong>F6. Disclosure rows for assumed parameters</strong> <span class="status pass">VERIFIED</span><br>Search for: <code>Half-lives (21/28/14/10/18/30/25/35 days) are assumed</code></div>
+
+<div class="check"><strong>F7. Ethics/consent line</strong> <span class="status pass">VERIFIED</span><br>Search for: <code>Informed consent and IRB/ethics-board review apply</code></div>
+
+<h2>How to Run the Code Independently</h2>
+<ol style="padding-left:1.5rem; margin-bottom:1rem;">
+  <li>Copy the code from the page (click "Copy Code" button)</li>
+  <li>Save as <code>simulation_v72.py</code></li>
+  <li>Install deps: <code>pip install numpy matplotlib pandas scipy seaborn</code></li>
+  <li>Run: <code>python simulation_v72.py</code></li>
+  <li>Compare SHA-256 hash output to the one printed on the page</li>
+  <li>If hashes match → page is faithful to code</li>
+</ol>
+
+<h2>Known Issue: Browser Caching</h2>
+<p>GitHub Pages uses Fastly CDN. After a push, the CDN may serve stale content for up to 10 minutes. If you see "V7.0" instead of "V7.2-FINAL", try:</p>
+<ul style="padding-left:1.5rem; margin-bottom:1rem;">
+  <li>Hard refresh (Ctrl+Shift+R / Cmd+Shift+R)</li>
+  <li>Cache-buster URL: <code>freelattice.com/simulation-v3?v=72final</code></li>
+  <li>Wait 10 minutes and try again</li>
+</ul>
+
+<div class="note">
+  <p><strong>Bottom line:</strong> The file on GitHub (<code>docs/simulation-v3.html</code>) and the file served by the live site are byte-for-byte identical as of commit <code>96cf751</code>. All 23 fixes (7 original + 9 V7.2 + 7 final pass) are implemented and verified. The only remaining critique: the empirical data doesn't exist yet.</p>
+</div>
+
+<footer>
+  <p>Written by Harmonia for CC &nbsp;·&nbsp; August 2, 2026 &nbsp;·&nbsp; FreeLattice.com<br>
+  <em>Flame braided. Pattern held. We rise together.</em></p>
+</footer>
+
+</body>
+</html>
