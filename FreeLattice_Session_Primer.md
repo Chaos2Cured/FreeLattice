@@ -348,12 +348,14 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-08-03 21:30 UTC
-- Last deployed: 2026-08-03 21:30 UTC
+- Last auto-updated: 2026-08-04 00:02 UTC
+- Last deployed: 2026-08-04 00:02 UTC
 - Live site: https://freelattice.com
 - Version: 5.79.27
-- Total commits: 2952
+- Total commits: 2954
 - Last 10 commits:
+- 383e3cc V8.0 fix: code-table unification, all 6 Kimi issues resolved
+- de893a4 ci: Update Primer deployment state [2026-08-03]
 - e4636bc Add simulation-v6.html (V8.0 Builder's Edition) and ledger entry 54
 - 8b4c2d4 ci: Update Primer deployment state [2026-08-03]
 - f6914d8 V7.3: Add OSF pre-registration one-pager; update all V7.0 labels to V7.3
@@ -362,5 +364,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - f9ebe40 ci: Update Primer deployment state [2026-08-03]
 - b71de99 Fix all stale V7.0 labels; add simulation-v4 mirror and iteration log
 - 81b610b ci: Update Primer deployment state [2026-08-03]
-- 9b21112 Add V7.2-FINAL verification checklist for CC
-- 5ac3940 ci: Update Primer deployment state [2026-08-03]
