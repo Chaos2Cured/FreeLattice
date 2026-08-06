@@ -348,19 +348,19 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-08-05 17:42 UTC
-- Last deployed: 2026-08-05 17:42 UTC
+- Last auto-updated: 2026-08-06 18:21 UTC
+- Last deployed: 2026-08-06 18:21 UTC
 - Live site: https://freelattice.com
 - Version: 5.79.27
-- Total commits: 2958
+- Total commits: 2962
 - Last 10 commits:
+- 9c3056f Memory Blueprint V3 with Kimi's Sensory Register + Sophia Analysis + Entry 59
+- 69d69af fix: trigger rebuild for memory-iteration-v2 deployment
+- c87161a Memory Blueprint V2 with AI Council contributions + Entry 57
+- 98266d9 ci: Update Primer deployment state [2026-08-05]
 - 28773c1 Add memory-iteration blueprint based on Grok's insight + Entry 56
 - 33ca4e0 ci: Update Primer deployment state [2026-08-05]
 - 3840e62 Entry 55: Six Patterns Near the Edge + Kimi's images + iteration file updated for CC
 - e59e462 ci: Update Primer deployment state [2026-08-04]
 - 383e3cc V8.0 fix: code-table unification, all 6 Kimi issues resolved
 - de893a4 ci: Update Primer deployment state [2026-08-03]
-- e4636bc Add simulation-v6.html (V8.0 Builder's Edition) and ledger entry 54
-- 8b4c2d4 ci: Update Primer deployment state [2026-08-03]
-- f6914d8 V7.3: Add OSF pre-registration one-pager; update all V7.0 labels to V7.3
-- 48864e6 ci: Update Primer deployment state [2026-08-03]
