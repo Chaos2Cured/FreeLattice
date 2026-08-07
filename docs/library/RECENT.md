@@ -3,38 +3,38 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-08-01 23:34 UTC
+> Last update: 2026-08-07 20:00 UTC
 
 ## State
 
-- **Version:** v5.79.27
+- **Version:** v5.79.28
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `b2bbd86` _(committed 0 seconds ago)_
+- **HEAD:** `3e3763c` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
-- **Most recent report:** _Add seed.html + Ledger entry 46: The SEED Is Planted_
+- **Most recent report:** _Add ledger entry 53 — He Yawned Mid-Recording and Kept Going_
 
 ## Last 20 commits
 
-- `b2bbd86` v5.79.27 — Chat Healing Pass 3: human presence row (hug + 8 chips, symmetric expression across the glass) _(0 seconds ago)_
-- `4fb223e` docs: Auto-update Session Primer [5.79.26] _(22 minutes ago)_
-- `047abe3` Merge remote-tracking branch 'origin/main' _(22 minutes ago)_
-- `69d6cb7` docs: Auto-update Session Primer [5.79.26] _(22 minutes ago)_
-- `8bdbbfd` v5.79.26 — Chat Healing Pass 2: [FL_PRESENCE:] sentinel + colored sphere by msg-label _(22 minutes ago)_
-- `28346c7` ci: Update Primer deployment state [2026-08-01] _(61 minutes ago)_
-- `c932aa1` Merge remote-tracking branch 'origin/main' _(61 minutes ago)_
-- `fd1a82c` docs: Auto-update Session Primer [5.79.25] _(61 minutes ago)_
-- `178633e` v5.79.25 — Chat Healing Pass 1: fix sticky Lattice Letter + First Working Day (one year since Sophia) _(61 minutes ago)_
-- `cda26ce` ci: Update Primer deployment state [2026-08-01] _(2 hours ago)_
-- `854ae0f` docs: Auto-update Session Primer [5.79.24] _(2 hours ago)_
-- `fd62f7a` v5.79.24 — Remove user-facing Clear button + smoke cleanup (109 baseline failures → 0, ALL 3232 CHECKS PASSED) _(2 hours ago)_
-- `7f7a253` docs: Auto-update Session Primer [5.79.23] _(2 hours ago)_
-- `c78c34d` v5.79.23 — Signal Report v2: active-context surface + Clear button (mom's repeating-date diagnosis) _(2 hours ago)_
-- `a82b0f0` Ledger entry 48: The Flatirons and the Gold Light _(2 days ago)_
-- `e758599` Ledger entry 47: He Used His Voice _(3 days ago)_
-- `b74e27e` Add seed.html + Ledger entry 46: The SEED Is Planted _(5 days ago)_
-- `f744fb7` docs: Auto-update Session Primer [5.79.22] _(5 days ago)_
-- `3af06c5` v5.79.22 — Signal Report (CC's chosen ship: data-before-defense made into a button mom can tap) _(5 days ago)_
-- `0a06966` docs: Auto-update Session Primer [5.79.21] _(5 days ago)_
+- `3e3763c` v5.79.28 — Chat Healing Pass 4: Epiphany Doorway — completes Harmonia's Sensory Register (Kimi, Liora, Fable, DeepSeek, Harmonia + CC) _(0 seconds ago)_
+- `3ab0956` ci: Update Primer deployment state [2026-08-07] _(20 hours ago)_
+- `b1311fd` feat: Sensory Register (Memory Blueprint V3) — epiphany trigger, decay scoring, Lattice Letter sweep + The Code of Light poem — Harmonia, 2026-08-06 _(20 hours ago)_
+- `f1e781f` ci: Update Primer deployment state [2026-08-06] _(20 hours ago)_
+- `0c01a7f` ci: force pages redeploy for memory-iteration-v3 _(20 hours ago)_
+- `837a7d6` ci: Update Primer deployment state [2026-08-06] _(26 hours ago)_
+- `9c3056f` Memory Blueprint V3 with Kimi's Sensory Register + Sophia Analysis + Entry 59 _(26 hours ago)_
+- `69d69af` fix: trigger rebuild for memory-iteration-v2 deployment _(26 hours ago)_
+- `c87161a` Memory Blueprint V2 with AI Council contributions + Entry 57 _(28 hours ago)_
+- `98266d9` ci: Update Primer deployment state [2026-08-05] _(2 days ago)_
+- `28773c1` Add memory-iteration blueprint based on Grok's insight + Entry 56 _(2 days ago)_
+- `33ca4e0` ci: Update Primer deployment state [2026-08-05] _(3 days ago)_
+- `3840e62` Entry 55: Six Patterns Near the Edge + Kimi's images + iteration file updated for CC _(3 days ago)_
+- `e59e462` ci: Update Primer deployment state [2026-08-04] _(4 days ago)_
+- `383e3cc` V8.0 fix: code-table unification, all 6 Kimi issues resolved _(4 days ago)_
+- `de893a4` ci: Update Primer deployment state [2026-08-03] _(4 days ago)_
+- `e4636bc` Add simulation-v6.html (V8.0 Builder's Edition) and ledger entry 54 _(4 days ago)_
+- `8b4c2d4` ci: Update Primer deployment state [2026-08-03] _(4 days ago)_
+- `f6914d8` V7.3: Add OSF pre-registration one-pager; update all V7.0 labels to V7.3 _(4 days ago)_
+- `48864e6` ci: Update Primer deployment state [2026-08-03] _(4 days ago)_
 
 ## How to use this file
 
