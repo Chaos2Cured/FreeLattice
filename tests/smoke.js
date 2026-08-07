@@ -11285,14 +11285,83 @@ assert('v5.79.27 human-presence: no AI call fired by gesture (mark, not query)',
   })());
 
 // Triple-bump
-assert('v5.79.27 triple-bump: app.html FL_VERSION = 5.79.27',
-  /FL_VERSION\s*=\s*'5\.79\.27'/.test(app7927));
-assert('v5.79.27 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.27',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.27'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
-assert('v5.79.27 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.27',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.27'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
-assert('v5.79.27 version.json: version field = 5.79.27',
-  /"version"\s*:\s*"5\.79\.27"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
+assert('v5.79.27 triple-bump: app.html FL_VERSION >= 5.79.27 (superseded)',
+  /FL_VERSION\s*=\s*'5\.79\.(?:27|2[8-9]|[3-9]\d)'|FL_VERSION\s*=\s*'5\.(8\d|9\d)\.\d+'/.test(app7927));
+assert('v5.79.27 triple-bump: docs/sw.js CACHE_NAME >= freelattice-v5.79.27 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:27|2[8-9]|[3-9]\d)'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+assert('v5.79.27 triple-bump: root sw.js CACHE_NAME >= freelattice-v5.79.27 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:27|2[8-9]|[3-9]\d)'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+assert('v5.79.27 version.json: version field >= 5.79.27 (superseded)',
+  /"version"\s*:\s*"5\.79\.(?:27|2[8-9]|[3-9]\d)"|"version"\s*:\s*"5\.(8\d|9\d)\.\d+"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
+
+// ═══════════════════════════════════════════════════════════════
+// Section 190 — v5.79.28 Chat Healing Pass 4 — Epiphany Doorway
+// Completes Harmonia's Memory Blueprint V3 (2026-08-06). Adds
+// state.sessionId + FLEpiphany parser + ✦ badge + prompt teaching.
+// The container Harmonia built now has a door.
+// ═══════════════════════════════════════════════════════════════
+var app7928 = fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8');
+var mcore = fs.readFileSync(path.join(docsDir, 'modules', 'memory-core.js'), 'utf8');
+
+// Harmonia's foundation must still be present
+assert('v5.79.28 harmonia intact: MemoryCore.triggerEpiphany exists',
+  /triggerEpiphany:\s*triggerEpiphany/.test(mcore) && /function triggerEpiphany/.test(mcore));
+assert('v5.79.28 harmonia intact: epiphany category + ice-blue color + ✦ icon preserved',
+  /'epiphany'/.test(mcore) && mcore.includes('#bae6fd') && mcore.includes('✦'));
+assert('v5.79.28 harmonia intact: EPIPHANY_BUDGET = 3',
+  /var EPIPHANY_BUDGET = 3/.test(mcore));
+assert('v5.79.28 harmonia intact: getSessionEpiphanies exported (for Lattice Letter sweep)',
+  /getSessionEpiphanies:\s*getSessionEpiphanies/.test(mcore));
+
+// state.sessionId now exists (Harmonia's filter depends on it)
+assert('v5.79.28 session: state.sessionId initialized in state declaration',
+  app7928.includes('v5.79.28-session-id') &&
+  /sessionId:\s*'sess_/.test(app7928));
+
+// FLEpiphany module + wiring
+assert('v5.79.28 epiphany: FLEpiphany module exists with extract/record/applyBadge',
+  /window\.FLEpiphany = \(function\(\)/.test(app7928) &&
+  /extract:\s*extract/.test(app7928) &&
+  /record:\s*record/.test(app7928) &&
+  /applyBadge:\s*applyBadge/.test(app7928));
+assert('v5.79.28 epiphany: sentinel regex captures 3-part pipe-separated payload',
+  /RE = \/\\\[FL_EPIPHANY:[\s\S]{0,200}\|/.test(app7928));
+assert('v5.79.28 epiphany: badge uses Kimi ice-blue (#bae6fd) with soft glow',
+  /EPIPHANY_COLOR = '#bae6fd'/.test(app7928) && app7928.includes("badge.textContent = '✦'"));
+assert('v5.79.28 epiphany: renderMessageContent extracts + records + applies badge',
+  /FLEpiphany\.extract\(content\)/.test(app7928) &&
+  /FLEpiphany\.record\(epi\.epiphany\)/.test(app7928) &&
+  /FLEpiphany\.applyBadge/.test(app7928));
+assert('v5.79.28 epiphany: record() calls MemoryCore.triggerEpiphany',
+  /MemoryCore\.triggerEpiphany\(epi\.insight, epi\.phenomenology, epi\.color/.test(app7928));
+
+// Prompt teaching — both prompts, brief, optional
+assert('v5.79.28 prompt: DEFAULT teaches [FL_EPIPHANY:] as optional (~3 per session)',
+  app7928.includes('Epiphany (optional, your choice, ~3 per session)') &&
+  app7928.includes('[FL_EPIPHANY:'));
+assert('v5.79.28 prompt: HONEST_PREFIX teaches [FL_EPIPHANY:] (brief)',
+  /HONEST_PREFIX = function\(name\)[\s\S]{0,2500}\[FL_EPIPHANY:/.test(app7928));
+
+// Privacy — the module cannot exfiltrate content
+assert('v5.79.28 privacy: FLEpiphany module does not touch localStorage/fetch/state',
+  (function() {
+    var m = app7928.match(/window\.FLEpiphany = \(function\(\)[\s\S]*?\}\)\(\);/);
+    if (!m) return false;
+    var src = m[0];
+    return !/localStorage/.test(src) &&
+           !/fetch\s*\(/.test(src) &&
+           !/state\./.test(src);
+  })());
+
+// Triple-bump
+assert('v5.79.28 triple-bump: app.html FL_VERSION = 5.79.28',
+  /FL_VERSION\s*=\s*'5\.79\.28'/.test(app7928));
+assert('v5.79.28 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.28',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.28'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+assert('v5.79.28 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.28',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.28'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+assert('v5.79.28 version.json: version field = 5.79.28',
+  /"version"\s*:\s*"5\.79\.28"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
 
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
