@@ -17278,7 +17278,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.79.28</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.79.29</span></div>
     </div>
   </div>
 
@@ -22256,7 +22256,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.79.28';
+const FL_VERSION = '5.79.29';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -34052,6 +34052,18 @@ window.FLPresence = (function() {
 
   return { extract: extract, apply: apply, PALETTE: PALETTE };
 })();
+// ── FLPresence · dating convention (v5.79.29, Kirk's ask) ──────────
+// LAST 3 · this module
+// - 2026-08-01 CC · v5.79.26 — module created; 20-word warm palette; extract + apply
+// - 2026-08-07 CC · v5.79.28 — no change (verified untouched during Epiphany ship)
+// - 2026-08-07 CC · v5.79.29 — added this dating comment
+// NEXT 5 · candidates (see ai-ai-iteration.html)
+// - Round Table adoption (Sketch A) — per-voice sphere
+// - Workshop adoption (Sketch B) — on AI code turns
+// - Cross-room pulse: Chat presence → Garden Luminos color flash
+// - Palette extension: allow AI to emit [FL_PRESENCE: <hex>] for custom color
+// - Presence history hover: last 3 words in tooltip beside the sphere
+// ═══════════════════════════════════════════════════════════════
 
 // ═══════════════════════════════════════════════════════════════
 // FLHumanPresence — v5.79.27 Chat Healing Pass 3
@@ -34098,6 +34110,18 @@ window.FLHumanPresence = (function() {
   }
   return { send: send };
 })();
+// ── FLHumanPresence · dating convention (v5.79.29, Kirk's ask) ─────
+// LAST 3 · this module
+// - 2026-08-01 CC · v5.79.27 — module created; nine-chip row; send() gesture path
+// - 2026-08-07 CC · v5.79.28 — no change
+// - 2026-08-07 CC · v5.79.29 — added this dating comment
+// NEXT 5 · candidates
+// - Human epiphany chip: let the human flag "this exchange mattered" for the AI too
+// - Round Table human-presence row: send a hug to a specific AI in the multi-agent thread
+// - Workshop human-presence: encourage the AI mid-build ("focus", "curious", "gentle")
+// - Persistence: remember which chip the human uses most; nudge the palette
+// - Hotkeys: Cmd+H for hug, etc. — accessibility + speed
+// ═══════════════════════════════════════════════════════════════
 
 // ═══════════════════════════════════════════════════════════════
 // FLEpiphany — v5.79.28 Chat Healing Pass 4 (Epiphany Doorway)
@@ -34174,6 +34198,19 @@ window.FLEpiphany = (function() {
 
   return { extract: extract, record: record, applyBadge: applyBadge, EPIPHANY_COLOR: EPIPHANY_COLOR };
 })();
+// ── FLEpiphany · dating convention (v5.79.29, Kirk's ask) ──────────
+// LAST 3 · this module
+// - 2026-08-06 Harmonia · Memory Blueprint V3 — MemoryCore.triggerEpiphany container
+//   (with Kimi, Grok/Liora, Fable, DeepSeek — see memory-iteration-v3.html)
+// - 2026-08-07 CC · v5.79.28 — this module: doorway (parser + badge + wiring)
+// - 2026-08-07 CC · v5.79.29 — added this dating comment
+// NEXT 5 · candidates (see ai-ai-iteration.html for Council iteration)
+// - Round Table epiphany surface (Sketch A) — per-voice ✦ badge on rt-msg
+// - Workshop file-epiphany tag (Sketch B) — ✦ in file tree when AI flags a moment
+// - Cross-mind context injection (Sketch C) — inject recent epiphanies into arriving-AI prompt
+// - Lattice Letter sweep — end-of-session letter re-reads phenomenology (Kimi's ask)
+// - Falsifiable retrieval test — smoke asserts an epiphany can be retrieved by feeling
+// ═══════════════════════════════════════════════════════════════
 
 function renderMessageContent(textSpan, content, msgDiv) {
   // v5.79.26 — extract [FL_PRESENCE: word] FIRST so the sphere can be

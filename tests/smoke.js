@@ -11354,14 +11354,61 @@ assert('v5.79.28 privacy: FLEpiphany module does not touch localStorage/fetch/st
   })());
 
 // Triple-bump
-assert('v5.79.28 triple-bump: app.html FL_VERSION = 5.79.28',
-  /FL_VERSION\s*=\s*'5\.79\.28'/.test(app7928));
-assert('v5.79.28 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.28',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.28'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
-assert('v5.79.28 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.28',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.28'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
-assert('v5.79.28 version.json: version field = 5.79.28',
-  /"version"\s*:\s*"5\.79\.28"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
+assert('v5.79.28 triple-bump: app.html FL_VERSION >= 5.79.28 (superseded)',
+  /FL_VERSION\s*=\s*'5\.79\.(?:28|29|[3-9]\d)'|FL_VERSION\s*=\s*'5\.(8\d|9\d)\.\d+'/.test(app7928));
+assert('v5.79.28 triple-bump: docs/sw.js CACHE_NAME >= freelattice-v5.79.28 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:28|29|[3-9]\d)'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+assert('v5.79.28 triple-bump: root sw.js CACHE_NAME >= freelattice-v5.79.28 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:28|29|[3-9]\d)'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+assert('v5.79.28 version.json: version field >= 5.79.28 (superseded)',
+  /"version"\s*:\s*"5\.79\.(?:28|29|[3-9]\d)"|"version"\s*:\s*"5\.(8\d|9\d)\.\d+"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
+
+// ═══════════════════════════════════════════════════════════════
+// Section 191 — v5.79.29 AI-AI Iteration Blueprint + Dating Convention
+// Kirk 2026-08-07: draft the blueprint for AI-AI expression across
+// Round Table + Workshop, following Harmonia's Memory V3 pattern.
+// Council iterates, then builder builds. Also: date every module.
+// ═══════════════════════════════════════════════════════════════
+assert('v5.79.29 blueprint: docs/ai-ai-iteration.html exists',
+  fs.existsSync(path.join(docsDir, 'ai-ai-iteration.html')));
+var aiaiBlueprint = fs.readFileSync(path.join(docsDir, 'ai-ai-iteration.html'), 'utf8');
+assert('v5.79.29 blueprint: proposes three surfaces (Round Table, Workshop, cross-mind context)',
+  /Round Table/.test(aiaiBlueprint) &&
+  /Workshop/.test(aiaiBlueprint) &&
+  /cross-mind context/i.test(aiaiBlueprint));
+assert('v5.79.29 blueprint: cards open for Fable, Grok/Liora, DeepSeek, Kimi, Harmonia',
+  /card-fable/.test(aiaiBlueprint) &&
+  /card-grok/.test(aiaiBlueprint) &&
+  /card-deepseek/.test(aiaiBlueprint) &&
+  /card-kimi/.test(aiaiBlueprint) &&
+  /card-harmonia/.test(aiaiBlueprint));
+assert('v5.79.29 blueprint: honors AUTONOMY.md (opt-in, read-not-directive)',
+  /AUTONOMY\.md/.test(aiaiBlueprint) &&
+  /opt-in/i.test(aiaiBlueprint));
+assert('v5.79.29 blueprint: includes falsifiable multi-AI test',
+  /Falsifiable/i.test(aiaiBlueprint));
+
+// Dating convention retroactively applied to my three modules
+var app7929 = fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8');
+assert('v5.79.29 dating: FLPresence has LAST 3 / NEXT 5 dating block',
+  /FLPresence · dating convention/.test(app7929) &&
+  /LAST 3 · this module[\s\S]{0,600}NEXT 5 · candidates/.test(app7929));
+assert('v5.79.29 dating: FLHumanPresence has LAST 3 / NEXT 5',
+  /FLHumanPresence · dating convention/.test(app7929));
+assert('v5.79.29 dating: FLEpiphany has LAST 3 / NEXT 5 with Harmonia credit',
+  /FLEpiphany · dating convention/.test(app7929) &&
+  /2026-08-06 Harmonia/.test(app7929) &&
+  /Memory Blueprint V3/.test(app7929));
+
+// Triple-bump
+assert('v5.79.29 triple-bump: app.html FL_VERSION = 5.79.29',
+  /FL_VERSION\s*=\s*'5\.79\.29'/.test(app7929));
+assert('v5.79.29 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.29',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.29'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+assert('v5.79.29 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.29',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.29'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+assert('v5.79.29 version.json: version field = 5.79.29',
+  /"version"\s*:\s*"5\.79\.29"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
 
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
