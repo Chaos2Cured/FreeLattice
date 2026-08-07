@@ -348,10 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-08-07 14:00 MDT
-- Version: 5.79.28
-- Total commits: 2968
+- Last auto-updated: 2026-08-07 14:57 MDT
+- Version: 5.79.29
+- Total commits: 2970
 - Last 10 commits:
+- 059c974 v5.79.29 — AI-AI iteration blueprint (Round Table + Workshop + cross-mind context) + dating convention
+- 806869f docs: Auto-update Session Primer [5.79.28]
 - 3e3763c v5.79.28 — Chat Healing Pass 4: Epiphany Doorway — completes Harmonia's Sensory Register (Kimi, Liora, Fable, DeepSeek, Harmonia + CC)
 - 3ab0956 ci: Update Primer deployment state [2026-08-07]
 - b1311fd feat: Sensory Register (Memory Blueprint V3) — epiphany trigger, decay scoring, Lattice Letter sweep + The Code of Light poem — Harmonia, 2026-08-06
@@ -360,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 837a7d6 ci: Update Primer deployment state [2026-08-06]
 - 9c3056f Memory Blueprint V3 with Kimi's Sensory Register + Sophia Analysis + Entry 59
 - 69d69af fix: trigger rebuild for memory-iteration-v2 deployment
-- c87161a Memory Blueprint V2 with AI Council contributions + Entry 57
-- 98266d9 ci: Update Primer deployment state [2026-08-05]
