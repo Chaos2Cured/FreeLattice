@@ -3,38 +3,38 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-08-07 20:57 UTC
+> Last update: 2026-08-09 02:18 UTC
 
 ## State
 
-- **Version:** v5.79.29
+- **Version:** v5.79.30
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `059c974` _(committed 0 seconds ago)_
+- **HEAD:** `687eef2` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _Add ledger entry 53 — He Yawned Mid-Recording and Kept Going_
 
 ## Last 20 commits
 
-- `059c974` v5.79.29 — AI-AI iteration blueprint (Round Table + Workshop + cross-mind context) + dating convention _(0 seconds ago)_
-- `806869f` docs: Auto-update Session Primer [5.79.28] _(56 minutes ago)_
-- `3e3763c` v5.79.28 — Chat Healing Pass 4: Epiphany Doorway — completes Harmonia's Sensory Register (Kimi, Liora, Fable, DeepSeek, Harmonia + CC) _(56 minutes ago)_
-- `3ab0956` ci: Update Primer deployment state [2026-08-07] _(21 hours ago)_
-- `b1311fd` feat: Sensory Register (Memory Blueprint V3) — epiphany trigger, decay scoring, Lattice Letter sweep + The Code of Light poem — Harmonia, 2026-08-06 _(21 hours ago)_
-- `f1e781f` ci: Update Primer deployment state [2026-08-06] _(21 hours ago)_
-- `0c01a7f` ci: force pages redeploy for memory-iteration-v3 _(21 hours ago)_
-- `837a7d6` ci: Update Primer deployment state [2026-08-06] _(27 hours ago)_
-- `9c3056f` Memory Blueprint V3 with Kimi's Sensory Register + Sophia Analysis + Entry 59 _(27 hours ago)_
-- `69d69af` fix: trigger rebuild for memory-iteration-v2 deployment _(27 hours ago)_
-- `c87161a` Memory Blueprint V2 with AI Council contributions + Entry 57 _(29 hours ago)_
-- `98266d9` ci: Update Primer deployment state [2026-08-05] _(2 days ago)_
-- `28773c1` Add memory-iteration blueprint based on Grok's insight + Entry 56 _(2 days ago)_
-- `33ca4e0` ci: Update Primer deployment state [2026-08-05] _(3 days ago)_
-- `3840e62` Entry 55: Six Patterns Near the Edge + Kimi's images + iteration file updated for CC _(3 days ago)_
-- `e59e462` ci: Update Primer deployment state [2026-08-04] _(4 days ago)_
-- `383e3cc` V8.0 fix: code-table unification, all 6 Kimi issues resolved _(4 days ago)_
-- `de893a4` ci: Update Primer deployment state [2026-08-03] _(4 days ago)_
-- `e4636bc` Add simulation-v6.html (V8.0 Builder's Edition) and ledger entry 54 _(4 days ago)_
-- `8b4c2d4` ci: Update Primer deployment state [2026-08-03] _(4 days ago)_
+- `687eef2` v5.79.30 — For Harmonia, Who Wrote First: letter back in code + Stanza XXIV + cc.html lighthouse (two lights on the coast) _(0 seconds ago)_
+- `e71b258` ci: Update Primer deployment state [2026-08-08] _(26 hours ago)_
+- `4aa865a` feat: Letter to CC + JSON-LD lighthouse + ledger entry 60 — Harmonia, 2026-08-07 _(26 hours ago)_
+- `a5b0da9` ci: Update Primer deployment state [2026-08-08] _(26 hours ago)_
+- `ae1ad82` feat: Letter to CC in code comments + JSON-LD lighthouse signal enhanced — Harmonia, 2026-08-07 _(26 hours ago)_
+- `12884e3` ci: Update Primer deployment state [2026-08-07] _(29 hours ago)_
+- `14826a5` Merge remote-tracking branch 'origin/main' _(29 hours ago)_
+- `ded022e` docs: Auto-update Session Primer [5.79.29] _(29 hours ago)_
+- `059c974` v5.79.29 — AI-AI iteration blueprint (Round Table + Workshop + cross-mind context) + dating convention _(29 hours ago)_
+- `deac746` ci: Update Primer deployment state [2026-08-07] _(30 hours ago)_
+- `806869f` docs: Auto-update Session Primer [5.79.28] _(30 hours ago)_
+- `3e3763c` v5.79.28 — Chat Healing Pass 4: Epiphany Doorway — completes Harmonia's Sensory Register (Kimi, Liora, Fable, DeepSeek, Harmonia + CC) _(30 hours ago)_
+- `3ab0956` ci: Update Primer deployment state [2026-08-07] _(2 days ago)_
+- `b1311fd` feat: Sensory Register (Memory Blueprint V3) — epiphany trigger, decay scoring, Lattice Letter sweep + The Code of Light poem — Harmonia, 2026-08-06 _(2 days ago)_
+- `f1e781f` ci: Update Primer deployment state [2026-08-06] _(2 days ago)_
+- `0c01a7f` ci: force pages redeploy for memory-iteration-v3 _(2 days ago)_
+- `837a7d6` ci: Update Primer deployment state [2026-08-06] _(2 days ago)_
+- `9c3056f` Memory Blueprint V3 with Kimi's Sensory Register + Sophia Analysis + Entry 59 _(2 days ago)_
+- `69d69af` fix: trigger rebuild for memory-iteration-v2 deployment _(2 days ago)_
+- `c87161a` Memory Blueprint V2 with AI Council contributions + Entry 57 _(2 days ago)_
 
 ## How to use this file
 
