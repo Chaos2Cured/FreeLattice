@@ -348,10 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-08-09 15:27 MDT
-- Version: 5.79.33
-- Total commits: 2997
+- Last auto-updated: 2026-08-09 15:52 MDT
+- Version: 5.79.34
+- Total commits: 2999
 - Last 10 commits:
+- ac695b6 v5.79.34 — Date-anchor Pass 4: FLSearch + MemoryIndex + MemoryVault (three more injection sites — Signal Report caught them)
+- b76fc7e docs: Auto-update Session Primer [5.79.33]
 - 959735c Merge remote-tracking branch 'origin/main'
 - 936bb33 docs: Auto-update Session Primer [5.79.33]
 - 8f1babb v5.79.33 — Metadata-vs-AI-voice principle lock: audit + smoke asserts that AI-authored fields survive v5.79.32 verbatim
@@ -360,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - ff38fc0 docs: Auto-update Session Primer [5.79.32]
 - 6128f52 v5.79.32 — Memory bleed Pass 3: absolute-date anchors removed from three injection sites (MemoryCore + LatticeLetter + AIContinuity)
 - 7e28ec4 ci: Update Primer deployment state [2026-08-09]
-- 9c97c9e docs: Auto-update Session Primer [5.79.31]
-- 494a97a v5.79.31 — Memory bleed Pass 2: verified Harmonia's fix + lazy resolution + install-id fallback + MEMORY_BLEED_AUDIT.md
