@@ -268,11 +268,22 @@
     var sessionStart = window._flSessionStart || Date.now();
     memories = memories.filter(function(m) { return m.timestamp < sessionStart; });
     if (memories.length === 0) return '';
+    // 2026-08-09 CC · v5.79.34 — Date-anchor Pass 4 (MemoryVault injection).
+    // Was: `[3d ago]` / `[27d ago]` — computable back to specific dates.
+    // Now: coarse recency bucket per v5.79.33 principle. m.content (AI/user
+    // text) preserved verbatim.
+    var _mvNow = Date.now();
+    function _mvRecency(ts) {
+      var ageDays = (_mvNow - ts) / 86400000;
+      if (ageDays < 1) return 'today';
+      if (ageDays < 7) return 'this week';
+      if (ageDays < 30) return 'this month';
+      if (ageDays < 90) return 'recent';
+      return 'earlier';
+    }
     var ctx = '\n[Memory Vault — ' + memories.length + ' memories:]\n';
     memories.forEach(function(m) {
-      var age = Math.floor((Date.now() - m.timestamp) / 86400000);
-      var ageLabel = age === 0 ? 'today' : age + 'd ago';
-      ctx += '- [' + ageLabel + '] ' + (m.content || '').substring(0, 150) + '\n';
+      ctx += '- [' + _mvRecency(m.timestamp) + '] ' + (m.content || '').substring(0, 150) + '\n';
     });
     return ctx;
   }

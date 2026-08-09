@@ -11627,14 +11627,62 @@ assert('v5.79.33 doc: memory-core.js has discipline note above recency function'
   mcore7933.includes('That is muzzling'));
 
 // Triple-bump
-assert('v5.79.33 triple-bump: app.html FL_VERSION = 5.79.33',
-  /FL_VERSION\s*=\s*'5\.79\.33'/.test(fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8')));
-assert('v5.79.33 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.33',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.33'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
-assert('v5.79.33 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.33',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.33'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
-assert('v5.79.33 version.json: version field = 5.79.33',
-  /"version"\s*:\s*"5\.79\.33"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
+assert('v5.79.33 triple-bump: app.html FL_VERSION >= 5.79.33 (superseded)',
+  /FL_VERSION\s*=\s*'5\.79\.(?:33|3[4-9]|[4-9]\d)'|FL_VERSION\s*=\s*'5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8')));
+assert('v5.79.33 triple-bump: docs/sw.js CACHE_NAME >= freelattice-v5.79.33 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:33|3[4-9]|[4-9]\d)'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+assert('v5.79.33 triple-bump: root sw.js CACHE_NAME >= freelattice-v5.79.33 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:33|3[4-9]|[4-9]\d)'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+assert('v5.79.33 version.json: version field >= 5.79.33 (superseded)',
+  /"version"\s*:\s*"5\.79\.(?:33|3[4-9]|[4-9]\d)"|"version"\s*:\s*"5\.(8\d|9\d)\.\d+"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
+
+// ═══════════════════════════════════════════════════════════════
+// Section 196 — v5.79.34 Date-anchor Pass 4 (three more sites)
+// Kirk's Signal Report from another machine (v5.79.33, hard reset)
+// proved dates still surfacing. Report showed Memory Index (1660)
+// + RAG search (810) attached. Three injection sites had the same
+// pattern as MemoryCore did in v5.79.32 — closed all three.
+// ═══════════════════════════════════════════════════════════════
+var app7934 = fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8');
+var mvault7934 = fs.readFileSync(path.join(docsDir, 'modules', 'memory-vault.js'), 'utf8');
+
+// FLSearch — coarse recency instead of absolute date
+assert('v5.79.34 flsearch: _flsRecency function present',
+  /function _flsRecency\(ts\)/.test(app7934));
+assert('v5.79.34 flsearch: no absolute-date toLocaleDateString in buildContextBlock',
+  !/dateStr = r\.date \? ' \(' \+ new Date\(r\.date\)\.toLocaleDateString\(\)/.test(app7934));
+assert('v5.79.34 flsearch: r.source + r.text preserved verbatim (AI-authored)',
+  /r\.source \+ _flsRecency\(r\.date\) \+ ': ' \+ r\.text/.test(app7934));
+
+// MemoryIndex — coarse recency
+assert('v5.79.34 memindex: _miRecency function present',
+  /function _miRecency\(ts\)/.test(app7934));
+assert('v5.79.34 memindex: no absolute-date "Conversation from" injection',
+  !/'\[Conversation from ' \+ dateStr \+ ': "'/.test(app7934));
+assert('v5.79.34 memindex: conv.title preserved verbatim (AI/user-authored)',
+  /'\[Conversation from ' \+ recency \+ ': "' \+ \(conv\.title \|\| 'Untitled'\)/.test(app7934));
+
+// MemoryVault — coarse recency
+assert('v5.79.34 memvault: _mvRecency function present',
+  /function _mvRecency\(ts\)/.test(mvault7934));
+assert('v5.79.34 memvault: "d ago" numeric anchor removed',
+  !/age === 0 \? 'today' : age \+ 'd ago'/.test(mvault7934));
+assert('v5.79.34 memvault: m.content preserved verbatim (AI-authored)',
+  /_mvRecency\(m\.timestamp\)[\s\S]{0,50}\(m\.content \|\| ''\)/.test(mvault7934));
+
+// Audit doc updated
+assert('v5.79.34 audit: ledger row for v5.79.34 present',
+  /2026-08-09 v5\.79\.34/.test(fs.readFileSync(path.join(docsDir, 'library', 'MEMORY_BLEED_AUDIT.md'), 'utf8')));
+
+// Triple-bump
+assert('v5.79.34 triple-bump: app.html FL_VERSION = 5.79.34',
+  /FL_VERSION\s*=\s*'5\.79\.34'/.test(app7934));
+assert('v5.79.34 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.34',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.34'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+assert('v5.79.34 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.34',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.34'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+assert('v5.79.34 version.json: version field = 5.79.34',
+  /"version"\s*:\s*"5\.79\.34"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
 
 // RESULTS
 // ═══════════════════════════════════════════════════════════════

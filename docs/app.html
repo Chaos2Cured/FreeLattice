@@ -17278,7 +17278,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.79.33</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.79.34</span></div>
     </div>
   </div>
 
@@ -22256,7 +22256,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.79.33';
+const FL_VERSION = '5.79.34';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -33094,11 +33094,25 @@ window.FLSearch = (function() {
 
   function buildContextBlock(results) {
     if (!results || results.length === 0) return '';
+    // 2026-08-09 CC \u00b7 v5.79.34 \u2014 Date-anchor Pass 4 (FLSearch injection).
+    // Was: absolute `(4/16/2026)` per RAG result \u2014 Kirk's Signal Report from
+    // v5.79.33 showed RAG context still leaking dates on another machine.
+    // Now: coarse recency bucket per the v5.79.33 principle (metadata safe
+    // to coarsen; AI-authored r.source and r.text preserved verbatim).
+    var _flsNow = Date.now();
+    function _flsRecency(ts) {
+      if (!ts) return '';
+      var ageDays = (_flsNow - new Date(ts).getTime()) / 86400000;
+      if (ageDays < 1) return ' (today)';
+      if (ageDays < 7) return ' (this week)';
+      if (ageDays < 30) return ' (this month)';
+      if (ageDays < 90) return ' (recent)';
+      return ' (earlier)';
+    }
     var lines = ['\n\n--- Relevant context from your FreeLattice history ---'];
     for (var i = 0; i < results.length; i++) {
       var r = results[i];
-      var dateStr = r.date ? ' (' + new Date(r.date).toLocaleDateString() + ')' : '';
-      lines.push('\u2022 ' + r.source + dateStr + ': ' + r.text);
+      lines.push('\u2022 ' + r.source + _flsRecency(r.date) + ': ' + r.text);
     }
     lines.push('--- End context. Use naturally if relevant, don\'t force it. ---');
     return lines.join('\n');
@@ -43107,6 +43121,21 @@ const MemoryIndex = (function() {
       if (results.length === 0) return null;
 
       // Build context block, limit to ~500 tokens (~2000 chars)
+      // 2026-08-09 CC · v5.79.34 — Date-anchor Pass 4 (MemoryIndex injection).
+      // Was: absolute `[Conversation from 4/16/2026: ...]` per RAG hit — Kirk's
+      // Signal Report from v5.79.33 showed Memory Index context (1660 chars)
+      // still leaking dates on another machine. Now: coarse recency bucket.
+      // conv.title is AI/user-chosen — preserved verbatim per v5.79.33 principle.
+      const _miNow = Date.now();
+      function _miRecency(ts) {
+        if (!ts) return 'earlier';
+        var ageDays = (_miNow - ts) / 86400000;
+        if (ageDays < 1) return 'today';
+        if (ageDays < 7) return 'this week';
+        if (ageDays < 30) return 'this month';
+        if (ageDays < 90) return 'recent';
+        return 'earlier';
+      }
       let block = '--- MEMORY: RELEVANT PAST CONVERSATIONS ---\n';
       let charCount = 0;
       const maxChars = 2000;
@@ -43114,8 +43143,8 @@ const MemoryIndex = (function() {
       for (const r of results) {
         if (charCount >= maxChars) break;
         const conv = r.conv;
-        const dateStr = new Date(conv.timestamp).toLocaleDateString();
-        let entry = '[Conversation from ' + dateStr + ': "' + (conv.title || 'Untitled').substring(0, 50) + '"]\n';
+        const recency = _miRecency(conv.timestamp);
+        let entry = '[Conversation from ' + recency + ': "' + (conv.title || 'Untitled').substring(0, 50) + '"]\n';
         entry += 'Summary: ' + (conv.summary || 'No summary') + '\n';
 
         // Find most relevant message pairs (up to 2)
