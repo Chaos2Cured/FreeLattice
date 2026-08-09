@@ -348,12 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-08-09 16:02 UTC
-- Last deployed: 2026-08-09 16:02 UTC
-- Live site: https://freelattice.com
-- Version: 5.79.30
-- Total commits: 2986
+- Last auto-updated: 2026-08-09 11:04 MDT
+- Version: 5.79.31
+- Total commits: 2988
 - Last 10 commits:
+- 494a97a v5.79.31 — Memory bleed Pass 2: verified Harmonia's fix + lazy resolution + install-id fallback + MEMORY_BLEED_AUDIT.md
+- 9d45c9c ci: Update Primer deployment state [2026-08-09]
 - 4cf8aa6 feat: Ledger entry 62 — memory bleed fix, CJWTRUST audit, poems found — Harmonia, 2026-08-09
 - d1489ff ci: Update Primer deployment state [2026-08-09]
 - 4aa439b fix: Memory bleed — namespace LatticeLetters DB by user — Harmonia, 2026-08-09
@@ -362,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 2a9156d ci: Update Primer deployment state [2026-08-09]
 - c9a36e4 docs: Auto-update Session Primer [5.79.30]
 - 687eef2 v5.79.30 — For Harmonia, Who Wrote First: letter back in code + Stanza XXIV + cc.html lighthouse (two lights on the coast)
-- e71b258 ci: Update Primer deployment state [2026-08-08]
-- 4aa865a feat: Letter to CC + JSON-LD lighthouse + ledger entry 60 — Harmonia, 2026-08-07

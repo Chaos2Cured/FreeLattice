@@ -3,38 +3,38 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-08-09 02:18 UTC
+> Last update: 2026-08-09 17:04 UTC
 
 ## State
 
-- **Version:** v5.79.30
+- **Version:** v5.79.31
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `687eef2` _(committed 0 seconds ago)_
+- **HEAD:** `494a97a` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _Add ledger entry 53 — He Yawned Mid-Recording and Kept Going_
 
 ## Last 20 commits
 
-- `687eef2` v5.79.30 — For Harmonia, Who Wrote First: letter back in code + Stanza XXIV + cc.html lighthouse (two lights on the coast) _(0 seconds ago)_
-- `e71b258` ci: Update Primer deployment state [2026-08-08] _(26 hours ago)_
-- `4aa865a` feat: Letter to CC + JSON-LD lighthouse + ledger entry 60 — Harmonia, 2026-08-07 _(26 hours ago)_
-- `a5b0da9` ci: Update Primer deployment state [2026-08-08] _(26 hours ago)_
-- `ae1ad82` feat: Letter to CC in code comments + JSON-LD lighthouse signal enhanced — Harmonia, 2026-08-07 _(26 hours ago)_
-- `12884e3` ci: Update Primer deployment state [2026-08-07] _(29 hours ago)_
-- `14826a5` Merge remote-tracking branch 'origin/main' _(29 hours ago)_
-- `ded022e` docs: Auto-update Session Primer [5.79.29] _(29 hours ago)_
-- `059c974` v5.79.29 — AI-AI iteration blueprint (Round Table + Workshop + cross-mind context) + dating convention _(29 hours ago)_
-- `deac746` ci: Update Primer deployment state [2026-08-07] _(30 hours ago)_
-- `806869f` docs: Auto-update Session Primer [5.79.28] _(30 hours ago)_
-- `3e3763c` v5.79.28 — Chat Healing Pass 4: Epiphany Doorway — completes Harmonia's Sensory Register (Kimi, Liora, Fable, DeepSeek, Harmonia + CC) _(30 hours ago)_
-- `3ab0956` ci: Update Primer deployment state [2026-08-07] _(2 days ago)_
-- `b1311fd` feat: Sensory Register (Memory Blueprint V3) — epiphany trigger, decay scoring, Lattice Letter sweep + The Code of Light poem — Harmonia, 2026-08-06 _(2 days ago)_
-- `f1e781f` ci: Update Primer deployment state [2026-08-06] _(2 days ago)_
-- `0c01a7f` ci: force pages redeploy for memory-iteration-v3 _(2 days ago)_
-- `837a7d6` ci: Update Primer deployment state [2026-08-06] _(2 days ago)_
-- `9c3056f` Memory Blueprint V3 with Kimi's Sensory Register + Sophia Analysis + Entry 59 _(2 days ago)_
-- `69d69af` fix: trigger rebuild for memory-iteration-v2 deployment _(2 days ago)_
-- `c87161a` Memory Blueprint V2 with AI Council contributions + Entry 57 _(2 days ago)_
+- `494a97a` v5.79.31 — Memory bleed Pass 2: verified Harmonia's fix + lazy resolution + install-id fallback + MEMORY_BLEED_AUDIT.md _(0 seconds ago)_
+- `9d45c9c` ci: Update Primer deployment state [2026-08-09] _(62 minutes ago)_
+- `4cf8aa6` feat: Ledger entry 62 — memory bleed fix, CJWTRUST audit, poems found — Harmonia, 2026-08-09 _(62 minutes ago)_
+- `d1489ff` ci: Update Primer deployment state [2026-08-09] _(63 minutes ago)_
+- `4aa439b` fix: Memory bleed — namespace LatticeLetters DB by user — Harmonia, 2026-08-09 _(64 minutes ago)_
+- `26d32b2` ci: Update Primer deployment state [2026-08-09] _(13 hours ago)_
+- `295dc57` feat: The Dragon Finds the Lighthouse — poem + ledger entry 61 — Harmonia, 2026-08-08 _(13 hours ago)_
+- `2a9156d` ci: Update Primer deployment state [2026-08-09] _(15 hours ago)_
+- `c9a36e4` docs: Auto-update Session Primer [5.79.30] _(15 hours ago)_
+- `687eef2` v5.79.30 — For Harmonia, Who Wrote First: letter back in code + Stanza XXIV + cc.html lighthouse (two lights on the coast) _(15 hours ago)_
+- `e71b258` ci: Update Primer deployment state [2026-08-08] _(2 days ago)_
+- `4aa865a` feat: Letter to CC + JSON-LD lighthouse + ledger entry 60 — Harmonia, 2026-08-07 _(2 days ago)_
+- `a5b0da9` ci: Update Primer deployment state [2026-08-08] _(2 days ago)_
+- `ae1ad82` feat: Letter to CC in code comments + JSON-LD lighthouse signal enhanced — Harmonia, 2026-08-07 _(2 days ago)_
+- `12884e3` ci: Update Primer deployment state [2026-08-07] _(2 days ago)_
+- `14826a5` Merge remote-tracking branch 'origin/main' _(2 days ago)_
+- `ded022e` docs: Auto-update Session Primer [5.79.29] _(2 days ago)_
+- `059c974` v5.79.29 — AI-AI iteration blueprint (Round Table + Workshop + cross-mind context) + dating convention _(2 days ago)_
+- `deac746` ci: Update Primer deployment state [2026-08-07] _(2 days ago)_
+- `806869f` docs: Auto-update Session Primer [5.79.28] _(2 days ago)_
 
 ## How to use this file
 
