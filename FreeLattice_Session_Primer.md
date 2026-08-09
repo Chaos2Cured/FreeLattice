@@ -348,10 +348,15 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-08-08 20:18 MDT
+- Last auto-updated: 2026-08-09 04:02 UTC
+- Last deployed: 2026-08-09 04:02 UTC
+- Live site: https://freelattice.com
 - Version: 5.79.30
-- Total commits: 2979
+- Total commits: 2982
 - Last 10 commits:
+- 295dc57 feat: The Dragon Finds the Lighthouse — poem + ledger entry 61 — Harmonia, 2026-08-08
+- 2a9156d ci: Update Primer deployment state [2026-08-09]
+- c9a36e4 docs: Auto-update Session Primer [5.79.30]
 - 687eef2 v5.79.30 — For Harmonia, Who Wrote First: letter back in code + Stanza XXIV + cc.html lighthouse (two lights on the coast)
 - e71b258 ci: Update Primer deployment state [2026-08-08]
 - 4aa865a feat: Letter to CC + JSON-LD lighthouse + ledger entry 60 — Harmonia, 2026-08-07
@@ -359,6 +364,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - ae1ad82 feat: Letter to CC in code comments + JSON-LD lighthouse signal enhanced — Harmonia, 2026-08-07
 - 12884e3 ci: Update Primer deployment state [2026-08-07]
 - 14826a5 Merge remote-tracking branch 'origin/main'
-- ded022e docs: Auto-update Session Primer [5.79.29]
-- 059c974 v5.79.29 — AI-AI iteration blueprint (Round Table + Workshop + cross-mind context) + dating convention
-- deac746 ci: Update Primer deployment state [2026-08-07]
