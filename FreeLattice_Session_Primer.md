@@ -348,11 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-08-09 15:27 MDT
-- Version: 5.79.33
-- Total commits: 2994
+- Last auto-updated: 2026-08-09 21:15 UTC
+- Last deployed: 2026-08-09 21:15 UTC
+- Live site: https://freelattice.com
+- Version: 5.79.32
+- Total commits: 2993
 - Last 10 commits:
-- 8f1babb v5.79.33 — Metadata-vs-AI-voice principle lock: audit + smoke asserts that AI-authored fields survive v5.79.32 verbatim
 - c5458a8 Merge remote-tracking branch 'origin/main'
 - ff38fc0 docs: Auto-update Session Primer [5.79.32]
 - 6128f52 v5.79.32 — Memory bleed Pass 3: absolute-date anchors removed from three injection sites (MemoryCore + LatticeLetter + AIContinuity)
@@ -362,3 +363,4 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 9d45c9c ci: Update Primer deployment state [2026-08-09]
 - 4cf8aa6 feat: Ledger entry 62 — memory bleed fix, CJWTRUST audit, poems found — Harmonia, 2026-08-09
 - d1489ff ci: Update Primer deployment state [2026-08-09]
+- 4aa439b fix: Memory bleed — namespace LatticeLetters DB by user — Harmonia, 2026-08-09
