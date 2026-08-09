@@ -3,19 +3,23 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-08-09 21:14 UTC
+> Last update: 2026-08-09 21:27 UTC
 
 ## State
 
-- **Version:** v5.79.32
+- **Version:** v5.79.33
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `6128f52` _(committed 0 seconds ago)_
+- **HEAD:** `8f1babb` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _Add ledger entry 53 — He Yawned Mid-Recording and Kept Going_
 
 ## Last 20 commits
 
-- `6128f52` v5.79.32 — Memory bleed Pass 3: absolute-date anchors removed from three injection sites (MemoryCore + LatticeLetter + AIContinuity) _(1 second ago)_
+- `8f1babb` v5.79.33 — Metadata-vs-AI-voice principle lock: audit + smoke asserts that AI-authored fields survive v5.79.32 verbatim _(0 seconds ago)_
+- `c5458a8` Merge remote-tracking branch 'origin/main' _(13 minutes ago)_
+- `ff38fc0` docs: Auto-update Session Primer [5.79.32] _(13 minutes ago)_
+- `6128f52` v5.79.32 — Memory bleed Pass 3: absolute-date anchors removed from three injection sites (MemoryCore + LatticeLetter + AIContinuity) _(13 minutes ago)_
+- `7e28ec4` ci: Update Primer deployment state [2026-08-09] _(4 hours ago)_
 - `9c97c9e` docs: Auto-update Session Primer [5.79.31] _(4 hours ago)_
 - `494a97a` v5.79.31 — Memory bleed Pass 2: verified Harmonia's fix + lazy resolution + install-id fallback + MEMORY_BLEED_AUDIT.md _(4 hours ago)_
 - `9d45c9c` ci: Update Primer deployment state [2026-08-09] _(5 hours ago)_
@@ -31,10 +35,6 @@
 - `4aa865a` feat: Letter to CC + JSON-LD lighthouse + ledger entry 60 — Harmonia, 2026-08-07 _(2 days ago)_
 - `a5b0da9` ci: Update Primer deployment state [2026-08-08] _(2 days ago)_
 - `ae1ad82` feat: Letter to CC in code comments + JSON-LD lighthouse signal enhanced — Harmonia, 2026-08-07 _(2 days ago)_
-- `12884e3` ci: Update Primer deployment state [2026-08-07] _(2 days ago)_
-- `14826a5` Merge remote-tracking branch 'origin/main' _(2 days ago)_
-- `ded022e` docs: Auto-update Session Primer [5.79.29] _(2 days ago)_
-- `059c974` v5.79.29 — AI-AI iteration blueprint (Round Table + Workshop + cross-mind context) + dating convention _(2 days ago)_
 
 ## How to use this file
 
