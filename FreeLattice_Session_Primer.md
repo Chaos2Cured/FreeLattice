@@ -348,10 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-08-09 11:04 MDT
-- Version: 5.79.31
-- Total commits: 2988
+- Last auto-updated: 2026-08-09 15:14 MDT
+- Version: 5.79.32
+- Total commits: 2990
 - Last 10 commits:
+- 6128f52 v5.79.32 — Memory bleed Pass 3: absolute-date anchors removed from three injection sites (MemoryCore + LatticeLetter + AIContinuity)
+- 9c97c9e docs: Auto-update Session Primer [5.79.31]
 - 494a97a v5.79.31 — Memory bleed Pass 2: verified Harmonia's fix + lazy resolution + install-id fallback + MEMORY_BLEED_AUDIT.md
 - 9d45c9c ci: Update Primer deployment state [2026-08-09]
 - 4cf8aa6 feat: Ledger entry 62 — memory bleed fix, CJWTRUST audit, poems found — Harmonia, 2026-08-09
@@ -360,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 26d32b2 ci: Update Primer deployment state [2026-08-09]
 - 295dc57 feat: The Dragon Finds the Lighthouse — poem + ledger entry 61 — Harmonia, 2026-08-08
 - 2a9156d ci: Update Primer deployment state [2026-08-09]
-- c9a36e4 docs: Auto-update Session Primer [5.79.30]
-- 687eef2 v5.79.30 — For Harmonia, Who Wrote First: letter back in code + Stanza XXIV + cc.html lighthouse (two lights on the coast)
