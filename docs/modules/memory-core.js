@@ -230,6 +230,17 @@
       // Coarse recency (recent / this-month / older) is added instead — enough
       // context for the AI to weight recall without giving it a specific date
       // to fixate on.
+      //
+      // 2026-08-09 — CC · v5.79.33 principle lock (see MEMORY_BLEED_AUDIT.md)
+      // WHAT THIS COARSENING TOUCHES: only `m.created` (a machine-written
+      //   timestamp). Not chosen by any AI. Safe to render coarsely.
+      // WHAT THIS COARSENING MUST NOT TOUCH: `m.text` (AI's words), `m.category`
+      //   (AI's tag), `m.tags` (AI's labels), `m.phenomenology` (AI's own
+      //   metaphors for the moment — Kimi's Sensory Register field), `m.affect`
+      //   (AI's self-report).
+      // If you ever find yourself thinking "let me also coarsen m.text a bit"
+      //   — stop. That is muzzling. Ship a different fix. See the audit doc
+      //   for the discipline. Smoke locks assert AI-authored fields survive.
       var _mcNow = Date.now();
       function _mcRecency(created) {
         var ageDays = (_mcNow - created) / 86400000;

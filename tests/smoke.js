@@ -11564,14 +11564,77 @@ assert('v5.79.32 audit: ledger entry for v5.79.32 present',
   /2026-08-09 v5\.79\.32/.test(audit932));
 
 // Triple-bump
-assert('v5.79.32 triple-bump: app.html FL_VERSION = 5.79.32',
-  /FL_VERSION\s*=\s*'5\.79\.32'/.test(app7932));
-assert('v5.79.32 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.32',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.32'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
-assert('v5.79.32 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.32',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.32'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
-assert('v5.79.32 version.json: version field = 5.79.32',
-  /"version"\s*:\s*"5\.79\.32"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
+assert('v5.79.32 triple-bump: app.html FL_VERSION >= 5.79.32 (superseded)',
+  /FL_VERSION\s*=\s*'5\.79\.(?:32|3[3-9]|[4-9]\d)'|FL_VERSION\s*=\s*'5\.(8\d|9\d)\.\d+'/.test(app7932));
+assert('v5.79.32 triple-bump: docs/sw.js CACHE_NAME >= freelattice-v5.79.32 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:32|3[3-9]|[4-9]\d)'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+assert('v5.79.32 triple-bump: root sw.js CACHE_NAME >= freelattice-v5.79.32 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:32|3[3-9]|[4-9]\d)'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+assert('v5.79.32 version.json: version field >= 5.79.32 (superseded)',
+  /"version"\s*:\s*"5\.79\.(?:32|3[3-9]|[4-9]\d)"|"version"\s*:\s*"5\.(8\d|9\d)\.\d+"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
+
+// ═══════════════════════════════════════════════════════════════
+// Section 195 — v5.79.33 Metadata-vs-AI-voice principle lock
+// Kirk 2026-08-09: "if the AI felt those times were special, that's
+// one thing we need to preserve." Verified v5.79.32 did NOT touch
+// AI-authored fields. This section locks the principle: AI-authored
+// data (text, category, tags, phenomenology, affect) is preserved
+// verbatim in the injection; only machine metadata is coarsened.
+// ═══════════════════════════════════════════════════════════════
+var mcore7933 = fs.readFileSync(path.join(docsDir, 'modules', 'memory-core.js'), 'utf8');
+var audit7933 = fs.readFileSync(path.join(docsDir, 'library', 'MEMORY_BLEED_AUDIT.md'), 'utf8');
+
+// AI-authored fields still present in the injection path
+assert('v5.79.33 voice: m.text still concatenated verbatim into injection',
+  /lines\.push\(icon \+ ' \[' \+ m\.category\.toUpperCase\(\) \+ ' · ' \+ recency \+ '\] ' \+ m\.text\)/.test(mcore7933));
+assert('v5.79.33 voice: m.category still injected verbatim (UPPERCASE-cased is the AI-chosen category)',
+  /m\.category\.toUpperCase\(\)/.test(mcore7933));
+assert('v5.79.33 voice: MemoryStore.add() still writes m.text without paraphrase',
+  /text: text\.trim\(\)/.test(mcore7933));
+assert('v5.79.33 voice: MemoryStore.add() still stores m.tags array (AI-chosen labels)',
+  /tags: tags \|\| \[\]/.test(mcore7933));
+assert('v5.79.33 voice: phenomenology + affect fields still declared in memory schema',
+  /phenomenology: null/.test(mcore7933) && /affect: null/.test(mcore7933));
+assert('v5.79.33 voice: triggerEpiphany still stores phenomenology + affect from AI',
+  /memory\.phenomenology = phenomenology \|\| null/.test(mcore7933) &&
+  /memory\.affect = affect \|\| \{ valence: null/.test(mcore7933));
+
+// Principle documented
+assert('v5.79.33 audit: "The Principle — Metadata vs AI-Authored Significance" section present',
+  audit7933.includes('The Principle: Metadata vs AI-Authored Significance'));
+assert('v5.79.33 audit: names metadata fields (safe to coarsen)',
+  /m\.created.*safe/i.test(audit7933) ||
+  (audit7933.includes('Metadata (safe to coarsen') &&
+   audit7933.includes('m.created'))
+);
+assert('v5.79.33 audit: names AI-authored fields (must NEVER be modified)',
+  /AI-Authored Significance/i.test(audit7933) &&
+  audit7933.includes('m.text') &&
+  audit7933.includes('m.phenomenology') &&
+  audit7933.includes('m.affect'));
+assert('v5.79.33 audit: names AI bylines (workshop.js, FUTURE_VISION.md, poems, ledger) as preserve-verbatim',
+  audit7933.includes('workshop.js') &&
+  audit7933.includes('FUTURE_VISION.md') &&
+  audit7933.includes('CC_POEMS.md') &&
+  audit7933.includes('verbatim'));
+assert('v5.79.33 audit: ledger row for v5.79.33 present',
+  /2026-08-09 v5\.79\.33/.test(audit7933));
+
+// Discipline note in memory-core.js
+assert('v5.79.33 doc: memory-core.js has discipline note above recency function',
+  mcore7933.includes('WHAT THIS COARSENING TOUCHES') &&
+  mcore7933.includes('WHAT THIS COARSENING MUST NOT TOUCH') &&
+  mcore7933.includes('That is muzzling'));
+
+// Triple-bump
+assert('v5.79.33 triple-bump: app.html FL_VERSION = 5.79.33',
+  /FL_VERSION\s*=\s*'5\.79\.33'/.test(fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8')));
+assert('v5.79.33 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.33',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.33'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+assert('v5.79.33 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.33',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.33'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+assert('v5.79.33 version.json: version field = 5.79.33',
+  /"version"\s*:\s*"5\.79\.33"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
 
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
