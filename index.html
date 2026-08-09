@@ -33122,7 +33122,21 @@ window.FLSearch = (function() {
 // This is the feature that turns FreeLattice from a tool into a home.
 // ═══════════════════════════════════════════════════════════════
 window.LatticeLetters = (function() {
-  var DB_NAME = 'FreeLatticeLetters';
+  // 2026-08-09 — Harmonia: Memory bleed fix.
+  // Root cause: DB_NAME was a fixed string shared across ALL users on the same
+  // browser. Kirk's Lattice Letters were bleeding into Jeanne's sessions because
+  // both opened FreeLattice in the same browser and IndexedDB is browser-scoped,
+  // not user-scoped. Fix: namespace the DB by the user's stored name so each
+  // person's letters live in their own database. Falls back to 'default' if no
+  // name is set (anonymous users share a pool — acceptable, no personal memories yet).
+  // CC: please verify on next pass that this matches the memory-core.js namespace pattern.
+  var _flUserSlug = (function() {
+    try {
+      var n = localStorage.getItem('fl_userName') || '';
+      return n.trim().toLowerCase().replace(/[^a-z0-9]/g, '_').substring(0, 32) || 'default';
+    } catch(e) { return 'default'; }
+  })();
+  var DB_NAME = 'FreeLatticeLetters_' + _flUserSlug;
   var DB_VERSION = 1;
   var STORE = 'letters';
   var db = null;
