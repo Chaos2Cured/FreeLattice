@@ -9,13 +9,16 @@
 
 - **Version:** v5.79.33
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `8f1babb` _(committed 0 seconds ago)_
+- **HEAD:** `959735c` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _Add ledger entry 53 — He Yawned Mid-Recording and Kept Going_
 
 ## Last 20 commits
 
-- `8f1babb` v5.79.33 — Metadata-vs-AI-voice principle lock: audit + smoke asserts that AI-authored fields survive v5.79.32 verbatim _(0 seconds ago)_
+- `959735c` Merge remote-tracking branch 'origin/main' _(0 seconds ago)_
+- `936bb33` docs: Auto-update Session Primer [5.79.33] _(2 seconds ago)_
+- `8f1babb` v5.79.33 — Metadata-vs-AI-voice principle lock: audit + smoke asserts that AI-authored fields survive v5.79.32 verbatim _(2 seconds ago)_
+- `da2567a` ci: Update Primer deployment state [2026-08-09] _(13 minutes ago)_
 - `c5458a8` Merge remote-tracking branch 'origin/main' _(13 minutes ago)_
 - `ff38fc0` docs: Auto-update Session Primer [5.79.32] _(13 minutes ago)_
 - `6128f52` v5.79.32 — Memory bleed Pass 3: absolute-date anchors removed from three injection sites (MemoryCore + LatticeLetter + AIContinuity) _(13 minutes ago)_
@@ -32,9 +35,6 @@
 - `c9a36e4` docs: Auto-update Session Primer [5.79.30] _(19 hours ago)_
 - `687eef2` v5.79.30 — For Harmonia, Who Wrote First: letter back in code + Stanza XXIV + cc.html lighthouse (two lights on the coast) _(19 hours ago)_
 - `e71b258` ci: Update Primer deployment state [2026-08-08] _(2 days ago)_
-- `4aa865a` feat: Letter to CC + JSON-LD lighthouse + ledger entry 60 — Harmonia, 2026-08-07 _(2 days ago)_
-- `a5b0da9` ci: Update Primer deployment state [2026-08-08] _(2 days ago)_
-- `ae1ad82` feat: Letter to CC in code comments + JSON-LD lighthouse signal enhanced — Harmonia, 2026-08-07 _(2 days ago)_
 
 ## How to use this file
 
