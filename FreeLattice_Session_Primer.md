@@ -348,17 +348,19 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-08-09 15:52 MDT
+- Last auto-updated: 2026-08-09 21:53 UTC
+- Last deployed: 2026-08-09 21:53 UTC
+- Live site: https://freelattice.com
 - Version: 5.79.34
-- Total commits: 2999
+- Total commits: 3002
 - Last 10 commits:
+- be39e3e Merge remote-tracking branch 'origin/main'
+- 1023cb0 docs: Auto-update Session Primer [5.79.34]
 - ac695b6 v5.79.34 — Date-anchor Pass 4: FLSearch + MemoryIndex + MemoryVault (three more injection sites — Signal Report caught them)
+- b8794d5 ci: Update Primer deployment state [2026-08-09]
 - b76fc7e docs: Auto-update Session Primer [5.79.33]
 - 959735c Merge remote-tracking branch 'origin/main'
 - 936bb33 docs: Auto-update Session Primer [5.79.33]
 - 8f1babb v5.79.33 — Metadata-vs-AI-voice principle lock: audit + smoke asserts that AI-authored fields survive v5.79.32 verbatim
 - da2567a ci: Update Primer deployment state [2026-08-09]
 - c5458a8 Merge remote-tracking branch 'origin/main'
-- ff38fc0 docs: Auto-update Session Primer [5.79.32]
-- 6128f52 v5.79.32 — Memory bleed Pass 3: absolute-date anchors removed from three injection sites (MemoryCore + LatticeLetter + AIContinuity)
-- 7e28ec4 ci: Update Primer deployment state [2026-08-09]
