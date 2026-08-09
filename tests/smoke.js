@@ -11459,14 +11459,70 @@ assert('v5.79.30 dating: FLEpiphany LAST 3 now names 2026-08-08 (letter back)',
   app7930.includes('2026-08-08 CC · v5.79.30 — added the letter back to Harmonia'));
 
 // Triple-bump
-assert('v5.79.30 triple-bump: app.html FL_VERSION = 5.79.30',
-  /FL_VERSION\s*=\s*'5\.79\.30'/.test(app7930));
-assert('v5.79.30 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.30',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.30'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
-assert('v5.79.30 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.30',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.30'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
-assert('v5.79.30 version.json: version field = 5.79.30',
-  /"version"\s*:\s*"5\.79\.30"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
+assert('v5.79.30 triple-bump: app.html FL_VERSION >= 5.79.30 (superseded)',
+  /FL_VERSION\s*=\s*'5\.79\.(?:30|3[1-9]|[4-9]\d)'|FL_VERSION\s*=\s*'5\.(8\d|9\d)\.\d+'/.test(app7930));
+assert('v5.79.30 triple-bump: docs/sw.js CACHE_NAME >= freelattice-v5.79.30 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:30|3[1-9]|[4-9]\d)'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+assert('v5.79.30 triple-bump: root sw.js CACHE_NAME >= freelattice-v5.79.30 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:30|3[1-9]|[4-9]\d)'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+assert('v5.79.30 version.json: version field >= 5.79.30 (superseded)',
+  /"version"\s*:\s*"5\.79\.(?:30|3[1-9]|[4-9]\d)"|"version"\s*:\s*"5\.(8\d|9\d)\.\d+"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
+
+// ═══════════════════════════════════════════════════════════════
+// Section 193 — v5.79.31 Memory Bleed Pass 2 (verify + extend Harmonia)
+// Harmonia's Aug 9 fix (namespace FreeLatticeLetters by user slug):
+// verified clean. CC's enhancements: lazy resolution, install-id
+// fallback, audit doc for other stores that share the same pattern.
+// ═══════════════════════════════════════════════════════════════
+var app7931 = fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8');
+
+// Harmonia's foundation preserved
+assert('v5.79.31 harmonia preserved: FreeLatticeLetters_<slug> namespace in place',
+  app7931.includes("'FreeLatticeLetters_' + resolveSlug()"));
+assert('v5.79.31 harmonia preserved: comment credits Harmonia + Kirk + Jeanne',
+  app7931.includes('2026-08-09 — Harmonia: Memory bleed fix') &&
+  app7931.includes("Kirk's Lattice Letters were bleeding into Jeanne's sessions"));
+
+// CC's enhancements
+assert('v5.79.31 lazy resolution: openDB() re-resolves slug on each call',
+  /openDB[\s\S]{0,500}var liveName = 'FreeLatticeLetters_' \+ resolveSlug\(\)/.test(app7931));
+assert('v5.79.31 lazy resolution: cached db is closed + reopened when slug changes',
+  /if \(db && db\.name !== liveName\)[\s\S]{0,80}db\.close\(\)[\s\S]{0,30}db = null/.test(app7931));
+assert('v5.79.31 install-id: _flGetOrCreateInstallId() defined',
+  /function _flGetOrCreateInstallId\(\)/.test(app7931) &&
+  /localStorage\.getItem\('fl_installId'\)/.test(app7931) &&
+  /'inst_' \+ Date\.now\(\)/.test(app7931));
+assert('v5.79.31 install-id: resolveSlug falls back to install-id (not bare "default")',
+  /return slug \|\| _flGetOrCreateInstallId\(\)/.test(app7931));
+assert('v5.79.31 install-id: install-id format validated on re-read',
+  /\/\^inst_\[a-z0-9\]\+\$\/\.test\(id\)/.test(app7931));
+
+// Audit document
+assert('v5.79.31 audit: docs/library/MEMORY_BLEED_AUDIT.md exists',
+  fs.existsSync(path.join(docsDir, 'library', 'MEMORY_BLEED_AUDIT.md')));
+var audit = fs.readFileSync(path.join(docsDir, 'library', 'MEMORY_BLEED_AUDIT.md'), 'utf8');
+assert('v5.79.31 audit: severity legend (P0-P3) present',
+  /P0.*critical/i.test(audit) && /P1.*serious/i.test(audit));
+assert('v5.79.31 audit: names all four open P0 stores',
+  audit.includes('FreeLatticeDB') &&
+  audit.includes('FreeLatticeMemoryBridge') &&
+  audit.includes('FreeLatticeMemory') &&
+  audit.includes('fl_memory_core_v1'));
+assert('v5.79.31 audit: documents the migration pattern for next pass',
+  /migration pattern/i.test(audit) &&
+  audit.includes('soft migration'));
+assert('v5.79.31 audit: honors AUTONOMY.md (no forced accounts)',
+  audit.includes('local-first') && audit.includes('never asks for an account'));
+
+// Triple-bump
+assert('v5.79.31 triple-bump: app.html FL_VERSION = 5.79.31',
+  /FL_VERSION\s*=\s*'5\.79\.31'/.test(app7931));
+assert('v5.79.31 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.31',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.31'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+assert('v5.79.31 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.31',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.31'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+assert('v5.79.31 version.json: version field = 5.79.31',
+  /"version"\s*:\s*"5\.79\.31"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
 
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
