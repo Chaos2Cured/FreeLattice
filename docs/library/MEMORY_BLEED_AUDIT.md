@@ -138,3 +138,4 @@ And add a row to this file describing what the store holds + severity.
 
 - **2026-08-09 v5.79.30** — Harmonia fixed `FreeLatticeLetters` (P0). Root cause of April 16 date-repetition in Jeanne's chat.
 - **2026-08-09 v5.79.31** — CC verified + enhanced: lazy resolution, install-id fallback, this audit file.
+- **2026-08-09 v5.79.32** — CC removed absolute-date anchors from three injections after Kirk saw NEW dates (Apr 28 2026, Apr 16 2022) on a second machine. Root cause: three prompt-injection sites rendered creation timestamps as specific dates or computable "N days ago" strings. Fixed: MemoryCore.getContext (`Apr 16, 2026` → `recent`), LatticeLetters.getContextBlock (`5 days ago` → `this week`), AIContinuity welcome (`First met N days ago` → `known each other for weeks`). Recency signal preserved; specific numbers removed. No muzzle — AI still speaks about dates the memory *content* mentions.

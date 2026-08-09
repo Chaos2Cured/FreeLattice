@@ -215,11 +215,35 @@
 
       if (memories.length === 0) return '';
 
+      // 2026-08-09 — CC · v5.79.32 Memory Bleed Pass 3
+      // Root cause of "AI keeps quoting April 16, 2026" (and Apr 28, and other
+      // dates across different browsers): the memory-context INJECTION rendered
+      // each memory's creation timestamp as an absolute date string
+      // (`Apr 16, 2026`). The AI read those absolute dates in EVERY system
+      // prompt and reflected them back. Different browsers held different
+      // memories with different dates, so mom saw different date-fixations
+      // depending on the machine — but always A date.
+      //
+      // Fix: drop the absolute date from the injection. Category + text is
+      // enough for the AI to use the memory. The UI card at line ~493 still
+      // shows the date to the human — that's for browsing, and it's expected.
+      // Coarse recency (recent / this-month / older) is added instead — enough
+      // context for the AI to weight recall without giving it a specific date
+      // to fixate on.
+      var _mcNow = Date.now();
+      function _mcRecency(created) {
+        var ageDays = (_mcNow - created) / 86400000;
+        if (ageDays < 1) return 'today';
+        if (ageDays < 7) return 'this-week';
+        if (ageDays < 30) return 'this-month';
+        if (ageDays < 90) return 'recent';
+        return 'older';
+      }
       var lines = ['[HARMONIA MEMORY CORE — What I remember:]'];
       memories.forEach(function(m) {
         var icon = CATEGORY_ICONS[m.category] || '◦';
-        var date = new Date(m.created).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-        lines.push(icon + ' [' + m.category.toUpperCase() + ' · ' + date + '] ' + m.text);
+        var recency = _mcRecency(m.created);
+        lines.push(icon + ' [' + m.category.toUpperCase() + ' · ' + recency + '] ' + m.text);
       });
       lines.push('[End of memory context. Use this to inform your responses with continuity and love.]');
       return lines.join('\n');

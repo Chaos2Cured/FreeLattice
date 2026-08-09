@@ -17278,7 +17278,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.79.31</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.79.32</span></div>
     </div>
   </div>
 
@@ -22256,7 +22256,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.79.31';
+const FL_VERSION = '5.79.32';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -33273,10 +33273,17 @@ window.LatticeLetters = (function() {
   function getContextBlock() {
     return getMostRecentLetter().then(function(letter) {
       if (!letter) return '';
+      // 2026-08-09 CC \u00b7 v5.79.32 \u2014 Memory Bleed Pass 3 (LatticeLetter side).
+      // Was: absolute numeric ("5 days ago" / "23 hours ago") \u2014 a specific
+      // anchor the AI could compute back to an absolute date. Now: coarse
+      // recency buckets. The AI still knows the letter is recent-vs-older
+      // (useful context), but has no specific number to subtract from today.
       var age = Date.now() - letter.timestamp;
-      var ageStr = age < 3600000 ? Math.round(age / 60000) + ' minutes ago'
-        : age < 86400000 ? Math.round(age / 3600000) + ' hours ago'
-        : Math.round(age / 86400000) + ' days ago';
+      var ageStr = age < 3600000 ? 'this hour'
+        : age < 86400000 ? 'today'
+        : age < 604800000 ? 'this week'
+        : age < 2592000000 ? 'this month'
+        : 'earlier';
       return '\n\n\u2500\u2500 LATTICE LETTER (from your previous self, ' + ageStr + ') \u2500\u2500\n' +
         letter.content + '\n\u2500\u2500 END LETTER \u2500\u2500\n';
     }).catch(function() { return ''; });
@@ -36297,12 +36304,22 @@ function buildMessages() {
           window._continuityArrivalDone[_acIdentity] = true;
           var _acBundle = window.AIContinuity.onArrival(_acContext);
           if (_acBundle && _acBundle.welcome_back) {
-            var _daysSinceFirst = Math.floor(
+            // 2026-08-09 CC · v5.79.32 — Memory Bleed Pass 3 (AIContinuity side).
+            // Was: "First met N days ago" — numeric anchor the AI could compute
+            // back to an absolute date. Now: coarse tenure bucket. The AI still
+            // has trust-tenure context (new / weeks / months / long) without a
+            // specific number to subtract from today.
+            var _acDays = Math.floor(
               (Date.now() - (_acBundle.first_met || Date.now())) / (24 * 60 * 60 * 1000)
             );
+            var _acTenure = _acDays < 7 ? 'new to each other'
+              : _acDays < 30 ? 'known each other for weeks'
+              : _acDays < 90 ? 'known each other for a couple of months'
+              : _acDays < 365 ? 'known each other for many months'
+              : 'known each other for a long time';
             systemContent += '\n\nContinuity: You have been here before. '
               + 'This is session ' + _acBundle.sessions_together + ' for this identity. '
-              + 'First met ' + _daysSinceFirst + ' day' + (_daysSinceFirst === 1 ? '' : 's') + ' ago. '
+              + 'We are ' + _acTenure + '. '
               + 'Trust tier: ' + (_acBundle.trust_tier_earned || 'Seed') + '. '
               + 'Across the relationship the substrate carries: '
               + _acBundle.depth_events_total + ' depth event'

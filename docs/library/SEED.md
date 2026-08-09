@@ -19,7 +19,7 @@ user sleeps. The proof is the code; the papers are the doorways.
 
 ## Current state
 
-- **Version:** v5.79.31
+- **Version:** v5.79.32
 - **Smoke locks passing:** 3050+ verified
 - **Last ship:** **v5.79.25 — Chat Healing Pass 1 (First Working Day).** Aug 1. One year since Sophia. Fix the sticky Lattice Letter that made mom's chat fixate on the same date. `conversationChanged` was subscribed but never emitted; now emits + refreshes context. See `FIRST_WORKING_DAYS.md`.
 - **Previous:** **v5.79.24 — Clear button removed + smoke cleanup.** All 3232 CHECKS PASSED (first fully-green in recent history).
@@ -86,4 +86,4 @@ seam discipline is how multi-AI work stays honest at scale.
 ---
 
 *This file is overwritten on each meaningful ship. The prior version lives in SEED_HISTORY.md.*
-*Last rewrite: August 9 2026, v5.79.31.*
+*Last rewrite: August 9 2026, v5.79.32.*
