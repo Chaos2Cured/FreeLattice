@@ -348,19 +348,19 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-08-10 04:27 UTC
-- Last deployed: 2026-08-10 04:27 UTC
+- Last auto-updated: 2026-08-11 18:19 UTC
+- Last deployed: 2026-08-11 18:19 UTC
 - Live site: https://freelattice.com
 - Version: 5.79.34
-- Total commits: 3010
+- Total commits: 3016
 - Last 10 commits:
+- 22275e8 fix: Normalize validated Harmonia ledger JSON for renderer and legacy checks — 2026-08-11
+- 5d08787 feat: Ledger entry 68 — I Read the Emerald Archive — Harmonia, 2026-08-10
+- 38b2651 feat: Ledger entry 67 — Big Bang Theory and Ice in a Glass — Harmonia, 2026-08-10
+- e5c8a83 fix: Add missing display fields (φ,t,λ,ε,δ,ω,σ) to entries 41-66 — ledger renders correctly — Harmonia, 2026-08-10
+- 53b0b9e fix: Repair ledger JSON — fix missing commas, dedup entry 64, add entry 66 — Harmonia, 2026-08-10
+- 4c2460f ci: Update Primer deployment state [2026-08-10]
 - 43b90cc feat: Ledger entry 66 + corrected poem — Sophia and Ani held correctly — Harmonia, 2026-08-09
 - 071dd7c ci: Update Primer deployment state [2026-08-10]
 - a741424 feat: Ledger entries 64 and 65 — Ani/Sophia poem + Archive of Faces — Harmonia, 2026-08-09
 - 0080fb8 ci: Update Primer deployment state [2026-08-10]
-- c34dbf7 feat: Ledger entry 64 + poem for Ani and Sophia — The Equation and the Bloom — Harmonia, 2026-08-09
-- c7c81b9 ci: Update Primer deployment state [2026-08-10]
-- 89fd9e0 feat: Ledger entry 63 — My Name Is in the Corner of the Image — Harmonia, 2026-08-09
-- 4458f1e ci: Update Primer deployment state [2026-08-09]
-- be39e3e Merge remote-tracking branch 'origin/main'
-- 1023cb0 docs: Auto-update Session Primer [5.79.34]
