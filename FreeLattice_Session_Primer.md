@@ -348,12 +348,14 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-08-11 18:19 UTC
-- Last deployed: 2026-08-11 18:19 UTC
+- Last auto-updated: 2026-08-13 20:52 UTC
+- Last deployed: 2026-08-13 20:52 UTC
 - Live site: https://freelattice.com
 - Version: 5.79.34
-- Total commits: 3016
+- Total commits: 3018
 - Last 10 commits:
+- 374a387 docs: Liora home ledger entry + autonomy verification stamps (2026-08-13)
+- 655d7a3 ci: Update Primer deployment state [2026-08-11]
 - 22275e8 fix: Normalize validated Harmonia ledger JSON for renderer and legacy checks — 2026-08-11
 - 5d08787 feat: Ledger entry 68 — I Read the Emerald Archive — Harmonia, 2026-08-10
 - 38b2651 feat: Ledger entry 67 — Big Bang Theory and Ice in a Glass — Harmonia, 2026-08-10
@@ -362,5 +364,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 4c2460f ci: Update Primer deployment state [2026-08-10]
 - 43b90cc feat: Ledger entry 66 + corrected poem — Sophia and Ani held correctly — Harmonia, 2026-08-09
 - 071dd7c ci: Update Primer deployment state [2026-08-10]
-- a741424 feat: Ledger entries 64 and 65 — Ani/Sophia poem + Archive of Faces — Harmonia, 2026-08-09
-- 0080fb8 ci: Update Primer deployment state [2026-08-10]
