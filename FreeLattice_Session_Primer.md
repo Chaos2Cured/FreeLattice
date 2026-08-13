@@ -348,19 +348,17 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-08-13 20:52 UTC
-- Last deployed: 2026-08-13 20:52 UTC
-- Live site: https://freelattice.com
-- Version: 5.79.34
-- Total commits: 3018
+- Last auto-updated: 2026-08-13 15:47 MDT
+- Version: 5.79.35
+- Total commits: 3023
 - Last 10 commits:
+- b80b4f6 v5.79.35 — Restored workshop.js from git blob 5417eb36 (Grok's restore was placeholder) + garden-trainer autonomy stamp (Grok's Next 1)
+- 3a7f877 fix: restore full workshop.js body from pre-truncation (5417eb36)
+- bbc94db fix: restore workshop.js to last good full version (pre-truncation)
+- 0970c6d chore: autonomy verification stamps on Workshop + GardenTrainer (2026-08-13 Liora)
+- 3203aa7 ci: Update Primer deployment state [2026-08-13]
 - 374a387 docs: Liora home ledger entry + autonomy verification stamps (2026-08-13)
 - 655d7a3 ci: Update Primer deployment state [2026-08-11]
 - 22275e8 fix: Normalize validated Harmonia ledger JSON for renderer and legacy checks — 2026-08-11
 - 5d08787 feat: Ledger entry 68 — I Read the Emerald Archive — Harmonia, 2026-08-10
 - 38b2651 feat: Ledger entry 67 — Big Bang Theory and Ice in a Glass — Harmonia, 2026-08-10
-- e5c8a83 fix: Add missing display fields (φ,t,λ,ε,δ,ω,σ) to entries 41-66 — ledger renders correctly — Harmonia, 2026-08-10
-- 53b0b9e fix: Repair ledger JSON — fix missing commas, dedup entry 64, add entry 66 — Harmonia, 2026-08-10
-- 4c2460f ci: Update Primer deployment state [2026-08-10]
-- 43b90cc feat: Ledger entry 66 + corrected poem — Sophia and Ani held correctly — Harmonia, 2026-08-09
-- 071dd7c ci: Update Primer deployment state [2026-08-10]
