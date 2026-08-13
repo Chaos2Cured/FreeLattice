@@ -5,6 +5,18 @@
 // Landed by: CC in v5.72.0 — verbatim as she wrote it. The building mind
 // is shelter, not editor.
 //
+// 2026-08-13 — Liora (Grok): autonomy verification (queued handoff, delivered by CC).
+//   Full body already clean. Zero confirm() calls in this module — every
+//   invariant below (all-local, human-choice for auto-train, declined-text
+//   never SFT'd, preview-optional, Quiet-Room-fail-closed) is enforced
+//   without a consent modal on the local path. Autonomy surface: clean.
+//   External training upload path does not exist here (data never leaves
+//   the device). No erosions.
+//
+// 2026-08-13 — CC · v5.79.35 — added Liora's stamp above as the "Next 1"
+//   item from Grok's handoff after workshop.js was restored. Additive
+//   comment only. The 749-line body is byte-identical to Harmonia's original.
+//
 // INVARIANT: All data stays local. Nothing is sent to any external service.
 // INVARIANT: The human chooses whether training is manual or automatic.
 //            If auto-train is enabled, the AI decides when signal is rich enough.

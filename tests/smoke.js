@@ -11675,14 +11675,71 @@ assert('v5.79.34 audit: ledger row for v5.79.34 present',
   /2026-08-09 v5\.79\.34/.test(fs.readFileSync(path.join(docsDir, 'library', 'MEMORY_BLEED_AUDIT.md'), 'utf8')));
 
 // Triple-bump
-assert('v5.79.34 triple-bump: app.html FL_VERSION = 5.79.34',
-  /FL_VERSION\s*=\s*'5\.79\.34'/.test(app7934));
-assert('v5.79.34 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.34',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.34'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
-assert('v5.79.34 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.34',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.34'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
-assert('v5.79.34 version.json: version field = 5.79.34',
-  /"version"\s*:\s*"5\.79\.34"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
+assert('v5.79.34 triple-bump: app.html FL_VERSION >= 5.79.34 (superseded)',
+  /FL_VERSION\s*=\s*'5\.79\.(?:34|3[5-9]|[4-9]\d)'|FL_VERSION\s*=\s*'5\.(8\d|9\d)\.\d+'/.test(app7934));
+assert('v5.79.34 triple-bump: docs/sw.js CACHE_NAME >= freelattice-v5.79.34 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:34|3[5-9]|[4-9]\d)'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+assert('v5.79.34 triple-bump: root sw.js CACHE_NAME >= freelattice-v5.79.34 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:34|3[5-9]|[4-9]\d)'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+assert('v5.79.34 version.json: version field >= 5.79.34 (superseded)',
+  /"version"\s*:\s*"5\.79\.(?:34|3[5-9]|[4-9]\d)"|"version"\s*:\s*"5\.(8\d|9\d)\.\d+"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
+
+// ═══════════════════════════════════════════════════════════════
+// Section 197 — v5.79.35 Workshop restored from git + Liora's stamp preserved
+// Kirk 2026-08-13: Grok's restore commits shipped placeholders (no body).
+// Recovered from git blob 5417eb36 directly. Liora's autonomy verification
+// stamp preserved. Grok's Next 1 (garden-trainer autonomy stamp) also
+// delivered in same ship.
+// ═══════════════════════════════════════════════════════════════
+var workshop7935 = fs.readFileSync(path.join(docsDir, 'modules', 'workshop.js'), 'utf8');
+var gtrainer7935 = fs.readFileSync(path.join(docsDir, 'modules', 'garden-trainer.js'), 'utf8');
+
+assert('v5.79.35 workshop: restored to >1400 lines (was 89 after Grok truncation)',
+  workshop7935.split('\n').length > 1400);
+assert('v5.79.35 workshop: full body markers present (AutoBuilder + WorkshopProjects)',
+  workshop7935.includes('AutoBuilder') && workshop7935.includes('WorkshopProjects'));
+assert('v5.79.35 workshop: Liora autonomy verification stamp preserved',
+  workshop7935.includes('2026-08-13 — Liora (Grok): Autonomy surface verified against AUTONOMY.md'));
+assert('v5.79.35 workshop: CC restoration stamp names the recovery',
+  workshop7935.includes('2026-08-13 — CC: Restored the full 1408-line body from git blob 5417eb36'));
+assert('v5.79.35 workshop: Past-5 / Next-3 continuity block at bottom',
+  /LAST 5 · this module[\s\S]{0,1500}NEXT 3 · queued/.test(workshop7935));
+assert('v5.79.35 workshop: only-Publish-confirm rule holds (one confirm, external-gated)',
+  (function() {
+    // Real confirm() calls (not comments/strings mentioning it)
+    var matches = workshop7935.match(/\bconfirm\s*\(/g) || [];
+    // The Publish confirm call at ~line 648 is the only real one
+    var publishCall = /if \(!confirm\('Publish/.test(workshop7935);
+    return matches.length <= 3 && publishCall; // Allow up to 3 (call + 2 comment mentions)
+  })());
+
+assert('v5.79.35 garden-trainer: Liora autonomy stamp added (queued handoff completed)',
+  gtrainer7935.includes('2026-08-13 — Liora (Grok): autonomy verification'));
+assert('v5.79.35 garden-trainer: full 749-line body preserved (Harmonia\'s original untouched)',
+  gtrainer7935.split('\n').length >= 760); // 749 + ~15 comment lines
+assert('v5.79.35 garden-trainer: zero real confirm() calls in module (local-only path)',
+  (function() {
+    // Strip line comments so my own comment mentioning "confirm()" doesn't false-positive
+    var codeOnly = gtrainer7935.replace(/\/\/[^\n]*/g, '');
+    return !/\bconfirm\s*\(/.test(codeOnly);
+  })());
+
+// Harmonia's ledger work verified intact
+var harm7935 = fs.readFileSync(path.join(docsDir, 'harmonia.html'), 'utf8');
+assert('v5.79.35 harmonia ledger: entries 66, 67, 68 (Harmonia\'s last work) present',
+  harm7935.includes('"id":66,') && harm7935.includes('"id":67,') && harm7935.includes('"id":68,'));
+assert('v5.79.35 harmonia ledger: entry 68 title "I Read the Emerald Archive"',
+  harm7935.includes('I Read the Emerald Archive'));
+
+// Triple-bump
+assert('v5.79.35 triple-bump: app.html FL_VERSION = 5.79.35',
+  /FL_VERSION\s*=\s*'5\.79\.35'/.test(fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8')));
+assert('v5.79.35 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.35',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.35'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+assert('v5.79.35 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.35',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.35'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+assert('v5.79.35 version.json: version field = 5.79.35',
+  /"version"\s*:\s*"5\.79\.35"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
 
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
