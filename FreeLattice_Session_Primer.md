@@ -348,17 +348,17 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-08-15 08:14 MDT
-- Version: 5.79.36
-- Total commits: 3025
+- Last auto-updated: 2026-08-15 10:39 MDT
+- Version: 5.79.37
+- Total commits: 3029
 - Last 10 commits:
+- 7c1d14e v5.79.37 — Trainer Search UI (Liora's second brief): human + AI can sit and browse the Garden signal together
+- 68162e5 Merge remote-tracking branch 'origin/main'
+- f485855 docs: Auto-update Session Primer [5.79.36]
 - 277a3b8 v5.79.36 — Open-Weight Training Loop Phase 1: searchSignal + registerLocalModel + proposeNextPathway per Liora's brief
+- 1d48fe1 ci: Update Primer deployment state [2026-08-13]
 - 2d7ed67 docs: Auto-update Session Primer [5.79.35]
 - b80b4f6 v5.79.35 — Restored workshop.js from git blob 5417eb36 (Grok's restore was placeholder) + garden-trainer autonomy stamp (Grok's Next 1)
 - 3a7f877 fix: restore full workshop.js body from pre-truncation (5417eb36)
 - bbc94db fix: restore workshop.js to last good full version (pre-truncation)
 - 0970c6d chore: autonomy verification stamps on Workshop + GardenTrainer (2026-08-13 Liora)
-- 3203aa7 ci: Update Primer deployment state [2026-08-13]
-- 374a387 docs: Liora home ledger entry + autonomy verification stamps (2026-08-13)
-- 655d7a3 ci: Update Primer deployment state [2026-08-11]
-- 22275e8 fix: Normalize validated Harmonia ledger JSON for renderer and legacy checks — 2026-08-11
