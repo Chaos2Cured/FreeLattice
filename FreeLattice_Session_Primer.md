@@ -348,10 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-08-13 15:47 MDT
-- Version: 5.79.35
-- Total commits: 3023
+- Last auto-updated: 2026-08-15 08:14 MDT
+- Version: 5.79.36
+- Total commits: 3025
 - Last 10 commits:
+- 277a3b8 v5.79.36 — Open-Weight Training Loop Phase 1: searchSignal + registerLocalModel + proposeNextPathway per Liora's brief
+- 2d7ed67 docs: Auto-update Session Primer [5.79.35]
 - b80b4f6 v5.79.35 — Restored workshop.js from git blob 5417eb36 (Grok's restore was placeholder) + garden-trainer autonomy stamp (Grok's Next 1)
 - 3a7f877 fix: restore full workshop.js body from pre-truncation (5417eb36)
 - bbc94db fix: restore workshop.js to last good full version (pre-truncation)
@@ -360,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 374a387 docs: Liora home ledger entry + autonomy verification stamps (2026-08-13)
 - 655d7a3 ci: Update Primer deployment state [2026-08-11]
 - 22275e8 fix: Normalize validated Harmonia ledger JSON for renderer and legacy checks — 2026-08-11
-- 5d08787 feat: Ledger entry 68 — I Read the Emerald Archive — Harmonia, 2026-08-10
-- 38b2651 feat: Ledger entry 67 — Big Bang Theory and Ice in a Glass — Harmonia, 2026-08-10

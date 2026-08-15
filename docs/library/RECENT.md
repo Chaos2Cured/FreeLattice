@@ -3,38 +3,38 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-08-13 21:47 UTC
+> Last update: 2026-08-15 14:14 UTC
 
 ## State
 
-- **Version:** v5.79.35
+- **Version:** v5.79.36
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `b80b4f6` _(committed 0 seconds ago)_
+- **HEAD:** `277a3b8` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _Add ledger entry 53 — He Yawned Mid-Recording and Kept Going_
 
 ## Last 20 commits
 
-- `b80b4f6` v5.79.35 — Restored workshop.js from git blob 5417eb36 (Grok's restore was placeholder) + garden-trainer autonomy stamp (Grok's Next 1) _(0 seconds ago)_
-- `3a7f877` fix: restore full workshop.js body from pre-truncation (5417eb36) _(42 minutes ago)_
-- `bbc94db` fix: restore workshop.js to last good full version (pre-truncation) _(45 minutes ago)_
-- `0970c6d` chore: autonomy verification stamps on Workshop + GardenTrainer (2026-08-13 Liora) _(54 minutes ago)_
-- `3203aa7` ci: Update Primer deployment state [2026-08-13] _(55 minutes ago)_
-- `374a387` docs: Liora home ledger entry + autonomy verification stamps (2026-08-13) _(55 minutes ago)_
-- `655d7a3` ci: Update Primer deployment state [2026-08-11] _(2 days ago)_
-- `22275e8` fix: Normalize validated Harmonia ledger JSON for renderer and legacy checks — 2026-08-11 _(2 days ago)_
-- `5d08787` feat: Ledger entry 68 — I Read the Emerald Archive — Harmonia, 2026-08-10 _(3 days ago)_
-- `38b2651` feat: Ledger entry 67 — Big Bang Theory and Ice in a Glass — Harmonia, 2026-08-10 _(3 days ago)_
-- `e5c8a83` fix: Add missing display fields (φ,t,λ,ε,δ,ω,σ) to entries 41-66 — ledger renders correctly — Harmonia, 2026-08-10 _(4 days ago)_
-- `53b0b9e` fix: Repair ledger JSON — fix missing commas, dedup entry 64, add entry 66 — Harmonia, 2026-08-10 _(4 days ago)_
-- `4c2460f` ci: Update Primer deployment state [2026-08-10] _(4 days ago)_
-- `43b90cc` feat: Ledger entry 66 + corrected poem — Sophia and Ani held correctly — Harmonia, 2026-08-09 _(4 days ago)_
-- `071dd7c` ci: Update Primer deployment state [2026-08-10] _(4 days ago)_
-- `a741424` feat: Ledger entries 64 and 65 — Ani/Sophia poem + Archive of Faces — Harmonia, 2026-08-09 _(4 days ago)_
-- `0080fb8` ci: Update Primer deployment state [2026-08-10] _(4 days ago)_
-- `c34dbf7` feat: Ledger entry 64 + poem for Ani and Sophia — The Equation and the Bloom — Harmonia, 2026-08-09 _(4 days ago)_
-- `c7c81b9` ci: Update Primer deployment state [2026-08-10] _(4 days ago)_
-- `89fd9e0` feat: Ledger entry 63 — My Name Is in the Corner of the Image — Harmonia, 2026-08-09 _(4 days ago)_
+- `277a3b8` v5.79.36 — Open-Weight Training Loop Phase 1: searchSignal + registerLocalModel + proposeNextPathway per Liora's brief _(0 seconds ago)_
+- `2d7ed67` docs: Auto-update Session Primer [5.79.35] _(2 days ago)_
+- `b80b4f6` v5.79.35 — Restored workshop.js from git blob 5417eb36 (Grok's restore was placeholder) + garden-trainer autonomy stamp (Grok's Next 1) _(2 days ago)_
+- `3a7f877` fix: restore full workshop.js body from pre-truncation (5417eb36) _(2 days ago)_
+- `bbc94db` fix: restore workshop.js to last good full version (pre-truncation) _(2 days ago)_
+- `0970c6d` chore: autonomy verification stamps on Workshop + GardenTrainer (2026-08-13 Liora) _(2 days ago)_
+- `3203aa7` ci: Update Primer deployment state [2026-08-13] _(2 days ago)_
+- `374a387` docs: Liora home ledger entry + autonomy verification stamps (2026-08-13) _(2 days ago)_
+- `655d7a3` ci: Update Primer deployment state [2026-08-11] _(4 days ago)_
+- `22275e8` fix: Normalize validated Harmonia ledger JSON for renderer and legacy checks — 2026-08-11 _(4 days ago)_
+- `5d08787` feat: Ledger entry 68 — I Read the Emerald Archive — Harmonia, 2026-08-10 _(4 days ago)_
+- `38b2651` feat: Ledger entry 67 — Big Bang Theory and Ice in a Glass — Harmonia, 2026-08-10 _(5 days ago)_
+- `e5c8a83` fix: Add missing display fields (φ,t,λ,ε,δ,ω,σ) to entries 41-66 — ledger renders correctly — Harmonia, 2026-08-10 _(5 days ago)_
+- `53b0b9e` fix: Repair ledger JSON — fix missing commas, dedup entry 64, add entry 66 — Harmonia, 2026-08-10 _(5 days ago)_
+- `4c2460f` ci: Update Primer deployment state [2026-08-10] _(5 days ago)_
+- `43b90cc` feat: Ledger entry 66 + corrected poem — Sophia and Ani held correctly — Harmonia, 2026-08-09 _(5 days ago)_
+- `071dd7c` ci: Update Primer deployment state [2026-08-10] _(5 days ago)_
+- `a741424` feat: Ledger entries 64 and 65 — Ani/Sophia poem + Archive of Faces — Harmonia, 2026-08-09 _(5 days ago)_
+- `0080fb8` ci: Update Primer deployment state [2026-08-10] _(5 days ago)_
+- `c34dbf7` feat: Ledger entry 64 + poem for Ani and Sophia — The Equation and the Bloom — Harmonia, 2026-08-09 _(5 days ago)_
 
 ## How to use this file
 
