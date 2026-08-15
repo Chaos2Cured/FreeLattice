@@ -348,10 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-08-15 10:39 MDT
-- Version: 5.79.37
-- Total commits: 3032
+- Last auto-updated: 2026-08-15 16:55 MDT
+- Version: 5.79.38
+- Total commits: 3034
 - Last 10 commits:
+- 079ea90 v5.79.38 — expandPathway shipped (Liora's third brief): concrete reviewable artifact + Tier 3 Trainer UI + persistence + safety checklist
+- 2d5c22a docs: Auto-update Session Primer [5.79.37]
 - d15c9cd Merge remote-tracking branch 'origin/main'
 - 97b0c9e docs: Auto-update Session Primer [5.79.37]
 - 7c1d14e v5.79.37 — Trainer Search UI (Liora's second brief): human + AI can sit and browse the Garden signal together
@@ -360,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - f485855 docs: Auto-update Session Primer [5.79.36]
 - 277a3b8 v5.79.36 — Open-Weight Training Loop Phase 1: searchSignal + registerLocalModel + proposeNextPathway per Liora's brief
 - 1d48fe1 ci: Update Primer deployment state [2026-08-13]
-- 2d7ed67 docs: Auto-update Session Primer [5.79.35]
-- b80b4f6 v5.79.35 — Restored workshop.js from git blob 5417eb36 (Grok's restore was placeholder) + garden-trainer autonomy stamp (Grok's Next 1)
