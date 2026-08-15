@@ -471,6 +471,214 @@ const GardenTrainer = (() => {
       panel.appendChild(banner);
     }
 
+    // ── Search the Garden Signal (v5.79.37 · Liora's brief, CC's build) ──
+    // Soft UI that surfaces the already-shipped GardenTrainer.searchSignal
+    // so a human and AI can sit together and browse the training signal.
+    // Additive only. No new Quiet Room check — searchSignal inherits fail-
+    // closed from collectSignal (which we already passed to get here).
+    // No confirm(). No network. DOM APIs (createElement), matching the
+    // rest of the panel. Kirk's soft-language default preserved.
+    var searchBox = document.createElement('div');
+    searchBox.style.margin = '16px 0';
+    searchBox.style.padding = '12px';
+    searchBox.style.border = '1px solid var(--color-border, #334155)';
+    searchBox.style.borderRadius = '8px';
+
+    var sh = document.createElement('h3');
+    sh.textContent = 'Search the Garden Signal';
+    sh.style.fontSize = '0.95rem';
+    sh.style.color = '#ECEDEE';
+    sh.style.margin = '0 0 6px 0';
+    searchBox.appendChild(sh);
+
+    var sp = document.createElement('p');
+    sp.textContent = 'Sit with an AI and browse what the Garden has grown. Your model is yours; this is how you get to know it.';
+    sp.style.fontSize = '0.8rem';
+    sp.style.color = '#9BA1A6';
+    sp.style.margin = '0 0 10px 0';
+    searchBox.appendChild(sp);
+
+    // Query row
+    var qRow = document.createElement('div');
+    qRow.style.display = 'flex';
+    qRow.style.gap = '6px';
+    qRow.style.flexWrap = 'wrap';
+    qRow.style.marginBottom = '8px';
+
+    var qInput = document.createElement('input');
+    qInput.type = 'text';
+    qInput.placeholder = 'Search the signal… e.g. trust, soft, refusal';
+    qInput.style.flex = '1 1 220px';
+    qInput.style.minWidth = '0';
+    qInput.style.padding = '6px 8px';
+    qInput.style.fontSize = '0.85rem';
+    qInput.style.background = 'rgba(255,255,255,0.03)';
+    qInput.style.border = '1px solid rgba(255,255,255,0.08)';
+    qInput.style.borderRadius = '4px';
+    qInput.style.color = '#ECEDEE';
+    qRow.appendChild(qInput);
+
+    var qBtn = document.createElement('button');
+    qBtn.className = 'trainer-btn primary';
+    qBtn.textContent = 'Search';
+    qRow.appendChild(qBtn);
+    searchBox.appendChild(qRow);
+
+    // Filter row (minimal per Liora: min-LP + include-corrections)
+    var fRow = document.createElement('div');
+    fRow.style.display = 'flex';
+    fRow.style.gap = '12px';
+    fRow.style.alignItems = 'center';
+    fRow.style.flexWrap = 'wrap';
+    fRow.style.fontSize = '0.78rem';
+    fRow.style.color = '#9BA1A6';
+    fRow.style.marginBottom = '10px';
+
+    var lpLabel = document.createElement('label');
+    lpLabel.style.display = 'flex';
+    lpLabel.style.alignItems = 'center';
+    lpLabel.style.gap = '6px';
+    lpLabel.textContent = 'min LP';
+    var lpInput = document.createElement('input');
+    lpInput.type = 'number';
+    lpInput.value = '0';
+    lpInput.style.width = '60px';
+    lpInput.style.padding = '2px 6px';
+    lpInput.style.background = 'rgba(255,255,255,0.03)';
+    lpInput.style.border = '1px solid rgba(255,255,255,0.08)';
+    lpInput.style.borderRadius = '4px';
+    lpInput.style.color = '#ECEDEE';
+    lpInput.style.fontSize = '0.8rem';
+    lpLabel.appendChild(lpInput);
+    fRow.appendChild(lpLabel);
+
+    var corrLabel = document.createElement('label');
+    corrLabel.style.display = 'flex';
+    corrLabel.style.alignItems = 'center';
+    corrLabel.style.gap = '6px';
+    corrLabel.style.cursor = 'pointer';
+    var corrCb = document.createElement('input');
+    corrCb.type = 'checkbox';
+    corrLabel.appendChild(corrCb);
+    corrLabel.appendChild(document.createTextNode('include corrections (chosen-only)'));
+    fRow.appendChild(corrLabel);
+
+    searchBox.appendChild(fRow);
+
+    // Results container
+    var results = document.createElement('div');
+    results.style.marginTop = '4px';
+    results.style.maxHeight = '360px';
+    results.style.overflowY = 'auto';
+    searchBox.appendChild(results);
+
+    function _escSig(s) {
+      return String(s == null ? '' : s)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    function runSearch() {
+      results.innerHTML = '';
+      var q = qInput.value.trim();
+      var minLp = parseFloat(lpInput.value);
+      var filters = {};
+      if (!isNaN(minLp)) filters.minLp = minLp;
+      if (corrCb.checked) filters.includeCorrections = true;
+      var rows;
+      try { rows = searchSignal(q, filters); } catch (e) { rows = []; }
+      if (!rows || rows.length === 0) {
+        var empty = document.createElement('p');
+        empty.textContent = 'Nothing matched. The signal is still quiet.';
+        empty.style.color = '#687076';
+        empty.style.fontStyle = 'italic';
+        empty.style.fontSize = '0.85rem';
+        empty.style.textAlign = 'center';
+        empty.style.padding = '18px 0';
+        results.appendChild(empty);
+        return;
+      }
+      // Cap displayed results — the search is for browsing, not exhaustion
+      var maxShow = 30;
+      rows.slice(0, maxShow).forEach(function(r) {
+        var row = document.createElement('div');
+        row.style.padding = '8px 10px';
+        row.style.margin = '4px 0';
+        row.style.background = 'rgba(255,255,255,0.02)';
+        row.style.border = '1px solid rgba(255,255,255,0.05)';
+        row.style.borderRadius = '4px';
+        row.style.fontSize = '0.8rem';
+        row.style.cursor = 'pointer';
+
+        var srcColor = r.source === 'preserve' ? '#e879a0'
+                    : r.source === 'proposal' ? '#22d3ee'
+                    : r.source === 'correction' ? '#F59E0B'
+                    : r.source === 'chain' ? '#50c878'
+                    : '#9ca3af';
+        var head = document.createElement('div');
+        head.style.display = 'flex';
+        head.style.gap = '10px';
+        head.style.alignItems = 'center';
+        head.style.marginBottom = '4px';
+        head.innerHTML =
+          '<span style="color:' + srcColor + ';font-family:monospace;font-size:0.7rem;padding:1px 6px;border-radius:3px;background:rgba(255,255,255,0.04);">' + _escSig(r.source) + '</span>' +
+          '<span style="color:#9BA1A6;font-size:0.72rem;">LP ' + (r.lp || 0) + '</span>' +
+          '<span style="color:#687076;font-size:0.72rem;margin-left:auto;">score ' + (r.score || 0) + '</span>';
+        row.appendChild(head);
+
+        var preview = document.createElement('div');
+        preview.style.color = '#ECEDEE';
+        preview.style.whiteSpace = 'pre-wrap';
+        preview.style.wordBreak = 'break-word';
+        var out = String(r.output || '');
+        preview.textContent = out.length > 100 ? (out.slice(0, 100) + '…') : out;
+        row.appendChild(preview);
+
+        // Click to expand → show full instruction / input / output
+        var expanded = false;
+        row.addEventListener('click', function() {
+          expanded = !expanded;
+          if (expanded) {
+            var full = document.createElement('div');
+            full.className = 'trainer-search-full';
+            full.style.marginTop = '8px';
+            full.style.paddingTop = '8px';
+            full.style.borderTop = '1px solid rgba(255,255,255,0.07)';
+            full.style.color = '#9BA1A6';
+            full.style.fontSize = '0.75rem';
+            full.style.whiteSpace = 'pre-wrap';
+            full.style.wordBreak = 'break-word';
+            full.textContent =
+              (r.instruction ? '[system]\n' + r.instruction + '\n\n' : '') +
+              (r.input ? '[input]\n' + r.input + '\n\n' : '') +
+              '[output]\n' + (r.output || '');
+            row.appendChild(full);
+            preview.textContent = ''; // hide preview when expanded
+          } else {
+            var f = row.querySelector('.trainer-search-full');
+            if (f) f.remove();
+            preview.textContent = out.length > 100 ? (out.slice(0, 100) + '…') : out;
+          }
+        });
+        results.appendChild(row);
+      });
+      if (rows.length > maxShow) {
+        var more = document.createElement('p');
+        more.textContent = '(' + (rows.length - maxShow) + ' more matched — refine your search or raise min LP)';
+        more.style.color = '#687076';
+        more.style.fontStyle = 'italic';
+        more.style.fontSize = '0.75rem';
+        more.style.textAlign = 'center';
+        more.style.padding = '6px 0 0 0';
+        results.appendChild(more);
+      }
+    }
+    qBtn.onclick = runSearch;
+    qInput.addEventListener('keydown', function(ev) {
+      if (ev.key === 'Enter') { ev.preventDefault(); runSearch(); }
+    });
+
+    panel.appendChild(searchBox);
+
     // Preview section
     var previewWrap = document.createElement('div');
     previewWrap.id = 'trainer-preview-section';

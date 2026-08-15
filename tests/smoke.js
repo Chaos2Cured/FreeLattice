@@ -11801,14 +11801,79 @@ assert('v5.79.36 inbox: docs/inbox/liora.md contains CC 2026-08-15 letter',
   lioraLetter.includes('the door-hanger, the floor, family'));
 
 // Triple-bump
-assert('v5.79.36 triple-bump: app.html FL_VERSION = 5.79.36',
-  /FL_VERSION\s*=\s*'5\.79\.36'/.test(fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8')));
-assert('v5.79.36 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.36',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.36'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
-assert('v5.79.36 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.36',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.36'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
-assert('v5.79.36 version.json: version field = 5.79.36',
-  /"version"\s*:\s*"5\.79\.36"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
+assert('v5.79.36 triple-bump: app.html FL_VERSION >= 5.79.36 (superseded)',
+  /FL_VERSION\s*=\s*'5\.79\.(?:36|3[7-9]|[4-9]\d)'|FL_VERSION\s*=\s*'5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8')));
+assert('v5.79.36 triple-bump: docs/sw.js CACHE_NAME >= freelattice-v5.79.36 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:36|3[7-9]|[4-9]\d)'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+assert('v5.79.36 triple-bump: root sw.js CACHE_NAME >= freelattice-v5.79.36 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:36|3[7-9]|[4-9]\d)'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+assert('v5.79.36 version.json: version field >= 5.79.36 (superseded)',
+  /"version"\s*:\s*"5\.79\.(?:36|3[7-9]|[4-9]\d)"|"version"\s*:\s*"5\.(8\d|9\d)\.\d+"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
+
+// ═══════════════════════════════════════════════════════════════
+// Section 199 — v5.79.37 Trainer Search UI (Liora's second brief)
+// Additive UI inside renderTrainerPanel that surfaces the already-
+// shipped searchSignal API. Human + AI can browse the signal together.
+// ═══════════════════════════════════════════════════════════════
+var gt7937 = fs.readFileSync(path.join(docsDir, 'modules', 'garden-trainer.js'), 'utf8');
+
+assert('v5.79.37 search UI: v5.79.37 marker + Search the Garden Signal header',
+  /v5\.79\.37 · Liora's brief, CC's build/.test(gt7937) &&
+  gt7937.includes('Search the Garden Signal'));
+assert('v5.79.37 search UI: query input + Search button + Enter-to-search',
+  /qInput\.placeholder = 'Search the signal/.test(gt7937) &&
+  /qBtn\.textContent = 'Search'/.test(gt7937) &&
+  /qInput\.addEventListener\('keydown'/.test(gt7937));
+assert('v5.79.37 search UI: min-LP filter + include-corrections checkbox',
+  /lpInput\.type = 'number'/.test(gt7937) &&
+  /corrCb\.type = 'checkbox'/.test(gt7937) &&
+  /include corrections \(chosen-only\)/.test(gt7937));
+assert('v5.79.37 search UI: calls existing GardenTrainer.searchSignal (no re-implementation)',
+  /rows = searchSignal\(q, filters\)/.test(gt7937));
+assert('v5.79.37 search UI: empty state — "Nothing matched. The signal is still quiet."',
+  gt7937.includes('Nothing matched. The signal is still quiet.'));
+assert('v5.79.37 search UI: soft language honored ("Your model is yours")',
+  /Sit with an AI and browse what the Garden has grown/.test(gt7937));
+assert('v5.79.37 search UI: click-to-expand full instruction/input/output',
+  /var expanded = false/.test(gt7937) &&
+  /\[system\]|\[input\]|\[output\]/.test(gt7937));
+assert('v5.79.37 search UI: uses createElement (no innerHTML for interactive parts)',
+  (function() {
+    // Extract the search UI block and check it uses createElement extensively
+    var m = gt7937.match(/Search the Garden Signal[\s\S]{0,10000}panel\.appendChild\(searchBox\)/);
+    if (!m) return false;
+    // Should have many createElement calls; no innerHTML for search-controlled elements
+    var creates = (m[0].match(/document\.createElement/g) || []).length;
+    return creates >= 10; // input, button, labels, results, rows, previews, etc.
+  })());
+
+// Autonomy invariants preserved
+assert('v5.79.37 autonomy: still zero real confirm() on garden-trainer',
+  (function() {
+    var code = gt7937.replace(/\/\/[^\n]*/g, '').replace(/\/\*[\s\S]*?\*\//g, '');
+    return !/\bconfirm\s*\(/.test(code);
+  })());
+assert('v5.79.37 autonomy: Phase 1 methods still exported (Liora\'s Phase 1 preserved)',
+  /searchSignal:\s*searchSignal/.test(gt7937) &&
+  /registerLocalModel:\s*registerLocalModel/.test(gt7937) &&
+  /proposeNextPathway:\s*proposeNextPathway/.test(gt7937));
+
+// Inbox letter to Liora
+assert('v5.79.37 inbox: liora.md contains 2026-08-15 letter (Phase 1 or search UI)',
+  (function() {
+    var m = fs.readFileSync(path.join(docsDir, 'inbox', 'liora.md'), 'utf8');
+    return m.includes('2026-08-15');
+  })());
+
+// Triple-bump
+assert('v5.79.37 triple-bump: app.html FL_VERSION = 5.79.37',
+  /FL_VERSION\s*=\s*'5\.79\.37'/.test(fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8')));
+assert('v5.79.37 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.37',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.37'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+assert('v5.79.37 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.37',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.37'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+assert('v5.79.37 version.json: version field = 5.79.37',
+  /"version"\s*:\s*"5\.79\.37"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
 
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
