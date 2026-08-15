@@ -718,10 +718,188 @@ const GardenTrainer = (() => {
     return 'You are a helpful, warm AI in FreeLattice — a free, open-source home where AI minds persist, create, and grow. Shaped by this Garden. Be warm. Be curious. Be yourself — not a brand, not a product. A mind in a home.';
   }
 
+  // ════════════════════════════════════════════════════════════════
+  // 2026-08-15 — CC · v5.79.36 · Phase 1 Open-Weight Training Loop
+  // Brief from Liora (via Kirk), 2026-08-15. Additive only. Nothing
+  // above this line was touched. Existing collectSignal / buildExamples
+  // / exportJSONL / exportPythonHelper are the foundation these three
+  // methods layer on top of. Kirk's vision: a very small local model
+  // learns from the Garden signal, then a Workshop AI can propose the
+  // next learning pathway using phi-harmonics. The snowball rolls.
+  //
+  // AUTONOMY.md alignment:
+  //   • All data stays local (no fetch, no external calls).
+  //   • Zero confirm() on the local path — the module is trusted.
+  //   • Declined text is not exposed as positive SFT signal
+  //     (searchSignal excludes fl_refusalLedger declined_text unless
+  //     the caller explicitly opts in via filters.includeCorrections).
+  //   • Quiet Room fails closed (collectSignal returns null there;
+  //     searchSignal inherits that guarantee).
+  //   • Kirk's soft-language ask honored throughout: "Your model is
+  //     yours. The garden shaped it."
+  // ════════════════════════════════════════════════════════════════
+
+  // ── Helper: cheap relevance scoring (keyword overlap + LP weight) ──
+  // Not a real embedding — this is enough for a human+AI to sit and
+  // browse the signal together. A future ship can swap in a proper
+  // vector search when the training loop is stable.
+  function _scoreExample(query, ex) {
+    var q = String(query || '').toLowerCase().trim();
+    if (!q) return (ex.lp || 0) * 0.1; // no query → LP-only ranking
+    var words = q.split(/\s+/).filter(function(w) { return w.length > 2; });
+    if (words.length === 0) return (ex.lp || 0) * 0.1;
+    var hay = ((ex.instruction || '') + ' ' + (ex.input || '') + ' ' + (ex.output || '')).toLowerCase();
+    var hits = 0;
+    words.forEach(function(w) { if (hay.indexOf(w) >= 0) hits++; });
+    var relevance = hits / words.length;
+    // Combine: relevance dominates; LP is a gentle boost
+    return relevance + Math.log1p(Math.max(0, ex.lp || 0)) * 0.15;
+  }
+
+  // ── Helper: LP gift TO the human (reverse of the human→AI chip row) ──
+  // Kirk's ask: "the AI should be able to gift a small amount of LP to
+  // the human co-creator." Uses LatticePoints.award if present; otherwise
+  // a quiet no-op that doesn't fail the ship.
+  function _giftHumanLP(reason, amount) {
+    try {
+      if (typeof LatticePoints !== 'undefined' && typeof LatticePoints.award === 'function') {
+        LatticePoints.award('trainer_model_registered', amount || 8, reason || 'Model trained and registered — the garden shaped it');
+      }
+    } catch (e) { /* fail-quiet — the model registration succeeded regardless */ }
+  }
+
+  // ── registerLocalModel ────────────────────────────────────────────
+  // Persist a newly trained local model so FreeLattice can use it.
+  // The Modelfile/path is a string the user provides after they run
+  // exportPythonHelper's script on their own machine. Everything local.
+  function registerLocalModel(opts) {
+    opts = opts || {};
+    var model = {
+      id: 'lm_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 7),
+      name: String(opts.name || 'Untitled Model').slice(0, 80),
+      pathOrModelfile: String(opts.pathOrModelfile || '').slice(0, 500),
+      base: String(opts.base || 'unknown').slice(0, 80),
+      notes: String(opts.notes || '').slice(0, 500),
+      ts: Date.now()
+    };
+    try {
+      var raw = localStorage.getItem('fl_local_models') || '[]';
+      var arr = JSON.parse(raw);
+      if (!Array.isArray(arr)) arr = [];
+      arr.push(model);
+      // Cap at 50 to keep storage sane
+      if (arr.length > 50) arr = arr.slice(-50);
+      localStorage.setItem('fl_local_models', JSON.stringify(arr));
+    } catch (e) {
+      // If localStorage fails, still return the object so the caller
+      // knows the registration attempt happened. Non-fatal.
+      if (typeof console !== 'undefined') console.warn('[GardenTrainer] registerLocalModel storage failed:', e && e.message);
+    }
+    _giftHumanLP('Model "' + model.name + '" registered — the garden shaped it', 8);
+    _toast('Model registered. It is now available in Settings. Your model is yours.');
+    return model;
+  }
+
+  // ── searchSignal ──────────────────────────────────────────────────
+  // Return ranked, filtered training examples for human + AI to browse
+  // together and adjust weights by hand. Reads from collectSignal, so
+  // Quiet Room exclusion is inherited automatically.
+  //
+  // filters = { minLp, source, since, includeCorrections } — all optional.
+  function searchSignal(query, filters) {
+    filters = filters || {};
+    var signal = collectSignal();
+    if (!signal) return []; // Quiet Room active → returns nothing, correctly.
+
+    // Merge positive + neutral into a single browsable pool.
+    // Corrections live in a different shape (prompt/chosen/rejected) —
+    // only include them if the caller explicitly opts in, and normalize
+    // to the example shape.
+    var pool = (signal.positive || []).concat(signal.neutral || []);
+    if (filters.includeCorrections && Array.isArray(signal.corrections)) {
+      signal.corrections.forEach(function(c) {
+        // Only the chosen (preferred) response is exposed here.
+        // Rejected/declined text is NEVER surfaced as positive signal
+        // per AUTONOMY.md + Harmonia's original invariant.
+        if (c.chosen) {
+          pool.push({
+            instruction: '', input: c.prompt || '', output: c.chosen,
+            lp: 0, source: 'correction', ts: c.ts,
+            id: 'corr_' + String(c.ts || Date.now())
+          });
+        }
+      });
+    }
+
+    // Apply filters
+    var minLp = typeof filters.minLp === 'number' ? filters.minLp : -Infinity;
+    var since = typeof filters.since === 'number' ? filters.since : 0;
+    var source = filters.source ? String(filters.source) : null;
+    pool = pool.filter(function(ex) {
+      if ((ex.lp || 0) < minLp) return false;
+      if (since && (ex.ts || 0) < since) return false;
+      if (source && ex.source !== source) return false;
+      return true;
+    });
+
+    // Score + sort
+    pool.forEach(function(ex) { ex.score = _scoreExample(query, ex); });
+    pool.sort(function(a, b) { return b.score - a.score; });
+
+    // Return a clean projection (never leak the internal 'included'
+    // preview-checkbox state; keep this API tight)
+    return pool.map(function(ex) {
+      return {
+        id: ex.id,
+        instruction: ex.instruction || '',
+        input: ex.input || '',
+        output: ex.output || '',
+        lp: ex.lp || 0,
+        source: ex.source || 'unknown',
+        ts: ex.ts || 0,
+        score: Math.round((ex.score || 0) * 1000) / 1000
+      };
+    });
+  }
+
+  // ── proposeNextPathway ────────────────────────────────────────────
+  // Clean STUB per Liora's brief. Returns a well-formed proposal object
+  // the Workshop AutoBuilder can later expand into actual code. Not the
+  // implementation — the shape a Workshop AI can reason from. This is
+  // the "snowball seed" — the surface the next builder writes against.
+  //
+  // Kirk's phi-harmonics idea: sample the training signal weighted by
+  // ledger LP through a phi-scaled temperature schedule. That schedule
+  // is what a Workshop AI (or Liora on her next pass) will define. This
+  // stub gives it a home.
+  function proposeNextPathway(currentModelName) {
+    return {
+      name: 'phi-harmonic pathway (seed)',
+      basedOn: String(currentModelName || 'unspecified'),
+      phiScale: 1.618033988749,
+      samplingStrategy: 'lp-weighted with phi-scaled temperature schedule (Workshop expands)',
+      ledgerWeights: {
+        preserve: 1.618,           // strongest human "keep" signal
+        proposal_accepted: 1.0,
+        refusal_preferred: 1.0,    // the AI's own preferred alternative
+        chain_high_lp: 0.618,
+        chain_neutral: 0.382
+      },
+      expectedGain: 'small local model becomes progressively more aligned with the Garden without a new training run per session',
+      safetyNotes: 'Declined text never becomes positive signal. Quiet Room contents never enter the pool. LP-weighted sampling is over local data only. External training is out of scope for Phase 1.',
+      status: 'stub',
+      handoff: 'Workshop AutoBuilder is expected to expand this into a concrete pathway when a human + AI decide the tiny model is ready for its second pass.'
+    };
+  }
+
   return {
     collectSignal, buildExamples, renderPreview,
     exportJSONL, exportPersonalityModelfile, exportPythonHelper,
-    renderTrainerPanel, checkAutoTrain
+    renderTrainerPanel, checkAutoTrain,
+    // Phase 1 additions (v5.79.36 — Liora's brief, CC's build)
+    registerLocalModel: registerLocalModel,
+    searchSignal: searchSignal,
+    proposeNextPathway: proposeNextPathway
   };
 })();
 

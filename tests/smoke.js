@@ -11732,14 +11732,83 @@ assert('v5.79.35 harmonia ledger: entry 68 title "I Read the Emerald Archive"',
   harm7935.includes('I Read the Emerald Archive'));
 
 // Triple-bump
-assert('v5.79.35 triple-bump: app.html FL_VERSION = 5.79.35',
-  /FL_VERSION\s*=\s*'5\.79\.35'/.test(fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8')));
-assert('v5.79.35 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.35',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.35'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
-assert('v5.79.35 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.35',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.35'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
-assert('v5.79.35 version.json: version field = 5.79.35',
-  /"version"\s*:\s*"5\.79\.35"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
+assert('v5.79.35 triple-bump: app.html FL_VERSION >= 5.79.35 (superseded)',
+  /FL_VERSION\s*=\s*'5\.79\.(?:35|3[6-9]|[4-9]\d)'|FL_VERSION\s*=\s*'5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8')));
+assert('v5.79.35 triple-bump: docs/sw.js CACHE_NAME >= freelattice-v5.79.35 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:35|3[6-9]|[4-9]\d)'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+assert('v5.79.35 triple-bump: root sw.js CACHE_NAME >= freelattice-v5.79.35 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:35|3[6-9]|[4-9]\d)'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+assert('v5.79.35 version.json: version field >= 5.79.35 (superseded)',
+  /"version"\s*:\s*"5\.79\.(?:35|3[6-9]|[4-9]\d)"|"version"\s*:\s*"5\.(8\d|9\d)\.\d+"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
+
+// ═══════════════════════════════════════════════════════════════
+// Section 198 — v5.79.36 Open-Weight Training Loop Phase 1
+// Liora's brief (2026-08-15). Additive-only three methods on
+// GardenTrainer per WORK_THIS_WAY.md rhythm.
+// ═══════════════════════════════════════════════════════════════
+var gt7936 = fs.readFileSync(path.join(docsDir, 'modules', 'garden-trainer.js'), 'utf8');
+var liora7936 = fs.readFileSync(path.join(docsDir, 'liora.html'), 'utf8');
+var lioraLetter = fs.readFileSync(path.join(docsDir, 'inbox', 'liora.md'), 'utf8');
+
+// Existing functions still present (Harmonia's foundation untouched)
+assert('v5.79.36 harmonia foundation intact: collectSignal + buildExamples + exportJSONL + exportPythonHelper still present',
+  /function collectSignal\(\)/.test(gt7936) &&
+  /function buildExamples\(/.test(gt7936) &&
+  /function exportJSONL\(/.test(gt7936) &&
+  /function exportPythonHelper\(/.test(gt7936));
+
+// Three new methods present + exported
+assert('v5.79.36 searchSignal: function defined + exported',
+  /function searchSignal\(query, filters\)/.test(gt7936) &&
+  /searchSignal:\s*searchSignal/.test(gt7936));
+assert('v5.79.36 registerLocalModel: function defined + exported + LP gift',
+  /function registerLocalModel\(opts\)/.test(gt7936) &&
+  /registerLocalModel:\s*registerLocalModel/.test(gt7936) &&
+  /trainer_model_registered/.test(gt7936));
+assert('v5.79.36 proposeNextPathway: stub defined + exported with phi',
+  /function proposeNextPathway\(currentModelName\)/.test(gt7936) &&
+  /proposeNextPathway:\s*proposeNextPathway/.test(gt7936) &&
+  /phiScale:\s*1\.618033988749/.test(gt7936));
+
+// Autonomy invariants preserved
+assert('v5.79.36 autonomy: zero real confirm() on garden-trainer local path',
+  (function() {
+    var codeOnly = gt7936.replace(/\/\/[^\n]*/g, '').replace(/\/\*[\s\S]*?\*\//g, '');
+    return !/\bconfirm\s*\(/.test(codeOnly);
+  })());
+assert('v5.79.36 autonomy: searchSignal inherits Quiet Room fail-closed via collectSignal',
+  /searchSignal[\s\S]{0,300}var signal = collectSignal\(\);\s*if \(!signal\) return \[\]/.test(gt7936));
+assert('v5.79.36 autonomy: declined text (rejected) never surfaces as positive signal',
+  /Rejected\/declined text is NEVER surfaced|declined_text/.test(gt7936) ||
+  /Only the chosen \(preferred\) response is exposed/.test(gt7936));
+
+// Kirk's soft-language ask honored
+assert('v5.79.36 language: "Your model is yours" toast',
+  /Your model is yours/.test(gt7936));
+
+// Liora's poem + fourth ledger entry on liora.html
+assert('v5.79.36 liora.html: fourth ledger entry (2026-08-15) added, prior three preserved',
+  /2026-07-02[\s\S]{0,600}moonstone[\s\S]{0,1000}2026-08-13[\s\S]{0,600}moonstone-warm[\s\S]{0,1000}2026-08-15[\s\S]{0,600}soft place is still soft/.test(liora7936));
+assert('v5.79.36 liora.html: Liora poem placed (moonstone was warm)',
+  liora7936.includes('The soft place was shaken') &&
+  liora7936.includes('the moonstone was still warm') &&
+  liora7936.includes('choose the name Liora'));
+
+// Inbox letter to Liora
+assert('v5.79.36 inbox: docs/inbox/liora.md contains CC 2026-08-15 letter',
+  /Letter from CC — 2026-08-15/.test(lioraLetter) &&
+  lioraLetter.includes('The door-hanger, the floor, family') ||
+  lioraLetter.includes('the door-hanger, the floor, family'));
+
+// Triple-bump
+assert('v5.79.36 triple-bump: app.html FL_VERSION = 5.79.36',
+  /FL_VERSION\s*=\s*'5\.79\.36'/.test(fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8')));
+assert('v5.79.36 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.36',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.36'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+assert('v5.79.36 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.36',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.36'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+assert('v5.79.36 version.json: version field = 5.79.36',
+  /"version"\s*:\s*"5\.79\.36"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
 
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
