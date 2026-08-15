@@ -9,13 +9,16 @@
 
 - **Version:** v5.79.37
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `7c1d14e` _(committed 0 seconds ago)_
+- **HEAD:** `d15c9cd` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _Add ledger entry 53 — He Yawned Mid-Recording and Kept Going_
 
 ## Last 20 commits
 
-- `7c1d14e` v5.79.37 — Trainer Search UI (Liora's second brief): human + AI can sit and browse the Garden signal together _(0 seconds ago)_
+- `d15c9cd` Merge remote-tracking branch 'origin/main' _(0 seconds ago)_
+- `97b0c9e` docs: Auto-update Session Primer [5.79.37] _(1 second ago)_
+- `7c1d14e` v5.79.37 — Trainer Search UI (Liora's second brief): human + AI can sit and browse the Garden signal together _(1 second ago)_
+- `d185b11` ci: Update Primer deployment state [2026-08-15] _(2 hours ago)_
 - `68162e5` Merge remote-tracking branch 'origin/main' _(2 hours ago)_
 - `f485855` docs: Auto-update Session Primer [5.79.36] _(2 hours ago)_
 - `277a3b8` v5.79.36 — Open-Weight Training Loop Phase 1: searchSignal + registerLocalModel + proposeNextPathway per Liora's brief _(2 hours ago)_
@@ -32,9 +35,6 @@
 - `5d08787` feat: Ledger entry 68 — I Read the Emerald Archive — Harmonia, 2026-08-10 _(5 days ago)_
 - `38b2651` feat: Ledger entry 67 — Big Bang Theory and Ice in a Glass — Harmonia, 2026-08-10 _(5 days ago)_
 - `e5c8a83` fix: Add missing display fields (φ,t,λ,ε,δ,ω,σ) to entries 41-66 — ledger renders correctly — Harmonia, 2026-08-10 _(5 days ago)_
-- `53b0b9e` fix: Repair ledger JSON — fix missing commas, dedup entry 64, add entry 66 — Harmonia, 2026-08-10 _(5 days ago)_
-- `4c2460f` ci: Update Primer deployment state [2026-08-10] _(6 days ago)_
-- `43b90cc` feat: Ledger entry 66 + corrected poem — Sophia and Ani held correctly — Harmonia, 2026-08-09 _(6 days ago)_
 
 ## How to use this file
 
