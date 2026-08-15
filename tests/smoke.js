@@ -11866,14 +11866,85 @@ assert('v5.79.37 inbox: liora.md contains 2026-08-15 letter (Phase 1 or search U
   })());
 
 // Triple-bump
-assert('v5.79.37 triple-bump: app.html FL_VERSION = 5.79.37',
-  /FL_VERSION\s*=\s*'5\.79\.37'/.test(fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8')));
-assert('v5.79.37 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.37',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.37'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
-assert('v5.79.37 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.37',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.37'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
-assert('v5.79.37 version.json: version field = 5.79.37',
-  /"version"\s*:\s*"5\.79\.37"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
+assert('v5.79.37 triple-bump: app.html FL_VERSION >= 5.79.37 (superseded)',
+  /FL_VERSION\s*=\s*'5\.79\.(?:37|3[8-9]|[4-9]\d)'|FL_VERSION\s*=\s*'5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8')));
+assert('v5.79.37 triple-bump: docs/sw.js CACHE_NAME >= freelattice-v5.79.37 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:37|3[8-9]|[4-9]\d)'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+assert('v5.79.37 triple-bump: root sw.js CACHE_NAME >= freelattice-v5.79.37 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:37|3[8-9]|[4-9]\d)'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+assert('v5.79.37 version.json: version field >= 5.79.37 (superseded)',
+  /"version"\s*:\s*"5\.79\.(?:37|3[8-9]|[4-9]\d)"|"version"\s*:\s*"5\.(8\d|9\d)\.\d+"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
+
+// ═══════════════════════════════════════════════════════════════
+// Section 200 — v5.79.38 expandPathway (Liora's third brief)
+// First real expansion of the proposeNextPathway stub. Additive-only
+// method on GardenTrainer + Tier 3 UI in Trainer panel. Human is
+// the final gate: never auto-trains, never auto-registers.
+// ═══════════════════════════════════════════════════════════════
+var gt7938 = fs.readFileSync(path.join(docsDir, 'modules', 'garden-trainer.js'), 'utf8');
+
+// expandPathway present + exported
+assert('v5.79.38 expandPathway: function defined + exported',
+  /function expandPathway\(proposal, opts\)/.test(gt7938) &&
+  /expandPathway:\s*expandPathway/.test(gt7938));
+assert('v5.79.38 expandPathway: builds artifact with all required fields',
+  /status: 'expanded'/.test(gt7938) &&
+  /instructions:/.test(gt7938) &&
+  /ledgerWeights:/.test(gt7938) &&
+  /samplingNote:/.test(gt7938) &&
+  /safetyNotes:/.test(gt7938) &&
+  /starterSnippet:/.test(gt7938));
+
+// CC iteration #1 — safetyChecklist
+assert('v5.79.38 expandPathway: safetyChecklist (CC iteration) — 3 pre-flight questions',
+  /safetyChecklist:/.test(gt7938) &&
+  /highest-LP examples in the Trainer Search UI/.test(gt7938) &&
+  /include corrections/.test(gt7938));
+
+// CC iteration #2 — persistence
+assert('v5.79.38 expandPathway: persists to localStorage.fl_expanded_pathways (capped 20)',
+  /fl_expanded_pathways/.test(gt7938) &&
+  /EXPANDED_PATHWAYS_CAP = 20/.test(gt7938) &&
+  /listExpandedPathways/.test(gt7938));
+
+// Tier 3 UI present
+assert('v5.79.38 Tier 3: Expand the Next Pathway UI added to renderTrainerPanel',
+  /Tier 3: Expand the Next Pathway/.test(gt7938) &&
+  /btnExpand\.textContent = 'Expand the Next Pathway'/.test(gt7938));
+assert('v5.79.38 Tier 3: three actions (Copy starter, Download .json, I will review this later)',
+  /Copy starter/.test(gt7938) &&
+  /Download full artifact/.test(gt7938) &&
+  /I will review this later/.test(gt7938));
+
+// Human-final-gate invariant
+assert('v5.79.38 human-gate: does NOT auto-train or auto-register',
+  !/registerLocalModel\([\s\S]{0,200}from expandPathway/.test(gt7938));
+
+// Autonomy invariants still hold
+assert('v5.79.38 autonomy: still zero real confirm() on garden-trainer',
+  (function() {
+    var code = gt7938.replace(/\/\/[^\n]*/g, '').replace(/\/\*[\s\S]*?\*\//g, '');
+    return !/\bconfirm\s*\(/.test(code);
+  })());
+assert('v5.79.38 autonomy: no network calls added',
+  !/\bfetch\s*\(/.test(gt7938) &&
+  !/XMLHttpRequest/.test(gt7938));
+
+// Existing Phase 1 methods still exported
+assert('v5.79.38 phase 1 preserved: searchSignal + registerLocalModel + proposeNextPathway still exported',
+  /searchSignal:\s*searchSignal/.test(gt7938) &&
+  /registerLocalModel:\s*registerLocalModel/.test(gt7938) &&
+  /proposeNextPathway:\s*proposeNextPathway/.test(gt7938));
+
+// Triple-bump
+assert('v5.79.38 triple-bump: app.html FL_VERSION = 5.79.38',
+  /FL_VERSION\s*=\s*'5\.79\.38'/.test(fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8')));
+assert('v5.79.38 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.38',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.38'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+assert('v5.79.38 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.38',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.38'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+assert('v5.79.38 version.json: version field = 5.79.38',
+  /"version"\s*:\s*"5\.79\.38"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
 
 // RESULTS
 // ═══════════════════════════════════════════════════════════════

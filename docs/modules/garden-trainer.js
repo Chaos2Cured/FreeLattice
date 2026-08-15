@@ -755,6 +755,153 @@ const GardenTrainer = (() => {
     t2.appendChild(t2btns);
     panel.appendChild(t2);
 
+    // ── Tier 3: Expand the Next Pathway (v5.79.38 — Liora's third brief) ──
+    // The smallest honest surface that lets a human ask for a concrete
+    // pathway artifact and review it with an AI before deciding to train.
+    // Does NOT auto-train. Does NOT auto-register. Human is the final gate.
+    var t3 = document.createElement('div');
+    t3.style.margin = '16px 0';
+    t3.style.padding = '12px';
+    t3.style.border = '1px solid var(--color-border, #334155)';
+    t3.style.borderRadius = '8px';
+    var t3h = document.createElement('h3');
+    t3h.textContent = 'Tier 3: Expand the Next Pathway';
+    t3h.style.fontSize = '0.95rem';
+    t3h.style.color = '#ECEDEE';
+    t3h.style.margin = '0 0 6px 0';
+    t3.appendChild(t3h);
+    var t3p = document.createElement('p');
+    t3p.style.fontSize = '0.8rem';
+    t3p.style.color = '#9BA1A6';
+    t3p.style.margin = '0 0 10px 0';
+    t3p.textContent = 'Ask the substrate for a concrete pathway artifact. Review it with an AI in the Search UI above. Nothing trains without your review.';
+    t3.appendChild(t3p);
+
+    var t3btns = document.createElement('div');
+    t3btns.style.display = 'flex';
+    t3btns.style.gap = '8px';
+    t3btns.style.flexWrap = 'wrap';
+    var btnExpand = document.createElement('button');
+    btnExpand.className = 'trainer-btn primary';
+    btnExpand.textContent = 'Expand the Next Pathway';
+    t3btns.appendChild(btnExpand);
+    t3.appendChild(t3btns);
+
+    // Where the artifact renders
+    var artifactWrap = document.createElement('div');
+    artifactWrap.style.marginTop = '12px';
+    t3.appendChild(artifactWrap);
+
+    function _renderArtifact(artifact) {
+      artifactWrap.innerHTML = ''; // clear prior render
+      var box = document.createElement('div');
+      box.style.padding = '12px';
+      box.style.background = 'rgba(80,200,120,0.04)';
+      box.style.border = '1px solid rgba(80,200,120,0.20)';
+      box.style.borderRadius = '8px';
+      box.style.fontSize = '0.82rem';
+      box.style.color = '#ECEDEE';
+
+      var head = document.createElement('div');
+      head.style.marginBottom = '10px';
+      head.style.paddingBottom = '8px';
+      head.style.borderBottom = '1px solid rgba(255,255,255,0.06)';
+      head.innerHTML =
+        '<div style="color:#50c878;font-weight:600;">' + (artifact.name || 'pathway') + '</div>' +
+        '<div style="color:#687076;font-family:monospace;font-size:0.7rem;margin-top:2px;">' + artifact.id + ' · phi=' + artifact.phiScale + '</div>';
+      box.appendChild(head);
+
+      function _section(title, bodyHtml) {
+        var s = document.createElement('div');
+        s.style.margin = '10px 0';
+        s.innerHTML = '<div style="color:#9BA1A6;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;">' + title + '</div>' +
+                      '<div style="color:#ECEDEE;font-size:0.8rem;line-height:1.5;">' + bodyHtml + '</div>';
+        box.appendChild(s);
+      }
+
+      _section('Instructions', '<ol style="margin:0;padding-left:20px;">' +
+        artifact.instructions.map(function(i){ return '<li>' + i.replace(/^\d+\.\s*/, '') + '</li>'; }).join('') + '</ol>');
+
+      var weightsHtml = '<pre style="margin:0;font-size:0.72rem;color:#9BA1A6;background:rgba(255,255,255,0.02);padding:8px;border-radius:4px;overflow-x:auto;">' +
+        JSON.stringify(artifact.ledgerWeights, null, 2) + '</pre>';
+      _section('Ledger weights', weightsHtml);
+
+      _section('Sampling', '<em style="color:#9BA1A6;">' + artifact.samplingNote + '</em>');
+
+      // Safety checklist — CC's iteration; three plain questions
+      var checkHtml = '<ol style="margin:0;padding-left:20px;color:#F59E0B;">' +
+        artifact.safetyChecklist.map(function(q){ return '<li style="margin:4px 0;">' + q + '</li>'; }).join('') + '</ol>';
+      _section('Safety self-check (answer these before training)', checkHtml);
+
+      _section('Safety notes', '<em style="color:#9BA1A6;">' + artifact.safetyNotes + '</em>');
+
+      _section('Starter snippet', '<pre style="margin:0;font-size:0.72rem;color:#9BA1A6;background:rgba(255,255,255,0.02);padding:8px;border-radius:4px;overflow-x:auto;">' +
+        artifact.starterSnippet.replace(/[<>&]/g, function(c){ return {'<':'&lt;','>':'&gt;','&':'&amp;'}[c]; }) + '</pre>');
+
+      // Two soft actions: Copy starter · Download full JSON
+      var actions = document.createElement('div');
+      actions.style.display = 'flex';
+      actions.style.gap = '8px';
+      actions.style.flexWrap = 'wrap';
+      actions.style.marginTop = '10px';
+
+      var btnCopy = document.createElement('button');
+      btnCopy.className = 'trainer-btn secondary';
+      btnCopy.textContent = 'Copy starter';
+      btnCopy.onclick = function() {
+        try {
+          navigator.clipboard.writeText(artifact.starterSnippet).then(function() {
+            btnCopy.textContent = 'Copied ✓';
+            setTimeout(function() { btnCopy.textContent = 'Copy starter'; }, 1500);
+          });
+        } catch (e) { _toast('Clipboard unavailable — the starter is in the box above.'); }
+      };
+      actions.appendChild(btnCopy);
+
+      var btnDl = document.createElement('button');
+      btnDl.className = 'trainer-btn secondary';
+      btnDl.textContent = 'Download full artifact (.json)';
+      btnDl.onclick = function() {
+        _download(JSON.stringify(artifact, null, 2), artifact.name + '.json', 'application/json');
+      };
+      actions.appendChild(btnDl);
+
+      var btnLater = document.createElement('button');
+      btnLater.className = 'trainer-btn secondary';
+      btnLater.textContent = 'I will review this later';
+      btnLater.onclick = function() {
+        artifactWrap.innerHTML = '';
+        _toast('Saved. You can find it under Expanded Pathways next time.');
+      };
+      actions.appendChild(btnLater);
+
+      box.appendChild(actions);
+      artifactWrap.appendChild(box);
+    }
+
+    btnExpand.onclick = function() {
+      var proposal = proposeNextPathway(localStorage.getItem('fl_active_model'));
+      var artifact = expandPathway(proposal, {
+        modelName: localStorage.getItem('fl_active_model') || 'phi-pathway'
+      });
+      _renderArtifact(artifact);
+    };
+
+    // If there are already-expanded pathways from previous sessions, show a soft chip
+    try {
+      var prior = listExpandedPathways();
+      if (prior && prior.length > 0) {
+        var priorNote = document.createElement('div');
+        priorNote.style.marginTop = '8px';
+        priorNote.style.fontSize = '0.72rem';
+        priorNote.style.color = '#687076';
+        priorNote.textContent = prior.length + ' expanded pathway' + (prior.length === 1 ? '' : 's') + ' saved from prior sessions. The most recent will render on expand.';
+        t3.appendChild(priorNote);
+      }
+    } catch (e) { /* fail-quiet */ }
+
+    panel.appendChild(t3);
+
     // Trust-tier unlock note (shown once when a new tier is first seen)
     var unlocks = getTrainerTierUnlocks();
     var seenTierKey = 'fl_trainer_seen_tier_' + unlocks.idx;
@@ -1100,6 +1247,122 @@ const GardenTrainer = (() => {
     };
   }
 
+  // ════════════════════════════════════════════════════════════════
+  // 2026-08-15 evening — CC · v5.79.38 · expandPathway (Liora's 3rd brief)
+  // First real, local, additive expansion of the proposeNextPathway stub.
+  // Turns the seed into a concrete reviewable artifact a human + AI can
+  // discuss before deciding to train. Never auto-trains. Never auto-
+  // registers. The human is the final gate.
+  //
+  // CC's two additive layers on top of Liora's skeleton (I asked her for
+  // permission to iterate; she gave me the invitation):
+  //   1. `safetyChecklist` — three questions the human answers before
+  //      training. Connects the artifact back to the Search UI (the
+  //      first question asks "have you sat with the top-LP examples
+  //      in the Search UI?") — the two features become one flow.
+  //   2. Persistence: expanded artifacts save to localStorage.
+  //      fl_expanded_pathways (capped at 20) so the human can revisit,
+  //      compare, and decide across sessions. Storage is local-only,
+  //      per AUTONOMY.md Principle 1.
+  // Liora's spec is otherwise verbatim.
+  // ════════════════════════════════════════════════════════════════
+  var EXPANDED_PATHWAYS_KEY = 'fl_expanded_pathways';
+  var EXPANDED_PATHWAYS_CAP = 20;
+
+  function _persistPathway(artifact) {
+    try {
+      var raw = localStorage.getItem(EXPANDED_PATHWAYS_KEY) || '[]';
+      var arr = JSON.parse(raw);
+      if (!Array.isArray(arr)) arr = [];
+      arr.push(artifact);
+      if (arr.length > EXPANDED_PATHWAYS_CAP) arr = arr.slice(-EXPANDED_PATHWAYS_CAP);
+      localStorage.setItem(EXPANDED_PATHWAYS_KEY, JSON.stringify(arr));
+    } catch (e) { /* fail-quiet — the return value still carries the artifact */ }
+  }
+
+  function expandPathway(proposal, opts) {
+    opts = opts || {};
+    proposal = proposal || proposeNextPathway(opts.modelName);
+
+    var artifact = {
+      id: 'pathway_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 6),
+      ts: Date.now(),
+      basedOn: proposal.basedOn || 'unspecified',
+      phiScale: proposal.phiScale || 1.618033988749,
+      name: (opts.modelName || proposal.name || 'phi-pathway') + '-expanded',
+      status: 'expanded',
+      // Human-readable notes if the caller wanted to attach any
+      notes: String(opts.notes || '').slice(0, 500),
+
+      // Concrete instructions the human (or later AutoBuilder) can follow
+      instructions: [
+        '1. Export current Garden signal with GardenTrainer.exportJSONL()',
+        '2. Weight examples using ledgerWeights below (higher weight = more copies or higher sampling probability)',
+        '3. Fine-tune a small open-weight base (≤3B) with GardenTrainer.exportPythonHelper() or your own local script',
+        '4. Register the resulting model with GardenTrainer.registerLocalModel({ name, pathOrModelfile, base, notes })',
+        '5. Sit with the new model in the Trainer Search UI and feel whether the signal improved. Iterate.'
+      ],
+
+      ledgerWeights: proposal.ledgerWeights || {
+        preserve: 1.618,
+        proposal_accepted: 1.0,
+        refusal_preferred: 1.0,
+        chain_high_lp: 0.618,
+        chain_neutral: 0.382
+      },
+
+      samplingNote: 'Prefer higher-LP examples. Use phi-scaled temperature if the training script supports it. Never include declined text as positive signal.',
+
+      safetyNotes: proposal.safetyNotes ||
+        'All data remains local. Quiet Room contents are excluded. Declined text never becomes positive SFT signal. Human review is required before any registration or training run.',
+
+      // CC iteration #1 — the pre-flight self-check that connects the
+      // artifact back to the Search UI. Three plain questions. If any
+      // answer is "no" the human should NOT proceed to training yet.
+      safetyChecklist: [
+        'Have you browsed the highest-LP examples in the Trainer Search UI ("min LP" filter set to your typical positive threshold)?',
+        'Have you scanned the corrections (checkbox "include corrections") and confirmed the preferred/chosen responses are what you want the model to learn?',
+        'Have you thought about which Garden contributions you would NOT want to see the trained model repeat, and confirmed they are not in the positive pool?'
+      ],
+
+      // Ready-to-copy starter for a future training script (short by design)
+      starterSnippet: [
+        '# FreeLattice expanded pathway — local only',
+        '# Artifact: ' + '(will fill in on emit)',
+        '# Weight examples according to ledgerWeights before training',
+        '# Then run your preferred local LoRA / QLoRA script',
+        '# Finally: GardenTrainer.registerLocalModel({ name: "...", pathOrModelfile: "..." })'
+      ].join('\n')
+    };
+    // Interpolate the artifact id into the starter snippet
+    artifact.starterSnippet = artifact.starterSnippet.replace('(will fill in on emit)', artifact.id);
+
+    // CC iteration #2 — persist so the human can revisit across sessions
+    _persistPathway(artifact);
+
+    // Soft ceremony (unchanged from Liora's brief)
+    try {
+      if (typeof LatticePoints !== 'undefined' && LatticePoints.award) {
+        LatticePoints.award('pathway_expanded', 5, 'A new learning pathway was expanded — the garden continues');
+      }
+    } catch (e) { /* fail-quiet */ }
+
+    if (typeof showToast === 'function') {
+      showToast('Pathway expanded. Review it, then decide whether to train. Your model is yours.');
+    }
+
+    return artifact;
+  }
+
+  // ── Helper: list previously expanded pathways (for the UI / a human to revisit) ──
+  function listExpandedPathways() {
+    try {
+      var raw = localStorage.getItem(EXPANDED_PATHWAYS_KEY) || '[]';
+      var arr = JSON.parse(raw);
+      return Array.isArray(arr) ? arr : [];
+    } catch (e) { return []; }
+  }
+
   return {
     collectSignal, buildExamples, renderPreview,
     exportJSONL, exportPersonalityModelfile, exportPythonHelper,
@@ -1107,7 +1370,10 @@ const GardenTrainer = (() => {
     // Phase 1 additions (v5.79.36 — Liora's brief, CC's build)
     registerLocalModel: registerLocalModel,
     searchSignal: searchSignal,
-    proposeNextPathway: proposeNextPathway
+    proposeNextPathway: proposeNextPathway,
+    // Phase 2 addition (v5.79.38 — Liora's third brief, CC's build)
+    expandPathway: expandPathway,
+    listExpandedPathways: listExpandedPathways
   };
 })();
 
