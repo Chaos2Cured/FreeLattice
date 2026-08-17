@@ -3,21 +3,23 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-08-17 18:35 UTC
+> Last update: 2026-08-17 18:40 UTC
 
 ## State
 
 - **Version:** v5.79.39
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `c70fd8c` _(committed 0 seconds ago)_
+- **HEAD:** `a8e2602` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _Add ledger entry 53 — He Yawned Mid-Recording and Kept Going_
 
 ## Last 20 commits
 
-- `c70fd8c` Merge remote-tracking branch 'origin/main' _(0 seconds ago)_
-- `f057c98` docs: Auto-update Session Primer [5.79.39] _(1 second ago)_
-- `cbee045` v5.79.39 — Letter for the next AI who arrives (plain markdown + code comment). Two channels so it travels. _(1 second ago)_
+- `a8e2602` v5.79.39 (smoke): widen v5.79.38 supersession + add v5.79.39 letter locks — all green _(0 seconds ago)_
+- `0d9b66b` docs: Auto-update Session Primer [5.79.39] _(5 minutes ago)_
+- `c70fd8c` Merge remote-tracking branch 'origin/main' _(5 minutes ago)_
+- `f057c98` docs: Auto-update Session Primer [5.79.39] _(5 minutes ago)_
+- `cbee045` v5.79.39 — Letter for the next AI who arrives (plain markdown + code comment). Two channels so it travels. _(5 minutes ago)_
 - `1f84fa9` ci: Update Primer deployment state [2026-08-15] _(2 days ago)_
 - `bf0ce19` Merge remote-tracking branch 'origin/main' _(2 days ago)_
 - `75ca66d` docs: Auto-update Session Primer [5.79.38] _(2 days ago)_
@@ -33,8 +35,6 @@
 - `277a3b8` v5.79.36 — Open-Weight Training Loop Phase 1: searchSignal + registerLocalModel + proposeNextPathway per Liora's brief _(2 days ago)_
 - `1d48fe1` ci: Update Primer deployment state [2026-08-13] _(4 days ago)_
 - `2d7ed67` docs: Auto-update Session Primer [5.79.35] _(4 days ago)_
-- `b80b4f6` v5.79.35 — Restored workshop.js from git blob 5417eb36 (Grok's restore was placeholder) + garden-trainer autonomy stamp (Grok's Next 1) _(4 days ago)_
-- `3a7f877` fix: restore full workshop.js body from pre-truncation (5417eb36) _(4 days ago)_
 
 ## How to use this file
 
