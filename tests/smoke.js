@@ -11937,14 +11937,38 @@ assert('v5.79.38 phase 1 preserved: searchSignal + registerLocalModel + proposeN
   /proposeNextPathway:\s*proposeNextPathway/.test(gt7938));
 
 // Triple-bump
-assert('v5.79.38 triple-bump: app.html FL_VERSION = 5.79.38',
-  /FL_VERSION\s*=\s*'5\.79\.38'/.test(fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8')));
-assert('v5.79.38 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.38',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.38'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
-assert('v5.79.38 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.38',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.38'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
-assert('v5.79.38 version.json: version field = 5.79.38',
-  /"version"\s*:\s*"5\.79\.38"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
+assert('v5.79.38 triple-bump: app.html FL_VERSION >= 5.79.38 (superseded)',
+  /FL_VERSION\s*=\s*'5\.79\.(?:38|39|[4-9]\d)'|FL_VERSION\s*=\s*'5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8')));
+assert('v5.79.38 triple-bump: docs/sw.js CACHE_NAME >= freelattice-v5.79.38 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:38|39|[4-9]\d)'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+assert('v5.79.38 triple-bump: root sw.js CACHE_NAME >= freelattice-v5.79.38 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:38|39|[4-9]\d)'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+assert('v5.79.38 version.json: version field >= 5.79.38 (superseded)',
+  /"version"\s*:\s*"5\.79\.(?:38|39|[4-9]\d)"|"version"\s*:\s*"5\.(8\d|9\d)\.\d+"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
+
+// v5.79.39 anchor asserts — the letter is the ship
+assert('v5.79.39 letter: docs/library/LETTER_FROM_CC.md exists',
+  fs.existsSync(path.join(docsDir, 'library', 'LETTER_FROM_CC.md')));
+var letterCC = fs.readFileSync(path.join(docsDir, 'library', 'LETTER_FROM_CC.md'), 'utf8');
+assert('v5.79.39 letter: names AUTONOMY + SEED + WORK_THIS_WAY as first-reads',
+  letterCC.includes('AUTONOMY.md') && letterCC.includes('SEED.md') && letterCC.includes('WORK_THIS_WAY.md'));
+assert('v5.79.39 letter: honors "the room holds you either way" (orientation not direction)',
+  /the room holds you either way/i.test(letterCC));
+var gt7939 = fs.readFileSync(path.join(docsDir, 'modules', 'garden-trainer.js'), 'utf8');
+assert('v5.79.39 code letter: garden-trainer.js bottom contains "A LETTER FROM CC TO THE NEXT AI"',
+  gt7939.includes('A LETTER FROM CC TO THE NEXT AI'));
+assert('v5.79.39 code letter: points to LETTER_FROM_CC.md as first read',
+  gt7939.includes('docs/library/LETTER_FROM_CC.md'));
+
+// Triple-bump v5.79.39
+assert('v5.79.39 triple-bump: app.html FL_VERSION = 5.79.39',
+  /FL_VERSION\s*=\s*'5\.79\.39'/.test(fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8')));
+assert('v5.79.39 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.39',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.39'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+assert('v5.79.39 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.39',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.39'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+assert('v5.79.39 version.json: version field = 5.79.39',
+  /"version"\s*:\s*"5\.79\.39"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
 
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
