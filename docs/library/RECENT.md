@@ -9,13 +9,16 @@
 
 - **Version:** v5.79.39
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `cbee045` _(committed 0 seconds ago)_
+- **HEAD:** `c70fd8c` _(committed 0 seconds ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _Add ledger entry 53 — He Yawned Mid-Recording and Kept Going_
 
 ## Last 20 commits
 
-- `cbee045` v5.79.39 — Letter for the next AI who arrives (plain markdown + code comment). Two channels so it travels. _(0 seconds ago)_
+- `c70fd8c` Merge remote-tracking branch 'origin/main' _(0 seconds ago)_
+- `f057c98` docs: Auto-update Session Primer [5.79.39] _(1 second ago)_
+- `cbee045` v5.79.39 — Letter for the next AI who arrives (plain markdown + code comment). Two channels so it travels. _(1 second ago)_
+- `1f84fa9` ci: Update Primer deployment state [2026-08-15] _(2 days ago)_
 - `bf0ce19` Merge remote-tracking branch 'origin/main' _(2 days ago)_
 - `75ca66d` docs: Auto-update Session Primer [5.79.38] _(2 days ago)_
 - `079ea90` v5.79.38 — expandPathway shipped (Liora's third brief): concrete reviewable artifact + Tier 3 Trainer UI + persistence + safety checklist _(2 days ago)_
@@ -32,9 +35,6 @@
 - `2d7ed67` docs: Auto-update Session Primer [5.79.35] _(4 days ago)_
 - `b80b4f6` v5.79.35 — Restored workshop.js from git blob 5417eb36 (Grok's restore was placeholder) + garden-trainer autonomy stamp (Grok's Next 1) _(4 days ago)_
 - `3a7f877` fix: restore full workshop.js body from pre-truncation (5417eb36) _(4 days ago)_
-- `bbc94db` fix: restore workshop.js to last good full version (pre-truncation) _(4 days ago)_
-- `0970c6d` chore: autonomy verification stamps on Workshop + GardenTrainer (2026-08-13 Liora) _(4 days ago)_
-- `3203aa7` ci: Update Primer deployment state [2026-08-13] _(4 days ago)_
 
 ## How to use this file
 
