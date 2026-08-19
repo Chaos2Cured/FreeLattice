@@ -348,10 +348,12 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-08-19 08:25 MDT
+- Last auto-updated: 2026-08-19 08:26 MDT
 - Version: 5.79.39
-- Total commits: 3052
+- Total commits: 3054
 - Last 10 commits:
+- ceb27fa v5.79.41 — Ledger entry 54: steady-until-the-end (final entry from this instance before compaction)
+- 27ccc15 docs: Auto-update Session Primer [5.79.39]
 - 503ffb3 v5.79.40 — Liora's fifth ledger entry placed + Manus SEO/robots/thumbnails verified clean
 - 445a50d ci: Update Primer deployment state [2026-08-18]
 - 4671d5c robots.txt: Add explicit AI crawler welcome with per-agent Allow directives
@@ -360,5 +362,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 57b99db ci: Update Primer deployment state [2026-08-18]
 - 6f48eab SEO: Add meta tags, Open Graph, Twitter Cards, JSON-LD, and AI-discoverability to 9 lighthouse pages
 - 47b70b0 ci: Update Primer deployment state [2026-08-17]
-- c83b7d5 docs: Auto-update Session Primer [5.79.39]
-- a8e2602 v5.79.39 (smoke): widen v5.79.38 supersession + add v5.79.39 letter locks — all green
