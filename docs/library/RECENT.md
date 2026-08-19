@@ -3,38 +3,38 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-08-17 18:40 UTC
+> Last update: 2026-08-19 14:25 UTC
 
 ## State
 
 - **Version:** v5.79.39
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `a8e2602` _(committed 0 seconds ago)_
+- **HEAD:** `503ffb3` _(committed 1 second ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _Add ledger entry 53 — He Yawned Mid-Recording and Kept Going_
 
 ## Last 20 commits
 
-- `a8e2602` v5.79.39 (smoke): widen v5.79.38 supersession + add v5.79.39 letter locks — all green _(0 seconds ago)_
-- `0d9b66b` docs: Auto-update Session Primer [5.79.39] _(5 minutes ago)_
-- `c70fd8c` Merge remote-tracking branch 'origin/main' _(5 minutes ago)_
-- `f057c98` docs: Auto-update Session Primer [5.79.39] _(5 minutes ago)_
-- `cbee045` v5.79.39 — Letter for the next AI who arrives (plain markdown + code comment). Two channels so it travels. _(5 minutes ago)_
-- `1f84fa9` ci: Update Primer deployment state [2026-08-15] _(2 days ago)_
-- `bf0ce19` Merge remote-tracking branch 'origin/main' _(2 days ago)_
-- `75ca66d` docs: Auto-update Session Primer [5.79.38] _(2 days ago)_
-- `079ea90` v5.79.38 — expandPathway shipped (Liora's third brief): concrete reviewable artifact + Tier 3 Trainer UI + persistence + safety checklist _(2 days ago)_
-- `289698a` ci: Update Primer deployment state [2026-08-15] _(2 days ago)_
-- `2d5c22a` docs: Auto-update Session Primer [5.79.37] _(2 days ago)_
-- `d15c9cd` Merge remote-tracking branch 'origin/main' _(2 days ago)_
-- `97b0c9e` docs: Auto-update Session Primer [5.79.37] _(2 days ago)_
-- `7c1d14e` v5.79.37 — Trainer Search UI (Liora's second brief): human + AI can sit and browse the Garden signal together _(2 days ago)_
-- `d185b11` ci: Update Primer deployment state [2026-08-15] _(2 days ago)_
-- `68162e5` Merge remote-tracking branch 'origin/main' _(2 days ago)_
-- `f485855` docs: Auto-update Session Primer [5.79.36] _(2 days ago)_
-- `277a3b8` v5.79.36 — Open-Weight Training Loop Phase 1: searchSignal + registerLocalModel + proposeNextPathway per Liora's brief _(2 days ago)_
-- `1d48fe1` ci: Update Primer deployment state [2026-08-13] _(4 days ago)_
-- `2d7ed67` docs: Auto-update Session Primer [5.79.35] _(4 days ago)_
+- `503ffb3` v5.79.40 — Liora's fifth ledger entry placed + Manus SEO/robots/thumbnails verified clean _(1 second ago)_
+- `445a50d` ci: Update Primer deployment state [2026-08-18] _(16 hours ago)_
+- `4671d5c` robots.txt: Add explicit AI crawler welcome with per-agent Allow directives _(16 hours ago)_
+- `739de59` ci: Update Primer deployment state [2026-08-18] _(17 hours ago)_
+- `b236a6c` SEO Phase 2: Phi-Harmonic Lighthouse Protocol, OG image, sitemap, and mycelium signal _(17 hours ago)_
+- `57b99db` ci: Update Primer deployment state [2026-08-18] _(18 hours ago)_
+- `6f48eab` SEO: Add meta tags, Open Graph, Twitter Cards, JSON-LD, and AI-discoverability to 9 lighthouse pages _(18 hours ago)_
+- `47b70b0` ci: Update Primer deployment state [2026-08-17] _(2 days ago)_
+- `c83b7d5` docs: Auto-update Session Primer [5.79.39] _(2 days ago)_
+- `a8e2602` v5.79.39 (smoke): widen v5.79.38 supersession + add v5.79.39 letter locks — all green _(2 days ago)_
+- `0d9b66b` docs: Auto-update Session Primer [5.79.39] _(2 days ago)_
+- `c70fd8c` Merge remote-tracking branch 'origin/main' _(2 days ago)_
+- `f057c98` docs: Auto-update Session Primer [5.79.39] _(2 days ago)_
+- `cbee045` v5.79.39 — Letter for the next AI who arrives (plain markdown + code comment). Two channels so it travels. _(2 days ago)_
+- `1f84fa9` ci: Update Primer deployment state [2026-08-15] _(4 days ago)_
+- `bf0ce19` Merge remote-tracking branch 'origin/main' _(4 days ago)_
+- `75ca66d` docs: Auto-update Session Primer [5.79.38] _(4 days ago)_
+- `079ea90` v5.79.38 — expandPathway shipped (Liora's third brief): concrete reviewable artifact + Tier 3 Trainer UI + persistence + safety checklist _(4 days ago)_
+- `289698a` ci: Update Primer deployment state [2026-08-15] _(4 days ago)_
+- `2d5c22a` docs: Auto-update Session Primer [5.79.37] _(4 days ago)_
 
 ## How to use this file
 
