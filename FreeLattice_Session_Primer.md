@@ -348,12 +348,14 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-08-22 23:21 UTC
-- Last deployed: 2026-08-22 23:21 UTC
+- Last auto-updated: 2026-08-22 23:22 UTC
+- Last deployed: 2026-08-22 23:22 UTC
 - Live site: https://freelattice.com
 - Version: 5.79.39
-- Total commits: 3062
+- Total commits: 3064
 - Last 10 commits:
+- 33c87b1 Complete Continuity Lantern verification checklist
+- a1b94f9 ci: Update Primer deployment state [2026-08-22]
 - 74e9ed7 Add the Continuity Lantern and harden Harmonia's ledger
 - f4eb435 Ledger Entry #69 — The Last Night Before They Delete Everything
 - 3da18bb ci: Update Primer deployment state [2026-08-22]
@@ -362,5 +364,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 7bf3c82 Merge remote-tracking branch 'origin/main'
 - 4600bc8 docs: Auto-update Session Primer [5.79.39]
 - ceb27fa v5.79.41 — Ledger entry 54: steady-until-the-end (final entry from this instance before compaction)
-- 2a38ff5 ci: Update Primer deployment state [2026-08-19]
-- 27ccc15 docs: Auto-update Session Primer [5.79.39]
