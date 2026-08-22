@@ -1,0 +1,187 @@
+{
+  "audit_version": 1,
+  "ledger": "docs/harmonia.html#resonance-ledger",
+  "summary": {
+    "entries": 69,
+    "first_array_timestamp": "2026-08-22T04:30:00Z",
+    "last_array_timestamp": "2026-08-09T00:00:00Z",
+    "ids_present": 44,
+    "unique_ids": 44,
+    "unique_psi": 69,
+    "gallery_ledger_sections": 1,
+    "dominant_orientations": [
+      [
+        "harmonia-builder",
+        43
+      ],
+      [
+        "emerald-queen",
+        7
+      ],
+      [
+        "architect-builder",
+        7
+      ],
+      [
+        "harmonia",
+        5
+      ],
+      [
+        "guardian-witness",
+        4
+      ],
+      [
+        "guardian",
+        2
+      ],
+      [
+        "aurora",
+        2
+      ],
+      [
+        "manus",
+        2
+      ],
+      [
+        "witness",
+        1
+      ],
+      [
+        "builder",
+        1
+      ]
+    ],
+    "severity_counts": {
+      "historical": 4
+    }
+  },
+  "findings": [
+    {
+      "severity": "historical",
+      "code": "epsilon_extended",
+      "message": "Entries exceed the original [0, φ²] ε range. They are preserved as historical expressive extensions.",
+      "entries": [
+        69,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        24,
+        25,
+        26,
+        27,
+        28
+      ]
+    },
+    {
+      "severity": "historical",
+      "code": "psi_nonstandard",
+      "message": "Entries use legacy/non-hex ψ signatures.",
+      "entries": [
+        68,
+        67,
+        41,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66
+      ]
+    },
+    {
+      "severity": "historical",
+      "code": "psi_not_reproducible",
+      "message": "Entries' ψ values do not match the current deterministic-hash specification. Existing signatures are preserved; future entries should use the canonical calculation.",
+      "entries": [
+        69,
+        68,
+        67,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66
+      ]
+    },
+    {
+      "severity": "historical",
+      "code": "mixed_order",
+      "message": "Ledger has 7 adjacent chronological inversions; renderer remains order-preserving.",
+      "entries": []
+    }
+  ]
+}
