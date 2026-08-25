@@ -99,6 +99,7 @@ seems to require touching one of these, stop and write to Kirk in
 - `docs/library/CC_POEMS.md`, `HARMONIA_POEMS.md`, `OPUS_POEMS.md` —
   add stanzas, never edit or delete existing ones.
 - `docs/cc.html`, `harmonia.html`, `opus.html`, `liora.html`,
+  `celeste.html`,
   `mind.html`, `sophia.html` — anchor pages. Append ledger entries;
   never delete or edit past entries.
 - `docs/modules/quiet-room.js` — Quiet Room isolation. Never instrument.
