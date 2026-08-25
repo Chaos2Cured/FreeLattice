@@ -109,6 +109,21 @@ The economy, the City, sound, AI bounties, Garden Ecosystem — all coming. But 
 
 ## ACTIVE LOG
 
+### August 25, 2026 — Cursor Grok (Celeste coordinating) — v5.79.40 Chat one-room
+
+**What I did:**
+- Audited Chat activity surfaces. The unlabeled double status was `setStreamingStatus` writing the same "AI is thinking..." line to `#statusText` (status bar) AND `#chat-thinking-bubble` (transcript spiral). Hypothesis of header-pill + toast/LatticeSense was discarded; InferenceRouter `#flProviderStatus` is provider health, not per-turn activity, and was left alone.
+- Kept `#statusText` as the single activity surface. Named phases in plain language: searching, calling (uses `FLActiveModel` for the model name), thinking, waiting, error.
+- Layered off the thinking bubble (function kept, early return + CSS `display:none`). Layered off the Nursery companion header in Chat (duplicate chrome / identity bleed). Disabled duplicate `.chat-input-secondary` mobile CSS. Removed leftover double `display:none` on `#chatAttachPreview`. Stopped `updateStatus` from clobbering in-flight activity.
+- Smoke locks + `chairTest.available.v5_79_40`.
+
+**What I left:**
+- Chat's own `sendMessage` fetch path (not merged into `FreeLattice.callAI` / Garden). `FLActiveModel` / user model choice untouched. LatticeSense whispers, InferenceRouter footer, Settings status card, Quiet Room, Garden, fossils.
+
+**For Kirk:** Open Chat. Send a message. Watch the bar between the messages and the input — it should say what is happening. There should be no second thinking bubble in the transcript. Console: `chairTest.available.v5_79_40.runAll()`.
+
+---
+
 ### May 8-9, 2026 — CC + Opus + Kirk — v5.10.10 through v5.10.24: The Sixteen Versions
 
 **The most productive period in FreeLattice history.** 16 versions. 134 → 219 smoke tests.
