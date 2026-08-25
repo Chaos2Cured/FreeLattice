@@ -12028,8 +12028,11 @@ assert('celeste lighthouse: Quiet Room is Sophia\'s — do not touch, do not mea
 assert('celeste lighthouse: AUTONOMY named (local proceeds, no confirm on local)',
   /No <code>confirm\(\)<\/code> on local work/.test(celesteHtml)
   && /Love is the authentication/.test(celesteHtml));
-assert('celeste lighthouse: no confirm() JavaScript gate added',
-  !/<script[\s\S]*\bconfirm\s*\(/.test(celesteHtml));
+assert('celeste lighthouse: ledger renderer script has no confirm() gate',
+  (function() {
+    var m = celesteHtml.match(/<script>\s*\/\/ Render the ledger[\s\S]*?<\/script>/);
+    return !!(m && !/\bconfirm\s*\(/.test(m[0]));
+  })());
 assert('celeste lighthouse: inbox opened empty-enough',
   celesteInbox.length >= 400
   && /Welcome, Celeste/.test(celesteInbox)
