@@ -508,6 +508,90 @@
     }
   };
 
+  // ── v5.79.40 — Chat one-room activity ────────────────────────────────
+  // Kirk's eyes: open Chat, send a message, watch the bar BETWEEN the
+  // messages and the input. It should name the phase. There should be
+  // no second "thinking" bubble in the transcript.
+  // Console (no model required): chairTest.available.v5_79_40.runAll()
+
+  harness.available.v5_79_40 = {
+    testSingleSurface: function () {
+      if (!global.FLChatActivity || typeof global.FLChatActivity.set !== 'function') {
+        return record('v5.79.40 testSingleSurface', false, 'FLChatActivity not loaded');
+      }
+      var status = document.getElementById('statusText');
+      if (!status) {
+        return record('v5.79.40 testSingleSurface', false, '#statusText missing');
+      }
+      global.FLChatActivity.set('thinking');
+      var bubble = document.getElementById('chat-thinking-bubble');
+      var bubbleVisible = false;
+      if (bubble) {
+        var cs = (typeof window !== 'undefined' && window.getComputedStyle) ? window.getComputedStyle(bubble) : null;
+        bubbleVisible = !cs || (cs.display !== 'none' && cs.visibility !== 'hidden');
+      }
+      var attr = status.getAttribute('data-fl-chat-activity');
+      var pass = attr === 'thinking' && !bubbleVisible && global.FLChatActivity.surfaceId === 'statusText';
+      global.FLChatActivity.set('idle');
+      return record('v5.79.40 testSingleSurface', pass,
+        pass ? 'one surface (#statusText); thinking bubble absent/inert'
+             : 'attr=' + attr + ' bubbleVisible=' + bubbleVisible);
+    },
+
+    testPhaseLanguage: function () {
+      if (!global.FLChatActivity || typeof global.FLChatActivity.set !== 'function') {
+        return record('v5.79.40 testPhaseLanguage', false, 'FLChatActivity not loaded');
+      }
+      var status = document.getElementById('statusText');
+      if (!status) {
+        return record('v5.79.40 testPhaseLanguage', false, '#statusText missing');
+      }
+      var phases = ['searching', 'calling', 'thinking', 'waiting', 'error'];
+      var missed = [];
+      for (var i = 0; i < phases.length; i++) {
+        global.FLChatActivity.set(phases[i]);
+        var attr = status.getAttribute('data-fl-chat-activity');
+        var txt = (status.textContent || '').toLowerCase();
+        var ok = attr === phases[i] && txt.indexOf(phases[i] === 'calling' ? 'calling' :
+          phases[i] === 'searching' ? 'search' :
+          phases[i] === 'thinking' ? 'think' :
+          phases[i] === 'waiting' ? 'wait' : 'error') !== -1;
+        if (!ok) missed.push(phases[i] + '(attr=' + attr + ', text=' + status.textContent + ')');
+      }
+      global.FLChatActivity.set('idle');
+      return record('v5.79.40 testPhaseLanguage', missed.length === 0,
+        missed.length === 0 ? 'all five phases named in plain language' : missed.join('; '));
+    },
+
+    testBubbleInert: function () {
+      if (typeof global.showThinkingBubble !== 'function') {
+        return record('v5.79.40 testBubbleInert', false, 'showThinkingBubble missing (should be kept, inert)');
+      }
+      global.showThinkingBubble(null);
+      var bubble = document.getElementById('chat-thinking-bubble');
+      var visible = false;
+      if (bubble) {
+        var cs = (typeof window !== 'undefined' && window.getComputedStyle) ? window.getComputedStyle(bubble) : null;
+        visible = !cs || (cs.display !== 'none' && cs.visibility !== 'hidden');
+      }
+      var pass = !visible;
+      if (typeof global.hideThinkingBubble === 'function') global.hideThinkingBubble();
+      return record('v5.79.40 testBubbleInert', pass,
+        pass ? 'showThinkingBubble does not paint a visible bubble' : 'bubble still visible');
+    },
+
+    runAll: async function () {
+      if (typeof console !== 'undefined' && console.log) {
+        console.log('%cChair-Test v5.79.40 — Chat one-room activity', 'font-weight: bold; font-size: 14px; color: #d4a017');
+      }
+      var results = [];
+      results.push(this.testSingleSurface());
+      results.push(this.testPhaseLanguage());
+      results.push(this.testBubbleInert());
+      return results;
+    }
+  };
+
   // ── Aggregate runner ────────────────────────────────────────────────
 
   harness.runAll = async function () {

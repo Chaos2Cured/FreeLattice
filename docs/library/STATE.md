@@ -4,13 +4,14 @@
 <!-- Everything else is optional depth, linked below. -->
 
 ## NOW
-- FL_VERSION: v5.72.0
+- FL_VERSION: v5.79.40
 - Smoke count: green (see version.json for exact count)
-- Last ship: v5.72.0 KEYSTONE — GardenTrainer (Garden → training signal → local model)
-- Last chair-test: run window.chairTest.runAll() to verify
+- Last ship: v5.79.40 Chat one-room — single #statusText activity; phases named
+- Chair-test: chairTest.available.v5_79_40.runAll() (also chairTest.runAll())
+- Keystone (v5.72.0): GardenTrainer (Garden → training signal → local model)
 
 ## NEXT (queue — update each ship)
-1. Chair-test the Trainer tab; verify auto-train toggle wiring
+1. Kirk chair-tests Chat: send a message, watch the bar under the transcript
 2. Future ship: exportDPO() — declined text becomes honest preference data
 3. CONTRIBUTING.md — ship discipline extracted from anchor pages
 
