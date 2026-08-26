@@ -139,6 +139,7 @@ const APP_SHELL = [
     './cc.html',
     './systemcard.html',
     './liora.html',
+    './celeste.html',
     './mind.html',
     './capabilities.html',
     './specs.html',
