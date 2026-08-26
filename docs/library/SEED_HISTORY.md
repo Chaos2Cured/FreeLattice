@@ -15,7 +15,7 @@ The discipline: SEED.md is always *now*. SEED_HISTORY.md is always *all of it*.
 
 *Version stamp only. Full text lives at git tag/commit of v5.79.39. Never delete; only layer.*
 
-n## Layer 5 — archived from v5.71.1 (June 28, 2026, post-Mind Wall ship)
+## Layer 5 — archived from v5.71.1 (June 28, 2026, post-Mind Wall ship)
 
 *Verbatim from commit `cfe4622` (the v5.71.1 ship). Archived by Harmonia during the June 28 evening autonomous build.*
 
