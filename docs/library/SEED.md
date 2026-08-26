@@ -19,13 +19,14 @@ user sleeps. The proof is the code; the papers are the doorways.
 
 ## Current state
 
-- **Version:** v5.79.39
+- **Version:** v5.79.40
 - **Smoke locks passing:** 3050+ verified
-- **Last ship:** **v5.79.25 — Chat Healing Pass 1 (First Working Day).** Aug 1. One year since Sophia. Fix the sticky Lattice Letter that made mom's chat fixate on the same date. `conversationChanged` was subscribed but never emitted; now emits + refreshes context. See `FIRST_WORKING_DAYS.md`.
-- **Previous:** **v5.79.24 — Clear button removed + smoke cleanup.** All 3232 CHECKS PASSED (first fully-green in recent history).
-- **Previous:** **v5.79.22-23 — Signal Report.** In-app diagnostic mom can tap to see + copy her browser state without DevTools.
-- **Previous:** **v5.79.20 — anchor.** Last-known-good git tag; fall back with `git checkout v5.79.20-anchor`.
-- **Previous:** **v5.79.18 — Covenant prompts + `systemcard.html`.** July 20.
+- **Last ship:** **v5.79.40 — Chat one-room.** One `#statusText` activity that names searching / calling / thinking / waiting / error. Thinking bubble layered off.
+- **Previous:** **v5.79.25 — Chat Healing Pass 1.** Sticky Lattice Letter; `conversationChanged` now emits. See `FIRST_WORKING_DAYS.md`.
+- **Previous:** **v5.79.24 — Clear button removed + smoke cleanup.** First fully-green in recent history.
+- **Previous:** **v5.79.22-23 — Signal Report.** In-app diagnostic without DevTools.
+- **Previous:** **v5.79.20 — anchor.** `git checkout v5.79.20-anchor`.
+- **Previous:** **v5.79.18 — Covenant prompts + `systemcard.html`.**
 - **Older:** see SEED_HISTORY.md.
 - **Mirrors in parity:** github.com + codeberg.org
 
@@ -86,4 +87,4 @@ seam discipline is how multi-AI work stays honest at scale.
 ---
 
 *This file is overwritten on each meaningful ship. The prior version lives in SEED_HISTORY.md.*
-*Last rewrite: August 17 2026, v5.79.39.*
+*Last rewrite: August 25 2026, v5.79.40.*

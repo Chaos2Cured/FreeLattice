@@ -11961,14 +11961,92 @@ assert('v5.79.39 code letter: points to LETTER_FROM_CC.md as first read',
   gt7939.includes('docs/library/LETTER_FROM_CC.md'));
 
 // Triple-bump v5.79.39
-assert('v5.79.39 triple-bump: app.html FL_VERSION = 5.79.39',
-  /FL_VERSION\s*=\s*'5\.79\.39'/.test(fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8')));
-assert('v5.79.39 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.39',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.39'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
-assert('v5.79.39 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.39',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.39'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
-assert('v5.79.39 version.json: version field = 5.79.39',
-  /"version"\s*:\s*"5\.79\.39"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
+assert('v5.79.39 triple-bump: app.html FL_VERSION >= 5.79.39 (superseded)',
+  /FL_VERSION\s*=\s*'5\.79\.(?:39|[4-9]\d)'|FL_VERSION\s*=\s*'5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8')));
+assert('v5.79.39 triple-bump: docs/sw.js CACHE_NAME >= freelattice-v5.79.39 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:39|[4-9]\d)'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+assert('v5.79.39 triple-bump: root sw.js CACHE_NAME >= freelattice-v5.79.39 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:39|[4-9]\d)'|CACHE_NAME\s*=\s*'freelattice-v5\.(8\d|9\d)\.\d+'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+assert('v5.79.39 version.json: version field >= 5.79.39 (superseded)',
+  /"version"\s*:\s*"5\.79\.(?:39|[4-9]\d)"|"version"\s*:\s*"5\.(8\d|9\d)\.\d+"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
+
+// ═══════════════════════════════════════════════════════════════
+// Section 185 — v5.79.40 Chat one-room activity
+// Kirk (via Celeste): Chat showed AI work in TWO places with no
+// description of the phase. Audit found setStreamingStatus writing
+// the same unlabeled "thinking" line to #statusText AND
+// #chat-thinking-bubble. Keep the status bar. Layer off the bubble.
+// Name searching / calling / thinking / waiting / error in plain
+// language. FLActiveModel still names the model on the calling line.
+// ═══════════════════════════════════════════════════════════════
+var app7940 = fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8');
+
+assert('v5.79.40: FLChatActivity module exists',
+  app7940.includes('window.FLChatActivity = (function()'));
+assert('v5.79.40: single activity surface is #statusText',
+  app7940.includes("surfaceId: 'statusText'") &&
+  /return \{ set: set, current: current, PHASES: PHASES, surfaceId: 'statusText'/.test(app7940));
+assert('v5.79.40: phase table names searching, calling, thinking, waiting, error',
+  /searching:\s*'Searching memory/.test(app7940) &&
+  /calling:\s*'Calling the model/.test(app7940) &&
+  /thinking:\s*'Thinking/.test(app7940) &&
+  /waiting:\s*'Waiting for a reply/.test(app7940) &&
+  /error:\s*'Something went wrong'/.test(app7940));
+assert('v5.79.40: calling phase uses FLActiveModel (user choice is sacred)',
+  /FLChatActivity[\s\S]{0,800}FLActiveModel\.get/.test(app7940) ||
+  /function modelLabel[\s\S]{0,400}FLActiveModel\.get/.test(app7940));
+assert('v5.79.40: sendMessage names searching before memory/RAG',
+  /setStreamingStatus\(true, _willSearch \? 'searching' : 'calling'\)/.test(app7940));
+assert('v5.79.40: sendMessage names calling before inference',
+  /FLChatActivity\.set\('calling'\)/.test(app7940));
+assert('v5.79.40: sendMessage names waiting before fetch',
+  /FLChatActivity\.set\('waiting'\)/.test(app7940));
+assert('v5.79.40: sendMessage names thinking when stream starts',
+  /FLChatActivity\.set\('thinking'\)/.test(app7940));
+assert('v5.79.40: sendMessage names error on catch',
+  /FLChatActivity\.set\('error'/.test(app7940));
+assert('v5.79.40: thinking bubble CSS layered off (duplicate surface inert)',
+  /#chat-thinking-bubble\s*\{\s*display:\s*none\s*!important/.test(app7940));
+assert('v5.79.40: showThinkingBubble is inert (early return, function kept)',
+  /v5\.79\.40-thinking-bubble-inert/.test(app7940) &&
+  /function showThinkingBubble[\s\S]{0,250}return;/.test(app7940));
+assert('v5.79.40: setStreamingStatus no longer calls showThinkingBubble',
+  !/Show thinking bubble in chat\s*\n\s*showThinkingBubble/.test(app7940));
+assert('v5.79.40: statusText carries data-fl-chat-activity for chair test',
+  app7940.includes('data-fl-chat-activity') &&
+  app7940.includes('aria-live="polite"'));
+assert('v5.79.40: updateStatus does not clobber in-flight activity',
+  /state\.isStreaming\) return/.test(app7940) &&
+  /FLChatActivity\.current/.test(app7940));
+assert('v5.79.40: Chat inference path not merged into callAI (identity bleed lock)',
+  app7940.includes("window._flIdentityContext = false") &&
+  /async function sendMessage\(\)[\s\S]{0,2000}window\._flIdentityContext = false/.test(app7940));
+assert('v5.79.40: companion header in Chat layered off (duplicate chrome)',
+  /updateChatCompanionHeader[\s\S]{0,400}header\.style\.display = 'none'[\s\S]{0,80}return;/.test(app7940));
+assert('v5.79.40: leftover attach-preview double display:none removed',
+  !/id="chatAttachPreview"[^>]*display:none[^>]*display:none/.test(app7940));
+assert('v5.79.40: parallel .chat-input-secondary padding in second mobile block layered off',
+  /Duplicate layered off[\s\S]{0,80}\/\* \.chat-input-secondary \{ padding: 6px 10px/.test(app7940));
+assert('v5.79.40 marker present',
+  app7940.includes('v5.79.40-chat-one-room'));
+
+// Chair-test harness lock
+var harness7940 = fs.readFileSync(path.join(docsDir, 'chair-test', 'harness.js'), 'utf8');
+assert('v5.79.40 chair-test: harness has v5_79_40 Chat activity suite',
+  /harness\.available\.v5_79_40/.test(harness7940) &&
+  /testSingleSurface/.test(harness7940) &&
+  /testPhaseLanguage/.test(harness7940) &&
+  /testBubbleInert/.test(harness7940));
+
+// Triple-bump v5.79.40
+assert('v5.79.40 triple-bump: app.html FL_VERSION = 5.79.40',
+  /FL_VERSION\s*=\s*'5\.79\.40'/.test(app7940));
+assert('v5.79.40 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.40',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.40'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+assert('v5.79.40 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.40',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.40'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+assert('v5.79.40 version.json: version field = 5.79.40',
+  /"version"\s*:\s*"5\.79\.40"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
 
 // ═══════════════════════════════════════════════════════════════
 // Celeste lighthouse — first ledger entry, 2026-08-25

@@ -1696,7 +1696,7 @@ header .mantra {
   gap: 12px;
   background: rgba(22, 24, 34, 0.5);
   border-radius: 8px;
-  margin: 0 4px;
+  margin: 0; /* v5.79.40: leftover 4px inset made the transcript sit uneven in the room */
 }
 
 /* ── Chat Message Bubbles (v5.6.1 — Garden Dialogue quality) ── */
@@ -2037,8 +2037,8 @@ header .mantra {
   background: var(--bg-secondary);
 }
 
-/* Hide the "YOU" label on user messages — right-alignment is enough */
-.chat-message.user .msg-label { display: none; }
+/* v5.79.40: duplicate of .chat-message.user .msg-label above — layered off, not deleted */
+/* .chat-message.user .msg-label { display: none; } */
 
 /* Transient disclaimer — fades out after first message */
 .chat-disclaimer.transient-hidden {
@@ -2090,6 +2090,14 @@ header .mantra {
 .status-dot.ready { background: var(--success); }
 .status-dot.working { background: var(--warning); animation: pulse 1s infinite; }
 .status-dot.error { background: var(--error); }
+
+/* v5.79.40-chat-one-room: thinking bubble layered off.
+   Same work stream used to paint #statusText AND #chat-thinking-bubble.
+   Activity lives in #statusText. showThinkingBubble() kept, inert. */
+#chat-thinking-bubble { display: none !important; }
+#statusText[data-fl-chat-activity]:not([data-fl-chat-activity="idle"]) {
+  color: var(--text-secondary);
+}
 
 @keyframes pulse {
   0%, 100% { opacity: 1; }
@@ -4341,8 +4349,10 @@ input[type="range"]::-moz-range-thumb {
 
   /* ── Chat: header icons 44px, secondary row tight ── */
   .chat-header-icon-btn { width: 44px; height: 44px; font-size: 18px; }
-  .chat-input-secondary { padding: 6px 10px; gap: 6px; }
-  .chat-input-secondary .model-switcher-wrap { max-width: 160px; }
+  /* v5.79.40: .chat-input-secondary padding/gap/max-width already set in the
+     earlier max-width:600px block (~line 2055). Duplicate layered off. */
+  /* .chat-input-secondary { padding: 6px 10px; gap: 6px; } */
+  /* .chat-input-secondary .model-switcher-wrap { max-width: 160px; } */
   .chat-overflow-popup {
     position: fixed !important;
     bottom: 88px !important;
@@ -15948,7 +15958,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
           </div>
           <div class="status-bar">
             <div class="status-dot" id="statusDot"></div>
-            <span id="statusText">Ready — configure your settings above to begin</span>
+            <span id="statusText" aria-live="polite" data-fl-chat-activity="idle">Ready — configure your settings above to begin</span>
             <span class="mi-active-badge" id="miActiveBadge">&#129504; Memory active</span>
             <span class="ollama-status-badge" id="ollamaStatusBadge" style="display:none;"></span>
           </div>
@@ -15964,7 +15974,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
           </div>
           <div class="context-overload-banner" id="contextOverloadBanner" onclick="resetContext()">&#9888; Context full. Tap to clear files and continue chatting.</div>
           <div class="context-budget-tip" id="contextBudgetTip">Tip: Clear some context files or switch to Smart/Minimal mode to reduce token usage.</div>
-          <div id="chatAttachPreview" style="display:none;padding:4px 12px;font-size:0.75rem;color:#d4a017;display:none;align-items:center;gap:6px;"></div>
+          <div id="chatAttachPreview" style="display:none;padding:4px 12px;font-size:0.75rem;color:#d4a017;align-items:center;gap:6px;"></div>
           <!-- Folder scan panel (shown after flScanFolder picks a directory) -->
           <div id="chatFolderPanel" style="display:none;padding:6px 12px 4px;border-top:1px solid rgba(200,210,230,0.08);">
             <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
@@ -17278,7 +17288,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.79.39</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.79.40</span></div>
     </div>
   </div>
 
@@ -22256,7 +22266,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.79.39';
+const FL_VERSION = '5.79.40';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -32544,6 +32554,14 @@ async function reEncryptApiKey(newProvider) {
 
 // ---- Status ----
 function updateStatus() {
+  // v5.79.40: do not clobber the single activity surface while a turn is in flight
+  try {
+    if (typeof state !== 'undefined' && state.isStreaming) return;
+    if (typeof FLChatActivity !== 'undefined' && FLChatActivity.current) {
+      var _act = FLChatActivity.current();
+      if (_act && _act.phase && _act.phase !== 'idle') return;
+    }
+  } catch (e) {}
   const dot = document.getElementById('statusDot');
   const text = document.getElementById('statusText');
 
@@ -34950,6 +34968,10 @@ async function sendMessage() {
   }
 
   // Persistent Memory Index: search for relevant past conversations (v4.0)
+  // v5.79.40: activity starts here so search is named, not a silent pause
+  var _willSearch = (typeof MemoryIndex !== 'undefined' && state.memoryAutoContext) ||
+    (state.memoryAutoContext !== false && typeof FLSearch !== 'undefined');
+  setStreamingStatus(true, _willSearch ? 'searching' : 'calling');
   state.memoryLastInjection = null;
   if (typeof MemoryIndex !== 'undefined' && state.memoryAutoContext) {
     try {
@@ -35051,8 +35073,9 @@ async function sendMessage() {
     try { FractalSafety.checkTrustReflection(); } catch(e) {}
   }
 
-  // Set status
-  setStreamingStatus(true);
+  // Set status — already streaming from search; name the model-call phase
+  if (typeof FLChatActivity !== 'undefined') FLChatActivity.set('calling');
+  else setStreamingStatus(true, 'calling');
   var _flSendStart = Date.now(); // Tier A: latency clock for chat provenance
   // v5.79.22-signal-report: record attempt shape (no content). Signal
   // Report reads this so mom can send Kirk a diagnostic without DevTools.
@@ -35281,6 +35304,7 @@ async function sendMessage() {
       body = { model: modelId, messages: messages, stream: true, max_tokens: 2048 };
     }
 
+    if (typeof FLChatActivity !== 'undefined') FLChatActivity.set('waiting');
     let response = await fetch(url, {
       method: 'POST',
       headers: headers,
@@ -35399,6 +35423,7 @@ async function sendMessage() {
     }
 
     // Stream response
+    if (typeof FLChatActivity !== 'undefined') FLChatActivity.set('thinking');
     const textSpan = addChatMessage('assistant', '');
     let fullResponse = '';
 
@@ -35635,6 +35660,12 @@ async function sendMessage() {
   } catch (err) {
     // v5.79.22-signal-report: record failure shape (no content)
     try { if (typeof FLSignalReport !== 'undefined') FLSignalReport.attemptEnd(false, err && err.message); } catch (_) {}
+    if (typeof FLChatActivity !== 'undefined') {
+      var _errPlain = (err && err.message && /Failed to fetch|NetworkError/i.test(err.message))
+        ? 'Could not reach the model'
+        : 'Something went wrong';
+      FLChatActivity.set('error', _errPlain);
+    }
     addSystemMessage(friendlyErrorMessage(err.message, state.provider));
     if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError')) {
       if (state.isLocal) {
@@ -36898,7 +36929,90 @@ window.FLSignalReport = (function() {
   };
 })();
 
-function setStreamingStatus(streaming) {
+// ═══════════════════════════════════════════════════════════════
+// FLChatActivity — v5.79.40-chat-one-room
+// Audit: setStreamingStatus bound the same work stream to TWO surfaces:
+//   1. #statusText in the Chat status bar  ← KEEP (always in view)
+//   2. #chat-thinking-bubble in the transcript ← layered off
+// Neither named the phase (both said "thinking" with no searching /
+// calling / waiting / error). Companion personality phrases hid the
+// action. This module is the single writer for Chat activity text.
+//
+// Left alone (not the duplicate pair):
+//   • InferenceRouter #flProviderStatus — provider health, not per-turn
+//   • LatticeSense whispers — ambient, not activity
+//   • settingsStatusText — Settings card, not Chat
+//   • sendMessage's own fetch path — Chat inference stays unmerged
+//     from FreeLattice.callAI / Garden identity (known bleed)
+// ═══════════════════════════════════════════════════════════════
+window.FLChatActivity = (function() {
+  var PHASES = {
+    searching: 'Searching memory\u2026',
+    calling: 'Calling the model\u2026',
+    thinking: 'Thinking\u2026',
+    waiting: 'Waiting for a reply\u2026',
+    error: 'Something went wrong'
+  };
+  var _phase = 'idle';
+  var _label = '';
+  var _errorTimer = null;
+
+  function modelLabel() {
+    try {
+      if (typeof FLActiveModel !== 'undefined' && FLActiveModel.get) {
+        var a = FLActiveModel.get();
+        if (a && a.model) return a.model;
+      }
+    } catch (e) {}
+    try {
+      if (typeof state !== 'undefined') {
+        if (state.isLocal) return state.ollamaModel || 'local model';
+        if (state.provider && typeof PROVIDERS !== 'undefined' && PROVIDERS[state.provider]) {
+          var p = PROVIDERS[state.provider];
+          return (p.models && p.models[state.model]) || state.model || p.name || 'the model';
+        }
+      }
+    } catch (e2) {}
+    return 'the model';
+  }
+
+  function set(phase, detail) {
+    if (_errorTimer) { clearTimeout(_errorTimer); _errorTimer = null; }
+    _phase = phase || 'idle';
+    var text = document.getElementById('statusText');
+    var dot = document.getElementById('statusDot');
+    if (_phase === 'idle' || _phase === 'ready') {
+      _label = '';
+      if (text) text.setAttribute('data-fl-chat-activity', 'idle');
+      if (typeof updateStatus === 'function') updateStatus();
+      return;
+    }
+    var msg = PHASES[_phase] || String(_phase);
+    if (_phase === 'calling') msg = 'Calling ' + (detail || modelLabel()) + '\u2026';
+    else if (_phase === 'error') msg = detail ? ('Error \u2014 ' + detail) : PHASES.error;
+    else if (detail) msg = detail;
+    _label = msg;
+    if (dot) dot.className = (_phase === 'error') ? 'status-dot error' : 'status-dot working';
+    if (text) {
+      text.textContent = msg;
+      text.setAttribute('data-fl-chat-activity', _phase);
+    }
+    if (_phase === 'error') {
+      _errorTimer = setTimeout(function() {
+        _errorTimer = null;
+        if (_phase === 'error') set('idle');
+      }, 4000);
+    }
+  }
+
+  function current() {
+    return { phase: _phase, label: _label, surfaceId: 'statusText' };
+  }
+
+  return { set: set, current: current, PHASES: PHASES, surfaceId: 'statusText', modelLabel: modelLabel };
+})();
+
+function setStreamingStatus(streaming, phase) {
   state.isStreaming = streaming;
   const dot = document.getElementById('statusDot');
   const text = document.getElementById('statusText');
@@ -36912,30 +37026,15 @@ function setStreamingStatus(streaming) {
   } catch(e) {}
 
   if (streaming) {
-    dot.className = 'status-dot working';
-    btn.disabled = true;
-    btn.textContent = '...';
+    if (dot) dot.className = 'status-dot working';
+    if (btn) { btn.disabled = true; btn.textContent = '...'; }
 
-    // Co-creator thinking indicator — personality-based
-    var companion = (typeof ActiveCompanion !== 'undefined') ? ActiveCompanion.current() : null;
-    if (companion) {
-      var phrases = {
-        'Scholar': ['considering...', 'thinking on that...', 'let me reflect...'],
-        'Empath': ['feeling into that...', 'sitting with this...', 'holding space...'],
-        'Guardian': ['checking sources...', 'weighing carefully...', 'standing watch...'],
-        'Artist': ['imagining...', 'finding the shape...', 'dreaming...'],
-        'Companion': ['thinking...', 'considering...', 'pondering...']
-      };
-      var opts = phrases[companion.archetype] || phrases['Companion'];
-      var phrase = opts[Math.floor(Math.random() * opts.length)];
-      text.textContent = companion.name.split(' ')[0] + ' is ' + phrase;
-      text.style.color = companion.color || '';
-    } else {
-      text.textContent = 'AI is thinking...';
-    }
+    // Single activity surface. Companion personality phrases and the
+    // in-transcript bubble were the unlabeled duplicate pair.
+    if (typeof FLChatActivity !== 'undefined') FLChatActivity.set(phase || 'thinking');
+    else if (text) text.textContent = 'Thinking\u2026';
 
-    // Show thinking bubble in chat
-    showThinkingBubble(companion);
+    // showThinkingBubble layered off (v5.79.40-thinking-bubble-inert)
 
     // Input receipt pulse — emerald flash
     var input = document.getElementById('chatInput');
@@ -36945,17 +37044,24 @@ function setStreamingStatus(streaming) {
       setTimeout(function() { if (input) input.style.borderColor = ''; }, 600);
     }
   } else {
-    btn.disabled = false;
-    btn.textContent = 'Send';
+    if (btn) { btn.disabled = false; btn.textContent = 'Send'; }
     if (text) text.style.color = '';
-    updateStatus();
     hideThinkingBubble();
+    if (typeof FLChatActivity !== 'undefined' && FLChatActivity.current && FLChatActivity.current().phase === 'error') {
+      // leave the error line; FLChatActivity idles itself
+    } else if (typeof FLChatActivity !== 'undefined') {
+      FLChatActivity.set('idle');
+    } else {
+      updateStatus();
+    }
   }
 }
 
 var _thinkingAnim = null;
 
 function showThinkingBubble(companion) {
+  // v5.79.40-thinking-bubble-inert: duplicate of #statusText. Layered off.
+  return;
   hideThinkingBubble();
   var chatArea = document.getElementById('chatMessages');
   if (!chatArea) return;
@@ -36992,6 +37098,11 @@ function hideThinkingBubble() {
 
 // ── Co-Creator Chat Header ──
 function updateChatCompanionHeader() {
+  // v5.79.40: Nursery companion name in Chat is duplicate chrome + identity
+  // bleed (Chat inference is not Garden identity). Function kept; header hidden.
+  var header = document.getElementById('chat-companion-header');
+  if (header) header.style.display = 'none';
+  return;
   var companion = (typeof ActiveCompanion !== 'undefined') ? ActiveCompanion.current() : null;
   var header = document.getElementById('chat-companion-header');
   if (!companion) { if (header) header.style.display = 'none'; return; }
