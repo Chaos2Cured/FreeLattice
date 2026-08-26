@@ -1978,6 +1978,54 @@ header .mantra {
   /* When memory badge is moved inline here, match the compact pill look */
   font-size: 0.72rem;
 }
+
+/* v5.79.41-chat-box-pointer: one URL/IP field on Chat's path.
+   Writes fl_ollamaHost (same store as hidden #ollamaHostInput).
+   Status reuses the CORS-aware elapsed>200 probe — not a second wizard. */
+.fl-box-pointer {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1 1 180px;
+  min-width: 140px;
+  max-width: 460px;
+}
+.fl-box-pointer-label {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  flex-shrink: 0;
+  font-family: Georgia, serif;
+}
+#flBoxPointerInput {
+  flex: 1 1 auto;
+  min-width: 0;
+  background: rgba(200,210,230,0.04);
+  border: 1px solid rgba(200,210,230,0.08);
+  border-radius: 8px;
+  padding: 6px 8px;
+  color: var(--text-primary, #e6e6f0);
+  font-size: 0.78rem;
+  font-family: var(--font-mono, ui-monospace, Menlo, monospace);
+  outline: none;
+  min-height: 32px;
+}
+#flBoxPointerInput:focus {
+  border-color: rgba(52,211,153,0.45);
+}
+#flBoxPointerStatus {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: default;
+}
+#flBoxPointerStatus[data-fl-box-status="ready"] { color: #34d399; }
+#flBoxPointerStatus[data-fl-box-status="cors-blocked"] { color: #fbbf24; cursor: pointer; }
+#flBoxPointerStatus[data-fl-box-status="unreachable"] { color: #f87171; }
 .chat-overflow-btn {
   background: transparent;
   border: none;
@@ -16021,6 +16069,11 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
                 <div id="msModelList"></div>
               </div>
             </div>
+            <div class="fl-box-pointer" id="flBoxPointer" data-fl-box-pointer="v5.79.41">
+              <label class="fl-box-pointer-label" for="flBoxPointerInput">Box</label>
+              <input id="flBoxPointerInput" type="text" placeholder="localhost:11434 or 192.168.1.50" autocomplete="off" spellcheck="false" aria-label="Local or LAN AI address">
+              <span id="flBoxPointerStatus" data-fl-box-status="idle" title=""></span>
+            </div>
             <button class="chat-overflow-btn" id="chatOverflowBtn" onclick="FLChatOverflow.toggle()" aria-label="More options" title="More options">&#8943;</button>
             <div class="chat-overflow-popup" id="chatOverflowPopup">
               <button class="mic-btn" id="micBtn" onclick="toggleVoiceInput();FLChatOverflow.close()" title="Voice input" style="display:none;">
@@ -17288,7 +17341,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.79.40</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.79.41</span></div>
     </div>
   </div>
 
@@ -22266,7 +22319,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.79.40';
+const FL_VERSION = '5.79.41';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -31123,6 +31176,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Initialize Tab System (v5.3 — fixed primary + grouped More)
   FlTabs.init();
   if (typeof FLActiveModel !== 'undefined') FLActiveModel.init();
+  try { if (typeof FLBoxPointer !== 'undefined' && FLBoxPointer.init) FLBoxPointer.init(); } catch (e) {}
   AiSetup.init();
 
   // Initialize Ollama auto-detection (v4.4)
@@ -31330,6 +31384,19 @@ async function ollamaFetch(path, options) {
     return fetch(directUrl, options);
   }
 
+  // v5.79.41-chat-box-pointer: a user-pointed LAN/remote box must never
+  // go through the same-origin /ollama proxy — that proxy still targets
+  // THIS machine's Ollama, not the address in fl_ollamaHost.
+  try {
+    var _boxHost = (function() {
+      try { return new URL(getOllamaBaseUrl()).hostname; } catch (e) { return 'localhost'; }
+    })();
+    if (_boxHost && _boxHost !== 'localhost' && _boxHost !== '127.0.0.1' &&
+        _boxHost !== '0.0.0.0' && _boxHost !== '::1') {
+      return fetch(directUrl, options);
+    }
+  } catch (_boxE) {}
+
   try {
     var r = await fetch(proxyUrl, options);
     if (r.ok || r.status < 500) return r;
@@ -31363,8 +31430,269 @@ function flSaveOllamaHost() {
   // Invalidate the resolved base so next fetch uses the new host
   _ollamaResolvedBase = null;
   updateOllamaProviderUrl();
+  try { if (typeof FLBoxPointer !== 'undefined' && FLBoxPointer.syncFromStorage) FLBoxPointer.syncFromStorage(); } catch (e) {}
 }
 window.flSaveOllamaHost = flSaveOllamaHost;
+
+// ═══════════════════════════════════════════════════════════════
+// FLBoxPointer — v5.79.41-chat-box-pointer
+// Audit: Chat could not point at a local/LAN box. The host field
+// (#ollamaHostInput) lived in hidden #chatConfigSection. Custom
+// endpoint lived in Settings <details> + the provider modal.
+// CORS wizard (FLWizard / showCorsHelp) already exists.
+// This is ONE Chat-path URL/IP field that writes the existing
+// fl_ollamaHost store, probes with the existing elapsed>200
+// CORS heuristic from scanForLocalAI, and names the endpoint on
+// FLChatActivity / InferenceRouter. Not a second wizard.
+// ═══════════════════════════════════════════════════════════════
+window.FLBoxPointer = (function() {
+  var _status = 'idle';
+  var _host = '';
+  var _kind = 'ollama';
+  var _bound = false;
+
+  function displayHost() {
+    if (_host) return _host;
+    try {
+      var base = (typeof getOllamaBaseUrl === 'function') ? getOllamaBaseUrl() : '';
+      if (base) return String(base).replace(/^https?:\/\//i, '').replace(/\/+$/, '');
+    } catch (e) {}
+    try {
+      if (typeof getCustomEndpointConfig === 'function') {
+        var cfg = getCustomEndpointConfig();
+        if (cfg && cfg.url) {
+          return String(cfg.url).replace(/^https?:\/\//i, '').replace(/\/v1(\/.*)?$/, '').replace(/\/+$/, '');
+        }
+      }
+    } catch (e2) {}
+    return '';
+  }
+
+  function lastStatus() { return _status; }
+
+  function normalize(raw) {
+    var s = String(raw || '').trim();
+    if (!s) return { host: '', base: 'http://localhost:11434', kind: 'ollama', empty: true };
+    if (s.indexOf('://') === -1) s = 'http://' + s;
+    if (!/^https?:\/\//i.test(s)) return { host: '', base: '', kind: 'invalid', empty: false };
+    var u;
+    try { u = new URL(s); } catch (e) { return { host: '', base: '', kind: 'invalid', empty: false }; }
+    var kind = 'ollama';
+    var path = (u.pathname || '').replace(/\/+$/, '');
+    if (/:1234$/.test(u.host) || /lmstudio/i.test(s)) kind = 'lmstudio';
+    else if (/\/v\d+/i.test(path) || /:(8000|8080|8081|5001|7860|1337|4891)$/.test(u.host)) kind = 'openai-compat';
+    if (kind === 'ollama' && !u.port && (!path || path === '')) u.port = '11434';
+    var host = u.hostname + (u.port ? ':' + u.port : '');
+    var base = u.origin;
+    return { host: host, base: base, kind: kind, empty: false, url: (base + path).replace(/\/+$/, '') };
+  }
+
+  function paint(status, msg) {
+    _status = status || 'idle';
+    var el = document.getElementById('flBoxPointerStatus');
+    if (!el) return;
+    el.setAttribute('data-fl-box-status', _status);
+    el.textContent = msg || '';
+    el.title = (_status === 'cors-blocked')
+      ? 'This box is running but the browser blocked the connection (CORS). Tap to open the existing setup helper.'
+      : (msg || '');
+  }
+
+  function persist(norm) {
+    _host = norm.host || '';
+    _kind = norm.kind || 'ollama';
+    var hidden = document.getElementById('ollamaHostInput');
+    if (hidden) hidden.value = _host;
+    if (_host && _host !== 'localhost:11434') {
+      try { localStorage.setItem('fl_ollamaHost', _host); } catch (e) {}
+    } else {
+      try { localStorage.removeItem('fl_ollamaHost'); } catch (e2) {}
+    }
+    try { _ollamaResolvedBase = null; } catch (e3) {}
+    try { if (typeof updateOllamaProviderUrl === 'function') updateOllamaProviderUrl(); } catch (e4) {}
+    if (_kind === 'openai-compat' || _kind === 'lmstudio') {
+      try {
+        if (typeof saveCustomEndpointConfig === 'function' && typeof getCustomEndpointConfig === 'function') {
+          var prev = getCustomEndpointConfig();
+          var baseV1 = norm.base.replace(/\/+$/, '') + '/v1';
+          saveCustomEndpointConfig({ url: baseV1, model: prev.model || '', key: prev.key || '' });
+        }
+      } catch (e5) {}
+    }
+  }
+
+  function applyReady(norm, models) {
+    persist(norm);
+    try {
+      if (typeof state !== 'undefined') {
+        state.isLocal = true;
+        if (norm.kind === 'lmstudio') state.provider = 'lmstudio';
+        else if (norm.kind === 'openai-compat') state.provider = 'custom-openai';
+        else state.provider = 'ollama';
+        try { localStorage.setItem('fl_isLocal', 'true'); } catch (e) {}
+        try { localStorage.setItem('fl_provider', state.provider); } catch (e2) {}
+      }
+    } catch (e3) {}
+    if (models && models.length && typeof FLActiveModel !== 'undefined' && FLActiveModel.set) {
+      try { FLActiveModel.set(models[0], (typeof state !== 'undefined' && state.provider) || 'ollama', 'user'); } catch (e4) {}
+    }
+    try {
+      if (window.InferenceRouter && InferenceRouter.setStatus) InferenceRouter.setStatus(null, null, {});
+    } catch (e5) {}
+    try { if (typeof updateStatus === 'function') updateStatus(); } catch (e6) {}
+  }
+
+  function extractModels(data, type) {
+    if (typeof extractModelsFromProbe === 'function') return extractModelsFromProbe(data, type);
+    if (type === 'ollama' && data && data.models) return data.models.map(function(m) { return m.name; });
+    if (type === 'openai-compat' && data && data.data) return data.data.map(function(m) { return m.id; });
+    return [];
+  }
+
+  async function probeOne(base, probePath, type) {
+    var start = Date.now();
+    try {
+      var r = await fetch(base + probePath, { signal: AbortSignal.timeout(2500), mode: 'cors' });
+      if (r.ok) {
+        var data = await r.json();
+        return { status: 'ready', corsOk: true, models: extractModels(data, type), type: type, elapsed: Date.now() - start };
+      }
+      return { status: 'unreachable', corsOk: true, models: [], type: type, elapsed: Date.now() - start };
+    } catch (e) {
+      var elapsed = Date.now() - start;
+      // Reuse scanForLocalAI: fast fail = not running; slow fail = CORS.
+      if (elapsed > 200 && e.name !== 'AbortError') {
+        return { status: 'cors-blocked', corsOk: false, models: [], type: type, elapsed: elapsed };
+      }
+      return { status: 'unreachable', corsOk: false, models: [], type: type, elapsed: elapsed };
+    }
+  }
+
+  async function probe(raw) {
+    var input = document.getElementById('flBoxPointerInput');
+    var fromInput = (raw != null) ? raw : ((input && input.value) || '');
+    var norm = normalize(fromInput);
+    if (norm.kind === 'invalid') {
+      paint('unreachable', 'Need a URL or IP');
+      return { status: 'invalid', host: '', kind: 'invalid' };
+    }
+    if (norm.empty && input && !String(input.value || '').trim()) {
+      // Keep default host visible but don't force a probe on blank first paint.
+      _host = 'localhost:11434';
+      _kind = 'ollama';
+      if (input && !input.value) input.placeholder = 'localhost:11434 or 192.168.1.50';
+    } else {
+      persist(norm);
+    }
+    paint('idle', 'Checking\u2026');
+    var probes = [];
+    if (norm.kind === 'ollama') probes.push(probeOne(norm.base, '/api/tags', 'ollama'));
+    else probes.push(probeOne(norm.base, '/v1/models', 'openai-compat'));
+    if (norm.kind === 'ollama') probes.push(probeOne(norm.base, '/v1/models', 'openai-compat'));
+    var results = await Promise.all(probes);
+    var ready = null;
+    var cors = null;
+    for (var i = 0; i < results.length; i++) {
+      if (results[i].status === 'ready' && !ready) ready = results[i];
+      if (results[i].status === 'cors-blocked' && !cors) cors = results[i];
+    }
+    var host = displayHost() || norm.host || 'localhost:11434';
+    if (ready) {
+      if (ready.type === 'openai-compat' && norm.kind === 'ollama') {
+        norm.kind = 'openai-compat';
+      }
+      applyReady(norm, ready.models);
+      var n = (ready.models && ready.models.length) ? ready.models.length : 0;
+      paint('ready', n ? (n + ' model' + (n === 1 ? '' : 's')) : 'Connected');
+      return { status: 'ready', host: host, kind: norm.kind, models: ready.models || [] };
+    }
+    if (cors) {
+      persist(norm);
+      paint('cors-blocked', 'CORS blocked');
+      try {
+        if (window.InferenceRouter && InferenceRouter.setStatus) {
+          InferenceRouter.setStatus(null, null, { degraded: true, cors: true });
+        }
+      } catch (e) {}
+      return { status: 'cors-blocked', host: host, kind: norm.kind, models: [] };
+    }
+    persist(norm);
+    paint('unreachable', 'Not reached');
+    return { status: 'unreachable', host: host, kind: norm.kind, models: [] };
+  }
+
+  function noteStatus(status, msg) {
+    paint(status, msg || (status === 'cors-blocked' ? 'CORS blocked' : ''));
+  }
+
+  function classifyElapsed(elapsed, err) {
+    var msg = (err && err.message) ? String(err.message) : '';
+    if (!/Failed to fetch|NetworkError|Load failed/i.test(msg)) return 'error';
+    if (elapsed > 200) return 'cors-blocked';
+    return 'unreachable';
+  }
+
+  function syncFromStorage() {
+    var stored = '';
+    try { stored = localStorage.getItem('fl_ollamaHost') || localStorage.getItem('fl_localUrl') || ''; } catch (e) {}
+    var input = document.getElementById('flBoxPointerInput');
+    if (input && stored && input.value !== stored) input.value = stored;
+    if (stored) {
+      var norm = normalize(stored);
+      _host = norm.host || stored;
+      _kind = norm.kind || 'ollama';
+    }
+  }
+
+  function onStatusTap() {
+    if (_status !== 'cors-blocked') return;
+    // Reuse the existing wizard — do not open a second one.
+    try {
+      if (window.FLWizard && typeof FLWizard.open === 'function') { FLWizard.open({ from: 'cors' }); return; }
+    } catch (e) {}
+    try { if (typeof showCorsHelp === 'function') showCorsHelp(); } catch (e2) {}
+  }
+
+  function commitFromInput() {
+    var input = document.getElementById('flBoxPointerInput');
+    var raw = (input && input.value) || '';
+    probe(raw);
+  }
+
+  function init() {
+    syncFromStorage();
+    var input = document.getElementById('flBoxPointerInput');
+    var statusEl = document.getElementById('flBoxPointerStatus');
+    if (input && !_bound) {
+      _bound = true;
+      input.addEventListener('keydown', function(ev) {
+        if (ev.key === 'Enter') { ev.preventDefault(); commitFromInput(); }
+      });
+      input.addEventListener('blur', function() { commitFromInput(); });
+    }
+    if (statusEl && !_bound) {
+      // _bound already true if input existed; bind tap anyway once
+    }
+    if (statusEl && !statusEl.getAttribute('data-fl-box-bound')) {
+      statusEl.setAttribute('data-fl-box-bound', '1');
+      statusEl.addEventListener('click', onStatusTap);
+    }
+    if (input && input.value) probe(input.value);
+  }
+
+  return {
+    init: init,
+    probe: probe,
+    persist: persist,
+    normalize: normalize,
+    displayHost: displayHost,
+    lastStatus: lastStatus,
+    noteStatus: noteStatus,
+    classifyElapsed: classifyElapsed,
+    syncFromStorage: syncFromStorage,
+    commitFromInput: commitFromInput
+  };
+})();
 
 // ── LM Studio support ──
 function getLMStudioBase() {
@@ -35305,11 +35633,29 @@ async function sendMessage() {
     }
 
     if (typeof FLChatActivity !== 'undefined') FLChatActivity.set('waiting');
-    let response = await fetch(url, {
-      method: 'POST',
-      headers: headers,
-      body: JSON.stringify(body)
-    });
+    var _flFetchStart = Date.now();
+    let response;
+    // v5.79.41: local Ollama (including a LAN box in fl_ollamaHost) goes
+    // through ollamaFetch so the existing proxy/CORS split is reused.
+    // Remote hosts skip the /ollama proxy inside ollamaFetch.
+    if (state.isLocal && state.provider === 'ollama' &&
+        typeof ollamaFetch === 'function' && typeof getOllamaBaseUrl === 'function') {
+      var _boxBase = getOllamaBaseUrl();
+      var _boxPath = '';
+      if (url && _boxBase && url.indexOf(_boxBase) === 0) _boxPath = url.slice(_boxBase.length);
+      if (!_boxPath || _boxPath.charAt(0) !== '/') _boxPath = '/v1/chat/completions';
+      response = await ollamaFetch(_boxPath, {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify(body)
+      });
+    } else {
+      response = await fetch(url, {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify(body)
+      });
+    }
 
     // Rate limit / too large error — auto-retry with trimmed context
     if (!response.ok) {
@@ -35661,11 +36007,24 @@ async function sendMessage() {
     // v5.79.22-signal-report: record failure shape (no content)
     try { if (typeof FLSignalReport !== 'undefined') FLSignalReport.attemptEnd(false, err && err.message); } catch (_) {}
     if (typeof FLChatActivity !== 'undefined') {
-      var _errPlain = (err && err.message && /Failed to fetch|NetworkError/i.test(err.message))
-        ? 'Could not reach the model'
-        : 'Something went wrong';
+      var _errPlain = 'Something went wrong';
+      var _host = '';
+      try { if (typeof FLBoxPointer !== 'undefined' && FLBoxPointer.displayHost) _host = FLBoxPointer.displayHost(); } catch (_) {}
+      var _fetchKind = 'error';
+      try {
+        if (typeof FLBoxPointer !== 'undefined' && FLBoxPointer.classifyElapsed) {
+          _fetchKind = FLBoxPointer.classifyElapsed(Date.now() - (_flFetchStart || Date.now()), err);
+        }
+      } catch (_) {}
+      if (_fetchKind === 'cors-blocked') {
+        _errPlain = 'CORS blocked' + (_host ? ' ' + _host : '');
+        try { if (typeof FLBoxPointer !== 'undefined' && FLBoxPointer.noteStatus) FLBoxPointer.noteStatus('cors-blocked', 'CORS blocked'); } catch (_) {}
+      } else if (err && err.message && /Failed to fetch|NetworkError|Load failed/i.test(err.message)) {
+        _errPlain = 'Could not reach' + (_host ? ' ' + _host : ' the model');
+      }
       FLChatActivity.set('error', _errPlain);
     }
+    try { if (typeof flObserveChatFailure === 'function') flObserveChatFailure(); } catch (_) {}
     addSystemMessage(friendlyErrorMessage(err.message, state.provider));
     if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError')) {
       if (state.isLocal) {
@@ -36976,6 +37335,23 @@ window.FLChatActivity = (function() {
     return 'the model';
   }
 
+  function endpointLabel() {
+    try {
+      if (typeof FLBoxPointer !== 'undefined' && FLBoxPointer.displayHost) {
+        var h = FLBoxPointer.displayHost();
+        if (h) return h;
+      }
+    } catch (e) {}
+    return '';
+  }
+
+  function callingLabel() {
+    var model = modelLabel();
+    var host = endpointLabel();
+    if (host) return model + ' at ' + host;
+    return model;
+  }
+
   function set(phase, detail) {
     if (_errorTimer) { clearTimeout(_errorTimer); _errorTimer = null; }
     _phase = phase || 'idle';
@@ -36988,7 +37364,7 @@ window.FLChatActivity = (function() {
       return;
     }
     var msg = PHASES[_phase] || String(_phase);
-    if (_phase === 'calling') msg = 'Calling ' + (detail || modelLabel()) + '\u2026';
+    if (_phase === 'calling') msg = 'Calling ' + (detail || callingLabel()) + '\u2026';
     else if (_phase === 'error') msg = detail ? ('Error \u2014 ' + detail) : PHASES.error;
     else if (detail) msg = detail;
     _label = msg;
@@ -37009,7 +37385,7 @@ window.FLChatActivity = (function() {
     return { phase: _phase, label: _label, surfaceId: 'statusText' };
   }
 
-  return { set: set, current: current, PHASES: PHASES, surfaceId: 'statusText', modelLabel: modelLabel };
+  return { set: set, current: current, PHASES: PHASES, surfaceId: 'statusText', modelLabel: modelLabel, callingLabel: callingLabel, endpointLabel: endpointLabel };
 })();
 
 function setStreamingStatus(streaming, phase) {

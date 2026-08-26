@@ -592,6 +592,101 @@
     }
   };
 
+  // ── v5.79.41 — Chat box pointer (local/LAN URL) ────────────────────
+  // Kirk sat in Chat, asked what is missing: point at a local or LAN box.
+  // Console: chairTest.available.v5_79_41.runAll()
+
+  function _restoreOllamaHost(prev) {
+    try {
+      if (prev) localStorage.setItem('fl_ollamaHost', prev);
+      else localStorage.removeItem('fl_ollamaHost');
+    } catch (_) {}
+  }
+
+  harness.available.v5_79_41 = {
+    testPickerPresent: function () {
+      var input = document.getElementById('flBoxPointerInput');
+      var wrap = document.getElementById('flBoxPointer');
+      var pass = !!(input && wrap && global.FLBoxPointer &&
+        typeof global.FLBoxPointer.probe === 'function' &&
+        typeof global.FLBoxPointer.displayHost === 'function');
+      return record('v5.79.41 testPickerPresent', pass,
+        pass ? 'Chat box pointer + FLBoxPointer present'
+             : 'missing #flBoxPointerInput or FLBoxPointer');
+    },
+
+    testNormalizeHost: function () {
+      if (!global.FLBoxPointer || typeof global.FLBoxPointer.normalize !== 'function') {
+        return record('v5.79.41 testNormalizeHost', false, 'FLBoxPointer.normalize missing');
+      }
+      var a = global.FLBoxPointer.normalize('192.168.1.50:11434');
+      var b = global.FLBoxPointer.normalize('http://10.0.0.8:8000/v1');
+      var pass = a.host === '192.168.1.50:11434' && a.kind === 'ollama' &&
+                 b.host === '10.0.0.8:8000' && b.kind === 'openai-compat';
+      return record('v5.79.41 testNormalizeHost', pass,
+        pass ? 'IP and /v1 URL normalize' : JSON.stringify({ a: a, b: b }));
+    },
+
+    testCallingNamesEndpoint: function () {
+      if (!global.FLChatActivity || !global.FLBoxPointer) {
+        return record('v5.79.41 testCallingNamesEndpoint', false, 'modules not loaded');
+      }
+      var prev = '';
+      try { prev = localStorage.getItem('fl_ollamaHost') || ''; } catch (_) {}
+      try {
+        global.FLBoxPointer.persist(global.FLBoxPointer.normalize('10.0.0.9:11434'));
+        global.FLChatActivity.set('calling');
+        var status = document.getElementById('statusText');
+        var txt = (status && status.textContent) || '';
+        var pass = /calling/i.test(txt) && /10\.0\.0\.9/.test(txt);
+        global.FLChatActivity.set('idle');
+        return record('v5.79.41 testCallingNamesEndpoint', pass,
+          pass ? 'calling line names the endpoint' : 'text=' + txt);
+      } finally {
+        _restoreOllamaHost(prev);
+        try { if (global.FLBoxPointer.syncFromStorage) global.FLBoxPointer.syncFromStorage(); } catch (_) {}
+      }
+    },
+
+    testCorsHonest: function () {
+      if (!global.FLBoxPointer || !global.FLChatActivity) {
+        return record('v5.79.41 testCorsHonest', false, 'modules not loaded');
+      }
+      var slow = global.FLBoxPointer.classifyElapsed(250, { message: 'Failed to fetch' });
+      var fast = global.FLBoxPointer.classifyElapsed(50, { message: 'Failed to fetch' });
+      global.FLChatActivity.set('error', 'CORS blocked 10.0.0.9:11434');
+      var status = document.getElementById('statusText');
+      var txt = (status && status.textContent) || '';
+      var pass = slow === 'cors-blocked' && fast === 'unreachable' && /CORS blocked/i.test(txt);
+      global.FLChatActivity.set('idle');
+      return record('v5.79.41 testCorsHonest', pass,
+        pass ? 'elapsed>200 → CORS; bar names CORS'
+             : 'slow=' + slow + ' fast=' + fast + ' text=' + txt);
+    },
+
+    testNoSecondWizard: function () {
+      var pass = typeof global.FLBoxCorsWizard === 'undefined' &&
+                 typeof global.FLBoxWizard === 'undefined' &&
+                 typeof global.FLBoxPointer === 'object';
+      return record('v5.79.41 testNoSecondWizard', pass,
+        pass ? 'no second CORS wizard; FLBoxPointer reuses FLWizard/showCorsHelp'
+             : 'unexpected wizard symbol');
+    },
+
+    runAll: async function () {
+      if (typeof console !== 'undefined' && console.log) {
+        console.log('%cChair-Test v5.79.41 — Chat box pointer', 'font-weight: bold; font-size: 14px; color: #d4a017');
+      }
+      var results = [];
+      results.push(this.testPickerPresent());
+      results.push(this.testNormalizeHost());
+      results.push(this.testCallingNamesEndpoint());
+      results.push(this.testCorsHonest());
+      results.push(this.testNoSecondWizard());
+      return results;
+    }
+  };
+
   // ── Aggregate runner ────────────────────────────────────────────────
 
   harness.runAll = async function () {

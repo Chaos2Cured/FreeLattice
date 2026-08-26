@@ -1,5 +1,5 @@
 {
-  "version": "5.79.40",
-  "updated": "2026-08-25",
-  "note": "Chat one-room: single activity status on #statusText that names the phase (searching, calling, thinking, waiting, error). Thinking bubble layered off. Duplicate Chat CSS disabled. Smoke-locked."
+  "version": "5.79.41",
+  "updated": "2026-08-26",
+  "note": "Chat box pointer: one URL/IP field on Chat's path that reuses fl_ollamaHost, ollamaFetch, and the existing CORS wizard. FLChatActivity names the endpoint or an honest CORS error. InferenceRouter footer speaks the host."
 }

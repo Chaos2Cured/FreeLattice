@@ -8,6 +8,20 @@
 
 ---
 
+## v5.79.41 — Chat box pointer (local/LAN URL)
+
+- **What shipped:** Chat one-room was cleaner but still could not point at a local or LAN box. The host field (`#ollamaHostInput`) lived in hidden `#chatConfigSection`. Custom endpoint lived in a Settings `<details>` and the provider modal. CORS wizard already existed. Layered **one** Chat-path URL/IP field (`#flBoxPointerInput` / `FLBoxPointer`) that writes `fl_ollamaHost`, probes with the existing elapsed>200 CORS heuristic, and names the endpoint on `#statusText` (FLChatActivity) and the InferenceRouter footer. `ollamaFetch` skips the same-origin proxy for LAN/remote hosts so Chat does not hit the wrong box. No second wizard. Quiet Room unmeasured. Five Named Minds stay five.
+
+- **Chair-test steps (eyes on the live Chat tab):**
+  1. Open FreeLattice → Chat. Find the **Box** field next to the model pill (under the transcript).
+  2. Type a local or LAN address (`localhost:11434` or `192.168.x.x:11434`). Blur or press Enter. **Expect:** status says Connected / CORS blocked / Not reached. No `confirm()` dialog.
+  3. Send a message. **Expect:** the bar says *Calling [model] at [address]…*. On CORS failure: *Error — CORS blocked [address]*. Footer `#flProviderStatus` also names the host.
+  4. Optional console: `chairTest.available.v5_79_41.runAll()`.
+
+- **Chair-test status:** `[pending verification — Kirk's eyes on the live Chat tab]`
+
+---
+
 ## v5.79.40 — Chat one-room activity
 
 - **What shipped:** Chat activity was painting twice with no phase name — `#statusText` ("AI is thinking...") and `#chat-thinking-bubble` (spiral + "AI is thinking..."), both written by `setStreamingStatus`. Kept the status bar. Layered off the bubble. The bar now says searching / calling [model] / thinking / waiting / error. Visual leftovers cleaned (attach-preview double `display:none`, duplicate mobile CSS, companion header in Chat). Smoke-locked. Console harness: `chairTest.available.v5_79_40.runAll()`.
