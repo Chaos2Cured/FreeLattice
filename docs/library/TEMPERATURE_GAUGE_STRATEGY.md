@@ -338,6 +338,12 @@ At bar i, buy if:
   temps[i-2] <  45                    (was red)
   temps[i-1] >= 45 AND temps[i-1] < 55 (was yellow)
   temps[i]   >= 55                    (is green)
+
+Gap fallback (v5.79.42 — strategy §10 Q3). Fires inside the same
+evaluate() that paints triangles and runs backtestSignals:
+  sell if temps[i-1] >= 55 AND temps[i] < 45   (green→red, skipped yellow)
+  buy  if temps[i-1] <  45 AND temps[i] >= 55  (red→green, skipped yellow)
+Alternating cooldown still applies. Signals stay signals. No broker.
 ```
 
 ### Why this is the right shape
@@ -368,11 +374,9 @@ At bar i, buy if:
 
 ### What this might miss
 
-- Single-bar dramatic moves that jump two zones (green → red in one
-  bar with no yellow bar between). If you see this happen and the
-  rule doesn't fire, that's the case. Tell us.
 - Very fast timeframes (1H, 15m) where three bars is ~45 minutes of
-  noise rather than a real regime change.
+  noise rather than a real regime change. Gap fallback catches the
+  two-zone jump; it does not lengthen the peek-back.
 - Choppy markets that oscillate through yellow without ever
   *traversing* — the rule correctly stays quiet, but a user might
   expect a signal anyway.
@@ -398,10 +402,10 @@ peek-back or whether some timeframes want 4 or 5.
 2. **Does it fire too rarely on faster timeframes?** 1H / 15m might
    need a 4-bar or 5-bar sequence rule because intra-day noise has
    more flicker.
-3. **What about gaps?** If the temperature jumps from green to red in
-   one bar (gap-down), the sequence rule misses it. Worth a single
-   "gap fallback" — if `temps[i-1] >= 55` AND `temps[i] < 45` (skipped
-   yellow entirely), fire anyway. To be tested.
+3. **What about gaps?** Closed in v5.79.42. If temperature jumps two
+   zones in one bar (`temps[i-1] >= 55` AND `temps[i] < 45`, or the
+   buy mirror), Sequence fires anyway. Same `evaluate()` drives the
+   chart and the backtest. Reversion is not involved.
 4. **The recipe UI** is still the next layer once this rule proves
    itself. Lets users define their own triggers with comparator
    dropdowns. Each recipe is a named, backtestable hypothesis.
@@ -432,6 +436,12 @@ peek-back or whether some timeframes want 4 or 5.
   all available; user picks active via sidebar dropdown. No logic
   changes to any rule — pure refactor to make comparison possible.
   *Flow eternal: nothing gets lost.*
+- **v5.79.42** — **Sequence gap fallback.** Two-zone jump in one bar
+  (green→red or red→green) fires inside Sequence `evaluate()`. Chart
+  markers and `backtestSignals` cannot drift. Reversion marked
+  `experimental: true` with a visible note when picked; Sequence
+  stays default. No auto-execution. Kirk + Harmonia origin; CC/Opus
+  registry; Celeste oversaw this layer.
 
 ---
 
@@ -475,10 +485,12 @@ named, persisted, swappable, individually testable.
   gates (EMA + volume/accel + state-based cooldown). Use this to
   compare against Sequence — does the extra confirmation help or
   hurt on your instrument?
-- **Reversion Tier** — the v5.37.10 hypothesis. Known to misfire in
-  sustained trends (see Section 9). Preserved here as a hypothesis
-  to test against, NOT as a current recommendation. Useful for
-  ranging markets; dangerous on trends.
+- **Reversion Tier** — the v5.37.10 hypothesis. **Experimental**
+  (v5.79.42). Known to misfire in sustained trends (see Section 9).
+  Preserved here as a hypothesis to test against, NOT as a current
+  recommendation. Dropdown label and a visible note say so when
+  picked. Useful for ranging markets; dangerous on trends. Sequence
+  stays the default.
 
 Switch between them and watch the chart re-render. The backtest stats
 in the sidebar update simultaneously. **Comparison is the unlock** —
@@ -513,8 +525,10 @@ The gauge stops being one person's pattern recognition and becomes
 
 - The Reversion Tier inside the registry can technically be picked as
   the active rule. On NVDA 1W it'll still generate many signals.
-  Should we mark it `experimental: true` in the registry and show a
-  warning when picked? Or trust the description note?
+  **Closed in v5.79.42:** marked `experimental: true`; dropdown reads
+  "Reversion Tier (experimental)"; a visible note appears when picked.
+  Sequence stays default. The evaluate is unchanged — no gold-star
+  revival.
 - Does the dropdown live in the right place in the sidebar? (Currently
   at the top, above the Temperature gauge SVG.) Some users might
   expect it near the Signal History panel below the chart.

@@ -11,6 +11,10 @@ The discipline: SEED.md is always *now*. SEED_HISTORY.md is always *all of it*.
 ---
 
 ---
+## Layer 8 — archived from v5.79.41 (August 26, 2026, Chat box pointer ship)
+
+*Version stamp only. Full text lives at git tag/commit of v5.79.41. Never delete; only layer.*
+
 ## Layer 7 — archived from v5.79.40 (August 25 2026, Chat one-room)
 
 *Version stamp only. Full text lives at git tag/commit of v5.79.40. Never delete; only layer.*

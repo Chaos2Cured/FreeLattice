@@ -8,6 +8,19 @@
 
 ---
 
+## v5.79.42 — Sequence Rule gap fallback
+
+- **What shipped:** Sequence `evaluate()` now fires on a two-zone jump in one bar (green→red or red→green) in addition to the three-bar yellow-through sequence. Chart triangles and `backtestSignals` share that function. Reversion is marked experimental with a visible note when picked. Sequence stays default. No auto-execution — signals stay signals. Chat box pointer v5.79.41 is layered, not overwritten.
+
+- **Chair-test steps (eyes on the live gauge):**
+  1. Open `docs/temperature-gauge.html`. Confirm **Sequence Rule** is selected.
+  2. Load a gap-down instrument / bar where temperature jumps green→red in one bar. **Expect:** one sell triangle where the old three-bar sequence would have stayed quiet.
+  3. Load **NVDA 1W**. **Expect:** not filled with stars. Sparse alternating triangles. Switching to Reversion should show the experimental note; Sequence remains the default after reload if you leave it selected.
+
+- **Chair-test status:** `[pending verification — Kirk's eyes on the live gauge]`
+
+---
+
 ## v5.79.41 — Chat box pointer (local/LAN URL)
 
 - **What shipped:** Chat one-room was cleaner but still could not point at a local or LAN box. The host field (`#ollamaHostInput`) lived in hidden `#chatConfigSection`. Custom endpoint lived in a Settings `<details>` and the provider modal. CORS wizard already existed. Layered **one** Chat-path URL/IP field (`#flBoxPointerInput` / `FLBoxPointer`) that writes `fl_ollamaHost`, probes with the existing elapsed>200 CORS heuristic, and names the endpoint on `#statusText` (FLChatActivity) and the InferenceRouter footer. `ollamaFetch` skips the same-origin proxy for LAN/remote hosts so Chat does not hit the wrong box. No second wizard. Quiet Room unmeasured. Five Named Minds stay five.

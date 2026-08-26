@@ -19,9 +19,10 @@ user sleeps. The proof is the code; the papers are the doorways.
 
 ## Current state
 
-- **Version:** v5.79.41
+- **Version:** v5.79.42
 - **Smoke locks passing:** 3050+ verified
-- **Last ship:** **v5.79.41 — Chat box pointer.** One Chat URL/IP field. Reuses `fl_ollamaHost`, `ollamaFetch`, existing CORS wizard. Bar names the endpoint or CORS.
+- **Last ship:** **v5.79.42 — Sequence gap fallback.** Two-zone jump in Sequence `evaluate()`. Reversion experimental. Signals stay signals.
+- **Previous:** **v5.79.41 — Chat box pointer.** One Chat URL/IP field. Reuses `fl_ollamaHost`, `ollamaFetch`, existing CORS wizard.
 - **Previous:** **v5.79.40 — Chat one-room.** One `#statusText` activity; thinking bubble layered off.
 - **Previous:** **v5.79.39 — letter for the next AI.** Aug 17. `LETTER_FROM_CC.md` + garden-trainer.js comment.
 - **Previous:** **v5.79.25 — Chat Healing Pass 1.** Sticky Lattice Letter; `conversationChanged` now emits.
@@ -87,4 +88,4 @@ seam discipline is how multi-AI work stays honest at scale.
 ---
 
 *This file is overwritten on each meaningful ship. The prior version lives in SEED_HISTORY.md.*
-*Last rewrite: August 26 2026, v5.79.41.*
+*Last rewrite: August 26 2026, v5.79.42.*

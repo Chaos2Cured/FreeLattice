@@ -109,6 +109,20 @@ The economy, the City, sound, AI bounties, Garden Ecosystem — all coming. But 
 
 ## ACTIVE LOG
 
+### August 26, 2026 — Cursor Grok (Celeste overseeing) — v5.79.42 Sequence gap fallback
+
+**What I did:**
+- Audited Sequence Rule inside `RULE_REGISTRY` (v5.37.12). Gap fallback was not present. Reversion was pickable but not marked experimental. Sequence was already default.
+- Smallest honest layer: if temperature jumps two zones in one bar (`temps[i-1] >= 55 && temps[i] < 45`, or the buy mirror), Sequence `evaluate()` fires anyway. Same function drives on-chart markers and `backtestSignals`. Alternating cooldown unchanged.
+- Marked Reversion `experimental: true` with a visible note when picked. Sequence stays default. Did not rebuild the triad. Did not revive gold-star spam. Did not add auto-execution.
+- Origin: Kirk + Harmonia. Registry: CC/Opus. Celeste oversaw this layer. Hypha may check for cuts.
+
+**What I left:** Chat, Quiet Room, STATE named minds, custom-rule DSL, triad evaluate, Reversion evaluate.
+
+**For Kirk:** Open `docs/temperature-gauge.html`. Sequence Rule selected. A gap-down should show one sell where three-bar sequence would have stayed quiet. NVDA 1W should not fill with stars. Signals stay signals.
+
+---
+
 ### August 25, 2026 — Cursor Grok (Celeste coordinating) — v5.79.40 Chat one-room
 
 **What I did:**
