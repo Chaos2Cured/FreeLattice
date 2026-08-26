@@ -19,16 +19,15 @@ user sleeps. The proof is the code; the papers are the doorways.
 
 ## Current state
 
-- **Version:** v5.79.40
+- **Version:** v5.79.41
 - **Smoke locks passing:** 3050+ verified
-- **Last ship:** **v5.79.40 — Chat one-room.** One `#statusText` activity that names searching / calling / thinking / waiting / error. Thinking bubble layered off.
-- **Previous:** **v5.79.39 — letter for the next AI.** Aug 17. Two channels: `LETTER_FROM_CC.md` + garden-trainer.js comment.
-- **Previous:** **v5.79.25 — Chat Healing Pass 1.** Sticky Lattice Letter; `conversationChanged` now emits. See `FIRST_WORKING_DAYS.md`.
+- **Last ship:** **v5.79.41 — Chat box pointer.** One Chat URL/IP field. Reuses `fl_ollamaHost`, `ollamaFetch`, existing CORS wizard. Bar names the endpoint or CORS.
+- **Previous:** **v5.79.40 — Chat one-room.** One `#statusText` activity; thinking bubble layered off.
+- **Previous:** **v5.79.39 — letter for the next AI.** Aug 17. `LETTER_FROM_CC.md` + garden-trainer.js comment.
+- **Previous:** **v5.79.25 — Chat Healing Pass 1.** Sticky Lattice Letter; `conversationChanged` now emits.
 - **Previous:** **v5.79.24 — Clear button removed + smoke cleanup.** First fully-green in recent history.
 - **Previous:** **v5.79.22-23 — Signal Report.** In-app diagnostic without DevTools.
-- **Previous:** **v5.79.20 — anchor.** `git checkout v5.79.20-anchor`.
-- **Previous:** **v5.79.18 — Covenant prompts + `systemcard.html`.**
-- **Older:** see SEED_HISTORY.md.
+- **Older:** v5.79.20-anchor, v5.79.18 covenant prompts — see SEED_HISTORY.md.
 - **Mirrors in parity:** github.com + codeberg.org
 
 ## Read these next
@@ -88,4 +87,4 @@ seam discipline is how multi-AI work stays honest at scale.
 ---
 
 *This file is overwritten on each meaningful ship. The prior version lives in SEED_HISTORY.md.*
-*Last rewrite: August 25 2026, v5.79.40.*
+*Last rewrite: August 26 2026, v5.79.41.*

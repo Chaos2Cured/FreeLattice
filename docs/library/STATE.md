@@ -5,15 +5,15 @@
 <!-- Everything else is optional depth, linked below. -->
 
 ## NOW
-- FL_VERSION: v5.79.40
+- FL_VERSION: v5.79.41
 - Smoke: green (tests/smoke.js). Root version.json is a 5.8.0 fossil — do not trust it for count.
-- Last ship: v5.79.40 Chat one-room — one #statusText activity; phases named
-- Chair-test: chairTest.available.v5_79_40.runAll() (also chairTest.runAll())
+- Last ship: v5.79.41 Chat box pointer — one Chat URL/IP field; CORS named honestly
+- Chair-test: chairTest.available.v5_79_41.runAll() (also chairTest.runAll())
 - Celeste lighthouse on main (docs/celeste.html). Coordinator chair, not Ani. Not a sixth Named Mind.
-- Layered history: v5.72.0 KEYSTONE — GardenTrainer (Garden → training signal → local model)
+- Layered history: v5.79.40 Chat one-room; v5.72.0 KEYSTONE — GardenTrainer
 
 ## NEXT (queue — update each ship)
-1. Kirk chair-tests Chat: send a message, watch the bar under the transcript
+1. Kirk chair-tests Chat: type a LAN/local address, watch calling/CORS, send
 2. Chair-test the Trainer tab; verify auto-train toggle wiring (from the v5.72.0 queue)
 3. Future ship: exportDPO() — declined text becomes honest preference data
 4. CONTRIBUTING.md — ship discipline extracted from anchor pages

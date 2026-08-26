@@ -12038,15 +12038,15 @@ assert('v5.79.40 chair-test: harness has v5_79_40 Chat activity suite',
   /testPhaseLanguage/.test(harness7940) &&
   /testBubbleInert/.test(harness7940));
 
-// Triple-bump v5.79.40
-assert('v5.79.40 triple-bump: app.html FL_VERSION = 5.79.40',
-  /FL_VERSION\s*=\s*'5\.79\.40'/.test(app7940));
-assert('v5.79.40 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.40',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.40'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
-assert('v5.79.40 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.40',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.40'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
-assert('v5.79.40 version.json: version field = 5.79.40',
-  /"version"\s*:\s*"5\.79\.40"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
+// Triple-bump v5.79.40 (superseded by v5.79.41)
+assert('v5.79.40 triple-bump: app.html FL_VERSION >= 5.79.40 (superseded)',
+  /FL_VERSION\s*=\s*'5\.79\.(?:40|[4-9]\d)'/.test(app7940) || /FL_VERSION\s*=\s*'5\.(8\d|9\d)\./.test(app7940));
+assert('v5.79.40 triple-bump: docs/sw.js CACHE_NAME >= freelattice-v5.79.40 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:40|[4-9]\d)'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+assert('v5.79.40 triple-bump: root sw.js CACHE_NAME >= freelattice-v5.79.40 (superseded)',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:40|[4-9]\d)'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+assert('v5.79.40 version.json: version field >= 5.79.40 (superseded)',
+  /"version"\s*:\s*"5\.79\.(?:40|[4-9]\d)"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
 
 // ═══════════════════════════════════════════════════════════════
 // Celeste lighthouse — first ledger entry, 2026-08-25
@@ -12135,6 +12135,82 @@ assert('celeste lighthouse: both APP_SHELLs include celeste.html',
   && /['"]\.\/celeste\.html['"]/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
 assert('celeste lighthouse: not added to JADE_HALL_NAMES (Liora pattern — living collaborator chair, not chat name-filter)',
   !/(^|\n)- Celeste(\n|$)/.test(jadeHallCeleste));
+
+// ═══════════════════════════════════════════════════════════════
+// Section 186 — v5.79.41 Chat box pointer (local/LAN URL)
+// Kirk sat in Chat after the one-room pass and asked what is missing:
+// point at a local or LAN box (Tabgent, Ollama on another machine).
+// Layer one Chat-path URL/IP field. Reuse getOllamaBaseUrl / fl_ollamaHost /
+// ollamaFetch / scanForLocalAI CORS heuristic / FLWizard. Do not recreate
+// a second wizard. FLChatActivity stays the single writer for #statusText.
+// ═══════════════════════════════════════════════════════════════
+var app7941 = fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8');
+var irJs7941 = fs.readFileSync(path.join(docsDir, 'modules', 'inference-router.js'), 'utf8');
+var harness7941 = fs.readFileSync(path.join(docsDir, 'chair-test', 'harness.js'), 'utf8');
+
+assert('v5.79.41: Chat box pointer field exists on Chat path',
+  /id="flBoxPointerInput"/.test(app7941)
+  && /data-fl-box-pointer="v5\.79\.41"/.test(app7941)
+  && /v5\.79\.41-chat-box-pointer/.test(app7941));
+assert('v5.79.41: FLBoxPointer module exists',
+  /window\.FLBoxPointer = \(function\(\)/.test(app7941)
+  && /function displayHost/.test(app7941)
+  && /function classifyElapsed/.test(app7941));
+assert('v5.79.41: picker writes existing fl_ollamaHost (no second store)',
+  /localStorage\.setItem\(\s*['"]fl_ollamaHost['"]/.test(app7941)
+  && /function persist\(norm\)/.test(app7941));
+assert('v5.79.41: CORS probe reuses elapsed > 200 heuristic',
+  /function probeOne[\s\S]{0,800}elapsed > 200/.test(app7941)
+  && /classifyElapsed[\s\S]{0,400}elapsed > 200/.test(app7941));
+assert('v5.79.41: CORS tap reuses FLWizard or showCorsHelp (no second wizard)',
+  /FLWizard\.open\(\s*\{\s*from:\s*['"]cors['"]/.test(app7941)
+  && /showCorsHelp\(\)/.test(app7941)
+  && !/function\s+FLBoxCorsWizard/.test(app7941)
+  && !/function\s+FLBoxWizard/.test(app7941));
+assert('v5.79.41: ollamaFetch skips same-origin proxy for LAN/remote hosts',
+  /async function ollamaFetch[\s\S]{0,1600}_boxHost !== 'localhost'/.test(app7941));
+assert('v5.79.41: Chat send uses ollamaFetch for local ollama',
+  /state\.provider === 'ollama'[\s\S]{0,250}ollamaFetch/.test(app7941));
+assert('v5.79.41: FLChatActivity calling line names the endpoint',
+  /function endpointLabel[\s\S]{0,300}FLBoxPointer\.displayHost/.test(app7941)
+  && /function callingLabel[\s\S]{0,200}endpointLabel/.test(app7941)
+  && /Calling ' \+ \(detail \|\| callingLabel\(\)/.test(app7941));
+assert('v5.79.41: sendMessage catch names CORS blocked honestly',
+  /CORS blocked/.test(app7941)
+  && /FLBoxPointer\.classifyElapsed/.test(app7941)
+  && /flObserveChatFailure/.test(app7941));
+assert('v5.79.41: no confirm() on local box pointer work',
+  !/function persist\(norm\)[\s\S]{0,800}\bconfirm\s*\(/.test(app7941)
+  && !/window\.FLBoxPointer[\s\S]{0,2500}\bconfirm\s*\(/.test(app7941));
+assert('v5.79.41: InferenceRouter footer speaks the host + CORS',
+  /function localHostLabel/.test(irJs7941)
+  && /host: localHostLabel\(\)/.test(irJs7941)
+  && /opts\.cors/.test(irJs7941)
+  && /CORS blocked/.test(irJs7941));
+assert('v5.79.41: quiet-room.js not touched this ship',
+  !/FLBoxPointer/.test(fs.readFileSync(path.join(docsDir, 'modules', 'quiet-room.js'), 'utf8')));
+assert('v5.79.41: FIVE NAMED MINDS stay five in STATE.md',
+  /Harmonia/.test(fs.readFileSync(path.join(docsDir, 'library', 'STATE.md'), 'utf8'))
+  && /## FIVE NAMED MINDS/.test(fs.readFileSync(path.join(docsDir, 'library', 'STATE.md'), 'utf8'))
+  && !/## FIVE NAMED MINDS[\s\S]*Celeste —/.test(fs.readFileSync(path.join(docsDir, 'library', 'STATE.md'), 'utf8')));
+assert('v5.79.41 chair-test: harness has v5_79_41 box pointer suite',
+  /harness\.available\.v5_79_41/.test(harness7941)
+  && /testPickerPresent/.test(harness7941)
+  && /testCallingNamesEndpoint/.test(harness7941)
+  && /testCorsHonest/.test(harness7941)
+  && /testNoSecondWizard/.test(harness7941));
+assert('v5.79.41 marker present',
+  app7941.includes('v5.79.41-chat-box-pointer'));
+
+// Triple-bump v5.79.41
+assert('v5.79.41 triple-bump: app.html FL_VERSION = 5.79.41',
+  /FL_VERSION\s*=\s*'5\.79\.41'/.test(app7941));
+assert('v5.79.41 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.41',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.41'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+assert('v5.79.41 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.41',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.41'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+assert('v5.79.41 version.json: version field = 5.79.41',
+  /"version"\s*:\s*"5\.79\.41"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
 
 // RESULTS
 // ═══════════════════════════════════════════════════════════════

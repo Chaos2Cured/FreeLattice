@@ -48,6 +48,21 @@
     return target;
   }
 
+  function localHostLabel() {
+    try {
+      if (typeof FLBoxPointer !== 'undefined' && FLBoxPointer.displayHost) {
+        var h = FLBoxPointer.displayHost();
+        if (h) return h;
+      }
+    } catch (e) {}
+    try {
+      if (typeof getOllamaBaseUrl === 'function') {
+        return String(getOllamaBaseUrl()).replace(/^https?:\/\//i, '').replace(/\/+$/, '');
+      }
+    } catch (e2) {}
+    return '';
+  }
+
   function activeProvider() {
     try {
       if (typeof BrowserAI !== 'undefined' && BrowserAI.ready &&
@@ -56,13 +71,14 @@
       }
       if (typeof state !== 'undefined') {
         if (state.provider === 'openai-compat-local') {
-          return { key: 'local:openai-compat', label: 'Local server', type: 'local', isLocal: true, model: state.ollamaModel || 'local' };
+          return { key: 'local:openai-compat', label: 'Local server', type: 'local', isLocal: true, model: state.ollamaModel || 'local', host: localHostLabel() };
         }
         if (state.meshInference && state.meshPeerId) {
           return { key: 'mesh:' + state.meshPeerId, label: 'Mesh peer', type: 'mesh', isLocal: false, model: state.meshModel || state.ollamaModel || 'peer' };
         }
         if (state.isLocal) {
-          return { key: 'local:' + (state.provider || 'ollama'), label: (state.provider === 'lmstudio' ? 'LM Studio' : 'Ollama'), type: 'local', isLocal: true, model: state.ollamaModel || 'local' };
+          var locLabel = (state.provider === 'lmstudio' ? 'LM Studio' : (state.provider === 'custom-openai' ? 'Custom endpoint' : 'Ollama'));
+          return { key: 'local:' + (state.provider || 'ollama'), label: locLabel, type: 'local', isLocal: true, model: state.ollamaModel || 'local', host: localHostLabel() };
         }
         if (state.apiKey) {
           return { key: 'cloud:' + state.provider, label: CLOUD_LABELS[state.provider] || (state.provider || 'Cloud'), type: 'cloud', isLocal: false, model: state.model || state.provider };
@@ -129,6 +145,7 @@
       + 'gap:6px;max-width:92vw;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}'
       + '#flProviderStatus.flps-degraded{color:#fbbf24;border-top-color:rgba(251,191,36,0.45);}'
       + '#flProviderStatus.flps-offline{color:#f87171;border-top-color:rgba(248,113,113,0.45);}'
+      + '#flProviderStatus.flps-cors{color:#fbbf24;border-top-color:rgba(251,191,36,0.45);}'
       + '@media (min-width:769px){#flProviderStatus{left:280px;}}';
     var st = document.createElement('style');
     st.id = 'flProvStatusStyle';
@@ -161,15 +178,17 @@
     injectStyles();
     var el = ensureBar();
     if (!el) return;
-    el.className = opts.offline ? 'flps-offline' : (opts.degraded ? 'flps-degraded' : '');
+    el.className = opts.offline ? 'flps-offline' : (opts.cors ? 'flps-cors flps-degraded' : (opts.degraded ? 'flps-degraded' : ''));
     var inner = el.querySelector('.flps-inner');
     if (!inner) return;
     var type = opts.offline ? 'none' : (opts.cached ? 'cached' : p.type);
     var bits = [];
     if (p.model) bits.push(p.model);
+    if (p.host) bits.push(p.host);
     bits.push(p.isLocal ? 'local' : (p.type || 'cloud'));
     if (latency != null) bits.push(latency + 'ms');
     if (opts.cached) bits.push('cached');
+    if (opts.cors) bits.push('CORS blocked');
     inner.textContent = dotFor(type) + ' ' + (p.label || 'AI') + (bits.length ? ' · ' + bits.join(' · ') : '');
     _lastStatus = { p: p, latency: latency, opts: opts };
   }
@@ -179,7 +198,9 @@
     if (!s) return;
     var parts = ['Provider: ' + (s.p.label || 'AI')];
     if (s.p.model) parts.push('Model: ' + s.p.model);
+    if (s.p.host) parts.push('Host: ' + s.p.host);
     parts.push('Type: ' + (s.p.type || '') + (s.p.isLocal ? ' (local)' : ''));
+    if (s.opts && s.opts.cors) parts.push('CORS blocked');
     if (s.latency != null) parts.push('Latency: ' + s.latency + 'ms');
     var h = _health[s.p.key];
     parts.push('Health: ' + (h ? h.state : 'healthy'));
@@ -339,7 +360,15 @@
   function observe(provider, latencyMs, ok) {
     var p = provider || activeProvider();
     if (ok) { markHealthy(p, latencyMs); setStatus(p, latencyMs); }
-    else { markFail(p); setStatus(p, null, { degraded: true }); }
+    else {
+      markFail(p);
+      var cors = false;
+      try {
+        cors = (typeof FLBoxPointer !== 'undefined' && FLBoxPointer.lastStatus &&
+                FLBoxPointer.lastStatus() === 'cors-blocked');
+      } catch (e) {}
+      setStatus(p, null, { degraded: true, cors: cors });
+    }
     return p;
   }
 

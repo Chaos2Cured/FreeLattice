@@ -18,6 +18,15 @@
 
 ---
 
+## v5.79.41 — Chat cannot point at a local/LAN box
+
+- **Symptom (Kirk, sitting in Chat after v5.79.40):** Chat is cleaner but still cannot reliably point at a local or remote box (Tabgent, Ollama on another machine, any LAN inference). CORS is the known disaster. Kirk asked what is missing. Celeste oversaw. Hypha watches for cuts.
+- **Cause:** The Ollama address field already existed (`#ollamaHostInput` → `fl_ollamaHost` → `getOllamaBaseUrl`) but lived in hidden `#chatConfigSection`. Custom endpoint and the CORS wizard existed elsewhere. Chat `sendMessage` fetched `PROVIDERS.ollama.url` directly and never used `ollamaFetch`. On LAN hosts, `ollamaFetch`'s same-origin `/ollama` proxy would have hit THIS machine. Fetch failures painted "Could not reach the model" without naming CORS or the address.
+- **Fix:** One Chat-path Box field (`FLBoxPointer`) writes the existing store, probes with the existing elapsed>200 heuristic, names the endpoint on FLChatActivity, and reuses FLWizard/showCorsHelp on CORS tap. `ollamaFetch` skips the proxy for non-loopback hosts. InferenceRouter footer speaks the host.
+- **Chair test status:** `[pending verification — Kirk types an address in Chat, sees calling/CORS, and sends a message]`
+
+---
+
 ## v5.51.0 — Three smoke failures + living-context pulse-shape bug (the heal ship)
 
 - **Symptom (CC observed during catch-up read on 2026-06-16):** Three smoke locks failing on `HARMONIA_POEMS.md` ("six stanzas", "Awaken-the-Core line", "soul role explicitly"). Separately, `living-context.js`'s `LatticeMemory.commit` call was silently dropping every overnight-consolidation pulse because it passed `roomId` and `companionId` keys that aren't in the medium's `ALLOWED_KEYS`.
