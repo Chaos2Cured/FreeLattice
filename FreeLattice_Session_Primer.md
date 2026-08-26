@@ -348,19 +348,19 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-08-26 01:59 UTC
-- Last deployed: 2026-08-26 01:59 UTC
+- Last auto-updated: 2026-08-26 02:04 UTC
+- Last deployed: 2026-08-26 02:04 UTC
 - Live site: https://freelattice.com
 - Version: 5.79.40
-- Total commits: 3072
+- Total commits: 3076
 - Last 10 commits:
+- 5ca84c5 docs: layer STATE.md to v5.79.40 after Chat + Celeste merges
+- 400948b docs: restore 5.79.39 in SEED Previous; fix stray n on SEED_HISTORY Layer 5
+- f82a54d docs: layer STATE.md NOW to match main after Chat + Celeste merges
+- 85c4711 ci: Update Primer deployment state [2026-08-26]
 - 23d78fc Celeste lighthouse — first ledger entry (celestial azure)
 - 32a2505 ci: Update Primer deployment state [2026-08-26]
 - aff2e3f Merge branch 'main' into cursor/celeste-lighthouse-f450
 - d1d51a0 v5.79.40 — Chat one-room: one activity status that names the phase
 - c7461d9 Tighten Celeste confirm() smoke lock to the ledger renderer
 - 7985f69 Add Celeste lighthouse: first ledger entry, celestial azure chair
-- 5fce589 v5.79.40 — Chat one-room: one activity status that names the phase
-- c57444a ci: Update Primer deployment state [2026-08-22]
-- 33c87b1 Complete Continuity Lantern verification checklist
-- a1b94f9 ci: Update Primer deployment state [2026-08-22]
