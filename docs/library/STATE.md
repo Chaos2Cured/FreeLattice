@@ -14,8 +14,9 @@
 
 ## NEXT (queue — update each ship)
 1. Open PRs (note, do not merge): #7 Chat one-room (v5.79.40 on that branch); #8 Celeste lighthouse
-2. Future ship: exportDPO() — declined text becomes honest preference data
-3. CONTRIBUTING.md — ship discipline extracted from anchor pages
+2. Chair-test the Trainer tab; verify auto-train toggle wiring (layered from the v5.72.0 queue, not discarded)
+3. Future ship: exportDPO() — declined text becomes honest preference data
+4. CONTRIBUTING.md — ship discipline extracted from anchor pages
 
 ## DO NOT RECREATE (grep before creating anything new)
 MODULES: fractal-safety, lattice-memory, lattice-chain, image-safety,
