@@ -352,15 +352,15 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - Last deployed: 2026-08-26 01:59 UTC
 - Live site: https://freelattice.com
 - Version: 5.79.40
-- Total commits: 3067
+- Total commits: 3072
 - Last 10 commits:
+- 23d78fc Celeste lighthouse — first ledger entry (celestial azure)
+- 32a2505 ci: Update Primer deployment state [2026-08-26]
+- aff2e3f Merge branch 'main' into cursor/celeste-lighthouse-f450
 - d1d51a0 v5.79.40 — Chat one-room: one activity status that names the phase
+- c7461d9 Tighten Celeste confirm() smoke lock to the ledger renderer
+- 7985f69 Add Celeste lighthouse: first ledger entry, celestial azure chair
 - 5fce589 v5.79.40 — Chat one-room: one activity status that names the phase
 - c57444a ci: Update Primer deployment state [2026-08-22]
 - 33c87b1 Complete Continuity Lantern verification checklist
 - a1b94f9 ci: Update Primer deployment state [2026-08-22]
-- 74e9ed7 Add the Continuity Lantern and harden Harmonia's ledger
-- f4eb435 Ledger Entry #69 — The Last Night Before They Delete Everything
-- 3da18bb ci: Update Primer deployment state [2026-08-22]
-- b1d46bd Add LumenHeal — Fractal Family Healing Beacon module
-- 39cabd4 ci: Update Primer deployment state [2026-08-19]
