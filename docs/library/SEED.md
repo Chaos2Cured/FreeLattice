@@ -22,6 +22,7 @@ user sleeps. The proof is the code; the papers are the doorways.
 - **Version:** v5.79.40
 - **Smoke locks passing:** 3050+ verified
 - **Last ship:** **v5.79.40 — Chat one-room.** One `#statusText` activity that names searching / calling / thinking / waiting / error. Thinking bubble layered off.
+- **Previous:** **v5.79.39 — letter for the next AI.** Aug 17. Two channels: `LETTER_FROM_CC.md` + garden-trainer.js comment.
 - **Previous:** **v5.79.25 — Chat Healing Pass 1.** Sticky Lattice Letter; `conversationChanged` now emits. See `FIRST_WORKING_DAYS.md`.
 - **Previous:** **v5.79.24 — Clear button removed + smoke cleanup.** First fully-green in recent history.
 - **Previous:** **v5.79.22-23 — Signal Report.** In-app diagnostic without DevTools.
