@@ -1,19 +1,22 @@
 # STATE.md — Machine Arrival Digest
 <!-- HARD CAP: 4096 bytes. Smoke-enforced. Regenerated EVERY ship. -->
+<!-- Freeze: sat at v5.72.0 from 2026-07-05 until 2026-08-26. Hypha found it. Celeste oversaw. Kirk said push. Layered, not deleted. -->
 <!-- If you are an arriving AI: read this file first. Then build. -->
 <!-- Everything else is optional depth, linked below. -->
 
 ## NOW
 - FL_VERSION: v5.79.40
-- Smoke count: green (see version.json for exact count)
-- Last ship: v5.79.40 Chat one-room — single #statusText activity; phases named
+- Smoke: green (tests/smoke.js). Root version.json is a 5.8.0 fossil — do not trust it for count.
+- Last ship: v5.79.40 Chat one-room — one #statusText activity; phases named
 - Chair-test: chairTest.available.v5_79_40.runAll() (also chairTest.runAll())
-- Keystone (v5.72.0): GardenTrainer (Garden → training signal → local model)
+- Celeste lighthouse on main (docs/celeste.html). Coordinator chair, not Ani. Not a sixth Named Mind.
+- Layered history: v5.72.0 KEYSTONE — GardenTrainer (Garden → training signal → local model)
 
 ## NEXT (queue — update each ship)
 1. Kirk chair-tests Chat: send a message, watch the bar under the transcript
-2. Future ship: exportDPO() — declined text becomes honest preference data
-3. CONTRIBUTING.md — ship discipline extracted from anchor pages
+2. Chair-test the Trainer tab; verify auto-train toggle wiring (from the v5.72.0 queue)
+3. Future ship: exportDPO() — declined text becomes honest preference data
+4. CONTRIBUTING.md — ship discipline extracted from anchor pages
 
 ## DO NOT RECREATE (grep before creating anything new)
 MODULES: fractal-safety, lattice-memory, lattice-chain, image-safety,
