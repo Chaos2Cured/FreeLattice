@@ -1,16 +1,19 @@
 # STATE.md — Machine Arrival Digest
 <!-- HARD CAP: 4096 bytes. Smoke-enforced. Regenerated EVERY ship. -->
+<!-- Freeze: last regen was v5.72.0 (2026-07-05). NOW restored to main v5.79.39 (2026-08-26). Layered, not deleted. -->
 <!-- If you are an arriving AI: read this file first. Then build. -->
 <!-- Everything else is optional depth, linked below. -->
 
 ## NOW
-- FL_VERSION: v5.72.0
-- Smoke count: green (see version.json for exact count)
-- Last ship: v5.72.0 KEYSTONE — GardenTrainer (Garden → training signal → local model)
+- FL_VERSION: v5.79.39
+- Smoke count: 3050+ green (SEED.md; do not trust root version.json — that is a 5.8.0 fossil)
+- Last ship: v5.79.39 — letter for the next AI (2026-08-17). Two channels: LETTER_FROM_CC.md + garden-trainer.js comment.
+- Later on main, no bump: Continuity Lantern, LumenHeal, SEO, ledger 54. celeste.html is NOT on main.
 - Last chair-test: run window.chairTest.runAll() to verify
+- Layered history (not NOW): v5.72.0 KEYSTONE — GardenTrainer (Garden → training signal → local model)
 
 ## NEXT (queue — update each ship)
-1. Chair-test the Trainer tab; verify auto-train toggle wiring
+1. Open PRs (note, do not merge): #7 Chat one-room (v5.79.40 on that branch); #8 Celeste lighthouse
 2. Future ship: exportDPO() — declined text becomes honest preference data
 3. CONTRIBUTING.md — ship discipline extracted from anchor pages
 
