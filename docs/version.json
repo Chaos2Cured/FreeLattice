@@ -1,5 +1,5 @@
 {
-  "version": "5.79.42",
-  "updated": "2026-08-26",
-  "note": "Sequence Rule gap fallback: two-zone jump in one bar fires inside evaluate(). Chart and backtest stay in lockstep. Reversion marked experimental. Sequence stays default. Signals stay signals. Chat box pointer v5.79.41 is layered, not overwritten."
+  "version": "5.79.43",
+  "updated": "2026-08-27",
+  "note": "Trainer simple face: Keep this runs the existing personality export. True fine-tune reveals Tier 2 JSONL + Python. Search, Review, and Tier 3 live behind More (default closed). Keystone collector untouched. Sequence gap fallback v5.79.42 is layered, not overwritten."
 }

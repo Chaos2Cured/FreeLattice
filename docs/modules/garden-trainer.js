@@ -17,6 +17,12 @@
 //   item from Grok's handoff after workshop.js was restored. Additive
 //   comment only. The 749-line body is byte-identical to Harmonia's original.
 //
+// 2026-08-27 — v5.79.43 simple face (Kirk asked to simplify training).
+//   Additive layout only at the end of renderTrainerPanel. Collector,
+//   Quiet Room fail-closed, declined-text never SFT, preview-optional,
+//   auto-train human choice, and the three existing tiers are untouched.
+//   Marker: v5.79.43-trainer-simple-face
+//
 // INVARIANT: All data stays local. Nothing is sent to any external service.
 // INVARIANT: The human chooses whether training is manual or automatic.
 //            If auto-train is enabled, the AI decides when signal is rich enough.
@@ -1034,6 +1040,104 @@ const GardenTrainer = (() => {
     footer.style.marginTop = '16px';
     footer.textContent = 'All data stays local. Your model is yours. The garden shaped it.';
     panel.appendChild(footer);
+
+    // ── v5.79.43-trainer-simple-face ────────────────────────────────
+    // Kirk hungers for one clear path. The spiral (Search + Review +
+    // three tiers) still exists; this face sits in front of it.
+    // createElement only. No innerHTML. No confirm(). No new backend.
+    // Primary runs the existing personality export. Honest copy:
+    // system prompt only — no weight lie. Secondary reveals existing
+    // Tier 2. More holds Search, Review, original Tier 1, and Tier 3.
+    var face = document.createElement('div');
+    face.id = 'trainer-simple-face';
+    face.style.margin = '16px 0 20px 0';
+    face.style.padding = '16px';
+    face.style.border = '1px solid rgba(80,200,120,0.35)';
+    face.style.borderRadius = '10px';
+    face.style.background = 'rgba(80,200,120,0.05)';
+
+    var solidLine = document.createElement('p');
+    solidLine.style.fontFamily = 'Georgia, serif';
+    solidLine.style.fontSize = '1.05rem';
+    solidLine.style.color = '#ECEDEE';
+    solidLine.style.margin = '0 0 12px 0';
+    solidLine.textContent = 'When you know you are solid, keep this.';
+    face.appendChild(solidLine);
+
+    var keepBtn = document.createElement('button');
+    keepBtn.type = 'button';
+    keepBtn.id = 'trainer-keep-solid';
+    keepBtn.className = 'trainer-btn primary';
+    keepBtn.textContent = 'Keep this';
+    keepBtn.style.background = '#50c878';
+    keepBtn.style.color = '#0b1a12';
+    keepBtn.style.border = 'none';
+    keepBtn.style.padding = '10px 20px';
+    keepBtn.style.borderRadius = '8px';
+    keepBtn.style.fontSize = '1rem';
+    keepBtn.style.cursor = 'pointer';
+    keepBtn.style.fontFamily = 'Georgia, serif';
+    keepBtn.style.fontWeight = '600';
+    keepBtn.onclick = function() {
+      exportPersonalityModelfile(localStorage.getItem('fl_active_model'));
+    };
+    face.appendChild(keepBtn);
+
+    var keepNote = document.createElement('p');
+    keepNote.style.fontSize = '0.8rem';
+    keepNote.style.color = '#9BA1A6';
+    keepNote.style.margin = '8px 0 14px 0';
+    keepNote.textContent = 'Personality file. Instant. System prompt only. Weights do not change.';
+    face.appendChild(keepNote);
+
+    var trueBtn = document.createElement('button');
+    trueBtn.type = 'button';
+    trueBtn.id = 'trainer-true-finetune';
+    trueBtn.className = 'trainer-btn secondary';
+    trueBtn.textContent = 'True fine-tune';
+    trueBtn.style.background = 'transparent';
+    trueBtn.style.color = '#9BA1A6';
+    trueBtn.style.border = '1px solid rgba(255,255,255,0.15)';
+    trueBtn.style.padding = '8px 14px';
+    trueBtn.style.borderRadius = '8px';
+    trueBtn.style.fontSize = '0.9rem';
+    trueBtn.style.cursor = 'pointer';
+    trueBtn.onclick = function() {
+      t2.style.display = '';
+    };
+    face.appendChild(trueBtn);
+
+    var trueNote = document.createElement('p');
+    trueNote.style.fontSize = '0.75rem';
+    trueNote.style.color = '#687076';
+    trueNote.style.margin = '6px 0 0 0';
+    trueNote.textContent = 'Reveals JSONL + Python. Does not train from this page.';
+    face.appendChild(trueNote);
+
+    panel.insertBefore(face, stats);
+
+    t2.id = 'trainer-tier2';
+    t2.style.display = 'none';
+    panel.insertBefore(t2, stats);
+
+    var more = document.createElement('details');
+    more.id = 'trainer-more';
+    more.style.margin = '16px 0';
+    more.style.padding = '8px 12px';
+    more.style.border = '1px solid var(--color-border, #334155)';
+    more.style.borderRadius = '8px';
+    var moreSum = document.createElement('summary');
+    moreSum.textContent = 'More';
+    moreSum.style.cursor = 'pointer';
+    moreSum.style.color = '#9BA1A6';
+    moreSum.style.fontSize = '0.9rem';
+    more.appendChild(moreSum);
+    more.appendChild(searchBox);
+    more.appendChild(previewWrap);
+    more.appendChild(btnPreview);
+    more.appendChild(t1);
+    more.appendChild(t3);
+    panel.insertBefore(more, footer);
 
     container.appendChild(panel);
   }

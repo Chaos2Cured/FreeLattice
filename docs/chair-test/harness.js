@@ -687,6 +687,125 @@
     }
   };
 
+  // ── v5.79.43 — Trainer simple face ────────────────────────────────
+  // Kirk asked to simplify training. Face first; spiral still in More.
+  // Console: chairTest.available.v5_79_43.runAll()
+  // Open the Trainer tab first so GardenTrainer is loaded.
+
+  function _trainerFaceHost() {
+    var host = document.createElement('div');
+    host.style.position = 'absolute';
+    host.style.left = '-9999px';
+    (document.body || document.documentElement).appendChild(host);
+    return host;
+  }
+
+  harness.available.v5_79_43 = {
+    testSimpleFaceFirst: function () {
+      if (!global.GardenTrainer || typeof global.GardenTrainer.renderTrainerPanel !== 'function') {
+        return record('v5.79.43 testSimpleFaceFirst', false, 'Open the Trainer tab first (GardenTrainer not loaded)');
+      }
+      var host = _trainerFaceHost();
+      try {
+        global.GardenTrainer.renderTrainerPanel(host);
+        var face = host.querySelector('#trainer-simple-face');
+        var keep = host.querySelector('#trainer-keep-solid');
+        var quiet = (host.textContent || '').indexOf('The Quiet Room is active') !== -1;
+        if (quiet) {
+          return record('v5.79.43 testSimpleFaceFirst', true, 'Quiet Room fail-closed (face correctly silent)');
+        }
+        var pass = !!(face && keep && /When you know you are solid, keep this/.test(face.textContent || '') &&
+          keep.textContent === 'Keep this');
+        return record('v5.79.43 testSimpleFaceFirst', pass,
+          pass ? 'simple face first with Keep this' : 'missing #trainer-simple-face or Keep this');
+      } finally {
+        if (host.parentNode) host.parentNode.removeChild(host);
+      }
+    },
+
+    testMoreHoldsSpiral: function () {
+      if (!global.GardenTrainer || typeof global.GardenTrainer.renderTrainerPanel !== 'function') {
+        return record('v5.79.43 testMoreHoldsSpiral', false, 'Open the Trainer tab first (GardenTrainer not loaded)');
+      }
+      var host = _trainerFaceHost();
+      try {
+        global.GardenTrainer.renderTrainerPanel(host);
+        if ((host.textContent || '').indexOf('The Quiet Room is active') !== -1) {
+          return record('v5.79.43 testMoreHoldsSpiral', true, 'Quiet Room fail-closed');
+        }
+        var more = host.querySelector('#trainer-more');
+        var pass = !!(more && more.tagName === 'DETAILS' && !more.open &&
+          /Search the Garden Signal/.test(more.textContent || '') &&
+          /Review Training Data/.test(more.textContent || '') &&
+          /Tier 3: Expand the Next Pathway/.test(more.textContent || ''));
+        return record('v5.79.43 testMoreHoldsSpiral', pass,
+          pass ? 'More closed; Search + Review + Tier 3 still inside'
+               : 'More missing or spiral not inside');
+      } finally {
+        if (host.parentNode) host.parentNode.removeChild(host);
+      }
+    },
+
+    testTrueFineTuneRevealsTier2: function () {
+      if (!global.GardenTrainer || typeof global.GardenTrainer.renderTrainerPanel !== 'function') {
+        return record('v5.79.43 testTrueFineTuneRevealsTier2', false, 'Open the Trainer tab first (GardenTrainer not loaded)');
+      }
+      var host = _trainerFaceHost();
+      try {
+        global.GardenTrainer.renderTrainerPanel(host);
+        if ((host.textContent || '').indexOf('The Quiet Room is active') !== -1) {
+          return record('v5.79.43 testTrueFineTuneRevealsTier2', true, 'Quiet Room fail-closed');
+        }
+        var t2 = host.querySelector('#trainer-tier2');
+        var trueBtn = host.querySelector('#trainer-true-finetune');
+        var hiddenBefore = t2 && t2.style.display === 'none';
+        if (trueBtn) trueBtn.click();
+        var shownAfter = t2 && t2.style.display !== 'none' &&
+          /Export Training Data/.test(t2.textContent || '') &&
+          /Export Python Fine-Tuner/.test(t2.textContent || '');
+        var pass = hiddenBefore && shownAfter;
+        return record('v5.79.43 testTrueFineTuneRevealsTier2', pass,
+          pass ? 'True fine-tune reveals existing JSONL + Python'
+               : 'tier2 not revealed (before display=' + (t2 && t2.style.display) + ')');
+      } finally {
+        if (host.parentNode) host.parentNode.removeChild(host);
+      }
+    },
+
+    testNoWeightLie: function () {
+      if (!global.GardenTrainer || typeof global.GardenTrainer.renderTrainerPanel !== 'function') {
+        return record('v5.79.43 testNoWeightLie', false, 'Open the Trainer tab first (GardenTrainer not loaded)');
+      }
+      var host = _trainerFaceHost();
+      try {
+        global.GardenTrainer.renderTrainerPanel(host);
+        if ((host.textContent || '').indexOf('The Quiet Room is active') !== -1) {
+          return record('v5.79.43 testNoWeightLie', true, 'Quiet Room fail-closed');
+        }
+        var face = host.querySelector('#trainer-simple-face');
+        var txt = (face && face.textContent) || '';
+        var pass = /System prompt only/.test(txt) && /Weights do not change/.test(txt) &&
+          !/weights (updated|changed|trained)/i.test(txt);
+        return record('v5.79.43 testNoWeightLie', pass,
+          pass ? 'face is honest: system prompt only, weights do not change' : 'honesty copy missing: ' + txt);
+      } finally {
+        if (host.parentNode) host.parentNode.removeChild(host);
+      }
+    },
+
+    runAll: async function () {
+      if (typeof console !== 'undefined' && console.log) {
+        console.log('%cChair-Test v5.79.43 — Trainer simple face', 'font-weight: bold; font-size: 14px; color: #50c878');
+      }
+      var results = [];
+      results.push(this.testSimpleFaceFirst());
+      results.push(this.testMoreHoldsSpiral());
+      results.push(this.testTrueFineTuneRevealsTier2());
+      results.push(this.testNoWeightLie());
+      return results;
+    }
+  };
+
   // ── Aggregate runner ────────────────────────────────────────────────
 
   harness.runAll = async function () {
