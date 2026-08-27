@@ -800,17 +800,17 @@ canvas.sub-canvas.custom { height: 80px !important; }
       <select id="ruleSelect" onchange="setActiveRule(this.value)" style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:0.85rem;cursor:pointer;font-family:inherit;">
         <option value="sequence">Sequence Rule</option>
         <option value="triad">Original Triad</option>
-        <option value="reversion">Reversion Tier</option>
+        <option value="reversion">Reversion Tier (experimental)</option>
       </select>
       <div id="ruleDescription" style="font-size:0.66rem;color:var(--muted);line-height:1.5;padding:6px 2px 0;"></div>
+      <div id="ruleExperimentalNote" style="display:none;margin-top:6px;padding:6px 8px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.28);border-radius:6px;font-size:0.68rem;color:#F59E0B;line-height:1.45;">Experimental. Known-noisy on trends — NVDA 1W filled with stars. Sequence Rule stays the default. Signals stay signals; you decide.</div>
     </div>
     <script>
     document.addEventListener('DOMContentLoaded', function () {
       if (typeof RULE_REGISTRY === 'undefined') return;
       var sel = document.getElementById('ruleSelect');
-      var desc = document.getElementById('ruleDescription');
       if (sel) sel.value = getActiveRule();
-      if (desc && RULE_REGISTRY[sel.value]) desc.textContent = RULE_REGISTRY[sel.value].description;
+      if (typeof syncRuleDescription === 'function') syncRuleDescription(getActiveRule());
     });
     </script>
 
@@ -1256,7 +1256,7 @@ function setEmaPeriods(arr) {
 var RULE_REGISTRY = {
   sequence: {
     name: 'Sequence Rule',
-    description: 'Buy: red→yellow→green in 3 bars. Sell: green→yellow→red in 3 bars. Alternating cooldown (next signal must be the opposite type). The clean signal that survived the chair-test pass.',
+    description: 'Buy: red→yellow→green in 3 bars, or red→green gap. Sell: green→yellow→red in 3 bars, or green→red gap. Alternating cooldown (next must be opposite type). Chair-test survivor.',
     color: '#10B981',
     evaluate: function (candles, a) {
       var closes = candles.map(function (c) { return c.c; });
@@ -1264,15 +1264,22 @@ var RULE_REGISTRY = {
       var sell = new Array(candles.length).fill(null);
       var last = null;
       for (var i = 2; i < candles.length; i++) {
-        if (a.temps[i] == null || a.temps[i-1] == null || a.temps[i-2] == null) continue;
-        var buySeq  = a.temps[i-2] <  45 &&
-                      a.temps[i-1] >= 45 && a.temps[i-1] < 55 &&
-                      a.temps[i]   >= 55;
-        var sellSeq = a.temps[i-2] >= 55 &&
-                      a.temps[i-1] >= 45 && a.temps[i-1] < 55 &&
-                      a.temps[i]   <  45;
-        if (buySeq && last !== 'buy')      { buy[i]  = closes[i]; last = 'buy'; }
-        else if (sellSeq && last !== 'sell') { sell[i] = closes[i]; last = 'sell'; }
+        if (a.temps[i] == null || a.temps[i-1] == null) continue;
+        var buySeq = false, sellSeq = false;
+        if (a.temps[i-2] != null) {
+          buySeq  = a.temps[i-2] <  45 &&
+                    a.temps[i-1] >= 45 && a.temps[i-1] < 55 &&
+                    a.temps[i]   >= 55;
+          sellSeq = a.temps[i-2] >= 55 &&
+                    a.temps[i-1] >= 45 && a.temps[i-1] < 55 &&
+                    a.temps[i]   <  45;
+        }
+        // v5.79.42-sequence-gap-fallback — strategy §10 Q3. Same evaluate()
+        // drives on-chart markers and backtestSignals. No broker, no orders.
+        var buyGap  = a.temps[i-1] <  45 && a.temps[i] >= 55;
+        var sellGap = a.temps[i-1] >= 55 && a.temps[i] <  45;
+        if ((buySeq || buyGap) && last !== 'buy')         { buy[i]  = closes[i]; last = 'buy'; }
+        else if ((sellSeq || sellGap) && last !== 'sell') { sell[i] = closes[i]; last = 'sell'; }
       }
       return { buy: buy, sell: sell };
     }
@@ -1345,8 +1352,9 @@ var RULE_REGISTRY = {
     }
   },
   reversion: {
+    experimental: true,
     name: 'Reversion Tier',
-    description: 'Exhaustion (tpSpread beyond ±1.2 ATR) + Confluence (≥3 of 5 components agree: EMA, RSI, MACD, tempROC, gravity) + Pullback to gravity in last 5 bars + sustained 2-bar acceleration + today turning in the signal direction. Rare and conviction-gated. Preserved from v5.37.10 — known to misfire in sustained trends (NVDA 1W generated 20+ in one trend). Use with care; named here as a hypothesis to test against.',
+    description: 'EXPERIMENTAL. Exhaustion (tpSpread beyond ±1.2 ATR) + Confluence (≥3 of 5 components agree: EMA, RSI, MACD, tempROC, gravity) + Pullback to gravity in last 5 bars + sustained 2-bar acceleration + today turning in the signal direction. Rare and conviction-gated. Preserved from v5.37.10 — known to misfire in sustained trends (NVDA 1W generated 20+ in one trend). Use with care; named here as a hypothesis to test against. Not the default.',
     color: '#ffd560',
     evaluate: function (candles, a) {
       var closes = candles.map(function (c) { return c.c; });
@@ -1418,12 +1426,18 @@ function getActiveRule() {
     return (v && RULE_REGISTRY[v]) ? v : 'sequence';
   } catch (e) { return 'sequence'; }
 }
+function syncRuleDescription(id) {
+  var rule = RULE_REGISTRY[id];
+  if (!rule) return;
+  var desc = document.getElementById('ruleDescription');
+  if (desc) desc.textContent = rule.description;
+  var note = document.getElementById('ruleExperimentalNote');
+  if (note) note.style.display = rule.experimental ? 'block' : 'none';
+}
 function setActiveRule(id) {
   if (!RULE_REGISTRY[id]) return false;
   try { localStorage.setItem('fl_tg_activeRule', id); } catch (e) {}
-  // Update the inline description if the dropdown is mounted.
-  var desc = document.getElementById('ruleDescription');
-  if (desc) desc.textContent = RULE_REGISTRY[id].description;
+  syncRuleDescription(id);
   if (typeof lastCandles !== 'undefined' && lastCandles && typeof lastAnalysis !== 'undefined' && lastAnalysis) {
     renderAll(lastCandles, lastAnalysis, typeof lastSymbol !== 'undefined' ? lastSymbol : '');
   }

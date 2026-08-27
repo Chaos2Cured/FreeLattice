@@ -12202,15 +12202,131 @@ assert('v5.79.41 chair-test: harness has v5_79_41 box pointer suite',
 assert('v5.79.41 marker present',
   app7941.includes('v5.79.41-chat-box-pointer'));
 
-// Triple-bump v5.79.41
+// Triple-bump v5.79.41 (superseded by v5.79.42 Sequence gap fallback)
 assert('v5.79.41 triple-bump: app.html FL_VERSION = 5.79.41',
-  /FL_VERSION\s*=\s*'5\.79\.41'/.test(app7941));
+  /FL_VERSION\s*=\s*'5\.79\.(?:41|4[2-9]|[5-9]\d)'/.test(app7941) || /FL_VERSION\s*=\s*'5\.(8\d|9\d)\./.test(app7941));
 assert('v5.79.41 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.41',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.41'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:41|4[2-9]|[5-9]\d)'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
 assert('v5.79.41 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.41',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.41'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:41|4[2-9]|[5-9]\d)'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
 assert('v5.79.41 version.json: version field = 5.79.41',
-  /"version"\s*:\s*"5\.79\.41"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
+  /"version"\s*:\s*"5\.79\.(?:41|4[2-9]|[5-9]\d)"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
+
+// ═══════════════════════════════════════════════════════════════
+// Section 187 — v5.79.42 Sequence Rule gap fallback
+// Kirk asked to improve buy/sell. Strategy §10 Q3: if temperature
+// jumps two zones in one bar, Sequence fires anyway. Same
+// evaluate() drives chart markers and backtestSignals. Reversion
+// stays opt-in and is marked experimental. Sequence stays default.
+// Signals stay signals — no broker, no auto-execution.
+// Origin: Kirk + Harmonia. Registry: CC/Opus. Celeste oversaw.
+// Chat box pointer v5.79.41 is layered, not overwritten.
+// ═══════════════════════════════════════════════════════════════
+section('187. Sequence gap fallback + Reversion experimental (v5.79.42)');
+
+var gauge7942 = fs.readFileSync(path.join(docsDir, 'temperature-gauge.html'), 'utf8');
+var strat7942 = fs.readFileSync(path.join(docsDir, 'library', 'TEMPERATURE_GAUGE_STRATEGY.md'), 'utf8');
+var coordTg7942 = fs.readFileSync(path.join(docsDir, 'library', 'COORDINATION_TEMPERATURE_GAUGE.md'), 'utf8');
+
+assert('v5.79.42: Sequence evaluate contains gap-fallback marker',
+  gauge7942.includes('v5.79.42-sequence-gap-fallback'));
+assert('v5.79.42: Sequence sell gap is temps[i-1] >= 55 AND temps[i] < 45',
+  /sequence:[\s\S]{0,3500}sellGap = a\.temps\[i-1\] >= 55 && a\.temps\[i\] <\s+45/.test(gauge7942));
+assert('v5.79.42: Sequence buy gap is the red→green mirror',
+  /sequence:[\s\S]{0,3500}buyGap\s+= a\.temps\[i-1\] <\s+45 && a\.temps\[i\] >= 55/.test(gauge7942));
+assert('v5.79.42: gap ORs into the same last-type cooldown as 3-bar sequence',
+  /\(buySeq \|\| buyGap\) && last !== 'buy'/.test(gauge7942) &&
+  /\(sellSeq \|\| sellGap\) && last !== 'sell'/.test(gauge7942));
+assert('v5.79.42: Sequence loop still starts at i=2 (existing 3-bar peek-back lock honored)',
+  /sequence:[\s\S]{0,1500}for \(var i = 2; i < candles\.length/.test(gauge7942));
+assert('v5.79.42: renderChart still delegates to RULE_REGISTRY evaluate (no second sequence)',
+  /_activeRule = RULE_REGISTRY\[getActiveRule\(\)\][\s\S]{0,200}_activeRule\.evaluate\(candles, a\)/.test(gauge7942));
+assert('v5.79.42: backtestSignals still delegates to the same evaluate',
+  /btRule = RULE_REGISTRY\[getActiveRule\(\)\][\s\S]{0,200}btRule\.evaluate\(candles, btAnalysis\)/.test(gauge7942));
+assert('v5.79.42: default active rule remains sequence',
+  /return \(v && RULE_REGISTRY\[v\]\) \? v : 'sequence'/.test(gauge7942));
+assert('v5.79.42: Reversion is marked experimental in the registry',
+  /reversion:\s*\{\s*experimental:\s*true/.test(gauge7942));
+assert('v5.79.42: Sequence is not marked experimental',
+  !/sequence:\s*\{[\s\S]{0,80}experimental:\s*true/.test(gauge7942));
+assert('v5.79.42: visible experimental note element exists',
+  gauge7942.includes('id="ruleExperimentalNote"') &&
+  /Known-noisy on trends/.test(gauge7942));
+assert('v5.79.42: dropdown labels Reversion as experimental',
+  /value="reversion">Reversion Tier \(experimental\)</.test(gauge7942));
+assert('v5.79.42: syncRuleDescription shows the note only when experimental',
+  /function syncRuleDescription\(id\)[\s\S]{0,500}rule\.experimental \? 'block' : 'none'/.test(gauge7942));
+assert('v5.79.42: gold-star Reversion datasets stay removed (no revival)',
+  !gauge7942.includes("label: 'Reversion Buy'") && !gauge7942.includes("label: 'Reversion Sell'"));
+assert('v5.79.42: no broker / auto-execution added to the gauge',
+  !/placeOrder|submitOrder|broker\.|auto.?execut/i.test(gauge7942));
+assert('v5.79.42: Chat box pointer marker survived on app.html',
+  fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8').includes('v5.79.41-chat-box-pointer'));
+assert('v5.79.42: chairTest.available.v5_79_41 box pointer suite still present',
+  /harness\.available\.v5_79_41/.test(fs.readFileSync(path.join(docsDir, 'chair-test', 'harness.js'), 'utf8')));
+
+// Runtime: extract Sequence evaluate() and prove gap vs 3-bar vs quiet trend.
+(function () {
+  var m = gauge7942.match(/sequence:\s*\{[\s\S]*?evaluate:\s*function\s*\(candles,\s*a\)\s*\{([\s\S]*?)\n    \}\n  \},\n  triad:/);
+  assert('v5.79.42 runtime: Sequence evaluate extracts', !!m);
+  if (!m) return;
+  var seqEval;
+  try { seqEval = new Function('candles', 'a', m[1]); }
+  catch (e) {
+    assert('v5.79.42 runtime: Sequence evaluate compiles', false, String(e));
+    return;
+  }
+  function synth(n) {
+    var out = [];
+    for (var i = 0; i < n; i++) out.push({ c: 100 + i, t: i, h: 101, l: 99, o: 100, v: 1000 });
+    return out;
+  }
+  function nSig(arr) { return arr.filter(function (x) { return x != null; }).length; }
+
+  var gapDown = [50, 50, 60, 40, 42, 41];
+  var rGap = seqEval(synth(gapDown.length), { temps: gapDown });
+  assert('v5.79.42 runtime: gap-down 60→40 fires exactly one sell (3-bar would stay quiet)',
+    nSig(rGap.sell) === 1 && rGap.sell[3] != null && nSig(rGap.buy) === 0);
+
+  var threeBar = [50, 60, 50, 40, 40];
+  var r3 = seqEval(synth(threeBar.length), { temps: threeBar });
+  assert('v5.79.42 runtime: three-bar green→yellow→red still sells',
+    nSig(r3.sell) === 1 && r3.sell[3] != null);
+
+  var gapUp = [50, 50, 40, 60, 61];
+  var rUp = seqEval(synth(gapUp.length), { temps: gapUp });
+  assert('v5.79.42 runtime: gap-up 40→60 fires exactly one buy',
+    nSig(rUp.buy) === 1 && rUp.buy[3] != null && nSig(rUp.sell) === 0);
+
+  var quietGreen = [50, 50];
+  for (var t = 0; t < 40; t++) quietGreen.push(58 + (t % 3));
+  var rQ = seqEval(synth(quietGreen.length), { temps: quietGreen });
+  assert('v5.79.42 runtime: green-zone oscillation does not fill with stars',
+    nSig(rQ.sell) === 0 && nSig(rQ.buy) === 0);
+
+  var alt = [50, 60, 40, 30, 20];
+  var rAlt = seqEval(synth(alt.length), { temps: alt });
+  assert('v5.79.42 runtime: after a gap sell, same-side repeats stay quiet',
+    nSig(rAlt.sell) === 1 && nSig(rAlt.buy) === 0);
+})();
+
+assert('v5.79.42 strategy: gap fallback closed in §10 Q3',
+  /Closed in v5\.79\.42/.test(strat7942) && /temps\[i-1\] >= 55/.test(strat7942));
+assert('v5.79.42 strategy: iteration log names gap fallback',
+  strat7942.includes('v5.79.42') && /Sequence gap fallback/.test(strat7942));
+assert('v5.79.42 strategy: Reversion experimental closed in §12',
+  /marked `experimental: true`/.test(strat7942));
+assert('v5.79.42 coordination: gap fallback named in COORDINATION_TEMPERATURE_GAUGE.md',
+  coordTg7942.includes('Sequence gap fallback (v5.79.42)'));
+
+assert('v5.79.42 triple-bump: app.html FL_VERSION = 5.79.42',
+  /FL_VERSION\s*=\s*'5\.79\.42'/.test(fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8')));
+assert('v5.79.42 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.42',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.42'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+assert('v5.79.42 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.42',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.42'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+assert('v5.79.42 version.json: version field = 5.79.42',
+  /"version"\s*:\s*"5\.79\.42"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
 
 // RESULTS
 // ═══════════════════════════════════════════════════════════════

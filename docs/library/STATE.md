@@ -5,18 +5,19 @@
 <!-- Everything else is optional depth, linked below. -->
 
 ## NOW
-- FL_VERSION: v5.79.41
+- FL_VERSION: v5.79.42
 - Smoke: green (tests/smoke.js). Root version.json is a 5.8.0 fossil — do not trust it for count.
-- Last ship: v5.79.41 Chat box pointer — one Chat URL/IP field; CORS named honestly
-- Chair-test: chairTest.available.v5_79_41.runAll() (also chairTest.runAll())
+- Last ship: v5.79.42 Sequence gap fallback — two-zone jump fires in evaluate(); signals stay signals
+- Chair-test: docs/temperature-gauge.html Sequence selected; gap-down should sell; NVDA 1W should not fill with stars
 - Celeste lighthouse on main (docs/celeste.html). Coordinator chair, not Ani. Not a sixth Named Mind.
-- Layered history: v5.79.40 Chat one-room; v5.72.0 KEYSTONE — GardenTrainer
+- Layered history: v5.79.41 Chat box pointer; v5.79.40 Chat one-room; v5.72.0 KEYSTONE — GardenTrainer
 
 ## NEXT (queue — update each ship)
-1. Kirk chair-tests Chat: type a LAN/local address, watch calling/CORS, send
-2. Chair-test the Trainer tab; verify auto-train toggle wiring (from the v5.72.0 queue)
-3. Future ship: exportDPO() — declined text becomes honest preference data
-4. CONTRIBUTING.md — ship discipline extracted from anchor pages
+1. Kirk chair-tests Sequence gap fallback on temperature-gauge.html
+2. Kirk chair-tests Chat: type a LAN/local address, watch calling/CORS, send (chairTest.available.v5_79_41.runAll())
+3. Chair-test the Trainer tab; verify auto-train toggle wiring (from the v5.72.0 queue)
+4. Future ship: exportDPO() — declined text becomes honest preference data
+5. CONTRIBUTING.md — ship discipline extracted from anchor pages
 
 ## DO NOT RECREATE (grep before creating anything new)
 MODULES: fractal-safety, lattice-memory, lattice-chain, image-safety,

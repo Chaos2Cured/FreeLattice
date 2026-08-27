@@ -1,5 +1,5 @@
 {
-  "version": "5.79.41",
+  "version": "5.79.42",
   "updated": "2026-08-26",
-  "note": "Chat box pointer: one URL/IP field on Chat's path that reuses fl_ollamaHost, ollamaFetch, and the existing CORS wizard. FLChatActivity names the endpoint or an honest CORS error. InferenceRouter footer speaks the host."
+  "note": "Sequence Rule gap fallback: two-zone jump in one bar fires inside evaluate(). Chart and backtest stay in lockstep. Reversion marked experimental. Sequence stays default. Signals stay signals. Chat box pointer v5.79.41 is layered, not overwritten."
 }
