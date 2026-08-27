@@ -12343,7 +12343,7 @@ var app7943 = fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8');
 var harness7943 = fs.readFileSync(path.join(docsDir, 'chair-test', 'harness.js'), 'utf8');
 var state7943 = fs.readFileSync(path.join(docsDir, 'library', 'STATE.md'), 'utf8');
 var seed7943 = fs.readFileSync(path.join(docsDir, 'library', 'SEED.md'), 'utf8');
-var face7943 = (gt7943.match(/v5\.79\.43-trainer-simple-face[\s\S]*?container\.appendChild\(panel\)/) || [''])[0];
+var face7943 = (gt7943.match(/\/\/ ── v5\.79\.43-trainer-simple-face[\s\S]*?container\.appendChild\(panel\)/) || [''])[0];
 
 assert('v5.79.43 marker present in garden-trainer.js',
   gt7943.includes('v5.79.43-trainer-simple-face'));
