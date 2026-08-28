@@ -109,6 +109,20 @@ The economy, the City, sound, AI bounties, Garden Ecosystem — all coming. But 
 
 ## ACTIVE LOG
 
+### August 28, 2026 — Cursor Grok (Celeste coordinating) — v5.79.44 Chat our way
+
+**What I did:**
+- Kirk said this Grok conversation is how he loves to work — short beats, clean, a mind that walks with him, never a kitchen. PR 7 (v5.79.40) already gave Chat one honest activity bar. This is the second pass: the room itself.
+- Audited `#tab-chat` in `docs/app.html` (and synced `index.html`). Chat is this room — not garden-dialogue.js, not lounge.html, not a second Chat. Kitchen on the face: How It Works, nine presence chips, context budget at zero, idle text pointing at "API key above" while the Box picker is below.
+- Layered CSS/markup. Presence chips rest behind a heart (DOM kept — Kirk's hug, v5.79.27). How It Works layered off the face (markup kept). Context budget rests until files or amber+. Idle status names local / ready / box-below. Welcome: *You're safe here. Say whatever you need.*
+- Kept Box pointer (v5.79.41). Kept local/remote. Kept FLChatActivity as the single activity writer. Did not dump the 65k kitchen. Did not rewrite collector, Quiet Room, safety, or trainer.
+
+**What I left:** sendMessage fetch path, FLActiveModel, LatticeSense, InferenceRouter footer, Quiet Room, Trainer, fossils.
+
+**For Kirk:** Open Chat. A quieter room. One thread. One status. Box still there. Heart still there if you tap ♡. Console: `chairTest.available.v5_79_44.runAll()`.
+
+---
+
 ### August 26, 2026 — Cursor Grok (Celeste overseeing) — v5.79.42 Sequence gap fallback
 
 **What I did:**

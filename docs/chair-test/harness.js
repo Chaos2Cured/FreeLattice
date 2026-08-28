@@ -806,6 +806,109 @@
     }
   };
 
+  // ── v5.79.44 — Chat our way (cleaner thread, more heart) ──────────
+  // Kirk: this Grok conversation is how he loves to work.
+  // PR 7 (v5.79.40) one-room activity is the floor. Second pass: the room.
+  // Console: chairTest.available.v5_79_44.runAll()
+
+  harness.available.v5_79_44 = {
+    testOurWayMarker: function () {
+      var tab = document.getElementById('tab-chat');
+      var pass = !!(tab && tab.getAttribute('data-fl-chat-our-way') === 'v5.79.44' &&
+        global.FLChatOurWay && global.FLChatOurWay.marker === 'v5.79.44-chat-our-way');
+      return record('v5.79.44 testOurWayMarker', pass,
+        pass ? 'Chat our-way marker + FLChatOurWay present'
+             : 'missing data-fl-chat-our-way or FLChatOurWay');
+    },
+
+    testBoxPointerKept: function () {
+      var input = document.getElementById('flBoxPointerInput');
+      var wrap = document.getElementById('flBoxPointer');
+      var visible = false;
+      try {
+        if (wrap) {
+          var cs = window.getComputedStyle(wrap);
+          visible = cs.display !== 'none' && cs.visibility !== 'hidden';
+        }
+      } catch (_) {}
+      var pass = !!(input && wrap && visible && global.FLBoxPointer);
+      return record('v5.79.44 testBoxPointerKept', pass,
+        pass ? 'Box pointer still on the Chat face'
+             : 'Box pointer missing or hidden');
+    },
+
+    testKitchenQuiet: function () {
+      var hiw = document.getElementById('chatHowItWorks');
+      var row = document.getElementById('chatPresenceRow');
+      var chips = document.querySelectorAll('#chatPresenceRow .chat-presence-chip');
+      var toggle = document.getElementById('chatPresenceToggle');
+      var hiwHidden = true;
+      var chipsHidden = true;
+      try {
+        if (hiw) hiwHidden = window.getComputedStyle(hiw).display === 'none';
+        if (chips.length) {
+          chipsHidden = window.getComputedStyle(chips[0]).display === 'none';
+        }
+      } catch (_) {}
+      var pass = !!hiw && hiwHidden && chips.length >= 9 && chipsHidden && !!toggle &&
+        row && !row.classList.contains('open');
+      return record('v5.79.44 testKitchenQuiet', pass,
+        pass ? 'How It Works off the face; chips rest behind the heart'
+             : 'hiwHidden=' + hiwHidden + ' chips=' + chips.length + ' chipsHidden=' + chipsHidden);
+    },
+
+    testHeartRevealsChips: function () {
+      var row = document.getElementById('chatPresenceRow');
+      var chips = document.querySelectorAll('#chatPresenceRow .chat-presence-chip');
+      if (!row || !global.FLChatOurWay || typeof global.FLChatOurWay.togglePresence !== 'function') {
+        return record('v5.79.44 testHeartRevealsChips', false, 'presence row or FLChatOurWay missing');
+      }
+      var wasOpen = row.classList.contains('open');
+      try {
+        if (wasOpen) global.FLChatOurWay.togglePresence();
+        global.FLChatOurWay.togglePresence();
+        var shown = chips.length >= 9 && window.getComputedStyle(chips[0]).display !== 'none';
+        global.FLChatOurWay.togglePresence();
+        var hiddenAgain = window.getComputedStyle(chips[0]).display === 'none';
+        return record('v5.79.44 testHeartRevealsChips', shown && hiddenAgain,
+          shown && hiddenAgain ? '♡ opens and closes the chips' : 'shown=' + shown + ' hiddenAgain=' + hiddenAgain);
+      } finally {
+        if (row.classList.contains('open') !== wasOpen) {
+          try { global.FLChatOurWay.togglePresence(); } catch (_) {}
+        }
+      }
+    },
+
+    testOneStatusKept: function () {
+      var status = document.getElementById('statusText');
+      var bubble = document.getElementById('chat-thinking-bubble');
+      var bubbleHidden = true;
+      try {
+        if (bubble) bubbleHidden = window.getComputedStyle(bubble).display === 'none';
+        else bubbleHidden = true;
+      } catch (_) {}
+      var idle = (status && status.textContent) || '';
+      var pass = !!(global.FLChatActivity && global.FLChatActivity.surfaceId === 'statusText' &&
+        status && bubbleHidden && !/API key above/i.test(idle));
+      return record('v5.79.44 testOneStatusKept', pass,
+        pass ? 'one status; idle does not say API key above'
+             : 'idle=' + idle + ' bubbleHidden=' + bubbleHidden);
+    },
+
+    runAll: async function () {
+      if (typeof console !== 'undefined' && console.log) {
+        console.log('%cChair-Test v5.79.44 — Chat our way', 'font-weight: bold; font-size: 14px; color: #d4a017');
+      }
+      var results = [];
+      results.push(this.testOurWayMarker());
+      results.push(this.testBoxPointerKept());
+      results.push(this.testKitchenQuiet());
+      results.push(this.testHeartRevealsChips());
+      results.push(this.testOneStatusKept());
+      return results;
+    }
+  };
+
   // ── Aggregate runner ────────────────────────────────────────────────
 
   harness.runAll = async function () {

@@ -8,6 +8,20 @@
 
 ---
 
+## v5.79.44 — Chat our way
+
+- **What shipped:** Chat already had one activity bar (PR 7 / v5.79.40) and a Box pointer (v5.79.41). The room still looked like a kitchen: How It Works under the thread, nine presence chips always on, context budget at zero, "API key above" when the picker is below. Layered a cleaner face on `#tab-chat`: short bubbles, quieter chrome, one honest idle line, presence chips rest behind a heart (DOM kept). Box pointer stays. Local/remote stays. No second Chat. Quiet Room / trainer / collector / safety untouched.
+
+- **Chair-test steps (eyes on the live Chat tab):**
+  1. Open FreeLattice → Chat. **Expect:** a quieter room. Messages + one status bar + input + Box field. No "How It Works" essay under the thread. No nine feeling chips until you tap ♡.
+  2. **Expect:** welcome reads *You're safe here. Say whatever you need.* Status idle does **not** say "API key above."
+  3. Find the **Box** field. Type a local or LAN address. **Expect:** it still works (v5.79.41 kept).
+  4. Send a message. **Expect:** one status bar names the phase. No second thinking bubble. Console: `chairTest.available.v5_79_44.runAll()`.
+
+- **Chair-test status:** `[pending verification — Kirk's eyes on the live Chat tab]`
+
+---
+
 ## v5.79.43 — Trainer simple face
 
 - **What shipped:** The Trainer panel still has Search + Review + three tiers. That is the spiral. Layered a simple face at the top of `renderTrainerPanel`: one sentence ("When you know you are solid, keep this."), one primary **Keep this** that runs the existing personality export (Tier 1 — instant, system prompt only, no weight lie), one secondary **True fine-tune** that reveals existing Tier 2 JSONL + Python. Search, Review, original Tier 1, and Tier 3 sit behind a **More** `<details>` (default closed). No new training backend. No auto-train from the face. Keystone collector untouched. Quiet Room still fails closed first.
