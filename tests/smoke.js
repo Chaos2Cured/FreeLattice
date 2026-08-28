@@ -12494,7 +12494,8 @@ assert('v5.79.44 presence chips kept in the DOM (Kirk hug), rest behind a heart'
 assert('v5.79.44 welcome lifts; idle status does not say API key above',
   app7944.includes("You're safe here. Say whatever you need.") &&
   app7944.includes('point at a box below, or Settings') &&
-  !/Enter your API key above to begin chatting/.test(app7944));
+  !/Enter your API key above to begin chatting/.test(app7944) &&
+  !/Connect an AI provider above to start chatting/.test(app7944));
 assert('v5.79.44 context budget rests until files or amber+',
   app7944.includes('chat-budget-live') &&
   /#tab-chat\[data-fl-chat-our-way="v5\.79\.44"\] #contextBudgetBar:not\(\.chat-budget-live\)/.test(app7944));

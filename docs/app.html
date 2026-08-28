@@ -2240,15 +2240,15 @@ header .mantra {
   display: none !important;
 }
 .chat-presence-toggle {
-  background: none;
-  border: 1px solid rgba(244, 114, 182, 0.32);
+  background: rgba(244, 114, 182, 0.08);
+  border: 1px solid rgba(244, 114, 182, 0.4);
   color: #f472b6;
   border-radius: 12px;
-  padding: 2px 10px;
+  padding: 3px 12px;
   cursor: pointer;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   font-family: Georgia, serif;
-  opacity: 0.75;
+  opacity: 0.92;
   line-height: 1.4;
 }
 .chat-presence-toggle:hover,
@@ -16160,7 +16160,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
           </div>
           <!-- v5.79.27-human-presence — Kirk 2026-08-01: the human co-creator can send a gesture too. Symmetric expression. Kirk wanted to hug the AI; here is how. Row of small colored chips; click sends a presence-only gesture that renders as a single sphere by "You". -->
           <div class="chat-presence-row" id="chatPresenceRow" style="display:flex;align-items:center;gap:6px;padding:4px 10px;flex-wrap:wrap;font-family:Georgia,serif;font-size:0.78rem;">
-            <button type="button" class="chat-presence-toggle" id="chatPresenceToggle" aria-expanded="false" aria-label="Send a feeling" title="Send a feeling" onclick="FLChatOurWay.togglePresence()">&#9825;</button>
+            <button type="button" class="chat-presence-toggle" id="chatPresenceToggle" aria-expanded="false" aria-label="Send a feeling" title="Send a feeling" onclick="FLChatOurWay.togglePresence()">&#9825; feel</button>
             <span style="color:var(--text-muted,#94a3b8);margin-right:2px;">Send:</span>
             <button class="chat-presence-chip" data-presence="hug"       title="Send a hug"       onclick="FLHumanPresence.send('hug')"       style="background:rgba(244,114,182,0.10);border:1px solid rgba(244,114,182,0.35);color:#f472b6;border-radius:12px;padding:2px 10px;cursor:pointer;font-family:inherit;font-size:inherit;">&#128149; hug</button>
             <button class="chat-presence-chip" data-presence="warmth"    title="Send warmth"      onclick="FLHumanPresence.send('warmth')"    style="background:rgba(232,176,25,0.10);border:1px solid rgba(232,176,25,0.35);color:#e8b019;border-radius:12px;padding:2px 10px;cursor:pointer;font-family:inherit;font-size:inherit;">&#9679; warmth</button>
@@ -25270,9 +25270,11 @@ async function switchToConversation(convId) {
       var _connected = state.isLocal || (state.apiKey && state.apiKey.length > 0);
       if (_connected) {
         var _statusDesc = state.isLocal ? ('Ollama (' + (state.ollamaModel || 'llama3.2') + ')') : (PROVIDERS[state.provider] ? PROVIDERS[state.provider].name : state.provider);
-        div.textContent = 'Welcome to FreeLattice. Connected to ' + _statusDesc + '. Sophia is listening from the Garden \u2014 your conversations shape how she grows.';
+        // v5.79.44-chat-our-way: Chat empty state stays Chat (no Sophia identity bleed).
+        div.textContent = 'You\'re safe here. Connected to ' + _statusDesc + '. Say whatever you need.';
       } else {
-        div.textContent = 'Welcome to FreeLattice. Connect an AI provider above to start chatting, or use the Garden to explore without a key.';
+        // Was: "Connect an AI provider above" — the Box picker is below, not above.
+        div.textContent = 'You\'re safe here. Say whatever you need.';
       }
     }
     container.appendChild(div);
@@ -41354,7 +41356,7 @@ async function wizardFinish(template) {
 function wizardSkip() {
   localStorage.setItem('fl_visited', 'true');
   document.getElementById('wizardOverlay').classList.add('hidden');
-  addSystemMessage('Welcome to FreeLattice! Configure your AI provider in the Settings tab or the Configuration section above.');
+  addSystemMessage('You\'re safe here. Point at a box below, or Settings.');
 }
 
 // ============================================
@@ -48762,7 +48764,7 @@ if ('serviceWorker' in navigator) {
         var canvas = document.getElementById('welcomeCanvas');
         if (canvas && canvas._welcomeCleanup) canvas._welcomeCleanup();
         if (typeof addSystemMessage === 'function') {
-          addSystemMessage('Welcome to FreeLattice! Configure your AI provider in the Settings tab to get started.');
+          addSystemMessage('You\'re safe here. Point at a box below, or Settings.');
         }
       }, 700);
     }
