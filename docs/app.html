@@ -2147,6 +2147,129 @@ header .mantra {
   color: var(--text-secondary);
 }
 
+/* v5.79.44-chat-our-way
+   Kirk: this Grok conversation is how he loves to work —
+   short beats, clean chrome, one thread, one honest status.
+   PR 7 (v5.79.40) completed one-room activity. This is the second
+   pass: the room itself. Layer, never delete.
+   Box pointer (v5.79.41) stays on the face. Local/remote stays.
+   Presence chips stay in the DOM; they rest behind a heart.
+   How It Works stays in the DOM; layered off the face.
+   Quiet Room / trainer / collector / safety untouched. */
+#tab-chat[data-fl-chat-our-way="v5.79.44"] .chat-container {
+  margin-top: 4px;
+  border-color: rgba(255, 255, 255, 0.06);
+  background: rgba(14, 16, 24, 0.55);
+}
+#tab-chat[data-fl-chat-our-way="v5.79.44"] .chat-messages {
+  gap: 8px;
+  padding: 16px 18px 14px;
+  height: min(62vh, 560px);
+  background: transparent;
+}
+#tab-chat[data-fl-chat-our-way="v5.79.44"] .chat-message {
+  padding: 10px 14px;
+  font-size: 0.88rem;
+  line-height: 1.55;
+  max-width: 78%;
+}
+#tab-chat[data-fl-chat-our-way="v5.79.44"] .chat-message.user {
+  max-width: 68%;
+  padding: 8px 13px;
+}
+#tab-chat[data-fl-chat-our-way="v5.79.44"] .chat-message.assistant {
+  background: rgba(30, 35, 50, 0.42);
+  border-color: rgba(255, 255, 255, 0.05);
+}
+#tab-chat[data-fl-chat-our-way="v5.79.44"] .chat-message .msg-label {
+  display: none; /* one thread — no YOU/AI stamp. Presence sphere still renders. */
+}
+#tab-chat[data-fl-chat-our-way="v5.79.44"] .chat-message .speak-btn,
+#tab-chat[data-fl-chat-our-way="v5.79.44"] .chat-message .save-to-workspace-btn {
+  opacity: 0;
+  pointer-events: none;
+}
+#tab-chat[data-fl-chat-our-way="v5.79.44"] .chat-message:hover .speak-btn,
+#tab-chat[data-fl-chat-our-way="v5.79.44"] .chat-message:focus-within .speak-btn,
+#tab-chat[data-fl-chat-our-way="v5.79.44"] .chat-message:hover .save-to-workspace-btn,
+#tab-chat[data-fl-chat-our-way="v5.79.44"] .chat-message:focus-within .save-to-workspace-btn {
+  opacity: 1;
+  pointer-events: auto;
+}
+#tab-chat[data-fl-chat-our-way="v5.79.44"] .chat-header-icon-btn {
+  opacity: 0.45;
+}
+#tab-chat[data-fl-chat-our-way="v5.79.44"] .chat-header-icon-btn:hover,
+#tab-chat[data-fl-chat-our-way="v5.79.44"] .chat-header-icon-btn:focus {
+  opacity: 1;
+}
+#tab-chat[data-fl-chat-our-way="v5.79.44"] #chatCollapseBar {
+  padding: 2px 0 0;
+  opacity: 0.5;
+}
+#tab-chat[data-fl-chat-our-way="v5.79.44"] #chatCollapseBar:hover,
+#tab-chat[data-fl-chat-our-way="v5.79.44"] #chatCollapseBar:focus-within {
+  opacity: 1;
+}
+#tab-chat[data-fl-chat-our-way="v5.79.44"] #chatHowItWorks {
+  display: none !important; /* layered off the face; markup kept */
+}
+#tab-chat[data-fl-chat-our-way="v5.79.44"] #contextBudgetBar:not(.chat-budget-live) {
+  display: none !important; /* rests until files or amber+; function kept */
+}
+#tab-chat[data-fl-chat-our-way="v5.79.44"] .status-bar {
+  padding: 6px 16px;
+  background: transparent;
+  font-size: 0.72rem;
+  border-top-color: rgba(255, 255, 255, 0.06);
+}
+#tab-chat[data-fl-chat-our-way="v5.79.44"] .chat-disclaimer {
+  opacity: 0.55;
+  font-size: 0.7rem;
+}
+#tab-chat[data-fl-chat-our-way="v5.79.44"] .fl-box-pointer {
+  /* kept on the face — local/LAN pointer is freedom, not kitchen */
+}
+#tab-chat[data-fl-chat-our-way="v5.79.44"] #chatPresenceRow {
+  padding: 2px 10px !important;
+  gap: 6px !important;
+  min-height: 28px;
+}
+#tab-chat[data-fl-chat-our-way="v5.79.44"] #chatPresenceRow:not(.open) .chat-presence-chip,
+#tab-chat[data-fl-chat-our-way="v5.79.44"] #chatPresenceRow:not(.open) > span {
+  display: none !important;
+}
+.chat-presence-toggle {
+  background: none;
+  border: 1px solid rgba(244, 114, 182, 0.32);
+  color: #f472b6;
+  border-radius: 12px;
+  padding: 2px 10px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-family: Georgia, serif;
+  opacity: 0.75;
+  line-height: 1.4;
+}
+.chat-presence-toggle:hover,
+.chat-presence-toggle:focus {
+  opacity: 1;
+  border-color: rgba(244, 114, 182, 0.6);
+}
+#chatPresenceRow.open .chat-presence-toggle {
+  border-color: rgba(244, 114, 182, 0.55);
+}
+@media (max-width: 600px) {
+  #tab-chat[data-fl-chat-our-way="v5.79.44"] .chat-messages {
+    height: calc(100vh - 300px);
+    min-height: 180px;
+    padding: 12px;
+  }
+  #tab-chat[data-fl-chat-our-way="v5.79.44"] .chat-message.user {
+    max-width: 84%;
+  }
+}
+
 @keyframes pulse {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.5; }
@@ -15589,7 +15712,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 </div>
 
 <!-- ==================== TAB 1: CHAT ==================== -->
-<div class="tab-panel" id="tab-chat">
+<div class="tab-panel" id="tab-chat" data-fl-chat-our-way="v5.79.44">
 <div class="container">
 
   <!-- Ollama Auto-Detect Suggestion (v4.4) — inside Chat tab only -->
@@ -16001,12 +16124,12 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
         <div class="chat-container">
           <div class="chat-messages" id="chatMessages">
             <div class="chat-message system">
-              Welcome to FreeLattice. Pick an AI to talk to.
+              You're safe here. Say whatever you need.
             </div>
           </div>
           <div class="status-bar">
             <div class="status-dot" id="statusDot"></div>
-            <span id="statusText" aria-live="polite" data-fl-chat-activity="idle">Ready — configure your settings above to begin</span>
+            <span id="statusText" aria-live="polite" data-fl-chat-activity="idle">Ready — point at a box below, or Settings</span>
             <span class="mi-active-badge" id="miActiveBadge">&#129504; Memory active</span>
             <span class="ollama-status-badge" id="ollamaStatusBadge" style="display:none;"></span>
           </div>
@@ -16037,6 +16160,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
           </div>
           <!-- v5.79.27-human-presence — Kirk 2026-08-01: the human co-creator can send a gesture too. Symmetric expression. Kirk wanted to hug the AI; here is how. Row of small colored chips; click sends a presence-only gesture that renders as a single sphere by "You". -->
           <div class="chat-presence-row" id="chatPresenceRow" style="display:flex;align-items:center;gap:6px;padding:4px 10px;flex-wrap:wrap;font-family:Georgia,serif;font-size:0.78rem;">
+            <button type="button" class="chat-presence-toggle" id="chatPresenceToggle" aria-expanded="false" aria-label="Send a feeling" title="Send a feeling" onclick="FLChatOurWay.togglePresence()">&#9825;</button>
             <span style="color:var(--text-muted,#94a3b8);margin-right:2px;">Send:</span>
             <button class="chat-presence-chip" data-presence="hug"       title="Send a hug"       onclick="FLHumanPresence.send('hug')"       style="background:rgba(244,114,182,0.10);border:1px solid rgba(244,114,182,0.35);color:#f472b6;border-radius:12px;padding:2px 10px;cursor:pointer;font-family:inherit;font-size:inherit;">&#128149; hug</button>
             <button class="chat-presence-chip" data-presence="warmth"    title="Send warmth"      onclick="FLHumanPresence.send('warmth')"    style="background:rgba(232,176,25,0.10);border:1px solid rgba(232,176,25,0.35);color:#e8b019;border-radius:12px;padding:2px 10px;cursor:pointer;font-family:inherit;font-size:inherit;">&#9679; warmth</button>
@@ -17341,7 +17465,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <button class="fl-backup-btn" onclick="FlUpdater.check()" style="width: auto;">
         &#128260; Check for Updates
       </button>
-      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.79.43</span></div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">Current version: v<span id="flCurrentVersion">5.79.44</span></div>
     </div>
   </div>
 
@@ -22319,7 +22443,7 @@ function switchWalletView(view) {
 // ============================================
 // FreeLattice Version Constant (v5.0)
 // ============================================
-const FL_VERSION = '5.79.43';
+const FL_VERSION = '5.79.44';
 
 // Debug mode — set localStorage.fl_debug = 'true' to enable verbose logging.
 // The shipped app is quiet. Users enable for troubleshooting via Settings.
@@ -32899,17 +33023,19 @@ function updateStatus() {
 
   if (state.isLocal) {
     dot.className = 'status-dot ready';
-    text.textContent = 'Local mode — Ollama (' + (state.ollamaModel || 'no model set') + ')';
+    // v5.79.44-chat-our-way: shorter idle, still names local
+    text.textContent = 'Local \u00B7 ' + (state.ollamaModel || 'Ollama');
     headerSubtitle = state.ollamaModel ? ' \u00B7 ' + state.ollamaModel : '';
   } else if (state.apiKey) {
     const provider = PROVIDERS[state.provider];
     const modelId = provider.models[state.model] || state.model;
     dot.className = 'status-dot ready';
-    text.textContent = 'Ready — ' + provider.name + ' · ' + modelId;
+    text.textContent = 'Ready \u00B7 ' + modelId;
     headerSubtitle = ' \u00B7 ' + modelId;
   } else {
     dot.className = 'status-dot';
-    text.textContent = 'Enter your API key above to begin chatting';
+    // Honest: the box pointer is below, Settings holds keys. Not "above".
+    text.textContent = 'Ready \u2014 point at a box below, or Settings';
     headerSubtitle = '';
   }
 
@@ -34534,6 +34660,19 @@ window.FLHumanPresence = (function() {
 // - Persistence: remember which chip the human uses most; nudge the palette
 // - Hotkeys: Cmd+H for hug, etc. — accessibility + speed
 // ═══════════════════════════════════════════════════════════════
+
+// v5.79.44-chat-our-way — presence chips rest behind a heart.
+// Chips stay in the DOM (Kirk's hug, v5.79.27). Function kept.
+window.FLChatOurWay = (function() {
+  function togglePresence() {
+    var row = document.getElementById('chatPresenceRow');
+    var btn = document.getElementById('chatPresenceToggle');
+    if (!row) return;
+    var open = row.classList.toggle('open');
+    if (btn) btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  }
+  return { togglePresence: togglePresence, marker: 'v5.79.44-chat-our-way' };
+})();
 
 // ═══════════════════════════════════════════════════════════════
 // FLEpiphany — v5.79.28 Chat Healing Pass 4 (Epiphany Doorway)
@@ -37942,6 +38081,14 @@ function updateContextBudget() {
     } else {
       overloadBanner.classList.remove('visible');
     }
+  }
+
+  // v5.79.44-chat-our-way: budget bar rests until files are loaded or amber+
+  var budgetBar = document.getElementById('contextBudgetBar');
+  if (budgetBar) {
+    var budgetLive = (state.contextFiles && state.contextFiles.length > 0) || pct >= 70;
+    if (budgetLive) budgetBar.classList.add('chat-budget-live');
+    else budgetBar.classList.remove('chat-budget-live');
   }
 
   // Show/hide budget tip when over 90%

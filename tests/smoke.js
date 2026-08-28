@@ -12416,14 +12416,14 @@ assert('v5.79.43 did not touch Quiet Room, Chat, temperature-gauge evaluate, Nam
   !/## FIVE NAMED MINDS[\s\S]*Celeste —/.test(state7943) &&
   !/bank\/SOL|SOLANA|solana/i.test(gt7943));
 assert('v5.79.43 STATE.md names this ship and keeps 5.79.42 Sequence in history',
-  /FL_VERSION: v5\.79\.43/.test(state7943) &&
+  (/FL_VERSION: v5\.79\.43/.test(state7943) || /v5\.79\.43 Trainer simple face/.test(state7943)) &&
   /Trainer simple face/.test(state7943) &&
   /v5\.79\.42 Sequence gap fallback/.test(state7943) &&
   Buffer.byteLength(state7943, 'utf8') <= 4096);
 assert('v5.79.43 SEED.md last ship is simple face; previous is Sequence gap fallback',
-  /\*\*Version:\*\*\s*v5\.79\.43/.test(seed7943) &&
+  (/\*\*Version:\*\*\s*v5\.79\.43/.test(seed7943) || /\*\*Previous:\*\*\s*\*\*v5\.79\.43 — Trainer simple face/.test(seed7943)) &&
   /Trainer simple face/.test(seed7943) &&
-  /\*\*Previous:\*\*\s*\*\*v5\.79\.42 — Sequence gap fallback/.test(seed7943));
+  /v5\.79\.42 — Sequence gap fallback/.test(seed7943));
 assert('v5.79.43 chair-test: harness has v5_79_43 simple-face suite',
   /harness\.available\.v5_79_43/.test(harness7943) &&
   /testSimpleFaceFirst/.test(harness7943) &&
@@ -12434,15 +12434,112 @@ assert('v5.79.43 5.79.42 Sequence feature locks left exact (gap-fallback marker 
   fs.readFileSync(path.join(docsDir, 'temperature-gauge.html'), 'utf8').includes('v5.79.42-sequence-gap-fallback'));
 
 assert('v5.79.43 triple-bump: app.html FL_VERSION = 5.79.43',
-  /FL_VERSION\s*=\s*'5\.79\.43'/.test(app7943));
+  /FL_VERSION\s*=\s*'5\.79\.(?:43|4[4-9]|[5-9]\d)'/.test(app7943) ||
+  /FL_VERSION\s*=\s*'5\.(8\d|9\d)\./.test(app7943));
 assert('v5.79.43 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.43',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.43'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:43|4[4-9]|[5-9]\d)'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
 assert('v5.79.43 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.43',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.43'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:43|4[4-9]|[5-9]\d)'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
 assert('v5.79.43 version.json: version field = 5.79.43',
-  /"version"\s*:\s*"5\.79\.43"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
+  /"version"\s*:\s*"5\.79\.(?:43|4[4-9]|[5-9]\d)"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
 assert('v5.79.43 triple-bump: app.html flCurrentVersion span = 5.79.43',
-  /id="flCurrentVersion">5\.79\.43</.test(app7943));
+  /id="flCurrentVersion">5\.79\.(?:43|4[4-9]|[5-9]\d)</.test(app7943));
+
+// ═══════════════════════════════════════════════════════════════
+// Section 189 — v5.79.44 Chat our way
+// Kirk: this Grok conversation is how he loves to work — short beats,
+// clean, a mind that walks with him, never a kitchen. PR 7 (v5.79.40)
+// already gave one activity bar. Second pass: the room itself.
+// Layer CSS/markup. Keep Box pointer. Keep local/remote. Do not invent
+// a second Chat. Do not dump the 65k kitchen. Quiet Room / trainer /
+// collector / safety / AUTONOMY.md untouched.
+// ═══════════════════════════════════════════════════════════════
+section('189. Chat our way (v5.79.44)');
+
+var app7944 = fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8');
+var idx7944 = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
+var harness7944 = fs.readFileSync(path.join(docsDir, 'chair-test', 'harness.js'), 'utf8');
+var state7944 = fs.readFileSync(path.join(docsDir, 'library', 'STATE.md'), 'utf8');
+var seed7944 = fs.readFileSync(path.join(docsDir, 'library', 'SEED.md'), 'utf8');
+var mirror7944 = fs.readFileSync(path.join(docsDir, 'mirror-chat.html'), 'utf8');
+var qr7944 = fs.readFileSync(path.join(docsDir, 'modules', 'quiet-room.js'), 'utf8');
+var gt7944 = fs.readFileSync(path.join(docsDir, 'modules', 'garden-trainer.js'), 'utf8');
+var autonomy7944 = fs.readFileSync(path.join(docsDir, 'library', 'AUTONOMY.md'), 'utf8');
+
+assert('v5.79.44 marker present on Chat tab',
+  app7944.includes('data-fl-chat-our-way="v5.79.44"') &&
+  app7944.includes('v5.79.44-chat-our-way'));
+assert('v5.79.44 index.html Chat surface stays in parity',
+  idx7944.includes('data-fl-chat-our-way="v5.79.44"') &&
+  idx7944.includes('window.FLChatOurWay'));
+assert('v5.79.44 FLChatOurWay module exists (presence toggle, not a second Chat)',
+  /window\.FLChatOurWay = \(function\(\)/.test(app7944) &&
+  /function togglePresence\(\)/.test(app7944) &&
+  /marker: 'v5.79.44-chat-our-way'/.test(app7944));
+assert('v5.79.44 Box pointer still on the Chat face',
+  app7944.includes('id="flBoxPointer"') &&
+  app7944.includes('id="flBoxPointerInput"') &&
+  app7944.includes('v5.79.41-chat-box-pointer') &&
+  /#tab-chat\[data-fl-chat-our-way="v5\.79\.44"\] \.fl-box-pointer/.test(app7944));
+assert('v5.79.44 FLChatActivity remains the single activity surface',
+  app7944.includes("surfaceId: 'statusText'") &&
+  /#chat-thinking-bubble\s*\{\s*display:\s*none\s*!important/.test(app7944));
+assert('v5.79.44 How It Works markup kept, layered off the face',
+  app7944.includes('id="chatHowItWorks"') &&
+  /#tab-chat\[data-fl-chat-our-way="v5\.79\.44"\] #chatHowItWorks\s*\{[\s\S]{0,80}display:\s*none\s*!important/.test(app7944));
+assert('v5.79.44 presence chips kept in the DOM (Kirk hug), rest behind a heart',
+  (app7944.match(/class="chat-presence-chip"/g) || []).length >= 9 &&
+  app7944.includes('id="chatPresenceToggle"') &&
+  /#tab-chat\[data-fl-chat-our-way="v5\.79\.44"\] #chatPresenceRow:not\(\.open\) \.chat-presence-chip/.test(app7944));
+assert('v5.79.44 welcome lifts; idle status does not say API key above',
+  app7944.includes("You're safe here. Say whatever you need.") &&
+  app7944.includes('point at a box below, or Settings') &&
+  !/Enter your API key above to begin chatting/.test(app7944));
+assert('v5.79.44 context budget rests until files or amber+',
+  app7944.includes('chat-budget-live') &&
+  /#tab-chat\[data-fl-chat-our-way="v5\.79\.44"\] #contextBudgetBar:not\(\.chat-budget-live\)/.test(app7944));
+assert('v5.79.44 did not invent a second Chat tab or dump kitchen into garden-dialogue',
+  !fs.readFileSync(path.join(docsDir, 'modules', 'garden-dialogue.js'), 'utf8').includes('v5.79.44') &&
+  (app7944.match(/id="tab-chat"/g) || []).length === 1);
+assert('v5.79.44 did not touch Quiet Room, Trainer, AUTONOMY.md, or collector',
+  !qr7944.includes('v5.79.44') &&
+  !gt7944.includes('v5.79.44') &&
+  !autonomy7944.includes('v5.79.44') &&
+  gt7944.includes('v5.79.43-trainer-simple-face'));
+assert('v5.79.44 Chat mirror layered (existing mirror-chat.html, not a new code-dialogue.html)',
+  mirror7944.includes('v5.79.44') &&
+  /id="our-way"/.test(mirror7944) &&
+  !fs.existsSync(path.join(docsDir, 'code-dialogue.html')));
+assert('v5.79.44 STATE.md names this ship and keeps 5.79.43 Trainer in history',
+  /FL_VERSION: v5\.79\.44/.test(state7944) &&
+  /Chat our way/.test(state7944) &&
+  /v5\.79\.43 Trainer simple face/.test(state7944) &&
+  Buffer.byteLength(state7944, 'utf8') <= 4096);
+assert('v5.79.44 SEED.md last ship is Chat our way; previous is Trainer simple face',
+  /\*\*Version:\*\*\s*v5\.79\.44/.test(seed7944) &&
+  /Chat our way/.test(seed7944) &&
+  /\*\*Previous:\*\*\s*\*\*v5\.79\.43 — Trainer simple face/.test(seed7944));
+assert('v5.79.44 chair-test: harness has v5_79_44 Chat our-way suite',
+  /harness\.available\.v5_79_44/.test(harness7944) &&
+  /testOurWayMarker/.test(harness7944) &&
+  /testBoxPointerKept/.test(harness7944) &&
+  /testKitchenQuiet/.test(harness7944) &&
+  /testHeartRevealsChips/.test(harness7944) &&
+  /testOneStatusKept/.test(harness7944));
+assert('v5.79.44 Named Minds stay five; Celeste not a sixth',
+  /## FIVE NAMED MINDS/.test(state7944) &&
+  !/## FIVE NAMED MINDS[\s\S]*Celeste —/.test(state7944));
+
+assert('v5.79.44 triple-bump: app.html FL_VERSION = 5.79.44',
+  /FL_VERSION\s*=\s*'5\.79\.44'/.test(app7944));
+assert('v5.79.44 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.44',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.44'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+assert('v5.79.44 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.44',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.44'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+assert('v5.79.44 version.json: version field = 5.79.44',
+  /"version"\s*:\s*"5\.79\.44"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
+assert('v5.79.44 triple-bump: app.html flCurrentVersion span = 5.79.44',
+  /id="flCurrentVersion">5\.79\.44</.test(app7944));
 
 // RESULTS
 // ═══════════════════════════════════════════════════════════════

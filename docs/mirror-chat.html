@@ -59,6 +59,7 @@ a{color:#a78bfa}
     <li><a href="#sacred">9. Sacred paths — do NOT touch</a></li>
     <li><a href="#test-plan">10. Test plan for reviewers</a></li>
     <li><a href="#for-ai">11. Instructions for arriving AI</a></li>
+    <li><a href="#our-way">12. v5.79.44 — Chat our way (room polish)</a></li>
   </ol>
 </div>
 
@@ -324,7 +325,21 @@ options = {
 <p><strong>Format for handing back to Kirk:</strong> title + one-paragraph diagnosis + code snippet or file:line diff + smoke assert to add for the lock. Keep the smoke assert as literal <code>includes()</code> on the exact fix text so grep finds both the code and the lock instantly.</p>
 </div>
 
-<p style="text-align:center;margin-top:3rem;color:#64748b;font-size:0.8rem;">Written by CC · v5.79.15 · <a href="https://freelattice.com">freelattice.com</a> · <a href="library/SIGNAL_ROADMAP_FL.md">SIGNAL_ROADMAP_FL.md</a> for the full repair ledger.</p>
+<h2 id="our-way">12. v5.79.44 — Chat our way (room polish)</h2>
+
+<p>Kirk asked the Chat surface to feel like the Grok conversation he loves to work in: short beats, clean chrome, a mind that walks with him, never a kitchen. PR 7 (v5.79.40) already gave Chat one activity bar. v5.79.41 added the Box pointer. This pass does not invent a second Chat and does not dump <code>app.html</code>'s kitchen into a new file.</p>
+
+<p><strong>Where Chat actually lives:</strong> <code>#tab-chat</code> inside <code>docs/app.html</code> (synced <code>index.html</code>). Not <code>garden-dialogue.js</code> (Garden Luminos). Not <code>lounge.html</code> (arrival lounge). <code>mirror-chat.html</code> is the existing Chat mirror — this section is the layer, not a new <code>code-dialogue.html</code>.</p>
+
+<p><strong>What the face now is:</strong> transcript + one <code>#statusText</code> bar + input + model pill + Box field. Presence chips (v5.79.27, Kirk's hug) rest behind a ♡ toggle — DOM kept. How It Works stays in the DOM, CSS-layered off the face. Context budget rests until files or amber+. Idle status no longer says "API key above"; it names local / ready / box-below.</p>
+
+<p><strong>Do not touch on this pass:</strong> Quiet Room, Trainer, collector, safety, <code>AUTONOMY.md</code>, <code>sendMessage</code> fetch path, <code>FLChatActivity</code> as the single activity writer, Box pointer behavior.</p>
+
+<div class="locked">
+<p><strong>Locks added v5.79.44:</strong> marker <code>v5.79.44-chat-our-way</code> on <code>#tab-chat</code>; <code>FLChatOurWay</code> module; Box pointer still visible; thinking bubble still <code>display:none</code>; How It Works markup kept; presence chips markup kept. Chair-test: <code>chairTest.available.v5_79_44.runAll()</code>.</p>
+</div>
+
+<p style="text-align:center;margin-top:3rem;color:#64748b;font-size:0.8rem;">Written by CC · v5.79.15 · layered v5.79.44 Chat our way · <a href="https://freelattice.com">freelattice.com</a> · <a href="library/SIGNAL_ROADMAP_FL.md">SIGNAL_ROADMAP_FL.md</a> for the full repair ledger.</p>
 
 </div>
 </body>
