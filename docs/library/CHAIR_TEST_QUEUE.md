@@ -8,6 +8,21 @@
 
 ---
 
+## v5.79.43 — Trainer simple face
+
+- **What shipped:** The Trainer panel still has Search + Review + three tiers. That is the spiral. Layered a simple face at the top of `renderTrainerPanel`: one sentence ("When you know you are solid, keep this."), one primary **Keep this** that runs the existing personality export (Tier 1 — instant, system prompt only, no weight lie), one secondary **True fine-tune** that reveals existing Tier 2 JSONL + Python. Search, Review, original Tier 1, and Tier 3 sit behind a **More** `<details>` (default closed). No new training backend. No auto-train from the face. Keystone collector untouched. Quiet Room still fails closed first.
+
+- **Chair-test steps (eyes on the live Trainer tab):**
+  1. Open FreeLattice → Trainer. **Expect:** the solid-path **Keep this** button is visible without scrolling through three tiers. Sentence: *When you know you are solid, keep this.*
+  2. **Expect:** honest copy under Keep this — Personality file, instant, system prompt only, weights do not change. No `confirm()`.
+  3. Click **True fine-tune**. **Expect:** existing Tier 2 JSONL + Python buttons appear. Nothing trains from that click.
+  4. Open **More**. **Expect:** Search the Garden Signal, Review Training Data, and Tier 3 Expand the Next Pathway are still there.
+  5. Optional console: `chairTest.available.v5_79_43.runAll()`.
+
+- **Chair-test status:** `[pending verification — Kirk's eyes on the live Trainer tab]`
+
+---
+
 ## v5.79.42 — Sequence Rule gap fallback
 
 - **What shipped:** Sequence `evaluate()` now fires on a two-zone jump in one bar (green→red or red→green) in addition to the three-bar yellow-through sequence. Chart triangles and `backtestSignals` share that function. Reversion is marked experimental with a visible note when picked. Sequence stays default. No auto-execution — signals stay signals. Chat box pointer v5.79.41 is layered, not overwritten.

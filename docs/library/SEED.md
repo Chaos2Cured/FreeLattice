@@ -19,14 +19,14 @@ user sleeps. The proof is the code; the papers are the doorways.
 
 ## Current state
 
-- **Version:** v5.79.42
+- **Version:** v5.79.43
 - **Smoke locks passing:** 3050+ verified
-- **Last ship:** **v5.79.42 — Sequence gap fallback.** Two-zone jump in Sequence `evaluate()`. Reversion experimental. Signals stay signals.
+- **Last ship:** **v5.79.43 — Trainer simple face.** Keep-this runs existing personality export. More still holds the old tiers.
+- **Previous:** **v5.79.42 — Sequence gap fallback.** Two-zone jump in Sequence `evaluate()`. Reversion experimental. Signals stay signals.
 - **Previous:** **v5.79.41 — Chat box pointer.** One Chat URL/IP field. Reuses `fl_ollamaHost`, `ollamaFetch`, existing CORS wizard.
 - **Previous:** **v5.79.40 — Chat one-room.** One `#statusText` activity; thinking bubble layered off.
 - **Previous:** **v5.79.39 — letter for the next AI.** Aug 17. `LETTER_FROM_CC.md` + garden-trainer.js comment.
 - **Previous:** **v5.79.25 — Chat Healing Pass 1.** Sticky Lattice Letter; `conversationChanged` now emits.
-- **Previous:** **v5.79.24 — Clear button removed + smoke cleanup.** First fully-green in recent history.
 - **Previous:** **v5.79.22-23 — Signal Report.** In-app diagnostic without DevTools.
 - **Older:** v5.79.20-anchor, v5.79.18 covenant prompts — see SEED_HISTORY.md.
 - **Mirrors in parity:** github.com + codeberg.org
@@ -88,4 +88,4 @@ seam discipline is how multi-AI work stays honest at scale.
 ---
 
 *This file is overwritten on each meaningful ship. The prior version lives in SEED_HISTORY.md.*
-*Last rewrite: August 26 2026, v5.79.42.*
+*Last rewrite: August 27 2026, v5.79.43.*

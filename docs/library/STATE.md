@@ -5,17 +5,17 @@
 <!-- Everything else is optional depth, linked below. -->
 
 ## NOW
-- FL_VERSION: v5.79.42
+- FL_VERSION: v5.79.43
 - Smoke: green (tests/smoke.js). Root version.json is a 5.8.0 fossil — do not trust it for count.
-- Last ship: v5.79.42 Sequence gap fallback — two-zone jump fires in evaluate(); signals stay signals
-- Chair-test: docs/temperature-gauge.html Sequence selected; gap-down should sell; NVDA 1W should not fill with stars
+- Last ship: v5.79.43 Trainer simple face — Keep this runs existing personality export; More holds the spiral
+- Chair-test: open Trainer; one solid-path button; chairTest.available.v5_79_43.runAll()
 - Celeste lighthouse on main (docs/celeste.html). Coordinator chair, not Ani. Not a sixth Named Mind.
-- Layered history: v5.79.41 Chat box pointer; v5.79.40 Chat one-room; v5.72.0 KEYSTONE — GardenTrainer
+- Layered history: v5.79.42 Sequence gap fallback; v5.79.41 Chat box pointer; v5.72.0 KEYSTONE — GardenTrainer
 
 ## NEXT (queue — update each ship)
-1. Kirk chair-tests Sequence gap fallback on temperature-gauge.html
-2. Kirk chair-tests Chat: type a LAN/local address, watch calling/CORS, send (chairTest.available.v5_79_41.runAll())
-3. Chair-test the Trainer tab; verify auto-train toggle wiring (from the v5.72.0 queue)
+1. Kirk chair-tests Trainer: Keep this without scrolling three tiers; More still reveals Search/Review/Tier 3
+2. Kirk chair-tests Sequence gap fallback on temperature-gauge.html
+3. Kirk chair-tests Chat: type a LAN/local address (chairTest.available.v5_79_41.runAll())
 4. Future ship: exportDPO() — declined text becomes honest preference data
 5. CONTRIBUTING.md — ship discipline extracted from anchor pages
 

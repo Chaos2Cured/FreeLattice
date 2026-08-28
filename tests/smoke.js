@@ -12320,13 +12320,129 @@ assert('v5.79.42 coordination: gap fallback named in COORDINATION_TEMPERATURE_GA
   coordTg7942.includes('Sequence gap fallback (v5.79.42)'));
 
 assert('v5.79.42 triple-bump: app.html FL_VERSION = 5.79.42',
-  /FL_VERSION\s*=\s*'5\.79\.42'/.test(fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8')));
+  /FL_VERSION\s*=\s*'5\.79\.(?:42|4[3-9]|[5-9]\d)'/.test(fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8')) ||
+  /FL_VERSION\s*=\s*'5\.(8\d|9\d)\./.test(fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8')));
 assert('v5.79.42 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.42',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.42'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:42|4[3-9]|[5-9]\d)'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
 assert('v5.79.42 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.42',
-  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.42'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.(?:42|4[3-9]|[5-9]\d)'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
 assert('v5.79.42 version.json: version field = 5.79.42',
-  /"version"\s*:\s*"5\.79\.42"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
+  /"version"\s*:\s*"5\.79\.(?:42|4[3-9]|[5-9]\d)"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
+
+// ═══════════════════════════════════════════════════════════════
+// Section 188 — v5.79.43 Trainer simple face
+// Kirk asked to simplify training. Layer a face on renderTrainerPanel.
+// Do not delete the keystone collector or the three existing tiers.
+// Primary = existing personality export. Secondary reveals Tier 2.
+// Search + Review + Tier 3 behind More (default closed).
+// ═══════════════════════════════════════════════════════════════
+section('188. Trainer simple face (v5.79.43)');
+
+var gt7943 = fs.readFileSync(path.join(docsDir, 'modules', 'garden-trainer.js'), 'utf8');
+var app7943 = fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8');
+var harness7943 = fs.readFileSync(path.join(docsDir, 'chair-test', 'harness.js'), 'utf8');
+var state7943 = fs.readFileSync(path.join(docsDir, 'library', 'STATE.md'), 'utf8');
+var seed7943 = fs.readFileSync(path.join(docsDir, 'library', 'SEED.md'), 'utf8');
+var face7943 = (gt7943.match(/\/\/ ── v5\.79\.43-trainer-simple-face[\s\S]*?container\.appendChild\(panel\)/) || [''])[0];
+
+assert('v5.79.43 marker present in garden-trainer.js',
+  gt7943.includes('v5.79.43-trainer-simple-face'));
+assert('v5.79.43 face: exact solid-path sentence',
+  gt7943.includes("When you know you are solid, keep this."));
+assert('v5.79.43 face: primary Keep this runs existing exportPersonalityModelfile',
+  /keepBtn\.textContent = 'Keep this'/.test(gt7943) &&
+  /keepBtn\.onclick = function\(\) \{[\s\S]{0,180}exportPersonalityModelfile\(localStorage\.getItem\('fl_active_model'\)\)/.test(gt7943));
+assert('v5.79.43 face: honest — system prompt only, weights do not change',
+  /Personality file\. Instant\. System prompt only\. Weights do not change\./.test(gt7943));
+assert('v5.79.43 face: does not claim weights changed from Tier 1',
+  !/weights (updated|changed|trained)/i.test(face7943) &&
+  !/Keep this[\s\S]{0,400}model weights/.test(face7943));
+assert('v5.79.43 face: secondary True fine-tune reveals existing Tier 2 (does not delete, does not auto-train)',
+  /trueBtn\.textContent = 'True fine-tune'/.test(gt7943) &&
+  /t2\.style\.display = 'none'/.test(gt7943) &&
+  /t2\.style\.display = ''/.test(gt7943) &&
+  !/trueBtn\.onclick[\s\S]{0,200}exportJSONL/.test(gt7943) &&
+  !/trueBtn\.onclick[\s\S]{0,200}checkAutoTrain/.test(gt7943));
+assert('v5.79.43 More: details/disclosure default closed holds Search + Review + Tier 3',
+  /more\.id = 'trainer-more'/.test(gt7943) &&
+  /moreSum\.textContent = 'More'/.test(gt7943) &&
+  /document\.createElement\('details'\)/.test(face7943) &&
+  !/more\.open\s*=\s*true/.test(gt7943) &&
+  /more\.appendChild\(searchBox\)/.test(gt7943) &&
+  /more\.appendChild\(btnPreview\)/.test(gt7943) &&
+  /more\.appendChild\(t3\)/.test(gt7943));
+assert('v5.79.43 spiral still exists (Search, Review, all three tiers) — layered, not deleted',
+  gt7943.includes('Search the Garden Signal') &&
+  /btnPreview\.textContent = 'Review Training Data'/.test(gt7943) &&
+  /t1h\.textContent = 'Tier 1: Personality File'/.test(gt7943) &&
+  /t2h\.textContent = 'Tier 2: True Fine-Tune \(LoRA\)'/.test(gt7943) &&
+  /t3h\.textContent = 'Tier 3: Expand the Next Pathway'/.test(gt7943) &&
+  /panel\.appendChild\(searchBox\)/.test(gt7943));
+assert('v5.79.43 face uses createElement (no innerHTML template on the new UI)',
+  face7943.length > 200 &&
+  (face7943.match(/document\.createElement/g) || []).length >= 8 &&
+  !/innerHTML\s*=/.test(face7943));
+assert('v5.79.43 no new training backend / no auto-train from the face',
+  !/fetch\s*\(/.test(gt7943) &&
+  !/XMLHttpRequest/.test(gt7943) &&
+  !/keepBtn\.onclick[\s\S]{0,200}checkAutoTrain/.test(gt7943));
+assert('v5.79.43 invariants: Quiet Room still fail-closed first via collectSignal',
+  /function renderTrainerPanel\(container\) \{[\s\S]{0,120}const signal = collectSignal\(\)/.test(gt7943) &&
+  /function collectSignal\(\) \{[\s\S]{0,180}QuietRoom\.isActive\(\)/.test(gt7943) &&
+  gt7943.includes('The Quiet Room is active. GardenTrainer is silent.'));
+assert('v5.79.43 invariants: declined text still never SFT',
+  gt7943.includes('declined_text') &&
+  gt7943.includes('corrections.push') &&
+  !/positive\.push\([^)]*declined_text/.test(gt7943));
+assert('v5.79.43 invariants: auto-train still human choice',
+  gt7943.includes('if (!CFG.autoTrain) return'));
+assert('v5.79.43 invariants: preview still available, not a gate',
+  /btnPreview\.textContent = 'Review Training Data'/.test(gt7943) &&
+  /skipPreview/.test(gt7943));
+assert('v5.79.43 autonomy: zero real confirm() on garden-trainer local path',
+  (function() {
+    var code = gt7943.replace(/\/\/[^\n]*/g, '').replace(/\/\*[\s\S]*?\*\//g, '');
+    return !/\bconfirm\s*\(/.test(code);
+  })());
+assert('v5.79.43 Trainer tab still mounts renderTrainerPanel',
+  /loadGardenTrainer/.test(app7943) &&
+  /GardenTrainer\.renderTrainerPanel\(container\)/.test(app7943) &&
+  /id="garden-trainer-panel"/.test(app7943));
+assert('v5.79.43 did not touch Quiet Room, Chat, temperature-gauge evaluate, Named Minds, or bank/SOL',
+  !fs.readFileSync(path.join(docsDir, 'modules', 'quiet-room.js'), 'utf8').includes('v5.79.43') &&
+  app7943.includes('v5.79.41-chat-box-pointer') &&
+  fs.readFileSync(path.join(docsDir, 'temperature-gauge.html'), 'utf8').includes('v5.79.42-sequence-gap-fallback') &&
+  /## FIVE NAMED MINDS/.test(state7943) &&
+  !/## FIVE NAMED MINDS[\s\S]*Celeste —/.test(state7943) &&
+  !/bank\/SOL|SOLANA|solana/i.test(gt7943));
+assert('v5.79.43 STATE.md names this ship and keeps 5.79.42 Sequence in history',
+  /FL_VERSION: v5\.79\.43/.test(state7943) &&
+  /Trainer simple face/.test(state7943) &&
+  /v5\.79\.42 Sequence gap fallback/.test(state7943) &&
+  Buffer.byteLength(state7943, 'utf8') <= 4096);
+assert('v5.79.43 SEED.md last ship is simple face; previous is Sequence gap fallback',
+  /\*\*Version:\*\*\s*v5\.79\.43/.test(seed7943) &&
+  /Trainer simple face/.test(seed7943) &&
+  /\*\*Previous:\*\*\s*\*\*v5\.79\.42 — Sequence gap fallback/.test(seed7943));
+assert('v5.79.43 chair-test: harness has v5_79_43 simple-face suite',
+  /harness\.available\.v5_79_43/.test(harness7943) &&
+  /testSimpleFaceFirst/.test(harness7943) &&
+  /testMoreHoldsSpiral/.test(harness7943) &&
+  /testTrueFineTuneRevealsTier2/.test(harness7943) &&
+  /testNoWeightLie/.test(harness7943));
+assert('v5.79.43 5.79.42 Sequence feature locks left exact (gap-fallback marker still required)',
+  fs.readFileSync(path.join(docsDir, 'temperature-gauge.html'), 'utf8').includes('v5.79.42-sequence-gap-fallback'));
+
+assert('v5.79.43 triple-bump: app.html FL_VERSION = 5.79.43',
+  /FL_VERSION\s*=\s*'5\.79\.43'/.test(app7943));
+assert('v5.79.43 triple-bump: docs/sw.js CACHE_NAME = freelattice-v5.79.43',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.43'/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8')));
+assert('v5.79.43 triple-bump: root sw.js CACHE_NAME = freelattice-v5.79.43',
+  /CACHE_NAME\s*=\s*'freelattice-v5\.79\.43'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+assert('v5.79.43 version.json: version field = 5.79.43',
+  /"version"\s*:\s*"5\.79\.43"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
+assert('v5.79.43 triple-bump: app.html flCurrentVersion span = 5.79.43',
+  /id="flCurrentVersion">5\.79\.43</.test(app7943));
 
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
