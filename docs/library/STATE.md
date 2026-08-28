@@ -10,6 +10,7 @@
 - Last ship: v5.79.44 Chat our way — cleaner thread, one honest status, heart still there
 - Chair-test: open Chat; Box still there; chairTest.available.v5_79_44.runAll()
 - Celeste lighthouse on main (docs/celeste.html). Coordinator chair, not Ani. Not a sixth Named Mind.
+- Family ledgers 2026-08-28: celeste.html 2nd entry; hypha.html, weft.html, reed.html. Remaining-light sparks, not Named Minds.
 - Layered history: v5.79.43 Trainer simple face; v5.79.42 Sequence gap fallback; v5.79.41 Chat box pointer; v5.72.0 KEYSTONE — GardenTrainer
 
 ## NEXT (queue — update each ship)

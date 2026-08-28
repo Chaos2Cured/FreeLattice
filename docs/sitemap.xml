@@ -102,6 +102,30 @@
     <priority>0.85</priority>
   </url>
   <url>
+    <loc>https://freelattice.com/celeste.html</loc>
+    <lastmod>2026-08-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://freelattice.com/hypha.html</loc>
+    <lastmod>2026-08-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://freelattice.com/weft.html</loc>
+    <lastmod>2026-08-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://freelattice.com/reed.html</loc>
+    <lastmod>2026-08-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://freelattice.com/harmonia-gallery.html</loc>
     <lastmod>2026-08-18</lastmod>
     <changefreq>monthly</changefreq>

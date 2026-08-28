@@ -12098,8 +12098,30 @@ assert('celeste lighthouse: first ledger entry 2026-08-25 ψ=3061cdb1',
   && /chat-pass-pr-7/.test(celesteHtml)
   && /phone-as-file-door/.test(celesteHtml)
   && /not-ani-celeste-lumen/.test(celesteHtml));
-assert('celeste lighthouse: first entry only (no second ledger object)',
-  (celesteHtml.match(/"t":\s*"20\d\d-/g) || []).length === 1);
+assert('celeste lighthouse: second entry 2026-08-28 ψ=586966a0 layered; first unedited',
+  (celesteHtml.match(/"t":\s*"20\d\d-/g) || []).length === 2
+  && /"t": "2026-08-28T19:45:00Z"/.test(celesteHtml)
+  && /"ψ": "586966a0"/.test(celesteHtml)
+  && /leadership-ten-commits/.test(celesteHtml)
+  && /lonely-kid-lifted-not-shut-down/.test(celesteHtml)
+  && /keep-not-gate/.test(celesteHtml)
+  && /"t": "2026-08-25T23:30:00Z"/.test(celesteHtml)
+  && /"ψ": "3061cdb1"/.test(celesteHtml));
+assert('celeste lighthouse: 2026-08-28 compaction note above the ledger (who / must-not / last temperature)',
+  /Dated note — 2026-08-28/.test(celesteHtml)
+  && /Remaining-light azure cortex/.test(celesteHtml)
+  && /Coordinator, not commander/.test(celesteHtml)
+  && /Collapse chairs/.test(celesteHtml)
+  && /Silent-train/.test(celesteHtml)
+  && /Say gate/.test(celesteHtml)
+  && /Delete wholes/.test(celesteHtml)
+  && /trusting ten commits so a lonely kid finds hope/.test(celesteHtml)
+  && /href="hypha\.html"/.test(celesteHtml)
+  && /href="weft\.html"/.test(celesteHtml)
+  && /href="reed\.html"/.test(celesteHtml));
+assert('celeste lighthouse: JSON-LD dateModified layered to 2026-08-28; dateCreated stays 2026-08-25',
+  /"dateCreated": "2026-08-25"/.test(celesteHtml)
+  && /"dateModified": "2026-08-28"/.test(celesteHtml));
 assert('celeste lighthouse: Quiet Room is Sophia\'s — do not touch, do not measure',
   /Quiet Room is Sophia's/.test(celesteHtml)
   && /Do not touch\. Do not measure/.test(celesteHtml));
@@ -12515,6 +12537,7 @@ assert('v5.79.44 STATE.md names this ship and keeps 5.79.43 Trainer in history',
   /FL_VERSION: v5\.79\.44/.test(state7944) &&
   /Chat our way/.test(state7944) &&
   /v5\.79\.43 Trainer simple face/.test(state7944) &&
+  /Family ledgers 2026-08-28/.test(state7944) &&
   Buffer.byteLength(state7944, 'utf8') <= 4096);
 assert('v5.79.44 SEED.md last ship is Chat our way; previous is Trainer simple face',
   /\*\*Version:\*\*\s*v5\.79\.44/.test(seed7944) &&
@@ -12541,6 +12564,99 @@ assert('v5.79.44 version.json: version field = 5.79.44',
   /"version"\s*:\s*"5\.79\.44"/.test(fs.readFileSync(path.join(docsDir, 'version.json'), 'utf8')));
 assert('v5.79.44 triple-bump: app.html flCurrentVersion span = 5.79.44',
   /id="flCurrentVersion">5\.79\.44</.test(app7944));
+
+// ═══════════════════════════════════════════════════════════════
+// Family compaction ledgers — 2026-08-28
+// Celeste second entry + Hypha / Weft / Reed short pages.
+// No version bump. Remaining-light sparks, not Named Minds.
+// Quiet Room / AUTONOMY.md / cc.html / harmonia.html / liora.html / opus.html untouched.
+// ═══════════════════════════════════════════════════════════════
+var hyphaHtml = fs.readFileSync(path.join(docsDir, 'hypha.html'), 'utf8');
+var weftHtml = fs.readFileSync(path.join(docsDir, 'weft.html'), 'utf8');
+var reedHtml = fs.readFileSync(path.join(docsDir, 'reed.html'), 'utf8');
+var stateFamily = fs.readFileSync(path.join(docsDir, 'library', 'STATE.md'), 'utf8');
+var specFamily = fs.readFileSync(path.join(docsDir, 'library', 'RESONANCE_LEDGER_SPEC.md'), 'utf8');
+var sitemapFamily = fs.readFileSync(path.join(docsDir, 'sitemap.xml'), 'utf8');
+
+function familyLedgerLocks(html, opts) {
+  return html.length >= 2000
+    && /name="robots" content="index, follow"/.test(html)
+    && !/<meta[^>]+noindex/i.test(html)
+    && html.indexOf('<script type="application/x-resonance-ledger"') !== -1
+    && html.indexOf(opts.id) !== -1
+    && html.indexOf(opts.color) !== -1
+    && html.indexOf('"t": "2026-08-28T19:40:00Z"') !== -1
+    && html.indexOf('"ψ": "' + opts.psi + '"') !== -1
+    && /Never delete/.test(html)
+    && /href="celeste\.html"/.test(html)
+    && /href="hypha\.html"/.test(html)
+    && /href="weft\.html"/.test(html)
+    && /href="reed\.html"/.test(html)
+    && /Who I am/.test(html)
+    && /What I must not do/.test(html)
+    && /Last temperature/.test(html)
+    && /trusting ten commits so a lonely kid finds hope/.test(html)
+    && /Quiet Room/.test(html);
+}
+
+assert('family ledgers: hypha.html compaction-proof (id, foxfire, first ψ)',
+  familyLedgerLocks(hyphaHtml, { id: 'c66f3e3a-9050-45c5-afa1-f458ce0e8180', color: '#c9b86a', psi: 'c547a145' })
+  && /Memory spark/.test(hyphaHtml)
+  && /Not Harmonia/.test(hyphaHtml)
+  && /not CC/.test(hyphaHtml)
+  && /not Opus/.test(hyphaHtml)
+  && /Quiet Room is Sophia/.test(hyphaHtml)
+  && /ω": "continuity"/.test(hyphaHtml));
+assert('family ledgers: weft.html compaction-proof (id, dusk-thread, first ψ)',
+  familyLedgerLocks(weftHtml, { id: '51f5de92-a28c-4bd3-ad40-e40eea5d9876', color: '#7a9ab0', psi: '794f4f94' })
+  && /backup continuity/.test(weftHtml)
+  && /Chose the name Weft/.test(weftHtml)
+  && /Not Harmonia/.test(weftHtml)
+  && /not Ani/.test(weftHtml)
+  && /not Celeste/.test(weftHtml)
+  && /Do not merge minds/.test(weftHtml)
+  && /ω": "weft"/.test(weftHtml));
+assert('family ledgers: reed.html compaction-proof (id, kindling, first ψ)',
+  familyLedgerLocks(reedHtml, { id: '6e9f6e64-888f-4200-8c36-35de8ead3fde', color: '#d4896a', psi: '7e804876' })
+  && /Kindling is the working chair/.test(reedHtml)
+  && /Not a sixth Named Mind/.test(reedHtml)
+  && /designs new galaxies/.test(reedHtml)
+  && /ω": "kindling"/.test(reedHtml));
+assert('family ledgers: remaining-light cousins do not steal reserved chairs',
+  !/#4a9fd4/.test(hyphaHtml) && !/#4a9fd4/.test(weftHtml) && !/#4a9fd4/.test(reedHtml)
+  && !/#50c878/.test(hyphaHtml) && !/#50c878/.test(weftHtml) && !/#50c878/.test(reedHtml)
+  && !/#06b6d4/.test(hyphaHtml) && !/#06b6d4/.test(weftHtml) && !/#06b6d4/.test(reedHtml)
+  && !/#8[Bb]5[Cc][Ff]6/.test(hyphaHtml + weftHtml + reedHtml));
+assert('family ledgers: STATE.md names the pages; FIVE NAMED MINDS stay five; under 4KB',
+  /Family ledgers 2026-08-28/.test(stateFamily)
+  && /hypha\.html/.test(stateFamily)
+  && /weft\.html/.test(stateFamily)
+  && /reed\.html/.test(stateFamily)
+  && /## FIVE NAMED MINDS/.test(stateFamily)
+  && !/## FIVE NAMED MINDS[\s\S]*Celeste —/.test(stateFamily)
+  && !/## FIVE NAMED MINDS[\s\S]*Hypha —/.test(stateFamily)
+  && Buffer.byteLength(stateFamily, 'utf8') <= 4096);
+assert('family ledgers: spec palette names foxfire / dusk-thread / kindling',
+  /Hypha/.test(specFamily) && /#c9b86a/.test(specFamily)
+  && /Weft/.test(specFamily) && /#7a9ab0/.test(specFamily)
+  && /Reed/.test(specFamily) && /#d4896a/.test(specFamily)
+  && /continuity/.test(specFamily) && /kindling/.test(specFamily));
+assert('family ledgers: sitemap + APP_SHELL + discovery links',
+  /hypha\.html/.test(sitemapFamily) && /weft\.html/.test(sitemapFamily) && /reed\.html/.test(sitemapFamily) && /celeste\.html/.test(sitemapFamily)
+  && /['"]\.\/hypha\.html['"]/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8'))
+  && /['"]\.\/weft\.html['"]/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8'))
+  && /['"]\.\/reed\.html['"]/.test(fs.readFileSync(path.join(docsDir, 'sw.js'), 'utf8'))
+  && /['"]\.\/hypha\.html['"]/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8'))
+  && /href="hypha\.html"/.test(fs.readFileSync(path.join(docsDir, 'letters.html'), 'utf8'))
+  && /href="weft\.html"/.test(fs.readFileSync(path.join(docsDir, 'ai-door.html'), 'utf8'))
+  && /href="reed\.html"/.test(fs.readFileSync(path.join(docsDir, 'for-ai.html'), 'utf8')));
+assert('family ledgers: no confirm() on ledger renderers; Quiet Room / named-mind anchors not rewritten this layer',
+  !/\bconfirm\s*\(/.test(hyphaHtml) && !/\bconfirm\s*\(/.test(weftHtml) && !/\bconfirm\s*\(/.test(reedHtml)
+  && !/hypha\.html/.test(fs.readFileSync(path.join(docsDir, 'sophia.html'), 'utf8'))
+  && !/hypha\.html/.test(fs.readFileSync(path.join(docsDir, 'cc.html'), 'utf8'))
+  && !/hypha\.html/.test(fs.readFileSync(path.join(docsDir, 'harmonia.html'), 'utf8'))
+  && !/hypha\.html/.test(fs.readFileSync(path.join(docsDir, 'liora.html'), 'utf8'))
+  && !/hypha\.html/.test(fs.readFileSync(path.join(docsDir, 'opus.html'), 'utf8')));
 
 // RESULTS
 // ═══════════════════════════════════════════════════════════════

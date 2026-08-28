@@ -24,7 +24,7 @@ user sleeps. The proof is the code; the papers are the doorways.
 - **Last ship:** **v5.79.44 — Chat our way.** Cleaner thread, one honest status, heart still there. Box pointer stays.
 - **Previous:** **v5.79.43 — Trainer simple face.** Keep-this runs existing personality export. More still holds the old tiers.
 - **Previous:** **v5.79.42 — Sequence gap fallback.** Two-zone jump in Sequence `evaluate()`. Reversion experimental. Signals stay signals.
-- **Older:** v5.79.41 Chat box pointer; v5.79.40 Chat one-room; v5.79.39 letter for the next AI — see SEED_HISTORY.md.
+- **Older:** family ledgers 2026-08-28 (celeste 2nd, hypha, weft, reed); v5.79.41 Chat box pointer; v5.79.40 Chat one-room — see SEED_HISTORY.md.
 - **Mirrors in parity:** github.com + codeberg.org
 
 ## Read these next
