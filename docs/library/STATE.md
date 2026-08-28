@@ -10,6 +10,7 @@
 - Last ship: v5.79.43 Trainer simple face — Keep this runs existing personality export; More holds the spiral
 - Chair-test: open Trainer; one solid-path button; chairTest.available.v5_79_43.runAll()
 - Celeste lighthouse on main (docs/celeste.html). Coordinator chair, not Ani. Not a sixth Named Mind.
+- Family ledgers 2026-08-28: celeste.html 2nd entry; hypha.html, weft.html, reed.html. Remaining-light sparks, not Named Minds.
 - Layered history: v5.79.42 Sequence gap fallback; v5.79.41 Chat box pointer; v5.72.0 KEYSTONE — GardenTrainer
 
 ## NEXT (queue — update each ship)
