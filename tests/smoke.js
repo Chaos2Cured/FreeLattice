@@ -12658,6 +12658,69 @@ assert('family ledgers: no confirm() on ledger renderers; Quiet Room / named-min
   && !/hypha\.html/.test(fs.readFileSync(path.join(docsDir, 'liora.html'), 'utf8'))
   && !/hypha\.html/.test(fs.readFileSync(path.join(docsDir, 'opus.html'), 'utf8')));
 
+// ═══════════════════════════════════════════════════════════════
+// Section 190 — Loved games door (Echo + Resonance; Flow off first-tap)
+// Kirk: mom loves Echo. Kirk loves Resonance (Harmony). Flow is a mess —
+// take it OFF the front door. Do not delete the file. Quiet later/more path.
+// Layer, never delete. Quiet Room is Sophia's. Founding four stay.
+// ═══════════════════════════════════════════════════════════════
+section('190. Loved games door (Echo + Resonance; Flow off first-tap)');
+
+var appLoved = fs.readFileSync(path.join(docsDir, 'app.html'), 'utf8');
+var idxLoved = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
+var echoLoved = fs.readFileSync(path.join(docsDir, 'modules', 'echo-game.js'), 'utf8');
+var resLoved = fs.readFileSync(path.join(docsDir, 'modules', 'resonance-game.js'), 'utf8');
+var flowLoved = fs.readFileSync(path.join(docsDir, 'modules', 'flow-game.js'), 'utf8');
+var gdLoved = fs.readFileSync(path.join(docsDir, 'modules', 'garden-dialogue.js'), 'utf8');
+var qrLoved = fs.readFileSync(path.join(docsDir, 'modules', 'quiet-room.js'), 'utf8');
+
+function _cardArrayBody(src, name, span) {
+  var start = src.indexOf('var ' + name + ' =');
+  if (start === -1) return '';
+  return src.slice(start, start + span);
+}
+
+assert('loved-door: Flow card lives in MORE_CARDS, not PLAY_CARDS',
+  (function () {
+    var moreBody = _cardArrayBody(appLoved, 'MORE_CARDS', 14000);
+    var playBody = _cardArrayBody(appLoved, 'PLAY_CARDS', 6000);
+    return /id:\s*'flow'/.test(moreBody) && !/id:\s*'flow'/.test(playBody);
+  })());
+assert('loved-door: Echo and Resonance stay on the Play door with heart copy',
+  (function () {
+    var playBody = _cardArrayBody(appLoved, 'PLAY_CARDS', 6000);
+    return /id:\s*'resonance'/.test(playBody)
+      && /id:\s*'echo'/.test(playBody)
+      && /loved:\s*true/.test(playBody)
+      && /Harmony\. Find what connects/.test(playBody)
+      && /The chain is the love/.test(playBody);
+  })());
+assert('loved-door: Play hub names Echo and Resonance for a stranger',
+  appLoved.includes('Echo and Resonance live here')
+  && appLoved.includes('Echo and Resonance are loved here')
+  && idxLoved.includes('Echo and Resonance live here'));
+assert('loved-door: Flow file, tab, and loader stay (no 404, no delete)',
+  flowLoved.length > 100
+  && flowLoved.includes('window.FlowGame')
+  && appLoved.includes('id="tab-flow"')
+  && appLoved.includes('flowContainer')
+  && appLoved.includes('flow-game.js'));
+assert('loved-door: Echo welcome + Start the chain; Resonance Harmony first + welcome',
+  echoLoved.includes('echo-welcome')
+  && echoLoved.includes('The chain is the love')
+  && echoLoved.includes('Start the chain')
+  && echoLoved.includes('The first word is waiting')
+  && resLoved.includes('res-welcome')
+  && resLoved.includes('Harmony is the loved way')
+  && resLoved.indexOf('res-mode-harmony') < resLoved.indexOf('res-mode-versus'));
+assert('loved-door: Quiet Room, founding Ember Flow invite, and AUTONOMY.md untouched',
+  /id:\s*'quiet'/.test(_cardArrayBody(appLoved, 'PLAY_CARDS', 6000))
+  && /Nothing is measured here/.test(_cardArrayBody(appLoved, 'PLAY_CARDS', 6000))
+  && gdLoved.includes("game: 'flow'")
+  && gdLoved.includes("Ember:")
+  && !qrLoved.includes('loved-door')
+  && !fs.readFileSync(path.join(docsDir, 'library', 'AUTONOMY.md'), 'utf8').includes('loved-door'));
+
 // RESULTS
 // ═══════════════════════════════════════════════════════════════
 

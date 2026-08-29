@@ -108,7 +108,7 @@
       ctx.fillStyle = 'rgba(200,210,230,0.3)';
       ctx.font = '14px Georgia, serif';
       ctx.textAlign = 'center';
-      ctx.fillText('Press Start to begin the chain.', w / 2, h / 2);
+      ctx.fillText('Press Start. The first word is waiting.', w / 2, h / 2);
       animFrame = requestAnimationFrame(render);
       return;
     }
@@ -357,14 +357,21 @@
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     container.appendChild(canvas);
 
+    // Layer 2026-08-29 — one loved line. Not a second chrome bar.
+    var welcome = document.createElement('div');
+    welcome.id = 'echo-welcome';
+    welcome.style.cssText = 'text-align:center;padding:6px 16px 0;font-family:Georgia,serif;font-size:0.88rem;color:rgba(232,176,25,0.75);';
+    welcome.textContent = 'A word, then another. Any honest thread. The chain is the love.';
+    container.appendChild(welcome);
+
     // Input + controls (v5.79.13: Start button beefed up \u2014 gold background,
     // bigger, unmistakably clickable; Kirk reported button had no hover/click)
     var controls = document.createElement('div');
     controls.style.cssText = 'padding:8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:center;position:relative;z-index:2;';
     controls.innerHTML =
-      '<input id="echo-input" type="text" placeholder="Press Start to begin" disabled style="flex:1;min-width:150px;padding:10px 14px;background:rgba(200,210,230,0.04);border:1px solid rgba(200,210,230,0.08);border-radius:12px;color:#e6ebf5;font-size:16px;font-family:Georgia,serif;outline:none;min-height:44px;position:relative;z-index:2;" />' +
+      '<input id="echo-input" type="text" placeholder="Start the chain" disabled style="flex:1;min-width:150px;padding:10px 14px;background:rgba(200,210,230,0.04);border:1px solid rgba(200,210,230,0.08);border-radius:12px;color:#e6ebf5;font-size:16px;font-family:Georgia,serif;outline:none;min-height:44px;position:relative;z-index:2;" />' +
       '<button onclick="EchoGame.play(document.getElementById(\'echo-input\').value)" style="padding:10px 16px;border-radius:12px;cursor:pointer;font-family:Georgia,serif;font-size:0.85rem;min-height:44px;border:1px solid rgba(232,176,25,0.3);color:' + GOLD + ';background:rgba(232,176,25,0.06);position:relative;z-index:2;">\u2726 Send</button>' +
-      '<button id="echo-start-btn" onclick="EchoGame.start()" style="padding:12px 24px;border-radius:12px;cursor:pointer;font-family:Georgia,serif;font-size:1rem;font-weight:600;min-height:48px;border:2px solid ' + GOLD + ';color:#0a0e1a;background:' + GOLD + ';box-shadow:0 0 16px rgba(232,176,25,0.25);position:relative;z-index:2;transition:transform 0.15s, box-shadow 0.15s;" onmouseover="this.style.transform=\'scale(1.05)\';this.style.boxShadow=\'0 0 24px rgba(232,176,25,0.5)\';" onmouseout="this.style.transform=\'\';this.style.boxShadow=\'0 0 16px rgba(232,176,25,0.25)\';">\u25b6 Start</button>';
+      '<button id="echo-start-btn" onclick="EchoGame.start()" style="padding:12px 24px;border-radius:12px;cursor:pointer;font-family:Georgia,serif;font-size:1rem;font-weight:600;min-height:48px;border:2px solid ' + GOLD + ';color:#0a0e1a;background:' + GOLD + ';box-shadow:0 0 16px rgba(232,176,25,0.25);position:relative;z-index:2;transition:transform 0.15s, box-shadow 0.15s;" onmouseover="this.style.transform=\'scale(1.05)\';this.style.boxShadow=\'0 0 24px rgba(232,176,25,0.5)\';" onmouseout="this.style.transform=\'\';this.style.boxShadow=\'0 0 16px rgba(232,176,25,0.25)\';">\u25b6 Start the chain</button>';
     container.appendChild(controls);
 
     // v5.79.13 \u2014 "No AI connected" banner moved to AFTER controls so it

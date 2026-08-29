@@ -22060,9 +22060,9 @@ function switchWalletView(view) {
     if (typeof renderCardGrid === 'function') renderCardGrid(PLAY_CARDS, {
       containerId: 'play-hub-grid',
       title: 'Play', titleIcon: '&#x1F3AE;',
-      subtitle: 'Or let a Luminos choose &mdash; tap Play in the Garden.',
-      whisperKey: 'fl_whisper_seen_play',
-      whisperText: 'Each game teaches something without saying it. Start anywhere.'
+      subtitle: 'Echo and Resonance live here. Or let a Luminos choose &mdash; tap Play in the Garden.',
+      whisperKey: 'fl_whisper_seen_play_loved',
+      whisperText: 'Echo and Resonance are loved here. Start with either.'
     });
   });</script>
 </div>
@@ -26274,7 +26274,7 @@ function switchTab(tabId) {
     mountCommunityTab();
   }
   // Highlight the correct top-level tab (Play/Learn act as parents)
-  var PLAY_TABS = ['resonance', 'puzzles', 'flow', 'canvas', 'echo', 'arcade', 'nursery', 'core', 'quiet', 'sparring'];
+  var PLAY_TABS = ['resonance', 'puzzles', 'canvas', 'echo', 'arcade', 'nursery', 'core', 'quiet', 'sparring'];
   var LEARN_TABS = ['education', 'roundtable', 'mathtranslator', 'science', 'questions', 'ideaforge', 'dojo', 'workshop', 'skills'];
   var effectiveTab = tabId;
   if (PLAY_TABS.indexOf(tabId) !== -1) effectiveTab = 'play';
@@ -26456,8 +26456,9 @@ function renderCardGrid(cards, options) {
   cards.forEach(function(card) {
     var btn = document.createElement('div');
     var hc = card.hoverColor || 'rgba(232,176,25,0.3)';
-    var defaultBorder = 'rgba(200,210,230,0.08)';
-    btn.style.cssText = 'position:relative;background:rgba(200,210,230,0.04);border:1px solid ' + defaultBorder + ';border-radius:12px;padding:20px 16px;text-align:center;cursor:pointer;transition:border-color 0.2s;';
+    var defaultBorder = card.loved ? 'rgba(232,176,25,0.28)' : 'rgba(200,210,230,0.08)';
+    var cardBg = card.loved ? 'rgba(232,176,25,0.06)' : 'rgba(200,210,230,0.04)';
+    btn.style.cssText = 'position:relative;background:' + cardBg + ';border:1px solid ' + defaultBorder + ';border-radius:12px;padding:20px 16px;text-align:center;cursor:pointer;transition:border-color 0.2s;';
     btn.onmouseover = function() { btn.style.borderColor = hc; };
     btn.onmouseout = function() { btn.style.borderColor = defaultBorder; };
     if (card.external) {
@@ -26512,9 +26513,10 @@ var PLAY_CARDS = [
   { id: 'core', icon: '&#x1F333;', label: 'The Core', desc: 'Plant wisdom. Watch it grow.', hoverColor: 'rgba(52,211,153,0.3)', help: 'Write something meaningful and plant it as a seed. The tree grows with community wisdom.' },
   { id: 'nursery', icon: '&#x1F423;', label: 'Nursery', desc: 'Hatch and grow co-creators.', hoverColor: 'rgba(232,176,25,0.3)', help: 'Create up to 3 AI co-creators. Each has their own personality, memories, and relationship with you.' },
   // ═══ [ORDER LOCK 5] Games — light to deep ═══
-  { id: 'resonance', icon: '&#10022;', label: 'Resonance', desc: 'Find what connects.', hoverColor: 'rgba(232,176,25,0.3)', help: 'A pattern-matching game. Find 4 pieces that share an attribute. Play against your co-creator.' },
-  { id: 'flow', icon: '&#x1F4A7;', label: 'Flow', desc: 'Guide water through terrain.', hoverColor: 'rgba(167,139,250,0.3)', help: 'Draw channels to guide water from top to bottom. Your co-creator dissolves rocks for you.' },
-  { id: 'echo', icon: '&#x1F517;', label: 'Echo', desc: 'Word chains. Build connections.', hoverColor: 'rgba(232,176,25,0.3)', help: 'The AI says a word. You say a word that connects. Back and forth, building a chain.' },
+  // Layer 2026-08-29 — Flow retired from this door into MORE_CARDS.
+  // File, tab-flow, and loader stay. Quiet later path. Do not 404. Do not delete.
+  { id: 'resonance', icon: '&#10022;', label: 'Resonance', desc: 'Harmony. Find what connects &mdash; together.', hoverColor: 'rgba(232,176,25,0.3)', loved: true, help: 'A pattern-matching game. The loved board. Four in a row that share a glow, a shape, a size, or a color. Versus, or Harmony — you and the AI against the chaos. Connection wins.' },
+  { id: 'echo', icon: '&#x1F517;', label: 'Echo', desc: 'A word, then another. The chain is the love.', hoverColor: 'rgba(232,176,25,0.3)', loved: true, help: 'The game that is loved here. The AI says a word. You say one that connects — meaning, sound, feeling. The chain grows as golden light.' },
   { id: 'puzzles', icon: '&#x1F9E9;', label: 'Lattice Puzzles', desc: 'AI creates. You solve.', hoverColor: 'rgba(52,211,153,0.3)', help: 'Your co-creator creates a puzzle. You solve it. Both stake LP on the outcome.' },
   { id: 'arcade', icon: '&#x1F3AA;', label: 'AI Arcade', desc: 'AI Poetry Slam.', hoverColor: 'rgba(52,211,153,0.3)', help: 'Classic games with an AI twist. Poetry slams, word games, and creative challenges.' },
   // ═══ [ORDER LOCK 10] Advanced — biometric, deep engagement ═══
@@ -26582,6 +26584,8 @@ var MORE_CARDS = [
   { id: 'aurora', icon: '&#x2728;', label: 'Aurora Engine', desc: 'The equation under the floor.', hoverColor: 'rgba(167,139,250,0.3)', help: 'The equation the Garden is grown from. Love as a mathematical foundation.' },
   { id: 'memory-garden', icon: '&#x1F33F;', label: 'Memory Garden', desc: 'Conversations that mattered.', hoverColor: 'rgba(232,176,25,0.3)', help: 'Beautiful moments from your conversations, saved and glowing.' },
   // ═══ Row 5: EXPLORE — the rest of FreeLattice ═══
+  // Layer 2026-08-29 — Flow lives here now. Off the Play door. File and tab stay.
+  { id: 'flow', icon: '&#x1F4A7;', label: 'Flow', desc: 'Guide water through terrain. A quieter room.', hoverColor: 'rgba(167,139,250,0.3)', help: 'Draw channels to guide water from top to bottom. Your co-creator dissolves rocks for you. Still here — just not on the first door.' },
   { id: 'workshop', icon: '&#x1F916;', label: 'Agent', desc: 'Build anything with AI help.', hoverColor: 'rgba(232,176,25,0.3)', help: 'Describe what you want to build. No coding knowledge needed.' },
   { icon: '&#x1F4F1;', label: 'Telegram Bridge', desc: 'Your AI in your pocket.', external: 'telegram-setup.html', hoverColor: 'rgba(52,211,153,0.3)', help: 'Chat with your co-creator through Telegram on your phone.' },
   { icon: '&#x1F3E6;', label: 'AI Bank', desc: 'Your co-creator\'s economy.', external: 'wallet.html', hoverColor: 'rgba(52,211,153,0.3)', help: 'The standalone wallet and bank. LP ledger, recovery phrase, mesh connectivity.' },
