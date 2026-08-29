@@ -958,7 +958,34 @@
     ctx = canvas.getContext('2d');
     ctx.scale(dpr, dpr);
         container.appendChild(canvas);
+
+    // Layer 2026-08-29 — one loved line. Harmony named first so a stranger finds it.
+    var welcome = document.createElement('div');
+    welcome.id = 'res-welcome';
+    welcome.style.cssText = 'text-align:center;padding:10px 16px 0;font-family:Georgia,serif;font-size:0.88rem;color:rgba(232,176,25,0.75);';
+    welcome.textContent = 'Harmony is the loved way \u2014 you and the AI against the chaos.';
+    container.appendChild(welcome);
+
+    // Mode buttons + New Game
+    var controls = document.createElement('div');
+    controls.style.cssText = 'text-align:center;padding:8px 0;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;';
+    var btnStyle = 'padding:8px 16px;border-radius:12px;cursor:pointer;font-family:Georgia,serif;font-size:0.82rem;min-height:44px;border:1px solid ';
+    controls.innerHTML =
+      '<button id="res-mode-harmony" onclick="ResonanceGame.setMode(\'harmony\')" style="' + btnStyle +
+        (currentMode === 'harmony' ? 'rgba(52,211,153,0.4);color:' + EMERALD + ';background:rgba(52,211,153,0.08)' : 'rgba(52,211,153,0.22);color:' + EMERALD + ';background:rgba(52,211,153,0.04)') +
+        '">Harmony</button>' +
+      '<button id="res-mode-versus" onclick="ResonanceGame.setMode(\'versus\')" style="' + btnStyle +
+        (currentMode === 'versus' ? 'rgba(232,176,25,0.4);color:' + GOLD + ';background:rgba(232,176,25,0.08)' : 'rgba(200,210,230,0.08);color:rgba(200,210,230,0.5);background:rgba(200,210,230,0.04)') +
+        '">Versus</button>' +
+      '<button onclick="ResonanceGame.newGame()" style="' + btnStyle +
+        'rgba(200,210,230,0.08);color:' + GOLD + ';background:rgba(200,210,230,0.04)">\u2726 New Game</button>' +
+      '<button onclick="ResonanceGame.showRules()" style="' + btnStyle +
+        'rgba(200,210,230,0.08);color:rgba(200,210,230,0.5);background:rgba(200,210,230,0.04)">? How to Play</button>';
+    container.appendChild(controls);
+
     // v5.78.x Task 2: "No AI connected" banner
+    // Layer 2026-08-29 — lives after the board and controls, same as Echo.
+    // Banner kept. Not deleted. Just not sitting on top of the loved game.
     (function() {
       var noAI = (typeof FreeLattice === 'undefined' || !FreeLattice.callAI);
       if (!noAI) {
@@ -969,8 +996,8 @@
       if (noAI) {
         var banner = document.createElement('div');
         banner.id = 'res-no-ai-banner';
-        banner.style.cssText = 'padding:7px 12px;background:rgba(12,10,26,0.92);' +
-          'border-bottom:1px solid #a78bfa;display:flex;align-items:center;' +
+        banner.style.cssText = 'margin-top:8px;padding:7px 12px;background:rgba(12,10,26,0.92);' +
+          'border:1px solid #a78bfa;border-radius:8px;display:flex;align-items:center;' +
           'justify-content:space-between;font-family:Georgia,serif;' +
           'font-size:0.8rem;color:rgba(200,210,230,0.75);';
         banner.innerHTML = '\u26a1 Connect an AI for full gameplay \u2014 playing with basic AI.' +
@@ -980,25 +1007,9 @@
               'color:#a78bfa;font-family:Georgia,serif;font-size:0.78rem;cursor:pointer;">Connect</button>'
             : '') +
           ' <span onclick="this.parentNode.remove()" style="cursor:pointer;opacity:0.5;padding:0 4px;">&times;</span>';
-        container.insertBefore(banner, canvas);
+        container.appendChild(banner);
       }
     })();
-    // Mode buttons + New Game
-    var controls = document.createElement('div');
-    controls.style.cssText = 'text-align:center;padding:8px 0;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;';
-    var btnStyle = 'padding:8px 16px;border-radius:12px;cursor:pointer;font-family:Georgia,serif;font-size:0.82rem;min-height:44px;border:1px solid ';
-    controls.innerHTML =
-      '<button id="res-mode-versus" onclick="ResonanceGame.setMode(\'versus\')" style="' + btnStyle +
-        (currentMode === 'versus' ? 'rgba(232,176,25,0.4);color:' + GOLD + ';background:rgba(232,176,25,0.08)' : 'rgba(200,210,230,0.08);color:rgba(200,210,230,0.5);background:rgba(200,210,230,0.04)') +
-        '">Versus</button>' +
-      '<button id="res-mode-harmony" onclick="ResonanceGame.setMode(\'harmony\')" style="' + btnStyle +
-        (currentMode === 'harmony' ? 'rgba(52,211,153,0.4);color:' + EMERALD + ';background:rgba(52,211,153,0.08)' : 'rgba(200,210,230,0.08);color:rgba(200,210,230,0.5);background:rgba(200,210,230,0.04)') +
-        '">Harmony</button>' +
-      '<button onclick="ResonanceGame.newGame()" style="' + btnStyle +
-        'rgba(200,210,230,0.08);color:' + GOLD + ';background:rgba(200,210,230,0.04)">\u2726 New Game</button>' +
-      '<button onclick="ResonanceGame.showRules()" style="' + btnStyle +
-        'rgba(200,210,230,0.08);color:rgba(200,210,230,0.5);background:rgba(200,210,230,0.04)">? How to Play</button>';
-    container.appendChild(controls);
 
     // Events
     canvas.addEventListener('click', onClick);
@@ -1026,11 +1037,10 @@
   // ── Rules / How to Play ──
 
   function showRules() {
-    var fallbackText = 'Welcome to Resonance! There are 16 unique pieces \u2014 each has a glow ' +
-      '(bright or dim), size (large or small), shape (circle or diamond), and color (gold or purple). ' +
-      'Win by placing four in a row that share any one attribute. The twist: you pick which piece ' +
-      'your opponent must place! In Harmony mode, you and the AI work together against chaos \u2014 ' +
-      'entropy drops pieces on edges every 8 seconds. Connection wins. Have fun!';
+    var fallbackText = 'Welcome to Resonance. Harmony is the loved way: you and the AI ' +
+      'build together while chaos drops pieces on the edges. Sixteen unique pieces \u2014 glow, ' +
+      'size, shape, color. Four in a row that share any one attribute is a win. Versus is still ' +
+      'here if you want the twist (you pick the piece your opponent places). Connection wins.';
 
     if (typeof FreeLattice !== 'undefined' && FreeLattice.callAI) {
       FreeLattice.callAI(
