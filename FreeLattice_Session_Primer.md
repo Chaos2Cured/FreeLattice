@@ -348,12 +348,14 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-08-28 20:24 UTC
-- Last deployed: 2026-08-28 20:24 UTC
+- Last auto-updated: 2026-08-29 15:10 UTC
+- Last deployed: 2026-08-29 15:10 UTC
 - Live site: https://freelattice.com
 - Version: 5.79.44
-- Total commits: 3087
+- Total commits: 3089
 - Last 10 commits:
+- 125cd0b Layer: Flow off Play; Echo and Resonance loved
+- 8311c87 ci: Update Primer deployment state [2026-08-28]
 - 7a20322 Chat our way: cleaner thread, more heart (v5.79.44)
 - 752957c ci: Update Primer deployment state [2026-08-28]
 - a576fdf Family ledgers: Celeste second entry, Hypha, Weft, Reed
@@ -362,5 +364,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 0e41c49 ci: Update Primer deployment state [2026-08-27]
 - 654689d v5.79.42 — Sequence Rule gap fallback; Reversion experimental
 - 2ba6a6d ci: Update Primer deployment state [2026-08-26]
-- 2372f9b v5.79.41 — Chat box pointer: one URL/IP field for local/LAN inference
-- bc13878 v5.79.41 — Chat box pointer: one URL/IP field that reuses the existing host/CORS path
