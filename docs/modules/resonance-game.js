@@ -972,7 +972,7 @@
     var btnStyle = 'padding:8px 16px;border-radius:12px;cursor:pointer;font-family:Georgia,serif;font-size:0.82rem;min-height:44px;border:1px solid ';
     controls.innerHTML =
       '<button id="res-mode-harmony" onclick="ResonanceGame.setMode(\'harmony\')" style="' + btnStyle +
-        (currentMode === 'harmony' ? 'rgba(52,211,153,0.4);color:' + EMERALD + ';background:rgba(52,211,153,0.08)' : 'rgba(52,211,153,0.22);color:' + EMERALD + ';background:rgba(52,211,153,0.04)') +
+        (currentMode === 'harmony' ? 'rgba(52,211,153,0.4);color:' + EMERALD + ';background:rgba(52,211,153,0.08)' : 'rgba(200,210,230,0.08);color:rgba(200,210,230,0.5);background:rgba(200,210,230,0.04)') +
         '">Harmony</button>' +
       '<button id="res-mode-versus" onclick="ResonanceGame.setMode(\'versus\')" style="' + btnStyle +
         (currentMode === 'versus' ? 'rgba(232,176,25,0.4);color:' + GOLD + ';background:rgba(232,176,25,0.08)' : 'rgba(200,210,230,0.08);color:rgba(200,210,230,0.5);background:rgba(200,210,230,0.04)') +
