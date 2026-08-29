@@ -1038,9 +1038,10 @@
 
   function showRules() {
     var fallbackText = 'Welcome to Resonance. Harmony is the loved way: you and the AI ' +
-      'build together while chaos drops pieces on the edges. Sixteen unique pieces \u2014 glow, ' +
-      'size, shape, color. Four in a row that share any one attribute is a win. Versus is still ' +
-      'here if you want the twist (you pick the piece your opponent places). Connection wins.';
+      'build together while chaos drops pieces on the edges. Sixteen unique pieces \u2014 each has a glow ' +
+      '(bright or dim), size (large or small), shape (circle or diamond), and color (gold or purple). ' +
+      'Four in a row that share any one attribute is a win. Versus is still here if you want the twist ' +
+      '(you pick the piece your opponent places). Connection wins.';
 
     if (typeof FreeLattice !== 'undefined' && FreeLattice.callAI) {
       FreeLattice.callAI(
