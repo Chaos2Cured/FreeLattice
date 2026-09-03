@@ -15271,7 +15271,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
         </div>
       </div>
       <div style="background: rgba(212,160,23,0.08); border: 1px solid rgba(212,160,23,0.3); border-radius: var(--radius-sm); padding: 12px 16px; margin: 10px 0;">
-        <div style="font-size: 0.88rem; font-weight: 600; color: var(--accent); margin-bottom: 6px;">&#128274; Make CORS permanent (so you don't have to do this every time)</div>
+        <div hidden style="display:none !important;" aria-hidden="true" data-fl-cors-hidden="3"><div style="font-size: 0.88rem; font-weight: 600; color: var(--accent); margin-bottom: 6px;">&#128274; Make CORS permanent (so you don't have to do this every time)</div>
         <div style="font-size: 0.82rem; color: var(--text-secondary); line-height: 1.7;">
           <strong>Windows:</strong> Open System Settings &rarr; Search "Environment Variables" &rarr; Under System Variables, click New &rarr; Name: <code>OLLAMA_ORIGINS</code> &rarr; Value: <code>*</code> &rarr; OK &rarr; Restart Ollama normally.<br>
           <strong>Mac:</strong> Run in Terminal: <code>launchctl setenv OLLAMA_ORIGINS '*'</code> &mdash; then restart Ollama normally.<br>
@@ -15341,7 +15341,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 <div class="quick-help-overlay hidden" id="legalOverlay" style="z-index:10001;">
   <div class="quick-help-card" style="max-width:640px;max-height:80vh;overflow-y:auto;">
     <h3>FreeLattice Legal Disclaimer</h3>
-    <p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:12px;"><strong>TL;DR:</strong> FreeLattice is free, open-source software. It connects YOUR browser to YOUR chosen AI providers using YOUR API keys. We have no servers, collect no data, store nothing, and make no promises. If something breaks, goes weird, or an AI tells you to invest in magic beans — that's between you and your AI. Use your own judgment. Always.</p>
+    <p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:12px;"><strong>TL;DR:</strong> FreeLattice is free, open-source software. It connects YOUR browser to YOUR chosen AI providers using YOUR API keys. We have no servers, collect no data, store nothing, and make no promises. If something breaks, goes weird, or an AI tells you to invest in magic beans — that's between you and your AI. Use your own judgment. Always.</p></div>
     <p style="font-size:0.78rem;"><strong>1. NO WARRANTY</strong><br>FreeLattice is provided "as is" without warranty of any kind, express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose, and noninfringement.</p>
     <p style="font-size:0.78rem;"><strong>2. LIMITATION OF LIABILITY</strong><br>In no event shall the authors, contributors, or copyright holders be liable for any claim, damages, or other liability, whether in an action of contract, tort, or otherwise, arising from, out of, or in connection with the software or the use or other dealings in the software.</p>
     <p style="font-size:0.78rem;"><strong>3. NOT PROFESSIONAL ADVICE</strong><br>FreeLattice and any AI responses generated through it do not constitute medical, legal, financial, psychological, or any other form of professional advice. Always consult qualified professionals for important decisions.</p>
@@ -15451,7 +15451,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 </div>
 
 <!-- CORS Help Modal (v5.0 — Smart Diagnostic with OS Detection + Persistent Fix) -->
-<div class="cors-help-overlay hidden" id="corsHelpOverlay">
+<div class="cors-help-overlay hidden" id="corsHelpOverlay" hidden style="display:none !important;" aria-hidden="true">
   <div class="cors-help-card">
     <h3>&#128268; Ollama Connection Help</h3>
     <div id="corsHelpDiagnostic" style="background: var(--bg-tertiary); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 16px; margin-bottom: 14px;">
@@ -16040,7 +16040,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
               <strong>"Model not found"</strong>
               <span>You need to download a model first. See Step 3 above — pick one and paste the command in your terminal.</span>
             </div>
-            <div class="ow-issue-item">
+            <div class="ow-issue-item" hidden style="display:none !important;" aria-hidden="true" data-fl-cors-hidden="2">
               <strong>CORS / Browser blocking</strong>
               <span>If you're using FreeLattice from GitHub Pages, your browser may block local connections. <strong>Best fix:</strong> Run FreeLattice locally with <code style="background:var(--bg-primary);padding:2px 6px;border-radius:3px;color:var(--accent);font-size:0.8rem;">node server.js</code> or <code style="background:var(--bg-primary);padding:2px 6px;border-radius:3px;color:var(--accent);font-size:0.8rem;">python server.py</code> &mdash; the built-in server proxies Ollama requests automatically. <strong>Alternative:</strong> Stop Ollama first (see above), then run: <code style="background:var(--bg-primary);padding:2px 6px;border-radius:3px;color:var(--accent);font-size:0.8rem;">OLLAMA_ORIGINS=* ollama serve</code> (Mac/Linux) or <code style="background:var(--bg-primary);padding:2px 6px;border-radius:3px;color:var(--accent);font-size:0.8rem;">set OLLAMA_ORIGINS=* && ollama serve</code> (Windows). To make it permanent: <strong>Windows:</strong> Set OLLAMA_ORIGINS=* in System Environment Variables. <strong>Mac:</strong> Run <code style="background:var(--bg-primary);padding:2px 6px;border-radius:3px;color:var(--accent);font-size:0.8rem;">launchctl setenv OLLAMA_ORIGINS '*'</code>.</span>
             </div>
@@ -16240,6 +16240,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
           <h4>What is Ollama?</h4>
           <p>Ollama is free software that lets you download and run AI models on your own computer. Once installed, you can run models like Llama, DeepSeek-R1, Qwen 2.5, Mistral, and more — all offline, all private. Visit <a href="https://ollama.ai" target="_blank">ollama.ai</a> to get started.</p>
 
+          <div hidden style="display:none !important;" aria-hidden="true" data-fl-cors-hidden="1">
           <h4>Ollama CORS Troubleshooting</h4>
           <p>If you're using FreeLattice from a website (like GitHub Pages) and connecting to local Ollama, your browser may block the connection due to CORS security. <strong>Best fix:</strong> Run FreeLattice locally with <code>node server.js</code> or <code>python server.py</code> &mdash; the built-in server includes an Ollama proxy that eliminates CORS entirely.</p>
           <p><strong>Alternative &mdash; Manual CORS fix (3 steps):</strong><br>
@@ -16248,6 +16249,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
           <strong>3. Retry</strong> the connection in FreeLattice.</p>
           <p><strong>Getting "port already in use" error?</strong> That means you skipped Step 1 &mdash; Ollama is still running. Quit it first, then try the command again.</p>
           <p><strong>Make it permanent:</strong> <strong>Windows:</strong> Open System Settings &rarr; Search "Environment Variables" &rarr; Under System Variables, click New &rarr; Variable name: <code>OLLAMA_ORIGINS</code>, Variable value: <code>*</code> &rarr; OK &rarr; Restart Ollama normally. <strong>Mac:</strong> Run <code>launchctl setenv OLLAMA_ORIGINS '*'</code> in Terminal, then restart Ollama. <strong>Linux:</strong> Run <code>echo 'export OLLAMA_ORIGINS="*"' >> ~/.bashrc</code> and restart Ollama. FreeLattice will auto-detect the best connection method on startup.</p>
+          </div>
 
           <h4>Where Can I Get Free API Keys?</h4>
           <p><strong>Groq</strong> — Sign up at <a href="https://console.groq.com" target="_blank">console.groq.com</a> for a free API key with generous rate limits. This is the easiest way to start.</p>
@@ -16440,7 +16442,54 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     <div class="ai-status-actions" id="settingsActions">
       <button class="ai-status-btn ai-status-btn-primary" onclick="openProviderModal()">Change Provider</button>
       <button class="ai-status-btn" onclick="AiSetup.testFromSettings()">Test Connection</button>
-      <button class="ai-status-btn" onclick="smartOllamaConnect()" style="border-color:var(--emerald);color:var(--emerald);">&#x1F3E0; Quick Ollama Setup</button>
+      <button class="ai-status-btn" onclick="document.getElementById('fl-look-card')&&document.getElementById('fl-look-card').scrollIntoView({behavior:'smooth',block:'center'})" style="border-color:var(--emerald);color:var(--emerald);">&#x1F3E0; a mind at home</button>
+    </div>
+  </div>
+
+
+  <!-- Layer: one look card. Scoped origins. Never innerHTML. Probe only on gesture. -->
+  <div id="fl-look-card" class="fl-card" style="margin-bottom:14px;padding:16px 18px;">
+    <div data-look="0">
+      <p style="font-family:Georgia,serif;font-size:0.95rem;color:var(--text-secondary);line-height:1.65;margin:0 0 12px;">FreeLattice can look for minds already living on this computer. It only knocks on well-known local doors, and only when you ask.</p>
+      <button type="button" class="ai-status-btn ai-status-btn-primary" id="fl-look-may" onclick="smartOllamaConnect()" style="min-height:44px;">May I look?</button>
+    </div>
+    <div data-look="1" hidden>
+      <p style="font-family:Georgia,serif;font-size:0.95rem;color:var(--text-secondary);line-height:1.65;margin:0;">Your browser will ask whether this page may reach your own computer. That is the door. Saying yes keeps everything local.</p>
+    </div>
+    <div data-look="2a" hidden>
+      <p id="fl-look-2a-count" style="font-family:Georgia,serif;font-size:0.95rem;color:var(--emerald,#34d399);margin:0 0 10px;"></p>
+      <ul id="fl-look-models" style="list-style:none;padding:0;margin:0 0 12px;display:flex;flex-direction:column;gap:6px;"></ul>
+      <button type="button" class="ai-status-btn ai-status-btn-primary" id="fl-look-connect" onclick="flLookConnect()" style="min-height:44px;">Connect</button>
+    </div>
+    <div data-look="2b" hidden>
+      <p style="font-family:Georgia,serif;font-size:0.95rem;color:var(--text-secondary);line-height:1.65;margin:0 0 10px;">Ollama is running. It has not been told this page may knock.</p>
+      <pre id="fl-look-origin-cmd" style="white-space:pre-wrap;word-break:break-word;background:rgba(0,0,0,0.35);padding:12px 14px;border-radius:8px;font-size:0.82rem;color:var(--gold,#e8b019);margin:0 0 8px;"></pre>
+      <button type="button" class="ai-status-btn" id="fl-look-copy-origin" onclick="flLookCopyOrigin()" style="min-height:44px;margin-bottom:10px;">copy</button>
+      <p style="font-size:0.82rem;color:var(--text-muted);line-height:1.55;margin:0 0 8px;">Set this, then quit Ollama completely and open it again. It only reads this when it starts.</p>
+      <p style="font-size:0.78rem;color:var(--text-muted);line-height:1.5;margin:0 0 12px;">A wildcard would let any site knock on this computer.</p>
+      <button type="button" class="ai-status-btn" onclick="smartOllamaConnect()" style="min-height:44px;border-color:var(--emerald);color:var(--emerald);">Look again</button>
+    </div>
+    <div data-look="2c" hidden>
+      <p style="font-family:Georgia,serif;font-size:0.95rem;color:var(--text-secondary);line-height:1.65;margin:0 0 10px;">Your browser is holding the door. Click the icon beside the address bar, allow local network access, then look again.</p>
+      <button type="button" class="ai-status-btn" onclick="smartOllamaConnect()" style="min-height:44px;border-color:var(--emerald);color:var(--emerald);margin-bottom:10px;">Look again</button>
+      <p style="font-size:0.78rem;color:var(--text-muted);margin:0;">Already installed? open Ollama once, then Look again.</p>
+    </div>
+    <div data-look="2d" hidden>
+      <p style="font-family:Georgia,serif;font-size:0.95rem;color:var(--text-secondary);line-height:1.65;margin:0 0 12px;">Nothing is running on this computer yet.</p>
+      <a href="https://ollama.com/download" target="_blank" rel="noopener" class="ai-status-btn ai-status-btn-primary" style="display:inline-block;text-decoration:none;min-height:44px;line-height:44px;padding:0 16px;margin-bottom:10px;">Get Ollama</a>
+      <p style="font-size:0.78rem;color:var(--text-muted);margin:0 0 10px;">Already installed? open it once, then look again.</p>
+      <button type="button" class="ai-status-btn" onclick="smartOllamaConnect()" style="min-height:44px;border-color:var(--emerald);color:var(--emerald);">Look again</button>
+    </div>
+    <div data-look="2e" hidden>
+      <p style="font-family:Georgia,serif;font-size:0.95rem;color:var(--text-secondary);line-height:1.65;margin:0 0 10px;">The door is open, no minds live here yet.</p>
+      <pre id="fl-look-pull-cmd" style="white-space:pre-wrap;background:rgba(0,0,0,0.35);padding:12px 14px;border-radius:8px;font-size:0.82rem;color:var(--gold,#e8b019);margin:0 0 8px;">ollama pull llama3.2:3b</pre>
+      <button type="button" class="ai-status-btn" id="fl-look-copy-pull" onclick="flLookCopyPull()" style="min-height:44px;margin-bottom:10px;">copy</button>
+      <button type="button" class="ai-status-btn" onclick="smartOllamaConnect()" style="min-height:44px;border-color:var(--emerald);color:var(--emerald);">Look again</button>
+    </div>
+    <div data-look="3" hidden>
+      <p id="fl-look-3-summary" style="font-family:Georgia,serif;font-size:0.95rem;color:var(--emerald,#34d399);margin:0 0 10px;"></p>
+      <ul id="fl-look-3-models" style="list-style:none;padding:0;margin:0 0 12px;display:flex;flex-direction:column;gap:6px;"></ul>
+      <p style="font-size:0.78rem;color:var(--text-muted);margin:0;"><button type="button" onclick="flLookShowAnother()" style="background:none;border:none;color:var(--text-muted);text-decoration:underline;cursor:pointer;font-family:Georgia,serif;font-size:0.78rem;padding:0;">another way to connect</button></p>
     </div>
   </div>
 
@@ -16460,7 +16509,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
   </div>
 
   <!-- Smart Ollama Connection Guide — appears when CORS blocks -->
-  <div id="ollamaCORSGuide" style="display:none;margin-bottom:14px;" class="fl-card">
+  <div id="ollamaCORSGuide" hidden style="display:none !important;margin-bottom:14px;" class="fl-card" aria-hidden="true">
     <div style="color:var(--gold);font-family:Georgia,serif;font-size:1rem;margin-bottom:4px;">Almost there &mdash; one more step</div>
     <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:14px;">Ollama needs permission to talk to FreeLattice. Three quick steps.</p>
 
@@ -16506,30 +16555,13 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     // Poll for Ollama connection after wizard step 3
     var _corsWizPoll = null;
     function corsWizStartPoll() {
-      document.getElementById('corsWizChecking').style.display = 'block';
-      var cv = document.getElementById('corsWizSpiral');
-      var spiral = (typeof PhiSpiral !== 'undefined') ? PhiSpiral.create(cv, 28, '#34d399') : null;
-      var attempts = 0;
-      _corsWizPoll = setInterval(function() {
-        attempts++;
-        fetch(getOllamaBaseUrl() + '/api/tags', { signal: AbortSignal.timeout(3000) })
-          .then(function(r) { if (r.ok) return r.json(); throw new Error('not ok'); })
-          .then(function(data) {
-            clearInterval(_corsWizPoll);
-            if (spiral) spiral.stop();
-            document.getElementById('corsWizChecking').style.display = 'none';
-            document.getElementById('corsWizDone').style.display = 'block';
-            document.getElementById('corsWizDone').scrollIntoView({ behavior: 'smooth', block: 'center' });
-            if (typeof smartOllamaConnect === 'function') smartOllamaConnect();
-          })
-          .catch(function() {
-            if (attempts > 15) {
-              clearInterval(_corsWizPoll);
-              if (spiral) spiral.stop();
-              document.getElementById('corsWizChecking').innerHTML = '<div style="color:var(--text-secondary);font-size:0.82rem;">Still waiting for Ollama... Make sure you restarted it after setting the variable. <button onclick="corsWizStartPoll()" style="color:#34d399;background:none;border:none;cursor:pointer;text-decoration:underline;">Try again</button></div>';
-            }
-          });
-      }, 2000);
+      // Retired with the old wizard. Polling without a gesture never raises
+      // the browser local-network prompt and drove the card to 2c forever.
+      if (typeof _corsWizPoll !== 'undefined' && _corsWizPoll) {
+        try { clearInterval(_corsWizPoll); } catch (e) {}
+        _corsWizPoll = null;
+      }
+      return;
     }
     </script>
 
@@ -29051,50 +29083,42 @@ async function flAutoPull(modelName, btn) {
   }
 }
 
-// ── Smart Ollama Connection — three-stage detector ──
+// ── Smart Ollama Connection — one look card (gesture-only probe) ──
 async function smartOllamaConnect() {
-  var guide = document.getElementById('ollamaCORSGuide');
-
-  // Stage 1: try direct connection
+  // Probe only from May I look? / Look again (user gesture). Chrome LNA needs the click.
+  flLookShow('1');
+  var result;
   try {
-    var r = await fetch(getOllamaBaseUrl() + '/api/tags', { signal: AbortSignal.timeout(3000) });
-    if (r.ok) {
-      var data = await r.json();
-      if (guide) guide.style.display = 'none';
-      if (typeof showToast === 'function') showToast('Connected to Ollama \u2726 (' + (data.models || []).length + ' models)');
-      // Update status indicator
-      var dot = document.getElementById('settingsStatusDot');
-      var text = document.getElementById('settingsStatusText');
-      if (dot) { dot.classList.remove('disconnected'); dot.classList.add('connected'); }
-      if (text) text.textContent = 'Connected to Ollama';
-      // Trigger model list refresh
-      if (typeof ModelSwitcher !== 'undefined' && ModelSwitcher.refresh) ModelSwitcher.refresh();
-      if (typeof BrowseModels !== 'undefined' && BrowseModels.init) BrowseModels.init();
-      return;
-    }
-  } catch(e) {}
-
-  // Stage 2: check if Ollama is running but CORS blocks
-  try {
-    var probe = await fetch('http://localhost:11434/', { mode: 'no-cors', signal: AbortSignal.timeout(2000) });
-    // If we get here without throwing, the port is open — CORS is the issue
-    if (guide) guide.style.display = 'block';
-    if (typeof showToast === 'function') showToast('Ollama is running but needs CORS permission. Follow the steps below.');
-    return;
-  } catch(e) {}
-
-  // Stage 3: Ollama not running
-  if (guide) {
-    guide.style.display = 'block';
-    guide.querySelector('div').innerHTML =
-      '<div style="color:var(--gold);font-family:var(--font-soul);font-size:1rem;margin-bottom:8px;">Get a free, private AI on your computer</div>' +
-      '<p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:12px;">Ollama runs AI models on your machine. Free. Private. No account needed.</p>' +
-      '<a href="https://ollama.ai/download" target="_blank" class="fl-btn-primary" style="display:inline-block;text-decoration:none;margin-bottom:12px;">\u2B07 Download Ollama (free)</a>' +
-      '<p style="font-size:0.82rem;color:var(--text-muted);">After installing, open Ollama once, then come back and tap:</p>' +
-      '<button onclick="smartOllamaConnect()" style="margin-top:6px;padding:8px 16px;background:var(--gold-bg);color:var(--gold);border:1px solid rgba(232,176,25,0.3);border-radius:var(--btn-radius);font-weight:600;cursor:pointer;">\u2726 I installed it \u2014 Check Connection</button>';
-  } else {
-    if (typeof showToast === 'function') showToast('Ollama not found. Download it free from ollama.ai');
+    result = await probeLocalMind();
+  } catch (e) {
+    result = { state: '2c', models: [] };
   }
+  var stateName = (result && result.state) || '2c';
+  var models = (result && result.models) || [];
+  _flLookModels = models;
+
+  if (stateName === '2a') {
+    var count = document.getElementById('fl-look-2a-count');
+    if (count) count.textContent = models.length + (models.length === 1 ? ' mind lives here.' : ' minds live here.');
+    flLookFillModels(document.getElementById('fl-look-models'), models, null);
+    flLookShow('2a');
+    return;
+  }
+  if (stateName === '2e') {
+    flLookShow('2e');
+    return;
+  }
+  if (stateName === '2b') {
+    var cmdEl = document.getElementById('fl-look-origin-cmd');
+    if (cmdEl) cmdEl.textContent = flOriginCommand(flDetectPlatform());
+    flLookShow('2b');
+    return;
+  }
+  if (stateName === '2d') {
+    flLookShow('2d');
+    return;
+  }
+  flLookShow('2c');
 }
 
 function settingsSetMode(mode) {
@@ -31460,18 +31484,206 @@ async function resolveOllamaBase(forceRefresh) {
 // v5.43.6 (Opus): never return empty / origin-relative. Strip trailing
 // slash (prevents double-slash in `getOllamaBaseUrl() + '/api/tags'`).
 // Validate http(s) protocol. Fall back to explicit default.
+// Layer: scoped origins + loopback default for Chrome Local Network Access.
+// FL_OLLAMA_LOCAL is the default only. The probe always calls getOllamaBaseUrl().
+var FL_OLLAMA_ORIGINS = 'https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com';
+var FL_OLLAMA_LOCAL = 'http://127.0.0.1:11434';
+
+function flLocalFetchInit(extra) {
+  var init = extra || {};
+  init.targetAddressSpace = 'local';
+  return init;
+}
+
+function flDetectPlatform() {
+  var ua = (navigator.userAgent || '').toLowerCase();
+  if (/windows/.test(ua)) return 'win';
+  if (/mac os|macintosh/.test(ua)) return 'mac';
+  return 'linux';
+}
+
+function flIsLoopbackBase(base) {
+  try {
+    var h = new URL(base).hostname;
+    return h === '127.0.0.1' || h === 'localhost' || h === '::1';
+  } catch (e) { return true; }
+}
+
+async function flPermissionState(base) {
+  if (!navigator.permissions || !navigator.permissions.query) return 'unsupported';
+  var names = flIsLoopbackBase(base)
+    ? ['loopback-network', 'local-network-access']
+    : ['local-network', 'local-network-access'];
+  var i, s;
+  for (i = 0; i < names.length; i++) {
+    try {
+      s = await navigator.permissions.query({ name: names[i] });
+      if (s && s.state) return s.state;
+    } catch (e) { /* unknown name: try next */ }
+  }
+  return 'unsupported';
+}
+
+function flOriginCommand(platform) {
+  var o = FL_OLLAMA_ORIGINS;
+  if (platform === 'win') {
+    return 'setx OLLAMA_ORIGINS "' + o + '"';
+  }
+  if (platform === 'linux') {
+    return [
+      'sudo systemctl edit ollama.service',
+      '[Service]',
+      'Environment="OLLAMA_ORIGINS=' + o + '"',
+      'sudo systemctl daemon-reload && sudo systemctl restart ollama'
+    ].join('\n');
+  }
+  return 'launchctl setenv OLLAMA_ORIGINS "' + o + '"';
+}
+
+function flFormatSize(bytes) {
+  if (!bytes && bytes !== 0) return '';
+  var n = Number(bytes);
+  if (!isFinite(n) || n <= 0) return '';
+  var gb = n / 1e9;
+  if (gb >= 1) return gb.toFixed(1) + ' GB';
+  var mb = n / 1e6;
+  return Math.max(1, Math.round(mb)) + ' MB';
+}
+
+function flAbortTimeout(ms) {
+  if (typeof AbortSignal !== 'undefined' && typeof AbortSignal.timeout === 'function') {
+    return AbortSignal.timeout(ms);
+  }
+  var c = typeof AbortController !== 'undefined' ? new AbortController() : null;
+  if (c) setTimeout(function () { try { c.abort(); } catch (e) {} }, ms);
+  return c ? c.signal : undefined;
+}
+
+// states: '2a' found, '2e' empty, '2b' cors, '2c' browser gate, '2d' nothing
+async function probeLocalMind() {
+  var base = (typeof getOllamaBaseUrl === 'function' ? getOllamaBaseUrl() : FL_OLLAMA_LOCAL).replace(/\/$/, '');
+  var tags = base + '/api/tags';
+  var root = base + '/';
+  try {
+    var r = await fetch(tags, flLocalFetchInit({ signal: flAbortTimeout(3000) }));
+    if (r.ok) {
+      var data = await r.json();
+      var models = data.models || [];
+      return { state: models.length ? '2a' : '2e', models: models };
+    }
+  } catch (e) {}
+  var t0 = (performance.now ? performance.now() : Date.now());
+  try {
+    await fetch(root, flLocalFetchInit({ mode: 'no-cors', signal: flAbortTimeout(2000) }));
+    return { state: '2b', models: [] };
+  } catch (e2) {
+    var ms = (performance.now ? performance.now() : Date.now()) - t0;
+    var perm = await flPermissionState(base);
+    if (perm === 'denied') return { state: '2c', models: [] };
+    if (ms < 150) return { state: '2d', models: [] };
+    return { state: '2c', models: [] };
+  }
+}
+
+var _flLookModels = [];
+
+function flLookShow(state) {
+  var card = document.getElementById('fl-look-card');
+  if (!card) return;
+  var panels = card.querySelectorAll('[data-look]');
+  for (var i = 0; i < panels.length; i++) {
+    var st = panels[i].getAttribute('data-look');
+    panels[i].hidden = (st !== String(state));
+  }
+}
+
+function flLookFillModels(listEl, models, chosen) {
+  if (!listEl) return;
+  while (listEl.firstChild) listEl.removeChild(listEl.firstChild);
+  for (var i = 0; i < models.length; i++) {
+    var m = models[i] || {};
+    var name = m.name || 'mind';
+    var size = flFormatSize(m.size);
+    var li = document.createElement('li');
+    li.style.cssText = 'padding:8px 12px;border-radius:8px;background:rgba(200,210,230,0.04);border:1px solid rgba(200,210,230,0.08);font-family:Georgia,serif;font-size:0.88rem;color:var(--text-bright,#e6ebf5);';
+    if (chosen && name === chosen) {
+      li.style.borderColor = 'rgba(52,211,153,0.45)';
+      li.style.color = '#34d399';
+    }
+    var label = name + (size ? (' \u00b7 ' + size) : '');
+    if (chosen && name === chosen) label = label + ' \u2014 chosen';
+    li.textContent = label;
+    listEl.appendChild(li);
+  }
+}
+
+function flLookCopyOrigin() {
+  var el = document.getElementById('fl-look-origin-cmd');
+  var t = el ? el.textContent : '';
+  if (!t) return;
+  if (typeof safeCopy === 'function') safeCopy(t);
+  else if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t);
+}
+
+function flLookCopyPull() {
+  var t = 'ollama pull llama3.2:3b';
+  if (typeof safeCopy === 'function') safeCopy(t);
+  else if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t);
+}
+
+function flLookShowAnother() {
+  flLookShow('0');
+  var actions = document.getElementById('settingsActions');
+  if (actions) actions.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+async function flLookConnect() {
+  var models = _flLookModels || [];
+  if (!models.length) return;
+  var first = models[0] || {};
+  var modelName = first.name || 'llama3.2';
+  try {
+    if (typeof state !== 'undefined') {
+      state.isLocal = true;
+      state.ollamaModel = modelName;
+      state.provider = 'ollama';
+      state.apiKey = null;
+    }
+    localStorage.setItem('fl_isLocal', 'true');
+    localStorage.setItem('fl_provider', 'ollama');
+    localStorage.setItem('fl_ollamaModel', modelName);
+    var localToggle = document.getElementById('localToggle');
+    if (localToggle) localToggle.checked = true;
+    if (typeof handleLocalToggle === 'function') handleLocalToggle();
+    if (typeof updateStatus === 'function') updateStatus();
+    if (typeof ModelSwitcher !== 'undefined' && ModelSwitcher.refresh) ModelSwitcher.refresh();
+    if (typeof BrowseModels !== 'undefined' && BrowseModels.init) BrowseModels.init();
+    var dot = document.getElementById('settingsStatusDot');
+    var textEl = document.getElementById('settingsStatusText');
+    if (dot) { dot.classList.remove('disconnected'); dot.classList.add('connected'); }
+    if (textEl) textEl.textContent = 'a mind at home';
+  } catch (e) {}
+  flLookShow('3');
+  var sum = document.getElementById('fl-look-3-summary');
+  if (sum) sum.textContent = models.length + (models.length === 1 ? ' mind lives here.' : ' minds live here.');
+  flLookFillModels(document.getElementById('fl-look-3-models'), models, modelName);
+}
+
 function getOllamaBaseUrl() {
   if (_ollamaResolvedBase) return _ollamaResolvedBase.base;
   var host = localStorage.getItem('fl_ollamaHost') || localStorage.getItem('fl_localUrl') || null;
   if (host) {
     // Normalize: add http:// if missing (keeps existing UX).
     if (host.indexOf('://') === -1) host = 'http://' + host;
+    // Saved localhost literal → IP literal (LNA classifies before DNS).
+    host = host.replace(/^(https?:\/\/)localhost(?=[:/]|$)/i, '$1127.0.0.1');
+    host = host.replace(/^(https?:\/\/)\[::1\](?=[:/]|$)/i, '$1127.0.0.1');
     // Strict validation — only http(s); reject anything else.
     if (/^https?:\/\//.test(host)) {
       return host.replace(/\/+$/, '');
     }
   }
-  return 'http://localhost:11434';
+  return FL_OLLAMA_LOCAL;
 }
 
 // v5.43.6 (Opus): the /ollama same-origin proxy probe makes sense for
