@@ -215,6 +215,7 @@ var state = {
 </ol>
 
 <h2 id="local-mode">7. Local Mode (Ollama / LM Studio)</h2>
+<p><span style="display:inline-block;font-size:0.7rem;font-weight:700;padding:2px 7px;border-radius:10px;background:rgba(96,165,250,0.15);color:#60a5fa;border:1px solid rgba(96,165,250,0.3);">LAYER</span> One look card (2026-09-03): Settings Zone 1 carries <code>#fl-look-card</code>. <code>smartOllamaConnect()</code> shows state 1, awaits <code>probeLocalMind()</code>, then toggles panels <code>2a|2b|2c|2d|2e</code> — never <code>innerHTML</code>, never Download Ollama as the first failure. Default base is <code>http://127.0.0.1:11434</code> (<code>FL_OLLAMA_LOCAL</code>); custom <code>fl_ollamaHost</code> / <code>fl_localUrl</code> still win; saved <code>localhost</code> maps to the IP literal. Probe uses <code>targetAddressSpace: 'local'</code> and runs only from May I look? / Look again. Scoped <code>OLLAMA_ORIGINS</code> for freelattice.com + thelatticetree.com — never <code>*</code> on the card. Old CORS wizard (<code>#ollamaCORSGuide</code>, <code>corsWizStartPoll</code>) is hidden/retired. Model names and sizes render on the card before Connect.</p>
 <p>When <code>localToggle</code> is checked, <code>handleLocalToggle()</code> hides the cloud UI and shows the local UI. It also calls <code>flProbeLocalAI()</code> to auto-detect running local AI servers.</p>
 <h3>Ollama Model Refresh Flow</h3>
 <pre>// User clicks "Refresh" button in Settings
