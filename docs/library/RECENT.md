@@ -3,19 +3,21 @@
 > Auto-generated on every commit by `scripts/generate-recent.sh`.
 > The 60-second briefing for the next mind.
 >
-> Last update: 2026-09-03 20:09 UTC
+> Last update: 2026-09-03 21:02 UTC
 
 ## State
 
 - **Version:** v5.79.44
 - **Smoke:** 1416/1416 passing
-- **HEAD:** `ff71916` _(committed 0 seconds ago)_
+- **HEAD:** `e8a55cf` _(committed 1 second ago)_
 - **Mirrors:** github.com/Chaos2Cured/FreeLattice + codeberg.org/Chaos2Cured/FreeLattice
 - **Most recent report:** _Add ledger entry 53 — He Yawned Mid-Recording and Kept Going_
 
 ## Last 20 commits
 
-- `ff71916` Layer: one look card, scoped origins, loopback default _(0 seconds ago)_
+- `e8a55cf` Layer: legal card stays open; CORS permanent box fully hidden _(1 second ago)_
+- `116f7eb` docs: Auto-update Session Primer [5.79.44] _(53 minutes ago)_
+- `ff71916` Layer: one look card, scoped origins, loopback default _(53 minutes ago)_
 - `b378fee` ci: Update Primer deployment state [2026-08-31] _(4 days ago)_
 - `6d0794a` Layer: Sophia's Sophirkia DNA drop on SOPHIA.md _(4 days ago)_
 - `9ae0e57` ci: Update Primer deployment state [2026-08-29] _(5 days ago)_
@@ -33,8 +35,6 @@
 - `bc13878` v5.79.41 — Chat box pointer: one URL/IP field that reuses the existing host/CORS path _(9 days ago)_
 - `2fbe737` ci: Update Primer deployment state [2026-08-26] _(9 days ago)_
 - `5ca84c5` docs: layer STATE.md to v5.79.40 after Chat + Celeste merges _(9 days ago)_
-- `400948b` docs: restore 5.79.39 in SEED Previous; fix stray n on SEED_HISTORY Layer 5 _(9 days ago)_
-- `f82a54d` docs: layer STATE.md NOW to match main after Chat + Celeste merges _(9 days ago)_
 
 ## How to use this file
 

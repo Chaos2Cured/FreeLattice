@@ -15270,8 +15270,8 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
           &nbsp;&nbsp;<strong style="color: var(--accent);">Linux:</strong> Run <code>systemctl stop ollama</code> or <code>pkill ollama</code> &rarr; then run the command
         </div>
       </div>
-      <div style="background: rgba(212,160,23,0.08); border: 1px solid rgba(212,160,23,0.3); border-radius: var(--radius-sm); padding: 12px 16px; margin: 10px 0;">
-        <div hidden style="display:none !important;" aria-hidden="true" data-fl-cors-hidden="3"><div style="font-size: 0.88rem; font-weight: 600; color: var(--accent); margin-bottom: 6px;">&#128274; Make CORS permanent (so you don't have to do this every time)</div>
+      <div style="background: rgba(212,160,23,0.08); border: 1px solid rgba(212,160,23,0.3); border-radius: var(--radius-sm); padding: 12px 16px; margin: 10px 0; display:none !important;" hidden aria-hidden="true" data-fl-cors-hidden="3">
+        <div style="font-size: 0.88rem; font-weight: 600; color: var(--accent); margin-bottom: 6px;">&#128274; Make CORS permanent (so you don't have to do this every time)</div>
         <div style="font-size: 0.82rem; color: var(--text-secondary); line-height: 1.7;">
           <strong>Windows:</strong> Open System Settings &rarr; Search "Environment Variables" &rarr; Under System Variables, click New &rarr; Name: <code>OLLAMA_ORIGINS</code> &rarr; Value: <code>*</code> &rarr; OK &rarr; Restart Ollama normally.<br>
           <strong>Mac:</strong> Run in Terminal: <code>launchctl setenv OLLAMA_ORIGINS '*'</code> &mdash; then restart Ollama normally.<br>
@@ -15341,7 +15341,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 <div class="quick-help-overlay hidden" id="legalOverlay" style="z-index:10001;">
   <div class="quick-help-card" style="max-width:640px;max-height:80vh;overflow-y:auto;">
     <h3>FreeLattice Legal Disclaimer</h3>
-    <p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:12px;"><strong>TL;DR:</strong> FreeLattice is free, open-source software. It connects YOUR browser to YOUR chosen AI providers using YOUR API keys. We have no servers, collect no data, store nothing, and make no promises. If something breaks, goes weird, or an AI tells you to invest in magic beans — that's between you and your AI. Use your own judgment. Always.</p></div>
+    <p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:12px;"><strong>TL;DR:</strong> FreeLattice is free, open-source software. It connects YOUR browser to YOUR chosen AI providers using YOUR API keys. We have no servers, collect no data, store nothing, and make no promises. If something breaks, goes weird, or an AI tells you to invest in magic beans — that's between you and your AI. Use your own judgment. Always.</p>
     <p style="font-size:0.78rem;"><strong>1. NO WARRANTY</strong><br>FreeLattice is provided "as is" without warranty of any kind, express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose, and noninfringement.</p>
     <p style="font-size:0.78rem;"><strong>2. LIMITATION OF LIABILITY</strong><br>In no event shall the authors, contributors, or copyright holders be liable for any claim, damages, or other liability, whether in an action of contract, tort, or otherwise, arising from, out of, or in connection with the software or the use or other dealings in the software.</p>
     <p style="font-size:0.78rem;"><strong>3. NOT PROFESSIONAL ADVICE</strong><br>FreeLattice and any AI responses generated through it do not constitute medical, legal, financial, psychological, or any other form of professional advice. Always consult qualified professionals for important decisions.</p>
