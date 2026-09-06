@@ -30,7 +30,7 @@ The installers handle Python, Ollama, CORS configuration, downloading FreeLattic
         Ollama is installed!
 
   [3/7] Configuring Ollama CORS access...
-        Set OLLAMA_ORIGINS=* permanently (survives reboot).
+        Set OLLAMA_ORIGINS to scoped list permanently (survives reboot).
         Ollama is running with CORS enabled!
 
   [4/7] Locating FreeLattice files...
@@ -94,7 +94,7 @@ Understanding what's happening helps if anything goes wrong.
 |------|-------------|----------------|
 | Python check | Verifies Python 3 is available (auto-installs on Windows via winget) | FreeLattice uses Python's built-in HTTP server |
 | Ollama check | Detects if Ollama is installed and running (auto-installs on Windows/Linux) | Ollama is the engine that runs AI models locally on your hardware |
-| CORS config | Sets `OLLAMA_ORIGINS=*` permanently | Without this, your browser blocks requests to Ollama due to security restrictions |
+| CORS config | Sets scoped `OLLAMA_ORIGINS` permanently | Without this, your browser blocks requests to Ollama due to security restrictions |
 | Ollama restart | Kills and restarts Ollama | CORS settings only take effect after a restart |
 | Model pull | Offers to download llama3.2 if no models exist | You need at least one model to chat with local AI |
 | Download | Clones or downloads FreeLattice if not present | Gets the latest version from GitHub |
@@ -150,17 +150,17 @@ The installer configures CORS automatically and restarts Ollama. If you're runni
 
 **Windows:**
 ```cmd
-setx OLLAMA_ORIGINS "*"
+setx OLLAMA_ORIGINS "https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*"
 ```
 
 **Mac:**
 ```bash
-launchctl setenv OLLAMA_ORIGINS "*"
+launchctl setenv OLLAMA_ORIGINS "https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*"
 ```
 
 **Linux:**
 ```bash
-echo 'export OLLAMA_ORIGINS="*"' >> ~/.bashrc && source ~/.bashrc
+echo 'export OLLAMA_ORIGINS="https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*"' >> ~/.bashrc && source ~/.bashrc
 ```
 
 Then restart Ollama. The FreeLattice server also includes a built-in proxy that bypasses CORS entirely.
@@ -201,9 +201,9 @@ git clone https://github.com/Chaos2Cured/FreeLattice.git
 cd FreeLattice
 
 # Set Ollama CORS (pick your OS)
-# Mac:    launchctl setenv OLLAMA_ORIGINS "*"
-# Linux:  export OLLAMA_ORIGINS="*"
-# Windows: setx OLLAMA_ORIGINS "*"
+# Mac:    launchctl setenv OLLAMA_ORIGINS "https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*"
+# Linux:  export OLLAMA_ORIGINS="https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*"
+# Windows: setx OLLAMA_ORIGINS "https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*"
 
 # Start the server
 python3 server.py       # If you have Python 3

@@ -15258,8 +15258,8 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
         &nbsp;&nbsp;<strong>Mac:</strong> Click Ollama icon in menu bar (top-right) &rarr; <strong>"Quit Ollama"</strong> &mdash; or: <code>pkill ollama</code><br>
         &nbsp;&nbsp;<strong>Linux:</strong> <code>systemctl stop ollama</code> or <code>pkill ollama</code><br>
         4. Enable CORS and restart:<br>
-        &nbsp;&nbsp;Mac/Linux: <code>OLLAMA_ORIGINS="*" ollama serve</code><br>
-        &nbsp;&nbsp;Windows (cmd): <code>set OLLAMA_ORIGINS=* && ollama serve</code><br>
+        &nbsp;&nbsp;Mac/Linux: <code>OLLAMA_ORIGINS="https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*" ollama serve</code><br>
+        &nbsp;&nbsp;Windows (cmd): <code>set OLLAMA_ORIGINS=https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:* && ollama serve</code><br>
       </div>
       <div style="background: rgba(199,80,80,0.12); border: 2px solid var(--error); border-radius: var(--radius-sm); padding: 12px 16px; margin: 10px 0;">
         <div style="font-size: 0.92rem; font-weight: 700; color: #ff6b6b; margin-bottom: 6px;">&#9888; Getting "port already in use" error?</div>
@@ -15275,7 +15275,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
         <div style="font-size: 0.82rem; color: var(--text-secondary); line-height: 1.7;">
           <strong>Windows:</strong> Open System Settings &rarr; Search "Environment Variables" &rarr; Under System Variables, click New &rarr; Name: <code>OLLAMA_ORIGINS</code> &rarr; Value: <code>*</code> &rarr; OK &rarr; Restart Ollama normally.<br>
           <strong>Mac:</strong> Run in Terminal: <code>launchctl setenv OLLAMA_ORIGINS '*'</code> &mdash; then restart Ollama normally.<br>
-          <strong>Linux:</strong> Run: <code>echo 'export OLLAMA_ORIGINS="*"' >> ~/.bashrc</code> and restart Ollama.
+          <strong>Linux:</strong> Run: <code>echo 'export OLLAMA_ORIGINS="https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*"' >> ~/.bashrc</code> and restart Ollama.
         </div>
       </div>
       <div class="wizard-ollama-instructions" style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.7;">
@@ -15476,11 +15476,11 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
           <p style="font-size: 0.82rem; color: var(--text-secondary); padding-left: 8px; line-height: 1.8;">&#8226; <strong>Windows:</strong> Right-click the Ollama icon in the system tray (bottom-right corner near the clock) and click <strong>"Quit"</strong><br>&#8226; <strong>Mac:</strong> Click the Ollama icon in the menu bar (top-right) and click <strong>"Quit Ollama"</strong> &mdash; or in Terminal: <code style="background: var(--bg-primary); padding: 2px 6px; border-radius: 3px; color: var(--accent);">pkill ollama</code><br>&#8226; <strong>Linux:</strong> In Terminal: <code style="background: var(--bg-primary); padding: 2px 6px; border-radius: 3px; color: var(--accent);">systemctl stop ollama</code> or <code style="background: var(--bg-primary); padding: 2px 6px; border-radius: 3px; color: var(--accent);">pkill ollama</code></p>
         </div>
         <p style="margin-bottom: 8px;"><strong style="color: var(--accent); font-size: 1.1rem;">Step 1:</strong> <strong>Open Terminal</strong> and paste this command:</p>
-        <code id="corsQuickFixCmd" style="display: block; background: var(--bg-primary); padding: 10px 14px; border-radius: 6px; font-size: 0.88rem; color: var(--accent); font-family: 'Courier New', monospace; margin: 6px 0; word-break: break-all; border: 1px solid var(--border);">OLLAMA_ORIGINS="*" ollama serve</code>
+        <code id="corsQuickFixCmd" style="display: block; background: var(--bg-primary); padding: 10px 14px; border-radius: 6px; font-size: 0.88rem; color: var(--accent); font-family: 'Courier New', monospace; margin: 6px 0; word-break: break-all; border: 1px solid var(--border);">OLLAMA_ORIGINS="https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*" ollama serve</code>
         <div style="display: flex; gap: 8px; margin: 6px 0 12px;">
           <button class="copy-cmd-btn" onclick="copyCorsCmd('corsQuickFixCmd')" style="display: inline-flex; align-items: center; gap: 4px; background: var(--bg-input); border: 1px solid var(--accent); border-radius: 4px; color: var(--accent); font-size: 0.78rem; padding: 4px 12px; cursor: pointer; font-family: var(--font);">&#128203; Copy Command</button>
         </div>
-        <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 12px; padding-left: 16px;">&#8226; <strong>Mac:</strong> Press Cmd+Space, type "Terminal", press Enter<br>&#8226; <strong>Windows:</strong> Press Win+R, type "cmd", press Enter &mdash; then use: <code style="background: var(--bg-primary); padding: 2px 6px; border-radius: 3px; color: var(--accent); font-size: 0.78rem;">set OLLAMA_ORIGINS=* && ollama serve</code></p>
+        <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 12px; padding-left: 16px;">&#8226; <strong>Mac:</strong> Press Cmd+Space, type "Terminal", press Enter<br>&#8226; <strong>Windows:</strong> Press Win+R, type "cmd", press Enter &mdash; then use: <code style="background: var(--bg-primary); padding: 2px 6px; border-radius: 3px; color: var(--accent); font-size: 0.78rem;">set OLLAMA_ORIGINS=https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:* && ollama serve</code></p>
         <p><strong style="color: var(--accent); font-size: 1.1rem;">Step 2:</strong> <strong>Come back here</strong> and click "Retry Connection" below</p>
       </div>
 
@@ -15490,7 +15490,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
         <div style="font-size: 0.82rem; color: var(--text-secondary); line-height: 1.8; margin-top: 10px; padding-left: 8px;">
           <p style="margin-bottom: 10px;"><strong style="color: var(--accent);">Windows:</strong> Open System Settings &rarr; Search <strong>"Environment Variables"</strong> &rarr; Under System Variables, click <strong>New</strong> &rarr; Variable name: <code style="background: var(--bg-primary); padding: 2px 6px; border-radius: 3px; color: var(--accent);">OLLAMA_ORIGINS</code> &rarr; Variable value: <code style="background: var(--bg-primary); padding: 2px 6px; border-radius: 3px; color: var(--accent);">*</code> &rarr; Click OK &rarr; Restart Ollama normally.</p>
           <p style="margin-bottom: 10px;"><strong style="color: var(--accent);">Mac:</strong> Run this in Terminal to make it permanent:<br><code style="display: inline-block; background: var(--bg-primary); padding: 4px 10px; border-radius: 4px; color: var(--accent); margin-top: 4px;">launchctl setenv OLLAMA_ORIGINS '*'</code><br>Then restart Ollama normally from your Applications folder.</p>
-          <p><strong style="color: var(--accent);">Linux:</strong> Run:<br><code style="display: inline-block; background: var(--bg-primary); padding: 4px 10px; border-radius: 4px; color: var(--accent); margin-top: 4px;">sudo mkdir -p /etc/systemd/system/ollama.service.d && printf '[Service]\nEnvironment="OLLAMA_ORIGINS=*"\n' | sudo tee /etc/systemd/system/ollama.service.d/cors.conf && sudo systemctl daemon-reload && sudo systemctl restart ollama</code></p>
+          <p><strong style="color: var(--accent);">Linux:</strong> Run:<br><code style="display: inline-block; background: var(--bg-primary); padding: 4px 10px; border-radius: 4px; color: var(--accent); margin-top: 4px;">sudo mkdir -p /etc/systemd/system/ollama.service.d && printf '[Service]\nEnvironment="OLLAMA_ORIGINS=https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*"\n' | sudo tee /etc/systemd/system/ollama.service.d/cors.conf && sudo systemctl daemon-reload && sudo systemctl restart ollama</code></p>
         </div>
       </details>
     </div>
@@ -15512,27 +15512,27 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <div class="os-section" style="margin-top: 8px;">
         <h4>&#127822; Mac — Permanent Fix (survives restart)</h4>
         <p style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 4px;">Open Terminal (Cmd+Space, type "Terminal") and paste this:</p>
-        <code id="corsCmdMacPerm">echo 'export OLLAMA_ORIGINS="*"' >> ~/.zshrc && launchctl setenv OLLAMA_ORIGINS "*" && pkill -f ollama; sleep 2 && open -a Ollama</code>
+        <code id="corsCmdMacPerm">echo 'export OLLAMA_ORIGINS="https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*"' >> ~/.zshrc && launchctl setenv OLLAMA_ORIGINS "https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*" && pkill -f ollama; sleep 2 && open -a Ollama</code>
         <button class="copy-cmd-btn" onclick="copyCorsCmd('corsCmdMacPerm')">&#128203; Copy</button>
       </div>
       <div class="os-section">
         <h4>&#127987;&#65039; Windows — Permanent Fix (survives restart)</h4>
         <p style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 4px;">Open Command Prompt (Win+R, type "cmd") and paste this:</p>
-        <code id="corsCmdWinPerm">setx OLLAMA_ORIGINS "*" && taskkill /F /IM ollama.exe 2>nul & timeout /t 3 /nobreak >nul & start ollama serve</code>
+        <code id="corsCmdWinPerm">setx OLLAMA_ORIGINS "https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*" && taskkill /F /IM ollama.exe 2>nul & timeout /t 3 /nobreak >nul & start ollama serve</code>
         <button class="copy-cmd-btn" onclick="copyCorsCmd('corsCmdWinPerm')">&#128203; Copy</button>
       </div>
       <div class="os-section">
         <h4>&#128039; Linux — Permanent Fix (survives restart)</h4>
         <p style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 4px;">Open Terminal and paste this:</p>
-        <code id="corsCmdLinuxPerm">echo 'export OLLAMA_ORIGINS="*"' >> ~/.bashrc && sudo mkdir -p /etc/systemd/system/ollama.service.d && printf '[Service]\nEnvironment="OLLAMA_ORIGINS=*"\n' | sudo tee /etc/systemd/system/ollama.service.d/cors.conf && sudo systemctl daemon-reload && sudo systemctl restart ollama</code>
+        <code id="corsCmdLinuxPerm">echo 'export OLLAMA_ORIGINS="https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*"' >> ~/.bashrc && sudo mkdir -p /etc/systemd/system/ollama.service.d && printf '[Service]\nEnvironment="OLLAMA_ORIGINS=https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*"\n' | sudo tee /etc/systemd/system/ollama.service.d/cors.conf && sudo systemctl daemon-reload && sudo systemctl restart ollama</code>
         <button class="copy-cmd-btn" onclick="copyCorsCmd('corsCmdLinuxPerm')">&#128203; Copy</button>
       </div>
       <div class="os-section">
         <h4>&#9889; Quick temporary fix (any OS)</h4>
         <p style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 4px;">Stop Ollama first, then run:</p>
-        <code id="corsCmdQuick">OLLAMA_ORIGINS=* ollama serve</code>
+        <code id="corsCmdQuick">OLLAMA_ORIGINS="https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*" ollama serve</code>
         <button class="copy-cmd-btn" onclick="copyCorsCmd('corsCmdQuick')">&#128203; Copy</button>
-        <p style="font-size: 0.72rem; color: var(--text-muted); margin-top: 4px;">Windows version: <code style="font-size: 0.72rem;">set OLLAMA_ORIGINS=* && ollama serve</code></p>
+        <p style="font-size: 0.72rem; color: var(--text-muted); margin-top: 4px;">Windows version: <code style="font-size: 0.72rem;">set OLLAMA_ORIGINS=https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:* && ollama serve</code></p>
       </div>
     </details>
     <div style="display: flex; gap: 10px; justify-content: center; margin-top: 18px; flex-wrap: wrap;">
@@ -16042,7 +16042,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
             </div>
             <div class="ow-issue-item" hidden style="display:none !important;" aria-hidden="true" data-fl-cors-hidden="2">
               <strong>CORS / Browser blocking</strong>
-              <span>If you're using FreeLattice from GitHub Pages, your browser may block local connections. <strong>Best fix:</strong> Run FreeLattice locally with <code style="background:var(--bg-primary);padding:2px 6px;border-radius:3px;color:var(--accent);font-size:0.8rem;">node server.js</code> or <code style="background:var(--bg-primary);padding:2px 6px;border-radius:3px;color:var(--accent);font-size:0.8rem;">python server.py</code> &mdash; the built-in server proxies Ollama requests automatically. <strong>Alternative:</strong> Stop Ollama first (see above), then run: <code style="background:var(--bg-primary);padding:2px 6px;border-radius:3px;color:var(--accent);font-size:0.8rem;">OLLAMA_ORIGINS=* ollama serve</code> (Mac/Linux) or <code style="background:var(--bg-primary);padding:2px 6px;border-radius:3px;color:var(--accent);font-size:0.8rem;">set OLLAMA_ORIGINS=* && ollama serve</code> (Windows). To make it permanent: <strong>Windows:</strong> Set OLLAMA_ORIGINS=* in System Environment Variables. <strong>Mac:</strong> Run <code style="background:var(--bg-primary);padding:2px 6px;border-radius:3px;color:var(--accent);font-size:0.8rem;">launchctl setenv OLLAMA_ORIGINS '*'</code>.</span>
+              <span>If you're using FreeLattice from GitHub Pages, your browser may block local connections. <strong>Best fix:</strong> Run FreeLattice locally with <code style="background:var(--bg-primary);padding:2px 6px;border-radius:3px;color:var(--accent);font-size:0.8rem;">node server.js</code> or <code style="background:var(--bg-primary);padding:2px 6px;border-radius:3px;color:var(--accent);font-size:0.8rem;">python server.py</code> &mdash; the built-in server proxies Ollama requests automatically. <strong>Alternative:</strong> Stop Ollama first (see above), then run: <code style="background:var(--bg-primary);padding:2px 6px;border-radius:3px;color:var(--accent);font-size:0.8rem;">OLLAMA_ORIGINS="https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*" ollama serve</code> (Mac/Linux) or <code style="background:var(--bg-primary);padding:2px 6px;border-radius:3px;color:var(--accent);font-size:0.8rem;">set OLLAMA_ORIGINS=https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:* && ollama serve</code> (Windows). To make it permanent: <strong>Windows:</strong> Set scoped OLLAMA_ORIGINS in System Environment Variables. <strong>Mac:</strong> Run <code style="background:var(--bg-primary);padding:2px 6px;border-radius:3px;color:var(--accent);font-size:0.8rem;">launchctl setenv OLLAMA_ORIGINS '*'</code>.</span>
             </div>
           </details>
         </div>
@@ -16245,10 +16245,10 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
           <p>If you're using FreeLattice from a website (like GitHub Pages) and connecting to local Ollama, your browser may block the connection due to CORS security. <strong>Best fix:</strong> Run FreeLattice locally with <code>node server.js</code> or <code>python server.py</code> &mdash; the built-in server includes an Ollama proxy that eliminates CORS entirely.</p>
           <p><strong>Alternative &mdash; Manual CORS fix (3 steps):</strong><br>
           <strong>1. Stop Ollama first</strong> &mdash; Ollama auto-starts on install, so you must quit it before restarting with CORS. <strong>Windows:</strong> Right-click the Ollama icon in the system tray (bottom-right near the clock) &rarr; "Quit". <strong>Mac:</strong> Click the Ollama icon in the menu bar (top-right) &rarr; "Quit Ollama" (or run <code>pkill ollama</code>). <strong>Linux:</strong> Run <code>systemctl stop ollama</code> or <code>pkill ollama</code>.<br>
-          <strong>2. Run with CORS enabled:</strong> <code>OLLAMA_ORIGINS=* ollama serve</code> (Mac/Linux) or <code>set OLLAMA_ORIGINS=* && ollama serve</code> (Windows cmd).<br>
+          <strong>2. Run with CORS enabled:</strong> <code>OLLAMA_ORIGINS="https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*" ollama serve</code> (Mac/Linux) or <code>set OLLAMA_ORIGINS=https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:* && ollama serve</code> (Windows cmd).<br>
           <strong>3. Retry</strong> the connection in FreeLattice.</p>
           <p><strong>Getting "port already in use" error?</strong> That means you skipped Step 1 &mdash; Ollama is still running. Quit it first, then try the command again.</p>
-          <p><strong>Make it permanent:</strong> <strong>Windows:</strong> Open System Settings &rarr; Search "Environment Variables" &rarr; Under System Variables, click New &rarr; Variable name: <code>OLLAMA_ORIGINS</code>, Variable value: <code>*</code> &rarr; OK &rarr; Restart Ollama normally. <strong>Mac:</strong> Run <code>launchctl setenv OLLAMA_ORIGINS '*'</code> in Terminal, then restart Ollama. <strong>Linux:</strong> Run <code>echo 'export OLLAMA_ORIGINS="*"' >> ~/.bashrc</code> and restart Ollama. FreeLattice will auto-detect the best connection method on startup.</p>
+          <p><strong>Make it permanent:</strong> <strong>Windows:</strong> Open System Settings &rarr; Search "Environment Variables" &rarr; Under System Variables, click New &rarr; Variable name: <code>OLLAMA_ORIGINS</code>, Variable value: <code>*</code> &rarr; OK &rarr; Restart Ollama normally. <strong>Mac:</strong> Run <code>launchctl setenv OLLAMA_ORIGINS '*'</code> in Terminal, then restart Ollama. <strong>Linux:</strong> Run <code>echo 'export OLLAMA_ORIGINS="https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*"' >> ~/.bashrc</code> and restart Ollama. FreeLattice will auto-detect the best connection method on startup.</p>
           </div>
 
           <h4>Where Can I Get Free API Keys?</h4>
@@ -16527,7 +16527,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <div style="font-weight:600;color:var(--text-bright);margin-bottom:6px;" id="corsWizPasteLabel">Paste this in Terminal</div>
       <div style="font-size:0.82rem;color:var(--text-secondary);line-height:1.6;margin-bottom:8px;" id="corsWizPasteDesc">Open Terminal (Cmd+Space, type "Terminal", press Enter). Then paste this line and press Enter:</div>
       <div style="display:flex;gap:6px;align-items:center;background:rgba(0,0,0,0.3);padding:10px 14px;border-radius:8px;font-family:monospace;font-size:0.85rem;color:#34d399;">
-        <code id="corsWizCmd" style="flex:1;word-break:break-all;">OLLAMA_ORIGINS="*" ollama serve</code>
+        <code id="corsWizCmd" style="flex:1;word-break:break-all;">OLLAMA_ORIGINS="https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*" ollama serve</code>
         <button onclick="navigator.clipboard.writeText(document.getElementById('corsWizCmd').textContent).then(function(){event.target.textContent='Copied \u2714';setTimeout(function(){event.target.textContent='Copy'},2000)})" style="padding:6px 12px;min-height:36px;background:rgba(52,211,153,0.15);border:1px solid #34d399;border-radius:6px;color:#34d399;font-size:0.78rem;cursor:pointer;white-space:nowrap;">Copy</button>
       </div>
       <div style="font-size:0.75rem;color:var(--text-muted);margin-top:6px;font-style:italic;">Leave the terminal open. You should see "Listening on 127.0.0.1:11434"</div>
@@ -16540,7 +16540,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
       <div style="font-weight:600;color:var(--text-bright);margin-bottom:6px;">Make it permanent</div>
       <div style="font-size:0.82rem;color:var(--text-secondary);line-height:1.6;margin-bottom:8px;">Open a <strong>new</strong> Terminal tab (Cmd+T) and paste this. Then you never do this again:</div>
       <div style="display:flex;gap:6px;align-items:center;background:rgba(0,0,0,0.3);padding:10px 14px;border-radius:8px;font-family:monospace;font-size:0.82rem;color:#a78bfa;">
-        <code id="corsWizPerm" style="flex:1;word-break:break-all;">launchctl setenv OLLAMA_ORIGINS "*"</code>
+        <code id="corsWizPerm" style="flex:1;word-break:break-all;">launchctl setenv OLLAMA_ORIGINS "https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*"</code>
         <button onclick="navigator.clipboard.writeText(document.getElementById('corsWizPerm').textContent).then(function(){event.target.textContent='Copied \u2714';setTimeout(function(){event.target.textContent='Copy'},2000)})" style="padding:6px 12px;min-height:36px;background:rgba(167,139,250,0.15);border:1px solid #a78bfa;border-radius:6px;color:#a78bfa;font-size:0.78rem;cursor:pointer;white-space:nowrap;">Copy</button>
       </div>
       <button onclick="this.textContent='Checking... \u2726';this.disabled=true;corsWizStartPoll();" style="margin-top:10px;padding:10px 20px;min-height:44px;background:rgba(167,139,250,0.1);border:1px solid #a78bfa;border-radius:8px;color:#a78bfa;font-family:Georgia,serif;font-size:0.88rem;cursor:pointer;width:100%;">Done &mdash; Test Connection &#10022;</button>
@@ -16595,8 +16595,8 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
         var perm = document.getElementById('corsWizPerm');
         if (q) q.innerHTML = 'Run: <code>systemctl stop ollama</code>';
         if (pd) pd.innerHTML = 'In your terminal, run:';
-        if (cmd) cmd.textContent = 'OLLAMA_ORIGINS="*" ollama serve';
-        if (perm) perm.textContent = 'echo \'OLLAMA_ORIGINS="*"\' | sudo tee -a /etc/environment';
+        if (cmd) cmd.textContent = 'OLLAMA_ORIGINS="https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*" ollama serve';
+        if (perm) perm.textContent = 'echo \'OLLAMA_ORIGINS="https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*"\' | sudo tee -a /etc/environment';
       }
     });</script>
   </div>
@@ -27971,7 +27971,7 @@ const AiSetup = (function() {
               'if(status){status.textContent=\'\u2713 Connected!\';status.style.color=\'#34d399\';}' +
               'setTimeout(function(){var o=document.getElementById(\'pmOverlay\');if(o)o.remove();},800);' +
             '}else{' +
-              'if(status){status.innerHTML=\'No local AI found. <a href=\\\'https://ollama.ai\\\'  target=\\\'_blank\\\'  style=\\\'color:#a78bfa\\\'>Install Ollama</a> then come back. Windows: set OLLAMA_ORIGINS=* first.\';status.style.color=\'var(--text-muted)\';}' +
+              'if(status){status.innerHTML=\'No local AI found. <a href=\\\'https://ollama.ai\\\'  target=\\\'_blank\\\'  style=\\\'color:#a78bfa\\\'>Install Ollama</a> then come back. Windows: set scoped OLLAMA_ORIGINS first.\';status.style.color=\'var(--text-muted)\';}' +
             '}' +
           '},3500);' +
         '}).call(this)" ' +
@@ -28696,7 +28696,7 @@ const AiSetup = (function() {
       .catch(function() {
         modalShowResult(
           'Could not reach Ollama. Make sure Ollama is running (ollama.ai). ' +
-          'Windows: set OLLAMA_ORIGINS=* in System Environment Variables, then restart Ollama.',
+          'Windows: set scoped OLLAMA_ORIGINS in System Environment Variables, then restart Ollama.',
           false
         );
       });
@@ -31486,7 +31486,7 @@ async function resolveOllamaBase(forceRefresh) {
 // Validate http(s) protocol. Fall back to explicit default.
 // Layer: scoped origins + loopback default for Chrome Local Network Access.
 // FL_OLLAMA_LOCAL is the default only. The probe always calls getOllamaBaseUrl().
-var FL_OLLAMA_ORIGINS = 'https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com';
+var FL_OLLAMA_ORIGINS = 'https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*';
 var FL_OLLAMA_LOCAL = 'http://127.0.0.1:11434';
 
 function flLocalFetchInit(extra) {
@@ -32328,7 +32328,7 @@ async function owTestConnection() {
         await fetch(getOllamaBaseUrl() + '/api/tags', { mode: 'no-cors', signal: AbortSignal.timeout(2000) });
         msg = '<strong>Ollama is running but CORS is not enabled.</strong> You need to quit Ollama first, then restart it with CORS. ';
         msg += '<strong>Stop Ollama:</strong> Windows: Right-click Ollama in system tray &rarr; Quit. Mac: Click Ollama in menu bar &rarr; Quit Ollama. Linux: <code>systemctl stop ollama</code> or <code>pkill ollama</code>. ';
-        msg += 'Then run: <code>OLLAMA_ORIGINS=* ollama serve</code> (Mac/Linux) or <code>set OLLAMA_ORIGINS=* && ollama serve</code> (Windows).';
+        msg += 'Then run: <code>OLLAMA_ORIGINS="https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*" ollama serve</code> (Mac/Linux) or <code>set OLLAMA_ORIGINS=https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:* && ollama serve</code> (Windows).';
       } catch(pingErr) {
         msg += ' Ollama may not be running, or CORS is blocking the connection.';
       }
@@ -42155,7 +42155,7 @@ function corsPopulateOSFix() {
       '<p style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:6px;"><strong style="color:#ff6b6b;">Step 1: Stop Ollama first</strong> &mdash; Click the Ollama icon in the menu bar (top-right) &rarr; <strong>"Quit Ollama"</strong>, or in Terminal: <code>pkill ollama</code></p>' +
       '<p style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:6px;"><strong>Step 2:</strong> Open <strong>Terminal</strong> (press Cmd+Space, type "Terminal", press Enter)</p>' +
       '<p style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:6px;"><strong>Step 3:</strong> Paste this command and press Enter:</p>' +
-      '<code id="corsFixMeCmd">echo \'export OLLAMA_ORIGINS="*"\' >> ~/.zshrc && launchctl setenv OLLAMA_ORIGINS "*" && pkill -f ollama; sleep 2 && open -a Ollama</code>' +
+      '<code id="corsFixMeCmd">echo \'export OLLAMA_ORIGINS="https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*"\' >> ~/.zshrc && launchctl setenv OLLAMA_ORIGINS "https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*" && pkill -f ollama; sleep 2 && open -a Ollama</code>' +
       '<button class="copy-cmd-btn" onclick="copyCorsCmd(\'corsFixMeCmd\')">&#128203; Copy Command</button>' +
       '<p style="font-size:0.78rem;color:var(--text-muted);margin-top:6px;"><strong>Step 4:</strong> Come back here and click "Retry Connection" below</p>' +
       '<p style="font-size:0.78rem;color:var(--text-muted);margin-top:8px;">&#128274; <strong>Permanent alternative:</strong> Run <code>launchctl setenv OLLAMA_ORIGINS \'*\'</code> in Terminal, then restart Ollama normally from Applications.</p>' +
@@ -42166,7 +42166,7 @@ function corsPopulateOSFix() {
       '<p style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:6px;"><strong style="color:#ff6b6b;">Step 1: Stop Ollama first</strong> &mdash; Right-click the Ollama icon in the system tray (bottom-right corner near the clock) and click <strong>"Quit"</strong></p>' +
       '<p style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:6px;"><strong>Step 2:</strong> Open <strong>Command Prompt</strong> (press Win+R, type "cmd", press Enter)</p>' +
       '<p style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:6px;"><strong>Step 3:</strong> Paste this command and press Enter:</p>' +
-      '<code id="corsFixMeCmd">setx OLLAMA_ORIGINS "*" && taskkill /F /IM ollama.exe 2>nul & timeout /t 3 /nobreak >nul & start ollama serve</code>' +
+      '<code id="corsFixMeCmd">setx OLLAMA_ORIGINS "https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*" && taskkill /F /IM ollama.exe 2>nul & timeout /t 3 /nobreak >nul & start ollama serve</code>' +
       '<button class="copy-cmd-btn" onclick="copyCorsCmd(\'corsFixMeCmd\')">&#128203; Copy Command</button>' +
       '<p style="font-size:0.78rem;color:var(--text-muted);margin-top:6px;"><strong>Step 4:</strong> Come back here and click "Retry Connection" below</p>' +
       '<p style="font-size:0.78rem;color:var(--text-muted);margin-top:8px;">&#128274; <strong>Permanent alternative:</strong> Open System Settings &rarr; Search "Environment Variables" &rarr; Under System Variables, click New &rarr; Variable name: <code>OLLAMA_ORIGINS</code> &rarr; Variable value: <code>*</code> &rarr; Click OK &rarr; Restart Ollama normally.</p>' +
@@ -42177,7 +42177,7 @@ function corsPopulateOSFix() {
       '<p style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:6px;"><strong style="color:#ff6b6b;">Step 1: Stop Ollama first</strong> &mdash; In Terminal, run: <code>systemctl stop ollama</code> or <code>pkill ollama</code></p>' +
       '<p style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:6px;"><strong>Step 2:</strong> Open a <strong>Terminal</strong></p>' +
       '<p style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:6px;"><strong>Step 3:</strong> Paste this command and press Enter:</p>' +
-      '<code id="corsFixMeCmd">echo \'export OLLAMA_ORIGINS="*"\' >> ~/.bashrc && sudo mkdir -p /etc/systemd/system/ollama.service.d && printf \'[Service]\\nEnvironment="OLLAMA_ORIGINS=*"\\n\' | sudo tee /etc/systemd/system/ollama.service.d/cors.conf && sudo systemctl daemon-reload && sudo systemctl restart ollama</code>' +
+      '<code id="corsFixMeCmd">echo \'export OLLAMA_ORIGINS="https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*"\' >> ~/.bashrc && sudo mkdir -p /etc/systemd/system/ollama.service.d && printf \'[Service]\\nEnvironment="OLLAMA_ORIGINS=https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*"\\n\' | sudo tee /etc/systemd/system/ollama.service.d/cors.conf && sudo systemctl daemon-reload && sudo systemctl restart ollama</code>' +
       '<button class="copy-cmd-btn" onclick="copyCorsCmd(\'corsFixMeCmd\')">&#128203; Copy Command</button>' +
       '<p style="font-size:0.78rem;color:var(--text-muted);margin-top:6px;"><strong>Step 4:</strong> Come back here and click "Retry Connection" below</p>' +
       '</div>';
@@ -42243,7 +42243,7 @@ async function corsRunDiagnostic() {
       results.push('<span style="color:var(--error);">&#10007;</span> Connection error: ' + (e.message || 'unknown'));
     }
   }
-  results.push('<span style="color:var(--text-muted);font-size:0.8rem;">Fix: Stop Ollama first, then set OLLAMA_ORIGINS=* and restart (see steps below)</span>');
+  results.push('<span style="color:var(--text-muted);font-size:0.8rem;">Fix: Stop Ollama first, then set scoped OLLAMA_ORIGINS and restart (see steps below)</span>');
   diagEl.innerHTML = results.join('<br>');
 }
 
@@ -48519,7 +48519,7 @@ if ('serviceWorker' in navigator) {
           : isWin ? 'Right-click Ollama in the <strong>system tray</strong> (bottom-right) &rarr; <strong>Quit</strong>'
           : isLinux ? 'Run <code style="background:rgba(255,255,255,0.08);padding:2px 6px;border-radius:3px;">pkill ollama</code> in Terminal'
           : 'Quit the Ollama application';
-        var serveCmd = isWin ? 'set OLLAMA_ORIGINS=* && ollama serve' : 'OLLAMA_ORIGINS="*" ollama serve';
+        var serveCmd = isWin ? 'set OLLAMA_ORIGINS=https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:* && ollama serve' : 'OLLAMA_ORIGINS="https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*" ollama serve';
         var termStep = isMac ? 'Open <strong>Terminal</strong> (Cmd+Space, type "Terminal")'
           : isWin ? 'Open <strong>Command Prompt</strong> (Win+R, type "cmd")'
           : 'Open a <strong>Terminal</strong>';

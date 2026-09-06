@@ -1,3 +1,5 @@
+> **Superseded (2026-09):** scoped `OLLAMA_ORIGINS` + Settings look card. Do not teach bare `*`.
+
 # FreeLattice CORS Diagnosis Report
 
 ## Problem Statement

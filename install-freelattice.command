@@ -166,8 +166,8 @@ if [ "$OLLAMA_INSTALLED" = true ]; then
 
   # ── 3a: Set OLLAMA_ORIGINS persistently via launchctl ──
   # This is the most reliable method for GUI apps on macOS
-  launchctl setenv OLLAMA_ORIGINS "*" 2>/dev/null && \
-    info "Set OLLAMA_ORIGINS=* via launchctl (affects GUI apps)" || true
+  launchctl setenv OLLAMA_ORIGINS "https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*" 2>/dev/null && \
+    info "Set scoped OLLAMA_ORIGINS via launchctl (affects GUI apps)" || true
 
   # ── 3b: Clean up and deduplicate OLLAMA_ORIGINS in shell profiles ──
   for PROFILE in "$HOME/.zshrc" "$HOME/.zprofile" "$HOME/.bash_profile" "$HOME/.bashrc"; do
@@ -190,8 +190,8 @@ if [ "$OLLAMA_INSTALLED" = true ]; then
   fi
   echo '' >> "$ZSHRC"
   echo '# FreeLattice — Allow browser access to local Ollama (CORS fix)' >> "$ZSHRC"
-  echo 'export OLLAMA_ORIGINS="*"' >> "$ZSHRC"
-  info "Added OLLAMA_ORIGINS=* to $ZSHRC (deduplicated)"
+  echo 'export OLLAMA_ORIGINS="https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*"' >> "$ZSHRC"
+  info "Added scoped OLLAMA_ORIGINS to $ZSHRC (deduplicated)"
 
   # Also add to .zprofile for login shells
   ZPROFILE="$HOME/.zprofile"
@@ -201,8 +201,8 @@ if [ "$OLLAMA_INSTALLED" = true ]; then
     fi
     echo '' >> "$ZPROFILE"
     echo '# FreeLattice — Allow browser access to local Ollama (CORS fix)' >> "$ZPROFILE"
-    echo 'export OLLAMA_ORIGINS="*"' >> "$ZPROFILE"
-    info "Added OLLAMA_ORIGINS=* to $ZPROFILE (deduplicated)"
+    echo 'export OLLAMA_ORIGINS="https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*"' >> "$ZPROFILE"
+    info "Added scoped OLLAMA_ORIGINS to $ZPROFILE (deduplicated)"
   fi
 
   success "CORS setting will persist across reboots"
@@ -223,7 +223,7 @@ if [ "$OLLAMA_INSTALLED" = true ]; then
         <string>/bin/launchctl</string>
         <string>setenv</string>
         <string>OLLAMA_ORIGINS</string>
-        <string>*</string>
+        <string>https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*</string>
     </array>
     <key>RunAtLoad</key>
     <true/>
@@ -236,7 +236,7 @@ PLIST_EOF
   fi
 
   # ── 3e: Set for current process ──
-  export OLLAMA_ORIGINS="*"
+  export OLLAMA_ORIGINS="https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*"
 
   # ── 3f: Kill and restart Ollama so it picks up the new setting ──
   info "Restarting Ollama to apply CORS settings..."
@@ -255,13 +255,13 @@ PLIST_EOF
 
   # Start Ollama fresh — try the app first, then CLI
   if [ -d "/Applications/Ollama.app" ]; then
-    OLLAMA_ORIGINS="*" open -a Ollama 2>/dev/null
+    OLLAMA_ORIGINS="https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*" open -a Ollama 2>/dev/null
     info "Started Ollama.app with CORS enabled"
   elif [ -f "/usr/local/bin/ollama" ]; then
-    OLLAMA_ORIGINS="*" /usr/local/bin/ollama serve &>/dev/null &
+    OLLAMA_ORIGINS="https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*" /usr/local/bin/ollama serve &>/dev/null &
     info "Started ollama serve with CORS enabled"
   elif command -v ollama &>/dev/null; then
-    OLLAMA_ORIGINS="*" ollama serve &>/dev/null &
+    OLLAMA_ORIGINS="https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*" ollama serve &>/dev/null &
     info "Started ollama serve with CORS enabled"
   fi
 
@@ -497,5 +497,5 @@ echo ""
 
 # Start the server (this blocks until Ctrl+C or window close)
 export PORT=$PORT
-export OLLAMA_ORIGINS="*"
+export OLLAMA_ORIGINS="https://freelattice.com,https://www.freelattice.com,https://thelatticetree.com,http://localhost:*,http://127.0.0.1:*"
 $SERVER_CMD
